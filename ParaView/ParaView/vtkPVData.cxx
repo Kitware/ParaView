@@ -68,6 +68,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVSource.h"
 #include "vtkPVWindow.h"
 #include "vtkPolyDataMapper.h"
+#include "vtkRectilinearGrid.h"
 #include "vtkProperty.h"
 #include "vtkString.h"
 #include "vtkTexture.h"
@@ -77,7 +78,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.161.2.7");
+vtkCxxRevisionMacro(vtkPVData, "1.161.2.8");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -136,6 +137,9 @@ vtkPVData::vtkPVData()
   
   this->BoundsDisplay = vtkKWBoundsDisplay::New();
   this->BoundsDisplay->ShowHideFrameOn();
+  
+  this->ExtentDisplay = vtkKWBoundsDisplay::New();
+  this->ExtentDisplay->ShowHideFrameOn();
   
   this->AmbientScale = vtkKWScale::New();
 
@@ -230,6 +234,9 @@ vtkPVData::~vtkPVData()
   
   this->BoundsDisplay->Delete();
   this->BoundsDisplay = NULL;
+  
+  this->ExtentDisplay->Delete();
+  this->ExtentDisplay = NULL;
   
   this->AmbientScale->Delete();
   this->AmbientScale = NULL;
@@ -1381,6 +1388,10 @@ void vtkPVData::CreateProperties()
   this->BoundsDisplay->SetParent(this->InformationFrame->GetFrame());
   this->BoundsDisplay->Create(this->Application);
   
+  this->ExtentDisplay->SetParent(this->InformationFrame->GetFrame());
+  this->ExtentDisplay->Create(this->Application);
+  this->ExtentDisplay->SetLabel("Extent");
+  
   this->Script("pack %s %s -side top -anchor nw",
                this->NumCellsLabel->GetWidgetName(),
                this->NumPointsLabel->GetWidgetName());
@@ -1500,6 +1511,54 @@ void vtkPVData::UpdateProperties()
   // Get bounds to time completion (not just triggering) of update.
   this->GetBounds(bounds);
   vtkTimerLog::MarkEndEvent("Create LOD");
+
+  // Put the data type as the label of the top frame.
+  if (this->VTKData)
+    {
+    if (this->VTKData->IsA("vtkPolyData"))
+      {
+      this->StatsFrame->SetLabel("Unstructured Surface");
+      this->Script("pack forget %s", 
+                   this->ExtentDisplay->GetWidgetName());
+      }
+    if (this->VTKData->IsA("vtkUnstructuredGrid"))
+      {
+      this->StatsFrame->SetLabel("Unstructured Grid");
+      this->Script("pack forget %s", 
+                   this->ExtentDisplay->GetWidgetName());
+      }
+    if (this->VTKData->IsA("vtkStructuredGrid"))
+      {
+      this->StatsFrame->SetLabel("Structured Grid");
+      this->ExtentDisplay->SetExtent(
+              ((vtkStructuredGrid*)(this->VTKData))->GetExtent());
+      this->Script("pack %s -fill x -expand t -pady 2", 
+                   this->ExtentDisplay->GetWidgetName());
+      }
+    if (this->VTKData->IsA("vtkRectilinearGrid"))
+      {
+      this->StatsFrame->SetLabel("Rectilinear Grid");
+      this->ExtentDisplay->SetExtent(
+              ((vtkRectilinearGrid*)(this->VTKData))->GetExtent());
+      this->Script("pack %s -fill x -expand t -pady 2", 
+                   this->ExtentDisplay->GetWidgetName());
+      }
+    if (this->VTKData->IsA("vtkImageData"))
+      {
+      int *ext = ((vtkImageData*)(this->VTKData))->GetExtent();
+      if (ext[0] == ext[1] || ext[2] == ext[3] || ext[4] == ext[5])
+        {
+        this->StatsFrame->SetLabel("Image");
+        }
+      else
+        {
+        this->StatsFrame->SetLabel("Volume");
+        }
+      this->ExtentDisplay->SetExtent(ext);
+      this->Script("pack %s -fill x -expand t -pady 2", 
+                   this->ExtentDisplay->GetWidgetName());
+      }
+    }
 
   sprintf(tmp, "Number of cells: %d", 
           this->GetNumberOfCells());
@@ -2809,7 +2868,7 @@ void vtkPVData::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVData ";
-  this->ExtractRevision(os,"$Revision: 1.161.2.7 $");
+  this->ExtractRevision(os,"$Revision: 1.161.2.8 $");
 }
 
 //----------------------------------------------------------------------------

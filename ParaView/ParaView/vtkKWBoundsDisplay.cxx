@@ -46,7 +46,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWBoundsDisplay);
-vtkCxxRevisionMacro(vtkKWBoundsDisplay, "1.5");
+vtkCxxRevisionMacro(vtkKWBoundsDisplay, "1.5.2.1");
 
 int vtkKWBoundsDisplayCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -62,6 +62,10 @@ vtkKWBoundsDisplay::vtkKWBoundsDisplay()
 
   this->Bounds[0] = this->Bounds[2] = this->Bounds[4] = VTK_LARGE_FLOAT;
   this->Bounds[1] = this->Bounds[3] = this->Bounds[5] = -VTK_LARGE_FLOAT;
+  this->Extent[0] = this->Extent[2] = this->Extent[4] = 0;
+  this->Extent[1] = this->Extent[3] = this->Extent[5] = 0;
+
+  this->ExtentMode = 1;
 }
 
 //----------------------------------------------------------------------------
@@ -108,6 +112,7 @@ void vtkKWBoundsDisplay::SetBounds(float bounds[6])
 {
   int i;
 
+  this->ExtentMode = 0;
   // Copy to our ivar.
   for (i = 0; i < 6; ++i)
     {
@@ -118,31 +123,76 @@ void vtkKWBoundsDisplay::SetBounds(float bounds[6])
 }
 
 //----------------------------------------------------------------------------
+void vtkKWBoundsDisplay::SetExtent(int ext[6])
+{
+  int i;
+
+  this->ExtentMode = 1;
+  // Copy to our ivar.
+  for (i = 0; i < 6; ++i)
+    {
+    this->Extent[i] = ext[i];
+    }
+    
+  this->UpdateWidgets();
+}
+
+//----------------------------------------------------------------------------
 void vtkKWBoundsDisplay::UpdateWidgets()
 {
-  if (this->Bounds[0] > this->Bounds[1] || 
-      this->Bounds[2] > this->Bounds[3] || 
-      this->Bounds[4] > this->Bounds[5]) 
+  if (this->ExtentMode)
     {
-    this->XRangeLabel->SetLabel("Empty bounds");
-    this->YRangeLabel->SetLabel("");
-    this->ZRangeLabel->SetLabel("");
+    if (this->Extent[0] > this->Extent[1] || 
+        this->Extent[2] > this->Extent[3] || 
+        this->Extent[4] > this->Extent[5]) 
+      {
+      this->XRangeLabel->SetLabel("Empty extent");
+      this->YRangeLabel->SetLabel("");
+      this->ZRangeLabel->SetLabel("");
+      }
+    else
+      {
+      char tmp[350];
+      sprintf(tmp, "X extent: %d to %d (dimension: %d)", 
+              this->Extent[0], this->Extent[1], 
+              this->Extent[1]-this->Extent[0]+1);
+      this->XRangeLabel->SetLabel(tmp);
+      sprintf(tmp, "Y extent: %d to %d (dimension: %d)", 
+              this->Extent[2], this->Extent[3],
+              this->Extent[3]-this->Extent[2]+1);
+      this->YRangeLabel->SetLabel(tmp);
+      sprintf(tmp, "Z extent: %d to %d (dimension: %d)", 
+              this->Extent[4], this->Extent[5],
+              this->Extent[5]-this->Extent[4]+1);
+      this->ZRangeLabel->SetLabel(tmp);
+      }
     }
   else
     {
-    char tmp[350];
-    sprintf(tmp, "X range: %f to %f (= %f)", 
-            this->Bounds[0], this->Bounds[1], 
-            this->Bounds[1] - this->Bounds[0]);
-    this->XRangeLabel->SetLabel(tmp);
-    sprintf(tmp, "Y range: %f to %f (= %f)", 
-            this->Bounds[2], this->Bounds[3],
-            this->Bounds[3] - this->Bounds[2]);
-    this->YRangeLabel->SetLabel(tmp);
-    sprintf(tmp, "Z range: %f to %f (= %f)", 
-            this->Bounds[4], this->Bounds[5],
-            this->Bounds[5] - this->Bounds[4]);
-    this->ZRangeLabel->SetLabel(tmp);
+    if (this->Bounds[0] > this->Bounds[1] || 
+        this->Bounds[2] > this->Bounds[3] || 
+        this->Bounds[4] > this->Bounds[5]) 
+      {
+      this->XRangeLabel->SetLabel("Empty bounds");
+      this->YRangeLabel->SetLabel("");
+      this->ZRangeLabel->SetLabel("");
+      }
+    else
+      {
+      char tmp[350];
+      sprintf(tmp, "X range: %f to %f (= %f)", 
+              this->Bounds[0], this->Bounds[1], 
+              this->Bounds[1] - this->Bounds[0]);
+      this->XRangeLabel->SetLabel(tmp);
+      sprintf(tmp, "Y range: %f to %f (= %f)", 
+              this->Bounds[2], this->Bounds[3],
+              this->Bounds[3] - this->Bounds[2]);
+      this->YRangeLabel->SetLabel(tmp);
+      sprintf(tmp, "Z range: %f to %f (= %f)", 
+              this->Bounds[4], this->Bounds[5],
+              this->Bounds[5] - this->Bounds[4]);
+      this->ZRangeLabel->SetLabel(tmp);
+      }
     }
 }
 
@@ -150,5 +200,20 @@ void vtkKWBoundsDisplay::UpdateWidgets()
 void vtkKWBoundsDisplay::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
-  os << indent << "Bounds: " << this->GetBounds();
+  if (this->ExtentMode)
+    {
+    os << indent << "Mode: Extent\n";
+    os << indent << "Extent: " << this->Extent[0] << ", " 
+                 << this->Extent[1] << ", " << this->Extent[2] << ", "
+                 << this->Extent[3] << ", " << this->Extent[4] << ", "
+                 << this->Extent[5] << endl;
+    }
+  else
+    {
+    os << indent << "Mode: Bounds\n";
+    os << indent << "Bounds: " << this->Bounds[0] << ", " 
+                 << this->Bounds[1] << ", " << this->Bounds[2] << ", "
+                 << this->Bounds[3] << ", " << this->Bounds[4] << ", "
+                 << this->Bounds[5] << endl;
+    }
 }

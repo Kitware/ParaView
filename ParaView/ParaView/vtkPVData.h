@@ -394,7 +394,10 @@ protected:
   vtkKWFrame *InformationFrame;
   vtkKWLabel *NumCellsLabel;
   vtkKWLabel *NumPointsLabel;
+  vtkKWLabel *ExtentLabel;
+  
   vtkKWBoundsDisplay *BoundsDisplay;
+  vtkKWBoundsDisplay *ExtentDisplay;
   
   vtkKWScale *AmbientScale;
   
