@@ -90,12 +90,14 @@ public:
                            vtkIndent *indent = 0);
 
   // Description:
-  // Read a vtkXMLDataElement from a file
+  // Read a vtkXMLDataElement from a file or stream
   // Return the root element on success, NULL otherwise.
   // Note that you have to call Delete() on the element returned by that
   // function to ensure it is freed properly.
   //BTX
-  static vtkXMLDataElement* ReadElement(const char *filename);
+  static vtkXMLDataElement* ReadElementFromStream(istream&);
+  static vtkXMLDataElement* ReadElementFromString(const char *str);
+  static vtkXMLDataElement* ReadElementFromFile(const char *filename);
   //ETX
 
   // Description:

@@ -43,7 +43,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkXMLDataParser.h"
 
 vtkStandardNewMacro(vtkXMLUtilities);
-vtkCxxRevisionMacro(vtkXMLUtilities, "1.6");
+vtkCxxRevisionMacro(vtkXMLUtilities, "1.7");
 
 #define  VTK_XML_UTILITIES_FACTORED_POOL_NAME "FactoredPool"
 #define  VTK_XML_UTILITIES_FACTORED_NAME      "Factored"
@@ -222,26 +222,50 @@ void vtkXMLUtilities::WriteElement(vtkXMLDataElement *elem,
 
 //----------------------------------------------------------------------------
 vtkXMLDataElement*
-vtkXMLUtilities::ReadElement(const char *filename)
+vtkXMLUtilities::ReadElementFromStream(istream &is)
+{
+  vtkXMLDataElement *res = NULL;
+  vtkXMLDataParser* xml_parser = vtkXMLDataParser::New();
+
+  xml_parser->SetStream(&is);
+  if (xml_parser->Parse())
+    {
+    res = xml_parser->GetRootElement();
+    res->SetReferenceCount(res->GetReferenceCount() + 1);
+    vtkXMLUtilities::UnFactorElements(res);
+    }
+
+  xml_parser->Delete();
+  return res;
+}
+
+//----------------------------------------------------------------------------
+vtkXMLDataElement*
+vtkXMLUtilities::ReadElementFromString(const char *str)
+{
+  if (!str)
+    {
+    return 0;
+    }
+
+  strstream strstr;
+  strstr << str;
+  vtkXMLDataElement *res = vtkXMLUtilities::ReadElementFromStream(strstr);
+  strstr.rdbuf()->freeze(0);
+  return res;
+}
+
+//----------------------------------------------------------------------------
+vtkXMLDataElement*
+vtkXMLUtilities::ReadElementFromFile(const char *filename)
 {
   if (!filename)
     {
     return NULL;
     }
 
-  vtkXMLDataElement *res = NULL;
-  vtkXMLDataParser* xml_parser = vtkXMLDataParser::New();
-
   ifstream is(filename);
-  xml_parser->SetStream(&is);
-  if (xml_parser->Parse())
-    {
-    res = xml_parser->GetRootElement();
-    res->SetReferenceCount(res->GetReferenceCount() + 1);
-    }
-
-  xml_parser->Delete();
-  return res;
+  return vtkXMLUtilities::ReadElementFromStream(is);
 }
 
 //----------------------------------------------------------------------------
