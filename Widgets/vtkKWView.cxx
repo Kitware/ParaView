@@ -46,13 +46,16 @@ int vtkKWViewCommand(ClientData cd, Tcl_Interp *interp,
 
 vtkKWView::vtkKWView()
 {
-  this->SupportPrint       = 1;
-  this->SupportSaveAsImage = 1;
+  this->SupportPrint        = 1;
+  this->SupportSaveAsImage  = 1;
+  this->SupportControlFrame = 0;
   
   this->Frame = vtkKWWidget::New();
   this->Frame->SetParent(this);
   this->Frame2 = vtkKWWidget::New();
   this->Frame2->SetParent(this->Frame);
+  this->ControlFrame = vtkKWWidget::New();
+  this->ControlFrame->SetParent(this->Frame);
   this->Label = vtkKWWidget::New();
   this->Label->SetParent(this->Frame2);
   this->VTKWidget = vtkKWWidget::New();
@@ -158,6 +161,7 @@ vtkKWView::~vtkKWView()
   this->Label->Delete();
   this->Frame->Delete();
   this->Frame2->Delete();
+  this->ControlFrame->Delete();
   if (this->PropertiesParent)
     {
     this->PropertiesParent->Delete();
@@ -1046,5 +1050,5 @@ void vtkKWView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWView ";
-  this->ExtractRevision(os,"$Revision: 1.27 $");
+  this->ExtractRevision(os,"$Revision: 1.28 $");
 }

@@ -286,6 +286,15 @@ public:
   vtkGetMacro( SupportPrint, int );
   vtkBooleanMacro( SupportPrint, int );
 
+  vtkSetMacro( SupportControlFrame, int );
+  vtkGetMacro( SupportControlFrame, int );
+  vtkBooleanMacro( SupportControlFrame, int );
+
+  // Description::
+  // Get the control frame to put custom controls within
+  vtkGetObjectMacro( ControlFrame, vtkKWWidget );
+  
+  
 protected:
   vtkKWView();
   ~vtkKWView();
@@ -306,6 +315,7 @@ protected:
   vtkKWWidget *Label;
   vtkKWWidget *Frame;
   vtkKWWidget *Frame2;
+  vtkKWWidget *ControlFrame;
   vtkKWComposite *SelectedComposite;
 
   vtkKWWidget            *AnnotationProperties;
@@ -339,6 +349,7 @@ protected:
   
   int              SupportSaveAsImage;
   int              SupportPrint;
+  int              SupportControlFrame;
   
 };
 
