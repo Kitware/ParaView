@@ -160,6 +160,12 @@ public:
                                  int *pady);
 
   // Description:
+  // Get the -in value of a slave (packed).
+  static int GetPackSlaveIn(Tcl_Interp *interp,
+                            const char *widget,
+                            ostream &in);
+
+  // Description:
   // Get the column widths of a grid (i.e. a master widget that has been grid).
   // If 'allocate' is true, the resulting array (col_widths) is allocated
   // by the function to match the number of columns.
@@ -193,11 +199,19 @@ public:
                                            const char *options = 0);
 
   // Description:
-  // Returns the slaves of widget. The slaves array is allocated automatically
-  // and the number of slaves is returned.
+  // Store the slaves (packed) of widget in 'slaves'. The slaves array is 
+  // allocated automatically and the number of slaves is returned.
   static int GetSlaves(Tcl_Interp *interp,
                        const char *widget,
                        char ***slaves);
+
+  // Description:
+  // Browse all the slaves (packed) of widget and store the slave packed
+  // before 'slave' in 'previous_slave'.
+  static int GetPreviousSlave(Tcl_Interp *interp,
+                              const char *widget,
+                              const char *slave,
+                              ostream &previous_slave);
 
   //ETX
 

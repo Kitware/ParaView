@@ -53,7 +53,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWTkUtilities);
-vtkCxxRevisionMacro(vtkKWTkUtilities, "1.33");
+vtkCxxRevisionMacro(vtkKWTkUtilities, "1.34");
 
 //----------------------------------------------------------------------------
 void vtkKWTkUtilities::GetRGBColor(Tcl_Interp *interp,
@@ -696,6 +696,48 @@ int vtkKWTkUtilities::GetPackSlavePadding(Tcl_Interp *interp,
 }
 
 //----------------------------------------------------------------------------
+int vtkKWTkUtilities::GetPackSlaveIn(Tcl_Interp *interp,
+                                     const char *widget,
+                                     ostream &in)
+{
+  ostrstream packinfo;
+  packinfo << "pack info " << widget << ends;
+  int res = Tcl_GlobalEval(interp, packinfo.str());
+  packinfo.rdbuf()->freeze(0);
+  if (res != TCL_OK || !interp->result || !interp->result[0])
+    {
+    vtkGenericWarningMacro(<< "Unable to get pack info!");
+    return 0;
+    }
+  
+  // Parse for -in
+
+  const char *pack_in = strstr(interp->result, "-in ");
+  if (!pack_in)
+    {
+    return 0;
+    }
+
+  pack_in += 4;
+  const char *pack_in_end = strchr(pack_in, ' ');
+
+  if (pack_in_end)
+    {
+    char *pack_in_buffer = new char [strlen(pack_in) + 1];
+    strncpy(pack_in_buffer, pack_in, pack_in_end - pack_in);
+    pack_in_buffer[pack_in_end - pack_in] = '\0';
+    in << pack_in_buffer;
+    delete [] pack_in_buffer;
+    }
+  else
+    {
+    in << pack_in;
+    }
+
+  return 1;
+}
+
+//----------------------------------------------------------------------------
 int vtkKWTkUtilities::GetPackSlavesBbox(Tcl_Interp *interp,
                                         const char *widget,
                                         int *width,
@@ -1198,6 +1240,49 @@ int vtkKWTkUtilities::GetSlaves(
   delete [] buffer;
 
   return nb_slaves;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWTkUtilities::GetPreviousSlave(
+  Tcl_Interp *interp,
+  const char *widget,
+  const char *slave,
+  ostream &previous_slave)
+{
+  // Search (and allocate) the slaves
+
+  char **slaves = 0;
+  int nb_slaves = vtkKWTkUtilities::GetSlaves(interp, widget, &slaves);
+  if (!nb_slaves)
+    {
+    return 0;
+    }
+
+  // Browse each of them
+
+  int i, found = 0;
+  for (i = 0; i < nb_slaves; i++)
+    {
+    if (!strcmp(slaves[i], slave))
+      {
+      if (i > 0)
+        {
+        previous_slave << slaves[i - 1];
+        found = 1;
+        }
+      break;
+      }
+    }
+
+  // Deallocate slaves
+
+  for (i = 0 ; i < nb_slaves; i++)
+    {
+    delete [] slaves[i];
+    }
+  delete [] slaves;
+
+  return found;
 }
 
 //----------------------------------------------------------------------------
