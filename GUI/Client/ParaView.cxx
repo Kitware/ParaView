@@ -183,11 +183,11 @@ int MyMain(int argc, char *argv[])
         }
       else if (app->GetClientMode())
         { // Client server, no tiled display.
-          //#if defined(PARAVIEW_USE_ICE_T) && defined(VTK_USE_MPI)
-          //app->SetRenderModuleName("DeskTopRenderModule");
-          //#else
+#if defined(PARAVIEW_USE_ICE_T) && defined(VTK_USE_MPI)
+        app->SetRenderModuleName("DeskTopRenderModule");
+#else
         app->SetRenderModuleName("MPIRenderModule");
-          //#endif        
+#endif        
         }
       else
         { // Single process, or one MPI program
