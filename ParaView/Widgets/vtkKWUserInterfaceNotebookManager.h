@@ -165,6 +165,12 @@ public:
   virtual void UpdatePanel(vtkKWUserInterfacePanel *panel);
 
   // Description:
+  // Enable/disable Drag and Drop.
+  virtual void SetEnableDragAndDrop(int);
+  vtkBooleanMacro(EnableDragAndDrop, int);
+  vtkGetMacro(EnableDragAndDrop, int);
+
+  // Description:
   // Drag and Drop callback
   virtual void DragAndDropEndCallback(
     int x, int y, 
@@ -183,6 +189,11 @@ protected:
   virtual int RemovePageWidgets(vtkKWUserInterfacePanel *panel);
   
   vtkKWNotebook *Notebook;
+
+  // Description:
+  // Update Drag And Drop bindings
+  virtual void UpdatePanelDragAndDrop(vtkKWUserInterfacePanel *panel);
+  int EnableDragAndDrop;
 
 private:
 

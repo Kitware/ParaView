@@ -56,7 +56,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWUserInterfaceNotebookManager);
-vtkCxxRevisionMacro(vtkKWUserInterfaceNotebookManager, "1.9");
+vtkCxxRevisionMacro(vtkKWUserInterfaceNotebookManager, "1.10");
 
 int vtkKWUserInterfaceNotebookManagerCommand(ClientData cd, Tcl_Interp *interp,
                                              int argc, char *argv[]);
@@ -73,6 +73,7 @@ vtkKWUserInterfaceNotebookManager::vtkKWUserInterfaceNotebookManager()
 
   this->IdCounter = 1;
   this->Notebook = NULL;
+  this->EnableDragAndDrop = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -438,6 +439,42 @@ int vtkKWUserInterfaceNotebookManager::RemovePageWidgets(
 void vtkKWUserInterfaceNotebookManager::UpdatePanel(
   vtkKWUserInterfacePanel *panel)
 {
+  this->UpdatePanelDragAndDrop(panel);
+}
+
+// ---------------------------------------------------------------------------
+void vtkKWUserInterfaceNotebookManager::SetEnableDragAndDrop(int arg)
+{
+  if (this->EnableDragAndDrop == arg)
+    {
+    return;
+    }
+
+  this->EnableDragAndDrop = arg;
+  this->Modified();
+
+  // Update all panels Drag And Drop bindings
+
+  vtkKWUserInterfaceManager::PanelSlot *panel_slot = NULL;
+  vtkKWUserInterfaceManager::PanelsContainerIterator *panel_it = 
+    this->Panels->NewIterator();
+
+  panel_it->InitTraversal();
+  while (!panel_it->IsDoneWithTraversal())
+    {
+    if (panel_it->GetData(panel_slot) == VTK_OK)
+      {
+      this->UpdatePanelDragAndDrop(panel_slot->Panel);
+      }
+    panel_it->GoToNextItem();
+    }
+  panel_it->Delete();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWUserInterfaceNotebookManager::UpdatePanelDragAndDrop(
+  vtkKWUserInterfacePanel *panel)
+{
   if (!panel)
     {
     vtkErrorMacro("Can not update a NULL panel.");
@@ -451,17 +488,17 @@ void vtkKWUserInterfaceNotebookManager::UpdatePanel(
     return;
     }
 
+  if (!this->Notebook)
+    {
+    return;
+    }
+
   // Get the pages parent, and check if there are widgets (here, labeled frame)
   // that can be Drag&Dropped from one page to the other (since they share the 
   // same parent)
 
   vtkKWWidget *parent = this->GetPagesParentWidget(panel);
   if (!parent)
-    {
-    return;
-    }
-
-  if (!this->Notebook)
     {
     return;
     }
@@ -492,18 +529,29 @@ void vtkKWUserInterfaceNotebookManager::UpdatePanel(
         }
       }
 
-    // Enable Drag & Drop for that frame, the notebook is the drop target
+    // Enable/Disable Drag & Drop for that frame, the notebook is the drop target
 
-    if (widget && frame && 
-        !widget->HasDragAndDropTarget(this->Notebook))
+    if (widget && frame)
       {
-      widget->EnableDragAndDropOn();
-      widget->SetDragAndDropAnchor(frame->GetDragAndDropAnchor());
-      widget->AddDragAndDropTarget(this->Notebook);
-      widget->SetDragAndDropEndCommand(
-        this->Notebook, this, "DragAndDropEndCallback");
+      if (this->EnableDragAndDrop)
+        {
+        if (!widget->HasDragAndDropTarget(this->Notebook))
+          {
+          widget->EnableDragAndDropOn();
+          widget->SetDragAndDropAnchor(frame->GetDragAndDropAnchor());
+          widget->AddDragAndDropTarget(this->Notebook);
+          widget->SetDragAndDropEndCommand(
+            this->Notebook, this, "DragAndDropEndCallback");
+          }
+        }
+      else
+        {
+        if (widget->HasDragAndDropTarget(this->Notebook))
+          {
+          widget->RemoveDragAndDropTarget(this->Notebook);
+          }
+        }
       }
-
     it->GoToNextItem();
     }
   it->Delete();
@@ -613,5 +661,7 @@ void vtkKWUserInterfaceNotebookManager::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
   os << indent << "Notebook: " << this->Notebook << endl;
+  os << indent << "EnableDragAndDrop: " 
+     << (this->EnableDragAndDrop ? "On" : "Off") << endl;
 }
 
