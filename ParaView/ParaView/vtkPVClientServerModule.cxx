@@ -270,7 +270,7 @@ void vtkPVSendPolyData(void* arg, void*, int, int)
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVClientServerModule);
-vtkCxxRevisionMacro(vtkPVClientServerModule, "1.44.2.16");
+vtkCxxRevisionMacro(vtkPVClientServerModule, "1.44.2.17");
 
 int vtkPVClientServerModuleCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -1243,6 +1243,7 @@ void vtkPVClientServerModule::SendStreamToServerRoot()
   this->ClientServerStream->GetData(&data, &len);
   this->SocketController->TriggerRMI(1, (void*)(data), len,
                                      VTK_PV_CLIENTSERVER_ROOT_RMI_TAG);
+  this->ClientServerStream->Reset();
 }
 
 void vtkPVClientServerModule::SendStreamToClientAndServer()

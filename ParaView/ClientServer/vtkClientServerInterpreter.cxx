@@ -28,7 +28,7 @@
 #include <sys/stat.h>
 
 vtkStandardNewMacro(vtkClientServerInterpreter);
-vtkCxxRevisionMacro(vtkClientServerInterpreter, "1.1.2.17");
+vtkCxxRevisionMacro(vtkClientServerInterpreter, "1.1.2.18");
 
 //----------------------------------------------------------------------------
 // Internal container instantiations.
@@ -83,8 +83,9 @@ vtkClientServerInterpreter::~vtkClientServerInterpreter()
   this->ClassToFunctionMap->Delete();
 
   delete this->LastResultMessage;
-
+  this->LastResultMessage = 0;
   delete this->Internal;
+  this->Internal = 0;
 }
 
 //----------------------------------------------------------------------------
