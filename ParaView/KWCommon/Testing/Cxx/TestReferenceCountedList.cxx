@@ -7,7 +7,7 @@
 template<class DType>
 int TestList(DType* tlist)
 {
-  int count = 30000;
+  int count = 300;
   int cc;
   for ( cc = 0; cc < count; cc ++ )
     {

@@ -57,10 +57,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __vtkArrayMap_h
 
 template<class DataType> class vtkVector;
+template<class KeyType, class DataType> class vtkArrayMapIterator;
 
 template<class KeyType, class DataType>
 class vtkArrayMap : public vtkAbstractMap<KeyType,DataType>
 {
+  friend class vtkArrayMapIterator<KeyType,DataType>;
+  
 public:
   // Cannot use this macro because of the comma in the type name.
   // The CPP splits that in two and we ae in trouble.
@@ -84,6 +87,11 @@ public:
 
   static vtkArrayMap<KeyType,DataType> *New() 
     { return new vtkArrayMap<KeyType,DataType>(); }  
+
+  // Description:
+  // Return an iterator to the list. This iterator is allocated using
+  // New, so the developer is responsible for deleating it.
+  vtkArrayMapIterator<KeyType,DataType> *NewIterator();
 
   // Description:
   // Sets the item at with specific key to data.

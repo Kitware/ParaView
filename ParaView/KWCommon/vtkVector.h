@@ -46,13 +46,22 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkAbstractList.h"
 
+template <class DType> class vtkVectorIterator;
+
 template <class DType>
 class vtkVector : public vtkAbstractList<DType>
 {
+  friend class vtkVectorIterator<DType>;
+
 public:
   vtkContainerTypeMacro(vtkVector<DType>, vtkAbstractList<DType>);
   
   static vtkVector<DType> *New() { return new vtkVector<DType>(); }  
+
+  // Description:
+  // Return an iterator to the list. This iterator is allocated using
+  // New, so the developer is responsible for deleating it.
+  vtkVectorIterator<DType> *NewIterator();
   
   // Description:
   // Append an Item to the end of the vector.

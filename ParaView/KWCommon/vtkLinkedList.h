@@ -47,14 +47,22 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkAbstractList.h"
 
 template <class DType> class vtkLinkedListNode;
+template <class DType> class vtkLinkedListIterator;
 
 template <class DType>
 class vtkLinkedList : public vtkAbstractList<DType>
 {
+  friend class vtkLinkedListIterator<DType>;
+
 public:
   vtkContainerTypeMacro(vtkLinkedList<DType>, vtkAbstractList<DType>);
   
   static vtkLinkedList<DType> *New() { return new vtkLinkedList<DType>(); }  
+
+  // Description:
+  // Return an iterator to the list. This iterator is allocated using
+  // New, so the developer is responsible for deleating it.
+  vtkLinkedListIterator<DType> *NewIterator();
   
   // Description:
   // Append an Item to the end of the linked list.

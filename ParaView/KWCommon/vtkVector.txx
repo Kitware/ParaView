@@ -22,6 +22,7 @@
 
 #include "vtkVector.h"
 #include "vtkAbstractList.txx"
+#include "vtkVectorIterator.txx"
 
 // Description:
 // Append an Item to the end of the vector
@@ -326,6 +327,15 @@ void vtkVector<DType>::DebugList()
     {
     cout << "Item [" << cc << "]: " << this->Array[cc] << endl;
     }
+}
+
+template <class DType>
+vtkVectorIterator<DType> *vtkVector<DType>::NewIterator()
+{
+  vtkVectorIterator<DType> *it = vtkVectorIterator<DType>::New();
+  it->SetContainer(this);
+  it->InitTraversal();
+  return it;
 }
 
 #endif

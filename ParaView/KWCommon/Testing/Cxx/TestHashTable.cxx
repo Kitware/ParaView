@@ -48,6 +48,28 @@ int main()
 	" one inserted" << endl;
       }
     }
+
+  // Try the iterator
+  vtkAbstractIterator<int,char*> *nit = am->NewIterator();
+  //cout << "Try iterator" << endl;
+  while ( nit->IsDoneWithTraversal() != VTK_OK )
+    {
+    char* str = 0;
+    int idx = 0;
+    if ( nit->GetData(str) != VTK_OK )
+      {
+      cout << "Problem accessing data from iterator" << endl;
+      error =1;
+      }
+    if ( nit->GetKey(idx) != VTK_OK )
+      {
+      cout << "Problem accessing key from iterator" << endl;
+      error =1;     
+      }
+    cout << "Item: " << idx << " = " << str << endl;
+    nit->GoToNextItem();
+    }
+  nit->Delete();
  
   am->Delete();
 

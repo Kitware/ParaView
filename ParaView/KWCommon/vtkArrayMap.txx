@@ -23,6 +23,7 @@
 #include "vtkArrayMap.h"
 #include "vtkVector.txx"
 #include "vtkAbstractMap.txx"
+#include "vtkArrayMapIterator.txx"
 
 // Description:
 // Sets the item at with specific key to data.
@@ -174,6 +175,17 @@ void vtkArrayMap<KeyType,DataType>::DebugList()
     {
     this->Array->DebugList();
     }
+}
+
+template <class KeyType, class DataType>
+vtkArrayMapIterator<KeyType,DataType> *
+vtkArrayMap<KeyType,DataType>::NewIterator()
+{
+  vtkArrayMapIterator<KeyType,DataType> *it 
+    = vtkArrayMapIterator<KeyType,DataType>::New();
+  it->SetContainer(this);
+  it->InitTraversal();
+  return it;
 }
 
 #endif

@@ -189,6 +189,29 @@ int TestList(DType*)
       }
     }
 
+
+  // Try the iterator
+  vtkAbstractIterator<vtkIdType,char*> *it = strings->NewIterator();
+  //cout << "Try iterator" << endl;
+  while ( it->IsDoneWithTraversal() != VTK_OK )
+    {
+    char* str = 0;
+    vtkIdType idx = 0;
+    if ( it->GetData(str) != VTK_OK )
+      {
+      C_ERROR(strings) << "Problem accessing data from iterator" << endl;
+      error =1;
+      }
+    if ( it->GetKey(idx) != VTK_OK )
+      {
+      C_ERROR(strings) << "Problem accessing data from iterator" << endl;
+      error =1;     
+      }
+    //cout << "Item: " << idx << " = " << str << endl;
+    it->GoToNextItem();
+    }
+  it->Delete();
+
   for ( ; strings->GetNumberOfItems(); )
     {
     if ( strings->RemoveItem(0) != VTK_OK )
@@ -240,6 +263,7 @@ int TestList(DType*)
 
   return error;
 }
+
 
 int main()
 {

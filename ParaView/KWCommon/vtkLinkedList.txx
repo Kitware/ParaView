@@ -21,6 +21,7 @@
 #define __vtkLinkedList_txx
 
 #include "vtkLinkedList.h"
+#include "vtkLinkedListIterator.txx"
 
 template <class DType>
 class vtkLinkedListNode 
@@ -320,6 +321,15 @@ void vtkLinkedList<DType>::DebugList()
 	 << " Data: " << curr->Data << endl;
     cc ++;
     }
+}
+
+template <class DType>
+vtkLinkedListIterator<DType> *vtkLinkedList<DType>::NewIterator()
+{
+  vtkLinkedListIterator<DType> *it = vtkLinkedListIterator<DType>::New();
+  it->SetContainer(this);
+  it->InitTraversal();
+  return it;
 }
 
 #endif
