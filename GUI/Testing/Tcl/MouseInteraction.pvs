@@ -1,6 +1,10 @@
 set kw(vtkTemp4) [$Application GetMainWindow]
 set kw(vtkTemp18) [$kw(vtkTemp4) GetMainView]
 
+# Hide the animation toolbar since takes up too much space
+[$Application GetMainWindow]  SetToolbarVisibility animation 0
+update
+
 source [file join [file dirname [info script]] CommandLineOptions.tcl]
 ParseCommandLine $kw(vtkTemp18) $argv $argc
 
@@ -11,8 +15,6 @@ set MainView [[$Application GetMainWindow] GetMainView]
 $MainView SetRenderWindowSize 300 300
 update
 
-# Hide the animation toolbar since takes up too much space
-[$Application GetMainWindow]  SetToolbarVisibility animation 0
 
 $kw(vtkTemp18) SetOrientationAxesVisibility 0
 
