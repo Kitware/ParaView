@@ -11,6 +11,9 @@ vtkString.cxx
 vtkContainer.cxx
 vtkXMLCameraReader.cxx
 vtkXMLCameraWriter.cxx
+vtkXMLPropertyReader.cxx
+vtkXMLPropertyWriter.cxx
+vtkXMLStack.cxx
 vtkXMLTextPropertyReader.cxx
 vtkXMLTextPropertyWriter.cxx
 )
