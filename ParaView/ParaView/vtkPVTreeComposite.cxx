@@ -42,14 +42,30 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVTreeComposite.h"
 
 #include "vtkActor.h"
-#include "vtkCommand.h"
 #include "vtkActorCollection.h"
+#include "vtkCallbackCommand.h"
+#include "vtkCamera.h"
+#include "vtkCommand.h"
+#include "vtkCompositer.h"
 #include "vtkDataSet.h"
+#include "vtkFloatArray.h"
+#include "vtkImageActor.h"
+#include "vtkImageCast.h"
+#include "vtkImageData.h"
+#include "vtkLight.h"
+#include "vtkLightCollection.h"
 #include "vtkMapper.h"
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
-#include "vtkRenderWindow.h"
+#include "vtkPointData.h"
 #include "vtkRendererCollection.h"
+#include "vtkRenderWindow.h"
+#include "vtkTimerLog.h"
+#include "vtkUnsignedCharArray.h"
+
+#ifdef _WIN32
+#include "vtkWin32OpenGLRenderWindow.h"
+#endif
 
 #ifdef VTK_USE_MPI
 #include "vtkMPIController.h"
@@ -59,7 +75,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVTreeComposite);
-vtkCxxRevisionMacro(vtkPVTreeComposite, "1.39");
+vtkCxxRevisionMacro(vtkPVTreeComposite, "1.39.4.1");
 
 
 //=========================================================================
@@ -74,6 +90,122 @@ void vtkPVTreeCompositeCheckForDataRMI(void *arg, void *, int, int)
   self->CheckForDataRMI();
 }
 
+
+struct vtkPVTreeCompositeRenderWindowInfo 
+{
+  int Size[2];
+  int ImageReductionFactor;
+  int NumberOfRenderers;
+  float DesiredUpdateRate;
+};
+
+struct vtkPVTreeCompositeRendererInfo 
+{
+  float CameraPosition[3];
+  float CameraFocalPoint[3];
+  float CameraViewUp[3];
+  float CameraClippingRange[2];
+  float LightPosition[3];
+  float LightFocalPoint[3];
+  float Background[3];
+  float ParallelScale;
+};
+
+//-------------------------------------------------------------------------
+void vtkPVTreeCompositeAbortRenderCheck(vtkObject*, unsigned long, void* arg,
+                                        void*)
+{
+  vtkPVTreeComposite *self = (vtkPVTreeComposite*)arg;
+  
+  self->CheckForAbortRender();
+}
+
+//-------------------------------------------------------------------------
+void vtkPVTreeCompositeStartRender(vtkObject *caller,
+                                   unsigned long vtkNotUsed(event), 
+                                   void *clientData, void *)
+{
+  vtkPVTreeComposite *self = (vtkPVTreeComposite *)clientData;
+  
+  if (caller != self->GetRenderWindow())
+    { // Sanity check.
+    vtkGenericWarningMacro("Caller mismatch.");
+    return;
+    }
+
+  static int inRender = 0;
+  if (inRender)
+    {
+    return;
+    }
+  inRender = 1;
+  self->StartRender();
+  inRender = 0;
+}
+
+//-------------------------------------------------------------------------
+void vtkPVTreeCompositeEndRender(vtkObject *caller,
+                                 unsigned long vtkNotUsed(event), 
+                                 void *clientData, void *)
+{
+  vtkPVTreeComposite *self = (vtkPVTreeComposite *)clientData;
+  
+  if (caller != self->GetRenderWindow())
+    { // Sanity check.
+    vtkGenericWarningMacro("Caller mismatch.");
+    return;
+    }
+
+  static int inRender = 0;
+  if (inRender)
+    {
+    return;
+    }
+  inRender = 1;
+  self->EndRender();
+  inRender = 0;
+}
+
+//-------------------------------------------------------------------------
+void vtkPVTreeCompositeResetCameraClippingRange(
+  vtkObject *caller, unsigned long vtkNotUsed(event),void *clientData, void *)
+{
+  vtkPVTreeComposite *self = (vtkPVTreeComposite *)clientData;
+  vtkRenderer *ren = (vtkRenderer*)caller;
+
+  self->ResetCameraClippingRange(ren);
+}
+
+//-------------------------------------------------------------------------
+void vtkPVTreeCompositeResetCamera(vtkObject *caller,
+                                   unsigned long vtkNotUsed(event), 
+                                   void *clientData, void *)
+{
+  vtkPVTreeComposite *self = (vtkPVTreeComposite *)clientData;
+  vtkRenderer *ren = (vtkRenderer*)caller;
+
+  self->ResetCamera(ren);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVTreeCompositeSatelliteStartRender(vtkObject* vtkNotUsed(caller),
+                                            unsigned long vtkNotUsed(event), 
+                                            void *clientData, void *)
+{
+  vtkPVTreeComposite* self = (vtkPVTreeComposite*) clientData;
+  
+  self->SatelliteStartRender();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVTreeCompositeSatelliteEndRender(vtkObject* vtkNotUsed(caller),
+                                          unsigned long vtkNotUsed(event), 
+                                          void *clientData, void *)
+{
+  vtkPVTreeComposite* self = (vtkPVTreeComposite*) clientData;
+  
+  self->SatelliteEndRender();
+}
 
 //-------------------------------------------------------------------------
 // This is only called in the satellite processes (not 0).
@@ -190,8 +322,135 @@ void vtkPVTreeComposite::StartRender()
   // I believe it does, but just in case ...
   if (this->UseCompositing)
     {
-    this->vtkCompositeManager::StartRender();
+    this->InternalStartRender();
     }
+}
+
+//-------------------------------------------------------------------------
+void vtkPVTreeComposite::InternalStartRender()
+{
+  struct vtkPVTreeCompositeRenderWindowInfo winInfo;
+  struct vtkPVTreeCompositeRendererInfo renInfo;
+  int id, numProcs;
+  int *size;
+  vtkRendererCollection *rens;
+  vtkRenderer* ren;
+  vtkCamera *cam;
+  vtkLightCollection *lc;
+  vtkLight *light;
+  
+  vtkDebugMacro("StartRender");
+  
+  // Used to time the total render (without compositing.)
+  this->Timer->StartTimer();
+
+  if (!this->UseCompositing)
+    {
+    return;
+    }  
+
+  vtkRenderWindow* renWin = this->RenderWindow;
+  vtkMultiProcessController *controller = this->Controller;
+
+  if (controller == NULL || this->Lock)
+    {
+    return;
+    }
+  
+  // Lock here, unlock at end render.
+  this->Lock = 1;
+  
+  // Trigger the satellite processes to start their render routine.
+  rens = this->RenderWindow->GetRenderers();
+  numProcs = this->NumberOfProcesses;
+  size = this->RenderWindow->GetSize();
+  if (this->ImageReductionFactor > 0)
+    {
+    winInfo.Size[0] = size[0];
+    winInfo.Size[1] = size[1];
+    winInfo.ImageReductionFactor = this->ImageReductionFactor;
+    vtkRenderer* renderer =
+      ((vtkRenderer*)this->RenderWindow->GetRenderers()->GetItemAsObject(1));
+    renderer->SetViewport(0, 0, 1.0/this->ImageReductionFactor, 
+                          1.0/this->ImageReductionFactor);
+    }
+  else
+    {
+    winInfo.Size[0] = size[0];
+    winInfo.Size[1] = size[1];
+    winInfo.ImageReductionFactor = 1;
+    }
+//  winInfo.NumberOfRenderers = rens->GetNumberOfItems();
+  winInfo.NumberOfRenderers = 1;
+  winInfo.DesiredUpdateRate = this->RenderWindow->GetDesiredUpdateRate();
+  
+  if ( winInfo.Size[0] == 0 || winInfo.Size[1] == 0 )
+    {
+    this->FirstRender = 1;
+    renWin->SwapBuffersOff();
+    return;
+    }
+
+  this->SetRendererSize(winInfo.Size[0]/this->ImageReductionFactor, 
+                        winInfo.Size[1]/this->ImageReductionFactor);
+  
+  for (id = 1; id < numProcs; ++id)
+    {
+    if (this->Manual == 0)
+      {
+      controller->TriggerRMI(id, NULL, 0, 
+                             vtkCompositeManager::RENDER_RMI_TAG);
+      }
+    // Synchronize the size of the windows.
+    controller->Send((char*)(&winInfo), 
+                     sizeof(vtkPVTreeCompositeRenderWindowInfo), id, 
+                     vtkCompositeManager::WIN_INFO_TAG);
+    }
+  
+  // Make sure the satellite renderers have the same camera I do.
+  // Note: This will lockup unless every process has the same number
+  // of renderers.
+  rens->InitTraversal();
+//  while ( (ren = rens->GetNextItem()) )
+//    {
+  ren = static_cast<vtkRenderer*>(rens->GetItemAsObject(1));
+  
+    cam = ren->GetActiveCamera();
+    lc = ren->GetLights();
+    lc->InitTraversal();
+    light = lc->GetNextItem();
+    cam->GetPosition(renInfo.CameraPosition);
+    cam->GetFocalPoint(renInfo.CameraFocalPoint);
+    cam->GetViewUp(renInfo.CameraViewUp);
+    cam->GetClippingRange(renInfo.CameraClippingRange);
+    if (cam->GetParallelProjection())
+      {
+      renInfo.ParallelScale = cam->GetParallelScale();
+      }
+    else
+      {
+      renInfo.ParallelScale = 0.0;
+      }
+    if (light)
+      {
+      light->GetPosition(renInfo.LightPosition);
+      light->GetFocalPoint(renInfo.LightFocalPoint);
+      }
+    ren->GetBackground(renInfo.Background);
+    
+    for (id = 1; id < numProcs; ++id)
+      {
+      controller->Send((char*)(&renInfo),
+                       sizeof(struct vtkPVTreeCompositeRendererInfo), id, 
+                       vtkCompositeManager::REN_INFO_TAG);
+      }
+//    }
+  
+  // Turn swap buffers off before the render so the end render method
+  // has a chance to add to the back buffer.
+  renWin->SwapBuffersOff();
+
+  vtkTimerLog::MarkStartEvent("Render Geometry");
 }
 
 // Done disabling compositing when no data is on satelite processes.
@@ -784,6 +1043,316 @@ int vtkPVTreeComposite::CheckForAbortComposite()
 }
 
 #endif  // VTK_USE_MPI
+
+//----------------------------------------------------------------------------
+void vtkPVTreeComposite::SetRenderWindow(vtkRenderWindow *renWin)
+{
+  vtkRendererCollection *rens;
+  vtkRenderer *ren = 0;
+
+  if (this->RenderWindow == renWin)
+    {
+    return;
+    }
+  this->Modified();
+
+  if (this->RenderWindow)
+    {
+    // Remove all of the observers.
+    if (this->Controller && this->Controller->GetLocalProcessId() == 0)
+      {
+      this->RenderWindow->RemoveObserver(this->StartTag);
+      this->RenderWindow->RemoveObserver(this->EndTag);
+      
+      // Will make do with renderer 1. (Assumes renderer does not change.)
+      rens = this->RenderWindow->GetRenderers();
+      rens->InitTraversal();
+      ren = static_cast<vtkRenderer*>(rens->GetItemAsObject(1));
+      if (ren)
+        {
+        ren->RemoveObserver(this->ResetCameraTag);
+        ren->RemoveObserver(this->ResetCameraClippingRangeTag);
+        }
+      }
+    if ( this->Controller && this->Controller->GetLocalProcessId() != 0 )
+      {
+      this->RenderWindow->RemoveObserver(this->StartTag);
+      this->RenderWindow->RemoveObserver(this->EndTag);
+      }
+    // Delete the reference.
+    this->RenderWindow->UnRegister(this);
+    this->RenderWindow =  NULL;
+    this->SetRenderWindowInteractor(NULL);
+    }
+  if (renWin)
+    {
+    renWin->Register(this);
+    this->RenderWindow = renWin;
+    this->SetRenderWindowInteractor(renWin->GetInteractor());
+    if (this->Controller)
+      {
+      // In case a subclass wants to check for aborts.
+      vtkCallbackCommand* abc = vtkCallbackCommand::New();
+      abc->SetCallback(vtkPVTreeCompositeAbortRenderCheck);
+      abc->SetClientData(this);
+      this->RenderWindow->AddObserver(vtkCommand::AbortCheckEvent, abc);
+      abc->Delete();
+      
+      if (this->Controller && this->Controller->GetLocalProcessId() == 0)
+        {
+        vtkCallbackCommand *cbc;
+        
+        cbc= vtkCallbackCommand::New();
+        cbc->SetCallback(vtkPVTreeCompositeStartRender);
+        cbc->SetClientData((void*)this);
+        // renWin will delete the cbc when the observer is removed.
+        this->StartTag = renWin->AddObserver(vtkCommand::StartEvent,cbc);
+        cbc->Delete();
+        
+        cbc = vtkCallbackCommand::New();
+        cbc->SetCallback(vtkPVTreeCompositeEndRender);
+        cbc->SetClientData((void*)this);
+        // renWin will delete the cbc when the observer is removed.
+        this->EndTag = renWin->AddObserver(vtkCommand::EndEvent,cbc);
+        cbc->Delete();
+        
+        // Will make do with renderer 1. (Assumes renderer does
+        // not change.)
+        rens = this->RenderWindow->GetRenderers();
+        rens->InitTraversal();
+        ren = static_cast<vtkRenderer*>(rens->GetItemAsObject(1));
+        if (ren)
+          {
+          cbc = vtkCallbackCommand::New();
+          cbc->SetCallback(vtkPVTreeCompositeResetCameraClippingRange);
+          cbc->SetClientData((void*)this);
+          // ren will delete the cbc when the observer is removed.
+          this->ResetCameraClippingRangeTag = 
+          ren->AddObserver(vtkCommand::ResetCameraClippingRangeEvent,cbc);
+          cbc->Delete();          
+          
+          cbc = vtkCallbackCommand::New();
+          cbc->SetCallback(vtkPVTreeCompositeResetCamera);
+          cbc->SetClientData((void*)this);
+          // ren will delete the cbc when the observer is removed.
+          this->ResetCameraTag = 
+          ren->AddObserver(vtkCommand::ResetCameraEvent,cbc);
+          cbc->Delete();
+          }
+        }
+      else if (this->Controller && this->Controller->GetLocalProcessId() != 0)
+        {
+        vtkCallbackCommand *cbc;
+        
+        cbc= vtkCallbackCommand::New();
+        cbc->SetCallback(vtkPVTreeCompositeSatelliteStartRender);
+        cbc->SetClientData((void*)this);
+        // renWin will delete the cbc when the observer is removed.
+        this->StartTag = renWin->AddObserver(vtkCommand::StartEvent,cbc);
+        cbc->Delete();
+        
+        cbc = vtkCallbackCommand::New();
+        cbc->SetCallback(vtkPVTreeCompositeSatelliteEndRender);
+        cbc->SetClientData((void*)this);
+        // renWin will delete the cbc when the observer is removed.
+        this->EndTag = renWin->AddObserver(vtkCommand::EndEvent,cbc);
+        cbc->Delete();
+        }
+      else
+        {
+#ifdef _WIN32
+        // I had a problem with some graphics cards getting front and
+        // back buffers mixed up, so I made the remote render windows
+        // single buffered. One nice feature of this is being able to
+        // see the render in these helper windows.
+        vtkWin32OpenGLRenderWindow *renWin;
+  
+        renWin = vtkWin32OpenGLRenderWindow::SafeDownCast(this->RenderWindow);
+        if (renWin)
+          {
+          // Lets keep the render window single buffer
+          renWin->DoubleBufferOff();
+          // I do not want to replace the original.
+          renWin = renWin;
+          }
+#endif
+        }
+      }
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVTreeComposite::Composite()
+{
+  int front;
+  int myId;
+  myId = this->Controller->GetLocalProcessId();  
+  
+  // Stop the timer that has been timing the render.
+  this->Timer->StopTimer();
+  this->MaxRenderTime = this->Timer->GetElapsedTime();
+
+  vtkTimerLog *timer = vtkTimerLog::New();
+  
+  // Get the z buffer.
+  timer->StartTimer();
+  vtkTimerLog::MarkStartEvent("GetZBuffer");
+  this->RenderWindow->GetZbufferData(0,0,
+                                     this->RendererSize[0]-1, 
+                                     this->RendererSize[1]-1,
+                                     this->LocalZData);  
+  vtkTimerLog::MarkEndEvent("GetZBuffer");
+
+  // If we are process 0 and using double buffering, then we want 
+  // to get the back buffer, otherwise we need to get the front.
+  if (myId == 0)
+    {
+    front = 0;
+    }
+  else
+    {
+    front = 1;
+    }
+
+  // Get the pixel data.
+  if (this->UseChar) 
+    {
+    if (this->LocalPData->GetNumberOfComponents() == 4)
+      {
+      vtkTimerLog::MarkStartEvent("Get RGBA Char Buffer");
+      this->RenderWindow->GetRGBACharPixelData(
+        0,0,this->RendererSize[0]-1,this->RendererSize[1]-1, 
+        front,static_cast<vtkUnsignedCharArray*>(this->LocalPData));
+      vtkTimerLog::MarkEndEvent("Get RGBA Char Buffer");
+      }
+    else if (this->LocalPData->GetNumberOfComponents() == 3)
+      {
+      vtkTimerLog::MarkStartEvent("Get RGB Char Buffer");
+      this->RenderWindow->GetPixelData(
+        0,0,this->RendererSize[0]-1,this->RendererSize[1]-1, 
+        front,static_cast<vtkUnsignedCharArray*>(this->LocalPData));
+      vtkTimerLog::MarkEndEvent("Get RGB Char Buffer");
+      }
+    } 
+  else 
+    {
+    vtkTimerLog::MarkStartEvent("Get RGBA Float Buffer");
+    this->RenderWindow->GetRGBAPixelData(
+      0,0,this->RendererSize[0]-1,this->RendererSize[1]-1, 
+      front,static_cast<vtkFloatArray*>(this->LocalPData));
+    vtkTimerLog::MarkEndEvent("Get RGBA Float Buffer");
+    }
+  
+  timer->StopTimer();
+  this->GetBuffersTime = timer->GetElapsedTime();
+  
+  timer->StartTimer();
+  
+  // Let the subclass use its owns composite algorithm to
+  // collect the results into "localPData" on process 0.
+  vtkTimerLog::MarkStartEvent("Composite Buffers");
+  this->Compositer->CompositeBuffer(this->LocalPData, this->LocalZData,
+                                    this->PData, this->ZData);
+    
+  vtkTimerLog::MarkEndEvent("Composite Buffers");
+
+  timer->StopTimer();
+  this->CompositeTime = timer->GetElapsedTime();
+    
+  if (myId == 0) 
+    {
+    int windowSize[2];
+    // Default value (no reduction).
+    windowSize[0] = this->RendererSize[0];
+    windowSize[1] = this->RendererSize[1];
+
+    vtkDataArray* magPdata = 0;
+    
+    if (this->ImageReductionFactor > 1 && this->DoMagnifyBuffer)
+      {
+      // localPdata gets freed (new memory is allocated and returned.
+      // windowSize get modified.
+      if (this->UseChar)
+        {
+        magPdata = vtkUnsignedCharArray::New();
+        }
+      else
+        {
+        magPdata = vtkFloatArray::New();
+        }
+      magPdata->SetNumberOfComponents(
+        this->LocalPData->GetNumberOfComponents());
+      vtkTimerLog::MarkStartEvent("Magnify Buffer");
+      this->MagnifyBuffer(this->LocalPData, magPdata, windowSize);
+      vtkTimerLog::MarkEndEvent("Magnify Buffer");
+      
+      vtkRenderer* renderer =
+        ((vtkRenderer*)
+         this->RenderWindow->GetRenderers()->GetItemAsObject(1));
+      renderer->SetViewport(0, 0, 1.0, 1.0);
+      renderer->GetActiveCamera()->UpdateViewport(renderer);
+      }
+
+    
+    timer->StartTimer();
+    if (this->UseChar) 
+      {
+      vtkUnsignedCharArray *buf;
+      if (magPdata)
+        {
+        buf = static_cast<vtkUnsignedCharArray*>(magPdata);
+        }
+      else
+        {
+        buf = static_cast<vtkUnsignedCharArray*>(this->LocalPData);
+        }
+      if (this->LocalPData->GetNumberOfComponents() == 4)
+        {
+        vtkTimerLog::MarkStartEvent("Set RGBA Char Buffer");
+        this->RenderWindow->SetRGBACharPixelData(0, 0, windowSize[0]-1, 
+                                  windowSize[1]-1, buf, 0);
+        vtkTimerLog::MarkEndEvent("Set RGBA Char Buffer");
+        }
+      else if (this->LocalPData->GetNumberOfComponents() == 3)
+        {
+        vtkTimerLog::MarkStartEvent("Set RGB Char Buffer");
+        this->RenderWindow->SetPixelData(0, 0, windowSize[0]-1, 
+                                         windowSize[1]-1, buf, 0);
+        vtkTimerLog::MarkEndEvent("Set RGB Char Buffer");
+        }
+      } 
+    else 
+      {
+      if (magPdata)
+        {
+        vtkTimerLog::MarkStartEvent("Set RGBA Float Buffer");
+        this->RenderWindow->SetRGBAPixelData(0, 0, windowSize[0]-1, 
+                                             windowSize[1]-1,
+                                             static_cast<vtkFloatArray*>(magPdata), 0);
+        vtkTimerLog::MarkEndEvent("Set RGBA Float Buffer");
+        }
+      else
+        {
+        vtkTimerLog::MarkStartEvent("Set RGBA Float Buffer");
+        this->RenderWindow->SetRGBAPixelData(
+          0, 0, windowSize[0]-1, windowSize[1]-1,
+          static_cast<vtkFloatArray*>(this->LocalPData), 0);
+        vtkTimerLog::MarkEndEvent("Set RGBA Float Buffer");
+        }
+      }
+    
+    timer->StopTimer();
+    this->SetBuffersTime = timer->GetElapsedTime();
+
+    if (magPdata)
+      {
+      magPdata->Delete();
+      }    
+    }
+  
+  timer->Delete();
+  timer = NULL;
+}
 
 //----------------------------------------------------------------------------
 void vtkPVTreeComposite::PrintSelf(ostream& os, vtkIndent indent)
