@@ -343,12 +343,20 @@ void vtkKWApplication::Exit()
 Tcl_Interp *vtkKWApplication::InitializeTcl(int argc, char *argv[])
 {
   Tcl_Interp *interp;
-  
+  char *args;
+  char buf[100];
+
   putenv("TCL_LIBRARY=" ET_TCL_LIBRARY);
   putenv("TK_LIBRARY=" ET_TK_LIBRARY);
   
   Tcl_FindExecutable(argv[0]);
   interp = Tcl_CreateInterp();
+  args = Tcl_Merge(argc-1, argv+1);
+  Tcl_SetVar(interp, "argv", args, TCL_GLOBAL_ONLY);
+  ckfree(args);
+  sprintf(buf, "%d", argc-1);
+  Tcl_SetVar(interp, "argc", buf, TCL_GLOBAL_ONLY);
+  Tcl_SetVar(interp, "argv0", argv[0], TCL_GLOBAL_ONLY);
   Tcl_SetVar(interp, "tcl_interactive", "0", TCL_GLOBAL_ONLY);
 
   Et_DoInit(interp);
