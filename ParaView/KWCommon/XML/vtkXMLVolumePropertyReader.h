@@ -45,6 +45,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkXMLObjectReader.h"
 
+class vtkImageData;
+
 class VTK_EXPORT vtkXMLVolumePropertyReader : public vtkXMLObjectReader
 {
 public:
@@ -61,9 +63,35 @@ public:
   // is supposed to read and process.
   virtual char* GetRootElementName();
 
+  // Description:
+  // Set the image data the volume property that is going to be read will
+  // be used on. This will be used for CheckScalarOpacityUnitDistance.
+  virtual void SetImageData(vtkImageData *data);
+  vtkGetObjectMacro(ImageData, vtkImageData);
+
+  // Description:
+  // Check if the scalar opacity unit distance attribute fits within
+  // the data spacing (see SetImageData). If not, ignore it.
+  vtkSetMacro(CheckScalarOpacityUnitDistance, int);
+  vtkGetMacro(CheckScalarOpacityUnitDistance, int);
+  vtkBooleanMacro(CheckScalarOpacityUnitDistance, int);
+
+  // Description:
+  // Keep points range. The transfer function points will be adjusted so that
+  // the transfer function range remain the same. Points out of the
+  // range will be discarded.
+  vtkSetMacro(KeepTransferFunctionPointsRange, int);
+  vtkGetMacro(KeepTransferFunctionPointsRange, int);
+  vtkBooleanMacro(KeepTransferFunctionPointsRange, int);
+
 protected:  
-  vtkXMLVolumePropertyReader() {};
-  ~vtkXMLVolumePropertyReader() {};
+  vtkXMLVolumePropertyReader();
+  ~vtkXMLVolumePropertyReader();
+
+  vtkImageData *ImageData;
+
+  int CheckScalarOpacityUnitDistance;
+  int KeepTransferFunctionPointsRange;
 
 private:
   vtkXMLVolumePropertyReader(const vtkXMLVolumePropertyReader&); // Not implemented
