@@ -39,8 +39,6 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #else
 #include "vtkXRenderWindow.h"
 
-
-
 int vtkKWRenderViewFoundMatch;
 Bool vtkKWRenderViewPredProc(Display *vtkNotUsed(disp), XEvent *event, 
 			     char *arg)
@@ -664,5 +662,5 @@ void vtkKWRenderView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWView::SerializeRevision(os,indent);
   os << indent << "vtkKWRenderView ";
-  this->ExtractRevision(os,"$Revision: 1.3 $");
+  this->ExtractRevision(os,"$Revision: 1.4 $");
 }

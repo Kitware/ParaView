@@ -51,9 +51,12 @@ struct vtkPVRenderSlaveInfo
   float LightFocalPoint[3];
   int WindowSize[2];
 };
+
+void vtkTreeComposite(vtkRenderWindow *renWin, 
+		      vtkMultiProcessController *controller,
+		      int flag, float *g_zdata, 
+		      float *g_pdata);
 //ETX
-
-
 
 
 class VTK_EXPORT vtkPVRenderSlave : public vtkObject

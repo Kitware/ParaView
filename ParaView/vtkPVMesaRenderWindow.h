@@ -161,8 +161,8 @@ public:
 
   // Description:
   // Set/Get the pixel data of an image, transmitted as RGBARGBA...
-  virtual float *GetRGBACharPixelData(int x,int y,int x2,int y2,int front);
-  virtual void SetRGBACharPixelData(int x,int y,int x2,int y2,float *,
+  virtual unsigned char *GetRGBACharPixelData(int x,int y,int x2,int y2,int front);
+  virtual void SetRGBACharPixelData(int x,int y,int x2,int y2,unsigned char *,
 				    int front, int blend=0);
 
   // Description:

@@ -32,6 +32,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkDummyRenderWindowInteractor.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVRenderSlave.h"
+#include "vtkMesaRenderWindow.h"
 
 #include "vtkTimerLog.h"
 
@@ -94,65 +95,83 @@ void vtkPVRenderViewEndRender(void *arg)
   vtkRenderWindow *renWin = rv->GetRenderWindow();
   vtkMultiProcessController *controller;
   int *windowSize;
-  int length;
-  unsigned char *pdata, *pTmp;
-  unsigned char *overlay, *endPtr;
+  int length, numPixels;
   int id, num;
   
   windowSize = renWin->GetSize();
-  length = 3*(windowSize[0] * windowSize[1]);
-
-
-  // Get the results from the local process.
-  TIMER->StartTimer();
-  cerr << "  -Start Get Overlay\n";
-  overlay = renWin->GetPixelData(0,0,windowSize[0]-1, \
-				 windowSize[1]-1,0);
-  TIMER->StopTimer();
-  cerr << "  -End GetOverlay: " << TIMER->GetElapsedTime() << endl;
-  
-
-  // Get the results from the remote processes.
-  pdata = new unsigned char[length];
-  
-  // This will hold the place for compositing.
   controller = pvApp->GetController();
-  num = controller->GetNumberOfProcesses();
-  for (id = 1; id < num; ++id)
-    {
-    controller->Receive((char*)pdata, length, id, 99);
-    }
+  numPixels = (windowSize[0] * windowSize[1]);
   
-  TIMER->StopTimer();
-  cerr << "  -End Remote Render: " << TIMER->GetElapsedTime() << endl;
-  
-  // merge the two images.
-  TIMER->StartTimer();
-  cerr << "  -Start Merge\n";  
-  pTmp = pdata;
-  endPtr = overlay+length;
-  while (overlay != endPtr)
-    {
-    if (*overlay)
-      {
-      *pTmp = *overlay;
-      }
-    ++pTmp;
-    ++overlay;
-    }
-  TIMER->StopTimer();
-  cerr << "  -End Merge: " << TIMER->GetElapsedTime() << endl;
-  
-  // For now just put this image in the renderer.
-  TIMER->StartTimer();
-  cerr << "  -Start Put Image\n";
-  renWin->SetPixelData(0,0,windowSize[0]-1, windowSize[1]-1,pdata,0);
-  TIMER->StopTimer();
-  cerr << "  -End Put Image: " << TIMER->GetElapsedTime() << endl;
 
+  if (1)
+    {
+    float *pdata, *zdata;    
+    
+    pdata = new float[numPixels];
+    zdata = new float[numPixels];
+    vtkTreeComposite(rv->GetRenderWindow(), controller, 0, zdata, pdata);
+
+    delete [] zdata;
+    delete [] pdata;    
+    }
+  else if (0)
+    {
+    unsigned char *pdata, *pTmp;
+    unsigned char *overlay, *endPtr;
+    
+    length = 3*numPixels;
+    // Get the results from the local process.
+    TIMER->StartTimer();
+    cerr << "  -Start Get Overlay\n";
+    overlay = renWin->GetPixelData(0,0,windowSize[0]-1, \
+				   windowSize[1]-1,0);
+    TIMER->StopTimer();
+    cerr << "  -End GetOverlay: " << TIMER->GetElapsedTime() << endl;
+    
+    
+    // Get the results from the remote processes.
+    pdata = new unsigned char[length];
+    
+    // This will hold the place for compositing.
+    num = controller->GetNumberOfProcesses();
+    for (id = 1; id < num; ++id)
+      {
+      controller->Receive((char*)pdata, length, id, 99);
+      }
+    
+    TIMER->StopTimer();
+    cerr << "  -End Remote Render: " << TIMER->GetElapsedTime() << endl;
+    
+    // merge the two images.
+    TIMER->StartTimer();
+    cerr << "  -Start Merge\n";  
+    pTmp = pdata;
+    endPtr = overlay+length;
+    while (overlay != endPtr)
+      {
+      if (*overlay)
+	{
+	*pTmp = *overlay;
+	}
+      ++pTmp;
+      ++overlay;
+      }
+    TIMER->StopTimer();
+    cerr << "  -End Merge: " << TIMER->GetElapsedTime() << endl;
+    
+    // For now just put this image in the renderer.
+    TIMER->StartTimer();
+    cerr << "  -Start Put Image\n";
+    renWin->SetPixelData(0,0,windowSize[0]-1, windowSize[1]-1,pdata,0);
+    TIMER->StopTimer();
+    cerr << "  -End Put Image: " << TIMER->GetElapsedTime() << endl;
+    
+    delete [] pdata;
+    }
+  
   renWin->SwapBuffersOn();  
   renWin->Frame(); 
-  delete [] pdata;
+  
 }
 
 

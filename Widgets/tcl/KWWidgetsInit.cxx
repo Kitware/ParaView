@@ -1,4 +1,7 @@
 #include "vtkTclUtil.h"
+int vtkCornerAnnotationCommand(ClientData cd, Tcl_Interp *interp,
+             int argc, char *argv[]);
+ClientData vtkCornerAnnotationNewCommand();
 int vtkKWApplicationCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkKWApplicationNewCommand();
@@ -32,6 +35,9 @@ ClientData vtkKWExtentNewCommand();
 int vtkKWGenericCompositeCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkKWGenericCompositeNewCommand();
+int vtkKWLabelCommand(ClientData cd, Tcl_Interp *interp,
+             int argc, char *argv[]);
+ClientData vtkKWLabelNewCommand();
 int vtkKWLabeledFrameCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkKWLabeledFrameNewCommand();
@@ -120,6 +126,8 @@ int VTK_EXPORT Vtkkwwidgetstcl_SafeInit(Tcl_Interp *interp)
 
 int VTK_EXPORT Vtkkwwidgetstcl_Init(Tcl_Interp *interp)
 {
+  vtkTclCreateNew(interp,"vtkCornerAnnotation", vtkCornerAnnotationNewCommand,
+                  vtkCornerAnnotationCommand);
   vtkTclCreateNew(interp,"vtkKWApplication", vtkKWApplicationNewCommand,
                   vtkKWApplicationCommand);
   vtkTclCreateNew(interp,"vtkKWCallbackSpecification", vtkKWCallbackSpecificationNewCommand,
@@ -142,6 +150,8 @@ int VTK_EXPORT Vtkkwwidgetstcl_Init(Tcl_Interp *interp)
                   vtkKWExtentCommand);
   vtkTclCreateNew(interp,"vtkKWGenericComposite", vtkKWGenericCompositeNewCommand,
                   vtkKWGenericCompositeCommand);
+  vtkTclCreateNew(interp,"vtkKWLabel", vtkKWLabelNewCommand,
+                  vtkKWLabelCommand);
   vtkTclCreateNew(interp,"vtkKWLabeledFrame", vtkKWLabeledFrameNewCommand,
                   vtkKWLabeledFrameCommand);
   vtkTclCreateNew(interp,"vtkKWMenu", vtkKWMenuNewCommand,

@@ -1,3 +1,31 @@
+vtkCornerAnnotation.o : ./vtkCornerAnnotation.cxx  \
+  ./vtkCornerAnnotation.h \
+  /home/lawcc/vtk/common/vtkActor2D.h \
+  /home/lawcc/vtk/common/vtkProp.h \
+  /home/lawcc/vtk/common/vtkObject.h \
+  /home/lawcc/vtk/common/vtkIndent.h \
+  /home/lawcc/vtk/common/vtkWin32Header.h \
+  /home/lawcc/vtk/common/vtkSystemIncludes.h \
+  /home/lawcc/vtk/common/vtkTimeStamp.h \
+  /home/lawcc/vtk/common/vtkSetGet.h \
+  /home/lawcc/vtk/common/vtkRayCastStructures.h \
+  /home/lawcc/vtk/common/vtkCoordinate.h \
+  /home/lawcc/vtk/common/vtkProperty2D.h \
+  /home/lawcc/vtk/imaging/vtkTextMapper.h \
+  /home/lawcc/vtk/common/vtkMapper2D.h \
+  /home/lawcc/vtk/common/vtkAbstractMapper.h \
+  /home/lawcc/vtk/common/vtkProcessObject.h \
+  /home/lawcc/vtk/common/vtkDataObject.h \
+  /home/lawcc/vtk/common/vtkFieldData.h \
+  /home/lawcc/vtk/common/vtkDataArray.h \
+  /home/lawcc/vtk/common/vtkIdList.h \
+  /home/lawcc/vtk/common/vtkWindow.h \
+  /home/lawcc/vtk/common/vtkViewport.h \
+  /home/lawcc/vtk/common/vtkPropCollection.h \
+  /home/lawcc/vtk/common/vtkCollection.h \
+  /home/lawcc/vtk/common/vtkActor2DCollection.h \
+  /home/lawcc/vtk/common/vtkObjectFactory.h
+
 vtkKWApplication.o : ./vtkKWApplication.cxx  \
   ./vtkKWApplication.h \
   ./vtkKWObject.h \
@@ -21,6 +49,7 @@ vtkKWApplication.o : ./vtkKWApplication.cxx  \
   ./vtkKWProgressGauge.h \
   ./vtkKWViewCollection.h \
   ./vtkKWMenu.h \
+  ./vtkKWNotebook.h \
   ./vtkKWEventNotifier.h \
   ./vtkKWCallbackSpecification.h
 
@@ -41,6 +70,7 @@ vtkKWCallbackSpecification.o : ./vtkKWCallbackSpecification.cxx  \
   ./vtkKWProgressGauge.h \
   ./vtkKWViewCollection.h \
   ./vtkKWMenu.h \
+  ./vtkKWNotebook.h \
   /home/lawcc/vtk/common/vtkObjectFactory.h
 
 vtkKWChangeColorButton.o : ./vtkKWChangeColorButton.cxx  \
@@ -139,7 +169,8 @@ vtkKWCornerAnnotation.o : ./vtkKWCornerAnnotation.cxx  \
   ./vtkKWProgressGauge.h \
   ./vtkKWViewCollection.h \
   ./vtkKWMenu.h \
-  /home/lawcc/vtk/common/vtkObjectFactory.h
+  /home/lawcc/vtk/common/vtkObjectFactory.h \
+  ./vtkCornerAnnotation.h
 
 vtkKWDialog.o : ./vtkKWDialog.cxx  \
   ./vtkKWApplication.h \
@@ -191,6 +222,7 @@ vtkKWEventNotifier.o : ./vtkKWEventNotifier.cxx  \
   ./vtkKWProgressGauge.h \
   ./vtkKWViewCollection.h \
   ./vtkKWMenu.h \
+  ./vtkKWNotebook.h \
   /home/lawcc/vtk/common/vtkObjectFactory.h
 
 vtkKWExtent.o : ./vtkKWExtent.cxx  \
@@ -234,6 +266,22 @@ vtkKWGenericComposite.o : ./vtkKWGenericComposite.cxx  \
   ./vtkKWMenu.h \
   /home/lawcc/vtk/common/vtkObjectFactory.h
 
+vtkKWLabel.o : ./vtkKWLabel.cxx  \
+  ./vtkKWApplication.h \
+  ./vtkKWObject.h \
+  /home/lawcc/vtk/common/vtkObject.h \
+  /home/lawcc/vtk/common/vtkIndent.h \
+  /home/lawcc/vtk/common/vtkWin32Header.h \
+  /home/lawcc/vtk/common/vtkSystemIncludes.h \
+  /home/lawcc/vtk/common/vtkTimeStamp.h \
+  /home/lawcc/vtk/common/vtkSetGet.h \
+  ./vtkKWSerializer.h \
+  ./vtkKWLabel.h \
+  ./vtkKWWidget.h \
+  ./vtkKWWidgetCollection.h \
+  /home/lawcc/vtk/common/vtkCollection.h \
+  /home/lawcc/vtk/common/vtkObjectFactory.h
+
 vtkKWLabeledFrame.o : ./vtkKWLabeledFrame.cxx  \
   ./vtkKWApplication.h \
   ./vtkKWObject.h \
@@ -267,7 +315,8 @@ vtkKWMenu.o : ./vtkKWMenu.cxx  \
   /home/lawcc/vtk/common/vtkObjectFactory.h \
   ./vtkKWWindow.h \
   ./vtkKWProgressGauge.h \
-  ./vtkKWViewCollection.h
+  ./vtkKWViewCollection.h \
+  ./vtkKWNotebook.h
 
 vtkKWMessageDialog.o : ./vtkKWMessageDialog.cxx  \
   ./vtkKWApplication.h \
@@ -473,7 +522,8 @@ vtkKWWidget.o : ./vtkKWWidget.cxx  \
   ./vtkKWWindow.h \
   ./vtkKWProgressGauge.h \
   ./vtkKWViewCollection.h \
-  ./vtkKWMenu.h
+  ./vtkKWMenu.h \
+  ./vtkKWNotebook.h
 
 vtkKWWidgetCollection.o : ./vtkKWWidgetCollection.cxx  \
   ./vtkKWWidgetCollection.h \
@@ -534,6 +584,7 @@ vtkKWVolumeComposite.o : ./vtkKWVolumeComposite.cxx  \
   /home/lawcc/vtk/common/vtkPlane.h \
   /home/lawcc/vtk/common/vtkImplicitFunction.h \
   /home/lawcc/vtk/common/vtkGeneralTransform.h \
+  /home/lawcc/vtk/common/vtkMatrix4x4.h \
   /home/lawcc/vtk/common/vtkPoints.h \
   /home/lawcc/vtk/common/vtkAttributeData.h \
   /home/lawcc/vtk/common/vtkNormals.h \
@@ -559,7 +610,6 @@ vtkKWVolumeComposite.o : ./vtkKWVolumeComposite.cxx  \
   /home/lawcc/vtk/common/vtkMultiThreader.h \
   /home/lawcc/vtk/graphics/vtkRayBounder.h \
   /home/lawcc/vtk/graphics/vtkRenderer.h \
-  /home/lawcc/vtk/common/vtkMatrix4x4.h \
   /home/lawcc/vtk/graphics/vtkLightCollection.h \
   /home/lawcc/vtk/graphics/vtkLight.h \
   /home/lawcc/vtk/graphics/vtkVolumeCollection.h \
@@ -636,10 +686,10 @@ vtkKWWindow.o : ./vtkKWWindow.cxx  \
   ./vtkKWProgressGauge.h \
   ./vtkKWViewCollection.h \
   ./vtkKWMenu.h \
+  ./vtkKWNotebook.h \
   ./vtkKWView.h \
   ./vtkKWCompositeCollection.h \
   ./vtkKWComposite.h \
-  ./vtkKWNotebook.h \
   /home/lawcc/vtk/common/vtkWindow.h \
   ./vtkKWEntry.h \
   ./vtkKWCheckButton.h \
@@ -719,7 +769,11 @@ vtkKWComposite.o : ./vtkKWComposite.cxx  \
   ./vtkKWText.h \
   ./vtkKWLabeledFrame.h \
   ./vtkKWChangeColorButton.h \
-  ./vtkKWApplication.h
+  ./vtkKWApplication.h \
+  ./vtkKWWindow.h \
+  ./vtkKWProgressGauge.h \
+  ./vtkKWViewCollection.h \
+  ./vtkKWMenu.h
 
 vtkKWView.o : ./vtkKWView.cxx  \
   ./vtkKWApplication.h \
@@ -800,6 +854,32 @@ vtkKWView.o : ./vtkKWView.cxx  \
 
 
 
+tcl/vtkCornerAnnotationTcl.cxx : ./vtkCornerAnnotation.h /home/lawcc/vtk/common/vtkTclUtil.h /home/lawcc/vtk/wrap/vtkParse.y /home/lawcc/vtk/wrap/vtkWrapTcl.c \
+  /home/lawcc/vtk/common/vtkActor2D.h \
+  /home/lawcc/vtk/common/vtkProp.h \
+  /home/lawcc/vtk/common/vtkObject.h \
+  /home/lawcc/vtk/common/vtkIndent.h \
+  /home/lawcc/vtk/common/vtkWin32Header.h \
+  /home/lawcc/vtk/common/vtkSystemIncludes.h \
+  /home/lawcc/vtk/common/vtkTimeStamp.h \
+  /home/lawcc/vtk/common/vtkSetGet.h \
+  /home/lawcc/vtk/common/vtkRayCastStructures.h \
+  /home/lawcc/vtk/common/vtkCoordinate.h \
+  /home/lawcc/vtk/common/vtkProperty2D.h \
+  /home/lawcc/vtk/imaging/vtkTextMapper.h \
+  /home/lawcc/vtk/common/vtkMapper2D.h \
+  /home/lawcc/vtk/common/vtkAbstractMapper.h \
+  /home/lawcc/vtk/common/vtkProcessObject.h \
+  /home/lawcc/vtk/common/vtkDataObject.h \
+  /home/lawcc/vtk/common/vtkFieldData.h \
+  /home/lawcc/vtk/common/vtkDataArray.h \
+  /home/lawcc/vtk/common/vtkIdList.h \
+  /home/lawcc/vtk/common/vtkWindow.h \
+  /home/lawcc/vtk/common/vtkViewport.h \
+  /home/lawcc/vtk/common/vtkPropCollection.h \
+  /home/lawcc/vtk/common/vtkCollection.h \
+  /home/lawcc/vtk/common/vtkActor2DCollection.h
+
 tcl/vtkKWApplicationTcl.cxx : ./vtkKWApplication.h /home/lawcc/vtk/common/vtkTclUtil.h /home/lawcc/vtk/wrap/vtkParse.y /home/lawcc/vtk/wrap/vtkWrapTcl.c \
   ./vtkKWObject.h \
   /home/lawcc/vtk/common/vtkObject.h \
@@ -825,7 +905,8 @@ tcl/vtkKWCallbackSpecificationTcl.cxx : ./vtkKWCallbackSpecification.h /home/law
   /home/lawcc/vtk/common/vtkCollection.h \
   ./vtkKWProgressGauge.h \
   ./vtkKWViewCollection.h \
-  ./vtkKWMenu.h
+  ./vtkKWMenu.h \
+  ./vtkKWNotebook.h
 
 tcl/vtkKWChangeColorButtonTcl.cxx : ./vtkKWChangeColorButton.h /home/lawcc/vtk/common/vtkTclUtil.h /home/lawcc/vtk/wrap/vtkParse.y /home/lawcc/vtk/wrap/vtkWrapTcl.c \
   ./vtkKWEntry.h \
@@ -953,7 +1034,8 @@ tcl/vtkKWEventNotifierTcl.cxx : ./vtkKWEventNotifier.h /home/lawcc/vtk/common/vt
   /home/lawcc/vtk/common/vtkCollection.h \
   ./vtkKWProgressGauge.h \
   ./vtkKWViewCollection.h \
-  ./vtkKWMenu.h
+  ./vtkKWMenu.h \
+  ./vtkKWNotebook.h
 
 tcl/vtkKWExtentTcl.cxx : ./vtkKWExtent.h /home/lawcc/vtk/common/vtkTclUtil.h /home/lawcc/vtk/wrap/vtkParse.y /home/lawcc/vtk/wrap/vtkWrapTcl.c \
   ./vtkKWScale.h \
@@ -986,6 +1068,19 @@ tcl/vtkKWGenericCompositeTcl.cxx : ./vtkKWGenericComposite.h /home/lawcc/vtk/com
   /home/lawcc/vtk/common/vtkCollection.h \
   /home/lawcc/vtk/common/vtkProp.h \
   /home/lawcc/vtk/common/vtkRayCastStructures.h
+
+tcl/vtkKWLabelTcl.cxx : ./vtkKWLabel.h /home/lawcc/vtk/common/vtkTclUtil.h /home/lawcc/vtk/wrap/vtkParse.y /home/lawcc/vtk/wrap/vtkWrapTcl.c \
+  ./vtkKWWidget.h \
+  ./vtkKWObject.h \
+  /home/lawcc/vtk/common/vtkObject.h \
+  /home/lawcc/vtk/common/vtkIndent.h \
+  /home/lawcc/vtk/common/vtkWin32Header.h \
+  /home/lawcc/vtk/common/vtkSystemIncludes.h \
+  /home/lawcc/vtk/common/vtkTimeStamp.h \
+  /home/lawcc/vtk/common/vtkSetGet.h \
+  ./vtkKWSerializer.h \
+  ./vtkKWWidgetCollection.h \
+  /home/lawcc/vtk/common/vtkCollection.h
 
 tcl/vtkKWLabeledFrameTcl.cxx : ./vtkKWLabeledFrame.h /home/lawcc/vtk/common/vtkTclUtil.h /home/lawcc/vtk/wrap/vtkParse.y /home/lawcc/vtk/wrap/vtkWrapTcl.c \
   ./vtkKWWidget.h \
@@ -1225,7 +1320,8 @@ tcl/vtkKWWindowTcl.cxx : ./vtkKWWindow.h /home/lawcc/vtk/common/vtkTclUtil.h /ho
   /home/lawcc/vtk/common/vtkCollection.h \
   ./vtkKWProgressGauge.h \
   ./vtkKWViewCollection.h \
-  ./vtkKWMenu.h
+  ./vtkKWMenu.h \
+  ./vtkKWNotebook.h
 
 tcl/vtkKWWindowCollectionTcl.cxx : ./vtkKWWindowCollection.h /home/lawcc/vtk/common/vtkTclUtil.h /home/lawcc/vtk/wrap/vtkParse.y /home/lawcc/vtk/wrap/vtkWrapTcl.c \
   /home/lawcc/vtk/common/vtkCollection.h \
@@ -1294,6 +1390,7 @@ tcl/vtkKWViewTcl.cxx : ./vtkKWView.h /home/lawcc/vtk/common/vtkTclUtil.h /home/l
 
 
 SRC_OBJ = \
+vtkCornerAnnotation.o \
 vtkKWApplication.o \
 vtkKWCallbackSpecification.o \
 vtkKWChangeColorButton.o \
@@ -1305,6 +1402,7 @@ vtkKWEntry.o \
 vtkKWEventNotifier.o \
 vtkKWExtent.o \
 vtkKWGenericComposite.o \
+vtkKWLabel.o \
 vtkKWLabeledFrame.o \
 vtkKWMenu.o \
 vtkKWMessageDialog.o \
@@ -1329,6 +1427,7 @@ vtkKWComposite.o \
 vtkKWView.o 
 
 TCL_OBJ = \
+tcl/vtkCornerAnnotationTcl.o \
 tcl/vtkKWApplicationTcl.o \
 tcl/vtkKWCallbackSpecificationTcl.o \
 tcl/vtkKWChangeColorButtonTcl.o \
@@ -1340,6 +1439,7 @@ tcl/vtkKWEntryTcl.o \
 tcl/vtkKWEventNotifierTcl.o \
 tcl/vtkKWExtentTcl.o \
 tcl/vtkKWGenericCompositeTcl.o \
+tcl/vtkKWLabelTcl.o \
 tcl/vtkKWLabeledFrameTcl.o \
 tcl/vtkKWMenuTcl.o \
 tcl/vtkKWMessageDialogTcl.o \
@@ -1364,6 +1464,7 @@ tcl/vtkKWCompositeTcl.o \
 tcl/vtkKWViewTcl.o 
 
 TCL_NEWS = \
+vtkCornerAnnotation.h \
 vtkKWApplication.h \
 vtkKWCallbackSpecification.h \
 vtkKWChangeColorButton.h \
@@ -1375,6 +1476,7 @@ vtkKWEntry.h \
 vtkKWEventNotifier.h \
 vtkKWExtent.h \
 vtkKWGenericComposite.h \
+vtkKWLabel.h \
 vtkKWLabeledFrame.h \
 vtkKWMenu.h \
 vtkKWMessageDialog.h \
@@ -1396,6 +1498,8 @@ vtkKWVolumeComposite.h \
 vtkKWWindow.h \
 vtkKWWindowCollection.h 
 
+tcl/vtkCornerAnnotationTcl.cxx: vtkCornerAnnotation.h ${VTK_OBJ}/wrap/vtkWrapTcl ../wrap/hints
+	rm -f tcl/vtkCornerAnnotationTcl.cxx; ${VTK_OBJ}/wrap/vtkWrapTcl ${srcdir}/vtkCornerAnnotation.h ${srcdir}/../wrap/hints 1 > tcl/vtkCornerAnnotationTcl.cxx
 tcl/vtkKWApplicationTcl.cxx: vtkKWApplication.h ${VTK_OBJ}/wrap/vtkWrapTcl ../wrap/hints
 	rm -f tcl/vtkKWApplicationTcl.cxx; ${VTK_OBJ}/wrap/vtkWrapTcl ${srcdir}/vtkKWApplication.h ${srcdir}/../wrap/hints 1 > tcl/vtkKWApplicationTcl.cxx
 tcl/vtkKWCallbackSpecificationTcl.cxx: vtkKWCallbackSpecification.h ${VTK_OBJ}/wrap/vtkWrapTcl ../wrap/hints
@@ -1418,6 +1522,8 @@ tcl/vtkKWExtentTcl.cxx: vtkKWExtent.h ${VTK_OBJ}/wrap/vtkWrapTcl ../wrap/hints
 	rm -f tcl/vtkKWExtentTcl.cxx; ${VTK_OBJ}/wrap/vtkWrapTcl ${srcdir}/vtkKWExtent.h ${srcdir}/../wrap/hints 1 > tcl/vtkKWExtentTcl.cxx
 tcl/vtkKWGenericCompositeTcl.cxx: vtkKWGenericComposite.h ${VTK_OBJ}/wrap/vtkWrapTcl ../wrap/hints
 	rm -f tcl/vtkKWGenericCompositeTcl.cxx; ${VTK_OBJ}/wrap/vtkWrapTcl ${srcdir}/vtkKWGenericComposite.h ${srcdir}/../wrap/hints 1 > tcl/vtkKWGenericCompositeTcl.cxx
+tcl/vtkKWLabelTcl.cxx: vtkKWLabel.h ${VTK_OBJ}/wrap/vtkWrapTcl ../wrap/hints
+	rm -f tcl/vtkKWLabelTcl.cxx; ${VTK_OBJ}/wrap/vtkWrapTcl ${srcdir}/vtkKWLabel.h ${srcdir}/../wrap/hints 1 > tcl/vtkKWLabelTcl.cxx
 tcl/vtkKWLabeledFrameTcl.cxx: vtkKWLabeledFrame.h ${VTK_OBJ}/wrap/vtkWrapTcl ../wrap/hints
 	rm -f tcl/vtkKWLabeledFrameTcl.cxx; ${VTK_OBJ}/wrap/vtkWrapTcl ${srcdir}/vtkKWLabeledFrame.h ${srcdir}/../wrap/hints 1 > tcl/vtkKWLabeledFrameTcl.cxx
 tcl/vtkKWMenuTcl.cxx: vtkKWMenu.h ${VTK_OBJ}/wrap/vtkWrapTcl ../wrap/hints
@@ -1463,6 +1569,7 @@ tcl/vtkKWCompositeTcl.cxx: vtkKWComposite.h ${VTK_OBJ}/wrap/vtkWrapTcl ../wrap/h
 tcl/vtkKWViewTcl.cxx: vtkKWView.h ${VTK_OBJ}/wrap/vtkWrapTcl ../wrap/hints
 	rm -f tcl/vtkKWViewTcl.cxx; ${VTK_OBJ}/wrap/vtkWrapTcl ${srcdir}/vtkKWView.h ${srcdir}/../wrap/hints 0 > tcl/vtkKWViewTcl.cxx
 JAVA_CLASSES = \
+../java/vtk/vtkCornerAnnotation.java \
 ../java/vtk/vtkKWApplication.java \
 ../java/vtk/vtkKWCallbackSpecification.java \
 ../java/vtk/vtkKWChangeColorButton.java \
@@ -1474,6 +1581,7 @@ JAVA_CLASSES = \
 ../java/vtk/vtkKWEventNotifier.java \
 ../java/vtk/vtkKWExtent.java \
 ../java/vtk/vtkKWGenericComposite.java \
+../java/vtk/vtkKWLabel.java \
 ../java/vtk/vtkKWLabeledFrame.java \
 ../java/vtk/vtkKWMenu.java \
 ../java/vtk/vtkKWMessageDialog.java \
@@ -1498,6 +1606,7 @@ JAVA_CLASSES = \
 ../java/vtk/vtkKWView.java 
 
 JAVA_CODE = \
+../java/vtk/vtkCornerAnnotation.class \
 ../java/vtk/vtkKWApplication.class \
 ../java/vtk/vtkKWCallbackSpecification.class \
 ../java/vtk/vtkKWChangeColorButton.class \
@@ -1509,6 +1618,7 @@ JAVA_CODE = \
 ../java/vtk/vtkKWEventNotifier.class \
 ../java/vtk/vtkKWExtent.class \
 ../java/vtk/vtkKWGenericComposite.class \
+../java/vtk/vtkKWLabel.class \
 ../java/vtk/vtkKWLabeledFrame.class \
 ../java/vtk/vtkKWMenu.class \
 ../java/vtk/vtkKWMessageDialog.class \
@@ -1533,6 +1643,7 @@ JAVA_CODE = \
 ../java/vtk/vtkKWView.class 
 
 JAVA_WRAP = \
+java/vtkCornerAnnotationJava.o \
 java/vtkKWApplicationJava.o \
 java/vtkKWCallbackSpecificationJava.o \
 java/vtkKWChangeColorButtonJava.o \
@@ -1544,6 +1655,7 @@ java/vtkKWEntryJava.o \
 java/vtkKWEventNotifierJava.o \
 java/vtkKWExtentJava.o \
 java/vtkKWGenericCompositeJava.o \
+java/vtkKWLabelJava.o \
 java/vtkKWLabeledFrameJava.o \
 java/vtkKWMenuJava.o \
 java/vtkKWMessageDialogJava.o \
@@ -1567,6 +1679,10 @@ java/vtkKWWindowCollectionJava.o \
 java/vtkKWCompositeJava.o \
 java/vtkKWViewJava.o 
 
+../java/vtk/vtkCornerAnnotation.java: vtkCornerAnnotation.h ${VTK_OBJ}/wrap/vtkParseJava ../wrap/hints
+	rm -f ../java/vtk/vtkCornerAnnotation.java; ${VTK_OBJ}/wrap/vtkParseJava ${srcdir}/vtkCornerAnnotation.h ${srcdir}/../wrap/hints 1 > ../java/vtk/vtkCornerAnnotation.java
+java/vtkCornerAnnotationJava.cxx: vtkCornerAnnotation.h ${VTK_OBJ}/wrap/vtkWrapJava ../wrap/hints
+	rm -f java/vtkCornerAnnotationJava.cxx; ${VTK_OBJ}/wrap/vtkWrapJava ${srcdir}/vtkCornerAnnotation.h ${srcdir}/../wrap/hints 1 > java/vtkCornerAnnotationJava.cxx
 ../java/vtk/vtkKWApplication.java: vtkKWApplication.h ${VTK_OBJ}/wrap/vtkParseJava ../wrap/hints
 	rm -f ../java/vtk/vtkKWApplication.java; ${VTK_OBJ}/wrap/vtkParseJava ${srcdir}/vtkKWApplication.h ${srcdir}/../wrap/hints 1 > ../java/vtk/vtkKWApplication.java
 java/vtkKWApplicationJava.cxx: vtkKWApplication.h ${VTK_OBJ}/wrap/vtkWrapJava ../wrap/hints
@@ -1611,6 +1727,10 @@ java/vtkKWExtentJava.cxx: vtkKWExtent.h ${VTK_OBJ}/wrap/vtkWrapJava ../wrap/hint
 	rm -f ../java/vtk/vtkKWGenericComposite.java; ${VTK_OBJ}/wrap/vtkParseJava ${srcdir}/vtkKWGenericComposite.h ${srcdir}/../wrap/hints 1 > ../java/vtk/vtkKWGenericComposite.java
 java/vtkKWGenericCompositeJava.cxx: vtkKWGenericComposite.h ${VTK_OBJ}/wrap/vtkWrapJava ../wrap/hints
 	rm -f java/vtkKWGenericCompositeJava.cxx; ${VTK_OBJ}/wrap/vtkWrapJava ${srcdir}/vtkKWGenericComposite.h ${srcdir}/../wrap/hints 1 > java/vtkKWGenericCompositeJava.cxx
+../java/vtk/vtkKWLabel.java: vtkKWLabel.h ${VTK_OBJ}/wrap/vtkParseJava ../wrap/hints
+	rm -f ../java/vtk/vtkKWLabel.java; ${VTK_OBJ}/wrap/vtkParseJava ${srcdir}/vtkKWLabel.h ${srcdir}/../wrap/hints 1 > ../java/vtk/vtkKWLabel.java
+java/vtkKWLabelJava.cxx: vtkKWLabel.h ${VTK_OBJ}/wrap/vtkWrapJava ../wrap/hints
+	rm -f java/vtkKWLabelJava.cxx; ${VTK_OBJ}/wrap/vtkWrapJava ${srcdir}/vtkKWLabel.h ${srcdir}/../wrap/hints 1 > java/vtkKWLabelJava.cxx
 ../java/vtk/vtkKWLabeledFrame.java: vtkKWLabeledFrame.h ${VTK_OBJ}/wrap/vtkParseJava ../wrap/hints
 	rm -f ../java/vtk/vtkKWLabeledFrame.java; ${VTK_OBJ}/wrap/vtkParseJava ${srcdir}/vtkKWLabeledFrame.h ${srcdir}/../wrap/hints 1 > ../java/vtk/vtkKWLabeledFrame.java
 java/vtkKWLabeledFrameJava.cxx: vtkKWLabeledFrame.h ${VTK_OBJ}/wrap/vtkWrapJava ../wrap/hints
@@ -1700,6 +1820,7 @@ java/vtkKWCompositeJava.cxx: vtkKWComposite.h ${VTK_OBJ}/wrap/vtkWrapJava ../wra
 java/vtkKWViewJava.cxx: vtkKWView.h ${VTK_OBJ}/wrap/vtkWrapJava ../wrap/hints
 	rm -f java/vtkKWViewJava.cxx; ${VTK_OBJ}/wrap/vtkWrapJava ${srcdir}/vtkKWView.h ${srcdir}/../wrap/hints 0 > java/vtkKWViewJava.cxx
 PYTHON_WRAP = \
+python/vtkCornerAnnotationPython.o \
 python/vtkKWApplicationPython.o \
 python/vtkKWCallbackSpecificationPython.o \
 python/vtkKWChangeColorButtonPython.o \
@@ -1711,6 +1832,7 @@ python/vtkKWEntryPython.o \
 python/vtkKWEventNotifierPython.o \
 python/vtkKWExtentPython.o \
 python/vtkKWGenericCompositePython.o \
+python/vtkKWLabelPython.o \
 python/vtkKWLabeledFramePython.o \
 python/vtkKWMenuPython.o \
 python/vtkKWMessageDialogPython.o \
@@ -1734,6 +1856,8 @@ python/vtkKWWindowCollectionPython.o \
 python/vtkKWCompositePython.o \
 python/vtkKWViewPython.o 
 
+python/vtkCornerAnnotationPython.cxx: vtkCornerAnnotation.h ${VTK_OBJ}/wrap/vtkWrapPython ../wrap/hints
+	rm -f python/vtkCornerAnnotationPython.cxx; ${VTK_OBJ}/wrap/vtkWrapPython ${srcdir}/vtkCornerAnnotation.h ${srcdir}/../wrap/hints 0 > python/vtkCornerAnnotationPython.cxx
 python/vtkKWApplicationPython.cxx: vtkKWApplication.h ${VTK_OBJ}/wrap/vtkWrapPython ../wrap/hints
 	rm -f python/vtkKWApplicationPython.cxx; ${VTK_OBJ}/wrap/vtkWrapPython ${srcdir}/vtkKWApplication.h ${srcdir}/../wrap/hints 0 > python/vtkKWApplicationPython.cxx
 python/vtkKWCallbackSpecificationPython.cxx: vtkKWCallbackSpecification.h ${VTK_OBJ}/wrap/vtkWrapPython ../wrap/hints
@@ -1756,6 +1880,8 @@ python/vtkKWExtentPython.cxx: vtkKWExtent.h ${VTK_OBJ}/wrap/vtkWrapPython ../wra
 	rm -f python/vtkKWExtentPython.cxx; ${VTK_OBJ}/wrap/vtkWrapPython ${srcdir}/vtkKWExtent.h ${srcdir}/../wrap/hints 0 > python/vtkKWExtentPython.cxx
 python/vtkKWGenericCompositePython.cxx: vtkKWGenericComposite.h ${VTK_OBJ}/wrap/vtkWrapPython ../wrap/hints
 	rm -f python/vtkKWGenericCompositePython.cxx; ${VTK_OBJ}/wrap/vtkWrapPython ${srcdir}/vtkKWGenericComposite.h ${srcdir}/../wrap/hints 0 > python/vtkKWGenericCompositePython.cxx
+python/vtkKWLabelPython.cxx: vtkKWLabel.h ${VTK_OBJ}/wrap/vtkWrapPython ../wrap/hints
+	rm -f python/vtkKWLabelPython.cxx; ${VTK_OBJ}/wrap/vtkWrapPython ${srcdir}/vtkKWLabel.h ${srcdir}/../wrap/hints 0 > python/vtkKWLabelPython.cxx
 python/vtkKWLabeledFramePython.cxx: vtkKWLabeledFrame.h ${VTK_OBJ}/wrap/vtkWrapPython ../wrap/hints
 	rm -f python/vtkKWLabeledFramePython.cxx; ${VTK_OBJ}/wrap/vtkWrapPython ${srcdir}/vtkKWLabeledFrame.h ${srcdir}/../wrap/hints 0 > python/vtkKWLabeledFramePython.cxx
 python/vtkKWMenuPython.cxx: vtkKWMenu.h ${VTK_OBJ}/wrap/vtkWrapPython ../wrap/hints
