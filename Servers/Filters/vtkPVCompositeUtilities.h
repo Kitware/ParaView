@@ -13,9 +13,13 @@
 
 =========================================================================*/
 // .NAME vtkPVCompositeUtilities - Compression and composite buffers.
+//
 // .SECTION Description
-// This is going  to handle buffer managment, compressing buffers
+// This is going  to handle buffer management, compressing buffers
 // and compositing buffer pairs. ......
+//
+// .SECTION See Also
+// vtkPVCompositeBuffer
 
 
 #ifndef __vtkPVCompositeUtilities_h
