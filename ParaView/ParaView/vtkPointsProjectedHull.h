@@ -8,6 +8,23 @@
   Date:      $Date$
   Version:   $Revision$
 
+  Copyright (c) 1993-2002 Ken Martin, Will Schroeder, Bill Lorensen
+  All rights reserved.
+  See Copyright.txt or http://www.kitware.com/Copyright.htm for details.
+
+  Copyright (C) 2003 Sandia Corporation
+  Under the terms of Contract DE-AC04-94AL85000, there is a non-exclusive
+  license for use of this work by or on behalf of the U.S. Government.
+  Redistribution and use in source and binary forms, with or without
+  modification, are permitted provided that this Notice and any statement
+  of authorship are reproduced on all copies.
+
+  Contact: Lee Ann Fisk, lafisk@sandia.gov
+
+     This software is distributed WITHOUT ANY WARRANTY; without even
+     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+     PURPOSE.  See the above copyright notice for more information.
+
 =========================================================================*/
 
 // .NAME vtkPointsProjectedHull - the convex hull of the orthogonal 
@@ -22,10 +39,9 @@
 #ifndef __vtkPointsProjectedHull_h
 #define __vtkPointsProjectedHull_h
 
-//#include <vtksnlGraphicsWin32Header.h>
-#include <vtkObjectFactory.h>
-#include <vtkSetGet.h>
-#include <vtkPoints.h>
+#include "vtkObjectFactory.h"
+#include "vtkSetGet.h"
+#include "vtkPoints.h"
 
 
 class VTK_EXPORT vtkPointsProjectedHull : public vtkPoints
@@ -140,6 +156,10 @@ private:
                             double vmin, double vmax, int direction);
   int rectangleOutside(double hmin, double hmax,
                             double vmin, double vmax, int direction);
+
+  int rectangleOutside1DPolygon(double hmin, double hmax,
+                            double vmin, double vmax, int dir);
+
   void initFlags();
   void clearAllocations();
 
@@ -154,9 +174,9 @@ private:
   static int outsideVerticalLine(double hmin, double hmax, double *p0, 
            double *p1, double *insidePt);
 
-  double *pts;
-  int npts;
-  vtkTimeStamp ptsTime;
+  double *Pts;
+  int Npts;
+  vtkTimeStamp PtsTime;
 
   double *ccwHull[3];
   float hullBBox[3][4];

@@ -8,6 +8,23 @@
   Date:    $Date$
   Version:   $Revision$ 
 
+  Copyright (c) 1993-2002 Ken Martin, Will Schroeder, Bill Lorensen
+  All rights reserved.
+  See Copyright.txt or http://www.kitware.com/Copyright.htm for details.
+
+  Copyright (C) 2003 Sandia Corporation
+  Under the terms of Contract DE-AC04-94AL85000, there is a non-exclusive
+  license for use of this work by or on behalf of the U.S. Government.
+  Redistribution and use in source and binary forms, with or without
+  modification, are permitted provided that this Notice and any statement
+  of authorship are reproduced on all copies.
+
+  Contact: Lee Ann Fisk, lafisk@sandia.gov
+
+     This software is distributed WITHOUT ANY WARRANTY; without even
+     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+     PURPOSE.  See the above copyright notice for more information.
+
 =========================================================================*/
 
 #include "vtkMergeCells.h"
@@ -19,18 +36,28 @@
 #include "vtkPointData.h"
 #include "vtkCellData.h"
 #include "vtkObjectFactory.h"
+#include "vtkCellArray.h"
+#include "vtkUnsignedCharArray.h"
+#include "vtkObjectFactory.h"
 #include "vtkIntArray.h"
-#include "vtkCollection.h"
+#include "vtkIdTypeArray.h"
+#include "vtkShortArray.h"
+#include "vtkUnsignedShortArray.h"
+#include "vtkUnsignedIntArray.h"
+#include "vtkLongArray.h"
+#include "vtkUnsignedLongArray.h"
+#include "vtkDataArray.h"
 #include <stdlib.h>
 #include <algorithm>
 
-vtkCxxRevisionMacro(vtkMergeCells, "1.1.2.3");
+vtkCxxRevisionMacro(vtkMergeCells, "1.1.2.4");
 vtkStandardNewMacro(vtkMergeCells);
 
 vtkCxxSetObjectMacro(vtkMergeCells, UnstructuredGrid, vtkUnstructuredGrid);
 
 vtkMergeCells::vtkMergeCells()
 {
+  this->TotalNumberOfDataSets = 0;
   this->TotalCells = 0;
   this->TotalPoints = 0;
 
@@ -39,292 +66,436 @@ vtkMergeCells::vtkMergeCells()
 
   this->GlobalIdArrayName = NULL;
 
+  this->InputIsUGrid = 0;
+  
+  this->ptList = NULL;
+  this->cellList = NULL;
+
   this->UnstructuredGrid = NULL;
-  this->Inputs = vtkCollection::New();
+
+  this->nextGrid = 0;
 }
 
 vtkMergeCells::~vtkMergeCells()
 {
   this->FreeLists();
-  this->Inputs->Delete();
-  this->Inputs = NULL;
   this->SetUnstructuredGrid(0);
 }
 
 void vtkMergeCells::FreeLists()
 {
-  if (this->GlobalIdArrayName){
+  if (this->GlobalIdArrayName)
+    {
     delete [] this->GlobalIdArrayName;
     this->GlobalIdArrayName = NULL;
-  }
+    }
 
   this->GlobalIdMap.clear();
+
+  if (this->ptList)
+    {
+    delete this->ptList;
+    this->ptList = NULL;
+    }
+
+  if (this->cellList)
+    {
+    delete this->cellList;
+    this->cellList = NULL;
+    }
 }
 
 
-void vtkMergeCells::MergeDataSet(vtkDataSet *set)
+int vtkMergeCells::MergeDataSet(vtkDataSet *set)
 {
-  // Just add the ugrid to the list to merge later.
-  this->Inputs->AddItem(set);
-}
-
-
-
-void vtkMergeCells::FinishInput(vtkDataSet *set, int inputId,
-                                vtkDataSetAttributes::FieldList *ptList,
-                                vtkDataSetAttributes::FieldList *cellList)
-{
-  int newId, nextCell;
-  int *idMap;
+  vtkIdType newPtId, oldPtId, newCellId;
+  vtkIdType *idMap;
 
   vtkUnstructuredGrid *ugrid = this->UnstructuredGrid;
 
-  if (!ugrid){
+  if (!ugrid)
+    {
     vtkErrorMacro(<< "SetUnstructuredGrid first");
-    return;
-  }
+    return -1;
+    }
 
-  if ((this->TotalCells == 0) || (this->TotalPoints == 0)){
-    vtkErrorMacro(<< "SetTotalCells and SetTotalPoints first");
-    return;
-  }
+  if ((this->TotalCells <= 0) || (this->TotalPoints <= 0) ||
+      (this->TotalNumberOfDataSets <= 0))
+    {
+    vtkErrorMacro(<<
+     "Must SetTotalCells, SetTotalPoints and SetTotalNumberOfDataSets (upper bounds at least)"
+     " before starting to MergeDataSets");
+
+    return -1;
+    }
 
   vtkPointData *pointArrays = set->GetPointData();
   vtkCellData *cellArrays   = set->GetCellData();
 
-  int numPoints = set->GetNumberOfPoints();
-  int numCells  = set->GetNumberOfCells();
+  // Since vtkMergeCells is to be used only on distributed vtkDataSets,
+  // each DataSet should have the same field arrays.  However I've been
+  // told that the field arrays may get rearranged in the process of
+  // Marshalling/UnMarshalling.  So we use a
+  // vtkDataSetAttributes::FieldList to ensure the field arrays are
+  // merged in the right order.
 
-  if (numCells == 0) return;
+  if (ugrid->GetNumberOfCells() == 0)
+    {
+    vtkUnstructuredGrid *checkInput = vtkUnstructuredGrid::SafeDownCast(set);
 
-  if (this->GlobalIdArrayName){
+    this->InputIsUGrid = (checkInput != NULL);
+
+    this->StartUGrid(pointArrays, cellArrays);
+    }
+  else
+    {
+    this->ptList->IntersectFieldList(pointArrays);
+    this->cellList->IntersectFieldList(cellArrays);
+    }
+
+  vtkIdType numPoints = set->GetNumberOfPoints();
+  vtkIdType numCells  = set->GetNumberOfCells();
+
+  if (numCells == 0) return 0;
+
+
+  if (this->GlobalIdArrayName)
+    {
     idMap = this->MapPointsToIds(set);
-  }
-  else{
+    }
+  else
+    {
     idMap = NULL;
-  }
+    }
 
-  int nextPt = this->NumberOfPoints;
+  vtkIdType nextPt = (vtkIdType)this->NumberOfPoints;
 
   vtkPoints *pts = ugrid->GetPoints();
 
-  for (int ptId=0; ptId < numPoints; ptId++){
+  for (oldPtId=0; oldPtId < numPoints; oldPtId++)
+    {
+    if (idMap)
+      {
+      newPtId = idMap[oldPtId];
+      }
+    else 
+      {
+      newPtId = nextPt;
+      }
 
-    if (idMap){
+    if (newPtId == nextPt)
+      {
+      pts->SetPoint(nextPt, set->GetPoint(oldPtId));
 
-      newId = idMap[ptId];
-    }
-    else{
-
-      newId = nextPt;
-    }
-
-    if (newId == nextPt){
-
-      pts->SetPoint(nextPt, set->GetPoint(ptId));
-      ugrid->GetPointData()->CopyData(*ptList, pointArrays, inputId, ptId, nextPt);
+      ugrid->GetPointData()->CopyData(*this->ptList,
+                           pointArrays, this->nextGrid, oldPtId, nextPt);
 
       nextPt++;
+      }
     }
-  }
+
+  if (this->InputIsUGrid)
+    {
+    newCellId = this->AddNewCellsUnstructuredGrid(set, idMap);
+    }
+  else
+    {
+    newCellId = this->AddNewCellsDataSet(set, idMap);
+    }
+
+  if (idMap) delete [] idMap;
+
+  this->NumberOfPoints = nextPt;
+  this->NumberOfCells = newCellId;
+
+  this->nextGrid++;
+
+  return 0;
+}
+vtkIdType vtkMergeCells::AddNewCellsDataSet(vtkDataSet *set, vtkIdType *idMap)
+{
+  vtkIdType oldCellId, id, newPtId, newCellId, oldPtId;
+
+  vtkUnstructuredGrid *ugrid = this->UnstructuredGrid;
+  vtkCellData *cellArrays = set->GetCellData();
+  vtkIdType numCells      = set->GetNumberOfCells();
 
   vtkIdList *cellPoints = vtkIdList::New();
   cellPoints->Allocate(VTK_CELL_SIZE);
 
-  for (int cellId=0; cellId < numCells; cellId++){
+  for (oldCellId=0; oldCellId < numCells; oldCellId++)
+    {
+    set->GetCellPoints(oldCellId, cellPoints);
 
-    set->GetCellPoints(cellId, cellPoints);
+    for (id=0; id < cellPoints->GetNumberOfIds(); id++)
+      {
+      oldPtId = cellPoints->GetId(id);
 
-    for (int i=0; i < cellPoints->GetNumberOfIds(); i++){
-
-      int id = cellPoints->GetId(i);
-
-      if (idMap){
-
-        newId = idMap[id];
-
+      if (idMap)
+        {
+        newPtId = idMap[oldPtId];
+        }
+      else
+        {
+        newPtId = this->NumberOfPoints + oldPtId;
+        }
+      cellPoints->SetId(id, newPtId);
       }
-      else{
 
-        newId = this->NumberOfPoints + id;
-      }
+    newCellId =
+      (vtkIdType)ugrid->InsertNextCell(set->GetCellType(oldCellId), cellPoints);
 
-      cellPoints->SetId(i, newId);
+    ugrid->GetCellData()->CopyData(*(this->cellList), cellArrays,
+                                   this->nextGrid, oldCellId, newCellId);
     }
 
-    nextCell = ugrid->InsertNextCell(set->GetCellType(cellId), cellPoints);
-
-    ugrid->GetCellData()->CopyData(*cellList, cellArrays, inputId, cellId, nextCell);
-  }
-
   cellPoints->Delete();
-  if (idMap) delete [] idMap;
 
-  this->NumberOfPoints = nextPt;
-  this->NumberOfCells = nextCell;
+  return newCellId;
+}
+vtkIdType vtkMergeCells::AddNewCellsUnstructuredGrid(vtkDataSet *set,
+                                                     vtkIdType *idMap)
+{
+  char firstSet = 0;
+
+  if (this->nextGrid == 0) firstSet = 1;
+
+  vtkUnstructuredGrid *newUgrid = vtkUnstructuredGrid::SafeDownCast(set);
+  vtkUnstructuredGrid *Ugrid = this->UnstructuredGrid;
+
+  // connectivity information for the new data set
+      
+  vtkCellArray *newCellArray = newUgrid->GetCells();
+  vtkIdType *newCells = newCellArray->GetPointer();
+  int *newLocs = newUgrid->GetCellLocationsArray()->GetPointer(0);
+  unsigned char *newTypes = newUgrid->GetCellTypesArray()->GetPointer(0);
+    
+  int newNumCells = newUgrid->GetNumberOfCells();
+  int newNumConnections = newCellArray->GetData()->GetNumberOfTuples();
+    
+  // connectivity for the merged ugrid so far
+  
+  vtkCellArray *cellArray = NULL;
+  vtkIdType *cells = NULL;
+  int *locs = NULL;
+  unsigned char *types = NULL;
+
+  int numCells = 0;
+  int numConnections = 0;                            
+
+  if (!firstSet)
+    { 
+    cellArray  = Ugrid->GetCells();
+    cells = cellArray->GetPointer();
+    locs = Ugrid->GetCellLocationsArray()->GetPointer(0);
+    types = Ugrid->GetCellTypesArray()->GetPointer(0);;
+  
+    numCells         = Ugrid->GetNumberOfCells();
+    numConnections    =  cellArray->GetData()->GetNumberOfTuples();
+    }
+
+  //  New output grid: merging of existing and incoming grids
+
+  //           CELL ARRAY
+
+  int totalNumCells = numCells + newNumCells;
+  int totalNumConnections = numConnections + newNumConnections;
+
+  vtkIdTypeArray *mergedcells = vtkIdTypeArray::New();
+  mergedcells->SetNumberOfValues(totalNumConnections);
+
+  if (!firstSet)
+    {
+    vtkIdType *idptr = mergedcells->GetPointer(0);
+    memcpy(idptr, cells, sizeof(vtkIdType) * numConnections);
+    }
+
+  vtkCellArray *finalCellArray = vtkCellArray::New();
+  finalCellArray->SetCells(totalNumCells, mergedcells);
+
+  //           LOCATION ARRAY
+
+  vtkIntArray *locationArray = vtkIntArray::New();
+  locationArray->SetNumberOfValues(totalNumCells);
+
+  int *iptr = locationArray->GetPointer(0);  // new output dataset
+
+  if (!firstSet)
+    {
+    memcpy(iptr, locs, numCells * sizeof(int));   // existing set
+    }
+  iptr += numCells;
+
+  memcpy(iptr, newLocs, newNumCells * sizeof(int));  // new set
+
+  if (!firstSet)
+    {
+    for (int i=0; i<newNumCells; i++)
+      {
+      iptr[i] += numConnections;
+      }
+    }
+
+  //           TYPE ARRAY
+
+  vtkUnsignedCharArray *typeArray = vtkUnsignedCharArray::New();
+  typeArray->SetNumberOfValues(totalNumCells);
+
+  unsigned char *cptr = typeArray->GetPointer(0);
+
+  if (!firstSet)
+    {
+    memcpy(cptr, types, numCells * sizeof(unsigned char));
+    }
+  cptr += numCells;
+  
+  memcpy(cptr, newTypes, newNumCells * sizeof(unsigned char));
+  
+  // set up new cell data
+  
+  vtkIdType newCellId = numCells;
+  int nextCellArrayIndex = numConnections;
+  vtkCellData *cellArrays = set->GetCellData();
+  
+  vtkIdType oldPtId, newPtId;
+  
+  for (vtkIdType oldCellId=0; oldCellId < newNumCells; oldCellId++)
+    {
+    vtkIdType size = *newCells++;
+    
+    mergedcells->SetValue(nextCellArrayIndex++, size);
+    
+    for (vtkIdType id=0; id < size; id++)
+      {
+      oldPtId = *newCells++;
+      
+      if (idMap)
+        { 
+        newPtId = idMap[oldPtId];
+        }
+      else
+        {
+        newPtId = this->NumberOfPoints + oldPtId;
+        }
+      
+      mergedcells->SetValue(nextCellArrayIndex++, newPtId);
+      }
+    
+    Ugrid->GetCellData()->CopyData(*(this->cellList), cellArrays,
+                                   this->nextGrid, oldCellId, newCellId);
+    
+    newCellId++;
+    }
+  
+  Ugrid->SetCells(typeArray, locationArray, finalCellArray);
+  
+  mergedcells->Delete();
+  typeArray->Delete();
+  locationArray->Delete();
+  finalCellArray->Delete();
+
+  return newCellId;
+}
+
+void vtkMergeCells::StartUGrid(vtkPointData *PD, vtkCellData *CD)
+{
+  vtkUnstructuredGrid *ugrid = this->UnstructuredGrid;
+
+  ugrid->Initialize();
+
+  if (!this->InputIsUGrid)
+    {
+    ugrid->Allocate(this->TotalCells);
+    }
+
+  vtkPoints *pts = vtkPoints::New();
+
+  pts->SetNumberOfPoints(this->TotalPoints);  // upper bound
+
+  ugrid->SetPoints(pts);
+
+  pts->Delete();
+
+  // Order of field arrays may get changed when data sets are
+  // marshalled/sent/unmarshalled.  So we need to re-index the
+  // field arrays before copying them using a FieldList
+
+  this->ptList   = new vtkDataSetAttributes::FieldList(this->TotalNumberOfDataSets);
+  this->cellList = new vtkDataSetAttributes::FieldList(this->TotalNumberOfDataSets);
+
+  this->ptList->InitializeFieldList(PD);
+  this->cellList->InitializeFieldList(CD);
+
+  ugrid->GetPointData()->CopyAllocate(*ptList, this->TotalPoints);
+  ugrid->GetCellData()->CopyAllocate(*cellList, this->TotalCells);
 
   return;
 }
 
-// Initializes the ouput given the set of inputs.
-void vtkMergeCells::StartUGrid(vtkDataSetAttributes::FieldList *ptList,
-                               vtkDataSetAttributes::FieldList *cellList)
-{
-  if ((this->TotalCells <= 0) || (this->TotalPoints <= 0)){
-    vtkErrorMacro(<<
-     "Must SetTotalCells and SetTotalPoints before starting to MergeDataSets");
-
-    return;
-  }
-
-  // Putting this before list generation to try to solve a problem.
-  vtkUnstructuredGrid *output = this->UnstructuredGrid;
-  output->Initialize();
-  output->Allocate(this->TotalCells); //allocate storage for geometry/topology
-  vtkPoints *pts = vtkPoints::New();
-  pts->SetNumberOfPoints(this->TotalPoints);
-  output->SetPoints(pts);
-  pts->Delete();
-
-  int numPts = 0;
-  int numCells = 0;
-  int firstPD=1;
-  int firstCD=1;
-  this->Inputs->InitTraversal();
-  vtkDataSet *ds;
-  while ( (ds = (vtkDataSet*)(this->Inputs->GetNextItemAsObject())) )
-    {
-    if ( ds->GetNumberOfPoints() <= 0 && ds->GetNumberOfCells() <= 0 )
-      {
-      continue; //no input, just skip
-      }
-
-    numPts += ds->GetNumberOfPoints();
-    numCells += ds->GetNumberOfCells();
-
-    if ( firstPD )
-      {
-      ptList->InitializeFieldList(ds->GetPointData());
-      firstPD = 0;
-      }
-    else
-      {
-      ptList->IntersectFieldList(ds->GetPointData());
-      }
-      
-    if ( firstCD )
-      {
-      cellList->InitializeFieldList(ds->GetCellData());
-      firstCD = 0;
-      }
-    else
-      {
-      cellList->IntersectFieldList(ds->GetCellData());
-      }
-    }//for all inputs
-
-  if ( numPts < 1 || numCells < 1 )
-    {
-    vtkErrorMacro(<<"No data to append!");
-    return;
-    }
-  if (numPts > this->TotalPoints)
-    {
-    // With this approach, the number of points/cells
-    // do not really need to be set ahead of time.
-    vtkWarningMacro("NumberOfPoints Mismatch.");
-    }  
-  if (numCells > this->TotalCells)
-    {
-    // With this approach, the number of points/cells
-    // do not really need to be set ahead of time.
-    vtkWarningMacro("NumberOfCells Mismatch.");
-    }  
-  // Now can allocate arrays.
-  output->GetPointData()->CopyAllocate(*ptList,numPts);
-  output->GetCellData()->CopyAllocate(*cellList,numCells);
-}
-
 void vtkMergeCells::Finish()
 {
-  int numInputs = this->Inputs->GetNumberOfItems();
-  vtkDataSetAttributes::FieldList ptList(numInputs);
-  vtkDataSetAttributes::FieldList cellList(numInputs);
-
-  // Allocate output.
-  this->StartUGrid(&ptList, &cellList);
-
-  vtkDataSet *input;
-  int inputId = 0;
-  this->Inputs->InitTraversal();
-  while ( (input = (vtkDataSet*)(this->Inputs->GetNextItemAsObject())) )
-    {
-    this->FinishInput(input, inputId, &ptList, &cellList);
-    ++inputId;
-    }
-
-  this->Inputs->RemoveAllItems();
   this->FreeLists();
 
   vtkUnstructuredGrid *ugrid = this->UnstructuredGrid;
 
-  if (this->NumberOfPoints < this->TotalPoints){
-
+  if (this->NumberOfPoints < this->TotalPoints)
+    {
     // if we don't do this, ugrid->GetNumberOfPoints() gives
     //   the wrong value
 
     ugrid->GetPoints()->GetData()->Resize(this->NumberOfPoints);
-  }
+    }
 
   ugrid->Squeeze();
 
   return;
 }
 
-int *vtkMergeCells::MapPointsToIds(vtkDataSet *set)
+vtkIdType *vtkMergeCells::MapPointsToIds(vtkDataSet *set)
 {
-  vtkIntArray *ids = NULL;
-
   vtkDataArray *globalIds = 
     set->GetPointData()->GetScalars(this->GlobalIdArrayName);
 
-  if (globalIds) ids = vtkIntArray::SafeDownCast(globalIds);
-
-  if (!ids){
+  if (!globalIds)
+    {
     vtkErrorMacro("global id array is not available");
     return NULL;
-  }
-  int npoints = set->GetNumberOfPoints();
+    }
 
-  int *idMap = new int [npoints];
+  vtkIdType npoints = set->GetNumberOfPoints();
 
-  int nextNewLocalId = this->GlobalIdMap.size();
+  vtkIdType *idMap = new vtkIdType [npoints];
+
+  vtkIdType nextNewLocalId = this->GlobalIdMap.size();
 
   // map global point Ids to Ids in the new data set
 
-  for (int i=0; i<npoints; i++){
+  for (vtkIdType oldId=0; oldId<npoints; oldId++)
+    {
+    float *id = globalIds->GetTuple(oldId);
+    vtkIdType globalId = (vtkIdType)*id;
 
-    int globalId = ids->GetValue(i);
+    vtkstd::pair<vtkstd::map<vtkIdType, vtkIdType>::iterator, bool> inserted =
 
-    vtkstd::pair<vtkstd::map<int, int>::iterator, bool> inserted =
+      this->GlobalIdMap.insert(
+         vtkstd::pair<vtkIdType,vtkIdType>(globalId, nextNewLocalId));
 
-      this->GlobalIdMap.insert(vtkstd::pair<int,int>(globalId, nextNewLocalId));
-
-    if (inserted.second){
-
+    if (inserted.second)
+      {
       // this is a new global node Id
 
-      idMap[i] = nextNewLocalId;
+      idMap[oldId] = nextNewLocalId;
 
       nextNewLocalId++; 
-    }
-    else{
-
+      }
+    else
+      {
       // a repeat, it was not inserted
 
-      idMap[i] = inserted.first->second;
+      idMap[oldId] = inserted.first->second;
+      }
     }
-  }
+
   return idMap;
 }
 
@@ -332,6 +503,7 @@ void vtkMergeCells::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
 
+  os << indent << "TotalNumberOfDataSets: " << this->TotalNumberOfDataSets << endl;
   os << indent << "TotalCells: " << this->TotalCells << endl;
   os << indent << "TotalPoints: " << this->TotalPoints << endl;
 
@@ -344,6 +516,9 @@ void vtkMergeCells::PrintSelf(ostream& os, vtkIndent indent)
     }
   os << indent << "GlobalIdMap size: " << this->GlobalIdMap.size() << endl;
 
+  os << indent << "InputIsUGrid: " << this->InputIsUGrid << endl;
   os << indent << "UnstructuredGrid: " << this->UnstructuredGrid << endl;
+  os << indent << "ptList: " << this->ptList << endl;
+  os << indent << "cellList: " << this->cellList << endl;
 }
 

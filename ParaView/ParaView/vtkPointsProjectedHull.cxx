@@ -7,12 +7,31 @@
   Language:  C++
   Date:    $Date$
   Version:   $Revision$
+  Date:    $Date$
+
+  Copyright (c) 1993-2002 Ken Martin, Will Schroeder, Bill Lorensen
+  All rights reserved.
+  See Copyright.txt or http://www.kitware.com/Copyright.htm for details.
+
+  Copyright (C) 2003 Sandia Corporation
+  Under the terms of Contract DE-AC04-94AL85000, there is a non-exclusive
+  license for use of this work by or on behalf of the U.S. Government.
+  Redistribution and use in source and binary forms, with or without
+  modification, are permitted provided that this Notice and any statement
+  of authorship are reproduced on all copies.
+
+  Contact: Lee Ann Fisk, lafisk@sandia.gov
+
+     This software is distributed WITHOUT ANY WARRANTY; without even
+     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+     PURPOSE.  See the above copyright notice for more information.
+
 
 =========================================================================*/
 
 #include "vtkPointsProjectedHull.h"
 
-vtkCxxRevisionMacro(vtkPointsProjectedHull, "1.1.2.1");
+vtkCxxRevisionMacro(vtkPointsProjectedHull, "1.1.2.2");
 vtkStandardNewMacro(vtkPointsProjectedHull);
 
 static const int xdim=0, ydim=1, zdim=2;
@@ -22,7 +41,7 @@ static double firstPt[3];
 //    Return: >0 for P2 left of the line through P0 and P1
 //            =0 for P2 on the line
 //            <0 for P2 right of the line
-#define ISLEFT(P0, P1, P2) \
+#define VTK_ISLEFT(P0, P1, P2) \
 (((P1)[0] - (P0)[0])*((P2)[1] - (P0)[1]) - ((P2)[0] - (P0)[0])*((P1)[1] - (P0)[1]))
 
 vtkPointsProjectedHull::vtkPointsProjectedHull()
@@ -48,74 +67,89 @@ void vtkPointsProjectedHull::Update()
 void vtkPointsProjectedHull::initFlags()
 {
   int i;
-  for (i=0; i<3; i++){
-    this->hullSize[i]     = 0;
+
+  this->Pts = NULL;
+  this->Npts = 0;
+
+  for (i=0; i<3; i++)
+    {
     this->ccwHull[i] = NULL;
-  }
-  this->npts = 0;
-  this->pts = NULL;
+    }
+
+  for (i=0; i<3; i++)
+    {
+    this->hullSize[i]     = 0;
+    }
 }
 void vtkPointsProjectedHull::clearAllocations()
 {
   int i;
-  for (i=0; i<3; i++){
-    if (this->ccwHull[i]){
+  for (i=0; i<3; i++)
+    {
+    if (this->ccwHull[i])
+      {
       delete [] this->ccwHull[i];
       this->ccwHull[i] = NULL;
+      }
     }
-  }
-  if (this->pts){
-    delete [] this->pts;
-    this->pts = NULL; 
-  }
+  if (this->Pts)
+    {
+    delete [] this->Pts;
+    this->Pts = NULL; 
+    }
 }
-#define GETCCWHULL(which, dim) \
+#define VTK_GETCCWHULL(which, dim) \
 int vtkPointsProjectedHull::GetCcwHull##which(float *pts, int len)\
-{                                                       \
-  int i;                                        \
-  double *dpts = new double [len*2];            \
-  int copypts = this->GetCcwHull##which(dpts, len);     \
-  for (i=0; i<copypts*2; i++){                  \
-    pts[i] = (float)dpts[i];                    \
-  }                                             \
+{                                                   \
+  int i;                                            \
+  double *dpts = new double [len*2];                \
+  int copypts = this->GetCcwHull##which(dpts, len); \
+  for (i=0; i<copypts*2; i++)                       \
+    {                                               \
+    pts[i] = (float)dpts[i];                        \
+    }                                               \
   delete [] dpts;                \
   return copypts;                \
 }                                \
 int vtkPointsProjectedHull::GetCcwHull##which(double *pts, int len)\
-{                                                                 \
-  if ((this->hullSize[dim] == 0) ||                           \
-      (this->GetMTime() > this->hullTime[dim])){   \
+{                                                 \
+  if ((this->hullSize[dim] == 0) ||               \
+      (this->GetMTime() > this->hullTime[dim]))   \
+    {                                             \
     grahamScanAlgorithm(dim);                             \
-  }                                                       \
+    }                                                       \
   int copylen = (this->hullSize[dim] <= len) ? this->hullSize[dim] : len; \
   if (copylen <= 0) return 0; \
   memcpy(pts, this->ccwHull[dim], sizeof(double) * 2 * copylen); \
   return copylen;             \
 }
-GETCCWHULL(X, 0);
-GETCCWHULL(Y, 1);
-GETCCWHULL(Z, 2);
+VTK_GETCCWHULL(X, 0);
+VTK_GETCCWHULL(Y, 1);
+VTK_GETCCWHULL(Z, 2);
 
-#define GETSIZECCWHULL(which, dim) \
+#define VTK_GETSIZECCWHULL(which, dim) \
 int vtkPointsProjectedHull::GetSizeCcwHull##which()\
 {                                                  \
   if ((this->hullSize[dim] == 0) ||                \
-      (this->GetMTime() > this->hullTime[dim])){   \
+      (this->GetMTime() > this->hullTime[dim]))   \
+    {                                             \
     grahamScanAlgorithm(dim);                      \
-  }                                                \
+    }                                              \
   return this->hullSize[dim];                      \
 }
-GETSIZECCWHULL(X, 0);
-GETSIZECCWHULL(Y, 1);
-GETSIZECCWHULL(Z, 2);
+VTK_GETSIZECCWHULL(X, 0);
+VTK_GETSIZECCWHULL(Y, 1);
+VTK_GETSIZECCWHULL(Z, 2);
 
-#define RECTANGLEINTERSECTION(which, dim) \
+#define VTK_RECTANGLEINTERSECTION(which, dim) \
 int vtkPointsProjectedHull::rectangleIntersection##which(vtkPoints *R) \
 {                                                                      \
   float bounds[6];                                             \
+  R->Modified();                                               \
   R->GetBounds(bounds);                                        \
   double hmin, hmax, vmin, vmax;                               \
-  switch (dim) {                                               \
+  switch (dim)                                                 \
+    {                                                          \
     case xdim:                                                 \
        hmin = (double)bounds[2]; hmax = (double)bounds[3];     \
        vmin = (double)bounds[4]; vmax = (double)bounds[5];     \
@@ -140,14 +174,15 @@ int vtkPointsProjectedHull::rectangleIntersection##which(double hmin, \
                          double hmax, double vmin, double vmax)       \
 {                                                                     \
   if ((this->hullSize[dim] == 0) ||                           \
-      (this->GetMTime() > this->hullTime[dim])){              \
+      (this->GetMTime() > this->hullTime[dim]))               \
+    {                                                         \
     grahamScanAlgorithm(dim);                                 \
-  }                                                           \
+    }                                                           \
   return rectangleIntersection(hmin, hmax, vmin, vmax ,dim);  \
 }
-RECTANGLEINTERSECTION(X, 0);
-RECTANGLEINTERSECTION(Y, 1);
-RECTANGLEINTERSECTION(Z, 2);
+VTK_RECTANGLEINTERSECTION(X, 0);
+VTK_RECTANGLEINTERSECTION(Y, 1);
+VTK_RECTANGLEINTERSECTION(Z, 2);
 
 // Does the axis-aligned rectangle R intersect the convex polygon 
 // given by the counter-clockwise enumeration of it's vertices.
@@ -163,13 +198,15 @@ RECTANGLEINTERSECTION(Z, 2);
 int vtkPointsProjectedHull::rectangleIntersection(double hmin, double hmax, 
                                  double vmin, double vmax, int dim)
 {
-  if (rectangleBoundingBoxIntersection(hmin,hmax,vmin,vmax,dim) == 0){
+  if (rectangleBoundingBoxIntersection(hmin,hmax,vmin,vmax,dim) == 0)
+    {
       return 0;
-  }
+    }
 
-  if (rectangleOutside(hmin,hmax,vmin,vmax, dim) == 1){
+  if (rectangleOutside(hmin,hmax,vmin,vmax, dim) == 1)
+    {
       return 0;
-  }
+    }
 
   return 1;
 }
@@ -196,11 +233,13 @@ int incrVertAxis(const void *p1, const void *p2);
 int ccw(const void *p1, const void *p2);
 int i,j;
 
-  if ((this->npts == 0) || (this->GetMTime() > this->ptsTime)){
+  if ((this->Npts == 0) || (this->GetMTime() > this->PtsTime))
+    {
     getPoints();
-  }
+    }
 
-  switch (dir){
+  switch (dir)
+    {
     case xdim:
        horizAxis = ydim;
        vertAxis = zdim;
@@ -215,62 +254,66 @@ int i,j;
        horizAxis = xdim;
        vertAxis = ydim;
        break;
-  }
+    }
 
   // Find the lowest, rightmost point in the set
 
-  double *hullPts = new double[this->npts*2];
+  double *hullPts = new double[this->Npts*2];
 
-  for (i=0; i<this->npts; i++){
-    hullPts[i*2]     = this->pts[i*3 + horizAxis];
-    hullPts[i*2 + 1] = this->pts[i*3 + vertAxis];
-  }
+  for (i=0; i<this->Npts; i++)
+    {
+    hullPts[i*2]     = this->Pts[i*3 + horizAxis];
+    hullPts[i*2 + 1] = this->Pts[i*3 + vertAxis];
+    }
 
-  qsort(hullPts, this->npts, sizeof(double) * 2, incrVertAxis);
+  qsort(hullPts, this->Npts, sizeof(double) * 2, incrVertAxis);
 
   int firstId = 0;
 
-  for (i=1; i<this->npts; i++){
-
+  for (i=1; i<this->Npts; i++)
+    {
     if (hullPts[i*2 + 1] != hullPts[1]) break;
 
-    if (hullPts[i*2] > hullPts[firstId*2]){
+    if (hullPts[i*2] > hullPts[firstId*2])
+      {
        firstId = i;
+      }
     }
-  }
 
   firstPt[0] = hullPts[firstId * 2];     // lowest, rightmost
   firstPt[1] = hullPts[firstId * 2 + 1];
 
-  if (firstId != 0){
+  if (firstId != 0)
+    {
     hullPts[2*firstId]     = hullPts[0];
     hullPts[2*firstId + 1] = hullPts[1];
     hullPts[0] = firstPt[0];
     hullPts[1] = firstPt[1];
-  }
+    }
   // If there are duplicates of the first point in the
   // projection, the ccw sort will fail.
 
   int dups = 0;
 
-  for (j=1, i=1; j < this->npts; j++){
-
+  for (j=1, i=1; j < this->Npts; j++)
+    {
     if ( !dups && (hullPts[j*2+1] != hullPts[1])) break;
   
-    if ( (hullPts[j*2+1] != hullPts[1]) || (hullPts[j*2] != hullPts[0])){
-
-      if (j > i){
+    if ( (hullPts[j*2+1] != hullPts[1]) || (hullPts[j*2] != hullPts[0]))
+      {
+      if (j > i)
+        {
         hullPts[i*2]   = hullPts[j*2];
         hullPts[i*2+1] = hullPts[j*2+1];
-      }
+        }
       i++;
-
-    }
-    else{
+      }
+    else
+      {
       dups++;
+      }
     }
-  }
-  int nHullPts = this->npts - dups;
+  int nHullPts = this->Npts - dups;
   
 
   // Sort in counter clockwise order the other points by the angle
@@ -291,8 +334,8 @@ int i,j;
 
   int top = 1;
 
-  for (i=2; i<nHullPts; i++){
-
+  for (i=2; i<nHullPts; i++)
+    {
     int newpos = positionInHull(hullPts, hullPts + top*2,
                                    hullPts + i*2);
 
@@ -300,7 +343,7 @@ int i,j;
       hullPts[newpos*2+ 1] = hullPts[i*2+ 1];
     
     top = newpos;
-  }
+    }
   nHullPts = top + 1;
 
   // hull bounding box
@@ -310,13 +353,14 @@ int i,j;
   double y0 = hullPts[1];
   double y1 = hullPts[1];
 
-  for (i=1; i<nHullPts; i++){
+  for (i=1; i<nHullPts; i++)
+    {
     if (hullPts[2*i] < x0) x0 = hullPts[2*i];
     else if (hullPts[2*i] > x1) x1 = hullPts[2*i];
 
     if (hullPts[2*i+1] < y0) y0 = hullPts[2*i+1];
     else if (hullPts[2*i+1] > y1) y1 = hullPts[2*i+1];
-  }
+    }
   this->hullBBox[dir][xmin] = (float)x0;
   this->hullBBox[dir][xmax] = (float)x1;
   this->hullBBox[dir][ymin] = (float)y0;
@@ -348,54 +392,56 @@ int vtkPointsProjectedHull::removeExtras(double *pts, int n)
 
     prev = 0;
 
-    for (i=1; i<n; i++){
-
+    for (i=1; i<n; i++)
+      {
         skipMe = 0;
 
         // case: point is equal to previous point
 
         if ((pts[i*2] == pts[prev*2]) &&
-            (pts[i*2+ 1] == pts[prev*2+ 1])){
-        
+            (pts[i*2+ 1] == pts[prev*2+ 1]))
+          {
             skipMe = 1;
-        }
+          }
 
         // case: point is at same angle as previous point - 
         //   discard the point that is closest to first point
     
-        else if (prev >= 1){
-
-            where = ISLEFT(pts, 
+        else if (prev >= 1)
+          {
+            where = VTK_ISLEFT(pts, 
                            pts + prev*2,
                            pts + i*2);
 
 
-            if (where == 0){  // on same ray from first point
-
+            if (where == 0)  // on same ray from first point
+              {
                 double d1 = distance(pts, pts + prev*2);
                 double d2 = distance(pts, pts + i*2);
     
-                if (d2 > d1){  // save only the most distant
-        
-                    for (coord=0; coord<2; coord++){
-        
+                if (d2 > d1)  // save only the most distant
+                  {
+                    for (coord=0; coord<2; coord++)
+                      {
                          pts[prev*2+ coord] = pts[i*2+ coord];
-                    } 
-                }
+                      } 
+                  }
                 skipMe = 1;
-            }
-        }
+              }
+          }
 
-        if (!skipMe){
+        if (!skipMe)
+          {
             prev++;
-
-            if (prev < i){
-                for (coord=0; coord<2; coord++){
+            if (prev < i)
+              {
+                for (coord=0; coord<2; coord++)
+                  {
                      pts[prev*2+ coord] = pts[i*2+ coord];
-                }
-            }
-        }
-    }
+                  }
+              }
+          }
+      }
 
     return prev+1;   // size of new list
 }
@@ -412,9 +458,9 @@ double where;
     // could now be inside the convex hull if the new vertex is to
     // the right of the line formed by the previous two vertices.
     
-    while (p2 > base){     
-
-        where = ISLEFT(p1, p2, pt);
+    while (p2 > base)
+      {     
+        where = VTK_ISLEFT(p1, p2, pt);
 
         // If vertex is to left of line, don't remove previous points
 
@@ -426,7 +472,7 @@ double where;
 
         p2 -= 2;   // pop top of stack
         p1 -= 2;
-    }
+      }
 
     // return the position in the list where the new vertex goes
 
@@ -436,20 +482,22 @@ void vtkPointsProjectedHull::getPoints()
 {
   int i;
 
-  if (this->pts){
-     delete [] this->pts;
-  }
-  this->npts = this->Data->GetNumberOfTuples();
+  if (this->Pts)
+    {
+     delete [] this->Pts;
+    }
+  this->Npts = this->Data->GetNumberOfTuples();
 
-  this->pts = new double [this->npts*3];
+  this->Pts = new double [this->Npts*3];
 
-  for (i=0; i<this->npts; i++){
-    this->pts[i*3]     = this->Data->GetComponent(i, 0);
-    this->pts[i*3 + 1] = this->Data->GetComponent(i, 1);
-    this->pts[i*3 + 2] = this->Data->GetComponent(i, 2);
-  }
+  for (i=0; i<this->Npts; i++)
+    {
+    this->Pts[i*3]     = this->Data->GetComponent(i, 0);
+    this->Pts[i*3 + 1] = this->Data->GetComponent(i, 1);
+    this->Pts[i*3 + 2] = this->Data->GetComponent(i, 2);
+    }
 
-  this->ptsTime.Modified();
+  this->PtsTime.Modified();
 }
 int vtkPointsProjectedHull::
 rectangleBoundingBoxIntersection(double hmin, double hmax, 
@@ -460,10 +508,10 @@ rectangleBoundingBoxIntersection(double hmin, double hmax,
   if ((hmin >= r2Bounds[xmax]) ||
       (hmax <= r2Bounds[xmin]) ||
       (vmin >= r2Bounds[ymax]) ||
-      (vmax <= r2Bounds[ymin])){
-        
+      (vmax <= r2Bounds[ymin]))
+    {
     return 0;     
-  }
+    }
     
   return 1;
 }
@@ -473,37 +521,33 @@ rectangleBoundingBoxIntersection(double hmin, double hmax,
 
 int vtkPointsProjectedHull::
 outsideHorizontalLine(double vmin, double vmax, 
-                      double *p0, double *p1, double *insidePt)
+                      double *p0, double *, double *insidePt)
 {
-    if (insidePt[1] > p0[1]){
-
+    if (insidePt[1] > p0[1])
+      {
         if (vmax <= p0[1]) return 1;
         else              return 0;
-
-    }
-    else{
-
+      }
+    else
+      {
         if (vmin >= p0[1]) return 1;
         else              return 0;
-
-    }
+      }
 }
 int vtkPointsProjectedHull::
 outsideVerticalLine(double hmin, double hmax,
-                      double *p0, double *p1, double *insidePt)
+                      double *p0, double *, double *insidePt)
 {
-    if (insidePt[0] > p0[0]){
-
+    if (insidePt[0] > p0[0])
+      {
         if (hmax <= p0[0]) return 1;
         else              return 0;
-
-    }
-    else{
-        
+      }
+    else
+      {
         if (hmin >= p0[0]) return 1;
         else              return 0;
-    
-    }
+      }
 }
 int vtkPointsProjectedHull::
 outsideLine(double hmin, double hmax, double vmin, double vmax,
@@ -520,7 +564,7 @@ outsideLine(double hmin, double hmax, double vmin, double vmax,
   // Are any of the points of the rectangle in the same half-plane as the
   //    inside point?
     
-  double ip = ISLEFT(p0, p1, insidePt);
+  double ip = VTK_ISLEFT(p0, p1, insidePt);
   double rp;
 
   double pts[4][2];
@@ -530,16 +574,16 @@ outsideLine(double hmin, double hmax, double vmin, double vmax,
   pts[2][0] = hmax; pts[2][1] = vmax;
   pts[3][0] = hmax; pts[3][1] = vmin;
         
-  for (i=0; i < 4; i++){
-
-     rp = ISLEFT(p0, p1, pts[i]);
+  for (i=0; i < 4; i++)
+    {
+     rp = VTK_ISLEFT(p0, p1, pts[i]);
         
      if (  ((rp < 0) && (ip < 0)) ||
-           ((rp > 0) && (ip > 0))    ){
-
+           ((rp > 0) && (ip > 0))    )
+       {
           return 0;
-     } 
-  }
+       } 
+    }
 
   return 1;
 }
@@ -548,9 +592,14 @@ int vtkPointsProjectedHull::rectangleOutside(double hmin, double hmax,
 {
   int i;
 
-  // a representative point inside the polygon
-
   int npts = this->hullSize[dir];
+
+  if (npts == 2)
+    {
+    return this->rectangleOutside1DPolygon(hmin, hmax, vmin, vmax, dir);
+    }
+
+  // a representative point inside the polygon
 
   double *insidePt = new double[2];
 
@@ -560,29 +609,79 @@ int vtkPointsProjectedHull::rectangleOutside(double hmin, double hmax,
   insidePt[0] += this->ccwHull[dir][4];
   insidePt[1] += this->ccwHull[dir][5];
 
-  insidePt[0] /= 2;
-  insidePt[1] /= 2;
-         
+  if (npts == 3)
+    {
+    insidePt[0] += this->ccwHull[dir][2];
+    insidePt[1] += this->ccwHull[dir][3];
+
+    insidePt[0] /= 3;
+    insidePt[1] /= 3;
+    }
+  else
+    {
+    insidePt[0] /= 2;
+    insidePt[1] /= 2;
+    }
+
   // For each infinite line given by the line segments of the
   // polygon, determine if rectangle is entirely outside that line.
   // If so, it must be outside the polygon.
 
-  for (i=0; i < npts-1; i++){
-
+  for (i=0; i < npts-1; i++)
+    {
     if (outsideLine(hmin,hmax,vmin,vmax, 
                   this->ccwHull[dir] + 2*i,
                   this->ccwHull[dir] + 2*i + 2,
-                  insidePt)){
-
+                  insidePt))
+      {
       return 1;
+      }
     }
-  }
 
   delete [] insidePt;
 
   return 0; 
 }
+int vtkPointsProjectedHull::rectangleOutside1DPolygon(double hmin, double hmax,
+                                  double vmin, double vmax, int dir)
+{
+  int i;
 
+  double *p0 = this->ccwHull[dir];
+  double *p1 = this->ccwHull[dir] + 2;
+
+  double pts[4][2];
+
+  pts[0][0] = hmin; pts[0][1] = vmin;
+  pts[1][0] = hmin; pts[1][1] = vmax;
+  pts[2][0] = hmax; pts[2][1] = vmax;
+  pts[3][0] = hmax; pts[3][1] = vmin;
+
+  double side;
+  double reference=0.0;
+
+  for (i=0; i<4; i++)
+    {
+    side = VTK_ISLEFT(p0, p1,pts[i]);
+
+    if (reference != 0.0)
+      {
+      if (side != reference)
+        {
+        return 0;   // two points are on opposite sides of the line
+        }
+      }
+    else if (side != 0.0)
+      {
+      reference = side;
+      }
+    }
+
+  // all four vertices are either on the line or on the same side
+  // of the line
+
+  return 1; 
+}
 
 // The sort functions
 
@@ -607,7 +706,7 @@ double val;
 
     // sort in counter clockwise order from first point 
 
-    val = ISLEFT(firstPt, a, b);
+    val = VTK_ISLEFT(firstPt, a, b);
 
     if (val < 0)       return 1;   // b is right of line firstPt->a
     else if (val == 0) return 0;   // b is on line firstPt->a
@@ -617,22 +716,28 @@ void vtkPointsProjectedHull::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
 
-  os << indent << "pts: " << this->pts << endl;
-  os << indent << "npts: " << this->npts << endl;
-  os << indent << "ptsTime: " << this->ptsTime << endl;
+  os << indent << "Pts: " << this->Pts << endl;
+  os << indent << "Npts: " << this->Npts << endl;
+  os << indent << "PtsTime: " << this->PtsTime << endl;
 
   os << indent << "ccwHull X: " << this->ccwHull[0] << endl;
-  os << indent << "hullBBox X: " << this->hullBBox[0] << endl;
+  os << indent << "hullBBox X: [" ;
+        os << this->hullBBox[0][0] << ", " <<  this->hullBBox[0][1] << "] [";
+        os << this->hullBBox[0][2] << ", " <<  this->hullBBox[0][3] << "] ";
   os << indent << "hullSize X: " << this->hullSize[0] << endl;
   os << indent << "hullTime X: " << this->hullTime[0] << endl;
 
   os << indent << "ccwHull Y: " << this->ccwHull[1] << endl;
-  os << indent << "hullBBox Y: " << this->hullBBox[1] << endl;
+  os << indent << "hullBBox Y: [" ;
+        os << this->hullBBox[1][0] << ", " <<  this->hullBBox[1][1] << "] [";
+        os << this->hullBBox[1][2] << ", " <<  this->hullBBox[1][3] << "] ";
   os << indent << "hullSize Y: " << this->hullSize[1] << endl;
   os << indent << "hullTime Y: " << this->hullTime[1] << endl;
 
   os << indent << "ccwHull Z: " << this->ccwHull[2] << endl;
-  os << indent << "hullBBox Z: " << this->hullBBox[2] << endl;
+  os << indent << "hullBBox Z: [" ;
+        os << this->hullBBox[2][0] << ", " <<  this->hullBBox[2][1] << "] [";
+        os << this->hullBBox[2][2] << ", " <<  this->hullBBox[2][3] << "] ";
   os << indent << "hullSize Z: " << this->hullSize[2] << endl;
   os << indent << "hullTime Z: " << this->hullTime[2] << endl;
 }
