@@ -221,7 +221,7 @@ static unsigned char image_prev[] =
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.635");
+vtkCxxRevisionMacro(vtkPVWindow, "1.636");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -1012,7 +1012,6 @@ void vtkPVWindow::InitializeToolbars(vtkKWApplication *app)
   this->AddToolbar(this->Toolbar, VTK_PV_TOOLBARS_TOOLS_LABEL);
   this->AddToolbar(this->AnimationToolbar, VTK_PV_TOOLBARS_ANIMATION_LABEL);
   this->AddToolbar(this->PickCenterToolbar, VTK_PV_TOOLBARS_CAMERA_LABEL);
-  this->HideToolbar(this->AnimationToolbar, VTK_PV_TOOLBARS_ANIMATION_LABEL);
 
   this->InteractorToolbar->SetParent(this->Toolbars->GetToolbarsFrame());
   this->InteractorToolbar->Create(app);
