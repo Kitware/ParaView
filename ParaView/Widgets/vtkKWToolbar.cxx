@@ -44,6 +44,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkObjectFactory.h"
 #include "vtkVector.txx"
 #include "vtkVectorIterator.txx"
+#include "vtkKWRadioButton.h"
 
 #ifndef VTK_NO_EXPLICIT_TEMPLATE_INSTANTIATION
 
@@ -82,7 +83,7 @@ void vtkKWToolbar::SetGlobalWidgetsFlatAspect(int val)
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWToolbar );
-vtkCxxRevisionMacro(vtkKWToolbar, "1.23");
+vtkCxxRevisionMacro(vtkKWToolbar, "1.24");
 
 
 int vtkKWToolbarCommand(ClientData cd, Tcl_Interp *interp,
@@ -106,6 +107,11 @@ vtkKWToolbar::vtkKWToolbar()
   this->WidgetsFlatAspect = vtkKWToolbar::GetGlobalWidgetsFlatAspect();
 
   this->Resizable = 0;
+
+  // This widget is used to keep track of default options
+
+  this->DefaultOptionsWidget = vtkKWRadioButton::New();
+  this->DefaultOptionsWidget->SetParent(this);
 }
 
 //----------------------------------------------------------------------------
@@ -118,6 +124,8 @@ vtkKWToolbar::~vtkKWToolbar()
   this->Separator = 0;
 
   this->Widgets->Delete();
+
+  this->DefaultOptionsWidget->Delete();
 }
 
 //----------------------------------------------------------------------------
@@ -209,6 +217,11 @@ void vtkKWToolbar::Create(vtkKWApplication *app)
   this->Separator->Create(app, "frame", "-bd 2 -relief raised");
 
   this->Update();
+
+  // Create the default options repository (never packed, just a way
+  // to keep track of default options)
+
+  this->DefaultOptionsWidget->Create(app, "");
 }
 
 //----------------------------------------------------------------------------
@@ -265,9 +278,9 @@ void vtkKWToolbar::UpdateWidgetsAspect()
       else
         {
         // Can not use -relief, try to hack -bd by specifying
-        // an empty border using the negative current value (i.e.
-        // the negative value will be handled as 0, but still enable
-        // us to retrieve the old value using abs().
+        // an empty border as the negative current value (i.e.
+        // the negative value will be handled as 0, but still will enable
+        // us to retrieve the old value using abs() later on).
         if (widget->HasConfigurationOption("-bd"))
           {
           this->Script("%s cget -bd", widget->GetWidgetName());
@@ -286,8 +299,14 @@ void vtkKWToolbar::UpdateWidgetsAspect()
           }
         else
           {
+#if 1
+          s << widget->GetWidgetName() << " config -selectcolor [" 
+            << this->DefaultOptionsWidget->GetWidgetName() 
+            << " cget -selectcolor]" << endl; 
+#else
           s << widget->GetWidgetName() << " config -selectcolor [lindex [" 
             << widget->GetWidgetName() << " config -selectcolor] 3]" << endl;
+#endif
           }
         }
       // Do not use active background in flat mode either
@@ -300,8 +319,14 @@ void vtkKWToolbar::UpdateWidgetsAspect()
           }
         else
           {
+#if 1
+          s << widget->GetWidgetName() << " config -activebackground [" 
+            << this->DefaultOptionsWidget->GetWidgetName() 
+            << " cget -activebackground]" << endl; 
+#else
           s << widget->GetWidgetName() << " config -activebackground [lindex [" 
             << widget->GetWidgetName() << " config -activebackground] 3]" << endl;
+#endif
           }
         }
       }

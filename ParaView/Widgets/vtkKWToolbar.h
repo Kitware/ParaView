@@ -49,7 +49,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __vtkKWToolbar_h
 
 #include "vtkKWWidget.h"
+
 class vtkKWApplication;
+class vtkKWRadioButton;
 
 //BTX
 template <class value>
@@ -142,8 +144,8 @@ protected:
   // Height stuf is not working (ask ken)
   int Expanding;
 
-  vtkKWWidget* Frame;
-  vtkKWWidget* Separator;
+  vtkKWWidget *Frame;
+  vtkKWWidget *Separator;
 
   void ConstrainWidgetsLayout();
   void UpdateWidgetsLayout();
@@ -156,6 +158,8 @@ protected:
   int FlatAspect;
   int WidgetsFlatAspect;
   int Resizable;
+
+  vtkKWRadioButton *DefaultOptionsWidget;
 
 private:
   vtkKWToolbar(const vtkKWToolbar&); // Not implemented
