@@ -67,8 +67,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define VTK_KW_HIDE_PROPERTIES_LABEL "Hide Left Panel" 
 #define VTK_KW_SHOW_PROPERTIES_LABEL "Show Left Panel"
 #define VTK_KW_EXIT_DIALOG_NAME "ExitApplication"
+#define VTK_KW_SAVE_WINDOW_GEOMETRY_REG_KEY "SaveWindowGeometry"
+#define VTK_KW_WINDOW_GEOMETRY_REG_KEY "WindowGeometry"
 
-vtkCxxRevisionMacro(vtkKWWindow, "1.122");
+vtkCxxRevisionMacro(vtkKWWindow, "1.122.2.1");
 vtkCxxSetObjectMacro(vtkKWWindow, PropertiesParent, vtkKWWidget);
 
 class vtkKWWindowMenuEntry
@@ -298,6 +300,7 @@ vtkKWWindow::vtkKWWindow()
 
   this->DialogSettingsFrame = 0;
   this->DialogSettingsConfirmExitCheck = 0;
+  this->DialogSettingsSaveWindowGeometry = 0;
   this->DialogSettingsShowSplashScreenCheck = 0;
 }
 
@@ -384,6 +387,10 @@ vtkKWWindow::~vtkKWWindow()
   if (this->DialogSettingsConfirmExitCheck)
     {
     this->DialogSettingsConfirmExitCheck->Delete();
+    }
+  if (this->DialogSettingsSaveWindowGeometry)
+    {
+    this->DialogSettingsSaveWindowGeometry->Delete();
     }
   if (this->DialogSettingsShowSplashScreenCheck)
     {
@@ -489,6 +496,20 @@ void vtkKWWindow::Close()
   
 void vtkKWWindow::CloseNoPrompt()
 {
+  // If it's the last win, save its geometry
+
+  if (this->Application->GetWindows()->GetNumberOfItems() <= 1 &&
+      this->Application->HasRegisteryValue(
+        2, "RunTime", VTK_KW_SAVE_WINDOW_GEOMETRY_REG_KEY) &&
+      this->Application->GetIntRegisteryValue(
+        2, "RunTime", VTK_KW_SAVE_WINDOW_GEOMETRY_REG_KEY))
+    {
+    this->Script("wm geometry %s", this->GetWidgetName());
+    this->Application->SetRegisteryValue(
+      2, "RunTime", VTK_KW_WINDOW_GEOMETRY_REG_KEY, "%s", 
+      this->Application->GetMainInterp()->result);
+    }
+
   vtkKWView *v;
 
   // Give each view a chance to close
@@ -619,6 +640,23 @@ void vtkKWWindow::Create(vtkKWApplication *app, char *args)
                app->GetApplicationName());
   this->Script("wm protocol %s WM_DELETE_WINDOW {%s Close}",
                wname, this->GetTclName());
+
+  // Restore window geometry
+
+  if (this->Application->HasRegisteryValue(
+    2, "RunTime", VTK_KW_SAVE_WINDOW_GEOMETRY_REG_KEY) &&
+      this->Application->GetIntRegisteryValue(
+        2, "RunTime", VTK_KW_SAVE_WINDOW_GEOMETRY_REG_KEY) &&
+      this->Application->HasRegisteryValue(
+        2, "RunTime", VTK_KW_WINDOW_GEOMETRY_REG_KEY))
+    {
+    char geometry[40];
+    if (this->Application->GetRegisteryValue(
+      2, "RunTime", VTK_KW_WINDOW_GEOMETRY_REG_KEY, geometry))
+      {
+      this->Script("wm geometry %s %s", wname, geometry);
+      }
+    }
 
   this->StatusFrame->Create(app,"frame","");
 
@@ -816,7 +854,7 @@ void vtkKWWindow::CreatePreferencesProperties()
     this->Notebook->GetFrame(VTK_KW_PREFERENCES_PAGE_LABEL));
   this->DialogSettingsFrame->ShowHideFrameOn();
   this->DialogSettingsFrame->Create(this->Application);
-  this->DialogSettingsFrame->SetLabel("Dialog Settings");
+  this->DialogSettingsFrame->SetLabel("Interface Settings");
   
   // Confirm on exit ?
 
@@ -836,10 +874,42 @@ void vtkKWWindow::CreatePreferencesProperties()
   this->DialogSettingsConfirmExitCheck->SetBalloonHelpString(
     "A confirmation dialog will be presented to the user on exit.");
 
-  // Pack inside the frame
-
   this->Script("pack %s -side top -anchor w -expand no -fill none",
                this->DialogSettingsConfirmExitCheck->GetWidgetName());
+
+  // Save application geometry on exit ?
+
+  if (!this->DialogSettingsSaveWindowGeometry)
+    {
+    this->DialogSettingsSaveWindowGeometry = vtkKWCheckButton::New();
+    }
+
+  this->DialogSettingsSaveWindowGeometry->SetParent(
+    this->DialogSettingsFrame->GetFrame());
+  this->DialogSettingsSaveWindowGeometry->Create(
+    this->Application, "-text {Save window geometry on exit}");
+  
+  if (this->Application->HasRegisteryValue(
+    2, "RunTime", VTK_KW_SAVE_WINDOW_GEOMETRY_REG_KEY))
+    {
+    this->DialogSettingsSaveWindowGeometry->SetState(
+      this->Application->GetIntRegisteryValue(
+        2, "RunTime", VTK_KW_SAVE_WINDOW_GEOMETRY_REG_KEY));
+    }
+  else
+    {
+    this->Application->SetRegisteryValue(
+      2, "RunTime", VTK_KW_SAVE_WINDOW_GEOMETRY_REG_KEY, "%d", 1);
+    this->DialogSettingsSaveWindowGeometry->SetState(1);
+    }
+  
+  this->DialogSettingsSaveWindowGeometry->SetCommand(
+    this, "OnDialogSettingsChange");
+  this->DialogSettingsSaveWindowGeometry->SetBalloonHelpString(
+    "Save the window geometry on exit and restore it on startup.");
+
+  this->Script("pack %s -side top -anchor w -expand no -fill none",
+               this->DialogSettingsSaveWindowGeometry->GetWidgetName());
 
   // Show splash screen ?
 
@@ -854,6 +924,7 @@ void vtkKWWindow::CreatePreferencesProperties()
       this->DialogSettingsFrame->GetFrame());
     this->DialogSettingsShowSplashScreenCheck->Create(
       this->Application, "-text {Show splash screen}");
+
     if (this->Application->HasRegisteryValue(
       2, "RunTime", VTK_KW_SPLASH_SCREEN_REG_KEY))
       {
@@ -866,10 +937,9 @@ void vtkKWWindow::CreatePreferencesProperties()
       this->DialogSettingsShowSplashScreenCheck->SetState(
         this->Application->GetShowSplashScreen());
       }
+
     this->DialogSettingsShowSplashScreenCheck->SetCommand(
       this, "OnDialogSettingsChange");
-
-    // Pack inside the frame
 
     this->Script("pack %s -side top -anchor w -expand no -fill none",
                  this->DialogSettingsShowSplashScreenCheck->GetWidgetName());
@@ -888,6 +958,13 @@ void vtkKWWindow::OnDialogSettingsChange()
    {
    this->Application->SetMessageDialogResponse(
      VTK_KW_EXIT_DIALOG_NAME, this->DialogSettingsConfirmExitCheck->GetState() ? 0 : 1);
+   }
+
+ if (this->DialogSettingsSaveWindowGeometry)
+   {
+   this->Application->SetRegisteryValue(
+     2, "RunTime", VTK_KW_SAVE_WINDOW_GEOMETRY_REG_KEY,
+     "%d", this->DialogSettingsSaveWindowGeometry->GetState());
    }
 
  if (this->Application->GetHasSplashScreen() && 
@@ -1154,7 +1231,7 @@ void vtkKWWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWWindow ";
-  this->ExtractRevision(os,"$Revision: 1.122 $");
+  this->ExtractRevision(os,"$Revision: 1.122.2.1 $");
 }
 
 int vtkKWWindow::ExitDialog()
