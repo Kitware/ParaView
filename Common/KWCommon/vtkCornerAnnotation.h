@@ -130,7 +130,7 @@ protected:
   int ShowSliceAndImage;
   
   // search for replacable tokens and replace
-  void ReplaceText(vtkImageActor *ia,  vtkImageMapToWindowLevelColors *wl);
+  void TextReplace(vtkImageActor *ia,  vtkImageMapToWindowLevelColors *wl);
 private:
   vtkCornerAnnotation(const vtkCornerAnnotation&);  // Not implemented.
   void operator=(const vtkCornerAnnotation&);  // Not implemented.

@@ -26,7 +26,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkCornerAnnotation);
-vtkCxxRevisionMacro(vtkCornerAnnotation, "1.3");
+vtkCxxRevisionMacro(vtkCornerAnnotation, "1.4");
 
 vtkSetObjectImplementationMacro(vtkCornerAnnotation,ImageActor,vtkImageActor);
 vtkSetObjectImplementationMacro(vtkCornerAnnotation,WindowLevel,
@@ -97,7 +97,7 @@ void vtkCornerAnnotation::ReleaseGraphicsResources(vtkWindow *win)
 }
 
 //----------------------------------------------------------------------------
-void vtkCornerAnnotation::ReplaceText(vtkImageActor *ia,
+void vtkCornerAnnotation::TextReplace(vtkImageActor *ia,
                                       vtkImageMapToWindowLevelColors *wl)
 {
   int i;
@@ -277,7 +277,7 @@ int vtkCornerAnnotation::RenderOpaqueGeometry(vtkViewport *viewport)
     vtkDebugMacro(<<"Rebuilding text");
     
     // Replace text
-    this->ReplaceText(ia, wl);
+    this->TextReplace(ia, wl);
     
     // Get the viewport size in display coordinates
     this->LastSize[0] = vSize[0];
