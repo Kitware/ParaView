@@ -48,13 +48,14 @@
 #include "vtkScalarBarWidget.h"
 #include "vtkPVProcessModule.h"
 #include "vtkPVRenderModule.h"
+#include "vtkKWRange.h"
 
 #include "vtkRMScalarBarWidget.h"
 #include "vtkKWEvent.h"
 #include "vtkMath.h"
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVColorMap);
-vtkCxxRevisionMacro(vtkPVColorMap, "1.101");
+vtkCxxRevisionMacro(vtkPVColorMap, "1.102");
 
 int vtkPVColorMapCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -142,23 +143,19 @@ vtkPVColorMap::vtkPVColorMap()
   this->PVRenderView = NULL;
   this->RMScalarBarObserver = NULL;
 
-  // Create a unique id for creating tcl names.
-  ++instanceCount;
-  this->InstanceCount = instanceCount;    
-
   // User interaface.
   this->ColorMapFrame = vtkKWLabeledFrame::New();
   this->ArrayNameLabel = vtkKWLabel::New();
+  // Stuff for setting the range of the color map.
+  this->ColorRangeFrame = vtkKWWidget::New();
+  this->ColorRangeLabel = vtkKWLabel::New();
+  this->ColorRangeWidget = vtkKWRange::New();
+  this->ColorRangeWidget->ClampRangeOff();
   this->NumberOfColorsScale = vtkKWScale::New();  
   this->ColorEditorFrame = vtkKWWidget::New();
   this->StartColorButton = vtkKWChangeColorButton::New();
   this->Map = vtkKWLabel::New();
   this->EndColorButton = vtkKWChangeColorButton::New();
-  // Stuff for setting the range of the color map.
-  this->ColorRangeFrame = vtkKWWidget::New();
-  this->ColorRangeResetButton = vtkKWPushButton::New();
-  this->ColorRangeMinEntry = vtkKWLabeledEntry::New();
-  this->ColorRangeMaxEntry = vtkKWLabeledEntry::New();
 
   this->VectorFrame = vtkKWLabeledFrame::New();
   this->VectorModeMenu = vtkKWOptionMenu::New() ;
@@ -218,6 +215,13 @@ vtkPVColorMap::~vtkPVColorMap()
   this->ColorMapFrame = NULL;
   this->ArrayNameLabel->Delete();
   this->ArrayNameLabel = NULL;
+  // Stuff for setting the range of the color map.
+  this->ColorRangeFrame->Delete();
+  this->ColorRangeFrame = NULL;
+  this->ColorRangeLabel->Delete();
+  this->ColorRangeLabel = NULL;
+  this->ColorRangeWidget->Delete();
+  this->ColorRangeWidget = NULL;
   this->NumberOfColorsScale->Delete();
   this->NumberOfColorsScale = NULL;
 
@@ -230,17 +234,6 @@ vtkPVColorMap::~vtkPVColorMap()
   this->EndColorButton->Delete();
   this->EndColorButton = NULL;
   
-  // Stuff for setting the range of the color map.
-  this->ColorRangeFrame->Delete();
-  this->ColorRangeFrame = NULL;
-  this->ColorRangeResetButton->Delete();
-  this->ColorRangeResetButton = NULL;
-  this->ColorRangeMinEntry->Delete();
-  this->ColorRangeMinEntry = NULL;
-  this->ColorRangeMaxEntry->Delete();      
-  this->ColorRangeMaxEntry = NULL;     
-
-
   this->ScalarBarFrame->Delete();
   this->ScalarBarFrame = NULL;
   this->ScalarBarCheck->Delete();
@@ -316,45 +309,30 @@ void vtkPVColorMap::Create(vtkKWApplication *app)
   this->ArrayNameLabel->SetLabel("Parameter: ");
 
   // Color map: range
-
   this->ColorRangeFrame->SetParent(this->ColorMapFrame->GetFrame());
   this->ColorRangeFrame->Create(app, "frame", "");
-
-  this->ColorRangeResetButton->SetParent(this->ColorRangeFrame);
-  this->ColorRangeResetButton->Create(app, 
-                                      "-text {Reset Range}");
-  this->ColorRangeResetButton->SetCommand(this, "ResetScalarRange");
-
-  this->ColorRangeMinEntry->SetParent(this->ColorRangeFrame);
-  this->ColorRangeMinEntry->Create(app);
-  this->ColorRangeMinEntry->SetLabel("Min:");
-  this->ColorRangeMinEntry->GetEntry()->SetWidth(10);
-  this->Script("bind %s <KeyPress-Return> {%s ColorRangeEntryCallback}",
-               this->ColorRangeMinEntry->GetEntry()->GetWidgetName(),
-               this->GetTclName());
-  this->Script("bind %s <FocusOut> {%s ColorRangeEntryCallback}",
-               this->ColorRangeMinEntry->GetEntry()->GetWidgetName(),
-               this->GetTclName()); 
-
-  this->ColorRangeMaxEntry->SetParent(this->ColorRangeFrame);
-  this->ColorRangeMaxEntry->Create(app);
-  this->ColorRangeMaxEntry->SetLabel("Max:");
-  this->ColorRangeMaxEntry->GetEntry()->SetWidth(
-    this->ColorRangeMinEntry->GetEntry()->GetWidth());
-  this->Script("bind %s <KeyPress-Return> {%s ColorRangeEntryCallback}",
-               this->ColorRangeMaxEntry->GetEntry()->GetWidgetName(),
-               this->GetTclName());
-  this->Script("bind %s <FocusOut> {%s ColorRangeEntryCallback}",
-               this->ColorRangeMaxEntry->GetEntry()->GetWidgetName(),
-               this->GetTclName());
-
+  this->ColorRangeLabel->SetParent(this->ColorRangeFrame);
+  this->ColorRangeLabel->SetLabel("Range:");
+  this->ColorRangeLabel->Create(app, "");
   this->Script("pack %s -side left -expand f",
-               this->ColorRangeResetButton->GetWidgetName());
+               this->ColorRangeLabel->GetWidgetName());
 
-  this->Script("pack %s %s -side left -expand t -fill x",
-               this->ColorRangeMinEntry->GetWidgetName(),
-               this->ColorRangeMaxEntry->GetWidgetName());
-
+  this->ColorRangeWidget->SetParent(this->ColorRangeFrame);
+  this->ColorRangeWidget->Create(app, "");
+  this->ColorRangeWidget->SetWholeRange(
+    -VTK_LARGE_FLOAT, VTK_LARGE_FLOAT);
+  this->ColorRangeWidget->ShowEntriesOn();
+  this->ColorRangeWidget->ShowLabelOff();
+  this->ColorRangeWidget->GetEntry1()->SetWidth(7);
+  this->ColorRangeWidget->GetEntry2()->SetWidth(7);
+  this->ColorRangeWidget->SetCommand(this, "ColorRangeWidgetCallback");
+  this->ColorRangeWidget->SetEntriesPosition(
+    vtkKWRange::POSITION_ALIGNED);
+  this->ColorRangeWidget->SetBalloonHelpString(
+    "Set the minimum and maximum of the values of the color map");
+  this->Script("pack %s -side left -fill x -expand t",
+               this->ColorRangeWidget->GetWidgetName());
+               
   // Color map: gradient editor
 
   this->ColorEditorFrame->SetParent(this->ColorMapFrame->GetFrame());
@@ -1186,6 +1164,82 @@ void vtkPVColorMap::ResetScalarRangeInternal()
     }
 }
 
+
+//----------------------------------------------------------------------------
+void vtkPVColorMap::ResetScalarRangeInternal(vtkPVSource* pvs)
+{
+  double range[2];
+  double tmp[2];
+
+  int component = this->RMScalarBarWidget->GetVectorComponent();
+  if (this->RMScalarBarWidget->GetVectorMode() == vtkRMScalarBarWidget::MAGNITUDE)
+    {
+    component = -1;
+    }
+
+  if (this->GetApplication() == NULL || this->PVRenderView == NULL)
+    {
+    vtkErrorMacro("Trying to reset scalar range without application and view.");
+    return;
+    }
+
+  range[0] = VTK_DOUBLE_MAX;
+  range[1] = -VTK_DOUBLE_MAX;
+
+  // For point data ...
+  vtkPVArrayInformation *ai;
+  ai = pvs->GetDataInformation()->GetPointDataInformation()->
+    GetArrayInformation(this->RMScalarBarWidget->GetArrayName());
+  if (ai)
+    {
+    ai->GetComponentRange(component, tmp);
+    if (tmp[0] < range[0])
+      {
+      range[0] = tmp[0];
+      }
+    if (tmp[1] > range[1])
+      {
+      range[1] = tmp[1];
+      }
+    }
+  // For cell data ...
+  ai = pvs->GetDataInformation()->GetCellDataInformation()->
+    GetArrayInformation(this->RMScalarBarWidget->GetArrayName());
+  if (ai)
+    {  
+    ai->GetComponentRange(component, tmp);
+    if (tmp[0] < range[0])
+      {
+      range[0] = tmp[0];
+      }
+    if (tmp[1] > range[1])
+      {
+      range[1] = tmp[1];
+      }
+    }
+
+  if (range[1] < range[0])
+    {
+    range[0] = 0.0;
+    range[1] = 1.0;
+    }
+  if (range[0] == range[1])
+    {
+    range[1] = range[0] + 0.001;
+    }
+
+  this->SetScalarRangeInternal(range[0], range[1]);
+
+  if ( this->GetPVRenderView() )
+    {
+    this->GetPVRenderView()->EventuallyRender();
+    }
+}
+
+
+
+
+
 //----------------------------------------------------------------------------
 vtkPVApplication* vtkPVColorMap::GetPVApplication()
 {
@@ -1337,73 +1391,24 @@ void vtkPVColorMap::SaveInBatchScript(ofstream *file)
   *file << "  $pvTemp" << lookupTableID << " Build"
         << endl;
   *file << endl;
-
-// TODO implement all this
-
-//    if (this->ScalarBarVisibility)
-//      {
-//      char scalarBarTclName[128];
-//      sprintf(scalarBarTclName, "ScalarBar%d", this->InstanceCount);
-//      ostrstream actor;
-
-//      //*file << "vtkScalarBarWidget " << scalarBarTclName << "\n";
-//      *file << "vtkScalarBarActor " << scalarBarTclName << "\n";
-//      actor << scalarBarTclName << ends;
-
-//      *file << "\t" << actor.str() << " SetLookupTable pvTemp" 
-//            << this->LookupTableID << "\n";
-
-//      *file << "\t" << actor.str() << " SetOrientation "
-//            << this->ScalarBar->GetScalarBarActor()->GetOrientation() << "\n";
-
-//      *file << "\t" << actor.str() << " SetWidth " 
-//            << this->ScalarBar->GetScalarBarActor()->GetWidth() << "\n";
-
-//      *file << "\t" << actor.str() << " SetHeight " 
-//            << this->ScalarBar->GetScalarBarActor()->GetHeight() << "\n";
-
-//      const double *pos = 
-//       this->ScalarBar->GetScalarBarActor()->GetPositionCoordinate()->GetValue();
-//      *file << "\t[" << actor.str() << " GetPositionCoordinate] SetValue " 
-//            << pos[0] << " " << pos[1] << "\n";
-
-//      *file << "\t" << actor.str() << " SetTitle {" 
-//            << this->ScalarBar->GetScalarBarActor()->GetTitle() << "}\n";
-
-//      *file << "\t" << actor.str() << " SetLabelFormat {" 
-//            << this->ScalarBar->GetScalarBarActor()->GetLabelFormat() << "}\n";
-
-//      ostrstream ttprop, tlprop;
-//      ttprop << "[" << actor.str() << " GetTitleTextProperty]" << ends;
-//      this->TitleTextPropertyWidget->SaveInTclScript(file, ttprop.str());
-//      ttprop.rdbuf()->freeze(0);
-
-//      tlprop << "[" << actor.str() << " GetLabelTextProperty]" << ends;
-//      this->LabelTextPropertyWidget->SaveInTclScript(file, tlprop.str());
-//      tlprop.rdbuf()->freeze(0);
-
-//      *file << "Ren1" << " AddActor " << scalarBarTclName << endl;
-
-//      actor.rdbuf()->freeze(0);
-//      }
 }
 
 
-//----------------------------------------------------------------------------
-void vtkPVColorMap::ColorRangeEntryCallback()
-{
-  double min, max;
 
-  min = this->ColorRangeMinEntry->GetEntry()->GetValueAsFloat();
-  max = this->ColorRangeMaxEntry->GetEntry()->GetValueAsFloat();
+//----------------------------------------------------------------------------
+void vtkPVColorMap::ColorRangeWidgetCallback()
+{
+  double range[2];
+
+  this->ColorRangeWidget->GetRange(range);
   
   // Avoid the bad range error
-  if (max <= min)
+  if (range[1] <= range[0])
     {
-    max = min + 0.00001;
+    range[1] = range[0] + 0.00001;
     }
 
-  this->SetScalarRange(min, max);
+  this->SetScalarRange(range[0], range[1]);
   if ( this->GetPVRenderView() )
     {
     this->GetPVRenderView()->EventuallyRender();
@@ -1641,13 +1646,8 @@ void vtkPVColorMap::ExecuteEvent(vtkObject* vtkNotUsed(wdg),
         this->RMScalarBarWidget->GetScalarBarTitle());
 
       double range[2];
-      char str[256];
       this->RMScalarBarWidget->GetScalarRange(range);
-      sprintf(str, "%g", range[0]);
-      this->ColorRangeMinEntry->GetEntry()->SetValue(str);
-      sprintf(str, "%g", range[1]);
-      this->ColorRangeMaxEntry->GetEntry()->SetValue(str);
-      
+      this->ColorRangeWidget->SetRange(range);      
       if (this->MapWidth > 0 && this->MapHeight > 0)
           {
           this->UpdateMap(this->MapWidth, this->MapHeight);
@@ -1766,6 +1766,91 @@ void vtkPVColorMap::SaveState(ofstream *file)
 }
 
 //----------------------------------------------------------------------------
+void vtkPVColorMap::Update()
+{
+  double range[2];
+  double tmp[2];
+  vtkPVSourceCollection *sourceList;
+  vtkPVSource *pvs;
+  int component = this->RMScalarBarWidget->GetVectorComponent();
+  if (this->RMScalarBarWidget->GetVectorMode() == vtkRMScalarBarWidget::MAGNITUDE)
+    {
+    component = -1;
+    }
+
+  if (this->GetApplication() == NULL || this->PVRenderView == NULL)
+    {
+    vtkErrorMacro("Trying to reset scalar range without application and view.");
+    return;
+    }
+
+  range[0] = VTK_DOUBLE_MAX;
+  range[1] = -VTK_DOUBLE_MAX;
+
+  // Compute global scalar range ...
+  sourceList = this->PVRenderView->GetPVWindow()->GetSourceList("Sources");
+  sourceList->InitTraversal();
+  while ( (pvs = sourceList->GetNextPVSource()) )
+    {
+    // For point data ...
+    vtkPVArrayInformation *ai;
+    ai = pvs->GetDataInformation()->GetPointDataInformation()->
+      GetArrayInformation(this->RMScalarBarWidget->GetArrayName());
+    if (ai)
+      {
+      ai->GetComponentRange(component, tmp);
+      if (tmp[0] < range[0])
+        {
+        range[0] = tmp[0];
+        }
+      if (tmp[1] > range[1])
+        {
+        range[1] = tmp[1];
+        }
+      }
+    // For cell data ...
+    ai = pvs->GetDataInformation()->GetCellDataInformation()->
+      GetArrayInformation(this->RMScalarBarWidget->GetArrayName());
+    if (ai)
+      {  
+      ai->GetComponentRange(component, tmp);
+      if (tmp[0] < range[0])
+        {
+        range[0] = tmp[0];
+        }
+      if (tmp[1] > range[1])
+        {
+        range[1] = tmp[1];
+        }
+      }
+    }
+
+  if (range[1] < range[0])
+    {
+    range[0] = 0.0;
+    range[1] = 1.0;
+    }
+  if (range[0] == range[1])
+    {
+    range[1] = range[0] + 0.001;
+    }
+
+  int fixme;  // Compute resolution ...
+
+  this->ColorRangeWidget->SetWholeRange(range[0], range[1]);
+
+  // Compute an appropriate resolution.
+  double x = range[1]-range[0];
+  x = log10(x);
+  // shift place value over 2 (100 divisions).
+  int place = (int)(x) - 2;
+  this->ColorRangeWidget->SetResolution(pow(10.0, (double)(place)));
+
+  this->RMScalarBarWidget->GetScalarRange(tmp);
+  this->ColorRangeWidget->SetRange(tmp[0], tmp[1]);
+}
+
+//----------------------------------------------------------------------------
 void vtkPVColorMap::UpdateEnableState()
 {
   this->Superclass::UpdateEnableState();
@@ -1793,9 +1878,7 @@ void vtkPVColorMap::UpdateEnableState()
   this->PropagateEnableState(this->LabelTextPropertyWidget);
   this->PropagateEnableState(this->PresetsMenuButton);
   this->PropagateEnableState(this->ColorRangeFrame);
-  this->PropagateEnableState(this->ColorRangeResetButton);
-  this->PropagateEnableState(this->ColorRangeMinEntry);
-  this->PropagateEnableState(this->ColorRangeMaxEntry);
+  this->PropagateEnableState(this->ColorRangeWidget);
   this->PropagateEnableState(this->BackButton);
 }
 

@@ -47,6 +47,8 @@ class vtkPVRenderView;
 class vtkScalarBarWidget;
 class vtkRMScalarBarWidgetObserver;
 class vtkRMScalarBarWidget;
+class vtkPVSource;
+class vtkKWRange;
 
 class VTK_EXPORT vtkPVColorMap : public vtkKWWidget
 {
@@ -116,6 +118,7 @@ public:
   // it will rescale to match changes in the global scalar range.
   void ResetScalarRange();
   void ResetScalarRangeInternal();
+  void ResetScalarRangeInternal(vtkPVSource* source);
   
   // Descriptions:
   // Adds and removes scalar bar from renderer.
@@ -154,7 +157,7 @@ public:
   // Description:
   // Callbacks.
   void ScalarBarCheckCallback();
-  void ColorRangeEntryCallback();
+  void ColorRangeWidgetCallback();
 
   // Description:
   // This method returns the user to the source page.
@@ -232,6 +235,12 @@ public:
   virtual void RenderView();
 
   // Description:
+  // Call this method before you show this GUI so that
+  // the widgets will reflect changes in the data.
+  // Right now it just sets the whole range of the color range widget.
+  virtual void Update();
+
+  // Description:
   // Update the "enable" state of the object and its internal parts.
   // Depending on different Ivars (this->Enabled, the application's 
   // Limited Edition Mode, etc.), the "enable" state of the object is updated
@@ -252,10 +261,6 @@ protected:
 
   vtkRMScalarBarWidget *RMScalarBarWidget;
     
-  // Here to create unique Tcl names.
-  int InstanceCount;
-
-
   vtkRMScalarBarWidgetObserver* RMScalarBarObserver;
 
   void UpdateVectorComponentMenu();
@@ -274,6 +279,10 @@ protected:
   // User interaface.
   vtkKWLabeledFrame* ColorMapFrame;
   vtkKWLabel*        ArrayNameLabel;
+  // Stuff for setting the range of the color map.
+  vtkKWWidget*       ColorRangeFrame;
+  vtkKWLabel*        ColorRangeLabel;
+  vtkKWRange*        ColorRangeWidget;
   vtkKWScale*        NumberOfColorsScale;
   // Stuff for selecting start and end colors.
   vtkKWWidget*            ColorEditorFrame;
@@ -305,14 +314,7 @@ protected:
   int MapHeight;
   void UpdateMap(int width, int height);
 
-  vtkKWMenuButton* PresetsMenuButton;
-
-  // Stuff for setting the range of the color map.
-  vtkKWWidget*       ColorRangeFrame;
-  vtkKWPushButton*   ColorRangeResetButton;
-  vtkKWLabeledEntry* ColorRangeMinEntry;
-  vtkKWLabeledEntry* ColorRangeMaxEntry;
-  
+  vtkKWMenuButton* PresetsMenuButton;  
   vtkKWPushButton*   BackButton;
 
   // For Saving into a tcl script.
