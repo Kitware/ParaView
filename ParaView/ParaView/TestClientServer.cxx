@@ -3,6 +3,7 @@
 #include <vtkstd/string>
 #ifndef _WIN32
 #include <unistd.h>
+#include <sys/wait.h>
 #endif
 
 void RunServer(void * p)
@@ -45,6 +46,17 @@ int main(int ac, char* av[])
   cout << "Running:" <<  path.c_str() << "\n";
   cout.flush();
   int ret = system(path.c_str());
+#ifndef _WIN32
+  // Translate unix result.
+  if(ret == -1 || !WIFEXITED(ret))
+    {
+    ret = 1;
+    }
+  else
+    {
+    ret = WEXITSTATUS(ret);
+    }
+#endif
   thread->TerminateThread(ret);
   thread->Delete();
   return ret;
