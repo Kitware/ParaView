@@ -54,7 +54,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVReaderModule);
-vtkCxxRevisionMacro(vtkPVReaderModule, "1.28");
+vtkCxxRevisionMacro(vtkPVReaderModule, "1.29");
 
 int vtkPVReaderModuleCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -228,8 +228,8 @@ int vtkPVReaderModule::ReadFileInformation(const char* fname)
     {
     this->FileEntry->SetValue(fname);
     vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
-    pm->RootScript("%s Set%s {%s}", this->GetVTKSourceTclName(), 
-                   this->FileEntry->GetVariableName(), fname);
+    pm->ServerScript("%s Set%s {%s}", this->GetVTKSourceTclName(), 
+                     this->FileEntry->GetVariableName(), fname);
     
     const char* ext = this->ExtractExtension(fname);
     if (ext)
