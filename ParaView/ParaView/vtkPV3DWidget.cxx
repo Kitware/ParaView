@@ -177,13 +177,16 @@ void vtkPV3DWidget::CopyProperties(vtkPVWidget* clone,
 //----------------------------------------------------------------------------
 void vtkPV3DWidget::Reset()
 {
-  vtkDataSet* data = this->PVSource->GetPVOutput()->GetVTKData();
-  if (this->Placed || data != this->Widget3D->GetInput())
-    {
-    this->Widget3D->SetInput(data);
-    this->Widget3D->PlaceWidget();
-    }
   this->ModifiedFlag = 0;
+  this->ValueChanged = 0;
+}
+
+//----------------------------------------------------------------------------
+void vtkPV3DWidget::Accept()
+{
+  this->PlaceWidget();
+  this->ModifiedFlag = 0;
+  this->ValueChanged = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -211,7 +214,6 @@ void vtkPV3DWidget::SetVisibility(int visibility)
 //----------------------------------------------------------------------------
 void vtkPV3DWidget::Select()
 {
-  cout << "Select called" << endl;
   if ( this->Visible )
     {
     this->SetVisibilityNoTrace(1);
@@ -221,7 +223,6 @@ void vtkPV3DWidget::Select()
 //----------------------------------------------------------------------------
 void vtkPV3DWidget::Deselect()
 {
-  cout << "Deselect called" << endl;
   this->SetVisibilityNoTrace(0);
 }
 
@@ -238,6 +239,17 @@ void vtkPV3DWidget::SetFrameLabel(const char* label)
     {
     this->LabeledFrame->SetLabel(label);
     } 
+}
+
+//----------------------------------------------------------------------------
+void vtkPV3DWidget::PlaceWidget()
+{
+  vtkDataSet* data = this->PVSource->GetPVInput()->GetVTKData();
+  if (this->Placed || data != this->Widget3D->GetInput())
+    {
+    this->Widget3D->SetInput(data);
+    this->Widget3D->PlaceWidget();
+    }
 }
 
 //----------------------------------------------------------------------------

@@ -70,7 +70,7 @@ public:
   // Called when accept button is pushed.  
   // Sets objects variable to the widgets value.
   // Adds a trace entry.  Side effect is to turn modified flag off.
-  virtual void Accept() = 0;
+  virtual void Accept();
   
   // Description:
   // Called when the reset button is pushed.
@@ -97,6 +97,10 @@ public:
   // This method is called when the source that contains this widget
   // is deselected. 
   virtual void Deselect();
+
+  // Description:
+  // This method sets the input to the 3D widget and places the widget.
+  virtual void PlaceWidget();
 
 protected:
   vtkPV3DWidget();
