@@ -149,7 +149,7 @@ void vtkPVRelayRemoteScript(void *localArg, void *remoteArg,
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVClientServerModule);
-vtkCxxRevisionMacro(vtkPVClientServerModule, "1.14");
+vtkCxxRevisionMacro(vtkPVClientServerModule, "1.15");
 
 int vtkPVClientServerModuleCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -217,8 +217,9 @@ void vtkPVClientServerModule::Initialize()
 
   if (this->ClientMode)
     {
-    this->SocketController = vtkSocketController::New();
-    this->SocketController->Initialize();
+    vtkSocketController* dummy = vtkSocketController::New();
+    dummy->Initialize();
+    dummy->Delete();
     vtkSocketCommunicator *comm = vtkSocketCommunicator::New();
 
     // Get the host name from the command line arguments
@@ -230,10 +231,11 @@ void vtkPVClientServerModule::Initialize()
       {
       vtkErrorMacro("Client error: Could not connect to the server.");
       comm->Delete();
-      delete[] hostname;
+      pvApp->Exit();
       this->ReturnValue = 1;
       return;
       }
+    this->SocketController = vtkSocketController::New();
     this->SocketController->SetCommunicator(comm);
     comm->Delete();
     //this->Controller->CreateOutputWindow();
@@ -376,8 +378,13 @@ void vtkPVClientServerModule::Exit()
     return;
     }
 
-  this->SocketController->TriggerRMI(1, 
-                              vtkMultiProcessController::BREAK_RMI_TAG);
+  // If we are being called because a connection was not established,
+  // we don't need to cleanup the connection.
+  if(this->SocketController)
+    {
+    this->SocketController->TriggerRMI(
+      1, vtkMultiProcessController::BREAK_RMI_TAG);
+    }
   // Break RMI for MPI controller is in Init method.
 }
 
