@@ -41,7 +41,7 @@ static void SatelliteEndParallelRender(vtkObject *caller,
                        unsigned long vtkNotUsed(event),
                        void *clientData, void *);
 
-vtkCxxRevisionMacro(vtkDesktopDeliveryServer, "1.13");
+vtkCxxRevisionMacro(vtkDesktopDeliveryServer, "1.14");
 vtkStandardNewMacro(vtkDesktopDeliveryServer);
 
 vtkDesktopDeliveryServer::vtkDesktopDeliveryServer()
@@ -102,8 +102,17 @@ void vtkDesktopDeliveryServer
     // Create a reference.
     this->ParallelRenderManager->Register(this);
 
-    // No need to write the image back on the render server.
-    this->ParallelRenderManager->WriteBackImagesOff();
+    if (this->RemoteDisplay)
+      {
+      // No need to write the image back on the render server.
+      this->ParallelRenderManager->WriteBackImagesOff();
+      }
+    else
+      {
+      // Presumably someone is viewing the remote screen, perhaps in a
+      // tile display.
+      this->ParallelRenderManager->WriteBackImagesOn();
+      }
 
     // Attach observers.
     vtkCallbackCommand *cbc;
@@ -192,6 +201,33 @@ void vtkDesktopDeliveryServer::SetRenderWindow(vtkRenderWindow *renWin)
       }
     }
 }
+
+void vtkDesktopDeliveryServer::SetRemoteDisplay(int flag)
+{
+  vtkDebugMacro(<< this->GetClassName() << " (" << this
+                << "): setting RemoteDisplay to " << flag);
+  if (this->RemoteDisplay != flag)
+    {
+    this->RemoteDisplay = flag;
+    this->Modified();
+
+    if (this->ParallelRenderManager)
+      {
+      if (this->RemoteDisplay)
+        {
+        // No need to write the image back on the render server.
+        this->ParallelRenderManager->WriteBackImagesOff();
+        }
+      else
+        {
+        // Presumably someone is viewing the remote screen, perhaps in a
+        // tile display.
+        this->ParallelRenderManager->WriteBackImagesOn();
+        }
+      }
+    }
+}
+
 
 void vtkDesktopDeliveryServer::ReceiveWindowInformation()
 {

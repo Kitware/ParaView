@@ -68,7 +68,7 @@ public:
   // resized based on the remote window settings.  If off, the images are
   // assumed to be displayed locally.  The render window maintains its
   // current size.
-  vtkSetMacro(RemoteDisplay, int);
+  virtual void SetRemoteDisplay(int);
   vtkGetMacro(RemoteDisplay, int);
   vtkBooleanMacro(RemoteDisplay, int);
 
