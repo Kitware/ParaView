@@ -55,7 +55,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkstd/string>
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVScale);
-vtkCxxRevisionMacro(vtkPVScale, "1.17.2.7");
+vtkCxxRevisionMacro(vtkPVScale, "1.17.2.8");
 
 //----------------------------------------------------------------------------
 vtkPVScale::vtkPVScale()
@@ -252,15 +252,7 @@ void vtkPVScale::AcceptInternal(vtkClientServerID sourceID)
       {
       scalar = this->GetValue();
       }
-    ostrstream str;
-    str << "Set" << this->VariableName << ends;
-    vtkPVProcessModule* pm = pvApp->GetProcessModule();
-    pm->GetStream() << vtkClientServerStream::Invoke <<  sourceID
-                    << str.str() << scalar
-                    << vtkClientServerStream::End;
-    pm->SendStreamToServer();
-    delete []str.str();
-    this->Property->SetScalars(1, &scalar);
+    this->UpdateVTKSourceInternal(sourceID, scalar);
     }
 
   this->ModifiedFlag = 0;
@@ -401,14 +393,7 @@ void vtkPVScale::AddAnimationScriptsToMenu(vtkKWMenu *menu,
 //----------------------------------------------------------------------------
 void vtkPVScale::SetObjectVariableToPVTime(int time)
 {
-  vtkPVApplication *pvApp = this->GetPVApplication();
-  vtkPVProcessModule* pm = pvApp->GetProcessModule();
-  pm->GetStream() << vtkClientServerStream::Invoke
-                  << (vtkstd::string("Set") +
-                      vtkstd::string(this->VariableName)).c_str()
-                  << time
-                  << vtkClientServerStream::End;
-  pm->SendStreamToClient();
+  this->UpdateVTKSourceInternal(this->ObjectID, time);
 }
   
 //----------------------------------------------------------------------------
@@ -461,4 +446,32 @@ vtkPVWidgetProperty* vtkPVScale::GetProperty()
 vtkPVWidgetProperty* vtkPVScale::CreateAppropriateProperty()
 {
   return vtkPVScalarListWidgetProperty::New();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVScale::UpdateVTKSourceInternal(vtkClientServerID sourceID,
+                                         float value)
+{
+  vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
+  vtkstd::string method = "Set";
+  vtkstd::string varname = this->VariableName;
+  vtkstd::string::size_type pos = varname.find(' ');
+  pm->GetStream() << vtkClientServerStream::Invoke << sourceID;
+  if(pos != varname.npos)
+    {
+    // Hack to pass a string argument as first parameter.  Needed
+    // for "SetRestrictionAsIndex timestep" in vtkPVDReaderModule.
+    method += varname.substr(0, pos);
+    pm->GetStream() << method.c_str() << varname.substr(pos+1).c_str();
+    }
+  else
+    {
+    method += varname;
+    pm->GetStream() << method.c_str();
+    }
+  pm->GetStream() << value << vtkClientServerStream::End;
+  cout << "Value = " << value << endl;
+  pm->GetStream().Print(cout);
+  pm->SendStreamToServer();
+  this->Property->SetScalars(1, &value);
 }

@@ -178,7 +178,9 @@ protected:
   int AcceptedValueInitialized;
 
   vtkPVScalarListWidgetProperty *Property;
-  
+
+  void UpdateVTKSourceInternal(vtkClientServerID sourceID,
+                               float value);
 //BTX
   virtual void CopyProperties(vtkPVWidget* clone, vtkPVSource* pvSource,
                               vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
