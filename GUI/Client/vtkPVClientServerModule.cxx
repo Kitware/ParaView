@@ -68,6 +68,7 @@
 
 #include "vtkClientServerStream.h"
 #include "vtkClientServerInterpreter.h"
+#include "vtkMPIMToNSocketConnectionPortInformation.h"
 
 int vtkStringListCommand(ClientData cd, Tcl_Interp *interp,
                          int argc, char *argv[]);
@@ -144,7 +145,7 @@ void vtkPVSendStreamToClientServerNodeRMI(void *localArg, void *remoteArg,
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVClientServerModule);
-vtkCxxRevisionMacro(vtkPVClientServerModule, "1.63");
+vtkCxxRevisionMacro(vtkPVClientServerModule, "1.64");
 
 int vtkPVClientServerModuleCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -171,7 +172,7 @@ vtkPVClientServerModule::vtkPVClientServerModule()
   this->RenderServerPort = 0;
   this->MultiProcessMode = vtkPVClientServerModule::SINGLE_PROCESS_MODE;
   this->NumberOfProcesses = 2;
-
+  this->GatherRenderServer = 0;
   this->RemoteExecution = vtkKWRemoteExecute::New();
 }
 
@@ -243,16 +244,25 @@ void vtkPVClientServerModule::Initialize()
     } 
 
   if (this->ClientMode)
-    {
+    { 
     // Receive as the hand shake the number of processes available.
     int numServerProcs = 0;
     this->SocketController->Receive(&numServerProcs, 1, 1, 8843);
     this->NumberOfServerProcesses = numServerProcs;
    
+    if(this->RenderServerMode)
+      { 
+      this->RenderServerSocket->Receive(&numServerProcs, 1, 1, 8843);
+      this->NumberOfRenderServerProcesses = numServerProcs;
+      }
+    // attempt to initialize render server connection to data server
+    this->InitializeRenderServer();
+      
+
     // Start the application (UI). 
     // For SGI pipe option.
     pvApp->SetNumberOfPipes(numServerProcs);
-    
+
 #ifdef PV_HAVE_TRAPS_FOR_SIGNALS
     pvApp->SetupTrapsForSignals(myId);   
 #endif // PV_HAVE_TRAPS_FOR_SIGNALS
@@ -303,7 +313,7 @@ void vtkPVClientServerModule::Initialize()
     // Process rmis until the application exits.
     this->Controller->ProcessRMIs();    
     // Now we are exiting.
-    }
+    }  
 }
 
 
@@ -587,6 +597,65 @@ void vtkPVClientServerModule::Connect()
 }
 
 
+void vtkPVClientServerModule::InitializeRenderServer()
+{
+  // if this is not client and using render server, then exit
+  if(!(this->ClientMode && this->RenderServerMode))
+    {
+    return;
+    }
+  // Create a vtkMPIMToNSocketConnection object on both the 
+  // data and render servers
+  vtkClientServerID id = this->NewStreamObject("vtkMPIMToNSocketConnection");
+  this->SendStreamToRenderServerAndServer();
+  
+  // now tell the render server to find out what ports it is going
+  // to use
+  this->GetStream() 
+    << vtkClientServerStream::Invoke << id << "SetupWaitForConnection"
+    << vtkClientServerStream::End;
+  this->SendStreamToRenderServer();
+  // find out how many processes are running on the render server
+  vtkMPIMToNSocketConnectionPortInformation* info = vtkMPIMToNSocketConnectionPortInformation::New();
+  this->GatherInformationRenderServer(info, id);
+  
+   // Set the number of connections on the server to be equal to
+   // the number of connections on the render server
+  this->GetStream() 
+    << vtkClientServerStream::Invoke << id 
+    << "SetNumberOfConnections" << info->GetNumberOfConnections()
+    << vtkClientServerStream::End;
+  this->SendStreamToServer();
+  
+  // Set up the port information for each process on the data server
+  // to match those found on the render server
+  for(int i=0; i < info->GetNumberOfConnections(); ++i)
+    {
+    this->GetStream() 
+      << vtkClientServerStream::Invoke << id 
+      << "SetPortInformation" 
+      << static_cast<unsigned int>(i)
+      << info->GetProcessPort(i)
+      << info->GetProcessHostName(i)
+      << vtkClientServerStream::End;
+    } 
+  this->SendStreamToServer();
+  
+  // now tell the render server to wait for the connection
+  this->GetStream() 
+    << vtkClientServerStream::Invoke << id << "WaitForConnection"
+    << vtkClientServerStream::End;
+  this->SendStreamToRenderServer();
+  
+  // now tell the data server to connect
+  this->GetStream() 
+    << vtkClientServerStream::Invoke << id << "Connect"
+    << vtkClientServerStream::End;
+  this->SendStreamToServer();
+
+  info->Print(cerr);
+  info->Delete();
+}
 
 //----------------------------------------------------------------------------
 // same as the MPI start.
@@ -611,7 +680,6 @@ int vtkPVClientServerModule::Start(int argc, char **argv)
   vtkMultiProcessController::SetGlobalController(this->Controller);
   vtkPVClientServerInit(this->Controller, (void*)this);
 #endif
-
 
   return this->ReturnValue;
 }
@@ -705,20 +773,50 @@ void vtkPVClientServerModule::GatherInformation(vtkPVInformation* info,
 }
 
 //----------------------------------------------------------------------------
+void vtkPVClientServerModule::GatherInformationRenderServer(vtkPVInformation* info,
+                                                            vtkClientServerID id)
+{
+  // Just a simple way of passing the information object to the next method.
+  this->TemporaryInformation = info;
+
+  // Gather on the server.
+  this->GetStream()
+    << vtkClientServerStream::Invoke
+    << this->GetApplicationID() << "GetProcessModule"
+    << vtkClientServerStream::End
+    << vtkClientServerStream::Invoke
+    << vtkClientServerStream::LastResult
+    << "GatherInformationInternal" << info->GetClassName() << id
+    << vtkClientServerStream::End;
+  this->SendStreamToRenderServer();
+  this->GatherRenderServer = 1;
+  // Gather on the client.
+  this->GatherInformationInternal(NULL, NULL);
+  this->GatherRenderServer = 0; 
+  this->TemporaryInformation = NULL;
+}
+
+//----------------------------------------------------------------------------
 // This method is broadcast to all processes.
 void
 vtkPVClientServerModule::GatherInformationInternal(const char* infoClassName,
                                                    vtkObject* object)
 {
   vtkClientServerStream css;
-
+  
   if(this->GetPVApplication()->GetClientMode())
     {
+    vtkSocketController* controller = this->SocketController;
+    if(this->GatherRenderServer)
+      {
+      controller = this->RenderServerSocket;
+      }
+    
     // Client just receives information from the server.
     int length;
-    this->SocketController->Receive(&length, 1, 1, 398798);
+    controller->Receive(&length, 1, 1, 398798);
     unsigned char* data = new unsigned char[length];
-    this->SocketController->Receive(data, length, 1, 398799);
+    controller->Receive(data, length, 1, 398799);
     css.SetData(data, length);
     this->TemporaryInformation->CopyFromStream(&css);
     delete [] data;
@@ -951,6 +1049,26 @@ void vtkPVClientServerModule::SendStreamToRenderServer()
   this->SendStreamToRenderServerInternal();
   this->ClientServerStream->Reset();
 }
+
+
+//----------------------------------------------------------------------------
+// This sends the current stream to the server
+void vtkPVClientServerModule::SendStreamToRenderServerClientAndServer()
+{ 
+  if(!this->ClientMode)
+    {
+    vtkErrorMacro("Attempt to call SendStreamToServer on server node.");
+    return;
+    }
+  if(this->RenderServerMode)
+    {
+    this->SendStreamToRenderServerInternal();
+    }
+  this->SendStreamToServerInternal(); 
+  this->SendStreamToClient();
+}
+
+
 //----------------------------------------------------------------------------
 // This sends the current stream to the server
 void vtkPVClientServerModule::SendStreamToRenderServerAndServerRoot()
@@ -964,6 +1082,35 @@ void vtkPVClientServerModule::SendStreamToRenderServerAndServerRoot()
   this->SendStreamToServerRootInternal();
   this->ClientServerStream->Reset();
 }
+
+
+//----------------------------------------------------------------------------
+// This sends the current stream to the server
+void vtkPVClientServerModule::SendStreamToClientAndRenderServer()
+{
+  if(!this->ClientMode)
+    {
+    vtkErrorMacro("Attempt to call SendStreamToServer on server node.");
+    return;
+    }
+  this->SendStreamToRenderServerInternal();
+  this->SendStreamToClient();
+}
+
+//----------------------------------------------------------------------------
+// This sends the current stream to the server
+void vtkPVClientServerModule::SendStreamToClientAndRenderServerRoot()
+{
+  if(!this->ClientMode)
+    {
+    vtkErrorMacro("Attempt to call SendStreamToServer on server node.");
+    return;
+    }
+  this->SendStreamToRenderServerRootInternal();
+  this->SendStreamToClient();
+}
+
+
 //----------------------------------------------------------------------------
 // This sends the current stream to the server
 void vtkPVClientServerModule::SendStreamToRenderServerAndServer()
@@ -1034,6 +1181,11 @@ void vtkPVClientServerModule::SendLastClientServerResult()
 //----------------------------------------------------------------------------
 void vtkPVClientServerModule::SendStreamToRenderServerInternal()
 {
+  if(!this->RenderServerMode)
+    {
+    this->SendStreamToServerInternal();
+    return;
+    }
   const unsigned char* data;
   size_t len;
   this->ClientServerStream->GetData(&data, &len);
@@ -1044,6 +1196,11 @@ void vtkPVClientServerModule::SendStreamToRenderServerInternal()
 //----------------------------------------------------------------------------
 void vtkPVClientServerModule::SendStreamToRenderServerRootInternal()
 {
+  if(!this->RenderServerMode)
+    {
+    this->SendStreamToServerRootInternal();
+    return;
+    }
   const unsigned char* data;
   size_t len;
   this->ClientServerStream->GetData(&data, &len);
