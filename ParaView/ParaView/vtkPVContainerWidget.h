@@ -74,7 +74,7 @@ public:
   // Description:
   // This method considers all contained widgets 
   // when computing the modified flag.
-  virtual GetModifiedFlag();  
+  virtual int GetModifiedFlag();  
 
   // Description:
   // Called when accept button is pushed.
