@@ -325,6 +325,7 @@ vtkKWWindow::~vtkKWWindow()
     }
 
   this->SetWindowClass(0);
+  this->SetScriptExtension(".tcl");
 }
 
 void vtkKWWindow::DisplayHelp()
@@ -613,7 +614,6 @@ void vtkKWWindow::Create(vtkKWApplication *app, char *args)
   this->MenuFile->SetTearOff(0);
   this->MenuFile->Create(app,"");
   this->Menu->AddCascade("File", this->MenuFile, 0);
-  this->MenuFile->AddCommand("Load Script", this, "LoadScript", 0);
 
   // add render quality setting
   this->PageMenu->SetTearOff(0);
@@ -904,8 +904,17 @@ void vtkKWWindow::AddRecentFile(char *key, char *name,vtkKWObject *target,
 
 int vtkKWWindow::GetFileMenuIndex()
 {
+  int clidx;
   // first find Close
-  int clidx = this->GetMenuFile()->GetIndex("Close");  
+  if ( this->GetMenuFile()->IsItemPresent("Close") )
+    {
+    clidx = this->GetMenuFile()->GetIndex("Close");  
+    }
+  else
+    {
+    // Close was removed, use Exit instead
+    clidx = this->GetMenuFile()->GetIndex("Exit");  
+    }
   if (this->NumberOfMRUFiles > 0)
     {
     return clidx - this->NumberOfMRUFiles - 2;
@@ -917,7 +926,7 @@ void vtkKWWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWWindow ";
-  this->ExtractRevision(os,"$Revision: 1.60 $");
+  this->ExtractRevision(os,"$Revision: 1.61 $");
 }
 
 int vtkKWWindow::ExitDialog()
