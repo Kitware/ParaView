@@ -1,0 +1,51 @@
+$Application ExitOnReturnOn
+
+set kw(vtkTemp4) [$Application GetMainWindow]
+set kw(vtkTemp18) [$kw(vtkTemp4) GetMainView]
+
+if {[info exists argc]} { 
+    set argcm1 [expr $argc - 1]
+    for {set i 0} {$i < $argcm1} {incr i} {
+        if {[lindex $argv $i] == "-D" && $i < $argcm1} {
+		set DataDir [lindex $argv [expr $i + 1]]
+        }
+        if {[lindex $argv $i] == "-UC" && $i < $argcm1} {
+            set rmui [$kw(vtkTemp18) GetRenderModuleUI]
+            catch {$rmui SetCompositeThreshold 0}
+        }
+    }
+} 
+
+
+set kw(vtkTemp897) [$kw(vtkTemp4) CreatePVSource MazeSource]
+set kw(vtkTemp903) [$kw(vtkTemp897) GetPVWidget {XSize}]
+$kw(vtkTemp903) SetValue 20
+set kw(vtkTemp906) [$kw(vtkTemp897) GetPVWidget {YSize}]
+$kw(vtkTemp906) SetValue 20
+set kw(vtkTemp909) [$kw(vtkTemp897) GetPVWidget {RunLength}]
+$kw(vtkTemp909) SetValue 20
+set kw(vtkTemp912) [$kw(vtkTemp897) GetPVWidget {MagnetFactor}]
+$kw(vtkTemp912) SetValue 4
+set kw(vtkTemp915) [$kw(vtkTemp897) GetPVWidget {RandomSeed}]
+$kw(vtkTemp915) SetValue 111
+set kw(vtkTemp918) [$kw(vtkTemp897) GetPVWidget {ShowSolution}]
+$kw(vtkTemp918) SetState 1
+$kw(vtkTemp4) SetCenterOfRotation 10.000000 10.000000 0.000000
+$kw(vtkTemp4) SetCenterOfRotation 10.000000 10.000000 0.000000
+$kw(vtkTemp897) AcceptCallback
+$kw(vtkTemp4) ToggleCenterActorCallback
+
+# Fix the size of the image.
+set RenWin1 [[[$Application GetMainWindow] GetMainView] GetRenderWindow]
+$RenWin1 SetSize 300 300
+$RenWin1 Render
+update
+
+for {set i  1} {$i < [expr $argc - 1]} {incr i} {
+    if {[lindex $argv $i] == "-C"} {
+	source [lindex $argv [expr $i + 1]]
+	$Application SetExitStatus [CompareImage [[$Application GetMainWindow] GetMainView]]
+    }
+}
+   
+$Application Exit
