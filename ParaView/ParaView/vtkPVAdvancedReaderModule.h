@@ -39,8 +39,21 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-// .NAME vtkPVAdvancedReaderModule - A class to handle the UI for vtkGlyph3D
+// .NAME vtkPVAdvancedReaderModule - Module representing an "advanced" reader
 // .SECTION Description
+// The class vtkPVAdvancedReaderModule is used to represent an "advanced"
+// reader (or a pipeline which contains a reader). An advanced reader is
+// one which allows the user to pre-select certain attributes (for example,
+// list of arrays to be loaded) before reading the whole file.  This is
+// done by reading some header information during UpdateInformation.  The
+// main difference between vtkPVAdvancedReaderModule and vtkPVReaderModule
+// is that the former does not automatically call Accept after the filename
+// is selected. Instead, it prompts the user for more selections. The file
+// is only fully loaded when the user presses Accept.
+//
+// .SECTION See also
+// vtkPVReadermodule vtkPVEnSightReaderModule
+
 
 
 #ifndef __vtkPVAdvancedReaderModule_h
@@ -55,6 +68,10 @@ public:
   vtkTypeMacro(vtkPVAdvancedReaderModule, vtkPVReaderModule);
     
   // Description:
+  // Tries to read a given file. Return VTK_OK on success, VTK_ERROR
+  // on failure. A new instance of a reader module (which contains the 
+  // actual VTK reader to be used) is returned. This should be called
+  // only on a prototype.
   virtual int ReadFile(const char* fname, vtkPVReaderModule*& prm);
 
 protected:
