@@ -43,7 +43,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkXMLDataParser.h"
 
 vtkStandardNewMacro(vtkXMLUtilities);
-vtkCxxRevisionMacro(vtkXMLUtilities, "1.5");
+vtkCxxRevisionMacro(vtkXMLUtilities, "1.6");
 
 #define  VTK_XML_UTILITIES_FACTORED_POOL_NAME "FactoredPool"
 #define  VTK_XML_UTILITIES_FACTORED_NAME      "Factored"
@@ -208,7 +208,8 @@ void vtkXMLUtilities::FlattenElement(vtkXMLDataElement *elem,
 
 //----------------------------------------------------------------------------
 void vtkXMLUtilities::WriteElement(vtkXMLDataElement *elem, 
-                                   const char *filename)
+                                   const char *filename,
+                                   vtkIndent *indent)
 {
   if (!filename)
     {
@@ -216,9 +217,7 @@ void vtkXMLUtilities::WriteElement(vtkXMLDataElement *elem,
     }
 
   ofstream os(filename, ios::out);
-  vtkIndent indent;
-
-  vtkXMLUtilities::FlattenElement(elem, os, &indent);
+  vtkXMLUtilities::FlattenElement(elem, os, indent);
 }
 
 //----------------------------------------------------------------------------
