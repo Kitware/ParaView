@@ -143,7 +143,7 @@ static unsigned char image_goto_end[] =
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterface);
-vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.61");
+vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.62");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterface,ControlledWidget, vtkPVWidget);
 
@@ -746,6 +746,7 @@ void vtkPVAnimationInterface::Create(vtkKWApplication *app, char *frameArgs)
   this->LoopCheckButton->Create(this->Application, "");
   this->LoopCheckButton->SetCommand(this, "LoopCheckButtonCallback");
   this->LoopCheckButton->SetState(this->Loop ? 1 : 0);
+  this->LoopCheckButton->SetIndicator(0);
   this->LoopCheckButton->SetBalloonHelpString(
     "Enable/Disable animation loop.");
 
