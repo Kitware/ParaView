@@ -1327,19 +1327,25 @@ void vtkPVSource::SaveInTclScript(ofstream *file)
     if (pvsInterface && strcmp(pvsInterface->GetSourceClassName(),
                                "vtkGenericEnSightReader") == 0)
       {
-      dataName = this->GetNthPVInput(0)->GetVTKDataTclName();
+      dataName = new char[strlen(this->GetNthPVInput(0)->GetVTKDataTclName()) + 1];
+      strcpy(dataName, this->GetNthPVInput(0)->GetVTKDataTclName());
+      
       charFound = strrchr(dataName, 't');
       tempName = strtok(dataName, "O");
       *file << tempName << " GetOutput ";
       pos = charFound - dataName + 1;
       *file << dataName+pos << "]\n\t";
+      delete [] dataName;
       }
     else if (pvsInterface && strcmp(pvsInterface->GetSourceClassName(),
                                     "vtkPDataSetReader") == 0)
       {
-      dataName = this->GetNthPVInput(0)->GetVTKDataTclName();      
+      dataName = new char[strlen(this->GetNthPVInput(0)->GetVTKDataTclName()) + 1];
+      strcpy(dataName, this->GetNthPVInput(0)->GetVTKDataTclName());
+      
       tempName = strtok(dataName, "O");
       *file << tempName << " GetOutput]\n\t";
+      delete [] dataName;
       }
     else
       {
@@ -1399,21 +1405,27 @@ void vtkPVSource::SaveInTclScript(ofstream *file)
       {
       char *charFound;
       int pos;
-      char *dataName = this->GetNthPVInput(0)->GetVTKDataTclName();
+      char *dataName = new char[strlen(this->GetNthPVInput(0)->GetVTKDataTclName()) + 1];
+      strcpy(dataName, this->GetNthPVInput(0)->GetVTKDataTclName());
       
       charFound = strrchr(dataName, 't');
       tempName = strtok(dataName, "O");
       *file << dataName << " GetOutput ";
       pos = charFound - dataName + 1;
       *file << dataName+pos << "]\n";
+      delete [] dataName;
       }
     else if (pvsInterface && strcmp(pvsInterface->GetSourceClassName(),
                                     "vtkPDataSetReader") == 0)
       {
+      char *dataName = new char[strlen(this->GetNthPVInput(0)->GetVTKDataTclName()) + 1];
+      strcpy(dataName, this->GetNthPVInput(0)->GetVTKDataTclName());
+      
       sprintf(sourceTclName, "DataSetReader");
-      tempName = strtok(this->GetNthPVInput(0)->GetVTKDataTclName(), "O");
+      tempName = strtok(dataName, "O");
       strcat(sourceTclName, tempName+7);
       *file << sourceTclName << " GetOutput]\n";
+      delete [] dataName;
       }
     else
       {

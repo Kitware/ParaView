@@ -367,19 +367,25 @@ void vtkPVContour::SaveInTclScript(ofstream* file)
       {
       char *charFound;
       int pos;
-      char *dataName = this->GetNthPVInput(0)->GetVTKDataTclName();
+      char *dataName = new char[strlen(this->GetNthPVInput(0)->GetVTKDataTclName()) + 1];
+      strcpy(dataName, this->GetNthPVInput(0)->GetVTKDataTclName());
       
       charFound = strrchr(dataName, 't');
       tempName = strtok(dataName, "O");
       *file << tempName << " GetOutput ";
       pos = charFound - dataName + 1;
       *file << dataName+pos << "]\n\t";
+      delete [] dataName;
       }
     else if (pvsInterface && strcmp(pvsInterface->GetSourceClassName(),
                                     "vtkPDataSetReader") == 0)
       {
-      tempName = strtok(this->GetNthPVInput(0)->GetVTKDataTclName(), "O");
+      char *dataName = new char[strlen(this->GetNthPVInput(0)->GetVTKDataTclName()) + 1];
+      strcpy(dataName, this->GetNthPVInput(0)->GetVTKDataTclName());
+      
+      tempName = strtok(dataName, "O");
       *file << tempName << " GetOutput]\n\t";
+      delete [] dataName;
       }
     else
       {
@@ -406,19 +412,25 @@ void vtkPVContour::SaveInTclScript(ofstream* file)
       {
       char *charFound;
       int pos;
-      char *dataName = this->GetNthPVInput(0)->GetVTKDataTclName();
+      char *dataName = new char[strlen(this->GetNthPVInput(0)->GetVTKDataTclName()) + 1];
+      strcpy(dataName, this->GetNthPVInput(0)->GetVTKDataTclName());
       
       charFound = strrchr(dataName, 't');
       tempName = strtok(dataName, "O");
       *file << tempName << " GetOutput ";
       pos = charFound - dataName + 1;
       *file << dataName+pos << "]\n\t";
+      delete [] dataName;
       }
     else if (pvsInterface && strcmp(pvsInterface->GetSourceClassName(),
                                     "vtkPDataSetReader") == 0)
       {
-      tempName = strtok(this->GetNthPVInput(0)->GetVTKDataTclName(), "O");
+      char *dataName = new char[strlen(this->GetNthPVInput(0)->GetVTKDataTclName()) + 1];
+      strcpy(dataName, this->GetNthPVInput(0)->GetVTKDataTclName());
+      
+      tempName = strtok(dataName, "O");
       *file << tempName << " GetOutput]\n\t";
+      delete [] dataName;
       }
     else
       {

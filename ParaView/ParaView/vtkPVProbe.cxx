@@ -989,21 +989,27 @@ void vtkPVProbe::SaveInTclScript(ofstream *file)
   if (pvsInterface && strcmp(pvsInterface->GetSourceClassName(),
                              "vtkGenericEnSightReader") == 0)
     {
-    char *dataName = this->ProbeSourceTclName;
+    char *dataName = new char[strlen(this->ProbeSourceTclName) + 1];
     char *charFound;
     int pos;
     
+    strcpy(dataName, this->ProbeSourceTclName);
     charFound = strrchr(dataName, 't');
     tempName = strtok(dataName, "O");
     *file << tempName << " GetOutput ";
     pos = charFound - dataName + 1;
     *file << dataName+pos << "]\n\n";
+    delete [] dataName;
     }
   else if (pvsInterface && strcmp(pvsInterface->GetSourceClassName(),
                                   "vtkPDataSetReader") == 0)
     {
+    char *dataName = new char[strlen(this->ProbeSourceTclName) + 1];
+    strcpy(dataName, this->ProbeSourceTclName);
+    
     tempName = strtok(this->ProbeSourceTclName, "O");
     *file << tempName << " GetOutput]\n\n";
+    delete [] dataName;
     }
   else
     {
