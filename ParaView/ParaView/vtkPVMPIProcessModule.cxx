@@ -85,7 +85,7 @@ void vtkPVSlaveScript(void *localArg, void *remoteArg,
 
  //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVMPIProcessModule);
-vtkCxxRevisionMacro(vtkPVMPIProcessModule, "1.2");
+vtkCxxRevisionMacro(vtkPVMPIProcessModule, "1.3");
 
 int vtkPVMPIProcessModuleCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -300,7 +300,6 @@ void vtkPVMPIProcessModule::GetPVDataBounds(vtkPVData *pvd, float bounds[6])
   vtkMultiProcessController *controller = this->GetController();
   float tmp[6];
   int id, num;
-  vtkDataSet *ds = pvd->GetVTKData();
 
   pvd->GetVTKData()->GetBounds(bounds);
 

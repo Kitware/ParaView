@@ -46,7 +46,7 @@
  #include <mpi.h>
 #endif
 
-vtkCxxRevisionMacro(vtkClientCompositeManager, "1.4");
+vtkCxxRevisionMacro(vtkClientCompositeManager, "1.5");
 vtkStandardNewMacro(vtkClientCompositeManager);
 
 vtkCxxSetObjectMacro(vtkClientCompositeManager,Compositer,vtkCompositer);
@@ -233,7 +233,6 @@ void vtkClientCompositeManager::StartRender()
   
   vtkDebugMacro("StartRender");
   
-  vtkRenderWindow* renWin = this->RenderWindow;
   vtkMultiProcessController *controller = this->ClientController;
 
   if (controller == NULL)
@@ -242,6 +241,7 @@ void vtkClientCompositeManager::StartRender()
     }
 
   // Make sure they all swp buffers at the same time.
+  //vtkRenderWindow* renWin = this->RenderWindow;
   //renWin->SwapBuffersOff();
 
   // Trigger the satellite processes to start their render routine.
@@ -1333,6 +1333,13 @@ void vtkClientCompositeManager::PrintSelf(ostream& os, vtkIndent indent)
     os << indent << "Tiled display with dimensions: " 
        << this->TiledDimensions[0] << ", " << this->TiledDimensions[1] << endl;
     }
+  
+  os << indent << "UseChar: " << this->UseChar << endl;
+  os << indent << "UseRGB: " << this->UseRGB << endl;
+  os << indent << "ClientFlag: " << this->ClientFlag << endl;
+
+  os << indent << "Compositer: " << this->Compositer << endl;
+
 }
 
 

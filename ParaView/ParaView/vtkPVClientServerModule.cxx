@@ -112,7 +112,7 @@ void vtkPVRelayRemoteScript(void *localArg, void *remoteArg,
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVClientServerModule);
-vtkCxxRevisionMacro(vtkPVClientServerModule, "1.4");
+vtkCxxRevisionMacro(vtkPVClientServerModule, "1.5");
 
 int vtkPVClientServerModuleCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -167,6 +167,7 @@ void vtkPVClientServerInit(vtkMultiProcessController *controller, void *arg )
 // to simplify it. !!!!!
 void vtkPVClientServerModule::Initialize()
 {
+  vtkPVApplication *pvApp = this->GetPVApplication();
   int myId = this->Controller->GetLocalProcessId();
   int numProcs = this->Controller->GetNumberOfProcesses();
   int id;
@@ -175,7 +176,7 @@ void vtkPVClientServerModule::Initialize()
   vtkCommunicator::SetUseCopy(1);
 #endif
 
-  this->ClientMode = this->GetPVApplication()->GetClientMode();
+  this->ClientMode = pvApp->GetClientMode();
 
   if (this->ClientMode)
     {
@@ -184,9 +185,9 @@ void vtkPVClientServerModule::Initialize()
     vtkSocketCommunicator *comm = vtkSocketCommunicator::New();
 
     // Get the host name from the command line arguments
-    char* hostname = this->GetPVApplication()->GetHostName();
+    char* hostname = pvApp->GetHostName();
     // Get the port from the command line arguments
-    int port= this->GetPVApplication()->GetPort();
+    int port = pvApp->GetPort();
     // Establish connection
     if (!comm->ConnectTo(hostname, port))
       {
@@ -206,7 +207,6 @@ void vtkPVClientServerModule::Initialize()
     this->NumberOfServerProcesses = numServerProcs;
    
     // Start the application (UI). 
-    vtkPVApplication *pvApp = this->GetPVApplication();
     // For SGI pipe option.
     pvApp->SetNumberOfPipes(numServerProcs);
     
@@ -226,7 +226,7 @@ void vtkPVClientServerModule::Initialize()
     this->SocketController->Initialize();
     vtkSocketCommunicator* comm = vtkSocketCommunicator::New();
 
-    int port= this->GetPVApplication()->GetPort();
+    int port= pvApp->GetPort();
 
     // Establish connection
     if (!comm->WaitForConnection(port))
@@ -243,11 +243,6 @@ void vtkPVClientServerModule::Initialize()
     // send the number of server processes as a handshake.
     this->SocketController->Send(&numProcs, 1, 1, 8843);
     
-    // We should use the application tcl name in the future.
-    // All object in the satellite processes must be created through tcl.
-    // (To assign the correct name).
-    vtkPVApplication *pvApp = this->GetPVApplication();
-
     // Loop listening to the socket for RMI's.
     this->SocketController->AddRMI(vtkPVBroadcastScript, (void *)(this), 
                                    VTK_PV_BROADCAST_SCRIPT_RMI_TAG);
@@ -264,7 +259,6 @@ void vtkPVClientServerModule::Initialize()
     }
   else
     { // Sattelite processes of server.
-    vtkPVApplication *pvApp = this->GetPVApplication();
     this->Controller->AddRMI(vtkPVServerSlaveScript, (void *)(pvApp), 
                              VTK_PV_SATELLITE_SCRIPT);
 
@@ -647,7 +641,7 @@ void vtkPVClientServerModule::SendDataNumberOfCells(vtkDataSet *data)
 //----------------------------------------------------------------------------
 int vtkPVClientServerModule::GetPVDataNumberOfPoints(vtkPVData *pvd)
 {
-  float numPoints;
+  int numPoints;
 
   if ( ! this->ClientMode)
     {
@@ -664,7 +658,7 @@ int vtkPVClientServerModule::GetPVDataNumberOfPoints(vtkPVData *pvd)
 //----------------------------------------------------------------------------
 void vtkPVClientServerModule::SendDataNumberOfPoints(vtkDataSet *data)
 {
-  float numPoints;
+  int numPoints;
   
   if (this->ClientMode)
     {
@@ -935,7 +929,7 @@ void vtkPVClientServerModule::SendCompleteArrays(vtkMapper *mapper)
   int type;
   int numComps;
   int nameLength;
-  const char *name;
+  const char *name = NULL;
   vtkDataArray *array;
   int activeAttributes[5];
 
@@ -1115,7 +1109,6 @@ void vtkPVClientServerModule::SendCompleteArrays(vtkMapper *mapper)
 void vtkPVClientServerModule::CompleteArrays(vtkDataSet *data, char *dataTclName)
 {
   int j;
-  int nonEmptyFlag = 0;
   int activeAttributes[5];
 
   if (data == NULL || this->Controller == NULL)
@@ -1264,7 +1257,7 @@ void vtkPVClientServerModule::SendCompleteArrays(vtkDataSet *data)
   int type;
   int numComps;
   int nameLength;
-  const char *name;
+  const char *name = NULL;
   vtkDataArray *array;
   int activeAttributes[5];
 
@@ -1485,4 +1478,6 @@ void vtkPVClientServerModule::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
   os << indent << "Controller: " << this->Controller << endl;;
+  os << indent << "SocketController: " << this->SocketController << endl;;
+  os << indent << "ClientMode: " << this->ClientMode << endl;
 }

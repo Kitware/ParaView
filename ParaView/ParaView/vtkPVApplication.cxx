@@ -104,7 +104,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.163");
+vtkCxxRevisionMacro(vtkPVApplication, "1.164");
 
 
 int vtkPVApplicationCommand(ClientData cd, Tcl_Interp *interp,
@@ -1547,10 +1547,13 @@ void vtkPVApplication::PrintSelf(ostream& os, vtkIndent indent)
   if (this->ClientMode)
     {
     os << indent << "Running as a client\n";
+    os << indent << "Port: " << this->Port << endl;
+    os << indent << "Host: " << this->HostName << endl;
     }
   if (this->ServerMode)
     {
     os << indent << "Running as a server\n";
+    os << indent << "Port: " << this->Port << endl;
     }
   if (this->UseSoftwareRendering)
     {
