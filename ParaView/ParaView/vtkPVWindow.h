@@ -479,6 +479,13 @@ public:
   // Access to the Tcl interactor.
   vtkGetObjectMacro(TclInteractor, vtkKWTclInteractor);
 
+  // Descrition:
+  // Show/Hide the sources long help.
+  virtual void SetShowSourcesLongHelp(int);
+  vtkGetMacro(ShowSourcesLongHelp, int);
+  vtkBooleanMacro(ShowSourcesLongHelp, int);
+  void ShowSourcesLongHelpCheckButtonCallback();
+
 protected:
   vtkPVWindow();
   ~vtkPVWindow();
@@ -646,6 +653,9 @@ protected:
   int Interaction;
 
   void UpdateStatusImage();
+
+  vtkKWCheckButton *ShowSourcesLongHelpCheckButton;
+  int ShowSourcesLongHelp;
 
 private:
 

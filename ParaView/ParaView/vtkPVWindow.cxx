@@ -115,6 +115,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #define VTK_PV_TOOLBAR_FLAT_FRAME_REG_KEY "ToolbarFlatFrame"
 #define VTK_PV_TOOLBAR_FLAT_BUTTONS_REG_KEY "ToolbarFlatButtons"
+#define VTK_PV_SHOW_SOURCES_LONG_HELP_REG_KEY "ShowSourcesLongHelp"
 
 #define VTK_PV_VTK_FILTERS_MENU_LABEL "Filter"
 #define VTK_PV_VTK_SOURCES_MENU_LABEL "Source"
@@ -124,7 +125,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.391.2.16");
+vtkCxxRevisionMacro(vtkPVWindow, "1.391.2.17");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -278,6 +279,9 @@ vtkPVWindow::vtkPVWindow()
   this->ToolbarSettingsFlatButtonsCheck = 0;
 
   this->CenterActorVisibility = 1;
+
+  this->ShowSourcesLongHelpCheckButton = vtkKWCheckButton::New();
+  this->ShowSourcesLongHelp = 1;
 }
 
 //----------------------------------------------------------------------------
@@ -369,6 +373,9 @@ vtkPVWindow::~vtkPVWindow()
     {
     this->ToolbarSettingsFlatButtonsCheck->Delete();
     }
+
+  this->ShowSourcesLongHelpCheckButton->Delete();
+  this->ShowSourcesLongHelpCheckButton = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -1797,6 +1804,34 @@ void vtkPVWindow::AddPreferencesProperties()
      pack_before.str());
   pack_before.rdbuf()->freeze(0);
 
+  // Interface settings: show sources long help
+  // This settings will be added at the "Application Settings" level. 
+
+  this->ShowSourcesLongHelpCheckButton->SetParent(
+    this->GetInterfaceSettingsFrame()->GetFrame());
+  this->ShowSourcesLongHelpCheckButton->Create(this->Application, "");
+  this->ShowSourcesLongHelpCheckButton->SetText(
+    "Show sources description");
+  this->ShowSourcesLongHelpCheckButton->SetCommand(
+    this, "ShowSourcesLongHelpCheckButtonCallback");
+  this->ShowSourcesLongHelpCheckButton->SetBalloonHelpString(
+    "This advanced option adjusts whether the sources description "
+    "are shown in the parameters page.");
+
+  if (this->Application->HasRegisteryValue(
+    2, "RunTime", VTK_PV_SHOW_SOURCES_LONG_HELP_REG_KEY) &&
+      !this->Application->GetIntRegisteryValue(
+        2, "RunTime", VTK_PV_SHOW_SOURCES_LONG_HELP_REG_KEY))
+    {
+    this->SetShowSourcesLongHelp(0);
+    }
+  else
+    {
+    this->SetShowSourcesLongHelp(1);
+    }
+
+  this->Script("pack %s -side top -anchor w -expand no -fill none",
+               this->ShowSourcesLongHelpCheckButton->GetWidgetName());
 }
 
 void vtkPVWindow::OnToolbarSettingsChange()
@@ -1855,6 +1890,43 @@ void vtkPVWindow::UpdateToolbarAspect()
 
 //   this->FlySpeedToolbar->SetFlatAspect(flat_frame);
 //   this->FlySpeedToolbar->SetWidgetsFlatAspect(flat_buttons);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVWindow::ShowSourcesLongHelpCheckButtonCallback()
+{
+  int val = this->ShowSourcesLongHelpCheckButton->GetState();
+  this->SetShowSourcesLongHelp(val);
+  this->Application->SetRegisteryValue(
+    2, "RunTime", VTK_PV_SHOW_SOURCES_LONG_HELP_REG_KEY, val ? "1" : "0");
+}
+
+//----------------------------------------------------------------------------
+void vtkPVWindow::SetShowSourcesLongHelp(int v)
+{
+  this->ShowSourcesLongHelpCheckButton->SetState(v);
+
+  if (this->ShowSourcesLongHelp == v)
+    {
+    return;
+    }
+  this->ShowSourcesLongHelp = v;
+  this->Modified();
+
+  // Update the properties of all the sources previously created
+  // so that the Description label can be removed/brought back.
+  
+  vtkPVSource *pvs;
+  vtkPVSourceCollection *col = this->GetSourceList("Sources");
+  vtkCollectionIterator *cit = col->NewIterator();
+  cit->InitTraversal();
+  while (!cit->IsDoneWithTraversal())
+    {
+    pvs = static_cast<vtkPVSource*>(cit->GetObject()); 
+    pvs->UpdateProperties();
+    cit->GoToNextItem();
+    }
+  cit->Delete();
 }
 
 //----------------------------------------------------------------------------
@@ -1957,7 +2029,7 @@ int vtkPVWindow::OpenWithReader(const char *fileName, vtkPVReaderModule* reader,
     {
     this->GetPVApplication()->AddTraceEntry("$kw(%s) OpenCustom \"%s\" \"%s\"", 
                                             this->GetTclName(), 
-                                            reader->GetDescription(),
+                                            reader->GetLabel(),
                                             fileName);
     }
 
@@ -1975,7 +2047,7 @@ int vtkPVWindow::OpenWithReader(const char *fileName, vtkPVReaderModule* reader,
     if ( custom )
       {
       ostrstream str;
-      str << "OpenCustom \"" << reader->GetDescription() << "\"" <<ends;
+      str << "OpenCustom \"" << reader->GetLabel() << "\"" <<ends;
       this->AddRecentFile(NULL, fileName, this, str.str());
       str.rdbuf()->freeze(0);
       }
@@ -2001,7 +2073,7 @@ int vtkPVWindow::OpenCustom(const char* reader, const char* filename)
     {
     vtkPVReaderModule* rm = 0;
     int retVal = it->GetData(rm);
-    if (retVal == VTK_OK && rm && vtkString::Equals(rm->GetDescription(), reader) &&
+    if (retVal == VTK_OK && rm && vtkString::Equals(rm->GetLabel(), reader) &&
         this->OpenWithReader(filename, rm, 1) == VTK_OK )
       {
       it->Delete();
@@ -3782,7 +3854,7 @@ void vtkPVWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVWindow ";
-  this->ExtractRevision(os,"$Revision: 1.391.2.16 $");
+  this->ExtractRevision(os,"$Revision: 1.391.2.17 $");
 }
 
 //----------------------------------------------------------------------------
@@ -4179,4 +4251,5 @@ void vtkPVWindow::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "UseMessageDialog: " << this->UseMessageDialog << endl;
   os << indent << "Interaction: " << (this->Interaction?"on":"off") << endl;
   os << indent << "TclInteractor: " << this->GetTclInteractor() << endl;
+  os << indent << "ShowSourcesLongHelp: " << (this->ShowSourcesLongHelp?"on":"off") << endl;
 }

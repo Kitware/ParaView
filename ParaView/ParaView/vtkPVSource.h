@@ -142,18 +142,17 @@ public:
   char* GetName();
     
   // Description:
-  // The (short) description that can be used to give a more descriptive
-  // name to the object. Note that if the description is empty when
-  // GetDescription() is called, the Ivar is automatically initialized to
+  // The (short) label that can be used to give a more descriptive
+  // name to the object. Note that if the label is empty when
+  // GetLabel() is called, the Ivar is automatically initialized to
   // the name of the composite (GetName()).
-  virtual void SetDescriptionNoTrace(const char *description);
-  virtual void SetDescription(const char *description);
-  virtual char* GetDescription();
-  vtkGetObjectMacro(DescriptionFrame, vtkKWWidget);
+  virtual void SetLabelNoTrace(const char *label);
+  virtual void SetLabel(const char *label);
+  virtual char* GetLabel();
 
   // Description:
   // Called when the description entry is changed.
-  virtual void DescriptionEntryCallback();
+  virtual void LabelEntryCallback();
     
   // Description:
   // This just returns the application typecast correctly.
@@ -218,7 +217,8 @@ public:
   
   vtkGetObjectMacro(ParameterFrame, vtkKWFrame);
   vtkGetObjectMacro(MainParameterFrame, vtkKWWidget);
-  
+  vtkGetObjectMacro(DescriptionFrame, vtkKWWidget);
+
   // Description:
   // Save the renderer and render window to a file.
   // The "vtkFlag" argument is only set when regression testing.
@@ -395,6 +395,10 @@ public:
   void GrabFocus();
   void UnGrabFocus();
 
+  // Description:
+  // Update the properties page.
+  void UpdateProperties();
+
 protected:
   vtkPVSource();
   ~vtkPVSource();
@@ -448,6 +452,8 @@ protected:
   
   void SetNthPVOutput(int idx, vtkPVData *output);
   void SetNthPVInput(int idx, vtkPVData *input);
+
+  void UpdateDescriptionFrame();
   
   // The real AcceptCallback method.
   virtual void AcceptCallbackInternal();
@@ -457,7 +463,7 @@ protected:
   // The name is just for display.
   char      *Name;
   char      *MenuName;
-  char      *Description;
+  char      *Label;
   char      *ShortHelp;
   char      *LongHelp;
 
@@ -465,7 +471,6 @@ protected:
   char      *ModuleName;
 
   vtkKWWidget* Parameters;
-  void UpdateProperties();
 
   vtkKWWidget *MainParameterFrame;
   vtkKWWidget *ButtonFrame;
@@ -480,9 +485,9 @@ protected:
   vtkKWWidget *DescriptionFrame;
   vtkKWLabeledLabel *NameLabel;
   vtkKWLabeledLabel *TypeLabel;
-  vtkKWLabeledEntry *DescriptionEntry;
+  vtkKWLabeledEntry *LabelEntry;
+  vtkKWLabeledLabel *LongHelpLabel;
 
-  void UpdateDescriptionFrame();
     
   char *OutputClassName;
   char *SourceClassName;
