@@ -39,7 +39,7 @@
 #include <algorithm>
 #include <vtkstd/set>
 
-vtkCxxRevisionMacro(vtkKdTree, "1.16");
+vtkCxxRevisionMacro(vtkKdTree, "1.17");
 
 // methods for vtkKdNode -------------------------------------------
 
@@ -822,7 +822,7 @@ void vtkKdNode::PrintVerboseNode(int depth)
 static char dots[MSGSIZE] = "...........................................................";
 static char msg[MSGSIZE];
 
-static char * makeEntry(char *s)
+static char * makeEntry(const char *s)
 {
   memcpy(msg, dots, MSGSIZE);
   int len = strlen(s);
