@@ -74,7 +74,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVColorMap);
-vtkCxxRevisionMacro(vtkPVColorMap, "1.61");
+vtkCxxRevisionMacro(vtkPVColorMap, "1.61.2.1");
 
 int vtkPVColorMapCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -2154,18 +2154,13 @@ void vtkPVColorMap::SaveState(ofstream *file)
   *file << "$kw(" << this->GetTclName() << ") SetScalarRange " 
         << this->ScalarRange[0] << " " << this->ScalarRange[1] << endl;
 
-  if (this->StartHSV[0] != 0 || this->StartHSV[1] != 1 || this->StartHSV[2] != 1)
-    {
-    *file << "$kw(" << this->GetTclName() << ") SetStartHSV " 
-          << this->StartHSV[0] << " " << this->StartHSV[1] << " " 
-          << this->StartHSV[2] << endl;
-    }
-  if (this->EndHSV[0] != 2.0/6.0 || this->EndHSV[1] != 1 || this->EndHSV[2] != 1)
-    {
-    *file << "$kw(" << this->GetTclName() << ") SetEndHSV " 
-          << this->EndHSV[0] << " " << this->EndHSV[1] << " " 
-          << this->EndHSV[2] << endl;
-    }
+  *file << "$kw(" << this->GetTclName() << ") SetStartHSV " 
+        << this->StartHSV[0] << " " << this->StartHSV[1] << " " 
+        << this->StartHSV[2] << endl;
+  *file << "$kw(" << this->GetTclName() << ") SetEndHSV " 
+        << this->EndHSV[0] << " " << this->EndHSV[1] << " " 
+        << this->EndHSV[2] << endl;
+
   if (this->NumberOfColors != 256)
     {
     *file << "$kw(" << this->GetTclName() << ") SetNumberOfColors " 
