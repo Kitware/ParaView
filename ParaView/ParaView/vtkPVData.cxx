@@ -2339,6 +2339,8 @@ void vtkPVData::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "VTKDataTclName: " << (this->VTKDataTclName?this->VTKDataTclName:"none") << endl;
   os << indent << "View: " << this->GetView() << endl;
   os << indent << "PropertiesCreated: " << this->PropertiesCreated << endl;
+  os << indent << "CubeAxesCheck: " << this->CubeAxesCheck << endl;
+  os << indent << "ScalarBarCheck: " << this->ScalarBarCheck << endl;
 }
 
 
