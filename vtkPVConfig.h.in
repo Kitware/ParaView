@@ -28,6 +28,8 @@
 #cmakedefine PARAVIEW_ENABLE_FPE
 // Build ParaView with all experimental options (such as script in animation...)
 #cmakedefine PARAVIEW_EXPERIMENTAL_USER
+//Build ParaView with enforced secure connection (--connect-id)
+#cmakedefine PARAVIEW_ALWAYS_SECURE_CONNECTION
 
 #define PARAVIEW_VERSION_MAJOR @PARAVIEW_VERSION_MAJOR@
 #define PARAVIEW_VERSION_MINOR @PARAVIEW_VERSION_MINOR@

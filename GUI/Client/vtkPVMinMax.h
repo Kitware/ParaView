@@ -50,7 +50,7 @@ public:
   void  SetResolution(float res);
   float GetResolution();
   void  SetRange(float min, float max);
-  void GetRange(float range[2]);
+  void  GetRange(float range[2]);
 
   // Description:
   // Use the scalar range of the selected array to set the min max range.
@@ -121,7 +121,7 @@ public:
   // using NewInstance() and then copy some necessary state 
   // parameters.
   vtkPVMinMax* ClonePrototype(vtkPVSource* pvSource,
-                                 vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
+                              vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
 //ETX
 
   // Description:

@@ -32,7 +32,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVMinMax);
-vtkCxxRevisionMacro(vtkPVMinMax, "1.41");
+vtkCxxRevisionMacro(vtkPVMinMax, "1.41.2.1");
 
 vtkCxxSetObjectMacro(vtkPVMinMax, ArrayMenu, vtkPVArrayMenu);
 
@@ -47,6 +47,9 @@ vtkPVMinMax::vtkPVMinMax()
   this->MaxLabel = vtkKWLabel::New();
   this->MinScale = vtkKWScale::New();
   this->MaxScale = vtkKWScale::New();
+  // Disabling Clamp to allow advanced user full interaction
+  this->MinScale->ClampValueOff();
+  this->MaxScale->ClampValueOff();
 
   this->MinHelp = 0;
   this->MaxHelp = 0;
@@ -327,6 +330,13 @@ void vtkPVMinMax::ResetInternal()
         {
         this->SetMinValueInternal(iprop->GetElement(0));
         this->SetMaxValueInternal(iprop->GetElement(1));
+        }
+      else
+        {
+        vtkErrorMacro(
+          "Could not find property of name: "
+          << (this->GetSMPropertyName()?this->GetSMPropertyName():"(null)")
+          << " for widget: " << this->GetTraceName());
         }
       }
     }

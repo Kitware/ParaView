@@ -14,6 +14,7 @@
 #include "vtkPVOptions.h"
 #include "vtkPVOptionsXMLParser.h"
 #include "vtkObjectFactory.h"
+#include "vtkPVConfig.h" //For PARAVIEW_ALWAYS_SECURE_CONNECTION option
 
 #include <kwsys/CommandLineArguments.hxx>
 #include <kwsys/SystemTools.hxx>
@@ -41,7 +42,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVOptions);
-vtkCxxRevisionMacro(vtkPVOptions, "1.27");
+vtkCxxRevisionMacro(vtkPVOptions, "1.27.2.1");
 
 //----------------------------------------------------------------------------
 vtkPVOptions::vtkPVOptions()
@@ -157,14 +158,15 @@ void vtkPVOptions::Initialize()
                     vtkPVOptions::PVCLIENT|vtkPVOptions::PARAVIEW);
   this->AddArgument("--connect-id", 0, &this->ConnectID,
                     "Set the ID of the server and client to make sure they match.",
-                    vtkPVOptions::PVCLIENT);
+                    vtkPVOptions::PVCLIENT | vtkPVOptions::PVSERVER |
+                    vtkPVOptions::PVRENDER_SERVER | vtkPVOptions::PVDATA_SERVER);
   this->AddArgument("--render-module", 0, &this->RenderModuleName,
                     "User specified rendering module.",
-                    vtkPVOptions::PVCLIENT| vtkPVOptions::PVRENDER_SERVER| vtkPVOptions::PVSERVER);
+                    vtkPVOptions::PVCLIENT| vtkPVOptions::PVRENDER_SERVER | vtkPVOptions::PVSERVER);
   this->AddBooleanArgument("--use-offscreen-rendering", 0, &this->UseOffscreenRendering,
                            "Render offscreen on the satellite processes."
                            " This option only works with software rendering or mangled mesa on Unix.",
-                           vtkPVOptions::PVRENDER_SERVER| vtkPVOptions::PVSERVER);
+                           vtkPVOptions::PVRENDER_SERVER | vtkPVOptions::PVSERVER);
   this->AddBooleanArgument("--stereo", 0, &this->UseStereoRendering,
                            "Tell the application to enable stereo rendering"
                            " (only when running on a single process).",
@@ -180,7 +182,8 @@ void vtkPVOptions::Initialize()
                     vtkPVOptions::PVCLIENT);
   this->AddArgument("--client-host", "-ch", &this->ClientHostName,
                     "Tell the data|render server the host name of the client, use with -rc.",
-                    vtkPVOptions::PVRENDER_SERVER|vtkPVOptions::PVDATA_SERVER|vtkPVOptions::PVSERVER);
+                    vtkPVOptions::PVRENDER_SERVER | vtkPVOptions::PVDATA_SERVER |
+                    vtkPVOptions::PVSERVER);
   this->AddArgument("--data-server-port", "-dsp", &this->DataServerPort,
                     "What port data server use to connect to the client. (default 11111).", 
                     vtkPVOptions::PVCLIENT | vtkPVOptions::PVDATA_SERVER);
@@ -271,6 +274,13 @@ int vtkPVOptions::PostProcess(int, const char* const*)
     this->ClientMode = 1;
     this->RenderServerMode = 2;
     }
+#ifdef PARAVIEW_ALWAYS_SECURE_CONNECTION
+  if ( (this->ClientMode || this->ServerMode) && !this->ConnectID)
+    {
+    this->SetErrorMessage("You need to specify a connect ID (--connect-id).");
+    return 0;
+    }
+#endif //PARAVIEW_ALWAYS_SECURE_CONNECTION
   return 1;
 }
 
