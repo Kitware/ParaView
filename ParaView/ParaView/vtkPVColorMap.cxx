@@ -70,7 +70,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVColorMap);
-vtkCxxRevisionMacro(vtkPVColorMap, "1.24.2.14");
+vtkCxxRevisionMacro(vtkPVColorMap, "1.24.2.15");
 
 int vtkPVColorMapCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -1414,7 +1414,7 @@ void vtkPVColorMap::UpdateMap(int width, int height)
       {
       delete [] this->MapData;
       }
-    this->MapData = new unsigned char[size*4];
+    this->MapData = new unsigned char[size*3];
     this->MapDataSize = size;
     }
   this->MapWidth = width;
@@ -1438,14 +1438,13 @@ void vtkPVColorMap::UpdateMap(int width, int height)
       ptr[0] = rgba[0];
       ptr[1] = rgba[1];
       ptr[2] = rgba[2];
-      ptr[3] = rgba[3];
-      ptr += 4;
+      ptr += 3;
       }
     }
 
   if (size > 0)
     {
-    this->Map->SetImageData(this->MapData, width, height);
+    this->Map->SetImageData(this->MapData, width, height, 3);
     }
 }
 
