@@ -124,6 +124,7 @@ static const char *vtkKWEventStrings[] = {
   "VolumeBackgroundColorChangedEvent",
   "VolumeCornerAnnotationChangedEvent",
   "VolumeCornerAnnotationColorChangedEvent",
+  "VolumeFlySpeedChangedEvent",
   "VolumeHeaderAnnotationColorChangedEvent",
   "VolumeMouseBindingChangedEvent",
   "WindowLevelChangedEvent",

@@ -133,6 +133,7 @@ class VTK_EXPORT vtkKWEvent
     VolumeBackgroundColorChangedEvent,
     VolumeCornerAnnotationChangedEvent,
     VolumeCornerAnnotationColorChangedEvent,
+    VolumeFlySpeedChangedEvent,
     VolumeHeaderAnnotationColorChangedEvent,
     VolumeMouseBindingChangedEvent,
     WindowLevelChangedEvent,
