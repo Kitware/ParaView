@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endif
 
 vtkStandardNewMacro(vtkXMLUtilities);
-vtkCxxRevisionMacro(vtkXMLUtilities, "1.8");
+vtkCxxRevisionMacro(vtkXMLUtilities, "1.9");
 
 #define  VTK_XML_UTILITIES_FACTORED_POOL_NAME "FactoredPool"
 #define  VTK_XML_UTILITIES_FACTORED_NAME      "Factored"
@@ -159,6 +159,10 @@ void vtkXMLUtilities::FlattenElement(vtkXMLDataElement *elem,
     if (indent && indent_attributes)
       {
       unsigned long len = (unsigned long)os.tellp() - pos;
+      if (os.fail())
+        {
+        return;
+        }
       char *sep = new char [1 + len + 1];
       sep[0] = '\n';
       vtkString::FillString(sep + 1, ' ', len);

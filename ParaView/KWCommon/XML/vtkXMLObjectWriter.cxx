@@ -40,7 +40,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkXMLUtilities.h"
 #include "vtkXMLDataElement.h"
 
-vtkCxxRevisionMacro(vtkXMLObjectWriter, "1.7");
+#if !defined(_WIN32) || defined(__CYGWIN__)
+# include <unistd.h> /* unlink */
+#endif
+
+vtkCxxRevisionMacro(vtkXMLObjectWriter, "1.8");
 
 vtkCxxSetObjectMacro(vtkXMLObjectWriter, Object, vtkObject);
 
@@ -200,6 +204,12 @@ int vtkXMLObjectWriter::Write(ostream &os, vtkIndent *indent)
 
   elem->Delete();
 
+  os.flush();
+  if (os.fail())
+    {
+    return 0;
+    }
+  
   return 1;
 }
 
@@ -207,7 +217,15 @@ int vtkXMLObjectWriter::Write(ostream &os, vtkIndent *indent)
 int vtkXMLObjectWriter::Write(const char *filename)
 {
   ofstream os(filename, ios::out);
-  return this->Write(os);
+  int ret = this->Write(os);
+  
+  if (!ret)
+    {
+    os.close();
+    unlink(filename);
+    }
+  
+  return ret;
 }
 
 //----------------------------------------------------------------------------
