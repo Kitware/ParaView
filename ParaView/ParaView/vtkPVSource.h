@@ -152,7 +152,8 @@ public:
   // Internal method; called by AcceptCallback.
   // Hide flag is used for hidding creation of 
   // the glyph sources from the user.
-  void Accept(int hideFlag);
+  virtual void Accept() { this->Accept(0); }
+  virtual void Accept(int hideFlag);
   
   // Description:
   // Called when the reset button is pressed.
