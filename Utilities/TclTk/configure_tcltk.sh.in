@@ -3,12 +3,12 @@
 build_tcl=true
 build_tk=true
 if [ -f @TclTk_BINARY_DIR@/tcl8.4.5/unix/tclsh -a \
-  -f @TclTk_BINARY_DIR@/tcl8.4.5/unix/libtcl8.4.a -a \
-  -f @TclTk_BINARY_DIR@/tcl8.4.5/unix/libtclstub8.4.a ]; then
+  -f @TclTk_BINARY_DIR@/tcl8.4.5/unix/libtcl8.4@TCLTK_DEBUG_EXT@.a -a \
+  -f @TclTk_BINARY_DIR@/tcl8.4.5/unix/libtclstub8.4@TCLTK_DEBUG_EXT@.a ]; then
   build_tcl=false;
 fi
-if [ -f @TclTk_BINARY_DIR@/tk8.4.5/unix/libtk8.4.a -a \
-  -f @TclTk_BINARY_DIR@/tk8.4.5/unix/libtkstub8.4.a ]; then
+if [ -f @TclTk_BINARY_DIR@/tk8.4.5/unix/libtk8.4@TCLTK_DEBUG_EXT@.a -a \
+  -f @TclTk_BINARY_DIR@/tk8.4.5/unix/libtkstub8.4@TCLTK_DEBUG_EXT@.a ]; then
   build_tk=false;
 fi
 
@@ -19,14 +19,14 @@ fi
 
 if [ "x$build_tcl" = "xtrue" ]; then
   cd "@TclTk_BINARY_DIR@/tcl8.4.5/unix"
-  "@TclTk_SOURCE_DIR@/tcl8.4.5/unix/configure" --disable-shared ${EXTRAFLAGS}
+  "@TclTk_SOURCE_DIR@/tcl8.4.5/unix/configure" --disable-shared ${EXTRAFLAGS} || exit 1
 else
   echo "-- Found existing Tcl, not reruning configure"
 fi
 
 if [ "x$build_tcl" = "xtrue" -o "x$build_tk" = "xtrue" ]; then
   cd "@TclTk_BINARY_DIR@/tk8.4.5/unix"
-  "@TclTk_SOURCE_DIR@/tk8.4.5/unix/configure" --disable-shared ${EXTRAFLAGS}
+  "@TclTk_SOURCE_DIR@/tk8.4.5/unix/configure" --disable-shared ${EXTRAFLAGS} || exit 1
 else
   echo "-- Found existing Tk, not reruning configure"
 fi
