@@ -136,7 +136,7 @@ void vtkPVClipPlane::CreateProperties()
   this->CenterEntry->SetParent(this->GetParameterFrame()->GetFrame());
   this->CenterEntry->SetModifiedCommand(this->GetTclName(), 
                                         "ChangeAcceptButtonColor");
-  this->CenterEntry->SetObjectVariable(this->GetVTKSourceTclName(), "Center");
+  this->CenterEntry->SetObjectVariable(this->GetVTKSourceTclName(), "Origin");
   this->CenterEntry->Create(this->Application, "Center", 3, NULL, NULL);
   this->Widgets->AddItem(this->CenterEntry);
   this->Script("pack %s -side top -fill x",

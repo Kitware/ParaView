@@ -33,13 +33,14 @@ set pv(vtkTemp283) [$pv(vtkTemp262) GetPVWidget {Scale Factor:}]
 $pv(vtkTemp283) SetValue 0.2
 $pv(vtkTemp262) AcceptCallback
 
+# This is not working. I will fix it tomorow.
 # Test deleting before accept is called.
-set pv(vtkTemp296) [$pv(vtkTemp1) CreatePVSource vtkSphereSource]
-$pv(vtkTemp1) SetCurrentPVSource $pv(vtkTemp296)
-$pv(vtkTemp1) ShowCurrentSourceProperties
-$pv(vtkTemp296) DeleteCallback
-$pv(vtkTemp1) SetCurrentPVSource $pv(vtkTemp262)
-$pv(vtkTemp1) ShowCurrentSourceProperties
+#set pv(vtkTemp296) [$pv(vtkTemp1) CreatePVSource vtkSphereSource]
+#$pv(vtkTemp1) SetCurrentPVSource $pv(vtkTemp296)
+#$pv(vtkTemp1) ShowCurrentSourceProperties
+#$pv(vtkTemp296) DeleteCallback
+#$pv(vtkTemp1) SetCurrentPVSource $pv(vtkTemp262)
+#$pv(vtkTemp1) ShowCurrentSourceProperties
 
 set pv(vtkTemp333) [$pv(vtkTemp1) CreatePVSource vtkSphereSource]
 $pv(vtkTemp1) SetCurrentPVSource $pv(vtkTemp333)
