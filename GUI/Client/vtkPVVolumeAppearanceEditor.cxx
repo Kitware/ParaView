@@ -36,7 +36,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVVolumeAppearanceEditor);
-vtkCxxRevisionMacro(vtkPVVolumeAppearanceEditor, "1.17");
+vtkCxxRevisionMacro(vtkPVVolumeAppearanceEditor, "1.18");
 
 int vtkPVVolumeAppearanceEditorCommand(ClientData cd, Tcl_Interp *interp,
                                        int argc, char *argv[]);
@@ -158,7 +158,6 @@ void vtkPVVolumeAppearanceEditor::VolumePropertyChangedCallback()
     vtkKWScale* scale = 
       this->VolumePropertyWidget->GetScalarOpacityUnitDistanceScale();
     double unitDistance = scale->GetValue();
-
 
     // Color Ramp (vtkColorTransferFunction)
     vtkKWColorTransferFunctionEditor *kwcolor = 
@@ -434,5 +433,143 @@ void vtkPVVolumeAppearanceEditor::UpdateEnableState()
 void vtkPVVolumeAppearanceEditor::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVVolumeAppearanceEditor::SetScalarOpacityRamp( double scalarStart,
+                                                        double opacityStart,
+                                                        double scalarEnd,
+                                                        double opacityEnd )
+{
+  vtkPVApplication *pvApp = NULL;
+  
+  if ( this->GetApplication() )
+    {
+    pvApp =
+      vtkPVApplication::SafeDownCast(this->GetApplication());    
+    }
+  
+  if ( this->PVSource && this->ArrayInfo && pvApp )
+    {
+    int numParts = this->PVSource->GetNumberOfParts();
+    vtkSMPart *part;
+
+    for (int i = 0; i < numParts; i++)
+      {
+      part = this->PVSource->GetPart(i);
+      // Access the vtkPiecewiseFunction:
+      vtkClientServerID volumeOpacityID =
+        this->PVSource->GetPartDisplay()->GetVolumeOpacityProxy()->GetID(0);
+
+      vtkPVProcessModule* pm = pvApp->GetProcessModule();
+      vtkClientServerStream& stream = pm->GetStream();
+      
+      // Remove all previous points:
+      stream << vtkClientServerStream::Invoke << volumeOpacityID 
+             << "RemoveAllPoints" << vtkClientServerStream::End;
+      // Copy points one by one from the vtkPiecewiseFunction:
+      stream << vtkClientServerStream::Invoke << volumeOpacityID 
+        << "AddPoint" << scalarStart << opacityStart 
+        << vtkClientServerStream::End;
+      stream << vtkClientServerStream::Invoke << volumeOpacityID 
+        << "AddPoint" << scalarEnd << opacityEnd
+        << vtkClientServerStream::End;
+
+      //Send everything:
+      pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
+      }
+    this->RenderView();
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVVolumeAppearanceEditor::SetScalarOpacityUnitDistance(double d)
+{
+  vtkPVApplication *pvApp = NULL;
+  
+  if ( this->GetApplication() )
+    {
+    pvApp =
+      vtkPVApplication::SafeDownCast(this->GetApplication());    
+    }
+  
+  if ( this->PVSource && this->ArrayInfo && pvApp )
+    {
+    int numParts = this->PVSource->GetNumberOfParts();
+    int i;
+    vtkSMPart *part;
+
+    for (i = 0; i < numParts; i++)
+      {
+      part = this->PVSource->GetPart(i);
+      // Access the vtkPiecewiseFunction:
+      vtkClientServerID volumeOpacityID =
+        this->PVSource->GetPartDisplay()->GetVolumeOpacityProxy()->GetID(0);
+
+      vtkPVProcessModule* pm = pvApp->GetProcessModule();
+      vtkClientServerStream& stream = pm->GetStream();
+      
+      //2. ScalarOpacityUnitDistance
+      vtkClientServerID volumePropertyID = 
+        this->PVSource->GetPartDisplay()->GetVolumePropertyProxy()->GetID(0);
+      stream << vtkClientServerStream::Invoke << volumePropertyID 
+             << "SetScalarOpacityUnitDistance" << d
+             << vtkClientServerStream::End;
+
+      //Send everything:
+      pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
+      }
+    this->RenderView();
+    } 
+}
+
+//----------------------------------------------------------------------------
+void vtkPVVolumeAppearanceEditor::SetColorRamp( double s1, double r1,
+                                                double g1, double b1,
+                                                double s2, double r2,
+                                                double g2, double b2 )
+{
+  vtkPVApplication *pvApp = NULL;
+  
+  if ( this->GetApplication() )
+    {
+    pvApp =
+      vtkPVApplication::SafeDownCast(this->GetApplication());    
+    }
+  
+  if ( this->PVSource && this->ArrayInfo && pvApp )
+    {
+    int numParts = this->PVSource->GetNumberOfParts();
+    int i;
+    vtkSMPart *part;
+
+    for (i = 0; i < numParts; i++)
+      {
+      part = this->PVSource->GetPart(i);
+      // Access the vtkPiecewiseFunction:
+      vtkClientServerID volumeOpacityID =
+        this->PVSource->GetPartDisplay()->GetVolumeOpacityProxy()->GetID(0);
+
+      vtkPVProcessModule* pm = pvApp->GetProcessModule();
+      vtkClientServerStream& stream = pm->GetStream();
+      
+      //3. Color Ramp, similar to ScalarOpacity
+      vtkClientServerID volumeColorID = 
+        this->PVSource->GetPartDisplay()->GetVolumeColorProxy()->GetID(0);
+
+      stream << vtkClientServerStream::Invoke << volumeColorID 
+             << "RemoveAllPoints" << vtkClientServerStream::End;
+      stream << vtkClientServerStream::Invoke << volumeColorID 
+        << "AddRGBPoint" << s1 << r1 << g1 << b1
+        << vtkClientServerStream::End;
+      stream << vtkClientServerStream::Invoke << volumeColorID 
+        << "AddRGBPoint" << s2 << r2 << g2 << b2
+        << vtkClientServerStream::End;
+ 
+      //Send everything:
+      pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
+      }
+    this->RenderView();
+    }
 }
 

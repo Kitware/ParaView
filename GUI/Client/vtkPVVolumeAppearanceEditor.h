@@ -75,6 +75,14 @@ public:
   void VolumePropertyChangedCallback();
   void VolumePropertyChangingCallback();
   
+  // Description
+  // These methods are for reading state files.
+  void SetScalarOpacityRamp( double scalarStart, double opacityStart,
+                             double scalarEnd, double opacityEnd );
+  void SetColorRamp( double s1, double r1, double g1, double b1,
+                     double s2, double r2, double g2, double b2 );
+  void SetScalarOpacityUnitDistance(double d);
+
 protected:
   vtkPVVolumeAppearanceEditor();
   ~vtkPVVolumeAppearanceEditor();
