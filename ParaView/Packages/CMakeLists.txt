@@ -11,7 +11,6 @@ SET( AltIO_SRCS
   vtkDataCompressor.cxx
   vtkInputStream.cxx
   vtkOutputStream.cxx
-  vtkTableExtentTranslator.cxx
   vtkZLibDataCompressor.cxx
 
   vtkXMLDataElement.cxx
