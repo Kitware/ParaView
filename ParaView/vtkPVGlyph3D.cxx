@@ -40,6 +40,9 @@ vtkPVGlyph3D::vtkPVGlyph3D()
   this->CommandFunction = vtkPVGlyph3DCommand;
   
   this->Glyph3D = NULL;
+  this->GlyphSourceTclName = NULL;
+  this->GlyphScaleMode = NULL;
+  this->GlyphVectorMode = NULL;
   
   this->GlyphSourceFrame = vtkKWWidget::New();
   this->GlyphSourceLabel = vtkKWLabel::New();
@@ -58,6 +61,22 @@ vtkPVGlyph3D::vtkPVGlyph3D()
 //----------------------------------------------------------------------------
 vtkPVGlyph3D::~vtkPVGlyph3D()
 {
+  if (this->GlyphSourceTclName)
+    {
+    delete [] this->GlyphSourceTclName;
+    this->GlyphSourceTclName = NULL;
+    }
+  if (this->GlyphScaleMode)
+    {
+    delete [] this->GlyphScaleMode;
+    this->GlyphScaleMode = NULL;
+    }
+  if (this->GlyphVectorMode)
+    {
+    delete [] this->GlyphVectorMode;
+    this->GlyphVectorMode = NULL;
+    }
+  
   this->GlyphSourceLabel->Delete();
   this->GlyphSourceLabel = NULL;
   this->GlyphSourceMenu->Delete();
@@ -116,7 +135,16 @@ void vtkPVGlyph3D::CreateProperties()
   this->GlyphSourceMenu->Create(pvApp, "");
   this->GlyphSourceMenu->SetInputType("vtkPolyData");
   this->UpdateSourceMenu();
-
+  if (this->GlyphSourceTclName)
+    {
+    this->GlyphSourceMenu->SetValue(this->GlyphSourceTclName);
+    }
+  this->AcceptCommands->AddString("%s ChangeSource",
+                                  this->GetTclName());
+  this->CancelCommands->AddString("%s SetValue %s",
+                                  this->GlyphSourceMenu->GetTclName(),
+                                  this->GetGlyphSourceTclName());
+  
   this->Script("pack %s %s -side left",
                this->GlyphSourceLabel->GetWidgetName(),
                 this->GlyphSourceMenu->GetWidgetName());
@@ -132,15 +160,18 @@ void vtkPVGlyph3D::CreateProperties()
   
   this->ScaleModeMenu->SetParent(this->ScaleModeFrame);
   this->ScaleModeMenu->Create(pvApp, "");
-  this->ScaleModeMenu->AddEntryWithCommand("Scalar", this,
-                                           "ChangeScaleMode scalar");
-  this->ScaleModeMenu->AddEntryWithCommand("Vector", this,
-                                           "ChangeScaleMode vector");
-  this->ScaleModeMenu->AddEntryWithCommand("Vector Components", this,
-                                           "ChangeScaleMode components");
-  this->ScaleModeMenu->AddEntryWithCommand("Data Scaling Off", this,
-                                           "ChangeScaleMode off");
-  this->ScaleModeMenu->SetCurrentEntry("Scalar");
+  this->ScaleModeMenu->AddEntry("Scalar");
+  this->ScaleModeMenu->AddEntry("Vector");
+  this->ScaleModeMenu->AddEntry("Vector Components");
+  this->ScaleModeMenu->AddEntry("Data Scaling Off");
+  this->ScaleModeMenu->SetValue("Scalar");
+  this->SetGlyphScaleMode("Scalar");
+  
+  this->AcceptCommands->AddString("%s ChangeScaleMode",
+                                  this->GetTclName());
+  this->CancelCommands->AddString("%s SetValue %s",
+                                  this->GetTclName(),
+                                  this->GetGlyphScaleMode());
   
   this->Script("pack %s %s -side left",
                this->ScaleModeLabel->GetWidgetName(),
@@ -157,13 +188,17 @@ void vtkPVGlyph3D::CreateProperties()
   
   this->VectorModeMenu->SetParent(this->VectorModeFrame);
   this->VectorModeMenu->Create(pvApp, "");
-  this->VectorModeMenu->AddEntryWithCommand("Normal", this,
-                                            "ChangeVectorMode normal");
-  this->VectorModeMenu->AddEntryWithCommand("Vector", this,
-                                            "ChangeVectorMode vector");
-  this->VectorModeMenu->AddEntryWithCommand("Vector Rotation Off", this,
-                                            "ChangeVectorMode rotationOff");
-  this->VectorModeMenu->SetCurrentEntry("Vector");
+  this->VectorModeMenu->AddEntry("Normal");
+  this->VectorModeMenu->AddEntry("Vector");
+  this->VectorModeMenu->AddEntry("Vector Rotation Off");
+  this->VectorModeMenu->SetValue("Vector");
+  this->SetGlyphVectorMode("Vector");
+  
+  this->AcceptCommands->AddString("%s ChangeVectorMode",
+                                  this->GetTclName());
+  this->CancelCommands->AddString("%s SetValue %s",
+                                  this->GetTclName(),
+                                  this->GetGlyphVectorMode());
   
   this->Script("pack %s %s -side left",
                this->VectorModeLabel->GetWidgetName(),
@@ -173,12 +208,9 @@ void vtkPVGlyph3D::CreateProperties()
   this->OrientCheck->Create(pvApp, "-text Orient");
   this->OrientCheck->SetState(1);
   
-  // Command to update the UI.
   this->CancelCommands->AddString("%s SetState [%s GetOrient]",
                                   this->OrientCheck->GetTclName(),
                                   this->GetVTKSourceTclName()); 
-  // Format a command to move value from widget to vtkObjects (on all processes).
-  // The VTK objects do not yet have to have the same Tcl name!
   this->AcceptCommands->AddString("%s AcceptHelper2 %s SetOrient [%s GetState]",
                                   this->GetTclName(),
                                   this->GetVTKSourceTclName(),
@@ -188,12 +220,9 @@ void vtkPVGlyph3D::CreateProperties()
   this->ScaleCheck->Create(pvApp, "-text Scale");
   this->ScaleCheck->SetState(1);
   
-  // Command to update the UI.
   this->CancelCommands->AddString("%s SetState [%s GetScaling]",
                                   this->ScaleCheck->GetTclName(),
                                   this->GetVTKSourceTclName()); 
-  // Format a command to move value from widget to vtkObjects (on all processes).
-  // The VTK objects do not yet have to have the same Tcl name!
   this->AcceptCommands->AddString("%s AcceptHelper2 %s SetScaling [%s GetState]",
                                   this->GetTclName(),
                                   this->GetVTKSourceTclName(),
@@ -204,12 +233,9 @@ void vtkPVGlyph3D::CreateProperties()
   this->ScaleEntry->SetLabel("Scale Factor:");
   this->ScaleEntry->SetValue("1.0");
   
-  // Command to update the UI.
   this->CancelCommands->AddString("%s SetValue [%s GetScaleFactor]",
                                   this->ScaleEntry->GetTclName(),
                                   this->GetVTKSourceTclName()); 
-  // Format a command to move value from widget to vtkObjects (on all processes).
-  // The VTK objects do not yet have to have the same Tcl name!
   this->AcceptCommands->AddString("%s AcceptHelper2 %s SetScaleFactor [%s GetValueAsFloat]",
                                   this->GetTclName(),
                                   this->GetVTKSourceTclName(),
@@ -221,50 +247,64 @@ void vtkPVGlyph3D::CreateProperties()
                this->ScaleEntry->GetWidgetName());
 }
 
-void vtkPVGlyph3D::ChangeScaleMode(const char *newMode)
+void vtkPVGlyph3D::ChangeScaleMode()
 {
+  char *newMode = NULL;
   vtkPVApplication *pvApp = this->GetPVApplication();
+
+  newMode = this->ScaleModeMenu->GetValue();
   
-  if (strcmp(newMode, "scalar") == 0)
+  if (strcmp(newMode, "Scalar") == 0)
     {
     pvApp->BroadcastScript("[%s GetVTKSource] SetScaleModeToScaleByScalar",
                            this->GetTclName());
     }
-  else if (strcmp(newMode, "vector") == 0)
+  else if (strcmp(newMode, "Vector") == 0)
     {
     pvApp->BroadcastScript("[%s GetVTKSource] SetScaleModeToScaleByVector",
                            this->GetTclName());
     }
-  else if (strcmp(newMode, "components") == 0)
+  else if (strcmp(newMode, "Vector Components") == 0)
     {
     pvApp->BroadcastScript("[%s GetVTKSource] SetScaleModeToScaleByVectorComponents",
                            this->GetTclName());
     }
-  else if (strcmp(newMode, "off") == 0)
+  else if (strcmp(newMode, "Data Scaling Off") == 0)
     {
     pvApp->BroadcastScript("[%s GetVTKSource] SetScaleModeToDataScalingOff",
                            this->GetTclName());
     }
+  if (newMode)
+    {
+    this->SetGlyphScaleMode(newMode);
+    }
 }
 
-void vtkPVGlyph3D::ChangeVectorMode(const char *newMode)
+void vtkPVGlyph3D::ChangeVectorMode()
 {
+  char *newMode = NULL;
   vtkPVApplication *pvApp = this->GetPVApplication();
   
-  if (strcmp(newMode, "normal") == 0)
+  newMode = this->VectorModeMenu->GetValue();
+  
+  if (strcmp(newMode, "Normal") == 0)
     {
     pvApp->BroadcastScript("[%s GetVTKSource] SetVectorModeToUseNormal",
                            this->GetTclName());
     }
-  else if (strcmp(newMode, "vector") == 0)
+  else if (strcmp(newMode, "Vector") == 0)
     {
     pvApp->BroadcastScript("[%s GetVTKSource] SetVectorModeToUseVector",
                            this->GetTclName());
     }
-  else if (strcmp(newMode, "rotationOff") == 0)
+  else if (strcmp(newMode, "Vector Rotation Off") == 0)
     {
     pvApp->BroadcastScript("[%s GetVTKSource] SetVectorModeToVectorRotationOff",
                            this->GetTclName());
+    }
+  if (newMode)
+    {
+    this->SetGlyphVectorMode(newMode);
     }
 }
 
@@ -282,13 +322,12 @@ void vtkPVGlyph3D::UpdateSourceMenu()
     if (currentSource->GetNthPVOutput(0)->GetVTKData()->IsA("vtkPolyData"))
       {
       tclName = currentSource->GetNthPVOutput(0)->GetVTKDataTclName();
-      this->GlyphSourceMenu->AddEntryWithCommand(tclName, this,
-                                                 "ChangeSource");
+      if (!this->GlyphSourceTclName)
+        {
+        this->SetGlyphSourceTclName(tclName);
+        }
+      this->GlyphSourceMenu->AddEntry(tclName);
       }
-    }
-  if (tclName)
-    {
-    this->GlyphSourceMenu->SetValue(tclName);
     }
 }
 
@@ -298,6 +337,7 @@ void vtkPVGlyph3D::ChangeSource()
   char *tclName;
   
   tclName = this->GlyphSourceMenu->GetValue();
+  this->SetGlyphSourceTclName(tclName);
   
   pvApp->BroadcastScript("[%s GetVTKSource] SetSource %s",
                          this->GetTclName(), tclName);

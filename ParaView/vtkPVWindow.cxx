@@ -787,6 +787,10 @@ void vtkPVWindow::ShowCurrentSourceProperties()
   // We need to update the properties-menu radio button too!
   
   this->GetCurrentPVSource()->UpdateInputList();
+  if (this->GetCurrentPVSource()->IsA("vtkPVGlyph3D"))
+    {
+    ((vtkPVGlyph3D*)this->GetCurrentPVSource())->UpdateSourceMenu();
+    }
   this->MainView->ShowSourceParent();
 }
 

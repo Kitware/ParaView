@@ -51,8 +51,8 @@ public:
 
   // Description:
   // Tcl callback for the scale and vector mode option menus
-  void ChangeScaleMode(const char* newMode);
-  void ChangeVectorMode(const char* newMode);
+  void ChangeScaleMode();
+  void ChangeVectorMode();
 
   // Description:
   // Fill in the source menu
@@ -62,6 +62,21 @@ public:
   // Tcl callback for the source menu
   void ChangeSource();
   
+  // Description:
+  // Set/Get the tcl name of the current glyph source
+  vtkSetStringMacro(GlyphSourceTclName);
+  vtkGetStringMacro(GlyphSourceTclName);
+  
+  // Description:
+  // Set/Get the current glyph scale mode
+  vtkSetStringMacro(GlyphScaleMode);
+  vtkGetStringMacro(GlyphScaleMode);
+
+  // Description:
+  // Set/Get the current glyph scale mode
+  vtkSetStringMacro(GlyphVectorMode);
+  vtkGetStringMacro(GlyphVectorMode);
+
 protected:
   vtkPVGlyph3D();
   ~vtkPVGlyph3D();
@@ -69,7 +84,10 @@ protected:
   void operator=(const vtkPVGlyph3D&) {};
 
   vtkGlyph3D* Glyph3D;
-
+  char *GlyphSourceTclName;
+  char *GlyphScaleMode;
+  char *GlyphVectorMode;
+  
   vtkKWWidget *GlyphSourceFrame;
   vtkKWLabel *GlyphSourceLabel;
   vtkPVInputMenu *GlyphSourceMenu;
