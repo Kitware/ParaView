@@ -78,6 +78,7 @@ vtkKWMessageDialog::vtkKWMessageDialog()
   this->Icon->SetParent(this);
   this->IconImage = 0;
   this->Default = NoneDefault;
+  this->DialogName = 0;
 }
 
 vtkKWMessageDialog::~vtkKWMessageDialog()
@@ -94,8 +95,8 @@ vtkKWMessageDialog::~vtkKWMessageDialog()
     {
     this->IconImage->Delete();
     }
+  this->SetDialogName(0);
 }
-
 
 void vtkKWMessageDialog::Create(vtkKWApplication *app, const char *args)
 {
@@ -195,6 +196,20 @@ int vtkKWMessageDialog::Invoke()
     {
     return 0;
     }
+
+  if ( this->DialogName )
+    {
+    int res = this->Application->GetMessageDialogResponse(this->DialogName);
+    if ( res == 1 )
+      {
+      return 1;
+      }
+    if ( res == -1 )
+      {
+      return 0;
+      }
+    }
+  
   if ( this->Default == vtkKWMessageDialog::YesDefault )
     {
     this->OKButton->Focus();
@@ -222,8 +237,18 @@ int vtkKWMessageDialog::Invoke()
     }
   this->Script("wm resizable %s 0 0", this->GetWidgetName());
   this->Script("update idletasks");
-  
-  return vtkKWDialog::Invoke();
+
+  int res = vtkKWDialog::Invoke();
+  if ( this->DialogName && this->GetRememberMessage() )
+    {
+    int ires = res;
+    if ( !ires )
+      {
+      ires = -1;
+      }
+    this->Application->SetMessageDialogResponse(this->DialogName, ires);
+    }
+  return res;
 }
 
 void vtkKWMessageDialog::SetIcon( int ico )
@@ -309,4 +334,9 @@ int vtkKWMessageDialog::PopupOkCancel(vtkKWApplication *app, vtkKWWindow *win,
   int ret = dlg2->Invoke();
   dlg2->Delete();
   return ret;
+}
+
+int vtkKWMessageDialog::GetRememberMessage()
+{
+  return 0;
 }

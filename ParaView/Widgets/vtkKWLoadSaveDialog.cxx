@@ -90,6 +90,7 @@ void vtkKWLoadSaveDialog::Create(vtkKWApplication *app, const char* /*args*/)
 
 int vtkKWLoadSaveDialog::Invoke()
 {
+  this->Application->SetDialogUp(1);
   char *path = NULL;
   this->Script("%s -title \"%s\" -defaultextension {%s} "
 	       "-filetypes {%s} -initialdir {%s}", 
@@ -100,8 +101,10 @@ int vtkKWLoadSaveDialog::Invoke()
   if ( path && strlen(path) )
     {
     this->SetFileName(path);
+    this->Application->SetDialogUp(0);
     return 1;
     }
   this->SetFileName(0);
+  this->Application->SetDialogUp(0);
   return 0;
 }

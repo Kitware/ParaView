@@ -107,6 +107,11 @@ public:
   void SetStyleToOkCancel() {this->SetStyle(vtkKWMessageDialog::OkCancel);};
 
   // Description:
+  // Set or get the message dialog name
+  vtkSetStringMacro(DialogName);
+  vtkGetStringMacro(DialogName);
+
+  // Description:
   // Utility methods to create various dialog windows.
   static void PopupMessage(vtkKWApplication *app, vtkKWWindow *masterWin,
 			   unsigned int icon, const char* title, 
@@ -122,8 +127,9 @@ protected:
   vtkKWMessageDialog();
   ~vtkKWMessageDialog();
 
-  int Style;
-  int Default;
+  int             Style;
+  int             Default;
+  char            *DialogName;
 
   vtkKWWidget     *MessageDialogFrame;
   vtkKWLabel      *Label;
@@ -134,6 +140,9 @@ protected:
   vtkKWIcon       *IconImage;
   vtkKWWidget     *OKFrame;
   vtkKWWidget     *CancelFrame;
+
+  int GetRememberMessage();
+
 private:
   vtkKWMessageDialog(const vtkKWMessageDialog&); // Not implemented
   void operator=(const vtkKWMessageDialog&); // Not implemented

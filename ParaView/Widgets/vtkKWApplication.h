@@ -58,6 +58,10 @@ class vtkKWWindow;
 class vtkKWWidget;
 class vtkKWRegisteryUtilities;
 
+//BTX
+template<class KeyType,class DataType> class vtkAbstractMap;
+//ETX
+
 class VTK_EXPORT vtkKWApplication : public vtkKWObject
 {
 public:
@@ -66,9 +70,9 @@ public:
   
   virtual vtkKWApplication *GetApplication()  { return this;  }
   virtual void SetApplication (vtkKWApplication*) 
-    { 
-      vtkErrorMacro( << "Do not set the Application on an Application" << endl ); 
-    }
+  { 
+  vtkErrorMacro( << "Do not set the Application on an Application" << endl ); 
+  }
   
   
   // Description:
@@ -196,6 +200,18 @@ public:
   // There is no way back for now.
   void SupressMessageDialogs() { this->UseMessageDialogs = 0; }
   vtkGetMacro(UseMessageDialogs, int);
+
+  // Description:
+  // This method returns a message dialog response.
+  // The string is the name of dialog and the return is:
+  // 0 for no response (display dialog), 1 for response ok/yes
+  // and -1 for response cancel/no.
+  int GetMessageDialogResponse(const char* dialogname);
+  
+  // Description:
+  // Set the message dialog response. Set 1 for ok/yes and -1 for 
+  // cancel/no.
+  int SetMessageDialogResponse(const char* dialogname, int response);
   
 protected:
   vtkKWApplication();

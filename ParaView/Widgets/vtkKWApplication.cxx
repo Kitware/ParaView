@@ -53,6 +53,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWWindow.h"
 #include "kwinit.h"
 
+#include "vtkArrayMap.txx"
+
 
 int vtkKWApplication::WidgetVisibility = 1;
 
@@ -123,7 +125,7 @@ vtkKWApplication::vtkKWApplication()
   this->Registery = 0;
   this->RegisteryLevel = 10;
 
-  this->UseMessageDialogs = 1;
+  this->UseMessageDialogs = 1;  
 }
 
 vtkKWApplication::~vtkKWApplication()
@@ -742,4 +744,17 @@ void vtkKWApplication::SetBalloonHelpWidget( vtkKWWidget *widget )
     this->BalloonHelpWidget = widget;
     this->BalloonHelpWidget->Register(this);
     }  
+}
+
+
+int vtkKWApplication::GetMessageDialogResponse(const char* dialogname)
+{
+  return 0;
+}
+
+int vtkKWApplication::SetMessageDialogResponse(const char* dialogname, 
+					       int response)
+{
+  dialogname = dialogname;
+  response = response;
 }
