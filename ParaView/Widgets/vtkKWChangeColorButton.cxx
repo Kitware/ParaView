@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWChangeColorButton);
-vtkCxxRevisionMacro(vtkKWChangeColorButton, "1.26");
+vtkCxxRevisionMacro(vtkKWChangeColorButton, "1.27");
 
 int vtkKWChangeColorButtonCommand(ClientData cd, Tcl_Interp *interp,
                                   int argc, char *argv[]);
@@ -345,20 +345,16 @@ void vtkKWChangeColorButton::AButtonRelease(int x, int y)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWChangeColorButton::SetEnabled(int e)
+void vtkKWChangeColorButton::UpdateEnableState()
 {
-  // Propagate first (since objects can be modified externally, they might
-  // not be in synch with this->Enabled)
+  this->Superclass::UpdateEnableState();
 
-  if (this->IsCreated())
+  // Color button
+
+  if (this->ColorButton)
     {
-    this->ColorButton->SetEnabled(e);
+    this->ColorButton->SetEnabled(this->Enabled);
     }
-
-  // Then call superclass, which will call SetEnabled on the label and 
-  // update the internal Enabled ivar (although it is not of much use here)
-
-  this->Superclass::SetEnabled(e);
 
   // Now given the state, bind or unbind
 
@@ -492,7 +488,7 @@ void vtkKWChangeColorButton::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWChangeColorButton ";
-  this->ExtractRevision(os,"$Revision: 1.26 $");
+  this->ExtractRevision(os,"$Revision: 1.27 $");
 }
 
 //----------------------------------------------------------------------------
