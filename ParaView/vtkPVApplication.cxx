@@ -151,14 +151,15 @@ void vtkPVApplication::BroadcastSimpleScript(char *str)
 {
   int id, num;
   
-  
-  this->SimpleScript(str);
-  
   num = this->Controller->GetNumberOfProcesses();
+
   for (id = 1; id < num; ++id)
     {
     this->RemoteSimpleScript(id, str);
     }
+  
+  // Do reverse order, because 0 will block.
+  this->SimpleScript(str);
 }
 
 
