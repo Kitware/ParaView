@@ -62,7 +62,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.349");
+vtkCxxRevisionMacro(vtkPVSource, "1.350");
 
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
@@ -1880,7 +1880,7 @@ void vtkPVSource::CleanBatchScript(ofstream *file)
 //----------------------------------------------------------------------------
 void vtkPVSource::SaveFilterInBatchScript(ofstream *file)
 {
-  int i, numWidgets;
+  int i;
 
   // Detect special sources we do not handle yet.
   if (this->GetSourceClassName() == NULL)
