@@ -55,7 +55,7 @@
 #endif
 
 
-vtkCxxRevisionMacro(vtkClientCompositeManager, "1.41");
+vtkCxxRevisionMacro(vtkClientCompositeManager, "1.42");
 vtkStandardNewMacro(vtkClientCompositeManager);
 
 vtkCxxSetObjectMacro(vtkClientCompositeManager,Compositer,vtkCompositer);
@@ -504,7 +504,7 @@ void vtkClientCompositeManager::ReceiveAndSetColorBuffer()
   this->SavedCamera->SetParallelScale(cam->GetParallelScale());
   this->SavedCamera->SetClippingRange(cam->GetClippingRange());
   this->SavedCamera->SetViewAngle(cam->GetViewAngle());
-  double* tmp = cam->GetWindowCenter();
+  //double* tmp = cam->GetWindowCenter();
   //this->SavedCamera->SetWindowCenter(tmp[0], tmp[1]);
 
   cam->ParallelProjectionOn();
