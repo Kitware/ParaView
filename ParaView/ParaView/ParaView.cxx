@@ -99,17 +99,6 @@ int MyMain(int argc, char *argv[])
   vtkOutputWindow::GetInstance()->PromptUserOff();
 #endif
 
-  // When running remote application, we need to detach, otherwise the session
-  // will stay open. So, we will do a little hack and we will call Paraview
-  // with --detach as an argument, which will detach ParaView.
-  if ( argc > 2 && (strcmp(argv[1],"--detach") == 0 || strcmp(argv[1],"-dd") == 0))
-    {
-    if ( vtkKWRemoteExecute::Detach() != VTK_OK )
-      {
-      return 1;
-      }
-    }
-  
   // The server is a special case.  We do not initialize Tk for process 0.
   // I would rather have application find this command line option, but
   // I cannot create an application before I initialize Tcl.
@@ -137,6 +126,7 @@ int MyMain(int argc, char *argv[])
   app = vtkPVApplication::New();
   if (myId == 0 && app->ParseCommandLineArguments(argc, argv))
     {
+    // either error occured during parsing or we are not root node
     retVal = 1;
     app->SetStartGUI(0);
     }
