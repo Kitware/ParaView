@@ -60,7 +60,7 @@ vtkKWEventNotifier::~vtkKWEventNotifier()
 {
   if ( this->Callbacks )
     {
-    for ( int i; i < 26; i++ )
+    for ( int i = 0; i < 26; i++ )
       {
       if ( this->Callbacks[i] )
 	{
