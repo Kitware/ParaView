@@ -149,12 +149,20 @@ public:
     { vtkKWToolbar::SetGlobalWidgetsFlatAspect(0); };
 
   // Description:
-  // Set/Get the padding that will be applied around each widget when 
-  // WidgetsFlatAspect is On (default to 1 on Windows, 2 otherwise).
-  virtual void SetWidgetsFlatPadX(int);
-  vtkGetMacro(WidgetsFlatPadX, int);
-  virtual void SetWidgetsFlatPadY(int);
-  vtkGetMacro(WidgetsFlatPadY, int);
+  // Set/Get the padding that will be applied around each widget.
+  // (default to 0 on Windows, 1 otherwise).
+  virtual void SetPadX(int);
+  vtkGetMacro(PadX, int);
+  virtual void SetPadY(int);
+  vtkGetMacro(PadY, int);
+
+  // Description:
+  // Set/Get the additional padding that will be applied around each widget
+  // when WidgetsFlatAspect is On (default to 1).
+  virtual void SetWidgetsFlatAdditionalPadX(int);
+  vtkGetMacro(WidgetsFlatAdditionalPadX, int);
+  virtual void SetWidgetsFlatAdditionalPadY(int);
+  vtkGetMacro(WidgetsFlatAdditionalPadY, int);
   
 protected:
   vtkKWToolbar();
@@ -174,8 +182,10 @@ protected:
   vtkVector<vtkKWWidget*>* Widgets;
 //ETX
 
-  int WidgetsFlatPadX;
-  int WidgetsFlatPadY;
+  int PadX;
+  int PadY;
+  int WidgetsFlatAdditionalPadX;
+  int WidgetsFlatAdditionalPadY;
 
   int FlatAspect;
   int WidgetsFlatAspect;

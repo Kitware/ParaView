@@ -83,7 +83,7 @@ void vtkKWToolbar::SetGlobalWidgetsFlatAspect(int val)
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWToolbar );
-vtkCxxRevisionMacro(vtkKWToolbar, "1.27");
+vtkCxxRevisionMacro(vtkKWToolbar, "1.28");
 
 
 int vtkKWToolbarCommand(ClientData cd, Tcl_Interp *interp,
@@ -114,10 +114,11 @@ vtkKWToolbar::vtkKWToolbar()
   this->DefaultOptionsWidget->SetParent(this);
 
 #if defined(WIN32)
-  this->WidgetsFlatPadX = this->WidgetsFlatPadY = 1;
+  this->PadX = this->PadY = 0;
 #else
-  this->WidgetsFlatPadX = this->WidgetsFlatPadY = 2;
+  this->PadX = this->PadY = 1;
 #endif
+  this->WidgetsFlatAdditionalPadX = this->WidgetsFlatAdditionalPadY = 1;
 }
 
 //----------------------------------------------------------------------------
@@ -419,10 +420,10 @@ void vtkKWToolbar::ConstrainWidgetsLayout()
     if (it->GetData(widget) == VTK_OK)
       {
       this->Script("winfo reqwidth %s", widget->GetWidgetName());
-      totReqWidth += this->GetIntegerResult(this->Application);
+      totReqWidth += this->GetIntegerResult(this->Application) + this->PadX;
       if (this->WidgetsFlatAspect)
         {
-        totReqWidth += this->WidgetsFlatPadX;
+        totReqWidth += this->WidgetsFlatAdditionalPadX;
         }
       }
     it->GoToNextItem();
@@ -446,12 +447,14 @@ void vtkKWToolbar::ConstrainWidgetsLayout()
       if (it->GetData(widget) == VTK_OK)
         {
         s << "grid " << widget->GetWidgetName() << " -row " 
-          << row << " -column " << num << " -sticky news";
-        if (this->WidgetsFlatAspect)
-          {
-          s << " -padx " << this->WidgetsFlatPadX << " -pady " << this->WidgetsFlatPadY;
-          }
-        s << endl;
+          << row << " -column " << num << " -sticky news "
+          << " -padx " 
+          << (this->PadX + (this->WidgetsFlatAspect ? 
+                            this->WidgetsFlatAdditionalPadX : 0))
+          << " -pady "
+          << (this->PadY + (this->WidgetsFlatAspect ? 
+                            this->WidgetsFlatAdditionalPadY : 0))
+          << endl;
         num++;
         if ( num == numPerRow ) 
           { 
@@ -504,13 +507,14 @@ void vtkKWToolbar::UpdateWidgetsLayout()
     }
   it->Delete();
 
-  s << " -sticky news -row 0";
-  if (this->WidgetsFlatAspect)
-    {
-    s << " -padx " << this->WidgetsFlatPadX 
-      << " -pady " << this->WidgetsFlatPadY;
-    }
-  s << ends;
+  s << " -sticky news -row 0 "
+    << " -padx " 
+    << (this->PadX + (this->WidgetsFlatAspect ? 
+                      this->WidgetsFlatAdditionalPadX : 0))
+    << " -pady "
+    << (this->PadY + (this->WidgetsFlatAspect ? 
+                      this->WidgetsFlatAdditionalPadY : 0))
+    << ends;
   this->Script(s.str());
   s.rdbuf()->freeze(0);
 }
@@ -523,28 +527,56 @@ void vtkKWToolbar::UpdateWidgets()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWToolbar::SetWidgetsFlatPadX(int arg)
+void vtkKWToolbar::SetPadX(int arg)
 {
-  if (arg == this->WidgetsFlatPadX)
+  if (arg == this->PadX)
     {
     return;
     }
 
-  this->WidgetsFlatPadX = arg;
+  this->PadX = arg;
   this->Modified();
 
   this->UpdateWidgetsLayout();
 }
 
 //----------------------------------------------------------------------------
-void vtkKWToolbar::SetWidgetsFlatPadY(int arg)
+void vtkKWToolbar::SetPadY(int arg)
 {
-  if (arg == this->WidgetsFlatPadX)
+  if (arg == this->PadX)
     {
     return;
     }
 
-  this->WidgetsFlatPadY = arg;
+  this->PadY = arg;
+  this->Modified();
+
+  this->UpdateWidgetsLayout();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWToolbar::SetWidgetsFlatAdditionalPadX(int arg)
+{
+  if (arg == this->WidgetsFlatAdditionalPadX)
+    {
+    return;
+    }
+
+  this->WidgetsFlatAdditionalPadX = arg;
+  this->Modified();
+
+  this->UpdateWidgetsLayout();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWToolbar::SetWidgetsFlatAdditionalPadY(int arg)
+{
+  if (arg == this->WidgetsFlatAdditionalPadX)
+    {
+    return;
+    }
+
+  this->WidgetsFlatAdditionalPadY = arg;
   this->Modified();
 
   this->UpdateWidgetsLayout();
@@ -676,6 +708,8 @@ void vtkKWToolbar::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "Resizable: " << (this->Resizable ? "On" : "Off") << endl;
   os << indent << "FlatAspect: " << (this->FlatAspect ? "On" : "Off") << endl;
   os << indent << "WidgetsFlatAspect: " << (this->WidgetsFlatAspect ? "On" : "Off") << endl;
-  os << indent << "WidgetsFlatPadX: " << this->WidgetsFlatPadX << endl;
-  os << indent << "WidgetsFlatPadY: " << this->WidgetsFlatPadY << endl;
+  os << indent << "PadX: " << this->PadX << endl;
+  os << indent << "PadY: " << this->PadY << endl;
+  os << indent << "WidgetsFlatAdditionalPadX: " << this->WidgetsFlatAdditionalPadX << endl;
+  os << indent << "WidgetsFlatAdditionalPadY: " << this->WidgetsFlatAdditionalPadY << endl;
 }
