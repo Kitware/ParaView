@@ -274,6 +274,15 @@ public:
   // Access to the canvas
   vtkGetObjectMacro(Canvas, vtkKWWidget);
 
+  // Description:
+  // Update the "enable" state of the object and its internal parts.
+  // Depending on different Ivars (this->Enabled, the application's 
+  // Limited Edition Mode, etc.), the "enable" state of the object is updated
+  // and propagated to its internal parts/subwidgets. This will, for example,
+  // enable/disable parts of the widget UI, enable/disable the visibility
+  // of 3D widgets, etc.
+  virtual void UpdateEnableState();
+
 protected:
   vtkKWRange();
   ~vtkKWRange();
@@ -367,11 +376,6 @@ protected:
   // Description:
   // Get the current sliders center positions
   virtual void GetSlidersPositions(int pos[2]);
-
-  // Description:
-  // Update the enable state. This should propagate similar calls to the
-  // internal widgets.
-  virtual void UpdateEnableState();
 
 private:
   vtkKWRange(const vtkKWRange&); // Not implemented

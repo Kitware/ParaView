@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWWidget );
-vtkCxxRevisionMacro(vtkKWWidget, "1.75");
+vtkCxxRevisionMacro(vtkKWWidget, "1.76");
 
 int vtkKWWidgetCommand(ClientData cd, Tcl_Interp *interp,
                        int argc, char *argv[]);
@@ -174,6 +174,8 @@ void vtkKWWidget::Create(vtkKWApplication *app, const char *name,
   this->SetApplication(app);
 
   this->Script("%s %s %s", name, this->GetWidgetName(), (args ? args : ""));
+
+  // Update enable state
 
   this->UpdateEnableState();
 }
@@ -347,7 +349,7 @@ void vtkKWWidget::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkKWWidget ";
-  this->ExtractRevision(os,"$Revision: 1.75 $");
+  this->ExtractRevision(os,"$Revision: 1.76 $");
 }
 
 //----------------------------------------------------------------------------
@@ -482,6 +484,7 @@ void vtkKWWidget::SetEnabled(int e)
   this->Enabled = e;
 
   this->UpdateEnableState();
+
   this->Modified();
 }
 

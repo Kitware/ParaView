@@ -84,6 +84,7 @@ public:
   // Enable/Disable this interface. This propagates SetEnabled() calls to all
   // panels.
   virtual void SetEnabled(int);
+  virtual void UpdateEnableState();
 
   // Description:
   // Iterate over all panels and call Update() for each one. This will refresh

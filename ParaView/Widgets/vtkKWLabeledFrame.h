@@ -48,6 +48,7 @@ class vtkKWApplication;
 class vtkKWFrame;
 class vtkKWIcon;
 class vtkKWLabel;
+class vtkKWLabeledLabel;
 
 #define VTK_KW_LABEL_CASE_USER_SPECIFIED 0
 #define VTK_KW_LABEL_CASE_UPPERCASE_FIRST 1
@@ -83,8 +84,8 @@ public:
   vtkGetObjectMacro(LabelFrame, vtkKWFrame);
 
   // Description:
-  // Get the label.
-  vtkGetObjectMacro(Label, vtkKWLabel);
+  // Get the label (frame title).
+  virtual vtkKWLabel *GetLabel();
 
   // Description:
   // Show or hide the frame.
@@ -120,29 +121,46 @@ public:
   static void BoldLabelOn();
   static void BoldLabelOff();
 
+  // Description:
+  // Show a special icon (lock) when the application is in 
+  // Limited Edition Mode and the label frame is disabled.
+  virtual void SetShowIconInLimitedEditionMode(int);
+  vtkBooleanMacro(ShowIconInLimitedEditionMode, int);
+  vtkGetMacro(ShowIconInLimitedEditionMode, int);
+
+  // Description:
+  // Update the "enable" state of the object and its internal parts.
+  // Depending on different Ivars (this->Enabled, the application's 
+  // Limited Edition Mode, etc.), the "enable" state of the object is updated
+  // and propagated to its internal parts/subwidgets. This will, for example,
+  // enable/disable parts of the widget UI, enable/disable the visibility
+  // of 3D widgets, etc.
+  virtual void UpdateEnableState();
+
 protected:
 
   vtkKWLabeledFrame();
   ~vtkKWLabeledFrame();
 
-  vtkKWFrame *Frame;
-  vtkKWFrame *LabelFrame;
-  vtkKWLabel *Label;
+  vtkKWFrame        *Frame;
+  vtkKWFrame        *LabelFrame;
+  vtkKWLabeledLabel *Label;
 
-  vtkKWWidget *Border;
-  vtkKWWidget *Border2;
-  vtkKWWidget *Groove;
-  vtkKWLabel  *Icon;
-  vtkKWIcon   *IconData;
+  vtkKWWidget       *Border;
+  vtkKWWidget       *Border2;
+  vtkKWWidget       *Groove;
+  vtkKWLabel        *Icon;
+  vtkKWIcon         *IconData;
+
   int Displayed;
+  int ShowHideFrame;
+  int ShowIconInLimitedEditionMode;
+
   static int AllowShowHide;
   static int BoldLabel;
   static int LabelCase;
-  int ShowHideFrame;
 
-  // Update the enable state. This should propagate similar calls to the
-  // internal widgets.
-  virtual void UpdateEnableState();
+  virtual vtkKWLabel *GetLabelIcon();
 
 private:
   vtkKWLabeledFrame(const vtkKWLabeledFrame&); // Not implemented

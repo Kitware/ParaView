@@ -36,6 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWApplication.h"
 
 #include "vtkArrayMap.txx"
+#include "vtkCollectionIterator.h"
 #include "vtkKWApplicationSettingsInterface.h"
 #include "vtkKWBWidgets.h"
 #include "vtkKWDirectoryUtilities.h"
@@ -71,7 +72,7 @@ int vtkKWApplication::WidgetVisibility = 1;
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.136");
+vtkCxxRevisionMacro(vtkKWApplication, "1.137");
 
 extern "C" int Vtktcl_Init(Tcl_Interp *interp);
 extern "C" int Vtkkwwidgetstcl_Init(Tcl_Interp *interp);
@@ -1310,8 +1311,19 @@ void vtkKWApplication::SetLimitedEditionMode(int v)
     }
 
   this->LimitedEditionMode = v;
-  this->Modified();
 
+  vtkCollectionIterator *it = this->Windows->NewIterator();
+  for (it->InitTraversal(); !it->IsDoneWithTraversal(); it->GoToNextItem())
+    {
+    vtkKWWindow* win = vtkKWWindow::SafeDownCast(it->GetObject());
+    if (win)
+      {
+      win->UpdateEnableState();
+      }
+    }
+  it->Delete();
+
+  this->Modified();
 }
 
 //----------------------------------------------------------------------------

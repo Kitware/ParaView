@@ -116,6 +116,15 @@ public:
   // Get the actuall Entry widget.
   vtkGetObjectMacro(Entry, vtkKWWidget);
 
+  // Description:
+  // Update the "enable" state of the object and its internal parts.
+  // Depending on different Ivars (this->Enabled, the application's 
+  // Limited Edition Mode, etc.), the "enable" state of the object is updated
+  // and propagated to its internal parts/subwidgets. This will, for example,
+  // enable/disable parts of the widget UI, enable/disable the visibility
+  // of 3D widgets, etc.
+  virtual void UpdateEnableState();
+
 protected:
   vtkKWEntry();
   ~vtkKWEntry();
@@ -134,9 +143,6 @@ protected:
   vtkKWListBox* List;
 
   vtkKWEntryInternals* Internals;
-
-  // Also greys out the entry when disabled.
-  virtual void UpdateEnableState();
 
 private:
   vtkKWEntry(const vtkKWEntry&); // Not implemented

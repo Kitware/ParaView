@@ -85,6 +85,15 @@ public:
   virtual void Update();
 
   // Description:
+  // Update the "enable" state of the object and its internal parts.
+  // Depending on different Ivars (Enabled, the application's 
+  // Limited Edition Mode, etc.), the "enable" state of the object is updated
+  // and propagated to its internal parts subwidgets. This will, for example,
+  // enable disable parts of the widget UI, enable disable the visibility
+  // of 3D widgets, etc.
+  virtual void UpdateEnableState();
+
+  // Description:
   // Pack the toolbar. Do not use Tk 'pack' since the toolbar has more
   // fancy things to do after packing.
   virtual void Pack(const char*);
@@ -157,7 +166,7 @@ public:
   vtkGetMacro(WidgetsFlatAdditionalPadX, int);
   virtual void SetWidgetsFlatAdditionalPadY(int);
   vtkGetMacro(WidgetsFlatAdditionalPadY, int);
-  
+
 protected:
   vtkKWToolbar();
   ~vtkKWToolbar();
@@ -186,10 +195,6 @@ protected:
   int Resizable;
 
   vtkKWRadioButton *DefaultOptionsWidget;
-
-  // Update the enable state. This should propagate similar calls to the
-  // internal widgets.
-  virtual void UpdateEnableState();
 
 private:
   vtkKWToolbar(const vtkKWToolbar&); // Not implemented

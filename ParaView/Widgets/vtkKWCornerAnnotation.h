@@ -152,6 +152,15 @@ public:
   virtual void SerializeToken(istream& is, const char *token);
   virtual void SerializeRevision(ostream& os, vtkIndent indent);
 
+  // Description:
+  // Update the "enable" state of the object and its internal parts.
+  // Depending on different Ivars (this->Enabled, the application's 
+  // Limited Edition Mode, etc.), the "enable" state of the object is updated
+  // and propagated to its internal parts/subwidgets. This will, for example,
+  // enable/disable parts of the widget UI, enable/disable the visibility
+  // of 3D widgets, etc.
+  virtual void UpdateEnableState();
+
 protected:
   vtkKWCornerAnnotation();
   ~vtkKWCornerAnnotation();
@@ -184,10 +193,6 @@ protected:
   // for example, an annotation visibility).
   // This does *not* return the state of the widget.
   virtual int GetCheckButtonState() { return this->GetVisibility(); };
-
-  // Update the enable state. This should propagate similar calls to the
-  // internal widgets.
-  virtual void UpdateEnableState();
 
   // Send an event representing the state of the widget
   virtual void SendChangedEvent();

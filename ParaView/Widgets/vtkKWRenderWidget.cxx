@@ -53,7 +53,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkWin32OpenGLRenderWindow.h"
 #endif
 
-vtkCxxRevisionMacro(vtkKWRenderWidget, "1.55");
+vtkCxxRevisionMacro(vtkKWRenderWidget, "1.56");
 
 //----------------------------------------------------------------------------
 class vtkKWRenderWidgetObserver : public vtkCommand
@@ -246,12 +246,19 @@ void vtkKWRenderWidget::Create(vtkKWApplication *app, const char *args)
   this->Script("frame %s %s", wname, args);
   
   sprintf(local, "%s -rw Addr=%p", args, this->RenderWindow);
+
+  // Create the VTK Tk render widget in VTKWidget
+
   this->Script("vtkTkRenderWidget %s %s",
                this->VTKWidget->GetWidgetName(), local);
+  this->VTKWidget->SetApplication(app);
+
   this->Script("grid rowconfigure %s 0 -weight 1",
                this->GetWidgetName());
+
   this->Script("grid columnconfigure %s 0 -weight 1",
                this->GetWidgetName());
+
   this->Script("grid %s -sticky nsew",
                this->VTKWidget->GetWidgetName());
   
@@ -274,19 +281,26 @@ void vtkKWRenderWidget::SetupBindings()
 
   this->RemoveBindings();
 
-  const char *wname = this->VTKWidget->GetWidgetName();
   const char *tname = this->GetTclName();
 
-  // Setup some default bindings
+  if (this->VTKWidget->IsCreated())
+    {
+    const char *wname = this->VTKWidget->GetWidgetName();
 
-  this->Script("bind %s <Expose> {%s Exposed}",
-               wname, tname);
+    // Setup some default bindings
+    
+    this->Script("bind %s <Expose> {%s Exposed}",
+                 wname, tname);
   
-  this->Script("bind %s <Enter> {%s Enter %%x %%y}",
-               wname, tname);
+    this->Script("bind %s <Enter> {%s Enter %%x %%y}",
+                 wname, tname);
+    }
 
-  this->Script("bind %s <Configure> {%s Configure %%w %%h}",
-               this->GetWidgetName(), tname);
+  if (this->IsCreated())
+    {
+    this->Script("bind %s <Configure> {%s Configure %%w %%h}",
+                 this->GetWidgetName(), tname);
+    }
   
   this->SetupInteractionBindings();
 }
@@ -294,11 +308,18 @@ void vtkKWRenderWidget::SetupBindings()
 //----------------------------------------------------------------------------
 void vtkKWRenderWidget::RemoveBindings()
 {
-  const char *wname = this->VTKWidget->GetWidgetName();
+  if (this->VTKWidget->IsCreated())
+    {
+    const char *wname = this->VTKWidget->GetWidgetName();
   
-  this->Script("bind %s <Expose> {}", wname);
-  this->Script("bind %s <Enter> {}", wname);
-  this->Script("bind %s <Configure> {}", this->GetWidgetName());
+    this->Script("bind %s <Expose> {}", wname);
+    this->Script("bind %s <Enter> {}", wname);
+    }
+
+  if (this->IsCreated())
+    {
+    this->Script("bind %s <Configure> {}", this->GetWidgetName());
+    }
 
   this->RemoveInteractionBindings();
 }
@@ -317,99 +338,121 @@ void vtkKWRenderWidget::SetupInteractionBindings()
     return;
     }
 
-  const char *wname = this->VTKWidget->GetWidgetName();
-  const char *tname = this->GetTclName();
+  if (this->VTKWidget->IsCreated())
+    {
+    const char *wname = this->VTKWidget->GetWidgetName();
+    const char *tname = this->GetTclName();
 
-  this->Script("bind %s <Any-ButtonPress> {%s AButtonPress %%b %%x %%y 0 0}",
-               wname, tname);
+    this->Script(
+      "bind %s <Any-ButtonPress> {%s AButtonPress %%b %%x %%y 0 0}",
+      wname, tname);
 
-  this->Script("bind %s <Any-ButtonRelease> {%s AButtonRelease %%b %%x %%y}",
-               wname, tname);
+    this->Script(
+      "bind %s <Any-ButtonRelease> {%s AButtonRelease %%b %%x %%y}",
+      wname, tname);
 
-  this->Script(
-    "bind %s <Shift-Any-ButtonPress> {%s AButtonPress %%b %%x %%y 0 1}",
-    wname, tname);
+    this->Script(
+      "bind %s <Shift-Any-ButtonPress> {%s AButtonPress %%b %%x %%y 0 1}",
+      wname, tname);
 
-  this->Script(
-    "bind %s <Shift-Any-ButtonRelease> {%s AButtonRelease %%b %%x %%y}",
-    wname, tname);
+    this->Script(
+      "bind %s <Shift-Any-ButtonRelease> {%s AButtonRelease %%b %%x %%y}",
+      wname, tname);
 
-  this->Script(
-    "bind %s <Control-Any-ButtonPress> {%s AButtonPress %%b %%x %%y 1 0}",
-    wname, tname);
+    this->Script(
+      "bind %s <Control-Any-ButtonPress> {%s AButtonPress %%b %%x %%y 1 0}",
+      wname, tname);
 
-  this->Script(
-    "bind %s <Control-Any-ButtonRelease> {%s AButtonRelease %%b %%x %%y}",
-    wname, tname);
+    this->Script(
+      "bind %s <Control-Any-ButtonRelease> {%s AButtonRelease %%b %%x %%y}",
+      wname, tname);
 
-  this->Script("bind %s <B1-Motion> {%s MouseMove 1 %%x %%y}",
-               wname, tname);
+    this->Script(
+      "bind %s <B1-Motion> {%s MouseMove 1 %%x %%y}",
+      wname, tname);
 
-  this->Script("bind %s <B2-Motion> {%s MouseMove 2 %%x %%y}", 
-               wname, tname);
+    this->Script(
+      "bind %s <B2-Motion> {%s MouseMove 2 %%x %%y}", 
+      wname, tname);
   
-  this->Script("bind %s <B3-Motion> {%s MouseMove 3 %%x %%y}", 
-               wname, tname);
+    this->Script(
+      "bind %s <B3-Motion> {%s MouseMove 3 %%x %%y}", 
+      wname, tname);
 
-  this->Script("bind %s <Shift-B1-Motion> {%s MouseMove 1 %%x %%y}", 
-               wname, tname);
+    this->Script(
+      "bind %s <Shift-B1-Motion> {%s MouseMove 1 %%x %%y}", 
+      wname, tname);
 
-  this->Script("bind %s <Shift-B2-Motion> {%s MouseMove 2 %%x %%y}", 
-               wname, tname);
+    this->Script(
+      "bind %s <Shift-B2-Motion> {%s MouseMove 2 %%x %%y}", 
+      wname, tname);
   
-  this->Script("bind %s <Shift-B3-Motion> {%s MouseMove 3 %%x %%y}", 
-               wname, tname);
+    this->Script(
+      "bind %s <Shift-B3-Motion> {%s MouseMove 3 %%x %%y}", 
+      wname, tname);
 
-  this->Script("bind %s <Control-B1-Motion> {%s MouseMove 1 %%x %%y}",
-               wname, tname);
+    this->Script(
+      "bind %s <Control-B1-Motion> {%s MouseMove 1 %%x %%y}",
+      wname, tname);
 
-  this->Script("bind %s <Control-B2-Motion> {%s MouseMove 2 %%x %%y}",
-               wname, tname);
+    this->Script(
+      "bind %s <Control-B2-Motion> {%s MouseMove 2 %%x %%y}",
+      wname, tname);
   
-  this->Script("bind %s <Control-B3-Motion> {%s MouseMove 3 %%x %%y}",
-               wname, tname);
+    this->Script(
+      "bind %s <Control-B3-Motion> {%s MouseMove 3 %%x %%y}",
+      wname, tname);
 
-  this->Script("bind %s <KeyPress> {%s AKeyPress %%A %%x %%y 0 0 %%K}",
-               wname, tname);
+    this->Script(
+      "bind %s <KeyPress> {%s AKeyPress %%A %%x %%y 0 0 %%K}",
+      wname, tname);
   
-  this->Script("bind %s <Shift-KeyPress> {%s AKeyPress %%A %%x %%y 0 1 %%K}",
-               wname, tname);
+    this->Script(
+      "bind %s <Shift-KeyPress> {%s AKeyPress %%A %%x %%y 0 1 %%K}",
+      wname, tname);
   
-  this->Script("bind %s <Control-KeyPress> {%s AKeyPress %%A %%x %%y 1 0 %%K}",
-               wname, tname);
+    this->Script(
+      "bind %s <Control-KeyPress> {%s AKeyPress %%A %%x %%y 1 0 %%K}",
+      wname, tname);
   
-  this->Script("bind %s <Motion> {%s MouseMove 0 %%x %%y}", wname, tname);
+    this->Script(
+      "bind %s <Motion> {%s MouseMove 0 %%x %%y}", 
+      wname, tname);
+    }
 }
 
 //----------------------------------------------------------------------------
 void vtkKWRenderWidget::RemoveInteractionBindings()
 {
-  const char *wname = this->VTKWidget->GetWidgetName();
+  if (this->VTKWidget->IsCreated())
+    {
+    const char *wname = this->VTKWidget->GetWidgetName();
   
-  this->Script("bind %s <Any-ButtonPress> {}", wname);
-  this->Script("bind %s <Any-ButtonRelease> {}", wname);
-  this->Script("bind %s <Shift-Any-ButtonPress> {}", wname);
-  this->Script("bind %s <Shift-Any-ButtonRelease> {}", wname);
-  this->Script("bind %s <Control-Any-ButtonPress> {}", wname);
-  this->Script("bind %s <Control-Any-ButtonRelease> {}", wname);
+    this->Script("bind %s <Any-ButtonPress> {}", wname);
+    this->Script("bind %s <Any-ButtonRelease> {}", wname);
+    this->Script("bind %s <Shift-Any-ButtonPress> {}", wname);
+    this->Script("bind %s <Shift-Any-ButtonRelease> {}", wname);
+    this->Script("bind %s <Control-Any-ButtonPress> {}", wname);
+    this->Script("bind %s <Control-Any-ButtonRelease> {}", wname);
 
-  this->Script("bind %s <B1-Motion> {}", wname);
-  this->Script("bind %s <B2-Motion> {}", wname);
-  this->Script("bind %s <B3-Motion> {}", wname);
+    this->Script("bind %s <B1-Motion> {}", wname);
+    this->Script("bind %s <B2-Motion> {}", wname);
+    this->Script("bind %s <B3-Motion> {}", wname);
 
-  this->Script("bind %s <Shift-B1-Motion> {}", wname);
-  this->Script("bind %s <Shift-B2-Motion> {}", wname);
-  this->Script("bind %s <Shift-B3-Motion> {}", wname);
+    this->Script("bind %s <Shift-B1-Motion> {}", wname);
+    this->Script("bind %s <Shift-B2-Motion> {}", wname);
+    this->Script("bind %s <Shift-B3-Motion> {}", wname);
 
-  this->Script("bind %s <Control-B1-Motion> {}", wname);
-  this->Script("bind %s <Control-B2-Motion> {}", wname);
-  this->Script("bind %s <Control-B3-Motion> {}", wname);
+    this->Script("bind %s <Control-B1-Motion> {}", wname);
+    this->Script("bind %s <Control-B2-Motion> {}", wname);
+    this->Script("bind %s <Control-B3-Motion> {}", wname);
 
-  this->Script("bind %s <KeyPress> {}", wname);
-  this->Script("bind %s <Shift-KeyPress> {}", wname);
-  this->Script("bind %s <Control-KeyPress> {}", wname);
+    this->Script("bind %s <KeyPress> {}", wname);
+    this->Script("bind %s <Shift-KeyPress> {}", wname);
+    this->Script("bind %s <Control-KeyPress> {}", wname);
 
-  this->Script("bind %s <Motion> {}", wname);
+    this->Script("bind %s <Motion> {}", wname);
+    }
 }
 
 //----------------------------------------------------------------------------

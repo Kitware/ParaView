@@ -39,6 +39,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWFrame.h"
 #include "vtkKWIcon.h"
 #include "vtkKWLabel.h"
+#include "vtkKWLabeledLabel.h"
 #include "vtkKWTkUtilities.h"
 #include "vtkObjectFactory.h"
 
@@ -46,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLabeledFrame );
-vtkCxxRevisionMacro(vtkKWLabeledFrame, "1.28");
+vtkCxxRevisionMacro(vtkKWLabeledFrame, "1.29");
 
 int vtkKWLabeledFrameCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -56,26 +57,20 @@ vtkKWLabeledFrame::vtkKWLabeledFrame()
 {
   this->CommandFunction = vtkKWLabeledFrameCommand;
 
-  this->Border = vtkKWWidget::New();
-  this->Border->SetParent(this);
-  this->Groove = vtkKWWidget::New();
-  this->Groove->SetParent(this);
-  this->Border2 = vtkKWWidget::New();
-  this->Border2->SetParent(this->Groove);
-  this->Frame = vtkKWFrame::New();
-  this->Frame->SetParent(this->Groove);
+  this->Border     = vtkKWWidget::New();
+  this->Groove     = vtkKWWidget::New();
+  this->Border2    = vtkKWWidget::New();
+  this->Frame      = vtkKWFrame::New();
   this->LabelFrame = vtkKWFrame::New();
-  this->LabelFrame->SetParent(this);
-  this->Label = vtkKWLabel::New();
-  this->Label->SetParent(this->LabelFrame);
-  this->Icon = vtkKWLabel::New();
-  this->Icon->SetParent(this);
-  this->IconData = vtkKWIcon::New();
-  this->IconData->SetImage(vtkKWIcon::ICON_SHRINK);
-  this->Displayed = 1;
-  this->ShowHideFrame = 0;
+  this->Label      = vtkKWLabeledLabel::New();
+  this->Icon       = vtkKWLabel::New();
+  this->IconData   = vtkKWIcon::New();
 
-  this->DragAndDropAnchor = this->Label;
+  this->Displayed     = 1;
+  this->ShowHideFrame = 0;
+  this->ShowIconInLimitedEditionMode = 0;
+
+  this->DragAndDropAnchor = this->GetLabel();
 }
 
 //----------------------------------------------------------------------------
@@ -89,6 +84,26 @@ vtkKWLabeledFrame::~vtkKWLabeledFrame()
   this->Border->Delete();
   this->Border2->Delete();
   this->Groove->Delete();
+}
+
+//----------------------------------------------------------------------------
+vtkKWLabel* vtkKWLabeledFrame::GetLabel()
+{
+  if (this->Label)
+    {
+    return this->Label->GetLabel2();
+    }
+  return NULL;
+}
+
+//----------------------------------------------------------------------------
+vtkKWLabel* vtkKWLabeledFrame::GetLabelIcon()
+{
+  if (this->Label)
+    {
+    return this->Label->GetLabel();
+    }
+  return NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -133,7 +148,7 @@ void vtkKWLabeledFrame::SetLabel(const char *text)
     ptr = buffer;
     }
 
-  this->Label->SetLabel(ptr);
+  this->GetLabel()->SetLabel(ptr);
 
   if (vtkKWLabeledFrame::LabelCase != VTK_KW_LABEL_CASE_USER_SPECIFIED)
     {
@@ -200,8 +215,6 @@ void vtkKWLabeledFrame::AdjustMargin()
 //----------------------------------------------------------------------------
 void vtkKWLabeledFrame::Create(vtkKWApplication *app, const char* args)
 {
-  const char *wname;
-  
   // Set the application
 
   if (this->IsCreated())
@@ -212,30 +225,52 @@ void vtkKWLabeledFrame::Create(vtkKWApplication *app, const char* args)
 
   this->SetApplication(app);
 
-  // create the top level
-  wname = this->GetWidgetName();
-  this->Script("frame %s -borderwidth 0 -relief flat %s",wname, 
-               (args?args:""));
+  // Create the top level
 
-  this->Border->Create(app,"frame","-borderwidth 0 -relief flat");
+  const char *wname = this->GetWidgetName();
 
-  this->Groove->Create(app,"frame","-borderwidth 2 -relief groove");
+  this->Script("frame %s -borderwidth 0 -relief flat %s",
+               wname, (args ? args : ""));
+  
+  this->Border->SetParent(this);
+  this->Border->Create(app, "frame", "-borderwidth 0 -relief flat");
 
-  this->Border2->Create(app,"frame","-borderwidth 0 -relief flat");
+  this->Groove->SetParent(this);
+  this->Groove->Create(app, "frame", "-borderwidth 2 -relief groove");
 
+  this->Border2->SetParent(this->Groove);
+  this->Border2->Create(app, "frame", "-borderwidth 0 -relief flat");
+
+  this->Frame->SetParent(this->Groove);
   this->Frame->Create(app, "");
 
+  this->LabelFrame->SetParent(this);
   this->LabelFrame->Create(app, "");
 
-  this->Label->Create(app, " -bd 0 -pady 0 -padx 2");
+  this->Label->SetParent(this->LabelFrame);
+  this->Label->Create(app, "-bd 0 -pady 0 -padx 2");
+
+  this->Script("%s config -bd 1 -pady 0 -padx 0", 
+               this->GetLabel()->GetWidgetName());
+
+  this->Script("%s config -bd 0 -pady 0 -padx 0", 
+               this->GetLabelIcon()->GetWidgetName());
+
+  this->GetLabelIcon()->SetImageOption(vtkKWIcon::ICON_LOCK);
+  this->GetLabelIcon()->SetBalloonHelpString(
+    "This feature is not available in Limited Edition Mode.");
 
   if (vtkKWLabeledFrame::BoldLabel)
     {
-    vtkKWTkUtilities::ChangeFontWeightToBold(this->Application->GetMainInterp(),
-                                             this->Label->GetWidgetName());
+    vtkKWTkUtilities::ChangeFontWeightToBold(
+      this->Application->GetMainInterp(),
+      this->GetLabel()->GetWidgetName());
     }
 
-  this->Icon->Create(app,"");
+  this->IconData->SetImage(vtkKWIcon::ICON_SHRINK);
+
+  this->Icon->SetParent(this);
+  this->Icon->Create(app, "");
   this->Icon->SetImageOption(this->IconData);
   this->Icon->SetBalloonHelpString("Shrink or expand the frame");
   
@@ -325,13 +360,42 @@ int vtkKWLabeledFrame::GetLabelCase()
 }
 
 //----------------------------------------------------------------------------
+void vtkKWLabeledFrame::SetShowIconInLimitedEditionMode(int arg)
+{
+  if (this->ShowIconInLimitedEditionMode == arg)
+    {
+    return;
+    }
+
+  this->ShowIconInLimitedEditionMode = arg;
+  this->Modified();
+
+  this->UpdateEnableState();
+}
+
+//----------------------------------------------------------------------------
 void vtkKWLabeledFrame::UpdateEnableState()
 {
   this->Superclass::UpdateEnableState();
 
-  if (this->Label)
+  // Disable only the label part of the labeled label
+  // (we want the icon not to look disabled)
+
+  if (this->GetLabel())
     {
-    this->Label->SetEnabled(this->Enabled);
+    this->GetLabel()->SetEnabled(this->Enabled);
+    }
+
+  int limited = 
+    (this->Application && this->Application->GetLimitedEditionMode());
+  
+  if (limited && this->ShowIconInLimitedEditionMode && !this->Enabled)
+    {
+    this->Label->ShowLabelOn();
+    }
+  else
+    {
+    this->Label->ShowLabelOff();
     }
 }
 
@@ -339,9 +403,11 @@ void vtkKWLabeledFrame::UpdateEnableState()
 void vtkKWLabeledFrame::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
-  os << indent << "ShowHideFrame: " << this->GetShowHideFrame() << endl;
+  os << indent << "ShowHideFrame: " 
+     << (this->ShowHideFrame ? "On" : "Off") << endl;
   os << indent << "Frame: " << this->Frame << endl;
   os << indent << "LabelFrame: " << this->LabelFrame << endl;
   os << indent << "Label: " << this->Label << endl;
+  os << indent << "ShowIconInLimitedEditionMode: " 
+     << (this->ShowIconInLimitedEditionMode ? "On" : "Off") << endl;
 }
-
