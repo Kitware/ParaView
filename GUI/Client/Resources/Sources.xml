@@ -456,7 +456,7 @@ Thickness: If the Toroidal box is checked, this value represents the thickness o
 Theta roundness: Define the roundness in the theta direction. A value of 0 represents a rectangular shape, a value of 1 represents a circular shape, and values greater than 1 produce higher order shapes. The default value is 1.
 Phi roundness: Define the roundness in the theta direction. A value of 0 represents a rectangular shape, a value of 1 represents a circular shape, and values greater than 1 produce higher order shapes. The default value is 1.
 Size: This value represents an isotropic size of the superquadric. By default it is 0.5. Not the the Size and Thickness parameters control coefficients of superquadric generation and may not exactly describe the size of the superquadric.
-Torodial: If this box is not checked (the default), the generated superquadric will not contain a hole. If checked, a toroidal object is generated.
+Toroidal: If this box is not checked (the default), the generated superquadric will not contain a hole. If checked, a toroidal object is generated.
 The output of the Superquadric source is polygonal data with point normals and texture coordinates defined.
   </Documentation>
 </Module>
