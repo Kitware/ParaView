@@ -69,6 +69,10 @@ public:
   void UpdateFunction(const char* newSymbol);
 
   // Description:
+  // Set the function in the function label
+  void SetFunctionLabel(char *function);
+  
+  // Description:
   // Tcl callback for the attribute mode option menu
   void ChangeAttributeMode(const char* newMode);
 
@@ -88,6 +92,10 @@ public:
   // Description:
   // Save this source to a file.
   void SaveInTclScript(ofstream *file);
+
+  // Description:
+  // Accept callback
+  virtual void AcceptCallback();
   
 protected:
   vtkPVArrayCalculator();
@@ -143,6 +151,8 @@ protected:
   vtkKWPushButton* ButtonRightParenthesis;
   vtkKWMenuButton* ScalarsMenu;
   vtkKWMenuButton* VectorsMenu;
+  
+  int ModifiedFlag;
 };
 
 #endif

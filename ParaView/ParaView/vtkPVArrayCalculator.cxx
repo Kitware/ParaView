@@ -105,6 +105,8 @@ vtkPVArrayCalculator::vtkPVArrayCalculator()
   this->ButtonRightParenthesis = vtkKWPushButton::New();
   this->ScalarsMenu = vtkKWMenuButton::New();
   this->VectorsMenu = vtkKWMenuButton::New();
+  
+  this->ModifiedFlag = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -512,6 +514,8 @@ void vtkPVArrayCalculator::UpdateFunction(const char* newSymbol)
   sprintf(newFunction, "%s%s", currentFunction, newSymbol);
   this->FunctionLabel->SetLabel(newFunction);
   delete [] newFunction;
+  
+  this->ModifiedFlag = 1;
 }
 
 void vtkPVArrayCalculator::ClearFunction()
@@ -522,6 +526,8 @@ void vtkPVArrayCalculator::ClearFunction()
   this->FunctionLabel->SetLabel("");
   pvApp->BroadcastScript("%s RemoveAllVariables",
                          this->GetVTKSourceTclName());
+  
+  this->ModifiedFlag = 1;
 }
 
 void vtkPVArrayCalculator::ChangeAttributeMode(const char* newMode)
@@ -598,6 +604,9 @@ void vtkPVArrayCalculator::AddScalarVariable(const char* variableName,
   pvApp->BroadcastScript("%s AddScalarVariable %s %s %d",
                          this->GetVTKSourceTclName(),
                          variableName, arrayName, component);
+  
+  pvApp->AddTraceEntry("$pv(%s) AddScalarVariable %s %s %d",
+                       this->GetTclName(), variableName, arrayName, component);
 }
 
 void vtkPVArrayCalculator::AddVectorVariable(const char* variableName,
@@ -609,6 +618,26 @@ void vtkPVArrayCalculator::AddVectorVariable(const char* variableName,
   pvApp->BroadcastScript("%s AddVectorVariable %s %s 0 1 2",
                          this->GetVTKSourceTclName(),
                          variableName, arrayName);
+  
+  pvApp->AddTraceEntry("$pv(%s) AddVectorVariable %s %s",
+                       this->GetTclName(), variableName, arrayName);
+}
+
+void vtkPVArrayCalculator::AcceptCallback()
+{
+  if (this->ModifiedFlag)
+    {
+    this->GetPVApplication()->AddTraceEntry("$pv(%s) SetFunctionLabel {%s}",
+                                            this->GetTclName(),
+                                            this->FunctionLabel->GetLabel());
+    this->ModifiedFlag = 0;
+    }
+  this->vtkPVSource::AcceptCallback();
+}
+
+void vtkPVArrayCalculator::SetFunctionLabel(char *function)
+{
+  this->FunctionLabel->SetLabel(function);
 }
 
 void vtkPVArrayCalculator::SaveInTclScript(ofstream *file)
