@@ -90,8 +90,8 @@ public:
     this->PrintHeader(title, file);
     this->Stream << "\"";
 
-    std::string line;
-    std::string::size_type cc;
+    vtkstd::string line;
+    vtkstd::string::size_type cc;
 
     kwsys::RegularExpression reIfDef("^[ \r\n\t]*#[ \r\n\t]*if");
     kwsys::RegularExpression reElse("^[ \r\n\t]*#[ \r\n\t]*el(se|if)");
