@@ -114,6 +114,11 @@ public:
   void SaveState(const char* filename);
 
   // Description:
+  // Saves the state of the object in XML format. Should
+  // be overwritten by proxies and properties.
+  virtual void SaveState(const char*, ostream*, vtkIndent);
+
+  // Description:
   // Given a group name, create prototypes and store them
   // in a instance group called groupName_prototypes.
   void InstantiateGroupPrototypes(const char* groupName);
@@ -133,11 +138,6 @@ protected:
   friend class vtkSMProxyIterator;
   friend class vtkSMProxy;
 //ETX
-
-  // Description:
-  // Saves the state of the object in XML format. Should
-  // be overwritten by proxies and properties.
-  virtual void SaveState(const char*, ostream*, vtkIndent);
 
   // Description:
   // Given an XML element and group name create a proxy 
