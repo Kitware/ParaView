@@ -1,0 +1,58 @@
+if {[info exists argc]} { 
+    set argcm1 [expr $argc - 1]
+    for {set i 0} {$i < $argcm1} {incr i} {
+        if {[lindex $argv $i] == "-D" && $i < $argcm1} {
+		set DataDir [lindex $argv [expr $i + 1]]
+        }
+    }
+} 
+
+
+set kw(vtkTemp1) [Application GetMainWindow]
+set kw(vtkTemp29) [$kw(vtkTemp1) GetMainView]
+set kw(vtkTemp224) [$kw(vtkTemp1) CreatePVSource vtkImageMandelbrotSource]
+set kw(vtkTemp235) [$kw(vtkTemp224) GetPVWidget {Extent}]
+$kw(vtkTemp235) SetValue 0 25 0 25 0 25
+set kw(vtkTemp248) [$kw(vtkTemp224) GetPVWidget {Origin}]
+$kw(vtkTemp248) SetValue -2 -1.25 0 0
+set kw(vtkTemp254) [$kw(vtkTemp224) GetPVWidget {Size}]
+$kw(vtkTemp254) SetValue 2.5 1.25 2 1.5
+$kw(vtkTemp224) AcceptCallback
+set kw(vtkTemp260) [$kw(vtkTemp224) GetPVWidget {MaxIterations}]
+$kw(vtkTemp260) SetValue 10
+$kw(vtkTemp224) AcceptCallback
+set kw(vtkTemp279) [$kw(vtkTemp1) ContourCallback]
+set kw(vtkTemp287) [$kw(vtkTemp279) GetPVWidget {Scalars}]
+$kw(vtkTemp287) SetValue {Iterations}
+set kw(vtkTemp290) [$kw(vtkTemp279) GetPVWidget {Contour Values}]
+$kw(vtkTemp290) RemoveAllValues
+$kw(vtkTemp290) AddValue 4.500000
+$kw(vtkTemp279) AcceptCallback
+set kw(vtkTemp75) [$kw(vtkTemp1) GetRotateCameraInteractor]
+$kw(vtkTemp75) SetCameraState -1.717 -2.853 9.108  -0.750 -0.625 1.000  0.901 0.378 0.211
+set kw(vtkTemp325) [$kw(vtkTemp1) CreatePVSource vtkReflectionFilter]
+set kw(vtkTemp336) [$kw(vtkTemp325) GetPVWidget {Plane}]
+$kw(vtkTemp336) SetCurrentValue {1}
+$kw(vtkTemp325) AcceptCallback
+$kw(vtkTemp336) SetCurrentValue {0}
+$kw(vtkTemp325) AcceptCallback
+$kw(vtkTemp336) SetCurrentValue {2}
+$kw(vtkTemp325) AcceptCallback
+
+# Fix the size of the image.
+RenWin1 SetSize 300 300
+RenWin1 Render
+update
+
+for {set i  1} {$i < [expr $argc - 1]} {incr i} {
+    if {[lindex $argv $i] == "-C"} {
+	source [lindex $argv [expr $i + 1]]
+	$Application SetExitStatus [CompareImage [[Application GetMainWindow] GetMainView]]
+    }
+}
+
+Application Exit
+
+
+
+
