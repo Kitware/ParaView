@@ -480,7 +480,7 @@ public:
 
   // Description:
   // This method is now in the vtkPVSourceNotebook.
-  // This legacy method is for backward compatability.
+  // This legacy method is for backward compatibility.
   void SetAcceptButtonColorToModified();
 
   // Description:

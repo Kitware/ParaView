@@ -65,7 +65,7 @@
 
 
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.425");
+vtkCxxRevisionMacro(vtkPVSource, "1.426");
 vtkCxxSetObjectMacro(vtkPVSource,Notebook,vtkPVSourceNotebook);
 vtkCxxSetObjectMacro(vtkPVSource,PartDisplay,vtkSMPartDisplay);
 
@@ -415,8 +415,11 @@ void vtkPVSource::UpdateEnableState()
 {
   this->Superclass::UpdateEnableState();
 
-  this->PropagateEnableState(this->Notebook);
-  this->Notebook->UpdateEnableStateWithSource(this);
+  if( this->Notebook)
+    {
+    this->PropagateEnableState(this->Notebook);
+    this->Notebook->UpdateEnableStateWithSource(this);
+    }
   this->PropagateEnableState(this->PVColorMap);
 
   if ( this->Widgets )
@@ -1635,7 +1638,10 @@ void vtkPVSource::UpdateVTKSourceParameters()
 void vtkPVSource::UpdateProperties()
 {
   this->UpdateEnableState();
-  this->Notebook->Update();
+  if ( this->Notebook )
+    {
+    this->Notebook->Update();
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -2159,14 +2165,6 @@ int vtkPVSource::GetNumberOfProcessorsValid()
     }
   return 1;
 }
-
-
-//----------------------------------------------------------------------------
-void vtkPVSource::SetAcceptButtonColorToModified()
-{
-  this->Notebook->SetAcceptButtonColorToModified();
-}
-
 //----------------------------------------------------------------------------
 int vtkPVSource::CloneAndInitialize(int makeCurrent, vtkPVSource*& clone)
 {
@@ -2186,7 +2184,7 @@ int vtkPVSource::CloneAndInitialize(int makeCurrent, vtkPVSource*& clone)
     return retVal;
     }
 
-  clone->SetAcceptButtonColorToModified();
+  clone->Notebook->SetAcceptButtonColorToModified();
 
   return VTK_OK;
 }
@@ -2563,3 +2561,10 @@ void vtkPVSource::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "PointLabelVisibility: " << this->PointLabelVisibility << endl;
   os << indent << "OverideAutoAccept: " << (this->OverideAutoAccept?"yes":"no") << endl;
 }
+
+//----------------------------------------------------------------------------
+void vtkPVSource::SetAcceptButtonColorToModified()
+{
+  this->Notebook->SetAcceptButtonColorToModified();
+}
+
