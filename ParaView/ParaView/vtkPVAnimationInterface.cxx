@@ -143,7 +143,7 @@ static unsigned char image_goto_end[] =
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterface);
-vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.66");
+vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.67");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterface,ControlledWidget, vtkPVWidget);
 
@@ -2065,10 +2065,6 @@ vtkPVAnimationInterfaceEntry* vtkPVAnimationInterface::GetSourceEntry(int idx)
 //-----------------------------------------------------------------------------
 void vtkPVAnimationInterface::UpdateNewScript()
 {
-  if ( this->InPlay )
-    {
-    abort();
-    }
   //cout << "UpdateNewScript" << endl;
   ostrstream str;
   //str << "puts \"------------- start --------------\"" << endl;
