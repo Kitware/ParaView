@@ -184,7 +184,7 @@ void vtkImageOutlineFilter::Execute()
   // Let OutlineSource do all the work
   //
   
-  if (input->GetUpdatePiece() == 0)
+  if (output->GetUpdatePiece() == 0)
     {
     spacing = input->GetSpacing();
     origin = input->GetOrigin();
@@ -216,7 +216,6 @@ void vtkImageOutlineFilter::ExecuteInformation()
   //
   // Let OutlineSource do all the work
   //
-  
   this->vtkSource::ExecuteInformation();
 
   this->OutlineSource->UpdateInformation();

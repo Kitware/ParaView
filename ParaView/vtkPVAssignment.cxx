@@ -74,7 +74,7 @@ void vtkPVAssignment::Clone(vtkPVApplication *pvApp)
 
   // Clone this object on every other process, and set up the assignment.
   num = pvApp->GetController()->GetNumberOfProcesses();
-  this->Translator->SetPiece(1);
+  this->Translator->SetPiece(0);
   this->Translator->SetNumberOfPieces(2);
   for (id = 1; id < num; ++id)
     {

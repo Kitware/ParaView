@@ -35,9 +35,6 @@ ClientData vtkPVApplicationNewCommand();
 int vtkPVAssignmentCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkPVAssignmentNewCommand();
-int vtkPVAssignmentClipCommand(ClientData cd, Tcl_Interp *interp,
-             int argc, char *argv[]);
-ClientData vtkPVAssignmentClipNewCommand();
 int vtkPVConeSourceCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkPVConeSourceNewCommand();
@@ -144,8 +141,6 @@ int VTK_EXPORT Vtkkwparaviewtcl_Init(Tcl_Interp *interp)
                   vtkPVApplicationCommand);
   vtkTclCreateNew(interp,"vtkPVAssignment", vtkPVAssignmentNewCommand,
                   vtkPVAssignmentCommand);
-  vtkTclCreateNew(interp,"vtkPVAssignmentClip", vtkPVAssignmentClipNewCommand,
-                  vtkPVAssignmentClipCommand);
   vtkTclCreateNew(interp,"vtkPVConeSource", vtkPVConeSourceNewCommand,
                   vtkPVConeSourceCommand);
   vtkTclCreateNew(interp,"vtkPVContourFilter", vtkPVContourFilterNewCommand,

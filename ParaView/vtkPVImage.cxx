@@ -95,7 +95,6 @@ void vtkPVImage::Slice()
 {
   vtkPVApplication *pvApp = (vtkPVApplication *)this->Application;
   vtkPVImageSlice *slice;
-  int *extents;
   
   slice = vtkPVImageSlice::New();
   slice->Clone(pvApp);
