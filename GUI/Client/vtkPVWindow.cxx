@@ -124,7 +124,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.531");
+vtkCxxRevisionMacro(vtkPVWindow, "1.532");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -4244,6 +4244,19 @@ void vtkPVWindow::SetInteractiveRenderEnabled(int s)
     return;
     }
   rwi->SetInteractiveRenderEnabled(s);
+  
+  vtkRenderWindow *rw = rwi->GetRenderWindow();
+  if ( rw )
+    {
+    if ( s )
+      {
+      rw->SetDesiredUpdateRate(5.0);
+      }
+    else
+      {
+      rw->SetDesiredUpdateRate(0.002);
+      }
+    }
 }
 
 //-----------------------------------------------------------------------------
