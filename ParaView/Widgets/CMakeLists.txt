@@ -25,6 +25,7 @@ vtkKWLabeledCheckButtonSet.cxx
 vtkKWLabeledEntry.cxx 
 vtkKWLabeledFrame.cxx 
 vtkKWLabeledLabel.cxx 
+vtkKWLabeledLabelSet.cxx
 vtkKWLabeledOptionMenu.cxx 
 vtkKWLabeledPushButtonSet.cxx 
 vtkKWLabeledRadioButtonSet.cxx 
