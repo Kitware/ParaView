@@ -38,7 +38,7 @@
 #include "vtkUnstructuredGrid.h"
 #include "vtkCallbackCommand.h"
 
-vtkCxxRevisionMacro(vtkPVGeometryFilter, "1.33");
+vtkCxxRevisionMacro(vtkPVGeometryFilter, "1.34");
 vtkStandardNewMacro(vtkPVGeometryFilter);
 
 vtkCxxSetObjectMacro(vtkPVGeometryFilter, Controller, vtkMultiProcessController);
@@ -496,8 +496,6 @@ void vtkPVGeometryFilter::UnstructuredGridExecute(vtkUnstructuredGrid* input)
     this->DataSetSurfaceExecute(input);
     return;
     }
-  
-  vtkPolyData *output = this->GetOutput();
   
   this->OutlineFlag = 1;
 
