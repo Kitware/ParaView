@@ -60,6 +60,7 @@ public:
   virtual void SetPVProcessModule(vtkPVProcessModule*);
 protected:
   vtkPVProcessModuleGUIHelper();
+  virtual ~vtkPVProcessModuleGUIHelper();
 private:
   vtkPVApplication* PVApplication;
   vtkPVProcessModule* PVProcessModule;
