@@ -35,7 +35,7 @@ class vtkRenderWindowInteractor;
 class vtkMultiProcessController;
 class vtkRenderer;
 
-class VTK_PARALLEL_EXPORT vtkTiledDisplayManager : public vtkObject
+class VTK_EXPORT vtkTiledDisplayManager : public vtkObject
 {
 public:
   static vtkTiledDisplayManager *New();
