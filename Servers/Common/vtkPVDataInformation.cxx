@@ -14,6 +14,8 @@
 =========================================================================*/
 #include "vtkPVDataInformation.h"
 
+#include "vtkAlgorithm.h"
+#include "vtkAlgorithmOutput.h"
 #include "vtkByteSwap.h"
 #include "vtkCellData.h"
 #include "vtkClientServerStream.h"
@@ -24,17 +26,20 @@
 #include "vtkDataSet.h"
 #include "vtkImageData.h"
 #include "vtkInformation.h"
+#include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVDataSetAttributesInformation.h"
 #include "vtkPointData.h"
+#include "vtkProcessModule.h"
 #include "vtkRectilinearGrid.h"
+#include "vtkSource.h"
 #include "vtkStructuredGrid.h"
 #include "vtkGenericDataSet.h"
 
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkPVDataInformation);
-vtkCxxRevisionMacro(vtkPVDataInformation, "1.5");
+vtkCxxRevisionMacro(vtkPVDataInformation, "1.6");
 
 //----------------------------------------------------------------------------
 vtkPVDataInformation::vtkPVDataInformation()
@@ -216,6 +221,22 @@ void vtkPVDataInformation::CopyFromDataSet(vtkDataSet* data)
     return;
     }
   this->NumberOfCells = data->GetNumberOfCells();
+  vtkProcessModule *pm = vtkProcessModule::GetProcessModule();
+  ofstream *tmpFile = pm->GetLogFile();
+  if (tmpFile)
+    {
+    if (data->GetSource())
+      {
+      *tmpFile << "output of " << data->GetSource()->GetClassName();
+      }
+    else if (data->GetProducerPort())
+      {
+      *tmpFile << "output of "
+               << data->GetProducerPort()->GetProducer()->GetClassName();
+      }
+    *tmpFile << " contains " << this->NumberOfCells << " cells" << endl;
+    }
+  
   bds = data->GetBounds();
   for (idx = 0; idx < 6; ++idx)
     {

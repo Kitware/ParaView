@@ -251,6 +251,12 @@ public:
   // Set the gui helper
   void SetGUIHelper(vtkProcessModuleGUIHelper*);
 
+  // Description:
+  // Get a pointer to the log file.
+  ofstream* GetLogFile();
+
+  virtual void CreateLogFile(const char *filePrefix);
+
 protected:
   vtkProcessModule();
   ~vtkProcessModule();
@@ -307,6 +313,7 @@ protected:
   vtkPVRenderModule *RenderModule;
   vtkPVOptions* Options;
   vtkProcessModuleGUIHelper* GUIHelper;
+  ofstream *LogFile;
 
 private:
   vtkProcessModule(const vtkProcessModule&); // Not implemented

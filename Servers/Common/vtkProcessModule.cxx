@@ -46,7 +46,7 @@ struct vtkProcessModuleInternals
 };
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkProcessModule, "1.17");
+vtkCxxRevisionMacro(vtkProcessModule, "1.18");
 vtkCxxSetObjectMacro(vtkProcessModule, RenderModule, vtkPVRenderModule);
 
 //----------------------------------------------------------------------------
@@ -102,6 +102,7 @@ vtkProcessModule::vtkProcessModule()
   this->ProgressHandler = vtkPVProgressHandler::New();
   this->RenderModule = 0;
   this->GUIHelper = 0;
+  this->LogFile = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -128,6 +129,13 @@ vtkProcessModule::~vtkProcessModule()
   this->SetRenderModule(0);
 
   delete this->Internals;
+
+  if (this->LogFile)
+    {
+    this->LogFile->close();
+    delete this->LogFile;
+    this->LogFile = 0;
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -774,3 +782,32 @@ void vtkProcessModule::Finalize()
   this->FinalizeInterpreter();
 }
 
+//----------------------------------------------------------------------------
+ofstream* vtkProcessModule::GetLogFile()
+{
+  return this->LogFile;
+}
+
+//----------------------------------------------------------------------------
+void vtkProcessModule::CreateLogFile(const char *prefix)
+{
+  if (!prefix)
+    {
+    return;
+    }
+  ostrstream fileName;
+  fileName << prefix << this->Controller->GetLocalProcessId() << ".txt"
+           << ends;
+  if (this->LogFile)
+    {
+    this->LogFile->close();
+    delete this->LogFile;
+    }
+  this->LogFile = new ofstream(fileName.str(), ios::out);
+  fileName.rdbuf()->freeze(0);
+  if (this->LogFile->fail())
+    {
+    delete this->LogFile;
+    this->LogFile = 0;
+    }
+}

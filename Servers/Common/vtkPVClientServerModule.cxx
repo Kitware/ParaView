@@ -147,7 +147,7 @@ void vtkPVSendStreamToClientServerNodeRMI(void *localArg, void *remoteArg,
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVClientServerModule);
-vtkCxxRevisionMacro(vtkPVClientServerModule, "1.27");
+vtkCxxRevisionMacro(vtkPVClientServerModule, "1.28");
 
 
 //----------------------------------------------------------------------------
@@ -434,6 +434,7 @@ void vtkPVClientServerModule::Initialize()
 
     // Process rmis until the application exits.
     this->Controller->ProcessRMIs();    
+
     // Now we are exiting.
     }  
 }
@@ -879,6 +880,32 @@ int vtkPVClientServerModule::Start(int argc, char **argv)
   this->Controller = vtkMPIController::New();
   vtkMultiProcessController::SetGlobalController(this->Controller);
   this->Controller->Initialize(&argc, &argv, 1);
+  if (this->Options)
+    {
+    switch (this->Options->GetProcessType())
+      {
+      case vtkPVOptions::PVCLIENT:
+        // don't need a log for the client
+        break;
+      case vtkPVOptions::PVSERVER:
+        this->CreateLogFile("ServerNodeLog");
+        break;
+      case vtkPVOptions::PVRENDER_SERVER:
+        this->CreateLogFile("RenderServerNodeLog");
+        break;
+      case vtkPVOptions::PVDATA_SERVER:
+        this->CreateLogFile("DataServerNodeLog");
+        break;
+      default:
+        this->CreateLogFile("NodeLog");
+        break;
+      }
+    }
+  else
+    {
+    this->CreateLogFile("NodeLog");
+    }
+
   this->Controller->SetSingleMethod(vtkPVClientServerInit, (void *)(this));
   this->Controller->SingleMethodExecute();
   this->Controller->Finalize(1);
