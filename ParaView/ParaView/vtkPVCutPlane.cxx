@@ -40,6 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 #include "vtkPVCutPlane.h"
+
 #include "vtkKWBoundsDisplay.h"
 #include "vtkPVWindow.h"
 #include "vtkKWCompositeCollection.h"
@@ -52,6 +53,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVInputMenu.h"
 #include "vtkObjectFactory.h"
 #include "vtkKWFrame.h"
+
+//----------------------------------------------------------------------------
+vtkStandardNewMacro(vtkPVCutPlane);
 
 int vtkPVCutPlaneCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -67,20 +71,6 @@ vtkPVCutPlane::vtkPVCutPlane()
 vtkPVCutPlane::~vtkPVCutPlane()
 {
 }
-
-//----------------------------------------------------------------------------
-vtkPVCutPlane* vtkPVCutPlane::New()
-{
-  // First try to create the object from the vtkObjectFactory
-  vtkObject* ret = vtkObjectFactory::CreateInstance("vtkPVCutPlane");
-  if(ret)
-    {
-    return (vtkPVCutPlane*)ret;
-    }
-  // If the factory was unable to create the object, then create it here.
-  return new vtkPVCutPlane;
-}
-
 
 //----------------------------------------------------------------------------
 void vtkPVCutPlane::CreateProperties()

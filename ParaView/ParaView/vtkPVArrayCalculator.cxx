@@ -61,6 +61,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSource.h"
 #include "vtkStringList.h"
 
+//----------------------------------------------------------------------------
+vtkStandardNewMacro(vtkPVArrayCalculator);
+
 int vtkPVArrayCalculatorCommand(ClientData cd, Tcl_Interp *interp,
                                 int argc, char *argv[]);
 
@@ -215,18 +218,6 @@ vtkPVArrayCalculator::~vtkPVArrayCalculator()
   this->VectorsMenu = NULL;
   this->CalculatorFrame->Delete();
   this->CalculatorFrame = NULL;
-}
-
-//----------------------------------------------------------------------------
-vtkPVArrayCalculator* vtkPVArrayCalculator::New()
-{
-  // First try to create the object from the vtkObjectFactory
-  vtkObject* ret = vtkObjectFactory::CreateInstance("vtkPVArrayCalculator");
-  if(ret)
-    {
-    return (vtkPVArrayCalculator*)ret;
-    }
-  return new vtkPVArrayCalculator;
 }
 
 //----------------------------------------------------------------------------

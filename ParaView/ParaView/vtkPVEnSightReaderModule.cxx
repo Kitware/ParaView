@@ -65,6 +65,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <ctype.h>
 
+//----------------------------------------------------------------------------
+vtkStandardNewMacro(vtkPVEnSightReaderModule);
+
 int vtkPVEnSightReaderModuleCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
 
@@ -96,20 +99,6 @@ void vtkPVEnSightReaderModule::DeleteVerifier()
     }
   this->SetVerifierTclName(0);
 #endif
-}
-
-//----------------------------------------------------------------------------
-vtkPVEnSightReaderModule* vtkPVEnSightReaderModule::New()
-{
-  // First try to create the object from the vtkObjectFactory
-  vtkObject* ret = 
-    vtkObjectFactory::CreateInstance("vtkPVEnSightReaderModule");
-  if(ret)
-    {
-    return (vtkPVEnSightReaderModule*)ret;
-    }
-  // If the factory was unable to create the object, then create it here.
-  return new vtkPVEnSightReaderModule;
 }
 
 //----------------------------------------------------------------------------

@@ -50,17 +50,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWEntry.h"
 
 //----------------------------------------------------------------------------
-vtkPVFileEntry* vtkPVFileEntry::New()
-{
-  // First try to create the object from the vtkObjectFactory
-  vtkObject* ret = vtkObjectFactory::CreateInstance("vtkPVFileEntry");
-  if (ret)
-    {
-    return (vtkPVFileEntry*)ret;
-    }
-  // If the factory was unable to create the object, then create it here.
-  return new vtkPVFileEntry;
-}
+vtkStandardNewMacro(vtkPVFileEntry);
 
 //----------------------------------------------------------------------------
 vtkPVFileEntry::vtkPVFileEntry()

@@ -51,21 +51,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVData.h"
 #include "vtkPVWindow.h"
 
+//---------------------------------------------------------------------------
+vtkStandardNewMacro(vtkPVExtractGeometryByScalar);
+
 int vtkPVExtractGeometryByScalarCommand(ClientData cd, Tcl_Interp *interp,
                                         int argc, char *argv[]);
-
-//---------------------------------------------------------------------------
-vtkPVExtractGeometryByScalar* vtkPVExtractGeometryByScalar::New()
-{
-  // First try to create the object from the vtkObjectFactory
-  vtkObject* ret =
-    vtkObjectFactory::CreateInstance("vtkPVExtractGeometryByScalar");
-  if (ret)
-    {
-    return (vtkPVExtractGeometryByScalar*)ret;
-    }
-  return new vtkPVExtractGeometryByScalar;
-}
 
 //---------------------------------------------------------------------------
 vtkPVExtractGeometryByScalar::vtkPVExtractGeometryByScalar()

@@ -39,35 +39,28 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-
 #include "vtkPVGenericRenderWindowInteractor.h"
 
 #include "vtkPVRenderView.h"
 #include "vtkObjectFactory.h"
 #include "vtkRenderWindow.h"
 
-vtkPVGenericRenderWindowInteractor* vtkPVGenericRenderWindowInteractor::New()
-{
-  // First try to create the object from the vtkObjectFactory
-  vtkObject* ret = vtkObjectFactory::CreateInstance("vtkPVGenericRenderWindowInteractor");
-  if(ret)
-    {
-    return (vtkPVGenericRenderWindowInteractor*)ret;
-    }
-  // If the factory was unable to create the object, then create it here.
-  return new vtkPVGenericRenderWindowInteractor;
-}
+//----------------------------------------------------------------------------
+vtkStandardNewMacro(vtkPVGenericRenderWindowInteractor);
 
+//----------------------------------------------------------------------------
 vtkPVGenericRenderWindowInteractor::vtkPVGenericRenderWindowInteractor()
 {
   this->PVRenderView = NULL;
 }
 
+//----------------------------------------------------------------------------
 vtkPVGenericRenderWindowInteractor::~vtkPVGenericRenderWindowInteractor()
 {
   this->SetPVRenderView(NULL);
 }
 
+//----------------------------------------------------------------------------
 void vtkPVGenericRenderWindowInteractor::SetPVRenderView(vtkPVRenderView *view)
 {
   if (this->PVRenderView != view)
@@ -81,6 +74,7 @@ void vtkPVGenericRenderWindowInteractor::SetPVRenderView(vtkPVRenderView *view)
     }
 }
 
+//----------------------------------------------------------------------------
 void vtkPVGenericRenderWindowInteractor::Render()
 {
   if ( ! this->PVRenderView)

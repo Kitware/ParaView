@@ -71,6 +71,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkTreeComposite.h"
 #include "vtkPVColorMap.h"
 
+//----------------------------------------------------------------------------
+vtkStandardNewMacro(vtkPVData);
+
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
 		     int argc, char *argv[]);
 
@@ -562,21 +565,6 @@ void vtkPVData::CreateParallelTclObjects(vtkPVApplication *pvApp)
       pvApp->RemoteScript(id, "%s SetPiece %d", this->LODMapperTclName, id);
       }
     }
-}
-
-
-
-//----------------------------------------------------------------------------
-vtkPVData* vtkPVData::New()
-{
-  // First try to create the object from the vtkObjectFactory
-  vtkObject* ret = vtkObjectFactory::CreateInstance("vtkPVData");
-  if(ret)
-    {
-    return (vtkPVData*)ret;
-    }
-  // If the factory was unable to create the object, then create it here.
-  return new vtkPVData;
 }
 
 //----------------------------------------------------------------------------

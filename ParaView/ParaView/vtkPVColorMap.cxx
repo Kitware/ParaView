@@ -48,6 +48,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVSourceCollection.h"
 #include "vtkObjectFactory.h"
 
+//----------------------------------------------------------------------------
+vtkStandardNewMacro(vtkPVColorMap);
 
 int vtkPVColorMapCommand(ClientData cd, Tcl_Interp *interp,
 		     int argc, char *argv[]);
@@ -157,19 +159,6 @@ void vtkPVColorMap::SetName(const char* name)
   this->UpdateScalarBarTitle();
 
   this->ResetScalarRange();
-}
-
-//----------------------------------------------------------------------------
-vtkPVColorMap* vtkPVColorMap::New()
-{
-  // First try to create the object from the vtkObjectFactory
-  vtkObject* ret = vtkObjectFactory::CreateInstance("vtkPVColorMap");
-  if(ret)
-    {
-    return (vtkPVColorMap*)ret;
-    }
-  // If the factory was unable to create the object, then create it here.
-  return new vtkPVColorMap;
 }
 
 //----------------------------------------------------------------------------

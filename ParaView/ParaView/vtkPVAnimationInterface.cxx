@@ -52,6 +52,9 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 // Handle methods with multiple entries.
 // Handle special sources (contour, probe, threshold).
 
+//----------------------------------------------------------------------------
+vtkStandardNewMacro(vtkPVAnimationInterface);
+
 vtkCxxSetObjectMacro(vtkPVAnimationInterface,ControlledWidget, vtkPVWidget);
 
 int vtkPVAnimationInterfaceCommand(ClientData cd, Tcl_Interp *interp,
@@ -223,19 +226,6 @@ vtkPVAnimationInterface::~vtkPVAnimationInterface()
   this->SetControlledWidget(NULL);
   this->SetView(NULL);
   this->SetWindow(NULL);
-}
-
-//----------------------------------------------------------------------------
-vtkPVAnimationInterface* vtkPVAnimationInterface::New()
-{
-  // First try to create the object from the vtkObjectFactory
-  vtkObject* ret = vtkObjectFactory::CreateInstance("vtkPVAnimationInterface");
-  if(ret)
-    {
-    return (vtkPVAnimationInterface*)ret;
-    }
-  // If the factory was unable to create the object, then create it here.
-  return new vtkPVAnimationInterface();
 }
 
 //----------------------------------------------------------------------------

@@ -47,17 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVXMLElement.h"
 
 //----------------------------------------------------------------------------
-vtkPVLabel* vtkPVLabel::New()
-{
-  // First try to create the object from the vtkObjectFactory
-  vtkObject* ret = vtkObjectFactory::CreateInstance("vtkPVLabel");
-  if (ret)
-    {
-    return (vtkPVLabel*)ret;
-    }
-  // If the factory was unable to create the object, then create it here.
-  return new vtkPVLabel;
-}
+vtkStandardNewMacro(vtkPVLabel);
 
 //----------------------------------------------------------------------------
 vtkPVLabel::vtkPVLabel()

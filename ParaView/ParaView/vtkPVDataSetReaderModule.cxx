@@ -53,6 +53,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <ctype.h>
 
+//----------------------------------------------------------------------------
+vtkStandardNewMacro(vtkPVDataSetReaderModule);
+
 int vtkPVDataSetReaderModuleCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
 
@@ -66,20 +69,6 @@ vtkPVDataSetReaderModule::vtkPVDataSetReaderModule()
 vtkPVDataSetReaderModule::~vtkPVDataSetReaderModule()
 {
 }
-
-//----------------------------------------------------------------------------
-vtkPVDataSetReaderModule* vtkPVDataSetReaderModule::New()
-{
-  // First try to create the object from the vtkObjectFactory
-  vtkObject* ret = vtkObjectFactory::CreateInstance("vtkPVDataSetReaderModule");
-  if(ret)
-    {
-    return (vtkPVDataSetReaderModule*)ret;
-    }
-  // If the factory was unable to create the object, then create it here.
-  return new vtkPVDataSetReaderModule;
-}
-
 
 //----------------------------------------------------------------------------
 void vtkPVDataSetReaderModule::CreateProperties()

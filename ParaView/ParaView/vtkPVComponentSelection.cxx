@@ -40,6 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 #include "vtkPVComponentSelection.h"
+
 #include "vtkPVSource.h"
 #include "vtkPVApplication.h"
 #include "vtkObjectFactory.h"
@@ -49,17 +50,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVXMLElement.h"
 
 //---------------------------------------------------------------------------
-vtkPVComponentSelection* vtkPVComponentSelection::New()
-{
-  // First try to create the object from the vtkObjectFactory
-  vtkObject* ret = vtkObjectFactory::CreateInstance("vtkPVComponentSelection");
-  if (ret)
-    {
-    return (vtkPVComponentSelection*)ret;
-    }
-  // If the factory was unable to create the object, then create it here.
-  return new vtkPVComponentSelection;
-}
+vtkStandardNewMacro(vtkPVComponentSelection);
 
 //---------------------------------------------------------------------------
 vtkPVComponentSelection::vtkPVComponentSelection()

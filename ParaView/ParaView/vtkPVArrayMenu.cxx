@@ -56,20 +56,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVSource.h"
 #include "vtkPVXMLElement.h"
 
-vtkCxxSetObjectMacro(vtkPVArrayMenu,InputMenu, vtkPVInputMenu);
-
 //----------------------------------------------------------------------------
-vtkPVArrayMenu* vtkPVArrayMenu::New()
-{
-  // First try to create the object from the vtkObjectFactory
-  vtkObject* ret = vtkObjectFactory::CreateInstance("vtkPVArrayMenu");
-  if(ret)
-    {
-    return (vtkPVArrayMenu*)ret;
-    }
-  // If the factory was unable to create the object, then create it here.
-  return new vtkPVArrayMenu;
-}
+vtkStandardNewMacro(vtkPVArrayMenu);
+
+vtkCxxSetObjectMacro(vtkPVArrayMenu,InputMenu, vtkPVInputMenu);
 
 //----------------------------------------------------------------------------
 vtkPVArrayMenu::vtkPVArrayMenu()

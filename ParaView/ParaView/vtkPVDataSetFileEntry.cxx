@@ -47,17 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVWindow.h"
 
 //----------------------------------------------------------------------------
-vtkPVDataSetFileEntry* vtkPVDataSetFileEntry::New()
-{
-  // First try to create the object from the vtkObjectFactory
-  vtkObject* ret = vtkObjectFactory::CreateInstance("vtkPVDataSetFileEntry");
-  if (ret)
-    {
-    return (vtkPVDataSetFileEntry*)ret;
-    }
-  // If the factory was unable to create the object, then create it here.
-  return new vtkPVDataSetFileEntry;
-}
+vtkStandardNewMacro(vtkPVDataSetFileEntry);
 
 //----------------------------------------------------------------------------
 vtkPVDataSetFileEntry::vtkPVDataSetFileEntry()

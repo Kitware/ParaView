@@ -46,20 +46,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSource.h"
 
 //------------------------------------------------------------------------------
-vtkPVExtentTranslator* vtkPVExtentTranslator::New()
-{
-  // First try to create the object from the vtkObjectFactory
-  vtkObject* ret = vtkObjectFactory::CreateInstance("vtkPVExtentTranslator");
-  if(ret)
-    {
-    return (vtkPVExtentTranslator*)ret;
-    }
-  // If the factory was unable to create the object, then create it here.
-  return new vtkPVExtentTranslator;
-}
+vtkStandardNewMacro(vtkPVExtentTranslator);
 
 vtkCxxSetObjectMacro(vtkPVExtentTranslator, OriginalSource, vtkDataSet);
-
 
 //----------------------------------------------------------------------------
 vtkPVExtentTranslator::vtkPVExtentTranslator()

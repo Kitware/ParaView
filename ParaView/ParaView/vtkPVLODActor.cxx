@@ -51,20 +51,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <math.h>
 
-vtkCxxSetObjectMacro(vtkPVLODActor, LODMapper, vtkMapper);
-
 //-----------------------------------------------------------------------------
-vtkPVLODActor* vtkPVLODActor::New()
-{
-  // First try to create the object from the vtkObjectFactory
-  vtkObject* ret = vtkObjectFactory::CreateInstance("vtkPVLODActor");
-  if(ret)
-    {
-    return (vtkPVLODActor*)ret;
-    }
-  // If the factory was unable to create the object, then create it here.
-  return new vtkPVLODActor;
-}
+vtkStandardNewMacro(vtkPVLODActor);
+
+vtkCxxSetObjectMacro(vtkPVLODActor, LODMapper, vtkMapper);
 
 //----------------------------------------------------------------------------
 vtkPVLODActor::vtkPVLODActor()

@@ -45,6 +45,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkLinkedList.txx"
 #include "vtkPVXMLElement.h"
 
+//----------------------------------------------------------------------------
+vtkStandardNewMacro(vtkPVContainerWidget);
+
 int vtkPVContainerWidgetCommand(ClientData cd, Tcl_Interp *interp,
 		     int argc, char *argv[]);
 
@@ -54,7 +57,6 @@ template class VTK_EXPORT vtkAbstractList<vtkPVWidget*>;
 template class VTK_EXPORT vtkLinkedList<vtkPVWidget*>;
 
 #endif
-
 
 //----------------------------------------------------------------------------
 vtkPVContainerWidget::vtkPVContainerWidget()
@@ -69,19 +71,6 @@ vtkPVContainerWidget::~vtkPVContainerWidget()
 {
   this->Widgets->Delete();
   this->Widgets = NULL;
-}
-
-//----------------------------------------------------------------------------
-vtkPVContainerWidget* vtkPVContainerWidget::New()
-{
-  // First try to create the object from the vtkObjectFactory
-  vtkObject* ret = vtkObjectFactory::CreateInstance("vtkPVContainerWidget");
-  if(ret)
-    {
-    return (vtkPVContainerWidget*)ret;
-    }
-  // If the factory was unable to create the object, then create it here.
-  return new vtkPVContainerWidget;
 }
 
 //----------------------------------------------------------------------------

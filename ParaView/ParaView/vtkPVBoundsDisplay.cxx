@@ -51,21 +51,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVSource.h"
 #include "vtkPVXMLElement.h"
 
+//----------------------------------------------------------------------------
+vtkStandardNewMacro(vtkPVBoundsDisplay);
+
 vtkCxxSetObjectMacro(vtkPVBoundsDisplay, Widget, vtkKWBoundsDisplay);
 vtkCxxSetObjectMacro(vtkPVBoundsDisplay, InputMenu, vtkPVInputMenu);
-
-//----------------------------------------------------------------------------
-vtkPVBoundsDisplay* vtkPVBoundsDisplay::New()
-{
-  // First try to create the object from the vtkObjectFactory
-  vtkObject* ret = vtkObjectFactory::CreateInstance("vtkPVBoundsDisplay");
-  if(ret)
-    {
-    return (vtkPVBoundsDisplay*)ret;
-    }
-  // If the factory was unable to create the object, then create it here.
-  return new vtkPVBoundsDisplay;
-}
 
 //----------------------------------------------------------------------------
 int vtkPVBoundsDisplayCommand(ClientData cd, Tcl_Interp *interp,

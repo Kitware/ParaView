@@ -16,13 +16,18 @@
 
 =========================================================================*/
 #include "vtkDummyRenderWindow.h"
+
+#include "vtkCommand.h"
+#include "vtkObjectFactory.h"
 #include "vtkRenderer.h"
 #include "vtkRendererCollection.h"
-#include "vtkCommand.h"
 
+//----------------------------------------------------------------------------
+vtkStandardNewMacro(vtkDummyRenderWindow);
 
-vtkCxxRevisionMacro(vtkDummyRenderWindow, "1.5");
+vtkCxxRevisionMacro(vtkDummyRenderWindow, "1.6");
 
+//----------------------------------------------------------------------------
 // Construct an instance of  vtkDummyRenderWindow with its screen size 
 // set to 300x300, borders turned on, positioned at (0,0), double 
 // buffering turned on, stereo capable off.
@@ -31,17 +36,12 @@ vtkDummyRenderWindow::vtkDummyRenderWindow()
 
 }
 
+//----------------------------------------------------------------------------
 vtkDummyRenderWindow::~vtkDummyRenderWindow()
 {
 }
 
-// return the correct type of RenderWindow 
-vtkDummyRenderWindow *vtkDummyRenderWindow::New()
-{
-  return new vtkDummyRenderWindow;
-}
-
-
+//----------------------------------------------------------------------------
 // Ask each renderer owned by this RenderWindow to render its image and 
 // synchronize this process.
 void vtkDummyRenderWindow::Render()
@@ -79,12 +79,14 @@ void vtkDummyRenderWindow::Render()
   this->InvokeEvent(vtkCommand::EndEvent,NULL);  
 }
 
+//----------------------------------------------------------------------------
 void vtkDummyRenderWindow::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
 
 }
 
+//----------------------------------------------------------------------------
 float *vtkDummyRenderWindow::GetZbufferData(int x1, int y1, int x2, int y2)
 {
   float *buf;
@@ -100,6 +102,7 @@ float *vtkDummyRenderWindow::GetZbufferData(int x1, int y1, int x2, int y2)
   return buf;
 }
 
+//----------------------------------------------------------------------------
 float *vtkDummyRenderWindow::GetRGBAPixelData(int x1,int y1,int x2,int y2,
                                               int vtkNotUsed(front))
 {
@@ -116,6 +119,7 @@ float *vtkDummyRenderWindow::GetRGBAPixelData(int x1,int y1,int x2,int y2,
   return buf;
 }
 
+//----------------------------------------------------------------------------
 unsigned char* 
 vtkDummyRenderWindow::GetRGBACharPixelData(int x1,int y1,
                                            int x2,int y2,
@@ -134,70 +138,93 @@ vtkDummyRenderWindow::GetRGBACharPixelData(int x1,int y1,
   return buf;
 }
 
-
-
+//----------------------------------------------------------------------------
 unsigned char *vtkDummyRenderWindow::GetPixelData(int, int, int, int, 
 						  int) 
 {
   return 0;
 }
+
+//----------------------------------------------------------------------------
 int vtkDummyRenderWindow::GetPixelData(int ,int ,int ,int , int,
 				       vtkUnsignedCharArray*) 
 {
   return VTK_ERROR;
 }
+
+//----------------------------------------------------------------------------
 int vtkDummyRenderWindow::SetPixelData(int, int, int, int, 
 				       unsigned char *,int)
 {
   return VTK_ERROR;
 }
+
+//----------------------------------------------------------------------------
 int vtkDummyRenderWindow::SetPixelData(int, int, int, int, 
 				       vtkUnsignedCharArray*,int)
 {
   return VTK_ERROR;
 }
+
+//----------------------------------------------------------------------------
 int vtkDummyRenderWindow::GetRGBAPixelData(int, int, int, int, int, 
 					   vtkFloatArray*)
 {
   return VTK_ERROR;
 }
+
+//----------------------------------------------------------------------------
 int vtkDummyRenderWindow::SetRGBAPixelData(int ,int ,int ,int ,float *,
 					   int, int) 
 {
   return VTK_ERROR;
 }
+
+//----------------------------------------------------------------------------
 int vtkDummyRenderWindow::SetRGBAPixelData(int, int, int, int, 
 					   vtkFloatArray*,
 					   int, int) 
 {
   return VTK_ERROR;
 }
+
+//----------------------------------------------------------------------------
 int vtkDummyRenderWindow::GetRGBACharPixelData(int ,int, int, int, int,
 					       vtkUnsignedCharArray*)
 {
   return VTK_ERROR;
 }
+
+//----------------------------------------------------------------------------
 int vtkDummyRenderWindow::SetRGBACharPixelData(int ,int ,int ,int ,
 					       unsigned char *, int,
 					       int) 
 {
   return VTK_ERROR;
 }
+
+//----------------------------------------------------------------------------
 int vtkDummyRenderWindow::SetRGBACharPixelData(int, int, int, int,
 					       vtkUnsignedCharArray *,
 					       int, int) 
 {
   return VTK_ERROR;
 }
+
+//----------------------------------------------------------------------------
 int vtkDummyRenderWindow::GetZbufferData( int, int, int, int, 
 					  vtkFloatArray*)
 {
   return VTK_ERROR;
 }
+
+//----------------------------------------------------------------------------
 int vtkDummyRenderWindow::SetZbufferData(int, int, int, int, float *)
 {
   return VTK_ERROR;
 }
+
+//----------------------------------------------------------------------------
 int vtkDummyRenderWindow::SetZbufferData( int, int, int, int, 
 					  vtkFloatArray * )
 {

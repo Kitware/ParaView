@@ -231,17 +231,7 @@ Tcl_Interp *vtkPVApplication::InitializeTcl(int argc, char *argv[])
 }
 
 //----------------------------------------------------------------------------
-vtkPVApplication* vtkPVApplication::New()
-{
-  // First try to create the object from the vtkObjectFactory
-  vtkObject* ret = vtkObjectFactory::CreateInstance("vtkPVApplication");
-  if(ret)
-    {
-    return (vtkPVApplication*)ret;
-    }
-  // If the factory was unable to create the object, then create it here.
-  return new vtkPVApplication;
-}
+vtkStandardNewMacro(vtkPVApplication);
 
 int vtkPVApplicationCommand(ClientData cd, Tcl_Interp *interp,
 			    int argc, char *argv[]);

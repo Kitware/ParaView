@@ -20,9 +20,14 @@
 #include "vtkCommand.h"
 #include "vtkGraphicsFactory.h"
 #include "vtkMapper.h"
+#include "vtkObjectFactory.h"
 
-vtkCxxRevisionMacro(vtkDummyRenderer, "1.4");
+//----------------------------------------------------------------------------
+vtkStandardNewMacro(vtkDummyRenderer);
 
+vtkCxxRevisionMacro(vtkDummyRenderer, "1.5");
+
+//----------------------------------------------------------------------------
 // Create a vtkDummyRenderer with a black background, a white ambient light, 
 // two-sided lighting turned on, a viewport of (0,0,1,1), and backface culling
 // turned off.
@@ -30,16 +35,12 @@ vtkDummyRenderer::vtkDummyRenderer()
 {
 }
 
+//----------------------------------------------------------------------------
 vtkDummyRenderer::~vtkDummyRenderer()
 {
 }
 
-// return the correct type of Renderer 
-vtkDummyRenderer *vtkDummyRenderer::New()
-{ 
-  return new vtkDummyRenderer;
-}
-
+//----------------------------------------------------------------------------
 // Concrete render method.
 void vtkDummyRenderer::Render(void)
 {
@@ -68,40 +69,49 @@ void vtkDummyRenderer::Render(void)
   this->InvokeEvent(vtkCommand::EndEvent,NULL);
 }
 
+//----------------------------------------------------------------------------
 void vtkDummyRenderer::RenderOverlay()
 {
 }
 
+//----------------------------------------------------------------------------
 void vtkDummyRenderer::DeviceRender()
 {
 }
 
+//----------------------------------------------------------------------------
 void vtkDummyRenderer::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
 }
 
+//----------------------------------------------------------------------------
 float vtkDummyRenderer::GetPickedZ()
 {
   return 0.0;
 }
 
+//----------------------------------------------------------------------------
 void vtkDummyRenderer::DevicePickRender()
 {
 }
 
+//----------------------------------------------------------------------------
 void vtkDummyRenderer::StartPick(unsigned int vtkNotUsed(pickFromSize))
 {
 }
 
+//----------------------------------------------------------------------------
 void vtkDummyRenderer::UpdatePickId()
 {
 }
 
+//----------------------------------------------------------------------------
 void vtkDummyRenderer::DonePick()
 {
 }
 
+//----------------------------------------------------------------------------
 unsigned int vtkDummyRenderer::GetPickedId()
 {
   return 0;

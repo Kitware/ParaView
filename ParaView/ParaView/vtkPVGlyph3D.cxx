@@ -40,17 +40,21 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 #include "vtkPVGlyph3D.h"
-#include "vtkPVApplication.h"
-#include "vtkStringList.h"
+
 #include "vtkKWCompositeCollection.h"
-#include "vtkPVWindow.h"
+#include "vtkKWFrame.h"
 #include "vtkObjectFactory.h"
+#include "vtkPVApplication.h"
 #include "vtkPVData.h"
 #include "vtkPVInputMenu.h"
-#include "vtkKWFrame.h"
-#include "vtkPVSelectionList.h"
 #include "vtkPVLabeledToggle.h"
+#include "vtkPVSelectionList.h"
 #include "vtkPVVectorEntry.h"
+#include "vtkPVWindow.h"
+#include "vtkStringList.h"
+
+//----------------------------------------------------------------------------
+vtkStandardNewMacro(vtkPVGlyph3D);
 
 int vtkPVGlyph3DCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -74,19 +78,6 @@ vtkPVGlyph3D::~vtkPVGlyph3D()
     this->GlyphSource->UnRegister(this);
     this->GlyphSource = NULL;
     }
-}
-
-//----------------------------------------------------------------------------
-vtkPVGlyph3D* vtkPVGlyph3D::New()
-{
-  // First try to create the object from the vtkObjectFactory
-  vtkObject* ret = vtkObjectFactory::CreateInstance("vtkPVGlyph3D");
-  if(ret)
-    {
-    return (vtkPVGlyph3D*)ret;
-    }
-  // If the factory was unable to create the object, then create it here.
-  return new vtkPVGlyph3D;
 }
 
 //----------------------------------------------------------------------------

@@ -45,21 +45,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkObjectFactory.h"
 
 //----------------------------------------------------------------------------
-vtkKWBoundsDisplay* vtkKWBoundsDisplay::New()
-{
-  // First try to create the object from the vtkObjectFactory
-  vtkObject* ret = vtkObjectFactory::CreateInstance("vtkKWBoundsDisplay");
-  if(ret)
-    {
-    return (vtkKWBoundsDisplay*)ret;
-    }
-  // If the factory was unable to create the object, then create it here.
-  return new vtkKWBoundsDisplay;
-}
+vtkStandardNewMacro(vtkKWBoundsDisplay);
 
 int vtkKWBoundsDisplayCommand(ClientData cd, Tcl_Interp *interp,
 			     int argc, char *argv[]);
 
+//----------------------------------------------------------------------------
 vtkKWBoundsDisplay::vtkKWBoundsDisplay()
 {
   this->CommandFunction = vtkKWBoundsDisplayCommand;
@@ -72,6 +63,7 @@ vtkKWBoundsDisplay::vtkKWBoundsDisplay()
   this->Bounds[1] = this->Bounds[3] = this->Bounds[5] = -VTK_LARGE_FLOAT;
 }
 
+//----------------------------------------------------------------------------
 vtkKWBoundsDisplay::~vtkKWBoundsDisplay()
 {
   this->XRangeLabel->Delete();
@@ -82,7 +74,7 @@ vtkKWBoundsDisplay::~vtkKWBoundsDisplay()
   this->ZRangeLabel = NULL;
 }
 
-
+//----------------------------------------------------------------------------
 void vtkKWBoundsDisplay::Create(vtkKWApplication *app)
 {
   // must set the application
@@ -110,6 +102,7 @@ void vtkKWBoundsDisplay::Create(vtkKWApplication *app)
   this->UpdateWidgets();
 }
 
+//----------------------------------------------------------------------------
 void vtkKWBoundsDisplay::SetBounds(float bounds[6])
 {
   int i;
@@ -123,6 +116,7 @@ void vtkKWBoundsDisplay::SetBounds(float bounds[6])
   this->UpdateWidgets();
 }
 
+//----------------------------------------------------------------------------
 void vtkKWBoundsDisplay::UpdateWidgets()
 {
   if (this->Bounds[0] > this->Bounds[1] || 

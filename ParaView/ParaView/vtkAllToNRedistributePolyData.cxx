@@ -75,27 +75,21 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkObjectFactory.h"
 #include "vtkMultiProcessController.h"
 
-vtkAllToNRedistributePolyData* vtkAllToNRedistributePolyData::New()
-{
-  // First try to create the object from the vtkObjectFactory
-  vtkObject* ret = vtkObjectFactory::CreateInstance("vtkAllToNRedistributePolyData");
-  if(ret)
-    {
-    return (vtkAllToNRedistributePolyData*)ret;
-    }
-  // If the factory was unable to create the object, then create it here.
-  return new vtkAllToNRedistributePolyData;
-}
+//----------------------------------------------------------------------------
+vtkStandardNewMacro(vtkAllToNRedistributePolyData);
 
+//----------------------------------------------------------------------------
 vtkAllToNRedistributePolyData::vtkAllToNRedistributePolyData()
 {
   this->NumberOfProcesses = 1;
 }
 
+//----------------------------------------------------------------------------
 vtkAllToNRedistributePolyData::~vtkAllToNRedistributePolyData()
 {
 }
 
+//----------------------------------------------------------------------------
 void vtkAllToNRedistributePolyData::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->vtkWeightedRedistributePolyData::PrintSelf(os,indent);

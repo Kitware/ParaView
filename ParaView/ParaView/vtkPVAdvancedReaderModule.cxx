@@ -40,6 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 #include "vtkPVAdvancedReaderModule.h"
+
 #include "vtkPVWidgetCollection.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVFileEntry.h"
@@ -47,6 +48,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVData.h"
 #include "vtkVector.txx"
 #include "vtkVectorIterator.txx"
+
+//----------------------------------------------------------------------------
+vtkStandardNewMacro(vtkPVAdvancedReaderModule);
 
 int vtkPVAdvancedReaderModuleCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -64,19 +68,6 @@ vtkPVAdvancedReaderModule::~vtkPVAdvancedReaderModule()
 }
 
 //----------------------------------------------------------------------------
-vtkPVAdvancedReaderModule* vtkPVAdvancedReaderModule::New()
-{
-  // First try to create the object from the vtkObjectFactory
-  vtkObject* ret = vtkObjectFactory::CreateInstance("vtkPVAdvancedReaderModule");
-  if(ret)
-    {
-    return (vtkPVAdvancedReaderModule*)ret;
-    }
-  // If the factory was unable to create the object, then create it here.
-  return new vtkPVAdvancedReaderModule;
-}
-
-
 int vtkPVAdvancedReaderModule::ReadFile(const char* fname, 
 					vtkPVReaderModule*& clone)
 {

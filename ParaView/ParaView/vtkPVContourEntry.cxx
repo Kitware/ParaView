@@ -53,6 +53,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVSource.h"
 #include "vtkPVXMLElement.h"
 
+//----------------------------------------------------------------------------
+vtkStandardNewMacro(vtkPVContourEntry);
+
 int vtkPVContourEntryCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
 
@@ -89,18 +92,6 @@ vtkPVContourEntry::~vtkPVContourEntry()
   this->DeleteValueButton = NULL;
 
   this->SetPVSource(NULL);
-}
-
-//----------------------------------------------------------------------------
-vtkPVContourEntry* vtkPVContourEntry::New()
-{
-  // First try to create the object from the vtkObjectFactory
-  vtkObject* ret = vtkObjectFactory::CreateInstance("vtkPVContourEntry");
-  if(ret)
-    {
-    return (vtkPVContourEntry*)ret;
-    }
-  return new vtkPVContourEntry;
 }
 
 //----------------------------------------------------------------------------

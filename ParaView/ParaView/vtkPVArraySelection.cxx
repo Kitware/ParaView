@@ -52,17 +52,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWLabeledFrame.h"
 
 //----------------------------------------------------------------------------
-vtkPVArraySelection* vtkPVArraySelection::New()
-{
-  // First try to create the object from the vtkObjectFactory
-  vtkObject* ret = vtkObjectFactory::CreateInstance("vtkPVArraySelection");
-  if (ret)
-    {
-    return (vtkPVArraySelection*)ret;
-    }
-  // If the factory was unable to create the object, then create it here.
-  return new vtkPVArraySelection;
-}
+vtkStandardNewMacro(vtkPVArraySelection);
 
 //----------------------------------------------------------------------------
 int vtkPVArraySelectionCommand(ClientData cd, Tcl_Interp *interp,

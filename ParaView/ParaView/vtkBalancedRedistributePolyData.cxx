@@ -74,26 +74,20 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkObjectFactory.h"
 #include "vtkMultiProcessController.h"
 
-vtkBalancedRedistributePolyData* vtkBalancedRedistributePolyData::New()
-{
-  // First try to create the object from the vtkObjectFactory
-  vtkObject* ret = vtkObjectFactory::CreateInstance("vtkBalancedRedistributePolyData");
-  if(ret)
-    {
-    return (vtkBalancedRedistributePolyData*)ret;
-    }
-  // If the factory was unable to create the object, then create it here.
-  return new vtkBalancedRedistributePolyData;
-}
+//----------------------------------------------------------------------------
+vtkStandardNewMacro(vtkBalancedRedistributePolyData);
 
+//----------------------------------------------------------------------------
 vtkBalancedRedistributePolyData::vtkBalancedRedistributePolyData()
 {
 }
 
+//----------------------------------------------------------------------------
 vtkBalancedRedistributePolyData::~vtkBalancedRedistributePolyData()
 {
 }
 
+//----------------------------------------------------------------------------
 void vtkBalancedRedistributePolyData::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->vtkWeightedRedistributePolyData::PrintSelf(os,indent);
