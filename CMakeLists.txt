@@ -206,6 +206,10 @@ ELSE(VTK_USE_SYSTEM_ZLIB)
 ENDIF(VTK_USE_SYSTEM_ZLIB)
 
 #########################################################################
+# Configure SPCTH
+SUBDIRS(Utilities/SPCTH)
+
+#########################################################################
 # Configure HDF5
 OPTION(PARAVIEW_USE_SYSTEM_HDF5 "Use system installed HDF5" OFF)
 IF(PARAVIEW_USE_SYSTEM_HDF5)

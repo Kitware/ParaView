@@ -1,0 +1,20 @@
+#ifndef _spcthConfig_h
+#define _spcthConfig_h
+
+#cmakedefine SPCTHSTATIC
+
+#if defined(_WIN32) && !defined(WIN32)
+# define WIN32
+#endif
+
+#if defined(WIN32) && !defined(SPCTHSTATIC)
+#  if defined(SPCTH_EXPORTS) || defined(SPCTH_EXPORTS)
+#    define SPCTH_EXPORT __declspec( dllexport ) 
+#  else
+#    define SPCTH_EXPORT __declspec( dllimport ) 
+#  endif
+#else
+#  define SPCTH_EXPORT
+#endif
+
+#endif
