@@ -68,7 +68,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProbe);
-vtkCxxRevisionMacro(vtkPVProbe, "1.94");
+vtkCxxRevisionMacro(vtkPVProbe, "1.95");
 
 int vtkPVProbeCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -255,8 +255,6 @@ void vtkPVProbe::AcceptCallbackInternal()
     vtkstd::string tempArray;
 
     // used to read data values to a vtkstd::string using arbitrary length buffer
-    ostrstream arrayStrm;
-    ostrstream tempStrm;
 
     this->XYPlotWidget->SetEnabled(0);
 
@@ -267,18 +265,18 @@ void vtkPVProbe::AcceptCallbackInternal()
       if (numComponents > 1)
         {
         // make sure we fill buffer from the beginning
-        arrayStrm.rdbuf()->freeze(0);
-        arrayStrm.seekp( 0, ios::beg );
+        ostrstream arrayStrm;
         arrayStrm << array->GetName() << ": ( " << ends;
         arrayData = arrayStrm.str();
+        arrayStrm.rdbuf()->freeze(0);
 
         for (j = 0; j < numComponents; j++)
           {
           // make sure we fill buffer from the beginning
-          tempStrm.rdbuf()->freeze(0);
-          tempStrm.seekp( 0, ios::beg );
+          ostrstream tempStrm;
           tempStrm << array->GetComponent( 0, j ) << ends; 
           tempArray = tempStrm.str();
+          tempStrm.rdbuf()->freeze(0);
 
           if (j < numComponents - 1)
             {
@@ -303,11 +301,11 @@ void vtkPVProbe::AcceptCallbackInternal()
       else
         {
         // make sure we fill buffer from the beginning
-        arrayStrm.rdbuf()->freeze(0);
-        arrayStrm.seekp( 0, ios::beg );
+        ostrstream arrayStrm;
         arrayStrm << array->GetName() << ": " << array->GetComponent( 0, 0 ) << endl << ends;
 
         label += arrayStrm.str();
+        arrayStrm.rdbuf()->freeze(0);
         }
       }
     this->PointDataLabel->SetLabel( label.c_str() );
