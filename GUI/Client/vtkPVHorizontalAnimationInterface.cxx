@@ -28,9 +28,11 @@
 #include "vtkKWEvent.h"
 #include "vtkPVWindow.h"
 #include "vtkPVAnimationManager.h"
+#include "vtkPVTimeLine.h"
+#include "vtkKWParameterValueFunctionEditor.h"
 
 vtkStandardNewMacro(vtkPVHorizontalAnimationInterface);
-vtkCxxRevisionMacro(vtkPVHorizontalAnimationInterface, "1.3");
+vtkCxxRevisionMacro(vtkPVHorizontalAnimationInterface, "1.4");
 
 //*****************************************************************************
 class vtkPVHorizontalAnimationInterfaceObserver : public vtkCommand
@@ -131,6 +133,8 @@ void vtkPVHorizontalAnimationInterface::Create(vtkKWApplication* app, const char
   this->InitializeObservers(this->ParentTree);
   this->ParentTree->PackWidget(); 
   this->ParentTree->SetExpanded(1);
+  this->ParentTree->GetTimeLine()->SetParameterRangePosition(
+    vtkKWParameterValueFunctionEditor::ParameterRangePositionAtTop);
 }
 
 //-----------------------------------------------------------------------------
