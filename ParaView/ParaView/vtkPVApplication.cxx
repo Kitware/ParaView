@@ -120,7 +120,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.214.2.13");
+vtkCxxRevisionMacro(vtkPVApplication, "1.214.2.14");
 vtkCxxSetObjectMacro(vtkPVApplication, RenderModule, vtkPVRenderModule);
 
 
@@ -325,9 +325,11 @@ vtkPVApplication::vtkPVApplication()
   this->MinorVersion = PARAVIEW_VERSION_MINOR;
   this->SetApplicationName("ParaView");
   char name[128];
+  char patch[128];
   sprintf(name, "ParaView%d.%d", this->MajorVersion, this->MinorVersion);
   this->SetApplicationVersionName(name);
-  this->SetApplicationReleaseName("1");
+  sprintf(patch, "%d", PARAVIEW_VERSION_PATCH);
+  this->SetApplicationReleaseName(patch);
 
 
   this->Display3DWidgets = 0;
