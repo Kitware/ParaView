@@ -118,7 +118,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.197");
+vtkCxxRevisionMacro(vtkPVApplication, "1.198");
 vtkCxxSetObjectMacro(vtkPVApplication, RenderModule, vtkPVRenderModule);
 
 
@@ -288,6 +288,17 @@ Tcl_Interp *vtkPVApplication::InitializeTcl(int argc, char *argv[])
 //----------------------------------------------------------------------------
 vtkPVApplication::vtkPVApplication()
 {
+  this->MajorVersion = 0;
+  this->MinorVersion = 7;
+  this->SetApplicationName("ParaView");
+  char name[128];
+  sprintf(name, "ParaView%d.%d", this->MajorVersion, this->MinorVersion);
+  this->SetApplicationVersionName(name);
+  this->SetApplicationReleaseName("1");
+
+  // Find the installation directory (now that we have the app name)
+
+  this->FindApplicationInstallationDirectory();
 
   this->TotalVisibleMemorySizeValid = 0;
 
@@ -296,19 +307,12 @@ vtkPVApplication::vtkPVApplication()
   this->ProcessId = 0;
   this->RunningParaViewScript = 0;
 
-  char name[128];
-
   this->ProcessModule = NULL;
   this->RenderModule = NULL;
   this->RenderModuleName = NULL;
   this->SetRenderModuleName("LODRenderModule");
   this->CommandFunction = vtkPVApplicationCommand;
-  this->MajorVersion = 0;
-  this->MinorVersion = 7;
-  this->SetApplicationName("ParaView");
-  sprintf(name, "ParaView%d.%d", this->MajorVersion, this->MinorVersion);
-  this->SetApplicationVersionName(name);
-  this->SetApplicationReleaseName("1");
+
   this->NumberOfPipes = 1;
 
   this->UseRenderingGroup = 0;
@@ -1528,39 +1532,34 @@ vtkObject *vtkPVApplication::TclToVTKObject(const char *tclName)
 void vtkPVApplication::DisplayHelp(vtkKWWindow* master)
 {
 #ifdef _WIN32
-  char temp[1024];
-  char loc[1024];
+  ostrstream temp;
+  if (this->ApplicationInstallationDirectory)
+    {
+    temp << this->ApplicationInstallationDirectory << "/";
+    }
+  temp << this->ApplicationName << ".chm" << ends;
+
   struct stat fs;
-
-  if (!this->GetRegisteryValue(2, "Setup", "InstalledPath", 0))
+  if (stat(temp.str(), &fs) == 0) 
     {
-    this->GetRegistery()->SetGlobalScope(1);
-    }
-
-  if (this->GetRegisteryValue(2, "Setup", "InstalledPath", loc))
-    {
-    sprintf(temp, "%s/%s.chm", loc, this->ApplicationName);
-    }
-  else
-    {
-    sprintf(temp, "%s.chm", this->ApplicationName);
-    }
-  this->GetRegistery()->SetGlobalScope(0);
-  if (stat(temp, &fs) == 0) 
-    {
-    HtmlHelp(NULL, temp, HH_DISPLAY_TOPIC, 0);
+    HtmlHelp(NULL, temp.str(), HH_DISPLAY_TOPIC, 0);
+    temp.rdbuf()->freeze(0);
     return;
     }
+  temp.rdbuf()->freeze(0);
 
   const char** dir;
   for(dir=VTK_PV_HELP_PATHS; *dir; ++dir)
     {
-    sprintf(temp, "%s/%s.chm", *dir, this->ApplicationName);
-    if (stat(temp, &fs) == 0) 
+    ostrstream temp2;
+    temp2 << *dir << "/" << this->ApplicationName << ".chm";
+    if (stat(temp2.str(), &fs) == 0) 
       {
-      HtmlHelp(NULL, temp, HH_DISPLAY_TOPIC, 0);
+      HtmlHelp(NULL, temp2.str(), HH_DISPLAY_TOPIC, 0);
+      temp2.rdbuf()->freeze(0);
       return;
       }
+    temp2.rdbuf()->freeze(0);
     }
 
   vtkKWMessageDialog *dlg = vtkKWMessageDialog::New();

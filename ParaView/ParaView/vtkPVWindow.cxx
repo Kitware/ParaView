@@ -137,7 +137,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.450");
+vtkCxxRevisionMacro(vtkPVWindow, "1.451");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -1646,32 +1646,19 @@ void vtkPVWindow::PlayDemo()
 
 #ifdef _WIN32  
 
-  // First look in the registery
-  char loc[1024];
-  
-  vtkKWApplication* app = this->GetApplication();
-  vtkKWRegisteryUtilities *reg = app->GetRegistery();
-  if (!app->GetRegisteryValue(2, "Setup", "InstalledPath", 0))
+  vtkKWApplication *app = this->GetApplication();
+  if (app->GetApplicationInstallationDirectory())
     {
-    app->GetRegistery()->SetGlobalScope(1);
-    }
-
-  if (app->GetRegisteryValue(2, "Setup", "InstalledPath", loc))
-    {
-    sprintf(temp1,"%s/Demos/Demo1.pvs",loc);
+    sprintf(temp1, 
+            "%s/Demos/Demo1.pvs", app->GetApplicationInstallationDirectory());
     if (stat(temp1, &fs) == 0) 
       {
-      int len=(int)(strlen(loc));
-      for(int i=0; i<len; i++)
-        {
-        if (loc[i] == '\\') { loc[i] = '/';}
-        }
-      this->Script("set DemoDir %s/Demos", loc);
+      this->Script("set DemoDir %s/Demos", 
+                   app->GetApplicationInstallationDirectory());
       this->LoadScript(temp1);
       found=1;
       }
     }
-  app->GetRegistery()->SetGlobalScope(0);
 
 #else
 
