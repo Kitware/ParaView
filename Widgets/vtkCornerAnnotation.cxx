@@ -29,7 +29,6 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkObjectFactory.h"
 
 
-
 //------------------------------------------------------------------------------
 vtkCornerAnnotation* vtkCornerAnnotation::New()
 {
@@ -59,6 +58,7 @@ vtkCornerAnnotation::vtkCornerAnnotation()
   
   for (int i = 0; i < 4; i++)
     {
+    this->CornerText[i] = NULL;
     this->TextMapper[i] = vtkTextMapper::New();
     this->TextMapper[i]->SetFontSize(15);  
     this->TextMapper[i]->ShadowOff();  
@@ -77,15 +77,22 @@ vtkCornerAnnotation::vtkCornerAnnotation()
   
   this->TextMapper[3]->SetJustificationToRight();
   this->TextMapper[3]->SetVerticalJustificationToTop();
+
+  this->ImageActor = NULL;
+  this->WindowLevel = NULL;
 }
 
 vtkCornerAnnotation::~vtkCornerAnnotation()
 {
   for (int i = 0; i < 4; i++)
     {
+    delete [] this->CornerText[i];
     this->TextMapper[i]->Delete();
     this->TextActor[i]->Delete();
     }
+  
+  this->SetWindowLevel(NULL);
+  this->SetImageActor(NULL);
 }
 
 // Release any graphics resources that are being consumed by this actor.
@@ -97,6 +104,112 @@ void vtkCornerAnnotation::ReleaseGraphicsResources(vtkWindow *win)
   for (int i = 0; i < 4; i++)
     {
     this->TextActor[i]->ReleaseGraphicsResources(win);
+    }
+}
+
+void vtkCornerAnnotation::ReplaceText()
+{
+  int i;
+  char *text, *text2;
+  int image;
+  char *rpos, *tmp;
+  float window, level;
+  
+  if (this->ImageActor)
+    {
+    image = this->ImageActor->GetSliceNumber();
+    }
+  if (this->WindowLevel)
+    {
+    window = this->WindowLevel->GetWindow();
+    level = this->WindowLevel->GetLevel();    
+    }
+  
+  // search for tokens, replace and then assign to TextMappers
+  for (i = 0; i < 4; i++)
+    {
+    if (strlen(this->CornerText[i]))
+      {
+      text = new char [strlen(this->CornerText[i])+1000];
+      text2 = new char [strlen(this->CornerText[i])+1000];
+      strcpy(text,this->CornerText[i]);
+      // now do the replacements
+      rpos = strstr(text,"<image>");
+      while (rpos)
+        {
+        *rpos = '\0';
+        if (this->ImageActor)
+          {
+          sprintf(text2,"%sImage: %i%s",text,image,rpos+7);
+          }
+        else
+          {
+          sprintf(text2,"%s%s",text,rpos+7);
+          }
+        tmp = text;
+        text = text2;
+        text2 = tmp;
+        rpos = strstr(text,"<image>");
+        }
+      rpos = strstr(text,"<slice>");
+      while (rpos)
+        {
+        *rpos = '\0';
+        if (this->ImageActor)
+          {
+          sprintf(text2,"%sSlice: %i%s",text,image,rpos+7);
+          }
+        else
+          {
+          sprintf(text2,"%s%s",text,rpos+7);
+          }
+        tmp = text;
+        text = text2;
+        text2 = tmp;
+        rpos = strstr(text,"<slice>");
+        }
+      rpos = strstr(text,"<window>");
+      while (rpos)
+        {
+        *rpos = '\0';
+        if (this->ImageActor)
+          {
+          sprintf(text2,"%sWindow: %.2f%s",text,window,rpos+8);
+          }
+        else
+          {
+          sprintf(text2,"%s%s",text,rpos+8);
+          }
+        tmp = text;
+        text = text2;
+        text2 = tmp;
+        rpos = strstr(text,"<window>");
+        }
+      rpos = strstr(text,"<level>");
+      while (rpos)
+        {
+        *rpos = '\0';
+        if (this->ImageActor)
+          {
+          sprintf(text2,"%sLevel: %.2f%s",text,level,rpos+7);
+          }
+        else
+          {
+          sprintf(text2,"%s%s",text,rpos+7);
+          }
+        tmp = text;
+        text = text2;
+        text2 = tmp;
+        rpos = strstr(text,"<level>");
+        }
+      this->TextMapper[i]->SetInput(text);
+      delete [] text;
+      delete [] text2;
+      }
+    else
+      {
+      this->TextMapper[i]->SetInput("");
+      }
     }
 }
 
@@ -134,11 +247,16 @@ int vtkCornerAnnotation::RenderOpaqueGeometry(vtkViewport *viewport)
     }
   
   // Check to see whether we have to rebuild everything
-  if ( this->GetMTime() > this->BuildTime)
+  if ( (this->GetMTime() > this->BuildTime) ||
+       (this->ImageActor && this->ImageActor->GetMTime() > this->BuildTime) ||
+       (this->WindowLevel && this->WindowLevel->GetMTime() > this->BuildTime))
     {
     int *vSize = viewport->GetSize();
-	int maxX, maxY;
+    int maxX, maxY;
     vtkDebugMacro(<<"Rebuilding text");
+    
+    // replace text
+    this->ReplaceText();
     
     // get the viewport size in display coordinates
     this->LastSize[0] = vSize[0];
@@ -237,6 +355,12 @@ void vtkCornerAnnotation::PrintSelf(ostream& os, vtkIndent indent)
 
 void vtkCornerAnnotation::SetText(int i, const char *text)
 {
-  this->TextMapper[i]->SetInput(text);
+  if ( this->CornerText[i] && text && (!strcmp(this->CornerText[i],text))) 
+    { 
+    return;
+    } 
+  delete [] this->CornerText[i];
+  this->CornerText[i] = new char [strlen(text)+1];
+  strcpy(this->CornerText[i],text);
   this->Modified();
 }
