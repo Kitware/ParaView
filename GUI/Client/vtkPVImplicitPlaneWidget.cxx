@@ -43,10 +43,11 @@
 #include "vtkSMProxyManager.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkCommand.h"
+#include "vtkPVWindow.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVImplicitPlaneWidget);
-vtkCxxRevisionMacro(vtkPVImplicitPlaneWidget, "1.48");
+vtkCxxRevisionMacro(vtkPVImplicitPlaneWidget, "1.49");
 
 vtkCxxSetObjectMacro(vtkPVImplicitPlaneWidget, InputMenu, vtkPVInputMenu);
 
@@ -333,6 +334,10 @@ void vtkPVImplicitPlaneWidget::Accept()
     }
   this->WidgetProxy->UpdateVTKObjects();
   this->ImplicitFunctionProxy->UpdateVTKObjects();
+  // 3DWidgets need to explictly call UpdateAnimationInterface on accept
+  // since the animatable proxies might have been registered/unregistered
+  // which needs to be updated in the Animation interface.
+  this->GetPVApplication()->GetMainWindow()->UpdateAnimationInterface();
   this->ModifiedFlag = 0;
 
   // I put this after the accept internal, because

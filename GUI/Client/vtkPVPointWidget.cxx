@@ -36,7 +36,7 @@
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkPVPointWidget);
-vtkCxxRevisionMacro(vtkPVPointWidget, "1.42");
+vtkCxxRevisionMacro(vtkPVPointWidget, "1.43");
 
 int vtkPVPointWidgetCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -167,7 +167,10 @@ void vtkPVPointWidget::Accept()
     {
     vtkErrorMacro("Could not find property "<<variablename<<" for widget: "<< sproxy->GetVTKClassName());
     }
-  
+  // 3DWidgets need to explictly call UpdateAnimationInterface on accept
+  // since the animatable proxies might have been registered/unregistered
+  // which needs to be updated in the Animation interface.
+  this->GetPVApplication()->GetMainWindow()->UpdateAnimationInterface();
   this->ModifiedFlag = 0;
   // I put this after the accept internal, because
   // vtkPVGroupWidget inactivates and builds an input list ...

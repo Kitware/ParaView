@@ -40,7 +40,7 @@
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkPVLineWidget);
-vtkCxxRevisionMacro(vtkPVLineWidget, "1.59");
+vtkCxxRevisionMacro(vtkPVLineWidget, "1.60");
 
 //----------------------------------------------------------------------------
 vtkPVLineWidget::vtkPVLineWidget()
@@ -416,6 +416,10 @@ void vtkPVLineWidget::Accept()
     }
   sproxy->UpdateVTKObjects();
   sproxy->UpdatePipeline();
+  // 3DWidgets need to explictly call UpdateAnimationInterface on accept
+  // since the animatable proxies might have been registered/unregistered
+  // which needs to be updated in the Animation interface.
+  this->GetPVApplication()->GetMainWindow()->UpdateAnimationInterface();
   this->ModifiedFlag = 0;
   // I put this after the accept internal, because
   // vtkPVGroupWidget inactivates and builds an input list ...

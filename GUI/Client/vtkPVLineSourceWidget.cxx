@@ -26,9 +26,10 @@
 #include "vtkSMProxyManager.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkSM3DWidgetProxy.h"
+#include "vtkPVWindow.h"
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLineSourceWidget);
-vtkCxxRevisionMacro(vtkPVLineSourceWidget, "1.31");
+vtkCxxRevisionMacro(vtkPVLineSourceWidget, "1.32");
 
 int vtkPVLineSourceWidgetCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -190,7 +191,10 @@ void vtkPVLineSourceWidget::Accept()
     this->SourceProxy->UpdateVTKObjects();
     this->SourceProxy->UpdatePipeline();
     }
-
+  // 3DWidgets need to explictly call UpdateAnimationInterface on accept
+  // since the animatable proxies might have been registered/unregistered
+  // which needs to be updated in the Animation interface.
+  this->GetPVApplication()->GetMainWindow()->UpdateAnimationInterface();
   // I actually want to call vtkPVWidget::Accept, not the Accept method of
   // the superclass (vtkPVLineWidget).
   this->vtkPVWidget::Accept();

@@ -39,9 +39,10 @@
 #include "vtkSMProxyProperty.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkCommand.h"
+#include "vtkPVWindow.h"
 
 vtkStandardNewMacro(vtkPVBoxWidget);
-vtkCxxRevisionMacro(vtkPVBoxWidget, "1.49");
+vtkCxxRevisionMacro(vtkPVBoxWidget, "1.50");
 
 vtkCxxSetObjectMacro(vtkPVBoxWidget, InputMenu, vtkPVInputMenu);
 
@@ -217,7 +218,10 @@ void vtkPVBoxWidget::Accept()
     }
   this->BoxProxy->UpdateVTKObjects();
   this->BoxTransformProxy->UpdateVTKObjects();
-  
+  // 3DWidgets need to explictly call UpdateAnimationInterface on accept
+  // since the animatable proxies might have been registered/unregistered
+  // which needs to be updated in the Animation interface.
+  this->GetPVApplication()->GetMainWindow()->UpdateAnimationInterface();
   this->ModifiedFlag = 0;
   // I put this after the accept internal, because
   // vtkPVGroupWidget inactivates and builds an input list ...

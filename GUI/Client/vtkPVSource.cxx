@@ -69,7 +69,7 @@
 
 
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.418");
+vtkCxxRevisionMacro(vtkPVSource, "1.419");
 vtkCxxSetObjectMacro(vtkPVSource,Notebook,vtkPVSourceNotebook);
 vtkCxxSetObjectMacro(vtkPVSource,PartDisplay,vtkSMPartDisplay);
 
@@ -794,6 +794,7 @@ void vtkPVSource::SetLabelNoTrace(const char* arg)
   if (window)
     {
     window->UpdateSelectMenu();
+    window->UpdateAnimationInterface();
     }
 
 } 
@@ -1162,6 +1163,7 @@ void vtkPVSource::Accept(int hideFlag, int hideSource)
     // I put it at the end so the InputFixedTypeRequirement will work.
     this->UnGrabFocus();
     this->SetDefaultColorParameters();
+    // Has an implicit update.
     window->AddDefaultAnimation(this);
 
     // If a property called TimestepValues exists, automatically add

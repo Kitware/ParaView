@@ -590,6 +590,11 @@ public:
   // Called to add a default animation for a source.
   // vtkPVSource calls this when the source is initialized.
   void AddDefaultAnimation(vtkPVSource* pvSource);
+
+  // Description:
+  // Calls an Update on the Animation Manager forcing it to get in sync with the 
+  // current system state. Called when a source is created or deleted.
+  void UpdateAnimationInterface();
 protected:
   vtkPVWindow();
   ~vtkPVWindow();

@@ -142,7 +142,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.667");
+vtkCxxRevisionMacro(vtkPVWindow, "1.668");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -3639,6 +3639,12 @@ void vtkPVWindow::SetCurrentPVSource(vtkPVSource *pvs)
 }
 
 //-----------------------------------------------------------------------------
+void vtkPVWindow::UpdateAnimationInterface()
+{
+  this->AnimationManager->Update();
+}
+
+//-----------------------------------------------------------------------------
 void vtkPVWindow::AddDefaultAnimation(vtkPVSource* pvSource)
 {
   this->AnimationManager->Update();
@@ -3671,6 +3677,7 @@ void vtkPVWindow::RemovePVSource(const char* listname, vtkPVSource *pvs)
       col->RemoveItem(pvs);
       this->MainView->UpdateNavigationWindow(this->CurrentPVSource, 0);
       this->UpdateSelectMenu();
+      this->UpdateAnimationInterface();
       }
     }
 }
@@ -3774,11 +3781,6 @@ void vtkPVWindow::UpdateSelectMenu()
     {
     this->SelectMenu->AddCascade("Glyphs", this->GlyphMenu, 0,
                                  "Select one of the glyph sources.");  
-    }
-
-  if (this->AnimationManager)
-    {
-    this->AnimationManager->Update();
     }
 }
 

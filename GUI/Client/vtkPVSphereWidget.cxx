@@ -33,6 +33,7 @@
 #include "vtkPVXMLElement.h"
 #include "vtkRenderer.h"
 #include "vtkPVProcessModule.h"
+#include "vtkPVWindow.h"
 
 #include "vtkKWEvent.h"
 #include "vtkSMSphereWidgetProxy.h"
@@ -43,7 +44,7 @@
 #include "vtkSMSourceProxy.h"
 #include "vtkCommand.h"
 vtkStandardNewMacro(vtkPVSphereWidget);
-vtkCxxRevisionMacro(vtkPVSphereWidget, "1.54");
+vtkCxxRevisionMacro(vtkPVSphereWidget, "1.55");
 
 vtkCxxSetObjectMacro(vtkPVSphereWidget, InputMenu, vtkPVInputMenu);
 
@@ -222,6 +223,10 @@ void vtkPVSphereWidget::Accept()
       << this->ImplicitFunctionProxy->GetVTKClassName());
     }
   this->ImplicitFunctionProxy->UpdateVTKObjects();
+  // 3DWidgets need to explictly call UpdateAnimationInterface on accept
+  // since the animatable proxies might have been registered/unregistered
+  // which needs to be updated in the Animation interface.
+  this->GetPVApplication()->GetMainWindow()->UpdateAnimationInterface();
   this->ModifiedFlag = 0;
   
   // I put this after the accept internal, because
