@@ -64,7 +64,7 @@ public:
 
   int ProcessFile(const char* file, const char* title)
     {
-    ifstream ifs(file);
+    kwsys_ios::ifstream ifs(file);
     if ( !ifs )
       {
       cout << "Canot open file: " << file << endl;
