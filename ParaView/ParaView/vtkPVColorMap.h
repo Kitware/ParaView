@@ -203,6 +203,8 @@ public:
   // Callbacks to change the color map.
   void StartColorButtonCallback(float r, float g, float b);
   void EndColorButtonCallback(float r, float g, float b);
+  void SetStartHSV(float h, float s, float v);
+  void SetEndHSV(float h, float s, float v);
 
   // Description:
   // Internal call used when the color map image changes shape.
@@ -211,6 +213,7 @@ public:
   // Description:
   // Called when the slider that select the resolution changes.
   void NumberOfColorsScaleCallback();
+  void SetNumberOfColors(int num);
 
   // Description:
   // For internal use.
@@ -242,6 +245,10 @@ public:
   // Scalar bar becomes invisible when use count reaches zero.
   void IncrementUseCount();
   void DecrementUseCount();
+
+  // Description:
+  // Save the state of the color map in the state file.
+  void SaveState(ofstream *file);
 
 //BTX
   enum VectorModes {

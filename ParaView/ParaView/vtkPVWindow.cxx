@@ -128,7 +128,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.423");
+vtkCxxRevisionMacro(vtkPVWindow, "1.424");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -2706,6 +2706,7 @@ void vtkPVWindow::SaveState(const char* filename)
 {
   vtkPVSource *pvs;
   ofstream* file;    
+  vtkPVColorMap *cm;
   
   file = new ofstream(filename, ios::out);
   if (file->fail())
@@ -2765,14 +2766,6 @@ void vtkPVWindow::SaveState(const char* filename)
     }
   it->Delete();
 
-  // Mark all color maps as not visited.
-  vtkPVColorMap *cm;
-  this->PVColorMaps->InitTraversal();
-  while( (cm = (vtkPVColorMap*)(this->PVColorMaps->GetNextItemAsObject())) )
-    {    
-    cm->SetVisitedFlag(0);
-    }
-
   // Loop through sources saving the visible sources.
   vtkPVSourceCollection* modules = this->GetSourceList("Sources");
   vtkCollectionIterator* cit = modules->NewIterator();
@@ -2784,6 +2777,13 @@ void vtkPVWindow::SaveState(const char* filename)
     cit->GoToNextItem();
     }
   cit->Delete();
+
+  // Save the state of all of the color maps.
+  this->PVColorMaps->InitTraversal();
+  while( (cm = (vtkPVColorMap*)(this->PVColorMaps->GetNextItemAsObject())) )
+    {    
+    cm->SaveState(file);
+    }
 
   // Save the view at the end so camera get set properly.
   this->GetMainView()->SaveState(file);
@@ -4016,7 +4016,7 @@ void vtkPVWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVWindow ";
-  this->ExtractRevision(os,"$Revision: 1.423 $");
+  this->ExtractRevision(os,"$Revision: 1.424 $");
 }
 
 //-----------------------------------------------------------------------------

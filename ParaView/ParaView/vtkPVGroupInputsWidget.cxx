@@ -55,7 +55,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVGroupInputsWidget);
-vtkCxxRevisionMacro(vtkPVGroupInputsWidget, "1.10");
+vtkCxxRevisionMacro(vtkPVGroupInputsWidget, "1.11");
 
 int vtkPVGroupInputsWidgetCommand(ClientData cd, Tcl_Interp *interp,
                                 int argc, char *argv[]);
@@ -308,8 +308,6 @@ void vtkPVGroupInputsWidget::AllOnCallback()
 
   num = this->PartSelectionList->GetNumberOfItems();
 
-  vtkPVApplication *pvApp = this->GetPVApplication();
-
   for (idx = 0; idx < num; ++idx)
     {
     this->PartSelectionList->SetSelectState(idx, 1);
@@ -324,8 +322,6 @@ void vtkPVGroupInputsWidget::AllOffCallback()
   int num, idx;
 
   num = this->PartSelectionList->GetNumberOfItems();
-
-  vtkPVApplication *pvApp = this->GetPVApplication();
 
   for (idx = 0; idx < num; ++idx)
     {
