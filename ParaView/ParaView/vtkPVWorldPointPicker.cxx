@@ -22,7 +22,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWorldPointPicker);
-vtkCxxRevisionMacro(vtkPVWorldPointPicker, "1.9");
+vtkCxxRevisionMacro(vtkPVWorldPointPicker, "1.10");
 
 vtkCxxSetObjectMacro(vtkPVWorldPointPicker, RenderModule, vtkPVRenderModule);
 
@@ -41,8 +41,8 @@ vtkPVWorldPointPicker::~vtkPVWorldPointPicker()
 
 // Perform pick operation with selection point provided. The z location
 // is recovered from the zBuffer. Always returns 0 since no actors are picked.
-int vtkPVWorldPointPicker::Pick(float selectionX, float selectionY, 
-                              float selectionZ, vtkRenderer *renderer)
+int vtkPVWorldPointPicker::Pick(double selectionX, double selectionY, 
+                                double selectionZ, vtkRenderer *renderer)
 {
   vtkCamera *camera;
   double cameraFP[4];

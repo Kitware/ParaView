@@ -40,8 +40,8 @@ public:
 
   // Description:
   // A pick method that uses composited zbuffer.
-  int Pick(float selectionX, float selectionY, 
-           float selectionZ, vtkRenderer *renderer);
+  int Pick(double selectionX, double selectionY, 
+           double selectionZ, vtkRenderer *renderer);
 
 protected:
   vtkPVWorldPointPicker();
