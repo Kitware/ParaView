@@ -1,0 +1,13 @@
+<ModuleInterfaces>
+ <Library name="vtkXdmfTCL"/>
+ <Module name="XdmfReader" root_name="XdmfReader" 
+   output="vtkDataSet" 
+   class="vtkARLReaderModule" module_type="Reader" extensions=".xmf" 
+   file_description="Xdmf Reader">
+  <Source class="vtkMyXdmfReader"/>
+  <ArraySelection attribute_name="Cell" />
+  <ArraySelection attribute_name="Point" />
+  <VectorEntry label="Stride" variable="Stride" type="int" length="3"
+               help="Set the number of steps to skip between each point (structured data only)."/>
+ </Module>
+</ModuleInterfaces>
