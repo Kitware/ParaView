@@ -45,11 +45,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkQuadricClustering.h"
 #include "vtkByteSwap.h"
 #include "vtkTimerLog.h"
+#include "vtkPVApplication.h"
 
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVTimerInformation);
-vtkCxxRevisionMacro(vtkPVTimerInformation, "1.1.2.1");
+vtkCxxRevisionMacro(vtkPVTimerInformation, "1.1.2.2");
 
 
 
@@ -122,13 +123,21 @@ void vtkPVTimerInformation::Reallocate(int num)
 
 //----------------------------------------------------------------------------
 // This ignores the object, and gets the log from the timer.
-void vtkPVTimerInformation::CopyFromObject(vtkObject*)
+void vtkPVTimerInformation::CopyFromObject(vtkObject* o)
 {
   this->Reallocate(1);
   ostrstream *fptr;
   int length;
   char *str;
-   
+  vtkPVApplication* pvApp;
+  float threshold = 0.001;
+
+  pvApp = vtkPVApplication::SafeDownCast(o);
+  if (pvApp)
+    {
+    threshold = pvApp->GetLogThreshold();
+    }
+  
   length = vtkTimerLog::GetNumberOfEvents() * 40;
   if (length > 0)
     {
@@ -143,7 +152,7 @@ void vtkPVTimerInformation::CopyFromObject(vtkObject*)
     else
       {
       //*fptr << "Hello world !!!\n ()";
-      vtkTimerLog::DumpLogWithIndents(fptr, 0.0001);
+      vtkTimerLog::DumpLogWithIndents(fptr, threshold);
 
       length = fptr->pcount();
       str[length] = '\0';
