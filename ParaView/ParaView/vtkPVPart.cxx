@@ -38,7 +38,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPart);
-vtkCxxRevisionMacro(vtkPVPart, "1.44");
+vtkCxxRevisionMacro(vtkPVPart, "1.45");
 
 
 int vtkPVPartCommand(ClientData cd, Tcl_Interp *interp,
@@ -188,7 +188,7 @@ void vtkPVPart::GatherDataInformation()
   // Pass the field data, but until all is working well, this is a default.
   if (this->Name == NULL || this->Name[0] == '\0')
     {
-    char str[100];
+    char str[256];
     if (this->DataInformation->GetDataSetType() == VTK_POLY_DATA)
       {
       long nc = this->DataInformation->GetNumberOfCells();

@@ -124,7 +124,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.529");
+vtkCxxRevisionMacro(vtkPVWindow, "1.530");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -3031,6 +3031,12 @@ void vtkPVWindow::UpdateFilterMenu()
   // Remove all of the entries from the filter menu.
   this->FilterMenu->DeleteAllMenuItems();
   this->DisableToolbarButtons();
+
+  if ( !this->Enabled )
+    {
+    this->FilterMenu->SetEnabled(0);
+    return;
+    }
 
   if (this->CurrentPVSource &&
       !this->CurrentPVSource->GetIsPermanent() && 
