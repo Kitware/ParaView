@@ -110,6 +110,7 @@ public:
   // Description:
   // Set/Get the maximum line height.
   void SetMaximumLineHeight(float);
+  void SetMaximumLineHeightNoTrace(float);
   float GetMaximumLineHeight();
   void MaximumLineHeightCallback();
   void MaximumLineHeightEndCallback();
