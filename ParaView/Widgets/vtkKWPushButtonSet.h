@@ -100,6 +100,10 @@ public:
   int GetNumberOfVisibleButtons();
 
   // Description:
+  // Remove all buttons
+  void DeleteAllButtons();
+
+  // Description:
   // Set the widget packing order to be horizontal (default is vertical).
   // This means that given the insertion order of the button in the set,
   // the buttons will be packed in the horizontal direction.

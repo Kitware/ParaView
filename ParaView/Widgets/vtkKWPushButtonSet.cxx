@@ -51,7 +51,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //------------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkKWPushButtonSet);
-vtkCxxRevisionMacro(vtkKWPushButtonSet, "1.5");
+vtkCxxRevisionMacro(vtkKWPushButtonSet, "1.6");
 
 int vtkvtkKWPushButtonSetCommand(ClientData cd, Tcl_Interp *interp,
                                   int argc, char *argv[]);
@@ -68,6 +68,16 @@ vtkKWPushButtonSet::vtkKWPushButtonSet()
 
 //----------------------------------------------------------------------------
 vtkKWPushButtonSet::~vtkKWPushButtonSet()
+{
+  this->DeleteAllButtons();
+
+  // Delete the container
+
+  this->Buttons->Delete();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWPushButtonSet::DeleteAllButtons()
 {
   // Delete all pushbuttons
 
@@ -91,9 +101,7 @@ vtkKWPushButtonSet::~vtkKWPushButtonSet()
     }
   it->Delete();
 
-  // Delete the container
-
-  this->Buttons->Delete();
+  this->Buttons->RemoveAllItems();
 }
 
 //----------------------------------------------------------------------------
