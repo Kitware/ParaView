@@ -62,6 +62,11 @@ public:
   // is supposed to write.
   virtual char* GetRootElementName();
 
+  // Description:
+  // Return the name of the property element used inside that tree to
+  // store a property.
+  static char* GetPropertyElementName();
+
 protected:
   vtkXMLActor2DWriter() {};
   ~vtkXMLActor2DWriter() {};  

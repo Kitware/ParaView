@@ -48,12 +48,18 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkXMLProperty2DWriter.h"
 
 vtkStandardNewMacro(vtkXMLActor2DWriter);
-vtkCxxRevisionMacro(vtkXMLActor2DWriter, "1.1");
+vtkCxxRevisionMacro(vtkXMLActor2DWriter, "1.2");
 
 //----------------------------------------------------------------------------
 char* vtkXMLActor2DWriter::GetRootElementName()
 {
   return "Actor2D";
+}
+
+//----------------------------------------------------------------------------
+char* vtkXMLActor2DWriter::GetPropertyElementName()
+{
+  return "Property";
 }
 
 //----------------------------------------------------------------------------
@@ -114,12 +120,9 @@ int vtkXMLActor2DWriter::AddNestedElements(vtkXMLDataElement *elem)
   vtkProperty2D *prop2d = obj->GetProperty();
   if (prop2d)
     {
-    vtkXMLDataElement *nested_elem = vtkXMLDataElement::New();
-    elem->AddNestedElement(nested_elem);
-    nested_elem->Delete();
     vtkXMLProperty2DWriter *xmlw = vtkXMLProperty2DWriter::New();
     xmlw->SetObject(prop2d);
-    xmlw->Create(nested_elem);
+    xmlw->CreateInNestedElement(elem, this->GetPropertyElementName());
     xmlw->Delete();
     }
  
