@@ -40,6 +40,7 @@ class vtkVolumeProperty;
 class vtkPiecewiseFunction;
 class vtkColorTransferFunction;
 class vtkUnstructuredGridVolumeRayCastMapper;
+class vtkPVArrayInformation;
 
 class VTK_EXPORT vtkPVPartDisplay : public vtkPVDisplay
 {
@@ -150,6 +151,10 @@ public:
   // simultaneously.
   void VolumeRenderModeOn();
   void VolumeRenderModeOff();
+
+  // Description:
+  // Initialize the transfer functions based on the scalar range
+  void ResetTransferFunctions(vtkPVArrayInformation *info);
   
 protected:
   vtkPVPartDisplay();

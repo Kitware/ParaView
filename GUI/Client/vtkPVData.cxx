@@ -83,7 +83,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.276");
+vtkCxxRevisionMacro(vtkPVData, "1.277");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -1170,7 +1170,7 @@ void vtkPVData::UpdatePropertiesInternal()
   const char *currentColorBy, *inputColorBy = 0;
   int currentColorByFound = 0, inputColorByFound = 0;
   int defPoint = 0, inputPoint = 0;
-  vtkPVArrayInformation *defArray, *inputArray;
+  vtkPVArrayInformation *defArray, *inputArray, *volRenArray;
   int inputColorSetByUser = 0, inputArraySetByUser = 0;
   
   // Default is the scalars to use when current color is not found.
@@ -1330,6 +1330,7 @@ void vtkPVData::UpdatePropertiesInternal()
       if ( firstField )
         {
         this->VolumeScalarsMenu->SetValue( tmp );
+        volRenArray = arrayInfo;
         firstField = 0;
         }
       }
@@ -1349,6 +1350,7 @@ void vtkPVData::UpdatePropertiesInternal()
       strcpy(defCmd, tmp);
       defPoint = 1;
       defArray = arrayInfo;
+      volRenArray = arrayInfo;
       this->VolumeScalarsMenu->SetValue( tmp );
       }
     }
@@ -1450,8 +1452,19 @@ void vtkPVData::UpdatePropertiesInternal()
     }
   if (dataType == VTK_UNSTRUCTURED_GRID)
     {
-      this->RepresentationMenu->AddEntryWithCommand(VTK_PV_VOLUME_LABEL, this,
-                                                    "DrawVolume");
+    this->RepresentationMenu->AddEntryWithCommand(VTK_PV_VOLUME_LABEL, this,
+                                                  "DrawVolume");
+      
+    // Update the transfer functions
+    vtkPVPart *part;
+    int idx, num;
+    
+    num = this->GetPVSource()->GetNumberOfParts();
+    for (idx = 0; idx < num; ++idx)
+      {
+      part = this->GetPVSource()->GetPart(idx);
+      part->GetPartDisplay()->ResetTransferFunctions(volRenArray);
+      }
     }
 }
 

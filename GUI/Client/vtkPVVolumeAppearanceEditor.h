@@ -47,9 +47,8 @@ public:
     { vtkErrorMacro("No MakeObject"); return NULL;}
       
   // Description:
-  // Looks at all of the data object for a global range.
-  // This also sets the color map to automatic.  In the future,
-  // it will rescale to match changes in the global scalar range.
+  // Looks at the data to reset the range used for the various
+  // color maps
   void ResetScalarRange();
   void ResetScalarRangeInternal();
   

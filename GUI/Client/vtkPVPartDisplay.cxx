@@ -44,10 +44,11 @@
 #include "vtkPiecewiseFunction.h"
 #include "vtkColorTransferFunction.h"
 #include "vtkUnstructuredGridVolumeRayCastMapper.h"
+#include "vtkPVArrayInformation.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPartDisplay);
-vtkCxxRevisionMacro(vtkPVPartDisplay, "1.31");
+vtkCxxRevisionMacro(vtkPVPartDisplay, "1.32");
 
 
 //----------------------------------------------------------------------------
@@ -666,6 +667,38 @@ void vtkPVPartDisplay::VolumeRenderModeOff()
   this->VolumeRenderMode = 0;
 }
 
+
+//----------------------------------------------------------------------------
+void vtkPVPartDisplay::ResetTransferFunctions(vtkPVArrayInformation *info)
+{
+  double range[2];
+  
+  info->GetComponentRange(0, range);
+  
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  vtkPVProcessModule* pm = pvApp->GetProcessModule();
+  vtkClientServerStream& stream = pm->GetStream();
+  
+  stream << vtkClientServerStream::Invoke << this->VolumeOpacityID 
+         << "RemoveAllPoints" << vtkClientServerStream::End;
+  stream << vtkClientServerStream::Invoke << this->VolumeOpacityID 
+         << "AddPoint" << range[0] << 0.0 << vtkClientServerStream::End;
+  stream << vtkClientServerStream::Invoke << this->VolumeOpacityID 
+         << "AddPoint" << range[1] << 1.0 << vtkClientServerStream::End;
+  
+  stream << vtkClientServerStream::Invoke << this->VolumeColorID 
+         << "AddHSVPoint" << range[0] << 0.01 << 1.0 << 1.0 
+         << vtkClientServerStream::End;
+  stream << vtkClientServerStream::Invoke << this->VolumeColorID 
+         << "AddHSVPoint" << (range[0]+range[1])/2.0 << 0.5 << 1.0 << 1.0 
+         << vtkClientServerStream::End;
+  stream << vtkClientServerStream::Invoke << this->VolumeColorID 
+         << "AddHSVPoint" << range[1] << 0.99 << 1.0 << 1.0 
+         << vtkClientServerStream::End;
+
+  pm->SendStreamToClientAndRenderServer();
+
+}
 
 //----------------------------------------------------------------------------
 void vtkPVPartDisplay::VolumeRenderPointField(const char *name)
