@@ -115,7 +115,6 @@ void vtkKWEventNotifier::AddCallback( const char *event,
 
 void vtkKWEventNotifier::AddCallback( const char *event, 
 				      vtkKWWindow *window,
-				      vtkKWObject *object, 
 				      void (*command)(const char *) )
 {
   int                         index;
@@ -127,7 +126,6 @@ void vtkKWEventNotifier::AddCallback( const char *event,
   // Create a callback specification object to store it in
   tmp1   = (vtkKWCallbackSpecification *)vtkKWCallbackSpecification::New();
   tmp1->SetEventString  ( event   );
-  tmp1->SetCalledObject ( object  );
   tmp1->SetWindow( window );
   tmp1->SetCommandMethod( command );
 
