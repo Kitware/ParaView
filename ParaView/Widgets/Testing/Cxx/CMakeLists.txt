@@ -1,10 +1,12 @@
 ADD_EXECUTABLE( TestHashTable TestHashTable )
 ADD_EXECUTABLE( TestPointerArray TestPointerArray )
 ADD_EXECUTABLE( TestRegistery TestRegistery )
+ADD_EXECUTABLE( TestMemory TestMemory )
 
 ADD_TEST(TestHashTable ${CXX_TEST_PATH}/TestHashTable)
 ADD_TEST(TestPointerArray ${CXX_TEST_PATH}/TestPointerArray)
 ADD_TEST(TestRegistery ${CXX_TEST_PATH}/TestRegistery)
+ADD_TEST(TestMemory ${CXX_TEST_PATH}/TestMemory)
 
 LINK_LIBRARIES( vtkpng vtkzlib vtkjpeg )
 

@@ -33,6 +33,7 @@ vtkKWOKCancelDialog
 vtkKWOptionMenu 
 vtkKWPointerArray
 vtkKWProgressGauge 
+vtkKWProcessStatistics
 vtkKWPushButton 
 vtkKWRadioButton 
 vtkKWRegisteryUtilities
