@@ -70,7 +70,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVColorMap);
-vtkCxxRevisionMacro(vtkPVColorMap, "1.24.2.13");
+vtkCxxRevisionMacro(vtkPVColorMap, "1.24.2.14");
 
 int vtkPVColorMapCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -147,7 +147,6 @@ vtkPVColorMap::vtkPVColorMap()
   
   this->NumberOfVectorComponents = 1;
   this->VectorComponent = 0;
-
 
   // User interaface.
   this->ColorMapFrame = vtkKWLabeledFrame::New();
@@ -713,6 +712,7 @@ void vtkPVColorMap::SetArrayName(const char* str)
     delete [] tmp;
     }
   this->ResetScalarRange();
+  this->Modified();
 }
 
 //----------------------------------------------------------------------------
@@ -729,7 +729,6 @@ int vtkPVColorMap::MatchArrayName(const char* str)
   return 0;
 }
 
-
 //----------------------------------------------------------------------------
 void vtkPVColorMap::ScalarBarTitleEntryCallback()
 {
@@ -739,45 +738,42 @@ void vtkPVColorMap::ScalarBarTitleEntryCallback()
 //----------------------------------------------------------------------------
 void vtkPVColorMap::SetScalarBarTitle(const char* name)
 {
-  this->AddTraceEntry("$kw(%s) SetScalarBarTitle {%s}", 
-                      this->GetTclName(), 
-                      name);
-  this->SetScalarBarTitleNoTrace(name);
-}
+  if (this->ScalarBarTitle == NULL && name == NULL) 
+    { 
+    return;
+    }
 
-//----------------------------------------------------------------------------
-void vtkPVColorMap::SetScalarBarTitleNoTrace(const char* name)
-{
-  if ( this->ScalarBarTitle == NULL && name == NULL) 
+  if (this->ScalarBarTitle && name && (!strcmp(this->ScalarBarTitle, name))) 
     { 
     return;
     }
-  if ( this->ScalarBarTitle && name && (!strcmp(this->ScalarBarTitle,name))) 
-    { 
-    return;
-    }
+
   if (this->ScalarBarTitle) 
     { 
     delete [] this->ScalarBarTitle; 
     this->ScalarBarTitle = NULL;
     }
+
   if (name)
     {
-    this->ScalarBarTitle = new char[strlen(name)+1];
-    strcpy(this->ScalarBarTitle,name);
-    } 
+    this->ScalarBarTitle = new char[strlen(name) + 1];
+    strcpy(this->ScalarBarTitle, name);
 
-  this->ScalarBarTitleEntry->SetValue(name);
-  if (name != NULL)
-    {
     char *str;
     str = new char [strlen(name) + 128];
     sprintf(str, "GetPVColorMap {%s}", name);
     this->SetTraceReferenceCommand(str);
     delete [] str;
-    }
+    } 
+
+  this->ScalarBarTitleEntry->SetValue(name);
+
+  this->AddTraceEntry("$kw(%s) SetScalarBarTitle {%s}", 
+                      this->GetTclName(), name);
 
   this->UpdateScalarBarTitle();
+
+  this->Modified();
 }
 
 //----------------------------------------------------------------------------
@@ -820,12 +816,15 @@ void vtkPVColorMap::SetScalarBarLabelFormat(const char* name)
 
   if (this->ScalarBar != NULL && this->ScalarBarLabelFormat != NULL)
     {
-    this->ScalarBar->GetScalarBarActor()->SetLabelFormat(this->ScalarBarLabelFormat);
+    this->ScalarBar->GetScalarBarActor()->SetLabelFormat(
+      this->ScalarBarLabelFormat);
     if (this->PVRenderView)
       {
       this->PVRenderView->EventuallyRender();
       }
     }
+
+  this->Modified();
 }
 
 //----------------------------------------------------------------------------
@@ -991,6 +990,7 @@ void vtkPVColorMap::SetScalarRangeInternal(float min, float max)
   //this->Script("%s Build", this->LookupTableTclName);
   //this->Script("%s Modified", this->LookupTableTclName);
 
+  this->Modified();
 }
 
 //----------------------------------------------------------------------------
@@ -1013,6 +1013,7 @@ void vtkPVColorMap::SetVectorComponent(int component, int numberOfComponents)
   pvApp->BroadcastScript("%s SetVectorComponent %d", 
                          this->LookupTableTclName, component);
 
+  this->Modified();
 }
 
 
@@ -1152,6 +1153,8 @@ void vtkPVColorMap::SetScalarBarVisibility(int val)
 
   this->AddTraceEntry("$kw(%s) SetScalarBarVisibility %d", this->GetTclName(),
                       val);
+
+  this->Modified();
 }
 
 
