@@ -22,8 +22,8 @@ $pv(vtkTemp1) ShowCurrentSourceProperties
 $pv(vtkTemp1) ShowCurrentSourceProperties
 set pv(vtkTemp110) [$pv(vtkTemp98) GetPVWidget {Extent}]
 $pv(vtkTemp110) SetValue 0 12 0 12 0 10
-set pv(vtkTemp129) [$pv(vtkTemp98) GetPVWidget {Spacing}]
-$pv(vtkTemp129) SetValue 0.1 0.1 0.1 0.01
+set pv(vtkTemp129) [$pv(vtkTemp98) GetPVWidget {Size}]
+$pv(vtkTemp129) SetValue 1.2 1.2 1.0 1.0
 $pv(vtkTemp98) AcceptCallback
 
 set pv(vtkTemp164) [$pv(vtkTemp1) CreatePVSource vtkImageMandelbrotSource]
@@ -34,8 +34,8 @@ $pv(vtkTemp1) ShowCurrentSourceProperties
 $pv(vtkTemp1) ShowCurrentSourceProperties
 set pv(vtkTemp176) [$pv(vtkTemp164) GetPVWidget {Extent}]
 $pv(vtkTemp176) SetValue 13 25 0 12 0 10
-set pv(vtkTemp195) [$pv(vtkTemp164) GetPVWidget {Spacing}]
-$pv(vtkTemp195) SetValue 0.1 0.1 0.1 0.01
+set pv(vtkTemp195) [$pv(vtkTemp164) GetPVWidget {Size}]
+$pv(vtkTemp195) SetValue 1.2 1.2 1.0 1.0
 $pv(vtkTemp164) AcceptCallback
 $pv(vtkTemp1) ResetCameraCallback
 
@@ -47,8 +47,8 @@ $pv(vtkTemp1) ShowCurrentSourceProperties
 $pv(vtkTemp1) ShowCurrentSourceProperties
 set pv(vtkTemp219) [$pv(vtkTemp207) GetPVWidget {Extent}]
 $pv(vtkTemp219) SetValue 0 12 13 25 0 10
-set pv(vtkTemp238) [$pv(vtkTemp207) GetPVWidget {Spacing}]
-$pv(vtkTemp238) SetValue 0.1 0.1 0.1 0.01
+set pv(vtkTemp238) [$pv(vtkTemp207) GetPVWidget {Size}]
+$pv(vtkTemp238) SetValue 1.2 1.2 1.0 1.0
 $pv(vtkTemp207) AcceptCallback
 $pv(vtkTemp1) ResetCameraCallback
 
@@ -60,8 +60,8 @@ $pv(vtkTemp1) ShowCurrentSourceProperties
 $pv(vtkTemp1) ShowCurrentSourceProperties
 set pv(vtkTemp262) [$pv(vtkTemp250) GetPVWidget {Extent}]
 $pv(vtkTemp262) SetValue 13 25 13 25 0 10
-set pv(vtkTemp281) [$pv(vtkTemp250) GetPVWidget {Spacing}]
-$pv(vtkTemp281) SetValue 0.1 0.1 0.1 0.01
+set pv(vtkTemp281) [$pv(vtkTemp250) GetPVWidget {Size}]
+$pv(vtkTemp281) SetValue 1.2 1.2 1.0 1.0
 $pv(vtkTemp250) AcceptCallback
 
 set pv(vtkTemp294) [$pv(vtkTemp1) ClipPlaneCallback]
