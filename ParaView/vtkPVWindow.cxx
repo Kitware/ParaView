@@ -280,9 +280,6 @@ void vtkPVWindow::NewVolume()
   
   reader->GetImageReader()->UpdateInformation();
   
-  // Does not actually read.  Just sets the file name ...
-  reader->ReadImage();
-  
   reader->SetName("volume");
   this->MainView->AddComposite(reader);
   this->SetCurrentSource(reader);

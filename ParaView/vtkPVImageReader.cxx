@@ -36,19 +36,35 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 //----------------------------------------------------------------------------
 vtkPVImageReader::vtkPVImageReader()
 {
-  this->Label = vtkKWLabel::New();
-  this->Label->SetParent(this->Properties);
   this->Accept = vtkKWWidget::New();
   this->Accept->SetParent(this->Properties);
+  this->Open = vtkKWWidget::New();
+  this->Open->SetParent(this->Properties);
+  
+  this->XLabel = vtkKWLabel::New();
+  this->XLabel->SetParent(this->Properties);
+  this->XDimension = vtkKWEntry::New();
+  this->XDimension->SetParent(this->Properties);
+  this->YLabel = vtkKWLabel::New();
+  this->YLabel->SetParent(this->Properties);
+  this->YDimension = vtkKWEntry::New();
+  this->YDimension->SetParent(this->Properties);
+  this->ZLabel = vtkKWLabel::New();
+  this->ZLabel->SetParent(this->Properties);
+  this->ZDimension = vtkKWEntry::New();
+  this->ZDimension->SetParent(this->Properties);
   
   this->ImageReader = vtkImageReader::New();
+  this->ImageReader->SetFilePrefix("../../vtkdata/headsq/quarter");
 }
 
 //----------------------------------------------------------------------------
 vtkPVImageReader::~vtkPVImageReader()
 {
-  this->Label->Delete();
-  this->Label = NULL;
+  this->Accept->Delete();
+  this->Accept = NULL;
+  this->Open->Delete();
+  this->Open = NULL;
   
   this->ImageReader->Delete();
   this->ImageReader = NULL;
@@ -64,14 +80,33 @@ vtkPVImageReader* vtkPVImageReader::New()
 void vtkPVImageReader::CreateProperties()
 {  
   this->vtkPVSource::CreateProperties();
-
-  this->Label->Create(this->Application, "");
-  this->Label->SetLabel("vtkPVImageReader label");
-  this->Script("pack %s", this->Label->GetWidgetName());
   
   this->Accept->Create(this->Application, "button", "-text Accept");
   this->Accept->SetCommand(this, "ImageAccepted");
   this->Script("pack %s", this->Accept->GetWidgetName());
+  
+  this->Open->Create(this->Application, "button", "-text OpenFile");
+  this->Open->SetCommand(this, "OpenFile");
+  this->Script("pack %s", this->Open->GetWidgetName());
+  
+  this->XLabel->Create(this->Application, "");
+  this->XLabel->SetLabel("X Dim.");
+  this->XDimension->Create(this->Application, "");
+  this->XDimension->SetValue(63);
+  this->YLabel->Create(this->Application, "");
+  this->YLabel->SetLabel("Y Dim.");
+  this->YDimension->Create(this->Application, "");
+  this->YDimension->SetValue(63);
+  this->ZLabel->Create(this->Application, "");
+  this->ZLabel->SetLabel("Z Dim.");
+  this->ZDimension->Create(this->Application, "");
+  this->ZDimension->SetValue(93);
+  this->Script("pack %s %s %s %s %s %s", this->XLabel->GetWidgetName(),
+	       this->XDimension->GetWidgetName(),
+	       this->YLabel->GetWidgetName(),
+	       this->YDimension->GetWidgetName(),
+	       this->ZLabel->GetWidgetName(),
+	       this->ZDimension->GetWidgetName());
 }
 
 //----------------------------------------------------------------------------
@@ -92,8 +127,9 @@ vtkPVImage *vtkPVImageReader::GetOutput()
 void vtkPVImageReader::ReadImage()
 {
   this->ImageReader->SetDataByteOrderToLittleEndian();
-  this->ImageReader->SetDataExtent(0, 63, 0, 63, 1, 93);
-  this->ImageReader->SetFilePrefix("../../vtkdata/headsq/quarter");
+  this->ImageReader->SetDataExtent(0, this->XDimension->GetValueAsInt(),
+				   0, this->YDimension->GetValueAsInt(),
+				   1, this->ZDimension->GetValueAsInt());
   this->ImageReader->SetDataSpacing(4, 4, 1.8);
 }
 
@@ -112,6 +148,9 @@ void vtkPVImageReader::ImageAccepted()
   a->Clone(pvApp);
   a->SetOriginalImage(image);
 
+  // Does not actually read.  Just sets the file name ...
+  this->ReadImage();
+  
   this->SetOutput(image);
   this->SetAssignment(a);
   
@@ -122,4 +161,12 @@ void vtkPVImageReader::ImageAccepted()
   ac = this->GetPVData()->GetActorComposite();
   window->GetMainView()->AddComposite(ac);
   window->GetMainView()->SetSelectedComposite(this);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVImageReader::OpenFile()
+{
+  // We need to figure out what to do if the image is stored in multiple files
+  // (so we only need a file prefix, not a file).
+  this->Script("tk_getOpenFile -title \"Open Image File\"");
 }
