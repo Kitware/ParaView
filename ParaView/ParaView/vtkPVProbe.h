@@ -77,7 +77,8 @@ public:
 
   // Description:
   // Methods to call when this pv source is selected/deselected
-  void Deselect();
+  virtual void Deselect() { this->Deselect(1); }
+  virtual void Deselect(int doPackForget);
 
   // Description:
   // Called when the accept button is pressed.

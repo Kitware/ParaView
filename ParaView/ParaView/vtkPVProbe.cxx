@@ -751,7 +751,7 @@ void vtkPVProbe::UpdateProbe()
   remoteProbeOutput->Delete();
 }
 
-void vtkPVProbe::Deselect()
+void vtkPVProbe::Deselect(int doPackForget)
 {
   this->Script("set isPresent [[%s GetProps] IsItemPresent %s]",
 	       this->GetPVRenderView()->GetRendererTclName(),
@@ -765,7 +765,7 @@ void vtkPVProbe::Deselect()
     this->GetPVRenderView()->Render();
     }
   
-  this->vtkPVSource::Deselect();
+  this->vtkPVSource::Deselect(doPackForget);
 }
 
 void vtkPVProbe::UsePoint()
