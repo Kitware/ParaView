@@ -33,6 +33,7 @@ class vtkKWSplashScreen;
 class vtkKWWidget;
 class vtkKWWindow;
 class vtkKWWindowCollection;
+class vtkKWText;
 
 //BTX
 template<class KeyType,class DataType> class vtkAbstractMap;
@@ -424,6 +425,8 @@ protected:
   virtual void AddAboutCopyrights(ostream &);
   vtkKWMessageDialog *AboutDialog;
   vtkKWLabel         *AboutDialogImage;
+  vtkKWText          *AboutRuntimeInfo;
+  vtkKWWidget        *AboutScrollBar;
 
   int CharacterEncoding;
 

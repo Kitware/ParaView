@@ -24,7 +24,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWMessageDialog );
-vtkCxxRevisionMacro(vtkKWMessageDialog, "1.65");
+vtkCxxRevisionMacro(vtkKWMessageDialog, "1.66");
 
 //----------------------------------------------------------------------------
 int vtkKWMessageDialogCommand(ClientData cd, Tcl_Interp *interp,
@@ -86,6 +86,7 @@ vtkKWMessageDialog::~vtkKWMessageDialog()
   this->SetOtherButtonText(0);
 }
 
+//----------------------------------------------------------------------------
 void vtkKWMessageDialog::Create(vtkKWApplication *app, const char *args)
 {
   // Check if already created
@@ -605,4 +606,3 @@ void vtkKWMessageDialog::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "CancelButton: " << this->CancelButton << endl;
   os << indent << "OtherButton: " << this->OtherButton << endl;
 }
-
