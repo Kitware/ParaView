@@ -393,15 +393,27 @@ void vtkPVWindow::NewVolume()
 {
   vtkPVApplication *pvApp = (vtkPVApplication *)this->Application;
   vtkPVComposite *comp;
-  vtkPVImageReader *reader = vtkPVImageReader::New();
-  vtkPVImage *image = vtkPVImage::New();
-  
-  reader->ReadImage();
-  image->SetImageData(reader->GetImageReader()->GetOutput());
+  vtkPVImageReader *reader;
+  vtkPVImage *image;
+  vtkPVAssignment *a;
+
   
   comp = vtkPVComposite::New();
-  comp->SetSource(reader);
+  comp->Clone(pvApp);
+  reader = vtkPVImageReader::New();
+  reader->Clone(pvApp);
+  image = vtkPVImage::New();
+  image->Clone(pvApp);
+  a = vtkPVAssignment::New();
+  a->Clone(pvApp);
+
+  // Does not actually read.  Just sets the file name ...
+  reader->ReadImage();
+  
   reader->SetOutput(image);
+  reader->SetAssignment(a);
+  
+  comp->SetSource(reader);
   comp->SetCompositeName("volume");
   comp->SetPropertiesParent(this->GetDataPropertiesParent());
   comp->CreateProperties("");

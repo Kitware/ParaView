@@ -70,9 +70,6 @@ void vtkPVComposite::Clone(vtkPVApplication *pvApp)
     }
   this->SetApplication(pvApp);
   
-  cerr << "Composite: " << this << ", app: " << this->Application 
-       << ", controller: " << pvApp->GetController() << endl;
-
   // Clone this object on every other process.
   pvApp->BroadcastScript("%s %s", this->GetClassName(), this->GetTclName());
 }
