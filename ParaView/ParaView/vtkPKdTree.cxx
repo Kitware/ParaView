@@ -20,7 +20,7 @@
 #include <queue>
 #include <algorithm>
 
-vtkCxxRevisionMacro(vtkPKdTree, "1.1.2.3");
+vtkCxxRevisionMacro(vtkPKdTree, "1.1.2.4");
 vtkStandardNewMacro(vtkPKdTree);
 
 const int vtkPKdTree::NoRegionAssignment = 0;   // default
@@ -1016,7 +1016,8 @@ int vtkPKdTree::PartitionSubArray(int L, int R, int K, int dim, int p1, int p2)
   int hasK   = this->WhoHas(K);
 
   int Krank    = sg->getLocalRank(hasK);
-  int myrank   = sg->getLocalRank(me);
+  // I do not know if this has a side effect or not.
+  sg->getLocalRank(me);
 
   int myL = this->StartVal[me];
   int myR = this->EndVal[me];
