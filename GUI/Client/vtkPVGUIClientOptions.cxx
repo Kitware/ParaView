@@ -21,7 +21,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVGUIClientOptions);
-vtkCxxRevisionMacro(vtkPVGUIClientOptions, "1.3");
+vtkCxxRevisionMacro(vtkPVGUIClientOptions, "1.4");
 
 //----------------------------------------------------------------------------
 vtkPVGUIClientOptions::vtkPVGUIClientOptions()
@@ -31,6 +31,7 @@ vtkPVGUIClientOptions::vtkPVGUIClientOptions()
   this->CrashOnErrors = 0;
   this->StartEmpty = 0;
   this->ParaViewScriptName = 0;
+  this->ParaViewDataName = 0;
 
   // We do not require batch script in this subclass
   this->RequireBatchScript = 0;
@@ -40,6 +41,7 @@ vtkPVGUIClientOptions::vtkPVGUIClientOptions()
 vtkPVGUIClientOptions::~vtkPVGUIClientOptions()
 {
   this->SetParaViewScriptName(0);
+  this->SetParaViewDataName(0);
 }
 
 //----------------------------------------------------------------------------
@@ -50,8 +52,8 @@ void vtkPVGUIClientOptions::Initialize()
     "Start ParaView as a server (use MPI run).");
   this->AddBooleanArgument("--client", "-c", &this->ClientMode,
     "Run ParaView as client (MPI run, 1 process) (ParaView Server must be started first).");
-  this->AddArgument("--batch", "-b", &this->BatchScriptName,
-    "Load and run the batch script specified.");
+  this->AddArgument("--data", 0, &this->ParaViewDataName,
+    "Load the specified data.");
   this->AddBooleanArgument("--play-demo", "-pd", &this->PlayDemoFlag,
     "Run the ParaView demo.");
   this->AddBooleanArgument("--disable-registry", "-dr", &this->DisableRegistry,
@@ -92,4 +94,5 @@ void vtkPVGUIClientOptions::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "Username: " << (this->Username?this->Username:"(none)") << endl;
   os << indent << "HostName: " << (this->HostName?this->HostName:"(none)") << endl;
   os << indent << "ParaViewScriptName: " << (this->ParaViewScriptName?this->ParaViewScriptName:"(none)") << endl;
+  os << indent << "ParaViewDataName: " << (this->ParaViewDataName?this->ParaViewDataName:"(none)") << endl;
 }

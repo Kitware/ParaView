@@ -110,7 +110,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.321");
+vtkCxxRevisionMacro(vtkPVApplication, "1.322");
 
 
 int vtkPVApplicationCommand(ClientData cd, Tcl_Interp *interp,
@@ -1156,6 +1156,10 @@ void vtkPVApplication::Start(int argc, char*argv[])
   else if (this->Options->GetParaViewScriptName())
     {
     this->LoadScript(this->Options->GetParaViewScriptName());
+    }
+  if ( this->Options->GetParaViewDataName() )
+    {
+    ui->Open(this->Options->GetParaViewDataName());
     }
   
   if (this->Options->GetPlayDemoFlag())

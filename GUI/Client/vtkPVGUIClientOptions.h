@@ -39,6 +39,7 @@ public:
   vtkGetMacro(CrashOnErrors, int);
   vtkGetMacro(StartEmpty, int);
   vtkGetStringMacro(ParaViewScriptName);
+  vtkGetStringMacro(ParaViewDataName);
 
   // Description:
   // Some variables need to be overwritten
@@ -79,6 +80,9 @@ private:
   int CrashOnErrors;
   int StartEmpty;
   char* ParaViewScriptName;
+
+  vtkSetStringMacro(ParaViewDataName);
+  char* ParaViewDataName;
 };
 
 #endif // #ifndef __vtkPVGUIClientOptions_h
