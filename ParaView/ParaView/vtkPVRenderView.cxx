@@ -239,6 +239,25 @@ void vtkPVRenderView::CreateRenderObjects(vtkPVApplication *pvApp)
 
   this->RenderWindowTclName = NULL;
   this->SetRenderWindowTclName("RenWin1");
+  
+  // Just testing the dummy stuff.
+  int numProcs = pvApp->GetController()->GetNumberOfProcesses();
+  if (numProcs > 0)
+    {
+    char *arg = getenv("PV_NUMBER_OF_IR_PIPES");
+    if (arg)
+      {
+      int i;
+      int num = atoi(arg);
+      for (i = num; i < numProcs; ++i)
+        {
+        pvApp->RemoteSimpleScript(i, "Ren1 Delete");
+        pvApp->RemoteSimpleScript(i, "RenWin1 Delete");
+        pvApp->RemoteSimpleScript(i, "vtkDummyRenderer Ren1");
+        pvApp->RemoteSimpleScript(i, "vtkDummyRenderWindow RenWin1");
+        }
+      }
+    }
 
   if (this->RenderWindow->IsA("vtkOpenGLRenderWindow") &&
       (pvApp->GetController()->GetNumberOfProcesses() > 1))
@@ -268,6 +287,7 @@ void vtkPVRenderView::CreateRenderObjects(vtkPVApplication *pvApp)
     {
     pvApp->BroadcastScript("%s InitializeOffScreen", this->CompositeTclName);
     }
+
 #else
 
   pvApp->BroadcastScript("%s AddRenderer %s", this->RenderWindowTclName,
