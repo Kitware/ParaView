@@ -119,7 +119,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.189");
+vtkCxxRevisionMacro(vtkPVApplication, "1.190");
 
 
 int vtkPVApplicationCommand(ClientData cd, Tcl_Interp *interp,
@@ -547,8 +547,8 @@ const char vtkPVApplication::ArgumentList[vtkPVApplication::NUM_ARGS][128] =
   "Start ParaView without any default modules.", 
   "--disable-registry", "-dr", 
   "Do not use registry when running ParaView (for testing).", 
-  "--run-vtk-script", "-rv", 
-  "Load and run the vtk script specified.", 
+  "--batch", "-b", 
+  "Load and run the batch script specified.", 
 #ifdef VTK_USE_MPI
   "--use-rendering-group", "-p",
   "Use a subset of processes to render.",
@@ -1757,12 +1757,12 @@ const char* const vtkPVApplication::LoadComponentProc =
 "                    return \"\"\n"
 "                } else {\n"
 "                    # If not loaded but file was found, oops\n"
-"                    puts stderr $errormsg\n"
+"                    error $errormsg\n"
 "                }\n"
 "            }\n"
 "        }\n"
 "        \n"
-"        puts stderr \"::paraview::load_component: $name could not be found.\"\n"
+"        error \"::paraview::load_component: $name could not be found.\"\n"
 "        \n"
 "        return 1\n"
 "    }\n"
