@@ -133,7 +133,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.621");
+vtkCxxRevisionMacro(vtkPVWindow, "1.622");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -2846,6 +2846,7 @@ void vtkPVWindow::SaveBatchScript(const char *filename, int offScreenFlag, const
 
   
   *file << "if { $saveState } {" << endl;
+  *file << "   $Ren1 UpdateVTKObjects" << endl;
   *file << "   $proxyManager SaveState $stateName" << endl;
   *file << "} else {" << endl;
 
