@@ -51,7 +51,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLabeledFrame );
-vtkCxxRevisionMacro(vtkKWLabeledFrame, "1.21");
+vtkCxxRevisionMacro(vtkKWLabeledFrame, "1.22");
 
 
 
@@ -317,6 +317,26 @@ void vtkKWLabeledFrame::SetLabelCase(int v)
 int vtkKWLabeledFrame::GetLabelCase() 
 { 
   return vtkKWLabeledFrame::LabelCase;
+}
+
+//----------------------------------------------------------------------------
+void vtkKWLabeledFrame::SetEnabled(int e)
+{
+  // Propagate first (since objects can be modified externally, they might
+  // not be in synch with this->Enabled)
+
+  if (this->IsCreated())
+    {
+    if (this->Label)
+      {
+      this->Label->SetEnabled(e);
+      }
+    }
+
+  // Then call superclass, which will call SetEnabled and 
+  // update the internal Enabled ivar (although it is not of much use here)
+
+  this->Superclass::SetEnabled(e);
 }
 
 //----------------------------------------------------------------------------

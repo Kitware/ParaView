@@ -125,6 +125,11 @@ public:
   static void BoldLabelOn();
   static void BoldLabelOff();
 
+  // Description:
+  // Set/Get the enabled state.
+  // Override to pass down to children.
+  virtual void SetEnabled(int);
+
 protected:
   vtkKWLabeledFrame();
   ~vtkKWLabeledFrame();
