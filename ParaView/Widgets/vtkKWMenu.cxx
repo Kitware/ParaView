@@ -42,7 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWMenu );
-vtkCxxRevisionMacro(vtkKWMenu, "1.46");
+vtkCxxRevisionMacro(vtkKWMenu, "1.47");
 
 
 
@@ -908,9 +908,9 @@ void vtkKWMenu::StoreMenuState(vtkArrayMap<const char*, int>* state)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWMenu::RestoreMenuState(vtkArrayMap<const char*, int>* state)
+void vtkKWMenu::RestoreMenuState(vtkArrayMap<const char*, int>* states)
 {
-  vtkArrayMapIterator<const char*, int>* it = state->NewIterator();
+  vtkArrayMapIterator<const char*, int>* it = states->NewIterator();
 
   // Mark all sources as not visited.
   while( !it->IsDoneWithTraversal() )
