@@ -102,6 +102,8 @@ OPTION(VTK_USE_PATENTED "Build VTK with patented support" OFF)
 # vtkRenderWindow wrapped.
 ADD_DEFINITIONS(-DVTK_PYTHON_BUILD)
 
+CONFIGURE_FILE(${ParaView_SOURCE_DIR}/VTK/Utilities/TclTk/.NoDartCoverage
+  ${ParaView_BINARY_DIR}/VTK/.NoDartCoverage)
 SUBDIRS(VTK)
 
 # This is a hack for now. Once the transition is over, this macro goes aways
