@@ -414,7 +414,13 @@ extern "C" void vtkParallelCS_Initialize(vtkClientServerInterpreter*);
 extern "C" void vtkPatentedCS_Initialize(vtkClientServerInterpreter*);
 #endif
 extern "C" void vtkPVFiltersCS_Initialize(vtkClientServerInterpreter*);
+
+#ifdef PARAVIEW_NEW_SOURCE_ORGANIZATION
+extern "C" void vtkKWParaViewCS_Initialize(vtkClientServerInterpreter*);
+#else
 extern "C" void vtkParaViewServerCS_Initialize(vtkClientServerInterpreter*);
+#endif
+
 #ifdef PARAVIEW_LINK_XDMF
 extern "C" void vtkXdmfCS_Initialize(vtkClientServerInterpreter *);
 #endif
@@ -438,7 +444,13 @@ void ParaViewInitializeInterpreter(vtkPVProcessModule* pm)
   vtkPatentedCS_Initialize(pm->GetInterpreter());
 #endif
   vtkPVFiltersCS_Initialize(pm->GetInterpreter());
+
+#ifdef PARAVIEW_NEW_SOURCE_ORGANIZATION
+  vtkKWParaViewCS_Initialize(pm->GetInterpreter());
+#else
   vtkParaViewServerCS_Initialize(pm->GetInterpreter());
+#endif
+
 #ifdef PARAVIEW_LINK_XDMF
   vtkXdmfCS_Initialize(pm->GetInterpreter());
 #endif
