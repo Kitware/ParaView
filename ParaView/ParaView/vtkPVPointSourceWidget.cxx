@@ -26,7 +26,7 @@ int vtkPVPointSourceWidget::InstanceCount = 0;
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPointSourceWidget);
-vtkCxxRevisionMacro(vtkPVPointSourceWidget, "1.14");
+vtkCxxRevisionMacro(vtkPVPointSourceWidget, "1.15");
 
 int vtkPVPointSourceWidgetCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -127,10 +127,10 @@ void vtkPVPointSourceWidget::Create(vtkKWApplication *app)
     {
     this->SourceID = pm->NewStreamObject("vtkPointSource");
     pm->GetStream() << vtkClientServerStream::Invoke 
-                    << this->SourceID << "SetNumberOfPoints" << 1 
+                    << this->SourceID << "SetNumberOfPoints" << 100 
                     << vtkClientServerStream::End;
     pm->GetStream() << vtkClientServerStream::Invoke 
-                    << this->SourceID << "SetRadius" << 0.0 
+                    << this->SourceID << "SetRadius" << 1.0 
                     << vtkClientServerStream::End;
     this->OutputID = pm->NewStreamObject("vtkPolyData");
     pm->GetStream() << vtkClientServerStream::Invoke 
@@ -155,6 +155,7 @@ void vtkPVPointSourceWidget::Create(vtkKWApplication *app)
   this->RadiusWidget->Create(this->Application);
   this->RadiusProperty = this->RadiusWidget->CreateAppropriateProperty();
   this->RadiusProperty->SetWidget(this->RadiusWidget);
+  this->RadiusWidget->SetValue("1"); // This should really be 1/10 of longest axis
   this->Script("pack %s -side top -fill both -expand true",
                this->RadiusWidget->GetWidgetName());
   
@@ -169,7 +170,7 @@ void vtkPVPointSourceWidget::Create(vtkKWApplication *app)
   this->NumberOfPointsProperty =
     this->NumberOfPointsWidget->CreateAppropriateProperty();
   this->NumberOfPointsProperty->SetWidget(this->NumberOfPointsWidget);
-  this->NumberOfPointsWidget->SetValue("1"); // match value set in point source
+  this->NumberOfPointsWidget->SetValue("100"); // match value set in point source
   this->Script("pack %s -side top -fill both -expand true",
                this->NumberOfPointsWidget->GetWidgetName());
   
