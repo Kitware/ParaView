@@ -59,7 +59,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVWizard );
-vtkCxxRevisionMacro(vtkPVWizard, "1.10");
+vtkCxxRevisionMacro(vtkPVWizard, "1.11");
 
 vtkCxxSetObjectMacro(vtkPVWizard,Data, vtkRectilinearGrid);
 
@@ -225,11 +225,11 @@ void vtkPVWizard::CheckForValidFile(int gate)
     {
     if (gate)
       {
-      this->NextButton->Disable();
+      this->NextButton->SetEnabled(0);
       }
     else
       {
-      this->NextButton->Enable();
+      this->NextButton->SetEnabled(1);
       }
     return;
     }
@@ -238,7 +238,7 @@ void vtkPVWizard::CheckForValidFile(int gate)
   this->Script("file readable {%s}", fileName);
   if (this->GetIntegerResult(this->Application) == 0)
     {
-    this->NextButton->Disable();
+    this->NextButton->SetEnabled(0);
     return;
     }
 
@@ -247,11 +247,11 @@ void vtkPVWizard::CheckForValidFile(int gate)
                this->FileEntry->GetValue());
   if (this->GetIntegerResult(this->Application))
     { 
-    this->NextButton->Enable();
+    this->NextButton->SetEnabled(1);
     }
   else
     {
-    this->NextButton->Disable();
+    this->NextButton->SetEnabled(0);
     }
 }
 
@@ -462,7 +462,7 @@ void vtkPVWizard::SetupPipeline(vtkPVWindow *pvWin)
 void vtkPVWizard::QueryFirstFileName()
 {
   // Disable the next button until a valid file is choose.
-  this->NextButton->Disable();
+  this->NextButton->SetEnabled(0);
 
   this->Label->SetLabel("Select your first CTH file.");
   this->FileEntry->SetLabel("First CTH File");
@@ -492,7 +492,7 @@ void vtkPVWizard::QueryLastFileName()
 
   // Disable the next button until a valid file is choose.
   this->FileEntry->SetValue("");
-  this->NextButton->Enable();
+  this->NextButton->SetEnabled(1);
 
   // wait for the end
   this->Done = 0;
@@ -517,7 +517,7 @@ void vtkPVWizard::QueryStride()
   int *ext;
   
   // Enable the next button because we have a good default value.
-  this->NextButton->Enable();
+  this->NextButton->SetEnabled(1);
 
   this->Script("%s SetFileName {%s}", this->ReaderTclName, this->FirstFileName);
   this->Script("%s UpdateInformation", this->ReaderTclName);
@@ -567,7 +567,7 @@ void vtkPVWizard::QueryMaterials()
   char *name;
 
   // Enable the next button because we default to visualize all materials.
-  this->NextButton->Enable();
+  this->NextButton->SetEnabled(1);
 
   this->Label->SetLabel("Choose which materials you want to include in your visualization.");
 
@@ -621,7 +621,7 @@ void vtkPVWizard::QueryColorVariable()
   vtkPVSelectionList *menu;
 
   // Enable the next button because we default to have no arrays to visualize.
-  this->NextButton->Enable();
+  this->NextButton->SetEnabled(1);
 
   this->Label->SetLabel("Choose a variable to visualize.");
 
@@ -667,7 +667,7 @@ void vtkPVWizard::QueryColoredMaterials()
     }
 
   // Enable the next button. We default to color no materials.
-  this->NextButton->Enable();
+  this->NextButton->SetEnabled(1);
 
   this->Label->SetLabel("Which materials do you want to color?");
 
