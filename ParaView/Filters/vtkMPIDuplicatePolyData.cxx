@@ -27,7 +27,7 @@
 #include "vtkSocketController.h"
 #include "vtkTimerLog.h"
 
-vtkCxxRevisionMacro(vtkMPIDuplicatePolyData, "1.6");
+vtkCxxRevisionMacro(vtkMPIDuplicatePolyData, "1.7");
 vtkStandardNewMacro(vtkMPIDuplicatePolyData);
 
 vtkCxxSetObjectMacro(vtkMPIDuplicatePolyData,Controller, vtkMultiProcessController);
@@ -197,6 +197,9 @@ void vtkMPIDuplicatePolyData::ServerExecute(vtkMPICommunicator* com,
   int size = writer->GetOutputStringLength();
   char* buf = writer->RegisterAndGetOutputString();
   
+  pd->Delete();
+  pd = NULL;
+  
   // Compute the displacements.
   sum = 0;
   
@@ -268,6 +271,7 @@ void vtkMPIDuplicatePolyData::ReconstructOutput(vtkPolyDataReader* reader,
     pd->GetCellData()->PassData(output->GetCellData());
     append->AddInput(pd);
     pd->Delete();
+    pd = NULL;
     }
 
   // Append
@@ -279,6 +283,9 @@ void vtkMPIDuplicatePolyData::ReconstructOutput(vtkPolyDataReader* reader,
   pd->CopyStructure(output);
   pd->GetPointData()->PassData(output->GetPointData());
   pd->GetCellData()->PassData(output->GetCellData());
+
+  append->Delete();
+  append = NULL;
 }
 
 
