@@ -34,10 +34,9 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 vtkPVComposite::vtkPVComposite()
 {
   this->Notebook = vtkKWNotebook::New();
-  this->Image = vtkPVImage::New();
+  this->Image = NULL;
   this->ImageReader = vtkPVImageReader::New();
   
-  this->PropertiesCreated = 0;
   this->NotebookCreated = 0;
 }
 
@@ -91,6 +90,11 @@ void vtkPVComposite::CreateProperties(vtkKWApplication *app, char *args)
   this->Script("pack %s -pady 2 -padx 2 -fill both -expand yes -anchor n",
                this->Notebook->GetWidgetName());
   this->Notebook->Raise("Image");
+  
+  if (this->Image == NULL)
+    {
+    this->Image = vtkPVImage::New();
+    }
   
   this->Image->SetParent(this->Notebook->GetFrame("Image"));
   this->Image->Create(app, "");

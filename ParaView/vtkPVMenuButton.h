@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   Visualization Toolkit
-  Module:    vtkPVImage.h
+  Module:    vtkPVMenuButton.h
   Language:  C++
   Date:      $Date$
   Version:   $Revision$
@@ -26,45 +26,37 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 =========================================================================*/
 
-#ifndef __vtkPVImage_h
-#define __vtkPVImage_h
+#ifndef __vtkPVMenuButton_h
+#define __vtkPVMenuButton_h
 
-#include "vtkKWWidget.h"
-#include "vtkProp.h"
-#include "vtkImageData.h"
-#include "vtkOutlineSource.h"
-#include "vtkKWLabel.h"
-#include "vtkPolyDataMapper.h"
+#include "vtkKWMenu.h"
 
-class vtkPVComposite;
-
-class VTK_EXPORT vtkPVImage : public vtkKWWidget
+class VTK_EXPORT vtkPVMenuButton : public vtkKWWidget
 {
 public:
-  static vtkPVImage* New();
-  vtkTypeMacro(vtkPVImage,vtkKWWidget);
-  
+  static vtkPVMenuButton* New();
+  vtkTypeMacro(vtkPVMenuButton, vtkKWWidget);
+
+  // Description:
+  // Create a Tk widget
   void Create(vtkKWApplication *app, char *args);
-
-  vtkProp* GetProp();
-
-  vtkSetObjectMacro(Image, vtkImageData);
-  vtkGetObjectMacro(Image, vtkImageData);
   
-  void SetComposite(vtkPVComposite *comp);
+  // Description:
+  // Add text to the button
+  void SetButtonText(char *text);
+  
+  // Description: 
+  // Append a standard menu item and command to the current menu.
+  void AddCommand(const char* label, vtkKWObject* Object,
+		  const char* MethodAndArgString , const char* help = 0);
   
 protected:
-  vtkPVImage();
-  ~vtkPVImage();
-  vtkPVImage(const vtkPVImage&) {};
-  void operator=(const vtkPVImage&) {};
-
-  vtkKWLabel *Label;
-  vtkImageData *Image;
-  vtkOutlineSource *Outline;
-  vtkPolyDataMapper *Mapper;
-  vtkActor *Actor;
-  vtkPVComposite *Comp;
+  vtkPVMenuButton();
+  ~vtkPVMenuButton();
+  vtkPVMenuButton(const vtkPVMenuButton&) {};
+  void operator=(const vtkPVMenuButton&) {};
+  
+  vtkKWMenu *Menu;
 };
 
 #endif

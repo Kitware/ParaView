@@ -24,9 +24,13 @@ vtkInteractorStyleSphere \
 vtkKWRenderView \
 vtkPVApplication \
 vtkPVComposite \
+vtkPVConeSource \
 vtkPVImage \
 vtkPVImagePlaneComponent \
 vtkPVImageReader \
+vtkPVMenuButton \
+vtkPVPolyData \
+vtkPVPolyDataComposite \
 vtkPVRenderSlave \
 vtkPVRenderView \
 vtkPVSlave \

@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   Visualization Toolkit
-  Module:    vtkPVComposite.h
+  Module:    vtkPVPolyDataComposite.h
   Language:  C++
   Date:      $Date$
   Version:   $Revision$
@@ -25,29 +25,23 @@ PARTICULAR PURPOSE, AND NON-INFRINGEMENT.  THIS SOFTWARE IS PROVIDED ON AN
 MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 =========================================================================*/
-// .NAME vtkPVComposite - an element in a view containing props / properties
-// .SECTION Description
-// A composite represents an element in the view. It is very similar to
-// the notion of an actor in a renderer. The composite is different in 
-// that it combines the Actor (vtkProp actually) with some user interface
-// code called the properties, and it may also contain more complex
-// elements such as filters etc.
 
-#ifndef __vtkPVComposite_h
-#define __vtkPVComposite_h
+#ifndef __vtkPVPolyDataComposite_h
+#define __vtkPVPolyDataComposite_h
 
 #include "vtkKWComposite.h"
-#include "vtkOutlineSource.h"
 #include "vtkPolyDataMapper.h"
 #include "vtkActor.h"
 #include "vtkKWLabel.h"
-#include "vtkPVImage.h"
-#include "vtkPVImageReader.h"
+#include "vtkPVPolyData.h"
+#include "vtkPVConeSource.h"
 
-class VTK_EXPORT vtkPVComposite : public vtkKWComposite
+class vtkPVWindow;
+
+class VTK_EXPORT vtkPVPolyDataComposite : public vtkKWComposite
 {
 public:
-  static vtkPVComposite* New();
+  static vtkPVPolyDataComposite* New();
   
   // Description:
   // Get the Prop for this class.
@@ -64,16 +58,32 @@ public:
   void Select(vtkKWView *);
   void Deselect(vtkKWView *);
   
+  vtkPVPolyDataComposite *GetComposite();
+
+  void SetTabLabels(char *label1, char *label2);
+
+  void SetWindow(vtkPVWindow *window);
+  vtkPVWindow *GetWindow();
+  
+  vtkPVConeSource *GetConeSource();
+
+  void SetPVPolyData(vtkPVPolyData* poly);
+  
 protected:
-  vtkPVComposite();
-  ~vtkPVComposite();
+  vtkPVPolyDataComposite();
+  ~vtkPVPolyDataComposite();
   
   vtkKWNotebook *Notebook;
-  vtkPVImage *Image;
-  vtkPVImageReader *ImageReader;
+  vtkPVPolyData *PolyData;
+  vtkPVConeSource *ConeSource;
   vtkActor *Actor;
   
+  char *Label1;
+  char *Label2;
+  
   int NotebookCreated;
+  
+  vtkPVWindow *Window;
 };
 
 #endif

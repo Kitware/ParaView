@@ -899,6 +899,28 @@ vtkPVApplication.o : ./vtkPVApplication.cxx  \
   /home/henderson/vtk/graphics/vtkRenderWindowInteractor.h \
   /home/henderson/vtk/graphics/vtkAbstractPropPicker.h \
   /home/henderson/vtk/graphics/vtkAbstractPicker.h \
+  ./vtkPVComposite.h \
+  /home/henderson/vtk/graphics/vtkOutlineSource.h \
+  /home/henderson/vtk/graphics/vtkPolyDataSource.h \
+  /home/henderson/vtk/common/vtkPolyData.h \
+  /home/henderson/vtk/common/vtkPointSet.h \
+  /home/henderson/vtk/common/vtkPointLocator.h \
+  /home/henderson/vtk/common/vtkLocator.h \
+  /home/henderson/vtk/common/vtkCellArray.h \
+  /home/henderson/vtk/common/vtkIntArray.h \
+  /home/henderson/vtk/common/vtkCellLinks.h \
+  /home/henderson/vtk/graphics/vtkPolyDataMapper.h \
+  ../Widgets/vtkKWLabel.h \
+  ./vtkPVImage.h \
+  ./vtkPVImageReader.h \
+  /home/henderson/vtk/imaging/vtkImageReader.h \
+  /home/henderson/vtk/common/vtkImageSource.h \
+  ./vtkPVPolyDataComposite.h \
+  ./vtkPVPolyData.h \
+  ./vtkPVMenuButton.h \
+  ../Widgets/vtkKWScale.h \
+  ./vtkPVConeSource.h \
+  /home/henderson/vtk/graphics/vtkConeSource.h \
   ../Widgets/vtkKWDialog.h \
   ../Widgets/vtkKWWindowCollection.h \
   ../Widgets/vtkKWMessageDialog.h \
@@ -996,6 +1018,10 @@ vtkPVComposite.o : ./vtkPVComposite.cxx  \
   /home/henderson/vtk/common/vtkActor2DCollection.h \
   /home/henderson/vtk/graphics/vtkActorCollection.h \
   ../Widgets/vtkKWLabel.h \
+  ./vtkPVImage.h \
+  ./vtkPVImageReader.h \
+  /home/henderson/vtk/imaging/vtkImageReader.h \
+  /home/henderson/vtk/common/vtkImageSource.h \
   ./vtkPVApplication.h \
   ../Widgets/vtkKWApplication.h \
   /home/henderson/vtk/contrib/vtkMultiProcessController.h \
@@ -1013,7 +1039,148 @@ vtkPVComposite.o : ./vtkPVComposite.cxx  \
   ../Widgets/vtkKWLabeledFrame.h \
   ../Widgets/vtkKWChangeColorButton.h
 
-vtkPVImage.o : ./vtkPVImage.cxx 
+vtkPVConeSource.o : ./vtkPVConeSource.cxx  \
+  ./vtkPVConeSource.h \
+  ../Widgets/vtkKWWidget.h \
+  ../Widgets/vtkKWObject.h \
+  /home/henderson/vtk/common/vtkObject.h \
+  /home/henderson/vtk/common/vtkIndent.h \
+  /home/henderson/vtk/common/vtkWin32Header.h \
+  /home/henderson/vtk/common/vtkSystemIncludes.h \
+  /home/henderson/vtk/common/vtkTimeStamp.h \
+  /home/henderson/vtk/common/vtkSetGet.h \
+  ../Widgets/vtkKWSerializer.h \
+  ../Widgets/vtkKWWidgetCollection.h \
+  /home/henderson/vtk/common/vtkCollection.h \
+  ../Widgets/vtkKWLabel.h \
+  /home/henderson/vtk/graphics/vtkConeSource.h \
+  /home/henderson/vtk/graphics/vtkPolyDataSource.h \
+  /home/henderson/vtk/common/vtkSource.h \
+  /home/henderson/vtk/common/vtkProcessObject.h \
+  /home/henderson/vtk/common/vtkDataObject.h \
+  /home/henderson/vtk/common/vtkFieldData.h \
+  /home/henderson/vtk/common/vtkDataArray.h \
+  /home/henderson/vtk/common/vtkIdList.h \
+  /home/henderson/vtk/common/vtkPolyData.h \
+  /home/henderson/vtk/common/vtkPointSet.h \
+  /home/henderson/vtk/common/vtkDataSet.h \
+  /home/henderson/vtk/common/vtkCellData.h \
+  /home/henderson/vtk/common/vtkDataSetAttributes.h \
+  /home/henderson/vtk/common/vtkScalars.h \
+  /home/henderson/vtk/common/vtkAttributeData.h \
+  /home/henderson/vtk/common/vtkVectors.h \
+  /home/henderson/vtk/common/vtkNormals.h \
+  /home/henderson/vtk/common/vtkTCoords.h \
+  /home/henderson/vtk/common/vtkTensors.h \
+  /home/henderson/vtk/common/vtkTensor.h \
+  /home/henderson/vtk/common/vtkPointData.h \
+  /home/henderson/vtk/common/vtkGenericCell.h \
+  /home/henderson/vtk/common/vtkCell.h \
+  /home/henderson/vtk/common/vtkPoints.h \
+  /home/henderson/vtk/common/vtkCellType.h \
+  /home/henderson/vtk/common/vtkCellTypes.h \
+  /home/henderson/vtk/common/vtkPointLocator.h \
+  /home/henderson/vtk/common/vtkLocator.h \
+  /home/henderson/vtk/common/vtkCellArray.h \
+  /home/henderson/vtk/common/vtkIntArray.h \
+  /home/henderson/vtk/common/vtkCellLinks.h \
+  ../Widgets/vtkKWApplication.h
+
+vtkPVImage.o : ./vtkPVImage.cxx  \
+  ./vtkPVImage.h \
+  ../Widgets/vtkKWWidget.h \
+  ../Widgets/vtkKWObject.h \
+  /home/henderson/vtk/common/vtkObject.h \
+  /home/henderson/vtk/common/vtkIndent.h \
+  /home/henderson/vtk/common/vtkWin32Header.h \
+  /home/henderson/vtk/common/vtkSystemIncludes.h \
+  /home/henderson/vtk/common/vtkTimeStamp.h \
+  /home/henderson/vtk/common/vtkSetGet.h \
+  ../Widgets/vtkKWSerializer.h \
+  ../Widgets/vtkKWWidgetCollection.h \
+  /home/henderson/vtk/common/vtkCollection.h \
+  /home/henderson/vtk/common/vtkProp.h \
+  /home/henderson/vtk/common/vtkRayCastStructures.h \
+  /home/henderson/vtk/common/vtkAssemblyPaths.h \
+  /home/henderson/vtk/common/vtkAssemblyPath.h \
+  /home/henderson/vtk/common/vtkImageData.h \
+  /home/henderson/vtk/common/vtkDataSet.h \
+  /home/henderson/vtk/common/vtkDataObject.h \
+  /home/henderson/vtk/common/vtkFieldData.h \
+  /home/henderson/vtk/common/vtkDataArray.h \
+  /home/henderson/vtk/common/vtkIdList.h \
+  /home/henderson/vtk/common/vtkCellData.h \
+  /home/henderson/vtk/common/vtkDataSetAttributes.h \
+  /home/henderson/vtk/common/vtkScalars.h \
+  /home/henderson/vtk/common/vtkAttributeData.h \
+  /home/henderson/vtk/common/vtkVectors.h \
+  /home/henderson/vtk/common/vtkNormals.h \
+  /home/henderson/vtk/common/vtkTCoords.h \
+  /home/henderson/vtk/common/vtkTensors.h \
+  /home/henderson/vtk/common/vtkTensor.h \
+  /home/henderson/vtk/common/vtkPointData.h \
+  /home/henderson/vtk/common/vtkGenericCell.h \
+  /home/henderson/vtk/common/vtkCell.h \
+  /home/henderson/vtk/common/vtkPoints.h \
+  /home/henderson/vtk/common/vtkCellType.h \
+  /home/henderson/vtk/common/vtkCellTypes.h \
+  /home/henderson/vtk/common/vtkStructuredData.h \
+  /home/henderson/vtk/graphics/vtkOutlineSource.h \
+  /home/henderson/vtk/graphics/vtkPolyDataSource.h \
+  /home/henderson/vtk/common/vtkSource.h \
+  /home/henderson/vtk/common/vtkProcessObject.h \
+  /home/henderson/vtk/common/vtkPolyData.h \
+  /home/henderson/vtk/common/vtkPointSet.h \
+  /home/henderson/vtk/common/vtkPointLocator.h \
+  /home/henderson/vtk/common/vtkLocator.h \
+  /home/henderson/vtk/common/vtkCellArray.h \
+  /home/henderson/vtk/common/vtkIntArray.h \
+  /home/henderson/vtk/common/vtkCellLinks.h \
+  ../Widgets/vtkKWLabel.h \
+  /home/henderson/vtk/graphics/vtkPolyDataMapper.h \
+  /home/henderson/vtk/graphics/vtkMapper.h \
+  /home/henderson/vtk/graphics/vtkAbstractMapper3D.h \
+  /home/henderson/vtk/common/vtkAbstractMapper.h \
+  /home/henderson/vtk/common/vtkPlaneCollection.h \
+  /home/henderson/vtk/common/vtkPlane.h \
+  /home/henderson/vtk/common/vtkImplicitFunction.h \
+  /home/henderson/vtk/common/vtkAbstractTransform.h \
+  /home/henderson/vtk/common/vtkMatrix4x4.h \
+  /home/henderson/vtk/common/vtkMutexLock.h \
+  /home/henderson/vtk/common/vtkScalarsToColors.h \
+  /home/henderson/vtk/common/vtkUnsignedCharArray.h \
+  /home/henderson/vtk/graphics/vtkRenderer.h \
+  /home/henderson/vtk/graphics/vtkLightCollection.h \
+  /home/henderson/vtk/graphics/vtkLight.h \
+  /home/henderson/vtk/graphics/vtkVolumeCollection.h \
+  /home/henderson/vtk/common/vtkPropCollection.h \
+  /home/henderson/vtk/graphics/vtkCullerCollection.h \
+  /home/henderson/vtk/graphics/vtkCamera.h \
+  /home/henderson/vtk/common/vtkTransform.h \
+  /home/henderson/vtk/common/vtkLinearTransform.h \
+  /home/henderson/vtk/common/vtkHomogenousTransform.h \
+  /home/henderson/vtk/common/vtkPerspectiveTransform.h \
+  /home/henderson/vtk/graphics/vtkActor.h \
+  /home/henderson/vtk/graphics/vtkProp3D.h \
+  /home/henderson/vtk/graphics/vtkProperty.h \
+  /home/henderson/vtk/graphics/vtkRender.h \
+  /home/henderson/vtk/common/vtkStructuredPoints.h \
+  /home/henderson/vtk/graphics/vtkTexture.h \
+  /home/henderson/vtk/common/vtkLookupTable.h \
+  /home/henderson/vtk/common/vtkImageToStructuredPoints.h \
+  /home/henderson/vtk/common/vtkActor2D.h \
+  /home/henderson/vtk/common/vtkCoordinate.h \
+  /home/henderson/vtk/common/vtkProperty2D.h \
+  /home/henderson/vtk/common/vtkViewport.h \
+  /home/henderson/vtk/common/vtkActor2DCollection.h \
+  /home/henderson/vtk/graphics/vtkActorCollection.h \
+  /home/henderson/vtk/common/vtkMath.h \
+  ./vtkPVComposite.h \
+  ../Widgets/vtkKWComposite.h \
+  ../Widgets/vtkKWNotebook.h \
+  ./vtkPVImageReader.h \
+  /home/henderson/vtk/imaging/vtkImageReader.h \
+  /home/henderson/vtk/common/vtkImageSource.h
 
 vtkPVImagePlaneComponent.o : ./vtkPVImagePlaneComponent.cxx  \
   ./vtkPVImagePlaneComponent.h \
@@ -1107,7 +1274,293 @@ vtkPVImagePlaneComponent.o : ./vtkPVImagePlaneComponent.cxx  \
   /home/henderson/vtk/common/vtkActor2DCollection.h \
   /home/henderson/vtk/graphics/vtkActorCollection.h
 
-vtkPVImageReader.o : ./vtkPVImageReader.cxx 
+vtkPVImageReader.o : ./vtkPVImageReader.cxx  \
+  ./vtkPVImageReader.h \
+  ../Widgets/vtkKWWidget.h \
+  ../Widgets/vtkKWObject.h \
+  /home/henderson/vtk/common/vtkObject.h \
+  /home/henderson/vtk/common/vtkIndent.h \
+  /home/henderson/vtk/common/vtkWin32Header.h \
+  /home/henderson/vtk/common/vtkSystemIncludes.h \
+  /home/henderson/vtk/common/vtkTimeStamp.h \
+  /home/henderson/vtk/common/vtkSetGet.h \
+  ../Widgets/vtkKWSerializer.h \
+  ../Widgets/vtkKWWidgetCollection.h \
+  /home/henderson/vtk/common/vtkCollection.h \
+  ../Widgets/vtkKWLabel.h \
+  /home/henderson/vtk/imaging/vtkImageReader.h \
+  /home/henderson/vtk/common/vtkImageSource.h \
+  /home/henderson/vtk/common/vtkImageData.h \
+  /home/henderson/vtk/common/vtkDataSet.h \
+  /home/henderson/vtk/common/vtkDataObject.h \
+  /home/henderson/vtk/common/vtkFieldData.h \
+  /home/henderson/vtk/common/vtkDataArray.h \
+  /home/henderson/vtk/common/vtkIdList.h \
+  /home/henderson/vtk/common/vtkCellData.h \
+  /home/henderson/vtk/common/vtkDataSetAttributes.h \
+  /home/henderson/vtk/common/vtkScalars.h \
+  /home/henderson/vtk/common/vtkAttributeData.h \
+  /home/henderson/vtk/common/vtkVectors.h \
+  /home/henderson/vtk/common/vtkNormals.h \
+  /home/henderson/vtk/common/vtkTCoords.h \
+  /home/henderson/vtk/common/vtkTensors.h \
+  /home/henderson/vtk/common/vtkTensor.h \
+  /home/henderson/vtk/common/vtkPointData.h \
+  /home/henderson/vtk/common/vtkGenericCell.h \
+  /home/henderson/vtk/common/vtkCell.h \
+  /home/henderson/vtk/common/vtkPoints.h \
+  /home/henderson/vtk/common/vtkCellType.h \
+  /home/henderson/vtk/common/vtkCellTypes.h \
+  /home/henderson/vtk/common/vtkStructuredData.h \
+  /home/henderson/vtk/common/vtkSource.h \
+  /home/henderson/vtk/common/vtkProcessObject.h \
+  /home/henderson/vtk/common/vtkTransform.h \
+  /home/henderson/vtk/common/vtkLinearTransform.h \
+  /home/henderson/vtk/common/vtkHomogenousTransform.h \
+  /home/henderson/vtk/common/vtkAbstractTransform.h \
+  /home/henderson/vtk/common/vtkMatrix4x4.h \
+  /home/henderson/vtk/common/vtkMutexLock.h \
+  ../Widgets/vtkKWApplication.h
+
+vtkPVMenuButton.o : ./vtkPVMenuButton.cxx  \
+  ./vtkPVMenuButton.h \
+  ../Widgets/vtkKWMenu.h \
+  ../Widgets/vtkKWWidget.h \
+  ../Widgets/vtkKWObject.h \
+  /home/henderson/vtk/common/vtkObject.h \
+  /home/henderson/vtk/common/vtkIndent.h \
+  /home/henderson/vtk/common/vtkWin32Header.h \
+  /home/henderson/vtk/common/vtkSystemIncludes.h \
+  /home/henderson/vtk/common/vtkTimeStamp.h \
+  /home/henderson/vtk/common/vtkSetGet.h \
+  ../Widgets/vtkKWSerializer.h \
+  ../Widgets/vtkKWWidgetCollection.h \
+  /home/henderson/vtk/common/vtkCollection.h \
+  /home/henderson/vtk/common/vtkObjectFactory.h
+
+vtkPVPolyData.o : ./vtkPVPolyData.cxx  \
+  ./vtkPVPolyData.h \
+  ../Widgets/vtkKWWidget.h \
+  ../Widgets/vtkKWObject.h \
+  /home/henderson/vtk/common/vtkObject.h \
+  /home/henderson/vtk/common/vtkIndent.h \
+  /home/henderson/vtk/common/vtkWin32Header.h \
+  /home/henderson/vtk/common/vtkSystemIncludes.h \
+  /home/henderson/vtk/common/vtkTimeStamp.h \
+  /home/henderson/vtk/common/vtkSetGet.h \
+  ../Widgets/vtkKWSerializer.h \
+  ../Widgets/vtkKWWidgetCollection.h \
+  /home/henderson/vtk/common/vtkCollection.h \
+  /home/henderson/vtk/common/vtkProp.h \
+  /home/henderson/vtk/common/vtkRayCastStructures.h \
+  /home/henderson/vtk/common/vtkAssemblyPaths.h \
+  /home/henderson/vtk/common/vtkAssemblyPath.h \
+  ../Widgets/vtkKWLabel.h \
+  /home/henderson/vtk/graphics/vtkPolyDataMapper.h \
+  /home/henderson/vtk/graphics/vtkMapper.h \
+  /home/henderson/vtk/graphics/vtkAbstractMapper3D.h \
+  /home/henderson/vtk/common/vtkAbstractMapper.h \
+  /home/henderson/vtk/common/vtkProcessObject.h \
+  /home/henderson/vtk/common/vtkDataObject.h \
+  /home/henderson/vtk/common/vtkFieldData.h \
+  /home/henderson/vtk/common/vtkDataArray.h \
+  /home/henderson/vtk/common/vtkIdList.h \
+  /home/henderson/vtk/common/vtkPlaneCollection.h \
+  /home/henderson/vtk/common/vtkPlane.h \
+  /home/henderson/vtk/common/vtkImplicitFunction.h \
+  /home/henderson/vtk/common/vtkAbstractTransform.h \
+  /home/henderson/vtk/common/vtkMatrix4x4.h \
+  /home/henderson/vtk/common/vtkPoints.h \
+  /home/henderson/vtk/common/vtkAttributeData.h \
+  /home/henderson/vtk/common/vtkNormals.h \
+  /home/henderson/vtk/common/vtkVectors.h \
+  /home/henderson/vtk/common/vtkMutexLock.h \
+  /home/henderson/vtk/common/vtkScalarsToColors.h \
+  /home/henderson/vtk/common/vtkUnsignedCharArray.h \
+  /home/henderson/vtk/common/vtkDataSet.h \
+  /home/henderson/vtk/common/vtkCellData.h \
+  /home/henderson/vtk/common/vtkDataSetAttributes.h \
+  /home/henderson/vtk/common/vtkScalars.h \
+  /home/henderson/vtk/common/vtkTCoords.h \
+  /home/henderson/vtk/common/vtkTensors.h \
+  /home/henderson/vtk/common/vtkTensor.h \
+  /home/henderson/vtk/common/vtkPointData.h \
+  /home/henderson/vtk/common/vtkGenericCell.h \
+  /home/henderson/vtk/common/vtkCell.h \
+  /home/henderson/vtk/common/vtkCellType.h \
+  /home/henderson/vtk/common/vtkCellTypes.h \
+  /home/henderson/vtk/common/vtkPolyData.h \
+  /home/henderson/vtk/common/vtkPointSet.h \
+  /home/henderson/vtk/common/vtkPointLocator.h \
+  /home/henderson/vtk/common/vtkLocator.h \
+  /home/henderson/vtk/common/vtkCellArray.h \
+  /home/henderson/vtk/common/vtkIntArray.h \
+  /home/henderson/vtk/common/vtkCellLinks.h \
+  /home/henderson/vtk/graphics/vtkRenderer.h \
+  /home/henderson/vtk/graphics/vtkLightCollection.h \
+  /home/henderson/vtk/graphics/vtkLight.h \
+  /home/henderson/vtk/graphics/vtkVolumeCollection.h \
+  /home/henderson/vtk/common/vtkPropCollection.h \
+  /home/henderson/vtk/graphics/vtkCullerCollection.h \
+  /home/henderson/vtk/graphics/vtkCamera.h \
+  /home/henderson/vtk/common/vtkTransform.h \
+  /home/henderson/vtk/common/vtkLinearTransform.h \
+  /home/henderson/vtk/common/vtkHomogenousTransform.h \
+  /home/henderson/vtk/common/vtkPerspectiveTransform.h \
+  /home/henderson/vtk/graphics/vtkActor.h \
+  /home/henderson/vtk/graphics/vtkProp3D.h \
+  /home/henderson/vtk/graphics/vtkProperty.h \
+  /home/henderson/vtk/graphics/vtkRender.h \
+  /home/henderson/vtk/common/vtkStructuredPoints.h \
+  /home/henderson/vtk/common/vtkImageData.h \
+  /home/henderson/vtk/common/vtkStructuredData.h \
+  /home/henderson/vtk/graphics/vtkTexture.h \
+  /home/henderson/vtk/common/vtkLookupTable.h \
+  /home/henderson/vtk/common/vtkImageToStructuredPoints.h \
+  /home/henderson/vtk/common/vtkSource.h \
+  /home/henderson/vtk/common/vtkActor2D.h \
+  /home/henderson/vtk/common/vtkCoordinate.h \
+  /home/henderson/vtk/common/vtkProperty2D.h \
+  /home/henderson/vtk/common/vtkViewport.h \
+  /home/henderson/vtk/common/vtkActor2DCollection.h \
+  /home/henderson/vtk/graphics/vtkActorCollection.h \
+  ./vtkPVMenuButton.h \
+  ../Widgets/vtkKWMenu.h \
+  ../Widgets/vtkKWScale.h \
+  ../Widgets/vtkKWEntry.h \
+  ./vtkPVPolyDataComposite.h \
+  ../Widgets/vtkKWComposite.h \
+  ../Widgets/vtkKWNotebook.h \
+  ./vtkPVConeSource.h \
+  /home/henderson/vtk/graphics/vtkConeSource.h \
+  /home/henderson/vtk/graphics/vtkPolyDataSource.h \
+  /home/henderson/vtk/graphics/vtkShrinkPolyData.h \
+  /home/henderson/vtk/graphics/vtkPolyDataToPolyDataFilter.h \
+  ../Widgets/vtkKWView.h \
+  ../Widgets/vtkKWCompositeCollection.h \
+  /home/henderson/vtk/common/vtkWindow.h \
+  ../Widgets/vtkKWCheckButton.h \
+  ../Widgets/vtkKWGenericComposite.h \
+  /home/henderson/vtk/imaging/vtkTextMapper.h \
+  /home/henderson/vtk/common/vtkMapper2D.h \
+  /home/henderson/vtk/imaging/vtkScaledTextActor.h \
+  ../Widgets/vtkKWOptionMenu.h \
+  ../Widgets/vtkKWText.h \
+  ../Widgets/vtkKWLabeledFrame.h \
+  ../Widgets/vtkKWChangeColorButton.h \
+  ../Widgets/vtkKWPushButton.h
+
+vtkPVPolyDataComposite.o : ./vtkPVPolyDataComposite.cxx  \
+  ./vtkPVPolyDataComposite.h \
+  ../Widgets/vtkKWComposite.h \
+  ../Widgets/vtkKWNotebook.h \
+  ../Widgets/vtkKWWidget.h \
+  ../Widgets/vtkKWObject.h \
+  /home/henderson/vtk/common/vtkObject.h \
+  /home/henderson/vtk/common/vtkIndent.h \
+  /home/henderson/vtk/common/vtkWin32Header.h \
+  /home/henderson/vtk/common/vtkSystemIncludes.h \
+  /home/henderson/vtk/common/vtkTimeStamp.h \
+  /home/henderson/vtk/common/vtkSetGet.h \
+  ../Widgets/vtkKWSerializer.h \
+  ../Widgets/vtkKWWidgetCollection.h \
+  /home/henderson/vtk/common/vtkCollection.h \
+  /home/henderson/vtk/graphics/vtkPolyDataMapper.h \
+  /home/henderson/vtk/graphics/vtkMapper.h \
+  /home/henderson/vtk/graphics/vtkAbstractMapper3D.h \
+  /home/henderson/vtk/common/vtkAbstractMapper.h \
+  /home/henderson/vtk/common/vtkProcessObject.h \
+  /home/henderson/vtk/common/vtkDataObject.h \
+  /home/henderson/vtk/common/vtkFieldData.h \
+  /home/henderson/vtk/common/vtkDataArray.h \
+  /home/henderson/vtk/common/vtkIdList.h \
+  /home/henderson/vtk/common/vtkPlaneCollection.h \
+  /home/henderson/vtk/common/vtkPlane.h \
+  /home/henderson/vtk/common/vtkImplicitFunction.h \
+  /home/henderson/vtk/common/vtkAbstractTransform.h \
+  /home/henderson/vtk/common/vtkMatrix4x4.h \
+  /home/henderson/vtk/common/vtkPoints.h \
+  /home/henderson/vtk/common/vtkAttributeData.h \
+  /home/henderson/vtk/common/vtkNormals.h \
+  /home/henderson/vtk/common/vtkVectors.h \
+  /home/henderson/vtk/common/vtkMutexLock.h \
+  /home/henderson/vtk/common/vtkScalarsToColors.h \
+  /home/henderson/vtk/common/vtkUnsignedCharArray.h \
+  /home/henderson/vtk/common/vtkDataSet.h \
+  /home/henderson/vtk/common/vtkCellData.h \
+  /home/henderson/vtk/common/vtkDataSetAttributes.h \
+  /home/henderson/vtk/common/vtkScalars.h \
+  /home/henderson/vtk/common/vtkTCoords.h \
+  /home/henderson/vtk/common/vtkTensors.h \
+  /home/henderson/vtk/common/vtkTensor.h \
+  /home/henderson/vtk/common/vtkPointData.h \
+  /home/henderson/vtk/common/vtkGenericCell.h \
+  /home/henderson/vtk/common/vtkCell.h \
+  /home/henderson/vtk/common/vtkCellType.h \
+  /home/henderson/vtk/common/vtkCellTypes.h \
+  /home/henderson/vtk/common/vtkPolyData.h \
+  /home/henderson/vtk/common/vtkPointSet.h \
+  /home/henderson/vtk/common/vtkPointLocator.h \
+  /home/henderson/vtk/common/vtkLocator.h \
+  /home/henderson/vtk/common/vtkCellArray.h \
+  /home/henderson/vtk/common/vtkIntArray.h \
+  /home/henderson/vtk/common/vtkCellLinks.h \
+  /home/henderson/vtk/graphics/vtkRenderer.h \
+  /home/henderson/vtk/graphics/vtkLightCollection.h \
+  /home/henderson/vtk/graphics/vtkLight.h \
+  /home/henderson/vtk/graphics/vtkVolumeCollection.h \
+  /home/henderson/vtk/common/vtkPropCollection.h \
+  /home/henderson/vtk/graphics/vtkCullerCollection.h \
+  /home/henderson/vtk/graphics/vtkCamera.h \
+  /home/henderson/vtk/common/vtkTransform.h \
+  /home/henderson/vtk/common/vtkLinearTransform.h \
+  /home/henderson/vtk/common/vtkHomogenousTransform.h \
+  /home/henderson/vtk/common/vtkPerspectiveTransform.h \
+  /home/henderson/vtk/graphics/vtkActor.h \
+  /home/henderson/vtk/graphics/vtkProp3D.h \
+  /home/henderson/vtk/common/vtkProp.h \
+  /home/henderson/vtk/common/vtkRayCastStructures.h \
+  /home/henderson/vtk/common/vtkAssemblyPaths.h \
+  /home/henderson/vtk/common/vtkAssemblyPath.h \
+  /home/henderson/vtk/graphics/vtkProperty.h \
+  /home/henderson/vtk/graphics/vtkRender.h \
+  /home/henderson/vtk/common/vtkStructuredPoints.h \
+  /home/henderson/vtk/common/vtkImageData.h \
+  /home/henderson/vtk/common/vtkStructuredData.h \
+  /home/henderson/vtk/graphics/vtkTexture.h \
+  /home/henderson/vtk/common/vtkLookupTable.h \
+  /home/henderson/vtk/common/vtkImageToStructuredPoints.h \
+  /home/henderson/vtk/common/vtkSource.h \
+  /home/henderson/vtk/common/vtkActor2D.h \
+  /home/henderson/vtk/common/vtkCoordinate.h \
+  /home/henderson/vtk/common/vtkProperty2D.h \
+  /home/henderson/vtk/common/vtkViewport.h \
+  /home/henderson/vtk/common/vtkActor2DCollection.h \
+  /home/henderson/vtk/graphics/vtkActorCollection.h \
+  ../Widgets/vtkKWLabel.h \
+  ./vtkPVPolyData.h \
+  ./vtkPVMenuButton.h \
+  ../Widgets/vtkKWMenu.h \
+  ../Widgets/vtkKWScale.h \
+  ../Widgets/vtkKWEntry.h \
+  ./vtkPVConeSource.h \
+  /home/henderson/vtk/graphics/vtkConeSource.h \
+  /home/henderson/vtk/graphics/vtkPolyDataSource.h \
+  ./vtkPVApplication.h \
+  ../Widgets/vtkKWApplication.h \
+  /home/henderson/vtk/contrib/vtkMultiProcessController.h \
+  ../Widgets/vtkKWView.h \
+  ../Widgets/vtkKWCompositeCollection.h \
+  /home/henderson/vtk/common/vtkWindow.h \
+  ../Widgets/vtkKWCheckButton.h \
+  ../Widgets/vtkKWGenericComposite.h \
+  /home/henderson/vtk/imaging/vtkTextMapper.h \
+  /home/henderson/vtk/common/vtkMapper2D.h \
+  /home/henderson/vtk/imaging/vtkScaledTextActor.h \
+  ../Widgets/vtkKWOptionMenu.h \
+  ../Widgets/vtkKWText.h \
+  ../Widgets/vtkKWLabeledFrame.h \
+  ../Widgets/vtkKWChangeColorButton.h
 
 vtkPVRenderSlave.o : ./vtkPVRenderSlave.cxx  \
   ./vtkPVRenderSlave.h \
@@ -1439,8 +1892,8 @@ vtkPVWindow.o : ./vtkPVWindow.cxx  \
   /home/henderson/vtk/graphics/vtkRenderWindowInteractor.h \
   /home/henderson/vtk/graphics/vtkAbstractPropPicker.h \
   /home/henderson/vtk/graphics/vtkAbstractPicker.h \
-  /home/henderson/vtk/graphics/vtkOutlineFilter.h \
-  /home/henderson/vtk/graphics/vtkDataSetToPolyDataFilter.h \
+  ./vtkPVComposite.h \
+  /home/henderson/vtk/graphics/vtkOutlineSource.h \
   /home/henderson/vtk/graphics/vtkPolyDataSource.h \
   /home/henderson/vtk/common/vtkPolyData.h \
   /home/henderson/vtk/common/vtkPointSet.h \
@@ -1449,23 +1902,30 @@ vtkPVWindow.o : ./vtkPVWindow.cxx  \
   /home/henderson/vtk/common/vtkCellArray.h \
   /home/henderson/vtk/common/vtkIntArray.h \
   /home/henderson/vtk/common/vtkCellLinks.h \
+  /home/henderson/vtk/graphics/vtkPolyDataMapper.h \
+  ../Widgets/vtkKWLabel.h \
+  ./vtkPVImage.h \
+  ./vtkPVImageReader.h \
+  /home/henderson/vtk/imaging/vtkImageReader.h \
+  /home/henderson/vtk/common/vtkImageSource.h \
+  ./vtkPVPolyDataComposite.h \
+  ./vtkPVPolyData.h \
+  ./vtkPVMenuButton.h \
+  ../Widgets/vtkKWScale.h \
+  ./vtkPVConeSource.h \
+  /home/henderson/vtk/graphics/vtkConeSource.h \
+  /home/henderson/vtk/graphics/vtkOutlineFilter.h \
+  /home/henderson/vtk/graphics/vtkDataSetToPolyDataFilter.h \
   /home/henderson/vtk/common/vtkObjectFactory.h \
   ../Widgets/vtkKWDialog.h \
   ./vtkInteractorStylePlaneSource.h \
   /home/henderson/vtk/graphics/vtkPlaneSource.h \
   /home/henderson/vtk/graphics/vtkSphereSource.h \
-  /home/henderson/vtk/graphics/vtkPolyDataMapper.h \
   ./vtkInteractorStyleCamera.h \
   /home/henderson/vtk/common/vtkMath.h \
-  /home/henderson/vtk/imaging/vtkImageReader.h \
-  /home/henderson/vtk/common/vtkImageSource.h \
-  /home/henderson/vtk/graphics/vtkOutlineSource.h \
   /home/henderson/vtk/patented/vtkSynchronizedTemplates3D.h \
   /home/henderson/vtk/common/vtkContourValues.h \
-  /home/henderson/vtk/common/vtkMultiThreader.h \
-  ../Widgets/vtkKWScale.h \
-  ./vtkPVComposite.h \
-  ../Widgets/vtkKWLabel.h
+  /home/henderson/vtk/common/vtkMultiThreader.h
 
 vtkPVMesaRenderWindow.o : ./vtkPVMesaRenderWindow.cxx  \
   ./vtkPVMesaRenderWindow.h \
@@ -2480,9 +2940,144 @@ tcl/vtkPVCompositeTcl.cxx : ./vtkPVComposite.h /home/henderson/vtk/common/vtkTcl
   /home/henderson/vtk/common/vtkViewport.h \
   /home/henderson/vtk/common/vtkActor2DCollection.h \
   /home/henderson/vtk/graphics/vtkActorCollection.h \
-  ../Widgets/vtkKWLabel.h
+  ../Widgets/vtkKWLabel.h \
+  ./vtkPVImage.h \
+  ./vtkPVImageReader.h \
+  /home/henderson/vtk/imaging/vtkImageReader.h \
+  /home/henderson/vtk/common/vtkImageSource.h
 
-tcl/vtkPVImageTcl.cxx : ./vtkPVImage.h /home/henderson/vtk/common/vtkTclUtil.h /home/henderson/vtk/wrap/vtkParse.y /home/henderson/vtk/wrap/vtkWrapTcl.c
+tcl/vtkPVConeSourceTcl.cxx : ./vtkPVConeSource.h /home/henderson/vtk/common/vtkTclUtil.h /home/henderson/vtk/wrap/vtkParse.y /home/henderson/vtk/wrap/vtkWrapTcl.c \
+  ../Widgets/vtkKWWidget.h \
+  ../Widgets/vtkKWObject.h \
+  /home/henderson/vtk/common/vtkObject.h \
+  /home/henderson/vtk/common/vtkIndent.h \
+  /home/henderson/vtk/common/vtkWin32Header.h \
+  /home/henderson/vtk/common/vtkSystemIncludes.h \
+  /home/henderson/vtk/common/vtkTimeStamp.h \
+  /home/henderson/vtk/common/vtkSetGet.h \
+  ../Widgets/vtkKWSerializer.h \
+  ../Widgets/vtkKWWidgetCollection.h \
+  /home/henderson/vtk/common/vtkCollection.h \
+  ../Widgets/vtkKWLabel.h \
+  /home/henderson/vtk/graphics/vtkConeSource.h \
+  /home/henderson/vtk/graphics/vtkPolyDataSource.h \
+  /home/henderson/vtk/common/vtkSource.h \
+  /home/henderson/vtk/common/vtkProcessObject.h \
+  /home/henderson/vtk/common/vtkDataObject.h \
+  /home/henderson/vtk/common/vtkFieldData.h \
+  /home/henderson/vtk/common/vtkDataArray.h \
+  /home/henderson/vtk/common/vtkIdList.h \
+  /home/henderson/vtk/common/vtkPolyData.h \
+  /home/henderson/vtk/common/vtkPointSet.h \
+  /home/henderson/vtk/common/vtkDataSet.h \
+  /home/henderson/vtk/common/vtkCellData.h \
+  /home/henderson/vtk/common/vtkDataSetAttributes.h \
+  /home/henderson/vtk/common/vtkScalars.h \
+  /home/henderson/vtk/common/vtkAttributeData.h \
+  /home/henderson/vtk/common/vtkVectors.h \
+  /home/henderson/vtk/common/vtkNormals.h \
+  /home/henderson/vtk/common/vtkTCoords.h \
+  /home/henderson/vtk/common/vtkTensors.h \
+  /home/henderson/vtk/common/vtkTensor.h \
+  /home/henderson/vtk/common/vtkPointData.h \
+  /home/henderson/vtk/common/vtkGenericCell.h \
+  /home/henderson/vtk/common/vtkCell.h \
+  /home/henderson/vtk/common/vtkPoints.h \
+  /home/henderson/vtk/common/vtkCellType.h \
+  /home/henderson/vtk/common/vtkCellTypes.h \
+  /home/henderson/vtk/common/vtkPointLocator.h \
+  /home/henderson/vtk/common/vtkLocator.h \
+  /home/henderson/vtk/common/vtkCellArray.h \
+  /home/henderson/vtk/common/vtkIntArray.h \
+  /home/henderson/vtk/common/vtkCellLinks.h
+
+tcl/vtkPVImageTcl.cxx : ./vtkPVImage.h /home/henderson/vtk/common/vtkTclUtil.h /home/henderson/vtk/wrap/vtkParse.y /home/henderson/vtk/wrap/vtkWrapTcl.c \
+  ../Widgets/vtkKWWidget.h \
+  ../Widgets/vtkKWObject.h \
+  /home/henderson/vtk/common/vtkObject.h \
+  /home/henderson/vtk/common/vtkIndent.h \
+  /home/henderson/vtk/common/vtkWin32Header.h \
+  /home/henderson/vtk/common/vtkSystemIncludes.h \
+  /home/henderson/vtk/common/vtkTimeStamp.h \
+  /home/henderson/vtk/common/vtkSetGet.h \
+  ../Widgets/vtkKWSerializer.h \
+  ../Widgets/vtkKWWidgetCollection.h \
+  /home/henderson/vtk/common/vtkCollection.h \
+  /home/henderson/vtk/common/vtkProp.h \
+  /home/henderson/vtk/common/vtkRayCastStructures.h \
+  /home/henderson/vtk/common/vtkAssemblyPaths.h \
+  /home/henderson/vtk/common/vtkAssemblyPath.h \
+  /home/henderson/vtk/common/vtkImageData.h \
+  /home/henderson/vtk/common/vtkDataSet.h \
+  /home/henderson/vtk/common/vtkDataObject.h \
+  /home/henderson/vtk/common/vtkFieldData.h \
+  /home/henderson/vtk/common/vtkDataArray.h \
+  /home/henderson/vtk/common/vtkIdList.h \
+  /home/henderson/vtk/common/vtkCellData.h \
+  /home/henderson/vtk/common/vtkDataSetAttributes.h \
+  /home/henderson/vtk/common/vtkScalars.h \
+  /home/henderson/vtk/common/vtkAttributeData.h \
+  /home/henderson/vtk/common/vtkVectors.h \
+  /home/henderson/vtk/common/vtkNormals.h \
+  /home/henderson/vtk/common/vtkTCoords.h \
+  /home/henderson/vtk/common/vtkTensors.h \
+  /home/henderson/vtk/common/vtkTensor.h \
+  /home/henderson/vtk/common/vtkPointData.h \
+  /home/henderson/vtk/common/vtkGenericCell.h \
+  /home/henderson/vtk/common/vtkCell.h \
+  /home/henderson/vtk/common/vtkPoints.h \
+  /home/henderson/vtk/common/vtkCellType.h \
+  /home/henderson/vtk/common/vtkCellTypes.h \
+  /home/henderson/vtk/common/vtkStructuredData.h \
+  /home/henderson/vtk/graphics/vtkOutlineSource.h \
+  /home/henderson/vtk/graphics/vtkPolyDataSource.h \
+  /home/henderson/vtk/common/vtkSource.h \
+  /home/henderson/vtk/common/vtkProcessObject.h \
+  /home/henderson/vtk/common/vtkPolyData.h \
+  /home/henderson/vtk/common/vtkPointSet.h \
+  /home/henderson/vtk/common/vtkPointLocator.h \
+  /home/henderson/vtk/common/vtkLocator.h \
+  /home/henderson/vtk/common/vtkCellArray.h \
+  /home/henderson/vtk/common/vtkIntArray.h \
+  /home/henderson/vtk/common/vtkCellLinks.h \
+  ../Widgets/vtkKWLabel.h \
+  /home/henderson/vtk/graphics/vtkPolyDataMapper.h \
+  /home/henderson/vtk/graphics/vtkMapper.h \
+  /home/henderson/vtk/graphics/vtkAbstractMapper3D.h \
+  /home/henderson/vtk/common/vtkAbstractMapper.h \
+  /home/henderson/vtk/common/vtkPlaneCollection.h \
+  /home/henderson/vtk/common/vtkPlane.h \
+  /home/henderson/vtk/common/vtkImplicitFunction.h \
+  /home/henderson/vtk/common/vtkAbstractTransform.h \
+  /home/henderson/vtk/common/vtkMatrix4x4.h \
+  /home/henderson/vtk/common/vtkMutexLock.h \
+  /home/henderson/vtk/common/vtkScalarsToColors.h \
+  /home/henderson/vtk/common/vtkUnsignedCharArray.h \
+  /home/henderson/vtk/graphics/vtkRenderer.h \
+  /home/henderson/vtk/graphics/vtkLightCollection.h \
+  /home/henderson/vtk/graphics/vtkLight.h \
+  /home/henderson/vtk/graphics/vtkVolumeCollection.h \
+  /home/henderson/vtk/common/vtkPropCollection.h \
+  /home/henderson/vtk/graphics/vtkCullerCollection.h \
+  /home/henderson/vtk/graphics/vtkCamera.h \
+  /home/henderson/vtk/common/vtkTransform.h \
+  /home/henderson/vtk/common/vtkLinearTransform.h \
+  /home/henderson/vtk/common/vtkHomogenousTransform.h \
+  /home/henderson/vtk/common/vtkPerspectiveTransform.h \
+  /home/henderson/vtk/graphics/vtkActor.h \
+  /home/henderson/vtk/graphics/vtkProp3D.h \
+  /home/henderson/vtk/graphics/vtkProperty.h \
+  /home/henderson/vtk/graphics/vtkRender.h \
+  /home/henderson/vtk/common/vtkStructuredPoints.h \
+  /home/henderson/vtk/graphics/vtkTexture.h \
+  /home/henderson/vtk/common/vtkLookupTable.h \
+  /home/henderson/vtk/common/vtkImageToStructuredPoints.h \
+  /home/henderson/vtk/common/vtkActor2D.h \
+  /home/henderson/vtk/common/vtkCoordinate.h \
+  /home/henderson/vtk/common/vtkProperty2D.h \
+  /home/henderson/vtk/common/vtkViewport.h \
+  /home/henderson/vtk/common/vtkActor2DCollection.h \
+  /home/henderson/vtk/graphics/vtkActorCollection.h
 
 tcl/vtkPVImagePlaneComponentTcl.cxx : ./vtkPVImagePlaneComponent.h /home/henderson/vtk/common/vtkTclUtil.h /home/henderson/vtk/wrap/vtkParse.y /home/henderson/vtk/wrap/vtkWrapTcl.c \
   /home/henderson/vtk/common/vtkImageData.h \
@@ -2555,6 +3150,7 @@ tcl/vtkPVImageReaderTcl.cxx : ./vtkPVImageReader.h /home/henderson/vtk/common/vt
   ../Widgets/vtkKWSerializer.h \
   ../Widgets/vtkKWWidgetCollection.h \
   /home/henderson/vtk/common/vtkCollection.h \
+  ../Widgets/vtkKWLabel.h \
   /home/henderson/vtk/imaging/vtkImageReader.h \
   /home/henderson/vtk/common/vtkImageSource.h \
   /home/henderson/vtk/common/vtkImageData.h \
@@ -2587,6 +3183,206 @@ tcl/vtkPVImageReaderTcl.cxx : ./vtkPVImageReader.h /home/henderson/vtk/common/vt
   /home/henderson/vtk/common/vtkAbstractTransform.h \
   /home/henderson/vtk/common/vtkMatrix4x4.h \
   /home/henderson/vtk/common/vtkMutexLock.h
+
+tcl/vtkPVMenuButtonTcl.cxx : ./vtkPVMenuButton.h /home/henderson/vtk/common/vtkTclUtil.h /home/henderson/vtk/wrap/vtkParse.y /home/henderson/vtk/wrap/vtkWrapTcl.c \
+  ../Widgets/vtkKWMenu.h \
+  ../Widgets/vtkKWWidget.h \
+  ../Widgets/vtkKWObject.h \
+  /home/henderson/vtk/common/vtkObject.h \
+  /home/henderson/vtk/common/vtkIndent.h \
+  /home/henderson/vtk/common/vtkWin32Header.h \
+  /home/henderson/vtk/common/vtkSystemIncludes.h \
+  /home/henderson/vtk/common/vtkTimeStamp.h \
+  /home/henderson/vtk/common/vtkSetGet.h \
+  ../Widgets/vtkKWSerializer.h \
+  ../Widgets/vtkKWWidgetCollection.h \
+  /home/henderson/vtk/common/vtkCollection.h
+
+tcl/vtkPVPolyDataTcl.cxx : ./vtkPVPolyData.h /home/henderson/vtk/common/vtkTclUtil.h /home/henderson/vtk/wrap/vtkParse.y /home/henderson/vtk/wrap/vtkWrapTcl.c \
+  ../Widgets/vtkKWWidget.h \
+  ../Widgets/vtkKWObject.h \
+  /home/henderson/vtk/common/vtkObject.h \
+  /home/henderson/vtk/common/vtkIndent.h \
+  /home/henderson/vtk/common/vtkWin32Header.h \
+  /home/henderson/vtk/common/vtkSystemIncludes.h \
+  /home/henderson/vtk/common/vtkTimeStamp.h \
+  /home/henderson/vtk/common/vtkSetGet.h \
+  ../Widgets/vtkKWSerializer.h \
+  ../Widgets/vtkKWWidgetCollection.h \
+  /home/henderson/vtk/common/vtkCollection.h \
+  /home/henderson/vtk/common/vtkProp.h \
+  /home/henderson/vtk/common/vtkRayCastStructures.h \
+  /home/henderson/vtk/common/vtkAssemblyPaths.h \
+  /home/henderson/vtk/common/vtkAssemblyPath.h \
+  ../Widgets/vtkKWLabel.h \
+  /home/henderson/vtk/graphics/vtkPolyDataMapper.h \
+  /home/henderson/vtk/graphics/vtkMapper.h \
+  /home/henderson/vtk/graphics/vtkAbstractMapper3D.h \
+  /home/henderson/vtk/common/vtkAbstractMapper.h \
+  /home/henderson/vtk/common/vtkProcessObject.h \
+  /home/henderson/vtk/common/vtkDataObject.h \
+  /home/henderson/vtk/common/vtkFieldData.h \
+  /home/henderson/vtk/common/vtkDataArray.h \
+  /home/henderson/vtk/common/vtkIdList.h \
+  /home/henderson/vtk/common/vtkPlaneCollection.h \
+  /home/henderson/vtk/common/vtkPlane.h \
+  /home/henderson/vtk/common/vtkImplicitFunction.h \
+  /home/henderson/vtk/common/vtkAbstractTransform.h \
+  /home/henderson/vtk/common/vtkMatrix4x4.h \
+  /home/henderson/vtk/common/vtkPoints.h \
+  /home/henderson/vtk/common/vtkAttributeData.h \
+  /home/henderson/vtk/common/vtkNormals.h \
+  /home/henderson/vtk/common/vtkVectors.h \
+  /home/henderson/vtk/common/vtkMutexLock.h \
+  /home/henderson/vtk/common/vtkScalarsToColors.h \
+  /home/henderson/vtk/common/vtkUnsignedCharArray.h \
+  /home/henderson/vtk/common/vtkDataSet.h \
+  /home/henderson/vtk/common/vtkCellData.h \
+  /home/henderson/vtk/common/vtkDataSetAttributes.h \
+  /home/henderson/vtk/common/vtkScalars.h \
+  /home/henderson/vtk/common/vtkTCoords.h \
+  /home/henderson/vtk/common/vtkTensors.h \
+  /home/henderson/vtk/common/vtkTensor.h \
+  /home/henderson/vtk/common/vtkPointData.h \
+  /home/henderson/vtk/common/vtkGenericCell.h \
+  /home/henderson/vtk/common/vtkCell.h \
+  /home/henderson/vtk/common/vtkCellType.h \
+  /home/henderson/vtk/common/vtkCellTypes.h \
+  /home/henderson/vtk/common/vtkPolyData.h \
+  /home/henderson/vtk/common/vtkPointSet.h \
+  /home/henderson/vtk/common/vtkPointLocator.h \
+  /home/henderson/vtk/common/vtkLocator.h \
+  /home/henderson/vtk/common/vtkCellArray.h \
+  /home/henderson/vtk/common/vtkIntArray.h \
+  /home/henderson/vtk/common/vtkCellLinks.h \
+  /home/henderson/vtk/graphics/vtkRenderer.h \
+  /home/henderson/vtk/graphics/vtkLightCollection.h \
+  /home/henderson/vtk/graphics/vtkLight.h \
+  /home/henderson/vtk/graphics/vtkVolumeCollection.h \
+  /home/henderson/vtk/common/vtkPropCollection.h \
+  /home/henderson/vtk/graphics/vtkCullerCollection.h \
+  /home/henderson/vtk/graphics/vtkCamera.h \
+  /home/henderson/vtk/common/vtkTransform.h \
+  /home/henderson/vtk/common/vtkLinearTransform.h \
+  /home/henderson/vtk/common/vtkHomogenousTransform.h \
+  /home/henderson/vtk/common/vtkPerspectiveTransform.h \
+  /home/henderson/vtk/graphics/vtkActor.h \
+  /home/henderson/vtk/graphics/vtkProp3D.h \
+  /home/henderson/vtk/graphics/vtkProperty.h \
+  /home/henderson/vtk/graphics/vtkRender.h \
+  /home/henderson/vtk/common/vtkStructuredPoints.h \
+  /home/henderson/vtk/common/vtkImageData.h \
+  /home/henderson/vtk/common/vtkStructuredData.h \
+  /home/henderson/vtk/graphics/vtkTexture.h \
+  /home/henderson/vtk/common/vtkLookupTable.h \
+  /home/henderson/vtk/common/vtkImageToStructuredPoints.h \
+  /home/henderson/vtk/common/vtkSource.h \
+  /home/henderson/vtk/common/vtkActor2D.h \
+  /home/henderson/vtk/common/vtkCoordinate.h \
+  /home/henderson/vtk/common/vtkProperty2D.h \
+  /home/henderson/vtk/common/vtkViewport.h \
+  /home/henderson/vtk/common/vtkActor2DCollection.h \
+  /home/henderson/vtk/graphics/vtkActorCollection.h \
+  ./vtkPVMenuButton.h \
+  ../Widgets/vtkKWMenu.h \
+  ../Widgets/vtkKWScale.h \
+  ../Widgets/vtkKWEntry.h
+
+tcl/vtkPVPolyDataCompositeTcl.cxx : ./vtkPVPolyDataComposite.h /home/henderson/vtk/common/vtkTclUtil.h /home/henderson/vtk/wrap/vtkParse.y /home/henderson/vtk/wrap/vtkWrapTcl.c \
+  ../Widgets/vtkKWComposite.h \
+  ../Widgets/vtkKWNotebook.h \
+  ../Widgets/vtkKWWidget.h \
+  ../Widgets/vtkKWObject.h \
+  /home/henderson/vtk/common/vtkObject.h \
+  /home/henderson/vtk/common/vtkIndent.h \
+  /home/henderson/vtk/common/vtkWin32Header.h \
+  /home/henderson/vtk/common/vtkSystemIncludes.h \
+  /home/henderson/vtk/common/vtkTimeStamp.h \
+  /home/henderson/vtk/common/vtkSetGet.h \
+  ../Widgets/vtkKWSerializer.h \
+  ../Widgets/vtkKWWidgetCollection.h \
+  /home/henderson/vtk/common/vtkCollection.h \
+  /home/henderson/vtk/graphics/vtkPolyDataMapper.h \
+  /home/henderson/vtk/graphics/vtkMapper.h \
+  /home/henderson/vtk/graphics/vtkAbstractMapper3D.h \
+  /home/henderson/vtk/common/vtkAbstractMapper.h \
+  /home/henderson/vtk/common/vtkProcessObject.h \
+  /home/henderson/vtk/common/vtkDataObject.h \
+  /home/henderson/vtk/common/vtkFieldData.h \
+  /home/henderson/vtk/common/vtkDataArray.h \
+  /home/henderson/vtk/common/vtkIdList.h \
+  /home/henderson/vtk/common/vtkPlaneCollection.h \
+  /home/henderson/vtk/common/vtkPlane.h \
+  /home/henderson/vtk/common/vtkImplicitFunction.h \
+  /home/henderson/vtk/common/vtkAbstractTransform.h \
+  /home/henderson/vtk/common/vtkMatrix4x4.h \
+  /home/henderson/vtk/common/vtkPoints.h \
+  /home/henderson/vtk/common/vtkAttributeData.h \
+  /home/henderson/vtk/common/vtkNormals.h \
+  /home/henderson/vtk/common/vtkVectors.h \
+  /home/henderson/vtk/common/vtkMutexLock.h \
+  /home/henderson/vtk/common/vtkScalarsToColors.h \
+  /home/henderson/vtk/common/vtkUnsignedCharArray.h \
+  /home/henderson/vtk/common/vtkDataSet.h \
+  /home/henderson/vtk/common/vtkCellData.h \
+  /home/henderson/vtk/common/vtkDataSetAttributes.h \
+  /home/henderson/vtk/common/vtkScalars.h \
+  /home/henderson/vtk/common/vtkTCoords.h \
+  /home/henderson/vtk/common/vtkTensors.h \
+  /home/henderson/vtk/common/vtkTensor.h \
+  /home/henderson/vtk/common/vtkPointData.h \
+  /home/henderson/vtk/common/vtkGenericCell.h \
+  /home/henderson/vtk/common/vtkCell.h \
+  /home/henderson/vtk/common/vtkCellType.h \
+  /home/henderson/vtk/common/vtkCellTypes.h \
+  /home/henderson/vtk/common/vtkPolyData.h \
+  /home/henderson/vtk/common/vtkPointSet.h \
+  /home/henderson/vtk/common/vtkPointLocator.h \
+  /home/henderson/vtk/common/vtkLocator.h \
+  /home/henderson/vtk/common/vtkCellArray.h \
+  /home/henderson/vtk/common/vtkIntArray.h \
+  /home/henderson/vtk/common/vtkCellLinks.h \
+  /home/henderson/vtk/graphics/vtkRenderer.h \
+  /home/henderson/vtk/graphics/vtkLightCollection.h \
+  /home/henderson/vtk/graphics/vtkLight.h \
+  /home/henderson/vtk/graphics/vtkVolumeCollection.h \
+  /home/henderson/vtk/common/vtkPropCollection.h \
+  /home/henderson/vtk/graphics/vtkCullerCollection.h \
+  /home/henderson/vtk/graphics/vtkCamera.h \
+  /home/henderson/vtk/common/vtkTransform.h \
+  /home/henderson/vtk/common/vtkLinearTransform.h \
+  /home/henderson/vtk/common/vtkHomogenousTransform.h \
+  /home/henderson/vtk/common/vtkPerspectiveTransform.h \
+  /home/henderson/vtk/graphics/vtkActor.h \
+  /home/henderson/vtk/graphics/vtkProp3D.h \
+  /home/henderson/vtk/common/vtkProp.h \
+  /home/henderson/vtk/common/vtkRayCastStructures.h \
+  /home/henderson/vtk/common/vtkAssemblyPaths.h \
+  /home/henderson/vtk/common/vtkAssemblyPath.h \
+  /home/henderson/vtk/graphics/vtkProperty.h \
+  /home/henderson/vtk/graphics/vtkRender.h \
+  /home/henderson/vtk/common/vtkStructuredPoints.h \
+  /home/henderson/vtk/common/vtkImageData.h \
+  /home/henderson/vtk/common/vtkStructuredData.h \
+  /home/henderson/vtk/graphics/vtkTexture.h \
+  /home/henderson/vtk/common/vtkLookupTable.h \
+  /home/henderson/vtk/common/vtkImageToStructuredPoints.h \
+  /home/henderson/vtk/common/vtkSource.h \
+  /home/henderson/vtk/common/vtkActor2D.h \
+  /home/henderson/vtk/common/vtkCoordinate.h \
+  /home/henderson/vtk/common/vtkProperty2D.h \
+  /home/henderson/vtk/common/vtkViewport.h \
+  /home/henderson/vtk/common/vtkActor2DCollection.h \
+  /home/henderson/vtk/graphics/vtkActorCollection.h \
+  ../Widgets/vtkKWLabel.h \
+  ./vtkPVPolyData.h \
+  ./vtkPVMenuButton.h \
+  ../Widgets/vtkKWMenu.h \
+  ../Widgets/vtkKWScale.h \
+  ../Widgets/vtkKWEntry.h \
+  ./vtkPVConeSource.h \
+  /home/henderson/vtk/graphics/vtkConeSource.h \
+  /home/henderson/vtk/graphics/vtkPolyDataSource.h
 
 tcl/vtkPVRenderSlaveTcl.cxx : ./vtkPVRenderSlave.h /home/henderson/vtk/common/vtkTclUtil.h /home/henderson/vtk/wrap/vtkParse.y /home/henderson/vtk/wrap/vtkWrapTcl.c \
   ../Widgets/vtkKWObject.h \
@@ -2890,7 +3686,29 @@ tcl/vtkPVWindowTcl.cxx : ./vtkPVWindow.h /home/henderson/vtk/common/vtkTclUtil.h
   /home/henderson/vtk/graphics/vtkInteractorStyle.h \
   /home/henderson/vtk/graphics/vtkRenderWindowInteractor.h \
   /home/henderson/vtk/graphics/vtkAbstractPropPicker.h \
-  /home/henderson/vtk/graphics/vtkAbstractPicker.h
+  /home/henderson/vtk/graphics/vtkAbstractPicker.h \
+  ./vtkPVComposite.h \
+  /home/henderson/vtk/graphics/vtkOutlineSource.h \
+  /home/henderson/vtk/graphics/vtkPolyDataSource.h \
+  /home/henderson/vtk/common/vtkPolyData.h \
+  /home/henderson/vtk/common/vtkPointSet.h \
+  /home/henderson/vtk/common/vtkPointLocator.h \
+  /home/henderson/vtk/common/vtkLocator.h \
+  /home/henderson/vtk/common/vtkCellArray.h \
+  /home/henderson/vtk/common/vtkIntArray.h \
+  /home/henderson/vtk/common/vtkCellLinks.h \
+  /home/henderson/vtk/graphics/vtkPolyDataMapper.h \
+  ../Widgets/vtkKWLabel.h \
+  ./vtkPVImage.h \
+  ./vtkPVImageReader.h \
+  /home/henderson/vtk/imaging/vtkImageReader.h \
+  /home/henderson/vtk/common/vtkImageSource.h \
+  ./vtkPVPolyDataComposite.h \
+  ./vtkPVPolyData.h \
+  ./vtkPVMenuButton.h \
+  ../Widgets/vtkKWScale.h \
+  ./vtkPVConeSource.h \
+  /home/henderson/vtk/graphics/vtkConeSource.h
 
 tcl/vtkPVMesaRenderWindowTcl.cxx : ./vtkPVMesaRenderWindow.h /home/henderson/vtk/common/vtkTclUtil.h /home/henderson/vtk/wrap/vtkParse.y /home/henderson/vtk/wrap/vtkWrapTcl.c \
   /home/henderson/vtk/graphics/vtkRenderWindow.h \
@@ -3072,9 +3890,13 @@ vtkInteractorStyleSphere.o \
 vtkKWRenderView.o \
 vtkPVApplication.o \
 vtkPVComposite.o \
+vtkPVConeSource.o \
 vtkPVImage.o \
 vtkPVImagePlaneComponent.o \
 vtkPVImageReader.o \
+vtkPVMenuButton.o \
+vtkPVPolyData.o \
+vtkPVPolyDataComposite.o \
 vtkPVRenderSlave.o \
 vtkPVRenderView.o \
 vtkPVSlave.o \
@@ -3093,9 +3915,13 @@ tcl/vtkInteractorStyleSphereTcl.o \
 tcl/vtkKWRenderViewTcl.o \
 tcl/vtkPVApplicationTcl.o \
 tcl/vtkPVCompositeTcl.o \
+tcl/vtkPVConeSourceTcl.o \
 tcl/vtkPVImageTcl.o \
 tcl/vtkPVImagePlaneComponentTcl.o \
 tcl/vtkPVImageReaderTcl.o \
+tcl/vtkPVMenuButtonTcl.o \
+tcl/vtkPVPolyDataTcl.o \
+tcl/vtkPVPolyDataCompositeTcl.o \
 tcl/vtkPVRenderSlaveTcl.o \
 tcl/vtkPVRenderViewTcl.o \
 tcl/vtkPVSlaveTcl.o \
@@ -3114,9 +3940,13 @@ vtkInteractorStyleSphere.h \
 vtkKWRenderView.h \
 vtkPVApplication.h \
 vtkPVComposite.h \
+vtkPVConeSource.h \
 vtkPVImage.h \
 vtkPVImagePlaneComponent.h \
 vtkPVImageReader.h \
+vtkPVMenuButton.h \
+vtkPVPolyData.h \
+vtkPVPolyDataComposite.h \
 vtkPVRenderSlave.h \
 vtkPVRenderView.h \
 vtkPVSlave.h \
@@ -3143,12 +3973,20 @@ tcl/vtkPVApplicationTcl.cxx: vtkPVApplication.h ${VTK_OBJ}/wrap/vtkWrapTcl ../wr
 	rm -f tcl/vtkPVApplicationTcl.cxx; ${VTK_OBJ}/wrap/vtkWrapTcl ${srcdir}/vtkPVApplication.h ${srcdir}/../wrap/hints 1 > tcl/vtkPVApplicationTcl.cxx
 tcl/vtkPVCompositeTcl.cxx: vtkPVComposite.h ${VTK_OBJ}/wrap/vtkWrapTcl ../wrap/hints
 	rm -f tcl/vtkPVCompositeTcl.cxx; ${VTK_OBJ}/wrap/vtkWrapTcl ${srcdir}/vtkPVComposite.h ${srcdir}/../wrap/hints 1 > tcl/vtkPVCompositeTcl.cxx
+tcl/vtkPVConeSourceTcl.cxx: vtkPVConeSource.h ${VTK_OBJ}/wrap/vtkWrapTcl ../wrap/hints
+	rm -f tcl/vtkPVConeSourceTcl.cxx; ${VTK_OBJ}/wrap/vtkWrapTcl ${srcdir}/vtkPVConeSource.h ${srcdir}/../wrap/hints 1 > tcl/vtkPVConeSourceTcl.cxx
 tcl/vtkPVImageTcl.cxx: vtkPVImage.h ${VTK_OBJ}/wrap/vtkWrapTcl ../wrap/hints
 	rm -f tcl/vtkPVImageTcl.cxx; ${VTK_OBJ}/wrap/vtkWrapTcl ${srcdir}/vtkPVImage.h ${srcdir}/../wrap/hints 1 > tcl/vtkPVImageTcl.cxx
 tcl/vtkPVImagePlaneComponentTcl.cxx: vtkPVImagePlaneComponent.h ${VTK_OBJ}/wrap/vtkWrapTcl ../wrap/hints
 	rm -f tcl/vtkPVImagePlaneComponentTcl.cxx; ${VTK_OBJ}/wrap/vtkWrapTcl ${srcdir}/vtkPVImagePlaneComponent.h ${srcdir}/../wrap/hints 1 > tcl/vtkPVImagePlaneComponentTcl.cxx
 tcl/vtkPVImageReaderTcl.cxx: vtkPVImageReader.h ${VTK_OBJ}/wrap/vtkWrapTcl ../wrap/hints
 	rm -f tcl/vtkPVImageReaderTcl.cxx; ${VTK_OBJ}/wrap/vtkWrapTcl ${srcdir}/vtkPVImageReader.h ${srcdir}/../wrap/hints 1 > tcl/vtkPVImageReaderTcl.cxx
+tcl/vtkPVMenuButtonTcl.cxx: vtkPVMenuButton.h ${VTK_OBJ}/wrap/vtkWrapTcl ../wrap/hints
+	rm -f tcl/vtkPVMenuButtonTcl.cxx; ${VTK_OBJ}/wrap/vtkWrapTcl ${srcdir}/vtkPVMenuButton.h ${srcdir}/../wrap/hints 1 > tcl/vtkPVMenuButtonTcl.cxx
+tcl/vtkPVPolyDataTcl.cxx: vtkPVPolyData.h ${VTK_OBJ}/wrap/vtkWrapTcl ../wrap/hints
+	rm -f tcl/vtkPVPolyDataTcl.cxx; ${VTK_OBJ}/wrap/vtkWrapTcl ${srcdir}/vtkPVPolyData.h ${srcdir}/../wrap/hints 1 > tcl/vtkPVPolyDataTcl.cxx
+tcl/vtkPVPolyDataCompositeTcl.cxx: vtkPVPolyDataComposite.h ${VTK_OBJ}/wrap/vtkWrapTcl ../wrap/hints
+	rm -f tcl/vtkPVPolyDataCompositeTcl.cxx; ${VTK_OBJ}/wrap/vtkWrapTcl ${srcdir}/vtkPVPolyDataComposite.h ${srcdir}/../wrap/hints 1 > tcl/vtkPVPolyDataCompositeTcl.cxx
 tcl/vtkPVRenderSlaveTcl.cxx: vtkPVRenderSlave.h ${VTK_OBJ}/wrap/vtkWrapTcl ../wrap/hints
 	rm -f tcl/vtkPVRenderSlaveTcl.cxx; ${VTK_OBJ}/wrap/vtkWrapTcl ${srcdir}/vtkPVRenderSlave.h ${srcdir}/../wrap/hints 1 > tcl/vtkPVRenderSlaveTcl.cxx
 tcl/vtkPVRenderViewTcl.cxx: vtkPVRenderView.h ${VTK_OBJ}/wrap/vtkWrapTcl ../wrap/hints
@@ -3172,9 +4010,13 @@ JAVA_CLASSES = \
 ../java/vtk/vtkKWRenderView.java \
 ../java/vtk/vtkPVApplication.java \
 ../java/vtk/vtkPVComposite.java \
+../java/vtk/vtkPVConeSource.java \
 ../java/vtk/vtkPVImage.java \
 ../java/vtk/vtkPVImagePlaneComponent.java \
 ../java/vtk/vtkPVImageReader.java \
+../java/vtk/vtkPVMenuButton.java \
+../java/vtk/vtkPVPolyData.java \
+../java/vtk/vtkPVPolyDataComposite.java \
 ../java/vtk/vtkPVRenderSlave.java \
 ../java/vtk/vtkPVRenderView.java \
 ../java/vtk/vtkPVSlave.java \
@@ -3193,9 +4035,13 @@ JAVA_CODE = \
 ../java/vtk/vtkKWRenderView.class \
 ../java/vtk/vtkPVApplication.class \
 ../java/vtk/vtkPVComposite.class \
+../java/vtk/vtkPVConeSource.class \
 ../java/vtk/vtkPVImage.class \
 ../java/vtk/vtkPVImagePlaneComponent.class \
 ../java/vtk/vtkPVImageReader.class \
+../java/vtk/vtkPVMenuButton.class \
+../java/vtk/vtkPVPolyData.class \
+../java/vtk/vtkPVPolyDataComposite.class \
 ../java/vtk/vtkPVRenderSlave.class \
 ../java/vtk/vtkPVRenderView.class \
 ../java/vtk/vtkPVSlave.class \
@@ -3214,9 +4060,13 @@ java/vtkInteractorStyleSphereJava.o \
 java/vtkKWRenderViewJava.o \
 java/vtkPVApplicationJava.o \
 java/vtkPVCompositeJava.o \
+java/vtkPVConeSourceJava.o \
 java/vtkPVImageJava.o \
 java/vtkPVImagePlaneComponentJava.o \
 java/vtkPVImageReaderJava.o \
+java/vtkPVMenuButtonJava.o \
+java/vtkPVPolyDataJava.o \
+java/vtkPVPolyDataCompositeJava.o \
 java/vtkPVRenderSlaveJava.o \
 java/vtkPVRenderViewJava.o \
 java/vtkPVSlaveJava.o \
@@ -3264,6 +4114,10 @@ java/vtkPVApplicationJava.cxx: vtkPVApplication.h ${VTK_OBJ}/wrap/vtkWrapJava ..
 	rm -f ../java/vtk/vtkPVComposite.java; ${VTK_OBJ}/wrap/vtkParseJava ${srcdir}/vtkPVComposite.h ${srcdir}/../wrap/hints 1 > ../java/vtk/vtkPVComposite.java
 java/vtkPVCompositeJava.cxx: vtkPVComposite.h ${VTK_OBJ}/wrap/vtkWrapJava ../wrap/hints
 	rm -f java/vtkPVCompositeJava.cxx; ${VTK_OBJ}/wrap/vtkWrapJava ${srcdir}/vtkPVComposite.h ${srcdir}/../wrap/hints 1 > java/vtkPVCompositeJava.cxx
+../java/vtk/vtkPVConeSource.java: vtkPVConeSource.h ${VTK_OBJ}/wrap/vtkParseJava ../wrap/hints
+	rm -f ../java/vtk/vtkPVConeSource.java; ${VTK_OBJ}/wrap/vtkParseJava ${srcdir}/vtkPVConeSource.h ${srcdir}/../wrap/hints 1 > ../java/vtk/vtkPVConeSource.java
+java/vtkPVConeSourceJava.cxx: vtkPVConeSource.h ${VTK_OBJ}/wrap/vtkWrapJava ../wrap/hints
+	rm -f java/vtkPVConeSourceJava.cxx; ${VTK_OBJ}/wrap/vtkWrapJava ${srcdir}/vtkPVConeSource.h ${srcdir}/../wrap/hints 1 > java/vtkPVConeSourceJava.cxx
 ../java/vtk/vtkPVImage.java: vtkPVImage.h ${VTK_OBJ}/wrap/vtkParseJava ../wrap/hints
 	rm -f ../java/vtk/vtkPVImage.java; ${VTK_OBJ}/wrap/vtkParseJava ${srcdir}/vtkPVImage.h ${srcdir}/../wrap/hints 1 > ../java/vtk/vtkPVImage.java
 java/vtkPVImageJava.cxx: vtkPVImage.h ${VTK_OBJ}/wrap/vtkWrapJava ../wrap/hints
@@ -3276,6 +4130,18 @@ java/vtkPVImagePlaneComponentJava.cxx: vtkPVImagePlaneComponent.h ${VTK_OBJ}/wra
 	rm -f ../java/vtk/vtkPVImageReader.java; ${VTK_OBJ}/wrap/vtkParseJava ${srcdir}/vtkPVImageReader.h ${srcdir}/../wrap/hints 1 > ../java/vtk/vtkPVImageReader.java
 java/vtkPVImageReaderJava.cxx: vtkPVImageReader.h ${VTK_OBJ}/wrap/vtkWrapJava ../wrap/hints
 	rm -f java/vtkPVImageReaderJava.cxx; ${VTK_OBJ}/wrap/vtkWrapJava ${srcdir}/vtkPVImageReader.h ${srcdir}/../wrap/hints 1 > java/vtkPVImageReaderJava.cxx
+../java/vtk/vtkPVMenuButton.java: vtkPVMenuButton.h ${VTK_OBJ}/wrap/vtkParseJava ../wrap/hints
+	rm -f ../java/vtk/vtkPVMenuButton.java; ${VTK_OBJ}/wrap/vtkParseJava ${srcdir}/vtkPVMenuButton.h ${srcdir}/../wrap/hints 1 > ../java/vtk/vtkPVMenuButton.java
+java/vtkPVMenuButtonJava.cxx: vtkPVMenuButton.h ${VTK_OBJ}/wrap/vtkWrapJava ../wrap/hints
+	rm -f java/vtkPVMenuButtonJava.cxx; ${VTK_OBJ}/wrap/vtkWrapJava ${srcdir}/vtkPVMenuButton.h ${srcdir}/../wrap/hints 1 > java/vtkPVMenuButtonJava.cxx
+../java/vtk/vtkPVPolyData.java: vtkPVPolyData.h ${VTK_OBJ}/wrap/vtkParseJava ../wrap/hints
+	rm -f ../java/vtk/vtkPVPolyData.java; ${VTK_OBJ}/wrap/vtkParseJava ${srcdir}/vtkPVPolyData.h ${srcdir}/../wrap/hints 1 > ../java/vtk/vtkPVPolyData.java
+java/vtkPVPolyDataJava.cxx: vtkPVPolyData.h ${VTK_OBJ}/wrap/vtkWrapJava ../wrap/hints
+	rm -f java/vtkPVPolyDataJava.cxx; ${VTK_OBJ}/wrap/vtkWrapJava ${srcdir}/vtkPVPolyData.h ${srcdir}/../wrap/hints 1 > java/vtkPVPolyDataJava.cxx
+../java/vtk/vtkPVPolyDataComposite.java: vtkPVPolyDataComposite.h ${VTK_OBJ}/wrap/vtkParseJava ../wrap/hints
+	rm -f ../java/vtk/vtkPVPolyDataComposite.java; ${VTK_OBJ}/wrap/vtkParseJava ${srcdir}/vtkPVPolyDataComposite.h ${srcdir}/../wrap/hints 1 > ../java/vtk/vtkPVPolyDataComposite.java
+java/vtkPVPolyDataCompositeJava.cxx: vtkPVPolyDataComposite.h ${VTK_OBJ}/wrap/vtkWrapJava ../wrap/hints
+	rm -f java/vtkPVPolyDataCompositeJava.cxx; ${VTK_OBJ}/wrap/vtkWrapJava ${srcdir}/vtkPVPolyDataComposite.h ${srcdir}/../wrap/hints 1 > java/vtkPVPolyDataCompositeJava.cxx
 ../java/vtk/vtkPVRenderSlave.java: vtkPVRenderSlave.h ${VTK_OBJ}/wrap/vtkParseJava ../wrap/hints
 	rm -f ../java/vtk/vtkPVRenderSlave.java; ${VTK_OBJ}/wrap/vtkParseJava ${srcdir}/vtkPVRenderSlave.h ${srcdir}/../wrap/hints 1 > ../java/vtk/vtkPVRenderSlave.java
 java/vtkPVRenderSlaveJava.cxx: vtkPVRenderSlave.h ${VTK_OBJ}/wrap/vtkWrapJava ../wrap/hints
@@ -3311,9 +4177,13 @@ python/vtkInteractorStyleSpherePython.o \
 python/vtkKWRenderViewPython.o \
 python/vtkPVApplicationPython.o \
 python/vtkPVCompositePython.o \
+python/vtkPVConeSourcePython.o \
 python/vtkPVImagePython.o \
 python/vtkPVImagePlaneComponentPython.o \
 python/vtkPVImageReaderPython.o \
+python/vtkPVMenuButtonPython.o \
+python/vtkPVPolyDataPython.o \
+python/vtkPVPolyDataCompositePython.o \
 python/vtkPVRenderSlavePython.o \
 python/vtkPVRenderViewPython.o \
 python/vtkPVSlavePython.o \
@@ -3341,12 +4211,20 @@ python/vtkPVApplicationPython.cxx: vtkPVApplication.h ${VTK_OBJ}/wrap/vtkWrapPyt
 	rm -f python/vtkPVApplicationPython.cxx; ${VTK_OBJ}/wrap/vtkWrapPython ${srcdir}/vtkPVApplication.h ${srcdir}/../wrap/hints 0 > python/vtkPVApplicationPython.cxx
 python/vtkPVCompositePython.cxx: vtkPVComposite.h ${VTK_OBJ}/wrap/vtkWrapPython ../wrap/hints
 	rm -f python/vtkPVCompositePython.cxx; ${VTK_OBJ}/wrap/vtkWrapPython ${srcdir}/vtkPVComposite.h ${srcdir}/../wrap/hints 0 > python/vtkPVCompositePython.cxx
+python/vtkPVConeSourcePython.cxx: vtkPVConeSource.h ${VTK_OBJ}/wrap/vtkWrapPython ../wrap/hints
+	rm -f python/vtkPVConeSourcePython.cxx; ${VTK_OBJ}/wrap/vtkWrapPython ${srcdir}/vtkPVConeSource.h ${srcdir}/../wrap/hints 0 > python/vtkPVConeSourcePython.cxx
 python/vtkPVImagePython.cxx: vtkPVImage.h ${VTK_OBJ}/wrap/vtkWrapPython ../wrap/hints
 	rm -f python/vtkPVImagePython.cxx; ${VTK_OBJ}/wrap/vtkWrapPython ${srcdir}/vtkPVImage.h ${srcdir}/../wrap/hints 0 > python/vtkPVImagePython.cxx
 python/vtkPVImagePlaneComponentPython.cxx: vtkPVImagePlaneComponent.h ${VTK_OBJ}/wrap/vtkWrapPython ../wrap/hints
 	rm -f python/vtkPVImagePlaneComponentPython.cxx; ${VTK_OBJ}/wrap/vtkWrapPython ${srcdir}/vtkPVImagePlaneComponent.h ${srcdir}/../wrap/hints 0 > python/vtkPVImagePlaneComponentPython.cxx
 python/vtkPVImageReaderPython.cxx: vtkPVImageReader.h ${VTK_OBJ}/wrap/vtkWrapPython ../wrap/hints
 	rm -f python/vtkPVImageReaderPython.cxx; ${VTK_OBJ}/wrap/vtkWrapPython ${srcdir}/vtkPVImageReader.h ${srcdir}/../wrap/hints 0 > python/vtkPVImageReaderPython.cxx
+python/vtkPVMenuButtonPython.cxx: vtkPVMenuButton.h ${VTK_OBJ}/wrap/vtkWrapPython ../wrap/hints
+	rm -f python/vtkPVMenuButtonPython.cxx; ${VTK_OBJ}/wrap/vtkWrapPython ${srcdir}/vtkPVMenuButton.h ${srcdir}/../wrap/hints 0 > python/vtkPVMenuButtonPython.cxx
+python/vtkPVPolyDataPython.cxx: vtkPVPolyData.h ${VTK_OBJ}/wrap/vtkWrapPython ../wrap/hints
+	rm -f python/vtkPVPolyDataPython.cxx; ${VTK_OBJ}/wrap/vtkWrapPython ${srcdir}/vtkPVPolyData.h ${srcdir}/../wrap/hints 0 > python/vtkPVPolyDataPython.cxx
+python/vtkPVPolyDataCompositePython.cxx: vtkPVPolyDataComposite.h ${VTK_OBJ}/wrap/vtkWrapPython ../wrap/hints
+	rm -f python/vtkPVPolyDataCompositePython.cxx; ${VTK_OBJ}/wrap/vtkWrapPython ${srcdir}/vtkPVPolyDataComposite.h ${srcdir}/../wrap/hints 0 > python/vtkPVPolyDataCompositePython.cxx
 python/vtkPVRenderSlavePython.cxx: vtkPVRenderSlave.h ${VTK_OBJ}/wrap/vtkWrapPython ../wrap/hints
 	rm -f python/vtkPVRenderSlavePython.cxx; ${VTK_OBJ}/wrap/vtkWrapPython ${srcdir}/vtkPVRenderSlave.h ${srcdir}/../wrap/hints 0 > python/vtkPVRenderSlavePython.cxx
 python/vtkPVRenderViewPython.cxx: vtkPVRenderView.h ${VTK_OBJ}/wrap/vtkWrapPython ../wrap/hints

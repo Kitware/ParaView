@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   Visualization Toolkit
-  Module:    vtkPVComposite.h
+  Module:    vtkPVPolyData.h
   Language:  C++
   Date:      $Date$
   Version:   $Revision$
@@ -25,55 +25,53 @@ PARTICULAR PURPOSE, AND NON-INFRINGEMENT.  THIS SOFTWARE IS PROVIDED ON AN
 MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 =========================================================================*/
-// .NAME vtkPVComposite - an element in a view containing props / properties
-// .SECTION Description
-// A composite represents an element in the view. It is very similar to
-// the notion of an actor in a renderer. The composite is different in 
-// that it combines the Actor (vtkProp actually) with some user interface
-// code called the properties, and it may also contain more complex
-// elements such as filters etc.
 
-#ifndef __vtkPVComposite_h
-#define __vtkPVComposite_h
+#ifndef __vtkPVPolyData_h
+#define __vtkPVPolyData_h
 
-#include "vtkKWComposite.h"
-#include "vtkOutlineSource.h"
-#include "vtkPolyDataMapper.h"
-#include "vtkActor.h"
+#include "vtkKWWidget.h"
+#include "vtkProp.h"
 #include "vtkKWLabel.h"
-#include "vtkPVImage.h"
-#include "vtkPVImageReader.h"
+#include "vtkPolyDataMapper.h"
+#include "vtkPVMenuButton.h"
+#include "vtkKWScale.h"
+#include "vtkActor.h"
 
-class VTK_EXPORT vtkPVComposite : public vtkKWComposite
+class vtkPVPolyDataComposite;
+
+class VTK_EXPORT vtkPVPolyData : public vtkKWWidget
 {
 public:
-  static vtkPVComposite* New();
+  static vtkPVPolyData* New();
+  vtkTypeMacro(vtkPVPolyData, vtkKWWidget);
   
-  // Description:
-  // Get the Prop for this class.
-  virtual vtkProp *GetProp();
+  void Create(vtkKWApplication *app, char *args);
 
-  // Description:
-  // Create the properties object, called by InitializeProperties.
-  virtual void CreateProperties(vtkKWApplication *app, char *args);
+  vtkProp* GetProp();
 
-  void SetPropertiesParent(vtkKWWidget *parent);
-  vtkKWWidget *GetPropertiesParent();
-  vtkKWWidget *GetProperties();
+  vtkSetObjectMacro(PolyData, vtkPolyData);
+  vtkGetObjectMacro(PolyData, vtkPolyData);
+
+  void SetupShrink();
+  void Shrink();
   
-  void Select(vtkKWView *);
-  void Deselect(vtkKWView *);
+  void SetComposite(vtkPVPolyDataComposite *pvComp);
   
 protected:
-  vtkPVComposite();
-  ~vtkPVComposite();
-  
-  vtkKWNotebook *Notebook;
-  vtkPVImage *Image;
-  vtkPVImageReader *ImageReader;
+  vtkPVPolyData();
+  ~vtkPVPolyData();
+  vtkPVPolyData(const vtkPVPolyData&) {};
+  void operator=(const vtkPVPolyData&) {};
+
+  vtkKWLabel *Label;
+  vtkPVMenuButton *FiltersMenuButton;
+  vtkKWScale *ShrinkFactorScale;
+  vtkKWWidget *Accept;
+  vtkPolyData *PolyData;
+  vtkPolyDataMapper *Mapper;
   vtkActor *Actor;
-  
-  int NotebookCreated;
+  vtkPVPolyDataComposite *Comp;
 };
 
 #endif
+

@@ -46,6 +46,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkKWScale.h"
 
 #include "vtkPVComposite.h"
+#include "vtkPVPolyDataComposite.h"
 
 //----------------------------------------------------------------------------
 vtkPVWindow* vtkPVWindow::New()
@@ -271,7 +272,32 @@ void vtkPVWindow::SetCurrentDataComposite(vtkPVComposite *comp)
 }
 
 
-
+void vtkPVWindow::SetCurrentDataComposite(vtkPVPolyDataComposite *pdcomp)
+{
+  if (pdcomp->GetPropertiesParent() != this->GetDataPropertiesParent())
+    {
+    vtkErrorMacro("CurrentComposites must use our DataPropertiesParent.");
+    return;
+    }
+  
+  if (this->CurrentDataComposite)
+    {
+    this->CurrentDataComposite->Deselect(this->MainView);
+    this->CurrentDataComposite->UnRegister(this);
+    this->CurrentDataComposite = NULL;
+    this->Script("catch {eval pack forget [pack slaves %s]}",
+		 this->GetDataPropertiesParent()->GetWidgetName());
+    }
+  
+  if (pdcomp)
+    {
+    this->CurrentDataComposite = pdcomp;
+    pdcomp->Select(this->MainView);
+    pdcomp->Register(this);
+    this->Script("pack %s -side top -anchor w -padx 2 -pady 2 -expand yes -fill x",
+		 pdcomp->GetProperties()->GetWidgetName());
+    }
+}
 
 
 
@@ -316,12 +342,29 @@ void vtkPVWindow::SetupCone()
   this->MainView->ResetCamera();
 }
 
+void vtkPVWindow::NewCone()
+{
+  vtkPVApplication *pvApp = (vtkPVApplication *)this->Application;
+  vtkPVPolyDataComposite *pdcomp;
+  
+  pdcomp = vtkPVPolyDataComposite::New();
+  pdcomp->SetTabLabels("PolyData", "ConeSource");
+  pdcomp->SetPropertiesParent(this->GetDataPropertiesParent());
+  pdcomp->CreateProperties(pvApp, "");
+  this->MainView->AddComposite(pdcomp);
+  pdcomp->SetWindow(this);
+  this->SetCurrentDataComposite(pdcomp);
+  pdcomp->Delete();
+  
+  this->MainView->ResetCamera();
+  
+  this->MainView->Render();
+}
 
 //----------------------------------------------------------------------------
 // Setup the pipeline
 void vtkPVWindow::NewVolume()
 {
-  int id, num;
   vtkPVApplication *pvApp = (vtkPVApplication *)this->Application;
   vtkPVComposite *comp;
   

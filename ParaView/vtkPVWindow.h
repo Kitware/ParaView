@@ -36,6 +36,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkKWWindow.h"
 #include "vtkPVRenderView.h"
 #include "vtkPVComposite.h"
+#include "vtkPVPolyDataComposite.h"
 class vtkKWNotebook;
 class vtkKWToolbar;
 class vtkKWScale;
@@ -55,7 +56,8 @@ public:
   virtual void NewWindow();
   virtual void Save();
   virtual void NewVolume();
-
+  virtual void NewCone();
+  
   // Description:
   // Chaining method to serialize an object and its superclasses.
   virtual void SerializeSelf(ostream& os, vtkIndent indent);
@@ -75,7 +77,7 @@ public:
   void ZPlaneChanged();
   
   void SetCurrentDataComposite(vtkPVComposite *comp);
-  
+  void SetCurrentDataComposite(vtkPVPolyDataComposite *pdcomp);
   
 protected:
   vtkPVWindow();
@@ -99,7 +101,7 @@ protected:
   int DataPropertiesFrameCreated;
   void CreateDataPropertiesFrame();
 
-  vtkPVComposite *CurrentDataComposite;
+  vtkKWComposite *CurrentDataComposite;
   
   vtkKWScale *IsoScale;
   vtkKWScale *XPlaneScale;
@@ -108,5 +110,3 @@ protected:
 
 
 #endif
-
-

@@ -27,6 +27,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 =========================================================================*/
 #include "vtkPVImage.h"
 #include "vtkMath.h"
+#include "vtkPVComposite.h"
 
 vtkPVImage::vtkPVImage()
 {
@@ -41,6 +42,8 @@ vtkPVImage::vtkPVImage()
   this->Outline->SetBounds(0, 255, 0, 255, 0, 92 * 1.8);
   this->Mapper->SetInput(Outline->GetOutput());
   this->Actor->SetMapper(Mapper);
+  
+  this->Comp = vtkPVComposite::New();
 }
 
 vtkPVImage::~vtkPVImage()
@@ -89,4 +92,7 @@ vtkProp* vtkPVImage::GetProp()
   return this->Actor;
 }
 
-
+void vtkPVImage::SetComposite(vtkPVComposite *comp)
+{
+  this->Comp = comp;
+}
