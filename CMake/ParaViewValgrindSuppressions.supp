@@ -2476,3 +2476,21 @@
    fun:malloc
    fun:XtMalloc
 }
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:malloc
+   fun:dice_yyalloc
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:calloc
+   fun:H5MM_calloc
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:malloc
+   fun:H5MM_malloc
+}
