@@ -197,7 +197,6 @@ class VTK_EXPORT vtkKWEvent
     WindowLayoutChangedEvent,
     WindowLevelChangedEvent,
     WindowLevelChangingEvent,
-    WindowLevelEndEvent,
     WindowLevelResetEvent,
     // PV
     ErrorMessageEvent,
