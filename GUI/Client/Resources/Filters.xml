@@ -394,10 +394,10 @@ The line can be specified interactively using the 3D line widget. See section 7.
   </Module>
 <!-- #ifdef PARAVIEW_BUILD_DEVELOPMENT-->
   <Module name="CTHPartAMR"
-          menu_name="Extract CTH Parts"
+          menu_name="Extract AMR CTH Parts"
           root_name="CTHPartAMR"
           module_type="Filter"
-          long_help="Create a surface from a CTH volume fraction."
+          long_help="Create a surface from a AMR CTH volume fraction."
           short_help="Extract a part from a CTH dataset.">
     <Filter class="vtkCTHExtractAMRPart">
       <Input name="Input"
@@ -414,12 +414,12 @@ The line can be specified interactively using the 3D line widget. See section 7.
                      help="Select the volume fraction arrays for generating parts."/>
     <SelectWidget variable="ClipPlane"
                   trace_name="Clipping" type="object">
-      <Item label="On">
+      <Item label="On" value="On">
         <ImplicitPlaneWidget use_label="0" trace_name="Plane"
                              input_menu="im"
                              help="Adjusts the parameters of the plane to clip with."/>
       </Item>
-      <Item label="Off">
+      <Item label="Off" value="Off">
         <DummyWidget trace_name="Dummy"/>
       </Item>
     </SelectWidget>
