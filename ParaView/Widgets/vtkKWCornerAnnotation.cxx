@@ -45,7 +45,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkObjectFactory.h"
 #include "vtkCornerAnnotation.h"
 #include "vtkKWApplication.h"
-#include "vtkKWEventNotifier.h"
 
 //-----------------------------------------------------------------------------
 vtkKWCornerAnnotation* vtkKWCornerAnnotation::New()
@@ -105,10 +104,6 @@ vtkKWCornerAnnotation::vtkKWCornerAnnotation()
 
 vtkKWCornerAnnotation::~vtkKWCornerAnnotation()
 {
-  if (this->Application)
-    {
-    this->Application->GetEventNotifier()->RemoveCallbacks(this);
-    }
   this->SetMasterCornerAnnotation(NULL);
   
   this->CornerDisplayFrame->Delete();
@@ -216,19 +211,6 @@ void vtkKWCornerAnnotation::Create(vtkKWApplication *app)
   this->CornerLabel[3]->SetBalloonHelpJustificationToRight();
   this->CornerLabel[3]->SetBalloonHelpString("Set the upper right corner annotation. The text will automatically scale to fit within the allocated space");
 
-  // Register the events we are interested. 
-
-  // If we are part of a lightbox, but not the master lightbox view, we
-  // have to update ourselves if the master lightbox corner anno changes in
-  // any way.
-
-  
-  if ( this->LightboxID > 0 )
-    {
-    this->Application->GetEventNotifier()->
-      AddCallback( "LightboxCornerAnnoChanged", this->View->GetWindow(),
-		   this, "UpdateFromMaster" );
-    }
 }
 
 void vtkKWCornerAnnotation::SetTextColor( float r, float g, float b )
@@ -238,9 +220,7 @@ void vtkKWCornerAnnotation::SetTextColor( float r, float g, float b )
 
   if ( this->LightboxID == 0 )
     {
-    this->Application->GetEventNotifier()->
-      InvokeCallbacks( this, "LightboxCornerAnnoChanged",  
-		       this->View->GetWindow(), "" );
+    this->View->GetWindow()->InvokeEvent( vtkKWObject::LightboxCornerAnnoChangedEvent, ""  ); // ANDY Problems
     }
 }
 
@@ -263,9 +243,7 @@ void vtkKWCornerAnnotation::OnDisplayCorner()
 
   if ( this->LightboxID == 0 )
     {
-    this->Application->GetEventNotifier()->
-      InvokeCallbacks( this, "LightboxCornerAnnoChanged",  
-		       this->View->GetWindow(), "" );
+    this->View->GetWindow()->InvokeEvent( vtkKWObject::LightboxCornerAnnoChangedEvent, ""  ); // ANDY Problems
     }
 }
 
@@ -301,9 +279,7 @@ void vtkKWCornerAnnotation::CornerChanged(int i)
 
   if ( this->LightboxID == 0 )
     {
-    this->Application->GetEventNotifier()->
-      InvokeCallbacks( this, "LightboxCornerAnnoChanged",  
-		       this->View->GetWindow(), "" );
+    this->View->GetWindow()->InvokeEvent( vtkKWObject::LightboxCornerAnnoChangedEvent, ""  ); // ANDY Problems
     }
 }
 
@@ -403,6 +379,6 @@ void vtkKWCornerAnnotation::SerializeToken(istream& is,
 void vtkKWCornerAnnotation::SerializeRevision(ostream& os, vtkIndent indent)
 {
   os << indent << "vtkKWCornerAnnotation ";
-  this->ExtractRevision(os,"$Revision: 1.13 $");
+  this->ExtractRevision(os,"$Revision: 1.14 $");
   vtkKWLabeledFrame::SerializeRevision(os,indent);
 }
