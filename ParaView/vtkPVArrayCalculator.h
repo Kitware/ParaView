@@ -68,6 +68,10 @@ public:
   void AddVectorVariable(const char* variableName, const char* arrayName);
 
   // Description:
+  // Clear the function.
+  void ClearFunction();
+  
+  // Description:
   // Save this source to a file.
   void Save(ofstream *file);
   
@@ -87,8 +91,9 @@ protected:
   vtkKWLabeledEntry* ArrayNameEntry;
   
   vtkKWLabeledFrame* CalculatorFrame;
-  vtkKWEntry* FunctionEntry;
-  
+  vtkKWLabel* FunctionLabel;
+
+  vtkKWPushButton* ButtonClear;
   vtkKWPushButton* ButtonZero;
   vtkKWPushButton* ButtonOne;
   vtkKWPushButton* ButtonTwo;

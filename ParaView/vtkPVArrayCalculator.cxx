@@ -45,7 +45,9 @@ vtkPVArrayCalculator::vtkPVArrayCalculator()
   this->ArrayNameEntry = vtkKWLabeledEntry::New();
   
   this->CalculatorFrame = vtkKWLabeledFrame::New();
-  this->FunctionEntry = vtkKWEntry::New();
+  this->FunctionLabel = vtkKWLabel::New();
+
+  this->ButtonClear = vtkKWPushButton::New();
   this->ButtonZero = vtkKWPushButton::New();
   this->ButtonOne = vtkKWPushButton::New();
   this->ButtonTwo = vtkKWPushButton::New();
@@ -100,8 +102,11 @@ vtkPVArrayCalculator::~vtkPVArrayCalculator()
   this->ArrayNameEntry->Delete();
   this->ArrayNameEntry = NULL;
   
-  this->FunctionEntry->Delete();
-  this->FunctionEntry = NULL;
+  this->FunctionLabel->Delete();
+  this->FunctionLabel = NULL;
+  
+  this->ButtonClear->Delete();
+  this->ButtonClear = NULL;
   this->ButtonZero->Delete();
   this->ButtonZero = NULL;
   this->ButtonOne->Delete();
@@ -257,27 +262,41 @@ void vtkPVArrayCalculator::CreateProperties()
   this->Script("pack %s -fill x -expand t -side top",
                this->CalculatorFrame->GetWidgetName());
 
-  this->FunctionEntry->SetParent(this->CalculatorFrame->GetFrame());
-  this->FunctionEntry->Create(pvApp, "");
-  this->Script("%s configure -xscrollcommand {%s EntryChanged}",
-               this->FunctionEntry->GetWidgetName(), this->GetTclName());
-  this->FunctionEntry->SetValue("");
-  this->Script("grid %s -columnspan 8 -sticky ew", this->FunctionEntry->GetWidgetName());
+  this->FunctionLabel->SetParent(this->CalculatorFrame->GetFrame());
+  this->FunctionLabel->Create(pvApp, "-background white");
+  this->FunctionLabel->SetLabel("");
+  this->Script("grid %s -columnspan 8 -sticky ew", this->FunctionLabel->GetWidgetName());
 
   
   // Command to update the UI.
-  this->ResetCommands->AddString("%s SetValue [%s %s]",
-                                 this->FunctionEntry->GetTclName(),
+  this->ResetCommands->AddString("%s SetLabel [%s %s]",
+                                 this->FunctionLabel->GetTclName(),
                                  this->GetVTKSourceTclName(),
                                  "GetFunction");
   // Format a command to move value from widget to vtkObjects (on all processes).
   // The VTK objects do not yet have to have the same Tcl name!
-  this->AcceptCommands->AddString("%s AcceptHelper2 %s %s [%s GetValue]",
+  this->AcceptCommands->AddString("%s AcceptHelper2 %s %s [%s GetLabel]",
                                   this->GetTclName(),
                                   this->GetVTKSourceTclName(),
                                   "SetFunction",
-                                  this->FunctionEntry->GetTclName());
+                                  this->FunctionLabel->GetTclName());
 
+  this->ButtonClear->SetParent(this->CalculatorFrame->GetFrame());
+  this->ButtonClear->Create(pvApp, "");
+  this->ButtonClear->SetLabel("Clear");
+  this->ButtonClear->SetCommand(this, "ClearFunction");
+  this->ButtonLeftParenthesis->SetParent(this->CalculatorFrame->GetFrame());
+  this->ButtonLeftParenthesis->Create(pvApp, "");
+  this->ButtonLeftParenthesis->SetLabel("(");
+  this->ButtonLeftParenthesis->SetCommand(this, "UpdateFunction (");
+  this->ButtonRightParenthesis->SetParent(this->CalculatorFrame->GetFrame());
+  this->ButtonRightParenthesis->Create(pvApp, "");
+  this->ButtonRightParenthesis->SetLabel(")");
+  this->ButtonRightParenthesis->SetCommand(this, "UpdateFunction )");
+  this->Script("grid %s %s %s -sticky ew", this->ButtonClear->GetWidgetName(),
+               this->ButtonLeftParenthesis->GetWidgetName(),
+               this->ButtonRightParenthesis->GetWidgetName());
+  
   this->ButtonSin->SetParent(this->CalculatorFrame->GetFrame());
   this->ButtonSin->Create(pvApp, "");
   this->ButtonSin->SetLabel("sin");
@@ -306,19 +325,14 @@ void vtkPVArrayCalculator::CreateProperties()
   this->ButtonDivide->Create(pvApp, "");
   this->ButtonDivide->SetLabel("/");
   this->ButtonDivide->SetCommand(this, "UpdateFunction /");
-  this->ButtonLeftParenthesis->SetParent(this->CalculatorFrame->GetFrame());
-  this->ButtonLeftParenthesis->Create(pvApp, "");
-  this->ButtonLeftParenthesis->SetLabel("(");
-  this->ButtonLeftParenthesis->SetCommand(this, "UpdateFunction (");
-  this->Script("grid %s %s %s %s %s %s %s %s -sticky ew",
+  this->Script("grid %s %s %s %s %s %s %s -sticky ew",
                this->ButtonSin->GetWidgetName(),
                this->ButtonCos->GetWidgetName(),
                this->ButtonTan->GetWidgetName(),
                this->ButtonSeven->GetWidgetName(),
                this->ButtonEight->GetWidgetName(),
                this->ButtonNine->GetWidgetName(),
-               this->ButtonDivide->GetWidgetName(),
-               this->ButtonLeftParenthesis->GetWidgetName());
+               this->ButtonDivide->GetWidgetName());
   
   this->ButtonASin->SetParent(this->CalculatorFrame->GetFrame());
   this->ButtonASin->Create(pvApp, "");
@@ -348,19 +362,14 @@ void vtkPVArrayCalculator::CreateProperties()
   this->ButtonMultiply->Create(pvApp, "");
   this->ButtonMultiply->SetLabel("*");
   this->ButtonMultiply->SetCommand(this, "UpdateFunction *");
-  this->ButtonRightParenthesis->SetParent(this->CalculatorFrame->GetFrame());
-  this->ButtonRightParenthesis->Create(pvApp, "");
-  this->ButtonRightParenthesis->SetLabel(")");
-  this->ButtonRightParenthesis->SetCommand(this, "UpdateFunction )");
-  this->Script("grid %s %s %s %s %s %s %s %s -sticky ew",
+  this->Script("grid %s %s %s %s %s %s %s -sticky ew",
                this->ButtonASin->GetWidgetName(),
                this->ButtonACos->GetWidgetName(),
                this->ButtonATan->GetWidgetName(),
                this->ButtonFour->GetWidgetName(),
                this->ButtonFive->GetWidgetName(),
                this->ButtonSix->GetWidgetName(),
-               this->ButtonMultiply->GetWidgetName(),
-               this->ButtonRightParenthesis->GetWidgetName());
+               this->ButtonMultiply->GetWidgetName());
   
   this->ButtonSinh->SetParent(this->CalculatorFrame->GetFrame());
   this->ButtonSinh->Create(pvApp, "");
@@ -477,9 +486,9 @@ void vtkPVArrayCalculator::CreateProperties()
   this->VectorsMenu->SetButtonText("vectors");
   this->VectorsMenu->SetBalloonHelpString("Select a vector array to operate on");
   this->ChangeAttributeMode("point");
-  this->Script("grid %s -row 5 -column 3 -columnspan 4 -sticky news",
-               this->ScalarsMenu->GetWidgetName());
   this->Script("grid %s -row 6 -column 3 -columnspan 4 -sticky news",
+               this->ScalarsMenu->GetWidgetName());
+  this->Script("grid %s -row 7 -column 3 -columnspan 4 -sticky news",
                this->VectorsMenu->GetWidgetName());
   
   this->Script("grid columnconfigure %s 3 -minsize 40",
@@ -495,14 +504,23 @@ void vtkPVArrayCalculator::CreateProperties()
 void vtkPVArrayCalculator::UpdateFunction(const char* newSymbol)
 {
   char* newFunction;
-  char* currentFunction = this->FunctionEntry->GetValue();
+  const char* currentFunction = this->FunctionLabel->GetLabel();
   this->ChangeAcceptButtonColor();
   newFunction = new char[strlen(currentFunction)+strlen(newSymbol)+1];
   sprintf(newFunction, "%s%s", currentFunction, newSymbol);
-  this->FunctionEntry->SetValue(newFunction);
-  this->Script("%s xview %d", this->FunctionEntry->GetWidgetName(),
-               strlen(this->FunctionEntry->GetValue()));
+  this->FunctionLabel->SetLabel(newFunction);
   delete [] newFunction;
+}
+
+void vtkPVArrayCalculator::ClearFunction()
+{
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  
+  this->ChangeAcceptButtonColor();
+  this->FunctionLabel->SetLabel("");
+  this->Calculator->RemoveAllVariables();
+  pvApp->BroadcastScript("%s RemoveAllVariables",
+                         this->GetVTKSourceTclName());
 }
 
 void vtkPVArrayCalculator::ChangeAttributeMode(const char* newMode)
@@ -518,7 +536,7 @@ void vtkPVArrayCalculator::ChangeAttributeMode(const char* newMode)
   
   this->ScalarsMenu->GetMenu()->DeleteAllMenuItems();
   this->VectorsMenu->GetMenu()->DeleteAllMenuItems();
-  this->FunctionEntry->SetValue("");
+  this->FunctionLabel->SetLabel("");
   this->Calculator->RemoveAllVariables();
 
   pvApp->BroadcastScript("%s RemoveAllVariables",
@@ -635,7 +653,7 @@ void vtkPVArrayCalculator::Save(ofstream *file)
     }
   
   *file << "\t" << this->VTKSourceTclName << " SetFunction "
-        << this->FunctionEntry->GetValue() << "\n\t"
+        << this->FunctionLabel->GetLabel() << "\n\t"
         << this->VTKSourceTclName << " SetAttributeModeToUse";
   if (strcmp(this->AttributeModeMenu->GetValue(), "Point Data") == 0)
     {
