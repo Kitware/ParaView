@@ -18,7 +18,9 @@ SET (ROLLUP_URL "http://${DROP_SITE}/cgi-bin/paraview-rollup-dashboard.sh")
 SET (CVS_WEB_URL "http://${DROP_SITE}/cgi-bin/cvsweb.cgi/ParaView/")
 SET (CVS_WEB_CVSROOT "ParaView")
 SET (DOXYGEN_URL "http://${DROP_SITE}/" )
-SET (GNATS_WEB_URL "http://${DROP_SITE}/")
+
+SET (USE_GNATS "On")
+SET (GNATS_WEB_URL "http://${DROP_SITE}/cgi-bin/gnatsweb.pl/ParaView")
 
 # copy over the testing logo
 CONFIGURE_FILE(${PARAVIEW_SOURCE_DIR}/Web/Art/ParaViewLogo.gif ${PARAVIEW_BINARY_DIR}/Testing/HTML/TestingResults/Icons/Logo.gif COPYONLY)
