@@ -23,7 +23,7 @@
 #include "vtkSMProxyManager.h"
 
 vtkStandardNewMacro(vtkSMInputProperty);
-vtkCxxRevisionMacro(vtkSMInputProperty, "1.5");
+vtkCxxRevisionMacro(vtkSMInputProperty, "1.6");
 
 int vtkSMInputProperty::InputsUpdateImmediately = 1;
 
@@ -39,6 +39,7 @@ vtkSMInputProperty::vtkSMInputProperty()
 //---------------------------------------------------------------------------
 vtkSMInputProperty::~vtkSMInputProperty()
 {
+  this->SetCleanCommand(0);
 }
 
 //---------------------------------------------------------------------------
