@@ -71,7 +71,7 @@ SET(CTEST_CUSTOM_WARNING_EXCEPTION
   "warning LNK4221"
   "variable .var_args[2]*. is used before its value is set"
   "jobserver unavailable"
-  "warning: (Long double usage is reported only once for each file"
+  "warning: \\(Long double usage is reported only once for each file"
   "warning: To disable this warning use"
   "ranlib: file: .+ has no symbols"
   )
