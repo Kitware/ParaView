@@ -203,7 +203,7 @@ protected:
 //ETX
   void CreateProxy();
   int InPlay;
-
+  int InvokingError;
   
   unsigned long ErrorEventTag;
 private:
