@@ -125,7 +125,6 @@ vtkTiledDisplayManager.cxx
 vtkPVWarpScalar
 vtkPVClipDataSet
 vtkPVContourFilter
-vtkPVKitwareContourFilter
 vtkPVGlyphFilter
 vtkPVThresholdFilter
 vtkPVRibbonFilter
@@ -136,6 +135,12 @@ vtkPVImageMedian3D
 vtkPVImageContinuousDilate3D
 vtkPVImageContinuousErode3D
 )
+
+IF (VTK_USE_PATENTED)
+ SET( ParaView_SRCS
+      ${ParaView_SRCS}
+      vtkPVKitwareContourFilter)
+ENDIF (VTK_USE_PATENTED)
 
 SET_SOURCE_FILES_PROPERTIES(
   vtkPVApplicationResources
