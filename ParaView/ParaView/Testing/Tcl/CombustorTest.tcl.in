@@ -1,8 +1,8 @@
 proc AdjustContourValue { cnt val } {
-    $cnt DeleteAllValues
-    set entry [$cnt GetNewValueEntry]
-    $entry SetValue $val
-    $cnt AddValueCallback
+    set entry [$cnt GetPVWidget {Contour Values}]
+    $entry RemoveAllValues
+    $entry AddValue $val
+    $entry AddValueCallback
     $cnt AcceptCallback
 }
 
