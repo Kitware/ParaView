@@ -87,7 +87,11 @@ public:
   void SetStyleToMessage() {this->SetStyle(vtkKWMessageDialog::Message);};
   void SetStyleToYesNo() {this->SetStyle(vtkKWMessageDialog::YesNo);};
   void SetStyleToOkCancel() {this->SetStyle(vtkKWMessageDialog::OkCancel);};
-  
+
+  static void PopupMessage(vtkKWApplication *app, unsigned int icon, const char* title, const char*message);
+  static int PopupYesNo(vtkKWApplication *app, unsigned int icon, const char* title, const char*message);
+  static int PopupOkCancel(vtkKWApplication *app, unsigned int icon, const char* title, const char*message);
+
 protected:
   vtkKWMessageDialog();
   ~vtkKWMessageDialog();
