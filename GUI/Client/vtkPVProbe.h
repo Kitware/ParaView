@@ -85,8 +85,6 @@ protected:
   vtkXYPlotWidget* XYPlotWidget;
   vtkXYPlotWidgetObserver* XYPlotObserver;
 
-  int GetDimensionality();
-
   int InstanceCount;
   
   vtkPVProbe(const vtkPVProbe&); // Not implemented
