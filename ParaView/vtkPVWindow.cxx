@@ -2091,6 +2091,13 @@ void vtkPVWindow::ReadSourceInterfaces()
     // Don't complain for now.  We can choose desired behavior later.
     // vtkWarningMacro("Could not find any directories for standard interface files.");
     }
+
+  char* str = getenv("PV_INTERFACE_PATH");
+  if (str)
+    {
+    this->ReadSourceInterfacesFromDirectory(str);
+    }
+
 }
 
 //----------------------------------------------------------------------------
