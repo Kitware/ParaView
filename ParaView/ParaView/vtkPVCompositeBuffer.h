@@ -47,6 +47,8 @@ protected:
   friend class vtkPVCompositeUtilities;
 //ETX
 
+  int UncompressedLength;
+
   vtkFloatArray* ZData;
   vtkUnsignedCharArray* PData;
 

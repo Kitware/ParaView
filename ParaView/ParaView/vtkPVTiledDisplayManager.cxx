@@ -43,7 +43,7 @@
  #include <mpi.h>
 #endif
 
-vtkCxxRevisionMacro(vtkPVTiledDisplayManager, "1.9");
+vtkCxxRevisionMacro(vtkPVTiledDisplayManager, "1.10");
 vtkStandardNewMacro(vtkPVTiledDisplayManager);
 
 vtkCxxSetObjectMacro(vtkPVTiledDisplayManager, RenderView, vtkObject);
@@ -608,7 +608,7 @@ vtkPVTiledDisplayManager::vtkPVTiledDisplayManager()
 
   this->Schedule = NULL;
   this->ZeroEmpty = 1;
-  this->UseCompositing = 1;
+  this->UseCompositing = 0;
 
   this->CompositeUtilities = vtkPVCompositeUtilities::New();
 
@@ -792,6 +792,7 @@ void vtkPVTiledDisplayManager::Composite()
   vtkPVCompositeBuffer* buf;
   vtkPVCompositeBuffer* buf2;
   vtkPVCompositeBuffer* buf3;
+  int length;
   int size[2];
   int *rws;
   vtkPVCompositeBuffer** tileBuffers;
@@ -870,12 +871,12 @@ void vtkPVTiledDisplayManager::Composite()
              0,0,size[0]-1, size[1]-1, 
              front,pData);
     // Get the z buffer.
-    zData = this->CompositeUtilities->NewFloatArray(size[0]*size[1], 3);
+    zData = this->CompositeUtilities->NewFloatArray(size[0]*size[1], 1);
     this->RenderWindow->GetZbufferData(0,0, size[0]-1, size[1]-1,
                                        zData);  
     // Compress the buffer.
-    // I could reuse the buffer here (inplace) !!!!!!!
-    buf = this->CompositeUtilities->NewCompositeBuffer(size[0]*size[1]);
+    length = vtkPVCompositeUtilities::GetCompressedLength(zData);
+    buf = this->CompositeUtilities->NewCompositeBuffer(length);
     vtkPVCompositeUtilities::Compress(zData, pData, buf);
 
     // Overhead of deleting these and getting them is low.
@@ -909,9 +910,9 @@ void vtkPVTiledDisplayManager::Composite()
       // Receive a buffer.
       buf2 = this->CompositeUtilities->ReceiveNewBuffer(this->Controller, 
                                                  tde->OtherProcessId, 98);
-      // This buffer has to be full size because 
-      // we do not know how large the result will be.
-      buf3 = this->CompositeUtilities->NewCompositeBuffer(size[0]*size[1]);
+      // This value is currently a conservative estimate.
+      length = vtkPVCompositeUtilities::GetCompositedLength(buf, buf2);
+      buf3 = this->CompositeUtilities->NewCompositeBuffer(length);
       // Buf1 was allocated as full size.
       vtkPVCompositeUtilities::CompositeImagePair(buf, buf2, buf3);
       tileBuffers[idx] = buf3;
@@ -944,9 +945,9 @@ void vtkPVTiledDisplayManager::Composite()
       // Receive a buffer.
       buf2 = this->CompositeUtilities->ReceiveNewBuffer(this->Controller, 
                                                  tde->OtherProcessId, 99);
-      // This buffer has to be full size because 
-      // we do not know how large the result will be.
-      buf3 = this->CompositeUtilities->NewCompositeBuffer(size[0]*size[1]);
+      // Length is a conservative estimate.
+      length = vtkPVCompositeUtilities::GetCompositedLength(buf, buf2);
+      buf3 = this->CompositeUtilities->NewCompositeBuffer(length);
       // Buf1 was allocated as full size.
       vtkPVCompositeUtilities::CompositeImagePair(buf, buf2, buf3);
       tileBuffers[tde->TileId] = buf3;
@@ -1274,6 +1275,10 @@ void vtkPVTiledDisplayManager::PrintSelf(ostream& os, vtkIndent indent)
     {
     this->Schedule->Print(os, indent);
     }
+
+  os << indent << "CompositeUtilities: \n";
+  vtkIndent i2 = indent.GetNextIndent();
+  this->CompositeUtilities->PrintSelf(os, i2);
 }
 
 

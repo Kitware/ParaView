@@ -113,6 +113,10 @@ public:
   vtkSetMacro(LODReductionFactor, int);
   vtkGetMacro(LODReductionFactor, int);
 
+  // Description:
+  // Just used for debugging.
+  vtkGetObjectMacro(CompositeUtilities,vtkPVCompositeUtilities);
+
 protected:
   vtkPVTiledDisplayManager();
   ~vtkPVTiledDisplayManager();

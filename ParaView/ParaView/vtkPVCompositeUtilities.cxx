@@ -30,7 +30,7 @@
 #include "vtkUnsignedCharArray.h"
 #include "vtkTimerLog.h"
 
-vtkCxxRevisionMacro(vtkPVCompositeUtilities, "1.3");
+vtkCxxRevisionMacro(vtkPVCompositeUtilities, "1.4");
 vtkStandardNewMacro(vtkPVCompositeUtilities);
 
 
@@ -62,6 +62,9 @@ vtkPVCompositeUtilities::vtkPVCompositeUtilities()
 {
   this->FloatArrayCollection = vtkCollection::New();
   this->UnsignedCharArrayCollection = vtkCollection::New();
+  this->MaximumMemoryUsage = 500000; // 500MB
+  this->FloatMemoryUsage = 0;
+  this->UnsignedCharMemoryUsage = 0;
 }
 
   
@@ -90,6 +93,8 @@ vtkFloatArray* vtkPVCompositeUtilities::NewFloatArray(int numTuples,
   vtkFloatArray* a;
   int length;
   vtkObject* o;
+  int target = numTuples * numComps;
+  unsigned long memoryTotal = 0;
 
   // Search for an appropriate sized array.
   // Has to have the same number of components (all will).
@@ -98,11 +103,12 @@ vtkFloatArray* vtkPVCompositeUtilities::NewFloatArray(int numTuples,
   while ( (o = this->FloatArrayCollection->GetNextItemAsObject()))
     {
     a = vtkFloatArray::SafeDownCast(o);
-    if (a && a->GetReferenceCount() == 1 && 
+    memoryTotal += a->GetActualMemorySize();
+    if (a->GetReferenceCount() == 1 && 
         a->GetNumberOfComponents() == numComps)
       {
       length = a->GetSize();
-      if (length > numComps*numTuples)
+      if (length >= target)
         { // This is a viable candidate.
         if (best == NULL || bestLength > length)
           {
@@ -122,7 +128,7 @@ vtkFloatArray* vtkPVCompositeUtilities::NewFloatArray(int numTuples,
     best->SetNumberOfTuples(numTuples);
     vtkCompositeManager::ResizeFloatArray(best, 
                                numComps, numTuples);
-    
+    memoryTotal += best->GetActualMemorySize();
     this->FloatArrayCollection->AddItem(best);
     }
   else
@@ -131,6 +137,18 @@ vtkFloatArray* vtkPVCompositeUtilities::NewFloatArray(int numTuples,
     best->SetNumberOfTuples(numTuples);
     }
 
+  // Modify to keep track of oldest.
+  best->Modified();
+
+  int removedMemory = 1;
+  while (memoryTotal+this->FloatMemoryUsage > this->MaximumMemoryUsage &&
+         removedMemory)
+    {
+    removedMemory = this->RemoveOldestUnused(this->FloatArrayCollection);
+    memoryTotal = memoryTotal - removedMemory;
+    }
+
+  this->FloatMemoryUsage = memoryTotal;
   return best;
 }
 
@@ -144,6 +162,8 @@ vtkPVCompositeUtilities::NewUnsignedCharArray(int numTuples,
   vtkUnsignedCharArray* a;
   int length;
   vtkObject* o;
+  int target = numTuples * numComps;
+  unsigned long memoryTotal = 0;
 
   // Search for an appropriate sized array.
   // Has to have the same number of components (all will).
@@ -152,11 +172,12 @@ vtkPVCompositeUtilities::NewUnsignedCharArray(int numTuples,
   while ( (o = this->UnsignedCharArrayCollection->GetNextItemAsObject()))
     {
     a = vtkUnsignedCharArray::SafeDownCast(o);
-    if (a && a->GetReferenceCount() == 1 && 
+    memoryTotal += a->GetActualMemorySize();
+    if (a->GetReferenceCount() == 1 && 
         a->GetNumberOfComponents() == numComps)
       {
       length = a->GetSize();
-      if (length > numComps*numTuples)
+      if (length >= target)
         { // This is a viable candidate.
         if (best == NULL || bestLength > length)
           {
@@ -176,6 +197,8 @@ vtkPVCompositeUtilities::NewUnsignedCharArray(int numTuples,
     best->SetNumberOfTuples(numTuples);
     vtkCompositeManager::ResizeUnsignedCharArray(best, 
                                       numComps, numTuples);
+
+    memoryTotal += best->GetActualMemorySize();
     this->UnsignedCharArrayCollection->AddItem(best);
     }
   else
@@ -184,8 +207,51 @@ vtkPVCompositeUtilities::NewUnsignedCharArray(int numTuples,
     best->SetNumberOfTuples(numTuples);
     }
 
+  // Modify to keep track of oldest.
+  best->Modified();
+
+  int removedMemory = 1;
+  while (memoryTotal+this->UnsignedCharMemoryUsage > this->MaximumMemoryUsage &&
+         removedMemory)
+    {
+    removedMemory = this->RemoveOldestUnused(this->UnsignedCharArrayCollection);
+    memoryTotal = memoryTotal - removedMemory;
+    }
+
+  this->UnsignedCharMemoryUsage = memoryTotal;
   return best;
 }
+
+//-------------------------------------------------------------------------
+int vtkPVCompositeUtilities::RemoveOldestUnused(vtkCollection* arrayCollection)
+{
+  vtkObject* o;
+  vtkDataArray* a;
+  vtkDataArray* oldest = NULL;
+  int memory;
+
+  arrayCollection->InitTraversal();
+  while ( (o = arrayCollection->GetNextItemAsObject()) )
+    {
+    a = vtkDataArray::SafeDownCast(o);
+    if (a->GetReferenceCount() == 1)
+      {
+      if (oldest == NULL || a->GetMTime() < oldest->GetMTime())
+        {
+        oldest = a;
+        }
+      }
+    }
+
+  if (oldest)
+    {
+    memory = oldest->GetActualMemorySize();
+    arrayCollection->RemoveItem(oldest);
+    return memory;
+    }
+  return 0;
+}
+
 
 
 //-------------------------------------------------------------------------
@@ -207,11 +273,13 @@ void vtkPVCompositeUtilities::SendBuffer(vtkMultiProcessController* controller,
                                          vtkPVCompositeBuffer* buf, 
                                          int otherProc, int tag) 
 {
-  int length = buf->PData->GetNumberOfTuples();
+  int lengths[2];
+  lengths[0] = buf->PData->GetNumberOfTuples();
+  lengths[1] = buf->UncompressedLength;
 
-  controller->Send(&length, 1,otherProc, tag);
-  controller->Send(buf->ZData->GetPointer(0), length, otherProc, tag*2);
-  controller->Send(buf->PData->GetPointer(0), length*3, otherProc, tag*2);
+  controller->Send(lengths, 2, otherProc, tag);
+  controller->Send(buf->ZData->GetPointer(0), lengths[0], otherProc, tag*2);
+  controller->Send(buf->PData->GetPointer(0), lengths[0]*3, otherProc, tag*2);
 }
 
 
@@ -220,17 +288,50 @@ vtkPVCompositeBuffer* vtkPVCompositeUtilities::ReceiveNewBuffer(
                                       vtkMultiProcessController* controller,
                                       int otherProc, int tag)
 {
-  int length;
+  int lengths[2];
   vtkPVCompositeBuffer *buf;
 
-  controller->Receive(&length, 1, otherProc, tag);
-  buf = this->NewCompositeBuffer(length);
-  controller->Receive(buf->ZData->GetPointer(0), length, otherProc, tag*2);
-  controller->Receive(buf->PData->GetPointer(0), length*3, otherProc, tag*2);
+  controller->Receive(lengths, 2, otherProc, tag);
+  buf = this->NewCompositeBuffer(lengths[0]);
+  controller->Receive(buf->ZData->GetPointer(0), lengths[0], otherProc, tag*2);
+  controller->Receive(buf->PData->GetPointer(0), lengths[0]*3, otherProc, tag*2);
+  buf->UncompressedLength = lengths[1];
 
   return buf;
 }
 
+
+
+//-------------------------------------------------------------------------
+int vtkPVCompositeUtilities::GetCompressedLength(vtkFloatArray *zArray)
+{
+  int numPixels;
+  float* zRun;
+  float* zIn;
+  float* endZ;
+  int length = 0;
+
+  numPixels = zArray->GetNumberOfTuples();
+  zIn = zArray->GetPointer(0);
+  endZ = zIn+numPixels;
+
+  while (zIn < endZ)
+    {
+    ++length;
+    zRun = zIn;
+    // Skip over compressed runs.
+    while (*zIn == 1.0 && zIn < endZ)
+      {
+      ++zIn;
+      }
+
+    if (zRun == zIn)
+      { 
+      *zIn++;
+      }
+    }
+  return length;
+}
 
 //-------------------------------------------------------------------------
 // Compress background pixels with runlength encoding.
@@ -292,6 +393,9 @@ void vtkPVCompositeUtilities::Compress(vtkFloatArray *zIn, vtkUnsignedCharArray 
   
   vtkTimerLog::MarkStartEvent("Compress");
 
+  // Store for later use.
+  outBuf->UncompressedLength = zIn->GetNumberOfTuples();
+
   // This is just a complex switch statment 
   // to call the correct templated function.
   if (pIn->GetDataType() == VTK_UNSIGNED_CHAR) 
@@ -328,6 +432,12 @@ void vtkPVCompositeUtilities::Compress(vtkFloatArray *zIn, vtkUnsignedCharArray 
     {
     vtkGenericWarningMacro("Unexpected pixel type.");
     return;
+    }
+
+  // Sanity check
+  if (outBuf->ZData->GetSize() < length)
+    {
+    vtkGenericWarningMacro("Buffer too small.");
     }
 
   outBuf->ZData->SetNumberOfTuples(length);
@@ -383,6 +493,12 @@ void vtkPVCompositeUtilities::Uncompress(vtkPVCompositeBuffer *inBuf,
   void*  ppv1 = inBuf->PData->GetVoidPointer(0);
   void*  ppv2 = pOut->GetVoidPointer(0);
   int lengthIn = inBuf->ZData->GetNumberOfTuples();
+
+  // Sanity check
+  if (pOut->GetSize() < inBuf->UncompressedLength*3)
+    {
+    vtkGenericWarningMacro("Buffer too small.");
+    }
 
   vtkTimerLog::MarkStartEvent("Uncompress");
 
@@ -563,6 +679,13 @@ void vtkPVCompositeUtilities::CompositeImagePair(vtkPVCompositeBuffer* inBuf1,
   void*  p3 = outBuf->PData->GetVoidPointer(0);
   int length1 = inBuf1->ZData->GetNumberOfTuples();
   int l3;
+
+  // Transfer the uncomposited length.
+  if (inBuf1->UncompressedLength != inBuf2->UncompressedLength)
+    {
+    vtkGenericWarningMacro("Compositing buffers of different sizes.");
+    }
+  outBuf->UncompressedLength = inBuf1->UncompressedLength;
   
   //vtkTimerLog::MarkStartEvent("Composite Image Pair");
 
@@ -607,13 +730,41 @@ void vtkPVCompositeUtilities::CompositeImagePair(vtkPVCompositeBuffer* inBuf1,
     return;
     }
 
+  // Sanity check
+  if (outBuf->ZData->GetSize() < l3)
+    {
+    vtkGenericWarningMacro("Buffer too small.");
+    }
+
   outBuf->ZData->SetNumberOfTuples(l3); // length3 not 13
   outBuf->PData->SetNumberOfTuples(l3);
 
   //vtkTimerLog::MarkEndEvent("Composite Image Pair");
 }
 
+//-------------------------------------------------------------------------
+int vtkPVCompositeUtilities::GetCompositedLength(vtkPVCompositeBuffer* b1,
+                                                 vtkPVCompositeBuffer* b2)
+{
+  int total;
 
+  if (b1->UncompressedLength < 0 || b2->UncompressedLength < 0)
+    {
+    vtkGenericWarningMacro("Buffers uncompressed length has not been set.");
+    }
+  if (b1->UncompressedLength != b2->UncompressedLength)
+    {
+    vtkGenericWarningMacro("Buffers have different lengths.");
+    }
+
+  total = b1->ZData->GetNumberOfTuples() + b2->ZData->GetNumberOfTuples();
+  if (total > b1->UncompressedLength)
+    {
+    total = b1->UncompressedLength;
+    }
+
+  return total;
+}
 
 //----------------------------------------------------------------------------
 // We change this to work backwards so we can make it inplace. !!!!!!!     
@@ -634,6 +785,12 @@ void vtkPVCompositeUtilities::MagnifyBuffer(vtkDataArray* localP,
   
   xInDim = inWinSize[0];
   yInDim = inWinSize[1];
+
+  // Sanity check
+  if (magP->GetSize() < xInDim*yInDim*3)
+    {
+    vtkGenericWarningMacro("Buffer too small.");
+    }
 
   newLocalPData = reinterpret_cast<float*>(magP->GetVoidPointer(0));
   float* localPdata = reinterpret_cast<float*>(localP->GetVoidPointer(0));
@@ -734,7 +891,32 @@ void vtkPVCompositeUtilities::MagnifyBuffer(vtkDataArray* localP,
 //----------------------------------------------------------------------------
 void vtkPVCompositeUtilities::PrintSelf(ostream& os, vtkIndent indent)
 {
+  unsigned long         arrayMemory;
+  unsigned long         totalMemory = 0;
+  vtkFloatArray*        floatArray;
+  vtkUnsignedCharArray* ucharArray;
+
   this->vtkObject::PrintSelf(os, indent);
+
+  this->FloatArrayCollection->InitTraversal();
+  while( (floatArray = (vtkFloatArray*)(this->FloatArrayCollection->GetNextItemAsObject())) )
+    {
+    arrayMemory = floatArray->GetActualMemorySize();
+    os << indent << "Float Array: " << arrayMemory << " kB\n";
+    totalMemory += arrayMemory;
+    }
+
+  this->UnsignedCharArrayCollection->InitTraversal();
+  while( (ucharArray = (vtkUnsignedCharArray*)(this->UnsignedCharArrayCollection->GetNextItemAsObject())) )
+    {
+    arrayMemory = ucharArray->GetActualMemorySize();
+    os << indent << "Unsigned Char Array: " << arrayMemory << " kB\n";
+    totalMemory += arrayMemory;
+    }
+
+  os << "Total Memory Usage: " << totalMemory << " kB \n";
+
+  os << "Maximum Memory Usage: " << this->MaximumMemoryUsage << " kB \n";
 }
 
 

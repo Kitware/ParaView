@@ -58,15 +58,24 @@ public:
   vtkPVCompositeBuffer* ReceiveNewBuffer(vtkMultiProcessController* controller,
                                          int otherProc, int tag);
 
-
   // Description:
   // I am granting access to these methods and making them static
   // So I can create a TileDisplayCompositer which uses compression.
   static void Compress(vtkFloatArray *zIn, vtkUnsignedCharArray *pIn,
                        vtkPVCompositeBuffer* outBuf);
 
+  // Description:
+  // This method returns the length of a compressed buffer.
+  static int GetCompressedLength(vtkFloatArray* zIn);
+
   static void Uncompress(vtkPVCompositeBuffer* inBuf,
                          vtkUnsignedCharArray *pOut);
+
+  // Description:
+  // This method returns a conservative guess at the 
+  // output length after two bufferes are composited.
+  static int GetCompositedLength(vtkPVCompositeBuffer* b1,
+                                 vtkPVCompositeBuffer* b2);
 
   static void CompositeImagePair(vtkPVCompositeBuffer* inBuf1,
                                  vtkPVCompositeBuffer* inBuf2,
@@ -75,6 +84,12 @@ public:
   static void MagnifyBuffer(vtkDataArray* in, vtkDataArray* out, 
                             int inWinSize[2], int factor);
 
+  // Description:
+  // The maximum amount of memory (kB) that the buffers can use.
+  // If this value is set too low, then memory will be reallocated
+  // as needed.
+  vtkSetMacro(MaximumMemoryUsage, unsigned long);
+  vtkGetMacro(MaximumMemoryUsage, unsigned long);
 
 protected:
   vtkPVCompositeUtilities();
@@ -82,6 +97,13 @@ protected:
   
   vtkCollection* FloatArrayCollection;
   vtkCollection* UnsignedCharArrayCollection;
+
+  unsigned long MaximumMemoryUsage;
+  unsigned long FloatMemoryUsage;
+  unsigned long UnsignedCharMemoryUsage;
+
+  // Returns memory freed up in kB.
+  int RemoveOldestUnused(vtkCollection* arrayCollection);
 
 private:
   vtkPVCompositeUtilities(const vtkPVCompositeUtilities&); // Not implemented
