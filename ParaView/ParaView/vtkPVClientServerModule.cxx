@@ -154,7 +154,7 @@ void vtkPVRelayRemoteScript(void *localArg, void *remoteArg,
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVClientServerModule);
-vtkCxxRevisionMacro(vtkPVClientServerModule, "1.22");
+vtkCxxRevisionMacro(vtkPVClientServerModule, "1.23");
 
 int vtkPVClientServerModuleCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -817,11 +817,12 @@ int vtkPVClientServerModule::GetDirectoryListing(const char* dir,
     this->RootScript(
       "::paraview::vtkPVProcessModule::GetDirectoryListing {%s} {%s}",
       dir, perm);
-    const char* result = vtkString::Duplicate(this->GetRootResult());
+    char* result = vtkString::Duplicate(this->GetRootResult());
     if(!result || strcmp(result, "<NO_SUCH_DIRECTORY>") == 0)
       {
       dirs->RemoveAllItems();
       files->RemoveAllItems();
+      delete [] result;
       return 0;
       }
     vtkTclGetObjectFromPointer(this->Application->GetMainInterp(), dirs,
