@@ -527,6 +527,8 @@ void vtkPVWindow::Create(vtkKWApplication *app, char *args)
   this->SelectMenu->SetParent(this->GetMenu());
   this->SelectMenu->Create(this->Application, "-tearoff 0");
   this->Menu->InsertCascade(2, "Select", this->SelectMenu, 0);
+  this->Script("%s entryconfigure Select -state disabled",
+	       this->Menu->GetWidgetName());
   
   this->VTKMenu->SetParent(this->GetMenu());
   this->VTKMenu->Create(this->Application, "-tearoff 0");
@@ -541,6 +543,8 @@ void vtkPVWindow::Create(vtkKWApplication *app, char *args)
   this->FilterMenu->SetParent(this->VTKMenu);
   this->FilterMenu->Create(this->Application, "-tearoff 0");
   this->VTKMenu->AddCascade("Filters", this->FilterMenu, 0);  
+  this->Script("%s entryconfigure Filters -state disabled",
+	       this->VTKMenu->GetWidgetName());
   
   // Create all of the menu items for sources with no inputs.
   this->SourceInterfaces->InitTraversal();
@@ -860,7 +864,7 @@ void vtkPVWindow::OpenCallback()
 #ifdef _WIN32  
   this->Script("set openFileName [tk_getOpenFile -filetypes {{{ParaView Files} {*.vtk;*.pvtk;*.stl;*.pop;*.case}}  {{VTK files} {.vtk}} {{PVTK files} {.pvtk}} {{EnSight files} {.case}} {{POP files} {.pop}} {{STL files} {.stl}}}]");
 #else
-  this->Script("set openFileName [tk_getOpenFile -filetypes {{{ParaView Files} {.(vtk|pvtk|stl|pop|case)}}  {{VTK files} {.vtk}} {{PVTK files} {.pvtk}} {{EnSight files} {.case}} {{POP files} {.pop}} {{STL files} {.stl}}}]");
+  this->Script("set openFileName [tk_getOpenFile -filetypes {{{ParaView Files} {.vtk .pvtk .case .pop .stl}}  {{VTK files} {.vtk}} {{PVTK files} {.pvtk}} {{EnSight files} {.case}} {{POP files} {.pop}} {{STL files} {.stl}}}]");
 #endif
   openFileName = this->GetPVApplication()->GetMainInterp()->result;
 
@@ -1278,10 +1282,15 @@ void vtkPVWindow::SetCurrentPVData(vtkPVData *pvd)
         this->FilterMenu->AddCommand(sInt->GetSourceClassName()+3, sInt, "CreateCallback");
         }
       }
+    this->Script("%s entryconfigure Filters -state normal",
+		 this->VTKMenu->GetWidgetName());
     }
   else
     {
     this->DisableFilterButtons();
+    this->Script("%s entryconfigure Filters -state disabled",
+		 this->VTKMenu->GetWidgetName());
+
     }
 }
 
@@ -1427,6 +1436,13 @@ void vtkPVWindow::EnableMenus()
     {
     this->Script("%s entryconfigure %d -state normal",
                  this->Menu->GetWidgetName(), i);
+    }
+
+  // Disable or enable the menu.
+  if (this->GetSources()->GetNumberOfItems() == 0)
+    {
+    this->Script("%s entryconfigure Select -state disabled",
+                 this->Menu->GetWidgetName());
     }
 }
 
