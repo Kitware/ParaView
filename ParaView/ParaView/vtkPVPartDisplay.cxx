@@ -61,7 +61,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPartDisplay);
-vtkCxxRevisionMacro(vtkPVPartDisplay, "1.3");
+vtkCxxRevisionMacro(vtkPVPartDisplay, "1.4");
 
 int vtkPVPartDisplayCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -381,6 +381,19 @@ void vtkPVPartDisplay::CreateParallelTclObjects(vtkPVApplication *pvApp)
   pvApp->GetProcessModule()->InitializePartition(this);
 }
 
+
+//----------------------------------------------------------------------------
+void vtkPVPartDisplay::SetUseImmediateMode(int val)
+{
+  vtkPVApplication* pvApp = this->GetPVApplication();
+
+  pvApp->BroadcastScript("%s SetImmediateModeRendering %d",
+                         this->GetMapperTclName(),
+                         val);
+  pvApp->BroadcastScript("%s SetImmediateModeRendering %d",
+                         this->GetLODMapperTclName(),
+                         val);
+}
 
 //----------------------------------------------------------------------------
 void vtkPVPartDisplay::SetLODResolution(int res)

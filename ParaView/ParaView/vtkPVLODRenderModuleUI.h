@@ -68,7 +68,8 @@ class vtkPVSourceList;
 class vtkPVSourcesNavigationWindow;
 class vtkPVTreeComposite;
 class vtkPVWindow;
-
+class vtkPVRenderModule;
+class vtkPVLODRenderModule;
 
 class VTK_EXPORT vtkPVLODRenderModuleUI : public vtkPVRenderModuleUI
 {
@@ -84,7 +85,13 @@ public:
   // Description:
   // Casts to vtkPVApplication.
   vtkPVApplication *GetPVApplication();
-    
+  
+  // Description:
+  // The subclass should implement this method and 
+  // downcast it to the right type.  It can then access
+  // any unique methods of the specific render module.
+  virtual void SetRenderModule(vtkPVRenderModule *rm);
+  
   // Description:
   // Callback for the interrupt render check button
   void InterruptRenderCheckCallback();
@@ -154,6 +161,8 @@ protected:
   vtkPVLODRenderModuleUI();
   ~vtkPVLODRenderModuleUI();
  
+  vtkPVLODRenderModule* LODRenderModule;
+
   int UseReductionFactor;
   
   vtkKWLabeledFrame *LODFrame;

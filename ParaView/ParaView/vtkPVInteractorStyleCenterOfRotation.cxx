@@ -51,7 +51,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVRenderModule.h"
 #include "vtkPVApplication.h"
 
-vtkCxxRevisionMacro(vtkPVInteractorStyleCenterOfRotation, "1.3");
+vtkCxxRevisionMacro(vtkPVInteractorStyleCenterOfRotation, "1.4");
 vtkStandardNewMacro(vtkPVInteractorStyleCenterOfRotation);
 
 //-------------------------------------------------------------------------
@@ -96,7 +96,11 @@ void vtkPVInteractorStyleCenterOfRotation::Pick()
       ((vtkPVGenericRenderWindowInteractor*)this->Interactor)->GetPVRenderView();
     if (view)
       {
-      this->Picker->SetComposite(view->GetPVApplication()->GetRenderModule()->GetComposite());
+      // I used to do parallel picks by having the composite manager
+      // Keep the final zbuffer on node 0.  This does not work for client server
+      // mode and I do not like generic reference to the composite manager.
+      // I need to find a better solution.
+      //this->Picker->SetComposite(view->GetPVApplication()->GetRenderModule()->GetComposite());
       }
     }
   int x = this->Interactor->GetEventPosition()[0];

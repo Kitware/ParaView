@@ -52,7 +52,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVRenderModule.h"
 
 vtkStandardNewMacro(vtkPVPivotManipulator);
-vtkCxxRevisionMacro(vtkPVPivotManipulator, "1.4");
+vtkCxxRevisionMacro(vtkPVPivotManipulator, "1.5");
 
 //-------------------------------------------------------------------------
 vtkPVPivotManipulator::vtkPVPivotManipulator()
@@ -93,7 +93,11 @@ void vtkPVPivotManipulator::OnButtonDown(int, int, vtkRenderer *ren,
     vtkPVRenderView *view = window->GetMainView();
     if (view)
       {
-      this->Picker->SetComposite(app->GetRenderModule()->GetComposite());
+      // The composite use to keep the correct zbuffer on node zero.
+      // This does not work for client server, and I do not want any
+      // Generic access to the composite manager anyway.
+      // I still need to solve the parallel picking problem.
+      //this->Picker->SetComposite(app->GetRenderModule()->GetComposite());
       }
     else
       {

@@ -135,16 +135,6 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // These use the total memory size of the visible
-  // geoemtry and decimated LOD to make a collection decision.
-  // I would like to move this method into a rendering module.  
-  // It resides here for the moment because vtkPVWindow has a list of sources.
-  int MakeCollectionDecision();
-  int MakeLODCollectionDecision();
-  // Needed so to make global LOD descision.
-  unsigned long GetTotalVisibleGeometryMemorySize();
-
-  // Description:
   // Create the window and all of the associated widgets. This
   // essentially creates the whole user interface. ParaView supports
   // only one window.
@@ -512,13 +502,6 @@ public:
 protected:
   vtkPVWindow();
   ~vtkPVWindow();
-
-  // Move these to a render module when it is created.
-  void ComputeTotalVisibleMemorySize();
-  unsigned long TotalVisibleGeometryMemorySize;
-  unsigned long TotalVisibleLODMemorySize;
-  int CollectionDecision;
-  int LODCollectionDecision;
 
   virtual void SerializeRevision(ostream& os, vtkIndent indent);
   virtual void SerializeSelf(ostream& os, vtkIndent indent);

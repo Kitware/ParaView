@@ -79,6 +79,10 @@ public:
   void SetLODResolution(int res);
 
   // Description:
+  // Toggles the mappers to use immediate mode rendering or display lists.
+  void SetUseImmediateMode(int val);
+
+  // Description:
   // Turns visibilioty on or off.
   void SetVisibility(int v);
   vtkGetMacro(Visibility,int);

@@ -40,7 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 #include "vtkPVLODRenderModuleUI.h"
-#include "vtkPVRenderModule.h"
+#include "vtkPVLODRenderModule.h"
 
 #include "vtkCamera.h"
 #include "vtkCollectionIterator.h"
@@ -91,7 +91,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLODRenderModuleUI);
-vtkCxxRevisionMacro(vtkPVLODRenderModuleUI, "1.1");
+vtkCxxRevisionMacro(vtkPVLODRenderModuleUI, "1.2");
 
 int vtkPVLODRenderModuleUICommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -102,6 +102,7 @@ vtkPVLODRenderModuleUI::vtkPVLODRenderModuleUI()
 {
   this->CommandFunction = vtkPVLODRenderModuleUICommand;
   
+  this->LODRenderModule = NULL;
   this->UseReductionFactor = 1;
 
   this->ParallelRenderParametersFrame = vtkKWLabeledFrame::New();
@@ -142,7 +143,7 @@ vtkPVLODRenderModuleUI::~vtkPVLODRenderModuleUI()
     pvapp->SetRegisteryValue(2, "RunTime", "LODResolution", "%d",
                              this->LODResolution);
 
-    if (pvapp->GetRenderModule()->GetComposite() || pvapp->GetClientMode())
+    if (this->LODRenderModule->GetComposite() || pvapp->GetClientMode())
       {
       pvapp->SetRegisteryValue(2, "RunTime", "CollectThreshold", "%f",
                                this->CollectThreshold);
@@ -198,8 +199,34 @@ vtkPVLODRenderModuleUI::~vtkPVLODRenderModuleUI()
   this->CollectThresholdScale = NULL;
   this->CollectThresholdValue->Delete();
   this->CollectThresholdValue = NULL;
+
+  if (this->LODRenderModule)
+    {
+    this->LODRenderModule->UnRegister(this);
+    this->LODRenderModule = NULL;
+    }
 }
 
+
+//----------------------------------------------------------------------------
+void vtkPVLODRenderModuleUI::SetRenderModule(vtkPVRenderModule* rm)
+{
+  if (this->LODRenderModule)
+    {
+    this->LODRenderModule->UnRegister(this);
+    this->LODRenderModule = NULL;
+    }
+  this->LODRenderModule = vtkPVLODRenderModule::SafeDownCast(rm);
+  if (this->LODRenderModule)
+    {
+    this->LODRenderModule->Register(this);
+    }
+
+  if (rm != NULL && this->LODRenderModule == NULL)
+    {
+    vtkErrorMacro("Expecting a LODRenderModule.");
+    }
+}
 
 //----------------------------------------------------------------------------
 void vtkPVLODRenderModuleUI::Create(vtkKWApplication *app, const char *)
@@ -402,7 +429,7 @@ void vtkPVLODRenderModuleUI::Create(vtkKWApplication *app, const char *)
   // Parallel rendering parameters
   // Conditional interface should really be part of a module !!!!!!
   if (pvapp->GetProcessModule()->GetNumberOfPartitions() > 1 && 
-      pvapp->GetRenderModule()->GetComposite())
+      this->LODRenderModule->GetComposite())
     {
     this->ParallelRenderParametersFrame->SetParent(this); 
     this->ParallelRenderParametersFrame->ShowHideFrameOn();
@@ -559,7 +586,7 @@ void vtkPVLODRenderModuleUI::SetLODThresholdInternal(float threshold)
 
   sprintf(str, "%.1f MBytes", threshold);
   this->LODThresholdValue->SetLabel(str);
-  this->GetPVApplication()->GetRenderModule()->SetLODThreshold(threshold);
+  this->LODRenderModule->SetLODThreshold(threshold);
 
   this->LODThreshold = threshold;
 }
@@ -618,7 +645,7 @@ void vtkPVLODRenderModuleUI::SetLODResolutionInternal(int resolution)
   this->LODResolution = resolution;
  
   pvApp = this->GetPVApplication();
-  pvApp->GetRenderModule()->SetLODResolution(resolution);
+  this->LODRenderModule->SetLODResolution(resolution);
 }
 
 
@@ -662,7 +689,7 @@ void vtkPVLODRenderModuleUI::SetCollectThresholdInternal(float threshold)
   // This will cause collection to be re evaluated.
   pvApp = this->GetPVApplication();
   pvApp->SetTotalVisibleMemorySizeValid(0);
-  pvApp->GetRenderModule()->SetCollectThreshold(threshold);
+  this->LODRenderModule->SetCollectThreshold(threshold);
 
 }
 
@@ -691,10 +718,10 @@ void vtkPVLODRenderModuleUI::CompositeWithFloatCallback(int val)
     this->CompositeWithFloatCheck->SetState(val);
     }
  
-  if (this->GetPVApplication()->GetRenderModule()->GetComposite())
+  if (this->LODRenderModule->GetComposite())
     {
     this->GetPVApplication()->BroadcastScript("%s SetUseChar %d",
-                                              this->GetPVApplication()->GetRenderModule()->GetCompositeTclName(),
+                                              this->LODRenderModule->GetCompositeTclName(),
                                               !val);
     // Limit of composite manager.
     if (val != 0) // float
@@ -731,10 +758,10 @@ void vtkPVLODRenderModuleUI::CompositeWithRGBACallback(int val)
     {
     this->CompositeWithRGBACheck->SetState(val);
     }
-  if (this->GetPVApplication()->GetRenderModule()->GetComposite())
+  if (this->LODRenderModule->GetComposite())
     {
     this->GetPVApplication()->BroadcastScript("%s SetUseRGB %d",
-                                              this->GetPVApplication()->GetRenderModule()->GetCompositeTclName(),
+                                              this->LODRenderModule->GetCompositeTclName(),
                                               !val);
     // Limit of composite manager.
     if (val != 1) // RGB
@@ -773,7 +800,7 @@ void vtkPVLODRenderModuleUI::CompositeCompressionCallback(int val)
     {
     this->CompositeCompressionCheck->SetState(val);
     }
-  if (pvApp->GetRenderModule()->GetComposite())
+  if (this->LODRenderModule->GetComposite())
     {
     if (val)
       {
@@ -783,7 +810,8 @@ void vtkPVLODRenderModuleUI::CompositeCompressionCallback(int val)
       {
       pvApp->BroadcastScript("vtkTreeCompositer pvTemp");
       }
-    pvApp->BroadcastScript("%s SetCompositer pvTemp", pvApp->GetRenderModule()->GetCompositeTclName());
+    pvApp->BroadcastScript("%s SetCompositer pvTemp", 
+                           this->LODRenderModule->GetCompositeTclName());
     pvApp->BroadcastScript("pvTemp Delete");
     this->GetPVApplication()->GetMainView()->EventuallyRender();
     }

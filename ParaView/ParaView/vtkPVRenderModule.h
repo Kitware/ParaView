@@ -49,6 +49,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // Some common camera manipulation (and other render window control)
 // may be moved back into vtkPVRenderView to simplify this module.
 
+// Although I do not intend that this class should be instantiated
+// and used as a rendering module, I am implementing the methods
+// in the most simple way.  No LODs or parallel support.
+
 #ifndef __vtkPVRenderModule_h
 #define __vtkPVRenderModule_h
 
@@ -59,7 +63,6 @@ class vtkPVApplication;
 class vtkPVData;
 class vtkPVSource;
 class vtkPVSourceList;
-class vtkPVTreeComposite;
 class vtkPVWindow;
 class vtkRenderer;
 class vtkRenderWindow;
@@ -73,12 +76,8 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // A conveniance method that I do not mean to be permenant !!!!!
-  vtkPVWindow* GetPVWindow();
-
-  // Description:
   // Set the application right after construction.
-  void SetPVApplication(vtkPVApplication *pvApp);
+  virtual void SetPVApplication(vtkPVApplication *pvApp);
   vtkGetObjectMacro(PVApplication, vtkPVApplication);
 
   // Description:
@@ -93,13 +92,9 @@ public:
   void RemovePVSource(vtkPVSource *pvs);
   
   // Description:
-  // Computes the reduction factor to use in compositing.
-  void StartRender();
-  
-  // Description:
-  // Composites
-  void StillRender();
-  void InteractiveRender();
+  // Renders using Still/FullRes or interactive/LODs
+  virtual void StillRender();
+  virtual void InteractiveRender();
 
   // Description:
   // Are we currently in interactive mode?
@@ -112,12 +107,6 @@ public:
   const char *GetRenderWindowTclName() {return this->RenderWindowTclName;}
 
   // Description:
-  // The center of rotation picker needs the compositers zbuffer.
-  // Remove this method.  Change picking the center of rotation.
-  vtkPVTreeComposite *GetComposite() {return this->Composite;}
-  vtkGetStringMacro(CompositeTclName);
-
-  // Description:
   // Change the background color.
   void SetBackgroundColor(float r, float g, float b);
   virtual void SetBackgroundColor(float *c) {this->SetBackgroundColor(c[0],c[1],c[2]);}
@@ -125,20 +114,11 @@ public:
   // Description:
   // Get the tcl name of the renderer.
   vtkGetStringMacro(RendererTclName);
-  
-  // Description:
-  // Set this flag to indicate whether to calculate the reduction factor for
-  // use in tree composite.
-  vtkSetMacro(UseReductionFactor, int);
-  vtkGetMacro(UseReductionFactor, int);
-  vtkBooleanMacro(UseReductionFactor, int);
-  
+    
   // Description:
   // The render view keeps track of these times but does not use them.
   vtkGetMacro(StillRenderTime, double);
   vtkGetMacro(InteractiveRenderTime, double);
-  vtkGetMacro(StillCompositeTime, double);
-  vtkGetMacro(InteractiveCompositeTime, double);
   
   // Description:
   // Callback for the triangle strips check button
@@ -154,11 +134,6 @@ public:
   void SetUseParallelProjection(int val);
 
   // Description:
-  void SetUseCompositeWithFloat(int val);
-  void SetUseCompositeWithRGBA(int val);
-  void SetUseCompositeCompression(int val);
-  
-  // Description:
   // Used to temporarily disable rendering. Useful for collecting a few
   // renders and flusing them out at the end with one render
   vtkSetMacro(DisableRenderingFlag, int);
@@ -168,24 +143,6 @@ public:
   // Description:
   // Get the size of the render window.
   int* GetRenderWindowSize();
-
-  // Description:
-  // This methods can be used from a script.  
-  // "Set" sets the value of the scale, and adds an entry to the trace.
-  void SetLODThreshold(float);
-  vtkGetMacro(LODThreshold, float);
-
-  // Description:
-  // This methods can be used from a script.  
-  // "Set" sets the value of the scale, and adds an entry to the trace.
-  void SetLODResolution(int);
-  vtkGetMacro(LODResolution, int);
-
-  // Description:
-  // This methods can be used from a script.  
-  // "Set" sets the value of the scale, and adds an entry to the trace.
-  void SetCollectThreshold(float);
-  vtkGetMacro(CollectThreshold, float);
 
   // Description:
   // Controls whether the render module invokes abort check events.
@@ -204,20 +161,14 @@ protected:
   // This is used before a render to make sure all visible sources
   // have been updated.  It returns 1 if all the data has been collected
   // and the render should be local.
-  int UpdateAllPVData(int interactive);
+  virtual int UpdateAllPVData(int interactive);
  
   vtkPVApplication* PVApplication;
   vtkRenderer*      Renderer;
   vtkRenderWindow*  RenderWindow;
 
   int Interactive;
-
-  int UseReductionFactor;
   
-  vtkPVTreeComposite *Composite;
-  char *CompositeTclName;
-  vtkSetStringMacro(CompositeTclName);
-
   char *RendererTclName;
   vtkSetStringMacro(RendererTclName);  
    
@@ -226,17 +177,11 @@ protected:
     
   double StillRenderTime;
   double InteractiveRenderTime;
-  double StillCompositeTime;
-  double InteractiveCompositeTime;
 
   int DisableRenderingFlag;
   int RenderInterruptsEnabled;
 
   unsigned long ResetCameraClippingRangeTag;
-
-  float LODThreshold;
-  int LODResolution;
-  float CollectThreshold;
 
   vtkPVRenderModule(const vtkPVRenderModule&); // Not implemented
   void operator=(const vtkPVRenderModule&); // Not implemented
