@@ -71,7 +71,7 @@ int vtkKWApplication::WidgetVisibility = 1;
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.130.2.1");
+vtkCxxRevisionMacro(vtkKWApplication, "1.130.2.2");
 
 extern "C" int Vtktcl_Init(Tcl_Interp *interp);
 extern "C" int Vtkkwwidgetstcl_Init(Tcl_Interp *interp);
@@ -1002,6 +1002,12 @@ void vtkKWApplication::ConfigureAbout()
   this->AboutDialog->SetText(str.str());
 
   str.rdbuf()->freeze(0);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWApplication::AddSimpleTraceEntry(const char *trace)
+{
+  this->AddTraceEntry(trace);
 }
 
 //----------------------------------------------------------------------------

@@ -199,6 +199,7 @@ public:
   // This can be used to trace the application.
   // Look at vtkKWWidgets to see how it is used.
   ofstream *GetTraceFile() {return this->TraceFile;}
+  virtual void AddSimpleTraceEntry(const char* trace);
   //BTX
   virtual void AddTraceEntry(const char* format, ...);
   //ETX
