@@ -38,7 +38,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPart);
-vtkCxxRevisionMacro(vtkPVPart, "1.45");
+vtkCxxRevisionMacro(vtkPVPart, "1.46");
 
 
 int vtkPVPartCommand(ClientData cd, Tcl_Interp *interp,
@@ -135,8 +135,7 @@ void vtkPVPart::SetPartDisplay(vtkPVPartDisplay* pDisp)
     {
     this->PartDisplay = pDisp;
     this->PartDisplay->Register(this);
-    // This is special (why we cannot use a macro).
-    this->PartDisplay->ConnectToData(this->VTKDataID);
+    this->PartDisplay->SetInput(this);
     }
 }
 

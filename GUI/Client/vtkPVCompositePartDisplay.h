@@ -46,11 +46,9 @@ public:
   virtual void SetLODCollectionDecision(int val);
   vtkGetMacro(LODCollectionDecision, int);
 
-  //BTX
   // Description:
   // Connect the VTK data object to the display pipeline.
-  virtual void ConnectToData(vtkClientServerID geometryID);
-  //ETX
+  virtual void SetInput(vtkPVPart* input);
 
   // Description:
   // Collection filters for both levels of detail.

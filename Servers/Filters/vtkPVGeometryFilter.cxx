@@ -36,8 +36,9 @@
 #include "vtkStructuredGrid.h"
 #include "vtkStructuredGridOutlineFilter.h"
 #include "vtkUnstructuredGrid.h"
+#include "vtkCallbackCommand.h"
 
-vtkCxxRevisionMacro(vtkPVGeometryFilter, "1.30");
+vtkCxxRevisionMacro(vtkPVGeometryFilter, "1.31");
 vtkStandardNewMacro(vtkPVGeometryFilter);
 
 vtkCxxSetObjectMacro(vtkPVGeometryFilter, Controller, vtkMultiProcessController);
@@ -53,6 +54,12 @@ vtkPVGeometryFilter::vtkPVGeometryFilter ()
   this->DataSetSurfaceFilter = vtkDataSetSurfaceFilter::New();
   this->HierarchicalBoxOutline = vtkHierarchicalBoxOutlineFilter::New();
 
+  // Setup a callback for the internal readers to report progress.
+  this->InternalProgressObserver = vtkCallbackCommand::New();
+  this->InternalProgressObserver->SetCallback(
+    &vtkPVGeometryFilter::InternalProgressCallbackFunction);
+  this->InternalProgressObserver->SetClientData(this);
+
   this->Controller = 0;
   this->SetController(vtkMultiProcessController::GetGlobalController());
 
@@ -65,7 +72,30 @@ vtkPVGeometryFilter::~vtkPVGeometryFilter ()
   this->DataSetSurfaceFilter->Delete();
   this->HierarchicalBoxOutline->Delete();
   this->OutlineSource->Delete();
+  this->InternalProgressObserver->Delete();
   this->SetController(0);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVGeometryFilter::InternalProgressCallbackFunction(vtkObject*,
+                                                           unsigned long,
+                                                           void* clientdata,
+                                                           void*)
+{
+  reinterpret_cast<vtkPVGeometryFilter*>(clientdata)
+    ->InternalProgressCallback();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVGeometryFilter::InternalProgressCallback()
+{
+  // This limits progress for only the DataSetSurfaceFilter.
+  float progress = this->DataSetSurfaceFilter->GetProgress();
+  this->UpdateProgress(progress);
+  if (this->AbortExecute)
+    {
+    this->DataSetSurfaceFilter->SetAbortExecute(1);
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -275,7 +305,15 @@ void vtkPVGeometryFilter::DataSetSurfaceExecute(vtkDataSet *input)
   ds->ShallowCopy(input);
   this->DataSetSurfaceFilter->SetInput(ds);
   ds->Delete();
+
+
+  // Observe the progress of the internal filter.
+  this->DataSetSurfaceFilter->AddObserver(vtkCommand::ProgressEvent, 
+                                          this->InternalProgressObserver);
   this->DataSetSurfaceFilter->Update();
+  // The internal filter is finished.  Remove the observer.
+  this->DataSetSurfaceFilter->RemoveObserver(this->InternalProgressObserver);
+
   this->GetOutput()->ShallowCopy(this->DataSetSurfaceFilter->GetOutput());
 }
 
