@@ -85,6 +85,7 @@ public:
   void SetVisibility();
   void SetVisibility(int val);
   void SetVisibilityNoTrace(int val);
+  vtkBooleanMacro(Visibility, int);
 
   // Description:
   // Set modified to 1 when value has changed.

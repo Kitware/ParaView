@@ -86,7 +86,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.196");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.197");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -187,6 +187,7 @@ vtkPVRenderView::vtkPVRenderView()
   this->ParaViewOptionsFrame = vtkKWLabeledFrame::New();
   this->NavigationWindowButton = vtkKWRadioButton::New();
   this->SelectionWindowButton = vtkKWRadioButton::New();
+  this->Display3DWidgets = vtkKWCheckButton::New();
 
   this->LODThreshold = 1000;
   this->LODResolution = 50;
@@ -256,6 +257,7 @@ vtkPVRenderView::~vtkPVRenderView()
   this->ParaViewOptionsFrame->Delete();
   this->NavigationWindowButton->Delete();
   this->SelectionWindowButton->Delete();
+  this->Display3DWidgets->Delete();
 
   if ( this->SelectionWindow )
     {
@@ -731,6 +733,16 @@ void vtkPVRenderView::Create(vtkKWApplication *app, const char *args)
     this->ShowNavigationWindowCallback(0);
     }
 
+  if ( !this->Application->GetRegisteryValue(2, "RunTime", "Display3DWidgets", 0) ||
+       this->GetPVWindow()->GetIntRegisteryValue(2, "RunTime", "Display3DWidgets") )
+    {
+    this->SetDisplay3DWidgets(1);
+    }
+  else
+    {
+    this->SetDisplay3DWidgets(0);
+    }
+  
   this->EventuallyRender();
   delete [] local;
 }
@@ -742,7 +754,21 @@ vtkKWWidget *vtkPVRenderView::GetSourceParent()
   return this->SplitFrame->GetFrame2();
 }
 
+//----------------------------------------------------------------------------
+void vtkPVRenderView::Display3DWidgetsCallback()
+{
+  int val = this->Display3DWidgets->GetState();
+  this->SetDisplay3DWidgets(val);
+  this->Application->SetRegisteryValue(2, "RunTime","Display3DWidgets",
+                                      (val?"1":"0"));
+}
 
+//----------------------------------------------------------------------------
+void vtkPVRenderView::SetDisplay3DWidgets(int s)
+{
+  this->Display3DWidgets->SetState(s);
+  this->GetPVApplication()->SetDisplay3DWidgets(s);
+}
 
 //----------------------------------------------------------------------------
 void vtkPVRenderView::CreateViewProperties()
@@ -1105,6 +1131,15 @@ void vtkPVRenderView::CreateViewProperties()
                this->SelectionWindowButton->GetWidgetName(),
                this->NavigationWindowButton->GetWidgetName());
 
+  this->Display3DWidgets->SetParent(
+    this->ParaViewOptionsFrame->GetFrame());
+  this->Display3DWidgets->Create(this->Application, 0);
+  this->Display3DWidgets->SetText("Display 3D Widgets Automatically");
+  this->Display3DWidgets->SetCommand(this, "Display3DWidgetsCallback");
+
+  this->Script("pack %s -side top -padx 2 -pady 2 -anchor w",
+               this->Display3DWidgets->GetWidgetName());
+
   this->Notebook->AddPage("Camera", "Camera and viewing navigation properties page");
   vtkKWWidget* page = this->Notebook->GetFrame("Camera");
 
@@ -1208,7 +1243,15 @@ void vtkPVRenderView::CreateViewProperties()
     this->ShowNavigationWindowCallback(0);
     }
 
-  
+  if ( !this->Application->GetRegisteryValue(2, "RunTime", "Display3DWidgets", 0) ||
+       pvwindow->GetIntRegisteryValue(2, "RunTime", "Display3DWidgets") )
+    {
+    this->SetDisplay3DWidgets(1);
+    }
+  else
+    {
+    this->SetDisplay3DWidgets(0);
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -2278,7 +2321,7 @@ void vtkPVRenderView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVRenderView ";
-  this->ExtractRevision(os,"$Revision: 1.196 $");
+  this->ExtractRevision(os,"$Revision: 1.197 $");
 }
 
 //------------------------------------------------------------------------------

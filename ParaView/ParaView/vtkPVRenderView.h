@@ -355,6 +355,11 @@ public:
   // Restore current camera from a specified position.
   void RestoreCurrentCamera(int position);  
 
+  // Description:
+  // Set the global variable for always displaying 3D widgets.
+  void Display3DWidgetsCallback();
+  void SetDisplay3DWidgets(int s);
+
 protected:
   vtkPVRenderView();
   ~vtkPVRenderView();
@@ -403,6 +408,7 @@ protected:
   vtkKWLabeledFrame *ParaViewOptionsFrame;
   vtkKWRadioButton *NavigationWindowButton;
   vtkKWRadioButton *SelectionWindowButton;
+  vtkKWCheckButton *Display3DWidgets;
 
   vtkKWCheckButton *ReductionCheck;
   

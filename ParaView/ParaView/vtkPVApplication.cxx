@@ -98,7 +98,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.138");
+vtkCxxRevisionMacro(vtkPVApplication, "1.139");
 
 int vtkPVApplicationCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -242,6 +242,7 @@ Tcl_Interp *vtkPVApplication::InitializeTcl(int argc, char *argv[])
 //----------------------------------------------------------------------------
 vtkPVApplication::vtkPVApplication()
 {
+  this->Display3DWidgets = 0;
   this->ProcessId = 0;
   this->RunningParaViewScript = 0;
 

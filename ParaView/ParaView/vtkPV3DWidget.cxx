@@ -55,7 +55,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVXMLElement.h"
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkPV3DWidget, "1.25");
+vtkCxxRevisionMacro(vtkPV3DWidget, "1.26");
 
 //===========================================================================
 //***************************************************************************
@@ -184,6 +184,7 @@ void vtkPV3DWidget::Create(vtkKWApplication *kwApp)
   this->Observer->Execute(this->Widget3D, vtkCommand::InteractionEvent, 0);
 
   this->PlaceWidget();
+  this->Visible = pvApp->GetDisplay3DWidgets();
 }
 
 //----------------------------------------------------------------------------

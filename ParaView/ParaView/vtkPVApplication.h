@@ -244,6 +244,16 @@ public:
   // only once.
   void SetEnvironmentVariable(const char* string);
 
+  // Description: 
+  
+  // Set or get the display 3D widgets flag.  When this flag is set,
+  // the 3D widgets will be displayed when they are created. Otherwise
+  // user has to enable them. User will still be able to disable the
+  // 3D widget.
+  vtkSetClampMacro(Display3DWidgets, int, 0, 1);
+  vtkBooleanMacro(Display3DWidgets, int);
+  vtkGetMacro(Display3DWidgets, int);
+
 protected:
   vtkPVApplication();
   ~vtkPVApplication();
@@ -261,6 +271,8 @@ protected:
   int NumberOfPipes;
 
   int ProcessId;
+
+  int Display3DWidgets;
 
   // Need to put a global flag that indicates interactive rendering.
   // All process must be consistent in choosing LODs because
