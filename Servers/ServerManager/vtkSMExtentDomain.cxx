@@ -21,7 +21,7 @@
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkSMExtentDomain);
-vtkCxxRevisionMacro(vtkSMExtentDomain, "1.2");
+vtkCxxRevisionMacro(vtkSMExtentDomain, "1.2.2.1");
 
 //---------------------------------------------------------------------------
 vtkSMExtentDomain::vtkSMExtentDomain()
