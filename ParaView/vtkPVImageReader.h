@@ -34,13 +34,24 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkImageReader.h"
 #include "vtkPVSource.h"
 
+class vtkPVImage;
+
+
 class VTK_EXPORT vtkPVImageReader : public vtkPVSource
 {
 public:
   static vtkPVImageReader* New();
   vtkTypeMacro(vtkPVImageReader, vtkPVSource);
 
-  void Create(vtkKWApplication *app, char *args);
+  // Description:
+  // You will need to clone this object before you create it.
+  int Create(char *args);
+  
+  // Description:
+  // For now you have to set the output explicitly.  This allows you to manage
+  // the object creation/tcl-names in the other processes.
+  void SetOutput(vtkPVImage *pvi);
+  vtkPVImage *GetOutput();
   
   vtkGetObjectMacro(ImageReader, vtkImageReader);
   

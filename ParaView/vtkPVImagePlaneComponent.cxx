@@ -36,7 +36,8 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkLookupTable.h"
 #include "vtkTexture.h"
 
-//------------------------------------------------------------------------------
+
+//----------------------------------------------------------------------------
 vtkPVImagePlaneComponent* vtkPVImagePlaneComponent::New()
 {
   // First try to create the object from the vtkObjectFactory

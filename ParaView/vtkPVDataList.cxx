@@ -242,13 +242,13 @@ void vtkPVDataList::ToggleVisibility(int compIdx, int button)
     {
     // Toggle visibility
     
-    if (comp->GetProp()->GetVisibility())
+    if (comp->GetVisibility())
       {
-      comp->GetProp()->VisibilityOff();
+      comp->VisibilityOff();
       }
     else
       {
-      comp->GetProp()->VisibilityOn();
+      comp->VisibilityOn();
       }
     comp->GetView()->Render();
     }
@@ -314,7 +314,7 @@ int vtkPVDataList::Update(vtkPVComposite *comp, int y, int in)
 
   // Draw the icon indicating visibility.
   result = NULL;
-  switch (comp->GetProp()->GetVisibility())
+  switch (comp->GetVisibility())
     {
     case 0:
       this->Script("%s create image %d %d -image visoffbm",

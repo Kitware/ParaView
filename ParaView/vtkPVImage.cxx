@@ -36,20 +36,24 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 int vtkPVImageCommand(ClientData cd, Tcl_Interp *interp,
 		      int argc, char *argv[]);
 
+//----------------------------------------------------------------------------
 vtkPVImage::vtkPVImage()
 {
   this->CommandFunction = vtkPVImageCommand;
 }
 
+//----------------------------------------------------------------------------
 vtkPVImage::~vtkPVImage()
 {
 }
 
+//----------------------------------------------------------------------------
 vtkPVImage* vtkPVImage::New()
 {
   return new vtkPVImage();
 }
 
+//----------------------------------------------------------------------------
 void vtkPVImage::Clip()
 {
   vtkPVImageClip *clip;
@@ -73,9 +77,9 @@ void vtkPVImage::Clip()
   
   vtkPVWindow *window = this->GetComposite()->GetWindow();
   newComp->SetPropertiesParent(window->GetDataPropertiesParent());
-  newComp->CreateProperties(this->Application, "");
+  newComp->CreateProperties("");
   this->GetComposite()->GetView()->AddComposite(newComp);
-  this->GetComposite()->GetProp()->VisibilityOff();
+  this->GetComposite()->VisibilityOff();
   
   newComp->SetWindow(window);
   
@@ -91,6 +95,7 @@ void vtkPVImage::Clip()
   clip->Delete();
 }
 
+//----------------------------------------------------------------------------
 void vtkPVImage::Slice()
 {
   vtkPVImageSlice *slice;
@@ -116,9 +121,9 @@ void vtkPVImage::Slice()
   
   vtkPVWindow *window = this->GetComposite()->GetWindow();
   newComp->SetPropertiesParent(window->GetDataPropertiesParent());
-  newComp->CreateProperties(this->Application, "");
+  newComp->CreateProperties("");
   this->GetComposite()->GetView()->AddComposite(newComp);
-  this->GetComposite()->GetProp()->VisibilityOff();
+  this->GetComposite()->VisibilityOff();
   
   newComp->SetWindow(window);
   
@@ -131,16 +136,21 @@ void vtkPVImage::Slice()
   slice->Delete();
 }
 
-void vtkPVImage::Create(vtkKWApplication *app, char *args)
+//----------------------------------------------------------------------------
+int vtkPVImage::Create(char *args)
 {
-  vtkPVData::AddCommonWidgets(app, args);
-  
-  this->SetApplication(app);
+  if (this->vtkPVData::Create(args) == 0)
+    {
+    return 0;
+    }
   
   this->FiltersMenuButton->AddCommand("vtkImageClip", this, "Clip");
   this->FiltersMenuButton->AddCommand("ImageSlice", this, "Slice");
+  
+  return 1;
 }
 
+//----------------------------------------------------------------------------
 void vtkPVImage::SetImageData(vtkImageData *data)
 {
   vtkOutlineFilter *outline;
@@ -161,18 +171,20 @@ void vtkPVImage::SetImageData(vtkImageData *data)
     this->Mapper->SetInput(data);
     }
   
-  this->GetData()->Update();
-  this->Mapper->SetScalarRange(this->GetData()->GetScalarRange());
+  this->Data->Update();
+  this->Mapper->SetScalarRange(this->Data->GetScalarRange());
   this->Actor->SetMapper(this->Mapper);
   
   outline->Delete();
 }
 
+//----------------------------------------------------------------------------
 vtkImageData* vtkPVImage::GetImageData()
 {
   return (vtkImageData*)this->Data;
 }
 
+//----------------------------------------------------------------------------
 void vtkPVImage::SetAssignment(vtkPVAssignment *a)
 {
   if (this->Assignment == a)
@@ -201,4 +213,12 @@ void vtkPVImage::SetAssignment(vtkPVAssignment *a)
     image->SetUpdateExtent(a->GetExtent());
     }
 }
+
+
+
+
+
+
+
+
 

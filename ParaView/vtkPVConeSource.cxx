@@ -32,10 +32,12 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkKWRenderView.h"
 #include "vtkPVComposite.h"
 #include "vtkPVPolyData.h"
+#include "vtkPVApplication.h"
 
 int vtkPVConeSourceCommand(ClientData cd, Tcl_Interp *interp,
 			   int argc, char *argv[]);
 
+//----------------------------------------------------------------------------
 vtkPVConeSource::vtkPVConeSource()
 {
   vtkPVPolyData *pvData;
@@ -55,14 +57,10 @@ vtkPVConeSource::vtkPVConeSource()
   this->ResolutionEntry->SetParent(this);
   this->Accept = vtkKWWidget::New();
   this->Accept->SetParent(this);
-  this->ConeSource = vtkConeSource::New();
-
-  pvData = vtkPVPolyData::New();
-  pvData->SetPolyData(this->ConeSource->GetOutput());
-  this->SetDataWidget(pvData);
-  pvData->Delete();
+  this->ConeSource = vtkConeSource::New();  
 }
 
+//----------------------------------------------------------------------------
 vtkPVConeSource::~vtkPVConeSource()
 {
   this->HeightLabel->Delete();
@@ -91,18 +89,13 @@ vtkPVConeSource* vtkPVConeSource::New()
   return new vtkPVConeSource();
 }
 
-void vtkPVConeSource::Create(vtkKWApplication *app, char *args)
+//----------------------------------------------------------------------------
+int vtkPVConeSource::Create(char *args)
 {  
-  // must set the application
-  if (this->Application)
+  if (this->vtkPVSource::Create(args) == 0)
     {
-    vtkErrorMacro("vtkPVConeSource already created");
-    return;
+    return 0;
     }
-  this->SetApplication(app);
-  
-  // create the top level
-  this->Script("frame %s %s", this->GetWidgetName(), args);
   
   this->RadiusLabel->Create(this->Application, "");
   this->RadiusLabel->SetLabel("Radius:");
@@ -129,12 +122,109 @@ void vtkPVConeSource::Create(vtkKWApplication *app, char *args)
                this->ResolutionEntry->GetWidgetName());
 }
 
+//----------------------------------------------------------------------------
+void vtkPVConeSource::SetOutput(vtkPVPolyData *pd)
+{
+  vtkPVApplication *pvApp = this->GetPVApplication();
+
+  this->SetPVData(pd);  
+  pd->SetPolyData(this->ConeSource->GetOutput());
+  
+  if (pvApp && pvApp->GetController()->GetLocalProcessId() == 0)
+    {
+    pvApp->BroadcastScript("%s SetOutput %s", this->GetTclName(), 
+			   pd->GetTclName());
+    }  
+}
+
+
+//----------------------------------------------------------------------------
+vtkPVPolyData *vtkPVConeSource::GetOutput()
+{
+  return vtkPVPolyData::SafeDownCast(this->Output);
+}
+
+
+//----------------------------------------------------------------------------
 void vtkPVConeSource::ConeParameterChanged()
 {
+  int id, num;
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  
   this->ConeSource->SetRadius(this->RadiusEntry->GetValueAsFloat());
   this->ConeSource->SetHeight(this->HeightEntry->GetValueAsFloat());
   this->ConeSource->SetResolution(this->ResolutionEntry->GetValueAsInt());
   
+  num = pvApp->GetController()->GetNumberOfProcesses();
+  for (id = 1; id < num; ++id)
+    {
+    pvApp->RemoteScript(id, "%s SetRadius %f", this->GetTclName(),
+			this->ConeSource->GetRadius());
+    pvApp->RemoteScript(id, "%s SetHeight %f", this->GetTclName(),
+			this->ConeSource->GetHeight());
+    pvApp->RemoteScript(id, "%s SetResolution %d", this->GetTclName(),
+			this->ConeSource->GetResolution());
+    }
+  
   this->Composite->GetView()->Render();
+}
+
+//----------------------------------------------------------------------------
+vtkPVApplication* vtkPVConeSource::GetPVApplication()
+{
+  if (this->Application == NULL)
+    {
+    return NULL;
+    }
+  
+  if (this->Application->IsA("vtkPVApplication"))
+    {  
+    return (vtkPVApplication*)(this->Application);
+    }
+  else
+    {
+    vtkErrorMacro("Bad typecast");
+    return NULL;
+    } 
+}
+
+
+//----------------------------------------------------------------------------
+void vtkPVConeSource::SetRadius(float rad)
+{
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  
+  this->ConeSource->SetRadius(rad);
+  
+  if (pvApp && pvApp->GetController()->GetNumberOfProcesses() == 0)
+    {
+    pvApp->BroadcastScript("%s SetRadius %f", this->GetTclName(), rad);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVConeSource::SetHeight(float height)
+{
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  
+  this->ConeSource->SetHeight(height);
+  
+  if (pvApp && pvApp->GetController()->GetNumberOfProcesses() == 0)
+    {
+    pvApp->BroadcastScript("%s SetHeight %f", this->GetTclName(), height);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVConeSource::SetResolution(int res)
+{
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  
+  this->ConeSource->SetResolution(res);
+  
+  if (pvApp && pvApp->GetController()->GetNumberOfProcesses() == 0)
+    {
+    pvApp->BroadcastScript("%s SetResolution %d", this->GetTclName(), res);
+    }
 }
 

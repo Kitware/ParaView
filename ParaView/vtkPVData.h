@@ -38,6 +38,8 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 class vtkPVComposite;
 class vtkPVSource;
 class vtkPVAssignment;
+class vtkPVApplication;
+
 
 class VTK_EXPORT vtkPVData : public vtkKWWidget
 {
@@ -45,14 +47,18 @@ public:
   static vtkPVData* New();
   vtkTypeMacro(vtkPVData, vtkKWWidget);
   
-  virtual void Create(vtkKWApplication *app, char *args) {}
-  void AddCommonWidgets(vtkKWApplication *app, char *args);
-
+  // Description:
+  // This duplicates the object in the satellite processes.
+  // They will all have the same tcl name.
+  void Clone(vtkPVApplication *app);
+  
+  // Description:
+  // Creates common widgets.
+  // Returns 0 if there was an error.
+  virtual int Create(char *args);
+  
   vtkProp* GetProp();
   
-  vtkGetObjectMacro(Data, vtkDataSet);
-  vtkSetObjectMacro(Data, vtkDataSet);
-
   // Description:
   // General filters that can be applied to vtkDataSet.
   void Contour();
@@ -60,13 +66,21 @@ public:
   // Description:
   // DO NOT CALL THIS IF YOU ARE NOT A COMPOSITE!
   // The composite sets this so this data widget will know who owns it.
-  void SetSourceWidget(vtkPVSource *source);
-
+  void SetPVSource(vtkPVSource *source);
+  vtkGetObjectMacro(PVSource, vtkPVSource);
+  
   // Description:
   // Like update extent, but an object tells which piece to assign this process.
   virtual void SetAssignment(vtkPVAssignment *a);
   vtkPVAssignment *GetAssignment() {return this->Assignment;}
   
+  // Description:
+  // Casts to vtkPVApplication.
+  vtkPVApplication *GetPVApplication();
+
+  // Description:
+  // A generic way of getting the data.
+  vtkGetObjectMacro(Data,vtkDataSet);
   
 protected:
   vtkPVData();
@@ -75,13 +89,15 @@ protected:
   vtkPVData(const vtkPVData&) {};
   void operator=(const vtkPVData&) {};
   
+  vtkSetObjectMacro(Data, vtkDataSet);
+
   vtkPVMenuButton *FiltersMenuButton;
   vtkDataSet *Data;
   vtkDataSetMapper *Mapper;
   vtkActor *Actor;
 
   // This points to the source widget that owns this data widget.
-  vtkPVSource *SourceWidget;
+  vtkPVSource *PVSource;
 
   // Description:
   // A convenience method to get the cpmposite that owns the source widget

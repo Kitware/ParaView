@@ -35,6 +35,9 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkKWLabel.h"
 #include "vtkPVSource.h"
 
+class vtkPVPolyData;
+class vtkPVImage;
+
 
 class VTK_EXPORT vtkPVContourFilter : public vtkPVSource
 {
@@ -42,7 +45,24 @@ public:
   static vtkPVContourFilter* New();
   vtkTypeMacro(vtkPVContourFilter, vtkPVSource);
 
-  void Create(vtkKWApplication *app, char *args);
+  // Description:
+  // You have to clone this object before you create its UI.
+  int Create(char *args);
+  
+  // Description:
+  // The methods executes on all processes.
+  void SetInput(vtkPVData *pvData);
+  
+  // Description:
+  // For now you have to set the output explicitly.  This allows you to manage
+  // the object creation/tcl-names in the other processes.  Do not try to
+  // set the output before the input has been set.
+  void SetOutput(vtkPVPolyData *pvd);
+  vtkPVPolyData *GetOutput();
+  
+  // Description:
+  // This interface broadcasts the change to all the processes.
+  void SetValue(int contour, float val);
   
   void ContourValueChanged();
 

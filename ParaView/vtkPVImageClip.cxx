@@ -35,6 +35,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 int vtkPVImageClipCommand(ClientData cd, Tcl_Interp *interp,
 			  int argc, char *argv[]);
 
+//----------------------------------------------------------------------------
 vtkPVImageClip::vtkPVImageClip()
 {
   this->CommandFunction = vtkPVImageClipCommand;
@@ -69,13 +70,9 @@ vtkPVImageClip::vtkPVImageClip()
   this->ClipZMaxLabel->SetParent(this);
   
   this->ImageClip = vtkImageClip::New();
-
-  vtkPVImage *d = vtkPVImage::New();
-  d->SetImageData(this->ImageClip->GetOutput());
-  this->SetDataWidget(d);
-  d->Delete();
 }
 
+//----------------------------------------------------------------------------
 vtkPVImageClip::~vtkPVImageClip()
 { 
   this->Accept->Delete();
@@ -111,25 +108,22 @@ vtkPVImageClip::~vtkPVImageClip()
   this->ImageClip = NULL;
 }
 
+//----------------------------------------------------------------------------
 vtkPVImageClip* vtkPVImageClip::New()
 {
   return new vtkPVImageClip();
 }
 
-void vtkPVImageClip::Create(vtkKWApplication *app, char *args)
+//----------------------------------------------------------------------------
+int vtkPVImageClip::Create(char *args)
 {
   int *extents;
   
   // must set the application
-  if (this->Application)
+  if (this->vtkPVSource::Create(args) == 0)
     {
-    vtkErrorMacro("vtkPVContourFilter already created");
-    return;
+    return 0;
     }
-  this->SetApplication(app);
-  
-  // create the top level
-  this->Script("frame %s %s", this->GetWidgetName(), args);
   
   extents = this->GetImageClip()->GetOutputWholeExtent();
   
@@ -174,8 +168,25 @@ void vtkPVImageClip::Create(vtkKWApplication *app, char *args)
 	       this->ClipZMinEntry->GetWidgetName(),
 	       this->ClipZMaxLabel->GetWidgetName(),
 	       this->ClipZMaxEntry->GetWidgetName());
+  return 1;
 }
 
+
+//----------------------------------------------------------------------------
+void vtkPVImageClip::SetOutput(vtkPVImage *pvi)
+{
+  this->SetPVData(pvi);
+
+  pvi->SetImageData(this->ImageClip->GetOutput());
+}
+
+//----------------------------------------------------------------------------
+vtkPVImage *vtkPVImageClip::GetOutput()
+{
+  return vtkPVImage::SafeDownCast(this->Output);
+}
+
+//----------------------------------------------------------------------------
 void vtkPVImageClip::ExtentsChanged()
 {  
   this->ImageClip->SetOutputWholeExtent(this->ClipXMinEntry->GetValueAsInt(),

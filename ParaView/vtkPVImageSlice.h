@@ -35,13 +35,25 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkKWRadioButton.h"
 #include "vtkPVSource.h"
 
+class vtkPVImage;
+
+
+
 class VTK_EXPORT vtkPVImageSlice : public vtkPVSource
 {
 public:
   static vtkPVImageSlice* New();
   vtkTypeMacro(vtkPVImageSlice, vtkPVSource);
 
-  void Create(vtkKWApplication *app, char *args);
+  // Description:
+  // You have to clone this object before you create its UI.
+  int Create(char *args);
+  
+  // Description:
+  // For now you have to set the output explicitly.  This allows you to manage
+  // the object creation/tcl-names in the other processes.
+  void SetOutput(vtkPVImage *pvd);
+  vtkPVImage *GetOutput();
   
   void SliceChanged();
   void SelectX();

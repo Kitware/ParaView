@@ -27,7 +27,15 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 =========================================================================*/
 // .NAME vtkPVRenderView - For using styles
 // .SECTION Description
+// This is a render view that is a parallel object.  It needs to be cloned
+// in all the processes to work correctly.  After cloning, the parallel
+// nature of the object is transparent.
+// Other features:
 // I am going to try to divert the events to a vtkInteractorStyle object.
+// I also have put compositing into this object.  I had to create a separate
+// renderwindow and renderer fro the off screen compositing (Hacks).
+// Eventually I need to merge these back into the main renderer and renderer window.
+
 
 #ifndef __vtkPVRenderView_h
 #define __vtkPVRenderView_h
@@ -36,7 +44,8 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkInteractorStyle.h"
 #include "vtkRenderWindowInteractor.h"
 
-class vtkKWApplication;
+class vtkPVApplication;
+
 
 class VTK_EXPORT vtkPVRenderView : public vtkKWRenderView
 {
@@ -45,9 +54,22 @@ public:
   vtkTypeMacro(vtkPVRenderView,vtkKWRenderView);
 
   // Description:
+  // Duplicate this object in the satellite processes.  Clones will
+  // have the same tcl name.  Unlike other parallel objects in
+  // ParaView, this one does not use Clone to set the application.
+  // That is still done in the method "Create" (for superclass reasons).
+  void Clone(vtkPVApplication *pvApp);
+  
+  // Description:
   // Create the TK widgets associated with the view.
   void Create(vtkKWApplication *app, char *args);
 
+  // Description:
+  // This is a parallel version of the superclasses method.
+  // It makes the assignment in all of the processes.
+  // Pass in a vtkPVApplication, or the method will fail.
+  void SetApplication(vtkKWApplication *app);
+  
   // Description:
   // The events will be forwarded to this style object,
   void SetInteractorStyle(vtkInteractorStyle *style);
@@ -79,7 +101,30 @@ public:
   // Reset the camera clipping range based on the bounds of the
   // visible actors. This ensures that no props are cut off
   void ResetCameraClippingRange();
- 
+
+  // Description:
+  // This method is called in the satellite renderers to comp[ute the bounds of the
+  // actors.
+  void TransmitBounds();
+
+  // Description:
+  // This method is called in the satellite renderers to render and composite the
+  // results.
+  void RenderHack();
+  
+  // Description:
+  // This method is executed in all processes.
+  void AddComposite(vtkKWComposite *c);
+
+  // Description:
+  // Until we can get the supperclass renderer working ...
+  // This is the special call made in the satellite processes.
+  void AddCompositeHack(vtkKWComposite *c);
+
+  // Description:
+  // Casts to vtkPVApplication.
+  vtkPVApplication *GetPVApplication();
+  
 protected:
 
   vtkPVRenderView();
@@ -89,6 +134,11 @@ protected:
 
   vtkInteractorStyle *InteractorStyle;
   vtkRenderWindowInteractor *Interactor;
+  
+  // For satellite renderers (from the old render slave).
+  // I cannot get the RenderView working with the superclass render window.
+  vtkRenderWindow *RenderWindowHack;
+  vtkRenderer *RendererHack;
 };
 
 

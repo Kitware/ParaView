@@ -37,49 +37,63 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkKWPushButton.h"
 #include "vtkKWEntry.h"
 #include "vtkPVWindow.h"
-#include "vtkKWApplication.h"
+#include "vtkPVAssignment.h"
 
 #include "vtkConeSource.h"
+#include "vtkPVApplication.h"
 
 int vtkPVPolyDataCommand(ClientData cd, Tcl_Interp *interp,
 		                     int argc, char *argv[]);
 
 
+//----------------------------------------------------------------------------
 vtkPVPolyData::vtkPVPolyData()
 {
   this->CommandFunction = vtkPVPolyDataCommand;
 }
 
+//----------------------------------------------------------------------------
 vtkPVPolyData::~vtkPVPolyData()
 {
 }
 
+//----------------------------------------------------------------------------
 vtkPVPolyData* vtkPVPolyData::New()
 {
   return new vtkPVPolyData();
 }
 
+//----------------------------------------------------------------------------
 void vtkPVPolyData::Shrink()
 {
+  vtkPVApplication *pvApp = (vtkPVApplication *)this->Application;
   //shrink factor defaults to 0.5, which seems reasonable
   vtkPVShrinkPolyData *shrink;
+  vtkPVPolyData *pvd;
+  vtkPVAssignment *a;
   vtkPVComposite *newComp;
   vtkPVWindow *window = this->GetComposite()->GetWindow();
   
-  shrink = vtkPVShrinkPolyData::New();
-  shrink->GetShrink()->SetInput(this->GetPolyData());  
-    
   newComp = vtkPVComposite::New();
+  newComp->Clone(pvApp);
+  shrink = vtkPVShrinkPolyData::New();
+  shrink->Clone(pvApp);
+  pvd = vtkPVPolyData::New();
+  pvd->Clone(pvApp);
+  
+  shrink->SetInput(this);
+  shrink->SetOutput(pvd);
+  a = this->GetAssignment();
+  shrink->SetAssignment(a);
+  
   newComp->SetSource(shrink);
   newComp->SetCompositeName("shrink");
-  
   newComp->SetPropertiesParent(window->GetDataPropertiesParent());
-  newComp->CreateProperties(this->Application, "");
+  newComp->CreateProperties("");
 
   this->GetComposite()->GetView()->AddComposite(newComp);
-
   // Turn this data object off so the next will will not be ocluded.
-  this->GetComposite()->GetProp()->VisibilityOff();
+  this->GetComposite()->VisibilityOff();
 
   // The window here should probably be replaced with the view.
   newComp->SetWindow(window);
@@ -92,6 +106,7 @@ void vtkPVPolyData::Shrink()
   shrink->New();
 }
 
+//----------------------------------------------------------------------------
 void vtkPVPolyData::Glyph()
 {
   vtkPVComposite *glyphComp;
@@ -103,7 +118,7 @@ void vtkPVPolyData::Glyph()
   glyphComp = vtkPVComposite::New();
   glyphComp->SetSource(glyphCone);
   glyphComp->SetPropertiesParent(window->GetDataPropertiesParent());
-  glyphComp->CreateProperties(this->Application, "");
+  glyphComp->CreateProperties("");
   window->GetMainView()->AddComposite(glyphComp);
   glyphComp->SetWindow(window);
   glyphComp->SetCompositeName("glyph comp");
@@ -114,16 +129,16 @@ void vtkPVPolyData::Glyph()
   glyph->SetGlyphComposite(glyphComp);
   glyph->GetGlyph()->SetScaleModeToDataScalingOff();
   
-  glyphComp->GetProp()->VisibilityOff();
+  glyphComp->VisibilityOff();
     
   newComp = vtkPVComposite::New();
   newComp->SetSource(glyph);
   newComp->SetCompositeName("glyph");
  
   newComp->SetPropertiesParent(window->GetDataPropertiesParent());
-  newComp->CreateProperties(this->Application, "");
+  newComp->CreateProperties("");
   this->GetComposite()->GetView()->AddComposite(newComp);
-  this->GetComposite()->GetProp()->VisibilityOff();
+  this->GetComposite()->VisibilityOff();
   
   newComp->SetWindow(window);
   window->SetCurrentDataComposite(newComp);
@@ -137,50 +152,62 @@ void vtkPVPolyData::Glyph()
   glyphComp->Delete();
 }
 
+
+  
+//----------------------------------------------------------------------------
 void vtkPVPolyData::Elevation()
 {
+  vtkPVApplication *pvApp = (vtkPVApplication *)this->Application;
   vtkPVElevationFilter *elevation;
   vtkPVComposite *newComp;
+  vtkPVPolyData *newData;
+  vtkPVAssignment *a;
   float *bounds;
-  float low[3], high[3];
-  
+
+  // This should go through the PVData who will collect the info.
   bounds = this->GetPolyData()->GetBounds();
-  low[0] = 0;
-  low[1] = 0;
-  low[2] = bounds[4];
-  high[0] = 0;
-  high[1] = 0;
-  high[2] = bounds[5];
   
-  elevation = vtkPVElevationFilter::New();
-  elevation->GetElevation()->SetInput(this->GetPolyData());
-  elevation->GetElevation()->SetLowPoint(low);
-  elevation->GetElevation()->SetHighPoint(high);
-    
   newComp = vtkPVComposite::New();
+  newComp->Clone(pvApp);
+  elevation = vtkPVElevationFilter::New();
+  elevation->Clone(pvApp);
+  newData = vtkPVPolyData::New();
+  newData->Clone(pvApp);
+  
+  elevation->SetInput(this);
+  elevation->SetOutput(newData);
+  a = this->GetAssignment();
+  elevation->SetAssignment(a);
+  
   newComp->SetSource(elevation);
   newComp->SetCompositeName("elevation");
   
   vtkPVWindow *window = this->GetComposite()->GetWindow();
   newComp->SetPropertiesParent(window->GetDataPropertiesParent());
-  newComp->CreateProperties(this->Application, "");
+  newComp->CreateProperties("");
   this->GetComposite()->GetView()->AddComposite(newComp);
-  this->GetComposite()->GetProp()->VisibilityOff();
+  this->GetComposite()->VisibilityOff();
   
   newComp->SetWindow(window);
   
   window->SetCurrentDataComposite(newComp);
   window->GetDataList()->Update();
 
+  elevation->SetLowPoint(bounds[0], 0.0, 0.0);
+  elevation->SetHighPoint(bounds[1], 0.0, 0.0);
+  
   this->GetComposite()->GetView()->Render();
+  elevation->Delete();
   newComp->Delete();
 }
 
-void vtkPVPolyData::Create(vtkKWApplication *app, char *args)
+//----------------------------------------------------------------------------
+int vtkPVPolyData::Create(char *args)
 {
-  vtkPVData::AddCommonWidgets(app, args);
-  
-  this->SetApplication(app);
+  if (this->vtkPVData::Create(args) == 0)
+    {
+    return 0;
+    }
   
   this->FiltersMenuButton->AddCommand("vtkShrinkPolyData", this,
 				      "Shrink");
@@ -188,8 +215,11 @@ void vtkPVPolyData::Create(vtkKWApplication *app, char *args)
 				      "Elevation");
   this->FiltersMenuButton->AddCommand("vtkGlyph3D", this,
 				      "Glyph");
+
+  return 1;
 }
 
+//----------------------------------------------------------------------------
 void vtkPVPolyData::SetPolyData(vtkPolyData *data)
 {
   this->SetData(data);
@@ -197,7 +227,9 @@ void vtkPVPolyData::SetPolyData(vtkPolyData *data)
   this->Actor->SetMapper(this->Mapper);
 }
 
+//----------------------------------------------------------------------------
 vtkPolyData *vtkPVPolyData::GetPolyData()
 {
   return (vtkPolyData*)this->Data;
 }
+

@@ -25,13 +25,12 @@ PARTICULAR PURPOSE, AND NON-INFRINGEMENT.  THIS SOFTWARE IS PROVIDED ON AN
 MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 =========================================================================*/
-// .NAME vtkPVComposite - an element in a view containing props / properties
+// .NAME vtkPVComposite - parallel filter/data object.
 // .SECTION Description
-// A composite represents an element in the view. It is very similar to
-// the notion of an actor in a renderer. The composite is different in 
-// that it combines the Actor (vtkProp actually) with some user interface
-// code called the properties, and it may also contain more complex
-// elements such as filters etc.
+// This composite is a parallel object.  It needs to be cloned
+// in all the processes to work correctly.  After cloning, the parallel
+// nature of the object is transparent.
+
 
 #ifndef __vtkPVComposite_h
 #define __vtkPVComposite_h
@@ -49,20 +48,29 @@ public:
   vtkTypeMacro(vtkPVComposite,vtkKWComposite);
   
   // Description:
-  // Get the Prop for this class.
-  virtual vtkProp *GetProp();
-
+  // This duplicates the object in the satellite processes.
+  // They will all have the same tcl name.
+  void Clone(vtkPVApplication *app);
+  
   // Description:
   // Create the properties object, called by InitializeProperties.
-  virtual void CreateProperties(vtkKWApplication *app, char *args);
+  virtual void CreateProperties(char *args);
 
   void SetPropertiesParent(vtkKWWidget *parent);
   vtkKWWidget *GetPropertiesParent();
   vtkKWWidget *GetProperties();
 
-  void SetData(vtkPVData *data);
-  vtkPVData *GetData();
+  // Description:
+  // Get the Prop for this class.
+  virtual vtkProp *GetProp();
 
+  // Description:
+  // A convenience method that returns the data from the source.
+  vtkPVData *GetPVData();
+
+  // Description:
+  // The source should really be merged with this composite class.
+  // The set method assigns the source in all of the processes.
   void SetSource(vtkPVSource *source);
   vtkGetObjectMacro(Source, vtkPVSource);
 
@@ -72,9 +80,22 @@ public:
   void SetWindow(vtkPVWindow *window);
   vtkPVWindow *GetWindow();
   
+  // Description:
+  // This name is used in the data list to identify the composite.
   virtual void SetCompositeName(const char *name);
   char* GetCompositeName();
   
+  // Description:
+  // This flage turns the visibility of the prop on and off.  These methods transmit
+  // the state change to all of the satellite processes.
+  void SetVisibility(int v);
+  int GetVisibility();
+  vtkBooleanMacro(Visibility, int);
+
+  // Description:
+  // This just returns the application typecast correctly.
+  vtkPVApplication* GetPVApplication();
+
 protected:
   vtkPVComposite();
   ~vtkPVComposite();

@@ -27,15 +27,15 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 =========================================================================*/
 
 #include "vtkPVShrinkPolyData.h"
-#include "vtkKWApplication.h"
-#include "vtkKWView.h"
-#include "vtkKWRenderView.h"
+#include "vtkPVApplication.h"
+#include "vtkPVRenderView.h"
 #include "vtkPVComposite.h"
 #include "vtkPVPolyData.h"
 
 int vtkPVShrinkPolyDataCommand(ClientData cd, Tcl_Interp *interp,
 			   int argc, char *argv[]);
 
+//----------------------------------------------------------------------------
 vtkPVShrinkPolyData::vtkPVShrinkPolyData()
 {
   vtkPVPolyData *pd;
@@ -47,13 +47,10 @@ vtkPVShrinkPolyData::vtkPVShrinkPolyData()
   this->ShrinkFactorScale = vtkKWScale::New();
   this->ShrinkFactorScale->SetParent(this);
   this->Shrink = vtkShrinkPolyData::New();
-
-  pd = vtkPVPolyData::New();
-  pd->SetPolyData(this->Shrink->GetOutput());
-  this->SetDataWidget(pd);
-  pd->Delete();
+  
 }
 
+//----------------------------------------------------------------------------
 vtkPVShrinkPolyData::~vtkPVShrinkPolyData()
 { 
   this->Accept->Delete();
@@ -66,23 +63,20 @@ vtkPVShrinkPolyData::~vtkPVShrinkPolyData()
   this->Shrink = NULL;
 }
 
+//----------------------------------------------------------------------------
 vtkPVShrinkPolyData* vtkPVShrinkPolyData::New()
 {
   return new vtkPVShrinkPolyData();
 }
 
-void vtkPVShrinkPolyData::Create(vtkKWApplication *app, char *args)
+//----------------------------------------------------------------------------
+int vtkPVShrinkPolyData::Create(char *args)
 {  
   // must set the application
-  if (this->Application)
+  if (this->vtkPVSource::Create(args) == 0)
     {
-    vtkErrorMacro("vtkPVShrinkPolyData already created");
-    return;
+    return 0;
     }
-  this->SetApplication(app);
-  
-  // create the top level
-  this->Script("frame %s %s", this->GetWidgetName(), args);
   
   this->ShrinkFactorScale->Create(this->Application,
 				  "-showvalue 1");
@@ -94,8 +88,35 @@ void vtkPVShrinkPolyData::Create(vtkKWApplication *app, char *args)
   this->Accept->SetCommand(this, "ShrinkFactorChanged");
   this->Script("pack %s %s", this->ShrinkFactorScale->GetWidgetName(),
 	this->Accept->GetWidgetName());
+
+  return 1;
 }
 
+
+//----------------------------------------------------------------------------
+void vtkPVShrinkPolyData::SetOutput(vtkPVPolyData *pvd)
+{
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  
+  if (pvApp && pvApp->GetController()->GetLocalProcessId() == 0)
+    {
+    pvApp->BroadcastScript("%s SetOutput %s", this->GetTclName(),
+			   pvd->GetTclName());
+    }  
+  
+  this->SetPVData(pvd);  
+  pvd->SetPolyData(this->Shrink->GetOutput());
+}
+
+
+//----------------------------------------------------------------------------
+vtkPVPolyData *vtkPVShrinkPolyData::GetOutput()
+{
+  return vtkPVPolyData::SafeDownCast(this->Output);
+}
+
+
+//----------------------------------------------------------------------------
 void vtkPVShrinkPolyData::ShrinkFactorChanged()
 {  
   this->Shrink->SetShrinkFactor(this->ShrinkFactorScale->GetValue());
@@ -103,6 +124,21 @@ void vtkPVShrinkPolyData::ShrinkFactorChanged()
   this->Shrink->Update();
   
   this->Composite->GetView()->Render();
+}
+
+
+//----------------------------------------------------------------------------
+void vtkPVShrinkPolyData::SetInput(vtkPVPolyData *pvData)
+{
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  
+  if (pvApp && pvApp->GetController()->GetLocalProcessId() == 0)
+    {
+    pvApp->BroadcastScript("%s SetInput %s", this->GetTclName(),
+			   pvData->GetTclName());
+    }  
+  
+  this->GetShrink()->SetInput(pvData->GetPolyData());
 }
 
 

@@ -68,9 +68,6 @@ ClientData vtkPVMenuButtonNewCommand();
 int vtkPVPolyDataCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkPVPolyDataNewCommand();
-int vtkPVRenderSlaveCommand(ClientData cd, Tcl_Interp *interp,
-             int argc, char *argv[]);
-ClientData vtkPVRenderSlaveNewCommand();
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkPVRenderViewNewCommand();
@@ -160,8 +157,6 @@ int VTK_EXPORT Vtkkwparaviewtcl_Init(Tcl_Interp *interp)
                   vtkPVMenuButtonCommand);
   vtkTclCreateNew(interp,"vtkPVPolyData", vtkPVPolyDataNewCommand,
                   vtkPVPolyDataCommand);
-  vtkTclCreateNew(interp,"vtkPVRenderSlave", vtkPVRenderSlaveNewCommand,
-                  vtkPVRenderSlaveCommand);
   vtkTclCreateNew(interp,"vtkPVRenderView", vtkPVRenderViewNewCommand,
                   vtkPVRenderViewCommand);
   vtkTclCreateNew(interp,"vtkPVShrinkPolyData", vtkPVShrinkPolyDataNewCommand,

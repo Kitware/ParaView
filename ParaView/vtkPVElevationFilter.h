@@ -35,19 +35,46 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkKWScale.h"
 #include "vtkPVSource.h"
 
+class vtkPVPolyData;
+class vtkPVImage;
+
+
 class VTK_EXPORT vtkPVElevationFilter : public vtkPVSource
 {
 public:
   static vtkPVElevationFilter* New();
   vtkTypeMacro(vtkPVElevationFilter, vtkPVSource);
 
-  void Create(vtkKWApplication *app, char *args);
+  // Description:
+  // You have to clone this object before you create its UI.
+  int Create(char *args);
 
+  // Description:
+  // For now you have to set the output explicitly.  This allows you to manage
+  // the object creation/tcl-names in the other processes.  Do not try to
+  // set the output before the input has been set.
+  // This methods gets called in all processes.
+  void SetOutput(vtkPVPolyData *pvd);
+  void SetOutput(vtkPVImage *pvd);
+  vtkPVData *GetOutput();
+  vtkPVPolyData *GetPVPolyDataOutput();
+  vtkPVImage *GetPVImageOutput();
+  
   vtkGetObjectMacro(Elevation, vtkElevationFilter);
   
   void ElevationParameterChanged();
 
-  vtkPVData *GetDataWidget();
+  // Description:
+  // All pipeline calls have to use vtkKWObjects so GetTclName will work.
+  // The methods executes on all processes.
+  void SetInput(vtkPVData *pvData);
+
+  // Description:
+  // Filter parameters that get broadcast to all processes.
+  void SetLowPoint(float x, float y, float z);
+  void SetHighPoint(float x, float y, float z);
+  void SetScalarRange(float min, float max);
+
   
 protected:
   vtkPVElevationFilter();

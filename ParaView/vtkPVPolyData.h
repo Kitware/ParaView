@@ -25,6 +25,10 @@ PARTICULAR PURPOSE, AND NON-INFRINGEMENT.  THIS SOFTWARE IS PROVIDED ON AN
 MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 =========================================================================*/
+// .NAME vtkPVPolyData - PolyData interface.
+// .SECTION Description
+// This is a parallel object.  It needs to be cloned to work correctly.  
+// After cloning, the parallel nature of the object is transparent.
 
 #ifndef __vtkPVPolyData_h
 #define __vtkPVPolyData_h
@@ -43,8 +47,12 @@ public:
   static vtkPVPolyData* New();
   vtkTypeMacro(vtkPVPolyData, vtkKWWidget);
   
-  void Create(vtkKWApplication *app, char *args);
+  // Description:
+  // You have to clone this object before you create it.
+  int Create(char *args);
 
+  // Description:
+  // Source uses this method to set the VTK data object.
   void SetPolyData(vtkPolyData *data);
   vtkPolyData *GetPolyData();
   
@@ -58,7 +66,6 @@ protected:
   vtkPVPolyData(const vtkPVPolyData&) {};
   void operator=(const vtkPVPolyData&) {};
 
-  vtkSetObjectMacro(Data, vtkDataSet);
 };
 
 #endif

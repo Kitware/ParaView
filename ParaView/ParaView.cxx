@@ -150,6 +150,7 @@ void Process_Init(vtkMultiProcessController *controller, void *arg )
     Tcl_Interp *interp = vtkPVApplication::InitializeTcl(pvArgs->argc,pvArgs->argv);
     vtkPVApplication *app = vtkPVApplication::New();
     app->SetController(controller);
+    cerr << "app: " << app << " has controller: " << app->GetController() << endl;
     app->Script("wm withdraw .");
     
     app->Start(pvArgs->argc,pvArgs->argv);

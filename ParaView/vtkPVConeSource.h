@@ -25,6 +25,10 @@ PARTICULAR PURPOSE, AND NON-INFRINGEMENT.  THIS SOFTWARE IS PROVIDED ON AN
 MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 =========================================================================*/
+// .NAME vtkPVConeSource - Parallel cone source with interface.
+// .SECTION Description
+// This is a parallel object.  It needs to be cloned to work correctly.  
+// After cloning, the parallel nature of the object is transparent.
 
 #ifndef __vtkPVConeSource_h
 #define __vtkPVConeSource_h
@@ -36,18 +40,42 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkKWScale.h"
 #include "vtkPVSource.h"
 
+class vtkPVPolyData;
+
+
 class VTK_EXPORT vtkPVConeSource : public vtkPVSource
 {
 public:
   static vtkPVConeSource* New();
   vtkTypeMacro(vtkPVConeSource,vtkPVSource);
 
-  void Create(vtkKWApplication *app, char *args);
+  // Description:
+  // You have to clone this object before you can create it.
+  int Create(char *args);
 
   vtkGetObjectMacro(ConeSource, vtkConeSource);
-    
+
+  // Description:
+  // Accept button callback.  It takes the Widget states and sets the 
+  // cone sources parameters.
   void ConeParameterChanged();
+
+  // Description:
+  // These are parallel versions of the vtkConeSource's methods.
+  void SetRadius(float rad);
+  void SetHeight(float height);
+  void SetResolution(int res);
+
+  // Description:
+  // The user has to set the output explicitly.
+  // This is executed in all processes.
+  void SetOutput(vtkPVPolyData *pvd);
+  vtkPVPolyData *GetOutput();
   
+  // Description:
+  // This just returns the application typecast correctly.
+  vtkPVApplication* GetPVApplication();
+
 protected:
   vtkPVConeSource();
   ~vtkPVConeSource();

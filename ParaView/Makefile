@@ -37,7 +37,6 @@ vtkPVImageReader \
 vtkPVImageSlice \
 vtkPVMenuButton \
 vtkPVPolyData \
-vtkPVRenderSlave \
 vtkPVRenderView \
 vtkPVShrinkPolyData \
 vtkPVSource \

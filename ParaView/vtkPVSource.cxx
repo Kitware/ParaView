@@ -27,7 +27,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 =========================================================================*/
 
 #include "vtkPVSource.h"
-#include "vtkKWApplication.h"
+#include "vtkPVApplication.h"
 #include "vtkPVComposite.h"
 #include "vtkKWView.h"
 #include "vtkKWRenderView.h"
@@ -35,19 +35,26 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
 			   int argc, char *argv[]);
 
+//----------------------------------------------------------------------------
 vtkPVSource::vtkPVSource()
 {
   this->CommandFunction = vtkPVSourceCommand;
   
   this->Composite = NULL;
-  this->DataWidget = NULL;
   this->Input = NULL;
+  this->Output = NULL;
 }
 
+//----------------------------------------------------------------------------
 vtkPVSource::~vtkPVSource()
 {
   this->SetComposite(NULL);
-  this->SetDataWidget(NULL);
+  if (this->Output)
+    {
+    this->Output->UnRegister(this);
+    this->Output = NULL;
+    }
+  
   if (this->Input)
     {
     this->Input->UnRegister(this);
@@ -55,11 +62,27 @@ vtkPVSource::~vtkPVSource()
     }
 }
 
+//----------------------------------------------------------------------------
 vtkPVSource* vtkPVSource::New()
 {
   return new vtkPVSource();
 }
 
+//----------------------------------------------------------------------------
+void vtkPVSource::Clone(vtkPVApplication *pvApp)
+{
+  if (this->Application)
+    {
+    vtkErrorMacro("Application has already been set.");
+    }
+  this->SetApplication(pvApp);
+
+  // Clone this object on every other process.
+  pvApp->BroadcastScript("%s %s", this->GetClassName(), this->GetTclName());
+}
+
+
+//----------------------------------------------------------------------------
 void vtkPVSource::SetComposite(vtkPVComposite *comp)
 {
   if (this->Composite == comp)
@@ -81,45 +104,76 @@ void vtkPVSource::SetComposite(vtkPVComposite *comp)
     }
 }
 
-void vtkPVSource::SetDataWidget(vtkPVData *data)
+//----------------------------------------------------------------------------
+void vtkPVSource::SetPVData(vtkPVData *data)
 {
-  if (this->DataWidget == data)
+  if (this->Output == data)
     {
     return;
     }
   this->Modified();
 
-  if (this->DataWidget)
+  if (this->Output)
     {
     // extra careful for circular references
-    vtkPVData *tmp = this->DataWidget;
-    this->DataWidget = NULL;
+    vtkPVData *tmp = this->Output;
+    this->Output = NULL;
     // Manage double pointer.
-    tmp->SetSourceWidget(NULL);
+    tmp->SetPVSource(NULL);
     tmp->UnRegister(this);
     }
   if (data)
     {
-    this->DataWidget = data;
+    this->Output = data;
     data->Register(this);
     // Manage double pointer.
-    data->SetSourceWidget(this);
+    data->SetPVSource(this);
     }
 }
   
-vtkPVData *vtkPVSource::GetDataWidget()
-{
-  return this->DataWidget;
-}
-
-
+//----------------------------------------------------------------------------
 // Data must be set first.  This is OK, because Source will merge with PVComposite ...
 void vtkPVSource::SetAssignment(vtkPVAssignment *a)
 {
-  if (this->GetDataWidget() == NULL)
+  if (this->Output == NULL)
     {
     vtkErrorMacro("Cannot make assignment.  Output has not been created.");
     return;
     }
-  this->GetDataWidget()->SetAssignment(a);
+  this->Output->SetAssignment(a); 
+}
+
+
+//----------------------------------------------------------------------------
+int vtkPVSource::Create(char *args)
+{
+  if (this->Application == NULL)
+    {
+    vtkErrorMacro("This object has not been cloned yet.");
+    return 0;
+    }
+  
+  // create the top level
+  this->Script("frame %s %s", this->GetWidgetName(), args);
+  
+  return 1;
+}
+
+//----------------------------------------------------------------------------
+vtkPVApplication* vtkPVSource::GetPVApplication()
+{
+  if (this->Application == NULL)
+    {
+    return NULL;
+    }
+  
+  if (this->Application->IsA("vtkPVApplication"))
+    {  
+    return (vtkPVApplication*)(this->Application);
+    }
+  else
+    {
+    vtkErrorMacro("Bad typecast");
+    return NULL;
+    } 
 }

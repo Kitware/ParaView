@@ -25,6 +25,11 @@ PARTICULAR PURPOSE, AND NON-INFRINGEMENT.  THIS SOFTWARE IS PROVIDED ON AN
 MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 =========================================================================*/
+// .NAME vtkPVImage - ImageData interface.
+// .SECTION Description
+// This is a parallel object.  It needs to be cloned to work correctly.  
+// After cloning, the parallel nature of the object is transparent.
+
 
 #ifndef __vtkPVImage_h
 #define __vtkPVImage_h
@@ -43,7 +48,9 @@ public:
   static vtkPVImage* New();
   vtkTypeMacro(vtkPVImage,vtkKWWidget);
   
-  void Create(vtkKWApplication *app, char *args);
+  // Description:
+  // You have to clone this object before you create it.
+  int Create(char *args);
   
   void SetImageData(vtkImageData *data);
   vtkImageData *GetImageData();
@@ -60,8 +67,6 @@ protected:
   ~vtkPVImage();
   vtkPVImage(const vtkPVImage&) {};
   void operator=(const vtkPVImage&) {};
-  
-  vtkSetObjectMacro(Data, vtkDataSet);
 };
 
 #endif

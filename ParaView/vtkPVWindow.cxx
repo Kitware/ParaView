@@ -157,6 +157,7 @@ void vtkPVWindow::Create(vtkKWApplication *app, char *args)
   // create the main view
   // we keep a handle to them as well
   this->MainView = vtkPVRenderView::New();
+  this->MainView->Clone((vtkPVApplication*)app);
   this->MainView->SetParent(this->ViewFrame);
   // Why do I have to explicitly state the class?  I do not know.
   this->MainView->vtkPVRenderView::Create(this->Application,"-width 200 -height 200");
@@ -294,6 +295,7 @@ void vtkPVWindow::SetCurrentDataComposite(vtkPVComposite *comp)
 
 //----------------------------------------------------------------------------
 // Setup a cone
+// The first example that is not used anymore.
 void vtkPVWindow::SetupCone()
 {
   vtkPVApplication *pvApp = (vtkPVApplication *)this->Application;
@@ -332,50 +334,47 @@ void vtkPVWindow::SetupCone()
   this->MainView->ResetCamera();
 }
 
+//----------------------------------------------------------------------------
 void vtkPVWindow::NewCone()
 {
   int id, num;
   vtkPVApplication *pvApp = (vtkPVApplication *)this->Application;
   vtkPVComposite *comp;
   vtkPVConeSource *cone;
+  vtkPVPolyData *pvd;
+  vtkPVAssignment *a;
   
-  // Maybe theses two objects should be merged ito one.
-  cone = vtkPVConeSource::New();
-
+  // Maybe source and composite should be merged into one class.
+  // Create the pipeline objects in all processes.
   comp = vtkPVComposite::New();
+  comp->Clone(pvApp);
+  cone = vtkPVConeSource::New();
+  cone->Clone(pvApp);
+  pvd = vtkPVPolyData::New();
+  pvd->Clone(pvApp);
+  a = vtkPVAssignment::New();
+  a->Clone(pvApp);
+  
+  // Link the objects together (in all processes).
+  cone->SetOutput(pvd);
   comp->SetSource(cone);
   comp->SetCompositeName("cone");
-
-  num = pvApp->GetController()->GetNumberOfProcesses();
-  vtkPVAssignment *a = vtkPVAssignment::New();
-  a->SetApplication(pvApp);
-  a->SetPiece(0, num);
   cone->SetAssignment(a);
   
   // Create the properties (interface).
   comp->SetPropertiesParent(this->GetDataPropertiesParent());
-  comp->CreateProperties(pvApp, "");
+  comp->CreateProperties("");
 
+  // Add the new composite to the View (in all processes).
   this->MainView->AddComposite(comp);
-  // We should probably use the View instead of the window.
+  
+  // We should probably use the View (instead of the window)
+  // to manage the selected composite.
   comp->SetWindow(this);
+  // Select this composite
   this->SetCurrentDataComposite(comp);
 
-  // Lets show a cone as a test.
-  for (id = 1; id < num; ++id)
-    {
-    pvApp->RemoteScript(id, "%s %s", cone->GetClassName(), cone->GetTclName());
-    pvApp->RemoteScript(id, "%s %s", comp->GetClassName(), comp->GetTclName());
-    pvApp->RemoteScript(id, "%s %s", a->GetClassName(), a->GetTclName());
-    pvApp->RemoteScript(id, "%s SetPiece %d %d", a->GetTclName(), id, num);
-    pvApp->RemoteScript(id, "%s SetSource %s", comp->GetTclName(), cone->GetTclName());
-    //pvApp->RemoteScript(id, "[%s GetConeSource] DebugOn", cone->GetTclName());
-    pvApp->RemoteScript(id, "%s SetAssignment %s", cone->GetTclName(), a->GetTclName());
-    // We sould probably use a view in the satellite processes (then delete the comp/source).
-    pvApp->RemoteScript(id, "[RenderSlave GetRenderer] AddProp [%s GetProp]",comp->GetTclName());
-    }
-  
-  // Clean up.
+  // Clean up. (How about on the other processes?)
   comp->Delete();
   comp = NULL;
   this->DataList->Update();
@@ -402,10 +401,10 @@ void vtkPVWindow::NewVolume()
   
   comp = vtkPVComposite::New();
   comp->SetSource(reader);
-  comp->SetData(image);
+  reader->SetOutput(image);
   comp->SetCompositeName("volume");
   comp->SetPropertiesParent(this->GetDataPropertiesParent());
-  comp->CreateProperties(pvApp, "");
+  comp->CreateProperties("");
   this->MainView->AddComposite(comp);
   comp->SetWindow(this);
   this->SetCurrentDataComposite(comp);
@@ -457,11 +456,13 @@ void vtkPVWindow::SerializeToken(istream& is, const char token[1024])
   vtkKWWindow::SerializeToken(is,token);
 }
 
+//----------------------------------------------------------------------------
 vtkPVComposite* vtkPVWindow::GetCurrentDataComposite()
 {
   return this->CurrentDataComposite;
 }
 
+//----------------------------------------------------------------------------
 void vtkPVWindow::NextComposite()
 {
   vtkPVComposite *composite = this->GetNextComposite();
@@ -476,6 +477,7 @@ void vtkPVWindow::NextComposite()
   this->DataList->Update();
 }
 
+//----------------------------------------------------------------------------
 void vtkPVWindow::PreviousComposite()
 {
   vtkPVComposite *composite = this->GetPreviousComposite();
@@ -491,26 +493,33 @@ void vtkPVWindow::PreviousComposite()
 }
 
 
+//----------------------------------------------------------------------------
 vtkPVComposite* vtkPVWindow::GetNextComposite()
 {
   int pos = this->CompositeList->IsItemPresent(this->CurrentDataComposite);
   return (vtkPVComposite*)this->CompositeList->GetItemAsObject(pos);
 }
 
+//----------------------------------------------------------------------------
 vtkPVComposite* vtkPVWindow::GetPreviousComposite()
 {
   int pos = this->CompositeList->IsItemPresent(this->CurrentDataComposite);
   return (vtkPVComposite*)this->CompositeList->GetItemAsObject(pos-2);
 }
 
+//----------------------------------------------------------------------------
 vtkKWCompositeCollection* vtkPVWindow::GetCompositeList()
 {
   return this->CompositeList;
 }
 
+//----------------------------------------------------------------------------
 void vtkPVWindow::ResetCameraCallback()
 {
   
   this->MainView->ResetCamera();
   this->MainView->Render();
 }
+
+
+

@@ -97,9 +97,22 @@ void vtkPVApplication::RemoteSimpleScript(int remoteId, char *str)
     return;
     }
 
-  //cerr << "---- RemoteScript, id = " << remoteId << ", str = " << str << endl;
+  cerr << "---- RemoteScript, id = " << remoteId << ", str = " << str << endl;
   
   this->Controller->TriggerRMI(remoteId, str, VTK_PV_SLAVE_SCRIPT_RMI_TAG);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVApplication::BroadcastScript(char *format, ...)
+{
+  static char event[16000];
+  
+  va_list var_args;
+  va_start(var_args, format);
+  vsprintf(event, format, var_args);
+  va_end(var_args);
+
+  this->BroadcastSimpleScript(event);
 }
 
 //----------------------------------------------------------------------------

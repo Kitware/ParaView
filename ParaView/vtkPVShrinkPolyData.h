@@ -34,6 +34,8 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkKWScale.h"
 #include "vtkPVSource.h"
 
+class vtkPVPolyData;
+
 
 class VTK_EXPORT vtkPVShrinkPolyData : public vtkPVSource
 {
@@ -41,11 +43,23 @@ public:
   static vtkPVShrinkPolyData* New();
   vtkTypeMacro(vtkPVShrinkPolyData,vtkPVSource);
 
-  void Create(vtkKWApplication *app, char *args);
+  // Description:
+  // You have to clone this object before you create its UI.
+  int Create(char *args);
+  
+  // Description:
+  // For now you have to set the output explicitly.  This allows you to manage
+  // the object creation/tcl-names in the other processes.
+  void SetOutput(vtkPVPolyData *pvd);
+  vtkPVPolyData *GetOutput();
   
   void ShrinkFactorChanged();
 
   vtkGetObjectMacro(Shrink, vtkShrinkPolyData);
+
+  // Description:
+  // The methods executes on all processes.
+  void SetInput(vtkPVPolyData *pvData);
   
 protected:
   vtkPVShrinkPolyData();

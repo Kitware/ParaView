@@ -27,14 +27,17 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 =========================================================================*/
 
 #include "vtkPVImageReader.h"
-#include "vtkKWApplication.h"
+#include "vtkPVApplication.h"
+#include "vtkPVImage.h"
 
+//----------------------------------------------------------------------------
 vtkPVImageReader::vtkPVImageReader()
 {
   this->Label = vtkKWLabel::New();
   this->ImageReader = vtkImageReader::New();
 }
 
+//----------------------------------------------------------------------------
 vtkPVImageReader::~vtkPVImageReader()
 {
   this->Label->Delete();
@@ -44,20 +47,19 @@ vtkPVImageReader::~vtkPVImageReader()
   this->ImageReader = NULL;
 }
 
+//----------------------------------------------------------------------------
 vtkPVImageReader* vtkPVImageReader::New()
 {
   return new vtkPVImageReader();
 }
 
-void vtkPVImageReader::Create(vtkKWApplication *app, char *args)
+//----------------------------------------------------------------------------
+int vtkPVImageReader::Create(char *args)
 {  
-  // must set the application
-  if (this->Application)
+  if (this->vtkPVSource::Create(args) == 0)
     {
-    vtkErrorMacro("vtkPVImageReader already created");
-    return;
+    return 0;
     }
-  this->SetApplication(app);
   
   // create the top level
   this->Script("frame %s %s", this->GetWidgetName(), args);
@@ -66,8 +68,25 @@ void vtkPVImageReader::Create(vtkKWApplication *app, char *args)
   this->Label->Create(this->Application, "");
   this->Label->SetLabel("vtkPVImageReader label");
   this->Script("pack %s", this->Label->GetWidgetName());
+  
+  return 1;
 }
 
+//----------------------------------------------------------------------------
+void vtkPVImageReader::SetOutput(vtkPVImage *pvi)
+{
+  this->SetPVData(pvi);
+
+  pvi->SetImageData(this->ImageReader->GetOutput());
+}
+
+//----------------------------------------------------------------------------
+vtkPVImage *vtkPVImageReader::GetOutput()
+{
+  return vtkPVImage::SafeDownCast(this->Output);
+}
+
+//----------------------------------------------------------------------------
 void vtkPVImageReader::ReadImage()
 {
   this->ImageReader->SetDataByteOrderToLittleEndian();

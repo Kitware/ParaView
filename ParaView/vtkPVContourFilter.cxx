@@ -27,15 +27,15 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 =========================================================================*/
 
 #include "vtkPVContourFilter.h"
-#include "vtkKWApplication.h"
-#include "vtkKWView.h"
-#include "vtkKWRenderView.h"
+#include "vtkPVApplication.h"
+#include "vtkPVRenderView.h"
 #include "vtkPVComposite.h"
 #include "vtkPVPolyData.h"
 
 int vtkPVContourFilterCommand(ClientData cd, Tcl_Interp *interp,
 			      int argc, char *argv[]);
 
+//----------------------------------------------------------------------------
 vtkPVContourFilter::vtkPVContourFilter()
 {
   this->CommandFunction = vtkPVContourFilterCommand;
@@ -47,14 +47,10 @@ vtkPVContourFilter::vtkPVContourFilter()
   this->ContourValueLabel = vtkKWLabel::New();
   this->ContourValueLabel->SetParent(this);
   
-  this->Contour = vtkContourFilter::New();
-  
-  vtkPVPolyData *pd = vtkPVPolyData::New();
-  pd->SetPolyData(this->Contour->GetOutput());
-  this->SetDataWidget(pd);
-  pd->Delete();
+  this->Contour = vtkContourFilter::New();  
 }
 
+//----------------------------------------------------------------------------
 vtkPVContourFilter::~vtkPVContourFilter()
 { 
   this->Accept->Delete();
@@ -69,23 +65,19 @@ vtkPVContourFilter::~vtkPVContourFilter()
   this->Contour = NULL;
 }
 
+//----------------------------------------------------------------------------
 vtkPVContourFilter* vtkPVContourFilter::New()
 {
   return new vtkPVContourFilter();
 }
 
-void vtkPVContourFilter::Create(vtkKWApplication *app, char *args)
+//----------------------------------------------------------------------------
+int vtkPVContourFilter::Create(char *args)
 {
-  // must set the application
-  if (this->Application)
+  if (this->vtkPVSource::Create(args) == 0)
     {
-    vtkErrorMacro("vtkPVContourFilter already created");
-    return;
+    return 0;
     }
-  this->SetApplication(app);
-  
-  // create the top level
-  this->Script("frame %s %s", this->GetWidgetName(), args);
   
   this->ContourValueLabel->Create(this->Application, "");
   this->ContourValueLabel->SetLabel("Contour Value:");
@@ -98,12 +90,65 @@ void vtkPVContourFilter::Create(vtkKWApplication *app, char *args)
   this->Script("pack %s %s -side left -anchor w",
 	       this->ContourValueLabel->GetWidgetName(),
 	       this->ContourValueEntry->GetWidgetName());
+
+  return 1;
+}
+
+//----------------------------------------------------------------------------
+void vtkPVContourFilter::SetInput(vtkPVData *pvData)
+{
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  
+  if (pvApp && pvApp->GetController()->GetLocalProcessId() == 0)
+    {
+    pvApp->BroadcastScript("%s SetInput %s", this->GetTclName(),
+			   pvData->GetTclName());
+    }  
+  
+  this->GetContour()->SetInput(pvData->GetData());
 }
 
 
+
+//----------------------------------------------------------------------------
+void vtkPVContourFilter::SetOutput(vtkPVPolyData *pvd)
+{
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  
+  if (pvApp && pvApp->GetController()->GetLocalProcessId() == 0)
+    {
+    pvApp->BroadcastScript("%s SetOutput %s", this->GetTclName(),
+			   pvd->GetTclName());
+    }  
+  
+  this->SetPVData(pvd);  
+  pvd->SetPolyData(this->Contour->GetOutput());
+}
+
+//----------------------------------------------------------------------------
+vtkPVPolyData *vtkPVContourFilter::GetOutput()
+{
+  return vtkPVPolyData::SafeDownCast(this->Output);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVContourFilter::SetValue(int contour, float val)
+{  
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  
+  if (pvApp && pvApp->GetController()->GetLocalProcessId() == 0)
+    {
+    pvApp->BroadcastScript("%s SetValue %d %f", this->GetTclName(),
+			   contour, val);
+    }
+  
+  this->GetContour()->SetValue(contour, val);
+}
+
+//----------------------------------------------------------------------------
 void vtkPVContourFilter::ContourValueChanged()
 {  
-  this->Contour->SetValue(0, this->ContourValueEntry->GetValueAsFloat());
+  this->SetValue(0, this->ContourValueEntry->GetValueAsFloat());
   this->Contour->Modified();
   this->Contour->Update();
   

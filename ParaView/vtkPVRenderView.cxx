@@ -26,17 +26,20 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 =========================================================================*/
 
+#include "vtkPolyData.h"
+#include "vtkPolyDataMapper.h"
+
 #include "vtkPVRenderView.h"
 #include "vtkPVApplication.h"
 #include "vtkMultiProcessController.h"
 #include "vtkDummyRenderWindowInteractor.h"
 #include "vtkObjectFactory.h"
-#include "vtkPVRenderSlave.h"
 
 #ifdef WIN32
 #include "vtkRenderWindow.h"
 #else
 #include "vtkMesaRenderWindow.h"
+#include "vtkMesaRenderer.h"
 #endif
 
 #include "vtkTimerLog.h"
@@ -44,11 +47,182 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 vtkTimerLog *TIMER = NULL;
 
 
+// A structure to communicate renderer info.
+struct vtkPVRenderInfo 
+{
+  float CameraPosition[3];
+  float CameraFocalPoint[3];
+  float CameraViewUp[3];
+  float CameraClippingRange[2];
+  float LightPosition[3];
+  float LightFocalPoint[3];
+  int WindowSize[2];
+};
+
+// Jim's composite stuff
+
+//----------------------------------------------------------------------------
+// Results are put in the local data.
+void vtkCompositeImagePair(float *localZdata, float *localPdata, 
+			   float *remoteZdata, float *remotePdata, 
+			   int total_pixels, int flag) 
+{
+  int i,j;
+  int pixel_data_size;
+  float *pEnd;
+
+  if (flag) 
+    {
+    pixel_data_size = 4;
+    for (i = 0; i < total_pixels; i++) 
+      {
+      if (remoteZdata[i] < localZdata[i]) 
+	{
+	localZdata[i] = remoteZdata[i];
+	for (j = 0; j < pixel_data_size; j++) 
+	  {
+	  localPdata[i*pixel_data_size+j] = remotePdata[i*pixel_data_size+j];
+	  }
+	}
+      }
+    } 
+  else 
+    {
+    pEnd = remoteZdata + total_pixels;
+    while(remoteZdata != pEnd) 
+      {
+      if (*remoteZdata < *localZdata) 
+	{
+	*localZdata++ = *remoteZdata++;
+	*localPdata++ = *remotePdata++;
+	}
+      else
+	{
+	++localZdata;
+	++remoteZdata;
+	++localPdata;
+	++remotePdata;
+	}
+      }
+    }
+}
+
+
+#define pow2(j) (1 << j)
+
+
+//----------------------------------------------------------------------------
+void vtkTreeComposite(vtkRenderWindow *renWin, 
+		      vtkMultiProcessController *controller,
+		      int flag, float *remoteZdata, 
+		      float *remotePdata) 
+{
+  float *localZdata, *localPdata;
+  int *windowSize;
+  int total_pixels;
+  int pdata_size, zdata_size;
+  int myId, numProcs;
+  int i, id;
+  
+
+  myId = controller->GetLocalProcessId();
+  numProcs = controller->GetNumberOfProcesses();
+
+  windowSize = renWin->GetSize();
+  total_pixels = windowSize[0] * windowSize[1];
+
+  // Get the z buffer.
+  localZdata = renWin->GetZbufferData(0,0,windowSize[0]-1, windowSize[1]-1);
+  zdata_size = total_pixels;
+
+  // Get the pixel data.
+  if (flag) 
+    { 
+    localPdata = renWin->GetRGBAPixelData(0,0,windowSize[0]-1, \
+				     windowSize[1]-1,0);
+    pdata_size = 4*total_pixels;
+    } 
+  else 
+    {
+#ifndef WIN32
+    // Condition is here until we fix the resize bug in vtkMesarenderWindow.
+    localPdata = (float*)((vtkMesaRenderWindow *)renWin)-> \
+      	GetRGBACharPixelData(0,0,windowSize[0]-1,windowSize[1]-1,0);    
+    pdata_size = total_pixels;
+#endif
+    }
+  
+  double doubleLogProcs = log((double)numProcs)/log((double)2);
+  int logProcs = (int)doubleLogProcs;
+
+  // not a power of 2 -- need an additional level
+  if (doubleLogProcs != (double)logProcs) 
+    {
+    logProcs++;
+    }
+
+  for (i = 0; i < logProcs; i++) 
+    {
+    if ((myId % (int)pow2(i)) == 0) 
+      { // Find participants
+      if ((myId % (int)pow2(i+1)) < pow2(i)) 
+        {
+	// receivers
+	id = myId+pow2(i);
+	
+	// only send or receive if sender or receiver id is valid
+	// (handles non-power of 2 cases)
+	if (id < numProcs) 
+          {
+	  //cerr << "phase " << i << " receiver: " << myId 
+	  //     << " receives data from " << id << endl;
+	  controller->Receive(remoteZdata, zdata_size, id, 99);
+	  controller->Receive(remotePdata, pdata_size, id, 99);
+	  
+	  // notice the result is stored as the local data
+	  vtkCompositeImagePair(localZdata, localPdata, remoteZdata, remotePdata, 
+				total_pixels, flag);
+	  }
+	}
+      else 
+	{
+	id = myId-pow2(i);
+	if (id < numProcs) 
+	  {
+	  //cerr << i << " sender: " << myId << " sends data to "
+	  //       << id << endl;
+	  controller->Send(localZdata, zdata_size, id, 99);
+	  controller->Send(localPdata, pdata_size, id, 99);
+	  }
+	}
+      }
+    }
+
+  if (myId ==0) 
+    {
+    if (flag) 
+      {
+      renWin->SetRGBAPixelData(0,0,windowSize[0]-1, 
+			       windowSize[1]-1,localPdata,0);
+      } 
+    else 
+      {
+#ifndef WIN32
+      ((vtkMesaRenderWindow *)renWin)-> \
+	         SetRGBACharPixelData(0,0, windowSize[0]-1, \
+			     windowSize[1]-1,(unsigned char*)localPdata,0);
+#endif
+      }
+    }
+}
+
+//----------------------------------------------------------------------------
+// Start method of renderer.  Called before a render.
 void vtkPVRenderViewStartRender(void *arg)
 {
   vtkPVRenderView *rv = (vtkPVRenderView*)arg;
   vtkPVApplication *pvApp = (vtkPVApplication*)(rv->GetApplication());
-  struct vtkPVRenderSlaveInfo info;
+  struct vtkPVRenderInfo info;
   int id, num;
   int *windowSize;
   
@@ -57,12 +231,11 @@ void vtkPVRenderViewStartRender(void *arg)
     TIMER = vtkTimerLog::New();
     }
   TIMER->StartTimer();
-  cerr << "  -Start Remote Render\n";
 
   // Get a global (across all processes) clipping range.
   rv->ResetCameraClippingRange();
   
-  // Make sure the render slave has the same camera we do.
+  // Make sure the satellite renderers have the same camera I do.
   vtkMultiProcessController *controller = pvApp->GetController();
   vtkCamera *cam = rv->GetRenderer()->GetActiveCamera();
   vtkLightCollection *lc = rv->GetRenderer()->GetLights();
@@ -84,8 +257,8 @@ void vtkPVRenderViewStartRender(void *arg)
   num = controller->GetNumberOfProcesses();
   for (id = 1; id < num; ++id)
     {
-    pvApp->RemoteSimpleScript(id, "RenderSlave Render");
-    controller->Send((char*)(&info), sizeof(struct vtkPVRenderSlaveInfo), id, 133);
+    pvApp->RemoteScript(id, "%s RenderHack", rv->GetTclName());
+    controller->Send((char*)(&info), sizeof(struct vtkPVRenderInfo), id, 133);
     }
   
   // Turn swap buffers off before the render so the end render method has a chance
@@ -93,6 +266,8 @@ void vtkPVRenderViewStartRender(void *arg)
   rv->GetRenderWindow()->SwapBuffersOff();
 }
 
+//----------------------------------------------------------------------------
+// End method of renderer.  Called after a render.
 void vtkPVRenderViewEndRender(void *arg)
 {
   vtkPVRenderView *rv = (vtkPVRenderView*)arg;
@@ -108,7 +283,6 @@ void vtkPVRenderViewEndRender(void *arg)
   controller = pvApp->GetController();
   numProcs = controller->GetNumberOfProcesses();
   numPixels = (windowSize[0] * windowSize[1]);
-  
 
   if (numProcs > 1)
     {
@@ -120,6 +294,7 @@ void vtkPVRenderViewEndRender(void *arg)
     delete [] pdata;    
     }
   
+  // Force swap buffers here.
   renWin->SwapBuffersOn();  
   renWin->Frame();
 }
@@ -150,6 +325,32 @@ vtkPVRenderView::vtkPVRenderView()
   this->CommandFunction = vtkPVRenderViewCommand;
   this->InteractorStyle = NULL;
   this->Interactor = vtkDummyRenderWindowInteractor::New();
+  
+#ifdef WIN32
+  vtkWin32OpenGLRenderWindow *renderWindow;
+  vtkRenderer *renderer;
+
+  renderWindow = vtkWin32OpenGLRenderWindow::New();
+  // Win32 have SetupmemoryRendering.
+  // We are not going to run this app on win32 in parallel.
+  //renderWindow->SetOffScreenRendering(1);
+  renderer = vtkRenderer::New();
+  renderWindow->AddRenderer(renderer);
+
+  this->RenderWindowHack = renderWindow;
+  this->RendererHack = renderer;
+#else
+  vtkMesaRenderWindow *mesaRenderWindow;
+  vtkMesaRenderer *mesaRenderer;
+
+  mesaRenderWindow = vtkMesaRenderWindow::New();
+  mesaRenderWindow->SetOffScreenRendering(1);
+  mesaRenderer = vtkMesaRenderer::New();
+  mesaRenderWindow->AddRenderer(mesaRenderer);
+
+  this->RenderWindowHack = mesaRenderWindow;
+  this->RendererHack = mesaRenderer;
+#endif 
 }
 
 //----------------------------------------------------------------------------
@@ -158,7 +359,36 @@ vtkPVRenderView::~vtkPVRenderView()
   this->Interactor->Delete();
   this->Interactor = NULL;
   this->SetInteractorStyle(NULL);
+  
+  this->RenderWindowHack->Delete();
+  this->RenderWindowHack = NULL;
+  this->RendererHack->Delete();
+  this->RendererHack = NULL;    
 }
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::Clone(vtkPVApplication *pvApp)
+{
+  this->Application = pvApp;
+  // Clone this object on every other process.
+  pvApp->BroadcastScript("%s %s", this->GetClassName(), this->GetTclName());
+  
+  this->Application = NULL;
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::SetApplication(vtkKWApplication *app)
+{
+  this->vtkKWView::SetApplication(app);
+  
+  vtkPVApplication *pvApp = vtkPVApplication::SafeDownCast(app);
+  if (pvApp && pvApp->GetController()->GetLocalProcessId() == 0)
+    {
+    pvApp->BroadcastScript("%s SetApplication %s", this->GetTclName(),
+			   pvApp->GetTclName());
+    }
+}
+
 
 //----------------------------------------------------------------------------
 void vtkPVRenderView::SetInteractorStyle(vtkInteractorStyle *style)
@@ -191,23 +421,33 @@ void vtkPVRenderView::Create(vtkKWApplication *app, char *args)
     return;
     }
   
+#ifndef WIN32  
+  if (app->GetWidgetVisibility() == 0)
+    {
+    this->Renderer->Delete();
+    this->Renderer = NULL;
+    this->RenderWindow->Delete();
+    this->RenderWindow = NULL;
+    
+    vtkMesaRenderWindow *mesaRenderWindow;
+    vtkMesaRenderer *mesaRenderer;
+
+    mesaRenderWindow = vtkMesaRenderWindow::New();
+    mesaRenderWindow->SetOffScreenRendering(1);
+    mesaRenderer = vtkMesaRenderer::New();
+    mesaRenderWindow->AddRenderer(mesaRenderer);
+    
+    this->RenderWindow = mesaRenderWindow;
+    this->Renderer = mesaRenderer;    
+    }
+#endif
+  
   this->vtkKWRenderView::Create(app, args);
 
   // Styles need motion events.
   this->Script("bind %s <Motion> {%s MotionCallback %%x %%y}", 
                this->VTKWidget->GetWidgetName(), this->GetTclName());
   
-  
-  
-  // Setup the remote renderers.
-  vtkPVApplication *pvApp = (vtkPVApplication*)app;
-  num = pvApp->GetController()->GetNumberOfProcesses();
-  for (id = 1; id < num; ++id)
-    {
-    pvApp->RemoteSimpleScript(id, "vtkPVRenderSlave RenderSlave");
-    // The global "Slave" was setup when the process was initiated.
-    pvApp->RemoteSimpleScript(id, "RenderSlave SetPVSlave Slave");
-    }
   // The start and end methods merge the processes renderers.
   this->GetRenderer()->SetStartRenderMethod(vtkPVRenderViewStartRender, this);
   this->GetRenderer()->SetEndRenderMethod(vtkPVRenderViewEndRender, this);  
@@ -225,7 +465,7 @@ void vtkPVRenderView::ComputeVisiblePropBounds(float bounds[6])
   num = controller->GetNumberOfProcesses();  
   for (id = 1; id < num; ++id)
     {
-    pvApp->RemoteSimpleScript(id, "RenderSlave TransmitBounds");
+    pvApp->RemoteScript(id, "%s TransmitBounds", this->GetTclName());
     }
 
   this->GetRenderer()->ComputeVisiblePropBounds(bounds);
@@ -366,6 +606,132 @@ void vtkPVRenderView::AKeyPress(char key, int x, int y)
     this->InteractorStyle->OnChar(0, 0, key, 1);
     }
 }
+
+
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::TransmitBounds()
+{
+  float bounds[6];
+  vtkMultiProcessController *controller;
+  vtkPVApplication *pvApp;
+  
+  pvApp = (vtkPVApplication*)(this->Application);
+  controller = pvApp->GetController();
+  
+  this->RendererHack->ComputeVisiblePropBounds(bounds);
+
+  // Makes an assumption about how the tasks are setup (UI id is 0).
+  controller->Send(bounds, 6, 0, 112);  
+}
+
+//----------------------------------------------------------------------------
+vtkPVApplication* vtkPVRenderView::GetPVApplication()
+{
+  if (this->Application == NULL)
+    {
+    return NULL;
+    }
+  
+  if (this->Application->IsA("vtkPVApplication"))
+    {  
+    return (vtkPVApplication*)(this->Application);
+    }
+  else
+    {
+    vtkErrorMacro("Bad typecast");
+    return NULL;
+    } 
+}
+
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::AddComposite(vtkKWComposite *c)
+{
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  
+  if (pvApp && pvApp->GetController()->GetLocalProcessId() == 0)
+    {
+    pvApp->BroadcastScript("%s AddCompositeHack %s",
+			   this->GetTclName(), c->GetTclName());
+    }
+
+  this->vtkKWRenderView::AddComposite(c);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::AddCompositeHack(vtkKWComposite *c)
+{
+  this->RendererHack->AddProp(c->GetProp());
+}
+
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::RenderHack()
+{
+  unsigned char *pdata;
+  int *window_size;
+  int length, numPixels;
+  int myId, numProcs;
+  vtkPVRenderInfo info;
+  vtkPVApplication *pvApp;
+  vtkMultiProcessController *controller;
+  vtkRenderer *ren;
+  vtkRenderWindow *renWin;
+  
+  pvApp = (vtkPVApplication*)(this->Application);
+  controller = pvApp->GetController();
+  myId = controller->GetLocalProcessId();
+  numProcs = controller->GetNumberOfProcesses();
+  ren = this->RendererHack;
+  renWin = this->RenderWindowHack;
+  
+  
+  // Makes an assumption about how the tasks are setup (UI id is 0).
+  // Receive the camera information.
+  controller->Receive((char*)(&info), sizeof(struct vtkPVRenderInfo), 0, 133);
+  vtkCamera *cam = ren->GetActiveCamera();
+  vtkLightCollection *lc = ren->GetLights();
+  lc->InitTraversal();
+  vtkLight *light = lc->GetNextItem();
+  
+  cam->SetPosition(info.CameraPosition);
+  cam->SetFocalPoint(info.CameraFocalPoint);
+  cam->SetViewUp(info.CameraViewUp);
+  cam->SetClippingRange(info.CameraClippingRange);
+  if (light)
+    {
+    light->SetPosition(info.LightPosition);
+    light->SetFocalPoint(info.LightFocalPoint);
+    }
+  
+  renWin->SetSize(info.WindowSize);
+  renWin->Render();
+
+  renWin->SetFileName("/home/lawcc/Views/ParaView/partial0.ppm");
+  renWin->SaveImageAsPPM();
+  
+  window_size = renWin->GetSize();
+  
+  numPixels = (window_size[0] * window_size[1]);
+  
+  if (1)
+    {
+    float *pdata, *zdata;
+    pdata = new float[numPixels];
+    zdata = new float[numPixels];
+    vtkTreeComposite(renWin, controller, 0, zdata, pdata);
+    delete [] zdata;
+    delete [] pdata;
+    }
+  else
+    {
+    length = 3*numPixels;  
+    pdata = renWin->GetPixelData(0,0,window_size[0]-1, window_size[1]-1,1);
+    controller->Send((char*)pdata, length, 0, 99);
+    }
+}
+
 
 
 

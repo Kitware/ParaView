@@ -35,14 +35,25 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkPVSource.h"
 #include "vtkPVComposite.h"
 
+class vtkPVPolyData;
+
+
 class VTK_EXPORT vtkPVGlyph3D : public vtkPVSource
 {
 public:
   static vtkPVGlyph3D* New();
   vtkTypeMacro(vtkPVGlyph3D, vtkPVSource);
 
-  void Create(vtkKWApplication *app, char *args);
+  // Description:
+  // You have to clone this object before you create its UI.
+  int Create(char *args);
 
+  // Description:
+  // For now you have to set the output explicitly.  This allows you to manage
+  // the object creation/tcl-names in the other processes.
+  void SetOutput(vtkPVPolyData *pvd);
+  vtkPVPolyData *GetOutput();  
+  
   vtkGetObjectMacro(Glyph, vtkGlyph3D);
   
   vtkGetObjectMacro(GlyphComposite, vtkPVComposite);
@@ -51,8 +62,6 @@ public:
   void ShowGlyphComposite();
   void ScaleFactorChanged();
   
-  vtkPVData *GetDataWidget();
-
 protected:
   vtkPVGlyph3D();
   ~vtkPVGlyph3D();

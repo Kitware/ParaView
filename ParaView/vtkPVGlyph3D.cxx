@@ -37,6 +37,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 int vtkPVGlyph3DCommand(ClientData cd, Tcl_Interp *interp,
 			int argc, char *argv[]);
 
+//----------------------------------------------------------------------------
 vtkPVGlyph3D::vtkPVGlyph3D()
 {
   this->CommandFunction = vtkPVGlyph3DCommand;
@@ -53,6 +54,7 @@ vtkPVGlyph3D::vtkPVGlyph3D()
   this->Glyph = vtkGlyph3D::New();
 }
 
+//----------------------------------------------------------------------------
 vtkPVGlyph3D::~vtkPVGlyph3D()
 {
   this->GlyphCompositeButton->Delete();
@@ -68,23 +70,20 @@ vtkPVGlyph3D::~vtkPVGlyph3D()
   this->Glyph = NULL;
 }
 
+//----------------------------------------------------------------------------
 vtkPVGlyph3D* vtkPVGlyph3D::New()
 {
   return new vtkPVGlyph3D();
 }
 
-void vtkPVGlyph3D::Create(vtkKWApplication *app, char *args)
+//----------------------------------------------------------------------------
+int vtkPVGlyph3D::Create(char *args)
 {
   // must set the application
-  if (this->Application)
+  if (this->vtkPVSource::Create(args) == 0)
     {
-    vtkErrorMacro("vtkPVGlyph3D already created");
-    return;
+    return 0;
     }
-  this->SetApplication(app);
-  
-  // create the top level
-  this->Script("frame %s %s", this->GetWidgetName(), args);
   
   this->GlyphCompositeButton->Create(this->Application, "button",
 			 "-text GetGlyphComposite");
@@ -103,24 +102,46 @@ void vtkPVGlyph3D::Create(vtkKWApplication *app, char *args)
 	       this->Accept->GetWidgetName(),
 	       this->ScaleFactorLabel->GetWidgetName(),
 	       this->ScaleFactorEntry->GetWidgetName());
+
+  return 1;
 }
 
+
+//----------------------------------------------------------------------------
+void vtkPVGlyph3D::SetOutput(vtkPVPolyData *pd)
+{
+  this->SetPVData(pd);
+  
+  pd->SetPolyData(this->Glyph->GetOutput());
+}
+
+
+//----------------------------------------------------------------------------
+vtkPVPolyData *vtkPVGlyph3D::GetOutput()
+{
+  return vtkPVPolyData::SafeDownCast(this->Output);
+}
+
+
+//----------------------------------------------------------------------------
 void vtkPVGlyph3D::SetGlyphComposite(vtkPVComposite *comp)
 {
   this->GlyphComposite = comp;
 }
 
+//----------------------------------------------------------------------------
 void vtkPVGlyph3D::ShowGlyphComposite()
 {
   vtkPVWindow *window = this->Composite->GetWindow();
   
-  this->Composite->GetProp()->VisibilityOff();
+  this->Composite->VisibilityOff();
   window->SetCurrentDataComposite(this->GlyphComposite);
-  this->GlyphComposite->GetProp()->VisibilityOn();
+  this->GlyphComposite->VisibilityOn();
   this->GlyphComposite->GetView()->Render();
   window->GetDataList()->Update();
 }
 
+//----------------------------------------------------------------------------
 void vtkPVGlyph3D::ScaleFactorChanged()
 {
   this->Glyph->SetScaleFactor(this->ScaleFactorEntry->GetValueAsFloat());
@@ -130,15 +151,3 @@ void vtkPVGlyph3D::ScaleFactorChanged()
   this->Composite->GetView()->Render();
 }
 
-vtkPVData *vtkPVGlyph3D::GetDataWidget()
-{
-  if (this->DataWidget == NULL)
-    {
-    vtkPVPolyData *pd = vtkPVPolyData::New();
-    pd->SetPolyData(this->Glyph->GetOutput());
-    this->SetDataWidget(pd);
-    pd->Delete();    
-    }
-
-  return this->DataWidget;
-}

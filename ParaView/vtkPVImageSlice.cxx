@@ -36,6 +36,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 int vtkPVImageSliceCommand(ClientData cd, Tcl_Interp *interp,
 			   int argc, char *argv[]);
 
+//----------------------------------------------------------------------------
 vtkPVImageSlice::vtkPVImageSlice()
 {
   this->CommandFunction = vtkPVImageSliceCommand;
@@ -55,13 +56,9 @@ vtkPVImageSlice::vtkPVImageSlice()
   this->ZDimension->SetParent(this);
   
   this->Slice = vtkImageClip::New();
-
-  vtkPVImage *d = vtkPVImage::New();
-  d->SetImageData(this->Slice->GetOutput());
-  this->SetDataWidget(d);
-  d->Delete();
 }
 
+//----------------------------------------------------------------------------
 vtkPVImageSlice::~vtkPVImageSlice()
 { 
   this->Accept->Delete();
@@ -82,26 +79,23 @@ vtkPVImageSlice::~vtkPVImageSlice()
   this->Slice = NULL;
 }
 
+//----------------------------------------------------------------------------
 vtkPVImageSlice* vtkPVImageSlice::New()
 {
   return new vtkPVImageSlice();
 }
 
-void vtkPVImageSlice::Create(vtkKWApplication *app, char *args)
+//----------------------------------------------------------------------------
+int vtkPVImageSlice::Create(char *args)
 {
   int *extents;
   int sliceNumber;
   
   // must set the application
-  if (this->Application)
+  if (this->vtkPVSource::Create(args) == 0)
     {
-    vtkErrorMacro("vtkPVContourFilter already created");
-    return;
+    return 0;
     }
-  this->SetApplication(app);
-  
-  // create the top level
-  this->Script("frame %s %s", this->GetWidgetName(), args);
   
   this->XDimension->Create(this->Application, "-text X");
   this->XDimension->SetCommand(this, "SelectX");
@@ -141,8 +135,11 @@ void vtkPVImageSlice::Create(vtkKWApplication *app, char *args)
 	       this->XDimension->GetWidgetName(),
 	       this->YDimension->GetWidgetName(),
 	       this->ZDimension->GetWidgetName());
+
+  return 1;
 }
 
+//----------------------------------------------------------------------------
 void vtkPVImageSlice::SliceChanged()
 {
   int newSliceNum = this->SliceEntry->GetValueAsInt();
@@ -178,6 +175,7 @@ void vtkPVImageSlice::SliceChanged()
   this->Composite->GetView()->Render();
 }
 
+//----------------------------------------------------------------------------
 void vtkPVImageSlice::SelectX()
 {
   this->XDimension->SetState(1);
@@ -185,6 +183,7 @@ void vtkPVImageSlice::SelectX()
   this->ZDimension->SetState(0);
 }
 
+//----------------------------------------------------------------------------
 void vtkPVImageSlice::SelectY()
 {
   this->XDimension->SetState(0);
@@ -192,6 +191,7 @@ void vtkPVImageSlice::SelectY()
   this->ZDimension->SetState(0);
 }
 
+//----------------------------------------------------------------------------
 void vtkPVImageSlice::SelectZ()
 {
   this->XDimension->SetState(0);
@@ -199,6 +199,7 @@ void vtkPVImageSlice::SelectZ()
   this->ZDimension->SetState(1);
 }
 
+//----------------------------------------------------------------------------
 void vtkPVImageSlice::SetDimensions(int dim[6])
 {
   int i;
@@ -209,7 +210,31 @@ void vtkPVImageSlice::SetDimensions(int dim[6])
     }
 }
 
+//----------------------------------------------------------------------------
 int* vtkPVImageSlice::GetDimensions()
 {
   return this->Dimensions;
 }
+
+//----------------------------------------------------------------------------
+void vtkPVImageSlice::SetOutput(vtkPVImage *pvi)
+{
+  this->SetPVData(pvi);
+
+  pvi->SetImageData(this->Slice->GetOutput());
+}
+
+//----------------------------------------------------------------------------
+vtkPVImage *vtkPVImageSlice::GetOutput()
+{
+  return vtkPVImage::SafeDownCast(this->Output);
+}
+
+
+
+
+
+
+
+
+

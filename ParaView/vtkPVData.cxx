@@ -34,17 +34,19 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkKWApplication.h"
 #include "vtkPVContourFilter.h"
 #include "vtkPVAssignment.h"
+#include "vtkPVApplication.h"
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
 		     int argc, char *argv[]);
 
 
+//----------------------------------------------------------------------------
 vtkPVData::vtkPVData()
 {
   this->CommandFunction = vtkPVDataCommand;
 
   this->Data = NULL;
-  this->SourceWidget = NULL;
+  this->PVSource = NULL;
   
   this->FiltersMenuButton = vtkPVMenuButton::New();
   
@@ -53,11 +55,12 @@ vtkPVData::vtkPVData()
   this->Assignment = NULL;
 }
 
+//----------------------------------------------------------------------------
 vtkPVData::~vtkPVData()
 {
   this->SetAssignment(NULL);
   this->SetData(NULL);
-  this->SetSourceWidget(NULL);
+  this->SetPVSource(NULL);
 
   this->FiltersMenuButton->Delete();
   this->FiltersMenuButton = NULL;
@@ -69,66 +72,46 @@ vtkPVData::~vtkPVData()
   this->Actor = NULL;
 }
 
+//----------------------------------------------------------------------------
 vtkPVData* vtkPVData::New()
 {
   return new vtkPVData();
 }
 
-void vtkPVData::Contour()
+//----------------------------------------------------------------------------
+void vtkPVData::Clone(vtkPVApplication *pvApp)
 {
-  vtkPVContourFilter *contour;
-  vtkPVComposite *newComp;
-  float *range;
-  
-  contour = vtkPVContourFilter::New();
-  // I would like to be setting a PVData as input to PVSource ...
-  contour->GetContour()->SetInput(this->GetData());
-  
-  range = this->GetData()->GetScalarRange();
-  contour->GetContour()->SetValue(0, (range[1]-range[0])/2.0);
-      
-  newComp = vtkPVComposite::New();
-  newComp->SetSource(contour);
-  newComp->SetCompositeName("contour");
-
-  vtkPVWindow *window = this->GetComposite()->GetWindow();
-  newComp->SetPropertiesParent(window->GetDataPropertiesParent());
-  newComp->CreateProperties(this->Application, "");
-  this->GetComposite()->GetView()->AddComposite(newComp);
-  this->GetComposite()->GetProp()->VisibilityOff();
-  
-  newComp->SetWindow(window);
-  
-  window->SetCurrentDataComposite(newComp);
-  window->GetDataList()->Update();
-  
-  this->GetComposite()->GetView()->Render();
-  
-  contour->Delete();
-  newComp->Delete();
-}
-
-void vtkPVData::AddCommonWidgets(vtkKWApplication *app, char *args)
-{
-  // must set the application
   if (this->Application)
     {
-    vtkErrorMacro("Label already created");
-    return;
+    vtkErrorMacro("Application has already been set.");
     }
-  this->SetApplication(app);
+  this->SetApplication(pvApp);
+
+  // Clone this object on every other process.
+  pvApp->BroadcastScript("%s %s", this->GetClassName(), this->GetTclName());
+}
+
+
+//----------------------------------------------------------------------------
+int vtkPVData::Create(char *args)
+{
+  if (this->Application == NULL)
+    {
+    vtkErrorMacro("Object has not been cloned yet.");
+    return 0;
+    }
   
   // create the top level
   this->Script("frame %s %s", this->GetWidgetName(), args);
 
-  this->GetData()->Update();
+  this->Data->Update();
   
   this->FiltersMenuButton->SetParent(this);
-  this->FiltersMenuButton->Create(app, "");
+  this->FiltersMenuButton->Create(this->Application, "");
   this->FiltersMenuButton->SetButtonText("Filters");
   this->FiltersMenuButton->AddCommand("vtkContourFilter", this,
 				      "Contour");
-  if (this->GetData()->GetPointData()->GetScalars() == NULL)
+  if (this->Data->GetPointData()->GetScalars() == NULL)
     {
     this->Script("%s entryconfigure 3 -state disabled",
 		 this->FiltersMenuButton->GetMenu()->GetWidgetName());
@@ -140,49 +123,127 @@ void vtkPVData::AddCommonWidgets(vtkKWApplication *app, char *args)
     }
   
   this->Script("pack %s", this->FiltersMenuButton->GetWidgetName());
+
+  return 1;
 }
 
+//----------------------------------------------------------------------------
+void vtkPVData::Contour()
+{
+  vtkPVApplication *pvApp = (vtkPVApplication *)this->Application;
+  vtkPVComposite *newComp;
+  vtkPVContourFilter *contour;
+  vtkPVPolyData *pvd;
+  vtkPVAssignment *a;
+  float *range;
+  
+  newComp = vtkPVComposite::New();
+  newComp->Clone(pvApp);
+  contour = vtkPVContourFilter::New();
+  contour->Clone(pvApp);
+  pvd = vtkPVPolyData::New();
+  pvd->Clone(pvApp);
+  
+  contour->SetInput(this);
+  contour->SetOutput(pvd);
+  a = this->GetAssignment();
+  contour->SetAssignment(a);
+  
+  range = this->Data->GetScalarRange();
+  contour->SetValue(0, (range[1]-range[0])/2.0);
+      
+  newComp->SetSource(contour);
+  newComp->SetCompositeName("contour");
+
+  vtkPVWindow *window = this->GetComposite()->GetWindow();
+  newComp->SetPropertiesParent(window->GetDataPropertiesParent());
+  newComp->CreateProperties("");
+  this->GetComposite()->GetView()->AddComposite(newComp);
+  this->GetComposite()->VisibilityOff();
+  
+  newComp->SetWindow(window);
+  
+  window->SetCurrentDataComposite(newComp);
+  window->GetDataList()->Update();
+  
+  this->GetComposite()->GetView()->Render();
+  
+  contour->Delete();
+  newComp->Delete();
+  pvd->Delete();
+}
+
+//----------------------------------------------------------------------------
 vtkProp* vtkPVData::GetProp()
 {
   return this->Actor;
 }
 
+//----------------------------------------------------------------------------
+vtkPVApplication* vtkPVData::GetPVApplication()
+{
+  if (this->Application == NULL)
+    {
+    return NULL;
+    }
+  
+  if (this->Application->IsA("vtkPVApplication"))
+    {  
+    return (vtkPVApplication*)(this->Application);
+    }
+  else
+    {
+    vtkErrorMacro("Bad typecast");
+    return NULL;
+    } 
+}
+
+//----------------------------------------------------------------------------
 // MAYBE WE SHOULD NOT REFERENCE COUNT HERE BECAUSE NO ONE BUT THE 
 // SOURCE WIDGET WILL REFERENCE THE DATA WIDGET.
-void vtkPVData::SetSourceWidget(vtkPVSource *source)
+void vtkPVData::SetPVSource(vtkPVSource *source)
 {
-  if (this->SourceWidget == source)
+  if (this->PVSource == source)
     {
     return;
     }
   this->Modified();
 
-  if (this->SourceWidget)
+  if (this->PVSource)
     {
-    vtkPVSource *tmp = this->SourceWidget;
-    this->SourceWidget = NULL;
+    vtkPVSource *tmp = this->PVSource;
+    this->PVSource = NULL;
     tmp->UnRegister(this);
     }
   if (source)
     {
-    this->SourceWidget = source;
+    this->PVSource = source;
     source->Register(this);
     }
 }
 
 
+//----------------------------------------------------------------------------
 vtkPVComposite *vtkPVData::GetComposite()
 {
-  if (this->SourceWidget == NULL)
+  if (this->PVSource == NULL)
     {
     return NULL;
     }
 
-  return this->SourceWidget->GetComposite();
+  return this->PVSource->GetComposite();
 }
 
+//----------------------------------------------------------------------------
 void vtkPVData::SetAssignment(vtkPVAssignment *a)
 {
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  if (pvApp && pvApp->GetController()->GetLocalProcessId() == 0)
+    {
+    pvApp->BroadcastScript("%s SetAssignment %s", this->GetTclName(), 
+			   a->GetTclName());
+    }
+  
   if (this->Assignment == a)
     {
     return;
@@ -207,4 +268,12 @@ void vtkPVData::SetAssignment(vtkPVAssignment *a)
     this->Data->SetUpdateExtent(a->GetPiece(), a->GetNumberOfPieces());
     }
 }
+
+  
+
+
+
+
+
+
 

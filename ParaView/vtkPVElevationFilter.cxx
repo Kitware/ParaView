@@ -27,15 +27,17 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 =========================================================================*/
 
 #include "vtkPVElevationFilter.h"
-#include "vtkKWApplication.h"
+#include "vtkPVApplication.h"
 #include "vtkKWView.h"
 #include "vtkKWRenderView.h"
 #include "vtkPVComposite.h"
 #include "vtkPVPolyData.h"
+#include "vtkPVImage.h"
 
 int vtkPVElevationFilterCommand(ClientData cd, Tcl_Interp *interp,
 				int argc, char *argv[]);
 
+//----------------------------------------------------------------------------
 vtkPVElevationFilter::vtkPVElevationFilter()
 {
   this->CommandFunction = vtkPVElevationFilterCommand;
@@ -95,6 +97,7 @@ vtkPVElevationFilter::vtkPVElevationFilter()
 
 }
 
+//----------------------------------------------------------------------------
 vtkPVElevationFilter::~vtkPVElevationFilter()
 {
   this->LowPointLabel->Delete();
@@ -151,25 +154,22 @@ vtkPVElevationFilter::~vtkPVElevationFilter()
   this->Elevation = NULL;
 }
 
+//----------------------------------------------------------------------------
 vtkPVElevationFilter* vtkPVElevationFilter::New()
 {
   return new vtkPVElevationFilter();
 }
 
-void vtkPVElevationFilter::Create(vtkKWApplication *app, char *args)
+//----------------------------------------------------------------------------
+int vtkPVElevationFilter::Create(char *args)
 { 
   float *low, *high, *range;
  
   // must set the application
-  if (this->Application)
+  if (this->vtkPVSource::Create(args) == 0)
     {
-    vtkErrorMacro("vtkPVElevationFilter already created");
-    return;
+    return 0;
     }
-  this->SetApplication(app);
-  
-  // create the top level
-  this->Script("frame %s %s", this->GetWidgetName(), args);
   
   low = this->GetElevation()->GetLowPoint();
   high = this->GetElevation()->GetHighPoint();
@@ -264,21 +264,67 @@ void vtkPVElevationFilter::Create(vtkKWApplication *app, char *args)
   this->Script("pack %s %s",
 	       this->RangeLabel->GetWidgetName(),
 	       this->RangeFrame->GetWidgetName());
+
+  return 1;
 }
 
-vtkPVData *vtkPVElevationFilter::GetDataWidget()
+//----------------------------------------------------------------------------
+void vtkPVElevationFilter::SetOutput(vtkPVPolyData *pvd)
 {
-  if (this->DataWidget == NULL)
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  if (pvApp && pvApp->GetController()->GetLocalProcessId() == 0)
     {
-    vtkPVPolyData *pd = vtkPVPolyData::New();
-    pd->SetPolyData(this->Elevation->GetPolyDataOutput());
-    this->SetDataWidget(pd);
-    pd->Delete();    
+    pvApp->BroadcastScript("%s SetOutput %s", this->GetTclName(), 
+			   pvd->GetTclName());
     }
-
-  return this->DataWidget;
+  
+  this->SetPVData(pvd);
+  pvd->SetPolyData(this->Elevation->GetPolyDataOutput());
 }
 
+//----------------------------------------------------------------------------
+void vtkPVElevationFilter::SetOutput(vtkPVImage *pvd)
+{
+  vtkDataSet *ds;
+  vtkPVApplication *pvApp = this->GetPVApplication();
+
+  if (pvApp && pvApp->GetController()->GetLocalProcessId() == 0)
+    {
+    pvApp->BroadcastScript("%s SetOutput %s", this->GetTclName(), 
+			   pvd->GetTclName());
+    }
+  
+  this->SetPVData(pvd);
+  
+  ds = this->Elevation->GetOutput();
+  if ( ! ds->IsA("vtkImageData") )
+    {
+    vtkErrorMacro("Expecting an image.");
+    return;
+    }
+  
+  pvd->SetImageData((vtkImageData*)ds);
+}
+
+//----------------------------------------------------------------------------
+vtkPVData *vtkPVElevationFilter::GetOutput()
+{
+  return this->Output;
+}
+
+//----------------------------------------------------------------------------
+vtkPVPolyData *vtkPVElevationFilter::GetPVPolyDataOutput()
+{
+  return vtkPVPolyData::SafeDownCast(this->Output);
+}
+
+//----------------------------------------------------------------------------
+vtkPVImage *vtkPVElevationFilter::GetPVImageOutput()
+{
+  return vtkPVImage::SafeDownCast(this->Output);
+}
+
+//----------------------------------------------------------------------------
 void vtkPVElevationFilter::ElevationParameterChanged()
 {
   float low[3], high[3], range[2];
@@ -292,9 +338,66 @@ void vtkPVElevationFilter::ElevationParameterChanged()
   range[0] = this->RangeMinEntry->GetValueAsFloat();
   range[1] = this->RangeMaxEntry->GetValueAsFloat();
   
-  this->GetElevation()->SetLowPoint(low);
-  this->GetElevation()->SetHighPoint(high);
-  this->GetElevation()->SetScalarRange(range);
+  this->SetLowPoint(low[0], low[1], low[2]);
+  this->SetHighPoint(high[0], high[1], high[2]);
+  this->SetScalarRange(range[0], range[1]);
   
   this->Composite->GetView()->Render();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVElevationFilter::SetInput(vtkPVData *pvData)
+{
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  
+  if (pvApp && pvApp->GetController()->GetLocalProcessId() == 0)
+    {
+    pvApp->BroadcastScript("%s SetInput %s", this->GetTclName(),
+			   pvData->GetTclName());
+    }  
+  
+  this->GetElevation()->SetInput(pvData->GetData());
+}
+
+
+//----------------------------------------------------------------------------
+void vtkPVElevationFilter::SetLowPoint(float x, float y, float z)
+{
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  
+  if (pvApp && pvApp->GetController()->GetLocalProcessId() == 0)
+    {
+    pvApp->BroadcastScript("%s SetLowPoint %f %f %f", this->GetTclName(),
+			   x, y, z);
+    }  
+  
+  this->GetElevation()->SetLowPoint(x, y, z);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVElevationFilter::SetHighPoint(float x, float y, float z)
+{
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  
+  if (pvApp && pvApp->GetController()->GetLocalProcessId() == 0)
+    {
+    pvApp->BroadcastScript("%s SetHighPoint %f %f %f", this->GetTclName(),
+			   x, y, z);
+    }  
+  
+  this->GetElevation()->SetHighPoint(x, y, z);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVElevationFilter::SetScalarRange(float min, float max)
+{
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  
+  if (pvApp && pvApp->GetController()->GetLocalProcessId() == 0)
+    {
+    pvApp->BroadcastScript("%s SetScalarRange %f %f", this->GetTclName(),
+			   min, max);
+    }  
+  
+  this->GetElevation()->SetScalarRange(min, max);
 }

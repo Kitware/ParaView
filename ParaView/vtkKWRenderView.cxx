@@ -173,6 +173,11 @@ void vtkKWRenderView::SetupMemoryRendering(int x, int y, void *cd)
     cd = this->RenderWindow->GetGenericContext();
     }
   ((vtkWin32OpenGLRenderWindow *)this->RenderWindow)->SetupMemoryRendering(x,y,(HDC)cd);
+#elseif
+  if (this->RenderWindow->IsA("vtkMesaRenderWindow"))
+    {
+    ((vtkMesaRenderWindow*)(this->RenderWindow))->SetOffScreenRendering(1);
+    } 
 #endif
 }
 
@@ -180,6 +185,11 @@ void vtkKWRenderView::ResumeScreenRendering()
 {
 #ifdef _WIN32
   ((vtkWin32OpenGLRenderWindow *)this->RenderWindow)->ResumeScreenRendering();
+#elseif
+  if (this->RenderWindow->IsA("vtkMesaRenderWindow"))
+    {
+    ((vtkMesaRenderWindow*)(this->RenderWindow))->SetOffScreenRendering(0);
+    } 
 #endif
 }
 
@@ -240,8 +250,8 @@ void vtkKWRenderView::Create(vtkKWApplication *app, char *args)
                this->VTKWidget->GetWidgetName(),local);
   this->Script("pack %s -expand yes -fill both -side top -anchor nw",
                this->VTKWidget->GetWidgetName());
-
-
+  
+  
   this->RenderWindow->Render();
   delete local;
 }
@@ -662,5 +672,5 @@ void vtkKWRenderView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWView::SerializeRevision(os,indent);
   os << indent << "vtkKWRenderView ";
-  this->ExtractRevision(os,"$Revision: 1.4 $");
+  this->ExtractRevision(os,"$Revision: 1.5 $");
 }

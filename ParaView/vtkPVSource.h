@@ -25,6 +25,12 @@ PARTICULAR PURPOSE, AND NON-INFRINGEMENT.  THIS SOFTWARE IS PROVIDED ON AN
 MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 =========================================================================*/
+// .NAME vtkPVSource - A super class for filter objects.
+// .SECTION Description
+// This is a parallel object.  It needs to be cloned to work correctly.  
+// After cloning, the parallel nature of the object is transparent.
+// This class should probably be merged with vtkPVComposite.
+
 
 #ifndef __vtkPVSource_h
 #define __vtkPVSource_h
@@ -43,15 +49,15 @@ public:
   vtkTypeMacro(vtkPVSource,vtkKWWidget);
   
   // Description:
-  // Create a Tk widget
-  virtual void Create(vtkKWApplication *app, char *args) {};
-
+  // This duplicates the object in the satellite processes.
+  // They will all have the same tcl name.
+  void Clone(vtkPVApplication *app);
+  
   // Description:
-  // Set and get the UI representing the data.  These calls also manage the
-  // double pointers between the data widget and this source widget.
-  void SetDataWidget(vtkPVData *data);
-  virtual vtkPVData *GetDataWidget();
-
+  // Creates common widgets.
+  // Returns 0 if there was an error.
+  virtual int Create(char *args);  
+  
   // Description:
   // DO NOT CALL THIS IF YOU ARE NOT A COMPOSITE!
   void SetComposite(vtkPVComposite *comp);
@@ -61,22 +67,35 @@ public:
   vtkGetObjectMacro(Composite, vtkPVComposite);
 
   // Description:
-  // Tells the filter wich piece of data to generate.
+  // Tells the filter which piece of data to generate.
+  // Makes the call (indirectly) in parallel (on every process).
   virtual void SetAssignment(vtkPVAssignment *a);
+  
+  // Description:
+  // A way to get the output in the superclass.
+  vtkPVData *GetPVData() {return this->Output;}
+    
+  // Description:
+  // Casts to vtkPVApplication.
+  vtkPVApplication *GetPVApplication();
   
 protected:
   vtkPVSource();
   ~vtkPVSource();
   vtkPVSource(const vtkPVSource&) {};
   void operator=(const vtkPVSource&) {};
-    
-  vtkPVComposite* Composite;
   
-  // Should this be called output ?
-  vtkPVData *DataWidget;
-
+  // Description:
+  // Mangages the double pointer and reference counting.
+  void SetPVData(vtkPVData *data);
+  
+  vtkPVData *Output;
+  
   // Just one input for now.
   vtkPVData *Input;
+
+  vtkPVComposite* Composite;
+  
 };
 
 #endif
