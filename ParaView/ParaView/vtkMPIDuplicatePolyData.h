@@ -85,7 +85,7 @@ protected:
   void ServerExecute(vtkMPICommunicator* com, vtkPolyDataReader* reader, 
                      vtkPolyDataWriter* writer);
   void ClientExecute(vtkPolyDataReader* reader);
-  void ReconstructOutput(vtkPolyDataReader* reader,
+  void ReconstructOutput(vtkPolyDataReader* reader, int numProcs,
                          char* recv, int* recvLengths, int* recvOffsets);
   void ExecuteInformation();
 

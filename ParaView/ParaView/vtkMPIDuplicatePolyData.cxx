@@ -27,7 +27,7 @@
 #include "vtkSocketController.h"
 #include "vtkTimerLog.h"
 
-vtkCxxRevisionMacro(vtkMPIDuplicatePolyData, "1.1.2.2");
+vtkCxxRevisionMacro(vtkMPIDuplicatePolyData, "1.1.2.3");
 vtkStandardNewMacro(vtkMPIDuplicatePolyData);
 
 vtkCxxSetObjectMacro(vtkMPIDuplicatePolyData,Controller, vtkMultiProcessController);
@@ -221,12 +221,12 @@ void vtkMPIDuplicatePolyData::ServerExecute(vtkMPICommunicator* com,
   if (myId == 0)
     {
     // Send the string to the client.
-    this->SocketController->Send(&numProcs, 1, 0, 948344);
-    this->SocketController->Send(recvLengths, numProcs*2, 0, 948345);
-    this->SocketController->Send(allbuffers, sum, 0, 948346);
+    this->SocketController->Send(&numProcs, 1, 1, 948344);
+    this->SocketController->Send(recvLengths, numProcs*2, 1, 948345);
+    this->SocketController->Send(allbuffers, sum, 1, 948346);
     }
 
-  this->ReconstructOutput(reader, allbuffers, 
+  this->ReconstructOutput(reader, numProcs, allbuffers, 
                           recvLengths, recvOffsets);
 
   delete [] buf;
@@ -243,10 +243,10 @@ void vtkMPIDuplicatePolyData::ServerExecute(vtkMPICommunicator* com,
 
 //-----------------------------------------------------------------------------
 void vtkMPIDuplicatePolyData::ReconstructOutput(vtkPolyDataReader* reader,
-                                char* recv, int* recvLengths, int* recvOffsets)
+                                                int numProcs, char* recv,
+                                                int* recvLengths, 
+                                                int* recvOffsets)
 {
-  int numProcs;
-  numProcs = this->Controller->GetNumberOfProcesses();
   vtkPolyData* output;
   vtkPolyData* pd;
   int idx;
@@ -292,23 +292,23 @@ void vtkMPIDuplicatePolyData::ClientExecute(vtkPolyDataReader* reader)
   char* buffers;
 
   // Receive the numer of processes.
-  this->SocketController->Receive(&numProcs, 1, 0, 948344);
+  this->SocketController->Receive(&numProcs, 1, 1, 948344);
 
   // Receive information about the lengths/offsets of each marshaled data set.
   recvLengths = new int[numProcs*2];
   recvOffsets = recvLengths + numProcs;
-  this->SocketController->Receive(recvLengths, numProcs*2, 0, 948345);
+  this->SocketController->Receive(recvLengths, numProcs*2, 1, 948345);
 
   // Receive the actual buffers.
-  totalLengths = 0;
+  totalLength = 0;
   for (idx = 0; idx < numProcs; ++idx)
     {
-    totalLengths += recvLengths[idx];
+    totalLength += recvLengths[idx];
     }
   buffers = new char[totalLength];
-  this->SocketController->Receive(allbuffers, totalLengths, 0, 948346);
+  this->SocketController->Receive(buffers, totalLength, 1, 948346);
 
-  this->ReconstructOutput(reader, buffers, 
+  this->ReconstructOutput(reader, numProcs, buffers, 
                           recvLengths, recvOffsets);
   delete [] recvLengths;
   recvLengths = NULL;
