@@ -56,6 +56,7 @@ class vtkPVRenderView;
 class vtkPVSource;
 class vtkPVWindow;
 class vtkPVWidget;
+class vtkPVApplication;
 
 class VTK_EXPORT vtkPVAnimationInterface : public vtkKWWidget
 {
@@ -181,6 +182,17 @@ public:
   // It executes the script.
   void TimeScaleCallback();
 
+  // Description:
+  // Save images or geometry for replay.
+  void SaveImagesCallback();
+  void SaveImages(const char* fileRoot, const char* ext);
+  void SaveGeometryCallback();
+  void SaveGeometry(const char* fileRoot);
+
+  // Description:
+  // Convenience method.
+  vtkPVApplication* GetPVApplication();
+
 protected:
   vtkPVAnimationInterface();
   ~vtkPVAnimationInterface();
@@ -227,8 +239,8 @@ protected:
   vtkKWMenuButton *SourceMenuButton;
 
   // Menu Showing all of the possible methods of the selected source.
-  vtkKWLabel *MethodLabel;
-  vtkKWMenuButton *MethodMenuButton;
+  vtkKWLabel*        MethodLabel;
+  vtkKWMenuButton*   MethodMenuButton;
 
   // The source selected.
   vtkPVSource *PVSource;
@@ -236,6 +248,11 @@ protected:
 
   // The formated string to evaluate.
   char *ScriptString;
+
+  // Should be a better way (menu?)
+  vtkKWLabeledFrame* SaveFrame;
+  vtkKWPushButton*   SaveImagesButton;
+  vtkKWPushButton*   SaveGeometryButton;
 
   vtkPVAnimationInterface(const vtkPVAnimationInterface&); // Not implemented
   void operator=(const vtkPVAnimationInterface&); // Not implemented

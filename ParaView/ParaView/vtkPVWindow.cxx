@@ -128,7 +128,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.429");
+vtkCxxRevisionMacro(vtkPVWindow, "1.430");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -208,6 +208,7 @@ vtkPVWindow::vtkPVWindow()
   this->AnimationInterface = vtkPVAnimationInterface::New();
   this->AnimationInterface->SetTraceReferenceObject(this);
   this->AnimationInterface->SetTraceReferenceCommand("GetAnimationInterface");
+  this->AnimationInterface->SetApplication(this->GetApplication());
 
   this->TimerLogDisplay = NULL;
   this->ErrorLogDisplay = NULL;
@@ -4013,7 +4014,7 @@ void vtkPVWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVWindow ";
-  this->ExtractRevision(os,"$Revision: 1.429 $");
+  this->ExtractRevision(os,"$Revision: 1.430 $");
 }
 
 //-----------------------------------------------------------------------------

@@ -48,6 +48,14 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkPVWidget.h"
 #include "vtkPVWidgetCollection.h"
 #include "vtkPVWindow.h"
+#include "vtkKWLoadSaveDialog.h"
+#include "vtkWindowToImageFilter.h"
+#include "vtkJPEGWriter.h"
+#include "vtkTIFFWriter.h"
+#include "vtkPNGWriter.h"
+#include "vtkRenderWindow.h"
+#include "vtkPVProcessModule.h"
+#include "vtkPVPart.h"
 
 // We need to:
 // Format min/max/resolution entries better.
@@ -126,7 +134,7 @@ static unsigned char image_goto_end[] =
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterface);
-vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.39");
+vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.40");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterface,ControlledWidget, vtkPVWidget);
 
@@ -198,6 +206,11 @@ vtkPVAnimationInterface::vtkPVAnimationInterface()
   this->MethodMenuButton = vtkKWMenuButton::New();
 
   this->ControlledWidget = NULL;
+
+  // Save button frame
+  this->SaveFrame = vtkKWLabeledFrame::New();
+  this->SaveImagesButton = vtkKWPushButton::New();
+  this->SaveGeometryButton = vtkKWPushButton::New();
 }
 
 //-----------------------------------------------------------------------------
@@ -313,6 +326,13 @@ vtkPVAnimationInterface::~vtkPVAnimationInterface()
     this->MethodMenuButton->Delete();
     this->MethodMenuButton = NULL;
     }
+
+  this->SaveFrame->Delete();
+  this->SaveFrame = NULL;
+  this->SaveImagesButton->Delete();
+  this->SaveImagesButton = NULL;
+  this->SaveGeometryButton->Delete();
+  this->SaveGeometryButton = NULL;
 
   this->SetPVSource(NULL);
   this->SetControlledWidget(NULL);
@@ -675,11 +695,29 @@ void vtkPVAnimationInterface::Create(vtkKWApplication *app, char *frameArgs)
   this->Script("bind %s <KeyPress> {%s ScriptEditorCallback}",
                this->ScriptEditor->GetWidgetName(), this->GetTclName());
 
+  // Save frame stuff
+  this->SaveFrame->SetParent(this);
+  this->SaveFrame->ShowHideFrameOn();
+  this->SaveFrame->Create(this->Application, 0);
+  this->SaveFrame->SetLabel("Save");
+  this->SaveImagesButton->SetParent(this->SaveFrame->GetFrame());
+  this->SaveImagesButton->Create(this->Application, 0);
+  this->SaveImagesButton->SetLabel("Save Images");
+  this->SaveImagesButton->SetCommand(this, "SaveImagesCallback");
+  this->SaveGeometryButton->SetParent(this->SaveFrame->GetFrame());
+  this->SaveGeometryButton->Create(this->Application, 0);
+  this->SaveGeometryButton->SetLabel("Save Geometry");
+  this->SaveGeometryButton->SetCommand(this, "SaveGeometryCallback");
+  this->Script("pack %s %s -side left -expand t -fill x -padx 2 -pady 2", 
+               this->SaveImagesButton->GetWidgetName(),
+               this->SaveGeometryButton->GetWidgetName());
+
   // Pack frames
 
-  this->Script("pack %s %s -side top -expand t -fill x -padx 2 -pady 2", 
+  this->Script("pack %s %s %s -side top -expand t -fill x -padx 2 -pady 2", 
                this->ControlFrame->GetWidgetName(),
-               this->ActionFrame->GetWidgetName());
+               this->ActionFrame->GetWidgetName(),
+               this->SaveFrame->GetWidgetName());
 
   this->UpdateSourceMenu();
   this->UpdateMethodMenu();
@@ -1236,6 +1274,253 @@ void vtkPVAnimationInterface::SetView(vtkPVRenderView *renderView)
 }
 
 //-----------------------------------------------------------------------------
+void vtkPVAnimationInterface::SaveImagesCallback()
+{
+  vtkKWLoadSaveDialog* saveDialog = vtkKWLoadSaveDialog::New();
+  this->GetWindow()->RetrieveLastPath(saveDialog, "SaveAnimationFile");
+  saveDialog->SetParent(this);
+  saveDialog->Create(this->Application, 0);
+  saveDialog->SaveDialogOn();
+  saveDialog->SetTitle("Save Animation Images");
+  saveDialog->SetDefaultExtension(".jpg");
+  saveDialog->SetFileTypes("{{jpeg} {.jpg}} {{tiff} {.tif}} {{Portable Network Graphics} {.png}}");
+
+  if ( saveDialog->Invoke() &&
+       strlen(saveDialog->GetFileName())>0 )
+    {
+    this->GetWindow()->SaveLastPath(saveDialog, "SaveAnimationFile");
+    const char* filename = saveDialog->GetFileName();  
+
+    // Split into root and extension.
+    char* fileRoot;
+    char* ptr;
+    char* ext = NULL;
+    fileRoot = new char[strlen(filename)+1];
+    strcpy(fileRoot, filename);
+    // Find extension (last .)
+    ptr = fileRoot;
+    while (*ptr != '\0')
+      {
+      if (*ptr == '.')
+        {
+        ext = ptr;
+        }
+      ++ptr;
+      }
+    if (ext == NULL)
+      {
+      vtkErrorMacro(<< "Could not find extension in " << filename);
+      delete [] fileRoot;
+      fileRoot = NULL;
+      saveDialog->Delete();
+      saveDialog = NULL;
+      return;
+      }
+    // Separate the root from the extension.
+    *ext = '\0';
+    ++ext;
+
+    this->SaveImages(fileRoot, ext);
+    delete [] fileRoot;
+    fileRoot = NULL;
+    ext = NULL;
+    }
+
+  saveDialog->Delete();
+  saveDialog = NULL;
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVAnimationInterface::SaveImages(const char* fileRoot, 
+                                         const char* ext) 
+{
+  vtkWindowToImageFilter* winToImage;
+  vtkImageWriter* writer;
+  char *fileName;
+  int fileCount;
+  float t;
+  float sgn = 1;
+
+  winToImage = vtkWindowToImageFilter::New();
+  winToImage->SetInput(this->View->GetRenderWindow());
+  if (strcmp(ext,"jpg") == 0)
+    {
+    writer = vtkJPEGWriter::New();
+    }
+  else if (strcmp(ext,"tif") == 0)
+    {
+    writer = vtkTIFFWriter::New();
+    }
+  else if (strcmp(ext,"png") == 0)
+    {
+    writer = vtkPNGWriter::New();
+    }
+  else
+    {
+    vtkErrorMacro("Unknown extension " << ext << ", try: jpg, tif or png.");
+    return;
+    }
+  writer->SetInput(winToImage->GetOutput());
+  fileName = new char[strlen(fileRoot) + strlen(ext) + 25];      
+  if (this->TimeStep < 0)
+    {
+    sgn = -1.0;
+    }
+
+  // Loop through all of the time steps.
+  t = this->TimeStart;
+  fileCount = 0;
+  while ((sgn*t) <= (sgn*this->TimeEnd))
+    {
+    this->SetCurrentTime(t);
+    this->View->EventuallyRender();
+    this->Script("update");
+
+    // Create a file name for this image.
+    sprintf(fileName, "%s%04d.%s", fileRoot, fileCount, ext);
+    writer->SetFileName(fileName);
+    winToImage->Modified();
+    writer->Write();
+    
+    ++fileCount;
+    t = t + this->TimeStep;
+    }
+
+  winToImage->Delete();
+  winToImage = NULL;
+  writer->Delete();
+  writer = NULL;
+  delete [] fileName;
+  fileName = NULL;
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVAnimationInterface::SaveGeometryCallback()
+{
+  vtkKWLoadSaveDialog* saveDialog = vtkKWLoadSaveDialog::New();
+  this->GetWindow()->RetrieveLastPath(saveDialog, "SaveAnimationFile");
+  saveDialog->SetParent(this);
+  saveDialog->Create(this->Application, 0);
+  saveDialog->SaveDialogOn();
+  saveDialog->SetTitle("Save Animation Images");
+  saveDialog->SetDefaultExtension(".pva");
+  saveDialog->SetFileTypes("{{PV Animation} {.pva}}");
+
+  if ( saveDialog->Invoke() &&
+       strlen(saveDialog->GetFileName())>0 )
+    {
+    this->GetWindow()->SaveLastPath(saveDialog, "SaveAnimationFile");
+    const char* filename = saveDialog->GetFileName();  
+
+    // Split into root and extension.
+    char* fileRoot;
+    char* ptr;
+    char* ext = NULL;
+    fileRoot = new char[strlen(filename)+1];
+    strcpy(fileRoot, filename);
+    // Find extension (last .)
+    ptr = fileRoot;
+    while (*ptr != '\0')
+      {
+      if (*ptr == '.')
+        {
+        ext = ptr;
+        }
+      ++ptr;
+      }
+    if (ext != NULL)
+      {
+      // Separate the root from the extension.
+      *ext = '\0';
+      ++ext;
+      }
+
+    this->SaveGeometry(fileRoot);
+    delete [] fileRoot;
+    fileRoot = NULL;
+    ext = NULL;
+    }
+
+  saveDialog->Delete();
+  saveDialog = NULL;
+}
+
+
+//-----------------------------------------------------------------------------
+void vtkPVAnimationInterface::SaveGeometry(const char* fileRoot) 
+{
+  int numSources, sourceIdx;
+  vtkPVSource* source;
+  const char* sourceName;
+  int numParts, partIdx;
+  vtkPVPart* part;
+  char *fileName;
+  int timeCount;
+  float t;
+  float sgn = 1;
+  vtkPVSourceCollection *sources;
+
+  sources = this->GetWindow()->GetSourceList("Sources");
+
+  // Writer has to be in tcl to connect to geometry filter. 
+  this->GetPVApplication()->GetProcessModule()->ServerScript(
+          "vtkPolyDataWriter pvAnimWriter"); 
+
+  fileName = new char[strlen(fileRoot) + 30];      
+  if (this->TimeStep < 0)
+    {
+    sgn = -1.0;
+    }
+
+  // Loop through all of the time steps.
+  t = this->TimeStart;
+  timeCount = 0;
+  while ((sgn*t) <= (sgn*this->TimeEnd))
+    {
+    this->SetCurrentTime(t);
+    this->View->EventuallyRender();
+    this->Script("update");
+
+    // Loop through visible sources.
+    sources->InitTraversal();
+    while ( (source = sources->GetNextPVSource()) )
+      {
+      if (source->GetVisibility())
+        {
+        sourceName = source->GetName();
+        numParts = source->GetNumberOfPVParts();
+        for ( partIdx = 0; partIdx < numParts; ++partIdx)
+          {
+          part = source->GetPVPart(partIdx);
+          // Create a file name for this image.
+          if (numParts == 1)
+            {
+            sprintf(fileName, "%s%sT%04d.vtk", 
+                    fileRoot, sourceName, timeCount);
+            }
+          else
+            {
+            sprintf(fileName, "%s%sP%dT%04d.vtk", 
+                    fileRoot, sourceName, partIdx, timeCount);
+            }
+          this->GetPVApplication()->GetProcessModule()->ServerScript(
+                  "pvAnimWriter SetInput [%s GetInput]; pvAnimWriter SetFileName %s; pvAnimWriter Write", 
+                  part->GetMapperTclName(), fileName);
+          }
+        }
+      }
+    
+    ++timeCount;
+    t = t + this->TimeStep;
+    }
+  this->GetPVApplication()->GetProcessModule()->ServerScript(
+                                                   "pvAnimWriter Delete");
+
+  delete [] fileName;
+  fileName = NULL;
+}
+
+//-----------------------------------------------------------------------------
 void vtkPVAnimationInterface::SaveInBatchScript(ofstream *file, 
                                                 const char* fileRoot,
                                                 const char* extension,
@@ -1295,6 +1580,12 @@ void vtkPVAnimationInterface::SaveInBatchScript(ofstream *file,
     *file << "Writer Write\n"; 
     *file << "}\n\n";
     }
+}
+
+//-----------------------------------------------------------------------------
+vtkPVApplication* vtkPVAnimationInterface::GetPVApplication()
+{
+  return vtkPVApplication::SafeDownCast(this->Application);
 }
 
 //-----------------------------------------------------------------------------

@@ -61,7 +61,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <ctype.h>
 
-vtkCxxRevisionMacro(vtkPVXMLPackageParser, "1.21");
+vtkCxxRevisionMacro(vtkPVXMLPackageParser, "1.22");
 vtkStandardNewMacro(vtkPVXMLPackageParser);
 
 #ifndef VTK_NO_EXPLICIT_TEMPLATE_INSTANTIATION
@@ -582,13 +582,6 @@ int vtkPVXMLPackageParser::ParseVTKFilter(vtkPVXMLElement* filterElement,
   unsigned int rIdx;
   const char* classAttr;
   const char* quantityAttr;
-
-  //static int hack = 1;
-  //if (hack)
-  //  {
-  //  Sleep(15000);
-  //  hack = 0;
-  //  }
 
   classAttr = filterElement->GetAttribute("class");
   if (classAttr) 

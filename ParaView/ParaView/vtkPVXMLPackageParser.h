@@ -46,7 +46,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // module in the package.
 #ifndef __vtkPVXMLPackageParser_h
 #define __vtkPVXMLPackageParser_h
-
 #include "vtkPVXMLParser.h"
 
 //BTX

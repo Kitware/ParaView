@@ -51,7 +51,7 @@
 #endif
 
 
-vtkCxxRevisionMacro(vtkClientCompositeManager, "1.10");
+vtkCxxRevisionMacro(vtkClientCompositeManager, "1.11");
 vtkStandardNewMacro(vtkClientCompositeManager);
 
 vtkCxxSetObjectMacro(vtkClientCompositeManager,Compositer,vtkCompositer);
@@ -199,20 +199,24 @@ void vtkClientCompositeManagerResetCamera(vtkObject *caller,
                                           unsigned long vtkNotUsed(event), 
                                           void *clientData, void *)
 {
+  /*
   vtkClientCompositeManager *self = (vtkClientCompositeManager *)clientData;
   vtkRenderer *ren = (vtkRenderer*)caller;
 
   self->ResetCamera(ren);
+  */
 }
 
 //-------------------------------------------------------------------------
 void vtkClientCompositeManagerResetCameraClippingRange(vtkObject *caller, 
                    unsigned long vtkNotUsed(event),void *clientData, void *)
 {
+  /*
   vtkClientCompositeManager *self = (vtkClientCompositeManager *)clientData;
   vtkRenderer *ren = (vtkRenderer*)caller;
 
   self->ResetCameraClippingRange(ren);
+  */
 }
 
 
@@ -647,6 +651,7 @@ void vtkClientCompositeManager::DoubleBuffer(vtkDataArray* localP,
 //-------------------------------------------------------------------------
 void vtkClientCompositeManager::ResetCamera(vtkRenderer *ren)
 {
+  /*
   float bounds[6];
 
   if (this->ClientController == NULL)
@@ -666,11 +671,13 @@ void vtkClientCompositeManager::ResetCamera(vtkRenderer *ren)
       }
     }
   ren->ResetCamera(bounds);
+  */
 }
 
 //-------------------------------------------------------------------------
 void vtkClientCompositeManager::ResetCameraClippingRange(vtkRenderer *ren)
 {
+  /*
   float bounds[6];
 
   if (this->ClientController == NULL)
@@ -680,6 +687,7 @@ void vtkClientCompositeManager::ResetCameraClippingRange(vtkRenderer *ren)
   
   this->ComputeVisiblePropBounds(ren, bounds);
   ren->ResetCameraClippingRange(bounds);
+  */
 }
 
 //----------------------------------------------------------------------------
@@ -1072,8 +1080,8 @@ void vtkClientCompositeManager::SetRenderWindow(vtkRenderWindow *renWin)
       ren = rens->GetNextItem();
       if (ren)
         {
-        ren->RemoveObserver(this->ResetCameraTag);
-        ren->RemoveObserver(this->ResetCameraClippingRangeTag);
+        //ren->RemoveObserver(this->ResetCameraTag);
+        //ren->RemoveObserver(this->ResetCameraClippingRangeTag);
         }
       }
     // Delete the reference.
@@ -1102,22 +1110,22 @@ void vtkClientCompositeManager::SetRenderWindow(vtkRenderWindow *renWin)
       ren = rens->GetNextItem();
       if (ren)
         {
-        cbc = vtkCallbackCommand::New();
-        cbc->SetCallback(vtkClientCompositeManagerResetCameraClippingRange);
-        cbc->SetClientData((void*)this);
+        //cbc = vtkCallbackCommand::New();
+        //cbc->SetCallback(vtkClientCompositeManagerResetCameraClippingRange);
+        //cbc->SetClientData((void*)this);
         // ren will delete the cbc when the observer is removed.
-        this->ResetCameraClippingRangeTag = 
-        ren->AddObserver(vtkCommand::ResetCameraClippingRangeEvent,cbc);
-        cbc->Delete();
+        //this->ResetCameraClippingRangeTag = 
+        //ren->AddObserver(vtkCommand::ResetCameraClippingRangeEvent,cbc);
+        //cbc->Delete();
         
         
-        cbc = vtkCallbackCommand::New();
-        cbc->SetCallback(vtkClientCompositeManagerResetCamera);
-        cbc->SetClientData((void*)this);
+        //cbc = vtkCallbackCommand::New();
+        //cbc->SetCallback(vtkClientCompositeManagerResetCamera);
+        //cbc->SetClientData((void*)this);
         // ren will delete the cbc when the observer is removed.
-        this->ResetCameraTag = 
-        ren->AddObserver(vtkCommand::ResetCameraEvent,cbc);
-        cbc->Delete();
+        //this->ResetCameraTag = 
+        //ren->AddObserver(vtkCommand::ResetCameraEvent,cbc);
+        //cbc->Delete();
         }
       }
      if (this->Tiled && this->ClientFlag == 0)
