@@ -40,7 +40,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMLODPartDisplay);
-vtkCxxRevisionMacro(vtkSMLODPartDisplay, "1.1");
+vtkCxxRevisionMacro(vtkSMLODPartDisplay, "1.2");
 
 
 //----------------------------------------------------------------------------
@@ -452,16 +452,19 @@ void vtkSMLODPartDisplay::Update()
 //----------------------------------------------------------------------------
 void vtkSMLODPartDisplay::RemoveAllCaches()
 {
-  vtkPVProcessModule* pm = this->GetProcessModule();
-  pm->GetStream()
-    << vtkClientServerStream::Invoke
-    << this->UpdateSuppressorProxy->GetID(0) << "RemoveAllCaches"
-    << vtkClientServerStream::End;
-  pm->GetStream()
-    << vtkClientServerStream::Invoke
-    << this->LODUpdateSuppressorProxy->GetID(0) << "RemoveAllCaches"
-    << vtkClientServerStream::End;
-  pm->SendStream(vtkProcessModule::CLIENT_AND_SERVERS);
+  if (this->UpdateSuppressorProxy)
+    {
+    vtkPVProcessModule* pm = this->GetProcessModule();
+    pm->GetStream()
+      << vtkClientServerStream::Invoke
+      << this->UpdateSuppressorProxy->GetID(0) << "RemoveAllCaches"
+      << vtkClientServerStream::End;
+    pm->GetStream()
+      << vtkClientServerStream::Invoke
+      << this->LODUpdateSuppressorProxy->GetID(0) << "RemoveAllCaches"
+      << vtkClientServerStream::End;
+    pm->SendStream(vtkProcessModule::CLIENT_AND_SERVERS);
+    }
 }
 
 
