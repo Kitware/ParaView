@@ -150,7 +150,6 @@ SET( ParaViewClient_SRCS
   vtkPVPointSourceWidget.cxx
   vtkPVPointWidget.cxx
   vtkPVProbe.cxx
-  vtkPVPushButton.cxx
   vtkPVRawReaderModule.cxx
   vtkPVReaderModule.cxx
   vtkPVRenderModule.cxx
