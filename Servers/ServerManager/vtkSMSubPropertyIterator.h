@@ -12,8 +12,9 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSMSubPropertyIterator -
+// .NAME vtkSMSubPropertyIterator - iterates over the sub-properties of a property
 // .SECTION Description
+// vtkSMSubPropertyIterator iterates over the sub-properties of a property
 
 #ifndef __vtkSMSubPropertyIterator_h
 #define __vtkSMSubPropertyIterator_h

@@ -12,10 +12,24 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSMArrayListDomain -
+// .NAME vtkSMArrayListDomain - list of arrays obtained from input
 // .SECTION Description
+// vtkSMArrayListDomain represents a domain consisting of array names
+// obtained from an input. vtkSMArrayListDomain requires
+// a property of class vtkSMProxyProperty which points to a
+// vtkSMSourceProxy and contains a vtkSMInputArrayDomain. Only
+// the first proxy and domain are used.
+// Valid XML attributes are:
+// @verbatim
+// * attribute_type - one of:
+//    - scalars
+//    - vectors
+//    - normals
+//    - tcoords
+//    - tensors
+// @endverbatim
 // .SECTION See Also
-// vtkSMDomain 
+// vtkSMDomain vtkSMProxyProperty vtkSMInputArrayDomain
 
 #ifndef __vtkSMArrayListDomain_h
 #define __vtkSMArrayListDomain_h
@@ -42,6 +56,11 @@ public:
   virtual void Update(vtkSMProperty* prop);
 
   // Description:
+  // The DefaultElement is set during Update() using the "active
+  // attribute" of the assigned AttributeType. For example,
+  // if the AttributeType is set to SCALARS, DefaultElement is
+  // set to the index of the array that is the active scalars
+  // in the dataset.
   vtkGetMacro(DefaultElement, unsigned int);
 
 protected:
@@ -62,6 +81,8 @@ protected:
   void Update(vtkSMProxyProperty* pp, vtkSMSourceProxy* sp);
   void Update(vtkSMProxyProperty* pp);
 
+  // Description:
+  // Set to an attribute type defined in vtkDataSetAttributes.
   vtkSetMacro(AttributeType, int);
   vtkGetMacro(AttributeType, int);
 

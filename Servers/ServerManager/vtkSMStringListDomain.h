@@ -12,10 +12,16 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSMStringListDomain -
+// .NAME vtkSMStringListDomain - list of strings
 // .SECTION Description
+// vtkSMStringListDomain represents a domain consisting of a list of
+// strings. It only works with vtkSMStringVectorProperty. 
+// Valid XML elements are:
+// @verbatim
+// * <String value="">
+// @endverbatim
 // .SECTION See Also
-// vtkSMDomain 
+// vtkSMDomain vtkSMStringVectorProperty
 
 #ifndef __vtkSMStringListDomain_h
 #define __vtkSMStringListDomain_h
@@ -45,18 +51,24 @@ public:
   int IsInDomain(const char* string, unsigned int& idx);
 
   // Description:
+  // Returns the number of strings in the domain.
   unsigned int GetNumberOfStrings();
 
   // Description:
+  // Returns a string in the domain. The pointer may become
+  // invalid once the domain has been modified.
   const char* GetString(unsigned int idx);
 
   // Description:
+  // Adds a new string to the domain.
   unsigned int AddString(const char* string);
 
   // Description:
+  // Removes a string from the domain.
   void RemoveString(const char* string);
 
   // Description:
+  // Removes all strings from the domain.
   void RemoveAllStrings();
 
 protected:
