@@ -45,7 +45,7 @@
  #include <mpi.h>
 #endif
 
-vtkCxxRevisionMacro(vtkMultiDisplayManager, "1.4");
+vtkCxxRevisionMacro(vtkMultiDisplayManager, "1.5");
 vtkStandardNewMacro(vtkMultiDisplayManager);
 
 vtkCxxSetObjectMacro(vtkMultiDisplayManager, RenderView, vtkObject);
@@ -932,6 +932,7 @@ void vtkMultiDisplayManager::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "NumberOfProcesses: " << this->NumberOfProcesses << endl;
 
   os << indent << "Controller: (" << this->Controller << ")\n"; 
+  os << indent << "SocketController: (" << this->SocketController << ")\n"; 
 
   if (this->Schedule)
     {
