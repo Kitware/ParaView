@@ -23,6 +23,7 @@
 #include "vtkSMIntRangeDomain.h"
 #include "vtkSMProxyGroupDomain.h"
 #include "vtkSMStringListDomain.h"
+#include "vtkSMStringListRangeDomain.h"
 
 #include "vtkSMProxyProperty.h"
 #include "vtkSMDoubleVectorProperty.h"
@@ -31,7 +32,7 @@
 #include "vtkSMStringVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMPropertyAdaptor);
-vtkCxxRevisionMacro(vtkSMPropertyAdaptor, "1.3");
+vtkCxxRevisionMacro(vtkSMPropertyAdaptor, "1.4");
 
 //---------------------------------------------------------------------------
 vtkSMPropertyAdaptor::vtkSMPropertyAdaptor()
@@ -107,6 +108,15 @@ void vtkSMPropertyAdaptor::SetDomain(vtkSMDomain* domain)
     {
     this->StringListDomain = vtkSMStringListDomain::SafeDownCast(domain);
     }
+  if (!this->StringListDomain)
+    {
+    this->StringListDomain = vtkSMStringListDomain::SafeDownCast(domain);
+    }
+  if (!this->StringListRangeDomain)
+    {
+    this->StringListRangeDomain = 
+      vtkSMStringListRangeDomain::SafeDownCast(domain);
+    }
 }
 
 //---------------------------------------------------------------------------
@@ -118,6 +128,7 @@ void vtkSMPropertyAdaptor::InitializeDomains()
   this->IntRangeDomain = 0;
   this->ProxyGroupDomain = 0;
   this->StringListDomain = 0;
+  this->StringListRangeDomain = 0;
 }
 
 //---------------------------------------------------------------------------
@@ -163,6 +174,30 @@ int vtkSMPropertyAdaptor::GetPropertyType()
     return vtkSMPropertyAdaptor::ENUMERATION;
     }
 
+  if (this->StringListRangeDomain)
+    {
+    return vtkSMPropertyAdaptor::SELECTION;
+    }
+
+  return vtkSMPropertyAdaptor::UNKNOWN;
+}
+
+//---------------------------------------------------------------------------
+int vtkSMPropertyAdaptor::GetSelectionType()
+{
+  if (this->StringListRangeDomain)
+    {
+    int intDomainMode = this->StringListRangeDomain->GetIntDomainMode();
+    if (intDomainMode == vtkSMStringListRangeDomain::BOOLEAN)
+      {
+      return vtkSMPropertyAdaptor::BOOLEAN;
+      }
+    else
+      {
+      return vtkSMPropertyAdaptor::RANGE;
+      }
+    }
+
   return vtkSMPropertyAdaptor::UNKNOWN;
 }
 
@@ -188,6 +223,26 @@ const char* vtkSMPropertyAdaptor::GetMinimum(unsigned int idx)
       {
       sprintf(this->Minimum, "%d", min);
       return this->Minimum;
+      }
+    }
+
+  if (this->StringListRangeDomain)
+    {
+    int intDomainMode = this->StringListRangeDomain->GetIntDomainMode();
+    if (intDomainMode == vtkSMStringListRangeDomain::BOOLEAN)
+      {
+      sprintf(this->Minimum, "%d", 0);
+      return this->Minimum;
+      }
+    else
+      {
+      int exists;
+      int min = this->StringListRangeDomain->GetMinimum(idx, exists);
+      if (exists)
+        {
+        sprintf(this->Minimum, "%d", min);
+        return this->Minimum;
+        }
       }
     }
 
@@ -219,6 +274,26 @@ const char* vtkSMPropertyAdaptor::GetMaximum(unsigned int idx)
       }
     }
 
+  if (this->StringListRangeDomain)
+    {
+    int intDomainMode = this->StringListRangeDomain->GetIntDomainMode();
+    if (intDomainMode == vtkSMStringListRangeDomain::BOOLEAN)
+      {
+      sprintf(this->Maximum, "%d", 0);
+      return this->Maximum;
+      }
+    else
+      {
+      int exists;
+      int max = this->StringListRangeDomain->GetMaximum(idx, exists);
+      if (exists)
+        {
+        sprintf(this->Maximum, "%d", max);
+        return this->Maximum;
+        }
+      }
+    }
+
   return 0;
 }
 
@@ -240,6 +315,10 @@ unsigned int vtkSMPropertyAdaptor::GetNumberOfEnumerationEntries()
   if (this->StringListDomain)
     {
     return this->StringListDomain->GetNumberOfStrings();
+    }
+  if (this->StringListRangeDomain)
+    {
+    return this->StringListRangeDomain->GetNumberOfStrings();
     }
   return 0;
 }
@@ -266,6 +345,10 @@ const char* vtkSMPropertyAdaptor::GetEnumerationValue(unsigned int idx)
   if (this->StringListDomain)
     {
     return this->StringListDomain->GetString(idx);
+    }
+  if (this->StringListRangeDomain)
+    {
+    return this->StringListRangeDomain->GetString(idx);
     }
   return 0;
 }

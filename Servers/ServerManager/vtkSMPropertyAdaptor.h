@@ -31,6 +31,7 @@ class vtkSMEnumerationDomain;
 class vtkSMIntRangeDomain;
 class vtkSMProxyGroupDomain;
 class vtkSMStringListDomain;
+class vtkSMStringListRangeDomain;
 
 class vtkSMProperty;
 class vtkSMProxyProperty;
@@ -92,12 +93,22 @@ public:
   // Returns either ENUMERATION, RANGE or UNKNOWN.
   int GetPropertyType();
 
+  // Description:
+  // Returns either BOOLEAN, RANGE or UNKNOWN.
+  int GetSelectionType();
+
 //BTX
   enum PropertyTypes
   {
     UNKNOWN,
     ENUMERATION,
+    SELECTION,
     RANGE
+  };
+
+  enum SelectionTypes
+  {
+    BOOLEAN
   };
 //ETX
 
@@ -116,6 +127,7 @@ protected:
   vtkSMIntRangeDomain* IntRangeDomain;
   vtkSMProxyGroupDomain* ProxyGroupDomain;
   vtkSMStringListDomain* StringListDomain;
+  vtkSMStringListRangeDomain* StringListRangeDomain;
 
   vtkSMProxyProperty* ProxyProperty;
   vtkSMDoubleVectorProperty* DoubleVectorProperty;
