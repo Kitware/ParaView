@@ -327,6 +327,11 @@ public:
   // level set).
   virtual void GetApplicationSettingsFromRegistery();
 
+  // Description:
+  // Get/Set the internal character encoding of the application.
+  virtual void SetCharacterEncoding(int val);
+  vtkGetMacro(CharacterEncoding, int);
+  
 protected:
   vtkKWApplication();
   ~vtkKWApplication();
@@ -397,6 +402,8 @@ protected:
   virtual void ConfigureAbout();
   vtkKWMessageDialog *AboutDialog;
   vtkKWLabel         *AboutDialogImage;
+
+  int CharacterEncoding;
 
 private:
   vtkKWApplication(const vtkKWApplication&);   // Not implemented.

@@ -52,6 +52,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkOutputWindow.h"
 #include "vtkString.h"
 #include "vtkTclUtil.h"
+#ifndef DO_NOT_BUILD_XML_RW
+#include "vtkXMLIOBase.h"
+#endif
 
 #include <stdarg.h>
 
@@ -72,7 +75,7 @@ int vtkKWApplication::WidgetVisibility = 1;
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.137");
+vtkCxxRevisionMacro(vtkKWApplication, "1.138");
 
 extern "C" int Vtktcl_Init(Tcl_Interp *interp);
 extern "C" int Vtkkwwidgetstcl_Init(Tcl_Interp *interp);
@@ -105,6 +108,9 @@ vtkKWApplication::vtkKWApplication()
   this->RegisteryLevel = 10;
 
   this->UseMessageDialogs = 1;  
+
+  this->CharacterEncoding = VTK_ENCODING_UNKNOWN;
+  this->SetCharacterEncoding(VTK_ENCODING_ISO_8859_1);
 
   this->Windows = vtkKWWindowCollection::New();  
 
@@ -1373,6 +1379,32 @@ const char* vtkKWApplication::GetApplicationPrettyName()
 }
 
 //----------------------------------------------------------------------------
+void vtkKWApplication::SetCharacterEncoding(int val)
+{
+  if (val == this->CharacterEncoding)
+    {
+    return;
+    }
+
+  if (val < VTK_ENCODING_NONE)
+    {
+    val = VTK_ENCODING_NONE;
+    }
+  else if (val > VTK_ENCODING_UNKNOWN)
+    {
+    val = VTK_ENCODING_UNKNOWN;
+    }
+
+  this->CharacterEncoding = val;
+  
+#ifndef DO_NOT_BUILD_XML_RW
+  vtkXMLIOBase::SetDefaultCharacterEncoding(this->CharacterEncoding);
+#endif
+
+  this->Modified();
+}
+
+//----------------------------------------------------------------------------
 void vtkKWApplication::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
@@ -1411,4 +1443,5 @@ void vtkKWApplication::PrintSelf(ostream& os, vtkIndent indent)
      << (this->SaveWindowGeometry ? "On" : "Off") << endl;
   os << indent << "LimitedEditionMode: " 
      << (this->LimitedEditionMode ? "On" : "Off") << endl;
+  os << indent << "CharacterEncoding: " << this->CharacterEncoding << "\n";
 }
