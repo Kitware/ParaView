@@ -72,13 +72,12 @@ vtkPVExtentTranslator::~vtkPVExtentTranslator()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVExtentTranslator::PieceToExtent()
+int vtkPVExtentTranslator::PieceToExtent()
 {
   if (this->OriginalSource == NULL)
     { // If the user has not set the original source, then just default
     // to the method in the superclass.
-    this->vtkExtentTranslator::PieceToExtent();
-    return;
+    return this->vtkExtentTranslator::PieceToExtent();
     }
 
   this->OriginalSource->UpdateInformation();
@@ -88,7 +87,7 @@ void vtkPVExtentTranslator::PieceToExtent()
     // Nothing in this piece.
     this->Extent[0] = this->Extent[2] = this->Extent[4] = 0;
     this->Extent[1] = this->Extent[3] = this->Extent[5] = -1;
-    return;
+    return 0;
     }
 
   // Clip with the whole extent passed in.
@@ -116,6 +115,18 @@ void vtkPVExtentTranslator::PieceToExtent()
     {
     this->Extent[5] = this->WholeExtent[5];
     }
+  
+  
+  if (this->Extent[0] > this->Extent[1] ||
+      this->Extent[2] > this->Extent[3] ||
+      this->Extent[4] > this->Extent[5])
+    {
+    this->Extent[0] = this->Extent[2] = this->Extent[4] = 0;
+    this->Extent[1] = this->Extent[3] = this->Extent[5] = -1;
+    return 0;
+    }  
+  
+  return 1;
 }
 
 

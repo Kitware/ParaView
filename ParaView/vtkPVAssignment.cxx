@@ -113,6 +113,7 @@ void vtkPVAssignment::SetOriginalImage(vtkPVImage *pvImage)
     {
     pvImage->Register(this);
     this->OriginalImage = pvImage;
+    this->Translator->SetOriginalSource(pvImage->GetImageData());
     }
 }
 

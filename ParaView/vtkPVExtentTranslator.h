@@ -83,7 +83,7 @@ public:
   vtkSetObjectMacro(OriginalSource,vtkImageData);
   vtkGetObjectMacro(OriginalSource,vtkImageData);
 
-  void PieceToExtent();
+  int PieceToExtent();
 
 protected:
   vtkPVExtentTranslator();

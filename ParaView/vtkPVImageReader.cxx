@@ -149,7 +149,7 @@ void vtkPVImageReader::ReadImage()
 void vtkPVImageReader::ImageAccepted()
 {
   vtkPVApplication *pvApp = vtkPVApplication::SafeDownCast(this->Application);
-  vtkPVImage *image;
+  vtkPVImage *pvImage;
   vtkPVAssignment *a;
   vtkPVActorComposite *ac;
   vtkPVWindow *window = this->GetWindow();
@@ -159,14 +159,19 @@ void vtkPVImageReader::ImageAccepted()
   
   if (this->GetPVData() == NULL)
     {
-    image = vtkPVImage::New();
-    image->Clone(pvApp);
+    pvImage = vtkPVImage::New();
+    pvImage->Clone(pvApp);
     a = vtkPVAssignment::New();
     a->Clone(pvApp);
-    a->SetOriginalImage(image);
     
-    this->SetOutput(image);
-    image->SetAssignment(a);
+    this->SetOutput(pvImage);
+    // It is important that the pvImage have its image data befor this call.
+    // The assignments vtk object is vtkPVExtentTranslator which needs the image.
+    // This may get resolved as more functionality of Assignement gets into ExtentTranslator.
+    // Maybe the pvImage should create the vtkIamgeData, and the source will set it as its output.
+    a->SetOriginalImage(pvImage);
+    
+    pvImage->SetAssignment(a);
     
     this->CreateDataPage();
   
