@@ -192,7 +192,7 @@ protected:
   vtkKWWidget *BalloonHelpLabel;
   char *BalloonHelpPending;
   vtkSetStringMacro(BalloonHelpPending);
-
+  vtkKWWidget *BalloonHelpWidget;
 
   static int WidgetVisibility;
   int InExit;
