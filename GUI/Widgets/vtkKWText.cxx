@@ -17,7 +17,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWText );
-vtkCxxRevisionMacro(vtkKWText, "1.22");
+vtkCxxRevisionMacro(vtkKWText, "1.23");
 
 //----------------------------------------------------------------------------
 vtkKWText::vtkKWText()
@@ -98,5 +98,7 @@ void vtkKWText::UpdateEnableState()
 void vtkKWText::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
+  
+  os << indent << "ValueString: " << (this->ValueString?this->ValueString:"(none)") << endl;
 }
 
