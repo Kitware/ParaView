@@ -382,6 +382,10 @@ class VTK_EXPORT vtkKWView : public vtkKWWidget
   vtkBooleanMacro(UseProgressGauge, int);
 
   vtkGetObjectMacro(ProgressGauge, vtkKWSegmentedProgressGauge);
+
+  // Description:
+  // Check if the application needs to abort.
+  virtual int CheckForOtherAbort() { return 0; }
   
 protected:
   vtkKWView();

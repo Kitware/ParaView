@@ -83,7 +83,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWMessageDialog.h"
 int vtkKWViewFoundMatch;
 Bool vtkKWRenderViewPredProc(Display *vtkNotUsed(disp), XEvent *event, 
-                             char * vtkNotUsed(arg))
+                             XPointer vtkNotUsed(arg))
 {  
   if (event->type == Expose)
     {
@@ -95,13 +95,14 @@ Bool vtkKWRenderViewPredProc(Display *vtkNotUsed(disp), XEvent *event,
     }
   if (event->type == ButtonPress)
     {
-    vtkKWViewFoundMatch = 2;
+    vtkKWViewFoundMatch = 2;    
     }
+
   return 0;
 }
 #endif
 
-vtkCxxRevisionMacro(vtkKWView, "1.99");
+vtkCxxRevisionMacro(vtkKWView, "1.100");
 
 //----------------------------------------------------------------------------
 int vtkKWViewCommand(ClientData cd, Tcl_Interp *interp,
@@ -375,6 +376,13 @@ int vtkKWView::ShouldIAbort()
   XSync(dpy,0);
   flag = vtkKWViewFoundMatch;
 #endif
+
+
+  int flag2 = this->CheckForOtherAbort();
+  if ( flag2 > flag )
+    {
+    flag = flag2;
+    }
   
   return flag;
   
@@ -1505,7 +1513,7 @@ void vtkKWView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWView ";
-  this->ExtractRevision(os,"$Revision: 1.99 $");
+  this->ExtractRevision(os,"$Revision: 1.100 $");
 }
 
 //----------------------------------------------------------------------------

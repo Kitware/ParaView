@@ -319,6 +319,10 @@ public:
   // Access to the Tcl interactor.
   vtkGetObjectMacro(TclInteractor, vtkKWTclInteractor);
 
+  // Description:
+  // Check if the application needs to abort.
+  virtual int CheckForOtherAbort() { return 0; }
+  
 protected:
   vtkKWWindow();
   ~vtkKWWindow();
