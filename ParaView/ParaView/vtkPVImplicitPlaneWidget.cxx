@@ -63,7 +63,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVImplicitPlaneWidget);
-vtkCxxRevisionMacro(vtkPVImplicitPlaneWidget, "1.5.2.1");
+vtkCxxRevisionMacro(vtkPVImplicitPlaneWidget, "1.5.2.2");
 
 int vtkPVImplicitPlaneWidgetCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -312,6 +312,55 @@ vtkPVImplicitPlaneWidget* vtkPVImplicitPlaneWidget::ClonePrototype(vtkPVSource* 
 }
 
 //----------------------------------------------------------------------------
+void vtkPVImplicitPlaneWidget::SetBalloonHelpString(const char *str)
+{
+
+  // A little overkill.
+  if (this->BalloonHelpString == NULL && str == NULL)
+    {
+    return;
+    }
+
+  // This check is needed to prevent errors when using
+  // this->SetBalloonHelpString(this->BalloonHelpString)
+  if (str != this->BalloonHelpString)
+    {
+    // Normal string stuff.
+    if (this->BalloonHelpString)
+      {
+      delete [] this->BalloonHelpString;
+      this->BalloonHelpString = NULL;
+      }
+    if (str != NULL)
+      {
+      this->BalloonHelpString = new char[strlen(str)+1];
+      strcpy(this->BalloonHelpString, str);
+      }
+    }
+  
+  if ( this->Application && !this->BalloonHelpInitialized )
+    {
+    this->Labels[0]->SetBalloonHelpString(this->BalloonHelpString);
+    this->Labels[1]->SetBalloonHelpString(this->BalloonHelpString);
+
+    this->CenterResetButton->SetBalloonHelpString(this->BalloonHelpString);
+    this->NormalCameraButton->SetBalloonHelpString(this->BalloonHelpString);
+    this->NormalXButton->SetBalloonHelpString(this->BalloonHelpString);
+    this->NormalYButton->SetBalloonHelpString(this->BalloonHelpString);
+    this->NormalZButton->SetBalloonHelpString(this->BalloonHelpString);
+
+    for (int i=0; i<3; i++)
+      {
+      this->CoordinateLabel[i]->SetBalloonHelpString(this->BalloonHelpString);
+      this->CenterEntry[i]->SetBalloonHelpString(this->BalloonHelpString);
+      this->NormalEntry[i]->SetBalloonHelpString(this->BalloonHelpString);
+      }
+
+    this->BalloonHelpInitialized = 1;
+    }
+}
+
+//----------------------------------------------------------------------------
 void vtkPVImplicitPlaneWidget::ChildCreate(vtkPVApplication* pvApp)
 {
   static int instanceCount = 0;
@@ -471,6 +520,8 @@ void vtkPVImplicitPlaneWidget::ChildCreate(vtkPVApplication* pvApp)
     plane->GetPlaneProperty()->SetOpacity(1.0);
     plane->GetSelectedPlaneProperty()->SetOpacity(1.0);
     }
+
+  this->SetBalloonHelpString(this->BalloonHelpString);
 
 }
 

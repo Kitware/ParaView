@@ -55,7 +55,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVXMLElement.h"
 
 vtkStandardNewMacro(vtkPVLineWidget);
-vtkCxxRevisionMacro(vtkPVLineWidget, "1.28.2.3");
+vtkCxxRevisionMacro(vtkPVLineWidget, "1.28.2.4");
 
 //----------------------------------------------------------------------------
 vtkPVLineWidget::vtkPVLineWidget()
@@ -564,6 +564,51 @@ void vtkPVLineWidget::ExecuteEvent(vtkObject* wdg, unsigned long l, void* p)
 }
 
 //----------------------------------------------------------------------------
+void vtkPVLineWidget::SetBalloonHelpString(const char *str)
+{
+
+  // A little overkill.
+  if (this->BalloonHelpString == NULL && str == NULL)
+    {
+    return;
+    }
+
+  // This check is needed to prevent errors when using
+  // this->SetBalloonHelpString(this->BalloonHelpString)
+  if (str != this->BalloonHelpString)
+    {
+    // Normal string stuff.
+    if (this->BalloonHelpString)
+      {
+      delete [] this->BalloonHelpString;
+      this->BalloonHelpString = NULL;
+      }
+    if (str != NULL)
+      {
+      this->BalloonHelpString = new char[strlen(str)+1];
+      strcpy(this->BalloonHelpString, str);
+      }
+    }
+  
+  if ( this->Application && !this->BalloonHelpInitialized )
+    {
+    this->Labels[0]->SetBalloonHelpString(this->BalloonHelpString);
+    this->Labels[1]->SetBalloonHelpString(this->BalloonHelpString);
+
+    this->ResolutionLabel->SetBalloonHelpString(this->BalloonHelpString);
+    this->ResolutionEntry->SetBalloonHelpString(this->BalloonHelpString);
+    for (int i=0; i<3; i++)
+      {
+      this->CoordinateLabel[i]->SetBalloonHelpString(this->BalloonHelpString);
+      this->Point1[i]->SetBalloonHelpString(this->BalloonHelpString);
+      this->Point2[i]->SetBalloonHelpString(this->BalloonHelpString);
+      }
+
+    this->BalloonHelpInitialized = 1;
+    }
+}
+
+//----------------------------------------------------------------------------
 void vtkPVLineWidget::ChildCreate(vtkPVApplication* pvApp)
 {
   if ((this->TraceNameState == vtkPVWidget::Uninitialized ||
@@ -672,6 +717,8 @@ void vtkPVLineWidget::ChildCreate(vtkPVApplication* pvApp)
                this->GetTclName());
   
   this->SetResolution(20);
+
+  this->SetBalloonHelpString(this->BalloonHelpString);
 }
 
 //----------------------------------------------------------------------------
@@ -689,5 +736,7 @@ void vtkPVLineWidget::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "ResolutionVariable: " 
      << ( this->ResolutionVariable ? this->ResolutionVariable : "(none)" ) << endl;
   os << indent << "ResolutionLabelText: " 
-     << ( this->ResolutionLabelText ? this->ResolutionLabelText : "(none)" ) << endl;
+     << ( this->ResolutionLabelText ? this->ResolutionLabelText : "(none)" ) 
+     << endl;
+  os << indent << "ShowResolution: " << this->ShowResolution << endl;
 }

@@ -99,6 +99,11 @@ public:
   virtual void AddAnimationScriptsToMenu(vtkKWMenu *menu, 
                                          vtkPVAnimationInterface *ai);
 
+  // Description:
+  // This class redefines SetBalloonHelpString since it
+  // has to forward the call to a widget it contains.
+  virtual void SetBalloonHelpString(const char *str);
+
 //BTX
   // Description:
   // Creates and returns a copy of this widget. It will create

@@ -58,7 +58,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVContour);
-vtkCxxRevisionMacro(vtkPVContour, "1.53.2.1");
+vtkCxxRevisionMacro(vtkPVContour, "1.53.2.2");
 
 //----------------------------------------------------------------------------
 int vtkPVContourCommand(ClientData cd, Tcl_Interp *interp,
@@ -143,6 +143,7 @@ void vtkPVContour::CreateProperties()
   entry->SetParent(this->GetParameterFrame()->GetFrame());
   entry->SetLabel("Contour Values");
   entry->Create(pvApp);
+  entry->SetBalloonHelpString("List of the current contour values");
   this->AddPVWidget(entry);
   this->Script("pack %s", entry->GetWidgetName());
   entry->SetModifiedCommand(this->GetTclName(), 

@@ -138,6 +138,11 @@ public:
 //ETX
 
   // Description:
+  // This class redefines SetBalloonHelpString since it
+  // has to forward the call to a widget it contains.
+  virtual void SetBalloonHelpString(const char *str);
+
+  // Description:
   // Used internally. Method to save widget parameters into vtk tcl script.
   virtual void SaveInTclScript(ofstream *file);
 

@@ -55,7 +55,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVXMLElement.h"
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkPV3DWidget, "1.27");
+vtkCxxRevisionMacro(vtkPV3DWidget, "1.27.2.1");
 
 //===========================================================================
 //***************************************************************************
@@ -160,6 +160,8 @@ void vtkPV3DWidget::Create(vtkKWApplication *kwApp)
   this->Visibility->SetParent(parent);
   this->Visibility->Create(pvApp, "");
   this->Visibility->SetText("Visibility");
+  this->Visibility->SetBalloonHelpString(
+    "Toggle the visibility of the 3D widget on/off.");
   if ( this->Visible )
     {
     this->Visibility->SetState(1);

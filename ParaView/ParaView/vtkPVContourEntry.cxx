@@ -55,7 +55,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVContourEntry);
-vtkCxxRevisionMacro(vtkPVContourEntry, "1.16.2.1");
+vtkCxxRevisionMacro(vtkPVContourEntry, "1.16.2.2");
 
 int vtkPVContourEntryCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -127,7 +127,6 @@ void vtkPVContourEntry::Create(vtkKWApplication *app)
   this->ContourValuesList->SetParent(this);
   this->ContourValuesList->Create(app, "");
   this->ContourValuesList->SetHeight(5);
-  this->ContourValuesList->SetBalloonHelpString("List of the current contour values");
   this->Script("bind %s <Delete> {%s DeleteValueCallback}",
                this->ContourValuesList->GetWidgetName(),
                this->GetTclName());
@@ -148,12 +147,12 @@ void vtkPVContourEntry::Create(vtkKWApplication *app)
   this->NewValueLabel->SetParent(this->NewValueFrame);
   this->NewValueLabel->Create(app, "");
   this->NewValueLabel->SetLabel("New Value:");
-  this->NewValueLabel->SetBalloonHelpString("Enter a new contour value");
+  this->NewValueLabel->SetBalloonHelpString("Enter a new value");
   
   this->NewValueEntry->SetParent(this->NewValueFrame);
   this->NewValueEntry->Create(app, "");
   this->NewValueEntry->SetValue("");
-  this->NewValueEntry->SetBalloonHelpString("Enter a new contour value");
+  this->NewValueEntry->SetBalloonHelpString("Enter a new value");
   this->Script("bind %s <KeyPress-Return> {%s AddValueCallback}",
                this->NewValueEntry->GetWidgetName(),
                this->GetTclName());
@@ -163,7 +162,7 @@ void vtkPVContourEntry::Create(vtkKWApplication *app)
   this->AddValueButton->SetParent(this->NewValueFrame);
   this->AddValueButton->Create(app, "-text {Add}");
   this->AddValueButton->SetCommand(this, "AddValueCallback");
-  this->AddValueButton->SetBalloonHelpString("Add the new contour value to the contour values list");
+  this->AddValueButton->SetBalloonHelpString("Add the new value to the list");
   
   this->Script("pack %s %s %s -side left",
                this->NewValueLabel->GetWidgetName(),
@@ -173,10 +172,47 @@ void vtkPVContourEntry::Create(vtkKWApplication *app)
   this->DeleteValueButton->SetParent(this->NewValueFrame);
   this->DeleteValueButton->Create(app, "-text {Delete}");
   this->DeleteValueButton->SetCommand(this, "DeleteValueCallback");
-  this->DeleteValueButton->SetBalloonHelpString("Remove the currently selected contour value from the list");
+  this->DeleteValueButton->SetBalloonHelpString(
+    "Remove the currently selected  value from the list");
 
   this->Script("pack %s -side left",
                this->DeleteValueButton->GetWidgetName());
+
+  this->SetBalloonHelpString(this->BalloonHelpString);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVContourEntry::SetBalloonHelpString(const char *str)
+{
+
+  // A little overkill.
+  if (this->BalloonHelpString == NULL && str == NULL)
+    {
+    return;
+    }
+
+  // This check is needed to prevent errors when using
+  // this->SetBalloonHelpString(this->BalloonHelpString)
+  if (str != this->BalloonHelpString)
+    {
+    // Normal string stuff.
+    if (this->BalloonHelpString)
+      {
+      delete [] this->BalloonHelpString;
+      this->BalloonHelpString = NULL;
+      }
+    if (str != NULL)
+      {
+      this->BalloonHelpString = new char[strlen(str)+1];
+      strcpy(this->BalloonHelpString, str);
+      }
+    }
+  
+  if ( this->Application && !this->BalloonHelpInitialized )
+    {
+    this->ContourValuesList->SetBalloonHelpString(this->BalloonHelpString);
+    this->BalloonHelpInitialized = 1;
+    }
 }
 
 //----------------------------------------------------------------------------
