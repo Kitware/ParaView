@@ -16,7 +16,6 @@
 
 #include "vtkClientServerStream.h"
 #include "vtkDirectory.h"
-#include "vtkKWArguments.h"
 #include "vtkObjectFactory.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMXMLParser.h"
@@ -28,32 +27,75 @@
 #include "vtkToolkits.h"
 #include "vtkSMGeneratedModules.h"
 
+#include <vtkstd/vector>
+
+#include "vtkStdString.h"
+
+struct vtkSMApplicationInternals
+{
+  struct ConfFile
+  {
+    vtkStdString FileName;
+    vtkStdString Dir;
+  };
+
+  vtkstd::vector<ConfFile> Files;
+};
+
 vtkStandardNewMacro(vtkSMApplication);
-vtkCxxRevisionMacro(vtkSMApplication, "1.10");
+vtkCxxRevisionMacro(vtkSMApplication, "1.11");
 
 //---------------------------------------------------------------------------
 vtkSMApplication::vtkSMApplication()
 {
+  this->Internals = new vtkSMApplicationInternals;
 }
 
 //---------------------------------------------------------------------------
 vtkSMApplication::~vtkSMApplication()
 {
+  delete this->Internals;
 }
 
 extern "C" { void vtkPVServerManager_Initialize(vtkClientServerInterpreter*); }
 
 //---------------------------------------------------------------------------
+void vtkSMApplication::AddConfigurationFile(const char* fname, const char* dir)
+{
+  vtkSMApplicationInternals::ConfFile file;
+  file.FileName = fname;
+  file.Dir = dir;
+  this->Internals->Files.push_back(file);
+}
+
+//---------------------------------------------------------------------------
+unsigned int vtkSMApplication::GetNumberOfConfigurationFiles()
+{
+  return this->Internals->Files.size();
+}
+
+//---------------------------------------------------------------------------
+void vtkSMApplication::GetConfigurationFile(
+  unsigned int idx, const char*& fname, const char*& dir)
+{
+  fname = this->Internals->Files[idx].FileName.c_str();
+  dir = this->Internals->Files[idx].Dir.c_str();
+}
+
+//---------------------------------------------------------------------------
+void vtkSMApplication::ParseConfigurationFiles()
+{
+  unsigned int numFiles = this->GetNumberOfConfigurationFiles();
+  for (unsigned int i=0; i<numFiles; i++)
+    {
+    this->ParseConfigurationFile(this->Internals->Files[i].FileName.c_str(),
+                                 this->Internals->Files[i].Dir.c_str());
+    }
+}
+
+//---------------------------------------------------------------------------
 void vtkSMApplication::Initialize()
 {
-//   args->AddCallback("--configuration-path", 
-//                     vtkKWArguments::EQUAL_ARGUMENT, 
-//                     NULL, 
-//                     NULL, 
-//                     "Directory where all configuration files are stored");
-
-//   args->Parse();
-
   vtkPVServerManager_Initialize(
     vtkProcessModule::GetProcessModule()->GetInterpreter());
 

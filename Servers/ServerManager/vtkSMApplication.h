@@ -22,6 +22,10 @@
 
 #include "vtkSMObject.h"
 
+//BTX
+struct vtkSMApplicationInternals;
+//ETX
+
 class VTK_EXPORT vtkSMApplication : public vtkSMObject
 {
 public:
@@ -45,12 +49,26 @@ public:
   // Description:
   int ParseConfigurationFile(const char* fname, const char* dir);
 
+  // Description:
+  void AddConfigurationFile(const char* fname, const char* dir);
+
+  // Description:
+  unsigned int GetNumberOfConfigurationFiles();
+
+  // Description:
+  void GetConfigurationFile(
+    unsigned int idx, const char*& fname, const char*& dir);
+
+  // Description:
+  void ParseConfigurationFiles();
+
 protected:
   vtkSMApplication();
   ~vtkSMApplication();
 
   virtual void SaveState(const char*, ostream*, vtkIndent) {};
 
+  vtkSMApplicationInternals* Internals;
 private:
   vtkSMApplication(const vtkSMApplication&); // Not implemented
   void operator=(const vtkSMApplication&); // Not implemented
