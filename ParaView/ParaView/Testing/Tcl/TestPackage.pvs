@@ -38,8 +38,9 @@ if { [catch {
   if { [ Application SelfTest ] == 0 } {
 	Application SetExitStatus 0
   }
-} ] != 0 } {
+} result ]  != 0 } {
 	puts "Script failed..."
+	puts $result	
 	Application SetExitStatus 1
 }
 
