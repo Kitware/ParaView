@@ -79,7 +79,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.285");
+vtkCxxRevisionMacro(vtkPVSource, "1.286");
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -275,7 +275,7 @@ void vtkPVSource::SetPVInput(int idx, vtkPVSource *pvs)
   int partIdx, numParts;
   vtkPVPart *part;
   vtkPVApplication *pvApp = this->GetPVApplication();
-  char *sourceTclName;
+  const char *sourceTclName;
   const char* inputName;
 
   if (pvApp == NULL)
@@ -635,7 +635,7 @@ void vtkPVSource::AddVTKSource(vtkSource *source, const char *tclName)
 //----------------------------------------------------------------------------
 void vtkPVSource::RemoveAllVTKSources()
 {
-  char *tclName;
+  const char *tclName;
   vtkPVApplication *pvApp = this->GetPVApplication();
   int num, idx;
 
@@ -663,7 +663,7 @@ vtkSource* vtkPVSource::GetVTKSource(int idx)
 }
 
 //----------------------------------------------------------------------------
-char* vtkPVSource::GetVTKSourceTclName(int idx)
+const char* vtkPVSource::GetVTKSourceTclName(int idx)
 {
   return this->VTKSourceTclNames->GetString(idx);
 }
@@ -2317,7 +2317,7 @@ int vtkPVSource::InitializeData()
   vtkPVApplication* pvApp = this->GetPVApplication();
   int numSources, sourceIdx;
   vtkSource* source;
-  char* sourceTclName;
+  const char* sourceTclName;
   int numOutputs, idx;
   char dataName[1024];
   int outputCount = 0;
@@ -2604,7 +2604,7 @@ void vtkPVSource::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVSource ";
-  this->ExtractRevision(os,"$Revision: 1.285 $");
+  this->ExtractRevision(os,"$Revision: 1.286 $");
 }
 
 //----------------------------------------------------------------------------

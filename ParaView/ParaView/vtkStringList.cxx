@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkStringList);
-vtkCxxRevisionMacro(vtkStringList, "1.8");
+vtkCxxRevisionMacro(vtkStringList, "1.9");
 
 //----------------------------------------------------------------------------
 vtkStringList::vtkStringList()
@@ -86,7 +86,7 @@ void vtkStringList::RemoveAllItems()
 }
 
 //----------------------------------------------------------------------------
-char *vtkStringList::GetString(int idx)
+const char *vtkStringList::GetString(int idx)
 {
   if (idx < 0 || idx >= this->NumberOfStrings)
     {

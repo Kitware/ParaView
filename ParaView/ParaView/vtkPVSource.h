@@ -223,10 +223,10 @@ public:
   void RemoveAllVTKSources();
   int GetNumberOfVTKSources();
   vtkSource *GetVTKSource(int idx);
-  char *GetVTKSourceTclName(int idx);
+  const char *GetVTKSourceTclName(int idx);
   // Legacy
   vtkSource *GetVTKSource() {return this->GetVTKSource(0);}
-  char *GetVTKSourceTclName() {return this->GetVTKSourceTclName(0);}
+  const char *GetVTKSourceTclName() {return this->GetVTKSourceTclName(0);}
 
   vtkGetObjectMacro(DeleteButton, vtkKWPushButton);
   vtkGetObjectMacro(AcceptButton, vtkKWPushButton);
