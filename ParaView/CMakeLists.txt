@@ -139,6 +139,7 @@ IF(PARAVIEW_USE_ICE_T)
   ENDIF(ICET_USE_FILE)
 ENDIF(PARAVIEW_USE_ICE_T)	 
 
+OPTION(PARAVIEW_BUILD_DEVELOPMENT "Build development library. This library contains experimental code still under development and should not be part of a stable release" OFF)	 
 IF (PARAVIEW_CAN_BUILD)
  IF ( NOT VTK_WRAP_TCL )
    MESSAGE("ParaView requires VTK to be built with Tcl bindings. Please rebuild VTK with Tcl bindings and re-run CMake")
@@ -190,9 +191,13 @@ IF (PARAVIEW_CAN_BUILD)
 
  SET (DO_NOT_BUILD_XML_RW 1)
 
- SUBDIRS(Utilities KWCommon Filters Widgets ParaView Demos)
+ SUBDIRS(Utilities KWCommon Filters Widgets)
 
- SUBDIRS(Packages)
+ IF(PARAVIEW_BUILD_DEVELOPMENT)
+   SUBDIRS(Development)
+ ENDIF(PARAVIEW_BUILD_DEVELOPMENT)
+
+ SUBDIRS(Packages ParaView Demos)
 
  SUBDIR_DEPENDS(ParaView Widgets)
  SUBDIRS(Config)
