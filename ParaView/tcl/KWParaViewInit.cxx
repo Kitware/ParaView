@@ -89,6 +89,9 @@ ClientData vtkPVInputMenuNewCommand();
 int vtkPVMethodInterfaceCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkPVMethodInterfaceNewCommand();
+int vtkPVOutputWindowCommand(ClientData cd, Tcl_Interp *interp,
+             int argc, char *argv[]);
+ClientData vtkPVOutputWindowNewCommand();
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkPVRenderViewNewCommand();
@@ -216,6 +219,8 @@ int VTK_EXPORT Vtkkwparaviewtcl_Init(Tcl_Interp *interp)
                   vtkPVInputMenuCommand);
   vtkTclCreateNew(interp,(char *) "vtkPVMethodInterface", vtkPVMethodInterfaceNewCommand,
                   vtkPVMethodInterfaceCommand);
+  vtkTclCreateNew(interp,(char *) "vtkPVOutputWindow", vtkPVOutputWindowNewCommand,
+                  vtkPVOutputWindowCommand);
   vtkTclCreateNew(interp,(char *) "vtkPVRenderView", vtkPVRenderViewNewCommand,
                   vtkPVRenderViewCommand);
   vtkTclCreateNew(interp,(char *) "vtkPVSelectionList", vtkPVSelectionListNewCommand,

@@ -109,6 +109,11 @@ void vtkPVTreeComposite::PrintSelf(ostream& os, vtkIndent indent)
 //----------------------------------------------------------------------------
 void vtkPVTreeComposite::CheckForAbortRender()
 {
+  if (!this->RenderView)
+    {
+    return;
+    }
+  
   if ( ! this->Initialized)
     {
     // Never abort while printing.
