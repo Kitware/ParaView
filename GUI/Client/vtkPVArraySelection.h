@@ -42,7 +42,7 @@ public:
   // Description:
   // Methods for setting the value of the VTKReader from the widget.
   // User internally when user hits Accept.
-  virtual void AcceptInternal(vtkClientServerID id);
+  virtual void Accept();
 //ETX
 
   // Description:
@@ -117,7 +117,6 @@ protected:
 
   char* LabelText;
   char* AttributeName;
-  vtkClientServerID VTKReaderID;
   
   vtkKWLabeledFrame* LabeledFrame;
   

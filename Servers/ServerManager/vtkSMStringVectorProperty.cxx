@@ -22,7 +22,7 @@
 #include "vtkStdString.h"
 
 vtkStandardNewMacro(vtkSMStringVectorProperty);
-vtkCxxRevisionMacro(vtkSMStringVectorProperty, "1.13");
+vtkCxxRevisionMacro(vtkSMStringVectorProperty, "1.14");
 
 struct vtkSMStringVectorPropertyInternals
 {
@@ -225,6 +225,21 @@ int vtkSMStringVectorProperty::SetElement(unsigned int idx, const char* value)
   this->Internals->Values[idx] = value;
   this->Modified();
   return 1;
+}
+
+//---------------------------------------------------------------------------
+int vtkSMStringVectorProperty::GetElementIndex(const char *value)
+{
+  unsigned int i;
+  for (i = 0; i < this->GetNumberOfElements(); i++)
+    {
+    if (value && this->Internals->Values[i].c_str() &&
+        !strcmp(value, this->Internals->Values[i].c_str()))
+      {
+      return i;
+      }
+    }
+  return -1;
 }
 
 //---------------------------------------------------------------------------

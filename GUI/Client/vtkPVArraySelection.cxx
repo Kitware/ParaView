@@ -28,6 +28,7 @@
 #include "vtkPVProcessModule.h"
 #include "vtkPVSource.h"
 #include "vtkPVXMLElement.h"
+#include "vtkSMStringVectorProperty.h"
 #include "vtkTclUtil.h"
 
 #include <vtkstd/string>
@@ -38,7 +39,7 @@ class vtkPVArraySelectionArraySet: public vtkPVArraySelectionArraySetBase {};
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVArraySelection);
-vtkCxxRevisionMacro(vtkPVArraySelection, "1.49");
+vtkCxxRevisionMacro(vtkPVArraySelection, "1.50");
 
 //----------------------------------------------------------------------------
 int vtkDataArraySelectionCommand(ClientData cd, Tcl_Interp *interp,
@@ -51,7 +52,6 @@ vtkPVArraySelection::vtkPVArraySelection()
 {
   this->CommandFunction = vtkPVArraySelectionCommand;
   
-  this->VTKReaderID.ID = 0;
   this->AttributeName = 0;
   this->LabelText = 0;
   
@@ -194,12 +194,18 @@ void vtkPVArraySelection::SetLocalSelectionsFromReader()
 {
   vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
   this->Selection->RemoveAllArrays();
-  if(this->VTKReaderID.ID)
+  
+  vtkClientServerID sourceID = this->PVSource->GetVTKSourceID(0);
+
+  vtkSMStringVectorProperty *svp = vtkSMStringVectorProperty::SafeDownCast(
+    this->GetSMProperty());
+  
+  if(sourceID.ID && (svp || this->AcceptCalled))
     {
     this->CreateServerSide();
     pm->GetStream() << vtkClientServerStream::Invoke
                     << this->ServerSideID << "GetArraySettings"
-                    << this->VTKReaderID << this->AttributeName
+                    << sourceID << this->AttributeName
                     << vtkClientServerStream::End;
     pm->SendStream(vtkProcessModule::DATA_SERVER_ROOT);
     vtkClientServerStream arrays;
@@ -228,10 +234,20 @@ void vtkPVArraySelection::SetLocalSelectionsFromReader()
         if(status)
           {
           this->Selection->EnableArray(name);
+          if (!this->AcceptCalled)
+            {
+            svp->SetElement(2*i, name);
+            svp->SetElement(2*i+1, "1");
+            }
           }
         else
           {
           this->Selection->DisableArray(name);
+          if (!this->AcceptCalled)
+            {
+            svp->SetElement(2*i, name);
+            svp->SetElement(2*i+1, "0");
+            }
           }
         }
       }
@@ -268,8 +284,10 @@ void vtkPVArraySelection::ResetInternal()
                  this->CheckFrame->GetWidgetName());
     this->ArrayCheckButtons->RemoveAllItems();
     
+    vtkClientServerID sourceID = this->PVSource->GetVTKSourceID(0);
+
     // Create new check buttons.
-    if (this->VTKReaderID.ID)
+    if (sourceID.ID)
       {
       int numArrays, idx;
       int row = 0;
@@ -296,6 +314,11 @@ void vtkPVArraySelection::ResetInternal()
   
   // Now set the state of the check buttons.
   this->SetWidgetSelectionsFromLocal();
+  
+  if (this->AcceptCalled)
+    {
+    this->ModifiedFlag = 0;
+    }
 }
 
 //---------------------------------------------------------------------------
@@ -317,12 +340,12 @@ void vtkPVArraySelection::Trace(ofstream *file)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVArraySelection::AcceptInternal(vtkClientServerID id)
+void vtkPVArraySelection::Accept()
 {
-  this->Superclass::AcceptInternal(id);
+  int modFlag = this->GetModifiedFlag();
 
   // Create new check buttons.
-  if (!this->VTKReaderID.ID)
+  if (!this->PVSource->GetVTKSourceID(0).ID)
     {
     vtkErrorMacro("VTKReader has not been set.");
     }
@@ -331,18 +354,46 @@ void vtkPVArraySelection::AcceptInternal(vtkClientServerID id)
   this->SetReaderSelectionsFromWidgets();
   this->SetLocalSelectionsFromReader();
   this->SetWidgetSelectionsFromLocal();
+
+  this->ModifiedFlag = 0;
+  
+  // I put this after the accept internal, because
+  // vtkPVGroupWidget inactivates and builds an input list ...
+  // Putting this here simplifies subclasses AcceptInternal methods.
+  if (modFlag)
+    {
+    vtkPVApplication *pvApp = this->GetPVApplication();
+    ofstream* file = pvApp->GetTraceFile();
+    if (file)
+      {
+      this->Trace(file);
+      }
+    }
+
+  this->AcceptCalled = 1;
 }
 
 //---------------------------------------------------------------------------
 void vtkPVArraySelection::SetWidgetSelectionsFromLocal()
 {
-  vtkCollectionIterator* it = this->ArrayCheckButtons->NewIterator();
-  for(it->GoToFirstItem(); !it->IsDoneWithTraversal(); it->GoToNextItem())
+  vtkSMStringVectorProperty *svp = vtkSMStringVectorProperty::SafeDownCast(
+    this->GetSMProperty());
+  if (svp)
     {
-    vtkKWCheckButton* check = static_cast<vtkKWCheckButton*>(it->GetObject());
-    check->SetState(this->Selection->ArrayIsEnabled(check->GetText()));
+    vtkCollectionIterator* it = this->ArrayCheckButtons->NewIterator();
+    int checkIdx;
+    for(it->GoToFirstItem(); !it->IsDoneWithTraversal(); it->GoToNextItem())
+      {
+      vtkKWCheckButton* check =
+        static_cast<vtkKWCheckButton*>(it->GetObject());
+      checkIdx = svp->GetElementIndex(check->GetText());
+      if (checkIdx > -1)
+        {
+        check->SetState(atoi(svp->GetElement(checkIdx+1)));
+        }
+      }
+    it->Delete();
     }
-  it->Delete();
 }
 
 //----------------------------------------------------------------------------
@@ -351,25 +402,24 @@ void vtkPVArraySelection::SetReaderSelectionsFromWidgets()
   vtkPVApplication *pvApp = this->GetPVApplication();  
   vtkPVProcessModule* pm = pvApp->GetProcessModule();
   vtkCollectionIterator* it = this->ArrayCheckButtons->NewIterator();
-  vtkstd::string setArrayStatus = "Set";
-  setArrayStatus += this->AttributeName;
-  setArrayStatus += "ArrayStatus";
-  for(it->GoToFirstItem(); !it->IsDoneWithTraversal(); it->GoToNextItem())
+
+  vtkSMStringVectorProperty *svp = vtkSMStringVectorProperty::SafeDownCast(
+    this->GetSMProperty());
+  int elemCount = 0;
+
+  if (svp)
     {
-    vtkKWCheckButton* check = static_cast<vtkKWCheckButton*>(it->GetObject());
-    // This test is only here to try to avoid extra lines in the trace
-    // file.  We could make every check button a pv widget.
-    if(this->Selection->ArrayIsEnabled(check->GetText()) != check->GetState())
+    for(it->GoToFirstItem(); !it->IsDoneWithTraversal(); it->GoToNextItem())
       {
-      pm->GetStream() << vtkClientServerStream::Invoke
-                      << this->VTKReaderID
-                      << setArrayStatus.c_str()
-                      << check->GetText() << check->GetState()
-                      << vtkClientServerStream::End;
+      vtkKWCheckButton* check = static_cast<vtkKWCheckButton*>(it->GetObject());
+      svp->SetElement(elemCount++, check->GetText());
+      ostrstream str;
+      str << check->GetState() << ends;
+      svp->SetElement(elemCount++, str.str());
+      str.rdbuf()->freeze();
       }
+    it->Delete();
     }
-  it->Delete();
-  pm->SendStream(vtkProcessModule::DATA_SERVER);
 }
 
 //----------------------------------------------------------------------------
@@ -438,9 +488,12 @@ void vtkPVArraySelection::SetArrayStatus(const char *name, int status)
 //----------------------------------------------------------------------------
 void vtkPVArraySelection::SaveInBatchScript(ofstream *file)
 {
-  if (!this->VTKReaderID.ID)
+  vtkClientServerID sourceID = this->PVSource->GetVTKSourceID(0);
+
+  if (!sourceID.ID || !this->SMPropertyName)
     {
-    vtkErrorMacro("VTKReader has not been set.");
+    vtkErrorMacro("Sanity check failed. " << this->GetClassName());
+    return;
     }
 
   this->SetLocalSelectionsFromReader();
@@ -451,15 +504,16 @@ void vtkPVArraySelection::SaveInBatchScript(ofstream *file)
     {
     numElems++;
     }
+
   if (numElems > 0)
     {
     // Need to update information before setting array selections.
     *file << "  " 
-          << "$pvTemp" << this->VTKReaderID << " UpdateVTKObjects\n";
+          << "$pvTemp" << sourceID << " UpdateVTKObjects\n";
     *file << "  " 
-          << "$pvTemp" << this->VTKReaderID << " UpdateInformation\n";
-    *file << "  [$pvTemp" << this->VTKReaderID << " GetProperty "
-          << this->AttributeName << "ArrayStatus ] SetNumberOfElements " 
+          << "$pvTemp" << sourceID << " UpdateInformation\n";
+    *file << "  [$pvTemp" << sourceID << " GetProperty "
+          << this->SMPropertyName << "] SetNumberOfElements " 
           << 2*numElems << endl;
     }
   numElems=0;
@@ -469,20 +523,20 @@ void vtkPVArraySelection::SaveInBatchScript(ofstream *file)
     // Since they default to on.
     if(this->Selection->ArrayIsEnabled(check->GetText()))
       {
-      *file << "  [$pvTemp" << this->VTKReaderID << " GetProperty "
-            << this->AttributeName << "ArrayStatus ] SetElement " 
+      *file << "  [$pvTemp" << sourceID << " GetProperty "
+            << this->SMPropertyName << "] SetElement " 
             << 2*numElems << " {" << check->GetText() << "}" << endl;
-      *file << "  [$pvTemp" << this->VTKReaderID << " GetProperty "
-            << this->AttributeName << "ArrayStatus ] SetElement " 
+      *file << "  [$pvTemp" << sourceID << " GetProperty "
+            << this->SMPropertyName << "] SetElement " 
             << 2*numElems+1 << " " << 1 << endl;
       }
     else
       {
-      *file << "  [$pvTemp" << this->VTKReaderID << " GetProperty "
-            << this->AttributeName << "ArrayStatus ] SetElement " 
+      *file << "  [$pvTemp" << sourceID << " GetProperty "
+            << this->SMPropertyName << "] SetElement " 
             << 2*numElems << " {" << check->GetText() << "}" << endl;
-      *file << "  [$pvTemp" << this->VTKReaderID << " GetProperty "
-            << this->AttributeName << "ArrayStatus ] SetElement " 
+      *file << "  [$pvTemp" << sourceID << " GetProperty "
+            << this->SMPropertyName << "] SetElement " 
             << 2*numElems+1 << " " << 0 << endl;
       }
     numElems++;
@@ -508,10 +562,6 @@ void vtkPVArraySelection::CopyProperties(vtkPVWidget* clone,
     {
     pvas->SetAttributeName(this->AttributeName);
     pvas->SetLabelText(this->LabelText);
-    // It is assumed that there is only one VTK source id.
-    // Since this is a source object (reader probably), this
-    // is a reasonable assumption.
-    pvas->VTKReaderID = pvSource->GetVTKSourceID(0);
     }
   else 
     {
@@ -596,6 +646,5 @@ void vtkPVArraySelection::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os,indent);
   os << indent << "AttributeName: " 
      << (this->AttributeName?this->AttributeName:"none") << endl;
-  os << indent << "VTKReaderID: " << this->VTKReaderID.ID << endl;
   os << indent << "LabelText: " << (this->LabelText?this->LabelText:"none") << endl;
 }

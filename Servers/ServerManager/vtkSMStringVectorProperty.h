@@ -59,6 +59,11 @@ public:
   const char* GetElement(unsigned int idx);
 
   // Description:
+  // Returns the index of an element with a particular value.
+  // Returns -1 if no element has that value.
+  int GetElementIndex(const char *value);
+  
+  // Description:
   // Set the cast type used when passing a value to the stream.
   // For example, if the type is INT, the string is converted
   // to an int (with atoi()) before being passed to stream.
