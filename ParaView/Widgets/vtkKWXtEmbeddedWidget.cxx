@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWXtEmbeddedWidget);
-vtkCxxRevisionMacro(vtkKWXtEmbeddedWidget, "1.5");
+vtkCxxRevisionMacro(vtkKWXtEmbeddedWidget, "1.6");
 
 int vtkKWXtEmbeddedWidgetCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -71,8 +71,9 @@ void vtkKWXtEmbeddedWidget::Display()
 
 void vtkKWXtEmbeddedWidget::Create(vtkKWApplication *app, char *args)
 {
-  // must set the application
-  if (this->Application)
+  // Set the application
+
+  if (this->IsCreated())
     {
     vtkErrorMacro("Dialog already created");
     return;
