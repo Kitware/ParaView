@@ -77,9 +77,12 @@ public:
     { this->SetRange(range[0], range[1]); };
 
   // Description:
-  // Set/Get the resolution.
+  // Set/Get the resolution. Also get the entries resolution, which is the
+  // number of decimal places displayed in the entries 
+  // (computed automatically from the current resolution).
   virtual void SetResolution(float r);
   vtkGetMacro(Resolution, float);
+  vtkGetMacro(EntriesResolution, int);
 
   // Description:
   // Adjust the resolution automatically (to a power of 10 in this implem)
@@ -280,6 +283,7 @@ protected:
 
   virtual void CreateEntries();
   virtual void UpdateEntriesResolution();
+  virtual void ConstraintResolution();
 
   // Description:
   // Bind/Unbind all components.
