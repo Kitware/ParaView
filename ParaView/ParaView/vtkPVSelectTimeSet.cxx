@@ -160,7 +160,7 @@ void vtkPVSelectTimeSet::Create(vtkKWApplication *pvApp)
 			  "-relief sunken -borderwidth 2");
 
   this->Tree->Create(this->Application, "Tree", 
-		     "-borderwidth 0 -width 15 -padx 2 "
+		     "-background white -borderwidth 0 -width 15 -padx 2 "
 		     "-redraw 1 -relief flat -selectbackground red");
   this->Script("%s bindText <ButtonPress-1>  {%s SetTimeValueCallback}",
 	       this->Tree->GetWidgetName(), this->GetTclName());

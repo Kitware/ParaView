@@ -2562,6 +2562,7 @@ const char* bwidgets4 =
 "        } else {\n"
 "            set bmp bwplus\n"
 "        }\n"
+"$path.c create rectangle [expr $x0-4] [expr $y0-4] [expr $x0+4] [expr $y0+4] -fill black\n"
 "        $path.c create image $x0 $y0 \\\n"
 "            -image     $bmp \\\n"
 "            -tags       \"cross c:$node\" -anchor c\n"
