@@ -376,13 +376,13 @@ void vtkPVActorComposite::UpdateProperties()
     }
   this->UpdateTime.Modified();
 
-  vtkWarningMacro( << "Start timer");
+  vtkDebugMacro( << "Start timer");
   vtkTimerLog *timer = vtkTimerLog::New();
   timer->StartTimer();
   pvApp->BroadcastScript("%s Update", this->MapperTclName);
   this->GetPVData()->GetBounds(bounds);
   timer->StopTimer();
-  vtkWarningMacro(<< "Stop timer : " << this->PVData->GetVTKDataTclName() << " : took " 
+  vtkDebugMacro(<< "Stop timer : " << this->PVData->GetVTKDataTclName() << " : took " 
                   << timer->GetElapsedTime() << " seconds.");
   timer->Delete();
   
@@ -682,7 +682,7 @@ void vtkPVActorComposite::Initialize()
     this->SetModeToDataSet();
     }
 
-  vtkWarningMacro( << "Initialize --------")
+  vtkDebugMacro( << "Initialize --------")
   this->UpdateProperties();
   
   // Mapper needs an input, so the mode needs to be set first.
@@ -968,7 +968,7 @@ void vtkPVActorComposite::ReductionCallback()
   
   factor = this->ReductionEntry->GetValueAsInt();
 
-  vtkWarningMacro( << "Setting reduction factor to " << factor);
+  vtkDebugMacro( << "Setting reduction factor to " << factor);
   this->PVData->GetPVSource()->GetWindow()->GetMainView()->GetComposite()->SetReductionFactor(factor);
 }
 

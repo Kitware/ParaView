@@ -207,6 +207,7 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 {
   int argc;
   char *argv[5];
+  vtkPVArgs pvArgs;
 
   argv[0] = new char [strlen(lpCmdLine)+1];
   argv[1] = new char [strlen(lpCmdLine)+1];
@@ -254,14 +255,23 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 
   vtkMultiProcessController *controller = vtkMultiProcessController::New();
   controller->Initialize(&argc, (char***)(&argv));
+  controller->SetNumberOfProcesses(1);
+
+  pvArgs.argc = argc;
+  pvArgs.argv = argv;
+  controller->SetSingleMethod(Process_Init, (void *)(&pvArgs));
+  controller->SingleMethodExecute();
+
+  //Process_Init((void *)(&pvArgs));
   
-  Tcl_Interp *interp = vtkPVApplication::InitializeTcl(argc,argv);
-  vtkPVApplication *app = vtkPVApplication::New();
-  app->SetController(controller);
-  app->Script("wm withdraw .");
-    
-  app->Start(argc,argv);
-  app->Delete();
+
+  // The old way with no controller.
+  //Tcl_Interp *interp = vtkPVApplication::InitializeTcl(argc,argv);
+  //vtkPVApplication *app = vtkPVApplication::New();
+  //app->SetController(controller);
+  //app->Script("wm withdraw .");
+  //app->Start(argc,argv);
+  //app->Delete();
   
   controller->Delete();
   
