@@ -14,11 +14,12 @@ OPTION (VTK_WRAP_TCL "wrap classes into the TCL intepreted language" ON)
 
 OPTION (USE_INCLUDED_TCLTK "Should Tcl/Tk included in ParaViewComplete be used. Turn this off if you want to use your own Tcl/Tk. Note that you need version 8.3.2" ON)
 
-OPTION (PARAVIEW_LINK_XDMF "Build ParaView complete using included Xdmf library" OFF)
+OPTION (PARAVIEW_LINK_XDMF "Build ParaView complete using included Xdmf library" ON)
 IF(PARAVIEW_LINK_XDMF)
   SET(XDMF_BUILD_VTK 1)
   SET(XDMF_WRAP_PYTHON 0)
   SET(XDMF_WRAP_TCL 0)
+  SET(XDMF_SYSTEM_HDF5 OFF CACHE BOOL "Use system HDF5")
   SET(VTK_DIR ${ParaViewComplete_BINARY_DIR}/VTK)
   SET(VTK_NO_LIBRARY_DEPENDS 1)
   SUBDIRS(Xdmf)
