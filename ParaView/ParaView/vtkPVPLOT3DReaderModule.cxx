@@ -59,7 +59,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPLOT3DReaderModule);
-vtkCxxRevisionMacro(vtkPVPLOT3DReaderModule, "1.4");
+vtkCxxRevisionMacro(vtkPVPLOT3DReaderModule, "1.5");
 
 int vtkPVPLOT3DReaderModuleCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -139,6 +139,7 @@ void vtkPVPLOT3DReaderModule::Accept(int hideFlag, int hideSource)
   if (numOutputs > 1)
     {
     this->HideDisplayPageOn();
+    this->HideInformationPageOn();
     }
 
   window->GetMainView()->DisableRenderingFlagOn();

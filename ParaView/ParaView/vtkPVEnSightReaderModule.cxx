@@ -71,7 +71,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVEnSightReaderModule);
-vtkCxxRevisionMacro(vtkPVEnSightReaderModule, "1.24");
+vtkCxxRevisionMacro(vtkPVEnSightReaderModule, "1.25");
 
 int vtkPVEnSightReaderModuleCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -735,6 +735,7 @@ int vtkPVEnSightReaderModule::ReadFile(const char* fname, float timeValue,
   if (numOutputs > 1)
     {
     pvs->HideDisplayPageOn();
+    pvs->HideInformationPageOn();
     }
 
   // Since, at the end of creation, the main reader will be

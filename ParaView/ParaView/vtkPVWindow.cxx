@@ -121,7 +121,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.388");
+vtkCxxRevisionMacro(vtkPVWindow, "1.389");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -1123,6 +1123,7 @@ void vtkPVWindow::Create(vtkKWApplication *app, char* vtkNotUsed(args))
     pvs = this->CreatePVSource("ArrowSource", "GlyphSources", 0);
     pvs->IsPermanentOn();
     pvs->HideDisplayPageOn();
+    pvs->HideInformationPageOn();
     pvs->Accept(1);
     pvs->SetTraceReferenceObject(this);
     {
@@ -1136,6 +1137,7 @@ void vtkPVWindow::Create(vtkKWApplication *app, char* vtkNotUsed(args))
     pvs = this->CreatePVSource("ConeSource", "GlyphSources", 0);
     pvs->IsPermanentOn();
     pvs->HideDisplayPageOn();
+    pvs->HideInformationPageOn();
     pvs->Accept(1);
     pvs->SetTraceReferenceObject(this);
     {
@@ -1149,6 +1151,7 @@ void vtkPVWindow::Create(vtkKWApplication *app, char* vtkNotUsed(args))
     pvs = this->CreatePVSource("SphereSource", "GlyphSources", 0);
     pvs->IsPermanentOn();
     pvs->HideDisplayPageOn();
+    pvs->HideInformationPageOn();
     pvs->Accept(1);
     pvs->SetTraceReferenceObject(this);
     {
@@ -3780,7 +3783,7 @@ void vtkPVWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVWindow ";
-  this->ExtractRevision(os,"$Revision: 1.388 $");
+  this->ExtractRevision(os,"$Revision: 1.389 $");
 }
 
 //----------------------------------------------------------------------------
