@@ -48,6 +48,7 @@ SET( ParaViewClientNotWrapped_SRCS
   )
 
 SET( ParaViewClient_SRCS
+  vtkPVTest.cxx
   vtkKWBoundsDisplay.cxx
   vtkPV3DWidget.cxx
   vtkPVAdvancedReaderModule.cxx
@@ -121,7 +122,7 @@ SET( ParaViewClient_SRCS
   vtkPVScalarRangeLabel.cxx
   vtkPVScale.cxx
   vtkPVScaleFactorEntry.cxx
-  vtkPVSelectCTHArrays.cxx
+  vtkPVSelectArrays.cxx
   vtkPVSelectCustomReader.cxx
   vtkPVSelectTimeSet.cxx
   vtkPVSelectWidget.cxx

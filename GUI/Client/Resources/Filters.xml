@@ -182,10 +182,13 @@ Create texture coordinates.
                property="Input"
                help="Set the input to this filter." />
 
-    <SelectCTHArrays input_menu="im"
-                     trace_name="ArraySelection"
-                     property="AddVolumeArrayName"
-                     help="Select the cells attributes to convert to point attributes."/>
+    <SelectArrays filter_arrays="Off"
+                  deactivate="Off"
+		  field="Cell"
+                  input_menu="im"
+                  trace_name="ArraySelection"
+                  property="AddVolumeArrayName"
+                  help="Select the cells attributes to convert to point attributes."/>
 
     <LabeledToggle label="IgnoreGhostLevels"
                    property="IgnoreGhostLevels"
@@ -744,10 +747,13 @@ The line can be specified interactively using the 3D line widget. See section 7.
                    property="IgnoreGhostLevels"
                    trace_name="IgnoreGhostLevels"
                    help="Alternative algorithm" />
-    <SelectCTHArrays input_menu="im"
-                     trace_name="ArraySelection"
-                     property="AddVolumeArrayName"
-                     help="Select the volume fraction arrays for generating parts."/>
+    <SelectArrays filter_arrays="On"
+                  deactivate="On"
+		  field="Cell"
+                  input_menu="im"
+                  trace_name="ArraySelection"
+                  property="AddVolumeArrayName"
+                  help="Select the volume fraction arrays for generating parts."/>
     <SelectWidget property="ClipPlane" label="Clip Plane"
                   trace_name="Clipping">
       <Item label="Off" value="Off">
@@ -777,10 +783,13 @@ The line can be specified interactively using the 3D line widget. See section 7.
                id="im" label="Input"
                help="Set the input to this filter."
                input_name="Input"/>
-    <SelectCTHArrays input_menu="im"
-                     trace_name="ArraySelection"
-                     property="AddVolumeArrayName"
-                     help="Select the volume fraction arrays for generating parts."/>
+    <SelectArrays filter_arrays="On"
+                  deactivate="On"
+		  field="Cell"
+                  input_menu="im"
+                  trace_name="ArraySelection"
+                  property="AddVolumeArrayName"
+                  help="Select the volume fraction arrays for generating parts."/>
     <SelectWidget property="ClipPlane"
                   trace_name="Clipping" label="Clip Plane">
       <Item label="Off" value="Off">
