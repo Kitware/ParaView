@@ -136,7 +136,7 @@ public:
   // Called when accept button is pushed.  
   // Sets objects variable to the widgets value.
   // Side effect is to turn modified flag off.
-  virtual void AcceptInternal(const char* sourceTclName);
+  virtual void AcceptInternal(vtkClientServerID);
   
   // Description:
   // Called when the reset button is pushed.
@@ -171,7 +171,7 @@ protected:
   // Execute event of the 3D Widget.
   virtual void ExecuteEvent(vtkObject*, unsigned long, void*);
 
-  void UpdateVTKObject(const char* sourceTclName);
+  void UpdateVTKObject(vtkClientServerID);
 
   vtkKWEntry* Point1[3];
   vtkKWEntry* Point2[3];
@@ -207,7 +207,7 @@ protected:
   
   // Description:
   // Used internally. Method to save widget parameters into vtk tcl script.
-  virtual void SaveInBatchScriptForPart(ofstream *file, const char* sourceTclName);
+  virtual void SaveInBatchScriptForPart(ofstream *file, vtkClientServerID);
 
 private:  
   vtkPVLineWidget(const vtkPVLineWidget&); // Not implemented

@@ -56,7 +56,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCompositeRenderModuleUI);
-vtkCxxRevisionMacro(vtkPVCompositeRenderModuleUI, "1.5");
+vtkCxxRevisionMacro(vtkPVCompositeRenderModuleUI, "1.6");
 
 int vtkPVCompositeRenderModuleUICommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -551,9 +551,7 @@ void vtkPVCompositeRenderModuleUI::CompositeWithFloatCallback(int val)
  
   if (this->CompositeRenderModule->GetComposite())
     {
-    this->GetPVApplication()->BroadcastScript("%s SetUseChar %d",
-                                        this->CompositeRenderModule->GetCompositeTclName(),
-                                        !val);
+    this->CompositeRenderModule->SetUseCompositeWithFloat(val);
     // Limit of composite manager.
     if (val != 0) // float
       {
@@ -592,9 +590,7 @@ void vtkPVCompositeRenderModuleUI::CompositeWithRGBACallback(int val)
     }
   if (this->CompositeRenderModule->GetComposite())
     {
-    this->GetPVApplication()->BroadcastScript("%s SetUseRGB %d",
-                                   this->CompositeRenderModule->GetCompositeTclName(),
-                                   !val);
+    this->CompositeRenderModule->SetUseCompositeWithRGBA(val);
     // Limit of composite manager.
     if (val != 1) // RGB
       {

@@ -145,13 +145,14 @@ if {[catch {set channel [open test.tmp w]}] == 0 } {
 }
 
 # Fix the size of the image.
-RenWin1 SetSize 300 300
-RenWin1 Render
+set RenWin1 [[[$Application GetMainWindow] GetMainView] GetRenderWindow]
+$RenWin1 SetSize 300 300
+$RenWin1 Render
 update
 
 $kw(vtkTemp20) CompositeWithFloatCallback 1
 update
-RenWin1 Render
+$RenWin1 Render
 update
 for {set i  1} {$i < [expr $argc - 1]} {incr i} {
     if {[lindex $argv $i] == "-C"} {
@@ -161,7 +162,7 @@ for {set i  1} {$i < [expr $argc - 1]} {incr i} {
 }
 $kw(vtkTemp20) CompositeCompressionCallback 1
 update
-RenWin1 Render
+$RenWin1 Render
 update
 for {set i  1} {$i < [expr $argc - 1]} {incr i} {
     if {[lindex $argv $i] == "-C"} {
@@ -171,7 +172,7 @@ for {set i  1} {$i < [expr $argc - 1]} {incr i} {
 }
 $kw(vtkTemp20) CompositeWithRGBACallback 0
 update
-RenWin1 Render
+$RenWin1 Render
 update
 for {set i  1} {$i < [expr $argc - 1]} {incr i} {
     if {[lindex $argv $i] == "-C"} {
@@ -181,7 +182,7 @@ for {set i  1} {$i < [expr $argc - 1]} {incr i} {
 }
 $kw(vtkTemp20) CompositeCompressionCallback 0
 update
-RenWin1 Render
+$RenWin1 Render
 update
 for {set i  1} {$i < [expr $argc - 1]} {incr i} {
     if {[lindex $argv $i] == "-C"} {
@@ -191,7 +192,7 @@ for {set i  1} {$i < [expr $argc - 1]} {incr i} {
 }
 $kw(vtkTemp20) CompositeCompressionCallback 1
 update
-RenWin1 Render
+$RenWin1 Render
 update
 for {set i  1} {$i < [expr $argc - 1]} {incr i} {
     if {[lindex $argv $i] == "-C"} {
@@ -201,7 +202,7 @@ for {set i  1} {$i < [expr $argc - 1]} {incr i} {
 }
 $kw(vtkTemp20) CompositeCompressionCallback 0
 update
-RenWin1 Render
+$RenWin1 Render
 update
 for {set i  1} {$i < [expr $argc - 1]} {incr i} {
     if {[lindex $argv $i] == "-C"} {
@@ -211,7 +212,7 @@ for {set i  1} {$i < [expr $argc - 1]} {incr i} {
 }
 $kw(vtkTemp20) CompositeWithRGBACallback 1
 update
-RenWin1 Render
+$RenWin1 Render
 update
 for {set i  1} {$i < [expr $argc - 1]} {incr i} {
     if {[lindex $argv $i] == "-C"} {
@@ -221,7 +222,7 @@ for {set i  1} {$i < [expr $argc - 1]} {incr i} {
 }
 $kw(vtkTemp20) CompositeWithRGBACallback 0
 update
-RenWin1 Render
+$RenWin1 Render
 update
 for {set i  1} {$i < [expr $argc - 1]} {incr i} {
     if {[lindex $argv $i] == "-C"} {
@@ -231,7 +232,7 @@ for {set i  1} {$i < [expr $argc - 1]} {incr i} {
 }
 $kw(vtkTemp20) CompositeWithFloatCallback 1
 update
-RenWin1 Render
+$RenWin1 Render
 update
 for {set i  1} {$i < [expr $argc - 1]} {incr i} {
     if {[lindex $argv $i] == "-C"} {
@@ -241,7 +242,7 @@ for {set i  1} {$i < [expr $argc - 1]} {incr i} {
 }
 $kw(vtkTemp20) CompositeWithFloatCallback 0
 update
-RenWin1 Render
+$RenWin1 Render
 update
 for {set i  1} {$i < [expr $argc - 1]} {incr i} {
     if {[lindex $argv $i] == "-C"} {
@@ -251,7 +252,7 @@ for {set i  1} {$i < [expr $argc - 1]} {incr i} {
 }
 $kw(vtkTemp20) CompositeCompressionCallback 1
 update
-RenWin1 Render
+$RenWin1 Render
 update
 for {set i  1} {$i < [expr $argc - 1]} {incr i} {
     if {[lindex $argv $i] == "-C"} {
@@ -261,7 +262,7 @@ for {set i  1} {$i < [expr $argc - 1]} {incr i} {
 }
 $kw(vtkTemp20) CompositeWithRGBACallback 0
 update
-RenWin1 Render
+$RenWin1 Render
 update
 for {set i  1} {$i < [expr $argc - 1]} {incr i} {
     if {[lindex $argv $i] == "-C"} {
@@ -271,7 +272,7 @@ for {set i  1} {$i < [expr $argc - 1]} {incr i} {
 }
 $kw(vtkTemp20) CompositeCompressionCallback 0
 update
-RenWin1 Render
+$RenWin1 Render
 update
 for {set i  1} {$i < [expr $argc - 1]} {incr i} {
     if {[lindex $argv $i] == "-C"} {

@@ -53,10 +53,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVWindow.h"
 #include "vtkVector.txx"
 #include "vtkVectorIterator.txx"
-
+#include <vtkstd/string>
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVReaderModule);
-vtkCxxRevisionMacro(vtkPVReaderModule, "1.34");
+vtkCxxRevisionMacro(vtkPVReaderModule, "1.35");
 
 int vtkPVReaderModuleCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -95,7 +95,7 @@ void vtkPVReaderModule::CreateProperties()
   this->FileEntry->SetParent(this->GetParameterFrame()->GetFrame());
   this->FileEntry->SetModifiedCommand(this->GetTclName(), 
                                       "SetAcceptButtonColorToRed");
-  this->FileEntry->SetObjectVariable(this->GetVTKSourceTclName(), "FileName");
+  this->FileEntry->SetVariableName("FileName");
   this->FileEntry->Create(this->GetPVApplication());
   if (this->AddFileEntry)
     {
@@ -140,36 +140,44 @@ int vtkPVReaderModule::CloneAndInitialize(int makeCurrent,
 int vtkPVReaderModule::CanReadFile(const char* fname)
 {
   vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
-
   const char* ext = this->ExtractExtension(fname);
-  const char* val = 0;
-  this->Iterator->GoToFirstItem();
-  while(!this->Iterator->IsDoneWithTraversal())
+  int matches = 0;
+  int canRead = 0;
+
+  // Check if the file name matches any of our extensions.
+  for(this->Iterator->GoToFirstItem();
+      !this->Iterator->IsDoneWithTraversal() && !matches;
+      this->Iterator->GoToNextItem())
     {
+    const char* val = 0;
     this->Iterator->GetData(val);
-    if (ext && strcmp(ext, val) == 0)
+    if(ext && strcmp(ext, val) == 0)
       {
-      // The extension matches, see if the reader can read the file.
-      pm->RootScript(
-        "namespace eval ::paraview::vtkPVReaderModule {\n"
-        "  proc CanReadFileTest {reader fname} {\n"
-        "    $reader vtkPVReaderModuleCanReadFileTemp\n"
-        "    if {[catch {vtkPVReaderModuleCanReadFileTemp CanReadFile \"$fname\"} result]} {\n"
-        "      set result 1\n"
-        "    }\n"
-        "    vtkPVReaderModuleCanReadFileTemp Delete\n"
-        "    return $result\n"
-        "  }\n"
-        "  CanReadFileTest {%s} {%s}\n"
-        "}\n", this->SourceClassName, fname);
-      if(atoi(pm->GetRootResult()))
-        {
-        return 1;
-        }
+      matches = 1;
       }
-    this->Iterator->GoToNextItem();
     }
-  return 0;
+
+  // If the extension matches, see if the reader can read the file.
+  if(matches)
+    {
+    vtkClientServerID tmpID = pm->NewStreamObject(this->SourceClassName);
+    pm->GetStream() << vtkClientServerStream::Invoke
+                    << pm->GetProcessModuleID()
+                    << "SetReportInterpreterErrors" << 0
+                    << vtkClientServerStream::End;
+    pm->GetStream() << vtkClientServerStream::Invoke
+                    << tmpID << "CanReadFile" << fname
+                    << vtkClientServerStream::End;
+    pm->SendStreamToServer();
+    pm->GetLastServerResult().GetArgument(0, 0, &canRead);
+    pm->DeleteStreamObject(tmpID);
+    pm->GetStream() << vtkClientServerStream::Invoke
+                    << pm->GetProcessModuleID()
+                    << "SetReportInterpreterErrors" << 1
+                    << vtkClientServerStream::End;
+    pm->SendStreamToServer();
+    }
+  return canRead;
 }
 
 //----------------------------------------------------------------------------
@@ -229,8 +237,9 @@ int vtkPVReaderModule::ReadFileInformation(const char* fname)
 
   // Update the reader's information.
   vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
-  pm->ServerScript("%s UpdateInformation", this->GetVTKSourceTclName());
-
+  pm->GetStream() << vtkClientServerStream::Invoke <<  this->GetVTKSourceID()
+                  << "UpdateInformation" << vtkClientServerStream::End;
+  pm->SendStreamToServer();
   return VTK_OK;
 }
 
@@ -362,9 +371,13 @@ void vtkPVReaderModule::SetReaderFileName(const char* fname)
     {
     this->FileEntry->SetValue(fname);
     vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
-    pm->ServerScript("%s Set%s {%s}", this->GetVTKSourceTclName(), 
-                     this->FileEntry->GetVariableName(), fname);
-    
+    pm->GetStream() << vtkClientServerStream::Invoke 
+                    << this->GetVTKSourceID() 
+                    << (vtkstd::string("Set") 
+                        + vtkstd::string(this->FileEntry->GetVariableName())).c_str()
+                    << fname
+                    << vtkClientServerStream::End;
+    pm->SendStreamToServer();
     const char* ext = this->ExtractExtension(fname);
     if (ext)
       {

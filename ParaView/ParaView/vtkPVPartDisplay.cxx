@@ -64,7 +64,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPartDisplay);
-vtkCxxRevisionMacro(vtkPVPartDisplay, "1.12");
+vtkCxxRevisionMacro(vtkPVPartDisplay, "1.13");
 
 
 //----------------------------------------------------------------------------
@@ -81,12 +81,11 @@ vtkPVPartDisplay::vtkPVPartDisplay()
 
   this->Mapper = NULL;
   this->Property = NULL;
-  this->PropertyTclName = NULL;
   this->Prop = NULL;
-  this->PropTclName = NULL;
-  this->MapperTclName = NULL;
-  this->UpdateSuppressorTclName = NULL;
-
+  this->PropID.ID =0;
+  this->PropertyID.ID =0;
+  this->MapperID.ID = 0;
+  this->UpdateSuppressorID.ID = 0;
   this->GeometryIsValid = 0;
 
   // Create a unique id for creating tcl names.
@@ -98,39 +97,40 @@ vtkPVPartDisplay::vtkPVPartDisplay()
 vtkPVPartDisplay::~vtkPVPartDisplay()
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
-    
-  if ( pvApp && this->MapperTclName)
+  vtkPVProcessModule* pm = 0;
+  if(pvApp)
     {
-    pvApp->BroadcastScript("%s Delete", this->MapperTclName);
+    pm = pvApp->GetProcessModule();
     }
-  this->SetMapperTclName(NULL);
+  
+  if ( pm && this->MapperID.ID != 0)
+    {
+    pm->DeleteStreamObject(this->MapperID);
+    }
   this->Mapper = NULL;
     
-  if ( pvApp && this->PropTclName)
+  if ( pm && this->PropID.ID != 0)
     {
-    pvApp->BroadcastScript("%s Delete", this->PropTclName);
+    pm->DeleteStreamObject(this->PropID);
     }
-  this->SetPropTclName(NULL);
   this->Prop = NULL;
   
-  if ( pvApp && this->PropertyTclName)
-    {
-    pvApp->BroadcastScript("%s Delete", this->PropertyTclName);
+  if ( pm && this->PropertyID.ID !=0)
+    {  
+    pm->DeleteStreamObject(this->PropertyID);
     }
-  this->SetPropertyTclName(NULL);
   this->Property = NULL;
   
-  if (this->UpdateSuppressorTclName)
+  if (pm && this->UpdateSuppressorID.ID)
     {
-    if ( pvApp )
-      {
-      pvApp->BroadcastScript("%s Delete", this->UpdateSuppressorTclName);
-      }
-    this->SetUpdateSuppressorTclName(NULL);
+    pm->DeleteStreamObject(this->UpdateSuppressorID);
+    }
+  if(pm)
+    {
+    pm->SendStreamToClientAndServer();
     }
 
   this->SetPart(NULL);
-
   this->SetPVApplication( NULL);
 }
 
@@ -142,66 +142,86 @@ void vtkPVPartDisplay::InvalidateGeometry()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVPartDisplay::ConnectToGeometry(char* geometryTclName)
+void vtkPVPartDisplay::ConnectToGeometry(vtkClientServerID geometryID)
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
 
-  pvApp->BroadcastScript("%s SetInput [%s GetOutput]", 
-                         this->UpdateSuppressorTclName, geometryTclName);
+  vtkPVProcessModule *pm = pvApp->GetProcessModule();
+  vtkClientServerStream& stream = pm->GetStream();
+  stream.Reset();
+  stream << vtkClientServerStream::Invoke << geometryID
+         << "GetOutput" << vtkClientServerStream::End;
+  stream << vtkClientServerStream::Invoke << this->UpdateSuppressorID << "SetInput" 
+         << vtkClientServerStream::LastResult << vtkClientServerStream::End;
+  pm->SendStreamToClientAndServer();
 }
 
 
 //----------------------------------------------------------------------------
 void vtkPVPartDisplay::CreateParallelTclObjects(vtkPVApplication *pvApp)
 {
-  char tclName[100];
-  
-
+  vtkPVProcessModule *pm = pvApp->GetProcessModule();
+  vtkClientServerStream& stream = pm->GetStream();
   // Now create the update supressors which keep the renderers/mappers
   // from updating the pipeline.  These are here to ensure that all
   // processes get updated at the same time.
   // ===== Primary branch:
-  sprintf(tclName, "UpdateSuppressor%d", this->InstanceCount);
-  pvApp->BroadcastScript("vtkPVUpdateSuppressor %s", tclName);
-  this->SetUpdateSuppressorTclName(tclName);
+  this->UpdateSuppressorID = pm->NewStreamObject("vtkPVUpdateSuppressor");
 
   // Now create the mapper.
-  sprintf(tclName, "Mapper%d", this->InstanceCount);
-  this->Mapper = (vtkPolyDataMapper*)pvApp->MakeTclObject("vtkPolyDataMapper",
-                                                          tclName);
-  this->MapperTclName = NULL;
-  this->SetMapperTclName(tclName);
-  pvApp->BroadcastScript("%s UseLookupTableScalarRangeOn", this->MapperTclName);
-  //pvApp->BroadcastScript("%s SetColorModeToMapScalars", this->MapperTclName);
-  pvApp->BroadcastScript("%s SetInput [%s GetOutput]", this->MapperTclName,
-                         this->UpdateSuppressorTclName);
-  pvApp->BroadcastScript("%s SetImmediateModeRendering %d", this->MapperTclName,
-                  pvApp->GetMainView()->GetImmediateModeCheck()->GetState());
-
+  this->MapperID = pm->NewStreamObject("vtkPolyDataMapper");
+  stream << vtkClientServerStream::Invoke << this->MapperID << "UseLookupTableScalarRangeOn" 
+         << vtkClientServerStream::End;
+  stream << vtkClientServerStream::Invoke << this->UpdateSuppressorID << "GetOutput" 
+         <<  vtkClientServerStream::End;
+  stream << vtkClientServerStream::Invoke << this->MapperID << "SetInput" 
+         << vtkClientServerStream::LastResult << vtkClientServerStream::End;
+  stream << vtkClientServerStream::Invoke << this->MapperID
+         << "SetImmediateModeRendering" 
+         << pvApp->GetMainView()->GetImmediateModeCheck()->GetState() << vtkClientServerStream::End;
   // Create a LOD Actor for the subclasses.
   // I could use just a plain actor for this class.
-  sprintf(tclName, "Actor%d", this->InstanceCount);
-  this->Prop = (vtkProp*)pvApp->MakeTclObject("vtkPVLODActor", tclName);
-  this->SetPropTclName(tclName);
-
-  // Make a new tcl object.
-  sprintf(tclName, "Property%d", this->InstanceCount);
-  this->Property = (vtkProperty*)pvApp->MakeTclObject("vtkProperty", tclName);
-  this->SetPropertyTclName(tclName);
+  
+  this->PropID = pm->NewStreamObject("vtkPVLODActor");
+  this->PropertyID = pm->NewStreamObject("vtkProperty");
+  
   // I used to use ambient 0.15 and diffuse 0.85, but VTK did not
   // handle it correctly.
-  pvApp->BroadcastScript("%s SetAmbient 0.0", this->PropertyTclName);
-  pvApp->BroadcastScript("%s SetDiffuse 1.0", this->PropertyTclName);
-  pvApp->BroadcastScript("%s SetProperty %s", this->PropTclName, 
-                         this->PropertyTclName);
-  pvApp->BroadcastScript("%s SetMapper %s", this->PropTclName, 
-                         this->MapperTclName);
+  stream << vtkClientServerStream::Invoke << this->PropertyID 
+         << "SetAmbient" << 0.0 << vtkClientServerStream::End;
+  stream << vtkClientServerStream::Invoke << this->PropertyID 
+         << "SetDiffuse" << 1.0 << vtkClientServerStream::End;
+  stream << vtkClientServerStream::Invoke << this->PropID 
+         << "SetProperty" << this->PropertyID  << vtkClientServerStream::End;
+  stream << vtkClientServerStream::Invoke << this->PropID 
+         << "SetMapper" << this->MapperID  << vtkClientServerStream::End;
+  pm->SendStreamToClientAndServer();
+  // now we can get pointers to the client vtk objects, this
+  // must be after the streams are sent
+  this->Property = 
+    vtkProperty::SafeDownCast(
+      pm->GetObjectFromID(this->PropertyID));
+  this->Mapper = 
+    vtkPolyDataMapper::SafeDownCast(
+      pm->GetObjectFromID(this->MapperID));
 
-  // Broadcast for subclasses.  
-  pvApp->BroadcastScript("%s SetUpdateNumberOfPieces [[$Application GetProcessModule] GetNumberOfPartitions]",
-                        this->UpdateSuppressorTclName);
-  pvApp->BroadcastScript("%s SetUpdatePiece [[$Application GetProcessModule] GetPartitionId]",
-                        this->UpdateSuppressorTclName);
+  pm->GetStream()
+    << vtkClientServerStream::Invoke
+    << pm->GetProcessModuleID() << "GetNumberOfPartitions"
+    << vtkClientServerStream::End
+    << vtkClientServerStream::Invoke
+    << this->UpdateSuppressorID << "SetUpdateNumberOfPieces"
+    << vtkClientServerStream::LastResult
+    << vtkClientServerStream::End;
+  pm->GetStream()
+    << vtkClientServerStream::Invoke
+    << pm->GetProcessModuleID() << "GetPartitionId"
+    << vtkClientServerStream::End
+    << vtkClientServerStream::Invoke
+    << this->UpdateSuppressorID << "SetUpdatePiece"
+    << vtkClientServerStream::LastResult
+    << vtkClientServerStream::End;
+  pm->SendStreamToClientAndServer();
 }
 
 
@@ -209,9 +229,11 @@ void vtkPVPartDisplay::CreateParallelTclObjects(vtkPVApplication *pvApp)
 void vtkPVPartDisplay::SetUseImmediateMode(int val)
 {
   vtkPVApplication* pvApp = this->GetPVApplication();
-
-  pvApp->BroadcastScript("%s SetImmediateModeRendering %d",
-                         this->MapperTclName, val);
+  vtkPVProcessModule *pm = pvApp->GetProcessModule();
+  vtkClientServerStream& stream = pm->GetStream();
+  stream << vtkClientServerStream::Invoke << this->MapperID
+         << "SetImmediateModeRendering" << val << vtkClientServerStream::End;
+  pm->SendStreamToClientAndServer();
 }
 
 
@@ -219,17 +241,20 @@ void vtkPVPartDisplay::SetUseImmediateMode(int val)
 void vtkPVPartDisplay::SetVisibility(int v)
 {
   vtkPVApplication* pvApp = this->GetPVApplication();
-
-  if (this->GetPropTclName())
-    {
-    pvApp->BroadcastScript("%s SetVisibility %d", this->GetPropTclName(), v);
-    }
-  this->Visibility = v;
-
   if ( !pvApp || !pvApp->GetRenderModule() )
     {
     return;
     }
+
+  if (this->PropID.ID != 0)
+    {
+    vtkPVProcessModule *pm = pvApp->GetProcessModule();
+    vtkClientServerStream& stream = pm->GetStream();
+    stream << vtkClientServerStream::Invoke << this->PropID
+           << "SetVisibility" << v << vtkClientServerStream::End;
+    pm->SendStreamToClientAndServer();
+    }
+  this->Visibility = v;
   // Recompute total visibile memory size.
   pvApp->GetRenderModule()->SetTotalVisibleMemorySizeValid(0);
 }
@@ -239,19 +264,17 @@ void vtkPVPartDisplay::SetVisibility(int v)
 void vtkPVPartDisplay::SetColor(float r, float g, float b)
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
-
-  pvApp->BroadcastScript("%s SetColor %f %f %f", 
-                         this->PropertyTclName, r, g, b);
-
-  // Add a bit of specular when just coloring by property.
-  pvApp->BroadcastScript("%s SetSpecular 0.1", 
-                         this->PropertyTclName);
-
-  pvApp->BroadcastScript("%s SetSpecularPower 100.0", 
-                         this->PropertyTclName);
-
-  pvApp->BroadcastScript("%s SetSpecularColor 1.0 1.0 1.0", 
-                         this->PropertyTclName);
+  vtkPVProcessModule *pm = pvApp->GetProcessModule();
+  vtkClientServerStream& stream = pm->GetStream();
+  stream << vtkClientServerStream::Invoke << this->PropertyID
+         << "SetColor" << r << g << b << vtkClientServerStream::End;
+  stream << vtkClientServerStream::Invoke << this->PropertyID
+         << "SetSpecular" << 0.1 << vtkClientServerStream::End;
+  stream << vtkClientServerStream::Invoke << this->PropertyID
+         << "SetSpecularPower" << 100.0 << vtkClientServerStream::End;
+  stream << vtkClientServerStream::Invoke << this->PropertyID
+         << "SetSpecularColor" << 1.0 << 1.0 << 1.0 << vtkClientServerStream::End;
+  pm->SendStreamToClientAndServer();
 }  
 
 
@@ -259,10 +282,14 @@ void vtkPVPartDisplay::SetColor(float r, float g, float b)
 void vtkPVPartDisplay::Update()
 {
   vtkPVApplication* pvApp = this->GetPVApplication();
-
-  if ( ! this->GeometryIsValid && this->UpdateSuppressorTclName )
+  // Current problem is that there is no input for the UpdateSuppressor object
+  if ( ! this->GeometryIsValid && this->UpdateSuppressorID.ID != 0 )
     {
-    pvApp->BroadcastScript("%s ForceUpdate", this->UpdateSuppressorTclName);
+    vtkPVProcessModule *pm = pvApp->GetProcessModule();
+    vtkClientServerStream& stream = pm->GetStream();
+    stream << vtkClientServerStream::Invoke << this->UpdateSuppressorID 
+           << "ForceUpdate" << vtkClientServerStream::End;
+    pm->SendStreamToClientAndServer();
     this->GeometryIsValid = 1;
     }
 }
@@ -296,9 +323,12 @@ void vtkPVPartDisplay::SetPVApplication(vtkPVApplication *pvApp)
 //----------------------------------------------------------------------------
 void vtkPVPartDisplay::RemoveAllCaches()
 {
-  this->GetPVApplication()->BroadcastScript(
-             "%s RemoveAllCaches",
-             this->UpdateSuppressorTclName);
+  vtkPVApplication* pvApp = this->GetPVApplication();
+  vtkPVProcessModule *pm = pvApp->GetProcessModule();
+  vtkClientServerStream& stream = pm->GetStream();
+  stream << vtkClientServerStream::Invoke << this->UpdateSuppressorID 
+         << "RemoveAllCaches" << vtkClientServerStream::End; 
+  pm->SendStreamToClientAndServer();
 }
 
 
@@ -307,9 +337,12 @@ void vtkPVPartDisplay::RemoveAllCaches()
 // This is like the ForceUpdate method, but uses cached values if possible.
 void vtkPVPartDisplay::CacheUpdate(int idx, int total)
 {
-  this->GetPVApplication()->BroadcastScript(
-             "%s CacheUpdate %d %d",
-             this->UpdateSuppressorTclName, idx, total);
+  vtkPVApplication* pvApp = this->GetPVApplication();
+  vtkPVProcessModule *pm = pvApp->GetProcessModule();
+  vtkClientServerStream& stream = pm->GetStream();
+  stream << vtkClientServerStream::Invoke << this->UpdateSuppressorID 
+         << "CacheUpdate" << idx << total << vtkClientServerStream::End; 
+  pm->SendStreamToClientAndServer();
 }
 
 
@@ -319,10 +352,13 @@ void vtkPVPartDisplay::CacheUpdate(int idx, int total)
 
 //----------------------------------------------------------------------------
 void vtkPVPartDisplay::SetScalarVisibility(int val)
-{
+{  
   vtkPVApplication* pvApp = this->GetPVApplication();
-  pvApp->BroadcastScript("%s SetScalarVisibility %d", 
-                         this->MapperTclName, val);
+  vtkPVProcessModule *pm = pvApp->GetProcessModule();
+  vtkClientServerStream& stream = pm->GetStream();
+  stream << vtkClientServerStream::Invoke << this->MapperID
+         << "SetScalarVisibility" << val << vtkClientServerStream::End;
+  pm->SendStreamToClientAndServer();
 }
 
 //----------------------------------------------------------------------------
@@ -337,16 +373,21 @@ void vtkPVPartDisplay::SetDirectColorFlag(int val)
     return;
     }
 
-  vtkPVApplication* pvApp = this->GetPVApplication();
+  vtkPVApplication* pvApp = this->GetPVApplication(); 
+  vtkPVProcessModule *pm = pvApp->GetProcessModule();
+  vtkClientServerStream& stream = pm->GetStream();
   this->DirectColorFlag = val;
   if (val)
     {
-    pvApp->BroadcastScript("%s SetColorModeToDefault", this->MapperTclName);
+    stream << vtkClientServerStream::Invoke << this->MapperID
+           << "SetColorModeToDefault" << vtkClientServerStream::End;
     }
   else
     {
-    pvApp->BroadcastScript("%s SetColorModeToMapScalars", this->MapperTclName);
+    stream << vtkClientServerStream::Invoke << this->MapperID
+           << "SetColorModeToMapScalars" << vtkClientServerStream::End;
     }
+  pm->SendStreamToClientAndServer();
 }
 
 //----------------------------------------------------------------------------
@@ -354,34 +395,34 @@ void vtkPVPartDisplay::ColorByArray(vtkPVColorMap *colorMap,
                                     int field)
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
-
+  vtkPVProcessModule *pm = pvApp->GetProcessModule();
+  vtkClientServerStream& stream = pm->GetStream();
+  
   // Turn off the specualr so it does not interfere with data.
-  pvApp->BroadcastScript("%s SetSpecular 0.0", 
-                         this->PropertyTclName);
+  stream << vtkClientServerStream::Invoke << this->PropertyID
+         << "SetSpecular" << 0.0 << vtkClientServerStream::End;
+  stream << vtkClientServerStream::Invoke << this->MapperID
+         << "SetLookupTable" << colorMap->GetLookupTableID()
+         << vtkClientServerStream::End;
+  stream << vtkClientServerStream::Invoke << this->MapperID
+         << "ScalarVisibilityOn" << vtkClientServerStream::End;
 
-  pvApp->BroadcastScript("%s SetLookupTable %s", 
-                         this->MapperTclName,
-                         colorMap->GetLookupTableTclName());
-  pvApp->BroadcastScript("%s ScalarVisibilityOn", 
-                         this->MapperTclName);
   if (field == VTK_CELL_DATA_FIELD)
-    {
-    pvApp->BroadcastScript("%s SetScalarModeToUseCellFieldData",
-                           this->MapperTclName);
+    { 
+    stream << vtkClientServerStream::Invoke << this->MapperID
+           << "SetScalarModeToUseCellFieldData" << vtkClientServerStream::End;
     }
   else if (field == VTK_POINT_DATA_FIELD)
     {
-    pvApp->BroadcastScript("%s SetScalarModeToUsePointFieldData",
-                           this->MapperTclName);
+    stream << vtkClientServerStream::Invoke << this->MapperID
+           << "SetScalarModeToUsePointFieldData" << vtkClientServerStream::End;
     }
   else
     {
     vtkErrorMacro("Only point or cell field please.");
     }
-
-  pvApp->BroadcastScript("%s SelectColorArray {%s}",
-                         this->MapperTclName, colorMap->GetArrayName());
-
+//   stream << vtkClientServerStream::Invoke << this->MapperID
+//          << "SelectColorArray" << colorMap->GetArrayName() << vtkClientServerStream::End;
 }
 
 //----------------------------------------------------------------------------
@@ -391,17 +432,12 @@ void vtkPVPartDisplay::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "Visibility: " << this->Visibility << endl;
   os << indent << "Part: " << this->Part << endl;
   os << indent << "Mapper: " << this->GetMapper() << endl;
-  os << indent << "MapperTclName: " << (this->MapperTclName?this->MapperTclName:"none") << endl;
-  os << indent << "PropTclName: " << (this->PropTclName?this->PropTclName:"none") << endl;
-  os << indent << "PropertyTclName: " << (this->PropertyTclName?this->PropertyTclName:"none") << endl;
+  os << indent << "MapperID: " << this->MapperID.ID << endl;
+  os << indent << "PropID: " << this->PropID.ID << endl;
+  os << indent << "PropertyID: " << this->PropertyID.ID << endl;
   os << indent << "PVApplication: " << this->PVApplication << endl;
-
   os << indent << "DirectColorFlag: " << this->DirectColorFlag << endl;
-
-  if (this->UpdateSuppressorTclName)
-    {
-    os << indent << "UpdateSuppressor: " << this->UpdateSuppressorTclName << endl;
-    }
+  os << indent << "UpdateSuppressor: " << this->UpdateSuppressorID.ID << endl;
 }
 
 

@@ -88,8 +88,8 @@ public:
 
   vtkSetStringMacro(Domain);
 
-  void UpdateGrids(const char*);
-  void UpdateDomains(const char*);
+  void UpdateGrids();
+  void UpdateDomains();
 
   void EnableGrid(const char* grid);
   void EnableAllGrids();

@@ -39,15 +39,15 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-// .NAME vtkPVStringWidgetProperty - a property for a string value
+// .NAME vtkPVStringWidgetProperty
 // .SECTION Description
-// vtkPVStringWidgetProperty is a subclass of vtkPVWidgetProperty that is
-// used to pass a string to a VTK object.
 
 #ifndef __vtkPVStringWidgetProperty_h
 #define __vtkPVStringWidgetProperty_h
 
 #include "vtkPVWidgetProperty.h"
+#include "vtkPVSelectWidget.h"
+#include "vtkClientServerID.h"
 
 class VTK_EXPORT vtkPVStringWidgetProperty : public vtkPVWidgetProperty
 {
@@ -55,27 +55,26 @@ public:
   static vtkPVStringWidgetProperty* New();
   vtkTypeRevisionMacro(vtkPVStringWidgetProperty, vtkPVWidgetProperty);
   void PrintSelf(ostream& os, vtkIndent indent);
-
-  // Description:
-  // Set/get the string that is the parameter to the specified VTK command.
+  
   vtkSetStringMacro(String);
   vtkGetStringMacro(String);
   
-  // Description:
-  // Pass values to VTK objects.
   virtual void AcceptInternal();
-  
-  // Description:
-  // Set the method to call on the specifed VTK object.
+  vtkSetMacro(ObjectID, vtkClientServerID);
   vtkSetStringMacro(VTKCommand);
-  
+  //BTX
+  void SetStringType(vtkPVSelectWidget::ElementTypes);
+  //ETX
 protected:
   vtkPVStringWidgetProperty();
   ~vtkPVStringWidgetProperty();
 
+  vtkClientServerID ObjectID;
   char *String;
   char *VTKCommand;
-  
+  //BTX
+  vtkPVSelectWidget::ElementTypes ElementType;
+  //ETX
 private:
   vtkPVStringWidgetProperty(const vtkPVStringWidgetProperty&); // Not implemented
   void operator=(const vtkPVStringWidgetProperty&); // Not implemented

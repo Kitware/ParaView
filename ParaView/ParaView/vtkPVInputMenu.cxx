@@ -60,7 +60,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVInputMenu);
-vtkCxxRevisionMacro(vtkPVInputMenu, "1.48");
+vtkCxxRevisionMacro(vtkPVInputMenu, "1.49");
 
 
 //----------------------------------------------------------------------------
@@ -322,7 +322,7 @@ vtkPVInputProperty* vtkPVInputMenu::GetInputProperty()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVInputMenu::AcceptInternal(const char*)
+void vtkPVInputMenu::AcceptInternal(vtkClientServerID)
 {
   // Since this is done on PVSource and not vtk source,
   // We can ignore the sourceTclName and return after the first call.

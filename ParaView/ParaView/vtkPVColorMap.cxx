@@ -73,10 +73,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkRenderWindow.h"
 #include "vtkScalarBarActor.h"
 #include "vtkScalarBarWidget.h"
-
+#include "vtkPVProcessModule.h"
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVColorMap);
-vtkCxxRevisionMacro(vtkPVColorMap, "1.66");
+vtkCxxRevisionMacro(vtkPVColorMap, "1.67");
 
 int vtkPVColorMapCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -161,7 +161,7 @@ vtkPVColorMap::vtkPVColorMap()
   this->NumberOfColors = 256;
 
   this->PVRenderView = NULL;
-  this->LookupTableTclName = NULL;
+  this->LookupTableID.ID = 0;
   this->LookupTable = NULL;
   this->ScalarBar = NULL;
   this->ScalarBarObserver = NULL;
@@ -245,13 +245,15 @@ vtkPVColorMap::~vtkPVColorMap()
 
   this->SetPVRenderView(NULL);
 
-  if (this->LookupTableTclName)
+  if (this->LookupTableID.ID)
     {
     if ( pvApp )
       {
-      pvApp->BroadcastScript("%s Delete", this->LookupTableTclName);
+      vtkPVProcessModule* pm = pvApp->GetProcessModule();
+      pm->DeleteStreamObject(this->LookupTableID);
+      pm->SendStreamToClientAndServer();
       }
-    this->SetLookupTableTclName(NULL);
+    this->LookupTableID.ID = 0;
     this->LookupTable = NULL;
     }
 
@@ -852,16 +854,18 @@ void vtkPVColorMap::SetNumberOfVectorComponents(int  num)
 //----------------------------------------------------------------------------
 void vtkPVColorMap::CreateParallelTclObjects(vtkPVApplication *pvApp)
 {
-  char tclName[100];
-  
   this->vtkKWWidget::SetApplication(pvApp);
+  vtkPVProcessModule* pm = pvApp->GetProcessModule();
   
-  sprintf(tclName, "LookupTable%d", this->InstanceCount);
-  this->SetLookupTableTclName(tclName);
-  this->LookupTable = static_cast<vtkLookupTable*>(
-    pvApp->MakeTclObject("vtkLookupTable", this->LookupTableTclName));
-  pvApp->BroadcastScript("%s SetVectorModeToComponent", this->LookupTableTclName);  
-
+  this->LookupTableID = pm->NewStreamObject("vtkLookupTable");
+  pm->SendStreamToClientAndServer();
+  
+  this->LookupTable =
+    vtkLookupTable::SafeDownCast(pm->GetObjectFromID(this->LookupTableID));
+  pm->GetStream() << vtkClientServerStream::Invoke 
+                  << this->LookupTableID << "SetVectorModeToComponent"
+                  << vtkClientServerStream::End;
+  
   this->ScalarBar = vtkScalarBarWidget::New();
   this->ScalarBar->SetInteractor(
     this->PVRenderView->GetPVWindow()->GetInteractor());
@@ -1151,7 +1155,7 @@ void vtkPVColorMap::SetScalarBarLabelFormat(const char* name)
 void vtkPVColorMap::UpdateLookupTable()
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
-
+  vtkPVProcessModule* pm = pvApp->GetProcessModule();
 
   // The a hue is arbitrary, make is consistent
   // so we do not get unexpected interpolated hues.
@@ -1163,18 +1167,25 @@ void vtkPVColorMap::UpdateLookupTable()
     {
     this->EndHSV[0] = this->StartHSV[0];
     }
-
-  pvApp->BroadcastScript("%s SetNumberOfTableValues %d", this->LookupTableTclName,
-                         this->NumberOfColors);
-
-  pvApp->BroadcastScript("%s SetHueRange %f %f", this->LookupTableTclName,
-                         this->StartHSV[0], this->EndHSV[0]);
-  pvApp->BroadcastScript("%s SetSaturationRange %f %f", this->LookupTableTclName,
-                         this->StartHSV[1], this->EndHSV[1]);
-  pvApp->BroadcastScript("%s SetValueRange %f %f", this->LookupTableTclName,
-                         this->StartHSV[2], this->EndHSV[2]);
-  pvApp->BroadcastScript("%s ForceBuild",
-                         this->LookupTableTclName);
+  pm->GetStream() << vtkClientServerStream::Invoke
+                  << this->LookupTableID << "SetNumberOfTableValues"
+                  << this->NumberOfColors
+                  << vtkClientServerStream::End;
+  pm->GetStream() << vtkClientServerStream::Invoke
+                  << this->LookupTableID << "SetHueRange"
+                  << this->StartHSV[0] << this->EndHSV[0]
+                  << vtkClientServerStream::End;
+  pm->GetStream() << vtkClientServerStream::Invoke
+                  << this->LookupTableID << "SetSaturationRange"
+                  << this->StartHSV[2] << this->EndHSV[2]
+                  << vtkClientServerStream::End;
+  pm->GetStream() << vtkClientServerStream::Invoke
+                  << this->LookupTableID << "SetValueRange"
+                  << this->StartHSV[2] << this->EndHSV[2]
+                  << vtkClientServerStream::End;
+  pm->GetStream() << vtkClientServerStream::Invoke
+                  << this->LookupTableID << "ForceBuild"
+                  << vtkClientServerStream::End;
 
   if (this->MapWidth > 0 && this->MapHeight > 0)
     {
@@ -1292,12 +1303,28 @@ void vtkPVColorMap::SetColorSchemeToRGBW()
   this->EndHSV[2] = 1.0;
 
   vtkPVApplication* pvApp = this->GetPVApplication();
-  pvApp->BroadcastScript("%s SetNumberOfTableValues 4", this->LookupTableTclName);
-  pvApp->BroadcastScript("%s SetTableValue 0 1 0 0 1", this->LookupTableTclName);
-  pvApp->BroadcastScript("%s SetTableValue 1 0 1 0 1", this->LookupTableTclName);
-  pvApp->BroadcastScript("%s SetTableValue 2 0 0 1 1", this->LookupTableTclName);
-  pvApp->BroadcastScript("%s SetTableValue 3 1 1 1 1", this->LookupTableTclName);
-
+  vtkPVProcessModule* pm = pvApp->GetProcessModule();
+  pm->GetStream() << vtkClientServerStream::Invoke 
+                  << this->LookupTableID << "SetNumberOfTableValues"
+                  << 4
+                  << vtkClientServerStream::End;
+  pm->GetStream() << vtkClientServerStream::Invoke 
+                  << this->LookupTableID << "SetTableValue"
+                  << 0 << 1 << 0 << 0 << 1
+                  << vtkClientServerStream::End;
+  pm->GetStream() << vtkClientServerStream::Invoke 
+                  << this->LookupTableID << "SetTableValue"
+                  << 1 << 0 << 1 << 0 << 1
+                  << vtkClientServerStream::End;
+  pm->GetStream() << vtkClientServerStream::Invoke 
+                  << this->LookupTableID << "SetTableValue"
+                  << 2 << 0 << 0 << 1 << 1
+                  << vtkClientServerStream::End;
+  pm->GetStream() << vtkClientServerStream::Invoke 
+                  << this->LookupTableID << "SetTableValue"
+                  << 3 << 1 << 1 << 1 << 1
+                  << vtkClientServerStream::End;
+  pm->SendStreamToClientAndServer();
   if (this->MapWidth > 0 && this->MapHeight > 0)
     {
     this->UpdateMap(this->MapWidth, this->MapHeight);
@@ -1418,6 +1445,7 @@ void vtkPVColorMap::SetScalarRange(float min, float max)
 void vtkPVColorMap::SetScalarRangeInternal(float min, float max)
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
+  vtkPVProcessModule* pm = pvApp->GetProcessModule();
   char str[256];
 
   sprintf(str, "%g", min);
@@ -1432,11 +1460,12 @@ void vtkPVColorMap::SetScalarRangeInternal(float min, float max)
 
   this->ScalarRange[0] = min;
   this->ScalarRange[1] = max;
+  pm->GetStream() << vtkClientServerStream::Invoke 
+                  << this->LookupTableID << "SetTableRange"
+                  << min << max
+                  << vtkClientServerStream::End;
 
-  pvApp->BroadcastScript("%s SetTableRange %g %g", 
-                         this->LookupTableTclName, min, max);
-  //this->Script("%s Build", this->LookupTableTclName);
-  //this->Script("%s Modified", this->LookupTableTclName);
+  pm->SendStreamToClientAndServer();
 
   this->Modified();
 }
@@ -1471,10 +1500,12 @@ void vtkPVColorMap::SetVectorComponent(int component)
     {
     return;
     }
-
-  pvApp->BroadcastScript("%s SetVectorComponent %d", 
-                         this->LookupTableTclName, component);
-
+  vtkPVProcessModule* pm = pvApp->GetProcessModule();
+  pm->GetStream() << vtkClientServerStream::Invoke 
+                  << this->LookupTableID << "SetVectorComponent"
+                  << component
+                  << vtkClientServerStream::End;
+  pm->SendStreamToClientAndServer();
   this->Modified();
 }
 
@@ -1676,20 +1707,20 @@ void vtkPVColorMap::SaveInBatchScript(ofstream *file)
     }
   this->VisitedFlag = 1;
 
-  *file << "vtkLookupTable " << this->LookupTableTclName << endl;
-  *file << "\t" << this->LookupTableTclName << " SetNumberOfTableValues " 
+  *file << "vtkLookupTable pvTemp" << this->LookupTableID << endl;
+  *file << "\tpvTemp" << this->LookupTableID << " SetNumberOfTableValues " 
         << this->NumberOfColors << endl;
-  *file << "\t" << this->LookupTableTclName << " SetHueRange " 
+  *file << "\tpvTemp" << this->LookupTableID << " SetHueRange " 
         << this->StartHSV[0] << " " << this->EndHSV[0] << endl;
-  *file << "\t" << this->LookupTableTclName << " SetSaturationRange " 
+  *file << "\tpvTemp" << this->LookupTableID << " SetSaturationRange " 
         << this->StartHSV[1] << " " << this->EndHSV[1] << endl;
-  *file << "\t" << this->LookupTableTclName << " SetValueRange " 
+  *file << "\tpvTemp" << this->LookupTableID << " SetValueRange " 
         << this->StartHSV[2] << " " << this->EndHSV[2] << endl;
-  *file << "\t" << this->LookupTableTclName << " SetTableRange "
+  *file << "\tpvTemp" << this->LookupTableID << " SetTableRange "
         << this->ScalarRange[0] << " " << this->ScalarRange[1] << endl;
-  *file << "\t" << this->LookupTableTclName << " SetVectorComponent " 
+  *file << "\tpvTemp" << this->LookupTableID << " SetVectorComponent " 
         << this->VectorComponent << endl;
-  *file << "\t" << this->LookupTableTclName << " Build" << endl;
+  *file << "\tpvTemp" << this->LookupTableID << " Build" << endl;
 
   if (this->ScalarBarVisibility)
     {
@@ -1701,8 +1732,8 @@ void vtkPVColorMap::SaveInBatchScript(ofstream *file)
     *file << "vtkScalarBarActor " << scalarBarTclName << "\n";
     actor << scalarBarTclName << ends;
 
-    *file << "\t" << actor.str() << " SetLookupTable " 
-          << this->LookupTableTclName << "\n";
+    *file << "\t" << actor.str() << " SetLookupTable pvTemp" 
+          << this->LookupTableID << "\n";
 
     *file << "\t" << actor.str() << " SetOrientation "
           << this->ScalarBar->GetScalarBarActor()->GetOrientation() << "\n";
@@ -1974,8 +2005,11 @@ void vtkPVColorMap::VectorModeMagnitudeCallback()
   this->AddTraceEntry("$kw(%s) VectorModeMagnitudeCallback", 
                       this->GetTclName());
 
-  pvApp->BroadcastScript("%s SetVectorModeToMagnitude", 
-                         this->LookupTableTclName);  
+  vtkPVProcessModule* pm = pvApp->GetProcessModule();
+  pm->GetStream() << vtkClientServerStream::Invoke 
+                  << this->LookupTableID << "SetVectorModeToMagnitude"
+                  << vtkClientServerStream::End;
+  pm->SendStreamToClientAndServer();
   this->VectorMode = vtkPVColorMap::MAGNITUDE;
   this->Script("pack forget %s",
                this->VectorComponentMenu->GetWidgetName());
@@ -1996,8 +2030,11 @@ void vtkPVColorMap::VectorModeComponentCallback()
   this->AddTraceEntry("$kw(%s) VectorModeComponentCallback", 
                       this->GetTclName());
 
-  pvApp->BroadcastScript("%s SetVectorModeToComponent", 
-                         this->LookupTableTclName);  
+  vtkPVProcessModule* pm = pvApp->GetProcessModule();
+  pm->GetStream() << vtkClientServerStream::Invoke 
+                  << this->LookupTableID << "SetVectorModeToComponent"
+                  << vtkClientServerStream::End;
+  pm->SendStreamToClientAndServer();
   this->VectorMode = vtkPVColorMap::COMPONENT;
   this->Script("pack %s -side left -expand f -fill both -padx 2",
                this->VectorComponentMenu->GetWidgetName());
@@ -2222,8 +2259,8 @@ void vtkPVColorMap::PrintSelf(ostream& os, vtkIndent indent)
      << this->NumberOfVectorComponents << endl;
 
   os << indent << "VectorComponent: " << this->VectorComponent << endl;
-  os << indent << "LookupTableTclName: " 
-     << (this->LookupTableTclName ? this->LookupTableTclName : "none" )
+  os << indent << "LookupTableID: " 
+     << this->LookupTableID
      << endl;
   os << indent << "ScalarBar: " << this->ScalarBar << endl;
   os << indent << "ScalarBarCheck: " << this->ScalarBarCheck << endl;

@@ -52,7 +52,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectionList);
-vtkCxxRevisionMacro(vtkPVSelectionList, "1.37");
+vtkCxxRevisionMacro(vtkPVSelectionList, "1.38");
 
 int vtkPVSelectionListCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -213,11 +213,11 @@ const char *vtkPVSelectionList::GetLabel()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVSelectionList::AcceptInternal(const char* sourceTclName)
+void vtkPVSelectionList::AcceptInternal(vtkClientServerID sourceId)
 {
   this->ModifiedFlag = 0;
   this->Property->SetIndex(this->CurrentValue);
-  this->Property->SetVTKSourceTclName(sourceTclName);
+  this->Property->SetVTKSourceID(sourceId);
   
   this->Property->AcceptInternal();
 }

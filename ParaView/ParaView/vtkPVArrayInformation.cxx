@@ -21,7 +21,7 @@ modification, are permitted provided that the following conditions are met:
    and/or other materials provided with the distribution.
 
  * Neither the name of Kitware nor the names of any contributors may be used
-   to endorse or promote products derived from this software without specific 
+   to endorse or promote products derived from this software without specific
    prior written permission.
 
  * Modified source versions must be plainly marked as such, and must not be
@@ -41,34 +41,57 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "vtkPVArrayInformation.h"
 
-#include "vtkObjectFactory.h"
+#include "vtkClientServerStream.h"
 #include "vtkDataArray.h"
-#include "vtkByteSwap.h"
+#include "vtkObjectFactory.h"
 
-//----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVArrayInformation);
-vtkCxxRevisionMacro(vtkPVArrayInformation, "1.7");
+vtkCxxRevisionMacro(vtkPVArrayInformation, "1.8");
 
 //----------------------------------------------------------------------------
 vtkPVArrayInformation::vtkPVArrayInformation()
 {
-  this->Name = NULL;
+  this->Name = 0;
   this->DataType = VTK_VOID;
   this->NumberOfComponents = 0;
-  this->Ranges = NULL;
+  this->Ranges = 0;
 }
 
 //----------------------------------------------------------------------------
 vtkPVArrayInformation::~vtkPVArrayInformation()
-{  
-  this->SetName(NULL);
-  if (this->Ranges)
+{
+  this->SetName(0);
+  if(this->Ranges)
     {
     delete [] this->Ranges;
     }
 }
 
+//----------------------------------------------------------------------------
+void vtkPVArrayInformation::PrintSelf(ostream& os, vtkIndent indent)
+{
+  int num, idx;
+  vtkIndent i2 = indent.GetNextIndent();
 
+  this->Superclass::PrintSelf(os,indent);
+  if (this->Name)
+    {
+    os << indent << "Name: " << this->Name << endl;
+    }
+  os << indent << "DataType: " << this->DataType << endl;
+  os << indent << "NumberOfComponents: " << this->NumberOfComponents << endl;
+
+  os << indent << "Ranges :" << endl;
+  num = this->NumberOfComponents;
+  if (num > 1)
+    {
+    ++num;
+    }
+  for (idx = 0; idx < num; ++idx)
+    {
+    os << i2 << this->Ranges[2*idx] << ", " << this->Ranges[2*idx+1] << endl;
+    }
+}
 
 //----------------------------------------------------------------------------
 void vtkPVArrayInformation::SetNumberOfComponents(int numComps)
@@ -89,10 +112,10 @@ void vtkPVArrayInformation::SetNumberOfComponents(int numComps)
     return;
     }
   if (numComps > 1)
-    { // Extra range for vector magnitude (first in array). 
+    { // Extra range for vector magnitude (first in array).
     numComps = numComps + 1;
     }
- 
+
   int idx;
   this->Ranges = new double[numComps*2];
   for (idx = 0; idx < numComps; ++idx)
@@ -101,7 +124,6 @@ void vtkPVArrayInformation::SetNumberOfComponents(int numComps)
     this->Ranges[2*idx+1] = -VTK_DOUBLE_MAX;
     }
 }
-
 
 //----------------------------------------------------------------------------
 void vtkPVArrayInformation::SetComponentRange(int comp, double min, double max)
@@ -131,7 +153,7 @@ double* vtkPVArrayInformation::GetComponentRange(int comp)
     return NULL;
     }
   if (this->NumberOfComponents > 1)
-    { // Shift over vector mag range.    
+    { // Shift over vector mag range.
     ++comp;
     }
   if (comp < 0)
@@ -145,7 +167,7 @@ double* vtkPVArrayInformation::GetComponentRange(int comp)
 void vtkPVArrayInformation::GetComponentRange(int comp, double *range)
 {
   double *ptr;
-  
+
   ptr = this->GetComponentRange(comp);
 
   if (ptr == NULL)
@@ -221,8 +243,29 @@ void vtkPVArrayInformation::DeepCopy(vtkPVArrayInformation *info)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVArrayInformation::CopyFromArray(vtkDataArray *array)
+int vtkPVArrayInformation::Compare(vtkPVArrayInformation *info)
 {
+  if (info == NULL)
+    {
+    return 0;
+    }
+  if (strcmp(info->GetName(), this->Name) == 0 &&
+      info->GetNumberOfComponents() == this->NumberOfComponents)
+    {
+    return 1;
+    }
+  return 0;
+}
+
+//----------------------------------------------------------------------------
+void vtkPVArrayInformation::CopyFromObject(vtkObject* obj)
+{
+  vtkDataArray* array = vtkDataArray::SafeDownCast(obj);
+  if(!array)
+    {
+    vtkErrorMacro("Cannot downcast to array.");
+    }
+
   double range[2];
   double *ptr;
   int idx;
@@ -233,6 +276,7 @@ void vtkPVArrayInformation::CopyFromArray(vtkDataArray *array)
   ptr = this->Ranges;
   if (this->NumberOfComponents > 1)
     {
+    // First store range of vector magnitude.
     array->GetRange(range, -1);
     *ptr++ = range[0];
     *ptr++ = range[1];
@@ -246,192 +290,71 @@ void vtkPVArrayInformation::CopyFromArray(vtkDataArray *array)
 }
 
 //----------------------------------------------------------------------------
-int vtkPVArrayInformation::Compare(vtkPVArrayInformation *info)
+void vtkPVArrayInformation::AddInformation(vtkPVInformation*)
 {
-  if (info == NULL)
-    {
-    return 0;
-    }
-  if (strcmp(info->GetName(), this->Name) == 0 && 
-      info->GetNumberOfComponents() == this->NumberOfComponents)
-    {
-    return 1;
-    }
-  return 0;
-}
-
-
-
-//----------------------------------------------------------------------------
-int vtkPVArrayInformation::GetMessageLength()
-{
-  int length = 0;
-  
-  // Short for name length.
-  length += sizeof(short);
-  // N (length) charaters for name (including last /0 charater).
-  if (this->Name)
-    {
-    length += (static_cast<int>(strlen(this->Name)) + 1) * sizeof(unsigned char);
-    } 
-  // char for a data type.
-  length += sizeof(unsigned char);
-  // char for number of components
-  length += sizeof(unsigned char);
-  // doubles for ranges.
-  if (this->NumberOfComponents == 1)
-    {
-    length += 2*sizeof(double);
-    }
-  else if (this->NumberOfComponents > 1)
-    {
-    length += 2*(this->NumberOfComponents+1)*sizeof(double);
-    }
-
-  return length;
 }
 
 //----------------------------------------------------------------------------
-int vtkPVArrayInformation::WriteMessage(unsigned char *msg)
+void vtkPVArrayInformation::CopyToStream(vtkClientServerStream* css) const
 {
-  int length = 0;
-  short nameLength;
-  
-  if (this->Name == NULL)
-    {
-    nameLength = 0;
-    }
-  else
-    {
-    nameLength = (int)(strlen(this->Name)) + 1;
-    }
+  css->Reset();
+  *css << vtkClientServerStream::Reply;
 
-  // Short for name length.
-  memcpy(msg, &nameLength, sizeof(nameLength));
-  msg += sizeof(short); 
-  length += sizeof(short);
-  if (this->Name)
-    {
-    // N (length) charaters for name (including last /0 charater).
-    memcpy(msg, this->Name, nameLength);
-    msg += nameLength * sizeof(unsigned char);
-    length += nameLength * sizeof(unsigned char);
-    } 
+  // Array name, data type, and number of components.
+  *css << this->Name;
+  *css << this->DataType;
+  *css << this->NumberOfComponents;
 
-  // char for a data type.
-  *msg = (unsigned char)(this->DataType);
-  msg += sizeof(unsigned char);
-  length += sizeof(unsigned char);
-  // char for number of components
-  *msg = (unsigned char)(this->NumberOfComponents);
-  msg += sizeof(unsigned char);
-  length += sizeof(unsigned char);
-
-  // doubles for ranges.
-  int num, idx;
-  num = this->NumberOfComponents;
-  if (num > 1)
+  // Range of each component.
+  int num = this->NumberOfComponents;
+  if(this->NumberOfComponents > 1)
     {
+    // First range is range of vector magnitude.
     ++num;
     }
-  for (idx = 0; idx < num; ++idx)
+  for(int i=0; i < num; ++i)
     {
-    memcpy(msg, (unsigned char*)&this->Ranges[2*idx], sizeof(double));
-    msg += sizeof(double);
-    length += sizeof(double);
-    memcpy(msg, (unsigned char*)&this->Ranges[2*idx + 1], sizeof(double));
-    msg += sizeof(double);
-    length += sizeof(double);
+    *css << vtkClientServerStream::InsertArray(this->Ranges + 2*i, 2);
     }
 
-  return length;
+  *css << vtkClientServerStream::End;
 }
 
 //----------------------------------------------------------------------------
-int vtkPVArrayInformation::CopyFromMessage(unsigned char *msg, int swap)
+void vtkPVArrayInformation::CopyFromStream(const vtkClientServerStream* css)
 {
-  int length = 0;
-  short nameLength;
-  
-  // Clear out some info.
-  if (this->Name)
+  // Array name.
+  const char* name = 0;
+  if(!css->GetArgument(0, 0, &name))
     {
-    delete [] this->Name;
-    this->Name = NULL;
+    vtkErrorMacro("Error parsing array name from message.");
+    return;
+    }
+  this->SetName(name);
+
+  // Data type.
+  if(!css->GetArgument(0, 1, &this->DataType))
+    {
+    vtkErrorMacro("Error parsing array data type from message.");
+    return;
     }
 
-  // Short for name length.
-  if (swap) {vtkByteSwap::SwapVoidRange((void *)msg, 1, sizeof(short));}
-  memcpy(&nameLength, msg, sizeof(short));
-  msg += sizeof(short); 
-  length += sizeof(short);
-
-  if (nameLength > 0)
+  // Number of components.
+  int num;
+  if(!css->GetArgument(0, 2, &num))
     {
-    this->SetName((char*)msg);
-    msg += nameLength;
-    length += nameLength;
-    } 
-
-  // char for a data type.
-  this->DataType = *((unsigned char*)msg);
-  msg += 1;
-  length += 1;
-  // char for number of components
-  this->SetNumberOfComponents(*((unsigned char*)msg));
-  msg += 1;
-  length += 1;
-
-  // doubles for ranges.
-  int num, idx;
-  num = this->NumberOfComponents;
-  if (num > 1)
-    {
-    ++num;
+    vtkErrorMacro("Error parsing number of components from message.");
+    return;
     }
-  for (idx = 0; idx < num; ++idx)
+  this->SetNumberOfComponents(num);
+
+  // Range of each component.
+  for(int i=0; i < num; ++i)
     {
-    if (swap) {vtkByteSwap::SwapVoidRange((void *)msg, 2, sizeof(double));}
-    memcpy((unsigned char*)&this->Ranges[2*idx], msg, sizeof(double));
-    msg += sizeof(double);
-    length += sizeof(double);
-    memcpy((unsigned char*)&this->Ranges[2*idx + 1], msg, sizeof(double));
-    msg += sizeof(double);
-    length += sizeof(double);
-    }
-
-  return length;
-}
-
-
-//----------------------------------------------------------------------------
-void vtkPVArrayInformation::PrintSelf(ostream& os, vtkIndent indent)
-{
-  int num, idx;
-  vtkIndent i2 = indent.GetNextIndent();
-
-  this->Superclass::PrintSelf(os,indent);
-  if (this->Name)
-    {
-    os << indent << "Name: " << this->Name << endl;
-    }
-  os << indent << "DataType: " << this->DataType << endl;
-  os << indent << "NumberOfComponents: " << this->NumberOfComponents << endl;
-
-  os << indent << "Ranges :" << endl;
-  num = this->NumberOfComponents;
-  if (num > 1)
-    {
-    ++num;
-    }
-  for (idx = 0; idx < num; ++idx)
-    {
-    os << i2 << this->Ranges[2*idx] << ", " << this->Ranges[2*idx+1] << endl;
+    if(!css->GetArgument(0, 3+i, this->Ranges + 2*i, 2))
+      {
+      vtkErrorMacro("Error parsing range of component.");
+      return;
+      }
     }
 }
-
-
-  
-
-
-

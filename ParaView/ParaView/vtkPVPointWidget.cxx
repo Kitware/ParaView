@@ -62,7 +62,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkRenderer.h"
 
 vtkStandardNewMacro(vtkPVPointWidget);
-vtkCxxRevisionMacro(vtkPVPointWidget, "1.22");
+vtkCxxRevisionMacro(vtkPVPointWidget, "1.23");
 
 int vtkPVPointWidgetCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -141,7 +141,7 @@ void vtkPVPointWidget::ResetInternal()
 
 
 //----------------------------------------------------------------------------
-void vtkPVPointWidget::AcceptInternal(const char* sourceTclName)  
+void vtkPVPointWidget::AcceptInternal(vtkClientServerID sourceID)  
 {
   this->SetPositionInternal(this->PositionEntry[0]->GetValueAsFloat(),
                             this->PositionEntry[1]->GetValueAsFloat(),
@@ -149,7 +149,7 @@ void vtkPVPointWidget::AcceptInternal(const char* sourceTclName)
 
   this->UpdateVTKObject();
   
-  this->Superclass::AcceptInternal(sourceTclName);
+  this->Superclass::AcceptInternal(sourceID);
 }
 
 //---------------------------------------------------------------------------
@@ -170,17 +170,20 @@ void vtkPVPointWidget::Trace(ofstream *file)
 void vtkPVPointWidget::UpdateVTKObject()  
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
-
+  
   // Accept point
   char acceptCmd[1024];
-  if ( this->VariableName && this->ObjectTclName )
+  if ( this->VariableName && this->ObjectID.ID )
     {    
-    sprintf(acceptCmd, "%s Set%s %f %f %f", this->ObjectTclName, 
-            this->VariableName,
-            this->PositionEntry[0]->GetValueAsFloat(),
-            this->PositionEntry[1]->GetValueAsFloat(),
-            this->PositionEntry[2]->GetValueAsFloat());
-    pvApp->GetProcessModule()->ServerScript(acceptCmd);
+    sprintf(acceptCmd, "Set%s", this->VariableName);
+    vtkPVProcessModule* pm = pvApp->GetProcessModule();
+    pm->GetStream() << vtkClientServerStream::Invoke << this->ObjectID
+                    << acceptCmd 
+                    << this->PositionEntry[0]->GetValueAsFloat()
+                    << this->PositionEntry[1]->GetValueAsFloat()
+                    << this->PositionEntry[2]->GetValueAsFloat()
+                    << vtkClientServerStream::End;
+    pm->SendStreamToServer();
     }
   
   this->SetLastAcceptedPosition(this->PositionEntry[0]->GetValueAsFloat(),
@@ -190,8 +193,7 @@ void vtkPVPointWidget::UpdateVTKObject()
 
 
 //----------------------------------------------------------------------------
-void vtkPVPointWidget::SaveInBatchScriptForPart(ofstream *, 
-                                                const char*)
+void vtkPVPointWidget::SaveInBatchScriptForPart(ofstream *, vtkClientServerID)
 {
 }
 
@@ -212,9 +214,6 @@ vtkPVPointWidget* vtkPVPointWidget::ClonePrototype(vtkPVSource* pvSource,
 //----------------------------------------------------------------------------
 void vtkPVPointWidget::ChildCreate(vtkPVApplication* pvApp)
 {
-  static int instanceCount = 0;
-  char tclName[256];
-
   if ((this->TraceNameState == vtkPVWidget::Uninitialized ||
        this->TraceNameState == vtkPVWidget::Default) )
     {
@@ -222,12 +221,12 @@ void vtkPVPointWidget::ChildCreate(vtkPVApplication* pvApp)
     this->SetTraceNameState(vtkPVWidget::SelfInitialized);
     }
 
-  ++instanceCount;
-  sprintf(tclName, "pvPointWidget%d", instanceCount);
-  pvApp->BroadcastScript("vtkPointWidget %s", tclName);
-  pvApp->BroadcastScript("%s AllOff", tclName);
-  this->SetWidget3DTclName(tclName);
-
+  vtkPVProcessModule* pm = pvApp->GetProcessModule();
+  this->Widget3DID = pm->NewStreamObject("vtkPointWidget");
+  pm->GetStream() << vtkClientServerStream::Invoke << this->Widget3DID << "AllOff" 
+                  << vtkClientServerStream::End;
+  pm->SendStreamToClientAndServer();
+  
   this->SetFrameLabel("Point Widget");
   this->Labels[0]->SetParent(this->Frame->GetFrame());
   this->Labels[0]->Create(pvApp, "");
@@ -341,14 +340,16 @@ void vtkPVPointWidget::ActualPlaceWidget()
 
 //----------------------------------------------------------------------------
 void vtkPVPointWidget::SetPositionInternal(float x, float y, float z)
-{
+{ 
+  vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
   this->PositionEntry[0]->SetValue(x);
   this->PositionEntry[1]->SetValue(y);
   this->PositionEntry[2]->SetValue(z);  
-  if ( this->Widget3DTclName )
+  if ( this->Widget3DID.ID )
     {
-    this->GetPVApplication()->BroadcastScript(
-      "%s SetPosition %f %f %f", this->Widget3DTclName, x, y, z);
+    pm->GetStream() << vtkClientServerStream::Invoke << this->Widget3DID 
+                    << "SetPosition" << x << y << z << vtkClientServerStream::End;
+    pm->SendStreamToClientAndServer();
     }
   this->Render();
 }
@@ -382,8 +383,7 @@ void vtkPVPointWidget::SetPosition()
     {
     val[cc] = atof(this->PositionEntry[cc]->GetValue());
     }
-  this->GetPVApplication()->BroadcastScript(
-    "%s SetPosition %f %f %f", this->Widget3DTclName, val[0], val[1], val[2]);
+  this->SetPositionInternal(val[0], val[1], val[2]);
   this->ModifiedCallback();
   this->ValueChanged = 0;
 }

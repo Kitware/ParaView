@@ -69,7 +69,7 @@ public:
   // Called when accept button is pushed.  
   // Sets objects variable to the widgets value.
   // Adds a trace entry.  Side effect is to turn modified flag off.
-  virtual void AcceptInternal(const char*);
+  virtual void AcceptInternal(vtkClientServerID);
   
   // Description:
   // Called when the reset button is pushed.
@@ -163,12 +163,8 @@ protected:
   char* FrameLabel;
 
   vtkDataArrayCollection* TimeSets;
-  vtkSetStringMacro(TimeSetsTclName);
-  char* TimeSetsTclName;
-  
-  // Set TimeSetsTclName with the tcl name of the TimeSets instance.
-  void SetupTimeSetsTclName();
-  
+  vtkClientServerID ServerSideID;
+
   // Fill the TimeSets collection with that from the actual reader.
   void SetTimeSetsFromReader();
 
@@ -182,7 +178,7 @@ protected:
 
   // Description:
   // An interface for saving a widget into a script.
-  virtual void SaveInBatchScriptForPart(ofstream *file, const char* sourceTclName);
+  virtual void SaveInBatchScriptForPart(ofstream *file, vtkClientServerID);
 
 };
 

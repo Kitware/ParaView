@@ -117,7 +117,7 @@ public:
   // Description:
   // Called when accept button is pushed.
   // Adds to the trace file and sets the objects variable from UI.
-  virtual void AcceptInternal(const char* sourceTclName);
+  virtual void AcceptInternal(vtkClientServerID);
 
   // Description:
   // Called when reset button is pushed.

@@ -60,7 +60,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVXMLElement.h"
 
 vtkStandardNewMacro(vtkPVOrientScaleWidget);
-vtkCxxRevisionMacro(vtkPVOrientScaleWidget, "1.8");
+vtkCxxRevisionMacro(vtkPVOrientScaleWidget, "1.9");
 
 vtkCxxSetObjectMacro(vtkPVOrientScaleWidget, InputMenu, vtkPVInputMenu);
 
@@ -718,7 +718,7 @@ void vtkPVOrientScaleWidget::ScaleModeMenuCallback()
   this->UpdateScaleFactor();
 }
 
-void vtkPVOrientScaleWidget::AcceptInternal(const char *sourceTclName)
+void vtkPVOrientScaleWidget::AcceptInternal(vtkClientServerID sourceID)
 {
   float scalars[3];
   scalars[0] = this->OrientModeMenu->GetMenu()->GetIndex(
@@ -727,7 +727,7 @@ void vtkPVOrientScaleWidget::AcceptInternal(const char *sourceTclName)
     this->ScaleModeMenu->GetValue());
   scalars[2] = this->ScaleFactorEntry->GetValueAsFloat();
   
-  this->Property->SetVTKSourceTclName(sourceTclName);
+  this->Property->SetVTKSourceID(sourceID);
   this->Property->SetString(0, (char*)(this->ScalarsMenu->GetValue()));
   this->Property->SetString(1, (char*)(this->VectorsMenu->GetValue()));
   this->Property->SetScalars(3, scalars);

@@ -64,16 +64,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLODPartDisplay);
-vtkCxxRevisionMacro(vtkPVLODPartDisplay, "1.6");
+vtkCxxRevisionMacro(vtkPVLODPartDisplay, "1.7");
 
 
 //----------------------------------------------------------------------------
 vtkPVLODPartDisplay::vtkPVLODPartDisplay()
 {
-  this->LODDeciTclName = NULL;
-  this->LODDeciTclName = NULL;
-  this->LODMapperTclName = NULL;
-  this->LODUpdateSuppressorTclName = NULL;
+  this->LODDeciID.ID = 0;
+  this->LODMapperID.ID = 0;
+  this->LODUpdateSuppressorID.ID = 0;
 
   this->Information = vtkPVLODPartDisplayInformation::New();
   this->InformationIsValid = 0;
@@ -84,29 +83,25 @@ vtkPVLODPartDisplay::vtkPVLODPartDisplay()
 vtkPVLODPartDisplay::~vtkPVLODPartDisplay()
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
-    
-  if ( pvApp && this->LODMapperTclName)
-    {
-    pvApp->BroadcastScript("%s Delete", this->LODMapperTclName);
-    }
-  this->SetLODMapperTclName(NULL);
-  
-  if (this->LODDeciTclName)
-    {
     if ( pvApp )
       {
-      pvApp->BroadcastScript("%s Delete", this->LODDeciTclName);
-      }
-    this->SetLODDeciTclName(NULL);
-    }
-
-  if (this->LODUpdateSuppressorTclName)
-    {
-    if ( pvApp )
+    vtkPVProcessModule* pm = pvApp->GetProcessModule();
+    if(this->LODMapperID.ID)
       {
-      pvApp->BroadcastScript("%s Delete", this->LODUpdateSuppressorTclName);
+      pm->DeleteStreamObject(this->LODMapperID);
+      this->LODMapperID.ID = 0;
+    }
+    if(this->LODDeciID.ID)
+    {
+      pm->DeleteStreamObject(this->LODDeciID);
+      this->LODDeciID.ID = 0;
       }
-    this->SetLODUpdateSuppressorTclName(NULL);
+    if(this->LODUpdateSuppressorID.ID)
+      {
+      pm->DeleteStreamObject(this->LODUpdateSuppressorID);
+      this->LODUpdateSuppressorID.ID = 0;
+      }
+    pm->SendStreamToClientAndServer();
     }
 
   this->Information->Delete();
@@ -125,7 +120,7 @@ vtkPVLODPartDisplayInformation* vtkPVLODPartDisplay::GetInformation()
     return 0;
     }
   this->GetPVApplication()->GetProcessModule()->GatherInformation(
-                 this->Information, this->LODDeciTclName);
+                 this->Information, this->LODDeciID);
 
   this->InformationIsValid = 1;
 
@@ -134,79 +129,124 @@ vtkPVLODPartDisplayInformation* vtkPVLODPartDisplay::GetInformation()
 
 
 //----------------------------------------------------------------------------
-void vtkPVLODPartDisplay::ConnectToGeometry(char* geometryTclName)
+void vtkPVLODPartDisplay::ConnectToGeometry(vtkClientServerID geometryID)
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
-
+  vtkPVProcessModule* pm = pvApp->GetProcessModule();
+  vtkClientServerStream& stream = pm->GetStream();
   // Superclass connects the full res pipeline.
-  this->Superclass::ConnectToGeometry(geometryTclName);
-
-  // The input of course is the geometry filter.
-  pvApp->BroadcastScript("%s SetInput [%s GetOutput]", 
-                         this->LODDeciTclName, geometryTclName);
+  this->Superclass::ConnectToGeometry(geometryID);
+  
+  stream << vtkClientServerStream::Invoke << geometryID
+         << "GetOutput" << vtkClientServerStream::End;
+  stream << vtkClientServerStream::Invoke << this->LODDeciID << "SetInput" 
+         << vtkClientServerStream::LastResult << vtkClientServerStream::End;
+  pm->SendStreamToClientAndServer();
 }
 
 //----------------------------------------------------------------------------
 void vtkPVLODPartDisplay::CreateParallelTclObjects(vtkPVApplication *pvApp)
 {
-  char tclName[100];
-    
   this->Superclass::CreateParallelTclObjects(pvApp);
+  vtkPVProcessModule* pm = pvApp->GetProcessModule();
 
   // Create the decimation filter which branches the LOD pipeline.
-  sprintf(tclName, "LODDeci%d", this->InstanceCount);
-  this->LODDeciTclName = NULL;
-  this->SetLODDeciTclName(tclName);
-  pvApp->BroadcastScript("vtkQuadricClustering %s", tclName);
+  this->LODDeciID = pm->NewStreamObject("vtkQuadricClustering");
+
   // Keep track of how long each decimation filter takes to execute.
-  pvApp->BroadcastScript("%s AddObserver StartEvent {$Application LogStartEvent {Execute Decimate}}", 
-                         this->LODDeciTclName);
-  pvApp->BroadcastScript("%s AddObserver EndEvent {$Application LogEndEvent {Execute Decimate}}", 
-                         this->LODDeciTclName);
-  pvApp->BroadcastScript("%s CopyCellDataOn", this->LODDeciTclName);
-  pvApp->BroadcastScript("%s UseInputPointsOn", this->LODDeciTclName);
-  pvApp->BroadcastScript("%s UseInternalTrianglesOff", this->LODDeciTclName);
+  vtkClientServerStream cmd;
+  cmd << vtkClientServerStream::Invoke
+      << pm->GetApplicationID() << "LogStartEvent" << "Execute Decimate"
+      << vtkClientServerStream::End;
+  pm->GetStream()
+    << vtkClientServerStream::Invoke
+    << this->LODDeciID << "AddObserver" << "StartEvent" << cmd
+    << vtkClientServerStream::End;
+  cmd.Reset();
+  cmd << vtkClientServerStream::Invoke
+      << pm->GetApplicationID() << "LogEndEvent" << "Execute Decimate"
+      << vtkClientServerStream::End;
+  pm->GetStream()
+    << vtkClientServerStream::Invoke
+    << this->LODDeciID << "AddObserver" << "EndEvent" << cmd
+    << vtkClientServerStream::End;
+  pm->GetStream()
+    << vtkClientServerStream::Invoke
+    << this->LODDeciID << "CopyCellDataOn"
+    << vtkClientServerStream::End;
+  pm->GetStream()
+    << vtkClientServerStream::Invoke
+    << this->LODDeciID << "UseInputPointsOn"
+    << vtkClientServerStream::End;
+  pm->GetStream()
+    << vtkClientServerStream::Invoke
+    << this->LODDeciID << "UseInternalTrianglesOff"
+    << vtkClientServerStream::End;
   // These options reduce seams, but makes the decimation too slow.
   //pvApp->BroadcastScript("%s UseFeatureEdgesOn", this->LODDeciTclName);
   //pvApp->BroadcastScript("%s UseFeaturePointsOn", this->LODDeciTclName);
   // This should be changed to origin and spacing determined globally.
+  int res[3] = {this->LODResolution,this->LODResolution,this->LODResolution};
+  pm->GetStream()
+    << vtkClientServerStream::Invoke
+    << this->LODDeciID << "SetNumberOfDivisions"
+    << vtkClientServerStream::InsertArray(res, 3)
+    << vtkClientServerStream::End;
+  pm->SendStreamToClientAndServer();
 
-  pvApp->BroadcastScript("%s SetNumberOfDivisions %d %d %d", 
-                         this->LODDeciTclName, this->LODResolution, 
-                         this->LODResolution, this->LODResolution);
-
-
-  // ===== LOD branch:
-  sprintf(tclName, "LODUpdateSuppressor%d", this->InstanceCount);
-  pvApp->BroadcastScript("vtkPVUpdateSuppressor %s", tclName);
-  this->SetLODUpdateSuppressorTclName(tclName);
-  if (this->LODDeciTclName)
-    {
-    pvApp->BroadcastScript("%s SetInput [%s GetOutput]", 
-                           this->LODUpdateSuppressorTclName, 
-                           this->LODDeciTclName);
-    }
 
   // ===== LOD branch:
-  sprintf(tclName, "LODMapper%d", this->InstanceCount);
-  pvApp->MakeTclObject("vtkPolyDataMapper", tclName);
-  this->LODMapperTclName = NULL;
-  this->SetLODMapperTclName(tclName);
-  pvApp->BroadcastScript("%s UseLookupTableScalarRangeOn", this->LODMapperTclName);
-  //pvApp->BroadcastScript("%s SetColorModeToMapScalars", this->LODMapperTclName);
-  pvApp->BroadcastScript("%s SetInput [%s GetOutput]", this->LODMapperTclName,
-                         this->LODUpdateSuppressorTclName);
-  pvApp->BroadcastScript("%s SetImmediateModeRendering %d", this->LODMapperTclName,
-                  pvApp->GetMainView()->GetImmediateModeCheck()->GetState());
- 
-  pvApp->BroadcastScript("%s SetLODMapper %s", this->PropTclName,
-                         this->LODMapperTclName);
-  
-  // Broadcast for subclasses.  
-  pvApp->BroadcastScript("%s SetUpdateNumberOfPieces [[$Application GetProcessModule] GetNumberOfPartitions]",
-                        this->LODUpdateSuppressorTclName);
-  pvApp->BroadcastScript("%s SetUpdatePiece [[$Application GetProcessModule] GetPartitionId]",
-                        this->LODUpdateSuppressorTclName);
+  this->LODUpdateSuppressorID = pm->NewStreamObject("vtkPVUpdateSuppressor");
+  pm->GetStream()
+    << vtkClientServerStream::Invoke << this->LODDeciID << "GetOutput"
+    << vtkClientServerStream::End
+    << vtkClientServerStream::Invoke << this->LODUpdateSuppressorID
+    << "SetInput" << vtkClientServerStream::LastResult
+    << vtkClientServerStream::End;
+  pm->SendStreamToClientAndServer();
+
+  // ===== LOD branch:
+  this->LODMapperID = pm->NewStreamObject("vtkPolyDataMapper");
+  pm->GetStream()
+    << vtkClientServerStream::Invoke
+    << this->LODMapperID << "UseLookupTableScalarRangeOn"
+    << vtkClientServerStream::End;
+  pm->GetStream()
+    << vtkClientServerStream::Invoke
+    << this->LODUpdateSuppressorID << "GetOutput"
+    << vtkClientServerStream::End
+    << vtkClientServerStream::Invoke
+    << this->LODMapperID << "SetInput" << vtkClientServerStream::LastResult
+    << vtkClientServerStream::End;
+  pm->GetStream()
+    << vtkClientServerStream::Invoke
+    << this->LODMapperID << "SetImmediateModeRendering"
+    << pvApp->GetMainView()->GetImmediateModeCheck()->GetState()
+    << vtkClientServerStream::End;
+  pm->GetStream()
+    << vtkClientServerStream::Invoke
+    << this->PropID << "SetLODMapper" << this->LODMapperID
+    << vtkClientServerStream::End;
+  pm->SendStreamToClientAndServer();
+
+  // Broadcast for subclasses.
+  pm->GetStream()
+    << vtkClientServerStream::Invoke
+    << pm->GetProcessModuleID() << "GetNumberOfPartitions"
+    << vtkClientServerStream::End
+    << vtkClientServerStream::Invoke
+    << this->LODUpdateSuppressorID << "SetUpdateNumberOfPieces"
+    << vtkClientServerStream::LastResult
+    << vtkClientServerStream::End;
+  pm->GetStream()
+    << vtkClientServerStream::Invoke
+    << pm->GetProcessModuleID() << "GetPartitionId"
+    << vtkClientServerStream::End
+    << vtkClientServerStream::Invoke
+    << this->LODUpdateSuppressorID << "SetUpdatePiece"
+    << vtkClientServerStream::LastResult
+    << vtkClientServerStream::End;
+  pm->SendStreamToClientAndServer();
 }
 
 
@@ -215,45 +255,66 @@ void vtkPVLODPartDisplay::ColorByArray(vtkPVColorMap *colorMap,
                                        int field)
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
+  vtkPVProcessModule* pm = pvApp->GetProcessModule();
 
-  // Turn off the specualr so it does not interfere with data.
-  pvApp->BroadcastScript("%s SetSpecular 0.0", 
-                         this->PropertyTclName);
+  // Turn off the specular so it does not interfere with data.
+  pm->GetStream()
+    << vtkClientServerStream::Invoke
+    << this->PropertyID << "SetSpecular" << 0.0
+    << vtkClientServerStream::End;
+  pm->GetStream()
+    << vtkClientServerStream::Invoke
+    << this->MapperID << "SetLookupTable" << colorMap->GetLookupTableID()
+    << vtkClientServerStream::End;
+  pm->GetStream()
+    << vtkClientServerStream::Invoke
+    << this->MapperID << "ScalarVisibilityOn"
+    << vtkClientServerStream::End;
 
-  pvApp->BroadcastScript("%s SetLookupTable %s", 
-                         this->MapperTclName,
-                         colorMap->GetLookupTableTclName());
-  pvApp->BroadcastScript("%s ScalarVisibilityOn", 
-                         this->MapperTclName);
   if (field == VTK_CELL_DATA_FIELD)
     {
-    pvApp->BroadcastScript("%s SetScalarModeToUseCellFieldData",
-                           this->MapperTclName);
-    pvApp->BroadcastScript("%s SetScalarModeToUseCellFieldData",
-                           this->LODMapperTclName);
+    pm->GetStream()
+      << vtkClientServerStream::Invoke
+      << this->MapperID << "SetScalarModeToUseCellFieldData"
+      << vtkClientServerStream::End;
+    pm->GetStream()
+      << vtkClientServerStream::Invoke
+      << this->LODMapperID << "SetScalarModeToUseCellFieldData"
+      << vtkClientServerStream::End;
     }
   else if (field == VTK_POINT_DATA_FIELD)
     {
-    pvApp->BroadcastScript("%s SetScalarModeToUsePointFieldData",
-                           this->MapperTclName);
-    pvApp->BroadcastScript("%s SetScalarModeToUsePointFieldData",
-                           this->LODMapperTclName);
+    pm->GetStream()
+      << vtkClientServerStream::Invoke
+      << this->MapperID << "SetScalarModeToUsePointFieldData"
+      << vtkClientServerStream::End;
+    pm->GetStream()
+      << vtkClientServerStream::Invoke
+      << this->LODMapperID << "SetScalarModeToUsePointFieldData"
+      << vtkClientServerStream::End;
     }
   else
     {
     vtkErrorMacro("Only point or cell field please.");
     }
 
-  pvApp->BroadcastScript("%s SelectColorArray {%s}",
-                         this->MapperTclName, colorMap->GetArrayName());
-
-  pvApp->BroadcastScript("%s SetLookupTable %s", 
-                         this->LODMapperTclName,
-                         colorMap->GetLookupTableTclName());
-  pvApp->BroadcastScript("%s ScalarVisibilityOn", 
-                         this->LODMapperTclName);
-  pvApp->BroadcastScript("%s SelectColorArray {%s}",
-                         this->LODMapperTclName, colorMap->GetArrayName());
+  pm->GetStream()
+    << vtkClientServerStream::Invoke
+    << this->MapperID << "SelectColorArray" << colorMap->GetArrayName()
+    << vtkClientServerStream::End;
+  pm->GetStream()
+    << vtkClientServerStream::Invoke
+    << this->LODMapperID << "SetLookupTable" << colorMap->GetLookupTableID()
+    << vtkClientServerStream::End;
+  pm->GetStream()
+    << vtkClientServerStream::Invoke
+    << this->LODMapperID << "ScalarVisibilityOn"
+    << vtkClientServerStream::End;
+  pm->GetStream()
+    << vtkClientServerStream::Invoke
+    << this->LODMapperID << "SelectColorArray" << colorMap->GetArrayName()
+    << vtkClientServerStream::End;
+  pm->SendStreamToClientAndServer();
 }
 
 
@@ -261,22 +322,30 @@ void vtkPVLODPartDisplay::ColorByArray(vtkPVColorMap *colorMap,
 void vtkPVLODPartDisplay::SetScalarVisibility(int val)
 {
   vtkPVApplication* pvApp = this->GetPVApplication();
-
-  pvApp->BroadcastScript("%s SetScalarVisibility %d", 
-                         this->MapperTclName, val);
-  pvApp->BroadcastScript("%s SetScalarVisibility %d", 
-                         this->LODMapperTclName, val);
+  vtkPVProcessModule* pm = pvApp->GetProcessModule();
+  pm->GetStream()
+    << vtkClientServerStream::Invoke
+    << this->MapperID << "SetScalarVisibility" << val
+    << vtkClientServerStream::End;
+  pm->GetStream()
+    << vtkClientServerStream::Invoke
+    << this->LODMapperID << "SetScalarVisibility" << val
+    << vtkClientServerStream::End;
+  pm->SendStreamToClientAndServer();
 }
 
 //----------------------------------------------------------------------------
 void vtkPVLODPartDisplay::SetUseImmediateMode(int val)
 {
   vtkPVApplication* pvApp = this->GetPVApplication();
+  vtkPVProcessModule* pm = pvApp->GetProcessModule();
 
   this->Superclass::SetUseImmediateMode(val);
-  pvApp->BroadcastScript("%s SetImmediateModeRendering %d",
-                         this->GetLODMapperTclName(),
-                         val);
+  pm->GetStream()
+    << vtkClientServerStream::Invoke
+    << this->LODMapperID << "SetImmediateModeRendering" << val
+    << vtkClientServerStream::End;
+  pm->SendStreamToClientAndServer();
 }
 
 //----------------------------------------------------------------------------
@@ -291,8 +360,12 @@ void vtkPVLODPartDisplay::SetLODResolution(int res)
   vtkPVApplication* pvApp = this->GetPVApplication();
   if (pvApp)
     {
-    pvApp->BroadcastScript("%s SetNumberOfDivisions %d %d %d", 
-                           this->LODDeciTclName, res, res, res);
+    vtkPVProcessModule* pm = pvApp->GetProcessModule();
+    pm->GetStream()
+      << vtkClientServerStream::Invoke
+      << this->LODDeciID << "SetNumberOfDivisions" << res << res << res
+      << vtkClientServerStream::End;
+    pm->SendStreamToClientAndServer();
     }
   this->InvalidateGeometry();
 }
@@ -303,12 +376,20 @@ void vtkPVLODPartDisplay::SetLODResolution(int res)
 void vtkPVLODPartDisplay::Update()
 {
   vtkPVApplication* pvApp = this->GetPVApplication();
+  vtkPVProcessModule* pm = pvApp->GetProcessModule();
 
-  if ( ! this->GeometryIsValid && this->UpdateSuppressorTclName )
+  if ( ! this->GeometryIsValid && this->UpdateSuppressorID.ID )
     {
     this->InformationIsValid = 0;
-    pvApp->BroadcastScript("%s ForceUpdate", this->UpdateSuppressorTclName);
-    pvApp->BroadcastScript("%s ForceUpdate", this->LODUpdateSuppressorTclName);
+    pm->GetStream()
+      << vtkClientServerStream::Invoke
+      << this->UpdateSuppressorID << "ForceUpdate"
+      << vtkClientServerStream::End;
+    pm->GetStream()
+      << vtkClientServerStream::Invoke
+      << this->LODUpdateSuppressorID << "ForceUpdate"
+      << vtkClientServerStream::End;
+    pm->SendStreamToClientAndServer();
     this->GeometryIsValid = 1;
     }
 }
@@ -319,9 +400,16 @@ void vtkPVLODPartDisplay::RemoveAllCaches()
 {
   if (this->PVApplication)
     {
-    this->GetPVApplication()->BroadcastScript(
-             "%s RemoveAllCaches; %s RemoveAllCaches",
-             this->UpdateSuppressorTclName, this->LODUpdateSuppressorTclName);
+    vtkPVProcessModule* pm = this->PVApplication->GetProcessModule();
+    pm->GetStream()
+      << vtkClientServerStream::Invoke
+      << this->UpdateSuppressorID << "RemoveAllCaches"
+      << vtkClientServerStream::End;
+    pm->GetStream()
+      << vtkClientServerStream::Invoke
+      << this->LODUpdateSuppressorID << "RemoveAllCaches"
+      << vtkClientServerStream::End;
+    pm->SendStreamToClientAndServer();
     }
 }
 
@@ -331,10 +419,16 @@ void vtkPVLODPartDisplay::RemoveAllCaches()
 // This is like the ForceUpdate method, but uses cached values if possible.
 void vtkPVLODPartDisplay::CacheUpdate(int idx, int total)
 {
-  this->GetPVApplication()->BroadcastScript(
-             "%s CacheUpdate %d %d; %s CacheUpdate %d %d",
-             this->UpdateSuppressorTclName, idx, total,
-             this->LODUpdateSuppressorTclName, idx, total);
+  vtkPVProcessModule* pm = this->PVApplication->GetProcessModule();
+  pm->GetStream()
+    << vtkClientServerStream::Invoke
+    << this->UpdateSuppressorID << "CacheUpdate" << idx << total
+    << vtkClientServerStream::End;
+  pm->GetStream()
+    << vtkClientServerStream::Invoke
+    << this->LODUpdateSuppressorID << "CacheUpdate" << idx << total
+    << vtkClientServerStream::End;
+  pm->SendStreamToClientAndServer();
 }
 
 
@@ -351,16 +445,31 @@ void vtkPVLODPartDisplay::SetDirectColorFlag(int val)
     }
 
   vtkPVApplication* pvApp = this->GetPVApplication();
+  vtkPVProcessModule* pm = pvApp->GetProcessModule();
   this->DirectColorFlag = val;
   if (val)
     {
-    pvApp->BroadcastScript("%s SetColorModeToDefault", this->MapperTclName);
-    pvApp->BroadcastScript("%s SetColorModeToDefault", this->LODMapperTclName);
+    pm->GetStream()
+      << vtkClientServerStream::Invoke
+      << this->MapperID << "SetColorModeToDefault"
+      << vtkClientServerStream::End;
+    pm->GetStream()
+      << vtkClientServerStream::Invoke
+      << this->LODMapperID << "SetColorModeToDefault"
+      << vtkClientServerStream::End;
+    pm->SendStreamToClientAndServer();
     }
   else
     {
-    pvApp->BroadcastScript("%s SetColorModeToMapScalars", this->MapperTclName);
-    pvApp->BroadcastScript("%s SetColorModeToMapScalars", this->LODMapperTclName);
+    pm->GetStream()
+      << vtkClientServerStream::Invoke
+      << this->MapperID << "SetColorModeToMapScalars"
+      << vtkClientServerStream::End;
+    pm->GetStream()
+      << vtkClientServerStream::Invoke
+      << this->LODMapperID << "SetColorModeToMapScalars"
+      << vtkClientServerStream::End;
+    pm->SendStreamToClientAndServer();
     }
 }
 
@@ -369,19 +478,10 @@ void vtkPVLODPartDisplay::SetDirectColorFlag(int val)
 void vtkPVLODPartDisplay::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
-  os << indent << "LODMapperTclName: " << (this->LODMapperTclName?this->LODMapperTclName:"none") << endl;
-  os << indent << "LODDeciTclName: " << (this->LODDeciTclName?this->LODDeciTclName:"none") << endl;
+  os << indent << "LODMapperID: " << this->LODMapperID.ID << endl;
+  os << indent << "LODDeciID: " << this->LODDeciID.ID << endl;
 
   os << indent << "LODResolution: " << this->LODResolution << endl;
-
-  if (this->LODUpdateSuppressorTclName)
-    {
-    os << indent << "LODUpdateSuppressor: " << this->LODUpdateSuppressorTclName << endl;
-    }
+  os << indent << "LODUpdateSuppressor: " << this->LODUpdateSuppressorID.ID
+     << endl;
 }
-
-
-  
-
-
-

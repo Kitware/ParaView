@@ -21,7 +21,7 @@ modification, are permitted provided that the following conditions are met:
    and/or other materials provided with the distribution.
 
  * Neither the name of Kitware nor the names of any contributors may be used
-   to endorse or promote products derived from this software without specific 
+   to endorse or promote products derived from this software without specific
    prior written permission.
 
  * Modified source versions must be plainly marked as such, and must not be
@@ -40,104 +40,23 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 #include "vtkPVLODPartDisplayInformation.h"
-#include "vtkObjectFactory.h"
+
+#include "vtkClientServerStream.h"
 #include "vtkDataObject.h"
+#include "vtkObjectFactory.h"
 #include "vtkQuadricClustering.h"
-#include "vtkByteSwap.h"
 
-
-//----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLODPartDisplayInformation);
-vtkCxxRevisionMacro(vtkPVLODPartDisplayInformation, "1.2");
+vtkCxxRevisionMacro(vtkPVLODPartDisplayInformation, "1.3");
 
 //----------------------------------------------------------------------------
-void vtkPVLODPartDisplayInformation::CopyFromObject(vtkObject* object)
+vtkPVLODPartDisplayInformation::vtkPVLODPartDisplayInformation()
 {
-  vtkDataObject** dataObjects;
-  vtkDataObject* geoData;
-  vtkDataObject* deciData;
-  vtkSource* deci;
-
-  deci = vtkQuadricClustering::SafeDownCast(object);
-  if (deci == NULL)
-    {
-    vtkErrorMacro("Could not downcast decimation filter.");
-    return;
-    }
-
-  // Get the data object form the decimate filter.
-  // This is a bit of a hack. Maybe we should have a PVPart object
-  // on all processes.
-  // Sanity checks to avoid slim chance of segfault.
-  dataObjects = deci->GetOutputs(); 
-  if (dataObjects == NULL || dataObjects[0] == NULL)
-    {
-    vtkErrorMacro("Could not get deci output.");
-    return;
-    }
-  deciData = dataObjects[0];
-  dataObjects = deci->GetInputs(); 
-  if (dataObjects == NULL || dataObjects[0] == NULL)
-    {
-    vtkErrorMacro("Could not get deci input.");
-    return;
-    }
-  geoData = dataObjects[0];
-
-  this->GeometryMemorySize = geoData->GetActualMemorySize();
-  this->LODGeometryMemorySize = deciData->GetActualMemorySize();
 }
 
 //----------------------------------------------------------------------------
-void vtkPVLODPartDisplayInformation::CopyFromMessage(unsigned char* msg)
+vtkPVLODPartDisplayInformation::~vtkPVLODPartDisplayInformation()
 {
-  int endianMarker;
-
-  memcpy((unsigned char*)&endianMarker, msg, sizeof(int));
-  if (endianMarker != 1)
-    {
-    // Mismatch endian between client and server.
-    vtkByteSwap::SwapVoidRange((void*)msg, 3, sizeof(int));
-    memcpy((unsigned char*)&endianMarker, msg, sizeof(int));
-    if (endianMarker != 1)
-      {
-      vtkErrorMacro("Could not decode information.");
-      this->GeometryMemorySize = this->GeometryMemorySize = 0;
-      return;
-      }
-    }
-  msg += sizeof(int);
-  memcpy((unsigned char*)&this->GeometryMemorySize, msg, sizeof(int));
-  msg += sizeof(int);
-  memcpy((unsigned char*)&this->LODGeometryMemorySize, msg, sizeof(int));  
-}
-
-//----------------------------------------------------------------------------
-void vtkPVLODPartDisplayInformation::AddInformation(vtkPVInformation* info)
-{
-  vtkPVLODPartDisplayInformation* pdInfo;
-
-  pdInfo = vtkPVLODPartDisplayInformation::SafeDownCast(info);
-  this->GeometryMemorySize += pdInfo->GetGeometryMemorySize();
-  this->LODGeometryMemorySize += pdInfo->GetLODGeometryMemorySize();
-}
-
-//----------------------------------------------------------------------------
-int vtkPVLODPartDisplayInformation::GetMessageLength()
-{
-  return 3 * static_cast<int>(sizeof(int));
-}
-
-//----------------------------------------------------------------------------
-void vtkPVLODPartDisplayInformation::WriteMessage(unsigned char* msg)
-{
-  int endianMarker = 1;
-
-  memcpy(msg, (unsigned char*)&endianMarker, sizeof(int));
-  msg += sizeof(int);
-  memcpy(msg, (unsigned char*)&this->GeometryMemorySize, sizeof(int));
-  msg += sizeof(int);
-  memcpy(msg, (unsigned char*)&this->LODGeometryMemorySize, sizeof(int));  
 }
 
 //----------------------------------------------------------------------------
@@ -145,12 +64,82 @@ void vtkPVLODPartDisplayInformation::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
 
-  os << indent << "GeometryMemorySize: " << this->GeometryMemorySize << endl;
-  os << indent << "LODGeometryMemorySize: " 
-     << this->LODGeometryMemorySize << endl;
+  os << indent << "GeometryMemorySize: " << this->GeometryMemorySize << "\n";
+  os << indent << "LODGeometryMemorySize: "
+     << this->LODGeometryMemorySize << "\n";
 }
 
-  
+//----------------------------------------------------------------------------
+void vtkPVLODPartDisplayInformation::CopyFromObject(vtkObject* obj)
+{
+  this->GeometryMemorySize = 0;
+  this->LODGeometryMemorySize = 0;
+  vtkQuadricClustering* deci = vtkQuadricClustering::SafeDownCast(obj);
+  if(!deci)
+    {
+    vtkErrorMacro("Could not downcast decimation filter.");
+    return;
+    }
 
+  // Get the data object form the decimate filter.  This is a bit of a
+  // hack. Maybe we should have a PVPart object on all processes.
+  // Sanity checks to avoid slim chance of segfault.
+  vtkDataObject** inputs = deci->GetInputs();
+  vtkDataObject** outputs = deci->GetOutputs();
+  if(!outputs || !outputs[0])
+    {
+    vtkErrorMacro("Could not get deci output.");
+    return;
+    }
+  if(!inputs || !inputs[0])
+    {
+    vtkErrorMacro("Could not get deci input.");
+    return;
+    }
+  vtkDataObject* geoData = inputs[0];
+  vtkDataObject* deciData = outputs[0];
 
+  this->GeometryMemorySize = geoData->GetActualMemorySize();
+  this->LODGeometryMemorySize = deciData->GetActualMemorySize();
+}
 
+//----------------------------------------------------------------------------
+void vtkPVLODPartDisplayInformation::AddInformation(vtkPVInformation* info)
+{
+  vtkPVLODPartDisplayInformation* pdInfo =
+    vtkPVLODPartDisplayInformation::SafeDownCast(info);
+  if(!pdInfo)
+    {
+    vtkErrorMacro("Cannot downcast to LODPartDisplay information.");
+    return;
+    }
+  this->GeometryMemorySize += pdInfo->GetGeometryMemorySize();
+  this->LODGeometryMemorySize += pdInfo->GetLODGeometryMemorySize();
+}
+
+//----------------------------------------------------------------------------
+void
+vtkPVLODPartDisplayInformation::CopyToStream(vtkClientServerStream* css) const
+{
+  css->Reset();
+  *css << vtkClientServerStream::Reply;
+  *css << this->GeometryMemorySize << this->LODGeometryMemorySize;
+  *css << vtkClientServerStream::End;
+}
+
+//----------------------------------------------------------------------------
+void
+vtkPVLODPartDisplayInformation
+::CopyFromStream(const vtkClientServerStream* css)
+{
+  if(!css->GetArgument(0, 0, &this->GeometryMemorySize))
+    {
+    vtkErrorMacro("Error parsing geometry memory size from message.");
+    return;
+    }
+  if(!css->GetArgument(0, 1, &this->LODGeometryMemorySize))
+    {
+    vtkErrorMacro("Error parsing LOD geometry memory size from message.");
+    return;
+    }
+}

@@ -62,7 +62,7 @@ public:
   // Description:
   // Test whether the file with the given name can be read by this
   // reader.
-  //virtual int CanReadFile(const char* name);
+  virtual int CanReadFile(const char* name);
   
   // Description:
   // Get the data array selection tables used to configure which data

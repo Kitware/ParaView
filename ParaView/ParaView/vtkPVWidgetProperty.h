@@ -39,16 +39,14 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-// .NAME vtkPVWidgetProperty - a class for passing values to a VTK object
+// .NAME vtkPVWidgetProperty
 // .SECTION Description
-// vtkPVWidgetProperty is a class for passing values from a GUI element to a
-// VTK object.
 
 #ifndef __vtkPVWidgetProperty_h
 #define __vtkPVWidgetProperty_h
 
 #include "vtkObject.h"
-
+#include "vtkClientServerID.h" // needed for vtkClientServerID
 class vtkPVWidget;
 
 class VTK_EXPORT vtkPVWidgetProperty : public vtkObject
@@ -57,43 +55,24 @@ public:
   static vtkPVWidgetProperty* New();
   vtkTypeRevisionMacro(vtkPVWidgetProperty, vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);
-
-  // Description:
-  // Set/get the vtkPVWidget that this property holds values for.
+  
   void SetWidget(vtkPVWidget *widget);
   vtkGetObjectMacro(Widget, vtkPVWidget);
 
-  // Description:
-  // Call Reset on the vtkPVWidget this object has a pointer to.
-  // This causes the values in the widget to be set to the ones in this
-  // property.
   virtual void Reset();
-  
-  // Description:
-  // Call Accept on the vtkPVWidget this object has a pointer to.
-  // This causes the values in this property to be set to the ones in the
-  // widget.
   virtual void Accept();
-  
-  // Description:
-  // Pass the values from this property to VTK.
   virtual void AcceptInternal() {}
 
-  // Description:
-  // Set the Tcl name of the VTK object that values will be passed to.
-  vtkSetStringMacro(VTKSourceTclName);
-
-  // Description:
-  // Set the animation time for this property.  This sets the modified flag on
-  // the widget, and then calls Reset on it.
   virtual void SetAnimationTime(float) {}
-  
+  // BTX
+  vtkSetMacro(VTKSourceID,vtkClientServerID);
+  // ETX
 protected:
   vtkPVWidgetProperty();
   ~vtkPVWidgetProperty();
 
   vtkPVWidget *Widget;
-  char *VTKSourceTclName;
+  vtkClientServerID VTKSourceID;
   
 private:
   vtkPVWidgetProperty(const vtkPVWidgetProperty&); // Not implemented

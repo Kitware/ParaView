@@ -100,7 +100,7 @@ public:
   // Description:
   // Gets called when the accept button is pressed. The sub-classes
   // should first call this and then do their own thing.
-  virtual void AcceptInternal(const char* sourceTclName);
+  virtual void AcceptInternal(vtkClientServerID);
 
   // Description:
   // This serves a dual purpose.  For tracing and for saving state.

@@ -52,6 +52,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 #include "vtkKWObject.h"
+#include "vtkClientServerStream.h"
 
 class vtkDataSet;
 class vtkPVApplication;
@@ -88,8 +89,21 @@ public:
   // source.  We could change the object so that it creates its own
   // data (during initia but then we would have to tell it what type
   // of data to create.
-  virtual void SetVTKDataTclName(const char* tclName);
-  vtkGetStringMacro(VTKDataTclName);  
+//  virtual void SetVTKDataTclName(const char* tclName);
+//  vtkGetStringMacro(VTKDataTclName);  
+
+  // Description:
+  // Set the id for the vtk data object.  This should be the primary
+  // method of manipulating the data since it exists on all processes.
+  // This is for setting up the links between VTK objects and PV
+  // object.  This call also sets the input to the mapper.
+  // SetVTKDataTclName should be called after the application has been
+  // set, but befor PVData is used as input a filter or output of a
+  // source.  We could change the object so that it creates its own
+  // data (during initia but then we would have to tell it what type
+  // of data to create.
+  virtual void SetVTKDataID(vtkClientServerID id);
+  vtkClientServerID GetVTKDataID() {return this->VTKDataID;}
 
   // Description:
   // This method is called on creation.  If the data object is unstructured and 
@@ -101,7 +115,7 @@ public:
   // Description:
   // Create the extent translator (sources with no inputs only).
   // Needs to be before "ExtractPieces" because translator propagates.
-  void CreateTranslatorIfNecessary(const char* translatorTclName);
+  void CreateTranslatorIfNecessary();
 
 
   //===================
@@ -112,8 +126,10 @@ public:
         
   // Description:
   // Get the tcl name of the vtkPVGeometryFilter.
-  vtkGetStringMacro(GeometryTclName);
+//  vtkGetStringMacro(GeometryTclName);
+  vtkClientServerID GetGeometryID() {return this->GeometryID;}
   
+
   // Description:
   // Moving away from direct access to VTK data objects.
   vtkPVDataInformation* GetDataInformation();
@@ -141,20 +157,20 @@ public:
   void SetPartDisplay(vtkPVPartDisplay* pDisp);
 
   // Description:
-  // VTKSourceIndex points to the VTKSourceTclName in this
+  // VTKSourceIndex points to the VTKSourceID in this
   // part's PVSource. The tcl name of the VTK source that produced
   // the data in this part can be obtained with
-  // source->GetVTKSourceTclName(part->GetVTKSourceIndex())
+  // source->GetVTKSourceID(part->GetVTKSourceIndex())
   // This is used during batch file generation.
   vtkGetMacro(VTKSourceIndex, int);
   vtkSetMacro(VTKSourceIndex, int);
 
   // Description:
-  // VTKOutputIndex together with  VTKSourceTclName is used
+  // VTKOutputIndex together with  VTKSourceID is used
   // to obtain the source of the data object in this part.
   // For example, the output in this data object is obtained
   // with "%s GetOutput %d",
-  // source->GetVTKSourceTclName(part->GetVTKSourceIndex()),
+  // source->GetVTKSourceID(part->GetVTKSourceIndex()),
   // part->GetVTKOutputIndex()
   // This is used during batch file generation.
   vtkGetMacro(VTKOutputIndex, int);
@@ -176,9 +192,12 @@ protected:
   vtkPVClassNameInformation *ClassNameInformation;
   
   char *VTKDataTclName;
+  vtkClientServerID GeometryID;
+  vtkClientServerID VTKDataID;
+  
     
-  char *GeometryTclName;
-  vtkSetStringMacro(GeometryTclName);
+//  char *GeometryTclName;
+//  vtkSetStringMacro(GeometryTclName);
 
   // Here to create unique names.
   int InstanceCount;

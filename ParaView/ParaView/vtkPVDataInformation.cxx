@@ -21,7 +21,7 @@ modification, are permitted provided that the following conditions are met:
    and/or other materials provided with the distribution.
 
  * Neither the name of Kitware nor the names of any contributors may be used
-   to endorse or promote products derived from this software without specific 
+   to endorse or promote products derived from this software without specific
    prior written permission.
 
  * Modified source versions must be plainly marked as such, and must not be
@@ -43,6 +43,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkByteSwap.h"
 #include "vtkCellData.h"
+#include "vtkClientServerStream.h"
 #include "vtkCollection.h"
 #include "vtkPVConfig.h" // needed for PARAVIEW_BUILD_DEVELOPMENT
 #ifdef PARAVIEW_BUILD_DEVELOPMENT
@@ -58,10 +59,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkRectilinearGrid.h"
 #include "vtkStructuredGrid.h"
 
-//----------------------------------------------------------------------------
-vtkStandardNewMacro(vtkPVDataInformation);
-vtkCxxRevisionMacro(vtkPVDataInformation, "1.17");
+#include <vtkstd/vector>
 
+vtkStandardNewMacro(vtkPVDataInformation);
+vtkCxxRevisionMacro(vtkPVDataInformation, "1.18");
 
 //----------------------------------------------------------------------------
 vtkPVDataInformation::vtkPVDataInformation()
@@ -84,10 +85,41 @@ vtkPVDataInformation::vtkPVDataInformation()
 vtkPVDataInformation::~vtkPVDataInformation()
 {
   this->PointDataInformation->Delete();
-  this->PointDataInformation = NULL;  
+  this->PointDataInformation = NULL;
   this->CellDataInformation->Delete();
-  this->CellDataInformation = NULL;  
+  this->CellDataInformation = NULL;
   this->SetName(NULL);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVDataInformation::PrintSelf(ostream& os, vtkIndent indent)
+{
+  vtkIndent i2 = indent.GetNextIndent();
+  this->Superclass::PrintSelf(os,indent);
+
+  os << indent << "DataSetType: " << this->DataSetType << endl;
+  os << indent << "NumberOfPoints: " << this->NumberOfPoints << endl;
+  os << indent << "NumberOfCells: " << this->NumberOfCells << endl;
+  os << indent << "MemorySize: " << this->MemorySize << endl;
+  os << indent << "Bounds: " << this->Bounds[0] << ", " << this->Bounds[1]
+     << ", " << this->Bounds[2] << ", " << this->Bounds[3]
+     << ", " << this->Bounds[4] << ", " << this->Bounds[5] << endl;
+  os << indent << "Extent: " << this->Extent[0] << ", " << this->Extent[1]
+     << ", " << this->Extent[2] << ", " << this->Extent[3]
+     << ", " << this->Extent[4] << ", " << this->Extent[5] << endl;
+  os << indent << "PointDataInformation " << endl;
+  this->PointDataInformation->PrintSelf(os, i2);
+  os << indent << "CellDataInformation " << endl;
+  this->CellDataInformation->PrintSelf(os, i2);
+
+  if (this->Name)
+    {
+    os << indent << "Name: " << this->Name << endl;
+    }
+  else
+    {
+    os << indent << "Name: NULL\n";
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -195,7 +227,7 @@ void vtkPVDataInformation::CopyFromDataSet(vtkDataSet* data)
     this->Bounds[idx] = bds[idx];
     }
   this->MemorySize = data->GetActualMemorySize();
-  
+
   this->DataSetType = data->GetDataObjectType();
   if (this->DataSetType == VTK_IMAGE_DATA)
     {
@@ -222,7 +254,7 @@ void vtkPVDataInformation::CopyFromDataSet(vtkDataSet* data)
 
   // Copy Cell Data information
   this->CellDataInformation->CopyFromDataSetAttributes(data->GetCellData());
- 
+
   // Look for a name stored in Field Data.
   vtkDataArray *nameArray = data->GetFieldData()->GetArray("Name");
   if (nameArray)
@@ -405,7 +437,7 @@ int vtkPVDataInformation::DataSetTypeIsA(const char* type)
     }
   if (strcmp(type, "vtkPointSet") == 0)
     {
-    if (this->DataSetType == VTK_POLY_DATA || 
+    if (this->DataSetType == VTK_POLY_DATA ||
         this->DataSetType == VTK_STRUCTURED_GRID ||
         this->DataSetType == VTK_UNSTRUCTURED_GRID)
       {
@@ -414,7 +446,7 @@ int vtkPVDataInformation::DataSetTypeIsA(const char* type)
     }
   if (strcmp(type, "vtkStructuredData") == 0)
     {
-    if (this->DataSetType == VTK_IMAGE_DATA || 
+    if (this->DataSetType == VTK_IMAGE_DATA ||
         this->DataSetType == VTK_STRUCTURED_GRID ||
         this->DataSetType == VTK_RECTILINEAR_GRID)
       {
@@ -425,243 +457,108 @@ int vtkPVDataInformation::DataSetTypeIsA(const char* type)
   return 0;
 }
 
-
-
 //----------------------------------------------------------------------------
-//void vtkPVDataInformation::AddInformation(vtkDataSet *data)
-//{
-// vtkPVDataInformation *info = vtkPVDataInformation::New();
-//
-//  info->CopyFromData(data);
-//  this->AddInformation(info);
-//  info->Delete();
-//}
-
-
-//----------------------------------------------------------------------------
-int vtkPVDataInformation::GetMessageLength()
+void vtkPVDataInformation::CopyToStream(vtkClientServerStream* css) const
 {
-  int length;
- 
-  // Figure out message length, and allocate memory.
-  // 1- First byte is a flag specifying big or little endian (ignore for now).
-  // 1- Second byte specifies the data set type.
-  length = 2*sizeof(unsigned char);
-  
-  // - vtkIdType for numberOfPoints
-  // - vtkIdType for numberOfCells
-  length += 2*sizeof(vtkIdType);
+  css->Reset();
+  *css << vtkClientServerStream::Reply;
+  *css << this->Name
+       << this->DataSetType
+       << this->NumberOfPoints
+       << this->NumberOfCells
+       << this->MemorySize
+       << vtkClientServerStream::InsertArray(this->Bounds, 6)
+       << vtkClientServerStream::InsertArray(this->Extent, 6);
 
-  // 1 int for memory size.
-  length += 1*sizeof(int);
+  size_t length;
+  const unsigned char* data;
+  vtkClientServerStream dcss;
 
-  // - 6 doubles for bounds.
-  // - 6 integers for extent.
-  length +=  + 6*sizeof(double) + 6*sizeof(int);
+  this->PointDataInformation->CopyToStream(&dcss);
+  dcss.GetData(&data, &length);
+  *css << vtkClientServerStream::InsertArray(data, length);
 
-  // - For each data set attributes ...
-  // Now add space for all of the cell and point data information.
-  length += this->PointDataInformation->GetMessageLength();
-  length += this->CellDataInformation->GetMessageLength();
+  dcss.Reset();
 
-  // One char for length,
-  int nameLength = 0;
-  if (this->Name)
-    {
-    nameLength = static_cast<int>(strlen(this->Name));
-    }
-  if (nameLength > 255)
-    {
-    nameLength = 255;
-    }
-  length += (nameLength+1) * sizeof(unsigned char);
+  this->CellDataInformation->CopyToStream(&dcss);
+  dcss.GetData(&data, &length);
+  *css << vtkClientServerStream::InsertArray(data, length);
 
-  return length;
-}
-
-
-
-
-//----------------------------------------------------------------------------
-void vtkPVDataInformation::WriteMessage(unsigned char* msg)
-{
-  int attrMsgLength;
-  unsigned char* tmp;
-  int idx;
-
-  int nameLength = 0;
-  if (this->Name)
-    {
-    nameLength = static_cast<int>(strlen(this->Name));
-    }
-  if (nameLength > 255)
-    {
-    nameLength = 255;
-    }
-
-  // Start filling in the message.
-  tmp = msg;
-#ifdef VTK_WORDS_BIGENDIAN
-  *tmp = (unsigned char)(1);
-#else
-  *tmp = (unsigned char)(0);
-#endif
-  tmp += sizeof(unsigned char);
-  *tmp = (unsigned char)(this->DataSetType);
-  tmp += sizeof(unsigned char);
-  memcpy(tmp, (unsigned char*)&this->NumberOfPoints, sizeof(vtkIdType));
-  tmp += sizeof(vtkIdType);
-  memcpy(tmp, (unsigned char*)&this->NumberOfCells, sizeof(vtkIdType));
-  tmp += sizeof(vtkIdType);
-  // Memory Size
-  memcpy(tmp, (unsigned char*)&this->MemorySize, sizeof(int));
-  tmp += sizeof(int);
-
-  // Bounds
-  for (idx = 0; idx < 6; ++idx)
-    {
-    memcpy(tmp, (unsigned char*)&this->Bounds[idx], sizeof(double));
-    tmp += sizeof(double);
-    }
-  // Extent
-  for (idx = 0; idx < 6; ++idx)
-    {
-    memcpy(tmp, (unsigned char*)&this->Extent[idx], sizeof(int));
-    tmp += sizeof(int);
-    }
-
-  // Point data
-  attrMsgLength = this->PointDataInformation->WriteMessage(tmp);
-  tmp += attrMsgLength;
-
-  // Cell data
-  attrMsgLength = this->CellDataInformation->WriteMessage(tmp);
-  tmp += attrMsgLength;
-
-  // Name
-  *tmp = static_cast<unsigned char>(nameLength);
-  ++tmp;
-  for (idx = 0; idx < nameLength; ++idx)
-    {
-    tmp[idx] = static_cast<unsigned char>(this->Name[idx]);
-    }
+  *css << vtkClientServerStream::End;
 }
 
 //----------------------------------------------------------------------------
-void vtkPVDataInformation::CopyFromMessage(unsigned char *msg)
+void vtkPVDataInformation::CopyFromStream(const vtkClientServerStream* css)
 {
-  unsigned char bigEndianFlag;
-  int swap = 0;
-  unsigned char* tmp;
-  int attrMsgLength;
-  int idx;
-
-  if (msg == NULL)
-    { // Something really bad has happend ...
+  const char* name = 0;
+  if(!css->GetArgument(0, 0, &name))
+    {
+    vtkErrorMacro("Error parsing name of data.");
+    return;
+    }
+  this->SetName(name);
+  if(!css->GetArgument(0, 1, &this->DataSetType))
+    {
+    vtkErrorMacro("Error parsing data set type.");
+    return;
+    }
+  if(!css->GetArgument(0, 2, &this->NumberOfPoints))
+    {
+    vtkErrorMacro("Error parsing number of points.");
+    return;
+    }
+  if(!css->GetArgument(0, 3, &this->NumberOfCells))
+    {
+    vtkErrorMacro("Error parsing number of cells.");
+    return;
+    }
+  if(!css->GetArgument(0, 4, &this->MemorySize))
+    {
+    vtkErrorMacro("Error parsing memory size.");
+    return;
+    }
+  if(!css->GetArgument(0, 5, this->Bounds, 6))
+    {
+    vtkErrorMacro("Error parsing bounds.");
+    return;
+    }
+  if(!css->GetArgument(0, 6, this->Extent, 6))
+    {
+    vtkErrorMacro("Error parsing extent.");
     return;
     }
 
-#ifdef VTK_WORDS_BIGENDIAN
-  bigEndianFlag = (unsigned char)(1);
-#else
-  bigEndianFlag = (unsigned char)(0);
-#endif
+  vtkTypeUInt32 length;
+  vtkstd::vector<unsigned char> data;
+  vtkClientServerStream dcss;
 
-  tmp = msg;
-  if (bigEndianFlag != *tmp)
+  // Point data array information.
+  if(!css->GetArgumentLength(0, 7, &length))
     {
-    swap = 1;
+    vtkErrorMacro("Error parsing length of point data information.");
+    return;
     }
-  tmp += 1;
-
-  this->DataSetType = *tmp;
-  tmp += 1;
-
-  if (swap) {vtkByteSwap::SwapVoidRange((void *)tmp, 1, sizeof(vtkIdType));}
-  memcpy((unsigned char*)&this->NumberOfPoints, tmp, sizeof(vtkIdType));
-  tmp += sizeof(vtkIdType);
-
-  if (swap) {vtkByteSwap::SwapVoidRange((void *)tmp, 1, sizeof(vtkIdType));}
-  memcpy((unsigned char*)&this->NumberOfCells, tmp, sizeof(vtkIdType));
-  tmp += sizeof(vtkIdType);
-
-  if (swap) {vtkByteSwap::SwapVoidRange((void *)tmp, 1, sizeof(int));}
-  memcpy((unsigned char*)&this->MemorySize, tmp, sizeof(int));
-  tmp += sizeof(int);
-
-  // Bounds
-  if (swap) {vtkByteSwap::SwapVoidRange((void *)tmp, 6, sizeof(double));}
-  for (idx = 0; idx < 6; ++idx)
+  data.resize(length);
+  if(!css->GetArgument(0, 7, &*data.begin(), length))
     {
-    memcpy((unsigned char*)&this->Bounds[idx], tmp, sizeof(double));
-    tmp += sizeof(double);
+    vtkErrorMacro("Error parsing point data information.");
+    return;
     }
+  dcss.SetData(&*data.begin(), length);
+  this->PointDataInformation->CopyFromStream(&dcss);
 
-  // Extent
-  if (swap) {vtkByteSwap::SwapVoidRange((void *)tmp, 6, sizeof(int));}
-  for (idx = 0; idx < 6; ++idx)
+  // Cell data array information.
+  if(!css->GetArgumentLength(0, 8, &length))
     {
-    memcpy((unsigned char*)&this->Extent[idx], tmp, sizeof(int));
-    tmp += sizeof(int);
+    vtkErrorMacro("Error parsing length of point data information.");
+    return;
     }
-
-  // Point data
-  attrMsgLength = this->PointDataInformation->CopyFromMessage(tmp, swap);
-  tmp += attrMsgLength;
-
-  // Cell data
-  attrMsgLength = this->CellDataInformation->CopyFromMessage(tmp, swap);
-  tmp += attrMsgLength;
-
-  int nameLength = *tmp;
-  ++tmp;
-  // Manually allocate and copy because their is no ending \0.
-  this->SetName(NULL);
-  this->Name = new char[nameLength + 1];
-  strncpy(this->Name, (char*)(tmp), nameLength);
-  this->Name[nameLength] = '\0';
+  data.resize(length);
+  if(!css->GetArgument(0, 8, &*data.begin(), length))
+    {
+    vtkErrorMacro("Error parsing point data information.");
+    return;
+    }
+  dcss.SetData(&*data.begin(), length);
+  this->CellDataInformation->CopyFromStream(&dcss);
 }
-
-
-//----------------------------------------------------------------------------
-void vtkPVDataInformation::PrintSelf(ostream& os, vtkIndent indent)
-{
-  vtkIndent i2 = indent.GetNextIndent();
-  this->Superclass::PrintSelf(os,indent);
-
-  os << indent << "DataSetType: " << this->DataSetType << endl;
-  os << indent << "NumberOfPoints: " << this->NumberOfPoints << endl;
-  os << indent << "NumberOfCells: " << this->NumberOfCells << endl;
-  os << indent << "MemorySize: " << this->MemorySize << endl;
-  os << indent << "Bounds: " << this->Bounds[0] << ", " << this->Bounds[1] 
-     << ", " << this->Bounds[2] << ", " << this->Bounds[3] 
-     << ", " << this->Bounds[4] << ", " << this->Bounds[5] << endl;
-  os << indent << "Extent: " << this->Extent[0] << ", " << this->Extent[1] 
-     << ", " << this->Extent[2] << ", " << this->Extent[3] 
-     << ", " << this->Extent[4] << ", " << this->Extent[5] << endl;
-  os << indent << "PointDataInformation " << endl;
-  this->PointDataInformation->PrintSelf(os, i2);
-  os << indent << "CellDataInformation " << endl;
-  this->CellDataInformation->PrintSelf(os, i2);
-
-  if (this->Name)
-    {
-    os << indent << "Name: " << this->Name << endl;
-    }
-  else  
-    {
-    os << indent << "Name: NULL\n";
-    }
-}
-
-  
-
-
-
-
-
-
-
-
-
-

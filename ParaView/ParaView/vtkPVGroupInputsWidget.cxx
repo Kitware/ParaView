@@ -56,7 +56,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVGroupInputsWidget);
-vtkCxxRevisionMacro(vtkPVGroupInputsWidget, "1.14");
+vtkCxxRevisionMacro(vtkPVGroupInputsWidget, "1.15");
 
 int vtkPVGroupInputsWidgetCommand(ClientData cd, Tcl_Interp *interp,
                                 int argc, char *argv[]);
@@ -175,7 +175,7 @@ void vtkPVGroupInputsWidget::Inactivate()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVGroupInputsWidget::AcceptInternal(const char* vtkSourceTclName)
+void vtkPVGroupInputsWidget::AcceptInternal(vtkClientServerID vtkSourceID)
 {
   int num, idx, count;
   int state;
@@ -201,8 +201,10 @@ void vtkPVGroupInputsWidget::AcceptInternal(const char* vtkSourceTclName)
   this->Inputs->RemoveAllItems();
 
   // Now loop through the input mask setting the selection states.
-  pvApp->GetProcessModule()->ServerScript("%s RemoveAllInputs",
-                                          vtkSourceTclName);
+  pvApp->GetProcessModule()->GetStream() << 
+    vtkClientServerStream::Invoke << vtkSourceID << "RemoveAllInputs" << 
+    vtkClientServerStream::End;
+  pvApp->GetProcessModule()->SendStreamToServer();
   this->PVSource->RemoveAllPVInputs();  
   sources->InitTraversal();
   for (idx = 0; idx < num; ++idx)

@@ -57,7 +57,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVTimerLogDisplay );
-vtkCxxRevisionMacro(vtkPVTimerLogDisplay, "1.11");
+vtkCxxRevisionMacro(vtkPVTimerLogDisplay, "1.12");
 
 int vtkPVTimerLogDisplayCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -320,7 +320,13 @@ void vtkPVTimerLogDisplay::SetThreshold(float val)
   vtkPVApplication* pvApp = this->GetPVApplication();
   if ( pvApp )
     {
-    pvApp->BroadcastScript("$Application SetLogThreshold %f", val);
+    vtkPVProcessModule* pm = pvApp->GetProcessModule();
+    pm->GetStream() << vtkClientServerStream::Invoke 
+                    << pm->GetApplicationID()
+                    << "SetLogThreshold"
+                    << val
+                    << vtkClientServerStream::End;
+    pm->SendStreamToClientAndServer();
     }
 
   this->Threshold = val;
@@ -337,8 +343,13 @@ void vtkPVTimerLogDisplay::SetBufferLength(int length)
   this->Modified();
 
   vtkPVApplication *pvApp = this->GetPVApplication();
-  pvApp->BroadcastScript("$Application SetLogBufferLength %d", length);
-
+  vtkPVProcessModule* pm = pvApp->GetProcessModule();
+  pm->GetStream() << vtkClientServerStream::Invoke 
+                  << pm->GetApplicationID()
+                  << "SetLogBufferLength"
+                  << length
+                  << vtkClientServerStream::End;
+  pm->SendStreamToClientAndServer();
   this->Update();
 }
 
@@ -354,7 +365,12 @@ int vtkPVTimerLogDisplay::GetBufferLength()
 void vtkPVTimerLogDisplay::Clear()
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
-  pvApp->BroadcastScript("$Application ResetLog");
+  vtkPVProcessModule* pm = pvApp->GetProcessModule();
+  pm->GetStream() << vtkClientServerStream::Invoke 
+                  << pm->GetApplicationID()
+                  << "ResetLog"
+                  << vtkClientServerStream::End;
+  pm->SendStreamToClientAndServer();
   this->Update();
 }
 
@@ -363,15 +379,14 @@ void vtkPVTimerLogDisplay::Clear()
 void vtkPVTimerLogDisplay::EnableCheckCallback()
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
-
-  if (this->EnableCheck->GetState())
-    {
-    pvApp->BroadcastScript("$Application SetEnableLog 1");
-    }
-  else
-    {
-    pvApp->BroadcastScript("$Application SetEnableLog 0");
-    }
+  vtkPVProcessModule* pm = pvApp->GetProcessModule();
+  
+  pm->GetStream() << vtkClientServerStream::Invoke 
+                  << pm->GetApplicationID()
+                  << "SetEnableLog"
+                  << this->EnableCheck->GetState()
+                  << vtkClientServerStream::End;
+  pm->SendStreamToClientAndServer();
 }
 
 //----------------------------------------------------------------------------
@@ -489,10 +504,10 @@ void vtkPVTimerLogDisplay::Update()
     this->TimerInformation = NULL;
     }
   this->TimerInformation = vtkPVTimerInformation::New();
-  pvApp->GetProcessModule()->GatherInformation(this->TimerInformation, 
-                                               "$Application");
-  // Special case for client-server.
-  // add the client process as a log.
+  vtkPVProcessModule* pm = pvApp->GetProcessModule();
+  pm->GatherInformation(this->TimerInformation, pm->GetApplicationID());
+
+  // Special case for client-server.  add the client process as a log.
   if (pvApp->GetClientMode())
     {
     vtkPVTimerInformation* tmp = vtkPVTimerInformation::New();

@@ -26,7 +26,8 @@ $warpOutput SetVisibility 0
 set pvWindow [lindex [vtkPVWindow ListInstances] 0]
 $pvWindow SetCurrentPVSourceCallback $pvWarp
 
-set camera [Ren1 GetActiveCamera]
+set Ren1 [[[$Application GetMainWindow] GetMainView] GetRenderer]
+set camera [$Ren1 GetActiveCamera]
 $camera SetPosition 143.632 4.67034 -39.8384
 $camera SetFocalPoint 2 12 4.1578e-15
 $camera SetViewUp 0.270701 -0.00149368 0.962662
@@ -36,7 +37,8 @@ $camera SetClippingRange 127.006 167.567
 [$pvWarp GetPVWidget {Vectors}] SetValue displacement1
 $pvWarp AcceptCallback
 
-RenWin1 SetSize 300 300
+set RenWin1 [[[$Application GetMainWindow] GetMainView] GetRenderWindow]
+$RenWin1 SetSize 300 300
 
 for {set i 1} {$i <= 2} {incr i 1} {
 	[$pvWarp GetPVWidget {Vectors}] SetValue displacement$i

@@ -101,6 +101,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkUnsignedIntArray.h"
 #include "vtkUnsignedLongArray.h"
 #include "vtkUnsignedShortArray.h"
+#include "vtkClientServerStream.h"
+#include "vtkClientServerInterpreter.h"
+#include "vtkGraphicsFactory.h"
+#include "vtkImagingFactory.h"
 
 // #include "vtkPVRenderGroupDialog.h"
 
@@ -124,7 +128,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.235");
+vtkCxxRevisionMacro(vtkPVApplication, "1.236");
 vtkCxxSetObjectMacro(vtkPVApplication, RenderModule, vtkPVRenderModule);
 
 
@@ -195,24 +199,9 @@ public:
   static vtkPVOutputWindow* New();
 
   void DisplayText(const char* t)
-    {
-    int cc;
-    ostrstream str;
-    for ( cc= 0; cc < vtkString::Length(t); cc ++ )
-      {
-      str << t[cc];
-      if ( t[cc] == '\n' )
-        {
-        str << "# ";
-        }
-      }
-    str << ends;
-    this->Application->AddTraceEntry("# %s\n#", str.str());
-    //cout << "# " << str.str() << endl;
-    str.rdbuf()->freeze(0);
-
+  {
     if ( this->Windows && this->Windows->GetNumberOfItems() &&
-      this->Windows->GetLastKWWindow() )
+         this->Windows->GetLastKWWindow() )
       {
       vtkKWWindow *win = this->Windows->GetLastKWWindow();
       char buffer[4096];      
@@ -231,16 +220,16 @@ public:
         char *rmessage = vtkString::Duplicate(message);
         int last = vtkString::Length(rmessage)-1;
         while ( last > 0 && 
-          (rmessage[last] == ' ' || rmessage[last] == '\n' || 
-           rmessage[last] == '\r' || rmessage[last] == '\t') )
+                (rmessage[last] == ' ' || rmessage[last] == '\n' || 
+                 rmessage[last] == '\r' || rmessage[last] == '\t') )
           {
           rmessage[last] = 0;
           last--;
           }
         sprintf(buffer, "There was a VTK %s in file: %s (%d)\n %s", 
-          (error ? "Error" : "Warning"),
-          file, line,
-          rmessage);
+                (error ? "Error" : "Warning"),
+                file, line,
+                rmessage);
         if ( error )
           {
           win->ErrorMessage(buffer);
@@ -256,35 +245,29 @@ public:
         delete [] rmessage;
         }
       }
-    }
+  }
   
   vtkPVOutputWindow()
   {
     this->Windows = 0;
     this->ErrorOccurred = 0;
     this->TestErrors = 1;
-    this->Application = 0;
   }
   
   void SetWindowCollection(vtkKWWindowCollection *windows)
   {
     this->Windows = windows;
   }
-  void SetApplication(vtkPVApplication* app)
-  {
-    this->Application = app;
-  }
 
   int GetErrorOccurred()
-  {
+    {
     return this->ErrorOccurred;
-  }
+    }
 
   void EnableTestErrors() { this->TestErrors = 1; }
   void DisableTestErrors() { this->TestErrors = 0; }
 protected:
   vtkKWWindowCollection *Windows;
-  vtkKWApplication *Application;
   int ErrorOccurred;
   int TestErrors;
 private:
@@ -323,20 +306,7 @@ Tcl_Interp *vtkPVApplication::InitializeTcl(int argc,
 #ifdef PARAVIEW_LINK_XDMF
   Vtkxdmftcl_Init(interp);
 #endif
-  
-  // Create the component loader procedure in Tcl.
-  char* script = vtkString::Duplicate(vtkPVApplication::LoadComponentProc);  
-  if (Tcl_GlobalEval(interp, script) != TCL_OK)
-    {
-    if (err)
-      {
-      *err << Tcl_GetStringResult(interp) << endl;
-      }
-    // ????
-    }  
-  delete [] script;
-
-  script = vtkString::Duplicate(vtkPVApplication::ExitProc);  
+  char* script = vtkString::Duplicate(vtkPVApplication::ExitProc);  
   if (Tcl_GlobalEval(interp, script) != TCL_OK)
     {
     if (err)
@@ -361,7 +331,9 @@ vtkPVApplication::vtkPVApplication()
   char name[128];
   sprintf(name, "ParaView%d.%d", this->MajorVersion, this->MinorVersion);
   this->SetApplicationVersionName(name);
-  this->SetApplicationReleaseName("1");
+  char patch[128];
+  sprintf(patch, "%d", PARAVIEW_VERSION_PATCH);
+  this->SetApplicationReleaseName(patch);
 
 
   this->Display3DWidgets = 0;
@@ -1140,8 +1112,13 @@ void vtkPVApplication::Start(int argc, char*argv[])
 
   if (this->RunBatchScript)
     {
-    this->BroadcastScript("$Application LoadScript {%s}", 
-                          this->GetBatchScriptName());
+    vtkPVProcessModule* pm = this->GetProcessModule();
+    pm->GetStream() << vtkClientServerStream::Invoke
+                    << pm->GetApplicationID()
+                    << "LoadScript"
+                    << this->GetBatchScriptName()
+                    << vtkClientServerStream::End;
+    pm->SendStreamToClientAndServer();
     this->Exit();
     return;
     }
@@ -1173,20 +1150,23 @@ void vtkPVApplication::Start(int argc, char*argv[])
 #ifdef VTK_USE_MANGLED_MESA
   if (this->UseSoftwareRendering)
     {
-    this->BroadcastScript("vtkGraphicsFactory _graphics_fact\n"
-                          "_graphics_fact SetUseMesaClasses 1\n"
-                          "_graphics_fact Delete");
-    this->BroadcastScript("vtkImagingFactory _imaging_fact\n"
-                          "_imaging_fact SetUseMesaClasses 1\n"
-                          "_imaging_fact Delete");
+    vtkPVProcessModule* pm = this->GetProcessModule();
+    vtkClientServerID gf = pm->NewStreamObject("vtkGraphicsFactory");
+    pm->GetStream() << vtkClientServerStream::Invoke
+                    << gf << "SetUseMesaClasses" << 1
+                    << vtkClientServerStream::End;
+    pm->DeleteStreamObject(gf);
+    vtkClientServerID imf = pm->NewStreamObject("vtkImagingFactory");
+    pm->GetStream() << vtkClientServerStream::Invoke
+                    << imf << "SetUseMesaClasses" << 1
+                    << vtkClientServerStream::End;
+    pm->DeleteStreamObject(imf);
+    pm->SendStreamToClientAndServer();
+
     if (this->UseSatelliteSoftware)
       {
-      this->Script("vtkGraphicsFactory _graphics_fact\n"
-                   "_graphics_fact SetUseMesaClasses 0\n"
-                   "_graphics_fact Delete");
-      this->Script("vtkImagingFactory _imaging_fact\n"
-                   "_imaging_fact SetUseMesaClasses 0\n"
-                   "_imaging_fact Delete");
+      vtkGraphicsFactory::SetUseMesaClasses(1);
+      vtkImagingFactory::SetUseMesaClasses(1);
       }
     }
 #endif
@@ -1366,7 +1346,6 @@ void vtkPVApplication::Start(int argc, char*argv[])
   this->Script("proc bgerror { m } "
                "{ global Application; $Application DisplayTCLError $m }");
   vtkPVOutputWindow *window = vtkPVOutputWindow::New();
-  window->SetApplication(this);
   window->SetWindowCollection( this->Windows );
   this->OutputWindow = window;
   vtkOutputWindow::SetInstance(this->OutputWindow);
@@ -1472,23 +1451,6 @@ void vtkPVApplication::Start(int argc, char*argv[])
     ui->LoadScript(open_files[cc].c_str());
     this->RunningParaViewScript = 0;
     }
-  
-  //********
-  // Simple test for Client/Server wrapper of vtkObject
-#if 0
-  vtkClientServerStream& stream = this->ProcessModule->GetStream();
-  vtkClientServerID instance_id = stream.GetUniqueID();
-  stream << vtkClientServerStream::New << "vtkObject" 
-         << instance_id << vtkClientServerStream::End;
-  stream << vtkClientServerStream::Invoke << instance_id
-         << "DebugOn" << vtkClientServerStream::End;
-  this->ProcessModule->SendMessages();
-  stream.Reset();
-  stream << vtkClientServerStream::Delete << instance_id 
-         << vtkClientServerStream::End;
-#endif
-  //********
-  
   
   if (this->PlayDemo)
     {
@@ -1676,9 +1638,13 @@ void vtkPVApplication::SetGlobalLODFlag(int val)
     {
     return;
     }
-
-  this->ProcessModule->BroadcastScript(
-                        "$Application SetGlobalLODFlagInternal %d",val);
+  vtkPVProcessModule* pm = this->GetProcessModule();
+  pm->GetStream() << vtkClientServerStream::Invoke
+                  << pm->GetApplicationID()
+                  << "SetGlobalLODFlagInternal"
+                  << val
+                  << vtkClientServerStream::End;
+  pm->SendStreamToClientAndServer();
 }
 
  
@@ -1717,6 +1683,7 @@ void vtkPVApplication::MakeServerTclObject(const char *className,
 {
   this->GetProcessModule()->ServerScript("%s %s", className, tclName);
 }
+
 
 //----------------------------------------------------------------------------
 vtkObject *vtkPVApplication::TclToVTKObject(const char *tclName)
@@ -2024,66 +1991,8 @@ void vtkPVApplication::DisplayTCLError(const char* message)
 }
 
 //----------------------------------------------------------------------------
-const char* const vtkPVApplication::LoadComponentProc =
-"namespace eval ::paraview {\n"
-"    proc load_component {name {optional_paths {}}} {\n"
-"        \n"
-"        global tcl_platform auto_path env\n"
-"        \n"
-"        # First dir is empty, to let Tcl try in the current dir\n"
-"        \n"
-"        set dirs $optional_paths\n"
-"        set dirs [concat $dirs {\"\"}]\n"
-"        set ext [info sharedlibextension]\n"
-"        if {$tcl_platform(platform) == \"unix\"} {\n"
-"            set prefix \"lib\"\n"
-"            # Help Unix a bit by browsing into $auto_path and /usr/lib...\n"
-"            set dirs [concat $dirs /usr/local/lib /usr/local/lib/vtk $auto_path]\n"
-"            if {[info exists env(LD_LIBRARY_PATH)]} {\n"
-"                set dirs [concat $dirs [split $env(LD_LIBRARY_PATH) \":\"]]\n"
-"            }\n"
-"            if {[info exists env(PATH)]} {\n"
-"                set dirs [concat $dirs [split $env(PATH) \":\"]]\n"
-"            }\n"
-"        } else {\n"
-"            set prefix \"\"\n"
-"            if {$tcl_platform(platform) == \"windows\"} {\n"
-"                if {[info exists env(PATH)]} {\n"
-"                    set dirs [concat $dirs [split $env(PATH) \";\"]]\n"
-"                }\n"
-"            }\n"
-"        }\n"
-"        \n"
-"        foreach dir $dirs {\n"
-"            set libname [file join $dir ${prefix}${name}${ext}]\n"
-"            if {[file exists $libname]} {\n"
-"                if {![catch {load $libname} errormsg]} {\n"
-"                    # WARNING: it HAS to be \"\" so that pkg_mkIndex work (since\n"
-"                    # while evaluating a package ::paraview::load_component won't\n"
-"                    # exist and will default to the unknown() proc that \n"
-"                    # returns \"\"\n"
-"                    return \"\"\n"
-"                } else {\n"
-"                    # If not loaded but file was found, oops\n"
-"                    error $errormsg\n"
-"                }\n"
-"            }\n"
-"        }\n"
-"        \n"
-"        error \"::paraview::load_component: $name could not be found.\"\n"
-"        \n"
-"        return 1\n"
-"    }\n"
-"    namespace export load_component\n"
-"}\n";
-
-
-
-//----------------------------------------------------------------------------
 const char* const vtkPVApplication::ExitProc =
 "proc exit {} { global Application; $Application Exit }";
-
-
 
 //============================================================================
 // Stuff that is a part of render-process module.

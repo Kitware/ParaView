@@ -47,12 +47,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVWidget.h"
 
 vtkStandardNewMacro(vtkPVStringWidgetProperty);
-vtkCxxRevisionMacro(vtkPVStringWidgetProperty, "1.2");
+vtkCxxRevisionMacro(vtkPVStringWidgetProperty, "1.3");
 
 vtkPVStringWidgetProperty::vtkPVStringWidgetProperty()
 {
   this->String = NULL;
   this->VTKCommand = NULL;
+  this->ElementType = vtkPVSelectWidget::STRING;
 }
 
 vtkPVStringWidgetProperty::~vtkPVStringWidgetProperty()
@@ -61,18 +62,46 @@ vtkPVStringWidgetProperty::~vtkPVStringWidgetProperty()
   this->SetVTKCommand(NULL);
 }
 
+void vtkPVStringWidgetProperty::SetStringType(vtkPVSelectWidget::ElementTypes t)
+{
+  this->ElementType = t;
+}
+
+
 void vtkPVStringWidgetProperty::AcceptInternal()
 {
-  if (this->String[0] != '[')
+  vtkPVApplication *pvApp = this->GetWidget()->GetPVApplication();
+  vtkPVProcessModule* pm = pvApp->GetProcessModule();
+  
+  if (this->String[0] == '[')
     {
-    this->Widget->GetPVApplication()->GetProcessModule()->ServerScript(
-      "%s %s {%s}", this->VTKSourceTclName, this->VTKCommand, this->String);
+    vtkErrorMacro("nasty [ used in string for vtkPVStringWidgetProperty");
+    return;
     }
-  else
+  
+  pm->GetStream() << vtkClientServerStream::Invoke
+                  << this->VTKSourceID 
+                  << this->VTKCommand;
+  switch(this->ElementType)
     {
-    this->Widget->GetPVApplication()->GetProcessModule()->ServerScript(
-      "%s %s %s", this->VTKSourceTclName, this->VTKCommand, this->String);
+    case vtkPVSelectWidget::INT:
+      pm->GetStream() << atoi(this->String);
+      break;
+    case vtkPVSelectWidget::FLOAT:
+      pm->GetStream() << atof(this->String);
+      break;
+    case vtkPVSelectWidget::STRING:
+      pm->GetStream() << this->String;
+      break;
+    case vtkPVSelectWidget::OBJECT:
+      {
+      pm->GetStream() << this->ObjectID;
+      }
+      break;
     }
+  
+  pm->GetStream() << vtkClientServerStream::End;
+  pm->SendStreamToServer();
 }
 
 void vtkPVStringWidgetProperty::PrintSelf(ostream& os, vtkIndent indent)
@@ -81,6 +110,7 @@ void vtkPVStringWidgetProperty::PrintSelf(ostream& os, vtkIndent indent)
   
   os << indent << "String: " << (this->String ? this->String : "(none)")
      << endl;
+  os << indent << "ObjectID: " << this->ObjectID << endl;
   os << indent << "VTKCommand: " << (this->VTKCommand ? this->VTKCommand :
                                      "(none")
      << endl;

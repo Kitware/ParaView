@@ -21,7 +21,7 @@ modification, are permitted provided that the following conditions are met:
    and/or other materials provided with the distribution.
 
  * Neither the name of Kitware nor the names of any contributors may be used
-   to endorse or promote products derived from this software without specific 
+   to endorse or promote products derived from this software without specific
    prior written permission.
 
  * Modified source versions must be plainly marked as such, and must not be
@@ -93,6 +93,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVPart.h"
 #include "vtkPVPartDisplay.h"
 
+#include "vtkClientServerStream.h"
+#include "vtkClientServerInterpreter.h"
+
 int vtkStringListCommand(ClientData cd, Tcl_Interp *interp,
                          int argc, char *argv[]);
 
@@ -102,18 +105,66 @@ int vtkStringListCommand(ClientData cd, Tcl_Interp *interp,
 #define VTK_PV_SATELLITE_SCRIPT              838431
 
 #define VTK_PV_CLIENTSERVER_RMI_TAG          938531
+#define VTK_PV_CLIENTSERVER_ROOT_RMI_TAG     938532
 
 #define VTK_PV_ROOT_SCRIPT_RMI_TAG           838485
 #define VTK_PV_ROOT_RESULT_RMI_TAG           838486
 #define VTK_PV_ROOT_RESULT_LENGTH_TAG        838487
 #define VTK_PV_ROOT_RESULT_TAG               838488
+#define VTK_PV_CLIENT_SERVER_LAST_RESULT_TAG 838490
 
 #define VTK_PV_SEND_DATA_OBJECT_TAG          838489
 #define VTK_PV_DATA_OBJECT_TAG               923857
 
+
 //----------------------------------------------------------------------------
 // This RMI is only on process 0 of server. (socket controller)
-void vtkPVRootScript(void *localArg, void *remoteArg, 
+void vtkPVClientServerLastResultRMI(void *localArg, void* ,
+                                    int vtkNotUsed(remoteArgLength),
+                                    int vtkNotUsed(remoteProcessId))
+{
+  vtkPVClientServerModule *self = (vtkPVClientServerModule *)(localArg);
+  self->SendLastClientServerResult();
+}
+
+
+void vtkPVClientServerMPIRMI(void *localArg, void *remoteArg,
+                                int remoteArgLength,
+                                int vtkNotUsed(remoteProcessId))
+{
+  vtkPVClientServerModule *self = (vtkPVClientServerModule *)(localArg);
+  self->ProcessMessage((unsigned char*)remoteArg, remoteArgLength);
+  // do something with result here??
+}
+
+//----------------------------------------------------------------------------
+// This RMI is used for
+void vtkPVClientServerSocketRMI(void *localArg, void *remoteArg,
+                                int remoteArgLength,
+                                int remoteProcessId)
+{
+  vtkPVClientServerModule *self = (vtkPVClientServerModule *)(localArg);
+  vtkMultiProcessController* controler = self->GetController();
+  for(int i = 1; i < controler->GetNumberOfProcesses(); ++i)
+    {
+    controler->TriggerRMI(i, remoteArg, remoteArgLength, VTK_PV_CLIENTSERVER_RMI_TAG);
+    }
+  vtkPVClientServerMPIRMI(localArg, remoteArg, remoteArgLength, remoteProcessId);
+}
+
+
+//----------------------------------------------------------------------------
+// This RMI is only on process 0 of server. (socket controller)
+void vtkPVClientServerRootRMI(void *localArg, void *remoteArg,
+                              int remoteArgLength,
+                              int remoteProcessId)
+{
+  vtkPVClientServerMPIRMI(localArg, remoteArg, remoteArgLength, remoteProcessId);
+}
+
+//----------------------------------------------------------------------------
+// This RMI is only on process 0 of server. (socket controller)
+void vtkPVRootScript(void *localArg, void *remoteArg,
                             int vtkNotUsed(remoteArgLength),
                             int vtkNotUsed(remoteProcessId))
 {
@@ -127,7 +178,7 @@ void vtkPVRootScript(void *localArg, void *remoteArg,
 
 //----------------------------------------------------------------------------
 // This RMI is only on process 0 of server. (socket controller)
-void vtkPVRootResult(void *localArg, void* , 
+void vtkPVRootResult(void *localArg, void* ,
                      int vtkNotUsed(remoteArgLength),
                      int vtkNotUsed(remoteProcessId))
 {
@@ -135,12 +186,12 @@ void vtkPVRootResult(void *localArg, void* ,
   const char* result = self->vtkPVProcessModule::GetRootResult();
   int length = static_cast<int>(strlen(result)) + 1;
 
-  self->GetSocketController()->Send(&length, 1, 1, 
+  self->GetSocketController()->Send(&length, 1, 1,
                                     VTK_PV_ROOT_RESULT_LENGTH_TAG);
   if (length > 0)
     {
     self->GetSocketController()->Send((char*)(result), length, 1,
-                                      VTK_PV_ROOT_RESULT_TAG);  
+                                      VTK_PV_ROOT_RESULT_TAG);
     }
 }
 
@@ -148,19 +199,19 @@ void vtkPVRootResult(void *localArg, void* ,
 
 //----------------------------------------------------------------------------
 // This RMI is only on MPI controller (procs 1->num-1) of server.
-void vtkPVServerSlaveScript(void *localArg, void *remoteArg, 
+void vtkPVServerSlaveScript(void *localArg, void *remoteArg,
                             int vtkNotUsed(remoteArgLength),
                             int vtkNotUsed(remoteProcessId))
 {
   vtkPVApplication *pvApp = (vtkPVApplication *)(localArg);
-  //cerr << " ++++ SlaveScript: " << ((char*)remoteArg) << endl;  
+  //cerr << " ++++ SlaveScript: " << ((char*)remoteArg) << endl;
   pvApp->SimpleScript((char*)remoteArg);
 }
 
 
 //----------------------------------------------------------------------------
 // RMI only on server 0 socket controller.
-void vtkPVBroadcastScript(void *localArg, void *remoteArg, 
+void vtkPVBroadcastScript(void *localArg, void *remoteArg,
                           int vtkNotUsed(remoteArgLength),
                           int vtkNotUsed(remoteProcessId))
 {
@@ -173,7 +224,7 @@ void vtkPVBroadcastScript(void *localArg, void *remoteArg,
 // RMI only on server 0 socket controller.
 // Destination process will be received separately.
 // This is used only for debugging.
-void vtkPVRelayRemoteScript(void *localArg, void *remoteArg, 
+void vtkPVRelayRemoteScript(void *localArg, void *remoteArg,
                        int vtkNotUsed(remoteArgLength),
                        int vtkNotUsed(remoteProcessId))
 {
@@ -186,21 +237,21 @@ void vtkPVRelayRemoteScript(void *localArg, void *remoteArg,
 void vtkPVSendPolyData(void* arg, void*, int, int)
 {
   vtkPVClientServerModule* self = static_cast<vtkPVClientServerModule*>(arg);
-  
+
   // Get the length of the Tcl object name we are about to receive.
   int length = 0;
   self->GetSocketController()->Receive(&length, 1, 1, VTK_PV_DATA_OBJECT_TAG);
-  
+
   // Allocate space and receive the Tcl object name.
   char* tclName = new char[length+1];
   self->GetSocketController()->Receive(tclName, length, 1, VTK_PV_DATA_OBJECT_TAG);
   tclName[length] = '\0';
-  
+
   // Get the object from the local process.
   vtkPolyData* obj = vtkPolyData::New();
   int retVal = self->vtkPVProcessModule::ReceiveRootPolyData(tclName, obj);
   delete [] tclName;
-  
+
   // Send success/failure flag and the object itself.
   if(retVal)
     {
@@ -219,7 +270,7 @@ void vtkPVSendPolyData(void* arg, void*, int, int)
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVClientServerModule);
-vtkCxxRevisionMacro(vtkPVClientServerModule, "1.49");
+vtkCxxRevisionMacro(vtkPVClientServerModule, "1.50");
 
 int vtkPVClientServerModuleCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -228,9 +279,7 @@ int vtkPVClientServerModuleCommand(ClientData cd, Tcl_Interp *interp,
 //----------------------------------------------------------------------------
 vtkPVClientServerModule::vtkPVClientServerModule()
 {
-  this->ClientServerInterpreter = 0;
-  this->ClientServerStream = 0;
-
+  this->LastServerResultStream = new vtkClientServerStream;
   this->Controller = NULL;
   this->SocketController = NULL;
   this->ClientMode = 1;
@@ -252,6 +301,7 @@ vtkPVClientServerModule::vtkPVClientServerModule()
 //----------------------------------------------------------------------------
 vtkPVClientServerModule::~vtkPVClientServerModule()
 {
+  delete this->LastServerResultStream;
   if (this->Controller)
     {
     this->Controller->Delete();
@@ -282,23 +332,20 @@ vtkPVClientServerModule::~vtkPVClientServerModule()
 // Each server process starts with this method.  One process is designated as
 // "master" to handle communication.  The other processes are slaves.
 void vtkPVClientServerInit(vtkMultiProcessController *, void *arg )
-{ 
+{
   vtkPVClientServerModule *self = (vtkPVClientServerModule*)arg;
   self->Initialize();
 }
 
 //----------------------------------------------------------------------------
-void vtkPVClientServerModule::ErrorCallback(vtkObject *vtkNotUsed(caller), 
+void vtkPVClientServerModule::ErrorCallback(vtkObject *vtkNotUsed(caller),
   unsigned long vtkNotUsed(eid), void *vtkNotUsed(clientdata), void *calldata)
 {
   cout << (char*)calldata << endl;
 }
-// Declare the initialization function as external
-// this is defined in the PackageInit file
-extern void Vtkparaviewcswrapped_Initialize(vtkClientServerInterpreter *arlu);
 
 //----------------------------------------------------------------------------
-// This method is a bit long, we should probably break it up 
+// This method is a bit long, we should probably break it up
 // to simplify it. !!!!!
 void vtkPVClientServerModule::Initialize()
 {
@@ -315,6 +362,8 @@ void vtkPVClientServerModule::Initialize()
 
   if (this->ClientMode)
     {
+    this->Interpreter->SetLogFile("pvClient.out");
+
     // Receive as the hand shake the number of processes available.
     int numServerProcs = 0;
     this->SocketController->Receive(&numServerProcs, 1, 1, 8843);
@@ -343,9 +392,19 @@ void vtkPVClientServerModule::Initialize()
     }
   else if (myId == 0)
     { // process 0 of Server
+    this->Interpreter->SetLogFile("pvServer.out");
 
     // send the number of server processes as a handshake.
     this->SocketController->Send(&numProcs, 1, 1, 8843);
+
+        //
+    this->SocketController->AddRMI(vtkPVClientServerLastResultRMI, (void *)(this),
+                                   VTK_PV_CLIENT_SERVER_LAST_RESULT_TAG);
+    // for SendMessages
+    this->SocketController->AddRMI(vtkPVClientServerSocketRMI, (void *)(this),
+                                   VTK_PV_CLIENTSERVER_RMI_TAG);
+    this->SocketController->AddRMI(vtkPVClientServerRootRMI, (void *)(this),
+                                   VTK_PV_CLIENTSERVER_ROOT_RMI_TAG);
 
     // For root script: Execute script only on process 0 of server.
     this->SocketController->AddRMI(vtkPVRootScript, (void *)(this), 
@@ -377,7 +436,7 @@ void vtkPVClientServerModule::Initialize()
     { // Sattelite processes of server.
     this->Controller->AddRMI(vtkPVServerSlaveScript, (void *)(pvApp), 
                              VTK_PV_SATELLITE_SCRIPT);
-    
+
     this->Controller->CreateOutputWindow();
     // Process rmis until the application exits.
     this->Controller->ProcessRMIs();    
@@ -507,7 +566,7 @@ void vtkPVClientServerModule::Connect()
             cc = max_try;
             break;
             }
-          if (comm->ConnectTo(this->Hostname, this->Port)) 
+          if (comm->ConnectTo(this->Hostname, this->Port))
             {
             break;
             }
@@ -579,7 +638,6 @@ void vtkPVClientServerModule::Connect()
 
 
 
-
 //----------------------------------------------------------------------------
 // same as the MPI start.
 int vtkPVClientServerModule::Start(int argc, char **argv)
@@ -614,7 +672,7 @@ int vtkPVClientServerModule::Start(int argc, char **argv)
 //----------------------------------------------------------------------------
 // Only called by the client.
 void vtkPVClientServerModule::Exit()
-{ 
+{
   if ( ! this->ClientMode)
     {
     vtkErrorMacro("Not expecting server to call Exit.");
@@ -659,7 +717,7 @@ void vtkPVClientServerModule::RootSimpleScript(const char *str)
 {
   // Clear any previous result.
   this->SetRootResult(0);
-  
+
   if (this->Application == NULL)
     {
     vtkErrorMacro("Missing application object.");
@@ -676,7 +734,7 @@ void vtkPVClientServerModule::RootSimpleScript(const char *str)
     return;
     }
 
-  this->SocketController->TriggerRMI(1, const_cast<char*>(str), 
+  this->SocketController->TriggerRMI(1, const_cast<char*>(str),
                                      VTK_PV_ROOT_SCRIPT_RMI_TAG);
 }
 
@@ -689,16 +747,16 @@ const char* vtkPVClientServerModule::GetRootResult()
     vtkErrorMacro("Missing application object.");
     return 0;
     }
-  
+
   if(!this->ClientMode)
     {
     vtkErrorMacro("NotExpecting this call on the server.");
     return 0;
     }
-  
+
   if(!this->RootResult)
     {
-    int length;    
+    int length;
     this->SocketController->TriggerRMI(1, "", VTK_PV_ROOT_RESULT_RMI_TAG);
     this->SocketController->Receive(&length, 1, 1, VTK_PV_ROOT_RESULT_LENGTH_TAG);
     if(length <= 0)
@@ -730,7 +788,7 @@ void vtkPVClientServerModule::ServerSimpleScript(const char *str)
     return;
     }
 
-  this->SocketController->TriggerRMI(1, const_cast<char*>(str), 
+  this->SocketController->TriggerRMI(1, const_cast<char*>(str),
                                      VTK_PV_BROADCAST_SCRIPT_RMI_TAG);
 }
 
@@ -754,10 +812,10 @@ void vtkPVClientServerModule::BroadcastSimpleScript(const char *str)
     return;
     }
 
-  this->SocketController->TriggerRMI(1, const_cast<char*>(str), 
+  this->SocketController->TriggerRMI(1, const_cast<char*>(str),
                                      VTK_PV_BROADCAST_SCRIPT_RMI_TAG);
 
-  // Execute the script locally.  
+  // Execute the script locally.
   // Do reverse order, because 0 will block.
   this->Application->SimpleScript(str);
 }
@@ -765,7 +823,7 @@ void vtkPVClientServerModule::BroadcastSimpleScript(const char *str)
 void vtkPVClientServerModule::BroadcastScriptRMI(const char *str)
 {
   int id, num;
-    
+
   if (this->Application == NULL)
     {
     vtkErrorMacro("Missing application object.");
@@ -776,7 +834,7 @@ void vtkPVClientServerModule::BroadcastScriptRMI(const char *str)
     vtkErrorMacro("Not expecting this call on the client.");
     return;
     }
-  
+
   // Sanity check.
   id = this->Controller->GetLocalProcessId();
   if (id != 0)
@@ -788,11 +846,11 @@ void vtkPVClientServerModule::BroadcastScriptRMI(const char *str)
   num = this->Controller->GetNumberOfProcesses();
   for (id = 1; id < num; ++id)
     {
-    this->Controller->TriggerRMI(id, const_cast<char*>(str), 
+    this->Controller->TriggerRMI(id, const_cast<char*>(str),
                                  VTK_PV_SATELLITE_SCRIPT);
     }
 
-  // Execute the script locally.  
+  // Execute the script locally.
   // Do reverse order, because 0 will block.
   this->Application->SimpleScript(str);
   this->SetRootResult(this->Application->GetMainInterp()->result);
@@ -816,7 +874,7 @@ void vtkPVClientServerModule::RemoteSimpleScript(int remoteId, const char *str)
     }
   if (remoteId == 0)
     {
-    // Execute the script locally.  
+    // Execute the script locally.
     this->Application->SimpleScript(str);
     return;
     }
@@ -826,7 +884,7 @@ void vtkPVClientServerModule::RemoteSimpleScript(int remoteId, const char *str)
     return;
     }
 
-  this->SocketController->TriggerRMI(1, const_cast<char*>(str), 
+  this->SocketController->TriggerRMI(1, const_cast<char*>(str),
                                      VTK_PV_REMOTE_SCRIPT_RMI_TAG);
   // Destination is sent as a separate message.
   this->SocketController->Send(&remoteId, 1, 1, VTK_PV_REMOTE_SCRIPT_DESTINATION_TAG);
@@ -836,10 +894,10 @@ void vtkPVClientServerModule::RelayScriptRMI(const char *str)
 {
   int id, num;
   int destination = 0;
-    
-  this->SocketController->Receive(&destination, 
-                                  1, 
-                                  1, 
+
+  this->SocketController->Receive(&destination,
+                                  1,
+                                  1,
                                   VTK_PV_REMOTE_SCRIPT_DESTINATION_TAG);
   // We count the client as process 0.
   --destination;
@@ -854,7 +912,7 @@ void vtkPVClientServerModule::RelayScriptRMI(const char *str)
     vtkErrorMacro("Not expecting this call on the client.");
     return;
     }
-  
+
   // Sanity check.
   id = this->Controller->GetLocalProcessId();
   if (id != 0)
@@ -872,12 +930,12 @@ void vtkPVClientServerModule::RelayScriptRMI(const char *str)
 
   if (destination == 0)
     {
-    // Execute the script locally.  
+    // Execute the script locally.
     this->Application->SimpleScript(str);
     return;
     }
 
-  this->Controller->TriggerRMI(destination, const_cast<char*>(str), 
+  this->Controller->TriggerRMI(destination, const_cast<char*>(str),
                                VTK_PV_SATELLITE_SCRIPT);
 }
 
@@ -900,116 +958,129 @@ int vtkPVClientServerModule::GetNumberOfPartitions()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVClientServerModule::GatherInformation(vtkPVInformation* info, 
-                                                char* objectTclName)
+void vtkPVClientServerModule::GatherInformation(vtkPVInformation* info,
+                                                vtkClientServerID id)
 {
   // Just a simple way of passing the information object to the next method.
   this->TemporaryInformation = info;
-  // Some objects are not created on the client (data.
-  if (!info->GetRootOnly())
-    {
-    this->ServerScript(
-      "[$Application GetProcessModule] GatherInformationInternal %s %s",
-      info->GetClassName(), objectTclName);
-    }
-  else
-    {
-    this->RootScript(
-      "[$Application GetProcessModule] GatherInformationInternal %s %s",
-      info->GetClassName(), objectTclName);
-    }
+
+  // Gather on the server.
+  this->GetStream()
+    << vtkClientServerStream::Invoke
+    << this->GetApplicationID() << "GetProcessModule"
+    << vtkClientServerStream::End
+    << vtkClientServerStream::Invoke
+    << vtkClientServerStream::LastResult
+    << "GatherInformationInternal" << info->GetClassName() << id
+    << vtkClientServerStream::End;
+  this->SendStreamToServer();
+
+  // Gather on the client.
   this->GatherInformationInternal(NULL, NULL);
-  this->TemporaryInformation = NULL; 
+  this->TemporaryInformation = NULL;
 }
 
 //----------------------------------------------------------------------------
 // This method is broadcast to all processes.
-void vtkPVClientServerModule::GatherInformationInternal(char* infoClassName, 
-                                                        vtkObject* object)
+void
+vtkPVClientServerModule::GatherInformationInternal(const char* infoClassName,
+                                                   vtkObject* object)
 {
-  int length;
-  unsigned char *msg;
-  int myId = this->Controller->GetLocalProcessId();
+  vtkClientServerStream css;
 
-  if (this->GetPVApplication()->GetClientMode())
-    { // Client just receives information from the server.
-    this->SocketController->Receive(&length, 1, 1, 398798);
-    msg = new unsigned char[length];
-    this->SocketController->Receive(msg, length, 1, 398799);
-    this->TemporaryInformation->CopyFromMessage(msg);
-    delete [] msg;
-    msg = NULL;
-    return;
-    }
-
-  if (object == NULL)
+  if(this->GetPVApplication()->GetClientMode())
     {
-    vtkErrorMacro("Deci tcl name must be wrong.");
+    // Client just receives information from the server.
+    int length;
+    this->SocketController->Receive(&length, 1, 1, 398798);
+    unsigned char* data = new unsigned char[length];
+    this->SocketController->Receive(data, length, 1, 398799);
+    css.SetData(data, length);
+    this->TemporaryInformation->CopyFromStream(&css);
+    delete [] data;
     return;
     }
 
-  // Create a temporary information object.
-  vtkObject* o;
-  o = vtkInstantiator::CreateInstance(infoClassName);
-  if ( o == NULL)
+  // We are one of the server nodes.
+  int myId = this->Controller->GetLocalProcessId();
+  if(!object)
+    {
+    vtkErrorMacro("Deci id must be wrong.");
+    return;
+    }
+
+  // Create a temporary information object to hold the input object's
+  // information.
+  vtkObject* o = vtkInstantiator::CreateInstance(infoClassName);
+  if(!o)
     {
     vtkErrorMacro("Could not instantiate object " << infoClassName);
     return;
     }
-  vtkPVInformation* tmp1;
-  tmp1 = vtkPVInformation::SafeDownCast(o);
-  o = NULL;
+  vtkPVInformation* tempInfo1 = vtkPVInformation::SafeDownCast(o);
+  o = 0;
 
-  if (myId != 0 && !tmp1->GetRootOnly())
+  // Nodes other than 0 just send their information.
+  if(myId != 0)
     {
-    tmp1->CopyFromObject(object);
-    length = tmp1->GetMessageLength();
-    msg = new unsigned char[length];
-    tmp1->WriteMessage(msg);
-    this->Controller->Send(&length, 1, 0, 498798);
-    this->Controller->Send(msg, length, 0, 498799);
-    delete [] msg;
-    msg = NULL;
-    tmp1->Delete();
-    tmp1 = NULL;
+    if(tempInfo1->GetRootOnly())
+      {
+      // Root-only and we are not the root.  Do nothing.
+      tempInfo1->Delete();
+      return;
+      }
+    tempInfo1->CopyFromObject(object);
+    tempInfo1->CopyToStream(&css);
+    size_t length;
+    const unsigned char* data;
+    css.GetData(&data, &length);
+    int len = static_cast<int>(length);
+    this->Controller->Send(&len, 1, 0, 498798);
+    this->Controller->Send(const_cast<unsigned char*>(data),
+                           length, 0, 498799);
+    tempInfo1->Delete();
     return;
     }
 
-  // Node 0.
-  tmp1->CopyFromObject(object);
-  if (!tmp1->GetRootOnly())
+  // This is node 0.  First get our own information.
+  tempInfo1->CopyFromObject(object);
+
+  if(!tempInfo1->GetRootOnly())
     {
+    // Create another temporary information object in which to
+    // receive information from other nodes.
     o = vtkInstantiator::CreateInstance(infoClassName);
-    vtkPVInformation* tmp2 = vtkPVInformation::SafeDownCast(o);
+    vtkPVInformation* tempInfo2 = vtkPVInformation::SafeDownCast(o);
     o = NULL;
-    
+
+    // Merge information from other nodes.
     int numProcs = this->Controller->GetNumberOfProcesses();
     int idx;
     for (idx = 1; idx < numProcs; ++idx)
       {
+      int length;
       this->Controller->Receive(&length, 1, idx, 498798);
-      msg = new unsigned char[length];
-      this->Controller->Receive(msg, length, idx, 498799);
-      tmp2->CopyFromMessage(msg);
-      tmp1->AddInformation(tmp2);
-      delete [] msg;
-      msg = NULL;
+      unsigned char* data = new unsigned char[length];
+      this->Controller->Receive(data, length, idx, 498799);
+      css.SetData(data, length);
+      tempInfo2->CopyFromStream(&css);
+      tempInfo1->AddInformation(tempInfo2);
+      delete [] data;
       }
-    tmp2->Delete();
-    tmp2 = NULL;
+    tempInfo2->Delete();
     }
 
   // Send final information to client over socket connection.
-  length = tmp1->GetMessageLength();
-  msg = new unsigned char[length];
-  tmp1->WriteMessage(msg);
-  this->SocketController->Send(&length, 1, 1, 398798);
-  this->SocketController->Send(msg, length, 1, 398799);
-  delete [] msg;
-  msg = NULL;
-  tmp1->Delete();
-  tmp1 = NULL;
-}    
+  size_t length;
+  const unsigned char* data;
+  tempInfo1->CopyToStream(&css);
+  css.GetData(&data, &length);
+  int len = static_cast<int>(length);
+  this->SocketController->Send(&len, 1, 1, 398798);
+  this->SocketController->Send(const_cast<unsigned char*>(data),
+                               length, 1, 398799);
+  tempInfo1->Delete();
+}
 
 //----------------------------------------------------------------------------
 void vtkPVClientServerModule::PrintSelf(ostream& os, vtkIndent indent)
@@ -1024,41 +1095,17 @@ void vtkPVClientServerModule::PrintSelf(ostream& os, vtkIndent indent)
 int vtkPVClientServerModule::GetDirectoryListing(const char* dir,
                                                  vtkStringList* dirs,
                                                  vtkStringList* files,
-                                                 const char* perm)
+                                                 int save)
 {
   if(this->ClientMode)
     {
-    this->RootScript(
-      "::paraview::vtkPVProcessModule::GetDirectoryListing {%s} {%s}",
-      dir, perm);
-    char* result = vtkString::Duplicate(this->GetRootResult());
-    if(!result || strcmp(result, "<NO_SUCH_DIRECTORY>") == 0)
-      {
-      dirs->RemoveAllItems();
-      files->RemoveAllItems();
-      delete [] result;
-      return 0;
-      }
-    vtkTclGetObjectFromPointer(this->Application->GetMainInterp(), dirs,
-                               vtkStringListCommand);
-    char* dirsTcl = vtkString::Duplicate(
-      Tcl_GetStringResult(this->Application->GetMainInterp()));
-    vtkTclGetObjectFromPointer(this->Application->GetMainInterp(), files,
-                               vtkStringListCommand);
-    char* filesTcl = vtkString::Duplicate(
-      Tcl_GetStringResult(this->Application->GetMainInterp()));
-    this->Application->Script(
-      "::paraview::vtkPVProcessModule::ParseDirectoryListing {%s} {%s} {%s}",
-      result, dirsTcl, filesTcl
-      );
-    delete [] dirsTcl;
-    delete [] filesTcl;
-    delete [] result;
-    return 1;
+    return this->Superclass::GetDirectoryListing(dir, dirs, files, save);
     }
   else
     {
-    return this->Superclass::GetDirectoryListing(dir, dirs, files, perm);
+    dirs->RemoveAllItems();
+    files->RemoveAllItems();
+    return 0;
     }
 }
 
@@ -1079,14 +1126,14 @@ int vtkPVClientServerModule::ReceiveRootPolyData(const char* tclName,
     {
     return 0;
     }
-  
+
   // Send the object name length and the name itself.
   int length = static_cast<int>(strlen(tclName));
   this->SocketController->TriggerRMI(1, VTK_PV_SEND_DATA_OBJECT_TAG);
   this->SocketController->Send(&length, 1, 1, VTK_PV_DATA_OBJECT_TAG);
   this->SocketController->Send(const_cast<char*>(tclName), length, 1,
                                VTK_PV_DATA_OBJECT_TAG);
-  
+
   // Receive success/failure flag and the object itself.
   int success;
   this->SocketController->Receive(&success, 1, 1, VTK_PV_DATA_OBJECT_TAG);
@@ -1096,4 +1143,199 @@ int vtkPVClientServerModule::ReceiveRootPolyData(const char* tclName,
     }
   this->SocketController->Receive(out, 1, VTK_PV_DATA_OBJECT_TAG);
   return 1;
+}
+
+
+
+
+
+
+
+
+void vtkPVClientServerModule::ProcessMessage(unsigned char* msg, size_t len)
+{
+  this->Interpreter->ProcessStream(msg, len);
+}
+
+const vtkClientServerStream& vtkPVClientServerModule::GetLastClientResult()
+{
+  return this->Interpreter->GetLastResult();
+}
+
+const vtkClientServerStream& vtkPVClientServerModule::GetLastServerResult()
+{
+  if(!this->Application)
+    {
+    vtkErrorMacro("Missing application object.");
+    this->LastServerResultStream->Reset();
+    *this->LastServerResultStream
+      << vtkClientServerStream::Error
+      << "vtkPVClientServerModule missing Application object."
+      << vtkClientServerStream::End;
+    return *this->LastServerResultStream;
+    }
+
+  if(!this->ClientMode)
+    {
+    vtkErrorMacro("GetLastServerResult() should not be called on the server.");
+    this->LastServerResultStream->Reset();
+    *this->LastServerResultStream
+      << vtkClientServerStream::Error
+      << "vtkPVClientServerModule::GetLastServerResult() should not be called on the server."
+      << vtkClientServerStream::End;
+    return *this->LastServerResultStream;
+    }
+  int length;
+  this->SocketController->TriggerRMI(1, "", VTK_PV_CLIENT_SERVER_LAST_RESULT_TAG);
+  this->SocketController->Receive(&length, 1, 1, VTK_PV_ROOT_RESULT_LENGTH_TAG);
+  if(length <= 0)
+    {
+    this->LastServerResultStream->Reset();
+    *this->LastServerResultStream
+      << vtkClientServerStream::Error
+      << "vtkPVClientServerModule::GetLastServerResult() received no data from the server."
+      << vtkClientServerStream::End;
+    return *this->LastServerResultStream;
+    }
+  unsigned char* result = new unsigned char[length];
+  this->SocketController->Receive((char*)result, length, 1, VTK_PV_ROOT_RESULT_TAG);
+  this->LastServerResultStream->SetData(result, length);
+  delete [] result;
+  return *this->LastServerResultStream;
+}
+
+void vtkPVClientServerModule::SendStreamToClient()
+{
+  if(!this->ClientMode)
+    {
+    vtkErrorMacro("Attempt to call SendStreamToClient on server node.");
+    return;
+    }
+  // Just process the stream locally.
+  this->Interpreter->ProcessStream(*this->ClientServerStream);
+  this->ClientServerStream->Reset();
+}
+
+//----------------------------------------------------------------------------
+// This sends the current stream to the server
+void vtkPVClientServerModule::SendStreamToServer()
+{
+  if(!this->ClientMode)
+    {
+    vtkErrorMacro("Attempt to call SendStreamToServer on server node.");
+    return;
+    }
+  this->SendStreamToServerInternal();
+  this->ClientServerStream->Reset();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVClientServerModule::SendStreamToServerRoot()
+{
+  this->SendStreamToServerRootInternal();
+  this->ClientServerStream->Reset();
+}
+
+void vtkPVClientServerModule::SendStreamToClientAndServer()
+{
+  if(!this->ClientMode)
+    {
+    vtkErrorMacro("Attempt to call SendStreamToClientAndServer "
+                  "on server node.");
+    return;
+    }
+
+  // Send to server first, then to client.
+  this->SendStreamToServerInternal();
+  this->SendStreamToClient();
+}
+
+void vtkPVClientServerModule::SendStreamToClientAndServerRoot()
+{
+  if(!this->ClientMode)
+    {
+    vtkErrorMacro("Attempt to call SendStreamToClientAndServerRoot "
+                  "on server node.");
+    return;
+    }
+
+  // Send to server root first, then to client.
+  this->SendStreamToServerRootInternal();
+  this->SendStreamToClient();
+}
+
+void vtkPVClientServerModule::SendLastClientServerResult()
+{
+  const unsigned char* data;
+  size_t length = 0;
+  this->Interpreter->GetLastResult().GetData(&data, &length);
+  int len = static_cast<int>(length);
+  this->GetSocketController()->Send(&len, 1, 1,
+                                    VTK_PV_ROOT_RESULT_LENGTH_TAG);
+  if(length > 0)
+    {
+    this->GetSocketController()->Send((char*)(data), length, 1,
+                                      VTK_PV_ROOT_RESULT_TAG);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVClientServerModule::SendStreamToServerInternal()
+{
+  const unsigned char* data;
+  size_t len;
+  this->ClientServerStream->GetData(&data, &len);
+  this->SocketController->TriggerRMI(1, (void*)(data), len,
+                                     VTK_PV_CLIENTSERVER_RMI_TAG);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVClientServerModule::SendStreamToServerRootInternal()
+{
+  const unsigned char* data;
+  size_t len;
+  this->ClientServerStream->GetData(&data, &len);
+  this->SocketController->TriggerRMI(1, (void*)(data), len,
+                                     VTK_PV_CLIENTSERVER_ROOT_RMI_TAG);
+}
+
+//----------------------------------------------------------------------------
+int vtkPVClientServerModule::LoadModuleInternal(const char* name)
+{
+  // Try to load the module on the local process.
+  int localResult = this->Interpreter->Load(name);
+
+  // Make sure we have a communicator.
+#ifdef VTK_USE_MPI
+  vtkMPICommunicator* communicator = vtkMPICommunicator::SafeDownCast(
+    this->Controller->GetCommunicator());
+  if(!communicator)
+    {
+    return 0;
+    }
+
+  // Gather load results to process 0.
+  int numProcs = this->Controller->GetNumberOfProcesses();
+  int myid = this->Controller->GetLocalProcessId();
+  int* results = new int[numProcs];
+  communicator->Gather(&localResult, results, numProcs, 0);
+
+  int globalResult = 1;
+  if(myid == 0)
+    {
+    for(int i=0; i < numProcs; ++i)
+      {
+      if(!results[i])
+        {
+        globalResult = 0;
+        }
+      }
+    }
+
+  delete [] results;
+
+  return globalResult;
+#else
+  return localResult;
+#endif
 }

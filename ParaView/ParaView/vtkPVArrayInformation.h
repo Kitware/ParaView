@@ -21,7 +21,7 @@ modification, are permitted provided that the following conditions are met:
    and/or other materials provided with the distribution.
 
  * Neither the name of Kitware nor the names of any contributors may be used
-   to endorse or promote products derived from this software without specific 
+   to endorse or promote products derived from this software without specific
    prior written permission.
 
  * Modified source versions must be plainly marked as such, and must not be
@@ -51,15 +51,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __vtkPVArrayInformation_h
 #define __vtkPVArrayInformation_h
 
+#include "vtkPVInformation.h"
 
-#include "vtkObject.h"
-class vtkDataArray;
+class vtkClientServerStream;
 
-class VTK_EXPORT vtkPVArrayInformation : public vtkObject
+class VTK_EXPORT vtkPVArrayInformation : public vtkPVInformation
 {
 public:
   static vtkPVArrayInformation* New();
-  vtkTypeRevisionMacro(vtkPVArrayInformation, vtkObject);
+  vtkTypeRevisionMacro(vtkPVArrayInformation, vtkPVInformation);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
@@ -70,7 +70,7 @@ public:
 
   vtkSetStringMacro(Name);
   vtkGetStringMacro(Name);
-  
+
   // Description:
   // Changing the number of components clears the ranges back to the default.
   void SetNumberOfComponents(int numComps);
@@ -81,7 +81,7 @@ public:
   // Range for component -1 is the range of the vector magnitude.
   // The number of components should be set before these ranges.
   void SetComponentRange(int comp, double min, double max);
-  void SetComponentRange(int comp, double *range) 
+  void SetComponentRange(int comp, double *range)
     { this->SetComponentRange(comp, range[0], range[1]);}
   double *GetComponentRange(int component);
   void GetComponentRange(int comp, double *range);
@@ -96,16 +96,19 @@ public:
   void AddRanges(vtkPVArrayInformation *info);
 
   void DeepCopy(vtkPVArrayInformation *info);
-  void CopyFromArray(vtkDataArray *array);
 
   // Description:
-  // Stuff for sending this object to other processes.
-  // I will worry about byte swapping later.
-  // CopyFromMessage returns how many bytes were used from the
-  // message (same as message length after call).
-  int GetMessageLength();
-  int WriteMessage(unsigned char *msg);
-  int CopyFromMessage(unsigned char *msg, int swap);
+  // Transfer information about a single object into this object.
+  virtual void CopyFromObject(vtkObject*);
+
+  // Description:
+  // Merge another information object.
+  virtual void AddInformation(vtkPVInformation*);
+
+  // Description:
+  // Manage a serialized version of the information.
+  virtual void CopyToStream(vtkClientServerStream*) const;
+  virtual void CopyFromStream(const vtkClientServerStream*);
 
 protected:
   vtkPVArrayInformation();

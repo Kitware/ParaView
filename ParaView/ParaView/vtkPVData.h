@@ -240,9 +240,9 @@ public:
   void CubeAxesCheckCallback();
   vtkGetObjectMacro(CubeAxesCheck, vtkKWCheckButton);
 
-  void SetPointLabelVisibility(int val);
-  void PointLabelCheckCallback();
-  vtkGetObjectMacro(PointLabelCheck, vtkKWCheckButton);
+  void SetAxesWidgetVisibility(int val);
+  void AxesWidgetCheckCallback();
+  vtkGetObjectMacro(AxesWidgetCheck, vtkKWCheckButton);
 
   void CenterCamera();
   
@@ -257,7 +257,7 @@ public:
     
   // Description:
   // Get the name of the cube axes actor.
-  vtkGetStringMacro(CubeAxesTclName);
+  vtkGetObjectMacro(CubeAxes, vtkCubeAxesActor2D);
 
   // Description:
   // Access to pointSize for scripting.
@@ -318,18 +318,6 @@ protected:
   vtkPVData();
   ~vtkPVData();
 
-  // Point Labeling
-  void UpdatePointLabelObjects(const char *type, const char *name);
-  void DeletePointLabelObjects();
-  vtkKWCheckButton *PointLabelCheck;
-  char *PointLabelMapperTclName;
-  vtkSetStringMacro(PointLabelMapperTclName);
-  vtkGetStringMacro(PointLabelMapperTclName);
-
-  char *PointLabelActorTclName;
-  vtkSetStringMacro(PointLabelActorTclName);
-  vtkGetStringMacro(PointLabelActorTclName);
-
   int InstanceCount;
   
   // This points to the source widget that owns this data widget.
@@ -346,7 +334,6 @@ protected:
   void ColorByCellFieldInternal(const char *name, int numComps);
   void SetColorRangeInternal(float min, float max);
   void SetActorColor(float r, float g, float b);
-  void PointLabelByInternal(const char *type, const char *name);
 
   // A flag that helps UpdateProperties determine 
   // whether tho set the default color.
@@ -413,12 +400,9 @@ protected:
   vtkKWScale*        OpacityScale;
 
   vtkKWCheckButton *CubeAxesCheck;
-  char* CubeAxesTclName;
+  vtkCubeAxesActor2D* CubeAxes;
   vtkKWCheckButton *AxesWidgetCheck;
-  char *AxesWidgetTclName;
-  vtkSetStringMacro(AxesWidgetTclName);
-  
-  vtkSetStringMacro(CubeAxesTclName);
+  vtkPVAxesWidget* AxesWidget;
 
   vtkKWPushButton *ResetCameraButton;
 

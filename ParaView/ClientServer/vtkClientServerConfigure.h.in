@@ -1,0 +1,33 @@
+/*=========================================================================
+
+  Program:   Visualization Toolkit
+  Module:    vtkClientServerConfigure.h.in
+  Language:  C++
+  Date:      $Date$
+  Version:   $Revision$
+
+  Copyright (c) 1993-2002 Ken Martin, Will Schroeder, Bill Lorensen
+  All rights reserved.
+  See Copyright.txt or http://www.kitware.com/Copyright.htm for details.
+
+     This software is distributed WITHOUT ANY WARRANTY; without even
+     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+     PURPOSE.  See the above copyright notice for more information.
+
+=========================================================================*/
+#ifndef __vtkClientServerConfigure_h
+#define __vtkClientServerConfigure_h
+
+#cmakedefine VTK_CLIENT_SERVER_BUILD_SHARED
+
+#if defined(VTK_CLIENT_SERVER_BUILD_SHARED) && defined(_WIN32)
+# if defined(vtkClientServer_EXPORTS)
+#  define VTK_CLIENT_SERVER_EXPORT __declspec(dllexport)
+# else
+#  define VTK_CLIENT_SERVER_EXPORT __declspec(dllimport)
+# endif
+#else
+# define VTK_CLIENT_SERVER_EXPORT
+#endif
+
+#endif

@@ -54,7 +54,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 #include "vtkKWWidget.h"
-
+#include "vtkClientServerID.h"
 class vtkKWChangeColorButton;
 class vtkKWCheckButton;
 class vtkKWEntry;
@@ -170,7 +170,7 @@ public:
     
   // Description:
   // The data needs to lookup table name to set the lookup table of the mapper.
-  vtkGetStringMacro(LookupTableTclName);
+  vtkGetMacro(LookupTableID,vtkClientServerID);
 
   // --- UI Stuff ---
 
@@ -297,8 +297,7 @@ protected:
   void HSVToRGB(float hsv[3], float rgb[3]);
 
   vtkLookupTable* LookupTable;
-  char* LookupTableTclName;
-  vtkSetStringMacro(LookupTableTclName);
+  vtkClientServerID LookupTableID;
 
   vtkPVRenderView *PVRenderView;
 

@@ -56,7 +56,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkRenderWindowInteractor.h"
 
 vtkStandardNewMacro(vtkPVAxesWidget);
-vtkCxxRevisionMacro(vtkPVAxesWidget, "1.3");
+vtkCxxRevisionMacro(vtkPVAxesWidget, "1.4");
 
 vtkCxxSetObjectMacro(vtkPVAxesWidget, AxesActor, vtkPVAxesActor);
 vtkCxxSetObjectMacro(vtkPVAxesWidget, ParentRenderer, vtkRenderer);
@@ -101,6 +101,7 @@ vtkPVAxesWidget::vtkPVAxesWidget()
   
   this->Moving = 0;
   this->MouseCursorState = vtkPVAxesWidget::Outside;
+
   this->StartTag = 0;
   
   this->Interactive = 1;
@@ -174,8 +175,7 @@ void vtkPVAxesWidget::SetEnabled(int enabling)
     this->ParentRenderer->GetRenderWindow()->SetNumberOfLayers(2);
     this->AxesActor->SetVisibility(1);
     this->ParentRenderer->GetRenderWindow()->Render();
-    this->StartTag = this->ParentRenderer->AddObserver(vtkCommand::StartEvent,
-                                                       this->Observer);
+    this->ParentRenderer->AddObserver(vtkCommand::StartEvent, this->Observer);
     
     this->InvokeEvent(vtkCommand::EnableEvent, NULL);
     }
@@ -194,11 +194,7 @@ void vtkPVAxesWidget::SetEnabled(int enabling)
       {
       this->ParentRenderer->GetRenderWindow()->RemoveRenderer(this->Renderer);
       this->ParentRenderer->GetRenderWindow()->Render();
-      if (this->StartTag > 0)
-        {
-        this->ParentRenderer->RemoveObserver(this->StartTag);
-        this->StartTag = 0;
-        }
+      this->ParentRenderer->RemoveObserver(vtkCommand::StartEvent);
       }
     
     this->InvokeEvent(vtkCommand::DisableEvent, NULL);

@@ -59,7 +59,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVFieldMenu);
-vtkCxxRevisionMacro(vtkPVFieldMenu, "1.5");
+vtkCxxRevisionMacro(vtkPVFieldMenu, "1.6");
 
 
 vtkCxxSetObjectMacro(vtkPVFieldMenu, InputMenu, vtkPVInputMenu);
@@ -206,13 +206,13 @@ vtkPVDataSetAttributesInformation* vtkPVFieldMenu::GetFieldInformation()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVFieldMenu::AcceptInternal(const char* sourceTclName)
+void vtkPVFieldMenu::AcceptInternal(vtkClientServerID sourceID)
 {
-  if (sourceTclName &&
+  if (sourceID.ID &&
       (this->Value == vtkDataSet::POINT_DATA_FIELD ||
        this->Value == vtkDataSet::CELL_DATA_FIELD))
     {
-    this->Property->SetVTKSourceTclName(sourceTclName);
+    this->Property->SetVTKSourceID(sourceID);
     this->Property->SetIndex(this->Value);
     this->Property->AcceptInternal();
     }
@@ -250,16 +250,16 @@ void vtkPVFieldMenu::ResetInternal()
 
 //----------------------------------------------------------------------------
 void vtkPVFieldMenu::SaveInBatchScriptForPart(ofstream *file,
-                                              const char* sourceTclName)
+                                              vtkClientServerID sourceID)
 {
-  if (sourceTclName == NULL)
+  if (sourceID.ID == 0)
     {
     vtkErrorMacro("Sanity check failed. ");
     return;
     }
 
   *file << "\t";
-  *file << sourceTclName << " SetAttributeMode " << this->Value << endl;
+  *file << "pvTemp" << sourceID << " SetAttributeMode " << this->Value << endl;
 }
 
 //----------------------------------------------------------------------------

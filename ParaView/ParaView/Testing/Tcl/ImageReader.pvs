@@ -39,7 +39,8 @@ $pv(vtkTemp187) AcceptCallback
 
 [$pv(vtkTemp187) GetPVOutput] SetColorRange 0 3926
 
-set activeCamera [Ren1 GetActiveCamera]
+set Ren1 [[[$Application GetMainWindow] GetMainView] GetRenderer]
+set activeCamera [$Ren1 GetActiveCamera]
 $activeCamera SetPosition 31.5 250.821 20.5266
 $activeCamera SetFocalPoint 31.5 31.5 31.5
 $activeCamera SetViewUp 0 -0.049971 -0.998751
@@ -60,8 +61,9 @@ $pv(vtkTemp1) ResetCameraCallback
 #  }
 
 # Fix the size of the image.
-RenWin1 SetSize 300 300
-RenWin1 Render
+set RenWin1 [[[$Application GetMainWindow] GetMainView] GetRenderWindow]
+$RenWin1 SetSize 300 300
+$RenWin1 Render
 update
 
 for {set i  1} {$i < [expr $argc - 1]} {incr i} {

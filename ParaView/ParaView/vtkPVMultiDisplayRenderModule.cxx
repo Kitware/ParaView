@@ -53,7 +53,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVMultiDisplayRenderModule);
-vtkCxxRevisionMacro(vtkPVMultiDisplayRenderModule, "1.7");
+vtkCxxRevisionMacro(vtkPVMultiDisplayRenderModule, "1.8");
 
 
 
@@ -80,40 +80,73 @@ void vtkPVMultiDisplayRenderModule::SetPVApplication(vtkPVApplication *pvApp)
     {
     return;
     }
+  vtkPVProcessModule* pm = pvApp->GetProcessModule();
+
   // We had trouble with SGI/aliasing with compositing.
   if (this->RenderWindow->IsA("vtkOpenGLRenderWindow") &&
       (pvApp->GetProcessModule()->GetNumberOfPartitions() > 1))
     {
-    pvApp->BroadcastScript("%s SetMultiSamples 0", this->RenderWindowTclName);
+    pm->GetStream() << vtkClientServerStream::Invoke
+                    << this->RenderWindowID 
+                    << "SetMultiSamples" << 0 
+                    << vtkClientServerStream::End;
     }
 
   this->Composite = NULL;
-  pvApp->MakeTclObject("vtkMultiDisplayManager", "TDispManager1");
+  this->CompositeID = pm->NewStreamObject("vtkMultiDisplayManager");
   int *tileDim = pvApp->GetTileDimensions();
-  pvApp->BroadcastScript("TDispManager1 SetTileDimensions %d %d",
-                         tileDim[0], tileDim[1]);
+  pm->GetStream()
+    << vtkClientServerStream::Invoke
+    << this->CompositeID << "SetTileDimensions"
+    << tileDim[0] << tileDim[1]
+    << vtkClientServerStream::End;
+  pm->SendStreamToClientAndServer();
 
   if (pvApp->GetClientMode())
     {
-    pvApp->Script("TDispManager1 SetClientFlag 1");
-    pvApp->BroadcastScript("TDispManager1 SetSocketController [[$Application GetProcessModule] GetSocketController]");
-    pvApp->BroadcastScript("TDispManager1 SetZeroEmpty 0");
+    pm->GetStream()
+      << vtkClientServerStream::Invoke
+      << this->CompositeID << "SetClientFlag" << 1
+      << vtkClientServerStream::End;
+    pm->SendStreamToClient();
+
+    pm->GetStream()
+      << vtkClientServerStream::Invoke
+      << pm->GetApplicationID() << "GetProcessModule"
+      << vtkClientServerStream::End
+      << vtkClientServerStream::Invoke
+      << vtkClientServerStream::LastResult << "GetSocketController"
+      << vtkClientServerStream::End;
+    pm->GetStream()
+      << vtkClientServerStream::Invoke
+      << this->CompositeID << "SetSocketController"
+      << vtkClientServerStream::LastResult
+      << vtkClientServerStream::End;
+    pm->GetStream()
+      << vtkClientServerStream::Invoke
+      << this->CompositeID << "SetZeroEmpty" << 0
+      << vtkClientServerStream::End;
+    pm->SendStreamToClientAndServer();
     }
   else
     {
-    pvApp->BroadcastScript("TDispManager1 SetZeroEmpty 1");
+    pm->GetStream()
+      << vtkClientServerStream::Invoke
+      << this->CompositeID << "SetZeroEmpty" << 1
+      << vtkClientServerStream::End;
+    pm->SendStreamToClientAndServer();
     }
+
   // Have to initialize after ZeroEmpty, and tile dimensions have been set.
-  pvApp->BroadcastScript("TDispManager1 InitializeSchedule");
-
-
-  this->CompositeTclName = NULL;
-  this->SetCompositeTclName("TDispManager1");
-
-  pvApp->BroadcastScript("%s SetRenderWindow %s", this->CompositeTclName,
-                         this->RenderWindowTclName);
-  pvApp->BroadcastScript("%s InitializeRMIs", this->CompositeTclName);
-
+  pm->GetStream()
+    << vtkClientServerStream::Invoke
+    << this->CompositeID << "InitializeSchedule"
+    << vtkClientServerStream::End;
+  pm->GetStream()
+    << vtkClientServerStream::Invoke
+    << this->CompositeID << "InitializeRMIs"
+    << vtkClientServerStream::End;
+  pm->SendStreamToClientAndServer();
 }
 
 //----------------------------------------------------------------------------
@@ -135,6 +168,7 @@ void vtkPVMultiDisplayRenderModule::StillRender()
   vtkPVLODPartDisplayInformation* info;
   unsigned long totalMemory = 0;
   int localRender;
+  vtkPVProcessModule* pm = this->PVApplication->GetProcessModule();
 
   // Find out whether we are going to render localy.
   this->PartDisplays->InitTraversal();
@@ -165,24 +199,36 @@ void vtkPVMultiDisplayRenderModule::StillRender()
       }
     }
 
-  if (this->PVApplication && this->CompositeTclName)
+  if (this->PVApplication && this->CompositeID.ID != 0)
     {
-    this->PVApplication->Script("%s SetImageReductionFactor 1",
-                                this->CompositeTclName);
+    pm->GetStream() 
+      << vtkClientServerStream::Invoke 
+      << this->CompositeID
+      << "SetImageReductionFactor" << 1 
+      << vtkClientServerStream::End;
+    pm->SendStreamToClient();
     }
 
   // Switch the compositer to local/composite mode.
   if (this->LocalRender != localRender)
     {
-    if (this->CompositeTclName)
+    if (this->CompositeID.ID)
       {
       if (localRender)
         {
-        this->PVApplication->Script("%s UseCompositingOff", this->CompositeTclName);
+        pm->GetStream()
+          << vtkClientServerStream::Invoke
+          << this->CompositeID << "UseCompositingOff"
+          << vtkClientServerStream::End;
+        pm->SendStreamToClient();
         }
       else
         {
-        this->PVApplication->Script("%s UseCompositingOn", this->CompositeTclName);
+        pm->GetStream()
+          << vtkClientServerStream::Invoke
+          << this->CompositeID << "UseCompositingOn"
+          << vtkClientServerStream::End;
+        pm->SendStreamToClient();
         }
       this->LocalRender = localRender;
       }
@@ -233,6 +279,7 @@ void vtkPVMultiDisplayRenderModule::InteractiveRender()
   unsigned long tmpMemory;
   int localRender;
   int useLOD;
+  vtkPVProcessModule* pm = this->PVApplication->GetProcessModule();
 
   // Compute memory totals.
   this->PartDisplays->InitTraversal();
@@ -304,15 +351,23 @@ void vtkPVMultiDisplayRenderModule::InteractiveRender()
   // Switch the compositer to local/composite mode.
   if (this->LocalRender != localRender)
     {
-    if (this->CompositeTclName)
+    if (this->CompositeID.ID)
       {
       if (localRender)
         {
-        this->PVApplication->Script("%s UseCompositingOff", this->CompositeTclName);
+        pm->GetStream()
+          << vtkClientServerStream::Invoke
+          << this->CompositeID << "UseCompositingOff"
+          << vtkClientServerStream::End;
+        pm->SendStreamToClient();
         }
       else
         {
-        this->PVApplication->Script("%s UseCompositingOn", this->CompositeTclName);
+        pm->GetStream()
+          << vtkClientServerStream::Invoke
+          << this->CompositeID << "UseCompositingOn"
+          << vtkClientServerStream::End;
+        pm->SendStreamToClient();
         }
       this->LocalRender = localRender;
       }
@@ -360,12 +415,14 @@ void vtkPVMultiDisplayRenderModule::InteractiveRender()
 //----------------------------------------------------------------------------
 void vtkPVMultiDisplayRenderModule::SetUseCompositeCompression(int val)
 {
-  if (this->CompositeTclName)
+  if (this->CompositeID.ID)
     {
-    vtkPVApplication *pvApp = this->GetPVApplication();
-    // !!!! Putting this catch here until I make a native TD sublcass. !!!
-    pvApp->BroadcastScript("catch {%s SetUseCompositeCompression %d}", 
-                            this->CompositeTclName, val);
+    vtkPVProcessModule* pm = this->PVApplication->GetProcessModule();
+    pm->GetStream()
+      << vtkClientServerStream::Invoke
+      << this->CompositeID << "SetUseCompositeCompression" << val
+      << vtkClientServerStream::End;
+    pm->SendStreamToClientAndServer();
     }
 }
 

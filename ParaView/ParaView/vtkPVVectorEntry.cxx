@@ -57,7 +57,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVVectorEntry);
-vtkCxxRevisionMacro(vtkPVVectorEntry, "1.42");
+vtkCxxRevisionMacro(vtkPVVectorEntry, "1.43");
 
 //-----------------------------------------------------------------------------
 vtkPVVectorEntry::vtkPVVectorEntry()
@@ -291,7 +291,7 @@ void vtkPVVectorEntry::CheckModifiedCallback(const char* key)
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVVectorEntry::AcceptInternal(const char* sourceTclName)
+void vtkPVVectorEntry::AcceptInternal(vtkClientServerID sourceID)
 {
   vtkKWEntry *entry;
   float scalars[6];
@@ -305,7 +305,7 @@ void vtkPVVectorEntry::AcceptInternal(const char* sourceTclName)
     count++;
     }
   this->Property->SetScalars(count, scalars);
-  this->Property->SetVTKSourceTclName(sourceTclName);
+  this->Property->SetVTKSourceID(sourceID);
   this->Property->AcceptInternal();
   
   this->ModifiedFlag = 0;  
@@ -559,15 +559,15 @@ void vtkPVVectorEntry::SetValue(char *v0, char *v1, char *v2,
 
 //-----------------------------------------------------------------------------
 void vtkPVVectorEntry::SaveInBatchScriptForPart(ofstream *file, 
-  const char* sourceTclName)
+                                                vtkClientServerID sourceID)
 {
   if (this->ScriptValue == NULL)
     {
-    vtkPVObjectWidget::SaveInBatchScriptForPart(file, sourceTclName);
+    vtkPVObjectWidget::SaveInBatchScriptForPart(file, sourceID);
     return;
     }
 
-  *file << "\t" << sourceTclName << " Set" << this->VariableName;
+  *file << "\t" << "pvTemp" << sourceID << " Set" << this->VariableName;
   *file << " " << this->ScriptValue << "\n";
 }
 

@@ -89,7 +89,7 @@ public:
   // Description:
   // The methods get called when the Accept button is pressed. 
   // It sets the VTK objects value using this widgets value.
-  virtual void AcceptInternal(const char* sourceTclName);
+  virtual void AcceptInternal(vtkClientServerID);
 
   // Description:
   // The methods get called when the Reset button is pressed. 
@@ -107,8 +107,6 @@ protected:
 
 
   vtkPVLineWidget* LineWidget;
-
-  static int InstanceCount;
 
   vtkPVLineSourceWidget(const vtkPVLineSourceWidget&); // Not implemented
   void operator=(const vtkPVLineSourceWidget&); // Not implemented

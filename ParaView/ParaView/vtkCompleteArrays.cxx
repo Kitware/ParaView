@@ -18,28 +18,28 @@
 #include "vtkCompleteArrays.h"
 
 #include "vtkCellData.h"
-#include "vtkDataSet.h"
-#include "vtkDataArray.h"
-#include "vtkObjectFactory.h"
-#include "vtkPointData.h"
-#include "vtkMultiProcessController.h"
-#include "vtkIdTypeArray.h"
-#include "vtkFloatArray.h"
-#include "vtkDoubleArray.h"
-#include "vtkIntArray.h"
-#include "vtkShortArray.h"
-#include "vtkLongArray.h"
 #include "vtkCharArray.h"
-#include "vtkUnsignedIntArray.h"
-#include "vtkUnsignedShortArray.h"
-#include "vtkUnsignedLongArray.h"
-#include "vtkUnsignedCharArray.h"
-
+#include "vtkClientServerStream.h"
+#include "vtkDataArray.h"
+#include "vtkDataSet.h"
+#include "vtkDoubleArray.h"
+#include "vtkFloatArray.h"
+#include "vtkIdTypeArray.h"
+#include "vtkIntArray.h"
+#include "vtkLongArray.h"
+#include "vtkMultiProcessController.h"
+#include "vtkObjectFactory.h"
+#include "vtkPVArrayInformation.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVDataSetAttributesInformation.h"
-#include "vtkPVArrayInformation.h"
+#include "vtkPointData.h"
+#include "vtkShortArray.h"
+#include "vtkUnsignedCharArray.h"
+#include "vtkUnsignedIntArray.h"
+#include "vtkUnsignedLongArray.h"
+#include "vtkUnsignedShortArray.h"
 
-vtkCxxRevisionMacro(vtkCompleteArrays, "1.2");
+vtkCxxRevisionMacro(vtkCompleteArrays, "1.3");
 vtkStandardNewMacro(vtkCompleteArrays);
 
 
@@ -75,8 +75,7 @@ void vtkCompleteArrays::Execute()
   int myProcId;
   int numProcs;
   int idx;
-  int length;
-  unsigned char* msg;
+  vtkClientServerStream css;
 
   // Initialize
   //
@@ -108,10 +107,13 @@ void vtkCompleteArrays::Execute()
     vtkPVDataInformation* tmpInfo = vtkPVDataInformation::New();
     for (idx = 1; idx < numProcs; ++idx)
       {
+      int length = 0;
       this->Controller->Receive(&length, 1, idx, 3389002);
-      msg = new unsigned char[length];
-      this->Controller->Receive(msg, length, idx, 3389003);
-      tmpInfo->CopyFromMessage(msg);
+      unsigned char* data = new unsigned char[length];
+      this->Controller->Receive(data, length, idx, 3389003);
+      css.SetData(data, length);
+      tmpInfo->CopyFromStream(&css);
+      delete [] data;
       dataInfo->AddInformation(tmpInfo);
       }
     this->FillArrays(output->GetPointData(), dataInfo->GetPointDataInformation());
@@ -125,16 +127,17 @@ void vtkCompleteArrays::Execute()
     if (noNeed)
       {
       return;
-      }    
+      }
     vtkPVDataInformation* dataInfo = vtkPVDataInformation::New();
     dataInfo->CopyFromObject(output);
-    length = dataInfo->GetMessageLength();
-    msg = new unsigned char[length];
-    dataInfo->WriteMessage(msg);
-    this->Controller->Send(&length, 1, 0, 3389002);
-    this->Controller->Send(msg, length, 0, 3389003);
+    dataInfo->CopyToStream(&css);
+    size_t length;
+    const unsigned char* data;
+    css.GetData(&data, &length);
+    int len = static_cast<int>(length);
+    this->Controller->Send(&len, 1, 0, 3389002);
+    this->Controller->Send(const_cast<unsigned char*>(data), len, 0, 3389003);
     dataInfo->Delete();
-    delete [] msg;
     }
 }
 

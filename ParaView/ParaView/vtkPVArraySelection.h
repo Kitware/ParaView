@@ -86,11 +86,6 @@ public:
   virtual void Create(vtkKWApplication *app);
 
   // Description:
-  // This is the name of the VTK reader.
-  vtkSetStringMacro(VTKReaderTclName);
-  vtkGetStringMacro(VTKReaderTclName);
-    
-  // Description:
   // Callback for the AllOn and AllOff buttons.
   void AllOnCallback();
   void AllOffCallback();
@@ -132,8 +127,8 @@ protected:
   virtual void SetReaderSelectionsFromWidgets();
   
   char* AttributeName;
-  char* VTKReaderTclName;
-
+  vtkClientServerID VTKReaderID;
+  
   vtkKWLabeledFrame* LabeledFrame;
   
   vtkKWWidget* ButtonFrame;
@@ -149,7 +144,11 @@ protected:
   char* SelectionTclName;
   
   vtkPVArraySelectionArraySet* ArraySet;
-  
+
+  // Server-side helper.
+  vtkClientServerID ServerSideID;
+  void CreateServerSide();
+
   vtkPVArraySelection(const vtkPVArraySelection&); // Not implemented
   void operator=(const vtkPVArraySelection&); // Not implemented
 

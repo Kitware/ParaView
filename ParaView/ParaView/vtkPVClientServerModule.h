@@ -117,10 +117,14 @@ public:
   // between the client and process 0 of the server.
   vtkGetObjectMacro(SocketController, vtkSocketController);
 
+  //BTX
   // Description:
   // Module dependant method for collecting data information from all procs.
-  virtual void GatherInformation(vtkPVInformation* info, char* objectTclName);
-  virtual void GatherInformationInternal(char* infoClassName, vtkObject* object);
+  virtual void GatherInformation(vtkPVInformation* info,
+                                 vtkClientServerID id);
+  //ETX
+  virtual void GatherInformationInternal(const char* infoClassName,
+                                         vtkObject* object);
 
   // Description:
   // This executes a script on process 0 of the server.
@@ -132,7 +136,7 @@ public:
   // Get a directory listing for the given directory.  This
   // implementation will always give a listing on the server side.
   virtual int GetDirectoryListing(const char* dir, vtkStringList* dirs,
-                                  vtkStringList* files, const char* perm);
+                                  vtkStringList* files, int save);
   
   // Description:
   // Get a file selection dialog instance.
@@ -154,10 +158,56 @@ public:
   
   static void ErrorCallback(vtkObject *caller, unsigned long eid, void *clientdata, void *calldata);
 
+  // Description:
+  // Process a client server message on the server.
+  void ProcessMessage(unsigned char* arg, size_t len);
+  
+  // Description:
+  // Send current ClientServerStream data to the client
+  virtual void SendStreamToClient();
+  
+  // Description:
+  // Send current ClientServerStream data to the server
+  virtual void SendStreamToServer();
+  
+  // Send the current vtkClientServerStream contents to the server
+  // root node.  Also reset the vtkClientServerStream object.
+  virtual void SendStreamToServerRoot();
+
+  // Description:
+  // Send current ClientServerStream data to the server and the client.
+  virtual void SendStreamToClientAndServer();
+
+  // Description:
+  // Send current ClientServerStream data to the server root and the client.
+  virtual void SendStreamToClientAndServerRoot();
+
+  //BTX
+  // Description:
+  // Return a message containing the result of the last SendMessages call.
+  // In client/server mode this causes a round trip to the server.
+  virtual const vtkClientServerStream& GetLastServerResult();
+
+  // Description:
+  // Return a message containing the result of the last call made on
+  // the client.
+  virtual const vtkClientServerStream& GetLastClientResult();
+  friend void vtkPVClientServerLastResultRMI(  void *, void* , int ,int );
+  //ETX
+
+  // Description:
+  // Used internally.  Do not call.  Use LoadModule instead.
+  int LoadModuleInternal(const char* name);
 protected:
   vtkPVClientServerModule();
   ~vtkPVClientServerModule();
 
+  // Description:
+  // Send the last client server result to the client called from an RMI
+  void SendLastClientServerResult();
+
+  void SendStreamToServerInternal();
+  void SendStreamToServerRootInternal();
   void Connect();
 
   int NumberOfServerProcesses;
@@ -176,7 +226,9 @@ protected:
   int Port;
   int MultiProcessMode;
   int NumberOfProcesses;
-
+  
+  vtkClientServerStream* LastServerResultStream;
+  
   vtkKWRemoteExecute* RemoteExecution;
 private:  
   vtkPVClientServerModule(const vtkPVClientServerModule&); // Not implemented
@@ -184,5 +236,3 @@ private:
 };
 
 #endif
-
-

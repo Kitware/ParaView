@@ -54,7 +54,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVIceTRenderModule);
-vtkCxxRevisionMacro(vtkPVIceTRenderModule, "1.2");
+vtkCxxRevisionMacro(vtkPVIceTRenderModule, "1.3");
 
 
 
@@ -64,7 +64,7 @@ vtkCxxRevisionMacro(vtkPVIceTRenderModule, "1.2");
 //----------------------------------------------------------------------------
 vtkPVIceTRenderModule::vtkPVIceTRenderModule()
 {
-  this->DisplayManagerTclName = 0;
+  this->DisplayManagerID.ID = 0;
 
   this->ReductionFactor = 2;
 }
@@ -81,17 +81,20 @@ vtkPVIceTRenderModule::~vtkPVIceTRenderModule()
     }
 
   // Tree Composite
-  if (this->DisplayManagerTclName && pvApp && pm)
-    {
-    pm->ServerScript("%s Delete", this->DisplayManagerTclName);
-    this->SetDisplayManagerTclName(NULL);
-    }
-  if (this->CompositeTclName && pvApp && pm)
-    {
-    pm->Script("%s Delete", this->CompositeTclName);
-    pm->RootScript("%s Delete", this->CompositeTclName);
-    this->SetCompositeTclName(NULL);
-    }
+   if (this->DisplayManagerID.ID && pvApp && pm)
+     {
+     pm->DeleteStreamObject(this->DisplayManagerID);
+     pm->SendStreamToServer();
+     this->DisplayManagerID.ID = 0;
+     }
+   if (this->CompositeID.ID && pvApp && pm)
+     {
+     pm->DeleteStreamObject(this->CompositeID);
+     pm->SendStreamToClient();
+     pm->DeleteStreamObject(this->CompositeID);
+     pm->SendStreamToServerRoot();
+     this->CompositeID.ID = 0;
+     }
 }
 
 //----------------------------------------------------------------------------
@@ -119,16 +122,19 @@ void vtkPVIceTRenderModule::SetPVApplication(vtkPVApplication *pvApp)
   this->PVApplication = pvApp;
   this->PVApplication->Register(this);
 
-  this->Renderer = (vtkRenderer*)pvApp->MakeTclObject("vtkRenderer", "Ren1");
-  this->RendererTclName = NULL;
-  this->SetRendererTclName("Ren1");
-
+  this->RendererID = pm->NewStreamObject("vtkIceTRenderer");
+  this->RenderWindowID = pm->NewStreamObject("vtkRenderWindow");
+  pm->SendStreamToClientAndServer();
+  this->Renderer = 
+    vtkRenderer::SafeDownCast(
+      pm->GetObjectFromID(this->RendererID));
   this->RenderWindow = 
-    (vtkRenderWindow*)pvApp->MakeTclObject("vtkRenderWindow", "RenWin1");
-
-  pm->ServerScript("Ren1 Delete");
-  pm->ServerScript("RenWin1 FullScreenOn");
-  pm->ServerScript("vtkIceTRenderer Ren1");
+    vtkRenderWindow::SafeDownCast(
+      pm->GetObjectFromID(this->RenderWindowID));
+  pm->GetStream() << vtkClientServerStream::Invoke << this->RenderWindowID 
+                  << "FullScreenOn" 
+                  << vtkClientServerStream::End;
+  pm->SendStreamToServer();
 
   if (pvApp->GetUseStereoRendering())
     {
@@ -136,56 +142,83 @@ void vtkPVIceTRenderModule::SetPVApplication(vtkPVApplication *pvApp)
     this->RenderWindow->StereoRenderOn();
     }
 
+  pm->GetStream() << vtkClientServerStream::Invoke
+                  << this->RenderWindowID << "AddRenderer" << this->RendererID
+                  << vtkClientServerStream::End;
+  pm->SendStreamToClientAndServer();
 
-  this->SetRenderWindowTclName("RenWin1");
-
-  pm->BroadcastScript("%s AddRenderer %s", this->RenderWindowTclName,
-    this->RendererTclName);
-
-  //cout << "Ren1: " << this->RendererTclName << " " << this->Renderer->GetClassName() << endl;
-  //cout << "RenWin1: " << this->RenderWindowTclName << " " << this->RenderWindow->GetClassName() << endl;
-
-
-  pvApp->MakeTclObject("vtkIceTRenderManager", "TDispManager1");
+  this->DisplayManagerID = pm->NewStreamObject("vtkIceTRenderManager");
+  pm->SendStreamToClientAndServer();
   int *tileDim = pvApp->GetTileDimensions();
   cout << "Size: " << tileDim[0] << ", " << tileDim[1] << endl;
-  pm->ServerScript("TDispManager1 SetTileDimensions %d %d",
-    tileDim[0], tileDim[1]);
+  pm->GetStream() <<  vtkClientServerStream::Invoke
+                  << this->DisplayManagerID
+                  << "SetTileDimensions"
+                  << tileDim[0] << tileDim[1]
+                  << vtkClientServerStream::End;
+  pm->SendStreamToServer();
 
-  this->DisplayManagerTclName = NULL;
-  this->SetDisplayManagerTclName("TDispManager1");
+  pm->GetStream() << vtkClientServerStream::Invoke
+                  << this->DisplayManagerID << "SetRenderWindow"
+                  << this->RenderWindowID
+                  << vtkClientServerStream::End;
+  pm->SendStreamToServer();
 
-  pm->ServerScript("%s SetRenderWindow %s", this->DisplayManagerTclName,
-    this->RenderWindowTclName);
-  pm->ServerScript("%s SetController [ [ $Application GetProcessModule ] GetController ]",
-    this->DisplayManagerTclName);
-  pm->ServerScript("%s InitializeRMIs", this->DisplayManagerTclName);
+  pm->GetStream() << vtkClientServerStream::Invoke
+                  << pm->GetProcessModuleID()
+                  << "GetController"
+                  << vtkClientServerStream::End;
+  pm->GetStream() << vtkClientServerStream::Invoke
+                  << this->DisplayManagerID << "SetController"
+                  << vtkClientServerStream::LastResult
+                  << vtkClientServerStream::End; 
+  pm->GetStream() << vtkClientServerStream::Invoke
+                  << this->DisplayManagerID 
+                  << "InitializeRMIs"
+                  << vtkClientServerStream::End;
+  pm->SendStreamToServer();
 
 
   // **********************************************************
-  this->SetCompositeTclName("CCompositeManager1");
-  pm->Script("vtkIceTClientCompositeManager %s", this->CompositeTclName);
-  pm->RootScript("vtkIceTClientCompositeManager %s", this->CompositeTclName);
+  this->CompositeID = pm->NewStreamObject("vtkIceTClientCompositeManager");
+  vtkClientServerStream tmp = pm->GetStream();
+  pm->SendStreamToClient();
+  pm->GetStream() = tmp;
+  pm->SendStreamToServerRoot();
   // Clean up this mess !!!!!!!!!!!!!
   // Even a cast to vtkPVClientServerModule would be better than this.
   // How can we syncronize the process modules and render modules?
-  pm->Script("%s SetClientController [$Application GetSocketController]", this->CompositeTclName);
-  pm->Script("%s SetClientFlag [$Application GetClientMode]", this->CompositeTclName);
-  pm->RootScript("%s SetClientController [$Application GetSocketController]", this->CompositeTclName);
-  pm->RootScript("%s SetClientFlag [$Application GetClientMode]", this->CompositeTclName);
-
-  pm->Script("%s SetRenderWindow %s", this->CompositeTclName, this->RenderWindowTclName);
-  pm->Script("%s InitializeRMIs", this->CompositeTclName);
-  pm->RootScript("%s SetRenderWindow %s", this->CompositeTclName, this->RenderWindowTclName);
-  pm->RootScript("%s InitializeRMIs", this->CompositeTclName);
-
-  pm->Script("%s UseCompositingOn", this->CompositeTclName);
-  pm->RootScript("%s UseCompositingOn", this->CompositeTclName);
+  pm->GetStream() << vtkClientServerStream::Invoke << pm->GetApplicationID() << "GetSocketController"
+                  << vtkClientServerStream::End;
+  pm->GetStream() << vtkClientServerStream::Invoke << this->CompositeID
+                  << "SetClientController" << vtkClientServerStream::LastResult
+                  << vtkClientServerStream::End;
+  pm->GetStream() << vtkClientServerStream::Invoke << pm->GetApplicationID() << "GetClientMode"
+                  << vtkClientServerStream::End;
+  pm->GetStream() << vtkClientServerStream::Invoke << this->CompositeID
+                  << "SetClientFlag" << vtkClientServerStream::LastResult
+                  << vtkClientServerStream::End; 
+  pm->GetStream() << vtkClientServerStream::Invoke << this->CompositeID
+                  << "SetRenderWindow"
+                  << this->RenderWindowID
+                  << vtkClientServerStream::End;
+  pm->GetStream() << vtkClientServerStream::Invoke << this->CompositeID
+                  << "InitializeRMIs"
+                  << vtkClientServerStream::End;
+  pm->GetStream() << vtkClientServerStream::Invoke << this->CompositeID
+                  << "UseCompositingOn"
+                  << vtkClientServerStream::End;
+  // copy the stream before it is sent and reset
+  vtkClientServerStream copy = pm->GetStream();
+  pm->SendStreamToClient(); // send the stream to the client
+  pm->GetStream() = copy; // now copy the copy into the current stream
+  pm->SendStreamToServerRoot(); // send the same stream to the server root
 
   // The client server manager needs to set parameters on the IceT manager.
-  pm->RootScript("%s SetIceTManager %s", 
-                 this->CompositeTclName, this->DisplayManagerTclName);
-
+  pm->GetStream() << vtkClientServerStream::Invoke << this->CompositeID
+                  << "SetIceTManager" << this->DisplayManagerID
+                  << vtkClientServerStream::End;
+  pm->SendStreamToServerRoot();
 }
 
 //----------------------------------------------------------------------------

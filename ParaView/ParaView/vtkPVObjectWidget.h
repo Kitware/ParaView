@@ -48,7 +48,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // .NOTE
 // Since we have created the AcceptInternal method that has the object tcl
 // name as an argument, many classes do not need this superclass or
-// use its ivar ObjectTclName.  I have not removed the class because I believe
+// use its ivar ObjectID.  I have not removed the class because I believe
 // some widgets use this class when the object is a PV object and not a VTK object.
 // I will have to clean this up later
 
@@ -70,9 +70,7 @@ public:
   // some objects state/ivars.  This is one way the object/variable
   // can be specified. Subclasses may have seperate or addition
   // variables for specifying the relationship.
-  void SetObjectVariable(const char *objectTclName, const char *var);
-  vtkSetStringMacro(ObjectTclName);
-  vtkGetStringMacro(ObjectTclName);
+  vtkSetMacro(ObjectID,vtkClientServerID);
   vtkSetStringMacro(VariableName);
   vtkGetStringMacro(VariableName);
 
@@ -84,18 +82,21 @@ public:
   // parameters.
   vtkPVObjectWidget* ClonePrototype(vtkPVSource* pvSource,
                                  vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
+  // Description:
+  // Get an object from a widget by name
+  virtual vtkClientServerID GetObjectByName(const char*){ vtkClientServerID id = {0}; return id;}
 //ETX
 
 protected:
   vtkPVObjectWidget();
   ~vtkPVObjectWidget();
 
-  char *ObjectTclName;
+  vtkClientServerID ObjectID;
   char *VariableName;
 
   vtkPVObjectWidget(const vtkPVObjectWidget&); // Not implemented
   void operator=(const vtkPVObjectWidget&); // Not implemented
-
+  
 //BTX
   virtual void CopyProperties(vtkPVWidget* clone, vtkPVSource* pvSource,
                               vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
@@ -106,7 +107,7 @@ protected:
 
   // Description:
   // An interface for saving a widget into a script.
-  virtual void SaveInBatchScriptForPart(ofstream *file, const char* sourceTclName);
+  virtual void SaveInBatchScriptForPart(ofstream *file, vtkClientServerID);
 };
 
 #endif

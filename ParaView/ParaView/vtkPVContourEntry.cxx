@@ -55,7 +55,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVContourEntry);
-vtkCxxRevisionMacro(vtkPVContourEntry, "1.41");
+vtkCxxRevisionMacro(vtkPVContourEntry, "1.42");
 
 vtkCxxSetObjectMacro(vtkPVContourEntry, ArrayMenu, vtkPVArrayMenu);
 
@@ -106,17 +106,17 @@ int vtkPVContourEntry::ComputeWidgetRange()
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVContourEntry::AcceptInternal(const char* sourceTclName)
+void vtkPVContourEntry::AcceptInternal(vtkClientServerID sourceID)
 {
   int i;
   int numContours;
 
-  if (sourceTclName == NULL)
+  if (sourceID.ID == 0)
     {
     return;
     }
 
-  this->Superclass::AcceptInternal(sourceTclName);
+  this->Superclass::AcceptInternal(sourceID);
 
   numContours = this->ContourValuesList->GetNumberOfItems();
 
@@ -136,7 +136,7 @@ void vtkPVContourEntry::AcceptInternal(const char* sourceTclName)
     numScalars[i+1] = 2;
     }
   
-  this->Property->SetVTKSourceTclName(sourceTclName);
+  this->Property->SetVTKSourceID(sourceID);
   this->Property->SetVTKCommands(numContours+1, cmds, numScalars);
   this->Property->AcceptInternal();
   
@@ -150,7 +150,7 @@ void vtkPVContourEntry::AcceptInternal(const char* sourceTclName)
 
 //-----------------------------------------------------------------------------
 void vtkPVContourEntry::SaveInBatchScriptForPart(ofstream *file,
-                                                 const char* sourceTclName)
+                                                 vtkClientServerID sourceID)
 {
   int i;
   float value;
@@ -162,7 +162,7 @@ void vtkPVContourEntry::SaveInBatchScriptForPart(ofstream *file,
     {
     value = this->Property->GetScalar(2*(i+1));
     *file << "\t";
-    *file << sourceTclName << " SetValue " 
+    *file << "pvTemp" << sourceID << " SetValue " 
           << i << " " << value << endl;
     }
 }

@@ -46,15 +46,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWLabel.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
+#include "vtkPVStringWidgetProperty.h"
 #include "vtkPVXMLElement.h"
 #include "vtkPVProcessModule.h"
-#include "vtkPVStringWidgetProperty.h"
 
 #include <vtkstd/string>
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVStringEntry);
-vtkCxxRevisionMacro(vtkPVStringEntry, "1.25");
+vtkCxxRevisionMacro(vtkPVStringEntry, "1.26");
 
 //----------------------------------------------------------------------------
 vtkPVStringEntry::vtkPVStringEntry()
@@ -202,12 +202,12 @@ void vtkPVStringEntry::SetValue(const char* fileName)
 
   
 //----------------------------------------------------------------------------
-void vtkPVStringEntry::AcceptInternal(const char* sourceTclName)
+void vtkPVStringEntry::AcceptInternal(vtkClientServerID sourceID)
 {
   this->ModifiedFlag = 0;
   
   this->Property->SetString(this->GetValue());
-  this->Property->SetVTKSourceTclName(sourceTclName);
+  this->Property->SetVTKSourceID(sourceID);
   this->Property->AcceptInternal();
 }
 
@@ -233,13 +233,27 @@ void vtkPVStringEntry::ResetInternal()
   // Command to update the UI.
   this->SetValue(this->Property->GetString());
 
-  if ( this->ObjectTclName && this->InitSourceVariable )
+  if ( this->ObjectID.ID && this->InitSourceVariable )
     {
-    this->GetPVApplication()->GetProcessModule()->RootScript("%s Get%s",
-                  this->ObjectTclName, this->InitSourceVariable);
-    this->SetValue(this->GetPVApplication()->GetProcessModule()->GetRootResult());
+    vtkstd::string method = "Get";
+    method += this->InitSourceVariable;
+    vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
+    pm->GetStream() << vtkClientServerStream::Invoke
+                    << this->ObjectID << method.c_str()
+                    << vtkClientServerStream::End;
+    pm->SendStreamToServerRoot();
+    const char* value;
+    if(pm->GetLastServerResult().GetArgument(0, 0, &value))
+      {
+      this->SetValue(value);
+      }
+    else
+      {
+      vtkErrorMacro("Error getting \"" << this->InitSourceVariable
+                    << "\" value from server.");
+      }
     }
-  
+
   if (this->AcceptCalled)
     {
     this->ModifiedFlag = 0;
@@ -311,21 +325,28 @@ const char* vtkPVStringEntry::GetValue()
 
 //----------------------------------------------------------------------------
 void vtkPVStringEntry::SaveInBatchScriptForPart(ofstream *file, 
-                                                const char* sourceTclName)
+                                                vtkClientServerID sourceID)
 {
-  char *result;
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  vtkPVProcessModule* pm = pvApp->GetProcessModule();
   
-  if (sourceTclName == NULL || this->VariableName == NULL)
+  if (sourceID.ID == 0 || this->VariableName == NULL)
     {
-    vtkErrorMacro(<< this->GetClassName() << " must not have SaveInBatchScript method.");
+    vtkErrorMacro(<< this->GetClassName()
+                  << " must not have SaveInBatchScript method.");
     return;
     } 
 
-  *file << "\t" << sourceTclName << " Set" << this->VariableName;
-  this->Script("set tempValue [%s Get%s]", 
-               sourceTclName, this->VariableName);
-  result = this->Application->GetMainInterp()->result;
-  *file << " {" << result << "}\n";
+  *file << "\t" << "pvTemp" << sourceID << " Set" << this->VariableName;
+  pm->GetStream() << vtkClientServerStream::Invoke << sourceID
+                  << (vtkstd::string("Get") 
+                      + vtkstd::string(this->VariableName)).c_str()
+                  << vtkClientServerStream::End;
+  ostrstream result;
+  pm->GetLastClientResult().PrintArgumentValue(result, 0,0);
+  result << ends;
+  *file << " {" << result.str() << "}\n";
+  delete [] result.str();
 }
 
 //----------------------------------------------------------------------------

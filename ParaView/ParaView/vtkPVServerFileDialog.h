@@ -48,6 +48,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __vtkPVServerFileDialog_h
 
 #include "vtkKWLoadSaveDialog.h"
+#include "vtkClientServerID.h" // Need vtkClientServerID.
 class vtkKWApplication;
 class vtkPVApplication;
 class vtkKWPushButton;
@@ -148,6 +149,10 @@ protected:
   vtkStringList*    FileTypeDescriptions;
   vtkStringList*    ExtensionStrings;
   int               CheckExtension(const char* name);
+
+  // Server-side helper.
+  vtkClientServerID ServerSideID;
+  void CreateServerSide();
 
   vtkKWWidget* ScrollBar;
   // Description:

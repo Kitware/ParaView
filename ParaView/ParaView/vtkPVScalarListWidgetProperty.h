@@ -39,11 +39,8 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-// .NAME vtkPVScalarListWidgetProperty - a property for a list of scalar values
+// .NAME vtkPVScalarListWidgetProperty
 // .SECTION Description
-// vtkPVScalarListWidgetProperty is a subclass of vtkPVWidgetProperty that is
-// used to pass a list of scalar values to a VTK object.  There can be
-// multiple VTK commands used to pass these values to VTK.
 
 #ifndef __vtkPVScalarListWidgetProperty_h
 #define __vtkPVScalarListWidgetProperty_h
@@ -56,45 +53,16 @@ public:
   static vtkPVScalarListWidgetProperty* New();
   vtkTypeRevisionMacro(vtkPVScalarListWidgetProperty, vtkPVWidgetProperty);
   void PrintSelf(ostream& os, vtkIndent indent);
-
-  // Description:
-  // Pass values to VTK objects.
+  
   virtual void AcceptInternal();
   
-  // Description:
-  // Set the method(s) to call on the specified VTK object.
-  // numCmds is the number of methods to call.
-  // cmds is a list of the methods.
-  // numScalars is an array containing the number of scalar parameters needed
-  // for each method.
   void SetVTKCommands(int numCmds, char **cmds, int *numScalars);
-
-  // Description:
-  // Specify the list of scalars to pass to VTK.
   void SetScalars(int num, float *scalars);
-  
-  // Description:
-  // Add a scalar to the list of scalars to pass to VTK.
   void AddScalar(float scalar);
-  
-  // Description:
-  // Return the list of scalar values to pass to VTK.
   float* GetScalars() { return this->Scalars; }
-  
-  // Description:
-  // Set/get the scalar value indicated by idx from the list of scalar values
-  // to pass to VTK.
-  void SetScalar(int idx, float scalar);
   float GetScalar(int idx);
-
-  // Description:
-  // Set the total number of scalars being sent to the specified VTK
-  // object.
   vtkGetMacro(NumberOfScalars, int);
 
-  // Description:
-  // Set the animation time for this property.  This sets the modified flag on
-  // the widget, and then calls Reset on it.
   virtual void SetAnimationTime(float time);
   
 protected:

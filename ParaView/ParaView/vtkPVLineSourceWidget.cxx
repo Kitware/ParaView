@@ -45,12 +45,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVApplication.h"
 #include "vtkPVLineWidget.h"
 #include "vtkPVSource.h"
+#include "vtkPVProcessModule.h"
 
-int vtkPVLineSourceWidget::InstanceCount = 0;
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLineSourceWidget);
-vtkCxxRevisionMacro(vtkPVLineSourceWidget, "1.8");
+vtkCxxRevisionMacro(vtkPVLineSourceWidget, "1.9");
 
 int vtkPVLineSourceWidgetCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -84,32 +84,19 @@ void vtkPVLineSourceWidget::Create(vtkKWApplication *app)
   // create the top level
   this->Script("frame %s", this->GetWidgetName());
 
-  char name[256];
-  sprintf(name, "LineSourceWidget%d", vtkPVLineSourceWidget::InstanceCount);
-
-  char outputName[256];
-  sprintf(outputName, "LineSourceWidgetOutput%d", 
-          vtkPVLineSourceWidget::InstanceCount++);
-
   vtkPVApplication* pvApp = vtkPVApplication::SafeDownCast(app);
+  vtkPVProcessModule* pm = pvApp->GetProcessModule();
   if (pvApp)
     {
-    this->SetSourceTclName(name);
-    pvApp->BroadcastScript("vtkLineSource %s;"
-                           "vtkPolyData %s;"
-                           "%s SetOutput %s;", 
-                           name,
-                           outputName,
-                           name, outputName);
-
-    //special for saving in tcl scripts.
-    sprintf(outputName, "[%s GetOutput]", name);
-    this->SetOutputTclName(outputName);
+    this->SourceID = pm->NewStreamObject("vtkLineSource");
+    this->OutputID = pm->NewStreamObject("vtkPolyData");
+    pm->GetStream() << vtkClientServerStream::Invoke << this->SourceID 
+                    << "SetOutput" << this->OutputID << vtkClientServerStream::End;
+    pm->SendStreamToServer();
     }
 
 
 
-  this->LineWidget->SetObjectTclName(name);
   this->LineWidget->SetPoint1VariableName("Point1");
   this->LineWidget->SetPoint2VariableName("Point2");
   this->LineWidget->SetResolutionVariableName("Resolution");
@@ -145,10 +132,10 @@ void vtkPVLineSourceWidget::ResetInternal()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVLineSourceWidget::AcceptInternal(const char* vtkNotUsed(sourceTclName))
+void vtkPVLineSourceWidget::AcceptInternal(vtkClientServerID)
 {
   // Ignore the source passed in.  Modify our one source.
-  this->LineWidget->AcceptInternal(this->SourceTclName);
+  this->LineWidget->AcceptInternal(this->SourceID);
   
   this->ModifiedFlag = 0;
 }
@@ -181,20 +168,20 @@ void vtkPVLineSourceWidget::SaveInBatchScript(ofstream *file)
 {
   float pt[3];
   
-  if (this->SourceTclName == NULL || this->LineWidget == NULL)
+  if (this->SourceID.ID == 0 || this->LineWidget == NULL)
     {
     vtkErrorMacro(<< this->GetClassName() << " must not have SaveInBatchScript method.");
     return;
     } 
 
-  *file << "vtkLineSource " << this->SourceTclName << "\n";
+  *file << "vtkLineSource " << "pvTemp" << this->SourceID.ID << "\n";
   this->LineWidget->GetPoint1(pt);
-  *file << "\t" << this->SourceTclName << " SetPoint1 " 
+  *file << "\t" << this->SourceID << " SetPoint1 " 
         << pt[0] << " " << pt[1] << " " << pt[2] << endl; 
   this->LineWidget->GetPoint2(pt);
-  *file << "\t" << this->SourceTclName << " SetPoint2 " 
+  *file << "\t" << this->SourceID << " SetPoint2 " 
         << pt[0] << " " << pt[1] << " " << pt[2] << endl; 
-  *file << "\t" << this->SourceTclName << " SetResolution " 
+  *file << "\t" << this->SourceID << " SetResolution " 
         << this->LineWidget->GetResolution() << endl; 
 }
 

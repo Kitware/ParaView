@@ -52,10 +52,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVProcessModule.h"
 #include "vtkPVScalarListWidgetProperty.h"
 #include "vtkPVXMLElement.h"
-
+#include <vtkstd/string>
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVScale);
-vtkCxxRevisionMacro(vtkPVScale, "1.23");
+vtkCxxRevisionMacro(vtkPVScale, "1.24");
 
 //----------------------------------------------------------------------------
 vtkPVScale::vtkPVScale()
@@ -64,12 +64,8 @@ vtkPVScale::vtkPVScale()
   this->LabelWidget = vtkKWLabel::New();
   this->Scale = vtkKWScale::New();
   this->Round = 0;
-
-  this->AcceptedValueInitialized = 0;
-  this->Property = NULL;
-
   this->RangeSourceVariable = 0;
-
+  this->Property = 0;
   this->DefaultValue = 0.0;
 }
 
@@ -81,9 +77,7 @@ vtkPVScale::~vtkPVScale()
   this->Scale = NULL;
   this->LabelWidget->Delete();
   this->LabelWidget = NULL;
-
   this->SetProperty(NULL);
-  
   this->SetRangeSourceVariable(0);
 }
 
@@ -245,29 +239,22 @@ void vtkPVScale::SetValue(float val)
 
 
 //----------------------------------------------------------------------------
-void vtkPVScale::AcceptInternal(const char* sourceTclName)
+void vtkPVScale::AcceptInternal(vtkClientServerID sourceID)
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
 
-  if (sourceTclName && this->VariableName)
-    {
+  if (sourceID.ID && this->VariableName)
+    { 
+    float scalar;
     if(this->Round)
       {
-      pvApp->GetProcessModule()->ServerScript(
-        "%s Set%s %d", sourceTclName, this->VariableName, 
-        this->RoundValue(this->GetValue()));
-      float scalar = this->RoundValue(this->GetValue());
-      this->Property->SetScalars(1, &scalar);
+      scalar = this->RoundValue(this->GetValue());
       }
     else
       {
-      pvApp->GetProcessModule()->ServerScript("%s Set%s %g", 
-                                              sourceTclName,
-                                              this->VariableName, 
-                                              this->GetValue());
-      float scalar = this->GetValue();
-      this->Property->SetScalars(1, &scalar);
+      scalar = this->GetValue();
       }
+    this->UpdateVTKSourceInternal(sourceID, scalar);
     }
 
   this->ModifiedFlag = 0;
@@ -289,16 +276,22 @@ void vtkPVScale::Trace(ofstream *file)
 //----------------------------------------------------------------------------
 void vtkPVScale::ResetInternal()
 {
-  if (this->Property)
+ if (this->Property)
     {
     this->SetValue(this->Property->GetScalar(0));
     }
-  if ( this->ObjectTclName && this->RangeSourceVariable )
+  if ( this->ObjectID.ID != 0 && this->RangeSourceVariable )
     {
-    this->GetPVApplication()->GetProcessModule()->RootScript("%s Get%s",
-                  this->ObjectTclName, this->RangeSourceVariable);
-    this->Script("eval %s SetRange %s", this->Scale->GetTclName(),
-                  this->GetPVApplication()->GetProcessModule()->GetRootResult());                  
+    vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
+    ostrstream str;
+    str << "Get" << this->RangeSourceVariable << ends;
+    pm->GetStream() << vtkClientServerStream::Invoke << this->ObjectID
+                    << str.str() << vtkClientServerStream::End;
+    pm->SendStreamToServerRoot();
+    int range[2] = { 0.0, 0.0 };
+    pm->GetLastServerResult().GetArgument(0,0, range, 2);
+    this->Script("eval %s SetRange %i %i", this->Scale->GetTclName(), 
+      range[0], range[1]);
     }
 
   this->ModifiedFlag = 0;
@@ -425,6 +418,12 @@ void vtkPVScale::AddAnimationScriptsToMenu(vtkKWMenu *menu,
 }
 
 //----------------------------------------------------------------------------
+void vtkPVScale::SetObjectVariableToPVTime(int time)
+{
+  this->UpdateVTKSourceInternal(this->ObjectID, time);
+}
+  
+//----------------------------------------------------------------------------
 void vtkPVScale::AnimationMenuCallback(vtkPVAnimationInterfaceEntry *ai)
 {
   char script[500];
@@ -436,8 +435,8 @@ void vtkPVScale::AnimationMenuCallback(vtkPVAnimationInterfaceEntry *ai)
     }
   
   // I do not like setting the label like this but ...
-  sprintf(script, "%s Set%s $pvTime", 
-          this->ObjectTclName, this->VariableName);
+  sprintf(script, "%s SetObjectVariableToPVTime $pvTime", 
+          this->GetTclName());
   ai->SetLabelAndScript(this->LabelWidget->GetLabel(), script);
   ai->SetCurrentProperty(this->Property);
   ai->SetTimeStart(this->GetRangeMin());
@@ -479,4 +478,32 @@ vtkPVWidgetProperty* vtkPVScale::GetProperty()
 vtkPVWidgetProperty* vtkPVScale::CreateAppropriateProperty()
 {
   return vtkPVScalarListWidgetProperty::New();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVScale::UpdateVTKSourceInternal(vtkClientServerID sourceID,
+                                         float value)
+{
+  vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
+  vtkstd::string method = "Set";
+  vtkstd::string varname = this->VariableName;
+  vtkstd::string::size_type pos = varname.find(' ');
+  pm->GetStream() << vtkClientServerStream::Invoke << sourceID;
+  if(pos != varname.npos)
+    {
+    // Hack to pass a string argument as first parameter.  Needed
+    // for "SetRestrictionAsIndex timestep" in vtkPVDReaderModule.
+    method += varname.substr(0, pos);
+    pm->GetStream() << method.c_str() << varname.substr(pos+1).c_str();
+    }
+  else
+    {
+    method += varname;
+    pm->GetStream() << method.c_str();
+    }
+  pm->GetStream() << value << vtkClientServerStream::End;
+  cout << "Value = " << value << endl;
+  pm->GetStream().Print(cout);
+  pm->SendStreamToServer();
+  this->Property->SetScalars(1, &value);
 }

@@ -1,0 +1,7 @@
+PROJECT(ClientServer_LOADED_COMMANDS)
+
+INCLUDE_DIRECTORIES(${CMAKE_ROOT}/include ${CMAKE_ROOT}/Source)
+ADD_LIBRARY(cmVTK_WRAP_ClientServer SHARED cmClientServerWrap.c)
+
+
+

@@ -107,7 +107,7 @@ public:
   // Called when accept button is pushed.  
   // Sets objects variable to the widgets value.
   // Side effect is to turn modified flag off.
-  virtual void AcceptInternal(const char* sourceTclName);
+  virtual void AcceptInternal(vtkClientServerID);
   
   // Description:
   // Called when the reset button is pushed.
@@ -144,7 +144,7 @@ public:
 
   // Description:
   // Used internally. Method to save widget parameters into vtk tcl script.
-  void SaveInBatchScriptForPart(ofstream* file, const char* sourceTclName);
+  void SaveInBatchScriptForPart(ofstream* file, vtkClientServerID);
 
   // Description:
   // Get the range of files.

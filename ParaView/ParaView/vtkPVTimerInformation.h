@@ -72,11 +72,10 @@ public:
   // Merge another information object.
   virtual void AddInformation(vtkPVInformation* info);
   
-  // Description:
-  // Serialize message.
-  virtual int GetMessageLength(); 
-  virtual void WriteMessage(unsigned char* msg);
-
+  // Description: 
+  // Serialize objects to/from a stream object.
+  virtual void CopyToStream(vtkClientServerStream*) const;
+  virtual void CopyFromStream(const vtkClientServerStream* css);
 protected:
   vtkPVTimerInformation();
   ~vtkPVTimerInformation();

@@ -61,7 +61,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <ctype.h>
 
-vtkCxxRevisionMacro(vtkPVXMLPackageParser, "1.26");
+vtkCxxRevisionMacro(vtkPVXMLPackageParser, "1.27");
 vtkStandardNewMacro(vtkPVXMLPackageParser);
 
 #ifndef VTK_NO_EXPLICIT_TEMPLATE_INSTANTIATION
@@ -680,23 +680,17 @@ int vtkPVXMLPackageParser::LoadLibrary(vtkPVXMLElement* le)
     vtkErrorMacro("Library missing name attribute.");
     return 0;
     }
-  
-  // Let Tcl find the library.  Add the executable's location to the
-  // list of possible paths.
-  this->Window->GetPVApplication()->GetProcessModule()->ServerScript(
-    "::paraview::load_component %s [file dirname [info nameofexecutable]]",
-    name);
-  
-  // Returns empty string if successful.
-  const char* result =
-    this->Window->GetPVApplication()->GetProcessModule()->GetRootResult();
-  if(strcmp(result, "") != 0)
+
+  // Load the module on the server nodes.
+  vtkPVProcessModule* pm =
+    this->Window->GetPVApplication()->GetProcessModule();
+  if(!pm->LoadModule(name))
     {
     vtkErrorMacro("Error loading Library component " << name);
     return 0;
     }
   this->Window->AddPackageName(name);
-  
+
   return 1;
 }
 

@@ -17,8 +17,8 @@ proc CheckForDemoFile { file } {
         return 0
     }
 
-    [$Application GetProcessModule] RootSimpleScript "file exists {$DemoDir/$file}"
-    if { ! [[$Application GetProcessModule] GetRootResult]} {
+    # Check if demo data are present on the server.
+    if { ! [[$Application GetMainWindow] CheckIfFileIsReadable "$DemoDir/$file"] } {
 	vtkKWMessageDialog _adialog
 	_adialog PopupMessage $Application [$Application GetMainWindow] Error "Could not find the data file $file. This usually means that ParaView was not installed properly. Please fix the problem and try again." 0
 	_adialog Delete
@@ -91,8 +91,6 @@ proc clip_run {} {
     if $pvDemoShouldStop {
         return
     }
-
-    $Application BroadcastSimpleScript {catch {TDispManager1 SetScale }}
 
     ChangeDemoText "Running Clip Demo:\n A sub-region of a dataset can be extracted by cutting or clipping with an arbitrary plane (all data types), specifying a threshold criteria to exclude cells (all data types) and/or specifying a VOI (volume of interest - structured data types only) "
 
@@ -856,8 +854,6 @@ proc extract_run {} {
         return
     }
 
-    $Application BroadcastSimpleScript {catch {TDispManager1 SetScale 0.8}}
-
     ChangeDemoText "Running Extract/Cut Demo:\n A sub-region of a dataset can be extracted by cutting or clipping with an arbitrary plane (all data types), specifying a threshold criteria to exclude cells (all data types) and/or specifying a VOI (volume of interest - structured data types only)"
 
     $extract(vtkTemp1) ShowCurrentSourcePropertiesCallback
@@ -869,11 +865,12 @@ proc extract_run {} {
     $extract(vtkTemp1) ShowAnimationProperties
     set extract(vtkTemp106) [$extract(vtkTemp1) GetAnimationInterface]
     set extract(vtkTemp1032) [$extract(vtkTemp106) GetSourceEntry 0]
-    $extract(vtkTemp1032) SetPVSource $extract(vtkTemp478) 
-    $Application BroadcastSimpleScript "set extract_tcl_name [$extract(vtkTemp478) GetVTKSourceTclName]"
-    $extract(vtkTemp1032) SetLabelAndScript {X Axis} {$extract_tcl_name SetVOI [expr int($pvTime)] [expr int($pvTime)] 0 32 0 24; after 100}
+    $extract(vtkTemp1032) SetPVSource $extract(vtkTemp478)
+    set extract(vtkTemp956) [$extract(vtkTemp478) GetPVWidget {VOI}]
+    $extract(vtkTemp956) SetValue 0 0 0 32 0 24
+    $extract(vtkTemp478) AcceptCallback
+    $extract(vtkTemp956) AnimationMenuCallback $extract(vtkTemp1032) 0
     $extract(vtkTemp106) SetCurrentTime 0
-    $extract(vtkTemp1032) SetTimeEnd {56.000000}
     $extract(vtkTemp1) SetCurrentPVSourceCallback $extract(vtkTemp478)
     $extract(vtkTemp1) ShowAnimationProperties
     $extract(vtkTemp106) SetNumberOfFrames 56
@@ -945,7 +942,11 @@ proc extract_run {} {
     $extract(vtkTemp106) SetCurrentTime 53
     $extract(vtkTemp106) SetCurrentTime 54
     $extract(vtkTemp106) SetCurrentTime 55
-    $extract(vtkTemp1032) SetLabelAndScript {Y Axis} {$extract_tcl_name SetVOI 0 56 [expr int($pvTime)] [expr int($pvTime)] 0 24; after 100}
+
+    $extract(vtkTemp956) SetValue 0 56 0 0 0 24
+    $extract(vtkTemp478) AcceptCallback
+    $extract(vtkTemp956) AnimationMenuCallback $extract(vtkTemp1032) 1
+
     $extract(vtkTemp106) SetCurrentTime 0
     $extract(vtkTemp106) SetNumberOfFrames 32
     $extract(vtkTemp1032) SetTimeStart 0.0
@@ -981,7 +982,10 @@ proc extract_run {} {
     $extract(vtkTemp106) SetCurrentTime 29
     $extract(vtkTemp106) SetCurrentTime 30
     $extract(vtkTemp106) SetCurrentTime 31
-    $extract(vtkTemp1032) SetLabelAndScript {Z Axis} {$extract_tcl_name SetVOI 0 56 0 32 [expr int($pvTime)] [expr int($pvTime)]; after 100}
+
+    $extract(vtkTemp956) SetValue 0 56 0 32 0 0
+    $extract(vtkTemp478) AcceptCallback
+    $extract(vtkTemp956) AnimationMenuCallback $extract(vtkTemp1032) 2
 
     if $pvDemoShouldStop {
         return
@@ -1022,12 +1026,12 @@ proc extract_run {} {
     $extract(vtkTemp615) SetVisibility 0
     $extract(vtkTemp598) SetVisibility 1
     $extract(vtkTemp106) SetNumberOfFrames 10
-    $extract(vtkTemp1032) SetTimeStart -1.0
-    $extract(vtkTemp1032) SetTimeEnd 3.0
     set extract(vtkTemp1032) [$extract(vtkTemp106) GetSourceEntry 0]
     $extract(vtkTemp1032) SetPVSource $extract(vtkTemp598)
-    $Application BroadcastSimpleScript "set cut_tcl_name [$extract(vtkTemp598) GetVTKSourceTclName]"
-    $extract(vtkTemp1032) SetLabelAndScript {Cut Values} {$cut_tcl_name SetValue 0 $pvTime}
+    set extract(vtkTemp957) [$extract(vtkTemp598) GetPVWidget {Cut Values}]
+    $extract(vtkTemp957) AnimationMenuCallback $extract(vtkTemp1032)
+    $extract(vtkTemp1032) SetTimeStart -1.0
+    $extract(vtkTemp1032) SetTimeEnd 3.0
     $extract(vtkTemp106) SetCurrentTime 0
     update
     $extract(vtkTemp106) SetCurrentTime 1
@@ -1183,8 +1187,6 @@ proc iso_run {} {
         return
     }
 
-    $Application BroadcastSimpleScript {catch {TDispManager1 SetScale 0.8}}
-
     ChangeDemoText "Running Isosurface/Contour Demo :\n Contours and isosurfaces can be extracted from all data types using scalars or vector components. The results can be colored by any other variable or processed further. When possible, structured data contours/isosurfaces are extracted with fast and efficient algorithms which make use of the special data layout."
 
     $iso(vtkTemp1) ShowCurrentSourcePropertiesCallback
@@ -1220,8 +1222,7 @@ proc iso_run {} {
     $iso(vtkTemp1032) SetTimeEnd 100.0
 
     $iso(vtkTemp1032) SetTimeEnd 0.600000
-    $Application BroadcastSimpleScript "set iso_tcl_name [$iso(vtkTemp449) GetVTKSourceTclName]"
-    $iso(vtkTemp1032) SetLabelAndScript {Contour Values} {$iso_tcl_name SetValue 0 $pvTime}
+    [$iso(vtkTemp449) GetPVWidget {Contour Values}] AnimationMenuCallback $iso(vtkTemp1032)
 
     if $pvDemoShouldStop {
         return
@@ -1355,16 +1356,13 @@ proc iso_run {} {
 
     set iso(vtkTemp1032) [$iso(vtkTemp106) GetSourceEntry 0]
     $iso(vtkTemp1032) SetPVSource $iso(vtkTemp739)
+    set iso(vtkTemp958) [$iso(vtkTemp739) GetPVWidget {VOI}]
+    $iso(vtkTemp958) AnimationMenuCallback $iso(vtkTemp1032) 1
     $iso(vtkTemp106) SetNumberOfFrames 29
     $iso(vtkTemp1032) SetTimeStart 0.0
     $iso(vtkTemp1032) SetTimeEnd 29.0
-    $Application BroadcastSimpleScript "set iso_tcl_name [$iso(vtkTemp739) GetVTKSourceTclName]"
-#    $iso(vtkTemp1032) SetLabelAndScript {Y Axis} {$iso_tcl_name SetVOI 0 29 [expr int($pvTime)] [expr int($pvTime)] 0 29}
-    $iso(vtkTemp1032) SetLabelAndScript {Y Axis} {}
-    $iso(vtkTemp1032) SetCurrentProperty [$iso(vtkTemp756) GetProperty]
-    $iso(vtkTemp756) SetAnimationAxis 1
+
     $iso(vtkTemp106) SetCurrentTime 0
-    $iso(vtkTemp1032) SetTimeEnd 29.000000
     $iso(vtkTemp106) SetCurrentTime 1; after 100
     $iso(vtkTemp106) SetCurrentTime 2; after 100
     $iso(vtkTemp106) SetCurrentTime 3; after 100
@@ -1528,8 +1526,6 @@ proc stream_run { } {
     if $pvDemoShouldStop {
         return
     }
-
-    $Application BroadcastSimpleScript {catch {TDispManager1 SetScale 1.0}}
 
     ChangeDemoText "Running Streamtraces Demo :\n Streamlines can be generated using constant step or adaptive integrators. The results can be displayed as points, lines, tubes, ribbons etc. and can be processed by a multitude of filters. "
 
@@ -3382,8 +3378,6 @@ proc threshold_run {} {
         return
     }
 
-    $Application BroadcastSimpleScript {catch {TDispManager1 SetScale 1.0}}
-
     ChangeDemoText "Running Threshold Demo:\n A sub-region of a dataset can be extracted by cutting or clipping with an arbitrary plane (all data types), specifying a threshold criteria to exclude cells (all data types) and/or specifying a VOI (volume of interest - structured data types only)"
 
     $threshold(vtkTemp1) ShowCurrentSourcePropertiesCallback
@@ -3447,8 +3441,6 @@ proc warp_run {} {
     if $pvDemoShouldStop {
         return
     }
-
-    $Application BroadcastSimpleScript {catch {TDispManager1 SetScale 1.1}}
 
     ChangeDemoText "Running Warp Demo :\n The points in a dataset can be warped (displaced) with scalars (given a user defined displacement vector) or with vectors (unavailable for rectilinear grids)."
 
@@ -3565,7 +3557,6 @@ if ![info exists DemoDir] {
         }
 
     }
-
     if { [info exists pvDemoCommandLine] } {
         $Application Exit
     } else {
@@ -3601,7 +3592,7 @@ if ![info exists DemoDir] {
         catch {$warp(vtkTemp384) DeleteCallback}
         
         catch {$clip(vtkTemp24) EventuallyRender}
-        
+
         grab release .control.main.stop
         wm withdraw .control
 

@@ -21,7 +21,7 @@ modification, are permitted provided that the following conditions are met:
    and/or other materials provided with the distribution.
 
  * Neither the name of Kitware nor the names of any contributors may be used
-   to endorse or promote products derived from this software without specific 
+   to endorse or promote products derived from this software without specific
    prior written permission.
 
  * Modified source versions must be plainly marked as such, and must not be
@@ -50,18 +50,17 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __vtkPVDataSetAttributesInformation_h
 #define __vtkPVDataSetAttributesInformation_h
 
+#include "vtkPVInformation.h"
 
-#include "vtkObject.h"
-
+class vtkCollection;
 class vtkDataSetAttributes;
 class vtkPVArrayInformation;
-class vtkCollection;
 
-class VTK_EXPORT vtkPVDataSetAttributesInformation : public vtkObject
+class VTK_EXPORT vtkPVDataSetAttributesInformation : public vtkPVInformation
 {
 public:
   static vtkPVDataSetAttributesInformation* New();
-  vtkTypeRevisionMacro(vtkPVDataSetAttributesInformation, vtkObject);
+  vtkTypeRevisionMacro(vtkPVDataSetAttributesInformation, vtkPVInformation);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
@@ -72,38 +71,34 @@ public:
 
   // Description:
   // Intersect information of argument with information currently
-  // in this object.  Arrays must be in both 
-  // (same name and number of components)to be in final.        
+  // in this object.  Arrays must be in both
+  // (same name and number of components)to be in final.
   void AddInformation(vtkDataSetAttributes* da);
   void AddInformation(vtkPVDataSetAttributesInformation* info);
-  
+
   // Description:
   // Remove all infommation. next add will be like a copy.
   void Initialize();
 
   // Description:
   // Access to information.
-  int                    GetNumberOfArrays();
-  vtkPVArrayInformation* GetArrayInformation(int idx);
-  vtkPVArrayInformation* GetArrayInformation(const char *name);
+  int                    GetNumberOfArrays() const;
+  vtkPVArrayInformation* GetArrayInformation(int idx) const;
+  vtkPVArrayInformation* GetArrayInformation(const char *name) const;
 
   // Description:
   // For getting default scalars ... (vtkDataSetAttributes::SCALARS).
   vtkPVArrayInformation* GetAttributeInformation(int attributeType);
-  
+
   // Description:
   // Mimicks data set attribute call.  Returns -1 if array (of index) is
   // not a standard attribute.  Returns attribute type otherwise.
   int IsArrayAnAttribute(int arrayIndex);
 
   // Description:
-  // Stuff for sending this object to other processes.
-  // I will worry about byte swapping later.
-  // CopyFromMessage returns how many bytes were used from the
-  // message (same as message length after call).
-  int GetMessageLength();
-  int WriteMessage(unsigned char *msg);
-  int CopyFromMessage(unsigned char *msg, int swap);
+  // Manage a serialized version of the information.
+  virtual void CopyToStream(vtkClientServerStream*) const;
+  virtual void CopyFromStream(const vtkClientServerStream*);
 
 protected:
   vtkPVDataSetAttributesInformation();
@@ -112,7 +107,7 @@ protected:
   // Data information collected from remote processes.
   vtkCollection* ArrayInformation;
   // Standard cell attributes.
-  short          AttributeIndices[5]; 
+  short          AttributeIndices[5];
 
   vtkPVDataSetAttributesInformation(const vtkPVDataSetAttributesInformation&); // Not implemented
   void operator=(const vtkPVDataSetAttributesInformation&); // Not implemented

@@ -68,7 +68,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProbe);
-vtkCxxRevisionMacro(vtkPVProbe, "1.101");
+vtkCxxRevisionMacro(vtkPVProbe, "1.102");
 
 int vtkPVProbeCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -139,11 +139,11 @@ vtkPVProbe::~vtkPVProbe()
 void vtkPVProbe::CreateProperties()
 {
   vtkPVApplication* pvApp = this->GetPVApplication();
-  
+  vtkPVProcessModule* pm = pvApp->GetProcessModule();
   this->vtkPVSource::CreateProperties();
-
-  pvApp->GetProcessModule()->ServerScript(
-    "%s SetSpatialMatch 2", this->GetVTKSourceTclName());
+  pm->GetStream() << vtkClientServerStream::Invoke <<  this->GetVTKSourceID()
+                  << "SetSpatialMatch" << 2
+                  << vtkClientServerStream::End;
 
   this->ProbeFrame->SetParent(this->GetParameterFrame()->GetFrame());
   this->ProbeFrame->Create(pvApp, "frame", "");
@@ -184,10 +184,14 @@ void vtkPVProbe::CreateProperties()
     xyp->GetPosition2Coordinate()->SetValue(0.8, 0.3, 0);
     xyp->SetNumberOfXLabels(5);
     xyp->SetXTitle("Line Divisions");
-    
-    pvApp->GetProcessModule()->ServerScript(
-      "%s SetController [ $Application GetController ] ", 
-      this->GetVTKSourceTclName());
+    pm->GetStream() << vtkClientServerStream::Invoke << pm->GetApplicationID()
+                    << "GetController"
+                    << vtkClientServerStream::End;
+    pm->GetStream() << vtkClientServerStream::Invoke << this->GetVTKSourceID() 
+                    << "SetController"
+                    << vtkClientServerStream::LastResult
+                    << vtkClientServerStream::End; 
+    pm->SendStreamToServer();
     // Special condition to signal the client.
     // Because both processes of the Socket controller think they are 0!!!!
 //    if (pvApp->GetClientMode())
@@ -225,15 +229,16 @@ void vtkPVProbe::AcceptCallbackInternal()
   // Get the probe filter's output from the root node's process.
   vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
   vtkPolyData* probeOutput = vtkPolyData::New();
-  if (!pm->ReceiveRootPolyData(
-    this->GetPart(0)->GetVTKDataTclName(), probeOutput))
-    {
-    probeOutput->Delete();
-    vtkErrorMacro("Failed to receive probe output from root node process.");
-    this->XYPlotWidget->SetEnabled(0);
-    this->Script("pack forget %s", this->PointDataLabel->GetWidgetName());
-    return;
-    }
+// ******
+//   if (!pm->ReceiveRootPolyData(
+//     this->GetPart(0)->GetVTKDataTclName(), probeOutput))
+//     {
+//     probeOutput->Delete();
+//     vtkErrorMacro("Failed to receive probe output from root node process.");
+//     this->XYPlotWidget->SetEnabled(0);
+//     this->Script("pack forget %s", this->PointDataLabel->GetWidgetName());
+//     return;
+//     }
 
   vtkPointData *pd = probeOutput->GetPointData();
   
@@ -377,7 +382,9 @@ void vtkPVProbe::Deselect(int doPackForget)
 //----------------------------------------------------------------------------
 void vtkPVProbe::SaveInBatchScript(ofstream *file)
 {
-  Tcl_Interp *interp = this->GetPVApplication()->GetMainInterp();  
+  Tcl_Interp *interp = this->GetPVApplication()->GetMainInterp(); 
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  vtkPVProcessModule* pm = pvApp->GetProcessModule();
 
   if (this->VisitedFlag)
     {
@@ -391,8 +398,6 @@ void vtkPVProbe::SaveInBatchScript(ofstream *file)
     *file << "\tpointList" << this->InstanceCount << " Allocate 1 1\n";
     *file << "\tpointList" << this->InstanceCount << " InsertNextId 0\n\n";
 
-    this->Script("set coords [[%s GetInput] GetPoint 0]",
-                 this->GetVTKSourceTclName());
     *file << "vtkPoints points" << this->InstanceCount << "\n";
     *file << "\tpoints" << this->InstanceCount << " Allocate 1 1\n";
     *file << "\tpoints" << this->InstanceCount << " InsertNextPoint " << interp->result << "\n\n";
@@ -406,33 +411,81 @@ void vtkPVProbe::SaveInBatchScript(ofstream *file)
     {
     *file << "vtkLineSource line" << this->InstanceCount << "\n";
 
-    this->Script("set point1 [[[%s GetInput] GetSource] GetPoint1]",
-                 this->GetVTKSourceTclName());
-    *file << "\tline" << this->InstanceCount << " SetPoint1 " << interp->result << "\n";
-    this->Script("set point2 [[[%s GetInput] GetSource] GetPoint2]",
-                 this->GetVTKSourceTclName());
-    *file << "\tline" << this->InstanceCount << " SetPoint2 " << interp->result << "\n";
-    this->Script("set res [[[%s GetInput] GetSource] GetResolution]",
-                 this->GetVTKSourceTclName());
-    *file << "\tline" << this->InstanceCount << " SetResolution " << interp->result << "\n\n";
+    pm->GetStream() << vtkClientServerStream::Invoke << this->GetVTKSourceID()
+                    << "GetInput"
+                    << vtkClientServerStream::End;
+    pm->GetStream() << vtkClientServerStream::Invoke 
+                    << vtkClientServerStream::LastResult
+                    << "GetSource" << 0 
+                    << vtkClientServerStream::End;
+    pm->GetStream() << vtkClientServerStream::Invoke 
+                    << vtkClientServerStream::LastResult
+                    << "GetGetPoint" << 0 
+                    << vtkClientServerStream::End;
+    pm->SendStreamToClient();
+    {
+    ostrstream result;
+    pm->GetLastClientResult().PrintArgumentValue(result, 0,0);
+    result << ends;
+    *file << "\tline" << this->InstanceCount << " SetPoint1 " << result.str() << "\n";
+    delete []result.str();
+    }
+    pm->GetStream() << vtkClientServerStream::Invoke << this->GetVTKSourceID()
+                    << "GetInput"
+                    << vtkClientServerStream::End;
+    pm->GetStream() << vtkClientServerStream::Invoke 
+                    << vtkClientServerStream::LastResult
+                    << "GetSource" << 0 
+                    << vtkClientServerStream::End;
+    pm->GetStream() << vtkClientServerStream::Invoke 
+                    << vtkClientServerStream::LastResult
+                    << "GetGetPoint" << 0 
+                    << vtkClientServerStream::End;
+    pm->SendStreamToClient();
+    {
+    ostrstream result;
+    pm->GetLastClientResult().PrintArgumentValue(result, 0,0);
+    result << ends;
+    *file << "\tline" << this->InstanceCount << " SetPoint2 " << result.str() << "\n";
+    delete []result.str();
+    }
+    pm->GetStream() << vtkClientServerStream::Invoke << this->GetVTKSourceID()
+                    << "GetInput"
+                    << vtkClientServerStream::End;
+    pm->GetStream() << vtkClientServerStream::Invoke 
+                    << vtkClientServerStream::LastResult
+                    << "GetSource" << 0 
+                    << vtkClientServerStream::End;
+    pm->GetStream() << vtkClientServerStream::Invoke 
+                    << vtkClientServerStream::LastResult
+                    << "GetResolution" << 0 
+                    << vtkClientServerStream::End;
+    pm->SendStreamToClient();
+    {
+    ostrstream result;
+    pm->GetLastClientResult().PrintArgumentValue(result, 0,0);
+    result << ends;
+    *file << "\tline" << this->InstanceCount << " SetResolution " << result.str() << "\n\n";
+    delete []result.str();
+    }
     }
   
 //  *file << this->GetVTKSource()->GetClassName() << " "
-  *file << this->GetSourceClassName() << " "
-        << this->GetVTKSourceTclName() << "\n";
+  *file << this->GetSourceClassName() << " pvTemp"
+        << this->GetVTKSourceID() << "\n";
   if (this->GetDimensionality() == 0)
     {
-    *file << "\t" << this->GetVTKSourceTclName() << " SetInput probeInput" 
+    *file << "\tpvTemp" << this->GetVTKSourceID() << " SetInput probeInput" 
           << this->InstanceCount << "\n";
     }
   else
     {
-    *file << "\t" << this->GetVTKSourceTclName()
+    *file << "\tpvTemp" << this->GetVTKSourceID()
           << " SetInput [line" << this->InstanceCount << " GetOutput]\n";
     }
   
-  *file << "\t" << this->GetVTKSourceTclName() << " SetSource [";
-  *file << this->GetPVInput(0)->GetVTKSourceTclName()
+  *file << "\tpvTemp" << this->GetVTKSourceID() << " SetSource [pvTemp";
+  *file << this->GetPVInput(0)->GetVTKSourceID()
         << " GetOutput]\n\n";
   
   if (this->GetDimensionality() == 1)
@@ -453,8 +506,8 @@ void vtkPVProbe::SaveInBatchScript(ofstream *file)
       *file << "\t" << this->XYPlotTclName << " SetXTitle \"" 
             << xyp->GetXTitle() << "\" \n";
       *file << "\t" << this->XYPlotTclName << " RemoveAllInputs" << endl;
-      *file << "\t" << this->XYPlotTclName << " AddInput [ " 
-            << this->GetVTKSourceTclName() << " GetOutput ]" << endl;
+      *file << "\t" << this->XYPlotTclName << " AddInput [ pvTemp" 
+            << this->GetVTKSourceID() << " GetOutput ]" << endl;
 
       *file << "Ren1" << " AddActor "
             << this->XYPlotTclName << endl;
@@ -468,21 +521,26 @@ void vtkPVProbe::SaveInBatchScript(ofstream *file)
 //----------------------------------------------------------------------------
 int vtkPVProbe::GetDimensionality()
 {
-  const char* sourceName = this->GetVTKSourceTclName();
-  if (!sourceName)
+  if (!this->GetVTKSourceID().ID)
     {
     return 0;
     }
-  
-  const char* input = 
-    this->Script("%s GetInput", this->GetVTKSourceTclName());
-
+  vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
+  pm->GetStream() << vtkClientServerStream::Invoke <<  this->GetVTKSourceID()
+                  << "GetInput" 
+                  << vtkClientServerStream::End;
+  pm->GetStream() << vtkClientServerStream::Invoke 
+                  << vtkClientServerStream::LastResult 
+                  << "GetSource"
+                  << vtkClientServerStream::End;
+  pm->GetStream() << vtkClientServerStream::Invoke 
+                  << vtkClientServerStream::LastResult 
+                  << "GetClassName"
+                  << vtkClientServerStream::End;
+  pm->SendStreamToClient();
   const char* name = 0;
-  if ( vtkString::Length(input) > 0 )
-    {
-    name = this->Script("[ %s GetSource ] GetClassName", input);
-    }
-  if ( vtkString::Equals(name, "vtkLineSource") )
+  pm->GetLastClientResult().GetArgument(0,0,&name);
+  if ( name && vtkString::Equals(name, "vtkLineSource") )
     {
     return 1;
     }

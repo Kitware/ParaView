@@ -79,7 +79,8 @@ public:
 
   // Description:
   // The Tcl name of the VTK implicit plane.
-  vtkGetStringMacro(PlaneTclName);
+  vtkGetMacro(PlaneID, vtkClientServerID);
+  vtkSetMacro(PlaneID, vtkClientServerID);
 
   // Description:
   // This method sets the input to the 3D widget and places the widget.
@@ -125,12 +126,16 @@ public:
     
   // Description:
   // Called when the PVSources accept button is called.
-  virtual void AcceptInternal(const char* sourceTclName);
+  virtual void AcceptInternal(vtkClientServerID);
 
   // Description:
   // This serves a dual purpose.  For tracing and for saving state.
   virtual void Trace(ofstream *file);
-
+  
+  // Description:
+  // Return a contained object by name as follows:
+  // Plane == PlaneID
+  vtkClientServerID GetObjectByName(const char* ){ return this->PlaneID;}
 protected:
   vtkPVImplicitPlaneWidget();
   ~vtkPVImplicitPlaneWidget();
@@ -159,8 +164,7 @@ protected:
   vtkKWLabel* Labels[2];
   vtkKWLabel* CoordinateLabel[3];
 
-  char *PlaneTclName;
-  vtkSetStringMacro(PlaneTclName);
+  vtkClientServerID PlaneID;
 
   float LastAcceptedCenter[3];
   float LastAcceptedNormal[3];

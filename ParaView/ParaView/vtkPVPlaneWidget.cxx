@@ -57,9 +57,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVXMLElement.h"
 #include "vtkPlaneWidget.h"
 #include "vtkRenderer.h"
+#include "vtkPVProcessModule.h"
 
 vtkStandardNewMacro(vtkPVPlaneWidget);
-vtkCxxRevisionMacro(vtkPVPlaneWidget, "1.36");
+vtkCxxRevisionMacro(vtkPVPlaneWidget, "1.37");
 
 int vtkPVPlaneWidgetCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -84,12 +85,12 @@ void vtkPVPlaneWidget::ActualPlaceWidget()
 //----------------------------------------------------------------------------
 void vtkPVPlaneWidget::SaveInBatchScript(ofstream *file)
 {
-  *file << "vtkPlane " << this->PlaneTclName << endl;
-  *file << "\t" << this->PlaneTclName << " SetOrigin ";
-  this->Script("%s GetOrigin", this->PlaneTclName);
+  *file << "vtkPlane " << "pvTemp" << this->PlaneID << endl;
+  *file << "\t" << "pvTemp" << this->PlaneID << " SetOrigin ";
+  this->Script("%s GetOrigin", this->PlaneID);
   *file << this->Application->GetMainInterp()->result << endl;
-  *file << "\t" << this->PlaneTclName << " SetNormal ";
-  this->Script("%s GetNormal", this->PlaneTclName);
+  *file << "\t" << this->PlaneID << " SetNormal ";
+  this->Script("%s GetNormal", this->PlaneID);
   *file << this->Application->GetMainInterp()->result << endl;
 }
 
@@ -110,22 +111,17 @@ vtkPVPlaneWidget* vtkPVPlaneWidget::ClonePrototype(vtkPVSource* pvSource,
 //----------------------------------------------------------------------------
 void vtkPVPlaneWidget::ChildCreate(vtkPVApplication* pvApp)
 {
-  char tclName[256];
-  static int instanceCount = 0;
-
   this->Superclass::ChildCreate(pvApp);
-
-  if ( this->Widget3DTclName )
+  vtkPVProcessModule* pm = pvApp->GetProcessModule();
+  if ( this->Widget3DID.ID )
     {
-    pvApp->BroadcastScript("%s Delete", this->Widget3DTclName);
-    this->SetWidget3DTclName(NULL);
+    pm->DeleteStreamObject(this->Widget3DID);
+    this->Widget3DID.ID = 0;
     }
-
-  ++instanceCount;
-  sprintf(tclName, "pvPlaneWidget%d", instanceCount);
-  pvApp->BroadcastScript("vtkPlaneWidget %s", tclName);
-  pvApp->BroadcastScript("%s SetPlaceFactor 1.0", tclName);
-  this->SetWidget3DTclName(tclName);
+  this->Widget3DID = pm->NewStreamObject("vtkPlaneWidget");
+  pm->GetStream() << vtkClientServerStream::Invoke << this->Widget3DID << "SetPlaceFactor" 
+                  << 1.0 << vtkClientServerStream::End;
+  pm->SendStreamToClientAndServer();
 }
 
 //----------------------------------------------------------------------------
@@ -158,10 +154,12 @@ void vtkPVPlaneWidget::SetCenter(float x, float y, float z)
   this->CenterEntry[1]->SetValue(y);
   this->CenterEntry[2]->SetValue(z); 
   this->ModifiedCallback();
-  if ( this->Widget3DTclName )
-    {
-    this->GetPVApplication()->BroadcastScript(
-      "%s SetCenter %f %f %f", this->Widget3DTclName, x, y, z);
+  if ( this->Widget3DID.ID )
+    { 
+    vtkPVProcessModule* pm =  this->GetPVApplication()->GetProcessModule();
+    pm->GetStream() << vtkClientServerStream::Invoke << this->Widget3DID << "SetCenter" 
+                    << x << y << z << vtkClientServerStream::End;
+    pm->SendStreamToClientAndServer();
     }
 }
 
@@ -172,10 +170,12 @@ void vtkPVPlaneWidget::SetNormal(float x, float y, float z)
   this->NormalEntry[1]->SetValue(y);
   this->NormalEntry[2]->SetValue(z); 
   this->ModifiedCallback();
-  if ( this->Widget3DTclName )
+  if ( this->Widget3DID.ID )
     {
-    this->GetPVApplication()->BroadcastScript(
-      "%s SetNormal %f %f %f", this->Widget3DTclName, x, y, z);
+    vtkPVProcessModule* pm =  this->GetPVApplication()->GetProcessModule();
+    pm->GetStream() << vtkClientServerStream::Invoke << this->Widget3DID << "SetNormal" 
+                    << x << y << z << vtkClientServerStream::End;
+    pm->SendStreamToClientAndServer();
     }
 }
 

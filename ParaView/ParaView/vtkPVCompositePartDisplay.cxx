@@ -61,7 +61,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCompositePartDisplay);
-vtkCxxRevisionMacro(vtkPVCompositePartDisplay, "1.6");
+vtkCxxRevisionMacro(vtkPVCompositePartDisplay, "1.7");
 
 
 //----------------------------------------------------------------------------
@@ -72,144 +72,243 @@ vtkPVCompositePartDisplay::vtkPVCompositePartDisplay()
   this->CollectionDecision = -1;
   this->LODCollectionDecision = -1;
 
-  this->CollectTclName = NULL;
-  this->LODCollectTclName = NULL;
+  this->CollectID.ID = 0;
+  this->LODCollectID.ID = 0;
 }
 
 //----------------------------------------------------------------------------
 vtkPVCompositePartDisplay::~vtkPVCompositePartDisplay()
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
-    
-  if (this->CollectTclName)
+
+  if (this->CollectID.ID)
     {
     if ( pvApp )
       {
-      pvApp->BroadcastScript("%s Delete", this->CollectTclName);
+      vtkPVProcessModule* pm = pvApp->GetProcessModule();
+      pm->DeleteStreamObject(this->CollectID);
+      pm->SendStreamToClientAndServer();
       }
-    this->SetCollectTclName(NULL);
+    this->CollectID.ID = 0;
     }
-  if (this->LODCollectTclName)
+  if (this->LODCollectID.ID)
     {
     if ( pvApp )
       {
-      pvApp->BroadcastScript("%s Delete", this->LODCollectTclName);
+      vtkPVProcessModule* pm = pvApp->GetProcessModule();
+      pm->DeleteStreamObject(this->LODCollectID);
+      pm->SendStreamToClientAndServer();
       }
-    this->SetLODCollectTclName(NULL);
+    this->LODCollectID.ID = 0;
     }
 }
 
 //----------------------------------------------------------------------------
-void vtkPVCompositePartDisplay::ConnectToGeometry(char* geometryTclName)
+void vtkPVCompositePartDisplay::ConnectToGeometry(vtkClientServerID geometryID)
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
+  vtkPVProcessModule* pm = pvApp->GetProcessModule();
 
   // The input of course is the geometry filter.
-  pvApp->BroadcastScript("%s SetInput [%s GetOutput]", 
-                         this->LODDeciTclName, geometryTclName);
-
-  pvApp->BroadcastScript("%s SetInput [%s GetOutput]", 
-                         this->CollectTclName, geometryTclName);
+  pm->GetStream()
+    << vtkClientServerStream::Invoke
+    << geometryID << "GetOutput"
+    << vtkClientServerStream::End
+    << vtkClientServerStream::Invoke
+    << this->LODDeciID << "SetInput"
+    << vtkClientServerStream::LastResult
+    << vtkClientServerStream::End;
+  pm->GetStream()
+    << vtkClientServerStream::Invoke
+    << geometryID << "GetOutput"
+    << vtkClientServerStream::End
+    << vtkClientServerStream::Invoke
+    << this->CollectID << "SetInput"
+    << vtkClientServerStream::LastResult
+    << vtkClientServerStream::End;
 }
 
 
 //----------------------------------------------------------------------------
 void vtkPVCompositePartDisplay::CreateParallelTclObjects(vtkPVApplication *pvApp)
 {
-  char tclName[100];
-  
   this->Superclass::CreateParallelTclObjects(pvApp);
-  
+  vtkPVProcessModule* pm = pvApp->GetProcessModule();
+
   // Create the collection filters which allow small models to render locally.  
   // They also redistributed data for SGI pipes option.
   // ===== Primary branch:
-  sprintf(tclName, "Collect%d", this->InstanceCount);
 
   // Different filter for  pipe redistribution.
   if (pvApp->GetUseRenderingGroup())
     {
-    pvApp->BroadcastScript("vtkAllToNRedistributePolyData %s", tclName);
-    pvApp->BroadcastScript("%s SetNumberOfProcesses %d", tclName,
-                           pvApp->GetNumberOfPipes());
+    this->CollectID = pm->NewStreamObject("vtkAllToNRedistributePolyData");
+    pm->GetStream()
+      << vtkClientServerStream::Invoke
+      << this->CollectID << "SetNumberOfProcesses"
+      << pvApp->GetNumberOfPipes()
+      << vtkClientServerStream::End;
+    pm->SendStreamToClientAndServer();
     }
   else if (pvApp->GetUseTiledDisplay())
     { // I would like to get this condition into the subclass.
-    pvApp->BroadcastScript("vtkPVDuplicatePolyData %s; %s SetPassThrough 1", 
-                           tclName, tclName);
+    this->CollectID = pm->NewStreamObject("vtkPVDuplicatePolyData");
+    pm->GetStream()
+      << vtkClientServerStream::Invoke
+      << this->CollectID << "SetPassThrough" << 1
+      << vtkClientServerStream::End;
+    pm->SendStreamToClientAndServer();
     }
   else
     {
-    pvApp->BroadcastScript("vtkCollectPolyData %s; %s SetPassThrough 1", 
-                           tclName, tclName);
+    this->CollectID = pm->NewStreamObject("vtkCollectPolyData");
+    pm->GetStream()
+      << vtkClientServerStream::Invoke
+      << this->CollectID << "SetPassThrough" << 1
+      << vtkClientServerStream::End;
+    pm->SendStreamToClientAndServer();
     }
-  this->SetCollectTclName(tclName);
-  pvApp->BroadcastScript(
-    "%s AddObserver StartEvent {$Application LogStartEvent {Execute Collect}}", 
-    this->CollectTclName);
-  pvApp->BroadcastScript(
-    "%s AddObserver EndEvent {$Application LogEndEvent {Execute Collect}}", 
-    this->CollectTclName);
-  //
+
+  vtkClientServerStream cmd;
+  cmd << vtkClientServerStream::Invoke
+      << pm->GetApplicationID() << "LogStartEvent" << "Execute Collect"
+      << vtkClientServerStream::End;
+  pm->GetStream()
+    << vtkClientServerStream::Invoke
+    << this->CollectID << "AddObserver" << "StartEvent" << cmd
+    << vtkClientServerStream::End;
+  cmd.Reset();
+  cmd << vtkClientServerStream::Invoke
+      << pm->GetApplicationID() << "LogEndEvent" << "Execute Collect"
+      << vtkClientServerStream::End;
+  pm->GetStream()
+    << vtkClientServerStream::Invoke
+    << this->CollectID << "AddObserver" << "EndEvent" << cmd
+    << vtkClientServerStream::End;
+  pm->SendStreamToClientAndServer();
+
   // ===== LOD branch:
-  sprintf(tclName, "LODCollect%d", this->InstanceCount);
   // Different filter for pipe redistribution.
   if (pvApp->GetUseRenderingGroup())
     {
-    pvApp->BroadcastScript("vtkAllToNRedistributePolyData %s", tclName);
-    pvApp->BroadcastScript("%s SetNumberOfProcesses %d", tclName,
-                           pvApp->GetNumberOfPipes());
+    this->LODCollectID = pm->NewStreamObject("vtkAllToNRedistributePolyData");
+    pm->GetStream()
+      << vtkClientServerStream::Invoke
+      << this->LODCollectID << "SetNumberOfProcesses"
+      << pvApp->GetNumberOfPipes()
+      << vtkClientServerStream::End;
+    pm->SendStreamToClientAndServer();
     }
   else if (pvApp->GetUseTiledDisplay())
     { // This should be in subclass.
     //int numProcs = pvApp->GetController()->GetNumberOfProcesses();
     int* dims = pvApp->GetTileDimensions();
-    pvApp->BroadcastScript("vtkPVDuplicatePolyData %s; %s SetPassThrough 1", 
-                           tclName, tclName);
-    pvApp->BroadcastScript("%s InitializeSchedule %d", tclName,
-                           dims[0]*dims[1]);
+    this->LODCollectID = pm->NewStreamObject("vtkPVDuplicatePolyData");
+    pm->GetStream()
+      << vtkClientServerStream::Invoke
+      << this->LODCollectID << "SetPassThrough" << 1
+      << vtkClientServerStream::End;
+    pm->GetStream()
+      << vtkClientServerStream::Invoke
+      << this->LODCollectID << "InitializeSchedule" << (dims[0]*dims[1])
+      << vtkClientServerStream::End;
+    pm->SendStreamToClientAndServer();
     }
   else
     {
-    pvApp->BroadcastScript("vtkCollectPolyData %s; %s SetPassThrough 1", 
-                           tclName, tclName);
+    this->LODCollectID = pm->NewStreamObject("vtkCollectPolyData");
+    pm->GetStream()
+      << vtkClientServerStream::Invoke
+      << this->LODCollectID << "SetPassThrough" << 1
+      << vtkClientServerStream::End;
+    pm->SendStreamToClientAndServer();
     }
-  this->SetLODCollectTclName(tclName);
-  pvApp->BroadcastScript("%s SetInput [%s GetOutput]", 
-                         this->LODCollectTclName, this->LODDeciTclName);
-  pvApp->BroadcastScript(
-   "%s AddObserver StartEvent {$Application LogStartEvent {Execute LODCollect}}",
-   this->LODCollectTclName);
-  pvApp->BroadcastScript(
-   "%s AddObserver EndEvent {$Application LogEndEvent {Execute LODCollect}}", 
-   this->LODCollectTclName);
-   // Handle collection setup with client server.
-  pvApp->BroadcastScript(
-    "%s SetSocketController [ $Application GetSocketController ] ", 
-    this->CollectTclName);
-  pvApp->BroadcastScript(
-    "%s SetSocketController [ $Application GetSocketController ] ", 
-    this->LODCollectTclName);
+
+  pm->GetStream()
+    << vtkClientServerStream::Invoke
+    << this->LODDeciID << "GetOutput"
+    << vtkClientServerStream::End
+    << vtkClientServerStream::Invoke
+    << this->LODCollectID << "SetInput"
+    << vtkClientServerStream::LastResult
+    << vtkClientServerStream::End;
+  cmd.Reset();
+  cmd << vtkClientServerStream::Invoke
+      << pm->GetApplicationID() << "LogStartEvent" << "Execute LODCollect"
+      << vtkClientServerStream::End;
+  pm->GetStream()
+    << vtkClientServerStream::Invoke
+    << this->LODCollectID << "AddObserver" << "StartEvent" << cmd
+    << vtkClientServerStream::End;
+  cmd.Reset();
+  cmd << vtkClientServerStream::Invoke
+      << pm->GetApplicationID() << "LogEndEvent" << "Execute LODCollect"
+      << vtkClientServerStream::End;
+  pm->GetStream()
+    << vtkClientServerStream::Invoke
+    << this->LODCollectID << "AddObserver" << "EndEvent" << cmd
+    << vtkClientServerStream::End;
+  pm->SendStreamToClientAndServer();
+
+  // Handle collection setup with client server.
+  pm->GetStream()
+    << vtkClientServerStream::Invoke
+    << pm->GetApplicationID() << "GetSocketController"
+    << vtkClientServerStream::End
+    << vtkClientServerStream::Invoke
+    << this->CollectID << "SetSocketController"
+    << vtkClientServerStream::LastResult
+    << vtkClientServerStream::End;
+  pm->GetStream()
+    << vtkClientServerStream::Invoke
+    << pm->GetApplicationID() << "GetSocketController"
+    << vtkClientServerStream::End
+    << vtkClientServerStream::Invoke
+    << this->LODCollectID << "SetSocketController"
+    << vtkClientServerStream::LastResult
+    << vtkClientServerStream::End;
+  pm->SendStreamToClientAndServer();
+
   // Special condition to signal the client.
   // Because both processes of the Socket controller think they are 0!!!!
   if (pvApp->GetClientMode())
     {
-    pvApp->Script("%s SetController {}", this->CollectTclName);
-    pvApp->Script("%s SetController {}", this->LODCollectTclName);
+    pm->GetStream()
+      << vtkClientServerStream::Invoke
+      << this->CollectID << "SetController" << 0
+      << vtkClientServerStream::End;
+    pm->GetStream()
+      << vtkClientServerStream::Invoke
+      << this->LODCollectID << "SetController" << 0
+      << vtkClientServerStream::End;
+    pm->SendStreamToClient();
     }
 
   // Insert collection filters into pipeline.
-  if (this->CollectTclName)
+  if (this->CollectID.ID)
     {
-    pvApp->BroadcastScript("%s SetInput [%s GetOutput]", 
-                           this->UpdateSuppressorTclName, 
-                           this->CollectTclName);
+    pm->GetStream()
+      << vtkClientServerStream::Invoke
+      << this->CollectID << "GetOutput"
+      << vtkClientServerStream::End
+      << vtkClientServerStream::Invoke
+      << this->UpdateSuppressorID << "SetInput"
+      << vtkClientServerStream::LastResult
+      << vtkClientServerStream::End;
+    pm->SendStreamToClientAndServer();
     }
 
-  if (this->LODCollectTclName)
+  if (this->LODCollectID.ID)
     {
-    pvApp->BroadcastScript("%s SetInput [%s GetOutput]", 
-                           this->LODUpdateSuppressorTclName, 
-                           this->LODCollectTclName);
+    pm->GetStream()
+      << vtkClientServerStream::Invoke
+      << this->LODCollectID << "GetOutput"
+      << vtkClientServerStream::End
+      << vtkClientServerStream::Invoke
+      << this->LODUpdateSuppressorID << "SetInput"
+      << vtkClientServerStream::LastResult
+      << vtkClientServerStream::End;
+    pm->SendStreamToClientAndServer();
     }
 }
 
@@ -226,17 +325,29 @@ vtkPVLODPartDisplayInformation* vtkPVCompositePartDisplay::GetInformation()
     vtkErrorMacro("Missing application.");
     return NULL;
     }
+  vtkPVProcessModule* pm = pvApp->GetProcessModule();
 
   if ( ! this->GeometryIsValid)
     { // Update but with collection filter off.
     this->CollectionDecision = 0;
     this->LODCollectionDecision = 0;
-    pvApp->BroadcastScript("%s SetPassThrough 1; %s ForceUpdate; " 
-                           "%s SetPassThrough 1; %s ForceUpdate", 
-                           this->CollectTclName,
-                           this->UpdateSuppressorTclName,
-                           this->LODCollectTclName,
-                           this->LODUpdateSuppressorTclName);
+    pm->GetStream()
+      << vtkClientServerStream::Invoke
+      << this->CollectID << "SetPassThrough" << 1
+      << vtkClientServerStream::End;
+    pm->GetStream()
+      << vtkClientServerStream::Invoke
+      << this->UpdateSuppressorID << "ForceUpdate"
+      << vtkClientServerStream::End;
+    pm->GetStream()
+      << vtkClientServerStream::Invoke
+      << this->LODCollectID << "SetPassThrough" << 1
+      << vtkClientServerStream::End;
+    pm->GetStream()
+      << vtkClientServerStream::Invoke
+      << this->LODUpdateSuppressorID << "ForceUpdate"
+      << vtkClientServerStream::End;
+    pm->SendStreamToClientAndServer();
     this->InformationIsValid = 0;
     }
 
@@ -254,81 +365,94 @@ void vtkPVCompositePartDisplay::SetCollectionDecision(int v)
     return;
     }
   this->CollectionDecision = v;
-
-  if ( this->UpdateSuppressorTclName == NULL )
+  if ( !this->UpdateSuppressorID.ID )
     {
     vtkErrorMacro("Missing Suppressor.");
     return;
     }
-
-  if (this->CollectTclName)
+  if(!pvApp)
     {
-    if (this->CollectionDecision)
-      {
-      pvApp->BroadcastScript("%s SetPassThrough 0; %s RemoveAllCaches; %s ForceUpdate", 
-                             this->CollectTclName,
-                             this->UpdateSuppressorTclName,
-                             this->UpdateSuppressorTclName);
-      }
-    else
-      {
-      pvApp->BroadcastScript("%s SetPassThrough 1; %s RemoveAllCaches; %s ForceUpdate", 
-                             this->CollectTclName,
-                             this->UpdateSuppressorTclName,
-                             this->UpdateSuppressorTclName);
-      }
+    return;
+    }
+  
+  vtkPVProcessModule* pm = pvApp->GetProcessModule();
+
+  if (this->CollectID.ID)
+    {
+    pm->GetStream()
+      << vtkClientServerStream::Invoke
+      << this->CollectID << "SetPassThrough"
+      << (this->CollectionDecision? 0:1)
+      << vtkClientServerStream::End;
+    pm->GetStream()
+      << vtkClientServerStream::Invoke
+      << this->UpdateSuppressorID << "RemoveAllCaches"
+      << vtkClientServerStream::End;
+    pm->GetStream()
+      << vtkClientServerStream::Invoke
+      << this->UpdateSuppressorID << "ForceUpdate"
+      << vtkClientServerStream::End;
     }
 
-  this->GetPVApplication()->BroadcastScript(
-             "%s RemoveAllCaches", this->UpdateSuppressorTclName);
+  pm->GetStream()
+    << vtkClientServerStream::Invoke
+    << this->UpdateSuppressorID << "RemoveAllCaches"
+    << vtkClientServerStream::End;
+  pm->SendStreamToClientAndServer();
 }
+
 
 //----------------------------------------------------------------------------
 void vtkPVCompositePartDisplay::SetLODCollectionDecision(int v)
 {
   vtkPVApplication* pvApp = this->GetPVApplication();
 
-  if (v == this->LODCollectionDecision)
+  if (v == this->CollectionDecision)
     {
     return;
     }
-  this->LODCollectionDecision = v;
+  this->CollectionDecision = v;
 
-  if ( this->UpdateSuppressorTclName == NULL )
+  if ( !this->LODUpdateSuppressorID.ID )
     {
     vtkErrorMacro("Missing Suppressor.");
     return;
     }
-
-  if (this->LODCollectTclName)
+  if(!pvApp)
     {
-    if (this->LODCollectionDecision)
-      {
-      pvApp->BroadcastScript("%s SetPassThrough 0; %s RemoveAllCaches; %s ForceUpdate", 
-                             this->LODCollectTclName,
-                             this->LODUpdateSuppressorTclName,
-                             this->LODUpdateSuppressorTclName);
-      }
-    else
-      {
-      pvApp->BroadcastScript("%s SetPassThrough 1; %s RemoveAllCaches; %s ForceUpdate", 
-                             this->LODCollectTclName,
-                             this->LODUpdateSuppressorTclName,
-                             this->LODUpdateSuppressorTclName);
-      }
+    return;
+    }
+  vtkPVProcessModule* pm = pvApp->GetProcessModule();
+  if (this->LODCollectID.ID)
+    {
+    pm->GetStream()
+      << vtkClientServerStream::Invoke
+      << this->LODCollectID << "SetPassThrough"
+      << (this->LODCollectionDecision? 0:1)
+      << vtkClientServerStream::End;
+    pm->GetStream()
+      << vtkClientServerStream::Invoke
+      << this->LODUpdateSuppressorID << "RemoveAllCaches"
+      << vtkClientServerStream::End;
+    pm->GetStream()
+      << vtkClientServerStream::Invoke
+      << this->LODUpdateSuppressorID << "ForceUpdate"
+      << vtkClientServerStream::End;
     }
 
+  pm->GetStream()
+    << vtkClientServerStream::Invoke
+    << this->LODUpdateSuppressorID << "RemoveAllCaches"
+    << vtkClientServerStream::End;
+  pm->SendStreamToClientAndServer();
 }
-
-
-
 
 //----------------------------------------------------------------------------
 void vtkPVCompositePartDisplay::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
-  os << indent << "CollectTclName: " << (this->CollectTclName?this->CollectTclName:"none") << endl;
-  os << indent << "LODCollectTclName: " << (this->LODCollectTclName?this->LODCollectTclName:"none") << endl;
+  os << indent << "CollectID: " << this->CollectID << endl;
+  os << indent << "LODCollectID: " << this->LODCollectID << endl;
 
   os << indent << "CollectionDecision: " 
      <<  this->CollectionDecision << endl;
@@ -336,9 +460,3 @@ void vtkPVCompositePartDisplay::PrintSelf(ostream& os, vtkIndent indent)
      <<  this->LODCollectionDecision << endl;
 
 }
-
-
-  
-
-
-

@@ -51,7 +51,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLabeledToggle);
-vtkCxxRevisionMacro(vtkPVLabeledToggle, "1.21");
+vtkCxxRevisionMacro(vtkPVLabeledToggle, "1.22");
 
 //----------------------------------------------------------------------------
 vtkPVLabeledToggle::vtkPVLabeledToggle()
@@ -188,11 +188,11 @@ void vtkPVLabeledToggle::Trace(ofstream *file)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVLabeledToggle::AcceptInternal(const char* sourceTclName)
+void vtkPVLabeledToggle::AcceptInternal(vtkClientServerID sourceID)
 {
   this->ModifiedFlag = 0;
   this->Property->SetIndex(this->GetState());
-  this->Property->SetVTKSourceTclName(sourceTclName);
+  this->Property->SetVTKSourceID(sourceID);
   this->Property->AcceptInternal();
 }
 

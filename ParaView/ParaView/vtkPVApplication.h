@@ -47,7 +47,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __vtkPVApplication_h
 
 #include "vtkKWApplication.h"
-
 class vtkPVProcessModule;
 class vtkPVRenderModule;
 
@@ -62,6 +61,7 @@ class vtkPVWindow;
 class vtkPVRenderView;
 class vtkPolyDataMapper;
 class vtkProbeFilter;
+
 
 #define VTK_PV_SLAVE_SCRIPT_RMI_TAG 1150
 #define VTK_PV_SLAVE_SCRIPT_COMMAND_LENGTH_TAG 1100
@@ -256,7 +256,6 @@ public:
   vtkGetMacro(StartGUI, int);
 
   //BTX
-  static const char* const LoadComponentProc;
   static const char* const ExitProc;
   //ETX
 

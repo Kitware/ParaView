@@ -112,6 +112,7 @@ class vtkPVWidget;
 class vtkPVWriter;
 class vtkPVXMLPackageParser;
 class vtkPolyDataMapper;
+#include "vtkClientServerID.h"
 
 //BTX
 template <class key, class data> 
@@ -487,12 +488,17 @@ public:
   // I am using this method instead of MakeTclObject.
   void SetInteractor(vtkPVGenericRenderWindowInteractor *iren);
   vtkPVGenericRenderWindowInteractor* GetInteractor() {return this->Interactor;}
-  vtkGetStringMacro(InteractorTclName);
 
   // Description:
   // For flip books. These methods should really be in a render module.
   void RemoveAllCaches();
   void CacheUpdate(int idx, int total);
+  vtkClientServerID GetInteractorID(){ return this->InteractorID;}
+
+  // Description:
+  // Returns 1 is file exists on the server and is readable and 0
+  // otherwise.
+  int CheckIfFileIsReadable(const char* fname);
 
 protected:
   vtkPVWindow();
@@ -507,9 +513,8 @@ protected:
 
   // Should I move this to vtkPVRenderView?
   vtkPVGenericRenderWindowInteractor *Interactor;
-  char *InteractorTclName;
-  vtkSetStringMacro(InteractorTclName);  
-
+  vtkClientServerID InteractorID;
+  
   // ParaView specific menus
   vtkKWMenu *SourceMenu;
   vtkKWMenu *FilterMenu;
@@ -551,14 +556,9 @@ protected:
   vtkKWEntry *CenterZEntry;
     
   //vtkAxes *CenterSource;
-  char *CenterSourceTclName;
-  vtkSetStringMacro(CenterSourceTclName);
-  //vtkPolyDataMapper *CenterMapper;
-  char *CenterMapperTclName;
-  vtkSetStringMacro(CenterMapperTclName);
-  //vtkActor *CenterActor;
-  char *CenterActorTclName;
-  vtkSetStringMacro(CenterActorTclName);
+  vtkClientServerID CenterSourceID;
+  vtkClientServerID CenterMapperID;
+  vtkClientServerID CenterActorID;
 
   void ResizeCenterActor();
   
@@ -573,9 +573,6 @@ protected:
 
   // Disable or enable the select menu.
   void EnableSelectMenu();
-
-  // Returns VTK_OK is file exists and is readable.
-  int CheckIfFileIsReadable(const char* fname);
 
   vtkPVSource *CurrentPVSource;
   vtkPVData *CurrentPVData;
@@ -665,6 +662,7 @@ protected:
   vtkPVApplicationSettingsInterface *ApplicationSettingsInterface;
   vtkKWUserInterfaceNotebookManager *UserInterfaceManager;
 
+  vtkClientServerID ServerFileListingID;
 private:
 
 //BTX

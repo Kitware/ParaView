@@ -59,9 +59,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVXMLElement.h"
 #include "vtkSphereWidget.h"
 #include "vtkRenderer.h"
+#include "vtkPVProcessModule.h"
 
 vtkStandardNewMacro(vtkPVSphereWidget);
-vtkCxxRevisionMacro(vtkPVSphereWidget, "1.27");
+vtkCxxRevisionMacro(vtkPVSphereWidget, "1.28");
 
 int vtkPVSphereWidgetCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -79,7 +80,7 @@ vtkPVSphereWidget::vtkPVSphereWidget()
    }
   this->RadiusEntry = vtkKWEntry::New();
   this->CenterResetButton = vtkKWPushButton::New();
-  this->SphereTclName = 0;
+  this->SphereID.ID = 0;
   
   this->LastAcceptedCenter[0] = this->LastAcceptedCenter[1] =
     this->LastAcceptedCenter[2] = 0.0;
@@ -89,11 +90,12 @@ vtkPVSphereWidget::vtkPVSphereWidget()
 //----------------------------------------------------------------------------
 vtkPVSphereWidget::~vtkPVSphereWidget()
 {
-  if (this->SphereTclName)
+  if (this->SphereID.ID)
     {
-    this->GetPVApplication()->BroadcastScript(
-      "%s Delete", this->SphereTclName);
-    this->SetSphereTclName(NULL);
+    vtkPVProcessModule* pv = this->GetPVApplication()->GetProcessModule();
+    pv->DeleteStreamObject(this->SphereID);
+    this->SphereID.ID = 0;
+    pv->SendStreamToServer();
     }
   int i;
   this->Labels[0]->Delete();
@@ -165,17 +167,18 @@ void vtkPVSphereWidget::ActualPlaceWidget()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVSphereWidget::AcceptInternal(const char* sourceTclName)  
+void vtkPVSphereWidget::AcceptInternal(vtkClientServerID sourceID)  
 {
   this->PlaceWidget();
   if ( ! this->ModifiedFlag)
     {
     return;
     }
-  if ( this->SphereTclName )
+  if ( this->SphereID.ID )
     {
     vtkPVApplication *pvApp = static_cast<vtkPVApplication*>(
-      this->Application);
+      this->Application); 
+    vtkPVProcessModule* pm = pvApp->GetProcessModule();
     float val[3];
     int cc;
     for ( cc = 0; cc < 3; cc ++ )
@@ -185,13 +188,17 @@ void vtkPVSphereWidget::AcceptInternal(const char* sourceTclName)
     this->SetCenterInternal(val);
     float rad = atof(this->RadiusEntry->GetValue());
     this->SetRadiusInternal(rad);
-    pvApp->BroadcastScript("%s SetCenter %f %f %f",
-                           this->SphereTclName, val[0], val[1], val[2]);
-    pvApp->BroadcastScript("%s SetRadius %f", this->SphereTclName, rad);
+    pm->GetStream() << vtkClientServerStream::Invoke << this->SphereID
+                    << "SetCenter" << val[0] << val[1] << val[2] 
+                    << vtkClientServerStream::End;
+    pm->GetStream() << vtkClientServerStream::Invoke << this->SphereID
+                    << "SetRadius" << rad
+                    << vtkClientServerStream::End;
+    pm->SendStreamToClientAndServer();
     this->SetLastAcceptedCenter(val);
     this->SetLastAcceptedRadius(rad);
     }
-  this->Superclass::AcceptInternal(sourceTclName);
+  this->Superclass::AcceptInternal(sourceID);
 }
 
 
@@ -229,12 +236,12 @@ void vtkPVSphereWidget::UpdateVTKObject(const char*)
 //----------------------------------------------------------------------------
 void vtkPVSphereWidget::SaveInBatchScript(ofstream *file)
 {
-  *file << "vtkSphere " << this->SphereTclName << endl;
-  *file << "\t" << this->SphereTclName << " SetCenter ";
-  this->Script("%s GetCenter", this->SphereTclName);
+  *file << "vtkSphere " << "pvTemp" << this->SphereID << endl;
+  *file << "\t" << this->SphereID << " SetCenter ";
+  this->Script("%s GetCenter", this->SphereID);
   *file << this->Application->GetMainInterp()->result << endl;
-  *file << "\t" << this->SphereTclName << " SetRadius ";
-  this->Script("%s GetRadius", this->SphereTclName);
+  *file << "\t" << "pvTemp" << this->SphereID << " SetRadius ";
+  this->Script("%s GetRadius", this->SphereID);
   *file << this->Application->GetMainInterp()->result << endl;
 }
 
@@ -242,8 +249,7 @@ void vtkPVSphereWidget::SaveInBatchScript(ofstream *file)
 void vtkPVSphereWidget::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
-  os << indent << "SphereTclName: " 
-     << (this->SphereTclName?this->SphereTclName:"none") << endl;
+  os << indent << "SphereID: " << this->SphereID << endl;
 }
 
 //----------------------------------------------------------------------------
@@ -301,9 +307,6 @@ void vtkPVSphereWidget::SetBalloonHelpString(const char *str)
 //----------------------------------------------------------------------------
 void vtkPVSphereWidget::ChildCreate(vtkPVApplication* pvApp)
 {
-  static int instanceCount = 0;
-  char tclName[256];
-
   if ((this->TraceNameState == vtkPVWidget::Uninitialized ||
        this->TraceNameState == vtkPVWidget::Default) )
     {
@@ -311,15 +314,13 @@ void vtkPVSphereWidget::ChildCreate(vtkPVApplication* pvApp)
     this->SetTraceNameState(vtkPVWidget::SelfInitialized);
     }
 
-  ++instanceCount;
-  sprintf(tclName, "pvSphereWidget%d", instanceCount);
-  this->SetWidget3DTclName(tclName);
-  pvApp->BroadcastScript("vtkSphereWidget %s", tclName);
-  pvApp->BroadcastScript("%s PlaceWidget 0 1 0 1 0 1", tclName);
+  vtkPVProcessModule* pm = pvApp->GetProcessModule();
+  this->Widget3DID = pm->NewStreamObject("vtkSphereWidget");
+  pm->GetStream() << vtkClientServerStream::Invoke << this->Widget3DID
+                  << "PlaceWidget" << 0 << 1 << 0 << 1 << 0 << 1 
+                  << vtkClientServerStream::End;
 
-  sprintf(tclName, "pvSphere%d", instanceCount);
-  pvApp->BroadcastScript("vtkSphere %s", tclName);
-  this->SetSphereTclName(tclName);
+  this->SphereID = pm->NewStreamObject("vtkSphere");
   
   this->SetFrameLabel("Sphere Widget");
   this->Labels[0]->SetParent(this->Frame->GetFrame());
@@ -406,15 +407,21 @@ void vtkPVSphereWidget::ChildCreate(vtkPVApplication* pvApp)
       {
       double bds[6];
       input->GetDataInformation()->GetBounds(bds);
-      pvApp->BroadcastScript("%s SetCenter %f %f %f", this->SphereTclName,
-                             0.5*(bds[0]+bds[1]), 0.5*(bds[2]+bds[3]),
-                             0.5*(bds[4]+bds[5]));
+      pm->GetStream() << vtkClientServerStream::Invoke << this->SphereID 
+                      << "SetCenter" 
+                      << 0.5*(bds[0]+bds[1])
+                      << 0.5*(bds[2]+bds[3])
+                      << 0.5*(bds[4]+bds[5]) 
+                      << vtkClientServerStream::End;
+      pm->SendStreamToClientAndServer();
       this->SetCenter(0.5*(bds[0]+bds[1]), 0.5*(bds[2]+bds[3]),
                       0.5*(bds[4]+bds[5]));
       this->SetLastAcceptedCenter(0.5*(bds[0]+bds[1]), 0.5*(bds[2]+bds[3]),
                                   0.5*(bds[4]+bds[5]));
-      pvApp->BroadcastScript("%s SetRadius %f", this->SphereTclName,
-                             0.5*(bds[1]-bds[0]));
+      pm->GetStream() << vtkClientServerStream::Invoke << this->SphereID 
+                      << "SetRadius"  << 0.5*(bds[1]-bds[0])
+                      << vtkClientServerStream::End;
+      pm->SendStreamToClientAndServer();
       this->SetRadius(0.5*(bds[1]-bds[0]));
       this->SetLastAcceptedRadius(0.5*(bds[1]-bds[0]));
       }
@@ -448,14 +455,18 @@ int vtkPVSphereWidget::ReadXMLAttributes(vtkPVXMLElement* element,
 }
 
 void vtkPVSphereWidget::SetCenterInternal(float x, float y, float z)
-{
+{ 
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  vtkPVProcessModule* pm = pvApp->GetProcessModule();
   this->CenterEntry[0]->SetValue(x);
   this->CenterEntry[1]->SetValue(y);
   this->CenterEntry[2]->SetValue(z);  
-  if ( this->Widget3DTclName )
+  if ( this->Widget3DID.ID )
     {
-    this->GetPVApplication()->BroadcastScript(
-      "%s SetCenter %f %f %f", this->Widget3DTclName, x, y, z);
+    pm->GetStream() << vtkClientServerStream::Invoke << this->Widget3DID
+                    << "SetCenter" << x << y << z
+                    << vtkClientServerStream::End;
+    pm->SendStreamToClientAndServer();
     }
 }
 
@@ -474,10 +485,13 @@ void vtkPVSphereWidget::SetCenter()
   for ( cc = 0; cc < 3; cc ++ )
     {
     val[cc] = atof(this->CenterEntry[cc]->GetValue());
-    }
-
-  this->GetPVApplication()->BroadcastScript(
-    "%s SetCenter %f %f %f", this->Widget3DTclName, val[0], val[1], val[2]);
+    } 
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  vtkPVProcessModule* pm = pvApp->GetProcessModule();
+  pm->GetStream() << vtkClientServerStream::Invoke << this->Widget3DID
+                  << "SetCenter" << val[0] << val[1] << val[2]
+                  << vtkClientServerStream::End;
+  pm->SendStreamToClientAndServer();
   this->Render();
   this->ModifiedCallback();
   this->ValueChanged = 0;
@@ -487,12 +501,17 @@ void vtkPVSphereWidget::SetCenter()
 void vtkPVSphereWidget::SetRadiusInternal(float r)
 {
   this->RadiusEntry->SetValue(r); 
-  if ( this->Widget3DTclName )
+  if ( this->Widget3DID.ID )
     {
-    this->GetPVApplication()->BroadcastScript(
-      "%s SetRadius %f", this->Widget3DTclName, r);
+    vtkPVApplication *pvApp = this->GetPVApplication();
+    vtkPVProcessModule* pm = pvApp->GetProcessModule();
+    pm->GetStream() << vtkClientServerStream::Invoke << this->Widget3DID
+                  << "SetRadius" << r
+                  << vtkClientServerStream::End;
+    pm->SendStreamToClientAndServer();
     }
 }
+
 
 //----------------------------------------------------------------------------
 void vtkPVSphereWidget::SetRadius(float r)
@@ -504,11 +523,14 @@ void vtkPVSphereWidget::SetRadius(float r)
 //----------------------------------------------------------------------------
 void vtkPVSphereWidget::SetRadius()
 {
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  vtkPVProcessModule* pm = pvApp->GetProcessModule();
   float val;
   val = atof(this->RadiusEntry->GetValue());
-
-  this->GetPVApplication()->BroadcastScript(
-    "%s SetRadius %f", this->Widget3DTclName, val);
+  pm->GetStream() << vtkClientServerStream::Invoke << this->SphereID
+                  << "SetRadius" << val
+                  << vtkClientServerStream::End;
+  pm->SendStreamToClientAndServer();
   this->Render();
   this->ModifiedCallback();
   this->ValueChanged = 0;

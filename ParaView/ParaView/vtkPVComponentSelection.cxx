@@ -52,14 +52,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //---------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVComponentSelection);
-vtkCxxRevisionMacro(vtkPVComponentSelection, "1.10");
+vtkCxxRevisionMacro(vtkPVComponentSelection, "1.11");
 
 //---------------------------------------------------------------------------
 vtkPVComponentSelection::vtkPVComponentSelection()
 {
   this->CheckButtons = vtkKWWidgetCollection::New();
   this->Initialized = 0;
-  this->ObjectTclName = NULL;
+  this->ObjectID.ID = 0;
   this->VariableName = NULL;
   this->NumberOfComponents = 0;
   this->LastAcceptedState = 0;
@@ -69,7 +69,7 @@ vtkPVComponentSelection::vtkPVComponentSelection()
 vtkPVComponentSelection::~vtkPVComponentSelection()
 {
   this->CheckButtons->Delete();
-  this->SetObjectTclName(NULL);
+  this->ObjectID.ID = 0;
   this->SetVariableName(NULL);
   if (this->LastAcceptedState)
     {
@@ -111,8 +111,13 @@ void vtkPVComponentSelection::Create(vtkKWApplication *app)
     sprintf(compId, "%d", i);
     button->SetText(compId);
     this->CheckButtons->AddItem(button);
-    pvApp->GetProcessModule()->ServerScript(
-      "%s Set%s %d %d", this->ObjectTclName, this->VariableName, i, i);
+    ostrstream str;
+    str << "Set" << this->VariableName << ends;
+    pvApp->GetProcessModule()->GetStream()
+      << vtkClientServerStream::Invoke << this->ObjectID << str.str() 
+      << i << i << vtkClientServerStream::End;
+    delete [] str.str();
+    pvApp->GetProcessModule()->SendStreamToServer();
     this->Script("pack %s", button->GetWidgetName());
     button->Delete();
     this->LastAcceptedState[i] = 1;
@@ -138,26 +143,33 @@ void vtkPVComponentSelection::Trace(ofstream *file)
 }
 
 //---------------------------------------------------------------------------
-void vtkPVComponentSelection::AcceptInternal(const char* sourceTclName)
+void vtkPVComponentSelection::AcceptInternal(vtkClientServerID sourceID)
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
   int i;
   
   if (this->ModifiedFlag)
     {
-    pvApp->GetProcessModule()->ServerScript(
-      "%s RemoveAllValues", sourceTclName);
+    vtkPVProcessModule* pm = pvApp->GetProcessModule();
+    pm->GetStream() << vtkClientServerStream::Invoke << sourceID
+                    << "RemoveAllValues" << vtkClientServerStream::End;
     for (i = 0; i < this->CheckButtons->GetNumberOfItems(); i++)
       {
       if (this->GetState(i))
         {
-        pvApp->GetProcessModule()->ServerScript(
-          "%s Set%s %d %d", sourceTclName, this->VariableName, i, i);
+        ostrstream str;
+        str << "Set" << this->VariableName << ends;
+        pm->GetStream() << vtkClientServerStream::Invoke << sourceID
+                        << str.str() << i << i << vtkClientServerStream::End;
+        delete [] str.str();
         }
       else
         {
-        pvApp->GetProcessModule()->ServerScript(
-          "%s Set%s %d %d", sourceTclName, this->VariableName, i, -1);
+        ostrstream str;
+        str << "Set" << this->VariableName << ends;
+        pm->GetStream() << vtkClientServerStream::Invoke << sourceID
+                        << str.str() << i << -1 << vtkClientServerStream::End;
+        delete [] str.str();
         }
       this->LastAcceptedState[i] = this->GetState(i);
       }

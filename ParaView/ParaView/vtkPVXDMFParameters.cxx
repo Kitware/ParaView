@@ -163,7 +163,7 @@ vtkStandardNewMacro(vtkPVXDMFParametersInternals);
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVXDMFParameters);
-vtkCxxRevisionMacro(vtkPVXDMFParameters, "1.10");
+vtkCxxRevisionMacro(vtkPVXDMFParameters, "1.11");
 
 //----------------------------------------------------------------------------
 vtkPVXDMFParameters::vtkPVXDMFParameters()
@@ -172,7 +172,8 @@ vtkPVXDMFParameters::vtkPVXDMFParameters()
   this->Frame = 0;
   this->FrameLabel = 0;
   this->SetFrameLabel("Parameters");
-  this->VTKReaderTclName = 0;
+  this->VTKReaderID.ID = 0;
+  this->ServerSideID.ID = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -183,12 +184,17 @@ vtkPVXDMFParameters::~vtkPVXDMFParameters()
     this->Frame->Delete();
     this->Frame = 0;
     }
-  
+
   this->Internals->Delete();
   this->Internals = 0;
 
   this->SetFrameLabel(0);
-  this->SetVTKReaderTclName(0);
+  if(this->ServerSideID.ID)
+    {
+    vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
+    pm->DeleteStreamObject(this->ServerSideID);
+    pm->SendStreamToServerRoot();
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -225,33 +231,51 @@ void vtkPVXDMFParameters::Create(vtkKWApplication *pvApp)
 void vtkPVXDMFParameters::UpdateFromReader()
 {
   vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
-  if(this->VTKReaderTclName)
+  if(this->VTKReaderID.ID)
     {
-    pm->RootScript(
-      "namespace eval ::paraview::vtkPVXDMFParameters {\n"
-      "  proc GetParameters { reader } {\n"
-//      "    puts \"GetParameters\"\n"
-      "    set n [$reader GetNumberOfParameters]\n"
-//      "    puts \"Number of parameters: $n\"\n"
-      "    set settings {}\n"
-      "    for {set i 0} {$i < $n} {incr i} {\n"
-      "      set name [$reader GetParameterName $i]\n"
-      "      set index [$reader GetParameterIndex $name]\n"
-      "      set range [$reader GetParameterRangeAsString $name]\n"
-      "      lappend settings [concat [list [list $name] $index ] $range]\n"
-      "    }\n"
-      "    return $settings\n"
-      "  }\n"
-      "  GetParameters {%s}\n"
-      "}\n",
-      this->VTKReaderTclName);
-    vtkstd::string parameters = pm->GetRootResult();
-    //cout << "Parameters: " << parameters.c_str() << endl;
-    this->Script(
-      "foreach a { %s } {\n"
-//      "  puts \"- $a\"\n"
-      "  eval %s AddXDMFParameter $a\n"
-      "}\n", parameters.c_str(), this->GetTclName());
+    // Create server-side helper if necessary.
+    if(!this->ServerSideID.ID)
+      {
+      this->ServerSideID = pm->NewStreamObject("vtkPVServerXDMFParameters");
+      }
+
+    // Get the parameters from the server.
+    pm->GetStream() << vtkClientServerStream::Invoke
+                    << this->ServerSideID << "GetParameters"
+                    << this->VTKReaderID
+                    << vtkClientServerStream::End;
+    pm->SendStreamToServerRoot();
+    vtkClientServerStream parameters;
+    if(!pm->GetLastServerResult().GetArgument(0, 0, &parameters))
+      {
+      vtkErrorMacro("Error getting parameters from server.");
+      return;
+      }
+
+    // Add each parameter locally.
+    int numParameters = parameters.GetNumberOfArguments(0)/3;
+    for(int i=0; i < numParameters; ++i)
+      {
+      const char* name;
+      int index;
+      int range[3];
+      if(!parameters.GetArgument(0, 3*i, &name))
+        {
+        vtkErrorMacro("Error parsing parameter name.");
+        return;
+        }
+      if(!parameters.GetArgument(0, 3*i + 1, &index))
+        {
+        vtkErrorMacro("Error parsing parameter index.");
+        return;
+        }
+      if(!parameters.GetArgument(0, 3*i + 2, range, 3))
+        {
+        vtkErrorMacro("Error parsing parameter range.");
+        return;
+        }
+      this->AddXDMFParameter(name, index, range[0], range[1], range[2]);
+      }
     this->Internals->Update(this);
     }
 }
@@ -263,44 +287,42 @@ void vtkPVXDMFParameters::AddXDMFParameter(const char* pname, int value, int min
 }
 
 //----------------------------------------------------------------------------
-void vtkPVXDMFParameters::AcceptInternal(const char* vtkNotUsed(sourceTclName))
+void vtkPVXDMFParameters::AcceptInternal(vtkClientServerID)
 {
   vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
 
-  vtkCollectionIterator* it = this->Internals->GetWidgetsIterator();
-  ostrstream str;
-  str << "{";
   int some = 0;
+  vtkCollectionIterator* it = this->Internals->GetWidgetsIterator();
   for (it->GoToFirstItem(); !it->IsDoneWithTraversal(); it->GoToNextItem() )
     {
     vtkKWScale* scale = (vtkKWScale*)it->GetObject();
     const char* label = scale->GetShortLabel();
-    //cout << "Looking at scale: " << label << endl;
-    vtkPVXDMFParametersInternals::Parameter* par = this->Internals->GetParameter(label);
+    vtkPVXDMFParametersInternals::Parameter* par =
+      this->Internals->GetParameter(label);
     par->Value = static_cast<int>(scale->GetValue());
-    str << " {" << label << "} " << par->Value;
+    pm->GetStream() << vtkClientServerStream::Invoke
+                    << this->VTKReaderID << "SetParameterIndex"
+                    << label << par->Value
+                    << vtkClientServerStream::End;
     some = 1;
     }
-  str << " }" << ends;
-  //cout << "List: " << str.str() << endl;
   if ( some )
     {
-    pm->ServerScript(
-      "namespace eval ::paraview::vtkPVXDMFParameters {\n"
-      "  proc SetParameters { reader parameters } {\n"
-      "    foreach { array value } $parameters {\n"
-      "      $reader SetParameterIndex $array $value\n"
-//      "      puts \"Parameter: [ $reader GetParameterIndex $array ]\"\n"
-      "    }\n" 
-      "  }\n" 
-      "  SetParameters %s %s\n"
-      "}\n",
-      this->VTKReaderTclName, str.str());
-
+    pm->SendStreamToServer();
     }
-  str.rdbuf()->freeze(0);
   this->UpdateFromReader();
   this->ModifiedFlag = 0;
+}
+
+//---------------------------------------------------------------------------
+void vtkPVXDMFParameters::SetParameterIndex(const char* label, int value)
+{
+  vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
+  pm->GetStream() << vtkClientServerStream::Invoke
+                  << this->VTKReaderID << "SetParameterIndex"
+                  << label << value
+                  << vtkClientServerStream::End;
+  pm->SendStreamToServer();
 }
 
 //---------------------------------------------------------------------------
@@ -311,16 +333,14 @@ void vtkPVXDMFParameters::Trace(ofstream *file)
     return;
     }
   vtkCollectionIterator* it = this->Internals->GetWidgetsIterator();
-  *file << "set kw(" << this->VTKReaderTclName << ") [ $kw(" << this->GetTclName() 
-    << ") GetVTKReaderTclName ]" << endl;
   for (it->GoToFirstItem(); !it->IsDoneWithTraversal(); it->GoToNextItem() )
     {
     vtkKWScale* scale = (vtkKWScale*)it->GetObject();
     const char* label = scale->GetShortLabel();
     //cout << "Looking at scale: " << label << endl;
     vtkPVXDMFParametersInternals::Parameter* p = this->Internals->GetParameter(label);
-    *file << "$kw(" << this->VTKReaderTclName << ") SetParameterIndex {" << label << "} "
-        << p->Value << endl;
+    *file << "$kw(" << this->GetTclName() << ") SetParameterIndex {"
+          << label << "} " << p->Value << endl;
     }
 }
 
@@ -348,7 +368,7 @@ void vtkPVXDMFParameters::CopyProperties(vtkPVWidget* clone, vtkPVSource* pvSour
   vtkPVXDMFParameters* pvs = vtkPVXDMFParameters::SafeDownCast(clone);
   if (pvs)
     {
-    pvs->SetVTKReaderTclName(pvSource->GetVTKSourceTclName());
+    pvs->VTKReaderID = pvSource->GetVTKSourceID();
     //float min, max;
     //this->Scale->GetRange(min, max);
     //pvs->SetRange(min, max);
@@ -394,7 +414,7 @@ int vtkPVXDMFParameters::ReadXMLAttributes(vtkPVXMLElement* element,
 void vtkPVXDMFParameters::AddAnimationScriptsToMenu(vtkKWMenu *menu, 
                                                   vtkPVAnimationInterfaceEntry *ai)
 {
-  if ( !(this->VTKReaderTclName) )
+  if ( !this->VTKReaderID.ID )
     {
     return;
     }
@@ -422,9 +442,8 @@ void vtkPVXDMFParameters::AnimationMenuCallback(vtkPVAnimationInterfaceEntry *ai
       this->GetTclName(), ai->GetTclName(), name);
     }
 
-  sprintf(script, "%s SetParameterIndex {%s} $pvTime",
-    this->GetPVSource()->GetVTKSourceTclName(),
-    name);
+  sprintf(script, "%s SetParameterIndex {%s} $pvTime", this->GetTclName(),
+          name);
   vtkPVXDMFParametersInternals::Parameter *p = this->Internals->GetParameter(name);
   ai->SetLabelAndScript(this->GetTraceName(), script);
   ai->SetTimeStart(0);
@@ -442,7 +461,7 @@ void vtkPVXDMFParameters::AnimationMenuCallback(vtkPVAnimationInterfaceEntry *ai
 //----------------------------------------------------------------------------
 void vtkPVXDMFParameters::SaveInBatchScript(ofstream *file)
 {
-  if (this->VTKReaderTclName == NULL)
+  if (!this->VTKReaderID.ID)
     {
     vtkErrorMacro("VTKReader has not been set.");
     }
@@ -452,14 +471,14 @@ void vtkPVXDMFParameters::SaveInBatchScript(ofstream *file)
     return;
     }
   vtkCollectionIterator* it = this->Internals->GetWidgetsIterator();
-  *file << "\t" << this->VTKReaderTclName << " UpdateInformation" << endl;
+  *file << "\t" << "pvTemp" << this->VTKReaderID.ID << " UpdateInformation" << endl;
   for (it->GoToFirstItem(); !it->IsDoneWithTraversal(); it->GoToNextItem() )
     {
     vtkKWScale* scale = (vtkKWScale*)it->GetObject();
     const char* label = scale->GetShortLabel();
     //cout << "Looking at scale: " << label << endl;
     vtkPVXDMFParametersInternals::Parameter* p = this->Internals->GetParameter(label);
-    *file << "\t" << this->VTKReaderTclName << " SetParameterIndex {" << label << "} "
+    *file << "\t" << "pvTemp" << this->VTKReaderID.ID << " SetParameterIndex {" << label << "} "
       << p->Value << endl;
     }
 }
@@ -468,7 +487,6 @@ void vtkPVXDMFParameters::SaveInBatchScript(ofstream *file)
 void vtkPVXDMFParameters::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
-  os << indent << "VTKReaderTclName: " 
-    << (this->VTKReaderTclName?this->VTKReaderTclName:"<none>") << endl;
+  os << indent << "VTKReaderID: " << this->VTKReaderID.ID << endl;
   os << indent << "Frame: " << this->Frame << endl;
 }

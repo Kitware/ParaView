@@ -1,0 +1,2 @@
+SET(KIT_WRAP_DEPS Filtering)
+PV_WRAP_VTK_CS(Imaging IMAGING "${KIT_WRAP_DEPS}")

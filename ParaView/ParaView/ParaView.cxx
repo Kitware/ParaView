@@ -71,6 +71,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkParaViewInstantiator.h"
 
 static void ParaViewEnableMSVCDebugHook();
+static void ParaViewInitializeInterpreter(vtkPVProcessModule* pm);
 
 //----------------------------------------------------------------------------
 int MyMain(int argc, char *argv[])
@@ -211,6 +212,8 @@ int MyMain(int argc, char *argv[])
 
   pm->SetApplication(app);
   app->SetProcessModule(pm);
+  pm->InitializeInterpreter();
+  ParaViewInitializeInterpreter(pm);
 
   // Start the application's event loop.  This will enable
   // vtkOutputWindow's user prompting for any further errors now that
@@ -218,6 +221,7 @@ int MyMain(int argc, char *argv[])
   startVal = pm->Start(argc, argv);
 
   // Clean up for exit.
+  pm->FinalizeInterpreter();
   app->Delete();
   pm->Delete();
   pm = NULL;
@@ -368,3 +372,44 @@ void ParaViewEnableMSVCDebugHook()
 {
 }
 #endif
+
+//----------------------------------------------------------------------------
+// ClientServer wrapper initialization functions.
+extern void vtkCommonCS_Initialize(vtkClientServerInterpreter*);
+extern void vtkFilteringCS_Initialize(vtkClientServerInterpreter*);
+extern void vtkImagingCS_Initialize(vtkClientServerInterpreter*);
+extern void vtkGraphicsCS_Initialize(vtkClientServerInterpreter*);
+extern void vtkIOCS_Initialize(vtkClientServerInterpreter*);
+extern void vtkRenderingCS_Initialize(vtkClientServerInterpreter*);
+extern void vtkHybridCS_Initialize(vtkClientServerInterpreter*);
+extern void vtkParallelCS_Initialize(vtkClientServerInterpreter*);
+#ifdef VTK_USE_PATENTED
+extern void vtkPatentedCS_Initialize(vtkClientServerInterpreter*);
+#endif
+extern void vtkPVFiltersCS_Initialize(vtkClientServerInterpreter*);
+extern void vtkParaViewServerCS_Initialize(vtkClientServerInterpreter*);
+#ifdef PARAVIEW_LINK_XDMF
+extern void vtkXdmfCS_Initialize(vtkClientServerInterpreter *);
+#endif
+
+//----------------------------------------------------------------------------
+void ParaViewInitializeInterpreter(vtkPVProcessModule* pm)
+{
+  // Initialize built-in wrapper modules.
+  vtkCommonCS_Initialize(pm->GetInterpreter());
+  vtkFilteringCS_Initialize(pm->GetInterpreter());
+  vtkImagingCS_Initialize(pm->GetInterpreter());
+  vtkGraphicsCS_Initialize(pm->GetInterpreter());
+  vtkIOCS_Initialize(pm->GetInterpreter());
+  vtkRenderingCS_Initialize(pm->GetInterpreter());
+  vtkHybridCS_Initialize(pm->GetInterpreter());
+  vtkParallelCS_Initialize(pm->GetInterpreter());
+#ifdef VTK_USE_PATENTED
+  vtkPatentedCS_Initialize(pm->GetInterpreter());
+#endif
+  vtkPVFiltersCS_Initialize(pm->GetInterpreter());
+  vtkParaViewServerCS_Initialize(pm->GetInterpreter());
+#ifdef PARAVIEW_LINK_XDMF
+  vtkXdmfCS_Initialize(pm->GetInterpreter());
+#endif
+}

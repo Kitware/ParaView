@@ -50,7 +50,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 #include "vtkPVPartDisplay.h"
-
+#include "vtkClientServerID.h" // needed for vtkClientServerID
 class vtkDataSet;
 class vtkPVApplication;
 class vtkPVLODPartDisplayInformation;
@@ -86,7 +86,7 @@ public:
 
   // Description:
   // Connect the geometry filter to the display pipeline.
-  virtual void ConnectToGeometry(char* geometryTclName);
+  virtual void ConnectToGeometry(vtkClientServerID);
 
   // Description:
   // This method updates the piece that has been assigned to this process.
@@ -101,10 +101,10 @@ public:
   //=============================================================== 
   // Description:
   // These access methods are neede for process module abstraction.
-  vtkGetStringMacro(LODUpdateSuppressorTclName);
-  vtkGetStringMacro(LODMapperTclName);
-  vtkGetStringMacro(LODDeciTclName);
-    
+  vtkGetMacro(LODUpdateSuppressorID,vtkClientServerID);
+  vtkGetMacro(LODMapperID,vtkClientServerID);
+  vtkGetMacro(LODDeciID,vtkClientServerID);
+  
   // Description:
   // Returns an up to data information object.
   // Do not keep a reference to this object.
@@ -116,14 +116,9 @@ protected:
 
   int LODResolution;
   
-  char *LODMapperTclName;
-  vtkSetStringMacro(LODMapperTclName);
-  
-  char *LODDeciTclName;
-  vtkSetStringMacro(LODDeciTclName);
-    
-  char *LODUpdateSuppressorTclName;
-  vtkSetStringMacro(LODUpdateSuppressorTclName);
+  vtkClientServerID LODUpdateSuppressorID;
+  vtkClientServerID LODMapperID;
+  vtkClientServerID LODDeciID;
   
   // Description:
   // This method should be called immediately after the object is constructed.

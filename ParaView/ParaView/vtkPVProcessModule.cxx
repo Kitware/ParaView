@@ -21,7 +21,7 @@ modification, are permitted provided that the following conditions are met:
    and/or other materials provided with the distribution.
 
  * Neither the name of Kitware nor the names of any contributors may be used
-   to endorse or promote products derived from this software without specific 
+   to endorse or promote products derived from this software without specific
    prior written permission.
 
  * Modified source versions must be plainly marked as such, and must not be
@@ -41,6 +41,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "vtkPVProcessModule.h"
 
+#include "vtkCallbackCommand.h"
 #include "vtkCharArray.h"
 #include "vtkDataSet.h"
 #include "vtkDoubleArray.h"
@@ -68,6 +69,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkUnsignedIntArray.h"
 #include "vtkUnsignedLongArray.h"
 #include "vtkUnsignedShortArray.h"
+#include "vtkClientServerStream.h"
+#include "vtkClientServerInterpreter.h"
 
 #include <vtkstd/string>
 
@@ -84,7 +87,7 @@ struct vtkPVArgs
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProcessModule);
-vtkCxxRevisionMacro(vtkPVProcessModule, "1.26");
+vtkCxxRevisionMacro(vtkPVProcessModule, "1.27");
 
 int vtkPVProcessModuleCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -93,16 +96,23 @@ int vtkPVProcessModuleCommand(ClientData cd, Tcl_Interp *interp,
 //----------------------------------------------------------------------------
 vtkPVProcessModule::vtkPVProcessModule()
 {
+  this->UniqueID.ID = 3;
   this->Controller = NULL;
   this->TemporaryInformation = NULL;
-  this->RootResult = NULL; 
+  this->RootResult = NULL;
   this->ClientServerStream = 0;
-  this->ClientServerInterpreter = 0;
+  this->Interpreter = 0;
+  this->InterpreterObserver = 0;
+  this->ReportInterpreterErrors = 1;
 }
 
 //----------------------------------------------------------------------------
 vtkPVProcessModule::~vtkPVProcessModule()
 {
+  // Free Interpreter and ClientServerStream.
+  this->FinalizeInterpreter();
+
+  // Other cleanup.
   if (this->Controller)
     {
     this->Controller->Delete();
@@ -123,15 +133,14 @@ int vtkPVProcessModule::Start(int argc, char **argv)
   vtkPVApplication *app = this->GetPVApplication();
   // For SGI pipes option.
   app->SetNumberOfPipes(1);
-    
+
 #ifdef PV_HAVE_TRAPS_FOR_SIGNALS
-  app->SetupTrapsForSignals(myId);   
+  app->SetupTrapsForSignals(myId);
 #endif // PV_HAVE_TRAPS_FOR_SIGNALS
   app->SetProcessModule(this);
   app->Script("wm withdraw .");
 
-  this->InitializeTclMethodImplementations();
-  
+  this->Interpreter->SetLogFile("pvClient.out");
   app->Start(argc,argv);
 
   return app->GetExitStatus();
@@ -159,7 +168,7 @@ void vtkPVProcessModule::BroadcastScript(const char* format, ...)
 {
   char event[1600];
   char* buffer = event;
-  
+
   if (this->Application == NULL)
     {
     vtkErrorMacro("Missing application object.");
@@ -170,19 +179,19 @@ void vtkPVProcessModule::BroadcastScript(const char* format, ...)
   va_start(ap, format);
   int length = this->Application->EstimateFormatLength(format, ap);
   va_end(ap);
-  
+
   if(length > 1599)
     {
     buffer = new char[length+1];
     }
-  
+
   va_list var_args;
   va_start(var_args, format);
   vsprintf(buffer, format, var_args);
   va_end(var_args);
-  
+
   this->BroadcastSimpleScript(buffer);
-  
+
   if(buffer != event)
     {
     delete [] buffer;
@@ -194,7 +203,7 @@ void vtkPVProcessModule::ServerScript(const char* format, ...)
 {
   char event[1600];
   char* buffer = event;
-  
+
   if (this->Application == NULL)
     {
     vtkErrorMacro("Missing application object.");
@@ -205,19 +214,19 @@ void vtkPVProcessModule::ServerScript(const char* format, ...)
   va_start(ap, format);
   int length = this->Application->EstimateFormatLength(format, ap);
   va_end(ap);
-  
+
   if(length > 1599)
     {
     buffer = new char[length+1];
     }
-  
+
   va_list var_args;
   va_start(var_args, format);
   vsprintf(buffer, format, var_args);
   va_end(var_args);
-  
+
   this->ServerSimpleScript(buffer);
-  
+
   if(buffer != event)
     {
     delete [] buffer;
@@ -234,7 +243,7 @@ void vtkPVProcessModule::BroadcastSimpleScript(const char *str)
 //----------------------------------------------------------------------------
 void vtkPVProcessModule::ServerSimpleScript(const char *str)
 {
-  // Do this so that only the client server process module 
+  // Do this so that only the client server process module
   // needs to implement this method.
   this->BroadcastSimpleScript(str);
   this->SetRootResult(this->Application->GetMainInterp()->result);
@@ -245,7 +254,7 @@ void vtkPVProcessModule::RemoteScript(int id, const char* format, ...)
 {
   char event[1600];
   char* buffer = event;
-    
+
   if (this->Application == NULL)
     {
     vtkErrorMacro("Missing application object.");
@@ -256,19 +265,19 @@ void vtkPVProcessModule::RemoteScript(int id, const char* format, ...)
   va_start(ap, format);
   int length = this->EstimateFormatLength(format, ap);
   va_end(ap);
-  
+
   if(length > 1599)
     {
     buffer = new char[length+1];
     }
-  
+
   va_list var_args;
   va_start(var_args, format);
   vsprintf(buffer, format, var_args);
-  va_end(var_args);  
-  
+  va_end(var_args);
+
   this->RemoteSimpleScript(id, buffer);
-  
+
   if(buffer != event)
     {
     delete [] buffer;
@@ -294,39 +303,29 @@ void vtkPVProcessModule::RemoteSimpleScript(int remoteId, const char *str)
 
 //----------------------------------------------------------------------------
 int vtkPVProcessModule::GetNumberOfPartitions()
-{ 
+{
   return 1;
 }
 
-
-
-
 //----------------------------------------------------------------------------
-void vtkPVProcessModule::GatherInformation(vtkPVInformation* info, 
-                                           char* objectTclName)
+void vtkPVProcessModule::GatherInformation(vtkPVInformation* info,
+                                           vtkClientServerID id)
 {
   // Just a simple way of passing the information object to the next
   // method.
   this->TemporaryInformation = info;
-  // Some objects are not created on the client (data.
-  if (!info->GetRootOnly())
-    {
-    this->ServerScript(
-      "[$Application GetProcessModule] GatherInformationInternal %s %s",
-      info->GetClassName(), objectTclName); 
-    }
-  else
-    {
-    this->RootScript(
-      "[$Application GetProcessModule] GatherInformationInternal %s %s",
-      info->GetClassName(), objectTclName); 
-    }
-  this->TemporaryInformation = NULL; 
+  this->GetStream()
+    << vtkClientServerStream::Invoke
+    << this->GetProcessModuleID()
+    << "GatherInformationInternal" << info->GetClassName() << id
+    << vtkClientServerStream::End;
+  this->SendStreamToClientAndServer();
+  this->TemporaryInformation = NULL;
 }
 
-
 //----------------------------------------------------------------------------
-void vtkPVProcessModule::GatherInformationInternal(char*, vtkObject* object)
+void vtkPVProcessModule::GatherInformationInternal(const char*,
+                                                   vtkObject* object)
 {
   // This class is used only for one processes.
   if (this->TemporaryInformation == NULL)
@@ -349,24 +348,24 @@ void vtkPVProcessModule::RootScript(const char* format, ...)
 {
   char event[1600];
   char* buffer = event;
-  
+
   va_list ap;
   va_start(ap, format);
   int length = this->EstimateFormatLength(format, ap);
   va_end(ap);
-  
+
   if(length > 1599)
     {
     buffer = new char[length+1];
     }
-  
+
   va_list var_args;
   va_start(var_args, format);
   vsprintf(buffer, format, var_args);
   va_end(var_args);
-  
+
   this->RootSimpleScript(buffer);
-  
+
   if(buffer != event)
     {
     delete [] buffer;
@@ -393,49 +392,70 @@ const char* vtkPVProcessModule::GetRootResult()
 void vtkPVProcessModule::SetApplication(vtkKWApplication* arg)
 {
   this->Superclass::SetApplication(arg);
-  this->InitializeTclMethodImplementations();
-}
-
-//----------------------------------------------------------------------------
-int vtkPVProcessModule::GetDirectoryListing(const char* dir,
-                                            vtkStringList* dirs,
-                                            vtkStringList* files)
-{
-  return this->GetDirectoryListing(dir, dirs, files, "readable");
 }
 
 //----------------------------------------------------------------------------
 int vtkPVProcessModule::GetDirectoryListing(const char* dir,
                                             vtkStringList* dirs,
                                             vtkStringList* files,
-                                            const char* perm)
+                                            int save)
 {
-  char* result = vtkString::Duplicate(this->Application->Script(
-    "::paraview::vtkPVProcessModule::GetDirectoryListing {%s} {%s}",
-    dir, perm));
-  if(strcmp(result, "<NO_SUCH_DIRECTORY>") == 0)
+  // Get the listing from the server.
+  vtkClientServerID lid = this->NewStreamObject("vtkPVServerFileListing");
+  this->GetStream() << vtkClientServerStream::Invoke
+                    << lid << "GetFileListing" << dir << save
+                    << vtkClientServerStream::End;
+  this->SendStreamToServerRoot();
+  vtkClientServerStream result;
+  if(!this->GetLastServerResult().GetArgument(0, 0, &result))
     {
-    dirs->RemoveAllItems();
-    files->RemoveAllItems();
-    delete [] result;
+    vtkErrorMacro("Error getting file list result from server.");
+    this->DeleteStreamObject(lid);
+    this->SendStreamToServerRoot();
     return 0;
     }
-  vtkTclGetObjectFromPointer(this->Application->GetMainInterp(), dirs,
-                             vtkStringListCommand);
-  char* dirsTcl = vtkString::Duplicate(
-    Tcl_GetStringResult(this->Application->GetMainInterp()));
-  vtkTclGetObjectFromPointer(this->Application->GetMainInterp(), files,
-                             vtkStringListCommand);
-  char* filesTcl = vtkString::Duplicate(
-    Tcl_GetStringResult(this->Application->GetMainInterp()));
-  this->Application->Script(
-    "::paraview::vtkPVProcessModule::ParseDirectoryListing {%s} {%s} {%s}",
-    result, dirsTcl, filesTcl
-    );
-  delete [] dirsTcl;
-  delete [] filesTcl;
-  delete [] result;
-  return 1;
+  this->DeleteStreamObject(lid);
+  this->SendStreamToServerRoot();
+
+  // Parse the listing.
+  dirs->RemoveAllItems();
+  files->RemoveAllItems();
+  if(result.GetNumberOfMessages() == 2)
+    {
+    int i;
+    // The first message lists directories.
+    for(i=0; i < result.GetNumberOfArguments(0); ++i)
+      {
+      const char* d;
+      if(result.GetArgument(0, i, &d))
+        {
+        dirs->AddString(d);
+        }
+      else
+        {
+        vtkErrorMacro("Error getting directory name from listing.");
+        }
+      }
+
+    // The second message lists files.
+    for(i=0; i < result.GetNumberOfArguments(1); ++i)
+      {
+      const char* f;
+      if(result.GetArgument(1, i, &f))
+        {
+        files->AddString(f);
+        }
+      else
+        {
+        vtkErrorMacro("Error getting file name from listing.");
+        }
+      }
+    return 1;
+    }
+  else
+    {
+    return 0;
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -443,53 +463,6 @@ vtkKWLoadSaveDialog* vtkPVProcessModule::NewLoadSaveDialog()
 {
   vtkKWLoadSaveDialog* dialog = vtkKWLoadSaveDialog::New();
   return dialog;
-}
-
-//----------------------------------------------------------------------------
-void vtkPVProcessModule::InitializeTclMethodImplementations()
-{
-  if ( !this->Application )
-    {
-    return;
-    }
-  this->Application->Script(
-    "namespace eval ::paraview::vtkPVProcessModule {\n"
-    "  proc GetDirectoryListing { dir perm {exp {[A-Za-z0-9]*}} } {\n"
-    "    set files {}\n"
-    "    set dirs {}\n"
-    "    if {$dir == {<GET_DRIVE_LETTERS>}} {\n"
-    "      foreach drive [file volumes] {\n"
-    "        if {![catch {file stat $drive .}]} {\n"
-    "          lappend dirs $drive\n"
-    "        }\n"
-    "      }\n"
-    "      return [list $dirs $files]\n"
-    "    }\n"
-    "    if {$dir != {}} {\n"
-    "      set cwd [pwd]\n"
-    "      if {[catch {cd $dir}]} {\n"
-    "        return {<NO_SUCH_DIRECTORY>}\n"
-    "      }\n"
-    "    }\n"
-    "    set entries [glob -nocomplain $exp]\n"
-    "    foreach f [lsort -dictionary $entries] {\n"
-    "      if {[file isfile $f] && [file $perm $f]} {\n"
-    "        lappend files $f\n"
-    "      } elseif {[file isdirectory $f] && [file readable $f]} {\n"
-    "        lappend dirs $f\n"
-    "      }\n"
-    "    }\n"
-    "    if {$dir != {}} { cd $cwd }\n"
-    "    return [list $dirs $files]\n"
-    "  }\n"
-    "  proc ParseDirectoryListing { lst dirs files } {\n"
-    "    $dirs RemoveAllItems\n"
-    "    $files RemoveAllItems\n"
-    "    foreach f [lindex $lst 0] { $dirs AddString $f }\n"
-    "    foreach f [lindex $lst 1] { $files AddString $f }\n"
-    "  }\n"
-    "}\n"
-    );
 }
 
 //----------------------------------------------------------------------------
@@ -501,10 +474,10 @@ int vtkPVProcessModule::ReceiveRootPolyData(const char* tclName,
     {
     return 0;
     }
-  
+
   // We are the server.  Just return the object from the local
   // interpreter.
-  vtkstd::string name = this->GetPVApplication()->EvaluateString(tclName);  
+  vtkstd::string name = this->GetPVApplication()->EvaluateString(tclName);
   vtkObject* obj = this->GetPVApplication()->TclToVTKObject(name.c_str());
   vtkPolyData* dobj = vtkPolyData::SafeDownCast(obj);
   if(dobj)
@@ -520,19 +493,226 @@ int vtkPVProcessModule::ReceiveRootPolyData(const char* tclName,
 }
 
 //----------------------------------------------------------------------------
-void vtkPVProcessModule::SendMessages()
+void vtkPVProcessModule::SendStreamToClient()
 {
+  this->SendStreamToServer();
 }
 
+//----------------------------------------------------------------------------
+void vtkPVProcessModule::SendStreamToServer()
+{
+  this->Interpreter->ProcessStream(*this->ClientServerStream);
+  this->ClientServerStream->Reset();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVProcessModule::SendStreamToServerRoot()
+{
+  this->Interpreter->ProcessStream(*this->ClientServerStream);
+  this->ClientServerStream->Reset();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVProcessModule::SendStreamToClientAndServer()
+{
+  this->SendStreamToServer();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVProcessModule::SendStreamToClientAndServerRoot()
+{
+  this->SendStreamToServer();
+}
+
+//----------------------------------------------------------------------------
+vtkClientServerID vtkPVProcessModule::NewStreamObject(const char* type)
+{
+  vtkClientServerStream& stream = this->GetStream();
+  vtkClientServerID id = this->GetUniqueID();
+  stream << vtkClientServerStream::New << type
+         << id <<  vtkClientServerStream::End;
+  return id;
+}
+
+vtkObjectBase* vtkPVProcessModule::GetObjectFromID(vtkClientServerID id)
+{
+  return this->Interpreter->GetObjectFromID(id);
+}
+
+vtkObjectBase* vtkPVProcessModule::GetObjectFromIntID(unsigned int idin)
+{
+  vtkClientServerID id;
+  id.ID = idin;
+  return this->GetObjectFromID(id);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVProcessModule::DeleteStreamObject(vtkClientServerID id)
+{
+  vtkClientServerStream& stream = this->GetStream();
+  stream << vtkClientServerStream::Delete << id
+         <<  vtkClientServerStream::End;
+}
+
+//----------------------------------------------------------------------------
+const vtkClientServerStream& vtkPVProcessModule::GetLastServerResult()
+{
+  return this->Interpreter->GetLastResult();
+}
+
+//----------------------------------------------------------------------------
+const vtkClientServerStream& vtkPVProcessModule::GetLastClientResult()
+{
+  return this->GetLastServerResult();
+}
+
+//----------------------------------------------------------------------------
+vtkClientServerInterpreter* vtkPVProcessModule::GetInterpreter()
+{
+  return this->Interpreter;
+}
+
+//----------------------------------------------------------------------------
+vtkClientServerID vtkPVProcessModule::GetUniqueID()
+{
+  this->UniqueID.ID++;
+  return this->UniqueID;
+}
+
+//----------------------------------------------------------------------------
+vtkClientServerID vtkPVProcessModule::GetApplicationID()
+{
+  vtkClientServerID id = {1};
+  return id;
+}
+
+//----------------------------------------------------------------------------
+vtkClientServerID vtkPVProcessModule::GetProcessModuleID()
+{
+  vtkClientServerID id = {2};
+  return id;
+}
 
 //----------------------------------------------------------------------------
 void vtkPVProcessModule::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
   os << indent << "Controller: " << this->Controller << endl;
+  os << indent << "ReportInterpreterErrors: "
+     << this->ReportInterpreterErrors << endl;
   if (this->RootResult)
     {
     os << indent << "RootResult: " << this->RootResult << endl;
     }
 }
 
+//----------------------------------------------------------------------------
+void vtkPVProcessModule::InitializeInterpreter()
+{
+  if(this->Interpreter)
+    {
+    return;
+    }
+
+  // Create the interpreter and supporting stream.
+  this->Interpreter = vtkClientServerInterpreter::New();
+  this->ClientServerStream = new vtkClientServerStream;
+
+  // Setup a callback for the interpreter to report errors.
+  this->InterpreterObserver = vtkCallbackCommand::New();
+  this->InterpreterObserver->SetCallback(&vtkPVProcessModule::InterpreterCallbackFunction);
+  this->InterpreterObserver->SetClientData(this);
+  this->Interpreter->AddObserver(vtkCommand::ErrorEvent,
+                                 this->InterpreterObserver);
+
+  // Assign standard IDs.
+  vtkPVApplication *app = this->GetPVApplication();
+  vtkClientServerStream css;
+  css << vtkClientServerStream::Assign
+      << this->GetApplicationID() << app
+      << vtkClientServerStream::End;
+  css << vtkClientServerStream::Assign
+      << this->GetProcessModuleID() << this
+      << vtkClientServerStream::End;
+  this->Interpreter->ProcessStream(css);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVProcessModule::FinalizeInterpreter()
+{
+  if(!this->Interpreter)
+    {
+    return;
+    }
+
+  // Delete the standard IDs.
+  vtkClientServerStream css;
+  css << vtkClientServerStream::Delete
+      << this->GetApplicationID()
+      << vtkClientServerStream::End;
+  css << vtkClientServerStream::Delete
+      << this->GetProcessModuleID()
+      << vtkClientServerStream::End;
+  this->Interpreter->ProcessStream(css);
+
+  // Free the interpreter and supporting stream.
+  this->Interpreter->RemoveObserver(this->InterpreterObserver);
+  this->InterpreterObserver->Delete();
+  delete this->ClientServerStream;
+  this->Interpreter->Delete();
+  this->Interpreter = 0;
+}
+
+//----------------------------------------------------------------------------
+void vtkPVProcessModule::InterpreterCallbackFunction(vtkObject*,
+                                                     unsigned long eid,
+                                                     void* cd, void* d)
+{
+  reinterpret_cast<vtkPVProcessModule*>(cd)->InterpreterCallback(eid, d);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVProcessModule::InterpreterCallback(unsigned long, void* pinfo)
+{
+  if(!this->ReportInterpreterErrors)
+    {
+    return;
+    }
+
+  const char* errorMessage;
+  vtkClientServerInterpreterErrorCallbackInfo* info
+    = static_cast<vtkClientServerInterpreterErrorCallbackInfo*>(pinfo);
+  const vtkClientServerStream& last = this->Interpreter->GetLastResult();
+  if(last.GetNumberOfMessages() > 0 &&
+     (last.GetCommand(0) == vtkClientServerStream::Error) &&
+     last.GetArgument(0, 0, &errorMessage))
+    {
+    ostrstream error;
+    error << "\nwhile processing\n";
+    info->css->PrintMessage(error, info->message);
+    error << ends;
+    vtkErrorMacro(<< errorMessage << error.str());
+    error.rdbuf()->freeze(0);
+    vtkErrorMacro("Aborting execution for debugging purposes.");
+    abort();
+    }
+}
+
+//----------------------------------------------------------------------------
+int vtkPVProcessModule::LoadModule(const char* name)
+{
+  this->GetStream()
+    << vtkClientServerStream::Invoke
+    << this->GetProcessModuleID() << "LoadModuleInternal" << name
+    << vtkClientServerStream::End;
+  this->SendStreamToServer();
+  int result = 0;
+  this->GetLastServerResult().GetArgument(0, 0, &result);
+  return result;
+}
+
+//----------------------------------------------------------------------------
+int vtkPVProcessModule::LoadModuleInternal(const char* name)
+{
+  return this->Interpreter->Load(name);
+}

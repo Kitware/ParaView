@@ -112,7 +112,7 @@ public:
   // Called when accept button is pushed.  
   // Sets objects variable to the widgets value.
   // Side effect is to turn modified flag off.
-  virtual void AcceptInternal(const char* sourceTclName);
+  virtual void AcceptInternal(vtkClientServerID);
   
   // Description:
   // Called when the reset button is pushed.
@@ -148,6 +148,11 @@ public:
   // Create the right property for use with this widget.
   virtual vtkPVWidgetProperty* CreateAppropriateProperty();
   
+  // Description:
+  // Call Set VariableName with the time passed to it.
+  // This is used as a script callback in AnimationMenuCallback.
+  void SetObjectVariableToPVTime(int time);
+  
 protected:
   vtkPVScale();
   ~vtkPVScale();
@@ -174,11 +179,14 @@ protected:
 
   vtkPVScalarListWidgetProperty *Property;
 
+  void UpdateVTKSourceInternal(vtkClientServerID sourceID,
+                               float value);
+
   vtkSetMacro(DefaultValue, float);
   vtkGetMacro(DefaultValue, float);
 
   float DefaultValue;
-  
+
 //BTX
   virtual void CopyProperties(vtkPVWidget* clone, vtkPVSource* pvSource,
                               vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);

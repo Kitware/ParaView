@@ -21,7 +21,7 @@ modification, are permitted provided that the following conditions are met:
    and/or other materials provided with the distribution.
 
  * Neither the name of Kitware nor the names of any contributors may be used
-   to endorse or promote products derived from this software without specific 
+   to endorse or promote products derived from this software without specific
    prior written permission.
 
  * Modified source versions must be plainly marked as such, and must not be
@@ -41,80 +41,62 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "vtkPVClassNameInformation.h"
 
+#include "vtkClientServerStream.h"
 #include "vtkObjectFactory.h"
 
 vtkStandardNewMacro(vtkPVClassNameInformation);
-vtkCxxRevisionMacro(vtkPVClassNameInformation, "1.2");
+vtkCxxRevisionMacro(vtkPVClassNameInformation, "1.3");
 
+//----------------------------------------------------------------------------
 vtkPVClassNameInformation::vtkPVClassNameInformation()
 {
-  this->VTKClassName = NULL;
-  this->RootOnly = 1;
+  this->VTKClassName = 0;
 }
 
+//----------------------------------------------------------------------------
 vtkPVClassNameInformation::~vtkPVClassNameInformation()
 {
-  if (this->VTKClassName)
-    {
-    this->SetVTKClassName(NULL);
-    }
+  this->SetVTKClassName(0);
 }
 
-void vtkPVClassNameInformation::CopyFromObject(vtkObject *data)
-{
-  if (!data)
-    {
-    vtkErrorMacro("Cannot get class name from NULL object.");
-    return;
-    }
-  
-  this->SetVTKClassName(data->GetClassName());
-}
-
-void vtkPVClassNameInformation::CopyFromMessage(unsigned char *msg)
-{
-  if (!msg)
-    {
-    return;
-    }
-  
-  this->SetVTKClassName(NULL);
-
-  int len = *msg;
-  msg++;
-  
-  this->VTKClassName = new char[len + 1];
-  strncpy(this->VTKClassName, (char*)(msg), len);
-  this->VTKClassName[len] = '\0';
-}
-
-int vtkPVClassNameInformation::GetMessageLength()
-{
-  int length = sizeof(int);
-  
-  if (this->VTKClassName)
-    {
-    length += static_cast<int>(strlen(this->VTKClassName));
-    }
-  
-  return length;
-}
-
-void vtkPVClassNameInformation::WriteMessage(unsigned char *msg)
-{
-  int len = strlen(this->VTKClassName);
-  *msg = static_cast<unsigned char>(len);
-  msg++;
-  int i;
-  for (i = 0; i < len; i++)
-    {
-    msg[i] = static_cast<unsigned char>(this->VTKClassName[i]);
-    }
-}
-
+//----------------------------------------------------------------------------
 void vtkPVClassNameInformation::PrintSelf(ostream &os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
   os << indent << "VTKClassName: "
-     << (this->VTKClassName ? this->VTKClassName : "(none)") << endl;
+     << (this->VTKClassName?this->VTKClassName:"(none)") << "\n";
+}
+
+//----------------------------------------------------------------------------
+void vtkPVClassNameInformation::CopyFromObject(vtkObject* obj)
+{
+  if(!obj)
+    {
+    vtkErrorMacro("Cannot get class name from NULL object.");
+    return;
+    }
+  this->SetVTKClassName(obj->GetClassName());
+}
+
+//----------------------------------------------------------------------------
+void vtkPVClassNameInformation::AddInformation(vtkPVInformation*)
+{
+}
+
+//----------------------------------------------------------------------------
+void
+vtkPVClassNameInformation::CopyToStream(vtkClientServerStream* css) const
+{
+  css->Reset();
+  *css << vtkClientServerStream::Reply << this->VTKClassName
+       << vtkClientServerStream::End;
+}
+
+//----------------------------------------------------------------------------
+void
+vtkPVClassNameInformation::CopyFromStream(const vtkClientServerStream* css)
+{
+  const char* cname = 0;
+  css->GetArgument(0, 0, &cname);
+  this->SetVTKClassName(cname);
 }

@@ -85,6 +85,28 @@ public:
   // This breaks rmi loops and cleans up processes.`                
   virtual void Exit();
 
+  // Send the current vtkClientServerStream contents to the client.
+  // Also reset the vtkClientServerStream object.
+  virtual void SendStreamToClient();
+
+  // Send the current vtkClientServerStream contents to the server.
+  // Also reset the vtkClientServerStream object.
+  virtual void SendStreamToServer();
+
+  // Send the current vtkClientServerStream contents to the server
+  // root node.  Also reset the vtkClientServerStream object.
+  virtual void SendStreamToServerRoot();
+
+  // Description:
+  // Send current ClientServerStream data to the server and the client.
+  // Also reset the vtkClientServerStream object.
+  virtual void SendStreamToClientAndServer();
+
+  // Description:
+  // Send current ClientServerStream data to the server root and the client.
+  // Also reset the vtkClientServerStream object.
+  virtual void SendStreamToClientAndServerRoot();
+
   // Description:
   // The primary method for building pipelines on remote proceses
   // is to use tcl.
@@ -93,7 +115,8 @@ public:
 
   // Description:
   // A method for getting generic information from the server.
-  virtual void GatherInformationInternal(char* infoClassName, vtkObject *object);
+  virtual void GatherInformationInternal(const char* infoClassName,
+                                         vtkObject* object);
     
   // Description:
   // Get the partition number. -1 means no assigned partition.
@@ -102,10 +125,16 @@ public:
   // Description:
   // Get the number of processes participating in sharing the data.
   virtual int GetNumberOfPartitions();
-  
+
+  // Description:
+  // Used internally.  Do not call.  Use LoadModule instead.
+  virtual int LoadModuleInternal(const char* name);
 protected:
   vtkPVMPIProcessModule();
   ~vtkPVMPIProcessModule();
+
+  virtual void SendStreamToServerNodeInternal(int remoteId);
+  virtual void SendStreamToServerInternal();
 
   // To pass arguments through controller single method.
   int    ArgumentCount;
@@ -118,5 +147,3 @@ private:
 };
 
 #endif
-
-

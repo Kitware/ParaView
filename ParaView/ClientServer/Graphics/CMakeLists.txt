@@ -1,0 +1,2 @@
+SET(KIT_WRAP_DEPS Filtering)
+PV_WRAP_VTK_CS(Graphics GRAPHICS "${KIT_WRAP_DEPS}")

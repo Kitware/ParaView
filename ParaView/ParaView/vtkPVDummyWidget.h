@@ -72,8 +72,8 @@ public:
 
   // Description:
   // Trying out a ne protocal.
-  virtual void AcceptInternal(const char*) { this->ModifiedFlag = 0;}
-  virtual void ResetIntenral(const char*) { this->ModifiedFlag = 0;}
+  virtual void AcceptInternal(vtkClientServerID) { this->ModifiedFlag = 0;}
+  virtual void ResetIntenral(vtkClientServerID) { this->ModifiedFlag = 0;}
 
   // Description:
   // Empty method to keep superclass from complaining.

@@ -71,7 +71,7 @@ public:
   
   // Description:
   // Move widget state to vtk object or back.
-  virtual void AcceptInternal(const char *sourceTclName);
+  virtual void AcceptInternal(vtkClientServerID);
   virtual void ResetInternal();
   
   // Description:

@@ -55,7 +55,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCompositeRenderModule);
-vtkCxxRevisionMacro(vtkPVCompositeRenderModule, "1.10");
+vtkCxxRevisionMacro(vtkPVCompositeRenderModule, "1.11");
+
 
 
 //***************************************************************************
@@ -68,7 +69,7 @@ vtkPVCompositeRenderModule::vtkPVCompositeRenderModule()
   this->CompositeThreshold = 20.0;
 
   this->Composite                = 0;
-  this->CompositeTclName    = 0;
+  this->CompositeID.ID    = 0;
   this->InteractiveCompositeTime = 0;
   this->StillCompositeTime       = 0;
 
@@ -91,10 +92,12 @@ vtkPVCompositeRenderModule::~vtkPVCompositeRenderModule()
     }
  
   // Tree Composite
-  if (this->CompositeTclName && pvApp)
+  if (this->CompositeID.ID && pvApp)
     {
-    pvApp->BroadcastScript("%s Delete", this->CompositeTclName);
-    this->SetCompositeTclName(NULL);
+    vtkPVProcessModule* pm = pvApp->GetProcessModule();
+    pm->DeleteStreamObject(this->CompositeID);
+    pm->SendStreamToClientAndServer();
+    this->CompositeID.ID = 0;
     this->Composite = NULL;
     }
   else if (this->Composite)
@@ -159,10 +162,14 @@ void vtkPVCompositeRenderModule::StillRender()
     }
 
   // No reduction for still render.
-  if (this->PVApplication && this->CompositeTclName)
+  if (this->PVApplication && this->CompositeID.ID)
     {
-    this->PVApplication->Script("%s SetImageReductionFactor 1",
-                                this->CompositeTclName);
+    vtkPVProcessModule* pm = this->PVApplication->GetProcessModule();
+    pm->GetStream()
+      << vtkClientServerStream::Invoke
+      << this->CompositeID << "SetImageReductionFactor" << 1
+      << vtkClientServerStream::End;
+    pm->SendStreamToClient();
     if (this->PVApplication->GetClientMode())
       {
       // No squirt if disabled, otherwise only lossless or still render.  
@@ -171,22 +178,33 @@ void vtkPVCompositeRenderModule::StillRender()
         {
         squirtLevel = 1;
         }
-      // Catch because IceTDesktopdeliveryClient does not have Squirt yet. !!!!
-      this->PVApplication->Script("%s SetSquirtLevel %d",
-                                  this->CompositeTclName, squirtLevel);
+      pm->GetStream()
+        << vtkClientServerStream::Invoke
+        << this->CompositeID << "SetSquirtLevel" << squirtLevel
+        << vtkClientServerStream::End;
+      pm->SendStreamToClient();
       }
     }
 
   // Switch the compositer to local/composite mode.
-  if (this->CompositeTclName)
+  if (this->CompositeID.ID)
     {
+    vtkPVProcessModule* pm = this->PVApplication->GetProcessModule();
     if (localRender)
       {
-      this->PVApplication->Script("%s UseCompositingOff", this->CompositeTclName);
+      pm->GetStream()
+        << vtkClientServerStream::Invoke
+        << this->CompositeID << "UseCompositingOff"
+        << vtkClientServerStream::End;
+      pm->SendStreamToClient();
       }
     else
       {
-      this->PVApplication->Script("%s UseCompositingOn", this->CompositeTclName);
+      pm->GetStream()
+        << vtkClientServerStream::Invoke
+        << this->CompositeID << "UseCompositingOn"
+        << vtkClientServerStream::End;
+      pm->SendStreamToClient();
       }
     // Save this so we know where to get the z buffer.
     this->LocalRender = localRender;
@@ -204,9 +222,19 @@ void vtkPVCompositeRenderModule::StillRender()
 
   this->GetPVApplication()->SetGlobalLODFlag(0);
   vtkTimerLog::MarkStartEvent("Still Render");
-  if (this->CompositeTclName && !strcmp(this->CompositeTclName, "CCompositeManager1"))
+  vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
+  pm->GetStream() << vtkClientServerStream::Invoke
+                  << this->CompositeID << "IsA" << "vtkClientCompositeManager"
+                  << vtkClientServerStream::End;
+  pm->SendStreamToClient();
+  int result = 0;
+  pm->GetLastClientResult().GetArgument(0, 0, &result);
+  if(result)
     {
-    this->PVApplication->Script("%s StartRender", this->CompositeTclName);
+    pm->GetStream() << vtkClientServerStream::Invoke
+                    << this->CompositeID << "StartRender"
+                    << vtkClientServerStream::End;
+    pm->SendStreamToClient();
     }
   else
     {
@@ -232,6 +260,7 @@ void vtkPVCompositeRenderModule::InteractiveRender()
   unsigned long tmpMemory;
   int localRender;
   int useLOD;
+  vtkPVProcessModule* pm = this->PVApplication->GetProcessModule();
 
   // Compute memory totals.
   this->PartDisplays->InitTraversal();
@@ -288,27 +317,36 @@ void vtkPVCompositeRenderModule::InteractiveRender()
     }
 
   // Switch the compositer to local/composite mode.
-  if (this->CompositeTclName)
+  if (this->CompositeID.ID)
     {
     if (localRender)
       {
-      this->PVApplication->Script("%s UseCompositingOff", this->CompositeTclName);
+      pm->GetStream()
+        << vtkClientServerStream::Invoke
+        << this->CompositeID << "UseCompositingOff"
+        << vtkClientServerStream::End;
+      pm->SendStreamToClient();
       }
     else
       {
-      this->PVApplication->Script("%s UseCompositingOn", 
-                                  this->CompositeTclName);
+      pm->GetStream()
+        << vtkClientServerStream::Invoke
+        << this->CompositeID << "UseCompositingOn"
+        << vtkClientServerStream::End;
+      pm->SendStreamToClient();
       }
     // Save this so we know where to get the z buffer.
     this->LocalRender = localRender;
-    }
+   }
 
   // Handle squirt compression.
   if (this->PVApplication->GetClientMode())
     {
-    this->PVApplication->Script("%s SetSquirtLevel %d", 
-                                this->CompositeTclName,
-                                this->SquirtLevel);
+    pm->GetStream()
+      << vtkClientServerStream::Invoke
+      << this->CompositeID << "SetSquirtLevel" << this->SquirtLevel
+      << vtkClientServerStream::End;
+    pm->SendStreamToClient();
     }
 
   // Still Render can get called some funky ways.
@@ -322,15 +360,24 @@ void vtkPVCompositeRenderModule::InteractiveRender()
   // this->GetPVWindow()->GetInteractor()->GetStillUpdateRate());
 
   // Compute reduction factor. 
-  if (this->CompositeTclName && ! localRender)
+  if (this->CompositeID.ID && ! localRender)
     {
     this->ComputeReductionFactor();
     }
 
   vtkTimerLog::MarkStartEvent("Interactive Render");
-  if (this->CompositeTclName && !strcmp(this->CompositeTclName, "CCompositeManager1"))
+  pm->GetStream() << vtkClientServerStream::Invoke
+                  << this->CompositeID << "IsA" << "vtkClientCompositeManager"
+                  << vtkClientServerStream::End;
+  pm->SendStreamToClient();
+  int result = 0;
+  pm->GetLastClientResult().GetArgument(0, 0, &result);
+  if(result)
     {
-    this->PVApplication->Script("%s StartRender", this->CompositeTclName);
+    pm->GetStream() << vtkClientServerStream::Invoke
+                    << this->CompositeID << "StartRender"
+                    << vtkClientServerStream::End;
+    pm->SendStreamToClient();
     }
   else
     {
@@ -416,12 +463,16 @@ void vtkPVCompositeRenderModule::ComputeReductionFactor()
         }
       }
     }
-  //this->Composite->SetReductionFactor((int)newReductionFactor);
-  if (this->PVApplication && this->CompositeTclName)
+
+  if (this->PVApplication && this->CompositeID.ID)
     {
-    this->PVApplication->Script("%s SetImageReductionFactor %d",
-                                this->CompositeTclName, 
-                                (int)(newReductionFactor));
+    vtkPVProcessModule* pm = this->PVApplication->GetProcessModule();
+    pm->GetStream()
+      << vtkClientServerStream::Invoke
+      << this->CompositeID << "SetImageReductionFactor"
+      << int(newReductionFactor)
+      << vtkClientServerStream::End;
+    pm->SendStreamToClient();
     }
 }
 
@@ -440,9 +491,12 @@ void vtkPVCompositeRenderModule::SetUseCompositeWithFloat(int val)
 {
   if (this->Composite)
     {
-    this->GetPVApplication()->BroadcastScript("%s SetUseChar %d",
-                                              this->CompositeTclName,
-                                              !val);
+    vtkPVProcessModule* pm = this->PVApplication->GetProcessModule();
+    pm->GetStream()
+      << vtkClientServerStream::Invoke
+      << this->CompositeID << "SetUseChar" << (val?0:1)
+      << vtkClientServerStream::End;
+    pm->SendStreamToClientAndServer();
     }
 
   if (val)
@@ -461,9 +515,12 @@ void vtkPVCompositeRenderModule::SetUseCompositeWithRGBA(int val)
 {
   if (this->Composite)
     {
-    this->GetPVApplication()->BroadcastScript("%s SetUseRGB %d",
-                                              this->CompositeTclName,
-                                              !val);
+    vtkPVProcessModule* pm = this->PVApplication->GetProcessModule();
+    pm->GetStream()
+      << vtkClientServerStream::Invoke
+      << this->CompositeID << "SetUseRGB" << (val?0:1)
+      << vtkClientServerStream::End;
+    pm->SendStreamToClientAndServer();
     }
 
   if (val)
@@ -586,11 +643,21 @@ float vtkPVCompositeRenderModule::GetZBufferValue(int x, int y)
   // If client-server...
   if (pvApp->GetClientMode())
     {
-    float z;
-    this->PVApplication->Script("%s GetZBufferValue %d %d",
-                                this->CompositeTclName, x, y);
-    z = this->PVApplication->GetFloatResult(this->PVApplication);
-    return z;
+    vtkPVProcessModule* pm = this->PVApplication->GetProcessModule();
+    pm->GetStream()
+      << vtkClientServerStream::Invoke
+      << this->CompositeID << "GetZBufferValue" << x << y
+      << vtkClientServerStream::End;
+    pm->SendStreamToClient();
+    float z = 0;
+    if(pm->GetLastClientResult().GetArgument(0, 0, &z))
+      {
+      return z;
+      }
+    else
+      {
+      vtkErrorMacro("Error getting float value from GetZBufferValue result.");
+      }
     }
 
   vtkErrorMacro("Unknown RenderModule mode.");
@@ -606,9 +673,9 @@ void vtkPVCompositeRenderModule::PrintSelf(ostream& os, vtkIndent indent)
 
   os << indent << "CompositeThreshold: " << this->CompositeThreshold << endl;
 
-  if (this->CompositeTclName)
+  if (this->CompositeID.ID)
     {
-    os << indent << "CompositeTclName: " << this->CompositeTclName << endl;
+    os << indent << "CompositeID: " << this->CompositeID.ID << endl;
     }
 
   os << indent << "InteractiveCompositeTime: " 

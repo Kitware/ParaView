@@ -88,10 +88,6 @@ protected:
                           vtkTiledDisplayElement* e,
                           int pId);
 
-  // Dependency in element is not used.
-  // It must be dependent on all previous receives.
-  int CheckDependency(vtkTiledDisplayProcess* p, 
-                      vtkTiledDisplayElement* e);
 
   int NumberOfProcesses; // User set.
   int NumberOfTiles;

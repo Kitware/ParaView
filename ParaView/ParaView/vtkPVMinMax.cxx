@@ -50,10 +50,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVArrayMenu.h"
 #include "vtkPVScalarListWidgetProperty.h"
 #include "vtkPVXMLElement.h"
+#include "vtkPVProcessModule.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVMinMax);
-vtkCxxRevisionMacro(vtkPVMinMax, "1.24");
+vtkCxxRevisionMacro(vtkPVMinMax, "1.25");
 
 vtkCxxSetObjectMacro(vtkPVMinMax, ArrayMenu, vtkPVArrayMenu);
 
@@ -308,13 +309,13 @@ void vtkPVMinMax::SetMaxValue(float val)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVMinMax::AcceptInternal(const char* sourceTclName)
+void vtkPVMinMax::AcceptInternal(vtkClientServerID sourceID)
 {
   float scalars[2];
   scalars[0] = this->GetMinValue();
   scalars[1] = this->GetMaxValue();
   this->Property->SetScalars(2, scalars);
-  this->Property->SetVTKSourceTclName(sourceTclName);
+  this->Property->SetVTKSourceID(sourceID);
   this->Property->AcceptInternal();
   
   this->ModifiedFlag = 0;
@@ -456,20 +457,32 @@ void vtkPVMinMax::MaxValueCallback()
 
 //----------------------------------------------------------------------------
 void vtkPVMinMax::SaveInBatchScriptForPart(ofstream *file,
-                                           const char* sourceTclName)
+                                           vtkClientServerID sourceID)
 {
-  char *result;
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  vtkPVProcessModule* pm = pvApp->GetProcessModule();
+  pm->GetStream() << vtkClientServerStream::Invoke << sourceID
+                  << this->GetMinCommand
+                  << vtkClientServerStream::End; 
+  pm->SendStreamToClient();
+  {
+  ostrstream result;
+  pm->GetLastClientResult().PrintArgumentValue(result, 0,0);
+  result << ends;
+  *file << "pvTemp" << sourceID << " " << this->SetCommand;
+  *file << " " << result.str();
+  }
   
-  *file << sourceTclName << " " << this->SetCommand;
-  this->Script("set tempValue [%s %s]", 
-               sourceTclName, this->GetMinCommand);
-  result = this->Application->GetMainInterp()->result;
-  *file << " " << result;
-
-  this->Script("set tempValue [%s %s]", 
-               sourceTclName, this->GetMaxCommand);
-  result = this->Application->GetMainInterp()->result;
-  *file << " " << result << "\n";
+  pm->GetStream() << vtkClientServerStream::Invoke << sourceID
+                  << this->GetMaxCommand
+                  << vtkClientServerStream::End; 
+  pm->SendStreamToClient();
+  {
+  ostrstream result;
+  pm->GetLastClientResult().PrintArgumentValue(result, 0,0);
+  result << ends;
+  *file << " " << result.str() << "\n";
+  }
 }
 
 

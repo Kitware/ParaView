@@ -36,7 +36,7 @@
 #include <hdf5.h>
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkHDF5RawImageReader, "1.6");
+vtkCxxRevisionMacro(vtkHDF5RawImageReader, "1.7");
 vtkStandardNewMacro(vtkHDF5RawImageReader);
 
 //----------------------------------------------------------------------------
@@ -744,4 +744,18 @@ void vtkHDF5RawImageReader::SetCellArrayStatus(const char* name, int status)
     {
     this->CellDataArraySelection->DisableArray(name);
     }
+}
+
+//----------------------------------------------------------------------------
+int vtkHDF5RawImageReader::CanReadFile(const char* name)
+{
+H5E_BEGIN_TRY {
+  hid_t file = H5Fopen (name, H5F_ACC_RDONLY, H5P_DEFAULT);
+  if(file >= 0)
+    {
+    H5Fclose(file);
+    return 1;
+    }
+} H5E_END_TRY;
+  return 0;
 }

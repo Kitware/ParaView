@@ -53,10 +53,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVDataInformation.h"
 #include "vtkPVDataSetAttributesInformation.h"
 #include "vtkPVArrayInformation.h"
+#include "vtkPVAxesWidget.h"
 #include "vtkImageData.h"
 #include "vtkKWBoundsDisplay.h"
 #include "vtkKWChangeColorButton.h"
-#include "vtkKWCheckButton.h"
 #include "vtkKWCheckButton.h"
 #include "vtkKWEntry.h"
 #include "vtkKWFrame.h"
@@ -85,7 +85,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPolyDataMapper.h"
 #include "vtkProp3D.h"
 #include "vtkProperty.h"
+#include "vtkProperty2D.h"
 #include "vtkRectilinearGrid.h"
+#include "vtkRenderer.h"
 #include "vtkString.h"
 #include "vtkStructuredGrid.h"
 #include "vtkTexture.h"
@@ -102,7 +104,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.230");
+vtkCxxRevisionMacro(vtkPVData, "1.231");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -120,11 +122,10 @@ vtkPVData::vtkPVData()
   
   this->PropertiesParent = NULL; 
 
-  this->CubeAxesTclName = NULL;
+  this->CubeAxes = NULL;
 
-  this->PointLabelMapperTclName = NULL;
-  this->PointLabelActorTclName = NULL;
-  
+  this->AxesWidget = NULL;
+
   // Create a unique id for creating tcl names.
   ++instanceCount;
   this->InstanceCount = instanceCount;
@@ -171,8 +172,7 @@ vtkPVData::vtkPVData()
   
   this->ScalarBarCheck = vtkKWCheckButton::New();
   this->CubeAxesCheck = vtkKWCheckButton::New();
-  this->PointLabelCheck = vtkKWCheckButton::New();
-  
+  this->AxesWidgetCheck = vtkKWCheckButton::New();
   this->VisibilityCheck = vtkKWCheckButton::New();
   this->Visibility = 1;
 
@@ -221,9 +221,6 @@ vtkPVData::~vtkPVData()
     }
 
   this->SetPVSource(NULL);
-
-  // Used to be in vtkPVActorComposite........
-  vtkPVApplication *pvApp = this->GetPVApplication();
 
   if (this->PropertiesParent)
     {
@@ -304,28 +301,24 @@ vtkPVData::~vtkPVData()
   this->OpacityLabel->Delete();
   this->OpacityScale->Delete();
  
-  if (this->CubeAxesTclName)
+  if (this->CubeAxes)
     {
-    if ( pvApp )
-      {
-      pvApp->GetProcessModule()->RootScript("%s Delete", this->CubeAxesTclName);
-      }
-    this->SetCubeAxesTclName(NULL);
+    this->CubeAxes->Delete();
+    }
+
+  if (this->AxesWidget)
+    {
+    this->AxesWidget->Delete();
     }
   
-  // remove the point label objects
-  this->DeletePointLabelObjects();
-  if (this->PointLabelCheck) 
-    {
-    this->PointLabelCheck->Delete();
-    this->PointLabelCheck = NULL;
-    }
- 
   this->ScalarBarCheck->Delete();
   this->ScalarBarCheck = NULL;  
 
   this->CubeAxesCheck->Delete();
   this->CubeAxesCheck = NULL;
+
+  this->AxesWidgetCheck->Delete();
+  this->AxesWidgetCheck = NULL;
   
   this->VisibilityCheck->Delete();
   this->VisibilityCheck = NULL;
@@ -437,7 +430,7 @@ void vtkPVData::CreateParallelTclObjects(vtkPVApplication *pvApp)
 void vtkPVData::DeleteCallback()
 {
   this->SetCubeAxesVisibility(0);
-  this->SetPointLabelVisibility(0);
+  this->SetAxesWidgetVisibility(0);
 }
 
 //----------------------------------------------------------------------------
@@ -547,13 +540,6 @@ void vtkPVData::CreateProperties()
   this->CubeAxesCheck->SetBalloonHelpString(
     "Toggle the visibility of X,Y,Z scales for this dataset.");
 
-  // label
-  this->PointLabelCheck->SetParent(this->ViewFrame->GetFrame());
-  this->PointLabelCheck->Create(this->Application, "-text {Label Point Data}");
-  this->PointLabelCheck->SetCommand(this, "PointLabelCheckCallback");
-  this->PointLabelCheck->SetBalloonHelpString(
-    "Toggle the visibility of point lables for this dataset.");
-
   this->Script("grid %s %s -sticky wns",
                this->VisibilityCheck->GetWidgetName(),
                this->ResetCameraButton->GetWidgetName());
@@ -567,9 +553,6 @@ void vtkPVData::CreateProperties()
   
   this->Script("grid %s -sticky wns",
                this->CubeAxesCheck->GetWidgetName());
-
-  this->Script("grid %s -sticky wns",
-               this->PointLabelCheck->GetWidgetName());
 
   // Color
   this->ColorFrame->SetParent(this->Properties->GetFrame());
@@ -1205,11 +1188,9 @@ void vtkPVData::UpdatePropertiesInternal()
 
   dataInfo->GetBounds(bounds);
   this->BoundsDisplay->SetBounds(bounds);
-  if (this->CubeAxesTclName)
-    {  
-    this->GetPVApplication()->GetProcessModule()->RootScript(
-      "%s SetBounds %f %f %f %f %f %f", this->CubeAxesTclName,
-      bounds[0], bounds[1], bounds[2], bounds[3], bounds[4], bounds[5]);
+  if (this->CubeAxes)
+    {
+    this->CubeAxes->SetBounds(bounds);
     }
 
   currentColorBy = this->ColorMenu->GetValue();
@@ -1389,7 +1370,6 @@ void vtkPVData::ColorByProperty()
   this->AddTraceEntry("$kw(%s) ColorByProperty", this->GetTclName());
   this->ColorMenu->SetValue("Property");
   this->ColorByPropertyInternal();
-  this->PointLabelByInternal(NULL, "Property");
 }
 
 //----------------------------------------------------------------------------
@@ -1482,16 +1462,6 @@ void vtkPVData::ColorByPointFieldInternal(const char *name, int numComps)
     this->GetPVRenderView()->EventuallyRender();
     }
 
-  this->PointLabelByInternal("Point", name);
-}
-
-void vtkPVData::PointLabelByInternal(const char *type, const char *name)  
-{
-  if ((this->PointLabelCheck->GetEnabled() != 0) &&
-      (this->PointLabelCheck->GetState() != 0) ) 
-    {
-      this->UpdatePointLabelObjects(type, name);
-    }
 }
 
 //----------------------------------------------------------------------------
@@ -1551,8 +1521,6 @@ void vtkPVData::ColorByCellFieldInternal(const char *name, int numComps)
     {
     this->GetPVRenderView()->EventuallyRender();
     }
-
-  this->PointLabelByInternal("Cell", name);
 }
 
 
@@ -1641,6 +1609,7 @@ void vtkPVData::SetRepresentation(const char* repr)
 void vtkPVData::DrawWireframe()
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
+  vtkPVProcessModule* pm = pvApp->GetProcessModule();
   vtkPVPart *part;
   int idx, num;
   
@@ -1659,7 +1628,7 @@ void vtkPVData::DrawWireframe()
   for (idx = 0; idx < num; ++idx)
     {
     part = this->GetPVSource()->GetPart(idx);
-    if (part->GetPartDisplay()->GetPropertyTclName())
+    if (part->GetPartDisplay()->GetPropertyID().ID != 0)
       {
       if (this->PreviousWasSolid)
         {
@@ -1668,21 +1637,40 @@ void vtkPVData::DrawWireframe()
         this->PreviousSpecular = part->GetPartDisplay()->GetProperty()->GetSpecular();
         }
       this->PreviousWasSolid = 0;
-      pvApp->BroadcastScript("%s SetAmbient 1", part->GetPartDisplay()->GetPropertyTclName());
-      pvApp->BroadcastScript("%s SetDiffuse 0", part->GetPartDisplay()->GetPropertyTclName());
-      pvApp->BroadcastScript("%s SetSpecular 0", part->GetPartDisplay()->GetPropertyTclName());
-      pvApp->BroadcastScript("%s SetRepresentationToWireframe",
-                             part->GetPartDisplay()->GetPropertyTclName());
+      pm->GetStream() 
+        << vtkClientServerStream::Invoke 
+        << part->GetPartDisplay()->GetPropertyID()
+        << "SetAmbient" << 1 << vtkClientServerStream::End;
+      pm->GetStream() 
+        << vtkClientServerStream::Invoke 
+        << part->GetPartDisplay()->GetPropertyID()
+        << "SetDiffuse" << 0 << vtkClientServerStream::End;
+      pm->GetStream() 
+        << vtkClientServerStream::Invoke 
+        << part->GetPartDisplay()->GetPropertyID()
+        << "SetSpecular" << 0 << vtkClientServerStream::End;
+      pm->GetStream() 
+        << vtkClientServerStream::Invoke 
+        << part->GetPartDisplay()->GetPropertyID()
+        << "SetRepresentationToWireframe" << vtkClientServerStream::End;
+      pm->SendStreamToClientAndServer();
       }
-    if (part->GetGeometryTclName())
+    if (part->GetGeometryID().ID != 0)
       {
-      this->Script("%s GetUseOutline", part->GetGeometryTclName());
-      if (vtkKWObject::GetIntegerResult(pvApp))
-        {
-        pvApp->BroadcastScript("%s SetUseOutline 0",
-                               part->GetGeometryTclName());
-        part->GetPartDisplay()->InvalidateGeometry();
-        }
+       pm->GetStream() 
+         << vtkClientServerStream::Invoke << part->GetGeometryID()
+         << "GetUseOutline" << vtkClientServerStream::End;
+       pm->SendStreamToClient();
+       int useOutline;
+       pm->GetLastClientResult().GetArgument(0, 0, &useOutline);
+       if (useOutline)
+         {
+         pm->GetStream() 
+           << vtkClientServerStream::Invoke << part->GetGeometryID()
+           << "SetUseOutline" << 0 << vtkClientServerStream::End;
+         pm->SendStreamToClientAndServer();
+         part->GetPartDisplay()->InvalidateGeometry();
+         }
       }
     }
 
@@ -1696,6 +1684,7 @@ void vtkPVData::DrawWireframe()
 void vtkPVData::DrawPoints()
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
+  vtkPVProcessModule* pm = pvApp->GetProcessModule();
   vtkPVPart *part;
   int idx, num;
 
@@ -1709,7 +1698,7 @@ void vtkPVData::DrawPoints()
   for (idx = 0; idx < num; ++idx)
     {
     part = this->GetPVSource()->GetPart(idx);
-    if (part->GetPartDisplay()->GetPropertyTclName())
+    if (part->GetPartDisplay()->GetProperty())
       {
       if (this->PreviousWasSolid)
         {
@@ -1718,19 +1707,39 @@ void vtkPVData::DrawPoints()
         this->PreviousSpecular = part->GetPartDisplay()->GetProperty()->GetSpecular();
         }
       this->PreviousWasSolid = 0;
-      pvApp->BroadcastScript("%s SetAmbient 1", part->GetPartDisplay()->GetPropertyTclName());
-      pvApp->BroadcastScript("%s SetDiffuse 0", part->GetPartDisplay()->GetPropertyTclName());
-      pvApp->BroadcastScript("%s SetSpecular 0", part->GetPartDisplay()->GetPropertyTclName());
-      pvApp->BroadcastScript("%s SetRepresentationToPoints",
-                             part->GetPartDisplay()->GetPropertyTclName());
+      pm->GetStream() 
+        << vtkClientServerStream::Invoke
+        << part->GetPartDisplay()->GetPropertyID()
+        << "SetAmbient" << 1 << vtkClientServerStream::End;
+      pm->GetStream() 
+        << vtkClientServerStream::Invoke 
+        << part->GetPartDisplay()->GetPropertyID()
+        << "SetDiffuse" << 0 << vtkClientServerStream::End;
+      pm->GetStream() 
+        << vtkClientServerStream::Invoke 
+        << part->GetPartDisplay()->GetPropertyID()
+        << "SetSpecular" << 0 << vtkClientServerStream::End;
+      pm->GetStream() 
+        << vtkClientServerStream::Invoke 
+        << part->GetPartDisplay()->GetPropertyID()
+        << "SetRepresentationToPoints" << vtkClientServerStream::End;
+      pm->SendStreamToClientAndServer();
       }
-    if (part->GetGeometryTclName())
+    if (part->GetGeometryID().ID != 0)
       {
-      this->Script("%s GetUseOutline", part->GetGeometryTclName());
-      if (vtkKWObject::GetIntegerResult(pvApp))
-        {
-        pvApp->BroadcastScript("%s SetUseOutline 0",
-                               part->GetGeometryTclName());
+      pm->GetStream() 
+        << vtkClientServerStream::Invoke << part->GetGeometryID()
+        << "GetUseOutline" << vtkClientServerStream::End;
+      pm->SendStreamToClient();
+      int useOutline;
+      pm->GetLastClientResult().GetArgument(0, 0, &useOutline);
+      if (useOutline)
+        { 
+        pm->GetStream() 
+          << vtkClientServerStream::Invoke 
+          << part->GetGeometryID()
+          << "SetUseOutline" << 0 << vtkClientServerStream::End;
+        pm->SendStreamToClientAndServer();
         part->GetPartDisplay()->InvalidateGeometry();
         }
       }
@@ -1746,6 +1755,8 @@ void vtkPVData::DrawPoints()
 void vtkPVData::DrawSurface()
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
+  vtkPVProcessModule* pm = pvApp->GetProcessModule();
+
   vtkPVPart *part;
   int num, idx;
   
@@ -1759,27 +1770,44 @@ void vtkPVData::DrawSurface()
   for (idx = 0; idx < num; ++idx)
     {
     part = this->GetPVSource()->GetPart(idx);
-    if (part->GetPartDisplay()->GetPropertyTclName())
+    if (part->GetPartDisplay()->GetProperty())
       {
       if (!this->PreviousWasSolid)
         {
-        pvApp->BroadcastScript("%s SetAmbient %f",
-                               part->GetPartDisplay()->GetPropertyTclName(), this->PreviousAmbient);
-        pvApp->BroadcastScript("%s SetDiffuse %f",
-                               part->GetPartDisplay()->GetPropertyTclName(), this->PreviousDiffuse);
-        pvApp->BroadcastScript("%s SetSpecular %f",
-                               part->GetPartDisplay()->GetPropertyTclName(), this->PreviousSpecular);
-        pvApp->BroadcastScript("%s SetRepresentationToSurface",
-                               part->GetPartDisplay()->GetPropertyTclName());
+        pm->GetStream() 
+          << vtkClientServerStream::Invoke 
+          << part->GetPartDisplay()->GetPropertyID()
+          << "SetAmbient" << this->PreviousAmbient << vtkClientServerStream::End;
+        pm->GetStream() 
+          << vtkClientServerStream::Invoke 
+          << part->GetPartDisplay()->GetPropertyID()
+          << "SetDiffuse" << this->PreviousDiffuse << vtkClientServerStream::End;
+        pm->GetStream() 
+          << vtkClientServerStream::Invoke
+          << part->GetPartDisplay()->GetPropertyID()
+          << "SetSpecular" << this->PreviousSpecular << vtkClientServerStream::End;
+        pm->GetStream() 
+          << vtkClientServerStream::Invoke 
+          << part->GetPartDisplay()->GetPropertyID()
+          << "SetRepresentationToSurface" << vtkClientServerStream::End;
+        pm->SendStreamToClientAndServer();
         }
       }
-    if (part->GetGeometryTclName())
+    if (part->GetGeometryID().ID != 0)
       {
-      this->Script("%s GetUseOutline", part->GetGeometryTclName());
-      if (vtkKWObject::GetIntegerResult(pvApp))
-        {
-        pvApp->BroadcastScript("%s SetUseOutline 0",
-                               part->GetGeometryTclName());
+      pm->GetStream() 
+        << vtkClientServerStream::Invoke << part->GetGeometryID()
+        << "GetUseOutline" << vtkClientServerStream::End;
+      pm->SendStreamToClient();
+      int useOutline;
+      pm->GetLastClientResult().GetArgument(0, 0, &useOutline);
+      if (useOutline)
+        { 
+        pm->GetStream() 
+          << vtkClientServerStream::Invoke
+          << part->GetGeometryID()
+          << "SetUseOutline" << 0 << vtkClientServerStream::End;
+        pm->SendStreamToClientAndServer();
         part->GetPartDisplay()->InvalidateGeometry();
         }
       }
@@ -1796,6 +1824,8 @@ void vtkPVData::DrawSurface()
 void vtkPVData::DrawOutline()
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
+  vtkPVProcessModule* pm = pvApp->GetProcessModule();
+
   vtkPVPart *part;
   int num, idx;
   
@@ -1809,7 +1839,7 @@ void vtkPVData::DrawOutline()
   for (idx = 0; idx < num; ++idx)
     {
     part = this->GetPVSource()->GetPart(idx);
-    if (part->GetPartDisplay()->GetPropertyTclName())
+    if (part->GetPartDisplay()->GetProperty())
       {
       if (this->PreviousWasSolid)
         {
@@ -1817,19 +1847,31 @@ void vtkPVData::DrawOutline()
         this->PreviousDiffuse = part->GetPartDisplay()->GetProperty()->GetDiffuse();
         this->PreviousSpecular = part->GetPartDisplay()->GetProperty()->GetSpecular();
         }
-      this->PreviousWasSolid = 0;
-      pvApp->BroadcastScript("%s SetAmbient 1",
-                             part->GetPartDisplay()->GetPropertyTclName());
-      pvApp->BroadcastScript("%s SetDiffuse 0",
-                             part->GetPartDisplay()->GetPropertyTclName());
-      pvApp->BroadcastScript("%s SetSpecular 0",
-                             part->GetPartDisplay()->GetPropertyTclName());
-      pvApp->BroadcastScript("%s SetRepresentationToSurface",
-                             part->GetPartDisplay()->GetPropertyTclName());
+      this->PreviousWasSolid = 0; 
+      pm->GetStream() 
+        << vtkClientServerStream::Invoke 
+        << part->GetPartDisplay()->GetPropertyID()
+        << "SetAmbient" << 1 << vtkClientServerStream::End;
+      pm->GetStream() 
+        << vtkClientServerStream::Invoke 
+        << part->GetPartDisplay()->GetPropertyID()
+        << "SetDiffuse" << 0 << vtkClientServerStream::End;
+      pm->GetStream() 
+        << vtkClientServerStream::Invoke 
+        << part->GetPartDisplay()->GetPropertyID()
+        << "SetSpecular" << 0 << vtkClientServerStream::End;
+      pm->GetStream() 
+        << vtkClientServerStream::Invoke 
+        << part->GetPartDisplay()->GetPropertyID()
+        << "SetRepresentationToSurface" << vtkClientServerStream::End;
+      pm->SendStreamToClientAndServer();
       }
-    if (part->GetGeometryTclName())
-      {
-      pvApp->BroadcastScript("%s SetUseOutline 1", part->GetGeometryTclName());
+    if (part->GetGeometryID().ID != 0)
+      { 
+      pm->GetStream() 
+        << vtkClientServerStream::Invoke <<  part->GetGeometryID()
+        << "SetUseOutline" << 1 << vtkClientServerStream::End;
+      pm->SendStreamToClientAndServer();
       part->GetPartDisplay()->InvalidateGeometry();
       }
     }
@@ -1862,6 +1904,8 @@ void vtkPVData::SetInterpolation(const char* repr)
 void vtkPVData::SetInterpolationToFlat()
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
+  vtkPVProcessModule* pm = pvApp->GetProcessModule();
+
   vtkPVPart *part;
   int idx, num;
   
@@ -1873,10 +1917,13 @@ void vtkPVData::SetInterpolationToFlat()
   for (idx = 0; idx < num; ++idx)
     {
     part = this->GetPVSource()->GetPart(idx);
-    if (part->GetPartDisplay()->GetPropertyTclName())
-      {
-      pvApp->BroadcastScript("%s SetInterpolationToFlat",
-                             part->GetPartDisplay()->GetPropertyTclName());
+    if (part->GetPartDisplay()->GetPropertyID().ID != 0)
+      { 
+      pm->GetStream() 
+        << vtkClientServerStream::Invoke 
+        << part->GetPartDisplay()->GetPropertyID()
+        << "SetInterpolationToFlat" << vtkClientServerStream::End;
+      pm->SendStreamToClientAndServer();
       }
     if ( this->GetPVRenderView() )
       {
@@ -1890,6 +1937,7 @@ void vtkPVData::SetInterpolationToFlat()
 void vtkPVData::SetInterpolationToGouraud()
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
+  vtkPVProcessModule* pm = pvApp->GetProcessModule();
   vtkPVPart *part;
   int num, idx;
   
@@ -1901,10 +1949,13 @@ void vtkPVData::SetInterpolationToGouraud()
   for (idx = 0; idx < num; ++idx)
     {
     part = this->GetPVSource()->GetPart(idx);
-    if (part->GetPartDisplay()->GetPropertyTclName())
-      {
-      pvApp->BroadcastScript("%s SetInterpolationToGouraud",
-                             part->GetPartDisplay()->GetPropertyTclName());
+      if (part->GetPartDisplay()->GetPropertyID().ID != 0)
+      { 
+      pm->GetStream() 
+        << vtkClientServerStream::Invoke 
+        << part->GetPartDisplay()->GetPropertyID()
+        << "SetInterpolationToGouraud" << vtkClientServerStream::End;
+      pm->SendStreamToClientAndServer();
       }
     }
   
@@ -1956,29 +2007,23 @@ void vtkPVData::Initialize()
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
   float bounds[6];
-  char *tclName;
-  char newTclName[100];
 
   vtkDebugMacro( << "Initialize --------")
   
   this->GetPVSource()->GetDataInformation()->GetBounds(bounds);
 
-  tclName = pvApp->GetRenderModule()->GetRendererTclName();
-  
-  sprintf(newTclName, "CubeAxes%d", this->InstanceCount);
-  this->SetCubeAxesTclName(newTclName);
-  pvApp->GetProcessModule()->RootScript("vtkCubeAxesActor2D %s", this->GetCubeAxesTclName());
-  pvApp->GetProcessModule()->RootScript("%s SetFlyModeToOuterEdges", this->GetCubeAxesTclName());
-  pvApp->GetProcessModule()->RootScript("[%s GetProperty] SetColor 1 1 1",
-                                        this->GetCubeAxesTclName());
-  
-  pvApp->GetProcessModule()->RootScript(
-    "%s SetBounds %f %f %f %f %f %f", this->GetCubeAxesTclName(),
-    bounds[0], bounds[1], bounds[2], bounds[3], bounds[4], bounds[5]);
-  pvApp->GetProcessModule()->RootScript("%s SetCamera [%s GetActiveCamera]",
-                                        this->GetCubeAxesTclName(), tclName);
-  pvApp->GetProcessModule()->RootScript("%s SetInertia 20", this->GetCubeAxesTclName());
-  
+  vtkRenderer* ren = pvApp->GetRenderModule()->GetRenderer();
+  this->CubeAxes = vtkCubeAxesActor2D::New();
+  this->CubeAxes->SetFlyModeToOuterEdges();
+  this->CubeAxes->GetProperty()->SetColor(1,1,1);
+  this->CubeAxes->SetBounds(bounds);
+  this->CubeAxes->SetCamera(ren->GetActiveCamera());
+  this->CubeAxes->SetInertia(20);
+
+  this->AxesWidget = vtkPVAxesWidget::New();
+  this->AxesWidget->SetParentRenderer(pvApp->GetRenderModule()->GetRenderer());
+  this->AxesWidget->SetInteractor(pvApp->GetMainWindow()->GetInteractor());
+
   // Choose the representation based on the data.
   // Polydata is always surface.
   // Structured data is surface when 2d, outline when 3d.
@@ -2024,18 +2069,15 @@ void vtkPVData::Initialize()
 //----------------------------------------------------------------------------
 void vtkPVData::CenterCamera()
 {
+  vtkPVApplication* pvApp = this->GetPVApplication();
+  vtkRenderer* ren = pvApp->GetRenderModule()->GetRenderer();
+
   float bounds[6];
-  vtkPVApplication *pvApp = this->GetPVApplication();
-  char* tclName;
-  
-  tclName = pvApp->GetRenderModule()->GetRendererTclName();
   this->GetPVSource()->GetDataInformation()->GetBounds(bounds);
   if (bounds[0]<=bounds[1] && bounds[2]<=bounds[3] && bounds[4]<=bounds[5])
     {
-    pvApp->Script("%s ResetCamera %f %f %f %f %f %f",
-                  tclName, bounds[0], bounds[1], bounds[2],
-                  bounds[3], bounds[4], bounds[5]);
-    pvApp->Script("%s ResetCameraClippingRange", tclName);
+    ren->ResetCamera(bounds);
+    ren->ResetCameraClippingRange();
     if ( this->GetPVRenderView() )
       {
       this->GetPVRenderView()->EventuallyRender();
@@ -2063,12 +2105,7 @@ void vtkPVData::SetVisibility(int v)
     }
   this->AddTraceEntry("$kw(%s) SetVisibility %d", this->GetTclName(), v);
   this->GetPVSource()->SetVisibilityInternal(v);
-  this->Script("%s SetVisibility %d", this->GetCubeAxesTclName(), v);
-  if (this->PointLabelCheck->GetState())
-    {
-    this->SetPointLabelVisibility(v);
-    }
-  this->GetPVApplication()->GetProcessModule()->RootScript("%s SetVisibility %d", this->GetCubeAxesTclName(), v);
+  this->CubeAxes->SetVisibility(v);
 }
 
 //----------------------------------------------------------------------------
@@ -2122,16 +2159,13 @@ void vtkPVData::SetScalarBarVisibility(int val)
 //----------------------------------------------------------------------------
 void vtkPVData::SetCubeAxesVisibility(int val)
 {
-  vtkRenderer *ren;
-  char *tclName;
   
   if (!this->GetPVRenderView())
     {
     return;
     }
   
-  ren = this->GetPVRenderView()->GetRenderer();
-  tclName = this->GetPVApplication()->GetRenderModule()->GetRendererTclName();
+  vtkRenderer* ren = this->GetPVRenderView()->GetRenderer();
   
   if (ren == NULL)
     {
@@ -2151,24 +2185,25 @@ void vtkPVData::SetCubeAxesVisibility(int val)
     {
     if (val)
       {
-      this->GetPVApplication()->GetProcessModule()->RootScript("%s AddProp %s", tclName, this->GetCubeAxesTclName());
+      ren->AddProp(this->CubeAxes);
       }
     else
       {
-      this->GetPVApplication()->GetProcessModule()->RootScript("%s RemoveProp %s", tclName, this->GetCubeAxesTclName());
+      ren->RemoveProp(this->CubeAxes);
       }
     }
 }
 
 //----------------------------------------------------------------------------
-void vtkPVData::SetPointLabelVisibility(int val)
+void vtkPVData::SetAxesWidgetVisibility(int state)
 {
-  if (this->PointLabelActorTclName != NULL)
+  if (this->AxesWidgetCheck->GetState() != state)
     {
-    this->Script("%s SetVisibility %d", this->GetPointLabelActorTclName(), val); 
-    this->AddTraceEntry("$kw(%s) this->SetPointLabelVisibility %d", 
-      this->GetTclName(), val);
+    this->AddTraceEntry("$kw(%s) SetAxesVisibility %d", this->GetTclName(),
+                        state);
+    this->AxesWidgetCheck->SetState(state);
     }
+  this->AxesWidget->SetEnabled(state);
 }
 
 //----------------------------------------------------------------------------
@@ -2194,30 +2229,14 @@ void vtkPVData::CubeAxesCheckCallback()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVData::PointLabelCheckCallback()
+void vtkPVData::AxesWidgetCheckCallback()
 {
-  this->AddTraceEntry("$kw(%s) SetPointLabelVisibility %d", this->GetTclName(),
-    this->PointLabelCheck->GetState());
-  if (this->VisibilityCheck->GetState())
+  this->AddTraceEntry("$kw(%s) SetAxesWidgetVisibility %d", this->GetTclName(),
+                      this->AxesWidgetCheck->GetState());
+  this->SetAxesWidgetVisibility(this->AxesWidgetCheck->GetState());
+  if (this->GetPVRenderView())
     {
-    this->SetPointLabelVisibility(this->PointLabelCheck->GetState());
-
-    if (this->PointLabelCheck->GetState()) 
-      {
-      const char *currentColorBy = this->ColorMenu->GetValue();
-      if (currentColorBy != NULL && strcmp(currentColorBy, "Property") != 0) 
-        {
-        char type[64];
-        char name[64];
-        sscanf(currentColorBy, "%s %s", type, name);
-        this->UpdatePointLabelObjects(type, name);
-        }
-      }
-
-    if ( this->GetPVRenderView() )
-      {
-      this->GetPVRenderView()->EventuallyRender();
-      }
+    this->GetPVRenderView()->EventuallyRender();
     }
 }
 
@@ -2279,6 +2298,7 @@ void vtkPVData::SetPointSize(int size)
 void vtkPVData::ChangePointSize()
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
+  vtkPVProcessModule* pm = pvApp->GetProcessModule();
   vtkPVPart *part;
   int idx, num;
   
@@ -2286,11 +2306,14 @@ void vtkPVData::ChangePointSize()
   for (idx = 0; idx < num; ++idx)
     {
     part = this->GetPVSource()->GetPart(idx);
-    if (part->GetPartDisplay()->GetPropertyTclName())
-      {
-      pvApp->BroadcastScript("%s SetPointSize %f",
-                             part->GetPartDisplay()->GetPropertyTclName(),
-                             this->PointSizeThumbWheel->GetValue());
+     if (part->GetPartDisplay()->GetPropertyID().ID != 0)
+      { 
+      pm->GetStream() 
+        << vtkClientServerStream::Invoke 
+        << part->GetPartDisplay()->GetPropertyID()
+        << "SetPointSize" << this->PointSizeThumbWheel->GetValue()
+        << vtkClientServerStream::End;
+      pm->SendStreamToClientAndServer();
       }
     }
  
@@ -2328,6 +2351,7 @@ void vtkPVData::SetLineWidth(int width)
 void vtkPVData::ChangeLineWidth()
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
+  vtkPVProcessModule* pm = pvApp->GetProcessModule();
   vtkPVPart *part;
   int idx, num;
   
@@ -2335,11 +2359,14 @@ void vtkPVData::ChangeLineWidth()
   for (idx = 0; idx < num; ++idx)
     {
     part = this->GetPVSource()->GetPart(idx);
-    if (part->GetPartDisplay()->GetPropertyTclName())
-      {
-      pvApp->BroadcastScript("%s SetLineWidth %f",
-                             part->GetPartDisplay()->GetPropertyTclName(),
-                             this->LineWidthThumbWheel->GetValue());
+      if (part->GetPartDisplay()->GetPropertyID().ID != 0)
+      { 
+      pm->GetStream() 
+        << vtkClientServerStream::Invoke 
+        << part->GetPartDisplay()->GetPropertyID()
+        << "SetLineWidth" << this->LineWidthThumbWheel->GetValue()
+        << vtkClientServerStream::End;
+      pm->SendStreamToClientAndServer();
       }
     }
 
@@ -2383,8 +2410,6 @@ void vtkPVData::SaveInBatchScript(ofstream *file)
   int fixme; // range is not used
   double range[2];
   const char* scalarMode;
-  const char* result;
-  char* renTclName;
   vtkPVPart *part;
   int partIdx, numParts;
   int sourceCount;
@@ -2393,7 +2418,7 @@ void vtkPVData::SaveInBatchScript(ofstream *file)
   int numOutputs;
   vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
 
-  renTclName = this->GetPVApplication()->GetRenderModule()->GetRendererTclName();
+  vtkClientServerID renID = this->GetPVApplication()->GetRenderModule()->GetRendererID();
   if (this->GetVisibility())
     {
     if (this->PVColorMap)
@@ -2421,80 +2446,80 @@ void vtkPVData::SaveInBatchScript(ofstream *file)
           }
         vtkPVSource *source = this->GetPVSource();
         pm->GatherInformation(source->GetNumberOfOutputsInformation(),
-                              (char*)(source->GetVTKSourceTclName(sourceCount)));
+                              source->GetVTKSourceID(sourceCount));
         numOutputs =
           source->GetNumberOfOutputsInformation()->GetNumberOfOutputs();
         outputCount = 0;
         }
 
-      *file << "vtkPVGeometryFilter " << part->GetGeometryTclName() << "\n\t"
-            << part->GetGeometryTclName() << " SetInput [" 
-            << this->GetPVSource()->GetVTKSourceTclName(sourceCount) 
+      *file << "vtkPVGeometryFilter pvTemp" << part->GetGeometryID() << "\n\t"
+            << "pvTemp" << part->GetGeometryID() << " SetInput [pvTemp" 
+            << this->GetPVSource()->GetVTKSourceID(sourceCount) 
             << " GetOutput " << outputCount << "]\n";
       *file << "\t";
       if ( vtkString::Equals(this->RepresentationMenu->GetValue(), "Outline") )
         {
-        *file << part->GetGeometryTclName() << " SetUseOutline 1" << endl;
+        *file << "pvTemp" << part->GetGeometryID() << " SetUseOutline 1" << endl;
         }
       else
         {
-        *file << part->GetGeometryTclName() << " SetUseOutline 0" << endl;
+        *file << "pvTemp" << part->GetGeometryID() << " SetUseOutline 0" << endl;
         }
       // Move to next output
       ++outputCount;
 
-
-      *file << "vtkPolyDataMapper " << part->GetPartDisplay()->GetMapperTclName() << "\n\t"
-            << part->GetPartDisplay()->GetMapperTclName() << " SetInput ["
-            << part->GetGeometryTclName() << " GetOutput]\n\t";  
-      *file << part->GetPartDisplay()->GetMapperTclName() << " SetImmediateModeRendering "
+      
+      *file << "vtkPolyDataMapper pvTemp" << part->GetPartDisplay()->GetMapperID() << "\n\t"
+            << "pvTemp" << part->GetPartDisplay()->GetMapperID() << " SetInput ["
+            << "pvTemp" << part->GetGeometryID() << " GetOutput]\n\t";  
+      *file << "pvTemp" << part->GetPartDisplay()->GetMapperID() << " SetImmediateModeRendering "
             << part->GetPartDisplay()->GetMapper()->GetImmediateModeRendering() << "\n\t";
       part->GetPartDisplay()->GetMapper()->GetScalarRange(range);
-      *file << part->GetPartDisplay()->GetMapperTclName() << " UseLookupTableScalarRangeOn\n\t";
-      *file << part->GetPartDisplay()->GetMapperTclName() << " SetScalarVisibility "
+      *file << "pvTemp" << part->GetPartDisplay()->GetMapperID() << " UseLookupTableScalarRangeOn\n\t";
+      *file << "pvTemp" << part->GetPartDisplay()->GetMapperID() << " SetScalarVisibility "
             << part->GetPartDisplay()->GetMapper()->GetScalarVisibility() << "\n\t"
-            << part->GetPartDisplay()->GetMapperTclName() << " SetScalarModeTo";
+            << "pvTemp" << part->GetPartDisplay()->GetMapperID() << " SetScalarModeTo";
       scalarMode = part->GetPartDisplay()->GetMapper()->GetScalarModeAsString();
       *file << scalarMode << "\n";
       if (strcmp(scalarMode, "UsePointFieldData") == 0 ||
           strcmp(scalarMode, "UseCellFieldData") == 0)
         {
-        *file << "\t" << part->GetPartDisplay()->GetMapperTclName() << " SelectColorArray {"
+        *file << "\t" << "pvTemp" << part->GetPartDisplay()->GetMapperID() << " SelectColorArray {"
               << part->GetPartDisplay()->GetMapper()->GetArrayName() << "}\n";
         }
       if (this->PVColorMap)
         {
-        *file << part->GetPartDisplay()->GetMapperTclName() << " SetLookupTable " 
-              << this->PVColorMap->GetLookupTableTclName() << endl;
+        *file << "pvTemp" << part->GetPartDisplay()->GetMapperID() << " SetLookupTable pvTemp" 
+              << this->PVColorMap->GetLookupTableID() << endl;
         }
   
-      *file << "vtkActor " << part->GetPartDisplay()->GetPropTclName() << "\n\t"
-            << part->GetPartDisplay()->GetPropTclName() << " SetMapper " 
-            << part->GetPartDisplay()->GetMapperTclName() << "\n\t"
-            << "[" << part->GetPartDisplay()->GetPropTclName() << " GetProperty] SetRepresentationTo"
+      *file << "vtkActor pvTemp" << part->GetPartDisplay()->GetPropID() << "\n\t"
+            << "pvTemp" << part->GetPartDisplay()->GetPropID() << " SetMapper " 
+            << "pvTemp" << part->GetPartDisplay()->GetMapperID() << "\n\t"
+            << "[ pvTemp" << part->GetPartDisplay()->GetPropID() << " GetProperty] SetRepresentationTo"
             << part->GetPartDisplay()->GetProperty()->GetRepresentationAsString() << "\n\t"
-            << "[" << part->GetPartDisplay()->GetPropTclName() << " GetProperty] SetInterpolationTo"
+            << "[pvTemp" << part->GetPartDisplay()->GetPropID() << " GetProperty] SetInterpolationTo"
             << part->GetPartDisplay()->GetProperty()->GetInterpolationAsString() << "\n";
 
-      *file << "\t[" << part->GetPartDisplay()->GetPropTclName() << " GetProperty] SetAmbient "
+      *file << "\t[pvTemp" << part->GetPartDisplay()->GetPropID() << " GetProperty] SetAmbient "
             << part->GetPartDisplay()->GetProperty()->GetAmbient() << "\n";
-      *file << "\t[" << part->GetPartDisplay()->GetPropTclName() << " GetProperty] SetDiffuse "
+      *file << "\t[pvTemp" << part->GetPartDisplay()->GetPropID() << " GetProperty] SetDiffuse "
             << part->GetPartDisplay()->GetProperty()->GetDiffuse() << "\n";
-      *file << "\t[" << part->GetPartDisplay()->GetPropTclName() << " GetProperty] SetSpecular "
+      *file << "\t[pvTemp" << part->GetPartDisplay()->GetPropID() << " GetProperty] SetSpecular "
             << part->GetPartDisplay()->GetProperty()->GetSpecular() << "\n";
-      *file << "\t[" << part->GetPartDisplay()->GetPropTclName() << " GetProperty] SetSpecularPower "
+      *file << "\t[pvTemp" << part->GetPartDisplay()->GetPropID() << " GetProperty] SetSpecularPower "
             << part->GetPartDisplay()->GetProperty()->GetSpecularPower() << "\n";
       float *color = part->GetPartDisplay()->GetProperty()->GetSpecularColor();
-      *file << "\t[" << part->GetPartDisplay()->GetPropTclName() << " GetProperty] SetSpecularColor "
+      *file << "\t[pvTemp" << part->GetPartDisplay()->GetPropID() << " GetProperty] SetSpecularColor "
             << color[0] << " " << color[1] << " " << color[2] << "\n";
       if (part->GetPartDisplay()->GetProperty()->GetLineWidth() > 1)
         {
-        *file << "\t[" << part->GetPartDisplay()->GetPropTclName() << " GetProperty] SetLineWidth "
+        *file << "\t[pvTemp" << part->GetPartDisplay()->GetPropID() << " GetProperty] SetLineWidth "
             << part->GetPartDisplay()->GetProperty()->GetLineWidth() << "\n";
         }
       if (part->GetPartDisplay()->GetProperty()->GetPointSize() > 1)
         {
-        *file << "\t[" << part->GetPartDisplay()->GetPropTclName() << " GetProperty] SetPointSize "
+        *file << "\t[pvTemp" << part->GetPartDisplay()->GetPropID() << " GetProperty] SetPointSize "
             << part->GetPartDisplay()->GetProperty()->GetPointSize() << "\n";
         }
 
@@ -2502,28 +2527,31 @@ void vtkPVData::SaveInBatchScript(ofstream *file)
         {
         float propColor[3];
         part->GetPartDisplay()->GetProperty()->GetColor(propColor);
-        *file << "[" << part->GetPartDisplay()->GetPropTclName() << " GetProperty] SetColor "
+        *file << "[pvTemp" << part->GetPartDisplay()->GetPropID() << " GetProperty] SetColor "
               << propColor[0] << " " << propColor[1] << " " << propColor[2]
               << "\n";
         }
 
-      *file << renTclName << " AddActor " << part->GetPartDisplay()->GetPropTclName() << "\n";
+      *file << "Ren1" << " AddActor pvTemp" << part->GetPartDisplay()->GetPropID() << "\n";
       }  
     }
 
   if (this->CubeAxesCheck->GetState())
     {
-    *file << "vtkCubeAxesActor2D " << this->CubeAxesTclName << "\n\t"
-          << this->CubeAxesTclName << " SetFlyModeToOuterEdges\n\t"
-          << "[" << this->CubeAxesTclName << " GetProperty] SetColor 1 1 1\n\t"
-          << this->CubeAxesTclName << " SetBounds ";
-    this->GetPVApplication()->GetProcessModule()->RootScript("set tempResult [%s GetBounds]", this->CubeAxesTclName);
-    result = this->GetPVApplication()->GetProcessModule()->GetRootResult();
-    *file << result << "\n\t"
-          << this->CubeAxesTclName << " SetCamera [";
-    *file << renTclName << " GetActiveCamera]\n\t"
-          << this->CubeAxesTclName << " SetInertia 20\n";
-    *file << renTclName << " AddProp " << this->CubeAxesTclName << "\n";
+    char cubeAxesBatchName[128];
+    float bounds[6];
+    this->CubeAxes->GetBounds(bounds);
+    sprintf(cubeAxesBatchName, "cubeAxes%d", this->InstanceCount);
+    *file << "vtkCubeAxesActor2D " << cubeAxesBatchName << "\n\t"
+          << cubeAxesBatchName << " SetFlyModeToOuterEdges\n\t"
+          << "[" << cubeAxesBatchName << " GetProperty] SetColor 1 1 1\n\t"
+          << cubeAxesBatchName << " SetBounds "
+          << bounds[0] << " " << bounds[1] << " " << bounds[2] << " "
+          << bounds[3] << " " << bounds[4] << " " << bounds[5] << "\n\t";
+    *file << cubeAxesBatchName << " SetCamera [";
+    *file << "pvTemp" << renID.ID << " GetActiveCamera]\n\t"
+          << cubeAxesBatchName << " SetInertia 20\n";
+    *file << "pvTemp" << renID.ID << " AddProp " << cubeAxesBatchName << "\n";
     }
 }
 
@@ -2644,7 +2672,30 @@ void vtkPVData::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "ColorMap: " << this->PVColorMap << endl;
   os << indent << "ColorMenu: " << this->ColorMenu << endl;
   os << indent << "EditColorMapButton: " << this->EditColorMapButton << endl;
-  os << indent << "CubeAxesTclName: " << (this->CubeAxesTclName?this->CubeAxesTclName:"none") << endl;
+  if(this->CubeAxes)
+    {
+    os << indent << "CubeAxes: " << this->CubeAxes << endl;
+    }
+  else
+    {
+    os << indent << "CubeAxes: none" << endl;
+    }
+  if(this->AxesWidget)
+    {
+    os << indent << "AxesWidget: " << this->AxesWidget << endl;
+    }
+  else
+    {
+    os << indent << "AxesWidget: none" << endl;
+    }
+  if(this->AxesWidgetCheck)
+    {
+    os << indent << "AxesWidgetCheck: " << this->AxesWidgetCheck << endl;
+    }
+  else
+    {
+    os << indent << "AxesWidgetCheck: none" << endl;
+    }
   os << indent << "PVSource: " << this->GetPVSource() << endl;
   os << indent << "PropertiesParent: " << this->GetPropertiesParent() << endl;
   if (this->PVColorMap)
@@ -2658,7 +2709,6 @@ void vtkPVData::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "PropertiesCreated: " << this->PropertiesCreated << endl;
   os << indent << "CubeAxesCheck: " << this->CubeAxesCheck << endl;
   os << indent << "ScalarBarCheck: " << this->ScalarBarCheck << endl;
-  os << indent << "PointLabelCheck: " << this->PointLabelCheck << endl;
   os << indent << "RepresentationMenu: " << this->RepresentationMenu << endl;
   os << indent << "InterpolationMenu: " << this->InterpolationMenu << endl;
   os << indent << "Visibility: " << this->Visibility << endl;
@@ -2690,6 +2740,8 @@ void vtkPVData::SetOpacity(float val)
 //----------------------------------------------------------------------------
 void vtkPVData::OpacityChangedCallback()
 {
+  vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
+
   vtkPVPart *part;
   int idx, num;
 
@@ -2697,9 +2749,16 @@ void vtkPVData::OpacityChangedCallback()
   for (idx = 0; idx < num; ++idx)
     {
     part = this->GetPVSource()->GetPart(idx);
-    this->GetPVApplication()->BroadcastScript("[ %s GetProperty ] SetOpacity %f",
-                                              part->GetPartDisplay()->GetPropTclName(), 
-                                              this->OpacityScale->GetValue());
+    pm->GetStream() 
+      << vtkClientServerStream::Invoke 
+      << part->GetPartDisplay()->GetPropID()
+      << "GetProperty"
+      << vtkClientServerStream::End
+      << vtkClientServerStream::Invoke
+      << vtkClientServerStream::LastResult 
+      << "SetOpacity" << this->OpacityScale->GetValue()
+      << vtkClientServerStream::End;
+    pm->SendStreamToClientAndServer();
     }
 
   if ( this->GetPVRenderView() )
@@ -2746,11 +2805,16 @@ void vtkPVData::SetActorTranslateNoTrace(float x, float y, float z)
   this->TranslateThumbWheel[2]->SetValue(z);
 
   num = this->GetPVSource()->GetNumberOfParts();
+  vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
   for (idx = 0; idx < num; ++idx)
     {
     part = this->GetPVSource()->GetPart(idx);
-    this->GetPVApplication()->BroadcastScript("%s SetPosition %f %f %f",
-                                              part->GetPartDisplay()->GetPropTclName(), x, y, z);
+    pm->GetStream() 
+      << vtkClientServerStream::Invoke 
+      << part->GetPartDisplay()->GetPropID()
+      << "SetPosition" << x << y << z
+      << vtkClientServerStream::End;
+    pm->SendStreamToClientAndServer();
     }
 
   // Do not render here (do it in the callback, since it could be either
@@ -2830,11 +2894,16 @@ void vtkPVData::SetActorScaleNoTrace(float x, float y, float z)
   this->ScaleThumbWheel[2]->SetValue(z);
 
   num = this->GetPVSource()->GetNumberOfParts();
+  vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
   for (idx = 0; idx < num; ++idx)
     {
-    part = this->GetPVSource()->GetPart(idx);
-    this->GetPVApplication()->BroadcastScript("%s SetScale %f %f %f",
-                                              part->GetPartDisplay()->GetPropTclName(), x, y, z);
+    part = this->GetPVSource()->GetPart(idx); 
+    pm->GetStream() 
+        << vtkClientServerStream::Invoke 
+        << part->GetPartDisplay()->GetPropID()
+        << "SetScale" << x << y << z 
+        << vtkClientServerStream::End;
+    pm->SendStreamToClientAndServer();
     }
 
   // Do not render here (do it in the callback, since it could be either
@@ -2915,11 +2984,16 @@ void vtkPVData::SetActorOrientationNoTrace(float x, float y, float z)
   this->OrientationScale[2]->SetValue(z);
 
   num = this->GetPVSource()->GetNumberOfParts();
+  vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
   for (idx = 0; idx < num; ++idx)
     {
-    part = this->GetPVSource()->GetPart(idx);
-    this->GetPVApplication()->BroadcastScript("%s SetOrientation %f %f %f",
-                                              part->GetPartDisplay()->GetPropTclName(), x, y, z);
+    part = this->GetPVSource()->GetPart(idx);  
+    pm->GetStream() 
+        << vtkClientServerStream::Invoke 
+        << part->GetPartDisplay()->GetPropID()
+        << "SetOrientation" << x << y << z 
+        << vtkClientServerStream::End;
+    pm->SendStreamToClientAndServer();
     }
 
   // Do not render here (do it in the callback, since it could be either
@@ -2999,11 +3073,16 @@ void vtkPVData::SetActorOriginNoTrace(float x, float y, float z)
   this->OriginThumbWheel[2]->SetValue(z);
 
   num = this->GetPVSource()->GetNumberOfParts();
+  vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
   for (idx = 0; idx < num; ++idx)
     {
-    part = this->GetPVSource()->GetPart(idx);
-    this->GetPVApplication()->BroadcastScript("%s SetOrigin %f %f %f",
-                                              part->GetPartDisplay()->GetPropTclName(), x, y, z);
+    part = this->GetPVSource()->GetPart(idx);  
+    pm->GetStream() 
+        << vtkClientServerStream::Invoke 
+        << part->GetPartDisplay()->GetPropID()
+        << "SetOrigin" << x << y << z 
+        << vtkClientServerStream::End;
+    pm->SendStreamToClientAndServer();
     }
 
   // Do not render here (do it in the callback, since it could be either
@@ -3081,95 +3160,5 @@ void vtkPVData::UpdateActorControlResolutions()
       }
     this->TranslateThumbWheel[i]->SetResolution(res);
     this->OriginThumbWheel[i]->SetResolution(res);
-    }
-}
-
-
-// 
-// Create or update label objects
-//----------------------------------------------------------------------------
-void vtkPVData::UpdatePointLabelObjects(const char *type, const char *name)
-{
-  vtkPVSource* source = this->GetPVSource();
-  if (!source)
-    {
-// returning
-    return;
-    }
-
-  // determine if we can annotate the current selection
-  if ((type == NULL) || (strcmp(type, "Point") != 0))
-    {
-      // we cannot map this variable
-      this->SetPointLabelVisibility(0);
-// returning
-      return;
-// returning
-    }
-
-  // if the mapper doesn't exist, make it 
-  if (this->PointLabelMapperTclName == NULL) 
-    {
-    char mapperTclName[100];
-    sprintf(mapperTclName, "PointLabelMapper%d", this->InstanceCount);
-    this->SetPointLabelMapperTclName(mapperTclName);
-    this->Script("vtkLabeledDataMapper %s",
-      this->GetPointLabelMapperTclName()); 
-    this->Script("%s SetInput [%s GetOutput]",
-      this->GetPointLabelMapperTclName(), 
-      source->GetVTKSourceTclName(0));
-    this->Script("[%s GetLabelTextProperty] SetFontSize 24", 
-      this->GetPointLabelMapperTclName());
-    }
-
-  int typeId = 0;
-  this->Script("[[%s GetInput] Get%sData] SetActiveAttribute %s %d", 
-    this->GetPointLabelMapperTclName(), type, name, typeId);
-  this->Script("%s SetLabelModeToLabelScalars", 
-    this->GetPointLabelMapperTclName()); 
-
-  // if the actor doesn't exist, make it
-  if (this->PointLabelActorTclName == NULL)
-    {
-    char actorTclName[100];
-    sprintf(actorTclName, "PointLabelActor%d", this->InstanceCount);
-    this->SetPointLabelActorTclName(actorTclName);
-    vtkPVApplication *pvApp = this->GetPVApplication();
-    char *renderTclName = pvApp->GetRenderModule()->GetRendererTclName();
-    this->Script("vtkActor2D %s", this->GetPointLabelActorTclName()); 
-    this->Script("%s SetMapper %s", this->GetPointLabelActorTclName(), 
-      this->GetPointLabelMapperTclName());
-    this->Script("%s AddActor %s", renderTclName, 
-      this->GetPointLabelActorTclName());
-    }
-  // make sure we can see it ...
-  this->SetPointLabelVisibility(1);
-}
-
-//
-// Delete all of the point label objects, if they exist
-//----------------------------------------------------------------------------
-void vtkPVData::DeletePointLabelObjects()
-{
-  if (this->PointLabelMapperTclName && this->PointLabelActorTclName)
-    {
-    vtkPVApplication *pvApp = this->GetPVApplication();
-    if ( pvApp )
-      {
-      if (pvApp->GetRenderModule())
-        {
-        char *renderTclName = pvApp->GetRenderModule()->GetRendererTclName();
-        pvApp->Script("%s RemoveActor %s", renderTclName, 
-          this->PointLabelActorTclName);
-        }
-      pvApp->Script("%s Delete", this->PointLabelActorTclName);
-      pvApp->Script("%s Delete", this->PointLabelMapperTclName);
-      }
-    this->SetPointLabelMapperTclName(NULL);
-    this->SetPointLabelActorTclName(NULL);
-    }
-  else 
-    {
-    // error check - if there's only one, there's a problem
     }
 }

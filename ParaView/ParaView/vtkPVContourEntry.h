@@ -66,7 +66,7 @@ public:
 
   // Description:
   // Gets called when the accept button is pressed.
-  virtual void AcceptInternal(const char* sourceTclName);
+  virtual void AcceptInternal(vtkClientServerID);
 
   // Description:
   // Gets called when the reset button is pressed.
@@ -120,7 +120,7 @@ protected:
   // Description:
   // The widget saves it state/command in the vtk tcl script.
   virtual void SaveInBatchScriptForPart(ofstream *file, 
-                                        const char* sourceTclName);
+                                        vtkClientServerID);
 };
 
 #endif

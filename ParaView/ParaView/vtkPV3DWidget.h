@@ -110,7 +110,7 @@ public:
 
   // Description:
   // Move widget state to VTK object or back.
-  virtual void AcceptInternal(const char* sourceTclName);
+  virtual void AcceptInternal(vtkClientServerID);
   virtual void ResetInternal();
 
 protected:
@@ -156,8 +156,7 @@ protected:
   int Visible;
   int UseLabel;
 
-  char* Widget3DTclName;
-  vtkSetStringMacro(Widget3DTclName);
+  vtkClientServerID Widget3DID;
   vtk3DWidget* Widget3D;
 
 private:  

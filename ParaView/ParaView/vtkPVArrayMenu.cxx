@@ -63,7 +63,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVArrayMenu);
-vtkCxxRevisionMacro(vtkPVArrayMenu, "1.45");
+vtkCxxRevisionMacro(vtkPVArrayMenu, "1.46");
 
 vtkCxxSetObjectMacro(vtkPVArrayMenu, InputMenu, vtkPVInputMenu);
 vtkCxxSetObjectMacro(vtkPVArrayMenu, FieldMenu, vtkPVFieldMenu);
@@ -82,7 +82,7 @@ vtkPVArrayMenu::vtkPVArrayMenu()
 
   this->InputName = NULL;
   this->AttributeType = 0;
-  this->ObjectTclName = NULL;
+  this->ObjectID.ID = 0;
 
   this->Label = vtkKWLabel::New();
   this->ArrayMenu = vtkKWOptionMenu::New();
@@ -100,7 +100,7 @@ vtkPVArrayMenu::~vtkPVArrayMenu()
   this->SetArrayName(NULL);
 
   this->SetInputName(NULL);
-  this->SetObjectTclName(NULL);
+  this->ObjectID.ID = 0;
 
   this->Label->Delete();
   this->Label = NULL;
@@ -341,7 +341,7 @@ void vtkPVArrayMenu::SetSelectedComponent(int comp)
 } 
 
 //----------------------------------------------------------------------------
-void vtkPVArrayMenu::AcceptInternal(const char* sourceTclName)
+void vtkPVArrayMenu::AcceptInternal(vtkClientServerID sourceID)
 {
   const char* attributeName;
 
@@ -353,7 +353,7 @@ void vtkPVArrayMenu::AcceptInternal(const char* sourceTclName)
     return;
     }
 
-  if (this->InputName == NULL || sourceTclName == NULL)
+  if (this->InputName == NULL || sourceID.ID == 0)
     {
     vtkDebugMacro("Access names have not all been set.");
     return;
@@ -388,7 +388,7 @@ void vtkPVArrayMenu::AcceptInternal(const char* sourceTclName)
     this->Property->SetScalars(1, &scalar);
     }
 
-  this->Property->SetVTKSourceTclName(sourceTclName);
+  this->Property->SetVTKSourceID(sourceID);
   this->Property->AcceptInternal();
   
   this->ModifiedFlag = 0;
@@ -456,14 +456,14 @@ void vtkPVArrayMenu::ResetInternal()
 
 //----------------------------------------------------------------------------
 void vtkPVArrayMenu::SaveInBatchScriptForPart(ofstream *file,
-                                              const char* sourceTclName)
+                                              vtkClientServerID sourceID)
 {
   const char* attributeName;
 
   attributeName = vtkDataSetAttributes::GetAttributeTypeAsString(
     this->AttributeType);
 
-  if (sourceTclName == NULL)
+  if (sourceID.ID == 0)
     {
     vtkErrorMacro("Sanity check failed. " 
                   << this->GetClassName());
@@ -473,19 +473,19 @@ void vtkPVArrayMenu::SaveInBatchScriptForPart(ofstream *file,
   if (this->ArrayName)
     {
     *file << "\t";
-    *file << sourceTclName << " Select" << this->InputName
+    *file << "pvTemp" << sourceID << " Select" << this->InputName
           << attributeName << " {" << this->ArrayName << "}\n";
     }
   else
     {
     *file << "\t";
-    *file << sourceTclName << " Select" << this->InputName
+    *file << "pvTemp" << sourceID << " Select" << this->InputName
           << attributeName << " {}\n";
     }
   if (this->ShowComponentMenu)
     {
     *file << "\t";
-    *file << sourceTclName << " Select" << this->InputName
+    *file << "pvTemp" << sourceID << " Select" << this->InputName
           << attributeName << "Component "  << this->SelectedComponent << endl;
     }
 }
@@ -709,7 +709,7 @@ void vtkPVArrayMenu::CopyProperties(vtkPVWidget* clone, vtkPVSource* pvSource,
     pvam->SetFieldSelection(this->FieldSelection);
     pvam->SetAttributeType(this->AttributeType);
     pvam->SetLabel(this->Label->GetLabel());
-    pvam->SetObjectTclName(pvSource->GetVTKSourceTclName());
+    pvam->SetObjectID(pvSource->GetVTKSourceID());
     if (this->InputMenu)
       {
       // This will either clone or return a previously cloned
@@ -880,8 +880,7 @@ void vtkPVArrayMenu::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "InputName: " << (this->InputName?this->InputName:"none") 
      << endl;
   os << indent << "NumberOfComponents: " << this->GetNumberOfComponents() << endl;
-  os << indent << "ObjectTclName: " 
-     << (this->ObjectTclName?this->ObjectTclName:"none") << endl;
+  os << indent << "ObjectID: " << this->ObjectID << endl;
   os << indent << "SelectedComponent: " << this->GetSelectedComponent() << endl;
   os << indent << "ShowComponentMenu: " << this->GetShowComponentMenu() << endl;
   if (this->InputMenu)

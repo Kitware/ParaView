@@ -49,6 +49,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __vtkPVProcessModule_h
 
 #include "vtkKWObject.h"
+#include "vtkClientServerStream.h"
 
 class vtkPolyData;
 class vtkKWLoadSaveDialog;
@@ -60,6 +61,7 @@ class vtkPVPart;
 class vtkPVPartDisplay;
 class vtkSource;
 class vtkStringList;
+class vtkCallbackCommand;
 class vtkClientServerInterpreter;
 class vtkClientServerStream;
 
@@ -111,11 +113,15 @@ public:
   // The controller is needed for filter that communicate internally.
   vtkGetObjectMacro(Controller, vtkMultiProcessController);
 
+  //BTX
   // Description:
   // This is going to be a generic method of getting/gathering 
   // information form the server.
-  virtual void GatherInformation(vtkPVInformation* info, char* objectTclName);
-  virtual void GatherInformationInternal(char* infoClassName, vtkObject* object);
+  virtual void GatherInformation(vtkPVInformation* info,
+                                 vtkClientServerID id);
+  //ETX
+  virtual void GatherInformationInternal(const char* infoClassName,
+                                         vtkObject* object);
   
   // Description:
   // Get the partition piece.  -1 means no assigned piece.
@@ -142,10 +148,8 @@ public:
   // Description:
   // Get a directory listing for the given directory.  Returns 1 for
   // success, and 0 for failure (when the directory does not exist).
-  int GetDirectoryListing(const char* dir, vtkStringList* dirs,
-                          vtkStringList* files);
   virtual int GetDirectoryListing(const char* dir, vtkStringList* dirs,
-                                  vtkStringList* files, const char* perm);
+                                  vtkStringList* files, int save);
   
   // Description:
   // Get a reference to a vtkDataObject from the server-side root node
@@ -156,6 +160,11 @@ public:
   // Description:
   // Get a file selection dialog instance.
   virtual vtkKWLoadSaveDialog* NewLoadSaveDialog();
+  // Description:
+  // Get an object from an int id.  This is only useful in
+  // when in client mode and calling this from tcl where vtkClientServerID
+  // is not wrapped.
+  virtual vtkObjectBase* GetObjectFromIntID(unsigned int);
 //BTX  
   // Description:
   // Return the client server stream
@@ -163,29 +172,109 @@ public:
     {
       return *this->ClientServerStream;
     }
+  
+  // Description: 
+  // These methods construct/delete a vtk object in the vtkClientServerStream
+  // owned by the process module.  The type of the object is specified by
+  // string name, and the object to delete is specified by the object id
+  // passed in.  To send the stream to the server call SendStreamToServer or
+  // SendStreamToClientAndServer.  For construction, the unique id for the
+  // new object is returned.
+  vtkClientServerID NewStreamObject(const char*);
+  void DeleteStreamObject(vtkClientServerID);
+  
+  // Description:
+  // Return the vtk object associated with the given id for the client.
+  // If the id is for an object on the server then 0 is returned.
+  virtual vtkObjectBase* GetObjectFromID(vtkClientServerID);
+  
+  // Description:
+  // Return a message containing the result of the last SendMessages call.
+  // In client/server mode this causes a round trip to the server.
+  virtual const vtkClientServerStream& GetLastServerResult();
+
+  // Description:
+  // Return a message containing the result of the last call made on
+  // the client.
+  virtual const vtkClientServerStream& GetLastClientResult();
 //ETX
   // Description:
+
+  // Send the current vtkClientServerStream contents to the client only.
+  // Also reset the vtkClientServerStream object.
+  virtual void SendStreamToClient();
+
   // Send the current vtkClientServerStream contents to the server.
-  virtual void SendMessages();
+  // Also reset the vtkClientServerStream object.
+  virtual void SendStreamToServer();
+
+  // Send the current vtkClientServerStream contents to the server
+  // root node.  Also reset the vtkClientServerStream object.
+  virtual void SendStreamToServerRoot();
+
+  // Description:
+  // Send current ClientServerStream data to the server and the client.
+  // Also reset the vtkClientServerStream object.
+  virtual void SendStreamToClientAndServer();
+
+  // Description:
+  // Send current ClientServerStream data to the server root and the client.
+  // Also reset the vtkClientServerStream object.
+  virtual void SendStreamToClientAndServerRoot();
+
+  //BTX
+  // Description:
+  // Get the interpreter used on the local process.
+  virtual vtkClientServerInterpreter* GetInterpreter();
+
+  // Description:
+  // Initialize/Finalize the process module's
+  // vtkClientServerInterpreter.
+  virtual void InitializeInterpreter();
+  virtual void FinalizeInterpreter();
+  //ETX
+
+  // Description:
+  // Set/Get whether to report errors from the Interpreter.
+  vtkGetMacro(ReportInterpreterErrors, int);
+  vtkSetMacro(ReportInterpreterErrors, int);
+  vtkBooleanMacro(ReportInterpreterErrors, int);
+
+  // Description:
+  // Load a ClientServer wrapper module dynamically in the server
+  // processes.  Returns 1 if all server nodes loaded the module and 0
+  // otherwise.
+  virtual int LoadModule(const char* name);
+
+  // Description:
+  // Used internally.  Do not call.  Use LoadModule instead.
+  virtual int LoadModuleInternal(const char* name);
+
+  vtkClientServerID GetUniqueID();
+  vtkClientServerID GetApplicationID();
+  vtkClientServerID GetProcessModuleID();
 protected:
   vtkPVProcessModule();
   ~vtkPVProcessModule();
 
-  void InitializeTclMethodImplementations();
-  
+  static void InterpreterCallbackFunction(vtkObject* caller,
+                                          unsigned long eid,
+                                          void* cd, void* d);
+  virtual void InterpreterCallback(unsigned long eid, void*);
+
   vtkMultiProcessController *Controller;
   vtkPVInformation *TemporaryInformation;
 
   char *RootResult;
 
-  vtkClientServerInterpreter* ClientServerInterpreter;
+  vtkClientServerInterpreter* Interpreter;
   vtkClientServerStream* ClientServerStream;
-
-private:  
+  vtkClientServerID UniqueID;
+  vtkCallbackCommand* InterpreterObserver;
+  int ReportInterpreterErrors;
+private:
   vtkPVProcessModule(const vtkPVProcessModule&); // Not implemented
   void operator=(const vtkPVProcessModule&); // Not implemented
 };
 
 #endif
-
-

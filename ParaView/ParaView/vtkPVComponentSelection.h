@@ -80,7 +80,7 @@ public:
   // Called when accept button is pushed.
   // Sets object's variable to the widget's value.
   // Side effect is to turn modified flag off.
-  virtual void AcceptInternal(const char* sourceTclName);
+  virtual void AcceptInternal(vtkClientServerID);
   
   // Description:
   // Called then the reset button is pushed.

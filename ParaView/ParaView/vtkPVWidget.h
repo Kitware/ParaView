@@ -53,7 +53,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __vtkPVWidget_h
 
 #include "vtkKWWidget.h"
-
+#include "vtkClientServerID.h" // needed for vtkClientServerID
 class vtkKWMenu;
 class vtkPVSource;
 class vtkPVApplication;
@@ -241,7 +241,7 @@ public:
   // Description:
   // Most subclasses implement these methods to move state from VTK objects
   // to the widget.  The Tcl name of the VTK object is supplied as a parameter.
-  virtual void AcceptInternal(const char* sourceTclName);
+  virtual void AcceptInternal(vtkClientServerID);
   virtual void ResetInternal();
 
   // Description:
@@ -311,7 +311,7 @@ protected:
   // Saves for a specific part.  SaveInBatchScript loops over parts.
   // This is the way Accept and Reset should work.
   virtual void SaveInBatchScriptForPart(ofstream *file, 
-                                        const char* sourceTclName);
+                                        vtkClientServerID);
 
 };
 

@@ -58,29 +58,29 @@ public:
 
   // Description:
   // The Tcl name of the contained VTK source.
-  vtkGetStringMacro(SourceTclName);
+  vtkGetMacro(SourceID,vtkClientServerID);
 
   // Description:
   // The Tcl name of the output of the contained VTK source.
-  vtkGetStringMacro(OutputTclName);
+  vtkGetMacro(OutputID,vtkClientServerID);
 
   // Description:
   // A method for saving a widget into a VTK Tcl script.
   virtual void SaveInBatchScript(ofstream *file);
+  // Description:
+  // Return SourceID for Source, and OutputID for Output.
+  virtual vtkClientServerID GetObjectByName(const char*);
 
 protected:
   vtkPVSourceWidget();
   ~vtkPVSourceWidget();
 
-  char* SourceTclName;
-  vtkSetStringMacro(SourceTclName);
-
-  char* OutputTclName;
-  vtkSetStringMacro(OutputTclName);
+  vtkClientServerID SourceID;
+  vtkClientServerID OutputID;
 
   // Description:
   // A method for saving a widget into a VTK Tcl script.
-  virtual void SaveInBatchScriptForPart(ofstream *file, const char* sourceTclName);
+  virtual void SaveInBatchScriptForPart(ofstream *file, vtkClientServerID);
 
   vtkPVSourceWidget(const vtkPVSourceWidget&); // Not implemented
   void operator=(const vtkPVSourceWidget&); // Not implemented

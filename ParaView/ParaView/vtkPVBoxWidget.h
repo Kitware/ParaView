@@ -71,11 +71,11 @@ public:
     
   // Description:
   // The Tcl name of the VTK implicit plane.
-  vtkGetStringMacro(BoxTclName);
+  vtkGetMacro(BoxID,vtkClientServerID);
 
   // Description:
   // The Tcl name of the VTK transform.
-  vtkGetStringMacro(BoxTransformTclName);
+  vtkGetMacro(BoxTransformID,vtkClientServerID);
 
   // Description:
   // This method sets the input to the 3D widget and places the widget.
@@ -102,7 +102,7 @@ public:
     
   // Description:
   // Called when the PVSources accept button is called.
-  virtual void AcceptInternal(const char* sourceTclName);
+  virtual void AcceptInternal(vtkClientServerID);
 
   // Description:
   // This serves a dual purpose.  For tracing and for saving state.
@@ -148,6 +148,14 @@ public:
   void UpdateBox(int update);
   void UpdateFromBox();
 
+  // Description:
+  // Return a contained object by name as follows:
+  // Box == BoxID
+  // BoxTransform == BoxTransformID
+  // BoxMatrix == BoxMatrixID
+  virtual vtkClientServerID GetObjectByName(const char*);
+
+
 protected:
   vtkPVBoxWidget();
   ~vtkPVBoxWidget();
@@ -162,14 +170,9 @@ protected:
 
   void UpdateVTKObject(const char* sourceTclName);
 
-  char *BoxTclName;
-  vtkSetStringMacro(BoxTclName);
-
-  char *BoxTransformTclName;
-  vtkSetStringMacro(BoxTransformTclName);
-
-  char *BoxMatrixTclName;
-  vtkSetStringMacro(BoxMatrixTclName);
+  vtkClientServerID BoxID;
+  vtkClientServerID BoxTransformID;
+  vtkClientServerID BoxMatrixID;
 
   vtkKWFrame*        ControlFrame;
   vtkKWLabel*        TranslateLabel;

@@ -2,6 +2,24 @@ CMAKE_MINIMUM_REQUIRED(VERSION 1.4)
 PROJECT(PARAVIEW)
 INCLUDE_REGULAR_EXPRESSION("^(vtk).*$")
 
+# load the ClientServer command
+IF (COMMAND VTK_WRAP_ClientServer)
+ELSE (COMMAND VTK_WRAP_ClientServer)
+    TRY_COMPILE(COMPILE_OK
+         ${PARAVIEW_BINARY_DIR}/ClientServer/CMake
+         ${PARAVIEW_SOURCE_DIR}/ClientServer/CMake
+         ClientServer_LOADED_COMMANDS OUTPUT_VARIABLE TRYOUT)
+    IF (COMPILE_OK)
+         LOAD_COMMAND(VTK_WRAP_ClientServer
+            ${PARAVIEW_BINARY_DIR}/ClientServer/CMake
+            ${PARAVIEW_BINARY_DIR}/ClientServer/CMake/Debug)
+    ELSE (COMPILE_OK)
+         MESSAGE("failed to compile ParaView ClientServer extensions to CMake:\n${TRYOUT}")
+    ENDIF (COMPILE_OK)
+ENDIF (COMMAND VTK_WRAP_ClientServer)
+UTILITY_SOURCE(VTK_WRAP_ClientServer_EXE vtkWrapClientServer ClientServer/Wrapping vtkWrapClientServer.c)
+MARK_AS_ADVANCED(VTK_WRAP_ClientServer_EXE)
+
 #-----------------------------------------------------------------------------
 # ParaView version number.  An even minor number corresponds to releases.
 SET(PARAVIEW_VERSION_MAJOR 1)
@@ -131,8 +149,15 @@ ELSE(ParaViewComplete_BINARY_DIR)
   ENDIF (VTK_FOUND)
 ENDIF(ParaViewComplete_BINARY_DIR)
 
-OPTION(PARAVIEW_USE_ICE_T "Build paraview using IceT" OFF)	 
-IF(PARAVIEW_USE_ICE_T)	 
+
+IF(PARAVIEW_LINK_XDMF)
+  FIND_PATH(XDMF_SOURCE_DIR
+    vtkXdmfKit.cmake
+    )
+ENDIF(PARAVIEW_LINK_XDMF)
+
+OPTION(PARAVIEW_USE_ICE_T "Build paraview using IceT" OFF)
+IF(PARAVIEW_USE_ICE_T)
 	INCLUDE( ${PARAVIEW_SOURCE_DIR}/FindIceT.cmake )
   IF(ICET_USE_FILE)
     INCLUDE(${ICET_USE_FILE})
@@ -191,7 +216,7 @@ IF (PARAVIEW_CAN_BUILD)
 
  SET (DO_NOT_BUILD_XML_RW 1)
 
- SUBDIRS(Utilities KWCommon Filters Widgets)
+ SUBDIRS(Utilities KWCommon ClientServer Filters Widgets)
 
  IF(PARAVIEW_BUILD_DEVELOPMENT)
    SUBDIRS(Development)
@@ -227,9 +252,11 @@ IF (PARAVIEW_CAN_BUILD)
    INCLUDE_DIRECTORIES(${VTK_TK_INTERNAL_DIR})
  ENDIF(VTK_TK_INTERNAL_DIR)
 
- INCLUDE_DIRECTORIES(${PARAVIEW_BINARY_DIR} 
+ INCLUDE_DIRECTORIES(${PARAVIEW_BINARY_DIR}
                      ${PARAVIEW_SOURCE_DIR}/KWCommon
                      ${PARAVIEW_SOURCE_DIR}/Widgets
+                     ${PARAVIEW_SOURCE_DIR}/ClientServer
+                     ${PARAVIEW_BINARY_DIR}/ClientServer
                      ${PARAVIEW_SOURCE_DIR}/Filters
                      ${PARAVIEW_SOURCE_DIR}/ParaView)
 
@@ -239,7 +266,7 @@ IF (PARAVIEW_CAN_BUILD)
                   ${PARAVIEW_BINARY_DIR}/ParaView)
 
  SET (PARAVIEW_EXECUTABLE ${EXECUTABLE_OUTPUT_PATH}/paraview)
-
+ SET(PARAVIEW_CS_EXECUTABLE ${EXECUTABLE_OUTPUT_PATH}/TestClientServer)
 # Include the standard Dart testing module
  INCLUDE (${CMAKE_ROOT}/Modules/Dart.cmake)
 
@@ -252,7 +279,7 @@ IF(BUILD_TESTING)
 
   ENABLE_TESTING()
   SUBDIRS(ParaView/Testing)
-  SUBDIRS(Filters/Testing)
+  SUBDIRS(ClientServer/Testing)
   SUBDIRS(Packages/Testing)
   IF(PARAVIEW_BUILD_DEVELOPMENT)
     SUBDIRS(Development/Testing)

@@ -49,7 +49,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVMPIRenderModule);
-vtkCxxRevisionMacro(vtkPVMPIRenderModule, "1.5");
+vtkCxxRevisionMacro(vtkPVMPIRenderModule, "1.6");
+
 
 
 //***************************************************************************
@@ -74,31 +75,47 @@ void vtkPVMPIRenderModule::SetPVApplication(vtkPVApplication *pvApp)
     {
     return;
     }
+  vtkPVProcessModule* pm = pvApp->GetProcessModule();
   // We had trouble with SGI/aliasing with compositing.
   if (this->RenderWindow->IsA("vtkOpenGLRenderWindow") &&
       (pvApp->GetProcessModule()->GetNumberOfPartitions() > 1))
     {
-    pvApp->BroadcastScript("%s SetMultiSamples 0", this->RenderWindowTclName);
+    pm->GetStream()
+      << vtkClientServerStream::Invoke
+      << this->RenderWindowID << "SetMultiSamples" << 0
+      << vtkClientServerStream::End;
+    pm->SendStreamToClientAndServer();
     }
 
   if (pvApp->GetClientMode() || pvApp->GetServerMode())
     {
     this->Composite = NULL;
-    pvApp->MakeTclObject("vtkClientCompositeManager", "CCompositeManager1");
+    this->CompositeID = pm->NewStreamObject("vtkClientCompositeManager");
     // Clean up this mess !!!!!!!!!!!!!
     // Even a cast to vtkPVClientServerModule would be better than this.
     // How can we syncronize the process modules and render modules?
-    pvApp->BroadcastScript("CCompositeManager1 SetClientController [$Application GetSocketController]");
-    pvApp->BroadcastScript("CCompositeManager1 SetClientFlag [$Application GetClientMode]");
-
-    this->CompositeTclName = NULL;
-    this->SetCompositeTclName("CCompositeManager1");    
+    pm->GetStream()
+      << vtkClientServerStream::Invoke << pm->GetApplicationID()
+      << "GetSocketController" << vtkClientServerStream::End;
+    pm->GetStream()
+      << vtkClientServerStream::Invoke << this->CompositeID
+      << "SetClientController" << vtkClientServerStream::LastResult
+      << vtkClientServerStream::End;
+    pm->GetStream()
+      << vtkClientServerStream::Invoke << pm->GetApplicationID()
+      << "GetClientMode" << vtkClientServerStream::End;
+    pm->GetStream()
+      << vtkClientServerStream::Invoke << this->CompositeID << "SetClientFlag"
+      << vtkClientServerStream::LastResult << vtkClientServerStream::End;
+    pm->SendStreamToClientAndServer();
     }
   else
     {
     // Create the compositer.
-    this->Composite = static_cast<vtkPVTreeComposite*>
-      (pvApp->MakeTclObject("vtkPVTreeComposite", "TreeComp1"));
+    this->CompositeID = pm->NewStreamObject("vtkPVTreeComposite");
+    pm->SendStreamToClientAndServer();
+    this->Composite = vtkPVTreeComposite::SafeDownCast(
+      pm->GetObjectFromID(this->CompositeID));
 
     //this->Composite->RemoveObservers(vtkCommand::AbortCheckEvent);
     //vtkCallbackCommand* abc = vtkCallbackCommand::New();
@@ -110,14 +127,15 @@ void vtkPVMPIRenderModule::SetPVApplication(vtkPVApplication *pvApp)
 
     // Try using a more efficient compositer (if it exists).
     // This should be a part of a module.
-    if (strcmp(pvApp->GetRenderModuleName(),"DeskTopRenderModule") != 0)
-      {
-      pvApp->BroadcastScript("if {[catch {vtkCompressCompositer pvTmp}] == 0} "
-                             "{TreeComp1 SetCompositer pvTmp; pvTmp Delete}");
-      }
-
-    this->CompositeTclName = NULL;
-    this->SetCompositeTclName("TreeComp1");
+    vtkClientServerID tmp = pm->NewStreamObject("vtkCompressCompositer");
+    pm->GetStream()
+      << vtkClientServerStream::Invoke
+      << this->CompositeID << "SetCompositer" << tmp
+      << vtkClientServerStream::End;
+    pm->GetStream()
+      << vtkClientServerStream::Delete << tmp
+      << vtkClientServerStream::End;
+    pm->SendStreamToClientAndServer();
 
     // If we are using SGI pipes, create a new Controller/Communicator/Group
     // to use for compositing.
@@ -126,49 +144,63 @@ void vtkPVMPIRenderModule::SetPVApplication(vtkPVApplication *pvApp)
       int numPipes = pvApp->GetNumberOfPipes();
       // I would like to create another controller with a subset of world, but...
       // For now, I added it as a hack to the composite manager.
-      pvApp->BroadcastScript("%s SetNumberOfProcesses %d",
-                             this->CompositeTclName, numPipes);
+      pm->GetStream()
+        << vtkClientServerStream::Invoke << this->CompositeID
+        << "SetNumberOfProcesses" << numPipes << vtkClientServerStream::End;
+      pm->SendStreamToClientAndServer();
       }
     }
 
-  pvApp->BroadcastScript("%s SetRenderWindow %s", this->CompositeTclName,
-                         this->RenderWindowTclName);
-  pvApp->BroadcastScript("%s InitializeRMIs", this->CompositeTclName);
-
-
+  pm->GetStream() 
+    << vtkClientServerStream::Invoke
+    <<  this->CompositeID 
+    << "SetRenderWindow"
+    << this->RenderWindowID
+    << vtkClientServerStream::End;
+  pm->GetStream()
+    << vtkClientServerStream::Invoke
+    << this->CompositeID << "InitializeRMIs" << vtkClientServerStream::End;
   if ( getenv("PV_DISABLE_COMPOSITE_INTERRUPTS") )
     {
-    pvApp->BroadcastScript("%s EnableAbortOff", this->CompositeTclName);
+    pm->GetStream()
+      << vtkClientServerStream::Invoke
+      << this->CompositeID << "EnableAbortOff" << vtkClientServerStream::End;
     }
-
   if ( pvApp->GetUseOffscreenRendering() )
     {
-    pvApp->BroadcastScript("%s InitializeOffScreen", this->CompositeTclName);
+    pm->GetStream()
+      << vtkClientServerStream::Invoke << this->CompositeID
+      << "InitializeOffScreen" << vtkClientServerStream::End;
     }
+  pm->SendStreamToClientAndServer();
 }
 
 //----------------------------------------------------------------------------
 void vtkPVMPIRenderModule::SetUseCompositeCompression(int val)
 {
-
-    vtkPVApplication *pvApp = this->GetPVApplication();
- if (strcmp(pvApp->GetRenderModuleName(),"DeskTopRenderModule") != 0)
-  {
-
-  if (this->CompositeTclName)
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  vtkPVProcessModule* pm = pvApp->GetProcessModule();
+  if (strcmp(pvApp->GetRenderModuleName(),"DeskTopRenderModule") != 0)
     {
-    if (val)
+    vtkClientServerID tmp;
+    if (this->CompositeID.ID)
       {
-      pvApp->BroadcastScript("vtkCompressCompositer pvTemp");
+      if (val)
+        {
+        tmp = pm->NewStreamObject("vtkCompressCompositer");
+        }
+      else
+        {
+        tmp = pm->NewStreamObject("vtkTreeCompositer");
+        }
+      pm->GetStream()
+        << vtkClientServerStream::Invoke
+        << this->CompositeID << "SetCompositer" << tmp
+        << vtkClientServerStream::End;
+      pm->DeleteStreamObject(tmp);
+      pm->SendStreamToClientAndServer();
       }
-    else
-      {
-      pvApp->BroadcastScript("vtkTreeCompositer pvTemp");
-      }
-    pvApp->BroadcastScript("%s SetCompositer pvTemp", this->CompositeTclName);
-    pvApp->BroadcastScript("pvTemp Delete");
     }
-   }
 }
 
 

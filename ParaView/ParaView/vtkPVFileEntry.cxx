@@ -64,7 +64,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVFileEntry);
-vtkCxxRevisionMacro(vtkPVFileEntry, "1.62");
+vtkCxxRevisionMacro(vtkPVFileEntry, "1.63");
 
 //----------------------------------------------------------------------------
 vtkPVFileEntry::vtkPVFileEntry()
@@ -442,7 +442,7 @@ void vtkPVFileEntry::SetValue(const char* fileName)
     sprintf(format, "%%s/%%s%%0%dd.%%s", ncnt);
     sprintf(secondformat, "%%s/%%s%%d.%%s");
     this->Entry->DeleteAllValues();
-    pm->GetDirectoryListing(path, dirs, files, "readable");
+    pm->GetDirectoryListing(path, dirs, files, 0);
     int cnt = 0;
     for ( cc = 0; cc < files->GetLength(); cc ++ )
       {
@@ -543,7 +543,7 @@ void vtkPVFileEntry::SetValue(const char* fileName)
     this->Timestep->SetValue(med);
     this->TimeStep = med;
     ostrstream str;
-    str << "set " << this->GetPVSource()->GetVTKSourceTclName() << "_files {";
+    str << "set pvTemp" << this->GetPVSource()->GetVTKSourceID() << "_files {";
     char* name = new char [ this->FileNameLength ];
     for ( cc = min; cc <= max; cc ++ )
       {
@@ -557,7 +557,7 @@ void vtkPVFileEntry::SetValue(const char* fileName)
     delete [] name;
     str << "}" << ends;
     //cout << str.str() << endl;
-    this->GetPVApplication()->GetProcessModule()->ServerScript(str.str());
+    this->Script(str.str());
     str.rdbuf()->freeze(0);
     }
 
@@ -587,15 +587,15 @@ void vtkPVFileEntry::Trace(ofstream *file)
 
 
 //----------------------------------------------------------------------------
-void vtkPVFileEntry::AcceptInternal(const char* sourceTclName)
+void vtkPVFileEntry::AcceptInternal(vtkClientServerID sourceID)
 {
   const char* fname = this->Entry->GetValue();
   char *cmd = new char[strlen(this->VariableName)+4];
   sprintf(cmd, "Set%s", this->VariableName);
   
   this->Property->SetString(fname);
+  this->Property->SetVTKSourceID(sourceID);
   this->Property->SetTimeStep(this->TimeStep);
-  this->Property->SetVTKSourceTclName(sourceTclName);
   this->Property->SetVTKCommand(cmd);
 
   delete[] cmd;
@@ -693,21 +693,24 @@ const char* vtkPVFileEntry::GetValue()
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVFileEntry::SaveInBatchScriptForPart(ofstream* file, const char* sourceTclName)
+void vtkPVFileEntry::SaveInBatchScriptForPart(ofstream* file,
+                                              vtkClientServerID sourceID)
 {
   if (this->Range[0] < this->Range[1])
     {
-    *file << "\tset " << sourceTclName << "_files {";
-    *file << this->Script("concat $%s_files", sourceTclName);
+    *file << "\tset " << "pvTemp" << sourceID << "_files {";
+    *file << this->Script("concat $pvTemp%d_files", sourceID.ID);
     *file << "}" << endl;
 
-    *file << "\t" << sourceTclName << " Set" << this->VariableName 
-          << " [ lindex $" << sourceTclName << "_files " << this->TimeStep 
+    *file << "\t" << "pvTemp" << sourceID << " Set" << this->VariableName 
+          << " [ lindex $" << "pvTemp" << sourceID << "_files " 
+          << this->TimeStep 
           << "]\n";
     }
   else
     {
-    *file << "\t" << sourceTclName << " Set" << this->VariableName << " {" 
+    *file << "\t" << "pvTemp" << sourceID
+          << " Set" << this->VariableName << " {" 
           << this->Entry->GetValue() << "}\n";
     }
 }

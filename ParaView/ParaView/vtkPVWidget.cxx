@@ -68,7 +68,7 @@ template class VTK_EXPORT vtkArrayMapIterator<vtkPVWidget*, vtkPVWidget*>;
 #endif
 
 //-----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkPVWidget, "1.40");
+vtkCxxRevisionMacro(vtkPVWidget, "1.41");
 
 //-----------------------------------------------------------------------------
 vtkPVWidget::vtkPVWidget()
@@ -141,7 +141,7 @@ void vtkPVWidget::Accept()
   num = this->PVSource->GetNumberOfVTKSources();
   for (idx = 0; idx < num; ++idx)
     {
-    this->AcceptInternal(this->PVSource->GetVTKSourceTclName(idx));
+    this->AcceptInternal(this->PVSource->GetVTKSourceID(idx));
     }
 
   // I put this after the accept internal, because
@@ -161,7 +161,7 @@ void vtkPVWidget::Accept()
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVWidget::AcceptInternal(const char*)
+void vtkPVWidget::AcceptInternal(vtkClientServerID)
 {
   // Suppress reset just allows the widget to set its own default value.
   // After accept is called, we want to enable the reset.
@@ -283,7 +283,7 @@ void vtkPVWidget::SaveInBatchScript(ofstream *file)
   for (sourceIdx = 0; sourceIdx < numSources; ++sourceIdx)
     {
     this->SaveInBatchScriptForPart(file, 
-                  this->PVSource->GetVTKSourceTclName(sourceIdx));
+                                   this->PVSource->GetVTKSourceID(sourceIdx));
     }
 }
 
@@ -294,7 +294,7 @@ void vtkPVWidget::SaveState(ofstream *file)
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVWidget::SaveInBatchScriptForPart(ofstream*, const char*)
+void vtkPVWidget::SaveInBatchScriptForPart(ofstream*, vtkClientServerID)
 {
   // Either SaveInBatchScript or SaveInBatchScriptForPart
   // must be defined.

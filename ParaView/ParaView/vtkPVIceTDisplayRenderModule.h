@@ -75,12 +75,9 @@ protected:
   vtkPVIceTDisplayRenderModule();
   ~vtkPVIceTDisplayRenderModule();
 
-  vtkSetStringMacro(CompositeTclName);
   vtkCompositeRenderManager* Composite;
-  char * CompositeTclName;
-
-  vtkSetStringMacro(DisplayManagerTclName);
-  char *DisplayManagerTclName;
+  vtkClientServerID CompositeID;
+  vtkClientServerID DisplayManagerID;
 
   int ReductionFactor;  
 

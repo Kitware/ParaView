@@ -36,12 +36,11 @@ proc decipadString { str before total } {
 set pvWindow [lindex [vtkPVWindow ListInstances] 0]
 
 set pvSphere [$pvWindow CreatePVSource SphereSource]
-[$pvSphere GetVTKSourceTclName 0] SetThetaResolution 16
+set pm [$Application GetProcessModule]
 $pvSphere UpdateParameterWidgets
 $pvSphere AcceptCallback
 
 set pvShrink [$pvWindow CreatePVSource ShrinkFilter]
-[$pvShrink GetVTKSourceTclName 0] SetShrinkFactor 0.9
 $pvShrink UpdateParameterWidgets
 $pvShrink AcceptCallback
 
@@ -60,8 +59,9 @@ if {[catch {set channel [open test.tmp w]}] == 0 } {
    source "[$Application GetTraceFileName]"
 }
 
-RenWin1 SetSize 250 250
-RenWin1 Render
+set RenWin1 [[[$Application GetMainWindow] GetMainView] GetRenderWindow]
+$RenWin1 SetSize 250 250
+$RenWin1 Render
 $Application Exit
 
 

@@ -21,7 +21,7 @@ modification, are permitted provided that the following conditions are met:
    and/or other materials provided with the distribution.
 
  * Neither the name of Kitware nor the names of any contributors may be used
-   to endorse or promote products derived from this software without specific 
+   to endorse or promote products derived from this software without specific
    prior written permission.
 
  * Modified source versions must be plainly marked as such, and must not be
@@ -56,33 +56,30 @@ public:
   static vtkPVNumberOfOutputsInformation* New();
   vtkTypeRevisionMacro(vtkPVNumberOfOutputsInformation, vtkPVInformation);
   void PrintSelf(ostream &os, vtkIndent indent);
-  
+
   // Description:
   // Get number of outputs for a particular source.
   vtkGetMacro(NumberOfOutputs, int);
-  
+
   // Description:
   // Transfer information about a single object into this object.
-  virtual void CopyFromObject(vtkObject *data);
-  virtual void CopyFromMessage(unsigned char *msg);
-  
-  // Description:
-  // Serialize message.
-  virtual int GetMessageLength() { return sizeof(int); }
-  virtual void WriteMessage(unsigned char *msg);
+  virtual void CopyFromObject(vtkObject*);
 
   // Description:
   // Merge another information object.
-  // This is not needed for this information object because the number of
-  // outputs will not change from one processor to another.
-  virtual void AddInformation(vtkPVInformation*) {};
-  
+  virtual void AddInformation(vtkPVInformation*);
+
+  // Description:
+  // Manage a serialized version of the information.
+  virtual void CopyToStream(vtkClientServerStream*) const;
+  virtual void CopyFromStream(const vtkClientServerStream*);
+
 protected:
   vtkPVNumberOfOutputsInformation();
   ~vtkPVNumberOfOutputsInformation();
-  
+
   int NumberOfOutputs;
-  
+  vtkSetMacro(NumberOfOutputs, int);
 private:
   vtkPVNumberOfOutputsInformation(const vtkPVNumberOfOutputsInformation&); // Not implemented
   void operator=(const vtkPVNumberOfOutputsInformation&); // Not implemented

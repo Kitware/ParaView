@@ -64,7 +64,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVEnSightMasterServerReader);
-vtkCxxRevisionMacro(vtkPVEnSightMasterServerReader, "1.13");
+vtkCxxRevisionMacro(vtkPVEnSightMasterServerReader, "1.14");
 
 vtkCxxSetObjectMacro(vtkPVEnSightMasterServerReader, Controller,
                      vtkMultiProcessController);
@@ -674,4 +674,21 @@ int vtkPVEnSightMasterServerReader::ParseMasterServerFile()
     }
   
   return VTK_OK;
+}
+
+//----------------------------------------------------------------------------
+int vtkPVEnSightMasterServerReader::CanReadFile(const char* fname)
+{
+  // We may have to read quite a few lines of the file to do this test
+  // for real.  Just check the extension.
+  size_t len = strlen(fname);
+  if((len >= 4) && (strcmp(fname+len-4, ".sos") == 0))
+    {
+    return 1;
+    }
+  else if((len >= 5) && (strcmp(fname+len-5, ".case") == 0))
+    {
+    return 1;
+    }
+  return 0;
 }

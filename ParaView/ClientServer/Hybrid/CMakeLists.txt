@@ -1,0 +1,2 @@
+SET(KIT_WRAP_DEPS Rendering)
+PV_WRAP_VTK_CS(Hybrid HYBRID "${KIT_WRAP_DEPS}")

@@ -57,21 +57,28 @@ SET(PROJECT_TESTS ArrayMenuChangeInput
 IF(RUN_WITH_MPI)
   FOREACH (tfile ${PROJECT_TESTS})
     ADD_TEST(${tfile}-MPI ${VTK_MPIRUN_EXE} ${VTK_MPI_PREFLAGS} ${PARAVIEW_EXECUTABLE}
-             --disable-registry
-             ${PARAVIEW_SOURCE_DIR}/${TEST_PATH}/Testing/Tcl/${tfile}.pvs
-               -D ${PARAVIEW_SOURCE_DIR}/Data 
-               -C ${PARAVIEW_SOURCE_DIR}/Widgets/Testing/Tcl/CompareImages.tcl
-               -V ${PARAVIEW_SOURCE_DIR}/Data/Baseline/${tfile}.png
-                  ${VTK_MPI_POSTFLAGS})
+      --disable-registry
+      ${PARAVIEW_SOURCE_DIR}/${TEST_PATH}/Testing/Tcl/${tfile}.pvs
+      -D ${PARAVIEW_SOURCE_DIR}/Data 
+      -C ${PARAVIEW_SOURCE_DIR}/Widgets/Testing/Tcl/CompareImages.tcl
+      -V ${PARAVIEW_SOURCE_DIR}/Data/Baseline/${tfile}.png
+      ${VTK_MPI_POSTFLAGS})
   ENDFOREACH(tfile)
 
 ENDIF(RUN_WITH_MPI)
 FOREACH (tfile ${PROJECT_TESTS})
   ADD_TEST(${tfile} ${PARAVIEW_EXECUTABLE} --disable-registry
-           ${PARAVIEW_SOURCE_DIR}/${TEST_PATH}/Testing/Tcl/${tfile}.pvs
-             -D ${PARAVIEW_SOURCE_DIR}/Data 
-             -C ${PARAVIEW_SOURCE_DIR}/Widgets/Testing/Tcl/CompareImages.tcl
-             -V ${PARAVIEW_SOURCE_DIR}/Data/Baseline/${tfile}.png)
+    ${PARAVIEW_SOURCE_DIR}/${TEST_PATH}/Testing/Tcl/${tfile}.pvs
+    -D ${PARAVIEW_SOURCE_DIR}/Data 
+    -C ${PARAVIEW_SOURCE_DIR}/Widgets/Testing/Tcl/CompareImages.tcl
+    -V ${PARAVIEW_SOURCE_DIR}/Data/Baseline/${tfile}.png)
+  # repeat the test with the client server driver
+  ADD_TEST("${tfile}ClientServer" ${PARAVIEW_CS_EXECUTABLE} 
+    --disable-registry
+    ${PARAVIEW_SOURCE_DIR}/${TEST_PATH}/Testing/Tcl/${tfile}.pvs
+    -D ${PARAVIEW_SOURCE_DIR}/Data 
+    -C ${PARAVIEW_SOURCE_DIR}/Widgets/Testing/Tcl/CompareImages.tcl
+    -V ${PARAVIEW_SOURCE_DIR}/Data/Baseline/${tfile}.png)
 ENDFOREACH (tfile)
 
 IF(VTK_PRINT_SELF_CHECK_TCL)

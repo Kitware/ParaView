@@ -63,7 +63,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVExtentEntry);
-vtkCxxRevisionMacro(vtkPVExtentEntry, "1.29");
+vtkCxxRevisionMacro(vtkPVExtentEntry, "1.30");
 
 vtkCxxSetObjectMacro(vtkPVExtentEntry, InputMenu, vtkPVInputMenu);
 
@@ -251,7 +251,7 @@ void vtkPVExtentEntry::Create(vtkKWApplication *pvApp)
 
 
 //-----------------------------------------------------------------------------
-void vtkPVExtentEntry::AcceptInternal(const char* sourceTclName)
+void vtkPVExtentEntry::AcceptInternal(vtkClientServerID sourceID)
 {
   float values[6];
   values[0] = this->MinMax[0]->GetMinValue();
@@ -261,7 +261,7 @@ void vtkPVExtentEntry::AcceptInternal(const char* sourceTclName)
   values[4] = this->MinMax[2]->GetMinValue();
   values[5] = this->MinMax[2]->GetMaxValue();
 
-  this->Property->SetVTKSourceTclName(sourceTclName);
+  this->Property->SetVTKSourceID(sourceID);
   this->Property->SetScalars(6, values);
   this->Property->AcceptInternal();
   
@@ -453,11 +453,18 @@ void vtkPVExtentEntry::AnimationMenuCallback(vtkPVAnimationInterfaceEntry *ai,
   // Now I can imagine that we will need a more flexible way of getting 
   // the whole extent from sources (in the future.
   vtkPVApplication *pvApp = this->GetPVApplication();
-  pvApp->GetProcessModule()->RootScript(
-    "[%s GetInput] GetWholeExtent", this->ObjectTclName);
-  const char *res = pvApp->GetProcessModule()->GetRootResult();
-  sscanf(res, "%d %d %d %d %d %d",
-         ext, ext+1, ext+2, ext+3, ext+4, ext+5);
+  vtkPVProcessModule* pm = pvApp->GetProcessModule();
+  pm->GetStream() << vtkClientServerStream::Invoke
+                  << this->ObjectID << "GetInput"
+                  << vtkClientServerStream::End
+                  << vtkClientServerStream::Invoke
+                  << vtkClientServerStream::LastResult << "GetWholeExtent"
+                  << vtkClientServerStream::End;
+  pm->SendStreamToServerRoot();
+  if(!pm->GetLastServerResult().GetArgument(0, 0, ext, 6))
+    {
+    vtkErrorMacro("Bad return value from GetWholeExtent");
+    }
 
   if (mode == 0)
     {

@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVWidget.h"
 
 vtkStandardNewMacro(vtkPVScalarListWidgetProperty);
-vtkCxxRevisionMacro(vtkPVScalarListWidgetProperty, "1.4");
+vtkCxxRevisionMacro(vtkPVScalarListWidgetProperty, "1.5");
 
 vtkPVScalarListWidgetProperty::vtkPVScalarListWidgetProperty()
 {
@@ -62,7 +62,7 @@ vtkPVScalarListWidgetProperty::~vtkPVScalarListWidgetProperty()
 {
   int i;
 
-  this->SetVTKSourceTclName(NULL);
+  this->VTKSourceID.ID = 0;
   for (i = 0; i < this->NumberOfCommands; i++)
     {
     delete [] this->VTKCommands[i];
@@ -147,16 +147,6 @@ void vtkPVScalarListWidgetProperty::AddScalar(float scalar)
   this->NumberOfScalars++;
 }
 
-void vtkPVScalarListWidgetProperty::SetScalar(int idx, float scalar)
-{
-  if (idx >= this->NumberOfScalars)
-    {
-    return;
-    }
-  
-  this->Scalars[idx] = scalar;
-}
-
 float vtkPVScalarListWidgetProperty::GetScalar(int idx)
 {
   if (idx >= this->NumberOfScalars)
@@ -169,21 +159,20 @@ float vtkPVScalarListWidgetProperty::GetScalar(int idx)
 void vtkPVScalarListWidgetProperty::AcceptInternal()
 {
   int i, j, count = 0;
-  ostrstream cmd;
+  vtkPVProcessModule* pm = this->Widget->GetPVApplication()->GetProcessModule();
+  
   for (i = 0; i < this->NumberOfCommands; i++)
     {
-    cmd << this->VTKSourceTclName << " " << this->VTKCommands[i];
+    pm->GetStream() 
+      << vtkClientServerStream::Invoke << this->VTKSourceID << this->VTKCommands[i];
     for (j = 0; j < this->NumberOfScalarsPerCommand[i]; j++)
       {
-      cmd << " " << this->Scalars[count];
+      pm->GetStream() << this->Scalars[count];
       count++;
       }
-    cmd << "; ";
+    pm->GetStream() << vtkClientServerStream::End;
     }
-  cmd << ends;
-  
-  this->Widget->GetPVApplication()->GetProcessModule()->ServerScript(cmd.str());
-  cmd.rdbuf()->freeze(0);
+  pm->SendStreamToServer();
 }
 
 void vtkPVScalarListWidgetProperty::SetAnimationTime(float time)

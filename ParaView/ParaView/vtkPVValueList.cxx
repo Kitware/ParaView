@@ -62,7 +62,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVValueList);
-vtkCxxRevisionMacro(vtkPVValueList, "1.6");
+vtkCxxRevisionMacro(vtkPVValueList, "1.7");
 
 int vtkPVValueListCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -562,16 +562,16 @@ void vtkPVValueList::RemoveAllValues()
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVValueList::AcceptInternal(const char* sourceTclName)
+void vtkPVValueList::AcceptInternal(vtkClientServerID sourceID)
 {
   int numContours;
 
-  if (sourceTclName == NULL)
+  if (sourceID.ID == 0)
     {
     return;
     }
 
-  this->Superclass::AcceptInternal(sourceTclName);
+  this->Superclass::AcceptInternal(sourceID);
   
   numContours = this->ContourValuesList->GetNumberOfItems();
 

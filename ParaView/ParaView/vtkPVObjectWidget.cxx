@@ -47,48 +47,52 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVSource.h"
 #include "vtkPVXMLElement.h"
 #include "vtkString.h"
+#include "vtkPVProcessModule.h"
+#include <vtkstd/string>
 
-vtkCxxRevisionMacro(vtkPVObjectWidget, "1.12");
+vtkCxxRevisionMacro(vtkPVObjectWidget, "1.13");
 
 //----------------------------------------------------------------------------
 vtkPVObjectWidget::vtkPVObjectWidget()
 {
-  this->ObjectTclName = NULL;
+  this->ObjectID.ID = 0;
   this->VariableName = NULL;
 }
 
 //----------------------------------------------------------------------------
 vtkPVObjectWidget::~vtkPVObjectWidget()
 {
-  this->SetObjectTclName(NULL);
   this->SetVariableName(NULL);
 }
 
-//----------------------------------------------------------------------------
-void vtkPVObjectWidget::SetObjectVariable(const char* objName, 
-                                          const char* varName)
-{
-  this->SetObjectTclName(objName);
-  this->SetVariableName(varName);
-}
 
 //----------------------------------------------------------------------------
 void vtkPVObjectWidget::SaveInBatchScriptForPart(ofstream *file,
-                                                 const char* sourceTclName)
+                                                 vtkClientServerID sourceID)
 {
-  char *result;
-  
-  if (sourceTclName == NULL || this->VariableName == NULL)
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  vtkPVProcessModule* pm = pvApp->GetProcessModule(); 
+ 
+  if (sourceID.ID == 0 || this->VariableName == NULL)
     {
-    vtkErrorMacro(<< this->GetClassName() << " must not have SaveInBatchScript method.");
+    vtkErrorMacro(<< this->GetClassName()
+                  << " must not have SaveInBatchScript method.");
     return;
     } 
 
-  *file << "\t" << sourceTclName << " Set" << this->VariableName;
-  this->Script("set tempValue [%s Get%s]", 
-               this->ObjectTclName, this->VariableName);
-  result = this->Application->GetMainInterp()->result;
-  *file << " " << result << "\n";
+  *file << "\t" << "pvTemp" << sourceID << " Set" << this->VariableName;
+  ostrstream str;
+  str << "Get" << this->VariableName << ends;
+  pm->GetStream() << vtkClientServerStream::Invoke << this->ObjectID
+                  << str.str() 
+                  << vtkClientServerStream::End;
+  pm->SendStreamToClient();
+  ostrstream result;
+  pm->GetLastClientResult().PrintArgumentValue(result, 0,0);
+  result << ends;
+  *file << " " << result.str() << "\n";
+  delete [] result.str();
+  delete [] str.str();
 }
 
 //----------------------------------------------------------------------------
@@ -109,7 +113,7 @@ void vtkPVObjectWidget::CopyProperties(vtkPVWidget* clone,
   if (pvow)
     {
     pvow->SetVariableName(this->VariableName);
-    pvow->SetObjectTclName(pvSource->GetVTKSourceTclName());
+    pvow->SetObjectID(pvSource->GetVTKSourceID());
     }
   else 
     {
@@ -135,7 +139,7 @@ int vtkPVObjectWidget::ReadXMLAttributes(vtkPVXMLElement* element,
 void vtkPVObjectWidget::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-  os << "ObjectTclName: " << (this->ObjectTclName?this->ObjectTclName:"none")
+  os << "ObjectID: " << (this->ObjectID.ID)
      << endl;
   os << "VariableName: " << (this->VariableName?this->VariableName:"none") 
      << endl;

@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVWidget.h"
 
 vtkStandardNewMacro(vtkPVIndexWidgetProperty);
-vtkCxxRevisionMacro(vtkPVIndexWidgetProperty, "1.2");
+vtkCxxRevisionMacro(vtkPVIndexWidgetProperty, "1.3");
 
 vtkPVIndexWidgetProperty::vtkPVIndexWidgetProperty()
 {
@@ -61,9 +61,11 @@ vtkPVIndexWidgetProperty::~vtkPVIndexWidgetProperty()
 }
 
 void vtkPVIndexWidgetProperty::AcceptInternal()
-{
-  this->Widget->GetPVApplication()->GetProcessModule()->ServerScript(
-    "%s %s %d", this->VTKSourceTclName, this->VTKCommand, this->Index);
+{ 
+  vtkPVProcessModule* pm = this->Widget->GetPVApplication()->GetProcessModule();
+  pm->GetStream() << vtkClientServerStream::Invoke << this->VTKSourceID
+                    << this->VTKCommand << this->Index << vtkClientServerStream::End;
+  pm->SendStreamToServer();
 }
 
 void vtkPVIndexWidgetProperty::PrintSelf(ostream &os, vtkIndent indent)

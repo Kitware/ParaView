@@ -50,15 +50,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVApplication.h"
 #include "vtkPVData.h"
 #include "vtkPVDataInformation.h"
+#include "vtkPVGenericRenderWindowInteractor.h"
 #include "vtkPVPart.h"
 #include "vtkPVProcessModule.h"
-#include "vtkPVGenericRenderWindowInteractor.h"
 #include "vtkPVSource.h"
 #include "vtkPVWindow.h"
 #include "vtkPVXMLElement.h"
+#include "vtkPVProcessModule.h"
 
 vtkStandardNewMacro(vtkPVLineWidget);
-vtkCxxRevisionMacro(vtkPVLineWidget, "1.41");
+vtkCxxRevisionMacro(vtkPVLineWidget, "1.42");
 
 //----------------------------------------------------------------------------
 vtkPVLineWidget::vtkPVLineWidget()
@@ -167,12 +168,14 @@ void vtkPVLineWidget::SetPoint1Internal(float x, float y, float z)
     {
     pos[i] = this->Point1[i]->GetValueAsFloat();
     }
-
-  this->GetPVApplication()->BroadcastScript(
-    "%s SetPoint1 %f %f %f; %s SetAlignToNone",
-    this->Widget3DTclName, 
-    pos[0], pos[1], pos[2],
-    this->Widget3DTclName);
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  vtkPVProcessModule* pm = pvApp->GetProcessModule();
+  pm->GetStream() << vtkClientServerStream::Invoke <<  this->Widget3DID
+                  << "SetPoint1" << pos[0] << pos[1] <<  pos[2]
+                  << vtkClientServerStream::End;
+  pm->GetStream() << vtkClientServerStream::Invoke <<  this->Widget3DID
+                  << "SetAlignToNone" <<  vtkClientServerStream::End;
+  pm->SendStreamToClientAndServer();
   this->Render();
 }
 
@@ -210,11 +213,14 @@ void vtkPVLineWidget::SetPoint2Internal(float x, float y, float z)
     pos[i] = this->Point2[i]->GetValueAsFloat();
     }
 
-  this->GetPVApplication()->BroadcastScript(
-    "%s SetPoint2 %f %f %f; %s SetAlignToNone",
-    this->Widget3DTclName, 
-    pos[0], pos[1], pos[2],
-    this->Widget3DTclName);
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  vtkPVProcessModule* pm = pvApp->GetProcessModule();
+  pm->GetStream() << vtkClientServerStream::Invoke <<  this->Widget3DID
+                  << "SetPoint2" << pos[0] << pos[1] <<  pos[2]
+                  << vtkClientServerStream::End;
+  pm->GetStream() << vtkClientServerStream::Invoke <<  this->Widget3DID
+                  << "SetAlignToNone" <<  vtkClientServerStream::End;
+  pm->SendStreamToClientAndServer();
   this->Render();
 }
 
@@ -284,9 +290,13 @@ void vtkPVLineWidget::SetResolution(int i)
   if ( !this->GetPVApplication() )
     {
     return;
-    }
-  this->GetPVApplication()->BroadcastScript(
-    "%s SetResolution %d", this->Widget3DTclName, res);
+    } 
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  vtkPVProcessModule* pm = pvApp->GetProcessModule();
+  pm->GetStream() << vtkClientServerStream::Invoke <<  this->Widget3DID
+                  << "SetResolution" << res
+                  << vtkClientServerStream::End;
+  pm->SendStreamToClientAndServer();
   this->Render();
 }
 
@@ -335,15 +345,15 @@ void vtkPVLineWidget::Trace(ofstream *file)
         << this->ResolutionEntry->GetValue() << endl;
 }
 //----------------------------------------------------------------------------
-void vtkPVLineWidget::AcceptInternal(const char* sourceTclName)
+void vtkPVLineWidget::AcceptInternal(vtkClientServerID sourceID)
 {
-  this->UpdateVTKObject(sourceTclName);
-  this->Superclass::AcceptInternal(sourceTclName);
+  this->UpdateVTKObject(sourceID);
+  this->Superclass::AcceptInternal(sourceID);
 }
 
 
 //----------------------------------------------------------------------------
-void vtkPVLineWidget::UpdateVTKObject(const char* sourceTclName)
+void vtkPVLineWidget::UpdateVTKObject(vtkClientServerID sourceID)
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
 
@@ -361,32 +371,35 @@ void vtkPVLineWidget::UpdateVTKObject(const char* sourceTclName)
                               this->Point2[1]->GetValueAsFloat(),
                               this->Point2[2]->GetValueAsFloat());
   this->SetLastAcceptedResolution(this->ResolutionEntry->GetValueAsFloat());
-  
+  vtkPVProcessModule* pm = pvApp->GetProcessModule();
   char acceptCmd[1024];
-  if ( this->Point1Variable && sourceTclName )    {    
-    sprintf(acceptCmd, "%s Set%s %f %f %f", sourceTclName, 
-            this->Point1Variable,
-            this->Point1[0]->GetValueAsFloat(),
-            this->Point1[1]->GetValueAsFloat(),
-            this->Point1[2]->GetValueAsFloat());
-    pvApp->GetProcessModule()->ServerScript(acceptCmd);
-    }
-  if ( this->Point2Variable && sourceTclName )
+  if ( this->Point1Variable && sourceID.ID )    
     {
-    sprintf(acceptCmd, "%s Set%s %f %f %f", sourceTclName, 
-            this->Point2Variable,
-            this->Point2[0]->GetValueAsFloat(),
-            this->Point2[1]->GetValueAsFloat(),
-            this->Point2[2]->GetValueAsFloat());
-    pvApp->GetProcessModule()->ServerScript(acceptCmd);
+    sprintf(acceptCmd, "Set%s", this->Point1Variable);
+    pm->GetStream() << vtkClientServerStream::Invoke << sourceID
+                    << acceptCmd << this->Point1[0]->GetValueAsFloat()
+                    << this->Point1[1]->GetValueAsFloat()
+                    << this->Point1[2]->GetValueAsFloat()
+                    << vtkClientServerStream::End;
     }
-  if ( this->ResolutionVariable && sourceTclName )
+  if ( this->Point2Variable && sourceID.ID )
     {
-    sprintf(acceptCmd, "%s Set%s %i", sourceTclName, 
-            this->ResolutionVariable,
-            this->ResolutionEntry->GetValueAsInt());
-    pvApp->GetProcessModule()->ServerScript(acceptCmd);
+    sprintf(acceptCmd, "Set%s", this->Point2Variable);
+    pm->GetStream() << vtkClientServerStream::Invoke << sourceID
+                    << acceptCmd << this->Point2[0]->GetValueAsFloat()
+                    << this->Point2[1]->GetValueAsFloat()
+                    << this->Point2[2]->GetValueAsFloat()
+                    << vtkClientServerStream::End;
     }
+  if ( this->ResolutionVariable && sourceID.ID )
+    {
+    sprintf(acceptCmd, "Set%s", this->ResolutionVariable);
+    pm->GetStream() << vtkClientServerStream::Invoke << sourceID
+                    << acceptCmd
+                    << this->ResolutionEntry->GetValueAsInt()
+                    << vtkClientServerStream::End;
+    }
+  pm->SendStreamToServer();
 }
 
 //----------------------------------------------------------------------------
@@ -413,48 +426,74 @@ void vtkPVLineWidget::ActualPlaceWidget()
     bds[0] = bds[2] = bds[4] = 0.0;
     bds[1] = bds[3] = bds[5] = 1.0;
     }
-
-  this->GetPVApplication()->BroadcastScript(
-    "%s PlaceWidget %f %f %f %f %f %f", this->Widget3DTclName,
-    bds[0], bds[1], bds[2], bds[3], bds[4], bds[5]);
-
-  this->UpdateVTKObject(this->ObjectTclName);
+  
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  vtkPVProcessModule* pm = pvApp->GetProcessModule();
+  pm->GetStream() << vtkClientServerStream::Invoke <<  this->Widget3DID
+                  << "PlaceWidget" 
+                  <<  bds[0] << bds[1] << bds[2] << bds[3] << bds[4] << bds[5] 
+                  << vtkClientServerStream::End;
+  pm->SendStreamToClientAndServer();
+  this->UpdateVTKObject(this->ObjectID);
 }
 
 //----------------------------------------------------------------------------
 void vtkPVLineWidget::SaveInBatchScriptForPart(ofstream *file,
-                                               const char* sourceTclName)
+                                               vtkClientServerID sourceID)
 {
-  char *result;
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  vtkPVProcessModule* pm = pvApp->GetProcessModule();
 
   // Point1
   if (this->Point1Variable)
     {  
-    *file << "\t" << sourceTclName << " Set" << this->Point1Variable;
-    this->Script("set tempValue [%s Get%s]", 
-                 sourceTclName, this->Point1Variable);
-    result = this->Application->GetMainInterp()->result;
-    *file << " " << result << "\n";
+    *file << "\t" << "pvTemp" << sourceID << " Set" << this->Point1Variable;
+    ostrstream str;
+    str << "Get" << this->Point1Variable << ends;
+    pm->GetStream() << vtkClientServerStream::Invoke << sourceID
+                    << str.str()
+                    << vtkClientServerStream::End; 
+    ostrstream result;
+    pm->GetLastClientResult().PrintArgumentValue(result, 0,0);
+    result << ends;
+    *file << " " << result.str() << "\n"; 
+    delete [] result.str();
+    delete [] str.str();
     }
-
   // Point2
   if (this->Point2Variable)
     {
-    *file << "\t" << sourceTclName << " Set" << this->Point2Variable;
-    this->Script("set tempValue [%s Get%s]", 
-                 sourceTclName, this->Point2Variable);
-    result = this->Application->GetMainInterp()->result;
-    *file << " " << result << "\n";
+    *file << "\t" << "pvTemp" << sourceID << " Set" << this->Point2Variable; 
+    ostrstream str;
+    str << "Get" << this->Point2Variable << ends;
+    pm->GetStream() << vtkClientServerStream::Invoke << sourceID
+                    << str.str()
+                    << vtkClientServerStream::End; 
+    pm->SendStreamToClient();
+    ostrstream result;
+    pm->GetLastClientResult().PrintArgumentValue(result, 0,0);
+    result << ends;
+    *file << " " << result.str() << "\n";
+    delete [] result.str();
+    delete [] str.str();
     }
 
   // Resolution
   if (this->ResolutionVariable)
     {
-    *file << "\t" << sourceTclName << " Set" << this->ResolutionVariable;
-    this->Script("set tempValue [%s Get%s]", 
-                 sourceTclName, this->ResolutionVariable);
-    result = this->Application->GetMainInterp()->result;
-    *file << " " << result << "\n";
+    *file << "\t" << "pvTemp" << sourceID << " Set" << this->ResolutionVariable;
+    ostrstream str;
+    str << "Get" << this->ResolutionVariable << ends;
+    pm->GetStream() << vtkClientServerStream::Invoke << sourceID
+                    << str.str()
+                    << vtkClientServerStream::End; 
+    pm->SendStreamToClient();
+    ostrstream result;
+    pm->GetLastClientResult().PrintArgumentValue(result, 0,0); 
+    result << ends;
+   *file << " " << result.str() << "\n";
+    delete [] result.str();
+    delete [] str.str();
     }
 }
 
@@ -577,17 +616,22 @@ void vtkPVLineWidget::ExecuteEvent(vtkObject* wdg, unsigned long l, void* p)
     {
     this->Point1[i]->SetValue(val[i]);
     }
-  this->GetPVApplication()->BroadcastScript(
-    "%s SetPoint1 %f %f %f", this->Widget3DTclName, val[0], val[1], val[2]);
+  
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  vtkPVProcessModule* pm = pvApp->GetProcessModule();
+  pm->GetStream() << vtkClientServerStream::Invoke <<  this->Widget3DID
+                  << "SetPoint1" << val[0] << val[1] <<  val[2]
+                  << vtkClientServerStream::End;
   
   widget->GetPoint2(val);
   for (i=0; i<3; i++)
     {
-    this->Point2[i]->SetValue(val[i]);
-    }
-  this->GetPVApplication()->BroadcastScript(
-    "%s SetPoint2 %f %f %f", this->Widget3DTclName, val[0], val[1], val[2]);
-  
+    this->Point2[i]->SetValue(val[i],5);
+    } 
+  pm->GetStream() << vtkClientServerStream::Invoke <<  this->Widget3DID
+                  << "SetPoint2" << val[0] << val[1] <<  val[2]
+                  << vtkClientServerStream::End;
+  pm->SendStreamToClientAndServer();
   this->Superclass::ExecuteEvent(wdg, l, p);
 }
 
@@ -639,22 +683,17 @@ void vtkPVLineWidget::SetBalloonHelpString(const char *str)
 //----------------------------------------------------------------------------
 void vtkPVLineWidget::ChildCreate(vtkPVApplication* pvApp)
 {
-  char tclName[256];
-  static int instanceCount = 0;
-
   if ((this->TraceNameState == vtkPVWidget::Uninitialized ||
        this->TraceNameState == vtkPVWidget::Default) )
     {
     this->SetTraceName("Line");
     this->SetTraceNameState(vtkPVWidget::SelfInitialized);
     }
-
-  ++instanceCount;
-  sprintf(tclName, "pvLineWidget%d", instanceCount);
-  this->SetWidget3DTclName(tclName);
-  pvApp->BroadcastScript("vtkLineWidget %s", tclName);
-  pvApp->BroadcastScript("%s SetAlignToNone", tclName);
-
+  vtkPVProcessModule* pm = pvApp->GetProcessModule();
+  this->Widget3DID = pm->NewStreamObject("vtkLineWidget");
+  pm->GetStream() << vtkClientServerStream::Invoke <<  this->Widget3DID
+                  << "SetAlignToNone" << vtkClientServerStream::End;
+  pm->SendStreamToClientAndServer();
   this->SetFrameLabel("Line Widget");
   this->Labels[0]->SetParent(this->Frame->GetFrame());
   this->Labels[0]->Create(pvApp, "");

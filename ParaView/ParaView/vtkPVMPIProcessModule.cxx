@@ -21,7 +21,7 @@ modification, are permitted provided that the following conditions are met:
    and/or other materials provided with the distribution.
 
  * Neither the name of Kitware nor the names of any contributors may be used
-   to endorse or promote products derived from this software without specific 
+   to endorse or promote products derived from this software without specific
    prior written permission.
 
  * Modified source versions must be plainly marked as such, and must not be
@@ -43,6 +43,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkObjectFactory.h"
 #include "vtkInstantiator.h"
 
+#include "vtkClientServerStream.h"
 #include "vtkToolkits.h"
 #include "vtkPVConfig.h"
 #include "vtkMultiProcessController.h"
@@ -68,11 +69,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVPart.h"
 #include "vtkPVPartDisplay.h"
 #include "vtkPVInformation.h"
+#include "vtkClientServerStream.h"
+#include "vtkClientServerInterpreter.h"
 
+#define VTK_PV_SLAVE_CLIENTSERVER_RMI_TAG 397529
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVMPIProcessModule);
-vtkCxxRevisionMacro(vtkPVMPIProcessModule, "1.18");
+vtkCxxRevisionMacro(vtkPVMPIProcessModule, "1.19");
 
 int vtkPVMPIProcessModuleCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -84,14 +88,27 @@ vtkMultiProcessController *VTK_PV_UI_CONTROLLER = NULL;
 
 
 //----------------------------------------------------------------------------
-void vtkPVSlaveScript(void *localArg, void *remoteArg, 
+void vtkPVSlaveScript(void *localArg, void *remoteArg,
                       int vtkNotUsed(remoteArgLength),
                       int vtkNotUsed(remoteProcessId))
 {
   vtkPVApplication *self = (vtkPVApplication *)(localArg);
 
-  //cerr << " ++++ SlaveScript: " << ((char*)remoteArg) << endl;  
+  //cerr << " ++++ SlaveScript: " << ((char*)remoteArg) << endl;
   self->SimpleScript((char*)remoteArg);
+}
+
+
+//----------------------------------------------------------------------------
+void vtkPVSendStreamToServerNodeRMI(void *localArg, void *remoteArg,
+                                    int remoteArgLength,
+                                    int vtkNotUsed(remoteProcessId))
+{
+  vtkPVMPIProcessModule* self =
+    reinterpret_cast<vtkPVMPIProcessModule*>(localArg);
+  self->GetInterpreter()
+    ->ProcessStream(reinterpret_cast<unsigned char*>(remoteArg),
+                    remoteArgLength);
 }
 
 
@@ -120,6 +137,12 @@ vtkPVMPIProcessModule::~vtkPVMPIProcessModule()
   this->ReturnValue = 0;
 }
 
+//----------------------------------------------------------------------------
+void vtkPVMPIProcessModule::PrintSelf(ostream& os, vtkIndent indent)
+{
+  this->Superclass::PrintSelf(os,indent);
+  os << indent << "Controller: " << this->Controller << endl;;
+}
 
 //----------------------------------------------------------------------------
 // Each process starts with this method.  One process is designated as
@@ -137,7 +160,7 @@ void vtkPVMPIProcessModuleInit(
 void vtkPVMPIProcessModule::Initialize()
 {
   int myId, numProcs;
-  
+
   myId = this->Controller->GetLocalProcessId();
   numProcs = this->Controller->GetNumberOfProcesses();
 
@@ -150,9 +173,9 @@ void vtkPVMPIProcessModule::Initialize()
     vtkPVApplication *pvApp = this->GetPVApplication();
     // This is for the SGI pipes option.
     pvApp->SetNumberOfPipes(numProcs);
-    
+
 #ifdef PV_HAVE_TRAPS_FOR_SIGNALS
-    pvApp->SetupTrapsForSignals(myId);   
+    pvApp->SetupTrapsForSignals(myId);
 #endif // PV_HAVE_TRAPS_FOR_SIGNALS
 
     if (pvApp->GetStartGUI())
@@ -169,12 +192,13 @@ void vtkPVMPIProcessModule::Initialize()
   else
     {
     vtkPVApplication *pvApp = this->GetPVApplication();
-    this->Controller->AddRMI(vtkPVSlaveScript, (void *)(pvApp), 
+    this->Controller->AddRMI(vtkPVSlaveScript, (void *)(pvApp),
                              VTK_PV_SLAVE_SCRIPT_RMI_TAG);
+    this->Controller->AddRMI(vtkPVSendStreamToServerNodeRMI, this,
+                             VTK_PV_SLAVE_CLIENTSERVER_RMI_TAG);
     this->Controller->ProcessRMIs();
     }
 }
-
 
 //----------------------------------------------------------------------------
 int vtkPVMPIProcessModule::Start(int argc, char **argv)
@@ -191,13 +215,15 @@ int vtkPVMPIProcessModule::Start(int argc, char **argv)
     }
   this->ArgumentCount = argc;
   this->Arguments = argv;
- 
+
+  this->Interpreter->SetLogFile("pvClient.out");
+
   // Go through the motions.
   // This indirection is not really necessary and is just to mimick the
   // threaded controller.
   this->Controller->SetSingleMethod(vtkPVMPIProcessModuleInit,(void*)(this));
   this->Controller->SingleMethodExecute();
-  
+
   this->Controller->Finalize();
 
   return this->ReturnValue;
@@ -208,7 +234,7 @@ int vtkPVMPIProcessModule::Start(int argc, char **argv)
 void vtkPVMPIProcessModule::Exit()
 {
   int id, myId, num;
-  
+
   // Send a break RMI to each of the slaves.
   num = this->Controller->GetNumberOfProcesses();
   myId = this->Controller->GetLocalProcessId();
@@ -216,7 +242,7 @@ void vtkPVMPIProcessModule::Exit()
     {
     if (id != myId)
       {
-      this->Controller->TriggerRMI(id, 
+      this->Controller->TriggerRMI(id,
                                    vtkMultiProcessController::BREAK_RMI_TAG);
       }
     }
@@ -237,7 +263,7 @@ int vtkPVMPIProcessModule::GetPartitionId()
 void vtkPVMPIProcessModule::BroadcastSimpleScript(const char *str)
 {
   int id, num;
-    
+
   if (this->Application == NULL)
     {
     vtkErrorMacro("Missing application object.");
@@ -256,7 +282,7 @@ void vtkPVMPIProcessModule::BroadcastSimpleScript(const char *str)
     {
     this->RemoteSimpleScript(id, str);
     }
-  
+
   // Do reverse order, because 0 will block.
   this->Application->SimpleScript(str);
 }
@@ -266,7 +292,7 @@ void vtkPVMPIProcessModule::BroadcastSimpleScript(const char *str)
 void vtkPVMPIProcessModule::RemoteSimpleScript(int remoteId, const char *str)
 {
   int length;
-  
+
   if (this->Application == NULL)
     {
     vtkErrorMacro("Missing application object.");
@@ -285,12 +311,75 @@ void vtkPVMPIProcessModule::RemoteSimpleScript(int remoteId, const char *str)
     this->Application->SimpleScript(str);
     return;
     }
-  
-  this->Controller->TriggerRMI(remoteId, const_cast<char*>(str), 
+
+  this->Controller->TriggerRMI(remoteId, const_cast<char*>(str),
                                VTK_PV_SLAVE_SCRIPT_RMI_TAG);
 }
 
+//----------------------------------------------------------------------------
+void vtkPVMPIProcessModule::SendStreamToClient()
+{
+  this->Interpreter->ProcessStream(*this->ClientServerStream);
+  this->ClientServerStream->Reset();
+}
 
+//----------------------------------------------------------------------------
+void vtkPVMPIProcessModule::SendStreamToServer()
+{
+  this->SendStreamToServerInternal();
+  this->ClientServerStream->Reset();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVMPIProcessModule::SendStreamToServerRoot()
+{
+  this->Interpreter->ProcessStream(*this->ClientServerStream);
+  this->ClientServerStream->Reset();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVMPIProcessModule::SendStreamToClientAndServer()
+{
+  this->SendStreamToServer();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVMPIProcessModule::SendStreamToClientAndServerRoot()
+{
+  this->SendStreamToServerRoot();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVMPIProcessModule::SendStreamToServerInternal()
+{
+  // First send the command to the other server nodes.
+  int numPartitions = this->GetNumberOfPartitions();
+  for(int i=1; i < numPartitions; ++i)
+    {
+    this->SendStreamToServerNodeInternal(i);
+    }
+
+  // Now process the stream locally.
+  this->Interpreter->ProcessStream(*this->ClientServerStream);
+}
+
+//----------------------------------------------------------------------------
+void
+vtkPVMPIProcessModule::SendStreamToServerNodeInternal(int remoteId)
+{
+  if(remoteId == this->Controller->GetLocalProcessId())
+    {
+    this->Interpreter->ProcessStream(*this->ClientServerStream);
+    }
+  else
+    {
+    const unsigned char* data;
+    size_t length;
+    this->ClientServerStream->GetData(&data, &length);
+    this->Controller->TriggerRMI(remoteId, (void*)data, length,
+                                 VTK_PV_SLAVE_CLIENTSERVER_RMI_TAG);
+    }
+}
 
 //----------------------------------------------------------------------------
 int vtkPVMPIProcessModule::GetNumberOfPartitions()
@@ -306,16 +395,16 @@ int vtkPVMPIProcessModule::GetNumberOfPartitions()
 
 //----------------------------------------------------------------------------
 // This method is broadcast to all processes.
-void vtkPVMPIProcessModule::GatherInformationInternal(char* infoClassName, 
-                                                      vtkObject *object)
+void
+vtkPVMPIProcessModule::GatherInformationInternal(const char* infoClassName,
+                                                 vtkObject *object)
 {
-  int msgLength;
-  unsigned char* msg;
+  vtkClientServerStream css;
   int myId = this->Controller->GetLocalProcessId();
 
   if (object == NULL)
     {
-    vtkErrorMacro("Object tcl name must be wrong.");
+    vtkErrorMacro("Object id must be wrong.");
     return;
     }
 
@@ -330,48 +419,89 @@ void vtkPVMPIProcessModule::GatherInformationInternal(char* infoClassName,
     return;
     }
   o = NULL;
-  
-  if (myId != 0 && !tmpInfo->GetRootOnly())
+
+  if(myId != 0)
     {
+    if(tmpInfo->GetRootOnly())
+      {
+      // Root-only and we are not the root.  Do nothing.
+      tmpInfo->Delete();
+      return;
+      }
     tmpInfo->CopyFromObject(object);
-    msgLength = tmpInfo->GetMessageLength();
-    msg = new unsigned char[msgLength];
-    tmpInfo->WriteMessage(msg);
-    this->Controller->Send(&msgLength, 1, 0, 498798);
-    this->Controller->Send(msg, msgLength, 0, 498799);
-    delete [] msg;
-    msg = NULL;
+    tmpInfo->CopyToStream(&css);
+    size_t length;
+    const unsigned char* data;
+    css.GetData(&data, &length);
+    int len = static_cast<int>(length);
+    this->Controller->Send(&len, 1, 0, 498798);
+    this->Controller->Send(const_cast<unsigned char*>(data), len, 0, 498799);
     tmpInfo->Delete();
-    tmpInfo = NULL;
     return;
     }
 
-  // Node 0.
-  int numProcs = this->Controller->GetNumberOfProcesses();
-  int idx;
+  // This is node 0.  First get our own information.
   this->TemporaryInformation->CopyFromObject(object);
-  if (!tmpInfo->GetRootOnly())
+
+  if(!tmpInfo->GetRootOnly())
     {
-    for (idx = 1; idx < numProcs; ++idx)
+    // Merge information from other nodes.
+    int numProcs = this->Controller->GetNumberOfProcesses();
+    for(int idx = 1; idx < numProcs; ++idx)
       {
-      this->Controller->Receive(&msgLength, 1, idx, 498798);
-      msg = new unsigned char[msgLength];
-      this->Controller->Receive(msg, msgLength, idx, 498799);
-      tmpInfo->CopyFromMessage(msg);
+      int length;
+      this->Controller->Receive(&length, 1, idx, 498798);
+      unsigned char* data = new unsigned char[length];
+      this->Controller->Receive(data, length, idx, 498799);
+      css.SetData(data, length);
+      tmpInfo->CopyFromStream(&css);
       this->TemporaryInformation->AddInformation(tmpInfo);
-      delete [] msg;
-      msg = NULL;
+      delete [] data;
       }
     }
   tmpInfo->Delete();
-  tmpInfo = NULL;
-}    
-
-
+}
 
 //----------------------------------------------------------------------------
-void vtkPVMPIProcessModule::PrintSelf(ostream& os, vtkIndent indent)
+#ifdef VTK_USE_MPI
+int vtkPVMPIProcessModule::LoadModuleInternal(const char* name)
 {
-  this->Superclass::PrintSelf(os,indent);
-  os << indent << "Controller: " << this->Controller << endl;;
+  // Make sure we have a communicator.
+  vtkMPICommunicator* communicator = vtkMPICommunicator::SafeDownCast(
+    this->Controller->GetCommunicator());
+  if(!communicator)
+    {
+    return 0;
+    }
+
+  // Try to load the module on the local process.
+  int localResult = this->Interpreter->Load(name);
+
+  // Gather load results to process 0.
+  int numProcs = this->Controller->GetNumberOfProcesses();
+  int myid = this->Controller->GetLocalProcessId();
+  int* results = new int[numProcs];
+  communicator->Gather(&localResult, results, numProcs, 0);
+
+  int globalResult = 1;
+  if(myid == 0)
+    {
+    for(int i=0; i < numProcs; ++i)
+      {
+      if(!results[i])
+        {
+        globalResult = 0;
+        }
+      }
+    }
+
+  delete [] results;
+
+  return globalResult;
 }
+#else
+int vtkPVMPIProcessModule::LoadModuleInternal(const char* name)
+{
+  return this->Superclass::LoadModuleInternal(name);
+}
+#endif
