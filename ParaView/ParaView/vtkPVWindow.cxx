@@ -111,7 +111,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.349");
+vtkCxxRevisionMacro(vtkPVWindow, "1.350");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -1724,6 +1724,8 @@ void vtkPVWindow::AddPreferencesProperties()
     ("pack %s %s -side top -anchor w -expand yes -fill x -padx 2 -pady 2",
      this->ToolbarSettingsFrame->GetWidgetName(),
      pack_before.str());
+  pack_before.rdbuf()->freeze(0);
+
 }
 
 void vtkPVWindow::OnToolbarSettingsChange()
@@ -3550,7 +3552,7 @@ void vtkPVWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVWindow ";
-  this->ExtractRevision(os,"$Revision: 1.349 $");
+  this->ExtractRevision(os,"$Revision: 1.350 $");
 }
 
 //----------------------------------------------------------------------------
