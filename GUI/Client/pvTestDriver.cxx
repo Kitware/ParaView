@@ -206,7 +206,7 @@ int pvTestDriver::StartServer(kwsysProcess* server, const char* name,
   vtkstd::string output;
   while(!foundWaiting)
         {
-    int pipe = this->WaitForAndPrintLine(name, server, output, 30.0, out, err,
+    int pipe = this->WaitForAndPrintLine(name, server, output, 100.0, out, err,
                                          &foundWaiting);
     if(pipe == kwsysProcess_Pipe_None ||
        pipe == kwsysProcess_Pipe_Timeout)
