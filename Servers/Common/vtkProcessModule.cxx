@@ -45,7 +45,7 @@ struct vtkProcessModuleInternals
 };
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkProcessModule, "1.12");
+vtkCxxRevisionMacro(vtkProcessModule, "1.13");
 vtkCxxSetObjectMacro(vtkProcessModule, RenderModule, vtkPVRenderModule);
 
 //----------------------------------------------------------------------------
@@ -555,10 +555,15 @@ void vtkProcessModule::InterpreterCallback(unsigned long, void* pinfo)
 }
 
 //----------------------------------------------------------------------------
-void vtkProcessModule::RegisterProgressEvent(vtkAlgorithm* po, int id)
+void vtkProcessModule::RegisterProgressEvent(vtkObject* po, int id)
 {
-  po->AddObserver(vtkCommand::ProgressEvent, this->Observer);
-  this->ProgressHandler->RegisterProgressEvent(po, id);
+  vtkAlgorithm* alg = vtkAlgorithm::SafeDownCast(po);
+  if ( !alg )
+    {
+    return;
+    }
+  alg->AddObserver(vtkCommand::ProgressEvent, this->Observer);
+  this->ProgressHandler->RegisterProgressEvent(alg, id);
 }
 
 //----------------------------------------------------------------------------

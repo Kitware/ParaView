@@ -204,7 +204,7 @@ public:
 
   // Description:
   // Register object with progress handler.
-  void RegisterProgressEvent(vtkAlgorithm* po, int id);
+  void RegisterProgressEvent(vtkObject* po, int id);
 
   // Description:
   virtual void SendPrepareProgress();
