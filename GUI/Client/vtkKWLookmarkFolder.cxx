@@ -35,7 +35,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLookmarkFolder );
-vtkCxxRevisionMacro( vtkKWLookmarkFolder, "1.2");
+vtkCxxRevisionMacro( vtkKWLookmarkFolder, "1.3");
 
 int vtkKWLookmarkFolderCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -52,8 +52,6 @@ vtkKWLookmarkFolder::vtkKWLookmarkFolder()
   this->NameField = vtkKWText::New();
   this->Checkbox = vtkKWCheckButton::New();
 
-  this->GetDragAndDropTargets()->SetAnchor(
-    this->LabelFrame->GetLabel());
   this->GetDragAndDropTargets()->SetStartCommand(
     this, "DragAndDropStartCallback");
   this->GetDragAndDropTargets()->SetEndCommand(
@@ -143,6 +141,9 @@ void vtkKWLookmarkFolder::Create(vtkKWApplication *app)
   this->LabelFrame->SetLabelText("Folder");
 //  this->LabelFrame->GetLabel()->SetBind(this, "<Double-1>", "EditCallback");
   this->Script("pack %s -fill x -expand t -side left", this->LabelFrame->GetWidgetName());
+
+  this->GetDragAndDropTargets()->SetAnchor(
+    this->LabelFrame->GetLabel());
 
   this->SeparatorFrame->SetParent(this);
   this->SeparatorFrame->SetScrollable(0);

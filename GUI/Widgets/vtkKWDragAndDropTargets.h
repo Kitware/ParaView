@@ -41,6 +41,7 @@ public:
   // Description:
   // Set/Get the Drag and Drop source widget. This is the widget that the
   // the Drag and Drop originates from.
+  // Make sure you have called SetApplication(..) on the instance before.
   virtual void SetSource(vtkKWWidget*);
   vtkGetObjectMacro(Source, vtkKWWidget);
 
@@ -50,6 +51,7 @@ public:
   // Source widget automatically. The anchor widget can be used to specify
   // that a sub-part of the Source widget is to be dragged & dropped, not
   // the whole Source widget.
+  // Make sure you have called SetApplication(..) on the instance before.
   virtual void SetAnchor(vtkKWWidget*);
   vtkGetObjectMacro(Anchor, vtkKWWidget);
 

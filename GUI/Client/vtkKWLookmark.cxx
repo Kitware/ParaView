@@ -35,7 +35,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLookmark );
-vtkCxxRevisionMacro( vtkKWLookmark, "1.2");
+vtkCxxRevisionMacro( vtkKWLookmark, "1.3");
 
 int vtkKWLookmarkCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -63,9 +63,6 @@ vtkKWLookmark::vtkKWLookmark()
   this->Dataset = NULL;
 
   this->Width = this->Height = 48; 
-
-  this->GetDragAndDropTargets()->SetAnchor(
-    this->LmkMainFrame->GetLabel());
 }
 
 //----------------------------------------------------------------------------
@@ -184,6 +181,9 @@ void vtkKWLookmark::Create(vtkKWApplication *app)
   this->LmkMainFrame->SetLabelText("Lookmark");
 //  this->LmkMainFrame->GetLabel()->SetBind(this, "<Double-1>", "EditLookmarkCallback");
 
+  this->GetDragAndDropTargets()->SetAnchor(
+    this->LmkMainFrame->GetLabel());
+
   this->SeparatorFrame->SetParent(this);
   this->SeparatorFrame->SetScrollable(0);
   this->SeparatorFrame->Create(app,"");
@@ -252,8 +252,6 @@ void vtkKWLookmark::Create(vtkKWApplication *app)
 
   // Update enable state
   this->UpdateEnableState();
-
-//  this->LmkMainFrame->SetDragAndDropAnchor(NULL);
 }
 
 //----------------------------------------------------------------------------
