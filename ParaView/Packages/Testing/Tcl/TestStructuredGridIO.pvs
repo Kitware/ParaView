@@ -35,17 +35,14 @@ if {$nprocs > 1} { set ext "pvts" }
 # Write the vtkStructuredGrid.
 $kw(vtkTemp1) WriteVTKFile "testStructuredGrid.$ext"
 
-# Barrier after write.
-Application BroadcastSimpleScript { [Application GetController] Barrier }
-
 # Delete the old pipeline.
 $kw(vtkTemp257) DeleteCallback
 
 # Read the vtkStructuredGrid from the temporary file.
 $kw(vtkTemp1) Open "testStructuredGrid.$ext"
-set kw(vtkTemp306) [$kw(vtkTemp1) GetCurrentPVSource]
 
 # Contour it to produce some actual data for display.
+set kw(vtkTemp306) [$kw(vtkTemp1) GetCurrentPVSource]
 set kw(vtkTemp336) [$kw(vtkTemp1) CreatePVSource Contour]
 set kw(vtkTemp342) [$kw(vtkTemp336) GetPVWidget {Scalars}]
 $kw(vtkTemp342) SetValue {Density}
@@ -70,11 +67,11 @@ for {set i  1} {$i < [expr $argc - 1]} {incr i} {
 }
 
 # Delete the temporary file.
-#catch { file delete -force "testStructuredGrid.$ext" }
+catch { file delete -force "testStructuredGrid.$ext" }
 
 if {$nprocs > 1} {
   # Delete the temporary file's pieces.
   for {set i 0} { $i < $nprocs } { incr i } {
-#  catch { file delete -force "testStructuredGrid$i.vts" }
+  catch { file delete -force "testStructuredGrid$i.vts" }
   }
 }
