@@ -61,7 +61,6 @@ class vtkPVSource;
 class vtkPVSourceList;
 class vtkPVTreeComposite;
 class vtkPVWindow;
-class vtkPVRenderView;
 class vtkRenderer;
 class vtkRenderWindow;
 
@@ -80,10 +79,6 @@ public:
   // Set the application right after construction.
   void SetPVApplication(vtkPVApplication *pvApp);
   vtkGetObjectMacro(PVApplication, vtkPVApplication);
-
-  // Description:
-  // Need the render view for compositeManager
-  void SetPVRenderView(vtkPVRenderView* pvView);
 
   // Description:
   // Compute the bounding box of all the visibile props
@@ -126,11 +121,6 @@ public:
   void SetBackgroundColor(float r, float g, float b);
   virtual void SetBackgroundColor(float *c) {this->SetBackgroundColor(c[0],c[1],c[2]);}
 
-  // Description:
-  // This method Sets all IVars to NULL and unregisters
-  // vtk objects.  This should eliminate circular references.
-  void PrepareForDelete();
-  
   // Description:
   // Get the tcl name of the renderer.
   vtkGetStringMacro(RendererTclName);

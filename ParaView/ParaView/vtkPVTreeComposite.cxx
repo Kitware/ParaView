@@ -42,12 +42,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVTreeComposite.h"
 
 #include "vtkActor.h"
+#include "vtkCommand.h"
 #include "vtkActorCollection.h"
 #include "vtkDataSet.h"
 #include "vtkMapper.h"
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
-#include "vtkPVRenderView.h"
 #include "vtkRenderWindow.h"
 #include "vtkRendererCollection.h"
 
@@ -59,9 +59,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVTreeComposite);
-vtkCxxRevisionMacro(vtkPVTreeComposite, "1.38");
+vtkCxxRevisionMacro(vtkPVTreeComposite, "1.39");
 
-vtkCxxSetObjectMacro(vtkPVTreeComposite, RenderView, vtkPVRenderView);
 
 //=========================================================================
 // Stuff to avoid compositing if there is no data on statlite processes.
@@ -187,20 +186,6 @@ int vtkPVTreeComposite::ShouldIComposite()
 // Only called in process 0.
 void vtkPVTreeComposite::StartRender()
 {
-  // 1st: ShouldIComposite (check for data) is broken.
-  // 2nd: vtkPVRenderView now makes the decision to use compositing
-  // based on data information which was already collected.
-  //if ( ! this->ShouldIComposite() )
-  //  {
-  //  // We have to disable the end render also.
-  //  this->UseCompositing = 0;
-  //  }
-  //else
-  //  {
-  //  this->UseCompositing = 1;
-  //  this->vtkCompositeManager::StartRender();
-  //  }
-
   // I do not know if the composite manager check this flag.
   // I believe it does, but just in case ...
   if (this->UseCompositing)
@@ -330,8 +315,6 @@ vtkPVTreeComposite::vtkPVTreeComposite()
     }
   this->RenderAborted = 0;
   
-  this->RenderView = NULL;
-  this->Printing = 0;
   this->Initialized = 0;
   
   this->UseChar = 1;
@@ -343,9 +326,7 @@ vtkPVTreeComposite::vtkPVTreeComposite()
 vtkPVTreeComposite::~vtkPVTreeComposite()
 {
   this->MPIController = NULL;
-  
-  this->SetRenderView(NULL);
-  
+    
   // sanity check
   if (this->ReceivePending)
     {
@@ -362,22 +343,6 @@ void vtkPVTreeComposite::CheckForAbortRender()
     {
     return;
     }
-
-  if ( ! this->Initialized)
-    {
-    // Never abort while printing.
-    if (this->RenderView != NULL && this->RenderView->GetPrinting())
-      {
-      this->Printing = 1;
-      }
-    else
-      {
-      this->Printing = 0;
-      }
-    }
-  
-  this->Initialized = 1;
-  
   
   if (this->LocalProcessId == 0)
     {
@@ -520,12 +485,6 @@ void vtkPVTreeComposite::RootAbortCheck()
   //sleep(5);
   int abort;
 
-  if (!this->RenderView)
-    {
-    vtkWarningMacro("No RenderView: Poosible lock up condition.");
-    return;
-    }
-
   // If the render has already been aborted, then we need do nothing else.
   if (this->RenderAborted)
     {
@@ -533,8 +492,9 @@ void vtkPVTreeComposite::RootAbortCheck()
     }
 
   // This checks for events to decide whether to abort.
-  abort = this->RenderView->ShouldIAbort();
-  if ( ! this->Printing && abort)
+  this->InvokeEvent(vtkCommand::AbortCheckEvent);
+  abort = this->RenderWindow->GetAbortRender();
+  if (abort)
     { // Yes, abort.
     int idx;
     int message;
@@ -549,13 +509,8 @@ void vtkPVTreeComposite::RootAbortCheck()
       }
     
     // abort our own render.
-    this->RenderWindow->SetAbortRender(1);
+    //this->RenderWindow->SetAbortRender(1);
     this->RenderAborted = 1;
-    // For some abort types, we want to queue another render.
-    if (abort == 1)
-      {
-      this->RenderView->EventuallyRender();
-      }
     }
 }
 
@@ -808,14 +763,12 @@ void vtkPVTreeComposite::SatelliteFinalAbortCheck()
 //-------------------------------------------------------------------------
 vtkPVTreeComposite::vtkPVTreeComposite()
 { 
-  this->RenderView = NULL;
 }
 
   
 //-------------------------------------------------------------------------
 vtkPVTreeComposite::~vtkPVTreeComposite()
 {
-  this->SetRenderView(NULL);
 }
 
 //----------------------------------------------------------------------------
@@ -837,5 +790,4 @@ void vtkPVTreeComposite::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
   os << indent << "EnableAbort: " << this->GetEnableAbort() << endl;
-  os << indent << "RenderView: " << this->GetRenderView() << endl;
 }

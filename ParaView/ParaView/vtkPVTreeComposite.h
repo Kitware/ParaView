@@ -57,8 +57,6 @@ class vtkMPIController;
 
 #include "vtkCompositeManager.h"
 
-class vtkPVRenderView;
-
 class VTK_EXPORT vtkPVTreeComposite : public vtkCompositeManager
 {
 public:
@@ -71,12 +69,7 @@ public:
   // Empty methods that can be used by the subclass to interupt a parallel render.
   virtual void CheckForAbortRender();
   virtual int CheckForAbortComposite();
-  
-  // Description:
-  // The RenderView has methods for checking for events.
-  virtual void SetRenderView(vtkPVRenderView*);
-  vtkGetObjectMacro(RenderView, vtkPVRenderView);
-  
+    
   // Description:
   // This flag is on by default.
   // If this flag is off, then the behavior of this class becomes
@@ -124,8 +117,6 @@ protected:
 
   int LocalProcessId;
   int RenderAborted;
-  vtkPVRenderView *RenderView;
-  int Printing;
   // Flag used to indicate the first call for a render.
   // There is no initialize method.
   int Initialized;

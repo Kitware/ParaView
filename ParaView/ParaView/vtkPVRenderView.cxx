@@ -77,7 +77,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVRenderView.h"
 #include "vtkPVSourceCollection.h"
 #include "vtkPVSourceList.h"
-//#include "vtkPVTreeComposite.h"
 #include "vtkPVWindow.h"
 #include "vtkPVSource.h"
 #include "vtkPolyData.h"
@@ -111,7 +110,7 @@ static unsigned char image_properties[] =
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.248");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.249");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -213,15 +212,6 @@ vtkPVRenderView::vtkPVRenderView()
   this->ManipulatorControl2D->SetRegisteryName("2D");
   this->ManipulatorControl3D = vtkPVInteractorStyleControl::New();
   this->ManipulatorControl3D->SetRegisteryName("3D");
-
-  //this->RendererTclName     = 0;
-  //this->CompositeTclName    = 0;
-  //this->RenderWindowTclName = 0;
-  //this->InteractiveCompositeTime = 0;
-  //this->InteractiveRenderTime    = 0;
-  //this->StillRenderTime          = 0;
-  //this->StillCompositeTime       = 0;
-  //this->Composite                = 0;
 
   this->DisableRenderingFlag = 0;
   this->NavigationFrame = vtkKWLabeledFrame::New();
@@ -331,56 +321,17 @@ vtkPVRenderView::~vtkPVRenderView()
   this->LODFrame->Delete();
   this->LODFrame = NULL;
 
-  // Tree Composite
-  //if (this->CompositeTclName && pvApp)
-  //  {
-  //  pvApp->BroadcastScript("%s Delete", this->CompositeTclName);
-  //  this->SetCompositeTclName(NULL);
-  //  this->Composite = NULL;
-  //  }
-  //else if (this->Composite)
-  //  {
-  //  this->Composite->Delete();
-  //  this->Composite = NULL;
-  //  }
-
   if (this->Renderer)
     {
     this->Renderer->UnRegister(this);
     this->Renderer = NULL;
     }
-  //if (this->Renderer)
-  //  {
-  //  if ( pvApp )
-  //    {
-  //    pvApp->BroadcastScript("%s Delete", this->RendererTclName);
-  //    }
-  //  else
-  //    {
-  //    this->Renderer->Delete();
-  //    }
-  //  this->SetRendererTclName(NULL);
-  //  this->Renderer = NULL;
-  //  }
   
   if (this->RenderWindow)
     {
     this->RenderWindow->UnRegister(this);
     this->RenderWindow = NULL;
     }
-  //if (this->RenderWindow)
-  //  {
-  //  if ( pvApp )
-  //    {
-  //    pvApp->BroadcastScript("%s Delete", this->RenderWindowTclName);
-  //    }
-  //  else
-  //    {
-  //    this->RenderWindow->Delete();
-  //    }
-  //  this->SetRenderWindowTclName(NULL);
-  //  this->RenderWindow = NULL;
-  // }
   
   // undo the binding we set up
   if ( this->Application )
@@ -521,109 +472,13 @@ void vtkPVRenderView::CreateRenderObjects(vtkPVApplication *pvApp)
   this->Renderer = pvApp->GetRenderModule()->GetRenderer();
   this->Renderer->Register(this);
 
-
-  //this->Renderer = (vtkRenderer*)pvApp->MakeTclObject("vtkRenderer", "Ren1");
-  //this->RendererTclName = NULL;
-  //this->SetRendererTclName("Ren1");
-  
   // Get rid of render window created by the superclass
   this->RenderWindow->Delete();
   this->RenderWindow = pvApp->GetRenderModule()->GetRenderWindow();
   this->RenderWindow->Register(this);
 
-
-  //this->RenderWindow = 
-  //  (vtkRenderWindow*)pvApp->MakeTclObject("vtkRenderWindow", "RenWin1");
   this->RenderWindow->AddObserver(
     vtkCommand::CursorChangedEvent, this->Observer);
-
-  //this->RenderWindowTclName = NULL;
-  //this->SetRenderWindowTclName("RenWin1");
-  
-  //if (this->RenderWindow->IsA("vtkOpenGLRenderWindow") &&
-  //    (pvApp->GetProcessModule()->GetNumberOfPartitions() > 1))
-  //  {
-  //  pvApp->BroadcastScript("%s SetMultiSamples 0", this->RenderWindowTclName);
-  //  }
-
-  //if (pvApp->GetUseTiledDisplay())
-  //  {
-    // Thr original tiled display with duplicate polydata.
-    //this->Composite = NULL;
-    //pvApp->MakeTclObject("vtkTiledDisplayManager", "TDispManager1");
-    //int *tileDim = pvApp->GetTileDimensions();
-    //pvApp->BroadcastScript("TDispManager1 SetTileDimensions %d %d",
-    //                       tileDim[0], tileDim[1]);
-    //this->CompositeTclName = NULL;
-    //this->SetCompositeTclName("TDispManager1");
-
-  //  this->Composite = NULL;
-  //  pvApp->MakeTclObject("vtkPVTiledDisplayManager", "TDispManager1");
-  //  int *tileDim = pvApp->GetTileDimensions();
-  //  pvApp->BroadcastScript("TDispManager1 SetTileDimensions %d %d",
-  //                         tileDim[0], tileDim[1]);
-  //  pvApp->BroadcastScript("TDispManager1 InitializeSchedule");
-
-  //  this->CompositeTclName = NULL;
-  //  this->SetCompositeTclName("TDispManager1");
-  //  }
-  //else if (pvApp->GetClientMode() || pvApp->GetServerMode())
-  //  {
-  //  this->Composite = NULL;
-  //  pvApp->MakeTclObject("vtkClientCompositeManager", "CCompositeManager1");
-    // Clean up this mess !!!!!!!!!!!!!
-    // Even a cast to vtkPVClientServerModule would be better than this.
-    // How can we syncronize the process modules and render modules?
-  //  pvApp->BroadcastScript("CCompositeManager1 SetClientController [[$Application GetProcessModule] GetSocketController]");
-  //  pvApp->BroadcastScript("CCompositeManager1 SetClientFlag [$Application GetClientMode]");
-
-  //  this->CompositeTclName = NULL;
-  //  this->SetCompositeTclName("CCompositeManager1");    
-  //  }
-  //else
-  //  {
-    // Create the compositer.
-  //  this->Composite = static_cast<vtkPVTreeComposite*>
-  //    (pvApp->MakeTclObject("vtkPVTreeComposite", "TreeComp1"));
-
-    // Try using a more efficient compositer (if it exists).
-    // This should be a part of a module.
-  //  pvApp->BroadcastScript("if {[catch {vtkCompressCompositer pvTmp}] == 0} "
-  //                         "{TreeComp1 SetCompositer pvTmp; pvTmp Delete}");
-
-  //  this->CompositeTclName = NULL;
-  //  this->SetCompositeTclName("TreeComp1");
-
-    // If we are using SGI pipes, create a new Controller/Communicator/Group
-    // to use for compositing.
-  //  if (pvApp->GetUseRenderingGroup())
-  //    {
-  //    int numPipes = pvApp->GetNumberOfPipes();
-      // I would like to create another controller with a subset of world, but...
-      // For now, I added it as a hack to the composite manager.
-  //    pvApp->BroadcastScript("%s SetNumberOfProcesses %d",
-  //                           this->CompositeTclName, numPipes);
-  //    }
-  //  }
-  //pvApp->BroadcastScript("%s AddRenderer %s", this->RenderWindowTclName,
-  //                         this->RendererTclName);
-  
-  //pvApp->BroadcastScript("%s SetRenderWindow %s", this->CompositeTclName,
-  //                       this->RenderWindowTclName);
-  //pvApp->BroadcastScript("%s InitializeRMIs", this->CompositeTclName);
-
-
-
-  //if ( getenv("PV_DISABLE_COMPOSITE_INTERRUPTS") )
-  //  {
-  //  pvApp->BroadcastScript("%s EnableAbortOff", this->CompositeTclName);
-  //  }
-
-  //if ( getenv("PV_OFFSCREEN") )
-  //  {
-  //  pvApp->BroadcastScript("%s InitializeOffScreen", this->CompositeTclName);
-  //  }
-
 }
 
 
@@ -1278,7 +1133,7 @@ void vtkPVRenderView::CreateViewProperties()
     this->CollectThresholdScale->Create(this->Application,
                                         "-orient horizontal");
     this->CollectThresholdScale->SetRange(0.0, 100.0);
-    this->CollectThresholdScale->SetResolution(0.1);
+    this->CollectThresholdScale->SetResolution(1.0);
 
     this->CollectThresholdValue->SetParent(this->LODScalesFrame);
     this->CollectThresholdValue->Create(this->Application, "-anchor w");
@@ -1605,8 +1460,6 @@ void vtkPVRenderView::SetBackgroundColor(float r, float g, float b)
   // not invoke the callback, We also trace the view.
   this->AddTraceEntry("$kw(%s) SetBackgroundColor %f %f %f",
                       this->GetTclName(), r, g, b);
-  //pvApp->BroadcastScript("%s SetBackground %f %f %f",
-  //                       this->RendererTclName, r, g, b);
   pvApp->GetRenderModule()->SetBackgroundColor(r, g, b);
   this->EventuallyRender();
 }
@@ -1635,43 +1488,7 @@ void vtkPVRenderView::Configured()
 {
   this->Exposed();
 }
-//----------------------------------------------------------------------------
-//void vtkPVRenderView::Update()
-//{
-//}
 
-//----------------------------------------------------------------------------
-//void vtkPVRenderView::ComputeVisiblePropBounds(float bds[6])/
-//{
-//  double *tmp;
-//  vtkPVSource *pvs;
-//  vtkPVSourceCollection *sources;
-//
-  // Compute the bounds for our sources.
-//  bds[0] = bds[2] = bds[4] = VTK_LARGE_FLOAT;
-//  bds[1] = bds[3] = bds[5] = -VTK_LARGE_FLOAT;
-//  sources = this->GetPVWindow()->GetSourceList("Sources");
-//  sources->InitTraversal();
-//  while ( (pvs = sources->GetNextPVSource()) )
-//    {
-//    if (pvs->GetVisibility())
-//      {
-//      tmp = pvs->GetDataInformation()->GetBounds();
-//      if (tmp[0] < bds[0]) { bds[0] = tmp[0]; }  
-//      if (tmp[1] > bds[1]) { bds[1] = tmp[1]; }  
-//      if (tmp[2] < bds[2]) { bds[2] = tmp[2]; }  
-//      if (tmp[3] > bds[3]) { bds[3] = tmp[3]; }  
-//      if (tmp[4] < bds[4]) { bds[4] = tmp[4]; }  
-//      if (tmp[5] > bds[5]) { bds[5] = tmp[5]; }  
-//      }
-//    }
-
-//  if ( bds[0] > bds[1])
-//    {
-//    bds[0] = bds[2] = bds[4] = -1.0;
-//    bds[1] = bds[3] = bds[5] = 1.0;
-//    }
-//}
 
 //----------------------------------------------------------------------------
 void vtkPVRenderView::ResetCamera()
@@ -1732,167 +1549,12 @@ vtkPVApplication* vtkPVRenderView::GetPVApplication()
     } 
 }
 
-//----------------------------------------------------------------------------
-//void vtkPVRenderView::AddPVSource(vtkPVSource *pvs)
-//{
-//  vtkPVApplication *pvApp = this->GetPVApplication();
-//  vtkPVPart *part;
-//  int num, idx;
-//  
-//  if (pvs == NULL)
-//    {
-//    return;
-//    }  
-//  
-//  // I would like to move the addition of the prop into vtkPVPart sometime.
-//  num = pvs->GetNumberOfPVParts();
-//  for (idx = 0; idx < num; ++idx)
-//    {
-//    part = pvs->GetPVPart(idx);
-//    if (part && part->GetPartDisplay()->GetPropTclName() != NULL)
-//      {
- //     pvApp->BroadcastScript("%s AddProp %s", this->RendererTclName,
-//                             part->GetPartDisplay()->GetPropTclName());
-//      }
-//    }
-//}
-//----------------------------------------------------------------------------
-//void vtkPVRenderView::RemovePVSource(vtkPVSource *pvs)
-//{
-//  int idx, num;
-//  vtkPVApplication *pvApp = this->GetPVApplication();
-//  vtkPVPart *part;
-//
-//  if (pvs == NULL)
-//    {
-//    return;
-//    }
-//
-//  num = pvs->GetNumberOfPVParts();
-//  for (idx = 0; idx < num; ++idx)
-//    {
-//    part = pvs->GetPVPart(idx);
-//    if (part->GetPartDisplay()->GetPropTclName() != NULL)
- //     {
-//      pvApp->BroadcastScript("%s RemoveProp %s", this->RendererTclName,
-//                             part->GetPartDisplay()->GetPropTclName());
-//      }
-//    }
-//}
 
-//----------------------------------------------------------------------------
-//void vtkPVRenderView::StartRender()
-//{
-//  float renderTime = 1.0 / this->RenderWindow->GetDesiredUpdateRate();
-//  int *windowSize = this->RenderWindow->GetSize();
-//  int area, reducedArea, reductionFactor;
-//  float timePerPixel;
-//  float getBuffersTime, setBuffersTime, transmitTime;
-//  float newReductionFactor;
-//  float maxReductionFactor;
-  
-//  // Tiled displays do not use pixel reduction LOD.
-  // This is not necessary because to caller already checks,
-  // but it clarifies the situation.
-//  if (this->Composite == NULL)
-//    {
-//    return;
-//    }
-
-//  if (!this->UseReductionFactor)
-//    {
-//    this->Composite->SetReductionFactor(1);
-//    return;
- //   }
-  
-  // Do not let the width go below 150.
-//  maxReductionFactor = windowSize[0] / 150.0;
-
-//  renderTime *= 0.5;
-//  area = windowSize[0] * windowSize[1];
-//  reductionFactor = this->Composite->GetReductionFactor();
-//  reducedArea = area / (reductionFactor * reductionFactor);
-//  getBuffersTime = this->Composite->GetGetBuffersTime();
-//  setBuffersTime = this->Composite->GetSetBuffersTime();
- // transmitTime = this->Composite->GetCompositeTime();
-
-  // Do not consider SetBufferTime because 
-  //it is not dependent on reduction factor.,
-//  timePerPixel = (getBuffersTime + transmitTime) / reducedArea;
-//  newReductionFactor = sqrt(area * timePerPixel / renderTime);
-//
-//  if (newReductionFactor > maxReductionFactor)
- //   {
- //   newReductionFactor = maxReductionFactor;
- //   }
- // if (newReductionFactor < 1.0)
-//    {
-//    newReductionFactor = 1.0;
-//    }
-
-  //cerr << "---------------------------------------------------------\n";
-  //cerr << "New ReductionFactor: " << newReductionFactor << ", oldFact: " 
-  //     << reductionFactor << endl;
-  //cerr << "Alloc.Comp.Time: " << renderTime << ", area: " << area 
-  //     << ", pixelTime: " << timePerPixel << endl;
-  //cerr << "GetBufTime: " << getBuffersTime << ", SetBufTime: " << setBuffersTime
-  //     << ", transTime: " << transmitTime << endl;
-  
- // this->Composite->SetReductionFactor((int)newReductionFactor);
-//}
-
-//int vtkPVRenderView::UpdateAllPVData(int interactive)
-//{
- // vtkPVWindow* pvwindow = this->GetPVWindow();
- // vtkPVApplication *pvApp = this->GetPVApplication();
- // if ( !pvwindow || !pvApp )
-//    {
- //   return 0;
- //   }
- // vtkPVSourceCollection* col = 0;
-  //cout << "Update all PVData" << endl;
-//  col = pvwindow->GetSourceList("Sources");
-//  if ( col )
-//    {
-//    vtkCollectionIterator *it = col->NewIterator();
-//    it->InitTraversal();
-//    vtkPVSource* source = 0;
- //   while ( !it->IsDoneWithTraversal() )
- //     {
- //     source = static_cast<vtkPVSource*>(it->GetObject());
-//      if ( source->GetInitialized() && source->GetVisibility() )
- //       {
-//        source->ForceUpdate(pvApp);
-//        }
-//      it->GoToNextItem();
-//      }
-//    it->Delete();
-//    }
-
-
-  // We need to decide globally whether to use decimated geometry.  
-//  if (interactive && 
- //       this->GetPVWindow()->GetTotalVisibleGeometryMemorySize() > 
- //       this->LODThreshold*1000)
-  //  {
-//    pvApp->SetGlobalLODFlag(1);
-//    return this->GetPVWindow()->MakeLODCollectionDecision();
- //   }
-//  pvApp->SetGlobalLODFlag(0);
-//  return this->GetPVWindow()->MakeCollectionDecision();
-//}
 
 //----------------------------------------------------------------------------
 void vtkPVRenderView::Render()
 {
   int abort;
-  //int renderLocally;
-
-  //this->Update();
-  //renderLocally = this->UpdateAllPVData(1);
-
-  //this->RenderWindow->SetDesiredUpdateRate(this->InteractiveUpdateRate);
-  //this->RenderWindow->SetDesiredUpdateRate(20.0);
 
   // Some aborts require us to que another render.
   abort = this->ShouldIAbort();
@@ -1905,36 +1567,7 @@ void vtkPVRenderView::Render()
     return;
     }
 
-
-  // The composite is not set for powerwall or client server.
-  // Only the CompositeTclName is set.  I should change this
-  // or eliminate the Composite pointer.
-  //if (this->CompositeTclName)
-   // {
-   // if (renderLocally)
-   //   {
-    //  this->Script("%s UseCompositingOff", this->CompositeTclName);
-    //  }
-    //else
-    //  {
-    //  this->Script("%s UseCompositingOn", this->CompositeTclName);
-    //  }
-  //  }
-
-  //if (this->Composite && ! renderLocally)
-  //  { // just set up the reduction factor
-  //  this->StartRender();
-  //  }
-
   this->GetPVApplication()->GetRenderModule()->InteractiveRender();
-
-  //if (this->Composite)
-  //  {
-  //  this->InteractiveRenderTime = this->Composite->GetMaxRenderTime();
-  //  this->InteractiveCompositeTime = this->Composite->GetCompositeTime()
-  //    + this->Composite->GetGetBuffersTime()
-  //    + this->Composite->GetSetBuffersTime();
-  //  }
 }
 
 
@@ -1999,28 +1632,9 @@ void vtkPVRenderView::EventuallyRender()
 //----------------------------------------------------------------------------
 void vtkPVRenderView::EventuallyRenderCallBack()
 {
-  //cout << "EventuallyRenderCallback()" << endl;
   int abort;
-  //int renderLocally;
 
   vtkPVApplication *pvApp = this->GetPVApplication();
-  //renderLocally = this->UpdateAllPVData(0);
-
-  // Tell composite whether to render locally  or composite.
-  // The composite is not set for powerwall or client server.
-  // Only the CompositeTclName is set.  I should change this
-  // or eliminate the Composite pointer.
-  //if (this->CompositeTclName)
-  //  {
-  //  if (renderLocally)
-  //    {
-  //    this->Script("%s UseCompositingOff", this->CompositeTclName);
-  //    }
-  //  else
-  //    {
-  //    this->Script("%s UseCompositingOn", this->CompositeTclName);
-  //    }
-  //  }
 
   // sanity check
   if (this->EventuallyRenderFlag == 0 || !this->RenderPending)
@@ -2031,11 +1645,6 @@ void vtkPVRenderView::EventuallyRenderCallBack()
   // We could get rid of the flag and use the pending ivar.
   this->EventuallyRenderFlag = 0;
   this->SetRenderPending(NULL);
-  //if (this->GetPVWindow()->GetInteractor())
-  //  {
-  //  this->RenderWindow->SetDesiredUpdateRate(
-  //    this->GetPVWindow()->GetInteractor()->GetStillUpdateRate());
-  //  }
 
   // I do not know if these are necessary here.
   abort = this->ShouldIAbort();
@@ -2048,21 +1657,8 @@ void vtkPVRenderView::EventuallyRenderCallBack()
     return;
     }
 
-  //if (this->Composite)
-  //  {
-  //  this->StartRender();
-  //  }
-
   pvApp->SetGlobalLODFlag(0);
   pvApp->GetRenderModule()->StillRender();
-
-  //if (this->Composite)
-  //  {
-  //  this->StillRenderTime = this->Composite->GetMaxRenderTime();
-  //  this->StillCompositeTime = this->Composite->GetCompositeTime()
-  //    + this->Composite->GetGetBuffersTime()
-  //    + this->Composite->GetSetBuffersTime();
-  //  }
 }
 
 //----------------------------------------------------------------------------
@@ -2194,14 +1790,6 @@ void vtkPVRenderView::SetLODThreshold(float threshold)
 {
   float value;
   
-  //if (threshold <= 0.0)
-  //  {
-  //  value = VTK_LARGE_FLOAT;
-  //  }
-  //else
-  //  {
-  //  value = 18.0 - log((double)(threshold));
-  //  }
   value = threshold;
   this->LODThresholdScale->SetValue(value);
 
@@ -2349,28 +1937,15 @@ void vtkPVRenderView::SetCollectThresholdInternal(float threshold)
 void vtkPVRenderView::InterruptRenderCallback()
 {
   vtkPVApplication* pvApp = this->GetPVApplication();
-  if (pvApp->GetRenderModule()->GetComposite())
-    {
 
-    // Interrupts will have to work with client server process modules. !!!!!!
-    if (pvApp->GetProcessModule()->GetNumberOfPartitions() > 1 )
-      {
-      pvApp->BroadcastScript(
-        "%s SetEnableAbort %d",pvApp->GetRenderModule()->GetCompositeTclName(),
-        this->InterruptRenderCheck->GetState());
-      }
-    else
-      {
-      this->RenderWindow->RemoveObservers(vtkCommand::AbortCheckEvent);
-      if (this->InterruptRenderCheck->GetState())
-        {
-        vtkCallbackCommand* abc = vtkCallbackCommand::New();
-        abc->SetCallback(PVRenderViewAbortCheck);
-        abc->SetClientData(this);
-        this->RenderWindow->AddObserver(vtkCommand::AbortCheckEvent, abc);
-        abc->Delete();
-        }
-      }
+  pvApp->GetRenderModule()->RemoveObservers(vtkCommand::AbortCheckEvent);
+  if (this->InterruptRenderCheck->GetState())
+    {
+    vtkCallbackCommand* abc = vtkCallbackCommand::New();
+    abc->SetCallback(PVRenderViewAbortCheck);
+    abc->SetClientData(this);
+    pvApp->GetRenderModule()->AddObserver(vtkCommand::AbortCheckEvent, abc);
+    abc->Delete();
     }
 }
 
@@ -2666,7 +2241,7 @@ void vtkPVRenderView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVRenderView ";
-  this->ExtractRevision(os,"$Revision: 1.248 $");
+  this->ExtractRevision(os,"$Revision: 1.249 $");
 }
 
 //------------------------------------------------------------------------------
@@ -2810,23 +2385,12 @@ void vtkPVRenderView::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os,indent);
   os << indent << "ImmediateModeCheck: " 
      << this->GetImmediateModeCheck() << endl;
-  //os << indent << "InteractiveCompositeTime: " 
-  //   << this->GetInteractiveCompositeTime() << endl;
-  //os << indent << "InteractiveRenderTime: " 
-  //   << this->GetInteractiveRenderTime() << endl;
   os << indent << "SplitFrame: " 
      << this->GetSplitFrame() << endl;
   os << indent << "NavigationFrame: " 
      << this->GetNavigationFrame() << endl;
-  //os << indent << "RendererTclName: " 
-  //   << (this->GetRendererTclName()?this->GetRendererTclName():"<none>") << endl;
-  //os << indent << "StillCompositeTime: " 
-  //   << this->GetStillCompositeTime() << endl;
-  //os << indent << "StillRenderTime: " << this->GetStillRenderTime() << endl;
   os << indent << "TriangleStripsCheck: " 
      << this->GetTriangleStripsCheck() << endl;
-  //os << indent << "UseReductionFactor: " 
-  //   << this->GetUseReductionFactor() << endl;
   os << indent << "DisableRenderingFlag: " 
      << (this->DisableRenderingFlag ? "on" : "off") << endl;
   os << indent << "ManipulatorControl2D: " 

@@ -55,7 +55,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVPart.h"
 #include "vtkPVPartDisplay.h"
 #include "vtkPVProcessModule.h"
-#include "vtkPVRenderView.h"
 #include "vtkPVSourceCollection.h"
 #include "vtkPVSourceList.h"
 #include "vtkPVTreeComposite.h"
@@ -77,7 +76,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderModule);
-vtkCxxRevisionMacro(vtkPVRenderModule, "1.2");
+vtkCxxRevisionMacro(vtkPVRenderModule, "1.3");
 
 //int vtkPVRenderModuleCommand(ClientData cd, Tcl_Interp *interp,
 //                             int argc, char *argv[]);
@@ -175,6 +174,10 @@ vtkPVRenderModule::~vtkPVRenderModule()
 }
 
 //----------------------------------------------------------------------------
+// This is a bit of a pain.  I do ResetCameraClippingRange as a call back
+// because the PVInteractorStyles call ResetCameraClippingRange 
+// directly on the renderer.  Since they are PV styles, I might
+// have them call the render module directly like they do for render.
 void vtkPVRenderModuleResetCameraClippingRange(
   vtkObject *caller, unsigned long vtkNotUsed(event),void *clientData, void *)
 {
@@ -185,6 +188,15 @@ void vtkPVRenderModuleResetCameraClippingRange(
 
   self->ComputeVisiblePropBounds(bds);
   ren->ResetCameraClippingRange(bds);
+}
+
+//----------------------------------------------------------------------------
+void PVRenderModuleAbortCheck(vtkObject*, unsigned long, void* arg, void*)
+{
+  vtkPVRenderModule *me = (vtkPVRenderModule*)arg;
+
+  // Just forward the event along.
+  me->InvokeEvent(vtkCommand::AbortCheckEvent, NULL);  
 }
 
 
@@ -267,6 +279,13 @@ void vtkPVRenderModule::SetPVApplication(vtkPVApplication *pvApp)
     this->Composite = static_cast<vtkPVTreeComposite*>
       (pvApp->MakeTclObject("vtkPVTreeComposite", "TreeComp1"));
 
+    //this->Composite->RemoveObservers(vtkCommand::AbortCheckEvent);
+    vtkCallbackCommand* abc = vtkCallbackCommand::New();
+    abc->SetCallback(PVRenderModuleAbortCheck);
+    abc->SetClientData(this);
+    this->Composite->AddObserver(vtkCommand::AbortCheckEvent, abc);
+    abc->Delete();
+
     // Try using a more efficient compositer (if it exists).
     // This should be a part of a module.
     pvApp->BroadcastScript("if {[catch {vtkCompressCompositer pvTmp}] == 0} "
@@ -318,19 +337,6 @@ void vtkPVRenderModule::SetPVApplication(vtkPVApplication *pvApp)
 
 
 //----------------------------------------------------------------------------
-// Here we are going to change only the satellite procs.
-void vtkPVRenderModule::PrepareForDelete()
-{
-  vtkPVApplication* pvapp = this->GetPVApplication();
-
-  // Circular reference.
-  if (this->Composite)
-    {
-    this->Composite->SetRenderView(NULL);
-    }
-}
-
-//----------------------------------------------------------------------------
 vtkRenderer *vtkPVRenderModule::GetRenderer()
 {
   return this->Renderer;
@@ -342,18 +348,6 @@ vtkRenderWindow *vtkPVRenderModule::GetRenderWindow()
   return this->RenderWindow;
 }
 
-//----------------------------------------------------------------------------
-void vtkPVRenderModule::SetPVRenderView(vtkPVRenderView* pvView)
-{
-  if (this->CompositeTclName)
-    {
-    // Since the render view is only on process 0, do not broadcast.
-    this->GetPVApplication()->Script("%s SetRenderView %s", 
-                                     this->CompositeTclName, 
-                                     pvView->GetTclName());
-    }
-
-}
 
 //----------------------------------------------------------------------------
 void vtkPVRenderModule::SetBackgroundColor(float r, float g, float b)
@@ -631,6 +625,12 @@ void vtkPVRenderModule::StillRender()
     this->StartRender();
     }
 
+  // Still Render can get called some funky ways.
+  // Interactive renders get called through the PVInteractorStyles
+  // which cal ResetCameraClippingRange on the Renderer.
+  // We could convert them to call a method on the module directly ...
+  this->Renderer->ResetCameraClippingRange();
+
   pvApp->SetGlobalLODFlag(0);
   vtkTimerLog::MarkStartEvent("Still Render");
   this->RenderWindow->Render();
@@ -903,6 +903,21 @@ void vtkPVRenderModule::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "StillRenderTime: " << this->GetStillRenderTime() << endl;
   os << indent << "DisableRenderingFlag: " 
      << (this->DisableRenderingFlag ? "on" : "off") << endl;
+
+
+  os << indent << "UseReductionFactor: " << this->UseReductionFactor << endl;
+  if (this->CompositeTclName)
+    {
+    os << indent << "CompositeTclName: " << this->CompositeTclName << endl;
+    }
+  if (this->PVApplication)
+    {
+    os << indent << "PVApplication: " << this->PVApplication << endl;
+    }
+  else
+    {
+    os << indent << "PVApplication: NULL" << endl;
+    }
   //os << indent << "LODThreshold: " << this->LODThreshold << endl;
   //os << indent << "LODResolution: " << this->LODResolution << endl;
   //os << indent << "CollectThreshold: " << this->CollectThreshold << endl;
