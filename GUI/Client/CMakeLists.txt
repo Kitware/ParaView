@@ -48,7 +48,6 @@ SET( ParaViewClientNotWrapped_SRCS
   )
 
 SET( ParaViewClient_SRCS
-  vtkPVTest.cxx
   vtkKWBoundsDisplay.cxx
   vtkPV3DWidget.cxx
   vtkPVAdvancedReaderModule.cxx
