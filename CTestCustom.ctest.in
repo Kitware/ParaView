@@ -4,6 +4,11 @@ SET(CTEST_CUSTOM_MEMCHECK_IGNORE
   otherPrint-ParaView
   )
 
+SET(CTEST_CUSTOM_WARNING_MATCH
+  ${CTEST_CUSTOM_WARNING_MATCH}
+  "{standard input}:[0-9][0-9]*: Warning: "
+  )
+
 SET(CTEST_CUSTOM_WARNING_EXCEPTION
   ${CTEST_CUSTOM_WARNING_EXCEPTION}
   "tcl8.4.5/[^/]+/../[^/]+/[^.]+.c[:\"]"
