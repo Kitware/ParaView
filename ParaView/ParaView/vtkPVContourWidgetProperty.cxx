@@ -50,7 +50,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVWidget.h"
 
 vtkStandardNewMacro(vtkPVContourWidgetProperty);
-vtkCxxRevisionMacro(vtkPVContourWidgetProperty, "1.2");
+vtkCxxRevisionMacro(vtkPVContourWidgetProperty, "1.3");
 
 void vtkPVContourWidgetProperty::SetAnimationTime(float time)
 {
@@ -81,33 +81,6 @@ void vtkPVContourWidgetProperty::SetAnimationTime(float time)
     }
   this->Widget->ModifiedCallback();
   this->Widget->Reset();
-}
-
-void vtkPVContourWidgetProperty::AcceptInternal()
-{
-  this->Superclass::AcceptInternal();
-
-  vtkPVProcessModule *pm =
-    this->Widget->GetPVApplication()->GetProcessModule();
-  
-  vtkPVClassNameInformation *cni = vtkPVClassNameInformation::New();
-  pm->GatherInformation(cni, this->VTKSourceTclName);
-  if (!strcmp(cni->GetVTKClassName(), "vtkPVContourFilter") ||
-      !strcmp(cni->GetVTKClassName(), "vtkPVKitwareContourFilter"))
-    {
-    this->Widget->SetUseWidgetRange(1);
-    vtkPVScalarRangeLabel *label = vtkPVScalarRangeLabel::SafeDownCast(
-      this->Widget->GetPVSource()->GetPVWidget("ScalarRangeLabel"));
-    if (label)
-      {
-      double *tmpRange = label->GetRange();
-      float range[2];
-      range[0] = (float)(tmpRange[0]);
-      range[1] = (float)(tmpRange[1]);
-      this->Widget->SetWidgetRange(range);
-      }
-    }
-  cni->Delete();
 }
 
 void vtkPVContourWidgetProperty::PrintSelf(ostream &os, vtkIndent indent)

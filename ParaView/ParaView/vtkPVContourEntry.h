@@ -73,11 +73,6 @@ public:
   virtual void ResetInternal();
 
   // Description:
-  // This virtual method returns the scalar range of the selected
-  // array for the input.
-  virtual int GetValueRange(float range[2]);
-  
-  // Description:
   // ArrayMenu is used to obtain the scalar range (it contains an array
   // information object)
   virtual void SetArrayMenu(vtkPVArrayMenu*);
@@ -108,6 +103,8 @@ protected:
 
   char *SetNumberCommand;
   char *SetContourCommand;
+  
+  virtual int ComputeWidgetRange();
   
   vtkPVContourEntry(const vtkPVContourEntry&); // Not implemented
   void operator=(const vtkPVContourEntry&); // Not implemented

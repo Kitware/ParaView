@@ -83,11 +83,6 @@ public:
   void RemoveAllValues();
 
   // Description:
-  // This virtual method returns the range in which new values
-  // can be added. This method should be overwritten by sub-classes.
-  virtual int GetValueRange(float range[2]) {(void)range;return 0;}
-
-  // Description:
   // Button callbacks.
   void AddValueCallback();
   void DeleteValueCallback();
@@ -150,6 +145,8 @@ protected:
   vtkKWPushButton* GenerateButton;
 
   vtkKWRange* GenerateRangeWidget;
+
+  virtual int ComputeWidgetRange() {return 0;}
   
   vtkPVValueList(const vtkPVValueList&); // Not implemented
   void operator=(const vtkPVValueList&); // Not implemented

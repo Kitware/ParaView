@@ -61,7 +61,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVValueList);
-vtkCxxRevisionMacro(vtkPVValueList, "1.2");
+vtkCxxRevisionMacro(vtkPVValueList, "1.3");
 
 int vtkPVValueListCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -377,15 +377,16 @@ void vtkPVValueList::Update()
     this->ContourValuesList->AppendUnique(str);
     }    
 
-  float range[2];
-
-  if (!this->GetValueRange(range))
+  if (!this->ComputeWidgetRange())
     {
     return;
     }
 
   float oldRange[2];
-
+  float range[2];
+  range[0] = this->WidgetRange[0];
+  range[1] = this->WidgetRange[1];
+  
   if (range[0] > range[1])
     {
     return;
@@ -529,10 +530,12 @@ void vtkPVValueList::GenerateValuesCallback()
 
   if (range[0] == 0 && range[1] == 0) // happens if the entries are empty
     {
-    if (!this->GetValueRange(range))
+    if (!this->ComputeWidgetRange())
       {
       return;
       }
+    range[0] = this->WidgetRange[0];
+    range[1] = this->WidgetRange[1];
     }
 
   int numContours = static_cast<int>(this->GenerateEntry->GetValue());

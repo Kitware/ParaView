@@ -54,7 +54,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVContourEntry);
-vtkCxxRevisionMacro(vtkPVContourEntry, "1.36");
+vtkCxxRevisionMacro(vtkPVContourEntry, "1.37");
 
 vtkCxxSetObjectMacro(vtkPVContourEntry, ArrayMenu, vtkPVArrayMenu);
 
@@ -89,7 +89,7 @@ vtkPVContourEntry::~vtkPVContourEntry()
 }
 
 //-----------------------------------------------------------------------------
-int vtkPVContourEntry::GetValueRange(float range[2])
+int vtkPVContourEntry::ComputeWidgetRange()
 {
   if (!this->ArrayMenu)
     {
@@ -103,7 +103,8 @@ int vtkPVContourEntry::GetValueRange(float range[2])
     return 0;
     }
 
-  ai->GetComponentRange(0, range);
+  ai->GetComponentRange(0, this->WidgetRange);
+  this->UseWidgetRange = 1;
   return 1;
 }
 

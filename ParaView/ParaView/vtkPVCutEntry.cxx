@@ -49,7 +49,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCutEntry);
-vtkCxxRevisionMacro(vtkPVCutEntry, "1.1");
+vtkCxxRevisionMacro(vtkPVCutEntry, "1.2");
 
 vtkCxxSetObjectMacro(vtkPVCutEntry, InputMenu, vtkPVInputMenu);
 
@@ -72,7 +72,7 @@ vtkPVCutEntry::~vtkPVCutEntry()
 }
 
 //-----------------------------------------------------------------------------
-int vtkPVCutEntry::GetValueRange(float range[2])
+int vtkPVCutEntry::ComputeWidgetRange()
 {
   if (!this->InputMenu)
     {
@@ -92,9 +92,9 @@ int vtkPVCutEntry::GetValueRange(float range[2])
       (bounds[3]-bounds[2])*(bounds[3]-bounds[2])+
       (bounds[5]-bounds[4])*(bounds[5]-bounds[4])));
   
-  range[0] = -length;
-  range[1] =  length;
-
+  this->WidgetRange[0] = -length;
+  this->WidgetRange[1] =  length;
+  this->UseWidgetRange = 1;
   return 1;
 }
 

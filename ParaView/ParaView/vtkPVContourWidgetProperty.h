@@ -62,11 +62,6 @@ public:
   // the widget, and then calls Reset on it.
   virtual void SetAnimationTime(float time);
 
-  // Description:
-  // Pass values to VTK objects.  For subclasses of vtkContourFilter, it also
-  // sets the widget range, which is used in animation.
-  virtual void AcceptInternal();
-  
 protected:
   vtkPVContourWidgetProperty() {}
   ~vtkPVContourWidgetProperty() {}
