@@ -71,11 +71,15 @@ vtkKWWindow::vtkKWWindow()
   this->ToolbarFrame = vtkKWWidget::New();
   this->ToolbarFrame->SetParent(this);  
 
-  this->MiddleFrame = vtkKWWidget::New();
+  this->MiddleFrame = vtkKWSplitFrame::New();
   this->MiddleFrame->SetParent(this);
+  // Default is not interactively resizable.
+  this->MiddleFrame->SetSeparatorWidth(0);
+  this->MiddleFrame->SetFrame1MinimumWidth(360);
+  this->MiddleFrame->SetFrame1Width(360);
 
   this->ViewFrame = vtkKWWidget::New();
-  this->ViewFrame->SetParent(this->MiddleFrame);
+  this->ViewFrame->SetParent(this->MiddleFrame->GetFrame2());
 
   this->StatusFrame = vtkKWWidget::New();
   this->StatusFrame->SetParent(this);
@@ -166,11 +170,10 @@ void vtkKWWindow::CreateDefaultPropertiesParent()
   if (!this->PropertiesParent)
     {
     vtkKWWidget *pp = vtkKWWidget::New();
-    pp->SetParent(this->MiddleFrame);
+    pp->SetParent(this->MiddleFrame->GetFrame1());
     pp->Create(this->Application,"frame","-bd 0");
-    this->Script("pack %s -before %s -side left -fill y -anchor nw",
-                 pp->GetWidgetName(), 
-                 this->ViewFrame->GetWidgetName());
+    this->Script("pack %s -side left -fill both -expand t -anchor nw",
+                 pp->GetWidgetName());
     this->SetPropertiesParent(pp);
     pp->Delete();
     }
@@ -368,7 +371,7 @@ void vtkKWWindow::Create(vtkKWApplication *app, char *args)
   this->Script("pack %s -side right -padx 2 -pady 2",
                this->ProgressGauge->GetWidgetName());
   // To force the toolbar on top, I am create a separate "MiddleFrame" for the ViewFrame and PropertiesParent
-  this->MiddleFrame->Create(app, "frame", "");
+  this->MiddleFrame->Create(app);
   this->Script("pack %s -side bottom -fill both -expand t",
     this->MiddleFrame->GetWidgetName());
 
@@ -439,9 +442,8 @@ void vtkKWWindow::OnPrint3()
 
 void vtkKWWindow::ShowProperties()
 {
-  this->Script("pack %s -before %s -side left -fill y -anchor nw",
-               this->PropertiesParent->GetWidgetName(), 
-               this->ViewFrame->GetWidgetName());
+  this->MiddleFrame->SetFrame1MinimumWidth(360);
+  this->MiddleFrame->SetFrame1Width(360);
 }
 
 void vtkKWWindow::HideProperties()
@@ -450,9 +452,8 @@ void vtkKWWindow::HideProperties()
   this->GetMenuProperties()->CheckRadioButton(
     this->GetMenuProperties(),"Radio",0);
   
-  // forget current props
-  this->Script("pack forget %s",
-               this->PropertiesParent->GetWidgetName());  
+  this->MiddleFrame->SetFrame1MinimumWidth(0);
+  this->MiddleFrame->SetFrame1Width(0);
 }
 
 void vtkKWWindow::InstallMenu(vtkKWMenu* menu)
@@ -794,5 +795,5 @@ void vtkKWWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWWindow ";
-  this->ExtractRevision(os,"$Revision: 1.23 $");
+  this->ExtractRevision(os,"$Revision: 1.24 $");
 }

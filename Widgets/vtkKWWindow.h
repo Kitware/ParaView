@@ -39,6 +39,7 @@ class vtkKWApplication;
 #include "vtkKWViewCollection.h"
 #include "vtkKWMenu.h"
 #include "vtkKWNotebook.h"
+#include "vtkKWSplitFrame.h"
 
 class VTK_EXPORT vtkKWWindow : public vtkKWWidget
 {
@@ -180,7 +181,7 @@ protected:
   vtkKWProgressGauge* ProgressGauge;
   vtkKWWidget* ProgressFrame;
   char        *StatusImageName;
-  vtkKWWidget *MiddleFrame; // Contains view frame and properties parent.
+  vtkKWSplitFrame *MiddleFrame; // Contains view frame and properties parent.
   vtkKWWidget *PropertiesParent;
   vtkKWWidget *ViewFrame;
   vtkKWWidget *ToolbarFrame;
