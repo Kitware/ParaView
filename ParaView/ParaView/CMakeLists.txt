@@ -324,10 +324,12 @@ SET(ParaView_SRCS ${ParaView_SRCS} ${ParaViewShared_SRCS}
   ${ParaViewClient_SRCS})
 
 # Setup vtkInstantiator registration for this library's classes.
-VTK_MAKE_INSTANTIATOR2(vtkParaViewInstantiator PVInstantiator_SRCS
-  ${ParaView_SRCS}
-  EXPORT_MACRO VTK_EXPORT
-  HEADER_LOCATION ${PARAVIEW_BINARY_DIR}/ParaView)
+VTK_MAKE_INSTANTIATOR3(vtkParaViewInstantiator 
+  PVInstantiator_SRCS
+  "${ParaView_SRCS}"
+  VTK_EXPORT
+  ${PARAVIEW_BINARY_DIR}/ParaView ""
+  )
 
 # Create Tcl wrappers for ParaView classes.
 VTK_WRAP_TCL2(vtkKWParaViewTCL ParaViewTCL_SRCS ${PVInstantiator_SRCS}
