@@ -134,9 +134,12 @@
 
 #define VTK_PV_ENABLE_OLD_ANIMATION_INTERFACE 0
 
+#if defined(PARAVIEW_USE_SERVERMANAGER_RENDERING)
+  #include "vtkSMRenderModuleProxy.h"
+#endif
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.678");
+vtkCxxRevisionMacro(vtkPVWindow, "1.678.2.1");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -332,7 +335,9 @@ vtkPVWindow::~vtkPVWindow()
     pm->DeleteStreamObject(this->ServerFileListingID, stream);
     pm->SendStream(vtkProcessModule::DATA_SERVER_ROOT, stream);
     }
-
+#if defined(PARAVIEW_USE_SERVERMANAGER_RENDERING)
+  this->SetInteractor(0);
+#else
   if (this->InteractorID.ID)
     {
     vtkPVApplication *pvApp = this->GetPVApplication();
@@ -349,6 +354,7 @@ vtkPVWindow::~vtkPVWindow()
     this->InteractorID.ID = 0;
     this->SetInteractor(NULL);
     }
+#endif
 
   this->PrepareForDelete();
 
@@ -1205,7 +1211,6 @@ void vtkPVWindow::Create(vtkKWApplication *app, const char* vtkNotUsed(args))
     }
   this->SetHorizontalPaneVisibility(hvisibility);
   
-  vtkPVProcessModule* pm = pvApp->GetProcessModule();
   pvApp->SetBalloonHelpDelay(1);
 
   // Put the version in the status bar.
@@ -1240,7 +1245,11 @@ void vtkPVWindow::Create(vtkKWApplication *app, const char* vtkNotUsed(args))
 
   vtkClientServerStream stream;
   // Interface for the preferences.
-
+#if defined(PARAVIEW_USE_SERVERMANAGER_RENDERING)
+  this->SetInteractor(vtkPVGenericRenderWindowInteractor::SafeDownCast(
+      this->GetPVApplication()->GetRenderModuleProxy()->GetInteractor()));
+#else
+  vtkPVProcessModule* pm = pvApp->GetProcessModule();
   // Create a dummy interactor on the satellites so they can have 3d widgets.
   // SetInteractor needs to be called before the main view is set so that there
   // is an interactor to pass to the main view's orientation marker.
@@ -1261,7 +1270,7 @@ void vtkPVWindow::Create(vtkKWApplication *app, const char* vtkNotUsed(args))
   this->SetInteractor(
     vtkPVGenericRenderWindowInteractor::SafeDownCast(
       pvApp->GetProcessModule()->GetObjectFromID(this->InteractorID)));
-  
+#endif
   // Create the main view.
   if (use_splash)
     {
@@ -1320,7 +1329,15 @@ void vtkPVWindow::Create(vtkKWApplication *app, const char* vtkNotUsed(args))
   this->SetCenterAxesProxyName(axes_str.str());
   axes_str.rdbuf()->freeze(0);
   pxm->RegisterProxy("axes",this->CenterAxesProxyName, this->CenterAxesProxy);
-  this->CenterAxesProxy->CreateVTKObjects(1);
+  this->CenterAxesProxy->UpdateVTKObjects();
+#if defined(PARAVIEW_USE_SERVERMANAGER_RENDERING)
+  vtkSMRenderModuleProxy* rm = this->GetPVApplication()->GetRenderModuleProxy();
+  if (rm)
+    {
+    rm->AddDisplay(this->CenterAxesProxy);
+    rm->UpdateVTKObjects();
+    }
+#endif
   
   this->CenterEntryFrame->SetParent(this->PickCenterToolbar->GetFrame());
   this->CenterEntryFrame->Create(app, "frame", "");
@@ -3076,6 +3093,7 @@ void vtkPVWindow::SaveGeometryInBatchFile(ofstream *file,
                                           const char* filename,
                                           int timeIdx) 
 {
+#if !defined(PARAVIEW_USE_SERVERMANAGER_RENDERING)
   vtkPVSource* source;
   const char* sourceName;
   int numParts, partIdx;
@@ -3165,6 +3183,7 @@ void vtkPVWindow::SaveGeometryInBatchFile(ofstream *file,
   delete [] fileName;
   fileName = NULL;
   delete [] filePath;
+#endif
 }
 
 
@@ -3705,10 +3724,15 @@ void vtkPVWindow::RemovePVSource(const char* listname, vtkPVSource *pvs)
     vtkPVSourceCollection* col = this->GetSourceList(listname);
     if (col)
       {
+      vtkSMProxy*p = pvs->GetProxy();
       col->RemoveItem(pvs);
       this->MainView->UpdateNavigationWindow(this->CurrentPVSource, 0);
       this->UpdateSelectMenu();
       this->UpdateAnimationInterface();
+      if (p)
+        {
+        cout << endl;
+        }
       }
     }
 }

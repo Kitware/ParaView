@@ -20,7 +20,7 @@
 #include "vtkPVDataSetAttributesInformation.h"
 
 vtkStandardNewMacro(vtkPVVolumePropertyWidget);
-vtkCxxRevisionMacro(vtkPVVolumePropertyWidget, "1.3");
+vtkCxxRevisionMacro(vtkPVVolumePropertyWidget, "1.3.2.1");
 
 vtkCxxSetObjectMacro(vtkPVVolumePropertyWidget, DataInformation,
                      vtkPVDataInformation);
@@ -28,12 +28,15 @@ vtkCxxSetObjectMacro(vtkPVVolumePropertyWidget, DataInformation,
 vtkPVVolumePropertyWidget::vtkPVVolumePropertyWidget()
 {
   this->DataInformation = NULL;
+  this->ArrayName = 0;
+  this->ScalarMode = vtkPVVolumePropertyWidget::POINT_FIELD_DATA;
 }
 
 // ---------------------------------------------------------------------------
 vtkPVVolumePropertyWidget::~vtkPVVolumePropertyWidget()
 {
   this->SetDataInformation( NULL );
+  this->SetArrayName(0);
 }
 
 
@@ -52,19 +55,25 @@ void vtkPVVolumePropertyWidget::PrintSelf(ostream &os, vtkIndent indent)
     {
     os << "(none)" << endl;
     }
+  os << indent << "ArrayName: " << ( (this->ArrayName)? this->ArrayName :
+    "(null)" ) << endl;
+  os << indent << "ScalarMode: " << this->ScalarMode << endl;
+    
 }
 
 
 // ---------------------------------------------------------------------------
 int vtkPVVolumePropertyWidget::GetDataSetNumberOfComponents()
 {
-  if (this->DataInformation)
+  if (this->DataInformation && this->ArrayName)
     {
-  vtkPVDataSetAttributesInformation *pdInfo = 
-      this->DataInformation->GetPointDataInformation ();
+    vtkPVDataSetAttributesInformation *pdInfo = 
+      (this->ScalarMode == vtkPVVolumePropertyWidget::POINT_FIELD_DATA)?
+      this->DataInformation->GetPointDataInformation ():
+        this->DataInformation->GetCellDataInformation();
     if( pdInfo )
       {
-      vtkPVArrayInformation *arrayInfo = pdInfo->GetArrayInformation (0);
+      vtkPVArrayInformation *arrayInfo = pdInfo->GetArrayInformation (this->ArrayName);
       return arrayInfo->GetNumberOfComponents();
       }
     }
@@ -75,13 +84,17 @@ int vtkPVVolumePropertyWidget::GetDataSetNumberOfComponents()
 int vtkPVVolumePropertyWidget::GetDataSetScalarRange(
   int comp, double range[2])
 {
-  if (this->DataInformation)
+  if (this->DataInformation && this->ArrayName)
     {
     vtkPVDataSetAttributesInformation *pdInfo = 
-      this->DataInformation->GetPointDataInformation ();
+      (this->ScalarMode == vtkPVVolumePropertyWidget::POINT_FIELD_DATA)?
+      this->DataInformation->GetPointDataInformation ():
+        this->DataInformation->GetCellDataInformation();
+    
     if( pdInfo )
       {
-      vtkPVArrayInformation *arrayInfo = pdInfo->GetArrayInformation (0);
+      vtkPVArrayInformation *arrayInfo = pdInfo->GetArrayInformation (
+        this->ArrayName);
       arrayInfo->GetComponentRange (comp, range);
       return 1;
       }
@@ -93,13 +106,15 @@ int vtkPVVolumePropertyWidget::GetDataSetScalarRange(
 int vtkPVVolumePropertyWidget::GetDataSetAdjustedScalarRange(
   int comp, double range[2])
 {
-  if (this->DataInformation)
+  if (this->DataInformation && this->ArrayName)
     {
     vtkPVDataSetAttributesInformation *pdInfo = 
-      this->DataInformation->GetPointDataInformation ();
+      (this->ScalarMode == vtkPVVolumePropertyWidget::POINT_FIELD_DATA)?
+      this->DataInformation->GetPointDataInformation ():
+        this->DataInformation->GetCellDataInformation();
     if( pdInfo )
       {
-      vtkPVArrayInformation *arrayInfo = pdInfo->GetArrayInformation (0);
+      vtkPVArrayInformation *arrayInfo = pdInfo->GetArrayInformation (this->ArrayName);
       arrayInfo->GetComponentRange (comp, range);
       switch( arrayInfo->GetDataType() )
         {
@@ -127,17 +142,7 @@ int vtkPVVolumePropertyWidget::GetDataSetAdjustedScalarRange(
 // ---------------------------------------------------------------------------
 const char* vtkPVVolumePropertyWidget::GetDataSetScalarName()
 {
-  if (this->DataInformation)
-    {
-   vtkPVDataSetAttributesInformation *pdInfo = 
-      this->DataInformation->GetPointDataInformation ();
-    if( pdInfo )
-      {
-      vtkPVArrayInformation *arrayInfo = pdInfo->GetArrayInformation (0);
-      return arrayInfo->GetName();
-      }
-    }
-  return NULL;
+  return this->ArrayName;
 }
 
 // ---------------------------------------------------------------------------

@@ -26,7 +26,7 @@
 #include "vtkUnstructuredGrid.h"
 #include "vtkUpdateSuppressorPipeline.h"
 
-vtkCxxRevisionMacro(vtkPVUpdateSuppressor, "1.24");
+vtkCxxRevisionMacro(vtkPVUpdateSuppressor, "1.24.2.1");
 vtkStandardNewMacro(vtkPVUpdateSuppressor);
 
 //----------------------------------------------------------------------------
@@ -53,7 +53,6 @@ void vtkPVUpdateSuppressor::ForceUpdate()
 {
   vtkDataSet *input = vtkDataSet::SafeDownCast(this->GetInput());
   vtkDataSet *output = this->GetOutput();
-
   if (input == 0)
     {
     vtkErrorMacro("Missing input.");

@@ -42,11 +42,6 @@ public:
   virtual void Create(vtkKWApplication *app, const char *);
       
   // Description:
-  // This pointer gets down cast to a vtkPVCompositeRenderModule.
-  // This UI uses the pointer to access composite specific methods.
-  void SetRenderModule(vtkPVRenderModule* rm);
-
-  // Description:
   // Callback for the use char check button.  
   // The ones without parameters are only public because they are callbacks;
   // they cannot be used from a script because they do not change the state of
@@ -81,8 +76,6 @@ public:
   void CompositeThresholdLabelCallback();
   void SetCompositeThreshold(float val);
   vtkGetMacro(CompositeThreshold, float);
-  // I should really put this in the composite module.
-  void SetCompositeThresholdInternal(float threshold);
 
   // Description:
   // This is a hack to disable a feature that is 
@@ -97,8 +90,6 @@ protected:
   vtkPVCompositeRenderModuleUI();
   ~vtkPVCompositeRenderModuleUI();
  
-  vtkPVCompositeRenderModule* CompositeRenderModule;
-
   vtkKWFrameLabeled *ParallelRenderParametersFrame;
 
   vtkKWCheckButton *CompositeWithFloatCheck;

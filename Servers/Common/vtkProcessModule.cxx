@@ -46,7 +46,7 @@ struct vtkProcessModuleInternals
 };
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkProcessModule, "1.17");
+vtkCxxRevisionMacro(vtkProcessModule, "1.17.2.1");
 vtkCxxSetObjectMacro(vtkProcessModule, RenderModule, vtkPVRenderModule);
 
 //----------------------------------------------------------------------------
@@ -667,6 +667,11 @@ void vtkProcessModule::SetGUIHelper(vtkProcessModuleGUIHelper* h)
 //----------------------------------------------------------------------------
 int vtkProcessModule::SetupRenderModule()
 {
+#if defined(PARAVIEW_USE_SERVERMANAGER_RENDERING)
+  vtkErrorMacro("This method should not have been invoked when using "
+    "ServerManager Render Modules.");
+  return 0;
+#else
   const char* renderModuleName = this->Options->GetRenderModuleName();
   // The client chooses a render module.
   if (renderModuleName == NULL)
@@ -735,6 +740,7 @@ int vtkProcessModule::SetupRenderModule()
   this->Options->SetRenderModuleName(renderModuleName);
 
   return 1;
+#endif
 }
 
 //----------------------------------------------------------------------------

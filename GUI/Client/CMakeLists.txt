@@ -103,6 +103,7 @@ SET( ParaViewClient_SRCS
   vtkPVCameraManipulator.cxx
   vtkPVCaveRenderModuleUI.cxx
   vtkPVColorMap.cxx
+  vtkPVColorSelectionWidget.cxx
   vtkPVCompositeRenderModuleUI.cxx
   vtkPVConnectDialog.cxx
   vtkPVContainerWidget.cxx

@@ -144,6 +144,12 @@ protected:
   // and all of it's properties.
   vtkSMProxy* NewProxy(vtkPVXMLElement* element, const char* groupname);
 
+  // Description:
+  // Given the proxy name and group name, returns the XML element for
+  // the proxy.
+  vtkPVXMLElement* GetProxyElement(const char* groupName,
+    const char* proxyName);
+
 private:
   vtkSMProxyManagerInternals* Internals;
 

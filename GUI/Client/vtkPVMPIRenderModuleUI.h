@@ -26,8 +26,6 @@
 
 #include "vtkPVCompositeRenderModuleUI.h"
 
-class vtkPVMPIRenderModule;
-
 class VTK_EXPORT vtkPVMPIRenderModuleUI : public vtkPVCompositeRenderModuleUI
 {
 public:

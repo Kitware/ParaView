@@ -40,7 +40,7 @@
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkPVLineWidget);
-vtkCxxRevisionMacro(vtkPVLineWidget, "1.63");
+vtkCxxRevisionMacro(vtkPVLineWidget, "1.63.2.1");
 
 //----------------------------------------------------------------------------
 vtkPVLineWidget::vtkPVLineWidget()
@@ -327,7 +327,7 @@ int vtkPVLineWidget::GetResolution()
 int vtkPVLineWidget::GetResolutionInternal()
 {
   vtkSMIntVectorProperty *ivp = vtkSMIntVectorProperty::SafeDownCast(
-    this->WidgetProxy->GetProperty("ResolutionInfo"));
+    this->WidgetProxy->GetProperty("Resolution"));
   return ivp->GetElement(0);
 }
 

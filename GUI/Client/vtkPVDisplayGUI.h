@@ -24,7 +24,6 @@
 
 
 #include "vtkKWFrame.h"
-
 class vtkCollection;
 class vtkKWBoundsDisplay;
 class vtkKWChangeColorButton;
@@ -44,6 +43,7 @@ class vtkPVSource;
 class vtkPVRenderView;
 class vtkPVDataSetAttributesInformation;
 class vtkPVVolumeAppearanceEditor;
+class vtkPVColorSelectionWidget;
 
 // Try to eliminate this !!!!
 class vtkData;
@@ -215,21 +215,13 @@ public:
 
   // Description:
   // Access to option menus for scripting.
-  vtkGetObjectMacro(ColorMenu, vtkKWOptionMenu);
+  vtkGetObjectMacro(ColorSelectionMenu, vtkPVColorSelectionWidget);
 
   // Description:
   // Callback methods when item chosen from ColorMenu
+  void ColorByArray(const char* name, int field);
+  void VolumeRenderByArray(const char* name ,int field);
   void ColorByProperty();
-  void ColorByPointField(const char *name, int numComps);
-  void ColorByCellField(const char *name, int numComps);
-  
-  // Description:
-  // Select a point field to use for volume rendering
-  void VolumeRenderPointField(const char *name, int numComps);
-
-  // Description:
-  // Select a cell field to use for volume rendering
-  void VolumeRenderCellField(const char *name, int numComps);
   
   // Description:
   // Called by vtkPVSource::DeleteCallback().
@@ -318,11 +310,7 @@ protected:
   //==================================================================
   // Internal versions that do not add to the trace.
   void ColorByPropertyInternal();
-  void ColorByPointFieldInternal(const char *name, int numComps);
-  void ColorByCellFieldInternal(const char *name, int numComps);
   void SetActorColor(double r, double g, double b);
-  void VolumeRenderPointFieldInternal(const char *name);
-  void VolumeRenderCellFieldInternal(const char *name);
 
   // Switch between showing the properties for actors and volumes
   void VolumeRenderModeOn();
@@ -343,15 +331,15 @@ protected:
   vtkKWFrameLabeled *ViewFrame;
   
   vtkKWLabel *ColorMenuLabel;
-  vtkKWOptionMenu *ColorMenu;
-
+  vtkPVColorSelectionWidget* ColorSelectionMenu;
+  
   vtkKWChangeColorButton* ColorButton;
   vtkKWWidget*     EditColorMapButtonFrame;
   vtkKWPushButton* EditColorMapButton;
   vtkKWPushButton* DataColorRangeButton;
 
   vtkKWLabel *VolumeScalarsMenuLabel;
-  vtkKWOptionMenu *VolumeScalarsMenu;
+  vtkPVColorSelectionWidget* VolumeScalarSelectionWidget;
 
   vtkKWPushButton *EditVolumeAppearanceButton;
 

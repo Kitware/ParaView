@@ -18,51 +18,48 @@
 #ifndef __vtkSMInteractorObserverProxy__
 #define __vtkSMInteractorObserverProxy__
 
-#include "vtkSMDisplayerProxy.h"
+#include "vtkSMDisplayProxy.h"
 
 class vtkInteractorObserver;
 class vtkSMInteractorObserverProxyObserver;
+class vtkSMRenderModuleProxy;
 
-class VTK_EXPORT vtkSMInteractorObserverProxy : public vtkSMDisplayerProxy
+class VTK_EXPORT vtkSMInteractorObserverProxy : public vtkSMDisplayProxy
 {
 public:
-  vtkTypeRevisionMacro(vtkSMInteractorObserverProxy, vtkSMDisplayerProxy);
+  vtkTypeRevisionMacro(vtkSMInteractorObserverProxy, vtkSMDisplayProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
+  // Called when the display is added/removed to/from a RenderModule.
+  virtual void AddToRenderModule(vtkSMRenderModuleProxy*) = 0;
+  virtual void RemoveFromRenderModule(vtkSMRenderModuleProxy*) = 0;
+  
+  // Description:
   // Get/Set Enabled state of the InteractorObserver
-  vtkSetMacro(Enabled,int);
+  virtual void SetEnabled(int e);
   vtkGetMacro(Enabled,int);
 
   virtual void SaveInBatchScript(ofstream *) { };
 
-  // Description:
-  // Adds this displayer to the Display window proxy
-  virtual void AddToDisplayWindow(vtkSMDisplayWindowProxy* dw);
-
-   // Description:
-   // Update the VTK object on the server by pushing the values of all 
-   // modifed properties (un-modified properties are ignored). If the 
-   // object has not been created, it will be created first.
-   virtual void UpdateVTKObjects();
-
 protected:
   vtkSMInteractorObserverProxy();
   ~vtkSMInteractorObserverProxy();
-  
+
+  void SetCurrentRenderModuleProxy(vtkSMRenderModuleProxy* rm);
+
+  // I keep this pointer since some interactor observers may need to access
+  // the rendermodule (eg. ScalarBarWidget).
+  // Widgets are not enabled until CurrentRenderModuleProxy is set.
+  vtkSMRenderModuleProxy* CurrentRenderModuleProxy;
+
   int Enabled; //flag indicating if the widget is enabled.
   //This is needed since change the Current renderer of the vtk3DWidget
   //does not lead to a call to Enable. 
 
-  void SetCurrentRenderer(vtkClientServerID rendererID);
-  void SetInteractor(vtkClientServerID interactorID);
+  void SetCurrentRenderer(vtkSMProxy* renderer);
+  void SetInteractor(vtkSMProxy* interactor);
 
-  // Flags indicating if the CurrentRenderer/Interactor are set.
-  // Unless they are, SetEnabled messages are not sent to the 
-  // VTK Widget
-  int RendererInitialized;
-  int InteractorInitialized;
-  
   virtual void CreateVTKObjects(int numObjects);
   
   virtual void InitializeObservers(vtkInteractorObserver* wdg);

@@ -358,6 +358,11 @@ IF(VTK_USE_MPI)
 ENDIF(VTK_USE_MPI)
 
 #########################################################################
+# Configure Use of ServerManager RenderModule and Displays.
+OPTION(PARAVIEW_USE_SERVERMANAGER_RENDERING "Use experimental ServerManger Render Modules." OFF)
+MARK_AS_ADVANCED(PARAVIEW_USE_SERVERMANAGER_RENDERING)
+
+#########################################################################
 # Configure KWsys
 SET(KWSYS_NAMESPACE kwsys)
 SET(KWSYS_USE_Process 1)

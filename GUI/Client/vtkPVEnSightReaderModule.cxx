@@ -23,7 +23,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVEnSightReaderModule);
-vtkCxxRevisionMacro(vtkPVEnSightReaderModule, "1.56");
+vtkCxxRevisionMacro(vtkPVEnSightReaderModule, "1.56.2.1");
 
 //----------------------------------------------------------------------------
 vtkPVEnSightReaderModule::vtkPVEnSightReaderModule()
@@ -87,11 +87,13 @@ void vtkPVEnSightReaderModule::SaveInBatchScript(ofstream *file)
       {
       this->PVColorMap->SaveInBatchScript(file);
       }
+#if !defined(PARAVIEW_USE_SERVERMANAGER_RENDERING)
     vtkSMPartDisplay *partD = this->GetPartDisplay();
     if (partD)
       {
       partD->SaveInBatchScript(file, this->GetProxy());
       }
+#endif
     }
 }
 

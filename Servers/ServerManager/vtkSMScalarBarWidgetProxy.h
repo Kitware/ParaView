@@ -85,6 +85,11 @@ public:
   void SetLookupTable(vtkSMProxy* lut);
   //vtkSMProxy* GetLookupTable();
 
+  
+  // Description:
+  // Called when the display is added/removed to/from a RenderModule.
+  virtual void AddToRenderModule(vtkSMRenderModuleProxy*);
+  virtual void RemoveFromRenderModule(vtkSMRenderModuleProxy*);
 protected:
 //BTX
   vtkSMScalarBarWidgetProxy();

@@ -36,7 +36,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkXDMFReaderModule);
-vtkCxxRevisionMacro(vtkXDMFReaderModule, "1.33");
+vtkCxxRevisionMacro(vtkXDMFReaderModule, "1.33.2.1");
 
 int vtkXDMFReaderModuleCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -495,11 +495,13 @@ void vtkXDMFReaderModule::SaveInBatchScript(ofstream *file)
       {
       this->PVColorMap->SaveInBatchScript(file);
       }
+#if !defined(PARAVIEW_USE_SERVERMANAGER_RENDERING)
     vtkSMPartDisplay *partD = this->GetPartDisplay();
     if (partD)
       {
       partD->SaveInBatchScript(file, this->GetProxy());
       }
+#endif
     }
 }
 

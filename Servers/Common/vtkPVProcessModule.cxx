@@ -53,7 +53,7 @@ int vtkPVProcessModule::GlobalLODFlag = 0;
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProcessModule);
-vtkCxxRevisionMacro(vtkPVProcessModule, "1.29");
+vtkCxxRevisionMacro(vtkPVProcessModule, "1.29.2.1");
 
 //----------------------------------------------------------------------------
 vtkPVProcessModule::vtkPVProcessModule()
@@ -488,6 +488,21 @@ void vtkPVProcessModule::SetProcessEnvironmentVariable(int processId,
   (void)processId;
   char* envstr = kwsys::SystemTools::DuplicateString(var);
   putenv(envstr);
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVProcessModule::SynchronizeServerClientOptions()
+{
+  if (!this->Options->GetTileDimensions()[0])
+    {
+    this->Options->SetTileDimensions
+      (this->ServerInformation->GetTileDimensions());
+    }
+  if (!this->Options->GetUseOffscreenRendering())
+    {
+    this->Options->SetUseOffscreenRendering
+      (this->ServerInformation->GetUseOffscreenRendering());
+    }
 }
 
 //-----------------------------------------------------------------------------

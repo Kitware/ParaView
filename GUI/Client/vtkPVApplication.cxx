@@ -12,10 +12,10 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-#include "vtkPVApplication.h"
 
 #include "vtkToolkits.h"
 #include "vtkPVConfig.h"
+#include "vtkPVApplication.h"
 #ifdef VTK_USE_MPI
 #include "vtkMPIController.h"
 #include "vtkMPICommunicator.h"
@@ -106,13 +106,15 @@
 #include <sys/stat.h>
 
 #include <kwsys/SystemTools.hxx>
+#if defined(PARAVIEW_USE_SERVERMANAGER_RENDERING)
+  #include "vtkSMRenderModuleProxy.h"
+#endif
 
 #define PVAPPLICATION_PROGRESS_TAG 31415
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.344");
-
+vtkCxxRevisionMacro(vtkPVApplication, "1.344.2.1");
 
 int vtkPVApplicationCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -452,11 +454,18 @@ vtkPVApplication::vtkPVApplication()
   this->SMApplication = vtkSMApplication::New();
 
   this->SaveRuntimeInfoButton = NULL;
+#if defined(PARAVIEW_USE_SERVERMANAGER_RENDERING)
+  this->RenderModuleProxy = 0;
+  this->RenderModuleProxyName = 0;
+#endif
 }
 
 //----------------------------------------------------------------------------
 vtkPVApplication::~vtkPVApplication()
 {
+#if defined(PARAVIEW_USE_SERVERMANAGER_RENDERING)
+  this->SetRenderModuleProxy(0);
+#endif
   // Remove the ParaView output window so errors during exit will
   // still be displayed.
   vtkOutputWindow::SetInstance(0);
@@ -482,6 +491,8 @@ vtkPVApplication::~vtkPVApplication()
     this->SaveRuntimeInfoButton->Delete();
     this->SaveRuntimeInfoButton = 0;
     }
+  
+
 }
 
 //----------------------------------------------------------------------------
@@ -506,7 +517,115 @@ void vtkPVApplication::SetProcessModule(vtkPVProcessModule *pm)
     pm->GetProgressHandler()->SetServerMode(this->Options->GetServerMode());
     }
 }
+//----------------------------------------------------------------------------
+#if defined(PARAVIEW_USE_SERVERMANAGER_RENDERING)  
+int vtkPVApplication::SetupRenderModule()
+{
+  vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
+  vtkPVProcessModule *pm = vtkPVProcessModule::SafeDownCast(
+    vtkProcessModule::GetProcessModule());
+  pm->SynchronizeServerClientOptions();
+
+  const char* renderModuleName = 0;
+
+  renderModuleName = pm->GetOptions()->GetRenderModuleName();
+  if (!renderModuleName)
+    {
+    // User didn't specify the render module to use.
+    if (pm->GetOptions()->GetTileDimensions()[0])
+      {
+      // Server/client says we are rendering for a Tile Display.
+      // Now decide if we must use IceT or not.
+      if (pm->GetServerInformation()->GetUseIceT())
+        {
+        renderModuleName = "IceTRenderModule";
+        }
+      else
+        {
+        renderModuleName = "MultiDisplayRenderModule";
+        }
+      }
+    else if (pm->GetOptions()->GetClientMode())
+      {
+      // Client server configuration without Tiles.
+      if (pm->GetServerInformation()->GetUseIceT())
+        {
+        renderModuleName = "DeskTopRenderModule";
+        //TODO: change name.
+        }
+      else
+        {
+        renderModuleName = "MPIRenderModule"; 
+        // TODO: if I separated the MPI and ClientServer
+        // render modules, this is where I will use
+        // the ClientServerRenderModule.
+        }
+      }
+    else
+      {
+      // Not running in Client Server Mode.
+      // Use local information to choose render module.
+#ifdef VTK_USE_MPI
+      renderModuleName = "MPIRenderModule";
+#else
+      renderModuleName = "LODRenderModule";
+#endif
+      }
+    }
   
+  vtkSMProxy *p = pxm->NewProxy("rendermodules", renderModuleName);
+  
+  if (!p)
+    {
+    return 0;
+    }
+  
+  vtkSMRenderModuleProxy* rm = vtkSMRenderModuleProxy::SafeDownCast(p);
+  if (!rm)
+    {
+    vtkErrorMacro("Render Module must be a subclass of vtkSMRenderModuleProxy.");
+    p->Delete();
+    return 0;
+    }
+  rm->UpdateVTKObjects();
+  this->SetRenderModuleProxy(rm);
+  pm->GetOptions()->SetRenderModuleName(renderModuleName);
+  rm->Delete();
+  return 1;
+}
+#endif
+
+//----------------------------------------------------------------------------
+#if defined(PARAVIEW_USE_SERVERMANAGER_RENDERING)
+void vtkPVApplication::SetRenderModuleProxy(vtkSMRenderModuleProxy* rm)
+{
+  vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
+  if (this->RenderModuleProxy)
+    {
+    if (this->RenderModuleProxyName && pxm)
+      {
+      pxm->UnRegisterProxy("rendermodules",this->RenderModuleProxyName);
+      }
+    this->SetRenderModuleProxyName(0);
+    this->RenderModuleProxy->UnRegister(this);
+    }
+  this->RenderModuleProxy = rm;
+  if (this->RenderModuleProxy)
+    {
+    this->RenderModuleProxy->Register(this);
+    if (pxm)
+      {
+      static int numObjects = 0;
+      ostrstream str;
+      str << "vtkPVApplication_RenderModule" << numObjects << ends;
+      pxm->RegisterProxy("rendermodules",str.str(), this->RenderModuleProxy);
+      this->SetRenderModuleProxyName(str.str());
+      str.rdbuf()->freeze(0);
+      }
+    }
+}
+#endif
+
 //----------------------------------------------------------------------------
 vtkMultiProcessController* vtkPVApplication::GetController()
 {
@@ -890,7 +1009,13 @@ void vtkPVApplication::Initialize()
 void vtkPVApplication::Start(int argc, char*argv[])
 {
   this->Initialize();
-
+#if defined(PARAVIEW_USE_SERVERMANAGER_RENDERING)
+  if (!this->SetupRenderModule())
+    {
+    vtkErrorMacro("Failed to setup Render Module. Aborting.");
+    abort();
+    }
+#endif
   // set the font size to be small
 #ifdef _WIN32
   this->Script("option add *font {{Tahoma} 8}");
@@ -1196,7 +1321,11 @@ void vtkPVApplication::Start(int argc, char*argv[])
   this->OutputWindow->SetWindowCollection(0);
 
   // Break a circular reference.
+#if defined(PARAVIEW_USE_SERVERMANAGER_RENDERING)
+  this->SetRenderModuleProxy(0);
+#else
   this->ProcessModule->SetRenderModule(NULL);
+#endif
 }
 
 //----------------------------------------------------------------------------
@@ -1282,7 +1411,11 @@ void vtkPVApplication::Close(vtkKWWindow *win)
   if (this->Windows->GetNumberOfItems() == 1)
     {
     // Try to get the render window to destruct before the render widget.
+#if defined(PARAVIEW_USE_SERVERMANAGER_RENDERING)
+    this->SetRenderModuleProxy(0);
+#else
     this->ProcessModule->SetRenderModule(NULL);
+#endif
     }
 
   this->Superclass::Close(win);

@@ -20,14 +20,14 @@
 #include "vtkScalarBarActor.h"
 #include "vtkScalarBarWidget.h"
 #include "vtkCoordinate.h"
-#include "vtkPVRenderModule.h"
 #include "vtkSMStringVectorProperty.h"
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMProxyProperty.h"
+#include "vtkSMRenderModuleProxy.h"
 
 vtkStandardNewMacro(vtkSMScalarBarWidgetProxy);
-vtkCxxRevisionMacro(vtkSMScalarBarWidgetProxy, "1.6");
+vtkCxxRevisionMacro(vtkSMScalarBarWidgetProxy, "1.6.2.1");
 
 //----------------------------------------------------------------------------
 vtkSMScalarBarWidgetProxy::vtkSMScalarBarWidgetProxy()
@@ -46,6 +46,25 @@ vtkSMScalarBarWidgetProxy::~vtkSMScalarBarWidgetProxy()
 }
 
 //----------------------------------------------------------------------------
+void vtkSMScalarBarWidgetProxy::AddToRenderModule(vtkSMRenderModuleProxy* rm)
+{
+  this->SetCurrentRenderer(rm->GetRenderer2DProxy());
+  this->SetInteractor(rm->GetInteractorProxy());
+  this->SetCurrentRenderModuleProxy(rm);
+}
+
+//----------------------------------------------------------------------------
+void vtkSMScalarBarWidgetProxy::RemoveFromRenderModule(vtkSMRenderModuleProxy* rm)
+{
+  if (this->CurrentRenderModuleProxy == rm )
+    {
+    this->SetCurrentRenderer(rm->GetRenderer2DProxy());
+    this->SetInteractor(rm->GetInteractorProxy());
+    this->SetCurrentRenderModuleProxy(0); 
+    }
+}
+
+//----------------------------------------------------------------------------
 void vtkSMScalarBarWidgetProxy::CreateVTKObjects(int numObjects)
 {
   if (this->ObjectsCreated)
@@ -53,27 +72,15 @@ void vtkSMScalarBarWidgetProxy::CreateVTKObjects(int numObjects)
     return;
     }
   this->Superclass::CreateVTKObjects(numObjects);
-  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  if (pm->GetRenderModule())
-    {
-    vtkClientServerID rendererID = pm->GetRenderModule()->GetRenderer2DID();
-    vtkClientServerID interactorID = pm->GetRenderModule()->GetInteractorID();
-    this->SetCurrentRenderer(rendererID);
-    this->SetInteractor(interactorID);
-    }
 }
 
 //----------------------------------------------------------------------------
 void vtkSMScalarBarWidgetProxy::SetEnabled(int enable)
 {
-  if (enable)
+  if (enable && this->CurrentRenderModuleProxy)
     {
-    vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-    if (pm->GetRenderModule())
-      {
-      vtkClientServerID rendererID = pm->GetRenderModule()->GetRenderer2DID();
-      this->SetCurrentRenderer(rendererID);
-      }
+    this->SetCurrentRenderer(
+      this->CurrentRenderModuleProxy->GetRenderer2DProxy());
     }
   this->Superclass::SetEnabled(enable);
 }

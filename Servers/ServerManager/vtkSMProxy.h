@@ -139,6 +139,10 @@ public:
   // information are updated.
   virtual void UpdateInformation();
   
+  // Description:
+  // Return the servers.
+  vtkTypeUInt32 GetServers();
+
 protected:
   vtkSMProxy();
   ~vtkSMProxy();
@@ -162,8 +166,18 @@ protected:
   friend class vtkSMCompositePartDisplay;
   friend class vtkSMPointLabelDisplay;
   friend class vtkSMPlotDisplay;
-  friend class vtkSMCubeAxesDisplay;
+  friend class vtkSMCubeAxesDisplayProxy;
   friend class vtkSMBoxWidgetProxy;
+  friend class vtkSMSimpleDisplayProxy;
+  friend class vtkSMLODDisplayProxy;
+  friend class vtkSMCompositeDisplayProxy;
+  friend class vtkSMRenderModuleProxy;
+  friend class vtkSMMPIRenderModuleProxy;
+  friend class vtkSMCaveRenderModuleProxy;
+  friend class vtkSMCompositeRenderModuleProxy;
+  friend class vtkSMIceTRenderModuleProxy;
+  friend class vtkSMIceTDesktopRenderModuleProxy;
+  friend class vtkSMMultiDisplayRenderModuleProxy;
 //ETX
 
   // Description:
@@ -217,10 +231,6 @@ protected:
   // Changing them after creation has no effect.
   // See vtkProcessModule.h for a list of all server types.
   // To add a server, OR it's value with the servers ivar.
-
-  // Description:
-  // Return the servers.
-  vtkTypeUInt32 GetServers();
 
   // Description:
   // Set server ids on self and sub-proxies.
@@ -321,6 +331,7 @@ protected:
   // Creates a new proxy and initializes it by calling ReadXMLAttributes()
   // with the right XML element.
   vtkSMProperty* NewProperty(const char* name);
+  vtkSMProperty* NewProperty(const char* name, vtkPVXMLElement* propElement);
 
   // Description:
   // Return a property of the given name from self or one of
@@ -330,7 +341,10 @@ protected:
 
   // Description:
   // Read attributes from an XML element.
-  int ReadXMLAttributes(vtkSMProxyManager* pm, vtkPVXMLElement* element);
+  virtual int ReadXMLAttributes(vtkSMProxyManager* pm, vtkPVXMLElement* element);
+
+  int CreateSubProxiesAndProperties(vtkSMProxyManager* pm, 
+    vtkPVXMLElement *element);
 
   char* VTKClassName;
   char* XMLGroup;
@@ -339,6 +353,14 @@ protected:
   vtkTypeUInt32 Servers;
   int DoNotModifyProperty;
 
+  // Avoids calls to UpdateVTKObjects in UpdateVTKObjects.
+  // UpdateVTKObjects call it self recursively until no
+  // properties are modified.
+  int InUpdateVTKObjects;
+
+  // Indicates if any properties are modified.
+  int ArePropertiesModified(int selfOnly = 0);
+
   vtkClientServerID SelfID;
 
   void SetXMLElement(vtkPVXMLElement* element);
@@ -346,6 +368,9 @@ protected:
 
   virtual void SaveState(const char* name, ostream* file, vtkIndent indent);
 
+  void SetupSharedProperties(vtkSMProxy* subproxy, vtkPVXMLElement *element);
+
+  int CreateProxyHierarchy(vtkSMProxyManager* pm, vtkPVXMLElement* element);
 private:
   vtkSMProxyInternals* Internals;
 

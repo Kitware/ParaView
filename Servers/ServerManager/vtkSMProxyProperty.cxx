@@ -21,13 +21,14 @@
 #include "vtkSMProxyGroupDomain.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSmartPointer.h"
+#include "vtkPVXMLElement.h"
 
 #include <vtkstd/vector>
 
 #include "vtkStdString.h"
 
 vtkStandardNewMacro(vtkSMProxyProperty);
-vtkCxxRevisionMacro(vtkSMProxyProperty, "1.14");
+vtkCxxRevisionMacro(vtkSMProxyProperty, "1.14.6.1");
 
 struct vtkSMProxyPropertyInternals
 {
@@ -40,12 +41,14 @@ struct vtkSMProxyPropertyInternals
 vtkSMProxyProperty::vtkSMProxyProperty()
 {
   this->PPInternals = new vtkSMProxyPropertyInternals;
+  this->CleanCommand = 0;
 }
 
 //---------------------------------------------------------------------------
 vtkSMProxyProperty::~vtkSMProxyProperty()
 {
   delete this->PPInternals;
+  this->SetCleanCommand(0);
 }
 
 //---------------------------------------------------------------------------
@@ -69,6 +72,13 @@ void vtkSMProxyProperty::AppendCommandToStream(
   if (!this->Command || this->InformationOnly)
     {
     return;
+    }
+
+  if (this->CleanCommand)
+    {
+    *str << vtkClientServerStream::Invoke
+      << objectId << this->CleanCommand
+      << vtkClientServerStream::End;
     }
 
   unsigned int numProxies = this->GetNumberOfProxies();
@@ -184,6 +194,31 @@ int vtkSMProxyProperty::AddProxy(vtkSMProxy* proxy, int modify)
 }
 
 //---------------------------------------------------------------------------
+void vtkSMProxyProperty::RemoveProxy(vtkSMProxy* proxy)
+{
+  this->RemoveProxy(proxy, 1);
+}
+
+//---------------------------------------------------------------------------
+void vtkSMProxyProperty::RemoveProxy(vtkSMProxy* proxy, int modify)
+{
+  vtkstd::vector<vtkSmartPointer<vtkSMProxy> >::iterator iter =   
+    this->PPInternals->Proxies.begin();
+  for ( ; iter != this->PPInternals->Proxies.end() ; ++iter)
+    {
+    if (*iter == proxy)
+      {
+      this->PPInternals->Proxies.erase(iter);
+      if (modify)
+        {
+        this->Modified();
+        }
+      break;
+      }
+    }
+}
+
+//---------------------------------------------------------------------------
 int vtkSMProxyProperty::SetProxy(unsigned int idx, vtkSMProxy* proxy)
 {
   if ( vtkSMProperty::GetCheckDomains() )
@@ -239,6 +274,20 @@ vtkSMProxy* vtkSMProxyProperty::GetProxy(unsigned int idx)
 vtkSMProxy* vtkSMProxyProperty::GetUncheckedProxy(unsigned int idx)
 {
   return this->PPInternals->UncheckedProxies[idx];
+}
+
+//---------------------------------------------------------------------------
+int vtkSMProxyProperty::ReadXMLAttributes(vtkSMProxy* parent,
+                                          vtkPVXMLElement* element)
+{
+  int ret = this->Superclass::ReadXMLAttributes(parent, element);
+  
+  const char* clean_command = element->GetAttribute("clean_command");
+  if(clean_command) 
+    { 
+    this->SetCleanCommand(clean_command); 
+    }
+  return ret;
 }
 
 //---------------------------------------------------------------------------
@@ -309,4 +358,8 @@ void vtkSMProxyProperty::PrintSelf(ostream& os, vtkIndent indent)
     os << this->GetProxy(i) << " ";
     }
   os << endl;
+  os << indent 
+     << "CleanCommand: "
+     << (this->CleanCommand ? this->CleanCommand : "(none)") 
+     << endl;
 }

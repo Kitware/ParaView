@@ -13,7 +13,6 @@
 
 =========================================================================*/
 #include "vtkPVMPIRenderModuleUI.h"
-#include "vtkPVMPIRenderModule.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
 
@@ -21,7 +20,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVMPIRenderModuleUI);
-vtkCxxRevisionMacro(vtkPVMPIRenderModuleUI, "1.3");
+vtkCxxRevisionMacro(vtkPVMPIRenderModuleUI, "1.3.14.1");
 
 int vtkPVMPIRenderModuleUICommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);

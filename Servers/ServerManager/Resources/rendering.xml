@@ -249,6 +249,16 @@
              default_values="0 0 1 1">
             <DoubleRangeDomain name="range" min="0 0 0 0" max="1 1 1 1" />
           </DoubleVectorProperty>
+          <ProxyProperty name="AddViewProp" command="AddViewProp">
+            <ProxyGroupDomain name="groups">
+              <Group name="actors"/>
+            </ProxyGroupDomain>
+          </ProxyProperty>
+          <ProxyProperty name="RemoveViewProp" command="RemoveViewProp">
+            <ProxyGroupDomain name="groups">
+              <Group name="actors"/>
+            </ProxyGroupDomain>
+          </ProxyProperty>
        </Proxy>
      </SubProxy>
      <SubProxy>
@@ -361,6 +371,1253 @@
      </SubProxy>
     </DisplayWindowProxy>
 
-   </ProxyGroup>
+  </ProxyGroup>
+   
+  <ProxyGroup name="renderers">
+    <Proxy name="Renderer" class="vtkRenderer">
+      <ProxyProperty name="ActiveCamera" command="SetActiveCamera">
+        <ProxyGroupDomain name="groups">
+          <Group name="camera"/>
+        </ProxyGroupDomain>
+      </ProxyProperty>
+      <ProxyProperty 
+        name="ViewProps" 
+        command="AddViewProp"
+        clean_command="RemoveAllProps">
+        <ProxyGroupDomain name="groups">
+          <Group name="props" />
+          <Group name="annotations" />
+        </ProxyGroupDomain>
+      </ProxyProperty>
 
- </ServerManagerConfiguration>
+      <IntVectorProperty
+        name="Erase"
+        command="SetErase"
+        number_of_elements="1"
+        default_values="1">
+        <BooleanDomain name="bool"/>
+      </IntVectorProperty>
+      
+      <IntVectorProperty
+        name="Layer"
+        command="SetLayer"
+        number_of_elements="1"
+        default_values="1">
+        <IntRangeDomain name="range" min="1" max="100"/>
+      </IntVectorProperty>
+      
+      <DoubleVectorProperty
+        name="BackgroundInfo"
+        command="GetBackground"
+        number_of_elements="3"
+        information_only="1"
+        default_values="0 0 0">
+        <SimpleDoubleInformationHelper/>
+      </DoubleVectorProperty>
+      
+      <DoubleVectorProperty
+        name="Background"
+        command="SetBackground"
+        number_of_elements="3"
+        information_property="BackgroundInfo"
+        default_values="0 0 0" >
+        <DoubleRangeDomain name="range" min="0 0 0" max="1 1 1"/>
+      </DoubleVectorProperty>
+    </Proxy>
+  </ProxyGroup>
+
+  <ProxyGroup name="camera">
+    <Proxy name="Camera" class="vtkCamera">
+      <DoubleVectorProperty
+        name="CameraPositionInfo"
+        command="GetPosition"
+        number_of_elements="3"
+        information_only="1"
+        default_values="1 0 0 ">
+        <SimpleDoubleInformationHelper/>
+      </DoubleVectorProperty>
+      
+      <DoubleVectorProperty
+        name="CameraPosition"
+        command="SetPosition"
+        number_of_elements="3"
+        information_property="CameraPositionInfo"
+        default_values="1 0 0">
+      </DoubleVectorProperty>
+      
+      <DoubleVectorProperty
+        name="CameraFocalPointInfo"
+        command="GetFocalPoint"
+        number_of_elements="3"
+        information_only="1"
+        default_values="0 0 0">
+        <SimpleDoubleInformationHelper/>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty
+        name="CameraFocalPoint"
+        command="SetFocalPoint"
+        number_of_elements="3"
+        information_property="CameraFocalPointInfo"
+        default_values="0 0 0">
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty
+        name="CameraViewUpInfo"
+        command="GetViewUp"
+        number_of_elements="3"
+        information_only="1"
+        default_values="0 1 0">
+        <SimpleDoubleInformationHelper/>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty
+        name="CameraViewUp"
+        command="SetViewUp"
+        number_of_elements="3"
+        information_property="CameraViewUpInfo"
+        default_values="0 1 0">
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty
+        name="CameraViewAngleInfo"
+        command="GetViewAngle"
+        number_of_elements="1"
+        information_only="1"
+        default_values="30">
+        <SimpleDoubleInformationHelper/>
+      </DoubleVectorProperty>
+        
+      <DoubleVectorProperty
+        name="CameraViewAngle"
+        command="SetViewAngle"
+        number_of_elements="1"
+        information_property="CameraViewAngleInfo"
+        default_values="30">
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty
+        name="CameraClippingRangeInfo"
+        command="GetClippingRange"
+        number_of_elements="2"
+        information_only="1"
+        default_values="0.01 1000.01">
+        <SimpleDoubleInformationHelper/>
+      </DoubleVectorProperty>
+        
+      <DoubleVectorProperty
+        name="CameraClippingRange"
+        command="SetClippingRange"
+        number_of_elements="2"
+        information_property="CameraClippingRangeInfo"
+        default_values="0.01 1000.01">
+      </DoubleVectorProperty>
+
+      <IntVectorProperty
+        name="ParallelProjection"
+        command="SetParallelProjection"
+        number_of_elements="1"
+        default_values="0">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+    </Proxy> <!-- end of Camera Proxy -->
+  </ProxyGroup>
+    
+  <ProxyGroup name="renderwindow">
+    <!-- Proxy for renderwindow -->
+    <Proxy name="RenderWindow" class="vtkRenderWindow">
+      <ProxyProperty name="Renderer" command="AddRenderer">
+        <ProxyGroupDomain name="groups">
+          <Group name="renderers"/>
+        </ProxyGroupDomain>
+      </ProxyProperty>
+
+      <IntVectorProperty
+        name="StereoCapableWindow"
+        command="SetStereoCapableWindow"
+        number_of_elements="1"
+        default_values="0">
+        <BooleanDomain name="bool"/>
+      </IntVectorProperty>
+
+      <IntVectorProperty
+        name="StereoRender"
+        command="SetStereoRender"
+        number_of_elements="1"
+        default_values="0">
+        <BooleanDomain name="bool"/>
+      </IntVectorProperty>
+
+      <IntVectorProperty
+        name="NumberOfLayers"
+        command="SetNumberOfLayers"
+        number_of_elements="1"
+        default_values="1">
+        <IntRangeDomain name="range" min="1" max="100"/>
+      </IntVectorProperty>
+
+      <DoubleVectorProperty
+        name="DesiredUpdateRate"
+        command="SetDesiredUpdateRate"
+        number_of_elements="1"
+        default_values="0">
+        <DoubleRangeDomain name="range" min="0" />
+      </DoubleVectorProperty>
+
+      <IntVectorProperty
+        name="FullScreen"
+        command="SetFullScreen"
+        number_of_elements="1"
+        default_values="0">
+        <BooleanDomain name="bool"/>
+      </IntVectorProperty>
+      <Property name="Render" command="Render">
+      </Property>
+    </Proxy>
+    
+  </ProxyGroup>
+
+  <ProxyGroup name="mappers">
+    <SourceProxy name="PolyDataMapper" class="vtkPolyDataMapper">
+      <InputProperty name="Input" command="SetInput">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkPolyData"/>
+        </DataTypeDomain>
+      </InputProperty>
+      <ProxyProperty
+        name="LookupTable" command="SetLookupTable">
+        <ProxyGroupDomain name="groups">
+          <Group name="lookup_tables"/>
+        </ProxyGroupDomain>
+      </ProxyProperty>
+      <IntVectorProperty 
+        name="ScalarVisibility" 
+        command="SetScalarVisibility"
+        number_of_elements="1"
+        default_values="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <IntVectorProperty 
+        name="ColorMode" 
+        command="SetColorMode"
+        number_of_elements="1"
+        default_values="0">
+        <EnumerationDomain name="enum">
+          <Entry value="0" text="Default"/>
+          <Entry value="1" text="MapScalars"/>
+        </EnumerationDomain>
+      </IntVectorProperty>
+      
+      <IntVectorProperty 
+        name="ImmediateModeRendering" 
+        command="SetImmediateModeRendering"
+        number_of_elements="1"
+        default_values="0">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <IntVectorProperty
+        name="InterpolateScalarsBeforeMapping"
+        command="SetInterpolateScalarsBeforeMapping"
+        number_of_elements="1"
+        default_values="0">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <IntVectorProperty
+        name="UseLookupTableScalarRange"
+        command="SetUseLookupTableScalarRange"
+        number_of_elements="1"
+        default_values="0">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <IntVectorProperty
+        name="ScalarMode"
+        command="SetScalarMode"
+        default_values="0"
+        number_of_elements="1">
+        <EnumerationDomain name="enum">
+          <Entry value="0" text="Default"/>
+          <Entry value="1" text="UsePointData"/>
+          <Entry value="2" text="UseCellData"/>
+          <Entry value="3" text="UsePointFieldData"/>
+          <Entry value="4" text="UseCellFieldData"/>
+        </EnumerationDomain>
+      </IntVectorProperty>
+      <StringVectorProperty 
+        name="ColorArray" 
+        command="SelectColorArray" 
+        number_of_elements="1"> 
+        <ArrayListDomain name="array_list" attribute_type="Scalars">
+          <RequiredProperties>
+            <Property name="Input" function="Input"/>
+          </RequiredProperties>
+        </ArrayListDomain>
+      </StringVectorProperty>
+    </SourceProxy>
+
+    <SourceProxy name="UnstructuredGridVolumeRayCastMapper" 
+      class="vtkUnstructuredGridVolumeRayCastMapper">
+      <InputProperty
+        name="Input"
+        command="SetInput">
+        <!-- 
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+        -->
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkUnstructuredGrid"/>
+        </DataTypeDomain>
+      </InputProperty>
+      <IntVectorProperty
+        name="ScalarMode"
+        command="SetScalarMode"
+        default_values="3"
+        number_of_elements="1">
+        <EnumerationDomain name="enum">
+          <Entry value="0" text="Default"/>
+          <Entry value="1" text="PointData"/>
+          <Entry value="2" text="CellData"/>
+          <Entry value="3" text="PointFieldData"/>
+          <Entry value="4" text="CellFieldData"/>
+        </EnumerationDomain>
+      </IntVectorProperty>
+      <StringVectorProperty
+        name="SelectScalarArray"
+        command="SelectScalarArray"
+        number_of_elements="1">
+        <ArrayListDomain name="array_list" attribute_type="Scalars">
+          <RequiredProperties>
+            <Property name="Input" function="Input"/>
+          </RequiredProperties>
+        </ArrayListDomain>
+      </StringVectorProperty>
+    </SourceProxy>
+  </ProxyGroup>
+
+  <ProxyGroup name="props">
+    <Proxy name="Actor" class="vtkActor">
+      <ProxyProperty
+        name="Property"
+        command="SetProperty"
+        immediate_update="1">
+        <ProxyGroupDomain name="groups">
+          <Group name="properties"/>
+        </ProxyGroupDomain>
+      </ProxyProperty>
+      <ProxyProperty
+        name="Mapper"
+        command="SetMapper">
+        <ProxyGroupDomain name="groups">
+          <Group name="mappers" />
+        </ProxyGroupDomain>
+      </ProxyProperty>
+      <IntVectorProperty
+        name="Visibility"
+        command="SetVisibility"
+        number_of_elements="1"
+        default_values="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <DoubleVectorProperty
+        name="Position"
+        command="SetPosition"
+        number_of_elements="3"
+        default_values="0 0 0">
+        <DoubleRangeDomain name="range" />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty
+        name="Scale"
+        command="SetScale"
+        number_of_elements="3"
+        default_values="1 1 1">
+        <DoubleRangeDomain name="range" />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty
+        name="Orientation"
+        command="SetOrientation"
+        number_of_elements="3"
+        default_values="0 0 0">
+        <DoubleRangeDomain name="range" />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty
+        name="Origin"
+        command="SetOrigin"
+        number_of_elements="3"
+        default_values="0 0 0">
+        <DoubleRangeDomain name="range" />
+      </DoubleVectorProperty>
+      <!-- End of Actor -->
+    </Proxy>
+
+    <Proxy name="LODActor" class="vtkPVLODActor"
+      base_proxygroup="props" base_proxyname="Actor">
+      <ProxyProperty name="LODMapper" command="SetLODMapper">
+        <ProxyGroupDomain name="groups">
+          <Group name="mappers" />
+        </ProxyGroupDomain>
+      </ProxyProperty>
+      <!-- End of LODActor -->
+    </Proxy>
+
+    <Proxy name="LODVolume" class="vtkPVLODVolume"
+      base_proxygroup="props" base_proxyname="Actor">
+      <ProxyProperty name="LODMapper" command="SetLODMapper">
+        <ProxyGroupDomain name="groups">
+          <Group name="mappers" />
+        </ProxyGroupDomain>
+      </ProxyProperty>
+      <!-- End of LODVolume -->
+    </Proxy>
+  </ProxyGroup>
+  
+  <ProxyGroup name="properties">
+    <Proxy name="VolumeProperty" class="vtkVolumeProperty">
+      <IntVectorProperty
+        name="InterpolationType"
+        command="SetInterpolationType"
+        number_of_elements="1"
+        default_values="0">
+        <EnumerationDomain name="enum" >
+          <Entry value="0" text="Nearest" />
+          <Entry value="1" text="Linear" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+      <ProxyProperty
+        name="ColorTransferFunction"
+        command="SetColor">
+        <ProxyGroupDomain name="groups">
+          <Group name="transfer_functions" />
+        </ProxyGroupDomain>
+      </ProxyProperty>
+      <ProxyProperty
+        name="ScalarOpacityFunction"
+        command="SetScalarOpacity">
+        <ProxyGroupDomain name="groups">
+          <Group name="piecewise_functions" />
+        </ProxyGroupDomain>
+      </ProxyProperty>
+      <DoubleVectorProperty
+        name="ScalarOpacityUnitDistance"
+        command="SetScalarOpacityUnitDistance"
+        number_of_elements="1"
+        default_values="1">
+      </DoubleVectorProperty>
+    </Proxy>
+
+    <Proxy name="Property" class="vtkProperty">
+      <DoubleVectorProperty
+        name="LineWidth"
+        command="SetLineWidth"
+        number_of_elements="1"
+        default_values="1.0">
+        <DoubleRangeDomain name="range" min="0"/>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty
+        name="PointSize"
+        command="SetPointSize"
+        number_of_elements="1"
+        default_values="1.0">
+        <DoubleRangeDomain name="range" min="0" />
+      </DoubleVectorProperty>
+      <IntVectorProperty
+        name="Interpolation"
+        command="SetInterpolation"
+        number_of_elements="1"
+        default_values="1">
+        <EnumerationDomain name="enum">
+          <Entry value="0" text="Flat" />
+          <Entry value="1" text="Gourand" />
+          <Entry value="2" text="Phong" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+      <IntVectorProperty
+        name="Representation"
+        command="SetRepresentation"
+        number_of_elements="1"
+        default_values="2">
+        <EnumerationDomain name="enum">
+          <Entry value="0" text="Points" />
+          <Entry value="1" text="Wireframe" />
+          <Entry value="2" text="Surface" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+      <DoubleVectorProperty
+        name="Color"
+        command="SetColor"
+        number_of_elements="3"
+        default_values="1.0 1.0 1.0">
+        <DoubleRangeDomain name="range" min="0 0 0" max="1 1 1" />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty
+        name="Opacity"
+        command="SetOpacity"
+        number_of_elements="1"
+        default_values="1.0">
+        <DoubleRangeDomain name="range" min="0" max="1" />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty
+        name="Ambient"
+        command="SetAmbient"
+        number_of_elements="1"
+        default_values="0.0">
+        <DoubleRangeDomain name="range" min="0" max="1" />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty
+        name="Diffuse"
+        command="SetDiffuse"
+        number_of_elements="1"
+        default_values="0.0">
+        <DoubleRangeDomain name="range" min="0" max="1" />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty
+        name="Specular"
+        command="SetSpecular"
+        number_of_elements="1"
+        default_values="0.0">
+        <DoubleRangeDomain name="range" min="0" max="1" />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty
+        name="SpecularPower"
+        command="SetSpecularPower"
+        number_of_elements="1"
+        default_values="0.0">
+        <DoubleRangeDomain name="range" min="0" max="100" />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty
+        name="SpecularColor"
+        command="SetSpecularColor"
+        number_of_elements="3"
+        default_values="1.0 1.0 1.0">
+        <DoubleRangeDomain name="range" min="0 0 0" max="1 1 1" />
+      </DoubleVectorProperty>
+    </Proxy>
+  </ProxyGroup>
+
+  <ProxyGroup name="rendermodules">
+    <SimpleRenderModuleProxy name="SimpleRenderModule">
+      <Property name="StillRender" command="StillRender" update_self="1">
+      </Property>
+      <Property name="InteractiveRender" command="InteractiveRender" update_self="1">
+      </Property>
+      <ProxyProperty
+        name="AddDisplay"
+        command="AddDisplay"
+        update_self="1">
+        <ProxyGroupDomain name="groups">
+          <Group name="displays" />
+        </ProxyGroupDomain>
+      </ProxyProperty>
+      <ProxyProperty
+        name="RemoveDisplay"
+        command="RemoveDisplay"
+        update_self="1">
+        <ProxyGroupDomain name="groups">
+          <Group name="displays" />
+        </ProxyGroupDomain>
+      </ProxyProperty>
+      <IntVectorProperty
+        name="CacheUpdate"
+        command="CacheUpdate"
+        number_of_elements="2"
+        update_self="1"
+        default_values="0 0">
+        <IntRangeDomain name="range" min="0 0" />
+      </IntVectorProperty>
+      <Property
+        name="InvalidateGeometry"
+        command="InvalidateGeometry">
+      </Property>
+      <IntVectorProperty
+        name="UseTriangleStrips"
+        command="SetUseTriangleStrips"
+        number_of_elements="1"
+        update_self="1"
+        default_values="0">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <IntVectorProperty
+        name="UseImmediateMode"
+        command="SetUseImmediateMode"
+        number_of_elements="1"
+        update_self="1"
+        default_values="0">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <IntVectorProperty
+        name="RenderInterruptsEnabled"
+        command="SetRenderInterruptsEnabled"
+        number_of_elements="1"
+        update_self="1"
+        default_values="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+        
+      <!-- SubProxies -->
+      <SubProxy>
+        <Proxy name="Renderer" proxyname="Renderer" proxygroup="renderers">
+        </Proxy>
+      </SubProxy>
+      <SubProxy>
+        <Proxy name="Renderer2D" proxyname="Renderer" proxygroup="renderers">
+        </Proxy>
+      </SubProxy>
+      <SubProxy>
+        <Proxy name="ActiveCamera" proxyname="Camera" proxygroup="camera">
+        </Proxy>
+      </SubProxy>
+      <SubProxy>
+        <Proxy name="RenderWindow" proxyname="RenderWindow" proxygroup="renderwindow">
+        </Proxy>
+      </SubProxy>
+      <SubProxy>
+        <Proxy name="Interactor" proxyname="GenericRenderWindowInteractor" 
+          proxygroup="interactors">
+        </Proxy>
+      </SubProxy>
+      <!-- Shouldnt there be an interactor as well? -->
+    </SimpleRenderModuleProxy>
+
+    <LODRenderModuleProxy name="LODRenderModule" base_proxygroup="rendermodules"
+      base_proxyname="SimpleRenderModule">
+      <IntVectorProperty
+        name="LODResolution"
+        command="SetLODResolution"
+        number_of_elements="1"
+        default_values="50"
+        update_self="1">
+        <IntRangeDomain name="range" />
+      </IntVectorProperty>
+      <DoubleVectorProperty
+        name="LODThreshold"
+        command="SetLODThreshold"
+        number_of_elements="1"
+        default_values="0"
+        update_self="1">
+        <DoubleRangeDomain name="range" />
+      </DoubleVectorProperty>
+    </LODRenderModuleProxy>
+
+    <CompositeRenderModuleProxy name="CompositeRenderModule" base_proxygroup="rendermodules"
+      base_proxyname="LODRenderModule">
+      <DoubleVectorProperty
+        name="CompositeThreshold"
+        command="SetCompositeThreshold"
+        number_of_elements="1"
+        default_values="20.0"
+        update_self="1">
+        <DoubleRangeDomain name="range" min="0" />
+      </DoubleVectorProperty>
+      <IntVectorProperty
+        name="SquirtLevel"
+        command="SetSquirtLevel"
+        number_of_elements="1"
+        default_values="0"
+        update_self="1">
+        <IntRangeDomain name="range" min="0" max="7" />
+      </IntVectorProperty>
+      <IntVectorProperty
+        name="ReductionFactor"
+        command="SetReductionFactor"
+        number_of_elements="1"
+        default_values="0"
+        update_self="1">
+        <IntRangeDomain name="range" min="0"/>
+      </IntVectorProperty>
+
+    </CompositeRenderModuleProxy>
+
+    <MPIRenderModuleProxy name="MPIRenderModule" base_proxygroup="rendermodules"
+      base_proxyname="CompositeRenderModule">
+      <IntVectorProperty
+        name="UseCompositeCompression"
+        command="SetUseCompositeCompression"
+        number_of_elements="1"
+        default_values="1"
+        update_self="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+    </MPIRenderModuleProxy>
+
+    <MultiDisplayRenderModuleProxy name="MultiDisplayRenderModule"
+      base_proxygroup="rendermodules" base_proxyname="CompositeRenderModule">
+      <SubProxy>
+        <Proxy name="CompositeManager" proxygroup="composite_managers"
+          proxyname="MultiDisplayManager">
+        </Proxy>
+      </SubProxy>
+    </MultiDisplayRenderModuleProxy>
+
+    <IceTDesktopRenderModuleProxy name="DeskTopRenderModule" 
+      base_proxygroup="rendermodules" base_proxyname="CompositeRenderModule">
+      <SubProxy>
+        <Proxy name="DisplayManager" proxygroup="composite_managers"
+          proxyname="IceTRenderManager">
+        </Proxy>
+      </SubProxy>
+      <SubProxy>
+        <Proxy name="CompositeManager" proxygroup="composite_managers"
+          proxyname="DesktopDeliveryClient">
+        </Proxy>
+      </SubProxy>
+    </IceTDesktopRenderModuleProxy>
+
+      
+    <IceTRenderModuleProxy name="IceTRenderModule"
+      base_proxygroup="rendermodules" base_proxyname="DeskTopRenderModule">
+    </IceTRenderModuleProxy>
+
+  </ProxyGroup>
+  
+  <ProxyGroup name="interactors">
+    <Proxy name="GenericRenderWindowInteractor" class="vtkPVGenericRenderWindowInteractor">
+      <ProxyProperty
+        name="RenderWindow"
+        command="SetRenderWindow">
+        <ProxyGroupDomain name="groups">
+          <Group name="renderwindow" />
+        </ProxyGroupDomain>
+      </ProxyProperty>
+      <ProxyProperty
+        name="Renderer"
+        command="SetRenderer">
+        <ProxyGroupDomain name="groups">
+          <Group  name="renderers" />
+        </ProxyGroupDomain>
+      </ProxyProperty>
+    </Proxy>
+  </ProxyGroup>
+  
+  <ProxyGroup name="compositers">
+    <Proxy name="CompressCompositer" class="vtkCompressCompositer">
+    </Proxy>
+    <Proxy  name="TreeCompositer" class="vtkTreeCompositer">
+    </Proxy>
+  </ProxyGroup>
+
+  <ProxyGroup name="composite_managers">
+    <Proxy name="DesktopDeliveryClient" class="vtkDesktopDeliveryClient">
+      <ProxyProperty
+        name="RenderWindow"
+        command="SetRenderWindow">
+        <ProxyGroupDomain name="groups">
+          <Group name="renderwindow" />
+        </ProxyGroupDomain>
+      </ProxyProperty>
+      <Property
+        name="InitializeRMIs"
+        command="InitializeRMIs">
+      </Property>
+      <Property
+        name="InitializeOffScreen"
+        command="InitializeOffScreen">
+      </Property>
+      <IntVectorProperty
+        name="ImageReductionFactor"
+        command="SetImageReductionFactor"
+        number_of_elements="1"
+        default_values="1">
+        <IntRangeDomain name="range" min="0" />
+      </IntVectorProperty>
+      <IntVectorProperty
+        name="UseCompositing"
+        command="SetUseCompositing"
+        number_of_elements="1"
+        default_values="0">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <IntVectorProperty
+        name="SquirtLevel"
+        command="SetSquirtLevel"
+        number_of_elements="1"
+        default_values="0">
+        <IntRangeDomain name="range" min="0" max="7" />
+      </IntVectorProperty>
+    </Proxy>
+    
+    <Proxy name="IceTRenderManager" class="vtkIceTRenderManager">
+      <ProxyProperty
+        name="RenderWindow"
+        command="SetRenderWindow">
+        <ProxyGroupDomain name="groups">
+          <Group name="renderwindow" />
+        </ProxyGroupDomain>
+      </ProxyProperty>
+      <IntVectorProperty
+        name="TileDimensions"
+        command="SetTileDimensions"
+        number_of_elements="2"
+        default_values="0 0">
+        <IntRangeDomain name="range" min="0 0" />
+      </IntVectorProperty>
+    </Proxy>
+
+    <Proxy name="MultiDisplayManager" class="vtkMultiDisplayManager">
+       <ProxyProperty
+        name="RenderWindow"
+        command="SetRenderWindow">
+        <ProxyGroupDomain name="groups">
+          <Group name="renderwindow" />
+        </ProxyGroupDomain>
+      </ProxyProperty>
+      <Property
+        name="InitializeOffScreen"
+        command="InitializeOffScreen">
+      </Property>
+      <Property
+        name="InitializeRMIs"
+        command="InitializeRMIs">
+      </Property>
+      <IntVectorProperty
+        name="ImageReductionFactor"
+        command="SetImageReductionFactor"
+        number_of_elements="1"
+        default_values="1">
+        <IntRangeDomain name="range" min="0" />
+      </IntVectorProperty>
+      <IntVectorProperty
+        name="UseCompositing"
+        command="SetUseCompositing"
+        number_of_elements="1"
+        default_values="0">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <IntVectorProperty
+        name="TileDimensions"
+        command="SetTileDimensions"
+        number_of_elements="2"
+        default_values="0 0">
+        <IntRangeDomain name="range" min="0 0" />
+      </IntVectorProperty>
+      <IntVectorProperty
+        name="UseCompositeCompression"
+        command="SetUseCompositeCompression"
+        number_of_elements="1"
+        default_values="0">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+    </Proxy>
+    
+    <Proxy name="TreeComposite" class="vtkPVTreeComposite">
+       <ProxyProperty
+        name="RenderWindow"
+        command="SetRenderWindow">
+        <ProxyGroupDomain name="groups">
+          <Group name="renderwindow" />
+        </ProxyGroupDomain>
+      </ProxyProperty>
+      <ProxyProperty
+        name="Compositer"
+        command="SetCompositer">
+        <ProxyGroupDomain name="group">
+          <Group name="compositers" />
+        </ProxyGroupDomain>
+      </ProxyProperty>
+      <Property
+        name="InitializeOffScreen"
+        command="InitializeOffScreen">
+      </Property>
+      <Property
+        name="InitializeRMIs"
+        command="InitializeRMIs">
+      </Property>
+      <IntVectorProperty
+        name="EnableAbort"
+        command="SetEnableAbort"
+        number_of_elements="1"
+        default_values="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <IntVectorProperty
+        name="ImageReductionFactor"
+        command="SetImageReductionFactor"
+        number_of_elements="1"
+        default_values="1">
+        <IntRangeDomain name="range" min="0" />
+      </IntVectorProperty>
+      <IntVectorProperty
+        name="UseCompositing"
+        command="SetUseCompositing"
+        number_of_elements="1"
+        default_values="0">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+    </Proxy>
+
+    <Proxy name="ClientCompositeManager" class="vtkClientCompositeManager">
+      <ProxyProperty
+        name="RenderWindow"
+        command="SetRenderWindow">
+        <ProxyGroupDomain name="groups">
+          <Group name="renderwindow" />
+        </ProxyGroupDomain>
+      </ProxyProperty>
+      <ProxyProperty
+        name="Compositer"
+        command="SetCompositer">
+        <ProxyGroupDomain name="group">
+          <Group name="compositers" />
+        </ProxyGroupDomain>
+      </ProxyProperty>
+      <Property
+        name="InitializeOffScreen"
+        command="InitializeOffScreen">
+      </Property>
+      <Property
+        name="InitializeRMIs"
+        command="InitializeRMIs">
+      </Property>
+      <IntVectorProperty
+        name="EnableAbort"
+        command="SetEnableAbort"
+        number_of_elements="1"
+        default_values="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <IntVectorProperty
+        name="ImageReductionFactor"
+        command="SetImageReductionFactor"
+        number_of_elements="1"
+        default_values="1">
+        <IntRangeDomain name="range" min="0" />
+      </IntVectorProperty>
+      <IntVectorProperty
+        name="SquirtLevel"
+        command="SetSquirtLevel"
+        number_of_elements="1"
+        default_values="0">
+        <IntRangeDomain name="range" min="0" max="7" />
+      </IntVectorProperty>
+      <IntVectorProperty
+        name="UseCompositing"
+        command="SetUseCompositing"
+        number_of_elements="1"
+        default_values="0">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+    </Proxy>
+
+    <Proxy name="CaveRenderManager" class="vtkCaveRenderManager">
+      <ProxyProperty
+        name="RenderWindow"
+        command="SetRenderWindow">
+        <ProxyGroupDomain name="groups">
+          <Group name="renderwindow" />
+        </ProxyGroupDomain>
+      </ProxyProperty>
+      <IntVectorProperty
+        name="ImageReductionFactor"
+        command="SetImageReductionFactor"
+        number_of_elements="1"
+        default_values="1">
+        <IntRangeDomain name="range" min="0" />
+      </IntVectorProperty>
+      <IntVectorProperty
+        name="UseCompositing"
+        command="SetUseCompositing"
+        number_of_elements="1"
+        default_values="0">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+    </Proxy>
+  </ProxyGroup>
+  
+  <ProxyGroup name="displays">
+    <XYPlotDisplayProxy name="XYPlotDisplay">
+      <ProxyProperty
+        name="Input"
+        command="SetInput"
+        update_self="1">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+      </ProxyProperty>
+      <Property
+        name="Update"
+        command="Update"
+        update_self="1">
+      </Property>
+      <Property
+        name="InvalidateGeometry"
+        command="InvalidateGeometry"
+        update_self="1">
+      </Property>
+      <IntVectorProperty
+        name="CacheUpdate"
+        command="CacheUpdate"
+        number_of_elements="2"
+        update_self="1"
+        default_values="0 0">
+      </IntVectorProperty>
+      <IntVectorProperty
+        name="Visibility"
+        command="SetVisibility"
+        number_of_elements="1"
+        update_self="1"
+        default_values="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+ 
+      <SubProxy>
+        <Proxy name="UpdateSuppressor" proxygroup="filters" proxyname="UpdateSuppressor" />
+      </SubProxy>
+
+      <SubProxy>
+        <Proxy name="Collect" proxygroup="filters" proxyname="MPIMoveData">
+        </Proxy>
+      </SubProxy>
+
+      <SubProxy>
+        <Proxy name="Property" proxygroup="properties" proxyname="Property" />
+      </SubProxy>
+      <SubProxy>
+        <Proxy 
+          name="XYPlotActor" 
+          proxygroup="annotations" proxyname="XYPlotActor">
+        </Proxy>
+      </SubProxy>
+
+    </XYPlotDisplayProxy>
+    
+    <CubeAxesDisplayProxy name="CubeAxesDisplay">
+       <ProxyProperty
+        name="Input"
+        command="SetInput"
+        update_self="1">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+      </ProxyProperty>
+      <Property
+        name="Update"
+        command="Update"
+        update_self="1">
+      </Property>
+      <Property
+        name="InvalidateGeometry"
+        command="InvalidateGeometry"
+        update_self="1">
+      </Property>
+      <IntVectorProperty
+        name="CacheUpdate"
+        command="CacheUpdate"
+        number_of_elements="2"
+        update_self="1"
+        default_values="0 0">
+      </IntVectorProperty>
+      <IntVectorProperty
+        name="Visibility"
+        command="SetVisibility"
+        number_of_elements="1"
+        update_self="1"
+        default_values="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
+      <SubProxy>
+        <Proxy name="CubeAxes" proxygroup="annotations" proxyname="CubeAxesActor2D">
+        </Proxy>
+      </SubProxy>
+    </CubeAxesDisplayProxy>
+    
+    <SimpleDisplayProxy name="SimpleDisplay">
+      <ProxyProperty
+        name="Input"
+        command="SetInput"
+        update_self="1">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+      </ProxyProperty>
+      <Property
+        name="Update"
+        command="Update"
+        update_self="1">
+      </Property>
+      <Property
+        name="InvalidateGeometry"
+        command="InvalidateGeometry"
+        update_self="1">
+      </Property>
+      <IntVectorProperty
+        name="CacheUpdate"
+        command="CacheUpdate"
+        number_of_elements="2"
+        update_self="1"
+        default_values="0 0">
+      </IntVectorProperty>
+      <IntVectorProperty
+        name="Representation"
+        command="SetRepresentation"
+        update_self="1"
+        number_of_elements="1"
+        default_values="2">
+        <EnumerationDomain name="enum" >
+          <Entry value="0" text="Points" />
+          <Entry value="1" text="Wireframe" />
+          <Entry value="2" text="Surface" />
+          <Entry value="3" text="Outline" />
+          <Entry value="4" text="Volume" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+      <IntVectorProperty
+        name="Visibility"
+        command="SetVisibility"
+        number_of_elements="1"
+        update_self="1"
+        default_values="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <Property
+        name="ResetTransferFunctions"
+        command="ResetTransferFunctions"
+        immediate_update="1"
+        update_self="1">
+      </Property>
+        
+      <SubProxy>
+        <Proxy name="GeometryFilter" proxygroup="filters" proxyname="GeometryFilter" />
+      </SubProxy>
+      <SubProxy>
+        <Proxy name="UpdateSuppressor" proxygroup="filters" proxyname="UpdateSuppressor" />
+      </SubProxy>
+      <SubProxy>
+        <Proxy name="Mapper" proxygroup="mappers" proxyname="PolyDataMapper" />
+      </SubProxy>
+      <SubProxy>
+        <Proxy name="Actor" proxygroup="props" proxyname="LODActor" />
+      </SubProxy>
+      <SubProxy>
+        <Proxy name="Property" proxygroup="properties" proxyname="Property" />
+      </SubProxy>
+    
+      <!-- Subproxies for Volume Pipeline -->
+      <SubProxy>
+        <SourceProxy name="VolumeFilter" class="vtkDataSetTriangleFilter" >
+          <!-- I don't directly use the DataSetTriangleFilter since I need
+          a more restrictive domain for this one -->
+          <InputProperty
+            name="Input"
+            command="SetInput">
+            <ProxyGroupDomain name="groups">
+              <Group name="sources"/>
+              <Group name="filters"/>
+            </ProxyGroupDomain>
+            <DataTypeDomain name="input_type">
+              <DataType value="vtkUnstructuredGrid" />
+            </DataTypeDomain>
+          </InputProperty>
+        </SourceProxy>
+      </SubProxy>
+
+      <SubProxy>
+        <Proxy name="VolumeMapper" 
+          proxygroup="mappers" 
+          proxyname="UnstructuredGridVolumeRayCastMapper">
+        </Proxy>
+        <ShareProperties subproxy="Mapper">
+          <Exception name="Input" />
+        </ShareProperties>
+      </SubProxy>
+
+      <SubProxy>
+        <Proxy name="VolumeActor" proxygroup="props" proxyname="LODVolume" />
+        <ShareProperties subproxy="Actor">
+          <Exception name="Mapper" />
+          <Exception name="LODMapper" />
+          <Exception name="Property" />
+          <Exception name="Visibility" />
+        </ShareProperties>
+      </SubProxy>
+
+      <SubProxy>
+        <Proxy name="VolumeProperty" proxygroup="properties" proxyname="VolumeProperty" />
+      </SubProxy>
+
+      <SubProxy>
+        <Proxy name="OpacityFunction" 
+          proxygroup="piecewise_functions" proxyname="PiecewiseFunction">
+        </Proxy>
+      </SubProxy>
+
+      <SubProxy>
+        <Proxy name="ColorTransferFunction"
+          proxygroup="transfer_functions" proxyname="ColorTransferFunction">
+        </Proxy>
+      </SubProxy>
+    </SimpleDisplayProxy>
+
+    <!-- Display Proxy with support for LOD -->
+    <LODDisplayProxy name="LODDisplay" base_proxygroup="displays" base_proxyname="SimpleDisplay">
+      <IntVectorProperty name="LODResolution" 
+        command="SetLODResolution"
+        number_of_elements="1"
+        update_self="1"
+        default_values="50">
+        <IntRangeDomain name="range" min="0" />
+      </IntVectorProperty>
+      
+      <SubProxy>
+        <Proxy name="LODDecimator" proxygroup="filters" proxyname="QuadricClustering" />
+      </SubProxy>
+      <SubProxy>
+        <Proxy name="LODUpdateSuppressor" proxygroup="filters" proxyname="UpdateSuppressor" />
+        <ShareProperties subproxy="UpdateSuppressor">
+          <Exception name="Input" />
+          <Exception name="ForceUpdate" />
+          <Exception name="RemoveAllCaches" />
+        </ShareProperties>
+      </SubProxy>
+      <SubProxy>
+        <Proxy name="LODMapper" proxygroup="mappers" proxyname="PolyDataMapper" >
+        </Proxy>
+        <ShareProperties subproxy="Mapper" >
+          <Exception name="Input" />
+        </ShareProperties>
+      </SubProxy>
+    </LODDisplayProxy>
+
+    <CompositeDisplayProxy name="CompositeDisplay" 
+      base_proxygroup="displays" base_proxyname="LODDisplay">
+      <IntVectorProperty
+        name="CollectionDecision"
+        command="SetCollectionDecision"
+        number_of_elements="1"
+        update_self="1"
+        default_values="0">
+        <BooleanDomain name="bool"/>
+      </IntVectorProperty>
+      <IntVectorProperty
+        name="LODCollectionDecision"
+        command="SetLODCollectionDecision"
+        number_of_elements="1"
+        update_self="1"
+        default_values="0">
+        <BooleanDomain name="bool"/>
+      </IntVectorProperty>
+     
+      <SubProxy>
+        <Proxy name="Collect" proxygroup="filters" proxyname="MPIMoveData">
+        </Proxy>
+      </SubProxy>
+
+      <SubProxy>
+        <Proxy name="LODCollect" proxygroup="filters" proxyname="MPIMoveData">
+        </Proxy>
+      </SubProxy>
+    </CompositeDisplayProxy>
+
+    <MultiDisplayProxy name="MultiDisplay"
+      base_proxygroup="displays" base_proxyname="CompositeDisplay">
+      <!-- nothing new here -->
+    </MultiDisplayProxy>
+  </ProxyGroup>
+
+</ServerManagerConfiguration>

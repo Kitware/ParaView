@@ -13,7 +13,7 @@
 
 =========================================================================*/
 #include "vtkPVLODRenderModuleUI.h"
-#include "vtkPVLODRenderModule.h"
+#include "vtkSMLODRenderModuleProxy.h"
 
 #include "vtkCamera.h"
 #include "vtkCollectionIterator.h"
@@ -57,12 +57,14 @@
 #include "vtkRenderer.h"
 #include "vtkTimerLog.h"
 #include "vtkToolkits.h"
+#include "vtkSMIntVectorProperty.h"
+#include "vtkSMDoubleVectorProperty.h"
 
 
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLODRenderModuleUI);
-vtkCxxRevisionMacro(vtkPVLODRenderModuleUI, "1.22");
+vtkCxxRevisionMacro(vtkPVLODRenderModuleUI, "1.22.2.1");
 
 int vtkPVLODRenderModuleUICommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -73,7 +75,6 @@ vtkPVLODRenderModuleUI::vtkPVLODRenderModuleUI()
 {
   this->CommandFunction = vtkPVLODRenderModuleUICommand;
   
-  this->LODRenderModule = NULL;
 
   this->RenderInterruptsEnabledCheck = vtkKWCheckButton::New();
 
@@ -148,33 +149,8 @@ vtkPVLODRenderModuleUI::~vtkPVLODRenderModuleUI()
   this->OutlineThresholdValue->Delete();
   this->OutlineThresholdValue = NULL;
 
-  if (this->LODRenderModule)
-    {
-    this->LODRenderModule->UnRegister(this);
-    this->LODRenderModule = NULL;
-    }
 }
 
-
-//----------------------------------------------------------------------------
-void vtkPVLODRenderModuleUI::SetRenderModule(vtkPVRenderModule* rm)
-{
-  if (this->LODRenderModule)
-    {
-    this->LODRenderModule->UnRegister(this);
-    this->LODRenderModule = NULL;
-    }
-  this->LODRenderModule = vtkPVLODRenderModule::SafeDownCast(rm);
-  if (this->LODRenderModule)
-    {
-    this->LODRenderModule->Register(this);
-    }
-
-  if (rm != NULL && this->LODRenderModule == NULL)
-    {
-    vtkErrorMacro("Expecting a LODRenderModule.");
-    }
-}
 
 //----------------------------------------------------------------------------
 void vtkPVLODRenderModuleUI::Create(vtkKWApplication *app, const char *)
@@ -432,9 +408,17 @@ void vtkPVLODRenderModuleUI::SetLODThreshold(float threshold)
     this->LODThresholdLabelCallback();
     }
     
-  if ( this->LODRenderModule )
+  if ( this->RenderModuleProxy)
     {
-    this->LODRenderModule->SetLODThreshold(threshold);
+    vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+      this->RenderModuleProxy->GetProperty("LODThreshold"));
+    if (!dvp)
+      {
+      vtkErrorMacro("Failed to find property LODThreshold on RenderModuleProxy.");
+      return;
+      }
+    dvp->SetElement(0, static_cast<double>(threshold));
+    this->RenderModuleProxy->UpdateVTKObjects();
     }
   this->LODThreshold = threshold;
 
@@ -499,12 +483,20 @@ void vtkPVLODRenderModuleUI::SetLODResolutionInternal(int resolution)
 
   this->LODResolution = resolution;
  
-  if ( !this->LODRenderModule )
+  if ( !this->RenderModuleProxy)
     {
     return;
     }
 
-  this->LODRenderModule->SetLODResolution(resolution);
+  vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
+    this->RenderModuleProxy->GetProperty("LODResolution"));
+  if (!ivp)
+    {
+    vtkErrorMacro("Failed to find property LODResolution on RenderModuleProxy.");
+    return;
+    }
+  ivp->SetElement(0, resolution);
+  this->RenderModuleProxy->UpdateVTKObjects();
 }
 
 //----------------------------------------------------------------------------
@@ -577,10 +569,18 @@ void vtkPVLODRenderModuleUI::SetRenderInterruptsEnabled(int state)
     this->RenderInterruptsEnabledCheck->SetState(state);
     }
   
-  vtkPVApplication* pvApp = this->GetPVApplication();
   this->RenderInterruptsEnabled = state;
   
-  pvApp->GetProcessModule()->GetRenderModule()->SetRenderInterruptsEnabled(state);
+  vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
+    this->RenderModuleProxy->GetProperty("RenderInterruptsEnabled"));
+  if (!ivp)
+    {
+    vtkErrorMacro("Failed to find property RenderInterruptsEnabled on "
+       "RenderModuleProxy.");
+    return;
+    }
+  ivp->SetElement(0, state);
+  this->RenderModuleProxy->UpdateVTKObjects();
 
   // We use a catch in this trace because the paraview executing
   // the trace might not have this module
@@ -607,7 +607,7 @@ void vtkPVLODRenderModuleUI::SaveState(ofstream *file)
 
   *file << "catch {$kw(" << this->GetTclName()
         << ") SetRenderInterruptsEnabled "
-        << this->GetPVApplication()->GetProcessModule()->GetRenderModule()->GetRenderInterruptsEnabled()
+        << this->RenderModuleProxy->GetRenderInterruptsEnabled()
         << "}" << endl;
 }
 

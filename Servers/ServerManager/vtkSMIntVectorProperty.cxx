@@ -22,7 +22,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMIntVectorProperty);
-vtkCxxRevisionMacro(vtkSMIntVectorProperty, "1.20");
+vtkCxxRevisionMacro(vtkSMIntVectorProperty, "1.20.6.1");
 
 struct vtkSMIntVectorPropertyInternals
 {
@@ -52,6 +52,13 @@ void vtkSMIntVectorProperty::AppendCommandToStream(
     return;
     }
 
+  if (this->CleanCommand)
+    {
+    *str << vtkClientServerStream::Invoke
+      << objectId << this->CleanCommand
+      << vtkClientServerStream::End;
+    }
+  
   if (!this->RepeatCommand)
     {
     *str << vtkClientServerStream::Invoke << objectId << this->Command;

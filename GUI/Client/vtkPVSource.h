@@ -24,7 +24,7 @@
 
 #include "vtkKWWidget.h"
 #include "vtkClientServerStream.h"  // needed for vtkClientServerID
-
+#include "vtkPVConfig.h"
 class vtkCollection;
 class vtkKWFrame;
 class vtkPVSourceNotebook;
@@ -36,11 +36,18 @@ class vtkPVWidget;
 class vtkPVWidgetCollection;
 class vtkPVWindow;
 class vtkSMSourceProxy;
+#if defined(PARAVIEW_USE_SERVERMANAGER_RENDERING)
+class vtkSMDisplayProxy;
+class vtkSMProxy;
+#else
 class vtkSMPartDisplay;
+#endif
+class vtkSource;
+class vtkStringList;
 class vtkSMPart;
 class vtkPVDataInformation;
 class vtkPVNumberOfOutputsInformation;
-class vtkSMCubeAxesDisplay;
+class vtkSMCubeAxesDisplayProxy;
 class vtkSMPointLabelDisplay;
 class vtkPVColorMap;
 class vtkPVDisplayGUI;
@@ -465,11 +472,33 @@ public:
   // Calls UpdateVTKObjects on the proxy as well as on all widgets.
   virtual void UpdateVTKObjects();
   
+#if defined(PARAVIEW_USE_SERVERMANAGER_RENDERING)
+  // Description
+  // This is the Display for this source.
+  void SetDisplayProxy(vtkSMDisplayProxy* pdisp);
+  vtkGetObjectMacro(DisplayProxy, vtkSMDisplayProxy);
+
+  // Description:
+  // Set the color map and the field to use.
+  void ColorByArray(vtkPVColorMap* colorMap, int field);
+
+  // Description:
+  // Set the volume rendering array and Scalar Mode.
+  void VolumeRenderByArray(const char* arrayname, int field);
+
+  // Description:
+  // Sets the array name and field type to color with.
+  // This also sets the LUT on the mapper.
+  void ColorByArray(const char* arrayname, int field);
+#else
+  //BTX
   // Description:
   // Source keeps the part display, because the DisplayGUI
   // is shared between all sources.
   void SetPartDisplay(vtkSMPartDisplay* pdisp);
   vtkGetObjectMacro(PartDisplay, vtkSMPartDisplay);
+  //ETX
+#endif
 
   // Description:
   // This method is now in the vtkPVSourceNotebook.
@@ -512,7 +541,13 @@ protected:
   int PointLabelVisibility;
 
   vtkKWFrame *ParameterFrame;
+#if defined(PARAVIEW_USE_SERVERMANAGER_RENDERING)
+  vtkSMDisplayProxy* DisplayProxy;
+  void AddDisplayToRenderModule(vtkSMDisplayProxy* pDisp);
+  void RemoveDisplayFromRenderModule(vtkSMDisplayProxy* pDisp);
+#else
   vtkSMPartDisplay*     PartDisplay;
+#endif
 
   // Called to allocate the input array.  Copies old inputs.
   void SetNumberOfPVInputs(int num);
@@ -596,7 +631,7 @@ protected:
   int ResetInSelect;
   
   // CubeAxes should be moved into a display of its own.
-  vtkSMCubeAxesDisplay* CubeAxesDisplay;
+  vtkSMCubeAxesDisplayProxy* CubeAxesDisplayProxy;
   vtkSMPointLabelDisplay* PointLabelDisplay;
 
 //BTX

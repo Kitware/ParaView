@@ -20,6 +20,7 @@
 #ifndef __vtkPVApplication_h
 #define __vtkPVApplication_h
 
+#include "vtkPVConfig.h"
 #include "vtkKWApplication.h"
 class vtkPVProcessModule;
 
@@ -42,6 +43,9 @@ class vtkKWLoadSaveDialog;
 class vtkSMApplication;
 class vtkPVGUIClientOptions;
 class vtkPVOptions;
+#if defined(PARAVIEW_USE_SERVERMANAGER_RENDERING)
+  class vtkSMRenderModuleProxy;
+#endif
 
 class VTK_EXPORT vtkPVApplication : public vtkKWApplication
 {
@@ -67,6 +71,17 @@ public:
   // processes and communication.
   void SetProcessModule(vtkPVProcessModule *module);
   vtkPVProcessModule* GetProcessModule() { return this->ProcessModule;}
+
+#if defined(PARAVIEW_USE_SERVERMANAGER_RENDERING)
+  // Description:
+  // RenderModuleProxy manages rendering.
+  void SetRenderModuleProxy(vtkSMRenderModuleProxy*);
+  vtkGetObjectMacro(RenderModuleProxy, vtkSMRenderModuleProxy);
+
+  // Description:
+  // Setups the Render Module.
+  int SetupRenderModule();
+#endif
 
   // Description:
   // Get a file selection dialog instance.
@@ -356,6 +371,12 @@ protected:
 
   vtkPVGUIClientOptions* Options;
 
+#if defined(PARAVIEW_USE_SERVERMANAGER_RENDERING) 
+  vtkSMRenderModuleProxy* RenderModuleProxy;
+  char* RenderModuleProxyName;
+  vtkSetStringMacro(RenderModuleProxyName);
+#endif
+  
 private:  
   vtkPVApplication(const vtkPVApplication&); // Not implemented
   void operator=(const vtkPVApplication&); // Not implemented

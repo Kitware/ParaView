@@ -20,14 +20,13 @@
 #include "vtkClientServerStream.h"
 #include "vtkCommand.h"
 #include "vtkSMDoubleVectorProperty.h"
-
+#include "vtkSMIntVectorProperty.h"
 vtkStandardNewMacro(vtkSMLineWidgetProxy);
-vtkCxxRevisionMacro(vtkSMLineWidgetProxy, "1.6");
+vtkCxxRevisionMacro(vtkSMLineWidgetProxy, "1.6.4.1");
 
 //----------------------------------------------------------------------------
 vtkSMLineWidgetProxy::vtkSMLineWidgetProxy()
 {
-  this->Resolution = 1;
   this->Point1[0] = -0.5;
   this->Point1[1] = this->Point1[2] = 0;
   this->Point2[0] = 0.5;
@@ -62,13 +61,6 @@ void vtkSMLineWidgetProxy::UpdateVTKObjects()
         << "SetPoint2" << this->Point2[0] << this->Point2[1] 
         <<  this->Point2[2]
         << vtkClientServerStream::End;
-    str << vtkClientServerStream::Invoke 
-        << this->GetID(cc)
-        << "SetResolution" << this->Resolution
-        << vtkClientServerStream::End;
-    str << vtkClientServerStream::Invoke 
-        << id
-        << "SetAlignToNone" <<  vtkClientServerStream::End;
     }
   if (str.GetNumberOfMessages() > 0)
     {
@@ -141,6 +133,9 @@ void vtkSMLineWidgetProxy::SaveState(const char* name,ostream* file,
 void vtkSMLineWidgetProxy::SaveInBatchScript(ofstream *file)
 {
   this->Superclass::SaveInBatchScript(file);
+  vtkSMIntVectorProperty* propResolution = vtkSMIntVectorProperty::SafeDownCast(
+    this->GetProperty("Resolution"));
+  
   for (unsigned int cc=0;cc < this->GetNumberOfIDs(); cc++)
     {
     vtkClientServerID id = this->GetID(cc);
@@ -162,7 +157,7 @@ void vtkSMLineWidgetProxy::SaveInBatchScript(ofstream *file)
 
     *file << "  [$pvTemp" << id.ID << " GetProperty Resolution] "
       << "SetElements1 "
-      << this->Resolution 
+      << propResolution->GetElement(0)
       << endl;
 
     *file << "  $pvTemp" << id.ID << " UpdateVTKObjects" << endl;
@@ -177,5 +172,4 @@ void vtkSMLineWidgetProxy::PrintSelf(ostream& os, vtkIndent indent)
     this->Point1[1] << "," << this->Point1[2] << endl;
   os << indent << "Point2: " << this->Point2[0] << "," <<
     this->Point2[1] << "," << this->Point2[2] << endl;
-  os << indent << "Resolution: " << this->Resolution << endl;
 }

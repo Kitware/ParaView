@@ -75,40 +75,19 @@
   </ProxyGroup>
 
   <ProxyGroup name="axes">
-    <AxesProxy name="Axes" class="vtkAxes">
+    <AxesProxy name="Axes" class="vtkAxes" >
       <SubProxy>
-        <Proxy name="mapper" class="vtkPolyDataMapper">
+        <Proxy name="Mapper" proxygroup="mappers" proxyname="PolyDataMapper">
         </Proxy>
       </SubProxy>
 
       <SubProxy>
-        <Proxy name="actor" class="vtkActor">
-          <IntVectorProperty
-             name="Visibility"
-             command="SetVisibility"
-             number_of_elements="1"
-             default_values="1">
-             <BooleanDomain name="bool"/>
-          </IntVectorProperty>
-
-          <DoubleVectorProperty
-             name="Position"
-             command="SetPosition"
-             number_of_elements="3"
-             animateable="1"
-             default_values="0 0 0">
-           </DoubleVectorProperty>
-
-          <DoubleVectorProperty
-             name="Scale"
-             command="SetScale"
-             number_of_elements="3"
-             default_values="1 1 1">
-          </DoubleVectorProperty>
+        <Proxy name="Actor" proxygroup="props" proxyname="Actor">
         </Proxy>
       </SubProxy>
     </AxesProxy>
   </ProxyGroup>
+
   <ProxyGroup name="implicit_functions">
     <ImplicitPlaneProxy name="Plane" class="vtkPlane">
       <DoubleVectorProperty
@@ -554,15 +533,6 @@
         default_values="0.0 0.0 0.0">
         <SimpleDoubleInformationHelper/>
       </DoubleVectorProperty>
-      <IntVectorProperty
-        name="ResolutionInfo"
-        command="GetResolution"
-        number_of_elements="1"
-        update_self ="1"
-        information_only="1"
-        default_values="20">
-        <SimpleIntInformationHelper/>
-      </IntVectorProperty>
       <DoubleVectorProperty
         name="PlaceWidget"
         command="PlaceWidget"
@@ -588,8 +558,6 @@
         name="Resolution"
         command="SetResolution"
         number_of_elements="1"
-        update_self ="1"
-        information_property="ResolutionInfo"
         default_values="20" />
       <IntVectorProperty
         name="Visibility"
@@ -1209,6 +1177,178 @@
 
     </SinusoidKeyFrameProxy>
 
+  </ProxyGroup>
+
+  <ProxyGroup name="piecewise_functions">
+    <Proxy name="PiecewiseFunction"  class="vtkPiecewiseFunction">
+      <DoubleVectorProperty
+        name="Points"
+        command="AddPoint"
+        number_of_elements_per_command="2"
+        repeat_command="1"
+        clean_command="RemoveAllPoints">
+      </DoubleVectorProperty>
+    </Proxy>
+  </ProxyGroup>
+
+  <ProxyGroup name="transfer_functions">
+    <Proxy name="ColorTransferFunction" class="vtkColorTransferFunction">
+      <DoubleVectorProperty
+        name="RGBPoints"
+        command="AddRGBPoint"
+        repeat_command="1"
+        number_of_elements_per_command="4"
+        clean_command="RemoveAllPoints">
+      </DoubleVectorProperty>
+
+      <IntVectorProperty
+        name="ColorSpace"
+        command="SetColorSpace"
+        number_of_elements="1"
+        default_values="0">
+        <EnumerationDomain name="enum">
+          <Entry value="0" text="RGB" />
+          <Entry value="1" text="HSV" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+
+      <IntVectorProperty
+        name="HSVWrap"
+        command="SetHSVWrap"
+        number_of_elements="1"
+        default_values="0">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+    </Proxy>
+  </ProxyGroup>
+
+  <ProxyGroup name="annotations">
+    <Proxy name="CubeAxesActor2D" class="vtkCubeAxesActor2D">
+      <IntVectorProperty name="FlyMode"
+        command="SetFlyMode"
+        number_of_elements="1"
+        default_values="1">
+        <EnumerationDomain name="enum">
+          <Entry value="0" text="FlyToOuterEdges" />
+          <Entry value="1" text="FlyToClosetTriad" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+      <IntVectorProperty
+        name="Inertia"
+        command="SetInertia"
+        number_of_elements="1"
+        default_values="1">
+        <IntRangeDomain name="range" />
+      </IntVectorProperty>
+      <ProxyProperty
+        name="Camera"
+        command="SetCamera">
+        <ProxyGroupDomain name="groups">
+          <Group name="camera"/>
+        </ProxyGroupDomain>
+      </ProxyProperty>
+      <IntVectorProperty
+        name="Visibility"
+        command="SetVisibility"
+        number_of_elements="1"
+        default_values="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+    </Proxy>
+
+    <XYPlotActorProxy name="XYPlotActor" class="vtkXYPlotActor">
+      <InputProperty
+        name="Input"
+        command="SetInput">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+      </InputProperty>
+      <ProxyProperty
+        name="Property"
+        command="SetProperty">
+        <ProxyGroupDomain name="groups">
+          <Group name="properties" />
+        </ProxyGroupDomain>
+      </ProxyProperty>
+      <DoubleVectorProperty
+        name="Position"
+        command="SetPosition"
+        number_of_elements="2"
+        default_values="0 0"
+        update_self="1">
+        <DoubleRangeDomain name="range" />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty
+        name="Position2"
+        command="SetPosition2"
+        number_of_elements="2"
+        default_values="0 0"
+        update_self="1">
+        <DoubleRangeDomain name="range" />
+      </DoubleVectorProperty>
+
+      <IntVectorProperty
+        name="Visibility"
+        command="SetVisibility"
+        number_of_elements="1"
+        default_values="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <IntVectorProperty
+        name="PlotPoints"
+        command="SetPlotPoints"
+        number_of_elements="1"
+        default_values="0">
+        <BooleanDomain name="bool"/>
+      </IntVectorProperty>
+      <IntVectorProperty 
+        name="PlotLines"
+        command="SetPlotLines"
+        number_of_elements="1"
+        default_values="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <IntVectorProperty
+        name="NumberOfXLabels"
+        comamnd="SetNumberOfXLabels"
+        number_of_elements="1"
+        default_values="5">
+        <IntRangeDomain name="range" min="0" max="50"/>
+      </IntVectorProperty>
+      <IntVectorProperty
+        name="NumberOfYLabels"
+        command="SetNumberOfYLabels"
+        number_of_elements="1"
+        default_values="5">
+        <IntRangeDomain name="range" min="0" max="50" />
+      </IntVectorProperty>
+      <IntVectorProperty
+        name="LegendPosition"
+        command="SetLegendPosition"
+        number_of_elements="2"
+        default_values="0.85 0.75">
+      </IntVectorProperty>
+      <IntVectorProperty
+        name="LegendPosition2"
+        command="SetLegendPosition2"
+        number_of_elements="2"
+        default_values="0.15 0.20">
+      </IntVectorProperty>
+      <IntVectorProperty
+        name="LegendVisibility"
+        command="SetLegend"
+        number_of_elements="1"
+        default_values="0">
+        <BooleanDomain name="bool"/>
+      </IntVectorProperty>
+      <StringVectorProperty
+        name="XTitle"
+        command="SetXTitle"
+        number_of_elements="1">
+      </StringVectorProperty>
+    </XYPlotActorProxy>
   </ProxyGroup>
 
 </ServerManagerConfiguration>

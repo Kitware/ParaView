@@ -46,7 +46,6 @@
 #include "vtkScalarBarActor.h"
 #include "vtkScalarBarWidget.h"
 #include "vtkPVProcessModule.h"
-#include "vtkPVRenderModule.h"
 #include "vtkKWRange.h"
 
 #include "vtkTextProperty.h"
@@ -60,10 +59,11 @@
 #include "vtkSMProxy.h"
 #include "vtkKWEvent.h"
 #include "vtkMath.h"
+#include "vtkSMRenderModuleProxy.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVColorMap);
-vtkCxxRevisionMacro(vtkPVColorMap, "1.116");
+vtkCxxRevisionMacro(vtkPVColorMap, "1.116.2.1");
 
 int vtkPVColorMapCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -997,6 +997,11 @@ void vtkPVColorMap::CreateParallelTclObjects(vtkPVApplication *pvApp)
   pp->RemoveAllProxies();
   pp->AddProxy(this->LookupTableProxy);
   this->ScalarBarProxy->UpdateVTKObjects();
+
+  // Add to rendermodule.
+  vtkSMRenderModuleProxy* rm = this->GetPVApplication()->GetRenderModuleProxy();
+  rm->AddDisplay(this->ScalarBarProxy);
+  rm->UpdateVTKObjects();
 }
 
 //----------------------------------------------------------------------------
@@ -1791,13 +1796,6 @@ void vtkPVColorMap::UpdateInternalScalarBarVisibility()
     return;
     }
   
-  vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
-  vtkPVRenderModule* rm = pm->GetRenderModule();
-
-  if (rm == NULL)
-    {
-    return;
-    }
   this->SetVisibilityInternal(visible);
   this->Modified();
 }

@@ -83,6 +83,12 @@ public:
   vtkSetMacro(UseIndex, int);
   vtkBooleanMacro(UseIndex, int);
 
+  // Description:
+  // Command that can be used to remove all values. 
+  // Typically used when RepeatCommand = 1. If set, the clean command
+  // is called before the main Command.
+  vtkSetStringMacro(CleanCommand);
+  vtkGetStringMacro(CleanCommand);
 protected:
   vtkSMVectorProperty();
   ~vtkSMVectorProperty();
@@ -90,6 +96,8 @@ protected:
   int RepeatCommand;
   int NumberOfElementsPerCommand;
   int UseIndex;
+
+  char* CleanCommand;
 
   // Description:
   // Set the appropriate ivars from the xml element.

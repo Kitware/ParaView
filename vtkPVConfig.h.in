@@ -23,6 +23,7 @@
 #cmakedefine XDMF_SYSTEM_HDF5
 #cmakedefine PARAVIEW_BUILD_DEVELOPMENT
 #cmakedefine PARAVIEW_BLT_LIBRARY
+#cmakedefine PARAVIEW_USE_SERVERMANAGER_RENDERING
 
 // Build ParaView with Floating Point Exceptions turned on
 #cmakedefine PARAVIEW_ENABLE_FPE

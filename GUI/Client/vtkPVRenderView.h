@@ -55,6 +55,7 @@ class vtkPVWindow;
 class vtkPVRenderModuleUI;
 class vtkPVRenderViewObserver;
 class vtkPVRenderModule;
+class vtkSMRenderModuleProxy;
 class vtkTimerLog;
 
 #define VTK_PV_VIEW_MENU_LABEL       " 3D View Properties"
@@ -387,10 +388,13 @@ protected:
   vtkSetStringMacro(MenuLabelSwitchBackAndForthToViewProperties);
   
   vtkPVRenderViewObserver* Observer;
-
+#if defined(PARAVIEW_USE_SERVERMANAGER_RENDERING)
+  vtkSMRenderModuleProxy* RenderModuleProxy;
+#else
   // Need to make sure it destructs right before this view does.
   // It's the whole TKRenderWidget destruction pain.
   vtkPVRenderModule* RenderModule;
+#endif
 
   vtkTimerLog *RenderTimer;
   Tcl_TimerToken TimerToken;

@@ -17,14 +17,14 @@
 #include "vtkClientServerStream.h"
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
-#include "vtkPVRenderModule.h"
+#include "vtkSMRenderModuleProxy.h"
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMIntVectorProperty.h"
+#include "vtkSMProxyProperty.h"
+#include "vtkSMInputProperty.h"
 
 vtkStandardNewMacro(vtkSMAxesProxy);
-vtkCxxRevisionMacro(vtkSMAxesProxy, "1.1");
-
-
+vtkCxxRevisionMacro(vtkSMAxesProxy, "1.1.4.1");
 //---------------------------------------------------------------------------
 vtkSMAxesProxy::vtkSMAxesProxy()
 {
@@ -57,35 +57,82 @@ void vtkSMAxesProxy::CreateVTKObjects(int numObjects)
     str << vtkClientServerStream::Invoke << id
       << "ComputeNormalsOff" << vtkClientServerStream::End;
     }
-  vtkSMProxy* actor = this->GetSubProxy("actor");
+  if (str.GetNumberOfMessages() > 0)
+    {
+    pm->SendStream(this->Servers,str,0);
+    }
+
+  // Setup the pipeline.
+  vtkSMProxy* mapper = this->GetSubProxy("Mapper");
+  vtkSMProxy* actor = this->GetSubProxy("Actor");
+
+  if (!mapper)
+    {
+    vtkErrorMacro("Subproxy Mapper must be defined.");
+    return;
+    }
+  
   if (!actor)
     {
-    vtkErrorMacro("No actor sub-proxy was defined. Please make sure that"
-      "the configuration file defines it.");
+    vtkErrorMacro("Subproxy Actor must be defined.");
+    return;
     }
-  else
+ 
+  /*
+  vtkSMInputProperty* ip = vtkSMInputProperty::SafeDownCast(
+    mapper->GetProperty("Input"));
+  ip->RemoveAllProxies();
+  ip->AddProxy(this);
+  */
+  
+  for (cc=0; cc< numObjects; cc++)
     {
-    unsigned int i;
-    unsigned int num = actor->GetNumberOfIDs();
-    for (i=0; i < num; i++)
-      {
-      vtkClientServerID id = actor->GetID(i);
-      str << vtkClientServerStream::Invoke << id
-        << "VisibilityOff" << vtkClientServerStream::End;
-      if (pm->GetRenderModule())
-        {
-        str << vtkClientServerStream::Invoke 
-          << pm->GetRenderModule()->GetRendererID()
-          << "AddActor" << id
-          << vtkClientServerStream::End;
-        }
-      }
+    str << vtkClientServerStream::Invoke << this->GetID(cc) 
+      << "GetOutput" << vtkClientServerStream::End;
+    str << vtkClientServerStream::Invoke << mapper->GetID(cc)
+      << "SetInput" 
+      << vtkClientServerStream::LastResult
+      << vtkClientServerStream::End;
     }
   if (str.GetNumberOfMessages() > 0)
     {
-
     pm->SendStream(this->Servers,str,0);
     }
+
+  vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
+    actor->GetProperty("Mapper"));
+  pp->RemoveAllProxies();
+  pp->AddProxy(mapper);
+
+  this->UpdateVTKObjects();
+
+  this->cmSetVisibility(0);
+}
+
+//---------------------------------------------------------------------------
+void vtkSMAxesProxy::AddToRenderModule(vtkSMRenderModuleProxy* rm)
+{
+  vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
+    rm->GetRendererProxy()->GetProperty("ViewProps"));
+  if (!pp)
+    {
+    vtkErrorMacro("Failed to find ViewProps on vtkSMRenderModuleProxy.");
+    return;
+    }
+  pp->AddProxy(this->GetSubProxy("Actor"));
+}
+
+//---------------------------------------------------------------------------
+void vtkSMAxesProxy::RemoveFromRenderModule(vtkSMRenderModuleProxy* rm)
+{
+  vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
+    rm->GetRendererProxy()->GetProperty("ViewProps"));
+  if (!pp)
+    {
+    vtkErrorMacro("Failed to find ViewProps on vtkSMRenderModuleProxy.");
+    return;
+    }
+  pp->RemoveProxy(this->GetSubProxy("Actor"));
 }
 
 //---------------------------------------------------------------------------

@@ -13,7 +13,7 @@
 
 =========================================================================*/
 #include "vtkPVSourcesNavigationWindow.h"
-
+#include "vtkPVConfig.h"
 #include "vtkProperty.h"
 #include "vtkKWApplication.h"
 #include "vtkKWCanvas.h"
@@ -22,6 +22,9 @@
 #include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
 #include "vtkPVSource.h"
+#if defined(PARAVIEW_USE_SERVERMANAGER_RENDERING)
+  #include "vtkSMDisplayProxy.h"
+#endif
 #include "vtkSMPartDisplay.h"
 #include "vtkPVWindow.h"
 #include "vtkPVRenderView.h"
@@ -30,7 +33,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVSourcesNavigationWindow );
-vtkCxxRevisionMacro(vtkPVSourcesNavigationWindow, "1.21");
+vtkCxxRevisionMacro(vtkPVSourcesNavigationWindow, "1.21.2.1");
 
 //-----------------------------------------------------------------------------
 vtkPVSourcesNavigationWindow::vtkPVSourcesNavigationWindow()
@@ -194,6 +197,20 @@ void vtkPVSourcesNavigationWindow::Create(vtkKWApplication *app, const char *arg
   // Representation
   this->PopupMenu->AddSeparator();
   var = this->PopupMenu->CreateRadioButtonVariable(this, "Representation");
+#if defined(PARAVIEW_USE_SERVERMANAGER_RENDERING)
+  this->PopupMenu->AddRadioButton(vtkSMDisplayProxy::OUTLINE, "Outline", var, 
+      this, "PopupOutlineRepresentationCallback",
+      "Outline is edges of the bounding box.");
+  this->PopupMenu->AddRadioButton(vtkSMDisplayProxy::SURFACE, "Surface", var,
+      this, "PopupSurfaceRepresentationCallback",
+      "Only external (non shared) faces of cells are displayed.");
+  this->PopupMenu->AddRadioButton(vtkSMDisplayProxy::WIREFRAME, "Wireframe of Surface", var,
+      this, "PopupWireframeRepresentationCallback",
+      "Wirefrace of surface (non shared) faces.");
+  this->PopupMenu->AddRadioButton(vtkSMDisplayProxy::POINTS, "Points of Surface", var,
+      this, "PopupPointsRepresentationCallback",
+      "Points of surface (non shared) faces.");
+#else
   this->PopupMenu->AddRadioButton(VTK_OUTLINE, "Outline", var, 
       this, "PopupOutlineRepresentationCallback",
       "Outline is edges of the bounding box.");
@@ -206,17 +223,27 @@ void vtkPVSourcesNavigationWindow::Create(vtkKWApplication *app, const char *arg
   this->PopupMenu->AddRadioButton(VTK_POINTS, "Points of Surface", var,
       this, "PopupPointsRepresentationCallback",
       "Points of surface (non shared) faces.");
+#endif
   delete [] var;
 
   // Interpolation
   this->PopupMenu->AddSeparator();
   var = this->PopupMenu->CreateRadioButtonVariable(this, "Interpolation");
+#if defined(PARAVIEW_USE_SERVERMANAGER_RENDERING)
+  this->PopupMenu->AddRadioButton(vtkSMDisplayProxy::FLAT, "Flat", var, 
+                                  this, "PopupFlatInterpolationCallback",
+                                  "Flat shading makes the surfaace look faceted.");
+  this->PopupMenu->AddRadioButton(vtkSMDisplayProxy::GOURAND, "Gouraud", var,
+      this, "PopupGouraudInterpolationCallback",
+      "When the data has normals, Gouraud shading make the surface look smooth.");
+#else
   this->PopupMenu->AddRadioButton(VTK_FLAT, "Flat", var, 
                                   this, "PopupFlatInterpolationCallback",
                                   "Flat shading makes the surfaace look faceted.");
   this->PopupMenu->AddRadioButton(VTK_GOURAUD, "Gouraud", var,
       this, "PopupGouraudInterpolationCallback",
       "When the data has normals, Gouraud shading make the surface look smooth.");
+#endif
   delete [] var;
   
   this->ChildCreate();
@@ -311,11 +338,21 @@ void vtkPVSourcesNavigationWindow::DisplayModulePopupMenu(vtkPVSource* module,
                                     module->GetVisibility());
 
   this->PopupMenu->CheckRadioButton(this, "Interpolation", 
-            module->GetPartDisplay()->GetInterpolation());
+#if defined(PARAVIEW_USE_SERVERMANAGER_RENDERING)
+            module->GetDisplayProxy()->cmGetInterpolation()
+#else
+            module->GetPartDisplay()->GetInterpolation()
+#endif
+            );
 
   // Set the value of the representation radio button.
   this->PopupMenu->CheckRadioButton(this, "Representation", 
-            module->GetPartDisplay()->GetRepresentation());
+#if defined(PARAVIEW_USE_SERVERMANAGER_RENDERING)
+            module->GetDisplayProxy()->cmGetRepresentation()
+#else
+            module->GetPartDisplay()->GetRepresentation()
+#endif
+            );
 
   // Show the popup menu in correct location (x, y is cursor position).
   this->Script("tk_popup %s %d %d", this->PopupMenu->GetWidgetName(), x, y);
@@ -341,37 +378,61 @@ void vtkPVSourcesNavigationWindow::PopupVisibilityCallback()
 //-----------------------------------------------------------------------------
 void vtkPVSourcesNavigationWindow::PopupFlatInterpolationCallback()
 {
+#if defined(PARAVIEW_USE_SERVERMANAGER_RENDERING)
+  this->PopupModule->GetDisplayProxy()->cmSetInterpolation(vtkSMDisplayProxy::FLAT);
+#else
   this->PopupModule->GetPartDisplay()->SetInterpolation(VTK_FLAT);
+#endif
   this->PopupModule->GetPVRenderView()->EventuallyRender();
 }
 //-----------------------------------------------------------------------------
 void vtkPVSourcesNavigationWindow::PopupGouraudInterpolationCallback()
 {
+#if defined(PARAVIEW_USE_SERVERMANAGER_RENDERING)
+  this->PopupModule->GetDisplayProxy()->cmSetInterpolation(vtkSMDisplayProxy::GOURAND);
+#else
   this->PopupModule->GetPartDisplay()->SetInterpolation(VTK_GOURAUD);
+#endif
   this->PopupModule->GetPVRenderView()->EventuallyRender();
 }
 //-----------------------------------------------------------------------------
 void vtkPVSourcesNavigationWindow::PopupOutlineRepresentationCallback()
 {
+#if defined(PARAVIEW_USE_SERVERMANAGER_RENDERING)
+  this->PopupModule->GetDisplayProxy()->cmSetRepresentation(vtkSMDisplayProxy::OUTLINE);
+#else
   this->PopupModule->GetPartDisplay()->SetRepresentation(VTK_OUTLINE);
+#endif
   this->PopupModule->GetPVRenderView()->EventuallyRender();
 }
 //-----------------------------------------------------------------------------
 void vtkPVSourcesNavigationWindow::PopupSurfaceRepresentationCallback()
 {
+#if defined(PARAVIEW_USE_SERVERMANAGER_RENDERING)
+  this->PopupModule->GetDisplayProxy()->cmSetRepresentation(vtkSMDisplayProxy::SURFACE);
+#else
   this->PopupModule->GetPartDisplay()->SetRepresentation(VTK_SURFACE);
+#endif
   this->PopupModule->GetPVRenderView()->EventuallyRender();
 }
 //-----------------------------------------------------------------------------
 void vtkPVSourcesNavigationWindow::PopupWireframeRepresentationCallback()
 {
+#if defined(PARAVIEW_USE_SERVERMANAGER_RENDERING)
+  this->PopupModule->GetDisplayProxy()->cmSetRepresentation(vtkSMDisplayProxy::WIREFRAME);
+#else
   this->PopupModule->GetPartDisplay()->SetRepresentation(VTK_WIREFRAME);
+#endif
   this->PopupModule->GetPVRenderView()->EventuallyRender();
 }
 //-----------------------------------------------------------------------------
 void vtkPVSourcesNavigationWindow::PopupPointsRepresentationCallback()
 {
+#if defined(PARAVIEW_USE_SERVERMANAGER_RENDERING)
+  this->PopupModule->GetDisplayProxy()->cmSetRepresentation(vtkSMDisplayProxy::POINTS);
+#else
   this->PopupModule->GetPartDisplay()->SetRepresentation(VTK_POINTS);
+#endif
   this->PopupModule->GetPVRenderView()->EventuallyRender();
 }
 

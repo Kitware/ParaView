@@ -68,7 +68,7 @@
 #endif
 
 vtkStandardNewMacro(vtkPVAnimationScene);
-vtkCxxRevisionMacro(vtkPVAnimationScene, "1.22");
+vtkCxxRevisionMacro(vtkPVAnimationScene, "1.22.2.1");
 #define VTK_PV_PLAYMODE_SEQUENCE_TITLE "Sequence"
 #define VTK_PV_PLAYMODE_REALTIME_TITLE "Real Time"
 
@@ -580,7 +580,9 @@ void vtkPVAnimationScene::SaveGeometry(const char* filename)
 //      animWriter->UpdateVTKObjects();
         //TODO: Since vtkSMPartDisplay is does not belong to any group,
         //we have a little difficulty is using the property interface.
+#if !defined(PARAVIEW_USE_SERVERMANAGER_RENDERING)
         animWriter->AddInput(source->GetPartDisplay());
+#endif
       }
     }
 

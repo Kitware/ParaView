@@ -15,13 +15,14 @@
 #include "vtkPVRenderModuleUI.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
-#include "vtkPVRenderModule.h"
-
+#include "vtkSMRenderModuleProxy.h"
 
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderModuleUI);
-vtkCxxRevisionMacro(vtkPVRenderModuleUI, "1.9");
+vtkCxxRevisionMacro(vtkPVRenderModuleUI, "1.9.10.1");
+vtkCxxSetObjectMacro(vtkPVRenderModuleUI, RenderModuleProxy, vtkSMRenderModuleProxy);
+//----------------------------------------------------------------------------
 
 int vtkPVRenderModuleUICommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -31,7 +32,7 @@ int vtkPVRenderModuleUICommand(ClientData cd, Tcl_Interp *interp,
 vtkPVRenderModuleUI::vtkPVRenderModuleUI()
 {
   this->CommandFunction = vtkPVRenderModuleUICommand;
-
+  this->RenderModuleProxy = 0;
   this->OutlineThreshold = 5000000.0;
 }
 
@@ -39,6 +40,7 @@ vtkPVRenderModuleUI::vtkPVRenderModuleUI()
 //----------------------------------------------------------------------------
 vtkPVRenderModuleUI::~vtkPVRenderModuleUI()
 {
+  this->SetRenderModuleProxy(0);
 }
 
 //----------------------------------------------------------------------------
@@ -59,13 +61,6 @@ vtkPVApplication* vtkPVRenderModuleUI::GetPVApplication()
     return NULL;
     } 
 }
-
-//----------------------------------------------------------------------------
-// Not needed in superclass.
-void vtkPVRenderModuleUI::SetRenderModule(vtkPVRenderModule *)
-{
-}
-
 
 //----------------------------------------------------------------------------
 void vtkPVRenderModuleUI::Create(vtkKWApplication* app, const char *)

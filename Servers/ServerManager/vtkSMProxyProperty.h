@@ -40,8 +40,16 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
   
   // Description:
+  // Command that can be used to remove inputs. If set, this
+  // command is called before the main Command is called with
+  // all the arguments.
+  vtkSetStringMacro(CleanCommand);
+  vtkGetStringMacro(CleanCommand);
+
+  // Description:
   // Add a proxy to the list of proxies.
   int AddProxy(vtkSMProxy* proxy);
+  void RemoveProxy(vtkSMProxy* proxy);
   int SetProxy(unsigned int idx, vtkSMProxy* proxy);
 
   // Description:
@@ -58,6 +66,10 @@ public:
   // the proxy passed to AppendCommandToStream().
   int AddProxy(vtkSMProxy* proxy, int modify);
 
+  // Description:
+  // Removes a proxy from the vector of added Proxies (added by AddProxy).
+  void RemoveProxy(vtkSMProxy* proxy, int modify);
+  
   // Description:
   // Add an unchecked proxy. Does not modify the property.
   // Unchecked proxies are used by domains when verifying whether
@@ -136,6 +148,13 @@ protected:
   void RemoveConsumers(vtkSMProxy* proxy);
 
   vtkSMProxyPropertyInternals* PPInternals;
+  char* CleanCommand;
+
+  // Description:
+  // Set the appropriate ivars from the xml element. Should
+  // be overwritten by subclass if adding ivars.
+  virtual int ReadXMLAttributes(vtkSMProxy* parent, 
+                                vtkPVXMLElement* element);
 
 private:
   vtkSMProxyProperty(const vtkSMProxyProperty&); // Not implemented

@@ -32,9 +32,6 @@ public:
   vtkGetVector3Macro(Point1,double);
   vtkGetVector3Macro(Point2,double);
 
-  vtkSetMacro(Resolution,int);
-  vtkGetMacro(Resolution,int);
-
   virtual void SaveInBatchScript(ofstream *file);
   virtual void UpdateVTKObjects();
 protected:
@@ -54,7 +51,6 @@ protected:
   
   double Point1[3];
   double Point2[3];
-  int Resolution;
 private:
   vtkSMLineWidgetProxy(const vtkSMLineWidgetProxy&);// Not implemented
   void operator=(const vtkSMLineWidgetProxy&); // Not implemented

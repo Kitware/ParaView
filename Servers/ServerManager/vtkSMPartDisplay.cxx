@@ -42,7 +42,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMPartDisplay);
-vtkCxxRevisionMacro(vtkSMPartDisplay, "1.26");
+vtkCxxRevisionMacro(vtkSMPartDisplay, "1.26.2.1");
 
 //----------------------------------------------------------------------------
 vtkSMPartDisplay::vtkSMPartDisplay()
@@ -647,6 +647,7 @@ void vtkSMPartDisplay::SetInput(vtkSMSourceProxy* input)
   this->SetInputInternal(input, pm);
 }
 
+//----------------------------------------------------------------------------
 void vtkSMPartDisplay::SetInputInternal(vtkSMSourceProxy *input,
                                         vtkPVProcessModule *pm)
 {

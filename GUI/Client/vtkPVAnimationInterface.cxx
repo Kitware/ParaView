@@ -178,7 +178,7 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterface);
-vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.180");
+vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.180.2.1");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterface,ControlledWidget, vtkPVWidget);
 
@@ -1638,8 +1638,10 @@ void vtkPVAnimationInterface::SaveGeometry(const char* fileName,
 
         vtkClientServerID animCompleteArraysID = 
           pm->NewStreamObject("vtkCompleteArrays", stream);
+#if !defined(PARAVIEW_USE_SERVERMANAGER_RENDERING)
         source->GetPartDisplay()->ConnectGeometryForWriting(
           animCompleteArraysID, "SetInput", &stream);
+#endif
         arrays.push_back(animCompleteArraysID);
         
         stream << vtkClientServerStream::Invoke 
@@ -1675,9 +1677,11 @@ void vtkPVAnimationInterface::SaveGeometry(const char* fileName,
       {
       if(source->GetVisibility())
         {
+#if !defined(PARAVIEW_USE_SERVERMANAGER_RENDERING)
         source->GetPartDisplay()->ConnectGeometryForWriting(pvAnimWriterID, 
                                                             "AddInput",
                                                             &stream);
+#endif
         }
       }
     }

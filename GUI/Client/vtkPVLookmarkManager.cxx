@@ -99,6 +99,8 @@
 #include "vtkClientServerStream.h"
 #include "vtkClientServerID.h"
 
+#include "vtkSMDisplayProxy.h"
+
 #ifndef _WIN32
   #include <sys/wait.h>
   #include <unistd.h>
@@ -109,7 +111,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLookmarkManager);
-vtkCxxRevisionMacro(vtkPVLookmarkManager, "1.17");
+vtkCxxRevisionMacro(vtkPVLookmarkManager, "1.17.2.1");
 int vtkPVLookmarkManagerCommand(ClientData cd, Tcl_Interp *interp, int argc, char *argv[]);
 
 //----------------------------------------------------------------------------
@@ -3317,12 +3319,15 @@ void vtkPVLookmarkManager::ParseAndExecuteStateScript(vtkPVSource *reader,char *
       if(strstr(ptr,"ColorByCellField"))
         {
         field = this->GetFieldNameAndValue(ptr,&val);
-        pvData->ColorByCellField(field,val);
+        //pvData->ColorByCellField(field,val);
+        pvData->ColorByArray(field, vtkSMDisplayProxy::CELL_FIELD_DATA);
         }
       else if(strstr(ptr,"ColorByPointField"))
         {
         field = this->GetFieldNameAndValue(ptr,&val);
-        pvData->ColorByPointField(field,val);
+        //pvData->ColorByPointField(field,val);
+        pvData->ColorByArray(field, vtkSMDisplayProxy::POINT_FIELD_DATA);
+        
         }
       else if(strstr(ptr,"ColorByProperty"))
         {
@@ -3338,16 +3343,18 @@ void vtkPVLookmarkManager::ParseAndExecuteStateScript(vtkPVSource *reader,char *
         if(strstr(ptr,"VolumeRenderPointField"))
           {
           field = this->GetFieldNameAndValue(ptr,&val);
-          pvData->VolumeRenderPointField(field,val);
+          //pvData->VolumeRenderPointField(field,val);
+          pvData->VolumeRenderByArray(field, vtkSMDisplayProxy::POINT_FIELD_DATA);
           }
         else if(strstr(ptr,"VolumeRenderCellField"))
           {
           field = this->GetFieldNameAndValue(ptr,&val);
-          pvData->VolumeRenderCellField(field,val);
+          //pvData->VolumeRenderCellField(field,val);
+          pvData->VolumeRenderByArray(field, vtkSMDisplayProxy::CELL_FIELD_DATA);
           }
         ptr = strtok(NULL,"\r\n");
         }
-
+#if !defined(PARAVIEW_USE_SERVERMANAGER_RENDERING)
       // this line sets the partdisplay variable
       ptr+=4;
       ptr2 = ptr;
@@ -3432,6 +3439,7 @@ void vtkPVLookmarkManager::ParseAndExecuteStateScript(vtkPVSource *reader,char *
           }   
         ptr = strtok(NULL,"\r\n");
         }
+#endif
 
       break;
       }

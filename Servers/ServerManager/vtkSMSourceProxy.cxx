@@ -32,10 +32,11 @@
 #include "vtkSMProperty.h"
 #include "vtkSmartPointer.h"
 #include "vtkCollection.h"
+#include "vtkPVXMLElement.h"
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMSourceProxy);
-vtkCxxRevisionMacro(vtkSMSourceProxy, "1.25");
+vtkCxxRevisionMacro(vtkSMSourceProxy, "1.25.4.1");
 
 struct vtkSMSourceProxyInternals
 {
@@ -50,6 +51,8 @@ vtkSMSourceProxy::vtkSMSourceProxy()
 
   this->DataInformation = vtkPVDataInformation::New();
   this->DataInformationValid = 0;
+  this->ExecutiveName = 0;
+  this->SetExecutiveName("vtkCompositeDataPipeline");
 }
 
 //---------------------------------------------------------------------------
@@ -58,6 +61,7 @@ vtkSMSourceProxy::~vtkSMSourceProxy()
   delete this->PInternals;
 
   this->DataInformation->Delete();
+  this->SetExecutiveName(0);
 }
 
 //---------------------------------------------------------------------------
@@ -94,6 +98,16 @@ void vtkSMSourceProxy::UpdateInformation()
   pm->SendStream(this->Servers, command);
   
   this->Superclass::UpdateInformation();
+}
+//---------------------------------------------------------------------------
+int vtkSMSourceProxy::ReadXMLAttributes(vtkSMProxyManager* pm, vtkPVXMLElement* element)
+{
+  const char* executiveName = element->GetAttribute("executive");
+  if (executiveName)
+    {
+    this->SetExecutiveName(executiveName);
+    }
+  return this->Superclass::ReadXMLAttributes(pm, element);
 }
 
 //---------------------------------------------------------------------------
@@ -149,20 +163,22 @@ void vtkSMSourceProxy::CreateVTKObjects(int numObjects)
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
 
   int numIDs = this->GetNumberOfIDs();
-  vtkClientServerStream stream;
-  for (int i=0; i<numIDs; i++)
+  if (this->ExecutiveName)
     {
-    vtkClientServerID execId = pm->NewStreamObject(
-      "vtkCompositeDataPipeline", stream);
-    vtkClientServerID sourceID = this->GetID(i);
-    stream << vtkClientServerStream::Invoke << sourceID
-           << "SetExecutive" << execId <<  vtkClientServerStream::End;
-    }
+    vtkClientServerStream stream;
+    for (int i=0; i<numIDs; i++)
+      {
+      vtkClientServerID execId = pm->NewStreamObject(
+        this->ExecutiveName, stream);
+      vtkClientServerID sourceID = this->GetID(i);
+      stream << vtkClientServerStream::Invoke << sourceID
+        << "SetExecutive" << execId <<  vtkClientServerStream::End;
+      }
 
-
-  if (stream.GetNumberOfMessages() > 0)
-    {
-    pm->SendStream(this->Servers, stream);
+    if (stream.GetNumberOfMessages() > 0)
+      {
+      pm->SendStream(this->Servers, stream);
+      }
     }
 }
 
@@ -333,7 +349,7 @@ void vtkSMSourceProxy::AddInput(vtkSMSourceProxy *input,
         }
       stream << vtkClientServerStream::End;
       }
-    pm->SendStream(this->Servers, stream);
+    pm->SendStream((this->Servers & input->GetServers()), stream);
     }
 }
 

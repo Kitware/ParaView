@@ -13,13 +13,16 @@
 
 =========================================================================*/
 #include "vtkPV3DWidget.h"
-
+#include "vtkPVConfig.h"
 #include "vtkCommand.h"
 #include "vtkKWCheckButton.h"
 #include "vtkKWFrame.h"
 #include "vtkKWFrameLabeled.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
+#if defined(PARAVIEW_USE_SERVERMANAGER_RENDERING)
+  #include "vtkSMRenderModuleProxy.h"
+#endif
 #include "vtkPVDisplayGUI.h"
 #include "vtkPVRenderModule.h"
 #include "vtkPVDataInformation.h"
@@ -37,7 +40,7 @@
 #include "vtkSMDoubleVectorProperty.h"
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkPV3DWidget, "1.67");
+vtkCxxRevisionMacro(vtkPV3DWidget, "1.67.2.1");
 
 //===========================================================================
 //***************************************************************************
@@ -98,6 +101,11 @@ vtkPV3DWidget::~vtkPV3DWidget()
   this->SetWidgetProxyName(0);
   if (this->WidgetProxy)
     {
+#if defined(PARAVIEW_USE_SERVERMANAGER_RENDERING)
+//    vtkSMRenderModuleProxy* rm = this->GetPVApplication()->GetRenderModuleProxy();
+//    rm->RemoveDisplay(this->WidgetProxy);
+//    rm->UpdateVTKObjects();
+#endif
     this->WidgetProxy->Delete();
     this->WidgetProxy = 0;
     }
@@ -174,6 +182,11 @@ void vtkPV3DWidget::Create(vtkKWApplication *app)
   proxyNum++;
   str.rdbuf()->freeze(0);
   this->WidgetProxy->CreateVTKObjects(1);
+#if defined(PARAVIEW_USE_SERVERMANAGER_RENDERING)
+  vtkSMRenderModuleProxy* rm = this->GetPVApplication()->GetRenderModuleProxy();
+  rm->AddDisplay(this->WidgetProxy);
+  rm->UpdateVTKObjects();
+#endif
   this->InitializeObservers(this->WidgetProxy);
   this->ChildCreate(pvApp);
 }

@@ -19,14 +19,17 @@
 #include "vtkCollection.h"
 #include "vtkDataSetAttributes.h"
 #include "vtkDataSetSurfaceFilter.h"
-#include "vtkSMPartDisplay.h"
-#include "vtkSMLODPartDisplay.h"
+#include "vtkSMDisplayProxy.h"
+#include "vtkSMLODDisplayProxy.h"
+#include "vtkSMIntVectorProperty.h"
+#include "vtkSMDoubleVectorProperty.h"
+#include "vtkSMStringVectorProperty.h"
+#include "vtkPVColorSelectionWidget.h"
 #include "vtkCollection.h"
 #include "vtkColorTransferFunction.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVDataSetAttributesInformation.h"
 #include "vtkPVArrayInformation.h"
-#include "vtkSMLODPartDisplay.h"
 #include "vtkImageData.h"
 #include "vtkKWBoundsDisplay.h"
 #include "vtkKWChangeColorButton.h"
@@ -48,7 +51,6 @@
 #include "vtkObjectFactory.h"
 #include "vtkPiecewiseFunction.h"
 #include "vtkPVApplication.h"
-#include "vtkPVConfig.h"
 #include "vtkPVNumberOfOutputsInformation.h"
 #include "vtkPVProcessModule.h"
 #include "vtkPVSource.h"
@@ -72,7 +74,6 @@
 #include "vtkPVArrayInformation.h"
 #include "vtkPVRenderModuleUI.h"
 #include "vtkVolumeProperty.h"
-#include "vtkDataSet.h"
 #include "vtkPVOptions.h"
 #include "vtkStdString.h"
 
@@ -84,7 +85,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVDisplayGUI);
-vtkCxxRevisionMacro(vtkPVDisplayGUI, "1.27");
+vtkCxxRevisionMacro(vtkPVDisplayGUI, "1.27.2.1");
 
 int vtkPVDisplayGUICommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -108,7 +109,7 @@ vtkPVDisplayGUI::vtkPVDisplayGUI()
   this->ViewFrame = vtkKWFrameLabeled::New();
   
   this->ColorMenuLabel = vtkKWLabel::New();
-  this->ColorMenu = vtkKWOptionMenu::New();
+  this->ColorSelectionMenu = vtkPVColorSelectionWidget::New();
 
   this->MapScalarsCheck = vtkKWCheckButton::New();
   this->InterpolateColorsCheck = vtkKWCheckButton::New();
@@ -119,7 +120,7 @@ vtkPVDisplayGUI::vtkPVDisplayGUI()
   this->ColorButton = vtkKWChangeColorButton::New();
 
   this->VolumeScalarsMenuLabel = vtkKWLabel::New();
-  this->VolumeScalarsMenu = vtkKWOptionMenu::New();
+  this->VolumeScalarSelectionWidget = vtkPVColorSelectionWidget::New();
   
   this->EditVolumeAppearanceButton = vtkKWPushButton::New();
 
@@ -169,6 +170,7 @@ vtkPVDisplayGUI::vtkPVDisplayGUI()
   this->VolumeAppearanceEditor = NULL;
 
   this->ShouldReinitialize = 0;
+
 }
 
 //----------------------------------------------------------------------------
@@ -185,8 +187,8 @@ vtkPVDisplayGUI::~vtkPVDisplayGUI()
   this->ColorMenuLabel->Delete();
   this->ColorMenuLabel = NULL;
   
-  this->ColorMenu->Delete();
-  this->ColorMenu = NULL;
+  this->ColorSelectionMenu->Delete();
+  this->ColorSelectionMenu = NULL;
 
   this->EditColorMapButtonFrame->Delete();
   this->EditColorMapButtonFrame = NULL;
@@ -206,9 +208,8 @@ vtkPVDisplayGUI::~vtkPVDisplayGUI()
   
   this->VolumeScalarsMenuLabel->Delete();
   this->VolumeScalarsMenuLabel = NULL;
-
-  this->VolumeScalarsMenu->Delete();
-  this->VolumeScalarsMenu = NULL;
+  this->VolumeScalarSelectionWidget->Delete();
+  this->VolumeScalarSelectionWidget = 0;
 
   this->EditVolumeAppearanceButton->Delete();
   this->EditVolumeAppearanceButton = NULL;
@@ -309,7 +310,10 @@ vtkPVColorMap* vtkPVDisplayGUI::GetPVColorMap()
 //----------------------------------------------------------------------------
 void vtkPVDisplayGUI::Close()
 {
-  this->VolumeAppearanceEditor->Close();
+  if (this->VolumeAppearanceEditor)
+    {
+    this->VolumeAppearanceEditor->Close();
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -470,9 +474,11 @@ void vtkPVDisplayGUI::Create(vtkKWApplication* app, const char* options)
   this->ColorMenuLabel->SetBalloonHelpString(
     "Select method for coloring dataset geometry.");
   
-  this->ColorMenu->SetParent(this->ColorFrame->GetFrame());
-  this->ColorMenu->Create(this->GetApplication(), "");   
-  this->ColorMenu->SetBalloonHelpString(
+  this->ColorSelectionMenu->SetParent(this->ColorFrame->GetFrame());
+  this->ColorSelectionMenu->Create(this->GetApplication(), "");   
+  this->ColorSelectionMenu->SetColorSelectionCommand("ColorByArray");
+  this->ColorSelectionMenu->SetTarget(this);
+  this->ColorSelectionMenu->SetBalloonHelpString(
     "Select method for coloring dataset geometry.");
 
   this->ColorButton->SetParent(this->ColorFrame->GetFrame());
@@ -526,9 +532,9 @@ void vtkPVDisplayGUI::Create(vtkKWApplication* app, const char* options)
 
   this->Script("grid %s %s -sticky wns",
                this->ColorMenuLabel->GetWidgetName(),
-               this->ColorMenu->GetWidgetName());
+               this->ColorSelectionMenu->GetWidgetName());
   this->Script("grid %s -sticky news -padx %d -pady %d",
-               this->ColorMenu->GetWidgetName(),
+               this->ColorSelectionMenu->GetWidgetName(),
                col_1_padx, button_pady);
 
   this->Script("grid %s %s -sticky wns",
@@ -550,7 +556,6 @@ void vtkPVDisplayGUI::Create(vtkKWApplication* app, const char* options)
   // Volume Appearance
   this->SetVolumeAppearanceEditor(this->GetPVApplication()->GetMainWindow()->
                                   GetVolumeAppearanceEditor());
-
   this->VolumeAppearanceFrame->SetParent(this->GetFrame());
   this->VolumeAppearanceFrame->ShowHideFrameOn();
   this->VolumeAppearanceFrame->Create(this->GetApplication(), 0);
@@ -562,10 +567,12 @@ void vtkPVDisplayGUI::Create(vtkKWApplication* app, const char* options)
   this->VolumeScalarsMenuLabel->SetText("View Scalars:");
   this->VolumeScalarsMenuLabel->SetBalloonHelpString(
     "Select scalars to view with volume rendering.");
-  
-  this->VolumeScalarsMenu->SetParent(this->VolumeAppearanceFrame->GetFrame());
-  this->VolumeScalarsMenu->Create(this->GetApplication(), "");   
-  this->VolumeScalarsMenu->SetBalloonHelpString(
+
+  this->VolumeScalarSelectionWidget->SetParent(this->VolumeAppearanceFrame->GetFrame());
+  this->VolumeScalarSelectionWidget->Create(this->GetApplication(), "");
+  this->VolumeScalarSelectionWidget->SetColorSelectionCommand("VolumeRenderByArray");
+  this->VolumeScalarSelectionWidget->SetTarget(this);
+  this->VolumeScalarSelectionWidget->SetBalloonHelpString(
     "Select scalars to view with volume rendering.");
 
   this->EditVolumeAppearanceButton->
@@ -580,10 +587,10 @@ void vtkPVDisplayGUI::Create(vtkKWApplication* app, const char* options)
   
   this->Script("grid %s %s -sticky wns",
                this->VolumeScalarsMenuLabel->GetWidgetName(),
-               this->VolumeScalarsMenu->GetWidgetName());
+               this->VolumeScalarSelectionWidget->GetWidgetName());
 
   this->Script("grid %s -sticky news -padx %d -pady %d",
-               this->VolumeScalarsMenu->GetWidgetName(),
+               this->VolumeScalarSelectionWidget->GetWidgetName(),
                col_1_padx, button_pady);
 
   this->Script("grid %s -column 1 -sticky news -padx %d -pady %d",
@@ -997,29 +1004,24 @@ void vtkPVDisplayGUI::ShowVolumeAppearanceEditor()
     return;
     }
 
-  vtkStdString command(this->VolumeScalarsMenu->GetValue());
-
-  vtkStdString::size_type firstspace = command.find_first_of(' ');
-  vtkStdString::size_type lastspace = command.find_last_of(' ');
-  vtkStdString name = command.substr(firstspace+1, lastspace-firstspace-1);
-
-  if ( command.c_str() && strlen(command.c_str()) > 6 )
+  const char* arrayname = source->GetDisplayProxy()->cmGetScalarArray();
+  int colorField = source->GetDisplayProxy()->cmGetScalarMode();
+  
+  if (arrayname)
     {
     vtkPVDataInformation* dataInfo = source->GetDataInformation();
     vtkPVArrayInformation *arrayInfo;
-    int colorField = this->PVSource->GetPartDisplay()->GetColorField();
-    if (colorField == vtkDataSet::POINT_DATA_FIELD)
+    vtkPVDataSetAttributesInformation *attrInfo;
+    
+    if (colorField == vtkSMDisplayProxy::POINT_FIELD_DATA)
       {
-      vtkPVDataSetAttributesInformation *attrInfo
-        = dataInfo->GetPointDataInformation();
-      arrayInfo = attrInfo->GetArrayInformation(name.c_str());
+      attrInfo = dataInfo->GetPointDataInformation();
       }
     else
       {
-      vtkPVDataSetAttributesInformation *attrInfo
-        = dataInfo->GetCellDataInformation();
-      arrayInfo = attrInfo->GetArrayInformation(name.c_str());
+      attrInfo = dataInfo->GetCellDataInformation();
       }
+    arrayInfo = attrInfo->GetArrayInformation(arrayname);
     this->VolumeAppearanceEditor->SetPVSourceAndArrayInfo( source, arrayInfo );
     }
   else
@@ -1032,7 +1034,7 @@ void vtkPVDisplayGUI::ShowVolumeAppearanceEditor()
 //----------------------------------------------------------------------------
 void vtkPVDisplayGUI::Update()
 {
-  if (this->PVSource == 0 || this->PVSource->GetPartDisplay() == 0)
+  if (this->PVSource == 0 || this->PVSource->GetDisplayProxy() == 0)
     {
     this->SetEnabled(0);
     this->UpdateEnableState();
@@ -1051,7 +1053,7 @@ void vtkPVDisplayGUI::Update()
 void vtkPVDisplayGUI::UpdateInternal()
 {
   vtkPVSource* source = this->GetPVSource();
-  vtkSMPartDisplay* pDisp = source->GetPartDisplay();
+  vtkSMDisplayProxy* pDisp = source->GetDisplayProxy();
   
   // First reset all the values of the widgets.
   // Active states, and menu items will ge generated later.  
@@ -1071,48 +1073,46 @@ void vtkPVDisplayGUI::UpdateInternal()
   this->UpdateColorGUI();
     
   // Representation menu.
-  switch (pDisp->GetRepresentation())
+  switch(pDisp->cmGetRepresentation())
     {
-    case VTK_OUTLINE:
-      this->RepresentationMenu->SetValue(VTK_PV_OUTLINE_LABEL);
-      break;
-    case VTK_SURFACE:
-      this->RepresentationMenu->SetValue(VTK_PV_SURFACE_LABEL);
-      break;
-    case VTK_WIREFRAME:
-      this->RepresentationMenu->SetValue(VTK_PV_WIREFRAME_LABEL);
-      break;
-    case VTK_POINTS:
-      this->RepresentationMenu->SetValue(VTK_PV_POINTS_LABEL);
-      break;
-    case VTK_VOLUME:
-      this->RepresentationMenu->SetValue(VTK_PV_VOLUME_LABEL);
-      break;
-    default:
-      vtkErrorMacro("Unknown representation.");
+  case vtkSMDisplayProxy::OUTLINE:
+    this->RepresentationMenu->SetValue(VTK_PV_OUTLINE_LABEL);
+    break;
+  case vtkSMDisplayProxy::SURFACE:
+    this->RepresentationMenu->SetValue(VTK_PV_SURFACE_LABEL);
+    break;
+  case vtkSMDisplayProxy::WIREFRAME:
+    this->RepresentationMenu->SetValue(VTK_PV_WIREFRAME_LABEL);
+    break;
+  case vtkSMDisplayProxy::POINTS:
+    this->RepresentationMenu->SetValue(VTK_PV_POINTS_LABEL);
+    break;
+  case vtkSMDisplayProxy::VOLUME:
+    this->RepresentationMenu->SetValue(VTK_PV_VOLUME_LABEL);
+    break;
+  default:
+    vtkErrorMacro("Unknown representation.");
     }
 
   // Interpolation menu.
-  switch (pDisp->GetInterpolation())
+  switch (pDisp->cmGetInterpolation())
     {
-    case VTK_FLAT:
-      this->InterpolationMenu->SetValue("Flat");
-      break;
-    case VTK_GOURAUD:
-      this->InterpolationMenu->SetValue("Gouraud");
-      break;
-    default:
-      vtkErrorMacro("Unknown representation.");
+  case vtkSMDisplayProxy::FLAT:
+    this->InterpolationMenu->SetValue("Flat");
+    break;
+  case vtkSMDisplayProxy::GOURAND:
+    this->InterpolationMenu->SetValue("Gouraud");
+    break;
+  default:
+    vtkErrorMacro("Unknown representation.");
     }
-
-  this->PointSizeThumbWheel->SetValue(this->PVSource->GetPartDisplay()->GetPointSize());
-  this->LineWidthThumbWheel->SetValue(this->PVSource->GetPartDisplay()->GetLineWidth());
+  this->PointSizeThumbWheel->SetValue(pDisp->cmGetPointSize());
+  this->PointSizeThumbWheel->SetValue(pDisp->cmGetLineWidth());
+  this->OpacityScale->SetValue(pDisp->cmGetOpacity());
 
   // Update actor control resolutions
   this->UpdateActorControl();
   this->UpdateActorControlResolutions();
-
-  this->OpacityScale->SetValue(this->PVSource->GetPartDisplay()->GetOpacity());
 
   this->UpdateVolumeGUI();
 }
@@ -1170,7 +1170,7 @@ void vtkPVDisplayGUI::UpdateScalarBarVisibilityCheck()
     this->ScalarBarCheckVisible = 0;
     }
   else if (this->MapScalarsCheckVisible && 
-           this->PVSource->GetPartDisplay()->GetDirectColorFlag())
+    !this->PVSource->GetDisplayProxy()->cmGetColorMode())
     {
     this->ScalarBarCheckVisible = 0;
     }
@@ -1198,8 +1198,6 @@ void vtkPVDisplayGUI::UpdateScalarBarVisibilityCheck()
 void vtkPVDisplayGUI::UpdateColorMenu()
 {  
   // Variables that hold the current color state.
-  char tmp[350], cmd[1024], current[350]; 
-  int currentColorByFound = 0;
   vtkPVDataInformation *dataInfo;
   vtkPVDataSetAttributesInformation *attrInfo;
   vtkPVArrayInformation *arrayInfo;
@@ -1208,7 +1206,7 @@ void vtkPVDisplayGUI::UpdateColorMenu()
 
   if (colorMap)
     {
-    colorField = this->PVSource->GetPartDisplay()->GetColorField();
+    colorField = this->PVSource->GetDisplayProxy()->cmGetScalarMode();
     }
   dataInfo = this->PVSource->GetDataInformation();
     
@@ -1216,7 +1214,7 @@ void vtkPVDisplayGUI::UpdateColorMenu()
   // If not, set a new default.
   if (colorMap)
     {
-    if (colorField == vtkDataSet::POINT_DATA_FIELD)
+    if (colorField == vtkSMDisplayProxy::POINT_FIELD_DATA)
       {
       attrInfo = dataInfo->GetPointDataInformation();
       }
@@ -1231,7 +1229,7 @@ void vtkPVDisplayGUI::UpdateColorMenu()
       colorMap = this->PVSource->GetPVColorMap();
       if (colorMap)
         {
-        colorField = this->PVSource->GetPartDisplay()->GetColorField();
+        colorField = this->PVSource->GetDisplayProxy()->cmGetScalarMode();
         }
       else
         {
@@ -1241,93 +1239,40 @@ void vtkPVDisplayGUI::UpdateColorMenu()
     }
       
   // Populate menus
-  this->ColorMenu->DeleteAllEntries();
-  this->ColorMenu->AddEntryWithCommand("Property",
-                                       this, "ColorByProperty");
-  
-  attrInfo = dataInfo->GetPointDataInformation();
-  int i;
-  int numArrays;
-  int numComps;
-  int firstField = 1;
-  
-  // First look at point data.
-  numArrays = attrInfo->GetNumberOfArrays();
-  for (i = 0; i < numArrays; i++)
+  this->ColorSelectionMenu->DeleteAllEntries();
+  this->ColorSelectionMenu->AddEntryWithCommand("Property", 
+    this, "ColorByProperty");
+  this->ColorSelectionMenu->SetPVSource(this->PVSource);
+
+  this->ColorSelectionMenu->Update(0);
+  if (colorMap)
     {
-    arrayInfo = attrInfo->GetArrayInformation(i);
-    numComps = arrayInfo->GetNumberOfComponents();
-    sprintf(cmd, "ColorByPointField {%s} %d", 
-            arrayInfo->GetName(), numComps);
-    if (numComps > 1)
+    // Verify that the old colorby array has not disappeared.
+    attrInfo = (colorField == vtkSMDisplayProxy::POINT_FIELD_DATA)?
+      dataInfo->GetPointDataInformation() : dataInfo->GetCellDataInformation();
+    arrayInfo = attrInfo->GetArrayInformation(colorMap->GetArrayName());
+    if (!attrInfo)
       {
-      sprintf(tmp, "Point %s (%d)", arrayInfo->GetName(), numComps);
+      vtkErrorMacro("Could not find previous color setting.");
+      this->ColorSelectionMenu->SetValue("Property");
       }
     else
       {
-      sprintf(tmp, "Point %s", arrayInfo->GetName());
-      firstField = 0;
+      this->ColorSelectionMenu->SetValue(colorMap->GetArrayName(),
+        colorField);
       }
-    this->ColorMenu->AddEntryWithCommand(tmp, this, cmd);
-    // Is this the same selection as the source has?
-    if (colorField == vtkDataSet::POINT_DATA_FIELD && 
-        strcmp(arrayInfo->GetName(), colorMap->GetArrayName()) == 0)
-      {
-      currentColorByFound = 1;
-      strcpy(current, tmp);
-      }
-    }
-
-  // Now look at cell attributes.
-  attrInfo = dataInfo->GetCellDataInformation();
-  numArrays = attrInfo->GetNumberOfArrays();
-  for (i = 0; i < numArrays; i++)
-    {
-    arrayInfo = attrInfo->GetArrayInformation(i);
-    sprintf(cmd, "ColorByCellField {%s} %d", 
-            arrayInfo->GetName(), arrayInfo->GetNumberOfComponents());
-    if (arrayInfo->GetNumberOfComponents() > 1)
-      {
-      sprintf(tmp, "Cell %s (%d)", arrayInfo->GetName(),
-              arrayInfo->GetNumberOfComponents());
-      }
-    else
-      {
-      sprintf(tmp, "Cell %s", arrayInfo->GetName());
-      }
-    this->ColorMenu->AddEntryWithCommand(tmp, this, cmd);
-    if (colorField == vtkDataSet::CELL_DATA_FIELD && 
-        strcmp(arrayInfo->GetName(), colorMap->GetArrayName()) == 0)
-      {
-      currentColorByFound = 1;
-      strcpy(current, tmp);
-      }
-    }
-
-  if (colorMap == 0)
-    {
-    this->ColorMenu->SetValue("Property");
-    return;
-    }
-
-  // If the current array we are coloring by has disappeared,
-  // then default back to the property.
-  if (currentColorByFound)
-    {
-    this->ColorMenu->SetValue(current);
     }
   else
-    { // Choose another color.
-    this->ColorMenu->SetValue("Property");
-    vtkErrorMacro("Could not find previous color setting.");
-    }    
+    {
+    this->ColorSelectionMenu->SetValue("Property");
+    }
 }
 
 //----------------------------------------------------------------------------
 void vtkPVDisplayGUI::UpdateColorButton()
 {
-  float rgb[3];
-  this->PVSource->GetPartDisplay()->GetColor(rgb);
+  double rgb[3];
+  this->PVSource->GetDisplayProxy()->cmGetColor(rgb);
   this->ColorButton->SetColor(rgb[0], rgb[1], rgb[2]);
   
   // We could look at the color menu's value too.
@@ -1347,7 +1292,7 @@ void vtkPVDisplayGUI::UpdateEditColorMapButton()
     this->EditColorMapButtonVisible = 0;
     }
   else if (this->MapScalarsCheckVisible && 
-           this->PVSource->GetPartDisplay()->GetDirectColorFlag())
+    !this->PVSource->GetDisplayProxy()->cmGetColorMode())
     {
     this->EditColorMapButtonVisible = 0;
     }
@@ -1362,10 +1307,10 @@ void vtkPVDisplayGUI::UpdateEditColorMapButton()
 void vtkPVDisplayGUI::UpdateInterpolateColorsCheck()
 {
   if (this->PVSource->GetPVColorMap() == 0 ||
-      (this->PVSource->GetPartDisplay()->GetDirectColorFlag() && 
-       this->MapScalarsCheckVisible) ||
-      this->PVSource->GetPartDisplay()->GetColorField() 
-                                            == vtkDataSet::CELL_DATA_FIELD)
+    (!this->PVSource->GetDisplayProxy()->cmGetInterpolateScalarsBeforeMapping() && 
+     this->MapScalarsCheckVisible) ||
+    this->PVSource->GetDisplayProxy()->cmGetScalarMode() 
+    == vtkDataSet::CELL_DATA_FIELD)
     {
     this->InterpolateColorsCheckVisible = 0;
     this->InterpolateColorsCheck->SetState(0);
@@ -1374,7 +1319,7 @@ void vtkPVDisplayGUI::UpdateInterpolateColorsCheck()
     {
     this->InterpolateColorsCheckVisible = 1;
     this->InterpolateColorsCheck->SetState(
-              this->PVSource->GetPartDisplay()->GetInterpolateColorsFlag());
+      !this->PVSource->GetDisplayProxy()->cmGetInterpolateScalarsBeforeMapping());
     }
   this->UpdateEnableState();
 }
@@ -1382,106 +1327,7 @@ void vtkPVDisplayGUI::UpdateInterpolateColorsCheck()
 //-----------------------------------------------------------------------------
 void vtkPVDisplayGUI::UpdateVolumeGUI()
 {
-  vtkSMPartDisplay *pDisp = this->PVSource->GetPartDisplay();
-  char tmp[350], volCmd[1024], defCmd[350];
-  int i, numArrays, numComps;
-  vtkPVDataInformation *dataInfo = this->PVSource->GetDataInformation();
-  vtkPVDataSetAttributesInformation *attrInfo;
-  vtkPVArrayInformation *arrayInfo;
-  int defPoint = 0;
-  vtkPVArrayInformation *defArray, *inputArray, *volRenArray;
-  int dataType = dataInfo->GetDataSetType();
-
-  this->VolumeRenderMode = pDisp->GetVolumeRenderMode();
-  
-  // Default is the scalars to use when current color is not found.
-  // This is sort of a mess, and should be handled by a color selection widget.
-  defCmd[0] = '\0'; 
-  defArray = NULL;
-  inputArray = NULL;
-  volRenArray = NULL;
-  
-  const char *currentVolumeField = pDisp->GetVolumeRenderField();
-  this->VolumeScalarsMenu->DeleteAllEntries();
-  
-  attrInfo = dataInfo->GetPointDataInformation();
-  numArrays = attrInfo->GetNumberOfArrays();
-  int firstField = 1;
-  for (i = 0; i < numArrays; i++)
-    {
-    arrayInfo = attrInfo->GetArrayInformation(i);
-    numComps = arrayInfo->GetNumberOfComponents();
-    sprintf(volCmd, "VolumeRenderPointField {%s} %d",
-            arrayInfo->GetName(), numComps);
-    if (numComps > 1)
-      {
-      sprintf(tmp, "Point %s (%d)", arrayInfo->GetName(), numComps);
-      }
-    else
-      {
-      sprintf(tmp, "Point %s", arrayInfo->GetName());
-      }
-    this->VolumeScalarsMenu->AddEntryWithCommand(tmp, this, volCmd);
-    if (   firstField
-        || (   currentVolumeField
-            && (pDisp->GetColorField() == vtkDataSet::POINT_DATA_FIELD)
-            && (strcmp(arrayInfo->GetName(), currentVolumeField) == 0) ) )
-      {
-      this->VolumeScalarsMenu->SetValue( tmp );
-      volRenArray = arrayInfo;
-      firstField = 0;
-      }
-    if (attrInfo->IsArrayAnAttribute(i) == vtkDataSetAttributes::SCALARS)
-      {
-      strcpy(defCmd, tmp);
-      defPoint = 1;
-      defArray = arrayInfo;
-      if (!currentVolumeField)
-        {
-        volRenArray = arrayInfo;
-        this->VolumeScalarsMenu->SetValue( tmp );
-        }
-      }
-    }
-  
-  attrInfo = dataInfo->GetCellDataInformation();
-  numArrays = attrInfo->GetNumberOfArrays();
-  for (i = 0; i < numArrays; i++)
-    {
-    arrayInfo = attrInfo->GetArrayInformation(i);
-    numComps = arrayInfo->GetNumberOfComponents();
-    sprintf(volCmd, "VolumeRenderCellField {%s} %d",
-            arrayInfo->GetName(), numComps);
-    if (numComps > 1)
-      {
-      sprintf(tmp, "Cell %s (%d)", arrayInfo->GetName(), numComps);
-      }
-    else
-      {
-      sprintf(tmp, "Cell %s", arrayInfo->GetName());
-      }
-    this->VolumeScalarsMenu->AddEntryWithCommand(tmp, this, volCmd);
-    if (   firstField
-        || (   currentVolumeField
-            && (pDisp->GetColorField() == vtkDataSet::CELL_DATA_FIELD)
-            && (strcmp(arrayInfo->GetName(), currentVolumeField) == 0) ) )
-      {
-      this->VolumeScalarsMenu->SetValue( tmp );
-      volRenArray = arrayInfo;
-      firstField = 0;
-      }
-    if (attrInfo->IsArrayAnAttribute(i) == vtkDataSetAttributes::SCALARS)
-      {
-      strcpy(defCmd, tmp);
-      defPoint = 1;
-      defArray = arrayInfo;
-      if (!currentVolumeField)
-        {
-        volRenArray = arrayInfo;
-        this->VolumeScalarsMenu->SetValue( tmp );
-        }
-      }
-    }
+  vtkSMDisplayProxy* pDisp = this->PVSource->GetDisplayProxy();
 
   // Determine if this is unstructured grid data and add the 
   // volume rendering option
@@ -1490,23 +1336,38 @@ void vtkPVDisplayGUI::UpdateVolumeGUI()
       this->RepresentationMenu->DeleteEntry( VTK_PV_VOLUME_LABEL );
     }
   
-  if (dataType == VTK_UNSTRUCTURED_GRID && volRenArray)
+  if (!vtkSMSimpleDisplayProxy::SafeDownCast(pDisp)->GetHasVolumePipeline())
     {
-    this->RepresentationMenu->AddEntryWithCommand(VTK_PV_VOLUME_LABEL, this,
-                                                  "DrawVolume");
-      
-    // Update the transfer functions    
-    pDisp->InitializeTransferFunctions(volRenArray, dataInfo);
+    return;
     }
-}
+  this->RepresentationMenu->AddEntryWithCommand(VTK_PV_VOLUME_LABEL, this,
+    "DrawVolume");
 
+  // Update the transfer functions    
+  // I wonder if this needs to be done here
+/*
+  vtkSMProperty* p = pDisp->GetProperty("ResetTransferFunctions");
+  if (!p)
+    {
+    vtkErrorMacro("Failed to find property ResetTransferFunctions on DisplayProxy.");
+    return;
+    }
+  p->Modified();
+*/
+  this->VolumeRenderMode = 
+    (pDisp->cmGetRepresentation() == vtkSMDisplayProxy::VOLUME)? 1 : 0;
+  this->VolumeScalarSelectionWidget->SetPVSource(this->PVSource);
+  this->VolumeScalarSelectionWidget->SetColorSelectionCommand(
+    "VolumeRenderByArray");
+  this->VolumeScalarSelectionWidget->Update();
+}
 //----------------------------------------------------------------------------
 void vtkPVDisplayGUI::SetActorColor(double r, double g, double b)
 {
   this->ActorColor[0] = r;
   this->ActorColor[1] = g;
   this->ActorColor[2] = b;
-  this->PVSource->GetPartDisplay()->SetColor(r, g, b);
+  this->PVSource->GetDisplayProxy()->cmSetColor(this->ActorColor);
 }  
 
 //----------------------------------------------------------------------------
@@ -1523,9 +1384,26 @@ void vtkPVDisplayGUI::ChangeActorColor(double r, double g, double b)
     this->GetPVRenderView()->EventuallyRender();
     }
   
-  if (strcmp(this->ColorMenu->GetValue(), "Property") == 0)
+  if (strcmp(this->ColorSelectionMenu->GetValue(), "Property") == 0)
     {
     this->ColorSetByUser = 1;
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVDisplayGUI::ColorByArray(const char* array, int field)
+{
+  this->AddTraceEntry("$kw(%s) ColorByArray %s %d", this->GetTclName(),
+    array, field);
+  
+  this->PVSource->ColorByArray(array, field);
+  this->ColorSelectionMenu->SetValue(array, field);
+  
+  this->UpdateColorGUI(); // why?
+
+  if ( this->GetPVRenderView() )
+    {
+    this->GetPVRenderView()->EventuallyRender();
     }
 }
 
@@ -1534,14 +1412,14 @@ void vtkPVDisplayGUI::ColorByProperty()
 {
   this->ColorSetByUser = 1;
   this->AddTraceEntry("$kw(%s) ColorByProperty", this->GetTclName());
-  this->ColorMenu->SetValue("Property");
+  this->ColorSelectionMenu->SetValue("Property");
   this->ColorByPropertyInternal();
 }
 
 //----------------------------------------------------------------------------
 void vtkPVDisplayGUI::ColorByPropertyInternal()
 {
-  this->PVSource->GetPartDisplay()->SetScalarVisibility(0);
+  this->PVSource->GetDisplayProxy()->cmSetScalarVisibility(0);
   double *color = this->ColorButton->GetColor();
   this->SetActorColor(color[0], color[1], color[2]);
 
@@ -1556,212 +1434,19 @@ void vtkPVDisplayGUI::ColorByPropertyInternal()
 
 
 //----------------------------------------------------------------------------
-// Select which point field to use for volume rendering
-//
-void vtkPVDisplayGUI::VolumeRenderPointField(const char *name, int numComps)
+void vtkPVDisplayGUI::VolumeRenderByArray(const char* name, int field)
 {
-  if (name == NULL)
-    {
-    return;
-    }
-
-  this->AddTraceEntry("$kw(%s) VolumeRenderPointField {%s} %d", 
-                      this->GetTclName(), name, numComps);
-
-  this->ArraySetByUser = 1;
-
-  char *str;
-  str = new char [strlen(name) + 16];
-  if (numComps == 1)
-    {
-    sprintf(str, "Point %s", name);
-    }
-  else
-    {
-    sprintf(str, "Point %s (%d)", name, numComps);
-    }
-  this->VolumeScalarsMenu->SetValue(str);
-  delete[] str;
-  
-  // Update the transfer functions  
-  vtkPVDataInformation* dataInfo = this->GetPVSource()->GetDataInformation();
-  vtkPVDataSetAttributesInformation *attrInfo = dataInfo->GetPointDataInformation();
-  vtkPVArrayInformation *arrayInfo = attrInfo->GetArrayInformation(name);
-  
-  this->PVSource->GetPartDisplay()->ResetTransferFunctions(arrayInfo, dataInfo);
-  
-  this->VolumeRenderPointFieldInternal(name);
-}
-
-//----------------------------------------------------------------------------
-void vtkPVDisplayGUI::VolumeRenderPointFieldInternal(const char *name)
-{
-  this->PVSource->GetPartDisplay()->VolumeRenderPointField( name );
-  if ( this->GetPVRenderView() )
+  this->AddTraceEntry("$kw(%s) VolumeRenderByArray %s %d",
+    this->GetTclName(), name, field);
+  this->PVSource->VolumeRenderByArray(name, field);
+  this->PVSource->ColorByArray(name, field); // So the LOD Mapper remains 
+  //synchronized with the Volume mapper.
+  this->VolumeScalarSelectionWidget->SetValue(name, field);
+  if (this->GetPVRenderView())
     {
     this->GetPVRenderView()->EventuallyRender();
-    }
-
+    } 
 }
-
-//----------------------------------------------------------------------------
-// Select which cell field to use for volume rendering
-//
-void vtkPVDisplayGUI::VolumeRenderCellField(const char *name, int numComps)
-{
-  if (name == NULL)
-    {
-    return;
-    }
-
-  this->AddTraceEntry("$kw(%s) VolumeRenderCellField {%s} %d", 
-                      this->GetTclName(), name, numComps);
-
-  this->ArraySetByUser = 1;
-
-  char *str;
-  str = new char [strlen(name) + 16];
-  if (numComps == 1)
-    {
-    sprintf(str, "Cell %s", name);
-    }
-  else
-    {
-    sprintf(str, "Cell %s (%d)", name, numComps);
-    }
-  this->VolumeScalarsMenu->SetValue(str);
-  delete[] str;
-  
-  // Update the transfer functions  
-  vtkPVDataInformation* dataInfo = this->GetPVSource()->GetDataInformation();
-  vtkPVDataSetAttributesInformation *attrInfo = dataInfo->GetCellDataInformation();
-  vtkPVArrayInformation *arrayInfo = attrInfo->GetArrayInformation(name);
-  
-  this->PVSource->GetPartDisplay()->ResetTransferFunctions(arrayInfo, dataInfo);
-  
-  this->VolumeRenderCellFieldInternal(name);
-}
-
-//----------------------------------------------------------------------------
-void vtkPVDisplayGUI::VolumeRenderCellFieldInternal(const char *name)
-{
-  this->PVSource->GetPartDisplay()->VolumeRenderCellField( name );
-  if ( this->GetPVRenderView() )
-    {
-    this->GetPVRenderView()->EventuallyRender();
-    }
-}
-
-//----------------------------------------------------------------------------
-void vtkPVDisplayGUI::ColorByPointField(const char *name, int numComps)
-{
-  if (name == NULL)
-    {
-    return;
-    }
-
-  this->AddTraceEntry("$kw(%s) ColorByPointField {%s} %d", 
-                      this->GetTclName(), name, numComps);
-
-  this->ArraySetByUser = 1;
-  
-  char *str;
-  str = new char [strlen(name) + 16];
-  if (numComps == 1)
-    {
-    sprintf(str, "Point %s", name);
-    }
-  else
-    {
-    sprintf(str, "Point %s (%d)", name, numComps);
-    }
-  this->ColorMenu->SetValue(str);
-  delete [] str;
-
-  this->ColorByPointFieldInternal(name, numComps);
-}
-
-//----------------------------------------------------------------------------
-void vtkPVDisplayGUI::ColorByPointFieldInternal(const char *name, int numComps)
-{
-  vtkPVApplication *pvApp = this->GetPVApplication();
-  vtkPVColorMap* colorMap = pvApp->GetMainWindow()->GetPVColorMap(name, numComps);
-
-  if (colorMap == 0)
-    {
-    vtkErrorMacro("Could not get the color map.");
-    return;
-    }
-  this->PVSource->SetPVColorMap(colorMap);
-
-  this->PVSource->GetPartDisplay()->ColorByArray(
-            colorMap->GetProxyByName("LookupTable"), 
-            vtkDataSet::POINT_DATA_FIELD);
-  this->UpdateColorGUI();
-
-  if ( this->GetPVRenderView() )
-    {
-    this->GetPVRenderView()->EventuallyRender();
-    }
-
-}
-
-//----------------------------------------------------------------------------
-void vtkPVDisplayGUI::ColorByCellField(const char *name, int numComps)
-{
-  if (name == NULL)
-    {
-    return;
-    }
-
-  this->AddTraceEntry("$kw(%s) ColorByCellField {%s} %d", 
-                      this->GetTclName(), name, numComps);
-  
-  this->ArraySetByUser = 1;
-  
-  // Set the menu value.
-  char *str;
-  str = new char [strlen(name) + 16];
-  if (numComps == 1)
-    {
-    sprintf(str, "Cell %s", name);
-    }
-  else
-    {
-    sprintf(str, "Cell %s (%d)", name, numComps);
-    }
-  this->ColorMenu->SetValue(str);
-  delete [] str;
-
-  this->ColorByCellFieldInternal(name, numComps);
-}
-
-//----------------------------------------------------------------------------
-void vtkPVDisplayGUI::ColorByCellFieldInternal(const char *name, int numComps)
-{
-  vtkPVApplication *pvApp = this->GetPVApplication();
-  vtkPVColorMap* colorMap = pvApp->GetMainWindow()->GetPVColorMap(name, numComps);
-
-  if (colorMap == NULL)
-    {
-    vtkErrorMacro("Could not get the color map.");
-    return;
-    }
-  this->PVSource->SetPVColorMap(colorMap);
-
-  this->PVSource->GetPartDisplay()->ColorByArray(
-                      colorMap->GetProxyByName("LookupTable"), 
-                      vtkDataSet::CELL_DATA_FIELD);
-
-  // These three shoiuld be combined into a single method.
-  this->UpdateColorGUI();
-
-  if ( this->GetPVRenderView() )
-    {
-    this->GetPVRenderView()->EventuallyRender();
-    }
-}
-
 
 //----------------------------------------------------------------------------
 void vtkPVDisplayGUI::UpdateMapScalarsCheck()
@@ -1776,7 +1461,7 @@ void vtkPVDisplayGUI::UpdateMapScalarsCheck()
     // See if the array satisfies conditions necessary for direct coloring.  
     vtkPVDataInformation* dataInfo = this->PVSource->GetDataInformation();
     vtkPVDataSetAttributesInformation* attrInfo;
-    if (this->PVSource->GetPartDisplay()->GetColorField() == vtkDataSet::POINT_DATA_FIELD)
+    if (this->PVSource->GetDisplayProxy()->cmGetScalarMode() == vtkSMDisplayProxy::POINT_FIELD_DATA)
       {
       attrInfo = dataInfo->GetPointDataInformation();
       }
@@ -1793,11 +1478,11 @@ void vtkPVDisplayGUI::UpdateMapScalarsCheck()
         { // I would like to have two as an option also ...
         // One component causes more trouble than it is worth.
         this->MapScalarsCheckVisible = 1;
-        this->MapScalarsCheck->SetState( ! this->PVSource->GetPartDisplay()->GetDirectColorFlag());
+        this->MapScalarsCheck->SetState(this->PVSource->GetDisplayProxy()->cmGetColorMode());
         }
       else
         { // Keep VTK from directly coloring single component arrays.
-        this->PVSource->GetPartDisplay()->SetDirectColorFlag(0);
+        this->PVSource->GetDisplayProxy()->cmSetColorMode(1);
         }
       }
     }
@@ -1847,8 +1532,7 @@ void vtkPVDisplayGUI::DrawWireframe()
     }
   this->RepresentationMenu->SetValue(VTK_PV_WIREFRAME_LABEL);
   this->VolumeRenderModeOff();
-  
-  this->PVSource->GetPartDisplay()->SetRepresentation(VTK_WIREFRAME);
+  this->PVSource->GetDisplayProxy()->cmSetRepresentation(vtkSMDisplayProxy::WIREFRAME);
 
   if ( this->GetPVRenderView() )
     {
@@ -1865,8 +1549,7 @@ void vtkPVDisplayGUI::DrawPoints()
     }
   this->RepresentationMenu->SetValue(VTK_PV_POINTS_LABEL);
   this->VolumeRenderModeOff();
-  
-  this->PVSource->GetPartDisplay()->SetRepresentation(VTK_POINTS);
+  this->PVSource->GetDisplayProxy()->cmSetRepresentation(vtkSMDisplayProxy::POINTS);
   
   if ( this->GetPVRenderView() )
     {
@@ -1890,8 +1573,7 @@ void vtkPVDisplayGUI::DrawVolume()
     }
   this->RepresentationMenu->SetValue(VTK_PV_VOLUME_LABEL);
   this->VolumeRenderModeOn();
-  
-  this->PVSource->GetPartDisplay()->SetRepresentation(VTK_VOLUME);
+  this->PVSource->GetDisplayProxy()->cmSetRepresentation(vtkSMDisplayProxy::VOLUME);
 
   if ( this->GetPVRenderView() )
     {
@@ -1911,7 +1593,7 @@ void vtkPVDisplayGUI::DrawSurface()
   
   // fixme
   // It would be better to loop over part displays from the render module.
-  this->PVSource->GetPartDisplay()->SetRepresentation(VTK_SURFACE);
+  this->PVSource->GetDisplayProxy()->cmSetRepresentation(vtkSMDisplayProxy::SURFACE);
 
   if ( this->GetPVRenderView() )
     {
@@ -1928,8 +1610,7 @@ void vtkPVDisplayGUI::DrawOutline()
     }
   this->RepresentationMenu->SetValue(VTK_PV_OUTLINE_LABEL);
   this->VolumeRenderModeOff();
-  
-  this->PVSource->GetPartDisplay()->SetRepresentation(VTK_OUTLINE);
+  this->PVSource->GetDisplayProxy()->cmSetRepresentation(vtkSMDisplayProxy::OUTLINE);
 
   if ( this->GetPVRenderView() )
     {
@@ -1956,33 +1637,18 @@ void vtkPVDisplayGUI::VolumeRenderModeOff()
   // rendering.
   if (this->VolumeRenderMode)
     {
-    const char *colorSelection = this->VolumeScalarsMenu->GetValue();
-    // The command is more specific about what is the variable name and
-    // what is the number of vector entries.
-    int menuIdx = this->VolumeScalarsMenu->GetMenu()->GetIndex(colorSelection);
-    vtkStdString command(this->VolumeScalarsMenu->GetMenu()->GetItemCommand(menuIdx));
-
-    // The form of the command is of the form
-    // vtkTemp??? VolumeRender???Field {Field Name} NumComponents
-    // The field name is between the first and last braces, and
-    // the number of components is at the end of the string.
-    vtkStdString::size_type firstbrace = command.find_first_of('{');
-    vtkStdString::size_type lastbrace = command.find_last_of('}');
-    vtkStdString name = command.substr(firstbrace+1, lastbrace-firstbrace-1);
-    vtkStdString numCompsStr = command.substr(command.find_last_of(' '));
-    int numComps;
-    sscanf(numCompsStr.c_str(), "%d", &numComps);
-
-    if (strncmp(colorSelection, "Point", 5) == 0)
+    vtkSMDisplayProxy* pDisp = this->PVSource->GetDisplayProxy();
+    vtkSMStringVectorProperty* svp = vtkSMStringVectorProperty::SafeDownCast(
+      pDisp->GetProperty("SelectScalarArray"));
+    if (svp)
       {
-      this->ColorByPointField(name.c_str(), numComps);
+      this->ColorByArray(svp->GetElement(0), pDisp->cmGetScalarMode());
       }
     else
       {
-      this->ColorByCellField(name.c_str(), numComps);
+      vtkErrorMacro("Failed to find property ScalarMode on DisplayProxy.");
       }
     }
-  
   this->VolumeRenderMode = 0;
   this->UpdateEnableState();
 }
@@ -2004,32 +1670,19 @@ void vtkPVDisplayGUI::VolumeRenderModeOn()
   // Make scalar selection be the same for colors.
   if (!this->VolumeRenderMode)
     {
-    const char *colorSelection = this->ColorMenu->GetValue();
+    const char *colorSelection = this->ColorSelectionMenu->GetValue();
     if (strcmp(colorSelection, "Property") != 0)
       {
-      // The command is more specific about what is the variable name and
-      // what is the number of vector entries.
-      int menuIdx = this->ColorMenu->GetMenu()->GetIndex(colorSelection);
-      vtkStdString command(this->ColorMenu->GetMenu()->GetItemCommand(menuIdx));
-
-      // The form of the command is of the form
-      // vtkTemp??? ColorBy???Field {Field Name} NumComponents
-      // The field name is between the first and last braces, and
-      // the number of components is at the end of the string.
-      vtkStdString::size_type firstbrace = command.find_first_of('{');
-      vtkStdString::size_type lastbrace = command.find_last_of('}');
-      vtkStdString name = command.substr(firstbrace+1, lastbrace-firstbrace-1);
-      vtkStdString numCompsStr = command.substr(command.find_last_of(' '));
-      int numComps;
-      sscanf(numCompsStr.c_str(), "%d", &numComps);
-
-      if (strncmp(colorSelection, "Point", 5) == 0)
+      vtkSMDisplayProxy* pDisp = this->PVSource->GetDisplayProxy();
+      vtkSMStringVectorProperty* svp = vtkSMStringVectorProperty::SafeDownCast(
+        pDisp->GetProperty("ColorArray"));
+      if (svp)
         {
-        this->VolumeRenderPointField(name.c_str(), numComps);
+        this->VolumeRenderByArray(svp->GetElement(0), pDisp->cmGetScalarMode());
         }
       else
         {
-        this->VolumeRenderCellField(name.c_str(), numComps);
+        vtkErrorMacro("Failed to find property ScalarMode on DisplayProxy.");
         }
       }
     }
@@ -2067,7 +1720,7 @@ void vtkPVDisplayGUI::SetInterpolationToFlat()
   this->AddTraceEntry("$kw(%s) SetInterpolationToFlat", 
                       this->GetTclName());
   this->InterpolationMenu->SetValue("Flat");
-  this->PVSource->GetPartDisplay()->SetInterpolation(VTK_FLAT);
+  this->PVSource->GetDisplayProxy()->cmSetInterpolation(vtkSMDisplayProxy::FLAT);
 
   if ( this->GetPVRenderView() )
     {
@@ -2083,7 +1736,7 @@ void vtkPVDisplayGUI::SetInterpolationToGouraud()
                       this->GetTclName());
   this->InterpolationMenu->SetValue("Gouraud");
 
-  this->PVSource->GetPartDisplay()->SetInterpolation(VTK_GOURAUD);
+  this->PVSource->GetDisplayProxy()->cmSetInterpolation(vtkSMDisplayProxy::GOURAND);
   
   if ( this->GetPVRenderView() )
     {
@@ -2281,7 +1934,7 @@ void vtkPVDisplayGUI::SetMapScalarsFlag(int val)
 
   this->UpdateEnableState();
 
-  this->PVSource->GetPartDisplay()->SetDirectColorFlag(!val);
+  this->PVSource->GetDisplayProxy()->cmSetColorMode(val);
   this->UpdateColorGUI();
 }
 
@@ -2304,7 +1957,7 @@ void vtkPVDisplayGUI::SetInterpolateColorsFlag(int val)
     this->InterpolateColorsCheck->SetState(val);
     }
 
-  this->PVSource->GetPartDisplay()->SetInterpolateColorsFlag(val);
+  this->PVSource->GetDisplayProxy()->cmSetInterpolateScalarsBeforeMapping(!val);
 }
 
 //----------------------------------------------------------------------------
@@ -2326,7 +1979,7 @@ void vtkPVDisplayGUI::SetPointSize(int size)
 //----------------------------------------------------------------------------
 void vtkPVDisplayGUI::ChangePointSize()
 {
-  this->PVSource->GetPartDisplay()->SetPointSize(this->PointSizeThumbWheel->GetValue());
+  this->PVSource->GetDisplayProxy()->cmSetPointSize(this->PointSizeThumbWheel->GetValue());
  
   if ( this->GetPVRenderView() )
     {
@@ -2361,7 +2014,7 @@ void vtkPVDisplayGUI::SetLineWidth(int width)
 //----------------------------------------------------------------------------
 void vtkPVDisplayGUI::ChangeLineWidth()
 {
-  this->PVSource->GetPartDisplay()->SetLineWidth(this->LineWidthThumbWheel->GetValue());
+  this->PVSource->GetDisplayProxy()->cmSetLineWidth(this->LineWidthThumbWheel->GetValue());
 
   if ( this->GetPVRenderView() )
     {
@@ -2377,30 +2030,25 @@ void vtkPVDisplayGUI::ChangeLineWidthEndCallback()
                       (int)(this->LineWidthThumbWheel->GetValue()));
 }
 
-
-
-
-
 //----------------------------------------------------------------------------
 void vtkPVDisplayGUI::SetVolumeOpacityUnitDistance( double d )
 {
-  vtkPVApplication *pvApp = this->GetPVApplication();
-  vtkPVProcessModule* pm = pvApp->GetProcessModule();
-  vtkClientServerStream stream;
-
-  vtkSMProxy *volume = 
-    this->PVSource->GetPartDisplay()->GetVolumePropertyProxy();
-  stream 
-    << vtkClientServerStream::Invoke 
-    << volume->GetID(0) << "SetScalarOpacityUnitDistance" << d 
-    << vtkClientServerStream::End;
-  pm->SendStream(
-    vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER, stream);
+  vtkSMDisplayProxy* pDisp = this->PVSource->GetDisplayProxy();
+  vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+    pDisp->GetProperty("ScalarOpacityUnitDistance"));
+  if (!dvp)
+    {
+    vtkErrorMacro("Failed to find property ScalarOpacityUnitDistance on DisplayProxy.");
+    return;
+    }
+  dvp->SetElement(0, d);
+  pDisp->UpdateVTKObjects();
 }
 
 //----------------------------------------------------------------------------
 void vtkPVDisplayGUI::ClearVolumeOpacity()
 {
+#if !defined(PARAVIEW_USE_SERVERMANAGER_RENDERING)
   vtkPVApplication *pvApp = this->GetPVApplication();
   vtkPVProcessModule* pm = pvApp->GetProcessModule();
   vtkClientServerStream stream;
@@ -2412,11 +2060,13 @@ void vtkPVDisplayGUI::ClearVolumeOpacity()
     << vtkClientServerStream::End;
   pm->SendStream(
     vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER, stream);
+#endif
 }
 
 //----------------------------------------------------------------------------
 void vtkPVDisplayGUI::AddVolumeOpacity( double scalar, double opacity )
 {
+#if !defined(PARAVIEW_USE_SERVERMANAGER_RENDERING)
   vtkPVApplication *pvApp = this->GetPVApplication();
   vtkPVProcessModule* pm = pvApp->GetProcessModule();
   vtkClientServerStream stream;
@@ -2428,11 +2078,13 @@ void vtkPVDisplayGUI::AddVolumeOpacity( double scalar, double opacity )
     << vtkClientServerStream::End;
   pm->SendStream(
     vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER, stream);
+#endif
 }
 
 //----------------------------------------------------------------------------
 void vtkPVDisplayGUI::ClearVolumeColor()
 {
+#if !defined(PARAVIEW_USE_SERVERMANAGER_RENDERING)
   vtkPVApplication *pvApp = this->GetPVApplication();
   vtkPVProcessModule* pm = pvApp->GetProcessModule();
   vtkClientServerStream stream;
@@ -2444,11 +2096,13 @@ void vtkPVDisplayGUI::ClearVolumeColor()
     << vtkClientServerStream::End;
   pm->SendStream(
     vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER, stream);
+#endif
 }
 
 //----------------------------------------------------------------------------
 void vtkPVDisplayGUI::AddVolumeColor( double scalar, double r, double g, double b )
 {
+#if !defined(PARAVIEW_USE_SERVERMANAGER_RENDERING)
   vtkPVApplication *pvApp = this->GetPVApplication();
   vtkPVProcessModule* pm = pvApp->GetProcessModule();
   vtkClientServerStream stream;
@@ -2460,14 +2114,17 @@ void vtkPVDisplayGUI::AddVolumeColor( double scalar, double r, double g, double 
     << vtkClientServerStream::End;
   pm->SendStream(
     vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER, stream);
+#endif
 }
 
 //----------------------------------------------------------------------------
 void vtkPVDisplayGUI::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
-  os << indent << "ColorMenu: " << this->ColorMenu << endl;
-  os << indent << "VolumeScalarsMenu: " << this->VolumeScalarsMenu << endl;
+  os << indent << "ColorSelectionMenu: " <<
+    this->ColorSelectionMenu << endl;
+  os << indent << "VolumeScalarSelectionWidget: " << 
+    this->VolumeScalarSelectionWidget << endl;
   os << indent << "ResetCameraButton: " << this->ResetCameraButton << endl;
   os << indent << "EditColorMapButton: " << this->EditColorMapButton << endl;
   os << indent << "PVSource: " << this->GetPVSource() << endl;
@@ -2493,7 +2150,11 @@ void vtkPVDisplayGUI::SetOpacity(float val)
 //----------------------------------------------------------------------------
 void vtkPVDisplayGUI::OpacityChangedCallback()
 {
+#if defined(PARAVIEW_USE_SERVERMANAGER_RENDERING)
+  this->PVSource->GetDisplayProxy()->cmSetOpacity(this->OpacityScale->GetValue());
+#else
   this->PVSource->GetPartDisplay()->SetOpacity(this->OpacityScale->GetValue());
+#endif
 
   if ( this->GetPVRenderView() )
     {
@@ -2512,11 +2173,19 @@ void vtkPVDisplayGUI::OpacityChangedEndCallback()
 //----------------------------------------------------------------------------
 void vtkPVDisplayGUI::GetActorTranslate(double* point)
 {
+#if defined(PARAVIEW_USE_SERVERMANAGER_RENDERING)
+  vtkSMDisplayProxy* pDisp = this->PVSource->GetDisplayProxy();
+  if (pDisp)
+    {
+    pDisp->cmGetPosition(point);
+    }
+#else
   vtkSMPartDisplay* pDisp = this->PVSource->GetPartDisplay();
   if (pDisp)
     {
     pDisp->GetTranslate(point);
     }
+#endif
   else
     {
     point[0] = this->TranslateThumbWheel[0]->GetValue();
@@ -2531,7 +2200,13 @@ void vtkPVDisplayGUI::SetActorTranslateNoTrace(double x, double y, double z)
   this->TranslateThumbWheel[0]->SetValue(x);
   this->TranslateThumbWheel[1]->SetValue(y);
   this->TranslateThumbWheel[2]->SetValue(z);
+#if defined(PARAVIEW_USE_SERVERMANAGER_RENDERING)
+  double pos[3];
+  pos[0] = x; pos[1] = y; pos[2] = z;
+  this->PVSource->GetDisplayProxy()->cmSetPosition(pos);
+#else
   this->PVSource->GetPartDisplay()->SetTranslate(x, y, z);
+#endif
   // Do not render here (do it in the callback, since it could be either
   // Render or EventuallyRender depending on the interaction)
 }
@@ -2582,10 +2257,14 @@ void vtkPVDisplayGUI::ActorTranslateEndCallback()
 //----------------------------------------------------------------------------
 void vtkPVDisplayGUI::GetActorScale(double* point)
 {
+#if defined(PARAVIEW_USE_SERVERMANAGER_RENDERING)
+  vtkSMDisplayProxy* pDisp = this->PVSource->GetDisplayProxy();
+#else
   vtkSMPartDisplay* pDisp = this->PVSource->GetPartDisplay();
+#endif
   if (pDisp)
     {
-    pDisp->GetScale(point);
+    pDisp->cmGetScale(point);
     }
   else
     {
@@ -2601,8 +2280,13 @@ void vtkPVDisplayGUI::SetActorScaleNoTrace(double x, double y, double z)
   this->ScaleThumbWheel[0]->SetValue(x);
   this->ScaleThumbWheel[1]->SetValue(y);
   this->ScaleThumbWheel[2]->SetValue(z);
-
+#if defined(PARAVIEW_USE_SERVERMANAGER_RENDERING)
+  double scale[3];
+  scale[0] = x; scale[1] = y; scale[2] = z;
+  this->PVSource->GetDisplayProxy()->cmSetScale(scale);
+#else
   this->PVSource->GetPartDisplay()->SetScale(x, y, z);
+#endif
 
   // Do not render here (do it in the callback, since it could be either
   // Render or EventuallyRender depending on the interaction)
@@ -2654,10 +2338,14 @@ void vtkPVDisplayGUI::ActorScaleEndCallback()
 //----------------------------------------------------------------------------
 void vtkPVDisplayGUI::GetActorOrientation(double* point)
 {
+#if defined(PARAVIEW_USE_SERVERMANAGER_RENDERING)
+  vtkSMDisplayProxy* pDisp = this->PVSource->GetDisplayProxy();
+#else
   vtkSMPartDisplay* pDisp = this->PVSource->GetPartDisplay();
+#endif
   if (pDisp)
     {
-    pDisp->GetOrientation(point);
+    pDisp->cmGetOrientation(point);
     }
   else
     {
@@ -2673,7 +2361,13 @@ void vtkPVDisplayGUI::SetActorOrientationNoTrace(double x, double y, double z)
   this->OrientationScale[0]->SetValue(x);
   this->OrientationScale[1]->SetValue(y);
   this->OrientationScale[2]->SetValue(z);
+#if defined(PARAVIEW_USE_SERVERMANAGER_RENDERING)
+  double orient[3];
+  orient[0] = x; orient[1] = y; orient[2] = z;
+  this->PVSource->GetDisplayProxy()->cmSetOrientation(orient);
+#else
   this->PVSource->GetPartDisplay()->SetOrientation(x, y, z);
+#endif
 
   // Do not render here (do it in the callback, since it could be either
   // Render or EventuallyRender depending on the interaction)
@@ -2725,10 +2419,17 @@ void vtkPVDisplayGUI::ActorOrientationEndCallback()
 //----------------------------------------------------------------------------
 void vtkPVDisplayGUI::GetActorOrigin(double* point)
 {
+#if defined(PARAVIEW_USE_SERVERMANAGER_RENDERING)
+  if (this->PVSource->GetDisplayProxy())
+    {
+    this->PVSource->GetDisplayProxy()->cmGetOrigin(point);
+    }
+#else
   if (this->PVSource->GetPartDisplay())
     {
     this->PVSource->GetPartDisplay()->GetOrigin(point);
     }
+#endif
   else
     {
     point[0] = this->OriginThumbWheel[0]->GetValue();
@@ -2743,7 +2444,13 @@ void vtkPVDisplayGUI::SetActorOriginNoTrace(double x, double y, double z)
   this->OriginThumbWheel[0]->SetValue(x);
   this->OriginThumbWheel[1]->SetValue(y);
   this->OriginThumbWheel[2]->SetValue(z);
+#if defined(PARAVIEW_USE_SERVERMANAGER_RENDERING)
+  double origin[3];
+  origin[0] = x; origin[1] = y; origin[2] = z;
+  this->PVSource->GetDisplayProxy()->cmSetOrigin(origin);
+#else
   this->PVSource->GetPartDisplay()->SetOrigin(x, y, z);
+#endif
 
   // Do not render here (do it in the callback, since it could be either
   // Render or EventuallyRender depending on the interaction)
@@ -2800,11 +2507,18 @@ void vtkPVDisplayGUI::UpdateActorControl()
   double scale[3];
   double origin[3];
   double orientation[3];
-  
+#if defined(PARAVIEW_USE_SERVERMANAGER_RENDERING)
+  vtkSMDisplayProxy* pDisp = this->PVSource->GetDisplayProxy();
+  pDisp->cmGetPosition(translate);
+  pDisp->cmGetScale(scale);
+  pDisp->cmGetOrientation(orientation);
+  pDisp->cmGetOrigin(origin);
+#else
   this->PVSource->GetPartDisplay()->GetTranslate(translate);
   this->PVSource->GetPartDisplay()->GetScale(scale);
   this->PVSource->GetPartDisplay()->GetOrientation(orientation);
   this->PVSource->GetPartDisplay()->GetOrigin(origin);
+#endif
   for (i = 0; i < 3; i++)
     {    
     this->TranslateThumbWheel[i]->SetValue(translate[i]);
@@ -2854,9 +2568,10 @@ void vtkPVDisplayGUI::UpdateEnableState()
   this->PropagateEnableState(this->DisplayStyleFrame);
   this->PropagateEnableState(this->ViewFrame);
   this->PropagateEnableState(this->ColorMenuLabel);
-  this->PropagateEnableState(this->ColorMenu);
   this->PropagateEnableState(this->VolumeScalarsMenuLabel);
-  this->PropagateEnableState(this->VolumeScalarsMenu);
+  this->PropagateEnableState(this->EditVolumeAppearanceButton);
+  this->PropagateEnableState(this->ColorSelectionMenu);
+  this->PropagateEnableState(this->VolumeScalarSelectionWidget);
   if ( this->EditColorMapButtonVisible )
     {
     this->PropagateEnableState(this->EditColorMapButton);
@@ -2947,7 +2662,7 @@ void vtkPVDisplayGUI::UpdateEnableState()
 //----------------------------------------------------------------------------
 void vtkPVDisplayGUI::SaveVolumeRenderStateDisplay(ofstream *file)
 {
-
+#if !defined(PARAVIEW_USE_SERVERMANAGER_RENDERING)
   if(this->VolumeRenderMode)
     {
     *file << "[$kw(" << this->GetPVSource()->GetTclName()
@@ -2992,4 +2707,5 @@ void vtkPVDisplayGUI::SaveVolumeRenderStateDisplay(ofstream *file)
         }
       }
     }
+#endif
 }

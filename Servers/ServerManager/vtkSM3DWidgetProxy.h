@@ -32,6 +32,11 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
+  // Called when the display is added/removed to/from a RenderModule.
+  virtual void AddToRenderModule(vtkSMRenderModuleProxy*);
+  virtual void RemoveFromRenderModule(vtkSMRenderModuleProxy*);
+
+  // Description:
   // Sends a PlaceWidget event to the 3DWidget.
   // A PlaceWidget call on most of the 3DWidgets (eg. ImplicitPlane)
   // leads to changes in some of the properties of the widget (such as
@@ -50,7 +55,7 @@ public:
   
   // Description:
   // Sets Visibility of the 3DWidget. Internally
-  // call SetEnabled.
+  // calls SetEnabled.
   virtual void SetVisibility(int visible) 
     { this->SetEnabled(visible); } 
 

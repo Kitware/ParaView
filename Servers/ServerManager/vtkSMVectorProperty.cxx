@@ -16,7 +16,7 @@
 
 #include "vtkPVXMLElement.h"
 
-vtkCxxRevisionMacro(vtkSMVectorProperty, "1.3");
+vtkCxxRevisionMacro(vtkSMVectorProperty, "1.3.10.1");
 
 //---------------------------------------------------------------------------
 vtkSMVectorProperty::vtkSMVectorProperty()
@@ -24,11 +24,13 @@ vtkSMVectorProperty::vtkSMVectorProperty()
   this->RepeatCommand = 0;
   this->NumberOfElementsPerCommand = 1;
   this->UseIndex = 0;
+  this->CleanCommand = 0;
 }
 
 //---------------------------------------------------------------------------
 vtkSMVectorProperty::~vtkSMVectorProperty()
 {
+  this->SetCleanCommand(0);
 }
 
 //---------------------------------------------------------------------------
@@ -68,6 +70,12 @@ int vtkSMVectorProperty::ReadXMLAttributes(vtkSMProxy* parent,
   if (retVal)
     {
     this->SetNumberOfElements(numEls);
+    }
+
+  const char* clean_command = element->GetAttribute("clean_command");
+  if (clean_command)
+    {
+    this->SetCleanCommand(clean_command);
     }
 
   return 1;

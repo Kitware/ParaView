@@ -14,34 +14,42 @@
 =========================================================================*/
 // .NAME vtkSMAxesProxy - proxy for the Axes actor.
 // .SECTION Description
-// vtkSMAxesProxy is the Displayer for the Axes actor. This is used 
+// vtkSMAxesProxy is the Display for the Axes actor. This is used 
 // as the center axes in ParaView. Proxifying it makes the axes
-// accessible in batch mode.
+// accessible in batch mode. The only reason why Axes is even a 
+// separate display proxy instead of the the generic Axes source proxy,
+// and the vtkSMSimpleDisplayProxy subclass is because we don't want the 
+// additional overhead of update suppressor etc for the Axes proxy.
 // .SECTION See Also
-// vtkSMDisplayerProxy vtkSMProxy
+// vtkSMDisplayProxy 
 
 #ifndef __vtkSMAxesProxy_h
 #define __vtkSMAxesProxy_h
 
-#include "vtkSMDisplayerProxy.h"
+#include "vtkSMDisplayProxy.h"
 class vtkPVWindow;
 
-class VTK_EXPORT vtkSMAxesProxy : public vtkSMDisplayerProxy
+class VTK_EXPORT vtkSMAxesProxy : public vtkSMDisplayProxy
 {
 public:
   static vtkSMAxesProxy* New();
-  vtkTypeRevisionMacro(vtkSMAxesProxy, vtkSMDisplayerProxy);
+  vtkTypeRevisionMacro(vtkSMAxesProxy, vtkSMDisplayProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
   // Save the proxy in batch script.
   virtual void SaveInBatchScript(ofstream* file);  
+
+  // Description:
+  // Called when the display is added/removed to/from a RenderModule.
+  virtual void AddToRenderModule(vtkSMRenderModuleProxy*);
+  virtual void RemoveFromRenderModule(vtkSMRenderModuleProxy*);
+
 //BTX
 protected:
   vtkSMAxesProxy();
   ~vtkSMAxesProxy();
 
-  friend class vtkPVWindow;
   // Description:
   // Create all the VTK objects.
   virtual void CreateVTKObjects(int numObjects);
