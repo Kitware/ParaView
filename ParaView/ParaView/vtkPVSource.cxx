@@ -70,7 +70,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.236");
+vtkCxxRevisionMacro(vtkPVSource, "1.237");
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -2028,7 +2028,7 @@ void vtkPVSource::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVSource ";
-  this->ExtractRevision(os,"$Revision: 1.236 $");
+  this->ExtractRevision(os,"$Revision: 1.237 $");
 }
 
 //----------------------------------------------------------------------------
@@ -2046,6 +2046,8 @@ void vtkPVSource::PrintSelf(ostream& os, vtkIndent indent)
      << (this->ExtentTranslatorTclName?this->ExtentTranslatorTclName:"null")
      << endl;
   os << indent << "MainParameterFrame: " << this->GetMainParameterFrame() 
+     << endl;
+  os << indent << "DescriptionFrame: " << this->GetDescriptionFrame() 
      << endl;
   os << indent << "Notebook: " << this->GetNotebook() << endl;
   os << indent << "NumberOfPVInputs: " << this->GetNumberOfPVInputs() << endl;
