@@ -1130,7 +1130,13 @@ void vtkPVRenderView::CreateViewProperties()
   this->Notebook->AddPage("Camera", "Camera and viewing navigation properties page");
   vtkKWWidget* page = this->Notebook->GetFrame("Camera");
 
-  this->StandardViewsFrame->SetParent( page );
+  vtkKWFrame* frame = vtkKWFrame::New();
+  frame->SetParent(page);
+  frame->Create(this->Application, 1);
+  this->Script("pack %s -fill both -expand yes", 
+               frame->GetWidgetName());
+
+  this->StandardViewsFrame->SetParent( frame->GetFrame() );
   this->StandardViewsFrame->Create(this->Application);
   this->StandardViewsFrame->SetLabel("Standard Views");
 
@@ -1172,15 +1178,15 @@ void vtkPVRenderView::CreateViewProperties()
   this->ZMinViewButton->SetCommand(this, "StandardViewCallback 0 0 -1");
   this->Script("grid configure %s -column 2 -row 1 -padx 2 -pady 2 -ipadx 5 -sticky ew",
                this->ZMinViewButton->GetWidgetName());
-  this->ManipulatorControl2D->SetParent(page);
+  this->ManipulatorControl2D->SetParent(frame->GetFrame());
   this->ManipulatorControl2D->Create(pvapp, 0);
   this->ManipulatorControl2D->SetLabel("2D Movements");
-  this->ManipulatorControl3D->SetParent(page);
+  this->ManipulatorControl3D->SetParent(frame->GetFrame());
   this->ManipulatorControl3D->Create(pvapp, 0);
   this->ManipulatorControl3D->SetLabel("3D Movements");
 
   int cc;
-  this->CameraIconsFrame->SetParent(page);
+  this->CameraIconsFrame->SetParent(frame->GetFrame());
   this->CameraIconsFrame->ShowHideFrameOn();
   this->CameraIconsFrame->Create(this->Application);
   this->CameraIconsFrame->SetLabel("Stored Camera Positions");
@@ -1209,6 +1215,9 @@ void vtkPVRenderView::CreateViewProperties()
   this->Script("pack %s %s -padx 2 -pady 2 -fill x -expand yes -anchor w",
                this->ManipulatorControl2D->GetWidgetName(),
                this->ManipulatorControl3D->GetWidgetName());
+
+  frame->Delete();
+
   this->Notebook->Raise("General");
 
   if ( this->Application->BooleanRegisteryCheck(2, "SourcesBrowser",
@@ -2249,7 +2258,7 @@ void vtkPVRenderView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVRenderView ";
-  this->ExtractRevision(os,"$Revision: 1.183 $");
+  this->ExtractRevision(os,"$Revision: 1.184 $");
 }
 
 //------------------------------------------------------------------------------
