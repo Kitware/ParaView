@@ -31,9 +31,6 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkKWView.h"
 #include "vtkPVWindow.h"
 #include "vtkKWApplication.h"
-#include "vtkPVContourFilter.h"
-#include "vtkPVExtractEdges.h"
-#include "vtkPVColorByProcess.h"
 #include "vtkPVCutter.h"
 #include "vtkPVAssignment.h"
 #include "vtkPVApplication.h"
@@ -41,6 +38,8 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkPVMenuButton.h"
 #include "vtkElevationFilter.h"
 #include "vtkSingleContourFilter.h"
+#include "vtkExtractEdges.h"
+#include "vtkPVDataSetToDataSetFilter.h"
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
 		     int argc, char *argv[]);
@@ -181,29 +180,41 @@ void vtkPVData::ShowActorComposite()
 //----------------------------------------------------------------------------
 void vtkPVData::Contour()
 {
-  vtkPVApplication *pvApp = (vtkPVApplication *)this->Application;
-  vtkPVContourFilter *contour;
-  float *range;
+  static instanceCount = 0;
+  vtkPVDataSetToPolyDataFilter *f;
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  vtkPVWindow *window = this->GetPVSource()->GetWindow();
+  float *range = this->GetData()->GetScalarRange();
   
-  contour = vtkPVContourFilter::New();
-  contour->Clone(pvApp);
+  // Create the pvSource. Clone the PVSource and the vtkSource,
+  // Link the PVSource to the vtkSource.
+  f = vtkPVDataSetToPolyDataFilter::SafeDownCast(
+    pvApp->MakePVSource("vtkPVDataSetToPolyDataFilter",
+			"vtkSingleContourFilter",
+			"Contour", ++instanceCount));
+  if (f == NULL) {return;}
+  f->SetInput(this);
+  ((vtkSingleContourFilter*)f->GetVTKSource())->SetFirstValue((range[0] +
+							       range[1])/2.0);
   
-  contour->SetInput(this);
+  // Add the new Source to the View, and make it current.
+  this->GetPVSource()->GetView()->AddComposite(f);
+  window->SetCurrentSource(f);
   
-  this->Update();
-  // This should be replaced by a parallel version.
-  range = this->Data->GetScalarRange();
-  contour->GetContour()->SetFirstValue((range[1]+range[0])/2.0);
-      
-  contour->SetName("contour");
-
-  vtkPVWindow *window = vtkPVWindow::SafeDownCast(
-    this->GetPVSource()->GetView()->GetParentWindow());
-  this->GetPVSource()->GetView()->AddComposite(contour);
+  // Add some source specific widgets.
+  // Normally these would be added in the CreateProperties method.
+  f->AddLabeledEntry("Value", "SetFirstValue", "GetFirstValue");
+  f->AddLabeledToggle("ComputeNormals", "SetComputeNormals",
+		      "GetComputeNormals");
+  f->AddLabeledToggle("ComputeGradients", "SetComputeGradients",
+		     "GetComputeGradients");
+  f->AddLabeledToggle("ComputeScalars", "SetComputeScalars",
+		      "GetComputeScalars");
+  f->UpdateParameterWidgets();
   
-  window->SetCurrentSource(contour);
-  
-  contour->Delete();
+  // Clean up. (How about on the other processes?)
+  // We cannot create an object in tcl and delete it in C++.
+  //f->Delete();
 }
 
 //----------------------------------------------------------------------------
@@ -235,6 +246,7 @@ void vtkPVData::Elevation()
   vtkPVDataSetToDataSetFilter *f;
   vtkPVApplication *pvApp = this->GetPVApplication();
   vtkPVWindow *window = this->GetPVSource()->GetWindow();
+  float *bounds = this->GetData()->GetBounds();
   
   // Create the pvSource. Clone the PVSource and the vtkSource,
   // Link the PVSource to the vtkSource.
@@ -244,6 +256,8 @@ void vtkPVData::Elevation()
 			"Elevation", ++instanceCount));
   if (f == NULL) {return;}
   f->SetInput(this);
+  ((vtkElevationFilter*)f->GetVTKSource())->SetLowPoint(bounds[0], 0, 0);
+  ((vtkElevationFilter*)f->GetVTKSource())->SetHighPoint(bounds[1], 0, 0);
   
   // Add the new Source to the View, and make it current.
   this->GetPVSource()->GetView()->AddComposite(f);
@@ -266,43 +280,61 @@ void vtkPVData::Elevation()
 //----------------------------------------------------------------------------
 void vtkPVData::ExtractEdges()
 {
-  vtkPVApplication *pvApp = (vtkPVApplication *)this->Application;
-  vtkPVWindow *window;
-  vtkPVExtractEdges *e;
-
-  e = vtkPVExtractEdges::New();
-  e->Clone(pvApp);
+  static instanceCount = 0;
+  vtkPVDataSetToPolyDataFilter *f;
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  vtkPVWindow *window = this->GetPVSource()->GetWindow();
   
-  e->SetInput(this);
+  // Create the pvSource. Clone the PVSource and the vtkSource,
+  // Link the PVSource to the vtkSource.
+  f = vtkPVDataSetToPolyDataFilter::SafeDownCast(
+    pvApp->MakePVSource("vtkPVDataSetToPolyDataFilter",
+			"vtkExtractEdges",
+			"ExtractEdges", ++instanceCount));
+  if (f == NULL) {return;}
+  f->SetInput(this);
   
-  this->GetPVSource()->GetView()->AddComposite(e);
-  e->SetName("edges");
+  // Add the new Source to the View, and make it current.
+  this->GetPVSource()->GetView()->AddComposite(f);
+  window->SetCurrentSource(f);
   
-  window = this->GetPVSource()->GetWindow();
-  window->SetCurrentSource(e);
+  // Add some source specific widgets.
+  // Normally these would be added in the CreateProperties method.
+  f->UpdateParameterWidgets();
   
-  e->Delete();
+  // Clean up. (How about on the other processes?)
+  // We cannot create an object in tcl and delete it in C++.
+  //f->Delete();
 }
 
 //----------------------------------------------------------------------------
 void vtkPVData::ColorByProcess()
 {
-  vtkPVApplication *pvApp = (vtkPVApplication *)this->Application;
-  vtkPVColorByProcess *pvFilter;
-  
-  pvFilter = vtkPVColorByProcess::New();
-  pvFilter->Clone(pvApp);
-  
-  pvFilter->SetInput(this);
-  
-  this->GetPVSource()->GetView()->AddComposite(pvFilter);
-  pvFilter->SetName("color by process");
-  
+  static instanceCount = 0;
+  vtkPVDataSetToDataSetFilter *f;
+  vtkPVApplication *pvApp = this->GetPVApplication();
   vtkPVWindow *window = this->GetPVSource()->GetWindow();
   
-  window->SetCurrentSource(pvFilter);
+  // Create the pvSource. Clone the PVSource and the vtkSource,
+  // Link the PVSource to the vtkSource.
+  f = vtkPVDataSetToDataSetFilter::SafeDownCast(
+    pvApp->MakePVSource("vtkPVDataSetToDataSetFilter",
+			"vtkColorByProcess",
+			"ColorByProcess", ++instanceCount));
+  if (f == NULL) {return;}
+  f->SetInput(this);
   
-  pvFilter->Delete();
+  // Add the new Source to the View, and make it current.
+  this->GetPVSource()->GetView()->AddComposite(f);
+  window->SetCurrentSource(f);
+  
+  // Add some source specific widgets.
+  // Normally these would be added in the CreateProperties method.
+  f->UpdateParameterWidgets();
+  
+  // Clean up. (How about on the other processes?)
+  // We cannot create an object in tcl and delete it in C++.
+  //f->Delete();
 }
 
 

@@ -71,7 +71,6 @@ vtkPVSource::vtkPVSource()
   
   this->AcceptCommands = vtkPVCommandList::New();
   this->CancelCommands = vtkPVCommandList::New();
-  this->DeleteCommands = vtkPVCommandList::New();
 }
 
 //----------------------------------------------------------------------------
@@ -138,8 +137,6 @@ vtkPVSource::~vtkPVSource()
   this->AcceptCommands = NULL;  
   this->CancelCommands->Delete();
   this->CancelCommands = NULL;
-  this->DeleteCommands->Delete();
-  this->DeleteCommands = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -1486,18 +1483,7 @@ void vtkPVSource::DeleteCallback()
     }
   else
     {
-    vtkKWMessageDialog *dlg = vtkKWMessageDialog::New();
-    dlg->SetStyleToYesNo();
-    dlg->Create(this->GetApplication(),"");
-    ostrstream str;
-    str << "This will delete all filters from here to the end of the pipeline.  Continue?" << ends;
-    dlg->SetText(str.str());
-    int ret = dlg->Invoke();  
-    dlg->Delete();
-    if (ret)
-      {
-      vtkWarningMacro("about to delete all filters from here to the end of the pipeline");
-      }
+    // disable the delete button
     }
 }
 

@@ -29,15 +29,12 @@ vtkPVActorComposite \
 vtkPVAnimation \
 vtkPVApplication \
 vtkPVAssignment \
-vtkPVColorByProcess \
 vtkPVCommandList \
-vtkPVContourFilter \
 vtkPVCutter \
 vtkPVData \
 vtkPVDataSetToDataSetFilter \
 vtkPVDataSetToPolyDataFilter \
 vtkPVExtentTranslator \
-vtkPVExtractEdges \
 vtkPVGetRemoteGhostCells \
 vtkPVGlyph3D \
 vtkPVImageData \

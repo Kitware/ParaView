@@ -236,7 +236,6 @@ protected:
 
   vtkPVCommandList *AcceptCommands;
   vtkPVCommandList *CancelCommands;
-  vtkPVCommandList *DeleteCommands;
 };
 
 #endif
