@@ -67,7 +67,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPart);
-vtkCxxRevisionMacro(vtkPVPart, "1.32");
+vtkCxxRevisionMacro(vtkPVPart, "1.33");
 
 
 int vtkPVPartCommand(ClientData cd, Tcl_Interp *interp,
@@ -443,10 +443,6 @@ void vtkPVPart::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "GeometryTclName: " << (this->GeometryTclName?this->GeometryTclName:"none") << endl;
   os << indent << "VTKDataTclName: " << (this->VTKDataTclName?this->VTKDataTclName:"none") << endl;
   os << indent << "ClassNameInformation: " << this->ClassNameInformation << endl;
+  os << indent << "VTKSourceIndex: " << this->VTKSourceIndex << endl;
+  os << indent << "VTKOutputIndex: " << this->VTKOutputIndex << endl;
 }
-
-
-  
-
-
-
