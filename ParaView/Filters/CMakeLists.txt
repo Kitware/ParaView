@@ -5,9 +5,11 @@ SET(Filters_SRCS
   vtkCleanUnstructuredGrid.cxx
   vtkColorByPart.cxx
   vtkGroup.cxx
+  vtkM2NCollect.cxx
   vtkMazeSource.cxx
   vtkMergeArrays.cxx
   vtkMPIDuplicatePolyData.cxx
+  vtkPickFilter.cxx
   vtkPVArrowSource.cxx
   vtkPVClipDataSet.cxx
   vtkPVConnectivityFilter.cxx
