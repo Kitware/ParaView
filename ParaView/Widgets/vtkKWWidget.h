@@ -177,6 +177,10 @@ public:
   int IsPacked();
   
   // Description:
+  // Query if widget is "alive"
+  int IsAlive();
+  
+  // Description:
   // Unpack widget, unpack siblings (slave's of parent widget)
   void Unpack();
   void UnpackSiblings();
