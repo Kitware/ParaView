@@ -30,6 +30,11 @@
 // Polygonal Approximation to Direct Scalar Volume Rendering" in Computer
 // Graphics, December 1990.
 //
+// .SECTION Bugs
+// This mapper relies highly on the implementation of the OpenGL pipeline.
+// A typically hardware driver has lots of options and some settings can
+// cause this mapper to produce artifacts.
+//
 
 #ifndef __vtkProjectedTetrahedraMapper_h
 #define __vtkProjectedTetrahedraMapper_h
