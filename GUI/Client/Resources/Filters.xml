@@ -247,7 +247,7 @@ The Connectivity filter assigns a region id to connected components of the input
                  input_menu="im"
                  help="Set the min/max extents in each dimension of the output"/>
     <Documentation>
-The Crop filter extracts an area/volume of interest from a 2D image or a 3D volume by allowing the user to specify the minimum and maximum extents of each dimension of the data. The Input menu allows the user to select the data set to which this filter will be applied. Both the input and output of this filter are of type image data.
+The Crop filter extracts an area/volume of interest from a 2D image or a 3D volume by allowing the user to specify the minimum and maximum extents of each dimension of the data. The Input menu allows the user to select the data set to which this filter will be applied. Both the input and output of this filter are of type uniform rectilinear (image) data.
     </Documentation>
   </Module>
   <Module name="Curvatures"
@@ -661,7 +661,7 @@ This filter operates on polygonal data and produces polygonal output.
             value="3"/>
     </SelectionList>
     <Documentation>
-The Gradient filter computes the gradient vector at each point in an image or volume. The Input menu allows the user to select the data set to which this filter will be applied. The Scalars menu determines which from which scalar array the gradient will be computed. The Dimensionality menu selects whether the gradient will be calculated in 2 or 3 dimensions. If only 2 dimensions are used, gradients are only computed in X and Y. This filter uses central differences to compute the gradients. The Gradient filter operates on image data and produces image data output.
+The Gradient filter computes the gradient vector at each point in an image or volume. The Input menu allows the user to select the data set to which this filter will be applied. The Scalars menu determines which from which scalar array the gradient will be computed. The Dimensionality menu selects whether the gradient will be calculated in 2 or 3 dimensions. If only 2 dimensions are used, gradients are only computed in X and Y. This filter uses central differences to compute the gradients. The Gradient filter operates on uniform rectilinear (image) data and produces image data output.
     </Documentation>
   </Module>
   <Module name="GradientMagnitude"
@@ -693,7 +693,7 @@ The Gradient filter computes the gradient vector at each point in an image or vo
             value="3"/>
     </SelectionList>
     <Documentation>
-The Gradient Magnitude filter computes the magnitude of the gradient vector at each point in an image or volume. The Input menu allows the user to select the data set to which this filter will be applied. The Scalars menu allows the user to select which scalar array will be used for gradient magnitude calculations. The Dimensionality menu determines whether the gradient magnitude will be computed in 2 or 3 dimensions. If 2 dimensions are used, the gradient magnitude will be computed from the gradients in X and Y. This filter operates on image data and produces image data output.
+The Gradient Magnitude filter computes the magnitude of the gradient vector at each point in an image or volume. The Input menu allows the user to select the data set to which this filter will be applied. The Scalars menu allows the user to select which scalar array will be used for gradient magnitude calculations. The Dimensionality menu determines whether the gradient magnitude will be computed in 2 or 3 dimensions. If 2 dimensions are used, the gradient magnitude will be computed from the gradients in X and Y. This filter operates on uniform rectilinear (image) data and produces image data output.
     </Documentation>
   </Module>
   <Module name="GroupParts"
@@ -853,7 +853,7 @@ The Input menu allows the user to select the data set to which this filter will 
                  help="Determines the smoothing neighborhood."
                  default_value="1 1 1"/>
     <Documentation>
-The Median filter operates on image data and produces image data output. It replaces the scalar value at each pixel / voxel with the median scalar value in the specified surrounding neighborhood (Kernel Size). From the Input menu, the user can select the data set for performing this calculation. The Scalar menu determines which scalar array will be used to determine the median. The Kernel Size entry boxes specify the number of pixels / voxels in each dimension to use in computing the median to assign to each pixel / voxel. If the kernel size in a particular dimension is 1, then the median will not be computed in that direction.
+The Median filter operates on uniform rectilinear (image) data and produces image data output. It replaces the scalar value at each pixel / voxel with the median scalar value in the specified surrounding neighborhood (Kernel Size). From the Input menu, the user can select the data set for performing this calculation. The Scalar menu determines which scalar array will be used to determine the median. The Kernel Size entry boxes specify the number of pixels / voxels in each dimension to use in computing the median to assign to each pixel / voxel. If the kernel size in a particular dimension is 1, then the median will not be computed in that direction.
     </Documentation>
   </Module>
   <Module name="PolyDataNormals"
