@@ -68,6 +68,10 @@ public:
 
   static inline int GetRootId(int serverId)
     {
+      if (serverId == ( DATA_SERVER | CLIENT) || serverId == ( RENDER_SERVER | CLIENT) || serverId == CLIENT_AND_SERVERS)
+        {
+        return CLIENT;
+        }
       if (serverId > CLIENT)
         {
         vtkGenericWarningMacro("Server ID correspond to either data or "
