@@ -2817,7 +2817,7 @@ void vtkRedistributePolyData::CompleteArrays(int recFrom)
   int j;
 
   int num=0;
-  vtkDataArray *array;
+  vtkDataArray *array=0;
   char *name;
   int nameLength=0;
   int type=-1;

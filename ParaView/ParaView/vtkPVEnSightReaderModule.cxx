@@ -530,6 +530,7 @@ int vtkPVEnSightReaderModule::ReadFile(const char* fname, float timeValue,
   pvApp->AddTraceEntry("%s Delete", name);
   delete[] name;
 
+#ifdef VTK_USE_MPI
   if (masterFile)
     {
     if (this->VerifyParts(pvApp, tclName) != VTK_OK)
@@ -544,6 +545,9 @@ int vtkPVEnSightReaderModule::ReadFile(const char* fname, float timeValue,
     {
     pvApp->BroadcastScript("%s Update", tclName);
     }
+#else
+  pvApp->BroadcastScript("%s Update", tclName);
+#endif
   
   numOutputs = reader->GetNumberOfOutputs();
   if (numOutputs < 1)
