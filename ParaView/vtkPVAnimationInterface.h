@@ -76,7 +76,7 @@ public:
 
   // Description:
   // This sets the entries from the animation parameters.
-  // This will be called when the use sets the animation
+  // This will be called when the user sets the animation
   // parameters programmatically.
   void EntryUpdate();
 
@@ -97,12 +97,14 @@ public:
 
   // Description:
   // Access to the render view. Needed to  render.
-  vtkSetObjectMacro(View, vtkPVRenderView);
+  void SetView(vtkPVRenderView *renderView);
   vtkGetObjectMacro(View, vtkPVRenderView);
 
   // Description:
-  // Access to the render view. Needed to build up the source list,
-  vtkSetObjectMacro(Window, vtkPVWindow);
+  // Access to the render view. Needed to build up the source list.
+  // SetWindow can't be an object macro because that sets up a circular
+  // reference.
+  void SetWindow(vtkPVWindow *window);
   vtkGetObjectMacro(Window, vtkPVWindow);
 
   // Description:

@@ -163,7 +163,12 @@ vtkPVAnimationInterface::~vtkPVAnimationInterface()
     this->TimeStepEntry = NULL;
     }
 
-
+  if (this->ScriptEditor)
+    {
+    this->ScriptEditor->Delete();
+    this->ScriptEditor = NULL;
+    }
+  
   if (this->ActionFrame)
     {
     this->ActionFrame->Delete();
@@ -206,6 +211,7 @@ vtkPVAnimationInterface::~vtkPVAnimationInterface()
     this->MethodMenuButton = NULL;
     }
 
+  this->SetPVSource(NULL);
   this->SetView(NULL);
   this->SetWindow(NULL);
 }
@@ -688,5 +694,12 @@ void vtkPVAnimationInterface::SetMethodInterfaceIndex(int idx)
     }
 }
 
+void vtkPVAnimationInterface::SetWindow(vtkPVWindow *window)
+{
+  this->Window = window;
+}
 
-
+void vtkPVAnimationInterface::SetView(vtkPVRenderView *renderView)
+{
+  this->View = renderView;
+}
