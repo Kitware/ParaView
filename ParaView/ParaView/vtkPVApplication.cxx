@@ -327,14 +327,30 @@ vtkPVApplication::~vtkPVApplication()
 //----------------------------------------------------------------------------
 void vtkPVApplication::RemoteScript(int id, char *format, ...)
 {
-  char event[16000];
+  char event[1600];
+  char* buffer = event;
+  
+  va_list ap;
+  va_start(ap, format);
+  int length = this->EstimateFormatLength(format, ap);
+  va_end(ap);
+  
+  if(length > 1599)
+    {
+    buffer = new char[length+1];
+    }
   
   va_list var_args;
   va_start(var_args, format);
-  vsprintf(event, format, var_args);
-  va_end(var_args);
-
-  this->RemoteSimpleScript(id, event);
+  vsprintf(buffer, format, var_args);
+  va_end(var_args);  
+  
+  this->RemoteSimpleScript(id, buffer);
+  
+  if(buffer != event)
+    {
+    delete [] buffer;
+    }
 }
 //----------------------------------------------------------------------------
 void vtkPVApplication::RemoteSimpleScript(int remoteId, const char *str)
@@ -361,14 +377,30 @@ void vtkPVApplication::RemoteSimpleScript(int remoteId, const char *str)
 //----------------------------------------------------------------------------
 void vtkPVApplication::BroadcastScript(char *format, ...)
 {
-  char event[16000];
+  char event[1600];
+  char* buffer = event;
+  
+  va_list ap;
+  va_start(ap, format);
+  int length = this->EstimateFormatLength(format, ap);
+  va_end(ap);
+  
+  if(length > 1599)
+    {
+    buffer = new char[length+1];
+    }
   
   va_list var_args;
   va_start(var_args, format);
-  vsprintf(event, format, var_args);
+  vsprintf(buffer, format, var_args);
   va_end(var_args);
-
-  this->BroadcastSimpleScript(event);
+  
+  this->BroadcastSimpleScript(buffer);
+  
+  if(buffer != event)
+    {
+    delete [] buffer;
+    }
 }
 
 //----------------------------------------------------------------------------

@@ -116,7 +116,7 @@ void vtkKWObject::ExtractRevision(ostream& os,const char *revIn)
 void vtkKWObject::SerializeRevision(ostream& os, vtkIndent indent)
 {
   os << indent << "vtkKWObject ";
-  this->ExtractRevision(os,"$Revision: 1.21 $");
+  this->ExtractRevision(os,"$Revision: 1.22 $");
 }
 
 void vtkKWObject::Serialize(istream& is)
@@ -194,20 +194,36 @@ const char *vtkKWObject::GetTclName()
 
 void vtkKWObject::Script(const char *format, ...)
 {
-  char event[16000];
-
+  char event[1600];
+  char* buffer = event;
+  
+  va_list ap;
+  va_start(ap, format);
+  int length = this->EstimateFormatLength(format, ap);
+  va_end(ap);
+  
+  if(length > 1599)
+    {
+    buffer = new char[length+1];
+    }
+  
   va_list var_args;
   va_start(var_args, format);
-  vsprintf(event, format, var_args);
+  vsprintf(buffer, format, var_args);
   va_end(var_args);
-
+  
   if (this->GetApplication())
     {
-    this->GetApplication()->SimpleScript(event);
+    this->GetApplication()->SimpleScript(buffer);
     }
   else
     {
     vtkWarningMacro("Attempt to script a command without a KWApplication");
+    }
+  
+  if(buffer != event)
+    {
+    delete [] buffer;
     }
 }
 
@@ -382,14 +398,30 @@ void vtkKWObject::AddTraceEntry(const char *format, ...)
     return;
     }
 
-  char event[6000];
+  char event[1600];
+  char* buffer = event;
+  
+  va_list ap;
+  va_start(ap, format);
+  int length = this->EstimateFormatLength(format, ap);
+  va_end(ap);
+  
+  if(length > 1599)
+    {
+    buffer = new char[length+1];
+    }
 
   va_list var_args;
   va_start(var_args, format);
-  vsprintf(event, format, var_args);
+  vsprintf(buffer, format, var_args);
   va_end(var_args);
-
-  *os << event << endl;
+  
+  *os << buffer << endl;
+  
+  if(buffer != event)
+    {
+    delete [] buffer;
+    }
 }
 
 
@@ -404,4 +436,51 @@ void vtkKWObject::PrintSelf(ostream& os, vtkIndent indent)
      << endl;
   os << indent << "TraceReferenceObject: " 
      << this->GetTraceReferenceObject() << endl;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWObject::EstimateFormatLength(const char* format, va_list ap)
+{
+  const char* cur = format;
+  
+  // Quick-hack attempt at estimating the length of the string.
+  // Should never under-estimate unless a construct of the form
+  // "%IIIs" is used, where III is an integer greater than 128.
+  
+  // Start with the length of the format itself.
+  int length = strlen(format);
+  
+  // Add to the length for each %foo format sequence.
+  while(*cur)
+    {
+    char ch = *cur++;
+    char next = *cur;
+    if(ch == '%')
+      {
+      if(next == '%')
+        {
+        // Skip "%%" since it doesn't correspond to a va_arg.
+        ++cur;
+        }
+      else if(next == 's')
+        {
+        // Use the length of the string.
+        char* s = va_arg(ap, char*);
+        if(s)
+          {
+          length += strlen(s);
+          }
+        }
+      else
+        {
+        // Assume the argument contributes no more than 128 characters.
+        length += 128;
+        
+        // Eat the argument.
+        int i = va_arg(ap, int);        
+        }
+      }
+    }
+  
+  return length;
 }

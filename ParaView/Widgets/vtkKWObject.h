@@ -64,6 +64,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "tcl.h"
 
+// Needed for "va_list" argument of EstimateFormatLength.
+#include <stdarg.h>
+
 class vtkKWApplication;
 
 class VTK_EXPORT vtkKWObject : public vtkObject
@@ -127,6 +130,13 @@ public:
   // A convienience method to invoke some tcl script code and
   // perform arguement substitution.
   void Script(const char *EventString, ...);
+  
+  // Description:
+  // Method to estimate the length of the string that will be produced
+  // from printing the given format string and arguments.  The
+  // returned length will always be at least as large as the string
+  // that will result from printing.
+  int EstimateFormatLength(const char* format, va_list ap);
 
 private:
   char *TclName;

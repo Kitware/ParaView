@@ -180,15 +180,33 @@ vtkKWApplication::~vtkKWApplication()
 
 const char* vtkKWApplication::EvaluateString(const char *String, ...)
 {
-  char event[16000];
+  char event[1600];
+  char* buffer = event;
+  
+  va_list ap;
+  va_start(ap, String);
+  int length = this->EstimateFormatLength(String, ap);
+  va_end(ap);
+  
+  if(length > 1599)
+    {
+    buffer = new char[length+1];
+    }
   
   va_list var_args;
   va_start(var_args, String);
-  vsprintf(event, String, var_args);
+  vsprintf(buffer, String, var_args);
   va_end(var_args);
+  
   ostrstream str;
   str << "eval set vtkKWApplicationEvaluateStringTemporaryString " 
-      << event << ends;
+      << buffer << ends;
+  
+  if(buffer != event)
+    {
+    delete [] buffer;
+    }
+  
   this->SimpleScript(str.str());
   str.rdbuf()->freeze(0);
   return this->MainInterp->result;
@@ -196,12 +214,31 @@ const char* vtkKWApplication::EvaluateString(const char *String, ...)
 
 int vtkKWApplication::EvaluateBooleanExpression(const char *Expression, ...)
 {
-  char event[16000];  
+  char event[1600];
+  char* buffer = event;
+  
+  va_list ap;
+  va_start(ap, Expression);
+  int length = this->EstimateFormatLength(Expression, ap);
+  va_end(ap);
+  
+  if(length > 1599)
+    {
+    buffer = new char[length+1];
+    }
+  
   va_list var_args;
   va_start(var_args, Expression);
-  vsprintf(event, Expression, var_args);
+  vsprintf(buffer, Expression, var_args);
   va_end(var_args);
-  this->SimpleScript(event);
+  
+  this->SimpleScript(buffer);
+  
+  if(buffer != event)
+    {
+    delete [] buffer;
+    }
+
   if ( vtkString::Equals(this->MainInterp->result, "1" ) )
     {
     return 1;
@@ -226,18 +263,32 @@ const char* vtkKWApplication::ExpandFileName(const char *String, ...)
 
 void vtkKWApplication::Script(const char *format, ...)
 {
-  char event[16000];
+  char event[1600];
+  char* buffer = event;
   
-  va_list var_args;
-  va_start(var_args, format);
-  vsprintf(event, format, var_args);
-  va_end(var_args);
+  va_list ap;
+  va_start(ap, format);
+  int length = this->EstimateFormatLength(format, ap);
+  va_end(ap);
+  
+  if(length > 1599)
+    {
+    buffer = new char[length+1];
+    }
+
+  va_start(ap, format);
+  vsprintf(buffer, format, ap);
+  va_end(ap);
 
   if (Tcl_GlobalEval(this->MainInterp, event) != TCL_OK)
     {
     vtkErrorMacro("\n    Script: \n" << event << "\n    Returned Error on line "
                   << this->MainInterp->errorLine << ": \n"  
                   << this->MainInterp->result << endl);
+    }
+  if(buffer != event)
+    {
+    delete [] buffer;
     }
 }
 
@@ -730,14 +781,30 @@ void vtkKWApplication::AddTraceEntry(const char *format, ...)
     return;
     }
   
-  char event[6000];
+  char event[1600];
+  char* buffer = event;
+  
+  va_list ap;
+  va_start(ap, format);
+  int length = this->EstimateFormatLength(format, ap);
+  va_end(ap);
+  
+  if(length > 1599)
+    {
+    buffer = new char[length+1];
+    }
 
   va_list var_args;
   va_start(var_args, format);
-  vsprintf(event, format, var_args);
+  vsprintf(buffer, format, var_args);
   va_end(var_args);
 
-  *(this->TraceFile) << event << endl;
+  *(this->TraceFile) << buffer << endl;
+  
+  if(buffer != event)
+    {
+    delete [] buffer;
+    }
 }
 
 vtkKWRegisteryUtilities *vtkKWApplication::GetRegistery( const char*toplevel )
