@@ -49,7 +49,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVMPIProcessModule);
-vtkCxxRevisionMacro(vtkPVMPIProcessModule, "1.29");
+vtkCxxRevisionMacro(vtkPVMPIProcessModule, "1.30");
 
 int vtkPVMPIProcessModuleCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -242,7 +242,7 @@ vtkTypeUInt32 vtkPVMPIProcessModule::CreateSendFlag(vtkTypeUInt32 servers)
     {
     sendflag |= CLIENT;
     }
-  if(sendflag & CLIENT && sendflag && DATA_SERVER)
+  if((sendflag & CLIENT) && (sendflag & DATA_SERVER))
     {
     sendflag = DATA_SERVER;
     }
