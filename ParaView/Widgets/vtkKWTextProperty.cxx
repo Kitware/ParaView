@@ -122,7 +122,7 @@ static unsigned char image_copy[] =
 
 // ----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWTextProperty);
-vtkCxxRevisionMacro(vtkKWTextProperty, "1.27");
+vtkCxxRevisionMacro(vtkKWTextProperty, "1.28");
 
 int vtkKWTextPropertyCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -1102,27 +1102,40 @@ void vtkKWTextProperty::SaveInTclScript(ofstream *file,
 
   vtkTextProperty *tprop = this->TextProperty;
 
-  char space[3];
-  if (tabify)
-    {
-    sprintf(space, "\t");
-    }
-  else
-    {
-    sprintf(space, "");
-    }
-  
   if (tprop)
     {
     float *rgb = this->GetColor();
-    *file << space << name << " SetColor " 
-          << rgb[0] << " "  << rgb[1] << " "  << rgb[2] << endl;
-    *file << space << name << " SetFontFamily " 
-          << tprop->GetFontFamily() << endl;
-    *file << space << name << " SetBold " << tprop->GetBold() << endl;
-    *file << space << name << " SetItalic " << tprop->GetItalic() << endl;
-    *file << space << name << " SetShadow " << tprop->GetShadow() << endl;
-    *file << space << name << " SetOpacity " << this->GetOpacity() << endl;
+    if (tabify)
+      {
+      *file << "\t";
+      }
+    *file << name << " SetColor " << rgb[0] << " "  << rgb[1] << " "  << rgb[2]
+          << endl;
+    if (tabify)
+      {
+      *file << "\t";
+      }
+    *file << name << " SetFontFamily " << tprop->GetFontFamily() << endl;
+    if (tabify)
+      {
+      *file << "\t";
+      }
+    *file << name << " SetBold " << tprop->GetBold() << endl;
+    if (tabify)
+      {
+      *file << "\t";
+      }
+    *file << name << " SetItalic " << tprop->GetItalic() << endl;
+    if (tabify)
+      {
+      *file << "\t";
+      }
+    *file << name << " SetShadow " << tprop->GetShadow() << endl;
+    if (tabify)
+      {
+      *file << "\t";
+      }
+    *file << name << " SetOpacity " << this->GetOpacity() << endl;
     }
 }
 
