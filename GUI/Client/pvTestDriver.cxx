@@ -182,7 +182,7 @@ int pvTestDriver::ProcessCommandLine(int argc, char* argv[])
       {
       this->ArgStart = i+2;
       this->TimeOut = atoi(argv[i+1]);
-      fprintf(stderr, "The timeout was set to %d.\n", this->TimeOut);
+      fprintf(stderr, "The timeout was set to %f.\n", this->TimeOut);
       }
     if(strcmp(argv[i], "--client-flags") == 0)
       {
