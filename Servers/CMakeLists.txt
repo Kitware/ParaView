@@ -4,3 +4,8 @@ SUBDIRS(Common)
 SUBDIRS(Filters)
 SUBDIRS(ServerManager)
 SUBDIRS(StreamInterpreter)
+
+IF(BUILD_TESTING)
+  SUBDIRS(Testing)
+ENDIF(BUILD_TESTING)
+
