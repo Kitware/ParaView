@@ -48,7 +48,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __vtkKWEntry_h
 
 #include "vtkKWWidget.h"
+
 class vtkKWApplication;
+class vtkKWListBox;
+class vtkKWEntryInternals;
 
 class VTK_EXPORT vtkKWEntry : public vtkKWWidget
 {
@@ -90,6 +93,27 @@ public:
   // of focus.
   virtual void BindCommand(vtkKWObject *object, const char *command);
 
+  // Description:
+  // When using popup menu, display it and hide it.
+  void DisplayPopupCallback();
+  void WithdrawPopupCallback();
+
+  // Description:
+  // Add and delete values to put in the list.
+  void AddValue(const char* value);
+  void DeleteValue(int idx);
+  int GetValueIndex(const char* value);
+
+  // Description:
+  // Make this entry a puldown combobox.
+  vtkSetClampMacro(PullDown, int, 0, 1);
+  vtkBooleanMacro(PullDown, int);
+  vtkGetMacro(PullDown, int);
+
+  // Description:
+  // This method is called when one of the entries in pulldown is selected.
+  void ValueSelectedCallback();
+
 protected:
   vtkKWEntry();
   ~vtkKWEntry();
@@ -100,6 +124,14 @@ protected:
   char *ValueString;
   int Width;
   int ReadOnly;
+  int PullDown;
+  int PopupDisplayed;
+
+  vtkKWWidget* Entry;
+  vtkKWWidget* TopLevel;
+  vtkKWListBox* List;
+
+  vtkKWEntryInternals* Internals;
 
 private:
   vtkKWEntry(const vtkKWEntry&); // Not implemented
