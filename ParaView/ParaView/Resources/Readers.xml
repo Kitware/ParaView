@@ -22,7 +22,7 @@
     <VectorEntry variable="Radius" trace_name="Radius" type="float" 
                  help="Set the radius of the data set"/>
     <VectorEntry label="Clip Extent" variable="ClipExtent" type="int"
-                 length="6" 
+                 length="6" trace_name="ClipExtent"
                  help="For reading a smaller extent."/>
     <VectorEntry label="Ghost Levels" trace_name="NumberOfGhostLevels"
                  variable="NumberOfGhostLevels" 
@@ -34,9 +34,9 @@
           module_type="Reader"
           extensions=".case .sos" file_description="EnSight Files">
     <Source class="vtkGenericEnSightReader"/>
-    <SelectTimeSet label="Select time value" trace_name="selectTimeSet"/>
-    <ArraySelection attribute_name="Point"/>
-    <ArraySelection attribute_name="Cell"/>
+    <SelectTimeSet label="Select time value" trace_name="TimeSet"/>
+    <ArraySelection attribute_name="Point" trace_name="PointArrays"/>
+    <ArraySelection attribute_name="Cell" trace_name="CellArrays"/>
   </Module>
   <Module name="P3DReader" class="vtkPVPLOT3DReaderModule"
           root_name="Plot3D"
