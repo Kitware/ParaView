@@ -61,7 +61,7 @@
 #define VTK_PV_ANIMATION_GROUP "animateable"
 
 vtkStandardNewMacro(vtkPVAnimationManager);
-vtkCxxRevisionMacro(vtkPVAnimationManager, "1.12");
+vtkCxxRevisionMacro(vtkPVAnimationManager, "1.13");
 vtkCxxSetObjectMacro(vtkPVAnimationManager, HorizantalParent, vtkKWWidget);
 vtkCxxSetObjectMacro(vtkPVAnimationManager, VerticalParent, vtkKWWidget);
 //*****************************************************************************
@@ -483,6 +483,7 @@ int vtkPVAnimationManager::AddProperties(vtkPVSource* pvSource, vtkSMProxy* prox
       ostrstream cueTreeName;
       cueTreeName << pvCueTree->GetName() << "." << property->GetXMLName() << ends;
       cueTree->SetName(cueTreeName.str());
+      cueTree->SetPVSource(pvSource);
       cueTreeName.rdbuf()->freeze(0);
       pvCueTree->AddChild(cueTree);
       cueTree->Delete();

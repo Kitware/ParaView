@@ -27,7 +27,7 @@
 #include "vtkKWEvent.h"
 
 vtkStandardNewMacro(vtkPVAnimationCueTree);
-vtkCxxRevisionMacro(vtkPVAnimationCueTree, "1.8");
+vtkCxxRevisionMacro(vtkPVAnimationCueTree, "1.9");
 
 //-----------------------------------------------------------------------------
 vtkPVAnimationCueTree::vtkPVAnimationCueTree()
@@ -123,14 +123,21 @@ void vtkPVAnimationCueTree::AddChild(vtkPVAnimationCue* child)
     }
 //  this->TimeLine->SetFrameBackgroundColor(0.15,0.46,0.67);
   child->SetParent(this->NavigatorChildrenFrame);
-  child->SetTraceReferenceObject(this);
-  
+  child->SetTimeLineParent(this->TimeLineChildrenFrame);
   ostrstream str;
-  str << "GetChild \"" << child->GetTclNameCommand() << "\"" << ends;
+  if (child->GetTclNameCommand())
+    {
+    str << "GetChild \"" << child->GetTclNameCommand() << "\"" << ends;
+    }
+  else
+    {
+    str << "GetChild \"" << child->GetName() << "\"" << ends;
+    }
+  
+  child->SetTraceReferenceObject(this);
   child->SetTraceReferenceCommand(str.str());
   str.rdbuf()->freeze(0);
 
-  child->SetTimeLineParent(this->TimeLineChildrenFrame);
   child->Create(this->GetApplication(), "-relief flat");
   child->PackWidget();
   this->Children->AddItem(child);
