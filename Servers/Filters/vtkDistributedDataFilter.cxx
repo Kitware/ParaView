@@ -68,7 +68,7 @@
 static char dots[MSGSIZE] = "...........................................................";
 static char msg[MSGSIZE];
 
-static char * makeEntry(const char *s)
+static char *makeEntry(const char *s)
 {
   memcpy(msg, dots, MSGSIZE);
   int len = strlen(s);
@@ -86,8 +86,12 @@ static char * makeEntry(const char *s)
     if (this->TimerLog == NULL)            \
       {                                    \
       this->TimerLog = vtkTimerLog::New(); \
+      if (this->Kdtree)                    \
+        {                                  \
+        this->Kdtree->SetTiming(1);        \
+        }                                  \
       }                                    \
-    this->TimerLog->MarkStartEvent(s2); \
+    this->TimerLog->MarkStartEvent(s2);    \
     }
 
 #define TIMERDONE(s) \
@@ -95,7 +99,7 @@ static char * makeEntry(const char *s)
 
 // Timing data ---------------------------------------------
 
-vtkCxxRevisionMacro(vtkDistributedDataFilter, "1.28")
+vtkCxxRevisionMacro(vtkDistributedDataFilter, "1.29")
 
 vtkStandardNewMacro(vtkDistributedDataFilter)
 
@@ -120,7 +124,7 @@ vtkDistributedDataFilter::vtkDistributedDataFilter()
 
   this->GlobalIdArrayName = NULL;
 
-  this->RetainKdtree = 0;
+  this->RetainKdtree = 1;
   this->IncludeAllIntersectingCells = 0;
   this->ClipCells = 0;
 
@@ -321,6 +325,8 @@ vtkPKdTree *vtkDistributedDataFilter::GetKdtree()
   if (this->Kdtree == NULL)
     {
     this->Kdtree = vtkPKdTree::New();
+    this->Kdtree->AssignRegionsContiguous();
+    this->Kdtree->SetTiming(this->GetTiming()); 
     }
 
   return this->Kdtree;
@@ -494,113 +500,212 @@ void vtkDistributedDataFilter::ExecuteInformation()
 void vtkDistributedDataFilter::Execute()
 {
   vtkDataSet *input  = this->GetInput();
-  vtkUnstructuredGrid *output  = this->GetOutput();
-  vtkDataSet* inputPlus = input;
+  vtkUnstructuredGrid *output = this->GetOutput();
 
   vtkDebugMacro(<< "vtkDistributedDataFilter::Execute()");
 
-  if (this->NumProcesses > 1)
+  this->GhostLevel = this->GetOutput()->GetUpdateGhostLevel();
+
+  if (this->NumProcesses == 1)
     {
-    int aok = 0;
-
-#ifdef VTK_USE_MPI
-
-    // Class compiles without MPI, but multiprocess execution requires MPI.
-  
-    if (vtkMPIController::SafeDownCast(this->Controller)) aok = 1;
-#endif
-  
-    if (!aok)
-      {
-      vtkErrorMacro(<< "vtkDistributedDataFilter multiprocess requires MPI");
-      return;
-      }
-  
-    vtkDataSet *shareInput = this->TestFixTooFewInputFiles();
-
-    if (shareInput == NULL)
-      {
-      return;    // Fewer cells than processes - can't divide input
-      }
-    else if (shareInput != input)
-      {
-      inputPlus = shareInput;  // Fewer files than processes, we divided them
-      }
-    }
-  else if (input->GetNumberOfCells() < 1)
-    {
-    vtkErrorMacro("Empty input");
-    return;
-    }
-
-  this->GhostLevel = output->GetUpdateGhostLevel();
-
-  if ( (this->NumProcesses == 1) && !this->RetainKdtree)
-    {
-    // Output is a new grid.  It is the input grid, with
-    // duplicate points removed.  Duplicate points arise
-    // when the input was read from a data set distributed
-    // across more than one file.  
-
     this->SingleProcessExecute();
-
     return;
     }
 
-  if (this->NumProcesses > 1)
+  // This method requires an MPI controller.
+
+  int aok = 0;
+    
+#ifdef VTK_USE_MPI
+  if (vtkMPIController::SafeDownCast(this->Controller)) aok = 1;
+#endif 
+    
+  if (!aok)
     {
-    int HasIdTypeArrays = this->CheckFieldArrayTypes(inputPlus);
+    vtkErrorMacro(<< "vtkDistributedDataFilter multiprocess requires MPI");
+    return;
+    }
+
+  // Stage (0) - If any processes have 0 cell input data sets, then
+  //   spread the input data sets around (quickly) before formal
+  //   redistribution.
+
+  vtkDataSet *splitInput = this->TestFixTooFewInputFiles();
+    
+  if (splitInput == NULL)
+    {
+    return;    // Fewer cells than processes - can't divide input
+    }
+
+  // Stage (1) - use vtkPKdTree to...
+  //   Create a load balanced spatial decomposition in parallel.
+  //   Create a table assigning regions to processes.
+  //
+  // Note k-d tree will only be re-built if input or parameters
+  // have changed on any of the processing nodes.
+
+  int fail = this->PartitionDataAndAssignToProcesses(splitInput);
   
-    if (HasIdTypeArrays)
+  if (fail)
+    {
+    if (splitInput != input)
       {
-      // We use vtkDataWriter to marshall portions of data sets to send to other
-      // processes.  Unfortunately, this writer writes out vtkIdType arrays as
-      // integer arrays.  Trying to combine that on receipt with your vtkIdType
-      // array won't work.  We need to exit with an error while we think of the
-      // best way to handle this situation.  In practice I would think data sets
-      // read in from disk files would never have such a field, only data sets created
-      // in VTK at run time would have such a field.
+      splitInput->Delete();
+      }
+    vtkErrorMacro(<< "vtkDistributedDataFilter::Execute k-d tree failure");
+    return;
+    }
+
+  // Let the vtkPKdTree class compile global bounds for all
+  // data arrays.  These can be accessed by D3 user by getting
+  // a handle to the vtkPKdTree object and querying it.
+
+  this->Kdtree->CreateGlobalDataArrayBounds();
+
+  // Stage (2) - Redistribute data, so that each process gets a ugrid
+  //   containing the cells in it's assigned spatial regions.  (Note
+  //   that a side effect of merging the grids received from different
+  //   processes is that the final grid has no duplicate points.)
+
+  vtkUnstructuredGrid *redistributedInput = this->RedistributeDataSet(splitInput);
+
+  if (splitInput != input)
+    {
+    splitInput->Delete();
+    }
+
+  if (redistributedInput == NULL)
+    {
+    this->Kdtree->Delete();
+    this->Kdtree = NULL;
+    vtkErrorMacro(<< "vtkDistributedDataFilter::Execute redistribute failure");
+    return;
+    }
+
+  // Stage (3) - Add ghost cells to my sub grid.
+
+  vtkUnstructuredGrid *expandedGrid = redistributedInput;
+
+  if (this->GhostLevel > 0)
+    {
+    // redistributedInput will be deleted by AcquireGhostCells
+
+    expandedGrid = this->AcquireGhostCells(redistributedInput);
+    }
+
+  // Stage (4) - Clip cells to the spatial region boundaries
+
+  if (this->ClipCells)
+    {
+    this->ClipGridCells(expandedGrid);
+    }
+
+  // remove temporary arrays we created
+
+  vtkDataArray *da = expandedGrid->GetCellData()->GetArray(TEMP_CELL_ID_NAME);
+
+  if (da)
+    {
+    expandedGrid->GetCellData()->RemoveArray(TEMP_CELL_ID_NAME);
+    }
+
+  da = expandedGrid->GetPointData()->GetArray(TEMP_NODE_ID_NAME);
+ 
+  if (da)
+    {
+    expandedGrid->GetCellData()->RemoveArray(TEMP_NODE_ID_NAME);
+    }
+
+  output->ShallowCopy(expandedGrid);
+
+  expandedGrid->Delete();
+
+  if (!this->RetainKdtree)
+    {
+    this->Kdtree->Delete();
+    this->Kdtree = NULL;
+    }
+}
+vtkUnstructuredGrid *vtkDistributedDataFilter::RedistributeDataSet(vtkDataSet *set)
+{
+  // Create global cell ids before redistributing data.  These
+  // will be necessary if we need ghost cells later on.
+
+  vtkDataSet *inputPlus = set;
+
+  if (this->GhostLevel > 0)
+    {
+    TIMER("Create vtk global cell IDs");
   
-      vtkErrorMacro(<<
-        "vtkDistributedDataFilter::Execute - Can't distribute vtkIdTypeArrays, sorry");
-      if (inputPlus != input);
-        {
-        inputPlus->Delete();
-        }
-      return;
+    vtkIntArray *ids = this->AssignGlobalCellIds(set); 
+  
+    if (set == this->GetInput())
+      {
+      inputPlus = set->NewInstance();
+      inputPlus->ShallowCopy(set);
+      }
+  
+    inputPlus->GetCellData()->AddArray(ids);
+  
+    ids->Delete();
+  
+    TIMERDONE("Create vtk global cell IDs");
+    }
+
+  TIMER("Redistribute data among processors");
+
+  // next call deletes inputPlus at the earliest opportunity
+
+  vtkUnstructuredGrid *finalGrid = this->MPIRedistribute(inputPlus);
+
+  TIMERDONE("Redistribute data among processors");
+
+  if (finalGrid == NULL)
+    {
+    return NULL;
+    }
+
+  // Create global nodes IDs if we don't have them
+
+  const char *nodeIdArrayName = this->GetGlobalNodeIdArray(finalGrid);
+  
+  if (!nodeIdArrayName)
+    {
+    TIMER("Create global node ID array");
+    int rc = this->AssignGlobalNodeIds(finalGrid);
+    TIMERDONE("Create global node ID array");
+
+    if (rc)
+      {
+      finalGrid->Delete();
+      return NULL;
       }
     }
 
+  return finalGrid;
+}
+
+int vtkDistributedDataFilter::PartitionDataAndAssignToProcesses(vtkDataSet *set)
+{
   if (this->Kdtree == NULL)
     {
     this->Kdtree = vtkPKdTree::New();
+    this->Kdtree->AssignRegionsContiguous();
+    this->Kdtree->SetTiming(this->GetTiming()); 
     }
 
   this->Kdtree->SetController(this->Controller);
   this->Kdtree->SetNumRegionsOrMore(this->NumProcesses);
   this->Kdtree->SetMinCells(2);
 
-  // Stage (1) - use vtkPKdTree to...
-  //   Create a load balanced spatial decomposition in parallel.
-  //   Create tables telling us how many cells each process has for
-  //    each spatial region.
-  //   Create a table assigning regions to processes.
-  //
-  // Note k-d tree will only be re-built if input or parameters
-  // have changed on any of the processing nodes.
-
-  int regionAssignmentScheme = this->Kdtree->GetRegionAssignment();
-
-  if (regionAssignmentScheme == vtkPKdTree::NoRegionAssignment)
-    {
-    this->Kdtree->AssignRegionsContiguous();
-    }
-
-  this->Kdtree->SetDataSet(inputPlus);
-
-  this->Kdtree->ProcessCellCountDataOn();
+  this->Kdtree->SetDataSet(set);
 
   TIMER("Build K-d tree in parallel");
+
+  // BuildLocator is smart enough to rebuild the k-d tree only if
+  // the input geometry has changed, or the k-d tree build parameters
+  // have changed.  It will reassign regions if the region assignment
+  // scheme has changed. 
 
   this->Kdtree->BuildLocator();
 
@@ -609,163 +714,74 @@ void vtkDistributedDataFilter::Execute()
   if (this->Kdtree->GetNumberOfRegions() == 0)
     {
     vtkErrorMacro("Unable to build k-d tree structure");
-    if (inputPlus != input);
-      {
-      inputPlus->Delete();
-      }
     this->Kdtree->Delete();
     this->Kdtree = NULL;
-    return;
+    return 1;
+    }
+  return 0;
+}
+int vtkDistributedDataFilter::ClipGridCells(vtkUnstructuredGrid *grid)
+{
+  // Global point IDs are meaningless after
+  // clipping, since this tetrahedralizes the whole data set.
+  // We remove that array.
+
+  const char *nodeIds = this->GetGlobalNodeIdArray(grid);
+
+  if (nodeIds)
+    {
+    grid->GetPointData()->RemoveArray(nodeIds);
+    this->GlobalIdArrayName = NULL;
     }
 
-  if (this->NumProcesses == 1)
-    {
-    this->SingleProcessExecute();
-    return;
-    }
-
-  // Stage (2) - Redistribute data, so that each process gets a ugrid
-  //   containing the cells in it's assigned spatial regions.  (Note
-  //   that a side effect of merging the grids received from different
-  //   processes is that the final grid has no duplicate points.)
-
-  if (this->GhostLevel > 0)
-    {
-    // We'll need some temporary global cell IDs later on 
-    // when we add ghost cells to our data set.  vtkPKdTree 
-    // knows how many cells each process read in, so we'll 
-    // use that to create cell IDs.
-
-    TIMER("Create temporary global cell IDs");
-
-    vtkIntArray *ids = this->AssignGlobalCellIds(inputPlus); 
-
-    if (inputPlus == input)
-      {
-      inputPlus = input->NewInstance();
-      inputPlus->ShallowCopy(input);
-      }
-
-    inputPlus->GetCellData()->AddArray(ids);
-
-    ids->Delete();
-
-    TIMERDONE("Create temporary global cell IDs");
-    }
-
-
-  TIMER("Redistribute data among processors");
-
-  vtkUnstructuredGrid *finalGrid = this->MPIRedistribute(inputPlus);
-
-  TIMERDONE("Redistribute data among processors");
-
-  if (finalGrid == NULL)
-    {
-    vtkErrorMacro("Unable to redistribute data");
-    return;
-    }
-
-  const char *nodeIdArrayName = this->GetGlobalNodeIdArray(finalGrid);
-
-  if (!nodeIdArrayName &&            // we don't have global point IDs
-      ((this->GhostLevel > 0) ||     // we need ids for ghost cell computation
-        this->GlobalIdArrayName))    // user requested that we compute ids
-    {
-    // Create unique global point IDs across processes
-
-    TIMER("Create global node ID array");
-    int rc = this->AssignGlobalNodeIds(finalGrid);
-
-    if (rc)
-      {
-      finalGrid->Delete();
-      this->Kdtree->Delete();
-      this->Kdtree = NULL;
-      return;
-      }
-    TIMERDONE("Create global node ID array");
-    }
-
-  if (this->GhostLevel > 0)
-    {
-    // If ghost cells were requested, then obtain enough cells from
-    // neighbors so we will have the required levels of ghost cells.
-
-    // Create a search structure mapping global point IDs to local point IDs
+  TIMER("Clip boundary cells to region");
   
-    TIMER("Build id search structure");
-  
-    this->GlobalNodeIdAccessStart(finalGrid);
-  
-    vtkstd::map<int, int> globalToLocalMap;
-    vtkIdType numPoints = finalGrid->GetNumberOfPoints();
-  
-    for (int localPtId = 0; localPtId < numPoints; localPtId++)
-      {
-      int gid = this->GlobalNodeIdAccessGetId(localPtId);
-      globalToLocalMap.insert(vtkstd::pair<int, int>(gid, localPtId));
-      }
-  
-    TIMERDONE("Build id search structure");
+  this->ClipCellsToSpatialRegion(grid);
 
-    TIMER("Add ghost cells");
+  TIMERDONE("Clip boundary cells to region");
 
-    vtkUnstructuredGrid *expandedGrid= NULL;
+  return 0;
+}
+vtkUnstructuredGrid *
+  vtkDistributedDataFilter::AcquireGhostCells(vtkUnstructuredGrid *grid)
+{
+  if (this->GhostLevel < 1) return grid;
 
-    if (this->IncludeAllIntersectingCells)
-      {
-      expandedGrid = 
-        this->AddGhostCellsDuplicateCellAssignment(finalGrid, &globalToLocalMap);
-      }
-    else
-      {
-      expandedGrid = 
-        this->AddGhostCellsUniqueCellAssignment(finalGrid, &globalToLocalMap);
-      }
+  // Create a search structure mapping global point IDs to local point IDs
 
-    TIMERDONE("Add ghost cells");
+  TIMER("Build id search structure");
 
-    expandedGrid->GetCellData()->RemoveArray(TEMP_CELL_ID_NAME);
+  this->GlobalNodeIdAccessStart(grid);
 
-    if (this->GlobalIdArrayName == NULL)
-      {
-      expandedGrid->GetPointData()->RemoveArray(TEMP_NODE_ID_NAME);
-      }
+  vtkstd::map<int, int> globalToLocalMap;
+  vtkIdType numPoints = grid->GetNumberOfPoints();
 
-    finalGrid = expandedGrid;
-    }
-
-  // Possible Stage (3) - Clip cells to the spatial region boundaries
-
-  if (this->ClipCells)
+  for (int localPtId = 0; localPtId < numPoints; localPtId++)
     {
-    // The clipping process introduces new points, and interpolates
-    // the point arrays.  Interpolating the global point id is
-    // meaningless, so we remove that array.
-
-    if (this->GlobalIdArrayName) 
-      {
-      finalGrid->GetPointData()->RemoveArray(this->GlobalIdArrayName);
-      this->GlobalIdArrayName = NULL;
-      }
-
-    TIMER("Clip boundary cells to region");
-    
-    this->ClipCellsToSpatialRegion(finalGrid);
-
-    TIMERDONE("Clip boundary cells to region");
+    int gid = this->GlobalNodeIdAccessGetId(localPtId);
+    globalToLocalMap.insert(vtkstd::pair<int, int>(gid, localPtId));
     }
 
-  this->GetOutput()->ShallowCopy(finalGrid);
+  TIMERDONE("Build id search structure");
 
-  finalGrid->Delete();
+  TIMER("Add ghost cells");
 
-  if (!this->RetainKdtree)
+  vtkUnstructuredGrid *expandedGrid= NULL;
+
+  if (this->IncludeAllIntersectingCells)
     {
-    this->Kdtree->Delete();
-    this->Kdtree = NULL;
+    expandedGrid =
+      this->AddGhostCellsDuplicateCellAssignment(grid, &globalToLocalMap);
     }
+  else
+    {
+    expandedGrid =
+      this->AddGhostCellsUniqueCellAssignment(grid, &globalToLocalMap);
+    }
+
+  TIMERDONE("Add ghost cells");
+
+  return expandedGrid;
 }
 void vtkDistributedDataFilter::SingleProcessExecute()
 {
@@ -780,15 +796,25 @@ void vtkDistributedDataFilter::SingleProcessExecute()
   vtkDataSet* tmp = input->NewInstance();
   tmp->ShallowCopy(input);
 
-  float tolerance;
+  float tolerance = 0.0;
 
-  if (this->Kdtree)
+  if (this->RetainKdtree)
     {
+    if (this->Kdtree == NULL)
+      {
+      this->Kdtree = vtkPKdTree::New();
+      this->Kdtree->SetTiming(this->GetTiming()); 
+      }
+
+    this->Kdtree->SetDataSet(tmp);
+    this->Kdtree->BuildLocator();
     tolerance = (float)this->Kdtree->GetFudgeFactor();
+    this->Kdtree->CreateGlobalDataArrayBounds();
     }
-  else
+  else if (this->Kdtree)
     {
-    tolerance = 0.0;
+    this->Kdtree->Delete();
+    this->Kdtree = NULL;
     }
 
   vtkUnstructuredGrid *clean = 
@@ -2213,14 +2239,17 @@ vtkUnstructuredGrid *
     }
 
   delete [] grids;
-  
-  const char *globalNodeIdArrayName = this->GetGlobalNodeIdArray(ds[0]);
 
-  // this call will merge the grids and then delete them
-  mergedGrid = 
-    vtkDistributedDataFilter::MergeGrids(ds, numReceivedGrids, DeleteYes,
+  if (numReceivedGrids > 0)
+    {
+    const char *globalNodeIdArrayName = this->GetGlobalNodeIdArray(ds[0]);
+
+    // this call will merge the grids and then delete them
+    mergedGrid = 
+      vtkDistributedDataFilter::MergeGrids(ds, numReceivedGrids, DeleteYes,
                      globalNodeIdArrayName, tolerance,
                      globalCellIds);
+    }
 
   delete [] ds;
   TIMERDONE("Merge");
