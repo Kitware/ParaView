@@ -143,7 +143,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.490");
+vtkCxxRevisionMacro(vtkPVWindow, "1.491");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -1224,11 +1224,6 @@ void vtkPVWindow::Create(vtkKWApplication *app, char* vtkNotUsed(args))
                this->GetMenuView()->GetWidgetName(),
                VTK_PV_VIEW_MENU_LABEL);
 
-  this->Script( "wm deiconify %s", this->GetWidgetName());
-
-  this->Script("wm protocol %s WM_DELETE_WINDOW { %s Exit }",
-               this->GetWidgetName(), this->GetTclName());
-
   if ( this->MainView )
     {
     this->MainView->SetupCameraManipulators();     
@@ -1237,6 +1232,12 @@ void vtkPVWindow::Create(vtkKWApplication *app, char* vtkNotUsed(args))
   // Udpate the enable state
 
   this->UpdateEnableState();
+
+  this->Script( "wm deiconify %s", this->GetWidgetName());
+
+  this->Script("wm protocol %s WM_DELETE_WINDOW { %s Exit }",
+               this->GetWidgetName(), this->GetTclName());
+
 }
 
 //-----------------------------------------------------------------------------
