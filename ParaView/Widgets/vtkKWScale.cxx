@@ -44,7 +44,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // ---------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWScale );
-vtkCxxRevisionMacro(vtkKWScale, "1.65");
+vtkCxxRevisionMacro(vtkKWScale, "1.66");
 
 int vtkKWScaleCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -667,9 +667,13 @@ void vtkKWScale::RefreshValue()
       }
     // Disable the callback, since set will trigget the -command although
     // we are doing something non-interactively
-    this->DisableScaleValueCallback = 1;
-    this->Script("%s set %g", 
-                 this->Scale->GetWidgetName(), this->Value);
+    double value = atof(this->Script("%s get", this->Scale->GetWidgetName()));
+    if ( value != this->Value )
+      {
+      this->DisableScaleValueCallback = 1;
+      this->Script("%s set %g", 
+                   this->Scale->GetWidgetName(), this->Value);
+      }
     if (was_disabled)
       {
       this->Scale->SetEnabled(0);
