@@ -185,7 +185,7 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterface);
-vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.161");
+vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.162");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterface,ControlledWidget, vtkPVWidget);
 
@@ -1277,8 +1277,7 @@ void vtkPVAnimationInterface::SaveImagesCallback()
       {
       dlg->SetText(
         "Specify the width and aspect ratio of the images to be saved from "
-        "this animation. The images will be scaled so that they are no larger "
-        "than the size of the display area.");
+        "this animation.");
       }
     else
       { 
@@ -1286,8 +1285,7 @@ void vtkPVAnimationInterface::SaveImagesCallback()
         "Specify the width and height of the images to be saved from this "
         "animation. Each dimension must be a multiple of 4. Each will be "
         "resized to the next smallest multiple of 4 if it does not meet this "
-        "criterion. The images will also be scaled so that they are no "
-        "larger than the size of the display area.");
+        "criterion.");
       }
     vtkKWWidget *frame = vtkKWWidget::New();
     frame->SetParent(dlg->GetTopFrame());
