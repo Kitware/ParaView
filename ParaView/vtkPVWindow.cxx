@@ -877,13 +877,14 @@ vtkPVSource *vtkPVWindow::Open(char *openFileName)
 {
   char *extension = NULL;
   vtkPVSourceInterface *sInt;
-  char rootName[100];
+  char *rootName;
   int position;
   char *endingSlash = NULL;
   char *newRootName;
   
   extension = strrchr(openFileName, '.');
   position = extension - openFileName;
+  rootName = new char[position + 1];
   strncpy(rootName, openFileName, position);
   rootName[position] = '\0';
   if ((endingSlash = strrchr(rootName, '/')))
@@ -891,8 +892,9 @@ vtkPVSource *vtkPVWindow::Open(char *openFileName)
     position = endingSlash - rootName + 1;
     newRootName = new char[strlen(rootName) - position + 1];
     strcpy(newRootName, rootName + position);
-    strcpy(rootName, "");
-    strcat(rootName, newRootName);
+    delete [] rootName;
+    rootName = new char[strlen(newRootName)+1];
+    strcpy(rootName, newRootName);
     delete [] newRootName;
     }
   if (isdigit(rootName[0]))
@@ -900,8 +902,9 @@ vtkPVSource *vtkPVWindow::Open(char *openFileName)
     // A VTK object names beginning with a digit is invalid.
     newRootName = new char[strlen(rootName) + 3];
     sprintf(newRootName, "PV%s", rootName);
-    strcpy(rootName, "");
-    strcat(rootName, newRootName);
+    delete [] rootName;
+    rootName = new char[strlen(newRootName)+1];
+    strcpy(rootName, newRootName);
     delete [] newRootName;
     }
   
@@ -938,6 +941,9 @@ vtkPVSource *vtkPVWindow::Open(char *openFileName)
 
   sInt->SetDataFileName(openFileName);
   sInt->SetRootName(rootName);
+  
+  delete [] rootName;
+  
   return sInt->CreateCallback();
 }
 
@@ -945,7 +951,7 @@ vtkPVSource *vtkPVWindow::Open(char *openFileName)
 void vtkPVWindow::WriteData()
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
-  char filename[256];
+  char *filename;
   int numProcs;
 
   if (!this->CurrentPVData)
@@ -962,10 +968,13 @@ void vtkPVWindow::WriteData()
   if (numProcs == 1)
     {
     this->Script("tk_getSaveFile -filetypes {{{VTK files} {.vtk}}} -defaultextension .vtk -initialfile data.vtk");
+    
+    filename = new char[strlen(this->Application->GetMainInterp()->result)+1];
     sprintf(filename, "%s", this->Application->GetMainInterp()->result);
   
     if (strcmp(filename, "") == 0)
       {
+      delete [] filename;
       return;
       }
   
@@ -983,9 +992,11 @@ void vtkPVWindow::WriteData()
     int idx;
 
     this->Script("tk_getSaveFile -filetypes {{{PVTK files} {.pvtk}}} -defaultextension .pvtk -initialfile data.pvtk");
+    filename = new char[strlen(this->Application->GetMainInterp()->result)+1];
     sprintf(filename, "%s", this->Application->GetMainInterp()->result);
     if (strcmp(filename, "") == 0)
       {
+      delete [] filename;
       return;
       }
   
@@ -994,6 +1005,7 @@ void vtkPVWindow::WriteData()
     ghostLevel = this->GetIntegerResult(pvApp);
     if (ghostLevel == -1)
       {
+      delete [] filename;
       return;
       }
 
@@ -1014,6 +1026,8 @@ void vtkPVWindow::WriteData()
     pvApp->BroadcastScript("writer Write");
     pvApp->BroadcastScript("writer Delete");
     }
+  
+  delete [] filename;
 }
 
 //============================================================================
