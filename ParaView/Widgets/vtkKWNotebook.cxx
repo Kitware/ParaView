@@ -186,12 +186,12 @@ void vtkKWNotebook::Create(vtkKWApplication *app, const char *args)
 
   int r,g,b;
   this->GetBackgroundColor(&r, &g, &b); 
-  sprintf(this->BackColor, "#%02x%02x%02x", r, g, b);
+  sprintf(this->ForegroundColor, "#%02x%02x%02x", r, g, b);
   
-  r = static_cast<int>( r * 0.93 );
-  g = static_cast<int>( g * 0.93 );
-  b = static_cast<int>( b * 0.93 );
-  sprintf(this->ForeColor, "#%02x%02x%02x", r, g, b);  
+  r = static_cast<int>( r * 0.97 );
+  g = static_cast<int>( g * 0.97 );
+  b = static_cast<int>( b * 0.97 );
+  sprintf(this->BackgroundColor, "#%02x%02x%02x", r, g, b);  
 }
 
 void vtkKWNotebook::Raise(int num)
@@ -214,26 +214,30 @@ void vtkKWNotebook::Raise(int num)
       this->Script("%s configure -bg %s -height 2 "
 		   "-highlightcolor %s -activebackground %s",
 		   this->Buttons[this->Current]->GetWidgetName(),
-		   this->ForeColor, this->ForeColor,
-		   this->ForeColor);
+		   this->BackgroundColor, this->BackgroundColor,
+		   this->BackgroundColor);
       if ( this->Icons[this->Current] )
 	{
 	this->Script("%s configure -bg %s",
 		     this->Icons[this->Current]->GetWidgetName(),
-		     this->ForeColor);
+		     this->BackgroundColor);
 	}
+      this->Script("set BackNotebook %s", 
+		   this->Buttons[this->Current]->GetWidgetName());
       }
     this->Script("pack %s -fill both -anchor n",
                  this->Frames[num]->GetWidgetName());
     this->Script("%s configure -disabledforeground black -state disabled"
 		 " -bg %s -height 1",
-		 this->Buttons[num]->GetWidgetName(), this->BackColor);
+		 this->Buttons[num]->GetWidgetName(), this->ForegroundColor);
     if ( this->Icons[num] )
       {
       this->Script("%s configure -bg %s",
-		   this->Icons[num]->GetWidgetName(), this->BackColor);
+		   this->Icons[num]->GetWidgetName(), this->ForegroundColor);
       }
     this->Script("focus %s", this->Frames[num]->GetWidgetName());
+    this->Script("set FrontNotebook %s", 
+		 this->Buttons[num]->GetWidgetName());
     }
 
   this->Current = num;
@@ -416,10 +420,10 @@ void vtkKWNotebook::AddPage(const char *title, const char *ballon,
     }
 
   this->Script(
-    "%s configure -text {%s%s} -borderwidth %d -command {%s Raise %d}",
+    "%s configure -text {%s%s} -borderwidth %d -command {%s Raise %d} -bg %s",
     this->Buttons[this->NumberOfPages]->GetWidgetName(), skip,
     this->Titles[this->NumberOfPages], this->BorderWidth,
-    this->GetTclName(),this->NumberOfPages);
+    this->GetTclName(),this->NumberOfPages, this->BackgroundColor);
 
   this->Script("pack %s -side left -pady 0 -padx %d -fill y",
                this->Buttons[this->NumberOfPages]->GetWidgetName(),
