@@ -53,6 +53,7 @@ class vtkPVWindow;
 class vtkPVRenderModuleUI;
 class vtkPVRenderViewObserver;
 class vtkPVRenderModule;
+class vtkTimerLog;
 
 #define VTK_PV_VIEW_MENU_LABEL       " 3D View Properties"
 
@@ -107,6 +108,7 @@ public:
   // Description:
   // Composites
   void Render();
+  void ForceRender();
   void EventuallyRender();
   void EventuallyRenderCallBack();
 
@@ -341,11 +343,7 @@ protected:
   vtkKWRadioButton *NavigationWindowButton;
   vtkKWRadioButton *SelectionWindowButton;
   
-  int EventuallyRenderFlag;
-  int DoingEventuallyRender;
   int BlockRender;
-  char* RenderPending;
-  vtkSetStringMacro(RenderPending);
 
   int ShowSelectionWindow;
   int ShowNavigationWindow;
@@ -375,6 +373,9 @@ protected:
   // It's the whole TKRenderWidget destruction pain.
   vtkPVRenderModule* RenderModule;
 
+  vtkTimerLog *RenderTimer;
+  Tcl_TimerToken TimerToken;
+  
 private:
   vtkPVRenderView(const vtkPVRenderView&); // Not implemented
   void operator=(const vtkPVRenderView&); // Not implemented

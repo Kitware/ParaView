@@ -135,7 +135,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.316");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.317");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -145,7 +145,6 @@ int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
 //----------------------------------------------------------------------------
 vtkPVRenderView::vtkPVRenderView()
 {
-  this->DoingEventuallyRender = 0;
   this->RenderModule = NULL;
 
   if (getenv("PV_SEPARATE_RENDER_WINDOW") != NULL)
@@ -163,9 +162,7 @@ vtkPVRenderView::vtkPVRenderView()
   this->CommandFunction = vtkPVRenderViewCommand;
   this->SplitFrame = vtkKWSplitFrame::New();
 
-  this->EventuallyRenderFlag = 0;
   this->BlockRender = 0;
-  this->RenderPending = NULL;
 
   this->MenuEntryUnderline = 4;
   this->SetMenuEntryName(VTK_PV_VIEW_MENU_LABEL);
@@ -226,6 +223,9 @@ vtkPVRenderView::vtkPVRenderView()
 
   this->Observer = vtkPVRenderViewObserver::New();
   this->Observer->PVRenderView = this;
+  
+  this->RenderTimer = vtkTimerLog::New();
+  this->TimerToken = NULL;
 }
 
 
@@ -399,11 +399,6 @@ vtkPVRenderView::~vtkPVRenderView()
     {
     this->Script("bind %s <Motion> {}", this->VTKWidget->GetWidgetName());
     }
-  if (this->RenderPending && this->Application )
-    {
-    this->Script("after cancel %s", this->RenderPending);
-    }
-  this->SetRenderPending(NULL);
 
   if (this->TopLevelRenderWindow)
     {
@@ -465,6 +460,13 @@ vtkPVRenderView::~vtkPVRenderView()
   this->PropertiesButton = NULL;
   this->SetMenuLabelSwitchBackAndForthToViewProperties(NULL);
   vtkTimerLog::CleanupLog();
+  
+  this->RenderTimer->Delete();
+  if (this->TimerToken)
+    {
+    Tcl_DeleteTimerHandler( this->TimerToken );
+    this->TimerToken = NULL;
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -1462,6 +1464,15 @@ vtkPVApplication* vtkPVRenderView::GetPVApplication()
 }
 
 
+void vtkPVRenderView::ForceRender()
+{
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  if ( pvApp )
+    {
+    pvApp->SetGlobalLODFlag(0);
+    pvApp->GetRenderModule()->StillRender();
+    }
+}
 
 //----------------------------------------------------------------------------
 void vtkPVRenderView::Render()
@@ -1504,13 +1515,11 @@ void vtkPVRenderView::UpdateTclButAvoidRendering()
   int saveRender = 0;
 
   // Remove any pending renders.
-  if (this->RenderPending && this->Application )
+  if (this->TimerToken)
     {
     saveRender = 1;
-    this->Script("after cancel %s", this->RenderPending);
-    this->SetRenderPending(NULL);
-    // This flag is not necessary.  We should just use render pending ivar.
-    this->EventuallyRenderFlag = 0;
+    Tcl_DeleteTimerHandler( this->TimerToken );
+    this->TimerToken = NULL;
     }
 
   this->Script("update");
@@ -1537,7 +1546,7 @@ void vtkPVRenderView::StartBlockingRender()
 void vtkPVRenderView::EndBlockingRender()
 {
   vtkDebugMacro("Stop blocking render requests");
-  if ( this->BlockRender > 1 && !this->DoingEventuallyRender)
+  if ( this->BlockRender > 1 )
     {
     vtkDebugMacro("There was a render request, so call render");
     this->EventuallyRender();
@@ -1547,67 +1556,64 @@ void vtkPVRenderView::EndBlockingRender()
 
 
 //----------------------------------------------------------------------------
+void PVRenderView_IdleRender(ClientData arg)
+{
+  vtkPVRenderView *me = (vtkPVRenderView *)arg;
+  me->EventuallyRenderCallBack();
+}
+//----------------------------------------------------------------------------
 void vtkPVRenderView::EventuallyRender()
 {
-  if (this->EventuallyRenderFlag)
-    {
-    return;
-    }
-  this->EventuallyRenderFlag = 1;
   vtkDebugMacro("Enqueue EventuallyRender request");
 
-  // Keep track of whether there is a render pending so that if a render is
-  // pending when this object is deleted, we can cancel the "after" command.
-  // We don't want to have this object register itself because this can
-  // cause leaks if we exit before EventuallyRenderCallBack is called.
-  this->Script("update idletasks");
-  this->Script("after idle {%s EventuallyRenderCallBack}",this->GetTclName());
-  this->SetRenderPending(this->Application->GetMainInterp()->result);
+  this->RenderTimer->StartTimer();
+  if ( !this->TimerToken )
+    {
+    this->TimerToken = Tcl_CreateTimerHandler(110, 
+                                              PVRenderView_IdleRender, 
+                                              (ClientData)this);
+    }
 }
-                      
+
 //----------------------------------------------------------------------------
 void vtkPVRenderView::EventuallyRenderCallBack()
 {
-  this->DoingEventuallyRender = 1;
-  if ( this->BlockRender )
+  int abortFlag;
+  double elapsedTime;
+  
+  this->RenderTimer->StopTimer();
+  
+  elapsedTime = this->RenderTimer->GetElapsedTime();
+  abortFlag = this->ShouldIAbort();
+  
+  this->TimerToken = NULL;
+  
+  if ( elapsedTime < 0.1 || abortFlag != 0 )
     {
-    this->BlockRender = 2;
-    this->EventuallyRenderFlag = 0;
-    this->DoingEventuallyRender = 0;
-    return;
-    }
-
-  int abort;
-
-  vtkPVApplication *pvApp = this->GetPVApplication();
-
-  // sanity check
-  if (this->EventuallyRenderFlag == 0 || !this->RenderPending)
-    {
-    vtkErrorMacro("Inconsistent EventuallyRenderFlag");
-    this->DoingEventuallyRender = 0;
-    return;
-    }
-  // We could get rid of the flag and use the pending ivar.
-  this->SetRenderPending(NULL);
-
-  // I do not know if these are necessary here.
-  abort = this->ShouldIAbort();
-  if (abort)
-    {
-    this->DoingEventuallyRender = 0;
-    this->EventuallyRenderFlag = 0;
-    if (abort == 1)
+    if ( abortFlag == 1 )
       {
-      this->EventuallyRender();
+      this->TimerToken = Tcl_CreateTimerHandler(200, 
+                                                PVRenderView_IdleRender, 
+                                                (ClientData)this);    
+      }
+    else if ( elapsedTime < 0.1 )
+      {
+      this->TimerToken = Tcl_CreateTimerHandler(100, 
+                                                PVRenderView_IdleRender, 
+                                                (ClientData)this);    
       }
     return;
     }
+  
+  if ( this->BlockRender )
+    {
+    this->BlockRender = 2;
+    return;
+    }
 
+  vtkPVApplication *pvApp = this->GetPVApplication();
   pvApp->SetGlobalLODFlag(0);
   pvApp->GetRenderModule()->StillRender();
-  this->DoingEventuallyRender = 0;
-  this->EventuallyRenderFlag = 0;
 }
 
 //----------------------------------------------------------------------------
