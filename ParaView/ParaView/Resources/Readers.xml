@@ -308,7 +308,7 @@
                help="Name to assign to array read"
                default_value="ImageFile"/>
 </Module>
-
+ 
 #ifdef PARAVIEW_LINK_XDMF
  <Module name="XdmfReader" root_name="XdmfReader"
    output="vtkDataSet"
@@ -350,6 +350,9 @@
   <ArraySelection trace_name="cell_array_sel" attribute_name="Cell" />
   <ArraySelection trace_name="point_array_sel" attribute_name="Point" />
   <ArraySelection trace_name="block_sel" attribute_name="Block"/>
+  <LabeledToggle label="Block Ids" variable="GenerateBlockIdCellArray" trace_name="block_ids" help="Select whether the reader generates block ids" default_value="1"/>
+  <LabeledToggle label="Global Node Ids" variable="GenerateGlobalNodeIdArray" trace_name="global_node_ids" help="Select whether the reader generates global node ids" default_value="1"/>
+  <LabeledToggle label="Global Element Ids" variable="GenerateGlobalElementIdArray" trace_name="blobal_element_ids" help="Select whether the reader generates global element ids" default_value="0"/>
  </Module>
 #endif
 #ifdef PARAVIEW_USE_SAF
