@@ -178,4 +178,5 @@ void vtkKWEntry::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
   os << indent << "Width: " << this->GetWidth() << endl;
+  os << indent << "Readonly: " << (this->ReadOnly?"on":"off") << endl;
 }

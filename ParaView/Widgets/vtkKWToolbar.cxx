@@ -183,4 +183,5 @@ void vtkKWToolbar::Resize()
 void vtkKWToolbar::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
+  os << indent << "Frame: " << this->Frame << endl;
 }
