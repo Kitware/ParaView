@@ -71,10 +71,6 @@ public:
   virtual void SetPVInput(vtkPVData *input);
 
   // Description:
-  // Called when the accept button is clicked.
-  void UpdateProbe();
-
-  // Description:
   // Methods to call when this pv source is selected/deselected
   virtual void Deselect() { this->Deselect(1); }
   virtual void Deselect(int doPackForget);
@@ -83,10 +79,6 @@ public:
   // Write out the part of the tcl script cooresponding to vtkPVProbe
   virtual void SaveInTclScript(ofstream *file, int interactiveFlag, int vtkFlag);
   
-  // Description:
-  // Method to update which scalars are being used in the xyplot
-  virtual void UpdateScalars();
-
   // Description:
   // Access to the ShowXYPlotToggle from Tcl
   vtkGetObjectMacro(ShowXYPlotToggle, vtkKWCheckButton);

@@ -57,7 +57,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVXMLElement.h"
 
 vtkStandardNewMacro(vtkPVLineWidget);
-vtkCxxRevisionMacro(vtkPVLineWidget, "1.32");
+vtkCxxRevisionMacro(vtkPVLineWidget, "1.33");
 
 //----------------------------------------------------------------------------
 vtkPVLineWidget::vtkPVLineWidget()
@@ -85,6 +85,8 @@ vtkPVLineWidget::vtkPVLineWidget()
   this->SetResolutionLabelTextName("Resolution");
 
   this->ShowResolution = 1;
+
+  this->SuppressReset = 1;
 }
 
 //----------------------------------------------------------------------------
@@ -318,6 +320,7 @@ void vtkPVLineWidget::Accept()
     }
 
   this->Superclass::Accept();
+  this->SuppressReset = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -368,8 +371,7 @@ void vtkPVLineWidget::UpdateVTKObject(const char* sourceTclName)
                   this->Point2[2]->GetValueAsFloat());
 
   char acceptCmd[1024];
-  if ( this->Point1Variable && sourceTclName )
-    {    
+  if ( this->Point1Variable && sourceTclName )    {    
     sprintf(acceptCmd, "%s Set%s %f %f %f", sourceTclName, 
             this->Point1Variable,
             this->Point1[0]->GetValueAsFloat(),
@@ -470,6 +472,10 @@ void vtkPVLineWidget::SaveInTclScript(ofstream *file)
 //----------------------------------------------------------------------------
 void vtkPVLineWidget::Reset(const char* sourceTclName)
 {
+  if (this->SuppressReset)
+    {
+    return;
+    }
   if ( ! this->ModifiedFlag)
     {
     return;

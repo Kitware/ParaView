@@ -84,7 +84,6 @@ vtkPVPushButton.cxx
 vtkPVReaderModule.cxx
 vtkPVRenderGroupDialog.cxx
 vtkPVRenderView.cxx 
-vtkPVSatelliteRenderWindowInteractor.cxx
 vtkPVScalarRangeLabel.cxx 
 vtkPVScale.cxx 
 vtkPVSelectCustomReader.cxx

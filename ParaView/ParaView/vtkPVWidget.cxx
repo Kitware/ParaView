@@ -67,7 +67,7 @@ template class VTK_EXPORT vtkArrayMapIterator<vtkPVWidget*, vtkPVWidget*>;
 #endif
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkPVWidget, "1.27");
+vtkCxxRevisionMacro(vtkPVWidget, "1.28");
 
 //----------------------------------------------------------------------------
 vtkPVWidget::vtkPVWidget()
@@ -85,6 +85,7 @@ vtkPVWidget::vtkPVWidget()
   this->PVSource = 0;
 
   this->TraceNameState = vtkPVWidget::Uninitialized;
+  this->SuppressReset = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -104,11 +105,17 @@ void vtkPVWidget::Accept(const char* sourceTclName)
 {
   //vtkErrorMacro("Multi source Accept not defined. " << this->GetClassName());
   this->Accept();
+  this->SuppressReset = 0;
 }
 
 //----------------------------------------------------------------------------
 void vtkPVWidget::Reset(const char* sourceTclName)
 {
+  if (this->SuppressReset)
+    {
+    return;
+    }
+
   this->Update();
   // We want the modifiedCallbacks to occur before we reset this flag.
   this->Script("update");
@@ -145,14 +152,6 @@ void vtkPVWidget::Accept()
 {
   this->ModifiedFlag = 0;
 }
-
-//----------------------------------------------------------------------------
-void vtkPVWidget::ForceReset(const char* sourceTclName)
-{
-  this->ModifiedFlag = 1;
-  this->Reset(sourceTclName);
-}
-
 
 //----------------------------------------------------------------------------
 void vtkPVWidget::Update()
@@ -361,7 +360,7 @@ void vtkPVWidget::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVWidget ";
-  this->ExtractRevision(os,"$Revision: 1.27 $");
+  this->ExtractRevision(os,"$Revision: 1.28 $");
 }
 
 //----------------------------------------------------------------------------

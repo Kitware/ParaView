@@ -57,7 +57,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVXMLElement.h"
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkPV3DWidget, "1.32");
+vtkCxxRevisionMacro(vtkPV3DWidget, "1.33");
 
 //===========================================================================
 //***************************************************************************
@@ -178,7 +178,7 @@ void vtkPV3DWidget::Create(vtkKWApplication *kwApp)
   if (this->Widget3DTclName)
     {
     // Default/dummy interactor for satelite procs.
-    pvApp->BroadcastScript("%s SetInteractor IRen", this->Widget3DTclName);
+    pvApp->BroadcastScript("%s SetInteractor pvRenderWindowInteractor", this->Widget3DTclName);
     this->Script("%s InitializeObservers %s", this->GetTclName(),
                  this->Widget3DTclName);
     }
@@ -190,10 +190,10 @@ void vtkPV3DWidget::Create(vtkKWApplication *kwApp)
 void vtkPV3DWidget::InitializeObservers(vtk3DWidget* widget3D) 
 {
   vtkPVGenericRenderWindowInteractor* iren = 
-    this->PVSource->GetPVWindow()->GetGenericInteractor();
+    this->PVSource->GetPVWindow()->GetInteractor();
   if (iren)
     {
-    widget3D->SetInteractor(iren);
+    //widget3D->SetInteractor(iren);
     widget3D->AddObserver(vtkCommand::InteractionEvent, 
                           this->Observer);
     widget3D->AddObserver(vtkCommand::PlaceWidgetEvent, 
@@ -392,12 +392,7 @@ void vtkPV3DWidget::Render()
 {
   if ( this->Placed )
     {
-    vtkPVGenericRenderWindowInteractor* iren = 
-      this->PVSource->GetPVWindow()->GetGenericInteractor();
-    if(iren)
-      {
-      iren->Render();
-      }
+    this->Script("pvRenderWindowInteractor Render");
     }
 }
 

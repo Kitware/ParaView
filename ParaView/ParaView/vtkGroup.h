@@ -53,7 +53,7 @@ public:
   virtual int GetNumberOfOutputs();
   vtkDataSet *GetOutput(int idx);
   vtkDataSet *GetOutput() 
-    {return this->GetInput( 0 );}
+    {return this->GetOutput( 0 );}
   
 protected:
   vtkGroup();

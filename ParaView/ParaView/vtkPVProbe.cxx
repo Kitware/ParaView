@@ -65,7 +65,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProbe);
-vtkCxxRevisionMacro(vtkPVProbe, "1.85");
+vtkCxxRevisionMacro(vtkPVProbe, "1.86");
 
 int vtkPVProbeCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -105,9 +105,18 @@ vtkPVProbe::vtkPVProbe()
   this->RequiredNumberOfInputParts = 1;
 }
 
-//----------------------------------------------------------------------------
+
 vtkPVProbe::~vtkPVProbe()
 {
+  if ( this->XYPlotWidget )
+    {
+    this->XYPlotWidget->SetEnabled(0);
+    this->XYPlotWidget->SetInteractor(NULL);
+    this->XYPlotWidget->Delete();
+    this->XYPlotWidget = 0;
+    }
+  this->SetXYPlotTclName(0);
+
   this->SelectedPointLabel->Delete();
   this->SelectedPointLabel = NULL;
   this->SelectedPointFrame->Delete();
@@ -121,13 +130,6 @@ vtkPVProbe::~vtkPVProbe()
   this->ProbeFrame->Delete();
   this->ProbeFrame = NULL;
   
-  if ( this->XYPlotWidget )
-    {
-    this->XYPlotWidget->Delete();
-    this->XYPlotWidget = 0;
-    }
-
-  this->SetXYPlotTclName(0);
 }
 
 //----------------------------------------------------------------------------
@@ -148,14 +150,6 @@ void vtkPVProbe::SetPVInput(vtkPVData *pvd)
   // rather inflexible vtkPVArrayMenu.
   pvApp->BroadcastScript("%s SetSource %s", this->GetVTKSourceTclName(),
                          pvd->GetPVPart()->GetVTKDataTclName());
-}
-
-
-
-
-//----------------------------------------------------------------------------
-void vtkPVProbe::UpdateScalars()
-{
 }
 
 //----------------------------------------------------------------------------
@@ -209,9 +203,12 @@ void vtkPVProbe::CreateProperties()
     
     pvApp->BroadcastScript("%s SetController [ $Application GetController ] ", 
                            this->GetVTKSourceTclName());
+    // This is not going to work because of empty extent on client ...
+    //pvApp->BroadcastScript("%s SetSocketController [ $Application GetSocketController ] ", 
+    //                       this->GetVTKSourceTclName());
     
     vtkPVGenericRenderWindowInteractor* iren = 
-      this->GetPVWindow()->GetGenericInteractor();
+      this->GetPVWindow()->GetInteractor();
     if ( iren )
       {
       this->XYPlotWidget->SetInteractor(iren);
@@ -224,30 +221,7 @@ void vtkPVProbe::AcceptCallbackInternal()
 {
   int i;
   const char *arrayName;
-  
-  // This can't be an accept command because this calls SetInput for
-  // the vtkProbeFilter, and vtkPVSource::AcceptCallbackInternal
-  // expects that the input has already been set.
-  this->UpdateProbe();
-  
-  vtkPVApplication *pvApp = this->GetPVApplication();
-
-  pvApp->AddTraceEntry("$kw(%s) UpdateScalars", this->GetTclName());
-  pvApp->AddTraceEntry("[$kw(%s) GetShowXYPlotToggle] SetState %d",
-                       this->GetTclName(),
-                       this->ShowXYPlotToggle->GetState());
-  
-  // Here is a hack!  The probe cannot return its output until its SOURCE
-  // is set.  The source is set by the widgets.
-  // Since we know the source is going to be a polydata, 
-  // just set the output here.
-  // Probe can only have one source.
-  if ( ! this->Initialized)
-    { // This is the first time, create the data.
-    pvApp->BroadcastScript("vtkPolyData ProbePolyData");
-    pvApp->BroadcastScript("%s SetOutput ProbePolyData", this->GetVTKSourceTclName());
-    pvApp->BroadcastScript("ProbePolyData Delete");
-    }
+    
   // call the superclass's method
   this->vtkPVSource::AcceptCallbackInternal();
   
@@ -267,7 +241,7 @@ void vtkPVProbe::AcceptCallbackInternal()
   int numArrays = pd->GetNumberOfArrays();
   vtkDataArray *array;
 
-  if (this->GetDimensionality() == 0)
+  if (probeOutput->GetNumberOfPoints() == 1)
     {
     // update the ui to see the point data for the probed point
     
@@ -275,6 +249,8 @@ void vtkPVProbe::AcceptCallbackInternal()
     char label[256]; // this may need to be longer
     char arrayData[256];
     char tempArray[32];
+
+    this->XYPlotWidget->SetEnabled(0);
 
     // label needs to be initialized so strcat doesn't fail
     label[0] = '\0';
@@ -319,7 +295,7 @@ void vtkPVProbe::AcceptCallbackInternal()
     this->PointDataLabel->SetLabel(label);
     this->Script("pack %s", this->PointDataLabel->GetWidgetName());
     }
-  else if (this->GetDimensionality() == 1)
+  else if (probeOutput->GetNumberOfPoints() > 1)
     {
     this->Script("pack forget %s", this->PointDataLabel->GetWidgetName());
 
@@ -367,27 +343,7 @@ void vtkPVProbe::AcceptCallbackInternal()
     }
 }
  
-
 //----------------------------------------------------------------------------
-void vtkPVProbe::UpdateProbe()
-{
-  vtkPVApplication *pvApp = this->GetPVApplication();
-  if (!pvApp)
-    {
-    vtkErrorMacro("No vtkPVApplication set");
-    return;
-    }
-
-  vtkMultiProcessController *controller = pvApp->GetController();
-  
-  if (!controller)
-    {
-    vtkErrorMacro("No vtkMultiProcessController");
-    return;
-    }  
-  this->GetPVRenderView()->Render();
-}
-
 void vtkPVProbe::Deselect(int doPackForget)
 {
   this->vtkPVSource::Deselect(doPackForget);
@@ -583,7 +539,6 @@ void vtkPVProbe::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
 
-  os << indent << "Dimensionality: " << this->GetDimensionality() << endl;
   os << indent << "ShowXYPlotToggle: " << this->GetShowXYPlotToggle() << endl;
   os << indent << "XYPlotWidget: " << this->XYPlotWidget << endl;
 }

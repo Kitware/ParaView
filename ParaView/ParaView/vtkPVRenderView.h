@@ -161,6 +161,7 @@ public:
   // My version.
   vtkRenderer *GetRenderer();
   vtkRenderWindow *GetRenderWindow();
+  const char *GetRenderWindowTclName() {return this->RenderWindowTclName;}
 
   // Description:
   // The center of rotation picker needs the compositers zbuffer.
@@ -394,10 +395,7 @@ protected:
    
   char *RenderWindowTclName;
   vtkSetStringMacro(RenderWindowTclName);  
-  
-  char *SatelliteInteractorTclName;
-  vtkSetStringMacro(SatelliteInteractorTclName);  
-  
+    
   vtkKWLabeledFrame *StandardViewsFrame;
   vtkKWPushButton   *XMaxViewButton; 
   vtkKWPushButton   *XMinViewButton; 

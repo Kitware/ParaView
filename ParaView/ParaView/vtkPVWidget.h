@@ -88,11 +88,6 @@ public:
   virtual void Accept();
 
   // Description:
-  // The methods get called when the Reset button is pressed. 
-  // It sets this widgets value using the VTK objects value.
-  void ForceReset(const char* sourceTclName);
-
-  // Description:
   // The methods get called when reset is called.  
   // It can also get called on its own.  If the widget has options 
   // or configuration values dependent on the VTK object, this method
@@ -247,6 +242,10 @@ protected:
   // This flag indicates that the widget has changed and should be
   // added to the trace file.
   int ModifiedFlag;
+
+  // This flag stops resets until accept has been called.
+  // It is used to let the widget set the default value.
+  int SuppressReset;
 
   vtkPVSource* PVSource;
 

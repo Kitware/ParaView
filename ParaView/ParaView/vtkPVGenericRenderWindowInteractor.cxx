@@ -44,10 +44,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVRenderView.h"
 #include "vtkObjectFactory.h"
 #include "vtkRenderWindow.h"
+#include "vtkRendererCollection.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVGenericRenderWindowInteractor);
-vtkCxxRevisionMacro(vtkPVGenericRenderWindowInteractor, "1.6");
+vtkCxxRevisionMacro(vtkPVGenericRenderWindowInteractor, "1.7");
 
 //----------------------------------------------------------------------------
 vtkPVGenericRenderWindowInteractor::vtkPVGenericRenderWindowInteractor()
@@ -87,8 +88,8 @@ void vtkPVGenericRenderWindowInteractor::SetMoveEventInformationFlipY(
 //----------------------------------------------------------------------------
 void vtkPVGenericRenderWindowInteractor::Render()
 {
-  if ( ! this->PVRenderView)
-    {
+  if ( this->PVRenderView == NULL || this->RenderWindow == NULL)
+    { // The case for interactors on the satellite processes.
     return;
     }
   
@@ -101,6 +102,127 @@ void vtkPVGenericRenderWindowInteractor::Render()
     this->PVRenderView->Render();
     }
 }
+
+// Special methods for forwarding events to satellite processes.
+// The take care of the reduction factor by comparing 
+// renderer size with render window size. 
+
+
+//----------------------------------------------------------------------------
+void vtkPVGenericRenderWindowInteractor::SatelliteLeftPress(int x, int y, 
+                                                     int control, int shift)
+{
+  int winSize, renSize;
+  winSize = this->RenderWindow->GetSize()[1];
+  vtkRendererCollection *rc = this->RenderWindow->GetRenderers();
+  rc->InitTraversal();
+  vtkRenderer *aren = rc->GetNextItem();
+  renSize = aren->GetSize()[1];
+  x = (int)((float)renSize * (float)x / (float)winSize);
+  y = (int)((float)renSize * (float)(winSize-y) / (float)winSize);
+  this->SetEventInformation(x, y, control, shift);
+  this->LeftButtonPressEvent();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVGenericRenderWindowInteractor::SatelliteMiddlePress(int x, int y, 
+                                                     int control, int shift)
+{
+  int winSize, renSize;
+  winSize = this->RenderWindow->GetSize()[1];
+  vtkRendererCollection *rc = this->RenderWindow->GetRenderers();
+  rc->InitTraversal();
+  vtkRenderer *aren = rc->GetNextItem();
+  renSize = aren->GetSize()[1];
+  x = (int)((float)renSize * (float)x / (float)winSize);
+  y = (int)((float)renSize * (float)(winSize-y) / (float)winSize);
+  this->SetEventInformation(x, y, control, shift);
+  this->MiddleButtonPressEvent();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVGenericRenderWindowInteractor::SatelliteRightPress(int x, int y, 
+                                                     int control, int shift)
+{
+  int winSize, renSize;
+  winSize = this->RenderWindow->GetSize()[1];
+  vtkRendererCollection *rc = this->RenderWindow->GetRenderers();
+  rc->InitTraversal();
+  vtkRenderer *aren = rc->GetNextItem();
+  renSize = aren->GetSize()[1];
+  x = (int)((float)renSize * (float)x / (float)winSize);
+  y = (int)((float)renSize * (float)(winSize-y) / (float)winSize);
+  this->SetEventInformation(x, y, control, shift);
+  this->RightButtonPressEvent();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVGenericRenderWindowInteractor::SatelliteLeftRelease(int x, int y, 
+                                                       int control, int shift)
+{
+  int winSize, renSize;
+  winSize = this->RenderWindow->GetSize()[1];
+  vtkRendererCollection *rc = this->RenderWindow->GetRenderers();
+  rc->InitTraversal();
+  vtkRenderer *aren = rc->GetNextItem();
+  renSize = aren->GetSize()[1];
+  x = (int)((float)renSize * (float)x / (float)winSize);
+  y = (int)((float)renSize * (float)(winSize-y) / (float)winSize);
+  this->SetEventInformation(x, y, control, shift);
+  this->LeftButtonReleaseEvent();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVGenericRenderWindowInteractor::SatelliteMiddleRelease(int x, int y, 
+                                                        int control, int shift)
+{
+  int winSize, renSize;
+  winSize = this->RenderWindow->GetSize()[1];
+  vtkRendererCollection *rc = this->RenderWindow->GetRenderers();
+  rc->InitTraversal();
+  vtkRenderer *aren = rc->GetNextItem();
+  renSize = aren->GetSize()[1];
+  x = (int)((float)renSize * (float)x / (float)winSize);
+  y = (int)((float)renSize * (float)(winSize-y) / (float)winSize);
+  this->SetEventInformation(x, y, control, shift);
+  this->MiddleButtonReleaseEvent();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVGenericRenderWindowInteractor::SatelliteRightRelease(int x, int y, 
+                                                        int control, int shift)
+{
+  int winSize, renSize;
+  winSize = this->RenderWindow->GetSize()[1];
+  vtkRendererCollection *rc = this->RenderWindow->GetRenderers();
+  rc->InitTraversal();
+  vtkRenderer *aren = rc->GetNextItem();
+  renSize = aren->GetSize()[1];
+  x = (int)((float)renSize * (float)x / (float)winSize);
+  y = (int)((float)renSize * (float)(winSize-y) / (float)winSize);
+  this->SetEventInformation(x, y, control, shift);
+  this->RightButtonReleaseEvent();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVGenericRenderWindowInteractor::SatelliteMove(int x, int y) 
+{
+  int winSize, renSize;
+  winSize = this->RenderWindow->GetSize()[1];
+  vtkRendererCollection *rc = this->RenderWindow->GetRenderers();
+  rc->InitTraversal();
+  vtkRenderer *aren = rc->GetNextItem();
+  renSize = aren->GetSize()[1];
+  x = (int)((float)renSize * (float)x / (float)winSize);
+  y = (int)((float)renSize * (float)(winSize-y) / (float)winSize);
+  this->SetEventInformation(x, y, this->ControlKey, this->ShiftKey,
+                                 this->KeyCode, this->RepeatCount,
+                                 this->KeySym);
+  this->MouseMoveEvent();
+}
+
+
+
 
 //----------------------------------------------------------------------------
 void vtkPVGenericRenderWindowInteractor::PrintSelf(ostream& os, vtkIndent indent)

@@ -81,7 +81,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class vtkActor;
 class vtkAxes;
 class vtkCollection;
-class vtkGenericRenderWindowInteractor;
+class vtkPVGenericRenderWindowInteractor;
 class vtkKWCheckButton;
 class vtkKWEntry;
 class vtkKWLabel;
@@ -100,7 +100,6 @@ class vtkPVCameraManipulator;
 class vtkPVColorMap;
 class vtkPVData;
 class vtkPVErrorLogDisplay;
-class vtkPVGenericRenderWindowInteractor;
 class vtkPVInteractorStyle;
 class vtkPVInteractorStyleCenterOfRotation;
 class vtkPVReaderModule;
@@ -426,14 +425,6 @@ public:
   vtkGetObjectMacro(CenterZEntry, vtkKWEntry);
 
   // Description:
-  // Callback for fly speed widget
-//  void FlySpeedScaleCallback();
-
-  // Description:
-  // Return the main render window interactor.
-  vtkGetObjectMacro(GenericInteractor, vtkPVGenericRenderWindowInteractor);
-
-  // Description:
   // Popup the vtk warning message
   virtual void WarningMessage(const char* message);
   
@@ -503,6 +494,11 @@ public:
   // Callback: update the toolbar aspects once toolbar settings have been changed
   void UpdateToolbarAspect();
 
+  // Description:
+  // I am using this method instead of MakeTclObject.
+  void SetInteractor(vtkPVGenericRenderWindowInteractor *iren);
+  vtkPVGenericRenderWindowInteractor* GetInteractor() {return this->Interactor;}
+
 protected:
   vtkPVWindow();
   ~vtkPVWindow();
@@ -517,6 +513,11 @@ protected:
 
   // Main render window
   vtkPVRenderView *MainView;
+
+  // Should I move this to vtkPVRenderView?
+  vtkPVGenericRenderWindowInteractor *Interactor;
+  char *InteractorTclName;
+  vtkSetStringMacro(InteractorTclName);  
 
   // ParaView specific menus
   vtkKWMenu *SourceMenu;
@@ -540,9 +541,7 @@ protected:
   vtkKWRadioButton *RotateCameraButton;
   vtkKWRadioButton *TranslateCameraButton;
   vtkKWRadioButton *TrackballCameraButton;
-  
-  vtkPVGenericRenderWindowInteractor *GenericInteractor;
-  
+    
   // Main toolbar
   vtkKWToolbar *Toolbar;
   

@@ -65,6 +65,19 @@ public:
 
   virtual void Render();
   
+  // Description:
+  // Methods broadcasted to the satellites to synchronize 3D widgets.
+  void SatelliteLeftPress(int x, int y, int control, int shift);
+  void SatelliteMiddlePress(int x, int y, int control, int shift);
+  void SatelliteRightPress(int x, int y, int control, int shift);
+  void SatelliteLeftRelease(int x, int y, int control, int shift);
+  void SatelliteMiddleRelease(int x, int y, int control, int shift);
+  void SatelliteRightRelease(int x, int y, int control, int shift);
+  void SatelliteMove(int x, int y);
+
+
+
+
 protected:
   vtkPVGenericRenderWindowInteractor();
   ~vtkPVGenericRenderWindowInteractor();

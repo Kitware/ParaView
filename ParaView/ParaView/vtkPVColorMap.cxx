@@ -74,7 +74,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVColorMap);
-vtkCxxRevisionMacro(vtkPVColorMap, "1.43");
+vtkCxxRevisionMacro(vtkPVColorMap, "1.44");
 
 int vtkPVColorMapCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -881,7 +881,7 @@ void vtkPVColorMap::CreateParallelTclObjects(vtkPVApplication *pvApp)
 
   this->ScalarBar = vtkScalarBarWidget::New();
   this->ScalarBar->SetInteractor(
-    this->PVRenderView->GetPVWindow()->GetGenericInteractor());
+    this->PVRenderView->GetPVWindow()->GetInteractor());
   this->ScalarBar->GetScalarBarActor()->GetPositionCoordinate()
     ->SetValue(0.87, 0.25);
   this->ScalarBar->GetScalarBarActor()->SetWidth(0.13);

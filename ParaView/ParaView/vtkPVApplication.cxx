@@ -83,6 +83,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVSourceInterfaceDirectories.h"
 #include "vtkPVTraceFileDialog.h"
 #include "vtkPVWindow.h"
+#include "vtkPVClientServerModule.h"
 #include "vtkPointData.h"
 #include "vtkPolyData.h"
 #include "vtkPolyDataMapper.h"
@@ -113,7 +114,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.177");
+vtkCxxRevisionMacro(vtkPVApplication, "1.178");
 
 
 int vtkPVApplicationCommand(ClientData cd, Tcl_Interp *interp,
@@ -370,6 +371,18 @@ vtkMultiProcessController* vtkPVApplication::GetController()
 }
 
 //----------------------------------------------------------------------------
+vtkSocketController* vtkPVApplication::GetSocketController()
+{
+  vtkPVClientServerModule *csm;
+  csm = vtkPVClientServerModule::SafeDownCast(this->ProcessModule);
+  if (csm)
+    {
+    return csm->GetSocketController();
+    }
+  return NULL;
+}
+
+//----------------------------------------------------------------------------
 vtkPVWindow *vtkPVApplication::GetMainWindow()
 {
   this->Windows->InitTraversal();
@@ -574,7 +587,7 @@ int vtkPVApplication::CheckForExtension(const char* arg,
     {
     return 0;
     }
-  int extLen = strlen(ext);
+  int extLen = static_cast<int>(strlen(ext));
   if (extLen <= 0)
     {
     return 0;

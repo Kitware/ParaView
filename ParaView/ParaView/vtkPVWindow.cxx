@@ -43,6 +43,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkActor.h"
 #include "vtkArrayMap.txx"
+#include "vtkPVGenericRenderWindowInteractor.h"
 #include "vtkAxes.h"
 #include "vtkCamera.h"
 #include "vtkCollection.h"
@@ -83,7 +84,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVDataInformation.h"
 #include "vtkPVDemoPaths.h"
 #include "vtkPVErrorLogDisplay.h"
-#include "vtkPVGenericRenderWindowInteractor.h"
 #include "vtkPVGhostLevelDialog.h"
 #include "vtkPVInitialize.h"
 #include "vtkPVInteractorStyle.h"
@@ -126,7 +126,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.411");
+vtkCxxRevisionMacro(vtkPVWindow, "1.412");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -134,6 +134,8 @@ int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
 //----------------------------------------------------------------------------
 vtkPVWindow::vtkPVWindow()
 {
+  this->Interactor = 0;
+
   this->Interaction = 0;
   this->NamesToSources = 0;
   this->SetWindowClass("ParaView");
@@ -160,9 +162,7 @@ vtkPVWindow::vtkPVWindow()
   //this->FlyButton = vtkKWRadioButton::New();
   this->RotateCameraButton = vtkKWRadioButton::New();
   this->TranslateCameraButton = vtkKWRadioButton::New();
-  
-  this->GenericInteractor = vtkPVGenericRenderWindowInteractor::New();
-  
+    
   // This toolbar contains buttons for instantiating new modules
   this->Toolbar = vtkKWToolbar::New();
 
@@ -173,7 +173,6 @@ vtkPVWindow::vtkPVWindow()
   this->CameraStyle3D = vtkPVInteractorStyle::New();
   this->CameraStyle2D = vtkPVInteractorStyle::New();
   this->CenterOfRotationStyle = vtkPVInteractorStyleCenterOfRotation::New();
-//  this->FlyStyle = vtkPVInteractorStyleFly::New();
   
   this->PickCenterToolbar = vtkKWToolbar::New();
   this->PickCenterButton = vtkKWPushButton::New();
@@ -273,12 +272,22 @@ vtkPVWindow::vtkPVWindow()
 
   this->UserInterfaceManager = 0;
   this->ApplicationSettingsInterface = 0;
+
+  this->InteractorTclName = 0;
 }
 
 //----------------------------------------------------------------------------
 vtkPVWindow::~vtkPVWindow()
 {
-  
+  if (this->InteractorTclName)
+    {
+    vtkPVApplication *pvApp = this->GetPVApplication();
+    pvApp->BroadcastScript("%s SetRenderWindow {}", this->InteractorTclName);
+    pvApp->BroadcastScript("%s Delete", this->InteractorTclName);
+    this->SetInteractorTclName(NULL);
+    this->SetInteractor(NULL);
+    }
+
   if ( this->NamesToSources )
     {
     this->NamesToSources->Delete();
@@ -453,12 +462,6 @@ void vtkPVWindow::PrepareForDelete()
     this->CenterOfRotationStyle = NULL;
     }
   
-  if (this->GenericInteractor)
-    {
-    this->GenericInteractor->Delete();
-    this->GenericInteractor = NULL;
-    }
-
   if (this->Toolbar)
     {
     this->Toolbar->Delete();
@@ -851,6 +854,14 @@ void vtkPVWindow::AddToolbarButton(const char* buttonName,
   button->Delete();
 }
 
+
+//----------------------------------------------------------------------------
+void vtkPVWindow::SetInteractor(vtkPVGenericRenderWindowInteractor *interactor)
+{
+  // Do not bother referencing.
+  this->Interactor = interactor;
+}
+
 //----------------------------------------------------------------------------
 void vtkPVWindow::Create(vtkKWApplication *app, char* vtkNotUsed(args))
 {
@@ -1043,8 +1054,17 @@ void vtkPVWindow::Create(vtkKWApplication *app, char* vtkNotUsed(args))
   
   pvApp->BroadcastScript("%s AddActor %s", this->MainView->GetRendererTclName(),
                          this->CenterActorTclName);
-  
-  this->GenericInteractor->SetPVRenderView(this->MainView);
+
+  // Create a dummy interactor on the satellites so they han have 3d widgets.
+  pvApp->BroadcastScript("vtkPVGenericRenderWindowInteractor pvRenderWindowInteractor");
+  pvApp->BroadcastScript("pvRenderWindowInteractor SetRenderWindow %s", 
+                         this->MainView->GetRenderWindowTclName());
+  this->SetInteractorTclName("pvRenderWindowInteractor");  
+  this->Script("%s SetInteractor pvRenderWindowInteractor", this->GetTclName());
+
+  // Only on client/proc0 (Only they render directly).
+  this->Script("%s SetPVRenderView %s", this->InteractorTclName,
+               this->MainView->GetTclName());
   this->ChangeInteractorStyle(1);
 
   // Configure the window, i.e. setup the interactors
@@ -1421,17 +1441,12 @@ void vtkPVWindow::ChangeInteractorStyle(int index)
   
   switch (index)
     {
-//     case 0:
-//       this->RotateCameraButton->SetState(0);
-//       this->TranslateCameraButton->SetState(0);
-//       this->HideCenterActor();
-//       this->GenericInteractor->SetInteractorStyle(this->FlyStyle);
-//       this->FlySpeedToolbar->Pack("-side left");
-//       break;
     case 1:
       //this->FlyButton->SetState(0);
       this->TranslateCameraButton->SetState(0);
-      this->GenericInteractor->SetInteractorStyle(this->CameraStyle3D);
+      // Camera styles are not duplicated on satellites.
+      // Cameras are synchronized before each render.
+      this->Interactor->SetInteractorStyle(this->CameraStyle3D);
       this->PickCenterToolbar->Pack("-side left");
       this->ResizeCenterActor();
       this->ShowCenterActor();
@@ -1439,14 +1454,14 @@ void vtkPVWindow::ChangeInteractorStyle(int index)
     case 2:
       //this->FlyButton->SetState(0);
       this->RotateCameraButton->SetState(0);
-      this->GenericInteractor->SetInteractorStyle(this->CameraStyle2D);
+      this->Interactor->SetInteractorStyle(this->CameraStyle2D);
       this->HideCenterActor();
       break;
     case 3:
       vtkErrorMacro("Trackball no longer suported.");
       break;
     case 4:
-      this->GenericInteractor->SetInteractorStyle(this->CenterOfRotationStyle);
+      this->Interactor->SetInteractorStyle(this->CenterOfRotationStyle);
       this->HideCenterActor();
       break;
     }
@@ -1463,54 +1478,48 @@ void vtkPVWindow::MouseAction(int action,int button,
     {
     if (button == 1)
       {
-      this->GenericInteractor->SetEventInformationFlipY(x, y, control, shift);
-      this->GenericInteractor->LeftButtonPressEvent();
       // Send the same event to the satellite to synchronize the 3D widgets.
       // Maybe I should itegrate this into the PV interactor.
-      pvApp->BroadcastScript("IRen LeftPress %d %d %d %d", x, y, control, shift);
+      pvApp->BroadcastScript("pvRenderWindowInteractor SatelliteLeftPress %d %d %d %d", 
+                             x, y, control, shift);
       }
     else if (button == 2)
       {
-      this->GenericInteractor->SetEventInformationFlipY(x, y, control, shift);
-      this->GenericInteractor->MiddleButtonPressEvent();
       // Send the same event to the satellite to synchronize the 3D widgets.
       // Maybe I should itegrate this into the PV interactor.
-      pvApp->BroadcastScript("IRen MiddlePress %d %d %d %d", x, y, control, shift);
+      pvApp->BroadcastScript("pvRenderWindowInteractor SatelliteMiddlePress %d %d %d %d", 
+                             x, y, control, shift);
       }
     else if (button == 3)
       {
-      this->GenericInteractor->SetEventInformationFlipY(x, y, control, shift);
-      this->GenericInteractor->RightButtonPressEvent();
       // Send the same event to the satellite to synchronize the 3D widgets.
       // Maybe I should itegrate this into the PV interactor.
-      pvApp->BroadcastScript("IRen RightPress %d %d %d %d", x, y, control, shift);
+      pvApp->BroadcastScript("pvRenderWindowInteractor SatelliteRightPress %d %d %d %d", 
+                             x, y, control, shift);
       }    
     }
   else if ( action == 1 )
     {
     if (button == 1)
       {
-      this->GenericInteractor->SetEventInformationFlipY(x, y, control, shift);
-      this->GenericInteractor->LeftButtonReleaseEvent();
       // Send the same event to the satellite to synchronize the 3D widgets.
       // Maybe I should itegrate this into the PV interactor.
-      pvApp->BroadcastScript("IRen LeftRelease %d %d %d %d", x, y, control, shift);
+      pvApp->BroadcastScript("pvRenderWindowInteractor SatelliteLeftRelease %d %d %d %d", 
+                             x, y, control, shift);
       }
     else if (button == 2)
       {
-      this->GenericInteractor->SetEventInformationFlipY(x, y, control, shift);
-      this->GenericInteractor->MiddleButtonReleaseEvent();
       // Send the same event to the satellite to synchronize the 3D widgets.
       // Maybe I should itegrate this into the PV interactor.
-      pvApp->BroadcastScript("IRen MiddleRelease %d %d %d %d", x, y, control, shift);
+      pvApp->BroadcastScript("pvRenderWindowInteractor SatelliteMiddleRelease %d %d %d %d", 
+                             x, y, control, shift);
       }
     else if (button == 3)
       {
-      this->GenericInteractor->SetEventInformationFlipY(x, y, control, shift);
-      this->GenericInteractor->RightButtonReleaseEvent();
       // Send the same event to the satellite to synchronize the 3D widgets.
       // Maybe I should itegrate this into the PV interactor.
-      pvApp->BroadcastScript("IRen RightRelease %d %d %d %d", x, y, control, shift);
+      pvApp->BroadcastScript("pvRenderWindowInteractor SatelliteRightRelease %d %d %d %d", 
+                             x, y, control, shift);
       }    
 
     vtkCamera* cam = this->MainView->GetRenderer()->GetActiveCamera();
@@ -1529,11 +1538,9 @@ void vtkPVWindow::MouseAction(int action,int button,
     }
   else
     {
-    this->GenericInteractor->SetMoveEventInformationFlipY(x, y);
-    this->GenericInteractor->MouseMoveEvent();
     // Send the same event to the satellite to synchronize the 3D widgets.
     // Maybe I should itegrate this into the PV interactor.
-    pvApp->BroadcastScript("IRen Move %d %d", x, y);
+    pvApp->BroadcastScript("pvRenderWindowInteractor SatelliteMove %d %d", x, y);
     }
 }
 
@@ -1541,8 +1548,8 @@ void vtkPVWindow::MouseAction(int action,int button,
 void vtkPVWindow::Configure(int width, int height)
 {
   this->MainView->Configured();
-  this->GenericInteractor->UpdateSize(width, height);
-  this->GenericInteractor->ConfigureEvent();
+  this->Interactor->UpdateSize(width, height);
+  this->Interactor->ConfigureEvent();
 }
 
 //----------------------------------------------------------------------------
@@ -3892,7 +3899,7 @@ void vtkPVWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVWindow ";
-  this->ExtractRevision(os,"$Revision: 1.411 $");
+  this->ExtractRevision(os,"$Revision: 1.412 $");
 }
 
 //----------------------------------------------------------------------------
@@ -4244,7 +4251,7 @@ void vtkPVWindow::DeleteAllSources()
 void vtkPVWindow::SetInteraction(int s)
 {
   this->Interaction = s;
-  vtkPVGenericRenderWindowInteractor* rwi = this->GetGenericInteractor();
+  vtkPVGenericRenderWindowInteractor* rwi = this->Interactor;
   vtkRenderWindow* rw = this->GetMainView()->GetRenderWindow();
   if ( !rwi || !rw )
     {
@@ -4282,7 +4289,7 @@ void vtkPVWindow::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "Toolbar: " << this->GetToolbar() << endl;
   os << indent << "PickCenterToolbar: " << this->GetPickCenterToolbar() << endl;
 //  os << indent << "FlySpeedToolbar: " << this->GetFlySpeedToolbar() << endl;
-  os << indent << "GenericInteractor: " << this->GenericInteractor << endl;
+  os << indent << "Interactor: " << this->Interactor << endl;
   os << indent << "GlyphMenu: " << this->GlyphMenu << endl;
   os << indent << "InitializeDefaultInterfaces: " 
      << this->InitializeDefaultInterfaces << endl;

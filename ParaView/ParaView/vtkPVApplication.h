@@ -52,6 +52,7 @@ class vtkDataSet;
 class vtkKWMessageDialog;
 class vtkMapper;
 class vtkMultiProcessController;
+class vtkSocketController;
 class vtkPVProcessModule;
 class vtkPVOutputWindow;
 class vtkPVSource;
@@ -113,6 +114,12 @@ public:
   // more "RegisterAndGetGlobalController" method.
   vtkMultiProcessController *GetController();
   
+  // Description:
+  // If ParaView is running in client server mode, then this returns
+  // the socket controller used for client server communication.
+  // It will only be set on the client and process 0 of the server.
+  vtkSocketController *GetSocketController();
+
   // Description:
   // Make sure the user accepts the license before running.
   int AcceptLicense();

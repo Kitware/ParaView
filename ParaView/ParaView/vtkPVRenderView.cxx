@@ -67,17 +67,17 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVConfig.h"
 #include "vtkPVData.h"
 #include "vtkPVDataInformation.h"
-#include "vtkPVPart.h"
 #include "vtkPVGenericRenderWindowInteractor.h"
+#include "vtkPVPart.h"
 #include "vtkPVInteractorStyleControl.h"
 #include "vtkPVNavigationWindow.h"
 #include "vtkPVProcessModule.h"
 #include "vtkPVRenderView.h"
-#include "vtkPVSource.h"
 #include "vtkPVSourceCollection.h"
 #include "vtkPVSourceList.h"
 #include "vtkPVTreeComposite.h"
 #include "vtkPVWindow.h"
+#include "vtkPVSource.h"
 #include "vtkPolyData.h"
 #include "vtkPolyDataMapper.h"
 #include "vtkRenderer.h"
@@ -109,7 +109,7 @@ static unsigned char image_properties[] =
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.231");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.232");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -215,7 +215,6 @@ vtkPVRenderView::vtkPVRenderView()
   this->RendererTclName     = 0;
   this->CompositeTclName    = 0;
   this->RenderWindowTclName = 0;
-  this->SatelliteInteractorTclName = 0;
   this->InteractiveCompositeTime = 0;
   this->InteractiveRenderTime    = 0;
   this->StillRenderTime          = 0;
@@ -305,13 +304,6 @@ vtkPVRenderView::~vtkPVRenderView()
   if ( this->Application )
     {
     pvApp = this->GetPVApplication();
-    }
-
-  if (this->SatelliteInteractorTclName)
-    {
-    pvApp->BroadcastScript("%s SetRenderWindow {}", this->SatelliteInteractorTclName);
-    pvApp->BroadcastScript("%s Delete", this->SatelliteInteractorTclName);
-    this->SetSatelliteInteractorTclName(NULL);
     }
 
   this->InterfaceSettingsFrame->Delete();
@@ -586,10 +578,6 @@ void vtkPVRenderView::CreateRenderObjects(vtkPVApplication *pvApp)
     }
   pvApp->BroadcastScript("%s AddRenderer %s", this->RenderWindowTclName,
                            this->RendererTclName);
-  // Create a dummy interactor on the satellites so they han have 3d widgets.
-  pvApp->BroadcastScript("vtkPVSatelliteRenderWindowInteractor IRen");
-  pvApp->BroadcastScript("IRen SetRenderWindow %s", this->RenderWindowTclName);
-  this->SetSatelliteInteractorTclName("IRen");  
   
   pvApp->BroadcastScript("%s SetRenderWindow %s", this->CompositeTclName,
                          this->RenderWindowTclName);
@@ -1992,7 +1980,7 @@ void vtkPVRenderView::EventuallyRenderCallBack()
     }
   this->EventuallyRenderFlag = 0;
   this->RenderWindow->SetDesiredUpdateRate(
-    this->GetPVWindow()->GetGenericInteractor()->GetStillUpdateRate());
+    this->GetPVWindow()->GetInteractor()->GetStillUpdateRate());
 
   // I do not know if these are necessary here.
   abort = this->ShouldIAbort();
@@ -2033,6 +2021,7 @@ void vtkPVRenderView::TriangleStripsCallback()
   vtkPVSource *pvs;
   vtkPVData *pvd;
   vtkPVApplication *pvApp;
+  int numParts, partIdx;
 
   pvApp = this->GetPVApplication();
   pvWin = this->GetPVWindow();
@@ -2047,9 +2036,13 @@ void vtkPVRenderView::TriangleStripsCallback()
   while ( (pvs = sources->GetNextPVSource()) )
     {
     pvd = pvs->GetPVOutput();
-    pvApp->BroadcastScript("%s SetUseStrips %d",
-                           pvd->GetPVPart()->GetGeometryTclName(),
-                           this->TriangleStripsCheck->GetState());
+    numParts = pvd->GetNumberOfPVParts();
+    for (partIdx = 0; partIdx < numParts; ++partIdx)
+      {
+      pvApp->BroadcastScript("%s SetUseStrips %d",
+                             pvd->GetPVPart(partIdx)->GetGeometryTclName(),
+                             this->TriangleStripsCheck->GetState());
+      }
     }
 
   if (this->TriangleStripsCheck->GetState())
@@ -2089,6 +2082,7 @@ void vtkPVRenderView::ImmediateModeCallback()
   vtkPVSource *pvs;
   vtkPVData *pvd;
   vtkPVApplication *pvApp;
+  int partIdx, numParts;
 
   pvApp = this->GetPVApplication();
   pvWin = this->GetPVWindow();
@@ -2103,12 +2097,16 @@ void vtkPVRenderView::ImmediateModeCallback()
   while ( (pvs = sources->GetNextPVSource()) )
     {
     pvd = pvs->GetPVOutput();
-    pvApp->BroadcastScript("%s SetImmediateModeRendering %d",
-                           pvd->GetPVPart()->GetMapperTclName(),
-                           this->ImmediateModeCheck->GetState());
-    pvApp->BroadcastScript("%s SetImmediateModeRendering %d",
-                           pvd->GetPVPart()->GetLODMapperTclName(),
-                           this->ImmediateModeCheck->GetState());
+    numParts = pvd->GetNumberOfPVParts();
+    for (partIdx = 0; partIdx < numParts; ++partIdx)
+      {
+      pvApp->BroadcastScript("%s SetImmediateModeRendering %d",
+                             pvd->GetPVPart(partIdx)->GetMapperTclName(),
+                             this->ImmediateModeCheck->GetState());
+      pvApp->BroadcastScript("%s SetImmediateModeRendering %d",
+                             pvd->GetPVPart(partIdx)->GetLODMapperTclName(),
+                             this->ImmediateModeCheck->GetState());
+      }
     }
 
   if (this->ImmediateModeCheck->GetState())
@@ -2654,7 +2652,7 @@ void vtkPVRenderView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVRenderView ";
-  this->ExtractRevision(os,"$Revision: 1.231 $");
+  this->ExtractRevision(os,"$Revision: 1.232 $");
 }
 
 //------------------------------------------------------------------------------
