@@ -111,7 +111,7 @@ static unsigned char image_properties[] =
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.265.2.3");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.265.2.4");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -759,8 +759,15 @@ void vtkPVRenderView::SwitchBackAndForthToViewProperties()
     if (this->MenuLabelSwitchBackAndForthToViewProperties &&
         viewmenu->HasItem(this->MenuLabelSwitchBackAndForthToViewProperties))
       {
+      // This entry of the view menu must be in "normal" state to switch
+      // between source and 3D views.
+      int state = viewmenu->GetState(this->MenuLabelSwitchBackAndForthToViewProperties);
+      viewmenu->SetState(this->MenuLabelSwitchBackAndForthToViewProperties,
+                         vtkKWMenu::Normal);
       viewmenu->Invoke(
         viewmenu->GetIndex(this->MenuLabelSwitchBackAndForthToViewProperties));
+      viewmenu->SetState(this->MenuLabelSwitchBackAndForthToViewProperties,
+                         state);
       }
     }
 }
