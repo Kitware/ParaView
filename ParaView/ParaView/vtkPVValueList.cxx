@@ -35,7 +35,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVValueList);
-vtkCxxRevisionMacro(vtkPVValueList, "1.9");
+vtkCxxRevisionMacro(vtkPVValueList, "1.10");
 
 int vtkPVValueListCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -370,7 +370,7 @@ void vtkPVValueList::Update()
     this->NewValueEntry->SetValue(range[0]);
 
     this->GenerateRangeWidget->SetWholeRange(range[0], range[1]);
-    this->GenerateRangeWidget->SetRange(range[0], range[1]);
+    //this->GenerateRangeWidget->SetRange(range[0], range[1]);
 
     return;
     }
@@ -387,7 +387,7 @@ void vtkPVValueList::Update()
   if (oldRange[0] != range[0] || oldRange[1] != range[1])
     {
     this->GenerateRangeWidget->SetResolution(resolution);
-    this->GenerateRangeWidget->SetWholeRange(range[0], range[1]);
+    //this->GenerateRangeWidget->SetWholeRange(range[0], range[1]);
     this->GenerateRangeWidget->SetRange(range[0], range[1]);
 
     this->NewValueEntry->SetResolution(resolution);
