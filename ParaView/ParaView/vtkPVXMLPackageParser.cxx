@@ -57,7 +57,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <ctype.h>
 
-vtkCxxRevisionMacro(vtkPVXMLPackageParser, "1.10");
+vtkCxxRevisionMacro(vtkPVXMLPackageParser, "1.11");
 vtkStandardNewMacro(vtkPVXMLPackageParser);
 
 #ifndef VTK_NO_EXPLICIT_TEMPLATE_INSTANTIATION
@@ -462,6 +462,7 @@ int vtkPVXMLPackageParser::CreateModule(vtkPVXMLElement* me, vtkPVSource* pvm)
     this->Window->AddToolbarButton(name, button_image, button_image_file,
                                    command.str(), button_help);
     command.rdbuf()->freeze(0);
+    pvm->SetToolbarModule(1);
     }
 
   const char* multiprocess_support = me->GetAttribute("multiprocess_support");
