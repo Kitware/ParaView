@@ -227,6 +227,7 @@ class VTK_EXPORT vtkStreamingTessellator : public vtkObject
 #ifdef PARAVIEW_DEBUG_TESSELLATOR
       return this->CaseCounts[c];
 #else
+      (void)c;
       return 0;
 #endif // PARAVIEW_DEBUG_TESSELLATOR
       }
@@ -235,6 +236,8 @@ class VTK_EXPORT vtkStreamingTessellator : public vtkObject
 #ifdef PARAVIEW_DEBUG_TESSELLATOR
       return this->SubcaseCounts[casenum][sub];
 #else
+      (void)casenum;
+      (void)sub;
       return 0;
 #endif // PARAVIEW_DEBUG_TESSELLATOR
       }
