@@ -73,6 +73,7 @@ void vtkKWImageLabel::SetImageData(const unsigned char* data,
 {
   int r, g, b;
   this->GetBackgroundColor(&r, &g, &b);
+  cout << "Color: " << r << ", " << g << ", " << b << endl;
   this->Script("image create photo -height %d -width %d", width, height);
   this->SetImageDataLabel(this->Application->GetMainInterp()->result);
   Tk_PhotoHandle photo;
@@ -83,14 +84,15 @@ void vtkKWImageLabel::SetImageData(const unsigned char* data,
   const unsigned char *dd = data;
   int xx, yy;
 
-  unsigned char array[4];
-  sblock.pixelPtr  = array;
-  sblock.width     = 1;
-  sblock.height    = 1;
-  sblock.pitch     = 0;
+  sblock.width     = width;
+  sblock.height    = height;
+  sblock.pixelSize = 3;
+  sblock.pitch     = width * sblock.pixelSize;
   sblock.offset[0] = 0;
   sblock.offset[1] = 1;
   sblock.offset[2] = 2;
+  unsigned char *array = new unsigned char[ width * height * sblock.pixelSize ];
+  sblock.pixelPtr  = array;
 
   unsigned char *pp = sblock.pixelPtr;
   
@@ -103,12 +105,13 @@ void vtkKWImageLabel::SetImageData(const unsigned char* data,
       *(pp)   = static_cast<int>(r*(1-alpha) + *(dd) * alpha);
       *(pp+1) = static_cast<int>(g*(1-alpha) + *(dd+1) * alpha);
       *(pp+2) = static_cast<int>(b*(1-alpha) + *(dd+2) * alpha);
-      *(pp+3) = *(dd+3);
-      Tk_PhotoPutBlock(photo, &sblock, xx, yy, 1, 1);
       dd+=4;
+      pp+=3;
       }
     }
+  Tk_PhotoPutBlock(photo, &sblock, 0, 0, width, height);
   this->Script("%s configure -image %s", this->GetWidgetName(),
 	       this->ImageDataLabel);
+  delete [] array;
 }
 
