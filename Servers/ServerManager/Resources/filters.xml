@@ -2444,6 +2444,25 @@
          <Entry value="1" text="Cell"/>
        </EnumerationDomain>
      </IntVectorProperty>
+
+     <IntVectorProperty 
+        name="UseIdToPick" 
+        command="SetUseIdToPick" 
+        number_of_elements="1"
+        default_values="0" >
+       <EnumerationDomain>
+         <Entry value="0" text="On"/>
+         <Entry value="1" text="Off"/>
+       </EnumerationDomain>
+     </IntVectorProperty>
+
+     <IntVectorProperty 
+        name="Id" 
+        command="SetId" 
+        number_of_elements="1"
+        default_values="0" >
+     </IntVectorProperty>
+
    </SourceProxy>
 
   </ProxyGroup>
