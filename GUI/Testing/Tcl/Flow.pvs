@@ -1,0 +1,244 @@
+set pvWindow [$Application GetMainWindow]
+set pv(vtkTemp43) [$pvWindow GetMainView]
+set MainView [[$Application GetMainWindow] GetMainView]
+
+source [file join [file dirname [info script]] CommandLineOptions.tcl]
+ParseCommandLine $pv(vtkTemp43) $argv $argc
+
+
+
+
+
+set pv(vtkTemp533) [$pvWindow InitializeReadCustom "P3DReader" "$DataDir/Data/combxyz.bin"]
+$pvWindow ReadFileInformation $pv(vtkTemp533) "$DataDir/Data/combxyz.bin"
+$pvWindow FinalizeRead $pv(vtkTemp533) "$DataDir/Data/combxyz.bin"
+set pv(vtkTemp563) [$pv(vtkTemp533) GetPVWidget {Filename}]
+$pv(vtkTemp563) SetValue "$DataDir/Data/combxyz.bin"
+set pv(vtkTemp534) [$pv(vtkTemp533) GetPVWidget {QFileName}]
+$pv(vtkTemp534) SetValue "$DataDir/Data/combq.bin"
+set pv(vtkTemp541) [$pv(vtkTemp533) GetPVWidget {BinaryFile}]
+$pv(vtkTemp541) SetState 1
+set pv(vtkTemp544) [$pv(vtkTemp533) GetPVWidget {MultiGrid}]
+$pv(vtkTemp544) SetState 0
+set pv(vtkTemp547) [$pv(vtkTemp533) GetPVWidget {HasByteCount}]
+$pv(vtkTemp547) SetState 0
+set pv(vtkTemp550) [$pv(vtkTemp533) GetPVWidget {IBlanking}]
+$pv(vtkTemp550) SetState 0
+set pv(vtkTemp553) [$pv(vtkTemp533) GetPVWidget {TwoDimensionalGeometry}]
+$pv(vtkTemp553) SetState 0
+set pv(vtkTemp556) [$pv(vtkTemp533) GetPVWidget {ForceRead}]
+$pv(vtkTemp556) SetState 0
+set pv(vtkTemp560) [$pv(vtkTemp533) GetPVWidget {ByteOrder}]
+$pv(vtkTemp560) SetCurrentValue {0}
+$pvWindow SetCenterOfRotation 8.255000 0.000000 29.763084
+$pvWindow SetCenterOfRotation 8.255000 0.000000 29.763084
+$pv(vtkTemp533) AcceptCallback
+
+set pv(vtkTemp41) [$pv(vtkTemp533) GetPVOutput]
+$pv(vtkTemp41) ColorByPointField {Density} 1
+$pvWindow SetCurrentPVSourceCallback $pv(vtkTemp533)
+set pv(vtkTemp632) [$pvWindow CreatePVSource Cut]
+$pv(vtkTemp632) SetLabel {Cut0}
+set pv(vtkTemp703) [$pv(vtkTemp632) GetPVWidget {Input}]
+$pv(vtkTemp703) SetCurrentValue $pv(vtkTemp533)
+set pv(vtkTemp673) [$pv(vtkTemp632) GetPVWidget {Cut Function}]
+set pv(vtkTemp642) [$pv(vtkTemp673) GetPVWidget {Plane}]
+$pv(vtkTemp642) SetCenter 6.1908 0.80089 28.571
+$pv(vtkTemp642) SetNormal 0.78547 -0.38007 0.48845
+$pv(vtkTemp673) SetCurrentValue {Plane}
+$pv(vtkTemp642) SetCenter 6.1908 0.80089 28.571
+$pv(vtkTemp642) SetNormal 0.78547 -0.38007 0.48845
+set pv(vtkTemp677) [$pv(vtkTemp632) GetPVWidget {Cut Values}]
+$pv(vtkTemp677) RemoveAllValues
+$pv(vtkTemp677) AddValue 0
+$pv(vtkTemp632) AcceptCallback
+
+$pv(vtkTemp41) ColorByPointField {Density} 1
+$pvWindow SetCurrentPVSourceCallback $pv(vtkTemp632)
+set pv(vtkTemp705) [$pvWindow CreatePVSource IntegrateFlowThroughSurface]
+$pv(vtkTemp705) SetLabel {SurfaceFlow0}
+set pv(vtkTemp708) [$pv(vtkTemp705) GetPVWidget {Input}]
+$pv(vtkTemp708) SetCurrentValue $pv(vtkTemp632)
+set pv(vtkTemp709) [$pv(vtkTemp705) GetPVWidget {Vectors}]
+$pv(vtkTemp709) SetValue {Momentum}
+$pv(vtkTemp705) AcceptCallback
+
+$pv(vtkTemp41) DrawWireframe
+$pv(vtkTemp41) ColorByProperty
+$pv(vtkTemp41) ChangeActorColor 0.800000 0.000000 0.200000
+$pv(vtkTemp41) SetLineWidth 2
+$pv(vtkTemp41) ColorByProperty
+$pvWindow SetCurrentPVSourceCallback $pv(vtkTemp705)
+set pv(vtkTemp711) [$pvWindow CreatePVSource Glyph]
+$pv(vtkTemp711) SetLabel {Glyph0}
+set pv(vtkTemp734) [$pv(vtkTemp711) GetPVWidget {Input}]
+$pv(vtkTemp734) SetCurrentValue $pv(vtkTemp705)
+set pv(vtkTemp735) [$pv(vtkTemp711) GetPVWidget {Glyph}]
+set pv(vtkTemp406) [$pvWindow GetPVSource GlyphSources Arrow0]
+$pv(vtkTemp735) SetCurrentValue $pv(vtkTemp406)
+set pv(vtkTemp720) [$pv(vtkTemp711) GetPVWidget {OrientScale}]
+$pv(vtkTemp720) SetOrientMode {Vector}
+$pv(vtkTemp720) SetScaleMode {Vector Magnitude}
+$pv(vtkTemp720) SetScalars {Surface Flow}
+$pv(vtkTemp720) SetVectors {Momentum}
+$pv(vtkTemp720) SetScaleFactor 0.001
+set pv(vtkTemp723) [$pv(vtkTemp711) GetPVWidget {Max Glyphs}]
+$pv(vtkTemp723) SetValue 5000
+set pv(vtkTemp728) [$pv(vtkTemp711) GetPVWidget {MaskPoints}]
+$pv(vtkTemp728) SetState 1
+set pv(vtkTemp731) [$pv(vtkTemp711) GetPVWidget {RandomMask}]
+$pv(vtkTemp731) SetState 1
+$pv(vtkTemp711) AcceptCallback
+
+$pv(vtkTemp41) ColorByProperty
+$pvWindow SetCurrentPVSourceCallback $pv(vtkTemp632)
+set pv(vtkTemp801) [$pvWindow CreatePVSource SurfaceVectors]
+$pv(vtkTemp801) SetLabel {SurfaceV0}
+set pv(vtkTemp808) [$pv(vtkTemp801) GetPVWidget {Input}]
+$pv(vtkTemp808) SetCurrentValue $pv(vtkTemp632)
+set pv(vtkTemp809) [$pv(vtkTemp801) GetPVWidget {Vectors}]
+$pv(vtkTemp809) SetValue {Momentum}
+set pv(vtkTemp805) [$pv(vtkTemp801) GetPVWidget {ConstraintMode}]
+$pv(vtkTemp805) SetCurrentValue {0}
+$pv(vtkTemp801) AcceptCallback
+
+$pv(vtkTemp41) ColorByPointField {Density} 1
+$pvWindow SetCurrentPVSourceCallback $pv(vtkTemp801)
+set pv(vtkTemp811) [$pvWindow CreatePVSource Glyph]
+$pv(vtkTemp811) SetLabel {Glyph1}
+set pv(vtkTemp834) [$pv(vtkTemp811) GetPVWidget {Input}]
+$pv(vtkTemp834) SetCurrentValue $pv(vtkTemp801)
+set pv(vtkTemp835) [$pv(vtkTemp811) GetPVWidget {Glyph}]
+$pv(vtkTemp835) SetCurrentValue $pv(vtkTemp406)
+set pv(vtkTemp820) [$pv(vtkTemp811) GetPVWidget {OrientScale}]
+$pv(vtkTemp820) SetOrientMode {Vector}
+$pv(vtkTemp820) SetScaleMode {Vector Magnitude}
+$pv(vtkTemp820) SetScalars {Density}
+$pv(vtkTemp820) SetVectors {Momentum}
+$pv(vtkTemp820) SetScaleFactor 0.008
+set pv(vtkTemp823) [$pv(vtkTemp811) GetPVWidget {Max Glyphs}]
+$pv(vtkTemp823) SetValue 300
+set pv(vtkTemp828) [$pv(vtkTemp811) GetPVWidget {MaskPoints}]
+$pv(vtkTemp828) SetState 1
+set pv(vtkTemp831) [$pv(vtkTemp811) GetPVWidget {RandomMask}]
+$pv(vtkTemp831) SetState 0
+$pv(vtkTemp811) AcceptCallback
+
+$pv(vtkTemp41) ColorByProperty
+$pvWindow SetCurrentPVSourceCallback $pv(vtkTemp632)
+set pv(vtkTemp837) [$pvWindow CreatePVSource IntegrateAttributes]
+$pv(vtkTemp837) SetLabel {Integrate0}
+set pv(vtkTemp839) [$pv(vtkTemp837) GetPVWidget {Input}]
+$pv(vtkTemp839) SetCurrentValue $pv(vtkTemp632)
+$pv(vtkTemp837) AcceptCallback
+$pv(vtkTemp41) DrawWireframe
+$pv(vtkTemp41) ColorByProperty
+$pv(vtkTemp41) ChangeActorColor 0.800000 0.000000 0.200000
+$pv(vtkTemp41) SetLineWidth 2
+$pv(vtkTemp41) ColorByProperty
+$pvWindow SetCurrentPVSourceCallback $pv(vtkTemp837)
+set pv(vtkTemp841) [$pvWindow CreatePVSource Glyph]
+$pv(vtkTemp841) SetLabel {Glyph2}
+set pv(vtkTemp864) [$pv(vtkTemp841) GetPVWidget {Input}]
+$pv(vtkTemp864) SetCurrentValue $pv(vtkTemp837)
+set pv(vtkTemp865) [$pv(vtkTemp841) GetPVWidget {Glyph}]
+set pv(vtkTemp478) [$pvWindow GetPVSource GlyphSources Sphere0]
+$pv(vtkTemp865) SetCurrentValue $pv(vtkTemp478)
+set pv(vtkTemp850) [$pv(vtkTemp841) GetPVWidget {OrientScale}]
+$pv(vtkTemp850) SetOrientMode {Off}
+$pv(vtkTemp850) SetScaleMode {Data Scaling Off}
+$pv(vtkTemp850) SetScalars {Density}
+$pv(vtkTemp850) SetVectors {Momentum}
+$pv(vtkTemp850) SetScaleFactor 2
+set pv(vtkTemp853) [$pv(vtkTemp841) GetPVWidget {Max Glyphs}]
+$pv(vtkTemp853) SetValue 5000
+set pv(vtkTemp858) [$pv(vtkTemp841) GetPVWidget {MaskPoints}]
+$pv(vtkTemp858) SetState 1
+set pv(vtkTemp861) [$pv(vtkTemp841) GetPVWidget {RandomMask}]
+$pv(vtkTemp861) SetState 1
+$pv(vtkTemp841) AcceptCallback
+
+$pv(vtkTemp41) ColorByPointField {Momentum} 3
+$pv(vtkTemp632) SetVisibility 1
+$pv(vtkTemp705) SetVisibility 0
+$pv(vtkTemp801) SetVisibility 0
+set pv(vtkTemp571) [$pvWindow GetPVColorMap {Density} 1]
+$pv(vtkTemp571) VectorModeMagnitudeCallback
+$pv(vtkTemp571) SetScalarRange 0.200965 0.638639
+set pv(vtkTemp740) [$pvWindow GetPVColorMap {Surface Flow} 1]
+$pv(vtkTemp740) VectorModeMagnitudeCallback
+$pv(vtkTemp740) SetScalarRange -5285.36 -5285.36
+set pv(vtkTemp940) [$pvWindow GetPVColorMap {StagnationEnergy} 1]
+$pv(vtkTemp940) VectorModeMagnitudeCallback
+$pv(vtkTemp940) SetScalarBarVisibility 1
+$pv(vtkTemp940) SetScalarBarPosition1 0.238571 0.036329
+$pv(vtkTemp940) SetScalarBarPosition2 0.500000 0.130000
+$pv(vtkTemp940) SetScalarBarOrientation 0
+set pv(vtkTemp870) [$pvWindow GetPVColorMap {Momentum} 3]
+$pv(vtkTemp870) SetScalarBarLabelFormat {%.0f}
+$pv(vtkTemp870) SetStartHSV 57.93 -26.85 -30.21
+$pv(vtkTemp870) SetEndHSV 57.93 26.85 30.21
+$pv(vtkTemp870) VectorModeMagnitudeCallback
+$pv(vtkTemp870) SetScalarRange 0 20000
+$pv(vtkTemp870) SetScalarRangeLock 1
+$pv(vtkTemp870) SetScalarBarVisibility 1
+$pv(vtkTemp870) SetScalarBarPosition1 0.042143 0.028023
+$pv(vtkTemp870) SetScalarBarPosition2 0.876984 0.130000
+$pv(vtkTemp870) SetScalarBarOrientation 0
+$pv(vtkTemp43) SetCameraState 24.768 -13.614 49.146  -7.100 12.659 11.739  -0.546 0.392 0.740
+
+set pv(vtkTemp406) [$pvWindow GetPVSource GlyphSources Arrow0]
+set pv(vtkTemp408) [$pv(vtkTemp406) GetPVWidget {TipResolution}]
+$pv(vtkTemp408) SetValue 32
+set pv(vtkTemp423) [$pv(vtkTemp406) GetPVWidget {ShaftResolution}]
+$pv(vtkTemp423) SetValue 16
+$pv(vtkTemp406) AcceptCallback
+
+update
+
+
+source [file join [file dirname [info script]] Compare.tcl]
+Compare $Application $argv $argc
+
+$Application Exit
+
+
+#set didRegression 0
+
+#for {set i  1} {$i < [expr $argc - 1]} {incr i} {
+#    if {[lindex $argv $i] == "-C"} {
+#	source [lindex $argv [expr $i + 1]]
+#	$Application SetExitStatus [CompareImage [[$Application GetMainWindow] GetMainView]]
+#       set didRegression 1
+#    }
+#}
+
+# I copied this from CombustorTest.  I do not know if it is needed.
+# It looks like code to avoid memory leaks.
+#if { ! $didRegression } {
+#    set colorMaps [[$Application GetMainWindow] GetPVColorMaps]
+#    $colorMaps InitTraversal
+#    while { 1 } {
+#        set colorMap [$colorMaps GetNextItemAsObject]
+#        if { $colorMap == {} } {
+#            break
+#        }
+#        $colorMap SetScalarBarVisibility 0
+#    }
+#    for {set i  1} {$i < [expr $argc - 1]} {incr i} {
+#        if {[lindex $argv $i] == "-BT"} {
+#            source [lindex $argv [expr $i + 1]]
+#        }
+#    }
+#}
+
+#$Application Exit
+
+
+
+
+
+
+
+
+
