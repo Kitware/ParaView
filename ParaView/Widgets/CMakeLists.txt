@@ -162,8 +162,6 @@ TARGET_LINK_LIBRARIES (vtkKWWidgetsTCL
 vtkKWCommonTCL
 vtkHybridTCL
 vtkHybrid
-${TCL_LIBRARY}
-${TK_LIBRARY}
 )
 
 IF (VTK_USE_PARALLEL)

@@ -116,8 +116,6 @@ vtkGraphics
 vtkIO
 vtkFiltering
 vtkRendering
-${TCL_LIBRARY}
-${TK_LIBRARY}
 )
 
 IF (NOT DO_NOT_BUILD_XML_RW)
