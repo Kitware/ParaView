@@ -64,7 +64,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPart);
-vtkCxxRevisionMacro(vtkPVPart, "1.19");
+vtkCxxRevisionMacro(vtkPVPart, "1.20");
 
 int vtkPVPartCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -104,6 +104,8 @@ vtkPVPart::~vtkPVPart()
     {
     this->GetPVApplication()->GetProcessModule()->
       ServerScript("%s SetExtentTranslator {}", this->VTKDataTclName);
+    delete [] this->VTKDataTclName;
+    this->VTKDataTclName = NULL;
     }  
     
   this->SetName(NULL);
