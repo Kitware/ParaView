@@ -42,7 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkXMLDataElement.h"
 
 vtkStandardNewMacro(vtkXMLKWUserInterfaceNotebookManagerWriter);
-vtkCxxRevisionMacro(vtkXMLKWUserInterfaceNotebookManagerWriter, "1.2");
+vtkCxxRevisionMacro(vtkXMLKWUserInterfaceNotebookManagerWriter, "1.3");
 
 //----------------------------------------------------------------------------
 char* vtkXMLKWUserInterfaceNotebookManagerWriter::GetRootElementName()
@@ -60,6 +60,18 @@ char* vtkXMLKWUserInterfaceNotebookManagerWriter::GetVisiblePagesElementName()
 char* vtkXMLKWUserInterfaceNotebookManagerWriter::GetPageElementName()
 {
   return "Page";
+}
+
+//----------------------------------------------------------------------------
+char* vtkXMLKWUserInterfaceNotebookManagerWriter::GetDragAndDropEntriesElementName()
+{
+  return "DragAndDropEntries";
+}
+
+//----------------------------------------------------------------------------
+char* vtkXMLKWUserInterfaceNotebookManagerWriter::GetDragAndDropEntryElementName()
+{
+  return "DragAndDropEntry";
 }
 
 //----------------------------------------------------------------------------
@@ -109,10 +121,97 @@ int vtkXMLKWUserInterfaceNotebookManagerWriter::AddNestedElements(vtkXMLDataElem
         vp_elem->AddNestedElement(p_elem);
         p_elem->Delete();
         p_elem->SetName(this->GetPageElementName());
-        p_elem->SetAttribute("PanelName", panel->GetName());
+
+        // If the page title and the panel name are the same, output the
+        // page title only
+        // Output the Pinned attribute only the page is pinned, since we
+        // assumed a page is not pinned by default.
+        
+        const char *panel_name = panel->GetName();
+        const char *page_title = notebook->GetPageTitle(id);
+        if (panel_name && (!page_title || strcmp(panel_name, page_title)))
+          {
+          p_elem->SetAttribute("PanelName", panel->GetName());
+          }
         p_elem->SetAttribute("PageTitle", notebook->GetPageTitle(id));
-        p_elem->SetIntAttribute("Pinned", notebook->GetPagePinned(id));
+        int page_pinned = notebook->GetPagePinned(id);
+        if (page_pinned)
+          {
+          p_elem->SetIntAttribute("Pinned", page_pinned);
+          }
         }
+      }
+    }
+
+  // Drag&Drop
+
+  int nb_dd_entries = obj->GetNumberOfDragAndDropEntries();
+  if (nb_dd_entries)
+    {
+    vtkXMLDataElement *dd_elem = this->NewDataElement();
+    elem->AddNestedElement(dd_elem);
+    dd_elem->Delete();
+    dd_elem->SetName(this->GetDragAndDropEntriesElementName());
+
+    for (int idx = 0; idx < nb_dd_entries; idx++)
+      {
+      ostrstream widget_label;
+      ostrstream from_panel_name;
+      ostrstream from_page_title;
+      ostrstream from_after_widget_label;
+      ostrstream to_panel_name; 
+      ostrstream to_page_title;
+      ostrstream to_after_widget_label;
+      
+      if (obj->GetDragAndDropEntry(idx, 
+                                   widget_label, 
+                                   from_panel_name, 
+                                   from_page_title, 
+                                   from_after_widget_label,
+                                   to_panel_name, 
+                                   to_page_title, 
+                                   to_after_widget_label))
+        {
+        widget_label << ends;
+        from_panel_name << ends;
+        from_page_title << ends;
+        from_after_widget_label << ends;
+        to_panel_name << ends; 
+        to_page_title << ends;
+        to_after_widget_label << ends;
+
+        vtkXMLDataElement *p_elem = this->NewDataElement();
+        dd_elem->AddNestedElement(p_elem);
+        p_elem->Delete();
+        p_elem->SetName(this->GetDragAndDropEntryElementName());
+        p_elem->SetAttribute("WidgetLabel", widget_label.str());
+
+        vtkXMLDataElement *from_elem = this->NewDataElement();
+        p_elem->AddNestedElement(from_elem);
+        from_elem->Delete();
+        from_elem->SetName("From");
+        from_elem->SetAttribute("PanelName", from_panel_name.str());
+        from_elem->SetAttribute("PageTitle", from_page_title.str());
+        from_elem->SetAttribute(
+          "AfterWidgetLabel", from_after_widget_label.str());
+
+        vtkXMLDataElement *to_elem = this->NewDataElement();
+        p_elem->AddNestedElement(to_elem);
+        to_elem->Delete();
+        to_elem->SetName("To");
+        to_elem->SetAttribute("PanelName", to_panel_name.str());
+        to_elem->SetAttribute("PageTitle", to_page_title.str());
+        to_elem->SetAttribute(
+          "AfterWidgetLabel", to_after_widget_label.str());
+        }
+      
+      widget_label.rdbuf()->freeze(0);
+      from_panel_name.rdbuf()->freeze(0);
+      from_page_title.rdbuf()->freeze(0);
+      from_after_widget_label.rdbuf()->freeze(0);
+      to_panel_name.rdbuf()->freeze(0); 
+      to_page_title.rdbuf()->freeze(0);
+      to_after_widget_label.rdbuf()->freeze(0);
       }
     }
 

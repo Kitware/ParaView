@@ -100,9 +100,11 @@ public:
   virtual int AddPanel(vtkKWUserInterfacePanel *panel);
 
   // Description:
-  // Convenience method to get the panel from its name or ID
-  vtkKWUserInterfacePanel* GetPanel(const char *panel_name);
-  vtkKWUserInterfacePanel* GetPanel(int id);
+  // Convenience method to get the panel from its name or ID, or from a page
+  // ID (return the ID of the panel that holds that page).
+  virtual vtkKWUserInterfacePanel* GetPanel(const char *panel_name);
+  virtual vtkKWUserInterfacePanel* GetPanel(int id);
+  virtual vtkKWUserInterfacePanel* GetPanelFromPageId(int id) = 0;
 
   // Description:
   // Remove a panel from the manager.
@@ -196,7 +198,8 @@ protected:
   //BTX
 
   // A panel slot associate a panel to a unique Id
-  // No, I don't want to use a map between those two, for the following reasons:
+  // No, I don't want to use a map between those two, for the 
+  // following reasons:
   // a), we might need more information in the future, b) a map 
   // Register/Unregister pointers if they are pointers to VTK objects.
  
