@@ -151,7 +151,7 @@ typedef struct H5FL_arr_head_t {
  * Macros for defining & using free lists for an array of a type
  */
 /* Declare a free list to manage arrays of type 't' */
-#define H5FL_ARR_DEFINE(t,m)  H5FL_arr_head_t t##_arr_free_list={0,0,NULL,0,#t##"_arr",m+1,sizeof(t),{NULL}}
+#define H5FL_ARR_DEFINE(t,m)  H5FL_arr_head_t t##_arr_free_list={0,0,NULL,0,#t "_arr",m+1,sizeof(t),{NULL}}
 
 /* Reference a free list for arrays of type 't' defined in another file */
 #define H5FL_ARR_EXTERN(t)  extern H5FL_arr_head_t t##_arr_free_list
