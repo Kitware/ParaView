@@ -50,7 +50,7 @@
 #include "vtkPVRenderModule.h"
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVColorMap);
-vtkCxxRevisionMacro(vtkPVColorMap, "1.80");
+vtkCxxRevisionMacro(vtkPVColorMap, "1.81");
 
 int vtkPVColorMapCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -474,12 +474,6 @@ void vtkPVColorMap::Create(vtkKWApplication *app)
     "Grayscale", 
     this, "SetColorSchemeToGrayscale", "Set Color Scheme to Grayscale");
   
-  // This was a molecular color map that we do not need.
-  // We may want to allow editing of individual color entries ...
-  //this->PresetsMenuButton->AddCommand(
-  //  "RGBW", 
-  //  this, "SetColorSchemeToRGBW", "Set Color Scheme to RGBW (Red Blue Green White)");
-
   this->PresetsMenuButton->SetImageOption(image_presets, 
                                           image_presets_width, 
                                           image_presets_height, 
@@ -1304,62 +1298,6 @@ void vtkPVColorMap::SetColorSchemeToGrayscale()
 
   this->UpdateLookupTable();
   this->AddTraceEntry("$kw(%s) SetColorSchemeToGrayscale", this->GetTclName());
-}
-
-//----------------------------------------------------------------------------
-void vtkPVColorMap::SetColorSchemeToRGBW()
-{
-  this->StartHSV[0] = 0.0;
-  this->StartHSV[1] = 0.0;
-  this->StartHSV[2] = 0.0;
-  this->EndHSV[0] = 0.0;
-  this->EndHSV[1] = 0.0;
-  this->EndHSV[2] = 1.0;
-
-  this->StartColorButton->SetColor(1.0, 0.0, 0.0);
-  this->EndColorButton->SetColor(1.0, 1.0, 1.0);
-  this->NumberOfColorsScale->SetValue(4);
-  this->NumberOfColors = 4;
-
-  // Try to keep interpolated colors consitent with this
-  // Special color map.
-  this->StartHSV[0] = 0.0;
-  this->StartHSV[1] = 1.0;
-  this->StartHSV[2] = 1.0;
-  this->EndHSV[0] = 0.6666;
-  this->EndHSV[1] = 0.0;
-  this->EndHSV[2] = 1.0;
-
-  vtkPVApplication* pvApp = this->GetPVApplication();
-  vtkPVProcessModule* pm = pvApp->GetProcessModule();
-  pm->GetStream() << vtkClientServerStream::Invoke 
-                  << this->LookupTableID << "SetNumberOfTableValues"
-                  << 4
-                  << vtkClientServerStream::End;
-  pm->GetStream() << vtkClientServerStream::Invoke 
-                  << this->LookupTableID << "SetTableValue"
-                  << 0 << 1 << 0 << 0 << 1
-                  << vtkClientServerStream::End;
-  pm->GetStream() << vtkClientServerStream::Invoke 
-                  << this->LookupTableID << "SetTableValue"
-                  << 1 << 0 << 1 << 0 << 1
-                  << vtkClientServerStream::End;
-  pm->GetStream() << vtkClientServerStream::Invoke 
-                  << this->LookupTableID << "SetTableValue"
-                  << 2 << 0 << 0 << 1 << 1
-                  << vtkClientServerStream::End;
-  pm->GetStream() << vtkClientServerStream::Invoke 
-                  << this->LookupTableID << "SetTableValue"
-                  << 3 << 1 << 1 << 1 << 1
-                  << vtkClientServerStream::End;
-  pm->SendStreamToClientAndServer();
-  if (this->MapWidth > 0 && this->MapHeight > 0)
-    {
-    this->UpdateMap(this->MapWidth, this->MapHeight);
-    }
-
-  this->GetPVRenderView()->EventuallyRender();
-  this->AddTraceEntry("$kw(%s) SetColorSchemeToRGBW", this->GetTclName());
 }
 
 //----------------------------------------------------------------------------
