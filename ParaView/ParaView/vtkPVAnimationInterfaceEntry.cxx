@@ -68,7 +68,7 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterfaceEntry);
-vtkCxxRevisionMacro(vtkPVAnimationInterfaceEntry, "1.28");
+vtkCxxRevisionMacro(vtkPVAnimationInterfaceEntry, "1.29");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterfaceEntry, CurrentProperty,
                      vtkPVWidgetProperty);
@@ -76,6 +76,7 @@ vtkCxxSetObjectMacro(vtkPVAnimationInterfaceEntry, CurrentProperty,
 //-----------------------------------------------------------------------------
 vtkPVAnimationInterfaceEntry::vtkPVAnimationInterfaceEntry()
 {
+  this->Parent = 0;
   this->Observer = vtkPVAnimationInterfaceEntryObserver::New();
   this->Observer->AnimationEntry = this;
   this->DeleteEventTag = 0;
@@ -705,6 +706,10 @@ void vtkPVAnimationInterfaceEntry::SetCustomScript(const char* script)
   this->CustomScript = 1;
   this->Dirty = 1;
   this->SetScript(script);
+  if ( !this->Parent )
+    {
+    return;
+    }
   this->AddTraceEntry("$kw(%s) SetCustomScript {%s}", this->GetTclName(),
     script);
   this->GetMethodMenuButton()->SetButtonText("Script");
