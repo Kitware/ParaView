@@ -59,11 +59,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSource.h"
 #include "vtkString.h"
 #include "vtkTclUtil.h"
+#include "vtkXYPlotActor.h"
 #include "vtkXYPlotWidget.h"
+#include "vtkProperty2D.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProbe);
-vtkCxxRevisionMacro(vtkPVProbe, "1.77");
+vtkCxxRevisionMacro(vtkPVProbe, "1.78");
 
 vtkCxxSetObjectMacro(vtkPVProbe, InputMenu, vtkPVInputMenu);
 
@@ -88,10 +90,7 @@ vtkPVProbe::vtkPVProbe()
   
   this->ProbeFrame = vtkKWWidget::New();
   
-  this->XYPlotTclName = NULL;
-
   this->XYPlotWidget = 0;
-  this->XYPlotWidgetName = 0;
   
   // Create a unique id for creating tcl names.
   ++instanceCount;
@@ -99,6 +98,12 @@ vtkPVProbe::vtkPVProbe()
   
   this->ReplaceInputOff();
   this->InputMenu = 0;
+
+  this->XYPlotTclName = 0;
+
+  char buffer[1024];
+  sprintf(buffer, "probeXYPlot%d", this->InstanceCount);
+  this->SetXYPlotTclName(buffer);
 }
 
 //----------------------------------------------------------------------------
@@ -117,22 +122,17 @@ vtkPVProbe::~vtkPVProbe()
   this->ProbeFrame->Delete();
   this->ProbeFrame = NULL;
   
-  if (this->XYPlotTclName)
-    {
-    this->Script("%s Delete", this->XYPlotTclName);
-    this->SetXYPlotTclName(NULL);
-    }
-
   if ( this->XYPlotWidget )
     {
     this->XYPlotWidget->Delete();
     this->XYPlotWidget = 0;
     }
-  this->SetXYPlotWidgetName(0);
 
   this->ScalarArrayMenu->Delete();
   this->ScalarArrayMenu = NULL;
   this->SetInputMenu(0);
+
+  this->SetXYPlotTclName(0);
 }
 
 //----------------------------------------------------------------------------
@@ -167,7 +167,6 @@ void vtkPVProbe::UpdateScalars()
 void vtkPVProbe::CreateProperties()
 {
   vtkPVApplication* pvApp = this->GetPVApplication();
-  char tclName[100];
   
   this->vtkPVSource::CreateProperties();
 
@@ -232,32 +231,24 @@ void vtkPVProbe::CreateProperties()
   this->Script("pack %s",
                this->ShowXYPlotToggle->GetWidgetName());
 
-  sprintf(tclName, "XYPlot%d", this->InstanceCount);
-  this->SetXYPlotTclName(tclName);
-  pvApp->BroadcastScript("vtkXYPlotActor %s", this->XYPlotTclName);
-  this->Script("[%s GetPositionCoordinate] SetValue 0.05 0.05 0",
-               this->XYPlotTclName);
-  this->Script("[%s GetPosition2Coordinate] SetValue 0.8 0.3 0",
-               this->XYPlotTclName);
-  this->Script("%s SetNumberOfXLabels 5", this->XYPlotTclName);
-  this->Script("%s SetXTitle {Line Divisions}", this->XYPlotTclName);
-
-  pvApp->BroadcastScript("%s SetController [ $Application GetController ] ", 
-                        this->GetVTKSourceTclName());
-                
   if ( !this->XYPlotWidget )
     {
+    this->XYPlotWidget = vtkXYPlotWidget::New();
+    vtkXYPlotActor* xyp = this->XYPlotWidget->GetXYPlotActor();
+    xyp->GetPositionCoordinate()->SetValue(0.05, 0.05, 0);
+    xyp->GetPosition2Coordinate()->SetValue(0.8, 0.3, 0);
+    xyp->SetNumberOfXLabels(5);
+    xyp->SetXTitle("Line Divisions");
+    
+    pvApp->BroadcastScript("%s SetController [ $Application GetController ] ", 
+                           this->GetVTKSourceTclName());
+    
     vtkPVGenericRenderWindowInteractor* iren = 
       this->GetPVWindow()->GetGenericInteractor();
-    this->XYPlotWidget = vtkXYPlotWidget::New();
     if ( iren )
       {
       this->XYPlotWidget->SetInteractor(iren);
       }
-    this->SetXYPlotWidgetName(this->Script("%s GetXYPlotWidget", 
-                                           this->GetTclName()));
-    this->Script("%s SetXYPlotActor %s", this->XYPlotWidgetName,
-                 this->XYPlotTclName);
     }
 }
 
@@ -352,16 +343,17 @@ void vtkPVProbe::AcceptCallbackInternal()
   else if (this->GetDimensionality() == 1)
     {
     this->Script("pack forget %s", this->PointDataLabel->GetWidgetName());
-    this->Script("%s RemoveAllInputs", this->XYPlotTclName);
+
+    vtkXYPlotActor* xyp = this->XYPlotWidget->GetXYPlotActor();
+    xyp->RemoveAllInputs();
+    xyp->SetYTitle(0);
+    xyp->PlotPointsOn();
+    xyp->PlotLinesOn();
+    xyp->GetProperty()->SetColor(1, .8, .8);
+    xyp->GetProperty()->SetPointSize(2);
+    xyp->SetLegendPosition(.4, .6);
+    xyp->SetLegendPosition2(.5, .25);
     component = this->ScalarArrayMenu->GetSelectedComponent();
-    this->Script("%s SetYTitle {}", this->XYPlotTclName);
-      
-    this->Script("%s PlotPointsOn", this->XYPlotTclName);
-    this->Script("%s PlotLinesOn", this->XYPlotTclName);
-    this->Script("[%s GetProperty] SetColor 1 .8 .8", this->XYPlotTclName);
-    this->Script("[%s GetProperty] SetPointSize 2", this->XYPlotTclName);
-    this->Script("%s SetLegendPosition 0.4 0.6", this->XYPlotTclName);
-    this->Script("%s SetLegendPosition2 0.5 0.25", this->XYPlotTclName);
     
     float cstep = 1.0 / numArrays;
     float ccolor = 0;
@@ -369,15 +361,11 @@ void vtkPVProbe::AcceptCallbackInternal()
       {
       array = pd->GetArray(i);
       arrayName = array->GetName();
-      this->Script("%s AddInput %s %s %d", this->XYPlotTclName,
-                   this->GetPVOutput()->GetVTKDataTclName(), 
-                   arrayName, component);
-      this->Script("%s SetPlotLabel %d \"%s\"", this->XYPlotTclName, i, arrayName);
+      xyp->AddInput(this->GetPVOutput()->GetVTKData(), arrayName, component);
+      xyp->SetPlotLabel(i, arrayName);
       float r, g, b;
       this->HSVtoRGB(ccolor, 1, 1, &r, &g, &b);
-      this->Script("%s SetPlotColor %d %f %f %f", 
-                   this->XYPlotTclName, i,
-                   r, g, b);
+      xyp->SetPlotColor(i, r, g, b);
       ccolor += cstep;
       
       // Color by the choosen array in the output.
@@ -391,14 +379,14 @@ void vtkPVProbe::AcceptCallbackInternal()
     
     if ( numArrays > 1 )
       {
-      this->Script("%s LegendOn", this->XYPlotTclName);
+      xyp->LegendOn();
       }
     else 
       {
-      this->Script("%s LegendOff", this->XYPlotTclName);
-      this->Script("%s SetYTitle {%s}", this->XYPlotTclName, arrayName);
-      this->Script("%s SetPlotColor 0 1 1 1", this->XYPlotTclName);
-     }
+      xyp->LegendOff();
+      xyp->SetYTitle(arrayName);
+      xyp->SetPlotColor(0, 1, 1, 1);
+      }
     this->XYPlotWidget->SetEnabled(this->ShowXYPlotToggle->GetState());
     
     window->GetMainView()->Render();
@@ -507,15 +495,27 @@ void vtkPVProbe::SaveInTclScript(ofstream *file, int interactiveFlag,
     {    
     if (this->ShowXYPlotToggle->GetState())
       {
+      float pos[3];
+      vtkXYPlotActor* xyp = this->XYPlotWidget->GetXYPlotActor();
       *file << "vtkXYPlotActor " << this->XYPlotTclName << "\n";
-      *file << "\t[" << this->XYPlotTclName
-            << " GetPositionCoordinate] SetValue 0.05 0.05 0\n";
-      *file << "\t[" << this->XYPlotTclName
-            << " GetPosition2Coordinate] SetValue 0.8 0.3 0\n";
-      *file << "\t" << this->XYPlotTclName << " SetNumberOfXLabels 5\n";
-      *file << "\t" << this->XYPlotTclName << " SetXTitle \"Line Divisions\"\n";
+      xyp->GetPositionCoordinate()->GetValue(pos);
+      *file << "\t[" << this->XYPlotTclName << " GetPositionCoordinate] SetValue " 
+            << pos[0] << " " << pos[1] << " 0\n";
+      xyp->GetPosition2Coordinate()->GetValue(pos);
+      *file << "\t[" << this->XYPlotTclName << " GetPosition2Coordinate] SetValue " 
+            << pos[0] << " " << pos[1] << " 0\n";
+      *file << "\t" << this->XYPlotTclName << " SetNumberOfXLabels "
+            << xyp->GetNumberOfXLabels() << "\n";
+      *file << "\t" << this->XYPlotTclName << " SetXTitle \"" 
+            << xyp->GetXTitle() << "\" \n";
+      *file << "\t" << this->XYPlotTclName << " RemoveAllInputs" << endl;
+      *file << "\t" << this->XYPlotTclName << " AddInput [ " 
+            << this->GetVTKSourceTclName() << " GetOutput ]" << endl;
+
+      *file << this->GetPVRenderView()->GetRendererTclName() << " AddActor "
+            << this->XYPlotTclName << endl;
+
       }
-    this->XYPlotWidget->SetEnabled(this->ShowXYPlotToggle->GetState());
     }
   
   this->GetPVOutput(0)->SaveInTclScript(file, interactiveFlag, vtkFlag);

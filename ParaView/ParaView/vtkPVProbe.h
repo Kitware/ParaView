@@ -129,8 +129,6 @@ protected:
   vtkSetStringMacro(XYPlotTclName);
 
   vtkXYPlotWidget* XYPlotWidget;
-  char* XYPlotWidgetName;
-  vtkSetStringMacro(XYPlotWidgetName);
 
   int GetDimensionality();
 
