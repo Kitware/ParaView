@@ -364,6 +364,16 @@
    <!-- End vrmlreader -->
    </SourceProxy>
 
+   <SourceProxy name="plyreader" class="vtkPLYReader">
+     <StringVectorProperty
+        name="FileName"
+        command="SetFileName"
+        number_of_elements="1">
+        <StringListDomain name="files"/>
+     </StringVectorProperty>
+   <!-- End plyreader -->
+   </SourceProxy>
+
    <SourceProxy name="pdbreader" class="vtkPDBReader">
      <StringVectorProperty
         name="FileName"
