@@ -1577,7 +1577,7 @@ void vtkPVWindow::WriteVTKFile(const char* filename)
   
   // Now that we can safely write the file, add the trace entry.
   vtkPVApplication *pvApp = this->GetPVApplication();  
-  pvApp->AddTraceEntry("$kw(%s) WriteVTKFile %s", this->GetTclName(),
+  pvApp->AddTraceEntry("$kw(%s) WriteVTKFile \"%s\"", this->GetTclName(),
                        filename);
   
   // Actually write the file.
@@ -1613,7 +1613,7 @@ void vtkPVWindow::WritePVTKFile(const char* filename, int ghostLevel)
     }
   
   // Now that we can safely write the file, add the trace entry.
-  pvApp->AddTraceEntry("$kw(%s) WritePVTKFile %s", this->GetTclName(),
+  pvApp->AddTraceEntry("$kw(%s) WritePVTKFile \"%s\"", this->GetTclName(),
                        filename, ghostLevel);
   
   // Actually write the file.
