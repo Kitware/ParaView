@@ -57,7 +57,6 @@ class vtkKWLabel;
 class vtkKWListBox;
 class vtkKWWindow;
 class vtkKWMenuButton;
-class vtkKWIcon;
 class vtkIntArray;
 class vtkStringList;
 
@@ -137,7 +136,6 @@ protected:
   vtkKWPushButton*  CancelButton;
 
   vtkKWLabel*       DownDirectoryButton;
-  vtkKWIcon*        DownDirectoryIcon;
     
   char*             SelectBoxId;
   vtkSetStringMacro(SelectBoxId);

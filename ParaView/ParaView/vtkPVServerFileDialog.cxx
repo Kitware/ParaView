@@ -46,7 +46,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWDirectoryUtilities.h"
 #include "vtkKWEntry.h"
 #include "vtkKWFrame.h"
-#include "vtkKWIcon.h"
 #include "vtkKWLabel.h"
 #include "vtkKWListBox.h"
 #include "vtkKWMenu.h"
@@ -64,14 +63,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVServerFileDialog );
-vtkCxxRevisionMacro(vtkPVServerFileDialog, "1.19");
+vtkCxxRevisionMacro(vtkPVServerFileDialog, "1.20");
 
 int vtkPVServerFileDialogCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
-
-
-
-
 
 // Taken from source selection list  we need ne images.
 /* 
@@ -121,16 +116,10 @@ static unsigned char image_PVDocument[] =
   "FHkK4JPZDzAj6MYkyyiSNzIS2k7vvwHIB2gH";
 
 
-
 // This constant must be adjusted to be the largest width of the icons
 // to be used on the left size of a label.
 
 #define image_icon_max_width         image_PVFolder_width
-
-
-
-
-
 
 //----------------------------------------------------------------------------
 vtkPVServerFileDialog::vtkPVServerFileDialog()
@@ -146,12 +135,6 @@ vtkPVServerFileDialog::vtkPVServerFileDialog()
   this->DirectoryMenuButton = vtkKWMenuButton::New();  
 
   this->DownDirectoryButton = vtkKWLabel::New();
-  this->DownDirectoryIcon = vtkKWIcon::New();
-  this->DownDirectoryIcon->SetImageData(image_PVUpDirectoryButton, 
-                    image_PVUpDirectoryButton_width,
-                    image_PVUpDirectoryButton_height,
-                    image_PVUpDirectoryButton_pixel_size,
-                    image_PVUpDirectoryButton_buffer_length);
 
   this->FileNameLabel = vtkKWLabel::New();
   this->FileNameEntry = vtkKWEntry::New();
@@ -196,8 +179,6 @@ vtkPVServerFileDialog::~vtkPVServerFileDialog()
 
   this->DownDirectoryButton->Delete();
   this->DownDirectoryButton = NULL;
-  this->DownDirectoryIcon->Delete();
-  this->DownDirectoryIcon = NULL;
 
   this->FileNameLabel->Delete();
   this->FileNameLabel = NULL;
@@ -364,7 +345,13 @@ void vtkPVServerFileDialog::Create(vtkKWApplication *app, const char *)
 
   this->DownDirectoryButton->SetParent(this->TopFrame);
   this->DownDirectoryButton->Create(app, "");
-  this->DownDirectoryButton->SetImageData(this->DownDirectoryIcon);
+  this->DownDirectoryButton->SetImageData(
+    image_PVUpDirectoryButton, 
+    image_PVUpDirectoryButton_width,
+    image_PVUpDirectoryButton_height,
+    image_PVUpDirectoryButton_pixel_size,
+    image_PVUpDirectoryButton_buffer_length);
+
   this->DownDirectoryButton->SetBalloonHelpString("Up One Level");
   this->Script("bind %s <ButtonRelease-1> { %s DownDirectoryCallback}",
                this->DownDirectoryButton->GetWidgetName(),

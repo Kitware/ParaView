@@ -38,7 +38,6 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkKWPushButton.h"
 #include "vtkKWScale.h"
 #include "vtkKWText.h"
-#include "vtkKWTkUtilities.h"
 #include "vtkKWView.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
@@ -144,7 +143,7 @@ static unsigned char image_goto_end[] =
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterface);
-vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.60");
+vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.61");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterface,ControlledWidget, vtkPVWidget);
 
@@ -692,116 +691,54 @@ void vtkPVAnimationInterface::Create(vtkKWApplication *app, char *frameArgs)
   this->PlayButton->SetParent(this->ControlButtonFrame);
   this->PlayButton->Create(this->Application, "");
   this->PlayButton->SetCommand(this, "Play");
-
-  ostrstream play;
-  play << this->PlayButton->GetWidgetName() << ".playimg" << ends;
-  if (!vtkKWTkUtilities::UpdatePhoto(this->Application->GetMainInterp(),
-                                     play.str(), 
-                                     image_play, 
-                                     image_play_width, 
-                                     image_play_height, 
-                                     image_play_pixel_size,
-                                     image_play_buffer_length,
-                                     this->PlayButton->GetWidgetName()))
-    {
-    vtkWarningMacro(<< "Error creating photo (play)");
-    this->PlayButton->SetLabel("Play");
-    }
-  else
-    {
-    this->Script("%s configure -image %s", 
-                 this->PlayButton->GetWidgetName(), play.str());
-    }
-  play.rdbuf()->freeze(0);
   this->PlayButton->SetBalloonHelpString("Play animation");
 
+  this->PlayButton->SetImageData(image_play, 
+                                 image_play_width, 
+                                 image_play_height, 
+                                 image_play_pixel_size,
+                                 image_play_buffer_length);
+  
   // Animation Control: Stop button to stop the animation.
 
   this->StopButton->SetParent(this->ControlButtonFrame);
   this->StopButton->Create(this->Application, "");
   this->StopButton->SetCommand(this, "Stop");
-
-  ostrstream stop;
-  stop << this->StopButton->GetWidgetName() << ".stopimg" << ends;
-  if (!vtkKWTkUtilities::UpdatePhoto(this->Application->GetMainInterp(),
-                                     stop.str(), 
-                                     image_stop, 
-                                     image_stop_width, 
-                                     image_stop_height, 
-                                     image_stop_pixel_size,
-                                     image_stop_buffer_length,
-                                     this->StopButton->GetWidgetName()))
-    {
-    vtkWarningMacro(<< "Error creating photo (stop)");
-    this->StopButton->SetLabel("Stop");
-    }
-  else
-    {
-    this->Script("%s configure -image %s", 
-                 this->StopButton->GetWidgetName(), stop.str());
-    }
-  stop.rdbuf()->freeze(0);
   this->StopButton->SetBalloonHelpString("Stop animation");
+  
+  this->StopButton->SetImageData(image_stop, 
+                                 image_stop_width, 
+                                 image_stop_height, 
+                                 image_stop_pixel_size,
+                                 image_stop_buffer_length);
 
   // Animation Control: "go to beginning" button.
 
   this->GoToBeginningButton->SetParent(this->ControlButtonFrame);
   this->GoToBeginningButton->Create(this->Application, "");
   this->GoToBeginningButton->SetCommand(this, "GoToBeginning");
-
-  ostrstream goto_beginning;
-  goto_beginning << this->GoToBeginningButton->GetWidgetName() 
-                 << ".goto_beginningimg" << ends;
-  if (!vtkKWTkUtilities::UpdatePhoto(this->Application->GetMainInterp(),
-                                     goto_beginning.str(), 
-                                     image_goto_beginning, 
-                                     image_goto_beginning_width, 
-                                     image_goto_beginning_height, 
-                                     image_goto_beginning_pixel_size,
-                                     image_goto_beginning_buffer_length,
-                                     this->GoToBeginningButton->GetWidgetName()))
-    {
-    vtkWarningMacro(<< "Error creating photo (goto_beginning)");
-    this->GoToBeginningButton->SetLabel("Go to beginning");
-    }
-  else
-    {
-    this->Script("%s configure -image %s", 
-                 this->GoToBeginningButton->GetWidgetName(), goto_beginning.str());
-    }
-  goto_beginning.rdbuf()->freeze(0);
   this->GoToBeginningButton->SetBalloonHelpString(
     "Go to the beginning of the animation");
+
+  this->GoToBeginningButton->SetImageData(image_goto_beginning, 
+                                          image_goto_beginning_width, 
+                                          image_goto_beginning_height, 
+                                          image_goto_beginning_pixel_size,
+                                          image_goto_beginning_buffer_length);
 
   // Animation Control: "go to beginning" button.
 
   this->GoToEndButton->SetParent(this->ControlButtonFrame);
   this->GoToEndButton->Create(this->Application, "");
   this->GoToEndButton->SetCommand(this, "GoToEnd");
-
-  ostrstream goto_end;
-  goto_end << this->GoToEndButton->GetWidgetName() 
-                 << ".goto_endimg" << ends;
-  if (!vtkKWTkUtilities::UpdatePhoto(this->Application->GetMainInterp(),
-                                     goto_end.str(), 
-                                     image_goto_end, 
-                                     image_goto_end_width, 
-                                     image_goto_end_height, 
-                                     image_goto_end_pixel_size,
-                                     image_goto_end_buffer_length,
-                                     this->GoToEndButton->GetWidgetName()))
-    {
-    vtkWarningMacro(<< "Error creating photo (goto_end)");
-    this->GoToEndButton->SetLabel("Go to end");
-    }
-  else
-    {
-    this->Script("%s configure -image %s", 
-                 this->GoToEndButton->GetWidgetName(), goto_end.str());
-    }
-  goto_end.rdbuf()->freeze(0);
   this->GoToEndButton->SetBalloonHelpString(
     "Go to the end of the animation");
+
+  this->GoToEndButton->SetImageData(image_goto_end, 
+                                    image_goto_end_width, 
+                                    image_goto_end_height, 
+                                    image_goto_end_pixel_size,
+                                    image_goto_end_buffer_length);
 
   //  Animation Control: loop button to loop the animation.
 
@@ -809,29 +746,14 @@ void vtkPVAnimationInterface::Create(vtkKWApplication *app, char *frameArgs)
   this->LoopCheckButton->Create(this->Application, "");
   this->LoopCheckButton->SetCommand(this, "LoopCheckButtonCallback");
   this->LoopCheckButton->SetState(this->Loop ? 1 : 0);
+  this->LoopCheckButton->SetBalloonHelpString(
+    "Enable/Disable animation loop.");
 
-  ostrstream loop;
-  loop << this->LoopCheckButton->GetWidgetName() << ".loopimg" << ends;
-  if (!vtkKWTkUtilities::UpdatePhoto(this->Application->GetMainInterp(),
-                                     loop.str(), 
-                                     image_loop, 
-                                     image_loop_width, 
-                                     image_loop_height, 
-                                     image_loop_pixel_size,
-                                     image_loop_buffer_length,
-                                     this->LoopCheckButton->GetWidgetName()))
-    {
-    vtkWarningMacro(<< "Error creating photo (loop)");
-    this->LoopCheckButton->SetText("Loop");
-    }
-  else
-    {
-    this->Script("%s configure -image %s -highlightthickness 0", 
-                 this->LoopCheckButton->GetWidgetName(), loop.str());
-    this->LoopCheckButton->SetIndicator(0);
-    }
-  loop.rdbuf()->freeze(0);
-  this->LoopCheckButton->SetBalloonHelpString("Enable/Disable animation loop.");
+  this->LoopCheckButton->SetImageData(image_loop, 
+                                      image_loop_width, 
+                                      image_loop_height, 
+                                      image_loop_pixel_size,
+                                      image_loop_buffer_length);
 
   //  Animation Control: pack the transport buttons
 

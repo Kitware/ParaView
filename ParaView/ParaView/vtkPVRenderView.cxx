@@ -59,7 +59,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWRadioButton.h"
 #include "vtkKWScale.h"
 #include "vtkKWSplitFrame.h"
-#include "vtkKWTkUtilities.h"
 #include "vtkKWWindowCollection.h"
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
@@ -112,7 +111,7 @@ static unsigned char image_properties[] =
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.260");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.261");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -566,22 +565,12 @@ void vtkPVRenderView::Create(vtkKWApplication *app, const char *args)
   this->PropertiesButton->SetBalloonHelpString(
     "Switch back and forth between the current view properties and the" 
     VTK_PV_VIEW_MENU_LABEL ".");
-  ostrstream viewprops;
-  viewprops << this->PropertiesButton->GetWidgetName() << ".propsimg" << ends;
-  if (!vtkKWTkUtilities::UpdatePhoto(this->Application->GetMainInterp(),
-                                     viewprops.str(), 
-                                     image_properties, 
-                                     image_properties_width, 
-                                     image_properties_height, 
-                                     image_properties_pixel_size,
-                                     image_properties_buffer_length,
-                                     this->PropertiesButton->GetWidgetName()))
-    {
-    vtkWarningMacro(<< "Error creating photo (view properties)");
-    }
-  this->Script("%s configure -image %s",
-               this->PropertiesButton->GetWidgetName(), viewprops.str());
-  viewprops.rdbuf()->freeze(0);
+
+  this->PropertiesButton->SetImageData(image_properties, 
+                                       image_properties_width, 
+                                       image_properties_height, 
+                                       image_properties_pixel_size,
+                                       image_properties_buffer_length);
 
   this->Script("pack %s %s -side left -anchor w -padx 2",
                this->Label->GetWidgetName(),

@@ -53,16 +53,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWOptionMenu.h"
 #include "vtkKWPushButton.h"
 #include "vtkKWScale.h"
-#include "vtkKWWidget.h"
 #include "vtkKWTextProperty.h"
 #include "vtkKWTkUtilities.h"
+#include "vtkKWWidget.h"
 #include "vtkLookupTable.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
+#include "vtkPVArrayInformation.h"
 #include "vtkPVData.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVDataSetAttributesInformation.h"
-#include "vtkPVArrayInformation.h"
 #include "vtkPVGenericRenderWindowInteractor.h"
 #include "vtkPVRenderView.h"
 #include "vtkPVSource.h"
@@ -74,7 +74,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVColorMap);
-vtkCxxRevisionMacro(vtkPVColorMap, "1.57");
+vtkCxxRevisionMacro(vtkPVColorMap, "1.58");
 
 int vtkPVColorMapCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -471,26 +471,11 @@ void vtkPVColorMap::Create(vtkKWApplication *app)
     "Grayscale", 
     this, "SetColorSchemeToGrayscale", "Set Color Scheme to Grayscale");
 
-  ostrstream presets;
-  presets << this->PresetsMenuButton->GetWidgetName() << ".presetsimg" << ends;
-  if (!vtkKWTkUtilities::UpdatePhoto(this->Application->GetMainInterp(),
-                                     presets.str(), 
-                                     image_presets, 
-                                     image_presets_width, 
-                                     image_presets_height, 
-                                     image_presets_pixel_size,
-                                     image_presets_buffer_length,
-                                     this->PresetsMenuButton->GetWidgetName()))
-    {
-    vtkWarningMacro(<< "Error creating photo (presets)");
-    this->PresetsMenuButton->SetButtonText("Presets");
-    }
-  else
-    {
-    this->Script("%s configure -image %s", 
-                 this->PresetsMenuButton->GetWidgetName(), presets.str());
-    }
-  presets.rdbuf()->freeze(0);
+  this->PresetsMenuButton->SetImageData(image_presets, 
+                                        image_presets_width, 
+                                        image_presets_height, 
+                                        image_presets_pixel_size,
+                                        image_presets_buffer_length);
 
   this->Script("grid %s %s %s %s -sticky news -padx 1 -pady 2",
                this->PresetsMenuButton->GetWidgetName(),
