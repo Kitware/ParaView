@@ -53,6 +53,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkPVWidget.h"
 
+class vtkKWCheckButton;
 class vtkKWEntry;
 class vtkKWLabel;
 class vtkKWLabeledFrame;
@@ -95,6 +96,14 @@ public:
 				 vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
 //ETX
 
+  // Description:
+  // Set the line visibility.
+  void SetLineVisibility();
+
+  // Description:
+  // Set modified to 1 when value has changed.
+  void SetLineValueChanged();
+
 protected:
   vtkPVLineWidget();
   ~vtkPVLineWidget();
@@ -117,7 +126,8 @@ protected:
   vtkKWLabel* Labels[2];
   vtkKWLabel* CoordinateLabel[3];
   vtkKWLabeledFrame* Frame;
-
+  vtkKWCheckButton* Visibility;
+  int LineValueChanged;
 private:  
   vtkPVLineWidget(const vtkPVLineWidget&); // Not implemented
   void operator=(const vtkPVLineWidget&); // Not implemented

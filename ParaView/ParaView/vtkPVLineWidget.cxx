@@ -43,6 +43,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkCommand.h"
 #include "vtkDataSet.h"
+#include "vtkKWCheckButton.h"
 #include "vtkKWEntry.h"
 #include "vtkKWFrame.h"
 #include "vtkKWLabel.h"
@@ -128,6 +129,8 @@ vtkPVLineWidget::vtkPVLineWidget()
     this->CoordinateLabel[i] = vtkKWLabel::New();
     }
   this->Frame    = vtkKWLabeledFrame::New();
+  this->Visibility = vtkKWCheckButton::New();
+  this->LineValueChanged = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -137,12 +140,14 @@ vtkPVLineWidget::~vtkPVLineWidget()
   if (this->Widget3D->GetEnabled())
     {
     cerr << "Disabling" << endl;
-//    this->Widget3D->EnabledOff();
+    this->Widget3D->EnabledOff();
     }
+  cout << "Ref count: " << this->Widget3D->GetReferenceCount() << endl;
   this->Widget3D->Delete();
   this->Observer->Delete();
   this->Labels[0]->Delete();
   this->Labels[1]->Delete();
+  this->Visibility->Delete();
   for (int i=0; i<3; i++)
     {
     this->Point1[i]->Delete();
@@ -173,8 +178,6 @@ void vtkPVLineWidget::Create(vtkKWApplication *pvApp)
   this->Frame->SetParent(this);
   this->Frame->Create(pvApp);
   this->Frame->SetLabel("Line Widget");
-  this->Script("%s configure -bg red", 
-	       this->Frame->GetFrame()->GetWidgetName());
 
   this->Script("pack %s -fill both -expand 1", 
 	       this->Frame->GetWidgetName());
@@ -193,12 +196,22 @@ void vtkPVLineWidget::Create(vtkKWApplication *pvApp)
     char buffer[3];
     sprintf(buffer, "%c", "xyz"[i]);
     this->CoordinateLabel[i]->SetLabel(buffer);
+    }
+  for (i=0; i<3; i++)
+    {
     this->Point1[i]->SetParent(this->Frame->GetFrame());
     this->Point1[i]->Create(pvApp, "");
-    
+    }
+
+  for (i=0; i<3; i++)    
+    {
     this->Point2[i]->SetParent(this->Frame->GetFrame());
     this->Point2[i]->Create(pvApp, "");
     }
+  this->Visibility->SetParent(this->Frame->GetFrame());
+  this->Visibility->Create(pvApp, "");
+  this->Visibility->SetText("Visibility");
+  this->Visibility->SetCommand(this, "SetLineVisibility");
     
   this->Script("grid propagate %s 1",
 	       this->Frame->GetFrame()->GetWidgetName());
@@ -217,12 +230,32 @@ void vtkPVLineWidget::Create(vtkKWApplication *pvApp)
 	       this->Point2[0]->GetWidgetName(),
 	       this->Point2[1]->GetWidgetName(),
 	       this->Point2[2]->GetWidgetName());
-  this->Script("grid columnconfigure %s 0 -weight 1", this->GetWidgetName());
-  this->Script("grid columnconfigure %s 0 -weight 1", this->GetWidgetName());
-  this->Script("grid columnconfigure %s 0 -weight 1", this->GetWidgetName());
+  this->Script("grid %s - - - -sticky ew",
+	       this->Visibility->GetWidgetName());
+  
+  this->Script("grid columnconfigure %s 0 -weight 0", 
+	       this->Frame->GetFrame()->GetWidgetName());
+  this->Script("grid columnconfigure %s 1 -weight 2", 
+	       this->Frame->GetFrame()->GetWidgetName());
+  this->Script("grid columnconfigure %s 2 -weight 2", 
+	       this->Frame->GetFrame()->GetWidgetName());
+  this->Script("grid columnconfigure %s 3 -weight 2", 
+	       this->Frame->GetFrame()->GetWidgetName());
 
   for (i=0; i<3; i++)
     {
+    this->Script("bind %s <Key> {%s SetLineValueChanged}",
+		 this->Point1[i]->GetWidgetName(),
+		 this->GetTclName());
+    this->Script("bind %s <Key> {%s SetLineValueChanged}",
+		 this->Point2[i]->GetWidgetName(),
+		 this->GetTclName());
+    this->Script("bind %s <FocusOut> {%s SetPoint1}",
+		 this->Point1[i]->GetWidgetName(),
+		 this->GetTclName());
+    this->Script("bind %s <FocusOut> {%s SetPoint2}",
+		 this->Point2[i]->GetWidgetName(),
+		 this->GetTclName());
     this->Script("bind %s <KeyPress-Return> {%s SetPoint1}",
 		 this->Point1[i]->GetWidgetName(),
 		 this->GetTclName());
@@ -244,15 +277,24 @@ void vtkPVLineWidget::Create(vtkKWApplication *pvApp)
     this->Widget3D->SetInteractor(iren);
     this->Widget3D->AddObserver(vtkCommand::InteractionEvent, 
 				this->Observer);
-    this->Widget3D->EnabledOn();
+    this->Widget3D->EnabledOff();
     }
   this->Observer->Execute(this->Widget3D, vtkCommand::InteractionEvent, 0);
 }
 
+//----------------------------------------------------------------------------
+void vtkPVLineWidget::SetLineValueChanged()
+{
+  this->LineValueChanged = 1;
+}
 
 //----------------------------------------------------------------------------
 void vtkPVLineWidget::SetPoint1()
 {
+  if ( !this->LineValueChanged )
+    {
+    return;
+    }
   float pos[3];
   int i;
   for (i=0; i<3; i++)
@@ -266,11 +308,17 @@ void vtkPVLineWidget::SetPoint1()
     {
     iren->Render();
     }
+  this->ModifiedCallback();
+  this->LineValueChanged = 0;
 }
 
 //----------------------------------------------------------------------------
 void vtkPVLineWidget::SetPoint2()
 {
+  if ( !this->LineValueChanged )
+    {
+    return;
+    }
   float pos[3];
   int i;
   for (i=0; i<3; i++)
@@ -284,6 +332,8 @@ void vtkPVLineWidget::SetPoint2()
     {
     iren->Render();
     }
+  this->ModifiedCallback();
+  this->LineValueChanged = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -325,6 +375,14 @@ void vtkPVLineWidget::CopyProperties(vtkPVWidget* clone,
     {
     vtkErrorMacro("Internal error. Could not downcast clone to PVLineWidget.");
     }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVLineWidget::SetLineVisibility()
+{
+  int visibility = this->Visibility->GetState();
+  cout << "Line visibility: " << visibility << endl;
+  this->Widget3D->SetEnabled(visibility);
 }
 
 //----------------------------------------------------------------------------
