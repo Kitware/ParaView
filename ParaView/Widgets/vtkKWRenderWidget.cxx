@@ -58,7 +58,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkWin32OpenGLRenderWindow.h"
 #endif
 
-vtkCxxRevisionMacro(vtkKWRenderWidget, "1.14");
+vtkCxxRevisionMacro(vtkKWRenderWidget, "1.15");
 
 vtkKWRenderWidget::vtkKWRenderWidget()
 {
@@ -569,4 +569,9 @@ void vtkKWRenderWidget::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "RenderState: " << this->RenderState << endl;
   os << indent << "Renderer: " << this->Renderer << endl;
   os << indent << "EventMap: " << this->EventMap << endl;
+  os << indent << "CollapsingRenders: " << this->CollapsingRenders << endl;
+  os << indent << "ScalarShift: " << this->ScalarShift << endl;
+  os << indent << "ScalarScale: " << this->ScalarScale << endl;
+  os << indent << "CurrentCamera: " << this->CurrentCamera << endl;
+  os << indent << "Units: " << (this->Units ? this->Units : "(none)") << endl;
 }
