@@ -40,7 +40,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPart);
-vtkCxxRevisionMacro(vtkPVPart, "1.47");
+vtkCxxRevisionMacro(vtkPVPart, "1.48");
 
 
 int vtkPVPartCommand(ClientData cd, Tcl_Interp *interp,
@@ -303,6 +303,11 @@ void vtkPVPart::CreateTranslatorIfNecessary()
   // The vtkData object will be moved to the output of the piece filter.
   pm->GatherInformation(this->ClassNameInformation, this->VTKDataID);
   char *className = this->ClassNameInformation->GetVTKClassName();
+  if (className == NULL)
+    {
+    vtkErrorMacro("Missing data information.");
+    return;
+    }
   if (strcmp(className, "vtkImageData") == 0 ||
       strcmp(className, "vtkStructuredPoints") == 0 ||
       strcmp(className, "vtkStructuredGrid") == 0 ||
@@ -357,6 +362,11 @@ void vtkPVPart::InsertExtractPiecesIfNecessary()
   pm->GatherInformation(this->ClassNameInformation, this->VTKDataID);
   char *className = this->ClassNameInformation->GetVTKClassName();
   vtkClientServerID tempDataPiece = {0};
+  if (className == NULL)
+    {
+    vtkErrorMacro("Missing data information.");
+    return;
+    }
   if (!strcmp(className, "vtkPolyData"))
     {
     // Don't add anything if we are only using one processes.
