@@ -191,12 +191,22 @@ void vtkPVSelectTimeSet::SetTimeValue(float time)
 //----------------------------------------------------------------------------
 void vtkPVSelectTimeSet::SetTimeValueCallback(const char* item)
 {
+  if ( strncmp(item, "timeset", strlen("timeset")) == 0 )
+    {
+    this->Script("if [%s itemcget %s -open] "
+		 "{%s closetree %s} else {%s opentree %s}", 
+		 this->Tree->GetWidgetName(), item,
+		 this->Tree->GetWidgetName(), item,
+		 this->Tree->GetWidgetName(), item);
+    return;
+    }
+
   this->Script("%s selection set %s", this->Tree->GetWidgetName(),
 	       item);
   this->Script("%s itemcget %s -data", this->Tree->GetWidgetName(),
 	       item);
   const char* result = this->Application->GetMainInterp()->result;
-  if (result[0] == '\0' && !this->Reader)
+  if (result[0] == '\0' || !this->Reader)
     {
     return;
     }
