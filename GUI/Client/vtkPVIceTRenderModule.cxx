@@ -27,7 +27,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVIceTRenderModule);
-vtkCxxRevisionMacro(vtkPVIceTRenderModule, "1.10");
+vtkCxxRevisionMacro(vtkPVIceTRenderModule, "1.11");
 
 
 
@@ -111,8 +111,22 @@ void vtkPVIceTRenderModule::SetPVApplication(vtkPVApplication *pvApp)
   pm->GetStream() << vtkClientServerStream::Invoke << this->RenderWindowID 
                   << "FullScreenOn" 
                   << vtkClientServerStream::End;
+
+  if (pvApp->GetUseStereoRendering)
+    {
+    pm->GetStream() << vtkClientServerStream::Invoke << this->RenderWindowID 
+                    << "StereoCapableWindowOn" 
+                    << vtkClientServerStream::End;
+    pm->GetStream() << vtkClientServerStream::Invoke << this->RenderWindowID 
+                    << "StereoRenderOn" 
+                    << vtkClientServerStream::End;
+    //pm->GetStream() << vtkClientServerStream::Invoke << this->RenderWindowID 
+    //                << "SetStereoTypeToCrystalEyes" 
+    //                << vtkClientServerStream::End;
+    }
   pm->SendStreamToRenderServer();
   
+  // Why have this on the client?
   if (pvApp->GetUseStereoRendering())
     {
     this->RenderWindow->StereoCapableWindowOn();
