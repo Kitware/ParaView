@@ -29,6 +29,10 @@ IF(UNIX)
   SET(TK_INCLUDE_PATH ${TclTk_SOURCE_DIR}/tk8.4.5/generic 
     CACHE INTERNAL "Path to tk include" FORCE)
 
+  IF(CMAKE_BUILD_TYPE MATCHES Debug)
+    SET(TCLTK_BUILD_DEBUG 1)
+  ENDIF(CMAKE_BUILD_TYPE MATCHES Debug)
+
   CONFIGURE_FILE(${TclTk_SOURCE_DIR}/configure_tcltk.sh.in
     ${TclTk_BINARY_DIR}/configure_tcltk.sh IMMEDIATE @ONLY)
   CONFIGURE_FILE(${TclTk_SOURCE_DIR}/build_tcltk.sh.in

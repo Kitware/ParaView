@@ -12,16 +12,21 @@ if [ -f @TclTk_BINARY_DIR@/tk8.4.5/unix/libtk8.4.a -a \
   build_tk=false;
 fi
 
+EXTRAFLAGS=
+if [ "x@TCLTK_BUILD_DEBUG@" = "x1" ]; then
+  EXTRAFLAGS="$EXTRAFLAGS --enable-symbols"
+fi
+
 if [ "x$build_tcl" = "xtrue" ]; then
   cd "@TclTk_BINARY_DIR@/tcl8.4.5/unix"
-  "@TclTk_SOURCE_DIR@/tcl8.4.5/unix/configure" "--disable-shared"
+  "@TclTk_SOURCE_DIR@/tcl8.4.5/unix/configure" --disable-shared ${EXTRAFLAGS}
 else
   echo "-- Found existing Tcl, not reruning configure"
 fi
 
 if [ "x$build_tcl" = "xtrue" -o "x$build_tk" = "xtrue" ]; then
   cd "@TclTk_BINARY_DIR@/tk8.4.5/unix"
-  "@TclTk_SOURCE_DIR@/tk8.4.5/unix/configure" "--disable-shared"
+  "@TclTk_SOURCE_DIR@/tk8.4.5/unix/configure" --disable-shared ${EXTRAFLAGS}
 else
   echo "-- Found existing Tk, not reruning configure"
 fi
