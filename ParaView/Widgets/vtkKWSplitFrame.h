@@ -60,7 +60,7 @@ public:
 
   // Description:
   // Create a Tk widget
-  void Create(vtkKWApplication *app);
+  virtual void Create(vtkKWApplication *app);
   
   // Description:
   // Get the vtkKWWidget for the left internal frame.

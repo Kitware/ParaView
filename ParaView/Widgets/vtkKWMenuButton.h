@@ -56,7 +56,7 @@ public:
 
   // Description:
   // Create a Tk widget
-  void Create(vtkKWApplication *app, char *args);
+  virtual void Create(vtkKWApplication *app, char *args);
   
   // Description:
   // Add text to the button

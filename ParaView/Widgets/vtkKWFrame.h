@@ -59,7 +59,7 @@ public:
 
   // Description:
   // Create a Tk widget
-  void Create(vtkKWApplication *app, const char* args);
+  virtual void Create(vtkKWApplication *app, const char* args);
 
   // Description:
   // Get the vtkKWWidget for the internal frame.

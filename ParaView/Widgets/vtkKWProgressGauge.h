@@ -59,7 +59,7 @@ public:
 
   // Description:
   // Create a Tk widget
-  void Create(vtkKWApplication *app, char *args);
+  virtual void Create(vtkKWApplication *app, char *args);
 
   // Description:
   // Set and get the length and width of the widget

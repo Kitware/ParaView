@@ -62,7 +62,7 @@ public:
   vtkTypeRevisionMacro(vtkKWMenu,vtkKWWidget);
   void PrintSelf(ostream& os, vtkIndent indent);
  
-  void Create(vtkKWApplication* app, const char* args);
+  virtual void Create(vtkKWApplication* app, const char* args);
   
   // Description: 
   // Append a separator to the menu.

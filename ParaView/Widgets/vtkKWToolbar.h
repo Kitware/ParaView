@@ -67,7 +67,7 @@ public:
 
   // Description:
   // Create a Tk widget
-  void Create(vtkKWApplication *app);
+  virtual void Create(vtkKWApplication *app);
 
   // Description:
   // Determines whether the toolbar is resizable. When you use Pack(),
