@@ -67,6 +67,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVWindow.h"
 #include "vtkPolyData.h"
 #include "vtkPolyDataMapper.h"
+#include "vtkString.h"
 #include "vtkTimerLog.h"
 #include "vtkToolkits.h"
 
@@ -1729,24 +1730,20 @@ void vtkPVRenderView::SerializeSelf(ostream& os, vtkIndent indent)
   vtkCamera* cam = this->GetRenderer()->GetActiveCamera();
   os << indent << "CameraParallelScale " << cam->GetParallelScale() << endl;
   os << indent << "CameraViewAngle " << cam->GetViewAngle() << endl;
-  os << indent << "CameraClippingRange { " << cam->GetClippingRange()[0] << " "
-     << cam->GetClippingRange()[1] << " }" 
-     << endl;
-  os << indent << "CameraFocalPoint { " 
+  os << indent << "CameraClippingRange " << cam->GetClippingRange()[0] << " "
+     << cam->GetClippingRange()[1] << endl;
+  os << indent << "CameraFocalPoint " 
      << cam->GetFocalPoint()[0] << " "
      << cam->GetFocalPoint()[1] << " " 
-     << cam->GetFocalPoint()[2] << " }" 
-     << endl;
-  os << indent << "CameraPosition { " 
+     << cam->GetFocalPoint()[2] << endl;
+  os << indent << "CameraPosition " 
      << cam->GetPosition()[0] << " "
      << cam->GetPosition()[1] << " " 
-     << cam->GetPosition()[2] << " }" 
-     << endl;
-  os << indent << "CameraViewUp { " 
+     << cam->GetPosition()[2] << endl;
+  os << indent << "CameraViewUp " 
      << cam->GetViewUp()[0] << " "
      << cam->GetViewUp()[1] << " " 
-     << cam->GetViewUp()[2] << " }" 
-     << endl;
+     << cam->GetViewUp()[2] << endl;
 }
 
 //------------------------------------------------------------------------------
@@ -1754,7 +1751,91 @@ void vtkPVRenderView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVRenderView ";
-  this->ExtractRevision(os,"$Revision: 1.172 $");
+  this->ExtractRevision(os,"$Revision: 1.173 $");
+}
+
+//------------------------------------------------------------------------------
+void vtkPVRenderView::SerializeToken(istream& is, const char token[1024])
+{
+  int cc;
+  if ( vtkString::Equals(token, "CameraPosition") )
+    {
+    float cor[3];
+    for ( cc = 0; cc < 3; cc ++ )
+      {
+      cor[cc] = 0.0;
+      if (! (is >> cor[cc]) )
+        {
+        vtkErrorMacro("Problem Parsing session file");
+        }
+      }
+    this->Renderer->GetActiveCamera()->SetPosition(cor);
+    }
+  else if ( vtkString::Equals(token, "CameraFocalPoint") )
+    {
+    float cor[3];
+    for ( cc = 0; cc < 3; cc ++ )
+      {
+      cor[cc] = 0.0;
+      if (! (is >> cor[cc]) )
+        {
+        vtkErrorMacro("Problem Parsing session file");
+        }
+      }
+    this->Renderer->GetActiveCamera()->SetFocalPoint(cor);
+    }
+  else if ( vtkString::Equals(token, "CameraViewUp") )
+    {
+    float cor[3];
+    for ( cc = 0; cc < 3; cc ++ )
+      {
+      cor[cc] = 0.0;
+      if (! (is >> cor[cc]) )
+        {
+        vtkErrorMacro("Problem Parsing session file");
+        }
+      }
+    this->Renderer->GetActiveCamera()->SetViewUp(cor);
+    }
+  else if ( vtkString::Equals(token, "CameraClippingRange") )
+    {
+    float cor[2];
+    for ( cc = 0; cc < 2; cc ++ )
+      {
+      cor[cc] = 0.0;
+      if (! (is >> cor[cc]) )
+        {
+        vtkErrorMacro("Problem Parsing session file");
+        }
+      }
+    this->Renderer->GetActiveCamera()->SetClippingRange(cor);
+    }
+  else if ( vtkString::Equals(token, "CameraParallelScale") )
+    {
+    float cor;
+    cor = 0.0;
+    if (! (is >> cor) )
+      {
+      vtkErrorMacro("Problem Parsing session file");
+      }
+    this->Renderer->GetActiveCamera()->SetParallelScale(cor);
+    }
+  else if ( vtkString::Equals(token, "CameraViewAngle") )
+    {
+    float cor;
+    cor = 0.0;
+    if (! (is >> cor) )
+      {
+      vtkErrorMacro("Problem Parsing session file");
+      }
+    this->Renderer->GetActiveCamera()->SetViewAngle(cor);
+    }
+  else
+    {
+    //cout << "Unknown Token for " << this->GetClassName() << ": " 
+    //     << token << endl;
+    this->Superclass::SerializeToken(is,token);  
+    }
 }
 
 //----------------------------------------------------------------------------
