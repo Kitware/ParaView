@@ -83,7 +83,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.184");
+vtkCxxRevisionMacro(vtkPVData, "1.185");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -1455,10 +1455,10 @@ void vtkPVData::CreateProperties()
   this->NumPointsLabel->Create(this->Application, "");
   
   this->BoundsDisplay->SetParent(this->InformationFrame->GetFrame());
-  this->BoundsDisplay->Create(this->Application);
+  this->BoundsDisplay->Create(this->Application, "");
   
   this->ExtentDisplay->SetParent(this->InformationFrame->GetFrame());
-  this->ExtentDisplay->Create(this->Application);
+  this->ExtentDisplay->Create(this->Application, "");
   this->ExtentDisplay->SetLabel("Extents");
   
   this->Script("pack %s %s %s -side top -anchor nw",
@@ -3300,7 +3300,7 @@ void vtkPVData::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVData ";
-  this->ExtractRevision(os,"$Revision: 1.184 $");
+  this->ExtractRevision(os,"$Revision: 1.185 $");
 }
 
 //----------------------------------------------------------------------------

@@ -46,7 +46,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWBoundsDisplay);
-vtkCxxRevisionMacro(vtkKWBoundsDisplay, "1.7");
+vtkCxxRevisionMacro(vtkKWBoundsDisplay, "1.8");
 
 int vtkKWBoundsDisplayCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -80,7 +80,8 @@ vtkKWBoundsDisplay::~vtkKWBoundsDisplay()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWBoundsDisplay::Create(vtkKWApplication *app)
+void vtkKWBoundsDisplay::Create(vtkKWApplication *app,
+                                const char* vtkNotUsed(args))
 {
   // must set the application
   if (this->Application)

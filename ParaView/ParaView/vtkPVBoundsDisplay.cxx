@@ -53,7 +53,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVBoundsDisplay);
-vtkCxxRevisionMacro(vtkPVBoundsDisplay, "1.10");
+vtkCxxRevisionMacro(vtkPVBoundsDisplay, "1.11");
 
 vtkCxxSetObjectMacro(vtkPVBoundsDisplay, Widget, vtkKWBoundsDisplay);
 vtkCxxSetObjectMacro(vtkPVBoundsDisplay, InputMenu, vtkPVInputMenu);
@@ -97,7 +97,7 @@ void vtkPVBoundsDisplay::Create(vtkKWApplication *app)
   this->Script("frame %s", this->GetWidgetName());
   this->Widget->SetParent(this);
   this->Widget->SetShowHideFrame( this->GetShowHideFrame() );
-  this->Widget->Create(app);
+  this->Widget->Create(app, "");
   if (this->FrameLabel)
     {
     this->Widget->SetLabel(this->FrameLabel);

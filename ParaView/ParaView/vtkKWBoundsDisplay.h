@@ -62,7 +62,7 @@ public:
 
   // Description:
   // Create a Tk widget
-  virtual void Create(vtkKWApplication *app);
+  virtual void Create(vtkKWApplication *app, const char* args);
 
   // Description:
   // Set the bounds to display.
