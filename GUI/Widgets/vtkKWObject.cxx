@@ -24,7 +24,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWObject );
-vtkCxxRevisionMacro(vtkKWObject, "1.44");
+vtkCxxRevisionMacro(vtkKWObject, "1.45");
 
 int vtkKWObjectCommand(ClientData cd, Tcl_Interp *interp,
                        int argc, char *argv[]);
@@ -91,7 +91,7 @@ void vtkKWObject::ExtractRevision(ostream& os,const char *revIn)
 void vtkKWObject::SerializeRevision(ostream& os, vtkIndent indent)
 {
   os << indent << "vtkKWObject ";
-  this->ExtractRevision(os,"$Revision: 1.44 $");
+  this->ExtractRevision(os,"$Revision: 1.45 $");
 }
 
 //----------------------------------------------------------------------------
@@ -164,7 +164,7 @@ const char *vtkKWObject::GetTclName()
     }
 
   vtkTclGetObjectFromPointer(this->GetApplication()->GetMainInterp(), 
-                             (void *)this, this->CommandFunction);
+                             (void *)this, "vtkKWObject");
   this->TclName = vtkString::Duplicate(
     this->GetApplication()->GetMainInterp()->result);
   return this->TclName;
