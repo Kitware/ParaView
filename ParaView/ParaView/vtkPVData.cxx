@@ -81,7 +81,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.251");
+vtkCxxRevisionMacro(vtkPVData, "1.252");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -504,7 +504,7 @@ void vtkPVData::CreateProperties()
     this->GetTclName());
 
   this->CubeAxesCheck->SetParent(this->ViewFrame->GetFrame());
-  this->CubeAxesCheck->Create(this->Application, "-text CubeAxes");
+  this->CubeAxesCheck->Create(this->Application, "-text {Cube Axes}");
   this->CubeAxesCheck->SetCommand(this, "CubeAxesCheckCallback");
   this->CubeAxesCheck->SetBalloonHelpString(
     "Toggle the visibility of X,Y,Z scales for this dataset.");
