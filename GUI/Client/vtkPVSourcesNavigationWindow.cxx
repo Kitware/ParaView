@@ -27,7 +27,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVSourcesNavigationWindow );
-vtkCxxRevisionMacro(vtkPVSourcesNavigationWindow, "1.13");
+vtkCxxRevisionMacro(vtkPVSourcesNavigationWindow, "1.13.2.1");
 
 //-----------------------------------------------------------------------------
 vtkPVSourcesNavigationWindow::vtkPVSourcesNavigationWindow()
@@ -298,7 +298,6 @@ void vtkPVSourcesNavigationWindow::DisplayModulePopupMenu(const char* module,
     char *var = this->PopupMenu->CreateCheckButtonVariable(this, "Visibility");
     str1 << "[ " << module << " GetPVOutput ] SetVisibility $" 
          << var << ";"
-         << this->GetTclName() << " Update " << module << ";"
          << "[ [ $Application GetMainWindow ] GetMainView ] EventuallyRender" 
          <<  ends;
     this->PopupMenu->SetEntryCommand("Visibility", str1.str());

@@ -106,7 +106,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.267.2.3");
+vtkCxxRevisionMacro(vtkPVApplication, "1.267.2.4");
 vtkCxxSetObjectMacro(vtkPVApplication, RenderModule, vtkPVRenderModule);
 
 
@@ -470,6 +470,7 @@ vtkPVApplication::vtkPVApplication()
   this->UseStereoRendering = 0;
   this->UseOffscreenRendering = 0;
   this->StartEmpty = 0;
+  this->DisableComposite = 0;
   this->PlayDemoFlag = 0;
 
   // GUI style & consistency
@@ -606,6 +607,8 @@ const char vtkPVApplication::ArgumentList[vtkPVApplication::NUM_ARGS][128] =
   "Start ParaView as a server (use MPI run).",
   "--render-server" , "-rs", 
   "Start ParaView as a server (use MPI run).",
+  "--render-server-host", "-rsh",
+  "Tell the client where to look for the render server (default: localhost). Used with --client option.", 
   "--host", "-h",
   "Tell the client where to look for the server (default: localhost). Used with --client option or --server -rc options.", 
   "--user", "",
@@ -656,6 +659,8 @@ const char vtkPVApplication::ArgumentList[vtkPVApplication::NUM_ARGS][128] =
   "Render offscreen on the satellite processes. This option only works with software rendering or mangled mesa on Unix", 
   "--play-demo", "-pd",
   "Run the ParaView demo.",
+  "--disable-composite", "-dc",
+  "Use this option when redering resources are not available on the server.",
   "--help", "",
   "Displays available command line arguments.",
   "" 
@@ -1268,6 +1273,14 @@ int vtkPVApplication::ParseCommandLineArguments(int argc, char*argv[])
     this->UseOffscreenRendering = 1;
     }
   
+  if ( vtkPVApplication::CheckForArgument(argc, argv, "--disable-composite",
+                                          index) == VTK_OK  ||
+       vtkPVApplication::CheckForArgument(argc, argv, "-dc",
+                                          index) == VTK_OK)
+    {
+    this->DisableComposite = 1;
+    }
+
   if ( vtkPVApplication::CheckForArgument(argc, argv, "--crash-on-errors",
       index) == VTK_OK )
     {
@@ -2247,7 +2260,10 @@ void vtkPVApplication::ExecuteEvent(vtkObject *o, unsigned long event, void* cal
 //----------------------------------------------------------------------------
 void vtkPVApplication::SendPrepareProgress()
 {
+  if (!this->ProgressRequests)
+    {
   this->GetMainWindow()->StartProgress();
+    }
   vtkPVProcessModule *pm = this->GetProcessModule();
   vtkClientServerStream& stream = pm->GetStream();
   stream << vtkClientServerStream::Invoke << pm->GetApplicationID()

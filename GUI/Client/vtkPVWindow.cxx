@@ -124,7 +124,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.541.2.8");
+vtkCxxRevisionMacro(vtkPVWindow, "1.541.2.9");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -3251,7 +3251,7 @@ void vtkPVWindow::UpdateSelectMenu()
       source = static_cast<vtkPVSource*>(it->GetObject());
       sprintf(methodAndArg, "SetCurrentPVSourceCallback %s", 
               source->GetTclName());
-      this->GlyphMenu->AddCommand(source->GetName(), this, methodAndArg,
+      this->GlyphMenu->AddCommand(source->GetLabel(), this, methodAndArg,
                                   source->GetSourceClassName());
       numGlyphs++;
       it->GoToNextItem();
@@ -3270,7 +3270,7 @@ void vtkPVWindow::UpdateSelectMenu()
       source = static_cast<vtkPVSource*>(it->GetObject());
       sprintf(methodAndArg, "SetCurrentPVSourceCallback %s", 
               source->GetTclName());
-      this->SelectMenu->AddCommand(source->GetName(), this, methodAndArg,
+      this->SelectMenu->AddCommand(source->GetLabel(), this, methodAndArg,
                                    source->GetSourceClassName());
       it->GoToNextItem();
       }
@@ -4381,11 +4381,19 @@ void vtkPVWindow::UpdateMenuState()
     {
     this->PropagateEnableState(this->SelectMenu);
     this->Menu->SetState(VTK_PV_SELECT_SOURCE_MENU_LABEL,  menustate);
+    if (this->MenuView)
+      {
+      this->MenuView->SetState(VTK_PV_SOURCE_MENU_LABEL, menustate);
+      }
     }
   else
     {
     this->SelectMenu->SetEnabled(0);
     this->Menu->SetState(VTK_PV_SELECT_SOURCE_MENU_LABEL,  vtkKWMenu::Disabled);
+    if (this->MenuView)
+      {
+      this->MenuView->SetState(VTK_PV_SOURCE_MENU_LABEL, vtkKWMenu::Disabled);
+      }
     }
   this->UpdateFilterMenu();
   if ( this->FilterMenu->GetEnabled() )

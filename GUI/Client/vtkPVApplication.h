@@ -295,6 +295,12 @@ public:
   vtkGetMacro(StartEmpty,int);
 
   // Description:
+  // Set by the command line arguments --disable-composite or -dc.
+  // You can use this option when redering resources are not available on
+  // the server.
+  vtkGetMacro(DisableComposite,int);
+
+  // Description:
   // This is used internally for specifying how many pipes
   // to use for rendering when UseRenderingGroup is defined.
   // All processes have this set to the same value.
@@ -458,6 +464,7 @@ protected:
   vtkSetStringMacro(GroupFileName);
   int UseTiledDisplay;
   int TileDimensions[2];
+  int DisableComposite;
 
   // Need to put a global flag that indicates interactive rendering.
   // All process must be consistent in choosing LODs because

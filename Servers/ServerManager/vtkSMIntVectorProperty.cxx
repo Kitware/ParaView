@@ -22,7 +22,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMIntVectorProperty);
-vtkCxxRevisionMacro(vtkSMIntVectorProperty, "1.1.2.1");
+vtkCxxRevisionMacro(vtkSMIntVectorProperty, "1.1.2.2");
 
 struct vtkSMIntVectorPropertyInternals
 {
@@ -173,6 +173,28 @@ int vtkSMIntVectorProperty::ReadXMLAttributes(vtkPVXMLElement* element)
   if(retVal) 
     { 
     this->SetArgumentIsArray(arg_is_array); 
+    }
+
+  int numElems = this->GetNumberOfElements();
+  if (numElems > 0)
+    {
+    int* initVal = new int[numElems];
+    int numRead = element->GetVectorAttribute("default_values",
+                                              numElems,
+                                              initVal);
+
+    if (numRead > 0)
+      {
+      if (numRead != numElems)
+        {
+        vtkErrorMacro("The umber of default values does not match the number "
+                      "of elements. Initialization failed.");
+        delete[] initVal;
+        return 0;
+        }
+      this->SetElements(initVal);
+      }
+    delete[] initVal;
     }
 
   return 1;

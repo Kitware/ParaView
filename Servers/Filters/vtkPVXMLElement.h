@@ -48,12 +48,14 @@ public:
   // value.  Returns whether value was extracted.
   int GetScalarAttribute(const char* name, int* value);
   int GetScalarAttribute(const char* name, float* value);
+  int GetScalarAttribute(const char* name, double* value);
 
   // Description:
   // Get the attribute with the given name and converted to a scalar
   // value.  Returns length of vector read.
   int GetVectorAttribute(const char* name, int length, int* value);
   int GetVectorAttribute(const char* name, int length, float* value);
+  int GetVectorAttribute(const char* name, int length, double* value);
 
   // Description:
   // Get the parent of this element.
