@@ -352,7 +352,8 @@ void vtkPVAnimationInterface::Create(vtkKWApplication *app, char *frameArgs)
   // Source menu
   this->SourceMenuButton->GetMenu()->SetTearOff(0);
   this->SourceMenuButton->Create(app, "");
-  this->SourceMenuButton->SetBalloonHelpString("Select the filter/source whose instance varible will change with time.");
+  this->SourceMenuButton->SetBalloonHelpString(
+    "Select the filter/source whose instance varible will change with time.");
   if (this->PVSource)
     {
     this->SourceMenuButton->SetButtonText(this->PVSource->GetName());
@@ -370,11 +371,13 @@ void vtkPVAnimationInterface::Create(vtkKWApplication *app, char *frameArgs)
   this->MethodMenuButton->Create(app, "");
   this->MethodMenuButton->GetMenu()->SetTearOff(0);
   this->MethodMenuButton->SetButtonText("Method");
-  this->MethodMenuButton->SetBalloonHelpString("Select the method that will be called.");
-  this->Script("pack %s %s %s %s -side left", this->SourceLabel->GetWidgetName(),
-                                              this->SourceMenuButton->GetWidgetName(),
-                                              this->MethodLabel->GetWidgetName(),
-                                              this->MethodMenuButton->GetWidgetName());
+  this->MethodMenuButton->SetBalloonHelpString(
+    "Select the method that will be called.");
+  this->Script("pack %s %s %s %s -side left", 
+	       this->SourceLabel->GetWidgetName(),
+	       this->SourceMenuButton->GetWidgetName(),
+	       this->MethodLabel->GetWidgetName(),
+	       this->MethodMenuButton->GetWidgetName());
 
   this->UpdateSourceMenu();
   this->UpdateMethodMenu();
@@ -388,8 +391,8 @@ void vtkPVAnimationInterface::SetTimeStart(float t)
   if (this->Application)
     {
     this->TimeStartEntry->SetValue(this->TimeStart, 2);
-    this->EntryCallback();
     }
+
 }
 
 //----------------------------------------------------------------------------
@@ -400,8 +403,8 @@ void vtkPVAnimationInterface::SetTimeEnd(float t)
   if (this->Application)
     {
     this->TimeEndEntry->SetValue(this->TimeEnd, 2);
-    this->EntryCallback();
     }
+
 }
 
 //----------------------------------------------------------------------------
@@ -412,8 +415,8 @@ void vtkPVAnimationInterface::SetTimeStep(float t)
   if (this->Application)
     {
     this->TimeStepEntry->SetValue(this->TimeStep, 2);
-    this->EntryCallback();
     }
+
 }
 
 
@@ -426,6 +429,14 @@ void vtkPVAnimationInterface::EntryCallback()
 
   this->TimeScale->SetRange(this->TimeStart, this->TimeEnd);
   this->TimeScale->SetResolution(this->TimeStep);
+
+  this->AddTraceEntry("$kw(%s) SetTimeStart {%f}", this->GetTclName(), 
+		      this->TimeStart);
+  this->AddTraceEntry("$kw(%s) SetTimeEnd {%f}", this->GetTclName(), 
+		      this->TimeEnd);
+  this->AddTraceEntry("$kw(%s) SetTimeStep {%f}", this->GetTclName(), 
+		      this->TimeStep);
+  this->AddTraceEntry("$kw(%s) EntryCallback", this->GetTclName());
 }
 
 //----------------------------------------------------------------------------
@@ -456,6 +467,16 @@ void vtkPVAnimationInterface::CurrentTimeCallback()
       {
       this->View->Render();
       }
+    this->AddTraceEntry("$kw(%s) SetCurrentTime %f", this->GetTclName(),
+			this->GetCurrentTime());
+    this->AddTraceEntry("$kw(%s) CurrentTimeCallback", this->GetTclName());
+    if (this->Window && this->Window->GetMainView())
+      {
+      this->AddTraceEntry("$kw(%s) ResetCameraClippingRange", 
+			  this->Window->GetMainView()->GetTclName());
+      }
+
+    this->AddTraceEntry("update");
     }
 }
 
@@ -468,9 +489,11 @@ float vtkPVAnimationInterface::GetCurrentTime()
 //----------------------------------------------------------------------------
 void vtkPVAnimationInterface::ScriptCheckButtonCallback()
 {
-    
+
   if (this->ScriptCheckButton->GetState())
     {
+    this->AddTraceEntry("$kw(%s) SetScriptCheckButtonState 1", 
+			this->GetTclName());
     this->Script("pack %s -expand yes -fill x",
                  this->ScriptEditor->GetWidgetName());
     this->Script("pack forget %s", 
@@ -478,6 +501,8 @@ void vtkPVAnimationInterface::ScriptCheckButtonCallback()
     }
   else
     {
+    this->AddTraceEntry("$kw(%s) SetScriptCheckButtonState 0", 
+			this->GetTclName());
     this->Script("pack %s -side top -expand t -fill x", 
                  this->SourceMethodFrame->GetWidgetName());
     this->Script("pack forget %s", 
@@ -522,10 +547,13 @@ void vtkPVAnimationInterface::SetPVSource(vtkPVSource *source)
     //source->Register(this);
     this->PVSource = source;
     this->SourceMenuButton->SetButtonText(this->PVSource->GetName());
+    this->AddTraceEntry("$kw(%s) SetPVSource {%s}", this->GetTclName(), 
+			source->GetTclName());
     }
   else
     {
     this->SourceMenuButton->SetButtonText("None");
+    this->AddTraceEntry("$kw(%s) SetPVSource {}", this->GetTclName());
     }
 
   this->UpdateMethodMenu();
@@ -546,6 +574,8 @@ void vtkPVAnimationInterface::Play()
 
   // Make sue we have the up to date entries for end and step.
   this->EntryCallback();
+
+  //this->AddTraceEntry("$kw(%s) Play", this->GetTclName());
 
   // We need a different end test if the step is negative.
   sgn = 1.0;
@@ -639,6 +669,11 @@ void vtkPVAnimationInterface::SetLabelAndScript(const char* label,
 {
   this->SetScript(script);
   this->MethodMenuButton->SetButtonText(label);
+  if (this->Application)
+    {
+    this->AddTraceEntry("$kw(%s) SetLabelAndScript {%s} {%s}", 
+			this->GetTclName(), label, script);
+    }
 }
 
 
@@ -651,7 +686,7 @@ const char* vtkPVAnimationInterface::GetScript()
 //----------------------------------------------------------------------------
 void vtkPVAnimationInterface::UpdateMethodMenu()
 {
-  vtkCollection *pvWidgets;
+  vtkPVWidgetCollection *pvWidgets;
   vtkPVWidget *pvw;
 
   // Remove all previous items form the menu.
@@ -665,7 +700,7 @@ void vtkPVAnimationInterface::UpdateMethodMenu()
   
   pvWidgets = this->PVSource->GetWidgets();
   pvWidgets->InitTraversal();
-  while ( (pvw = (vtkPVWidget*)(pvWidgets->GetNextItemAsObject())) )
+  while ( (pvw = pvWidgets->GetNextPVWidget()) )
     {
     pvw->AddAnimationScriptsToMenu(this->MethodMenuButton->GetMenu(), this);
     }
