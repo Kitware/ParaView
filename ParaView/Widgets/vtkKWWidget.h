@@ -334,6 +334,7 @@ public:
   // Description:
   // Take screendump of the widget and store it into the png file.
   int TakeScreenDump(const char* fname);
+  int TakeScreenDump(const char* wname, const char* fname);
 
 protected:
   vtkKWWidget();
