@@ -212,8 +212,6 @@ $kw(vtkTemp237) SetCurrentManipulator 1 0 {Pan}
 $kw(vtkTemp237) SetCurrentManipulator 2 1 {Pan}
 $kw(vtkTemp237) SetCurrentManipulator 2 0 {Zoom}
 set kw(vtkTemp237) [$kw(vtkTemp24) GetManipulatorControl3D]
-set kw(vtkTemp243) [$kw(vtkTemp237) GetWidget {FlySpeed}]
-$kw(vtkTemp243) SetValue 0
 $kw(vtkTemp183) SetNumberOfFrames 100
 $kw(vtkTemp183) SetCurrentTime 0
 $kw(vtkTemp183) SetCacheGeometry 1
