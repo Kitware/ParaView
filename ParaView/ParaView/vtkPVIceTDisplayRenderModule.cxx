@@ -27,7 +27,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVIceTDisplayRenderModule);
-vtkCxxRevisionMacro(vtkPVIceTDisplayRenderModule, "1.8");
+vtkCxxRevisionMacro(vtkPVIceTDisplayRenderModule, "1.9");
 
 
 
@@ -209,23 +209,6 @@ void vtkPVIceTDisplayRenderModule::StillRender()
     }
 
   this->Superclass::StillRender();
-  /*
-  this->UpdateAllPVData();
-
-  // Still Render can get called some funky ways.
-  // Interactive renders get called through the PVInteractorStyles
-  // which cal ResetCameraClippingRange on the Renderer.
-  // We could convert them to call a method on the module directly ...
-  this->Renderer->ResetCameraClippingRange();
-
-  this->GetPVApplication()->SetGlobalLODFlag(0);
-  vtkTimerLog::MarkStartEvent("Still Render");
-  vtkPVApplication* pvApp = this->PVApplication;
-  vtkPVProcessModule* pm = pvApp->GetProcessModule();
-  pm->RootScript("RenWin1 Render");
-  this->RenderWindow->Render();
-  vtkTimerLog::MarkEndEvent("Still Render");
-  */
 }
 
 //----------------------------------------------------------------------------
@@ -241,16 +224,6 @@ void vtkPVIceTDisplayRenderModule::InteractiveRender()
     }
 
   this->Superclass::InteractiveRender();
-    /*
-  this->UpdateAllPVData();
-
-  vtkTimerLog::MarkStartEvent("Interactive Render");
-  vtkPVApplication* pvApp = this->PVApplication;
-  vtkPVProcessModule* pm = pvApp->GetProcessModule();
-  pm->RootScript("RenWin1 Render");
-  this->RenderWindow->Render();
-  vtkTimerLog::MarkEndEvent("Interactive Render");
-  */
 }
 
 //----------------------------------------------------------------------------
