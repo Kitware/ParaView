@@ -46,7 +46,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMPartDisplay);
-vtkCxxRevisionMacro(vtkSMPartDisplay, "1.11");
+vtkCxxRevisionMacro(vtkSMPartDisplay, "1.12");
 
 
 //----------------------------------------------------------------------------s
@@ -1193,10 +1193,10 @@ void vtkSMPartDisplay::ResetTransferFunctions(vtkPVArrayInformation *arrayInfo,
   stream << vtkClientServerStream::Invoke << this->VolumeColorProxy->GetID(0)
          << "RemoveAllPoints" << vtkClientServerStream::End;
   stream << vtkClientServerStream::Invoke << this->VolumeColorProxy->GetID(0)
-         << "AddHSVPoint" << range[0] << 0.0 << 1.0 << 1.0 
+         << "AddHSVPoint" << range[0] << 0.667 << 1.0 << 1.0 
          << vtkClientServerStream::End;
   stream << vtkClientServerStream::Invoke << this->VolumeColorProxy->GetID(0)
-         << "AddHSVPoint" << range[1] << 0.8 << 1.0 << 1.0 
+         << "AddHSVPoint" << range[1] << 0.0 << 1.0 << 1.0 
          << vtkClientServerStream::End;
   stream << vtkClientServerStream::Invoke << this->VolumeColorProxy->GetID(0)
          << "SetColorSpaceToHSVNoWrap" << vtkClientServerStream::End;
