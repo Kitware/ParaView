@@ -58,7 +58,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWTkUtilities);
-vtkCxxRevisionMacro(vtkKWTkUtilities, "1.10.2.6");
+vtkCxxRevisionMacro(vtkKWTkUtilities, "1.10.2.7");
 
 //----------------------------------------------------------------------------
 void vtkKWTkUtilities::GetRGBColor(Tcl_Interp *interp,
@@ -205,6 +205,9 @@ int vtkKWTkUtilities::UpdatePhoto(Tcl_Interp *interp,
   sblock.offset[0] = 0;
   sblock.offset[1] = 1;
   sblock.offset[2] = 2;
+#if (TK_MAJOR_VERSION == 8) && (TK_MINOR_VERSION >= 3)
+  sblock.offset[3] = 0;
+#endif
 
   if (pixel_size == 3)
     {
