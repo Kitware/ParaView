@@ -74,6 +74,10 @@ public:
   // Description:
   vtkSMProperty* GetSubProperty(const char* name);
 
+  // Description:
+  // Returns true if all values are in all domains, false otherwise.
+  int IsInDomains();
+
 protected:
   vtkSMProperty();
   ~vtkSMProperty();
@@ -82,6 +86,7 @@ protected:
   friend class vtkSMProxyManager;
   friend class vtkSMProxy;
   friend class vtkSMSubPropertyIterator;
+  friend class vtkSMSourceProxy;
 
   // Description:
   // Append a command to update the vtk object with the property values(s).

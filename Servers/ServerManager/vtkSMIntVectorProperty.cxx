@@ -21,11 +21,12 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMIntVectorProperty);
-vtkCxxRevisionMacro(vtkSMIntVectorProperty, "1.9");
+vtkCxxRevisionMacro(vtkSMIntVectorProperty, "1.10");
 
 struct vtkSMIntVectorPropertyInternals
 {
   vtkstd::vector<int> Values;
+  vtkstd::vector<int> UncheckedValues;
 };
 
 //---------------------------------------------------------------------------
@@ -98,10 +99,23 @@ void vtkSMIntVectorProperty::AppendCommandToStream(
 }
 
 //---------------------------------------------------------------------------
+void vtkSMIntVectorProperty::SetNumberOfUncheckedElements(unsigned int num)
+{
+  this->Internals->UncheckedValues.resize(num);
+}
+
+//---------------------------------------------------------------------------
 void vtkSMIntVectorProperty::SetNumberOfElements(unsigned int num)
 {
   this->Internals->Values.resize(num);
+  this->Internals->UncheckedValues.resize(num);
   this->Modified();
+}
+
+//---------------------------------------------------------------------------
+unsigned int vtkSMIntVectorProperty::GetNumberOfUncheckedElements()
+{
+  return this->Internals->UncheckedValues.size();
 }
 
 //---------------------------------------------------------------------------
@@ -117,52 +131,95 @@ int vtkSMIntVectorProperty::GetElement(unsigned int idx)
 }
 
 //---------------------------------------------------------------------------
-void vtkSMIntVectorProperty::SetElement(unsigned int idx, int value)
+int vtkSMIntVectorProperty::GetUncheckedElement(unsigned int idx)
+{
+  return this->Internals->UncheckedValues[idx];
+}
+
+//---------------------------------------------------------------------------
+void vtkSMIntVectorProperty::SetUncheckedElement(unsigned int idx, int value)
+{
+  if (idx >= this->GetNumberOfUncheckedElements())
+    {
+    this->SetNumberOfUncheckedElements(idx+1);
+    }
+  this->Internals->UncheckedValues[idx] = value;
+}
+
+//---------------------------------------------------------------------------
+int vtkSMIntVectorProperty::SetElement(unsigned int idx, int value)
 {
   if (this->IsReadOnly)
     {
-    return;
+    return 0;
     }
 
+  int numArgs = this->GetNumberOfElements();
+  memcpy(&this->Internals->UncheckedValues[0], 
+         &this->Internals->Values[0], 
+         numArgs*sizeof(int));
+
+  this->SetUncheckedElement(idx, value);
+  if (!this->IsInDomains())
+    {
+    this->SetNumberOfUncheckedElements(this->GetNumberOfElements());
+    return 0;
+    }
+  
   if (idx >= this->GetNumberOfElements())
     {
     this->SetNumberOfElements(idx+1);
     }
   this->Internals->Values[idx] = value;
   this->Modified();
+  return 1;
 }
 
 //---------------------------------------------------------------------------
-void vtkSMIntVectorProperty::SetElements1(int value0)
+int vtkSMIntVectorProperty::SetElements1(int value0)
 {
-  this->SetElement(0, value0);
+  return this->SetElement(0, value0);
 }
 
 //---------------------------------------------------------------------------
-void vtkSMIntVectorProperty::SetElements2(int value0, int value1)
+int vtkSMIntVectorProperty::SetElements2(int value0, int value1)
 {
-  this->SetElement(0, value0);
-  this->SetElement(1, value1);
+  int retVal1 = this->SetElement(0, value0);
+  int retVal2 = this->SetElement(1, value1);
+  return (retVal1 && retVal2);
 }
 
 //---------------------------------------------------------------------------
-void vtkSMIntVectorProperty::SetElements3(int value0, int value1, int value2)
+int vtkSMIntVectorProperty::SetElements3(int value0, 
+                                          int value1, 
+                                          int value2)
 {
-  this->SetElement(0, value0);
-  this->SetElement(1, value1);
-  this->SetElement(2, value2);
+  int retVal1 = this->SetElement(0, value0);
+  int retVal2 = this->SetElement(1, value1);
+  int retVal3 = this->SetElement(2, value2);
+  return (retVal1 && retVal2 && retVal3);
 }
 
 //---------------------------------------------------------------------------
-void vtkSMIntVectorProperty::SetElements(const int* values)
+int vtkSMIntVectorProperty::SetElements(const int* values)
 {
   if (this->IsReadOnly)
     {
-    return;
+    return 0;
     }
+
   int numArgs = this->GetNumberOfElements();
+  memcpy(&this->Internals->UncheckedValues[0], 
+         values, 
+         numArgs*sizeof(int));
+  if (!this->IsInDomains())
+    {
+    return 0;
+    }
+
   memcpy(&this->Internals->Values[0], values, numArgs*sizeof(int));
   this->Modified();
+  return 1;
 }
 
 //---------------------------------------------------------------------------
@@ -195,12 +252,15 @@ int vtkSMIntVectorProperty::ReadXMLAttributes(vtkPVXMLElement* element)
       {
       if (numRead != numElems)
         {
-        vtkErrorMacro("The umber of default values does not match the number "
+        vtkErrorMacro("The number of default values does not match the number "
                       "of elements. Initialization failed.");
         delete[] initVal;
         return 0;
         }
-      this->SetElements(initVal);
+      for(int i=0; i<numRead; i++)
+        {
+        this->SetElement(i, initVal[i]);
+        }
       }
     delete[] initVal;
     }
@@ -235,4 +295,10 @@ void vtkSMIntVectorProperty::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os, indent);
 
   os << indent << "ArgumentIsArray: " << this->ArgumentIsArray << endl;
+  os << indent << "Values: ";
+  for (unsigned int i=0; i<this->GetNumberOfElements(); i++)
+    {
+    os << this->GetElement(i) << " ";
+    }
+  os << endl;
 }

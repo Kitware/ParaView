@@ -19,6 +19,7 @@
 #include "vtkPVXMLElement.h"
 #include "vtkSMDomain.h"
 #include "vtkSMInstantiator.h"
+#include "vtkSMSubPropertyIterator.h"
 #include "vtkSmartPointer.h"
 
 #include <vtkstd/vector>
@@ -26,7 +27,7 @@
 #include "vtkSMPropertyInternals.h"
 
 vtkStandardNewMacro(vtkSMProperty);
-vtkCxxRevisionMacro(vtkSMProperty, "1.8");
+vtkCxxRevisionMacro(vtkSMProperty, "1.9");
 
 //---------------------------------------------------------------------------
 vtkSMProperty::vtkSMProperty()
@@ -45,6 +46,21 @@ vtkSMProperty::~vtkSMProperty()
   this->SetCommand(0);
   delete this->PInternals;
   this->SetXMLName(0);
+}
+
+//---------------------------------------------------------------------------
+int vtkSMProperty::IsInDomains()
+{
+  vtkstd::vector<vtkSmartPointer<vtkSMDomain> >::iterator it =
+    this->PInternals->Domains.begin();
+  for(; it != this->PInternals->Domains.end(); it++)
+    {
+    if (!it->GetPointer()->IsInDomain(this))
+      {
+      return 0;
+      }
+    }
+  return 1;
 }
 
 //---------------------------------------------------------------------------
@@ -180,4 +196,19 @@ void vtkSMProperty::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "ImmediateUpdate:" << this->ImmediateUpdate << endl;
   os << indent << "UpdateSelf:" << this->UpdateSelf << endl;
   os << indent << "IsReadOnly:" << this->IsReadOnly << endl;
+
+  vtkSMSubPropertyIterator* iter = vtkSMSubPropertyIterator::New();
+  iter->SetProperty(this);
+  iter->Begin();
+  while(!iter->IsAtEnd())
+    {
+    vtkSMProperty* property = iter->GetSubProperty();
+    if (property)
+      {
+      os << indent << "Sub-property " << iter->GetKey() << ": " << endl;
+      property->PrintSelf(os, indent.GetNextIndent());
+      }
+    iter->Next();
+    }
+  iter->Delete();
 }

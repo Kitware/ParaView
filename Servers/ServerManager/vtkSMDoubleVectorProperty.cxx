@@ -21,11 +21,12 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMDoubleVectorProperty);
-vtkCxxRevisionMacro(vtkSMDoubleVectorProperty, "1.9");
+vtkCxxRevisionMacro(vtkSMDoubleVectorProperty, "1.10");
 
 struct vtkSMDoubleVectorPropertyInternals
 {
   vtkstd::vector<double> Values;
+  vtkstd::vector<double> UncheckedValues;
 };
 
 //---------------------------------------------------------------------------
@@ -98,10 +99,23 @@ void vtkSMDoubleVectorProperty::AppendCommandToStream(
 }
 
 //---------------------------------------------------------------------------
+void vtkSMDoubleVectorProperty::SetNumberOfUncheckedElements(unsigned int num)
+{
+  this->Internals->UncheckedValues.resize(num);
+}
+
+//---------------------------------------------------------------------------
 void vtkSMDoubleVectorProperty::SetNumberOfElements(unsigned int num)
 {
   this->Internals->Values.resize(num);
+  this->Internals->UncheckedValues.resize(num);
   this->Modified();
+}
+
+//---------------------------------------------------------------------------
+unsigned int vtkSMDoubleVectorProperty::GetNumberOfUncheckedElements()
+{
+  return this->Internals->UncheckedValues.size();
 }
 
 //---------------------------------------------------------------------------
@@ -117,52 +131,94 @@ double vtkSMDoubleVectorProperty::GetElement(unsigned int idx)
 }
 
 //---------------------------------------------------------------------------
-void vtkSMDoubleVectorProperty::SetElement(unsigned int idx, double value)
+double vtkSMDoubleVectorProperty::GetUncheckedElement(unsigned int idx)
+{
+  return this->Internals->UncheckedValues[idx];
+}
+
+//---------------------------------------------------------------------------
+void vtkSMDoubleVectorProperty::SetUncheckedElement(
+  unsigned int idx, double value)
+{
+  if (idx >= this->GetNumberOfUncheckedElements())
+    {
+    this->SetNumberOfUncheckedElements(idx+1);
+    }
+  this->Internals->UncheckedValues[idx] = value;
+}
+
+//---------------------------------------------------------------------------
+int vtkSMDoubleVectorProperty::SetElement(unsigned int idx, double value)
 {
   if (this->IsReadOnly)
     {
-    return;
+    return 0;
     }
+  int numArgs = this->GetNumberOfElements();
+  memcpy(&this->Internals->UncheckedValues[0], 
+         &this->Internals->Values[0], 
+         numArgs*sizeof(double));
+
+  this->SetUncheckedElement(idx, value);
+  if (!this->IsInDomains())
+    {
+    this->SetNumberOfUncheckedElements(this->GetNumberOfElements());
+    return 0;
+    }
+  
   if (idx >= this->GetNumberOfElements())
     {
     this->SetNumberOfElements(idx+1);
     }
   this->Internals->Values[idx] = value;
   this->Modified();
+  return 1;
 }
 
 //---------------------------------------------------------------------------
-void vtkSMDoubleVectorProperty::SetElements1(double value0)
+int vtkSMDoubleVectorProperty::SetElements1(double value0)
 {
-  this->SetElement(0, value0);
+  return this->SetElement(0, value0);
 }
 
 //---------------------------------------------------------------------------
-void vtkSMDoubleVectorProperty::SetElements2(double value0, double value1)
+int vtkSMDoubleVectorProperty::SetElements2(double value0, double value1)
 {
-  this->SetElement(0, value0);
-  this->SetElement(1, value1);
+  int retVal1 = this->SetElement(0, value0);
+  int retVal2 = this->SetElement(1, value1);
+  return (retVal1 && retVal2);
 }
 
 //---------------------------------------------------------------------------
-void vtkSMDoubleVectorProperty::SetElements3(
+int vtkSMDoubleVectorProperty::SetElements3(
   double value0, double value1, double value2)
 {
-  this->SetElement(0, value0);
-  this->SetElement(1, value1);
-  this->SetElement(2, value2);
+  int retVal1 = this->SetElement(0, value0);
+  int retVal2 = this->SetElement(1, value1);
+  int retVal3 = this->SetElement(2, value2);
+  return (retVal1 && retVal2 && retVal3);
 }
 
 //---------------------------------------------------------------------------
-void vtkSMDoubleVectorProperty::SetElements(const double* values)
+int vtkSMDoubleVectorProperty::SetElements(const double* values)
 {
   if (this->IsReadOnly)
     {
-    return;
+    return 0;
     }
+
   int numArgs = this->GetNumberOfElements();
+  memcpy(&this->Internals->UncheckedValues[0], 
+         values, 
+         numArgs*sizeof(double));
+  if (!this->IsInDomains())
+    {
+    return 0;
+    }
+
   memcpy(&this->Internals->Values[0], values, numArgs*sizeof(double));
   this->Modified();
+  return 1;
 }
 
 //---------------------------------------------------------------------------
@@ -235,4 +291,11 @@ void vtkSMDoubleVectorProperty::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os, indent);
 
   os << indent << "ArgumentIsArray: " << this->ArgumentIsArray << endl;
+
+  os << indent << "Values: ";
+  for (unsigned int i=0; i<this->GetNumberOfElements(); i++)
+    {
+    os << this->GetElement(i) << " ";
+    }
+  os << endl;
 }

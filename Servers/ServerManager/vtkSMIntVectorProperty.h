@@ -46,28 +46,55 @@ public:
 
   // Description:
   // Set the value of 1 element. The vector is resized as necessary.
-  void SetElement(unsigned int idx, int value);
+  // Returns 0 if Set fails either because the property is read only
+  // or the value is not in all domains. Returns 1 otherwise.
+  int SetElement(unsigned int idx, int value);
 
   // Description:
   // Set the values of all elements. The size of the values array
   // has to be equal or larger to the size of the vector.
-  void SetElements(const int* values);
+  // Returns 0 if Set fails either because the property is read only
+  // or one or more of the values is not in all domains.
+  // Returns 1 otherwise.
+  int SetElements(const int* values);
 
   // Description:
   // Set the value of 1st element. The vector is resized as necessary.
-  void SetElements1(int value0);
+  // Returns 0 if Set fails either because the property is read only
+  // or one or more of the values is not in all domains.
+  // Returns 1 otherwise.
+  int SetElements1(int value0);
 
   // Description:
   // Set the values of the first 2 elements. The vector is resized as necessary.
-  void SetElements2(int value0, int value1);
+  // Returns 0 if Set fails either because the property is read only
+  // or one or more of the values is not in all domains.
+  // Returns 1 otherwise.
+  int SetElements2(int value0, int value1);
 
   // Description:
   // Set the values of the first 3 elements. The vector is resized as necessary.
-  void SetElements3(int value0, int value1, int value2);
+  // Returns 0 if Set fails either because the property is read only
+  // or one or more of the values is not in all domains.
+  // Returns 1 otherwise.
+  int SetElements3(int value0, int value1, int value2);
 
   // Description:
   // Returns the value of 1 element.
   int GetElement(unsigned int idx);
+
+  // Description:
+  // Returns the value of 1 unchecked element. These are used by
+  // domains. SetElement() first sets the value of 1 unchecked
+  // element and then calls IsInDomain and updates the value of
+  // the corresponding element only if IsInDomain passes.
+  int GetUncheckedElement(unsigned int idx);
+
+  // Description:
+  // Set the value of 1 unchecked element. This can be used to
+  // check if a value is in all domains of the property. Call
+  // this and call IsInDomains().
+  void SetUncheckedElement(unsigned int idx, int value);
 
   // Description:
   // If ArgumentIsArray is true, multiple elements are passed in as
@@ -95,6 +122,18 @@ protected:
   int ArgumentIsArray;
 
   virtual void SaveState(const char* name, ofstream* file, vtkIndent indent);
+
+  // Description:
+  // Returns the size of unchecked elements. Usually this is
+  // the same as the number of elements but can be different
+  // before a domain check is performed.
+  virtual unsigned int GetNumberOfUncheckedElements();
+
+  // Description:
+  // Sets the size of unchecked elements. Usually this is
+  // the same as the number of elements but can be different
+  // before a domain check is performed.
+  virtual void SetNumberOfUncheckedElements(unsigned int num);
 
   //BTX  
   // Description:
