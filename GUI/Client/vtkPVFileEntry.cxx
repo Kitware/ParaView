@@ -72,7 +72,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVFileEntry);
-vtkCxxRevisionMacro(vtkPVFileEntry, "1.91");
+vtkCxxRevisionMacro(vtkPVFileEntry, "1.92");
 
 //----------------------------------------------------------------------------
 vtkPVFileEntry::vtkPVFileEntry()
@@ -649,7 +649,7 @@ void vtkPVFileEntry::SetValue(const char* fileName)
         break;
         }
       }
-    fullPath.rdbuf()->freeze();
+    fullPath.rdbuf()->freeze(0);
     delete [] cfile;
     this->Initialized = 1;
     }
