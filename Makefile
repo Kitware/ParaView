@@ -1,9 +1,17 @@
-VTKSRC = /viz/ccl/vtk
-VTKBIN = /viz/ccl/vtk
-VIEWSDIR = /viz/ccl/Views
+VTKSRC = /home/lawcc/vtk
+VTKBIN = /home/lawcc/vtk
+VIEWSDIR = /home/lawcc/Views
 
 
 all: doWidgets doParaView
+
+doTest: doWidgets
+	cd Test; ${MAKE} -${MAKEFLAGS} VTKBIN=$(VTKBIN) VTKSRC=$(VTKSRC) \
+		VIEWSDIR=$(VIEWSDIR) targets.make
+	cd Test; ${MAKE} -${MAKEFLAGS} VTKBIN=$(VTKBIN) VTKSRC=$(VTKSRC) \
+		VIEWSDIR=$(VIEWSDIR) all
+	cd Test; ${MAKE} -${MAKEFLAGS} VTKBIN=$(VTKBIN) VTKSRC=$(VTKSRC) \
+		VIEWSDIR=$(VIEWSDIR) Test
 
 doParaView: doWidgets
 	cd ParaView; ${MAKE} -${MAKEFLAGS} VTKBIN=$(VTKBIN) VTKSRC=$(VTKSRC) \
