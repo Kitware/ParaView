@@ -173,7 +173,7 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterface);
-vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.79");
+vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.80");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterface,ControlledWidget, vtkPVWidget);
 
@@ -185,6 +185,7 @@ vtkPVAnimationInterface::vtkPVAnimationInterface()
 {
   this->Observer = vtkPVAnimationInterfaceObserver::New();
   this->Observer->AnimationInterface = this;
+  this->ErrorEventTag = 0;
 
   this->CommandFunction = vtkPVAnimationInterfaceCommand;
 
@@ -1112,7 +1113,7 @@ void vtkPVAnimationInterface::SetWindow(vtkPVWindow *window)
   this->Window = window;
   if ( this->Window )
     {
-    this->Window->AddObserver(vtkKWEvent::ErrorMessageEvent, this->Observer);
+    this->ErrorEventTag = this->Window->AddObserver(vtkKWEvent::ErrorMessageEvent, this->Observer);
     }
 }
 
@@ -1860,10 +1861,9 @@ void vtkPVAnimationInterface::SaveState(ofstream* file)
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVAnimationInterface::ExecuteEvent(vtkObject *o, unsigned long event, 
-  void* calldata)
+void vtkPVAnimationInterface::ExecuteEvent(vtkObject *, unsigned long event, 
+  void*)
 {
-  // cout << "Event: " << event << " on object: " << o << " data: " << calldata << endl;
   if ( event == vtkKWEvent::ErrorMessageEvent )
     {
     this->Stop();
