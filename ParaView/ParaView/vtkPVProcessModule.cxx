@@ -64,6 +64,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkTclUtil.h"
 #include "vtkPVPart.h"
 
+#include <vtkstd/string>
+
 int vtkStringListCommand(ClientData cd, Tcl_Interp *interp,
                          int argc, char *argv[]);
 
@@ -77,7 +79,7 @@ struct vtkPVArgs
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProcessModule);
-vtkCxxRevisionMacro(vtkPVProcessModule, "1.14");
+vtkCxxRevisionMacro(vtkPVProcessModule, "1.15");
 
 int vtkPVProcessModuleCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -524,6 +526,29 @@ void vtkPVProcessModule::InitializeTclMethodImplementations()
     "  }\n"
     "}\n"
     );
+}
+
+//----------------------------------------------------------------------------
+vtkDataObject* vtkPVProcessModule::ReceiveRootDataObject(const char* tclName)
+{
+  // Make sure we have a named Tcl VTK object.
+  if(!tclName || !tclName[0])
+    {
+    return 0;
+    }
+  
+  // We are the server.  Just return the object from the local
+  // interpreter.
+  vtkstd::string name = this->GetPVApplication()->EvaluateString(tclName);  
+  vtkObject* obj = this->GetPVApplication()->TclToVTKObject(name.c_str());
+  vtkDataObject* dobj = vtkDataObject::SafeDownCast(obj);
+  if(dobj)
+    {
+    // This method must return a reference to the object.  The caller
+    // will invoke Delete().
+    dobj->Register(0);
+    }
+  return dobj;
 }
 
 //----------------------------------------------------------------------------

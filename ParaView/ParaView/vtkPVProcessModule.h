@@ -49,11 +49,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __vtkPVProcessModule_h
 
 #include "vtkKWObject.h"
+
+class vtkDataObject;
+class vtkMapper;
 class vtkMultiProcessController;
-class vtkPVPart;
 class vtkPVApplication;
 class vtkPVDataInformation;
-class vtkMapper;
+class vtkPVPart;
 class vtkSource;
 class vtkStringList;
 
@@ -149,6 +151,11 @@ public:
                           vtkStringList* files);
   virtual int GetDirectoryListing(const char* dir, vtkStringList* dirs,
                                   vtkStringList* files, const char* perm);
+  
+  // Description:
+  // Get a reference to a vtkDataObject from the server-side root node
+  // given the Tcl name of the object.
+  virtual vtkDataObject* ReceiveRootDataObject(const char* tclName);
   
 protected:
   vtkPVProcessModule();

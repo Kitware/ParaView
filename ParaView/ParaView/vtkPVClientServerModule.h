@@ -55,14 +55,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __vtkPVClientServerModule_h
 
 #include "vtkPVProcessModule.h"
-class vtkPVPart;
+
+class vtkMapper;
+class vtkMultiProcessController;
 class vtkPVApplication;
 class vtkPVDataInformation;
-class vtkMultiProcessController;
+class vtkPVPart;
 class vtkSocketController;
-class vtkMapper;
 class vtkSource;
-
 
 class VTK_EXPORT vtkPVClientServerModule : public vtkPVProcessModule
 {
@@ -137,6 +137,11 @@ public:
   // implementation will always give a listing on the server side.
   virtual int GetDirectoryListing(const char* dir, vtkStringList* dirs,
                                   vtkStringList* files, const char* perm);
+  
+  // Description:
+  // Get a reference to a vtkDataObject from the server-side root node
+  // given the Tcl name of the object.
+  virtual vtkDataObject* ReceiveRootDataObject(const char* tclName);
 protected:
   vtkPVClientServerModule();
   ~vtkPVClientServerModule();

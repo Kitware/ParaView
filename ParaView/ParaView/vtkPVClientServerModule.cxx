@@ -41,35 +41,34 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "vtkPVClientServerModule.h"
 
-#include "vtkObjectFactory.h"
-
-#include "vtkToolkits.h"
-#include "vtkPVConfig.h"
-#include "vtkMultiProcessController.h"
-#include "vtkDummyController.h"
-#include "vtkSocketController.h"
-#include "vtkSocketCommunicator.h"
-#include "vtkPVApplication.h"
-#include "vtkDataSet.h"
-#include "vtkPVDataInformation.h"
-#include "vtkSource.h"
-#include "vtkFloatArray.h"
-#include "vtkDoubleArray.h"
 #include "vtkCharArray.h"
+#include "vtkDataSet.h"
+#include "vtkDoubleArray.h"
+#include "vtkDummyController.h"
+#include "vtkFloatArray.h"
+#include "vtkInstantiator.h"
+#include "vtkKWEntry.h"
+#include "vtkKWLabel.h"
+#include "vtkKWMessageDialog.h"
 #include "vtkLongArray.h"
-#include "vtkShortArray.h"
-#include "vtkUnsignedIntArray.h"
-#include "vtkUnsignedLongArray.h"
-#include "vtkUnsignedShortArray.h"
 #include "vtkMapper.h"
+#include "vtkMultiProcessController.h"
+#include "vtkObjectFactory.h"
+#include "vtkPVApplication.h"
+#include "vtkPVConfig.h"
+#include "vtkPVDataInformation.h"
+#include "vtkPVWindow.h"
+#include "vtkShortArray.h"
+#include "vtkSocketCommunicator.h"
+#include "vtkSocketController.h"
+#include "vtkSource.h"
 #include "vtkString.h"
 #include "vtkStringList.h"
 #include "vtkTclUtil.h"
-
-#include "vtkKWMessageDialog.h"
-#include "vtkPVWindow.h"
-#include "vtkKWEntry.h"
-#include "vtkKWLabel.h"
+#include "vtkToolkits.h"
+#include "vtkUnsignedIntArray.h"
+#include "vtkUnsignedLongArray.h"
+#include "vtkUnsignedShortArray.h"
 
 #ifdef VTK_USE_MPI
 #include "vtkMPIController.h"
@@ -91,8 +90,9 @@ int vtkStringListCommand(ClientData cd, Tcl_Interp *interp,
 #define VTK_PV_ROOT_RESULT_RMI_TAG           838486
 #define VTK_PV_ROOT_RESULT_LENGTH_TAG        838487
 #define VTK_PV_ROOT_RESULT_TAG               838488
- 
 
+#define VTK_PV_SEND_DATA_OBJECT_TAG          838489
+#define VTK_PV_DATA_OBJECT_TAG               923857
 
 //----------------------------------------------------------------------------
 //============================================================================
@@ -196,7 +196,7 @@ private:
   void operator=(const vtkPVClientServerModuleConnectDialog&);
 };
 vtkStandardNewMacro(vtkPVClientServerModuleConnectDialog);
-vtkCxxRevisionMacro(vtkPVClientServerModuleConnectDialog, "1.25");
+vtkCxxRevisionMacro(vtkPVClientServerModuleConnectDialog, "1.26");
 //============================================================================
 //----------------------------------------------------------------------------
 
@@ -264,10 +264,44 @@ void vtkPVRelayRemoteScript(void *localArg, void *remoteArg,
   self->RelayScriptRMI((const char*)remoteArg);
 }
 
+//----------------------------------------------------------------------------
+// This RMI is only on process 0 of server. (socket controller)
+void vtkPVSendDataObject(void* arg, void*, int, int)
+{
+  vtkPVClientServerModule* self = static_cast<vtkPVClientServerModule*>(arg);
+  
+  // Get the length of the Tcl object name we are about to receive.
+  int length = 0;
+  self->GetSocketController()->Receive(&length, 1, 1, VTK_PV_DATA_OBJECT_TAG);
+  
+  // Allocate space and receive the Tcl object name.
+  char* tclName = new char[length+1];
+  self->GetSocketController()->Receive(tclName, length, 1, VTK_PV_DATA_OBJECT_TAG);
+  tclName[length] = '\0';
+  
+  // Get the object from the local process.
+  vtkDataObject* obj = self->vtkPVProcessModule::ReceiveRootDataObject(tclName);
+  delete [] tclName;
+  
+  // Send success/failure flag and the object itself.
+  if(obj)
+    {
+    int success = 1;
+    self->GetSocketController()->Send(&success, 1, 1, VTK_PV_DATA_OBJECT_TAG);
+    self->GetSocketController()->Send(obj, 1, VTK_PV_DATA_OBJECT_TAG);
+    obj->Delete();
+    }
+  else
+    {
+    int failure = 0;
+    self->GetSocketController()->Send(&failure, 1, 1, VTK_PV_DATA_OBJECT_TAG);
+    }
+}
+
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVClientServerModule);
-vtkCxxRevisionMacro(vtkPVClientServerModule, "1.25");
+vtkCxxRevisionMacro(vtkPVClientServerModule, "1.26");
 
 int vtkPVClientServerModuleCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -439,6 +473,10 @@ void vtkPVClientServerModule::Initialize()
     // For root script: Return result back to client.
     this->SocketController->AddRMI(vtkPVRootResult, (void *)(this), 
                                    VTK_PV_ROOT_RESULT_RMI_TAG);
+    
+    // For ReceiveRootDataObject: Send data object back to the client.
+    this->SocketController->AddRMI(vtkPVSendDataObject, this,
+                                   VTK_PV_SEND_DATA_OBJECT_TAG);
     
     // Loop listening to the socket for RMI's.
     this->SocketController->AddRMI(vtkPVBroadcastScript, (void *)(this), 
@@ -1006,4 +1044,42 @@ int vtkPVClientServerModule::GetDirectoryListing(const char* dir,
     {
     return this->Superclass::GetDirectoryListing(dir, dirs, files, perm);
     }
+}
+
+//----------------------------------------------------------------------------
+vtkDataObject* vtkPVClientServerModule::ReceiveRootDataObject(const char* tclName)
+{
+  // Make sure we have a named Tcl VTK object.
+  if(!tclName || !tclName[0])
+    {
+    return 0;
+    }
+  
+  // Create an instance of the proper object to receive.
+  this->RootScript("%s GetClassName", tclName);  
+  vtkObject* newObj = vtkInstantiator::CreateInstance(this->GetRootResult());
+  vtkDataObject* dataObj = vtkDataObject::SafeDownCast(newObj);
+  if(newObj && !dataObj)
+    {
+    newObj->Delete();
+    return 0;
+    }
+  
+  // Send the object name length and the name itself.
+  int length = static_cast<int>(strlen(tclName));
+  this->SocketController->TriggerRMI(1, VTK_PV_SEND_DATA_OBJECT_TAG);
+  this->SocketController->Send(&length, 1, 1, VTK_PV_DATA_OBJECT_TAG);
+  this->SocketController->Send(const_cast<char*>(tclName), length, 1,
+                               VTK_PV_DATA_OBJECT_TAG);
+  
+  // Receive success/failure flag and the object itself.
+  int success;
+  this->SocketController->Receive(&success, 1, 1, VTK_PV_DATA_OBJECT_TAG);
+  if(!success)
+    {
+    dataObj->Delete();
+    return 0;
+    }
+  this->SocketController->Receive(dataObj, 1, VTK_PV_DATA_OBJECT_TAG);
+  return dataObj;
 }
