@@ -72,7 +72,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVFileEntry);
-vtkCxxRevisionMacro(vtkPVFileEntry, "1.90");
+vtkCxxRevisionMacro(vtkPVFileEntry, "1.91");
 
 //----------------------------------------------------------------------------
 vtkPVFileEntry::vtkPVFileEntry()
@@ -634,7 +634,7 @@ void vtkPVFileEntry::SetValue(const char* fileName)
         }
       str << this->FileListSelect->GetElementFromFinalList(kk) << ends;
       dom->AddString(str.str());
-      str.rdbuf()->freeze();
+      str.rdbuf()->freeze(0);
       }
     char* cfile = new char[ strlen(fileName) + 1];
     vtkKWDirectoryUtilities::GetFilenameName(fileName, cfile);
