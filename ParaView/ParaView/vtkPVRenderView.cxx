@@ -87,7 +87,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.204");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.205");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -707,8 +707,9 @@ void vtkPVRenderView::Create(vtkKWApplication *app, const char *args)
   if (getenv("PV_SEPARATE_RENDER_WINDOW") != NULL)
     {
     this->TopLevelRenderWindow->Create(app, "toplevel", "");
-    this->Script("wm title %s ParaView", 
-                 this->TopLevelRenderWindow->GetWidgetName());
+    this->Script("wm title %s %s", 
+                 this->TopLevelRenderWindow->GetWidgetName(),
+                 this->Application->GetApplicationName());
     }
 
   // add the -rw argument
@@ -2356,7 +2357,7 @@ void vtkPVRenderView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVRenderView ";
-  this->ExtractRevision(os,"$Revision: 1.204 $");
+  this->ExtractRevision(os,"$Revision: 1.205 $");
 }
 
 //------------------------------------------------------------------------------
