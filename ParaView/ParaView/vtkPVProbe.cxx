@@ -64,36 +64,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkXYPlotActor.h"
 #include "vtkXYPlotWidget.h"
 
-
-
-// Needed by vtkOStrStreamWrapper 
-// Use ANSI ostrstream or ostringstream.
-#ifdef VTK_USE_ANSI_STDLIB
-# ifndef VTK_NO_ANSI_STRING_STREAM
-#  include <sstream>
-using std::ostringstream;
-# else
-#  include <strstream>
-using std::ostrstream;
-using std::ends;
-# endif
-
-// Use old-style strstream.
-#else
-# ifdef _WIN32_WCE
-#  include "vtkWinCE.h"
-# else
-#  if defined(_MSC_VER)
-#   include <strstrea.h>
-#  else
-#   include <strstream.h>
-#  endif
-# endif // Win CE
-#endif
-
+#include <vtkstd/string>
+ 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProbe);
-vtkCxxRevisionMacro(vtkPVProbe, "1.93");
+vtkCxxRevisionMacro(vtkPVProbe, "1.94");
 
 int vtkPVProbeCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -280,8 +255,8 @@ void vtkPVProbe::AcceptCallbackInternal()
     vtkstd::string tempArray;
 
     // used to read data values to a vtkstd::string using arbitrary length buffer
-    vtkstd::ostrstream arrayStrm;
-    vtkstd::ostrstream tempStrm;
+    ostrstream arrayStrm;
+    ostrstream tempStrm;
 
     this->XYPlotWidget->SetEnabled(0);
 
@@ -292,7 +267,7 @@ void vtkPVProbe::AcceptCallbackInternal()
       if (numComponents > 1)
         {
         // make sure we fill buffer from the beginning
-        arrayStrm.freeze( false );
+        arrayStrm.rdbuf()->freeze(0);
         arrayStrm.seekp( 0, ios::beg );
         arrayStrm << array->GetName() << ": ( " << ends;
         arrayData = arrayStrm.str();
@@ -300,7 +275,7 @@ void vtkPVProbe::AcceptCallbackInternal()
         for (j = 0; j < numComponents; j++)
           {
           // make sure we fill buffer from the beginning
-          tempStrm.freeze( false );
+          tempStrm.rdbuf()->freeze(0);
           tempStrm.seekp( 0, ios::beg );
           tempStrm << array->GetComponent( 0, j ) << ends; 
           tempArray = tempStrm.str();
@@ -328,7 +303,7 @@ void vtkPVProbe::AcceptCallbackInternal()
       else
         {
         // make sure we fill buffer from the beginning
-        arrayStrm.freeze( false );
+        arrayStrm.rdbuf()->freeze(0);
         arrayStrm.seekp( 0, ios::beg );
         arrayStrm << array->GetName() << ": " << array->GetComponent( 0, 0 ) << endl << ends;
 
