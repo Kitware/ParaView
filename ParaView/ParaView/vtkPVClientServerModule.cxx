@@ -211,7 +211,7 @@ void vtkPVSendPolyData(void* arg, void*, int, int)
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVClientServerModule);
-vtkCxxRevisionMacro(vtkPVClientServerModule, "1.43");
+vtkCxxRevisionMacro(vtkPVClientServerModule, "1.43.2.1");
 
 int vtkPVClientServerModuleCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -481,6 +481,7 @@ void vtkPVClientServerModule::Initialize()
     // Remote script is only really for debugging.
     this->SocketController->AddRMI(vtkPVRelayRemoteScript, (void *)(this), 
                                    VTK_PV_REMOTE_SCRIPT_RMI_TAG);
+    this->Controller->CreateOutputWindow();
     this->SocketController->ProcessRMIs();
     
     // Exiting.  Relay the break RMI to otehr processes.
@@ -494,6 +495,7 @@ void vtkPVClientServerModule::Initialize()
     this->Controller->AddRMI(vtkPVServerSlaveScript, (void *)(pvApp), 
                              VTK_PV_SATELLITE_SCRIPT);
 
+    this->Controller->CreateOutputWindow();
     // Process rmis until the application exits.
     this->Controller->ProcessRMIs();    
     // Now we are exiting.
