@@ -296,8 +296,8 @@ protected:
 
   vtkKWWidget       *Properties;
   void              UpdateProperties();
-  void              UpdateScalarsMenu();
-  void              UpdateScalars();
+  virtual void      UpdateScalarsMenu();
+  virtual void      UpdateScalars();
   void              UpdateVectorsMenu();
   void              UpdateVectors();
 

@@ -417,7 +417,6 @@ void vtkPVRenderView::UpdateNavigationWindow(vtkPVSource *currentSource)
   int numInputs, xMid, yMid, y, i;
   char *result, *tmp;
   int bbox[4], bboxOut[4];
-//  vtkPVSourceCollection *outs, *moreOuts;
   vtkPVData *moreOut;
   static char *font = "-adobe-helvetica-medium-r-normal-*-14-100-100-100-p-76-iso8859-1";  
   

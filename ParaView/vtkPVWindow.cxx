@@ -49,8 +49,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWPushButton.h"
 #include "vtkToolkits.h"
 
-#include "vtkInteractorStylePlaneSource.h"
-
 #include "vtkDirectory.h"
 #include "vtkMath.h"
 
@@ -383,16 +381,20 @@ void vtkPVWindow::Create(vtkKWApplication *app, char *args)
   this->ThresholdButton->SetBalloonHelpString("Threshold");
   
   this->ContourButton->SetParent(this->Toolbar);
-  this->ContourButton->Create(app, "-text Contour");
+  this->ContourButton->Create(app, "-image PVContourButton");
   this->ContourButton->SetCommand(this, "ContourCallback");
+  this->ContourButton->SetBalloonHelpString("Contour");
 
   this->GlyphButton->SetParent(this->Toolbar);
-  this->GlyphButton->Create(app, "-text Glyph");
+//  this->GlyphButton->Create(app, "-text Glyph");
+  this->GlyphButton->Create(app, "-image PVGlyphButton");
   this->GlyphButton->SetCommand(this, "GlyphCallback");
+  this->GlyphButton->SetBalloonHelpString("Glyph");
 
   this->ProbeButton->SetParent(this->Toolbar);
-  this->ProbeButton->Create(app, "-text Probe");
+  this->ProbeButton->Create(app, "-image PVProbeButton");
   this->ProbeButton->SetCommand(this, "ProbeCallback");
+  this->ProbeButton->SetBalloonHelpString("Probe");
   
   this->Script("pack %s %s %s %s %s -side left -pady 0 -fill none -expand no",
                this->CalculatorButton->GetWidgetName(),

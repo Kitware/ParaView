@@ -1,18 +1,10 @@
 SOURCE_FILES( ParaView_SRCS
-vtkInteractorStyleExtent 
 vtkCameraInteractor 
 vtkClipPlane 
 vtkCutMaterial 
 vtkCutPlane 
-vtkDummyRenderWindowInteractor 
 vtkImageOutlineFilter 
 vtkInteractor 
-vtkInteractorStyleCamera 
-vtkInteractorStyleGridExtent 
-vtkInteractorStyleImageExtent 
-vtkInteractorStylePlane 
-vtkInteractorStylePlaneSource 
-vtkInteractorStyleSphere 
 vtkKWCenterOfRotation 
 vtkKWFlyInteractor 
 vtkKWInteractor 
@@ -33,15 +25,12 @@ vtkPVGlyph3D
 vtkPVInputMenu 
 vtkPVLODActor
 vtkPVMethodInterface 
-vtkPVOutputWindow
 vtkPVProbe
 vtkPVRenderView 
 vtkPVSelectionList 
 vtkPVSource 
-vtkPVSourceCollection 
 vtkPVSourceInterface 
 vtkPVSourceInterfaceParser
-vtkPVSourceList 
 vtkPVThreshold 
 vtkPVTreeComposite 
 vtkPVWindow 
@@ -53,10 +42,6 @@ vtkStringList
 
 WRAP_EXCLUDE_FILES(
 vtkPVSourceInterfaceParser
-)
-
-ABSTRACT_FILES(
-vtkInteractorStyleExtent 
 )
 
 VTK_WRAP_TCL(vtkKWParaViewTCL ParaViewTCL_SRCS ParaView_SRCS)

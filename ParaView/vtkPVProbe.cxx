@@ -403,7 +403,6 @@ void vtkPVProbe::CreateProperties()
 	       this->XYPlotTclName);
   this->Script("%s SetNumberOfXLabels 5", this->XYPlotTclName);
   this->Script("%s SetXTitle \"Line Divisions\"", this->XYPlotTclName);
-  this->Script("%s SetYTitle Scalars", this->XYPlotTclName);
 }
 
 void vtkPVProbe::SetInteractor()
@@ -500,14 +499,41 @@ void vtkPVProbe::AcceptCallback()
     this->PointDataLabel->SetLabel(label);
     }
   else if (this->Dimensionality == 1)
-    {
+    {    
+    if (!this->ChangeScalarsFilterTclName)
+      {
+      char tclName[256];
+      sprintf(tclName, "ChangeScalars%d", this->InstanceCount);
+      this->SetChangeScalarsFilterTclName(tclName);
+      // I don't know why we are not using "MakeTclObject".
+      pvApp->BroadcastScript("vtkFieldDataToAttributeDataFilter %s",
+                             this->ChangeScalarsFilterTclName);
+      pvApp->BroadcastScript("%s SetInput [%s GetPolyDataOutput]",
+                             this->ChangeScalarsFilterTclName,
+                             this->VTKSourceTclName);
+      }
+    pvApp->BroadcastScript("%s SetInputFieldToPointDataField",
+                           this->ChangeScalarsFilterTclName);
+    pvApp->BroadcastScript("%s SetOutputAttributeDataToPointData",
+                           this->ChangeScalarsFilterTclName);
+    pvApp->BroadcastScript("%s SetScalarComponent 0 %s 0",
+                           this->ChangeScalarsFilterTclName,
+                           this->DefaultScalarsName);
+
+    this->Script("%s SetYTitle %s", this->XYPlotTclName, this->DefaultScalarsName);
+
     this->Script("set numItems [[%s GetInputList] GetNumberOfItems]",
 		 this->XYPlotTclName);
-    if (atoi(pvApp->GetMainInterp()->result) == 0)
+
+    if (atoi(pvApp->GetMainInterp()->result) > 0)
       {
-      this->Script("%s AddInput [%s GetOutput]", this->XYPlotTclName,
-		   this->GetVTKSourceTclName());
+      this->Script("%s RemoveInput [[%s GetInputList] GetItem 0]",
+                   this->XYPlotTclName, this->XYPlotTclName);
       }
+    
+    this->Script("%s AddInput [%s GetOutput]", this->XYPlotTclName,
+                 this->ChangeScalarsFilterTclName);
+    
     this->Script("%s AddActor %s",
 		 this->GetWindow()->GetMainView()->GetRendererTclName(),
 		 this->XYPlotTclName);
@@ -740,6 +766,8 @@ void vtkPVProbe::UsePoint()
   this->Dimensionality = 0;
   this->Script("catch {eval pack forget [pack slaves %s]}",
                this->ProbeFrame->GetWidgetName());
+  this->Script("catch {eval pack forget [pack slaves %s]}",
+               this->ScalarOperationFrame->GetWidgetName());
   this->Script("pack %s %s",
                this->SelectedPointFrame->GetWidgetName(),
                this->PointDataLabel->GetWidgetName());
@@ -756,6 +784,7 @@ void vtkPVProbe::UseLine()
                this->EndPoint1Frame->GetWidgetName(),
                this->EndPoint2Frame->GetWidgetName(),
 	       this->DivisionsEntry->GetWidgetName());
+  this->PackScalarsMenu();
   
   char* endPt = this->EndPointMenu->GetValue();
   if (strcmp(endPt, "End Point 1") == 0)
@@ -908,4 +937,80 @@ void vtkPVProbe::ChangeZPosition()
     }
   
   this->Interactor->SetSelectedPointZ(entry->GetValueAsFloat());
+}
+
+void vtkPVProbe::UpdateScalarsMenu()
+{
+  int i, defaultSet = 0;
+  vtkFieldData *fd;
+  const char *arrayName;
+  vtkDataSet *dataSet;
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  int error;
+  
+  // Set up some logic to set the default array if this is the first pass.
+  // Retain previous value if not.
+  arrayName = this->ScalarOperationMenu->GetValue();
+  if (arrayName && arrayName[0] != '\0')
+    {
+    defaultSet = 1;
+    } 
+  
+  dataSet = (vtkDataSet*)(vtkTclGetPointerFromObject(this->ProbeSourceTclName,
+                                                     "vtkDataSet",
+                                                     pvApp->GetMainInterp(),
+                                                     error));
+  fd = dataSet->GetPointData()->GetFieldData();
+  
+  if (fd)
+    {
+    this->ScalarOperationMenu->ClearEntries();
+    for (i = 0; i < fd->GetNumberOfArrays(); i++)
+      {
+      if (fd->GetArray(i)->GetNumberOfComponents() == 1)
+        {
+        this->ScalarOperationMenu->AddEntryWithCommand(fd->GetArrayName(i),
+                                                       this, "ChangeScalars");
+        if (!defaultSet)
+          {
+          arrayName = fd->GetArrayName(i);
+          if (arrayName && arrayName[0] != '\0')
+            {
+            defaultSet = 1;
+            } 
+          }
+        }
+      }
+    }
+  if (defaultSet)
+    {
+    this->ScalarOperationMenu->SetValue(arrayName);
+    this->SetDefaultScalarsName(arrayName);
+    }
+}
+
+void vtkPVProbe::UpdateScalars()
+{
+  char *newScalars = this->ScalarOperationMenu->GetValue();
+  vtkPVApplication *pvApp = this->GetPVApplication();
+
+  if (strcmp(newScalars, "") == 0)
+    {
+    return;
+    }
+  
+  if (this->DefaultScalarsName)
+    {
+    if (strcmp(newScalars, this->DefaultScalarsName) == 0)
+      {
+      return;
+      }
+    }
+
+  if (this->DefaultScalarsName)
+    {
+    delete [] this->DefaultScalarsName;
+    this->DefaultScalarsName = NULL;
+    }
+  this->SetDefaultScalarsName(newScalars);
 }

@@ -45,7 +45,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkPVActorComposite.h"
 #include "vtkDataSet.h"
-#include "vtkPVSourceCollection.h"
 
 class vtkPVSource;
 class vtkKWView;

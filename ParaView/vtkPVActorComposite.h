@@ -61,7 +61,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVApplication.h"
 #include "vtkDataSetMapper.h"
 
-//class vtkPVImageTextureFilter;
 class vtkPVApplication;
 class vtkPVRenderView;
 class vtkPVData;
@@ -264,8 +263,6 @@ protected:
   // I do not know what this point is for.  It is probably obsolete.
   // ???The data object that owns this composite???
   vtkPVData *PVData;
-  
-  //vtkPVImageTextureFilter *TextureFilter;
   
   // How to convert data set to polydata.
   int Mode;

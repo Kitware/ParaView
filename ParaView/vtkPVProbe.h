@@ -126,6 +126,9 @@ protected:
   vtkPVProbe(const vtkPVProbe&) {};
   void operator=(const vtkPVProbe&) {};
 
+  virtual void UpdateScalarsMenu();
+  virtual void UpdateScalars();
+  
   char *ProbeSourceTclName;
   
   vtkKWLabel *DimensionalityLabel;
@@ -164,6 +167,7 @@ protected:
   
   char *XYPlotTclName;
   vtkSetStringMacro(XYPlotTclName);
+
   int InstanceCount;
   vtkKWInteractor *PreviousInteractor;
 };
