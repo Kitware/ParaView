@@ -27,7 +27,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMDisplayWindowProxy);
-vtkCxxRevisionMacro(vtkSMDisplayWindowProxy, "1.11");
+vtkCxxRevisionMacro(vtkSMDisplayWindowProxy, "1.12");
 
 struct vtkSMDisplayWindowProxyInternals
 {
@@ -72,12 +72,6 @@ void vtkSMDisplayWindowProxy::CreateVTKObjects(int numObjects)
   // TODO revise
   // These are good defaults for batch scripting but should
   // be made more general for other uses.
-  for (i=0; i<numObjects; i++)
-    {
-    str << vtkClientServerStream::Invoke 
-        << this->GetID(i) << "DoubleBufferOff"
-        << vtkClientServerStream::End;
-    }
 
   vtkSMProxy* rendererProxy = this->GetSubProxy("renderer");
   if (!rendererProxy)
@@ -127,6 +121,14 @@ void vtkSMDisplayWindowProxy::CreateVTKObjects(int numObjects)
           << compositeProxy->GetID(i) 
           << "SetRenderWindow" 
           << this->GetID(i)
+          << vtkClientServerStream::End;
+      str << vtkClientServerStream::Invoke 
+          << compositeProxy->GetID(i) 
+          << "SetUseCompositing" << 1
+          << vtkClientServerStream::End;
+      str << vtkClientServerStream::Invoke 
+          << compositeProxy->GetID(i) 
+          << "SetEnableAbort" << 0
           << vtkClientServerStream::End;
       str << vtkClientServerStream::Invoke 
           << compositeProxy->GetID(i) 

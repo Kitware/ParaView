@@ -266,7 +266,7 @@
      </SubProxy>
 
      <SubProxy>
-       <Proxy name="composite" class="vtkCompositeRenderManager">
+       <Proxy name="composite" class="vtkPVTreeComposite">
        </Proxy>
      </SubProxy>
    </DisplayWindowProxy>
