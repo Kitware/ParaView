@@ -45,7 +45,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkKWRadioButtonSet);
-vtkCxxRevisionMacro(vtkKWRadioButtonSet, "1.10");
+vtkCxxRevisionMacro(vtkKWRadioButtonSet, "1.11");
 
 int vtkvtkKWRadioButtonSetCommand(ClientData cd, Tcl_Interp *interp,
                                   int argc, char *argv[]);
@@ -362,6 +362,33 @@ int vtkKWRadioButtonSet::IsAnyButtonSelected()
 }
 
 //----------------------------------------------------------------------------
+int vtkKWRadioButtonSet::IsAnyVisibleButtonSelected()
+{
+  vtkKWRadioButtonSet::ButtonSlot *button_slot = NULL;
+  vtkKWRadioButtonSet::ButtonSlot *found = NULL;
+  vtkKWRadioButtonSet::ButtonsContainerIterator *it = 
+    this->Buttons->NewIterator();
+
+  it->InitTraversal();
+  while (!it->IsDoneWithTraversal())
+    {
+    if (it->GetData(button_slot) == VTK_OK)
+      {
+      if (this->IsButtonSelected(button_slot->Id) &&
+          this->GetButtonVisibility(button_slot->Id))
+        {
+        found = button_slot;
+        break;
+        }
+      }
+    it->GoToNextItem();
+    }
+  it->Delete();
+
+  return found ? 1 : 0;
+}
+
+//----------------------------------------------------------------------------
 void vtkKWRadioButtonSet::HideButton(int id)
 {
   this->SetButtonVisibility(id, 0);
@@ -411,6 +438,29 @@ int vtkKWRadioButtonSet::GetNumberOfVisibleButtons()
     return 0;
     }
   return atoi(this->Script("llength [grid slaves %s]", this->GetWidgetName()));
+}
+
+//----------------------------------------------------------------------------
+void vtkKWRadioButtonSet::SelectFirstVisibleButton()
+{
+  vtkKWRadioButtonSet::ButtonSlot *button_slot = NULL;
+  vtkKWRadioButtonSet::ButtonsContainerIterator *it = 
+    this->Buttons->NewIterator();
+
+  it->InitTraversal();
+  while (!it->IsDoneWithTraversal())
+    {
+    if (it->GetData(button_slot) == VTK_OK)
+      {
+      if (this->GetButtonVisibility(button_slot->Id))
+        {
+        this->SelectButton(button_slot->Id);
+        break;
+        }
+      }
+    it->GoToNextItem();
+    }
+  it->Delete();
 }
 
 //----------------------------------------------------------------------------

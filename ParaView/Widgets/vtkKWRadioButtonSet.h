@@ -96,6 +96,8 @@ public:
   void SelectButton(int id);
   int IsButtonSelected(int id);
   int IsAnyButtonSelected();
+  int IsAnyVisibleButtonSelected();
+  void SelectFirstVisibleButton();
 
   // Description:
   // Convenience method to hide/show a button
