@@ -50,7 +50,7 @@
 
 //-------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVTreeComposite);
-vtkCxxRevisionMacro(vtkPVTreeComposite, "1.51");
+vtkCxxRevisionMacro(vtkPVTreeComposite, "1.52");
 
 
 //=========================================================================
@@ -350,7 +350,7 @@ void vtkPVTreeComposite::InternalStartRender()
     winInfoInt.FullSize[1] = winInfoInt.ReducedSize[1] = size[1];
     winInfoInt.ImageReductionFactor = 1;
     }
-//  winInfo.NumberOfRenderers = rens->GetNumberOfItems();
+  //  winInfo.NumberOfRenderers = rens->GetNumberOfItems();
   winInfoInt.NumberOfRenderers = 1;
   winInfoInt.UseCompositing = this->UseCompositing;
   winInfoDouble.DesiredUpdateRate = this->RenderWindow->GetDesiredUpdateRate();
@@ -423,6 +423,7 @@ void vtkPVTreeComposite::InternalStartRender()
       {
       light->GetPosition(lightInfoDouble.Position);
       light->GetFocalPoint(lightInfoDouble.FocalPoint);
+      cout << "Server light position: " << lightInfoDouble.Position[0] << " " << lightInfoDouble.Position[0] << " " << lightInfoDouble.Position[2] << endl;      
       }
     ren->GetBackground(renInfoDouble.Background);
     
@@ -443,12 +444,7 @@ void vtkPVTreeComposite::InternalStartRender()
         id, 
         vtkCompositeRenderManager::LIGHT_INFO_DOUBLE_TAG);
       }
-//    }
   
-  // Turn swap buffers off before the render so the end render method
-  // has a chance to add to the back buffer.
-  renWin->SwapBuffersOff();
-
   vtkTimerLog::MarkStartEvent("Render Geometry");
 }
 
@@ -470,8 +466,6 @@ void vtkPVTreeComposite::WriteFullImage()
     {
     this->WriteFullFloatImage();
     }
-  this->RenderWindow->SwapBuffersOn();
-  this->RenderWindow->Frame();
 }
   
 //----------------------------------------------------------------------------
@@ -1255,7 +1249,7 @@ void vtkPVTreeComposite::SetRenderWindow(vtkRenderWindow *renWin)
 {
   vtkRendererCollection *rens;
   vtkRenderer *ren = 0;
-
+  
   if (this->RenderWindow == renWin)
     {
     return;
@@ -1354,6 +1348,13 @@ void vtkPVTreeComposite::SetRenderWindow(vtkRenderWindow *renWin)
       else if (this->Controller && this->Controller->GetLocalProcessId() != 0)
         {
         vtkCallbackCommand *cbc;
+
+        // It is simpler to always use single buffer on the server.
+        if (this->RenderWindow)
+          {
+          // Lets keep the render window single buffer
+          this->RenderWindow->DoubleBufferOff();
+          }        
         
         ren = rens->GetNextItem();
         if (ren)
@@ -1372,25 +1373,6 @@ void vtkPVTreeComposite::SetRenderWindow(vtkRenderWindow *renWin)
           this->EndRenderTag = ren->AddObserver(vtkCommand::EndEvent,cbc);
           cbc->Delete();
           }
-        }
-      else
-        {
-#ifdef _WIN32
-        // I had a problem with some graphics cards getting front and
-        // back buffers mixed up, so I made the remote render windows
-        // single buffered. One nice feature of this is being able to
-        // see the render in these helper windows.
-        vtkWin32OpenGLRenderWindow *renWin;
-  
-        renWin = vtkWin32OpenGLRenderWindow::SafeDownCast(this->RenderWindow);
-        if (renWin)
-          {
-          // Lets keep the render window single buffer
-          renWin->DoubleBufferOff();
-          // I do not want to replace the original.
-          renWin = renWin;
-          }
-#endif
         }
       }
     }
