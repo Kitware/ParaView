@@ -83,7 +83,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.183");
+vtkCxxRevisionMacro(vtkPVData, "1.184");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -1890,8 +1890,34 @@ void vtkPVData::ColorByPropertyInternal()
 //----------------------------------------------------------------------------
 void vtkPVData::ColorByPointField(const char *name)
 {
+  if (name == NULL)
+    {
+    return;
+    }
+
   this->AddTraceEntry("$kw(%s) ColorByPointField {%s}", 
                       this->GetTclName(), name);
+  // Set the menu value.
+  vtkDataArray *array;
+  array = this->VTKData->GetPointData()->GetArray(name);
+  if (array == NULL)
+    {
+    return;
+    }
+  int numComps = array->GetNumberOfComponents();
+  char *str;
+  str = new char [strlen(name) + 16];
+  if (numComps == 1)
+    {
+    sprintf(str, "Point %s", name);
+    }
+  else
+    {
+    sprintf(str, "Point %s (%d)", name, numComps);
+    }
+  this->ColorMenu->SetValue(str);
+  delete [] str;
+
   this->ColorByPointFieldInternal(name);
 }
 
@@ -1953,39 +1979,35 @@ void vtkPVData::ColorByPointFieldInternal(const char *name)
 //----------------------------------------------------------------------------
 void vtkPVData::ColorByCellField(const char *name)
 {
+  if (name == NULL)
+    {
+    return;
+    }
+
   this->AddTraceEntry("$kw(%s) ColorByCellField {%s}", 
                       this->GetTclName(), name);
-  this->ColorByCellFieldInternal(name);
-  /*
-  const char *current;
-  current = this->ColorMenu->GetValue();
-  char newLabel[300];
-
-  this->ColorSetByUser = 1;
-
-  // In case this is called from a script.
-  vtkDataArray *array = NULL;
-  if (this->VTKData)
+  // Set the menu value.
+  vtkDataArray *array;
+  array = this->VTKData->GetCellData()->GetArray(name);
+  if (array == NULL)
     {
-    array = this->VTKData->GetPointData()->GetArray(name);
+    return;
     }
-  if (array && array->GetNumberOfComponents() > 1)
+  int numComps = array->GetNumberOfComponents();
+  char *str;
+  str = new char [strlen(name) + 16];
+  if (numComps == 1)
     {
-    sprintf(newLabel, "Cell %s %d", name, comp);
+    sprintf(str, "Cell %s", name);
     }
   else
-    {  
-    sprintf(newLabel, "Cell %s", name);
-    }
-  if (strncmp(current, newLabel, strlen(newLabel)) != 0)
     {
-    this->ColorMenu->SetValue(newLabel);
+    sprintf(str, "Cell %s (%d)", name, numComps);
     }
+  this->ColorMenu->SetValue(str);
+  delete [] str;
 
-  this->AddTraceEntry("$kw(%s) ColorByCellFieldComponent {%s} %d", 
-                      this->GetTclName(), name, comp);
-  this->ColorByCellFieldComponentInternal(name, comp);
-  */
+  this->ColorByCellFieldInternal(name);
 }
 
 //----------------------------------------------------------------------------
@@ -3278,7 +3300,7 @@ void vtkPVData::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVData ";
-  this->ExtractRevision(os,"$Revision: 1.183 $");
+  this->ExtractRevision(os,"$Revision: 1.184 $");
 }
 
 //----------------------------------------------------------------------------
