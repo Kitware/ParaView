@@ -39,12 +39,13 @@ public:
   // Always collect when using LOD
   virtual void InteractiveRender();
   virtual void StillRender();
+  
+  virtual vtkSMPartDisplay* CreatePartDisplay();
 
 protected:
   vtkPVCaveRenderModule();
   ~vtkPVCaveRenderModule();
 
-  virtual vtkPVPartDisplay* CreatePartDisplay();
   void LoadConfigurationFile(int numDisplays);
 
   vtkPVCaveRenderModule(const vtkPVCaveRenderModule&); // Not implemented

@@ -19,7 +19,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkRenderWindow.h"
 #include "vtkPVProcessModule.h"
-#include "vtkPVMultiDisplayPartDisplay.h"
+#include "vtkSMMultiDisplayPartDisplay.h"
 #include "vtkPVLODPartDisplayInformation.h"
 #include "vtkCollection.h"
 #include "vtkRenderer.h"
@@ -31,7 +31,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCaveRenderModule);
-vtkCxxRevisionMacro(vtkPVCaveRenderModule, "1.4");
+vtkCxxRevisionMacro(vtkPVCaveRenderModule, "1.5");
 
 
 
@@ -219,10 +219,10 @@ void vtkPVCaveRenderModule::LoadConfigurationFile(int numDisplays)
 }
 
 //----------------------------------------------------------------------------
-vtkPVPartDisplay* vtkPVCaveRenderModule::CreatePartDisplay()
+vtkSMPartDisplay* vtkPVCaveRenderModule::CreatePartDisplay()
 {
-  vtkPVMultiDisplayPartDisplay* pDisp = vtkPVMultiDisplayPartDisplay::New();
-  pDisp->SetProcessModule(this->ProcessModule);
+  vtkSMMultiDisplayPartDisplay* pDisp = vtkSMMultiDisplayPartDisplay::New();
+  pDisp->SetProcessModule(vtkPVProcessModule::SafeDownCast(this->GetProcessModule()));
   return pDisp;
 }
 
@@ -231,13 +231,13 @@ vtkPVPartDisplay* vtkPVCaveRenderModule::CreatePartDisplay()
 void vtkPVCaveRenderModule::StillRender()
 {
   vtkObject* object;
-  vtkPVCompositePartDisplay* pDisp;
+  vtkSMCompositePartDisplay* pDisp;
 
   // Change the collection flags and update.
   this->Displays->InitTraversal();
   while ( (object = this->Displays->GetNextItemAsObject()) )
     {
-    pDisp = vtkPVCompositePartDisplay::SafeDownCast(object);
+    pDisp = vtkSMCompositePartDisplay::SafeDownCast(object);
     if (pDisp && pDisp->GetVisibility())
       {
       pDisp->SetCollectionDecision(1);
@@ -268,7 +268,7 @@ void vtkPVCaveRenderModule::StillRender()
 void vtkPVCaveRenderModule::InteractiveRender()
 {
   vtkObject* object;
-  vtkPVCompositePartDisplay* pDisp;
+  vtkSMCompositePartDisplay* pDisp;
   vtkPVLODPartDisplayInformation* info;
   unsigned long totalGeoMemory = 0;
   unsigned long totalLODMemory = 0;
@@ -277,13 +277,13 @@ void vtkPVCaveRenderModule::InteractiveRender()
   this->Displays->InitTraversal();
   while ( (object = this->Displays->GetNextItemAsObject()) )
     {
-    pDisp = vtkPVCompositePartDisplay::SafeDownCast(object);
+    pDisp = vtkSMCompositePartDisplay::SafeDownCast(object);
     if (pDisp && pDisp->GetVisibility())
       {
       pDisp->SetCollectionDecision(1);
       pDisp->SetLODCollectionDecision(1);
       // This updates if required (collection disabled).
-      info = pDisp->GetInformation();
+      info = pDisp->GetLODInformation();
       totalGeoMemory += info->GetGeometryMemorySize();
       totalLODMemory += info->GetLODGeometryMemorySize();
       }
