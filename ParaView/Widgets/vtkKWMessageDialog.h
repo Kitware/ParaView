@@ -143,6 +143,11 @@ public:
   // Set the icon on the message dialog.
   void SetIcon();
 
+  // Description:
+  // Accessor for OK and cancel button
+  vtkGetObjectMacro(OKButton, vtkKWWidget);
+  vtkGetObjectMacro(CancelButton, vtkKWWidget);
+
 protected:
   vtkKWMessageDialog();
   ~vtkKWMessageDialog();
