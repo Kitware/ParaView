@@ -67,7 +67,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWSelectionFrameLayoutManager);
-vtkCxxRevisionMacro(vtkKWSelectionFrameLayoutManager, "1.4");
+vtkCxxRevisionMacro(vtkKWSelectionFrameLayoutManager, "1.5");
 
 //----------------------------------------------------------------------------
 class vtkKWSelectionFrameLayoutManagerInternals
@@ -471,7 +471,7 @@ void vtkKWSelectionFrameLayoutManager::CreateResolutionEntriesMenu(
   char label[64], command[128], help[128];  
 
   int res[][2] = VTK_KW_SFLMGR_RESOLUTIONS;
-  for (int idx = 0; idx < sizeof(res) / sizeof(res[0]); idx++)
+  for (size_t idx = 0; idx < sizeof(res) / sizeof(res[0]); idx++)
     {
     sprintf(label, VTK_KW_SFLMGR_LABEL_PATTERN, 
             res[idx][0], res[idx][1]);
@@ -506,7 +506,7 @@ void vtkKWSelectionFrameLayoutManager::UpdateResolutionEntriesMenu()
   char label[64];
 
   int res[][2] = VTK_KW_SFLMGR_RESOLUTIONS;
-  for (int idx = 0; idx < sizeof(res) / sizeof(res[0]); idx++)
+  for (size_t idx = 0; idx < sizeof(res) / sizeof(res[0]); idx++)
     {
     sprintf(label, VTK_KW_SFLMGR_LABEL_PATTERN, res[idx][0], res[idx][1]);
     this->ResolutionEntriesMenu->SetState(
@@ -685,7 +685,7 @@ void vtkKWSelectionFrameLayoutManager::CreateResolutionEntriesToolbar(
   char command[128], help[128], icon[128], icon_selected[128];  
 
   int res[][2] = VTK_KW_SFLMGR_RESOLUTIONS;
-  for (int idx = 0; idx < sizeof(res) / sizeof(res[0]); idx++)
+  for (size_t idx = 0; idx < sizeof(res) / sizeof(res[0]); idx++)
     {
     sprintf(command, "SetResolution %d %d", res[idx][0], res[idx][1]);
     sprintf(help, VTK_KW_SFLMGR_HELP_PATTERN, 
@@ -722,7 +722,7 @@ void vtkKWSelectionFrameLayoutManager::UpdateResolutionEntriesToolbar()
   char icon[128];
 
   int res[][2] = VTK_KW_SFLMGR_RESOLUTIONS;
-  for (int idx = 0; idx < sizeof(res) / sizeof(res[0]); idx++)
+  for (size_t idx = 0; idx < sizeof(res) / sizeof(res[0]); idx++)
     {
     sprintf(icon, VTK_KW_SFLMGR_ICON_PATTERN, res[idx][0], res[idx][1]);
     vtkKWWidget *w = this->ResolutionEntriesToolbar->GetWidget(icon);
@@ -940,7 +940,7 @@ void vtkKWSelectionFrameLayoutManager::CreateWidget(
 
 //----------------------------------------------------------------------------
 vtkKWRenderWidget* vtkKWSelectionFrameLayoutManager::GetVisibleRenderWidget(
-  vtkKWSelectionFrame *widget)
+  vtkKWSelectionFrame *vtkNotUsed(widget))
 {
   return NULL;
 }
@@ -1676,10 +1676,12 @@ int vtkKWSelectionFrameLayoutManager::CopyScreenshotAllWidgetsToClipboard()
 
 //----------------------------------------------------------------------------
 int vtkKWSelectionFrameLayoutManager::PrintWidgets(
+#ifndef _WIN32
+  double, int)
+{
+#else
   double dpi, int selection_only)
 {
-#ifdef _WIN32
-
   vtkKWSelectionFrame *first_widget = this->GetNthWidget(0);
   if (!first_widget)
     {
