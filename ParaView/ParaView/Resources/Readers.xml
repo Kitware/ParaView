@@ -228,7 +228,7 @@
           extensions=".pop" file_description="POP Ocean Files">
     <Source class="vtkPOPReader"/>
     <VectorEntry variable="Radius" trace_name="Radius" type="float" 
-                 help="Set the radius of the data set" defulat_value="60000"/>
+                 help="Set the radius of the data set" default_value="60000"/>
     <VectorEntry label="Clip Extent" variable="ClipExtent" type="int"
                  length="6" trace_name="ClipExtent"
                  help="For reading a smaller extent."
