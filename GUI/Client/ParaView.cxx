@@ -77,6 +77,18 @@ int MyMain(int argc, char *argv[])
   ParaViewEnableMSVCDebugHook();
   ParaViewEnableWindowsExceptionFilter();
 
+#ifdef PARAVIEW_ENABLE_FPE    
+#if defined(_MSC_VER)
+  // enable floating point exceptions on MSVC
+  short m = 0x372;
+  __asm
+    {
+    fldcw m;
+    }
+#endif
+#endif
+  
+
 #ifdef VTK_USE_MPI
   // This is here to avoid false leak messages from vtkDebugLeaks when
   // using mpich. It appears that the root process which spawns all the
@@ -286,17 +298,8 @@ int __stdcall WinMain(HINSTANCE vtkNotUsed(hInstance),
       }
     }
   
-    
-  // enable floating point exceptions on MSVC
-//  short m = 0x372;
-//  __asm
-//    {
-//    fldcw m;
-//    }
-
   // parse a few of the command line arguments
   // a space delimites an argument except when it is inside a quote
-
   argc = 1;
   int pos = 0;
   for (i = 0; i < strlen(lpCmdLine); i++)
