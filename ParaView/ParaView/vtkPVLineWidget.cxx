@@ -55,7 +55,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVXMLElement.h"
 
 vtkStandardNewMacro(vtkPVLineWidget);
-vtkCxxRevisionMacro(vtkPVLineWidget, "1.22");
+vtkCxxRevisionMacro(vtkPVLineWidget, "1.23");
 
 //----------------------------------------------------------------------------
 vtkPVLineWidget::vtkPVLineWidget()
@@ -586,4 +586,16 @@ void vtkPVLineWidget::ChildCreate(vtkPVApplication* pvApp)
 void vtkPVLineWidget::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
+  os << indent << "Point1Variable: " 
+     << ( this->Point1Variable ? this->Point1Variable : "(none)" ) << endl;
+  os << indent << "Point1LabelText: " 
+     << ( this->Point1LabelText ? this->Point1LabelText : "(none)" ) << endl;
+  os << indent << "Point2Variable: " 
+     << ( this->Point2Variable ? this->Point2Variable : "(none)" ) << endl;
+  os << indent << "Point2LabelText: " 
+     << ( this->Point2LabelText ? this->Point2LabelText : "(none)" ) << endl;
+  os << indent << "ResolutionVariable: " 
+     << ( this->ResolutionVariable ? this->ResolutionVariable : "(none)" ) << endl;
+  os << indent << "ResolutionLabelText: " 
+     << ( this->ResolutionLabelText ? this->ResolutionLabelText : "(none)" ) << endl;
 }
