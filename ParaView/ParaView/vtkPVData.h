@@ -71,6 +71,7 @@ class vtkKWCheckButton;
 class vtkKWBoundsDisplay;
 class vtkScalarBarActor;
 class vtkCubeAxesActor2D;
+class vtkKWScrollableFrame;
 
 
 
@@ -337,7 +338,7 @@ protected:
   vtkProp *Prop;
   
   // Not properties does not mean the same thing as vtk.
-  vtkKWWidget *Properties;
+  vtkKWScrollableFrame *Properties;
   vtkKWLabel *NumCellsLabel;
   vtkKWLabel *NumPointsLabel;
   vtkKWBoundsDisplay *BoundsDisplay;

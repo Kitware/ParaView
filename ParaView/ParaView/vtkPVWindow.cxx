@@ -77,6 +77,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWSplitFrame.h"
 #include "vtkKWTclInteractor.h"
 #include "vtkKWCompositeCollection.h"
+#include "vtkKWScrollableFrame.h"
 
 #include "vtkPVSourceInterfaceDirectories.h"
 #include "vtkPVAnimationInterface.h"
@@ -2351,8 +2352,6 @@ vtkPVSource *vtkPVWindow::ContourCallback()
 
   this->DisableMenus();
   this->DisableFilterButtons();
-  // Isolate events to this window until accept or reset is pressed.
-  this->Script("grab set %s", contour->GetParameterFrame()->GetWidgetName());
 
   // It has not really been deleted.
   return contour;

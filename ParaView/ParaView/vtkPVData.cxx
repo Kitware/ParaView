@@ -61,6 +61,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVSourceInterface.h"
 #include "vtkKWCheckButton.h"
 #include "vtkKWNotebook.h"
+#include "vtkKWScrollableFrame.h"
 
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
@@ -107,7 +108,7 @@ vtkPVData::vtkPVData()
   ++instanceCount;
   this->InstanceCount = instanceCount;
     
-  this->Properties = vtkKWWidget::New();
+  this->Properties = vtkKWScrollableFrame::New();
 
   this->ScalarBarFrame = vtkKWLabeledFrame::New();
   this->ColorFrame = vtkKWLabeledFrame::New();
@@ -811,24 +812,23 @@ void vtkPVData::InsertExtractPiecesIfNecessary()
 void vtkPVData::CreateProperties()
 {
   this->Properties->SetParent(this->GetPVSource()->GetNotebook()->GetFrame("Display"));
-  this->Properties->Create(this->Application, "frame","");
-  this->Script("pack %s -pady 2 -fill x -expand yes",
-               this->Properties->GetWidgetName());
-  this->ScalarBarFrame->SetParent(this->Properties);
+  this->Properties->Create(this->Application);
+
+  this->ScalarBarFrame->SetParent(this->Properties->GetFrame());
   this->ScalarBarFrame->ShowHideFrameOn();
   this->ScalarBarFrame->Create(this->Application);
   this->ScalarBarFrame->SetLabel("Scalar Bar");
-  this->ColorFrame->SetParent(this->Properties);
+  this->ColorFrame->SetParent(this->Properties->GetFrame());
   this->ColorFrame->ShowHideFrameOn();
   this->ColorFrame->Create(this->Application);
   this->ColorFrame->SetLabel("Color");
-  this->DisplayStyleFrame->SetParent(this->Properties);
+  this->DisplayStyleFrame->SetParent(this->Properties->GetFrame());
   this->DisplayStyleFrame->ShowHideFrameOn();
   this->DisplayStyleFrame->Create(this->Application);
   this->DisplayStyleFrame->SetLabel("Display Style");
-  this->StatsFrame->SetParent(this->Properties);
+  this->StatsFrame->SetParent(this->Properties->GetFrame());
   this->StatsFrame->Create(this->Application, "frame", "");
-  this->ViewFrame->SetParent(this->Properties);
+  this->ViewFrame->SetParent(this->Properties->GetFrame());
   this->ViewFrame->ShowHideFrameOn();
   this->ViewFrame->Create(this->Application);
   this->ViewFrame->SetLabel("View");
@@ -838,10 +838,10 @@ void vtkPVData::CreateProperties()
   this->NumPointsLabel->SetParent(this->StatsFrame);
   this->NumPointsLabel->Create(this->Application, "");
   
-  this->BoundsDisplay->SetParent(this->Properties);
+  this->BoundsDisplay->SetParent(this->Properties->GetFrame());
   this->BoundsDisplay->Create(this->Application);
   
-  this->AmbientScale->SetParent(this->Properties);
+  this->AmbientScale->SetParent(this->Properties->GetFrame());
   this->AmbientScale->Create(this->Application, "-showvalue 1");
   this->AmbientScale->DisplayLabel("Ambient Light");
   this->AmbientScale->SetRange(0.0, 1.0);
@@ -968,7 +968,7 @@ void vtkPVData::CreateProperties()
   this->ScalarBarOrientationCheck->SetState(1);
   this->ScalarBarOrientationCheck->SetCommand(this, "ScalarBarOrientationCallback");
   
-  this->CubeAxesCheck->SetParent(this->Properties);
+  this->CubeAxesCheck->SetParent(this->Properties->GetFrame());
   this->CubeAxesCheck->Create(this->Application, "-text CubeAxes");
   this->CubeAxesCheck->SetCommand(this, "CubeAxesCheckCallback");
   
@@ -1030,6 +1030,9 @@ void vtkPVData::CreateProperties()
   this->Script("pack %s -fill x", this->DisplayStyleFrame->GetWidgetName());
   this->Script("pack %s",
                this->CubeAxesCheck->GetWidgetName());
+
+  this->Script("pack %s -fill both -expand yes -side top",
+               this->Properties->GetWidgetName());
 }
 
 //----------------------------------------------------------------------------

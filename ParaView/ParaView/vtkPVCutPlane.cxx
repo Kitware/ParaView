@@ -48,6 +48,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVPlaneWidget.h"
 #include "vtkPVInputMenu.h"
 #include "vtkObjectFactory.h"
+#include "vtkKWScrollableFrame.h"
 
 int vtkPVCutPlaneCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -130,18 +131,6 @@ void vtkPVCutPlane::CreateProperties()
   this->Script("pack %s", contourEntry->GetWidgetName());
   contourEntry->Delete();
   contourEntry = NULL;
-
-  // Offset -------------------------
-  //this->OffsetEntry->SetParent(this->GetParameterFrame()->GetFrame());
-  //this->OffsetEntry->SetObjectVariable(this->GetVTKSourceTclName(), 
-  //                                     "Value");
-  //this->OffsetEntry->SetModifiedCommand(this->GetTclName(), 
-  //                                      "SetAcceptButtonColorToRed");
-  //this->OffsetEntry->Create(this->Application, "Offset", 1, NULL, NULL);
-  //this->AddPVWidget(this->OffsetEntry);
-  //this->Script("pack %s -side top -fill x",
-  //             this->OffsetEntry->GetWidgetName());
-
 
   // This makes the assumption that the vtkCutDataSet filter 
   // has already been set.  In the future we could also implement 

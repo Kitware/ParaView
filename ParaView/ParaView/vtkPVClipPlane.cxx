@@ -48,6 +48,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVData.h"
 #include "vtkPVInputMenu.h"
 #include "vtkObjectFactory.h"
+#include "vtkKWScrollableFrame.h"
 
 int vtkPVClipPlaneCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);

@@ -71,6 +71,10 @@ class vtkPVScalarRangeLabel;
 class vtkPVScale;
 class vtkPVSelectionList;
 class vtkPVSourceInterface;
+class vtkPVRenderView;
+class vtkKWLabeledFrame;
+class vtkKWScrollableFrame;
+class vtkKWLabel;
 class vtkPVStringEntry;
 class vtkPVVectorEntry;
 class vtkPVWidget;
@@ -246,7 +250,8 @@ public:
   
   vtkGetObjectMacro(Widgets, vtkKWWidgetCollection);
   
-  vtkGetObjectMacro(ParameterFrame, vtkKWLabeledFrame);
+  vtkGetObjectMacro(ParameterFrame, vtkKWScrollableFrame);
+  vtkGetObjectMacro(MainParameterFrame, vtkKWWidget);
   
   // Description:
   // Used to save the source into a file.
@@ -369,7 +374,9 @@ protected:
   vtkKWWidget       *Properties;
   void              UpdateProperties();
 
-  vtkKWLabeledFrame *ParameterFrame;
+  vtkKWWidget *MainParameterFrame;
+  vtkKWWidget *ButtonFrame;
+  vtkKWScrollableFrame *ParameterFrame;
   
   vtkKWWidgetCollection *Widgets;
 

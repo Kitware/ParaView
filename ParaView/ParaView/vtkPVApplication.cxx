@@ -137,7 +137,7 @@ vtkPVApplication::vtkPVApplication()
   char name[128];
   this->CommandFunction = vtkPVApplicationCommand;
   this->MajorVersion = 0;
-  this->MinorVersion = 3;
+  this->MinorVersion = 5;
   this->SetApplicationName("ParaView");
   sprintf(name, "ParaView%d.%d", this->MajorVersion, this->MinorVersion);
   this->SetApplicationVersionName(name);

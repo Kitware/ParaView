@@ -60,6 +60,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkObjectFactory.h"
 #include "vtkKWLabel.h"
 #include "vtkKWLabeledFrame.h"
+#include "vtkKWScrollableFrame.h"
 #include "vtkPVInputMenu.h"
 #include "vtkPVArrayMenu.h"
 #include "vtkPVArraySelection.h"
@@ -104,7 +105,9 @@ vtkPVSource::vtkPVSource()
 
   this->Properties = vtkKWWidget::New();
   
-  this->ParameterFrame = vtkKWLabeledFrame::New();
+  this->ParameterFrame = vtkKWScrollableFrame::New();
+  this->ButtonFrame = vtkKWWidget::New();
+  this->MainParameterFrame = vtkKWWidget::New();
   this->AcceptButton = vtkKWPushButton::New();
   this->ResetButton = vtkKWPushButton::New();
   this->DeleteButton = vtkKWPushButton::New();
@@ -174,6 +177,12 @@ vtkPVSource::~vtkPVSource()
   
   this->ParameterFrame->Delete();
   this->ParameterFrame = NULL;
+
+  this->MainParameterFrame->Delete();
+  this->MainParameterFrame = NULL;
+
+  this->ButtonFrame->Delete();
+  this->ButtonFrame = NULL;
 
   this->Properties->Delete();
   this->Properties = NULL;
@@ -418,15 +427,25 @@ void vtkPVSource::CreateProperties()
     }
   this->DisplayNameLabel->Create(app, "");
   this->Script("pack %s", this->DisplayNameLabel->GetWidgetName());
-  
-  this->ParameterFrame->SetParent(this->Properties);
-  this->ParameterFrame->ShowHideFrameOn();
+
+  this->MainParameterFrame->SetParent(this->Properties);
+  this->MainParameterFrame->Create(this->Application, "frame", "");
+  this->Script("pack %s -fill both -expand t -side top", 
+	       this->MainParameterFrame->GetWidgetName());
+
+  this->ButtonFrame->SetParent(this->MainParameterFrame);
+  this->ButtonFrame->Create(this->Application, "frame", "");
+  this->Script("pack %s -fill both -expand t -side top", 
+	       this->ButtonFrame->GetWidgetName());
+
+  this->ParameterFrame->SetParent(this->MainParameterFrame);
+
   this->ParameterFrame->Create(this->Application);
-  this->ParameterFrame->SetLabel("Parameters");
-  this->Script("pack %s -fill x -expand t -side top", this->ParameterFrame->GetWidgetName());
+  this->Script("pack %s -fill both -expand t -side top", 
+	       this->ParameterFrame->GetWidgetName());
 
   vtkKWWidget *frame = vtkKWWidget::New();
-  frame->SetParent(this->ParameterFrame->GetFrame());
+  frame->SetParent(this->ButtonFrame);
   frame->Create(this->Application, "frame", "");
   this->Script("pack %s -fill x -expand t", frame->GetWidgetName());  
   
@@ -454,7 +473,7 @@ void vtkPVSource::CreateProperties()
   frame->Delete();  
   
   // Isolate events to this window until accept or reset is pressed.
-  this->Script("grab set %s", this->ParameterFrame->GetWidgetName());
+  this->Script("grab set %s", this->MainParameterFrame->GetWidgetName());
   
   this->UpdateProperties();
   
@@ -656,7 +675,8 @@ void vtkPVSource::Accept(int hideFlag)
       }
 
     // Remove the local grab
-    this->Script("grab release %s", this->ParameterFrame->GetWidgetName());    
+    this->Script("grab release %s", 
+		 this->MainParameterFrame->GetWidgetName());    
     this->Initialized = 1;
     }
 
@@ -720,7 +740,8 @@ void vtkPVSource::DeleteCallback()
   if ( ! this->Initialized)
     {
     // Remove the local grab
-    this->Script("grab release %s", this->ParameterFrame->GetWidgetName()); 
+    this->Script("grab release %s", 
+		 this->MainParameterFrame->GetWidgetName()); 
     this->Script("update");   
     this->Initialized = 1;
     }
