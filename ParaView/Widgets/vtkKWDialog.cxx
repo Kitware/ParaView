@@ -41,15 +41,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWDialog );
-vtkCxxRevisionMacro(vtkKWDialog, "1.34");
+vtkCxxRevisionMacro(vtkKWDialog, "1.35");
 
 int vtkKWDialogCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
 
+//----------------------------------------------------------------------------
 vtkKWDialog::vtkKWDialog()
 {
   this->CommandFunction = vtkKWDialogCommand;
-  this->Command = NULL;
   this->Done = 1;
   this->TitleString = 0;
   this->SetTitleString("Kitware Dialog");
@@ -60,16 +60,14 @@ vtkKWDialog::vtkKWDialog()
   this->GrabDialog = 1;
 }
 
+//----------------------------------------------------------------------------
 vtkKWDialog::~vtkKWDialog()
 {
-  if (this->Command)
-    {
-    delete [] this->Command;
-    }
   this->SetTitleString(0);
   this->SetMasterWindow(0);
 }
 
+//----------------------------------------------------------------------------
 int vtkKWDialog::Invoke()
 {
   this->Done = 0;
@@ -159,6 +157,7 @@ int vtkKWDialog::Invoke()
   return (this->Done-1);
 }
 
+//----------------------------------------------------------------------------
 void vtkKWDialog::Display()
 {
   this->Done = 0;
@@ -170,29 +169,24 @@ void vtkKWDialog::Display()
   this->Grab();
 }
 
+//----------------------------------------------------------------------------
 void vtkKWDialog::Cancel()
 {
   this->Script("wm withdraw %s",this->GetWidgetName());
   this->ReleaseGrab();
 
   this->Done = 1;  
-  if (this->Command && strlen(this->Command) > 0)
-    {
-    this->Script("eval %s",this->Command);
-    }
 }
 
+//----------------------------------------------------------------------------
 void vtkKWDialog::OK()
 {
   this->Script("wm withdraw %s",this->GetWidgetName());
   this->ReleaseGrab();
   this->Done = 2;  
-  if (this->Command && strlen(this->Command) > 0)
-    {
-    this->Script("eval %s",this->Command);
-    }
 }
 
+//----------------------------------------------------------------------------
 void vtkKWDialog::Create(vtkKWApplication *app, const char *args)
 {
   const char *wname;
@@ -233,11 +227,13 @@ void vtkKWDialog::Create(vtkKWApplication *app, const char *args)
 
 }
 
+//----------------------------------------------------------------------------
 vtkKWWindow *vtkKWDialog::GetMasterWindow()
 {
   return this->MasterWindow;
 }
 
+//----------------------------------------------------------------------------
 void vtkKWDialog::SetMasterWindow(vtkKWWindow* win)
 {
   if (this->MasterWindow != win) 
@@ -255,11 +251,7 @@ void vtkKWDialog::SetMasterWindow(vtkKWWindow* win)
     }   
 }
 
-void vtkKWDialog::SetCommand(vtkKWObject* CalledObject, const char *CommandString)
-{
-  this->Command = this->CreateCommand(CalledObject, CommandString);
-}
-
+//----------------------------------------------------------------------------
 void vtkKWDialog::SetTitle( const char* title )
 {
   if (this->Application)

@@ -84,13 +84,6 @@ public:
   vtkKWWidget* GetFrame() { return this; }
 
   // Description:
-  // A method to set callback functions on objects.  The first argument is
-  // the KWObject that will have the method called on it.  The second is the
-  // name of the method to be called and any arguments in string form.
-  // The calling is done via TCL wrappers for the KWObject.
-  virtual void SetCommand(vtkKWObject* CalledObject, const char *CommandString);
-
-  // Description:
   // Play beep when the dialog is displayed
   vtkSetClampMacro( Beep, int, 0, 1 );
   vtkBooleanMacro( Beep, int );
@@ -131,7 +124,6 @@ protected:
 
   vtkKWWindow* MasterWindow;
 
-  char *Command;
   char *TitleString;
   int Done;
   int Beep;
