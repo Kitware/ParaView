@@ -37,7 +37,7 @@
 
 #include <ctype.h>
 
-vtkCxxRevisionMacro(vtkPVXMLPackageParser, "1.36");
+vtkCxxRevisionMacro(vtkPVXMLPackageParser, "1.37");
 vtkStandardNewMacro(vtkPVXMLPackageParser);
 
 #ifndef VTK_NO_EXPLICIT_TEMPLATE_INSTANTIATION
@@ -171,6 +171,21 @@ void vtkPVXMLPackageParser::ProcessConfiguration()
 
   // Loop over the top-level elements.
   unsigned int i;
+  // First server manager files
+  for(i=0; i < root->GetNumberOfNestedElements(); ++i)
+    {
+    vtkPVXMLElement* element = root->GetNestedElement(i);
+    const char* name = element->GetName();
+    if(strcmp(name, "ServerManagerFile") == 0)
+      {
+      this->LoadServerManagerFile(element);
+      }
+    }
+  // Instantiate new server manager prototypes
+  // These are used by the modules
+  vtkSMProxyManager* proxm = vtkSMObject::GetProxyManager();
+  proxm->InstantiateGroupPrototypes("filters");
+
   for(i=0; i < root->GetNumberOfNestedElements(); ++i)
     {
     vtkPVXMLElement* element = root->GetNestedElement(i);
@@ -220,7 +235,6 @@ void vtkPVXMLPackageParser::ProcessConfiguration()
       }
     else if(strcmp(name, "ServerManagerFile") == 0)
       {
-      this->LoadServerManagerFile(element);
       }
     else if(strcmp(name, "Library") == 0)
       {
