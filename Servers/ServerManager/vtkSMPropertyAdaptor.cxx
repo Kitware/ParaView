@@ -32,7 +32,7 @@
 #include "vtkSMStringVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMPropertyAdaptor);
-vtkCxxRevisionMacro(vtkSMPropertyAdaptor, "1.8");
+vtkCxxRevisionMacro(vtkSMPropertyAdaptor, "1.9");
 
 //---------------------------------------------------------------------------
 vtkSMPropertyAdaptor::vtkSMPropertyAdaptor()
@@ -651,5 +651,20 @@ void vtkSMPropertyAdaptor::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
   
-  os << indent << "Property: " << this->Property << endl;
+  os << indent << "Property: " << this->Property->GetClassName() << " (" << this->Property << ")" << endl;
+  this->Property->PrintSelf(os, indent.GetNextIndent());
+  os << indent << "Domains: " << endl;
+#define PRINT_DOMAIN(type) \
+  if ( this->type##Domain ) \
+    { \
+    os << indent << #type " domain: " << this->type##Domain << endl; \
+    this->type##Domain->PrintSelf(os, indent.GetNextIndent()); \
+    }
+  PRINT_DOMAIN(Boolean);
+  PRINT_DOMAIN(DoubleRange);
+  PRINT_DOMAIN(Enumeration);
+  PRINT_DOMAIN(IntRange);
+  PRINT_DOMAIN(ProxyGroup);
+  PRINT_DOMAIN(StringList);
+  PRINT_DOMAIN(StringListRange);
 }
