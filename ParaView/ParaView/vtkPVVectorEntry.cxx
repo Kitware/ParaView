@@ -122,7 +122,7 @@ void vtkPVVectorEntry::Create(vtkKWApplication *pvApp, char *label,
   // Now the sublabels and entries
   for (i = 0; i < vectorLength; i++)
     {
-    if (subLabels[i] && subLabels[i][0] != '\0')
+    if (subLabels && subLabels[i] && subLabels[i][0] != '\0')
       {
       subLabel = vtkKWLabel::New();
       subLabel->SetParent(this);

@@ -70,7 +70,7 @@ vtkPVGlyph3D::vtkPVGlyph3D()
   this->VectorModeMenu = vtkKWOptionMenu::New();
   this->OrientCheck = vtkPVLabeledToggle::New();
   this->ScaleCheck = vtkPVLabeledToggle::New();
-  this->ScaleEntry = vtkPVScalarEntry::New();
+  this->ScaleEntry = vtkPVVectorEntry::New();
 
   // Glyph adds too its input, so sould not replace it.
   this->ReplaceInput = 0;
@@ -254,15 +254,16 @@ void vtkPVGlyph3D::CreateProperties()
   
   this->ScaleEntry->SetParent(this->GetParameterFrame()->GetFrame());
   this->ScaleEntry->SetPVSource(this);
-  this->ScaleEntry->Create(pvApp, "Scale Factor:", "SetScaleFactor",
+  this->ScaleEntry->Create(pvApp, "Scale Factor:", 1, NULL, "SetScaleFactor",
                            "GetScaleFactor", "Select the amount to scale the glyphs by",
                            this->GetVTKSourceTclName());
   this->Widgets->AddItem(this->ScaleEntry);
-  this->ScaleEntry->GetEntry()->SetValue("1.0");
+  ((vtkKWEntry*)this->ScaleEntry->GetEntries()->GetItemAsObject(0))->SetValue("1.0");
 
-  this->Script("pack %s %s %s",
+  this->Script("pack %s %s",
                this->OrientCheck->GetWidgetName(),
-               this->ScaleCheck->GetWidgetName(),
+               this->ScaleCheck->GetWidgetName());
+  this->Script("pack %s -side left -fill x -expand t",
                this->ScaleEntry->GetWidgetName());
 }
 
@@ -518,7 +519,8 @@ void vtkPVGlyph3D::SaveInTclScript(ofstream *file)
   *file << this->VTKSourceTclName << " SetScaling "
         << this->ScaleCheck->GetCheckButton()->GetState() << "\n\t";
   *file << this->VTKSourceTclName << " SetScaleFactor "
-        << this->ScaleEntry->GetEntry()->GetValueAsFloat() << "\n\n";
+        << ((vtkKWEntry*)this->ScaleEntry->GetEntries()->GetItemAsObject(0))->GetValueAsFloat()
+        << "\n\n";
   
   this->GetPVOutput(0)->SaveInTclScript(file, this->VTKSourceTclName);
 }

@@ -62,7 +62,6 @@ class vtkStringList;
 class vtkPVLabeledToggle;
 class vtkPVFileEntry;
 class vtkPVStringEntry;
-class vtkPVScalarEntry;
 class vtkPVVectorEntry;
 class vtkKWScale;
 class vtkKWEntry;
@@ -199,7 +198,7 @@ public:
   // Description:
   // Create an entry for a single value.  Label is put to left of entry.
   // The methods are called on the object (VTKSource if o=NULL).
-  vtkPVScalarEntry *AddLabeledEntry(char *label, char *setCmd, char *getCmd,
+  vtkPVVectorEntry *AddLabeledEntry(char *label, char *setCmd, char *getCmd,
                                     char* help, vtkKWObject *o = NULL);
   
   // Description:

@@ -29,7 +29,6 @@ vtkPVLODActor
 vtkPVMethodInterface 
 vtkPVProbe
 vtkPVRenderView 
-vtkPVScalarEntry
 vtkPVSelectionList 
 vtkPVSource 
 vtkPVSourceInterface 

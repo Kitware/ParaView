@@ -66,7 +66,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVLabeledToggle.h"
 #include "vtkPVFileEntry.h"
 #include "vtkPVStringEntry.h"
-#include "vtkPVScalarEntry.h"
 #include "vtkPVVectorEntry.h"
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
@@ -1629,11 +1628,11 @@ vtkPVStringEntry *vtkPVSource::AddStringEntry(char *label, char *setCmd,
 }
 
 //----------------------------------------------------------------------------
-vtkPVScalarEntry *vtkPVSource::AddLabeledEntry(char *label, char *setCmd,
+vtkPVVectorEntry *vtkPVSource::AddLabeledEntry(char *label, char *setCmd,
                                                char *getCmd, char* help,
                                                vtkKWObject *o)
 {
-  vtkPVScalarEntry *entry;
+  vtkPVVectorEntry *entry;
 
   // Find the Tcl name of the object whose methods will be called.
   const char *tclName = this->GetVTKSourceTclName();
@@ -1642,11 +1641,12 @@ vtkPVScalarEntry *vtkPVSource::AddLabeledEntry(char *label, char *setCmd,
     tclName = o->GetTclName();
     }
 
-  entry = vtkPVScalarEntry::New();
+  entry = vtkPVVectorEntry::New();
   this->Widgets->AddItem(entry);
   entry->SetParent(this->ParameterFrame->GetFrame());
   entry->SetPVSource(this);
-  entry->Create(this->Application, label, setCmd, getCmd, help, tclName);
+  entry->Create(this->Application, label, 1, NULL, setCmd, getCmd, help,
+                tclName);
   this->Script("pack %s -fill x -expand t", entry->GetWidgetName());
 
   entry->Delete();
