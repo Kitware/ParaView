@@ -68,7 +68,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVWindow.h"
 #include "vtkPolyDataMapper.h"
 #include "vtkProperty.h"
-#include "vtkScalarBarActor.h"
 #include "vtkString.h"
 #include "vtkTexture.h"
 #include "vtkTimerLog.h"
@@ -77,7 +76,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.149");
+vtkCxxRevisionMacro(vtkPVData, "1.150");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -168,7 +167,6 @@ vtkPVData::vtkPVData()
   
   this->ScalarBarCheckFrame = vtkKWWidget::New();
   this->ScalarBarCheck = vtkKWCheckButton::New();
-  this->ScalarBarOrientationCheck = vtkKWCheckButton::New();
   this->CubeAxesCheck = vtkKWCheckButton::New();
 
   this->VisibilityCheck = vtkKWCheckButton::New();
@@ -354,8 +352,6 @@ vtkPVData::~vtkPVData()
   this->ScalarBarCheckFrame = NULL;
   this->ScalarBarCheck->Delete();
   this->ScalarBarCheck = NULL;  
-  this->ScalarBarOrientationCheck->Delete();
-  this->ScalarBarOrientationCheck = NULL;
   
   this->CubeAxesCheck->Delete();
   this->CubeAxesCheck = NULL;
@@ -1204,12 +1200,6 @@ void vtkPVData::CreateProperties()
     this->ScalarBarCheck->GetWidgetName(),
     this->GetTclName());
 
-  this->ScalarBarOrientationCheck->SetParent(this->ScalarBarCheckFrame);
-  this->ScalarBarOrientationCheck->Create(this->Application, "-text Vertical");
-  this->ScalarBarOrientationCheck->SetState(1);
-  this->ScalarBarOrientationCheck->SetCommand(this, 
-                                              "ScalarBarOrientationCallback");
-  
   this->CubeAxesCheck->SetParent(this->Properties->GetFrame());
   this->CubeAxesCheck->Create(this->Application, "-text CubeAxes");
   this->CubeAxesCheck->SetCommand(this, "CubeAxesCheckCallback");
@@ -1245,9 +1235,8 @@ void vtkPVData::CreateProperties()
   this->Script("pack %s %s -side top -expand t -fill x",
                this->ScalarBarCheckFrame->GetWidgetName(),
                this->ColorRangeFrame->GetWidgetName());
-  this->Script("pack %s %s %s -side left",
+  this->Script("pack %s %s -side left",
                this->ScalarBarCheck->GetWidgetName(),
-               this->ScalarBarOrientationCheck->GetWidgetName(),
                this->EditColorMapButton->GetWidgetName());
   this->Script("pack %s -side left -expand f",
                this->ColorRangeResetButton->GetWidgetName());
@@ -1414,14 +1403,6 @@ void vtkPVData::UpdateProperties()
     else
       {
       this->ScalarBarCheck->SetState(0);
-      }
-    if (this->PVColorMap->GetScalarBarOrientation())
-      {
-      this->ScalarBarOrientationCheck->SetState(1);
-      }
-    else
-      {
-      this->ScalarBarOrientationCheck->SetState(0);
       }
     }
 
@@ -2645,34 +2626,6 @@ void vtkPVData::GetColorRange(float *range)
   range[1] = tmp[1];
 }
 
-
-
-
-//----------------------------------------------------------------------------
-void vtkPVData::ScalarBarOrientationCallback()
-{
-  int state = this->ScalarBarOrientationCheck->GetState();
-  
-  if (this->PVColorMap == NULL)
-    {
-    vtkErrorMacro("Color map missing.");
-    return;
-    }
-
-  if (state)
-    {
-    this->PVColorMap->SetScalarBarOrientationToVertical();
-    }
-  else
-    {
-    this->PVColorMap->SetScalarBarOrientationToHorizontal();
-    }
-  if ( this->GetPVRenderView() )
-    {
-    this->GetPVRenderView()->EventuallyRender();
-    }
-}
-
 //----------------------------------------------------------------------------
 void vtkPVData::OpacityChangedCallback()
 {
@@ -2771,20 +2724,6 @@ void vtkPVData::GetActorScale(float* point)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVData::SetScalarBarOrientationToVertical()
-{
-  this->ScalarBarOrientationCheck->SetState(1);
-  this->ScalarBarOrientationCallback();
-}
-
-//----------------------------------------------------------------------------
-void vtkPVData::SetScalarBarOrientationToHorizontal()
-{
-  this->ScalarBarOrientationCheck->SetState(0);
-  this->ScalarBarOrientationCallback();
-}
-
-//----------------------------------------------------------------------------
 void vtkPVData::SetLODResolution(int dim)
 {
   if (this->LODResolution == dim)
@@ -2823,7 +2762,7 @@ void vtkPVData::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVData ";
-  this->ExtractRevision(os,"$Revision: 1.149 $");
+  this->ExtractRevision(os,"$Revision: 1.150 $");
 }
 
 //----------------------------------------------------------------------------

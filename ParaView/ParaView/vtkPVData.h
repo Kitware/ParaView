@@ -263,9 +263,6 @@ public:
 
   void SetScalarBarVisibility(int val);  
   void ScalarBarCheckCallback();
-  void ScalarBarOrientationCallback();
-  void SetScalarBarOrientationToVertical();
-  void SetScalarBarOrientationToHorizontal();
   vtkGetObjectMacro(ScalarBarCheck, vtkKWCheckButton);
 
   void SetCubeAxesVisibility(int val);
@@ -480,7 +477,6 @@ protected:
 
   vtkKWWidget *ScalarBarCheckFrame;
   vtkKWCheckButton *ScalarBarCheck;
-  vtkKWCheckButton *ScalarBarOrientationCheck;
   
   // Stuff for setting the range of the color map.
   vtkKWWidget *ColorRangeFrame;

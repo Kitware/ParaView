@@ -87,7 +87,6 @@ AdjustContourValue $cInt 0.3
 
 $cntOutput ColorByPointFieldComponent Momentum 0
 $cntOutput SetScalarBarVisibility 1
-$cntOutput SetScalarBarOrientationToHorizontal
 $cInt UpdateParameterWidgets
 
 RenWin1 SetSize 300 300
@@ -130,7 +129,6 @@ RenWin1 Render
 set extOutput [$pvExtract GetPVOutput]
 $extOutput ColorByPointFieldComponent {Density} 0
 $extOutput SetScalarBarVisibility 1
-$extOutput SetScalarBarOrientationToHorizontal
 
 for {set i 55} {$i < 56} {incr i 1} {
     $VOIEntry SetValue $i $i 0 32 3 20

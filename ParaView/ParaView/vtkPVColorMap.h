@@ -56,7 +56,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWWidget.h"
 
 class vtkLookupTable;
-class vtkScalarBarActor;
+class vtkScalarBarWidget;
 class vtkPVApplication;
 class vtkPVRenderView;
 class vtkKWOptionMenu;
@@ -129,13 +129,6 @@ public:
   int GetScalarBarVisibility() { return this->ScalarBarVisibility;}  
   
   // Description:
-  // Position of the scalar bar in the render view.
-  void SetScalarBarOrientation(int vertical);
-  void SetScalarBarOrientationToVertical();
-  void SetScalarBarOrientationToHorizontal();
-  vtkGetMacro(ScalarBarOrientation, int);
-
-  // Description:
   // Choose preset color schemes.
   void SetColorSchemeToRedBlue();
   void SetColorSchemeToBlueRed();
@@ -159,7 +152,6 @@ public:
   // Description:
   // Callbacks.
   void ScalarBarCheckCallback();
-  void ScalarBarOrientationCallback();
   void ColorRangeEntryCallback();
 
   // Description:
@@ -186,7 +178,7 @@ protected:
   int VectorComponent;
   int NumberOfVectorComponents;
 
-  vtkScalarBarActor* ScalarBar;
+  vtkScalarBarWidget* ScalarBar;
 
   void UpdateScalarBarTitle();
 
@@ -197,7 +189,6 @@ protected:
   vtkPVRenderView *PVRenderView;
   int Initialized;
   int ScalarBarVisibility;
-  int ScalarBarOrientation;
 
   // User interaface.
   vtkKWLabeledEntry* ScalarBarTitleEntry;
@@ -205,7 +196,6 @@ protected:
   vtkKWLabeledFrame* ScalarBarFrame;
   vtkKWWidget*       ScalarBarCheckFrame;
   vtkKWCheckButton*  ScalarBarCheck;
-  vtkKWCheckButton*  ScalarBarOrientationCheck;
   
   // Stuff for setting the range of the color map.
   vtkKWWidget*       ColorRangeFrame;

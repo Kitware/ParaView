@@ -54,14 +54,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVWindow.h"
 #include "vtkPVSource.h"
 #include "vtkPVData.h"
+#include "vtkPVGenericRenderWindowInteractor.h"
 #include "vtkPVSourceCollection.h"
 #include "vtkObjectFactory.h"
 #include "vtkRenderer.h"
 #include "vtkScalarBarActor.h"
+#include "vtkScalarBarWidget.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVColorMap);
-vtkCxxRevisionMacro(vtkPVColorMap, "1.13");
+vtkCxxRevisionMacro(vtkPVColorMap, "1.14");
 
 int vtkPVColorMapCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -85,7 +87,6 @@ vtkPVColorMap::vtkPVColorMap()
   this->ScalarBarTitle = NULL;
   this->ArrayName = NULL;
   this->ScalarBarVisibility = 0;
-  this->ScalarBarOrientation = 1;
   this->ScalarRange[0] = 0.0;
   this->ScalarRange[1] = 1.0;
   this->Initialized = 0;
@@ -110,7 +111,6 @@ vtkPVColorMap::vtkPVColorMap()
   this->ArrayNameLabel = vtkKWLabel::New();
   this->ScalarBarCheckFrame = vtkKWWidget::New();
   this->ScalarBarCheck = vtkKWCheckButton::New();
-  this->ScalarBarOrientationCheck = vtkKWCheckButton::New();
   
   // Stuff for setting the range of the color map.
   this->ColorRangeFrame = vtkKWWidget::New();
@@ -129,11 +129,6 @@ vtkPVColorMap::~vtkPVColorMap()
 {
   // Used to be in vtkPVActorComposite........
   vtkPVApplication *pvApp = this->GetPVApplication();
-
-  // To remove actors fropm render view, please turn visilibty off before 
-  // deleting this object.
-  // This line causes problems because we are not registering the PVRenderView.
-  //this->SetScalarBarVisibility(0);
 
   if (this->ArrayName)
     {
@@ -176,8 +171,6 @@ vtkPVColorMap::~vtkPVColorMap()
   this->ScalarBarCheckFrame = NULL;
   this->ScalarBarCheck->Delete();
   this->ScalarBarCheck = NULL;
-  this->ScalarBarOrientationCheck->Delete();
-  this->ScalarBarOrientationCheck = NULL;
   
   // Stuff for setting the range of the color map.
   this->ColorRangeFrame->Delete();
@@ -294,12 +287,6 @@ void vtkPVColorMap::Create(vtkKWApplication *app)
     this->ScalarBarCheck->GetWidgetName(),
     this->GetTclName());
 
-  this->ScalarBarOrientationCheck->SetParent(this->ScalarBarCheckFrame);
-  this->ScalarBarOrientationCheck->Create(this->Application, "-text Vertical");
-  this->ScalarBarOrientationCheck->SetState(1);
-  this->ScalarBarOrientationCheck->SetCommand(this, 
-                                              "ScalarBarOrientationCallback");
-
   this->BackButton->SetParent(this);
   this->BackButton->Create(this->Application, "-text {Back}");
   this->BackButton->SetCommand(this, "BackButtonCallback");
@@ -311,9 +298,8 @@ void vtkPVColorMap::Create(vtkKWApplication *app)
                this->ArrayNameLabel->GetWidgetName(),
                this->ScalarBarCheckFrame->GetWidgetName(),
                this->ColorRangeFrame->GetWidgetName());
-  this->Script("pack %s %s %s %s -side left",
+  this->Script("pack %s %s %s -side left",
                this->ScalarBarCheck->GetWidgetName(),
-               this->ScalarBarOrientationCheck->GetWidgetName(),
                this->ColorMapMenuLabel->GetWidgetName(),
                this->ColorMapMenu->GetWidgetName());
   this->Script("pack %s -side left -expand f",
@@ -337,17 +323,17 @@ void vtkPVColorMap::CreateParallelTclObjects(vtkPVApplication *pvApp)
     pvApp->MakeTclObject("vtkLookupTable", this->LookupTableTclName));
   
 
-  this->ScalarBar = vtkScalarBarActor::New();
-  this->ScalarBar->GetPositionCoordinate()
-    ->SetCoordinateSystemToNormalizedViewport();
-  this->ScalarBar->GetPositionCoordinate()->SetValue(0.87, 0.25);
-  this->ScalarBar->SetOrientationToVertical();
-  this->ScalarBar->SetWidth(0.13);
-  this->ScalarBar->SetHeight(0.5);
+  this->ScalarBar = vtkScalarBarWidget::New();
+  this->ScalarBar->SetInteractor(
+    this->PVRenderView->GetPVWindow()->GetGenericInteractor());
+  this->ScalarBar->GetScalarBarActor()->GetPositionCoordinate()
+    ->SetValue(0.87, 0.25);
+  this->ScalarBar->GetScalarBarActor()->SetWidth(0.13);
+  this->ScalarBar->GetScalarBarActor()->SetHeight(0.5);
 
   this->UpdateScalarBarTitle();
 
-  this->ScalarBar->SetLookupTable(this->LookupTable);
+  this->ScalarBar->GetScalarBarActor()->SetLookupTable(this->LookupTable);
 }
 
 //----------------------------------------------------------------------------
@@ -528,28 +514,6 @@ void vtkPVColorMap::ScalarBarCheckCallback()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVColorMap::ScalarBarOrientationCallback()
-{
-  int state = this->ScalarBarOrientationCheck->GetState();
-  
-  if (state)
-    {
-    this->SetScalarBarOrientationToVertical();
-    //this->AddTraceEntry("$kw(%s) SetScalarBarOrientationToVertical", this->GetTclName());
-    }
-  else
-    {
-    this->SetScalarBarOrientationToHorizontal();
-    //this->AddTraceEntry("$kw(%s) SetScalarBarOrientationToHorizontal", this->GetTclName());
-    }
-  if ( this->GetPVRenderView() )
-    {
-    this->GetPVRenderView()->EventuallyRender();
-    }
-}
-
-
-//----------------------------------------------------------------------------
 void vtkPVColorMap::SetScalarRange(float min, float max)
 {
   this->SetScalarRangeInternal(min, max);
@@ -726,7 +690,7 @@ void vtkPVColorMap::SetScalarBarVisibility(int val)
     {
     if (val)
       {
-      ren->AddActor(this->ScalarBar);
+      this->ScalarBar->SetEnabled(1);
       // This is here in case process 0 has not geometry.  
       // We have to explicitly build the color map.
       this->LookupTable->Build();
@@ -734,56 +698,12 @@ void vtkPVColorMap::SetScalarBarVisibility(int val)
       }
     else
       {
-      ren->RemoveActor(this->ScalarBar);
+      this->ScalarBar->SetEnabled(0);
       }
     }
 
   this->AddTraceEntry("$kw(%s) SetScalarBarVisibility %d", this->GetTclName(),
                       val);
-}
-
-
-//----------------------------------------------------------------------------
-void vtkPVColorMap::SetScalarBarOrientation(int vertical)
-{
-  if (this->ScalarBarOrientation == vertical)
-    {
-    return;
-    }
-
-  this->ScalarBarOrientation = vertical;
-  if (vertical)
-    {
-    this->ScalarBarOrientationCheck->SetState(1);
-    this->ScalarBar->GetPositionCoordinate()->SetValue(0.87, 0.25);
-    this->ScalarBar->SetOrientationToVertical();
-    this->ScalarBar->SetHeight(0.5);
-    this->ScalarBar->SetWidth(0.13);
-    }
-  else
-    {
-    this->ScalarBarOrientationCheck->SetState(0);
-    this->ScalarBar->GetPositionCoordinate()->SetValue(0.25, 0.13);
-    this->ScalarBar->SetOrientationToHorizontal();
-    this->ScalarBar->SetHeight(0.13);
-    this->ScalarBar->SetWidth(0.5);
-    }
-  this->GetPVRenderView()->EventuallyRender();
-
-  this->AddTraceEntry("$kw(%s) SetScalarBarOrientation %d", this->GetTclName(),
-                      vertical);
-}
-
-//----------------------------------------------------------------------------
-void vtkPVColorMap::SetScalarBarOrientationToVertical()
-{
-  this->SetScalarBarOrientation(1);
-}
-
-//----------------------------------------------------------------------------
-void vtkPVColorMap::SetScalarBarOrientationToHorizontal()
-{
-  this->SetScalarBarOrientation(0);
 }
 
 
@@ -800,31 +720,8 @@ void vtkPVColorMap::SaveInTclScript(ofstream *file)
 
   if (this->ScalarBarVisibility)
     {
-    *file << "vtkScalarBarActor " << scalarBarTclName << "\n\t"
-          << "[" << scalarBarTclName
-          << " GetPositionCoordinate] SetCoordinateSystemToNormalizedViewport\n\t"
-          << "[" << scalarBarTclName
-          << " GetPositionCoordinate] SetValue ";
-    position = this->ScalarBar->GetPositionCoordinate()->GetValue();
-    *file << position[0] << " " << position[1] << "\n\t"
-          << scalarBarTclName << " SetOrientationTo";
-    if (this->ScalarBar->GetOrientation() == 0)
-      {
-      *file << "Horizontal\n\t";
-      }
-    else
-      {
-      *file << "Vertical\n\t";
-      }
-    *file << scalarBarTclName << " SetWidth " 
-          << this->ScalarBar->GetWidth() << "\n\t";
-    *file << scalarBarTclName << " SetHeight "
-          << this->ScalarBar->GetHeight() << "\n\t";
-    *file << scalarBarTclName << " SetLookupTable "
-          << this->LookupTableTclName << "\n\t"
-          << scalarBarTclName << " SetTitle {" 
-          << this->ArrayName << "}\n";
-    *file << renTclName << " AddProp " << scalarBarTclName << "\n";
+    *file << "vtkScalarBarWidget " << scalarBarTclName << "\n\t";
+//    *file << renTclName << " AddProp " << scalarBarTclName << "\n";
     }
 
 
@@ -845,21 +742,21 @@ void vtkPVColorMap::UpdateScalarBarTitle()
       {
       ostrstream ostr;
       ostr << this->ScalarBarTitle << " X" << ends;
-      this->ScalarBar->SetTitle(ostr.str());
+      this->ScalarBar->GetScalarBarActor()->SetTitle(ostr.str());
       ostr.rdbuf()->freeze(0);
       }
     if (this->VectorComponent == 1)
       {
       ostrstream ostr;
       ostr << this->ScalarBarTitle << " Y" << ends;
-      this->ScalarBar->SetTitle(ostr.str());
+      this->ScalarBar->GetScalarBarActor()->SetTitle(ostr.str());
       ostr.rdbuf()->freeze(0);
       }
     if (this->VectorComponent == 2)
       {
       ostrstream ostr;
       ostr << this->ScalarBarTitle << " Z" << ends;
-      this->ScalarBar->SetTitle(ostr.str());
+      this->ScalarBar->GetScalarBarActor()->SetTitle(ostr.str());
       ostr.rdbuf()->freeze(0);
       }
     }
@@ -867,14 +764,14 @@ void vtkPVColorMap::UpdateScalarBarTitle()
     {
     ostrstream ostr;
     ostr << this->ScalarBarTitle << " " << this->VectorComponent << ends;
-    this->ScalarBar->SetTitle(ostr.str());
+    this->ScalarBar->GetScalarBarActor()->SetTitle(ostr.str());
     ostr.rdbuf()->freeze(0);
     }
   else
     {
     ostrstream ostr;
     ostr << this->ScalarBarTitle<< ends;
-    this->ScalarBar->SetTitle(ostr.str());
+    this->ScalarBar->GetScalarBarActor()->SetTitle(ostr.str());
     ostr.rdbuf()->freeze(0);
     }
   if (this->PVRenderView)
@@ -923,14 +820,6 @@ void vtkPVColorMap::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "ScalarBar: " << this->ScalarBar << endl;
   
   os << indent << "ScalarBarVisibility: " << this->ScalarBarVisibility << endl;
-  if (this->ScalarBarOrientation)
-    {
-    os << indent << "ScalarBarOrientation: Vertical\n";
-    }
-  else
-    {
-    os << indent << "ScalarBarOrientation: Horizontal\n";
-    }
 
   os << indent << "ScalarRange: " << this->ScalarRange[0] << ", "
      << this->ScalarRange[1] << endl;
