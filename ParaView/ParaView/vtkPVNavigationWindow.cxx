@@ -82,7 +82,7 @@ vtkPVNavigationWindow::~vtkPVNavigationWindow()
 
 
 void vtkPVNavigationWindow::CalculateBBox(vtkKWWidget* canvas, char* name, 
-					  int bbox[4])
+                                          int bbox[4])
 {
   char *result;
 
@@ -129,14 +129,14 @@ void vtkPVNavigationWindow::Update(vtkPVSource *currentSource)
 
   // Draw the name of the assembly.
   tmp = this->CreateCanvasItem("%s create text %d %d -text {%s} -font %s "
-			       "-tags x",
-			       this->Canvas->GetWidgetName(), 170, 10, 
-			       currentSource->GetName(),
-			       font);
+                               "-tags x",
+                               this->Canvas->GetWidgetName(), 170, 10, 
+                               currentSource->GetName(),
+                               font);
   this->Script("%s bind %s <ButtonPress-3> "
-	       "{ %s DisplayModulePopupMenu %s %%X %%Y }",
-	       this->Canvas->GetWidgetName(), tmp, this->GetTclName(), 
-	       currentSource->GetTclName());
+               "{ %s DisplayModulePopupMenu %s %%X %%Y }",
+               this->Canvas->GetWidgetName(), tmp, this->GetTclName(), 
+               currentSource->GetTclName());
   // Get the bounding box for the name.
   this->CalculateBBox(this->Canvas, tmp, bboxSource);
   delete [] tmp;
@@ -156,43 +156,43 @@ void vtkPVNavigationWindow::Update(vtkPVSource *currentSource)
         // Draw the name of the assembly.
         tmp = this->CreateCanvasItem(
           "%s create text %d %d -text {%s} -font %s -anchor e "
-	  "-tags x -fill blue",
+          "-tags x -fill blue",
           this->Canvas->GetWidgetName(), bboxSource[0]-50, y,
           source->GetName(), font);
         
-	this->CalculateBBox(this->Canvas, tmp, bboxIn);
+        this->CalculateBBox(this->Canvas, tmp, bboxIn);
         this->Script("%s bind %s <ButtonPress-1> {%s SetCurrentPVSourceCallback %s}",
                      this->Canvas->GetWidgetName(), tmp,
                      currentSource->GetPVWindow()->GetTclName(), 
-		     source->GetTclName());
-	this->Script("%s bind %s <Enter> {%s HighlightObject %s 1}",
-		     this->Canvas->GetWidgetName(), tmp,
-		     this->GetTclName(), tmp);
-	this->Script("%s bind %s <Leave> {%s HighlightObject %s 0}",
-		     this->Canvas->GetWidgetName(), tmp,
-		     this->GetTclName(), tmp);
-	this->Script("%s bind %s <ButtonPress-3> "
-		     "{ %s DisplayModulePopupMenu %s %%X %%Y }",
-		     this->Canvas->GetWidgetName(), tmp, this->GetTclName(), 
-		     source->GetTclName());
+                     source->GetTclName());
+        this->Script("%s bind %s <Enter> {%s HighlightObject %s 1}",
+                     this->Canvas->GetWidgetName(), tmp,
+                     this->GetTclName(), tmp);
+        this->Script("%s bind %s <Leave> {%s HighlightObject %s 0}",
+                     this->Canvas->GetWidgetName(), tmp,
+                     this->GetTclName(), tmp);
+        this->Script("%s bind %s <ButtonPress-3> "
+                     "{ %s DisplayModulePopupMenu %s %%X %%Y }",
+                     this->Canvas->GetWidgetName(), tmp, this->GetTclName(), 
+                     source->GetTclName());
         
         delete [] tmp;
         tmp = 0;
 
-	// only want to set yMid once
-	if ( i == 0 )
-	  {
-	  yMid = static_cast<int>(0.5 * (bboxIn[1]+bboxIn[3]));
-	  }
+        // only want to set yMid once
+        if ( i == 0 )
+          {
+          yMid = static_cast<int>(0.5 * (bboxIn[1]+bboxIn[3]));
+          }
 
         // Draw a line from input to source.
         if (y == 10)
           {
           tmp = this->CreateCanvasItem(
-	    "%s create line %d %d %d %d -fill gray50 -arrow last",
-	    this->Canvas->GetWidgetName(), bboxIn[2], yMid,
-	    bboxSource[0], yMid);
-	  delete[] tmp;
+            "%s create line %d %d %d %d -fill gray50 -arrow last",
+            this->Canvas->GetWidgetName(), bboxIn[2], yMid,
+            bboxSource[0], yMid);
+          delete[] tmp;
           }
         else
           {
@@ -207,21 +207,21 @@ void vtkPVNavigationWindow::Update(vtkPVSource *currentSource)
         
         if (source->GetPVInputs())
           {
-	  if (source->GetPVInput()->GetPVSource())
-	    {
-	    // Draw ellipsis indicating that this source has a source.
-	    this->Script("%s create line %d %d %d %d",
-			 this->Canvas->GetWidgetName(), bboxIn[0] - 18, yMid, 
-			 bboxIn[0] - 16, yMid);
-	    this->Script("%s create line %d %d %d %d",
-			 this->Canvas->GetWidgetName(), bboxIn[0] - 14, yMid, 
-			 bboxIn[0] - 12, yMid);
-	    this->Script("%s create line %d %d %d %d",
-			 this->Canvas->GetWidgetName(), bboxIn[0] - 10, yMid, 
-			 bboxIn[0] - 8, yMid);
-	    }
-	  }
-	}
+          if (source->GetPVInput()->GetPVSource())
+            {
+            // Draw ellipsis indicating that this source has a source.
+            this->Script("%s create line %d %d %d %d",
+                         this->Canvas->GetWidgetName(), bboxIn[0] - 18, yMid, 
+                         bboxIn[0] - 16, yMid);
+            this->Script("%s create line %d %d %d %d",
+                         this->Canvas->GetWidgetName(), bboxIn[0] - 14, yMid, 
+                         bboxIn[0] - 12, yMid);
+            this->Script("%s create line %d %d %d %d",
+                         this->Canvas->GetWidgetName(), bboxIn[0] - 10, yMid, 
+                         bboxIn[0] - 8, yMid);
+            }
+          }
+        }
       y += 15;
       }
     }
@@ -246,59 +246,59 @@ void vtkPVNavigationWindow::Update(vtkPVSource *currentSource)
       // of that output
       int num;
       if (numOutputs > 1)
-	{
-	num = numOutputs;
-	}
+        {
+        num = numOutputs;
+        }
       else
-	{
-	num = outputs[0]->GetNumberOfPVConsumers();
-	}
+        {
+        num = outputs[0]->GetNumberOfPVConsumers();
+        }
       for (i = 0; i < num; i++)
-	{
-	if (numOutputs > 1)
-	  {
-	  if ( outputs[i]->GetNumberOfPVConsumers() == 0 )
-	    {
-	    continue;
-	    }
-	  source = outputs[i]->GetPVConsumer(0);
-	  }
-	else
-	  {
-	  source = outputs[0]->GetPVConsumer(i);
-	  }
+        {
+        if (numOutputs > 1)
+          {
+          if ( outputs[i]->GetNumberOfPVConsumers() == 0 )
+            {
+            continue;
+            }
+          source = outputs[i]->GetPVConsumer(0);
+          }
+        else
+          {
+          source = outputs[0]->GetPVConsumer(i);
+          }
         
         // Draw the name of the assembly .
         tmp = this->CreateCanvasItem(
           "%s create text %d %d -text {%s} -font %s -anchor w "
-	  "-tags x -fill blue",
+          "-tags x -fill blue",
           this->Canvas->GetWidgetName(), bboxSource[2]+50, y,
           source->GetName(), font);
         
         // Get the bounding box for the name.
-	this->CalculateBBox(this->Canvas, tmp, bboxOut);
+        this->CalculateBBox(this->Canvas, tmp, bboxOut);
         this->Script("%s bind %s <ButtonPress-1> {%s  SetCurrentPVSourceCallback %s}",
                      this->Canvas->GetWidgetName(), tmp,
                      currentSource->GetPVWindow()->GetTclName(), 
-		     source->GetTclName());
-	this->Script("%s bind %s <Enter> {%s HighlightObject %s 1}",
-		     this->Canvas->GetWidgetName(), tmp,
-		     this->GetTclName(), tmp);
-	this->Script("%s bind %s <Leave> {%s HighlightObject %s 0}",
-		     this->Canvas->GetWidgetName(), tmp,
-		     this->GetTclName(), tmp); 
-	this->Script("%s bind %s <ButtonPress-3> "
-		     "{ %s DisplayModulePopupMenu %s %%X %%Y }",
-		     this->Canvas->GetWidgetName(), tmp, this->GetTclName(), 
-		     source->GetTclName());
+                     source->GetTclName());
+        this->Script("%s bind %s <Enter> {%s HighlightObject %s 1}",
+                     this->Canvas->GetWidgetName(), tmp,
+                     this->GetTclName(), tmp);
+        this->Script("%s bind %s <Leave> {%s HighlightObject %s 0}",
+                     this->Canvas->GetWidgetName(), tmp,
+                     this->GetTclName(), tmp); 
+        this->Script("%s bind %s <ButtonPress-3> "
+                     "{ %s DisplayModulePopupMenu %s %%X %%Y }",
+                     this->Canvas->GetWidgetName(), tmp, this->GetTclName(), 
+                     source->GetTclName());
         delete [] tmp;
         tmp = NULL;
         
-	// only want to set yMid once
-	if ( i == 0 )
-	  {
-	  yMid = static_cast<int>(0.5 * (bboxOut[1]+bboxOut[3]));
-	  }
+        // only want to set yMid once
+        if ( i == 0 )
+          {
+          yMid = static_cast<int>(0.5 * (bboxOut[1]+bboxOut[3]));
+          }
 
         // Draw to output.
         if (y == 10)
@@ -309,7 +309,7 @@ void vtkPVNavigationWindow::Update(vtkPVSource *currentSource)
           }
         else
           {
-	  xMid = (int)(0.5 * (bboxSource[2] + bboxOut[0]));
+          xMid = (int)(0.5 * (bboxSource[2] + bboxOut[0]));
           this->Script("%s create line %d %d %d %d -fill gray50 -arrow none",
                        this->Canvas->GetWidgetName(), xMid, yMid,
                        xMid, yMid+15);
@@ -334,7 +334,7 @@ void vtkPVNavigationWindow::Update(vtkPVSource *currentSource)
             }
           }
         y += 15;
-	}
+        }
       }
     }
 
@@ -345,16 +345,16 @@ void vtkPVNavigationWindow::Update(vtkPVSource *currentSource)
   if ( height > 1 && (bbox[3] - bbox[1]) > height )
     {
     this->Script("pack %s -fill both -side right", 
-		 this->ScrollBar->GetWidgetName());
+                 this->ScrollBar->GetWidgetName());
     this->Script("%s configure -scrollregion \"%d %d %d %d\"", 
-		 this->Canvas->GetWidgetName(), 
-		 0, bbox[1], 341, bbox[3]);
+                 this->Canvas->GetWidgetName(), 
+                 0, bbox[1], 341, bbox[3]);
     }
   else
     {
     this->Script("%s configure -scrollregion \"%d %d %d %d\"", 
-		 this->Canvas->GetWidgetName(), 
-		 0, 0, 341, 45);
+                 this->Canvas->GetWidgetName(), 
+                 0, 0, 341, 45);
     }
   
 }
@@ -376,7 +376,7 @@ void vtkPVNavigationWindow::Create(vtkKWApplication *app, const char *args)
   
   // create the top level
   wname = this->GetWidgetName();
-  this->Script("frame %s %s", wname, args);
+  this->Script("frame %s %s", wname, (args?args:""));
 
   if (this->Width > 0 && this->Height > 0)
     {
@@ -401,23 +401,23 @@ void vtkPVNavigationWindow::Create(vtkKWApplication *app, const char *args)
   ostrstream command;
   this->ScrollBar->SetParent(this);
   command << "-command \"" <<  this->Canvas->GetWidgetName()
-	  << " yview\"" << ends;
+          << " yview\"" << ends;
   char* commandStr = command.str();
   this->ScrollBar->Create(this->Application, "scrollbar", commandStr);
   delete[] commandStr;
 
   this->Script("%s configure -yscrollcommand \"%s set\"", 
-	       this->Canvas->GetWidgetName(),
-	       this->ScrollBar->GetWidgetName());
+               this->Canvas->GetWidgetName(),
+               this->ScrollBar->GetWidgetName());
 
   this->Script("pack %s -fill both -expand t -side left", this->Canvas->GetWidgetName());
   this->PopupMenu->SetParent(this);
   this->PopupMenu->Create(this->Application, "-tearoff 0");
   this->PopupMenu->AddCommand("Delete", this, "DeleteWidget", 0, 
-			      "Delete current widget");
+                              "Delete current widget");
   char *var = this->PopupMenu->CreateCheckButtonVariable(this, "Visibility");
   this->PopupMenu->AddCheckButton("Visibility", var, this, "Visibility", 0,
-				  "Set visibility for the current object");  
+                                  "Set visibility for the current object");  
   delete [] var;
   this->PopupMenu->AddCascade("Representation", 0, 0);
   this->PopupMenu->AddCascade("Interpolation", 0, 0);
@@ -442,7 +442,7 @@ void vtkPVNavigationWindow::SetWidth(int width)
   if (this->Application != NULL)
     {
     this->Script("%s configure -width %d", this->Canvas->GetWidgetName(), 
-		 width);
+                 width);
     }
 }
 
@@ -459,20 +459,20 @@ void vtkPVNavigationWindow::SetHeight(int height)
   if (this->Application != NULL)
     {
     this->Script("%s configure -height %d", this->Canvas->GetWidgetName(), 
-		 height);
+                 height);
     }
 }
 
 void vtkPVNavigationWindow::HighlightObject(const char* widget, int onoff)
 {
   this->Script("%s itemconfigure %s -fill %s", 
-	       this->Canvas->GetWidgetName(), widget,
-	       (onoff ? "red" : "blue") );
+               this->Canvas->GetWidgetName(), widget,
+               (onoff ? "red" : "blue") );
 }
 
 //----------------------------------------------------------------------------
 void vtkPVNavigationWindow::DisplayModulePopupMenu(const char* module, 
-						   int x, int y)
+                                                   int x, int y)
 {
   //cout << "Popup for module: " << module << " at " << x << ", " << y << endl;
   vtkKWApplication *app = this->Application;
@@ -496,12 +496,12 @@ void vtkPVNavigationWindow::DisplayModulePopupMenu(const char* module,
     this->PopupMenu->SetState("Interpolation", vtkKWMenu::Normal);
     char *var = this->PopupMenu->CreateCheckButtonVariable(this, "Visibility");
     str1 << "[ " << module << " GetPVOutput ] SetVisibility $" 
-	 << var << ";"
-	 << "[ [ Application GetMainWindow ] GetMainView ] EventuallyRender" 
-	 <<  ends;
+         << var << ";"
+         << "[ [ Application GetMainWindow ] GetMainView ] EventuallyRender" 
+         <<  ends;
     this->PopupMenu->SetEntryCommand("Visibility", str1.str());
     if ( app->EvaluateBooleanExpression("[ %s GetPVOutput ] GetVisibility",
-					module) )
+                                        module) )
       {
       this->Script("set %s 1", var);
       }
@@ -511,17 +511,17 @@ void vtkPVNavigationWindow::DisplayModulePopupMenu(const char* module,
       }
     delete [] var;
     this->Script("%s SetCascade [ %s GetIndex \"Representation\" ] "
-		 "[ [ [ [ %s GetPVOutput ] GetRepresentationMenu ] "
-		 "GetMenu ] GetWidgetName ]",
-		 this->PopupMenu->GetTclName(),
-		 this->PopupMenu->GetTclName(), module);
+                 "[ [ [ [ %s GetPVOutput ] GetRepresentationMenu ] "
+                 "GetMenu ] GetWidgetName ]",
+                 this->PopupMenu->GetTclName(),
+                 this->PopupMenu->GetTclName(), module);
 
     this->Script("%s SetCascade [ %s GetIndex \"Interpolation\" ] "
-		 "[ [ [ [ %s GetPVOutput ] GetInterpolationMenu ] "
-		 "GetMenu ] GetWidgetName ]",
-		 this->PopupMenu->GetTclName(),
-		 this->PopupMenu->GetTclName(), module);
-		 
+                 "[ [ [ [ %s GetPVOutput ] GetInterpolationMenu ] "
+                 "GetMenu ] GetWidgetName ]",
+                 this->PopupMenu->GetTclName(),
+                 this->PopupMenu->GetTclName(), module);
+                 
     }
   else
     {
