@@ -41,7 +41,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWDialog );
-vtkCxxRevisionMacro(vtkKWDialog, "1.31");
+vtkCxxRevisionMacro(vtkKWDialog, "1.31.2.1");
 
 int vtkKWDialogCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -243,14 +243,9 @@ void vtkKWDialog::SetMasterWindow(vtkKWWindow* win)
 {
   if (this->MasterWindow != win) 
     { 
-    if (this->MasterWindow) 
-      { 
-      this->MasterWindow->UnRegister(this); 
-      }
     this->MasterWindow = win; 
     if (this->MasterWindow) 
       { 
-      this->MasterWindow->Register(this); 
       if (this->Application)
         {
         this->Script("wm transient %s %s", this->GetWidgetName(), 
@@ -258,8 +253,7 @@ void vtkKWDialog::SetMasterWindow(vtkKWWindow* win)
         }
       } 
     this->Modified(); 
-    } 
-  
+    }   
 }
 
 void vtkKWDialog::SetCommand(vtkKWObject* CalledObject, const char *CommandString)

@@ -63,7 +63,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVServerFileDialog );
-vtkCxxRevisionMacro(vtkPVServerFileDialog, "1.21.2.1");
+vtkCxxRevisionMacro(vtkPVServerFileDialog, "1.21.2.2");
 
 int vtkPVServerFileDialogCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -225,14 +225,9 @@ void vtkPVServerFileDialog::SetMasterWindow(vtkKWWindow* win)
 {
   if (this->MasterWindow != win) 
     { 
-    if (this->MasterWindow) 
-      { 
-      this->MasterWindow->UnRegister(this); 
-      }
     this->MasterWindow = win; 
     if (this->MasterWindow) 
       { 
-      this->MasterWindow->Register(this); 
       if (this->Application)
         {
         this->Script("wm transient %s %s", this->GetWidgetName(), 
