@@ -30,13 +30,23 @@
       <DoubleVectorProperty
          name="ScalarRange"
          command="SetTableRange"
-         number_of_elements="2" >
+         number_of_elements="2" 
+         default_values="0 1">
       </DoubleVectorProperty>
 
       <IntVectorProperty
          name="VectorComponent"
          command="SetVectorComponent"
          number_of_elements="1" >
+      </IntVectorProperty>
+
+      <IntVectorProperty
+         name="VectorMode"
+         command="SetVectorMode"
+         number_of_elements="1" 
+         default_values="1">
+       <EnumarationDomain 
+          values="MAGNITUDE:0 COMPONENT:1" />
       </IntVectorProperty>
     </LookupTableProxy>
   </ProxyGroup>
