@@ -77,7 +77,7 @@ void vtkKWToolbar::SetGlobalWidgetsFlatAspect(int val)
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWToolbar );
-vtkCxxRevisionMacro(vtkKWToolbar, "1.19");
+vtkCxxRevisionMacro(vtkKWToolbar, "1.20");
 
 
 int vtkKWToolbarCommand(ClientData cd, Tcl_Interp *interp,
@@ -490,4 +490,7 @@ void vtkKWToolbar::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os,indent);
   os << indent << "Frame: " << this->Frame << endl;
   os << indent << "Separator: " << this->Separator << endl;
+  os << indent << "Resizable: " << (this->Resizable ? "On" : "Off") << endl;
+  os << indent << "FlatAspect: " << (this->FlatAspect ? "On" : "Off") << endl;
+  os << indent << "WidgetsFlatAspect: " << (this->WidgetsFlatAspect ? "On" : "Off") << endl;
 }
