@@ -107,7 +107,9 @@ vtkPVActorComposite::vtkPVActorComposite()
   this->LODMapperTclName = NULL;
   this->OutlineTclName = NULL;
   this->GeometryTclName = NULL;
-
+  this->OutputPortTclName = NULL;
+  this->AppendPolyDataTclName = NULL;
+  
   this->ScalarBar = vtkScalarBarActor::New();  
   this->ScalarBar->GetPositionCoordinate()->SetCoordinateSystemToNormalizedViewport();
   this->ScalarBar->GetPositionCoordinate()->SetValue(0.87, 0.25);
@@ -241,6 +243,18 @@ vtkPVActorComposite::~vtkPVActorComposite()
 
   pvApp->BroadcastScript("%s Delete", this->LODDeciTclName);
   this->SetLODDeciTclName(NULL);
+  
+  if (this->OutputPortTclName)
+    {
+    pvApp->BroadcastScript("%s Delete", this->OutputPortTclName);
+    this->SetOutputPortTclName(NULL);
+    }
+
+  if (this->AppendPolyDataTclName)
+    {
+    pvApp->BroadcastScript("%s Delete", this->AppendPolyDataTclName);
+    this->SetAppendPolyDataTclName(NULL);
+    }
   
   this->CompositeCheck->Delete();
   this->CompositeCheck = NULL;
@@ -931,7 +945,11 @@ void vtkPVActorComposite::CompositeCheckCallback()
 //----------------------------------------------------------------------------
 void vtkPVActorComposite::SetComposite(int val)
 {
+  int i, numProcs;
   vtkPVApplication *pvApp = this->GetPVApplication();
+  char outPortName[256];
+  char inPortName[256];
+  char appendName[256];
   
   if (val > 1)
     {
@@ -951,6 +969,47 @@ void vtkPVActorComposite::SetComposite(int val)
     vtkErrorMacro("No application set.");
     }
 
+  if (val)
+    {
+    this->SetMode(this->Mode);
+    numProcs = pvApp->GetController()->GetNumberOfProcesses();
+    this->Script("%s SetNumberOfPieces %d", this->MapperTclName, numProcs);
+    this->Script("%s SetPiece 0", this->MapperTclName);
+    }
+  else
+    {
+    sprintf(outPortName, "outputPort%d", this->InstanceCount);
+    pvApp->MakeTclObject("vtkOutputPort", outPortName);
+    this->SetOutputPortTclName(outPortName);
+    pvApp->BroadcastScript("%s SetInput [%s GetInput]",
+			   this->OutputPortTclName,
+			   this->MapperTclName);
+    pvApp->BroadcastScript("%s SetTag 1234", this->OutputPortTclName);
+    sprintf(appendName, "appendPD%d", this->InstanceCount);
+    this->SetAppendPolyDataTclName(appendName);
+    this->Script("vtkAppendPolyData %s", this->AppendPolyDataTclName);
+    this->Script("%s ParallelStreamingOn", this->AppendPolyDataTclName);
+    numProcs = pvApp->GetController()->GetNumberOfProcesses();
+    for (i = 1; i < numProcs; i++)
+      {
+      sprintf(inPortName, "inputPort%d", i);
+      this->Script("vtkInputPort %s", inPortName);
+      this->Script("%s SetRemoteProcessId %d", inPortName, i);
+      this->Script("%s SetTag %d", inPortName, 1234);
+      this->Script("%s AddInput [%s GetPolyDataOutput]",
+		   this->AppendPolyDataTclName,
+		   inPortName);
+      this->Script("%s Delete", inPortName);
+      }
+    this->Script("%s SetInput [%s GetOutput]",
+		 this->MapperTclName,
+		 this->AppendPolyDataTclName);
+    this->Script("%s SetNumberOfPieces 1", this->MapperTclName);
+    this->Script("%s SetPiece 0", this->MapperTclName);
+    this->Script("%s SetNumberOfPieces 1", this->LODMapperTclName);
+    this->Script("%s SetPiece 0", this->LODMapperTclName);
+    }
+  
   ((vtkPVRenderView*)this->GetView())->GetComposite()->SetUseCompositing(val);
 
   this->Composite = val;

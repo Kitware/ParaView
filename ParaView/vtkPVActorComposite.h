@@ -240,6 +240,12 @@ protected:
   char *GeometryTclName;
   vtkSetStringMacro(GeometryTclName);
   
+  char *OutputPortTclName;
+  vtkSetStringMacro(OutputPortTclName);
+  
+  char *AppendPolyDataTclName;
+  vtkSetStringMacro(AppendPolyDataTclName);
+  
   // Here to create unique names.
   int InstanceCount;
 
