@@ -17,6 +17,7 @@ if {[info exists argc]} {
     }
 } 
 
+
 $pv(vtkTemp43) SetOrientationAxesVisibility 0    
 $pv(vtkTemp43) SetRendererBackgroundColor 0 0 0
 
@@ -25,15 +26,35 @@ set pv(vtkTemp110) [$pv(vtkTemp98) GetPVWidget {Extent}]
 $pv(vtkTemp110) SetValue 0 12 0 12 0 10
 set pv(vtkTemp129) [$pv(vtkTemp98) GetPVWidget {Size}]
 $pv(vtkTemp129) SetValue 1.2 1.2 1.0 1.0
+set max1 [$pv(vtkTemp98) GetPVWidget {MaxIterations}]
+$max1 SetValue 50
 $pv(vtkTemp98) AcceptCallback
+
+# Paraview should grow the range with the data.
+$max1 SetValue 100
+$pv(vtkTemp98) AcceptCallback
+
+set map [$pv(vtkTemp98) GetPVColorMap]
+$map SetScalarRangeLock 1
+# Now the scalar range should not grow with the data.
+
 
 set pv(vtkTemp164) [$pv(vtkTemp1) CreatePVSource ImageMandelbrotSource]
 set pv(vtkTemp176) [$pv(vtkTemp164) GetPVWidget {Extent}]
 $pv(vtkTemp176) SetValue 13 25 0 12 0 10
 set pv(vtkTemp195) [$pv(vtkTemp164) GetPVWidget {Size}]
 $pv(vtkTemp195) SetValue 1.2 1.2 1.0 1.0
+
+set max2 [$pv(vtkTemp164) GetPVWidget {MaxIterations}]
+$max1 SetValue 200
+
 $pv(vtkTemp164) AcceptCallback
 $pv(vtkTemp1) ResetCameraCallback
+
+$max2 SetValue 100
+$pv(vtkTemp164) AcceptCallback
+
+
 
 set pv(vtkTemp207) [$pv(vtkTemp1) CreatePVSource ImageMandelbrotSource]
 set pv(vtkTemp219) [$pv(vtkTemp207) GetPVWidget {Extent}]
