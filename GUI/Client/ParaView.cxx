@@ -168,11 +168,8 @@ int MyMain(int argc, char *argv[])
       if (app->GetRenderModuleName() == NULL)
         { // I do not like this initialization here.
         // Think about moving it.
-#ifdef PARAVIEW_USE_ICE_T
-        app->SetRenderModuleName("IceTRenderModule");
-#else
+        // Use the MultiDisplayRenderModule as the default render module
         app->SetRenderModuleName("MultiDisplayRenderModule");
-#endif
         }
       }
     else
