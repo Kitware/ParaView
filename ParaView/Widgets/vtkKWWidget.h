@@ -175,6 +175,11 @@ public:
   int IsPacked();
   
   // Description:
+  // Unpack widget, unpack siblings (slave's of parent widget)
+  void UnPack();
+  void UnPackSiblings();
+  
+  // Description:
   // Adjusts the placement of the baloon help
   vtkSetMacro(BalloonHelpJustification,int);
   vtkGetMacro(BalloonHelpJustification,int);  
