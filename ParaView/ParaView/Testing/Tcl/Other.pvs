@@ -53,7 +53,6 @@ $pvWindow CenterEntryCallback
 $pvWindow ToggleCenterActorCallback
 $pvWindow ToggleCenterActorCallback
 $pvWindow ToggleCenterActorCallback
-$pvWindow OnToolbarSettingsChange
 $pvWindow Open "vtkParaViewThisIsAFileThatDoesNotExists"
 $pvWindow Open "vtkParaViewOtherTest.pvs"
 $pvWindow EnableNavigationWindow
