@@ -1,5 +1,5 @@
 #ifndef _REGEX_H_
-#define	_REGEX_H_	/* never again */
+#define _REGEX_H_       /* never again */
 /*
  * regular expressions
  *
@@ -43,8 +43,8 @@
  * functions (suggestion:  re_Xcomp and re_Xexec, where X is a letter
  * suggestive of the wide type, e.g. re_ucomp and re_uexec for Unicode).
  * For cranky old compilers, it may be necessary to do something like:
- * #define	__REG_WIDE_COMPILE(a,b,c,d)	re_Xcomp(a,b,c,d)
- * #define	__REG_WIDE_EXEC(a,b,c,d,e,f,g)	re_Xexec(a,b,c,d,e,f,g)
+ * #define      __REG_WIDE_COMPILE(a,b,c,d)     re_Xcomp(a,b,c,d)
+ * #define      __REG_WIDE_EXEC(a,b,c,d,e,f,g)  re_Xexec(a,b,c,d,e,f,g)
  * rather than just #defining the names as parameterless macros.
  *
  * For some specialized purposes, it may be desirable to suppress the
@@ -108,17 +108,17 @@ extern "C" {
 #undef __REG_NOCHAR
 #endif
 /* interface types */
-#define	__REG_WIDE_T	Tcl_UniChar
-#define	__REG_REGOFF_T	long	/* not really right, but good enough... */
-#define	__REG_VOID_T	VOID
-#define	__REG_CONST	CONST
+#define __REG_WIDE_T    Tcl_UniChar
+#define __REG_REGOFF_T  long    /* not really right, but good enough... */
+#define __REG_VOID_T    VOID
+#define __REG_CONST     CONST
 /* names and declarations */
-#define	__REG_WIDE_COMPILE	TclReComp
-#define	__REG_WIDE_EXEC		TclReExec
-#define	__REG_NOFRONT		/* don't want regcomp() and regexec() */
-#define	__REG_NOCHAR		/* or the char versions */
-#define	regfree		TclReFree
-#define	regerror	TclReError
+#define __REG_WIDE_COMPILE      TclReComp
+#define __REG_WIDE_EXEC         TclReExec
+#define __REG_NOFRONT           /* don't want regcomp() and regexec() */
+#define __REG_NOCHAR            /* or the char versions */
+#define regfree         TclReFree
+#define regerror        TclReError
 /* --- end --- */
 
 
@@ -152,7 +152,7 @@ typedef void re_void;
  * which expands to a substitute for `const'.
  */
 #ifndef __REG_CONST
-#define	__REG_CONST	const
+#define __REG_CONST     const
 #endif
 
 
@@ -163,39 +163,39 @@ typedef void re_void;
 
 /* the biggie, a compiled RE (or rather, a front end to same) */
 typedef struct {
-	int re_magic;		/* magic number */
-	size_t re_nsub;		/* number of subexpressions */
-	long re_info;		/* information about RE */
-#		define	REG_UBACKREF		000001
-#		define	REG_ULOOKAHEAD		000002
-#		define	REG_UBOUNDS		000004
-#		define	REG_UBRACES		000010
-#		define	REG_UBSALNUM		000020
-#		define	REG_UPBOTCH		000040
-#		define	REG_UBBS		000100
-#		define	REG_UNONPOSIX		000200
-#		define	REG_UUNSPEC		000400
-#		define	REG_UUNPORT		001000
-#		define	REG_ULOCALE		002000
-#		define	REG_UEMPTYMATCH		004000
-#		define	REG_UIMPOSSIBLE		010000
-#		define	REG_USHORTEST		020000
-	int re_csize;		/* sizeof(character) */
-	char *re_endp;		/* backward compatibility kludge */
-	/* the rest is opaque pointers to hidden innards */
-	char *re_guts;		/* `char *' is more portable than `void *' */
-	char *re_fns;
+        int re_magic;           /* magic number */
+        size_t re_nsub;         /* number of subexpressions */
+        long re_info;           /* information about RE */
+#               define  REG_UBACKREF            000001
+#               define  REG_ULOOKAHEAD          000002
+#               define  REG_UBOUNDS             000004
+#               define  REG_UBRACES             000010
+#               define  REG_UBSALNUM            000020
+#               define  REG_UPBOTCH             000040
+#               define  REG_UBBS                000100
+#               define  REG_UNONPOSIX           000200
+#               define  REG_UUNSPEC             000400
+#               define  REG_UUNPORT             001000
+#               define  REG_ULOCALE             002000
+#               define  REG_UEMPTYMATCH         004000
+#               define  REG_UIMPOSSIBLE         010000
+#               define  REG_USHORTEST           020000
+        int re_csize;           /* sizeof(character) */
+        char *re_endp;          /* backward compatibility kludge */
+        /* the rest is opaque pointers to hidden innards */
+        char *re_guts;          /* `char *' is more portable than `void *' */
+        char *re_fns;
 } regex_t;
 
 /* result reporting (may acquire more fields later) */
 typedef struct {
-	regoff_t rm_so;		/* start of substring */
-	regoff_t rm_eo;		/* end of substring */
+        regoff_t rm_so;         /* start of substring */
+        regoff_t rm_eo;         /* end of substring */
 } regmatch_t;
 
 /* supplementary control and reporting */
 typedef struct {
-	regmatch_t rm_extend;	/* see REG_EXPECT */
+        regmatch_t rm_extend;   /* see REG_EXPECT */
 } rm_detail_t;
 
 
@@ -212,24 +212,24 @@ typedef struct {
  ^ int __REG_WIDE_COMPILE(regex_t *, __REG_CONST __REG_WIDE_T *, size_t, int);
  ^ #endif
  */
-#define	REG_BASIC	000000	/* BREs (convenience) */
-#define	REG_EXTENDED	000001	/* EREs */
-#define	REG_ADVF	000002	/* advanced features in EREs */
-#define	REG_ADVANCED	000003	/* AREs (which are also EREs) */
-#define	REG_QUOTE	000004	/* no special characters, none */
-#define	REG_NOSPEC	REG_QUOTE	/* historical synonym */
-#define	REG_ICASE	000010	/* ignore case */
-#define	REG_NOSUB	000020	/* don't care about subexpressions */
-#define	REG_EXPANDED	000040	/* expanded format, white space & comments */
-#define	REG_NLSTOP	000100	/* \n doesn't match . or [^ ] */
-#define	REG_NLANCH	000200	/* ^ matches after \n, $ before */
-#define	REG_NEWLINE	000300	/* newlines are line terminators */
-#define	REG_PEND	000400	/* ugh -- backward-compatibility hack */
-#define	REG_EXPECT	001000	/* report details on partial/limited matches */
-#define	REG_BOSONLY	002000	/* temporary kludge for BOS-only matches */
-#define	REG_DUMP	004000	/* none of your business :-) */
-#define	REG_FAKE	010000	/* none of your business :-) */
-#define	REG_PROGRESS	020000	/* none of your business :-) */
+#define REG_BASIC       000000  /* BREs (convenience) */
+#define REG_EXTENDED    000001  /* EREs */
+#define REG_ADVF        000002  /* advanced features in EREs */
+#define REG_ADVANCED    000003  /* AREs (which are also EREs) */
+#define REG_QUOTE       000004  /* no special characters, none */
+#define REG_NOSPEC      REG_QUOTE       /* historical synonym */
+#define REG_ICASE       000010  /* ignore case */
+#define REG_NOSUB       000020  /* don't care about subexpressions */
+#define REG_EXPANDED    000040  /* expanded format, white space & comments */
+#define REG_NLSTOP      000100  /* \n doesn't match . or [^ ] */
+#define REG_NLANCH      000200  /* ^ matches after \n, $ before */
+#define REG_NEWLINE     000300  /* newlines are line terminators */
+#define REG_PEND        000400  /* ugh -- backward-compatibility hack */
+#define REG_EXPECT      001000  /* report details on partial/limited matches */
+#define REG_BOSONLY     002000  /* temporary kludge for BOS-only matches */
+#define REG_DUMP        004000  /* none of your business :-) */
+#define REG_FAKE        010000  /* none of your business :-) */
+#define REG_PROGRESS    020000  /* none of your business :-) */
 
 
 
@@ -237,22 +237,22 @@ typedef struct {
  * execution
  ^ #ifndef __REG_NOCHAR
  ^ int re_exec(regex_t *, __REG_CONST char *, size_t,
- ^				rm_detail_t *, size_t, regmatch_t [], int);
+ ^                              rm_detail_t *, size_t, regmatch_t [], int);
  ^ #endif
  ^ #ifndef __REG_NOFRONT
  ^ int regexec(regex_t *, __REG_CONST char *, size_t, regmatch_t [], int);
  ^ #endif
  ^ #ifdef __REG_WIDE_T
  ^ int __REG_WIDE_EXEC(regex_t *, __REG_CONST __REG_WIDE_T *, size_t,
- ^				rm_detail_t *, size_t, regmatch_t [], int);
+ ^                              rm_detail_t *, size_t, regmatch_t [], int);
  ^ #endif
  */
-#define	REG_NOTBOL	0001	/* BOS is not BOL */
-#define	REG_NOTEOL	0002	/* EOS is not EOL */
-#define	REG_STARTEND	0004	/* backward compatibility kludge */
-#define	REG_FTRACE	0010	/* none of your business */
-#define	REG_MTRACE	0020	/* none of your business */
-#define	REG_SMALL	0040	/* none of your business */
+#define REG_NOTBOL      0001    /* BOS is not BOL */
+#define REG_NOTEOL      0002    /* EOS is not EOL */
+#define REG_STARTEND    0004    /* backward compatibility kludge */
+#define REG_FTRACE      0010    /* none of your business */
+#define REG_MTRACE      0020    /* none of your business */
+#define REG_SMALL       0040    /* none of your business */
 
 
 
@@ -274,27 +274,27 @@ typedef struct {
  *
  ^ extern size_t regerror(int, __REG_CONST regex_t *, char *, size_t);
  */
-#define	REG_OKAY	 0	/* no errors detected */
-#define	REG_NOMATCH	 1	/* failed to match */
-#define	REG_BADPAT	 2	/* invalid regexp */
-#define	REG_ECOLLATE	 3	/* invalid collating element */
-#define	REG_ECTYPE	 4	/* invalid character class */
-#define	REG_EESCAPE	 5	/* invalid escape \ sequence */
-#define	REG_ESUBREG	 6	/* invalid backreference number */
-#define	REG_EBRACK	 7	/* brackets [] not balanced */
-#define	REG_EPAREN	 8	/* parentheses () not balanced */
-#define	REG_EBRACE	 9	/* braces {} not balanced */
-#define	REG_BADBR	10	/* invalid repetition count(s) */
-#define	REG_ERANGE	11	/* invalid character range */
-#define	REG_ESPACE	12	/* out of memory */
-#define	REG_BADRPT	13	/* quantifier operand invalid */
-#define	REG_ASSERT	15	/* "can't happen" -- you found a bug */
-#define	REG_INVARG	16	/* invalid argument to regex function */
-#define	REG_MIXED	17	/* character widths of regex and string differ */
-#define	REG_BADOPT	18	/* invalid embedded option */
+#define REG_OKAY         0      /* no errors detected */
+#define REG_NOMATCH      1      /* failed to match */
+#define REG_BADPAT       2      /* invalid regexp */
+#define REG_ECOLLATE     3      /* invalid collating element */
+#define REG_ECTYPE       4      /* invalid character class */
+#define REG_EESCAPE      5      /* invalid escape \ sequence */
+#define REG_ESUBREG      6      /* invalid backreference number */
+#define REG_EBRACK       7      /* brackets [] not balanced */
+#define REG_EPAREN       8      /* parentheses () not balanced */
+#define REG_EBRACE       9      /* braces {} not balanced */
+#define REG_BADBR       10      /* invalid repetition count(s) */
+#define REG_ERANGE      11      /* invalid character range */
+#define REG_ESPACE      12      /* out of memory */
+#define REG_BADRPT      13      /* quantifier operand invalid */
+#define REG_ASSERT      15      /* "can't happen" -- you found a bug */
+#define REG_INVARG      16      /* invalid argument to regex function */
+#define REG_MIXED       17      /* character widths of regex and string differ */
+#define REG_BADOPT      18      /* invalid embedded option */
 /* two specials for debugging and testing */
-#define	REG_ATOI	101	/* convert error-code name to number */
-#define	REG_ITOA	102	/* convert error-code number to name */
+#define REG_ATOI        101     /* convert error-code name to number */
+#define REG_ITOA        102     /* convert error-code number to name */
 
 
 

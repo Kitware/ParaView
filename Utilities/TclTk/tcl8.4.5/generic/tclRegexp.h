@@ -1,8 +1,8 @@
 /* 
  * tclRegexp.h --
  *
- * 	This file contains definitions used internally by Henry
- *	Spencer's regular expression code.
+ *      This file contains definitions used internally by Henry
+ *      Spencer's regular expression code.
  *
  * Copyright (c) 1998 by Sun Microsystems, Inc.
  * Copyright (c) 1998-1999 by Scriptics Corporation.
@@ -16,7 +16,7 @@
 #ifndef _TCLREGEXP
 #define _TCLREGEXP
 
-#include "regex.h"
+#include "regexTcl.h"
 
 #ifdef BUILD_tcl
 # undef TCL_STORAGE_CLASS
@@ -33,19 +33,19 @@
  */
 
 typedef struct TclRegexp {
-    int flags;			/* Regexp compile flags. */
-    regex_t re;			/* Compiled re, includes number of
-				 * subexpressions. */
-    CONST char *string;		/* Last string passed to Tcl_RegExpExec. */
-    Tcl_Obj *objPtr;		/* Last object passed to Tcl_RegExpExecObj. */
-    regmatch_t *matches;	/* Array of indices into the Tcl_UniChar
-				 * representation of the last string matched
-				 * with this regexp to indicate the location
-				 * of subexpressions. */
-    rm_detail_t details;	/* Detailed information on match (currently
-				 * used only for REG_EXPECT). */
-    int refCount;		/* Count of number of references to this
-				 * compiled regexp. */
+    int flags;                  /* Regexp compile flags. */
+    regex_t re;                 /* Compiled re, includes number of
+                                 * subexpressions. */
+    CONST char *string;         /* Last string passed to Tcl_RegExpExec. */
+    Tcl_Obj *objPtr;            /* Last object passed to Tcl_RegExpExecObj. */
+    regmatch_t *matches;        /* Array of indices into the Tcl_UniChar
+                                 * representation of the last string matched
+                                 * with this regexp to indicate the location
+                                 * of subexpressions. */
+    rm_detail_t details;        /* Detailed information on match (currently
+                                 * used only for REG_EXPECT). */
+    int refCount;               /* Count of number of references to this
+                                 * compiled regexp. */
 } TclRegexp;
 
 #endif /* _TCLREGEXP */

@@ -781,7 +781,7 @@ xtTestInit.o: $(UNIX_DIR)/tclAppInit.c
 
 # Object files used on all Unix systems:
 
-REGHDRS=$(GENERIC_DIR)/regex.h $(GENERIC_DIR)/regguts.h \
+REGHDRS=$(GENERIC_DIR)/regexTcl.h $(GENERIC_DIR)/regguts.h \
 		$(GENERIC_DIR)/regcustom.h
 regcomp.o: $(REGHDRS) $(GENERIC_DIR)/regcomp.c $(GENERIC_DIR)/regc_lex.c \
 		$(GENERIC_DIR)/regc_color.c $(GENERIC_DIR)/regc_locale.c \
