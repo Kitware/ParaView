@@ -145,7 +145,8 @@ public:
 
   // Description:
   // Open a data file.
-  void Open();
+  void OpenCallback();
+  vtkPVSource *Open(char *fileName);
   
   // Description:
   // Callback from the calculator button.

@@ -902,6 +902,13 @@ void vtkPVSource::AcceptCallback()
   int numMenus;
   vtkPVApplication *pvApp = this->GetPVApplication();
   
+  // This adds an extract filter only when the MaximumNumberOfPieces is 1.
+  // This is only the case the first time the accept is called.
+  if (this->GetNthPVOutput(0))
+    {
+    this->GetNthPVOutput(0)->InsertExtractPiecesIfNecessary();
+    }
+
   window = this->GetWindow();
 
   this->Script("update");

@@ -259,11 +259,6 @@ vtkPVWindow::vtkPVWindow()
   mInt = NULL;
 
 
-
-
-
-
-
 }
 
 //----------------------------------------------------------------------------
@@ -513,7 +508,7 @@ void vtkPVWindow::Create(vtkKWApplication *app, char *args)
 
   // create the top level
 
-  this->MenuFile->InsertCommand(0, "Open Data File", this, "Open");
+  this->MenuFile->InsertCommand(0, "Open Data File", this, "OpenCallback");
   // Save current data in VTK format
   this->MenuFile->InsertCommand(1, "Save Data", this, "WriteData");
   
@@ -848,15 +843,11 @@ void vtkPVWindow::NewWindow()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVWindow::Open()
+void vtkPVWindow::OpenCallback()
 {
   char *openFileName = NULL;
   char *extension = NULL;
-  vtkPVSourceInterface *sInt;
-  char rootName[100];
-  int position;
   char *endingSlash = NULL;
-  char *newRootName;
   istream *input;
   
   this->Script("set openFileName [tk_getOpenFile -filetypes {{{VTK files} {.vtk}} {{PVTK files} {.pvtk}} {{EnSight files} {.case}} {{POP files} {.pop}} {{STL files} {.stl}}}]");
@@ -876,6 +867,20 @@ void vtkPVWindow::Open()
     }
   
   delete input;
+  
+  this->Open(openFileName);
+
+}
+
+//----------------------------------------------------------------------------
+vtkPVSource *vtkPVWindow::Open(char *openFileName)
+{
+  char *extension = NULL;
+  vtkPVSourceInterface *sInt;
+  char rootName[100];
+  int position;
+  char *endingSlash = NULL;
+  char *newRootName;
   
   extension = strrchr(openFileName, '.');
   position = extension - openFileName;
@@ -928,14 +933,14 @@ void vtkPVWindow::Open()
   if (sInt == NULL)
     {
     vtkErrorMacro("Could not find interface.");
-  	}
-  else  
-    {
-    sInt->SetDataFileName(openFileName);
-    sInt->SetRootName(rootName);
-	  sInt->CreateCallback();
+    return NULL;
     }
+
+  sInt->SetDataFileName(openFileName);
+  sInt->SetRootName(rootName);
+  return sInt->CreateCallback();
 }
+
 
 void vtkPVWindow::WriteData()
 {

@@ -156,17 +156,7 @@ public:
 
   // Description:
   // Tcl name of the actor across all processes.
-  vtkGetStringMacro(PropTclName);
-  
-  // Description:
-  // Methods called when item chosen from ColorMenu
-  void ColorByProperty();
-  void ColorByPointFieldComponent(char *name, int comp);
-  void ColorByCellFieldComponent(char *name, int comp);
-
-  // Description:
-  // Callback for color map menu
-  void ChangeColorMap();
+  vtkGetStringMacro(PropTclName);  
   
   // Description:
   // Methods called when item chosen from RepresentationMenu
@@ -230,6 +220,21 @@ public:
   // Callbacks for point size and line width sliders
   void ChangePointSize();
   void ChangeLineWidth();
+
+  // Description:
+  // Access to option menus for scripting.
+  vtkGetObjectMacro(ColorMenu, vtkKWOptionMenu);
+  vtkGetObjectMacro(ColorMapMenu, vtkKWOptionMenu);
+
+  // Description:
+  // Callback methods when item chosen from ColorMenu
+  void ColorByProperty();
+  void ColorByPointFieldComponent(char *name, int comp);
+  void ColorByCellFieldComponent(char *name, int comp);
+
+  // Description:
+  // Callback for color map menu.
+  void ChangeColorMap();
 
 protected:
 

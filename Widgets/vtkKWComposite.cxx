@@ -84,7 +84,7 @@ vtkKWComposite::~vtkKWComposite()
   
   if (this->PropertiesParent)
     {
-    this->PropertiesParent->Delete();
+    this->PropertiesParent->UnRegister(this);
     this->PropertiesParent = NULL;
     }
 }
@@ -211,5 +211,5 @@ void vtkKWComposite::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWObject::SerializeRevision(os,indent);
   os << indent << "vtkKWComposite ";
-  this->ExtractRevision(os,"$Revision: 1.8 $");
+  this->ExtractRevision(os,"$Revision: 1.9 $");
 }
