@@ -229,11 +229,6 @@ public:
   // internal widgets.
   virtual void UpdateEnableState();
 
-  // Description:
-  // Chaining method to serialize an object and its superclasses.
-  virtual void SerializeSelf(ostream& os, vtkIndent indent);
-  virtual void SerializeToken(istream& is, const char *token);
-
 protected:
   vtkKWRenderWidget();
   ~vtkKWRenderWidget();
@@ -267,8 +262,6 @@ protected:
 
   virtual void UpdateAccordingToUnits() {};
 
-  virtual void SerializeRevision(ostream& os, vtkIndent indent);
-  
 private:
   vtkKWRenderWidget(const vtkKWRenderWidget&);  // Not implemented
   void operator=(const vtkKWRenderWidget&);  // Not implemented

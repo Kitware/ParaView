@@ -340,16 +340,9 @@ public:
   vtkGetObjectMacro(Toolbars, vtkVector<vtkKWToolbar*>);
   //ETX
 
-  // Description:
-  // Chaining method to serialize an object and its superclasses.
-  virtual void SerializeSelf(ostream& os, vtkIndent indent);
-  virtual void SerializeToken(istream& is, const char *token);
-
 protected:
   vtkKWWindow();
   ~vtkKWWindow();
-
-  virtual void SerializeRevision(ostream& os, vtkIndent indent);
 
   void InsertRecentFileToMenu(const char *filename, 
                               vtkKWObject *taret, 
