@@ -65,7 +65,7 @@ public:
 
   // Description:
   // Set/Get the number of pages in the notebook.
-  void AddPage(char *title);
+  void AddPage(const char *title);
   vtkGetMacro(NumberOfPages,int);
   
   // Description:

@@ -285,7 +285,7 @@ vtkKWWidget *vtkKWNotebook::GetFrame(int n)
 
 
 // Add a page to the notebook
-void vtkKWNotebook::AddPage(char *title)
+void vtkKWNotebook::AddPage(const char *title)
 {
   int cnt;
 
