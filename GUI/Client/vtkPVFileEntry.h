@@ -138,7 +138,8 @@ public:
 
   // Description:
   // Callback for Timesteps button
-  void UpdateAvailableFiles(int force = 0);
+  void UpdateAvailableFiles() { this->UpdateAvailableFiles(0); }
+  void UpdateAvailableFiles(int force);
 
   // Description:
   // Update the "enable" state of the object and its internal parts.
