@@ -44,13 +44,23 @@ vtkKWEntry* vtkKWEntry::New()
   return new vtkKWEntry;
 }
 
+vtkKWEntry::vtkKWEntry()
+{
+  this->ValueString = NULL;
+}
+
+vtkKWEntry::~vtkKWEntry()
+{
+  this->SetValueString(NULL);
+}
 
 
 
 char *vtkKWEntry::GetValue()
 {
   this->Script("%s get", this->GetWidgetName());
-  return this->Application->GetMainInterp()->result;
+  this->SetValueString( this->Application->GetMainInterp()->result );
+  return this->GetValueString();
 }
 
 int vtkKWEntry::GetValueAsInt()

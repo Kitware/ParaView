@@ -248,7 +248,7 @@ public:
 
   // Description:
   // Change the color of the annotation text
-  void SetHeaderTextColor( float r, float g, float b );
+  virtual void SetHeaderTextColor( float r, float g, float b );
 
   // Description:
   // Turn interactivity on / off - used for UI components that want 

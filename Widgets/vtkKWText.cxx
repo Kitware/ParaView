@@ -44,13 +44,23 @@ vtkKWText* vtkKWText::New()
   return new vtkKWText;
 }
 
+vtkKWText::vtkKWText()
+{
+  this->ValueString = NULL;
+}
+
+vtkKWText::~vtkKWText()
+{
+  this->SetValueString(NULL);
+}
 
 
 
 char *vtkKWText::GetValue()
 {
   this->Script("%s get 1.0 {end -1 chars}", this->GetWidgetName());
-  return this->Application->GetMainInterp()->result;
+  this->SetValueString( this->Application->GetMainInterp()->result );
+  return this->GetValueString();
 }
 
 void vtkKWText::SetValue(const char *s)

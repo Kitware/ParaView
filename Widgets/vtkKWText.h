@@ -52,11 +52,15 @@ public:
   char *GetValue();
 
 protected:
-  vtkKWText() {};
-  ~vtkKWText() {};
+  vtkKWText();
+  ~vtkKWText();
   vtkKWText(const vtkKWText&) {};
   void operator=(const vtkKWText&) {};
 
+  vtkGetStringMacro( ValueString );
+  vtkSetStringMacro( ValueString );
+  
+  char *ValueString;
 };
 
 

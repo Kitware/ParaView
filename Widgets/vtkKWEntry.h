@@ -59,10 +59,16 @@ public:
   
 
 protected:
-  vtkKWEntry() {};
-  ~vtkKWEntry() {};
+  vtkKWEntry();
+  ~vtkKWEntry();
   vtkKWEntry(const vtkKWEntry&) {};
   void operator=(const vtkKWEntry&) {};
+  
+  vtkSetStringMacro(ValueString);
+  vtkGetStringMacro(ValueString);
+  
+  char *ValueString;
+  
 };
 
 
