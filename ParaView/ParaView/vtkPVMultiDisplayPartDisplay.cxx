@@ -45,11 +45,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
 #include "vtkPVProcessModule.h"
+#include "vtkClientServerStream.h"
 
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVMultiDisplayPartDisplay);
-vtkCxxRevisionMacro(vtkPVMultiDisplayPartDisplay, "1.7");
+vtkCxxRevisionMacro(vtkPVMultiDisplayPartDisplay, "1.8");
 
 
 //----------------------------------------------------------------------------

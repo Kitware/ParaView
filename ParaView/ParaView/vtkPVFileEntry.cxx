@@ -95,7 +95,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVFileEntry);
-vtkCxxRevisionMacro(vtkPVFileEntry, "1.66");
+vtkCxxRevisionMacro(vtkPVFileEntry, "1.67");
 
 //----------------------------------------------------------------------------
 vtkPVFileEntry::vtkPVFileEntry()
@@ -776,6 +776,10 @@ const char* vtkPVFileEntry::GetValue()
 //-----------------------------------------------------------------------------
 int vtkPVFileEntry::GetNumberOfFiles()
 {
+  if ( !this->Property )
+    {
+    return 0;
+    }
   return this->Property->GetNumberOfFiles();
 }
 

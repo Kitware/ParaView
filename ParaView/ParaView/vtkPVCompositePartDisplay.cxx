@@ -57,11 +57,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkString.h"
 #include "vtkTimerLog.h"
 #include "vtkToolkits.h"
-
+#include "vtkClientServerStream.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCompositePartDisplay);
-vtkCxxRevisionMacro(vtkPVCompositePartDisplay, "1.7");
+vtkCxxRevisionMacro(vtkPVCompositePartDisplay, "1.8");
 
 
 //----------------------------------------------------------------------------

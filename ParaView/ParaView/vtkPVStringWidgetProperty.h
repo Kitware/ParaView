@@ -46,8 +46,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __vtkPVStringWidgetProperty_h
 
 #include "vtkPVWidgetProperty.h"
-#include "vtkPVSelectWidget.h"
-#include "vtkClientServerID.h"
+
+#include "vtkPVSelectWidget.h" // Needed for vtkPVSelectWidget::ElementType
+#include "vtkClientServerID.h" // Needed for ObjectID
 
 class VTK_EXPORT vtkPVStringWidgetProperty : public vtkPVWidgetProperty
 {

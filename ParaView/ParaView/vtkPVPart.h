@@ -52,7 +52,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 #include "vtkKWObject.h"
-#include "vtkClientServerStream.h"
+
+#include "vtkClientServerID.h" // Needed For Set Get VTKDataID
 
 class vtkDataSet;
 class vtkPVApplication;

@@ -45,12 +45,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkObjectFactory.h"
 #include "vtkPVProcessModule.h"
 #include "vtkXdmfReader.h"
+#include "vtkClientServerStream.h"
 
 #include <vtkstd/string>
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVServerXDMFParameters);
-vtkCxxRevisionMacro(vtkPVServerXDMFParameters, "1.2");
+vtkCxxRevisionMacro(vtkPVServerXDMFParameters, "1.3");
 
 //----------------------------------------------------------------------------
 class vtkPVServerXDMFParametersInternals

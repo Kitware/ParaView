@@ -53,10 +53,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVXMLElement.h"
 #include "vtkStringList.h"
 #include "vtkPVProcessModule.h"
+#include "vtkClientServerStream.h"
+
 #include <vtkstd/string>
+
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectWidget);
-vtkCxxRevisionMacro(vtkPVSelectWidget, "1.28");
+vtkCxxRevisionMacro(vtkPVSelectWidget, "1.29");
 
 int vtkPVSelectWidgetCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);

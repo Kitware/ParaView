@@ -46,9 +46,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVProcessModule.h"
 #include "vtkPVWidget.h"
 #include "vtkStringList.h"
+#include "vtkClientServerStream.h"
 
 vtkStandardNewMacro(vtkPVStringAndScalarListWidgetProperty);
-vtkCxxRevisionMacro(vtkPVStringAndScalarListWidgetProperty, "1.5");
+vtkCxxRevisionMacro(vtkPVStringAndScalarListWidgetProperty, "1.6");
 
 vtkPVStringAndScalarListWidgetProperty::vtkPVStringAndScalarListWidgetProperty()
 {

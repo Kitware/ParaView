@@ -55,10 +55,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkWindowToImageFilter.h"
 #include "vtkPVRenderModule.h"
 #include "vtkPVProcessModule.h"
+#include "vtkClientServerStream.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCameraIcon);
-vtkCxxRevisionMacro(vtkPVCameraIcon, "1.11");
+vtkCxxRevisionMacro(vtkPVCameraIcon, "1.12");
 
 vtkCxxSetObjectMacro(vtkPVCameraIcon,RenderView,vtkPVRenderView);
 

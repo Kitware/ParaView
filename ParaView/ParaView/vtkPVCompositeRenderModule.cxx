@@ -50,12 +50,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkCallbackCommand.h"
 #include "vtkPVCompositePartDisplay.h"
 #include "vtkPVLODPartDisplayInformation.h"
-
+#include "vtkClientServerStream.h"
 
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCompositeRenderModule);
-vtkCxxRevisionMacro(vtkPVCompositeRenderModule, "1.11");
+vtkCxxRevisionMacro(vtkPVCompositeRenderModule, "1.12");
 
 
 

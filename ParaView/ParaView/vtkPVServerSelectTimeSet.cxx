@@ -47,12 +47,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkGenericEnSightReader.h"
 #include "vtkDataArrayCollection.h"
 #include "vtkDataArrayCollectionIterator.h"
+#include "vtkClientServerStream.h"
 
 #include <vtkstd/string>
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVServerSelectTimeSet);
-vtkCxxRevisionMacro(vtkPVServerSelectTimeSet, "1.2");
+vtkCxxRevisionMacro(vtkPVServerSelectTimeSet, "1.3");
 
 //----------------------------------------------------------------------------
 class vtkPVServerSelectTimeSetInternals

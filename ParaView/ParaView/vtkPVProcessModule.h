@@ -49,7 +49,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __vtkPVProcessModule_h
 
 #include "vtkKWObject.h"
-#include "vtkClientServerStream.h"
+
+#include "vtkClientServerID.h" // Needed for UniqueID ...
 
 class vtkPolyData;
 class vtkKWLoadSaveDialog;

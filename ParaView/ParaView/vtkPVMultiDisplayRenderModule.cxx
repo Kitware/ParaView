@@ -40,6 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 #include "vtkPVMultiDisplayRenderModule.h"
+
 #include "vtkObjectFactory.h"
 #include "vtkRenderWindow.h"
 #include "vtkPVApplication.h"
@@ -49,11 +50,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkCollection.h"
 #include "vtkRenderer.h"
 #include "vtkTimerLog.h"
-
+#include "vtkClientServerStream.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVMultiDisplayRenderModule);
-vtkCxxRevisionMacro(vtkPVMultiDisplayRenderModule, "1.8");
+vtkCxxRevisionMacro(vtkPVMultiDisplayRenderModule, "1.9");
 
 
 

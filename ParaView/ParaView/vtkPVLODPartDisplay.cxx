@@ -39,8 +39,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 #include "vtkPVLODPartDisplay.h"
-#include "vtkPVLODPartDisplayInformation.h"
 
+#include "vtkPVLODPartDisplayInformation.h"
 #include "vtkImageData.h"
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
@@ -60,11 +60,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkToolkits.h"
 #include "vtkPVColorMap.h"
 #include "vtkFieldDataToAttributeDataFilter.h"
-
+#include "vtkClientServerStream.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLODPartDisplay);
-vtkCxxRevisionMacro(vtkPVLODPartDisplay, "1.7");
+vtkCxxRevisionMacro(vtkPVLODPartDisplay, "1.8");
 
 
 //----------------------------------------------------------------------------

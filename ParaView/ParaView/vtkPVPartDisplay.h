@@ -51,7 +51,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 #include "vtkObject.h"
-#include "vtkClientServerStream.h"
+
+#include "vtkClientServerID.h" // Needed for PropID ...
 
 class vtkDataSet;
 class vtkPVApplication;

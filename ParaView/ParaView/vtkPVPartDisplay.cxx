@@ -58,13 +58,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkTimerLog.h"
 #include "vtkToolkits.h"
 #include "vtkFieldDataToAttributeDataFilter.h"
-
+#include "vtkClientServerStream.h"
 #include "vtkPVRenderView.h"
 #include "vtkKWCheckButton.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPartDisplay);
-vtkCxxRevisionMacro(vtkPVPartDisplay, "1.13");
+vtkCxxRevisionMacro(vtkPVPartDisplay, "1.14");
 
 
 //----------------------------------------------------------------------------

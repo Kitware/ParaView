@@ -54,7 +54,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 #include "vtkKWWidget.h"
-#include "vtkClientServerID.h"
+
+#include "vtkClientServerID.h" // Needed for LookupTableID
+
 class vtkKWChangeColorButton;
 class vtkKWCheckButton;
 class vtkKWEntry;

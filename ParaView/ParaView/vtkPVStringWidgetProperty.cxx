@@ -45,9 +45,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVApplication.h"
 #include "vtkPVProcessModule.h"
 #include "vtkPVWidget.h"
+#include "vtkClientServerStream.h"
 
 vtkStandardNewMacro(vtkPVStringWidgetProperty);
-vtkCxxRevisionMacro(vtkPVStringWidgetProperty, "1.3");
+vtkCxxRevisionMacro(vtkPVStringWidgetProperty, "1.4");
 
 vtkPVStringWidgetProperty::vtkPVStringWidgetProperty()
 {

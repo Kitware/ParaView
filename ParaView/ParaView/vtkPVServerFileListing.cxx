@@ -45,6 +45,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkObjectFactory.h"
 #include "vtkPVProcessModule.h"
 #include "vtkSource.h"
+#include "vtkClientServerStream.h"
 
 #include <vtkstd/set>
 #include <vtkstd/string>
@@ -66,7 +67,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVServerFileListing);
-vtkCxxRevisionMacro(vtkPVServerFileListing, "1.2");
+vtkCxxRevisionMacro(vtkPVServerFileListing, "1.3");
 
 //----------------------------------------------------------------------------
 class vtkPVServerFileListingInternals

@@ -78,6 +78,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkKWWindow.h"
 
+#include "vtkClientServerID.h" // Needed for InteractorID
+
 class vtkActor;
 class vtkAxes;
 class vtkCollection;
@@ -112,7 +114,6 @@ class vtkPVWidget;
 class vtkPVWriter;
 class vtkPVXMLPackageParser;
 class vtkPolyDataMapper;
-#include "vtkClientServerID.h"
 
 //BTX
 template <class key, class data> 

@@ -52,10 +52,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVProcessModule.h"
 #include "vtkPVScalarListWidgetProperty.h"
 #include "vtkPVXMLElement.h"
+#include "vtkClientServerStream.h"
+
 #include <vtkstd/string>
+
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVScale);
-vtkCxxRevisionMacro(vtkPVScale, "1.24");
+vtkCxxRevisionMacro(vtkPVScale, "1.25");
 
 //----------------------------------------------------------------------------
 vtkPVScale::vtkPVScale()

@@ -49,12 +49,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkRenderer.h"
 #include "vtkTimerLog.h"
 #include "vtkCallbackCommand.h"
-
+#include "vtkClientServerStream.h"
 #include "vtkCompositeRenderManager.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVIceTRenderModule);
-vtkCxxRevisionMacro(vtkPVIceTRenderModule, "1.3");
+vtkCxxRevisionMacro(vtkPVIceTRenderModule, "1.4");
 
 
 

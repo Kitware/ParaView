@@ -43,8 +43,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkPVApplication.h"
 #include "vtkPVProcessModule.h"
+#include "vtkClientServerStream.h"
 
-vtkCxxRevisionMacro(vtkPVSourceWidget, "1.8");
+vtkCxxRevisionMacro(vtkPVSourceWidget, "1.9");
 
 //----------------------------------------------------------------------------
 vtkPVSourceWidget::vtkPVSourceWidget()

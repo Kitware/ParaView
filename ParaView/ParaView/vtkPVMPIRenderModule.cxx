@@ -40,16 +40,18 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 #include "vtkPVMPIRenderModule.h"
+
 #include "vtkObjectFactory.h"
 #include "vtkRenderWindow.h"
 #include "vtkPVApplication.h"
 #include "vtkPVProcessModule.h"
 #include "vtkPVTreeComposite.h"
+#include "vtkClientServerStream.h"
 
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVMPIRenderModule);
-vtkCxxRevisionMacro(vtkPVMPIRenderModule, "1.6");
+vtkCxxRevisionMacro(vtkPVMPIRenderModule, "1.7");
 
 
 

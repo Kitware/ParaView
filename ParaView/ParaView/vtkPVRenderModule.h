@@ -57,7 +57,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __vtkPVRenderModule_h
 
 #include "vtkObject.h"
-#include "vtkClientServerID.h"
+
+#include "vtkClientServerID.h" // Needed for RenderWindowID and RendererID
 
 class vtkMultiProcessController;
 class vtkPVApplication;

@@ -45,12 +45,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkObjectFactory.h"
 #include "vtkPVProcessModule.h"
 #include "vtkSource.h"
+#include "vtkClientServerStream.h"
 
 #include <vtkstd/string>
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVServerArraySelection);
-vtkCxxRevisionMacro(vtkPVServerArraySelection, "1.2");
+vtkCxxRevisionMacro(vtkPVServerArraySelection, "1.3");
 
 //----------------------------------------------------------------------------
 class vtkPVServerArraySelectionInternals
