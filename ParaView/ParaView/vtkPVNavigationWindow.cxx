@@ -105,7 +105,7 @@ void vtkPVNavigationWindow::Update(vtkPVSource *currentSource)
   vtkPVSource *source;
   vtkPVData **inputs = currentSource->GetPVInputs();
   vtkPVData **outputs;
-  int numInputs, xMid, yMid, y, i;
+  int numInputs, xMid, yMid=0, y, i;
   char *tmp;
   int bbox[4];
   int bboxIn[4], bboxOut[4], bboxSource[4];
@@ -151,6 +151,12 @@ void vtkPVNavigationWindow::Update(vtkPVSource *currentSource)
                      this->Canvas->GetWidgetName(), tmp,
                      currentSource->GetPVWindow()->GetTclName(), 
 		     source->GetTclName());
+	this->Script("%s bind %s <Enter> {%s HighlightObject %s 1}",
+		     this->Canvas->GetWidgetName(), tmp,
+		     this->GetTclName(), tmp);
+	this->Script("%s bind %s <Leave> {%s HighlightObject %s 0}",
+		     this->Canvas->GetWidgetName(), tmp,
+		     this->GetTclName(), tmp);
         
         delete [] tmp;
         tmp = 0;
@@ -228,6 +234,12 @@ void vtkPVNavigationWindow::Update(vtkPVSource *currentSource)
                      this->Canvas->GetWidgetName(), tmp,
                      currentSource->GetPVWindow()->GetTclName(), 
 		     source->GetTclName());
+	this->Script("%s bind %s <Enter> {%s HighlightObject %s 1}",
+		     this->Canvas->GetWidgetName(), tmp,
+		     this->GetTclName(), tmp);
+	this->Script("%s bind %s <Leave> {%s HighlightObject %s 0}",
+		     this->Canvas->GetWidgetName(), tmp,
+		     this->GetTclName(), tmp);
         delete [] tmp;
         tmp = NULL;
         
@@ -383,4 +395,11 @@ void vtkPVNavigationWindow::SetHeight(int height)
     this->Script("%s configure -height %d", this->Canvas->GetWidgetName(), 
 		 height);
     }
+}
+
+void vtkPVNavigationWindow::HighlightObject(const char* widget, int onoff)
+{
+  this->Script("%s itemconfigure %s -fill %s", 
+	       this->Canvas->GetWidgetName(), widget,
+	       (onoff ? "red" : "blue") );
 }

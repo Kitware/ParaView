@@ -76,6 +76,11 @@ public:
   // Description:
   // Regenerate the display and re-assign bindings.
   void Update(vtkPVSource *currentSource);
+
+
+  // Description:
+  // Highlight the object.
+  void HighlightObject(const char* widget, int onoff);
   
 protected:
   vtkPVNavigationWindow();
