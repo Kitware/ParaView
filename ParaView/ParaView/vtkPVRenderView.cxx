@@ -67,7 +67,6 @@
 #include "vtkPVSourceCollection.h"
 #include "vtkPVSourceList.h"
 #include "vtkPVWindow.h"
-#include "vtkPVWindowToImageFilter.h"
 #include "vtkPolyData.h"
 #include "vtkPolyDataMapper.h"
 #include "vtkPostScriptWriter.h"
@@ -136,7 +135,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.308");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.309");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -2174,8 +2173,9 @@ void vtkPVRenderView::SetOrientationAxesOutlineColor(double r, double g, double 
 //----------------------------------------------------------------------------
 void vtkPVRenderView::EditCopy()
 {
-  vtkPVWindowToImageFilter *w2i = vtkPVWindowToImageFilter::New();
-  w2i->SetInput(this->GetPVApplication()->GetRenderModule());
+  vtkWindowToImageFilter *w2i = vtkWindowToImageFilter::New();
+  w2i->SetInput(this->GetRenderWindow());
+  w2i->ShouldRerenderOff();
   w2i->Update();
 
 #ifdef _WIN32
