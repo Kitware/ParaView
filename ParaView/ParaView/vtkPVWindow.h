@@ -260,8 +260,8 @@ public:
   
   // Description:
   // Access to the interactor styles from tcl.
-  vtkGetObjectMacro(RotateCameraStyle, vtkPVInteractorStyle);
-  vtkGetObjectMacro(TranslateCameraStyle, vtkPVInteractorStyle);
+  vtkGetObjectMacro(CameraStyle3D, vtkPVInteractorStyle);
+  vtkGetObjectMacro(CameraStyle2D, vtkPVInteractorStyle);
   vtkGetObjectMacro(FlyStyle, vtkPVInteractorStyleFly);
   
   // Description:
@@ -399,6 +399,7 @@ public:
   // Description:
   // This method is for testing only.
   void SaveSessionFile(const char* path);
+  void LoadSessionFile(const char* path);
 
 protected:
   vtkPVWindow();
@@ -414,8 +415,8 @@ protected:
   vtkKWMenu *SelectMenu;
   vtkKWMenu *GlyphMenu;
   
-  vtkPVInteractorStyle *TranslateCameraStyle;
-  vtkPVInteractorStyle *RotateCameraStyle;
+  vtkPVInteractorStyle *CameraStyle2D;
+  vtkPVInteractorStyle *CameraStyle3D;
 
   // This should be made into a 3D Widget.
   vtkPVInteractorStyleCenterOfRotation *CenterOfRotationStyle;

@@ -152,8 +152,8 @@ vtkPVWindow::vtkPVWindow()
   // This toolbar contains buttons for instantiating new modules
   this->Toolbar = vtkKWToolbar::New();
 
-  this->RotateCameraStyle = vtkPVInteractorStyle::New();
-  this->TranslateCameraStyle = vtkPVInteractorStyle::New();
+  this->CameraStyle3D = vtkPVInteractorStyle::New();
+  this->CameraStyle2D = vtkPVInteractorStyle::New();
   this->CenterOfRotationStyle = vtkPVInteractorStyleCenterOfRotation::New();
   this->FlyStyle = vtkPVInteractorStyleFly::New();
 
@@ -389,15 +389,15 @@ void vtkPVWindow::PrepareForDelete()
     this->FlyStyle = NULL;
     }
 
-  if (this->RotateCameraStyle)
+  if (this->CameraStyle3D)
     {
-    this->RotateCameraStyle->Delete();
-    this->RotateCameraStyle = NULL;
+    this->CameraStyle3D->Delete();
+    this->CameraStyle3D = NULL;
     }
-  if (this->TranslateCameraStyle)
+  if (this->CameraStyle2D)
     {
-    this->TranslateCameraStyle->Delete();
-    this->TranslateCameraStyle = NULL;
+    this->CameraStyle2D->Delete();
+    this->CameraStyle2D = NULL;
     }
   if (this->CenterOfRotationStyle)
     {
@@ -822,7 +822,7 @@ void vtkPVWindow::Create(vtkKWApplication *app, char* vtkNotUsed(args))
   this->CenterXEntry->Create(app, "-width 7");
   this->Script("bind %s <KeyPress-Return> {%s CenterEntryCallback}",
                this->CenterXEntry->GetWidgetName(), this->GetTclName());
-  //this->CenterXEntry->SetValue(this->RotateCameraStyle->GetCenter()[0], 3);
+  //this->CenterXEntry->SetValue(this->CameraStyle3D->GetCenter()[0], 3);
   this->CenterXEntry->SetValue(0.0, 3);
   
   this->CenterYLabel->SetParent(this->CenterEntryFrame);
@@ -833,7 +833,7 @@ void vtkPVWindow::Create(vtkKWApplication *app, char* vtkNotUsed(args))
   this->CenterYEntry->Create(app, "-width 7");
   this->Script("bind %s <KeyPress-Return> {%s CenterEntryCallback}",
                this->CenterYEntry->GetWidgetName(), this->GetTclName());
-  //this->CenterYEntry->SetValue(this->RotateCameraStyle->GetCenter()[1], 3);
+  //this->CenterYEntry->SetValue(this->CameraStyle3D->GetCenter()[1], 3);
   this->CenterYEntry->SetValue(0.0, 3);
 
   this->CenterZLabel->SetParent(this->CenterEntryFrame);
@@ -844,7 +844,7 @@ void vtkPVWindow::Create(vtkKWApplication *app, char* vtkNotUsed(args))
   this->CenterZEntry->Create(app, "-width 7");
   this->Script("bind %s <KeyPress-Return> {%s CenterEntryCallback}",
                this->CenterZEntry->GetWidgetName(), this->GetTclName());
-  //this->CenterZEntry->SetValue(this->RotateCameraStyle->GetCenter()[2], 3);
+  //this->CenterZEntry->SetValue(this->CameraStyle3D->GetCenter()[2], 3);
   this->CenterZEntry->SetValue(0.0, 3);
 
   this->Script("pack %s %s %s %s %s %s %s -side left",
@@ -1080,7 +1080,7 @@ void vtkPVWindow::CenterEntryCallback()
 //----------------------------------------------------------------------------
 void vtkPVWindow::SetCenterOfRotation(float x, float y, float z)
 {
-  this->RotateCameraStyle->SetCenterOfRotation(x, y, z);
+  this->CameraStyle3D->SetCenterOfRotation(x, y, z);
   this->CenterActor->SetPosition(x, y, z);
 }
 
@@ -1164,7 +1164,7 @@ void vtkPVWindow::ChangeInteractorStyle(int index)
       this->FlyButton->SetState(0);
       this->TranslateCameraButton->SetState(0);
       //this->TrackballCameraButton->SetState(0);
-      this->GenericInteractor->SetInteractorStyle(this->RotateCameraStyle);
+      this->GenericInteractor->SetInteractorStyle(this->CameraStyle3D);
       this->Script("pack %s -side left",
                    this->PickCenterToolbar->GetWidgetName());
       this->ResizeCenterActor();
@@ -1174,7 +1174,7 @@ void vtkPVWindow::ChangeInteractorStyle(int index)
       this->FlyButton->SetState(0);
       this->RotateCameraButton->SetState(0);
       //this->TrackballCameraButton->SetState(0);
-      this->GenericInteractor->SetInteractorStyle(this->TranslateCameraStyle);
+      this->GenericInteractor->SetInteractorStyle(this->CameraStyle2D);
       this->CenterActor->VisibilityOff();
       break;
     case 3:
@@ -1286,10 +1286,10 @@ void vtkPVWindow::CreateMainView(vtkPVApplication *pvApp)
 
   vtkPVInteractorStyleControl *iscontrol3D = view->GetManipulatorControl3D();
   iscontrol3D->SetManipulatorCollection(
-    this->RotateCameraStyle->GetCameraManipulators());
+    this->CameraStyle3D->GetCameraManipulators());
   vtkPVInteractorStyleControl *iscontrol2D = view->GetManipulatorControl2D();
   iscontrol2D->SetManipulatorCollection(
-    this->TranslateCameraStyle->GetCameraManipulators());
+    this->CameraStyle2D->GetCameraManipulators());
   
   vtkPVCameraManipulator *manipulator;
   // ----
@@ -3025,7 +3025,8 @@ void vtkPVWindow::AddFileType(const char *description, const char *ext,
     }
   else
     {
-    sprintf(newStr, "%s {{%s} {%s}}", this->FileDescriptions, description, ext);
+    sprintf(newStr, "%s {{%s} {%s}}", 
+            this->FileDescriptions, description, ext);
     }
   if (this->FileDescriptions)
     {
@@ -3108,6 +3109,16 @@ void vtkPVWindow::SaveSessionFile(const char* path)
 }
 
 //----------------------------------------------------------------------------
+void vtkPVWindow::LoadSessionFile(const char* path)
+{
+  istream *fptr;
+  fptr = new ifstream(path, ios::in);
+  vtkIndent indent;
+  this->Serialize(*fptr);
+  delete fptr;
+}
+
+//----------------------------------------------------------------------------
 void vtkPVWindow::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
@@ -3120,14 +3131,15 @@ void vtkPVWindow::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "InteractorStyleToolbar: " << this->GetInteractorToolbar() 
      << endl;
   os << indent << "MainView: " << this->GetMainView() << endl;
-  os << indent << "RotateCameraStyle: " << this->GetRotateCameraStyle() << endl;
-  os << indent << "SelectMenu: " << this->GetSelectMenu() << endl;
-  os << indent << "SourceMenu: " << this->GetSourceMenu() << endl;
+  os << indent << "CameraStyle2D: " << this->CameraStyle2D << endl;
+  os << indent << "CameraStyle3D: " << this->CameraStyle3D << endl;
+  os << indent << "SelectMenu: " << this->SelectMenu << endl;
+  os << indent << "SourceMenu: " << this->SourceMenu << endl;
   os << indent << "Toolbar: " << this->GetToolbar() << endl;
-  os << indent << "TranslateCameraStyle: " << this->GetTranslateCameraStyle() << endl;
   os << indent << "GenericInteractor: " << this->GenericInteractor << endl;
   os << indent << "GlyphMenu: " << this->GlyphMenu << endl;
-  os << indent << "InitializeDefaultInterfaces: " << this->InitializeDefaultInterfaces << endl;
+  os << indent << "InitializeDefaultInterfaces: " 
+     << this->InitializeDefaultInterfaces << endl;
   os << indent << "UseMessageDialog: " << this->UseMessageDialog << endl;
 }
 
