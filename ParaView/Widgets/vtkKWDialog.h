@@ -47,6 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __vtkKWDialog_h
 
 #include "vtkKWWidget.h"
+
 class vtkKWApplication;
 class vtkKWWindow;
 
@@ -54,7 +55,7 @@ class VTK_EXPORT vtkKWDialog : public vtkKWWidget
 {
 public:
   static vtkKWDialog* New();
-  vtkTypeMacro(vtkKWDialog,vtkKWWidget);
+  vtkTypeRevisionMacro(vtkKWDialog,vtkKWWidget);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

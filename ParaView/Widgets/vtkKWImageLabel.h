@@ -56,7 +56,8 @@ class VTK_EXPORT vtkKWImageLabel : public vtkKWLabel
 {
 public:
   static vtkKWImageLabel* New();
-  vtkTypeMacro(vtkKWImageLabel,vtkKWLabel);
+  vtkTypeRevisionMacro(vtkKWImageLabel,vtkKWLabel);
+  void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
   // Create a Tk widget

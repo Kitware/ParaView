@@ -54,7 +54,8 @@ class VTK_EXPORT vtkKWCheckButton : public vtkKWWidget
 {
 public:
   static vtkKWCheckButton* New();
-  vtkTypeMacro(vtkKWCheckButton,vtkKWWidget);
+  vtkTypeRevisionMacro(vtkKWCheckButton,vtkKWWidget);
+  void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
   // Create a Tk widget

@@ -85,7 +85,7 @@ class vtkWindow;
 class VTK_EXPORT vtkKWView : public vtkKWWidget
 {
   public:
-  vtkTypeMacro(vtkKWView,vtkKWWidget);
+  vtkTypeRevisionMacro(vtkKWView,vtkKWWidget);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

@@ -56,6 +56,7 @@ template class VTK_EXPORT vtkVectorIterator<vtkKWWidget*>;
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWToolbar );
+vtkCxxRevisionMacro(vtkKWToolbar, "1.13");
 
 
 int vtkKWToolbarCommand(ClientData cd, Tcl_Interp *interp,

@@ -54,7 +54,7 @@ class VTK_EXPORT vtkKWProgressGauge : public vtkKWWidget
 {
 public:
   static vtkKWProgressGauge* New();
-  vtkTypeMacro(vtkKWProgressGauge,vtkKWWidget);
+  vtkTypeRevisionMacro(vtkKWProgressGauge,vtkKWWidget);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

@@ -47,6 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWRadioButton );
+vtkCxxRevisionMacro(vtkKWRadioButton, "1.7");
 
 
 
@@ -70,3 +71,9 @@ void vtkKWRadioButton::Create(vtkKWApplication *app, const char *args)
                wname,wname,(args?args:""));
 }
 
+
+//----------------------------------------------------------------------------
+void vtkKWRadioButton::PrintSelf(ostream& os, vtkIndent indent)
+{
+  this->Superclass::PrintSelf(os,indent);
+}

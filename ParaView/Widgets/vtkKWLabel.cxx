@@ -47,6 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLabel );
+vtkCxxRevisionMacro(vtkKWLabel, "1.12");
 
 vtkKWLabel::vtkKWLabel()
 {

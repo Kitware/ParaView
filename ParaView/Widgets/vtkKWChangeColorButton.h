@@ -47,14 +47,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __vtkKWChangeColorButton_h
 #define __vtkKWChangeColorButton_h
 
-#include "vtkKWEntry.h"
+#include "vtkKWWidget.h"
+
 class vtkKWApplication;
 
 class VTK_EXPORT vtkKWChangeColorButton : public vtkKWWidget
 {
 public:
   static vtkKWChangeColorButton* New();
-  vtkTypeMacro(vtkKWChangeColorButton,vtkKWWidget);
+  vtkTypeRevisionMacro(vtkKWChangeColorButton,vtkKWWidget);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

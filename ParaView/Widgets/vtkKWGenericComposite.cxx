@@ -46,6 +46,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWGenericComposite );
+vtkCxxRevisionMacro(vtkKWGenericComposite, "1.7");
 
 vtkSetObjectImplementationMacro(vtkKWGenericComposite, Prop, vtkProp);
 
@@ -64,4 +65,10 @@ vtkKWGenericComposite::vtkKWGenericComposite()
 vtkKWGenericComposite::~vtkKWGenericComposite()
 {
   this->SetProp(NULL);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWGenericComposite::PrintSelf(ostream& os, vtkIndent indent)
+{
+  this->Superclass::PrintSelf(os,indent);
 }

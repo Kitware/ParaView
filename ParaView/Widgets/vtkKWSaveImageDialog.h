@@ -53,7 +53,7 @@ class VTK_EXPORT vtkKWSaveImageDialog : public vtkKWWidget
 {
 public:
   static vtkKWSaveImageDialog* New();
-  vtkTypeMacro(vtkKWSaveImageDialog,vtkKWWidget);
+  vtkTypeRevisionMacro(vtkKWSaveImageDialog,vtkKWWidget);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

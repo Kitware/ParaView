@@ -43,13 +43,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __vtkKWMenuButton_h
 #define __vtkKWMenuButton_h
 
-#include "vtkKWMenu.h"
+#include "vtkKWWidget.h"
+
+class vtkKWMenu;
 
 class VTK_EXPORT vtkKWMenuButton : public vtkKWWidget
 {
 public:
   static vtkKWMenuButton* New();
-  vtkTypeMacro(vtkKWMenuButton, vtkKWWidget);
+  vtkTypeRevisionMacro(vtkKWMenuButton, vtkKWWidget);
+  void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
   // Create a Tk widget

@@ -47,6 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWXtEmbeddedWidget);
+vtkCxxRevisionMacro(vtkKWXtEmbeddedWidget, "1.5");
 
 int vtkKWXtEmbeddedWidgetCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -90,4 +91,10 @@ void vtkKWXtEmbeddedWidget::Create(vtkKWApplication *app, char *args)
     this->Script("toplevel %s %s",wname,args); 
     this->Script("wm withdraw %s",wname);
     }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWXtEmbeddedWidget::PrintSelf(ostream& os, vtkIndent indent)
+{
+  this->Superclass::PrintSelf(os,indent);
 }

@@ -47,6 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWFrame );
+vtkCxxRevisionMacro(vtkKWFrame, "1.6");
 
 vtkKWFrame::vtkKWFrame()
 {
@@ -112,4 +113,8 @@ void vtkKWFrame::Create(vtkKWApplication *app, int scrollable)
     }
 }
 
-
+//----------------------------------------------------------------------------
+void vtkKWFrame::PrintSelf(ostream& os, vtkIndent indent)
+{
+  this->Superclass::PrintSelf(os,indent);
+}

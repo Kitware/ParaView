@@ -55,7 +55,7 @@ class VTK_EXPORT vtkKWScale : public vtkKWWidget
 {
 public:
   static vtkKWScale* New();
-  vtkTypeMacro(vtkKWScale,vtkKWWidget);
+  vtkTypeRevisionMacro(vtkKWScale,vtkKWWidget);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

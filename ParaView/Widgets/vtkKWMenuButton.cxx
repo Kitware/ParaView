@@ -41,9 +41,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
 #include "vtkKWMenuButton.h"
+
+#include "vtkKWMenu.h"
 #include "vtkObjectFactory.h"
 
 vtkStandardNewMacro( vtkKWMenuButton );
+vtkCxxRevisionMacro(vtkKWMenuButton, "1.8");
 
 int vtkKWMenuButtonCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -97,4 +100,10 @@ void vtkKWMenuButton::AddCommand(const char* label, vtkKWObject* Object,
 vtkKWMenu* vtkKWMenuButton::GetMenu()
 {
   return this->Menu;
+}
+
+//----------------------------------------------------------------------------
+void vtkKWMenuButton::PrintSelf(ostream& os, vtkIndent indent)
+{
+  this->Superclass::PrintSelf(os,indent);
 }

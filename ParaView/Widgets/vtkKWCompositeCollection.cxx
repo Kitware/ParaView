@@ -45,6 +45,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWComposite.h"
 
 vtkStandardNewMacro( vtkKWCompositeCollection );
+vtkCxxRevisionMacro(vtkKWCompositeCollection, "1.5");
 
 void vtkKWCompositeCollection::AddItem(vtkKWComposite *a) 
 {
@@ -76,4 +77,10 @@ vtkKWComposite *vtkKWCompositeCollection::GetLastKWComposite()
     {
     return vtkKWComposite::SafeDownCast(this->Bottom->Item);
     }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWCompositeCollection::PrintSelf(ostream& os, vtkIndent indent)
+{
+  this->Superclass::PrintSelf(os,indent);
 }

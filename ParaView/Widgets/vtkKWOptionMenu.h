@@ -54,7 +54,7 @@ class VTK_EXPORT vtkKWOptionMenu : public vtkKWWidget
 {
 public:
   static vtkKWOptionMenu* New();
-  vtkTypeMacro(vtkKWOptionMenu,vtkKWWidget);
+  vtkTypeRevisionMacro(vtkKWOptionMenu,vtkKWWidget);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

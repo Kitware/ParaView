@@ -59,7 +59,8 @@ class VTK_EXPORT vtkKWGenericComposite : public vtkKWComposite
 {
 public:
   static vtkKWGenericComposite* New();
-  vtkTypeMacro(vtkKWGenericComposite,vtkKWComposite);
+  vtkTypeRevisionMacro(vtkKWGenericComposite,vtkKWComposite);
+  void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
   // Get the prop for this composite

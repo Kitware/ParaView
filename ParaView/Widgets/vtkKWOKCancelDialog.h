@@ -53,7 +53,8 @@ class VTK_EXPORT vtkKWOKCancelDialog : public vtkKWDialog
 {
 public:
   static vtkKWOKCancelDialog* New();
-  vtkTypeMacro(vtkKWOKCancelDialog,vtkKWDialog);
+  vtkTypeRevisionMacro(vtkKWOKCancelDialog,vtkKWDialog);
+  void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
   // Create a Tk widget

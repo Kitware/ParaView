@@ -47,6 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWPushButton );
+vtkCxxRevisionMacro(vtkKWPushButton, "1.8");
 
 
 vtkKWPushButton::vtkKWPushButton()
@@ -116,3 +117,9 @@ void vtkKWPushButton::Enable()
   this->Script("%s configure -state normal", this->GetWidgetName());
 }
 
+
+//----------------------------------------------------------------------------
+void vtkKWPushButton::PrintSelf(ostream& os, vtkIndent indent)
+{
+  this->Superclass::PrintSelf(os,indent);
+}

@@ -52,6 +52,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWActorComposite );
+vtkCxxRevisionMacro(vtkKWActorComposite, "1.9");
 
 
 

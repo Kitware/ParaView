@@ -58,7 +58,7 @@ class VTK_EXPORT vtkKWTclInteractor : public vtkKWWidget
 {
 public:
   static vtkKWTclInteractor* New();
-  vtkTypeMacro(vtkKWTclInteractor, vtkKWWidget);
+  vtkTypeRevisionMacro(vtkKWTclInteractor, vtkKWWidget);
   void PrintSelf(ostream& os, vtkIndent indent);
   
   // Description:

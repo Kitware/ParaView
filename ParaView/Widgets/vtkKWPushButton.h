@@ -53,7 +53,8 @@ class VTK_EXPORT vtkKWPushButton : public vtkKWWidget
 {
 public:
   static vtkKWPushButton* New();
-  vtkTypeMacro(vtkKWPushButton,vtkKWWidget);
+  vtkTypeRevisionMacro(vtkKWPushButton,vtkKWWidget);
+  void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
   // Create a Tk widget

@@ -61,7 +61,7 @@ class VTK_EXPORT vtkKWCornerAnnotation : public vtkKWLabeledFrame
 {
 public:
   static vtkKWCornerAnnotation* New();
-  vtkTypeMacro(vtkKWCornerAnnotation,vtkKWLabeledFrame);
+  vtkTypeRevisionMacro(vtkKWCornerAnnotation,vtkKWLabeledFrame);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

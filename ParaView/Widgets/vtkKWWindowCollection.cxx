@@ -46,6 +46,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkObjectFactory.h"
 
 vtkStandardNewMacro(vtkKWWindowCollection);
+vtkCxxRevisionMacro(vtkKWWindowCollection, "1.6");
 
 void vtkKWWindowCollection::AddItem(vtkKWWindow *a) 
 {
@@ -77,4 +78,10 @@ vtkKWWindow *vtkKWWindowCollection::GetLastKWWindow()
     {
     return vtkKWWindow::SafeDownCast(this->Bottom->Item);
     }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWWindowCollection::PrintSelf(ostream& os, vtkIndent indent)
+{
+  this->Superclass::PrintSelf(os,indent);
 }

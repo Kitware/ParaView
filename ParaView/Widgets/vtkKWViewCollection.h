@@ -55,7 +55,8 @@ class VTK_EXPORT vtkKWViewCollection : public vtkCollection
 {
 public:
   static vtkKWViewCollection *New();
-  vtkTypeMacro(vtkKWViewCollection,vtkCollection);
+  vtkTypeRevisionMacro(vtkKWViewCollection,vtkCollection);
+  void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
   // Add an KWView to the list.

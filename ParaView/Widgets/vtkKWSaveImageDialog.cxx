@@ -47,6 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWSaveImageDialog );
+vtkCxxRevisionMacro(vtkKWSaveImageDialog, "1.14");
 
 
 

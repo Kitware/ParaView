@@ -47,6 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWEntry );
+vtkCxxRevisionMacro(vtkKWEntry, "1.12");
 
 vtkKWEntry::vtkKWEntry()
 {

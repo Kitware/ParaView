@@ -57,7 +57,8 @@ class VTK_EXPORT vtkKWCompositeCollection : public vtkCollection
 {
 public:
   static vtkKWCompositeCollection *New();
-  vtkTypeMacro(vtkKWCompositeCollection,vtkCollection);
+  vtkTypeRevisionMacro(vtkKWCompositeCollection,vtkCollection);
+  void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
   // Add an KWComposite to the list.

@@ -57,7 +57,7 @@ class VTK_EXPORT vtkKWNotebook : public vtkKWWidget
 {
 public:
   static vtkKWNotebook* New();
-  vtkTypeMacro(vtkKWNotebook,vtkKWWidget);
+  vtkTypeRevisionMacro(vtkKWNotebook,vtkKWWidget);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

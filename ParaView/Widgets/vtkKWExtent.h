@@ -50,6 +50,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __vtkKWExtent_h
 
 #include "vtkKWWidget.h"
+
 class vtkKWScale;
 class vtkKWApplication;
 
@@ -57,7 +58,7 @@ class VTK_EXPORT vtkKWExtent : public vtkKWWidget
 {
 public:
   static vtkKWExtent* New();
-  vtkTypeMacro(vtkKWExtent,vtkKWWidget);
+  vtkTypeRevisionMacro(vtkKWExtent,vtkKWWidget);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
@@ -111,7 +112,7 @@ protected:
   vtkKWScale  *ZMaxScale;
 private:
   vtkKWExtent(const vtkKWExtent&); // Not implemented
-  void operator=(const vtkKWExtent&); // Not Implemented
+  void operator=(const vtkKWExtent&); // Not implemented
 };
 
 

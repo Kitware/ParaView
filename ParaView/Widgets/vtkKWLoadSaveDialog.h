@@ -54,7 +54,7 @@ class VTK_EXPORT vtkKWLoadSaveDialog : public vtkKWWidget
 {
 public:
   static vtkKWLoadSaveDialog* New();
-  vtkTypeMacro(vtkKWLoadSaveDialog,vtkKWWidget);
+  vtkTypeRevisionMacro(vtkKWLoadSaveDialog,vtkKWWidget);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

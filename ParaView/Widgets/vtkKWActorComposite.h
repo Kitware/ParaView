@@ -61,7 +61,7 @@ class VTK_EXPORT vtkKWActorComposite : public vtkKWComposite
 {
 public:
   static vtkKWActorComposite* New();
-  vtkTypeMacro(vtkKWActorComposite,vtkKWComposite);
+  vtkTypeRevisionMacro(vtkKWActorComposite,vtkKWComposite);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

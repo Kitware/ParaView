@@ -58,7 +58,8 @@ class VTK_EXPORT vtkKWWindowCollection : public vtkCollection
 {
 public:
   static vtkKWWindowCollection *New();
-  vtkTypeMacro(vtkKWWindowCollection,vtkCollection);
+  vtkTypeRevisionMacro(vtkKWWindowCollection,vtkCollection);
+  void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
   // Add an KWWindow to the list.

@@ -47,13 +47,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __vtkKWListBox_h
 
 #include "vtkKWWidget.h"
+
 class vtkKWApplication;
 
 class VTK_EXPORT vtkKWListBox : public vtkKWWidget
 {
 public:
   static vtkKWListBox* New();
-  vtkTypeMacro(vtkKWListBox,vtkKWWidget);
+  vtkTypeRevisionMacro(vtkKWListBox,vtkKWWidget);
+  void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
   // Create a Tk widget

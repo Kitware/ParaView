@@ -54,7 +54,8 @@ class VTK_EXPORT vtkKWWidgetCollection : public vtkCollection
 {
 public:
   static vtkKWWidgetCollection *New();
-  vtkTypeMacro(vtkKWWidgetCollection,vtkCollection);
+  vtkTypeRevisionMacro(vtkKWWidgetCollection,vtkCollection);
+  void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
   // Add an KWWidget to the list.

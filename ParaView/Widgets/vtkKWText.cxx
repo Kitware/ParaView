@@ -47,6 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWText );
+vtkCxxRevisionMacro(vtkKWText, "1.9");
 
 vtkKWText::vtkKWText()
 {
@@ -94,12 +95,8 @@ void vtkKWText::Create(vtkKWApplication *app, const char *args)
   this->Script("text %s %s",wname,(args?args:""));
 }
 
-
-
-
-
-
-
-
-
-
+//----------------------------------------------------------------------------
+void vtkKWText::PrintSelf(ostream& os, vtkIndent indent)
+{
+  this->Superclass::PrintSelf(os,indent);
+}

@@ -50,8 +50,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __vtkKWApplication_h
 
 #include "vtkKWObject.h"
-#include "tcl.h"
-#include "tk.h"
+#include "tcl.h" // Needed for Tcl_Interp
+#include "tk.h" // Needed for Tk_Window
 
 class vtkKWWindowCollection;
 class vtkKWWindow;
@@ -66,7 +66,7 @@ class VTK_EXPORT vtkKWApplication : public vtkKWObject
 {
 public:
   static vtkKWApplication* New();
-  vtkTypeMacro(vtkKWApplication,vtkKWObject);
+  vtkTypeRevisionMacro(vtkKWApplication,vtkKWObject);
   void PrintSelf(ostream& os, vtkIndent indent);
   
   virtual vtkKWApplication *GetApplication()  { return this;  }

@@ -1863,7 +1863,7 @@ void vtkPVRenderView::SetLODThresholdInternal(int threshold)
 //----------------------------------------------------------------------------
 void vtkPVRenderView::LODResolutionScaleCallback()
 {
-  int value = this->LODResolutionScale->GetValue();
+  int value = static_cast<int>(this->LODResolutionScale->GetValue());
   value = 170 - value;
 
   // Use internal method so we do not reset the slider.
@@ -2258,7 +2258,7 @@ void vtkPVRenderView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVRenderView ";
-  this->ExtractRevision(os,"$Revision: 1.185 $");
+  this->ExtractRevision(os,"$Revision: 1.186 $");
 }
 
 //------------------------------------------------------------------------------

@@ -46,6 +46,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWListBox );
+vtkCxxRevisionMacro(vtkKWListBox, "1.11");
 
 
 int vtkKWListBoxCommand(ClientData cd, Tcl_Interp *interp,
@@ -220,4 +221,10 @@ void vtkKWListBox::SetBalloonHelpJustification( int j )
 {
   this->Listbox->SetBalloonHelpJustification( j );
   this->Scrollbar->SetBalloonHelpJustification( j );
+}
+
+//----------------------------------------------------------------------------
+void vtkKWListBox::PrintSelf(ostream& os, vtkIndent indent)
+{
+  this->Superclass::PrintSelf(os,indent);
 }

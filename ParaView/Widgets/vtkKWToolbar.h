@@ -60,7 +60,7 @@ class VTK_EXPORT vtkKWToolbar : public vtkKWWidget
 {
 public:
   static vtkKWToolbar* New();
-  vtkTypeMacro(vtkKWToolbar, vtkKWWidget);
+  vtkTypeRevisionMacro(vtkKWToolbar, vtkKWWidget);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

@@ -54,7 +54,8 @@ class VTK_EXPORT vtkKWRadioButton : public vtkKWCheckButton
 {
 public:
   static vtkKWRadioButton* New();
-  vtkTypeMacro(vtkKWRadioButton,vtkKWCheckButton);
+  vtkTypeRevisionMacro(vtkKWRadioButton,vtkKWCheckButton);
+  void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
   // Create a Tk widget

@@ -59,7 +59,7 @@ class vtkImageActor;
 class VTK_EXPORT vtkCornerAnnotation : public vtkActor2D
 {
 public:
-  vtkTypeMacro(vtkCornerAnnotation,vtkActor2D);
+  vtkTypeRevisionMacro(vtkCornerAnnotation,vtkActor2D);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

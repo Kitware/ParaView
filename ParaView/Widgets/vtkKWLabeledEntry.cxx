@@ -47,6 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLabeledEntry );
+vtkCxxRevisionMacro(vtkKWLabeledEntry, "1.6");
 
 int vtkKWLabeledEntryCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -127,4 +128,10 @@ int vtkKWLabeledEntry::GetValueAsInt()
 float vtkKWLabeledEntry::GetValueAsFloat()
 {
   return this->Entry->GetValueAsFloat();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWLabeledEntry::PrintSelf(ostream& os, vtkIndent indent)
+{
+  this->Superclass::PrintSelf(os,indent);
 }

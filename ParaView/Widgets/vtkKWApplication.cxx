@@ -71,6 +71,7 @@ int vtkKWApplication::WidgetVisibility = 1;
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
+vtkCxxRevisionMacro(vtkKWApplication, "1.91");
 
 
 

@@ -55,7 +55,7 @@ class VTK_EXPORT vtkKWSplitFrame : public vtkKWWidget
 {
 public:
   static vtkKWSplitFrame* New();
-  vtkTypeMacro(vtkKWSplitFrame,vtkKWWidget);
+  vtkTypeRevisionMacro(vtkKWSplitFrame,vtkKWWidget);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

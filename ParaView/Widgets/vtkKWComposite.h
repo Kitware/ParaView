@@ -50,16 +50,18 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __vtkKWComposite_h
 #define __vtkKWComposite_h
 
-#include "vtkKWNotebook.h"
-class vtkKWView;
+#include "vtkKWObject.h"
+
 class vtkKWApplication;
-class vtkProp;
+class vtkKWNotebook;
+class vtkKWView;
 class vtkKWWidget;
+class vtkProp;
 
 class VTK_EXPORT vtkKWComposite : public vtkKWObject
 {
 public:
-  vtkTypeMacro(vtkKWComposite,vtkKWObject);
+  vtkTypeRevisionMacro(vtkKWComposite,vtkKWObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

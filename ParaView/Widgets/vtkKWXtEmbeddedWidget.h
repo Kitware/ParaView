@@ -54,7 +54,8 @@ class VTK_EXPORT vtkKWXtEmbeddedWidget : public vtkKWWidget
 {
 public:
   static vtkKWXtEmbeddedWidget* New();
-  vtkTypeMacro(vtkKWXtEmbeddedWidget,vtkKWWidget);
+  vtkTypeRevisionMacro(vtkKWXtEmbeddedWidget,vtkKWWidget);
+  void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
   // Set the window ID to embed the widget in.

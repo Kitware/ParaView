@@ -62,10 +62,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #  define HAS_STDARG
 #endif
 
-#include "tcl.h"
-
-// Needed for "va_list" argument of EstimateFormatLength.
-#include <stdarg.h>
+#include "tcl.h" // Needed for Tcl interpreter
+#include <stdarg.h> // Needed for "va_list" argument of EstimateFormatLength.
 
 class vtkKWApplication;
 
@@ -73,7 +71,7 @@ class VTK_EXPORT vtkKWObject : public vtkObject
 {
 public:
   static vtkKWObject* New();
-  vtkTypeMacro(vtkKWObject,vtkObject);
+  vtkTypeRevisionMacro(vtkKWObject,vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

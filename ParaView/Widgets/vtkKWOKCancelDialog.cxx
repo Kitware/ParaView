@@ -47,6 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWOKCancelDialog );
+vtkCxxRevisionMacro(vtkKWOKCancelDialog, "1.5");
 
 
 
@@ -100,4 +101,10 @@ void vtkKWOKCancelDialog::SetText(const char *txt)
 {
   this->Script("%s configure -text {%s}",
                this->Message->GetWidgetName(),txt);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWOKCancelDialog::PrintSelf(ostream& os, vtkIndent indent)
+{
+  this->Superclass::PrintSelf(os,indent);
 }

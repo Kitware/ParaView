@@ -56,6 +56,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWIcon.h"
 #include "vtkKWMenu.h"
 #include "vtkKWMessageDialog.h"
+#include "vtkKWNotebook.h"
 #include "vtkKWProgressGauge.h"
 #include "vtkKWSaveImageDialog.h"
 #include "vtkKWSerializer.h"
@@ -80,6 +81,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkWin32OpenGLRenderWindow.h"
 #else
 #include "vtkXOpenGLRenderWindow.h"
+
+vtkCxxRevisionMacro(vtkKWView, "1.76");
 
 int vtkKWViewFoundMatch;
 
@@ -1372,7 +1375,7 @@ void vtkKWView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWView ";
-  this->ExtractRevision(os,"$Revision: 1.75 $");
+  this->ExtractRevision(os,"$Revision: 1.76 $");
 }
 
 //----------------------------------------------------------------------------
