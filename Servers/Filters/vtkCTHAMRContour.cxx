@@ -41,7 +41,7 @@
 #include "vtkGarbageCollector.h"
 
 
-vtkCxxRevisionMacro(vtkCTHAMRContour, "1.6");
+vtkCxxRevisionMacro(vtkCTHAMRContour, "1.7");
 vtkStandardNewMacro(vtkCTHAMRContour);
 
 //----------------------------------------------------------------------------
@@ -125,7 +125,7 @@ void vtkCTHAMRContour::Execute()
     this->UpdateProgress(startProg);
     block = vtkImageData::New();
     inputCopy->GetBlock(blockId, block);
-    this->ExecuteBlock(block, tmp, startProg, endProg);
+    this->ExecuteBlock(block, tmp, startProg);
     block->Initialize();
     block->Delete();
     block = NULL;
@@ -162,7 +162,7 @@ void vtkCTHAMRContour::Execute()
 //-----------------------------------------------------------------------------
 void vtkCTHAMRContour::ExecuteBlock(vtkImageData* block, 
                                     vtkAppendPolyData* tmp,
-                                    double startProg, double endProg)
+                                    double startProg)
 {
   vtkFloatArray* pointVolumeFraction;
   const char* arrayName;
