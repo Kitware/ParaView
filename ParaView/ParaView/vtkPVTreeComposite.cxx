@@ -50,7 +50,7 @@
 
 //-------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVTreeComposite);
-vtkCxxRevisionMacro(vtkPVTreeComposite, "1.53");
+vtkCxxRevisionMacro(vtkPVTreeComposite, "1.53.2.1");
 
 
 //=========================================================================
@@ -420,6 +420,7 @@ void vtkPVTreeComposite::InternalStartRender()
     cam->GetPosition(renInfoDouble.CameraPosition);
     cam->GetFocalPoint(renInfoDouble.CameraFocalPoint);
     cam->GetViewUp(renInfoDouble.CameraViewUp);
+    renInfoDouble.CameraViewAngle = cam->GetViewAngle();
     cam->GetClippingRange(renInfoDouble.CameraClippingRange);
     if (cam->GetParallelProjection())
       {
