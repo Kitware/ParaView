@@ -48,12 +48,17 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkRenderer.h"
 #include "vtkRenderWindow.h"
 
-vtkCxxRevisionMacro(vtkPVTrackballRotate, "1.2");
+vtkCxxRevisionMacro(vtkPVTrackballRotate, "1.3");
 vtkStandardNewMacro(vtkPVTrackballRotate);
 
 //-------------------------------------------------------------------------
 vtkPVTrackballRotate::vtkPVTrackballRotate()
 {
+  this->Center[0] = 0;
+  this->Center[1] = 0;
+  this->Center[2] = 0;
+  this->DisplayCenter[0] = 0;
+  this->DisplayCenter[1] = 0;
 }
 
 //-------------------------------------------------------------------------
