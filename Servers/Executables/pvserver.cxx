@@ -1,7 +1,23 @@
-#include "vtkToolkits.h"
+/*=========================================================================
+
+Program:   ParaView
+Module:    pvserver.cxx
+
+Copyright (c) Kitware, Inc.
+All rights reserved.
+See Copyright.txt or http://www.paraview.org/HTML/Copyright.html for details.
+
+This software is distributed WITHOUT ANY WARRANTY; without even
+the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+PURPOSE.  See the above copyright notice for more information.
+
+=========================================================================*/
+#include "vtkToolkits.h" // For VTK_USE_MPI and VTK_USE_PATENTED
+
 #ifdef VTK_USE_MPI
 # include <mpi.h>
 #endif
+
 #include "vtkPVClientServerModule.h"
 #include "vtkOutputWindow.h"
 #include "vtkObject.h"
@@ -147,6 +163,25 @@ void ParaViewInitializeInterpreter(vtkPVProcessModule* pm)
 
 
 
+#ifdef PARAVIEW_ENABLE_FPE
+void u_fpu_setup()
+{
+#ifdef _MSC_VER
+  // enable floating point exceptions on MSVC
+  short m = 0x372;
+  __asm
+    {
+    fldcw m;
+    }
+#endif  //_MSC_VER
+#ifdef __linux__
+  // This only works on linux x86
+  unsigned int fpucw= 0x1372;
+  __asm__ ("fldcw %0" : : "m" (fpucw));
+#endif  //__linux__
+}
+#endif //PARAVIEW_ENABLE_FPE
+
 int main(int argc, char *argv[])
 { 
   // Avoid Ghost windows on windows XP
@@ -164,16 +199,9 @@ int main(int argc, char *argv[])
     }  
 #endif
   int retVal = 0;
-#ifdef PARAVIEW_ENABLE_FPE    
-#if defined(_MSC_VER)
-  // enable floating point exceptions on MSVC
-  short m = 0x372;
-  __asm
-    {
-    fldcw m;
-    }
-#endif
-#endif
+#ifdef PARAVIEW_ENABLE_FPE
+  u_fpu_setup();
+#endif //PARAVIEW_ENABLE_FPE
   
   int display_help = 0;
   vtkPVOptions* options = vtkPVOptions::New();
@@ -247,6 +275,6 @@ int main(int argc, char *argv[])
   MPI_Finalize();
 #endif
 
-  return (retVal);
+  return retVal;
 }
 
