@@ -34,47 +34,39 @@ IF (WIN32)
 
 ENDIF (WIN32)
 
-
-FIND_PATH( VTK_BINARY_DIR vtkConfigure.h )
-
-
-# load in the values from VTK if found
-IF ( VTK_BINARY_DIR )
-  LOAD_CACHE(${VTK_BINARY_DIR} EXCLUDE
-                                BUILD_SHARED_LIBS
-                                BUILD_TESTING
-                                LIBRARY_OUTPUT_PATH
-                                EXECUTABLE_OUTPUT_PATH
-                                MAKECOMMAND
-                               INCLUDE_INTERNALS
-                                VTK_BINARY_PATH
-                                VTK_LIBRARY_PATH)
-  INCLUDE (${VTK_SOURCE_DIR}/vtkCMakeOptions.cmake)
-
-  IF ( NOT VTK_WRAP_TCL )
-    MESSAGE("ParaView requires VTK to be built with Tcl bindings. Please rebuild VTK with Tcl bindings and re-run CMake")
+IF(NOT ParaViewComplete_BINARY_DIR)
+  # include module to find vtk
+  INCLUDE (${CMAKE_ROOT}/Modules/FindVTK.cmake)
+  # if vtk was found include the use vtk file
+  IF (USE_VTK_FILE)
+    INCLUDE(${USE_VTK_FILE})
+  ELSE(USE_VTK_FILE)
     SET (PARAVIEW_CAN_BUILD 0)
-  ENDIF ( NOT VTK_WRAP_TCL )
+    MESSAGE("ParaView requires VTK to build. Please set VTK_BINARY_DIR to directory where vtkConfigure.h and UseVTK.cmake are found.")
+  ENDIF (USE_VTK_FILE)
+ELSE(NOT ParaViewComplete_BINARY_DIR)
+  INCLUDE(${ParaViewComplete_BINARY_DIR}/VTK/UseVTK.cmake)
+ENDIF(NOT ParaViewComplete_BINARY_DIR)
 
-  IF (NOT VTK_USE_HYBRID)
-    MESSAGE("ParaView requires VTK to be built with hybrid support. Please rebuild VTK with hybrid and re-run CMake")
-    SET (PARAVIEW_CAN_BUILD 0)
-  ENDIF (NOT VTK_USE_HYBRID)
-
-  IF (NOT VTK_USE_RENDERING)
-    MESSAGE("ParaView requires VTK to be built with rendering support. Please rebuild VTK with rendering and re-run CMake")
-    SET (PARAVIEW_CAN_BUILD 0)
-  ENDIF (NOT VTK_USE_RENDERING)
-
-  IF (NOT VTK_USE_PARALLEL)
-    MESSAGE("ParaView requires VTK to be built with parallel support. Please rebuild VTK with parallel and re-run CMake")
-    SET (PARAVIEW_CAN_BUILD 0)
-  ENDIF (NOT VTK_USE_PARALLEL)
-
-ELSE (VTK_BINARY_DIR )
+IF ( NOT VTK_WRAP_TCL )
+  MESSAGE("ParaView requires VTK to be built with Tcl bindings. Please rebuild VTK with Tcl bindings and re-run CMake")
   SET (PARAVIEW_CAN_BUILD 0)
-  MESSAGE("ParaView requires VTK to build. Please set VTK_BINARY_DIR")
-ENDIF (VTK_BINARY_DIR )
+ENDIF ( NOT VTK_WRAP_TCL )
+
+IF (NOT VTK_USE_HYBRID)
+  MESSAGE("ParaView requires VTK to be built with hybrid support. Please rebuild VTK with hybrid and re-run CMake")
+  SET (PARAVIEW_CAN_BUILD 0)
+ENDIF (NOT VTK_USE_HYBRID)
+
+IF (NOT VTK_USE_RENDERING)
+  MESSAGE("ParaView requires VTK to be built with rendering support. Please rebuild VTK with rendering and re-run CMake")
+  SET (PARAVIEW_CAN_BUILD 0)
+ENDIF (NOT VTK_USE_RENDERING)
+
+IF (NOT VTK_USE_PARALLEL)
+  MESSAGE("ParaView requires VTK to be built with parallel support. Please rebuild VTK with parallel and re-run CMake")
+  SET (PARAVIEW_CAN_BUILD 0)
+ENDIF (NOT VTK_USE_PARALLEL)
 
 IF (PARAVIEW_CAN_BUILD)
 
