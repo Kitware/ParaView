@@ -269,8 +269,6 @@ void vtkPVActorComposite::CreateProperties()
 	       this->ColorMenuLabel->GetWidgetName());
   this->Script("pack %s",
                this->ColorMenu->GetWidgetName());
-  
-  this->UpdateProperties();  
 }
 
 
@@ -285,12 +283,13 @@ void vtkPVActorComposite::UpdateProperties()
   vtkPVApplication *pvApp = this->GetPVApplication();  
   vtkDataArray *array;
 
+  
   if (this->UpdateTime > this->PVData->GetVTKData()->GetMTime())
     {
     return;
     }
   this->UpdateTime.Modified();
-
+  
   pvApp->BroadcastScript("%s Update", this->MapperTclName);
   this->GetPVData()->GetBounds(bounds);
   this->GetPVData()->GetScalarRange(range);
@@ -527,6 +526,8 @@ void vtkPVActorComposite::Initialize()
     this->SetModeToDataSet();
     }
 
+  this->UpdateProperties();
+  
   // Mapper needs an input, so the mode needs to be set first.
   //this->ResetColorRange();
   this->ColorByProperty();
@@ -620,6 +621,8 @@ void vtkPVActorComposite::Select(vtkKWView *v)
   
   this->Script("pack %s -pady 2 -padx 2 -fill both -expand yes -anchor n",
                this->Notebook->GetWidgetName());
+  
+  this->UpdateProperties();
 }
 
 //----------------------------------------------------------------------------
