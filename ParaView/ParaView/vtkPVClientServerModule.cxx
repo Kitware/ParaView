@@ -55,6 +55,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkMapper.h"
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
+#include "vtkPolyData.h"
 #include "vtkPVApplication.h"
 #include "vtkPVConfig.h"
 #include "vtkPVInformation.h"
@@ -188,28 +189,29 @@ void vtkPVSendDataObject(void* arg, void*, int, int)
   tclName[length] = '\0';
   
   // Get the object from the local process.
-  vtkDataObject* obj = self->vtkPVProcessModule::ReceiveRootDataObject(tclName);
+  vtkPolyData* obj = vtkPolyData::New();
+  int retVal = self->vtkPVProcessModule::ReceiveRootPolyData(tclName, obj);
   delete [] tclName;
   
   // Send success/failure flag and the object itself.
-  if(obj)
+  if(retVal)
     {
     int success = 1;
     self->GetSocketController()->Send(&success, 1, 1, VTK_PV_DATA_OBJECT_TAG);
     self->GetSocketController()->Send(obj, 1, VTK_PV_DATA_OBJECT_TAG);
-    obj->Delete();
     }
   else
     {
     int failure = 0;
     self->GetSocketController()->Send(&failure, 1, 1, VTK_PV_DATA_OBJECT_TAG);
     }
+  obj->Delete();
 }
 
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVClientServerModule);
-vtkCxxRevisionMacro(vtkPVClientServerModule, "1.38");
+vtkCxxRevisionMacro(vtkPVClientServerModule, "1.39");
 
 int vtkPVClientServerModuleCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -982,21 +984,12 @@ vtkKWLoadSaveDialog* vtkPVClientServerModule::NewLoadSaveDialog()
 }
 
 //----------------------------------------------------------------------------
-vtkDataObject* vtkPVClientServerModule::ReceiveRootDataObject(const char* tclName)
+int vtkPVClientServerModule::ReceiveRootPolyData(const char* tclName,
+                                                 vtkPolyData* out)
 {
   // Make sure we have a named Tcl VTK object.
   if(!tclName || !tclName[0])
     {
-    return 0;
-    }
-  
-  // Create an instance of the proper object to receive.
-  this->RootScript("%s GetClassName", tclName);  
-  vtkObject* newObj = vtkInstantiator::CreateInstance(this->GetRootResult());
-  vtkDataObject* dataObj = vtkDataObject::SafeDownCast(newObj);
-  if(newObj && !dataObj)
-    {
-    newObj->Delete();
     return 0;
     }
   
@@ -1012,9 +1005,8 @@ vtkDataObject* vtkPVClientServerModule::ReceiveRootDataObject(const char* tclNam
   this->SocketController->Receive(&success, 1, 1, VTK_PV_DATA_OBJECT_TAG);
   if(!success)
     {
-    dataObj->Delete();
     return 0;
     }
-  this->SocketController->Receive(dataObj, 1, VTK_PV_DATA_OBJECT_TAG);
-  return dataObj;
+  this->SocketController->Receive(out, 1, VTK_PV_DATA_OBJECT_TAG);
+  return 1;
 }

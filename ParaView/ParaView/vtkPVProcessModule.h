@@ -50,7 +50,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkKWObject.h"
 
-class vtkDataObject;
+class vtkPolyData;
 class vtkKWLoadSaveDialog;
 class vtkMapper;
 class vtkMultiProcessController;
@@ -147,7 +147,8 @@ public:
   // Description:
   // Get a reference to a vtkDataObject from the server-side root node
   // given the Tcl name of the object.
-  virtual vtkDataObject* ReceiveRootDataObject(const char* tclName);
+  virtual int ReceiveRootPolyData(const char* tclName,
+                                  vtkPolyData* output);
   
   // Description:
   // Get a file selection dialog instance.

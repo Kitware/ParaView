@@ -141,7 +141,8 @@ public:
   // Description:
   // Get a reference to a vtkDataObject from the server-side root node
   // given the Tcl name of the object.
-  virtual vtkDataObject* ReceiveRootDataObject(const char* tclName);
+  virtual int ReceiveRootPolyData(const char* tclName,
+                                  vtkPolyData* output);
 
 //BTX
   enum 

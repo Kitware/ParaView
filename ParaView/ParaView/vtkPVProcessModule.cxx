@@ -58,6 +58,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVPartDisplay.h"
 #include "vtkPVPartDisplay.h"
 #include "vtkPVWindow.h"
+#include "vtkPolyData.h"
 #include "vtkShortArray.h"
 #include "vtkSource.h"
 #include "vtkString.h"
@@ -83,7 +84,7 @@ struct vtkPVArgs
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProcessModule);
-vtkCxxRevisionMacro(vtkPVProcessModule, "1.20");
+vtkCxxRevisionMacro(vtkPVProcessModule, "1.21");
 
 int vtkPVProcessModuleCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -480,7 +481,8 @@ void vtkPVProcessModule::InitializeTclMethodImplementations()
 }
 
 //----------------------------------------------------------------------------
-vtkDataObject* vtkPVProcessModule::ReceiveRootDataObject(const char* tclName)
+int vtkPVProcessModule::ReceiveRootPolyData(const char* tclName,
+                                            vtkPolyData* out)
 {
   // Make sure we have a named Tcl VTK object.
   if(!tclName || !tclName[0])
@@ -492,14 +494,17 @@ vtkDataObject* vtkPVProcessModule::ReceiveRootDataObject(const char* tclName)
   // interpreter.
   vtkstd::string name = this->GetPVApplication()->EvaluateString(tclName);  
   vtkObject* obj = this->GetPVApplication()->TclToVTKObject(name.c_str());
-  vtkDataObject* dobj = vtkDataObject::SafeDownCast(obj);
+  vtkPolyData* dobj = vtkPolyData::SafeDownCast(obj);
   if(dobj)
     {
-    // This method must return a reference to the object.  The caller
-    // will invoke Delete().
-    dobj->Register(0);
+    out->DeepCopy(dobj);
     }
-  return dobj;
+  else
+    {
+    return 0;
+    }
+  return 1;
+
 }
 
 //----------------------------------------------------------------------------

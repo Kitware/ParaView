@@ -68,7 +68,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProbe);
-vtkCxxRevisionMacro(vtkPVProbe, "1.97");
+vtkCxxRevisionMacro(vtkPVProbe, "1.98");
 
 int vtkPVProbeCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -222,15 +222,11 @@ void vtkPVProbe::AcceptCallbackInternal()
   
   // Get the probe filter's output from the root node's process.
   vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
-  vtkDataObject* output = pm->ReceiveRootDataObject(
-    this->GetPart(0)->GetVTKDataTclName());
-  vtkPolyData* probeOutput = vtkPolyData::SafeDownCast(output);
-  if(!probeOutput)
+  vtkPolyData* probeOutput = vtkPolyData::New();
+  if (!pm->ReceiveRootPolyData(
+    this->GetPart(0)->GetVTKDataTclName(), probeOutput))
     {
-    if(output)
-      {
-      output->Delete();
-      }
+    probeOutput->Delete();
     vtkErrorMacro("Failed to receive probe output from root node process.");
     this->XYPlotWidget->SetEnabled(0);
     this->Script("pack forget %s", this->PointDataLabel->GetWidgetName());
@@ -358,7 +354,7 @@ void vtkPVProbe::AcceptCallbackInternal()
     window->GetMainView()->Render();
     }
   
-  // Free reference produced by ReceiveRootDataObject.
+  // Free reference produced by ReceiveRootPolyData.
   probeOutput->Delete();
 }
  
