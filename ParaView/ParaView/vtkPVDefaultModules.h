@@ -442,7 +442,7 @@ const char* vtkPVWindow::StandardFilterInterfaces=
 "<Module name=\"ReflectionFilter\" root_name=\"Reflect\" input=\"vtkDataSet\" output=\"vtkUnstructuredGrid\" module_type=\"Filter\">\n"
 "  <Filter type=\"vtkReflectionFilter\"/>\n"
 "  <InputMenu label=\"Input\" help=\"Set the input to this filter.\"\n"
-"             input_name=\"PVInput\" input_type=\"vtkPolyData\"/>\n"
+"             input_name=\"PVInput\" input_type=\"vtkDataSet\"/>\n"
 "  <SelectionList variable=\"Plane\" help=\"Select which plane of the bounding box to reflect across\">\n"
 "    <Item name=\"X Min\" value=\"0\"/>\n"
 "    <Item name=\"Y Min\" value=\"1\"/>\n"
