@@ -65,22 +65,32 @@ public:
   virtual void Create(vtkKWApplication* app, const char* args);
   
   // Description: 
-  // Append a separator to the menu.
+  // Append/Insert a separator to the menu.
   void AddSeparator();
+  void InsertSeparator(int position);
   
   // Description: 
-  // Append a sub menu to the current menu.
-  void AddCascade(const char* label, vtkKWMenu*, int underline , 
-                  const char* help = 0);
+  // Append/Insert a sub menu to the current menu.
+  void AddCascade(const char* label, vtkKWMenu*, 
+                  int underline, const char* help = 0);
+  void InsertCascade(int position, const char* label,  vtkKWMenu*, 
+                     int underline, const char* help = 0  );
+
+  // Description:
+  // Set cascade menu for menu entry.
+  void SetCascade(int index, vtkKWMenu*);
+  void SetCascade(const char* item, vtkKWMenu*);
+  void SetCascade(int index, const char*);
+  void SetCascade(const char* item, const char*);
 
   // Description:
   // Copy the radio button variable logic.
+
+  // Description: 
+  // Append/Insert a CheckButton menu item to the current menu.
   char* CreateCheckButtonVariable(vtkKWObject* Object, const char* varname);
   int   GetCheckButtonValue(vtkKWObject* Object, const char* varname);
   void  CheckCheckButton(vtkKWObject *Object, const char *varname, int id);
-
-  // Description: 
-  // Append a CheckButton menu item to the current menu.
   void AddCheckButton(const char* label, const char* ButtonVar, 
                       vtkKWObject* Object, 
                       const char* MethodAndArgString , const char* help = 0);
@@ -88,38 +98,6 @@ public:
                       vtkKWObject* Object, 
                       const char* MethodAndArgString , int underline,
                       const char* help = 0);
-
-  // Description: 
-  // Append a standard menu item and command to the current menu.
-  void AddCommand(const char* label, vtkKWObject* Object,
-                  const char* MethodAndArgString , const char* help = 0);
-  void AddCommand(const char* label, vtkKWObject* Object,
-                  const char* MethodAndArgString , int underline, 
-                  const char* help = 0);
-
-  // Description: 
-  // Append a radio menu item and command to the current menu.
-  // The radio group is specified by the buttonVar value.
-  void AddRadioButton(int value, const char* label, const char* buttonVar, 
-                      vtkKWObject* Called, 
-                      const char* MethodAndArgString, const char* help = 0);
-  void AddRadioButton(int value, const char* label, const char* buttonVar, 
-                      vtkKWObject* Called, 
-                      const char* MethodAndArgString, int underline,  
-                      const char* help = 0);
-  void AddRadioButtonImage(int value, const char* imgname, 
-                           const char* buttonVar, vtkKWObject* Called, 
-                           const char* MethodAndArgString, const char* help = 0);
-
-  // Description:
-  // Same as add commands, but insert at a given integer position.
-  void InsertSeparator(int position);
-  
-  void InsertCascade(int position, const char* label,  vtkKWMenu*, 
-                     int underline, const char* help = 0  );
-  
-  // Description:
-  // Insert a check button at a given position.
   void InsertCheckButton(int position, 
                          const char* label, const char* ButtonVar, 
                          vtkKWObject* Object, 
@@ -129,22 +107,45 @@ public:
                          vtkKWObject* Object, 
                          const char* MethodAndArgString , 
                          int underline, const char* help = 0);
-  
-  // Description:
-  // Insert a menu item at a given position.
+
+  // Description: 
+  // Append/Insert a standard menu item and command to the current menu.
+  void AddCommand(const char* label, vtkKWObject* Object,
+                  const char* MethodAndArgString , const char* help = 0);
+  void AddCommand(const char* label, vtkKWObject* Object,
+                  const char* MethodAndArgString , int underline, 
+                  const char* help = 0);
   void InsertCommand(int position, const char* label, vtkKWObject* Object,
                      const char* MethodAndArgString , const char* help = 0);
   void InsertCommand(int position, const char* label, vtkKWObject* Object,
                      const char* MethodAndArgString , 
                      int underline, const char* help = 0);
-  
+
+  // Description:
+  // Set command of the menu entry with a given index.
+  void SetEntryCommand(int index, vtkKWObject* object, 
+                       const char* MethodAndArgString);
+  void SetEntryCommand(const char* item, vtkKWObject* object, 
+                       const char* method);
+  void SetEntryCommand(const char* item, const char* method);
+
   // Description: 
-  // Add a radio button menu item.  You must create a variable to store
-  // the value of the button.
+  // Append a radio menu item and command to the current menu.
+  // The radio group is specified by the buttonVar value.
   char* CreateRadioButtonVariable(vtkKWObject* Object, const char* varname);
   int   GetRadioButtonValue(vtkKWObject* Object, const char* varname);
   void  CheckRadioButton(vtkKWObject *Object, const char *varname, int id);
-  int  GetCheckedRadioButtonItem(vtkKWObject *Object, const char *varname);
+  int   GetCheckedRadioButtonItem(vtkKWObject *Object, const char *varname);
+  void AddRadioButton(int value, const char* label, const char* buttonVar, 
+                      vtkKWObject* Called, 
+                      const char* MethodAndArgString, const char* help = 0);
+  void AddRadioButton(int value, const char* label, const char* buttonVar, 
+                      vtkKWObject* Called, 
+                      const char* MethodAndArgString, int underline,  
+                      const char* help = 0);
+  void AddRadioButtonImage(int value, const char* imgname, 
+                           const char* buttonVar, vtkKWObject* Called, 
+                          const char* MethodAndArgString, const char* help = 0);
   void  InsertRadioButton(int position, int value, const char* label, 
                           const char* buttonVar, vtkKWObject* Called, 
                           const char* MethodAndArgString, const char* help = 0);
@@ -163,33 +164,40 @@ public:
                      const char* MethodAndArgString, const char* extra, 
                      const char* help);
 
-
   // Description:
   // Call the menu item callback at the given index
   void Invoke(int position);
-  void Invoke(const char* name);
+  void Invoke(const char* item);
 
   // Description:
   // Delete the menu item at the given position.
   // Be careful, there is a bug in tk, that will break other items
   // in the menu below the one being deleted, unless a new item is added.
   void DeleteMenuItem(int position);
-  void DeleteMenuItem(const char* menuname);
+  void DeleteMenuItem(const char* item);
   void DeleteAllMenuItems();
   
   // Description:
   // Returns the integer index of the menu item by string
-  int GetIndex(const char* menuname);
+  int GetIndex(const char* item);
 
   // Description:
   // Copies the label of the item at the given position
   // to the given string ( with the given length ). Returns VTK_OK
   // if there is label, VTK_ERROR otherwise.
+  // The second version returns a pointer to the result of the
+  // Tcl interpreter last evaluation (be careful).
   int GetItemLabel(int position, char* label, int maxlen);
+  const char* GetItemLabel(int position);
+
+  // Description:
+  // Get the option of an entry
+  const char* GetItemOption(int position, const char *option);
+  const char* GetItemOption(const char *item, const char *option);
 
   // Description:
   // Checks if an item is in the menu
-  int IsItemPresent(const char* menuname);
+  int HasItem(const char* item);
 
   // Description:
   // Returns the number of items
@@ -211,21 +219,6 @@ public:
   void SetState(const char* item, int state);
   int  GetState(int index);
   int  GetState(const char* item);
-
-  // Description:
-  // Set cascade menu for menu entry.
-  void SetCascade(int index, vtkKWMenu*);
-  void SetCascade(const char* item, vtkKWMenu*);
-  void SetCascade(int index, const char*);
-  void SetCascade(const char* item, const char*);
-
-  // Description:
-  // Set command of the menu entry with a given index.
-  void SetEntryCommand(int index, vtkKWObject* object, 
-                       const char* MethodAndArgString);
-  void SetEntryCommand(const char* item, vtkKWObject* object, 
-                       const char* method);
-  void SetEntryCommand(const char* item, const char* method);
 
   // Description:
   // Configure the item at given index.

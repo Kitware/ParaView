@@ -48,7 +48,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWMenu );
-vtkCxxRevisionMacro(vtkKWMenu, "1.36");
+vtkCxxRevisionMacro(vtkKWMenu, "1.37");
 
 
 
@@ -137,27 +137,37 @@ void vtkKWMenu::AddGeneric(const char* addtype,
                            const char* help)
 {
   ostrstream str;
-  str << this->GetWidgetName() << " add " 
-      << addtype << " -label {" << label
-      << "} -command {" << Object->GetTclName() 
-      << " " << MethodAndArgString << "} " ;
+  str << this->GetWidgetName() << " add " << addtype;
+
+  if (label)
+    {
+    str << " -label {" << label << "}";
+    }
+
+  if (Object && MethodAndArgString)
+    {
+    str << " -command {" << Object->GetTclName() 
+        << " " << MethodAndArgString << "}" ;
+    }
+
   if(extra)
     {
-    str << extra;
+    str << " " << extra;
     }
+
   str << ends;
   
   this->Application->SimpleScript(str.str());
   delete [] str.str();
+
   if(!help)
     {
     help = label;
     }
+
   this->Script("set {%sHelpArray(%s)} {%s}", this->GetTclName(), 
                label, help);
 }
-
-
 
 //------------------------------------------------------------------------------
 void vtkKWMenu::InsertGeneric(int position, const char* addtype, 
@@ -168,24 +178,36 @@ void vtkKWMenu::InsertGeneric(int position, const char* addtype,
                               const char* help)
 {
   ostrstream str;
-  str << this->GetWidgetName() << " insert " << position << " " 
-      << addtype << " -label {" << label
-      << "} -command {" << Object->GetTclName() 
-      << " " << MethodAndArgString << "} ";
+  str << this->GetWidgetName() << " insert " << position << " " << addtype;
+
+  if (label)
+    {
+    str << " -label {" << label << "}";
+    }
+
+  if (Object && MethodAndArgString)
+    {
+    str << " -command {" << Object->GetTclName() 
+        << " " << MethodAndArgString << "}" ;
+    }
+
   if(extra)
     {
-    str << extra;
+    str << " " << extra;
     }
+
   str << ends;
+  
+  this->Application->SimpleScript(str.str());
+  delete [] str.str();
+
   if(!help)
     {
     help = label;
     }
-  this->Application->SimpleScript(str.str());
-  delete [] str.str();
+
   this->Script("set {%sHelpArray(%s)} {%s}", this->GetTclName(), 
                label, help);
-
 }
 
 //------------------------------------------------------------------------------
@@ -625,7 +647,7 @@ void vtkKWMenu::Invoke(int position)
 //----------------------------------------------------------------------------
 void vtkKWMenu::Invoke(const char* item)
 {
-  if ( !this->IsItemPresent(item) )
+  if ( !this->HasItem(item) )
     {
     return;
     }
@@ -677,7 +699,7 @@ int vtkKWMenu::GetIndex(const char* menuname)
 //----------------------------------------------------------------------------
 int vtkKWMenu::GetItemLabel(int position, char* label, int maxlen)
 {
-  if (!label)
+  if (!this->IsCreated() || !label)
     {
     return VTK_ERROR;
     }
@@ -692,7 +714,21 @@ int vtkKWMenu::GetItemLabel(int position, char* label, int maxlen)
 }
 
 //----------------------------------------------------------------------------
-int vtkKWMenu::IsItemPresent(const char* menuname)
+const char* vtkKWMenu::GetItemLabel(int position)
+{
+  if (this->IsCreated())
+    {
+    if (position >= 0 && position < this->GetNumberOfItems())
+      {
+      return this->Script("%s entrycget %d -label", 
+                          this->GetWidgetName(), position);
+      }
+    }
+  return 0;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWMenu::HasItem(const char* menuname)
 {
   this->Script("catch {%s index {%s}}", this->GetWidgetName(), menuname);
   return !vtkKWObject::GetIntegerResult(this->Application);
@@ -701,7 +737,15 @@ int vtkKWMenu::IsItemPresent(const char* menuname)
 //----------------------------------------------------------------------------
 int vtkKWMenu::GetNumberOfItems()
 {
-  return this->GetIndex("end")+1;
+  if (this->IsCreated())
+    {
+    const char *end = this->Script("%s index end", this->GetWidgetName());
+    if (strcmp(end, "none"))
+      {
+      return atoi(end) + 1;
+      }
+    }
+  return 0;
 }
 
 //----------------------------------------------------------------------------
@@ -743,7 +787,7 @@ int vtkKWMenu::GetState(int index)
 //----------------------------------------------------------------------------
 int vtkKWMenu::GetState(const char* item)
 {
-  if ( !this->IsItemPresent(item) )
+  if ( !this->HasItem(item) )
     {
     return vtkKWMenu::Unknown;
     }
@@ -766,7 +810,7 @@ void vtkKWMenu::SetState(int index, int state)
 //----------------------------------------------------------------------------
 void vtkKWMenu::SetState(const char* item, int state)
 {
-  if ( !this->IsItemPresent(item) )
+  if ( !this->HasItem(item) )
     {
     return;
     }
@@ -800,7 +844,7 @@ void vtkKWMenu::SetEntryCommand(int index, vtkKWObject* object,
 //----------------------------------------------------------------------------
 void vtkKWMenu::SetEntryCommand(const char* item, const char* MethodAndArgString)
 {
-  if ( !this->IsItemPresent(item) )
+  if ( !this->HasItem(item) )
     {
     return;
     }
@@ -816,7 +860,7 @@ void vtkKWMenu::SetEntryCommand(const char* item, const char* MethodAndArgString
 void vtkKWMenu::SetEntryCommand(const char* item, vtkKWObject* object, 
                            const char* MethodAndArgString)
 {
-  if ( !this->IsItemPresent(item) )
+  if ( !this->HasItem(item) )
     {
     return;
     }
@@ -865,6 +909,23 @@ void vtkKWMenu::RestoreMenuState(vtkArrayMap<const char*, int>* state)
     }
   it->Delete();
 
+}
+
+//----------------------------------------------------------------------------
+const char* vtkKWMenu::GetItemOption(int position, const char *option)
+{
+  if (this->IsCreated())
+    {
+    return this->Script("%s entrycget %d %s", 
+                        this->GetWidgetName(), position, option);
+    }
+  return 0;
+}
+
+//----------------------------------------------------------------------------
+const char* vtkKWMenu::GetItemOption(const char *item, const char *option)
+{
+  return this->GetItemOption(this->GetIndex(item), option);
 }
 
 //----------------------------------------------------------------------------
