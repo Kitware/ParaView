@@ -74,6 +74,7 @@ public:
   
   // Description:
   // Access to this widget from a script.
+  void AddValueInternal(float val);
   void AddValue(float val);
   void RemoveAllValues();
 

@@ -56,7 +56,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVContourEntry);
-vtkCxxRevisionMacro(vtkPVContourEntry, "1.24");
+vtkCxxRevisionMacro(vtkPVContourEntry, "1.25");
 
 int vtkPVContourEntryCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -314,12 +314,18 @@ void vtkPVContourEntry::DeleteValueCallback()
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVContourEntry::AddValue(float val)
+void vtkPVContourEntry::AddValueInternal(float val)
 {
   int num = this->ContourValues->GetNumberOfContours();
 
   this->ContourValues->SetValue(num, val);
   this->Update();
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVContourEntry::AddValue(float val)
+{
+  this->AddValueInternal(val);
   this->ModifiedCallback();
 }
 
@@ -431,7 +437,7 @@ void vtkPVContourEntry::ResetInternal(const char* sourceTclName)
   this->ContourValuesList->DeleteAll();
   for (i = 0; i < numContours; i++)
     {
-    this->Script("%s AddValue [%s GetValue %d]", 
+    this->Script("%s AddValueInternal [%s GetValue %d]", 
                  this->GetTclName(),
                  sourceTclName, i);
     }
