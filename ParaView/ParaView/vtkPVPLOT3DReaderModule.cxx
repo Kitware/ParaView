@@ -59,7 +59,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPLOT3DReaderModule);
-vtkCxxRevisionMacro(vtkPVPLOT3DReaderModule, "1.5.2.3");
+vtkCxxRevisionMacro(vtkPVPLOT3DReaderModule, "1.5.2.4");
 
 int vtkPVPLOT3DReaderModuleCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -154,6 +154,7 @@ void vtkPVPLOT3DReaderModule::Accept(int hideFlag, int hideSource)
     {
     vtkPVPassThrough* connection;
     vtkPVData* connectionOutput;
+  
     for (i = begin; i < numOutputs; i++)
       {
       // ith output (PVData)
@@ -177,14 +178,25 @@ void vtkPVPLOT3DReaderModule::Accept(int hideFlag, int hideSource)
                              outputTclName, tclName, i);
       pvApp->BroadcastScript("%s SetOutput %d %s", tclName, i, 
                              outputTclName);
-      
+  
       pvd = vtkPVData::New();
       pvd->SetPVApplication(pvApp);
       pvd->SetVTKData(d, outputTclName);
       this->SetPVOutput(i, pvd);
-      delete [] outputTclName;
       
-      if (numOutputs > 1)
+      if (numOutputs <= 1)
+        {
+        // I do not know where this extent translator was created.
+        // Set the original source again.
+        pvApp->BroadcastScript("%s SetOriginalSource %s",
+                              this->ExtentTranslatorTclName, 
+                              outputTclName);
+        // Set the translator of the output.
+        pvApp->BroadcastScript("%s SetExtentTranslator %s",
+                               outputTclName, 
+                               this->ExtentTranslatorTclName);
+        }
+      else
         {
         // ith connection point and it's output
         // These are dummy filters (vtkPassThroughFilter) which
@@ -195,6 +207,23 @@ void vtkPVPLOT3DReaderModule::Accept(int hideFlag, int hideSource)
         connection->SetParametersParent(
           window->GetMainView()->GetSourceParent());
         connection->SetApplication(pvApp);
+
+        // Create an extent translator for each output.
+        char translatorTclName[512];
+        sprintf(translatorTclName, "%sTranslator", outputTclName);
+        pvApp->BroadcastScript("vtkPVExtentTranslator %s", translatorTclName);
+        // Hold onto name so it can be deleted.
+        connection->SetExtentTranslatorTclName(translatorTclName);
+        // Set the original source again.
+        pvApp->BroadcastScript("%s SetOriginalSource %s",
+                              this->ExtentTranslatorTclName, 
+                              outputTclName);
+        // Set the translator of the output.
+        pvApp->BroadcastScript("%s SetExtentTranslator %s",
+                               outputTclName, 
+                               this->ExtentTranslatorTclName);
+
+
         int len = strlen(tclName)+ 2 + 
           static_cast<int>(log10(static_cast<double>(i+1))) + 3;
         connectionTclName = new char[len];
@@ -250,6 +279,7 @@ void vtkPVPLOT3DReaderModule::Accept(int hideFlag, int hideSource)
         connection->Delete();
         }
 
+      delete [] outputTclName;
       pvd->Delete();
       }
     if (numOutputs > 1)
