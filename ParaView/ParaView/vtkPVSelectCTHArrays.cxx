@@ -35,7 +35,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectCTHArrays);
-vtkCxxRevisionMacro(vtkPVSelectCTHArrays, "1.7");
+vtkCxxRevisionMacro(vtkPVSelectCTHArrays, "1.8");
 vtkCxxSetObjectMacro(vtkPVSelectCTHArrays, InputMenu, vtkPVInputMenu);
 
 int vtkPVSelectCTHArraysCommand(ClientData cd, Tcl_Interp *interp,
@@ -291,6 +291,8 @@ void vtkPVSelectCTHArrays::ResetInternal()
 void vtkPVSelectCTHArrays::Update()
 {
   int showAll = this->ShowAllCheck->GetState();
+  int volumeFlag;
+  int voidFlag;
   int num, idx;
   vtkPVDataSetAttributesInformation* attrInfo;
   vtkPVArrayInformation* arrayInfo;
@@ -309,14 +311,28 @@ void vtkPVSelectCTHArrays::Update()
   attrInfo = this->InputMenu->GetCurrentValue()->GetDataInformation()->GetCellDataInformation();
 
   num = attrInfo->GetNumberOfArrays();
+  int count = 0;
   for (idx = 0; idx < num; ++idx)
     {
     arrayInfo = attrInfo->GetArrayInformation(idx);
     if (arrayInfo->GetNumberOfComponents() == 1)
       {
+      volumeFlag = this->StringMatch(arrayInfo->GetName());
+      voidFlag = 0;
+      if (strncmp(arrayInfo->GetName(), "Void", 4) == 0
+          || strncmp(arrayInfo->GetName(), "void", 4) == 0)
+        {
+        voidFlag = 1;
+        }
       if (showAll || this->StringMatch(arrayInfo->GetName()))
         {
-        this->ArraySelectionList->InsertEntry(idx, arrayInfo->GetName());
+        this->ArraySelectionList->InsertEntry(count, arrayInfo->GetName());
+        // It would be nice to get rid of the void volume fraction.
+        if (volumeFlag && ! voidFlag)
+          {
+          this->ArraySelectionList->SetSelectState(count, 1);
+          }
+        ++count;
         }
       }
     }
