@@ -223,6 +223,10 @@ void vtkKWScale::InvokeEndCommand()
 
 void vtkKWScale::ScaleValueChanged(float num)
 {
+  if ( this->GetValue() == num )
+    {
+    return;
+    }
   this->Value = num;
   if (this->Entry)
     {
