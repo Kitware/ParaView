@@ -923,11 +923,7 @@ void vtkPVSource::AcceptCallback()
                this->AcceptButton->GetWidgetName());
 #endif
   
-  // Call the commands to set ivars from widget values.
-  for (i = 0; i < this->AcceptCommands->GetLength(); ++i)
-    {
-    this->Script(this->AcceptCommands->GetString(i));
-    }  
+  this->UpdateVTKSourceParameters();
   
   // Initialize the output if necessary.
   if ( ! this->Initialized)
@@ -1167,6 +1163,20 @@ void vtkPVSource::UpdateParameterWidgets()
     } 
 }
 
+
+//----------------------------------------------------------------------------
+void vtkPVSource::UpdateVTKSourceParameters()
+{
+  int i;
+
+  // Call the commands to set ivars from widget values.
+  for (i = 0; i < this->AcceptCommands->GetLength(); ++i)
+    {
+    // This is not broadcast because the helper method takes 
+    // care of the broadcast.
+    this->Script(this->AcceptCommands->GetString(i));
+    }  
+}
 
 //----------------------------------------------------------------------------
 void vtkPVSource::AcceptHelper(char *method, char *args)

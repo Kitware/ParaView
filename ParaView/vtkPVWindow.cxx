@@ -72,6 +72,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWFlyInteractor.h"
 #include "vtkKWRotateCameraInteractor.h"
 #include "vtkKWTranslateCameraInteractor.h"
+#include "vtkKWSplitFrame.h"
 #include "vtkKWInteractor.h"
 
 #include "vtkPVSourceInterfaceDirectories.h"

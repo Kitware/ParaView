@@ -168,6 +168,11 @@ public:
   // It uses the GetCommand supplied to the interface.
   virtual void UpdateParameterWidgets();
   
+  // Description:
+  // This method gets called to set the VTK source parameters
+  // from the widget values.
+  void UpdateVTKSourceParameters();
+
   //---------------------------------------------------------------------
   // This is a poor way to create widgets.  Another method that integrates
   // with vtkPVMethodInterfaces should be created.

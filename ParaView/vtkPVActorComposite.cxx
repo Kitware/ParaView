@@ -169,7 +169,7 @@ void vtkPVActorComposite::CreateParallelTclObjects(vtkPVApplication *pvApp)
   this->SetApplication(pvApp);
   
   sprintf(tclName, "Geometry%d", this->InstanceCount);
-  pvApp->MakeTclObject("vtkPVGeometryFilter", tclName);
+  pvApp->BroadcastScript("vtkPVGeometryFilter %s", tclName);
   this->SetGeometryTclName(tclName);
 
   // Get rid of previous object created by the superclass.
@@ -181,7 +181,6 @@ void vtkPVActorComposite::CreateParallelTclObjects(vtkPVApplication *pvApp)
   // Make a new tcl object.
   sprintf(tclName, "Mapper%d", this->InstanceCount);
   this->Mapper = (vtkPolyDataMapper*)pvApp->MakeTclObject("vtkPolyDataMapper", tclName);
-  this->MapperTclName = NULL;
   this->SetMapperTclName(tclName);
   pvApp->BroadcastScript("%s ImmediateModeRenderingOn", this->MapperTclName);
   pvApp->BroadcastScript("%s SetInput [%s GetOutput]", this->MapperTclName,
@@ -203,8 +202,7 @@ void vtkPVActorComposite::CreateParallelTclObjects(vtkPVApplication *pvApp)
                this->GetScalarBarTclName(), this->MapperTclName);
   
   sprintf(tclName, "LODDeci%d", this->InstanceCount);
-  pvApp->MakeTclObject("vtkQuadricClustering", tclName);
-  this->LODDeciTclName = NULL;
+  pvApp->BroadcastScript("vtkQuadricClustering %s", tclName);
   this->SetLODDeciTclName(tclName);
   pvApp->BroadcastScript("%s SetInput [%s GetOutput]", 
                          this->LODDeciTclName, this->GeometryTclName);
@@ -215,8 +213,7 @@ void vtkPVActorComposite::CreateParallelTclObjects(vtkPVApplication *pvApp)
   //pvApp->BroadcastScript("%s UseFeaturePointsOn", this->LODDeciTclName);
 
   sprintf(tclName, "LODMapper%d", this->InstanceCount);
-  pvApp->MakeTclObject("vtkPolyDataMapper", tclName);
-  this->LODMapperTclName = NULL;
+  pvApp->BroadcastScript("vtkPolyDataMapper %s", tclName);
   this->SetLODMapperTclName(tclName);
   pvApp->BroadcastScript("%s ImmediateModeRenderingOn", this->LODMapperTclName);
 
@@ -356,20 +353,32 @@ vtkPVActorComposite::~vtkPVActorComposite()
     this->SetCubeAxesTclName(NULL);
     }
   
-  pvApp->BroadcastScript("%s Delete", this->MapperTclName);
-  this->SetMapperTclName(NULL);
-  this->Mapper = NULL;
-  
-  pvApp->BroadcastScript("%s Delete", this->LODMapperTclName);
-  this->SetLODMapperTclName(NULL);
+  if (this->MapperTclName)
+    {
+    pvApp->BroadcastScript("%s Delete", this->MapperTclName);
+    this->SetMapperTclName(NULL);
+    this->Mapper = NULL;
+    }
 
-  pvApp->BroadcastScript("%s Delete", this->PropTclName);
-  this->SetPropTclName(NULL);
-  this->Prop = NULL;
+  if (this->LODMapperTclName)
+    {
+    pvApp->BroadcastScript("%s Delete", this->LODMapperTclName);
+    this->SetLODMapperTclName(NULL);
+    }
 
-  pvApp->BroadcastScript("%s Delete", this->PropertyTclName);
-  this->SetPropertyTclName(NULL);
-  this->Property = NULL;
+  if (this->PropTclName)
+    {
+    pvApp->BroadcastScript("%s Delete", this->PropTclName);
+    this->SetPropTclName(NULL);
+    this->Prop = NULL;
+    }
+
+  if (this->PropertyTclName)
+    {
+    pvApp->BroadcastScript("%s Delete", this->PropertyTclName);
+    this->SetPropertyTclName(NULL);
+    this->Property = NULL;
+    }
 
   if (this->OutputPortTclName)
     {
