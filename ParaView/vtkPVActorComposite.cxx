@@ -137,6 +137,8 @@ void vtkPVActorComposite::CreateParallelTclObjects(vtkPVApplication *pvApp)
     {
     pvApp->RemoteScript(id, "%s SetNumberOfPieces %d", this->MapperTclName, numProcs);
     pvApp->RemoteScript(id, "%s SetPiece %d", this->MapperTclName, id);
+    //pvApp->RemoteScript(id, "%s SetNumberOfPieces 2", this->MapperTclName);
+    //pvApp->RemoteScript(id, "%s SetPiece 1", this->MapperTclName);
     }
 }
 
@@ -403,33 +405,25 @@ void vtkPVActorComposite::SetInput(vtkPVData *data)
     
   if (data->GetVTKData()->IsA("vtkPolyData"))
     {
-    pvApp->BroadcastScript("%s SetInput %s", this->MapperTclName, vtkDataTclName);
+    this->SetModeToPolyData();
     }
   else if (data->GetVTKData()->IsA("vtkImageData"))
     {
-    if (this->OutlineTclName == NULL)
+    int *ext;
+    data->GetVTKData()->UpdateInformation();
+    ext = data->GetVTKData()->GetWholeExtent();
+    if (ext[1] > ext[0] && ext[3] > ext[2] && ext[5] > ext[4])
       {
-      char tclName[150];
-      sprintf(tclName, "ActorCompositeOutline%d", this->InstanceCount);
-      pvApp->MakeTclObject("vtkImageOutlineFilter", tclName);
-      this->SetOutlineTclName(tclName);
+      this->SetModeToImageOutline();
       }
-    pvApp->BroadcastScript("%s SetInput %s", this->OutlineTclName, vtkDataTclName);
-    pvApp->BroadcastScript("%s SetInput [%s GetOutput]", 
-			   this->MapperTclName, this->OutlineTclName);    
+    else
+      {
+      this->SetModeToDataSet();
+      }      
     }
   else 
     {
-    if (this->GeometryTclName == NULL)
-      {
-      char tclName[150];
-      sprintf(tclName, "ActorCompositeGeometry%d", this->InstanceCount);
-      pvApp->MakeTclObject("vtkGeometryFilter", tclName);
-      this->SetGeometryTclName(tclName);
-      }
-    pvApp->BroadcastScript("%s SetInput %s", this->GeometryTclName, vtkDataTclName);
-    pvApp->BroadcastScript("%s SetInput [%s GetOutput]", 
-			   this->MapperTclName, this->GeometryTclName);    
+    this->SetModeToDataSet();
     }
 }
 
@@ -439,6 +433,16 @@ void vtkPVActorComposite::ResetScalarRange()
   float range[2];
 
   this->GetInputScalarRange(range);
+  if (range[0] > range[1])
+    {
+    return;
+    }
+  
+  // The mapper complains if the range is a single point.
+  if (range[0] == range[1])
+    {
+    range[1] += 0.0001;
+    }
   this->SetScalarRange(range[0], range[1]);
 }
 
@@ -624,78 +628,54 @@ vtkPVApplication* vtkPVActorComposite::GetPVApplication()
 // Not used.
 void vtkPVActorComposite::SetMode(int mode)
 {
-  if (this->Mode == mode)
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  
+  if (pvApp == NULL)
     {
-    return;
+    vtkErrorMacro("I cannot set the mode with no application.");
     }
-
+  
   this->Mode = mode;
 
-  if (this->DataSetInput == NULL)
+  if (this->PVData == NULL)
     {
     return;
     }
 
-  if (this->DataSetInput->IsA("vtkPolyData"))
-    { // Only one mode for poly data.
-    if (this->Mode != VTK_PV_ACTOR_COMPOSITE_POLY_DATA_MODE)
-      {
-      //vtkWarningMacro("Use poly data mode for poly data input.");
-      this->Mode = VTK_PV_ACTOR_COMPOSITE_POLY_DATA_MODE;
-      }
-    this->vtkKWActorComposite::SetInput((vtkPolyData*)this->DataSetInput);
-    return;
-    }
-
-  if (this->DataSetInput->IsA("vtkImageData"))
-    { // Three possible modes for image data.
-    if (this->Mode == VTK_PV_ACTOR_COMPOSITE_POLY_DATA_MODE)
-      {
-      //vtkWarningMacro("You cannot use poly data mode with an image input.");
-      this->Mode = VTK_PV_ACTOR_COMPOSITE_DATA_SET_MODE;
-      }
-    if (this->Mode == VTK_PV_ACTOR_COMPOSITE_IMAGE_OUTLINE_MODE)
-      {
-      vtkImageOutlineFilter *outline = vtkImageOutlineFilter::New();
-      outline->SetInput((vtkImageData *)(this->DataSetInput));
-      this->vtkKWActorComposite::SetInput(outline->GetOutput());
-      outline->Delete();
-      return;
-      }
-    // Empty texture segfaults.
-    if (0 && this->Mode == VTK_PV_ACTOR_COMPOSITE_IMAGE_TEXTURE_MODE)
-      {
-      //if (this->TextureFilter)
-      //{
-      //this->TextureFilter->Delete();
-      //}
-      // this->TextureFilter = vtkPVImageTextureFilter::New();
-      //this->TextureFilter->SetInput((vtkImageData *)(this->DataSetInput));
-      //this->vtkKWActorComposite::SetInput(this->TextureFilter->GetGeometryOutput());
-
-      //vtkTexture *texture = vtkTexture::New();
-      //texture->SetInput(this->TextureFilter->GetTextureOutput());
-      //this->GetActor()->SetTexture(texture);
-      //texture->Delete();
-      //texture = NULL;
-      
-      vtkErrorMacro("Texture disabled");
-      return;
-      }
-    }
-    
-  // Default to data set mode.
-  if (this->Mode != VTK_PV_ACTOR_COMPOSITE_DATA_SET_MODE)
+  if (mode == VTK_PV_ACTOR_COMPOSITE_POLY_DATA_MODE)
     {
-    //vtkWarningMacro("Use data set mode.");
-    this->Mode = VTK_PV_ACTOR_COMPOSITE_DATA_SET_MODE;
+    pvApp->BroadcastScript("%s SetInput %s", this->MapperTclName, 
+			   this->PVData->GetVTKDataTclName());
     }
-  vtkGeometryFilter *geom = vtkGeometryFilter::New();
-  geom->SetInput(this->DataSetInput);
-  this->vtkKWActorComposite::SetInput(geom->GetOutput());
-  geom->Delete();
-
-  // Hack hack hack
-  this->Mapper->SetScalarRange(0, 100);
+  else if (mode == VTK_PV_ACTOR_COMPOSITE_IMAGE_OUTLINE_MODE)
+    {
+    if (this->OutlineTclName == NULL)
+      {
+      char tclName[150];
+      sprintf(tclName, "ActorCompositeOutline%d", this->InstanceCount);
+      pvApp->MakeTclObject("vtkImageOutlineFilter", tclName);
+      this->SetOutlineTclName(tclName);
+      }
+    pvApp->BroadcastScript("%s SetInput %s", this->OutlineTclName, 
+			   this->PVData->GetVTKDataTclName());
+    pvApp->BroadcastScript("%s SetInput [%s GetOutput]", 
+			   this->MapperTclName, this->OutlineTclName);   
+    }
+  else if (mode == VTK_PV_ACTOR_COMPOSITE_DATA_SET_MODE)
+    {
+    if (this->GeometryTclName == NULL)
+      {
+      char tclName[150];
+      sprintf(tclName, "ActorCompositeGeometry%d", this->InstanceCount);
+      pvApp->MakeTclObject("vtkGeometryFilter", tclName);
+      this->SetGeometryTclName(tclName);
+      }
+    pvApp->BroadcastScript("%s SetInput %s", this->GeometryTclName,
+			   this->PVData->GetVTKDataTclName());
+    pvApp->BroadcastScript("%s SetInput [%s GetOutput]", 
+			   this->MapperTclName, this->GeometryTclName);    
+    }
+  
 }
+
 

@@ -825,6 +825,28 @@ void vtkPVWindow::ReadSourceInterfaces()
   sInt->Delete();
   sInt = NULL;
 
+  // ---- Contour ----.
+  sInt = vtkPVSourceInterface::New();
+  sInt->SetApplication(pvApp);
+  sInt->SetPVWindow(this);
+  sInt->SetSourceClassName("vtkSingleContourFilter");
+  sInt->SetRootName("ExtractEdges");
+  sInt->SetInputClassName("vtkDataSet");
+  sInt->SetOutputClassName("vtkPolyData");
+  // Method
+  mInt = vtkPVMethodInterface::New();
+  mInt->SetVariableName("Value");
+  mInt->SetSetCommand("SetFirstValue");
+  mInt->SetGetCommand("GetFirstValue");
+  mInt->AddFloatArgument();
+  sInt->AddMethodInterface(mInt);
+  mInt->Delete();
+  mInt = NULL;
+  // Add it to the list.
+  this->SourceInterfaces->AddItem(sInt);
+  sInt->Delete();
+  sInt = NULL;
+
   // ============= PolyData to PolyData Filters ==============
   
   // ---- PieceScalars ----.
