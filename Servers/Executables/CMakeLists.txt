@@ -27,3 +27,5 @@ TARGET_LINK_LIBRARIES(pvdataserver ${LIBS})
 
 ADD_EXECUTABLE(pvbatch pvbatch.cxx)
 TARGET_LINK_LIBRARIES(pvbatch ${LIBS} vtkPVServerManagerTCL vtkCommonTCL)
+
+INSTALL_TARGETS(/bin pvserver pvrenderserver pvdataserver pvbatch)
