@@ -71,6 +71,11 @@ public:
   // Removes all strings from the domain.
   void RemoveAllStrings();
 
+  // Description:
+  // Update self checking the "unchecked" values of all required
+  // properties. Overwritten by sub-classes.
+  virtual void Update(vtkSMProperty*);
+
 protected:
   vtkSMStringListDomain();
   ~vtkSMStringListDomain();
