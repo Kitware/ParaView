@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    vtkARLReaderModule.cxx
+  Module:    vtkXDMFReaderModule.cxx
   Language:  C++
   Date:      $Date$
   Version:   $Revision$
@@ -39,7 +39,7 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-#include "vtkARLReaderModule.h"
+#include "vtkXDMFReaderModule.h"
 
 #include "vtkCollectionIterator.h"
 #include "vtkKWLabeledFrame.h"
@@ -56,14 +56,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkVectorIterator.txx"
 
 //----------------------------------------------------------------------------
-vtkStandardNewMacro(vtkARLReaderModule);
-vtkCxxRevisionMacro(vtkARLReaderModule, "1.2");
+vtkStandardNewMacro(vtkXDMFReaderModule);
+vtkCxxRevisionMacro(vtkXDMFReaderModule, "1.1");
 
-int vtkARLReaderModuleCommand(ClientData cd, Tcl_Interp *interp,
+int vtkXDMFReaderModuleCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
 
 //----------------------------------------------------------------------------
-vtkARLReaderModule::vtkARLReaderModule()
+vtkXDMFReaderModule::vtkXDMFReaderModule()
 {
   this->DomainMenu = 0;
   this->GridMenu = 0;
@@ -73,12 +73,12 @@ vtkARLReaderModule::vtkARLReaderModule()
 }
 
 //----------------------------------------------------------------------------
-vtkARLReaderModule::~vtkARLReaderModule()
+vtkXDMFReaderModule::~vtkXDMFReaderModule()
 {
 }
 
 //----------------------------------------------------------------------------
-int vtkARLReaderModule::Initialize(const char* fname, 
+int vtkXDMFReaderModule::Initialize(const char* fname, 
                                    vtkPVReaderModule*& clone)
 { 
   if (this->ClonePrototypeInternal(reinterpret_cast<vtkPVSource*&>(clone)) 
@@ -99,7 +99,7 @@ int vtkARLReaderModule::Initialize(const char* fname,
 }
 
 //----------------------------------------------------------------------------
-int vtkARLReaderModule::ReadFileInformation(const char* fname)
+int vtkXDMFReaderModule::ReadFileInformation(const char* fname)
 {
   vtkPVApplication* pvApp = this->GetPVApplication();
   if ( !this->Grid || !this->Domain )
@@ -215,13 +215,13 @@ int vtkARLReaderModule::ReadFileInformation(const char* fname)
 }
 
 //----------------------------------------------------------------------------
-int vtkARLReaderModule::Finalize(const char* fname)
+int vtkXDMFReaderModule::Finalize(const char* fname)
 {
   return this->Superclass::Finalize(fname);
 }
 
 //----------------------------------------------------------------------------
-void vtkARLReaderModule::UpdateGrids(const char* ob)
+void vtkXDMFReaderModule::UpdateGrids(const char* ob)
 {
   int cc;
   int num;
@@ -241,7 +241,7 @@ void vtkARLReaderModule::UpdateGrids(const char* ob)
 }
 
 //----------------------------------------------------------------------------
-void vtkARLReaderModule::UpdateDomains(const char* ob)
+void vtkXDMFReaderModule::UpdateDomains(const char* ob)
 {
   int cc;
   int num;
@@ -264,7 +264,7 @@ void vtkARLReaderModule::UpdateDomains(const char* ob)
 }
 
 //----------------------------------------------------------------------------
-void vtkARLReaderModule::PrintSelf(ostream& os, vtkIndent indent)
+void vtkXDMFReaderModule::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
   os << indent << "Grid: " << (this->Grid?this->Grid:"(none)") << endl;

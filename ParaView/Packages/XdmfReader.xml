@@ -2,7 +2,7 @@
  <Library name="vtkXdmfTCL"/>
  <Module name="XdmfReader" root_name="XdmfReader" 
    output="vtkDataSet" 
-   class="vtkARLReaderModule" module_type="Reader" extensions=".xmf" 
+   class="vtkXDMFReaderModule" module_type="Reader" extensions=".xmf" 
    file_description="Xdmf Reader">
   <Source class="vtkMyXdmfReader"/>
   <ArraySelection attribute_name="Cell" />

@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    vtkARLReaderModule.h
+  Module:    vtkXDMFReaderModule.h
   Language:  C++
   Date:      $Date$
   Version:   $Revision$
@@ -39,14 +39,14 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-// .NAME vtkARLReaderModule - Module representing an "advanced" reader
+// .NAME vtkXDMFReaderModule - Module representing an "advanced" reader
 // .SECTION Description
-// The class vtkARLReaderModule is used to represent an "advanced"
+// The class vtkXDMFReaderModule is used to represent an "advanced"
 // reader (or a pipeline which contains a reader). An advanced reader is
 // one which allows the user to pre-select certain attributes (for example,
 // list of arrays to be loaded) before reading the whole file.  This is
 // done by reading some header information during UpdateInformation.  The
-// main difference between vtkARLReaderModule and vtkPVReaderModule
+// main difference between vtkXDMFReaderModule and vtkPVReaderModule
 // is that the former does not automatically call Accept after the filename
 // is selected. Instead, it prompts the user for more selections. The file
 // is only fully loaded when the user presses Accept.
@@ -56,18 +56,18 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 
-#ifndef __vtkARLReaderModule_h
-#define __vtkARLReaderModule_h
+#ifndef __vtkXDMFReaderModule_h
+#define __vtkXDMFReaderModule_h
 
 #include "vtkPVAdvancedReaderModule.h"
 
 class vtkKWOptionMenu;
 
-class VTK_EXPORT vtkARLReaderModule : public vtkPVAdvancedReaderModule
+class VTK_EXPORT vtkXDMFReaderModule : public vtkPVAdvancedReaderModule
 {
 public:
-  static vtkARLReaderModule* New();
-  vtkTypeRevisionMacro(vtkARLReaderModule, vtkPVAdvancedReaderModule);
+  static vtkXDMFReaderModule* New();
+  vtkTypeRevisionMacro(vtkXDMFReaderModule, vtkPVAdvancedReaderModule);
   void PrintSelf(ostream& os, vtkIndent indent);
     
   // Description:
@@ -86,8 +86,8 @@ public:
   void UpdateDomains(const char*);
 
 protected:
-  vtkARLReaderModule();
-  ~vtkARLReaderModule();
+  vtkXDMFReaderModule();
+  ~vtkXDMFReaderModule();
 
   vtkKWOptionMenu *DomainMenu;
   vtkKWOptionMenu *GridMenu;
@@ -96,8 +96,8 @@ protected:
   char *Domain;
 
 private:
-  vtkARLReaderModule(const vtkARLReaderModule&); // Not implemented
-  void operator=(const vtkARLReaderModule&); // Not implemented
+  vtkXDMFReaderModule(const vtkXDMFReaderModule&); // Not implemented
+  void operator=(const vtkXDMFReaderModule&); // Not implemented
 };
 
 #endif
