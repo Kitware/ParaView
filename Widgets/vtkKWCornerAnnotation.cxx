@@ -319,13 +319,13 @@ void vtkKWCornerAnnotation::SerializeSelf(ostream& os, vtkIndent indent)
   vtkKWSerializer::WriteSafeString(os, this->CornerText[0]->GetValue());
   os << endl;
   os << indent << "CornerText1 ";
-  vtkKWSerializer::WriteSafeString(os, this->CornerText[0]->GetValue());
+  vtkKWSerializer::WriteSafeString(os, this->CornerText[1]->GetValue());
   os << endl;
   os << indent << "CornerText2 ";
-  vtkKWSerializer::WriteSafeString(os, this->CornerText[0]->GetValue());
+  vtkKWSerializer::WriteSafeString(os, this->CornerText[2]->GetValue());
   os << endl;
   os << indent << "CornerText3 ";
-  vtkKWSerializer::WriteSafeString(os, this->CornerText[0]->GetValue());
+  vtkKWSerializer::WriteSafeString(os, this->CornerText[3]->GetValue());
   os << endl;
 
   os << indent << "CornerButton " << this->CornerButton->GetState() << endl;
@@ -386,6 +386,6 @@ void vtkKWCornerAnnotation::SerializeToken(istream& is,
 void vtkKWCornerAnnotation::SerializeRevision(ostream& os, vtkIndent indent)
 {
   os << indent << "vtkKWCornerAnnotation ";
-  this->ExtractRevision(os,"$Revision: 1.7 $");
+  this->ExtractRevision(os,"$Revision: 1.8 $");
   vtkKWLabeledFrame::SerializeRevision(os,indent);
 }
