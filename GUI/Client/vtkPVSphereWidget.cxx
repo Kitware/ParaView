@@ -43,7 +43,7 @@
 #include "vtkSMSourceProxy.h"
 #include "vtkCommand.h"
 vtkStandardNewMacro(vtkPVSphereWidget);
-vtkCxxRevisionMacro(vtkPVSphereWidget, "1.52");
+vtkCxxRevisionMacro(vtkPVSphereWidget, "1.53");
 
 vtkCxxSetObjectMacro(vtkPVSphereWidget, InputMenu, vtkPVInputMenu);
 
@@ -601,7 +601,13 @@ void vtkPVSphereWidget::ExecuteEvent(vtkObject* wdg, unsigned long l, void* p)
     switch(l)
       {
     case vtkCommand::ModifiedEvent:
-      this->ResetInternal();
+      if (!this->ModifiedFlag)
+        {
+        // This is the reset to make the widget reflect the state of the properties.
+        // If the widget has been modified, we don't reset it. This also helps
+        // avoid the reset from being called while 'Accept'ing the values.
+        this->ResetInternal();
+        }
       break;
       }
     }

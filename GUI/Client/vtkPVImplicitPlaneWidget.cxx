@@ -46,7 +46,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVImplicitPlaneWidget);
-vtkCxxRevisionMacro(vtkPVImplicitPlaneWidget, "1.46");
+vtkCxxRevisionMacro(vtkPVImplicitPlaneWidget, "1.47");
 
 vtkCxxSetObjectMacro(vtkPVImplicitPlaneWidget, InputMenu, vtkPVInputMenu);
 
@@ -780,7 +780,13 @@ void vtkPVImplicitPlaneWidget::ExecuteEvent(vtkObject* wdg, unsigned long l, voi
     switch (l)
       {
     case vtkCommand::ModifiedEvent:
-      this->ResetInternal();
+      if (!this->ModifiedFlag)
+        {
+        // This is the reset to make the widget reflect the state of the properties.
+        // If the widget has been modified, we don't reset it. This also helps
+        // avoid the reset from being called while 'Accept'ing the values.
+        this->ResetInternal();
+        }
       break;
       }
     }
