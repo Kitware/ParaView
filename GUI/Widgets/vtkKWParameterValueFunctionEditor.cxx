@@ -32,7 +32,7 @@
 
 #include <vtkstd/string>
 
-vtkCxxRevisionMacro(vtkKWParameterValueFunctionEditor, "1.38");
+vtkCxxRevisionMacro(vtkKWParameterValueFunctionEditor, "1.39");
 
 int vtkKWParameterValueFunctionEditorCommand(ClientData cd, Tcl_Interp *interp, int argc, char *argv[]);
 
@@ -5230,8 +5230,8 @@ void vtkKWParameterValueFunctionEditor::RedrawHistogram()
         int width = wext[1] - wext[0] + 1;
         int height = wext[3] - wext[2] + 1;
         int pixel_size = img_data->GetNumberOfScalarComponents();
-        const unsigned char *pixels = 
-          static_cast<const unsigned char*>(img_data->GetScalarPointer());
+        unsigned char *pixels = 
+          static_cast<unsigned char*>(img_data->GetScalarPointer());
         unsigned long buffer_length =  width * height * pixel_size;
         vtkKWTkUtilities::UpdatePhoto(
           this->GetApplication(), 
