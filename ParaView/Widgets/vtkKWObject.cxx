@@ -52,7 +52,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWObject );
-vtkCxxRevisionMacro(vtkKWObject, "1.34");
+vtkCxxRevisionMacro(vtkKWObject, "1.35");
 
 int vtkKWObjectCommand(ClientData cd, Tcl_Interp *interp,
                        int argc, char *argv[]);
@@ -119,7 +119,7 @@ void vtkKWObject::ExtractRevision(ostream& os,const char *revIn)
 void vtkKWObject::SerializeRevision(ostream& os, vtkIndent indent)
 {
   os << indent << "vtkKWObject ";
-  this->ExtractRevision(os,"$Revision: 1.34 $");
+  this->ExtractRevision(os,"$Revision: 1.35 $");
 }
 
 //-----------------------------------------------------------------------------
@@ -199,42 +199,26 @@ const char *vtkKWObject::GetTclName()
 }
 
 //-----------------------------------------------------------------------------
-const char* vtkKWObject::Script(const char *format, ...)
+const char* vtkKWObject::Script(const char* format, ...)
 {
-  char event[1600];
-  char* buffer = event;
-  const char* res = 0;
-  
-  va_list ap;
-  va_start(ap, format);
-  int length = this->EstimateFormatLength(format, ap);
-  va_end(ap);
-  
-  if(length > 1599)
+  if(this->GetApplication())
     {
-    buffer = new char[length+1];
-    }
-  
-  va_list var_args;
-  va_start(var_args, format);
-  vsprintf(buffer, format, var_args);
-  va_end(var_args);
-  
-  if (this->GetApplication())
-    {
-    res = this->GetApplication()->SimpleScript(buffer);
+    va_list var_args1, var_args2;
+    va_start(var_args1, format);
+    va_start(var_args2, format);
+    const char* result =
+      this->GetApplication()->ScriptInternal(format, var_args1, var_args2);
+    va_end(var_args1);
+    va_end(var_args2);
+    return result;
     }
   else
     {
-    vtkWarningMacro("Attempt to script a command without a KWApplication");
+    vtkWarningMacro("Attempt to script a command without a KWApplication.");
+    return 0;
     }
-  
-  if(buffer != event)
-    {
-    delete [] buffer;
-    }
-  return res;
 }
+
 
 //-----------------------------------------------------------------------------
 int vtkKWObject::GetIntegerResult(vtkKWApplication *app)
@@ -451,7 +435,7 @@ void vtkKWObject::AddTraceEntry(const char *format, ...)
     {
     buffer = new char[length+1];
     }
-
+  
   va_list var_args;
   va_start(var_args, format);
   vsprintf(buffer, format, var_args);

@@ -131,7 +131,7 @@ public:
   // Description:
   // A convienience method to invoke some tcl script code and
   // perform arguement substitution.
-  const char* Script(const char *EventString, ...);
+  virtual const char* Script(const char *EventString, ...);
   
   // Description:
   // Method to estimate the length of the string that will be produced
@@ -139,7 +139,7 @@ public:
   // returned length will always be at least as large as the string
   // that will result from printing.
   int EstimateFormatLength(const char* format, va_list ap);
-
+  
 private:
   char *TclName;
   

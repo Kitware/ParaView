@@ -75,7 +75,7 @@ int vtkKWApplication::WidgetVisibility = 1;
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.111");
+vtkCxxRevisionMacro(vtkKWApplication, "1.112");
 
 extern "C" int Vtktcl_Init(Tcl_Interp *interp);
 extern "C" int Vtkkwwidgetstcl_Init(Tcl_Interp *interp);
@@ -215,149 +215,150 @@ void vtkKWApplication::SetApplication(vtkKWApplication*)
   vtkErrorMacro( << "Do not set the Application on an Application" << endl); 
 }
 
-const char* vtkKWApplication::EvaluateString(const char *String, ...)
-{
-  char event[1600];
-  char* buffer = event;
-  
-  va_list ap;
-  va_start(ap, String);
-  int length = this->EstimateFormatLength(String, ap);
-  va_end(ap);
-  
-  if(length > 1599)
-    {
-    buffer = new char[length+1];
-    }
-  
-  va_list var_args;
-  va_start(var_args, String);
-  vsprintf(buffer, String, var_args);
-  va_end(var_args);
-  
+//----------------------------------------------------------------------------
+const char* vtkKWApplication::EvaluateString(const char* format, ...)
+{  
   ostrstream str;
   str << "eval set vtkKWApplicationEvaluateStringTemporaryString " 
-      << buffer << ends;
-  
-  if(buffer != event)
-    {
-    delete [] buffer;
-    }
-  
-  this->SimpleScript(str.str());
+      << format << ends;
+  va_list var_args1, var_args2;
+  va_start(var_args1, format);
+  va_start(var_args2, format);
+  const char* result = this->ScriptInternal(str.str(), var_args1, var_args2);
+  va_end(var_args1);
+  va_end(var_args2);
   str.rdbuf()->freeze(0);
-  return this->MainInterp->result;
+  return result;
 }
 
-int vtkKWApplication::EvaluateBooleanExpression(const char *Expression, ...)
+//----------------------------------------------------------------------------
+int vtkKWApplication::EvaluateBooleanExpression(const char* format, ...)
 {
-  char event[1600];
-  char* buffer = event;
-  
-  va_list ap;
-  va_start(ap, Expression);
-  int length = this->EstimateFormatLength(Expression, ap);
-  va_end(ap);
-  
-  if(length > 1599)
-    {
-    buffer = new char[length+1];
-    }
-  
-  va_list var_args;
-  va_start(var_args, Expression);
-  vsprintf(buffer, Expression, var_args);
-  va_end(var_args);
-  
-  this->SimpleScript(buffer);
-  
-  if(buffer != event)
-    {
-    delete [] buffer;
-    }
-
-  if ( vtkString::Equals(this->MainInterp->result, "1" ) )
+  va_list var_args1, var_args2;
+  va_start(var_args1, format);
+  va_start(var_args2, format);
+  const char* result = this->ScriptInternal(format, var_args1, var_args2);
+  va_end(var_args1);
+  va_end(var_args2);
+  if(vtkString::Equals(result, "1" ))
     {
     return 1;
     }
   return 0;
 }
 
-const char* vtkKWApplication::ExpandFileName(const char *String, ...)
+//----------------------------------------------------------------------------
+const char* vtkKWApplication::ExpandFileName(const char* format, ...)
 {
-  char event[16000];
-  
-  va_list var_args;
-  va_start(var_args, String);
-  vsprintf(event, String, var_args);
-  va_end(var_args);
   ostrstream str;
-  str << "eval file join {\"" << event << "\"}" << ends;
-  this->SimpleScript(str.str());
+  str << "eval file join {\"" << format << "\"}" << ends;
+  va_list var_args1, var_args2;
+  va_start(var_args1, format);
+  va_start(var_args2, format);
+  const char* result = this->ScriptInternal(str.str(), var_args1, var_args2);  
+  va_end(var_args1);
+  va_end(var_args2);
   str.rdbuf()->freeze(0);
-  return this->MainInterp->result;
+  return result;
 }
 
-const char* vtkKWApplication::Script(const char *format, ...)
+//----------------------------------------------------------------------------
+const char* vtkKWApplication::Script(const char* format, ...)
 {
+  va_list var_args1, var_args2;
+  va_start(var_args1, format);
+  va_start(var_args2, format);
+  const char* result = this->ScriptInternal(format, var_args1, var_args2);
+  va_end(var_args1);
+  va_end(var_args2);
+  return result;
+}
+
+//----------------------------------------------------------------------------
+const char* vtkKWApplication::ScriptInternal(const char* format,
+                                             va_list var_args1,
+                                             va_list var_args2)
+{
+  // We need a place to construct the script.
   char event[1600];
   char* buffer = event;
   
-  va_list ap;
-  va_start(ap, format);
-  int length = this->EstimateFormatLength(format, ap);
-  va_end(ap);
+  // Estimate the length of the result string.  Never underestimates.
+  int length = this->EstimateFormatLength(format, var_args1);
   
+  // If our stack-allocated buffer is too small, allocate on one on
+  // the heap that will be large enough.
   if(length > 1599)
     {
     buffer = new char[length+1];
     }
-
-  va_start(ap, format);
-  vsprintf(buffer, format, ap);
-  va_end(ap);
-
-  if (Tcl_GlobalEval(this->MainInterp, buffer) != TCL_OK)
+  
+  // Print to the string.
+  vsprintf(buffer, format, var_args2);
+  
+  // Evaluate the string in Tcl.
+  if(Tcl_GlobalEval(this->MainInterp, buffer) != TCL_OK)
     {
     vtkErrorMacro("\n    Script: \n" << buffer
                   << "\n    Returned Error on line "
                   << this->MainInterp->errorLine << ": \n"  
-                  << this->MainInterp->result << endl);
+                  << Tcl_GetStringResult(this->MainInterp) << endl);
     }
+  
+  // Free the buffer from the heap if we allocated it.
   if(buffer != event)
     {
     delete [] buffer;
     }
-  return this->MainInterp->result;
+  
+  // Convert the Tcl result to its string representation.
+  return Tcl_GetStringResult(this->MainInterp);
 }
 
-const char* vtkKWApplication::SimpleScript(const char *event)
+//----------------------------------------------------------------------------
+const char* vtkKWApplication::SimpleScript(const char* script)
 {
-//#define VTK_DEBUG_SCRIPT
-#ifdef VTK_DEBUG_SCRIPT
-  vtkOutputWindow::GetInstance()->DisplayText(event);
-  vtkOutputWindow::GetInstance()->DisplayText("\n");
-#endif
+  // Tcl might modify the script in-place.  We need a temporary copy.
+  char event[1600];
+  char* buffer = event;  
   
-  int len = vtkString::Length(event);
-  if (!event || (len < 1))
+  // Make sure we have a script.
+  int length = vtkString::Length(script);
+  if(length < 1)
     {
     return 0;
     }
-  char* script = new char[len+1];
-  strcpy(script, event);
-
-  if (Tcl_GlobalEval(this->MainInterp, script) != TCL_OK)
+  
+  // If our stack-allocated buffer is too small, allocate on one on
+  // the heap that will be large enough.
+  if(length > 1599)
     {
-    vtkErrorMacro("\n    Script: \n" << event << "\n    Returned Error: \n"  
-                  << this->MainInterp->result << endl);
+    buffer = new char[length+1];
     }
-  delete[] script;
-  return this->MainInterp->result;
+  
+  // Copy the string to our buffer.
+  strcpy(buffer, script);
+  
+  // Evaluate the string in Tcl.
+  if(Tcl_GlobalEval(this->MainInterp, buffer) != TCL_OK)
+    {
+    vtkErrorMacro("\n    Script: \n" << buffer
+                  << "\n    Returned Error on line "
+                  << this->MainInterp->errorLine << ": \n"  
+                  << Tcl_GetStringResult(this->MainInterp) << endl);
+    }
+  
+  // Free the buffer from the heap if we allocated it.
+  if(buffer != event)
+    {
+    delete [] buffer;
+    }
+  
+  // Convert the Tcl result to its string representation.
+  return Tcl_GetStringResult(this->MainInterp);
 }
 
-
-
+//----------------------------------------------------------------------------
 void vtkKWApplication::SetApplicationName(const char *_arg)
 {
   vtkDebugMacro(<< this->GetClassName() << " (" << this << "): setting ApplicationName to " << _arg ); 

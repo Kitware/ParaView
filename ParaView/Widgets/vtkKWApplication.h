@@ -144,11 +144,19 @@ public:
   // Description:
   // A convienience method to invoke some tcl script code and
   // perform arguement substitution.
-  const char* Script(const char *EventString, ...);
-  const char* SimpleScript(const char *EventString);
-  const char* EvaluateString(const char *String, ...);
-  const char* ExpandFileName(const char *String, ...);
-  int EvaluateBooleanExpression(const char*Expression, ...);
+  virtual const char* Script(const char* format, ...);
+  const char* SimpleScript(const char* script);
+  const char* EvaluateString(const char* format, ...);
+  const char* ExpandFileName(const char* format, ...);
+  int EvaluateBooleanExpression(const char* format, ...);
+  
+  // Description:
+  // Internal implementation method for Script invocation.  This
+  // function needs to walk through the var_args list twice.  The only
+  // portable way to do this is to pass two copies of the list's start
+  // pointer.
+  const char* ScriptInternal(const char* format, va_list var_args1,
+                             va_list var_args2);
 //ETX
 
   // Description:
@@ -188,7 +196,7 @@ public:
   // Look at vtkKWWidgets to see how it is used.
   ofstream *GetTraceFile() {return this->TraceFile;}
 //BTX
-  void AddTraceEntry(const char *format, ...);
+  virtual void AddTraceEntry(const char* format, ...);
 //ETX
   virtual int GetApplicationKey() {return -1;};
 
