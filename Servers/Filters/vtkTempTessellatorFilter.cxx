@@ -24,7 +24,7 @@
 #include <vtkDataSetSubdivisionAlgorithm.h>
 #include <vtkSubdivisionAlgorithm.h>
 
-vtkCxxRevisionMacro(vtkTempTessellatorFilter, "1.1.2.1");
+vtkCxxRevisionMacro(vtkTempTessellatorFilter, "1.1.2.2");
 vtkStandardNewMacro(vtkTempTessellatorFilter);
 
 // ========================================
@@ -279,8 +279,6 @@ void vtkTempTessellatorFilter::SetupOutput()
     this->OutputMesh->SetPoints( this->OutputPoints );
     this->OutputPoints->Delete();
     }
-
-  int maxNumComponents = 0;
 
   // This returns the id numbers of arrays that are default scalars, vectors, normals, texture coords, and tensors.
   // These are the fields that will be interpolated and passed on to the output mesh.
@@ -743,8 +741,8 @@ void vtkTempTessellatorFilter::Execute()
   this->Tessellator->SetPrivateData( this );
 
   vtkIdType cell;
-  int nprim;
-  vtkIdType* outconn;
+  int nprim=0;
+  vtkIdType* outconn=0;
   double pts[27][11 + vtkStreamingTessellator::MaxFieldSize];
   int c;
 

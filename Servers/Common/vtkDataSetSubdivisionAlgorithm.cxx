@@ -21,7 +21,7 @@
 
 using std::copy;
 
-vtkCxxRevisionMacro(vtkDataSetSubdivisionAlgorithm,"1.1.2.1");
+vtkCxxRevisionMacro(vtkDataSetSubdivisionAlgorithm,"1.1.2.2");
 vtkStandardNewMacro(vtkDataSetSubdivisionAlgorithm);
 
 vtkDataSetSubdivisionAlgorithm::vtkDataSetSubdivisionAlgorithm()
@@ -207,7 +207,7 @@ void vtkDataSetSubdivisionAlgorithm::SetFieldError2( int s, double err )
     this->FieldError2[j] = -1.;
   this->FieldError2Length = this->FieldError2Length > s ? this->FieldError2Length : s + 1;
 
-  if ( s < sizeof(int)*8  && s >= 0 )
+  if ( s < int(sizeof(int)*8)  && s >= 0 )
     {
     if ( err > 0. )
       this->ActiveFieldCriteria = this->ActiveFieldCriteria | (1<<s);

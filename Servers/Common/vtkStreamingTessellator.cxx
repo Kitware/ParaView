@@ -30,7 +30,7 @@
 
 #include <algorithm>
 
-vtkCxxRevisionMacro(vtkStreamingTessellator,"1.1.2.1");
+vtkCxxRevisionMacro(vtkStreamingTessellator,"1.1.2.2");
 vtkStandardNewMacro(vtkStreamingTessellator);
 
 void vtkStreamingTessellator::PrintSelf( ostream& os, vtkIndent indent )
@@ -570,7 +570,7 @@ void vtkStreamingTessellator::AdaptivelySample3Facet( double* v0, double* v1, do
     double permlen[6]; // permuted edge lengths
     int C = edgecodes_to_case_plus_permutation[ edgeCode ][0];
     int P = edgecodes_to_case_plus_permutation[ edgeCode ][1];
-    int i, j, k;
+    int i, j;
 
     // 1. Permute the tetrahedron into our canonical configuration
     for ( i=0; i<4; ++i )
