@@ -27,9 +27,8 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 =========================================================================*/
 
 #include "vtkPVGlyph3D.h"
-#include "vtkKWApplication.h"
-#include "vtkKWView.h"
-#include "vtkKWRenderView.h"
+#include "vtkPVApplication.h"
+#include "vtkPVRenderView.h"
 #include "vtkPVComposite.h"
 #include "vtkPVWindow.h"
 #include "vtkPVPolyData.h"
@@ -108,13 +107,49 @@ int vtkPVGlyph3D::Create(char *args)
 
 
 //----------------------------------------------------------------------------
-void vtkPVGlyph3D::SetOutput(vtkPVPolyData *pd)
+void vtkPVGlyph3D::SetInput(vtkPVData *pvData)
 {
-  this->SetPVData(pd);
+  vtkPVApplication *pvApp = this->GetPVApplication();
   
-  pd->SetPolyData(this->Glyph->GetOutput());
+  if (pvApp && pvApp->GetController()->GetLocalProcessId() == 0)
+    {
+    pvApp->BroadcastScript("%s SetInput %s", this->GetTclName(),
+			   pvData->GetTclName());
+    }  
+  
+  this->GetGlyph()->SetInput(pvData->GetData());
 }
 
+
+//----------------------------------------------------------------------------
+void vtkPVGlyph3D::SetSource(vtkPVPolyData *pvData)
+{
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  
+  if (pvApp && pvApp->GetController()->GetLocalProcessId() == 0)
+    {
+    pvApp->BroadcastScript("%s SetSource %s", this->GetTclName(),
+			   pvData->GetTclName());
+    }  
+  
+  this->GetGlyph()->SetSource(pvData->GetPolyData());
+}
+
+
+//----------------------------------------------------------------------------
+void vtkPVGlyph3D::SetOutput(vtkPVPolyData *pvd)
+{
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  
+  if (pvApp && pvApp->GetController()->GetLocalProcessId() == 0)
+    {
+    pvApp->BroadcastScript("%s SetOutput %s", this->GetTclName(),
+			   pvd->GetTclName());
+    }  
+  
+  this->SetPVData(pvd);  
+  pvd->SetPolyData(this->Glyph->GetOutput());
+}
 
 //----------------------------------------------------------------------------
 vtkPVPolyData *vtkPVGlyph3D::GetOutput()
@@ -128,6 +163,21 @@ void vtkPVGlyph3D::SetGlyphComposite(vtkPVComposite *comp)
 {
   this->GlyphComposite = comp;
 }
+
+//----------------------------------------------------------------------------
+void vtkPVGlyph3D::SetScaleModeToDataScalingOff()  
+{
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  
+  if (pvApp && pvApp->GetController()->GetLocalProcessId() == 0)
+    {
+    pvApp->BroadcastScript("%s SetScaleModeToDataScalingOff", 
+			   this->GetTclName());
+    }
+  
+  this->GetGlyph()->SetScaleModeToDataScalingOff();
+}
+
 
 //----------------------------------------------------------------------------
 void vtkPVGlyph3D::ShowGlyphComposite()

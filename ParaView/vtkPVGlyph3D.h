@@ -49,6 +49,11 @@ public:
   int Create(char *args);
 
   // Description:
+  // This method executes in every process.
+  void SetInput(vtkPVData *input);
+  void SetSource(vtkPVPolyData *source);
+  
+  // Description:
   // For now you have to set the output explicitly.  This allows you to manage
   // the object creation/tcl-names in the other processes.
   void SetOutput(vtkPVPolyData *pvd);
@@ -58,6 +63,10 @@ public:
   
   vtkGetObjectMacro(GlyphComposite, vtkPVComposite);
   void SetGlyphComposite(vtkPVComposite *comp);
+  
+  // Description:
+  // Propagated to all processes.
+  void SetScaleModeToDataScalingOff();  
   
   void ShowGlyphComposite();
   void ScaleFactorChanged();

@@ -109,29 +109,45 @@ void vtkPVPolyData::Shrink()
 //----------------------------------------------------------------------------
 void vtkPVPolyData::Glyph()
 {
+  vtkPVApplication *pvApp = this->GetPVApplication();
   vtkPVComposite *glyphComp;
-  vtkPVConeSource *glyphCone = vtkPVConeSource::New();
-  vtkPVGlyph3D *glyph;
+  vtkPVConeSource *glyphCone;
   vtkPVComposite *newComp;
+  vtkPVGlyph3D *glyph;
+  vtkPVPolyData *pvd;
+  vtkPVPolyData *glyphOut;
   vtkPVWindow *window = this->GetComposite()->GetWindow();
 
+  newComp = vtkPVComposite::New();
+  newComp->Clone(pvApp);
+  glyph = vtkPVGlyph3D::New();
+  glyph->Clone(pvApp);
+  pvd = vtkPVPolyData::New();
+  pvd->Clone(pvApp);
+
   glyphComp = vtkPVComposite::New();
+  glyphComp->Clone(pvApp);
+  glyphCone = vtkPVConeSource::New();
+  glyphCone->Clone(pvApp);
+  glyphOut = vtkPVPolyData::New();
+  glyphOut->Clone(pvApp);
+  
+  glyphCone->SetOutput(glyphOut);
   glyphComp->SetSource(glyphCone);
   glyphComp->SetPropertiesParent(window->GetDataPropertiesParent());
   glyphComp->CreateProperties("");
   window->GetMainView()->AddComposite(glyphComp);
   glyphComp->SetWindow(window);
-  glyphComp->SetCompositeName("glyph comp");
+  glyphComp->SetCompositeName("glyph source");
   
-  glyph = vtkPVGlyph3D::New();
-  glyph->GetGlyph()->SetInput(this->GetPolyData());
-  glyph->GetGlyph()->SetSource(glyphCone->GetConeSource()->GetOutput());
+  glyph->SetInput(this);
+  glyph->SetOutput(pvd);
+  glyph->SetSource(glyphOut);
   glyph->SetGlyphComposite(glyphComp);
-  glyph->GetGlyph()->SetScaleModeToDataScalingOff();
+  glyph->SetScaleModeToDataScalingOff();
   
   glyphComp->VisibilityOff();
     
-  newComp = vtkPVComposite::New();
   newComp->SetSource(glyph);
   newComp->SetCompositeName("glyph");
  
