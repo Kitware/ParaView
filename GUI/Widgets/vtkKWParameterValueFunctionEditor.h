@@ -20,8 +20,9 @@
 #define __vtkKWParameterValueFunctionEditor_h
 
 #include "vtkKWParameterValueFunctionInterface.h"
+
 //BTX
-#include "vtkKWHistogram.h"
+#include "vtkKWHistogram.h" // I need this one
 //ETX
 
 #define VTK_KW_PVFE_SELECTED_TAG             "selected_tag"
