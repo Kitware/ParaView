@@ -24,7 +24,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWObject );
-vtkCxxRevisionMacro(vtkKWObject, "1.45");
+vtkCxxRevisionMacro(vtkKWObject, "1.46");
 
 int vtkKWObjectCommand(ClientData cd, Tcl_Interp *interp,
                        int argc, char *argv[]);
@@ -91,7 +91,7 @@ void vtkKWObject::ExtractRevision(ostream& os,const char *revIn)
 void vtkKWObject::SerializeRevision(ostream& os, vtkIndent indent)
 {
   os << indent << "vtkKWObject ";
-  this->ExtractRevision(os,"$Revision: 1.45 $");
+  this->ExtractRevision(os,"$Revision: 1.46 $");
 }
 
 //----------------------------------------------------------------------------
@@ -504,17 +504,26 @@ void vtkKWObject::SetObjectMethodCommand(
     *command = NULL;
     }
 
-  ostrstream command_str;
-  if (object)
+  const char *object_name = object ? object->GetTclName() : NULL;
+
+  size_t object_len = object_name ? strlen(object_name) + 1 : 0;
+  size_t method_len = method ? strlen(method) : 0;
+
+  *command = new char[object_len + method_len + 1];
+  if (object_name && method)
     {
-    command_str << object->GetTclName() << " ";
+    sprintf(*command, "%s %s", object_name, method);
     }
-  if (method)
+  else if (object_name)
     {
-    command_str << method;
+    sprintf(*command, "%s", object_name);
     }
-  command_str << ends;
-  *command = command_str.str();
+  else if (method)
+    {
+    sprintf(*command, "%s", method);
+    }
+
+  (*command)[object_len + method_len] = '\0';
 }
 
 //----------------------------------------------------------------------------

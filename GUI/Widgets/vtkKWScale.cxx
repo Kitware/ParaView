@@ -22,7 +22,7 @@
 
 // ---------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWScale );
-vtkCxxRevisionMacro(vtkKWScale, "1.79");
+vtkCxxRevisionMacro(vtkKWScale, "1.80");
 
 int vtkKWScaleCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -745,80 +745,31 @@ void vtkKWScale::InvokeEntryCommand()
 void vtkKWScale::SetStartCommand(vtkKWObject* Object, 
                                  const char * MethodAndArgString)
 {
-  if (this->StartCommand)
-    {
-    delete [] this->StartCommand;
-    this->StartCommand = NULL;
-    }
-
-  if (!Object)
-    {
-    return;
-    }
-
-  ostrstream command;
-  command << Object->GetTclName() << " " << MethodAndArgString << ends;
-  this->StartCommand = command.str();
+  this->SetObjectMethodCommand(
+    &this->StartCommand, Object, MethodAndArgString);
 }
 
 // ---------------------------------------------------------------------------
 void vtkKWScale::SetEndCommand(vtkKWObject* Object, 
                                const char * MethodAndArgString)
 {
-  if (this->EndCommand)
-    {
-    delete [] this->EndCommand;
-    this->EndCommand = NULL;
-    }
-
-  if (!Object)
-    {
-    return;
-    }
-
-  ostrstream command;
-  command << Object->GetTclName() << " " << MethodAndArgString << ends;
-  this->EndCommand = command.str();
+  this->SetObjectMethodCommand(
+    &this->EndCommand, Object, MethodAndArgString);
 }
 
 // ---------------------------------------------------------------------------
 void vtkKWScale::SetEntryCommand(vtkKWObject* Object, 
                                  const char * MethodAndArgString)
 {
-  if (this->EntryCommand)
-    {
-    delete [] this->EntryCommand;
-    this->EntryCommand = NULL;
-    }
-
-  if (!Object)
-    {
-    return;
-    }
-
-  ostrstream command;
-  command << Object->GetTclName() << " " << MethodAndArgString << ends;
-  this->EntryCommand = command.str();
+  this->SetObjectMethodCommand(
+    &this->EntryCommand, Object, MethodAndArgString);
 }
 
 // ---------------------------------------------------------------------------
 void vtkKWScale::SetCommand(vtkKWObject* Object, 
                             const char *CommandString)
 {
-  if (this->Command)
-    {
-    delete [] this->Command;
-    this->Command = NULL;
-    }
-
-  if (!Object)
-    {
-    return;
-    }
-
-  ostrstream command;
-  command << Object->GetTclName() << " " << CommandString << ends;
-  this->Command = command.str();
+  this->SetObjectMethodCommand(&this->Command, Object, CommandString);
 }
 
 // ---------------------------------------------------------------------------

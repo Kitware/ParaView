@@ -45,7 +45,7 @@
 #define VTK_KW_SHOW_PROPERTIES_LABEL "Show Left Panel"
 #define VTK_KW_WINDOW_DEFAULT_GEOMETRY "900x700+0+0"
 
-vtkCxxRevisionMacro(vtkKWWindow, "1.201");
+vtkCxxRevisionMacro(vtkKWWindow, "1.202");
 vtkCxxSetObjectMacro(vtkKWWindow, PropertiesParent, vtkKWWidget);
 
 #define VTK_KW_RECENT_FILES_MAX 20
@@ -1370,11 +1370,9 @@ int vtkKWWindow::ExitDialog()
   ostrstream title;
   title << "Exit " << this->GetApplication()->GetApplicationPrettyName() 
         << ends;
-  char* ttl = title.str();
   ostrstream str;
   str << "Are you sure you want to exit " 
       << this->GetApplication()->GetApplicationPrettyName() << "?" << ends;
-  char* msg = str.str();
   
   vtkKWMessageDialog *dlg2 = vtkKWMessageDialog::New();
   this->ExitDialogWidget = dlg2;
@@ -1385,14 +1383,14 @@ int vtkKWWindow::ExitDialog()
      vtkKWMessageDialog::Beep | vtkKWMessageDialog::YesDefault );
   dlg2->SetDialogName(VTK_KW_EXIT_DIALOG_NAME);
   dlg2->Create(this->GetApplication(),"");
-  dlg2->SetText( msg );
-  dlg2->SetTitle( ttl );
+  dlg2->SetText( str.str() );
+  dlg2->SetTitle( title.str() );
   int ret = dlg2->Invoke();
   this->ExitDialogWidget = 0;
   dlg2->Delete();
 
-  delete[] msg;
-  delete[] ttl;
+  str.rdbuf()->freeze(0);
+  title.rdbuf()->freeze(0);
  
   vtkKWApplicationSettingsInterface *asi =  
     this->GetApplicationSettingsInterface();

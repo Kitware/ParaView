@@ -26,7 +26,7 @@
 #include "vtkObjectFactory.h"
 
 vtkStandardNewMacro( vtkKWRange );
-vtkCxxRevisionMacro(vtkKWRange, "1.37");
+vtkCxxRevisionMacro(vtkKWRange, "1.38");
 
 #define VTK_KW_RANGE_MIN_SLIDER_SIZE        2
 #define VTK_KW_RANGE_MIN_THICKNESS          (2*VTK_KW_RANGE_MIN_SLIDER_SIZE+1)
@@ -1245,77 +1245,25 @@ void vtkKWRange::InvokeEntriesCommand()
 //----------------------------------------------------------------------------
 void vtkKWRange::SetCommand(vtkKWObject *object, const char *method)
 {
-  if (this->Command)
-    {
-    delete [] this->Command;
-    this->Command = NULL;
-    }
-
-  if (!object)
-    {
-    return;
-    }
-
-  ostrstream command;
-  command << object->GetTclName() << " " << method << ends;
-  this->Command = command.str();
+  this->SetObjectMethodCommand(&this->Command, object, method);
 }
 
 //----------------------------------------------------------------------------
 void vtkKWRange::SetStartCommand(vtkKWObject *object, const char *method)
 {
-  if (this->StartCommand)
-    {
-    delete [] this->StartCommand;
-    this->StartCommand = NULL;
-    }
-
-  if (!object)
-    {
-    return;
-    }
-
-  ostrstream command;
-  command << object->GetTclName() << " " << method << ends;
-  this->StartCommand = command.str();
+  this->SetObjectMethodCommand(&this->StartCommand, object, method);
 }
 
 //----------------------------------------------------------------------------
 void vtkKWRange::SetEndCommand(vtkKWObject *object, const char *method)
 {
-  if (this->EndCommand)
-    {
-    delete [] this->EndCommand;
-    this->EndCommand = NULL;
-    }
-
-  if (!object)
-    {
-    return;
-    }
-
-  ostrstream command;
-  command << object->GetTclName() << " " << method << ends;
-  this->EndCommand = command.str();
+  this->SetObjectMethodCommand(&this->EndCommand, object, method);
 }
 
 //----------------------------------------------------------------------------
 void vtkKWRange::SetEntriesCommand(vtkKWObject *object, const char *method)
 {
-  if (this->EntriesCommand)
-    {
-    delete [] this->EntriesCommand;
-    this->EntriesCommand = NULL;
-    }
-
-  if (!object)
-    {
-    return;
-    }
-
-  ostrstream command;
-  command << object->GetTclName() << " " << method << ends;
-  this->EntriesCommand = command.str();
+  this->SetObjectMethodCommand(&this->EntriesCommand, object, method);
 }
 
 //----------------------------------------------------------------------------

@@ -19,7 +19,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWExtent );
-vtkCxxRevisionMacro(vtkKWExtent, "1.30");
+vtkCxxRevisionMacro(vtkKWExtent, "1.31");
 
 //----------------------------------------------------------------------------
 int vtkKWExtentCommand(ClientData cd, Tcl_Interp *interp,
@@ -292,14 +292,7 @@ void vtkKWExtent::ExtentChangedCallback()
 //----------------------------------------------------------------------------
 void vtkKWExtent::SetCommand(vtkKWObject* CalledObject, const char *CommandString)
 { 
-  if (this->Command)
-    {
-    delete [] this->Command;
-    }
-  ostrstream command;
-  command << CalledObject->GetTclName() << " " << CommandString << ends;
-
-  this->Command = command.str();
+  this->SetObjectMethodCommand(&this->Command, CalledObject, CommandString);
 }
 
 //----------------------------------------------------------------------------

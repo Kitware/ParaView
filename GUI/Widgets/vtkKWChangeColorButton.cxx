@@ -20,7 +20,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWChangeColorButton);
-vtkCxxRevisionMacro(vtkKWChangeColorButton, "1.46");
+vtkCxxRevisionMacro(vtkKWChangeColorButton, "1.47");
 
 int vtkKWChangeColorButtonCommand(ClientData cd, Tcl_Interp *interp,
                                   int argc, char *argv[]);
@@ -125,7 +125,7 @@ void vtkKWChangeColorButton::Create(vtkKWApplication *app, const char *args)
 
   this->ColorButton->SetParent(this->MainFrame);
   this->ColorButton->Create(
-    app, "-bd 0 -highlightthickness 0 -padx 0 -pady 0 -width 2");
+    app, "-bd 1 -fg black -relief groove -highlightthickness 0 -padx 0 -pady 0 -width 2");
 
   this->UpdateColorButton();
 
@@ -486,14 +486,7 @@ void vtkKWChangeColorButton::QueryUserForColor()
 void vtkKWChangeColorButton::SetCommand( vtkKWObject* CalledObject, 
                                          const char *CommandString )
 {
-  if (this->Command)
-    {
-    delete [] this->Command;
-    }
-  ostrstream command;
-  command << CalledObject->GetTclName() << " " << CommandString << ends;
-
-  this->Command = command.str();
+  this->SetObjectMethodCommand(&this->Command, CalledObject, CommandString);
 }
 
 //----------------------------------------------------------------------------
@@ -530,7 +523,7 @@ void vtkKWChangeColorButton::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWChangeColorButton ";
-  this->ExtractRevision(os,"$Revision: 1.46 $");
+  this->ExtractRevision(os,"$Revision: 1.47 $");
 }
 
 //----------------------------------------------------------------------------
