@@ -276,6 +276,9 @@ public:
   vtkGetObjectMacro(ScalarOperationMenu, vtkKWOptionMenu);
   vtkGetObjectMacro(VectorOperationMenu, vtkKWOptionMenu);
 
+  virtual void      UpdateScalars();
+  void              UpdateVectors();
+  
 protected:
   vtkPVSource();
   ~vtkPVSource();
@@ -309,9 +312,7 @@ protected:
   vtkKWWidget       *Properties;
   void              UpdateProperties();
   virtual void      UpdateScalarsMenu();
-  virtual void      UpdateScalars();
   void              UpdateVectorsMenu();
-  void              UpdateVectors();
 
   vtkKWLabeledFrame *ParameterFrame;
   

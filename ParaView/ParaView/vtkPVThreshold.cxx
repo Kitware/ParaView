@@ -216,8 +216,58 @@ void vtkPVThreshold::ChangeAttributeMode(const char* newMode)
   float range[2];
   vtkPVApplication *pvApp = this->GetPVApplication();
   vtkDataSet *thresholdInput = this->GetNthPVInput(0)->GetVTKData();
+  vtkFieldData *fd;
+  const char *arrayName, *defaultArrayName;
+  int defaultSet = 0, numArrays, i;
+  vtkDataArray *dataArray;
   
   this->ChangeAcceptButtonColor();
+  this->ScalarOperationMenu->ClearEntries();
+  
+  if (strcmp(newMode, "point") == 0)
+    {
+    fd = thresholdInput->GetPointData();
+    }
+  else
+    {
+    fd = thresholdInput->GetCellData();
+    }
+  
+  defaultArrayName = this->ScalarOperationMenu->GetValue();
+  if (defaultArrayName && defaultArrayName[0] != '\0' &&
+      fd->GetArray(defaultArrayName))
+    {
+    defaultSet = 1;
+    }
+  
+  numArrays = fd->GetNumberOfArrays();
+  for (i = 0; i < numArrays; i++)
+    {
+    dataArray = fd->GetArray(i);
+    arrayName = fd->GetArrayName(i);
+    if (!arrayName)
+      {
+      continue;
+      }
+    
+    if (dataArray->GetNumberOfComponents() == 1)
+      {
+      this->ScalarOperationMenu->AddEntryWithCommand(fd->GetArrayName(i),
+                                                     this,
+                                                     "UpdateScalars");
+      if (!defaultSet && arrayName[0] != '\0')
+        {
+        defaultArrayName = arrayName;
+        defaultSet = 1;
+        }
+      }
+    }
+  
+  if (defaultSet)
+    {
+    this->ScalarOperationMenu->SetValue(defaultArrayName);
+    pvApp->Script("%s UpdateScalars", this->GetTclName());
+    }
   
   if (strcmp(newMode, "point") == 0)
     {
@@ -257,6 +307,44 @@ void vtkPVThreshold::ChangeAttributeMode(const char* newMode)
   this->LowerValueScale->SetResolution((range[1] - range[0]) / 100.0);
   this->LowerValueScale->SetRange(range[0], range[1]);
   this->LowerValueScale->SetValue(range[0]);
+}
+
+void vtkPVThreshold::UpdateScalars()
+{
+  float range[2];
+  char *arrayName;
+  int attributeMode;
+  vtkDataArray *dataArray;
+  int defaultSet = 0;
+  
+  this->vtkPVSource::UpdateScalars();
+  arrayName = this->ScalarOperationMenu->GetValue();
+  attributeMode = ((vtkThreshold*)this->GetVTKSource())->GetAttributeMode();
+  
+  if (attributeMode == VTK_ATTRIBUTE_MODE_USE_POINT_DATA)
+    {
+    dataArray = this->GetNthPVInput(0)->GetVTKData()->GetPointData()->GetArray(arrayName);
+    if (dataArray)
+      {
+      dataArray->GetRange(range, 0);
+      }
+    }
+  else if (attributeMode == VTK_ATTRIBUTE_MODE_USE_CELL_DATA)
+    {
+    dataArray = this->GetNthPVInput(0)->GetVTKData()->GetCellData()->GetArray(arrayName);
+    if (dataArray)
+      {
+      dataArray->GetRange(range, 0);
+      }
+    }
+  
+  this->UpperValueScale->SetResolution((range[1] - range[0]) / 100.0);
+  this->UpperValueScale->SetRange(range[0], range[1]);
+  this->UpperValueScale->SetValue(range[1]);
+
+  this->LowerValueScale->SetResolution((range[1] - range[0]) / 100.0);
+  this->LowerValueScale->SetRange(range[0], range[1]);
+  this->LowerValueScale->SetValue(range[0]);  
 }
 
 void vtkPVThreshold::SaveInTclScript(ofstream *file)
