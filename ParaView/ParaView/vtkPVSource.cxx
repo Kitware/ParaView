@@ -79,7 +79,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.271");
+vtkCxxRevisionMacro(vtkPVSource, "1.272");
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -304,12 +304,14 @@ void vtkPVSource::SetPVInput(int idx, vtkPVData *pvd)
       }
     }
 
+  // Set the paraview reference to the new input.
   this->SetNthPVInput(idx, pvd);
   if (pvd == NULL)
     {
     return;
     }
 
+  // Set the VTK reference to the new input.
   vtkPVInputProperty* ip = this->GetInputProperty(idx);
   if (ip)
     {
@@ -352,12 +354,40 @@ void vtkPVSource::SetPVInput(int idx, vtkPVData *pvd)
       }
     }
 
+  // Manage the extent translators.
+  vtkPVData *pvOut = this->GetPVOutput();
+  vtkPVPart *partOut;
+  vtkPVPart *partIn;
+  if (this->VTKMultipleInputsFlag)
+    { // Just copy the first extent translator.
+    // Some filters might require a custom extent translator (AppendImages).
+    pvd = this->GetPVInput(0);
+    if (pvOut)
+      {
+      partOut = pvOut->GetPVPart(0);
+      partIn = pvd->GetPVPart(0);
+      pvApp->BroadcastScript("%s SetExtentTranslator [%s GetExtentTranslator]",
+                             partOut->GetVTKDataTclName(),
+                             partIn->GetVTKDataTclName());
+      }
+    }
+  else
+    {
+    for (partIdx = 0; partIdx < numParts; ++partIdx)
+      {
+      partIn = pvd->GetPVPart(partIdx);
+      if (pvOut)
+        {
+        partOut = pvOut->GetPVPart(partIdx);
+        pvApp->BroadcastScript("%s SetExtentTranslator [%s GetExtentTranslator]",
+                               partOut->GetVTKDataTclName(),
+                               partIn->GetVTKDataTclName());
+        }
+      }
+    }
+
   this->GetPVRenderView()->UpdateNavigationWindow(this, 0);
 
-  // Try to set the actor translate
-  //float *pt;
-  //pvd->GetActorTranslate(pt);
-  //this->GetPVOutput()->SetActorTranslate(pt);
 }
 
 //----------------------------------------------------------------------------
@@ -2262,14 +2292,18 @@ int vtkPVSource::InitializeData()
 {
   vtkPVApplication* pvApp = this->GetPVApplication();
   int numSources, sourceIdx;
-  vtkSource *source;
-  char *sourceTclName;
+  vtkSource* source;
+  char* sourceTclName;
   int numOutputs, idx;
   char dataName[1024];
   int outputCount = 0;
+  vtkPVPart* part;
+  vtkPVPart* inPart;
+  vtkPVData* input = this->GetPVInput(0);
+  vtkPVData* pvd;
 
   // Create the output.
-  vtkPVData* pvd = vtkPVData::New();
+  pvd = vtkPVData::New();
   pvd->SetPVApplication(pvApp);
 
   numSources = this->GetNumberOfVTKSources();
@@ -2288,7 +2322,7 @@ int vtkPVSource::InitializeData()
       sprintf(dataName, "%sOutput%d", this->GetName(), outputCount);
       pvApp->BroadcastScript("set %s [%s GetOutput %d]", dataName, 
                              sourceTclName, idx);
-      vtkPVPart *part = vtkPVPart::New();
+      part = vtkPVPart::New();
       part->SetPVApplication(pvApp);
       this->Script("%s SetVTKData ${%s} {${%s}}", part->GetTclName(),
                    dataName, dataName);
@@ -2298,14 +2332,12 @@ int vtkPVSource::InitializeData()
       part->SetCollectionDecision(this->GetPVWindow()->MakeCollectionDecision());
       part->SetLODCollectionDecision(this->GetPVWindow()->MakeLODCollectionDecision());
 
-      part->Delete();
-  
       // Create the extent translator
-      /*
-      if (this->GetPVInput())
+      if (input)
         {
+        inPart = input->GetPVPart(sourceIdx);
         pvApp->BroadcastScript("%s SetExtentTranslator [%s GetExtentTranslator]",
-                               dataName, this->GetPVInput()->GetPVPart()->GetVTKDataTclName());
+                               part->GetVTKDataTclName(), inPart->GetVTKDataTclName());
         }
       else
         {
@@ -2318,7 +2350,8 @@ int vtkPVSource::InitializeData()
                                dataName, translatorTclName);
         pvApp->BroadcastScript("%s Delete", translatorTclName);
         }
-      */
+
+      part->Delete();  
       }
     }
 
@@ -2519,7 +2552,7 @@ void vtkPVSource::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVSource ";
-  this->ExtractRevision(os,"$Revision: 1.271 $");
+  this->ExtractRevision(os,"$Revision: 1.272 $");
 }
 
 //----------------------------------------------------------------------------
