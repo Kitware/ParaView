@@ -1662,6 +1662,7 @@ The Warp (vector) filter translates the points of the input data set using a spe
     <CutEntry label="Cut Offset Values"
               trace_name="Cut Values"
               input_menu="im1" property="ContourValues"
+              animation_support="0"
               help="List of current offset values. This can be used to create multiple cut planes/spheres with different centers. Each entry represents a new cut with center shifted by the offset value."/>
     <Documentation>
 The Cut filter extracts the portion of the input data set that lies along the specified plane or sphere. From the Cut Function menu, you can select whether cutting will be performed with a plane or a sphere. The appropriate 3D widget (plane widget or sphere widget) will be displayed. The parameters of the cut function can be specified interactively using the 3D widget or manually using the traditional user interface controls. Instructions for using these 3D widgets and their corresponding user interfaces are found in section 7.4.
