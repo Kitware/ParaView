@@ -11,9 +11,7 @@
      the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
      PURPOSE.  See the above copyright notice for more information.
 
-*/
-
-
+=========================================================================*/
 #include "vtkMPIMToNSocketConnection.h"
 #include "vtkSocketCommunicator.h"
 #include "vtkMultiProcessController.h"
@@ -23,7 +21,7 @@
 #include <vtkstd/vector>
 
 
-vtkCxxRevisionMacro(vtkMPIMToNSocketConnection, "1.1");
+vtkCxxRevisionMacro(vtkMPIMToNSocketConnection, "1.2");
 vtkStandardNewMacro(vtkMPIMToNSocketConnection);
 
 vtkCxxSetObjectMacro(vtkMPIMToNSocketConnection,Controller, vtkMultiProcessController);
