@@ -18,6 +18,7 @@
 #include "vtkClientServerStream.h"
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
+#include "vtkRenderWindow.h"
 #include "vtkSMDisplayerProxy.h"
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMDoubleVectorProperty.h"
@@ -26,7 +27,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMDisplayWindowProxy);
-vtkCxxRevisionMacro(vtkSMDisplayWindowProxy, "1.9");
+vtkCxxRevisionMacro(vtkSMDisplayWindowProxy, "1.10");
 
 struct vtkSMDisplayWindowProxyInternals
 {
@@ -221,6 +222,18 @@ vtkCamera* vtkSMDisplayWindowProxy::GetCamera(unsigned int idx)
       return vtkCamera::SafeDownCast(
         pm->GetObjectFromID(cameraProxy->GetID(idx)));
       }
+    }
+  return 0;
+}
+
+//---------------------------------------------------------------------------
+vtkRenderWindow* vtkSMDisplayWindowProxy::GetRenderWindow()
+{
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  if (pm && this->GetNumberOfIDs() > 0)
+    {
+    return vtkRenderWindow::SafeDownCast(
+        pm->GetObjectFromID(this->GetID(0)));
     }
   return 0;
 }

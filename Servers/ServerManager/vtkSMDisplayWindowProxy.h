@@ -27,6 +27,7 @@
 #include "vtkClientServerID.h" // Needed for ClientServerID
 
 class vtkCamera;
+class vtkRenderWindow;
 class vtkSMProxy;
 //BTX
 struct vtkSMDisplayWindowProxyInternals;
@@ -62,6 +63,12 @@ public:
   // This requires that the display window instantiates a camera
   // on the server manager.
   vtkCamera* GetCamera(unsigned int idx);
+
+  // Description:
+  // If there is a local render window object with given index, return it.
+  // This requires that the display window instantiates a render window
+  // on the server manager.
+  vtkRenderWindow* GetRenderWindow();
 //ETX
 
 protected:
