@@ -9,5 +9,7 @@ ADD_TEST(TestRegistery ${CXX_TEST_PATH}/TestRegistery)
 LINK_LIBRARIES( 
     vtkKWWidgetsTCL
     vtkCommon
+    vtkjpeg
+    vtkpng
+    vtkzlib
 )
-
