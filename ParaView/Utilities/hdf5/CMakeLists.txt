@@ -25,7 +25,7 @@ INCLUDE (${CMAKE_ROOT}/Modules/CheckTypeSize.cmake)
 SET(LINK_LIBS "")
 MACRO(CHECK_LIBRARY_EXISTS_CONCAT LIBRARY SYMBOL VARIABLE)
   CHECK_LIBRARY_EXISTS("${LIBRARY};${LINK_LIBS}" ${SYMBOL} "" 
-                       ${VARIABLE})
+    ${VARIABLE})
   IF(${VARIABLE})
     SET(LINK_LIBS ${LINK_LIBS} ${LIBRARY})
   ENDIF(${VARIABLE})
@@ -135,24 +135,24 @@ CHECK_SYMBOL_EXISTS(TIOCGETD   "sys/ioctl.h" HAVE_TIOCGETD)
 MACRO(OTHER_INTERNAL_TEST OTHER_TEST)
   IF("${OTHER_TEST}" MATCHES "^${OTHER_TEST}$")
     SET(MACRO_CHECK_FUNCTION_DEFINITIONS 
-        "-D${OTHER_TEST} ${CMAKE_REQUIRED_FLAGS}")
+      "-D${OTHER_TEST} ${CMAKE_REQUIRED_FLAGS}")
     SET(OTHER_TEST_ADD_LIBRARIES)
     IF(CMAKE_REQUIRED_LIBRARIES)
       SET(OTHER_TEST_ADD_LIBRARIES
-          "-DLINK_LIBRARIES:STRING=${CMAKE_REQUIRED_LIBRARIES}")
+        "-DLINK_LIBRARIES:STRING=${CMAKE_REQUIRED_LIBRARIES}")
     ENDIF(CMAKE_REQUIRED_LIBRARIES)
     IF(HAVE_SYS_TIME_H)
       SET(MACRO_CHECK_FUNCTION_DEFINITIONS 
-          "${MACRO_CHECK_FUNCTION_DEFINITIONS} -DHAVE_SYS_TIME_H")
+        "${MACRO_CHECK_FUNCTION_DEFINITIONS} -DHAVE_SYS_TIME_H")
     ENDIF(HAVE_SYS_TIME_H)
 
     MESSAGE(STATUS "Performing Other Test ${OTHER_TEST}")
     TRY_COMPILE(${OTHER_TEST}
-                ${CMAKE_BINARY_DIR}
-                ${VTKHDF5_SOURCE_DIR}/CMake/HDF5Tests.c
-                CMAKE_FLAGS -DCOMPILE_DEFINITIONS:STRING=${MACRO_CHECK_FUNCTION_DEFINITIONS}
-                            "${OTHER_TEST_ADD_LIBRARIES}"
-                OUTPUT_VARIABLE OUTPUT)
+      ${CMAKE_BINARY_DIR}
+      ${VTKHDF5_SOURCE_DIR}/CMake/HDF5Tests.c
+      CMAKE_FLAGS -DCOMPILE_DEFINITIONS:STRING=${MACRO_CHECK_FUNCTION_DEFINITIONS}
+      "${OTHER_TEST_ADD_LIBRARIES}"
+      OUTPUT_VARIABLE OUTPUT)
     IF(${OTHER_TEST})
       SET(${OTHER_TEST} 1 CACHE INTERNAL "Other test ${FUNCTION}")
       MESSAGE(STATUS "Performing Other Test ${OTHER_TEST} - Success")
@@ -168,18 +168,18 @@ ENDMACRO(OTHER_INTERNAL_TEST)
 
 # Do curl specific tests
 FOREACH(CURL_TEST 
-        TIME_WITH_SYS_TIME
-        STDC_HEADERS
-        HAVE_TM_ZONE
-        HAVE_ATTRIBUTE
-        HAVE_FUNCTION
-        HAVE_TM_GMTOFF
-        HAVE_TIMEZONE
-        HAVE_STRUCT_TIMEZONE
-        HAVE_STAT_ST_BLOCKS
-        HAVE_ATTRIBUTE
-        HAVE_FUNCTION
-        )
+    TIME_WITH_SYS_TIME
+    STDC_HEADERS
+    HAVE_TM_ZONE
+    HAVE_ATTRIBUTE
+    HAVE_FUNCTION
+    HAVE_TM_GMTOFF
+    HAVE_TIMEZONE
+    HAVE_STRUCT_TIMEZONE
+    HAVE_STAT_ST_BLOCKS
+    HAVE_ATTRIBUTE
+    HAVE_FUNCTION
+    )
   OTHER_INTERNAL_TEST(${CURL_TEST})
 ENDFOREACH(CURL_TEST)
 
@@ -195,14 +195,14 @@ IF("${PRINTF_LL_WIDTH}" MATCHES "^${PRINTF_LL_WIDTH}$")
       SET(CURRENT_TEST_DEFINITIONS "${CURRENT_TEST_DEFINITIONS} -DHAVE_LONG_LONG")
     ENDIF(SIZEOF_LONG_LONG)
     TRY_RUN(HDF5_PRINTF_LL_TEST_RUN HDF5_PRINTF_LL_TEST_COMPILE
-            ${VTKHDF5_BINARY_DIR}/CMake
-            ${VTKHDF5_SOURCE_DIR}/CMake/HDF5Tests.c
-            CMAKE_FLAGS -DCOMPILE_DEFINITIONS:STRING=${CURRENT_TEST_DEFINITIONS}
-            OUTPUT_VARIABLE OUTPUT)
+      ${VTKHDF5_BINARY_DIR}/CMake
+      ${VTKHDF5_SOURCE_DIR}/CMake/HDF5Tests.c
+      CMAKE_FLAGS -DCOMPILE_DEFINITIONS:STRING=${CURRENT_TEST_DEFINITIONS}
+      OUTPUT_VARIABLE OUTPUT)
     IF(HDF5_PRINTF_LL_TEST_COMPILE)
       IF(HDF5_PRINTF_LL_TEST_RUN MATCHES 0)
         SET(PRINTF_LL_WIDTH "\"${HDF5_PRINTF_LL}\"" CACHE INTERNAL
-            "Width for printf for type `long long' or `__int64', us. `ll")
+          "Width for printf for type `long long' or `__int64', us. `ll")
         SET(PRINT_LL_FOUND 1)
       ELSE(HDF5_PRINTF_LL_TEST_RUN MATCHES 0)
         #MESSAGE("Width with ${HDF5_PRINTF_LL} failed with result: ${HDF5_PRINTF_LL_TEST_RUN}")
@@ -224,25 +224,25 @@ ENDIF("${PRINTF_LL_WIDTH}" MATCHES "^${PRINTF_LL_WIDTH}$")
 
 
 SET(common_SRCS
-H5.c          H5FDmulti.c   H5HG.c       H5Oname.c     H5T.c
-H5A.c         H5FDsec2.c    H5HL.c       H5Onull.c     H5TB.c
-H5AC.c        H5FDsrb.c     H5I.c        H5Osdspace.c  H5TS.c
-H5B.c         H5FDstdio.c   H5MF.c       H5Oshared.c   H5Tbit.c
-H5D.c         H5FDstream.c  H5MM.c       H5Ostab.c     H5Tconv.c
-H5E.c         H5FL.c        H5O.c        H5P.c         H5Tvlen.c
-H5F.c         H5Farray.c    H5Oattr.c    H5R.c         H5V.c
-H5FD.c        H5Fcontig.c   H5Ocomp.c    H5S.c         H5Z.c
-H5FDcore.c    H5Fistore.c   H5Ocont.c    H5Sall.c      H5Zdeflate.c
-H5FDdpss.c    H5Fseq.c      H5Odtype.c   H5Shyper.c    
-H5FDfamily.c  H5G.c         H5Oefl.c     H5Smpio.c
-H5FDgass.c    H5Gent.c      H5Ofill.c    H5Snone.c
-H5FDlog.c     H5Gnode.c     H5Olayout.c  H5Spoint.c
-H5FDmpio.c    H5Gstab.c     H5Omtime.c   H5Sselect.c
-H5Vprivate.c
-)
+  H5.c          H5FDmulti.c   H5HG.c       H5Oname.c     H5T.c
+  H5A.c         H5FDsec2.c    H5HL.c       H5Onull.c     H5TB.c
+  H5AC.c        H5FDsrb.c     H5I.c        H5Osdspace.c  H5TS.c
+  H5B.c         H5FDstdio.c   H5MF.c       H5Oshared.c   H5Tbit.c
+  H5D.c         H5FDstream.c  H5MM.c       H5Ostab.c     H5Tconv.c
+  H5E.c         H5FL.c        H5O.c        H5P.c         H5Tvlen.c
+  H5F.c         H5Farray.c    H5Oattr.c    H5R.c         H5V.c
+  H5FD.c        H5Fcontig.c   H5Ocomp.c    H5S.c         H5Z.c
+  H5FDcore.c    H5Fistore.c   H5Ocont.c    H5Sall.c      H5Zdeflate.c
+  H5FDdpss.c    H5Fseq.c      H5Odtype.c   H5Shyper.c    
+  H5FDfamily.c  H5G.c         H5Oefl.c     H5Smpio.c
+  H5FDgass.c    H5Gent.c      H5Ofill.c    H5Snone.c
+  H5FDlog.c     H5Gnode.c     H5Olayout.c  H5Spoint.c
+  H5FDmpio.c    H5Gstab.c     H5Omtime.c   H5Sselect.c
+  H5Vprivate.c
+  )
 
 INCLUDE_DIRECTORIES(${VTKHDF5_SOURCE_DIR}
-                    ${VTKHDF5_BINARY_DIR})
+  ${VTKHDF5_BINARY_DIR})
 
 SET(H5_const    ${const})
 SET(H5_HAVE_TM_ZONE     ${HAVE_TM_ZONE})
@@ -405,10 +405,10 @@ ELSE(WIN32)
   SET(CONFIG_FILE_EXT h.cmake)
 ENDIF(WIN32)
 CONFIGURE_FILE(${VTKHDF5_SOURCE_DIR}/H5config.${CONFIG_FILE_EXT}.in
-               ${VTKHDF5_BINARY_DIR}/H5config.h)
+  ${VTKHDF5_BINARY_DIR}/H5config.h)
 
 CONFIGURE_FILE(${VTKHDF5_SOURCE_DIR}/H5pubconf.${CONFIG_FILE_EXT}.in
-               ${VTKHDF5_BINARY_DIR}/H5pubconf.h)
+  ${VTKHDF5_BINARY_DIR}/H5pubconf.h)
 
 SET(common_SRCS ${common_SRCS} ${VTKHDF5_BINARY_DIR}/H5Tinit.c)
 SET_SOURCE_FILES_PROPERTIES (${VTKHDF5_BINARY_DIR}/H5Tinit.c GENERATED)
@@ -434,17 +434,23 @@ SET(CMD ${EXECUTABLE_OUTPUT_PATH}${CFG_INIT}/H5detect${EXE_EXT})
 
 ADD_EXECUTABLE(H5detect H5detect.c)
 TARGET_LINK_LIBRARIES(H5detect ${LINK_LIBS})
-ADD_CUSTOM_COMMAND(
-  SOURCE H5detect
-  COMMAND ${CMD}
-  ARGS > ${VTKHDF5_BINARY_DIR}/H5Tinit.c
-  TARGET H5detect
-  OUTPUTS ${VTKHDF5_BINARY_DIR}/H5Tinit.c)
+IF(MAKE_SYSTEM OR UNIX)
 
-ADD_CUSTOM_COMMAND(
-  SOURCE ${CMD}
-  COMMAND ${CMD}
-  ARGS > ${VTKHDF5_BINARY_DIR}/H5Tinit.c
-  TARGET vtkhdf5
-  OUTPUTS ${VTKHDF5_BINARY_DIR}/H5Tinit.c)
+  ADD_CUSTOM_COMMAND(
+    SOURCE ${CMD}
+    COMMAND ${CMD}
+    ARGS > ${VTKHDF5_BINARY_DIR}/H5Tinit.c
+    TARGET vtkhdf5
+    OUTPUTS ${VTKHDF5_BINARY_DIR}/H5Tinit.c)
+
+ELSE(MAKE_SYSTEM OR UNIX)
+
+  ADD_CUSTOM_COMMAND(
+    SOURCE H5detect
+    COMMAND ${CMD}
+    ARGS > ${VTKHDF5_BINARY_DIR}/H5Tinit.c
+    TARGET H5detect
+    OUTPUTS ${VTKHDF5_BINARY_DIR}/H5Tinit.c)
+
+ENDIF(MAKE_SYSTEM OR UNIX)
 ADD_DEPENDENCIES(vtkhdf5 H5detect)
