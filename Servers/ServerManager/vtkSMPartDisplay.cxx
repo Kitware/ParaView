@@ -45,7 +45,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMPartDisplay);
-vtkCxxRevisionMacro(vtkSMPartDisplay, "1.5");
+vtkCxxRevisionMacro(vtkSMPartDisplay, "1.6");
 
 
 //----------------------------------------------------------------------------s
@@ -1559,6 +1559,38 @@ void vtkSMPartDisplay::GatherGeometryInformation()
 }
 
 
+//----------------------------------------------------------------------------
+// This should be handle the same way batch is (in the future).
+void vtkSMPartDisplay::SaveState(ofstream *file, const char* tclName)
+{
+  float rgb[3];
+  this->GetColor(rgb);
+  *file << tclName << " SetColor " 
+        << rgb[0] << " " << rgb[1] << " " << rgb[2] << endl;
+     
+  *file << tclName << " SetRepresentation " << this->GetRepresentation() << endl; 
+  *file << tclName << " SetUseImmediateMode " << this->UseImmediateModeProperty->GetElement(0) << endl; 
+  *file << tclName << " SetScalarVisibility " << this->GetScalarVisibility() << endl; 
+  *file << tclName << " SetDirectColorFlag " << this->GetDirectColorFlag() << endl; 
+  *file << tclName << " SetInterpolateColorsFlag " << this->GetInterpolateColorsFlag() << endl; 
+  *file << tclName << " SetInterpolation " << this->GetInterpolation() << endl; 
+  *file << tclName << " SetLineWidth " << this->GetLineWidth() << endl; 
+  *file << tclName << " SetPointSize " << this->GetPointSize() << endl; 
+  double tmp[3];
+  this->GetTranslate(tmp);
+  *file << tclName << " SetTranslate " 
+        << tmp[0] << " " << tmp[1] << " " << tmp[2] << endl;
+  this->GetScale(tmp);
+  *file << tclName << " SetScale " 
+        << tmp[0] << " " << tmp[1] << " " << tmp[2] << endl;
+  this->GetOrientation(tmp);
+  *file << tclName << " SetOrientation " 
+        << tmp[0] << " " << tmp[1] << " " << tmp[2] << endl;
+  this->GetOrigin(tmp);
+    *file << tclName << " SetOrigin " 
+          << tmp[0] << " " << tmp[1] << " " << tmp[2] << endl;
+  *file << tclName << " SetOpacity " << this->GetOpacity() << endl; 
+}
 
 
 

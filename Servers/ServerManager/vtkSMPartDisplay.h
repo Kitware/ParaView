@@ -189,6 +189,11 @@ public:
   vtkPVGeometryInformation* GetGeometryInformation();
 //ETX
 
+  // Description:
+  // Saves the pipeline in a ParaView script.  This is similar
+  // to saveing a trace, except only the last state is stored.
+  virtual void SaveState(ofstream *file, const char* tclName);
+
 protected:
   vtkSMPartDisplay();
   ~vtkSMPartDisplay();
