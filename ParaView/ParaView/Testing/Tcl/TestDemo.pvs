@@ -1,0 +1,3 @@
+$Application ExitOnReturnOn
+[$Application GetMainWindow] PlayDemo 1
+$Application Exit
