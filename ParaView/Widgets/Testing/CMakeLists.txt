@@ -7,9 +7,9 @@ ENDIF (VTK_WRAP_PYTHON)
 
 
 
-IF(PYTHON_EXECUTABLE)
+IF(PYTHON_EXECUTABLE AND VTK_HEADER_TESTING_PY)
   ADD_TEST(HeaderTesting-Widgets ${PYTHON_EXECUTABLE}
-           ${PARAVIEW_SOURCE_DIR}/KWCommon/Testing/HeaderTesting.py
+           ${VTK_HEADER_TESTING_PY}
 	   "${Widgets_SOURCE_DIR}"
            KitwareLogo.h
            bitmaps.h
@@ -20,5 +20,5 @@ IF(PYTHON_EXECUTABLE)
            vtkKWWidgets.h
            vtkbwidgets.h
            )
-ENDIF(PYTHON_EXECUTABLE)
+ENDIF(PYTHON_EXECUTABLE AND VTK_HEADER_TESTING_PY)
 
