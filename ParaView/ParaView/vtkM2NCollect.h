@@ -41,8 +41,8 @@ protected:
   virtual void ExecuteData(vtkDataObject* outData);
   virtual void ExecuteInformation();
 
-  int ShuffleSizes(int size);
-  void Shuffle(int inSize, char* inBuf, int outSize, char* outBuf);
+  int ExchangeSizes(int size);
+  void ExchangeData(int inSize, char* inBuf, int outSize, char* outBuf);
 
   void SetMPIMToNSocketConnection(vtkMPIMToNSocketConnection*);
   
