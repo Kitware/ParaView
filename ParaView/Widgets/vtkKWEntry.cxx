@@ -33,7 +33,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWEntry );
-vtkCxxRevisionMacro(vtkKWEntry, "1.50");
+vtkCxxRevisionMacro(vtkKWEntry, "1.51");
 
 //----------------------------------------------------------------------------
 vtkKWEntry::vtkKWEntry()
@@ -311,31 +311,52 @@ void vtkKWEntry::BindCommand(vtkKWObject *object,
 //----------------------------------------------------------------------------
 void vtkKWEntry::AddValue(const char* value)
 {
+  if ( !this->PullDown )
+    {
+    return;
+    }
   if ( this->GetValueIndex(value) >= 0 )
     {
     return;
     }
   // Add to the combo
+  this->Script("%s list insert end {%s}", 
+    this->Entry->GetWidgetName(), value);
   this->Modified();
 }
 
 //----------------------------------------------------------------------------
 int vtkKWEntry::GetNumberOfValues()
 {
+  if ( !this->PullDown )
+    {
+    return 1;
+    }
   // Get the number of values in combo
-  return 1;
+  return atoi(this->Script("%s list size",
+      this->Entry->GetWidgetName()));
 }
 
 //----------------------------------------------------------------------------
 void vtkKWEntry::DeleteAllValues()
 {
+  if ( !this->PullDown )
+    {
+    return;
+    }
   // Delete all values from combo
+  this->Script("%s list delete 0 %d",
+    this->Entry->GetWidgetName(), this->GetNumberOfValues()-1);
   this->Modified();
 }
 
 //----------------------------------------------------------------------------
 void vtkKWEntry::DeleteValue(int idx)
 {
+  if ( !this->PullDown )
+    {
+    return;
+    }
   if ( idx >= (int)this->GetNumberOfValues() )
     {
     vtkErrorMacro("This entry has only: " 
@@ -344,33 +365,37 @@ void vtkKWEntry::DeleteValue(int idx)
     return;
     }
   // Delete from combo
+  this->Script("%s list delete %d",
+    this->Entry->GetWidgetName(), idx);
   this->Modified();
 }
 
 //----------------------------------------------------------------------------
 const char* vtkKWEntry::GetValueFromIndex(int idx)
 {
+  if ( !this->PullDown )
+    {
+    return 0;
+    }
   if ( idx >= this->GetNumberOfValues() )
     {
     return 0;
     }
   // Get value from index
-  return 0;
+  return this->Script("%s list get %d", 
+    this->Entry->GetWidgetName(), idx);
 }
 
 //----------------------------------------------------------------------------
 int vtkKWEntry::GetValueIndex(const char* value)
 {
-  int cc;
-  for ( cc = 0; cc < this->GetNumberOfValues(); cc ++ )
+  if ( !this->PullDown || !value)
     {
-    if ( this->GetValueFromIndex(cc) && 
-      strcmp(this->GetValueFromIndex(cc), value ) == 0 )
-      {
-      return int(cc);
-      }
+    return 0;
     }
-  return -1;
+  const char* res = this->Script("lsearch [ %s list get 0 end ] {%s}",
+      this->Entry->GetWidgetName(), value);
+  return atoi(res);
 }
 
 //----------------------------------------------------------------------------
