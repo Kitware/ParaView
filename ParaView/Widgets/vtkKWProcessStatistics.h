@@ -40,7 +40,7 @@ public:
   int QueryMemory();
 
   // Description:
-  // Retrieve memory information.
+  // Retrieve memory information in kilobytes.
   long GetTotalVirtualMemory();
   long GetAvailableVirtualMemory();
   long GetTotalPhysicalMemory();

@@ -17,7 +17,7 @@
 =========================================================================*/
 #include "vtkKWProcessStatistics.h"
 
-vtkCxxRevisionMacro(vtkKWProcessStatistics, "1.5");
+vtkCxxRevisionMacro(vtkKWProcessStatistics, "1.6");
 
 #ifdef __linux
 #include <sys/procfs.h>
@@ -153,6 +153,11 @@ float vtkKWProcessStatistics::GetProcessCPUTimeInMilliseconds()
 
 int vtkKWProcessStatistics::QueryMemory()
 {
+  unsigned long tv;
+  unsigned long tp;
+  unsigned long av;
+  unsigned long ap;
+
   this->TotalVirtualMemory = -1;
   this->TotalPhysicalMemory = -1;
   this->AvailableVirtualMemory = -1;
@@ -162,10 +167,15 @@ int vtkKWProcessStatistics::QueryMemory()
 #elif _WIN32  
   MEMORYSTATUS ms;
   GlobalMemoryStatus(&ms);
-  this->TotalVirtualMemory = ms.dwTotalVirtual;
-  this->TotalPhysicalMemory = ms.dwTotalPhys;
-  this->AvailableVirtualMemory = ms.dwAvailVirtual;
-  this->AvailablePhysicalMemory = ms.dwAvailPhys;
+  
+  tv = ms.dwTotalVirtual;
+  tp = ms.dwTotalPhys;
+  av = ms.dwAvailVirtual;
+  ap = ms.dwAvailPhys;
+  this->TotalVirtualMemory = tv>>10;
+  this->TotalPhysicalMemory = tp>>10;
+  this->AvailableVirtualMemory = av>>10;
+  this->AvailablePhysicalMemory = ap>>10;
   return 1;
 #elif __linux
   FILE *fd;
@@ -178,12 +188,14 @@ int vtkKWProcessStatistics::QueryMemory()
   long temp;
   char buffer[1024];
   fgets(buffer, sizeof(buffer), fd);
-  fscanf(fd, "Mem: %ld %ld %ld %ld %ld %ld\n",
-	 &this->TotalPhysicalMemory, &temp, &this->AvailablePhysicalMemory,
-	 &temp, &temp, &temp);
-  fscanf(fd, "Swap: %ld %ld %ld\n",
-	 &this->TotalVirtualMemory, &temp, &this->AvailableVirtualMemory);  
+  fscanf(fd, "Mem: %ul %ul %ul %ul %ul %ul\n",
+	 &tp, &temp, &ap, &temp, &temp, &temp);
+  fscanf(fd, "Swap: %ul %ul %ul\n", &tv, &temp, &tv);  
   fclose( fd );
+  this->TotalVirtualMemory = tv>>10;
+  this->TotalPhysicalMemory = tp>>10;
+  this->AvailableVirtualMemory = av>>10;
+  this->AvailablePhysicalMemory = ap>>10;
   return 1;
 #elif __hpux
   struct pst_static pst;
@@ -193,14 +205,16 @@ int vtkKWProcessStatistics::QueryMemory()
   if (pstat_getstatic(&pst, sizeof(pst), (size_t) 1, 0) != -1)
     {
     ps = pst.page_size;
-    this->TotalPhysicalMemory =  pst.physical_memory *ps;
-    this->TotalVirtualMemory = (pst.physical_memory + pst.pst_maxmem) * ps;
+    tp =  pst.physical_memory *ps;
+    tv = (pst.physical_memory + pst.pst_maxmem) * ps;
     if (pstat_getdynamic(&pdy, sizeof(pdy), (size_t) 1, 0) != -1)
       {
-      this->AvailablePhysicalMemory = this->TotalPhysicalMemory -
-	pdy.psd_rm * ps;
-      this->AvailableVirtualMemory = this->TotalVirtualMemory -
-	pdy.psd_vm;
+      ap = tp - pdy.psd_rm * ps;
+      av = tv - pdy.psd_vm;
+      this->TotalVirtualMemory = tv>>10;
+      this->TotalPhysicalMemory = tp>>10;
+      this->AvailableVirtualMemory = av>>10;
+      this->AvailablePhysicalMemory = ap>>10;
       return 1;
       }
     }
