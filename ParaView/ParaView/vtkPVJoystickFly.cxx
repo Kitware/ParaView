@@ -50,7 +50,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkRenderer.h"
 #include "vtkTimerLog.h"
 
-vtkCxxRevisionMacro(vtkPVJoystickFly, "1.2");
+vtkCxxRevisionMacro(vtkPVJoystickFly, "1.3");
 vtkStandardNewMacro(vtkPVJoystickFly);
 
 //-------------------------------------------------------------------------
@@ -117,6 +117,8 @@ void vtkPVJoystickFly::OnButtonUp(int, int, vtkRenderer*,
 void vtkPVJoystickFly::OnMouseMove(int x, int y, vtkRenderer*,
                                    vtkRenderWindowInteractor*)
 {
+  // Need to update the instance variables for mouse position. This
+  // will be called when update happens.
   this->LastX = x;
   this->LastY = y;
 }
@@ -130,22 +132,20 @@ void vtkPVJoystickFly::Fly(vtkRenderer* ren, vtkRenderWindowInteractor *rwi,
     return;
     }
   
-  this->FlyFlag = 1;
-
-  // Need to update the instance variables for mouse position
   // We'll need the size of the window
   int *size = ren->GetSize();
+
+  // Also we will need the camera.
+  vtkCamera *cam = ren->GetActiveCamera();  
+
+  // We need to time rendering so that we can adjust the speed
+  // accordingly
+  vtkTimerLog *timer = vtkTimerLog::New();
 
   // We are flying now!
   this->FlyFlag = 1;
 
-  vtkCamera *cam = ren->GetActiveCamera();
-  
-  float speed, angle;
- 
-  // We need to time rendering so that we can adjust the speed
-  // accordingly
-  vtkTimerLog *timer = vtkTimerLog::New();
+  float speed, angle; 
   
   // The first time through we don't want to move
   int first = 1;
