@@ -67,8 +67,8 @@ int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
 vtkPVWindow::vtkPVWindow()
 {  
   this->CommandFunction = vtkPVWindowCommand;
-  this->RetrieveMenu = vtkKWWidget::New();
-  this->CreateMenu = vtkKWWidget::New();
+  this->RetrieveMenu = vtkKWMenu::New();
+  this->CreateMenu = vtkKWMenu::New();
   this->Toolbar = vtkKWToolbar::New();
   this->ResetCameraButton = vtkKWWidget::New();
   this->PreviousCompositeButton = vtkKWWidget::New();
@@ -128,26 +128,21 @@ void vtkPVWindow::Create(vtkKWApplication *app, char *args)
   Tcl_Interp *interp = this->Application->GetMainInterp();
 
   // create the top level
-  this->Script(
-    "%s insert 0 command -label {New Window} -command {%s NewWindow}",
-    this->GetMenuFile()->GetWidgetName(), this->GetTclName());
+  this->MenuFile->InsertCommand(0,"New Window", this, "NewWindow");
 
   // Create the menu for creating data sources.
   this->MenuSource->Create(app,"-tearoff 0");
-  this->GetMenuFile()->InsertCascade(1, "New Data", this->MenuSource, 0);
+  this->MenuFile->InsertCascade(1, "New Data", this->MenuSource, 0);
   this->MenuSource->AddCommand("Volume", this, "NewVolume");
   this->MenuSource->AddCommand("Cone", this, "NewCone");
   
   this->CreateMenu->SetParent(this->GetMenu());
-  this->CreateMenu->Create(this->Application,"menu","-tearoff 0");
-  this->Script("%s insert 2 cascade -label {Create} -menu %s -underline 0",
-               this->Menu->GetWidgetName(),this->CreateMenu->GetWidgetName());
+  this->CreateMenu->Create(this->Application,"");
+  this->Menu->InsertCascade(2,"Create",this->CreateMenu,0);
 
   this->RetrieveMenu->SetParent(this->GetMenu());
-  this->RetrieveMenu->Create(this->Application,"menu","-tearoff 0");
-  this->Script(
-    "%s insert 3 cascade -label {Retrieve} -menu %s -underline 0",
-    this->GetMenu()->GetWidgetName(),this->RetrieveMenu->GetWidgetName());
+  this->RetrieveMenu->Create(this->Application,"");
+  this->Menu->InsertCascade(3, "Retrieve", this->RetrieveMenu, 0);
 
   this->SetStatusText("Version 1.0 beta");
   this->CreateDefaultPropertiesParent();
@@ -159,8 +154,7 @@ void vtkPVWindow::Create(vtkKWApplication *app, char *args)
   this->MainView = vtkPVRenderView::New();
   this->MainView->Clone((vtkPVApplication*)app);
   this->MainView->SetParent(this->ViewFrame);
-  // Why do I have to explicitly state the class?  I do not know.
-  this->MainView->vtkPVRenderView::Create(this->Application,"-width 200 -height 200");
+  this->MainView->Create(this->Application,"-width 200 -height 200");
   this->AddView(this->MainView);
   // force creation of the properties parent
   this->MainView->GetPropertiesParent();
@@ -337,7 +331,6 @@ void vtkPVWindow::SetupCone()
 //----------------------------------------------------------------------------
 void vtkPVWindow::NewCone()
 {
-  int id, num;
   vtkPVApplication *pvApp = (vtkPVApplication *)this->Application;
   vtkPVComposite *comp;
   vtkPVConeSource *cone;

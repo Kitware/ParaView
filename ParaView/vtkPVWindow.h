@@ -99,8 +99,8 @@ protected:
   void SetupCone();
   
   vtkPVRenderView *MainView;
-  vtkKWWidget *RetrieveMenu;
-  vtkKWWidget *CreateMenu;
+  vtkKWMenu *RetrieveMenu;
+  vtkKWMenu *CreateMenu;
   
   vtkKWToolbar *Toolbar;
   vtkKWWidget *ResetCameraButton;
