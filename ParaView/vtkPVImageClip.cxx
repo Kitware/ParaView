@@ -31,6 +31,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkPVImageData.h"
 #include "vtkPVWindow.h"
 #include "vtkPVActorComposite.h"
+#include "vtkPVScalarBar.h"
 #include "vtkPVAssignment.h"
 #include "vtkKWToolbar.h"
 
@@ -276,6 +277,7 @@ void vtkPVImageClip::ExtentsChanged()
     this->GetPVData()->GetData()->
       SetUpdateExtent(this->GetPVData()->GetData()->GetWholeExtent());
     this->GetInput()->GetActorComposite()->VisibilityOff();
+    this->GetInput()->GetScalarBar()->VisibilityOff();
     this->CreateDataPage();
     ac = this->GetPVData()->GetActorComposite();
     window->GetMainView()->AddComposite(ac);

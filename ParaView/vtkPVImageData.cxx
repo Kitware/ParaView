@@ -165,7 +165,6 @@ void vtkPVImageData::ShiftScale()
   // Clean up. (How about on the other processes?)
   // We cannot create an object in tcl and delete it in C++.
   //f->Delete();
-
 }
 
 //----------------------------------------------------------------------------

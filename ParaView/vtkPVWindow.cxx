@@ -39,6 +39,8 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 #include "vtkMath.h"
 #include "vtkSynchronizedTemplates3D.h"
+#include "vtkSuperquadricSource.h"
+#include "vtkImageMandelbrotSource.h"
 
 #include "vtkPVAssignment.h"
 #include "vtkPVSource.h"
@@ -46,6 +48,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkPVImageData.h"
 #include "vtkPVSourceList.h"
 #include "vtkPVActorComposite.h"
+#include "vtkPVScalarBar.h"
 #include "vtkPVAnimation.h"
 #include "vtkSuperquadricSource.h"
 #include "vtkRunTimeContour.h"
@@ -695,7 +698,7 @@ vtkPVImageSource *vtkPVWindow::CreateImageReader()
 
 //----------------------------------------------------------------------------
 // Setup the pipeline
-void vtkPVWindow::CreateFractalVolume()
+vtkPVImageSource *vtkPVWindow::CreateFractalVolume()
 {
   static int instanceCount = 0;
   vtkPVSource *pvs;
@@ -706,8 +709,8 @@ void vtkPVWindow::CreateFractalVolume()
   // Link the PVSource to the vtkSource.
   pvs = pvApp->MakePVSource("vtkPVImageSource","vtkImageMandelbrotSource",
                             "Fractal", ++instanceCount);
-  if (pvs == NULL) {return;}
-  
+  if (pvs == NULL) {return NULL;}
+
   // Set up the defaults.
   ms = vtkImageMandelbrotSource::SafeDownCast(pvs->GetVTKSource());
   ms->SetOriginCX(-0.733569, 0.24405, 0.296116, 0.0);
@@ -736,6 +739,8 @@ void vtkPVWindow::CreateFractalVolume()
   // Clean up. (How about on the other processes?)
   // We cannot create an object in tcl and delete it in C++.
   //pvs->Delete();
+
+  return vtkPVImageSource::SafeDownCast(pvs);
 }
 
 //----------------------------------------------------------------------------

@@ -32,6 +32,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkPVAssignment.h"
 #include "vtkPVWindow.h"
 #include "vtkPVActorComposite.h"
+#include "vtkPVScalarBar.h"
 
 int vtkPVPolyDataSourceCommand(ClientData cd, Tcl_Interp *interp,
 			   int argc, char *argv[]);
@@ -98,9 +99,11 @@ void vtkPVPolyDataSource::InitializeOutput()
 void vtkPVPolyDataSource::SelectInputSource()
 {
   this->GetPVData()->GetActorComposite()->VisibilityOff();
+  this->GetPVData()->GetScalarBar()->VisibilityOff();
   this->GetWindow()->GetMainView()->
     SetSelectedComposite(this->GetInput()->GetPVSource());
   this->GetInput()->GetActorComposite()->VisibilityOn();
+  this->GetInput()->GetScalarBar()->VisibilityOn();
   this->GetView()->Render();
   this->GetWindow()->GetMainView()->ResetCamera();
 }

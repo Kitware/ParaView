@@ -34,6 +34,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkPVSourceCollection.h"
 
 class vtkPVActorComposite;
+class vtkPVScalarBar;
 class vtkPVSource;
 class vtkPVAssignment;
 class vtkPVApplication;
@@ -73,6 +74,11 @@ public:
   // This composite actually has an actor that displays the data.
   vtkPVActorComposite* GetActorComposite();
   
+  // Description:
+  // Set/Get the scalar bar associated with this data object.
+  void SetScalarBar(vtkPVScalarBar *sb);
+  vtkPVScalarBar *GetScalarBar();
+                    
   // Description:
   // General filters that can be applied to vtkDataSet.
   void Contour();
@@ -129,6 +135,7 @@ public:
   vtkSetObjectMacro(Data, vtkDataSet);  
   
   void ShowActorComposite();
+  void ShowScalarBarParameters();
   
   // Description:
   // We are keeping the forward links.  I have not 
@@ -151,6 +158,8 @@ protected:
 
   vtkPVActorComposite *ActorComposite;
   vtkKWPushButton *ActorCompositeButton;
+  vtkPVScalarBar *ScalarBar;
+  vtkKWPushButton *ScalarBarButton;
   
   // This points to the source widget that owns this data widget.
   vtkPVSource *PVSource;

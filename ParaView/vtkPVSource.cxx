@@ -31,6 +31,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkPVSource.h"
 #include "vtkPVApplication.h"
 #include "vtkPVActorComposite.h"
+#include "vtkPVScalarBar.h"
 #include "vtkPVAssignment.h"
 #include "vtkKWView.h"
 #include "vtkKWScale.h"
@@ -1479,16 +1480,24 @@ void vtkPVSource::AcceptCallback()
     { // This is the first time, initialize data.  
     vtkPVData *input;
     vtkPVActorComposite *ac;
+    vtkPVScalarBar *sb;
     
     input = this->GetNthInput(0);
     this->InitializeOutput();
     this->CreateDataPage();
     ac = this->GetPVData()->GetActorComposite();
     window->GetMainView()->AddComposite(ac);
+    sb = this->GetPVData()->GetScalarBar();
+    window->GetMainView()->AddComposite(sb);
     // Make the last data invisible.
-    if (input)
+    // We want this to work whether we create different sources with or
+    // without using filters.
+    if (window->GetPreviousSource())
       {
-      input->GetActorComposite()->SetVisibility(0);
+      window->GetPreviousSource()->GetPVData()->GetActorComposite()->
+        SetVisibility(0);
+      window->GetPreviousSource()->GetPVData()->GetScalarBar()->
+        SetVisibility(0);
       }
     window->GetMainView()->ResetCamera();
     }
@@ -1595,6 +1604,7 @@ void vtkPVSource::DeleteCallback()
       }
     this->GetVTKSource()->Delete();
     this->PVOutput->GetActorComposite()->VisibilityOff();
+    this->PVOutput->GetScalarBar()->VisibilityOff();
     if (prev)
       {
       prev->GetPVData()->GetActorComposite()->VisibilityOn();

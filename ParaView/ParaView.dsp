@@ -409,6 +409,14 @@ SOURCE=.\vtkPVRunTimeContourTcl.cxx
 # End Source File
 # Begin Source File
 
+SOURCE=.\vtkPVScalarBar.cxx
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkPVScalarBarTcl.cxx
+# End Source File
+# Begin Source File
+
 SOURCE=.\vtkPVSelectionList.cxx
 # End Source File
 # Begin Source File
@@ -1283,6 +1291,26 @@ SOURCE=.\vtkPVRunTimeContour.h
 # Begin Custom Build
 InputPath=.\vtkPVRunTimeContour.h
 InputName=vtkPVRunTimeContour
+
+"$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx
+
+# End Custom Build
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkPVScalarBar.h
+
+!IF  "$(CFG)" == "ParaView - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "ParaView - Win32 Debug"
+
+# Begin Custom Build
+InputPath=.\vtkPVScalarBar.h
+InputName=vtkPVScalarBar
 
 "$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx

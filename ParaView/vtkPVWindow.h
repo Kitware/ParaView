@@ -60,7 +60,7 @@ public:
   // Description:
   // These create new sources.
   vtkPVImageSource *CreateImageReader();
-  void CreateFractalVolume();
+  vtkPVImageSource *CreateFractalVolume();
   vtkPVPolyDataSource *CreateCone();
   vtkPVPolyDataSource *CreateSTLReader();
   vtkPVRunTimeContour *CreateRunTimeContour();
