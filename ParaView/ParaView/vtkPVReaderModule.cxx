@@ -50,7 +50,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVReaderModule);
-vtkCxxRevisionMacro(vtkPVReaderModule, "1.13.2.2");
+vtkCxxRevisionMacro(vtkPVReaderModule, "1.13.2.3");
 
 int vtkPVReaderModuleCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -156,7 +156,7 @@ void vtkPVReaderModule::AddExtension(const char* ext)
 //----------------------------------------------------------------------------
 const char* vtkPVReaderModule::RemovePath(const char* fname)
 {
-  char* ptr = strrchr(fname, '/');
+  const char* ptr = strrchr(fname, '/');
   if ( ptr )
     {
     if ( ptr[1] != '\0' )

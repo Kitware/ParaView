@@ -60,7 +60,7 @@ class vtkKWLabel;
 class vtkKWLabeledFrame;
 class vtkKWOptionMenu;
 class vtkPVCameraManipulator;
-class vtkPVInteractorStyleControlCommand;
+class vtkPVInteractorStyleControlCmd;
 class vtkPVWidget;
 
 //BTX
@@ -162,7 +162,7 @@ protected:
   vtkKWFrame *ArgumentsFrame;
   vtkKWFrame *MenusFrame;
 
-  vtkPVInteractorStyleControlCommand *Observer;
+  vtkPVInteractorStyleControlCmd *Observer;
 
   int InEvent;
 

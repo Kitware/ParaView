@@ -66,20 +66,20 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVInteractorStyleControl );
-vtkCxxRevisionMacro(vtkPVInteractorStyleControl, "1.19.2.3");
+vtkCxxRevisionMacro(vtkPVInteractorStyleControl, "1.19.2.4");
 
 vtkCxxSetObjectMacro(vtkPVInteractorStyleControl,ManipulatorCollection,
                      vtkCollection);
 
 //===========================================================================
 //***************************************************************************
-class vtkPVInteractorStyleControlCommand : public vtkCommand
+class vtkPVInteractorStyleControlCmd : public vtkCommand
 {
 public:
-  static vtkPVInteractorStyleControlCommand *New() 
-    {return new vtkPVInteractorStyleControlCommand;};
+  static vtkPVInteractorStyleControlCmd *New() 
+    {return new vtkPVInteractorStyleControlCmd;};
 
-  vtkPVInteractorStyleControlCommand()
+  vtkPVInteractorStyleControlCmd()
     {
       this->InteractorStyleControl = 0;
     }
@@ -105,7 +105,7 @@ vtkPVInteractorStyleControl::vtkPVInteractorStyleControl()
   this->LabeledFrame = vtkKWLabeledFrame::New();
   this->LabeledFrame->SetParent(this);
 
-  this->Observer = vtkPVInteractorStyleControlCommand::New();
+  this->Observer = vtkPVInteractorStyleControlCmd::New();
   this->Observer->InteractorStyleControl = this;
   
   int cc;

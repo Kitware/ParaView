@@ -78,7 +78,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-------------------------------------------------------------------
 vtkStandardNewMacro(vtkWeightedRedistributePolyData);
-vtkCxxRevisionMacro(vtkWeightedRedistributePolyData, "1.12.2.2");
+vtkCxxRevisionMacro(vtkWeightedRedistributePolyData, "1.12.2.3");
 
 //-------------------------------------------------------------------
 
@@ -104,8 +104,8 @@ void vtkWeightedRedistributePolyData::PrintSelf
 
 
 //*****************************************************************
-void vtkWeightedRedistributePolyData::SetWeights
-  ( const int startProc, const int stopProc, const float weight )
+void vtkWeightedRedistributePolyData::SetWeights(
+  int startProc, int stopProc, float weight )
 {
   int myId, numProcs;
   if (!this->Controller)
