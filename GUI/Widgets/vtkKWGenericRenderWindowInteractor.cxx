@@ -28,7 +28,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWGenericRenderWindowInteractor);
-vtkCxxRevisionMacro(vtkKWGenericRenderWindowInteractor, "1.5");
+vtkCxxRevisionMacro(vtkKWGenericRenderWindowInteractor, "1.6");
 
 //----------------------------------------------------------------------------
 vtkKWGenericRenderWindowInteractor::vtkKWGenericRenderWindowInteractor()
@@ -75,7 +75,6 @@ void vtkKWGenericRenderWindowInteractor::PrintSelf(ostream& os, vtkIndent indent
 {
   this->Superclass::PrintSelf(os,indent);
   os << indent << "LastEventPosition: (" << this->LastEventPosition[0] << ", "
-     << this->LastEventPosition[1] << ", " << this->LastEventPosition[2]
-     << ")" << endl;
+     << this->LastEventPosition[1] << ")" << endl;
   os << indent << "RenderWidget: " << this->RenderWidget << endl;
 }
