@@ -81,7 +81,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.309.2.9");
+vtkCxxRevisionMacro(vtkPVSource, "1.309.2.10");
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -2450,12 +2450,20 @@ int vtkPVSource::InitializeData()
       translatorTclName[0] = '\0';
       if ( ! input)
         {
-        sprintf(translatorTclName, "%sTranslator%d", this->GetName(), idx);
-        pm->ServerScript("vtkPVExtentTranslator %s", translatorTclName);
-        pm->ServerScript("${%s} SetExtentTranslator %s",
-                         dataName, translatorTclName);
+        // Do not overwrite custom extent translators.
+        // PVExtent translator should really be the default,
+        // Then we would not need to do this.
+        pm->RootScript("[${%s} GetExtentTranslator] GetClassName",
+                       dataName);
+        if (strcmp(pm->GetRootResult(),"vtkExtentTranslator") == 0)
+          {
+          sprintf(translatorTclName, "%sTranslator%d", this->GetName(), idx);
+          pm->ServerScript("vtkPVExtentTranslator %s", translatorTclName);
+          pm->ServerScript("${%s} SetExtentTranslator %s",
+                           dataName, translatorTclName);
+          }
         }
-
+      
       part->InsertExtractPiecesIfNecessary();
       
       if (translatorTclName[0])

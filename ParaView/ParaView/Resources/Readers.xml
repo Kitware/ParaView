@@ -228,7 +228,6 @@
                  type="int" 
                  help="Set the number of ghost levels to read."/>
   </Module>
-<!--
   <Module name="ensightMS" class="vtkPVEnSightReaderModule"
           root_name="EnsightMS" 
           module_type="Reader"
@@ -238,8 +237,6 @@
     <ArraySelection attribute_name="Point" trace_name="PointArrays"/>
     <ArraySelection attribute_name="Cell" trace_name="CellArrays"/>
   </Module>
--->
-
 <Module name="ImageReader" menu_name="Raw File Reader" root_name="ImageRead" 
         module_type="Reader" class="vtkPVRawReaderModule"
         extensions=".raw" file_description="Raw (binary) Files"
