@@ -12,9 +12,11 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
+
 // .NAME vtkMPIMoveData - For distributed tiled displays.
-// .DESCRIPTION
-// This class combines all the duplicate and collection requirments
+//
+// .SECTION Description
+// This class combines all the duplicate and collection requirements
 // into one filter.
 
 #ifndef __vtkMPIMoveData_h

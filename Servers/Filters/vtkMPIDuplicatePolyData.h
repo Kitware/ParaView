@@ -12,9 +12,11 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
+
 // .NAME vtkMPIDuplicatePolyData - For distributed tiled displays.
-// .DESCRIPTION
-// This filter collects poly data and duplicates it on every node.
+//
+// .SECTION Description
+// This filter collects polydata and duplicates it on every node.
 // Converts data parallel so every node has a complete copy of the data.
 // The filter is used at the end of a pipeline for driving a tiled
 // display.  This version uses MPI Gather and Broadcast.

@@ -12,20 +12,21 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
+
 // .NAME vtkPVDuplicatePolyData - For distributed tiled displays.
-// .DESCRIPTION
-// This filter collects poly data from all nodes 
+//
+// .SECTION Description
+// This filter collects polydata from all nodes 
 // and duplicates it on every display node.
 // Converts data parallel so every display node has a complete 
 // copy of the data.  The filter is used at the end of a pipeline 
 // for driving a tiled display.  This filter does not duplicate if the
 // data will be over a specified threshold memory size.
-// .NOTE
+//
+// .SECTION Note
 // This filter uses binary trees to try to involve all processes.
 // I do not know if this is any better than just direct sends.
 // It may be worse.
-
-
 
 #ifndef __vtkPVDuplicatePolyData_h
 #define __vtkPVDuplicatePolyData_h
