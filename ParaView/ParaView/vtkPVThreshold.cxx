@@ -350,6 +350,7 @@ void vtkPVThreshold::SaveInTclScript(ofstream *file)
 //        << this->MinMaxScale->GetMaxValue() << "\n\t";
   
   this->MinMaxScale->SaveInTclScript(file, this->VTKSourceTclName);
+  *file << "\t";
   this->AllScalarsCheck->SaveInTclScript(file, this->VTKSourceTclName);
   *file << "\n";
   
