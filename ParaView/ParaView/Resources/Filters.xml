@@ -26,7 +26,6 @@
         short_help="Puts all input arrays into the single output.">
   <Filter class="vtkMergeArrays" >
     <Input name="Input" class="vtkDataSet" quantity="Multiple" > 
-      <ArrayRequirement /> 
       <GroupRequirement quantity="Multiple" /> 
     </Input> 
   </Filter>
