@@ -77,7 +77,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.137");
+vtkCxxRevisionMacro(vtkPVData, "1.138");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -1370,7 +1370,7 @@ void vtkPVData::UpdateProperties()
   // the data, not the rendered geometry.
   // It the solution communication in the PVLodActor?
   int numberOfPoints = this->GetNumberOfPoints();
-  if ( ! this->RenderOnlyLocally)
+  if ( ! this->RenderOnlyLocally && this->GetPVRenderView() )
     {
     if (numberOfPoints > this->GetPVRenderView()->GetLODThreshold())
       {
@@ -2796,7 +2796,7 @@ void vtkPVData::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVData ";
-  this->ExtractRevision(os,"$Revision: 1.137 $");
+  this->ExtractRevision(os,"$Revision: 1.138 $");
 }
 
 //----------------------------------------------------------------------------
