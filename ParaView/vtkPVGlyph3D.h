@@ -83,7 +83,6 @@ protected:
   vtkPVGlyph3D(const vtkPVGlyph3D&) {};
   void operator=(const vtkPVGlyph3D&) {};
 
-  vtkGlyph3D* Glyph3D;
   char *GlyphSourceTclName;
   char *GlyphScaleMode;
   char *GlyphVectorMode;

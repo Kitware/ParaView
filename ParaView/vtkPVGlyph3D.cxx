@@ -39,7 +39,6 @@ vtkPVGlyph3D::vtkPVGlyph3D()
 {
   this->CommandFunction = vtkPVGlyph3DCommand;
   
-  this->Glyph3D = NULL;
   this->GlyphSourceTclName = NULL;
   this->GlyphScaleMode = NULL;
   this->GlyphVectorMode = NULL;
@@ -116,12 +115,6 @@ void vtkPVGlyph3D::CreateProperties()
   
   this->vtkPVSource::CreateProperties();
   
-  this->Glyph3D = (vtkGlyph3D*)this->GetVTKSource();
-  if (!this->Glyph3D)
-    {
-    return;
-    }
-
   this->GlyphSourceFrame->SetParent(this->GetParameterFrame()->GetFrame());
   this->GlyphSourceFrame->Create(pvApp, "frame", "");
   this->Script("pack %s -side top -fill x",
