@@ -60,6 +60,7 @@ struct RenderWindowInfoInt {
   int ReducedSize[2];
   int NumberOfRenderers;
   int ImageReductionFactor;
+  int UseCompositing;
 };
 struct RenderWindowInfoFloat {
   float DesiredUpdateRate;
@@ -88,7 +89,7 @@ const int REN_INFO_INT_SIZE = sizeof(RendererInfoInt)/sizeof(int);
 const int REN_INFO_FLOAT_SIZE = sizeof(RendererInfoFloat)/sizeof(float);
 const int LIGHT_INFO_FLOAT_SIZE = sizeof(LightInfoFloat)/sizeof(float);
 
-vtkCxxRevisionMacro(vtkParallelRenderManager, "1.2.2.1");
+vtkCxxRevisionMacro(vtkParallelRenderManager, "1.2.2.2");
 
 vtkParallelRenderManager::vtkParallelRenderManager()
 {
@@ -110,6 +111,7 @@ vtkParallelRenderManager::vtkParallelRenderManager()
   this->WriteBackImages = 1;
   this->MagnifyImages = 1;
   this->RenderEventPropagation = 1;
+  this->UseCompositing = 1;
 
   this->FullImage = vtkUnsignedCharArray::New();
   this->ReducedImage = vtkUnsignedCharArray::New();
@@ -141,6 +143,8 @@ void vtkParallelRenderManager::PrintSelf(ostream &os, vtkIndent indent)
      << (this->ParallelRendering ? "on" : "off") << endl;
   os << indent << "RenderEventPropagation: "
      << (this->RenderEventPropagation ? "on" : "off") << endl;
+  os << indent << "UseCompositing: "
+     << (this->UseCompositing ? "on" : "off") << endl;
 
   os << indent << "ObservingRendererWindow: "
      << (this->ObservingRenderWindow ? "yes" : "no") << endl;
@@ -545,6 +549,7 @@ void vtkParallelRenderManager::StartRender()
   winInfoInt.ReducedSize[1] = this->ReducedImageSize[1];
   winInfoInt.NumberOfRenderers = rens->GetNumberOfItems();
   winInfoInt.ImageReductionFactor = this->ImageReductionFactor;
+  winInfoInt.UseCompositing = this->UseCompositing;
   winInfoFloat.DesiredUpdateRate = this->RenderWindow->GetDesiredUpdateRate();
 
   for (id = 0; id < numProcs; id++)
@@ -589,6 +594,9 @@ void vtkParallelRenderManager::StartRender()
     cam->GetClippingRange(renInfoFloat.CameraClippingRange);
     ren->GetBackground(renInfoFloat.Background);
 
+    cam->SetWindowCenter(0.0, 0.0);
+
+
     vtkLightCollection *lc = ren->GetLights();
     renInfoInt.NumberOfLights = lc->GetNumberOfItems();
 
@@ -608,12 +616,12 @@ void vtkParallelRenderManager::StartRender()
       light->GetFocalPoint(lightInfoFloat.FocalPoint);
 
       for (id = 0; id < numProcs; id++)
-  {
-  if (id == this->RootProcessId) continue;
-  this->Controller->Send((float *)(&lightInfoFloat),
+        {
+        if (id == this->RootProcessId) continue;
+        this->Controller->Send((float *)(&lightInfoFloat),
              LIGHT_INFO_FLOAT_SIZE, id,
              vtkParallelRenderManager::LIGHT_INFO_FLOAT_TAG);
-  }
+        }
       }
 
     this->SendRendererInformation(ren);
@@ -632,6 +640,12 @@ void vtkParallelRenderManager::EndRender()
   this->Timer->StopTimer();
   this->RenderTime = this->Timer->GetElapsedTime();
   this->ImageProcessingTime = 0;
+
+  if (!this->UseCompositing)
+    {
+    this->Lock = 0;
+    return;
+    }
 
   this->PostRenderProcessing();
 
@@ -692,6 +706,7 @@ void vtkParallelRenderManager::SatelliteStartRender()
   this->ReceiveWindowInformation();
 
   this->RenderWindow->SetDesiredUpdateRate(winInfoFloat.DesiredUpdateRate);
+  this->UseCompositing = winInfoInt.UseCompositing;
   this->ImageReductionFactor = winInfoInt.ImageReductionFactor;
   this->FullImageSize[0] = winInfoInt.FullSize[0];
   this->FullImageSize[1] = winInfoInt.FullSize[1];
@@ -725,6 +740,7 @@ void vtkParallelRenderManager::SatelliteStartRender()
       cam->SetFocalPoint(renInfoFloat.CameraFocalPoint);
       cam->SetViewUp(renInfoFloat.CameraViewUp);
       cam->SetClippingRange(renInfoFloat.CameraClippingRange);
+      cam->SetWindowCenter(0.0, 0.0);
       lc = ren->GetLights();
       lc->InitTraversal();
       }
@@ -756,10 +772,10 @@ void vtkParallelRenderManager::SatelliteStartRender()
       {
       vtkLight *light;
       while ((light = lc->GetNextItem()))
-  {
-  // To many lights?  Just remove the extras.
-  ren->RemoveLight(light);
-  }
+        {
+        // To many lights?  Just remove the extras.
+        ren->RemoveLight(light);
+        }
       }
 
     this->ReceiveRendererInformation(ren);
@@ -771,6 +787,10 @@ void vtkParallelRenderManager::SatelliteStartRender()
 void vtkParallelRenderManager::SatelliteEndRender()
 {
   if (!this->ParallelRendering)
+    {
+    return;
+    }
+  if (!this->UseCompositing)
     {
     return;
     }
@@ -894,6 +914,10 @@ void vtkParallelRenderManager::ComputeVisiblePropBounds(vtkRenderer *ren,
   ren->ComputeVisiblePropBounds(bounds);
 
   if (!this->ParallelRendering)
+    {
+    return;
+    }
+  if (!this->UseCompositing)
     {
     return;
     }

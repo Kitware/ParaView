@@ -155,6 +155,14 @@ public:
   vtkBooleanMacro(RenderEventPropagation, int);
 
   // Description:
+  // This is used for tiled display rendering.  When data has been
+  // duplicated on all processes, then we do not need to compositing.
+  // Cameras and renders are still propagated though.
+  vtkSetMacro(UseCompositing, int);
+  vtkGetMacro(UseCompositing, int);
+  vtkBooleanMacro(UseCompositing, int);
+
+  // Description:
   // Set/Get the reduction factor (for sort-last based parallel renderers).
   // The size of rendered image is divided by the reduction factor and then
   // is blown up to the size of the current vtkRenderWindow.  Setting
@@ -302,6 +310,7 @@ protected:
   int Lock;
   int ParallelRendering;
   int RenderEventPropagation;
+  int UseCompositing;
 
   vtkTimerLog *Timer;
 
