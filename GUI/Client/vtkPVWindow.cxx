@@ -127,7 +127,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.577");
+vtkCxxRevisionMacro(vtkPVWindow, "1.578");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -1178,73 +1178,100 @@ void vtkPVWindow::Create(vtkKWApplication *app, const char* vtkNotUsed(args))
     // Create the sources that can be used for glyphing.
     // ===== Arrow
     pvs = this->CreatePVSource("ArrowSource", "GlyphSources", 0, 0);
-    pvs->IsPermanentOn();
-    pvs->HideDisplayPageOn();
-    pvs->HideInformationPageOn();
-    pvs->Accept(1);
-    pvs->SetTraceReferenceObject(this);
-    {
-    ostrstream s;
-    s << "GetPVSource GlyphSources " << pvs->GetName() << ends;
-    pvs->SetTraceReferenceCommand(s.str());
-    s.rdbuf()->freeze(0);
-    }
+    if (pvs)
+      {
+      pvs->IsPermanentOn();
+      pvs->HideDisplayPageOn();
+      pvs->HideInformationPageOn();
+      pvs->Accept(1);
+      pvs->SetTraceReferenceObject(this);
+      ostrstream s;
+      s << "GetPVSource GlyphSources " << pvs->GetName() << ends;
+      pvs->SetTraceReferenceCommand(s.str());
+      s.rdbuf()->freeze(0);
+      }
+    else
+      {
+      vtkErrorMacro("Could not create glyph source: ArrowSource");
+      }
     
     // ===== Cone
     pvs = this->CreatePVSource("ConeSource", "GlyphSources", 0, 0);
-    pvs->IsPermanentOn();
-    pvs->HideDisplayPageOn();
-    pvs->HideInformationPageOn();
-    pvs->Accept(1);
-    pvs->SetTraceReferenceObject(this);
-    {
-    ostrstream s;
-    s << "GetPVSource GlyphSources " << pvs->GetName() << ends;
-    pvs->SetTraceReferenceCommand(s.str());
-    s.rdbuf()->freeze(0);
-    }
+    if (pvs)
+      {
+      pvs->IsPermanentOn();
+      pvs->HideDisplayPageOn();
+      pvs->HideInformationPageOn();
+      pvs->Accept(1);
+      pvs->SetTraceReferenceObject(this);
+      ostrstream s;
+      s << "GetPVSource GlyphSources " << pvs->GetName() << ends;
+      pvs->SetTraceReferenceCommand(s.str());
+      s.rdbuf()->freeze(0);
+      }
+    else
+      {
+      vtkErrorMacro("Could not create glyph source: ConeSource");
+      }
     
     // ==== Line
     pvs = this->CreatePVSource("LineSource", "GlyphSources", 0, 0);
-    pvs->IsPermanentOn();
-    pvs->HideDisplayPageOn();
-    pvs->HideInformationPageOn();
-    pvs->Accept(1);
-    pvs->SetTraceReferenceObject(this);
-    {
-    ostrstream s;
-    s << "GetPVSource GlyphSources " << pvs->GetName() << ends;
-    pvs->SetTraceReferenceCommand(s.str());
-    s.rdbuf()->freeze(0);
-    }
+    if (pvs)
+      {
+      pvs->IsPermanentOn();
+      pvs->HideDisplayPageOn();
+      pvs->HideInformationPageOn();
+      pvs->Accept(1);
+      pvs->SetTraceReferenceObject(this);
+      ostrstream s;
+      s << "GetPVSource GlyphSources " << pvs->GetName() << ends;
+      pvs->SetTraceReferenceCommand(s.str());
+      s.rdbuf()->freeze(0);
+      }
+    else
+      {
+      vtkErrorMacro("Could not create glyph source: LineSource");
+      }
+
     
     // ===== Sphere
     pvs = this->CreatePVSource("SphereSource", "GlyphSources", 0, 0);
-    pvs->IsPermanentOn();
-    pvs->HideDisplayPageOn();
-    pvs->HideInformationPageOn();
-    pvs->Accept(1);
-    pvs->SetTraceReferenceObject(this);
-    {
-    ostrstream s;
-    s << "GetPVSource GlyphSources " << pvs->GetName() << ends;
-    pvs->SetTraceReferenceCommand(s.str());
-    s.rdbuf()->freeze(0);
-    }
+    if (pvs)
+      {
+      pvs->IsPermanentOn();
+      pvs->HideDisplayPageOn();
+      pvs->HideInformationPageOn();
+      pvs->Accept(1);
+      pvs->SetTraceReferenceObject(this);
+      ostrstream s;
+      s << "GetPVSource GlyphSources " << pvs->GetName() << ends;
+      pvs->SetTraceReferenceCommand(s.str());
+      s.rdbuf()->freeze(0);
+      }
+    else
+      {
+      vtkErrorMacro("Could not create glyph source: SphereSource");
+      }
 
     // ===== Sphere
     pvs = this->CreatePVSource("GlyphSource2D", "GlyphSources", 0, 0);
-    pvs->IsPermanentOn();
-    pvs->HideDisplayPageOn();
-    pvs->HideInformationPageOn();
-    pvs->Accept(1);
-    pvs->SetTraceReferenceObject(this);
-    {
-    ostrstream s;
-    s << "GetPVSource GlyphSources " << pvs->GetName() << ends;
-    pvs->SetTraceReferenceCommand(s.str());
-    s.rdbuf()->freeze(0);
-    }
+    if (pvs)
+      {
+      pvs->IsPermanentOn();
+      pvs->HideDisplayPageOn();
+      pvs->HideInformationPageOn();
+      pvs->Accept(1);
+      pvs->SetTraceReferenceObject(this);
+      ostrstream s;
+      s << "GetPVSource GlyphSources " << pvs->GetName() << ends;
+      pvs->SetTraceReferenceCommand(s.str());
+      s.rdbuf()->freeze(0);
+      }
+    else
+      {
+      vtkErrorMacro("Could not create glyph source: GlyphSource2D");
+      }
+
     }
   else
     {
