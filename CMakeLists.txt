@@ -24,6 +24,11 @@ IF(PARAVIEW_LINK_XDMF)
   SUBDIRS(Xdmf)
 ENDIF(PARAVIEW_LINK_XDMF)
 
+# Tell Dart.cmake to generate the Experimental test target with the
+# project name.  This avoids the conflict in msdev between the
+# Experimental testing targets for VTK and ParaView.
+SET(DART_EXPERIMENTAL_USE_PROJECT_NAME 1)
+
 SUBDIRS(ParaView)
 
 IF(USE_INCLUDED_TCLTK)
