@@ -1,21 +1,4 @@
-PLATFORM="sparc-sunos57-static"
-CC="gcc"
-CXX="c++"
-
-# Write entries into the cache file before building cmake.
-write_cache()
-{
-BINDIR=`pwd`
-
-cat > UserMakeRules.cmake <<EOF
-SET(CMAKE_DL_LIBS "")
-EOF
-
-cat > CMakeCache.txt <<EOF
-BUILD_TESTING:BOOL=ON
-CMAKE_EXE_LINKER_FLAGS:STRING=-Wl,-Bdynamic -ldl -Wl,-Bstatic
-CMAKE_USER_MAKE_RULES_OVERRIDE:STRING=${BINDIR}/UserMakeRules.cmake
-CMAKE_SKIP_RPATH:BOOL=1
-CMAKE_VERBOSE_MAKEFILE:BOOL=TRUE
-EOF
-}
+PLATFORM="sparc-sunos57"
+CC="cc"
+CXX="CC"
+CMAKE="/space/berk/Dashboards/CMake-CC/bin/cmake"
