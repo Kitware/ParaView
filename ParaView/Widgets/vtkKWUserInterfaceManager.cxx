@@ -49,7 +49,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkObjectFactory.h"
 
 //------------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkKWUserInterfaceManager, "1.5");
+vtkCxxRevisionMacro(vtkKWUserInterfaceManager, "1.6");
 
 int vtkKWUserInterfaceManagerCommand(ClientData cd, Tcl_Interp *interp,
                                      int argc, char *argv[]);
@@ -191,6 +191,7 @@ void vtkKWUserInterfaceManager::SetEnabled(int arg)
     if (it->GetData(panel_slot) == VTK_OK)
       {
       panel_slot->Panel->SetEnabled(arg);
+      panel_slot->Panel->Update();
       }
     it->GoToNextItem();
     }
