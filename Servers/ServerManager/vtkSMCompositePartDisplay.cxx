@@ -34,7 +34,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMCompositePartDisplay);
-vtkCxxRevisionMacro(vtkSMCompositePartDisplay, "1.1");
+vtkCxxRevisionMacro(vtkSMCompositePartDisplay, "1.2");
 
 
 //----------------------------------------------------------------------------
@@ -147,6 +147,7 @@ void vtkSMCompositePartDisplay::CreateVTKObjects(int num)
         << vtkClientServerStream::Invoke
         << this->CollectProxy->GetID(i) << "SetMoveModeToPassThrough"
         << vtkClientServerStream::End;
+      pm->SendStream(vtkProcessModule::CLIENT_AND_SERVERS);
 
       // For the render server feature.
       pm->GetStream()
@@ -154,7 +155,8 @@ void vtkSMCompositePartDisplay::CreateVTKObjects(int num)
         << this->CollectProxy->GetID(i) << "SetMPIMToNSocketConnection" 
         << pm->GetMPIMToNSocketConnectionID()
         << vtkClientServerStream::End;
-      pm->SendStream(vtkProcessModule::CLIENT_AND_SERVERS);
+      pm->SendStream(
+        vtkProcessModule::DATA_SERVER|vtkProcessModule::RENDER_SERVER);
       }
 
     vtkClientServerStream cmd;
