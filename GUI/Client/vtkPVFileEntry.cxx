@@ -40,7 +40,7 @@
 #include "vtkSMStringListDomain.h"
 #include "vtkSMStringVectorProperty.h"
 
-#define MAX_FILES_ON_THE_LIST 100
+#define MAX_FILES_ON_THE_LIST 500
 
 //===========================================================================
 //***************************************************************************
@@ -72,7 +72,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVFileEntry);
-vtkCxxRevisionMacro(vtkPVFileEntry, "1.97");
+vtkCxxRevisionMacro(vtkPVFileEntry, "1.98");
 
 //----------------------------------------------------------------------------
 vtkPVFileEntry::vtkPVFileEntry()
