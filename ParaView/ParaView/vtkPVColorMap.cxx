@@ -76,7 +76,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVProcessModule.h"
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVColorMap);
-vtkCxxRevisionMacro(vtkPVColorMap, "1.67");
+vtkCxxRevisionMacro(vtkPVColorMap, "1.68");
 
 int vtkPVColorMapCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -121,6 +121,19 @@ public:
   vtkPVColorMap* PVColorMap;
 };
 
+#define VTK_PV_COLOR_MAP_RED_HUE 0.0
+#define VTK_PV_COLOR_MAP_RED_SATURATION 1.0
+#define VTK_PV_COLOR_MAP_RED_VALUE 1.0
+#define VTK_PV_COLOR_MAP_BLUE_HUE 0.6667
+#define VTK_PV_COLOR_MAP_BLUE_SATURATION 1.0
+#define VTK_PV_COLOR_MAP_BLUE_VALUE 1.0
+#define VTK_PV_COLOR_MAP_BLACK_HUE 0.0
+#define VTK_PV_COLOR_MAP_BLACK_SATURATION 0.0
+#define VTK_PV_COLOR_MAP_BLACK_VALUE 0.0
+#define VTK_PV_COLOR_MAP_WHITE_HUE 0.0
+#define VTK_PV_COLOR_MAP_WHITE_SATURATION 0.0
+#define VTK_PV_COLOR_MAP_WHITE_VALUE 1.0
+
 //***************************************************************************
 //===========================================================================
 //vtkCxxSetObjectMacro(vtkPVColorMap,PVRenderView,vtkPVRenderView);
@@ -151,12 +164,12 @@ vtkPVColorMap::vtkPVColorMap()
   this->ScalarRange[1] = 1.0;
   this->Initialized = 0;
 
-  this->StartHSV[0] = 0.0;
-  this->StartHSV[1] = 1.0;
-  this->StartHSV[2] = 1.0;
-  this->EndHSV[0] = 0.6667;
-  this->EndHSV[1] = 1.0;
-  this->EndHSV[2] = 1.0;
+  this->StartHSV[0] = VTK_PV_COLOR_MAP_RED_HUE;
+  this->StartHSV[1] = VTK_PV_COLOR_MAP_RED_SATURATION;
+  this->StartHSV[2] = VTK_PV_COLOR_MAP_RED_VALUE;
+  this->EndHSV[0] = VTK_PV_COLOR_MAP_BLUE_HUE;
+  this->EndHSV[1] = VTK_PV_COLOR_MAP_BLUE_SATURATION;
+  this->EndHSV[2] = VTK_PV_COLOR_MAP_BLUE_VALUE;
 
   this->NumberOfColors = 256;
 
@@ -1228,12 +1241,12 @@ void vtkPVColorMap::SetNumberOfColors(int num)
 //----------------------------------------------------------------------------
 void vtkPVColorMap::SetColorSchemeToRedBlue()
 {
-  this->StartHSV[0] = 0.0;
-  this->StartHSV[1] = 1.0;
-  this->StartHSV[2] = 1.0;
-  this->EndHSV[0] = 0.66667;
-  this->EndHSV[1] = 1.0;
-  this->EndHSV[2] = 1.0;
+  this->StartHSV[0] = VTK_PV_COLOR_MAP_RED_HUE;
+  this->StartHSV[1] = VTK_PV_COLOR_MAP_RED_SATURATION;
+  this->StartHSV[2] = VTK_PV_COLOR_MAP_RED_VALUE;
+  this->EndHSV[0] = VTK_PV_COLOR_MAP_BLUE_HUE;
+  this->EndHSV[1] = VTK_PV_COLOR_MAP_BLUE_SATURATION;
+  this->EndHSV[2] = VTK_PV_COLOR_MAP_BLUE_VALUE;
 
   this->StartColorButton->SetColor(1.0, 0.0, 0.0);
   this->EndColorButton->SetColor(0.0, 0.0, 1.0);
@@ -1245,12 +1258,12 @@ void vtkPVColorMap::SetColorSchemeToRedBlue()
 //----------------------------------------------------------------------------
 void vtkPVColorMap::SetColorSchemeToBlueRed()
 {
-  this->StartHSV[0] = 0.66667;
-  this->StartHSV[1] = 1.0;
-  this->StartHSV[2] = 1.0;
-  this->EndHSV[0] = 0.0;
-  this->EndHSV[1] = 1.0;
-  this->EndHSV[2] = 1.0;
+  this->StartHSV[0] = VTK_PV_COLOR_MAP_BLUE_HUE;
+  this->StartHSV[1] = VTK_PV_COLOR_MAP_BLUE_SATURATION;
+  this->StartHSV[2] = VTK_PV_COLOR_MAP_BLUE_VALUE;
+  this->EndHSV[0] = VTK_PV_COLOR_MAP_RED_HUE;
+  this->EndHSV[1] = VTK_PV_COLOR_MAP_RED_SATURATION;
+  this->EndHSV[2] = VTK_PV_COLOR_MAP_RED_VALUE;
 
   this->StartColorButton->SetColor(0.0, 0.0, 1.0);
   this->EndColorButton->SetColor(1.0, 0.0, 0.0);
@@ -1264,12 +1277,12 @@ void vtkPVColorMap::SetColorSchemeToBlueRed()
 //----------------------------------------------------------------------------
 void vtkPVColorMap::SetColorSchemeToGrayscale()
 {
-  this->StartHSV[0] = 0.0;
-  this->StartHSV[1] = 0.0;
-  this->StartHSV[2] = 0.0;
-  this->EndHSV[0] = 0.0;
-  this->EndHSV[1] = 0.0;
-  this->EndHSV[2] = 1.0;
+  this->StartHSV[0] = VTK_PV_COLOR_MAP_BLACK_HUE;
+  this->StartHSV[1] = VTK_PV_COLOR_MAP_BLACK_SATURATION;
+  this->StartHSV[2] = VTK_PV_COLOR_MAP_BLACK_VALUE;
+  this->EndHSV[0] = VTK_PV_COLOR_MAP_WHITE_HUE;
+  this->EndHSV[1] = VTK_PV_COLOR_MAP_WHITE_SATURATION;
+  this->EndHSV[2] = VTK_PV_COLOR_MAP_WHITE_VALUE;
 
   this->StartColorButton->SetColor(0.0, 0.0, 0.0);
   this->EndColorButton->SetColor(1.0, 1.0, 1.0);
@@ -2186,18 +2199,13 @@ void vtkPVColorMap::SaveState(ofstream *file)
   *file << "$kw(" << this->GetTclName() << ") SetScalarRange " 
         << this->ScalarRange[0] << " " << this->ScalarRange[1] << endl;
 
-  if (this->StartHSV[0] != 0 || this->StartHSV[1] != 1 || this->StartHSV[2] != 1)
-    {
-    *file << "$kw(" << this->GetTclName() << ") SetStartHSV " 
-          << this->StartHSV[0] << " " << this->StartHSV[1] << " " 
-          << this->StartHSV[2] << endl;
-    }
-  if (this->EndHSV[0] != 2.0/6.0 || this->EndHSV[1] != 1 || this->EndHSV[2] != 1)
-    {
-    *file << "$kw(" << this->GetTclName() << ") SetEndHSV " 
-          << this->EndHSV[0] << " " << this->EndHSV[1] << " " 
-          << this->EndHSV[2] << endl;
-    }
+  *file << "$kw(" << this->GetTclName() << ") SetStartHSV " 
+        << this->StartHSV[0] << " " << this->StartHSV[1] << " " 
+        << this->StartHSV[2] << endl;
+  *file << "$kw(" << this->GetTclName() << ") SetEndHSV " 
+        << this->EndHSV[0] << " " << this->EndHSV[1] << " " 
+        << this->EndHSV[2] << endl;
+
   if (this->NumberOfColors != 256)
     {
     *file << "$kw(" << this->GetTclName() << ") SetNumberOfColors " 
