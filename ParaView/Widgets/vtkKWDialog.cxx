@@ -78,6 +78,20 @@ int vtkKWDialog::Invoke()
   this->Done = 0;
 
   this->Application->SetDialogUp(1);
+
+  if ( this->GetMasterWindow() )
+    {
+    int width, height, x, y;
+    this->Script("wm geometry %s", this->GetMasterWindow()->GetWidgetName());
+    sscanf(this->GetApplication()->GetMainInterp()->result, "%dx%d+%d+%d",
+	   &width, &height, &x, &y);
+    x += width/2;
+    y += height/2;
+    this->Script("wm geometry %s +%d+%d", this->GetWidgetName(),
+		 x, y);
+    }
+  this->Script("update idletasks");
+
   // map the window
   this->Script("wm deiconify %s",this->GetWidgetName());
   this->Script("focus %s",this->GetWidgetName());

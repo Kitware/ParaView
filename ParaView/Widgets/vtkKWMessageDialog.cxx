@@ -250,19 +250,7 @@ int vtkKWMessageDialog::Invoke()
     this->SetBind("<Left>", "focus [ tk_focusPrev %W ]");
     }
   
-  if ( this->GetMasterWindow() )
-    {
-    int width, height, x, y;
-    this->Script("wm geometry %s", this->GetMasterWindow()->GetWidgetName());
-    sscanf(this->GetApplication()->GetMainInterp()->result, "%dx%d+%d+%d",
-	   &width, &height, &x, &y);
-    x += width/2;
-    y += height/2;
-    this->Script("wm geometry %s +%d+%d", this->GetWidgetName(),
-		 x, y);
-    }
   this->Script("wm resizable %s 0 0", this->GetWidgetName());
-  this->Script("update idletasks");
 
   int res = vtkKWDialog::Invoke();
   if ( this->DialogName && this->GetRememberMessage() )
