@@ -54,6 +54,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWRadioButton.h"
 #include "vtkKWScale.h"
 #include "vtkKWSplitFrame.h"
+#include "vtkKWWindowCollection.h"
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
@@ -83,11 +84,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkOpenGLRenderer.h"
 #endif
 
-
+#define VTK_PV_NAV_FRAME_SIZE_REG_KEY "NavigationFrameSize"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.213.2.4");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.213.2.5");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -590,6 +591,19 @@ void vtkPVRenderView::PrepareForDelete()
     pvapp->SetRegisteryValue(2, "RunTime", "UseCompressionInComposite", "%d",
                              this->CompositeCompressionCheck->GetState());
 #endif
+
+    // If it's the last win, save the size of the nav frame
+
+    if (pvapp->GetWindows()->GetNumberOfItems() <= 1 &&
+        pvapp->HasRegisteryValue(
+          2, "Geometry", VTK_KW_SAVE_WINDOW_GEOMETRY_REG_KEY) &&
+        pvapp->GetIntRegisteryValue(
+          2, "Geometry", VTK_KW_SAVE_WINDOW_GEOMETRY_REG_KEY))
+      {
+      pvapp->SetRegisteryValue(
+        2, "Geometry", VTK_PV_NAV_FRAME_SIZE_REG_KEY, "%d", 
+        this->SplitFrame->GetFrame1Size());
+      }
     }
 
   // Circular reference.
@@ -735,10 +749,25 @@ void vtkPVRenderView::Create(vtkKWApplication *app, const char *args)
 
   this->SplitFrame->SetParent(this->GetPropertiesParent());
   this->SplitFrame->SetOrientationToVertical();
-  this->SplitFrame->Create(this->Application);
-  this->SplitFrame->SetFrame1MinimumSize(80);
-  this->SplitFrame->SetFrame1Size(80);
   this->SplitFrame->SetSeparatorSize(5);
+  this->SplitFrame->SetFrame1MinimumSize(80);
+
+  if (this->Application->HasRegisteryValue(
+    2, "Geometry", VTK_KW_SAVE_WINDOW_GEOMETRY_REG_KEY) &&
+      this->Application->GetIntRegisteryValue(
+        2, "Geometry", VTK_KW_SAVE_WINDOW_GEOMETRY_REG_KEY) &&
+      this->Application->HasRegisteryValue(
+        2, "Geometry", VTK_PV_NAV_FRAME_SIZE_REG_KEY))
+    {
+    this->SplitFrame->SetFrame1Size(this->Application->GetIntRegisteryValue(
+      2, "Geometry", VTK_PV_NAV_FRAME_SIZE_REG_KEY));
+    }
+  else
+    {
+    this->SplitFrame->SetFrame1Size(80);
+    }
+
+  this->SplitFrame->Create(this->Application);
   this->Script("pack %s -fill both -expand t -side top", 
                this->SplitFrame->GetWidgetName());
 
@@ -780,12 +809,11 @@ void vtkPVRenderView::Create(vtkKWApplication *app, const char *args)
                this->NavigationWindowButton->GetWidgetName(),
                this->NavigationFrame->GetLabel()->GetWidgetName());
 
-  if (this->Application->GetRegisteryValue(2, 
-                                           "SourcesBrowser", 
-                                           "SelectionWindow", 0))
+  if (this->Application->HasRegisteryValue(2, "RunTime", "SourcesBrowser"))
     {
-    if ( this->Application->BooleanRegisteryCheck(2, "SourcesBrowser",
-                                                  "SelectionWindow") )
+    if (this->Application->BooleanRegisteryCheck(2, "RunTime", 
+                                                 "SourcesBrowser",
+                                                 "SelectionWindow"))
       {
       this->ShowSelectionWindowCallback(0);
       }
@@ -2341,7 +2369,7 @@ void vtkPVRenderView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVRenderView ";
-  this->ExtractRevision(os,"$Revision: 1.213.2.4 $");
+  this->ExtractRevision(os,"$Revision: 1.213.2.5 $");
 }
 
 //------------------------------------------------------------------------------
