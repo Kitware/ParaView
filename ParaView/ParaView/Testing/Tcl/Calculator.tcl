@@ -7,13 +7,12 @@
         }
     } 
 
-
 set pv(vtkTemp1) [Application GetMainWindow]
 set pv(vtkTemp43) [$pv(vtkTemp1) GetMainView]
 set pv(vtkTemp89) [$pv(vtkTemp1) GetGlyphSource Arrow]
 set pv(vtkTemp93) [$pv(vtkTemp1) GetGlyphSource Cone]
 set pv(vtkTemp97) [$pv(vtkTemp1) GetGlyphSource Sphere]
-set pv(vtkTemp100) [$pv(vtkTemp1) Open {$DataDir/Data/blow.vtk}]
+set pv(vtkTemp100) [$pv(vtkTemp1) Open "$DataDir/Data/blow.vtk"]
 set pv(vtkTemp156) [$pv(vtkTemp1) CalculatorCallback]
 $pv(vtkTemp156) AddVectorVariable displacement6 displacement6
 $pv(vtkTemp156) AddScalarVariable thickness6 thickness6 0
