@@ -265,9 +265,8 @@ void vtkPVWindow::Create(vtkKWApplication *app, char *args)
   delete [] rbv;
 
   // create the top level
-  this->MenuFile->InsertCommand(0,"New Window", this, "NewWindow");
-  this->MenuFile->InsertCommand(1, "Open Data File", this, "Open");
-  this->MenuFile->InsertCommand(2, "Save Tcl script", this, "Save");
+  this->MenuFile->InsertCommand(0, "Open Data File", this, "Open");
+  this->MenuFile->InsertCommand(1, "Save Tcl script", this, "Save");
   
   this->SelectMenu->SetParent(this->GetMenu());
   this->SelectMenu->Create(this->Application, "-tearoff 0");
