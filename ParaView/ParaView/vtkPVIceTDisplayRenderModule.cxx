@@ -54,7 +54,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVIceTDisplayRenderModule);
-vtkCxxRevisionMacro(vtkPVIceTDisplayRenderModule, "1.2");
+vtkCxxRevisionMacro(vtkPVIceTDisplayRenderModule, "1.3");
 
 
 
@@ -134,6 +134,7 @@ void vtkPVIceTDisplayRenderModule::SetPVApplication(vtkPVApplication *pvApp)
     (vtkRenderWindow*)pvApp->MakeTclObject("vtkRenderWindow", "RenWin1");
 
   pm->ServerScript("Ren1 Delete");
+  pm->ServerScript("RenWin1 FullScreenOn");
   pm->ServerScript("vtkIceTRenderer Ren1");
 
   if (pvApp->GetUseStereoRendering())

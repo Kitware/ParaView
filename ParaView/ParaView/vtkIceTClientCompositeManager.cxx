@@ -52,7 +52,7 @@
 #endif
 
 
-vtkCxxRevisionMacro(vtkIceTClientCompositeManager, "1.1");
+vtkCxxRevisionMacro(vtkIceTClientCompositeManager, "1.2");
 vtkStandardNewMacro(vtkIceTClientCompositeManager);
 
 vtkCxxSetObjectMacro(vtkIceTClientCompositeManager,Compositer,vtkCompositer);
@@ -121,7 +121,7 @@ vtkIceTClientCompositeManager::vtkIceTClientCompositeManager()
   this->Compositer = vtkCompressCompositer::New();
   //this->Compositer = vtkTreeCompositer::New();
 
-  this->Tiled = 0;
+  this->Tiled = 1;
   this->TiledDimensions[0] = this->TiledDimensions[1] = 1;
 
   this->UseChar = 1;
@@ -739,8 +739,8 @@ void vtkIceTClientCompositeManager::SatelliteStartRender()
                       vtkCompositeManager::WIN_INFO_TAG);
 
   // This should be fixed.  Round off will cause window to resize. !!!!!
-  renWin->SetSize(winInfo.Size[0] * winInfo.ReductionFactor,
-                  winInfo.Size[1] * winInfo.ReductionFactor);
+  //renWin->SetSize(winInfo.Size[0] * winInfo.ReductionFactor,
+  //                winInfo.Size[1] * winInfo.ReductionFactor);
   //this->ReductionFactor = winInfo.ReductionFactor;
   this->ReductionFactor = 1;
   this->SquirtCompression = 3 * (winInfo.ReductionFactor-1);
