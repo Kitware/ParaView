@@ -117,7 +117,7 @@ protected:
 
   virtual void PreRenderProcessing();
   virtual void PostRenderProcessing();
-  virtual void LocalComputeVisiblePropBounds(vtkRenderer *ren, float bounds[6]);
+  virtual void LocalComputeVisiblePropBounds(vtkRenderer *ren, double bounds[6]);
 
   vtkParallelRenderManager *ParallelRenderManager;
 

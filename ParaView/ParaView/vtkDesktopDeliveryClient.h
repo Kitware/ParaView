@@ -65,7 +65,7 @@ public:
   vtkGetMacro(ReplaceActors, int);
   vtkBooleanMacro(ReplaceActors, int);
 
-  virtual void ComputeVisiblePropBounds(vtkRenderer *ren, float bounds[6]);
+  virtual void ComputeVisiblePropBounds(vtkRenderer *ren, double bounds[6]);
 
   // Description:
   // Returns true if remote display is on.  If remote display is on, then

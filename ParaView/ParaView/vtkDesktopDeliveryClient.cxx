@@ -33,7 +33,7 @@
 
 //#include <vtkRef.h>
 
-vtkCxxRevisionMacro(vtkDesktopDeliveryClient, "1.10");
+vtkCxxRevisionMacro(vtkDesktopDeliveryClient, "1.11");
 vtkStandardNewMacro(vtkDesktopDeliveryClient);
 
 vtkDesktopDeliveryClient::vtkDesktopDeliveryClient()
@@ -251,7 +251,7 @@ void vtkDesktopDeliveryClient::PostRenderProcessing()
 }
 
 void vtkDesktopDeliveryClient::ComputeVisiblePropBounds(vtkRenderer *ren,
-                            float bounds[6])
+                            double bounds[6])
 {
   this->Superclass::ComputeVisiblePropBounds(ren, bounds);
 
@@ -261,8 +261,14 @@ void vtkDesktopDeliveryClient::ComputeVisiblePropBounds(vtkRenderer *ren,
 
     ren->GetActors()->RemoveAllItems();
 
+    // Convert doubles to float for vtkCubeSource
+    // Does anyone know why vtkCubeSource doesn't
+    // take doubles for SetBounds?
+    float fbounds[6];
+    for(int i=0;i<6;++i) fbounds[i]=bounds[i];
+
     vtkCubeSource* source = vtkCubeSource::New();
-    source->SetBounds(bounds);
+    source->SetBounds(fbounds);
 
     vtkPolyDataMapper* mapper = vtkPolyDataMapper::New();
     mapper->SetInput(source->GetOutput());

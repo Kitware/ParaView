@@ -43,7 +43,7 @@ static void SatelliteEndParallelRender(vtkObject *caller,
                        unsigned long vtkNotUsed(event),
                        void *clientData, void *);
 
-vtkCxxRevisionMacro(vtkDesktopDeliveryServer, "1.5");
+vtkCxxRevisionMacro(vtkDesktopDeliveryServer, "1.6");
 vtkStandardNewMacro(vtkDesktopDeliveryServer);
 
 vtkDesktopDeliveryServer::vtkDesktopDeliveryServer()
@@ -336,7 +336,7 @@ void vtkDesktopDeliveryServer::ReadReducedImage()
 }
 
 void vtkDesktopDeliveryServer::LocalComputeVisiblePropBounds(vtkRenderer *ren,
-                                 float bounds[6])
+                                 double bounds[6])
 {
   if (this->ParallelRenderManager)
     {
