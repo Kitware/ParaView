@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    vtkPVMultiDisplayRenderModule.h
+  Module:    vtkPVMultiDisplayPartDisplay.h
   Language:  C++
   Date:      $Date$
   Version:   $Revision$
@@ -39,38 +39,30 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-// .NAME vtkPVMultiDisplayRenderModule - Handles MPI and Client Server
+// .NAME vtkPVMultiDisplayPartDisplay - For tiled diplay (what on client).
 // .SECTION Description
-// This module hanldes both the cases of ParaView running Client-Server
-// and ParaView running as a set MPI processes.
+// This class has an unfortunate name ...  It always collects and displays
+// the LOD on node zero (client when we enable client server).
 
-#ifndef __vtkPVMultiDisplayRenderModule_h
-#define __vtkPVMultiDisplayRenderModule_h
+#ifndef __vtkPVMultiDisplayPartDisplay_h
+#define __vtkPVMultiDisplayPartDisplay_h
 
-#include "vtkPVCompositeRenderModule.h"
+#include "vtkPVCompositePartDisplay.h"
 
 
-class VTK_EXPORT vtkPVMultiDisplayRenderModule : public vtkPVCompositeRenderModule
+class VTK_EXPORT vtkPVMultiDisplayPartDisplay : public vtkPVCompositePartDisplay
 {
 public:
-  static vtkPVMultiDisplayRenderModule* New();
-  vtkTypeRevisionMacro(vtkPVMultiDisplayRenderModule,vtkPVCompositeRenderModule);
+  static vtkPVMultiDisplayPartDisplay* New();
+  vtkTypeRevisionMacro(vtkPVMultiDisplayPartDisplay, vtkPVCompositePartDisplay);
   void PrintSelf(ostream& os, vtkIndent indent);
-
-  // Description:
-  // Set the application right after construction.
-  virtual void SetPVApplication(vtkPVApplication *pvApp);
-  
-
+    
 protected:
-  vtkPVMultiDisplayRenderModule();
-  ~vtkPVMultiDisplayRenderModule();
-
-  virtual vtkPVPartDisplay* CreatePartDisplay();
-
-  vtkPVMultiDisplayRenderModule(const vtkPVMultiDisplayRenderModule&); // Not implemented
-  void operator=(const vtkPVMultiDisplayRenderModule&); // Not implemented
+  vtkPVMultiDisplayPartDisplay();
+  ~vtkPVMultiDisplayPartDisplay();
+  
+  vtkPVMultiDisplayPartDisplay(const vtkPVMultiDisplayPartDisplay&); // Not implemented
+  void operator=(const vtkPVMultiDisplayPartDisplay&); // Not implemented
 };
-
 
 #endif

@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    vtkPVMultiDisplayRenderModule.h
+  Module:    vtkPVMultiDisplayPartDisplay.cxx
   Language:  C++
   Date:      $Date$
   Version:   $Revision$
@@ -39,38 +39,34 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-// .NAME vtkPVMultiDisplayRenderModule - Handles MPI and Client Server
-// .SECTION Description
-// This module hanldes both the cases of ParaView running Client-Server
-// and ParaView running as a set MPI processes.
-
-#ifndef __vtkPVMultiDisplayRenderModule_h
-#define __vtkPVMultiDisplayRenderModule_h
-
-#include "vtkPVCompositeRenderModule.h"
+#include "vtkPVMultiDisplayPartDisplay.h"
+#include "vtkObjectFactory.h"
 
 
-class VTK_EXPORT vtkPVMultiDisplayRenderModule : public vtkPVCompositeRenderModule
+
+//----------------------------------------------------------------------------
+vtkStandardNewMacro(vtkPVMultiDisplayPartDisplay);
+vtkCxxRevisionMacro(vtkPVMultiDisplayPartDisplay, "1.1");
+
+
+//----------------------------------------------------------------------------
+vtkPVMultiDisplayPartDisplay::vtkPVMultiDisplayPartDisplay()
 {
-public:
-  static vtkPVMultiDisplayRenderModule* New();
-  vtkTypeRevisionMacro(vtkPVMultiDisplayRenderModule,vtkPVCompositeRenderModule);
-  void PrintSelf(ostream& os, vtkIndent indent);
+}
 
-  // Description:
-  // Set the application right after construction.
-  virtual void SetPVApplication(vtkPVApplication *pvApp);
+//----------------------------------------------------------------------------
+vtkPVMultiDisplayPartDisplay::~vtkPVMultiDisplayPartDisplay()
+{
+}
+
+
+//----------------------------------------------------------------------------
+void vtkPVMultiDisplayPartDisplay::PrintSelf(ostream& os, vtkIndent indent)
+{
+}
+
+
   
 
-protected:
-  vtkPVMultiDisplayRenderModule();
-  ~vtkPVMultiDisplayRenderModule();
-
-  virtual vtkPVPartDisplay* CreatePartDisplay();
-
-  vtkPVMultiDisplayRenderModule(const vtkPVMultiDisplayRenderModule&); // Not implemented
-  void operator=(const vtkPVMultiDisplayRenderModule&); // Not implemented
-};
 
 
-#endif

@@ -30,7 +30,7 @@
 #include "vtkUnsignedCharArray.h"
 #include "vtkTimerLog.h"
 
-vtkCxxRevisionMacro(vtkPVCompositeUtilities, "1.5");
+vtkCxxRevisionMacro(vtkPVCompositeUtilities, "1.6");
 vtkStandardNewMacro(vtkPVCompositeUtilities);
 
 
@@ -313,8 +313,13 @@ int vtkPVCompositeUtilities::GetCompressedLength(vtkFloatArray *zArray)
 
   numPixels = zArray->GetNumberOfTuples();
   zIn = zArray->GetPointer(0);
-  endZ = zIn+numPixels;
+  // Do not go past the last pixel (zbuf check/correct)
+  endZ = zIn+numPixels-1;
 
+  if (*zIn < 0.0 || *zIn > 1.0)
+    {
+    *zIn = 1.0;
+    } 
   while (zIn < endZ)
     {
     ++length;
@@ -323,14 +328,24 @@ int vtkPVCompositeUtilities::GetCompressedLength(vtkFloatArray *zArray)
     while (*zIn == 1.0 && zIn < endZ)
       {
       ++zIn;
+      if (*zIn < 0.0 || *zIn > 1.0)
+        {
+        *zIn = 1.0;
+        } 
       }
 
     if (zRun == zIn)
       { 
       //*zIn++;
       zIn++;
+      if (*zIn < 0.0 || *zIn > 1.0)
+        {
+        *zIn = 1.0;
+        } 
       }
     }
+  // 1 more for last pixel.
+  ++length;
   return length;
 }
 
@@ -347,8 +362,13 @@ int vtkPVCompositeUtilitiesCompress(float *zIn, P *pIn, float *zOut, P *pOut,
   int length = 0;
   int compressCount;
 
-  endZ = zIn+numPixels;
+  // Do not go past the last pixel (zbuf check/correct)
+  endZ = zIn+numPixels-1;
 
+  if (*zIn < 0.0 || *zIn > 1.0)
+    {
+    *zIn = 1.0;
+    } 
   while (zIn < endZ)
     {
     ++length;
@@ -360,6 +380,10 @@ int vtkPVCompositeUtilitiesCompress(float *zIn, P *pIn, float *zOut, P *pOut,
       {
       ++compressCount;
       ++zIn;
+      if (*zIn < 0.0 || *zIn > 1.0)
+        {
+        *zIn = 1.0;
+        } 
       }
  
     if (compressCount > 0)
@@ -372,8 +396,16 @@ int vtkPVCompositeUtilitiesCompress(float *zIn, P *pIn, float *zOut, P *pOut,
     else
       { 
       *zOut++ = *zIn++;
+      if (*zIn < 0.0 || *zIn > 1.0)
+        {
+        *zIn = 1.0;
+        } 
       }
     }
+  // Put the last pixel in.
+  *pOut = *pIn;
+  *zOut = *zIn;
+
   return length;
 }
 

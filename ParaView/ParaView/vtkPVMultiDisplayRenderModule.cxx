@@ -44,10 +44,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkRenderWindow.h"
 #include "vtkPVApplication.h"
 #include "vtkPVProcessModule.h"
+#include "vtkPVMultiDisplayPartDisplay.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVMultiDisplayRenderModule);
-vtkCxxRevisionMacro(vtkPVMultiDisplayRenderModule, "1.1");
+vtkCxxRevisionMacro(vtkPVMultiDisplayRenderModule, "1.2");
 
 
 
@@ -98,6 +99,13 @@ void vtkPVMultiDisplayRenderModule::SetPVApplication(vtkPVApplication *pvApp)
   pvApp->BroadcastScript("%s InitializeRMIs", this->CompositeTclName);
 
 }
+
+//----------------------------------------------------------------------------
+vtkPVPartDisplay* vtkPVMultiDisplayRenderModule::CreatePartDisplay()
+{
+  return vtkPVMultiDisplayPartDisplay::New();
+}
+
 
 
 //----------------------------------------------------------------------------

@@ -98,6 +98,7 @@ SET( ParaView_SRCS
   vtkPVMPIRenderModule.cxx
   vtkPVMPIRenderModuleUI.cxx
   vtkPVMinMax.cxx
+  vtkPVMultiDisplayPartDisplay.cxx
   vtkPVMultiDisplayRenderModule.cxx
   vtkPVMultiDisplayRenderModuleUI.cxx
   vtkPVNavigationWindow.cxx
