@@ -170,7 +170,7 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterface);
-vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.107");
+vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.108");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterface,ControlledWidget, vtkPVWidget);
 
@@ -1194,7 +1194,7 @@ void vtkPVAnimationInterface::SetView(vtkPVRenderView *renderView)
 void vtkPVAnimationInterface::SaveImagesCallback()
 {
   vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
-  vtkKWLoadSaveDialog* saveDialog = pm->NewLoadSaveDialog();
+  vtkKWLoadSaveDialog* saveDialog = vtkKWLoadSaveDialog::New();
   this->GetWindow()->RetrieveLastPath(saveDialog, "SaveAnimationFile");
   saveDialog->SetParent(this);
   saveDialog->SaveDialogOn();
