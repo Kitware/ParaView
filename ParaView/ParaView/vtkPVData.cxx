@@ -56,6 +56,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWOptionMenu.h"
 #include "vtkKWPushButton.h"
 #include "vtkKWScale.h"
+#include "vtkKWThumbWheel.h"
 #include "vtkKWTkUtilities.h"
 #include "vtkKWView.h"
 #include "vtkKWWidget.h"
@@ -80,7 +81,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.175");
+vtkCxxRevisionMacro(vtkPVData, "1.176");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -161,9 +162,9 @@ vtkPVData::vtkPVData()
   this->InterpolationMenu = vtkKWOptionMenu::New();
   
   this->PointSizeLabel = vtkKWLabel::New();
-  this->PointSizeScale = vtkKWScale::New();
+  this->PointSizeThumbWheel = vtkKWThumbWheel::New();
   this->LineWidthLabel = vtkKWLabel::New();
-  this->LineWidthScale = vtkKWScale::New();
+  this->LineWidthThumbWheel = vtkKWThumbWheel::New();
   
   this->ScalarBarCheck = vtkKWCheckButton::New();
   this->CubeAxesCheck = vtkKWCheckButton::New();
@@ -182,10 +183,10 @@ vtkPVData::vtkPVData()
   int cc;
   for ( cc = 0; cc < 3; cc ++ )
     {
-    this->TranslateEntry[cc] = vtkKWEntry::New();
-    this->ScaleEntry[cc] = vtkKWEntry::New();
+    this->TranslateThumbWheel[cc] = vtkKWThumbWheel::New();
+    this->ScaleThumbWheel[cc] = vtkKWThumbWheel::New();
     this->OrientationScale[cc] = vtkKWScale::New();
-    this->OriginEntry[cc] = vtkKWEntry::New();
+    this->OriginThumbWheel[cc] = vtkKWThumbWheel::New();
     }
 
   this->OpacityLabel = vtkKWLabel::New();
@@ -283,12 +284,12 @@ vtkPVData::~vtkPVData()
   
   this->PointSizeLabel->Delete();
   this->PointSizeLabel = NULL;
-  this->PointSizeScale->Delete();
-  this->PointSizeScale = NULL;
+  this->PointSizeThumbWheel->Delete();
+  this->PointSizeThumbWheel = NULL;
   this->LineWidthLabel->Delete();
   this->LineWidthLabel = NULL;
-  this->LineWidthScale->Delete();
-  this->LineWidthScale = NULL;
+  this->LineWidthThumbWheel->Delete();
+  this->LineWidthThumbWheel = NULL;
 
   this->ActorControlFrame->Delete();
   this->TranslateLabel->Delete();
@@ -299,10 +300,10 @@ vtkPVData::~vtkPVData()
   int cc;
   for ( cc = 0; cc < 3; cc ++ )
     {
-    this->TranslateEntry[cc]->Delete();
-    this->ScaleEntry[cc]->Delete();
+    this->TranslateThumbWheel[cc]->Delete();
+    this->ScaleThumbWheel[cc]->Delete();
     this->OrientationScale[cc]->Delete();
-    this->OriginEntry[cc]->Delete();
+    this->OriginThumbWheel[cc]->Delete();
     }
 
   this->OpacityLabel->Delete();
@@ -1249,20 +1250,22 @@ void vtkPVData::CreateProperties()
   this->PointSizeLabel->SetBalloonHelpString(
     "If your dataset contains points/verticies, "
     "this scale adjusts the diameter of the rendered points.");
-  this->PointSizeScale->SetParent(this->DisplayStyleFrame->GetFrame());
-  this->PointSizeScale->PopupScaleOn();
-  this->PointSizeScale->Create(this->Application, "");
-  this->PointSizeScale->SetRange(1, 5);
-  this->PointSizeScale->SetResolution(1);
-  this->PointSizeScale->SetValue(1);
-  this->PointSizeScale->DisplayEntry();
-  this->PointSizeScale->DisplayEntryAndLabelOnTopOff();
-  this->PointSizeScale->SetBalloonHelpString("Set the point size.");
-  this->PointSizeScale->GetEntry()->SetWidth(5);
-  this->PointSizeScale->SetCommand(this, "ChangePointSize");
-  this->PointSizeScale->SetEndCommand(this, "ChangePointSizeEndCallback");
-  this->PointSizeScale->SetEntryCommand(this, "ChangePointSizeEndCallback");
-  this->PointSizeScale->SetBalloonHelpString(
+
+  this->PointSizeThumbWheel->SetParent(this->DisplayStyleFrame->GetFrame());
+  this->PointSizeThumbWheel->PopupModeOn();
+  this->PointSizeThumbWheel->SetValue(1.0);
+  this->PointSizeThumbWheel->SetResolution(1.0);
+  this->PointSizeThumbWheel->SetMinimumValue(1.0);
+  this->PointSizeThumbWheel->ClampMinimumValueOn();
+  this->PointSizeThumbWheel->Create(this->Application, "");
+  this->PointSizeThumbWheel->DisplayEntryOn();
+  this->PointSizeThumbWheel->DisplayEntryAndLabelOnTopOff();
+  this->PointSizeThumbWheel->SetBalloonHelpString("Set the point size.");
+  this->PointSizeThumbWheel->GetEntry()->SetWidth(5);
+  this->PointSizeThumbWheel->SetCommand(this, "ChangePointSize");
+  this->PointSizeThumbWheel->SetEndCommand(this, "ChangePointSizeEndCallback");
+  this->PointSizeThumbWheel->SetEntryCommand(this, "ChangePointSizeEndCallback");
+  this->PointSizeThumbWheel->SetBalloonHelpString(
     "If your dataset contains points/verticies, "
     "this scale adjusts the diameter of the rendered points.");
 
@@ -1273,20 +1276,21 @@ void vtkPVData::CreateProperties()
     "If your dataset containes lines/edges, "
     "this scale adjusts the width of the rendered lines.");
   
-  this->LineWidthScale->SetParent(this->DisplayStyleFrame->GetFrame());
-  this->LineWidthScale->PopupScaleOn();
-  this->LineWidthScale->Create(this->Application, "");
-  this->LineWidthScale->SetRange(1, 5);
-  this->LineWidthScale->SetResolution(1);
-  this->LineWidthScale->SetValue(1);
-  this->LineWidthScale->DisplayEntry();
-  this->LineWidthScale->DisplayEntryAndLabelOnTopOff();
-  this->LineWidthScale->SetBalloonHelpString("Set the line width.");
-  this->LineWidthScale->GetEntry()->SetWidth(5);
-  this->LineWidthScale->SetCommand(this, "ChangeLineWidth");
-  this->LineWidthScale->SetEndCommand(this, "ChangeLineWidthEndCallback");
-  this->LineWidthScale->SetEntryCommand(this, "ChangeLineWidthEndCallback");
-  this->LineWidthScale->SetBalloonHelpString(
+  this->LineWidthThumbWheel->SetParent(this->DisplayStyleFrame->GetFrame());
+  this->LineWidthThumbWheel->PopupModeOn();
+  this->LineWidthThumbWheel->SetValue(1.0);
+  this->LineWidthThumbWheel->SetResolution(1.0);
+  this->LineWidthThumbWheel->SetMinimumValue(1.0);
+  this->LineWidthThumbWheel->ClampMinimumValueOn();
+  this->LineWidthThumbWheel->Create(this->Application, "");
+  this->LineWidthThumbWheel->DisplayEntryOn();
+  this->LineWidthThumbWheel->DisplayEntryAndLabelOnTopOff();
+  this->LineWidthThumbWheel->SetBalloonHelpString("Set the line width.");
+  this->LineWidthThumbWheel->GetEntry()->SetWidth(5);
+  this->LineWidthThumbWheel->SetCommand(this, "ChangeLineWidth");
+  this->LineWidthThumbWheel->SetEndCommand(this, "ChangeLineWidthEndCallback");
+  this->LineWidthThumbWheel->SetEntryCommand(this, "ChangeLineWidthEndCallback");
+  this->LineWidthThumbWheel->SetBalloonHelpString(
     "If your dataset containes lines/edges, "
     "this scale adjusts the width of the rendered lines.");
 
@@ -1308,18 +1312,18 @@ void vtkPVData::CreateProperties()
   
   this->Script("grid %s %s -sticky wns",
                this->PointSizeLabel->GetWidgetName(),
-               this->PointSizeScale->GetWidgetName());
+               this->PointSizeThumbWheel->GetWidgetName());
 
   this->Script("grid %s -sticky news -padx %d -pady %d",
-               this->PointSizeScale->GetWidgetName(), 
+               this->PointSizeThumbWheel->GetWidgetName(), 
                col_1_padx, button_pady);
 
   this->Script("grid %s %s -sticky wns",
                this->LineWidthLabel->GetWidgetName(),
-               this->LineWidthScale->GetWidgetName());
+               this->LineWidthThumbWheel->GetWidgetName());
 
   this->Script("grid %s -sticky news -padx %d -pady %d",
-               this->LineWidthScale->GetWidgetName(),
+               this->LineWidthThumbWheel->GetWidgetName(),
                col_1_padx, button_pady);
 
   // Now synchronize all those grids to have them aligned
@@ -1374,29 +1378,37 @@ void vtkPVData::CreateProperties()
   int cc;
   for ( cc = 0; cc < 3; cc ++ )
     {
-    this->TranslateEntry[cc]->SetParent(this->ActorControlFrame->GetFrame());
-    this->TranslateEntry[cc]->Create(this->Application, 0);
-    this->TranslateEntry[cc]->SetValue(0, 4);
-    this->Script("bind %s <Key-Return> { %s ActorTranslateCallback }",
-                 this->TranslateEntry[cc]->GetWidgetName(),
-                 this->GetTclName());
-    this->Script("bind %s <FocusOut> { %s ActorTranslateCallback }",
-                 this->TranslateEntry[cc]->GetWidgetName(),
-                 this->GetTclName());
-    this->TranslateEntry[cc]->SetBalloonHelpString(
+    this->TranslateThumbWheel[cc]->SetParent(this->ActorControlFrame->GetFrame());
+    this->TranslateThumbWheel[cc]->PopupModeOn();
+    this->TranslateThumbWheel[cc]->SetValue(0.0);
+    this->TranslateThumbWheel[cc]->Create(this->Application, 0);
+    this->TranslateThumbWheel[cc]->DisplayEntryOn();
+    this->TranslateThumbWheel[cc]->DisplayEntryAndLabelOnTopOff();
+    this->TranslateThumbWheel[cc]->ExpandEntryOn();
+    this->TranslateThumbWheel[cc]->GetEntry()->SetWidth(5);
+    this->TranslateThumbWheel[cc]->SetCommand(this, "ActorTranslateCallback");
+    this->TranslateThumbWheel[cc]->SetEndCommand(this, 
+                                                 "ActorTranslateEndCallback");
+    this->TranslateThumbWheel[cc]->SetEntryCommand(this,
+                                                   "ActorTranslateEndCallback");
+    this->TranslateThumbWheel[cc]->SetBalloonHelpString(
       "Translate the geometry relative to the dataset location.");
 
-    this->ScaleEntry[cc]->SetParent(this->ActorControlFrame->GetFrame());
-    this->ScaleEntry[cc]->Create(this->Application, 0);
-    this->ScaleEntry[cc]->SetValue(1, 4);
-    this->ScaleEntry[cc]->SetBalloonHelpString(
+    this->ScaleThumbWheel[cc]->SetParent(this->ActorControlFrame->GetFrame());
+    this->ScaleThumbWheel[cc]->PopupModeOn();
+    this->ScaleThumbWheel[cc]->SetValue(1.0);
+    this->ScaleThumbWheel[cc]->SetMinimumValue(0.0);
+    this->ScaleThumbWheel[cc]->ClampMinimumValueOn();
+    this->ScaleThumbWheel[cc]->Create(this->Application, 0);
+    this->ScaleThumbWheel[cc]->DisplayEntryOn();
+    this->ScaleThumbWheel[cc]->DisplayEntryAndLabelOnTopOff();
+    this->ScaleThumbWheel[cc]->ExpandEntryOn();
+    this->ScaleThumbWheel[cc]->GetEntry()->SetWidth(5);
+    this->ScaleThumbWheel[cc]->SetCommand(this, "ActorScaleCallback");
+    this->ScaleThumbWheel[cc]->SetEndCommand(this, "ActorScaleEndCallback");
+    this->ScaleThumbWheel[cc]->SetEntryCommand(this, "ActorScaleEndCallback");
+    this->ScaleThumbWheel[cc]->SetBalloonHelpString(
       "Scale the geometry relative to the size of the dataset.");
-    this->Script("bind %s <Key-Return> { %s ActorScaleCallback }",
-                 this->ScaleEntry[cc]->GetWidgetName(),
-                 this->GetTclName());
-    this->Script("bind %s <FocusOut> { %s ActorScaleCallback }",
-                 this->ScaleEntry[cc]->GetWidgetName(),
-                 this->GetTclName());
 
     this->OrientationScale[cc]->SetParent(this->ActorControlFrame->GetFrame());
     this->OrientationScale[cc]->PopupScaleOn();
@@ -1416,18 +1428,22 @@ void vtkPVData::CreateProperties()
     this->OrientationScale[cc]->SetBalloonHelpString(
       "Orient the geometry relative to the dataset origin.");
 
-    this->OriginEntry[cc]->SetParent(this->ActorControlFrame->GetFrame());
-    this->OriginEntry[cc]->Create(this->Application, 0);
-    this->OriginEntry[cc]->SetValue(0, 4);
-    this->OriginEntry[cc]->SetBalloonHelpString(
+    this->OriginThumbWheel[cc]->SetParent(this->ActorControlFrame->GetFrame());
+    this->OriginThumbWheel[cc]->PopupModeOn();
+    this->OriginThumbWheel[cc]->SetValue(0.0);
+    this->OriginThumbWheel[cc]->Create(this->Application, 0);
+    this->OriginThumbWheel[cc]->DisplayEntryOn();
+    this->OriginThumbWheel[cc]->DisplayEntryAndLabelOnTopOff();
+    this->OriginThumbWheel[cc]->ExpandEntryOn();
+    this->OriginThumbWheel[cc]->GetEntry()->SetWidth(5);
+    this->OriginThumbWheel[cc]->SetCommand(this, "ActorOriginCallback");
+    this->OriginThumbWheel[cc]->SetEndCommand(this, "ActorOriginEndCallback");
+    this->OriginThumbWheel[cc]->SetEntryCommand(this,"ActorOriginEndCallback");
+    this->OriginThumbWheel[cc]->SetBalloonHelpString(
       "Orient the geometry relative to the dataset origin.");
-    this->Script("bind %s <Key-Return> { %s ActorOriginCallback }",
-                 this->OriginEntry[cc]->GetWidgetName(),
-                 this->GetTclName());
-    this->Script("bind %s <FocusOut> { %s ActorOriginCallback }",
-                 this->OriginEntry[cc]->GetWidgetName(),
-                 this->GetTclName());
     }
+
+  this->UpdateActorControlResolutions();
 
   this->OpacityLabel->SetParent(this->ActorControlFrame->GetFrame());
   this->OpacityLabel->Create(this->Application, 0);
@@ -1457,9 +1473,9 @@ void vtkPVData::CreateProperties()
 
   this->Script("grid %s %s %s %s -sticky news -pady %d",
                this->TranslateLabel->GetWidgetName(),
-               this->TranslateEntry[0]->GetWidgetName(),
-               this->TranslateEntry[1]->GetWidgetName(),
-               this->TranslateEntry[2]->GetWidgetName(),
+               this->TranslateThumbWheel[0]->GetWidgetName(),
+               this->TranslateThumbWheel[1]->GetWidgetName(),
+               this->TranslateThumbWheel[2]->GetWidgetName(),
                button_pady);
 
   this->Script("grid %s -sticky nws",
@@ -1467,9 +1483,9 @@ void vtkPVData::CreateProperties()
 
   this->Script("grid %s %s %s %s -sticky news -pady %d",
                this->ScaleLabel->GetWidgetName(),
-               this->ScaleEntry[0]->GetWidgetName(),
-               this->ScaleEntry[1]->GetWidgetName(),
-               this->ScaleEntry[2]->GetWidgetName(),
+               this->ScaleThumbWheel[0]->GetWidgetName(),
+               this->ScaleThumbWheel[1]->GetWidgetName(),
+               this->ScaleThumbWheel[2]->GetWidgetName(),
                button_pady);
 
   this->Script("grid %s -sticky nws",
@@ -1487,9 +1503,9 @@ void vtkPVData::CreateProperties()
 
   this->Script("grid %s %s %s %s -sticky news -pady %d",
                this->OriginLabel->GetWidgetName(),
-               this->OriginEntry[0]->GetWidgetName(),
-               this->OriginEntry[1]->GetWidgetName(),
-               this->OriginEntry[2]->GetWidgetName(),
+               this->OriginThumbWheel[0]->GetWidgetName(),
+               this->OriginThumbWheel[1]->GetWidgetName(),
+               this->OriginThumbWheel[2]->GetWidgetName(),
                button_pady);
 
   this->Script("grid %s -sticky nws",
@@ -1680,6 +1696,10 @@ void vtkPVData::UpdateProperties()
   vtkTimerLog::MarkEndEvent(str);
   delete [] str;
 
+  // Update actor control resolutions
+
+  this->UpdateActorControlResolutions();
+  
   // Time creation of the LOD
   vtkTimerLog::MarkStartEvent("Create LOD");
   pvApp->BroadcastScript("%s ForceUpdate", this->LODUpdateSuppressorTclName);
@@ -2719,7 +2739,7 @@ void vtkPVData::CubeAxesCheckCallback()
 //----------------------------------------------------------------------------
 void vtkPVData::SetPointSize(int size)
 {
-  if ( this->PointSizeScale->GetValue() == size )
+  if ( this->PointSizeThumbWheel->GetValue() == size )
     {
     return;
     }
@@ -2727,9 +2747,9 @@ void vtkPVData::SetPointSize(int size)
   // but won't add a trace entry. Let's do it. A trace entry is also
   // added by the ChangePointSizeEndCallback but this callback is only
   // called when the interaction on the scale is stopped.
-  this->PointSizeScale->SetValue(size);
+  this->PointSizeThumbWheel->SetValue(size);
   this->AddTraceEntry("$kw(%s) SetPointSize %d", this->GetTclName(),
-                      (int)(this->PointSizeScale->GetValue()));
+                      (int)(this->PointSizeThumbWheel->GetValue()));
 }
 
 //----------------------------------------------------------------------------
@@ -2741,7 +2761,7 @@ void vtkPVData::ChangePointSize()
     {
     pvApp->BroadcastScript("%s SetPointSize %f",
                            this->PropertyTclName,
-                           this->PointSizeScale->GetValue());
+                           this->PointSizeThumbWheel->GetValue());
     }
   
   if ( this->GetPVRenderView() )
@@ -2755,13 +2775,13 @@ void vtkPVData::ChangePointSizeEndCallback()
 {
   this->ChangePointSize();
   this->AddTraceEntry("$kw(%s) SetPointSize %d", this->GetTclName(),
-                      (int)(this->PointSizeScale->GetValue()));
+                      (int)(this->PointSizeThumbWheel->GetValue()));
 } 
 
 //----------------------------------------------------------------------------
 void vtkPVData::SetLineWidth(int width)
 {
-  if ( this->LineWidthScale->GetValue() == width )
+  if ( this->LineWidthThumbWheel->GetValue() == width )
     {
     return;
     }
@@ -2769,9 +2789,9 @@ void vtkPVData::SetLineWidth(int width)
   // but won't add a trace entry. Let's do it. A trace entry is also
   // added by the ChangeLineWidthEndCallback but this callback is only
   // called when the interaction on the scale is stopped.
-  this->LineWidthScale->SetValue(width);
+  this->LineWidthThumbWheel->SetValue(width);
   this->AddTraceEntry("$kw(%s) SetLineWidth %d", this->GetTclName(),
-                      (int)(this->LineWidthScale->GetValue()));
+                      (int)(this->LineWidthThumbWheel->GetValue()));
 }
 
 //----------------------------------------------------------------------------
@@ -2783,7 +2803,7 @@ void vtkPVData::ChangeLineWidth()
     {
     pvApp->BroadcastScript("%s SetLineWidth %f",
                            this->PropertyTclName,
-                           this->LineWidthScale->GetValue());
+                           this->LineWidthThumbWheel->GetValue());
     }
 
   if ( this->GetPVRenderView() )
@@ -2797,7 +2817,7 @@ void vtkPVData::ChangeLineWidthEndCallback()
 {
   this->ChangeLineWidth();
   this->AddTraceEntry("$kw(%s) SetLineWidth %d", this->GetTclName(),
-                      (int)(this->LineWidthScale->GetValue()));
+                      (int)(this->LineWidthThumbWheel->GetValue()));
 }
 
 //----------------------------------------------------------------------------
@@ -3013,9 +3033,32 @@ void vtkPVData::GetActorTranslate(float* point)
     }
   else
     {
-    point[0] = this->TranslateEntry[0]->GetValueAsFloat();
-    point[1] = this->TranslateEntry[1]->GetValueAsFloat();
-    point[2] = this->TranslateEntry[2]->GetValueAsFloat();
+    point[0] = this->TranslateThumbWheel[0]->GetValue();
+    point[1] = this->TranslateThumbWheel[1]->GetValue();
+    point[2] = this->TranslateThumbWheel[2]->GetValue();
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVData::SetActorTranslateNoTrace(float x, float y, float z)
+{
+  float point[3];
+  this->GetActorTranslate(point);
+  if (x == point[0] && y == point[1] && z == point[2])
+    {
+    return;
+    }
+
+  this->TranslateThumbWheel[0]->SetValue(x);
+  this->TranslateThumbWheel[1]->SetValue(y);
+  this->TranslateThumbWheel[2]->SetValue(z);
+
+  this->GetPVApplication()->BroadcastScript("%s SetPosition %f %f %f",
+                                            this->PropTclName, x, y, z);
+
+  if ( this->GetPVRenderView() )
+    {
+    this->GetPVRenderView()->EventuallyRender();
     }
 }
 
@@ -3029,20 +3072,10 @@ void vtkPVData::SetActorTranslate(float x, float y, float z)
     return;
     }
 
-  this->TranslateEntry[0]->SetValue(x, 4);
-  this->TranslateEntry[1]->SetValue(y, 4);
-  this->TranslateEntry[2]->SetValue(z, 4);
-
-  this->GetPVApplication()->BroadcastScript("%s SetPosition %f %f %f",
-                                            this->PropTclName, x, y, z);
+  this->SetActorTranslateNoTrace(x, y, z);
 
   this->AddTraceEntry("$kw(%s) SetActorTranslate %f %f %f",
                       this->GetTclName(), x, y, z);  
-
-  if ( this->GetPVRenderView() )
-    {
-    this->GetPVRenderView()->EventuallyRender();
-    }
 }
 
 //----------------------------------------------------------------------------
@@ -3055,9 +3088,19 @@ void vtkPVData::SetActorTranslate(float* point)
 void vtkPVData::ActorTranslateCallback()
 {
   float point[3];
-  point[0] = this->TranslateEntry[0]->GetValueAsFloat();
-  point[1] = this->TranslateEntry[1]->GetValueAsFloat();
-  point[2] = this->TranslateEntry[2]->GetValueAsFloat();
+  point[0] = this->TranslateThumbWheel[0]->GetValue();
+  point[1] = this->TranslateThumbWheel[1]->GetValue();
+  point[2] = this->TranslateThumbWheel[2]->GetValue();
+  this->SetActorTranslateNoTrace(point[0], point[1], point[2]);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVData::ActorTranslateEndCallback()
+{
+  float point[3];
+  point[0] = this->TranslateThumbWheel[0]->GetValue();
+  point[1] = this->TranslateThumbWheel[1]->GetValue();
+  point[2] = this->TranslateThumbWheel[2]->GetValue();
   this->SetActorTranslate(point);
 }
 
@@ -3071,9 +3114,32 @@ void vtkPVData::GetActorScale(float* point)
     }
   else
     {
-    point[0] = this->ScaleEntry[0]->GetValueAsFloat();
-    point[1] = this->ScaleEntry[1]->GetValueAsFloat();
-    point[2] = this->ScaleEntry[2]->GetValueAsFloat();
+    point[0] = this->ScaleThumbWheel[0]->GetValue();
+    point[1] = this->ScaleThumbWheel[1]->GetValue();
+    point[2] = this->ScaleThumbWheel[2]->GetValue();
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVData::SetActorScaleNoTrace(float x, float y, float z)
+{
+  float point[3];
+  this->GetActorScale(point);
+  if (x == point[0] && y == point[1] && z == point[2])
+    {
+    return;
+    }
+
+  this->ScaleThumbWheel[0]->SetValue(x);
+  this->ScaleThumbWheel[1]->SetValue(y);
+  this->ScaleThumbWheel[2]->SetValue(z);
+
+  this->GetPVApplication()->BroadcastScript("%s SetScale %f %f %f",
+                                            this->PropTclName, x, y, z);
+
+  if ( this->GetPVRenderView() )
+    {
+    this->GetPVRenderView()->EventuallyRender();
     }
 }
 
@@ -3087,20 +3153,10 @@ void vtkPVData::SetActorScale(float x, float y, float z)
     return;
     }
 
-  this->ScaleEntry[0]->SetValue(x, 4);
-  this->ScaleEntry[1]->SetValue(y, 4);
-  this->ScaleEntry[2]->SetValue(z, 4);
-
-  this->GetPVApplication()->BroadcastScript("%s SetScale %f %f %f",
-                                            this->PropTclName, x, y, z);
+  this->SetActorScaleNoTrace(x, y, z);
 
   this->AddTraceEntry("$kw(%s) SetActorScale %f %f %f",
                       this->GetTclName(), x, y, z);  
-
-  if ( this->GetPVRenderView() )
-    {
-    this->GetPVRenderView()->EventuallyRender();
-    }
 }
 
 //----------------------------------------------------------------------------
@@ -3113,9 +3169,19 @@ void vtkPVData::SetActorScale(float* point)
 void vtkPVData::ActorScaleCallback()
 {
   float point[3];
-  point[0] = this->ScaleEntry[0]->GetValueAsFloat();
-  point[1] = this->ScaleEntry[1]->GetValueAsFloat();
-  point[2] = this->ScaleEntry[2]->GetValueAsFloat();
+  point[0] = this->ScaleThumbWheel[0]->GetValue();
+  point[1] = this->ScaleThumbWheel[1]->GetValue();
+  point[2] = this->ScaleThumbWheel[2]->GetValue();
+  this->SetActorScaleNoTrace(point[0], point[1], point[2]);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVData::ActorScaleEndCallback()
+{
+  float point[3];
+  point[0] = this->ScaleThumbWheel[0]->GetValue();
+  point[1] = this->ScaleThumbWheel[1]->GetValue();
+  point[2] = this->ScaleThumbWheel[2]->GetValue();
   this->SetActorScale(point);
 }
 
@@ -3210,9 +3276,32 @@ void vtkPVData::GetActorOrigin(float* point)
     }
   else
     {
-    point[0] = this->OriginEntry[0]->GetValueAsFloat();
-    point[1] = this->OriginEntry[1]->GetValueAsFloat();
-    point[2] = this->OriginEntry[2]->GetValueAsFloat();
+    point[0] = this->OriginThumbWheel[0]->GetValue();
+    point[1] = this->OriginThumbWheel[1]->GetValue();
+    point[2] = this->OriginThumbWheel[2]->GetValue();
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVData::SetActorOriginNoTrace(float x, float y, float z)
+{
+  float point[3];
+  this->GetActorOrigin(point);
+  if (x == point[0] && y == point[1] && z == point[2])
+    {
+    return;
+    }
+
+  this->OriginThumbWheel[0]->SetValue(x);
+  this->OriginThumbWheel[1]->SetValue(y);
+  this->OriginThumbWheel[2]->SetValue(z);
+
+  this->GetPVApplication()->BroadcastScript("%s SetOrigin %f %f %f",
+                                            this->PropTclName, x, y, z);
+
+  if ( this->GetPVRenderView() )
+    {
+    this->GetPVRenderView()->EventuallyRender();
     }
 }
 
@@ -3226,20 +3315,10 @@ void vtkPVData::SetActorOrigin(float x, float y, float z)
     return;
     }
 
-  this->OriginEntry[0]->SetValue(x, 4);
-  this->OriginEntry[1]->SetValue(y, 4);
-  this->OriginEntry[2]->SetValue(z, 4);
-
-  this->GetPVApplication()->BroadcastScript("%s SetOrigin %f %f %f",
-                                            this->PropTclName, x, y, z);
+  this->SetActorOriginNoTrace(x, y, z);
 
   this->AddTraceEntry("$kw(%s) SetActorOrigin %f %f %f",
                       this->GetTclName(), x, y, z);  
-
-  if ( this->GetPVRenderView() )
-    {
-    this->GetPVRenderView()->EventuallyRender();
-    }
 }
 
 //----------------------------------------------------------------------------
@@ -3252,10 +3331,47 @@ void vtkPVData::SetActorOrigin(float* point)
 void vtkPVData::ActorOriginCallback()
 {
   float point[3];
-  point[0] = this->OriginEntry[0]->GetValueAsFloat();
-  point[1] = this->OriginEntry[1]->GetValueAsFloat();
-  point[2] = this->OriginEntry[2]->GetValueAsFloat();
+  point[0] = this->OriginThumbWheel[0]->GetValue();
+  point[1] = this->OriginThumbWheel[1]->GetValue();
+  point[2] = this->OriginThumbWheel[2]->GetValue();
+  this->SetActorOriginNoTrace(point[0], point[1], point[2]);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVData::ActorOriginEndCallback()
+{
+  float point[3];
+  point[0] = this->OriginThumbWheel[0]->GetValue();
+  point[1] = this->OriginThumbWheel[1]->GetValue();
+  point[2] = this->OriginThumbWheel[2]->GetValue();
   this->SetActorOrigin(point);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVData::UpdateActorControlResolutions()
+{
+  float bounds[6];
+  this->GetBounds(bounds);
+
+  float res, oneh, half;
+
+  // Update the resolution according to the bounds
+  // Set res to 1/20 of the range, rounding to nearest .1 or .5 form.
+
+  int i;
+  for (i = 0; i < 3; i++)
+    {
+    if (bounds[i * 2 + 1] != bounds[i * 2])
+      {
+      oneh = log10((bounds[i * 2 + 1] - bounds[i * 2]) * 0.051234);
+      half = 0.5 * pow(10, ceil(oneh));
+      res = (oneh > log10(half) ? half : pow(10, floor(oneh)));
+      // cout << "up i: " << i << ", bounds: " << (bounds[i * 2 + 1] - bounds[i * 2]) << ", oneh: " << oneh << ", half: " << half << ", res: " << res << endl;
+      this->TranslateThumbWheel[i]->SetResolution(res);
+      this->ScaleThumbWheel[i]->SetResolution(res);
+      this->OriginThumbWheel[i]->SetResolution(res);
+      }
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -3303,7 +3419,7 @@ void vtkPVData::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVData ";
-  this->ExtractRevision(os,"$Revision: 1.175 $");
+  this->ExtractRevision(os,"$Revision: 1.176 $");
 }
 
 //----------------------------------------------------------------------------
@@ -3321,26 +3437,26 @@ void vtkPVData::SerializeSelf(ostream& os, vtkIndent indent)
 
   os << indent << "Representation " << this->RepresentationMenu->GetValue() << endl;
   os << indent << "Interpolation " << this->InterpolationMenu->GetValue() << endl;
-  os << indent << "PointSize " << this->PointSizeScale->GetValue() << endl;
-  os << indent << "LineWidth " << this->LineWidthScale->GetValue() << endl;
+  os << indent << "PointSize " << this->PointSizeThumbWheel->GetValue() << endl;
+  os << indent << "LineWidth " << this->LineWidthThumbWheel->GetValue() << endl;
   os << indent << "CubeAxes " << this->CubeAxesCheck->GetState() << endl;
   os << indent << "ActorTranslate " 
-     << this->TranslateEntry[0]->GetValue() << " "
-     << this->TranslateEntry[1]->GetValue() << " " 
-     << this->TranslateEntry[1]->GetValue() << endl;
+     << this->TranslateThumbWheel[0]->GetValue() << " "
+     << this->TranslateThumbWheel[1]->GetValue() << " " 
+     << this->TranslateThumbWheel[2]->GetValue() << endl;
   os << indent << "Opacity " << this->OpacityScale->GetValue() << endl;
   os << indent << "ActorScale " 
-     << this->ScaleEntry[0]->GetValue() << " "
-     << this->ScaleEntry[1]->GetValue() << " " 
-     << this->ScaleEntry[1]->GetValue() << endl;
+     << this->ScaleThumbWheel[0]->GetValue() << " "
+     << this->ScaleThumbWheel[1]->GetValue() << " " 
+     << this->ScaleThumbWheel[2]->GetValue() << endl;
   os << indent << "ActorOrientation " 
      << this->OrientationScale[0]->GetValue() << " "
      << this->OrientationScale[1]->GetValue() << " " 
-     << this->OrientationScale[1]->GetValue() << endl;
+     << this->OrientationScale[2]->GetValue() << endl;
   os << indent << "ActorOrigin " 
-     << this->OriginEntry[0]->GetValue() << " "
-     << this->OriginEntry[1]->GetValue() << " " 
-     << this->OriginEntry[1]->GetValue() << endl;
+     << this->OriginThumbWheel[0]->GetValue() << " "
+     << this->OriginThumbWheel[1]->GetValue() << " " 
+     << this->OriginThumbWheel[2]->GetValue() << endl;
   os << indent << "Opacity " << this->OpacityScale->GetValue() << endl;
 }
 

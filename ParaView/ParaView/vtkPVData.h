@@ -66,6 +66,7 @@ class vtkKWLabeledFrame;
 class vtkKWOptionMenu;
 class vtkKWPushButton;
 class vtkKWScale;
+class vtkKWThumbWheel;
 class vtkKWWidget;
 class vtkPVApplication;
 class vtkPVColorMap;
@@ -164,15 +165,19 @@ public:
   // entry widget that controles the translation.
   void SetActorTranslate(float* p);
   void SetActorTranslate(float x, float y, float z);
+  void SetActorTranslateNoTrace(float x, float y, float z);
   void GetActorTranslate(float* p);
   void ActorTranslateCallback();
+  void ActorTranslateEndCallback();
   
   // Description:
   // Scale the actor. Also modify the entry widget that controles the scaling.
   void SetActorScale(float* p);
   void SetActorScale(float x, float y, float z);
+  void SetActorScaleNoTrace(float x, float y, float z);
   void GetActorScale(float* p);
   void ActorScaleCallback();
+  void ActorScaleEndCallback();
   
   // Description:
   // Orient the actor. 
@@ -189,8 +194,10 @@ public:
   // Also modify the entry widget that controles the origin.
   void SetActorOrigin(float* p);
   void SetActorOrigin(float x, float y, float z);
+  void SetActorOriginNoTrace(float x, float y, float z);
   void GetActorOrigin(float* p);
   void ActorOriginCallback();
+  void ActorOriginEndCallback();
   
   // Description:
   // Set the transparency of the actor.
@@ -443,10 +450,10 @@ protected:
   vtkKWLabel *InterpolationMenuLabel;
   vtkKWOptionMenu *InterpolationMenu;
 
-  vtkKWLabel *PointSizeLabel;
-  vtkKWScale *PointSizeScale;
-  vtkKWLabel *LineWidthLabel;
-  vtkKWScale *LineWidthScale;
+  vtkKWLabel      *PointSizeLabel;
+  vtkKWThumbWheel *PointSizeThumbWheel;
+  vtkKWLabel      *LineWidthLabel;
+  vtkKWThumbWheel *LineWidthThumbWheel;
   
   vtkKWCheckButton *VisibilityCheck;
   // Need a separate value for visibility to properly manage 
@@ -499,16 +506,16 @@ protected:
   
   // For translating actor
   vtkKWLabeledFrame* ActorControlFrame;
-  vtkKWLabel* TranslateLabel;
-  vtkKWEntry* TranslateEntry[3];
-  vtkKWLabel* ScaleLabel;
-  vtkKWEntry* ScaleEntry[3];
-  vtkKWLabel* OrientationLabel;
-  vtkKWScale* OrientationScale[3];
-  vtkKWLabel* OriginLabel;
-  vtkKWEntry* OriginEntry[3];
-  vtkKWLabel* OpacityLabel;
-  vtkKWScale* OpacityScale;
+  vtkKWLabel*        TranslateLabel;
+  vtkKWThumbWheel*   TranslateThumbWheel[3];
+  vtkKWLabel*        ScaleLabel;
+  vtkKWThumbWheel*   ScaleThumbWheel[3];
+  vtkKWLabel*        OrientationLabel;
+  vtkKWScale*        OrientationScale[3];
+  vtkKWLabel*        OriginLabel;
+  vtkKWThumbWheel*   OriginThumbWheel[3];
+  vtkKWLabel*        OpacityLabel;
+  vtkKWScale*        OpacityScale;
 
   vtkKWCheckButton *CubeAxesCheck;
   char* CubeAxesTclName;
@@ -527,6 +534,8 @@ protected:
 
   int LODResolution;
   float CollectThreshold;
+
+  void UpdateActorControlResolutions();
 
   vtkPVData(const vtkPVData&); // Not implemented
   void operator=(const vtkPVData&); // Not implemented
