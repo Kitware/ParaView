@@ -303,6 +303,10 @@ void vtkKWView::ShowViewProperties()
     vtkErrorMacro("attempt to update properties without an application set");
     }
   
+  // make sure the variable is set, otherwise set it
+  this->ParentWindow->GetMenuProperties()->CheckRadioButton(
+    this->ParentWindow->GetMenuProperties(),"Radio",10);
+
   // unpack any current children
   this->Script("catch {eval pack forget [pack slaves %s]}",
                this->GetPropertiesParent()->GetWidgetName());
@@ -315,6 +319,27 @@ void vtkKWView::ShowViewProperties()
     }
   this->Script("pack %s -pady 2 -padx 2 -fill both -expand yes -anchor n",
                this->Notebook->GetWidgetName());
+  this->PackProperties();
+}
+
+void vtkKWView::PackProperties()
+{
+  // make sure the view is packed if necc
+  if (this->SharedPropertiesParent)
+    {
+    // if the windows prop is not currently this views prop
+    this->Script("pack slaves %s",
+                 this->PropertiesParent->GetParent()->GetWidgetName());
+    if (strcmp(this->Application->GetMainInterp()->result,
+               this->PropertiesParent->GetWidgetName()))
+      {
+      // forget current props
+      this->Script("pack forget [pack slaves %s]",
+                   this->PropertiesParent->GetParent()->GetWidgetName());  
+      this->Script("pack %s -side left -anchor nw -fill y",
+                   this->PropertiesParent->GetWidgetName());
+      }
+    }
 }
 
 void vtkKWView::SetSelectedComposite(vtkKWComposite *_arg)
@@ -638,7 +663,11 @@ void vtkKWView::EditCopy()
 void vtkKWView::Select(vtkKWWindow *pw)
 {
   // now add property options
-  pw->GetMenuProperties()->InsertCommand(0,"View", this, "ShowViewProperties");
+  char *rbv = 
+    pw->GetMenuProperties()->CreateRadioButtonVariable(
+      pw->GetMenuProperties(),"Radio");
+  pw->GetMenuProperties()->AddRadioButton(10,"View", rbv, this, "ShowViewProperties");
+  delete [] rbv;
   
   // add the Print option
   pw->GetMenuFile()->InsertCommand(this->ParentWindow->GetFileMenuIndex(),
@@ -665,8 +694,14 @@ void vtkKWView::Select(vtkKWWindow *pw)
   // map the property sheet as needed
   if (this->SharedPropertiesParent)
     {
-    this->Script("pack %s -side left -anchor nw -fill y",
-                 this->PropertiesParent->GetWidgetName());
+    // if the window prop is empty then pack this one
+    this->Script("pack slaves %s",
+                 this->PropertiesParent->GetParent()->GetWidgetName());
+    if (strlen(this->Application->GetMainInterp()->result) < 1)
+      {
+      this->Script("pack %s -side left -anchor nw -fill y",
+                   this->PropertiesParent->GetWidgetName());
+      }
     }
 }
 
@@ -917,5 +952,5 @@ void vtkKWView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWView ";
-  this->ExtractRevision(os,"$Revision: 1.11 $");
+  this->ExtractRevision(os,"$Revision: 1.12 $");
 }

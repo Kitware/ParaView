@@ -151,6 +151,10 @@ public:
   void CreateDefaultPropertiesParent();
 
   // Description:
+  // Make sure that the Views property parent is currently packed
+  void PackProperties();
+  
+  // Description:
   // Render the image.
   virtual void Render() {this->GetVTKWindow()->Render();};
   virtual void Reset() {};

@@ -38,6 +38,7 @@ class vtkKWApplication;
 #include "vtkKWProgressGauge.h"
 #include "vtkKWViewCollection.h"
 #include "vtkKWMenu.h"
+#include "vtkKWNotebook.h"
 
 class VTK_EXPORT vtkKWWindow : public vtkKWWidget
 {
@@ -127,6 +128,10 @@ public:
   void InstallMenu(vtkKWMenu* menu);
 
   // Description:
+  // Allow access to the notebook object.
+  vtkGetObjectMacro(Notebook,vtkKWNotebook);
+
+  // Description:
   // This toolbar frame is below the menu. It is empty initially.
   // Subclasses can add toolbars buttons as necessary.
   vtkGetObjectMacro(ToolbarFrame, vtkKWWidget);
@@ -143,6 +148,7 @@ protected:
   void operator=(const vtkKWWindow&) {};
   virtual void SerializeRevision(ostream& os, vtkIndent indent);
 
+  vtkKWNotebook *Notebook;
   virtual void CreateStatusImage();
   int NumberOfMRUFiles;
   vtkKWView *SelectedView;
