@@ -52,7 +52,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWUserInterfaceNotebookManager);
-vtkCxxRevisionMacro(vtkKWUserInterfaceNotebookManager, "1.19");
+vtkCxxRevisionMacro(vtkKWUserInterfaceNotebookManager, "1.20");
 
 int vtkKWUserInterfaceNotebookManagerCommand(ClientData cd, Tcl_Interp *interp,
                                              int argc, char *argv[]);
@@ -373,7 +373,7 @@ int vtkKWUserInterfaceNotebookManager::ShowPanel(
     this->Notebook->ShowPagesMatchingTag(tag);
     }
 
-  // If there were pages matching that tag, but we end up with no pages
+  // If there were pages matching that tag, but we end up with *no* pages
   // visible for that tag, then we failed (maybe because of the notebook
   // constraints, the number of pages already pinned, etc).
 
@@ -423,6 +423,44 @@ int vtkKWUserInterfaceNotebookManager::HidePanel(
 
   return 1;
 }
+
+//----------------------------------------------------------------------------
+int vtkKWUserInterfaceNotebookManager::IsPanelVisible(
+  vtkKWUserInterfacePanel *panel)
+{
+  if (!this->IsCreated())
+    {
+    vtkErrorMacro(
+      "Can not check pages visiblity if the manager has not been created.");
+    return 0;
+    }
+
+  if (!panel)
+    {
+    vtkErrorMacro("Can not check the pages visibility from a NULL panel.");
+    return 0;
+    }
+  
+  if (!this->HasPanel(panel))
+    {
+    vtkErrorMacro("Can not check the pages visibility from a panel that is "
+                  "not in the manager.");
+    return 0;
+    }
+
+  // Pages share the same tag
+
+  int tag = this->GetPanelId(panel);
+  if (tag < 0)
+    {
+    vtkErrorMacro("Can not access the panel to show its pages.");
+    return 0;
+    }
+
+  return (this->Notebook->GetNumberOfPagesMatchingTag(tag) ==
+          this->Notebook->GetNumberOfVisiblePagesMatchingTag(tag));
+}
+
 //----------------------------------------------------------------------------
 int vtkKWUserInterfaceNotebookManager::RaisePanel(
   vtkKWUserInterfacePanel *panel)
