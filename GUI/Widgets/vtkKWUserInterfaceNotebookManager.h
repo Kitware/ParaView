@@ -41,6 +41,11 @@ class vtkKWNotebook;
 class vtkKWUserInterfacePanel;
 class vtkKWWidget;
 
+//BTX
+template<class DataType> class vtkLinkedList;
+template<class DataType> class vtkLinkedListIterator;
+//ETX
+
 class VTK_EXPORT vtkKWUserInterfaceNotebookManager : public vtkKWUserInterfaceManager
 {
 public:

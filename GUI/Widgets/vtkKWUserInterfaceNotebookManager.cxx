@@ -28,7 +28,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWUserInterfaceNotebookManager);
-vtkCxxRevisionMacro(vtkKWUserInterfaceNotebookManager, "1.29");
+vtkCxxRevisionMacro(vtkKWUserInterfaceNotebookManager, "1.30");
 
 int vtkKWUserInterfaceNotebookManagerCommand(ClientData cd, Tcl_Interp *interp,
                                              int argc, char *argv[]);
@@ -550,20 +550,15 @@ void vtkKWUserInterfaceNotebookManager::SetEnableDragAndDrop(int arg)
 
   // Update all panels Drag And Drop bindings
 
-  vtkKWUserInterfaceManager::PanelSlot *panel_slot = NULL;
-  vtkKWUserInterfaceManager::PanelsContainerIterator *panel_it = 
-    this->Panels->NewIterator();
-
-  panel_it->InitTraversal();
-  while (!panel_it->IsDoneWithTraversal())
+  int i, nb_panels = this->GetNumberOfPanels();
+  for (i = 0; i < nb_panels; i++)
     {
-    if (panel_it->GetData(panel_slot) == VTK_OK)
+    vtkKWUserInterfacePanel *panel = this->GetNthPanel(i);
+    if (panel)
       {
-      this->UpdatePanelDragAndDrop(panel_slot->Panel);
+      this->UpdatePanelDragAndDrop(panel);
       }
-    panel_it->GoToNextItem();
     }
-  panel_it->Delete();
 }
 
 //----------------------------------------------------------------------------

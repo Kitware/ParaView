@@ -41,11 +41,7 @@ class vtkKWApplication;
 class vtkKWIcon;
 class vtkKWWidget;
 class vtkKWUserInterfacePanel;
-
-//BTX
-template<class DataType> class vtkLinkedList;
-template<class DataType> class vtkLinkedListIterator;
-//ETX
+class vtkKWUserInterfaceManagerInternals;
 
 class VTK_EXPORT vtkKWUserInterfaceManager : public vtkKWObject
 {
@@ -79,11 +75,16 @@ public:
   virtual int AddPanel(vtkKWUserInterfacePanel *panel);
 
   // Description:
-  // Convenience method to get the panel from its name or ID, or from a page
-  // ID (return the ID of the panel that holds that page).
+  // Get the number of panel
+  virtual int GetNumberOfPanels();
+
+  // Description:
+  // Convenience method to get the panel from its name or ID, from a page
+  // ID (return the ID of the panel that holds that page), or the nth panel
   virtual vtkKWUserInterfacePanel* GetPanel(const char *panel_name);
   virtual vtkKWUserInterfacePanel* GetPanel(int id);
   virtual vtkKWUserInterfacePanel* GetPanelFromPageId(int id) = 0;
+  virtual vtkKWUserInterfacePanel* GetNthPanel(int rank);
 
   // Description:
   // Remove a panel from the manager.
@@ -179,10 +180,6 @@ protected:
   //BTX
 
   // A panel slot associate a panel to a unique Id
-  // No, I don't want to use a map between those two, for the 
-  // following reasons:
-  // a), we might need more information in the future, b) a map 
-  // Register/Unregister pointers if they are pointers to VTK objects.
  
   class PanelSlot
   {
@@ -191,9 +188,10 @@ protected:
     vtkKWUserInterfacePanel *Panel;
   };
 
-  typedef vtkLinkedList<PanelSlot*> PanelsContainer;
-  typedef vtkLinkedListIterator<PanelSlot*> PanelsContainerIterator;
-  PanelsContainer *Panels;
+  // PIMPL Encapsulation for STL containers
+
+  vtkKWUserInterfaceManagerInternals *Internals;
+  friend class vtkKWUserInterfaceManagerInternals;
 
   // Helper methods
   // Get a panel slot given a panel or an id, check if the manager has a given
@@ -202,6 +200,7 @@ protected:
   PanelSlot* GetPanelSlot(vtkKWUserInterfacePanel *panel);
   PanelSlot* GetPanelSlot(int id);
   PanelSlot* GetPanelSlot(const char *panel_name);
+  PanelSlot* GetNthPanelSlot(int rank);
   int HasPanel(vtkKWUserInterfacePanel *panel);
   int GetPanelId(vtkKWUserInterfacePanel *panel);
 

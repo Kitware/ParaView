@@ -16,21 +16,34 @@
 
 #include "vtkKWWidget.h"
 #include "vtkKWUserInterfacePanel.h"
-#include "vtkLinkedList.txx"
-#include "vtkLinkedListIterator.txx"
 #include "vtkObjectFactory.h"
 
+#include <vtkstd/list>
+#include <vtkstd/algorithm>
+
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkKWUserInterfaceManager, "1.15");
+vtkCxxRevisionMacro(vtkKWUserInterfaceManager, "1.16");
 
 int vtkKWUserInterfaceManagerCommand(ClientData cd, Tcl_Interp *interp,
                                      int argc, char *argv[]);
 
 //----------------------------------------------------------------------------
+class vtkKWUserInterfaceManagerInternals
+{
+public:
+
+  typedef vtkstd::list<vtkKWUserInterfaceManager::PanelSlot*> PanelsContainer;
+  typedef vtkstd::list<vtkKWUserInterfaceManager::PanelSlot*>::iterator PanelsContainerIterator;
+
+  PanelsContainer Panels;
+};
+
+//----------------------------------------------------------------------------
 vtkKWUserInterfaceManager::vtkKWUserInterfaceManager()
 {
   this->IdCounter = 0;
-  this->Panels = vtkKWUserInterfaceManager::PanelsContainer::New();
+
+  this->Internals = new vtkKWUserInterfaceManagerInternals;
 }
 
 //----------------------------------------------------------------------------
@@ -38,99 +51,110 @@ vtkKWUserInterfaceManager::~vtkKWUserInterfaceManager()
 {
   // Delete all panels
 
-  vtkKWUserInterfaceManager::PanelSlot *panel_slot = NULL;
-  vtkKWUserInterfaceManager::PanelsContainerIterator *it = 
-    this->Panels->NewIterator();
-
-  it->InitTraversal();
-  while (!it->IsDoneWithTraversal())
+  if (this->Internals)
     {
-    if (it->GetData(panel_slot) == VTK_OK)
+    vtkKWUserInterfaceManagerInternals::PanelsContainerIterator it = 
+      this->Internals->Panels.begin();
+    vtkKWUserInterfaceManagerInternals::PanelsContainerIterator end = 
+      this->Internals->Panels.end();
+    for (; it != end; ++it)
       {
-      delete panel_slot;
+      if (*it)
+        {
+        delete (*it);
+        }
       }
-    it->GoToNextItem();
+    delete this->Internals;
     }
-  it->Delete();
-
-  // Delete the container
-
-  this->Panels->Delete();
 }
 
 //----------------------------------------------------------------------------
 vtkKWUserInterfaceManager::PanelSlot* 
 vtkKWUserInterfaceManager::GetPanelSlot(vtkKWUserInterfacePanel *panel)
 {
-  vtkKWUserInterfaceManager::PanelSlot *panel_slot = NULL;
-  vtkKWUserInterfaceManager::PanelSlot *found = NULL;
-  vtkKWUserInterfaceManager::PanelsContainerIterator *it = 
-    this->Panels->NewIterator();
-
-  it->InitTraversal();
-  while (!it->IsDoneWithTraversal())
+  if (this->Internals && panel)
     {
-    if (it->GetData(panel_slot) == VTK_OK && panel_slot->Panel == panel)
+    vtkKWUserInterfaceManagerInternals::PanelsContainerIterator it = 
+      this->Internals->Panels.begin();
+    vtkKWUserInterfaceManagerInternals::PanelsContainerIterator end = 
+      this->Internals->Panels.end();
+    for (; it != end; ++it)
       {
-      found = panel_slot;
-      break;
+      if (*it && (*it)->Panel == panel)
+        {
+        return *it;
+        }
       }
-    it->GoToNextItem();
     }
-  it->Delete();
 
-  return found;
+  return NULL;
 }
 
 //----------------------------------------------------------------------------
 vtkKWUserInterfaceManager::PanelSlot* 
 vtkKWUserInterfaceManager::GetPanelSlot(int id)
 {
-  vtkKWUserInterfaceManager::PanelSlot *panel_slot = NULL;
-  vtkKWUserInterfaceManager::PanelSlot *found = NULL;
-  vtkKWUserInterfaceManager::PanelsContainerIterator *it = 
-    this->Panels->NewIterator();
-
-  it->InitTraversal();
-  while (!it->IsDoneWithTraversal())
+  if (this->Internals)
     {
-    if (it->GetData(panel_slot) == VTK_OK && panel_slot->Id == id)
+    vtkKWUserInterfaceManagerInternals::PanelsContainerIterator it = 
+      this->Internals->Panels.begin();
+    vtkKWUserInterfaceManagerInternals::PanelsContainerIterator end = 
+      this->Internals->Panels.end();
+    for (; it != end; ++it)
       {
-      found = panel_slot;
-      break;
+      if (*it && (*it)->Id == id)
+        {
+        return *it;
+        }
       }
-    it->GoToNextItem();
     }
-  it->Delete();
 
-  return found;
+  return NULL;
 }
 
 //----------------------------------------------------------------------------
 vtkKWUserInterfaceManager::PanelSlot* 
 vtkKWUserInterfaceManager::GetPanelSlot(const char *panel_name)
 {
-  vtkKWUserInterfaceManager::PanelSlot *panel_slot = NULL;
-  vtkKWUserInterfaceManager::PanelSlot *found = NULL;
-  vtkKWUserInterfaceManager::PanelsContainerIterator *it = 
-    this->Panels->NewIterator();
-
-  it->InitTraversal();
-  while (!it->IsDoneWithTraversal())
+  if (this->Internals && panel_name)
     {
-    if (it->GetData(panel_slot) == VTK_OK && 
-        panel_slot->Panel &&
-        panel_slot->Panel->GetName() &&
-        !strcmp(panel_slot->Panel->GetName(), panel_name))
+    vtkKWUserInterfaceManagerInternals::PanelsContainerIterator it = 
+      this->Internals->Panels.begin();
+    vtkKWUserInterfaceManagerInternals::PanelsContainerIterator end = 
+      this->Internals->Panels.end();
+    for (; it != end; ++it)
       {
-      found = panel_slot;
-      break;
+      if (*it && (*it)->Panel && (*it)->Panel->GetName() &&
+          !strcmp((*it)->Panel->GetName(), panel_name))
+        {
+        return *it;
+        }
       }
-    it->GoToNextItem();
     }
-  it->Delete();
 
-  return found;
+  return NULL;
+}
+
+//----------------------------------------------------------------------------
+vtkKWUserInterfaceManager::PanelSlot* 
+vtkKWUserInterfaceManager::GetNthPanelSlot(int rank)
+{
+  if (this->Internals && rank >= 0 && rank < this->GetNumberOfPanels())
+    {
+    vtkKWUserInterfaceManagerInternals::PanelsContainerIterator it = 
+      this->Internals->Panels.begin();
+    vtkKWUserInterfaceManagerInternals::PanelsContainerIterator end = 
+      this->Internals->Panels.end();
+    for (; it != end; ++it)
+      {
+      if (*it && !rank--)
+        {
+        return *it;
+        }
+      }
+    }
+
+  return NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -178,6 +202,19 @@ vtkKWUserInterfacePanel* vtkKWUserInterfaceManager::GetPanel(
 }
 
 //----------------------------------------------------------------------------
+vtkKWUserInterfacePanel* vtkKWUserInterfaceManager::GetNthPanel(int rank)
+{
+  vtkKWUserInterfaceManager::PanelSlot *panel_slot = 
+    this->GetNthPanelSlot(rank);
+  if (!panel_slot)
+    {
+    return NULL;
+    }
+
+  return panel_slot->Panel;
+}
+
+//----------------------------------------------------------------------------
 void vtkKWUserInterfaceManager::Create(vtkKWApplication *app)
 {
   // Set the application
@@ -200,59 +237,65 @@ int vtkKWUserInterfaceManager::IsCreated()
 //----------------------------------------------------------------------------
 void vtkKWUserInterfaceManager::SetEnabled(int arg)
 {
-  vtkKWUserInterfaceManager::PanelSlot *panel_slot = NULL;
-  vtkKWUserInterfaceManager::PanelsContainerIterator *it = 
-    this->Panels->NewIterator();
-
-  it->InitTraversal();
-  while (!it->IsDoneWithTraversal())
+  if (this->Internals)
     {
-    if (it->GetData(panel_slot) == VTK_OK)
+    vtkKWUserInterfaceManagerInternals::PanelsContainerIterator it = 
+      this->Internals->Panels.begin();
+    vtkKWUserInterfaceManagerInternals::PanelsContainerIterator end = 
+      this->Internals->Panels.end();
+    for (; it != end; ++it)
       {
-      panel_slot->Panel->SetEnabled(arg);
-      panel_slot->Panel->Update();
+      if (*it && (*it)->Panel)
+        {
+        (*it)->Panel->SetEnabled(arg);
+        (*it)->Panel->Update();
+        }
       }
-    it->GoToNextItem();
     }
-  it->Delete();
 }
 
 //----------------------------------------------------------------------------
 void vtkKWUserInterfaceManager::Update()
 {
-  vtkKWUserInterfaceManager::PanelSlot *panel_slot = NULL;
-  vtkKWUserInterfaceManager::PanelsContainerIterator *it = 
-    this->Panels->NewIterator();
-
-  it->InitTraversal();
-  while (!it->IsDoneWithTraversal())
+  if (this->Internals)
     {
-    if (it->GetData(panel_slot) == VTK_OK)
+    vtkKWUserInterfaceManagerInternals::PanelsContainerIterator it = 
+      this->Internals->Panels.begin();
+    vtkKWUserInterfaceManagerInternals::PanelsContainerIterator end = 
+      this->Internals->Panels.end();
+    for (; it != end; ++it)
       {
-      panel_slot->Panel->Update();
+      if (*it && (*it)->Panel)
+        {
+        (*it)->Panel->Update();
+        }
       }
-    it->GoToNextItem();
     }
-  it->Delete();
 }
 
 //----------------------------------------------------------------------------
 void vtkKWUserInterfaceManager::UpdateEnableState()
 {
-  vtkKWUserInterfaceManager::PanelSlot *panel_slot = NULL;
-  vtkKWUserInterfaceManager::PanelsContainerIterator *it = 
-    this->Panels->NewIterator();
-
-  it->InitTraversal();
-  while (!it->IsDoneWithTraversal())
+  if (this->Internals)
     {
-    if (it->GetData(panel_slot) == VTK_OK)
+    vtkKWUserInterfaceManagerInternals::PanelsContainerIterator it = 
+      this->Internals->Panels.begin();
+    vtkKWUserInterfaceManagerInternals::PanelsContainerIterator end = 
+      this->Internals->Panels.end();
+    for (; it != end; ++it)
       {
-      panel_slot->Panel->UpdateEnableState();
+      if (*it && (*it)->Panel)
+        {
+        (*it)->Panel->UpdateEnableState();
+        }
       }
-    it->GoToNextItem();
     }
-  it->Delete();
+}
+
+// ----------------------------------------------------------------------------
+int vtkKWUserInterfaceManager::GetNumberOfPanels()
+{
+  return this->Internals ? this->Internals->Panels.size() : 0;
 }
 
 //----------------------------------------------------------------------------
@@ -276,12 +319,7 @@ int vtkKWUserInterfaceManager::AddPanel(vtkKWUserInterfacePanel *panel)
   vtkKWUserInterfaceManager::PanelSlot *panel_slot = 
     new vtkKWUserInterfaceManager::PanelSlot;
 
-  if (this->Panels->AppendItem(panel_slot) != VTK_OK)
-    {
-    vtkErrorMacro("Error while adding a panel to the manager.");
-    delete panel_slot;
-    return -1;
-    }
+  this->Internals->Panels.push_back(panel_slot);
   
   // Each panel has a unique ID in the manager lifetime
 
@@ -315,8 +353,12 @@ int vtkKWUserInterfaceManager::RemovePanel(vtkKWUserInterfacePanel *panel)
 
   vtkKWUserInterfaceManager::PanelSlot *panel_slot = this->GetPanelSlot(panel);
 
-  vtkIdType pos = 0;
-  if (this->Panels->FindItem(panel_slot, pos) != VTK_OK)
+  vtkKWUserInterfaceManagerInternals::PanelsContainerIterator pos = 
+    vtkstd::find(this->Internals->Panels.begin(),
+                 this->Internals->Panels.end(),
+                 panel_slot);
+
+  if (pos == this->Internals->Panels.end())
     {
     vtkErrorMacro("Error while removing a panel from the manager "
                   "(can not find the panel).");
@@ -325,11 +367,7 @@ int vtkKWUserInterfaceManager::RemovePanel(vtkKWUserInterfacePanel *panel)
 
   // Remove the panel from the container
 
-  if (this->Panels->RemoveItem(pos) != VTK_OK)
-    {
-    vtkErrorMacro("Error while removing a panel from the manager.");
-    return 0;
-    }
+  this->Internals->Panels.erase(pos);
 
   // Delete the panel slot
 
@@ -341,39 +379,39 @@ int vtkKWUserInterfaceManager::RemovePanel(vtkKWUserInterfacePanel *panel)
 //----------------------------------------------------------------------------
 void vtkKWUserInterfaceManager::ShowAllPanels()
 {
-  vtkKWUserInterfaceManager::PanelSlot *panel_slot = NULL;
-  vtkKWUserInterfaceManager::PanelsContainerIterator *it = 
-    this->Panels->NewIterator();
-
-  it->InitTraversal();
-  while (!it->IsDoneWithTraversal())
+  if (this->Internals)
     {
-    if (it->GetData(panel_slot) == VTK_OK && panel_slot->Panel)
+    vtkKWUserInterfaceManagerInternals::PanelsContainerIterator it = 
+      this->Internals->Panels.begin();
+    vtkKWUserInterfaceManagerInternals::PanelsContainerIterator end = 
+      this->Internals->Panels.end();
+    for (; it != end; ++it)
       {
-      this->ShowPanel(panel_slot->Panel);
+      if (*it && (*it)->Panel)
+        {
+        this->ShowPanel((*it)->Panel);
+        }
       }
-    it->GoToNextItem();
     }
-  it->Delete();
 }
 
 //----------------------------------------------------------------------------
 void vtkKWUserInterfaceManager::HideAllPanels()
 {
-  vtkKWUserInterfaceManager::PanelSlot *panel_slot = NULL;
-  vtkKWUserInterfaceManager::PanelsContainerIterator *it = 
-    this->Panels->NewIterator();
-
-  it->InitTraversal();
-  while (!it->IsDoneWithTraversal())
+  if (this->Internals)
     {
-    if (it->GetData(panel_slot) == VTK_OK && panel_slot->Panel)
+    vtkKWUserInterfaceManagerInternals::PanelsContainerIterator it = 
+      this->Internals->Panels.begin();
+    vtkKWUserInterfaceManagerInternals::PanelsContainerIterator end = 
+      this->Internals->Panels.end();
+    for (; it != end; ++it)
       {
-      this->HidePanel(panel_slot->Panel);
+      if (*it && (*it)->Panel)
+        {
+        this->HidePanel((*it)->Panel);
+        }
       }
-    it->GoToNextItem();
     }
-  it->Delete();
 }
 
 //----------------------------------------------------------------------------
