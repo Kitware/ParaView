@@ -53,7 +53,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWriter);
-vtkCxxRevisionMacro(vtkPVWriter, "1.8.2.4");
+vtkCxxRevisionMacro(vtkPVWriter, "1.8.2.5");
 
 //----------------------------------------------------------------------------
 vtkPVWriter::vtkPVWriter()
@@ -151,7 +151,7 @@ void vtkPVWriter::WriteOneFile(const char* fileName, vtkPVSource* pvs,
     {
     // Create the writer and configure it.
     pm->ServerScript("%s writer", this->WriterClassName);
-    pm->ServerScript("writer SetFileName %s", fileName);
+    pm->ServerScript("writer SetFileName {%s}", fileName);
     pm->ServerScript("writer SetInput %s", dataTclName);
     if (this->DataModeMethod)
       {
