@@ -39,9 +39,12 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-// .NAME vtkPVWriter - 
+// .NAME vtkPVWriter - Wraps a VTK file writer.
 // .SECTION Description
-// vtkPVWriter
+// vtkPVWriter provides functionality for writers similar to that
+// provided by vtkPVReaderModule for readers.  An instance of this
+// class is configured by an XML ModuleInterface specification and
+// knows how to create and use a single VTK file writer object.
 
 #ifndef __vtkPVWriter_h
 #define __vtkPVWriter_h
@@ -115,6 +118,10 @@ protected:
   char* Extension;
   int Parallel;
   char* DataModeMethod;
+  
+private:
+  vtkPVWriter(const vtkPVWriter&); // Not implemented
+  void operator=(const vtkPVWriter&); // Not implemented
 };
 
 #endif
