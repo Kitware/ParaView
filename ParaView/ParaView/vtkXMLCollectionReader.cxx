@@ -30,7 +30,7 @@
 #include <vtkstd/map>
 #include <vtkstd/algorithm>
 
-vtkCxxRevisionMacro(vtkXMLCollectionReader, "1.2");
+vtkCxxRevisionMacro(vtkXMLCollectionReader, "1.3");
 vtkStandardNewMacro(vtkXMLCollectionReader);
 
 //----------------------------------------------------------------------------
@@ -554,7 +554,8 @@ void vtkXMLCollectionReader::ReadXMLData()
       {
       int p = this->Outputs[this->CurrentOutput]->GetUpdatePiece();
       int n = this->Outputs[this->CurrentOutput]->GetUpdateNumberOfPieces();
-      out->SetUpdateExtent(p,n);
+      int g = this->Outputs[this->CurrentOutput]->GetUpdateGhostLevel();
+      out->SetUpdateExtent(p, n, g);
       }
     else
       {
