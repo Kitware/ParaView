@@ -108,7 +108,11 @@ void vtkKWImageLabel::SetImageData(const unsigned char* data,
       pp+=3;
       }
     }
+#if (TK_MAJOR_VERSION == 8) && (TK_MINOR_VERSION >= 4)
+  Tk_PhotoPutBlock(photo, &sblock, 0, 0, width, height, TK_PHOTO_COMPOSITE_SET);
+#else
   Tk_PhotoPutBlock(photo, &sblock, 0, 0, width, height);
+#endif
   this->Script("%s configure -image %s", this->GetWidgetName(),
                this->ImageDataLabel);
   delete [] array;

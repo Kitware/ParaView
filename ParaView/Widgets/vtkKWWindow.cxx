@@ -871,7 +871,11 @@ void vtkKWWindow::CreateStatusImage()
     lp = lp - 2*128*3;
     }
   
+#if (TK_MAJOR_VERSION == 8) && (TK_MINOR_VERSION >= 4)
+  Tk_PhotoPutBlock(photo, &block, 0, 0, block.width, block.height, TK_PHOTO_COMPOSITE_SET);
+#else
   Tk_PhotoPutBlock(photo, &block, 0, 0, block.width, block.height);
+#endif
   delete [] block.pixelPtr;
 }
 
@@ -992,7 +996,7 @@ void vtkKWWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWWindow ";
-  this->ExtractRevision(os,"$Revision: 1.104 $");
+  this->ExtractRevision(os,"$Revision: 1.105 $");
 }
 
 int vtkKWWindow::ExitDialog()
