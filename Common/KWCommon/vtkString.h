@@ -141,6 +141,11 @@ public:
   static int ConvertTimeStampMacroString(char *str, time_t *tmt);
   //ETX
 
+  // Description:
+  // Add space to string between word delimited by first letter in uppercase
+  // Return a pointer to the resulting string (i.e. 'res').
+  static char* AddSpaceToUpperFirstString(const char* str, char *res);
+
 protected:
   vtkString() {};
   ~vtkString() {};
