@@ -138,6 +138,10 @@ public:
   
   virtual void Close();
 
+  // Stuff for creating a log file for times.
+  void StartLog();
+  void StopLog();
+
 protected:
   vtkPVWindow();
   ~vtkPVWindow();

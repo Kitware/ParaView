@@ -289,6 +289,10 @@ void vtkPVWindow::Create(vtkKWApplication *app, char *args)
   this->MenuFile->InsertCommand(0, "Open Data File", this, "Open");
   this->MenuFile->InsertCommand(1, "Save Tcl script", this, "Save");
   
+  // Log stuff
+  this->MenuFile->InsertCommand(4, "Open Log File", this, "StartLog");
+  this->MenuFile->InsertCommand(5, "Close Log File", this, "StopLog");
+
   this->SelectMenu->SetParent(this->GetMenu());
   this->SelectMenu->Create(this->Application, "-tearoff 0");
   this->Menu->InsertCascade(2, "Select", this->SelectMenu, 0);
@@ -1154,6 +1158,29 @@ void vtkPVWindow::ShowCurrentSourceProperties()
 vtkPVApplication *vtkPVWindow::GetPVApplication()
 {
   return vtkPVApplication::SafeDownCast(this->Application);
+}
+
+
+//----------------------------------------------------------------------------
+void vtkPVWindow::StartLog()
+{
+  char *filename = NULL;
+  
+  this->Script("tk_getSaveFile -filetypes {{{Log Text File} {.txt}}}");
+  filename = this->Application->GetMainInterp()->result;
+
+  if (strcmp(filename, "") == 0)
+    {
+    return;
+    }
+  
+  this->GetPVApplication()->StartLog(filename);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVWindow::StopLog()
+{
+  this->GetPVApplication()->StopLog();
 }
 
 //----------------------------------------------------------------------------
@@ -2041,6 +2068,40 @@ void vtkPVWindow::ReadSourceInterfaces()
   mInt->SetGetCommand("GetGenerateClipScalars");
   mInt->SetWidgetTypeToToggle();
   mInt->SetBalloonHelp("If this flag is enabled, then the output scalar values will be interpolated from the implicit function values, and not the input scalar data");
+  sInt->AddMethodInterface(mInt);
+  mInt->Delete();
+  mInt = NULL;
+  // Add it to the list.
+  this->SourceInterfaces->AddItem(sInt);
+  sInt->Delete();
+  sInt = NULL;
+
+  // ---- Clip Scalars ----.
+  sInt = vtkPVSourceInterface::New();
+  sInt->SetApplication(pvApp);
+  sInt->SetPVWindow(this);
+  sInt->SetSourceClassName("vtkClipDataSet");
+  sInt->SetRootName("ClipDS");
+  sInt->SetInputClassName("vtkDataSet");
+  sInt->SetOutputClassName("vtkUnstructuredGrid");
+  sInt->DefaultScalarsOn();
+  // Method
+  mInt = vtkPVMethodInterface::New();
+  mInt->SetVariableName("Value");
+  mInt->SetSetCommand("SetValue");
+  mInt->SetGetCommand("GetValue");
+  mInt->AddFloatArgument();
+  mInt->SetBalloonHelp("Set the scalar value to clip by");
+  sInt->AddMethodInterface(mInt);
+  mInt->Delete();
+  mInt = NULL;
+  // Method
+  mInt = vtkPVMethodInterface::New();
+  mInt->SetVariableName("InsideOut");
+  mInt->SetSetCommand("SetInsideOut");
+  mInt->SetGetCommand("GetInsideOut");
+  mInt->SetWidgetTypeToToggle();
+  mInt->SetBalloonHelp("Select which \"side\" of the data set to clip away");
   sInt->AddMethodInterface(mInt);
   mInt->Delete();
   mInt = NULL;
