@@ -30,7 +30,7 @@
 #include <vtkstd/algorithm>
 
 vtkStandardNewMacro(vtkSMProxy);
-vtkCxxRevisionMacro(vtkSMProxy, "1.30");
+vtkCxxRevisionMacro(vtkSMProxy, "1.31");
 
 vtkCxxSetObjectMacro(vtkSMProxy, XMLElement, vtkPVXMLElement);
 
@@ -239,6 +239,8 @@ unsigned int vtkSMProxy::GetNumberOfIDs()
 //---------------------------------------------------------------------------
 vtkClientServerID vtkSMProxy::GetID(unsigned int idx)
 {
+  this->CreateVTKObjects(idx+1);
+
   return this->Internals->IDs[idx];
 }
 

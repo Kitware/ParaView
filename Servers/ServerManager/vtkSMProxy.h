@@ -163,15 +163,7 @@ protected:
   friend class vtkSMPointLabelDisplay;
   friend class vtkSMPlotDisplay;
   friend class vtkSMCubeAxesDisplay;
-  friend class vtkPVPointSourceWidget;
-  friend class vtkPVLineSourceWidget;
-  friend class vtkPVImplicitPlaneWidget;
-  friend class vtkPVSphereWidget;
-  friend class vtkPVBoxWidget;
-  friend class vtkPVColorMap;
   friend class vtkSMBoxWidgetProxy;
-  // Temporary
-  friend class vtkPVSource;
 //ETX
 
   // Description:
