@@ -37,7 +37,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVArrayMenu);
-vtkCxxRevisionMacro(vtkPVArrayMenu, "1.62");
+vtkCxxRevisionMacro(vtkPVArrayMenu, "1.63");
 
 vtkCxxSetObjectMacro(vtkPVArrayMenu, InputMenu, vtkPVInputMenu);
 vtkCxxSetObjectMacro(vtkPVArrayMenu, FieldMenu, vtkPVFieldMenu);
@@ -74,8 +74,6 @@ vtkPVArrayMenu::~vtkPVArrayMenu()
 
   this->SetInputMenu(NULL);
   this->SetFieldMenu(NULL);
-
-  this->SetProperty(NULL);
 }
 
 //----------------------------------------------------------------------------

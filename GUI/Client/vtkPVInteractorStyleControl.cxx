@@ -30,7 +30,6 @@
 #include "vtkPVScale.h"
 #include "vtkPVVectorEntry.h"
 #include "vtkPVWidget.h"
-#include "vtkPVWidgetProperty.h"
 #include "vtkString.h"
 #include "vtkTclUtil.h"
 #include "vtkSmartPointer.h"
@@ -41,7 +40,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVInteractorStyleControl );
-vtkCxxRevisionMacro(vtkPVInteractorStyleControl, "1.37");
+vtkCxxRevisionMacro(vtkPVInteractorStyleControl, "1.38");
 
 vtkCxxSetObjectMacro(vtkPVInteractorStyleControl,ManipulatorCollection,
                      vtkCollection);
@@ -86,7 +85,6 @@ public:
 
   ManipulatorMap          Manipulators;
   WidgetsMap              Widgets;
-  vtkCollection*          WidgetProperties;
   MapStringToArrayString Arguments;
 //ETX
 
@@ -117,8 +115,6 @@ vtkPVInteractorStyleControl::vtkPVInteractorStyleControl()
     {
     this->Menus[cc] = vtkKWOptionMenu::New();
     }
-
-  this->Internals->WidgetProperties = vtkCollection::New();
 
   this->ManipulatorCollection = 0;
   this->DefaultManipulator = 0;
@@ -169,7 +165,6 @@ vtkPVInteractorStyleControl::~vtkPVInteractorStyleControl()
     {
     this->Menus[cc]->Delete();
     }
-  this->Internals->WidgetProperties->Delete();
 
   this->SetDefaultManipulator(0);
   this->SetRegisteryName(0);
@@ -675,27 +670,8 @@ void vtkPVInteractorStyleControl::AddArgument(
     {
     wit->second->SetParent(0);
     wit->second->SetPVSource(0);
-    vtkCollectionIterator* it = this->Internals->WidgetProperties->NewIterator();
-    for ( it->InitTraversal(); !it->IsDoneWithTraversal();
-      it->GoToNextItem() )
-      {
-      vtkPVWidgetProperty* prop = vtkPVWidgetProperty::SafeDownCast(
-        it->GetObject());
-      if ( prop && prop->GetWidget() == wit->second.GetPointer() )
-        {
-        prop->SetWidget(0);
-        this->Internals->WidgetProperties->RemoveItem(prop);
-        break;
-        }
-      }
-    it->Delete();
-    wit->second->SetProperty(0);
     }
   this->Internals->Widgets[name] = widget;
-  vtkPVWidgetProperty *prop = widget->CreateAppropriateProperty();
-  prop->SetWidget(widget);
-  this->Internals->WidgetProperties->AddItem(prop);
-  prop->Delete();
 
   char str[512];
   widget->SetTraceReferenceObject(this);

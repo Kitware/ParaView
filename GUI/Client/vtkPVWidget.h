@@ -31,7 +31,6 @@ class vtkKWMenu;
 class vtkPVSource;
 class vtkPVApplication;
 class vtkPVAnimationInterfaceEntry;
-class vtkPVWidgetProperty;
 class vtkPVXMLElement;
 class vtkPVXMLPackageParser;
 class vtkPVWindow;
@@ -218,11 +217,6 @@ public:
   //ETX
 
   // Description:
-  // Set/get the property to use with this widget.  Overridden in subclasses.
-  virtual void SetProperty(vtkPVWidgetProperty *) {}
-  virtual vtkPVWidgetProperty* GetProperty() { return NULL; }
-
-  // Description:
   // Set/get the SM property to use with this widget..
   vtkSMProperty* GetSMProperty();
   void SetSMProperty(vtkSMProperty* prop);
@@ -233,11 +227,6 @@ public:
   vtkSetStringMacro(SMPropertyName);
   vtkGetStringMacro(SMPropertyName);
 
-  // Description:
-  // Create the right property for use with this widget.  Overridden in
-  // subclasses.
-  virtual vtkPVWidgetProperty* CreateAppropriateProperty();
-  
   vtkSetMacro(UseWidgetRange, int);
   vtkGetMacro(UseWidgetRange, int);
   vtkSetVector2Macro(WidgetRange, double);

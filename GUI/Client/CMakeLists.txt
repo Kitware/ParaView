@@ -80,7 +80,6 @@ SET( ParaViewClient_SRCS
   vtkPVGhostLevelDialog.cxx
   vtkPVGroupInputsWidget.cxx
   vtkPVImplicitPlaneWidget.cxx
-  vtkPVIndexWidgetProperty.cxx
   vtkPVInitialize.cxx
   vtkPVInputArrayRequirement.cxx
   vtkPVInputFixedTypeRequirement.cxx
@@ -112,7 +111,6 @@ SET( ParaViewClient_SRCS
   vtkPVRenderModuleUI.cxx
   vtkPVRenderView.cxx
   vtkPVSaveBatchScriptDialog.cxx
-  vtkPVScalarListWidgetProperty.cxx
   vtkPVScalarRangeLabel.cxx
   vtkPVScale.cxx
   vtkPVScaleFactorEntry.cxx
@@ -128,7 +126,6 @@ SET( ParaViewClient_SRCS
   vtkPVSourceWidget.cxx
   vtkPVSourcesNavigationWindow.cxx
   vtkPVSphereWidget.cxx
-  vtkPVStringAndScalarListWidgetProperty.cxx
   vtkPVStringEntry.cxx
   vtkPVTempTessellatorEntry.cxx
   vtkPVThumbWheel.cxx
@@ -143,7 +140,6 @@ SET( ParaViewClient_SRCS
   vtkPVVectorEntry.cxx
   vtkPVVolumeAppearanceEditor.cxx
   vtkPVWidget.cxx
-  vtkPVWidgetProperty.cxx
   vtkPVWindow.cxx
   vtkPVWindowResources.cxx
   vtkPVWriter.cxx

@@ -21,7 +21,6 @@
 #include "vtkCollection.h"
 #include "vtkArrayMap.txx"
 #include "vtkLinkedList.txx"
-#include "vtkPVWidgetProperty.h"
 #include "vtkPVXMLElement.h"
 #include "vtkPVXMLPackageParser.h"
 #include "vtkSMProperty.h"
@@ -45,7 +44,7 @@ template class VTK_EXPORT vtkArrayMapIterator<vtkPVWidget*, vtkPVWidget*>;
 vtkCxxSetObjectMacro(vtkPVWidget, SMProperty, vtkSMProperty);
 
 //-----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkPVWidget, "1.52");
+vtkCxxRevisionMacro(vtkPVWidget, "1.53");
 
 //-----------------------------------------------------------------------------
 vtkPVWidget::vtkPVWidget()
@@ -434,12 +433,6 @@ vtkPVWidget* vtkPVWidget::GetPVWidgetFromParser(vtkPVXMLElement* element,
 vtkPVWindow* vtkPVWidget::GetPVWindowFormParser(vtkPVXMLPackageParser* parser)
 {
   return parser->GetPVWindow();
-}
-
-//-----------------------------------------------------------------------------
-vtkPVWidgetProperty* vtkPVWidget::CreateAppropriateProperty()
-{
-  return vtkPVWidgetProperty::New();
 }
 
 //-----------------------------------------------------------------------------

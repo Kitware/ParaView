@@ -33,7 +33,6 @@
 #include "vtkPVProcessModule.h"
 #include "vtkPVWidget.h"
 #include "vtkPVWidgetCollection.h"
-#include "vtkPVWidgetProperty.h"
 #include "vtkString.h"
 #include "vtkKWThumbWheel.h"
 #include "vtkKWScale.h"
@@ -77,10 +76,8 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterfaceEntry);
-vtkCxxRevisionMacro(vtkPVAnimationInterfaceEntry, "1.47");
+vtkCxxRevisionMacro(vtkPVAnimationInterfaceEntry, "1.48");
 
-vtkCxxSetObjectMacro(vtkPVAnimationInterfaceEntry, CurrentProperty,
-                     vtkPVWidgetProperty);
 vtkCxxSetObjectMacro(vtkPVAnimationInterfaceEntry, CurrentSMDomain,
                      vtkSMDomain);
 
@@ -137,7 +134,6 @@ vtkPVAnimationInterfaceEntry::vtkPVAnimationInterfaceEntry()
 
   this->ScriptEditorDirty = 0;
   
-  this->CurrentProperty = NULL;
   this->CurrentSMProperty = NULL;
   this->CurrentSMDomain = NULL;
 }
@@ -437,7 +433,6 @@ vtkPVAnimationInterfaceEntry::~vtkPVAnimationInterfaceEntry()
   this->TimeRange->Delete();
   this->TimeScriptEntryFrame->Delete();
 
-  this->SetCurrentProperty(NULL);
   this->SetCurrentSMProperty(NULL);
   this->SetCurrentSMDomain(NULL);
 }
@@ -1179,14 +1174,7 @@ void vtkPVAnimationInterfaceEntry::SaveState(ofstream* file)
       {
       *file << "$kw(" << this->GetTclName() << ") SetCurrentMethod {"
             << this->CurrentMethod << "}" << endl;
-      if (this->CurrentProperty)
-        {
-        *file << "$kw(" << this->GetTclName() << ") SetCurrentProperty [["
-              << "$kw(" << this->GetPVSource()->GetTclName()
-              << ") GetPVWidget {" << this->GetTraceName() << "}] GetProperty]"
-              << endl;
-        }
-      else if (this->CurrentSMProperty && this->CurrentSMDomain)
+      if (this->CurrentSMProperty && this->CurrentSMDomain)
         {
         *file << "$kw(" << this->GetTclName() << ") SetCurrentSMProperty [["
               << "$kw(" << this->GetPVSource()->GetTclName()
@@ -1320,7 +1308,6 @@ void vtkPVAnimationInterfaceEntry::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "SaveStateScript: " 
      << (this->SaveStateScript?this->SaveStateScript:"(none") << endl;
   
-  os << indent << "CurrentProperty: " << this->CurrentProperty << endl;
   os << indent << "CurrentSMProperty: " << this->CurrentSMProperty << endl;
   os << indent << "CurrentSMDomain: " << this->CurrentSMDomain << endl;
   

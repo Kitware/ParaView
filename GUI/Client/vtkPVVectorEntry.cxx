@@ -34,7 +34,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVVectorEntry);
-vtkCxxRevisionMacro(vtkPVVectorEntry, "1.62");
+vtkCxxRevisionMacro(vtkPVVectorEntry, "1.63");
 
 //-----------------------------------------------------------------------------
 vtkPVVectorEntry::vtkPVVectorEntry()
@@ -76,8 +76,6 @@ vtkPVVectorEntry::~vtkPVVectorEntry()
       this->EntryValues[cc] = 0;
       }
     }
-  
-  this->SetProperty(NULL);
 }
 
 //-----------------------------------------------------------------------------

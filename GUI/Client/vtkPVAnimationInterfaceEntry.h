@@ -31,7 +31,6 @@ class vtkPVAnimationInterface;
 class vtkKWRange;
 class vtkPVAnimationInterfaceEntryObserver;
 class vtkKWText;
-class vtkPVWidgetProperty;
 class vtkKWLabeledOptionMenu;
 class vtkKWScale;
 class vtkKWThumbWheel;
@@ -66,9 +65,6 @@ public:
   vtkSetStringMacro(CurrentMethod);
   vtkGetStringMacro(CurrentMethod);
 
-  void SetCurrentProperty(vtkPVWidgetProperty *prop);
-  vtkGetObjectMacro(CurrentProperty, vtkPVWidgetProperty);
-  
   void SetCurrentSMProperty(vtkSMProperty *prop);
   vtkGetObjectMacro(CurrentSMProperty, vtkSMProperty);
   
@@ -245,7 +241,6 @@ protected:
   vtkSetStringMacro(TraceName);
   vtkGetStringMacro(TraceName);
 
-  vtkPVWidgetProperty *CurrentProperty;
   vtkSMProperty *CurrentSMProperty;
   vtkSMDomain *CurrentSMDomain;
   

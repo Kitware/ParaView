@@ -40,7 +40,6 @@
 #include "vtkPVSourceCollection.h"
 #include "vtkPVWidget.h"
 #include "vtkPVWidgetCollection.h"
-#include "vtkPVWidgetProperty.h"
 #include "vtkSMDomain.h"
 #include "vtkSMProperty.h"
 #include "vtkSMSourceProxy.h"
@@ -186,7 +185,7 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterface);
-vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.151");
+vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.152");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterface,ControlledWidget, vtkPVWidget);
 
@@ -948,20 +947,9 @@ void vtkPVAnimationInterface::SetCurrentTime(int time, int trace)
         }
       else
         {
-        vtkPVWidgetProperty *prop = entry->GetCurrentProperty();
         vtkSMProperty *smProp = entry->GetCurrentSMProperty();
         vtkSMDomain *smDomain = entry->GetCurrentSMDomain();
-        if (prop)
-          {
-          this->Script(entry->GetTimeEquation());
-          prop->SetAnimationTime(vtkKWObject::GetFloatResult(pvApp));
-          prop->GetWidget()->ModifiedCallback();
-          if ( entry->GetPVSource() )
-            {
-            entry->GetPVSource()->UpdateVTKSourceParameters();
-            }
-          }
-        else if (smProp && smDomain)
+        if (smProp && smDomain)
           {
           this->Script(entry->GetTimeEquation());
           smDomain->SetAnimationValue(smProp, entry->GetAnimationElement(),
