@@ -34,7 +34,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMCompositePartDisplay);
-vtkCxxRevisionMacro(vtkSMCompositePartDisplay, "1.3");
+vtkCxxRevisionMacro(vtkSMCompositePartDisplay, "1.4");
 
 
 //----------------------------------------------------------------------------
@@ -130,6 +130,14 @@ void vtkSMCompositePartDisplay::CreateVTKObjects(int num)
   this->Superclass::CreateVTKObjects(num);
 
   int i;
+  if (!this->CollectProxy->GetNumberOfIDs())
+    {
+    this->CollectProxy->UnRegisterVTKObjects();
+    }
+  if (!this->LODCollectProxy->GetNumberOfIDs())
+    {
+    this->LODCollectProxy->UnRegisterVTKObjects();
+    }
   this->CollectProxy->CreateVTKObjects(num);
   this->LODCollectProxy->CreateVTKObjects(num);
   

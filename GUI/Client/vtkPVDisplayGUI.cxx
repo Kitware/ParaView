@@ -86,7 +86,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVDisplayGUI);
-vtkCxxRevisionMacro(vtkPVDisplayGUI, "1.22");
+vtkCxxRevisionMacro(vtkPVDisplayGUI, "1.23");
 
 int vtkPVDisplayGUICommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -175,6 +175,8 @@ vtkPVDisplayGUI::vtkPVDisplayGUI()
   this->VolumeRenderMode = 0;
   
   this->VolumeAppearanceEditor = NULL;
+
+  this->ShouldReinitialize = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -2141,9 +2143,12 @@ void vtkPVDisplayGUI::Initialize()
   else
     {
     this->SetRepresentation(VTK_PV_OUTLINE_LABEL);
+    this->ShouldReinitialize = 1;
+    return;
     }
-}
 
+  this->ShouldReinitialize = 0;
+}
 
 //----------------------------------------------------------------------------
 void vtkPVDisplayGUI::CenterCamera()
@@ -2476,6 +2481,7 @@ void vtkPVDisplayGUI::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "ActorColor: " << this->ActorColor[0] << ", " << this->ActorColor[1]
                << ", " << this->ActorColor[2] << endl;
   os << indent << "ColorSetByUser: " << this->ColorSetByUser << endl;
+  os << indent << "ShouldReinitialize: " << this->ShouldReinitialize << endl;
 }
 
 //----------------------------------------------------------------------------

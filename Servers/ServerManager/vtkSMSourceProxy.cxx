@@ -35,7 +35,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMSourceProxy);
-vtkCxxRevisionMacro(vtkSMSourceProxy, "1.24");
+vtkCxxRevisionMacro(vtkSMSourceProxy, "1.25");
 
 struct vtkSMSourceProxyInternals
 {
@@ -171,7 +171,7 @@ void vtkSMSourceProxy::CreateVTKObjects(int numObjects)
 //---------------------------------------------------------------------------
 void vtkSMSourceProxy::CreateParts()
 {
-  if (this->PartsCreated)
+  if (this->PartsCreated && this->GetNumberOfParts())
     {
     return;
     }
@@ -340,6 +340,11 @@ void vtkSMSourceProxy::AddInput(vtkSMSourceProxy *input,
 //----------------------------------------------------------------------------
 void vtkSMSourceProxy::MarkConsumersAsModified()
 {
+  if (this->PartsCreated && !this->GetNumberOfParts())
+    {
+    this->UpdatePipeline();
+    }
+
   this->Superclass::MarkConsumersAsModified();
   this->InvalidateDataInformation();
 

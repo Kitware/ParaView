@@ -263,7 +263,9 @@ public:
 
   vtkGetMacro(ColorSetByUser, int);
   vtkGetMacro(ArraySetByUser, int);
-  
+
+  vtkGetMacro(ShouldReinitialize, int);
+
   // Description:
   // Update the "enable" state of the object and its internal parts.
   // Depending on different Ivars (this->Enabled, the application's 
@@ -333,7 +335,11 @@ protected:
   // whether to set the default color.
   int ColorSetByUser;
   int ArraySetByUser;
-    
+
+  // A flag to let the source know that Initialize should be called again.
+  // This flag is set when the data set type is unknown.
+  int ShouldReinitialize;
+
   vtkKWLabeledFrame *ColorFrame;
   vtkKWLabeledFrame *VolumeAppearanceFrame;
   vtkKWLabeledFrame *DisplayStyleFrame;

@@ -222,6 +222,8 @@ protected:
   // Sends the current stream to the client and server. 
   void SendForceUpdate(vtkClientServerStream* str);
 
+  void SetInputInternal(vtkSMSourceProxy *input, vtkPVProcessModule *pm);
+
   vtkSMSourceProxy* Source;
   vtkSMProxy* ColorMap;
   

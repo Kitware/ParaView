@@ -68,7 +68,7 @@
 
 
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.411");
+vtkCxxRevisionMacro(vtkPVSource, "1.412");
 vtkCxxSetObjectMacro(vtkPVSource,Notebook,vtkPVSourceNotebook);
 vtkCxxSetObjectMacro(vtkPVSource,PartDisplay,vtkSMPartDisplay);
 
@@ -1165,6 +1165,11 @@ void vtkPVSource::Accept(int hideFlag, int hideSource)
     }
   else
     {
+    if (this->Notebook->GetDisplayGUI()->GetShouldReinitialize())
+      {
+      this->Notebook->GetDisplayGUI()->Initialize();
+      this->SetDefaultColorParameters();
+      }
     // This executes the filter (from update suppressor)
     this->PartDisplay->Update();
     this->GetPVWindow()->UpdateEnableState();

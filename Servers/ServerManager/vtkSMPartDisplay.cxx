@@ -44,7 +44,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMPartDisplay);
-vtkCxxRevisionMacro(vtkSMPartDisplay, "1.21");
+vtkCxxRevisionMacro(vtkSMPartDisplay, "1.22");
 
 //----------------------------------------------------------------------------
 vtkSMPartDisplay::vtkSMPartDisplay()
@@ -561,15 +561,26 @@ void vtkSMPartDisplay::SetInput(vtkSMSourceProxy* input)
     vtkErrorMacro("Set the ProcessModule before you connect.");
     return;
     }
-  vtkClientServerStream stream;
+  this->SetInputInternal(input, pm);
+}
 
+void vtkSMPartDisplay::SetInputInternal(vtkSMSourceProxy *input,
+                                        vtkPVProcessModule *pm)
+{
+  vtkClientServerStream stream;
   // Now that we know how many server objects to create, finish
   // creating them and setting them up.
   int i, num = 0;
   if (input)
     {
     num = input->GetNumberOfParts();
+    if (!num)
+      {
+      input->CreateParts();
+      num = input->GetNumberOfParts();
+      }
     }
+  
   this->CreateVTKObjects(num);
 
   for ( i = 0; i < num; ++i)
