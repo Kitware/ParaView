@@ -224,17 +224,17 @@ SET(PARAVIEW_CMAKE_CLIENT_SERVER_EXTENSION
   ${VTKCS_SOURCE_DIR}/CMake/vtkWrapClientServer.cmake)
 SET(PARAVIEW_USE_FILE ${ParaView_SOURCE_DIR}/ParaViewUse.cmake)
 SET(PARAVIEW_INCLUDE_DIRS
-  ${ParaView_SOURCE_DIR}/ClientServer
-  ${ParaView_SOURCE_DIR}/KWCommon
-  ${ParaView_SOURCE_DIR}/Filters
-  ${ParaView_SOURCE_DIR}/Widgets
-  ${ParaView_SOURCE_DIR}/ParaView
+  ${ParaView_SOURCE_DIR}/Utilities/VTKClientServer
+  ${ParaView_SOURCE_DIR}/Common/KWCommon
+  ${ParaView_SOURCE_DIR}/Servers/Filters
+  ${ParaView_SOURCE_DIR}/GUI/Widgets
+  ${ParaView_SOURCE_DIR}/GUI/Client
 #
-  ${ParaView_BINARY_DIR}/ClientServer
-  ${ParaView_BINARY_DIR}/KWCommon
-  ${ParaView_BINARY_DIR}/Filters
-  ${ParaView_BINARY_DIR}/Widgets
-  ${ParaView_BINARY_DIR}/ParaView
+  ${ParaView_BINARY_DIR}/Utilities/VTKClientServer
+  ${ParaView_BINARY_DIR}/Common/KWCommon
+  ${ParaView_BINARY_DIR}/Servers/Filters
+  ${ParaView_BINARY_DIR}/GUI/Widgets
+  ${ParaView_BINARY_DIR}/GUI/Client
   )
 SET(PARAVIEW_LIBRARY_DIRS ${LIBRARY_OUTPUT_PATH})
 SET(PARAVIEW_LIBRARY_DEPENDS_FILE ${ParaView_BINARY_DIR}/ParaViewLibraryDepends.cmake)
