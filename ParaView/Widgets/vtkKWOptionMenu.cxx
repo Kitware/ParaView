@@ -42,7 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWOptionMenu );
-vtkCxxRevisionMacro(vtkKWOptionMenu, "1.25");
+vtkCxxRevisionMacro(vtkKWOptionMenu, "1.26");
 
 //----------------------------------------------------------------------------
 vtkKWOptionMenu::vtkKWOptionMenu()
@@ -241,6 +241,15 @@ void vtkKWOptionMenu::IndicatorOff()
     }
 
   this->Script("%s config -indicatoron 0", this->GetWidgetName());
+}
+
+//----------------------------------------------------------------------------
+void vtkKWOptionMenu::SetWidth(int width)
+{
+  if (this->IsCreated())
+    {
+    this->Script("%s configure -width %d", this->GetWidgetName(), width);
+    }
 }
 
 //----------------------------------------------------------------------------

@@ -100,6 +100,11 @@ public:
   void IndicatorOn();
   void IndicatorOff();
 
+  // Description:
+  // Convenience method to set the button width (in chars if text, 
+  // in pixels if image).
+  void SetWidth(int width);
+  
 protected:
   vtkKWOptionMenu();
   ~vtkKWOptionMenu();
