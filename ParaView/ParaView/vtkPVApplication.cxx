@@ -120,7 +120,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.214.2.10");
+vtkCxxRevisionMacro(vtkPVApplication, "1.214.2.11");
 vtkCxxSetObjectMacro(vtkPVApplication, RenderModule, vtkPVRenderModule);
 
 
@@ -1234,6 +1234,13 @@ void vtkPVApplication::Start(int argc, char*argv[])
   sprintf(rmClassName, "vtkPV%s", this->RenderModuleName);
   vtkObject* o = vtkInstantiator::CreateInstance(rmClassName);
   vtkPVRenderModule* rm = vtkPVRenderModule::SafeDownCast(o);
+  if (rm == NULL)
+    {
+    vtkErrorMacro("Could not create render module " << rmClassName);
+    this->SetRenderModuleName("RenderModule");
+    vtkObject* o = vtkInstantiator::CreateInstance("vtkPVRenderModule");
+    vtkPVRenderModule* rm = vtkPVRenderModule::SafeDownCast(o);
+    }
   this->SetRenderModule(rm);
   rm->SetPVApplication(this);
   o->Delete();
