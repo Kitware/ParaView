@@ -27,11 +27,11 @@
 #endif
 
 #include "vtkTk.h"
-#include "zlib.h"
+#include "vtk_zlib.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWTkUtilities);
-vtkCxxRevisionMacro(vtkKWTkUtilities, "1.36");
+vtkCxxRevisionMacro(vtkKWTkUtilities, "1.37");
 
 //----------------------------------------------------------------------------
 void vtkKWTkUtilities::GetRGBColor(Tcl_Interp *interp,
