@@ -538,8 +538,8 @@ void vtkPVRenderView::CreateViewProperties()
   this->CompositeWithRGBACheck->Create(this->Application, "-text \"Composite RGBA\"");
   
   this->CompositeWithFloatCheck->SetCommand(this, "CompositeWithFloatCallback");
-  if (pvwindow && pvwindow->GetRegisteryValue(2, "RunTime", 
-						 "UseFloatInComposite", 0))
+  if (pvwindow && pvwindow->GetWindowRegisteryValue(2, "RunTime", 
+                                                    "UseFloatInComposite", 0))
     {
     this->CompositeWithFloatCheck->SetState(pvwindow->GetIntRegisteryValue(
       2, "RunTime", "UseFloatInComposite"));
@@ -552,8 +552,8 @@ void vtkPVRenderView::CreateViewProperties()
   this->CompositeWithFloatCheck->SetBalloonHelpString("Toggle the use of char/float values when compositing. If rendering defects occur, try turning this on.");
   
   this->CompositeWithRGBACheck->SetCommand(this, "CompositeWithRGBACallback");
-  if (pvwindow && pvwindow->GetRegisteryValue(2, "RunTime", 
-						 "UseRGBAInComposite", 0))
+  if (pvwindow && pvwindow->GetWindowRegisteryValue(2, "RunTime", 
+                                                    "UseRGBAInComposite", 0))
     {
     this->CompositeWithRGBACheck->SetState(pvwindow->GetIntRegisteryValue(
       2, "RunTime", "UseRGBAInComposite"));
