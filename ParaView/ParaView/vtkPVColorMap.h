@@ -107,6 +107,7 @@ public:
   // Sets the color range of all the mappers (all procs) and updates
   // the user interface as well.
   void SetScalarRange(float min, float max);
+  void SetScalarRangeInternal(float min, float max);
   float *GetScalarRange() {return this->ScalarRange;}
       
   // Description:

@@ -77,7 +77,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.145");
+vtkCxxRevisionMacro(vtkPVData, "1.146");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -1361,7 +1361,7 @@ void vtkPVData::EditColorMapCallback()
     }
   this->Script("pack forget [pack slaves %s]",
           this->GetPVRenderView()->GetPropertiesParent()->GetWidgetName());
-  this->Script("pack %s -side top -fill x -expand t",
+  this->Script("pack %s -side top -fill both -expand t",
           this->PVColorMap->GetWidgetName());
 }
 
@@ -1605,10 +1605,7 @@ void vtkPVData::SetColorRange(float min, float max)
     {
     return;
     }
-  this->AddTraceEntry("$kw(%s) SetColorRange %f %f", 
-                      this->GetTclName(), min, max);
-
-  this->SetColorRangeInternal(min, max);
+  this->SetColorRange(min, max);
 }
 
 //----------------------------------------------------------------------------
@@ -1619,7 +1616,7 @@ void vtkPVData::SetColorRangeInternal(float min, float max)
     vtkErrorMacro("Color map is missing.");
     }
 
-  this->PVColorMap->SetScalarRange(min, max);
+  this->PVColorMap->SetScalarRangeInternal(min, max);
 
   this->ColorRangeMinEntry->SetValue(min, 5);
   this->ColorRangeMaxEntry->SetValue(max, 5);
@@ -2317,10 +2314,7 @@ void vtkPVData::SetScalarBarVisibility(int val)
   if (this->ScalarBarCheck->GetState() != val)
     {
     this->ScalarBarCheck->SetState(val);
-    // Here incase this is called from a script.
-    this->AddTraceEntry("$kw(%s) SetScalarBarVisibility %d", this->GetTclName(), val);
     }
-
 }
 
 //----------------------------------------------------------------------------
@@ -2367,8 +2361,6 @@ void vtkPVData::SetCubeAxesVisibility(int val)
 //----------------------------------------------------------------------------
 void vtkPVData::ScalarBarCheckCallback()
 {
-  this->AddTraceEntry("$kw(%s) SetScalarBarVisibility %d", this->GetTclName(),
-                      this->ScalarBarCheck->GetState());
   this->SetScalarBarVisibility(this->ScalarBarCheck->GetState());
   if ( this->GetPVRenderView() )
     {
@@ -2595,6 +2587,7 @@ void vtkPVData::SaveInTclScript(ofstream *file)
 void vtkPVData::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
+  os << indent << "ColorMap: " << this->PVColorMap << endl;
   os << indent << "EditColorMapButton: " << this->EditColorMapButton << endl;
   os << indent << "CubeAxesTclName: " << (this->CubeAxesTclName?this->CubeAxesTclName:"none") << endl;
   os << indent << "GeometryTclName: " << (this->GeometryTclName?this->GeometryTclName:"none") << endl;
@@ -2660,12 +2653,10 @@ void vtkPVData::ScalarBarOrientationCallback()
   if (state)
     {
     this->PVColorMap->SetScalarBarOrientationToVertical();
-    this->AddTraceEntry("$kw(%s) SetScalarBarOrientationToVertical", this->GetTclName());
     }
   else
     {
     this->PVColorMap->SetScalarBarOrientationToHorizontal();
-    this->AddTraceEntry("$kw(%s) SetScalarBarOrientationToHorizontal", this->GetTclName());
     }
   if ( this->GetPVRenderView() )
     {
@@ -2823,7 +2814,7 @@ void vtkPVData::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVData ";
-  this->ExtractRevision(os,"$Revision: 1.145 $");
+  this->ExtractRevision(os,"$Revision: 1.146 $");
 }
 
 //----------------------------------------------------------------------------

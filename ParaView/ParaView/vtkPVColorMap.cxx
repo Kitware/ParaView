@@ -58,7 +58,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVColorMap);
-vtkCxxRevisionMacro(vtkPVColorMap, "1.7");
+vtkCxxRevisionMacro(vtkPVColorMap, "1.8");
 
 int vtkPVColorMapCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -317,6 +317,15 @@ void vtkPVColorMap::CreateParallelTclObjects(vtkPVApplication *pvApp)
 //----------------------------------------------------------------------------
 void vtkPVColorMap::SetName(const char* name)
 {
+  if (name != NULL)
+    {
+    char *str;
+    str = new char [strlen(name) + 128];
+    sprintf(str, "GetPVColorMap {%s}", name);
+    this->SetTraceReferenceCommand(str);
+    delete [] str;
+    }
+
   this->SetParameterName(name);
   this->UpdateScalarBarTitle();
 
@@ -338,6 +347,8 @@ void vtkPVColorMap::SetColorSchemeToRedBlue()
                          this->LookupTableTclName);
 
   this->GetPVRenderView()->EventuallyRender();
+
+  this->AddTraceEntry("$kw(%s) SetColorSchemeToRedBlue", this->GetTclName());
 }
 
 
@@ -356,6 +367,8 @@ void vtkPVColorMap::SetColorSchemeToBlueRed()
                          this->LookupTableTclName);
 
   this->GetPVRenderView()->EventuallyRender();
+
+  this->AddTraceEntry("$kw(%s) SetColorSchemeToBlueRed", this->GetTclName());
 }
 
 
@@ -374,13 +387,14 @@ void vtkPVColorMap::SetColorSchemeToGrayscale()
                          this->LookupTableTclName);
 
   this->GetPVRenderView()->EventuallyRender();
+
+  this->AddTraceEntry("$kw(%s) SetColorSchemeToGrayscale", this->GetTclName());
+
 }
 
 //----------------------------------------------------------------------------
 void vtkPVColorMap::ScalarBarCheckCallback()
 {
-  //this->AddTraceEntry("$kw(%s) SetScalarBarVisibility %d", this->GetTclName(),
-  //                    this->ScalarBarCheck->GetState());
   this->SetScalarBarVisibility(this->ScalarBarCheck->GetState());
   if ( this->GetPVRenderView() )
     {
@@ -413,6 +427,15 @@ void vtkPVColorMap::ScalarBarOrientationCallback()
 //----------------------------------------------------------------------------
 void vtkPVColorMap::SetScalarRange(float min, float max)
 {
+  this->SetScalarRangeInternal(min, max);
+  this->AddTraceEntry("$kw(%s) SetScalarRange %f %f", this->GetTclName(),
+                      min, max);
+}
+
+
+//----------------------------------------------------------------------------
+void vtkPVColorMap::SetScalarRangeInternal(float min, float max)
+{
   vtkPVApplication *pvApp = this->GetPVApplication();
 
   if (this->ScalarRange[0] == min && this->ScalarRange[1] == max)
@@ -430,8 +453,8 @@ void vtkPVColorMap::SetScalarRange(float min, float max)
                          this->LookupTableTclName, min, max);
   //this->Script("%s Build", this->LookupTableTclName);
   //this->Script("%s Modified", this->LookupTableTclName);
-}
 
+}
 
 //----------------------------------------------------------------------------
 void vtkPVColorMap::SetVectorComponent(int component, int numberOfComponents)
@@ -452,6 +475,7 @@ void vtkPVColorMap::SetVectorComponent(int component, int numberOfComponents)
 
   pvApp->BroadcastScript("%s SetVectorComponent %d", 
                          this->LookupTableTclName, component);
+
 }
 
 
@@ -590,6 +614,9 @@ void vtkPVColorMap::SetScalarBarVisibility(int val)
       this->Script("%s RemoveActor %s", tclName, this->GetScalarBarTclName());
       }
     }
+
+  this->AddTraceEntry("$kw(%s) SetScalarBarVisibility %d", this->GetTclName(),
+                      val);
 }
 
 
@@ -621,6 +648,9 @@ void vtkPVColorMap::SetScalarBarOrientation(int vertical)
     this->Script("%s SetWidth 0.5", this->GetScalarBarTclName());
     }
   this->GetPVRenderView()->EventuallyRender();
+
+  this->AddTraceEntry("$kw(%s) SetScalarBarOrientation %d", this->GetTclName(),
+                      vertical);
 }
 
 //----------------------------------------------------------------------------

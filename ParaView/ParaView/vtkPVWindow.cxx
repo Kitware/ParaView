@@ -111,7 +111,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.352");
+vtkCxxRevisionMacro(vtkPVWindow, "1.353");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -3514,7 +3514,10 @@ vtkPVColorMap* vtkPVWindow::GetPVColorMap(const char* parameterName)
   cm->SetParent(this->GetMainView()->GetPropertiesParent());
   cm->SetPVRenderView(this->GetMainView());
   cm->Create(this->GetPVApplication());
+  cm->SetTraceReferenceObject(this);
   cm->SetName(parameterName);
+
+
   this->PVColorMaps->AddItem(cm);
   cm->Delete();
 
@@ -3555,7 +3558,7 @@ void vtkPVWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVWindow ";
-  this->ExtractRevision(os,"$Revision: 1.352 $");
+  this->ExtractRevision(os,"$Revision: 1.353 $");
 }
 
 //----------------------------------------------------------------------------
