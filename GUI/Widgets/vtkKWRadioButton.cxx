@@ -17,7 +17,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWRadioButton );
-vtkCxxRevisionMacro(vtkKWRadioButton, "1.16");
+vtkCxxRevisionMacro(vtkKWRadioButton, "1.17");
 
 //----------------------------------------------------------------------------
 void vtkKWRadioButton::Create(vtkKWApplication *app, const char *args)
@@ -61,9 +61,9 @@ int vtkKWRadioButton::GetState()
 {
   if (this->IsCreated())
     {
-    this->Script("expr {${%s}} == {[%s cget -value]}",
-                 this->VariableName, this->GetWidgetName());
-    return vtkKWObject::GetIntegerResult(this->GetApplication());
+    return atoi(
+      this->Script("expr {${%s}} == {[%s cget -value]}",
+                   this->VariableName, this->GetWidgetName()));
     }
   return 0;
 }

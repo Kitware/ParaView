@@ -22,7 +22,7 @@
 
 // ---------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWScale );
-vtkCxxRevisionMacro(vtkKWScale, "1.81");
+vtkCxxRevisionMacro(vtkKWScale, "1.82");
 
 int vtkKWScaleCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -855,8 +855,8 @@ void vtkKWScale::Resize()
     return;
     }
   
-  this->Script("winfo width %s", this->GetWidgetName());
-  int width = vtkKWObject::GetIntegerResult(this->GetApplication());
+  int width = atoi(
+    this->Script("winfo width %s", this->GetWidgetName()));
   
   char labelText[100];
   

@@ -33,7 +33,7 @@
 #include "vtkPVTraceHelper.h"
 
 vtkStandardNewMacro(vtkPVHorizontalAnimationInterface);
-vtkCxxRevisionMacro(vtkPVHorizontalAnimationInterface, "1.14");
+vtkCxxRevisionMacro(vtkPVHorizontalAnimationInterface, "1.15");
 
 //-----------------------------------------------------------------------------
 vtkPVHorizontalAnimationInterface::vtkPVHorizontalAnimationInterface()
@@ -210,11 +210,11 @@ void vtkPVHorizontalAnimationInterface::ResizeCallback()
 // doesn't have too vertical many entires.
   int splitframeheight;
   int old_splitframeheight;
-  this->Script("winfo height %s", this->SplitFrame->GetWidgetName());
-  old_splitframeheight = vtkKWObject::GetIntegerResult(this->GetApplication());
+  old_splitframeheight = atoi(
+    this->Script("winfo height %s", this->SplitFrame->GetWidgetName()));
  
-  this->Script("winfo reqheight %s", this->TimeLineFrame->GetWidgetName());
-  splitframeheight = vtkKWObject::GetIntegerResult(this->GetApplication());
+  splitframeheight = atoi(
+    this->Script("winfo reqheight %s", this->TimeLineFrame->GetWidgetName()));
   
   if (splitframeheight == 1 || splitframeheight == old_splitframeheight)
     {

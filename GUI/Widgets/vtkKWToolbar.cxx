@@ -49,7 +49,7 @@ void vtkKWToolbar::SetGlobalWidgetsFlatAspect(int val)
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWToolbar );
-vtkCxxRevisionMacro(vtkKWToolbar, "1.42");
+vtkCxxRevisionMacro(vtkKWToolbar, "1.43");
 
 int vtkKWToolbarCommand(ClientData cd, Tcl_Interp *interp,
                        int argc, char *argv[]);
@@ -445,8 +445,8 @@ void vtkKWToolbar::UpdateWidgetsAspect()
       int use_relief = (*it)->HasConfigurationOption("-relief");
       if ((*it)->HasConfigurationOption("-indicatoron"))
         {
-        this->Script("%s cget -indicatoron", (*it)->GetWidgetName());
-        use_relief = this->GetIntegerResult(this->GetApplication());
+        use_relief = atoi(
+          this->Script("%s cget -indicatoron", (*it)->GetWidgetName()));
         }
         
       if (use_relief)
@@ -463,8 +463,8 @@ void vtkKWToolbar::UpdateWidgetsAspect()
 
         if ((*it)->HasConfigurationOption("-bd"))
           {
-          this->Script("%s cget -bd", (*it)->GetWidgetName());
-          int bd = this->GetIntegerResult(this->GetApplication());
+          int bd = atoi(
+            this->Script("%s cget -bd", (*it)->GetWidgetName()));
           s << (*it)->GetWidgetName() << " config -bd "
             << (this->WidgetsFlatAspect ? -abs(bd) : abs(bd)) << endl;
           }
@@ -529,8 +529,8 @@ void vtkKWToolbar::ConstrainWidgetsLayout()
     {
     if (*it)
       {
-      this->Script("winfo reqwidth %s", (*it)->GetWidgetName());
-      totReqWidth += this->GetIntegerResult(this->GetApplication()) + this->PadX;
+      totReqWidth += this->PadX + atoi(
+        this->Script("winfo reqwidth %s", (*it)->GetWidgetName()));
       if (this->WidgetsFlatAspect)
         {
         totReqWidth += this->WidgetsFlatAdditionalPadX;
@@ -538,8 +538,8 @@ void vtkKWToolbar::ConstrainWidgetsLayout()
       }
     }
 
-  this->Script("winfo width %s", this->GetWidgetName());
-  int width = this->GetIntegerResult(this->GetApplication());
+  int width = atoi(
+    this->Script("winfo width %s", this->GetWidgetName()));
 
   int widthWidget = totReqWidth / this->Internals->Widgets.size();
   int numPerRow = width / widthWidget;

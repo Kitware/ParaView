@@ -16,7 +16,7 @@
 #include "vtkObjectFactory.h"
 
 vtkStandardNewMacro( vtkKWSplitFrame );
-vtkCxxRevisionMacro(vtkKWSplitFrame, "1.22");
+vtkCxxRevisionMacro(vtkKWSplitFrame, "1.23");
 
 int vtkKWSplitFrameCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -135,13 +135,12 @@ void vtkKWSplitFrame::ConfigureCallback()
 
   if (this->Orientation == vtkKWSplitFrame::Horizontal)
     {
-    this->Script( "winfo width %s", this->GetWidgetName());
+    size = atoi(this->Script( "winfo width %s", this->GetWidgetName()));
     }
   else
     {
-    this->Script( "winfo height %s", this->GetWidgetName());
+    size = atoi(this->Script( "winfo height %s", this->GetWidgetName()));
     }
-  size = vtkKWObject::GetIntegerResult(this->GetApplication());   
 
   // If size == 1 then the widget has not been packed, it will be later
   // and the Configure event will bring us back here with the correct size
@@ -203,35 +202,34 @@ void vtkKWSplitFrame::DragCallback()
 
   if (this->Orientation == vtkKWSplitFrame::Horizontal)
     {
-    this->Script( "winfo width %s", this->GetWidgetName());
+    size = atoi(this->Script( "winfo width %s", this->GetWidgetName()));
     }
   else
     {
-    this->Script( "winfo height %s", this->GetWidgetName());
+    size = atoi(this->Script( "winfo height %s", this->GetWidgetName()));
     }
-  size = vtkKWObject::GetIntegerResult(this->GetApplication()); 
   this->Size = size;
 
   // get the relative position of the render in the window
   if (this->Orientation == vtkKWSplitFrame::Horizontal)
     {
-    this->Script( "winfo rootx %s",this->GetWidgetName());
+    smin = atoi(this->Script( "winfo rootx %s",this->GetWidgetName()));
     }
   else
     {
-    this->Script( "winfo rooty %s",this->GetWidgetName());
+    smin = atoi(this->Script( "winfo rooty %s",this->GetWidgetName()));
     } 
-  smin = vtkKWObject::GetIntegerResult(this->GetApplication());
+
   // Get the position of the mouse in the renderer.
   if (this->Orientation == vtkKWSplitFrame::Horizontal)
     {
-    this->Script( "winfo pointerx %s", this->GetWidgetName());
+    s = atoi(this->Script( "winfo pointerx %s", this->GetWidgetName()));
     }
   else
     {
-    this->Script( "winfo pointery %s", this->GetWidgetName());
+    s = atoi(this->Script( "winfo pointery %s", this->GetWidgetName()));
     }
-  s = vtkKWObject::GetIntegerResult(this->GetApplication());
+
   // Relative position.
   s = s - smin;
 

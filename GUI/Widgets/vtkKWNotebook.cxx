@@ -60,7 +60,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWNotebook);
-vtkCxxRevisionMacro(vtkKWNotebook, "1.70");
+vtkCxxRevisionMacro(vtkKWNotebook, "1.71");
 
 //----------------------------------------------------------------------------
 int vtkKWNotebookCommand(ClientData cd, Tcl_Interp *interp,
@@ -2145,8 +2145,8 @@ void vtkKWNotebook::UpdateBodyPosition()
     // right under it, but slightly higher so that the bottom border of the
     // tabs is hidden (which will give the "notebook" look).
 
-    this->Script("winfo reqheight %s", this->TabsFrame->GetWidgetName());
-    int rheight = vtkKWObject::GetIntegerResult(this->GetApplication());
+    int rheight = atoi(
+      this->Script("winfo reqheight %s", this->TabsFrame->GetWidgetName()));
 
     // if 1, then we have not been mappep/configured at the moment, but this
     // function will be called by Resize() when Configure is triggered, so
@@ -2213,8 +2213,8 @@ void vtkKWNotebook::UpdateMaskPosition()
 #if 0
     if (tab_is_mapped)
       {
-      this->Script("winfo x %s", page->TabFrame->GetWidgetName());
-      tab_x = vtkKWObject::GetIntegerResult(this->GetApplication());
+      tab_x = atoi(
+        this->Script("winfo x %s", page->TabFrame->GetWidgetName()));
       }
     else
 #endif
@@ -2317,8 +2317,8 @@ void vtkKWNotebook::Resize()
 
   if (this->AreTabsVisible())
     {
-    this->Script("winfo y %s", this->Body->GetWidgetName());
-    height += vtkKWObject::GetIntegerResult(this->GetApplication());
+    height += atoi(
+      this->Script("winfo y %s", this->Body->GetWidgetName()));
     }
 
   // Now if the tabs require more width than the page, use the tabs width

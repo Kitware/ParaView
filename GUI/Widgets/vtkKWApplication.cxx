@@ -60,7 +60,7 @@ int vtkKWApplication::WidgetVisibility = 1;
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.189");
+vtkCxxRevisionMacro(vtkKWApplication, "1.190");
 
 extern "C" int Vtktcl_Init(Tcl_Interp *interp);
 extern "C" int Kwwidgetstcl_Init(Tcl_Interp *interp);
@@ -724,8 +724,8 @@ void vtkKWApplication::Start()
   int i;
   
   // look at Tcl for any args
-  this->Script("set argc");
-  int argc = vtkKWObject::GetIntegerResult(this) + 1;
+  ;
+  int argc = atoi(this->Script("set argc")) + 1;
   char **argv = new char *[argc];
   argv[0] = NULL;
   for (i = 1; i < argc; i++)
@@ -906,25 +906,20 @@ void vtkKWApplication::BalloonHelpDisplay(vtkKWWidget *widget)
   this->BalloonHelpLabel->SetText(widget->GetBalloonHelpString());
 
   // Get the position of the mouse in the renderer.
-  this->Script( "winfo pointerx %s", widget->GetWidgetName());
-  x = vtkKWObject::GetIntegerResult(this);
-  this->Script( "winfo pointery %s", widget->GetWidgetName());
-  y = vtkKWObject::GetIntegerResult(this);
+  x = atoi(this->Script( "winfo pointerx %s", widget->GetWidgetName()));
+  y = atoi(this->Script( "winfo pointery %s", widget->GetWidgetName()));
 
   // Get the position of the parent widget of the one needing help
-  this->Script( "winfo rootx %s", widget->GetParent()->GetWidgetName());
-  int xw = vtkKWObject::GetIntegerResult(this);
-  this->Script( "winfo rooty %s", widget->GetParent()->GetWidgetName());
+  int xw = atoi(
+    this->Script( "winfo rootx %s", widget->GetParent()->GetWidgetName()));
 
   // get the size of the balloon window
-  this->Script( "winfo reqwidth %s", this->BalloonHelpLabel->GetWidgetName());
-  int dx = vtkKWObject::GetIntegerResult(this);
-  this->Script( "winfo reqheight %s", this->BalloonHelpLabel->GetWidgetName());
+  int dx = atoi(
+    this->Script("winfo reqwidth %s",this->BalloonHelpLabel->GetWidgetName()));
   
   // get the size of the parent window of the one needing help
-  this->Script( "winfo width %s", widget->GetParent()->GetWidgetName());
-  int dxw = vtkKWObject::GetIntegerResult(this);
-  this->Script( "winfo height %s", widget->GetParent()->GetWidgetName());
+  int dxw = atoi(
+    this->Script( "winfo width %s", widget->GetParent()->GetWidgetName()));
   
   // Set the position of the window relative to the mouse.
   int just = widget->GetBalloonHelpJustification();

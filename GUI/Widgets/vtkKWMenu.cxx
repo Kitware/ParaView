@@ -19,7 +19,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWMenu );
-vtkCxxRevisionMacro(vtkKWMenu, "1.58");
+vtkCxxRevisionMacro(vtkKWMenu, "1.59");
 
 
 
@@ -463,8 +463,7 @@ int vtkKWMenu::GetRadioButtonValue(vtkKWObject* Object,
   
   char *rbv = 
     this->CreateRadioButtonVariable(Object,varname);
-  this->Script("set %s",rbv);
-  res = this->GetIntegerResult(this->GetApplication());
+  res = atoi(this->Script("set %s",rbv));
   delete [] rbv;
   return res;
 }
@@ -486,8 +485,10 @@ int vtkKWMenu::GetCheckedRadioButtonItem(vtkKWObject* Object,
       this->Script("%s entrycget %i -variable", this->GetWidgetName(), i);
       if (!strcmp(rbv, this->GetApplication()->GetMainInterp()->result))
         {
-        this->Script("%s entrycget %i -value", this->GetWidgetName(), i);
-        if (this->GetIntegerResult(this->GetApplication()) == value)
+        ;
+        if (atoi(
+              this->Script("%s entrycget %i -value", 
+                           this->GetWidgetName(), i)) == value)
           {
           delete [] rbv;
           return i;
@@ -506,8 +507,7 @@ void vtkKWMenu::CheckRadioButton(vtkKWObject* Object,
 {
   char *rbv = 
     this->CreateRadioButtonVariable(Object,varname);
-  this->Script("set %s",rbv);
-  if (this->GetIntegerResult(this->GetApplication()) != id)
+  if (atoi(this->Script("set %s",rbv)) != id)
     {
     this->Script("set %s %d",rbv,id);
     }
@@ -529,8 +529,7 @@ int vtkKWMenu::GetCheckButtonValue(vtkKWObject* Object,
   
   char *rbv = 
     this->CreateCheckButtonVariable(Object,name);
-  this->Script("set %s",rbv);
-  res = this->GetIntegerResult(this->GetApplication());
+  res = atoi(this->Script("set %s",rbv));
   delete [] rbv;
   return res;
 }
@@ -541,8 +540,7 @@ void vtkKWMenu::CheckCheckButton(vtkKWObject* Object,
 {
   char *rbv = 
     this->CreateCheckButtonVariable(Object,name);
-  this->Script("set %s",rbv);
-  if (this->GetIntegerResult(this->GetApplication()) != id)
+  if (atoi(this->Script("set %s",rbv)) != id)
     {
     this->Script("set %s %d",rbv,id);
     }
@@ -692,8 +690,7 @@ void vtkKWMenu::DeleteAllMenuItems()
 //----------------------------------------------------------------------------
 int vtkKWMenu::GetIndex(const char* menuname)
 {
-  this->Script("%s index {%s}", this->GetWidgetName(), menuname);
-  return vtkKWObject::GetIntegerResult(this->GetApplication());
+  return atoi(this->Script("%s index {%s}", this->GetWidgetName(), menuname));
 }
 
 //----------------------------------------------------------------------------
@@ -756,8 +753,8 @@ int vtkKWMenu::HasItem(const char* menuname)
 {
   if (this->IsCreated())
     {
-    this->Script("catch {%s index {%s}}", this->GetWidgetName(), menuname);
-    return !vtkKWObject::GetIntegerResult(this->GetApplication());
+    return !atoi(
+      this->Script("catch {%s index {%s}}", this->GetWidgetName(), menuname));
     }
   return 0;
 }

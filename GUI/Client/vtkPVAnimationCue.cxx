@@ -76,7 +76,7 @@ static unsigned char image_open[] =
   "eNpjYGD4z0AEBgIGXJgWanC5YSDcQwgDAO0pqFg=";
 
 vtkStandardNewMacro(vtkPVAnimationCue);
-vtkCxxRevisionMacro(vtkPVAnimationCue, "1.18");
+vtkCxxRevisionMacro(vtkPVAnimationCue, "1.19");
 vtkCxxSetObjectMacro(vtkPVAnimationCue, TimeLineParent, vtkKWWidget);
 
 //***************************************************************************
@@ -903,14 +903,14 @@ void vtkPVAnimationCue::PackWidget()
     {
     this->Script("pack %s -anchor w -side left",
       this->Image->GetWidgetName());
-    this->Script("winfo reqwidth %s", this->Image->GetWidgetName());
-    label_frame_width += vtkKWObject::GetIntegerResult(this->GetApplication());
+    label_frame_width += 
+      atoi(this->Script("winfo reqwidth %s", this->Image->GetWidgetName()));
     }
   
   this->Script("pack %s -anchor w -side left",
     this->Label->GetWidgetName());
-  this->Script("winfo reqwidth %s", this->Label->GetWidgetName());
-  label_frame_width += vtkKWObject::GetIntegerResult(this->GetApplication());
+  label_frame_width += 
+    atoi(this->Script("winfo reqwidth %s", this->Label->GetWidgetName()));
 
   this->Script("pack %s -anchor nw -side top -fill x -expand t",
     this->Frame->GetWidgetName());

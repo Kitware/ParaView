@@ -19,7 +19,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWSplashScreen );
-vtkCxxRevisionMacro(vtkKWSplashScreen, "1.22");
+vtkCxxRevisionMacro(vtkKWSplashScreen, "1.23");
 
 //----------------------------------------------------------------------------
 vtkKWSplashScreen::vtkKWSplashScreen()
@@ -99,8 +99,8 @@ void vtkKWSplashScreen::UpdateProgressMessagePosition()
 {
   if (this->IsCreated())
     {
-    this->Script("%s cget -height", this->Canvas->GetWidgetName());
-    int height = vtkKWObject::GetIntegerResult(this->GetApplication());
+    int height = atoi(
+      this->Script("%s cget -height", this->Canvas->GetWidgetName()));
 
     this->Script("%s coords msg [expr 0.5 * [%s cget -width]] %d", 
                  this->Canvas->GetWidgetName(), 

@@ -17,23 +17,23 @@
 #include "vtkObjectFactory.h"
 #include "vtkTclUtil.h"
 
-#include <stdarg.h>
 #include <ctype.h>
-
 #include <kwsys/SystemTools.hxx>
 
 //----------------------------------------------------------------------------
-vtkStandardNewMacro( vtkKWObject );
-vtkCxxRevisionMacro(vtkKWObject, "1.49");
+vtkStandardNewMacro(vtkKWObject);
+vtkCxxRevisionMacro(vtkKWObject, "1.50");
 
 int vtkKWObjectCommand(ClientData cd, Tcl_Interp *interp,
                        int argc, char *argv[]);
 
+vtkCxxSetObjectMacro(vtkKWObject, Application, vtkKWApplication);
+
 //----------------------------------------------------------------------------
 vtkKWObject::vtkKWObject()
 {
-  this->TclName = NULL;
-  this->Application = NULL;  
+  this->TclName         = NULL;
+  this->Application     = NULL;  
   this->CommandFunction = vtkKWObjectCommand;
 }
 
@@ -44,36 +44,42 @@ vtkKWObject::~vtkKWObject()
     {
     delete [] this->TclName;
     }
+
   this->SetApplication(NULL);
 }
 
 //----------------------------------------------------------------------------
 const char *vtkKWObject::GetTclName()
 {
-  // is the name is already set the just return it
+  // If the name is already set the just return it
+
   if (this->TclName)
     {
     return this->TclName;
     }
 
-  // otherwise we must register ourselves with tcl and get a name
+  // Otherwise we must register ourselves with Tcl and get a name
+
   if (!this->GetApplication())
     {
-    vtkErrorMacro("attempt to create Tcl instance before application was set!");
+    vtkErrorMacro(
+      "Attempt to create a Tcl instance before the application was set!");
     return NULL;
     }
 
-  vtkTclGetObjectFromPointer(this->GetApplication()->GetMainInterp(), 
-                             (void *)this, "vtkKWObject");
+  vtkTclGetObjectFromPointer(
+    this->GetApplication()->GetMainInterp(), (void *)this, "vtkKWObject");
+
   this->TclName = kwsys::SystemTools::DuplicateString(
     this->GetApplication()->GetMainInterp()->result);
+
   return this->TclName;
 }
 
 //----------------------------------------------------------------------------
 const char* vtkKWObject::Script(const char* format, ...)
 {
-  if(this->GetApplication())
+  if (this->GetApplication())
     {
     va_list var_args1, var_args2;
     va_start(var_args1, format);
@@ -84,53 +90,12 @@ const char* vtkKWObject::Script(const char* format, ...)
     va_end(var_args2);
     return result;
     }
-  else
-    {
-    vtkWarningMacro("Attempt to script a command without a KWApplication.");
-    return 0;
-    }
+
+  vtkWarningMacro(
+    "Attempt to script a command before the application was set!");
+  return NULL;
 }
 
-
-//----------------------------------------------------------------------------
-int vtkKWObject::GetIntegerResult(vtkKWApplication *app)
-{
-  if (app)
-    {
-    return atoi(Tcl_GetStringResult(app->GetMainInterp()));
-    }
-  return 0;
-}
-
-float vtkKWObject::GetFloatResult(vtkKWApplication *app)
-{
-  if (app)
-    {
-    return atof(Tcl_GetStringResult(app->GetMainInterp()));
-    }
-  return 0;
-}
-
-//----------------------------------------------------------------------------
-void vtkKWObject::SetApplication (vtkKWApplication* arg)
-{  
-  vtkDebugMacro(<< this->GetClassName() 
-  << " (" << this << "): setting " << "Application" " to " << arg ); 
-  if (this->Application != arg) 
-    { 
-    if (this->Application != NULL) 
-      { 
-      this->Application->UnRegister(this); 
-      this->Application = 0;
-      }
-    this->Application = arg;
-    if (this->Application != NULL)
-      {
-      this->Application->Register(this);
-      }
-    this->Modified();
-    }
-}
 
 //----------------------------------------------------------------------------
 void vtkKWObject::SetObjectMethodCommand(

@@ -179,7 +179,7 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterface);
-vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.181");
+vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.182");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterface,ControlledWidget, vtkPVWidget);
 
@@ -962,9 +962,8 @@ void vtkPVAnimationInterface::SetCurrentTime(int time, int trace)
         vtkSMDomain *smDomain = entry->GetCurrentSMDomain();
         if (smProp && smDomain)
           {
-          this->Script(entry->GetTimeEquation());
-          smDomain->SetAnimationValue(smProp, entry->GetAnimationElement(),
-                                      vtkKWObject::GetFloatResult(pvApp));
+          float t = atof(this->Script(entry->GetTimeEquation()));
+          smDomain->SetAnimationValue(smProp, entry->GetAnimationElement(), t);
           if (entry->GetPVSource() && entry->GetPVSource()->GetProxy())
             {
             entry->GetPVSource()->UpdateVTKObjects();
@@ -1814,12 +1813,12 @@ void vtkPVAnimationInterface::SaveInBatchScript(ofstream *file,
         vtkSMDomain *dom = entry->GetCurrentSMDomain();
         if (dom)
           {
-          this->Script(entry->GetTimeEquation());
+          float t = atof(this->Script(entry->GetTimeEquation()));
           helper->SetAnimationValueInBatch(
             file, entry->GetCurrentSMDomain(), entry->GetCurrentSMProperty(),
             entry->GetPVSource()->GetVTKSourceID(0),
             entry->GetAnimationElement(),
-            vtkKWObject::GetFloatResult(pvApp));
+            t);
           }
         }
       }
