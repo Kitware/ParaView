@@ -106,6 +106,14 @@ SOURCE=.\vtkKWApplicationTcl.cxx
 # End Source File
 # Begin Source File
 
+SOURCE=.\vtkKWCallbackSpecification.cxx
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkKWCallbackSpecificationTcl.cxx
+# End Source File
+# Begin Source File
+
 SOURCE=.\vtkKWChangeColorButton.cxx
 # End Source File
 # Begin Source File
@@ -159,6 +167,14 @@ SOURCE=.\vtkKWEntry.cxx
 # Begin Source File
 
 SOURCE=.\vtkKWEntryTcl.cxx
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkKWEventNotifier.cxx
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkKWEventNotifierTcl.cxx
 # End Source File
 # Begin Source File
 
@@ -395,6 +411,35 @@ InputName=vtkKWApplication
 # End Source File
 # Begin Source File
 
+SOURCE=.\vtkKWCallbackSpecification.h
+
+!IF  "$(CFG)" == "Widgets - Win32 Release"
+
+# Begin Custom Build
+InputPath=.\vtkKWCallbackSpecification.h
+InputName=vtkKWCallbackSpecification
+
+"$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx
+
+# End Custom Build
+
+!ELSEIF  "$(CFG)" == "Widgets - Win32 Debug"
+
+# Begin Custom Build
+InputPath=.\vtkKWCallbackSpecification.h
+InputName=vtkKWCallbackSpecification
+
+"$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx
+
+# End Custom Build
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
 SOURCE=.\vtkKWChangeColorButton.h
 
 !IF  "$(CFG)" == "Widgets - Win32 Release"
@@ -578,6 +623,35 @@ InputName=vtkKWEntry
 # Begin Custom Build
 InputPath=.\vtkKWEntry.h
 InputName=vtkKWEntry
+
+"$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx
+
+# End Custom Build
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkKWEventNotifier.h
+
+!IF  "$(CFG)" == "Widgets - Win32 Release"
+
+# Begin Custom Build
+InputPath=.\vtkKWEventNotifier.h
+InputName=vtkKWEventNotifier
+
+"$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx
+
+# End Custom Build
+
+!ELSEIF  "$(CFG)" == "Widgets - Win32 Debug"
+
+# Begin Custom Build
+InputPath=.\vtkKWEventNotifier.h
+InputName=vtkKWEventNotifier
 
 "$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx
