@@ -109,7 +109,7 @@
           extensions=".vtk" file_description="Legacy VTK files">
     <Source class="vtkPDataSetReader"/>
   </Module>
- <Module name="pvtkfile" class="vtkPVDataSetReaderModule" 
+ <Module name="pvtkfile" class="vtkPVAdvancedReaderModule" 
          root_name="LegaPVTK" output="vtkDataSet" 
          module_type="Reader" extensions=".pvtk" 
          file_description="Legacy VTK Files (partitioned)">
