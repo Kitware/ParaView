@@ -68,7 +68,7 @@ public:
 
   // Description:
   // Set the number of segments in the progress gauge
-  vtkSetClampMacro(NumberOfSegments, int, 1, 4);
+  void SetNumberOfSegments(int number);
   vtkGetMacro(NumberOfSegments, int);
   
   // Description:

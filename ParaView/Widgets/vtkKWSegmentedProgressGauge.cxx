@@ -37,7 +37,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkObjectFactory.h"
 
 vtkStandardNewMacro(vtkKWSegmentedProgressGauge);
-vtkCxxRevisionMacro(vtkKWSegmentedProgressGauge, "1.5");
+vtkCxxRevisionMacro(vtkKWSegmentedProgressGauge, "1.6");
 
 vtkKWSegmentedProgressGauge::vtkKWSegmentedProgressGauge()
 {
@@ -175,6 +175,54 @@ void vtkKWSegmentedProgressGauge::SetValue(int segment, int value)
       }
     }
   this->Script("update idletasks");
+}
+
+void vtkKWSegmentedProgressGauge::SetNumberOfSegments(int number)
+{
+  if (number < 1 || number > 4)
+    {
+    return;
+    }
+
+  int prevSegments = this->NumberOfSegments;
+  this->NumberOfSegments = number;
+  
+  if (!this->IsCreated())
+    {
+    return;
+    }
+  
+  int i;
+  for (i = 0; i < prevSegments; i++)
+    {
+    this->Script("%s delete bar%d",
+                 this->ProgressCanvas->GetWidgetName(), i);
+    }
+
+  for (i = 0; i < this->NumberOfSegments; i++)
+    {
+    this->Script("%s create rectangle %d 0 %d %d -fill #008 -tags bar%d",
+                 this->ProgressCanvas->GetWidgetName(),
+                 (int)(i*this->Width/(float)this->NumberOfSegments),
+                 (int)((i+1)*(this->Width/(float)this->NumberOfSegments)),
+                 this->Height, i);
+    }
+
+  switch (this->NumberOfSegments)
+    {
+    case 1:
+      this->Script("set color0 green1");
+      break;
+    case 2:
+      this->Script("set color0 red1; set color1 green1");
+      break;
+    case 3:
+      this->Script("set color0 red1; set color1 yellow1; set color2 green1");
+      break;
+    case 4:
+      this->Script("set color0 red1; set color1 orange1; set color2 yellow1; set color3 green1");
+      break;
+    }
 }
 
 void vtkKWSegmentedProgressGauge::PrintSelf(ostream& os, vtkIndent indent)
