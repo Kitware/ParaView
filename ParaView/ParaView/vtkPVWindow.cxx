@@ -88,6 +88,7 @@
 #include "vtkRectilinearGrid.h"
 #include "vtkRenderWindow.h"
 #include "vtkRenderer.h"
+#include "vtkStdString.h"
 #include "vtkString.h"
 #include "vtkStructuredGrid.h"
 #include "vtkStructuredPoints.h"
@@ -95,9 +96,7 @@
 #include "vtkUnstructuredGrid.h"
 #include "vtkClientServerStream.h"
 
-#include "vtkStdString.h"
 #include <vtkstd/map>
-#include "vtkSmartPointer.h"
 
 #ifdef _WIN32
 # include "vtkKWRegisteryUtilities.h"
@@ -124,7 +123,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.503");
+vtkCxxRevisionMacro(vtkPVWindow, "1.504");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -2886,12 +2885,16 @@ void vtkPVWindow::UpdateSourceMenu()
   // adding things twice.
   this->SourceMenu->DeleteAllMenuItems();
 
+  // Build an ordered list of sources for the menu.
+  vtkstd::map<vtkStdString, vtkStdString> sourceKeys;
+  vtkstd::map<vtkStdString, vtkPVSource*> sourceValues;
+
   // Create all of the menu items for sources with no inputs.
   vtkArrayMapIterator<const char*, vtkPVSource*>* it = 
     this->Prototypes->NewIterator();
   vtkPVSource* proto;
   const char* key = 0;
-  int numFilters = 0;
+  int numSources = 0;
   while ( !it->IsDoneWithTraversal() )
     {
     proto = 0;
@@ -2901,25 +2904,38 @@ void vtkPVWindow::UpdateSourceMenu()
       // add those to the source lists.
       if (proto && proto->GetNumberOfInputProperties() == 0)
         {
-        numFilters++;
-        char methodAndArgs[150];
+        numSources++;
         it->GetKey(key);
-        sprintf(methodAndArgs, "CreatePVSource %s", key);
         const char* menuName = proto->GetMenuName();
         if (!menuName)
           {
           menuName = key;
           }
-        this->SourceMenu->AddCommand(menuName, this, methodAndArgs,
-                                     proto->GetShortHelp());
+        sourceKeys[menuName] = key;
+        sourceValues[menuName] = proto;
         }
       }
     it->GoToNextItem();
     }
   it->Delete();
 
+  // Add the menu items in sorted order.
+  vtkstd::map<vtkStdString, vtkStdString>::iterator ki = sourceKeys.begin();
+  vtkstd::map<vtkStdString, vtkPVSource*>::iterator vi = sourceValues.begin();
+  vtkstd::string methodAndArgs;
+  while(ki != sourceKeys.end())
+    {
+    methodAndArgs = "CreatePVSource ";
+    methodAndArgs += ki->second;
+    this->SourceMenu->AddCommand(ki->first.c_str(), this,
+                                 methodAndArgs.c_str(),
+                                 vi->second->GetShortHelp());
+    ++ki;
+    ++vi;
+    }
+
   // If there are no filters, disable the menu.
-  if (numFilters > 0)
+  if (numSources > 0)
     {
     this->Menu->SetState(VTK_PV_VTK_SOURCES_MENU_LABEL, 
                          vtkKWMenu::Normal);
@@ -2948,12 +2964,15 @@ void vtkPVWindow::UpdateFilterMenu()
       !this->CurrentPVSource->GetIsPermanent() && 
       !this->CurrentPVSource->GetHideDisplayPage() )
     {
+    // Build an ordered list of filters for the menu.
+    vtkstd::map<vtkStdString, vtkStdString> filterKeys;
+    vtkstd::map<vtkStdString, vtkPVSource*> filterValues;
+
     // Add all the appropriate filters to the filter menu.
     vtkArrayMapIterator<const char*, vtkPVSource*>* it = 
       this->Prototypes->NewIterator();
     vtkPVSource* proto;
     const char* key = 0;
-    int numSources = 0;
     while ( !it->IsDoneWithTraversal() )
       {
       proto = 0;
@@ -2965,42 +2984,51 @@ void vtkPVWindow::UpdateFilterMenu()
             proto->GetInputProperty(0)->GetIsValidInput(this->CurrentPVSource, proto))
           {
           it->GetKey(key);
-          
-          numSources++;
-          char methodAndArgs[150];
-          sprintf(methodAndArgs, "CreatePVSource %s", key);
-          
           const char* menuName = proto->GetMenuName();
           if (!menuName)
             {
             menuName = key;
             }
-          
-          if (numSources % 25 == 0 )
-            {
-            this->FilterMenu->AddGeneric("command", menuName, this, 
-                                         methodAndArgs, "-columnbreak 1", 
-                                         proto->GetShortHelp());
-            }
-          else
-            {
-            this->FilterMenu->AddGeneric("command", menuName, this, 
-                                         methodAndArgs, 0, 
-                                         proto->GetShortHelp());
-            }
-          }
-
-        if (proto->GetToolbarModule())
-          {
-          this->EnableToolbarButton(key);
+          filterKeys[menuName] = key;
+          filterValues[menuName] = proto;
           }
         }
       it->GoToNextItem();
       }
     it->Delete();
-    
-    // If there are no sources, disable the menu.
-    if (numSources > 0)
+
+    // Add the menu items in sorted order.
+    vtkstd::map<vtkStdString, vtkStdString>::iterator ki = filterKeys.begin();
+    vtkstd::map<vtkStdString, vtkPVSource*>::iterator vi = filterValues.begin();
+    vtkstd::string methodAndArgs;
+    int numFilters = 0;
+    while(ki != filterKeys.end())
+      {
+      ++numFilters;
+      methodAndArgs = "CreatePVSource ";
+      methodAndArgs += ki->second;
+      if (numFilters % 25 == 0 )
+        {
+        this->FilterMenu->AddGeneric("command", ki->first.c_str(), this,
+                                     methodAndArgs.c_str(), "-columnbreak 1",
+                                     vi->second->GetShortHelp());
+        }
+      else
+        {
+        this->FilterMenu->AddGeneric("command", ki->first.c_str(), this,
+                                     methodAndArgs.c_str(), 0,
+                                     vi->second->GetShortHelp());
+        }
+      if(vi->second->GetToolbarModule())
+        {
+        this->EnableToolbarButton(ki->second.c_str());
+        }
+      ++ki;
+      ++vi;
+      }
+
+  // If there are no sources, disable the menu.
+    if (numFilters > 0)
       {
       this->Menu->SetState(VTK_PV_VTK_FILTERS_MENU_LABEL, 
                            vtkKWMenu::Normal);
@@ -3129,23 +3157,7 @@ void vtkPVWindow::AddPVSource(const char* listname, vtkPVSource *pvs)
   vtkPVSourceCollection* col = this->GetSourceList(listname);
   if (col && col->IsItemPresent(pvs) == 0)
     {
-    // Ugly implementation to sort the sources in the menu.  We should
-    // use a map to store the sources in the first place.
-    typedef vtkstd::map<vtkStdString, vtkSmartPointer<vtkPVSource> > SourcesType;
-    SourcesType sources;
-    sources[pvs->GetName()] = pvs;
-    vtkCollectionIterator* it = col->NewIterator();
-    for(it->InitTraversal(); !it->IsDoneWithTraversal(); it->GoToNextItem())
-      {
-      vtkPVSource* source = static_cast<vtkPVSource*>(it->GetObject());
-      sources[source->GetName()] = source;
-      }
-    it->Delete();
-    col->RemoveAllItems();
-    for(SourcesType::iterator i = sources.begin(); i != sources.end(); ++i)
-      {
-      col->AddItem(i->second.GetPointer());
-      }
+    col->AddItem(pvs);
     }
 }
 
@@ -3229,13 +3241,11 @@ void vtkPVWindow::UpdateSelectMenu()
     it->InitTraversal();
     while ( !it->IsDoneWithTraversal() )
       {
-      int numSources = 0;
       source = static_cast<vtkPVSource*>(it->GetObject());
       sprintf(methodAndArg, "SetCurrentPVSourceCallback %s", 
               source->GetTclName());
       this->SelectMenu->AddCommand(source->GetName(), this, methodAndArg,
                                    source->GetSourceClassName());
-      numSources++;
       it->GoToNextItem();
       }
     it->Delete();
