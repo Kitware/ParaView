@@ -74,7 +74,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWEntry );
-vtkCxxRevisionMacro(vtkKWEntry, "1.22");
+vtkCxxRevisionMacro(vtkKWEntry, "1.23");
 
 //----------------------------------------------------------------------------
 vtkKWEntry::vtkKWEntry()
@@ -469,4 +469,5 @@ void vtkKWEntry::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "Width: " << this->GetWidth() << endl;
   os << indent << "Readonly: " << (this->ReadOnly?"on":"off") << endl;
   os << indent << "PullDown: " << (this->PullDown?"on":"off") << endl;
+  os << indent << "Entry: " << this->Entry << endl;
 }
