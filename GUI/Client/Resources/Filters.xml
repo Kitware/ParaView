@@ -649,6 +649,7 @@ The Gradient Magnitude filter computes the magnitude of the gradient vector at e
 The Group Parts filter causes different data sets to be grouped into a collection and treated as a single data set for filtering purposes. All the data objects currently in ParaView will appear in the selection list. Only visible data objects are selected by default. To select a single data set, click on its name. To select several sources whose names are contiguous in the list, select the first name, press and hold the Shift key, and (while still holding the Shift key) click the last name. To select several data sets whose names are non-contiguous, press and hold the Ctrl key while clicking the names. This filter operates on any type of data. The output type depends on the data sets selected for grouping.
     </Documentation>
   </Module>
+  
   <Module name="LinearExtrusionFilter"
           menu_name="Linear Extrusion"
           root_name="LinExtrude"
@@ -1845,14 +1846,9 @@ The Glyph filter operates on any type of data set. Its output is polygonal. This
           short_help="Pick cells or points.">
     <Filter class="vtkPickFilter">
       <Input name="Input"
-             class="vtkDataSet">
+             class="vtkDataSet" quantity="Multiple">
       </Input>
     </Filter>
-    <InputMenu trace_name="Input" property="Input"
-               id="im"
-               label="Input"
-               help="Set the input to this filter."
-               input_name="Input"/>
     <PointWidget trace_name="Point" variable="WorldPoint"/>
     <SelectionList property="PickCell"
                    label="Pick Type"

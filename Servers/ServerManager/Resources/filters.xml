@@ -1,5 +1,6 @@
 <ServerManagerConfiguration>
   <ProxyGroup name="filters">
+
    <SourceProxy name="AllToN" class="vtkAllToNRedistributePolyData">
       <InputProperty
          name="Input"
@@ -1580,7 +1581,7 @@
              <Group name="filters"/>
            </ProxyGroupDomain>
            <DataTypeDomain name="input_type">
-             <DataType value="vtkDataSet"/>
+             <DataType value="vtkPolyData"/>
            </DataTypeDomain>
       </InputProperty>
    <!-- End TriangleFilter -->
@@ -2414,7 +2415,9 @@
    <SourceProxy name="Pick" class="vtkPickFilter">
      <InputProperty
         name="Input"
-        command="SetInput">
+        command="AddInput"
+        clean_command="RemoveAllInputs"
+        multiple_input="1">
            <ProxyGroupDomain name="groups">
              <Group name="sources"/>
              <Group name="filters"/>
