@@ -137,7 +137,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.462.2.9");
+vtkCxxRevisionMacro(vtkPVWindow, "1.462.2.10");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -2355,7 +2355,7 @@ void vtkPVWindow::SaveBatchScript()
   exportDialog->SaveDialogOn();
   exportDialog->SetTitle("Save Batch Script");
   exportDialog->SetDefaultExtension(".pvb");
-  exportDialog->SetFileTypes("{{ParaView Batch Script} {.pvb}} {{All Files} {.*}}");
+  exportDialog->SetFileTypes("{{ParaView Batch Script} {.pvb}} {{All Files} {*}}");
   if ( exportDialog->Invoke() && 
        vtkString::Length(exportDialog->GetFileName())>0)
     {
@@ -2753,7 +2753,7 @@ void vtkPVWindow::SaveState()
   exportDialog->SaveDialogOn();
   exportDialog->SetTitle("Save State");
   exportDialog->SetDefaultExtension(".pvs");
-  exportDialog->SetFileTypes("{{ParaView State} {.pvs}} {{All Files} {.*}}");
+  exportDialog->SetFileTypes("{{ParaView State} {.pvs}} {{All Files} {*}}");
   if ( exportDialog->Invoke() && 
        vtkString::Length(exportDialog->GetFileName())>0)
     {
@@ -3517,7 +3517,7 @@ void vtkPVWindow::SaveTrace()
   exportDialog->SaveDialogOn();
   exportDialog->SetTitle("Save ParaView Trace");
   exportDialog->SetDefaultExtension(".pvs");
-  exportDialog->SetFileTypes("{{ParaView Trace} {.pvs}} {{All Files} {.*}}");
+  exportDialog->SetFileTypes("{{ParaView Trace} {.pvs}} {{All Files} {*}}");
   if ( exportDialog->Invoke() && 
        vtkString::Length(exportDialog->GetFileName())>0 &&
        this->SaveTrace(exportDialog->GetFileName()) )
@@ -3689,7 +3689,7 @@ int vtkPVWindow::OpenPackage()
   loadDialog->Create(this->Application,0);
   loadDialog->SetTitle("Open ParaView Package");
   loadDialog->SetDefaultExtension(".xml");
-  loadDialog->SetFileTypes("{{ParaView Package Files} {*.xml}} {{All Files} {*.*}}");
+  loadDialog->SetFileTypes("{{ParaView Package Files} {*.xml}} {{All Files} {*}}");
   if ( loadDialog->Invoke() && this->OpenPackage(loadDialog->GetFileName()) )
     {
     this->SaveLastPath(loadDialog, "PackagePath");
