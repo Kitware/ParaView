@@ -41,29 +41,31 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "vtkPVServerFileDialog.h"
 
-#include "vtkPVApplication.h"
-#include "vtkPVProcessModule.h"
-#include "vtkKWLabel.h"
-#include "vtkKWMenuButton.h"
-#include "vtkKWPushButton.h"
-#include "vtkKWEntry.h"
-#include "vtkKWFrame.h"
-#include "vtkKWListBox.h"
-#include "vtkKWWindow.h"
-#include "vtkKWImageLabel.h"
-#include "vtkKWIcon.h"
-#include "vtkKWMenu.h"
-#include "vtkObjectFactory.h"
-#include "vtkString.h"
 #include "vtkDirectory.h"
 #include "vtkIntArray.h"
-#include "vtkStringList.h"
-#include "vtkKWTkUtilities.h"
 #include "vtkKWDirectoryUtilities.h"
+#include "vtkKWEntry.h"
+#include "vtkKWFrame.h"
+#include "vtkKWIcon.h"
+#include "vtkKWImageLabel.h"
+#include "vtkKWLabel.h"
+#include "vtkKWListBox.h"
+#include "vtkKWMenu.h"
+#include "vtkKWMenuButton.h"
+#include "vtkKWPushButton.h"
+#include "vtkKWTkUtilities.h"
+#include "vtkKWWindow.h"
+#include "vtkObjectFactory.h"
+#include "vtkPVApplication.h"
+#include "vtkPVProcessModule.h"
+#include "vtkString.h"
+#include "vtkStringList.h"
+
+#include <vtkstd/string>
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVServerFileDialog );
-vtkCxxRevisionMacro(vtkPVServerFileDialog, "1.17");
+vtkCxxRevisionMacro(vtkPVServerFileDialog, "1.18");
 
 int vtkPVServerFileDialogCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -262,7 +264,7 @@ void vtkPVServerFileDialog::SetMasterWindow(vtkKWWindow* win)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVServerFileDialog::Create(vtkKWApplication *app, const char *args)
+void vtkPVServerFileDialog::Create(vtkKWApplication *app, const char *)
 {
   const char *wname;
   
@@ -552,14 +554,38 @@ void vtkPVServerFileDialog::LoadSaveCallback()
     return;
     } 
 
+  vtkstd::string fileName = this->FileNameEntry->GetValue();
+  vtkstd::string::size_type pos = fileName.find_last_of("/.");
+  if(!(pos != fileName.npos && fileName[pos] == '.'))
+    {
+    // Need to add an extension.  Choose the first non-wildcard
+    // extension.
+    int i;
+    const char* ext = 0;
+    for(i = 0; i < this->ExtensionStrings->GetNumberOfStrings() && !ext; ++i)
+      {
+      const char* e = this->ExtensionStrings->GetString(i);
+      if(strcmp(e, "*") != 0)
+        {
+        ext = e;
+        }
+      }
+    
+    if(ext)
+      {
+      fileName += ".";
+      fileName += ext;
+      }
+    }
+    
   ostrstream fullpath;
   if (last >= 0 && dir[last] == '/')
     { // special case for root. Avoid "//" in path.
-    fullpath << dir << this->FileNameEntry->GetValue() << ends;
+    fullpath << dir << fileName.c_str() << ends;
     }
   else
     {
-    fullpath << dir << "/" << this->FileNameEntry->GetValue() << ends;
+    fullpath << dir << "/" << fileName.c_str() << ends;
     }
   this->SetFileName(fullpath.str());
   fullpath.rdbuf()->freeze(0);
