@@ -189,10 +189,14 @@ void vtkKWNotebook::Raise(int num)
     if (this->Current >= 0)
       {
       this->Script("pack forget %s",
-                   this->Frames[this->Current]->GetWidgetName());
+		   this->Frames[this->Current]->GetWidgetName());
+      this->Script("%s configure -disabledforeground black -state normal",
+		   this->Buttons[this->Current]->GetWidgetName());
       }
     this->Script("pack %s -fill both -anchor n",
                  this->Frames[num]->GetWidgetName());
+    this->Script("%s configure -disabledforeground black -state disabled",
+		 this->Buttons[num]->GetWidgetName());
     }
 
   this->Current = num;
@@ -232,20 +236,20 @@ void vtkKWNotebook::Raise(int num)
   this->Script("place %s -x %d -y %d -width %d -height %d",
 	       this->Mask->GetWidgetName(),x0,y0,w0,h0);
   
-  int x1 = x0 - bw;
-  int y1 = y0;
-  int w1 = bw;
-  int h1 = h0;
+  //int x1 = x0 - bw;
+  //int y1 = y0;
+  //int w1 = bw;
+  //int h1 = h0;
   //this->Script("place %s -x %d -y %d -width %d -height %d",
   //	       this->MaskLeft->GetWidgetName(),x1,y1,w1,h1);
   
-  int x2 = x0 + w0;
-  int y2 = y0;
-  int w2 = bw;
+  //int x2 = x0 + w0;
+  //int y2 = y0;
+  //int w2 = bw;
 #ifdef _WIN32
-  int h2 = h0; // Should be 2
+  //int h2 = h0; // Should be 2
 #else
-  int h2 = h0;
+  //int h2 = h0;
 #endif
   //this->Script("place %s -x %d -y %d -width %d -height %d",
   //	       this->MaskRight->GetWidgetName(),x2,y2,w2,h2);
