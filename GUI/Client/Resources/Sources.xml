@@ -21,6 +21,9 @@
   </SelectionList>
   <LabeledToggle label="Filled" property="Filled" trace_name="Filled"
                  help="Specify whether the glyph is filled (a polygon) or not (a closed polygon defined by line segments). This only applies to 2D closed glyphs"/>
+  <VectorEntry label="Center" property="Center" trace_name="Center"
+               type="float" length="3"
+               help="Set the x, y, z coordinates of the origin of the axes" />
   <Documentation>
 The 2D Glyph source is used for generating a family of 2D glyphs, each of which lies in the x-y plane. There are two parameters for 2D Glyphs.
 Glyph type: The types of 2D glyphs that can be created are Vertex, Dash, Cross, Thick Cross, Triangle, Square, Circle, Diamond, Arrow, and Thick Arrow. The default is Arrow.
