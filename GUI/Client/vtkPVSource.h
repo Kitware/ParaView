@@ -253,6 +253,7 @@ public:
   // to saveing a trace, except only the last state is stored.
   virtual void SaveState(ofstream *file);
   virtual void SaveStateVisibility(ofstream *file);
+  virtual void SaveStateDisplay(ofstream *file);
   
   // Description:
   // This flag determines whether a source will make its input invisible or

@@ -67,7 +67,7 @@
 
 
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.394");
+vtkCxxRevisionMacro(vtkPVSource, "1.395");
 vtkCxxSetObjectMacro(vtkPVSource,Notebook,vtkPVSourceNotebook);
 vtkCxxSetObjectMacro(vtkPVSource,PartDisplay,vtkSMPartDisplay);
 
@@ -1770,6 +1770,49 @@ void vtkPVSource::SaveStateVisibility(ofstream *file)
 }
 
 //----------------------------------------------------------------------------
+void vtkPVSource::SaveStateDisplay(ofstream *file)
+{
+  // Set the color map here for simplicity.
+  if (this->PVColorMap)
+    {
+    if (this->GetPartDisplay()->GetColorField() == vtkDataSet::POINT_DATA_FIELD)
+      {
+      *file << "[$kw(" << this->GetTclName()
+            << ") GetPVOutput] ColorByPointField {" 
+            << this->PVColorMap->GetArrayName() << "} " 
+            << this->PVColorMap->GetNumberOfVectorComponents() << endl;
+      }
+    if (this->GetPartDisplay()->GetColorField() == vtkDataSet::CELL_DATA_FIELD)
+      {
+      *file << "[$kw(" << this->GetTclName()
+            << ") GetPVOutput] ColorByCellField {" 
+            << this->PVColorMap->GetArrayName() << "} " 
+            << this->PVColorMap->GetNumberOfVectorComponents() << endl;
+      }
+    }
+  else
+    {
+    *file << "[$kw(" << this->GetTclName()
+          << ") GetPVOutput] ColorByProperty\n";
+    }
+  // Save the options from the display GUI.
+  char dispTclName[512];
+  sprintf(dispTclName, "$pvDisp(%s)", this->GetTclName());
+  *file << "set " << dispTclName+1 
+        << " [$kw(" << this->GetTclName() << ") GetPartDisplay]" << endl;
+  vtkIndent indent;
+  this->GetPartDisplay()->SavePVState(file, dispTclName, indent);
+
+  *file << "$kw(" << this->GetTclName()
+        << ") SetCubeAxesVisibility " << this->GetCubeAxesVisibility() << endl; 
+
+  // Make sure the GUI is upto date.  
+  *file << "[$kw(" << this->GetTclName()
+        << ") GetPVOutput] Update\n"; 
+  
+}
+  
+//----------------------------------------------------------------------------
 void vtkPVSource::SaveState(ofstream *file)
 {
   int i, numWidgets;
@@ -1835,41 +1878,7 @@ void vtkPVSource::SaveState(ofstream *file)
   // Call accept.
   *file << "$kw(" << this->GetTclName() << ") AcceptCallback" << endl;
 
-  // Set the color map here for simplicity.
-  if (this->PVColorMap)
-    {
-    if (this->GetPartDisplay()->GetColorField() == vtkDataSet::POINT_DATA_FIELD)
-      {
-      *file << "[$kw(" << this->GetTclName()
-            << ") GetPVOutput] ColorByPointField {" 
-            << this->PVColorMap->GetArrayName() << "} " 
-            << this->PVColorMap->GetNumberOfVectorComponents() << endl;
-      }
-    if (this->GetPartDisplay()->GetColorField() == vtkDataSet::CELL_DATA_FIELD)
-      {
-      *file << "[$kw(" << this->GetTclName()
-            << ") GetPVOutput] ColorByCellField {" 
-            << this->PVColorMap->GetArrayName() << "} " 
-            << this->PVColorMap->GetNumberOfVectorComponents() << endl;
-      }
-    }
-  else
-    {
-    *file << "[$kw(" << this->GetTclName()
-          << ") GetPVOutput] ColorByProperty\n";
-    }
-  // Save the options from the display GUI.
-  char dispTclName[512];
-  sprintf(dispTclName, "$pvDisp(%s)", this->GetTclName());
-  *file << "set " << dispTclName+1 
-        << " [$kw(" << this->GetTclName() << ") GetPartDisplay]" << endl;
-  vtkIndent indent;
-  this->GetPartDisplay()->SavePVState(file, dispTclName, indent);
-
-  // Make sure the GUI is upto date.  
-  *file << "[$kw(" << this->GetTclName()
-        << ") GetPVOutput] Update\n"; 
-  
+  this->SaveStateDisplay(file);
 }
 
 //----------------------------------------------------------------------------
