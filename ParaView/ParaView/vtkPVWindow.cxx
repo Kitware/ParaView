@@ -508,7 +508,7 @@ void vtkPVWindow::PrepareForDelete()
     // At exit, save the background colour in the registery.
     this->SaveColor(2, "RenderViewBG", 
                     this->MainView->GetBackgroundColor());
-    
+    this->MainView->PrepareForDelete();
     this->MainView->Delete();
     this->MainView = NULL;
     }
@@ -1658,6 +1658,7 @@ void vtkPVWindow::WriteData()
       {
       const char* desc = wm->GetDescription();
       const char* ext = wm->GetExtension();
+
       typesStr << " {{" << desc << "} {" << ext << "}}";
       if(!defaultExtension)
         {
