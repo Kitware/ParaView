@@ -34,7 +34,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPLOT3DReaderModule);
-vtkCxxRevisionMacro(vtkPVPLOT3DReaderModule, "1.21");
+vtkCxxRevisionMacro(vtkPVPLOT3DReaderModule, "1.22");
 
 int vtkPVPLOT3DReaderModuleCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -44,6 +44,7 @@ vtkPVPLOT3DReaderModule::vtkPVPLOT3DReaderModule()
 {
   this->CommandFunction = vtkPVPLOT3DReaderModuleCommand;
   this->PackFileEntry = 0;
+  this->AlreadyAccepted = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -54,7 +55,6 @@ vtkPVPLOT3DReaderModule::~vtkPVPLOT3DReaderModule()
 //----------------------------------------------------------------------------
 void vtkPVPLOT3DReaderModule::Accept(int hideFlag, int hideSource)
 {
-  int i;
   vtkPVWindow* window = this->GetPVWindow();
 
   this->UpdateVTKSourceParameters();
@@ -89,8 +89,24 @@ void vtkPVPLOT3DReaderModule::Accept(int hideFlag, int hideSource)
     return;
     }
 
+  this->AlreadyAccepted = 1;
+  this->UpdateEnableState();
+
+  this->Superclass::Accept(hideFlag, hideSource);
+}
+//----------------------------------------------------------------------------
+void vtkPVPLOT3DReaderModule::UpdateEnableState()
+{
+  this->Superclass::UpdateEnableState();
+
+  if ( !this->AlreadyAccepted )
+    {
+    return;
+    }
+
   vtkPVWidgetProperty *pvwp = 0;
   this->WidgetProperties->InitTraversal();
+  int i;
   for (i = 0; i < this->WidgetProperties->GetNumberOfItems(); i++)
     {
     pvwp =
@@ -99,19 +115,18 @@ void vtkPVPLOT3DReaderModule::Accept(int hideFlag, int hideSource)
       vtkPVLabeledToggle::SafeDownCast(pvwp->GetWidget());
     if (tog)
       {
-      tog->Disable();
+      tog->SetEnabled(0);
       }
 
     vtkPVSelectionList* list =
       vtkPVSelectionList::SafeDownCast(pvwp->GetWidget());
     if (list)
       {
-      list->Disable();
+      list->SetEnabled(0);
       }
     }
-  this->Superclass::Accept(hideFlag, hideSource);
-
 }
+
 
 //----------------------------------------------------------------------------
 void vtkPVPLOT3DReaderModule::PrintSelf(ostream& os, vtkIndent indent)
