@@ -75,6 +75,8 @@ public:
   // Description:
   // Set the range of the scale.
   void SetRange(float min, float max);
+  float GetRangeMin();
+  float GetRangeMax();
   
   // Description:
   // Turn on display of the entry box widget that lets the user entry

@@ -53,7 +53,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVScale);
-vtkCxxRevisionMacro(vtkPVScale, "1.16.2.3");
+vtkCxxRevisionMacro(vtkPVScale, "1.16.2.4");
 
 //----------------------------------------------------------------------------
 vtkPVScale::vtkPVScale()
@@ -124,6 +124,18 @@ void vtkPVScale::SetResolution(float res)
 void vtkPVScale::SetRange(float min, float max)
 {
   this->Scale->SetRange(min, max);
+}
+
+//----------------------------------------------------------------------------
+float vtkPVScale::GetRangeMin()
+{
+  return this->Scale->GetRangeMin();
+}
+
+//----------------------------------------------------------------------------
+float vtkPVScale::GetRangeMax()
+{
+  return this->Scale->GetRangeMax();
 }
 
 //----------------------------------------------------------------------------
@@ -367,8 +379,8 @@ void vtkPVScale::AnimationMenuCallback(vtkPVAnimationInterfaceEntry *ai)
   sprintf(script, "%s Set%s $pvTime", 
           this->ObjectTclName, this->VariableName);
   ai->SetLabelAndScript(this->LabelWidget->GetLabel(), script);
-  ai->SetTimeStart(this->Scale->GetRangeMin());
-  ai->SetTimeEnd(this->Scale->GetRangeMax());
+  ai->SetTimeStart(this->GetRangeMin());
+  ai->SetTimeEnd(this->GetRangeMax());
   ai->SetTypeToInt();
   ai->Update();
 }
