@@ -49,6 +49,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWWindowCollection.h"
 #include "vtkObjectFactory.h"
 #include "vtkOutputWindow.h"
+#include "vtkString.h"
 #include "vtkTclUtil.h"
 #include "vtkbwidgets.h"
 
@@ -173,6 +174,21 @@ const char* vtkKWApplication::EvaluateString(const char *String, ...)
   this->SimpleScript(str.str());
   str.rdbuf()->freeze(0);
   return this->MainInterp->result;
+}
+
+int vtkKWApplication::EvaluateBooleanExpression(const char *Expression, ...)
+{
+  char event[16000];  
+  va_list var_args;
+  va_start(var_args, Expression);
+  vsprintf(event, Expression, var_args);
+  va_end(var_args);
+  this->SimpleScript(event);
+  if ( vtkString::Equals(this->MainInterp->result, "1" ) )
+    {
+    return 1;
+    }
+  return 0;
 }
 
 const char* vtkKWApplication::ExpandFileName(const char *String, ...)

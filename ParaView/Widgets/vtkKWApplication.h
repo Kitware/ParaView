@@ -132,6 +132,7 @@ public:
   void SimpleScript(const char *EventString);
   const char* EvaluateString(const char *String, ...);
   const char* ExpandFileName(const char *String, ...);
+  int EvaluateBooleanExpression(const char*Expression, ...);
 //ETX
 
   // Description:
