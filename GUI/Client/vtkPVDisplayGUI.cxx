@@ -86,7 +86,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVDisplayGUI);
-vtkCxxRevisionMacro(vtkPVDisplayGUI, "1.18");
+vtkCxxRevisionMacro(vtkPVDisplayGUI, "1.19");
 
 int vtkPVDisplayGUICommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -2921,3 +2921,12 @@ void vtkPVDisplayGUI::UpdateEnableState()
   
 }
 
+//----------------------------------------------------------------------------
+void vtkPVDisplayGUI::SaveVolumeRenderStateDisplay(ofstream *file)
+{
+  if(this->VolumeRenderMode)
+    {
+    *file << "[$kw(" << this->GetPVSource()->GetTclName()
+          << ") GetPVOutput] VolumeRenderModeOn" << endl;
+    }
+}

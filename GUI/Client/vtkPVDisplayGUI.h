@@ -289,6 +289,16 @@ public:
 
   void SetVolumeOpacityUnitDistance( double d );
     
+  // Description:
+  // Checks to see if volume render mode is on and if so, saves the command
+  // to the script file. 
+  void SaveVolumeRenderStateDisplay(ofstream *os);
+
+  // Switch between showing the properties for actors and volumes
+  // Made public to alllow script to call it
+  void VolumeRenderModeOn();
+  void VolumeRenderModeOff();
+
 protected:
   vtkPVDisplayGUI();
   ~vtkPVDisplayGUI();
@@ -378,10 +388,6 @@ protected:
   vtkKWPushButton *ResetCameraButton;
 
   double ActorColor[3];
-
-  // Switch between showing the properties for actors and volumes
-  void VolumeRenderModeOn();
-  void VolumeRenderModeOff();
 
   int VolumeRenderMode;
 

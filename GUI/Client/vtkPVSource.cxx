@@ -68,7 +68,7 @@
 
 
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.405");
+vtkCxxRevisionMacro(vtkPVSource, "1.406");
 vtkCxxSetObjectMacro(vtkPVSource,Notebook,vtkPVSourceNotebook);
 vtkCxxSetObjectMacro(vtkPVSource,PartDisplay,vtkSMPartDisplay);
 
@@ -1847,6 +1847,10 @@ void vtkPVSource::SaveStateDisplay(ofstream *file)
     *file << "[$kw(" << this->GetTclName()
           << ") GetPVOutput] ColorByProperty\n";
     }
+
+  // Add command to switch to Volume Render mode if required
+  this->GetPVOutput()->SaveVolumeRenderStateDisplay(file);
+
   // Save the options from the display GUI.
   char dispTclName[512];
   sprintf(dispTclName, "$pvDisp(%s)", this->GetTclName());
