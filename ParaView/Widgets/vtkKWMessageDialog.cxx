@@ -45,6 +45,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWWindow.h"
 #include "vtkKWLabel.h"
 #include "vtkKWImageLabel.h"
+#include "vtkKWIcon.h"
+
 #include "icons.h"
 
 //-----------------------------------------------------------------------------
@@ -78,6 +80,7 @@ vtkKWMessageDialog::vtkKWMessageDialog()
   this->Style = vtkKWMessageDialog::Message;
   this->Icon = vtkKWImageLabel::New();
   this->Icon->SetParent(this);
+  this->IconImage = 0;
   this->Default = NoneDefault;
 }
 
@@ -91,6 +94,10 @@ vtkKWMessageDialog::~vtkKWMessageDialog()
   this->CancelButton->Delete();
   this->Icon->Delete();
   this->MessageDialogFrame->Delete();
+  if ( this->IconImage )
+    {
+    this->IconImage->Delete();
+    }
 }
 
 
@@ -224,19 +231,23 @@ int vtkKWMessageDialog::Invoke()
 
 void vtkKWMessageDialog::SetIcon( int ico )
 {
+  if ( ico && !this->IconImage )
+    {
+    this->IconImage = vtkKWIcon::New();
+    }
   switch ( ico )
     {
     case vtkKWMessageDialog::Error:
-      this->Icon->SetImageData(image_error, 
-			       image_error_width, image_error_height);
+      this->IconImage->SetImageData(vtkKWIcon::ICON_ERROR);
+      this->Icon->SetImageData(this->IconImage);
       break;
     case vtkKWMessageDialog::Question:
-      this->Icon->SetImageData(image_question, 
-			       image_question_width, image_question_height);
+      this->IconImage->SetImageData(vtkKWIcon::ICON_QUESTION);
+      this->Icon->SetImageData(this->IconImage);
       break;
     case vtkKWMessageDialog::Warning:
-      this->Icon->SetImageData(image_warning, 
-			       image_warning_width, image_warning_height);
+      this->IconImage->SetImageData(vtkKWIcon::ICON_WARNING);
+      this->Icon->SetImageData(this->IconImage);
       break;
     default:
       this->Script("%s configure -width 0 -pady 0 -padx 0 -borderwidth 0",
@@ -250,6 +261,7 @@ void vtkKWMessageDialog::SetIcon( int ico )
 	       this->Icon->GetWidgetName());
   this->Script("pack %s -pady 17 -side left -fill y", 
 	       this->Icon->GetWidgetName());
+  //this->Script("bind %s <Button-1> { puts hi}", this->Icon->GetWidgetName());
 }
 
 void vtkKWMessageDialog::PopupMessage(vtkKWApplication *app, vtkKWWindow *win,

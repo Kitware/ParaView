@@ -60,6 +60,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWProgressGauge.h"
 #include "vtkKWMenu.h"
 #include "vtkKWEvent.h"
+#include "vtkKWIcon.h"
 
 #ifdef _WIN32
 #include "vtkWin32OpenGLRenderWindow.h"
@@ -445,10 +446,14 @@ void vtkKWView::CreateViewProperties()
   this->Notebook->SetParent(this->GetPropertiesParent());
   this->Notebook->Create(this->Application,"");
 
+  vtkKWIcon *ico = vtkKWIcon::New();
+  ico->SetImageData(vtkKWIcon::ICON_GENERAL);
   this->Notebook->AddPage(
-    "General", "Set the general properties of the image view");
+    "General", "Set the general properties of the image view", ico);
+  ico->SetImageData(vtkKWIcon::ICON_ANNOTATE);
   this->Notebook->AddPage(
-    "Annotate", "Set the header and corner annotation");
+    "Annotate", "Set the header and corner annotation", ico);
+  ico->Delete();
   
   this->AnnotationProperties->SetParent
     (this->Notebook->GetFrame("Annotate"));
@@ -1287,7 +1292,7 @@ void vtkKWView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWView ";
-  this->ExtractRevision(os,"$Revision: 1.55 $");
+  this->ExtractRevision(os,"$Revision: 1.56 $");
 }
 
 void vtkKWView::SetupMemoryRendering(int x, int y, void *cd) 

@@ -42,7 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWApplication.h"
 #include "vtkKWImageLabel.h"
 #include "vtkObjectFactory.h"
-
+#include "vtkKWIcon.h"
 
 
 //------------------------------------------------------------------------------
@@ -61,6 +61,11 @@ vtkKWImageLabel::~vtkKWImageLabel()
 void vtkKWImageLabel::Create(vtkKWApplication *app, const char *args)
 {
   this->vtkKWLabel::Create(app, args);
+}
+
+void vtkKWImageLabel::SetImageData(vtkKWIcon* icon)
+{
+  this->SetImageData(icon->GetData(), icon->GetWidth(), icon->GetHeight());
 }
 
 void vtkKWImageLabel::SetImageData(const unsigned char* data, 

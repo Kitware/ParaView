@@ -1,6 +1,5 @@
 #include "vtkKWHashTable.h"
 #include "vtkKWHashTableIterator.h"
-#include <iostream.h>
 
 int main()
 {

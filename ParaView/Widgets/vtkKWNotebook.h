@@ -49,6 +49,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkKWWidget.h"
 class vtkKWApplication;
+class vtkKWImageLabel;
+class vtkKWIcon;
 
 class VTK_EXPORT vtkKWNotebook : public vtkKWWidget
 {
@@ -84,6 +86,8 @@ public:
   // Description:
   // Add new page to the notebook. By setting balloon string, 
   // the page will have balloon help.
+  void AddPage(const char *title, const char* balloon, 
+	       vtkKWIcon *icon);
   void AddPage(const char *title, const char* balloon);
   void AddPage(const char *title);
   
@@ -120,6 +124,7 @@ protected:
   int NumberOfPages;
   vtkKWWidget **Frames;
   vtkKWWidget **Buttons;
+  vtkKWImageLabel **Icons;
   char **Titles;
 private:
   vtkKWNotebook(const vtkKWNotebook&); // Not implemented

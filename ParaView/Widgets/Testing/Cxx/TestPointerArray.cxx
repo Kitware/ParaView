@@ -1,5 +1,4 @@
 #include "vtkKWPointerArray.h"
-#include <iostream.h>
 
 int main()
 {

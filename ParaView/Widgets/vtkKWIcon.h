@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   Visualization Toolkit
-  Module:    vtkKWImageLabel.h
+  Module:    vtkKWIcon.h
   Language:  C++
   Date:      $Date$
   Version:   $Revision$
@@ -39,44 +39,80 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-// .NAME vtkKWImageLabel - label widget
-// .SECTION Description
-// A simple widget that represents a label. The label can be set with 
-// the SetLabel method.
+// .NAME vtkKWIcon - simple wrapper for icons
 
-#ifndef __vtkKWImageLabel_h
-#define __vtkKWImageLabel_h
+#ifndef __vtkKWIcon_h
+#define __vtkKWIcon_h
 
 #include "vtkKWLabel.h"
 class vtkKWApplication;
 class vtkKWIcon;
 
-class VTK_EXPORT vtkKWImageLabel : public vtkKWLabel
+class VTK_EXPORT vtkKWIcon : public vtkKWLabel
 {
 public:
-  static vtkKWImageLabel* New();
-  vtkTypeMacro(vtkKWImageLabel,vtkKWLabel);
-
-  // Description:
-  // Create a Tk widget
-  virtual void Create(vtkKWApplication *app, const char *args);
+  static vtkKWIcon* New();
+  vtkTypeMacro(vtkKWIcon,vtkKWObject);
 
   // Description:
   // Set image data.
   void SetImageData(const unsigned char* data, int width, int height);
-  void SetImageData(vtkKWIcon *icon);
+
+//BTX
+  enum { 
+    ICON_NOICON = 0,
+    ICON_ANNOTATE,
+    ICON_CONTOURS,
+    ICON_CUT,
+    ICON_ERROR,
+    ICON_FILTERS,
+    ICON_GENERAL,
+    ICON_LAYOUT,
+    ICON_MACROS,
+    ICON_MATERIAL,
+    ICON_PREFERENCES,
+    ICON_QUESTION,
+    ICON_TRANSFER,
+    ICON_WARNING    
+  };
+//ETX
+
+  // Description:
+  // Set image data for specific icon
+  void SetImageData(int image);
+
+  // Description:
+  // Set icon to the custom image.
+  void SetData(const unsigned char* data, int width, int height);
+
+  // Description:
+  // Get the raw image data (RGBA).
+  const unsigned char* GetData();
+
+  // Description:
+  // Get the width of the image.
+  vtkGetMacro(Width, int);
+
+  // Description:
+  // Get the height of the image.
+  vtkGetMacro(Height, int);
   
 protected:
-  vtkKWImageLabel();
-  ~vtkKWImageLabel();
+  vtkKWIcon();
+  ~vtkKWIcon();
+  unsigned char* Data;
+  int Width;
+  int Height;
 
-  vtkSetStringMacro(ImageDataLabel);
-  vtkGetStringMacro(ImageDataLabel);
-
+  // Description:
+  // Set data to the internal image.
+  void SetInternalData(const unsigned char* data, int width, int height);
+  
+  const unsigned char* InternalData;
+  int Internal;
 private:
-  char *ImageDataLabel;
-  vtkKWImageLabel(const vtkKWImageLabel&); // Not implemented
-  void operator=(const vtkKWImageLabel&); // Not implemented
+  vtkKWIcon(const vtkKWIcon&); // Not implemented
+  void operator=(const vtkKWIcon&); // Not implemented
 };
 
 

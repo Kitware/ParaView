@@ -17,6 +17,7 @@ vtkKWExtent
 vtkKWGenericComposite 
 vtkKWHashTable
 vtkKWHashTableIterator
+vtkKWIcon
 vtkKWImageLabel
 vtkKWLabel 
 vtkKWLabeledEntry 

@@ -42,8 +42,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWApplication.h"
 #include "vtkKWNotebook.h"
 #include "vtkObjectFactory.h"
-
-
+#include "vtkKWImageLabel.h"
+#include "vtkKWIcon.h"
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWNotebook );
@@ -61,6 +61,7 @@ vtkKWNotebook::vtkKWNotebook()
   this->Pad = 0;
   this->NumberOfPages = 0;
   this->Buttons = NULL;
+  this->Icons   = NULL;
   this->Frames = NULL;
   this->Titles = NULL;
   this->Current = -1;
@@ -102,10 +103,18 @@ vtkKWNotebook::~vtkKWNotebook()
     this->Frames[cnt]->Delete();
     delete [] this->Titles[cnt];
     this->Buttons[cnt]->Delete();
+    if ( this->Icons[cnt] )
+      {
+      this->Icons[cnt]->Delete();
+      }
     }
   if (this->Buttons)
     {
     delete [] this->Buttons;
+    }
+  if (this->Icons)
+    {
+    delete [] this->Icons;
     }
   if (this->Frames)
     {
@@ -303,11 +312,19 @@ void vtkKWNotebook::AddPage(const char *title)
 // Add a page to the notebook
 void vtkKWNotebook::AddPage(const char *title, const char *ballon)
 {
+  this->AddPage(title, ballon, 0);
+}
+
+// Add a page to the notebook
+void vtkKWNotebook::AddPage(const char *title, const char *ballon, 
+			    vtkKWIcon *icon)
+{
   int cnt;
 
   // for the frames we want to add to the list but not delete
   vtkKWWidget **pages = new vtkKWWidget *[this->NumberOfPages+1];
   vtkKWWidget **buttons = new vtkKWWidget *[this->NumberOfPages+1];
+  vtkKWImageLabel **icons = new vtkKWImageLabel *[this->NumberOfPages+1];
   char **titles = new char * [this->NumberOfPages+1];
   // copy the old to the new
   for (cnt = 0; cnt < this->NumberOfPages; cnt++)
@@ -315,10 +332,15 @@ void vtkKWNotebook::AddPage(const char *title, const char *ballon)
     pages[cnt] = this->Frames[cnt];
     titles[cnt] = this->Titles[cnt];
     buttons[cnt] = this->Buttons[cnt];
+    icons[cnt] = this->Icons[cnt];
     }
   if (this->Buttons)
     {
     delete [] this->Buttons;
+    }
+  if (this->Icons)
+    {
+    delete [] this->Icons;
     }
   if (this->Frames)
     {
@@ -342,14 +364,25 @@ void vtkKWNotebook::AddPage(const char *title, const char *ballon)
 
   this->Buttons[this->NumberOfPages]->Create(this->Application,"button",
 					     "-bd 2 -highlightthickness 0");
+  this->Icons = icons;
+  this->Icons[this->NumberOfPages] = 0;
+  char skip[100] = "";
+  if ( icon && icon->GetData() )
+    {
+    this->Icons[this->NumberOfPages] = vtkKWImageLabel::New();
+    this->Icons[this->NumberOfPages]->SetParent(this->TabsFrame);
+    this->Icons[this->NumberOfPages]->Create(this->Application, "");
+    this->Icons[this->NumberOfPages]->SetImageData(icon); 
+    sprintf(skip, "      ");
+    }
   if ( ballon )
     {
     this->Buttons[this->NumberOfPages]->SetBalloonHelpString(ballon);
     }
 
   this->Script(
-    "%s configure -text {%s} -borderwidth %d -command {%s Raise %d}",
-    this->Buttons[this->NumberOfPages]->GetWidgetName(),
+    "%s configure -text {%s%s} -borderwidth %d -command {%s Raise %d}",
+    this->Buttons[this->NumberOfPages]->GetWidgetName(), skip,
     this->Titles[this->NumberOfPages], this->BorderWidth,
     this->GetTclName(),this->NumberOfPages);
   this->Script("pack %s -side left -pady 0 -padx %d -fill y",
@@ -358,6 +391,19 @@ void vtkKWNotebook::AddPage(const char *title, const char *ballon)
   this->Script("bind %s  <Configure> {%s RaiseCurrent}",
                this->Buttons[this->NumberOfPages]->GetWidgetName(),
                this->GetTclName(),this->NumberOfPages);
+  if ( this->Icons[this->NumberOfPages] )
+    {
+    this->Script("place %s -in %s -x -3", 
+		 this->Icons[this->NumberOfPages]->GetWidgetName(),
+		 this->Buttons[this->NumberOfPages]->GetWidgetName());   
+    this->Script("bind %s  <ButtonRelease-1> {%s invoke}",
+		 this->Icons[this->NumberOfPages]->GetWidgetName(),
+		 this->Buttons[this->NumberOfPages]->GetWidgetName());    
+    /*
+    this->Script("bind %s  <Button-1> {puts hi}",
+		 this->Icons[this->NumberOfPages]->GetWidgetName());
+    */
+    }
   
   this->NumberOfPages++;
   

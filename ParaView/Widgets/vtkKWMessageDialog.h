@@ -50,6 +50,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class vtkKWApplication;
 class vtkKWImageLabel;
 class vtkKWLabel;
+class vtkKWIcon;
 
 class VTK_EXPORT vtkKWMessageDialog : public vtkKWDialog
 {
@@ -124,14 +125,15 @@ protected:
   int Style;
   int Default;
 
-  vtkKWWidget *MessageDialogFrame;
-  vtkKWLabel *Label;
-  vtkKWWidget *ButtonFrame;
-  vtkKWWidget *OKButton;
-  vtkKWWidget *CancelButton;  
+  vtkKWWidget     *MessageDialogFrame;
+  vtkKWLabel      *Label;
+  vtkKWWidget     *ButtonFrame;
+  vtkKWWidget     *OKButton;
+  vtkKWWidget     *CancelButton;  
   vtkKWImageLabel *Icon;
-  vtkKWWidget *OKFrame;
-  vtkKWWidget *CancelFrame;
+  vtkKWIcon       *IconImage;
+  vtkKWWidget     *OKFrame;
+  vtkKWWidget     *CancelFrame;
 private:
   vtkKWMessageDialog(const vtkKWMessageDialog&); // Not implemented
   void operator=(const vtkKWMessageDialog&); // Not implemented
