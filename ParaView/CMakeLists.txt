@@ -235,7 +235,7 @@ IF (PARAVIEW_CAN_BUILD)
 
  SET (DO_NOT_BUILD_XML_RW 1)
 
- SUBDIRS(Utilities KWCommon ClientServer ClientManager Filters Widgets)
+ SUBDIRS(Utilities KWCommon ClientServer Filters Widgets)
 
  IF(PARAVIEW_BUILD_DEVELOPMENT)
    SUBDIRS(Development)
