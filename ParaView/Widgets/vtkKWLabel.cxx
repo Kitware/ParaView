@@ -49,7 +49,7 @@ int vtkKWLabelCommand(ClientData cd, Tcl_Interp *interp,
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLabel );
-vtkCxxRevisionMacro(vtkKWLabel, "1.18");
+vtkCxxRevisionMacro(vtkKWLabel, "1.19");
 
 //-----------------------------------------------------------------------------
 vtkKWLabel::vtkKWLabel()
@@ -110,7 +110,7 @@ void vtkKWLabel::Create(vtkKWApplication *app, const char *args)
     }
   else
     {
-    this->Script("label %s -text {%s} -anchor nw -justify left -width %d %s", 
+    this->Script("label %s -text {%s} -justify left -width %d %s", 
                  wname, this->Label, this->Width, (args?args:""));
     }
 
