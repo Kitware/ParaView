@@ -53,7 +53,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectCustomReader);
-vtkCxxRevisionMacro(vtkPVSelectCustomReader, "1.2");
+vtkCxxRevisionMacro(vtkPVSelectCustomReader, "1.3");
 
 //----------------------------------------------------------------------------
 vtkPVSelectCustomReader::vtkPVSelectCustomReader() 
@@ -73,7 +73,7 @@ vtkPVReaderModule* vtkPVSelectCustomReader::SelectReader(vtkPVWindow* win,
   this->SetStyleToOkCancel();
   this->SetOptions( vtkKWMessageDialog::Beep | vtkKWMessageDialog::YesDefault );
   this->Create(app, 0);
-  vtkKWWidget* frame = this->GetMessageDialogFrame();
+  vtkKWWidget* frame = this->GetTopFrame();
   this->SetMasterWindow(win);
   this->SetTitle("Open Data With...");
   vtkKWLabel* label = vtkKWLabel::New();

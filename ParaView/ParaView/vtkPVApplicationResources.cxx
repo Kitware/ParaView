@@ -310,7 +310,7 @@ void vtkPVApplication::DisplayAbout(vtkKWWindow* master)
     dlg->SetMasterWindow(master);
     dlg->Create(this,"");
     vtkKWImageLabel* label = vtkKWImageLabel::New();
-    label->SetParent(dlg->GetMessageDialogFrame());
+    label->SetParent(dlg->GetTopFrame());
     label->Create(this,0);
     label->SetImageDataName("PVSplashScreen");
     this->Script("pack %s", label->GetWidgetName());
