@@ -51,7 +51,7 @@
 #include "vtkSMProxyProperty.h"
 
 vtkStandardNewMacro(vtkPVBoxWidget);
-vtkCxxRevisionMacro(vtkPVBoxWidget, "1.43");
+vtkCxxRevisionMacro(vtkPVBoxWidget, "1.44");
 
 vtkCxxSetObjectMacro(vtkPVBoxWidget, InputMenu, vtkPVInputMenu);
 
@@ -616,7 +616,6 @@ void vtkPVBoxWidget::Create( vtkKWApplication *app)
   str1 << "vtkPVBoxWidget_Box" << instanceCount << ends;
   this->SetBoxProxyName(str1.str());
   pm->RegisterProxy("implicit_functions", this->BoxProxyName, this->BoxProxy);
-  this->BoxProxy->CreateVTKObjects(1);
   str1.rdbuf()->freeze(0);
 
   this->BoxTransformProxy = pm->NewProxy("transforms", "Transform2");
@@ -625,7 +624,6 @@ void vtkPVBoxWidget::Create( vtkKWApplication *app)
   this->SetBoxTransformProxyName(str2.str());
   pm->RegisterProxy("transforms", this->BoxTransformProxyName,
     this->BoxTransformProxy);
-  this->BoxTransformProxy->CreateVTKObjects(1);
   str2.rdbuf()->freeze(0);
 
   instanceCount++;

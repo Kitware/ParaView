@@ -28,7 +28,7 @@
 #include "vtkSM3DWidgetProxy.h"
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLineSourceWidget);
-vtkCxxRevisionMacro(vtkPVLineSourceWidget, "1.28");
+vtkCxxRevisionMacro(vtkPVLineSourceWidget, "1.29");
 
 int vtkPVLineSourceWidgetCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -77,7 +77,6 @@ void vtkPVLineSourceWidget::Create(vtkKWApplication *app)
   pm->RegisterProxy("sources", this->SourceProxyName, this->SourceProxy);
   proxyNum++;
   str.rdbuf()->freeze(0);
-  this->SourceProxy->CreateVTKObjects(1);
 }
 
 //----------------------------------------------------------------------------

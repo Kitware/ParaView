@@ -33,7 +33,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPointSourceWidget);
-vtkCxxRevisionMacro(vtkPVPointSourceWidget, "1.39");
+vtkCxxRevisionMacro(vtkPVPointSourceWidget, "1.40");
 
 int vtkPVPointSourceWidgetCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -164,7 +164,6 @@ void vtkPVPointSourceWidget::Create(vtkKWApplication *app)
   pm->RegisterProxy("sources", this->SourceProxyName, this->SourceProxy);
   proxyNum++;
   str.rdbuf()->freeze(0);
-  this->SourceProxy->CreateVTKObjects(1);
 
   this->RadiusWidget->SetVariableName("Radius");
   this->RadiusWidget->SetPVSource(this->GetPVSource());

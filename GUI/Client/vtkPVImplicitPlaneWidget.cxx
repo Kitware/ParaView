@@ -51,7 +51,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVImplicitPlaneWidget);
-vtkCxxRevisionMacro(vtkPVImplicitPlaneWidget, "1.42");
+vtkCxxRevisionMacro(vtkPVImplicitPlaneWidget, "1.43");
 
 vtkCxxSetObjectMacro(vtkPVImplicitPlaneWidget, InputMenu, vtkPVInputMenu);
 
@@ -705,7 +705,6 @@ void vtkPVImplicitPlaneWidget::Create(vtkKWApplication *app)
   this->SetImplicitFunctionProxyName(str.str());
   pm->RegisterProxy("implicit_functions", this->ImplicitFunctionProxyName,
     this->ImplicitFunctionProxy);
-  this->ImplicitFunctionProxy->CreateVTKObjects(1);
   str.rdbuf()->freeze(0);
 }
 

@@ -43,7 +43,7 @@
 #include "vtkSMProxy.h"
 #include "vtkSMSourceProxy.h" 
 vtkStandardNewMacro(vtkPVSphereWidget);
-vtkCxxRevisionMacro(vtkPVSphereWidget, "1.48");
+vtkCxxRevisionMacro(vtkPVSphereWidget, "1.49");
 
 vtkCxxSetObjectMacro(vtkPVSphereWidget, InputMenu, vtkPVInputMenu);
 
@@ -537,7 +537,6 @@ void vtkPVSphereWidget::Create( vtkKWApplication *app)
   this->SetImplicitFunctionProxyName(str.str());
   pm->RegisterProxy("implicit_functions", this->ImplicitFunctionProxyName,
     this->ImplicitFunctionProxy);
-  this->ImplicitFunctionProxy->CreateVTKObjects(1);
   str.rdbuf()->freeze(0);
 }
 //----------------------------------------------------------------------------
