@@ -255,7 +255,8 @@ void vtkPVArrayCalculator::CreateProperties()
                                           "ResultArrayName");
   this->ArrayNameEntry->SetModifiedCommand(this->GetTclName(), 
                                             "ChangeAcceptButtonColor");
-  this->Widgets->AddItem(this->ArrayNameEntry);
+  this->AddPVWidget(this->ArrayNameEntry);
+
   this->ArrayNameEntry->Create(pvApp, "Result Array Name:",
                                "Set the name of the array to hold the results of this computation");
   this->Script("pack %s -side top -fill x",

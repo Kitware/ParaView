@@ -227,7 +227,7 @@ void vtkPVContourEntry::Accept()
 
   if (this->ModifiedFlag)
     {  
-    pvApp->AddTraceEntry("$kw(%s) RemoveAllValues", 
+    this->AddTraceEntry("$kw(%s) RemoveAllValues", 
                          this->GetTclName());
     pvApp->BroadcastScript("%s SetNumberOfContours %d",
                            this->PVSource->GetVTKSourceTclName(), numContours);
@@ -238,7 +238,7 @@ void vtkPVContourEntry::Accept()
       pvApp->BroadcastScript("%s SetValue %d %f",
                              this->PVSource->GetVTKSourceTclName(),
                              i, value);
-      pvApp->AddTraceEntry("$kw(%s) AddValue %f", 
+      this->AddTraceEntry("$kw(%s) AddValue %f", 
                            this->GetTclName(), value);
       }
     }

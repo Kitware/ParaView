@@ -251,14 +251,14 @@ void vtkPVInputMenu::Accept()
     {
     this->Script("%s Set%s %s", this->PVSource->GetTclName(), this->InputName,
                  this->CurrentValue->GetPVOutput()->GetTclName());
-    pvApp->AddTraceEntry("$kw(%s) SetCurrentValue $pv(%s)", 
+    this->AddTraceEntry("$kw(%s) SetCurrentValue $kw(%s)", 
                          this->GetTclName(), 
                          this->CurrentValue->GetTclName());
     }
   else
     {
     this->Script("%s Set%s {}", this->PVSource->GetTclName(), this->InputName);
-    pvApp->AddTraceEntry("$kw(%s) SetCurrentValue {}", 
+    this->AddTraceEntry("$kw(%s) SetCurrentValue {}", 
                          this->GetTclName());
     }
 }

@@ -219,9 +219,9 @@ void vtkPVMinMax::Accept()
 
   if (this->ModifiedFlag)
     {  
-    pvApp->AddTraceEntry("$kw(%s) SetMinValue %f", this->GetTclName(), 
+    this->AddTraceEntry("$kw(%s) SetMinValue %f", this->GetTclName(), 
                          this->MinScale->GetValue());
-    pvApp->AddTraceEntry("$kw(%s) SetMaxValue %f", this->GetTclName(), 
+    this->AddTraceEntry("$kw(%s) SetMaxValue %f", this->GetTclName(), 
                          this->MaxScale->GetValue());
     }
 

@@ -331,6 +331,10 @@ protected:
   
   vtkKWWidgetCollection *Widgets;
 
+  // Description:
+  // This adds the PVWidget and sets up the callbacks to initialize its trace.
+  void AddPVWidget(vtkPVWidget *pvw);
+
   vtkKWPushButton *AcceptButton;
   vtkKWPushButton *ResetButton;
   vtkKWPushButton *DeleteButton;

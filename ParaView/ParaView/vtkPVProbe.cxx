@@ -248,7 +248,7 @@ void vtkPVProbe::CreateProperties()
   this->ScalarArrayMenu->SetModifiedCommand(this->GetTclName(), "ChangeAcceptButtonColor");
   this->ScalarArrayMenu->Create(this->Application);
   this->ScalarArrayMenu->SetBalloonHelpString("Choose the scalar array to graph.");
-  this->Widgets->AddItem(this->ScalarArrayMenu);
+  this->AddPVWidget(this->ScalarArrayMenu);
 
   frame = vtkKWWidget::New();
   frame->SetParent(this->GetParameterFrame()->GetFrame());

@@ -139,7 +139,7 @@ void vtkPVScale::Accept()
 
   if (this->ModifiedFlag)
     {  
-    pvApp->AddTraceEntry("$kw(%s) SetValue %f", this->GetTclName(), 
+    this->AddTraceEntry("$kw(%s) SetValue %f", this->GetTclName(), 
                          this->Scale->GetValue());
     }
 

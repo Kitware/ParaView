@@ -143,6 +143,7 @@ int vtkPVWidget::InitializeTrace()
 
   this->InvokeEvent(vtkKWEvent::InitializeTraceEvent, 0);
   this->TraceInitialized = 1;
+  return 1;
 }
 
 

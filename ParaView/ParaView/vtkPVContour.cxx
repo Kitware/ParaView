@@ -120,7 +120,7 @@ void vtkPVContour::CreateProperties()
   entry->SetLabel("Contour Values");
   entry->SetModifiedCommand(this->GetTclName(), "ChangeAcceptButtonColor");
   entry->Create(pvApp);
-  this->Widgets->AddItem(entry);
+  this->AddPVWidget(entry);
 
   this->Script("pack %s %s", this->ScalarRangeLabel->GetWidgetName(),
                entry->GetWidgetName());
@@ -137,7 +137,7 @@ void vtkPVContour::CreateProperties()
                                           "ChangeAcceptButtonColor");
   computeNormalsCheck->Create(pvApp, "Select whether to compute normals");
   computeNormalsCheck->SetState(1);
-  this->Widgets->AddItem(computeNormalsCheck);
+  this->AddPVWidget(computeNormalsCheck);
 
   computeGradientsCheck = vtkPVLabeledToggle::New();
   computeGradientsCheck->SetParent(this->GetParameterFrame()->GetFrame());
@@ -148,7 +148,7 @@ void vtkPVContour::CreateProperties()
                                             "ChangeAcceptButtonColor");
   computeGradientsCheck->Create(pvApp, "Select whether to compute gradients");
   computeGradientsCheck->SetState(0);
-  this->Widgets->AddItem(computeGradientsCheck);
+  this->AddPVWidget(computeGradientsCheck);
   
   computeScalarsCheck = vtkPVLabeledToggle::New();
   computeScalarsCheck->SetParent(this->GetParameterFrame()->GetFrame());
@@ -159,7 +159,7 @@ void vtkPVContour::CreateProperties()
                                           "ChangeAcceptButtonColor");
   computeScalarsCheck->Create(pvApp, "Select whether to compute scalars");
   computeScalarsCheck->SetState(1);
-  this->Widgets->AddItem(computeScalarsCheck);
+  this->AddPVWidget(computeScalarsCheck);
 
   this->Script("pack %s %s %s -anchor w -padx 10",
                computeNormalsCheck->GetWidgetName(),

@@ -147,7 +147,7 @@ void vtkPVThreshold::CreateProperties()
                             "GetUpperThreshold",
                             "Choose the lower value of the threshold",
                             "Choose the upper value of the threshold");
-  this->Widgets->AddItem(this->MinMaxScale);
+  this->AddPVWidget(this->MinMaxScale);
   
   this->AllScalarsCheck->SetParent(this->GetParameterFrame()->GetFrame());
   this->AllScalarsCheck->SetLabel("AllScalars");
@@ -156,7 +156,7 @@ void vtkPVThreshold::CreateProperties()
   this->AllScalarsCheck->SetModifiedCommand(this->GetTclName(), 
                                            "ChangeAcceptButtonColor");
   this->AllScalarsCheck->Create(pvApp, "If AllScalars is checked, then a cell is only included if all its points are within the threshold. This is only relevant for point data.");
-  this->Widgets->AddItem(this->AllScalarsCheck);
+  this->AddPVWidget(this->AllScalarsCheck);
   this->AllScalarsCheck->SetState(1);
 
   this->Script("pack %s %s -fill x -expand t",
@@ -219,7 +219,7 @@ void vtkPVThreshold::ChangeAttributeMode(const char* newMode)
 
   if ( ! this->TraceInitialized)
     {
-    pvApp->AddTraceEntry("set kw(%s) [$pv(%s) GetAttributeModeMenu]",
+    pvApp->AddTraceEntry("set kw(%s) [$kw(%s) GetAttributeModeMenu]",
                          this->AttributeModeMenu->GetTclName(),
                          this->GetTclName());
     this->TraceInitialized = 1;

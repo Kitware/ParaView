@@ -109,7 +109,7 @@ void vtkPVClipPlane::CreateProperties()
   planeWidget->Create(this->Application);
   this->Script("pack %s -side top -fill x", planeWidget->GetWidgetName());
   planeWidget->SetTraceName("Plane");
-  this->Widgets->AddItem(planeWidget);
+  this->AddPVWidget(planeWidget);
   // This makes the assumption that the vtkClipDataSet filter 
   // has already been set.  In the future we could also implement 
   // the virtual method "SetVTKSource" to catch the condition when
@@ -133,7 +133,7 @@ void vtkPVClipPlane::CreateProperties()
   offsetEntry->SetModifiedCommand(this->GetTclName(), 
                                   "ChangeAcceptButtonColor");
   offsetEntry->Create(this->Application, "Offset", 1, NULL, NULL);
-  this->Widgets->AddItem(offsetEntry);
+  this->AddPVWidget(offsetEntry);
   this->Script("pack %s -side top -fill x", offsetEntry->GetWidgetName());
   offsetEntry->Delete();
   offsetEntry = NULL;

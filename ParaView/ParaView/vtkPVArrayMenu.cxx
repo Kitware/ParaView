@@ -365,7 +365,7 @@ void vtkPVArrayMenu::Accept()
                            this->InputName,
                            attributeName,
                            this->ArrayName);
-    pvApp->AddTraceEntry("$kw(%s) SetValue %s", 
+    this->AddTraceEntry("$kw(%s) SetValue %s", 
                          this->GetTclName(), 
                          this->ArrayName);
     }
@@ -375,7 +375,7 @@ void vtkPVArrayMenu::Accept()
                            this->ObjectTclName,
                            this->InputName,
                            attributeName);
-    pvApp->AddTraceEntry("$kw(%s) SetValue {}", this->GetTclName());
+    this->AddTraceEntry("$kw(%s) SetValue {}", this->GetTclName());
     }
 
   if (this->ShowComponentMenu)
@@ -385,7 +385,7 @@ void vtkPVArrayMenu::Accept()
                            this->InputName,
                            attributeName,
                            this->SelectedComponent);
-    pvApp->AddTraceEntry("$kw(%s) SetSelectedComponent %s", 
+    this->AddTraceEntry("$kw(%s) SetSelectedComponent %s", 
                          this->GetTclName(), 
                          this->ArrayName);
     }

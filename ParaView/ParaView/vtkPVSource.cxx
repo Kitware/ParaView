@@ -1241,10 +1241,26 @@ void vtkPVSource::InitializePVWidgetTrace(vtkObject* o, unsigned long event,
     return;
     }
 
-  pvApp->AddTraceEntry("set kw(%s) [$kw(%s) GetPVWidget %s]", pvw->GetTclName(),
+  pvApp->AddTraceEntry("set kw(%s) [$kw(%s) GetPVWidget {%s}]", pvw->GetTclName(),
                        self->GetTclName(), pvw->GetTraceName());
 
 }
+
+
+
+//----------------------------------------------------------------------------
+void vtkPVSource::AddPVWidget(vtkPVWidget *pvw)
+{
+  this->Widgets->AddItem(pvw);  
+
+  vtkCallbackCommand *cb = vtkCallbackCommand::New();
+  cb->SetClientData(this);
+  cb->SetCallback(vtkPVSource::InitializePVWidgetTrace);
+  pvw->AddObserver(vtkKWEvent::InitializeTraceEvent,  cb);
+  cb->Delete();
+}
+
+
 
 //----------------------------------------------------------------------------
 vtkPVInputMenu *vtkPVSource::AddInputMenu(char *label, char *inputName, char *inputType,
@@ -1264,15 +1280,9 @@ vtkPVInputMenu *vtkPVSource::AddInputMenu(char *label, char *inputName, char *in
   inputMenu->SetInputType(inputType);
   inputMenu->SetBalloonHelpString(help);
 
-  vtkCallbackCommand *cb = vtkCallbackCommand::New();
-  cb->SetClientData(this);
-  cb->SetCallback(vtkPVSource::InitializePVWidgetTrace);
-  inputMenu->AddObserver(vtkKWEvent::InitializeTraceEvent,  cb);
-  cb->Delete();
-
   this->Script("pack %s -side top -fill x -expand t",
                inputMenu->GetWidgetName());
-  this->Widgets->AddItem(inputMenu);
+  this->AddPVWidget(inputMenu);
   inputMenu->Delete();
   return inputMenu;
 }
@@ -1298,15 +1308,9 @@ vtkPVArrayMenu *vtkPVSource::AddArrayMenu(const char *label,
   arrayMenu->Create(this->Application);
   arrayMenu->SetBalloonHelpString(help);
 
-  vtkCallbackCommand *cb = vtkCallbackCommand::New();
-  cb->SetClientData(this);
-  cb->SetCallback(vtkPVSource::InitializePVWidgetTrace);
-  arrayMenu->AddObserver(vtkKWEvent::InitializeTraceEvent,  cb);
-  cb->Delete();
-
   this->Script("pack %s -side top -fill x -expand t",
                arrayMenu->GetWidgetName());
-  this->Widgets->AddItem(arrayMenu);
+  this->AddPVWidget(arrayMenu);
   arrayMenu->Delete();
   return arrayMenu;
 }
@@ -1318,13 +1322,7 @@ vtkPVLabeledToggle *vtkPVSource::AddLabeledToggle(char *label, char *varName,
 {
   vtkPVLabeledToggle *toggle = vtkPVLabeledToggle::New();
 
-  vtkCallbackCommand *cb = vtkCallbackCommand::New();
-  cb->SetClientData(this);
-  cb->SetCallback(vtkPVSource::InitializePVWidgetTrace);
-  toggle->AddObserver(vtkKWEvent::InitializeTraceEvent,  cb);
-  cb->Delete();
-
-  this->Widgets->AddItem(toggle);
+  this->AddPVWidget(toggle);
 
   toggle->SetParent(this->ParameterFrame->GetFrame());
   toggle->SetObjectVariable(this->GetVTKSourceTclName(), varName);
@@ -1347,17 +1345,11 @@ vtkPVFileEntry *vtkPVSource::AddFileEntry(char *label, char *varName,
   vtkPVFileEntry *entry;
 
   entry = vtkPVFileEntry::New();
-  this->Widgets->AddItem(entry);
+  this->AddPVWidget(entry);
   entry->SetParent(this->ParameterFrame->GetFrame());
   entry->SetObjectVariable(this->GetVTKSourceTclName(), varName);
   entry->SetModifiedCommand(this->GetTclName(), "ChangeAcceptButtonColor");
   entry->Create(this->Application, label, ext, help);
-
-  vtkCallbackCommand *cb = vtkCallbackCommand::New();
-  cb->SetClientData(this);
-  cb->SetCallback(vtkPVSource::InitializePVWidgetTrace);
-  entry->AddObserver(vtkKWEvent::InitializeTraceEvent,  cb);
-  cb->Delete();
 
   this->Script("pack %s -fill x -expand t", entry->GetWidgetName());
 
@@ -1374,17 +1366,11 @@ vtkPVStringEntry *vtkPVSource::AddStringEntry(char *label, char *varName,
   vtkPVStringEntry *entry;
 
   entry = vtkPVStringEntry::New();
-  this->Widgets->AddItem(entry);
+  this->AddPVWidget(entry);
   entry->SetParent(this->ParameterFrame->GetFrame());
   entry->SetObjectVariable(this->GetVTKSourceTclName(), varName);
   entry->SetModifiedCommand(this->GetTclName(), "ChangeAcceptButtonColor");
   entry->Create(this->Application, label, help);
-
-  vtkCallbackCommand *cb = vtkCallbackCommand::New();
-  cb->SetClientData(this);
-  cb->SetCallback(vtkPVSource::InitializePVWidgetTrace);
-  entry->AddObserver(vtkKWEvent::InitializeTraceEvent,  cb);
-  cb->Delete();
 
   this->Script("pack %s -fill x -expand t", entry->GetWidgetName());
 
@@ -1401,18 +1387,12 @@ vtkPVVectorEntry *vtkPVSource::AddLabeledEntry(char *label, char *varName,
   vtkPVVectorEntry *entry;
 
   entry = vtkPVVectorEntry::New();
-  this->Widgets->AddItem(entry);
+  this->AddPVWidget(entry);
   entry->SetParent(this->ParameterFrame->GetFrame());
   entry->SetObjectVariable(this->GetVTKSourceTclName(), varName);
   entry->SetModifiedCommand(this->GetTclName(), "ChangeAcceptButtonColor");
   entry->Create(this->Application, label, 1, NULL, help);
   this->Script("pack %s -fill x -expand t", entry->GetWidgetName());
-
-  vtkCallbackCommand *cb = vtkCallbackCommand::New();
-  cb->SetClientData(this);
-  cb->SetCallback(vtkPVSource::InitializePVWidgetTrace);
-  entry->AddObserver(vtkKWEvent::InitializeTraceEvent,  cb);
-  cb->Delete();
 
   entry->Delete();
 
@@ -1433,17 +1413,11 @@ vtkPVVectorEntry* vtkPVSource::AddVector2Entry(char *label, char *l1, char *l2,
   subLabels[1] = new char[strlen(l2) + 1];
   strcpy(subLabels[1], l2);
   entry = vtkPVVectorEntry::New();
-  this->Widgets->AddItem(entry);
+  this->AddPVWidget(entry);
   entry->SetParent(this->ParameterFrame->GetFrame());
   entry->SetObjectVariable(this->GetVTKSourceTclName(), varName);
   entry->SetModifiedCommand(this->GetTclName(), "ChangeAcceptButtonColor");
   entry->Create(this->Application, label, 2, subLabels, help);
-
-  vtkCallbackCommand *cb = vtkCallbackCommand::New();
-  cb->SetClientData(this);
-  cb->SetCallback(vtkPVSource::InitializePVWidgetTrace);
-  entry->AddObserver(vtkKWEvent::InitializeTraceEvent,  cb);
-  cb->Delete();
 
   this->Script("pack %s -fill x -expand t", entry->GetWidgetName());
   entry->Delete();
@@ -1472,17 +1446,11 @@ vtkPVVectorEntry* vtkPVSource::AddVector3Entry(char *label, char *l1, char *l2,
   subLabels[2] = new char[strlen(l3) + 1];
   strcpy(subLabels[2], l3);
   entry = vtkPVVectorEntry::New();
-  this->Widgets->AddItem(entry);
+  this->AddPVWidget(entry);
   entry->SetParent(this->ParameterFrame->GetFrame());
   entry->SetObjectVariable(this->GetVTKSourceTclName(), varName);
   entry->SetModifiedCommand(this->GetTclName(), "ChangeAcceptButtonColor");
   entry->Create(this->Application, label, 3, subLabels, help);
-
-  vtkCallbackCommand *cb = vtkCallbackCommand::New();
-  cb->SetClientData(this);
-  cb->SetCallback(vtkPVSource::InitializePVWidgetTrace);
-  entry->AddObserver(vtkKWEvent::InitializeTraceEvent,  cb);
-  cb->Delete();
 
   this->Script("pack %s -fill x -expand t", entry->GetWidgetName());
   entry->Delete();
@@ -1515,17 +1483,11 @@ vtkPVVectorEntry* vtkPVSource::AddVector4Entry(char *label, char *l1, char *l2,
   strcpy(subLabels[3], l4);
 
   entry = vtkPVVectorEntry::New();
-  this->Widgets->AddItem(entry);
+  this->AddPVWidget(entry);
   entry->SetParent(this->ParameterFrame->GetFrame());
   entry->SetObjectVariable(this->GetVTKSourceTclName(), varName);
   entry->SetModifiedCommand(this->GetTclName(), "ChangeAcceptButtonColor");
   entry->Create(this->Application, label, 4, subLabels, help);
-
-  vtkCallbackCommand *cb = vtkCallbackCommand::New();
-  cb->SetClientData(this);
-  cb->SetCallback(vtkPVSource::InitializePVWidgetTrace);
-  entry->AddObserver(vtkKWEvent::InitializeTraceEvent,  cb);
-  cb->Delete();
 
   this->Script("pack %s -fill x -expand t", entry->GetWidgetName());
   entry->Delete();
@@ -1565,17 +1527,11 @@ vtkPVVectorEntry* vtkPVSource::AddVector6Entry(char *label, char *l1, char *l2,
   strcpy(subLabels[5], l6);
 
   entry = vtkPVVectorEntry::New();
-  this->Widgets->AddItem(entry);
+  this->AddPVWidget(entry);
   entry->SetParent(this->ParameterFrame->GetFrame());
   entry->SetObjectVariable(this->GetVTKSourceTclName(), varName);
   entry->SetModifiedCommand(this->GetTclName(), "ChangeAcceptButtonColor");
   entry->Create(this->Application, label, 6, subLabels, help);
-
-  vtkCallbackCommand *cb = vtkCallbackCommand::New();
-  cb->SetClientData(this);
-  cb->SetCallback(vtkPVSource::InitializePVWidgetTrace);
-  entry->AddObserver(vtkKWEvent::InitializeTraceEvent,  cb);
-  cb->Delete();
 
   this->Script("pack %s -fill x -expand t", entry->GetWidgetName());
   entry->Delete();
@@ -1597,17 +1553,11 @@ vtkPVScale *vtkPVSource::AddScale(char *label, char *varName,
   vtkPVScale *scale;
 
   scale = vtkPVScale::New();
-  this->Widgets->AddItem(scale);
+  this->AddPVWidget(scale);
   scale->SetParent(this->ParameterFrame->GetFrame());
   scale->SetObjectVariable(this->GetVTKSourceTclName(), varName);
   scale->SetModifiedCommand(this->GetTclName(), "ChangeAcceptButtonColor");
   scale->Create(this->Application, label, min, max, resolution, help);
-
-  vtkCallbackCommand *cb = vtkCallbackCommand::New();
-  cb->SetClientData(this);
-  cb->SetCallback(vtkPVSource::InitializePVWidgetTrace);
-  scale->AddObserver(vtkKWEvent::InitializeTraceEvent,  cb);
-  cb->Delete();
 
   this->Script("pack %s -fill x -expand t", scale->GetWidgetName());
 
@@ -1622,18 +1572,12 @@ vtkPVSelectionList *vtkPVSource::AddModeList(char *label, char *varName,
                                              char *help)
 {
   vtkPVSelectionList *sl = vtkPVSelectionList::New();  
-  this->Widgets->AddItem(sl);
+  this->AddPVWidget(sl);
   sl->SetParent(this->ParameterFrame->GetFrame());
   sl->SetLabel(label);
   sl->SetObjectVariable(this->GetVTKSourceTclName(), varName);
   sl->SetModifiedCommand(this->GetTclName(), "ChangeAcceptButtonColor");
   sl->Create(this->Application);
-
-  vtkCallbackCommand *cb = vtkCallbackCommand::New();
-  cb->SetClientData(this);
-  cb->SetCallback(vtkPVSource::InitializePVWidgetTrace);
-  sl->AddObserver(vtkKWEvent::InitializeTraceEvent,  cb);
-  cb->Delete();
 
   if (help)
     {

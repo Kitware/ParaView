@@ -128,7 +128,7 @@ void vtkPVSelectionList::Accept()
 
   if (this->ModifiedFlag)
     {  
-    pvApp->AddTraceEntry("$kw(%s) SetCurrentValue {%d}", this->GetTclName(), 
+    this->AddTraceEntry("$kw(%s) SetCurrentValue {%d}", this->GetTclName(), 
                          this->GetCurrentValue());
     }
 

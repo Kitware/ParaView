@@ -149,7 +149,7 @@ void vtkPVStringEntry::Accept()
 
   if (this->ModifiedFlag)
     {
-    pvApp->AddTraceEntry("$kw(%s) SetValue {%s}", this->GetTclName(), 
+    this->AddTraceEntry("$kw(%s) SetValue {%s}", this->GetTclName(), 
                          this->GetValue());
     }
 
