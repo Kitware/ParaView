@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWSplashScreen );
-vtkCxxRevisionMacro(vtkKWSplashScreen, "1.3");
+vtkCxxRevisionMacro(vtkKWSplashScreen, "1.4");
 
 //-----------------------------------------------------------------------------
 vtkKWSplashScreen::vtkKWSplashScreen()
@@ -108,6 +108,13 @@ void vtkKWSplashScreen::Create(vtkKWApplication *app, const char *args)
                this->Image->GetWidgetName(),
                this->ProgressMessage->GetWidgetName());
 
+}
+
+//-----------------------------------------------------------------------------
+void vtkKWSplashScreen::ShowWithBind()
+{
+  this->Show();
+  this->Image->SetBind(this, "<ButtonPress>", "Hide");
 }
 
 //-----------------------------------------------------------------------------

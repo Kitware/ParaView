@@ -98,7 +98,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.139");
+vtkCxxRevisionMacro(vtkPVApplication, "1.140");
 
 int vtkPVApplicationCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -1325,6 +1325,7 @@ vtkObject *vtkPVApplication::TclToVTKObject(const char *tclName)
 //----------------------------------------------------------------------------
 void vtkPVApplication::DisplayAbout(vtkKWWindow *master)
 {
+#ifdef 0  
   ostrstream str;
   str << this->GetApplicationName() << " was developed by Kitware Inc." << endl
       << "http://www.paraview.org" << endl
@@ -1341,6 +1342,9 @@ void vtkPVApplication::DisplayAbout(vtkKWWindow *master)
   dlg->Invoke();  
   dlg->Delete(); 
   delete[] msg;
+#else
+  this->SplashScreen->ShowWithBind();
+#endif
 }
 
 void vtkPVApplication::DisplayHelp(vtkKWWindow* master)
