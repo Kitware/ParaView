@@ -26,6 +26,7 @@
 
 #include "vtkSMDoubleRangeDomain.h"
 
+class vtkPVDataInformation;
 class vtkSMProxyProperty;
 
 class VTK_EXPORT vtkSMBoundsDomain : public vtkSMDoubleRangeDomain
@@ -41,14 +42,18 @@ public:
   virtual void Update(vtkSMProperty*);
 
   // Description:
-  vtkSetClampMacro(Mode, int, 0, 1);
+  vtkSetClampMacro(Mode, int, 0, 2);
   vtkGetMacro(Mode, int);
+
+  // Description:
+  void SetInputInformation(vtkPVDataInformation* input);
 
 //BTX
   enum Modes
   {
     NORMAL,
-    MAGNITUDE
+    MAGNITUDE,
+    ORIENTED_MAGNITUDE
   };
 //ETX
 
@@ -57,6 +62,7 @@ protected:
   ~vtkSMBoundsDomain();
 
   void Update(vtkSMProxyProperty *pp);
+  void UpdateOriented();
 
   // Description:
   // Set the appropriate ivars from the xml element. Should
@@ -64,6 +70,8 @@ protected:
   virtual int ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement* element);
   
   int Mode;
+
+  vtkPVDataInformation* InputInformation;
 
 private:
   vtkSMBoundsDomain(const vtkSMBoundsDomain&); // Not implemented
