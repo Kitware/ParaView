@@ -125,7 +125,7 @@ static unsigned char image_goto_end[] =
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterface);
-vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.28.2.5");
+vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.28.2.6");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterface,ControlledWidget, vtkPVWidget);
 
@@ -356,8 +356,6 @@ void vtkPVAnimationInterface::Create(vtkKWApplication *app, char *frameArgs)
 
   this->ControlButtonFrame->SetParent(this->ControlFrame->GetFrame());
   this->ControlButtonFrame->Create(this->Application, "frame", "");
-
-  cout << this->ControlButtonFrame->GetTclName() << endl;
 
   this->Script("pack %s -side top -fill none -expand t -anchor center", 
                this->ControlButtonFrame->GetWidgetName());
