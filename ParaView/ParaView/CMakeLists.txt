@@ -37,6 +37,7 @@ vtkPVExtentTranslator.cxx
 vtkPVExtractGeometryByScalar.cxx
 vtkPVFileEntry.cxx
 vtkPVGenericRenderWindowInteractor.cxx
+vtkPVGhostLevelDialog.cxx
 vtkPVGlyph3D.cxx 
 vtkPVImplicitPlaneWidget.cxx
 vtkPVInitialize.cxx

@@ -80,6 +80,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVDemoPaths.h"
 #include "vtkPVErrorLogDisplay.h"
 #include "vtkPVGenericRenderWindowInteractor.h"
+#include "vtkPVGhostLevelDialog.h"
 #include "vtkPVInteractorStyle.h"
 #include "vtkPVInteractorStyleCenterOfRotation.h"
 #include "vtkPVInteractorStyleControl.h"
@@ -126,7 +127,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.391.2.22");
+vtkCxxRevisionMacro(vtkPVWindow, "1.391.2.23");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -2263,11 +2264,19 @@ void vtkPVWindow::WriteData()
     // Write the file.
     if(parallel)
       {
+      vtkPVGhostLevelDialog* dlg = vtkPVGhostLevelDialog::New();
+      dlg->Create(this->Application, "");
+      dlg->SetMasterWindow(this);
+      dlg->SetTitle("Select ghost levels");
+
       // See if the user wants to save any ghost levels.
-      this->Script("tk_dialog .ghostLevelDialog {Ghost Level Selection} "
-                   "{How many ghost levels would you like to save?} "
-                   "{} 0 0 1 2");
-      int ghostLevel = this->GetIntegerResult(this->GetPVApplication());
+      int ghostLevel = 0;
+
+      if ( dlg->Invoke() )
+        {
+        ghostLevel = dlg->GetGhostLevel();
+        }
+      dlg->Delete();
       if (ghostLevel >= 0)
         {
         this->WriteVTKFile(filename, ghostLevel);
@@ -3131,18 +3140,12 @@ void vtkPVWindow::DisableToolbarButtons()
 //----------------------------------------------------------------------------
 void vtkPVWindow::EnableToolbarButton(const char* buttonName)
 {
-  if (!this->ToolbarButtonsDisabled)
-    {
-    return;
-    }
-
   vtkKWPushButton *button = 0;
   if ( this->ToolbarButtons->GetItem(buttonName, button) == VTK_OK &&
        button )
     {
     button->EnabledOn();
     }
-  this->ToolbarButtonsDisabled = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -3159,7 +3162,7 @@ void vtkPVWindow::DisableToolbarButton(const char* buttonName)
 //----------------------------------------------------------------------------
 void vtkPVWindow::EnableToolbarButtons()
 {
-  if (this->CurrentPVData == NULL)
+  if (this->CurrentPVData == NULL || !this->ToolbarButtonsDisabled)
     {
     return;
     }
@@ -3184,6 +3187,8 @@ void vtkPVWindow::EnableToolbarButtons()
     it->GoToNextItem();
     }
   it->Delete();
+
+  this->ToolbarButtonsDisabled = 0;
 
 
 }
@@ -3908,7 +3913,7 @@ void vtkPVWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVWindow ";
-  this->ExtractRevision(os,"$Revision: 1.391.2.22 $");
+  this->ExtractRevision(os,"$Revision: 1.391.2.23 $");
 }
 
 //----------------------------------------------------------------------------
