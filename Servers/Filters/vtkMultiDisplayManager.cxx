@@ -42,7 +42,7 @@
  #include <mpi.h>
 #endif
 
-vtkCxxRevisionMacro(vtkMultiDisplayManager, "1.1");
+vtkCxxRevisionMacro(vtkMultiDisplayManager, "1.2");
 vtkStandardNewMacro(vtkMultiDisplayManager);
 
 // Structures to communicate render info.
@@ -105,10 +105,10 @@ vtkMultiDisplayManager::vtkMultiDisplayManager()
 
   this->Controller = vtkMultiProcessController::GetGlobalController();
   this->SocketController = NULL;
-  this->NumberOfProcesses = this->Controller->GetNumberOfProcesses();
 
   if (this->Controller)
     {
+    this->NumberOfProcesses = this->Controller->GetNumberOfProcesses();
     this->Controller->Register(this);
     }
 
@@ -126,9 +126,6 @@ vtkMultiDisplayManager::vtkMultiDisplayManager()
 
   this->TileBuffers = NULL;
   this->TileBufferArrayLength = 0;
-
-
-
 }
 
   
