@@ -40,7 +40,7 @@
 #include "vtkImageData.h"
 #include "vtkRectilinearGrid.h"
 
-vtkCxxRevisionMacro(vtkCTHData, "1.24");
+vtkCxxRevisionMacro(vtkCTHData, "1.25");
 vtkStandardNewMacro(vtkCTHData);
 
 //----------------------------------------------------------------------------
@@ -150,7 +150,7 @@ void vtkCTHDataInterpolateDualFace(T *ptr0, int *dims, int numComps)
         ptrc = ptr1;
         for (k = 0; k < numComps; ++k)
           {
-          *ptrc = 0.5 * (*ptrc + ptrc[inc3]);
+          *ptrc = (T)(0.5 * (*ptrc + ptrc[inc3]));
           ++ptrc;
           }
         ptr1 += inc1;
@@ -170,7 +170,7 @@ void vtkCTHDataInterpolateDualFace(T *ptr0, int *dims, int numComps)
         ptrc = ptr1;
         for (k = 0; k < numComps; ++k)
           {
-          *ptrc = 0.5 * (*ptrc + ptrc[-inc3]);
+          *ptrc = (T)(0.5 * (*ptrc + ptrc[-inc3]));
           ++ptrc;
           }
         ptr1 += inc1;
@@ -191,7 +191,7 @@ void vtkCTHDataInterpolateDualFace(T *ptr0, int *dims, int numComps)
         ptrc = ptr1;
         for (k = 0; k < numComps; ++k)
           {
-          *ptrc = 0.5 * (*ptrc + ptrc[inc2]);
+          *ptrc = (T)(0.5 * (*ptrc + ptrc[inc2]));
           ++ptrc;
           }
         ptr1 += inc1;
@@ -211,7 +211,7 @@ void vtkCTHDataInterpolateDualFace(T *ptr0, int *dims, int numComps)
         ptrc = ptr1;
         for (k = 0; k < numComps; ++k)
           {
-          *ptrc = 0.5 * (*ptrc + ptrc[-inc2]);
+          *ptrc = (T)(0.5 * (*ptrc + ptrc[-inc2]));
           ++ptrc;
           }
         ptr1 += inc1;
@@ -231,7 +231,7 @@ void vtkCTHDataInterpolateDualFace(T *ptr0, int *dims, int numComps)
         ptrc = ptr1;
         for (k = 0; k < numComps; ++k)
           {
-          *ptrc = 0.5 * (*ptrc + ptrc[inc1]);
+          *ptrc = (T)(0.5 * (*ptrc + ptrc[inc1]));
           ++ptrc;
           }
         ptr1 += inc2;
@@ -250,7 +250,7 @@ void vtkCTHDataInterpolateDualFace(T *ptr0, int *dims, int numComps)
         ptrc = ptr1;
         for (k = 0; k < numComps; ++k)
           {
-          *ptrc = 0.5 * (*ptrc + ptrc[-inc1]);
+          *ptrc = (T)(0.5 * (*ptrc + ptrc[-inc1]));
           ++ptrc;
           }
         ptr1 += inc2;
