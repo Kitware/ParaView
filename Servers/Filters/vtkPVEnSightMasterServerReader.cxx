@@ -37,7 +37,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVEnSightMasterServerReader);
-vtkCxxRevisionMacro(vtkPVEnSightMasterServerReader, "1.19");
+vtkCxxRevisionMacro(vtkPVEnSightMasterServerReader, "1.20");
 
 vtkCxxSetObjectMacro(vtkPVEnSightMasterServerReader, Controller,
                      vtkMultiProcessController);
@@ -64,6 +64,7 @@ vtkPVEnSightMasterServerReader::vtkPVEnSightMasterServerReader()
 {
   this->Internal = new vtkPVEnSightMasterServerReaderInternal;
   this->Controller = 0;
+  this->SetController(vtkMultiProcessController::GetGlobalController());
   this->InformationError = 0;
   this->ExtentTranslator = vtkPVEnSightMasterServerTranslator::New();
   this->NumberOfPieces = 0;
