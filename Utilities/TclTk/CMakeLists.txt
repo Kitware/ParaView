@@ -14,7 +14,7 @@
 PROJECT(TclTk)
 
 IF(UNIX)
-  SET(TCL_TK_STATIC 1 CACHE INTERNAL "Build with static Tcl/Tk support. TCL_LIBRARY and TK_LIBRARY must point to the corresponding Tcl/Tk static libraries (example, tcl84sx.lib, tk84sx.lib)." FORCE)
+  SET(VTK_TCL_TK_STATIC 1 CACHE INTERNAL "Build with static Tcl/Tk support. TCL_LIBRARY and TK_LIBRARY must point to the corresponding Tcl/Tk static libraries (example, tcl84sx.lib, tk84sx.lib)." FORCE)
   SET(TclTk_BINARY_DIR_TCLBIN "${TclTk_BINARY_DIR}/tcl8.4.5/unix")
   SET(TclTk_BINARY_DIR_TKBIN "${TclTk_BINARY_DIR}/tk8.4.5/unix")
 
@@ -120,14 +120,14 @@ ENDIF(UNIX)
 # See vtkTclTkMacros.cmake for full documentation about
 # VTK_COPY_TCL_TK_SUPPORT_FILES_TO_DIR
 
-SET(TCL_TK_COPY_SUPPORT_LIBRARY 1 CACHE INTERNAL "ParaView links against its own version of Tcl/TK" FORCE)
-SET(TCL_SUPPORT_LIBRARY_PATH ${TclTk_SOURCE_DIR}/tcl8.4.5/library)
-SET(TK_SUPPORT_LIBRARY_PATH ${TclTk_SOURCE_DIR}/tk8.4.5/library)
+SET(VTK_TCL_TK_COPY_SUPPORT_LIBRARY 1 CACHE INTERNAL "ParaView links against its own version of Tcl/TK" FORCE)
+SET(VTK_TCL_SUPPORT_LIBRARY_PATH ${TclTk_SOURCE_DIR}/tcl8.4.5/library)
+SET(VTK_TK_SUPPORT_LIBRARY_PATH ${TclTk_SOURCE_DIR}/tk8.4.5/library)
 
 INCLUDE(${VTK_TCL_TK_MACROS_MODULE})
 VTK_COPY_TCL_TK_SUPPORT_FILES_TO_DIR(
-  "${TCL_SUPPORT_LIBRARY_PATH}"
-  "${TK_SUPPORT_LIBRARY_PATH}"
+  "${VTK_TCL_SUPPORT_LIBRARY_PATH}"
+  "${VTK_TK_SUPPORT_LIBRARY_PATH}"
   "${APPLICATION_BINARY_DIR}/lib")
 
 INSTALL_FILES(/lib/tcl8.4 FILES ${TCL_SUPPORT_FILES})
