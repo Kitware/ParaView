@@ -40,7 +40,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVServerFileListing);
-vtkCxxRevisionMacro(vtkPVServerFileListing, "1.5");
+vtkCxxRevisionMacro(vtkPVServerFileListing, "1.6");
 
 //----------------------------------------------------------------------------
 class vtkPVServerFileListingInternals
@@ -213,6 +213,8 @@ void vtkPVServerFileListing::List(const char* dirname, int save)
         }
       }
     }
+  closedir(dir);
+  
 #endif
 
   // List the directories in the first message.
