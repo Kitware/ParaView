@@ -62,6 +62,16 @@ public:
   // is supposed to write.
   virtual char* GetRootElementName();
 
+  // Description:
+  // Return the name of the element used inside that tree to
+  // store the title property.
+  static char* GetTitleTextPropertyElementName();
+
+  // Description:
+  // Return the name of the element used inside that tree to
+  // store the label text property.
+  static char* GetLabelTextPropertyElementName();
+
 protected:
   vtkXMLScalarBarActorWriter() {};
   ~vtkXMLScalarBarActorWriter() {};  

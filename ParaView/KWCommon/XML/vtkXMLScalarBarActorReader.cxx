@@ -45,10 +45,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkScalarBarActor.h"
 #include "vtkTextProperty.h"
 #include "vtkXMLDataElement.h"
+#include "vtkXMLScalarBarActorWriter.h"
 #include "vtkXMLTextPropertyReader.h"
 
 vtkStandardNewMacro(vtkXMLScalarBarActorReader);
-vtkCxxRevisionMacro(vtkXMLScalarBarActorReader, "1.1");
+vtkCxxRevisionMacro(vtkXMLScalarBarActorReader, "1.2");
 
 //----------------------------------------------------------------------------
 char* vtkXMLScalarBarActorReader::GetRootElementName()
@@ -105,47 +106,41 @@ int vtkXMLScalarBarActorReader::Parse(vtkXMLDataElement *elem)
   
   // Get nested elements
   
-  vtkXMLDataElement *nested_elem, *nested_elem2;
-  
-  // Title text property
+  // Title and label text property
 
-  vtkTextProperty *tprop = obj->GetTitleTextProperty();
-  if (tprop)
+  vtkXMLTextPropertyReader *xmlr = vtkXMLTextPropertyReader::New();
+
+  if (xmlr->IsInNestedElement(
+        elem, vtkXMLScalarBarActorWriter::GetTitleTextPropertyElementName()))
     {
-    nested_elem = elem->FindNestedElementWithName("Title");
-    if (nested_elem)
+    vtkTextProperty *tprop = obj->GetTitleTextProperty();
+    if (!tprop)
       {
-      vtkXMLTextPropertyReader *xmlr = vtkXMLTextPropertyReader::New();
-      nested_elem2 = nested_elem->FindNestedElementWithName(
-        xmlr->GetRootElementName());
-      if (nested_elem2)
-        {
-        xmlr->SetObject(tprop);
-        xmlr->Parse(nested_elem2);
-        }
-      xmlr->Delete();
+      tprop = vtkTextProperty::New();
+      obj->SetTitleTextProperty(tprop);
+      tprop->Delete();
       }
+    xmlr->SetObject(tprop);
+    xmlr->ParseInNestedElement(
+      elem, vtkXMLScalarBarActorWriter::GetTitleTextPropertyElementName());
     }
 
-  // Label text property
-
-  vtkTextProperty *lprop = obj->GetLabelTextProperty();
-  if (lprop)
+  if (xmlr->IsInNestedElement(
+        elem, vtkXMLScalarBarActorWriter::GetLabelTextPropertyElementName()))
     {
-    nested_elem = elem->FindNestedElementWithName("Label");
-    if (nested_elem)
+    vtkTextProperty *tprop = obj->GetLabelTextProperty();
+    if (!tprop)
       {
-      vtkXMLTextPropertyReader *xmlr = vtkXMLTextPropertyReader::New();
-      nested_elem2 = nested_elem->FindNestedElementWithName(
-        xmlr->GetRootElementName());
-      if (nested_elem2)
-        {
-        xmlr->SetObject(lprop);
-        xmlr->Parse(nested_elem2);
-        }
-      xmlr->Delete();
+      tprop = vtkTextProperty::New();
+      obj->SetLabelTextProperty(tprop);
+      tprop->Delete();
       }
+    xmlr->SetObject(tprop);
+    xmlr->ParseInNestedElement(
+      elem, vtkXMLScalarBarActorWriter::GetLabelTextPropertyElementName());
     }
+
+  xmlr->Delete();
 
   return 1;
 }

@@ -48,12 +48,24 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkXMLTextPropertyWriter.h"
 
 vtkStandardNewMacro(vtkXMLScalarBarActorWriter);
-vtkCxxRevisionMacro(vtkXMLScalarBarActorWriter, "1.1");
+vtkCxxRevisionMacro(vtkXMLScalarBarActorWriter, "1.2");
 
 //----------------------------------------------------------------------------
 char* vtkXMLScalarBarActorWriter::GetRootElementName()
 {
   return "ScalarBarActor";
+}
+
+//----------------------------------------------------------------------------
+char* vtkXMLScalarBarActorWriter::GetTitleTextPropertyElementName()
+{
+  return "TitleTextProperty";
+}
+
+//----------------------------------------------------------------------------
+char* vtkXMLScalarBarActorWriter::GetLabelTextPropertyElementName()
+{
+  return "LabelTextProperty";
 }
 
 //----------------------------------------------------------------------------
@@ -105,16 +117,9 @@ int vtkXMLScalarBarActorWriter::AddNestedElements(vtkXMLDataElement *elem)
   vtkTextProperty *tprop = obj->GetTitleTextProperty();
   if (tprop)
     {
-    vtkXMLDataElement *nested_elem = vtkXMLDataElement::New();
-    elem->AddNestedElement(nested_elem);
-    nested_elem->SetName("Title");
-    nested_elem->Delete();
-    vtkXMLDataElement *nested_elem2 = vtkXMLDataElement::New();
-    nested_elem->AddNestedElement(nested_elem2);
-    nested_elem2->Delete();
     vtkXMLTextPropertyWriter *xmlw = vtkXMLTextPropertyWriter::New();
     xmlw->SetObject(tprop);
-    xmlw->Create(nested_elem2);
+    xmlw->CreateInNestedElement(elem, this->GetTitleTextPropertyElementName());
     xmlw->Delete();
     }
  
@@ -123,16 +128,9 @@ int vtkXMLScalarBarActorWriter::AddNestedElements(vtkXMLDataElement *elem)
   vtkTextProperty *lprop = obj->GetLabelTextProperty();
   if (lprop)
     {
-    vtkXMLDataElement *nested_elem = vtkXMLDataElement::New();
-    elem->AddNestedElement(nested_elem);
-    nested_elem->SetName("Label");
-    nested_elem->Delete();
-    vtkXMLDataElement *nested_elem2 = vtkXMLDataElement::New();
-    nested_elem->AddNestedElement(nested_elem2);
-    nested_elem2->Delete();
     vtkXMLTextPropertyWriter *xmlw = vtkXMLTextPropertyWriter::New();
     xmlw->SetObject(lprop);
-    xmlw->Create(nested_elem2);
+    xmlw->CreateInNestedElement(elem, this->GetLabelTextPropertyElementName());
     xmlw->Delete();
     }
  
