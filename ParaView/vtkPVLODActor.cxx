@@ -111,20 +111,13 @@ vtkMapper *vtkPVLODActor::SelectMapper()
   myTime = this->AllocatedRenderTime;
 
   // Choose the smallest time constant.
-  timePerPoint = this->TimePerPoint;
-  if (this->LODTimePerPoint < timePerPoint)
-    {
-    timePerPoint = this->LODTimePerPoint;
-    }
+  timePerPoint = 0.5 * (this->TimePerPoint + this->LODTimePerPoint);
 
   // Will the high res take too long?
   if ( (timePerPoint * this->Mapper->GetInput()->GetNumberOfPoints()) > myTime)
     {
     return this->LODMapper;
     }
-
-  cerr << "tpp: " << timePerPoint << ", numpts: " 
-       << this->Mapper->GetInput()->GetNumberOfPoints() << ", mytime: " << myTime << endl;
 
   return this->Mapper;
 }

@@ -669,9 +669,6 @@ void vtkPVActorComposite::UpdateProperties()
   this->UpdateTime.Modified();
 
   window = this->GetView()->GetParentWindow();
-  this->Script("update");
-  this->Script("%s configure -cursor watch", window->GetWidgetName());
-  this->Script("update");
 
   vtkDebugMacro( << "Start timer");
   vtkTimerLog *timer = vtkTimerLog::New();
@@ -708,15 +705,8 @@ void vtkPVActorComposite::UpdateProperties()
     pvApp->AddLogEntry("DeciTime", time);
     }
 
-
   timer->Delete(); 
 
-#ifdef _WIN32
-  this->Script("%s configure -cursor arrow", window->GetWidgetName());
-#else
-  this->Script("%s configure -cursor left_ptr", window->GetWidgetName());
-#endif
-  
   sprintf(tmp, "number of cells: %d", 
 	  this->GetPVData()->GetNumberOfCells());
   this->NumCellsLabel->SetLabel(tmp);

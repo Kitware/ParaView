@@ -904,6 +904,10 @@ void vtkPVSource::AcceptCallback()
   
   window = this->GetWindow();
 
+  this->Script("update");
+  this->Script("%s configure -cursor watch", window->GetWidgetName());
+  this->Script("update");  
+
 #ifdef _WIN32
   this->Script("%s configure -background SystemButtonFace",
                this->AcceptButton->GetWidgetName());
@@ -931,6 +935,7 @@ void vtkPVSource::AcceptCallback()
       this->DeleteCallback();    
       return;
       }
+    
     window->GetMainView()->AddComposite(ac);
     ac->CreateProperties();
     ac->Initialize();
@@ -999,6 +1004,12 @@ void vtkPVSource::AcceptCallback()
     this->Script("%s entryconfigure %d -state normal",
                  window->GetMenu()->GetWidgetName(), i);
     }
+
+#ifdef _WIN32
+  this->Script("%s configure -cursor arrow", window->GetWidgetName());
+#else
+  this->Script("%s configure -cursor left_ptr", window->GetWidgetName());
+#endif  
 }
 
 //----------------------------------------------------------------------------
@@ -1034,7 +1045,14 @@ void vtkPVSource::DeleteCallback()
   vtkPVSource *source;
   vtkPVWindow *window = this->GetWindow();
   vtkPVApplication *pvApp = this->GetPVApplication();
-  
+
+  // Just in case cursor was left in a funny state.
+#ifdef _WIN32
+  this->Script("%s configure -cursor arrow", window->GetWidgetName());
+#else
+  this->Script("%s configure -cursor left_ptr", window->GetWidgetName());
+#endif  
+
   if ( ! this->Initialized)
     {
     // Remove the local grab
