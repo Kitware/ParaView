@@ -57,14 +57,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class vtkKWChangeColorButton;
 class vtkKWCheckButton;
+class vtkKWEntry;
 class vtkKWImageLabel;
 class vtkKWLabel;
 class vtkKWLabeledEntry;
 class vtkKWLabeledFrame;
 class vtkKWMenu;
-class vtkKWOptionMenu;
 class vtkKWPushButton;
 class vtkKWScale;
+class vtkKWTextProperty;
 class vtkKWWidget;
 class vtkLookupTable;
 class vtkPVApplication;
@@ -104,6 +105,11 @@ public:
   void SetArrayName(const char* name);
   const char* GetArrayName() { return this->ArrayName;}
   int MatchArrayName(const char* name);
+
+  // Description:
+  // The format of the scalar bar labels.
+  void SetScalarBarLabelFormat(const char* Name);
+  vtkGetStringMacro(ScalarBarLabelFormat);
 
   // Description:
   // Just like in vtk data objects, this method makes a data object
@@ -175,7 +181,12 @@ public:
 
   // Description:
   // This method is called when the user changes the name of the scalar bar.
-  void NameEntryCallback();
+  void ScalarBarTitleEntryCallback();
+
+  // Description:
+  // This method is called when the user changes the format of the scalar bar
+  // labels.
+  void ScalarBarLabelFormatEntryCallback();
 
   // Description:
   // Callbacks to change the color map.
@@ -211,6 +222,8 @@ public:
   // Description:
   // GUI components access
   vtkGetObjectMacro(ScalarBarCheck, vtkKWCheckButton);
+  vtkGetObjectMacro(TitleTextProperty, vtkKWTextProperty);
+  vtkGetObjectMacro(LabelTextProperty, vtkKWTextProperty);
 
 protected:
   vtkPVColorMap();
@@ -218,6 +231,7 @@ protected:
 
   char* ArrayName;
   char* ScalarBarTitle;
+  char* ScalarBarLabelFormat;
     
   // Here to create unique Tcl names.
   int InstanceCount;
@@ -234,6 +248,7 @@ protected:
   vtkScalarBarWidgetObserver* ScalarBarObserver;
 
   void UpdateScalarBarTitle();
+  void UpdateScalarBarLabelFormat();
   void UpdateLookupTable();
   void RGBToHSV(float rgb[3], float hsv[3]);
 
@@ -256,10 +271,16 @@ protected:
   vtkKWChangeColorButton* EndColorButton;
 
   vtkKWLabeledFrame* ScalarBarFrame;
-  vtkKWLabeledEntry* ScalarBarTitleEntry;
-  vtkKWWidget*       ScalarBarCheckFrame;
   vtkKWCheckButton*  ScalarBarCheck;
-
+  vtkKWWidget*       ScalarBarTitleFrame;
+  vtkKWLabel*        ScalarBarTitleLabel;
+  vtkKWEntry*        ScalarBarTitleEntry;
+  vtkKWWidget*       ScalarBarLabelFormatFrame;
+  vtkKWLabel*        ScalarBarLabelFormatLabel;
+  vtkKWEntry*        ScalarBarLabelFormatEntry;
+  
+  vtkKWTextProperty *TitleTextProperty;
+  vtkKWTextProperty *LabelTextProperty;
   
   // For the map image.
   unsigned char *MapData;

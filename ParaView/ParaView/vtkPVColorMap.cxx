@@ -53,6 +53,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWPushButton.h"
 #include "vtkKWScale.h"
 #include "vtkKWWidget.h"
+#include "vtkKWTextProperty.h"
+#include "vtkKWTkUtilities.h"
 #include "vtkLookupTable.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
@@ -68,7 +70,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVColorMap);
-vtkCxxRevisionMacro(vtkPVColorMap, "1.24.2.8");
+vtkCxxRevisionMacro(vtkPVColorMap, "1.24.2.9");
 
 int vtkPVColorMapCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -117,6 +119,7 @@ vtkPVColorMap::vtkPVColorMap()
   static int instanceCount = 0;
 
   this->ScalarBarTitle = NULL;
+  this->ScalarBarLabelFormat = NULL;
   this->ArrayName = NULL;
   this->ScalarBarVisibility = 0;
   this->ScalarRange[0] = 0.0;
@@ -162,9 +165,13 @@ vtkPVColorMap::vtkPVColorMap()
 
   // Stuff for manipulating the scalar bar.
   this->ScalarBarFrame = vtkKWLabeledFrame::New();
-  this->ScalarBarTitleEntry = vtkKWLabeledEntry::New();
-  this->ScalarBarCheckFrame = vtkKWWidget::New();
   this->ScalarBarCheck = vtkKWCheckButton::New();
+  this->ScalarBarTitleFrame = vtkKWWidget::New();
+  this->ScalarBarTitleLabel = vtkKWLabel::New();
+  this->ScalarBarTitleEntry = vtkKWEntry::New();
+  this->ScalarBarLabelFormatFrame = vtkKWWidget::New();
+  this->ScalarBarLabelFormatLabel = vtkKWLabel::New();
+  this->ScalarBarLabelFormatEntry = vtkKWEntry::New();
 
   this->BackButton = vtkKWPushButton::New();
 
@@ -176,6 +183,9 @@ vtkPVColorMap::vtkPVColorMap()
   this->PopupMenu = vtkKWMenu::New();
 
   this->VisitedFlag = 0;
+
+  this->TitleTextProperty = vtkKWTextProperty::New();
+  this->LabelTextProperty = vtkKWTextProperty::New();
 }
 
 //----------------------------------------------------------------------------
@@ -193,6 +203,11 @@ vtkPVColorMap::~vtkPVColorMap()
     {
     delete [] this->ScalarBarTitle;
     this->ScalarBarTitle = NULL;
+    }
+  if (this->ScalarBarLabelFormat)
+    {
+    delete [] this->ScalarBarLabelFormat;
+    this->ScalarBarLabelFormat = NULL;
     }
 
   this->SetPVRenderView(NULL);
@@ -249,13 +264,20 @@ vtkPVColorMap::~vtkPVColorMap()
 
   this->ScalarBarFrame->Delete();
   this->ScalarBarFrame = NULL;
-
-  this->ScalarBarTitleEntry->Delete();
-  this->ScalarBarTitleEntry = NULL;
-  this->ScalarBarCheckFrame->Delete();
-  this->ScalarBarCheckFrame = NULL;
   this->ScalarBarCheck->Delete();
   this->ScalarBarCheck = NULL;
+  this->ScalarBarTitleFrame->Delete();
+  this->ScalarBarTitleFrame = NULL;
+  this->ScalarBarTitleLabel->Delete();
+  this->ScalarBarTitleLabel = NULL;
+  this->ScalarBarTitleEntry->Delete();
+  this->ScalarBarTitleEntry = NULL;
+  this->ScalarBarLabelFormatFrame->Delete();
+  this->ScalarBarLabelFormatFrame = NULL;
+  this->ScalarBarLabelFormatLabel->Delete();
+  this->ScalarBarLabelFormatLabel = NULL;
+  this->ScalarBarLabelFormatEntry->Delete();
+  this->ScalarBarLabelFormatEntry = NULL;
 
   this->BackButton->Delete();
   this->BackButton = NULL;
@@ -272,6 +294,12 @@ vtkPVColorMap::~vtkPVColorMap()
     {
     this->PopupMenu->Delete();
     }
+
+  this->TitleTextProperty->Delete();
+  this->TitleTextProperty = NULL;
+
+  this->LabelTextProperty->Delete();
+  this->LabelTextProperty = NULL;
 }
 
 
@@ -391,13 +419,13 @@ void vtkPVColorMap::Create(vtkKWApplication *app)
   this->PopupMenu->AddCommand("Grayscale", this, "SetColorSchemeToGrayscale",
                               0, "Set Color Scheme to Grayscale");
 
-  this->Script("pack %s -side left -expand f -fill none",
+  this->Script("pack %s -side left -expand f -fill both -pady 2",
                this->StartColorButton->GetWidgetName());
 
   this->Script("pack %s -side left -expand t -fill both",
                this->Map->GetWidgetName());
 
-  this->Script("pack %s -side right -expand f -fill none",
+  this->Script("pack %s -side right -expand f -fill both -pady 2",
                this->EndColorButton->GetWidgetName());
 
   // Color map: resolution
@@ -431,32 +459,145 @@ void vtkPVColorMap::Create(vtkKWApplication *app)
   this->ScalarBarFrame->Create(this->Application);
   this->ScalarBarFrame->SetLabel("Scalar Bar");
 
-  this->ScalarBarTitleEntry->SetParent(this->ScalarBarFrame->GetFrame());
-  this->ScalarBarTitleEntry->Create(this->Application);
-  this->ScalarBarTitleEntry->SetLabel("Title:");
-  this->Script("bind %s <KeyPress-Return> {%s NameEntryCallback}",
-               this->ScalarBarTitleEntry->GetEntry()->GetWidgetName(),
-               this->GetTclName());
-  this->Script("bind %s <FocusOut> {%s NameEntryCallback}",
-               this->ScalarBarTitleEntry->GetEntry()->GetWidgetName(),
-               this->GetTclName()); 
+  ostrstream onchangecommand;
+  onchangecommand << "[" << this->GetTclName() 
+                  << " GetPVRenderView] EventuallyRender" << ends;
 
-  this->ScalarBarCheckFrame->SetParent(this->ScalarBarFrame->GetFrame());
-  this->ScalarBarCheckFrame->Create(this->Application, "frame", "");
-  
-  this->ScalarBarCheck->SetParent(this->ScalarBarCheckFrame);
+  const char *grid_settings = "-padx 1 -pady 2";
+  const char *label_settings = "-anchor w";
+
+  // Scalar bar : Visibility
+
+  this->ScalarBarCheck->SetParent(this->ScalarBarFrame->GetFrame());
   this->ScalarBarCheck->Create(this->Application, "-text Visibility");
   this->Application->Script(
     "%s configure -command {%s ScalarBarCheckCallback}",
     this->ScalarBarCheck->GetWidgetName(),
     this->GetTclName());
 
-  this->Script("pack %s -side left",
-               this->ScalarBarCheck->GetWidgetName());
+  // Scalar bar : Title control
 
-  this->Script("pack %s %s -side top -expand t -fill x",
+  this->ScalarBarTitleFrame->SetParent(this->ScalarBarFrame->GetFrame());
+  this->ScalarBarTitleFrame->Create(this->Application, "frame", "-bd 0");
+
+  this->ScalarBarTitleLabel->SetParent(this->ScalarBarTitleFrame);
+  this->ScalarBarTitleLabel->SetLabel("Title:");
+  this->ScalarBarTitleLabel->Create(this->Application, label_settings);
+  
+  this->ScalarBarTitleEntry->SetParent(this->ScalarBarTitleFrame);
+  this->ScalarBarTitleEntry->Create(this->Application, "");
+  this->Script("bind %s <KeyPress-Return> {%s ScalarBarTitleEntryCallback}",
                this->ScalarBarTitleEntry->GetWidgetName(),
-               this->ScalarBarCheckFrame->GetWidgetName());
+               this->GetTclName());
+  this->Script("bind %s <FocusOut> {%s ScalarBarTitleEntryCallback}",
+               this->ScalarBarTitleEntry->GetWidgetName(),
+               this->GetTclName()); 
+
+  this->TitleTextProperty->SetParent(this->ScalarBarTitleFrame);
+  this->TitleTextProperty->SetTextProperty(
+    this->ScalarBar->GetScalarBarActor()->GetTitleTextProperty());
+  this->TitleTextProperty->Create(this->Application);
+  this->TitleTextProperty->SetOnChangeCommand(onchangecommand.str());
+  this->TitleTextProperty->SetTraceReferenceObject(this);
+  this->TitleTextProperty->SetTraceReferenceCommand("GetTitleTextProperty");
+
+  this->Script("grid %s -row 0 -column 0 -sticky nws %s",
+               this->ScalarBarTitleLabel->GetWidgetName(),
+               grid_settings);
+
+  this->Script("grid %s -row 0 -column 1 -sticky news %s",
+               this->ScalarBarTitleEntry->GetWidgetName(),
+               grid_settings);
+
+  this->Script("grid %s -row 1 -column 1 -sticky nws %s",
+               this->TitleTextProperty->GetWidgetName(),
+               grid_settings);
+
+  // Scalar bar : Label control
+
+  this->ScalarBarLabelFormatFrame->SetParent(this->ScalarBarFrame->GetFrame());
+  this->ScalarBarLabelFormatFrame->Create(this->Application, "frame", "-bd 0");
+
+  this->ScalarBarLabelFormatLabel->SetParent(this->ScalarBarLabelFormatFrame);
+  this->ScalarBarLabelFormatLabel->SetLabel("Labels:");
+  this->ScalarBarLabelFormatLabel->Create(this->Application, label_settings);
+  
+  this->ScalarBarLabelFormatEntry->SetParent(this->ScalarBarLabelFormatFrame);
+  this->ScalarBarLabelFormatEntry->Create(this->Application, "");
+  this->Script("bind %s <KeyPress-Return> {%s ScalarBarLabelFormatEntryCallback}",
+               this->ScalarBarLabelFormatEntry->GetWidgetName(),
+               this->GetTclName());
+  this->Script("bind %s <FocusOut> {%s ScalarBarLabelFormatEntryCallback}",
+               this->ScalarBarLabelFormatEntry->GetWidgetName(),
+               this->GetTclName()); 
+  this->ScalarBarLabelFormatEntry->SetBalloonHelpString(
+    "Set the labels format (printf() style).");
+
+  this->LabelTextProperty->SetParent(this->ScalarBarLabelFormatFrame);
+  this->LabelTextProperty->SetTextProperty(
+    this->ScalarBar->GetScalarBarActor()->GetLabelTextProperty());
+  this->LabelTextProperty->Create(this->Application);
+  this->LabelTextProperty->SetOnChangeCommand(onchangecommand.str());
+  this->LabelTextProperty->SetTraceReferenceObject(this);
+  this->LabelTextProperty->SetTraceReferenceCommand("GetLabelTextProperty");
+
+  this->Script("grid %s -row 0 -column 0 -sticky nws %s",
+               this->ScalarBarLabelFormatLabel->GetWidgetName(),
+               grid_settings);
+
+  this->Script("grid %s -row 0 -column 1 -sticky news %s",
+               this->ScalarBarLabelFormatEntry->GetWidgetName(),
+               grid_settings);
+
+  this->Script("grid %s -row 1 -column 1 -sticky nws %s",
+               this->LabelTextProperty->GetWidgetName(),
+               grid_settings);
+
+  // Scalar bar : enable copy between text property widgets
+
+  this->TitleTextProperty->ShowCopyOn();
+  this->TitleTextProperty->GetCopyButton()->SetBalloonHelpString(
+    "Copy the labels text properties to the title text properties.");
+  ostrstream copy1;
+  copy1 << "CopyValuesFrom " << this->LabelTextProperty->GetTclName() << ends;
+  this->TitleTextProperty->GetCopyButton()->SetCommand(
+    this->TitleTextProperty, copy1.str());
+
+  this->LabelTextProperty->ShowCopyOn();
+  this->LabelTextProperty->GetCopyButton()->SetBalloonHelpString(
+    "Copy the title text properties to the labels text properties.");
+  ostrstream copy2;
+  copy2 << "CopyValuesFrom " << this->TitleTextProperty->GetTclName() << ends;
+  this->LabelTextProperty->GetCopyButton()->SetCommand(
+    this->LabelTextProperty, copy2.str());
+
+  // Scalar bar: synchronize all those grids to have them aligned
+
+  const char *widgets[2];
+  widgets[0] = this->ScalarBarTitleFrame->GetWidgetName();
+  widgets[1] = this->ScalarBarLabelFormatFrame->GetWidgetName();
+
+  int weights[2];
+  weights[0] = 0;
+  weights[1] = 1;
+
+  float factors[2];
+  factors[0] = 1.3;
+  factors[1] = 1.0;
+
+  vtkKWTkUtilities::SynchroniseGridsColumnMinimumSize(
+    this->Application->GetMainInterp(), 2, widgets, factors, weights);
+
+  // Scalar bar : pack/grid
+
+  this->Script("pack %s -side top -fill y -anchor w",
+               this->ScalarBarCheck->GetWidgetName());
+  
+  this->Script("pack %s %s -side top -expand t -fill both -anchor w",
+               this->ScalarBarTitleFrame->GetWidgetName(),
+               this->ScalarBarLabelFormatFrame->GetWidgetName());
+
+  onchangecommand.rdbuf()->freeze(0);
 
   // Back button
 
@@ -474,6 +615,11 @@ void vtkPVColorMap::Create(vtkKWApplication *app)
   //  this->Script("pack %s -padx 4", this->BackButton->GetWidgetName());
 
   this->SetColorSchemeToRedBlue();
+
+  if (this->ScalarBar && this->ScalarBar->GetScalarBarActor())
+    {
+    this->SetScalarBarLabelFormat(this->ScalarBar->GetScalarBarActor()->GetLabelFormat());
+    }
 }
 
 
@@ -581,7 +727,7 @@ int vtkPVColorMap::MatchArrayName(const char* str)
 
 
 //----------------------------------------------------------------------------
-void vtkPVColorMap::NameEntryCallback()
+void vtkPVColorMap::ScalarBarTitleEntryCallback()
 {
   this->SetScalarBarTitle(this->ScalarBarTitleEntry->GetValue());
 }
@@ -617,7 +763,6 @@ void vtkPVColorMap::SetScalarBarTitleNoTrace(const char* name)
     strcpy(this->ScalarBarTitle,name);
     } 
 
-
   this->ScalarBarTitleEntry->SetValue(name);
   if (name != NULL)
     {
@@ -631,6 +776,53 @@ void vtkPVColorMap::SetScalarBarTitleNoTrace(const char* name)
   this->UpdateScalarBarTitle();
 }
 
+//----------------------------------------------------------------------------
+void vtkPVColorMap::ScalarBarLabelFormatEntryCallback()
+{
+  this->SetScalarBarLabelFormat(this->ScalarBarLabelFormatEntry->GetValue());
+}
+
+//----------------------------------------------------------------------------
+void vtkPVColorMap::SetScalarBarLabelFormat(const char* name)
+{
+  if (this->ScalarBarLabelFormat == NULL && name == NULL) 
+    { 
+    return;
+    }
+
+  if (this->ScalarBarLabelFormat && 
+      name && 
+      (!strcmp(this->ScalarBarLabelFormat,name))) 
+    { 
+    return;
+    }
+
+  if (this->ScalarBarLabelFormat) 
+    { 
+    delete [] this->ScalarBarLabelFormat; 
+    this->ScalarBarLabelFormat = NULL;
+    }
+
+  if (name)
+    {
+    this->ScalarBarLabelFormat = new char[strlen(name) + 1];
+    strcpy(this->ScalarBarLabelFormat,name);
+    } 
+
+  this->ScalarBarLabelFormatEntry->SetValue(name);
+
+  this->AddTraceEntry("$kw(%s) SetScalarBarLabelFormat {%s}", 
+                      this->GetTclName(), name);
+
+  if (this->ScalarBar != NULL && this->ScalarBarLabelFormat != NULL)
+    {
+    this->ScalarBar->GetScalarBarActor()->SetLabelFormat(this->ScalarBarLabelFormat);
+    if (this->PVRenderView)
+      {
+      this->PVRenderView->EventuallyRender();
+      }
+    }
+}
 
 //----------------------------------------------------------------------------
 void vtkPVColorMap::UpdateLookupTable()
@@ -1034,7 +1226,6 @@ void vtkPVColorMap::SaveInTclScript(ofstream *file, int interactiveFlag,
     }
 }
 
-
 //----------------------------------------------------------------------------
 void vtkPVColorMap::UpdateScalarBarTitle()
 {
@@ -1301,6 +1492,9 @@ void vtkPVColorMap::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "ScalarBarTitle: " 
      << (this->ScalarBarTitle ? this->ScalarBarTitle : "none" )
      << endl;
+  os << indent << "ScalarBarLabelFormat: " 
+     << (this->ScalarBarLabelFormat ? this->ScalarBarLabelFormat : "none" )
+     << endl;
   os << indent << "ArrayName: " 
      << (this->ArrayName ? this->ArrayName : "none" )
      << endl;
@@ -1309,6 +1503,9 @@ void vtkPVColorMap::PrintSelf(ostream& os, vtkIndent indent)
      << (this->LookupTableTclName ? this->LookupTableTclName : "none" )
      << endl;
   os << indent << "ScalarBar: " << this->ScalarBar << endl;
+  os << indent << "ScalarBarCheck: " << this->ScalarBarCheck << endl;
+  os << indent << "TitleTextProperty: " << this->TitleTextProperty << endl;
+  os << indent << "LabelTextProperty: " << this->LabelTextProperty << endl;
   
   os << indent << "ScalarBarVisibility: " << this->ScalarBarVisibility << endl;
 
