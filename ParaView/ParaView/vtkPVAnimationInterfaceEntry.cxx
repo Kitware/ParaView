@@ -93,7 +93,7 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterfaceEntry);
-vtkCxxRevisionMacro(vtkPVAnimationInterfaceEntry, "1.3");
+vtkCxxRevisionMacro(vtkPVAnimationInterfaceEntry, "1.4");
 
 //-----------------------------------------------------------------------------
 vtkPVAnimationInterfaceEntry::vtkPVAnimationInterfaceEntry()
@@ -224,17 +224,17 @@ void vtkPVAnimationInterfaceEntry::Create(vtkPVApplication* pvApp, const char*)
   this->EndTimeEntry->SetLabel("End value");
 
   this->SourceMenuButton->SetBalloonHelpString(
-    "Select the filter/source whose instance varible will change with time.");
+    "Select the filter/source which will be modified by the current action.");
   this->MethodMenuButton->SetBalloonHelpString(
-    "Select the method that will be called.");
+    "Select the property of the selected filter/source to be modified.");
   this->StartTimeEntry->SetBalloonHelpString(
-    "This is the value of the source at the time frame 0."
-    " When time frame is between 0 and maximum, the value "
-    "will be interpolated between Start Value and End Value.");
+    "This is the value of the property for frame 0. "
+    "The value of the selected property is linearly interpolated "
+    "between the first and the last frame.");
   this->EndTimeEntry->SetBalloonHelpString(
-    "This is the value of the source at the minimum time frame."
-    " When time frame is between 0 and maximum, the value "
-    "will be interpolated between Start Value and End Value.");
+    "This is the value of the property for the last frame."
+    "The value of the selected property is linearly interpolated "
+    "between the first and the last frame.");
 
   if (this->PVSource)
     {

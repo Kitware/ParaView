@@ -143,7 +143,7 @@ static unsigned char image_goto_end[] =
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterface);
-vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.71");
+vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.72");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterface,ControlledWidget, vtkPVWidget);
 
@@ -622,33 +622,34 @@ void vtkPVAnimationInterface::Create(vtkKWApplication *app, char *frameArgs)
 
   this->AddEmptySourceItem();
 
-  this->PlayButton->SetBalloonHelpString("Play animation");
-  this->StopButton->SetBalloonHelpString("Stop animation");
+  this->PlayButton->SetBalloonHelpString("Play animation.");
+  this->StopButton->SetBalloonHelpString("Stop animation.");
   this->GoToBeginningButton->SetBalloonHelpString(
-    "Go to the beginning of the animation");
+    "Go to the beginning of the animation.");
   this->GoToEndButton->SetBalloonHelpString(
-    "Go to the end of the animation");
+    "Go to the end of the animation.");
   this->LoopCheckButton->SetBalloonHelpString(
     "Enable/Disable animation loop.");
   this->TimeScale->SetBalloonHelpString(
-    "Current frame of the animation");
+    "Current frame of the animation.");
   this->NumberOfFramesEntry->SetBalloonHelpString(
     "Total number of frames for the animation.");
   this->AnimationEntriesMenu->SetBalloonHelpString(
-    "Switch between animation actions");
+    "Select an animation action to edit.");
   this->AddItemButton->SetBalloonHelpString(
-    "Add additional action to the animation");
+    "Add new action to the animation.");
   this->DeleteItemButton->SetBalloonHelpString(
-    "Delete current action from the animation");
+    "Delete current action from the animation.");
   this->ScriptCheckButtonFrame->SetBalloonHelpString(
-    "Open/Close the Tcl script editor for manually editing animation");
+    "Open/Close the editor for manually editing the action Tcl script.");
   this->SaveImagesButton->SetBalloonHelpString(
-    "Save images resulting from the animation");
+    "Save each animation frame as an image.");
   this->SaveGeometryButton->SetBalloonHelpString(
-    "Save geometry resulting from the animation");
+    "Save geometry from each frame. This will create a series of .vtp files.");
   this->CacheGeometryCheck->SetBalloonHelpString(
     "Cache geometry when doing animation. This will "
-    "speedup animation when generating geometry is a slow operation.");
+    "speedup animation after the initial run at the cost "
+    "of memory.");
 
 }
 
@@ -1627,8 +1628,10 @@ void vtkPVAnimationInterface::UpdateNewScript()
     }
   ostrstream str;
   //str << "puts \"------------- start --------------\"" << endl;
-  str << "# There is a Tcl variable called " << endl;
-  str << "# globalPVTime which goes from 0 to 1" << endl;
+  str << "# globalPVTime is provided by the animation " << endl;
+  str << "# interface for convenience. " << endl;
+  str << "# It varies linearly between 0 and 1 (0 at the " << endl;
+  str << "# first frame, 1 at the last frame).\n" << endl;
   vtkCollectionIterator* it = this->AnimationEntriesIterator;
   int cnt = 0;
   if ( this->AnimationEntries->GetNumberOfItems() > 0 )
@@ -1663,13 +1666,15 @@ void vtkPVAnimationInterface::UpdateNewScript()
         {
         str << sit->first.c_str() << " ";
         }
+      str << endl;
       }
     }
   if ( !cnt )
     {
-    str << "# There are no source specified." << endl
-        << "# Only specified sources can be refered in the script." << endl;
+    str << "# The available sources are: none." << endl;
     }
+  str << "# Note: Only sources listed above can be used in the script." << endl
+      << "# Other sources will not be updated during the animation. " << endl;
   if ( !this->Dirty)
     {
     //cout << " \\- No change" << endl;
