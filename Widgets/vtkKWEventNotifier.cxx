@@ -118,7 +118,7 @@ void vtkKWEventNotifier::RemoveCallback( const char *event,
 					 const char *command )
 {
   int                         index;
-  vtkKWCallbackSpecification  *tmp1, *tmp2;
+  vtkKWCallbackSpecification  *tmp1, *tmp2, *tmp3;
 
   index  = this->ComputeIndex(event);
 
@@ -180,10 +180,12 @@ void vtkKWEventNotifier::RemoveCallback( const char *event,
 	  if ( tmp2->GetNextCallback() )
 	    {
 	    // Hang on to it so it isn't deleted when the event before it
-	    // is unregistered.
-	    tmp2->GetNextCallback()->Register(this);
+	    // is unregistered. Then when we set it as the next event it
+	    // is registered so we can unregister it again.
+	    tmp3 = tmp2->GetNextCallback();
+	    tmp3->Register(this);
 	    tmp1->SetNextCallback( tmp2->GetNextCallback() );
-	    tmp2->GetNextCallback()->UnRegister(this);
+	    tmp3->UnRegister(this);
 	    }
 	  // Otherwise we are removing the last callback in the list.
 	  else

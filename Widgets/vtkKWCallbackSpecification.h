@@ -46,12 +46,15 @@ class VTK_EXPORT vtkKWCallbackSpecification : public vtkKWObject
   vtkSetStringMacro( CommandString );
   vtkGetStringMacro( CommandString );
 
+  // Don't use a set macro since we don't want to reference count this
   void SetCalledObject( vtkKWObject *object ) {this->CalledObject = object;};
   vtkGetObjectMacro( CalledObject, vtkKWObject );
 
+  // Don't use a set macro since we don't want to reference count this
   void SetWindow( vtkKWWindow *window ) {this->Window = window;};
   vtkGetObjectMacro( Window, vtkKWWindow );
 
+  // We do want to reference count this one
   vtkSetObjectMacro( NextCallback, vtkKWCallbackSpecification );
   vtkGetObjectMacro( NextCallback, vtkKWCallbackSpecification );
   
