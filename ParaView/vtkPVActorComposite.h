@@ -136,13 +136,19 @@ public:
   vtkGetStringMacro(ActorTclName);
   
   // Description:
-  // This method is called when the ColorByCellCheck is pressed.
+  // Methods called when item chosen from ColorMenu
   void ColorByProperty();
   void ColorByPointScalars();
   void ColorByCellScalars();
   void ColorByPointFieldComponent(char *name, int comp);
   void ColorByCellFieldComponent(char *name, int comp);
 
+  // Description:
+  // Methods called when item chosen from RepresentationMenu
+  void DrawWireframe();
+  void DrawSurface();
+  void DrawPoints();
+  
   // Description:
   // Get the color range from the mappers on all the processes.
   void GetColorRange(float range[2]);
@@ -170,6 +176,9 @@ protected:
   
   vtkKWLabel *ColorMenuLabel;
   vtkKWOptionMenu *ColorMenu;
+
+  vtkKWLabel *RepresentationMenuLabel;
+  vtkKWOptionMenu *RepresentationMenu;
 
   // the data object that owns this composite
   vtkPVData *PVData;

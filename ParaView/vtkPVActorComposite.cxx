@@ -81,6 +81,9 @@ vtkPVActorComposite::vtkPVActorComposite()
   this->ColorMenuLabel = vtkKWLabel::New();
   this->ColorMenu = vtkKWOptionMenu::New();
 
+  this->RepresentationMenuLabel = vtkKWLabel::New();
+  this->RepresentationMenu = vtkKWOptionMenu::New();
+  
   this->PVData = NULL;
   this->DataSetInput = NULL;
   this->Mode = VTK_PV_ACTOR_COMPOSITE_POLY_DATA_MODE;
@@ -166,10 +169,16 @@ vtkPVActorComposite::~vtkPVActorComposite()
   this->AmbientScale = NULL;
   
   this->ColorMenuLabel->Delete();
-  this->ColorMenu = NULL;
+  this->ColorMenuLabel = NULL;
   
   this->ColorMenu->Delete();
   this->ColorMenu = NULL;
+  
+  this->RepresentationMenuLabel->Delete();
+  this->RepresentationMenuLabel = NULL;
+  
+  this->RepresentationMenu->Delete();
+  this->RepresentationMenu = NULL;
   
   this->SetInput(NULL);
   
@@ -248,6 +257,20 @@ void vtkPVActorComposite::CreateProperties()
   this->ColorMenu->SetParent(this->Properties);
   this->ColorMenu->Create(this->Application, "");    
 
+  this->RepresentationMenuLabel->SetParent(this->Properties);
+  this->RepresentationMenuLabel->Create(this->Application, "");
+  this->RepresentationMenuLabel->SetLabel("Data set representation:");
+  
+  this->RepresentationMenu->SetParent(this->Properties);
+  this->RepresentationMenu->Create(this->Application, "");
+  this->RepresentationMenu->AddEntryWithCommand("Wireframe", this,
+                                                "DrawWireframe");
+  this->RepresentationMenu->AddEntryWithCommand("Surface", this,
+                                                "DrawSurface");
+  this->RepresentationMenu->AddEntryWithCommand("Points", this,
+                                                "DrawPoints");
+  this->RepresentationMenu->SetValue("Surface");
+  
   this->Script("pack %s",
 	       this->NumCellsLabel->GetWidgetName());
   this->Script("pack %s",
@@ -262,6 +285,10 @@ void vtkPVActorComposite::CreateProperties()
 	       this->ColorMenuLabel->GetWidgetName());
   this->Script("pack %s",
                this->ColorMenu->GetWidgetName());
+  this->Script("pack %s",
+               this->RepresentationMenuLabel->GetWidgetName());
+  this->Script("pack %s",
+               this->RepresentationMenu->GetWidgetName());
 }
 
 
@@ -419,6 +446,7 @@ void vtkPVActorComposite::ColorByProperty()
   pvApp->BroadcastScript("%s ScalarVisibilityOff", this->MapperTclName);
   this->GetView()->Render();
 }
+
 //----------------------------------------------------------------------------
 void vtkPVActorComposite::ColorByPointScalars()
 {
@@ -430,6 +458,7 @@ void vtkPVActorComposite::ColorByPointScalars()
   this->ResetColorRange();
   this->GetView()->Render();
 }
+
 //----------------------------------------------------------------------------
 void vtkPVActorComposite::ColorByCellScalars()
 {
@@ -441,6 +470,7 @@ void vtkPVActorComposite::ColorByCellScalars()
   this->ResetColorRange();
   this->GetView()->Render();
 }
+
 //----------------------------------------------------------------------------
 void vtkPVActorComposite::ColorByPointFieldComponent(char *name, int comp)
 {
@@ -454,6 +484,7 @@ void vtkPVActorComposite::ColorByPointFieldComponent(char *name, int comp)
   this->ResetColorRange();
   this->GetView()->Render();
 }
+
 //----------------------------------------------------------------------------
 void vtkPVActorComposite::ColorByCellFieldComponent(char *name, int comp)
 {
@@ -468,6 +499,35 @@ void vtkPVActorComposite::ColorByCellFieldComponent(char *name, int comp)
   this->GetView()->Render();
 }
 
+//----------------------------------------------------------------------------
+void vtkPVActorComposite::DrawWireframe()
+{
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  
+  pvApp->BroadcastScript("[[%s GetActor] GetProperty] SetRepresentationToWireframe",
+                         this->GetTclName());
+  this->GetView()->Render();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVActorComposite::DrawSurface()
+{
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  
+  pvApp->BroadcastScript("[[%s GetActor] GetProperty] SetRepresentationToSurface",
+                         this->GetTclName());
+  this->GetView()->Render();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVActorComposite::DrawPoints()
+{
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  
+  pvApp->BroadcastScript("[[%s GetActor] GetProperty] SetRepresentationToPoints",
+                         this->GetTclName());
+  this->GetView()->Render();
+}
 
 //----------------------------------------------------------------------------
 void vtkPVActorComposite::AmbientChanged()
