@@ -76,7 +76,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.153");
+vtkCxxRevisionMacro(vtkPVData, "1.154");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -1651,7 +1651,7 @@ void vtkPVData::ColorRangeEntryCallback()
     max = min + 0.00001;
     }
 
-  this->SetColorRange(min, max);
+  this->PVColorMap->SetScalarRange(min, max);
   if ( this->GetPVRenderView() )
     {
     this->GetPVRenderView()->EventuallyRender();
@@ -2769,7 +2769,7 @@ void vtkPVData::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVData ";
-  this->ExtractRevision(os,"$Revision: 1.153 $");
+  this->ExtractRevision(os,"$Revision: 1.154 $");
 }
 
 //----------------------------------------------------------------------------
