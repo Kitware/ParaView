@@ -57,7 +57,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <ctype.h>
 
-vtkCxxRevisionMacro(vtkPVXMLPackageParser, "1.14");
+vtkCxxRevisionMacro(vtkPVXMLPackageParser, "1.15");
 vtkStandardNewMacro(vtkPVXMLPackageParser);
 
 #ifndef VTK_NO_EXPLICIT_TEMPLATE_INSTANTIATION
@@ -318,7 +318,7 @@ void vtkPVXMLPackageParser::CreateReaderModule(vtkPVXMLElement* me)
   
   // Add this reader for its extensions instead of as a prototype.
   int i;
-  pvm->SetDescription(file_description);
+  pvm->SetDescriptionNoTrace(file_description);
   for(i=0;i < pvm->GetNumberOfExtensions(); ++i)
     {
     this->Window->AddFileType(file_description, pvm->GetExtension(i), pvm);

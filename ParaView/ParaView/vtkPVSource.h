@@ -144,6 +144,7 @@ public:
   // Description:
   // The (short) description that can be used to give a more descriptive
   // name to the object.
+  virtual void SetDescriptionNoTrace(const char *description);
   virtual void SetDescription(const char *description);
   vtkGetStringMacro(Description);
   vtkGetObjectMacro(DescriptionFrame, vtkKWWidget);

@@ -70,7 +70,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.241");
+vtkCxxRevisionMacro(vtkPVSource, "1.242");
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -726,7 +726,19 @@ void vtkPVSource::SetName (const char* arg)
 } 
 
 //----------------------------------------------------------------------------
-void vtkPVSource::SetDescription (const char* arg) 
+void vtkPVSource::SetDescription(const char* arg) 
+{ 
+  this->SetDescriptionNoTrace(arg);
+  // Trace here, not in SetDescription (design choice)
+  this->GetPVApplication()->AddTraceEntry("$kw(%s) SetDescription {%s}",
+                                          this->GetTclName(),
+                                          this->Description);
+  this->GetPVApplication()->AddTraceEntry("$kw(%s) DescriptionEntryCallback",
+                                          this->GetTclName());
+}
+
+//----------------------------------------------------------------------------
+void vtkPVSource::SetDescriptionNoTrace(const char* arg) 
 { 
   vtkDebugMacro(<< this->GetClassName() << " (" << this << "): setting " 
                 << this->Description << " to " << arg ); 
@@ -757,12 +769,6 @@ void vtkPVSource::SetDescription (const char* arg)
     {
     this->GetPVRenderView()->UpdateNavigationWindow(this, this->SourceGrabbed);
     }
-  // Trace here, not in SetDescription (design choice)
-  this->GetPVApplication()->AddTraceEntry("$kw(%s) SetDescription {%s}",
-                                          this->GetTclName(),
-                                          this->Description);
-  this->GetPVApplication()->AddTraceEntry("$kw(%s) DescriptionEntryCallback",
-                                          this->GetTclName());
 } 
 
 //----------------------------------------------------------------------------
@@ -2039,7 +2045,7 @@ void vtkPVSource::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVSource ";
-  this->ExtractRevision(os,"$Revision: 1.241 $");
+  this->ExtractRevision(os,"$Revision: 1.242 $");
 }
 
 //----------------------------------------------------------------------------
