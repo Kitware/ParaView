@@ -77,7 +77,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderModule);
-vtkCxxRevisionMacro(vtkPVRenderModule, "1.1");
+vtkCxxRevisionMacro(vtkPVRenderModule, "1.2");
 
 //int vtkPVRenderModuleCommand(ClientData cd, Tcl_Interp *interp,
 //                             int argc, char *argv[]);
@@ -104,6 +104,8 @@ vtkPVRenderModule::vtkPVRenderModule()
   this->StillCompositeTime       = 0;
   this->Composite                = 0;
 
+  this->ResetCameraClippingRangeTag = -1;
+
   this->DisableRenderingFlag = 0;
 
   this->LODThreshold = 2.0;
@@ -117,6 +119,11 @@ vtkPVRenderModule::vtkPVRenderModule()
 vtkPVRenderModule::~vtkPVRenderModule()
 {
   vtkPVApplication *pvApp = this->PVApplication;
+
+  if (this->Renderer && this->ResetCameraClippingRangeTag > 0)
+    {
+    this->Renderer->RemoveObserver(this->ResetCameraClippingRangeTag);
+    }
 
   // Tree Composite
   if (this->CompositeTclName && pvApp)
@@ -133,6 +140,11 @@ vtkPVRenderModule::~vtkPVRenderModule()
   
   if (this->Renderer)
     {
+    if (this->ResetCameraClippingRangeTag > 0)
+      {
+      this->Renderer->RemoveObserver(this->ResetCameraClippingRangeTag);
+      }
+
     if ( pvApp )
       {
       pvApp->BroadcastScript("%s Delete", this->RendererTclName);
@@ -161,6 +173,20 @@ vtkPVRenderModule::~vtkPVRenderModule()
 
   this->SetPVApplication(NULL);
 }
+
+//----------------------------------------------------------------------------
+void vtkPVRenderModuleResetCameraClippingRange(
+  vtkObject *caller, unsigned long vtkNotUsed(event),void *clientData, void *)
+{
+  float bds[6];
+
+  vtkPVRenderModule *self = (vtkPVRenderModule *)clientData;
+  vtkRenderer *ren = (vtkRenderer*)caller;
+
+  self->ComputeVisiblePropBounds(bds);
+  ren->ResetCameraClippingRange(bds);
+}
+
 
 //----------------------------------------------------------------------------
 void vtkPVRenderModule::SetPVApplication(vtkPVApplication *pvApp)
@@ -278,6 +304,16 @@ void vtkPVRenderModule::SetPVApplication(vtkPVApplication *pvApp)
     pvApp->BroadcastScript("%s InitializeOffScreen", this->CompositeTclName);
     }
 
+
+  // Make sure we have a chance to set the clipping range properly.
+  vtkCallbackCommand* cbc;
+  cbc = vtkCallbackCommand::New();
+  cbc->SetCallback(vtkPVRenderModuleResetCameraClippingRange);
+  cbc->SetClientData((void*)this);
+  // ren will delete the cbc when the observer is removed.
+  this->ResetCameraClippingRangeTag = 
+    this->Renderer->AddObserver(vtkCommand::ResetCameraClippingRangeEvent,cbc);
+  cbc->Delete();
 }
 
 
@@ -327,6 +363,7 @@ void vtkPVRenderModule::SetBackgroundColor(float r, float g, float b)
   pvApp->BroadcastScript("%s SetBackground %f %f %f",
                          this->RendererTclName, r, g, b);
 }
+
 
 //----------------------------------------------------------------------------
 void vtkPVRenderModule::ComputeVisiblePropBounds(float bds[6])

@@ -111,7 +111,7 @@ static unsigned char image_properties[] =
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.247");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.248");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -239,7 +239,7 @@ vtkPVRenderView::vtkPVRenderView()
 
   this->LODThreshold = 2.0;
   this->LODResolution = 50;
-  this->CollectThreshold = 2.0;
+  this->CollectThreshold = 20.0;
 
   int cc;
   for ( cc = 0; cc < 6; cc ++ )
@@ -1277,21 +1277,21 @@ void vtkPVRenderView::CreateViewProperties()
     this->CollectThresholdScale->SetParent(this->LODScalesFrame);
     this->CollectThresholdScale->Create(this->Application,
                                         "-orient horizontal");
-    this->CollectThresholdScale->SetRange(0.0, 6.0);
+    this->CollectThresholdScale->SetRange(0.0, 100.0);
     this->CollectThresholdScale->SetResolution(0.1);
 
     this->CollectThresholdValue->SetParent(this->LODScalesFrame);
     this->CollectThresholdValue->Create(this->Application, "-anchor w");
-    if (pvapp && pvwindow &&
-        pvapp->GetRegisteryValue(2, "RunTime", "CollectThreshold", 0))
-      {
-      this->SetCollectThreshold(
-        pvwindow->GetFloatRegisteryValue(2, "RunTime", "CollectThreshold"));
-      }
-    else
-      {
-      this->SetCollectThreshold(this->CollectThreshold);
-      }
+    //if (pvapp && pvwindow &&
+    //    pvapp->GetRegisteryValue(2, "RunTime", "CollectThreshold", 0))
+    //  {
+    //  this->SetCollectThreshold(
+    //    pvwindow->GetFloatRegisteryValue(2, "RunTime", "CollectThreshold"));
+    //  }
+    //else
+    //  {
+    this->SetCollectThreshold(this->CollectThreshold);
+    //  }
 
     this->CollectThresholdScale->SetValue(this->CollectThreshold);
     this->CollectThresholdScale->SetCommand(this, 
@@ -1707,16 +1707,6 @@ void vtkPVRenderView::SetCameraState(float p0, float p1, float p2,
 }
 
 //----------------------------------------------------------------------------
-void vtkPVRenderView::ResetCameraClippingRange()
-{
-  float bds[6];
-
-  this->GetPVApplication()->GetRenderModule()->ComputeVisiblePropBounds(bds);
-
-  this->GetRenderer()->ResetCameraClippingRange(bds);
-}
-
-//----------------------------------------------------------------------------
 void vtkPVRenderView::AddBindings()
 {
   this->Script("bind %s <Motion> {%s MotionCallback %%x %%y}",
@@ -2057,9 +2047,6 @@ void vtkPVRenderView::EventuallyRenderCallBack()
       }
     return;
     }
-
-  // This is questionable whether it should be deleted !!!!!.
-  this->ResetCameraClippingRange();
 
   //if (this->Composite)
   //  {
@@ -2679,7 +2666,7 @@ void vtkPVRenderView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVRenderView ";
-  this->ExtractRevision(os,"$Revision: 1.247 $");
+  this->ExtractRevision(os,"$Revision: 1.248 $");
 }
 
 //------------------------------------------------------------------------------

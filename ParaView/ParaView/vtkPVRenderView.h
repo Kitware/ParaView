@@ -112,11 +112,6 @@ public:
                       float up0, float up1, float up2);
 
   // Description:
-  // Reset the camera clipping range based on the bounds of the
-  // visible actors. This ensures that no props are cut off
-  void ResetCameraClippingRange();
-
-  // Description:
   // Callback to set the view up or down one of the three axes.
   void StandardViewCallback(float x, float y, float z);
 

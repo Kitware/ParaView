@@ -230,6 +230,8 @@ protected:
 
   int DisableRenderingFlag;
 
+  unsigned long ResetCameraClippingRangeTag;
+
   float LODThreshold;
   int LODResolution;
   float CollectThreshold;
