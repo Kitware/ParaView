@@ -24,7 +24,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVIceTDisplayRenderModuleUI);
-vtkCxxRevisionMacro(vtkPVIceTDisplayRenderModuleUI, "1.6");
+vtkCxxRevisionMacro(vtkPVIceTDisplayRenderModuleUI, "1.7");
 
 int vtkPVIceTDisplayRenderModuleUICommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -102,7 +102,7 @@ void vtkPVIceTDisplayRenderModuleUI::Create(vtkKWApplication *app, const char *)
   // Skip over LOD res and threshold.
   int row = 4;
   
-  if (this->Application)
+  if (this->IsCreated())
     {
     vtkErrorMacro("RenderModuleUI already created");
     return;
@@ -112,16 +112,16 @@ void vtkPVIceTDisplayRenderModuleUI::Create(vtkKWApplication *app, const char *)
 
   // Determines which reduction/subsampling factor to use.
   this->ReductionLabel->SetParent(this->LODScalesFrame);
-  this->ReductionLabel->Create(this->Application, "-anchor w");
+  this->ReductionLabel->Create(app, "-anchor w");
   this->ReductionLabel->SetLabel("Subsample Rate:");
 
   this->ReductionCheck->SetParent(this->LODScalesFrame);
-  this->ReductionCheck->Create(this->Application, "");
+  this->ReductionCheck->Create(app, "");
   this->ReductionCheck->SetState(1);
   this->ReductionCheck->SetCommand(this, "ReductionCheckCallback");
 
   this->ReductionFactorScale->SetParent(this->LODScalesFrame);
-  this->ReductionFactorScale->Create(this->Application,
+  this->ReductionFactorScale->Create(app,
                                       "-orient horizontal");
   this->ReductionFactorScale->SetRange(2, 5);
   this->ReductionFactorScale->SetResolution(1);
@@ -134,7 +134,7 @@ void vtkPVIceTDisplayRenderModuleUI::Create(vtkKWApplication *app, const char *)
 
   this->ReductionFactorLabel->SetParent(this->LODScalesFrame);
   this->ReductionFactorLabel->SetLabel("2 Pixels");
-  this->ReductionFactorLabel->Create(this->Application, "-anchor w");
+  this->ReductionFactorLabel->Create(app, "-anchor w");
   if (pvapp &&
       pvapp->GetRegisteryValue(2, "RunTime", "ReductionFactor", 0))
     {
