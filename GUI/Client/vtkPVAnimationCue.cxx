@@ -74,7 +74,7 @@ static unsigned char image_open[] =
   "eNpjYGD4z0AEBgIGXJgWanC5YSDcQwgDAO0pqFg=";
 
 vtkStandardNewMacro(vtkPVAnimationCue);
-vtkCxxRevisionMacro(vtkPVAnimationCue, "1.6");
+vtkCxxRevisionMacro(vtkPVAnimationCue, "1.7");
 vtkCxxSetObjectMacro(vtkPVAnimationCue, TimeLineParent, vtkKWWidget);
 
 //***************************************************************************
@@ -111,7 +111,6 @@ vtkPVAnimationCue::vtkPVAnimationCue()
   this->Observer = vtkPVAnimationCueObserver::New();
   this->Observer->SetAnimationCue(this);
   this->TimeLineParent = NULL;
-  this->LabelText = NULL;
   this->TimeLineContainer = vtkKWFrame::New();
   this->Label = vtkKWLabel::New();
   this->TimeLine = vtkPVTimeLine::New();
@@ -153,7 +152,6 @@ vtkPVAnimationCue::~vtkPVAnimationCue()
 
   this->Observer->SetAnimationCue(NULL);
   this->Observer->Delete();
-  this->SetLabelText(0);
   this->SetTimeLineParent(0);
   this->TimeLineContainer->Delete();
   this->Label->Delete();
@@ -185,6 +183,18 @@ vtkPVAnimationCue::~vtkPVAnimationCue()
     this->PropertyStatusManager = NULL;
     }
   this->SetName(NULL);
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVAnimationCue::SetLabelText(const char* label)
+{
+  this->Label->SetLabel(label);
+}
+
+//-----------------------------------------------------------------------------
+const char* vtkPVAnimationCue::GetLabelText()
+{
+  return this->Label->GetLabel();
 }
 
 //-----------------------------------------------------------------------------
@@ -685,13 +695,6 @@ void vtkPVAnimationCue::Create(vtkKWApplication* app, const char* args)
   
   this->Label->SetParent(this->Frame);
   this->Label->Create(app, args);
-  ostrstream label_text;
-  label_text << "-text {" << ((this->LabelText)? this->LabelText:
-    "<No Label>" ) 
-    << "}"
-    << ends;
-  this->Label->ConfigureOptions(label_text.str());
-  label_text.rdbuf()->freeze(0);
 
   this->Script("pack propagate %s 0", this->Frame->GetWidgetName());
   this->Script("bind %s <ButtonPress-1> {%s GetFocus}",
@@ -1141,8 +1144,6 @@ void vtkPVAnimationCue::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
   os << indent << "Name: " << ((this->Name) ? this->Name : "NULL") << endl;
-  os << indent << "LabelText: " << 
-    ((this->LabelText)? this->LabelText : "NULL") << endl;
   os << indent << "ImageType: " << this->ImageType << endl;
   os << indent << "ShowTimeLine: " << this->ShowTimeLine << endl;
   os << indent << "Focus: " << this->Focus << endl;

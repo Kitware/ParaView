@@ -220,7 +220,7 @@ static unsigned char image_prev[] =
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.654");
+vtkCxxRevisionMacro(vtkPVWindow, "1.655");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -3898,7 +3898,6 @@ void vtkPVWindow::RemovePVSource(const char* listname, vtkPVSource *pvs)
       col->RemoveItem(pvs);
       this->MainView->UpdateNavigationWindow(this->CurrentPVSource, 0);
       this->UpdateSelectMenu();
-      this->AnimationManager->Update();
       }
     }
 }
@@ -4001,6 +4000,11 @@ void vtkPVWindow::UpdateSelectMenu()
     {
     this->SelectMenu->AddCascade("Glyphs", this->GlyphMenu, 0,
                                  "Select one of the glyph sources.");  
+    }
+
+  if (this->AnimationManager)
+    {
+    this->AnimationManager->Update();
     }
 }
 

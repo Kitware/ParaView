@@ -61,7 +61,7 @@
 #define VTK_PV_ANIMATION_GROUP "animateable"
 
 vtkStandardNewMacro(vtkPVAnimationManager);
-vtkCxxRevisionMacro(vtkPVAnimationManager, "1.10");
+vtkCxxRevisionMacro(vtkPVAnimationManager, "1.11");
 vtkCxxSetObjectMacro(vtkPVAnimationManager, HorizantalParent, vtkKWWidget);
 vtkCxxSetObjectMacro(vtkPVAnimationManager, VerticalParent, vtkKWWidget);
 //*****************************************************************************
@@ -277,13 +277,14 @@ void vtkPVAnimationManager::ValidateOldSources()
     char* sourcename = this->GetSourceName(sourcekey);
     char* subsourcename = this->GetSubSourceName(sourcekey);
 
+    vtkPVSource* pvSource = pvWindow->GetPVSource(listname, sourcename);
     if (strcmp(listname,"_dont_validate_") == 0)
       {
       // provides for special cues that are not PVSources.
       // such as Camera. These are not validate by this generic method.
       // We can validate and add them separately, if needed.
       }
-    else if (pvWindow->GetPVSource(listname, sourcename) == NULL)
+    else if (pvSource == NULL)
       {
       // the source has been deleted.
       if (subsourcename == NULL)
@@ -299,6 +300,13 @@ void vtkPVAnimationManager::ValidateOldSources()
       current_index = -1;
       iter = this->Internals->PVAnimationCues.begin(); 
       deleted = 1;
+      }
+    else if (pvSource && subsourcename == NULL)
+      {
+      // ensure that the label for the source and that of the cue are in sync.
+      char *label = pvApp->GetTextRepresentation(pvSource);
+      iter->second->SetLabelText(label);
+      delete []label;     
       }
     if (!deleted)
       {
@@ -355,7 +363,7 @@ void vtkPVAnimationManager::AddNewSources()
     vtkPVSource* pvSource = pvWindow->GetPVSource(listname, sourcename);
     if (!pvSource)
       {
-      vtkWarningMacro("Dangling proxy " << proxyname);
+      vtkDebugMacro("Dangling proxy " << proxyname << ". Source may be yet to be added.");
       delete [] listname;
       delete [] sourcename;
       delete [] subsourcename;

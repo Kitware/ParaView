@@ -67,9 +67,9 @@ public:
   void SetTimeLineParent(vtkKWWidget* frame);
 
   // Description:
-  // Label Text is the text show for this cue.
-  vtkSetStringMacro(LabelText);
-  vtkGetStringMacro(LabelText);
+  // Label Text is the text shown for this cue.
+  void SetLabelText(const char* label);
+  const char* GetLabelText();
 
   // Description:
   // Get the timeline object.
@@ -297,7 +297,6 @@ protected:
   vtkPVTimeLine* TimeLine;
 
   vtkSMPropertyStatusManager* PropertyStatusManager;
-  char *LabelText;
   int ImageType;
   int ShowTimeLine;
 
