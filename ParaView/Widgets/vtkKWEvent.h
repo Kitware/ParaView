@@ -154,6 +154,7 @@ class VTK_EXPORT vtkKWEvent
     VolumeBlendModeChangedEvent,
     VolumeBoundingBoxColorChangedEvent,
     VolumeBoundingBoxVisibilityChangedEvent,
+    VolumeCameraResetEvent,
     VolumeCornerAnnotationChangedEvent,
     VolumeDistanceVisibilityChangedEvent,
     VolumeFlySpeedChangedEvent,
