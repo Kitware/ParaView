@@ -127,7 +127,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.587");
+vtkCxxRevisionMacro(vtkPVWindow, "1.588");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -2683,7 +2683,7 @@ void vtkPVWindow::SaveBatchScript(const char *filename, int offScreenFlag, const
   else
     {
     *file << endl << "$Ren1 UpdateVTKObjects" << endl;
-    if (imageFileName)
+    if (imageFileName && *imageFileName && writerName)
       {
       *file 
         << "$Ren1 WriteImage {" << imageFileName << "} " << writerName
