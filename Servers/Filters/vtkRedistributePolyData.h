@@ -45,8 +45,8 @@ public:
   virtual void SetController(vtkMultiProcessController*);
   vtkGetObjectMacro(Controller, vtkMultiProcessController); 
 
-  vtkGetMacro(ColorProc,int);
-  vtkSetMacro(ColorProc,int);
+  void GetColorProc() { return this->ColorProc; };
+  void SetColorProc(int cp) { this->ColorProc = cp; };
   void SetColorProc() { this->ColorProc = 1; };
 
   // Description:
