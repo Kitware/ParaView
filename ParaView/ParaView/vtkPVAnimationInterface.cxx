@@ -125,7 +125,7 @@ static unsigned char image_goto_end[] =
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterface);
-vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.28.2.6");
+vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.28.2.7");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterface,ControlledWidget, vtkPVWidget);
 
@@ -513,7 +513,7 @@ void vtkPVAnimationInterface::Create(vtkKWApplication *app, char *frameArgs)
 
   //  Animation Control: pack the transport buttons
 
-  this->Script("pack %s %s %s %s %s -side left -fill x -padx 1", 
+  this->Script("pack %s %s %s %s %s -side left -fill both -padx 1", 
                this->GoToBeginningButton->GetWidgetName(), 
                this->PlayButton->GetWidgetName(), 
                this->StopButton->GetWidgetName(),
