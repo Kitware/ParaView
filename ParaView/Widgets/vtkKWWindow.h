@@ -366,6 +366,7 @@ protected:
 
   vtkKWLabel *StatusLabel;
   char       *StatusImageName;
+  vtkSetStringMacro(StatusImageName);
 
   vtkKWWidget *PropertiesParent;
   vtkKWWidget *ViewFrame;
