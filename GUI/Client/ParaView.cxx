@@ -66,8 +66,6 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkClientServerInterpreter.h"
 static void ParaViewInitializeInterpreter(vtkPVProcessModule* pm);
 
-#include <unistd.h>
-
 #ifdef PARAVIEW_ENABLE_FPE
 void u_fpu_setup()
 {
