@@ -88,7 +88,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.213.2.8");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.213.2.9");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -779,16 +779,12 @@ void vtkPVRenderView::Create(vtkKWApplication *app, const char *args)
   this->NavigationWindow->SetHeight(545);
   this->NavigationWindow->Create(this->Application, 0); 
 
-  cout << "NavigationWindow: " << this->NavigationWindow->GetTclName() << endl;
-
   // Configure the selection window
 
   this->SelectionWindow->SetParent(this->NavigationFrame->GetFrame());
   this->SelectionWindow->SetWidth(341);
   this->SelectionWindow->SetHeight(545);
   this->SelectionWindow->Create(this->Application, 0); 
-
-  cout << "SelectionWindow: " << this->SelectionWindow->GetTclName() << endl;
 
   this->SelectionWindowButton->SetParent(
     this->NavigationFrame->GetLabelFrame());
@@ -2398,7 +2394,7 @@ void vtkPVRenderView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVRenderView ";
-  this->ExtractRevision(os,"$Revision: 1.213.2.8 $");
+  this->ExtractRevision(os,"$Revision: 1.213.2.9 $");
 }
 
 //------------------------------------------------------------------------------
