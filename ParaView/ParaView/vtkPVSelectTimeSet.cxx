@@ -59,7 +59,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectTimeSet);
-vtkCxxRevisionMacro(vtkPVSelectTimeSet, "1.29");
+vtkCxxRevisionMacro(vtkPVSelectTimeSet, "1.30");
 
 //-----------------------------------------------------------------------------
 int vtkDataArrayCollectionCommand(ClientData cd, Tcl_Interp *interp,
@@ -253,8 +253,6 @@ void vtkPVSelectTimeSet::AddChildNode(const char* parent, const char* name,
 //-----------------------------------------------------------------------------
 void vtkPVSelectTimeSet::AcceptInternal(const char *sourceTclName)
 {
-  vtkPVApplication *pvApp = this->GetPVApplication();
-
   if (this->ModifiedFlag)
     {
     this->Script("%s selection get", this->Tree->GetWidgetName());
