@@ -919,6 +919,8 @@ void vtkPVActorComposite::SetColorRangeInternal(float min, float max)
 
   // This is here in case process 0 has not geometry.  
   // We have to explicitly build the color map.
+  this->Script("[%s GetLookupTable] SetTableRange %f %f", 
+               this->ScalarBarTclName, min, max);
   this->Script("[%s GetLookupTable] Build", this->ScalarBarTclName);
   this->Script("[%s GetLookupTable] Modified", this->ScalarBarTclName);
 
