@@ -62,6 +62,13 @@ public:
   const vtkClientServerStream& GetFileListing(const char* dirname,
                                               int save);
 
+  // Description:
+  // Get the current working directory of the process on the server.
+  const char* GetCurrentWorkingDirectory();
+
+  // Description:
+  // Check if the given directory exists on the server.
+  int FileIsDirectory(const char* dirname);
 protected:
   vtkPVServerFileListing();
   ~vtkPVServerFileListing();

@@ -51,24 +51,28 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #if defined(_WIN32)
 # include <windows.h>   // FindFirstFile, FindNextFile, FindClose
+# include <direct.h>    // _getcwd
+# define vtkPVServerFileListingGetCWD _getcwd
 #else
 # include <sys/types.h> // DIR, struct dirent, struct stat
 # include <sys/stat.h>  // stat
 # include <dirent.h>    // opendir, readdir, closedir
-# include <unistd.h>    // access
+# include <unistd.h>    // access, getcwd
 # include <errno.h>     // errno
 # include <string.h>    // strerror
+# define vtkPVServerFileListingGetCWD getcwd
 #endif
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVServerFileListing);
-vtkCxxRevisionMacro(vtkPVServerFileListing, "1.1.2.2");
+vtkCxxRevisionMacro(vtkPVServerFileListing, "1.1.2.3");
 
 //----------------------------------------------------------------------------
 class vtkPVServerFileListingInternals
 {
 public:
   vtkClientServerStream Result;
+  vtkstd::string CurrentWorkingDirectory;
 };
 
 //----------------------------------------------------------------------------
@@ -254,4 +258,28 @@ void vtkPVServerFileListing::List(const char* dirname, int save)
     this->Internal->Result << f->c_str();
     }
   this->Internal->Result << vtkClientServerStream::End;
+}
+
+//----------------------------------------------------------------------------
+const char* vtkPVServerFileListing::GetCurrentWorkingDirectory()
+{
+  char buf[2048];
+  vtkPVServerFileListingGetCWD(buf, sizeof(buf));
+  this->Internal->CurrentWorkingDirectory = buf;
+  return this->Internal->CurrentWorkingDirectory.c_str();
+}
+
+//----------------------------------------------------------------------------
+int vtkPVServerFileListing::FileIsDirectory(const char* dirname)
+{
+  struct stat fs;
+  if(stat(dirname, &fs) == 0)
+    {
+#ifdef _WIN32
+    return ((fs.st_mode & _S_IFDIR) != 0)? 1:0;
+#else
+    return S_ISDIR(fs.st_mode)? 1:0;
+#endif
+    }
+  return 0;
 }
