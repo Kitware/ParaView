@@ -135,7 +135,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.325");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.326");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -1803,17 +1803,16 @@ vtkPVWindow *vtkPVRenderView::GetPVWindow()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVRenderView::CleanBatchScript(ofstream* file)
-{
-  *file << "$Ren1 UnRegister {}" << endl;
-}
-
-//----------------------------------------------------------------------------
 void vtkPVRenderView::SaveInBatchScript(ofstream* file)
 {
   int i;
 
-  *file << "set Ren1 [$proxyManager NewProxy rendering DefaultRenderer]" << endl;
+  *file << "set Ren1 [$proxyManager NewProxy rendering DefaultDisplayWindow]" 
+        << endl;
+  *file << "  $proxyManager RegisterProxy rendering Ren1 $Ren1" 
+        << endl;
+  *file << "  $Ren1 UnRegister {}" << endl;
+
   double* color = this->GetRenderer()->GetBackground();
   *file << "  [$Ren1 GetProperty BackgroundColor] SetElements3 "; 
   for(i=0; i<3; i++)

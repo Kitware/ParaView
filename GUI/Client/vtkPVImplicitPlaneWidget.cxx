@@ -41,7 +41,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVImplicitPlaneWidget);
-vtkCxxRevisionMacro(vtkPVImplicitPlaneWidget, "1.30");
+vtkCxxRevisionMacro(vtkPVImplicitPlaneWidget, "1.31");
 
 vtkCxxSetObjectMacro(vtkPVImplicitPlaneWidget, InputMenu, vtkPVInputMenu);
 
@@ -307,20 +307,16 @@ void vtkPVImplicitPlaneWidget::Trace(ofstream *file)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVImplicitPlaneWidget::CleanBatchScript(ofstream* file)
-{
-  *file << "$pvTemp" <<  this->PlaneID.ID
-        << " UnRegister {}"
-        << endl;
-}
-
-//----------------------------------------------------------------------------
 void vtkPVImplicitPlaneWidget::SaveInBatchScript(ofstream* file)
 {
   *file << endl;
   *file << "set pvTemp" <<  this->PlaneID.ID
         << " [$proxyManager NewProxy implicit_functions Plane]"
         << endl;
+  *file << "  $proxyManager RegisterProxy implicit_functions pvTemp"
+        << this->PlaneID.ID << " $pvTemp" << this->PlaneID.ID
+        << endl;
+  *file << " $pvTemp" << this->PlaneID.ID << " UnRegister {}" << endl;
 
   double val[3];
   int cc;

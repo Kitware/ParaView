@@ -226,11 +226,6 @@ public:
   void SaveState(ofstream *file);
 
   // Description:
-  // Called to make the source write cleanup code at the
-  // end of a batch script.
-  virtual void CleanBatchScript(ofstream *file);
-  
-  // Description:
   // Callback for the change color button.
   void ChangeActorColor(double r, double g, double b);
   double* GetActorColor();

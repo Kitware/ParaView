@@ -126,11 +126,6 @@ public:
   virtual void SaveInBatchScript(ofstream *file);
 
   // Description:
-  // Called to make the source write cleanup code at the
-  // end of a batch script.
-  virtual void CleanBatchScript(ofstream *) {};
-
-  // Description:
   // This method calls "Trace" to save this widget into a state file.
   // This method is not virtual and sublclasses do not have to implement 
   // this method.  Subclasses define the interal "Trace" which works for

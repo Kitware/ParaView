@@ -23,7 +23,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLineSourceWidget);
-vtkCxxRevisionMacro(vtkPVLineSourceWidget, "1.18");
+vtkCxxRevisionMacro(vtkPVLineSourceWidget, "1.19");
 
 int vtkPVLineSourceWidgetCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -140,14 +140,6 @@ void vtkPVLineSourceWidget::Deselect()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVLineSourceWidget::CleanBatchScript(ofstream *file)
-{
-  *file << "$pvTemp" <<  this->OutputID.ID
-        << " UnRegister {}"
-        << endl;
-}
-
-//----------------------------------------------------------------------------
 void vtkPVLineSourceWidget::SaveInBatchScript(ofstream *file)
 {
   double pt[3];
@@ -162,6 +154,11 @@ void vtkPVLineSourceWidget::SaveInBatchScript(ofstream *file)
   *file << "set pvTemp" <<  this->OutputID.ID
         << " [$proxyManager NewProxy sources LineSource]"
         << endl;
+  *file << "  $proxyManager RegisterProxy sources pvTemp"
+        << this->OutputID.ID << " $pvTemp" << this->OutputID.ID
+        << endl;
+  *file << " $pvTemp" << this->OutputID.ID << " UnRegister {}" << endl;
+
   this->LineWidget->GetPoint1(pt);
   *file << "  [$pvTemp" << this->OutputID.ID << " GetProperty Point1] "
         << "SetElements3 " << pt[0] << " " << pt[1] << " " << pt[2] << endl;

@@ -35,7 +35,7 @@
 #include "vtkPVProcessModule.h"
 
 vtkStandardNewMacro(vtkPVSphereWidget);
-vtkCxxRevisionMacro(vtkPVSphereWidget, "1.36");
+vtkCxxRevisionMacro(vtkPVSphereWidget, "1.37");
 
 int vtkPVSphereWidgetCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -207,20 +207,16 @@ void vtkPVSphereWidget::UpdateVTKObject(const char*)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVSphereWidget::CleanBatchScript(ofstream *file)
-{
-  *file << "$pvTemp" <<  this->SphereID.ID
-        << " UnRegister {}"
-        << endl;
-}
-
-//----------------------------------------------------------------------------
 void vtkPVSphereWidget::SaveInBatchScript(ofstream *file)
 {
   *file << endl;
   *file << "set pvTemp" <<  this->SphereID.ID
         << " [$proxyManager NewProxy implicit_functions Sphere]"
         << endl;
+  *file << "  $proxyManager RegisterProxy implicit_functions pvTemp"
+        << this->SphereID.ID << " $pvTemp" << this->SphereID.ID
+        << endl;
+  *file << "  $pvTemp" << this->SphereID.ID << " UnRegister {}" << endl;
   *file << "  [$pvTemp" << this->SphereID.ID << " GetProperty Center] "
         << "SetElements3 " 
         << this->LastAcceptedCenter[0] << " "

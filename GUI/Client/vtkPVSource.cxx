@@ -62,7 +62,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.356");
+vtkCxxRevisionMacro(vtkPVSource, "1.357");
 
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
@@ -1867,33 +1867,6 @@ void vtkPVSource::SaveInBatchScript(ofstream *file)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVSource::CleanBatchScript(ofstream *file)
-{
-  // This should not be needed, but We can check anyway.
-  if (this->VisitedFlag)
-    {
-    return;
-    }
-  this->VisitedFlag = 1;
-
-  *file << "$pvTemp" <<  this->GetVTKSourceID(0)
-        << " UnRegister {}" << endl;
-  this->GetPVOutput()->CleanBatchScript(file);
-
-  // Let the PVWidgets set up the object.
-  vtkCollectionIterator *it = this->WidgetProperties->NewIterator();
-  vtkPVWidgetProperty *pvwProp;
-  it->InitTraversal();
-  while ( !it->IsDoneWithTraversal() )
-    {
-    pvwProp = static_cast<vtkPVWidgetProperty*>(it->GetObject());
-    pvwProp->GetWidget()->CleanBatchScript(file);
-    it->GoToNextItem();
-    }
-  it->Delete();
-}
-
-//----------------------------------------------------------------------------
 void vtkPVSource::SaveFilterInBatchScript(ofstream *file)
 {
   int i;
@@ -1931,6 +1904,10 @@ void vtkPVSource::SaveFilterInBatchScript(ofstream *file)
         << " [$proxyManager NewProxy " << module_group << " " 
         << this->GetModuleName() << "]"
         << endl;
+  *file << "  $proxyManager RegisterProxy " << module_group << " pvTemp" 
+        << this->GetVTKSourceID(0) << " $pvTemp" << this->GetVTKSourceID(0)
+        << endl;
+  *file << "  $pvTemp" << this->GetVTKSourceID(0) << " UnRegister {}" << endl;
 
   this->SetInputsInBatchScript(file);
 

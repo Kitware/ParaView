@@ -44,7 +44,7 @@
 #include "vtkPlane.h"
 
 vtkStandardNewMacro(vtkPVBoxWidget);
-vtkCxxRevisionMacro(vtkPVBoxWidget, "1.27");
+vtkCxxRevisionMacro(vtkPVBoxWidget, "1.28");
 
 int vtkPVBoxWidgetCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -254,17 +254,6 @@ void vtkPVBoxWidget::UpdateVTKObject(const char*)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVBoxWidget::CleanBatchScript(ofstream *file)
-{
-  *file << "$pvTemp" << this->BoxMatrixID.ID
-        << " UnRegister {}"
-        << endl;
-  *file << "$pvTemp" << this->BoxTransformID.ID
-        << " UnRegister {}"
-        << endl;
-}
-
-//----------------------------------------------------------------------------
 void vtkPVBoxWidget::SaveInBatchScript(ofstream *file)
 {
   vtkTransform* trans = this->BoxTransform;
@@ -281,6 +270,10 @@ void vtkPVBoxWidget::SaveInBatchScript(ofstream *file)
   *file << "set pvTemp" << this->BoxMatrixID.ID
         << " [$proxyManager NewProxy math Matrix4x4]"
         << endl;
+  *file << "$proxyManager RegisterProxy math pvTemp" << this->BoxMatrixID.ID
+        << " $pvTemp" << this->BoxMatrixID.ID << endl;
+  *file << " $pvTemp" << this->BoxMatrixID.ID << " UnRegister {}" << endl;
+
   for(int i=0; i<16; i++)
     {
     *file << "  [$pvTemp" << this->BoxMatrixID.ID
@@ -295,6 +288,9 @@ void vtkPVBoxWidget::SaveInBatchScript(ofstream *file)
   *file << "set pvTemp" << this->BoxTransformID.ID
         << " [$proxyManager NewProxy transforms Transform]"
         << endl;
+  *file << "$proxyManager RegisterProxy math pvTemp" << this->BoxTransformID.ID
+        << " $pvTemp" << this->BoxTransformID.ID << endl;
+  *file << " $pvTemp" << this->BoxTransformID.ID << " UnRegister {}" << endl;
   *file << "  [$pvTemp" << this->BoxTransformID.ID
         << " GetProperty Matrix] SetProxy $pvTemp" << this->BoxMatrixID.ID
         << endl;

@@ -42,7 +42,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCalculatorWidget);
-vtkCxxRevisionMacro(vtkPVCalculatorWidget, "1.19");
+vtkCxxRevisionMacro(vtkPVCalculatorWidget, "1.20");
 
 int vtkPVCalculatorWidgetCommand(ClientData cd, Tcl_Interp *interp,
                                 int argc, char *argv[]);
@@ -999,13 +999,13 @@ void vtkPVCalculatorWidget::SaveInBatchScript(ofstream *file)
           << " GetProperty AddVectorVariable] SetElement " << i*3+1
           << " {" <<  this->VectorArrayNames[i] << "}" << endl;
     *file << "  [$pvTemp" << sourceID.ID 
-          << " GetProperty AddScalarVariable] SetElement " << i*3+2
+          << " GetProperty AddVectorVariable] SetElement " << i*3+2
           << " 0" << endl;
     *file << "  [$pvTemp" << sourceID.ID 
-          << " GetProperty AddScalarVariable] SetElement " << i*3+3
+          << " GetProperty AddVectorVariable] SetElement " << i*3+3
           << " 1" << endl;
     *file << "  [$pvTemp" << sourceID.ID 
-          << " GetProperty AddScalarVariable] SetElement " << i*3+4
+          << " GetProperty AddVectorVariable] SetElement " << i*3+4
           << " 2" << endl;
     }
 

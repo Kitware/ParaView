@@ -29,7 +29,7 @@ int vtkPVPointSourceWidget::InstanceCount = 0;
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPointSourceWidget);
-vtkCxxRevisionMacro(vtkPVPointSourceWidget, "1.24");
+vtkCxxRevisionMacro(vtkPVPointSourceWidget, "1.25");
 
 int vtkPVPointSourceWidgetCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -88,14 +88,6 @@ vtkPVPointSourceWidget::~vtkPVPointSourceWidget()
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVPointSourceWidget::CleanBatchScript(ofstream *file)
-{
-  *file << "$pvTemp" <<  this->OutputID.ID
-        << " UnRegister {}"
-        << endl;
-}
-
-//-----------------------------------------------------------------------------
 void vtkPVPointSourceWidget::SaveInBatchScript(ofstream *file)
 {
   double pt[3];
@@ -112,6 +104,11 @@ void vtkPVPointSourceWidget::SaveInBatchScript(ofstream *file)
   *file << "set pvTemp" <<  this->OutputID.ID
         << " [$proxyManager NewProxy sources PointSource]"
         << endl;
+  *file << "  $proxyManager RegisterProxy sources pvTemp"
+        << this->OutputID.ID << " $pvTemp" << this->OutputID.ID
+        << endl;
+  *file << " $pvTemp" << this->OutputID.ID << " UnRegister {}" << endl;
+
   this->PointWidget->GetPosition(pt);
   *file << "  [$pvTemp" << this->OutputID.ID << " GetProperty Center] "
         << "SetElements3 " << pt[0] << " " << pt[1] << " " << pt[2] << endl;

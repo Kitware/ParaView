@@ -50,7 +50,7 @@
 #include "vtkPVRenderModule.h"
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVColorMap);
-vtkCxxRevisionMacro(vtkPVColorMap, "1.88");
+vtkCxxRevisionMacro(vtkPVColorMap, "1.89");
 
 int vtkPVColorMapCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -1697,20 +1697,6 @@ void vtkPVColorMap::UpdateInternalScalarBarVisibility()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVColorMap::CleanBatchScript(ofstream *file)
-{
-  // This should not be needed, but We can check anyway.
-  if (this->VisitedFlag)
-    {
-    return;
-    }
-  this->VisitedFlag = 1;
-  *file << "$pvTemp" <<  this->LookupTableID
-        << " UnRegister {}"
-        << endl;
-}
-
-//----------------------------------------------------------------------------
 void vtkPVColorMap::SaveInBatchScript(ofstream *file)
 {
   if (this->VisitedFlag)
@@ -1723,6 +1709,10 @@ void vtkPVColorMap::SaveInBatchScript(ofstream *file)
   *file << "set pvTemp" <<  this->LookupTableID
         << " [$proxyManager NewProxy lookup_tables LookupTable]"
         << endl;
+  *file << "  $proxyManager RegisterProxy lookup_tables pvTemp"
+        << this->LookupTableID << " $pvTemp" << this->LookupTableID
+        << endl;
+  *file << "  $pvTemp" << this->LookupTableID << " UnRegister {}" << endl;
   *file << "  [$pvTemp" << this->LookupTableID << " GetProperty "
         << "NumberOfTableValues] SetElements1 "
         << this->NumberOfColors << endl;

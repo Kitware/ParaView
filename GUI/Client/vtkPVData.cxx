@@ -83,7 +83,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.280");
+vtkCxxRevisionMacro(vtkPVData, "1.281");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -2823,23 +2823,6 @@ void vtkPVData::SetPropertiesParent(vtkKWWidget *parent)
 
 
 //----------------------------------------------------------------------------
-void vtkPVData::CleanBatchScript(ofstream *file)
-{
-  if (this->GetVisibility())
-    {
-    vtkPVPart *part = this->GetPVSource()->GetPart(0);
-    vtkPVPartDisplay *partD = part->GetPartDisplay();
-    *file << "$pvTemp" <<  partD->GetGeometryID()
-          << " UnRegister {}"
-          << endl;
-    if (this->PVColorMap)
-      {
-      this->PVColorMap->CleanBatchScript(file);
-      }
-    }
-}
-
-//----------------------------------------------------------------------------
 void vtkPVData::SaveInBatchScript(ofstream *file)
 {
   if (this->GetVisibility())
@@ -2854,6 +2837,10 @@ void vtkPVData::SaveInBatchScript(ofstream *file)
     *file << "set pvTemp" <<  partD->GetGeometryID()
           << " [$proxyManager NewProxy rendering DefaultDisplayer]"
           << endl;
+    *file << "  $proxyManager RegisterProxy rendering pvTemp"
+          << partD->GetGeometryID() << " $pvTemp" << partD->GetGeometryID() 
+          << endl;
+    *file << "  $pvTemp" << partD->GetGeometryID() << " UnRegister {}" << endl;
     *file << "  $pvTemp" <<  partD->GetGeometryID() << " SetInput 0 "
           << "$pvTemp" << this->GetPVSource()->GetVTKSourceID(0)
           << " SetInput 0"

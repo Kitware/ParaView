@@ -84,11 +84,6 @@ public:
 //ETX
 
   // Description:
-  // Called to make the source write cleanup code at the
-  // end of a batch script.
-  virtual void CleanBatchScript(ofstream *file);
-
-  // Description:
   // For saving the widget into a VTK tcl script.
   virtual void SaveInBatchScript(ofstream *file);
 

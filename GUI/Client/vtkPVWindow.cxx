@@ -126,7 +126,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.572");
+vtkCxxRevisionMacro(vtkPVWindow, "1.573");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -2618,40 +2618,7 @@ void vtkPVWindow::SaveBatchScript(const char *filename, int offScreenFlag, const
 
   *file << endl;
 
-  // Mark all color maps as not visited.
-  this->PVColorMaps->InitTraversal();
-  while( (cm = (vtkPVColorMap*)(this->PVColorMaps->GetNextItemAsObject())) )
-    {    
-    cm->SetVisitedFlag(0);
-    }
-
-  it = this->SourceLists->NewIterator();
-  // Mark all sources as not visited.
-  while( !it->IsDoneWithTraversal() )
-    {    
-    vtkPVSourceCollection* col = 0;
-    if (it->GetData(col) == VTK_OK && col)
-      {
-      vtkCollectionIterator *collIt = col->NewIterator();
-      collIt->InitTraversal();
-      while ( !collIt->IsDoneWithTraversal() )
-        {
-        pvs = static_cast<vtkPVSource*>(collIt->GetObject()); 
-        if (pvs->GetVisitedFlag())
-          {
-          pvs->SetVisitedFlag(0);
-          pvs->CleanBatchScript(file);
-          }
-        collIt->GoToNextItem();
-        }
-      collIt->Delete();
-      }
-    it->GoToNextItem();
-    }
-  it->Delete();
-
-  this->GetMainView()->CleanBatchScript(file);
-
+  *file << "$proxyManager UnRegisterProxies" << endl;
   *file << endl;
   *file << "app Finalize" << endl;
   *file << "app Delete" << endl;

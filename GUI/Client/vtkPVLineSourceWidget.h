@@ -59,11 +59,6 @@ public:
   // This creates the line source (one for all parts).
   virtual void SaveInBatchScript(ofstream *file);
 
-  // Description:
-  // Called to make the source write cleanup code at the
-  // end of a batch script.
-  virtual void CleanBatchScript(ofstream *file);
-  
   //BTX
   // Description:
   // The methods get called when the Accept button is pressed. 

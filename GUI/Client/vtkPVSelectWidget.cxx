@@ -34,7 +34,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectWidget);
-vtkCxxRevisionMacro(vtkPVSelectWidget, "1.42");
+vtkCxxRevisionMacro(vtkPVSelectWidget, "1.43");
 
 int vtkPVSelectWidgetCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -178,20 +178,6 @@ int vtkPVSelectWidget::GetModifiedFlag()
   return 0;
 }
   
-//-----------------------------------------------------------------------------
-void vtkPVSelectWidget::CleanBatchScript(ofstream *file)
-{
-  vtkPVWidgetProperty *pvwp;
-  pvwp = vtkPVWidgetProperty::SafeDownCast(
-    this->WidgetProperties->GetItemAsObject(this->CurrentIndex));
-  if (!pvwp)
-    {
-    return;
-    }
-
-  pvwp->GetWidget()->CleanBatchScript(file);
-}
-
 //-----------------------------------------------------------------------------
 void vtkPVSelectWidget::SaveInBatchScript(ofstream *file)
 {
