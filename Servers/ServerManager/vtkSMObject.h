@@ -12,8 +12,11 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSMObject -
+// .NAME vtkSMObject - superclass for most server manager classes
 // .SECTION Description
+// vtkSMObject provides several methods common to most server manager
+// classes. These are mostly for setting and getting singletons including
+// the communication and process modules and the proxy manager.
 
 #ifndef __vtkSMObject_h
 #define __vtkSMObject_h
@@ -32,14 +35,19 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
   
   // Description:
+  // The communication module singleton is used by server manager
+  // objects to communicate with servers.
   static vtkSMCommunicationModule* GetCommunicationModule();
   static void SetCommunicationModule(vtkSMCommunicationModule* cm);
 
   // Description:
+  // The process module singleton is used by server manager objects
+  // to process/execute streams.
   static vtkSMProcessModule* GetProcessModule();
   static void SetProcessModule(vtkSMProcessModule* pm);
 
   // Description:
+  // Proxy manager singleton stores all proxy groups and instances.
   static vtkSMProxyManager* GetProxyManager();
   static void SetProxyManager(vtkSMProxyManager* pm);
 

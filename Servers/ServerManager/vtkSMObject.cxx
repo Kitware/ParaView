@@ -20,7 +20,7 @@
 #include "vtkSMProxyManager.h"
 
 vtkStandardNewMacro(vtkSMObject);
-vtkCxxRevisionMacro(vtkSMObject, "1.1");
+vtkCxxRevisionMacro(vtkSMObject, "1.2");
 
 vtkSMCommunicationModule* vtkSMObject::CommunicationModule = 0;
 vtkSMProcessModule* vtkSMObject::ProcessModule = 0;
@@ -112,4 +112,9 @@ void vtkSMObject::SetProxyManager(vtkSMProxyManager* pm)
 void vtkSMObject::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+
+  os << indent << "Communication module: " << vtkSMObject::CommunicationModule
+     << endl;
+  os << indent << "Process module: " << vtkSMObject::ProcessModule << endl;
+  os << indent << "Proxy manager: " << vtkSMObject::ProxyManager << endl;
 }
