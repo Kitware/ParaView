@@ -46,7 +46,7 @@ const int ICET_INFO_SIZE = sizeof(struct IceTInformation)/sizeof(int);
 // vtkIceTRenderManager implementation.
 //******************************************************************
 
-vtkCxxRevisionMacro(vtkIceTRenderManager, "1.7.2.5");
+vtkCxxRevisionMacro(vtkIceTRenderManager, "1.7.2.6");
 vtkStandardNewMacro(vtkIceTRenderManager);
 
 vtkCxxSetObjectMacro(vtkIceTRenderManager, SortingKdTree, vtkPKdTree);
@@ -796,6 +796,17 @@ void vtkIceTRenderManager::PrintSelf(ostream &os, vtkIndent indent)
     {
     os << endl;
     this->SortingKdTree->PrintSelf(os, i2);
+    }
+  else
+    {
+    os << "(none)" << endl;
+    }
+
+  os << indent << "Data Replication Group: ";
+  if (this->DataReplicationGroup)
+    {
+    os << endl;
+    this->DataReplicationGroup->PrintSelf(os, i2);
     }
   else
     {
