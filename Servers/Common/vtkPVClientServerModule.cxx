@@ -147,7 +147,7 @@ void vtkPVSendStreamToClientServerNodeRMI(void *localArg, void *remoteArg,
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVClientServerModule);
-vtkCxxRevisionMacro(vtkPVClientServerModule, "1.11");
+vtkCxxRevisionMacro(vtkPVClientServerModule, "1.12");
 
 
 //----------------------------------------------------------------------------
@@ -271,6 +271,27 @@ void vtkPVClientServerModule::Initialize()
                     "The server will exit.");
       }
 
+    // Send the client version
+    int version;
+    version = PARAVIEW_VERSION_MAJOR;
+    this->SocketController->Send(&version, 1, 1, 8843);
+    version = PARAVIEW_VERSION_MINOR;
+    this->SocketController->Send(&version, 1, 1, 8843);
+    version = PARAVIEW_VERSION_PATCH;
+    this->SocketController->Send(&version, 1, 1, 8843);
+
+    // Check if versions matched
+    int tmpmatch;
+    this->SocketController->Receive(&tmpmatch, 1, 1, 8843);
+    if (!tmpmatch)
+      {
+      vtkErrorMacro("Client and data server versions do not match. "
+                    "Please make sure that you are using the right "
+                    "client version.");
+      dsmatch = 0;
+      }
+    
+    
     // Receive as the hand shake the number of processes available.
     int numServerProcs = 0;
     this->SocketController->Receive(&numServerProcs, 1, 1, 8843);
@@ -287,6 +308,24 @@ void vtkPVClientServerModule::Initialize()
         vtkErrorMacro("Connect ID mismatch. Data server was expecting "
                       "another ID. The server will exit.");
         }
+      // Send the client version
+      version = PARAVIEW_VERSION_MAJOR;
+      this->RenderServerSocket->Send(&version, 1, 1, 8843);
+      version = PARAVIEW_VERSION_MINOR;
+      this->RenderServerSocket->Send(&version, 1, 1, 8843);
+      version = PARAVIEW_VERSION_PATCH;
+      this->RenderServerSocket->Send(&version, 1, 1, 8843);
+
+      // Check if versions matched
+      this->RenderServerSocket->Receive(&tmpmatch, 1, 1, 8843);
+      if (!tmpmatch)
+        {
+        vtkErrorMacro("Client and render server versions do not match. "
+                      "Please make sure that you are using the right "
+                      "client version.");
+        rsmatch = 0;
+        }
+      
       this->RenderServerSocket->Receive(&numServerProcs, 1, 1, 8843);
       this->NumberOfRenderServerProcesses = numServerProcs;
       }
@@ -332,6 +371,29 @@ void vtkPVClientServerModule::Initialize()
       this->Enabled = 0;
       }
     // Tell the client the result of id check
+    this->SocketController->Send(&match, 1, 1, 8843);
+
+    // Do not send the actual number of procs. if the
+    // security check failed.
+    if (!match)
+      {
+      numProcs = 0;
+      }
+
+    // Receive the client version
+    int majorVersion, minorVersion, patchVersion;
+    this->SocketController->Receive(&majorVersion, 1, 1, 8843);
+    this->SocketController->Receive(&minorVersion, 1, 1, 8843);
+    this->SocketController->Receive(&patchVersion, 1, 1, 8843);
+
+    if ( (majorVersion != PARAVIEW_VERSION_MAJOR) ||
+         (minorVersion != PARAVIEW_VERSION_MINOR) )
+      {
+      match = 0;
+      vtkErrorMacro("Version mismatch.");
+      this->Enabled = 0;
+      }
+    // Tell the client the result of version check
     this->SocketController->Send(&match, 1, 1, 8843);
 
     // send the number of server processes as a handshake. 
