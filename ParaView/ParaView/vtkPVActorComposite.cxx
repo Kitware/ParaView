@@ -1578,6 +1578,11 @@ void vtkPVActorComposite::SetPointSize(int size)
   this->ChangePointSize();
 }
 
+void vtkPVActorComposite::SetLineWidth(int width)
+{
+  this->LineWidthScale->SetValue(width);
+  this->ChangeLineWidth();
+}
 
 void vtkPVActorComposite::ChangePointSize()
 {

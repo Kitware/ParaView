@@ -219,7 +219,8 @@ public:
   // Description:
   // Access to pointSize for scripting.
   void SetPointSize(int size);
-
+  void SetLineWidth(int width);
+  
   // Description:
   // Callbacks for point size and line width sliders.
   void ChangePointSize();
