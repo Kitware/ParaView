@@ -74,12 +74,14 @@ public:
   // Remove all array entries.
   void RemoveAllArrays();
   
+  //BTX
   // Description:
   // Set the list of arrays that have entries.  For arrays that
   // already have entries, the settings are copied.  For arrays that
   // don't already have an entry, they are assumed to be enabled.
   // There will be no more entries than the names given.
-  void SetArrays(const char** names, int numArrays);
+  void SetArrays(const char* const* names, int numArrays);
+  //ETX
   
   // Description:
   // Copy the selections from the given vtkDataArraySelection instance.

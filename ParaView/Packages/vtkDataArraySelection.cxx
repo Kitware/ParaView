@@ -19,7 +19,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkVector.txx"
 
-vtkCxxRevisionMacro(vtkDataArraySelection, "1.3");
+vtkCxxRevisionMacro(vtkDataArraySelection, "1.4");
 vtkStandardNewMacro(vtkDataArraySelection);
 
 //----------------------------------------------------------------------------
@@ -49,10 +49,18 @@ void vtkDataArraySelection::EnableArray(const char* name)
   vtkIdType pos=0;
   if(this->ArrayNames->FindItem(name, pos) == VTK_OK)
     {
-    this->ArraySettings->SetItem(pos, 1);
+    int value = 0;
+    this->ArraySettings->GetItemNoCheck(pos, value);
+    if(!value)
+      {
+      this->ArraySettings->SetItemNoCheck(pos, 1);
+      this->Modified();
+      }
+    return;
     }
   this->ArrayNames->AppendItem(name);
   this->ArraySettings->AppendItem(1);
+  this->Modified();
 }
 
 //----------------------------------------------------------------------------
@@ -61,10 +69,18 @@ void vtkDataArraySelection::DisableArray(const char* name)
   vtkIdType pos=0;
   if(this->ArrayNames->FindItem(name, pos) == VTK_OK)
     {
-    this->ArraySettings->SetItem(pos, 0);
+    int value = 0;
+    this->ArraySettings->GetItemNoCheck(pos, value);
+    if(value)
+      {
+      this->ArraySettings->SetItemNoCheck(pos, 0);
+      this->Modified();
+      }
+    return;
     }
   this->ArrayNames->AppendItem(name);
   this->ArraySettings->AppendItem(0);
+  this->Modified();
 }
 
 //----------------------------------------------------------------------------
@@ -86,20 +102,42 @@ int vtkDataArraySelection::ArrayIsEnabled(const char* name)
 //----------------------------------------------------------------------------
 void vtkDataArraySelection::EnableAllArrays()
 {
+  int modified = 0;
   vtkIdType i;
   for(i=0;i < this->ArraySettings->GetNumberOfItems();++i)
     {
-    this->ArraySettings->SetItem(i, 1);
+    int value = 0;
+    this->ArraySettings->GetItemNoCheck(i, value);
+    if(!value)
+      {
+      this->ArraySettings->SetItemNoCheck(i, 1);
+      modified = 1;
+      }
+    }
+  if(modified)
+    {
+    this->Modified();
     }
 }
 
 //----------------------------------------------------------------------------
 void vtkDataArraySelection::DisableAllArrays()
 {
+  int modified = 0;
   vtkIdType i;
   for(i=0;i < this->ArraySettings->GetNumberOfItems();++i)
     {
-    this->ArraySettings->SetItem(i, 0);
+    int value = 0;
+    this->ArraySettings->GetItemNoCheck(i, value);
+    if(value)
+      {
+      this->ArraySettings->SetItemNoCheck(i, 0);
+      modified = 1;
+      }
+    }
+  if(modified)
+    {
+    this->Modified();
     }
 }
 
@@ -134,13 +172,21 @@ int vtkDataArraySelection::GetArraySetting(int index)
 //----------------------------------------------------------------------------
 void vtkDataArraySelection::RemoveAllArrays()
 {
-  this->ArrayNames->RemoveAllItems();
-  this->ArraySettings->RemoveAllItems();
+  if(this->GetNumberOfArrays() > 0)
+    {
+    this->ArrayNames->RemoveAllItems();
+    this->ArraySettings->RemoveAllItems();
+    this->Modified();
+    }
 }
 
 //----------------------------------------------------------------------------
-void vtkDataArraySelection::SetArrays(const char** names, int numArrays)
+void vtkDataArraySelection::SetArrays(const char* const* names, int numArrays)
 {
+  // This function is called only by the filter owning the selection.
+  // It should not call Modified() because array settings are not
+  // changed.
+  
   // Create a new map for this set of arrays.
   ArrayNamesType* newNames = ArrayNamesType::New();
   ArraySettingsType* newSettings = ArraySettingsType::New();
@@ -200,4 +246,5 @@ void vtkDataArraySelection::CopySelections(vtkDataArraySelection* selections)
     this->ArrayNames->AppendItem(name);
     this->ArraySettings->AppendItem(setting);
     }
+  this->Modified();
 }
