@@ -33,7 +33,7 @@
 
 #include <vtkstd/string>
 
-vtkCxxRevisionMacro(vtkKWParameterValueFunctionEditor, "1.27");
+vtkCxxRevisionMacro(vtkKWParameterValueFunctionEditor, "1.28");
 
 int vtkKWParameterValueFunctionEditorCommand(ClientData cd, Tcl_Interp *interp, int argc, char *argv[]);
 
@@ -4377,28 +4377,28 @@ void vtkKWParameterValueFunctionEditor::RedrawRangeFrame()
         vtkKWParameterValueFunctionEditor::CanvasOutlineStyleLeftSide)
       {
       tk_cmd << canv << " coords framefg_l " 
-             << c1_x << " " << c2_y << " " 
+             << c1_x << " " << c2_y + 1 - LSTRANGE << " " 
              << c1_x << " " << c1_y - LSTRANGE << endl;
       }
     if (this->CanvasOutlineStyle & 
         vtkKWParameterValueFunctionEditor::CanvasOutlineStyleRightSide)
       {
       tk_cmd << canv << " coords framefg_r " 
-             << c2_x << " " << c2_y << " " 
+             << c2_x << " " << c2_y + 1 - LSTRANGE << " " 
              << c2_x << " " << c1_y - LSTRANGE << endl;
       }
     if (this->CanvasOutlineStyle & 
         vtkKWParameterValueFunctionEditor::CanvasOutlineStyleTopSide)
       {
       tk_cmd << canv << " coords framefg_t " 
-             << c2_x << " " << c1_y << " " 
+             << c2_x + 1 - LSTRANGE << " " << c1_y << " " 
              << c1_x - LSTRANGE << " " << c1_y << endl;
       }
     if (this->CanvasOutlineStyle & 
         vtkKWParameterValueFunctionEditor::CanvasOutlineStyleBottomSide)
       {
       tk_cmd << canv << " coords framefg_b " 
-             << c2_x << " " << c2_y << " " 
+             << c2_x + 1 - LSTRANGE << " " << c2_y << " " 
              << c1_x - LSTRANGE << " " << c2_y << endl;
       }
     }
