@@ -22,7 +22,7 @@
 #include "vtkMultiProcessController.h"
 #include "vtkPolyData.h"
 
-vtkCxxRevisionMacro(vtkDuplicatePolyData, "1.2.2.2");
+vtkCxxRevisionMacro(vtkDuplicatePolyData, "1.2.2.3");
 vtkStandardNewMacro(vtkDuplicatePolyData);
 
 vtkCxxSetObjectMacro(vtkDuplicatePolyData,Controller, vtkMultiProcessController);
@@ -279,9 +279,11 @@ void vtkDuplicatePolyData::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "Controller: (" << this->Controller << ")\n";
 
   os << indent << "Schedule:\n";
+
+  indent = indent.GetNextIndent();
   for (i = 0; i < this->NumberOfProcesses; ++i)
     {
-    os << indent.GetNextIndent() << i << ": ";
+    os << indent << i << ": ";
     if (this->Schedule[i][0] >= 0)
       {
       os << this->Schedule[i][0];
