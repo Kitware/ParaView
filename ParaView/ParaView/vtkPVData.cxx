@@ -114,6 +114,7 @@ vtkPVData::vtkPVData()
   this->CollectTclName = NULL;
   this->LODCollectTclName = NULL;
   this->CubeAxesTclName = NULL;
+  this->UpdateSupressorTclName = NULL;
 
   // Create a unique id for creating tcl names.
   ++instanceCount;
@@ -347,6 +348,15 @@ vtkPVData::~vtkPVData()
     this->SetGeometryTclName(NULL);
     }
 
+  if (this->UpdateSupressorTclName)
+    {
+    if ( pvApp )
+      {
+      pvApp->BroadcastScript("%s Delete", this->UpdateSupressorTclName);
+      }
+    this->SetUpdateSupressorTclName(NULL);
+    }
+
   if (this->CollectTclName)
     {
     if ( pvApp )
@@ -427,18 +437,21 @@ void vtkPVData::CreateParallelTclObjects(vtkPVApplication *pvApp)
   pvApp->BroadcastScript("%s SetEndMethod {Application LogEndEvent "
 			 "{Execute Geometry}}", this->GeometryTclName);
 
+  sprintf(tclName, "UpdateSupressor%d", this->InstanceCount);
+  pvApp->BroadcastScript("vtkPVUpdateSupressor %s", tclName);
+  this->SetUpdateSupressorTclName(tclName);
 
 #ifdef VTK_USE_MPI
-  //sprintf(tclName, "Collect%d", this->InstanceCount);
-  //pvApp->BroadcastScript("vtkCollectPolyData %s", tclName);
-  //this->SetCollectTclName(tclName);
-  //pvApp->BroadcastScript("%s SetInput [%s GetOutput]", 
-  //                       this->CollectTclName, this->GeometryTclName);
-
-  //pvApp->BroadcastScript("%s SetStartMethod {Application LogStartEvent "
-  //			 "{Execute Collect}}", this->CollectTclName);
-  //pvApp->BroadcastScript("%s SetEndMethod {Application LogEndEvent "
-  //			 "{Execute Collect}}", this->CollectTclName);
+  sprintf(tclName, "Collect%d", this->InstanceCount);
+  pvApp->BroadcastScript("vtkCollectPolyData %s", tclName);
+  this->SetCollectTclName(tclName);
+  pvApp->BroadcastScript("%s SetInput [%s GetOutput]", 
+                         this->CollectTclName, this->GeometryTclName);
+  
+  pvApp->BroadcastScript("%s SetStartMethod {Application LogStartEvent "
+  			 "{Execute Collect}}", this->CollectTclName);
+  pvApp->BroadcastScript("%s SetEndMethod {Application LogEndEvent "
+  			 "{Execute Collect}}", this->CollectTclName);
 #endif
 
   // Get rid of previous object created by the superclass.
@@ -456,16 +469,22 @@ void vtkPVData::CreateParallelTclObjects(vtkPVApplication *pvApp)
 
   pvApp->BroadcastScript("%s UseLookupTableScalarRangeOn", this->MapperTclName);
   pvApp->BroadcastScript("%s SetColorModeToMapScalars", this->MapperTclName);
+
   if (this->CollectTclName)
     {
-    pvApp->BroadcastScript("%s SetInput [%s GetOutput]", this->MapperTclName,
+    pvApp->BroadcastScript("%s SetInput [%s GetOutput]", 
+			   this->UpdateSupressorTclName,
 			   this->CollectTclName);
     }
   else
     {
-    pvApp->BroadcastScript("%s SetInput [%s GetOutput]", this->MapperTclName,
+    pvApp->BroadcastScript("%s SetInput [%s GetOutput]", 
+			   this->UpdateSupressorTclName,
 			   this->GeometryTclName);
     }
+
+  pvApp->BroadcastScript("%s SetInput [%s GetOutput]", this->MapperTclName,
+			 this->UpdateSupressorTclName);
   
   
   sprintf(tclName, "LODDeci%d", this->InstanceCount);
@@ -477,7 +496,7 @@ void vtkPVData::CreateParallelTclObjects(vtkPVApplication *pvApp)
   pvApp->BroadcastScript("%s SetEndMethod {Application LogEndEvent {Execute Decimate}}", 
                          this->LODDeciTclName);
   pvApp->BroadcastScript("%s SetInput [%s GetOutput]", 
-                         this->LODDeciTclName, this->GeometryTclName);
+                         this->LODDeciTclName, this->UpdateSupressorTclName);
   pvApp->BroadcastScript("%s CopyCellDataOn", this->LODDeciTclName);
   pvApp->BroadcastScript("%s UseInputPointsOn", this->LODDeciTclName);
   pvApp->BroadcastScript("%s UseInternalTrianglesOff", this->LODDeciTclName);
@@ -537,6 +556,8 @@ void vtkPVData::CreateParallelTclObjects(vtkPVApplication *pvApp)
     {
     this->Script("%s SetNumberOfPieces 0",this->MapperTclName);
     this->Script("%s SetPiece 0", this->MapperTclName);
+    this->Script("%s SetUpdateNumberOfPieces 0",this->UpdateSupressorTclName);
+    this->Script("%s SetUpdatePiece 0", this->UpdateSupressorTclName);
     this->Script("%s SetNumberOfPieces 0", this->LODMapperTclName);
     this->Script("%s SetPiece 0", this->LODMapperTclName);
     for (id = 1; id < numProcs; ++id)
@@ -544,6 +565,10 @@ void vtkPVData::CreateParallelTclObjects(vtkPVApplication *pvApp)
       pvApp->RemoteScript(id, "%s SetNumberOfPieces %d",
                           this->MapperTclName, debugNum-1);
       pvApp->RemoteScript(id, "%s SetPiece %d", this->MapperTclName, id-1);
+      pvApp->RemoteScript(id, "%s SetUpdateNumberOfPieces %d",
+                          this->UpdateSupressorTclName, debugNum-1);
+      pvApp->RemoteScript(id, "%s SetUpdatePiece %d", 
+			  this->UpdateSupressorTclName, id-1);
       pvApp->RemoteScript(id, "%s SetNumberOfPieces %d",
                           this->LODMapperTclName, debugNum-1);
       pvApp->RemoteScript(id, "%s SetPiece %d", this->LODMapperTclName, id-1);
@@ -558,12 +583,26 @@ void vtkPVData::CreateParallelTclObjects(vtkPVApplication *pvApp)
     for (id = 0; id < numProcs; ++id)
       {
       pvApp->RemoteScript(id, "%s SetNumberOfPieces %d",
-			    this->MapperTclName, debugNum);
+			  this->MapperTclName, debugNum);
       pvApp->RemoteScript(id, "%s SetPiece %d", this->MapperTclName, id);
+      pvApp->RemoteScript(id, "%s SetUpdateNumberOfPieces %d",
+			  this->UpdateSupressorTclName, debugNum);
+      pvApp->RemoteScript(id, "%s SetUpdatePiece %d", 
+			  this->UpdateSupressorTclName, id);
       pvApp->RemoteScript(id, "%s SetNumberOfPieces %d",
-		  	this->LODMapperTclName, debugNum);
+			  this->LODMapperTclName, debugNum);
       pvApp->RemoteScript(id, "%s SetPiece %d", this->LODMapperTclName, id);
       }
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVData::ForceUpdate(vtkPVApplication* pvApp)
+{
+  if ( this->UpdateSupressorTclName )
+    {
+    cout << "Force update on " << this->UpdateSupressorTclName << endl;
+    pvApp->BroadcastScript("%s ForceUpdate", this->UpdateSupressorTclName);
     }
 }
 
@@ -1207,6 +1246,7 @@ void vtkPVData::UpdateProperties()
   char *str = new char[strlen(this->GetVTKDataTclName()) + 80];
   sprintf(str, "Accept: %s", this->GetVTKDataTclName());
   vtkTimerLog::MarkStartEvent(str);
+  pvApp->BroadcastScript("%s ForceUpdate", this->UpdateSupressorTclName);
   pvApp->BroadcastScript("%s Update", this->MapperTclName);
   // Get bounds to time completion (not just triggering) of update.
   this->GetBounds(bounds);

@@ -1085,6 +1085,25 @@ void vtkPVRenderView::StartRender()
   this->GetComposite()->SetReductionFactor((int)newReductionFactor);
 }
 
+void vtkPVRenderView::UpdateAllPVData()
+{
+  vtkPVWindow* pvwindow = this->GetPVWindow();
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  vtkPVSourceCollection* col = 0;
+  //cout << "Update all PVData" << endl;
+  col = pvwindow->GetSourceList("RenderingSources");
+  if ( col )
+    {
+    col->InitTraversal();
+    vtkPVSource* source = 0;
+    while ( (source = col->GetNextPVSource()) )
+      {
+      vtkPVData* data = source->GetPVOutput();
+      data->ForceUpdate(pvApp);
+      }
+    }
+}
+
 //----------------------------------------------------------------------------
 void vtkPVRenderView::Render()
 {
@@ -1092,6 +1111,8 @@ void vtkPVRenderView::Render()
   int abort;
 
   this->Update();
+
+  this->UpdateAllPVData();
 
   this->RenderWindow->SetDesiredUpdateRate(this->InteractiveUpdateRate);
   //this->RenderWindow->SetDesiredUpdateRate(20.0);

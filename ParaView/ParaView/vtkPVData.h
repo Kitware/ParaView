@@ -325,6 +325,8 @@ public:
   void GetArrayComponentRange(float *range, int pointDataFlag,
                               const char *arrayName, int component);
 
+  void ForceUpdate(vtkPVApplication* pvApp);
+
   // Description:
   // Tells PVData to only use the data in the first
   // process to render and to compute array ranges etc.
@@ -417,6 +419,9 @@ protected:
   
   char *GeometryTclName;
   vtkSetStringMacro(GeometryTclName);
+
+  char *UpdateSupressorTclName;
+  vtkSetStringMacro(UpdateSupressorTclName);
   
   char *CollectTclName;
   vtkSetStringMacro(CollectTclName);

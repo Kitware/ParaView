@@ -262,6 +262,8 @@ protected:
 
   void CalculateBBox(char* name, int bbox[4]);
 
+  void UpdateAllPVData();
+
   int Interactive;
 
   int UseReductionFactor;

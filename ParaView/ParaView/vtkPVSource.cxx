@@ -896,6 +896,7 @@ void vtkPVSource::DeleteCallback()
   
   // This should delete this source.
   this->GetPVWindow()->RemovePVSource("Sources", this);
+  this->GetPVWindow()->RemovePVSource("RenderingSources", this);
 }
 
 //----------------------------------------------------------------------------
