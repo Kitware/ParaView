@@ -141,7 +141,11 @@ public:
     ShiftMiddleMouseOptionChangedEvent,
     ShiftRightMouseOptionChangedEvent,
     TransferFunctionsChangedEvent,
-    TransferFunctionsChangingEvent
+    TransferFunctionsChangingEvent,
+    ContourAnnotationAddEvent,
+    ContourAnnotationRemoveEvent,
+    ContourAnnotationChangeColorEvent,
+    ContourAnnotationChangeThicknessEvent
   };
 
 private:
