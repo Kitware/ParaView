@@ -58,7 +58,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVColorMap);
-vtkCxxRevisionMacro(vtkPVColorMap, "1.11");
+vtkCxxRevisionMacro(vtkPVColorMap, "1.12");
 
 int vtkPVColorMapCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -919,8 +919,12 @@ void vtkPVColorMap::ColorRangeEntryCallback()
 void vtkPVColorMap::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
-  os << indent << "ScalarBarTitle: " << this->ScalarBarTitle << endl;
-  os << indent << "ArrayName: " << this->ArrayName << endl;
+  os << indent << "ScalarBarTitle: " 
+     << (this->ScalarBarTitle ? this->ScalarBarTitle : "none" )
+     << endl;
+  os << indent << "ArrayName: " 
+     << (this->ArrayName ? this->ArrayName : "none" )
+     << endl;
   os << indent << "VectorComponent: " << this->VectorComponent << endl;
   os << indent << "LookupTableTclName: " 
      << (this->LookupTableTclName ? this->LookupTableTclName : "none" )
