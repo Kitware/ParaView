@@ -1,6 +1,6 @@
 PLATFORM="sparc-sunos57-static"
-CC="gcc"
-CXX="c++"
+CC="/disk2/home/hoffman/gcc322-install/bin/gcc"
+CXX="/disk2/home/hoffman/gcc322-install/bin/c++"
 CMAKE="/space/berk/Dashboards/CMake-CC/bin/cmake"
 DISPLAY=:0.0
 export DISPLAY
