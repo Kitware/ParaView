@@ -99,6 +99,7 @@ public:
   // Description:
   // Set the current entry of this optionmenu
   void SetCurrentEntry(const char *name);
+  void SetCurrentImageEntry(const char *image_name);
 
   // Description
   // Set the indicator On/Off. To be called after creation.

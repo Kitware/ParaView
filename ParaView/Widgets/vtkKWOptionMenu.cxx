@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWOptionMenu );
-vtkCxxRevisionMacro(vtkKWOptionMenu, "1.19");
+vtkCxxRevisionMacro(vtkKWOptionMenu, "1.20");
 
 //-----------------------------------------------------------------------------
 vtkKWOptionMenu::vtkKWOptionMenu()
@@ -101,6 +101,13 @@ void vtkKWOptionMenu::SetCurrentEntry(const char *name)
 }
  
 //-----------------------------------------------------------------------------
+void vtkKWOptionMenu::SetCurrentImageEntry(const char *image_name)
+{ 
+  this->Script("%s configure -image %s", this->GetWidgetName(), image_name);
+  this->SetValue(image_name);
+}
+ 
+//-----------------------------------------------------------------------------
 void vtkKWOptionMenu::AddEntry(const char *name)
 {
   if (this->Application)
@@ -139,8 +146,8 @@ void vtkKWOptionMenu::AddImageEntryWithCommand(const char *imageName,
                                                const char *options)
 {
   this->Script(
-    "%s add radiobutton -image %s -selectimage %s -variable %sValue -command {%s %s} %s",
-    this->Menu->GetWidgetName(), imageName, imageName,
+    "%s add radiobutton -image %s -selectimage %s -label {%s} -variable %sValue -command {%s %s} %s",
+    this->Menu->GetWidgetName(), imageName, imageName, imageName,
     this->GetWidgetName(), obj, method, (options ? options : ""));
 }
 
