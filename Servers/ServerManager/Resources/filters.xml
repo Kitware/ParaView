@@ -647,7 +647,7 @@
         name="SelectInputScalars" 
         command="SelectInputScalars" 
         number_of_elements="1"> 
-           <ArrayListDomain name="array_list">
+           <ArrayListDomain name="array_list" attribute_type="Scalars">
              <RequiredProperties>
                 <Property name="Input" function="Input"/>
              </RequiredProperties>
@@ -685,7 +685,7 @@
         name="SelectInputScalars" 
         command="SelectInputScalars" 
         number_of_elements="1"> 
-           <ArrayListDomain name="array_list">
+           <ArrayListDomain name="array_list" attribute_type="Scalars">
              <RequiredProperties>
                 <Property name="Input" function="Input"/>
              </RequiredProperties>
@@ -864,7 +864,7 @@
         name="SelectInputScalars" 
         command="SelectInputScalars" 
         number_of_elements="1"> 
-           <ArrayListDomain name="array_list">
+           <ArrayListDomain name="array_list" attribute_type="Scalars">
              <RequiredProperties>
                 <Property name="Input" function="Input"/>
              </RequiredProperties>
@@ -1198,7 +1198,7 @@
         name="SelectInputScalars" 
         command="SelectInputScalars" 
         number_of_elements="1"> 
-           <ArrayListDomain name="array_list">
+           <ArrayListDomain name="array_list" attribute_type="Scalars">
              <RequiredProperties>
                 <Property name="Input" function="Input"/>
              </RequiredProperties>
@@ -1209,7 +1209,7 @@
         name="SelectInputVectors" 
         command="SelectInputVectors" 
         number_of_elements="1"> 
-           <ArrayListDomain name="array_list">
+           <ArrayListDomain name="array_list" attribute_type="Vectors">
              <RequiredProperties>
                 <Property name="Input" function="Input"/>
              </RequiredProperties>
@@ -1536,7 +1536,7 @@
         name="SelectInputScalars" 
         command="SelectInputScalars" 
         number_of_elements="1"> 
-           <ArrayListDomain name="array_list">
+           <ArrayListDomain name="array_list" attribute_type="Scalars">
              <RequiredProperties>
                 <Property name="Input" function="Input"/>
              </RequiredProperties>
@@ -1677,7 +1677,7 @@
         name="SelectInputScalars" 
         command="SelectInputScalars" 
         number_of_elements="1"> 
-           <ArrayListDomain name="array_list">
+           <ArrayListDomain name="array_list" attribute_type="Scalars">
              <RequiredProperties>
                 <Property name="Input" function="Input"/>
              </RequiredProperties>
@@ -1733,7 +1733,7 @@
         name="SelectInputScalars" 
         command="SelectInputScalars" 
         number_of_elements="1"> 
-           <ArrayListDomain name="array_list">
+           <ArrayListDomain name="array_list" attribute_type="Scalars">
              <RequiredProperties>
                 <Property name="Input" function="Input"/>
                 <Property name="AttributeMode" function="FieldDataSelection"/>
@@ -1786,7 +1786,7 @@
         name="SelectInputScalars" 
         command="SelectInputScalars" 
         number_of_elements="1"> 
-          <ArrayListDomain name="array_list">
+          <ArrayListDomain name="array_list" attribute_type="Scalars">
             <RequiredProperties>
                <Property name="Input" function="Input"/>
             </RequiredProperties>
@@ -1864,7 +1864,7 @@
         name="SelectInputScalars" 
         command="SelectInputScalars" 
         number_of_elements="1"> 
-           <ArrayListDomain name="array_list">
+           <ArrayListDomain name="array_list" attribute_type="Scalars">
              <RequiredProperties>
                 <Property name="Input" function="Input"/>
              </RequiredProperties>
@@ -1875,7 +1875,7 @@
         name="SelectInputVectors" 
         command="SelectInputVectors" 
         number_of_elements="1"> 
-           <ArrayListDomain name="array_list">
+           <ArrayListDomain name="array_list" attribute_type="Vectors">
              <RequiredProperties>
                 <Property name="Input" function="Input"/>
              </RequiredProperties>
@@ -2024,7 +2024,7 @@
         name="SelectInputVectors" 
         command="SelectInputVectors" 
         number_of_elements="1"> 
-           <ArrayListDomain name="array_list">
+           <ArrayListDomain name="array_list" attribute_type="Vectors">
              <RequiredProperties>
                 <Property name="Input" function="Input"/>
              </RequiredProperties>
