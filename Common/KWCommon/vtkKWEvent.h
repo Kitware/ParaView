@@ -116,6 +116,8 @@ class VTK_EXPORT vtkKWEvent
     NotebookRaisePageEvent,
     NotebookShowPageEvent,
     NotebookUnpinPageEvent,
+    ObjectNameChangedEvent,
+    ObjectSetChangedEvent,
     ObjectStateChangedEvent,
     ObliqueProbeColorChangedEvent,
     ObliqueProbeMovementEvent,

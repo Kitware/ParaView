@@ -106,6 +106,8 @@ static const char *vtkKWEventStrings[] = {
   "NotebookRaisePageEvent",
   "NotebookShowPageEvent",
   "NotebookUnpinPageEvent",
+  "ObjectNameChangedEvent",
+  "ObjectSetChangedEvent",
   "ObjectStateChangedEvent",
   "ObliqueProbeColorChangedEvent",
   "ObliqueProbeMovementEvent",
