@@ -1,0 +1,120 @@
+SOURCE_FILES( ParaView_SRCS
+vtkCameraInteractor 
+vtkCutMaterial 
+vtkImageOutlineFilter 
+vtkInteractor 
+vtkKWBoundsDisplay
+vtkKWCenterOfRotation 
+vtkKWFlyInteractor 
+vtkKWInteractor 
+vtkKWRotateCameraInteractor 
+vtkKWSelectPointInteractor
+vtkKWTranslateCameraInteractor 
+vtkPVActorComposite 
+vtkPVAnimationInterface
+vtkPVApplication 
+vtkPVArrayCalculator 
+vtkPVClipPlane
+vtkPVCutPlane
+vtkPVContour 
+vtkPVData 
+vtkPVDataSetReaderInterface 
+vtkPVEnSightReaderInterface 
+vtkPVExtentTranslator 
+vtkPVGeometryFilter
+vtkPVGlyph3D 
+vtkPVInputMenu 
+vtkPVLODActor
+vtkPVMethodInterface 
+vtkPVProbe
+vtkPVRenderView 
+vtkPVSelectionList 
+vtkPVSource 
+vtkPVSourceInterface 
+vtkPVSourceInterfaceParser
+vtkPVThreshold 
+vtkPVTreeComposite 
+vtkPVWindow 
+vtkPVWorldPointPicker 
+vtkSimpleFieldDataToAttributeDataFilter 
+vtkStringList 
+)
+
+WRAP_EXCLUDE_FILES(
+vtkPVSourceInterfaceParser
+)
+
+VTK_WRAP_TCL(vtkKWParaViewTCL ParaViewTCL_SRCS ParaView_SRCS)
+ADD_LIBRARY(vtkKWParaViewTCL ParaViewTCL_SRCS ParaView_SRCS)
+
+CONFIGURE_FILE(${PARAVIEW_SOURCE_DIR}/ParaView/vtkPVSourceInterfaceDirectories.h.in
+               ${PARAVIEW_BINARY_DIR}/ParaView/vtkPVSourceInterfaceDirectories.h
+               ESCAPE_QUOTES)
+INCLUDE_DIRECTORIES(${PARAVIEW_BINARY_DIR}/ParaView)
+
+INCLUDE_DIRECTORIES(${EXPAT_SOURCE_DIR}/xmlparse)
+
+IF (TK_LIBRARY)
+  LINK_LIBRARIES (${TK_LIBRARY})
+ENDIF (TK_LIBRARY)
+
+IF (WIN32)
+  LINK_LIBRARIES( wsock32 )
+ENDIF (WIN32)
+
+ADD_EXECUTABLE(ParaView WIN32 ParaView) 
+
+LINK_LIBRARIES ( ${OPENGL_LIBRARY} )				    
+LINK_LIBRARIES( png zlib vtkjpeg )
+INCLUDE_DIRECTORIES(${OPENGL_INCLUDE_PATH})
+
+IF (VTK_MANGLE_MESA)
+  IF (MESA_INCLUDE_PATH)
+    INCLUDE_DIRECTORIES(${MESA_INCLUDE_PATH})
+  ENDIF(MESA_INCLUDE_PATH)     
+  LINK_LIBRARIES (${MESA_LIBRARY})
+ENDIF(VTK_MANGLE_MESA)
+
+IF(CMAKE_HAS_X)
+   LINK_LIBRARIES(-lXt)
+   LINK_LIBRARIES(${CMAKE_X_LIBS})
+   ADD_DEFINITIONS(${CMAKE_X_CFLAGS})
+ENDIF(CMAKE_HAS_X)
+
+IF (WIN32)
+  IF (TK_XLIB_PATH)
+    INCLUDE_DIRECTORIES(${TK_XLIB_PATH})
+  ENDIF (TK_XLIB_PATH) 
+ENDIF (WIN32)
+
+LINK_LIBRARIES (vtkKWWidgetsTCL 
+                vtkCommonTCL 
+                vtkFilteringTCL   
+                vtkGraphicsTCL 
+                vtkImagingTCL 
+                vtkRenderingTCL
+                vtkParallelTCL
+		vtkHybridTCL
+                vtkIOTCL
+                vtkCommon 
+                vtkFiltering
+                vtkImaging
+                vtkGraphics
+                vtkIO
+                vtkRendering
+                vtkParallel
+                vtkHybrid
+                ${TCL_LIBRARY} 
+                ${TK_LIBRARY})
+
+
+IF (VTK_USE_PATENTED)
+ LINK_LIBRARIES(vtkPatentedTCL vtkPatented)
+ENDIF (VTK_USE_PATENTED)
+
+LINK_LIBRARIES (Expat)
+
+TARGET_LINK_LIBRARIES (ParaView
+                       vtkKWParaViewTCL)
+
+
