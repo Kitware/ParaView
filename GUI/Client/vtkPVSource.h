@@ -277,7 +277,7 @@ public:
   // Description:
   // Saves the pipeline in a ParaView script.  This is similar
   // to saveing a trace, except only the last state is stored.
-  virtual void SaveState(ofstream *file);
+  virtual void SaveState(ofstream *file, int pass);
 
   // Description:
   // Make the Accept button turn green/white when one of the parameters 
@@ -521,13 +521,11 @@ public:
   // Calls UpdateVTKObjects on the proxy as well as on all widgets.
   virtual void UpdateVTKObjects();
   
-//BTX  
   // Description:
   // Source keeps the part display, because the DisplayGUI
   // is shared between all sources.
   void SetPartDisplay(vtkSMPartDisplay* pdisp);
   vtkGetObjectMacro(PartDisplay, vtkSMPartDisplay);
-//ETX
 
 protected:
   vtkPVSource();

@@ -68,7 +68,7 @@
 
 
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.386");
+vtkCxxRevisionMacro(vtkPVSource, "1.387");
 vtkCxxSetObjectMacro(vtkPVSource,Notebook,vtkKWNotebook);
 vtkCxxSetObjectMacro(vtkPVSource,InformationGUI,vtkPVInformationGUI);
 vtkCxxSetObjectMacro(vtkPVSource,DisplayGUI,vtkPVDisplayGUI);
@@ -2083,10 +2083,16 @@ void vtkPVSource::SaveFilterInBatchScript(ofstream *file)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVSource::SaveState(ofstream *file)
+void vtkPVSource::SaveState(ofstream *file, int pass)
 {
   int i, numWidgets;
   vtkPVWidget *pvw;
+
+  if (pass == 2)
+    {
+    *file << "$kw(" << this->GetTclName() << ") SetVisibility " 
+          << this->GetVisibility() << endl;
+    }
 
   // Detect if this source is in Glyph sourcesm and already exists.
   if (this->GetTraceReferenceCommand())
@@ -2096,12 +2102,6 @@ void vtkPVSource::SaveState(ofstream *file)
           << this->GetTraceReferenceCommand() << "]\n";
     return;
     }
-
-  // Detect special sources we do not handle yet.
-//  if (this->GetVTKSource() == NULL)
-//    {
-//    return;
-//    }
 
   // This should not be needed, but We can check anyway.
   if (this->VisitedFlag)
@@ -2116,7 +2116,7 @@ void vtkPVSource::SaveState(ofstream *file)
     {
     if (this->PVInputs[i] && this->PVInputs[i]->GetVisitedFlag() != 2)
       {
-      this->PVInputs[i]->SaveState(file);
+      this->PVInputs[i]->SaveState(file, pass);
       }
     }
   
@@ -2154,9 +2154,41 @@ void vtkPVSource::SaveState(ofstream *file)
   // Call accept.
   *file << "$kw(" << this->GetTclName() << ") AcceptCallback" << endl;
 
-  // What about visibility?  
-  // A second pass to set visibility?
-  // Can we disable rendering and changing input visibility?
+  // Set the color map here for simplicity.
+  if (this->PVColorMap)
+    {
+    if (this->GetPartDisplay()->GetColorField() == vtkDataSet::POINT_DATA_FIELD)
+      {
+      *file << "[$kw(" << this->GetTclName()
+            << ") GetPVOutput] ColorByPointField {" 
+            << this->PVColorMap->GetArrayName() << "} " 
+            << this->PVColorMap->GetNumberOfVectorComponents() << endl;
+      }
+    if (this->GetPartDisplay()->GetColorField() == vtkDataSet::CELL_DATA_FIELD)
+      {
+      *file << "[$kw(" << this->GetTclName()
+            << ") GetPVOutput] ColorByCellField {" 
+            << this->PVColorMap->GetArrayName() << "} " 
+            << this->PVColorMap->GetNumberOfVectorComponents() << endl;
+      }
+    }
+  else
+    {
+    *file << "[$kw(" << this->GetTclName()
+          << ") GetPVOutput] ColorByProperty\n";
+    }
+  // Save the options from the display GUI.
+  char dispTclName[512];
+  sprintf(dispTclName, "$pvDisp(%s)", this->GetTclName());
+  *file << "set " << dispTclName+1 
+        << " [$kw(" << this->GetTclName() << ") GetPartDisplay]" << endl;
+  this->GetPartDisplay()->SaveState(file, dispTclName);
+  
+
+  // Make sure the GUI is upto date.  
+  *file << "[$kw(" << this->GetTclName()
+        << ") GetPVOutput] Update\n"; 
+  
 }
 
 //----------------------------------------------------------------------------
