@@ -25,7 +25,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMProperty);
-vtkCxxRevisionMacro(vtkSMProperty, "1.3");
+vtkCxxRevisionMacro(vtkSMProperty, "1.4");
 
 struct vtkSMPropertyInternals
 {
@@ -85,10 +85,10 @@ void vtkSMProperty::AppendCommandToStream(
 //---------------------------------------------------------------------------
 int vtkSMProperty::ReadXMLAttributes(vtkPVXMLElement* element)
 {
-  const char* name = element->GetAttribute("name");
-  if(name) 
+  const char* xmlname = element->GetAttribute("name");
+  if(xmlname) 
     { 
-    this->SetXMLName(name); 
+    this->SetXMLName(xmlname); 
     }
 
   const char* command = element->GetAttribute("command");
