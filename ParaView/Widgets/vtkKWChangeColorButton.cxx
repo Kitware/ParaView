@@ -48,7 +48,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWChangeColorButton );
-vtkCxxRevisionMacro(vtkKWChangeColorButton, "1.21");
+vtkCxxRevisionMacro(vtkKWChangeColorButton, "1.22");
 
 
 int vtkKWChangeColorButtonCommand(ClientData cd, Tcl_Interp *interp,
@@ -124,7 +124,7 @@ void vtkKWChangeColorButton::Create(vtkKWApplication *app, const char *args)
            (int)(this->Color[1]*255.5), 
            (int)(this->Color[2]*255.5) );
 
-  this->Script("frame %s -relief raised -bd 2 %s", wname, args);
+  this->Script("frame %s -relief raised -bd 2 %s", wname, args?args:"");
   this->Label1->SetParent(this);
   this->Label1->Create(this->Application,0);
   this->Label1->SetLabel(this->Text);
@@ -268,7 +268,7 @@ void vtkKWChangeColorButton::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWChangeColorButton ";
-  this->ExtractRevision(os,"$Revision: 1.21 $");
+  this->ExtractRevision(os,"$Revision: 1.22 $");
 }
 
 //----------------------------------------------------------------------------
