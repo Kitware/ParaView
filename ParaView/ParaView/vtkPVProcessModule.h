@@ -55,7 +55,7 @@ class vtkPVApplication;
 class vtkPVDataInformation;
 class vtkMapper;
 class vtkSource;
-
+class vtkStringList;
 
 class VTK_EXPORT vtkPVProcessModule : public vtkKWObject
 {
@@ -129,11 +129,24 @@ public:
 //ETX
   virtual void  RootSimpleScript(const char *str);
   virtual char* NewRootResult();
-
+  
+  // Description:
+  // Set the application instance for this class.
+  virtual void SetApplication (vtkKWApplication* arg);
+  
+  // Description:
+  // Get a directory listing for the given directory.
+  void GetDirectoryListing(const char* dir, vtkStringList* dirs,
+                           vtkStringList* files);
+  virtual void GetDirectoryListing(const char* dir, vtkStringList* dirs,
+                                   vtkStringList* files, const char* perm);
+  
 protected:
   vtkPVProcessModule();
   ~vtkPVProcessModule();
 
+  void InitializeTclMethodImplementations();
+  
   vtkMultiProcessController *Controller;
   vtkPVDataInformation *TemporaryInformation;
 

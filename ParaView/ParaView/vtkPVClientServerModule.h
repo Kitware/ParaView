@@ -128,7 +128,12 @@ public:
   // Getting the result returns a string which has to be deleted.
   virtual void  RootSimpleScript(const char *str);
   virtual char* NewRootResult();
-
+  
+  // Description:
+  // Get a directory listing for the given directory.  This
+  // implementation will always give a listing on the server side.
+  virtual void GetDirectoryListing(const char* dir, vtkStringList* dirs,
+                                   vtkStringList* files, const char* perm);
 protected:
   vtkPVClientServerModule();
   ~vtkPVClientServerModule();

@@ -60,9 +60,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkUnsignedShortArray.h"
 #include "vtkMapper.h"
 #include "vtkString.h"
+#include "vtkTclUtil.h"
 #include "vtkPVPart.h"
 
-
+int vtkStringListCommand(ClientData cd, Tcl_Interp *interp,
+                         int argc, char *argv[]);
 
 struct vtkPVArgs
 {
@@ -74,7 +76,7 @@ struct vtkPVArgs
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProcessModule);
-vtkCxxRevisionMacro(vtkPVProcessModule, "1.7");
+vtkCxxRevisionMacro(vtkPVProcessModule, "1.8");
 
 int vtkPVProcessModuleCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -117,6 +119,9 @@ int vtkPVProcessModule::Start(int argc, char **argv)
 #endif // PV_HAVE_TRAPS_FOR_SIGNALS
   app->SetProcessModule(this);
   app->Script("wm withdraw .");
+
+  this->InitializeTclMethodImplementations();
+  
   app->Start(argc,argv);
 
   return app->GetExitStatus();
@@ -392,9 +397,76 @@ char* vtkPVProcessModule::NewRootResult()
   return str;
 }
 
+//----------------------------------------------------------------------------
+void vtkPVProcessModule::SetApplication(vtkKWApplication* arg)
+{
+  this->Superclass::SetApplication(arg);
+  this->InitializeTclMethodImplementations();
+}
 
+//----------------------------------------------------------------------------
+void vtkPVProcessModule::GetDirectoryListing(const char* dir,
+                                             vtkStringList* dirs,
+                                             vtkStringList* files)
+{
+  this->GetDirectoryListing(dir, dirs, files, "r w");
+}
 
+//----------------------------------------------------------------------------
+void vtkPVProcessModule::GetDirectoryListing(const char* dir,
+                                             vtkStringList* dirs,
+                                             vtkStringList* files,
+                                             const char* perm)
+{
+  char* result = vtkString::Duplicate(this->Application->Script(
+    "::paraview::vtkPVProcessModule::GetDirectoryListing {%s} {%s}",
+    dir, perm));
+  vtkTclGetObjectFromPointer(this->Application->GetMainInterp(), dirs,
+                             vtkStringListCommand);
+  char* dirsTcl = vtkString::Duplicate(
+    Tcl_GetStringResult(this->Application->GetMainInterp()));
+  vtkTclGetObjectFromPointer(this->Application->GetMainInterp(), files,
+                             vtkStringListCommand);
+  char* filesTcl = vtkString::Duplicate(
+    Tcl_GetStringResult(this->Application->GetMainInterp()));
+  this->Application->Script(
+    "::paraview::vtkPVProcessModule::ParseDirectoryListing {%s} {%s} {%s}",
+    result, dirsTcl, filesTcl
+    );
+  delete [] dirsTcl;
+  delete [] filesTcl;
+  delete [] result;
+}
 
+//----------------------------------------------------------------------------
+void vtkPVProcessModule::InitializeTclMethodImplementations()
+{
+  this->Application->Script(
+    "namespace eval ::paraview::vtkPVProcessModule {\n"
+    "  proc GetDirectoryListing { dir perm {exp {[A-Za-z0-9]*}} } {\n"
+    "    set files {}\n"
+    "    set dirs {}\n"
+    "    if {$dir != {}} { set cwd [pwd]; cd $dir }\n"
+    "    set entries [glob -nocomplain -type \"d f l $perm\" $exp]\n"
+    "    foreach f [lsort -dictionary $entries] {\n"
+    "      if {[file isfile $f]} {\n"
+    "        lappend files $f\n"
+    "      } elseif {[file isdirectory $f]} {\n"
+    "        lappend dirs $f\n"
+    "      }\n"
+    "    }\n"
+    "    if {$dir != {}} { cd $cwd }\n"
+    "    return [list $dirs $files]\n"
+    "  }\n"
+    "  proc ParseDirectoryListing { lst dirs files } {\n"
+    "    $dirs RemoveAllItems\n"
+    "    $files RemoveAllItems\n"
+    "    foreach f [lindex $lst 0] { $dirs AddString $f }\n"
+    "    foreach f [lindex $lst 1] { $files AddString $f }\n"
+    "  }\n"
+    "}\n"
+    );
+}
 
 //----------------------------------------------------------------------------
 void vtkPVProcessModule::PrintSelf(ostream& os, vtkIndent indent)

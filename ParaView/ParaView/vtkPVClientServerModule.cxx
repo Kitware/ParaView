@@ -62,6 +62,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkUnsignedShortArray.h"
 #include "vtkMapper.h"
 #include "vtkString.h"
+#include "vtkStringList.h"
+#include "vtkTclUtil.h"
 #ifdef VTK_USE_MPI
 #include "vtkMPIController.h"
 #include "vtkMPICommunicator.h"
@@ -69,6 +71,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endif
 
 #include "vtkPVPart.h"
+
+int vtkStringListCommand(ClientData cd, Tcl_Interp *interp,
+                         int argc, char *argv[]);
 
 #define VTK_PV_BROADCAST_SCRIPT_RMI_TAG      838422
 #define VTK_PV_REMOTE_SCRIPT_RMI_TAG         838427
@@ -149,7 +154,7 @@ void vtkPVRelayRemoteScript(void *localArg, void *remoteArg,
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVClientServerModule);
-vtkCxxRevisionMacro(vtkPVClientServerModule, "1.16");
+vtkCxxRevisionMacro(vtkPVClientServerModule, "1.17");
 
 int vtkPVClientServerModuleCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -794,4 +799,38 @@ void vtkPVClientServerModule::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "Controller: " << this->Controller << endl;;
   os << indent << "SocketController: " << this->SocketController << endl;;
   os << indent << "ClientMode: " << this->ClientMode << endl;
+}
+
+//----------------------------------------------------------------------------
+void vtkPVClientServerModule::GetDirectoryListing(const char* dir,
+                                                  vtkStringList* dirs,
+                                                  vtkStringList* files,
+                                                  const char* perm)
+{
+  if(this->ClientMode)
+    {
+    this->RootScript(
+      "::paraview::vtkPVProcessModule::GetDirectoryListing {%s} {%s}",
+      dir, perm);
+    char* result = result = this->NewRootResult();    
+    vtkTclGetObjectFromPointer(this->Application->GetMainInterp(), dirs,
+                               vtkStringListCommand);
+    char* dirsTcl = vtkString::Duplicate(
+      Tcl_GetStringResult(this->Application->GetMainInterp()));
+    vtkTclGetObjectFromPointer(this->Application->GetMainInterp(), files,
+                               vtkStringListCommand);
+    char* filesTcl = vtkString::Duplicate(
+      Tcl_GetStringResult(this->Application->GetMainInterp()));
+    this->Application->Script(
+      "::paraview::vtkPVProcessModule::ParseDirectoryListing {%s} {%s} {%s}",
+      result, dirsTcl, filesTcl
+      );
+    delete [] dirsTcl;
+    delete [] filesTcl;
+    delete [] result;
+    }
+  else
+    {
+    this->Superclass::GetDirectoryListing(dir, dirs, files, perm);
+    }
 }
