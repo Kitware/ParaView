@@ -124,7 +124,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.548");
+vtkCxxRevisionMacro(vtkPVWindow, "1.549");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -3051,8 +3051,7 @@ void vtkPVWindow::UpdateFilterMenu()
         {
         // Check if this is an appropriate filter by comparing
         // it's input type with the current data object's type.
-        if (proto && proto->GetInputProperty(0) &&
-            proto->GetInputProperty(0)->GetIsValidInput(this->CurrentPVSource, proto))
+        if (proto && proto->GetInputProperty(0) )
           {
           it->GetKey(key);
           const char* menuName = proto->GetMenuName();
@@ -3090,7 +3089,13 @@ void vtkPVWindow::UpdateFilterMenu()
                                      methodAndArgs.c_str(), 0,
                                      vi->second->GetShortHelp());
         }
-      if(vi->second->GetToolbarModule())
+      if (
+        !vi->second->GetInputProperty(0)->GetIsValidInput(
+          this->CurrentPVSource, vi->second) )
+        {
+        this->FilterMenu->SetState(ki->first.c_str(), vtkKWMenu::Disabled);
+        }
+      else if (vi->second->GetToolbarModule())
         {
         this->EnableToolbarButton(ki->second.c_str());
         }
@@ -4040,6 +4045,12 @@ void vtkPVWindow::ProcessErrorClick()
 {
   this->Superclass::ProcessErrorClick();
   this->ShowErrorLog();
+}
+
+//-----------------------------------------------------------------------------
+vtkCollection* vtkPVWindow::GetPVColorMaps()
+{
+  return this->PVColorMaps;
 }
 
 //-----------------------------------------------------------------------------
