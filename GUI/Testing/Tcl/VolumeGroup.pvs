@@ -54,6 +54,11 @@ $kw(vtkTemp783) SetValue 0.5
 $kw(vtkTemp743) AcceptCallback
 set kw(vtkTemp796) [$kw(vtkTemp743) GetPVOutput]
 $kw(vtkTemp796) ColorByPointField {RTData} 1
+
+set map [$kw(vtkTemp743) GetPVColorMap]
+$map SetScalarRangeLock 1
+# Now the scalar range should not grow with the data.
+
 set kw(vtkTemp890) [$kw(vtkTemp1) CreatePVSource RTAnalyticSource]
 set kw(vtkTemp896) [$kw(vtkTemp890) GetPVWidget {WholeExtent}]
 $kw(vtkTemp896) SetValue 2 10 -10 10 -10 10
