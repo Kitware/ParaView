@@ -95,6 +95,17 @@ file delete -force out.txt
 
 # might as well do the image comparison.
 
+# Retrace
+update
+Application StopRecordingScript
+[ Application GetMainWindow ] DeleteAllSources
+# Source the trace to regenerate the sources.
+if {[catch {set channel [open test.tmp w]}] == 0 } {
+   close $channel
+   file delete -force test.tmp
+   source "ParaViewTrace.pvs"
+}
+
 $kw(vtkTemp44) SetCameraState -1.425 1.244 7.301  -0.500 0.000 0.000  0.018 0.986 -0.166
 
 # Fix the size of the image.

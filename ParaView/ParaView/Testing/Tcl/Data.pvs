@@ -72,6 +72,17 @@ $kw(vtkTemp287) AmbientChanged
 
 [$kw(vtkTemp1) GetMainView] SetCameraState 4.145 5.676 5.818  0.124 -0.063 0.701  -0.232 0.733 -0.640
 
+# Retrace
+update
+Application StopRecordingScript
+[ Application GetMainWindow ] DeleteAllSources
+# Source the trace to regenerate the sources.
+if {[catch {set channel [open test.tmp w]}] == 0 } {
+   close $channel
+   file delete -force test.tmp
+   source "ParaViewTrace.pvs"
+}
+
 # Fix the size of the image.
 RenWin1 SetSize 300 300
 RenWin1 Render

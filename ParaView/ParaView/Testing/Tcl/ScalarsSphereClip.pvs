@@ -35,7 +35,16 @@ $kw(vtkTemp389) AcceptCallback
 [$kw(vtkTemp1) GetMainView] SetCameraState 53.415 25.363 36.925  0.000 0.000 0.000  -0.077 0.871 -0.486
 [$kw(vtkTemp1) GetMainView] SetCameraState 32.613 15.486 22.545  -20.802 -9.878 -14.380  -0.077 0.871 -0.486
 
-
+# Retrace
+update
+Application StopRecordingScript
+[ Application GetMainWindow ] DeleteAllSources
+# Source the trace to regenerate the sources.
+if {[catch {set channel [open test.tmp w]}] == 0 } {
+   close $channel
+   file delete -force test.tmp
+   source "ParaViewTrace.pvs"
+}
 
 # Fix the size of the image.
 RenWin1 SetSize 300 300

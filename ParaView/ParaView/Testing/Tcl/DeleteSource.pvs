@@ -47,6 +47,17 @@ $pvShrink AcceptCallback
 $pvShrink DeleteCallback
 
 
+# Retrace
+update
+Application StopRecordingScript
+[ Application GetMainWindow ] DeleteAllSources
+# Source the trace to regenerate the sources.
+if {[catch {set channel [open test.tmp w]}] == 0 } {
+   close $channel
+   file delete -force test.tmp
+   source "ParaViewTrace.pvs"
+}
+
 RenWin1 SetSize 250 250
 RenWin1 Render
 Application Exit
