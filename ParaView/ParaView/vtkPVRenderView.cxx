@@ -88,7 +88,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.213.2.6");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.213.2.7");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -173,22 +173,15 @@ vtkPVRenderView::vtkPVRenderView()
   this->CompositeWithRGBACheck = vtkKWCheckButton::New();
   this->CompositeCompressionCheck = vtkKWCheckButton::New();
 
-  this->ReductionCheck = vtkKWCheckButton::New();
-  this->FrameRateFrame = vtkKWWidget::New();
-  this->FrameRateLabel = vtkKWLabel::New();
-  this->FrameRateScale = vtkKWScale::New();
-
   this->LODFrame = vtkKWLabeledFrame::New();
  
-  this->LODThresholdFrame = vtkKWWidget::New();
+  this->LODScalesFrame = vtkKWWidget::New();
   this->LODThresholdLabel = vtkKWLabel::New();
   this->LODThresholdScale = vtkKWScale::New();
   this->LODThresholdValue = vtkKWLabel::New();
-  this->LODResolutionFrame = vtkKWWidget::New();
   this->LODResolutionLabel = vtkKWLabel::New();
   this->LODResolutionScale = vtkKWScale::New();
   this->LODResolutionValue = vtkKWLabel::New();
-  this->CollectThresholdFrame = vtkKWWidget::New();
   this->CollectThresholdLabel = vtkKWLabel::New();
   this->CollectThresholdScale = vtkKWScale::New();
   this->CollectThresholdValue = vtkKWLabel::New();
@@ -417,18 +410,9 @@ vtkPVRenderView::~vtkPVRenderView()
   this->ManipulatorControl2D->Delete();
   this->ManipulatorControl3D->Delete();
   
-  this->ReductionCheck->Delete();
-  this->ReductionCheck = NULL;
-  
-  this->FrameRateFrame->Delete();
-  this->FrameRateFrame = NULL;
-  this->FrameRateLabel->Delete();
-  this->FrameRateLabel = NULL;
-  this->FrameRateScale->Delete();
-  this->FrameRateScale = NULL;
+  this->LODScalesFrame->Delete();
+  this->LODScalesFrame = NULL;
 
-  this->LODThresholdFrame->Delete();
-  this->LODThresholdFrame = NULL;
   this->LODThresholdLabel->Delete();
   this->LODThresholdLabel = NULL;
   this->LODThresholdScale->Delete();
@@ -436,8 +420,6 @@ vtkPVRenderView::~vtkPVRenderView()
   this->LODThresholdValue->Delete();
   this->LODThresholdValue = NULL;
 
-  this->LODResolutionFrame->Delete();
-  this->LODResolutionFrame = NULL;
   this->LODResolutionLabel->Delete();
   this->LODResolutionLabel = NULL;
   this->LODResolutionScale->Delete();
@@ -445,8 +427,6 @@ vtkPVRenderView::~vtkPVRenderView()
   this->LODResolutionValue->Delete();
   this->LODResolutionValue = NULL;
 
-  this->CollectThresholdFrame->Delete();
-  this->CollectThresholdFrame = NULL;
   this->CollectThresholdLabel->Delete();
   this->CollectThresholdLabel = NULL;
   this->CollectThresholdScale->Delete();
@@ -506,8 +486,10 @@ void vtkPVRenderView::CreateRenderObjects(vtkPVApplication *pvApp)
   
   // Get rid of render window created by the superclass
   this->RenderWindow->Delete();
-  this->RenderWindow = (vtkRenderWindow*)pvApp->MakeTclObject("vtkRenderWindow", "RenWin1");
-  this->RenderWindow->AddObserver(vtkCommand::CursorChangedEvent, this->Observer);
+  this->RenderWindow = 
+    (vtkRenderWindow*)pvApp->MakeTclObject("vtkRenderWindow", "RenWin1");
+  this->RenderWindow->AddObserver(
+    vtkCommand::CursorChangedEvent, this->Observer);
 
   this->RenderWindowTclName = NULL;
   this->SetRenderWindowTclName("RenWin1");
@@ -519,21 +501,23 @@ void vtkPVRenderView::CreateRenderObjects(vtkPVApplication *pvApp)
     }
 
   // Create the compositer.
-  this->Composite = static_cast<vtkPVTreeComposite*>(pvApp->MakeTclObject("vtkPVTreeComposite", "TreeComp1"));
+  this->Composite = static_cast<vtkPVTreeComposite*>
+    (pvApp->MakeTclObject("vtkPVTreeComposite", "TreeComp1"));
 
   // Try using a more efficient compositer (if it exists).
   // This should be a part of a module.
-  pvApp->BroadcastScript("if {[catch {vtkCompressCompositer pvTmp}] == 0} {TreeComp1 SetCompositer pvTmp; pvTmp Delete}");
+  pvApp->BroadcastScript("if {[catch {vtkCompressCompositer pvTmp}] == 0} "
+                         "{TreeComp1 SetCompositer pvTmp; pvTmp Delete}");
 
   this->CompositeTclName = NULL;
   this->SetCompositeTclName("TreeComp1");
 
-        // If we are using SGI pipes, create a new Controller/Communicator/Group
+  // If we are using SGI pipes, create a new Controller/Communicator/Group
   // to use for compositing.
   if (pvApp->GetUseRenderingGroup())
     {
     int numPipes = pvApp->GetNumberOfPipes();
-    // I would like to create another controller with a subset of world, but ...
+    // I would like to create another controller with a subset of world, but...
     // For now, I added it as a hack to the composite manager.
     pvApp->BroadcastScript("%s SetNumberOfProcesses %d",
                            this->CompositeTclName, numPipes);
@@ -571,10 +555,6 @@ void vtkPVRenderView::PrepareForDelete()
                              this->TriangleStripsCheck->GetState());
     pvapp->SetRegisteryValue(2, "RunTime", "UseImmediateMode", "%d",
                              this->ImmediateModeCheck->GetState());
-    pvapp->SetRegisteryValue(2, "RunTime", "UseReduction", "%d",
-                             this->ReductionCheck->GetState());
-    pvapp->SetRegisteryValue(2, "RunTime", "FrameRate", "%f",
-                             this->FrameRateScale->GetValue());
     pvapp->SetRegisteryValue(2, "RunTime", "LODThreshold", "%d",
                              this->LODThreshold);
     pvapp->SetRegisteryValue(2, "RunTime", "LODResolution", "%d",
@@ -672,7 +652,8 @@ void vtkPVRenderView::Create(vtkKWApplication *app, const char *args)
     return;
     }
   
-  // must set the application
+  // Must set the application
+
   if (this->Application)
     {
     vtkErrorMacro("RenderView already created");
@@ -684,6 +665,7 @@ void vtkPVRenderView::Create(vtkKWApplication *app, const char *args)
   // Application has to be set before we can get a tcl name.
   // Otherwise I would have done this in "CreateRenderObjects".
   // Create the compositer.
+
   if (this->Composite)
     {
     // Since the render view is only on process 0, do not broadcast.
@@ -692,26 +674,32 @@ void vtkPVRenderView::Create(vtkKWApplication *app, const char *args)
                                      this->GetTclName());
     }
   
-  // create the frame
+  // Create the frames
+
   wname = this->GetWidgetName();
   this->Script("frame %s -bd 0 %s",wname,args);
-  //this->Script("pack %s -expand yes -fill both",wname);
-  
-  // create the label
+
   this->Frame->Create(app,"frame","-bd 3 -relief ridge");
   this->Script("pack %s -expand yes -fill both -side top -anchor nw",
                this->Frame->GetWidgetName());
-  this->Frame2->Create(app,"frame","-bd 0 -bg #888");
+
+  this->Frame2->Create(app,"frame","-bd 0");
   this->Script("pack %s -fill x -side top -anchor nw",
                this->Frame2->GetWidgetName());
+
   this->Label->Create(app,"label","-fg #fff -text {3D View} -bd 0");
-  this->Script("pack %s  -side left -anchor w",this->Label->GetWidgetName());
+
+  this->Script("pack %s  -side left -anchor w",
+               this->Label->GetWidgetName());
+
   this->Script("bind %s <Any-ButtonPress> {%s MakeSelected}",
                this->Label->GetWidgetName(), this->GetTclName());
+
   this->Script("bind %s <Any-ButtonPress> {%s MakeSelected}",
                this->Frame2->GetWidgetName(), this->GetTclName());
 
   // Create the control frame - only pack it if support option enabled
+
   this->ControlFrame->Create(app,"frame","-bd 0");
   if (this->SupportControlFrame)
     {
@@ -720,6 +708,7 @@ void vtkPVRenderView::Create(vtkKWApplication *app, const char *args)
     }
   
   // Separate window for the renderer.
+
   if (getenv("PV_SEPARATE_RENDER_WINDOW") != NULL)
     {
     this->TopLevelRenderWindow->Create(app, "toplevel", "");
@@ -728,24 +717,26 @@ void vtkPVRenderView::Create(vtkKWApplication *app, const char *args)
                  this->Application->GetApplicationName());
     }
 
-  // add the -rw argument
+  // Add the -rw argument
+
   sprintf(local,"%s -rw Addr=%p",args,this->RenderWindow);
   this->Script("vtkTkRenderWidget %s %s",
                this->VTKWidget->GetWidgetName(),local);
-  //this->Script("vtkTkRenderWidget %s %s",
-  //             this->VTKWidget->GetWidgetName(),args);
+
   this->Script("pack %s -expand yes -fill both -side top -anchor nw",
                this->VTKWidget->GetWidgetName());
   
-  // Expose.
+  // Expose
+
   this->Script("bind %s <Expose> {%s Exposed}", 
-               this->GetTclName(),
-               this->GetTclName());
+               this->GetTclName(), this->GetTclName());
 
   // Configure
+
   this->Script("bind %s <Configure> {%s Configured}", 
-               this->GetTclName(),
-               this->GetTclName());
+               this->GetTclName(), this->GetTclName());
+
+  // Configure the split frame
 
   this->SplitFrame->SetParent(this->GetPropertiesParent());
   this->SplitFrame->SetOrientationToVertical();
@@ -768,8 +759,11 @@ void vtkPVRenderView::Create(vtkKWApplication *app, const char *args)
     }
 
   this->SplitFrame->Create(this->Application);
+
   this->Script("pack %s -fill both -expand t -side top", 
                this->SplitFrame->GetWidgetName());
+
+  // Configure the navigation frame
 
   this->NavigationFrame->SetParent(this->SplitFrame->GetFrame1());
   this->NavigationFrame->ShowHideFrameOff();
@@ -778,10 +772,14 @@ void vtkPVRenderView::Create(vtkKWApplication *app, const char *args)
   this->Script("pack %s -fill both -expand t -side top", 
                this->NavigationFrame->GetWidgetName());
 
+  // Configure the navigation window
+
   this->NavigationWindow->SetParent(this->NavigationFrame->GetFrame());
   this->NavigationWindow->SetWidth(341);
   this->NavigationWindow->SetHeight(545);
   this->NavigationWindow->Create(this->Application, 0); 
+
+  // Configure the selection window
 
   this->SelectionWindow->SetParent(this->NavigationFrame->GetFrame());
   this->SelectionWindow->SetWidth(341);
@@ -790,7 +788,10 @@ void vtkPVRenderView::Create(vtkKWApplication *app, const char *args)
 
   this->SelectionWindowButton->SetParent(
     this->NavigationFrame->GetLabelFrame());
-  this->SelectionWindowButton->Create(this->Application, "-indicatoron 0 -highlightthickness 0 -image PVSelectionWindowButton -selectimage PVSelectionWindowButton");
+  this->SelectionWindowButton->Create(
+    this->Application, 
+    "-indicatoron 0 -highlightthickness 0 -image PVSelectionWindowButton "
+    "-selectimage PVSelectionWindowButton");
   this->SelectionWindowButton->SetBalloonHelpString(
     "Switch to selection window mode.");
   this->SelectionWindowButton->SetCommand(
@@ -798,7 +799,10 @@ void vtkPVRenderView::Create(vtkKWApplication *app, const char *args)
   
   this->NavigationWindowButton->SetParent(
     this->NavigationFrame->GetLabelFrame());
-  this->NavigationWindowButton->Create(this->Application, "-indicatoron 0 -highlightthickness 0 -image PVNavigationWindowButton -selectimage PVNavigationWindowButton");
+  this->NavigationWindowButton->Create(
+    this->Application, 
+    "-indicatoron 0 -highlightthickness 0 -image PVNavigationWindowButton "
+    "-selectimage PVNavigationWindowButton");
   this->NavigationWindowButton->SetBalloonHelpString(
     "Switch to navigation window mode.");
   this->NavigationWindowButton->SetCommand(
@@ -827,9 +831,8 @@ void vtkPVRenderView::Create(vtkKWApplication *app, const char *args)
     this->ShowSelectionWindowCallback(0);
     }
 
-  if ( 
-    !this->Application->GetRegisteryValue(2, "RunTime", "Display3DWidgets", 0) ||
-    this->GetPVWindow()->GetIntRegisteryValue(2, "RunTime", "Display3DWidgets") )
+  if (!this->Application->GetRegisteryValue(2,"RunTime","Display3DWidgets",0)||
+    this->GetPVWindow()->GetIntRegisteryValue(2,"RunTime","Display3DWidgets") )
     {
     this->SetDisplay3DWidgets(1);
     }
@@ -872,14 +875,17 @@ void vtkPVRenderView::CreateViewProperties()
 
   vtkPVWindow* pvwindow = this->GetPVWindow();
   vtkPVApplication* pvapp = this->GetPVApplication();
-  //this->RenderParametersFrame->ShowHideFrameOn();  
 
-  this->RenderParametersFrame->SetParent( this->GeneralProperties->GetFrame() );
+  // Render parameters
+
+  this->RenderParametersFrame->SetParent(this->GeneralProperties->GetFrame());
   this->RenderParametersFrame->ShowHideFrameOn();
   this->RenderParametersFrame->Create(this->Application);
   this->RenderParametersFrame->SetLabel("Advanced Render Parameters");
   this->Script("pack %s -padx 2 -pady 2 -fill x -expand yes -anchor w",
                this->RenderParametersFrame->GetWidgetName());
+
+  // Render parameters: parallel projection
 
   this->ParallelProjectionCheck->SetParent(
     this->RenderParametersFrame->GetFrame());
@@ -896,10 +902,13 @@ void vtkPVRenderView::CreateViewProperties()
     {
     this->ParallelProjectionCheck->SetState(0);
     }
-  this->ParallelProjectionCheck->SetCommand(this, "ParallelProjectionCallback");
+  this->ParallelProjectionCheck->SetCommand(this, 
+                                            "ParallelProjectionCallback");
   this->ParallelProjectionCheck->SetBalloonHelpString(
     "Toggle the use of parallel projection vesus perspective.");
   
+  // Render parameters: triangle strips
+
   this->TriangleStripsCheck->SetParent(
     this->RenderParametersFrame->GetFrame());
   this->TriangleStripsCheck->Create(this->Application, "");
@@ -918,6 +927,8 @@ void vtkPVRenderView::CreateViewProperties()
   this->TriangleStripsCheck->SetBalloonHelpString(
     "Toggle the use of triangle strips when rendering polygonal data");
   
+  // Render parameters: immediate mode
+
   this->ImmediateModeCheck->SetParent(this->RenderParametersFrame->GetFrame());
   this->ImmediateModeCheck->Create(this->Application, 
                                    "-text \"Use immediate mode rendering\"");
@@ -932,130 +943,121 @@ void vtkPVRenderView::CreateViewProperties()
     {
     this->ImmediateModeCheck->SetState(1);
     }
-  this->ImmediateModeCheck->SetBalloonHelpString("Toggle the use of immediate mode rendering (when off, display lists are used)");
+  this->ImmediateModeCheck->SetBalloonHelpString(
+    "Toggle the use of immediate mode rendering (when off, display "
+    "lists are used)");
 
-  this->ReductionCheck->SetParent(this->RenderParametersFrame->GetFrame());
-  this->ReductionCheck->Create(this->Application, "-text Reduction");
-  this->ReductionCheck->SetCommand(this, "ReductionCheckCallback");
-  if (pvapp && pvwindow &&
-      pvapp->GetRegisteryValue(2, "RunTime", "UseReduction", 0))
-    {
-    this->ReductionCheck->SetState(
-      pvwindow->GetIntRegisteryValue(2, "RunTime", "UseReduction"));
-    }
-  else
-    {
-    this->ReductionCheck->SetState(1);
-    }
-  this->ReductionCheck->SetBalloonHelpString(
-    "If selected, tree compositing will scale the size of the render window "
-    "based on how long the previous render took.");
-
-  this->FrameRateFrame->SetParent(this->RenderParametersFrame->GetFrame());
-  this->FrameRateFrame->Create(this->Application, "frame", "");
-  this->FrameRateLabel->SetParent(this->FrameRateFrame);
-  this->FrameRateLabel->Create(this->Application, "");
-  this->FrameRateLabel->SetLabel("Reduction");
-  this->FrameRateScale->SetParent(this->FrameRateFrame);
-  this->FrameRateScale->Create(this->Application, 
-                               "-resolution 0.1 -orient horizontal");
-  this->FrameRateScale->SetRange(0, 50);
-  if (pvapp && pvwindow &&
-      pvapp->GetRegisteryValue(2, "RunTime", "FrameRate", 0))
-    {
-    this->FrameRateScale->SetValue(
-      pvwindow->GetFloatRegisteryValue(2, "RunTime", "FrameRate"));
-    }
-  else
-    {
-    this->FrameRateScale->SetValue(3.0);
-    }
-  this->FrameRateScale->SetCommand(this, "FrameRateScaleCallback");
-  this->FrameRateScale->SetBalloonHelpString(
-    "This slider adjusts the target for subsample compression during "
-    "compositing.  "
-    "Left: Use slow full-resolution compositing. Right: Fast pixelated "
-    "compositing.");
+  // Render parameters: pack
 
   this->Script("pack %s %s %s -side top -anchor w",
                this->ParallelProjectionCheck->GetWidgetName(),
                this->TriangleStripsCheck->GetWidgetName(),
                this->ImmediateModeCheck->GetWidgetName());
 
-  this->LODFrame->SetParent( this->GeneralProperties->GetFrame() );
+  // LOD parameters
+
+  this->LODFrame->SetParent(this->GeneralProperties->GetFrame());
   this->LODFrame->ShowHideFrameOn();
   this->LODFrame->Create(this->Application);
   this->LODFrame->SetLabel("LOD Parameters");
   this->Script("pack %s -padx 2 -pady 2 -fill x -expand yes -anchor w",
                this->LODFrame->GetWidgetName());
 
-  // Determines when the decimated LOD is used.
-  this->LODThresholdFrame->SetParent(this->LODFrame->GetFrame());
-  this->LODThresholdFrame->Create(this->Application, "frame", "");
-  this->LODThresholdLabel->SetParent(this->LODThresholdFrame);
-  this->LODThresholdLabel->Create(this->Application, "-width 18 -anchor w");
+  // LOD parameters: the frame that will pack all scales
+
+  this->LODScalesFrame->SetParent(this->LODFrame->GetFrame());
+  this->LODScalesFrame->Create(this->Application, "frame", "");
+
+  // LOD parameters: threshold
+
+  this->LODThresholdLabel->SetParent(this->LODScalesFrame);
+  this->LODThresholdLabel->Create(this->Application, "-anchor w");
   this->LODThresholdLabel->SetLabel("LOD threshold:");
-  this->LODThresholdScale->SetParent(this->LODThresholdFrame);
+
+  this->LODThresholdScale->SetParent(this->LODScalesFrame);
   this->LODThresholdScale->Create(this->Application, 
-                               "-resolution 0.1 -orient horizontal");
+                                  "-resolution 0.1 -orient horizontal");
   this->LODThresholdScale->SetRange(0, 18);
   this->LODThresholdScale->SetResolution(0.1);
-  this->LODThresholdValue->SetParent(this->LODThresholdFrame);
-  this->LODThresholdValue->Create(this->Application, "");
+
+  this->LODThresholdValue->SetParent(this->LODScalesFrame);
+  this->LODThresholdValue->Create(this->Application, "-anchor w");
+
   if (pvapp && pvwindow &&
       pvapp->GetRegisteryValue(2, "RunTime", "LODThreshold", 0))
     {
     this->SetLODThreshold(
       pvwindow->GetIntRegisteryValue(2, "RunTime", "LODThreshold"));
     }
+  else
+    {
+    this->SetLODThreshold(this->LODThreshold);
+    }
   if (this->LODThreshold > 0 )
     {
-    this->LODThresholdScale->SetValue(18.0 - log((double)(this->LODThreshold)));
+    this->LODThresholdScale->SetValue(18.0-log((double)(this->LODThreshold)));
     }
   this->LODThresholdScale->SetCommand(this, "LODThresholdScaleCallback");
   this->LODThresholdScale->SetBalloonHelpString(
-    "This slider adjusts when the decimated LOD is used. Threshold is based on "
-    "number of points.  "
-    "Left: Use slow full-resolution models. Right: Use fast decimated models .");
+    "This slider adjusts when the decimated LOD is used. Threshold is based "
+    "on number of points.  "
+   "Left: Use slow full-resolution models. Right: Use fast decimated models.");
 
-  pvapp->Script("pack %s %s %s -side left", 
-                this->LODThresholdLabel->GetWidgetName(), 
-                this->LODThresholdScale->GetWidgetName(),
-                this->LODThresholdValue->GetWidgetName());
+  int row = 0;
+
+  pvapp->Script("grid %s -row %d -column 1 -sticky news", 
+                this->LODThresholdValue->GetWidgetName(), row++);
+  pvapp->Script("grid %s -row %d -column 0 -sticky nws", 
+                this->LODThresholdLabel->GetWidgetName(), row);
+  pvapp->Script("grid %s -row %d -column 1 -sticky news", 
+                this->LODThresholdScale->GetWidgetName(), row++);
   
-  // Determines the complexity of the decimated LOD
-  this->LODResolutionFrame->SetParent(this->LODFrame->GetFrame());
-  this->LODResolutionFrame->Create(this->Application, "frame", "");
-  this->LODResolutionLabel->SetParent(this->LODResolutionFrame);
-  this->LODResolutionLabel->Create(this->Application, "-width 18  -anchor w");
+  pvapp->Script("grid columnconfigure %s 1 -weight 1",
+                this->LODThresholdScale->GetParent()->GetWidgetName());
+
+  // LOD parameters: resolution
+
+  this->LODResolutionLabel->SetParent(this->LODScalesFrame);
+  this->LODResolutionLabel->Create(this->Application, "-anchor w");
   this->LODResolutionLabel->SetLabel("LOD resolution:");
-  this->LODResolutionScale->SetParent(this->LODResolutionFrame);
-  this->LODResolutionScale->Create(this->Application, 
-                               "-orient horizontal");
+
+  this->LODResolutionScale->SetParent(this->LODScalesFrame);
+  this->LODResolutionScale->Create(this->Application, "-orient horizontal");
   this->LODResolutionScale->SetRange(10, 160);
   this->LODResolutionScale->SetResolution(1.0);
-  this->LODResolutionValue->SetParent(this->LODResolutionFrame);
-  this->LODResolutionValue->Create(this->Application, "");
+
+  this->LODResolutionValue->SetParent(this->LODScalesFrame);
+  this->LODResolutionValue->Create(this->Application, "-anchor w");
+
   if (pvapp && pvwindow &&
       pvapp->GetRegisteryValue(2, "RunTime", "LODResolution", 0))
     {
     this->SetLODResolution(
       pvwindow->GetIntRegisteryValue(2, "RunTime", "LODResolution"));
     }
+  else
+    {
+    this->SetLODResolution(this->LODResolution);
+    }
+
   this->LODResolutionScale->SetValue(150 - this->LODResolution);
   this->LODResolutionScale->SetCommand(this, "LODResolutionLabelCallback");
   this->LODResolutionScale->SetEndCommand(this, "LODResolutionScaleCallback");
   this->LODResolutionScale->SetBalloonHelpString(
-    "This slider determines the resolution of the decimated level of details.  "
-    "The value is the dimension for each axis in the quadric clustering filter. "
-    "Left: Use slow high-resolution models. Right: Use fast simple models .");
-  pvapp->Script("pack %s %s %s -side left", 
-                this->LODResolutionLabel->GetWidgetName(), 
-                this->LODResolutionScale->GetWidgetName(),
-                this->LODResolutionValue->GetWidgetName());
+    "This slider determines the resolution of the decimated level of details. "
+   "The value is the dimension for each axis in the quadric clustering filter."
+   "Left: Use slow high-resolution models. Right: Use fast simple models .");
 
-  this->InterruptRenderCheck->SetParent(
-    this->LODFrame->GetFrame());
+  pvapp->Script("grid %s -row %d -column 1 -sticky news", 
+                this->LODResolutionValue->GetWidgetName(), row++);
+  pvapp->Script("grid %s -row %d -column 0 -sticky nws", 
+                this->LODResolutionLabel->GetWidgetName(), row);
+  pvapp->Script("grid %s -row %d -column 1 -sticky news", 
+                this->LODResolutionScale->GetWidgetName(), row++);
+
+  // LOD parameters: rendering interrupts
+
+  this->InterruptRenderCheck->SetParent(this->LODFrame->GetFrame());
   this->InterruptRenderCheck->Create(this->Application, 
                                      "-text \"Allow rendering interrupts\"");
   this->InterruptRenderCheck->SetCommand(this, "InterruptRenderCallback");
@@ -1075,33 +1077,43 @@ void vtkPVRenderView::CreateViewProperties()
     "Toggle the use of  render interrupts (when using MPI, this uses "
     "asynchronous messaging). When off, renders can not be interrupted.");
 
-  this->Script("pack %s %s -side top -anchor w",
-               this->LODResolutionFrame->GetWidgetName(),
-               this->LODThresholdFrame->GetWidgetName());
+  // LOD parameters: pack
+
+  this->Script("pack %s -side top -fill x -expand t -anchor w",
+               this->LODScalesFrame->GetWidgetName());
+  this->Script("pack %s -side top -anchor w",
+               this->InterruptRenderCheck->GetWidgetName());
+
+  // LOD parameters: collection threshold
 
   if (pvapp->GetController()->GetNumberOfProcesses() > 1 &&
       !pvapp->GetUseRenderingGroup())
     {
     // Determines when geometry is collected to process 0 for rendering.
-    this->CollectThresholdFrame->SetParent(this->LODFrame->GetFrame());
-    this->CollectThresholdFrame->Create(this->Application, "frame", "");
-    this->CollectThresholdLabel->SetParent(this->CollectThresholdFrame);
-    this->CollectThresholdLabel->Create(this->Application, 
-                                        "-width 18  -anchor w");
-    this->CollectThresholdLabel->SetLabel("Collection Threshold:");
-    this->CollectThresholdScale->SetParent(this->CollectThresholdFrame);
-    this->CollectThresholdScale->Create(this->Application, 
+
+    this->CollectThresholdLabel->SetParent(this->LODScalesFrame);
+    this->CollectThresholdLabel->Create(this->Application, "-anchor w");
+    this->CollectThresholdLabel->SetLabel("Collection threshold:");
+
+    this->CollectThresholdScale->SetParent(this->LODScalesFrame);
+    this->CollectThresholdScale->Create(this->Application,
                                         "-orient horizontal");
     this->CollectThresholdScale->SetRange(0.0, 6.0);
     this->CollectThresholdScale->SetResolution(0.1);
-    this->CollectThresholdValue->SetParent(this->CollectThresholdFrame);
-    this->CollectThresholdValue->Create(this->Application, "");
+
+    this->CollectThresholdValue->SetParent(this->LODScalesFrame);
+    this->CollectThresholdValue->Create(this->Application, "-anchor w");
     if (pvapp && pvwindow &&
         pvapp->GetRegisteryValue(2, "RunTime", "CollectThreshold", 0))
       {
       this->SetCollectThreshold(
         pvwindow->GetIntRegisteryValue(2, "RunTime", "CollectThreshold"));
       }
+    else
+      {
+      this->SetCollectThreshold(this->CollectThreshold);
+      }
+
     this->CollectThresholdScale->SetValue(this->CollectThreshold);
     this->CollectThresholdScale->SetCommand(this, 
                                             "CollectThresholdScaleCallback");
@@ -1111,17 +1123,16 @@ void vtkPVRenderView::CreateViewProperties()
       "bytes.  "
       "Left: Always leave models distributed. Right: Move even large models "
       "to process 0.");    
-    pvapp->Script("pack %s %s %s -side left", 
-                  this->CollectThresholdLabel->GetWidgetName(), 
-                  this->CollectThresholdScale->GetWidgetName(),
-                  this->CollectThresholdValue->GetWidgetName());
-    this->Script("pack %s -side top -anchor w", 
-                 this->CollectThresholdFrame->GetWidgetName());
+
+    pvapp->Script("grid %s -row %d -column 1 -sticky news", 
+                  this->CollectThresholdValue->GetWidgetName(), row++);
+    pvapp->Script("grid %s -row %d -column 0 -sticky nws", 
+                  this->CollectThresholdLabel->GetWidgetName(), row);
+    pvapp->Script("grid %s -row %d -column 1 -sticky news", 
+                  this->CollectThresholdScale->GetWidgetName(), row++);
     }
 
-  this->Script("pack %s -side top -anchor w",
-               this->InterruptRenderCheck->GetWidgetName());
-
+  // Parallel rendering parameters
 
   if (pvapp->GetController()->GetNumberOfProcesses() > 1)
     {
@@ -1131,22 +1142,24 @@ void vtkPVRenderView::CreateViewProperties()
     this->ParallelRenderParametersFrame->Create(this->Application);
     this->ParallelRenderParametersFrame->SetLabel(
       "Parallel Rendering Parameters");
+
     this->Script("pack %s -padx 2 -pady 2 -fill x -expand yes -anchor w",
                  this->ParallelRenderParametersFrame->GetWidgetName());
-
   
     this->CompositeWithFloatCheck->SetParent(
       this->ParallelRenderParametersFrame->GetFrame());
     this->CompositeWithFloatCheck->Create(this->Application, 
-                                          "-text \"Composite With Floats\"");
+                                          "-text \"Composite with floats\"");
+
     this->CompositeWithRGBACheck->SetParent(
       this->ParallelRenderParametersFrame->GetFrame());
     this->CompositeWithRGBACheck->Create(this->Application, 
                                          "-text \"Composite RGBA\"");
+
     this->CompositeCompressionCheck->SetParent(
       this->ParallelRenderParametersFrame->GetFrame());
     this->CompositeCompressionCheck->Create(this->Application, 
-                                            "-text \"Composite Compression\"");
+                                            "-text \"Composite compression\"");
   
     this->CompositeWithFloatCheck->SetCommand(this, 
                                               "CompositeWithFloatCallback");
@@ -1182,9 +1195,9 @@ void vtkPVRenderView::CreateViewProperties()
       "This is here to bypass some bugs in some graphics card drivers.");
 
     this->CompositeCompressionCheck->SetCommand(this, 
-                                                "CompositeCompressionCallback");
+                                               "CompositeCompressionCallback");
     if (pvwindow && pvapp && 
-        pvapp->GetRegisteryValue(2, "RunTime",  "UseCompressionInComposite", 0))
+        pvapp->GetRegisteryValue(2, "RunTime", "UseCompressionInComposite", 0))
       {
       this->CompositeCompressionCheck->SetState(
         pvwindow->GetIntRegisteryValue(2, "RunTime", 
@@ -1206,12 +1219,16 @@ void vtkPVRenderView::CreateViewProperties()
                  this->CompositeCompressionCheck->GetWidgetName());
     }
 
+  // Interface settings
+
   this->InterfaceSettingsFrame->SetParent(this->GeneralProperties->GetFrame());
   this->InterfaceSettingsFrame->ShowHideFrameOn();
   this->InterfaceSettingsFrame->Create(this->Application);
   this->InterfaceSettingsFrame->SetLabel("Interface Settings");
   this->Script("pack %s -padx 2 -pady 2 -fill x -expand yes -anchor w",
                this->InterfaceSettingsFrame->GetWidgetName());
+
+  // Interface settings: 3D widgets
 
   this->Display3DWidgets->SetParent(
     this->InterfaceSettingsFrame->GetFrame());
@@ -1346,25 +1363,6 @@ void vtkPVRenderView::StandardViewCallback(float x, float y, float z)
 
   this->GetRenderer()->ResetCamera();
   this->EventuallyRender();
-}
-
-
-//----------------------------------------------------------------------------
-void vtkPVRenderView::FrameRateScaleCallback()
-{
-  float newRate = this->FrameRateScale->GetValue();
-  if (newRate <= 0.0)
-    {
-    newRate = 0.00001;
-    }
-  this->SetInteractiveUpdateRate(newRate);
-}
-
-//----------------------------------------------------------------------------
-void vtkPVRenderView::ReductionCheckCallback()
-{
-  int reduce = this->ReductionCheck->GetState();
-  this->SetUseReductionFactor(reduce);
 }
 
 //----------------------------------------------------------------------------
@@ -1917,7 +1915,19 @@ void vtkPVRenderView::SetLODThresholdInternal(int threshold)
   vtkPVApplication *pvApp;
   char str[256];
 
-  sprintf(str, " %d points", threshold);
+  if (threshold < 1000)
+    {
+    sprintf(str, "%d points", threshold);
+    }
+  else if (threshold < 1000000)
+    {
+    sprintf(str, "%.1f Kpoints", (float)(threshold) / 1000.0);
+    }
+  else
+    {
+    sprintf(str, "%.1f Mpoints", (float)(threshold) / 1000000.0);
+    }
+
   this->LODThresholdValue->SetLabel(str);
 
   this->LODThreshold = threshold;
@@ -1968,7 +1978,7 @@ void vtkPVRenderView::LODResolutionLabelCallback()
   resolution = 170 - resolution;
 
   char str[256];
-  sprintf(str, " %dx%dx%d", resolution, resolution, resolution);
+  sprintf(str, "%dx%dx%d", resolution, resolution, resolution);
   this->LODResolutionValue->SetLabel(str);
 }
 
@@ -1995,7 +2005,7 @@ void vtkPVRenderView::SetLODResolutionInternal(int resolution)
   vtkPVApplication *pvApp;
   char str[256];
 
-  sprintf(str, " %dx%dx%d", resolution, resolution, resolution);
+  sprintf(str, "%dx%dx%d", resolution, resolution, resolution);
   this->LODResolutionValue->SetLabel(str);
 
   this->LODResolution = resolution;
@@ -2056,7 +2066,7 @@ void vtkPVRenderView::SetCollectThresholdInternal(float threshold)
   vtkPVApplication *pvApp;
   char str[256];
 
-  sprintf(str, " %.1f MBytes", threshold);
+  sprintf(str, "%.1f MBytes", threshold);
   this->CollectThresholdValue->SetLabel(str);
 
   this->CollectThreshold = threshold;
@@ -2382,7 +2392,7 @@ void vtkPVRenderView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVRenderView ";
-  this->ExtractRevision(os,"$Revision: 1.213.2.6 $");
+  this->ExtractRevision(os,"$Revision: 1.213.2.7 $");
 }
 
 //------------------------------------------------------------------------------

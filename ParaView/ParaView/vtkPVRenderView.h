@@ -263,14 +263,6 @@ public:
   vtkPVWindow *GetPVWindow();
 
   // Description:
-  // Callback for reduction check
-  void ReductionCheckCallback();
-  
-  // Description:
-  // Callback for frame rate slider
-  void FrameRateScaleCallback();
-
-  // Description:
   // Used to temporarily disable rendering. Useful for collecting a few
   // renders and flusing them out at the end with one render
   vtkSetMacro(DisableRenderingFlag, int);
@@ -419,23 +411,14 @@ protected:
   vtkKWLabeledFrame *InterfaceSettingsFrame;
   vtkKWCheckButton *Display3DWidgets;
 
-  vtkKWCheckButton *ReductionCheck;
-  
-  vtkKWWidget *FrameRateFrame;
-  vtkKWLabel *FrameRateLabel;
-  vtkKWScale *FrameRateScale;
-
-  vtkKWWidget *LODThresholdFrame;
+  vtkKWWidget *LODScalesFrame;
+  vtkKWLabel *LODResolutionLabel;
+  vtkKWScale *LODResolutionScale;
+  vtkKWLabel *LODResolutionValue;
   vtkKWLabel *LODThresholdLabel;
   vtkKWScale *LODThresholdScale;
   vtkKWLabel *LODThresholdValue;
 
-  vtkKWWidget *LODResolutionFrame;
-  vtkKWLabel *LODResolutionLabel;
-  vtkKWScale *LODResolutionScale;
-  vtkKWLabel *LODResolutionValue;
-
-  vtkKWWidget *CollectThresholdFrame;
   vtkKWLabel *CollectThresholdLabel;
   vtkKWScale *CollectThresholdScale;
   vtkKWLabel *CollectThresholdValue;
