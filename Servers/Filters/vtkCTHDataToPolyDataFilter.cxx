@@ -16,8 +16,16 @@
 
 #include "vtkCTHData.h"
 #include "vtkObjectFactory.h"
+#include "vtkInformation.h"
 
-vtkCxxRevisionMacro(vtkCTHDataToPolyDataFilter, "1.3");
+vtkCxxRevisionMacro(vtkCTHDataToPolyDataFilter, "1.4");
+
+//----------------------------------------------------------------------------
+vtkCTHDataToPolyDataFilter::vtkCTHDataToPolyDataFilter()
+{
+  this->SetNumberOfInputPorts(1);
+  this->NumberOfRequiredInputs = 1;
+}
 
 //----------------------------------------------------------------------------
 // Specify the input data or filter.
@@ -50,6 +58,19 @@ void vtkCTHDataToPolyDataFilter::ComputeInputUpdateExtents(vtkDataObject *output
     this->vtkPolyDataSource::ComputeInputUpdateExtents(output);
     input->RequestExactExtentOn();
     }
+}
+
+//----------------------------------------------------------------------------
+int vtkCTHDataToPolyDataFilter::FillInputPortInformation(int port,
+                                                          vtkInformation* info)
+{
+  if(!this->Superclass::FillInputPortInformation(port, info))
+    {
+    return 0;
+    }
+  //info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkPolyData"); HACK
+  info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkCTHData");
+  return 1;
 }
 
 //----------------------------------------------------------------------------

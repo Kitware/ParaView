@@ -44,9 +44,10 @@ public:
   virtual void ComputeInputUpdateExtents( vtkDataObject *output );
 
 protected:
-  vtkCTHDataToPolyDataFilter() {this->NumberOfRequiredInputs = 1;}
+  vtkCTHDataToPolyDataFilter();
   ~vtkCTHDataToPolyDataFilter() {}
   
+  virtual int FillInputPortInformation(int, vtkInformation*);
   
 private:
   vtkCTHDataToPolyDataFilter(const vtkCTHDataToPolyDataFilter&);  // Not implemented.
