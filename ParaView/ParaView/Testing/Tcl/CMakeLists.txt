@@ -16,6 +16,7 @@ IF (VTK_USE_MPI)
                CalcInput
                Calculator
                ClipCut
+	       ColorMap
                CombustorTest
                ConeCubeCylSQ
                CutContours
@@ -64,6 +65,7 @@ FOREACH (tfile
          CalcInput
          Calculator
          ClipCut
+	 ColorMap
          CombustorTest
          ConeCubeCylSQ
          CutContours

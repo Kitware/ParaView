@@ -1,0 +1,89 @@
+Application ExitOnReturnOn
+if {[info exists argc]} { 
+    set argcm1 [expr $argc - 1]
+    for {set i 0} {$i < $argcm1} {incr i} {
+        if {[lindex $argv $i] == "-D" && $i < $argcm1} {
+		set DataDir [lindex $argv [expr $i + 1]]
+        }
+    }
+} 
+
+set kw(vtkTemp1) [Application GetMainWindow]
+set kw(vtkTemp16) [$kw(vtkTemp1) GetMainView]
+set kw(vtkTemp224) [$kw(vtkTemp1) CreatePVSource ConeSource]
+$kw(vtkTemp224) AcceptCallback
+set kw(vtkTemp260) [$kw(vtkTemp1) CreatePVSource ElevationFilter]
+$kw(vtkTemp260) AcceptCallback
+set kw(vtkTemp294) [$kw(vtkTemp260) GetPVOutput]
+$kw(vtkTemp294) ChangeColorMapToBlueRed
+$kw(vtkTemp294) ChangeColorMapToGrayscale
+$kw(vtkTemp294) ChangeColorMapToRedBlue
+$kw(vtkTemp294) SetScalarBarVisibility 1
+$kw(vtkTemp294) DrawWireframe
+$kw(vtkTemp294) DrawPoints
+$kw(vtkTemp294) DrawSurface
+$kw(vtkTemp294) SetInterpolationToFlat
+$kw(vtkTemp294) SetInterpolationToGouraud
+$kw(vtkTemp294) ColorByProperty
+$kw(vtkTemp294) ChangeActorColor 1.000000 0.070588 1.000000
+$kw(vtkTemp294) ColorByPointFieldComponent {Elevation} 0
+$kw(vtkTemp294) SetColorRange 0.100000 0.433010
+$kw(vtkTemp294) SetColorRange 0.100000 0.433010
+$kw(vtkTemp294) SetColorRange 0.200000 0.433010
+$kw(vtkTemp294) SetColorRange 0.200000 0.433010
+$kw(vtkTemp294) SetColorRange 0.000000 0.433010
+$kw(vtkTemp294) SetColorRange 0.300000 0.433010
+$kw(vtkTemp294) SetColorRange 0.300000 0.433010
+$kw(vtkTemp294) ChangeColorMapToBlueRed
+$kw(vtkTemp294) SetColorRange 0.300000 0.433010
+$kw(vtkTemp294) ChangeColorMapToRedBlue
+$kw(vtkTemp294) SetColorRange 0.300000 0.433010
+$kw(vtkTemp294) SetColorRange 0.300000 0.433010
+$kw(vtkTemp294) SetCubeAxesVisibility 1
+$kw(vtkTemp294) SetScalarBarVisibility 1
+set kw(vtkTemp300) [$kw(vtkTemp1) CreatePVSource Glyph]
+$kw(vtkTemp294) SetColorRange 0.300000 0.433010
+set kw(vtkTemp97) [$kw(vtkTemp1) GetPVSource GlyphSources Arrow0]
+set kw(vtkTemp320) [$kw(vtkTemp300) GetPVWidget {Glyph}]
+$kw(vtkTemp320) SetCurrentValue $kw(vtkTemp97)
+$kw(vtkTemp300) AcceptCallback
+$kw(vtkTemp1) SetCurrentPVSourceCallback $kw(vtkTemp260)
+$kw(vtkTemp1) SetCurrentPVSourceCallback $kw(vtkTemp300)
+set kw(vtkTemp308) [$kw(vtkTemp300) GetPVWidget {Scale Mode}]
+$kw(vtkTemp308) SetCurrentValue {1}
+$kw(vtkTemp300) AcceptCallback
+$kw(vtkTemp308) SetCurrentValue {2}
+$kw(vtkTemp300) AcceptCallback
+$kw(vtkTemp308) SetCurrentValue {3}
+$kw(vtkTemp300) AcceptCallback
+$kw(vtkTemp308) SetCurrentValue {0}
+$kw(vtkTemp300) AcceptCallback
+set kw(vtkTemp309) [$kw(vtkTemp300) GetPVWidget {Vector Mode}]
+$kw(vtkTemp309) SetCurrentValue {1}
+$kw(vtkTemp300) AcceptCallback
+$kw(vtkTemp309) SetCurrentValue {2}
+$kw(vtkTemp300) AcceptCallback
+set kw(vtkTemp339) [$kw(vtkTemp300) GetPVOutput]
+$kw(vtkTemp339) ChangeColorMapToBlueRed
+$kw(vtkTemp339) ChangeColorMapToRedBlue
+$kw(vtkTemp1) ShowAnimationProperties
+set kw(vtkTemp67) [$kw(vtkTemp1) GetAnimationInterface]
+$kw(vtkTemp67) SetPVSource {vtkTemp300}
+$kw(vtkTemp67) SetCurrentTime 0.000000
+$kw(vtkTemp67) CurrentTimeCallback
+$kw(vtkTemp16) ResetCameraClippingRange
+update
+
+# Fix the size of the image.
+RenWin1 SetSize 300 300
+RenWin1 Render
+update
+
+for {set i  1} {$i < [expr $argc - 1]} {incr i} {
+    if {[lindex $argv $i] == "-C"} {
+	source [lindex $argv [expr $i + 1]]
+	$Application SetExitStatus [CompareImage [[Application GetMainWindow] GetMainView]]
+    }
+}
+
+Application Exit

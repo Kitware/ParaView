@@ -23,6 +23,7 @@ set pv(vtkTemp97) [$pv(vtkTemp1) GetPVSource GlyphSources Sphere0]
 [ $pv(vtkTemp43) GetCornerAnnotation ] SetVisibility 1
 $pv(vtkTemp43) SetHeaderTextColor 1 .5 .8
 $pv(vtkTemp43) SetHeaderTextColor 1 1 1
+$pv(vtkTemp43) SetHeaderTextColor 1 1 1
 $pv(vtkTemp43) GetHeaderTextColor
 $pv(vtkTemp43) HeaderChanged
 $pv(vtkTemp43) OnDisplayHeader
@@ -45,8 +46,10 @@ set pv(vtkTemp200) [$pv(vtkTemp179) GetPVWidget {Scale Factor}]
 $pv(vtkTemp200) SetValue .5
 $pv(vtkTemp179) AcceptCallback
 
-$pv(vtkTemp43) SaveAsImage vtkParaViewWriteTest.tif
-file delete -force vtkParaViewWriteTest.tif
+foreach a {bmp tif ppm png  jpg} {
+    $pv(vtkTemp43) SaveAsImage vtkParaViewWriteTest.$a
+    file delete -force vtkParaViewWriteTest.$a
+}
 
 # Fix the size of the image.
 RenWin1 SetSize 300 300
@@ -59,5 +62,5 @@ for {set i  1} {$i < [expr $argc - 1]} {incr i} {
 	$Application SetExitStatus [CompareImage [[Application GetMainWindow] GetMainView]]
     }
 }
-   
+
 Application Exit
