@@ -52,7 +52,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWUserInterfaceNotebookManager);
-vtkCxxRevisionMacro(vtkKWUserInterfaceNotebookManager, "1.21");
+vtkCxxRevisionMacro(vtkKWUserInterfaceNotebookManager, "1.22");
 
 int vtkKWUserInterfaceNotebookManagerCommand(ClientData cd, Tcl_Interp *interp,
                                              int argc, char *argv[]);
@@ -70,6 +70,7 @@ vtkKWUserInterfaceNotebookManager::vtkKWUserInterfaceNotebookManager()
   this->IdCounter = 1;
   this->Notebook = NULL;
   this->EnableDragAndDrop = 0;
+  this->LockDragAndDropEntries = 0;
 
   this->DragAndDropEntries = 
     vtkKWUserInterfaceNotebookManager::DragAndDropEntriesContainer::New();
@@ -1412,4 +1413,6 @@ void vtkKWUserInterfaceNotebookManager::PrintSelf(
   os << indent << "Notebook: " << this->Notebook << endl;
   os << indent << "EnableDragAndDrop: " 
      << (this->EnableDragAndDrop ? "On" : "Off") << endl;
+  os << indent << "LockDragAndDropEntries: " 
+     << (this->LockDragAndDropEntries ? "On" : "Off") << endl;
 }
