@@ -61,7 +61,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCompositePartDisplay);
-vtkCxxRevisionMacro(vtkPVCompositePartDisplay, "1.5.2.1");
+vtkCxxRevisionMacro(vtkPVCompositePartDisplay, "1.5.2.2");
 
 
 //----------------------------------------------------------------------------
@@ -132,11 +132,13 @@ void vtkPVCompositePartDisplay::CreateParallelTclObjects(vtkPVApplication *pvApp
     }
   else if (pvApp->GetUseTiledDisplay())
     { // I would like to get this condition into the subclass.
-    pvApp->BroadcastScript("vtkPVDuplicatePolyData %s", tclName);
+    pvApp->BroadcastScript("vtkPVDuplicatePolyData %s; %s SetPassThrough 1", 
+                           tclName, tclName);
     }
   else
     {
-    pvApp->BroadcastScript("vtkCollectPolyData %s", tclName);
+    pvApp->BroadcastScript("vtkCollectPolyData %s; %s SetPassThrough 1", 
+                           tclName, tclName);
     }
   this->SetCollectTclName(tclName);
   pvApp->BroadcastScript(
@@ -159,13 +161,15 @@ void vtkPVCompositePartDisplay::CreateParallelTclObjects(vtkPVApplication *pvApp
     { // This should be in subclass.
     //int numProcs = pvApp->GetController()->GetNumberOfProcesses();
     int* dims = pvApp->GetTileDimensions();
-    pvApp->BroadcastScript("vtkPVDuplicatePolyData %s", tclName);
+    pvApp->BroadcastScript("vtkPVDuplicatePolyData %s; %s SetPassThrough 1", 
+                           tclName, tclName);
     pvApp->BroadcastScript("%s InitializeSchedule %d", tclName,
                            dims[0]*dims[1]);
     }
   else
     {
-    pvApp->BroadcastScript("vtkCollectPolyData %s", tclName);
+    pvApp->BroadcastScript("vtkCollectPolyData %s; %s SetPassThrough 1", 
+                           tclName, tclName);
     }
   this->SetLODCollectTclName(tclName);
   pvApp->BroadcastScript("%s SetInput [%s GetOutput]", 

@@ -56,7 +56,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCompositeRenderModuleUI);
-vtkCxxRevisionMacro(vtkPVCompositeRenderModuleUI, "1.2.2.4");
+vtkCxxRevisionMacro(vtkPVCompositeRenderModuleUI, "1.2.2.5");
 
 int vtkPVCompositeRenderModuleUICommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -499,7 +499,6 @@ void vtkPVCompositeRenderModuleUI::SetCompositeThreshold(float threshold)
     {
     this->CompositeCheck->SetState(0);
     this->CompositeThresholdScale->EnabledOff();
-    this->CompositeThresholdScale->SetWidth(2);    
     this->CompositeThresholdLabel->EnabledOff();
     this->CompositeThresholdLabel->SetLabel("Compositing Disabled");
     }
@@ -508,7 +507,6 @@ void vtkPVCompositeRenderModuleUI::SetCompositeThreshold(float threshold)
     char str[256];
     this->CompositeCheck->SetState(1);
     this->CompositeThresholdScale->EnabledOn();
-    this->CompositeThresholdScale->SetWidth(15);    
     this->CompositeThresholdLabel->EnabledOn();
     this->CompositeThresholdScale->SetValue(threshold);
     sprintf(str, "Composite above %.1f MBytes", threshold);
@@ -687,7 +685,6 @@ void vtkPVCompositeRenderModuleUI::SetSquirtLevel(int level)
   if (level == 0)
     {
     this->SquirtLevelScale->EnabledOff();
-    this->SquirtLevelScale->SetWidth(2);    
     this->SquirtLevelLabel->EnabledOff();
     this->SquirtCheck->SetState(0);
     this->SquirtLevelLabel->SetLabel("24 Bits-disabled");
@@ -696,7 +693,6 @@ void vtkPVCompositeRenderModuleUI::SetSquirtLevel(int level)
   else
     {
     this->SquirtLevelScale->EnabledOn();
-    this->SquirtLevelScale->SetWidth(15);    
     this->SquirtLevelLabel->EnabledOn();
     this->SquirtLevelScale->SetValue(level);
     this->SquirtCheck->SetState(1);
@@ -770,23 +766,22 @@ void vtkPVCompositeRenderModuleUI::SetReductionFactor(int factor)
   if (factor == 1)
     {
     this->ReductionFactorScale->EnabledOff();
-    this->ReductionFactorScale->SetWidth(2);    
-    this->ReductionFactorScale->EnabledOff();
+    this->ReductionFactorLabel->EnabledOff();
     this->ReductionCheck->SetState(0);
+    this->ReductionFactorLabel->SetLabel("Subsampling Disabled"); 
     vtkTimerLog::MarkEvent("--- Reduction disabled.");
     }
   else
     {
     this->ReductionFactorScale->EnabledOn();
-    this->ReductionFactorScale->SetWidth(15);    
     this->ReductionFactorLabel->EnabledOn();
     this->ReductionFactorScale->SetValue(factor);
     this->ReductionCheck->SetState(1);
-    vtkTimerLog::FormatAndMarkEvent("--- Reduction factor %d.", factor);
-    }
-  char str[128];
-  sprintf(str, "%d Pixels", factor);
-  this->ReductionFactorLabel->SetLabel(str); 
+    char str[128];
+    sprintf(str, "%d Pixels", factor);
+    this->ReductionFactorLabel->SetLabel(str); 
+     vtkTimerLog::FormatAndMarkEvent("--- Reduction factor %d.", factor);
+   }
 
 
   if (this->CompositeRenderModule)

@@ -90,7 +90,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLODRenderModuleUI);
-vtkCxxRevisionMacro(vtkPVLODRenderModuleUI, "1.5.2.4");
+vtkCxxRevisionMacro(vtkPVLODRenderModuleUI, "1.5.2.5");
 
 int vtkPVLODRenderModuleUICommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -368,7 +368,6 @@ void vtkPVLODRenderModuleUI::SetLODThreshold(float threshold)
     {
     this->LODThresholdValue->SetLabel("Disabled");
     this->LODThresholdScale->EnabledOff();
-    this->LODThresholdScale->SetWidth(2);
     this->LODThresholdValue->EnabledOff();
     this->LODResolutionLabel->EnabledOff();
     this->LODResolutionScale->EnabledOff();
@@ -381,7 +380,6 @@ void vtkPVLODRenderModuleUI::SetLODThreshold(float threshold)
     sprintf(str, "%.1f MBytes", threshold);
     this->LODThresholdValue->SetLabel(str);
     this->LODThresholdScale->EnabledOn();
-    this->LODThresholdScale->SetWidth(15);
     this->LODThresholdValue->EnabledOn();
     this->LODResolutionLabel->EnabledOn();
     this->LODResolutionScale->EnabledOn();
