@@ -33,6 +33,7 @@ vtkKWNotebook \
 vtkKWObject \
 vtkKWOptionMenu \
 vtkKWProgressGauge \
+vtkKWPushButton \
 vtkKWRadioButton \
 vtkKWSaveImageDialog \
 vtkKWScale \
@@ -65,14 +66,14 @@ include targets.make
 KIT_LIBS = 
 
 # standard stuff here
-KIT_OBJ = ${SRC_OBJ} 
+KIT_OBJ = ${SRC_OBJ} kwinit.o
 KIT_TCL_OBJ = ${TCL_OBJ}
 KIT_NEWS = ${TCL_NEWS}
 KIT_FLAGS = 
 
 
-VTK_LIB_FILE  = libVTK${ME}${VTK_LIB_EXT}
-TCL_LIB_FILE  = vtk${ME}Tcl
+VTK_LIB_FILE  = vtk${ME}${VTK_LIB_EXT}
+TCL_LIB_FILE  = vtk${ME}Tcl${VTK_LIB_EXT}
 
 
 #------------------------------------------------------------------------------
