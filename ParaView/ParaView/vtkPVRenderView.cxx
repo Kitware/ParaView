@@ -89,7 +89,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.213.2.10");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.213.2.11");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -837,6 +837,36 @@ void vtkPVRenderView::Create(vtkKWApplication *app, const char *args)
     this->ShowSelectionWindowCallback(0);
     }
 
+  // Interface settings: sources browser always show name
+  // This settings will be added at the "Application Settings" level, since 
+  // it's not really related to the "3D View Properties" panel. 
+
+  this->SourcesBrowserAlwaysShowName->SetParent(
+    this->GetPVWindow()->GetInterfaceSettingsFrame()->GetFrame());
+  this->SourcesBrowserAlwaysShowName->Create(this->Application, "");
+  this->SourcesBrowserAlwaysShowName->SetText(
+    "Sources browsers show source name");
+  this->SourcesBrowserAlwaysShowName->SetCommand(
+    this, "SourcesBrowserAlwaysShowNameCallback");
+
+  if (this->Application->HasRegisteryValue(
+    2, "RunTime", VTK_PV_SOURCES_BROWSER_ALWAYS_SHOW_NAME_REG_KEY) &&
+      this->Application->GetIntRegisteryValue(
+        2, "RunTime", VTK_PV_SOURCES_BROWSER_ALWAYS_SHOW_NAME_REG_KEY))
+    {
+    this->SetSourcesBrowserAlwaysShowName(1);
+    }
+  else
+    {
+    this->SetSourcesBrowserAlwaysShowName(0);
+    }
+
+  // Interface settings: pack
+
+  this->Script("pack %s -side top -anchor w -expand no -fill none",
+               this->SourcesBrowserAlwaysShowName->GetWidgetName());
+
+
   this->EventuallyRender();
   delete [] local;
 }
@@ -1243,7 +1273,7 @@ void vtkPVRenderView::CreateViewProperties()
   this->InterfaceSettingsFrame->SetParent(this->GeneralProperties->GetFrame());
   this->InterfaceSettingsFrame->ShowHideFrameOn();
   this->InterfaceSettingsFrame->Create(this->Application);
-  this->InterfaceSettingsFrame->SetLabel("Interface Settings");
+  this->InterfaceSettingsFrame->SetLabel("3D Interface Settings");
   this->Script("pack %s -padx 2 -pady 2 -fill x -expand yes -anchor w",
                this->InterfaceSettingsFrame->GetWidgetName());
 
@@ -1265,33 +1295,10 @@ void vtkPVRenderView::CreateViewProperties()
     this->SetDisplay3DWidgets(0);
     }
   
-  // Interface settings: sources browser always show name
-
-  this->SourcesBrowserAlwaysShowName->SetParent(
-    this->InterfaceSettingsFrame->GetFrame());
-  this->SourcesBrowserAlwaysShowName->Create(this->Application, "");
-  this->SourcesBrowserAlwaysShowName->SetText(
-    "Sources browsers show source name");
-  this->SourcesBrowserAlwaysShowName->SetCommand(
-    this, "SourcesBrowserAlwaysShowNameCallback");
-
-  if (this->Application->HasRegisteryValue(
-    2, "RunTime", VTK_PV_SOURCES_BROWSER_ALWAYS_SHOW_NAME_REG_KEY) &&
-      this->Application->GetIntRegisteryValue(
-        2, "RunTime", VTK_PV_SOURCES_BROWSER_ALWAYS_SHOW_NAME_REG_KEY))
-    {
-    this->SetSourcesBrowserAlwaysShowName(1);
-    }
-  else
-    {
-    this->SetSourcesBrowserAlwaysShowName(0);
-    }
-
   // Interface settings: pack
 
-  this->Script("pack %s %s -side top -padx 2 -pady 2 -anchor w",
-               this->Display3DWidgets->GetWidgetName(),
-               this->SourcesBrowserAlwaysShowName->GetWidgetName());
+  this->Script("pack %s -side top -padx 2 -pady 2 -anchor w",
+               this->Display3DWidgets->GetWidgetName());
 
   // Camera settings
 
@@ -2439,7 +2446,7 @@ void vtkPVRenderView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVRenderView ";
-  this->ExtractRevision(os,"$Revision: 1.213.2.10 $");
+  this->ExtractRevision(os,"$Revision: 1.213.2.11 $");
 }
 
 //------------------------------------------------------------------------------
