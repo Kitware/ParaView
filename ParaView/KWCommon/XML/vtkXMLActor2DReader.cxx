@@ -46,9 +46,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkProperty2D.h"
 #include "vtkXMLDataElement.h"
 #include "vtkXMLProperty2DReader.h"
+#include "vtkXMLActor2DWriter.h"
 
 vtkStandardNewMacro(vtkXMLActor2DReader);
-vtkCxxRevisionMacro(vtkXMLActor2DReader, "1.1");
+vtkCxxRevisionMacro(vtkXMLActor2DReader, "1.2");
 
 //----------------------------------------------------------------------------
 char* vtkXMLActor2DReader::GetRootElementName()
@@ -101,22 +102,24 @@ int vtkXMLActor2DReader::Parse(vtkXMLDataElement *elem)
   
   // Get nested elements
   
-  vtkXMLDataElement *nested_elem;
-  
   // Property 2D
-  
-  vtkProperty2D *prop2d = obj->GetProperty();
-  if (prop2d)
-    {
-    vtkXMLProperty2DReader *xmlr = vtkXMLProperty2DReader::New();
-    nested_elem = elem->FindNestedElementWithName(xmlr->GetRootElementName());
-    if (nested_elem)
-      {
-      xmlr->SetObject(prop2d);
-      xmlr->Parse(nested_elem);
-      }
-    xmlr->Delete();
-    }
 
+  vtkXMLProperty2DReader *xmlr = vtkXMLProperty2DReader::New();
+  if (xmlr->IsInNestedElement(
+        elem, vtkXMLActor2DWriter::GetPropertyElementName()))
+    {
+    vtkProperty2D *prop2d = obj->GetProperty();
+    if (!prop2d)
+      {
+      prop2d = vtkProperty2D::New();
+      obj->SetProperty(prop2d);
+      prop2d->Delete();
+      }
+    xmlr->SetObject(prop2d);
+    xmlr->ParseInNestedElement(
+      elem, vtkXMLActor2DWriter::GetPropertyElementName());
+    }
+  xmlr->Delete();
+  
   return 1;
 }
