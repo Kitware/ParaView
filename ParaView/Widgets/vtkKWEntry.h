@@ -64,11 +64,11 @@ public:
   // number of decimal places to display.
   void SetValue(const char *);
   void SetValue(int a);
-  void SetValue(float f,int size);
-  void SetValue(float f);
+  void SetValue(double f,int size);
+  void SetValue(double f);
   char *GetValue();
   int GetValueAsInt();
-  float GetValueAsFloat();
+  double GetValueAsFloat();
   
   // Description:
   // The width is the number of charaters wide the entry box can fit.

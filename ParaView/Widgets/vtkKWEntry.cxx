@@ -73,7 +73,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWEntry );
-vtkCxxRevisionMacro(vtkKWEntry, "1.43");
+vtkCxxRevisionMacro(vtkKWEntry, "1.44");
 
 //----------------------------------------------------------------------------
 vtkKWEntry::vtkKWEntry()
@@ -134,7 +134,7 @@ int vtkKWEntry::GetValueAsInt()
 }
 
 //----------------------------------------------------------------------------
-float vtkKWEntry::GetValueAsFloat()
+double vtkKWEntry::GetValueAsFloat()
 {
   if ( !this->IsCreated() )
     {
@@ -228,7 +228,7 @@ void vtkKWEntry::SetValue(int i)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWEntry::SetValue(float f)
+void vtkKWEntry::SetValue(double f)
 {
   char tmp[1024];
   sprintf(tmp, "%g", f);
@@ -236,11 +236,11 @@ void vtkKWEntry::SetValue(float f)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWEntry::SetValue(float f, int size)
+void vtkKWEntry::SetValue(double f, int size)
 {
   char tmp[1024];
   char format[1024];
-  sprintf(format,"%%.%df",size);
+  sprintf(format,"%%.%dg",size);
   sprintf(tmp,format, f);
   this->SetValue(tmp);
 }
