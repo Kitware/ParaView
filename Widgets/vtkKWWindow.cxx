@@ -2244,13 +2244,19 @@ vtkKWWindow::vtkKWWindow()
 
   this->MenuHelp = vtkKWMenu::New();
   this->MenuHelp->SetParent(this->Menu);
+  
+  this->ToolbarFrame = vtkKWWidget::New();
+  this->ToolbarFrame->SetParent(this);  
+
+  this->MiddleFrame = vtkKWWidget::New();
+  this->MiddleFrame->SetParent(this);
 
   this->ViewFrame = vtkKWWidget::New();
-  this->ViewFrame->SetParent(this);
+  this->ViewFrame->SetParent(this->MiddleFrame);
 
   this->StatusFrame = vtkKWWidget::New();
   this->StatusFrame->SetParent(this);
-  
+    
   this->StatusLabel = vtkKWWidget::New();
   this->StatusLabel->SetParent(this->StatusFrame);
   this->StatusImage = vtkKWWidget::New();
@@ -2273,6 +2279,8 @@ vtkKWWindow::~vtkKWWindow()
   this->Menu->Delete();
   this->MenuFile->Delete();
   this->MenuHelp->Delete();
+  this->ToolbarFrame->Delete();
+  this->MiddleFrame->Delete();
   this->ViewFrame->Delete();
   this->StatusFrame->Delete();
   this->StatusImage->Delete();
@@ -2316,7 +2324,7 @@ void vtkKWWindow::CreateDefaultPropertiesParent()
   if (!this->PropertiesParent)
     {
     vtkKWWidget *pp = vtkKWWidget::New();
-    pp->SetParent(this);
+    pp->SetParent(this->MiddleFrame);
     pp->Create(this->Application,"frame","-bd 0");
     this->Script("pack %s -before %s -side left -fill y -anchor nw",
                  pp->GetWidgetName(), 
@@ -2496,9 +2504,18 @@ void vtkKWWindow::Create(vtkKWApplication *app, char *args)
   this->Script("pack %s -side bottom -fill x -pady 2",
     this->StatusFrame->GetWidgetName());
 
+  // To force the toolbar on top, I am create a separate "MiddleFrame" for the ViewFrame and PropertiesParent
+  this->MiddleFrame->Create(app, "frame", "");
+  this->Script("pack %s -side bottom -fill both -expand t",
+    this->MiddleFrame->GetWidgetName());
+
   this->ViewFrame->Create(app,"frame","");
   this->Script("pack %s -side right -fill both -expand yes",
                this->ViewFrame->GetWidgetName());
+
+  this->ToolbarFrame->Create(app, "frame", "-bd 0");
+  this->Script("pack %s -side bottom -fill x -expand no",
+    this->ToolbarFrame->GetWidgetName());
 
   // Set up standard menus
   this->Menu->Create(app,"-tearoff 0");
@@ -2519,8 +2536,7 @@ void vtkKWWindow::Create(vtkKWApplication *app, char *args)
 void vtkKWWindow::InstallMenu(vtkKWMenu* menu)
 { 
   this->Script("%s configure -menu %s", this->GetWidgetName(),
-	       this->Menu->GetWidgetName());
-  
+	       this->Menu->GetWidgetName());  
 }
 
 void vtkKWWindow::UnRegister(vtkObject *o)

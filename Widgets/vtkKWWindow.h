@@ -121,11 +121,16 @@ public:
   // in the file menu. This is useful because most menu options
   // go above the MRU list, hence above this index.
   int GetFileMenuIndex();
-  
+
   // Description:
   // Install a menu bar into this window.
   void InstallMenu(vtkKWMenu* menu);
-  
+
+  // Description:
+  // This toolbar frame is below the menu. It is empty initially.
+  // Subclasses can add toolbars buttons as necessary.
+  vtkGetObjectMacro(ToolbarFrame, vtkKWWidget);
+ 
 protected:
   void CreateStatusImage();
   int NumberOfMRUFiles;
@@ -141,8 +146,10 @@ protected:
   vtkKWWidget *StatusImage;
   vtkKWWidget *StatusLabel;
   char        *StatusImageName;
+  vtkKWWidget *MiddleFrame; // Contains view frame and properties parent.
   vtkKWWidget *PropertiesParent;
   vtkKWWidget *ViewFrame;
+  vtkKWWidget *ToolbarFrame;
 };
 
 
