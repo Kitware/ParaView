@@ -32,7 +32,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVScale);
-vtkCxxRevisionMacro(vtkPVScale, "1.34");
+vtkCxxRevisionMacro(vtkPVScale, "1.35");
 
 //----------------------------------------------------------------------------
 vtkPVScale::vtkPVScale()
@@ -565,22 +565,10 @@ void vtkPVScale::UpdateVTKSourceInternal(vtkClientServerID sourceID,
 {
   vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
   vtkstd::string method = "Set";
-  vtkstd::string varname = this->VariableName;
-  vtkstd::string::size_type pos = varname.find(' ');
-  pm->GetStream() << vtkClientServerStream::Invoke << sourceID;
-  if(pos != varname.npos)
-    {
-    // Hack to pass a string argument as first parameter.  Needed
-    // for "SetRestrictionAsIndex timestep" in vtkPVDReaderModule.
-    method += varname.substr(0, pos);
-    pm->GetStream() << method.c_str() << varname.substr(pos+1).c_str();
-    }
-  else
-    {
-    method += varname;
-    pm->GetStream() << method.c_str();
-    }
-  pm->GetStream() << value << vtkClientServerStream::End;
+  method += this->VariableName;
+  pm->GetStream() << vtkClientServerStream::Invoke
+                  << sourceID << method.c_str() << value
+                  << vtkClientServerStream::End;
   pm->SendStreamToServer();
   this->Property->SetScalars(1, &value);
 }

@@ -17,6 +17,7 @@ SET( ParaViewServer_SRCS
   vtkClientCompositeManager.cxx
   vtkCompleteArrays.cxx
   vtkExtractCTHPart.cxx
+  vtkPVDReader.cxx
   vtkPVServerArraySelection.cxx
   vtkPVServerFileListing.cxx
   vtkPVServerObject.cxx

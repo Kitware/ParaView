@@ -23,7 +23,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVDReaderModule);
-vtkCxxRevisionMacro(vtkPVDReaderModule, "1.5");
+vtkCxxRevisionMacro(vtkPVDReaderModule, "1.6");
 
 //----------------------------------------------------------------------------
 vtkPVDReaderModule::vtkPVDReaderModule()
@@ -113,7 +113,7 @@ int vtkPVDReaderModule::ReadFileInformation(const char* fname)
     this->TimeScale->SetParent(this->GetParameterFrame()->GetFrame());
     this->TimeScale->SetModifiedCommand(this->GetTclName(), 
                                         "SetAcceptButtonColorToRed");
-    this->TimeScale->SetVariableName("RestrictionAsIndex timestep");
+    this->TimeScale->SetVariableName("TimestepAsIndex");
     this->TimeScale->Create(this->GetPVApplication());
     this->TimeScale->DisplayEntry();
     this->TimeScale->SetDisplayEntryAndLabelOnTop(0);

@@ -5,7 +5,7 @@
           module_type="Reader"
           extensions=".pvd"
           file_description="ParaView Data Files">
-    <Source class="vtkXMLCollectionReader"/>
+    <Source class="vtkPVDReader"/>
   </Module>
   <Module name="XMLPolyDataReader"
           root_name="XMLPolyDataReader"
