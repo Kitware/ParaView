@@ -24,6 +24,7 @@
 #include "vtkPVOptions.h"
 
 #include <sys/stat.h>
+#include <vtkstd/string>
 
 #include "vtkPVSourceInterfaceDirectories.h"
 
