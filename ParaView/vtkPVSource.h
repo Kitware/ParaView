@@ -271,6 +271,11 @@ public:
   vtkGetMacro(ReplaceInput, int);
   vtkBooleanMacro(ReplaceInput, int);
 
+  // Description:
+  // Access for scripting
+  vtkGetObjectMacro(ScalarOperationMenu, vtkKWOptionMenu);
+  vtkGetObjectMacro(VectorOperationMenu, vtkKWOptionMenu);
+
 protected:
   vtkPVSource();
   ~vtkPVSource();
