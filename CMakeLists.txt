@@ -1,4 +1,4 @@
-CMAKE_MINIMUM_REQUIRED (VERSION 1.8)
+CMAKE_MINIMUM_REQUIRED (VERSION 2.0)
 PROJECT(ParaView)
 
 #########################################################################
