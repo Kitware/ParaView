@@ -39,7 +39,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWText );
-vtkCxxRevisionMacro(vtkKWText, "1.17");
+vtkCxxRevisionMacro(vtkKWText, "1.18");
 
 //----------------------------------------------------------------------------
 vtkKWText::vtkKWText()
@@ -79,7 +79,7 @@ void vtkKWText::SetValue(const char *s)
     {
     const char *str = this->ConvertInternalStringToTclString(s);
     this->Script("catch {%s insert 1.0 {%s}}", 
-                 this->GetWidgetName(), str);
+                 this->GetWidgetName(), str ? str : "");
     }
 }
 

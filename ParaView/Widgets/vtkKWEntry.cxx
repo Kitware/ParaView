@@ -73,7 +73,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWEntry );
-vtkCxxRevisionMacro(vtkKWEntry, "1.42");
+vtkCxxRevisionMacro(vtkKWEntry, "1.43");
 
 //----------------------------------------------------------------------------
 vtkKWEntry::vtkKWEntry()
@@ -204,7 +204,7 @@ void vtkKWEntry::SetValue(const char *s)
       {
       const char *str = this->ConvertInternalStringToTclString(s);
       this->Script("catch {%s insert 0 {%s}}", 
-                   this->Entry->GetWidgetName(), str);
+                   this->Entry->GetWidgetName(), str ? str : "");
       }
     }
 
