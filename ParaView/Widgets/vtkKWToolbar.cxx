@@ -77,7 +77,7 @@ void vtkKWToolbar::SetGlobalWidgetsFlatAspect(int val)
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWToolbar );
-vtkCxxRevisionMacro(vtkKWToolbar, "1.14");
+vtkCxxRevisionMacro(vtkKWToolbar, "1.15");
 
 
 int vtkKWToolbarCommand(ClientData cd, Tcl_Interp *interp,
@@ -137,7 +137,7 @@ void vtkKWToolbar::Create(vtkKWApplication *app)
 
   // Create the main frame for this widget
 
-  this->Script("frame %s -pady 2", this->GetWidgetName());
+  this->Script("frame %s ", this->GetWidgetName());
   this->Script("pack %s -side left -anchor nw -expand y -fill both -ipadx 0 -padx 2",
                this->GetWidgetName());
   
@@ -248,7 +248,7 @@ void vtkKWToolbar::Pack()
     }
   else
     {
-    this->Script("%s config -relief raised -bd 1 -padx 3", 
+    this->Script("%s config -relief raised -bd 1 -padx 3 -pady 2", 
                  this->GetWidgetName());
     this->Script("pack forget %s", this->Separator->GetWidgetName());
     this->Script("pack %s -side left -anchor nw -expand n -fill y -ipadx 0",
