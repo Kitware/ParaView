@@ -106,7 +106,6 @@ const char* vtkPVWindow::StandardSourceInterfaces =
 "\n"
 "<Module name=\"ConeSource\" root_name=\"Cone\" output=\"vtkPolyData\" module_type=\"Source\">\n"
 "  <Source type=\"vtkConeSource\"/>\n"
-"  <LineWidget />\n"
 "  <VectorEntry variable=\"Resolution\" type=\"int\" help=\"Set the number of faces on this cone\"/>\n"
 "  <VectorEntry variable=\"Radius\" type=\"float\" help=\"Set the radius of the widest part of the cone\"/>\n"
 "  <VectorEntry variable=\"Height\" type=\"float\" help=\"Set the height of the cone\"/>\n"
