@@ -61,7 +61,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVFileEntry);
-vtkCxxRevisionMacro(vtkPVFileEntry, "1.34");
+vtkCxxRevisionMacro(vtkPVFileEntry, "1.35");
 
 //----------------------------------------------------------------------------
 vtkPVFileEntry::vtkPVFileEntry()
@@ -435,7 +435,7 @@ void vtkPVFileEntry::SetValue(const char* fileName)
     delete [] name;
     str << "}" << ends;
     //cout << str.str() << endl;
-    this->Script(str.str());
+    this->GetPVApplication()->BroadcastScript(str.str());
     str.rdbuf()->freeze(0);
     }
 
