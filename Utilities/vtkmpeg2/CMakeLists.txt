@@ -1,5 +1,9 @@
 PROJECT(MPEG2ENC)
 
+# We need ansi c-flags, especially on HP
+SET(CMAKE_C_FLAGS "${CMAKE_ANSI_CFLAGS} ${CMAKE_C_FLAGS}")
+SET(CMAKE_REQUIRED_FLAGS ${CMAKE_ANSI_CFLAGS})
+
 SET(srcs
   conform.c  motion.c    putbits.c  putpic.c  quantize.c  stats.c
   fdctref.c  puthdr.c   putseq.c  ratectl.c   transfrm.c
