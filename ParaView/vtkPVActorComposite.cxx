@@ -1172,6 +1172,11 @@ void vtkPVActorComposite::SetScalarBarVisibility(int val)
     }
   
   ren = this->GetView()->GetRenderer();
+
+  if (ren == NULL)
+    {
+    return;
+    }
   
   if (this->ScalarBarCheck->GetState() != val)
     {
@@ -1204,6 +1209,11 @@ void vtkPVActorComposite::SetCubeAxesVisibility(int val)
     }
   
   ren = this->GetView()->GetRenderer();
+
+  if (ren == NULL)
+    {
+    return;
+    }
   
   if (this->CubeAxesCheck->GetState() != val)
     {

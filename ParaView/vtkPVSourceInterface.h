@@ -80,7 +80,8 @@ public:
   // Description:
   // Where to put any new source composites created.
   // This is here because the callback does not have an argument.
-  vtkSetObjectMacro(PVWindow, vtkPVWindow);
+  // No reference counting.
+  void SetPVWindow(vtkPVWindow *pvw);
   
   // Description:
   // This method is called by the window to determine if this filter should be

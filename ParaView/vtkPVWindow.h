@@ -128,9 +128,6 @@ public:
   // Callback from the contour button.
   void GlyphCallback();
 
-  // Description::
-  // Close this window, possibly exiting the application if no more
-  // windows are open.
   virtual void Close();
 
 protected:

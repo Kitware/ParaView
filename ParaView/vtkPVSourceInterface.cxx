@@ -52,8 +52,8 @@ vtkPVSourceInterface::vtkPVSourceInterface()
   this->MethodInterfaces = vtkCollection::New();
 
   this->CommandFunction = vtkPVSourceInterfaceCommand;
-
   this->PVWindow = NULL;
+
 }
 
 //----------------------------------------------------------------------------
@@ -68,13 +68,19 @@ vtkPVSourceInterface::~vtkPVSourceInterface()
   this->SetOutputClassName(NULL);
   this->SetDataFileName(NULL);
   
-  this->PVWindow = NULL;
+  this->SetPVWindow(NULL);
 }
 
 //----------------------------------------------------------------------------
 vtkPVSourceInterface* vtkPVSourceInterface::New()
 {
   return new vtkPVSourceInterface();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVSourceInterface::SetPVWindow(vtkPVWindow *w)
+{
+  this->PVWindow = w;
 }
 
 //----------------------------------------------------------------------------

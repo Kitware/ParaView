@@ -115,6 +115,12 @@ vtkPVWindow::~vtkPVWindow()
 //----------------------------------------------------------------------------
 void vtkPVWindow::PrepareForDelete()
 {
+  if (this->SourceInterfaces)
+    {
+    this->SourceInterfaces->Delete();
+    this->SourceInterfaces = NULL;
+    }
+
   if (this->InteractorToolbar)
     {
     this->InteractorToolbar->Delete();
@@ -133,6 +139,7 @@ void vtkPVWindow::PrepareForDelete()
     }
   if (this->RotateCameraInteractor)
     {
+    // Circular reference.
     this->RotateCameraInteractor->PrepareForDelete();
     this->RotateCameraInteractor->Delete();
     this->RotateCameraInteractor = NULL;
@@ -223,11 +230,11 @@ void vtkPVWindow::PrepareForDelete()
   //  }
 }
 
+
 //----------------------------------------------------------------------------
 void vtkPVWindow::Close()
 {
-  this->PrepareForDelete();
-  this->vtkKWWindow::Close();
+  vtkKWWindow::Close();
 }
 
 

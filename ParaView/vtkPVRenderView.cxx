@@ -29,7 +29,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkToolkits.h"
 #include "vtkPolyData.h"
 #include "vtkPolyDataMapper.h"
-#include "vtkTreeComposite.h"
+#include "vtkPVTreeComposite.h"
 #include "vtkPVRenderView.h"
 #include "vtkKWInteractor.h"
 #include "vtkPVApplication.h"
@@ -51,6 +51,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 #include "vtkTimerLog.h"
 #include "vtkPVActorComposite.h"
+#include "vtkKWCornerAnnotation.h"
 
 
 //----------------------------------------------------------------------------
@@ -134,7 +135,7 @@ void vtkPVRenderView::CreateRenderObjects(vtkPVApplication *pvApp)
 //----------------------------------------------------------------------------
 vtkPVRenderView::~vtkPVRenderView()
 {
-  this->PrepareForDelete();
+  vtkPVApplication *pvApp = this->GetPVApplication();
   
   this->NavigationFrame->Delete();
   this->NavigationFrame = NULL;
@@ -146,18 +147,10 @@ vtkPVRenderView::~vtkPVRenderView()
     this->CurrentInteractor->UnRegister(this);
     this->CurrentInteractor = NULL;
     }
-}
 
-//----------------------------------------------------------------------------
-// Here we are going to change only the satellite procs.
-void vtkPVRenderView::PrepareForDelete()
-{
-  vtkPVApplication *pvApp = this->GetPVApplication();
-  
+  // Tree Composite
   if (this->Composite)
     {
-    vtkErrorMacro("Deleting TreeComposite.");
-    this->Composite->DebugOn();
     pvApp->BroadcastScript("%s Delete", this->CompositeTclName);
     this->SetCompositeTclName(NULL);
     this->Composite = NULL;
@@ -165,8 +158,6 @@ void vtkPVRenderView::PrepareForDelete()
 
   if (this->Renderer)
     {
-    vtkErrorMacro("Deleting Renderer.");
-    this->Renderer->DebugOn();
     pvApp->BroadcastScript("%s Delete", this->RendererTclName);
     this->SetRendererTclName(NULL);
     this->Renderer = NULL;
@@ -174,13 +165,39 @@ void vtkPVRenderView::PrepareForDelete()
 
   if (this->RenderWindow)
     {
-    vtkErrorMacro("Deleting RenderWindow.");
-    this->RenderWindow->DebugOn();
     pvApp->BroadcastScript("%s Delete", this->RenderWindowTclName);
     this->SetRenderWindowTclName(NULL);
     this->RenderWindow = NULL;
     }
+}
 
+//----------------------------------------------------------------------------
+// Here we are going to change only the satellite procs.
+void vtkPVRenderView::PrepareForDelete()
+{
+  vtkPVTreeComposite *c;
+  
+  // Circular reference.
+  c = vtkPVTreeComposite::SafeDownCast(this->Composite); 
+  if (c)
+    {
+    c->SetRenderView(NULL);
+    }
+
+  //if (this->CornerAnnotation)
+  //  {
+  //  this->CornerAnnotation->SetView(NULL);
+  //  }
+
+
+  //if (this->Frame)
+  //  {
+  //  this->Frame->SetParent(NULL);
+  //  this->Frame->Delete();
+  //  this->Frame = NULL;
+  //  }
+
+  //this->SetParent(NULL);
 }
 
 
@@ -292,6 +309,8 @@ void vtkPVRenderView::Create(vtkKWApplication *app, const char *args)
   sprintf(local,"%s -rw Addr=%p",args,this->RenderWindow);
   this->Script("vtkTkRenderWidget %s %s",
                this->VTKWidget->GetWidgetName(),local);
+  //this->Script("vtkTkRenderWidget %s %s",
+  //             this->VTKWidget->GetWidgetName(),args);
   this->Script("pack %s -expand yes -fill both -side top -anchor nw",
                this->VTKWidget->GetWidgetName());
   
@@ -736,7 +755,7 @@ void vtkPVRenderView::EventuallyRender()
   this->EventuallyRenderFlag = 1;
   // Make sure we do not delete the render view before the queued
   // render gets executed
-  this->Register(NULL);
+  this->Register(this);
   this->Script("after idle {%s EventuallyRenderCallBack}",this->GetTclName());
 }
                       
@@ -750,7 +769,7 @@ void vtkPVRenderView::EventuallyRenderCallBack()
     return;
     }
   this->EventuallyRenderFlag = 0;
-  this->UnRegister(NULL);
+  this->UnRegister(this);
   this->RenderWindow->SetDesiredUpdateRate(0.000001);
   //this->SetRenderModeToStill();
   this->ResetCameraClippingRange();

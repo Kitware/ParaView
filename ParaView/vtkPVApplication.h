@@ -88,7 +88,7 @@ public:
 
   // Description:
   // We need to kill the slave processes
-  void Exit();
+  virtual void Exit();
   
   // Description:
   // class static method to initialize Tcl/Tk

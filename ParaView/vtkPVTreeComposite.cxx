@@ -55,7 +55,13 @@ vtkPVTreeComposite* vtkPVTreeComposite::New()
   return new vtkPVTreeComposite;
 }
 
-//-------------------------------------------------------------------------
+
+//#########################################################################
+// If we are not using MPI, just stub out this class so the supper class
+// will do every thing.
+#ifdef VTK_USE_MPI
+
+3/-------------------------------------------------------------------------
 vtkPVTreeComposite::vtkPVTreeComposite()
 {
   this->MPIController = vtkMPIController::SafeDownCast(this->Controller);
@@ -401,6 +407,50 @@ int vtkPVTreeComposite::RootFinalAbortCheck()
 }
 
 
+// end VTK_USE_MPI
+//#########################################################################
+#else
+// Not using MPI
+
+//-------------------------------------------------------------------------
+vtkPVTreeComposite::vtkPVTreeComposite()
+{ 
+  this->RenderView = NULL;
+}
+
+  
+//-------------------------------------------------------------------------
+vtkPVTreeComposite::~vtkPVTreeComposite()
+{
+  this->SetRenderView(NULL);
+}
+
+
+//----------------------------------------------------------------------------
+void vtkPVTreeComposite::PrintSelf(ostream& os, vtkIndent indent)
+{
+  vtkTreeComposite::PrintSelf(os, indent);
+}
+
+
+//----------------------------------------------------------------------------
+void vtkPVTreeComposite::CheckForAbortRender()
+{
+  this->vtkTreeComposite::CheckForAbortRender();
+}
+
+
+//----------------------------------------------------------------------------
+int vtkPVTreeComposite::CheckForAbortComposite()
+{
+  return this->vtkTreeComposite::CheckForAbortComposite();
+}
+
+
+
+
+
+#endif  // VTK_USE_MPI
 
 
 

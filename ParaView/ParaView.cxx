@@ -168,7 +168,10 @@ void Process_Init(vtkMultiProcessController *controller, void *arg )
     app->SetController(controller);
     app->Script("wm withdraw .");
     app->Start(pvArgs->argc,pvArgs->argv);
-    app->Delete();
+    if (Tcl_Eval(interp, "Application Delete") != TCL_OK)
+      {
+      cerr << "Could not delete application.\n";
+      }
     }
   else
     {
