@@ -206,7 +206,6 @@ int MyMain(int argc, char *argv[])
     {
     vtkPVClientServerModule *processModule = vtkPVClientServerModule::New();
 
-    int idx;
     for (idx = 0; idx < argc; ++idx)
       {
       const char* arg = "--connect-id";
