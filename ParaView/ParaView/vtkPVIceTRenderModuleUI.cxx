@@ -24,7 +24,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVIceTRenderModuleUI);
-vtkCxxRevisionMacro(vtkPVIceTRenderModuleUI, "1.3");
+vtkCxxRevisionMacro(vtkPVIceTRenderModuleUI, "1.4");
 
 int vtkPVIceTRenderModuleUICommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -34,6 +34,7 @@ int vtkPVIceTRenderModuleUICommand(ClientData cd, Tcl_Interp *interp,
 vtkPVIceTRenderModuleUI::vtkPVIceTRenderModuleUI()
 {
   this->CommandFunction = vtkPVIceTRenderModuleUICommand;
+  this->CompositeOptionEnabled = 1;
 }
 
 
