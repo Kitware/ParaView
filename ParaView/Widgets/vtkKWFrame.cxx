@@ -17,7 +17,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWFrame );
-vtkCxxRevisionMacro(vtkKWFrame, "1.18");
+vtkCxxRevisionMacro(vtkKWFrame, "1.19");
 
 //----------------------------------------------------------------------------
 vtkKWFrame::vtkKWFrame()
@@ -33,10 +33,12 @@ vtkKWFrame::~vtkKWFrame()
   if ( this->ScrollFrame )
     {
     this->ScrollFrame->Delete();
+    this->ScrollFrame = 0;
     }
   if (this->Frame && this->Frame != this)
     {
     this->Frame->Delete();
+    this->Frame = 0;
     }
 }
 
@@ -112,6 +114,15 @@ void vtkKWFrame::SetHeight(int height)
     {
     this->Script("%s config -height %d", this->GetWidgetName(), height);
     }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWFrame::UpdateEnableState()
+{
+  this->Superclass::UpdateEnableState();
+
+  this->PropagateEnableState(this->Frame);
+  this->PropagateEnableState(this->ScrollFrame);
 }
 
 //----------------------------------------------------------------------------

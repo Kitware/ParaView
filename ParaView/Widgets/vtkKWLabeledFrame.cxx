@@ -24,7 +24,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLabeledFrame );
-vtkCxxRevisionMacro(vtkKWLabeledFrame, "1.32");
+vtkCxxRevisionMacro(vtkKWLabeledFrame, "1.33");
 
 int vtkKWLabeledFrameCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -354,10 +354,8 @@ void vtkKWLabeledFrame::UpdateEnableState()
   // Disable only the label part of the labeled label
   // (we want the icon not to look disabled)
 
-  if (this->GetLabel())
-    {
-    this->GetLabel()->SetEnabled(this->Enabled);
-    }
+
+  this->PropagateEnableState(this->Label);
 
   int limited = 
     (this->Application && this->Application->GetLimitedEditionMode());
@@ -370,6 +368,12 @@ void vtkKWLabeledFrame::UpdateEnableState()
     {
     this->Label->ShowLabelOff();
     }
+  this->PropagateEnableState(this->Frame);
+  this->PropagateEnableState(this->LabelFrame);
+  this->PropagateEnableState(this->Border);
+  this->PropagateEnableState(this->Border2);
+  this->PropagateEnableState(this->Groove);
+  this->PropagateEnableState(this->Icon);
 }
 
 //----------------------------------------------------------------------------

@@ -100,7 +100,7 @@ static unsigned char image_copy[] =
 
 // ----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWTextProperty);
-vtkCxxRevisionMacro(vtkKWTextProperty, "1.30");
+vtkCxxRevisionMacro(vtkKWTextProperty, "1.31");
 
 int vtkKWTextPropertyCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -1122,30 +1122,13 @@ void vtkKWTextProperty::UpdateEnableState()
 {
   this->Superclass::UpdateEnableState();
 
-  if (this->Label)
-    {
-    this->Label->SetEnabled(this->Enabled);
-    }
 
-  if (this->ChangeColorButton)
-    {
-    this->ChangeColorButton->SetEnabled(this->Enabled);
-    }
-
-  if (this->FontFamilyOptionMenu)
-    {
-    this->FontFamilyOptionMenu->SetEnabled(this->Enabled);
-    }
-
-  if (this->StylesCheckButtonSet)
-    {
-    this->StylesCheckButtonSet->SetEnabled(this->Enabled);
-    }
-
-  if (this->OpacityScale)
-    {
-    this->OpacityScale->SetEnabled(this->Enabled);
-    }
+  this->PropagateEnableState(this->Label);
+  this->PropagateEnableState(this->ChangeColorButton);
+  this->PropagateEnableState(this->FontFamilyOptionMenu);
+  this->PropagateEnableState(this->StylesCheckButtonSet);
+  this->PropagateEnableState(this->OpacityScale);
+  this->PropagateEnableState(this->PushButtonSet);
 }
 
 //----------------------------------------------------------------------------

@@ -18,7 +18,7 @@
 
 
 vtkStandardNewMacro( vtkKWSplitFrame );
-vtkCxxRevisionMacro(vtkKWSplitFrame, "1.17");
+vtkCxxRevisionMacro(vtkKWSplitFrame, "1.18");
 
 
 
@@ -492,6 +492,16 @@ void vtkKWSplitFrame::Update()
     {
     this->Script("place forget %s", this->Frame2->GetWidgetName());
     }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWSplitFrame::UpdateEnableState()
+{
+  this->Superclass::UpdateEnableState();
+
+  this->PropagateEnableState(this->Frame1);
+  this->PropagateEnableState(this->Separator);
+  this->PropagateEnableState(this->Frame2);
 }
 
 //----------------------------------------------------------------------------

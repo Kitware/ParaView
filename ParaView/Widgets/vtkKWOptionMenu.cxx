@@ -20,7 +20,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWOptionMenu );
-vtkCxxRevisionMacro(vtkKWOptionMenu, "1.27");
+vtkCxxRevisionMacro(vtkKWOptionMenu, "1.28");
 
 //----------------------------------------------------------------------------
 vtkKWOptionMenu::vtkKWOptionMenu()
@@ -227,6 +227,19 @@ void vtkKWOptionMenu::SetWidth(int width)
   if (this->IsCreated())
     {
     this->Script("%s configure -width %d", this->GetWidgetName(), width);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWOptionMenu::UpdateEnableState()
+{
+  this->Superclass::UpdateEnableState();
+
+  this->PropagateEnableState(this->Menu);
+  if ( this->Menu )
+    {
+    int menu_state = this->Enabled ? vtkKWMenu::Normal : vtkKWMenu::Disabled;
+    this->Menu->SetState(menu_state);
     }
 }
 

@@ -33,6 +33,7 @@ class vtkKWWindow;
 template<class DataType> class vtkLinkedList;
 template<class DataType> class vtkLinkedListIterator;
 //ETX
+//
 
 class VTK_EXPORT vtkKWWidget : public vtkKWObject
 {
@@ -401,6 +402,8 @@ protected:
     const char *str, int no_curly_braces = 1);
   const char* ConvertInternalStringToTclString(
     const char *str, int no_curly_braces = 1);
+
+  void PropagateEnableState(vtkKWWidget* widget);
 
 private:
   vtkKWWidget(const vtkKWWidget&); // Not implemented

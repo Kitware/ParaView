@@ -18,7 +18,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWListBox );
-vtkCxxRevisionMacro(vtkKWListBox, "1.21");
+vtkCxxRevisionMacro(vtkKWListBox, "1.22");
 
 
 //----------------------------------------------------------------------------
@@ -320,6 +320,14 @@ void vtkKWListBox::SetBalloonHelpJustification( int j )
   this->Scrollbar->SetBalloonHelpJustification( j );
 }
 
+//----------------------------------------------------------------------------
+void vtkKWListBox::UpdateEnableState()
+{
+  this->Superclass::UpdateEnableState();
+
+  this->PropagateEnableState(this->Scrollbar);
+  this->PropagateEnableState(this->Listbox);
+}
 //----------------------------------------------------------------------------
 void vtkKWListBox::PrintSelf(ostream& os, vtkIndent indent)
 {

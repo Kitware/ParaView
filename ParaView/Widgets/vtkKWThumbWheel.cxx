@@ -31,7 +31,7 @@
 
 // ---------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWThumbWheel );
-vtkCxxRevisionMacro(vtkKWThumbWheel, "1.15");
+vtkCxxRevisionMacro(vtkKWThumbWheel, "1.16");
 
 // ---------------------------------------------------------------------------
 int vtkKWThumbWheelCommand(ClientData cd, 
@@ -1274,6 +1274,11 @@ void vtkKWThumbWheel::UpdateEnableState()
   if (this->ThumbWheel)
     {
     this->ThumbWheel->SetEnabled(this->Enabled);
+    }
+
+  if (this->TopLevel)
+    {
+    this->TopLevel->SetEnabled(this->Enabled);
     }
 
   if (this->PopupPushButton)

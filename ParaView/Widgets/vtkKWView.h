@@ -364,7 +364,16 @@ class VTK_EXPORT vtkKWView : public vtkKWWidget
   // Description:
   // Check if the application needs to abort.
   virtual int CheckForOtherAbort() { return 0; }
-  
+
+  // Description:
+  // Update the "enable" state of the object and its internal parts.
+  // Depending on different Ivars (this->Enabled, the application's 
+  // Limited Edition Mode, etc.), the "enable" state of the object is updated
+  // and propagated to its internal parts/subwidgets. This will, for example,
+  // enable/disable parts of the widget UI, enable/disable the visibility
+  // of 3D widgets, etc.
+  virtual void UpdateEnableState();
+ 
 protected:
   vtkKWView();
   ~vtkKWView();
@@ -398,7 +407,7 @@ protected:
   vtkKWCheckButton       *HeaderButton;
   vtkKWWidget            *HeaderLabel;
   vtkKWEntry             *HeaderEntry;
-  vtkTextActor     *HeaderProp;
+  vtkTextActor           *HeaderProp;
   vtkTextMapper          *HeaderMapper;
 
   vtkKWFrame             *GeneralProperties;

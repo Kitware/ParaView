@@ -85,7 +85,7 @@ Bool vtkKWRenderViewPredProc(Display *vtkNotUsed(disp), XEvent *event,
 }
 #endif
 
-vtkCxxRevisionMacro(vtkKWView, "1.123");
+vtkCxxRevisionMacro(vtkKWView, "1.124");
 
 //----------------------------------------------------------------------------
 int vtkKWViewCommand(ClientData cd, Tcl_Interp *interp,
@@ -1554,7 +1554,7 @@ void vtkKWView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWView ";
-  this->ExtractRevision(os,"$Revision: 1.123 $");
+  this->ExtractRevision(os,"$Revision: 1.124 $");
 }
 
 //----------------------------------------------------------------------------
@@ -1679,6 +1679,33 @@ vtkViewport *vtkKWView::GetViewport()
 void vtkKWView::Render() 
 {
   this->GetVTKWindow()->Render();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWView::UpdateEnableState()
+{
+  this->Superclass::UpdateEnableState();
+
+  this->PropagateEnableState(this->CornerAnnotation);
+  this->PropagateEnableState(this->Notebook);
+  this->PropagateEnableState(this->PropertiesParent);
+  this->PropagateEnableState(this->VTKWidget);
+  this->PropagateEnableState(this->Label);
+  this->PropagateEnableState(this->ProgressGauge);
+  this->PropagateEnableState(this->Frame);
+  this->PropagateEnableState(this->Frame2);
+  this->PropagateEnableState(this->ControlFrame);
+  this->PropagateEnableState(this->AnnotationProperties);
+  this->PropagateEnableState(this->HeaderFrame);
+  this->PropagateEnableState(this->HeaderDisplayFrame);
+  this->PropagateEnableState(this->HeaderEntryFrame);
+  this->PropagateEnableState(this->HeaderColor);
+  this->PropagateEnableState(this->HeaderButton);
+  this->PropagateEnableState(this->HeaderLabel);
+  this->PropagateEnableState(this->HeaderEntry);
+  this->PropagateEnableState(this->GeneralProperties);
+  this->PropagateEnableState(this->ColorsFrame);
+  this->PropagateEnableState(this->BackgroundColor);
 }
 
 //----------------------------------------------------------------------------

@@ -46,7 +46,7 @@
 #define VTK_KW_WINDOW_GEOMETRY_REG_KEY "WindowGeometry"
 #define VTK_KW_WINDOW_FRAME1_SIZE_REG_KEY "WindowFrame1Size"
 
-vtkCxxRevisionMacro(vtkKWWindow, "1.184");
+vtkCxxRevisionMacro(vtkKWWindow, "1.185");
 vtkCxxSetObjectMacro(vtkKWWindow, PropertiesParent, vtkKWWidget);
 
 #define VTK_KW_RECENT_FILES_MAX 20
@@ -1664,15 +1664,22 @@ void vtkKWWindow::UpdateEnableState()
   this->Superclass::UpdateEnableState();
 
   // Update the toolbars
-
-  this->Toolbars->SetEnabled(this->Enabled);
+  this->PropagateEnableState(this->Toolbars);
 
   // Update the notebook
+  this->PropagateEnableState(this->Notebook);
 
-  if (this->Notebook)
-    {
-    this->Notebook->SetEnabled(this->Enabled);
-    }
+  // Update the Tcl interactor
+  this->PropagateEnableState(this->TclInteractor);
+
+  this->PropagateEnableState(this->SelectedView);
+  this->PropagateEnableState(this->MiddleFrame);
+  this->PropagateEnableState(this->StatusFrame);
+  this->PropagateEnableState(this->StatusImage);
+  this->PropagateEnableState(this->StatusLabel);
+  this->PropagateEnableState(this->PropertiesParent);
+  this->PropagateEnableState(this->ViewFrame);
+  this->PropagateEnableState(this->MenuBarSeparatorFrame);
 
   // Given the state, can we close or not ?
 
@@ -1691,16 +1698,14 @@ void vtkKWWindow::UpdateEnableState()
       }
     }
 
-  // Update the Tcl interactor
-
-  if (this->TclInteractor)
-    {
-    this->TclInteractor->SetEnabled(this->Enabled);
-    }
 
   // Update the menus
 
   this->UpdateMenuState();
+  if ( this->MenuRecentFiles )
+    {
+    this->MenuRecentFiles->SetEnabled(this->Enabled);
+    }
 }
 
 //----------------------------------------------------------------------------

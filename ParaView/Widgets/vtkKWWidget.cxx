@@ -25,7 +25,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWWidget );
-vtkCxxRevisionMacro(vtkKWWidget, "1.90");
+vtkCxxRevisionMacro(vtkKWWidget, "1.91");
 
 int vtkKWWidgetCommand(ClientData cd, Tcl_Interp *interp,
                        int argc, char *argv[]);
@@ -326,7 +326,7 @@ void vtkKWWidget::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkKWWidget ";
-  this->ExtractRevision(os,"$Revision: 1.90 $");
+  this->ExtractRevision(os,"$Revision: 1.91 $");
 }
 
 //----------------------------------------------------------------------------
@@ -1527,6 +1527,16 @@ void vtkKWWidget::Configure(const char* opts)
     }
   this->Script("%s configure %s",
     this->GetWidgetName(), opts);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWWidget::PropagateEnableState(vtkKWWidget* widget)
+{
+  if ( !widget || widget == this )
+    {
+    return;
+    }
+  widget->SetEnabled(this->Enabled);
 }
 
 //----------------------------------------------------------------------------

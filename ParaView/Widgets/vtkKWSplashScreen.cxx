@@ -18,7 +18,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWSplashScreen );
-vtkCxxRevisionMacro(vtkKWSplashScreen, "1.16");
+vtkCxxRevisionMacro(vtkKWSplashScreen, "1.17");
 
 //----------------------------------------------------------------------------
 vtkKWSplashScreen::vtkKWSplashScreen()
@@ -122,6 +122,7 @@ void vtkKWSplashScreen::Show()
     {
     return;
     }
+  this->EnabledOn();
 
   // Update canvas size and message position
 
@@ -161,6 +162,7 @@ void vtkKWSplashScreen::Show()
 //----------------------------------------------------------------------------
 void vtkKWSplashScreen::Hide()
 {
+  this->EnabledOff();
   this->Script("wm withdraw %s", this->GetWidgetName());
 }
 
@@ -228,6 +230,14 @@ void vtkKWSplashScreen::SetProgressMessageVerticalOffset(int _arg)
   this->Modified();
 
   this->UpdateProgressMessagePosition();
+}
+
+// ---------------------------------------------------------------------------
+void vtkKWSplashScreen::UpdateEnableState()
+{
+  this->Superclass::UpdateEnableState();
+
+  if ( this->Canvas ) { this->Canvas->SetEnabled(this->Enabled); }
 }
 
 //----------------------------------------------------------------------------
