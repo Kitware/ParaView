@@ -33,7 +33,7 @@
 #include "vtkPVProcessModule.h"
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkPV3DWidget, "1.48");
+vtkCxxRevisionMacro(vtkPV3DWidget, "1.49");
 
 //===========================================================================
 //***************************************************************************
@@ -163,7 +163,6 @@ void vtkPV3DWidget::Create(vtkKWApplication *kwApp)
   // Only initialize observers on the UI process.
   if (this->Widget3DID.ID  != 0)
     {
-    vtkPVApplication *pvApp = this->GetPVApplication();
     vtkPVProcessModule* pm = pvApp->GetProcessModule();    
     pm->GetStream() << vtkClientServerStream::Invoke << this->Widget3DID 
                     << "SetCurrentRenderer" 
