@@ -42,7 +42,7 @@
  #include <mpi.h>
 #endif
 
-vtkCxxRevisionMacro(vtkMultiDisplayManager, "1.18");
+vtkCxxRevisionMacro(vtkMultiDisplayManager, "1.19");
 vtkStandardNewMacro(vtkMultiDisplayManager);
 
 // Structures to communicate render info.
@@ -892,6 +892,18 @@ void vtkMultiDisplayManager::SetRenderWindow(vtkRenderWindow *renWin)
     else
       {
       renWin->FullScreenOn();
+      // Set the tile settings for 2D widgets.
+      int tileIdx = this->Controller->GetLocalProcessId();
+      int y = tileIdx/this->TileDimensions[0];
+      int x = tileIdx - y*this->TileDimensions[0];
+      // Flip the y axis to match IceT
+      y = this->TileDimensions[1]-1-y;
+      // Setup the window for this tile.
+      renWin->SetTileScale(this->TileDimensions);
+      renWin->SetTileViewport(x*(1.0/(float)(this->TileDimensions[0])), 
+                              y*(1.0/(float)(this->TileDimensions[1])), 
+                              (x+1.0)*(1.0/(float)(this->TileDimensions[0])), 
+                              (y+1.0)*(1.0/(float)(this->TileDimensions[1])));
       }
     }
 }
