@@ -137,7 +137,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.444");
+vtkCxxRevisionMacro(vtkPVWindow, "1.445");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -2405,17 +2405,15 @@ void vtkPVWindow::WriteData()
   char* types = vtkString::Duplicate(typesStr.str());
   typesStr.rdbuf()->freeze(0);
   
-  vtkKWLoadSaveDialog* saveDialog = vtkKWLoadSaveDialog::New();
-  // Dialog does not support saving yet.
-  // vtkKWLoadSaveDialog* saveDialog = pm->NewLoadSaveDialog();
-
+  vtkKWLoadSaveDialog* saveDialog = pm->NewLoadSaveDialog();
+  
   this->RetrieveLastPath(saveDialog, "SaveDataFile");
-  saveDialog->SetParent(this);
-  saveDialog->Create(this->Application, 0);
   saveDialog->SaveDialogOn();
+  saveDialog->SetParent(this);
   saveDialog->SetTitle(VTK_PV_SAVE_DATA_MENU_LABEL);
   saveDialog->SetDefaultExtension(defaultExtension);
   saveDialog->SetFileTypes(types);
+  saveDialog->Create(this->Application, 0);
   // Ask the user for the filename.  Default the extension to the
   // first writer supported.
 
@@ -4251,7 +4249,7 @@ void vtkPVWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVWindow ";
-  this->ExtractRevision(os,"$Revision: 1.444 $");
+  this->ExtractRevision(os,"$Revision: 1.445 $");
 }
 
 //-----------------------------------------------------------------------------
