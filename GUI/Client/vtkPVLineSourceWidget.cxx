@@ -23,7 +23,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLineSourceWidget);
-vtkCxxRevisionMacro(vtkPVLineSourceWidget, "1.15");
+vtkCxxRevisionMacro(vtkPVLineSourceWidget, "1.16");
 
 int vtkPVLineSourceWidgetCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -137,6 +137,14 @@ void vtkPVLineSourceWidget::Select()
 void vtkPVLineSourceWidget::Deselect()
 {
   this->LineWidget->Deselect();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVLineSourceWidget::CleanBatchScript(ofstream *file)
+{
+  *file << "$pvTemp" <<  this->OutputID.ID
+        << " UnRegister {}"
+        << endl;
 }
 
 //----------------------------------------------------------------------------

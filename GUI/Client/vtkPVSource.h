@@ -242,6 +242,11 @@ public:
   virtual void SaveInBatchScript(ofstream *file);
 
   // Description:
+  // Called to make the source write cleanup code at the
+  // end of a batch script.
+  virtual void CleanBatchScript(ofstream *file);
+
+  // Description:
   // Saves the pipeline in a ParaView script.  This is similar
   // to saveing a trace, except only the last state is stored.
   virtual void SaveState(ofstream *file);

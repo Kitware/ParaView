@@ -185,6 +185,11 @@ protected:
   // one sphere.
   virtual void SaveInBatchScript(ofstream *file);
 
+  // Description:
+  // Called to make the source write cleanup code at the
+  // end of a batch script.
+  virtual void CleanBatchScript(ofstream *file);
+
   float* GetPositionFromGUI();
   float* GetRotationFromGUI();
   float* GetScaleFromGUI();

@@ -50,7 +50,7 @@
 #include "vtkPVRenderModule.h"
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVColorMap);
-vtkCxxRevisionMacro(vtkPVColorMap, "1.85");
+vtkCxxRevisionMacro(vtkPVColorMap, "1.86");
 
 int vtkPVColorMapCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -1690,6 +1690,19 @@ void vtkPVColorMap::UpdateInternalScalarBarVisibility()
   this->Modified();
 }
 
+//----------------------------------------------------------------------------
+void vtkPVColorMap::CleanBatchScript(ofstream *file)
+{
+  // This should not be needed, but We can check anyway.
+  if (this->VisitedFlag)
+    {
+    return;
+    }
+  this->VisitedFlag = 1;
+  *file << "$pvTemp" <<  this->LookupTableID
+        << " UnRegister {}"
+        << endl;
+}
 
 //----------------------------------------------------------------------------
 void vtkPVColorMap::SaveInBatchScript(ofstream *file)

@@ -135,7 +135,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.321");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.322");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -1790,6 +1790,12 @@ vtkPVWindow *vtkPVRenderView::GetPVWindow()
   vtkPVWindow *pvWin = vtkPVWindow::SafeDownCast(this->GetParentWindow());
 
   return pvWin;
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::CleanBatchScript(ofstream* file)
+{
+  *file << "$Ren1 UnRegister {}" << endl;
 }
 
 //----------------------------------------------------------------------------

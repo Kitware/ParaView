@@ -62,7 +62,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.348");
+vtkCxxRevisionMacro(vtkPVSource, "1.349");
 
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
@@ -1839,9 +1839,42 @@ void vtkPVSource::SetPVOutput(vtkPVData *pvd)
 //----------------------------------------------------------------------------
 void vtkPVSource::SaveInBatchScript(ofstream *file)
 {
+  // This should not be needed, but We can check anyway.
+  if (this->VisitedFlag)
+    {
+    return;
+    }
+
   this->SaveFilterInBatchScript(file);
   // Add the mapper, actor, scalar bar actor ...
   this->GetPVOutput()->SaveInBatchScript(file);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVSource::CleanBatchScript(ofstream *file)
+{
+  // This should not be needed, but We can check anyway.
+  if (this->VisitedFlag)
+    {
+    return;
+    }
+  this->VisitedFlag = 1;
+
+  *file << "$pvTemp" <<  this->GetVTKSourceID(0)
+        << " UnRegister {}" << endl;
+  this->GetPVOutput()->CleanBatchScript(file);
+
+  // Let the PVWidgets set up the object.
+  vtkCollectionIterator *it = this->WidgetProperties->NewIterator();
+  vtkPVWidgetProperty *pvwProp;
+  it->InitTraversal();
+  while ( !it->IsDoneWithTraversal() )
+    {
+    pvwProp = static_cast<vtkPVWidgetProperty*>(it->GetObject());
+    pvwProp->GetWidget()->CleanBatchScript(file);
+    it->GoToNextItem();
+    }
+  it->Delete();
 }
 
 //----------------------------------------------------------------------------
@@ -1851,12 +1884,6 @@ void vtkPVSource::SaveFilterInBatchScript(ofstream *file)
 
   // Detect special sources we do not handle yet.
   if (this->GetSourceClassName() == NULL)
-    {
-    return;
-    }
-
-  // This should not be needed, but We can check anyway.
-  if (this->VisitedFlag)
     {
     return;
     }
@@ -1892,11 +1919,10 @@ void vtkPVSource::SaveFilterInBatchScript(ofstream *file)
   this->SetInputsInBatchScript(file);
 
   // Let the PVWidgets set up the object.
-  numWidgets = this->WidgetProperties->GetNumberOfItems();
   vtkCollectionIterator *it = this->WidgetProperties->NewIterator();
   vtkPVWidgetProperty *pvwProp;
-  
-  for (i = 0; i < numWidgets; i++)
+  it->InitTraversal();
+  while ( !it->IsDoneWithTraversal() )
     {
     pvwProp = static_cast<vtkPVWidgetProperty*>(it->GetObject());
     pvwProp->GetWidget()->SaveInBatchScript(file);

@@ -91,6 +91,11 @@ public:
   // One plane object is create for all parts.
   virtual void SaveInBatchScript(ofstream *file);
 
+  // Description:
+  // Called to make the source write cleanup code at the
+  // end of a batch script.
+  virtual void CleanBatchScript(ofstream *file);
+  
   // Description: 
   // Called when the input chages (before accept).
   virtual void Update();

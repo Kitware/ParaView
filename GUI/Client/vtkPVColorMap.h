@@ -141,6 +141,11 @@ public:
   // Description:
   // Save out the mapper and actor to a file.
   void SaveInBatchScript(ofstream *file);
+
+  // Description:
+  // Called to make the source write cleanup code at the
+  // end of a batch script.
+  virtual void CleanBatchScript(ofstream *file);
     
   // Description:
   // The data needs to lookup table name to set the lookup table of the mapper.

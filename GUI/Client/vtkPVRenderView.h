@@ -141,6 +141,11 @@ public:
   void AddBindings();
   
   // Description:
+  // Called to make the source write cleanup code at the
+  // end of a batch script.
+  virtual void CleanBatchScript(ofstream *file);
+
+  // Description:
   // Export the renderer and render window to a file.
   void SaveInBatchScript(ofstream *file);
   void SaveState(ofstream *file);

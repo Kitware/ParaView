@@ -35,7 +35,7 @@
 #include "vtkPVProcessModule.h"
 
 vtkStandardNewMacro(vtkPVSphereWidget);
-vtkCxxRevisionMacro(vtkPVSphereWidget, "1.35");
+vtkCxxRevisionMacro(vtkPVSphereWidget, "1.36");
 
 int vtkPVSphereWidgetCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -204,6 +204,14 @@ void vtkPVSphereWidget::Trace(ofstream *file)
 //----------------------------------------------------------------------------
 void vtkPVSphereWidget::UpdateVTKObject(const char*)
 {
+}
+
+//----------------------------------------------------------------------------
+void vtkPVSphereWidget::CleanBatchScript(ofstream *file)
+{
+  *file << "$pvTemp" <<  this->SphereID.ID
+        << " UnRegister {}"
+        << endl;
 }
 
 //----------------------------------------------------------------------------

@@ -29,7 +29,7 @@ int vtkPVPointSourceWidget::InstanceCount = 0;
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPointSourceWidget);
-vtkCxxRevisionMacro(vtkPVPointSourceWidget, "1.20");
+vtkCxxRevisionMacro(vtkPVPointSourceWidget, "1.21");
 
 int vtkPVPointSourceWidgetCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -85,6 +85,14 @@ vtkPVPointSourceWidget::~vtkPVPointSourceWidget()
     }
   
   this->SetInputMenu(NULL);
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVPointSourceWidget::CleanBatchScript(ofstream *file)
+{
+  *file << "$pvTemp" <<  this->OutputID.ID
+        << " UnRegister {}"
+        << endl;
 }
 
 //-----------------------------------------------------------------------------

@@ -83,7 +83,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.261");
+vtkCxxRevisionMacro(vtkPVData, "1.262");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -2590,8 +2590,22 @@ void vtkPVData::SetPropertiesParent(vtkKWWidget *parent)
 }
 
 
-
-
+//----------------------------------------------------------------------------
+void vtkPVData::CleanBatchScript(ofstream *file)
+{
+  if (this->GetVisibility())
+    {
+    vtkPVPart *part = this->GetPVSource()->GetPart(0);
+    vtkPVPartDisplay *partD = part->GetPartDisplay();
+    *file << "$pvTemp" <<  partD->GetGeometryID()
+          << " UnRegister {}"
+          << endl;
+    if (this->PVColorMap)
+      {
+      this->PVColorMap->CleanBatchScript(file);
+      }
+    }
+}
 
 //----------------------------------------------------------------------------
 void vtkPVData::SaveInBatchScript(ofstream *file)

@@ -44,7 +44,7 @@
 #include "vtkPlane.h"
 
 vtkStandardNewMacro(vtkPVBoxWidget);
-vtkCxxRevisionMacro(vtkPVBoxWidget, "1.25");
+vtkCxxRevisionMacro(vtkPVBoxWidget, "1.26");
 
 int vtkPVBoxWidgetCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -251,6 +251,17 @@ void vtkPVBoxWidget::Trace(ofstream *file)
 void vtkPVBoxWidget::UpdateVTKObject(const char*)
 {
   this->Superclass::Update();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVBoxWidget::CleanBatchScript(ofstream *file)
+{
+  *file << "$pvTemp" << this->BoxMatrixID.ID
+        << " Unregister {}"
+        << endl;
+  *file << "$pvTemp" << this->BoxTransformID.ID
+        << " UnRegister {}"
+        << endl;
 }
 
 //----------------------------------------------------------------------------

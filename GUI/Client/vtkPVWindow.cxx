@@ -124,7 +124,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.542");
+vtkCxxRevisionMacro(vtkPVWindow, "1.543");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -2496,7 +2496,6 @@ void vtkPVWindow::SaveBatchScript(const char *filename, int offScreenFlag, const
     pvs->SaveInBatchScript(file);
     cit->GoToNextItem();
     }
-  cit->Delete();
 
 // TODO replace this
 //   if (geometryFileName)
@@ -2538,6 +2537,52 @@ void vtkPVWindow::SaveBatchScript(const char *filename, int offScreenFlag, const
       }
 
     }
+
+  it = this->SourceLists->NewIterator();
+  // Mark all sources as not visited.
+  while( !it->IsDoneWithTraversal() )
+    {    
+    vtkPVSourceCollection* col = 0;
+    if (it->GetData(col) == VTK_OK && col)
+      {
+      vtkCollectionIterator *cit = col->NewIterator();
+      cit->InitTraversal();
+      while ( !cit->IsDoneWithTraversal() )
+        {
+        pvs = static_cast<vtkPVSource*>(cit->GetObject()); 
+        pvs->SetVisitedFlag(0);
+        cit->GoToNextItem();
+        }
+      cit->Delete();
+      }
+    it->GoToNextItem();
+    }
+  it->Delete();
+
+  // Mark all color maps as not visited.
+  this->PVColorMaps->InitTraversal();
+  while( (cm = (vtkPVColorMap*)(this->PVColorMaps->GetNextItemAsObject())) )
+    {    
+    cm->SetVisitedFlag(0);
+    }
+
+  *file << endl;
+  // Loop through sources saving the visible sources.
+  cit->InitTraversal();
+  while ( !cit->IsDoneWithTraversal() )
+    {
+    pvs = static_cast<vtkPVSource*>(cit->GetObject()); 
+    pvs->CleanBatchScript(file);
+    cit->GoToNextItem();
+    }
+  cit->Delete();
+
+  this->GetMainView()->CleanBatchScript(file);
+
+  *file << endl;
+  *file << "app Finalize" << endl;
+  *file << "app Delete" << endl;
+      
 //   else
 //     { // Just do one frame.
 //     if (imageFileName)

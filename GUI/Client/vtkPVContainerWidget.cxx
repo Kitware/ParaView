@@ -22,7 +22,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVContainerWidget);
-vtkCxxRevisionMacro(vtkPVContainerWidget, "1.21");
+vtkCxxRevisionMacro(vtkPVContainerWidget, "1.22");
 
 int vtkPVContainerWidgetCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -324,6 +324,26 @@ vtkPVWidget* vtkPVContainerWidget::GetPVWidget(const char* traceName)
     }
   it->Delete();
   return 0;
+}
+
+//----------------------------------------------------------------------------
+void vtkPVContainerWidget::CleanBatchScript(ofstream *file)
+{
+  vtkCollectionIterator *it = this->WidgetProperties->NewIterator();
+  it->InitTraversal();
+  
+  vtkPVWidget* widget;
+  vtkPVWidgetProperty *prop;
+  int i;
+  
+  for (i = 0; i < this->WidgetProperties->GetNumberOfItems(); i++)
+    {
+    prop = static_cast<vtkPVWidgetProperty*>(it->GetObject());
+    widget = prop->GetWidget();
+    widget->CleanBatchScript(file);
+    it->GoToNextItem();
+    }
+  it->Delete();
 }
 
 //----------------------------------------------------------------------------

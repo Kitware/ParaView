@@ -41,7 +41,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVImplicitPlaneWidget);
-vtkCxxRevisionMacro(vtkPVImplicitPlaneWidget, "1.29");
+vtkCxxRevisionMacro(vtkPVImplicitPlaneWidget, "1.30");
 
 vtkCxxSetObjectMacro(vtkPVImplicitPlaneWidget, InputMenu, vtkPVInputMenu);
 
@@ -304,6 +304,14 @@ void vtkPVImplicitPlaneWidget::Trace(ofstream *file)
     }
   *file << "$kw(" << this->GetTclName() << ") SetNormal "
         << val[0] << " " << val[1] << " " << val[2] << endl;
+}
+
+//----------------------------------------------------------------------------
+void vtkPVImplicitPlaneWidget::CleanBatchScript(ofstream* file)
+{
+  *file << "$pvTemp" <<  this->PlaneID.ID
+        << " UnRegister {}"
+        << endl;
 }
 
 //----------------------------------------------------------------------------
