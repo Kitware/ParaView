@@ -18,7 +18,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWListBox );
-vtkCxxRevisionMacro(vtkKWListBox, "1.22");
+vtkCxxRevisionMacro(vtkKWListBox, "1.23");
 
 
 //----------------------------------------------------------------------------
@@ -180,7 +180,20 @@ int vtkKWListBox::GetSelectState(int idx)
 //----------------------------------------------------------------------------
 void vtkKWListBox::InsertEntry(int index, const char *name)
 {
+  if ( !this->IsCreated() )
+    {
+    return;
+    }
+  int enabled = this->Enabled;
+  if ( !enabled )
+    {
+    this->SetEnabled(1);
+    }
   this->Script("%s insert %d {%s}", this->Listbox->GetWidgetName(), index, name);
+  if ( !enabled )
+    {
+    this->SetEnabled(0);
+    }
 }
 
 
