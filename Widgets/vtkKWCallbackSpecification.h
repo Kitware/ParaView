@@ -58,7 +58,13 @@ class VTK_EXPORT vtkKWCallbackSpecification : public vtkKWObject
   vtkSetObjectMacro( NextCallback, vtkKWCallbackSpecification );
   vtkGetObjectMacro( NextCallback, vtkKWCallbackSpecification );
   
- protected:
+  // This is the C++ method to be called instead of going through tcl interpreter.
+//BTX
+  void SetCommandMethod(void (*f)(const char *)) {this->CommandMethod = f;};
+  void                       (*CommandMethod)(const char *);
+//ETX
+
+protected:
   vtkKWCallbackSpecification();
   ~vtkKWCallbackSpecification();
   vtkKWCallbackSpecification(const vtkKWCallbackSpecification&) {};

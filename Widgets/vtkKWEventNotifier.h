@@ -47,11 +47,27 @@ public:
   void AddCallback( const char *event,   vtkKWWindow *window,
 		    vtkKWObject *object, const char *command );
 
+//BTX  
+  // Description:
+  // Add a callback for a specified event occurring in a specified
+  // window. The command is a C++ method to be called (no tcl interpreter used)
+  // It must take a string as an argument, and know how to parse it.
+  void AddCallback( const char *event,   vtkKWWindow *window,
+		    vtkKWObject *object, void (*f)(const char *) );
+//ETX
+  
   // Description:
   // Remove a specific callback
   void RemoveCallback( const char *event,   vtkKWWindow *window,
 		       vtkKWObject *object, const char *command );
 
+//BTX  
+  // Description:
+  // Remove a specific callback - C++ method version
+  void RemoveCallback( const char *event,   vtkKWWindow *window,
+		       vtkKWObject *object, void (*f)(const char *) );
+//ETX
+  
   // Description:
   // Remove all callbacks associated with this object
   void RemoveCallbacks( vtkKWObject *object );
