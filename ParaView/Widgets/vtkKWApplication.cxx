@@ -73,7 +73,7 @@ int vtkKWApplication::WidgetVisibility = 1;
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.96");
+vtkCxxRevisionMacro(vtkKWApplication, "1.96.2.1");
 
 
 
@@ -1061,7 +1061,9 @@ int vtkKWApplication::GetIntRegisteryValue(int level, const char* subkey,
 }
 
 //----------------------------------------------------------------------------
-int vtkKWApplication::BooleanRegisteryCheck(int level, const char* key, 
+int vtkKWApplication::BooleanRegisteryCheck(int level, 
+                                            const char* subkey,
+                                            const char* key, 
                                             const char* trueval)
 {
   if ( this->GetRegisteryLevel() < 0 ||
@@ -1071,7 +1073,7 @@ int vtkKWApplication::BooleanRegisteryCheck(int level, const char* key,
     }
   char buffer[1024];
   int allset = 0;
-  if ( this->GetRegisteryValue(level, "RunTime", key, buffer) )
+  if ( this->GetRegisteryValue(level, subkey, key, buffer) )
     {
     if ( !strncmp(buffer+1, trueval+1, vtkString::Length(trueval)-1) )
       {

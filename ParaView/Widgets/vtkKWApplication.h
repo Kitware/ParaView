@@ -249,7 +249,7 @@ public:
   // Description:
   // Perform a boolean check of the value in registery. If the value
   // at the key is trueval, then return true, otherwise return false.
-  int BooleanRegisteryCheck(int level, const char* key, 
+  int BooleanRegisteryCheck(int level, const char* subkey, const char* key, 
                             const char* trueval);
 
   // Description:
