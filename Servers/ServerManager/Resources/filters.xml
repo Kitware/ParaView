@@ -1856,7 +1856,7 @@
         command="ThresholdBetween"
         number_of_elements="2"
         default_values="0 0">
-          <ArrayRangeDomain name="scalar_range">
+          <ArrayRangeDomain name="range">
             <RequiredProperties>
                <Property name="Input" function="Input"/>
                <Property name="SelectInputScalars" function="ArraySelection"/>
