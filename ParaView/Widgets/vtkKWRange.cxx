@@ -40,6 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWFrame.h"
 #include "vtkKWIcon.h"
 #include "vtkKWImageLabel.h"
+#include "vtkKWMath.h"
 #include "vtkKWPushButton.h"
 #include "vtkKWPushButtonSet.h"
 #include "vtkKWTkUtilities.h"
@@ -47,7 +48,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkObjectFactory.h"
 
 vtkStandardNewMacro( vtkKWRange );
-vtkCxxRevisionMacro(vtkKWRange, "1.17");
+vtkCxxRevisionMacro(vtkKWRange, "1.18");
 
 #define VTK_KW_RANGE_MIN_SLIDER_SIZE        2
 #define VTK_KW_RANGE_MIN_THICKNESS          (2*VTK_KW_RANGE_MIN_SLIDER_SIZE+1)
@@ -719,7 +720,7 @@ void vtkKWRange::ConstraintValueToResolution(float &value)
 {
   if (fmod(value, this->Resolution) != 0.0)
     {
-    value = this->Resolution * vtkMath::Round(value / this->Resolution);
+    value = this->Resolution * vtkKWMath::Round(value / this->Resolution);
     }
 }
 
