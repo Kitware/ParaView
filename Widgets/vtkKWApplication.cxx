@@ -92,13 +92,16 @@ vtkKWApplication::vtkKWApplication()
   this->BalloonHelpLabel->SetParent(this->BalloonHelpWindow);
   this->BalloonHelpPending = NULL;
 
-  //this->BalloonHelpWindow->SetParent(this->GetParentWindow());
-  this->BalloonHelpWindow->Create(this, "toplevel", "-background black -borderwidth 1 -relief flat");
-  this->BalloonHelpLabel->Create(this, "label", "-background LightYellow -justify left -wraplength 2i");
-  this->Script("pack %s", this->BalloonHelpLabel->GetWidgetName());
-  this->Script("wm overrideredirect %s 1", this->BalloonHelpWindow->GetWidgetName());
-  this->Script("wm withdraw %s", this->BalloonHelpWindow->GetWidgetName());
-
+  if (vtkKWApplication::WidgetVisibility)
+    {
+    //this->BalloonHelpWindow->SetParent(this->GetParentWindow());
+    this->BalloonHelpWindow->Create(this, "toplevel", "-background black -borderwidth 1 -relief flat");
+    this->BalloonHelpLabel->Create(this, "label", "-background LightYellow -justify left -wraplength 2i");
+    this->Script("pack %s", this->BalloonHelpLabel->GetWidgetName());
+    this->Script("wm overrideredirect %s 1", this->BalloonHelpWindow->GetWidgetName());
+    this->Script("wm withdraw %s", this->BalloonHelpWindow->GetWidgetName());
+    }
+  
   this->EventNotifier = vtkKWEventNotifier::New();
   this->EventNotifier->SetApplication( this );
 }
