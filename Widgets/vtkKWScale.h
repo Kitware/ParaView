@@ -66,6 +66,11 @@ public:
   virtual void EntryValueChanged();
   virtual void InvokeStartCommand();
   virtual void InvokeEndCommand();
+
+  // Description:
+  // Method to set / get the resolution of the slider
+  vtkGetMacro( Resolution, float );
+  void SetResolution( float r );
   
   // Description:
   // A method to set callback functions on objects.  The first argument is
@@ -86,6 +91,7 @@ protected:
   char        *StartCommand;
   char        *EndCommand;
   float       Value;
+  float       Resolution;
   vtkKWEntry  *Entry;
   vtkKWWidget *ScaleWidget;
   vtkKWWidget *ScaleLabel;
