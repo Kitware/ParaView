@@ -21,7 +21,7 @@
 #include "vtkObjectFactory.h"
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkKWUserInterfaceManager, "1.13");
+vtkCxxRevisionMacro(vtkKWUserInterfaceManager, "1.14");
 
 int vtkKWUserInterfaceManagerCommand(ClientData cd, Tcl_Interp *interp,
                                      int argc, char *argv[]);
@@ -189,6 +189,12 @@ void vtkKWUserInterfaceManager::Create(vtkKWApplication *app)
     }
 
   this->SetApplication(app);
+}
+
+// ---------------------------------------------------------------------------
+int vtkKWUserInterfaceManager::IsCreated()
+{
+  return (this->GetApplication() != NULL);
 }
 
 //----------------------------------------------------------------------------

@@ -86,7 +86,7 @@ Bool vtkKWRenderViewPredProc(Display *vtkNotUsed(disp), XEvent *event,
 }
 #endif
 
-vtkCxxRevisionMacro(vtkKWView, "1.128");
+vtkCxxRevisionMacro(vtkKWView, "1.129");
 
 //----------------------------------------------------------------------------
 int vtkKWViewCommand(ClientData cd, Tcl_Interp *interp,
@@ -222,7 +222,7 @@ vtkKWView::~vtkKWView()
     
   // Remove all binding
   const char *wname = this->VTKWidget->GetWidgetName();
-  if ( this->Application )
+  if (this->IsCreated())
     {
     this->Script("bind %s <Expose> {}",wname);
     this->Script("bind %s <Any-ButtonPress> {}",wname);
@@ -438,10 +438,10 @@ void vtkKWView::Close()
 //----------------------------------------------------------------------------
 void vtkKWView::CreateViewProperties()
 {
-  vtkKWApplication *app = this->Application;
+  vtkKWApplication *app = this->GetApplication();
 
   this->Notebook->SetParent(this->GetPropertiesParent());
-  this->Notebook->Create(this->Application,"");
+  this->Notebook->Create(app,"");
 
   vtkKWIcon *ico = vtkKWIcon::New();
   ico->SetImage(vtkKWIcon::ICON_GENERAL);
@@ -476,12 +476,12 @@ void vtkKWView::CreateViewProperties()
                this->HeaderEntryFrame->GetWidgetName());
 
   this->HeaderButton->SetParent(this->HeaderDisplayFrame);
-  this->HeaderButton->Create(this->Application, "");
+  this->HeaderButton->Create(this->GetApplication(), "");
   this->HeaderButton->SetText("Display Header Annotation");
   this->HeaderButton->SetBalloonHelpString("Toggle the visibility of the header text");
   this->HeaderButton->SetCommand(this, "OnDisplayHeader");
   this->HeaderColor->SetParent(this->HeaderDisplayFrame);
-  this->HeaderColor->Create(this->Application, "");
+  this->HeaderColor->Create(app, "");
   this->HeaderColor->SetCommand( this, "SetHeaderTextColor" );
   this->HeaderColor->SetBalloonHelpJustificationToRight();
   this->HeaderColor->SetBalloonHelpString("Change the color of the header text");
@@ -615,7 +615,7 @@ vtkKWWidget *vtkKWView::GetPropertiesParent()
     this->PropertiesParent = vtkKWWidget::New();
     this->PropertiesParent->SetParent
       (this->ParentWindow->GetPropertiesParent());
-    this->PropertiesParent->Create(this->Application,"frame","-bd 0");
+    this->PropertiesParent->Create(this->GetApplication(),"frame","-bd 0");
     this->SharedPropertiesParent = 1;
     }
   return this->PropertiesParent;
@@ -630,7 +630,7 @@ void vtkKWView::CreateDefaultPropertiesParent()
     {
     this->PropertiesParent = vtkKWWidget::New();
     this->PropertiesParent->SetParent(this);
-    this->PropertiesParent->Create(this->Application,"frame","-bd 0");
+    this->PropertiesParent->Create(this->GetApplication(),"frame","-bd 0");
     this->Script("pack %s -before %s -fill y -side left -anchor nw",
                  this->PropertiesParent->GetWidgetName(),
                  this->Frame->GetWidgetName());
@@ -647,7 +647,7 @@ void vtkKWView::ShowViewProperties()
   this->ParentWindow->ShowProperties();
   
   // make sure we have an applicaiton
-  if (!this->Application)
+  if (!this->IsCreated())
     {
     vtkErrorMacro("attempt to update properties without an application set");
     }
@@ -682,7 +682,7 @@ void vtkKWView::PackProperties()
     // if the windows prop is not currently this views prop
     this->Script("pack slaves %s",
                  this->PropertiesParent->GetParent()->GetWidgetName());
-    if (strcmp(this->Application->GetMainInterp()->result,
+    if (strcmp(this->GetApplication()->GetMainInterp()->result,
                this->PropertiesParent->GetWidgetName()))
       {
       // forget current props
@@ -841,8 +841,8 @@ void vtkKWView::PrintView()
   
   this->Script("tk_getSaveFile -title \"Save Postscript\" -filetypes {{{Postscript} {.ps}}}");
   char* path = 
-    strcpy(new char[strlen(this->Application->GetMainInterp()->result)+1], 
-           this->Application->GetMainInterp()->result);
+    strcpy(new char[strlen(this->GetApplication()->GetMainInterp()->result)+1], 
+           this->GetApplication()->GetMainInterp()->result);
   if (strlen(path) != 0)
     {
     vtkPostScriptWriter *psw = vtkPostScriptWriter::New();
@@ -853,7 +853,7 @@ void vtkKWView::PrintView()
 
     vtkKWMessageDialog *dlg = vtkKWMessageDialog::New();
     dlg->SetMasterWindow(this->ParentWindow);
-    dlg->Create(this->Application,"");
+    dlg->Create(this->GetApplication(),"");
     dlg->SetText(
       "A postscript file has been generated. You will need to\n"
       "print this file using a print command appropriate for\n"
@@ -983,7 +983,7 @@ void vtkKWView::SaveAsImage()
   // first get the file name
   vtkKWSaveImageDialog *dlg = vtkKWSaveImageDialog::New();
   dlg->SetParent(window);
-  dlg->Create(this->Application,"");  
+  dlg->Create(this->GetApplication(),"");  
   int enabled = 0;
   if (window)
     {
@@ -1088,7 +1088,7 @@ void vtkKWView::SaveAsImage(const char* filename)
   if (!success)
     {
     vtkKWMessageDialog::PopupMessage(
-      this->Application, this->ParentWindow, "Write Error",
+      this->GetApplication(), this->ParentWindow, "Write Error",
       "There is insufficient disk space to save this image. The file will be "
       "deleted.");
     }
@@ -1564,7 +1564,7 @@ void vtkKWView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWView ";
-  this->ExtractRevision(os,"$Revision: 1.128 $");
+  this->ExtractRevision(os,"$Revision: 1.129 $");
 }
 
 //----------------------------------------------------------------------------

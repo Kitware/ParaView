@@ -46,7 +46,7 @@
 #define VTK_KW_WINDOW_GEOMETRY_REG_KEY "WindowGeometry"
 #define VTK_KW_WINDOW_FRAME1_SIZE_REG_KEY "WindowFrame1Size"
 
-vtkCxxRevisionMacro(vtkKWWindow, "1.188");
+vtkCxxRevisionMacro(vtkKWWindow, "1.189");
 vtkCxxSetObjectMacro(vtkKWWindow, PropertiesParent, vtkKWWidget);
 
 #define VTK_KW_RECENT_FILES_MAX 20
@@ -289,7 +289,7 @@ void vtkKWWindow::Create(vtkKWApplication *app, const char *args)
 
   this->SetApplication(app);
 
-  Tcl_Interp *interp = this->Application->GetMainInterp();
+  Tcl_Interp *interp = app->GetMainInterp();
 
   // Create the top level
 
@@ -306,12 +306,12 @@ void vtkKWWindow::Create(vtkKWApplication *app, const char *args)
 
   // Restore window geometry
 
-  if (this->Application->GetSaveWindowGeometry() &&
-      this->Application->HasRegisteryValue(
+  if (app->GetSaveWindowGeometry() &&
+      app->HasRegisteryValue(
         2, "Geometry", VTK_KW_WINDOW_GEOMETRY_REG_KEY))
     {
     char geometry[40];
-    if (this->Application->GetRegisteryValue(
+    if (app->GetRegisteryValue(
           2, "Geometry", VTK_KW_WINDOW_GEOMETRY_REG_KEY, geometry))
       {
       this->Script("wm geometry %s %s", wname, geometry);
@@ -340,7 +340,7 @@ void vtkKWWindow::Create(vtkKWApplication *app, const char *args)
 
   this->PageMenu->SetParent(this->MenuFile);
   this->PageMenu->SetTearOff(0);
-  this->PageMenu->Create(this->Application, "");
+  this->PageMenu->Create(app, "");
 
   char* rbv = 
     this->PageMenu->CreateRadioButtonVariable(this, "PageSetup");
@@ -418,13 +418,13 @@ void vtkKWWindow::Create(vtkKWApplication *app, const char *args)
   this->MiddleFrame->SetSeparatorSize(0);
   this->MiddleFrame->SetFrame1MinimumSize(min_size);
 
-  if (this->Application->HasRegisteryValue(
+  if (app->HasRegisteryValue(
         2, "Geometry", VTK_KW_WINDOW_FRAME1_SIZE_REG_KEY) &&
-      this->Application->GetIntRegisteryValue(
+      app->GetIntRegisteryValue(
         2, "Geometry", VTK_KW_WINDOW_FRAME1_SIZE_REG_KEY) >= min_size)
     {
     this->MiddleFrame->SetFrame1Size(
-      this->Application->GetIntRegisteryValue(
+      app->GetIntRegisteryValue(
         2, "Geometry", VTK_KW_WINDOW_FRAME1_SIZE_REG_KEY));
     }
   else
@@ -453,7 +453,7 @@ void vtkKWWindow::Create(vtkKWApplication *app, const char *args)
   // Create the notebook
 
   this->Notebook->SetParent(this->GetPropertiesParent());
-  this->Notebook->Create(this->Application, "");
+  this->Notebook->Create(app, "");
   this->Notebook->AlwaysShowTabsOn();
 
   // Status frame
@@ -567,7 +567,7 @@ void vtkKWWindow::Create(vtkKWApplication *app, const char *args)
 //----------------------------------------------------------------------------
 void vtkKWWindow::DisplayHelp()
 {
-  this->Application->DisplayHelp(this);
+  this->GetApplication()->DisplayHelp(this);
 }
 
 //----------------------------------------------------------------------------
@@ -591,7 +591,7 @@ void vtkKWWindow::CreateDefaultPropertiesParent()
     {
     vtkKWWidget *pp = vtkKWWidget::New();
     pp->SetParent(this->MiddleFrame->GetFrame1());
-    pp->Create(this->Application,"frame","-bd 0");
+    pp->Create(this->GetApplication(),"frame","-bd 0");
     this->Script("pack %s -side left -fill both -expand t -anchor nw",
                  pp->GetWidgetName());
     this->SetPropertiesParent(pp);
@@ -627,7 +627,7 @@ void vtkKWWindow::SetSelectedView(vtkKWView *_arg)
 //----------------------------------------------------------------------------
 void vtkKWWindow::Exit()
 {  
-  if (this->Application->GetDialogUp())
+  if (this->GetApplication()->GetDialogUp())
     {
     this->Script("bell");
     return;
@@ -643,7 +643,7 @@ void vtkKWWindow::Exit()
   if ( this->ExitDialog() )
     {
     this->PromptBeforeClose = 0;
-    this->Application->Exit();
+    this->GetApplication()->Exit();
     }
   else
     {
@@ -654,13 +654,13 @@ void vtkKWWindow::Exit()
 //----------------------------------------------------------------------------
 void vtkKWWindow::Close()
 {
-  if (this->Application->GetDialogUp())
+  if (this->GetApplication()->GetDialogUp())
     {
     this->Script("bell");
     return;
     }
   if (this->PromptBeforeClose &&
-      this->Application->GetWindows()->GetNumberOfItems() <= 1)
+      this->GetApplication()->GetWindows()->GetNumberOfItems() <= 1)
     {
     if ( !this->ExitDialog() )
       {
@@ -682,14 +682,14 @@ void vtkKWWindow::CloseNoPrompt()
 
   // If it's the last win, save its geometry
 
-  if (this->Application->GetWindows()->GetNumberOfItems() <= 1 &&
-      this->Application->GetSaveWindowGeometry())
+  if (this->GetApplication()->GetWindows()->GetNumberOfItems() <= 1 &&
+      this->GetApplication()->GetSaveWindowGeometry())
     {
     this->Script("wm geometry %s", this->GetWidgetName());
-    this->Application->SetRegisteryValue(
+    this->GetApplication()->SetRegisteryValue(
       2, "Geometry", VTK_KW_WINDOW_GEOMETRY_REG_KEY, "%s", 
-      this->Application->GetMainInterp()->result);
-    this->Application->SetRegisteryValue(
+      this->GetApplication()->GetMainInterp()->result);
+    this->GetApplication()->SetRegisteryValue(
       2, "Geometry", VTK_KW_WINDOW_FRAME1_SIZE_REG_KEY, "%d", 
       this->MiddleFrame->GetFrame1Size());
     }
@@ -705,7 +705,7 @@ void vtkKWWindow::CloseNoPrompt()
 
   // Close this window in the application. The
   // application will exit if there are no more windows.
-  this->Application->Close(this);
+  this->GetApplication()->Close(this);
 }
 
 //----------------------------------------------------------------------------
@@ -723,7 +723,7 @@ void vtkKWWindow::Render()
 //----------------------------------------------------------------------------
 void vtkKWWindow::DisplayAbout()
 {
-  this->Application->DisplayAbout(this);
+  this->GetApplication()->DisplayAbout(this);
 }
 
 //----------------------------------------------------------------------------
@@ -754,7 +754,7 @@ vtkKWMenu *vtkKWWindow::GetMenuEdit()
   this->MenuEdit = vtkKWMenu::New();
   this->MenuEdit->SetParent(this->GetMenu());
   this->MenuEdit->SetTearOff(0);
-  this->MenuEdit->Create(this->Application,"");
+  this->MenuEdit->Create(this->GetApplication(),"");
   // Make sure Edit menu is next to file menu
   this->Menu->InsertCascade(1, "Edit", this->MenuEdit, 0);
   return this->MenuEdit;
@@ -776,7 +776,7 @@ vtkKWMenu *vtkKWWindow::GetMenuView()
   this->MenuView = vtkKWMenu::New();
   this->MenuView->SetParent(this->GetMenu());
   this->MenuView->SetTearOff(0);
-  this->MenuView->Create(this->Application, "");
+  this->MenuView->Create(this->GetApplication(), "");
   // make sure Help menu is on the right
   if (this->MenuEdit)
     { 
@@ -806,7 +806,7 @@ vtkKWMenu *vtkKWWindow::GetMenuWindow()
   this->MenuWindow = vtkKWMenu::New();
   this->MenuWindow->SetParent(this->GetMenu());
   this->MenuWindow->SetTearOff(0);
-  this->MenuWindow->Create(this->Application, "");
+  this->MenuWindow->Create(this->GetApplication(), "");
   // make sure Help menu is on the right
   if (this->MenuEdit)
     { 
@@ -978,7 +978,7 @@ void vtkKWWindow::LoadScript()
   vtkKWLoadSaveDialog* loadScriptDialog = vtkKWLoadSaveDialog::New();
   this->RetrieveLastPath(loadScriptDialog, "LoadScriptLastPath");
   loadScriptDialog->SetParent(this);
-  loadScriptDialog->Create(this->Application,"");
+  loadScriptDialog->Create(this->GetApplication(),"");
   loadScriptDialog->SaveDialogOff();
   loadScriptDialog->SetTitle("Load Script");
   loadScriptDialog->SetDefaultExtension(this->ScriptExtension);
@@ -1012,7 +1012,7 @@ void vtkKWWindow::LoadScript()
 void vtkKWWindow::LoadScript(const char *path)
 {
   this->Script("set InitialWindow %s", this->GetTclName());
-  this->Application->LoadScript(path);
+  this->GetApplication()->LoadScript(path);
 }
 
 //----------------------------------------------------------------------------
@@ -1031,7 +1031,7 @@ void vtkKWWindow::CreateStatusImage()
   block.offset[2] = 2;
   block.pixelPtr = new unsigned char [block.pitch*block.height];
 
-  photo = Tk_FindPhoto(this->Application->GetMainInterp(),
+  photo = Tk_FindPhoto(this->GetApplication()->GetMainInterp(),
                        this->StatusImageName);
   if (!photo)
     {
@@ -1137,7 +1137,7 @@ void vtkKWWindow::AddRecentFilesMenu(
     {
     this->MenuRecentFiles->SetParent(this->MenuFile);
     this->MenuRecentFiles->SetTearOff(0);
-    this->MenuRecentFiles->Create(this->Application, "");
+    this->MenuRecentFiles->Create(this->GetApplication(), "");
     }
 
   // Remove the menu if already there (in case that function was used to
@@ -1230,7 +1230,7 @@ void vtkKWWindow::UpdateRecentFilesMenu()
 void vtkKWWindow::AddRecentFile(const char *name, vtkKWObject *target,
                                 const char *command)
 {  
-  const char* filename = this->Application->ExpandFileName(name);
+  const char* filename = this->GetApplication()->ExpandFileName(name);
   this->InsertRecentFile(filename, target, command);
   this->UpdateRecentFilesMenu();
   this->StoreRecentFilesToRegistery();
@@ -1331,7 +1331,7 @@ int vtkKWWindow::GetHelpMenuIndex()
 //----------------------------------------------------------------------------
 int vtkKWWindow::ExitDialog()
 {
-  this->Application->SetBalloonHelpWidget(0);
+  this->GetApplication()->SetBalloonHelpWidget(0);
   if ( this->ExitDialogWidget )
     {
     return 1;
@@ -1547,7 +1547,7 @@ void vtkKWWindow::SetTitle (const char* _arg)
 
   this->Modified();
 
-  if (this->Application && this->Title)
+  if (this->IsCreated() && this->Title)
     {
     this->Script("wm title %s {%s}", this->GetWidgetName(), this->GetTitle());
     }
@@ -1557,10 +1557,10 @@ void vtkKWWindow::SetTitle (const char* _arg)
 char* vtkKWWindow::GetTitle()
 {
   if (!this->Title && 
-      this->Application && 
-      this->Application->GetApplicationName())
+      this->GetApplication() && 
+      this->GetApplication()->GetApplicationName())
     {
-    return this->Application->GetApplicationName();
+    return this->GetApplication()->GetApplicationName();
     }
   return this->Title;
 }
@@ -1580,7 +1580,7 @@ void vtkKWWindow::DisplayCommandPrompt()
     this->TclInteractor->SetTitle(title.str());
     title.rdbuf()->freeze(0);
     this->TclInteractor->SetMasterWindow(this);
-    this->TclInteractor->Create(this->Application);
+    this->TclInteractor->Create(this->GetApplication());
     }
   
   this->TclInteractor->Display();
@@ -1617,10 +1617,10 @@ void vtkKWWindow::UpdateToolbarAspect()
     }
 
   int flat_frame;
-  if (this->Application->HasRegisteryValue(
+  if (this->GetApplication()->HasRegisteryValue(
     2, "RunTime", VTK_KW_TOOLBAR_FLAT_FRAME_REG_KEY))
     {
-    flat_frame = this->Application->GetIntRegisteryValue(
+    flat_frame = this->GetApplication()->GetIntRegisteryValue(
       2, "RunTime", VTK_KW_TOOLBAR_FLAT_FRAME_REG_KEY);
     }
   else
@@ -1629,10 +1629,10 @@ void vtkKWWindow::UpdateToolbarAspect()
     }
 
   int flat_buttons;
-  if (this->Application->HasRegisteryValue(
+  if (this->GetApplication()->HasRegisteryValue(
     2, "RunTime", VTK_KW_TOOLBAR_FLAT_BUTTONS_REG_KEY))
     {
-    flat_buttons = this->Application->GetIntRegisteryValue(
+    flat_buttons = this->GetApplication()->GetIntRegisteryValue(
       2, "RunTime", VTK_KW_TOOLBAR_FLAT_BUTTONS_REG_KEY);
     }
   else

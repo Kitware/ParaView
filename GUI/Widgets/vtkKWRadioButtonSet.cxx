@@ -23,7 +23,7 @@
 //----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkKWRadioButtonSet);
-vtkCxxRevisionMacro(vtkKWRadioButtonSet, "1.12");
+vtkCxxRevisionMacro(vtkKWRadioButtonSet, "1.13");
 
 int vtkvtkKWRadioButtonSetCommand(ClientData cd, Tcl_Interp *interp,
                                   int argc, char *argv[]);
@@ -195,7 +195,7 @@ int vtkKWRadioButtonSet::AddButton(int id,
   button_slot->Id = id;
 
   button_slot->Button->SetParent(this);
-  button_slot->Button->Create(this->Application, 0);
+  button_slot->Button->Create(this->GetApplication(), 0);
   button_slot->Button->SetValue(id);
   button_slot->Button->SetEnabled(this->Enabled);
 
@@ -398,7 +398,7 @@ int vtkKWRadioButtonSet::GetButtonVisibility(int id)
   vtkKWRadioButtonSet::ButtonSlot *button_slot = 
     this->GetButtonSlot(id);
 
-  if (button_slot && button_slot->Button && this->Application)
+  if (button_slot && button_slot->Button && button_slot->Button->IsCreated())
     {
     const char *res = 
       this->Script("grid info %s", button_slot->Button->GetWidgetName());

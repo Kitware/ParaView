@@ -56,7 +56,7 @@ public:
   // Create the manager widget (i.e. the widget that will group and display
   // all user interface panels).
   virtual void Create(vtkKWApplication *app);
-  virtual int IsCreated() { return (this->Application != 0); }
+  virtual int IsCreated();
 
   // Description:
   // Enable/Disable this interface. This propagates SetEnabled() calls to all

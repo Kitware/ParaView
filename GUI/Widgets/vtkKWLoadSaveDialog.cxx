@@ -20,7 +20,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLoadSaveDialog );
-vtkCxxRevisionMacro(vtkKWLoadSaveDialog, "1.32");
+vtkCxxRevisionMacro(vtkKWLoadSaveDialog, "1.33");
 
 vtkKWLoadSaveDialog::vtkKWLoadSaveDialog()
 {
@@ -65,10 +65,10 @@ void vtkKWLoadSaveDialog::Create(vtkKWApplication *app, const char* /*args*/)
 
 int vtkKWLoadSaveDialog::Invoke()
 {
-  this->Application->SetDialogUp(1);
+  this->GetApplication()->SetDialogUp(1);
   ostrstream command;
 
-  int support_choose_dir = this->Application->EvaluateBooleanExpression(
+  int support_choose_dir = this->GetApplication()->EvaluateBooleanExpression(
     "string equal [info commands tk_chooseDirectory] tk_chooseDirectory");
 
   if (this->ChooseDirectory && support_choose_dir)
@@ -135,7 +135,7 @@ int vtkKWLoadSaveDialog::Invoke()
     this->SetFileName(0);
     }
 
-  this->Application->SetDialogUp(0);
+  this->GetApplication()->SetDialogUp(0);
   this->Script("update");
 
   return res;

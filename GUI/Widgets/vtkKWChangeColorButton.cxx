@@ -20,7 +20,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWChangeColorButton);
-vtkCxxRevisionMacro(vtkKWChangeColorButton, "1.44");
+vtkCxxRevisionMacro(vtkKWChangeColorButton, "1.45");
 
 int vtkKWChangeColorButtonCommand(ClientData cd, Tcl_Interp *interp,
                                   int argc, char *argv[]);
@@ -347,18 +347,18 @@ void vtkKWChangeColorButton::ButtonReleaseCallback(int x, int y)
   // Was it released over the button ?
 
   this->Script( "winfo rootx %s", this->MainFrame->GetWidgetName());
-  int xw = vtkKWObject::GetIntegerResult(this->Application);
+  int xw = vtkKWObject::GetIntegerResult(this->GetApplication());
 
   this->Script( "winfo rooty %s", this->MainFrame->GetWidgetName());
-  int yw = vtkKWObject::GetIntegerResult(this->Application);
+  int yw = vtkKWObject::GetIntegerResult(this->GetApplication());
 
   // Get the size and of the window
 
   this->Script( "winfo width %s", this->MainFrame->GetWidgetName());
-  int dxw = vtkKWObject::GetIntegerResult(this->Application);
+  int dxw = vtkKWObject::GetIntegerResult(this->GetApplication());
 
   this->Script( "winfo height %s", this->MainFrame->GetWidgetName());
-  int dyw = vtkKWObject::GetIntegerResult(this->Application);
+  int dyw = vtkKWObject::GetIntegerResult(this->GetApplication());
 
   if ((x >= xw) && (x<= xw+dxw) && (y >= yw) && (y <= yw + dyw))
     {
@@ -422,7 +422,7 @@ void vtkKWChangeColorButton::QueryUserForColor()
   int r, g, b;
   char *result, tmp[3];
 
-  this->Application->SetDialogUp(1);
+  this->GetApplication()->SetDialogUp(1);
 
   this->Script(
      "tk_chooseColor -initialcolor {#%02x%02x%02x} -title {%s} -parent %s",
@@ -432,9 +432,9 @@ void vtkKWChangeColorButton::QueryUserForColor()
      (this->DialogText?this->DialogText:"Chose Color"),
      this->GetWidgetName() );
 
-  result = this->Application->GetMainInterp()->result;
+  result = this->GetApplication()->GetMainInterp()->result;
 
-  this->Application->SetDialogUp(0);
+  this->GetApplication()->SetDialogUp(0);
 
   if (strlen(result) > 6)
     {
@@ -512,7 +512,7 @@ void vtkKWChangeColorButton::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWChangeColorButton ";
-  this->ExtractRevision(os,"$Revision: 1.44 $");
+  this->ExtractRevision(os,"$Revision: 1.45 $");
 }
 
 //----------------------------------------------------------------------------

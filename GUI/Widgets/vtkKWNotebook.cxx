@@ -59,7 +59,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWNotebook);
-vtkCxxRevisionMacro(vtkKWNotebook, "1.61");
+vtkCxxRevisionMacro(vtkKWNotebook, "1.62");
 
 //----------------------------------------------------------------------------
 int vtkKWNotebookCommand(ClientData cd, Tcl_Interp *interp,
@@ -426,7 +426,7 @@ vtkKWNotebook::Page* vtkKWNotebook::GetFirstPackedPageNotMatchingTag(int tag)
 
   char **slaves = 0;
   int nb_slaves = vtkKWTkUtilities::GetSlaves(
-    this->Application->GetMainInterp(),
+    this->GetApplication()->GetMainInterp(),
     this->TabsFrame->GetWidgetName(),
     &slaves);
   if (!nb_slaves)
@@ -722,7 +722,7 @@ int vtkKWNotebook::AddPage(const char *title,
 
   page->Frame = vtkKWFrame::New();
   page->Frame->SetParent(this->Body);
-  page->Frame->Create(this->Application, 0);
+  page->Frame->Create(this->GetApplication(), 0);
 
   // Store the page title for fast page retrieval on title
 
@@ -733,7 +733,7 @@ int vtkKWNotebook::AddPage(const char *title,
 
   page->TabFrame = vtkKWFrame::New();
   page->TabFrame->SetParent(this->TabsFrame);
-  page->TabFrame->Create(this->Application, 0);
+  page->TabFrame->Create(this->GetApplication(), 0);
 
   cmd << page->TabFrame->GetWidgetName() << " config -relief raised "
       << " -bd " << VTK_KW_NB_TAB_BD << endl;
@@ -742,7 +742,7 @@ int vtkKWNotebook::AddPage(const char *title,
 
   page->Label = vtkKWLabel::New();
   page->Label->SetParent(page->TabFrame);
-  page->Label->Create(this->Application, "-highlightthickness 0");
+  page->Label->Create(this->GetApplication(), "-highlightthickness 0");
   page->Label->SetLabel(page->Title);
   if (balloon)
     {
@@ -766,7 +766,7 @@ int vtkKWNotebook::AddPage(const char *title,
 
     page->ImageLabel = vtkKWLabel::New();
     page->ImageLabel->SetParent(page->TabFrame);
-    page->ImageLabel->Create(this->Application, "");
+    page->ImageLabel->Create(this->GetApplication(), "");
     page->ImageLabel->SetImageOption(page->Icon);
 
     if (this->ShowIcons)
@@ -1908,7 +1908,7 @@ void vtkKWNotebook::PageTabContextMenuCallback(int id, int x, int y)
     this->TabPopupMenu = vtkKWMenu::New();
     this->TabPopupMenu->SetParent(this);
     this->TabPopupMenu->TearOffOff();
-    this->TabPopupMenu->Create(this->Application, 0);
+    this->TabPopupMenu->Create(this->GetApplication(), 0);
     }
 
   this->TabPopupMenu->DeleteAllMenuItems();
@@ -1982,7 +1982,7 @@ void vtkKWNotebook::UpdatePageTabBackgroundColor(vtkKWNotebook::Page *page,
       cmd << page->TabFrame->GetWidgetName() << " config -bg [" 
           << page->Frame->GetWidgetName() << " cget -bg]" << endl;
       vtkKWTkUtilities::ChangeFontSlantToRoman(
-        this->Application->GetMainInterp(),
+        this->GetApplication()->GetMainInterp(),
         page->Label->GetWidgetName());
       }
     else
@@ -1993,7 +1993,7 @@ void vtkKWNotebook::UpdatePageTabBackgroundColor(vtkKWNotebook::Page *page,
       cmd << page->TabFrame->GetWidgetName() 
           << " config -bg " << color << endl;
       vtkKWTkUtilities::ChangeFontSlantToItalic(
-        this->Application->GetMainInterp(),
+        this->GetApplication()->GetMainInterp(),
         page->Label->GetWidgetName());
       }
     }
@@ -2105,7 +2105,7 @@ void vtkKWNotebook::UpdateBodyPosition()
     // tabs is hidden (which will give the "notebook" look).
 
     this->Script("winfo reqheight %s", this->TabsFrame->GetWidgetName());
-    int rheight = vtkKWObject::GetIntegerResult(this->Application);
+    int rheight = vtkKWObject::GetIntegerResult(this->GetApplication());
 
     // if 1, then we have not been mappep/configured at the moment, but this
     // function will be called by Resize() when Configure is triggered, so
@@ -2173,13 +2173,13 @@ void vtkKWNotebook::UpdateMaskPosition()
     if (tab_is_mapped)
       {
       this->Script("winfo x %s", page->TabFrame->GetWidgetName());
-      tab_x = vtkKWObject::GetIntegerResult(this->Application);
+      tab_x = vtkKWObject::GetIntegerResult(this->GetApplication());
       }
     else
 #endif
       {
       vtkKWTkUtilities::GetPackSlaveHorizontalPosition(
-        this->Application->GetMainInterp(),
+        this->GetApplication()->GetMainInterp(),
         this->TabsFrame->GetWidgetName(),
         page->TabFrame->GetWidgetName(),
         &tab_x);
@@ -2277,7 +2277,7 @@ void vtkKWNotebook::Resize()
   if (this->AreTabsVisible())
     {
     this->Script("winfo y %s", this->Body->GetWidgetName());
-    height += vtkKWObject::GetIntegerResult(this->Application);
+    height += vtkKWObject::GetIntegerResult(this->GetApplication());
     }
 
   // Now if the tabs require more width than the page, use the tabs width
@@ -2457,7 +2457,7 @@ void vtkKWNotebook::SetShowOnlyMostRecentPages(int arg)
     {
     char **slaves = 0;
     int nb_slaves = vtkKWTkUtilities::GetSlaves(
-      this->Application->GetMainInterp(),
+      this->GetApplication()->GetMainInterp(),
       this->TabsFrame->GetWidgetName(), &slaves);
 
     // Iterate over each slave and find the corresponding page

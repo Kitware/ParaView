@@ -22,7 +22,7 @@
 
 // ---------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWScale );
-vtkCxxRevisionMacro(vtkKWScale, "1.75");
+vtkCxxRevisionMacro(vtkKWScale, "1.76");
 
 int vtkKWScaleCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -244,7 +244,7 @@ void vtkKWScale::DisplayEntry()
 
   this->Entry = vtkKWEntry::New();
   this->Entry->SetParent(this);
-  this->Entry->Create(this->Application, 0);
+  this->Entry->Create(this->GetApplication(), 0);
   this->Entry->SetWidth(11);
   this->Entry->SetEnabled(this->Enabled);
   this->Entry->SetValue(this->GetValue());
@@ -271,7 +271,7 @@ void vtkKWScale::DisplayLabel(const char *label)
   if (!this->Label->IsCreated())
     {
     this->Label->SetParent(this);
-    this->Label->Create(this->Application, "-anchor w");
+    this->Label->Create(this->GetApplication(), "-anchor w");
     this->Label->SetEnabled(this->Enabled);
     }
 
@@ -530,7 +530,7 @@ void vtkKWScale::DisplayPopupScaleCallback()
                this->Scale->GetWidgetName(), this->Scale->GetWidgetName());
   
   int x, y, py, ph, scx, scy, sx, sy;
-  sscanf(this->Application->GetMainInterp()->result, 
+  sscanf(this->GetApplication()->GetMainInterp()->result, 
          "%d %d %d %d %d %d %d %d", 
          &x, &y, &py, &ph, &scx, &scy, &sx, &sy);
  
@@ -911,7 +911,7 @@ void vtkKWScale::Resize()
     }
   
   this->Script("winfo width %s", this->GetWidgetName());
-  int width = vtkKWObject::GetIntegerResult(this->Application);
+  int width = vtkKWObject::GetIntegerResult(this->GetApplication());
   
   char labelText[100];
   
@@ -1001,7 +1001,7 @@ void vtkKWScale::SetDisplayRange(int flag)
     this->RangeMinLabel = vtkKWLabel::New();
     this->RangeMinLabel->SetParent(this);
     sprintf(labelText, "(%g)", this->Range[0]);
-    this->RangeMinLabel->Create(this->Application, "");
+    this->RangeMinLabel->Create(this->GetApplication(), "");
     this->RangeMinLabel->SetLabel(labelText);
     this->RangeMinLabel->SetEnabled(this->Enabled);
     }
@@ -1010,7 +1010,7 @@ void vtkKWScale::SetDisplayRange(int flag)
     this->RangeMaxLabel = vtkKWLabel::New();
     this->RangeMaxLabel->SetParent(this);
     sprintf(labelText, "(%g)", this->Range[1]);
-    this->RangeMaxLabel->Create(this->Application, "");
+    this->RangeMaxLabel->Create(this->GetApplication(), "");
     this->RangeMaxLabel->SetLabel(labelText);
     this->RangeMaxLabel->SetEnabled(this->Enabled);
     }

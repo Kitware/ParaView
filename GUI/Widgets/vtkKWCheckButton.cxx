@@ -17,7 +17,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWCheckButton );
-vtkCxxRevisionMacro(vtkKWCheckButton, "1.27");
+vtkCxxRevisionMacro(vtkKWCheckButton, "1.28");
 
 //----------------------------------------------------------------------------
 vtkKWCheckButton::vtkKWCheckButton() 
@@ -117,7 +117,7 @@ int vtkKWCheckButton::GetState()
     {
     this->Script("expr {${%s}} == {[%s cget -onvalue]}",
                  this->VariableName, this->GetWidgetName());
-    return vtkKWObject::GetIntegerResult(this->Application);
+    return vtkKWObject::GetIntegerResult(this->GetApplication());
     }
   return 0;
 }

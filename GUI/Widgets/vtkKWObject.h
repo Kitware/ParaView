@@ -119,8 +119,6 @@ protected:
   vtkKWObject();
   ~vtkKWObject();
 
-  vtkKWApplication *Application;
-
   char **Versions;
   int   NumberOfVersions;
   int   VersionsLoaded;
@@ -155,6 +153,9 @@ protected:
     char **command, vtkKWObject *object, const char *method);
 
 private:
+
+  vtkKWApplication *Application;
+
   vtkKWObject(const vtkKWObject&); // Not implemented
   void operator=(const vtkKWObject&); // Not implemented
 };

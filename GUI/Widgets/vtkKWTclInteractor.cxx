@@ -24,7 +24,7 @@
 
 //-------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWTclInteractor );
-vtkCxxRevisionMacro(vtkKWTclInteractor, "1.19");
+vtkCxxRevisionMacro(vtkKWTclInteractor, "1.20");
 
 int vtkKWTclInteractorCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -92,7 +92,7 @@ void vtkKWTclInteractor::SetMasterWindow(vtkKWWindow* win)
     if (this->MasterWindow) 
       { 
       this->MasterWindow->Register(this); 
-      if (this->Application)
+      if (this->IsCreated())
         {
         this->Script("wm transient %s %s", this->GetWidgetName(), 
                      this->MasterWindow->GetWidgetName());
@@ -224,7 +224,7 @@ void vtkKWTclInteractor::Evaluate()
   this->Register(this);
   this->Script("catch {eval [list %s]} _tmp_err",  
                this->CommandEntry->GetValue());
-  if ( this->Application->GetApplicationExited() )
+  if ( this->GetApplication()->GetApplicationExited() )
     {
     this->UnRegister(this);
     return;
@@ -233,7 +233,7 @@ void vtkKWTclInteractor::Evaluate()
   this->Script("set _tmp_err");
   this->Script("%s insert end {%s}", 
                this->DisplayText->GetWidgetName(),
-               this->Application->GetMainInterp()->result);
+               this->GetApplication()->GetMainInterp()->result);
   this->Script("%s insert end \"\n\n\"", this->DisplayText->GetWidgetName());
   this->Script("%s configure -state disabled",
                this->DisplayText->GetWidgetName());
@@ -255,7 +255,7 @@ void vtkKWTclInteractor::AppendText(const char* text)
 //----------------------------------------------------------------------------
 void vtkKWTclInteractor::DownCallback()
 {
-  if ( ! this->Application)
+  if ( ! this->IsCreated())
     {
     return;
     }
@@ -278,7 +278,7 @@ void vtkKWTclInteractor::DownCallback()
 //----------------------------------------------------------------------------
 void vtkKWTclInteractor::UpCallback()
 {
-  if ( ! this->Application)
+  if ( ! this->IsCreated())
     {
     return;
     }

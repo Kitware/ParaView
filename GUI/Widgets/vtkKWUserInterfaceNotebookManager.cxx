@@ -30,7 +30,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWUserInterfaceNotebookManager);
-vtkCxxRevisionMacro(vtkKWUserInterfaceNotebookManager, "1.23");
+vtkCxxRevisionMacro(vtkKWUserInterfaceNotebookManager, "1.24");
 
 int vtkKWUserInterfaceNotebookManagerCommand(ClientData cd, Tcl_Interp *interp,
                                              int argc, char *argv[]);
@@ -325,7 +325,7 @@ int vtkKWUserInterfaceNotebookManager::ShowPanel(
 
   if (!panel->IsCreated())
     {
-    panel->Create(this->Application);
+    panel->Create(this->GetApplication());
     }
 
   // Show the pages that share the same tag (i.e. the pages that belong to the 
@@ -1030,7 +1030,7 @@ int vtkKWUserInterfaceNotebookManager::DragAndDropWidget(
     {
     if (!from_panel->IsCreated())
       {
-      from_panel->Create(this->Application);
+      from_panel->Create(this->GetApplication());
       }
     int from_panel_id = this->GetPanelId(from_panel);
     if (this->Notebook->HasPage(from_page_title, from_panel_id))
@@ -1070,7 +1070,7 @@ int vtkKWUserInterfaceNotebookManager::DragAndDropWidget(
     {
     if (!to_panel->IsCreated())
       {
-      to_panel->Create(this->Application);
+      to_panel->Create(this->GetApplication());
       }
     int to_panel_id = this->GetPanelId(to_panel);
     if (this->Notebook->HasPage(to_page_title, to_panel_id))

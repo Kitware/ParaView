@@ -37,7 +37,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWCornerAnnotation );
-vtkCxxRevisionMacro(vtkKWCornerAnnotation, "1.76");
+vtkCxxRevisionMacro(vtkKWCornerAnnotation, "1.77");
 
 int vtkKWCornerAnnotationCommand(ClientData cd, Tcl_Interp *interp,
                                  int argc, char *argv[]);
@@ -358,7 +358,7 @@ void vtkKWCornerAnnotation::Create(vtkKWApplication *app,
   this->MaximumLineHeightScale->SetRange(0.01, 0.2);
   this->MaximumLineHeightScale->SetResolution(0.01);
   this->MaximumLineHeightScale->PopupScaleOn();
-  this->MaximumLineHeightScale->Create(this->Application, "");
+  this->MaximumLineHeightScale->Create(app, "");
   this->MaximumLineHeightScale->DisplayEntry();
   this->MaximumLineHeightScale->DisplayEntryAndLabelOnTopOff();
   this->MaximumLineHeightScale->DisplayLabel("Max line height:");
@@ -391,7 +391,7 @@ void vtkKWCornerAnnotation::Create(vtkKWApplication *app,
       this->TextPropertyPopupButton = vtkKWLabeledPopupButton::New();
       }
     this->TextPropertyPopupButton->SetParent(this->PropertiesFrame);
-    this->TextPropertyPopupButton->Create(this->Application);
+    this->TextPropertyPopupButton->Create(app);
     this->TextPropertyPopupButton->SetLabel("Text properties:");
     this->TextPropertyPopupButton->SetPopupButtonLabel("Edit...");
     this->Script("%s configure -bd 2 -relief groove", 
@@ -415,7 +415,7 @@ void vtkKWCornerAnnotation::Create(vtkKWApplication *app,
   this->TextPropertyWidget->LongFormatOn();
   this->TextPropertyWidget->LabelOnTopOn();
   this->TextPropertyWidget->ShowLabelOn();
-  this->TextPropertyWidget->Create(this->Application);
+  this->TextPropertyWidget->Create(app);
   this->TextPropertyWidget->GetLabel()->SetLabel("Text properties:");
   this->TextPropertyWidget->SetTraceReferenceObject(this);
   this->TextPropertyWidget->SetTraceReferenceCommand("GetTextPropertyWidget");
@@ -761,7 +761,7 @@ void vtkKWCornerAnnotation::SerializeToken(istream& is, const char *token)
 void vtkKWCornerAnnotation::SerializeRevision(ostream& os, vtkIndent indent)
 {
   os << indent << "vtkKWCornerAnnotation ";
-  this->ExtractRevision(os,"$Revision: 1.76 $");
+  this->ExtractRevision(os,"$Revision: 1.77 $");
 }
 
 //----------------------------------------------------------------------------

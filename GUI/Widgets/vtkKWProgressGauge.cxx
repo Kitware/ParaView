@@ -19,7 +19,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWProgressGauge );
-vtkCxxRevisionMacro(vtkKWProgressGauge, "1.19");
+vtkCxxRevisionMacro(vtkKWProgressGauge, "1.20");
 
 int vtkKWProgressGaugeCommand(ClientData cd, Tcl_Interp *interp,
                               int argc, char *argv[]);
@@ -170,7 +170,7 @@ void vtkKWProgressGauge::SetHeight(int height)
 
   //  Change gauge height, move text
 
-  if (this->Application)
+  if (this->IsCreated())
     {
     this->Script("%s.display config -height %d", 
                  this->GetWidgetName(), this->Height);

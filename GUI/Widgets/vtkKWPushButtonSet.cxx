@@ -23,7 +23,7 @@
 //----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkKWPushButtonSet);
-vtkCxxRevisionMacro(vtkKWPushButtonSet, "1.10");
+vtkCxxRevisionMacro(vtkKWPushButtonSet, "1.11");
 
 int vtkvtkKWPushButtonSetCommand(ClientData cd, Tcl_Interp *interp,
                                   int argc, char *argv[]);
@@ -206,7 +206,7 @@ int vtkKWPushButtonSet::AddButton(int id,
   button_slot->Id = id;
 
   button_slot->Button->SetParent(this);
-  button_slot->Button->Create(this->Application, 0);
+  button_slot->Button->Create(this->GetApplication(), 0);
   button_slot->Button->SetEnabled(this->Enabled);
 
   // Set text command and balloon help, if any

@@ -31,7 +31,7 @@
 
 // ---------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWThumbWheel );
-vtkCxxRevisionMacro(vtkKWThumbWheel, "1.19");
+vtkCxxRevisionMacro(vtkKWThumbWheel, "1.20");
 
 // ---------------------------------------------------------------------------
 int vtkKWThumbWheelCommand(ClientData cd, 
@@ -358,7 +358,7 @@ void vtkKWThumbWheel::ResizeThumbWheelCallback()
                this->ThumbWheel->GetWidgetName());
   
   int tw, th;
-  sscanf(this->Application->GetMainInterp()->result, "%d %d", &tw, &th);
+  sscanf(this->GetApplication()->GetMainInterp()->result, "%d %d", &tw, &th);
 
   // Remove the border size (-bd)
 
@@ -403,7 +403,7 @@ void vtkKWThumbWheel::CreateEntry()
 
   this->Entry = vtkKWEntry::New();
   this->Entry->SetParent(this);
-  this->Entry->Create(this->Application, "-width 7");
+  this->Entry->Create(this->GetApplication(), "-width 7");
   this->Entry->SetEnabled(this->Enabled);
   this->Entry->SetValue(this->GetValue());
 }
@@ -438,7 +438,7 @@ void vtkKWThumbWheel::CreateLabel()
 
   this->Label = vtkKWLabel::New();
   this->Label->SetParent(this);
-  this->Label->Create(this->Application, "");
+  this->Label->Create(this->GetApplication(), "");
   this->Label->SetEnabled(this->Enabled);
 }
 
@@ -798,7 +798,7 @@ void vtkKWThumbWheel::DisplayPopupCallback()
                this->ThumbWheel->GetWidgetName());
   
   int x, y, py, ph, tw, th;
-  sscanf(this->Application->GetMainInterp()->result, 
+  sscanf(this->GetApplication()->GetMainInterp()->result, 
          "%d %d %d %d %d %d", 
          &x, &y, &py, &ph, &tw, &th);
  
@@ -863,7 +863,7 @@ double vtkKWThumbWheel::GetMousePositionInThumbWheel()
                this->GetWidgetName(), this->ThumbWheel->GetWidgetName());
   
   int x, tx;
-  sscanf(this->Application->GetMainInterp()->result, "%d %d", &x, &tx);
+  sscanf(this->GetApplication()->GetMainInterp()->result, "%d %d", &x, &tx);
 
   return (double)(x - tx - VTK_KW_TW_BORDER_SIZE) / 
     (double)(this->ThumbWheelWidth - 1);

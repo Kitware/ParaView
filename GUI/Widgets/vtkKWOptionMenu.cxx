@@ -20,7 +20,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWOptionMenu );
-vtkCxxRevisionMacro(vtkKWOptionMenu, "1.29");
+vtkCxxRevisionMacro(vtkKWOptionMenu, "1.30");
 
 //----------------------------------------------------------------------------
 vtkKWOptionMenu::vtkKWOptionMenu()
@@ -48,11 +48,11 @@ const char *vtkKWOptionMenu::GetValue()
     delete [] this->CurrentValue;
     this->CurrentValue = 0;
     }
-  if ( this->Application )
+  if (this->IsCreated())
     {
     this->Script("set %sValue",this->GetWidgetName());
     this->CurrentValue = vtkString::Duplicate(
-      this->Application->GetMainInterp()->result);
+      this->GetApplication()->GetMainInterp()->result);
     }
   return this->CurrentValue;  
 }
@@ -60,7 +60,7 @@ const char *vtkKWOptionMenu::GetValue()
 //----------------------------------------------------------------------------
 void vtkKWOptionMenu::SetValue(const char *s)
 {
-  if (this->Application && s)
+  if (this->IsCreated() && s)
     {
     this->Script("set %sValue {%s}", this->GetWidgetName(),s);
     }

@@ -19,7 +19,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWSplashScreen );
-vtkCxxRevisionMacro(vtkKWSplashScreen, "1.18");
+vtkCxxRevisionMacro(vtkKWSplashScreen, "1.19");
 
 //----------------------------------------------------------------------------
 vtkKWSplashScreen::vtkKWSplashScreen()
@@ -87,7 +87,7 @@ void vtkKWSplashScreen::UpdateCanvasSize()
 {
   // Resize the canvas according to the image
 
-  if (this->Application && this->ImageName)
+  if (this->IsCreated() && this->ImageName)
     {
     int w, h;
     this->Script("concat [%s cget -width] [%s cget -height]", 
@@ -102,10 +102,10 @@ void vtkKWSplashScreen::UpdateCanvasSize()
 //----------------------------------------------------------------------------
 void vtkKWSplashScreen::UpdateProgressMessagePosition()
 {
-  if (this->Application)
+  if (this->IsCreated())
     {
     this->Script("%s cget -height", this->Canvas->GetWidgetName());
-    int height = vtkKWObject::GetIntegerResult(this->Application);
+    int height = vtkKWObject::GetIntegerResult(this->GetApplication());
 
     this->Script("%s coords msg [expr 0.5 * [%s cget -width]] %d", 
                  this->Canvas->GetWidgetName(), 
@@ -119,7 +119,7 @@ void vtkKWSplashScreen::UpdateProgressMessagePosition()
 //----------------------------------------------------------------------------
 void vtkKWSplashScreen::Show()
 {
-  if (!this->Application)
+  if (!this->IsCreated())
     {
     return;
     }
@@ -195,7 +195,7 @@ void vtkKWSplashScreen::SetImageName (const char* _arg)
 
   this->Modified();
 
-  if (this->Application && this->ImageName)
+  if (this->IsCreated() && this->ImageName)
     {
     this->Script("%s itemconfigure image -image %s", 
                  this->Canvas->GetWidgetName(), this->ImageName);

@@ -18,7 +18,7 @@
 
 
 vtkStandardNewMacro( vtkKWSplitFrame );
-vtkCxxRevisionMacro(vtkKWSplitFrame, "1.18");
+vtkCxxRevisionMacro(vtkKWSplitFrame, "1.19");
 
 
 
@@ -154,7 +154,7 @@ void vtkKWSplitFrame::ConfigureCallback()
     {
     this->Script( "winfo height %s", this->GetWidgetName());
     }
-  size = vtkKWObject::GetIntegerResult(this->Application);   
+  size = vtkKWObject::GetIntegerResult(this->GetApplication());   
 
   // If size == 1 then the widget has not been packed, it will be later
   // and the Configure event will bring us back here with the correct size
@@ -222,7 +222,7 @@ void vtkKWSplitFrame::DragCallback()
     {
     this->Script( "winfo height %s", this->GetWidgetName());
     }
-  size = vtkKWObject::GetIntegerResult(this->Application); 
+  size = vtkKWObject::GetIntegerResult(this->GetApplication()); 
   this->Size = size;
 
   // get the relative position of the render in the window
@@ -234,7 +234,7 @@ void vtkKWSplitFrame::DragCallback()
     {
     this->Script( "winfo rooty %s",this->GetWidgetName());
     } 
-  smin = vtkKWObject::GetIntegerResult(this->Application);
+  smin = vtkKWObject::GetIntegerResult(this->GetApplication());
   // Get the position of the mouse in the renderer.
   if (this->Orientation == vtkKWSplitFrame::Horizontal)
     {
@@ -244,7 +244,7 @@ void vtkKWSplitFrame::DragCallback()
     {
     this->Script( "winfo pointery %s", this->GetWidgetName());
     }
-  s = vtkKWObject::GetIntegerResult(this->Application);
+  s = vtkKWObject::GetIntegerResult(this->GetApplication());
   // Relative position.
   s = s - smin;
 
@@ -401,7 +401,7 @@ void vtkKWSplitFrame::SetFrame2Visibility(int flag)
 //----------------------------------------------------------------------------
 void vtkKWSplitFrame::Update()
 {
-  if (this->Application == NULL)
+  if (!this->IsCreated())
     {
     return;
     }

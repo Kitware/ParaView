@@ -19,7 +19,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWUserInterfacePanel);
-vtkCxxRevisionMacro(vtkKWUserInterfacePanel, "1.9");
+vtkCxxRevisionMacro(vtkKWUserInterfacePanel, "1.10");
 
 int vtkKWUserInterfacePanelCommand(ClientData cd, Tcl_Interp *interp,
                                    int argc, char *argv[]);
@@ -94,10 +94,16 @@ void vtkKWUserInterfacePanel::Create(vtkKWApplication *app)
 
   if (this->UserInterfaceManager && !this->UserInterfaceManager->IsCreated())
     {
-    this->UserInterfaceManager->Create(this->Application);
+    this->UserInterfaceManager->Create(this->GetApplication());
     }
 
   // Do *not* call Update() here.
+}
+
+// ---------------------------------------------------------------------------
+int vtkKWUserInterfacePanel::IsCreated()
+{
+  return (this->GetApplication() != NULL);
 }
 
 //----------------------------------------------------------------------------

@@ -20,7 +20,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWMenu );
-vtkCxxRevisionMacro(vtkKWMenu, "1.49");
+vtkCxxRevisionMacro(vtkKWMenu, "1.50");
 
 
 
@@ -73,7 +73,7 @@ void vtkKWMenu::SetTearOff(int val)
   this->Modified();
   this->TearOff = val;
 
-  if (this->Application)
+  if (this->IsCreated())
     {
     this->Script("%s configure -tearoff %d", this->GetWidgetName(), val);
     }
@@ -129,7 +129,7 @@ void vtkKWMenu::AddGeneric(const char* addtype,
 
   str << ends;
   
-  this->Application->SimpleScript(str.str());
+  this->GetApplication()->SimpleScript(str.str());
   delete [] str.str();
 
   if(!help)
@@ -170,7 +170,7 @@ void vtkKWMenu::InsertGeneric(int position, const char* addtype,
 
   str << ends;
   
-  this->Application->SimpleScript(str.str());
+  this->GetApplication()->SimpleScript(str.str());
   delete [] str.str();
 
   if(!help)
@@ -191,7 +191,7 @@ void vtkKWMenu::AddCascade(const char* label,
   ostrstream str;
   str << this->GetWidgetName() << " add cascade -label {" << label << "}"
       << " -underline " << underline << ends;
-  this->Application->SimpleScript(str.str());
+  this->GetApplication()->SimpleScript(str.str());
   delete [] str.str();
 
   if(!help)
@@ -215,7 +215,7 @@ void  vtkKWMenu::InsertCascade(int position,
   
   str << this->GetWidgetName() << " insert " << position 
       << " cascade -label {" << label << "} -underline " << underline << ends;
-  this->Application->SimpleScript(str.str());
+  this->GetApplication()->SimpleScript(str.str());
   delete [] str.str();
 
   if(!help)
@@ -458,7 +458,7 @@ int vtkKWMenu::GetRadioButtonValue(vtkKWObject* Object,
   char *rbv = 
     this->CreateRadioButtonVariable(Object,varname);
   this->Script("set %s",rbv);
-  res = this->GetIntegerResult(this->Application);
+  res = this->GetIntegerResult(this->GetApplication());
   delete [] rbv;
   return res;
 }
@@ -481,7 +481,7 @@ int vtkKWMenu::GetCheckedRadioButtonItem(vtkKWObject* Object,
       if (!strcmp(rbv, this->GetApplication()->GetMainInterp()->result))
         {
         this->Script("%s entrycget %i -value", this->GetWidgetName(), i);
-        if (this->GetIntegerResult(this->Application) == value)
+        if (this->GetIntegerResult(this->GetApplication()) == value)
           {
           delete [] rbv;
           return i;
@@ -501,7 +501,7 @@ void vtkKWMenu::CheckRadioButton(vtkKWObject* Object,
   char *rbv = 
     this->CreateRadioButtonVariable(Object,varname);
   this->Script("set %s",rbv);
-  if (this->GetIntegerResult(this->Application) != id)
+  if (this->GetIntegerResult(this->GetApplication()) != id)
     {
     this->Script("set %s %d",rbv,id);
     }
@@ -528,7 +528,7 @@ int vtkKWMenu::GetCheckButtonValue(vtkKWObject* Object,
   char *rbv = 
     this->CreateCheckButtonVariable(Object,varname);
   this->Script("set %s",rbv);
-  res = this->GetIntegerResult(this->Application);
+  res = this->GetIntegerResult(this->GetApplication());
   delete [] rbv;
   return res;
 }
@@ -540,7 +540,7 @@ void vtkKWMenu::CheckCheckButton(vtkKWObject* Object,
   char *rbv = 
     this->CreateCheckButtonVariable(Object,varname);
   this->Script("set %s",rbv);
-  if (this->GetIntegerResult(this->Application) != id)
+  if (this->GetIntegerResult(this->GetApplication()) != id)
     {
     this->Script("set %s %d",rbv,id);
     }
@@ -677,7 +677,7 @@ void vtkKWMenu::DeleteAllMenuItems()
     return;
     }
   
-  last = vtkKWObject::GetIntegerResult(this->Application);
+  last = vtkKWObject::GetIntegerResult(this->GetApplication());
   
   for (i = last; i >= 0; --i)
     {
@@ -689,7 +689,7 @@ void vtkKWMenu::DeleteAllMenuItems()
 int vtkKWMenu::GetIndex(const char* menuname)
 {
   this->Script("%s index {%s}", this->GetWidgetName(), menuname);
-  return vtkKWObject::GetIntegerResult(this->Application);
+  return vtkKWObject::GetIntegerResult(this->GetApplication());
 }
 
 //----------------------------------------------------------------------------
@@ -727,7 +727,7 @@ const char* vtkKWMenu::GetItemLabel(int position)
 int vtkKWMenu::HasItem(const char* menuname)
 {
   this->Script("catch {%s index {%s}}", this->GetWidgetName(), menuname);
-  return !vtkKWObject::GetIntegerResult(this->Application);
+  return !vtkKWObject::GetIntegerResult(this->GetApplication());
 }
 
 //----------------------------------------------------------------------------
@@ -939,7 +939,7 @@ int vtkKWMenu::HasItemOption(int idx, const char *option)
     return 0;
     }
  
-  return !this->Application->EvaluateBooleanExpression(
+  return !this->GetApplication()->EvaluateBooleanExpression(
     "catch {%s entrycget %d %s}",
     this->GetWidgetName(), idx, option);
 }

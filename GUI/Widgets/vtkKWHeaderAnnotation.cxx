@@ -30,7 +30,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWHeaderAnnotation );
-vtkCxxRevisionMacro(vtkKWHeaderAnnotation, "1.8");
+vtkCxxRevisionMacro(vtkKWHeaderAnnotation, "1.9");
 
 int vtkKWHeaderAnnotationCommand(ClientData cd, Tcl_Interp *interp,
                                  int argc, char *argv[]);
@@ -191,7 +191,7 @@ void vtkKWHeaderAnnotation::Create(vtkKWApplication *app,
       this->TextPropertyPopupButton = vtkKWLabeledPopupButton::New();
       }
     this->TextPropertyPopupButton->SetParent(this->TextFrame);
-    this->TextPropertyPopupButton->Create(this->Application);
+    this->TextPropertyPopupButton->Create(app);
     this->TextPropertyPopupButton->SetLabel("Header properties:");
     this->TextPropertyPopupButton->SetPopupButtonLabel("Edit...");
     this->Script("%s configure -bd 2 -relief groove", 
@@ -215,7 +215,7 @@ void vtkKWHeaderAnnotation::Create(vtkKWApplication *app,
   this->TextPropertyWidget->LongFormatOn();
   this->TextPropertyWidget->LabelOnTopOn();
   this->TextPropertyWidget->ShowLabelOn();
-  this->TextPropertyWidget->Create(this->Application);
+  this->TextPropertyWidget->Create(app);
   this->TextPropertyWidget->GetLabel()->SetLabel("Header properties:");
   this->TextPropertyWidget->SetChangedCommand(this, "TextPropertyCallback");
 

@@ -33,7 +33,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWApplicationSettingsInterface);
-vtkCxxRevisionMacro(vtkKWApplicationSettingsInterface, "1.22");
+vtkCxxRevisionMacro(vtkKWApplicationSettingsInterface, "1.23");
 
 int vtkKWApplicationSettingsInterfaceCommand(ClientData cd, Tcl_Interp *interp,
                                              int argc, char *argv[]);
@@ -447,7 +447,7 @@ void vtkKWApplicationSettingsInterface::Update()
   if (this->ConfirmExitCheckButton)
     {
     this->ConfirmExitCheckButton->SetState(
-      this->Application->GetMessageDialogResponse(VTK_KW_EXIT_DIALOG_NAME)
+      this->GetApplication()->GetMessageDialogResponse(VTK_KW_EXIT_DIALOG_NAME)
       ? 0 : 1);
     }
 
@@ -456,7 +456,7 @@ void vtkKWApplicationSettingsInterface::Update()
   if (this->SaveWindowGeometryCheckButton)
     {
     this->SaveWindowGeometryCheckButton->SetState(
-      this->Application->GetSaveWindowGeometry());
+      this->GetApplication()->GetSaveWindowGeometry());
     }
   
   // Interface settings : Show splash screen ?
@@ -464,7 +464,7 @@ void vtkKWApplicationSettingsInterface::Update()
   if (this->ShowSplashScreenCheckButton)
     {
     this->ShowSplashScreenCheckButton->SetState(
-      this->Application->GetShowSplashScreen());
+      this->GetApplication()->GetShowSplashScreen());
     }
 
   // Interface settings : Show balloon help ?
@@ -472,7 +472,7 @@ void vtkKWApplicationSettingsInterface::Update()
   if (this->ShowBalloonHelpCheckButton)
     {
     this->ShowBalloonHelpCheckButton->SetState(
-      this->Application->GetShowBalloonHelp());
+      this->GetApplication()->GetShowBalloonHelp());
     }
 
   // Interface settings : show most recent panels
@@ -483,11 +483,11 @@ void vtkKWApplicationSettingsInterface::Update()
 
   if (this->ShowMostRecentPanelsCheckButton)
     {
-    if (this->Application->HasRegisteryValue(
+    if (this->GetApplication()->HasRegisteryValue(
           2, "RunTime", VTK_KW_SHOW_MOST_RECENT_PANELS_REG_KEY))
       {
       this->ShowMostRecentPanelsCheckButton->SetState(
-        this->Application->GetIntRegisteryValue(
+        this->GetApplication()->GetIntRegisteryValue(
           2, "RunTime", VTK_KW_SHOW_MOST_RECENT_PANELS_REG_KEY));
       }
     else
@@ -520,11 +520,11 @@ void vtkKWApplicationSettingsInterface::Update()
 
   if (FlatFrameCheckButton)
     {
-    if (this->Application->HasRegisteryValue(
+    if (this->GetApplication()->HasRegisteryValue(
           2, "RunTime", VTK_KW_TOOLBAR_FLAT_FRAME_REG_KEY))
       {
       this->FlatFrameCheckButton->SetState(
-        this->Application->GetIntRegisteryValue(
+        this->GetApplication()->GetIntRegisteryValue(
           2, "RunTime", VTK_KW_TOOLBAR_FLAT_FRAME_REG_KEY));
       }
     else
@@ -538,11 +538,11 @@ void vtkKWApplicationSettingsInterface::Update()
 
   if (FlatButtonsCheckButton)
     {
-    if (this->Application->HasRegisteryValue(
+    if (this->GetApplication()->HasRegisteryValue(
           2, "RunTime", VTK_KW_TOOLBAR_FLAT_BUTTONS_REG_KEY))
       {
       this->FlatButtonsCheckButton->SetState(
-        this->Application->GetIntRegisteryValue(
+        this->GetApplication()->GetIntRegisteryValue(
           2, "RunTime", VTK_KW_TOOLBAR_FLAT_BUTTONS_REG_KEY));
       }
     else
@@ -675,7 +675,7 @@ void vtkKWApplicationSettingsInterface::ResetDragAndDropCallback()
     }
 
   vtkKWMessageDialog::PopupMessage( 
-        this->Application, this->Window, 
+        this->GetApplication(), this->Window, 
         "Reset Interface", 
         "All Drag & Drop events performed so far will be discarded. "
         "Note that your interface will be reset the next time you "

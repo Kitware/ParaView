@@ -20,7 +20,7 @@
 #include "vtkKWView.h"
 #include "vtkKWWindow.h"
 
-vtkCxxRevisionMacro(vtkKWComposite, "1.21");
+vtkCxxRevisionMacro(vtkKWComposite, "1.22");
 
 int vtkKWCompositeCommand(ClientData cd, Tcl_Interp *interp,
                           int argc, char *argv[]);
@@ -32,7 +32,6 @@ vtkKWComposite::vtkKWComposite()
   this->Notebook2 = vtkKWNotebook::New();
   this->PropertiesCreated = 0;
   this->TopLevel = NULL;
-  this->Application = NULL;
   this->View = NULL;
   this->LastSelectedProperty = -1;
   
@@ -49,11 +48,6 @@ vtkKWComposite::~vtkKWComposite()
     {
     this->TopLevel->UnRegister(this);
     this->TopLevel = NULL;
-    }
-  if (this->Application)
-    {
-    this->Application->UnRegister(this);
-    this->Application = NULL;
     }
   if (this->View)
     {
@@ -91,7 +85,7 @@ void vtkKWComposite::SetView(vtkKWView *_arg)
 void vtkKWComposite::InitializeProperties()
 {
   // make sure we have an applicaiton
-  if (!this->Application)
+  if (!this->GetApplication())
     {
     if (this->View)
       {
@@ -130,7 +124,7 @@ void vtkKWComposite::SetPropertiesParent(vtkKWWidget *parent)
 
 void vtkKWComposite::CreateProperties()
 {
-  vtkKWApplication *app = this->Application;
+  vtkKWApplication *app = this->GetApplication();
 
   // If the user has not set the properties parent.
   if (this->PropertiesParent == NULL)
@@ -154,8 +148,8 @@ void vtkKWComposite::CreateProperties()
 
   this->Notebook->SetParent(this->PropertiesParent);
   this->Notebook2->SetParent(this->PropertiesParent);
-  this->Notebook->Create(this->Application,"");
-  this->Notebook2->Create(this->Application,"");
+  this->Notebook->Create(app, "");
+  this->Notebook2->Create(app, "");
 
   // I do not think this should be here, but removing it will probably break VolView.
   this->Script("pack %s -pady 2 -padx 2 -fill both -expand yes -anchor n",
@@ -172,7 +166,7 @@ void vtkKWComposite::Deselect(vtkKWView *v)
 void vtkKWComposite::Select(vtkKWView* /*v*/)
 {
   // make sure we have an applicaiton
-  if (!this->Application)
+  if (!this->GetApplication())
     {
     if (this->View)
       {
@@ -189,7 +183,7 @@ void vtkKWComposite::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWObject::SerializeRevision(os,indent);
   os << indent << "vtkKWComposite ";
-  this->ExtractRevision(os,"$Revision: 1.21 $");
+  this->ExtractRevision(os,"$Revision: 1.22 $");
 }
 
 //----------------------------------------------------------------------------

@@ -23,7 +23,7 @@
 //----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkKWScaleSet);
-vtkCxxRevisionMacro(vtkKWScaleSet, "1.3");
+vtkCxxRevisionMacro(vtkKWScaleSet, "1.4");
 
 int vtkvtkKWScaleSetCommand(ClientData cd, Tcl_Interp *interp,
                                   int argc, char *argv[]);
@@ -205,7 +205,7 @@ int vtkKWScaleSet::AddScale(int id,
   scale_slot->Id = id;
 
   scale_slot->Scale->SetParent(this);
-  scale_slot->Scale->Create(this->Application, 0);
+  scale_slot->Scale->Create(this->GetApplication(), 0);
   scale_slot->Scale->SetEnabled(this->Enabled);
 
   // Set command and balloon help, if any

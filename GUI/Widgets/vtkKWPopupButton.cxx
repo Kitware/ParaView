@@ -22,7 +22,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWPopupButton);
-vtkCxxRevisionMacro(vtkKWPopupButton, "1.12");
+vtkCxxRevisionMacro(vtkKWPopupButton, "1.13");
 
 int vtkKWPopupButtonCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -228,7 +228,7 @@ void vtkKWPopupButton::DisplayPopupCallback()
                this->GetWidgetName());
   
   int px, py, tw, th, sw, sh;
-  sscanf(this->Application->GetMainInterp()->result, 
+  sscanf(this->GetApplication()->GetMainInterp()->result, 
          "%d %d %d %d %d %d", &px, &py, &tw, &th, &sw, &sh);
 
   px -= tw / 2;
@@ -264,7 +264,7 @@ void vtkKWPopupButton::DisplayPopupCallback()
 // ---------------------------------------------------------------------------
 void vtkKWPopupButton::WithdrawPopupCallback()
 {
-  if ( this->Application->GetDialogUp() )
+  if ( this->GetApplication()->GetDialogUp() )
     {
     this->Script("bell");
     return;

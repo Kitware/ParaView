@@ -21,7 +21,7 @@ int vtkKWLabelCommand(ClientData cd, Tcl_Interp *interp,
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLabel );
-vtkCxxRevisionMacro(vtkKWLabel, "1.30");
+vtkCxxRevisionMacro(vtkKWLabel, "1.31");
 
 //----------------------------------------------------------------------------
 vtkKWLabel::vtkKWLabel()
@@ -206,7 +206,7 @@ void vtkKWLabel::AdjustWrapLengthToWidthCallback()
                this->GetWidgetName(), this->GetWidgetName());
 
   int width, wraplength;
-  sscanf(this->Application->GetMainInterp()->result, 
+   sscanf(this->GetApplication()->GetMainInterp()->result, 
          "%d %d", 
          &width, &wraplength);
 

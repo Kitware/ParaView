@@ -24,7 +24,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWMessageDialog );
-vtkCxxRevisionMacro(vtkKWMessageDialog, "1.61");
+vtkCxxRevisionMacro(vtkKWMessageDialog, "1.62");
 
 //----------------------------------------------------------------------------
 int vtkKWMessageDialogCommand(ClientData cd, Tcl_Interp *interp,
@@ -175,7 +175,7 @@ void vtkKWMessageDialog::Create(vtkKWApplication *app, const char *args)
 
   pack_opt.rdbuf()->freeze(0);
 
-  if (this->OKButton->GetApplication())
+  if (this->OKButton->IsCreated())
     {
     this->OKButton->SetBind(
       "<FocusIn>", this->OKFrame->GetWidgetName(), 
@@ -186,7 +186,7 @@ void vtkKWMessageDialog::Create(vtkKWApplication *app, const char *args)
     this->OKButton->SetBind(this, "<Return>", "OK");
     }
 
-  if (this->CancelButton->GetApplication())
+  if (this->CancelButton->IsCreated())
     {
     this->CancelButton->SetBind(
       "<FocusIn>", this->CancelFrame->GetWidgetName(), 
@@ -197,7 +197,7 @@ void vtkKWMessageDialog::Create(vtkKWApplication *app, const char *args)
     this->CancelButton->SetBind(this, "<Return>", "Cancel");
     }
 
-  if (this->OtherButton->GetApplication())
+  if (this->OtherButton->IsCreated())
     {
     this->OtherButton->SetBind(
       "<FocusIn>", this->OtherFrame->GetWidgetName(), 
@@ -270,7 +270,7 @@ int vtkKWMessageDialog::GetTextWidth()
 //----------------------------------------------------------------------------
 int vtkKWMessageDialog::Invoke()
 {
-  if ( !this->Application )
+  if (!this->IsCreated())
     {
     return 0;
     }
@@ -283,7 +283,7 @@ int vtkKWMessageDialog::Invoke()
 
   if ( this->DialogName )
     {
-    int res = this->Application->GetMessageDialogResponse(this->DialogName);
+    int res = this->GetApplication()->GetMessageDialogResponse(this->DialogName);
     if ( res == 1 )
       {
       return 1;
@@ -342,7 +342,7 @@ int vtkKWMessageDialog::Invoke()
         ires = -1;
         }
       }
-    this->Application->SetMessageDialogResponse(this->DialogName, ires);
+    this->GetApplication()->SetMessageDialogResponse(this->DialogName, ires);
     }
   return res;
 }

@@ -19,7 +19,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWExtent );
-vtkCxxRevisionMacro(vtkKWExtent, "1.25");
+vtkCxxRevisionMacro(vtkKWExtent, "1.26");
 
 //----------------------------------------------------------------------------
 int vtkKWExtentCommand(ClientData cd, Tcl_Interp *interp,
@@ -78,7 +78,7 @@ void vtkKWExtent::Create(vtkKWApplication *app, const char *args)
   this->XRange->SetParent(this);
   this->XRange->ShowLabelOn();
   this->XRange->ShowEntriesOn();
-  this->XRange->Create(this->Application, "");
+  this->XRange->Create(app, "");
   this->XRange->SetCommand(this, "ExtentSelected");
   this->XRange->AdjustResolutionOn();
   this->XRange->SetLabel("X (Units)");
@@ -86,7 +86,7 @@ void vtkKWExtent::Create(vtkKWApplication *app, const char *args)
   this->YRange->SetParent(this);
   this->YRange->ShowLabelOn();
   this->YRange->ShowEntriesOn();
-  this->YRange->Create(this->Application, "");
+  this->YRange->Create(app, "");
   this->YRange->AdjustResolutionOn();
   this->YRange->SetCommand(this, "ExtentSelected");
   this->YRange->SetLabel("Y (Units)");
@@ -94,7 +94,7 @@ void vtkKWExtent::Create(vtkKWApplication *app, const char *args)
   this->ZRange->SetParent(this);
   this->ZRange->ShowLabelOn();
   this->ZRange->ShowEntriesOn();
-  this->ZRange->Create(this->Application, "");
+  this->ZRange->Create(app, "");
   this->ZRange->AdjustResolutionOn();
   this->ZRange->SetCommand(this, "ExtentSelected");
   this->ZRange->SetLabel("Z (Units)");

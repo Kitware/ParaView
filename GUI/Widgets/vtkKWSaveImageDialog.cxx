@@ -21,7 +21,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWSaveImageDialog );
-vtkCxxRevisionMacro(vtkKWSaveImageDialog, "1.23");
+vtkCxxRevisionMacro(vtkKWSaveImageDialog, "1.24");
 
 int vtkKWSaveImageDialogCommand(ClientData cd, Tcl_Interp *interp,
                                 int argc, char *argv[]);
@@ -69,7 +69,7 @@ int vtkKWSaveImageDialog::Invoke()
       else
         {
         vtkKWMessageDialog::PopupMessage( 
-          this->Application, 0, "Save Image Error", 
+          this->GetApplication(), 0, "Save Image Error", 
           "A valid file extension was not found.\n"
           "Please use a .bmp, .jpg, .png, .ppm, or .tif file extension\n"
           "when naming your file.", vtkKWMessageDialog::ErrorIcon);
@@ -85,7 +85,7 @@ void vtkKWSaveImageDialog::Create(vtkKWApplication *app, const char* /*args*/)
 {
   // Already created ?
 
-  if (this->Application)
+  if (this->IsCreated())
     {
     vtkErrorMacro("SaveDialog already created");
     return;

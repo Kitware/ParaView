@@ -21,7 +21,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWPopupFrameCheckButton );
-vtkCxxRevisionMacro(vtkKWPopupFrameCheckButton, "1.2");
+vtkCxxRevisionMacro(vtkKWPopupFrameCheckButton, "1.3");
 
 int vtkKWPopupFrameCheckButtonCommand(ClientData cd, Tcl_Interp *interp,
                                       int argc, char *argv[]);
@@ -76,7 +76,7 @@ void vtkKWPopupFrameCheckButton::Create(vtkKWApplication *app,
     this->CheckButton->SetParent(this->Frame->GetFrame());
     }
 
-  this->CheckButton->Create(this->Application, "");
+  this->CheckButton->Create(app, "");
 
   this->CheckButton->SetCommand(this, "CheckButtonCallback");
 

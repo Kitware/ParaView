@@ -75,7 +75,7 @@ public:
   // the user interface manager has not been created at this point, it
   // is automatically created now (see vtkKWUserInterfaceManager::Create()).
   virtual void Create(vtkKWApplication *app);
-  virtual int IsCreated() { return (this->Application != 0); }
+  virtual int IsCreated();
 
   // Description:
   // Enable/Disable this panel. This should propagate SetEnabled() calls to the

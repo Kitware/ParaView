@@ -33,7 +33,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWEntry );
-vtkCxxRevisionMacro(vtkKWEntry, "1.53");
+vtkCxxRevisionMacro(vtkKWEntry, "1.54");
 
 //----------------------------------------------------------------------------
 vtkKWEntry::vtkKWEntry()
@@ -289,7 +289,7 @@ void vtkKWEntry::SetWidth(int width)
   this->Modified();
   this->Width = width;
 
-  if (this->Application != NULL)
+  if (this->IsCreated())
     {
     this->Script("%s configure -width %d", this->GetWidgetName(), width);
     }

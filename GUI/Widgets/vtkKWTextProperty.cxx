@@ -100,7 +100,7 @@ static unsigned char image_copy[] =
 
 // ----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWTextProperty);
-vtkCxxRevisionMacro(vtkKWTextProperty, "1.31");
+vtkCxxRevisionMacro(vtkKWTextProperty, "1.32");
 
 int vtkKWTextPropertyCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -210,13 +210,13 @@ void vtkKWTextProperty::Create(vtkKWApplication *app)
   // Label
 
   this->Label->SetParent(this);
-  this->Label->Create(this->Application, "");
+  this->Label->Create(app, "");
 
   // Color
 
   this->ChangeColorButton->SetParent(this);
   this->ChangeColorButton->LabelOutsideButtonOn();
-  this->ChangeColorButton->Create(this->Application, "");
+  this->ChangeColorButton->Create(app, "");
   this->ChangeColorButton->SetCommand(this, "ChangeColorButtonCallback");
   this->ChangeColorButton->SetBalloonHelpString("Select the text color.");
   this->ChangeColorButton->SetDialogText("Text Color");
@@ -224,7 +224,7 @@ void vtkKWTextProperty::Create(vtkKWApplication *app)
   // Font Family
 
   this->FontFamilyOptionMenu->SetParent(this);
-  this->FontFamilyOptionMenu->Create(this->Application);
+  this->FontFamilyOptionMenu->Create(app);
   this->Script("%s config -width 7 -padx 0 -pady 2", 
                this->FontFamilyOptionMenu->GetOptionMenu()->GetWidgetName());
   this->FontFamilyOptionMenu->SetBalloonHelpString("Select the font.");
@@ -242,7 +242,7 @@ void vtkKWTextProperty::Create(vtkKWApplication *app)
 
   this->StylesCheckButtonSet->SetParent(this);
   this->StylesCheckButtonSet->PackHorizontallyOn();
-  this->StylesCheckButtonSet->Create(this->Application);
+  this->StylesCheckButtonSet->Create(app);
   this->StylesCheckButtonSet->SetBalloonHelpString("Select the font style.");
 
   vtkKWCheckButtonSet *cbs = this->StylesCheckButtonSet->GetCheckButtonSet();
@@ -296,7 +296,7 @@ void vtkKWTextProperty::Create(vtkKWApplication *app)
   this->OpacityScale->PopupScaleOn();
   this->OpacityScale->SetResolution(0.01);
   this->OpacityScale->SetRange(0.0, 1.0);
-  this->OpacityScale->Create(this->Application, "");
+  this->OpacityScale->Create(app, "");
   this->OpacityScale->DisplayEntry();
   this->OpacityScale->DisplayLabel("");
   this->OpacityScale->SetEntryWidth(4);
@@ -310,7 +310,7 @@ void vtkKWTextProperty::Create(vtkKWApplication *app)
 
   this->PushButtonSet->SetParent(this);
   this->PushButtonSet->PackHorizontallyOn();
-  this->PushButtonSet->Create(this->Application);
+  this->PushButtonSet->Create(app);
 
   vtkKWPushButtonSet *pbs = this->PushButtonSet->GetPushButtonSet();
   pbs->PackHorizontallyOn();
@@ -433,7 +433,7 @@ void vtkKWTextProperty::Pack()
     labels[nb++] = this->OpacityScale->GetLabel()->GetWidgetName();
     labels[nb++] = this->PushButtonSet->GetLabel()->GetWidgetName();
     vtkKWTkUtilities::SynchroniseLabelsMaximumWidth(
-      this->Application->GetMainInterp(), nb, labels, "-anchor w");
+      this->GetApplication()->GetMainInterp(), nb, labels, "-anchor w");
     }
 }
 

@@ -20,7 +20,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWDialog );
-vtkCxxRevisionMacro(vtkKWDialog, "1.37");
+vtkCxxRevisionMacro(vtkKWDialog, "1.38");
 
 int vtkKWDialogCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -53,7 +53,7 @@ int vtkKWDialog::Invoke()
 {
   this->Done = 0;
 
-  this->Application->SetDialogUp(1);
+  this->GetApplication()->SetDialogUp(1);
 
   int width, height;
 
@@ -134,7 +134,7 @@ int vtkKWDialog::Invoke()
     {
     this->ReleaseGrab();
     }
-  this->Application->SetDialogUp(0);
+  this->GetApplication()->SetDialogUp(0);
   return (this->Done-1);
 }
 
@@ -222,7 +222,7 @@ void vtkKWDialog::SetMasterWindow(vtkKWWindow* win)
     this->MasterWindow = win; 
     if (this->MasterWindow) 
       { 
-      if (this->Application)
+      if (this->IsCreated())
         {
         this->Script("wm transient %s %s", this->GetWidgetName(), 
                      this->MasterWindow->GetWidgetName());
@@ -235,7 +235,7 @@ void vtkKWDialog::SetMasterWindow(vtkKWWindow* win)
 //----------------------------------------------------------------------------
 void vtkKWDialog::SetTitle( const char* title )
 {
-  if (this->Application)
+  if (this->IsCreated())
     {
     this->Script("wm title %s \"%s\"", this->GetWidgetName(), 
                  title);

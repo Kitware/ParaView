@@ -24,7 +24,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLabeledFrame );
-vtkCxxRevisionMacro(vtkKWLabeledFrame, "1.35");
+vtkCxxRevisionMacro(vtkKWLabeledFrame, "1.36");
 
 int vtkKWLabeledFrameCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -124,7 +124,7 @@ void vtkKWLabeledFrame::SetLabel(const char *text)
 //----------------------------------------------------------------------------
 void vtkKWLabeledFrame::AdjustMargin()
 {
-  if (this->Application)
+  if (this->IsCreated())
     {
     // Get the height of the label frame, and share it between
     // the two borders (frame).
@@ -139,9 +139,10 @@ void vtkKWLabeledFrame::AdjustMargin()
     if (height <= 1) 
       {
       int width;
-      vtkKWTkUtilities::GetPackSlavesBbox(this->Application->GetMainInterp(),
-                                          this->LabelFrame->GetWidgetName(),
-                                          &width, &height);
+      vtkKWTkUtilities::GetPackSlavesBbox(
+        this->GetApplication()->GetMainInterp(),
+        this->LabelFrame->GetWidgetName(),
+        &width, &height);
       }
 
     // Don't forget the show/hide collapse icon, it might be bigger than
@@ -240,7 +241,7 @@ void vtkKWLabeledFrame::Create(vtkKWApplication *app, const char* args)
   if (vtkKWLabeledFrame::BoldLabel)
     {
     vtkKWTkUtilities::ChangeFontWeightToBold(
-      this->Application->GetMainInterp(),
+      app->GetMainInterp(),
       this->GetLabel()->GetWidgetName());
     }
 
@@ -361,8 +362,8 @@ void vtkKWLabeledFrame::UpdateEnableState()
 
   this->PropagateEnableState(this->GetLabel());
 
-  int limited = 
-    (this->Application && this->Application->GetLimitedEditionMode());
+  int limited = (this->GetApplication() && 
+                 this->GetApplication()->GetLimitedEditionMode());
   
   if (limited && this->ShowIconInLimitedEditionMode && !this->Enabled)
     {

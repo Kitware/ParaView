@@ -26,7 +26,7 @@
 #include "vtkObjectFactory.h"
 
 vtkStandardNewMacro( vtkKWRange );
-vtkCxxRevisionMacro(vtkKWRange, "1.35");
+vtkCxxRevisionMacro(vtkKWRange, "1.36");
 
 #define VTK_KW_RANGE_MIN_SLIDER_SIZE        2
 #define VTK_KW_RANGE_MIN_THICKNESS          (2*VTK_KW_RANGE_MIN_SLIDER_SIZE+1)
@@ -244,7 +244,7 @@ void vtkKWRange::CreateEntries()
     if (!this->Entries[i]->IsCreated() && this->IsCreated())
       {
       this->Entries[i]->SetParent(this);
-      this->Entries[i]->Create(this->Application, "");
+      this->Entries[i]->Create(this->GetApplication(), "");
       this->Entries[i]->SetWidth(this->EntriesWidth);
       this->Entries[i]->SetEnabled(this->Enabled);
       this->Script("bind %s <Return> {%s EntriesUpdateCallback %d}",
@@ -268,7 +268,7 @@ void vtkKWRange::CreateZoomButtons()
   if (!this->ZoomButtons->IsCreated() && this->IsCreated())
     {
     this->ZoomButtons->SetParent(this);
-    this->ZoomButtons->Create(this->Application, "");
+    this->ZoomButtons->Create(this->GetApplication(), "");
 
     vtkKWPushButton *button;
 

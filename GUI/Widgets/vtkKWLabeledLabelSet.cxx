@@ -25,7 +25,7 @@
 //----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkKWLabeledLabelSet);
-vtkCxxRevisionMacro(vtkKWLabeledLabelSet, "1.8");
+vtkCxxRevisionMacro(vtkKWLabeledLabelSet, "1.9");
 
 int vtkvtkKWLabeledLabelSetCommand(ClientData cd, Tcl_Interp *interp,
                                   int argc, char *argv[]);
@@ -195,7 +195,7 @@ int vtkKWLabeledLabelSet::AddLabeledLabel(int id,
   labeledlabel_slot->Id = id;
 
   labeledlabel_slot->LabeledLabel->SetParent(this);
-  labeledlabel_slot->LabeledLabel->Create(this->Application, 0);
+  labeledlabel_slot->LabeledLabel->Create(this->GetApplication(), 0);
   labeledlabel_slot->LabeledLabel->SetEnabled(this->Enabled);
 
   // Set text balloon help, if any
@@ -349,7 +349,7 @@ void vtkKWLabeledLabelSet::SynchroniseLabelsMaximumWidth()
   it->Delete();
 
   vtkKWTkUtilities::SynchroniseLabelsMaximumWidth(
-    this->Application->GetMainInterp(), nb, labels);
+    this->GetApplication()->GetMainInterp(), nb, labels);
 
   delete [] labels;
 }

@@ -17,7 +17,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWRadioButton );
-vtkCxxRevisionMacro(vtkKWRadioButton, "1.13");
+vtkCxxRevisionMacro(vtkKWRadioButton, "1.14");
 
 //----------------------------------------------------------------------------
 void vtkKWRadioButton::Create(vtkKWApplication *app, const char *args)
@@ -25,7 +25,7 @@ void vtkKWRadioButton::Create(vtkKWApplication *app, const char *args)
   const char *wname;
 
   // must set the application
-  if (this->Application)
+  if (this->IsCreated())
     {
     vtkErrorMacro("RadioButton already created");
     return;
@@ -63,7 +63,7 @@ int vtkKWRadioButton::GetState()
     {
     this->Script("expr {${%s}} == {[%s cget -value]}",
                  this->VariableName, this->GetWidgetName());
-    return vtkKWObject::GetIntegerResult(this->Application);
+    return vtkKWObject::GetIntegerResult(this->GetApplication());
     }
   return 0;
 }

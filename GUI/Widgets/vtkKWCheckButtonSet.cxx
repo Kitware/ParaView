@@ -23,7 +23,7 @@
 //----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkKWCheckButtonSet);
-vtkCxxRevisionMacro(vtkKWCheckButtonSet, "1.7");
+vtkCxxRevisionMacro(vtkKWCheckButtonSet, "1.8");
 
 int vtkvtkKWCheckButtonSetCommand(ClientData cd, Tcl_Interp *interp,
                                   int argc, char *argv[]);
@@ -195,7 +195,7 @@ int vtkKWCheckButtonSet::AddButton(int id,
   button_slot->Id = id;
 
   button_slot->Button->SetParent(this);
-  button_slot->Button->Create(this->Application, 0);
+  button_slot->Button->Create(this->GetApplication(), 0);
   button_slot->Button->SetEnabled(this->Enabled);
 
   // Set text command and balloon help, if any

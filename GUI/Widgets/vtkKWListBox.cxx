@@ -18,7 +18,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWListBox );
-vtkCxxRevisionMacro(vtkKWListBox, "1.26");
+vtkCxxRevisionMacro(vtkKWListBox, "1.27");
 
 
 //----------------------------------------------------------------------------
@@ -61,7 +61,7 @@ int vtkKWListBox::GetNumberOfItems()
     return 0;
     }
   this->Script("%s size", this->Listbox->GetWidgetName());
-  char* result = this->Application->GetMainInterp()->result;
+  char* result = this->GetApplication()->GetMainInterp()->result;
   return atoi(result);
 }
 
@@ -78,7 +78,7 @@ void vtkKWListBox::DeleteRange(int start, int end)
 const char* vtkKWListBox::GetItem(int index)
 {
   this->Script("%s get %d", this->Listbox->GetWidgetName(), index);
-  char* result = this->Application->GetMainInterp()->result;
+  char* result = this->GetApplication()->GetMainInterp()->result;
   delete [] this->Item;
   this->Item = strcpy(new char[strlen(result)+1], result);
   return this->Item;
@@ -103,7 +103,7 @@ int vtkKWListBox::GetSelectionIndex()
     }
   this->Script("%s curselection", this->Listbox->GetWidgetName(),
                this->GetWidgetName());
-  char* result = this->Application->GetMainInterp()->result;
+  char* result = this->GetApplication()->GetMainInterp()->result;
   if ( strlen(result)>0 )
     {
     return atoi(result);
@@ -125,7 +125,7 @@ const char *vtkKWListBox::GetSelection()
     }
   this->Script("%s get [%s curselection]", this->Listbox->GetWidgetName(),
                this->Listbox->GetWidgetName());
-  char* result = this->Application->GetMainInterp()->result;
+  char* result = this->GetApplication()->GetMainInterp()->result;
   this->CurrentSelection = strcpy(new char[strlen(result)+1], result);
   return this->CurrentSelection;
 }
@@ -184,9 +184,10 @@ int vtkKWListBox::GetSelectState(int idx)
     return 0;
     }
 
-  this->Script("%s selection includes %d", this->Listbox->GetWidgetName(), idx);
+  this->Script("%s selection includes %d", 
+               this->Listbox->GetWidgetName(), idx);
 
-  int result = atoi(this->Application->GetMainInterp()->result);
+  int result = atoi(this->GetApplication()->GetMainInterp()->result);
   return result;
 }
 
@@ -304,7 +305,7 @@ void vtkKWListBox::SetScrollbarFlag(int v)
 {
   this->ScrollbarFlag = v;
 
-  if (this->Application)
+  if (this->IsCreated())
     {
     this->Script("pack forget %s", this->Scrollbar->GetWidgetName());
     this->Script("pack forget %s", this->Listbox->GetWidgetName());

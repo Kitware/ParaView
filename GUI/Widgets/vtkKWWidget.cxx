@@ -30,7 +30,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWWidget );
-vtkCxxRevisionMacro(vtkKWWidget, "1.100");
+vtkCxxRevisionMacro(vtkKWWidget, "1.101");
 
 int vtkKWWidgetCommand(ClientData cd, Tcl_Interp *interp,
                        int argc, char *argv[]);
@@ -82,7 +82,7 @@ vtkKWWidget::~vtkKWWidget()
     this->Children = NULL;
     }
   
-  if (this->Application)
+  if (this->IsCreated())
     {
     this->Script("destroy %s",this->GetWidgetName());
     }
@@ -166,20 +166,26 @@ void vtkKWWidget::Create(vtkKWApplication *app, const char *name,
   this->UpdateEnableState();
 }
 
+// ---------------------------------------------------------------------------
+int vtkKWWidget::IsCreated()
+{
+  return (this->GetApplication() != NULL);
+}
+
 //----------------------------------------------------------------------------
 void vtkKWWidget::SetUpBalloonHelpBindings()
 {
   this->Script("bind %s <Enter> {+%s BalloonHelpTrigger %s}", 
-               this->GetWidgetName(), this->Application->GetTclName(),
+               this->GetWidgetName(), this->GetApplication()->GetTclName(),
                this->GetTclName());
   this->Script("bind %s <ButtonPress> {+%s BalloonHelpWithdraw}", 
-               this->GetWidgetName(), this->Application->GetTclName());
+               this->GetWidgetName(), this->GetApplication()->GetTclName());
   this->Script("bind %s <KeyPress> {+%s BalloonHelpWithdraw}", 
-               this->GetWidgetName(), this->Application->GetTclName());
+               this->GetWidgetName(), this->GetApplication()->GetTclName());
   this->Script("bind %s <Leave> {+%s BalloonHelpCancel}", 
-               this->GetWidgetName(), this->Application->GetTclName());
+               this->GetWidgetName(), this->GetApplication()->GetTclName());
   this->Script("bind %s <B1-Motion> {+%s BalloonHelpWithdraw}", 
-               this->GetWidgetName(), this->Application->GetTclName());  
+               this->GetWidgetName(), this->GetApplication()->GetTclName());  
 }
 
 //----------------------------------------------------------------------------
@@ -377,12 +383,6 @@ void vtkKWWidget::SetCommand(vtkKWObject* CalledObject, const char * CommandStri
 //----------------------------------------------------------------------------
 void vtkKWWidget::SetBalloonHelpString(const char *str)
 {
-//    if (this->Application == NULL)
-//      {
-//      vtkErrorMacro("Application needs to be set before balloon help.");
-//      return;
-//      }
-
   // A little overkill.
   if (this->BalloonHelpString == NULL && str == NULL)
     {
@@ -401,7 +401,7 @@ void vtkKWWidget::SetBalloonHelpString(const char *str)
     strcpy(this->BalloonHelpString, str);
     }
   
-  if ( this->BalloonHelpString && this->Application && 
+  if ( this->BalloonHelpString && this->GetApplication() && 
        !this->BalloonHelpInitialized )
     {
     this->SetUpBalloonHelpBindings();
@@ -414,7 +414,7 @@ void vtkKWWidget::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkKWWidget ";
-  this->ExtractRevision(os,"$Revision: 1.100 $");
+  this->ExtractRevision(os,"$Revision: 1.101 $");
 }
 
 //----------------------------------------------------------------------------
@@ -443,15 +443,15 @@ int vtkKWWidget::InitializeTrace(ofstream* file)
   int *pInit;
   int stateFlag = 0;
   
-  if(this->Application == NULL)
+  if(!this->IsCreated())
     {
     vtkErrorMacro("Tracing before widget is created.");
     return 0;
     }
 
-  if (file == NULL || file == this->Application->GetTraceFile())
+  if (file == NULL || file == this->GetApplication()->GetTraceFile())
     { // Use the global trace file and respect initialized.
-    file = this->Application->GetTraceFile();
+    file = this->GetApplication()->GetTraceFile();
     pInit = &(this->TraceInitialized);
     }
   else
@@ -499,10 +499,10 @@ int vtkKWWidget::InitializeTrace(ofstream* file)
 //----------------------------------------------------------------------------
 const char* vtkKWWidget::GetType()
 {
-  if ( this->Application )
+  if (this->IsCreated())
     {
     this->Script("winfo class %s", this->GetWidgetName());
-    return this->Application->GetMainInterp()->result;
+    return this->GetApplication()->GetMainInterp()->result;
     }
   return "None";
 }
@@ -611,7 +611,7 @@ void vtkKWWidget::SetStateOption(int flag)
 //----------------------------------------------------------------------------
 void vtkKWWidget::GetBackgroundColor(int *r, int *g, int *b)
 {
-  vtkKWTkUtilities::GetBackgroundColor(this->Application->GetMainInterp(),
+  vtkKWTkUtilities::GetBackgroundColor(this->GetApplication()->GetMainInterp(),
                                        this->GetWidgetName(), 
                                        r, g, b);
 }
@@ -647,7 +647,7 @@ void vtkKWWidget::SetBackgroundColor(double r, double g, double b)
 //----------------------------------------------------------------------------
 void vtkKWWidget::GetForegroundColor(int *r, int *g, int *b)
 {
-  vtkKWTkUtilities::GetOptionColor(this->Application->GetMainInterp(),
+  vtkKWTkUtilities::GetOptionColor(this->GetApplication()->GetMainInterp(),
                                    this->GetWidgetName(), 
                                    "-fg",
                                    r, g, b);
@@ -684,8 +684,8 @@ void vtkKWWidget::SetForegroundColor(double r, double g, double b)
 //----------------------------------------------------------------------------
 int vtkKWWidget::HasConfigurationOption(const char* option)
 {
-  return (this->Application && 
-          !this->Application->EvaluateBooleanExpression(
+  return (this->GetApplication() && 
+          !this->GetApplication()->EvaluateBooleanExpression(
             "catch {%s cget %s}",
             this->GetWidgetName(), option));
 }
@@ -801,7 +801,7 @@ const char* vtkKWWidget::ConvertInternalStringToTclString(
     // Check if we have that encoding
     
     Tcl_Encoding tcl_encoding = 
-      Tcl_GetEncoding(this->Application->GetMainInterp(), tcl_encoding_name);
+      Tcl_GetEncoding(this->GetApplication()->GetMainInterp(), tcl_encoding_name);
     if (tcl_encoding != NULL)
       {
       Tcl_FreeEncoding(tcl_encoding);
@@ -921,14 +921,14 @@ int vtkKWWidget::IsAlive()
 //----------------------------------------------------------------------------
 int vtkKWWidget::IsMapped()
 {
-  return this->IsAlive() && this->Application->EvaluateBooleanExpression(
+  return this->IsAlive() && this->GetApplication()->EvaluateBooleanExpression(
     "winfo ismapped %s", this->GetWidgetName());
 }
 
 //----------------------------------------------------------------------------
 int vtkKWWidget::IsPacked()
 {
-  return this->IsCreated() && !this->Application->EvaluateBooleanExpression(
+  return this->IsCreated() && !this->GetApplication()->EvaluateBooleanExpression(
     "catch {pack info %s}", this->GetWidgetName());
 }
 
@@ -1780,7 +1780,7 @@ int vtkKWWidget::TakeScreenDump(const char* wname, const char* fname,
 
   Tk_Window image_window;
 
-  image_window = Tk_MainWindow (this->Application->GetMainInterp());
+  image_window = Tk_MainWindow (this->GetApplication()->GetMainInterp());
   Display *dpy = Tk_Display(image_window);
   int screen = DefaultScreen(dpy);
   Window win=RootWindow(dpy, screen);
@@ -1888,7 +1888,6 @@ int vtkKWWidget::TakeScreenDump(const char* wname, const char* fname,
       ptr[0] = (unsigned char)(255 * red);
       ptr[1] = (unsigned char)(255 * green);
       ptr[2] = (unsigned char)(255 * blue);
-      //std::cout << "RGB: " << ptr[0] << " " << ptr[1] << " " << ptr[2] << endl;
       ptr += 3;
       }
     }

@@ -30,7 +30,7 @@
 //----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkKWToolbarSet);
-vtkCxxRevisionMacro(vtkKWToolbarSet, "1.4");
+vtkCxxRevisionMacro(vtkKWToolbarSet, "1.5");
 
 int vtkvtkKWToolbarSetCommand(ClientData cd, Tcl_Interp *interp,
                                   int argc, char *argv[]);
@@ -224,7 +224,7 @@ void vtkKWToolbarSet::PackToolbars()
             {
             toolbar_slot->SeparatorFrame->SetParent(this->ToolbarsFrame);
             toolbar_slot->SeparatorFrame->Create(
-              this->Application, "-width 2 -bd 1");
+              this->GetApplication(), "-width 2 -bd 1");
             this->Script("%s config -relief %s", 
                          toolbar_slot->SeparatorFrame->GetWidgetName(), 
                          VTK_KW_TOOLBAR_RELIEF_SEP);
