@@ -76,7 +76,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.235");
+vtkCxxRevisionMacro(vtkPVData, "1.236");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -2406,7 +2406,6 @@ void vtkPVData::SetPropertiesParent(vtkKWWidget *parent)
 //----------------------------------------------------------------------------
 void vtkPVData::SaveInBatchScript(ofstream *file)
 {
-  int fixme; // range is not used
   double range[2];
   const char* scalarMode;
   vtkPVPart *part;
@@ -2467,13 +2466,14 @@ void vtkPVData::SaveInBatchScript(ofstream *file)
       // Move to next output
       ++outputCount;
 
-      
       *file << "vtkPolyDataMapper pvTemp" << part->GetPartDisplay()->GetMapperID() << "\n\t"
             << "pvTemp" << part->GetPartDisplay()->GetMapperID() << " SetInput ["
-            << "pvTemp" << part->GetGeometryID() << " GetOutput]\n\t";  
+            << "pvTemp" << part->GetGeometryID() << " GetOutput]\n\t";
       *file << "pvTemp" << part->GetPartDisplay()->GetMapperID() << " SetImmediateModeRendering "
             << part->GetPartDisplay()->GetMapper()->GetImmediateModeRendering() << "\n\t";
       part->GetPartDisplay()->GetMapper()->GetScalarRange(range);
+      *file << "pvTemp" << part->GetPartDisplay()->GetMapperID() << " SetScalarRange "
+            << range[0] << range[1] << "\n\t";
       *file << "pvTemp" << part->GetPartDisplay()->GetMapperID() << " UseLookupTableScalarRangeOn\n\t";
       *file << "pvTemp" << part->GetPartDisplay()->GetMapperID() << " SetScalarVisibility "
             << part->GetPartDisplay()->GetMapper()->GetScalarVisibility() << "\n\t"
