@@ -32,7 +32,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVTempTessellatorEntry);
-vtkCxxRevisionMacro(vtkPVTempTessellatorEntry, "1.1.2.1");
+vtkCxxRevisionMacro(vtkPVTempTessellatorEntry, "1.1.2.2");
 
 //-----------------------------------------------------------------------------
 class vtkTessellatorEntryData
@@ -332,7 +332,7 @@ void vtkPVTempTessellatorEntry::PointDataSelectedCallback()
     {
     char* label = new char[ fnl + 1 ];
     char* value = new char[ ftl - fnl ];
-    bool active = strcmp( field + fnl + 2, "inactive" );
+    int active = strcmp( field + fnl + 2, "inactive" );
 
     strncpy( label, field, fnl );
     strncpy( value, field+fnl+2, ftl - fnl );
@@ -349,7 +349,8 @@ void vtkPVTempTessellatorEntry::PointDataSelectedCallback()
     }
 }
 
-void vtkPVTempTessellatorEntry::AddAnimationScriptsToMenu( vtkKWMenu* menu, vtkPVAnimationInterfaceEntry* ai )
+void vtkPVTempTessellatorEntry::AddAnimationScriptsToMenu( 
+  vtkKWMenu* , vtkPVAnimationInterfaceEntry* )
 {
 }
 
@@ -413,7 +414,7 @@ void vtkPVTempTessellatorEntry::SetFieldCriterion( int fnum, float crit )
 
   const char* field = d->ScalarFieldList->GetItem(fnum);
   int flen = strlen(field);
-  bool want_active = crit <= 0.0;
+  int want_active = crit <= 0.0;
   if ( (strcmp( field + flen - 8 /*=strlen("inactive")+1*/, "inactive" ) == 0) ^ want_active )
     {
     d->ScalarFieldList->SetSelectionIndex( fnum );
@@ -505,7 +506,7 @@ void vtkPVTempTessellatorEntry::ResetInternal()
   for ( a = 0; a < numberOfArrays; ++a )
     {
     float scalar = scalars[ 2*a + 1 ];
-    bool active = scalar > 0.;
+    int active = scalar > 0.;
     const char *name = pdi->GetArrayInformation( a )->GetName();
     char *listEntry = new char[strlen(name) + 20];
     if ( !active )

@@ -50,7 +50,7 @@
 #include "vtkPVRenderModule.h"
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVColorMap);
-vtkCxxRevisionMacro(vtkPVColorMap, "1.84");
+vtkCxxRevisionMacro(vtkPVColorMap, "1.84.2.1");
 
 int vtkPVColorMapCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -859,6 +859,7 @@ void vtkPVColorMap::CreateParallelTclObjects(vtkPVApplication *pvApp)
                   << vtkClientServerStream::End;
 
   this->ScalarBar = vtkScalarBarWidget::New();
+  this->ScalarBar->SetCurrentRenderer(pvApp->GetRenderModule()->GetRenderer2D());
   
   // Actor will be in server manager.  Widget will be in UI.
   this->ScalarBarActorID = pm->NewStreamObject("vtkScalarBarActor");

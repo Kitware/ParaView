@@ -24,7 +24,7 @@
 #include <vtkDataSetSubdivisionAlgorithm.h>
 #include <vtkSubdivisionAlgorithm.h>
 
-vtkCxxRevisionMacro(vtkTempTessellatorFilter, "1.1.2.2");
+vtkCxxRevisionMacro(vtkTempTessellatorFilter, "1.1.2.3");
 vtkStandardNewMacro(vtkTempTessellatorFilter);
 
 // ========================================
@@ -32,7 +32,9 @@ vtkStandardNewMacro(vtkTempTessellatorFilter);
 void vtkTempTessellatorFilter::SetMaximumNumberOfSubdivisions( int N )
 {
   if ( this->Tessellator )
+    {
     this->Tessellator->SetMaximumNumberOfSubdivisions( N );
+    }
 }
 
 int vtkTempTessellatorFilter::GetMaximumNumberOfSubdivisions()
@@ -43,7 +45,9 @@ int vtkTempTessellatorFilter::GetMaximumNumberOfSubdivisions()
 void vtkTempTessellatorFilter::SetChordError( double E )
 {
   if ( this->Subdivider )
+    {
     this->Subdivider->SetChordError2( E > 0. ? E*E : E );
+    }
 }
 
 double vtkTempTessellatorFilter::GetChordError()
@@ -55,7 +59,9 @@ double vtkTempTessellatorFilter::GetChordError()
 void vtkTempTessellatorFilter::SetMergePoints( int DoTheMerge )
 {
   if ( DoTheMerge == this->MergePoints )
+    {
     return;
+    }
 
   this->MergePoints = DoTheMerge;
   this->Modified();
@@ -70,7 +76,10 @@ void vtkTempTessellatorFilter::AddATetrahedron( const double* a, const double* b
   self->OutputTetrahedron( a, b, c, d );
 }
 
-void vtkTempTessellatorFilter::OutputTetrahedron( const double* a, const double* b, const double* c, const double* d )
+void vtkTempTessellatorFilter::OutputTetrahedron( const double* a,
+                                                  const double* b, 
+                                                  const double* c, 
+                                                  const double* d )
 {
   vtkIdType cellIds[4];
 
@@ -100,14 +109,18 @@ void vtkTempTessellatorFilter::OutputTetrahedron( const double* a, const double*
     }
 }
 
-void vtkTempTessellatorFilter::AddATriangle( const double* a, const double* b, const double* c,
-                                           vtkSubdivisionAlgorithm*, void* pd, const void* )
+void vtkTempTessellatorFilter::AddATriangle( const double* a, const double* b, 
+                                             const double* c,
+                                             vtkSubdivisionAlgorithm*, 
+                                             void* pd, const void* )
 {
   vtkTempTessellatorFilter* self = (vtkTempTessellatorFilter*) pd;
   self->OutputTriangle( a, b, c );
 }
 
-void vtkTempTessellatorFilter::OutputTriangle( const double* a, const double* b, const double* c )
+void vtkTempTessellatorFilter::OutputTriangle( const double* a, 
+                                               const double* b, 
+                                               const double* c )
 {
   vtkIdType cellIds[3];
 
@@ -135,7 +148,8 @@ void vtkTempTessellatorFilter::OutputTriangle( const double* a, const double* b,
 }
 
 void vtkTempTessellatorFilter::AddALine( const double* a, const double* b,
-                                       vtkSubdivisionAlgorithm*, void* pd, const void* )
+                                         vtkSubdivisionAlgorithm*, void* pd, 
+                                         const void* )
 {
   vtkTempTessellatorFilter* self = (vtkTempTessellatorFilter*) pd;
   self->OutputLine( a, b );
@@ -218,10 +232,14 @@ unsigned long vtkTempTessellatorFilter::GetMTime()
 void vtkTempTessellatorFilter::SetTessellator( vtkStreamingTessellator* t )
 {
   if ( this->Tessellator == t )
+    {
     return;
+    }
 
   if ( this->Tessellator )
+    {
     this->Tessellator->UnRegister( this );
+    }
 
   this->Tessellator = t;
 
@@ -237,18 +255,26 @@ void vtkTempTessellatorFilter::SetTessellator( vtkStreamingTessellator* t )
 void vtkTempTessellatorFilter::SetSubdivider( vtkDataSetSubdivisionAlgorithm* s )
 {
   if ( this->Subdivider == s )
+    {
     return;
+    }
 
   if ( this->Subdivider )
+    {
     this->Subdivider->UnRegister( this );
+    }
 
   this->Subdivider = s;
 
   if ( this->Subdivider )
+    {
     this->Subdivider->Register( this );
+    }
 
   if ( this->Tessellator )
+    {
     this->Tessellator->SetSubdivisionAlgorithm( this->Subdivider );
+    }
 
   this->Modified();
 }
@@ -256,20 +282,26 @@ void vtkTempTessellatorFilter::SetSubdivider( vtkDataSetSubdivisionAlgorithm* s 
 void vtkTempTessellatorFilter::SetFieldCriterion( int s, double err )
 {
   if ( this->Subdivider )
+    {
     this->Subdivider->SetFieldError2( s, err > 0. ? err*err : -1. );
+    }
 }
 
 void vtkTempTessellatorFilter::ResetFieldCriteria()
 {
   if ( this->Subdivider )
+    {
     this->Subdivider->ResetFieldError2();
+    }
 }
 
 // ========================================
 // pipeline procedures
 void vtkTempTessellatorFilter::SetupOutput()
 {
-  this->OutputMesh = this->GetOutput(); // avoid doing all the stupid checks on NumberOfOutputs for every triangle/line.
+  this->OutputMesh = this->GetOutput(); 
+  // avoid doing all the stupid checks on NumberOfOutputs for every
+  // triangle/line.
   this->OutputMesh->Reset();
   this->OutputMesh->Allocate(0,0);
 
@@ -280,21 +312,26 @@ void vtkTempTessellatorFilter::SetupOutput()
     this->OutputPoints->Delete();
     }
 
-  // This returns the id numbers of arrays that are default scalars, vectors, normals, texture coords, and tensors.
-  // These are the fields that will be interpolated and passed on to the output mesh.
+  // This returns the id numbers of arrays that are default scalars, vectors,
+  // normals, texture coords, and tensors.  These are the fields that will be
+  // interpolated and passed on to the output mesh.
   vtkPointData* fields = this->GetInput()->GetPointData();
   vtkDataSetAttributes* outarrays = this->OutputMesh->GetPointData();
-  outarrays->Initialize(); // empty, turn off all attributes, and set CopyAllOn to true.
+  outarrays->Initialize(); 
+  // empty, turn off all attributes, and set CopyAllOn to true.
 
   this->OutputAttributes = new vtkDataArray* [ fields->GetNumberOfArrays() ];
   this->OutputAttributeIndices = new int [ fields->GetNumberOfArrays() ];
 
-  // OK, we always add normals as the 0-th array so that there's less work to do inside the tight loop (OutputTriangle)
+  // OK, we always add normals as the 0-th array so that there's less work to
+  // do inside the tight loop (OutputTriangle)
   int attrib = 0;
   for ( int a = 0; a < fields->GetNumberOfArrays(); ++a )
     {
     if ( fields->IsArrayAnAttribute( a ) == vtkDataSetAttributes::NORMALS )
+      {
       continue;
+      }
 
     vtkDataArray* array = fields->GetArray( a );
     this->OutputAttributes[ attrib ] = vtkDataArray::CreateDataArray( array->GetDataType() );
@@ -316,9 +353,13 @@ void vtkTempTessellatorFilter::Teardown()
   this->OutputMesh = 0;
   this->OutputPoints = 0;
   if ( this->OutputAttributes )
+    {
     delete [] this->OutputAttributes;
+    }
   if ( this->OutputAttributeIndices )
+    {
     delete [] this->OutputAttributeIndices;
+    }
   this->Subdivider->ResetFieldList();
 }
 
@@ -751,10 +792,15 @@ void vtkTempTessellatorFilter::Execute()
     this->Subdivider->SetCellId( cell );
     vtkCell* cp = this->Subdivider->GetCell(); // We set the cell ID, get the vtkCell pointer
     int np = cp->GetCellType();
-    if ( np == VTK_VOXEL || np == VTK_HEXAHEDRON || np == VTK_QUADRATIC_HEXAHEDRON )
+    if ( np == VTK_VOXEL || np == VTK_HEXAHEDRON || 
+         np == VTK_QUADRATIC_HEXAHEDRON )
+      {
       np = 27;
+      }
     else
+      {
       np = cp->GetNumberOfPoints();
+      }
     double* pcoord = cp->GetParametricCoords();
     double* gcoord;
     vtkDataArray* field;
@@ -896,7 +942,9 @@ void vtkTempTessellatorFilter::Execute()
       break;
     case VTK_QUADRATIC_QUAD:
       for ( c = 0; c < 3; ++c )
+        {
         pts[8][c+3] = extraQuadQuadParams[0][c];
+        }
       cp->EvaluateLocation( dummySubId, pts[8] + 3, pts[8], weights );
       this->Subdivider->EvaluateFields( pts[8], weights, 6 );
       if ( dim > 1 )
@@ -932,9 +980,11 @@ void vtkTempTessellatorFilter::Execute()
       // we sample 19 extra points to guarantee a compatible tetrahedralization
       for ( p = 8; p < 20; ++p )
         {
-        int dummySubId=-1;
+        dummySubId=-1;
         for ( int y = 0; y < 3; ++y )
+          {
           pts[p][y+3] = extraLinHexParams[p-8][y];
+          }
         cp->EvaluateLocation( dummySubId, pts[p] + 3, pts[p], weights );
         this->Subdivider->EvaluateFields( pts[p], weights, 6 );
         }
@@ -942,9 +992,11 @@ void vtkTempTessellatorFilter::Execute()
     case VTK_QUADRATIC_HEXAHEDRON:
       for ( p = 20; p < 27; ++p )
         {
-        int dummySubId=-1;
+        dummySubId=-1;
         for ( int x = 0; x < 3; ++x )
+          {
           pts[p][x+3] = extraQuadHexParams[p-20][x];
+          }
         cp->EvaluateLocation( dummySubId, pts[p] + 3, pts[p], weights );
         this->Subdivider->EvaluateFields( pts[p], weights, 6 );
         }
@@ -980,15 +1032,27 @@ void vtkTempTessellatorFilter::Execute()
       {
     case 3:
       for ( tet=0; tet<nprim; ++tet, outconn += 4 )
-        this->Tessellator->AdaptivelySample3Facet( pts[outconn[0]], pts[outconn[1]], pts[outconn[2]], pts[outconn[3]] );
+        {
+        this->Tessellator->AdaptivelySample3Facet( pts[outconn[0]], 
+                                                   pts[outconn[1]], 
+                                                   pts[outconn[2]], 
+                                                   pts[outconn[3]] );
+        }
       break;
     case 2:
       for ( tri=0; tri<nprim; ++tri, outconn += 3 )
-        this->Tessellator->AdaptivelySample2Facet( pts[outconn[0]], pts[outconn[1]], pts[outconn[2]] );
+        {
+        this->Tessellator->AdaptivelySample2Facet( pts[outconn[0]], 
+                                                   pts[outconn[1]], 
+                                                   pts[outconn[2]] );
+        }
       break;
     case 1:
       for ( edg=0; edg<nprim; ++edg, outconn += 2 )
-        this->Tessellator->AdaptivelySample1Facet( pts[outconn[0]], pts[outconn[1]] );
+        {
+        this->Tessellator->AdaptivelySample1Facet( pts[outconn[0]], 
+                                                   pts[outconn[1]] );
+        }
       break;
     default:
       // do nothing

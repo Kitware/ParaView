@@ -12,10 +12,7 @@
 #include <vtkDataSetAttributes.h>
 #include <vtkMatrix4x4.h>
 
-#include <iostream>
-
-
-vtkCxxRevisionMacro(vtkSubdivisionAlgorithm,"1.1.2.1");
+vtkCxxRevisionMacro(vtkSubdivisionAlgorithm,"1.1.2.2");
 
 void vtkSubdivisionAlgorithm::PrintSelf( ostream& os, vtkIndent indent )
 {
@@ -145,7 +142,7 @@ bool vtkSubdivisionAlgorithm::ViewDependentEval( const double* p0, double* p1, d
   return false ; // no need to subdivide
 }
 
-bool vtkSubdivisionAlgorithm::FixedFieldErrorEval( const double* p0, double* p1, double* real_pf, const double* p2, int field_start, int criteria, double* AllowableL2Error2 ) const
+bool vtkSubdivisionAlgorithm::FixedFieldErrorEval( const double*, double* p1, double* real_pf, const double*, int field_start, int criteria, double* AllowableL2Error2 ) const
 {
   int id = 0;
   double mag;

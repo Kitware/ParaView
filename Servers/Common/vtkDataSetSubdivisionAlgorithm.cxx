@@ -9,7 +9,7 @@
 #include "vtkDataSetSubdivisionAlgorithm.h"
 #include "vtkStreamingTessellator.h"
 
-#include <algorithm>
+#include <vtkstd/algorithm>
 
 #include <vtkObjectFactory.h>
 #include <vtkIdList.h>
@@ -19,9 +19,7 @@
 #include <vtkCell.h>
 #include <vtkDataSet.h>
 
-using std::copy;
-
-vtkCxxRevisionMacro(vtkDataSetSubdivisionAlgorithm,"1.1.2.2");
+vtkCxxRevisionMacro(vtkDataSetSubdivisionAlgorithm,"1.1.2.3");
 vtkStandardNewMacro(vtkDataSetSubdivisionAlgorithm);
 
 vtkDataSetSubdivisionAlgorithm::vtkDataSetSubdivisionAlgorithm()
@@ -30,7 +28,8 @@ vtkDataSetSubdivisionAlgorithm::vtkDataSetSubdivisionAlgorithm()
   this->CurrentCellId = -1;
   this->CurrentCellData = 0;
   this->ChordError2 = 1e-6;
-  // We require this->FieldError2 to be a valid address at all times -- it may never be null
+  // We require this->FieldError2 to be a valid address at all times -- it
+  // may never be null
   this->FieldError2Capacity = 2;
   this->FieldError2 = new double[this->FieldError2Capacity];
   this->FieldError2Length = 0;
@@ -158,7 +157,7 @@ bool vtkDataSetSubdivisionAlgorithm::EvaluateEdge( const double* p0, double* mid
   if ( active )
     {
     double real_pf[6+vtkStreamingTessellator::MaxFieldSize];
-    copy( midpt, midpt + field_start, real_pf );
+    vtkstd::copy( midpt, midpt + field_start, real_pf );
     this->EvaluateFields( real_pf, weights, field_start );
 
     rval = this->FixedFieldErrorEval( p0, midpt, real_pf, p1, field_start, active, this->FieldError2 );
@@ -171,7 +170,7 @@ bool vtkDataSetSubdivisionAlgorithm::EvaluateEdge( const double* p0, double* mid
 #endif
     if ( rval )
       {
-      copy( real_pf+field_start, real_pf+field_start+this->FieldOffsets[this->NumberOfFields], midpt+field_start );
+      vtkstd::copy( real_pf+field_start, real_pf+field_start+this->FieldOffsets[this->NumberOfFields], midpt+field_start );
       }
     }
 

@@ -38,7 +38,7 @@ static vtkIceTRenderer *currentRenderer;
 // vtkIceTRenderer implementation.
 //******************************************************************
 
-vtkCxxRevisionMacro(vtkIceTRenderer, "1.11");
+vtkCxxRevisionMacro(vtkIceTRenderer, "1.11.2.1");
 vtkStandardNewMacro(vtkIceTRenderer);
 
 vtkIceTRenderer::vtkIceTRenderer()
@@ -70,8 +70,8 @@ void vtkIceTRenderer::ComputeAspect()
   icetGetIntegerv(ICET_TILE_MAX_WIDTH, &tile_width);
   icetGetIntegerv(ICET_TILE_MAX_HEIGHT, &tile_height);
 
-  float global_aspect = (float)global_viewport[2]/(float)global_viewport[3];
-  float tile_aspect = (float)tile_width/(float)tile_height;
+  double global_aspect = global_viewport[2]/global_viewport[3];
+  double tile_aspect = tile_width/tile_height;
 
   aspect[0] *= global_aspect/tile_aspect;
 
@@ -135,7 +135,7 @@ void vtkIceTRenderer::DeviceRender()
     }
   else
     {
-    icetBoundingBoxf(allBounds[0], allBounds[1], allBounds[2], allBounds[3],
+    icetBoundingBoxd(allBounds[0], allBounds[1], allBounds[2], allBounds[3],
                      allBounds[4], allBounds[5]);
     }
 
@@ -238,6 +238,8 @@ int vtkIceTRenderer::UpdateGeometry()
   vtkDebugMacro("In vtkIceTRenderer::UpdateGeometry()");
   int i;
 
+  this->NumberOfPropsRendered = 0;
+
   //First, get the current transformation.
   GLdouble projection[16];
   GLdouble modelview[16];
@@ -289,10 +291,14 @@ int vtkIceTRenderer::UpdateGeometry()
 
       visible[i] = left && right && bottom && top && znear && zfar;
       }
+    else
+      {
+      // Can't check bounds.  Be conservative and assume it is visible.
+      visible[i] = 1;
+      }
     }
 
   //Now render the props that are really visible.
-  this->NumberOfPropsRendered = 0;
   for (i = 0; i < this->PropArrayCount; i++)
     {
     if (visible[i])
@@ -307,6 +313,14 @@ int vtkIceTRenderer::UpdateGeometry()
       {
       this->NumberOfPropsRendered +=
         this->PropArray[i]->RenderTranslucentGeometry(this);
+      }
+    }
+  for (i = 0; i < this->PropArrayCount; i++)
+    {
+    if (visible[i])
+      {
+      this->NumberOfPropsRendered +=
+        this->PropArray[i]->RenderOverlay(this);
       }
     }
 

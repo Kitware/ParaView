@@ -52,6 +52,7 @@
 
 class vtkPKdTree;
 class vtkIntArray;
+class vtkPerspectiveTransform;
 
 #include <GL/ice-t.h> // Needed for IceTContext
 
@@ -64,26 +65,24 @@ public:
 
   virtual vtkRenderer *MakeRenderer();
 
-  virtual void SetTileDimensions(int x, int y) 
-    {this->SetNumTilesX(x); this->SetNumTilesY(y);}
-
   virtual void SetController(vtkMultiProcessController *controller);
-
-  // Description:
-  // In addition to the superclass actions, this method
-  // sets up the window for 2D Actors.
-  virtual void SetRenderWindow(vtkRenderWindow *renWin);
 
   // Description:
   // Methods to set the characteristics of the tiled display.  Currently,
   // only an even grid is supported.  Numbering of tiles is 0 based.  Tiles
   // in the X direction (horizontal) are numbered from left to right.  Tiles
   // in the Y direction (vertical) are numbered from top to bottom.
-  vtkGetMacro(NumTilesX, int);
-  vtkGetMacro(NumTilesY, int);
-  virtual void SetNumTilesX(int tilesX);
-  virtual void SetNumTilesY(int tilesY);
+  virtual void SetTileDimensions(int tilesX, int tilesY);
+  void SetTileDimensions(int dims[2])
+    { this->SetTileDimensions(dims[0], dims[1]); }
+  vtkGetVector2Macro(TileDimensions, int);
 
+  // Description:
+  // Methods to set/get which processes is desplaying which tiles.
+  // Currently, only an even grid is supported.  Numbering of tiles is 0
+  // based.  Tiles in the X direction (horizontal) are numbered from left
+  // to right.  Tiles in the Y direction (vertical) are numbered from top
+  // to bottom.
   virtual int GetTileRank(int x, int y);
   virtual void SetTileRank(int x, int y, int rank);
 
@@ -105,6 +104,12 @@ public:
   vtkGetMacro(Strategy, StrategyType);
   virtual void SetStrategy(StrategyType strategy);
   virtual void SetStrategy(const char *strategy);
+  void SetStrategyToDefault() { this->SetStrategy(DEFAULT); }
+  void SetStrategyToReduce() { this->SetStrategy(REDUCE); }
+  void SetStrategyToVtree() { this->SetStrategy(VTREE); }
+  void SetStrategyToSplit() { this->SetStrategy(SPLIT); }
+  void SetStrategyToSerial() { this->SetStrategy(SERIAL); }
+  void SetStrategyToDirect() { this->SetStrategy(DIRECT); }
 
 //BTX
   enum ComposeOperationType {
@@ -182,8 +187,6 @@ protected:
 
   virtual void UpdateIceTContext();
 
-  virtual void ChangeTileDims(int tilesX, int tilesY);
-
   virtual void StartRender();
   virtual void SatelliteStartRender();
 
@@ -197,8 +200,7 @@ protected:
   int ContextDirty;
   vtkTimeStamp ContextUpdateTime;
 
-  int NumTilesX;
-  int NumTilesY;
+  int TileDimensions[2];
   int **TileRanks;
   int TilesDirty;
   int CleanScreenWidth;
@@ -223,6 +225,14 @@ protected:
   int ReducedImageSharesData;
 
   virtual void ReadReducedImage();
+
+  // Description:
+  // Holds a transform that shifts a camera to the displayed viewport.
+  vtkPerspectiveTransform *TileViewportTransform;
+  vtkGetObjectMacro(TileViewportTransform, vtkPerspectiveTransform);
+  virtual void SetTileViewportTransform(vtkPerspectiveTransform *arg);
+
+  virtual void ComputeTileViewportTransform();
 
 private:
   vtkIceTRenderManager(const vtkIceTRenderManager&); // Not implemented

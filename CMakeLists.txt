@@ -217,6 +217,10 @@ SUBDIRS(Utilities/VTKTclWrapping)
 SET(PVFILTERS_INCLUDE_DIR
   ${ParaView_SOURCE_DIR}/Servers/Filters
   ${ParaView_BINARY_DIR}/Servers/Filters)
+SET(PVSERVERMANAGER_INCLUDE_DIR
+  ${ParaView_SOURCE_DIR}/Servers/ServerManager
+  ${ParaView_BINARY_DIR}/Servers/ServerManager)
+
 SUBDIRS(Servers)
 
 #########################################################################

@@ -21,16 +21,18 @@
 #include "vtkIceTRenderManager.h"
 #include "vtkIceTRenderer.h"
 #include "vtkPKdTree.h"
-#include <vtkObjectFactory.h>
-#include <vtkRenderWindow.h>
-#include <vtkRendererCollection.h>
-#include <vtkMPIController.h>
-#include <vtkMPI.h>
-#include <vtkFloatArray.h>
-#include <vtkIntArray.h>
-#include <vtkUnsignedCharArray.h>
-#include <GL/ice-t_mpi.h>
+#include "vtkObjectFactory.h"
+#include "vtkRenderWindow.h"
+#include "vtkRendererCollection.h"
+#include "vtkMPIController.h"
+#include "vtkMPI.h"
+#include "vtkFloatArray.h"
+#include "vtkIntArray.h"
+#include "vtkUnsignedCharArray.h"
 #include "vtkCamera.h"
+#include "vtkPerspectiveTransform.h"
+
+#include <GL/ice-t_mpi.h>
 
 //******************************************************************
 // Hidden structures.
@@ -46,16 +48,18 @@ const int ICET_INFO_SIZE = sizeof(struct IceTInformation)/sizeof(int);
 // vtkIceTRenderManager implementation.
 //******************************************************************
 
-vtkCxxRevisionMacro(vtkIceTRenderManager, "1.16.2.1");
+vtkCxxRevisionMacro(vtkIceTRenderManager, "1.16.2.2");
 vtkStandardNewMacro(vtkIceTRenderManager);
 
 vtkCxxSetObjectMacro(vtkIceTRenderManager, SortingKdTree, vtkPKdTree);
 vtkCxxSetObjectMacro(vtkIceTRenderManager, DataReplicationGroup, vtkIntArray);
+vtkCxxSetObjectMacro(vtkIceTRenderManager, TileViewportTransform,
+                     vtkPerspectiveTransform);
 
 vtkIceTRenderManager::vtkIceTRenderManager()
 {
-  this->NumTilesX = 1;
-  this->NumTilesY = 1;
+  this->TileDimensions[0] = 1;
+  this->TileDimensions[1] = 1;
   this->TileRanks = new int*[1];
   this->TileRanks[0] = new int[1];
   this->TileRanks[0][0] = 0;
@@ -76,6 +80,8 @@ vtkIceTRenderManager::vtkIceTRenderManager()
 
   this->DataReplicationGroup = NULL;
 
+  this->TileViewportTransform = NULL;
+
   // Reload the controller so that we make an ICE-T context.
   this->Superclass::SetController(NULL);
   this->SetController(vtkMultiProcessController::GetGlobalController());  
@@ -84,13 +90,14 @@ vtkIceTRenderManager::vtkIceTRenderManager()
 vtkIceTRenderManager::~vtkIceTRenderManager()
 {
   this->SetController(NULL);
-  for (int x = 0; x < this->NumTilesX; x++)
+  for (int x = 0; x < this->TileDimensions[0]; x++)
     {
     delete[] this->TileRanks[x];
     }
   delete[] this->TileRanks;
   this->SetSortingKdTree(NULL);
   this->SetDataReplicationGroup(NULL);
+  this->SetTileViewportTransform(NULL);
 }
 
 vtkRenderer *vtkIceTRenderManager::MakeRenderer()
@@ -99,27 +106,6 @@ vtkRenderer *vtkIceTRenderManager::MakeRenderer()
 }
 
 //-------------------------------------------------------------------------
-// Only client needs start and end render callbacks.
-void vtkIceTRenderManager::SetRenderWindow(vtkRenderWindow *renWin)
-{
-  this->Superclass::SetRenderWindow(renWin);
-
-  if (this->Controller && renWin)
-    {
-    // Set the tile settings for 2D widgets.
-    int tileIdx = this->Controller->GetLocalProcessId();
-    int y = tileIdx/this->NumTilesX;
-    int x = tileIdx - y*this->NumTilesX;
-    // Flip the y axis to match IceT
-    y = this->NumTilesY-1-y;
-    // Setup the window for this tile.
-    renWin->SetTileScale(this->NumTilesX, this->NumTilesY);
-    renWin->SetTileViewport(x*(1.0/(float)(this->NumTilesX)), 
-                            y*(1.0/(float)(this->NumTilesY)), 
-                            (x+1.0)*(1.0/(float)(this->NumTilesX)), 
-                            (y+1.0)*(1.0/(float)(this->NumTilesY)));
-    }
-}
 
 void vtkIceTRenderManager::SetController(vtkMultiProcessController *controller)
 {
@@ -173,11 +159,19 @@ void vtkIceTRenderManager::SetController(vtkMultiProcessController *controller)
   this->ContextDirty = 1;
 }
 
+//-----------------------------------------------------------------------------
+
 void vtkIceTRenderManager::UpdateIceTContext()
 {
   vtkDebugMacro("UpdateIceTContext");
 
   icetSetContext(this->Context);
+
+  if (this->ContextDirty || this->TilesDirty)
+    {
+    // Compute transform for non-ICE-T renderers.
+    this->ComputeTileViewportTransform();
+    }
 
   if (this->ImageReductionFactor != this->LastKnownImageReductionFactor)
     {
@@ -192,12 +186,12 @@ void vtkIceTRenderManager::UpdateIceTContext()
     int x, y;
 
     icetResetTiles();
-    for (x = 0; x < this->NumTilesX; x++)
+    for (x = 0; x < this->TileDimensions[0]; x++)
       {
-      for (y = 0; y < this->NumTilesY; y++)
+      for (y = 0; y < this->TileDimensions[1]; y++)
         {
         icetAddTile(x*this->ReducedImageSize[0],
-                    (this->NumTilesY-y-1)*this->ReducedImageSize[1],
+                    (this->TileDimensions[1]-y-1)*this->ReducedImageSize[1],
                     this->ReducedImageSize[0], this->ReducedImageSize[1],
                     this->TileRanks[x][y]);
         }
@@ -293,24 +287,14 @@ void vtkIceTRenderManager::UpdateIceTContext()
   this->ContextDirty = 0;
 }
 
-void vtkIceTRenderManager::SetNumTilesX(int tilesX)
+//-----------------------------------------------------------------------------
+
+void vtkIceTRenderManager::SetTileDimensions(int tilesX, int tilesY)
 {
-  vtkDebugMacro("SetNumTilesX " << tilesX);
+  vtkDebugMacro("SetTileDimensions " << tilesX << " " << tilesY);
 
-  this->ChangeTileDims(tilesX, this->NumTilesY);
-}
-void vtkIceTRenderManager::SetNumTilesY(int tilesY)
-{
-  vtkDebugMacro("SetNumTilesY " << tilesY);
-
-  this->ChangeTileDims(this->NumTilesX, tilesY);
-}
-
-void vtkIceTRenderManager::ChangeTileDims(int tilesX, int tilesY)
-{
-  vtkDebugMacro("ChangeTileDims " << tilesX << " " << tilesY);
-
-  if ((this->NumTilesX == tilesX) && (this->NumTilesY == tilesY))
+  if (   (this->TileDimensions[0] == tilesX)
+      && (this->TileDimensions[1] == tilesY))
     {
     return;
     }
@@ -324,7 +308,7 @@ void vtkIceTRenderManager::ChangeTileDims(int tilesX, int tilesY)
     NewTileRanks[x] = new int[tilesY];
     for (y = 0; y < tilesY; y++)
       {
-      if ( (y < this->NumTilesY) && (x < this->NumTilesX))
+      if ( (y < this->TileDimensions[1]) && (x < this->TileDimensions[0]))
         {
         NewTileRanks[x][y] = this->TileRanks[x][y];
         }
@@ -333,7 +317,7 @@ void vtkIceTRenderManager::ChangeTileDims(int tilesX, int tilesY)
         NewTileRanks[x][y] = y*tilesX + x;
         }
       }
-    if (x < this->NumTilesX)
+    if (x < this->TileDimensions[0])
       {
       delete[] this->TileRanks[x];
       }
@@ -341,8 +325,8 @@ void vtkIceTRenderManager::ChangeTileDims(int tilesX, int tilesY)
 
   delete[] this->TileRanks;
   this->TileRanks = NewTileRanks;
-  this->NumTilesX = tilesX;
-  this->NumTilesY = tilesY;
+  this->TileDimensions[0] = tilesX;
+  this->TileDimensions[1] = tilesY;
   this->TilesDirty = 1;
 }
 
@@ -350,8 +334,8 @@ int vtkIceTRenderManager::GetTileRank(int x, int y)
 {
   vtkDebugMacro("GetTileRank " << x << " " << y);
 
-  if (   (x < 0) || (x >= this->NumTilesX)
-      || (y < 0) || (y >= this->NumTilesY) )
+  if (   (x < 0) || (x >= this->TileDimensions[0])
+      || (y < 0) || (y >= this->TileDimensions[1]) )
     {
     vtkErrorMacro("Invalid tile " << x << ", " << y);
     return -1;
@@ -363,8 +347,8 @@ void vtkIceTRenderManager::SetTileRank(int x, int y, int rank)
 {
   vtkDebugMacro("SetTileRank " << x << " " << y << " " << rank);
 
-  if (   (x < 0) || (x >= this->NumTilesX)
-      || (y < 0) || (y >= this->NumTilesY) )
+  if (   (x < 0) || (x >= this->TileDimensions[0])
+      || (y < 0) || (y >= this->TileDimensions[1]) )
     {
     vtkErrorMacro("Invalid tile " << x << ", " << y);
     return;
@@ -373,6 +357,58 @@ void vtkIceTRenderManager::SetTileRank(int x, int y, int rank)
   this->TileRanks[x][y] = rank;
   this->TilesDirty = 1;
 }
+
+//-----------------------------------------------------------------------------
+
+void vtkIceTRenderManager::ComputeTileViewportTransform()
+{
+  vtkDebugMacro("ComputeTileViewportTransform");
+
+  if (!this->Controller)
+    {
+    vtkDebugMacro("No controller, no viewport set.");
+    return;
+    }
+
+  int rank = this->Controller->GetLocalProcessId();
+
+  for (int y = 0; y < this->TileDimensions[1]; y++)
+    {
+    for (int x = 0; x < this->TileDimensions[0]; x++)
+      {
+      if (this->TileRanks[x][y] == rank)
+        {
+        // Transform camera for 3D actors.
+        vtkPerspectiveTransform *transform = vtkPerspectiveTransform::New();
+        transform->Identity();
+        transform->Ortho(x*2.0/this->TileDimensions[0] - 1.0,
+                         (x+1)*2.0/this->TileDimensions[0] - 1.0,
+                         y*2.0/this->TileDimensions[1] - 1.0,
+                         (y+1)*2.0/this->TileDimensions[1] - 1.0,
+                         1.0, -1.0);
+        this->SetTileViewportTransform(transform);
+        transform->Delete();
+
+        // Establish tiled window for 2D actors.
+        if (this->RenderWindow)
+          {
+          // RenderWindow tiles from lower left instead of upper left.
+          y = this->TileDimensions[0] - y - 1;
+          this->RenderWindow->SetTileScale(this->TileDimensions);
+          this->RenderWindow->SetTileViewport
+            (x*(1.0/(float)(this->TileDimensions[0])), 
+             y*(1.0/(float)(this->TileDimensions[1])), 
+             (x+1.0)*(1.0/(float)(this->TileDimensions[0])), 
+             (y+1.0)*(1.0/(float)(this->TileDimensions[1])));
+          }
+
+        return;
+        }
+      }
+    }
+}
+
+//-----------------------------------------------------------------------------
 
 void vtkIceTRenderManager::SetStrategy(StrategyType strategy)
 {
@@ -418,6 +454,8 @@ void vtkIceTRenderManager::SetStrategy(const char *strategy)
     }
 }
 
+//-----------------------------------------------------------------------------
+
 void vtkIceTRenderManager::SetComposeOperation(ComposeOperationType operation)
 {
   vtkDebugMacro("SetComposeOperation to " << operation);
@@ -427,6 +465,8 @@ void vtkIceTRenderManager::SetComposeOperation(ComposeOperationType operation)
   this->ComposeOperation = operation;
   this->ComposeOperationDirty = 1;
 }
+
+//-----------------------------------------------------------------------------
 
 void vtkIceTRenderManager::SetDataReplicationGroupColor(int color)
 {
@@ -445,6 +485,8 @@ void vtkIceTRenderManager::SetDataReplicationGroupColor(int color)
   this->SetDataReplicationGroup(drg);
   drg->Delete();
 }
+
+//-----------------------------------------------------------------------------
 
 double vtkIceTRenderManager::GetRenderTime()
 {
@@ -508,6 +550,8 @@ double vtkIceTRenderManager::GetCompositeTime()
     }
 }
 
+//-----------------------------------------------------------------------------
+
 void vtkIceTRenderManager::StartRender()
 {
   if (this->FullImageSharesData)
@@ -542,6 +586,8 @@ void vtkIceTRenderManager::SatelliteStartRender()
   this->Superclass::SatelliteStartRender();
 }
 
+//-----------------------------------------------------------------------------
+
 void vtkIceTRenderManager::SendWindowInformation()
 {
   vtkDebugMacro("Sending Window Information");
@@ -562,13 +608,13 @@ void vtkIceTRenderManager::SendWindowInformation()
                            vtkIceTRenderManager::ICET_INFO_TAG);
     if (this->TilesDirty)
       {
-      this->Controller->Send(&this->NumTilesX, 1, id,
+      this->Controller->Send(&this->TileDimensions[0], 1, id,
                              vtkIceTRenderManager::NUM_TILES_X_TAG);
-      this->Controller->Send(&this->NumTilesY, 1, id,
+      this->Controller->Send(&this->TileDimensions[1], 1, id,
                              vtkIceTRenderManager::NUM_TILES_Y_TAG);
-      for (int x = 0; x < this->NumTilesX; x++)
+      for (int x = 0; x < this->TileDimensions[0]; x++)
         {
-        this->Controller->Send(this->TileRanks[x], this->NumTilesY, id,
+        this->Controller->Send(this->TileRanks[x], this->TileDimensions[1], id,
                                vtkIceTRenderManager::TILE_RANKS_TAG);
         }
       }
@@ -591,10 +637,10 @@ void vtkIceTRenderManager::ReceiveWindowInformation()
                               vtkIceTRenderManager::NUM_TILES_X_TAG);
     this->Controller->Receive(&NewNumTilesY, 1, 0,
                               vtkIceTRenderManager::NUM_TILES_Y_TAG);
-    this->ChangeTileDims(NewNumTilesX, NewNumTilesY);
-    for (int x = 0; x < this->NumTilesX; x++)
+    this->SetTileDimensions(NewNumTilesX, NewNumTilesY);
+    for (int x = 0; x < this->TileDimensions[0]; x++)
       {
-      this->Controller->Receive(this->TileRanks[x], this->NumTilesY, 0,
+      this->Controller->Receive(this->TileRanks[x], this->TileDimensions[1], 0,
                                 vtkIceTRenderManager::TILE_RANKS_TAG);
       }
     }
@@ -603,28 +649,15 @@ void vtkIceTRenderManager::ReceiveWindowInformation()
   this->SetComposeOperation((ComposeOperationType)info.ComposeOperation);
 }
 
+//-----------------------------------------------------------------------------
+
 void vtkIceTRenderManager::PreRenderProcessing()
 {
   vtkDebugMacro("PreRenderProcessing");
-  vtkCamera* cam;
   vtkRenderWindow* renWin = this->RenderWindow;
   vtkRendererCollection *rens = renWin->GetRenderers();
   vtkRenderer* ren;
 
-  rens->InitTraversal();
-  ren = rens->GetNextItem();
-  if (ren == NULL)
-    {
-    vtkErrorMacro("Missing renderer.");
-    return;
-    }
-  cam = ren->GetActiveCamera();
-  if (cam == NULL)
-    {
-    vtkErrorMacro("Missing camera.");
-    return;
-    }
-  
   // Normally if this->UseCompositing was false, we would return here.  But
   // if we did that, the tile display would become invalid.  Instead, in
   // UpdateIceTContext we tell ICE-T that the data is replicated on all
@@ -638,8 +671,11 @@ void vtkIceTRenderManager::PreRenderProcessing()
   // Only composite the first renderer.
   rens->InitTraversal();
   ren = rens->GetNextItem();
-  //for (rens->InitTraversal(), i = 0; (ren = rens->GetNextItem()); i++)
+  if (ren == NULL)
     {
+    vtkErrorMacro("Missing renderer.");
+    return;
+    }
     vtkIceTRenderer *icetRen = vtkIceTRenderer::SafeDownCast(ren);
     if (icetRen == NULL)
       {
@@ -679,8 +715,16 @@ void vtkIceTRenderManager::PreRenderProcessing()
                        viewport[2]*this->ImageReductionFactor,
                        viewport[3]*this->ImageReductionFactor);
       }
+
+  // For all subsequent renderers, assume that the data is replicated, do
+  // no compositing, and asjust the camera to focus on the displayed tile.
+  for (ren = rens->GetNextItem(); ren != NULL; ren = rens->GetNextItem())
+    {
+    ren->GetActiveCamera()->SetUserTransform(this->GetTileViewportTransform());
     }
 }
+
+//-----------------------------------------------------------------------------
 
 void vtkIceTRenderManager::PostRenderProcessing()
 {
@@ -693,6 +737,8 @@ void vtkIceTRenderManager::PostRenderProcessing()
     this->RenderWindowImageUpToDate = true;
     }
 }
+
+//-----------------------------------------------------------------------------
 
 void vtkIceTRenderManager::ReadReducedImage()
 {
@@ -778,6 +824,8 @@ void vtkIceTRenderManager::ReadReducedImage()
     }
 }
 
+//-----------------------------------------------------------------------------
+
 void vtkIceTRenderManager::PrintSelf(ostream &os, vtkIndent indent)
 {
   int x, y;
@@ -786,12 +834,12 @@ void vtkIceTRenderManager::PrintSelf(ostream &os, vtkIndent indent)
 
   os << indent << "ICE-T Context: " << this->Context << endl;
 
-  os << indent << "Display: " << this->NumTilesX
-     << " X " << this->NumTilesY << " with display ranks" << endl;
-  for (y = 0; y < this->NumTilesY; y++)
+  os << indent << "Display: " << this->TileDimensions[0]
+     << " X " << this->TileDimensions[1] << " with display ranks" << endl;
+  for (y = 0; y < this->TileDimensions[1]; y++)
     {
     os << indent << "    ";
-    for (x = 0; x < this->NumTilesX; x++)
+    for (x = 0; x < this->TileDimensions[0]; x++)
       {
       os.width(4);
       os << this->GetTileRank(x, y);
@@ -843,9 +891,3 @@ void vtkIceTRenderManager::PrintSelf(ostream &os, vtkIndent indent)
     os << "(none)" << endl;
     }
 }
-
-
-//******************************************************************
-//Local function/method implementation.
-//******************************************************************
-

@@ -45,6 +45,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class vtkTesting;
 class vtkKWView;
+class vtkImageAppend;
 
 class VTK_EXPORT vtkKWTesting : public vtkObject
 {
@@ -70,6 +71,11 @@ public:
   // Perform the actual test.
   virtual int RegressionTest(float thresh);
 
+  // Description: Append a test image. Thsi is useful for combining multiple
+  // tests into one test with a large image. Thsi method will append test
+  // images together (left to right) in order to make a large valid image
+  virtual void AppendTestImage(vtkKWView *RenderView);
+
 protected:
   vtkKWTesting();
   ~vtkKWTesting();
@@ -77,6 +83,8 @@ protected:
   vtkTesting* Testing;
   vtkKWView* RenderView;
   char* ComparisonImage;
+  
+  vtkImageAppend *AppendFilter;
   
 private:
   vtkKWTesting(const vtkKWTesting&); // Not implemented
