@@ -46,13 +46,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWTesting );
-vtkCxxRevisionMacro(vtkKWTesting, "1.7");
+vtkCxxRevisionMacro(vtkKWTesting, "1.8");
 vtkCxxSetObjectMacro(vtkKWTesting,RenderView,vtkKWView);
 
 //----------------------------------------------------------------------------
 vtkKWTesting::vtkKWTesting()
 {
   this->Testing = vtkTesting::New();
+  this->Testing->SetBorderOffset(17);
   this->RenderView = 0;
   this->ComparisonImage = 0;
   this->AppendFilter = 0;
