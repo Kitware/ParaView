@@ -46,7 +46,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkObjectFactory.h"
 
 vtkStandardNewMacro( vtkKWMenuButton );
-vtkCxxRevisionMacro(vtkKWMenuButton, "1.8");
+vtkCxxRevisionMacro(vtkKWMenuButton, "1.8.2.1");
 
 int vtkKWMenuButtonCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -76,7 +76,7 @@ void vtkKWMenuButton::Create(vtkKWApplication *app, char* /*args*/)
   this->SetApplication(app);
 
   this->Menu->SetParent(this);
-  this->Script("menubutton %s -menu %s -relief raised -bd 2", 
+  this->Script("menubutton %s -menu %s -indicatoron 1 -relief raised -bd 2 -direction flush", 
                this->GetWidgetName(), this->Menu->GetWidgetName());
 
   // Should the args be passed through?
