@@ -2415,3 +2415,27 @@
    fun:Tk_MainEx
    fun:main
 }
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:malloc
+   fun:TclpAlloc
+   fun:Tcl_Alloc
+   fun:SetWindowFromAny
+   fun:Tcl_ConvertToType
+   fun:TkGetWindowFromObj
+   fun:Tk_WmObjCmd
+   fun:TclEvalObjvInternal
+   fun:TclExecuteByteCode
+   fun:TclCompEvalObj
+   fun:Tcl_EvalObjEx
+   fun:Tcl_TimeObjCmd
+   fun:TclEvalObjvInternal
+   fun:Tcl_EvalEx
+   fun:Tcl_EvalTokensStandard
+   fun:Tcl_EvalEx
+   fun:Tcl_FSEvalFile
+   fun:Tcl_EvalFile
+   fun:Tk_MainEx
+   fun:main
+}
