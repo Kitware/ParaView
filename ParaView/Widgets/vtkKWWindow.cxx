@@ -969,7 +969,7 @@ void vtkKWWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWWindow ";
-  this->ExtractRevision(os,"$Revision: 1.80 $");
+  this->ExtractRevision(os,"$Revision: 1.81 $");
 }
 
 int vtkKWWindow::ExitDialog()
@@ -1168,7 +1168,6 @@ int vtkKWWindow::GetRegisteryValue(int level, const char* subkey,
 {
   int res = 0;
   char buff[1024];
-  *value = 0;
   if ( !this->GetApplication() ||
        this->GetApplication()->GetRegisteryLevel() < 0 ||
        this->GetApplication()->GetRegisteryLevel() < level )
@@ -1186,6 +1185,7 @@ int vtkKWWindow::GetRegisteryValue(int level, const char* subkey,
   res = reg->ReadValue(buffer, key, buff);
   if ( *buff && value )
     {
+    *value = 0;
     strcpy(value, buff);
     }  
   return res;
