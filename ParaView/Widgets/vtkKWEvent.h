@@ -117,6 +117,7 @@ class VTK_EXPORT vtkKWEvent
     LightVisibilityChangedEvent,
     LightboxOrientationChangedEvent,
     LightboxResolutionChangedEvent,
+    MaterialPropertyChangedEvent,
     MiddleMouseOptionChangedEvent,
     MouseBindingChangedEvent,
     MultiPassStillRenderEndEvent,

@@ -108,6 +108,7 @@ static const char *vtkKWEventStrings[] = {
   "LightVisibilityChangedEvent",
   "LightboxOrientationChangedEvent",
   "LightboxResolutionChangedEvent",
+  "MaterialPropertyChangedEvent",
   "MiddleMouseOptionChangedEvent",
   "MouseBindingChangedEvent",
   "MultiPassStillRenderEndEvent",
