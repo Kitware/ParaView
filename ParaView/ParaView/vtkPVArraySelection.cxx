@@ -65,7 +65,7 @@ class vtkPVArraySelectionArraySet: public vtkPVArraySelectionArraySetBase {};
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVArraySelection);
-vtkCxxRevisionMacro(vtkPVArraySelection, "1.29");
+vtkCxxRevisionMacro(vtkPVArraySelection, "1.30");
 
 //----------------------------------------------------------------------------
 int vtkDataArraySelectionCommand(ClientData cd, Tcl_Interp *interp,
@@ -334,7 +334,7 @@ void vtkPVArraySelection::Accept()
   // Create new check buttons.
   if (this->VTKReaderTclName == NULL)
     {
-    vtkErrorMacro("VTKREader has not been set.");
+    vtkErrorMacro("VTKReader has not been set.");
     }
 
   if (this->ModifiedFlag == 0)
