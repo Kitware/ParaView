@@ -73,6 +73,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWEvent.h"
 #include "vtkKWNotebook.h"
 #include "vtkCallbackCommand.h"
+#include "vtkPVLabel.h"
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
 			   int argc, char *argv[]);
@@ -1361,6 +1362,24 @@ vtkPVLabeledToggle *vtkPVSource::AddLabeledToggle(char *label, char *varName,
 
   // Although it has been deleted, it did not destruct.
   return toggle;
+}
+
+//----------------------------------------------------------------------------
+vtkPVLabel *vtkPVSource::AddLabel(char *label, char* help)
+{
+  vtkPVLabel *lab = vtkPVLabel::New();
+
+  lab->SetParent(this->ParameterFrame->GetFrame());
+  lab->SetLabel(label);
+  lab->Create(this->Application, help);
+
+  this->Script("pack %s -fill x -expand t", lab->GetWidgetName());
+  
+  this->AddPVWidget(lab);
+  lab->Delete();
+
+  // Although it has been deleted, it did not destruct.
+  return lab;
 }
 
 //----------------------------------------------------------------------------

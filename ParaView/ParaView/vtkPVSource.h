@@ -52,30 +52,31 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWObject.h"
 #include "vtkKWView.h"
 
+class vtkCollection;
+class vtkKWEntry;
+class vtkKWLabel;
+class vtkKWLabeledFrame;
 class vtkKWPushButton;
 class vtkPVApplication;
-class vtkPVInputMenu;
 class vtkPVArrayMenu;
 class vtkPVArraySelection;
-class vtkSource;
+class vtkPVBoundsDisplay;
 class vtkPVData;
-class vtkPVWindow;
-class vtkStringList;
-class vtkPVLabeledToggle;
 class vtkPVFileEntry;
-class vtkPVStringEntry;
-class vtkPVVectorEntry;
+class vtkPVInputMenu;
+class vtkPVLabel;
+class vtkPVLabeledToggle;
+class vtkPVRenderView;
+class vtkPVScalarRangeLabel;
 class vtkPVScale;
-class vtkKWEntry;
 class vtkPVSelectionList;
 class vtkPVSourceInterface;
-class vtkPVRenderView;
-class vtkKWLabeledFrame;
-class vtkKWLabel;
+class vtkPVStringEntry;
+class vtkPVVectorEntry;
 class vtkPVWidget;
-class vtkPVBoundsDisplay;
-class vtkPVScalarRangeLabel;
-class vtkCollection;
+class vtkPVWindow;
+class vtkSource;
+class vtkStringList;
 
 class VTK_EXPORT vtkPVSource : public vtkKWObject
 {
@@ -200,6 +201,10 @@ public:
   vtkPVVectorEntry *AddLabeledEntry(char* label, char* varName,
                                     char* help);
   
+  // Description:
+  // Add label to vtkSource
+  vtkPVLabel *AddLabel(char* label, char* help);
+
   // Description:
   // Create an entry for items with multiple elements.
   // The primary label is put to the left.  The element labels

@@ -28,6 +28,7 @@ vtkPVExtentTranslator
 vtkPVFileEntry
 vtkPVGlyph3D 
 vtkPVInputMenu 
+vtkPVLabel
 vtkPVLabeledToggle
 vtkPVLODActor
 vtkPVMethodInterface 
