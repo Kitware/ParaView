@@ -356,6 +356,8 @@ public:
 
   // Descrition:
   // Get those application settings that are stored in the registery
+  // Should be called once the application name is known (and the registery
+  // level set).
   virtual void GetApplicationSettingsFromRegistery();
 
 protected:
