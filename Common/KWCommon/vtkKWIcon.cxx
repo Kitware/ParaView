@@ -29,7 +29,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWIcon );
-vtkCxxRevisionMacro(vtkKWIcon, "1.29");
+vtkCxxRevisionMacro(vtkKWIcon, "1.30");
 
 //----------------------------------------------------------------------------
 vtkKWIcon::vtkKWIcon()
@@ -547,6 +547,22 @@ void vtkKWIcon::SetImage(int image)
         image_general_width, image_general_height,
         image_general_pixel_size, 
         image_general_buffer_length);
+      break;      
+
+    case vtkKWIcon::ICON_GRID_LINEAR:
+      this->SetImage(
+        image_grid_linear, 
+        image_grid_linear_width, image_grid_linear_height,
+        image_grid_linear_pixel_size, 
+        image_grid_linear_buffer_length);
+      break;      
+
+    case vtkKWIcon::ICON_GRID_LOG:
+      this->SetImage(
+        image_grid_log, 
+        image_grid_log_width, image_grid_log_height,
+        image_grid_log_pixel_size, 
+        image_grid_log_buffer_length);
       break;      
 
     case vtkKWIcon::ICON_HELPBUBBLE:
