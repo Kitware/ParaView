@@ -20,42 +20,32 @@
 #include "vtkClientServerStream.h"
 #include "vtkCommand.h"
 #include "vtkDynamicLoader.h"
-#include "vtkHashMap.txx"
 #include "vtkObjectFactory.h"
 
+#include <vtkstd/map>
 #include <vtkstd/string>
 #include <vtkstd/vector>
 #include <sys/stat.h>
 
 vtkStandardNewMacro(vtkClientServerInterpreter);
-vtkCxxRevisionMacro(vtkClientServerInterpreter, "1.1.2.19");
-
-//----------------------------------------------------------------------------
-// Internal container instantiations.
-static inline vtkClientServerCommandFunction
-vtkContainerCreateMethod(vtkClientServerCommandFunction d1)
-{
-  return vtkContainerDefaultCreate(d1);
-}
-static inline void vtkContainerDeleteMethod(vtkClientServerCommandFunction) {}
-
-template class vtkHashMap<vtkTypeUInt32, vtkClientServerStream*>;
-template class vtkHashMap<const char*, vtkClientServerCommandFunction>;
+vtkCxxRevisionMacro(vtkClientServerInterpreter, "1.1.2.20");
 
 //----------------------------------------------------------------------------
 class vtkClientServerInterpreterInternals
 {
 public:
   typedef vtkstd::vector<vtkClientServerNewInstanceFunction> NewInstanceFunctionsType;
+  typedef vtkstd::map<vtkstd::string, vtkClientServerCommandFunction> ClassToFunctionMapType;
+  typedef vtkstd::map<vtkTypeUInt32, vtkClientServerStream*> IDToMessageMapType;
   NewInstanceFunctionsType NewInstanceFunctions;
+  ClassToFunctionMapType ClassToFunctionMap;
+  IDToMessageMapType IDToMessageMap;
 };
 
 //----------------------------------------------------------------------------
 vtkClientServerInterpreter::vtkClientServerInterpreter()
 {
   this->Internal = new vtkClientServerInterpreterInternals;
-  this->IDToMessageMap = IDToMessageMapType::New();
-  this->ClassToFunctionMap = ClassToFunctionMapType::New();
   this->LastResultMessage = new vtkClientServerStream;
   this->LogStream = 0;
   this->LogFileStream = 0;
@@ -65,22 +55,15 @@ vtkClientServerInterpreter::vtkClientServerInterpreter()
 vtkClientServerInterpreter::~vtkClientServerInterpreter()
 {
   // Delete any remaining messages.
-  vtkHashMapIterator<vtkTypeUInt32, vtkClientServerStream*>* hi =
-    this->IDToMessageMap->NewIterator();
-  vtkClientServerStream* tmp;
-  while(!hi->IsDoneWithTraversal())
+  vtkClientServerInterpreterInternals::IDToMessageMapType::iterator hi;
+  for(hi = this->Internal->IDToMessageMap.begin();
+      hi != this->Internal->IDToMessageMap.end(); ++hi)
     {
-    hi->GetData(tmp);
-    delete tmp;
-    hi->GoToNextItem();
+    delete hi->second;
     }
-  hi->Delete();
 
   // End logging.
   this->SetLogStream(0);
-
-  this->IDToMessageMap->Delete();
-  this->ClassToFunctionMap->Delete();
 
   delete this->LastResultMessage;
   this->LastResultMessage = 0;
@@ -121,25 +104,18 @@ vtkClientServerID
 vtkClientServerInterpreter::GetIDFromObject(vtkObjectBase* key)
 {
   // Search the hash table for the given object.
-  vtkHashMapIterator<vtkTypeUInt32, vtkClientServerStream*>* hi =
-    this->IDToMessageMap->NewIterator();
-  vtkClientServerStream* msg;
-  vtkTypeUInt32 id = 0;
-  while (!hi->IsDoneWithTraversal())
+  vtkClientServerID result = {0};
+  vtkClientServerInterpreterInternals::IDToMessageMapType::iterator hi;
+  for(hi = this->Internal->IDToMessageMap.begin();
+      hi != this->Internal->IDToMessageMap.end(); ++hi)
     {
-    hi->GetData(msg);
     vtkObjectBase* obj;
-    if(msg->GetArgument(0, 0, &obj) && obj == key)
+    if(hi->second->GetArgument(0, 0, &obj) && obj == key)
       {
-      hi->GetKey(id);
+      result.ID = hi->first;
       break;
       }
-    hi->GoToNextItem();
     }
-  hi->Delete();
-
-  // Convert the result to an ID object.
-  vtkClientServerID result = {id};
   return result;
 }
 
@@ -311,8 +287,8 @@ vtkClientServerInterpreter
       }
 
     // Make sure the ID doesn't exist.
-    vtkClientServerStream* tmp;
-    if(this->IDToMessageMap->GetItem(id.ID, tmp) == VTK_OK)
+    if(this->Internal->IDToMessageMap.find(id.ID) !=
+       this->Internal->IDToMessageMap.end())
       {
       ostrstream error;
       error << "Attempt to create object with existing ID " << id.ID << "."
@@ -449,7 +425,13 @@ vtkClientServerInterpreter
 
     // Find the ID in the map.
     vtkClientServerStream* item = 0;
-    if(this->IDToMessageMap->GetItem(id.ID, item) != VTK_OK)
+    vtkClientServerInterpreterInternals::IDToMessageMapType::iterator itemi;
+    itemi = this->Internal->IDToMessageMap.find(id.ID);
+    if(itemi != this->Internal->IDToMessageMap.end())
+      {
+      item = itemi->second;
+      }
+    else
       {
       *this->LastResultMessage
         << vtkClientServerStream::Error
@@ -469,7 +451,7 @@ vtkClientServerInterpreter
       }
 
     // Remove the ID from the map.
-    this->IDToMessageMap->RemoveItem(id.ID);
+    this->Internal->IDToMessageMap.erase(id.ID);
 
     // Delete the entry's value.
     delete item;
@@ -515,8 +497,8 @@ vtkClientServerInterpreter
       }
 
     // Make sure the ID doesn't exist.
-    vtkClientServerStream* tmp;
-    if(this->IDToMessageMap->GetItem(id.ID, tmp) == VTK_OK)
+    if(this->Internal->IDToMessageMap.find(id.ID) !=
+       this->Internal->IDToMessageMap.end())
       {
       ostrstream error;
       error << "Attempt to assign existing ID " << id.ID << "." << ends;
@@ -538,8 +520,9 @@ vtkClientServerInterpreter
 
     // Copy the result to store it in the map.  The result itself
     // remains unchanged.
+    vtkClientServerStream* tmp;
     tmp = new vtkClientServerStream(*this->LastResultMessage);
-    this->IDToMessageMap->SetItem(id.ID, tmp);
+    this->Internal->IDToMessageMap[id.ID] = tmp;
     return 1;
     }
   else
@@ -624,10 +607,11 @@ const vtkClientServerStream*
 vtkClientServerInterpreter::GetMessageFromID(vtkClientServerID id)
 {
   // Find the message in the map.
-  vtkClientServerStream* tmp;
-  if(id.ID > 0 && this->IDToMessageMap->GetItem(id.ID, tmp) == VTK_OK)
+  vtkClientServerInterpreterInternals::IDToMessageMapType::iterator tmp;
+  tmp = this->Internal->IDToMessageMap.find(id.ID);
+  if(id.ID > 0 && tmp != this->Internal->IDToMessageMap.end())
     {
-    return tmp;
+    return tmp->second;
     }
   else
     {
@@ -660,7 +644,7 @@ int vtkClientServerInterpreter::NewInstance(vtkObjectBase* obj,
   // have to be checked.
   vtkClientServerStream* entry =
     new vtkClientServerStream(*this->LastResultMessage);
-  this->IDToMessageMap->SetItem(id.ID, entry);
+  this->Internal->IDToMessageMap[id.ID] = entry;
   return 1;
 }
 
@@ -706,7 +690,7 @@ void
 vtkClientServerInterpreter
 ::AddCommandFunction(const char* cname, vtkClientServerCommandFunction func)
 {
-  this->ClassToFunctionMap->SetItem(cname, func);
+  this->Internal->ClassToFunctionMap[cname] = func;
 }
 
 //----------------------------------------------------------------------------
@@ -716,14 +700,15 @@ vtkClientServerInterpreter::GetCommandFunction(vtkObjectBase* obj)
   if(obj)
     {
     // Lookup the function for this object's class.
-    vtkClientServerCommandFunction res = 0;
     const char* cname = obj->GetClassName();
-    this->ClassToFunctionMap->GetItem(cname, res);
-    if(!res)
+    vtkClientServerInterpreterInternals::ClassToFunctionMapType::iterator res;
+    res = this->Internal->ClassToFunctionMap.find(cname);
+    if(res == this->Internal->ClassToFunctionMap.end())
       {
       vtkErrorMacro("Cannot find command function for \"" << cname << "\".");
+      return 0;
       }
-    return res;
+    return res->second;
     }
   else
     {

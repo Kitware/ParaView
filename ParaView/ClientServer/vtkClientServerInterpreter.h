@@ -28,10 +28,6 @@
 
 #include "vtkClientServerID.h" // Needed for vtkClientServerID.
 
-//BTX
-template<class KeyType, class DataType> class vtkHashMap;
-//ETX
-
 class vtkClientServerInterpreter;
 class vtkClientServerInterpreterCommand;
 class vtkClientServerInterpreterInternals;
@@ -148,15 +144,6 @@ public:
   int Load(const char* moduleName);
   int Load(const char* moduleName, const char*const* optionalPaths);
 protected:
-  // Map from ID to message stream.
-  typedef vtkHashMap<vtkTypeUInt32, vtkClientServerStream*> IDToMessageMapType;
-  IDToMessageMapType *IDToMessageMap;
-
-  // Map from class name to command function.
-  typedef vtkHashMap<const char*, vtkClientServerCommandFunction>
-          ClassToFunctionMapType;
-  ClassToFunctionMapType* ClassToFunctionMap;
-
   // constructor and destructor
   vtkClientServerInterpreter();
   ~vtkClientServerInterpreter();
