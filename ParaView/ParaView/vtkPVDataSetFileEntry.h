@@ -50,7 +50,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkPVFileEntry.h"
 
-class vtkDataSetReader;
+class vtkPDataSetReader;
 
 class VTK_EXPORT vtkPVDataSetFileEntry : public vtkPVFileEntry
 {
@@ -80,7 +80,7 @@ protected:
   vtkPVDataSetFileEntry();
   ~vtkPVDataSetFileEntry();
   
-  vtkDataSetReader *TypeReader;
+  vtkPDataSetReader *TypeReader;
   int Type;
 
   vtkPVDataSetFileEntry(const vtkPVDataSetFileEntry&); // Not implemented
