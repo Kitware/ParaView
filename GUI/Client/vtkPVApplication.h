@@ -22,7 +22,6 @@
 
 #include "vtkKWApplication.h"
 class vtkPVProcessModule;
-class vtkPVRenderModule;
 
 class vtkDataSet;
 class vtkKWMessageDialog;
@@ -290,11 +289,11 @@ public:
   // Description:
   // This root class name will eventually be replaced
   // with an XML specification of rendering module classes.
-  vtkGetStringMacro(RenderModuleName);
+  vtkGetStringMacro(OldRenderModuleName);
 
   // Description:
   // I have ParaView.cxx set the proper default render module.
-  vtkSetStringMacro(RenderModuleName);  
+  vtkSetStringMacro(OldRenderModuleName);  
 
   // Description:
   // This is used (Unix only) to obtain the path of the executable.
@@ -411,7 +410,7 @@ protected:
   virtual void FindApplicationInstallationDirectory();
 
   vtkPVProcessModule *ProcessModule;
-  char* RenderModuleName;
+  char* OldRenderModuleName;
 
   // For running with SGI pipes.
   int NumberOfPipes;

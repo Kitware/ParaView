@@ -43,7 +43,7 @@ struct vtkProcessModuleInternals
 };
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkProcessModule, "1.5");
+vtkCxxRevisionMacro(vtkProcessModule, "1.6");
 vtkCxxSetObjectMacro(vtkProcessModule, RenderModule, vtkPVRenderModule);
 
 //----------------------------------------------------------------------------
@@ -97,6 +97,7 @@ vtkProcessModule::vtkProcessModule()
   this->ProgressRequests = 0;
   this->ProgressHandler = vtkPVProgressHandler::New();
   this->RenderModule = 0;
+  this->RenderModuleName = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -117,6 +118,7 @@ vtkProcessModule::~vtkProcessModule()
   this->Observer->Delete();
   this->Observer = 0;
   this->SetRenderModule(0);
+  this->SetRenderModuleName(0);
 
   delete this->Internals;
 }
@@ -606,6 +608,48 @@ void vtkProcessModule::ExecuteEvent(vtkObject *o, unsigned long event, void* cal
       }
     break;
     }
+}
+
+//----------------------------------------------------------------------------
+int vtkProcessModule::SetupRenderModule()
+{
+  cout << "Creating process module: " << this->RenderModuleName << endl;
+  // Create the rendering module here.
+  char* rmClassName;
+  rmClassName = new char[strlen(this->RenderModuleName) + 20];
+  sprintf(rmClassName, "vtkPV%s", this->RenderModuleName);
+  vtkObject* o = vtkInstantiator::CreateInstance(rmClassName);
+  vtkPVRenderModule* rm = vtkPVRenderModule::SafeDownCast(o);
+  if (rm == 0)
+    {
+    vtkErrorMacro("Could not create render module " << rmClassName);
+    this->SetRenderModuleName("RenderModule");
+    o = vtkInstantiator::CreateInstance("vtkPVRenderModule");
+    rm = vtkPVRenderModule::SafeDownCast(o);
+    if ( rm == 0 )
+      {
+      vtkErrorMacro("Could not create the render module.");
+      return 0;
+      }
+    }
+  if (this->ProcessModule == NULL)
+    {
+    vtkErrorMacro("missing ProcessModule");
+    return 0;
+    }
+  else
+    { // Looks like a circular reference to me!
+    this->SetRenderModule(rm);
+    rm->SetProcessModule(this);
+    }
+  o->Delete();
+  o = NULL;
+  rm = NULL;
+
+  delete [] rmClassName;
+  rmClassName = NULL;
+
+  return 1;
 }
 
 //----------------------------------------------------------------------------

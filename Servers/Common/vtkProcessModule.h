@@ -224,6 +224,18 @@ public:
   void SetRenderModule(vtkPVRenderModule *module);
   vtkPVRenderModule* GetRenderModule() { return this->RenderModule;}
   
+  // Description:
+  // This root class name will eventually be replaced
+  // with an XML specification of rendering module classes.
+  vtkGetStringMacro(RenderModuleName);
+
+  // Description:
+  // I have ParaView.cxx set the proper default render module.
+  vtkSetStringMacro(RenderModuleName);  
+
+  // Create and start using render module
+  int SetupRenderModule();
+
 protected:
   vtkProcessModule();
   ~vtkProcessModule();
@@ -277,6 +289,7 @@ protected:
 
   vtkProcessModuleObserver* Observer;
   vtkPVRenderModule *RenderModule;
+  char* RenderModuleName;
 
 private:
   vtkProcessModule(const vtkProcessModule&); // Not implemented

@@ -180,37 +180,8 @@ int MyMain(int argc, char *argv[])
     // application name to be set)
     
     app->GetApplicationSettingsFromRegistery();
-    
-    // The client chooses a render module.
-    if (app->GetRenderModuleName() == NULL)
-      { // The render module has not been set by the user.  Choose a default.
-      if (app->GetUseTiledDisplay())
-        {
-#if defined(PARAVIEW_USE_ICE_T) && defined(VTK_USE_MPI)
-        app->SetRenderModuleName("IceTRenderModule");
-#else
-        app->SetRenderModuleName("MultiDisplayRenderModule");
-#endif
-        }
-      else if (app->GetClientMode())
-        { // Client server, no tiled display.
-#if defined(PARAVIEW_USE_ICE_T) && defined(VTK_USE_MPI)
-        app->SetRenderModuleName("DeskTopRenderModule");
-#else
-        app->SetRenderModuleName("MPIRenderModule");
-#endif        
-        }
-      else
-        { // Single process, or one MPI program
-#ifdef VTK_USE_MPI
-        app->SetRenderModuleName("MPIRenderModule");
-#else
-        app->SetRenderModuleName("LODRenderModule");
-#endif
-        }
-      }
     }
-  
+
   // Create the process module for initializing the processes.
   // Only the root server processes args.
   if (app->GetClientMode() || serverMode || renderServerMode) 
@@ -251,6 +222,44 @@ int MyMain(int argc, char *argv[])
 #endif
     pm = processModule;
     }
+
+  if ( app->GetOldRenderModuleName() )
+    {
+    pm->SetRenderModuleName(app->GetOldRenderModuleName());
+    }
+
+  if ( myId == 0 )
+    {
+    // The client chooses a render module.
+    if (pm->GetRenderModuleName() == NULL)
+      { // The render module has not been set by the user.  Choose a default.
+      if (app->GetUseTiledDisplay())
+        {
+#if defined(PARAVIEW_USE_ICE_T) && defined(VTK_USE_MPI)
+        pm->SetRenderModuleName("IceTRenderModule");
+#else
+        pm->SetRenderModuleName("MultiDisplayRenderModule");
+#endif
+        }
+      else if (app->GetClientMode())
+        { // Client server, no tiled display.
+#if defined(PARAVIEW_USE_ICE_T) && defined(VTK_USE_MPI)
+        pm->SetRenderModuleName("DeskTopRenderModule");
+#else
+        pm->SetRenderModuleName("MPIRenderModule");
+#endif        
+        }
+      else
+        { // Single process, or one MPI program
+#ifdef VTK_USE_MPI
+        pm->SetRenderModuleName("MPIRenderModule");
+#else
+        pm->SetRenderModuleName("LODRenderModule");
+#endif
+        }
+      }
+    }
+  
   
   app->SetProcessModule(pm);
   pm->InitializeInterpreter();

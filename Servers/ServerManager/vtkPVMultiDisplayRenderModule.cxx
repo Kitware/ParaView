@@ -28,7 +28,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVMultiDisplayRenderModule);
-vtkCxxRevisionMacro(vtkPVMultiDisplayRenderModule, "1.2");
+vtkCxxRevisionMacro(vtkPVMultiDisplayRenderModule, "1.3");
 
 
 
@@ -48,10 +48,10 @@ vtkPVMultiDisplayRenderModule::~vtkPVMultiDisplayRenderModule()
 
 
 //----------------------------------------------------------------------------
-void vtkPVMultiDisplayRenderModule::SetProcessModule(vtkPVProcessModule *pm)
+void vtkPVMultiDisplayRenderModule::SetProcessModule(vtkProcessModule *pm)
 {
   this->Superclass::SetProcessModule(pm);
-  if (pm == NULL)
+  if (this->ProcessModule == NULL)
     {
     return;
     }
@@ -68,7 +68,7 @@ void vtkPVMultiDisplayRenderModule::SetProcessModule(vtkPVProcessModule *pm)
 
   this->Composite = NULL;
   this->CompositeID = pm->NewStreamObject("vtkMultiDisplayManager");
-  int *tileDim = pm->GetServerInformation()->GetTileDimensions();
+  int *tileDim = this->ProcessModule->GetServerInformation()->GetTileDimensions();
   pm->GetStream()
     << vtkClientServerStream::Invoke
     << this->CompositeID << "SetTileDimensions"
@@ -76,7 +76,7 @@ void vtkPVMultiDisplayRenderModule::SetProcessModule(vtkPVProcessModule *pm)
     << vtkClientServerStream::End;
   pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
 
-  if (pm->GetClientMode())
+  if (this->ProcessModule->GetClientMode())
     {
     pm->GetStream()
       << vtkClientServerStream::Invoke
@@ -130,7 +130,7 @@ void vtkPVMultiDisplayRenderModule::SetProcessModule(vtkPVProcessModule *pm)
 vtkPVPartDisplay* vtkPVMultiDisplayRenderModule::CreatePartDisplay()
 {
   vtkPVPartDisplay* pDisp = vtkPVMultiDisplayPartDisplay::New();
-  pDisp->SetProcessModule(this->GetProcessModule());
+  pDisp->SetProcessModule(this->ProcessModule);
   return pDisp;
 }
 
@@ -147,7 +147,7 @@ void vtkPVMultiDisplayRenderModule::StillRender()
   vtkPVLODPartDisplayInformation* info;
   unsigned long totalMemory = 0;
   int localRender;
-  vtkPVProcessModule* pm = this->GetProcessModule();
+  vtkPVProcessModule* pm = this->ProcessModule;
 
   // Find out whether we are going to render localy.
   this->Displays->InitTraversal();
@@ -220,7 +220,7 @@ void vtkPVMultiDisplayRenderModule::StillRender()
   this->RenderWindow->SetDesiredUpdateRate(0.002);
   // this->GetPVWindow()->GetInteractor()->GetStillUpdateRate());
 
-  this->GetProcessModule()->SetGlobalLODFlag(0);
+  this->ProcessModule->SetGlobalLODFlag(0);
 
   // This is the only thing I believe makes a difference
   // for this sublcass !!!!!!
@@ -228,7 +228,7 @@ void vtkPVMultiDisplayRenderModule::StillRender()
     {
     // A bit of a hack to have client use LOD 
     // which may be different than satellites.
-    this->GetProcessModule()->SetGlobalLODFlagInternal(1);
+    this->ProcessModule->SetGlobalLODFlagInternal(1);
     }
 
   vtkTimerLog::MarkStartEvent("Still Render");
@@ -239,7 +239,7 @@ void vtkPVMultiDisplayRenderModule::StillRender()
   // it will get stuck in high res on satellites.
   if ( ! localRender)
     {
-    this->GetProcessModule()->SetGlobalLODFlagInternal(0);
+    this->ProcessModule->SetGlobalLODFlagInternal(0);
     }
 }
 
@@ -255,7 +255,7 @@ void vtkPVMultiDisplayRenderModule::InteractiveRender()
   unsigned long tmpMemory;
   int localRender;
   int useLOD;
-  vtkPVProcessModule* pm = this->GetProcessModule();
+  vtkPVProcessModule* pm = this->ProcessModule;
 
   // Compute memory totals.
   this->Displays->InitTraversal();
@@ -276,13 +276,13 @@ void vtkPVMultiDisplayRenderModule::InteractiveRender()
     {
     useLOD = 0;
     tmpMemory = totalGeoMemory;
-    this->GetProcessModule()->SetGlobalLODFlag(0);
+    this->ProcessModule->SetGlobalLODFlag(0);
     }
   else
     {
     useLOD = 1;
     tmpMemory = totalLODMemory;
-    this->GetProcessModule()->SetGlobalLODFlag(1);
+    this->ProcessModule->SetGlobalLODFlag(1);
     }
 
   // MakeCollection Decision.
@@ -365,7 +365,7 @@ void vtkPVMultiDisplayRenderModule::InteractiveRender()
     {
     // A bit of a hack to have client use LOD 
     // which may be different than satellites.
-    this->GetProcessModule()->SetGlobalLODFlagInternal(1);
+    this->ProcessModule->SetGlobalLODFlagInternal(1);
     }
 
   // Still Render can get called some funky ways.
@@ -384,7 +384,7 @@ void vtkPVMultiDisplayRenderModule::InteractiveRender()
   // it will get stuck in high res on satellites.
   if ( ! localRender)
     {
-    this->GetProcessModule()->SetGlobalLODFlagInternal(useLOD);
+    this->ProcessModule->SetGlobalLODFlagInternal(useLOD);
     }
 
 
@@ -395,7 +395,7 @@ void vtkPVMultiDisplayRenderModule::SetUseCompositeCompression(int val)
 {
   if (this->CompositeID.ID)
     {
-    vtkPVProcessModule* pm = this->GetProcessModule();
+    vtkPVProcessModule* pm = this->ProcessModule;
     pm->GetStream()
       << vtkClientServerStream::Invoke
       << this->CompositeID << "SetUseCompositeCompression" << val

@@ -39,6 +39,7 @@
 #include "vtkTimerLog.h"
 #include "vtkProcessModuleGUIHelper.h"
 #include "vtkPVServerInformation.h"
+#include "vtkInstantiator.h"
 
 // initialze the class variables
 int vtkPVProcessModule::GlobalLODFlag = 0;
@@ -46,7 +47,7 @@ int vtkPVProcessModule::GlobalLODFlag = 0;
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProcessModule);
-vtkCxxRevisionMacro(vtkPVProcessModule, "1.15");
+vtkCxxRevisionMacro(vtkPVProcessModule, "1.16");
 
 //----------------------------------------------------------------------------
 vtkPVProcessModule::vtkPVProcessModule()
@@ -108,6 +109,10 @@ int vtkPVProcessModule::Start(int argc, char **argv)
     {
     this->Controller = vtkDummyController::New();
     vtkMultiProcessController::SetGlobalController(this->Controller);
+    }
+  if ( !this->SetupRenderModule() )
+    {
+    return -1;
     }
   return this->GUIHelper->RunGUIStart(argc, argv, 1, 0);
 }

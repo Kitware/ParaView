@@ -20,6 +20,7 @@
 #include "vtkDoubleArray.h"
 #include "vtkLongArray.h"
 #include "vtkFloatArray.h"
+#include "vtkCharArray.h"
 #include "vtkImageData.h"
 #include "vtkPointData.h"
 #include "vtkIntArray.h"
@@ -34,8 +35,10 @@
 #include <sys/stat.h>
 #include <hdf5.h>
 
+#define VTK_HDF5_DEBUG 1
+
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkHDF5RawImageReader, "1.12");
+vtkCxxRevisionMacro(vtkHDF5RawImageReader, "1.13");
 vtkStandardNewMacro(vtkHDF5RawImageReader);
 
 //----------------------------------------------------------------------------
@@ -314,6 +317,9 @@ void vtkHDF5RawImageReader::Execute()
                               h_start, h_stride, h_count, 0) < 0)
       {
       vtkErrorMacro("Cannot select file hyperslab.");
+#ifdef VTK_HDF5_DEBUG
+      cout << "Cannot select file hyperslab" << endl;
+#endif
       result = 0;
       }
     hid_t memspace = H5Screate_simple(this->Rank, h_count, 0);
@@ -322,6 +328,9 @@ void vtkHDF5RawImageReader::Execute()
                               moffset, 0, h_count, 0) < 0)
       {
       vtkErrorMacro("Cannot select memory hyperslab.");
+#ifdef VTK_HDF5_DEBUG
+      cout << "Cannot select memory hyperslab" << endl;
+#endif
       result = 0;
       }
     read_memspace = memspace;
@@ -355,6 +364,10 @@ void vtkHDF5RawImageReader::Execute()
         data = vtkFloatArray::New();
         datatype = H5T_NATIVE_FLOAT;
         break;
+      case VTK_CHAR:
+        data = vtkCharArray::New();
+        datatype = H5T_NATIVE_CHAR;
+        break;
       case VTK_INT:
         data = vtkIntArray::New();
         datatype = H5T_NATIVE_INT;
@@ -369,6 +382,7 @@ void vtkHDF5RawImageReader::Execute()
         break;
       default:
         // This should never happen.  No other formats will have been set.
+        vtkErrorMacro("This should never happen.  No other formats will have been set.");
         result = 0;
         continue;
       }
@@ -390,6 +404,7 @@ void vtkHDF5RawImageReader::Execute()
                     H5P_DEFAULT, data->GetVoidPointer(0)) >= 0)
         {
         this->GetOutput()->GetPointData()->AddArray(data);
+        this->GetOutput()->GetPointData()->SetActiveScalars(name);
         }
       else
         {
@@ -516,6 +531,10 @@ int vtkHDF5RawImageReaderVisit(hid_t loc_id, const char* name, void* opdata)
       {
       ds.format = VTK_DOUBLE;
       }
+    else if(dclass == H5T_INTEGER && precision == 8)
+      {
+      ds.format = VTK_CHAR;
+      }
     else if(dclass == H5T_INTEGER && precision == 16)
       {
       ds.format = VTK_HDF5_TYPE_INT16;
@@ -526,6 +545,9 @@ int vtkHDF5RawImageReaderVisit(hid_t loc_id, const char* name, void* opdata)
       }
     else
       {
+#ifdef VTK_HDF5_DEBUG
+      cout << "Here" << endl;
+#endif
       H5Tclose(datatype);
       H5Dclose(dataset);
       return 0;

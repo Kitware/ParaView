@@ -29,7 +29,7 @@
 #include "vtkTimerLog.h"
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkPVRenderModule, "1.1");
+vtkCxxRevisionMacro(vtkPVRenderModule, "1.2");
 
 //===========================================================================
 //***************************************************************************
@@ -90,7 +90,7 @@ vtkPVRenderModule::vtkPVRenderModule()
 //----------------------------------------------------------------------------
 vtkPVRenderModule::~vtkPVRenderModule()
 {
-  vtkPVProcessModule* pm = this->ProcessModule;
+  vtkProcessModule* pm = this->ProcessModule;
   
   if (this->Renderer && this->ResetCameraClippingRangeTag > 0)
     {
@@ -169,11 +169,20 @@ void vtkPVRenderModule::StartRenderEvent()
 
 
 //----------------------------------------------------------------------------
-void vtkPVRenderModule::SetProcessModule(vtkPVProcessModule *pm)
+vtkProcessModule* vtkPVRenderModule::GetProcessModule()
 {
+  return this->ProcessModule;
+}
+
+//#############################
+//#############################
+//----------------------------------------------------------------------------
+void vtkPVRenderModule::SetProcessModule(vtkProcessModule *pm)
+{
+  vtkPVProcessModule* pvm = vtkPVProcessModule::SafeDownCast(pm);
   if (this->ProcessModule)
     {
-    if (pm == NULL)
+    if (pvm == NULL)
       {
       this->ProcessModule->UnRegister(this);
       this->ProcessModule = NULL;
@@ -182,46 +191,44 @@ void vtkPVRenderModule::SetProcessModule(vtkPVProcessModule *pm)
     vtkErrorMacro("ProcessModule already set.");
     return;
     }
-  if (pm == NULL)
+  if (pvm == NULL)
     {
     return;
     }  
-  vtkClientServerStream& stream = pm->GetStream();
+
+  vtkClientServerStream& stream = pvm->GetStream();
   // Maybe I should not reference count this object to avoid
   // a circular reference.
-  this->ProcessModule = pm;
+  this->ProcessModule = pvm;
   this->ProcessModule->Register(this);
 
-  this->RendererID = pm->NewStreamObject("vtkRenderer");
-  this->Renderer2DID = pm->NewStreamObject("vtkRenderer");
-  this->RenderWindowID = pm->NewStreamObject("vtkRenderWindow");
-  pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
+  this->RendererID = pvm->NewStreamObject("vtkRenderer");
+  this->Renderer2DID = pvm->NewStreamObject("vtkRenderer");
+  this->RenderWindowID = pvm->NewStreamObject("vtkRenderWindow");
+  pvm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
   this->Renderer = 
     vtkRenderer::SafeDownCast(
-      pm->GetObjectFromID(this->RendererID));
+      pvm->GetObjectFromID(this->RendererID));
   this->Renderer2D = 
     vtkRenderer::SafeDownCast(
-      pm->GetObjectFromID(this->Renderer2DID));
+      pvm->GetObjectFromID(this->Renderer2DID));
   this->RenderWindow = 
     vtkRenderWindow::SafeDownCast(
-      pm->GetObjectFromID(this->RenderWindowID));
+      pvm->GetObjectFromID(this->RenderWindowID));
 
-  if (pm->GetUseStereoRendering())
+  if (pvm->GetUseStereoRendering())
     {
-    pm->GetStream() << vtkClientServerStream::Invoke << this->RenderWindowID 
-                    << "StereoCapableWindowOn" 
-                    << vtkClientServerStream::End;
-    pm->GetStream() << vtkClientServerStream::Invoke << this->RenderWindowID 
-                    << "StereoRenderOn" 
-                    << vtkClientServerStream::End;
-    //pm->GetStream() << vtkClientServerStream::Invoke << this->RenderWindowID 
+    stream << vtkClientServerStream::Invoke << this->RenderWindowID 
+      << "StereoCapableWindowOn" 
+      << vtkClientServerStream::End;
+    stream << vtkClientServerStream::Invoke << this->RenderWindowID 
+      << "StereoRenderOn" 
+      << vtkClientServerStream::End;
+    //stream << vtkClientServerStream::Invoke << this->RenderWindowID 
     //                << "SetStereoTypeToCrystalEyes" 
     //                << vtkClientServerStream::End;
-    pm->SendStream(vtkProcessModule::RENDER_SERVER);
-    }
+    pvm->SendStream(vtkProcessModule::RENDER_SERVER);
 
-  if (pm->GetUseStereoRendering())
-    {
     this->RenderWindow->StereoCapableWindowOn();
     this->RenderWindow->StereoRenderOn();
     }
@@ -242,10 +249,12 @@ void vtkPVRenderModule::SetProcessModule(vtkPVProcessModule *pm)
   stream << vtkClientServerStream::Invoke
          << this->RenderWindowID << "AddRenderer" << this->Renderer2DID
          << vtkClientServerStream::End;
-  pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
+  pvm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
 
   this->InitializeObservers();
 }
+//#############################E
+//#############################E
 
 //----------------------------------------------------------------------------
 // This is a bit of a pain.  I do ResetCameraClippingRange as a call back
@@ -325,7 +334,7 @@ vtkRenderer *vtkPVRenderModule::GetRenderer2D()
 //----------------------------------------------------------------------------
 void vtkPVRenderModule::SetBackgroundColor(float r, float g, float b)
 {
-  vtkPVProcessModule *pm = this->GetProcessModule();
+  vtkProcessModule *pm = this->GetProcessModule();
   vtkClientServerStream& stream = pm->GetStream();
   stream << vtkClientServerStream::Invoke << this->RendererID << "SetBackground"
          << r << g << b << vtkClientServerStream::End;
@@ -353,7 +362,7 @@ void vtkPVRenderModule::StillRender()
   // We could convert them to call a method on the module directly ...
   this->Renderer->ResetCameraClippingRange();
 
-  this->GetProcessModule()->SetGlobalLODFlag(0);
+  this->ProcessModule->SetGlobalLODFlag(0);
   vtkTimerLog::MarkStartEvent("Still Render");
   this->RenderWindow->SetDesiredUpdateRate(0.002);
   this->RenderWindow->Render();

@@ -45,7 +45,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSimpleRenderModule);
-vtkCxxRevisionMacro(vtkPVSimpleRenderModule, "1.3");
+vtkCxxRevisionMacro(vtkPVSimpleRenderModule, "1.4");
 
 
 //----------------------------------------------------------------------------
@@ -141,13 +141,13 @@ void vtkPVSimpleRenderModule::ComputeVisiblePropBounds(double bds[6])
 vtkPVPartDisplay* vtkPVSimpleRenderModule::CreatePartDisplay()
 {
   vtkPVPartDisplay* pDisp = vtkPVPartDisplay::New();
-  pDisp->SetProcessModule(this->GetProcessModule());
+  pDisp->SetProcessModule(this->ProcessModule);
   return pDisp;
 }
 //----------------------------------------------------------------------------
 void vtkPVSimpleRenderModule::AddSource(vtkSMSourceProxy *s)
 {
-  vtkPVProcessModule *pm = this->GetProcessModule();
+  vtkPVProcessModule *pm = this->ProcessModule;
   vtkSMPart *part;
   vtkPVPartDisplay *pDisp;
   int num, idx;
@@ -184,7 +184,7 @@ void vtkPVSimpleRenderModule::AddSource(vtkSMSourceProxy *s)
 void vtkPVSimpleRenderModule::RemoveSource(vtkSMSourceProxy *s)
 {
   int idx, num;
-  vtkPVProcessModule *pm = this->GetProcessModule();
+  vtkPVProcessModule *pm = this->ProcessModule;
   vtkSMPart *part;
   vtkPVPartDisplay *pDisp;
 
@@ -223,7 +223,7 @@ void vtkPVSimpleRenderModule::UpdateAllDisplays()
 {
   vtkObject* object;
   vtkPVPartDisplay* pDisp;
-  vtkPVProcessModule* pm = this->GetProcessModule();
+  vtkPVProcessModule* pm = this->ProcessModule;
   pm->SendPrepareProgress();
 
   this->Displays->InitTraversal();
@@ -245,7 +245,7 @@ void vtkPVSimpleRenderModule::SetUseTriangleStrips(int val)
   vtkPVPartDisplay* pDisp;
   vtkPVProcessModule *pm;
 
-  pm = this->GetProcessModule();
+  pm = this->ProcessModule;
 
   this->Displays->InitTraversal();
   while ( (object = this->Displays->GetNextItemAsObject()) )

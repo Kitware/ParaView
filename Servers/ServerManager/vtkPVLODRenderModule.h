@@ -35,7 +35,7 @@ public:
   // Description:
   // In Addition to the superclass call, this method sets up
   // abort check observer on the render widnow.
-  virtual void SetProcessModule(vtkPVProcessModule *pm);
+  virtual void SetProcessModule(vtkProcessModule *pm);
 
   // Description:
   // This method makes the descision on whether to use LOD for rendering.

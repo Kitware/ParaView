@@ -32,7 +32,7 @@ public:
 
   // Description:
   // Set the ProcessModule right after construction.
-  virtual void SetProcessModule(vtkPVProcessModule *pm);
+  virtual void SetProcessModule(vtkProcessModule *pm);
 
   // Description:
   // Always collect when using LOD

@@ -34,7 +34,6 @@
 #include "vtkDirectory.h"
 #include "vtkDoubleArray.h"
 #include "vtkFloatArray.h"
-#include "vtkInstantiator.h"
 #include "vtkIntArray.h"
 #include "vtkKWApplicationSettingsInterface.h"
 #include "vtkKWDialog.h"
@@ -55,7 +54,6 @@
 #include "vtkPVHelpPaths.h"
 #include "vtkPVProcessModule.h"
 #include "vtkPVProcessModuleGUIHelper.h"
-#include "vtkPVRenderModule.h"
 #include "vtkPVRenderView.h"
 #include "vtkPVSource.h"
 #include "vtkPVSourceCollection.h"
@@ -112,7 +110,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.307");
+vtkCxxRevisionMacro(vtkPVApplication, "1.308");
 
 
 int vtkPVApplicationCommand(ClientData cd, Tcl_Interp *interp,
@@ -282,6 +280,10 @@ public:
     else
       {
       this->Errors.push_back(t);
+      if ( this->CrashOnErrors )
+        {
+        vtkPVApplication::Abort();
+        }
       }
   }
   
@@ -290,6 +292,7 @@ public:
     this->Windows = 0;
     this->ErrorOccurred = 0;
     this->TestErrors = 1;
+    this->CrashOnErrors = 0;
   }
 
   ~vtkPVOutputWindow()
@@ -331,12 +334,16 @@ public:
     return this->ErrorOccurred;
     }
 
+  vtkSetClampMacro(CrashOnErrors, int, 0, 1);
+  vtkBooleanMacro(CrashOnErrors, int);
+
   void EnableTestErrors() { this->TestErrors = 1; }
   void DisableTestErrors() { this->TestErrors = 0; }
 protected:
   vtkKWWindowCollection *Windows;
   int ErrorOccurred;
   int TestErrors;
+  int CrashOnErrors;
   vtkstd::vector<vtkstd::string> Errors;
 private:
   vtkPVOutputWindow(const vtkPVOutputWindow&);
@@ -417,7 +424,7 @@ vtkPVApplication::vtkPVApplication()
   this->RunningParaViewScript = 0;
 
   this->ProcessModule = NULL;
-  this->RenderModuleName = NULL;
+  this->OldRenderModuleName = NULL;
   this->CommandFunction = vtkPVApplicationCommand;
 
   this->NumberOfPipes = 1;
@@ -489,7 +496,7 @@ vtkPVApplication::~vtkPVApplication()
   vtkOutputWindow::SetInstance(0);
 
   this->SetProcessModule(NULL);
-  this->SetRenderModuleName(NULL);
+  this->SetOldRenderModuleName(NULL);
   if ( this->TraceFile )
     {
     delete this->TraceFile;
@@ -1169,7 +1176,7 @@ int vtkPVApplication::ParseCommandLineArguments(int argc, char*argv[])
           }
         }
       this->SetCaveConfigurationFileName(newarg);
-      this->SetRenderModuleName("CaveRenderModule");
+      this->SetOldRenderModuleName("CaveRenderModule");
       }
   
     if ( vtkPVApplication::CheckForArgument(argc, argv, "--render-node-port",
@@ -1329,7 +1336,7 @@ int vtkPVApplication::ParseCommandLineArguments(int argc, char*argv[])
         newarg = &(argv[index][i+1]);
         }
       }
-    this->SetRenderModuleName(newarg);
+    this->SetOldRenderModuleName(newarg);
     }
     
   if ( vtkPVApplication::CheckForArgument(argc, argv, "--disable-composite",
@@ -1344,6 +1351,7 @@ int vtkPVApplication::ParseCommandLineArguments(int argc, char*argv[])
       index) == VTK_OK )
     {
     this->CrashOnErrors = 1;
+    this->OutputWindow->CrashOnErrorsOn();
     }
 
   return 0;
@@ -1515,39 +1523,6 @@ void vtkPVApplication::Start(int argc, char*argv[])
     return;
     }
 
-  // Create the rendering module here.
-  char* rmClassName;
-  rmClassName = new char[strlen(this->RenderModuleName) + 20];
-  sprintf(rmClassName, "vtkPV%s", this->RenderModuleName);
-  vtkObject* o = vtkInstantiator::CreateInstance(rmClassName);
-  vtkPVRenderModule* rm = vtkPVRenderModule::SafeDownCast(o);
-  if (rm == 0)
-    {
-    vtkErrorMacro("Could not create render module " << rmClassName);
-    this->SetRenderModuleName("RenderModule");
-    o = vtkInstantiator::CreateInstance("vtkPVRenderModule");
-    rm = vtkPVRenderModule::SafeDownCast(o);
-    if ( rm == 0 )
-      {
-      vtkErrorMacro("Could not create the render module.");
-      return;
-      }
-    }
-  if (this->ProcessModule == NULL)
-    {
-    vtkErrorMacro("missing ProcessModule");
-    }
-  else
-    { // Looks like a circular reference to me!
-    this->ProcessModule->SetRenderModule(rm);
-    rm->SetProcessModule(this->ProcessModule);
-    }
-  o->Delete();
-  o = NULL;
-  rm = NULL;
-
-  delete [] rmClassName;
-  rmClassName = NULL;
 
   vtkstd::vector<vtkstd::string> open_files;
   // If any of the arguments has a .pvs extension, load it as a script.
@@ -2075,8 +2050,6 @@ void vtkPVApplication::PrintSelf(ostream& os, vtkIndent indent)
     }
 
   os << indent << "UseStereoRendering: " << this->UseStereoRendering << endl;
-  os << indent << "RenderModuleName: " 
-     << (this->RenderModuleName?this->RenderModuleName:"(none)") << endl;
 
   if (this->ClientMode)
     {
@@ -2132,8 +2105,6 @@ void vtkPVApplication::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "Argv0: " 
      << (this->Argv0 ? this->Argv0 : "(none)") << endl;
 
-  os << indent << "RenderModuleName: " 
-    << (this->RenderModuleName?this->RenderModuleName:"(null)") << endl;
   os << indent << "ShowSourcesLongHelp: " 
      << (this->ShowSourcesLongHelp?"on":"off") << endl;
   os << indent << "SourcesBrowserAlwaysShowName: " 

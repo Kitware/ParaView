@@ -32,6 +32,7 @@
 
 class vtkMultiProcessController;
 class vtkPVProcessModule;
+class vtkProcessModule;
 class vtkPVData;
 class vtkSMSourceProxy;
 class vtkPVWindow;
@@ -50,8 +51,8 @@ public:
 
   // Description:
   // Set the application right after construction.
-  virtual void SetProcessModule(vtkPVProcessModule *pm);
-  vtkGetObjectMacro(ProcessModule, vtkPVProcessModule);
+  virtual void SetProcessModule(vtkProcessModule *pm);
+  vtkProcessModule* GetProcessModule();
 
   // Description:
   // Compute the bounding box of all the visibile props

@@ -24,7 +24,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVMPIRenderModule);
-vtkCxxRevisionMacro(vtkPVMPIRenderModule, "1.1");
+vtkCxxRevisionMacro(vtkPVMPIRenderModule, "1.2");
 
 
 
@@ -43,10 +43,10 @@ vtkPVMPIRenderModule::~vtkPVMPIRenderModule()
 
 
 //----------------------------------------------------------------------------
-void vtkPVMPIRenderModule::SetProcessModule(vtkPVProcessModule *pm)
+void vtkPVMPIRenderModule::SetProcessModule(vtkProcessModule *pm)
 {
   this->Superclass::SetProcessModule(pm);
-  if (pm == NULL)
+  if (this->ProcessModule == NULL)
     {
     return;
     }
@@ -61,7 +61,7 @@ void vtkPVMPIRenderModule::SetProcessModule(vtkPVProcessModule *pm)
     pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
     }
 
-  if (pm->GetClientMode() || pm->GetServerMode())
+  if (this->ProcessModule->GetClientMode() || this->ProcessModule->GetServerMode())
     {
     this->Composite = NULL;
     this->CompositeID = pm->NewStreamObject("vtkClientCompositeManager");
@@ -140,7 +140,7 @@ void vtkPVMPIRenderModule::SetProcessModule(vtkPVProcessModule *pm)
       << vtkClientServerStream::Invoke
       << this->CompositeID << "EnableAbortOff" << vtkClientServerStream::End;
     }
-  if ( pm->GetServerInformation()->GetUseOffscreenRendering() )
+  if ( this->ProcessModule->GetServerInformation()->GetUseOffscreenRendering() )
     {
     pm->GetStream()
       << vtkClientServerStream::Invoke << this->CompositeID
@@ -152,7 +152,7 @@ void vtkPVMPIRenderModule::SetProcessModule(vtkPVProcessModule *pm)
 //----------------------------------------------------------------------------
 void vtkPVMPIRenderModule::SetUseCompositeCompression(int val)
 {
-  vtkPVProcessModule *pm = this->GetProcessModule();
+  vtkPVProcessModule *pm = this->ProcessModule;
   vtkClientServerID tmp;
   if (this->CompositeID.ID)
     {

@@ -32,7 +32,7 @@ public:
 
   // Description:
   // Set the application right after construction.
-  virtual void SetProcessModule(vtkPVProcessModule *pm);
+  virtual void SetProcessModule(vtkProcessModule *pm);
 
   void StillRender();
   void InteractiveRender();

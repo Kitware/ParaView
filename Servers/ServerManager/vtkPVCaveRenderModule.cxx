@@ -30,7 +30,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCaveRenderModule);
-vtkCxxRevisionMacro(vtkPVCaveRenderModule, "1.2");
+vtkCxxRevisionMacro(vtkPVCaveRenderModule, "1.3");
 
 
 
@@ -50,10 +50,10 @@ vtkPVCaveRenderModule::~vtkPVCaveRenderModule()
 
 
 //----------------------------------------------------------------------------
-void vtkPVCaveRenderModule::SetProcessModule(vtkPVProcessModule *pm)
+void vtkPVCaveRenderModule::SetProcessModule(vtkProcessModule *pm)
 {
   this->Superclass::SetProcessModule(pm);
-  if (pm == NULL)
+  if (this->ProcessModule == NULL)
     {
     return;
     }
@@ -61,54 +61,54 @@ void vtkPVCaveRenderModule::SetProcessModule(vtkPVProcessModule *pm)
 
   // We had trouble with SGI/aliasing with compositing.
   if (this->RenderWindow->IsA("vtkOpenGLRenderWindow") &&
-      (pm->GetNumberOfPartitions() > 1))
+      (this->ProcessModule->GetNumberOfPartitions() > 1))
     {
-    pm->GetStream() << vtkClientServerStream::Invoke
+    this->ProcessModule->GetStream() << vtkClientServerStream::Invoke
                     << this->RenderWindowID 
                     << "SetMultiSamples" << 0 
                     << vtkClientServerStream::End;
     }
 
   this->Composite = NULL;
-  this->CompositeID = pm->NewStreamObject("vtkCaveRenderManager");
-  pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
+  this->CompositeID = this->ProcessModule->NewStreamObject("vtkCaveRenderManager");
+  this->ProcessModule->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
 
-  if (pm->GetClientMode())
+  if (this->ProcessModule->GetClientMode())
     {
-    pm->GetStream()
+    this->ProcessModule->GetStream()
       << vtkClientServerStream::Invoke
       << this->CompositeID << "SetClientFlag" << 1
       << vtkClientServerStream::End;
-    pm->SendStream(vtkProcessModule::CLIENT);
+    this->ProcessModule->SendStream(vtkProcessModule::CLIENT);
 
-    pm->GetStream()
+    this->ProcessModule->GetStream()
       << vtkClientServerStream::Invoke
-      << pm->GetProcessModuleID() << "GetRenderServerSocketController"
+      << this->ProcessModule->GetProcessModuleID() << "GetRenderServerSocketController"
       << vtkClientServerStream::End;
-    pm->GetStream()
+    this->ProcessModule->GetStream()
       << vtkClientServerStream::Invoke
       << this->CompositeID << "SetSocketController"
       << vtkClientServerStream::LastResult
       << vtkClientServerStream::End;
-    pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
+    this->ProcessModule->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
 
     // Timing of this set is important for server.
     // It has to be after the SocketController has been set,
     // but before the Desplays are defined.
-    pm->GetStream()
+    this->ProcessModule->GetStream()
       << vtkClientServerStream::Invoke
       << this->CompositeID << "InitializeRMIs"
       << vtkClientServerStream::End;
-    pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
+    this->ProcessModule->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
 
     // Setup the tiles.
     // We need a better way to retreive the number of processes
-    numDisplays = pm->GetNumberOfPartitions();
+    numDisplays = this->ProcessModule->GetNumberOfPartitions();
     vtkMPIMToNSocketConnection* m2n = NULL;
-    if (pm->GetMPIMToNSocketConnectionID().ID)
+    if (this->ProcessModule->GetMPIMToNSocketConnectionID().ID)
       {
       m2n = vtkMPIMToNSocketConnection::SafeDownCast(
-        pm->GetObjectFromID(pm->GetMPIMToNSocketConnectionID()));
+        this->ProcessModule->GetObjectFromID(this->ProcessModule->GetMPIMToNSocketConnectionID()));
       }   
    if (m2n)
       {
@@ -119,20 +119,20 @@ void vtkPVCaveRenderModule::SetProcessModule(vtkPVProcessModule *pm)
     }
   else
     { // Timing of this set is important for server.
-    pm->GetStream()
+    this->ProcessModule->GetStream()
       << vtkClientServerStream::Invoke
       << this->CompositeID << "InitializeRMIs"
       << vtkClientServerStream::End;
-    pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
+    this->ProcessModule->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
     }
 
-  pm->GetStream() 
+  this->ProcessModule->GetStream() 
     << vtkClientServerStream::Invoke
     <<  this->CompositeID 
     << "SetRenderWindow"
     << this->RenderWindowID
     << vtkClientServerStream::End;
-  pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
+  this->ProcessModule->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
 }
 
 //----------------------------------------------------------------------------
@@ -171,9 +171,8 @@ void vtkPVCaveRenderModule::LoadConfigurationFile(int numDisplays)
     return;
     }
 
-  vtkPVProcessModule* pm = this->GetProcessModule();
   vtkCaveRenderManager* crm = 
-    vtkCaveRenderManager::SafeDownCast(pm->GetObjectFromID(this->CompositeID));
+    vtkCaveRenderManager::SafeDownCast(this->ProcessModule->GetObjectFromID(this->CompositeID));
 
   for (idx = 0; idx < numDisplays; ++idx)
     { // Just a test case.  Configuration file later.
@@ -190,7 +189,7 @@ void vtkPVCaveRenderModule::LoadConfigurationFile(int numDisplays)
       vtkErrorMacro(<< "Could not read display " << idx);
       return;
       }
-    pm->SetProcessEnvironmentVariable(idx, displayName); 
+    this->ProcessModule->SetProcessEnvironmentVariable(idx, displayName); 
 
     *File >> o[0];
     *File >> o[1];
@@ -222,7 +221,7 @@ void vtkPVCaveRenderModule::LoadConfigurationFile(int numDisplays)
 vtkPVPartDisplay* vtkPVCaveRenderModule::CreatePartDisplay()
 {
   vtkPVMultiDisplayPartDisplay* pDisp = vtkPVMultiDisplayPartDisplay::New();
-  pDisp->SetProcessModule(this->GetProcessModule());
+  pDisp->SetProcessModule(this->ProcessModule);
   return pDisp;
 }
 
@@ -255,7 +254,7 @@ void vtkPVCaveRenderModule::StillRender()
   this->RenderWindow->SetDesiredUpdateRate(0.002);
   // this->GetPVWindow()->GetInteractor()->GetStillUpdateRate());
 
-  this->GetProcessModule()->SetGlobalLODFlag(0);
+  this->ProcessModule->SetGlobalLODFlag(0);
 
 
   vtkTimerLog::MarkStartEvent("Still Render");
@@ -292,11 +291,11 @@ void vtkPVCaveRenderModule::InteractiveRender()
   // Make LOD decision.
   if ((float)(totalGeoMemory)/1000.0 < this->GetLODThreshold())
     {
-    this->GetProcessModule()->SetGlobalLODFlag(0);
+    this->ProcessModule->SetGlobalLODFlag(0);
     }
   else
     {
-    this->GetProcessModule()->SetGlobalLODFlag(1);
+    this->ProcessModule->SetGlobalLODFlag(1);
     }
 
   // This might be used for Reduction factor.

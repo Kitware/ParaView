@@ -26,7 +26,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLODRenderModule);
-vtkCxxRevisionMacro(vtkPVLODRenderModule, "1.2");
+vtkCxxRevisionMacro(vtkPVLODRenderModule, "1.3");
 
 //int vtkPVLODRenderModuleCommand(ClientData cd, Tcl_Interp *interp,
 //                             int argc, char *argv[]);
@@ -66,7 +66,7 @@ void PVLODRenderModuleAbortCheck(vtkObject*, unsigned long, void* arg, void*)
 }
 
 
-void vtkPVLODRenderModule::SetProcessModule(vtkPVProcessModule *pm)
+void vtkPVLODRenderModule::SetProcessModule(vtkProcessModule *pm)
 {
   if (this->RenderWindow)
     {
@@ -93,7 +93,7 @@ vtkPVPartDisplay* vtkPVLODRenderModule::CreatePartDisplay()
   vtkPVLODPartDisplay* pDisp;
 
   pDisp = vtkPVLODPartDisplay::New();
-  pDisp->SetProcessModule(this->GetProcessModule());
+  pDisp->SetProcessModule(this->ProcessModule);
   pDisp->SetLODResolution(this->LODResolution);
   return pDisp;
 }
@@ -110,11 +110,11 @@ void vtkPVLODRenderModule::InteractiveRender()
   // We need to decide globally whether to use decimated geometry.  
   if (this->GetTotalVisibleGeometryMemorySize() > this->LODThreshold*1000)
     {
-    this->GetProcessModule()->SetGlobalLODFlag(1);
+    this->ProcessModule->SetGlobalLODFlag(1);
     }
   else
     {
-    this->GetProcessModule()->SetGlobalLODFlag(0);
+    this->ProcessModule->SetGlobalLODFlag(0);
     }  
 
   vtkTimerLog::MarkStartEvent("Interactive Render");

@@ -68,7 +68,9 @@ public:
   // Remove this method.  Change picking the center of rotation.
   
   // Temporarily remove this to see what breaks.
+  //BTX
   vtkPVTreeComposite *GetComposite() {return this->Composite;}
+  //ETX
   vtkGetMacro(CompositeID, vtkClientServerID);
 
   // Description:

@@ -32,7 +32,7 @@ public:
 
   // Description:
   // Set the ProcessModule right after construction.
-  virtual void SetProcessModule(vtkPVProcessModule *pm);
+  virtual void SetProcessModule(vtkProcessModule *pm);
 
   // Description:
   // Compression uses active pixel encoding of color and zbuffer.

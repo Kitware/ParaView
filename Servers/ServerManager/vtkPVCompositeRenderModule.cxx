@@ -27,7 +27,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCompositeRenderModule);
-vtkCxxRevisionMacro(vtkPVCompositeRenderModule, "1.2");
+vtkCxxRevisionMacro(vtkPVCompositeRenderModule, "1.3");
 
 
 
@@ -85,7 +85,7 @@ vtkPVPartDisplay* vtkPVCompositeRenderModule::CreatePartDisplay()
   vtkPVLODPartDisplay* pDisp;
 
   pDisp = vtkPVCompositePartDisplay::New();
-  pDisp->SetProcessModule(this->GetProcessModule());
+  pDisp->SetProcessModule(this->ProcessModule);
   pDisp->SetLODResolution(this->LODResolution);
   return pDisp;
 }
@@ -101,7 +101,7 @@ void vtkPVCompositeRenderModule::StillRender()
   unsigned long totalMemory = 0;
   int localRender;
 
-  vtkPVProcessModule* pm = this->GetProcessModule();
+  vtkPVProcessModule* pm = this->ProcessModule;
 
   pm->SendPrepareProgress();
 
@@ -220,7 +220,7 @@ void vtkPVCompositeRenderModule::InteractiveRender()
   unsigned long tmpMemory;
   int localRender;
   int useLOD;
-  vtkPVProcessModule* pm = this->GetProcessModule();
+  vtkPVProcessModule* pm = this->ProcessModule;
   pm->SendPrepareProgress();
 
   // Compute memory totals.
@@ -427,7 +427,7 @@ void vtkPVCompositeRenderModule::SetUseCompositeWithFloat(int val)
 {
   if (this->Composite)
     {
-    vtkPVProcessModule* pm = this->GetProcessModule();
+    vtkPVProcessModule* pm = this->ProcessModule;
     pm->GetStream()
       << vtkClientServerStream::Invoke
       << this->CompositeID << "SetUseChar" << (val?0:1)
@@ -451,7 +451,7 @@ void vtkPVCompositeRenderModule::SetUseCompositeWithRGBA(int val)
 {
   if (this->Composite)
     {
-    vtkPVProcessModule* pm = this->GetProcessModule();
+    vtkPVProcessModule* pm = this->ProcessModule;
     pm->GetStream()
       << vtkClientServerStream::Invoke
       << this->CompositeID << "SetUseRGB" << (val?0:1)
@@ -575,7 +575,7 @@ float vtkPVCompositeRenderModule::GetZBufferValue(int x, int y)
     }
 
   // If client-server...
-  vtkPVProcessModule* pm = this->GetProcessModule();
+  vtkPVProcessModule* pm = this->ProcessModule;
   if (pm->GetClientMode())
     {
     pm->GetStream()

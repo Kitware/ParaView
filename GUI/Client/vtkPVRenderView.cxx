@@ -135,7 +135,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.336");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.337");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -984,14 +984,15 @@ void vtkPVRenderView::CreateViewProperties()
 
   // Create the render module user interface.
   char* rmuiClassName;
-  rmuiClassName = new char[strlen(pvapp->GetRenderModuleName()) + 20];
-  sprintf(rmuiClassName, "vtkPV%sUI", pvapp->GetRenderModuleName());
+  vtkProcessModule* pm = pvapp->GetProcessModule();
+  rmuiClassName = new char[strlen(pm->GetRenderModuleName()) + 20];
+  sprintf(rmuiClassName, "vtkPV%sUI", pm->GetRenderModuleName());
   vtkObject* rmui = vtkInstantiator::CreateInstance(rmuiClassName);
   vtkPVRenderModuleUI* rmuio = vtkPVRenderModuleUI::SafeDownCast(rmui);
   if ( rmuio )
     {
     this->RenderModuleUI = rmuio;
-    this->RenderModuleUI->SetRenderModule(pvapp->GetProcessModule()->GetRenderModule());
+    this->RenderModuleUI->SetRenderModule(pm->GetRenderModule());
     this->RenderModuleUI->SetParent(this->GeneralProperties->GetFrame());
     this->RenderModuleUI->Create(this->GetApplication(),0);
     this->RenderModuleUI->SetTraceReferenceObject(this);

@@ -147,7 +147,7 @@ void vtkPVSendStreamToClientServerNodeRMI(void *localArg, void *remoteArg,
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVClientServerModule);
-vtkCxxRevisionMacro(vtkPVClientServerModule, "1.13");
+vtkCxxRevisionMacro(vtkPVClientServerModule, "1.14");
 
 
 //----------------------------------------------------------------------------
@@ -346,8 +346,15 @@ void vtkPVClientServerModule::Initialize()
       serverInfo->Delete();
       serverInfo = NULL;
       
-      this->ReturnValue = this->GUIHelper->
-        RunGUIStart(this->ArgumentCount, this->Arguments, numServerProcs, myId);
+      if ( this->SetupRenderModule() )
+        {
+        this->ReturnValue = this->GUIHelper->
+          RunGUIStart(this->ArgumentCount, this->Arguments, numServerProcs, myId);
+        }
+      else
+        {
+        this->ReturnValue = -1;
+        }
       }
     else
       {

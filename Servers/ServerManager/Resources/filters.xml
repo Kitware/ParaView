@@ -2019,7 +2019,7 @@
         name="Source"
         command="SetSource">
            <ProxyGroupDomain name="groups">
-             <Group name="glyph_sources"/>
+             <Group name="sources"/>
            </ProxyGroupDomain>
            <DataTypeDomain name="input_type">
              <DataType value="vtkPolyData"/>
