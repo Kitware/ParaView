@@ -57,6 +57,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWMessageDialog.h"
 #include "vtkKWCornerAnnotation.h"
 #include "vtkRenderWindow.h"
+#include "vtkRenderer.h"
 #include "vtkKWProgressGauge.h"
 #include "vtkKWMenu.h"
 #include "vtkKWEvent.h"
@@ -1317,7 +1318,7 @@ void vtkKWView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWView ";
-  this->ExtractRevision(os,"$Revision: 1.62 $");
+  this->ExtractRevision(os,"$Revision: 1.63 $");
 }
 
 void vtkKWView::SetupMemoryRendering(
