@@ -104,59 +104,9 @@ void Process_Init(vtkMultiProcessController *controller, void *arg )
       }  
 
 #ifdef PV_USE_SGI_PIPES
-  int numPipes = numProcs;
-  if (myId == 0)
-  {
-    ifstream ifs("pipes.inp",ios::in);
-    ifs >> numPipes;
-    if (numPipes > numProcs) numPipes = numProcs;
-    if (numPipes < 1) numPipes = 1;
-  }
+  int numPipes = 1;
   app->SetNumberOfPipes(numPipes);
-
-  // assuming that the number of pipes is the same as the number of procs
-  char *displayString;
-  int startRenderProc = 0;
-  int stopRenderProc = numProcs - 1;
-
-  if ((startRenderProc <= myId) && (myId <= stopRenderProc))
-    {
-    // Get display root
-    char displayCommand[80];
-    char displayStringRoot[80];
-    displayString = getenv("DISPLAY");
-
-    int len = -1;
-    int j, i = 0;
-    while (i < 80)
-      {
-      if (displayString[i] == ':')
-        {
-        j = i+1;
-        while (j < 80)
-          {
-          if (displayString[j] == '.')
-            {
-            len = j+1;
-            break;
-            }
-          j++;
-          }
-        break;
-        }
-      i++;
-      }
-    strncpy(displayStringRoot, displayString, len);
-    displayStringRoot[len] = '\0';
-    //    cerr << "display string root = " << displayStringRoot << endl;
-    sprintf(displayCommand, "DISPLAY=%s%d", displayStringRoot, 
-            myId-startRenderProc);
-    //    cerr << "display command = " << displayCommand << endl;
-    putenv(displayCommand);
-    }
 #endif
-
-
 
     //app->SetupTrapsForSignals(myId);   
     app->SetController(controller);

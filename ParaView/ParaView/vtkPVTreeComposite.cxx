@@ -152,7 +152,7 @@ int vtkPVTreeComposite::ShouldIComposite()
     {
     return 0;
     }
-  numProcs = this->Controller->GetNumberOfProcesses();
+  numProcs = this->NumberOfProcesses;
   myId = this->Controller->GetLocalProcessId();
   if (myId != 0)
     {
@@ -213,7 +213,7 @@ void vtkPVTreeComposite::ComputeVisiblePropBounds(vtkRenderer *ren,
   vtkPropCollection *props;
   int foundOne = 0;
   
-  num = this->Controller->GetNumberOfProcesses();  
+  num = this->NumberOfProcesses;  
   for (id = 1; id < num; ++id)
     {
     this->Controller->TriggerRMI(id,COMPUTE_VISIBLE_PROP_BOUNDS_RMI_TAG);
@@ -524,7 +524,7 @@ void vtkPVTreeComposite::RootAbortCheck()
     { // Yes, abort.
     int idx;
     int message;
-    int num = this->MPIController->GetNumberOfProcesses();
+    int num = this->NumberOfProcesses;
 
     // Tell the satellite processes they need to abort.
     for (idx = 1; idx < num; ++idx)
@@ -560,7 +560,7 @@ void vtkPVTreeComposite::RootFinalAbortCheck()
     }
   
   // Wait for all the satelite processes to finish.
-  num = this->MPIController->GetNumberOfProcesses();
+  num = this->NumberOfProcesses;
   for (idx = 1; idx < num; ++idx)
     {
     // An abort could have occured while waiting for a satellite.
@@ -610,7 +610,7 @@ void vtkPVTreeComposite::RootWaitForSatelliteToFinish(int satelliteId)
     else 
       {
       vtkErrorMacro("Sanity check failed: Expecting CheckAbort or Finished "
-		    "message.");
+                    "message.");
       }
     }
 }
@@ -626,7 +626,7 @@ void vtkPVTreeComposite::RootSendFinalCompositeDecision()
   
   // If ABORT was already sent, then we do not need to worry about the
   // composite.  It is already cancelled.
-  num = this->MPIController->GetNumberOfProcesses();
+  num = this->NumberOfProcesses;
   if ( ! this->RenderAborted)
     {
     for (idx = 1; idx < num; ++idx)
@@ -662,7 +662,7 @@ void vtkPVTreeComposite::SatelliteAbortCheck()
     message = VTK_CHECK_ABORT;
     //cout << "1 noBlockSend to 0, message: " << status << endl;
     this->MPIController->NoBlockSend(&message, 1, 0, VTK_STATUS_TAG, 
-				     sendRequest);
+                                     sendRequest);
     }
   
   // If this is the first call for this render, 
@@ -670,8 +670,8 @@ void vtkPVTreeComposite::SatelliteAbortCheck()
   if ( ! this->ReceivePending)
     {
     this->MPIController->NoBlockReceive(&this->ReceiveMessage, 1, 0, 
-					VTK_STATUS_TAG, 
-					this->ReceiveRequest);
+                                        VTK_STATUS_TAG, 
+                                        this->ReceiveRequest);
     this->ReceivePending = 1;
     }
   
@@ -697,8 +697,8 @@ void vtkPVTreeComposite::SatelliteAbortCheck()
       this->RootWaiting = 1;
       // Rearm the receive to get a possible abort.
       this->MPIController->NoBlockReceive(&this->ReceiveMessage, 1, 0, 
-					  VTK_STATUS_TAG, 
-					  this->ReceiveRequest);
+                                          VTK_STATUS_TAG, 
+                                          this->ReceiveRequest);
       this->ReceivePending = 1;
       }
     else
@@ -730,24 +730,24 @@ void vtkPVTreeComposite::SatelliteFinalAbortCheck()
       this->ReceiveRequest.Wait();
       this->ReceivePending = 0;
       if (this->ReceiveMessage == VTK_ABORT_RENDER)
-	{  // Root is telling us to short circuit the render.
-	// We we have received a ROOT_WAITING message, then we have to send
-	// a FINISHED message (event if an ABORT has been received meanwhile).
-	this->RenderAborted = 1;
-	}      
+        {  // Root is telling us to short circuit the render.
+        // We we have received a ROOT_WAITING message, then we have to send
+        // a FINISHED message (event if an ABORT has been received meanwhile).
+        this->RenderAborted = 1;
+        }      
       else if (this->ReceiveMessage == VTK_ROOT_WAITING)
-	{ 
-	this->RootWaiting = 1;
-	// Rearm the receive to put in a consistent state.
-	this->MPIController->NoBlockReceive(&this->ReceiveMessage, 1, 0, 
-					    VTK_STATUS_TAG, 
-					    this->ReceiveRequest);
-	this->ReceivePending = 1;
-	}
+        { 
+        this->RootWaiting = 1;
+        // Rearm the receive to put in a consistent state.
+        this->MPIController->NoBlockReceive(&this->ReceiveMessage, 1, 0, 
+                                            VTK_STATUS_TAG, 
+                                            this->ReceiveRequest);
+        this->ReceivePending = 1;
+        }
       else 
-	{
-	vtkErrorMacro("Expecting ROOT_WAITING or ABORT message from root.");
-	}
+        {
+        vtkErrorMacro("Expecting ROOT_WAITING or ABORT message from root.");
+        }
       }
     }
   

@@ -57,6 +57,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkKWView.h"
 
+class vtkMultiProcessController;
 class vtkKWLabel;
 class vtkKWPushButton;
 class vtkKWRadioButton;
@@ -156,7 +157,7 @@ public:
   vtkRenderWindow *GetRenderWindow();
 
   // Description:
-  // This is for an experiment on rendering timing.  It should be temporary.
+  // The center of rotation picker needs the compositers zbuffer.
   vtkPVTreeComposite *GetComposite() {return this->Composite;}
 
   // Description:

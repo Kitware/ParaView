@@ -424,8 +424,25 @@ void vtkPVRenderView::CreateRenderObjects(vtkPVApplication *pvApp)
   // This should be a part of a module.
   pvApp->BroadcastScript("if {[catch {vtkCompressCompositer pvTmp}] == 0} {TreeComp1 SetCompositer pvTmp; pvTmp Delete}");
 
+  Sleep(15000);
+
+
   this->CompositeTclName = NULL;
   this->SetCompositeTclName("TreeComp1");
+
+        // If we are using SGI pipes, create a new Controller/Communicator/Group
+  // to use for compositing.
+#ifdef PV_USE_SGI_PIPES
+  int numPipes = pvApp->GetNumberOfPipes();
+  // I would like to create another controller with a subset of world, but ...
+  //pvApp->BroadcastScript("%s SetController [Application NewController 0 %d]",
+  //                       this->CompositeTclName, numPipes-1);
+  
+  // For now, I added it as a hack to the composite manager.
+  pvApp->BroadcastScript("%s SetNumberOfProcesses %d",
+                         this->CompositeTclName, numPipes);
+#endif
+
   pvApp->BroadcastScript("%s AddRenderer %s", this->RenderWindowTclName,
                          this->RendererTclName);
   pvApp->BroadcastScript("%s SetRenderWindow %s", this->CompositeTclName,
@@ -1112,7 +1129,7 @@ void vtkPVRenderView::ResetCameraClippingRange()
 {
   // Avoid serialization.
 #ifdef VTK_USE_MPI
-  this->GetComposite()->ResetCameraClippingRange(this->GetRenderer());
+  this->Composite->ResetCameraClippingRange(this->GetRenderer());
 #else
   // If not parallel, forward to the renderer.
   this->GetRenderer()->ResetCameraClippingRange();
@@ -1211,7 +1228,7 @@ void vtkPVRenderView::StartRender()
   
   if (!this->UseReductionFactor)
     {
-    this->GetComposite()->SetReductionFactor(1);
+    this->Composite->SetReductionFactor(1);
     return;
     }
   
@@ -1220,11 +1237,11 @@ void vtkPVRenderView::StartRender()
 
   renderTime *= 0.5;
   area = windowSize[0] * windowSize[1];
-  reductionFactor = this->GetComposite()->GetReductionFactor();
+  reductionFactor = this->Composite->GetReductionFactor();
   reducedArea = area / (reductionFactor * reductionFactor);
-  getBuffersTime = this->GetComposite()->GetGetBuffersTime();
-  setBuffersTime = this->GetComposite()->GetSetBuffersTime();
-  transmitTime = this->GetComposite()->GetCompositeTime();
+  getBuffersTime = this->Composite->GetGetBuffersTime();
+  setBuffersTime = this->Composite->GetSetBuffersTime();
+  transmitTime = this->Composite->GetCompositeTime();
 
   // Do not consider SetBufferTime because 
   //it is not dependent on reduction factor.,
@@ -1248,7 +1265,7 @@ void vtkPVRenderView::StartRender()
   //cerr << "GetBufTime: " << getBuffersTime << ", SetBufTime: " << setBuffersTime
   //     << ", transTime: " << transmitTime << endl;
   
-  this->GetComposite()->SetReductionFactor((int)newReductionFactor);
+  this->Composite->SetReductionFactor((int)newReductionFactor);
 }
 
 void vtkPVRenderView::UpdateAllPVData()

@@ -39,6 +39,14 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
+#include "vtkToolkits.h"
+#ifdef VTK_USE_MPI
+# include <mpi.h>
+#include "vtkMPIController.h"
+#include "vtkMPICommunicator.h"
+#include "vtkMPIGroup.h"
+#endif
+
 #include "vtkPVApplication.h"
 
 #include "vtkCallbackCommand.h"
@@ -81,7 +89,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkString.h"
 #include "vtkTclUtil.h"
 #include "vtkTimerLog.h"
-#include "vtkToolkits.h"
 #include "vtkUnsignedCharArray.h"
 #include "vtkUnsignedIntArray.h"
 #include "vtkUnsignedLongArray.h"
@@ -633,6 +640,63 @@ void vtkPVApplication::Start(int argc, char*argv[])
     }
 #endif
 
+
+  // Handle setting up the SGI pipes.
+#ifdef PV_USE_SGI_PIPES
+  int numPipes = 1;
+  // Until I add a user interface to set the number of pipes,
+  // just read it from a file.
+  //ifstream ifs("pipes.inp",ios::in);
+  //ifs >> numPipes;
+  //if (numPipes > numProcs) numPipes = numProcs;
+  //if (numPipes < 1) numPipes = 1;
+  numPipes = 2;
+  this->BroadcastScript("Application SetNumberOfPipes %d", numPipes);
+
+  // assuming that the number of pipes is the same as the number of procs
+  /*
+  char *displayString;
+  int startRenderProc = 0;
+  int stopRenderProc = numProcs - 1;
+
+  if ((startRenderProc <= myId) && (myId <= stopRenderProc))
+    {
+    // Get display root
+    char displayCommand[80];
+    char displayStringRoot[80];
+    displayString = getenv("DISPLAY");
+
+    int len = -1;
+    int j, i = 0;
+    while (i < 80)
+      {
+      if (displayString[i] == ':')
+        {
+        j = i+1;
+        while (j < 80)
+          {
+          if (displayString[j] == '.')
+            {
+            len = j+1;
+            break;
+            }
+          j++;
+          }
+        break;
+        }
+      i++;
+      }
+    strncpy(displayStringRoot, displayString, len);
+    displayStringRoot[len] = '\0';
+    //    cerr << "display string root = " << displayStringRoot << endl;
+    sprintf(displayCommand, "DISPLAY=%s%d", displayStringRoot, 
+            myId-startRenderProc);
+    //    cerr << "display command = " << displayCommand << endl;
+    putenv(displayCommand);
+    }
+  */
+#endif
+
   vtkPVWindow *ui = vtkPVWindow::New();
   this->Windows->AddItem(ui);
 
@@ -677,6 +741,38 @@ void vtkPVApplication::Start(int argc, char*argv[])
   this->vtkKWApplication::Start(argc,argv);
   vtkOutputWindow::SetInstance(0);
   this->OutputWindow->Delete();
+}
+
+
+//----------------------------------------------------------------------------
+vtkMultiProcessController *vtkPVApplication::NewController(int minId, int maxId)
+{
+#ifdef VTK_USE_MPI
+
+  vtkMPICommunicator* localComm = vtkMPICommunicator::New();
+  vtkMPIGroup* localGroup= vtkMPIGroup::New();
+  vtkMPIController* localController = vtkMPIController::New();
+  vtkMPICommunicator* worldComm = vtkMPICommunicator::GetWorldCommunicator();
+
+  // I might want to pass the reference controller as a parameter.
+  localGroup->Initialize( static_cast<vtkMPIController*>(this->Controller) );
+  for(int i=minId; i<=maxId; i++)
+    {
+    localGroup->AddProcessId(i);
+    }
+  localComm->Initialize(worldComm, localGroup);
+  localGroup->UnRegister(0);
+
+  // Create a local controller (for the sub-group)
+  localController->SetCommunicator(localComm);
+  localComm->UnRegister(0);
+
+  return localController;
+
+#else
+  return NULL;
+#endif
+
 }
 
 

@@ -129,7 +129,7 @@ void vtkRedistributePolyData::Execute()
   int myId;
   if (!this->Controller)
     {
-    this->Controller = vtkMultiProcessController::GetGlobalController();
+    this->SetController(vtkMultiProcessController::GetGlobalController());
     }
 
   if (!this->Controller)
@@ -338,14 +338,14 @@ void vtkRedistributePolyData::Execute()
       startCell = prevStopCell+1;
       stopCell = startCell+sendNum[i]-1;
       this->SendCellSizes (startCell, stopCell, input, sendTo[i], 
-			   numPointsSend[i], cellArraySize[i], NULL);
+                           numPointsSend[i], cellArraySize[i], NULL);
       }
     else
       {
       startCell = 0;
       stopCell = sendNum[i]-1;
       this->SendCellSizes (startCell, stopCell, input, sendTo[i], 
-			   numPointsSend[i], cellArraySize[i], sendCellList[i]);
+                           numPointsSend[i], cellArraySize[i], sendCellList[i]);
       }
 
     prevStopCell = stopCell;
@@ -387,18 +387,18 @@ void vtkRedistributePolyData::Execute()
   for (i=0; i<cntRec; i++)
     {
     this->Controller->Receive((vtkIdType*)&cellptCntr[i], 1, recFrom[i],
-			      CELL_CNT_TAG);
+                              CELL_CNT_TAG);
     this->Controller->Receive ((vtkIdType*)&numPointsRec[i], 1, recFrom[i],
-			       POINTS_SIZE_TAG);
+                               POINTS_SIZE_TAG);
     }
 
   vtkCellData* outputCellData   = output->GetCellData();
   vtkPointData* outputPointData = output->GetPointData();
 
   this->AllocateDataArrays (outputCellData, recNum, cntRec, 
-			    recFrom, origNumCells );
+                            recFrom, origNumCells );
   this->AllocateDataArrays (outputPointData, numPointsRec, cntRec, 
-			    recFrom, numPointsOnProc);
+                            recFrom, numPointsOnProc);
 
   vtkIdType totalNumPoints = numPointsOnProc;
   vtkIdType totalNumCells = origNumCells;
@@ -509,8 +509,8 @@ void vtkRedistributePolyData::Execute()
       stopCell = startCell+recNum[rcntr]-1;
 
       this->ReceiveCells (startCell, stopCell, output, recFrom[rcntr],
-			  prevCellptCntrRec, cellptCntr[rcntr], prevNumPointsRec,
-			  numPointsRec[rcntr]);
+                          prevCellptCntrRec, cellptCntr[rcntr], prevNumPointsRec,
+                          numPointsRec[rcntr]);
 
       prevNumPointsRec += numPointsRec[rcntr];
       prevCellptCntrRec += cellptCntr[rcntr];
@@ -522,18 +522,18 @@ void vtkRedistributePolyData::Execute()
       // ... sending ...
       if (sendCellList == NULL)
         {
-	startCell = prevStopCellSend+1;
-	stopCell = startCell+sendNum[scntr]-1;
-	this->SendCells (startCell, stopCell, input, output, sendTo[scntr], 
-			 numPointsSend[scntr], cellArraySize[scntr], NULL);
+        startCell = prevStopCellSend+1;
+        stopCell = startCell+sendNum[scntr]-1;
+        this->SendCells (startCell, stopCell, input, output, sendTo[scntr], 
+                         numPointsSend[scntr], cellArraySize[scntr], NULL);
         }
       else
         {
-	startCell = 0;
-	stopCell = sendNum[scntr]-1;
-	this->SendCells (startCell, stopCell, input, output, sendTo[scntr], 
-			 numPointsSend[scntr], cellArraySize[scntr], 
-			 sendCellList[scntr]);
+        startCell = 0;
+        stopCell = sendNum[scntr]-1;
+        this->SendCells (startCell, stopCell, input, output, sendTo[scntr], 
+                         numPointsSend[scntr], cellArraySize[scntr], 
+                         sendCellList[scntr]);
         }
  
       prevStopCellSend = stopCell;
@@ -625,46 +625,46 @@ void vtkRedistributePolyData::OrderSchedule ( vtkCommSched* localSched)
     for (i = 0; i<cntSend; i++) 
       {
       for (j = i+1; j<cntSend; j++) 
-	{
-	if (sendTo[i] > sendTo[j])
+        {
+        if (sendTo[i] > sendTo[j])
           {
-	  temp = order[i];
-	  order[i] = order[j];
-	  order[j] = temp;
-	  outoforder=1;
+          temp = order[i];
+          order[i] = order[j];
+          order[j] = temp;
+          outoforder=1;
           }
-	}
+        }
       }
     // ... now reorder the sends ...
     if (outoforder)
       {
       for (i = 0; i<cntSend; i++) 
-	{
-	while (order[i] != i)
+        {
+        while (order[i] != i)
           {
-	  temporder = order[i];
+          temporder = order[i];
 
-	  temp = sendTo[i];
-	  sendTo[i] = sendTo[temporder];
-	  sendTo[temporder] = temp;
+          temp = sendTo[i];
+          sendTo[i] = sendTo[temporder];
+          sendTo[temporder] = temp;
 
-	  tempid = sendNum[i];
-	  sendNum[i] = sendNum[temporder];
-	  sendNum[temporder] = tempid;
+          tempid = sendNum[i];
+          sendNum[i] = sendNum[temporder];
+          sendNum[temporder] = tempid;
 
-	  if (sendCellList != NULL)
-	    {
-	    templist = sendCellList[i];
-	    sendCellList[i] = sendCellList[temporder];
-	    sendCellList[temporder] = templist;
-	    }
+          if (sendCellList != NULL)
+            {
+            templist = sendCellList[i];
+            sendCellList[i] = sendCellList[temporder];
+            sendCellList[temporder] = templist;
+            }
 
-	  temporder = order[i];
-	  order[i] = order[temporder];
-	  order[temporder] = temporder;
+          temporder = order[i];
+          order[i] = order[temporder];
+          order[temporder] = temporder;
         
           }
-	}
+        }
       }
     delete [] order;
     }
@@ -676,38 +676,38 @@ void vtkRedistributePolyData::OrderSchedule ( vtkCommSched* localSched)
     for (i = 0; i<cntRec; i++) 
       {
       for (j = i+1; j<cntRec; j++) 
-	{
-	if (recFrom[i] > recFrom[j])
+        {
+        if (recFrom[i] > recFrom[j])
           {
-	  temp = order[i];
-	  order[i] = order[j];
-	  order[j] = temp;
-	  outoforder=1;
+          temp = order[i];
+          order[i] = order[j];
+          order[j] = temp;
+          outoforder=1;
           }
-	}
+        }
       }
     // ... now reorder the receives ...
     if (outoforder)
       {
       for (i = 0; i<cntRec; i++) 
-	{
-	while (order[i] != i)
+        {
+        while (order[i] != i)
           {
-	  temporder = order[i];
+          temporder = order[i];
 
-	  temp = recFrom[i];
-	  recFrom[i] = recFrom[temporder];
-	  recFrom[temporder] = temp;
+          temp = recFrom[i];
+          recFrom[i] = recFrom[temporder];
+          recFrom[temporder] = temp;
 
-	  tempid = recNum[i];
-	  recNum[i] = recNum[temporder];
-	  recNum[temporder] = tempid;
+          tempid = recNum[i];
+          recNum[i] = recNum[temporder];
+          recNum[temporder] = tempid;
 
-	  temporder = order[i];
-	  order[i] = order[temporder];
-	  order[temporder] = temporder;
+          temporder = order[i];
+          order[i] = order[temporder];
+          order[temporder] = temporder;
           }
-	}
+        }
       }
     delete [] order;
     }
@@ -734,7 +734,7 @@ void vtkRedistributePolyData::CopyDataArrays(
       int activeComponent = 0;
       //int activeComponent = fromScalars->GetActiveComponent();
       this->CopyArrays (dataFrom, dataTo, numToCopy, fromId, activeComponent, 
-			myId);
+                        myId);
       }
     }
 
@@ -748,7 +748,7 @@ void vtkRedistributePolyData::CopyDataArrays(
       dataTo = (vtkFloatArray*)toVectors;
       int activeComponent = -1;
       this->CopyArrays (dataFrom, dataTo, numToCopy, fromId, activeComponent, 
-			myId);
+                        myId);
       }
     }
 
@@ -762,7 +762,7 @@ void vtkRedistributePolyData::CopyDataArrays(
       dataTo = toNormals;
       int activeComponent = -1;
       this->CopyArrays (dataFrom, dataTo, numToCopy, fromId, activeComponent, 
-			myId);
+                        myId);
       }
     }
 
@@ -776,7 +776,7 @@ void vtkRedistributePolyData::CopyDataArrays(
       dataTo = toTCoords;
       int activeComponent = -1;
       this->CopyArrays (dataFrom, dataTo, numToCopy, fromId, activeComponent, 
-			myId);
+                        myId);
       }
     }
 
@@ -790,7 +790,7 @@ void vtkRedistributePolyData::CopyDataArrays(
       dataTo = toTensors;
       int activeComponent = -1;
       this->CopyArrays (dataFrom, dataTo, numToCopy, fromId, activeComponent, 
-			myId);
+                        myId);
       }
     }
 
@@ -815,7 +815,7 @@ void vtkRedistributePolyData::CopyDataArrays(
       //DataTo = toFieldData->GetArray(j);
       int activeComponent = -1;
       this->CopyArrays (dataFrom, dataTo, numToCopy, fromId, activeComponent, 
-			myId);
+                        myId);
       }
     }
   }
@@ -845,14 +845,14 @@ void vtkRedistributePolyData::CopyCellBlockDataArrays(
       int activeComponent = 0;
       //int activeComponent = fromScalars->GetActiveComponent();
       if (numComps>1)
-	{
+        {
         this->CopyArrays (dataFrom,dataTo, numToCopy, fromIds, activeComponent, 
-			  myId);
-	}
+                          myId);
+        }
       else
-	{
+        {
         this->CopyBlockArrays (dataFrom, dataTo, numToCopy, startCell, myId);
-	}
+        }
       }
     }
 
@@ -962,26 +962,26 @@ void vtkRedistributePolyData::CopyArrays(
       cArrayFrom = ((vtkCharArray*)dataFrom)->GetPointer(0);
       cArrayTo = ((vtkCharArray*)dataTo)->GetPointer(0);
       for (i = 0; i < numToCopy; i++)
-	{
-	for (j = 0; j < numCompsToCopy; j++)
-	  {
-	  cArrayTo[numCompsToCopy*i+j+activeComponent]=
-	    cArrayFrom[numCompsToCopy*fromId[i]+j+activeComponent];
-	  }
-	}
+        {
+        for (j = 0; j < numCompsToCopy; j++)
+          {
+          cArrayTo[numCompsToCopy*i+j+activeComponent]=
+            cArrayFrom[numCompsToCopy*fromId[i]+j+activeComponent];
+          }
+        }
       break;
 
     case VTK_UNSIGNED_CHAR:
       ucArrayFrom = ((vtkUnsignedCharArray*)dataFrom)->GetPointer(0);
       ucArrayTo = ((vtkUnsignedCharArray*)dataTo)->GetPointer(0);
       for (i = 0; i < numToCopy; i++)
-	{
-	for (j = 0; j < numCompsToCopy; j++)
-	  {
-	  ucArrayTo[numCompsToCopy*i+j+activeComponent]=
-	    ucArrayFrom[numCompsToCopy*fromId[i]+j+activeComponent];
-	  }
-	}
+        {
+        for (j = 0; j < numCompsToCopy; j++)
+          {
+          ucArrayTo[numCompsToCopy*i+j+activeComponent]=
+            ucArrayFrom[numCompsToCopy*fromId[i]+j+activeComponent];
+          }
+        }
 
       break;
 
@@ -989,13 +989,13 @@ void vtkRedistributePolyData::CopyArrays(
       iArrayFrom = ((vtkIntArray*)dataFrom)->GetPointer(0);
       iArrayTo = ((vtkIntArray*)dataTo)->GetPointer(0);
       for (i = 0; i < numToCopy; i++)
-	{
-	for (j = 0; j < numCompsToCopy; j++)
-	  {
-	  iArrayTo[numCompsToCopy*i+j+activeComponent]=
-	    iArrayFrom[numCompsToCopy*fromId[i]+j+activeComponent];
-	  }
-	}
+        {
+        for (j = 0; j < numCompsToCopy; j++)
+          {
+          iArrayTo[numCompsToCopy*i+j+activeComponent]=
+            iArrayFrom[numCompsToCopy*fromId[i]+j+activeComponent];
+          }
+        }
 
       break;
 
@@ -1003,13 +1003,13 @@ void vtkRedistributePolyData::CopyArrays(
       ulArrayFrom = ((vtkUnsignedLongArray*)dataFrom)->GetPointer(0);
       ulArrayTo = ((vtkUnsignedLongArray*)dataTo)->GetPointer(0);
       for (i = 0; i < numToCopy; i++)
-	{
-	for (j = 0; j < numCompsToCopy; j++)
-	  {
-	  ulArrayTo[numCompsToCopy*i+j+activeComponent]=
-	    ulArrayFrom[numCompsToCopy*fromId[i]+j+activeComponent];
-	  }
-	}
+        {
+        for (j = 0; j < numCompsToCopy; j++)
+          {
+          ulArrayTo[numCompsToCopy*i+j+activeComponent]=
+            ulArrayFrom[numCompsToCopy*fromId[i]+j+activeComponent];
+          }
+        }
         
       break;
 
@@ -1017,12 +1017,12 @@ void vtkRedistributePolyData::CopyArrays(
       fArrayFrom = ((vtkFloatArray*)dataFrom)->GetPointer(0);
       fArrayTo = ((vtkFloatArray*)dataTo)->GetPointer(0);
       for (i = 0; i < numToCopy; i++)
-	{
-	for (j = 0; j < numCompsToCopy; j++)
-	  {
-	  fArrayTo[numCompsToCopy*i+j+activeComponent]=
-	    fArrayFrom[numCompsToCopy*fromId[i]+j+activeComponent];
-	  }
+        {
+        for (j = 0; j < numCompsToCopy; j++)
+          {
+          fArrayTo[numCompsToCopy*i+j+activeComponent]=
+            fArrayFrom[numCompsToCopy*fromId[i]+j+activeComponent];
+          }
         }
       break;
 
@@ -1031,24 +1031,24 @@ void vtkRedistributePolyData::CopyArrays(
       dArrayTo = ((vtkDoubleArray*)dataTo)->GetPointer(0);
       if (!colorProc)
         {
-	for (i = 0; i < numToCopy; i++)
-	  {
-	  for (j = 0; j < numCompsToCopy; j++)
-	    {
-	    dArrayTo[numCompsToCopy*i+j+activeComponent]=
-	      dArrayFrom[numCompsToCopy*fromId[i]+j+activeComponent];
-	    }
-	  }
+        for (i = 0; i < numToCopy; i++)
+          {
+          for (j = 0; j < numCompsToCopy; j++)
+            {
+            dArrayTo[numCompsToCopy*i+j+activeComponent]=
+              dArrayFrom[numCompsToCopy*fromId[i]+j+activeComponent];
+            }
+          }
         }
       else
         {
-	for (i = 0; i < numToCopy; i++)
-	  {
-	  for (j = 0; j < numCompsToCopy; j++)
-	    {
-	    dArrayTo[numCompsToCopy*i+j+activeComponent]= myId;
-	    }
-	  }
+        for (i = 0; i < numToCopy; i++)
+          {
+          for (j = 0; j < numCompsToCopy; j++)
+            {
+            dArrayTo[numCompsToCopy*i+j+activeComponent]= myId;
+            }
+          }
         }
 
       break;
@@ -1057,13 +1057,13 @@ void vtkRedistributePolyData::CopyArrays(
       lArrayFrom = ((vtkLongArray*)dataFrom)->GetPointer(0);
       lArrayTo = ((vtkLongArray*)dataTo)->GetPointer(0);
       for (i = 0; i < numToCopy; i++)
-	{
-	for (j = 0; j < numCompsToCopy; j++)
-	  {
-	  lArrayTo[numCompsToCopy*i+j+activeComponent]=
-	    lArrayFrom[numCompsToCopy*fromId[i]+j+activeComponent];
-	  }
-	}
+        {
+        for (j = 0; j < numCompsToCopy; j++)
+          {
+          lArrayTo[numCompsToCopy*i+j+activeComponent]=
+            lArrayFrom[numCompsToCopy*fromId[i]+j+activeComponent];
+          }
+        }
 
       break;
         
@@ -1071,13 +1071,13 @@ void vtkRedistributePolyData::CopyArrays(
       idArrayFrom = ((vtkIdTypeArray*)dataFrom)->GetPointer(0);
       idArrayTo = ((vtkIdTypeArray*)dataTo)->GetPointer(0);
       for (i = 0; i < numToCopy; i++)
-	{
-	for (j = 0; j < numCompsToCopy; j++)
-	  {
-	  idArrayTo[numCompsToCopy*i+j+activeComponent]=
-	    idArrayFrom[numCompsToCopy*fromId[i]+j+activeComponent];
-	  }
-	}
+        {
+        for (j = 0; j < numCompsToCopy; j++)
+          {
+          idArrayTo[numCompsToCopy*i+j+activeComponent]=
+            idArrayFrom[numCompsToCopy*fromId[i]+j+activeComponent];
+          }
+        }
       break;
         
     case VTK_BIT:
@@ -1158,11 +1158,11 @@ void vtkRedistributePolyData::CopyBlockArrays(
       dArrayTo = ((vtkDoubleArray*)dataTo)->GetPointer(0);
       for (i=start; i<stop; i++) { dArrayTo[i] = dArrayFrom[i]; }
       if (!colorProc)
-	{
-	for (i=start; i<stop; i++) { dArrayTo[i] = dArrayFrom[i]; }
-	}
+        {
+        for (i=start; i<stop; i++) { dArrayTo[i] = dArrayFrom[i]; }
+        }
       else
-	for (i=start; i<stop; i++) { dArrayTo[i] = myId; }
+        for (i=start; i<stop; i++) { dArrayTo[i] = myId; }
       break;
 
     case VTK_LONG:
@@ -1229,13 +1229,13 @@ void vtkRedistributePolyData::CopyCells (vtkIdType numCells,
     {
     vtkIdType startCell = 0;
     this->CopyCellBlockDataArrays (inputCellData, outputCellData, numCells,
-				   fromIds, startCell, myId);
+                                   fromIds, startCell, myId);
     delete [] fromIds;
     }
   else
     {
     this->CopyDataArrays (inputCellData, outputCellData, numCells, fromIds, 
-			  myId);
+                          myId);
     }
 
 
@@ -1302,22 +1302,22 @@ void vtkRedistributePolyData::CopyCells (vtkIdType numCells,
       npts=*inPtr++;
       *ptr++ = npts;
       for (i = 0; i < npts; i++)
-	{
-	pointId = *inPtr++;
-	if (usedIds[pointId] == -1)
+        {
+        pointId = *inPtr++;
+        if (usedIds[pointId] == -1)
           {
-	  vtkIdType newPt = pointIncr;
-	  *ptr++ = newPt;
-	  usedIds[pointId] = newPt;
-	  fromPtIds[pointIncr] = pointId;
-	  pointIncr++;
+          vtkIdType newPt = pointIncr;
+          *ptr++ = newPt;
+          usedIds[pointId] = newPt;
+          fromPtIds[pointIncr] = pointId;
+          pointIncr++;
           }
-	else
+        else
           {
-	  // ... use new point id ...
-	  *ptr++ = usedIds[pointId];
+          // ... use new point id ...
+          *ptr++ = usedIds[pointId];
           }
-	}
+        }
       }
     }
   else
@@ -1328,32 +1328,32 @@ void vtkRedistributePolyData::CopyCells (vtkIdType numCells,
       cellId = keepCellList[id];
       //cerr<<"myId="<<myId<<",cellId="<<cellId<<endl;
       for (i=prevCellId; i<cellId; i++)
-	{
-	npts=*inPtr++;
-	inPtr += npts;
-	}
+        {
+        npts=*inPtr++;
+        inPtr += npts;
+        }
       prevCellId = cellId+1;
 
       // ... set output number of points to input number of points ...
       npts=*inPtr++;
       *ptr++ = npts;
       for (i = 0; i < npts; i++)
-	{
-	pointId = *inPtr++;
-	if (usedIds[pointId] == -1)
+        {
+        pointId = *inPtr++;
+        if (usedIds[pointId] == -1)
           {
-	  vtkIdType newPt = pointIncr;
-	  *ptr++ = newPt;
-	  usedIds[pointId] = newPt;
-	  fromPtIds[pointIncr] = pointId;
-	  pointIncr++;
+          vtkIdType newPt = pointIncr;
+          *ptr++ = newPt;
+          usedIds[pointId] = newPt;
+          fromPtIds[pointIncr] = pointId;
+          pointIncr++;
           }
-	else
+        else
           {
-	  // ... use new point id ...
-	  *ptr++ = usedIds[pointId];
+          // ... use new point id ...
+          *ptr++ = usedIds[pointId];
           }
-	}
+        }
       }
     }
 
@@ -1393,7 +1393,7 @@ void vtkRedistributePolyData::CopyCells (vtkIdType numCells,
   vtkPointData* outputPointData = output->GetPointData();
 
   this->CopyDataArrays (inputPointData, outputPointData, numPoints, fromPtIds, 
-			myId );
+                        myId );
   delete [] fromPtIds;
 
 #if VTK_REDIST_DO_TIMING
@@ -1455,11 +1455,11 @@ void vtkRedistributePolyData::SendCellSizes(
       npts=*inPtr++;
       ptcntr++;
       for (i = 0; i < npts; i++)
-	{
-	pointId = *inPtr++;
-	if (usedIds[pointId] == -1) { usedIds[pointId] = pointIncr++; }
-	ptcntr++;
-	}
+        {
+        pointId = *inPtr++;
+        if (usedIds[pointId] == -1) { usedIds[pointId] = pointIncr++; }
+        ptcntr++;
+        }
       }
     }
   else
@@ -1473,11 +1473,11 @@ void vtkRedistributePolyData::SendCellSizes(
        
       cellId = sendCellList[id];
       for (i = prevCellId; i<cellId ; i++)
-	{
-	// ... increment pointers to get to correct starting point ...
-	npts=*inPtr++;
-	inPtr+=npts;
-	}
+        {
+        // ... increment pointers to get to correct starting point ...
+        npts=*inPtr++;
+        inPtr+=npts;
+        }
       prevCellId = cellId+1;
 
       // ... set output number of points to input number of points ...
@@ -1486,11 +1486,11 @@ void vtkRedistributePolyData::SendCellSizes(
       ptcntr++;
 
       for (i = 0; i < npts; i++)
-	{
-	pointId = *inPtr++;
-	if (usedIds[pointId] == -1) { usedIds[pointId] = pointIncr++; }
-	ptcntr++;
-	}
+        {
+        pointId = *inPtr++;
+        if (usedIds[pointId] == -1) { usedIds[pointId] = pointIncr++; }
+        ptcntr++;
+        }
       }
     }
 
@@ -1500,7 +1500,7 @@ void vtkRedistributePolyData::SendCellSizes(
 
   numPoints = pointIncr;
   this->Controller->Send((vtkIdType*)&numPoints, 1, sendTo,
-			 POINTS_SIZE_TAG);
+                         POINTS_SIZE_TAG);
 
 }
 //*****************************************************************
@@ -1556,24 +1556,24 @@ void vtkRedistributePolyData::SendCells
       *ptr++ = npts;
       ptcntr++;
       for (i = 0; i < npts; i++)
-	{
-	pointId = *inPtr++;
-	if (usedIds[pointId] == -1)
-	  {
-	  vtkIdType newPt = pointIncr;
-	  *ptr++ = newPt;
-	  ptcntr++;
-	  usedIds[pointId] = newPt;
-	  fromPtIds[pointIncr] = pointId;
-	  pointIncr++;
-	  }
-	else
-	  {
-	  // ... use new point id ...
-	  *ptr++ = usedIds[pointId];
-	  ptcntr++;
-	  }
-	}
+        {
+        pointId = *inPtr++;
+        if (usedIds[pointId] == -1)
+          {
+          vtkIdType newPt = pointIncr;
+          *ptr++ = newPt;
+          ptcntr++;
+          usedIds[pointId] = newPt;
+          fromPtIds[pointIncr] = pointId;
+          pointIncr++;
+          }
+        else
+          {
+          // ... use new point id ...
+          *ptr++ = usedIds[pointId];
+          ptcntr++;
+          }
+        }
       }
     }
   else
@@ -1586,11 +1586,11 @@ void vtkRedistributePolyData::SendCells
       {
       cellId = sendCellList[id];
       for (i = prevCellId; i<cellId ; i++)
-	{
-	// ... increment pointers to get to correct starting point ...
-	npts=*inPtr++;
-	inPtr+=npts;
-	}
+        {
+        // ... increment pointers to get to correct starting point ...
+        npts=*inPtr++;
+        inPtr+=npts;
+        }
       prevCellId = cellId+1;
 
       // ... set output number of points to input number of points ...
@@ -1600,30 +1600,30 @@ void vtkRedistributePolyData::SendCells
       ptcntr++;
 
       for (i = 0; i < npts; i++)
-	{
-	pointId = *inPtr++;
-	if (usedIds[pointId] == -1)
-	  {
-	  vtkIdType newPt = pointIncr;
-	  *ptr++ = newPt;
-	  ptcntr++;
-	  usedIds[pointId] = newPt;
-	  fromPtIds[pointIncr] = pointId;
-	  pointIncr++;
-	  }
-	else
-	  {
-	  // ... use new point id ...
-	  *ptr++ = usedIds[pointId];
-	  ptcntr++;
-	  }
-	}
+        {
+        pointId = *inPtr++;
+        if (usedIds[pointId] == -1)
+          {
+          vtkIdType newPt = pointIncr;
+          *ptr++ = newPt;
+          ptcntr++;
+          usedIds[pointId] = newPt;
+          fromPtIds[pointIncr] = pointId;
+          pointIncr++;
+          }
+        else
+          {
+          // ... use new point id ...
+          *ptr++ = usedIds[pointId];
+          ptcntr++;
+          }
+        }
       }
     }
   if (numPoints != pointIncr) 
     {
     vtkErrorMacro("numPoints="<<numPoints<<", pointIncr="<<pointIncr
-		  <<", should be equal");
+                  <<", should be equal");
     }
 
   delete [] usedIds;
@@ -1656,14 +1656,14 @@ void vtkRedistributePolyData::SendCells
   if (sendCellList == NULL)
     {
     this->SendCellBlockDataArrays (inputCellData, outputCellData, numCells, 
-				   sendTo, fromIds, startCell );
+                                   sendTo, fromIds, startCell );
     delete [] fromIds; // this array was allocated above in this case
     }
   else
     {
     typetag = 0; //(typetag = 0 for cells)
     this->SendDataArrays (inputCellData, outputCellData, numCells, sendTo, 
-			  fromIds, typetag);
+                          fromIds, typetag);
     }
 
 
@@ -1700,7 +1700,7 @@ void vtkRedistributePolyData::SendCells
   vtkPointData* outputPointData = output->GetPointData();
   typetag = 1; //(typetag = 0 for cells, =1 for points)
   this->SendDataArrays (inputPointData, outputPointData, numPoints, sendTo,
-			fromPtIds, typetag);
+                        fromPtIds, typetag);
   delete [] fromPtIds;
 
 }
@@ -1771,7 +1771,7 @@ void vtkRedistributePolyData::ReceiveCells(
   vtkPointData* outputPointData = output->GetPointData();
   typetag = 1; //(typetag = 0 for cells, =1 for points)
   this->ReceiveDataArrays (outputPointData, numPoints, recFrom, toPtIds, 
-			   typetag);
+                           typetag);
   delete [] toPtIds;
 
 }
@@ -1863,7 +1863,7 @@ void vtkRedistributePolyData::AllocateDataArrays(
 }
 //************************************************************************
 void vtkRedistributePolyData::AllocateArrays(vtkDataArray* data, 
-					 vtkIdType numToCopyTotal )
+                                         vtkIdType numToCopyTotal )
 //************************************************************************
 {
   int dataType = data->GetDataType();
@@ -1877,72 +1877,72 @@ void vtkRedistributePolyData::AllocateArrays(vtkDataArray* data,
 
         if (((vtkCharArray*)data)-> 
             WritePointer(0,numToCopyTotal*numComp) ==0)
-	  {
-	  vtkErrorMacro("Error: can't alloc mem for data array");
-	  }
+          {
+          vtkErrorMacro("Error: can't alloc mem for data array");
+          }
         break;
 
       case VTK_UNSIGNED_CHAR:
 
         if (((vtkUnsignedCharArray*)data)-> 
             WritePointer(0,numToCopyTotal*numComp) ==0)
-	  {
-	  vtkErrorMacro("Error: can't alloc mem for data array");
-	  }
+          {
+          vtkErrorMacro("Error: can't alloc mem for data array");
+          }
         break;
 
       case VTK_INT:
 
         if (((vtkIntArray*)data)->
             WritePointer(0,numToCopyTotal*numComp) ==0)
-	  {
-	  vtkErrorMacro("Error: can't alloc mem for data array");
-	  }
+          {
+          vtkErrorMacro("Error: can't alloc mem for data array");
+          }
         break;
 
       case VTK_UNSIGNED_LONG:
 
         if (((vtkUnsignedLongArray*)data)->
             WritePointer(0,numToCopyTotal*numComp) ==0)
-	  {
-	  vtkErrorMacro("Error: can't alloc mem for data array");
-	  }
+          {
+          vtkErrorMacro("Error: can't alloc mem for data array");
+          }
         break;
 
       case VTK_FLOAT:
 
         if (((vtkFloatArray*)data)->
             WritePointer(0,numToCopyTotal*numComp) ==0)
-	  {
-	  vtkErrorMacro("Error: can't alloc mem for data array");
-	  }
+          {
+          vtkErrorMacro("Error: can't alloc mem for data array");
+          }
         break;
 
       case VTK_DOUBLE:
 
         if (((vtkDoubleArray*)data)->
             WritePointer(0,numToCopyTotal*numComp) ==0)
-	  {
-	  vtkErrorMacro("Error: can't alloc mem for data array")
-	  }
+          {
+          vtkErrorMacro("Error: can't alloc mem for data array")
+          }
         break;
 
       case VTK_LONG:
 
         if (((vtkLongArray*)data)->
             WritePointer(0,numToCopyTotal*numComp) ==0)
-	  {
-	  vtkErrorMacro("Error: can't alloc mem for data array");
-	  }
+          {
+          vtkErrorMacro("Error: can't alloc mem for data array");
+          }
         break;
         
       case VTK_ID_TYPE:
 
         if (((vtkIdTypeArray*)data)->
             WritePointer(0,numToCopyTotal*numComp) ==0)
-	  {
-	  vtkErrorMacro("Error: can't alloc mem for data array");
-	  }
+          {
+          vtkErrorMacro("Error: can't alloc mem for data array");
+          }
         break;
         
       case VTK_BIT:
@@ -1965,7 +1965,7 @@ void vtkRedistributePolyData::AllocateArrays(vtkDataArray* data,
 //----------------------------------------------------------------------
 //*****************************************************************
 void vtkRedistributePolyData::FindMemReq(vtkIdType origNumCells, vtkPolyData* input,
-				     vtkIdType& numPoints, vtkIdType& numCellPts)
+                                     vtkIdType& numPoints, vtkIdType& numCellPts)
 
 //*****************************************************************
 {
@@ -2001,9 +2001,9 @@ void vtkRedistributePolyData::FindMemReq(vtkIdType origNumCells, vtkPolyData* in
       pointId = *inPtr++;
       if (usedIds[pointId] == -1)
         {
-	vtkIdType newPt = numPoints;
-	usedIds[pointId] = newPt;
-	numPoints++;
+        vtkIdType newPt = numPoints;
+        usedIds[pointId] = newPt;
+        numPoints++;
         }
       }
     }
@@ -2031,7 +2031,7 @@ void vtkRedistributePolyData::SendDataArrays(
       //int activeComponent = fromScalars->GetActiveComponent();
       int sendTag = SCALARS_TAG+typetag;
       this->SendArrays (data, numToCopy, sendTo, fromId, activeComponent, 
-			sendTag);
+                        sendTag);
       }
     }
 
@@ -2044,7 +2044,7 @@ void vtkRedistributePolyData::SendDataArrays(
       int activeComponent = -1;
       int sendTag = VECTORS_TAG+typetag;
       this->SendArrays (data, numToCopy, sendTo, fromId, activeComponent, 
-			sendTag);
+                        sendTag);
       }
     }
 
@@ -2057,7 +2057,7 @@ void vtkRedistributePolyData::SendDataArrays(
       int activeComponent = -1;
       int sendTag = NORMALS_TAG+typetag;
       this->SendArrays (data, numToCopy, sendTo, fromId, activeComponent, 
-			sendTag);
+                        sendTag);
       }
     }
 
@@ -2071,7 +2071,7 @@ void vtkRedistributePolyData::SendDataArrays(
       int activeComponent = -1;
       int sendTag = TCOORDS_TAG+typetag;
       this->SendArrays (data, numToCopy, sendTo, fromId, activeComponent, 
-			sendTag);
+                        sendTag);
       }
     }
 
@@ -2084,7 +2084,7 @@ void vtkRedistributePolyData::SendDataArrays(
       int activeComponent = -1;
       int sendTag = TENSOR_TAG+typetag;
       this->SendArrays (data, numToCopy, sendTo, fromId, activeComponent, 
-			sendTag);
+                        sendTag);
       }
     }
 
@@ -2101,7 +2101,7 @@ void vtkRedistributePolyData::SendDataArrays(
       int activeComponent = -1;
       int sendTag = FIELDDATA_TAG+typetag+j*100;
       this->SendArrays (data, numToCopy, sendTo, fromId, activeComponent, 
-			sendTag);
+                        sendTag);
       }
     }
   }
@@ -2128,14 +2128,14 @@ void vtkRedistributePolyData::SendCellBlockDataArrays(
       //int activeComponent = fromScalars->GetActiveComponent();
       int sendTag = SCALARS_TAG;
       if (numComps>1)
-	{
+        {
         this->SendArrays (data, numToCopy, sendTo, fromIds, activeComponent, 
-			  sendTag);
-	}
+                          sendTag);
+        }
       else
-	{
+        {
         this->SendBlockArrays (data, numToCopy, sendTo, startCell, sendTag);
-	}
+        }
       }
     }
 
@@ -2243,13 +2243,13 @@ void vtkRedistributePolyData::SendArrays(
       cArray = ((vtkCharArray*)data)->GetPointer(0);
       sc = new char[numToCopy*numCompsToCopy];
       for (i = 0; i < numToCopy; i++)
-	{
-	for (j = 0; j < numCompsToCopy; j++)
-	  {
-	  sc[numCompsToCopy*i+j] = 
-	    cArray[numCompsToCopy*fromId[i]+j+activeComponent];
-	  }
-	}
+        {
+        for (j = 0; j < numCompsToCopy; j++)
+          {
+          sc[numCompsToCopy*i+j] = 
+            cArray[numCompsToCopy*fromId[i]+j+activeComponent];
+          }
+        }
 
       this->Controller->Send(sc, numToCopy*numCompsToCopy, sendTo, sendTag);
       delete [] sc;
@@ -2259,16 +2259,16 @@ void vtkRedistributePolyData::SendArrays(
       ucArray = ((vtkUnsignedCharArray*)data)->GetPointer(0);
       suc = new unsigned char[numToCopy*numCompsToCopy];
       for (i = 0; i < numToCopy; i++)
-	{
-	for (j = 0; j < numCompsToCopy; j++)
-	  {
-	  suc[numCompsToCopy*i+j] = 
-	    ucArray[numCompsToCopy*fromId[i]+j+activeComponent];
-	  }
-	}
+        {
+        for (j = 0; j < numCompsToCopy; j++)
+          {
+          suc[numCompsToCopy*i+j] = 
+            ucArray[numCompsToCopy*fromId[i]+j+activeComponent];
+          }
+        }
 
       this->Controller->Send((char*)suc, numToCopy*numCompsToCopy, sendTo, 
-			     sendTag);
+                             sendTag);
       delete [] suc;
       break;
 
@@ -2276,13 +2276,13 @@ void vtkRedistributePolyData::SendArrays(
       iArray = ((vtkIntArray*)data)->GetPointer(0);
       si = new int[numToCopy*numCompsToCopy];
       for (i = 0; i < numToCopy; i++)
-	{
-	for (j = 0; j < numCompsToCopy; j++)
-	  {
-	  si[numCompsToCopy*i+j] = 
-	    iArray[numCompsToCopy*fromId[i]+j+activeComponent];
-	  }
-	}
+        {
+        for (j = 0; j < numCompsToCopy; j++)
+          {
+          si[numCompsToCopy*i+j] = 
+            iArray[numCompsToCopy*fromId[i]+j+activeComponent];
+          }
+        }
 
       this->Controller->Send(si, numToCopy*numCompsToCopy, sendTo, sendTag);
       delete [] si;
@@ -2290,16 +2290,16 @@ void vtkRedistributePolyData::SendArrays(
 
     case VTK_UNSIGNED_LONG:
       ulArray = 
-	((vtkUnsignedLongArray*)data)->GetPointer(0);
+        ((vtkUnsignedLongArray*)data)->GetPointer(0);
       sul = new unsigned long [numToCopy*numCompsToCopy];
       for (i = 0; i < numToCopy; i++)
-	{
-	for (j = 0; j < numCompsToCopy; j++)
-	  {
-	  sul[numCompsToCopy*i+j] = 
-	    ulArray[numCompsToCopy*fromId[i]+j+activeComponent];
-	  }
-	}
+        {
+        for (j = 0; j < numCompsToCopy; j++)
+          {
+          sul[numCompsToCopy*i+j] = 
+            ulArray[numCompsToCopy*fromId[i]+j+activeComponent];
+          }
+        }
         
       this->Controller->Send(sul, numToCopy*numCompsToCopy, sendTo, sendTag);
       delete [] sul;
@@ -2309,13 +2309,13 @@ void vtkRedistributePolyData::SendArrays(
       fArray = ((vtkFloatArray*)data)->GetPointer(0);
       sf = new float[numToCopy*numCompsToCopy];
       for (i = 0; i < numToCopy; i++)
-	{
-	for (j = 0; j < numCompsToCopy; j++)
-	  {
-	  sf[numCompsToCopy*i+j] = 
-	    fArray[numCompsToCopy*fromId[i]+j+activeComponent];
-	  }
-	}
+        {
+        for (j = 0; j < numCompsToCopy; j++)
+          {
+          sf[numCompsToCopy*i+j] = 
+            fArray[numCompsToCopy*fromId[i]+j+activeComponent];
+          }
+        }
         
       this->Controller->Send(sf, numToCopy*numCompsToCopy, sendTo, sendTag);
       delete [] sf;
@@ -2327,16 +2327,16 @@ void vtkRedistributePolyData::SendArrays(
       sc = (char*)new char[numToCopy*dataSize*numCompsToCopy];
       sd = (double*)sc;
       for (i = 0; i < numToCopy; i++)
-	{
-	for (j = 0; j < numCompsToCopy; j++)
-	  {
-	  sd[numCompsToCopy*i+j] = 
-	    dArray[numCompsToCopy*fromId[i]+j+activeComponent];
-	  }
-	}
+        {
+        for (j = 0; j < numCompsToCopy; j++)
+          {
+          sd[numCompsToCopy*i+j] = 
+            dArray[numCompsToCopy*fromId[i]+j+activeComponent];
+          }
+        }
 
       this->Controller->Send(sc, numToCopy*numCompsToCopy*dataSize, sendTo, 
-			     sendTag);
+                             sendTag);
       delete [] sc;
       break;
 
@@ -2346,15 +2346,15 @@ void vtkRedistributePolyData::SendArrays(
       sc = (char*)new long[numToCopy*dataSize*numCompsToCopy];
       sl = (long*)sc;
       for (i = 0; i < numToCopy; i++)
-	{
-	for (j = 0; j < numCompsToCopy; j++)
-	  {
-	  sl[numCompsToCopy*i+j] = 
-	    lArray[numCompsToCopy*fromId[i]+j+activeComponent];
-	  }
-	}
+        {
+        for (j = 0; j < numCompsToCopy; j++)
+          {
+          sl[numCompsToCopy*i+j] = 
+            lArray[numCompsToCopy*fromId[i]+j+activeComponent];
+          }
+        }
       this->Controller->Send(sc, numToCopy*numCompsToCopy*dataSize, sendTo, 
-			     sendTag);
+                             sendTag);
       delete [] sc;
       break;
         
@@ -2364,16 +2364,16 @@ void vtkRedistributePolyData::SendArrays(
       sc = (char*)new vtkIdType[numToCopy*dataSize*numCompsToCopy];
       sid = (vtkIdType*)sc;
       for (i = 0; i < numToCopy; i++)
-	{
-	for (j = 0; j < numCompsToCopy; j++)
-	  {
-	  sid[numCompsToCopy*i+j] = 
-	    idArray[numCompsToCopy*fromId[i]+j+activeComponent];
-	  }
-	}
+        {
+        for (j = 0; j < numCompsToCopy; j++)
+          {
+          sid[numCompsToCopy*i+j] = 
+            idArray[numCompsToCopy*fromId[i]+j+activeComponent];
+          }
+        }
 
       this->Controller->Send(sc, numToCopy*numCompsToCopy*dataSize, sendTo, 
-			     sendTag);
+                             sendTag);
       delete [] sc;
       break;
         
@@ -2421,52 +2421,52 @@ void vtkRedistributePolyData::SendBlockArrays(
     case VTK_CHAR:
       cArray = ((vtkCharArray*)data)->GetPointer(0);
       this->Controller->
-	Send((char*)&cArray[start], size, sendTo, sendTag);
+        Send((char*)&cArray[start], size, sendTo, sendTag);
       break;
 
     case VTK_UNSIGNED_CHAR:
       ucArray = ((vtkUnsignedCharArray*)data)->GetPointer(0);
       this->Controller->
-	Send((char*)&ucArray[start], size, sendTo, sendTag);
+        Send((char*)&ucArray[start], size, sendTo, sendTag);
       break;
 
     case VTK_INT:
       iArray = ((vtkIntArray*)data)->GetPointer(0);
       this->Controller->
-	Send((int*)&iArray[start], size, sendTo, sendTag);
+        Send((int*)&iArray[start], size, sendTo, sendTag);
       break;
 
     case VTK_UNSIGNED_LONG:
       ulArray = ((vtkUnsignedLongArray*)data)->GetPointer(0);
       this->Controller->
-	Send((unsigned long*)&ulArray[start], size, sendTo, sendTag);
+        Send((unsigned long*)&ulArray[start], size, sendTo, sendTag);
       break;
 
     case VTK_FLOAT:
       fArray = ((vtkFloatArray*)data)->GetPointer(0);
       this->Controller->
-	Send((float*)&fArray[start], size, sendTo, sendTag);
+        Send((float*)&fArray[start], size, sendTo, sendTag);
       break;
 
     case VTK_DOUBLE:
       dArray = ((vtkDoubleArray*)data)->GetPointer(0);
       dataSize = sizeof(double);
       this->Controller->
-	Send((char*)&dArray[start], size*dataSize, sendTo, sendTag);
+        Send((char*)&dArray[start], size*dataSize, sendTo, sendTag);
       break;
 
     case VTK_LONG:
       lArray = ((vtkLongArray*)data)->GetPointer(0);
       dataSize = sizeof(long);
       this->Controller->
-	Send((char*)&lArray[start], size*dataSize, sendTo, sendTag);
+        Send((char*)&lArray[start], size*dataSize, sendTo, sendTag);
       break;
         
     case VTK_ID_TYPE:
       idArray = ((vtkIdTypeArray*)data)->GetPointer(0);
       dataSize = sizeof(vtkIdType);
       this->Controller->
-	Send((char*)&idArray[start], size*dataSize, sendTo, sendTag);
+        Send((char*)&idArray[start], size*dataSize, sendTo, sendTag);
       break;
         
     case VTK_BIT:
@@ -2508,7 +2508,7 @@ void vtkRedistributePolyData::ReceiveDataArrays(
       int recTag = SCALARS_TAG+typetag;
 
       this->ReceiveArrays (Data, numToCopy, recFrom, toId, activeComponent, 
-			   recTag);
+                           recTag);
       }
     }
 
@@ -2521,7 +2521,7 @@ void vtkRedistributePolyData::ReceiveDataArrays(
       int recTag = VECTORS_TAG+typetag;
       int activeComponent = -1;
       this->ReceiveArrays (Data, numToCopy, recFrom, toId, activeComponent, 
-			   recTag);
+                           recTag);
       }
     }
 
@@ -2534,7 +2534,7 @@ void vtkRedistributePolyData::ReceiveDataArrays(
       int recTag = NORMALS_TAG+typetag;
       int activeComponent = -1;
       this->ReceiveArrays (Data, numToCopy, recFrom, toId, activeComponent, 
-			   recTag);
+                           recTag);
       }
     }
 
@@ -2547,7 +2547,7 @@ void vtkRedistributePolyData::ReceiveDataArrays(
       int recTag = TCOORDS_TAG+typetag;
       int activeComponent = -1;
       this->ReceiveArrays (Data, numToCopy, recFrom, toId, activeComponent, 
-			   recTag);
+                           recTag);
       }
     }
 
@@ -2560,7 +2560,7 @@ void vtkRedistributePolyData::ReceiveDataArrays(
       int recTag = TENSOR_TAG+typetag;
       int activeComponent = -1;
       this->ReceiveArrays (Data, numToCopy, recFrom, toId, activeComponent, 
-			   recTag);
+                           recTag);
       }
     }
 #if 0
@@ -2576,7 +2576,7 @@ void vtkRedistributePolyData::ReceiveDataArrays(
       int recTag = FIELDDATA_TAG+typetag+j*100;
       int activeComponent = -1;
       this->ReceiveArrays (data, numToCopy, recFrom, toId, activeComponent, 
-			   recTag);
+                           recTag);
       }
     }
   }
@@ -2624,15 +2624,15 @@ void vtkRedistributePolyData::ReceiveArrays(
       sc = new char[numToCopy*numCompsToCopy];
 
       this->Controller->
-	Receive(sc, numToCopy*numCompsToCopy, recFrom, recTag);
+        Receive(sc, numToCopy*numCompsToCopy, recFrom, recTag);
       for (i = 0; i < numToCopy; i++)
-	{
-	for (j = 0; j < numCompsToCopy; j++)
-	  {
-	  cArray[toId[i]*numCompsToCopy+j+activeComponent] = 
-	    sc[numCompsToCopy*i+j];
-	  }
-	}
+        {
+        for (j = 0; j < numCompsToCopy; j++)
+          {
+          cArray[toId[i]*numCompsToCopy+j+activeComponent] = 
+            sc[numCompsToCopy*i+j];
+          }
+        }
 
       delete [] sc;
       break;
@@ -2642,15 +2642,15 @@ void vtkRedistributePolyData::ReceiveArrays(
       suc = new unsigned char[numToCopy*numCompsToCopy];
 
       this->Controller->
-	Receive((char*)suc, numToCopy*numCompsToCopy, recFrom, recTag);
+        Receive((char*)suc, numToCopy*numCompsToCopy, recFrom, recTag);
       for (i = 0; i < numToCopy; i++)
-	{
-	for (j = 0; j < numCompsToCopy; j++)
-	  {
-	  ucArray[toId[i]*numCompsToCopy+j+activeComponent] = 
-	    suc[numCompsToCopy*i+j];
-	  }
-	}
+        {
+        for (j = 0; j < numCompsToCopy; j++)
+          {
+          ucArray[toId[i]*numCompsToCopy+j+activeComponent] = 
+            suc[numCompsToCopy*i+j];
+          }
+        }
 
       delete [] suc;
       break;
@@ -2660,34 +2660,34 @@ void vtkRedistributePolyData::ReceiveArrays(
       si = new int[numToCopy*numCompsToCopy];
 
       this->Controller->
-	Receive(si, numToCopy*numCompsToCopy, recFrom, recTag);
+        Receive(si, numToCopy*numCompsToCopy, recFrom, recTag);
       for (i = 0; i < numToCopy; i++)
-	{
-	for (j = 0; j < numCompsToCopy; j++)
-	  {
-	  iArray[toId[i]*numCompsToCopy+j+activeComponent] = 
-	    si[numCompsToCopy*i+j];
-	  }
-	}
+        {
+        for (j = 0; j < numCompsToCopy; j++)
+          {
+          iArray[toId[i]*numCompsToCopy+j+activeComponent] = 
+            si[numCompsToCopy*i+j];
+          }
+        }
 
       delete [] si;
       break;
 
     case VTK_UNSIGNED_LONG:
       ulArray = 
-	((vtkUnsignedLongArray*)data)->GetPointer(0);
+        ((vtkUnsignedLongArray*)data)->GetPointer(0);
       sul = new unsigned long [numToCopy*numCompsToCopy];
 
       this->Controller->
-	Receive(sul, numToCopy*numCompsToCopy, recFrom, recTag);
+        Receive(sul, numToCopy*numCompsToCopy, recFrom, recTag);
       for (i = 0; i < numToCopy; i++)
-	{
-	for (j = 0; j < numCompsToCopy; j++)
-	  {
-	  ulArray[toId[i]*numCompsToCopy+j+activeComponent] = 
-	    sul[numCompsToCopy*i+j];
-	  }
-	}
+        {
+        for (j = 0; j < numCompsToCopy; j++)
+          {
+          ulArray[toId[i]*numCompsToCopy+j+activeComponent] = 
+            sul[numCompsToCopy*i+j];
+          }
+        }
         
       delete [] sul;
       break;
@@ -2697,15 +2697,15 @@ void vtkRedistributePolyData::ReceiveArrays(
       sf = new float[numToCopy*numCompsToCopy];
 
       this->Controller->
-	Receive(sf, numToCopy*numCompsToCopy, recFrom, recTag);
+        Receive(sf, numToCopy*numCompsToCopy, recFrom, recTag);
       for (i = 0; i < numToCopy; i++)
-	{
-	for (j = 0; j < numCompsToCopy; j++)
-	  {
-	  fArray[toId[i]*numCompsToCopy+j+activeComponent] = 
-	    sf[numCompsToCopy*i+j];
-	  }
-	}
+        {
+        for (j = 0; j < numCompsToCopy; j++)
+          {
+          fArray[toId[i]*numCompsToCopy+j+activeComponent] = 
+            sf[numCompsToCopy*i+j];
+          }
+        }
         
       delete [] sf;
       break;
@@ -2717,27 +2717,27 @@ void vtkRedistributePolyData::ReceiveArrays(
       sd = (double*)sc;
 
       this->Controller->
-	Receive(sc, numToCopy*numCompsToCopy*dataSize, recFrom, recTag);
+        Receive(sc, numToCopy*numCompsToCopy*dataSize, recFrom, recTag);
       if (!colorProc)
         {
-	for (i = 0; i < numToCopy; i++)
-	  {
-	  for (j = 0; j < numCompsToCopy; j++)
-	    {
-	    dArray[toId[i]*numCompsToCopy+j+activeComponent] = 
-	      sd[numCompsToCopy*i+j];
-	    }
-	  }
+        for (i = 0; i < numToCopy; i++)
+          {
+          for (j = 0; j < numCompsToCopy; j++)
+            {
+            dArray[toId[i]*numCompsToCopy+j+activeComponent] = 
+              sd[numCompsToCopy*i+j];
+            }
+          }
         }
       else
         {
-	for (i = 0; i < numToCopy; i++)
-	  {
-	  for (j = 0; j < numCompsToCopy; j++)
-	    {
-	    dArray[toId[i]*numCompsToCopy+j+activeComponent] = recFrom;
-	    }
-	  }
+        for (i = 0; i < numToCopy; i++)
+          {
+          for (j = 0; j < numCompsToCopy; j++)
+            {
+            dArray[toId[i]*numCompsToCopy+j+activeComponent] = recFrom;
+            }
+          }
         }
 
       delete [] sc;
@@ -2750,15 +2750,15 @@ void vtkRedistributePolyData::ReceiveArrays(
       sl = (long*)sc;
 
       this->Controller->
-	Receive(sc, numToCopy*numCompsToCopy*dataSize, recFrom, recTag);
+        Receive(sc, numToCopy*numCompsToCopy*dataSize, recFrom, recTag);
       for (i = 0; i < numToCopy; i++)
-	{
-	for (j = 0; j < numCompsToCopy; j++)
-	  {
-	  lArray[toId[i]*numCompsToCopy+j+activeComponent] = 
-	    sl[numCompsToCopy*i+j];
-	  }
-	}
+        {
+        for (j = 0; j < numCompsToCopy; j++)
+          {
+          lArray[toId[i]*numCompsToCopy+j+activeComponent] = 
+            sl[numCompsToCopy*i+j];
+          }
+        }
 
       delete [] sc;
       break;
@@ -2770,15 +2770,15 @@ void vtkRedistributePolyData::ReceiveArrays(
       sid = (vtkIdType*)sc;
 
       this->Controller->
-	Receive(sc, numToCopy*numCompsToCopy*dataSize, recFrom, recTag);
+        Receive(sc, numToCopy*numCompsToCopy*dataSize, recFrom, recTag);
       for (i = 0; i < numToCopy; i++)
-	{
-	for (j = 0; j < numCompsToCopy; j++)
-	  {
-	  idArray[toId[i]*numCompsToCopy+j+activeComponent] = 
-	    sid[numCompsToCopy*i+j];
-	  }
-	}
+        {
+        for (j = 0; j < numCompsToCopy; j++)
+          {
+          idArray[toId[i]*numCompsToCopy+j+activeComponent] = 
+            sid[numCompsToCopy*i+j];
+          }
+        }
 
       delete [] sc;
       break;
@@ -2984,31 +2984,31 @@ void vtkRedistributePolyData::SendCompleteArrays (int sendTo)
       //    GetCopyAttributeFlag function or if the variable 
       //    wasn't protected. ...
       switch (attributeType)
-	{
-	case vtkDataSetAttributes::SCALARS:
-	  copyFlag = input->GetPointData()->GetCopyScalars();
-	  break;
+        {
+        case vtkDataSetAttributes::SCALARS:
+          copyFlag = input->GetPointData()->GetCopyScalars();
+          break;
 
-	case vtkDataSetAttributes::VECTORS: 
-	  copyFlag = input->GetPointData()->GetCopyVectors(); 
-	  break;
+        case vtkDataSetAttributes::VECTORS: 
+          copyFlag = input->GetPointData()->GetCopyVectors(); 
+          break;
 
-	case vtkDataSetAttributes::NORMALS:
-	  copyFlag = input->GetPointData()->GetCopyNormals();
-	  break;
+        case vtkDataSetAttributes::NORMALS:
+          copyFlag = input->GetPointData()->GetCopyNormals();
+          break;
 
-	case vtkDataSetAttributes::TCOORDS:
-	  copyFlag = input->GetPointData()->GetCopyTCoords();
-	  break;
+        case vtkDataSetAttributes::TCOORDS:
+          copyFlag = input->GetPointData()->GetCopyTCoords();
+          break;
 
-	case vtkDataSetAttributes::TENSORS:
-	  copyFlag = input->GetPointData()->GetCopyTensors();
-	  break;
+        case vtkDataSetAttributes::TENSORS:
+          copyFlag = input->GetPointData()->GetCopyTensors();
+          break;
 
-	default:
-	  copyFlag = 0;
+        default:
+          copyFlag = 0;
 
-	}
+        }
       }
     this->Controller->Send(&attributeType, 1, sendTo, 997249);
     this->Controller->Send(&copyFlag, 1, sendTo, 997250);
@@ -3044,31 +3044,31 @@ void vtkRedistributePolyData::SendCompleteArrays (int sendTo)
       //    GetCopyAttributeFlag function or if the variable 
       //    wasn't protected. ...
       switch (attributeType)
-	{
-	case vtkDataSetAttributes::SCALARS:
-	  copyFlag = input->GetCellData()->GetCopyScalars();
-	  break;
+        {
+        case vtkDataSetAttributes::SCALARS:
+          copyFlag = input->GetCellData()->GetCopyScalars();
+          break;
 
-	case vtkDataSetAttributes::VECTORS: 
-	  copyFlag = input->GetCellData()->GetCopyVectors(); 
-	  break;
+        case vtkDataSetAttributes::VECTORS: 
+          copyFlag = input->GetCellData()->GetCopyVectors(); 
+          break;
 
-	case vtkDataSetAttributes::NORMALS:
-	  copyFlag = input->GetCellData()->GetCopyNormals();
-	  break;
+        case vtkDataSetAttributes::NORMALS:
+          copyFlag = input->GetCellData()->GetCopyNormals();
+          break;
 
-	case vtkDataSetAttributes::TCOORDS:
-	  copyFlag = input->GetCellData()->GetCopyTCoords();
-	  break;
+        case vtkDataSetAttributes::TCOORDS:
+          copyFlag = input->GetCellData()->GetCopyTCoords();
+          break;
 
-	case vtkDataSetAttributes::TENSORS:
-	  copyFlag = input->GetCellData()->GetCopyTensors();
-	  break;
+        case vtkDataSetAttributes::TENSORS:
+          copyFlag = input->GetCellData()->GetCopyTensors();
+          break;
 
-	default:
-	  copyFlag = 0;
+        default:
+          copyFlag = 0;
 
-	}
+        }
       }
     this->Controller->Send(&attributeType, 1, sendTo, 997249);
     this->Controller->Send(&copyFlag, 1, sendTo, 997250);

@@ -221,8 +221,14 @@ public:
   // Description:
   // This is used internally for specifying how many SGI pipes
   // to use for rendering which PV_USE_SGI_PIPES is defined.
+  // All processes have this set to the same value.
   vtkSetMacro(NumberOfPipes, int);
   vtkGetMacro(NumberOfPipes, int);
+
+  // Description:
+  // A helper class to create a controller/communicator pair
+  // the has a restricted set of processes as its world.
+  vtkMultiProcessController *NewController(int minId, int maxId);
 
 protected:
   vtkPVApplication();
