@@ -77,7 +77,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.144");
+vtkCxxRevisionMacro(vtkPVData, "1.145");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -1578,8 +1578,6 @@ void vtkPVData::SetActorColor(float r, float g, float b)
 //----------------------------------------------------------------------------
 void vtkPVData::ChangeActorColor(float r, float g, float b)
 {
-  vtkPVApplication *pvApp = this->GetPVApplication();
-  
   if (this->Mapper->GetScalarVisibility())
     {
     return;
@@ -2825,7 +2823,7 @@ void vtkPVData::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVData ";
-  this->ExtractRevision(os,"$Revision: 1.144 $");
+  this->ExtractRevision(os,"$Revision: 1.145 $");
 }
 
 //----------------------------------------------------------------------------
