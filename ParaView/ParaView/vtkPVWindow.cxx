@@ -137,7 +137,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.462.2.7");
+vtkCxxRevisionMacro(vtkPVWindow, "1.462.2.8");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -1655,11 +1655,11 @@ void vtkPVWindow::PlayDemo(int fromDashboard)
     this->Script("set pvDemoFromDashboard 1");
     }
 
-  // Client path
-  demoScriptPath = pvApp->GetDemoPath();
   // Server path
   pvApp->GetProcessModule()->RootScript("$Application GetDemoPath");
   demoDataPath = pvApp->GetProcessModule()->GetRootResult();
+  // Client path
+  demoScriptPath = pvApp->GetDemoPath();
 
   if (demoDataPath && demoScriptPath)
     {
