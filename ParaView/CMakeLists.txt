@@ -2,6 +2,12 @@ CMAKE_MINIMUM_REQUIRED(VERSION 1.4)
 PROJECT(PARAVIEW) 
 INCLUDE_REGULAR_EXPRESSION("^(vtk).*$")
 
+#-----------------------------------------------------------------------------
+# ParaView version number.  An even minor number corresponds to releases.
+SET(PARAVIEW_VERSION_MAJOR 0)
+SET(PARAVIEW_VERSION_MINOR 7)
+SET(PARAVIEW_VERSION_PATCH 0)
+
 SET (LIBRARY_OUTPUT_PATH ${PARAVIEW_BINARY_DIR}/bin/ CACHE PATH "Single output directory for building all libraries.")
 SET (EXECUTABLE_OUTPUT_PATH ${PARAVIEW_BINARY_DIR}/bin/ CACHE PATH "Single output directory for building all executables.")
 

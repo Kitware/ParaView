@@ -49,6 +49,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkMPIGroup.h"
 #endif
 
+#include "vtkPVConfig.h"
 #include "vtkPVProcessModule.h"
 #include "vtkPVRenderModule.h"
 #include "vtkInstantiator.h"
@@ -118,7 +119,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.209");
+vtkCxxRevisionMacro(vtkPVApplication, "1.210");
 vtkCxxSetObjectMacro(vtkPVApplication, RenderModule, vtkPVRenderModule);
 
 
@@ -288,8 +289,8 @@ Tcl_Interp *vtkPVApplication::InitializeTcl(int argc, char *argv[])
 //----------------------------------------------------------------------------
 vtkPVApplication::vtkPVApplication()
 {
-  this->MajorVersion = 0;
-  this->MinorVersion = 7;
+  this->MajorVersion = PARAVIEW_VERSION_MAJOR;
+  this->MinorVersion = PARAVIEW_VERSION_MINOR;
   this->SetApplicationName("ParaView");
   char name[128];
   sprintf(name, "ParaView%d.%d", this->MajorVersion, this->MinorVersion);
