@@ -57,7 +57,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkWin32OpenGLRenderWindow.h"
 #endif
 
-vtkCxxRevisionMacro(vtkKWRenderWidget, "1.10");
+vtkCxxRevisionMacro(vtkKWRenderWidget, "1.11");
 
 vtkKWRenderWidget::vtkKWRenderWidget()
 {
@@ -234,7 +234,7 @@ void vtkKWRenderWidget::RemoveBindings()
   this->Script("bind %s <Configure> {}", wname);
 }
 
-void vtkKWRenderWidget::MouseMove(int num, int x, int y)
+void vtkKWRenderWidget::MouseMove(int vtkNotUsed(num), int x, int y)
 {
   this->Interactor->SetMoveEventInformationFlipY(x, y);
   this->Interactor->MouseMoveEvent();
