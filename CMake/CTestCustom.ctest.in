@@ -33,6 +33,16 @@ SET(CTEST_CUSTOM_WARNING_MATCH
   "{standard input}:[0-9][0-9]*: Warning: "
   )
 
+IF("@CMAKE_SYSTEM@" MATCHES "OSF")
+  SET(CTEST_CUSTOM_WARNING_EXCEPTION
+    ${CTEST_CUSTOM_WARNING_EXCEPTION}
+    "XdmfDOM"
+    "XdmfExpr"
+    "vtkKWApplication"
+    "vtkKWObject"
+    )
+ENDIF("@CMAKE_SYSTEM@" MATCHES "OSF")
+
 SET(CTEST_CUSTOM_WARNING_EXCEPTION
   ${CTEST_CUSTOM_WARNING_EXCEPTION}
   "tcl8.4.5/[^/]+/../[^/]+/[^.]+.c[:\"]"
@@ -51,4 +61,5 @@ SET(CTEST_CUSTOM_WARNING_EXCEPTION
   "warning: To disable this warning use"
   "ranlib: file: .+ has no symbols"
   )
+
 
