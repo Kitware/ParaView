@@ -51,7 +51,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Resources/vtkKWArrowDown.h"
 
 vtkStandardNewMacro(vtkKWSelectionFrame);
-vtkCxxRevisionMacro(vtkKWSelectionFrame, "1.2");
+vtkCxxRevisionMacro(vtkKWSelectionFrame, "1.3");
 
 vtkCxxSetObjectMacro(vtkKWSelectionFrame, SelectObject, vtkKWObject);
 
@@ -100,7 +100,7 @@ void vtkKWSelectionFrame::Create(vtkKWApplication *app, const char *args)
   
   // create the top level
   wname = this->GetWidgetName();
-  this->Script("frame %s %s", wname, args);
+  this->Script("frame %s %s -bd 3 -relief ridge", wname, args);
   
   this->TitleBar->Create(app, "frame", "-bg #008");
   
@@ -176,4 +176,8 @@ void vtkKWSelectionFrame::SetSelectCommand(vtkKWObject *object,
 void vtkKWSelectionFrame::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+  
+  os << indent << "BodyFrame: " << this->BodyFrame << endl;
+  os << indent << "TitleBarRightSubframe: " << this->TitleBarRightSubframe
+     << endl;
 }

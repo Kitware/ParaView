@@ -48,7 +48,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWGenericRenderWindowInteractor);
-vtkCxxRevisionMacro(vtkKWGenericRenderWindowInteractor, "1.1");
+vtkCxxRevisionMacro(vtkKWGenericRenderWindowInteractor, "1.2");
 
 //----------------------------------------------------------------------------
 vtkKWGenericRenderWindowInteractor::vtkKWGenericRenderWindowInteractor()
@@ -131,4 +131,5 @@ void vtkKWGenericRenderWindowInteractor::PrintSelf(ostream& os, vtkIndent indent
   os << indent << "LastEventPosition: (" << this->LastEventPosition[0] << ", "
      << this->LastEventPosition[1] << ", " << this->LastEventPosition[2]
      << ")" << endl;
+  os << indent << "RenderWidget: " << this->RenderWidget << endl;
 }
