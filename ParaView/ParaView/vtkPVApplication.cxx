@@ -118,7 +118,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.202");
+vtkCxxRevisionMacro(vtkPVApplication, "1.203");
 vtkCxxSetObjectMacro(vtkPVApplication, RenderModule, vtkPVRenderModule);
 
 
@@ -1066,7 +1066,6 @@ void vtkPVApplication::Start(int argc, char*argv[])
       if ( !vtkKWDirectoryUtilities::FileExists(argv[i]) )
         {
         this->SetRenderModule(NULL);
-        cout << "Cannot find file: " << argv[i] << endl;
         this->SetExitStatus(1);
         this->Exit();
         return;
