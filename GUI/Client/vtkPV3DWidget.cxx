@@ -37,7 +37,7 @@
 #include "vtkSMDoubleVectorProperty.h"
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkPV3DWidget, "1.59");
+vtkCxxRevisionMacro(vtkPV3DWidget, "1.60");
 
 //===========================================================================
 //***************************************************************************
@@ -168,7 +168,7 @@ void vtkPV3DWidget::Create(vtkKWApplication *app)
     return;
     }
   ostrstream str;
-  str << this->WidgetProxyXMLName << proxyNum << ends;
+  str << "PV3DWidget_" << this->WidgetProxyXMLName << proxyNum << ends;
   this->SetWidgetProxyName(str.str());
   pxm->RegisterProxy("3d_widgets",this->WidgetProxyName, this->WidgetProxy);
   proxyNum++;
