@@ -70,7 +70,6 @@ public:
   vtkGetMacro(UseSatelliteSoftwareRendering, int);
   vtkGetMacro(HelpSelected, int);
   vtkGetMacro(ReverseConnection, int);
-  vtkGetMacro(AlwaysSSH, int);
   vtkGetMacro(UseRenderingGroup, int);
   vtkGetVector2Macro(TileDimensions, int);
   vtkGetStringMacro(RenderModuleName);
@@ -221,7 +220,6 @@ private:
   int UseSoftwareRendering;
   int UseSatelliteSoftwareRendering;
   int ReverseConnection;
-  int AlwaysSSH;
   int TileDimensions[2];
   int UseRenderingGroup;
 

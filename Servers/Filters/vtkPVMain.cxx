@@ -36,7 +36,7 @@
 #include "vtkDynamicLoader.h"
 
 vtkStandardNewMacro(vtkPVMain);
-vtkCxxRevisionMacro(vtkPVMain, "1.2");
+vtkCxxRevisionMacro(vtkPVMain, "1.3");
 
 
 
@@ -75,6 +75,9 @@ void vtkPVMain::Initialize(int argc, char* argv[])
   // Whether to initialize tk.  Once again, splitting Tk and Tcl 
   // initialization would clean things up.
   MPI_Comm_rank(MPI_COMM_WORLD,&myId); 
+#else
+  (void)argc;
+  (void)argv;
 #endif
 }
 
