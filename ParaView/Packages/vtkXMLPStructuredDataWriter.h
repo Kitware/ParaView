@@ -26,7 +26,7 @@
 
 class vtkXMLStructuredDataWriter;
 
-class VTK_IO_EXPORT vtkXMLPStructuredDataWriter : public vtkXMLPDataWriter
+class VTK_EXPORT vtkXMLPStructuredDataWriter : public vtkXMLPDataWriter
 {
 public:
   vtkTypeRevisionMacro(vtkXMLPStructuredDataWriter,vtkXMLPDataWriter);

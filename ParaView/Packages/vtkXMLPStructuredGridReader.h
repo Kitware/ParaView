@@ -26,7 +26,7 @@
 
 class vtkStructuredGrid;
 
-class VTK_IO_EXPORT vtkXMLPStructuredGridReader : public vtkXMLPStructuredDataReader
+class VTK_EXPORT vtkXMLPStructuredGridReader : public vtkXMLPStructuredDataReader
 {
 public:
   vtkTypeRevisionMacro(vtkXMLPStructuredGridReader,vtkXMLPStructuredDataReader);

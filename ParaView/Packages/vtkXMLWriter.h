@@ -32,7 +32,7 @@ class vtkPoints;
 class vtkOutputStream;
 class vtkDataCompressor;
 
-class VTK_IO_EXPORT vtkXMLWriter : public vtkProcessObject
+class VTK_EXPORT vtkXMLWriter : public vtkProcessObject
 {
 public:
   vtkTypeRevisionMacro(vtkXMLWriter,vtkProcessObject);
@@ -199,8 +199,15 @@ protected:
   
   int WriteScalarAttribute(const char* name, int data);
   int WriteScalarAttribute(const char* name, float data);
+#ifdef VTK_ID_TYPE_IS_NOT_BASIC_TYPE
+  int WriteScalarAttribute(const char* name, vtkIdType data);
+#endif
+  
   int WriteVectorAttribute(const char* name, int length, int* data);
   int WriteVectorAttribute(const char* name, int length, float* data);
+#ifdef VTK_ID_TYPE_IS_NOT_BASIC_TYPE
+  int WriteVectorAttribute(const char* name, int length, vtkIdType* data);
+#endif
   
   int WriteDataModeAttribute(const char* name);
   int WriteWordTypeAttribute(const char* name, int dataType);

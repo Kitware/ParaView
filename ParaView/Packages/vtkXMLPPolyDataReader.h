@@ -26,7 +26,7 @@
 
 class vtkPolyData;
 
-class VTK_IO_EXPORT vtkXMLPPolyDataReader : public vtkXMLPUnstructuredDataReader
+class VTK_EXPORT vtkXMLPPolyDataReader : public vtkXMLPUnstructuredDataReader
 {
 public:
   vtkTypeRevisionMacro(vtkXMLPPolyDataReader,vtkXMLPUnstructuredDataReader);

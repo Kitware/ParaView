@@ -25,7 +25,7 @@
 #include "vtkXMLDataReader.h"
 
 
-class VTK_IO_EXPORT vtkXMLStructuredDataReader : public vtkXMLDataReader
+class VTK_EXPORT vtkXMLStructuredDataReader : public vtkXMLDataReader
 {
 public:
   vtkTypeRevisionMacro(vtkXMLStructuredDataReader,vtkXMLDataReader);

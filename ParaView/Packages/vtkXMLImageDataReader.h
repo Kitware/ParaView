@@ -26,7 +26,7 @@
 
 class vtkImageData;
 
-class VTK_IO_EXPORT vtkXMLImageDataReader : public vtkXMLStructuredDataReader
+class VTK_EXPORT vtkXMLImageDataReader : public vtkXMLStructuredDataReader
 {
 public:
   vtkTypeRevisionMacro(vtkXMLImageDataReader,vtkXMLStructuredDataReader);

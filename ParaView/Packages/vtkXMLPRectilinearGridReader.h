@@ -26,7 +26,7 @@
 
 class vtkRectilinearGrid;
 
-class VTK_IO_EXPORT vtkXMLPRectilinearGridReader : public vtkXMLPStructuredDataReader
+class VTK_EXPORT vtkXMLPRectilinearGridReader : public vtkXMLPStructuredDataReader
 {
 public:
   vtkTypeRevisionMacro(vtkXMLPRectilinearGridReader,vtkXMLPStructuredDataReader);

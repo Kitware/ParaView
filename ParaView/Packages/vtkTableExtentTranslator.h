@@ -28,7 +28,7 @@
 
 #include "vtkExtentTranslator.h"
 
-class VTK_IO_EXPORT vtkTableExtentTranslator : public vtkExtentTranslator
+class VTK_EXPORT vtkTableExtentTranslator : public vtkExtentTranslator
 {
 public:
   vtkTypeRevisionMacro(vtkTableExtentTranslator,vtkExtentTranslator);

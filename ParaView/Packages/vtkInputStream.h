@@ -29,7 +29,7 @@
 
 #include "vtkObject.h"
 
-class VTK_IO_EXPORT vtkInputStream : public vtkObject
+class VTK_EXPORT vtkInputStream : public vtkObject
 {
 public:
   vtkTypeRevisionMacro(vtkInputStream,vtkObject);

@@ -24,7 +24,7 @@
 
 #include "vtkXMLReader.h"
 
-class VTK_IO_EXPORT vtkXMLDataReader : public vtkXMLReader
+class VTK_EXPORT vtkXMLDataReader : public vtkXMLReader
 {
 public:
   vtkTypeRevisionMacro(vtkXMLDataReader,vtkXMLReader);

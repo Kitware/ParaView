@@ -28,7 +28,7 @@
 template <class DType> class vtkVector;
 //ETX
 
-class VTK_IO_EXPORT vtkDataArraySelection : public vtkObject
+class VTK_EXPORT vtkDataArraySelection : public vtkObject
 {
 public:
   vtkTypeRevisionMacro(vtkDataArraySelection,vtkObject);

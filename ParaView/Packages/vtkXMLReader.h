@@ -29,7 +29,7 @@ class vtkXMLDataElement;
 class vtkDataSet;
 class vtkDataArray;
 
-class VTK_IO_EXPORT vtkXMLReader : public vtkSource
+class VTK_EXPORT vtkXMLReader : public vtkSource
 {
 public:
   vtkTypeRevisionMacro(vtkXMLReader,vtkSource);

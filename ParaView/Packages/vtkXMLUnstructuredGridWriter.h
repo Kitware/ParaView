@@ -26,7 +26,7 @@
 
 class vtkUnstructuredGrid;
 
-class VTK_IO_EXPORT vtkXMLUnstructuredGridWriter : public vtkXMLUnstructuredDataWriter
+class VTK_EXPORT vtkXMLUnstructuredGridWriter : public vtkXMLUnstructuredDataWriter
 {
 public:
   vtkTypeRevisionMacro(vtkXMLUnstructuredGridWriter,vtkXMLUnstructuredDataWriter);

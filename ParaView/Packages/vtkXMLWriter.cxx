@@ -26,7 +26,7 @@
 #include "vtkCellData.h"
 #include "vtkPoints.h"
 
-vtkCxxRevisionMacro(vtkXMLWriter, "1.1");
+vtkCxxRevisionMacro(vtkXMLWriter, "1.2");
 vtkCxxSetObjectMacro(vtkXMLWriter, Compressor, vtkDataCompressor);
 
 //----------------------------------------------------------------------------
@@ -568,6 +568,14 @@ int vtkXMLWriter::WriteScalarAttribute(const char* name, float data)
 }
 
 //----------------------------------------------------------------------------
+#ifdef VTK_ID_TYPE_IS_NOT_BASIC_TYPE
+int vtkXMLWriter::WriteScalarAttribute(const char* name, vtkIdType data)
+{
+  return this->WriteVectorAttribute(name, 1, &data);
+}
+#endif
+
+//----------------------------------------------------------------------------
 int vtkXMLWriter::WriteVectorAttribute(const char* name, int length,
                                        int* data)
 {
@@ -580,6 +588,15 @@ int vtkXMLWriter::WriteVectorAttribute(const char* name, int length,
 {
   return vtkXMLWriterWriteVectorAttribute(*(this->Stream), name, length, data);
 }
+
+//----------------------------------------------------------------------------
+#ifdef VTK_ID_TYPE_IS_NOT_BASIC_TYPE
+int vtkXMLWriter::WriteVectorAttribute(const char* name, int length,
+                                       vtkIdType* data)
+{
+  return vtkXMLWriterWriteVectorAttribute(*(this->Stream), name, length, data);
+}
+#endif
 
 //----------------------------------------------------------------------------
 int vtkXMLWriter::WriteDataModeAttribute(const char* name)

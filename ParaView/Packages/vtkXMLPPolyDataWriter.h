@@ -26,7 +26,7 @@
 
 class vtkPolyData;
 
-class VTK_IO_EXPORT vtkXMLPPolyDataWriter : public vtkXMLPUnstructuredDataWriter
+class VTK_EXPORT vtkXMLPPolyDataWriter : public vtkXMLPUnstructuredDataWriter
 {
 public:
   static vtkXMLPPolyDataWriter* New();

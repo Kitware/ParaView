@@ -19,7 +19,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkVector.txx"
 
-vtkCxxRevisionMacro(vtkDataArraySelection, "1.1");
+vtkCxxRevisionMacro(vtkDataArraySelection, "1.2");
 vtkStandardNewMacro(vtkDataArraySelection);
 
 //----------------------------------------------------------------------------
@@ -46,7 +46,7 @@ void vtkDataArraySelection::PrintSelf(ostream& os, vtkIndent indent)
 //----------------------------------------------------------------------------
 void vtkDataArraySelection::EnableArray(const char* name)
 {
-  int pos=0;
+  vtkIdType pos=0;
   if(this->ArrayNames->FindItem(name, pos) == VTK_OK)
     {
     this->ArraySettings->SetItem(pos, 1);
@@ -58,7 +58,7 @@ void vtkDataArraySelection::EnableArray(const char* name)
 //----------------------------------------------------------------------------
 void vtkDataArraySelection::DisableArray(const char* name)
 {
-  int pos=0;
+  vtkIdType pos=0;
   if(this->ArrayNames->FindItem(name, pos) == VTK_OK)
     {
     this->ArraySettings->SetItem(pos, 0);
@@ -71,7 +71,7 @@ void vtkDataArraySelection::DisableArray(const char* name)
 int vtkDataArraySelection::ArrayIsEnabled(const char* name)
 {
   // Check if there is a specific entry for this array.
-  int pos=0;
+  vtkIdType pos=0;
   int result=0;
   if((this->ArrayNames->FindItem(name, pos) == VTK_OK) &&
      (this->ArraySettings->GetItem(pos, result) == VTK_OK))
@@ -159,7 +159,7 @@ void vtkDataArraySelection::SetArrays(const char** names, int numArrays)
     newNames->AppendItem(names[i]);
     
     // Fill in the setting.
-    int pos=0;
+    vtkIdType pos=0;
     int result=0;
     if((this->ArrayNames->FindItem(names[i], pos) == VTK_OK) &&
        (this->ArraySettings->GetItem(pos, result) == VTK_OK))

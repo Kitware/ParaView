@@ -27,7 +27,7 @@
 class vtkPointSet;
 class vtkXMLUnstructuredDataWriter;
 
-class VTK_IO_EXPORT vtkXMLPUnstructuredDataWriter : public vtkXMLPDataWriter
+class VTK_EXPORT vtkXMLPUnstructuredDataWriter : public vtkXMLPDataWriter
 {
 public:
   vtkTypeRevisionMacro(vtkXMLPUnstructuredDataWriter,vtkXMLPDataWriter);

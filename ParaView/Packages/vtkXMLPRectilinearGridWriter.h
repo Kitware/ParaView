@@ -26,7 +26,7 @@
 
 class vtkRectilinearGrid;
 
-class VTK_IO_EXPORT vtkXMLPRectilinearGridWriter : public vtkXMLPStructuredDataWriter
+class VTK_EXPORT vtkXMLPRectilinearGridWriter : public vtkXMLPStructuredDataWriter
 {
 public:
   static vtkXMLPRectilinearGridWriter* New();

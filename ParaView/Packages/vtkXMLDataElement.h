@@ -74,6 +74,9 @@ public:
   int GetScalarAttribute(const char* name, int& value);
   int GetScalarAttribute(const char* name, float& value);
   int GetScalarAttribute(const char* name, unsigned long& value);
+#ifdef VTK_ID_TYPE_IS_NOT_BASIC_TYPE
+  int GetScalarAttribute(const char* name, vtkIdType& value);
+#endif
   
   // Description:
   // Get the attribute with the given name and converted to a scalar
@@ -81,6 +84,9 @@ public:
   int GetVectorAttribute(const char* name, int length, int* value);
   int GetVectorAttribute(const char* name, int length, float* value);
   int GetVectorAttribute(const char* name, int length, unsigned long* value);
+#ifdef VTK_ID_TYPE_IS_NOT_BASIC_TYPE
+  int GetVectorAttribute(const char* name, int length, vtkIdType* value);
+#endif
   
   // Description:
   // Get the attribute with the given name and converted to a word type

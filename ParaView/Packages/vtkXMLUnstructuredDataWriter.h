@@ -29,7 +29,7 @@ class vtkCellArray;
 class vtkDataArray;
 class vtkIdTypeArray;
 
-class VTK_IO_EXPORT vtkXMLUnstructuredDataWriter : public vtkXMLWriter
+class VTK_EXPORT vtkXMLUnstructuredDataWriter : public vtkXMLWriter
 {
 public:
   vtkTypeRevisionMacro(vtkXMLUnstructuredDataWriter,vtkXMLWriter);

@@ -28,7 +28,7 @@ class vtkDataArray;
 class vtkDataSet;
 class vtkXMLDataReader;
 
-class VTK_IO_EXPORT vtkXMLPDataReader : public vtkXMLReader
+class VTK_EXPORT vtkXMLPDataReader : public vtkXMLReader
 {
 public:
   vtkTypeRevisionMacro(vtkXMLPDataReader,vtkXMLReader);

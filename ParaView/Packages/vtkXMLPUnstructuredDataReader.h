@@ -28,7 +28,7 @@ class vtkPointSet;
 class vtkCellArray;
 class vtkXMLUnstructuredDataReader;
 
-class VTK_IO_EXPORT vtkXMLPUnstructuredDataReader : public vtkXMLPDataReader
+class VTK_EXPORT vtkXMLPUnstructuredDataReader : public vtkXMLPDataReader
 {
 public:
   vtkTypeRevisionMacro(vtkXMLPUnstructuredDataReader,vtkXMLPDataReader);

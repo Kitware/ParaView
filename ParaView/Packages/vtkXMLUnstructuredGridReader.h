@@ -26,7 +26,7 @@
 
 class vtkUnstructuredGrid;
 
-class VTK_IO_EXPORT vtkXMLUnstructuredGridReader : public vtkXMLUnstructuredDataReader
+class VTK_EXPORT vtkXMLUnstructuredGridReader : public vtkXMLUnstructuredDataReader
 {
 public:
   vtkTypeRevisionMacro(vtkXMLUnstructuredGridReader,vtkXMLUnstructuredDataReader);

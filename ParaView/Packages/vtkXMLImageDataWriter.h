@@ -26,7 +26,7 @@
 
 class vtkImageData;
 
-class VTK_IO_EXPORT vtkXMLImageDataWriter : public vtkXMLStructuredDataWriter
+class VTK_EXPORT vtkXMLImageDataWriter : public vtkXMLStructuredDataWriter
 {
 public:
   static vtkXMLImageDataWriter* New();

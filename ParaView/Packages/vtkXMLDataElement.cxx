@@ -45,7 +45,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <ctype.h>
 
-vtkCxxRevisionMacro(vtkXMLDataElement, "1.1");
+vtkCxxRevisionMacro(vtkXMLDataElement, "1.2");
 vtkStandardNewMacro(vtkXMLDataElement);
 
 //----------------------------------------------------------------------------
@@ -314,6 +314,14 @@ int vtkXMLDataElement::GetScalarAttribute(const char* name,
 }
 
 //----------------------------------------------------------------------------
+#ifdef VTK_ID_TYPE_IS_NOT_BASIC_TYPE
+int vtkXMLDataElement::GetScalarAttribute(const char* name, vtkIdType& value)
+{
+  return this->GetVectorAttribute(name, 1, &value);
+}
+#endif
+
+//----------------------------------------------------------------------------
 template <class T>
 static int vtkXMLVectorAttributeParse(const char* str, int length, T* data)
 {
@@ -349,6 +357,15 @@ int vtkXMLDataElement::GetVectorAttribute(const char* name, int length,
 {
   return vtkXMLVectorAttributeParse(this->GetAttribute(name), length, data);
 }
+
+//----------------------------------------------------------------------------
+#ifdef VTK_ID_TYPE_IS_NOT_BASIC_TYPE
+int vtkXMLDataElement::GetVectorAttribute(const char* name, int length,
+                                          vtkIdType* data)
+{
+  return vtkXMLVectorAttributeParse(this->GetAttribute(name), length, data);
+}
+#endif
 
 //----------------------------------------------------------------------------
 int vtkXMLDataElement::GetWordTypeAttribute(const char* name, int& value)

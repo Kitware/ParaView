@@ -26,7 +26,7 @@
 
 class vtkStructuredGrid;
 
-class VTK_IO_EXPORT vtkXMLStructuredGridWriter : public vtkXMLStructuredDataWriter
+class VTK_EXPORT vtkXMLStructuredGridWriter : public vtkXMLStructuredDataWriter
 {
 public:
   static vtkXMLStructuredGridWriter* New();

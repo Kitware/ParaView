@@ -28,7 +28,7 @@ class vtkExtentTranslator;
 class vtkTableExtentTranslator;
 class vtkXMLStructuredDataReader;
 
-class VTK_IO_EXPORT vtkXMLPStructuredDataReader : public vtkXMLPDataReader
+class VTK_EXPORT vtkXMLPStructuredDataReader : public vtkXMLPDataReader
 {
 public:
   vtkTypeRevisionMacro(vtkXMLPStructuredDataReader,vtkXMLPDataReader);
