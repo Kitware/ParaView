@@ -775,7 +775,7 @@ void vtkKWView::Print()
       "A postscript file has been generated. You will need to\n"
       "print this file using a print command appropriate for\n"
       "your system. Typically this command is lp or lpr. For\n"
-      "additional informaiton on printing a postscript file\n"
+      "additional information on printing a postscript file\n"
       "please contact your system administrator.");
     dlg->Invoke();
     }
@@ -1228,7 +1228,7 @@ void vtkKWView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWView ";
-  this->ExtractRevision(os,"$Revision: 1.41 $");
+  this->ExtractRevision(os,"$Revision: 1.42 $");
 }
 
 void vtkKWView::SetupMemoryRendering(int x, int y, void *cd) 
