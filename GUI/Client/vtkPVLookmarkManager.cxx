@@ -90,7 +90,6 @@
 #include "vtkObjectFactory.h"
 #include "vtkRenderer.h"
 #include "vtkVectorIterator.txx"
-#include "vtkString.h"
 #include "vtkImageClip.h"
 #include "vtkStdString.h"
 
@@ -109,7 +108,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLookmarkManager);
-vtkCxxRevisionMacro(vtkPVLookmarkManager, "1.12");
+vtkCxxRevisionMacro(vtkPVLookmarkManager, "1.13");
 int vtkPVLookmarkManagerCommand(ClientData cd, Tcl_Interp *interp, int argc, char *argv[]);
 
 //----------------------------------------------------------------------------

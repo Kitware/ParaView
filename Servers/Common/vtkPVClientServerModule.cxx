@@ -33,9 +33,6 @@
 #include "vtkSocketCommunicator.h"
 #include "vtkSocketController.h"
 #include "vtkSource.h"
-#include "vtkString.h"
-#include "vtkString.h"
-#include "vtkStringList.h"
 #include "vtkStringList.h"
 #include "vtkToolkits.h"
 #include "vtkUnsignedIntArray.h"
@@ -150,7 +147,7 @@ void vtkPVSendStreamToClientServerNodeRMI(void *localArg, void *remoteArg,
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVClientServerModule);
-vtkCxxRevisionMacro(vtkPVClientServerModule, "1.26");
+vtkCxxRevisionMacro(vtkPVClientServerModule, "1.27");
 
 
 //----------------------------------------------------------------------------

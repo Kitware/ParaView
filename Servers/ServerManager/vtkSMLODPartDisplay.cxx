@@ -31,7 +31,6 @@
 #include "vtkProperty.h"
 #include "vtkQuadricClustering.h"
 #include "vtkRectilinearGrid.h"
-#include "vtkString.h"
 #include "vtkStructuredGrid.h"
 #include "vtkTimerLog.h"
 #include "vtkToolkits.h"
@@ -39,7 +38,7 @@
 #include "vtkSMStringVectorProperty.h"
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMLODPartDisplay);
-vtkCxxRevisionMacro(vtkSMLODPartDisplay, "1.13");
+vtkCxxRevisionMacro(vtkSMLODPartDisplay, "1.14");
 
 
 //----------------------------------------------------------------------------

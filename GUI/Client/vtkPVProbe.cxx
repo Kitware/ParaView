@@ -39,7 +39,6 @@
 #include "vtkProperty2D.h"
 #include "vtkSocketController.h"
 #include "vtkSource.h"
-#include "vtkString.h"
 #include "vtkSystemIncludes.h"
 #include "vtkXYPlotActor.h"
 #include "vtkXYPlotWidget.h"
@@ -51,7 +50,7 @@
  
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProbe);
-vtkCxxRevisionMacro(vtkPVProbe, "1.134");
+vtkCxxRevisionMacro(vtkPVProbe, "1.135");
 
 int vtkPVProbeCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);

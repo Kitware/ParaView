@@ -33,7 +33,6 @@
 #include "vtkPolyData.h"
 #include "vtkPolyDataWriter.h"
 #include "vtkShortArray.h"
-#include "vtkString.h"
 #include "vtkTimerLog.h"
 #include "vtkUnsignedCharArray.h"
 #include "vtkUnsignedIntArray.h"
@@ -43,7 +42,7 @@
 #include "vtkMultiProcessController.h"
 
 vtkStandardNewMacro(vtkRedistributePolyData);
-vtkCxxRevisionMacro(vtkRedistributePolyData, "1.20");
+vtkCxxRevisionMacro(vtkRedistributePolyData, "1.21");
 
 vtkCxxSetObjectMacro(vtkRedistributePolyData, Controller, 
                      vtkMultiProcessController);

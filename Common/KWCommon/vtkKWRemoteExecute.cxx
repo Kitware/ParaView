@@ -14,7 +14,6 @@
 #include "vtkKWRemoteExecute.h"
 
 #include "vtkObjectFactory.h"
-#include "vtkString.h"
 #include "vtkMultiThreader.h"
 
 #ifdef _MSC_VER
@@ -53,7 +52,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWRemoteExecute );
-vtkCxxRevisionMacro(vtkKWRemoteExecute, "1.17");
+vtkCxxRevisionMacro(vtkKWRemoteExecute, "1.18");
 
 //----------------------------------------------------------------------------
 vtkKWRemoteExecute::vtkKWRemoteExecute()

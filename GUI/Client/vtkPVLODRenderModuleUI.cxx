@@ -55,7 +55,6 @@
 #include "vtkPolyData.h"
 #include "vtkPolyDataMapper.h"
 #include "vtkRenderer.h"
-#include "vtkString.h"
 #include "vtkTimerLog.h"
 #include "vtkToolkits.h"
 
@@ -63,7 +62,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLODRenderModuleUI);
-vtkCxxRevisionMacro(vtkPVLODRenderModuleUI, "1.18");
+vtkCxxRevisionMacro(vtkPVLODRenderModuleUI, "1.19");
 
 int vtkPVLODRenderModuleUICommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);

@@ -69,7 +69,6 @@
 #include "vtkRenderer.h"
 #include "vtkRendererCollection.h"
 #include "vtkRenderWindow.h"
-#include "vtkString.h"
 #include "vtkTIFFWriter.h"
 #include "vtkTimerLog.h"
 #include "vtkToolkits.h"
@@ -132,7 +131,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.353");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.354");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);

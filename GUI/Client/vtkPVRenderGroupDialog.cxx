@@ -24,12 +24,11 @@
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
-#include "vtkString.h"
 #include "vtkTimerLog.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVRenderGroupDialog );
-vtkCxxRevisionMacro(vtkPVRenderGroupDialog, "1.7");
+vtkCxxRevisionMacro(vtkPVRenderGroupDialog, "1.8");
 
 int vtkPVRenderGroupDialogCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);

@@ -56,7 +56,6 @@
 #include "vtkSMSourceProxy.h"
 #include "vtkSMProxyProperty.h"
 #include "vtkSource.h"
-#include "vtkString.h"
 #include "vtkRenderer.h"
 #include "vtkArrayMap.txx"
 #include "vtkStringList.h"
@@ -69,7 +68,7 @@
 
 
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.419");
+vtkCxxRevisionMacro(vtkPVSource, "1.420");
 vtkCxxSetObjectMacro(vtkPVSource,Notebook,vtkPVSourceNotebook);
 vtkCxxSetObjectMacro(vtkPVSource,PartDisplay,vtkSMPartDisplay);
 

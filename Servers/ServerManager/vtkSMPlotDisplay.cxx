@@ -28,7 +28,6 @@
 #include "vtkProperty.h"
 #include "vtkRectilinearGrid.h"
 #include "vtkStructuredGrid.h"
-#include "vtkString.h"
 #include "vtkTimerLog.h"
 #include "vtkToolkits.h"
 #include "vtkFieldDataToAttributeDataFilter.h"
@@ -44,7 +43,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMPlotDisplay);
-vtkCxxRevisionMacro(vtkSMPlotDisplay, "1.5");
+vtkCxxRevisionMacro(vtkSMPlotDisplay, "1.6");
 
 
 //----------------------------------------------------------------------------

@@ -22,9 +22,7 @@
 #include "vtkPVProcessModule.h"
 #include "vtkPVRenderModule.h"
 #include "vtkRectilinearGrid.h"
-#include "vtkString.h"
 #include "vtkStructuredGrid.h"
-#include "vtkString.h"
 #include "vtkSMPart.h"
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMDoubleVectorProperty.h"
@@ -44,7 +42,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMPartDisplay);
-vtkCxxRevisionMacro(vtkSMPartDisplay, "1.23");
+vtkCxxRevisionMacro(vtkSMPartDisplay, "1.24");
 
 //----------------------------------------------------------------------------
 vtkSMPartDisplay::vtkSMPartDisplay()

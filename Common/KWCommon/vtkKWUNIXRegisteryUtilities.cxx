@@ -14,7 +14,6 @@
 #include "vtkKWUNIXRegisteryUtilities.h"
 
 #include "vtkObjectFactory.h"
-#include "vtkString.h"
 
 #include "vtkStdString.h"
 #include <vtkstd/map>
@@ -28,7 +27,7 @@
 #define BUFFER_SIZE 8192
 
 vtkStandardNewMacro( vtkKWUNIXRegisteryUtilities );
-vtkCxxRevisionMacro(vtkKWUNIXRegisteryUtilities, "1.15");
+vtkCxxRevisionMacro(vtkKWUNIXRegisteryUtilities, "1.16");
 
 //----------------------------------------------------------------------------
 //****************************************************************************

@@ -22,13 +22,12 @@
 #include "vtkPVDisplayGUI.h"
 #include "vtkPVRenderView.h"
 #include "vtkPVWindow.h"
-#include "vtkString.h"
 
 #include <ctype.h>
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVDataSetReaderModule);
-vtkCxxRevisionMacro(vtkPVDataSetReaderModule, "1.19");
+vtkCxxRevisionMacro(vtkPVDataSetReaderModule, "1.20");
 
 int vtkPVDataSetReaderModuleCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);

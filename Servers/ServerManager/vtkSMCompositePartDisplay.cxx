@@ -25,7 +25,6 @@
 #include "vtkProperty.h"
 #include "vtkRectilinearGrid.h"
 #include "vtkStructuredGrid.h"
-#include "vtkString.h"
 #include "vtkTimerLog.h"
 #include "vtkToolkits.h"
 #include "vtkClientServerStream.h"
@@ -34,7 +33,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMCompositePartDisplay);
-vtkCxxRevisionMacro(vtkSMCompositePartDisplay, "1.4");
+vtkCxxRevisionMacro(vtkSMCompositePartDisplay, "1.5");
 
 
 //----------------------------------------------------------------------------
