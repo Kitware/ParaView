@@ -9,6 +9,7 @@ SET (files
   lib/tk8.4/button.tcl
   lib/tk8.4/comdlg.tcl
   lib/tk8.4/entry.tcl
+  lib/tk8.4/focus.tcl
   lib/tk8.4/listbox.tcl
   lib/tk8.4/menu.tcl
   lib/tk8.4/optMenu.tcl
