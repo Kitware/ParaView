@@ -77,13 +77,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.143");
+vtkCxxRevisionMacro(vtkPVData, "1.144");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
-
-vtkCxxSetObjectMacro(vtkPVData,View, vtkKWView);
-
 
 //----------------------------------------------------------------------------
 vtkPVData::vtkPVData()
@@ -103,7 +100,7 @@ vtkPVData::vtkPVData()
   // Used to be in vtkPVActorComposite
   static int instanceCount = 0;
   
-  this->View = NULL;
+  this->PVRenderView = NULL;
   this->PropertiesParent = NULL; 
 
   this->Mapper = NULL;
@@ -145,8 +142,7 @@ vtkPVData::vtkPVData()
   this->ColorMenuLabel = vtkKWLabel::New();
   this->ColorMenu = vtkKWOptionMenu::New();
 
-  this->ColorMapMenuLabel = vtkKWLabel::New();
-  this->ColorMapMenu = vtkKWOptionMenu::New();
+  this->EditColorMapButton = vtkKWPushButton::New();
   
   this->ColorButton = vtkKWChangeColorButton::New();
 
@@ -231,11 +227,7 @@ vtkPVData::~vtkPVData()
   // Used to be in vtkPVActorComposite........
   vtkPVApplication *pvApp = this->GetPVApplication();
 
-  if (this->View)
-    {
-    this->View->UnRegister(this);
-    this->View = NULL;
-    }
+  this->SetPVRenderView(NULL);
   if (this->PropertiesParent)
     {
     this->PropertiesParent->UnRegister(this);
@@ -260,11 +252,9 @@ vtkPVData::~vtkPVData()
   this->ColorMenu->Delete();
   this->ColorMenu = NULL;
 
-  this->ColorMapMenuLabel->Delete();
-  this->ColorMapMenuLabel = NULL;
-  this->ColorMapMenu->Delete();
-  this->ColorMapMenu = NULL;
-  
+  this->EditColorMapButton->Delete();
+  this->EditColorMapButton = NULL;
+    
   this->ColorButton->Delete();
   this->ColorButton = NULL;
   
@@ -520,8 +510,6 @@ void vtkPVData::CreateParallelTclObjects(vtkPVApplication *pvApp)
                          pvApp->GetNumberOfPipes());
 #else
   pvApp->BroadcastScript("vtkCollectPolyData %s", tclName);
-  pvApp->BroadcastScript("%s SetThreshold 1000", tclName);
-  
 #endif
   this->SetCollectTclName(tclName);
   pvApp->BroadcastScript("%s SetInput [%s GetOutput]", 
@@ -1121,20 +1109,11 @@ void vtkPVData::CreateProperties()
   this->ScalarBarCheckFrame->SetParent(this->ScalarBarFrame->GetFrame());
   this->ScalarBarCheckFrame->Create(this->Application, "frame", "");
 
-  this->ColorMapMenuLabel->SetParent(this->ScalarBarCheckFrame);
-  this->ColorMapMenuLabel->Create(this->Application, "");
-  this->ColorMapMenuLabel->SetLabel("Color map:");
-  
-  this->ColorMapMenu->SetParent(this->ScalarBarCheckFrame);
-  this->ColorMapMenu->Create(this->Application, "");
-  this->ColorMapMenu->AddEntryWithCommand("Red to Blue", this,
-                                          "ChangeColorMapToRedBlue");
-  this->ColorMapMenu->AddEntryWithCommand("Blue to Red", this,
-                                          "ChangeColorMapToBlueRed");
-  this->ColorMapMenu->AddEntryWithCommand("Grayscale", this,
-                                          "ChangeColorMapToGrayscale");
-  this->ColorMapMenu->SetValue("Red to Blue");
-  
+  this->EditColorMapButton->SetParent(this->ScalarBarCheckFrame);
+  this->EditColorMapButton->Create(this->Application, "");
+  this->EditColorMapButton->SetLabel("Edit Color Map");
+  this->EditColorMapButton->SetCommand(this,"EditColorMapCallback");
+    
   this->ColorRangeFrame->SetParent(this->ScalarBarFrame->GetFrame());
   this->ColorRangeFrame->Create(this->Application, "frame", "");
   this->ColorRangeResetButton->SetParent(this->ColorRangeFrame);
@@ -1266,11 +1245,10 @@ void vtkPVData::CreateProperties()
   this->Script("pack %s %s -side top -expand t -fill x",
                this->ScalarBarCheckFrame->GetWidgetName(),
                this->ColorRangeFrame->GetWidgetName());
-  this->Script("pack %s %s %s %s -side left",
+  this->Script("pack %s %s %s -side left",
                this->ScalarBarCheck->GetWidgetName(),
                this->ScalarBarOrientationCheck->GetWidgetName(),
-               this->ColorMapMenuLabel->GetWidgetName(),
-               this->ColorMapMenu->GetWidgetName());
+               this->EditColorMapButton->GetWidgetName());
   this->Script("pack %s -side left -expand f",
                this->ColorRangeResetButton->GetWidgetName());
   this->Script("pack %s %s -side left -expand t -fill x",
@@ -1372,6 +1350,22 @@ void vtkPVData::CreateProperties()
 }
 
 //----------------------------------------------------------------------------
+void vtkPVData::EditColorMapCallback()
+{
+  if (this->PVColorMap == NULL)
+    {
+    // We could get the color map from the window,
+    // but it must already be set for this button to be visible.
+    vtkErrorMacro("Expecting a color map.");
+    return;
+    }
+  this->Script("pack forget [pack slaves %s]",
+          this->GetPVRenderView()->GetPropertiesParent()->GetWidgetName());
+  this->Script("pack %s -side top -fill x -expand t",
+          this->PVColorMap->GetWidgetName());
+}
+
+//----------------------------------------------------------------------------
 void vtkPVData::UpdateProperties()
 {
   vtkPVSource* source = this->GetPVSource();
@@ -1420,6 +1414,14 @@ void vtkPVData::UpdateProperties()
     else
       {
       this->ScalarBarCheck->SetState(0);
+      }
+    if (this->PVColorMap->GetScalarBarOrientation())
+      {
+      this->ScalarBarOrientationCheck->SetState(1);
+      }
+    else
+      {
+      this->ScalarBarOrientationCheck->SetState(0);
       }
     }
 
@@ -1595,76 +1597,6 @@ void vtkPVData::ChangeActorColor(float r, float g, float b)
     }
 }
 
-//----------------------------------------------------------------------------
-void vtkPVData::ChangeColorMapToRedBlue()
-{
-  vtkPVApplication *pvApp = this->GetPVApplication();
-
-  this->AddTraceEntry("$kw(%s) ChangeColorMapToRedBlue",
-                      this->GetTclName());
-  
-  pvApp->BroadcastScript("[%s GetLookupTable] SetHueRange 0 0.666667",
-                         this->MapperTclName);
-  pvApp->BroadcastScript("[%s GetLookupTable] SetSaturationRange 1 1",
-                         this->MapperTclName);
-  pvApp->BroadcastScript("[%s GetLookupTable] SetValueRange 1 1",
-                         this->MapperTclName);
-  pvApp->BroadcastScript("[%s GetLookupTable] Build",
-                         this->MapperTclName);
-
-  if ( this->GetPVRenderView() )
-    {
-    this->GetPVRenderView()->EventuallyRender();
-    }
-}
-
-
-//----------------------------------------------------------------------------
-void vtkPVData::ChangeColorMapToBlueRed()
-{
-  vtkPVApplication *pvApp = this->GetPVApplication();
-
-  this->AddTraceEntry("$kw(%s) ChangeColorMapToBlueRed",
-                      this->GetTclName());
-
-  pvApp->BroadcastScript("[%s GetLookupTable] SetHueRange 0.666667 0",
-                         this->MapperTclName);
-  pvApp->BroadcastScript("[%s GetLookupTable] SetSaturationRange 1 1",
-                         this->MapperTclName);
-  pvApp->BroadcastScript("[%s GetLookupTable] SetValueRange 1 1",
-                         this->MapperTclName);
-  pvApp->BroadcastScript("[%s GetLookupTable] Build",
-                         this->MapperTclName);
-
-  if ( this->GetPVRenderView() )
-    {
-    this->GetPVRenderView()->EventuallyRender();
-    }
-}
-
-
-//----------------------------------------------------------------------------
-void vtkPVData::ChangeColorMapToGrayscale()
-{
-  vtkPVApplication *pvApp = this->GetPVApplication();
-
-  this->AddTraceEntry("$kw(%s) ChangeColorMapToGrayscale",
-                      this->GetTclName());
-
-  pvApp->BroadcastScript("[%s GetLookupTable] SetHueRange 0 0",
-                         this->MapperTclName);
-  pvApp->BroadcastScript("[%s GetLookupTable] SetSaturationRange 0 0",
-                         this->MapperTclName);
-  pvApp->BroadcastScript("[%s GetLookupTable] SetValueRange 0 1",
-                         this->MapperTclName);
-  pvApp->BroadcastScript("[%s GetLookupTable] Build",
-                         this->MapperTclName);
-
-  if ( this->GetPVRenderView() )
-    {
-    this->GetPVRenderView()->EventuallyRender();
-    }
-}
 
 
 //----------------------------------------------------------------------------
@@ -1720,6 +1652,8 @@ void vtkPVData::ColorRangeEntryCallback()
   min = this->ColorRangeMinEntry->GetValueAsFloat();
   max = this->ColorRangeMaxEntry->GetValueAsFloat();
   
+  vtkErrorMacro("Range " << min << ", " << max);
+
   // Avoid the bad range error
   if (max <= min)
     {
@@ -2213,17 +2147,14 @@ void vtkPVData::Initialize()
       this->GetVTKData()->IsA("vtkUnstructuredGrid"))
     {
     pvApp->BroadcastScript("%s SetUseStrips %d", this->GeometryTclName,
-                           static_cast<vtkPVRenderView*>(
-                             this->GetView())->GetTriangleStripsCheck()->GetState());
+                           this->GetPVRenderView()->GetTriangleStripsCheck()->GetState());
     }
   pvApp->BroadcastScript("%s SetImmediateModeRendering %d",
                          this->MapperTclName,
-                         static_cast<vtkPVRenderView*>(
-                           this->GetView())->GetImmediateModeCheck()->GetState());
+                         this->GetPVRenderView()->GetImmediateModeCheck()->GetState());
   pvApp->BroadcastScript("%s SetImmediateModeRendering %d", 
                          this->LODMapperTclName,
-                         static_cast<vtkPVRenderView*>(
-                           this->GetView())->GetImmediateModeCheck()->GetState());
+                         this->GetPVRenderView()->GetImmediateModeCheck()->GetState());
 }
 
 
@@ -2299,7 +2230,27 @@ int vtkPVData::GetVisibility()
 //----------------------------------------------------------------------------
 vtkPVRenderView* vtkPVData::GetPVRenderView()
 {
-  return vtkPVRenderView::SafeDownCast(this->GetView());
+  return this->PVRenderView;
+}
+
+//----------------------------------------------------------------------------
+void vtkPVData::SetPVRenderView(vtkPVRenderView* view)
+{
+  if (this->PVRenderView == view)
+    {
+    return;
+    }
+  if (view)
+    {
+    view->Register(this);
+    this->SetLODResolution(view->GetLODResolution());
+    this->SetCollectThreshold(view->GetCollectThreshold());
+    }
+  if (this->PVRenderView)
+    {
+    this->PVRenderView->UnRegister(this);
+    }
+  this->PVRenderView = view;
 }
 
 
@@ -2380,12 +2331,12 @@ void vtkPVData::SetCubeAxesVisibility(int val)
   vtkRenderer *ren;
   char *tclName;
   
-  if (!this->GetView())
+  if (!this->GetPVRenderView())
     {
     return;
     }
   
-  ren = this->GetView()->GetRenderer();
+  ren = this->GetPVRenderView()->GetRenderer();
   tclName = this->GetPVRenderView()->GetRendererTclName();
   
   if (ren == NULL)
@@ -2646,8 +2597,7 @@ void vtkPVData::SaveInTclScript(ofstream *file)
 void vtkPVData::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
-  os << indent << "ColorMapMenu: " << this->GetColorMapMenu() << endl;
-  os << indent << "ColorMenu: " << this->GetColorMenu() << endl;
+  os << indent << "EditColorMapButton: " << this->EditColorMapButton << endl;
   os << indent << "CubeAxesTclName: " << (this->CubeAxesTclName?this->CubeAxesTclName:"none") << endl;
   os << indent << "GeometryTclName: " << (this->GeometryTclName?this->GeometryTclName:"none") << endl;
   os << indent << "LODMapperTclName: " << (this->LODMapperTclName?this->LODMapperTclName:"none") << endl;
@@ -2668,7 +2618,7 @@ void vtkPVData::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "RenderOnlyLocally: " << (this->RenderOnlyLocally?"on":"off") << endl;
   os << indent << "VTKData: " << this->GetVTKData() << endl;
   os << indent << "VTKDataTclName: " << (this->VTKDataTclName?this->VTKDataTclName:"none") << endl;
-  os << indent << "View: " << this->GetView() << endl;
+  os << indent << "PVRenderView: " << this->PVRenderView << endl;
   os << indent << "PropertiesCreated: " << this->PropertiesCreated << endl;
   os << indent << "CubeAxesCheck: " << this->CubeAxesCheck << endl;
   os << indent << "ScalarBarCheck: " << this->ScalarBarCheck << endl;
@@ -2865,6 +2815,8 @@ void vtkPVData::SetCollectThreshold(float threshold)
     
   pvApp->BroadcastScript("%s SetThreshold %d", this->CollectTclName,
                          static_cast<unsigned long>(threshold*1000.0));
+  pvApp->BroadcastScript("%s SetThreshold %d", this->LODCollectTclName,
+                         static_cast<unsigned long>(threshold*1000.0));
 }
 
 
@@ -2873,7 +2825,7 @@ void vtkPVData::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVData ";
-  this->ExtractRevision(os,"$Revision: 1.143 $");
+  this->ExtractRevision(os,"$Revision: 1.144 $");
 }
 
 //----------------------------------------------------------------------------

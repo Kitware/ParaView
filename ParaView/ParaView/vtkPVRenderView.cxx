@@ -85,7 +85,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.193");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.194");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -541,7 +541,7 @@ void vtkPVRenderView::PrepareForDelete()
     pvapp->SetRegisteryValue(2, "RunTime", "LODResolution", "%d",
                              this->LODResolution);
 #ifdef VTK_USE_MPI
-    pvapp->SetRegisteryValue(2, "RunTime", "CollectThreshold", "%d",
+    pvapp->SetRegisteryValue(2, "RunTime", "CollectThreshold", "%f",
                              this->CollectThreshold);
     pvapp->SetRegisteryValue(2, "RunTime", "InterruptRender", "%d",
                              this->InterruptRenderCheck->GetState());
@@ -1412,7 +1412,7 @@ void vtkPVRenderView::AddPVData(vtkPVData *pvc)
     return;
     }  
 
-  pvc->SetView(this);
+  pvc->SetPVRenderView(this);
     
   if (pvc->GetPropTclName() != NULL)
     {
@@ -1439,7 +1439,7 @@ void vtkPVRenderView::RemovePVData(vtkPVData *pvc)
     return;
     }
 
-  pvc->SetView(NULL);
+  pvc->SetPVRenderView(NULL);
   if (pvc->GetPropTclName() != NULL)
     {
     if (pvc->GetRenderOnlyLocally() )
@@ -2277,7 +2277,7 @@ void vtkPVRenderView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVRenderView ";
-  this->ExtractRevision(os,"$Revision: 1.193 $");
+  this->ExtractRevision(os,"$Revision: 1.194 $");
 }
 
 //------------------------------------------------------------------------------

@@ -66,7 +66,6 @@ class vtkKWLabeledFrame;
 class vtkKWOptionMenu;
 class vtkKWPushButton;
 class vtkKWScale;
-class vtkKWView;
 class vtkKWWidget;
 class vtkPVApplication;
 class vtkPVColorMap;
@@ -258,13 +257,17 @@ public:
   // Set the color range from the entry widgets.
   void ColorRangeEntryCallback();
   
+  // Description:
+  // Called when the user presses the "Edit Color Map" button.
+  void EditColorMapCallback();
+
   void SetScalarBarVisibility(int val);  
   void ScalarBarCheckCallback();
   void ScalarBarOrientationCallback();
   void SetScalarBarOrientationToVertical();
   void SetScalarBarOrientationToHorizontal();
   vtkGetObjectMacro(ScalarBarCheck, vtkKWCheckButton);
-  
+
   void SetCubeAxesVisibility(int val);
   void CubeAxesCheckCallback();
 
@@ -281,7 +284,9 @@ public:
   void ChangeActorColor(float r, float g, float b);
   
   // Description:
-  // Needed to render.
+  // I would like to get rid of this reference if possible.
+  // Needed to render. Also needed to get the default values for deci lod
+  void SetPVRenderView(vtkPVRenderView *view);
   vtkPVRenderView *GetPVRenderView();
   
   // Description:
@@ -301,19 +306,12 @@ public:
   // Description:
   // Access to option menus for scripting.
   vtkGetObjectMacro(ColorMenu, vtkKWOptionMenu);
-  vtkGetObjectMacro(ColorMapMenu, vtkKWOptionMenu);
 
   // Description:
   // Callback methods when item chosen from ColorMenu
   void ColorByProperty();
   void ColorByPointFieldComponent(const char *name, int comp);
   void ColorByCellFieldComponent(const char *name, int comp);
-
-  // Description:
-  // Callback for color map menu.
-  void ChangeColorMapToRedBlue();
-  void ChangeColorMapToBlueRed();
-  void ChangeColorMapToGrayscale();
 
   // Description:
   // Get the tcl name of the vtkPVGeometryFilter.
@@ -324,10 +322,7 @@ public:
   vtkGetStringMacro(MapperTclName);
   vtkGetStringMacro(LODMapperTclName);
   
-  // I shall want to get rid of this.
-  virtual void SetView(vtkKWView*);
-  vtkGetObjectMacro(View, vtkKWView);
-  vtkKWView *View;
+  vtkPVRenderView *PVRenderView;
 
   // Description:
   // This allows you to set the propertiesParent to any widget you like.  
@@ -424,9 +419,7 @@ protected:
   vtkKWOptionMenu *ColorMenu;
 
   vtkKWChangeColorButton *ColorButton;
-
-  vtkKWLabel *ColorMapMenuLabel;
-  vtkKWOptionMenu *ColorMapMenu;
+  vtkKWPushButton *EditColorMapButton;
   
   vtkKWWidget *RepresentationMenuFrame;
   vtkKWLabel *RepresentationMenuLabel;

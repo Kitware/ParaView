@@ -50,25 +50,35 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __vtkPVColorMap_h
 
 
-#include "vtkKWObject.h"
+#include "vtkKWWidget.h"
 
 class vtkScalarBarActor;
 class vtkPVApplication;
 class vtkPVRenderView;
+class vtkKWOptionMenu;
+class vtkKWLabel;
+class vtkKWLabeledFrame;
+class vtkKWLabeledEntry;
+class vtkKWWidget;
+class vtkKWCheckButton;
+class vtkKWPushButton;
 
-class VTK_EXPORT vtkPVColorMap : public vtkKWObject
+
+
+
+
+class VTK_EXPORT vtkPVColorMap : public vtkKWWidget
 {
 public:
   static vtkPVColorMap* New();
-  vtkTypeRevisionMacro(vtkPVColorMap, vtkKWObject);
+  vtkTypeRevisionMacro(vtkPVColorMap, vtkKWWidget);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  void SetPVApplication(vtkPVApplication *pvApp);
-  void SetApplication(vtkKWApplication *)
-    {
-      vtkErrorMacro("vtkPVColorMap::SetApplication should not be used. Use SetPVApplcation instead.");
-    }
+  // Create the widget.
+  virtual void Create(vtkKWApplication *app);
+
+  // Description:
   vtkPVApplication *GetPVApplication();
   
   // Description:
@@ -77,8 +87,8 @@ public:
   vtkPVRenderView* GetPVRenderView() { return this->PVRenderView;}
 
   // Description:
-  // The name of the color map serves as the label of the ScalarBar (e.g. Temerature).
-  // Currently it also indeicates the arrays mapped by this color map object.
+  // The name of the color map serves as the label of the ScalarBar (e.g. Temperature).
+  // Currently it also indicates the arrays mapped by this color map object.
   void SetName(const char* Name);
   const char* GetName() {return this->ParameterName;}
 
@@ -115,6 +125,7 @@ public:
   void SetScalarBarOrientation(int vertical);
   void SetScalarBarOrientationToVertical();
   void SetScalarBarOrientationToHorizontal();
+  vtkGetMacro(ScalarBarOrientation, int);
 
   // Description:
   // Choose preset color schemes.
@@ -139,6 +150,13 @@ public:
   // The data needs to lookup table name to set the lookup table of the mapper.
   vtkGetStringMacro(LookupTableTclName);
 
+  // --- UI Stuff ---
+
+  // Description:
+  // Callbacks.
+  void ScalarBarCheckCallback();
+  void ScalarBarOrientationCallback();
+  void ColorRangeEntryCallback();
 
 protected:
   vtkPVColorMap();
@@ -165,6 +183,23 @@ protected:
   vtkPVRenderView *PVRenderView;
   int Initialized;
   int ScalarBarVisibility;
+  int ScalarBarOrientation;
+
+  // User interaface.
+  vtkKWLabeledEntry* LabelEntry;
+  vtkKWLabeledFrame* ScalarBarFrame;
+  vtkKWWidget*       ScalarBarCheckFrame;
+  vtkKWCheckButton*  ScalarBarCheck;
+  vtkKWCheckButton*  ScalarBarOrientationCheck;
+  
+  // Stuff for setting the range of the color map.
+  vtkKWWidget*       ColorRangeFrame;
+  vtkKWPushButton*   ColorRangeResetButton;
+  vtkKWLabeledEntry* ColorRangeMinEntry;
+  vtkKWLabeledEntry* ColorRangeMaxEntry;
+
+  vtkKWLabel*        ColorMapMenuLabel;
+  vtkKWOptionMenu*   ColorMapMenu;
   
   vtkPVColorMap(const vtkPVColorMap&); // Not implemented
   void operator=(const vtkPVColorMap&); // Not implemented

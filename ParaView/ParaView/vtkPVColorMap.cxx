@@ -40,6 +40,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 #include "vtkPVColorMap.h"
+#include "vtkKWOptionMenu.h"
+#include "vtkKWLabel.h"
+#include "vtkKWLabeledFrame.h"
+#include "vtkKWLabeledEntry.h"
+#include "vtkKWEntry.h"
+#include "vtkKWWidget.h"
+#include "vtkKWCheckButton.h"
+#include "vtkKWPushButton.h"
 #include "vtkPVRenderView.h"
 #include "vtkPVApplication.h"
 #include "vtkPVWindow.h"
@@ -50,7 +58,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVColorMap);
-vtkCxxRevisionMacro(vtkPVColorMap, "1.6");
+vtkCxxRevisionMacro(vtkPVColorMap, "1.7");
 
 int vtkPVColorMapCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -68,6 +76,7 @@ vtkPVColorMap::vtkPVColorMap()
 
   this->ParameterName = NULL;
   this->ScalarBarVisibility = 0;
+  this->ScalarBarOrientation = 1;
   this->ScalarRange[0] = 0.0;
   this->ScalarRange[1] = 1.0;
   this->Initialized = 0;
@@ -82,6 +91,24 @@ vtkPVColorMap::vtkPVColorMap()
   
   this->NumberOfVectorComponents = 1;
   this->VectorComponent = 0;
+
+
+  // User interaface.
+  this->ScalarBarFrame = vtkKWLabeledFrame::New();
+
+  this->LabelEntry = vtkKWLabeledEntry::New();
+  this->ScalarBarCheckFrame = vtkKWWidget::New();
+  this->ScalarBarCheck = vtkKWCheckButton::New();
+  this->ScalarBarOrientationCheck = vtkKWCheckButton::New();
+  
+  // Stuff for setting the range of the color map.
+  this->ColorRangeFrame = vtkKWWidget::New();
+  this->ColorRangeResetButton = vtkKWPushButton::New();
+  this->ColorRangeMinEntry = vtkKWLabeledEntry::New();
+  this->ColorRangeMaxEntry = vtkKWLabeledEntry::New();
+
+  this->ColorMapMenuLabel = vtkKWLabel::New();
+  this->ColorMapMenu = vtkKWOptionMenu::New();
 }
 
 //----------------------------------------------------------------------------
@@ -116,7 +143,141 @@ vtkPVColorMap::~vtkPVColorMap()
       pvApp->Script("%s Delete", this->ScalarBarTclName);
       }
     this->SetScalarBarTclName(NULL);
-    }  
+    }
+    
+  // User interaface.
+  this->ScalarBarFrame->Delete();
+  this->ScalarBarFrame = NULL;
+
+  this->LabelEntry->Delete();
+  this->LabelEntry = NULL;
+  this->ScalarBarCheckFrame->Delete();
+  this->ScalarBarCheckFrame = NULL;
+  this->ScalarBarCheck->Delete();
+  this->ScalarBarCheck = NULL;
+  this->ScalarBarOrientationCheck->Delete();
+  this->ScalarBarOrientationCheck = NULL;
+  
+  // Stuff for setting the range of the color map.
+  this->ColorRangeFrame->Delete();
+  this->ColorRangeFrame = NULL;
+  this->ColorRangeResetButton->Delete();
+  this->ColorRangeResetButton = NULL;
+  this->ColorRangeMinEntry->Delete();
+  this->ColorRangeMinEntry = NULL;
+  this->ColorRangeMaxEntry->Delete();      
+  this->ColorRangeMaxEntry = NULL;     
+
+  this->ColorMapMenuLabel->Delete();
+  this->ColorMapMenuLabel = NULL;
+  this->ColorMapMenu->Delete();
+  this->ColorMapMenu = NULL;
+}
+
+
+//----------------------------------------------------------------------------
+void vtkPVColorMap::Create(vtkKWApplication *app)
+{
+  vtkPVApplication *pvApp = vtkPVApplication::SafeDownCast(app);
+  const char* wname;
+  
+  if (this->Application)
+    {
+    vtkErrorMacro("LabeledToggle already created");
+    return;
+    }
+  // Superclass create takes a KWApplication, but we need a PVApplication.
+  if (pvApp == NULL)
+    {
+    vtkErrorMacro("Need a PV application");
+    return;
+    }
+  this->SetApplication(app);
+  this->CreateParallelTclObjects(pvApp);
+  
+  // create the top level
+  wname = this->GetWidgetName();
+  this->Script("frame %s -borderwidth 0 -relief flat", wname);
+  
+  // Now for the UI.
+  this->ScalarBarFrame->SetParent(this);
+  this->ScalarBarFrame->ShowHideFrameOff();
+  this->ScalarBarFrame->Create(this->Application);
+  this->ScalarBarFrame->SetLabel("Scalar Bar");
+
+  this->ScalarBarCheckFrame->SetParent(this->ScalarBarFrame->GetFrame());
+  this->ScalarBarCheckFrame->Create(this->Application, "frame", "");
+
+  this->ColorMapMenuLabel->SetParent(this->ScalarBarCheckFrame);
+  this->ColorMapMenuLabel->Create(this->Application, "");
+  this->ColorMapMenuLabel->SetLabel("Color map:");
+  
+  this->ColorMapMenu->SetParent(this->ScalarBarCheckFrame);
+  this->ColorMapMenu->Create(this->Application, "");
+  this->ColorMapMenu->AddEntryWithCommand("Red to Blue", this,
+                                          "SetColorSchemeToRedBlue");
+  this->ColorMapMenu->AddEntryWithCommand("Blue to Red", this,
+                                          "SetColorSchemeToBlueRed");
+  this->ColorMapMenu->AddEntryWithCommand("Grayscale", this,
+                                          "SetColorSchemeToGrayscale");
+  this->ColorMapMenu->SetValue("Red to Blue");
+  
+  this->ColorRangeFrame->SetParent(this->ScalarBarFrame->GetFrame());
+  this->ColorRangeFrame->Create(this->Application, "frame", "");
+  this->ColorRangeResetButton->SetParent(this->ColorRangeFrame);
+  this->ColorRangeResetButton->Create(this->Application, 
+                                      "-text {Reset Range}");
+  this->ColorRangeResetButton->SetCommand(this, "ResetScalarRange");
+  this->ColorRangeMinEntry->SetParent(this->ColorRangeFrame);
+  this->ColorRangeMinEntry->Create(this->Application);
+  this->ColorRangeMinEntry->SetLabel("Min:");
+  this->ColorRangeMinEntry->GetEntry()->SetWidth(7);
+  this->Script("bind %s <KeyPress-Return> {%s ColorRangeEntryCallback}",
+               this->ColorRangeMinEntry->GetEntry()->GetWidgetName(),
+               this->GetTclName());
+  this->Script("bind %s <FocusOut> {%s ColorRangeEntryCallback}",
+               this->ColorRangeMinEntry->GetEntry()->GetWidgetName(),
+               this->GetTclName()); 
+  this->ColorRangeMaxEntry->SetParent(this->ColorRangeFrame);
+  this->ColorRangeMaxEntry->Create(this->Application);
+  this->ColorRangeMaxEntry->SetLabel("Max:");
+  this->ColorRangeMaxEntry->GetEntry()->SetWidth(7);
+  this->Script("bind %s <KeyPress-Return> {%s ColorRangeEntryCallback}",
+               this->ColorRangeMaxEntry->GetEntry()->GetWidgetName(),
+               this->GetTclName());
+  this->Script("bind %s <FocusOut> {%s ColorRangeEntryCallback}",
+               this->ColorRangeMaxEntry->GetEntry()->GetWidgetName(),
+               this->GetTclName());
+
+  this->ScalarBarCheck->SetParent(this->ScalarBarCheckFrame);
+  this->ScalarBarCheck->Create(this->Application, "-text Visibility");
+  this->Application->Script(
+    "%s configure -command {%s ScalarBarCheckCallback}",
+    this->ScalarBarCheck->GetWidgetName(),
+    this->GetTclName());
+
+  this->ScalarBarOrientationCheck->SetParent(this->ScalarBarCheckFrame);
+  this->ScalarBarOrientationCheck->Create(this->Application, "-text Vertical");
+  this->ScalarBarOrientationCheck->SetState(1);
+  this->ScalarBarOrientationCheck->SetCommand(this, 
+                                              "ScalarBarOrientationCallback");
+
+
+
+  this->Script("pack %s -fill x", this->ScalarBarFrame->GetWidgetName());
+  this->Script("pack %s %s -side top -expand t -fill x",
+               this->ScalarBarCheckFrame->GetWidgetName(),
+               this->ColorRangeFrame->GetWidgetName());
+  this->Script("pack %s %s %s %s -side left",
+               this->ScalarBarCheck->GetWidgetName(),
+               this->ScalarBarOrientationCheck->GetWidgetName(),
+               this->ColorMapMenuLabel->GetWidgetName(),
+               this->ColorMapMenu->GetWidgetName());
+  this->Script("pack %s -side left -expand f",
+               this->ColorRangeResetButton->GetWidgetName());
+  this->Script("pack %s %s -side left -expand t -fill x",
+               this->ColorRangeMinEntry->GetWidgetName(),
+               this->ColorRangeMaxEntry->GetWidgetName());
 }
 
 
@@ -125,7 +286,7 @@ void vtkPVColorMap::CreateParallelTclObjects(vtkPVApplication *pvApp)
 {
   char tclName[100];
   
-  this->vtkKWObject::SetApplication(pvApp);
+  this->vtkKWWidget::SetApplication(pvApp);
   
   sprintf(tclName, "LookupTable%d", this->InstanceCount);
   this->SetLookupTableTclName(tclName);
@@ -160,13 +321,6 @@ void vtkPVColorMap::SetName(const char* name)
   this->UpdateScalarBarTitle();
 
   this->ResetScalarRange();
-}
-
-//----------------------------------------------------------------------------
-void vtkPVColorMap::SetPVApplication(vtkPVApplication *pvApp)
-{
-  this->CreateParallelTclObjects(pvApp);
-  this->vtkKWObject::SetApplication(pvApp);
 }
 
 //----------------------------------------------------------------------------
@@ -222,14 +376,55 @@ void vtkPVColorMap::SetColorSchemeToGrayscale()
   this->GetPVRenderView()->EventuallyRender();
 }
 
+//----------------------------------------------------------------------------
+void vtkPVColorMap::ScalarBarCheckCallback()
+{
+  //this->AddTraceEntry("$kw(%s) SetScalarBarVisibility %d", this->GetTclName(),
+  //                    this->ScalarBarCheck->GetState());
+  this->SetScalarBarVisibility(this->ScalarBarCheck->GetState());
+  if ( this->GetPVRenderView() )
+    {
+    this->GetPVRenderView()->EventuallyRender();
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVColorMap::ScalarBarOrientationCallback()
+{
+  int state = this->ScalarBarOrientationCheck->GetState();
+  
+  if (state)
+    {
+    this->SetScalarBarOrientationToVertical();
+    //this->AddTraceEntry("$kw(%s) SetScalarBarOrientationToVertical", this->GetTclName());
+    }
+  else
+    {
+    this->SetScalarBarOrientationToHorizontal();
+    //this->AddTraceEntry("$kw(%s) SetScalarBarOrientationToHorizontal", this->GetTclName());
+    }
+  if ( this->GetPVRenderView() )
+    {
+    this->GetPVRenderView()->EventuallyRender();
+    }
+}
+
 
 //----------------------------------------------------------------------------
 void vtkPVColorMap::SetScalarRange(float min, float max)
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
 
+  if (this->ScalarRange[0] == min && this->ScalarRange[1] == max)
+    {
+    return;
+    }
+
   this->ScalarRange[0] = min;
   this->ScalarRange[1] = max;
+
+  this->ColorRangeMinEntry->SetValue(this->ScalarRange[0], 5);
+  this->ColorRangeMaxEntry->SetValue(this->ScalarRange[1], 5);
 
   pvApp->BroadcastScript("%s SetTableRange %f %f", 
                          this->LookupTableTclName, min, max);
@@ -313,6 +508,11 @@ void vtkPVColorMap::ResetScalarRange()
     }
 
   this->SetScalarRange(range[0], range[1]);
+
+  if ( this->GetPVRenderView() )
+    {
+    this->GetPVRenderView()->EventuallyRender();
+    }
 }
 
 
@@ -348,6 +548,17 @@ void vtkPVColorMap::SetScalarBarVisibility(int val)
     }
   this->ScalarBarVisibility = val;
   
+  // Make sure the UI is up to date.
+  if (val)
+    {
+    this->ScalarBarCheck->SetState(1);
+    }
+  else
+    {
+    this->ScalarBarCheck->SetState(0);
+    }
+
+
   if (!this->GetPVRenderView())
     {
     return;
@@ -385,8 +596,15 @@ void vtkPVColorMap::SetScalarBarVisibility(int val)
 //----------------------------------------------------------------------------
 void vtkPVColorMap::SetScalarBarOrientation(int vertical)
 {
+  if (this->ScalarBarOrientation == vertical)
+    {
+    return;
+    }
+
+  this->ScalarBarOrientation = vertical;
   if (vertical)
     {
+    this->ScalarBarOrientationCheck->SetState(1);
     this->Script("[%s GetPositionCoordinate] SetValue 0.87 0.25",
                  this->GetScalarBarTclName());
     this->Script("%s SetOrientationToVertical", this->GetScalarBarTclName());
@@ -395,6 +613,7 @@ void vtkPVColorMap::SetScalarBarOrientation(int vertical)
     }
   else
     {
+    this->ScalarBarOrientationCheck->SetState(0);
     this->Script("[%s GetPositionCoordinate] SetValue 0.25 0.13",
                  this->GetScalarBarTclName());
     this->Script("%s SetOrientationToHorizontal", this->GetScalarBarTclName());
@@ -415,8 +634,6 @@ void vtkPVColorMap::SetScalarBarOrientationToHorizontal()
 {
   this->SetScalarBarOrientation(0);
 }
-
-
 
 
 //----------------------------------------------------------------------------
@@ -512,7 +729,26 @@ void vtkPVColorMap::UpdateScalarBarTitle()
                this->ParameterName);
 }
 
+//----------------------------------------------------------------------------
+void vtkPVColorMap::ColorRangeEntryCallback()
+{
+  float min, max;
 
+  min = this->ColorRangeMinEntry->GetValueAsFloat();
+  max = this->ColorRangeMaxEntry->GetValueAsFloat();
+  
+  // Avoid the bad range error
+  if (max <= min)
+    {
+    max = min + 0.00001;
+    }
+
+  this->SetScalarRange(min, max);
+  if ( this->GetPVRenderView() )
+    {
+    this->GetPVRenderView()->EventuallyRender();
+    }
+}
 
 
 
@@ -527,4 +763,17 @@ void vtkPVColorMap::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "ScalarBarTclName: " 
      << (this->ScalarBarTclName ? this->ScalarBarTclName : "none" )
      << endl;
+  
+  os << indent << "ScalarBarVisibility: " << this->ScalarBarVisibility << endl;
+  if (this->ScalarBarOrientation)
+    {
+    os << indent << "ScalarBarOrientation: Vertical\n";
+    }
+  else
+    {
+    os << indent << "ScalarBarOrientation: Horizontal\n";
+    }
+
+  os << indent << "ScalarRange: " << this->ScalarRange[0] << ", "
+     << this->ScalarRange[1] << endl;
 }

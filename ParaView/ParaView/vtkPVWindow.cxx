@@ -111,7 +111,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.351");
+vtkCxxRevisionMacro(vtkPVWindow, "1.352");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -997,7 +997,8 @@ void vtkPVWindow::Create(vtkKWApplication *app, char* vtkNotUsed(args))
   this->GenericInteractor->SetPVRenderView(this->MainView);
   this->ChangeInteractorStyle(1);
   int *windowSize = this->MainView->GetRenderWindowSize();
-  this->Configure(windowSize[0], windowSize[1]);
+  // I do not know why this was here, but it caused the render window to be the wrong size.
+  //this->Configure(windowSize[0], windowSize[1]);
  
   // set up bindings for the interactor  
   const char *wname = this->MainView->GetVTKWidget()->GetWidgetName();
@@ -3510,8 +3511,9 @@ vtkPVColorMap* vtkPVWindow::GetPVColorMap(const char* parameterName)
   it->Delete();
   
   cm = vtkPVColorMap::New();
-  cm->SetPVApplication(this->GetPVApplication());
+  cm->SetParent(this->GetMainView()->GetPropertiesParent());
   cm->SetPVRenderView(this->GetMainView());
+  cm->Create(this->GetPVApplication());
   cm->SetName(parameterName);
   this->PVColorMaps->AddItem(cm);
   cm->Delete();
@@ -3553,7 +3555,7 @@ void vtkPVWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVWindow ";
-  this->ExtractRevision(os,"$Revision: 1.351 $");
+  this->ExtractRevision(os,"$Revision: 1.352 $");
 }
 
 //----------------------------------------------------------------------------
