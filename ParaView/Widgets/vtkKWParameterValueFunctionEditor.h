@@ -50,6 +50,8 @@ class vtkKWRange;
 
 //BTX
 class ostrstream;
+template<class DataType> class vtkLinkedList;
+template<class DataType> class vtkLinkedListIterator;
 //ETX
 
 class VTK_EXPORT vtkKWParameterValueFunctionEditor : public vtkKWLabeledWidget
@@ -168,6 +170,36 @@ public:
   virtual void ClearSelection();
 
   // Description:
+  // Merge all the points from another function editor.
+  // Return the number of points merged.
+  virtual int MergePointsFromEditor(
+    vtkKWParameterValueFunctionEditor *editor);
+
+  // Description:
+  // Synchronize points with a given editor. 
+  // First it will make sure both editors have the same points in the
+  // parameter space (by calling MergePointsFromEditor on each other).
+  // Then each time a point is added, moved or removed, the same point
+  // is altered in the synchronized editor.
+  // Multiple editors can be synchronized.
+  // Return 1 on success, 0 otherwise.
+  virtual int SynchronizePointsWithEditor(
+    vtkKWParameterValueFunctionEditor *editor);
+  virtual int DoNotSynchronizePointsWithEditor(
+    vtkKWParameterValueFunctionEditor *editor);
+
+  // Description:
+  // Synchronize the visible parameter range with a given editor. 
+  // Each time the current visible range is changed, the same visible range
+  // is assigned to the synchronized editor.
+  // Multiple editors can be synchronized.
+  // Return 1 on success, 0 otherwise.
+  virtual int SynchronizeVisibleParameterRangeWithEditor(
+    vtkKWParameterValueFunctionEditor *editor);
+  virtual int DoNotSynchronizeVisibleParameterRangeWithEditor(
+    vtkKWParameterValueFunctionEditor *editor);
+
+  // Description:
   // Set/Get the point color. 
   // Overriden by ComputePointColorFromValue if supported.
   vtkGetVector3Macro(PointColor, float);
@@ -243,8 +275,10 @@ public:
   // Description:
   // Callbacks
   virtual void ConfigureCallback();
-  virtual void VisibleRangeChangingCallback();
-  virtual void VisibleRangeChangedCallback();
+  virtual void VisibleParameterRangeChangingCallback();
+  virtual void VisibleParameterRangeChangedCallback();
+  virtual void VisibleValueRangeChangingCallback();
+  virtual void VisibleValueRangeChangedCallback();
   virtual void StartInteractionCallback(int x, int y);
   virtual void MovePointCallback(int x, int y, int shift);
   virtual void EndInteractionCallback(int x, int y);
@@ -320,6 +354,42 @@ protected:
   vtkKWImageLabel   **Icons;
   //ETX
 
+  // Synchronized editors
+
+  //BTX
+
+  class SynchronizedEditorSlot
+  {
+  public:
+    enum
+    {
+      SYNC_VISIBLE_PARAMETER_RANGE = 1,
+      SYNC_POINTS                  = 2
+    };
+    int Options;
+    vtkKWParameterValueFunctionEditor *Editor;
+  };
+
+  typedef vtkLinkedList<SynchronizedEditorSlot*> 
+          SynchronizedEditorsContainer;
+  typedef vtkLinkedListIterator<SynchronizedEditorSlot*> 
+          SynchronizedEditorsContainerIterator;
+  SynchronizedEditorsContainer *SynchronizedEditors;
+
+  virtual void DeleteAllSynchronizedEditors();
+  SynchronizedEditorSlot* GetSynchronizedEditorSlot(
+    vtkKWParameterValueFunctionEditor *editor);
+  virtual int AddSynchronizedEditor(
+    vtkKWParameterValueFunctionEditor *editor);
+  virtual int RemoveSynchronizedEditor(
+    vtkKWParameterValueFunctionEditor *editor);
+  virtual int AddSynchronizedEditorOption(
+    vtkKWParameterValueFunctionEditor *editor, int option);
+  virtual int RemoveSynchronizedEditorOption(
+    vtkKWParameterValueFunctionEditor *editor, int option);
+
+  //ETX
+
   // Description:
   // Bind/Unbind all components.
   virtual void Bind();
@@ -379,15 +449,17 @@ protected:
 
   // Description:
   // Proxy to the function
-  virtual int HasFunction() = 0;
-  virtual int GetFunctionSize() = 0;
-  virtual unsigned long GetFunctionMTime() = 0;
-  virtual int GetFunctionPointColor(int id, float rgb[3]);
-  virtual int GetFunctionPointAsCanvasCoordinates(int id, int &x, int &y) = 0;
-  virtual int AddFunctionPointAtCanvasCoordinates(int x, int y, int &new_id)=0;
-  virtual int UpdateFunctionPointFromCanvasCoordinates(int id,int x,int y) = 0;
-  virtual int RemoveFunctionPoint(int id) = 0;
+  virtual int  HasFunction() = 0;
+  virtual int  GetFunctionSize() = 0;
+  virtual int  GetFunctionPointColor(int id, float rgb[3]);
+  virtual int  GetFunctionPointParameter(int id, float &parameter) = 0;
+  virtual int  GetFunctionPointCanvasCoordinates(int id, int &x, int &y) = 0;
+  virtual int  AddFunctionPointAtCanvasCoordinates(int x, int y, int &id) = 0;
+  virtual int  AddFunctionPointAtParameter(float parameter, int &id) = 0;
+  virtual int  MoveFunctionPointToCanvasCoordinates(int id,int x,int y) = 0;
+  virtual int  RemoveFunctionPoint(int id) = 0;
   virtual void UpdateInfoLabelWithFunctionPoint(int id) = 0;
+  virtual unsigned long GetFunctionMTime() = 0;
 
   // Description:
   // Update the enable state. This should propagate similar calls to the
