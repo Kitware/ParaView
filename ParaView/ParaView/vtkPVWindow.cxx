@@ -138,7 +138,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.462.2.2");
+vtkCxxRevisionMacro(vtkPVWindow, "1.462.2.3");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -766,9 +766,9 @@ void vtkPVWindow::InitializeMenus(vtkKWApplication* vtkNotUsed(app))
 
   // Edit menu
 
-  this->GetMenuEdit()->InsertCommand(5, "Delete All Sources", this, 
+  this->GetMenuEdit()->InsertCommand(5, "Delete All Modules", this, 
                                      "DeleteAllSourcesCallback", 
-                                     1, "Delete all sources currently created in ParaView");
+                                     1, "Delete all modules in ParaView");
 }
 
 //-----------------------------------------------------------------------------
@@ -4206,8 +4206,8 @@ void vtkPVWindow::DeleteAllSourcesCallback()
     }
   if ( vtkKWMessageDialog::PopupYesNo(
          this->Application, this, "DeleteAllTheSources",
-         "Delete All The Sources", 
-         "Are you sure you want to delete all the sources?", 
+         "Delete All Modules", 
+         "Are you sure you want to delete all the modules?", 
          vtkKWMessageDialog::QuestionIcon | vtkKWMessageDialog::RememberYes |
          vtkKWMessageDialog::Beep | vtkKWMessageDialog::YesDefault ))
     {
@@ -4219,7 +4219,7 @@ void vtkPVWindow::DeleteAllSourcesCallback()
 void vtkPVWindow::DeleteAllSources()
 {
   vtkPVApplication* pvApp = static_cast<vtkPVApplication*>(this->Application);
-  pvApp->AddTraceEntry("# User selected delete all sources");
+  pvApp->AddTraceEntry("# User selected delete all modules");
   vtkPVSourceCollection* col = this->GetSourceList("Sources");
   while ( col->GetNumberOfItems() > 0 )
     {
