@@ -41,6 +41,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "vtkKWRenderWidget.h"
 
+#include "vtkCamera.h"
 #include "vtkCornerAnnotation.h"
 #include "vtkKWApplication.h"
 #include "vtkKWEvent.h"
@@ -57,7 +58,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkWin32OpenGLRenderWindow.h"
 #endif
 
-vtkCxxRevisionMacro(vtkKWRenderWidget, "1.11");
+vtkCxxRevisionMacro(vtkKWRenderWidget, "1.12");
 
 vtkKWRenderWidget::vtkKWRenderWidget()
 {
@@ -70,6 +71,7 @@ vtkKWRenderWidget::vtkKWRenderWidget()
   
   this->Printing = 0;
   this->RenderMode = VTK_KW_STILL_RENDER;
+  this->RenderState = 1;
   
   this->ParentWindow = NULL;
   
@@ -83,6 +85,14 @@ vtkKWRenderWidget::vtkKWRenderWidget()
   this->CornerAnnotation = vtkCornerAnnotation::New();
   this->CornerAnnotation->SetMaximumLineHeight(0.07);
   this->CornerAnnotation->VisibilityOff();
+
+  this->Units = NULL;
+
+  this->CurrentCamera = this->Renderer->GetActiveCamera();
+  this->CurrentCamera->ParallelProjectionOn();  
+
+  this->ScalarShift = 0;
+  this->ScalarScale = 1;  
 }
 
 vtkKWRenderWidget::~vtkKWRenderWidget()
@@ -102,6 +112,8 @@ vtkKWRenderWidget::~vtkKWRenderWidget()
     this->CornerAnnotation->Delete();
     this->CornerAnnotation = NULL;
     }
+  
+  this->SetUnits(NULL);
 }
 
 void vtkKWRenderWidget::Create(vtkKWApplication *app, const char *args)
@@ -205,6 +217,9 @@ void vtkKWRenderWidget::SetupBindings()
                wname, tname);
   
   this->Script("bind %s <Configure> {%s Configure %%w %%h}",
+               wname, tname);
+  
+  this->Script("bind %s <Enter> {%s Enter %%x %%y}",
                wname, tname);
 }
 

@@ -52,6 +52,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkKWWidget.h"
 
+class vtkCamera;
 class vtkKWEventMap;
 class vtkKWGenericRenderWindowInteractor;
 class vtkKWWindow;
@@ -81,6 +82,7 @@ public:
   virtual void AKeyPress(char key, int x, int y, int ctrl, int shift);
   virtual void Exposed();
   virtual void Configure(int width, int height);
+  virtual void Enter(int x, int y) {}
   
   virtual void Render();
   virtual void Reset() = 0;
@@ -145,6 +147,18 @@ public:
   virtual void SetCornerTextColor(float *rgb)
                { this->SetCornerTextColor(rgb[0], rgb[1], rgb[2]); }
       
+  // Description:
+  // Set/Get the units that pixel sizes are measured in
+  vtkSetStringMacro(Units);
+  vtkGetStringMacro(Units);
+  
+  vtkGetObjectMacro(CurrentCamera, vtkCamera);
+
+  vtkSetMacro(ScalarShift, float);
+  vtkGetMacro(ScalarShift, float);
+  vtkSetMacro(ScalarScale, float);
+  vtkGetMacro(ScalarScale, float);
+  
 protected:
   vtkKWRenderWidget();
   ~vtkKWRenderWidget();
@@ -165,6 +179,13 @@ protected:
   int RenderState;
   int RenderMode;
   int Printing;
+  
+  char *Units;
+
+  vtkCamera *CurrentCamera;
+
+  float ScalarShift;
+  float ScalarScale;
   
 private:
   vtkKWRenderWidget(const vtkKWRenderWidget&);  // Not implemented
