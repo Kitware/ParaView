@@ -67,6 +67,10 @@ public:
   vtkGetMacro( MedResTextureID, int );
   vtkGetMacro( HiResTextureID, int );
 
+  vtkGetObjectMacro( HiResTextureMapper, vtkVolumeTextureMapper2D );
+  vtkGetObjectMacro( MedResTextureMapper, vtkVolumeTextureMapper2D );
+  vtkGetObjectMacro( LowResTextureMapper, vtkVolumeTextureMapper2D );
+  
   vtkGetObjectMacro( VolumeProMapper, vtkVolumeProMapper );
 
   vtkGetObjectMacro( VolumeProperty, vtkVolumeProperty );
