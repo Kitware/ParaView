@@ -194,9 +194,13 @@ void vtkPVWindow::Create(vtkKWApplication *app, char *args)
   this->MenuFile->InsertCommand(0,"New Window", this, "NewWindow");
   this->MenuFile->InsertCommand(2, "Save Tcl script", this, "Save");
   
+  this->SelectMenu->SetParent(this->GetMenu());
+  this->SelectMenu->Create(this->Application, "-tearoff 0");
+  this->Menu->InsertCascade(2, "Select", this->SelectMenu, 0);
+  
   this->VTKMenu->SetParent(this->GetMenu());
   this->VTKMenu->Create(this->Application, "-tearoff 0");
-  this->Menu->InsertCascade(2, "VTK", this->VTKMenu, 0);
+  this->Menu->InsertCascade(3, "VTK", this->VTKMenu, 0);
   
   // Create the menu for creating data sources.  
   this->SourceMenu->SetParent(this->VTKMenu);
@@ -207,10 +211,6 @@ void vtkPVWindow::Create(vtkKWApplication *app, char *args)
   this->FilterMenu->SetParent(this->VTKMenu);
   this->FilterMenu->Create(this->Application, "-tearoff 0");
   this->VTKMenu->AddCascade("Filters", this->FilterMenu, 0);  
-  
-  this->SelectMenu->SetParent(this->GetMenu());
-  this->SelectMenu->Create(this->Application, "-tearoff 0");
-  this->Menu->InsertCascade(3, "Select", this->SelectMenu, 0);
   
   // Create all of the menu items for sources with no inputs.
   this->SourceInterfaces->InitTraversal();
