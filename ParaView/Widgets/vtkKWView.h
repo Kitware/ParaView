@@ -137,10 +137,10 @@ class VTK_EXPORT vtkKWView : public vtkKWWidget
   // Printthe image. This may pop up a dialog box etc.
   virtual void PrintView();
 #ifdef _WIN32
-  void SetupPrint(RECT &rcDest, HDC ghdc, HDC adc,
+  void SetupPrint(RECT &rcDest, HDC ghdc,
                   int printerPageSizeX, int printerPageSizeY,
                   int printerDPIX, int printerDPIY,
-                  float minX, float minY, float scaleX, float scaleY,
+                  float scaleX, float scaleY,
                   int screenSizeX, int screenSizeY);
 #endif
   int GetPrinting() {return this->Printing;};
