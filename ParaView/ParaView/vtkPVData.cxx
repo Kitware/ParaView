@@ -79,7 +79,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.161.2.16");
+vtkCxxRevisionMacro(vtkPVData, "1.161.2.17");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -192,7 +192,7 @@ vtkPVData::vtkPVData()
 
   this->LODResolution = 50;
   this->CollectThreshold = 2.0;
-
+  this->ColorSetByUser = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -1748,10 +1748,16 @@ void vtkPVData::UpdateProperties()
         }
       }
     }
+  if (strcmp(currentColorBy, "Property") == 0 && this->ColorSetByUser)
+    {
+    return;
+    }
+
   // If the current array we are coloring by has disappeared,
   // then default back to the property.
   if ( ! currentColorByFound)
     {
+    this->ColorSetByUser = 0;
     if (defArrayName != NULL)
       {
       this->ColorMenu->SetValue(defCmd);
@@ -1856,6 +1862,7 @@ void vtkPVData::ResetColorRange()
 //----------------------------------------------------------------------------
 void vtkPVData::ColorByProperty()
 {
+  this->ColorSetByUser = 1;
   this->AddTraceEntry("$kw(%s) ColorByProperty", this->GetTclName());
   this->ColorMenu->SetValue("Property");
   this->ColorByPropertyInternal();
@@ -1893,6 +1900,7 @@ void vtkPVData::ColorByPointFieldComponent(const char *name, int comp)
   current = this->ColorMenu->GetValue();
   char newLabel[300];
 
+  this->ColorSetByUser = 1;
   // In case this is called from a script.
   vtkDataArray *array = NULL;
   if (this->VTKData)
@@ -1980,6 +1988,8 @@ void vtkPVData::ColorByCellFieldComponent(const char *name, int comp)
   const char *current;
   current = this->ColorMenu->GetValue();
   char newLabel[300];
+
+  this->ColorSetByUser = 1;
 
   // In case this is called from a script.
   vtkDataArray *array = NULL;
@@ -3001,7 +3011,7 @@ void vtkPVData::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVData ";
-  this->ExtractRevision(os,"$Revision: 1.161.2.16 $");
+  this->ExtractRevision(os,"$Revision: 1.161.2.17 $");
 }
 
 //----------------------------------------------------------------------------

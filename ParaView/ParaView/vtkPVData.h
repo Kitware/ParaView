@@ -495,6 +495,7 @@ protected:
 
   int LODResolution;
   float CollectThreshold;
+  int ColorSetByUser;
 
   vtkPVData(const vtkPVData&); // Not implemented
   void operator=(const vtkPVData&); // Not implemented
