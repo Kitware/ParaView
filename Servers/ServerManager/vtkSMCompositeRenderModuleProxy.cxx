@@ -26,7 +26,7 @@
 #include "vtkClientServerStream.h"
 
 vtkStandardNewMacro(vtkSMCompositeRenderModuleProxy);
-vtkCxxRevisionMacro(vtkSMCompositeRenderModuleProxy, "1.1.2.3");
+vtkCxxRevisionMacro(vtkSMCompositeRenderModuleProxy, "1.1.2.4");
 //-----------------------------------------------------------------------------
 vtkSMCompositeRenderModuleProxy::vtkSMCompositeRenderModuleProxy()
 {
@@ -77,8 +77,10 @@ void vtkSMCompositeRenderModuleProxy::InitializeCompositingPipeline()
     return;
     }
   
-  vtkSMProperty *p = 0;
-  vtkSMProxyProperty* pp = 0;
+  vtkSMProperty *p;
+  vtkSMProxyProperty* pp;
+  vtkSMIntVectorProperty* ivp;
+
   vtkPVProcessModule* pm = vtkPVProcessModule::SafeDownCast(
     vtkProcessModule::GetProcessModule());
  
@@ -123,6 +125,15 @@ void vtkSMCompositeRenderModuleProxy::InitializeCompositingPipeline()
       }
     p->Modified();
     }
+ 
+  ivp = vtkSMIntVectorProperty::SafeDownCast(
+    this->CompositeManagerProxy->GetProperty("UseCompositing"));
+  if (ivp)
+    {
+    // So that the server window does not popup until needed.
+    ivp->SetElement(0, 0); 
+    }
+
   this->CompositeManagerProxy->UpdateVTKObjects();
 
 }
