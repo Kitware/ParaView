@@ -5,6 +5,7 @@ kwinit
 vtkCornerAnnotation 
 vtkKWActorComposite 
 vtkKWApplication 
+vtkKWBWidgets
 vtkKWChangeColorButton 
 vtkKWCheckButton 
 vtkKWComposite 
