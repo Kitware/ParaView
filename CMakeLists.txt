@@ -52,6 +52,8 @@ IF(BUILD_TESTING)
   INCLUDE (${CMAKE_ROOT}/Modules/Dart.cmake)
 ENDIF(BUILD_TESTING)
 
+IF(NOT PARAVIEW_TESTING_DART_SERVER)
+
 #########################################################################
 # Configure TclTk
 IF(UNIX)
@@ -277,4 +279,5 @@ INSTALL_FILES(/lib/paraview-${PARAVIEW_VERSION} FILES
 CONFIGURE_FILE(${ParaView_SOURCE_DIR}/CMake/CTestCustom.ctest.in
   ${ParaView_BINARY_DIR}/CTestCustom.ctest @ONLY)
 
+ENDIF(NOT PARAVIEW_TESTING_DART_SERVER)
 
