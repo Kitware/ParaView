@@ -785,6 +785,8 @@ void vtkPVWindow::ShowWindowProperties()
 void vtkPVWindow::ShowCurrentSourceProperties()
 {
   // We need to update the properties-menu radio button too!
+  this->GetMenuProperties()->CheckRadioButton(
+    this->GetMenuProperties(), "Radio", 2);
   
   this->GetCurrentPVSource()->UpdateInputList();
   if (this->GetCurrentPVSource()->IsA("vtkPVGlyph3D"))
@@ -798,6 +800,8 @@ void vtkPVWindow::ShowCurrentSourceProperties()
 void vtkPVWindow::ShowCurrentActorProperties()
 {
   // We need to update the properties-menu radio button too!
+  this->GetMenuProperties()->CheckRadioButton(
+    this->GetMenuProperties(), "Radio", 3);
   
   this->MainView->ShowActorParent();
 }
