@@ -847,7 +847,10 @@ void vtkPVRenderView::CreateViewProperties()
     this->SetLODThreshold(
       pvwindow->GetIntRegisteryValue(2, "RunTime", "LODThreshold"));
     }
-  this->LODThresholdScale->SetValue(18.0 - log((double)(this->LODThreshold)));
+  if (this->LODThreshold > 0 )
+    {
+    this->LODThresholdScale->SetValue(18.0 - log((double)(this->LODThreshold)));
+    }
 
   this->LODThresholdScale->SetCommand(this, "LODThresholdScaleCallback");
   this->LODThresholdScale->SetBalloonHelpString(
@@ -1641,11 +1644,11 @@ void vtkPVRenderView::ImmediateModeCallback()
 void vtkPVRenderView::LODThresholdScaleCallback()
 {
   float value = this->LODThresholdScale->GetValue();
-  float threshold;
+  int threshold;
 
   // Value should be between 0 and 18.
   // producing threshold between 65Mil and 1.
-  threshold = exp(18.0 - value);
+  threshold = static_cast<int>(exp(18.0 - value));
   
   // Use internal method so we do not reset the slider.
   // I do not know if it would cause a problem, but ...
@@ -1661,7 +1664,14 @@ void vtkPVRenderView::SetLODThreshold(int threshold)
 {
   float value;
   
-  value = 18.0 - log((double)(threshold));
+  if (threshold <= 0.0)
+    {
+    value = VTK_LARGE_FLOAT;
+    }
+  else
+    {
+    value = 18.0 - log((double)(threshold));
+    }
   this->LODThresholdScale->SetValue(value);
 
   this->SetLODThresholdInternal(threshold);
@@ -1976,7 +1986,7 @@ void vtkPVRenderView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVRenderView ";
-  this->ExtractRevision(os,"$Revision: 1.180 $");
+  this->ExtractRevision(os,"$Revision: 1.181 $");
 }
 
 //------------------------------------------------------------------------------
