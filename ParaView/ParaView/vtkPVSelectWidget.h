@@ -51,14 +51,17 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __vtkPVSelectWidget_h
 
 #include "vtkPVObjectWidget.h"
-#include "vtkKWLabel.h"
-#include "vtkKWMenuButton.h"
-#include "vtkKWLabeledFrame.h"
 
 class vtkStringList;
 class vtkKWOptionMenu;
 class vtkKWLabel;
 class vtkPVWidgetCollection;
+class vtkPVSource;
+class vtkKWLabeledFrame;
+class vtkStringList;
+class vtkPVWidgetCollection;
+
+
 //BTX
 template <class key, class data> 
 class vtkArrayMap;
@@ -110,7 +113,7 @@ public:
 
   // Description:
   // All sub widgets should have this frame as their parent.
-  vtkKWWidget *GetFrame() {return this->LabeledFrame->GetFrame();}
+  vtkKWWidget *GetFrame();
 
   // Description:
   // Methods used internally by accept and reset to 
@@ -168,10 +171,6 @@ protected:
   vtkPVWidgetCollection *Widgets;
 
   int CurrentIndex;
-
-  vtkPVSelectWidget(const vtkPVSelectWidget&); // Not implemented
-  void operator=(const vtkPVSelectWidget&); // Not implemented
-
   int UseWidgetCommand;
 
 //BTX
@@ -183,6 +182,10 @@ protected:
   
   int ReadXMLAttributes(vtkPVXMLElement* element,
                         vtkPVXMLPackageParser* parser);
+
+private:
+  vtkPVSelectWidget(const vtkPVSelectWidget&); // Not implemented
+  void operator=(const vtkPVSelectWidget&); // Not implemented
 };
 
 #endif

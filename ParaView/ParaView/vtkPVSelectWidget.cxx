@@ -568,6 +568,12 @@ int vtkPVSelectWidget::ReadXMLAttributes(vtkPVXMLElement* element,
 }
 
 //----------------------------------------------------------------------------
+vtkKWWidget *vtkPVSelectWidget::GetFrame() 
+{
+  return this->LabeledFrame->GetFrame();
+}
+
+//----------------------------------------------------------------------------
 void vtkPVSelectWidget::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
