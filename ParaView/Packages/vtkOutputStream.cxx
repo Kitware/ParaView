@@ -18,7 +18,7 @@
 #include "vtkOutputStream.h"
 #include "vtkObjectFactory.h"
 
-vtkCxxRevisionMacro(vtkOutputStream, "1.1");
+vtkCxxRevisionMacro(vtkOutputStream, "1.2");
 vtkStandardNewMacro(vtkOutputStream);
 
 //----------------------------------------------------------------------------
@@ -60,11 +60,11 @@ int vtkOutputStream::EndWriting()
 //----------------------------------------------------------------------------
 int vtkOutputStream::Write(const unsigned char* data, unsigned long length)
 {
-  return (this->Stream->write(data, length)? 1:0);
+  return this->Write(reinterpret_cast<const char*>(data), length);
 }
 
 //----------------------------------------------------------------------------
 int vtkOutputStream::Write(const char* data, unsigned long length)
 {
-  return this->Write(reinterpret_cast<const unsigned char*>(data), length);
+  return (this->Stream->write(data, length)? 1:0);
 }

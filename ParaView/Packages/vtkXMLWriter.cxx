@@ -27,7 +27,7 @@
 #include "vtkPoints.h"
 #include "vtkUnsignedCharArray.h"
 
-vtkCxxRevisionMacro(vtkXMLWriter, "1.6");
+vtkCxxRevisionMacro(vtkXMLWriter, "1.7");
 vtkCxxSetObjectMacro(vtkXMLWriter, Compressor, vtkDataCompressor);
 
 //----------------------------------------------------------------------------
@@ -286,7 +286,8 @@ unsigned long vtkXMLWriter::ReserveAttributeSpace(const char* attr)
 //----------------------------------------------------------------------------
 unsigned long vtkXMLWriter::GetAppendedDataOffset()
 {
-  return (this->Stream->tellp() - this->AppendedDataPosition);
+  unsigned long pos = this->Stream->tellp();
+  return (pos - this->AppendedDataPosition);
 }
 
 //----------------------------------------------------------------------------

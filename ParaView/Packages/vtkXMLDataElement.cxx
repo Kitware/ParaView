@@ -45,7 +45,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <ctype.h>
 
-vtkCxxRevisionMacro(vtkXMLDataElement, "1.3");
+vtkCxxRevisionMacro(vtkXMLDataElement, "1.4");
 vtkStandardNewMacro(vtkXMLDataElement);
 
 //----------------------------------------------------------------------------
@@ -450,7 +450,8 @@ void vtkXMLDataElement::SeekInlineDataPosition(vtkXMLDataParser* parser)
     stream->clear(stream->rdstate() & ~ios::failbit);
     while(stream->get(c) && (c != '>'));
     while(stream->get(c) && this->IsSpace(c));
-    this->InlineDataPosition = stream->tellg()-1;
+    unsigned long pos = stream->tellg();
+    this->InlineDataPosition = pos-1;
     }
   
   // Seek to the data position.

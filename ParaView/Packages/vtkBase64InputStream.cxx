@@ -19,7 +19,7 @@
 #include "vtkObjectFactory.h"
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkBase64InputStream, "1.2");
+vtkCxxRevisionMacro(vtkBase64InputStream, "1.3");
 vtkStandardNewMacro(vtkBase64InputStream);
 
 //----------------------------------------------------------------------------
@@ -154,7 +154,7 @@ inline int vtkBase64InputStream::DecodeTriplet(unsigned char& c0,
   unsigned char d[4];
   
   // Read the 4 bytes encoding this triplet from the stream.
-  this->Stream->read(in, 4);
+  this->Stream->read(reinterpret_cast<char*>(in), 4);
   if(this->Stream->gcount() < 4) { return 0; }
   d[0] = vtkBase64InputStreamDecode(in[0]);
   d[1] = vtkBase64InputStreamDecode(in[1]);

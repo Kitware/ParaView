@@ -176,7 +176,8 @@ protected:
   int WriteBinaryData(void* data, int numWords, int wordType);
   
   int WriteBinaryData(char* data)
-    { return this->WriteBinaryData(data, strlen(data), VTK_CHAR); }
+    { return this->WriteBinaryData(data, static_cast<int>(strlen(data)),
+                                   VTK_CHAR); }
   int WriteBinaryData(char* data, int numWords)
     { return this->WriteBinaryData(data, numWords, VTK_CHAR); }
   int WriteBinaryData(unsigned char* data, int numWords)
@@ -193,7 +194,8 @@ protected:
   int WriteAsciiData(void* data, int numWords, int wordType, vtkIndent indent);
   
   int WriteAsciiData(char* data, vtkIndent indent)
-    { return this->WriteAsciiData(data, strlen(data), VTK_CHAR, indent); }
+    { return this->WriteAsciiData(data, static_cast<int>(strlen(data)),
+                                  VTK_CHAR, indent); }
   int WriteAsciiData(char* data, int numWords, vtkIndent indent)
     { return this->WriteAsciiData(data, numWords, VTK_CHAR, indent); }
   int WriteAsciiData(unsigned char* data, int numWords, vtkIndent indent)

@@ -19,7 +19,7 @@
 #include "vtkObjectFactory.h"
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkBase64OutputStream, "1.2");
+vtkCxxRevisionMacro(vtkBase64OutputStream, "1.3");
 vtkStandardNewMacro(vtkBase64OutputStream);
 
 //----------------------------------------------------------------------------
@@ -118,7 +118,7 @@ inline int vtkBase64OutputStream::EncodeTriplet(unsigned char c0,
   out[1] = vtkBase64OutputStreamEncode(((c0 << 4) & 0x30)|((c1 >> 4) & 0x0F));
   out[2] = vtkBase64OutputStreamEncode(((c1 << 2) & 0x3C)|((c2 >> 6) & 0x03));
   out[3] = vtkBase64OutputStreamEncode(c2 & 0x3F);
-  return (this->Stream->write(out, 4)? 1:0);
+  return (this->Stream->write(reinterpret_cast<char*>(out), 4)? 1:0);
 }
   
 //----------------------------------------------------------------------------
@@ -131,7 +131,7 @@ inline int vtkBase64OutputStream:: EncodeEnding(unsigned char c0,
   out[1] = vtkBase64OutputStreamEncode(((c0 << 4) & 0x30)|((c1 >> 4) & 0x0F));
   out[2] = vtkBase64OutputStreamEncode(((c1 << 2) & 0x3C));
   out[3] = '=';
-  return (this->Stream->write(out, 4)? 1:0);
+  return (this->Stream->write(reinterpret_cast<char*>(out), 4)? 1:0);
 }
 
 //----------------------------------------------------------------------------
@@ -143,7 +143,7 @@ inline int vtkBase64OutputStream::EncodeEnding(unsigned char c0)
   out[1] = vtkBase64OutputStreamEncode(((c0 << 4) & 0x30));
   out[2] = '=';
   out[3] = '=';
-  return (this->Stream->write(out, 4)? 1:0);
+  return (this->Stream->write(reinterpret_cast<char*>(out), 4)? 1:0);
 }
 
 //----------------------------------------------------------------------------
@@ -157,4 +157,3 @@ unsigned char vtkBase64OutputStreamEncode(unsigned char c)
 { 
   return vtkBase64OutputStreamEncodeTable[c]; 
 }
-

@@ -18,7 +18,7 @@
 #include "vtkInputStream.h"
 #include "vtkObjectFactory.h"
 
-vtkCxxRevisionMacro(vtkInputStream, "1.1");
+vtkCxxRevisionMacro(vtkInputStream, "1.2");
 vtkStandardNewMacro(vtkInputStream);
 
 //----------------------------------------------------------------------------
@@ -64,12 +64,12 @@ int vtkInputStream::Seek(unsigned long offset)
 //----------------------------------------------------------------------------
 unsigned long vtkInputStream::Read(unsigned char* data, unsigned long length)
 {
-  this->Stream->read(data, length);
-  return this->Stream->gcount();
+  return this->Read(reinterpret_cast<char*>(data), length);
 }
 
 //----------------------------------------------------------------------------
 unsigned long vtkInputStream::Read(char* data, unsigned long length)
 {
-  return this->Read(reinterpret_cast<unsigned char*>(data), length);
+  this->Stream->read(data, length);
+  return this->Stream->gcount();
 }
