@@ -46,13 +46,13 @@ SET(PROJECT_TESTS ArrayMenuChangeInput
 
 IF(RUN_WITH_MPI)
   FOREACH (tfile ${PROJECT_TESTS})
-    ADD_TEST(${tfile}-MPI ${VTK_MPIRUN_EXE} ${MPI_PREFLAGS} ${PARAVIEW_EXECUTABLE}
+    ADD_TEST(${tfile}-MPI ${VTK_MPIRUN_EXE} ${VTK_MPI_PREFLAGS} ${PARAVIEW_EXECUTABLE}
              --disable-registry
              ${PARAVIEW_SOURCE_DIR}/${TEST_PATH}/Testing/Tcl/${tfile}.pvs
                -D ${PARAVIEW_SOURCE_DIR}/Data 
                -C ${PARAVIEW_SOURCE_DIR}/Widgets/Testing/Tcl/CompareImages.tcl
                -V ${PARAVIEW_SOURCE_DIR}/Data/Baseline/${tfile}.png
-                  ${MPI_POSTFLAGS})
+                  ${VTK_MPI_POSTFLAGS})
   ENDFOREACH(tfile)
 ENDIF(RUN_WITH_MPI)
 FOREACH (tfile ${PROJECT_TESTS})
