@@ -1096,6 +1096,10 @@
    <!-- End ExtractGrid -->
    </SourceProxy>
 
+   <SourceProxy name="Probe" class="vtkPProbeFilter">
+   <!-- End Probe -->
+   </SourceProxy>
+
    <SourceProxy name="StreamTracer" class="vtkDistributedStreamTracer">
 
      <StringVectorProperty 
