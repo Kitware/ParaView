@@ -13,8 +13,8 @@ SET (PARAVIEW_CAN_BUILD 1)
 IF (WIN32)
 
  FIND_PATH( HTML_HELP_PATH htmlhelp.h 
- 	   "c:/program files/html help workshop"  
-	   "c:/program files/html help workshop/include" 
+           "c:/program files/html help workshop"  
+           "c:/program files/html help workshop/include" 
            "[HKEY_CURRENT_USER\\Software\\Microsoft\\HTML Help Workshop;InstallDir]/include" )
 
  IF (HTML_HELP_PATH)
@@ -24,18 +24,18 @@ IF (WIN32)
    MESSAGE("ParaView requires htmlhelp to build. Please install html help." 
            "You can find html help on the msdn web site here:\n"
            "http://msdn.microsoft.com/\n"
-"http://msdn.microsoft.com/library/default.asp?url=/library/en-us/htmlhelp/html/vsconwhtshw.asp")
+           "http://msdn.microsoft.com/library/default.asp?url=/library/en-us/htmlhelp/html/vsconwhtshw.asp")
  ENDIF (HTML_HELP_PATH)
 
 
  FIND_LIBRARY( HTML_HELP_LIBRARY htmlhelp
               "c:/program files/html help workshop"  
-	      "c:/program files/html help workshop/LIB"
+              "c:/program files/html help workshop/LIB"
               "[HKEY_CURRENT_USER\\Software\\Microsoft\\HTML Help Workshop;InstallDir]/lib")
 
- IF (HTML_HELP_LIBRARY)	  
+ IF (HTML_HELP_LIBRARY)   
    LINK_LIBRARIES( ${HTML_HELP_LIBRARY} )
- ELSE (HTML_HELP_LIBRARY)	  
+ ELSE (HTML_HELP_LIBRARY)         
    SET (PARAVIEW_CAN_BUILD 0)
    MESSAGE("ParaView requires htmlhelp to build. Please set HTML_HELP_PATH")
  ENDIF (HTML_HELP_LIBRARY)
@@ -90,7 +90,16 @@ IF (PARAVIEW_CAN_BUILD)
 
  SET (KWWIDGETS_SOURCE_DIR ${PARAVIEW_SOURCE_DIR}/Widgets)
  SET (KWWIDGETS_BINARY_DIR ${PARAVIEW_BINARY_DIR}/Widgets)
- SUBDIRS(KWCommon Widgets Utilities  ParaView Demos)
+ SUBDIRS(KWCommon Widgets Utilities ParaView Demos)
+
+ # Provide option for building packages.
+ OPTION(PARAVIEW_BUILD_PACKAGES
+        "Build provided ParaView packages. (EXPERIMENTAL)" OFF)
+ MARK_AS_ADVANCED(PARAVIEW_BUILD_PACKAGES)
+ IF(PARAVIEW_BUILD_PACKAGES)
+  SUBDIRS(Packages)
+ ENDIF(PARAVIEW_BUILD_PACKAGES)
+
  SUBDIR_DEPENDS(ParaView Widgets)
  SUBDIRS(Config)
  IF (BUILD_DOCUMENTATION)
