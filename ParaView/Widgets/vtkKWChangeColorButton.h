@@ -74,8 +74,7 @@ public:
   // Set the label to be used on the button
   vtkSetStringMacro(Text);
   vtkGetStringMacro(Text);
-
-  
+ 
   // Description:
   // Handle button press and release events
   void AButtonPress(int x, int y);
@@ -94,14 +93,18 @@ public:
   virtual void SerializeToken(istream& is,const char token[1024]);
   virtual void SerializeRevision(ostream& os, vtkIndent indent);
 
+  // Description:
+  // Access to the label
+  vtkGetObjectMacro(Label, vtkKWLabel);
+
   void        ChangeColor();
 
 protected:
   vtkKWChangeColorButton();
   ~vtkKWChangeColorButton();
 
-  vtkKWLabel *Label1;
-  vtkKWFrame *Label2;
+  vtkKWLabel *Label;
+  vtkKWFrame *ColorFrame;
   char        *Command;
   char        *Text;
   float       Color[3];
