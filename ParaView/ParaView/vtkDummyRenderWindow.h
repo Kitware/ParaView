@@ -63,11 +63,11 @@ public:
   virtual void SetDisplayId(void *) {};
   virtual void SetWindowId(void *)  {};
   virtual void SetParentId(void *)  {};
-  virtual void *GetGenericDisplayId() {};
-  virtual void *GetGenericWindowId()  {};
-  virtual void *GetGenericParentId()  {};
-  virtual void *GetGenericContext()   {};
-  virtual void *GetGenericDrawable()  {};
+  virtual void *GetGenericDisplayId() {return 0;};
+  virtual void *GetGenericWindowId()  {return 0;};
+  virtual void *GetGenericParentId()  {return 0;};
+  virtual void *GetGenericContext()   {return 0;};
+  virtual void *GetGenericDrawable()  {return 0;};
   virtual void SetWindowInfo(char *)  {};
   virtual void SetParentInfo(char *)  {};
   virtual void Start() {};
