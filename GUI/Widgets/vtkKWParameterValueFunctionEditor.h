@@ -504,7 +504,7 @@ public:
     PointMarginTopSide         = 4,
     PointMarginBottomSide      = 8,
     PointMarginVerticalSides   = 12,
-    PointMarginAllSides        = 15,
+    PointMarginAllSides        = 15
   };
   //ETX
   vtkBooleanMacro(PointMarginToCanvas, int);
