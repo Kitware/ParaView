@@ -902,7 +902,6 @@ void vtkPVSource::AcceptCallback()
   char methodAndArg[256];
   int numSources;
   vtkPVSource *source;
-  vtkPVApplication *pvApp = this->GetPVApplication();
   
   // This adds an extract filter only when the MaximumNumberOfPieces is 1.
   // This is only the case the first time the accept is called.
@@ -1042,7 +1041,6 @@ void vtkPVSource::DeleteCallback()
   char methodAndArg[256];
   vtkPVSource *source;
   vtkPVWindow *window = this->GetWindow();
-  vtkPVApplication *pvApp = this->GetPVApplication();
 
   // Just in case cursor was left in a funny state.
 #ifdef _WIN32

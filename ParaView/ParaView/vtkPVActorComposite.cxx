@@ -661,7 +661,6 @@ void vtkPVActorComposite::UpdateProperties()
   char *currentColorBy;
   int currentColorByFound = 0;
   float time;
-  int validBounds = 1;
   vtkKWWindow *window;
   
   if (this->UpdateTime > this->PVData->GetVTKData()->GetMTime())

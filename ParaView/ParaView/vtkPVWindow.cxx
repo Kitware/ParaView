@@ -858,8 +858,6 @@ void vtkPVWindow::NewWindow()
 void vtkPVWindow::OpenCallback()
 {
   char *openFileName = NULL;
-  char *extension = NULL;
-  char *endingSlash = NULL;
   istream *input;
   
   this->Script("set openFileName [tk_getOpenFile -filetypes {{{VTK files} {.vtk}} {{PVTK files} {.pvtk}} {{EnSight files} {.case}} {{POP files} {.pop}} {{STL files} {.stl}}}]");
