@@ -52,7 +52,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWWidget );
-vtkCxxRevisionMacro(vtkKWWidget, "1.67");
+vtkCxxRevisionMacro(vtkKWWidget, "1.68");
 
 int vtkKWWidgetCommand(ClientData cd, Tcl_Interp *interp,
                        int argc, char *argv[]);
@@ -300,7 +300,7 @@ char* vtkKWWidget::CreateCommand(vtkKWObject* CalledObject, const char * Command
 {
   ostrstream event;
   event << this->GetWidgetName() << " configure -command {" 
-        << CalledObject->GetTclName() 
+        << (CalledObject?CalledObject->GetTclName():"")
         << " " << CommandString << "} " << ends;
 
   return event.str();
@@ -346,7 +346,7 @@ void vtkKWWidget::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkKWWidget ";
-  this->ExtractRevision(os,"$Revision: 1.67 $");
+  this->ExtractRevision(os,"$Revision: 1.68 $");
 }
 
 //----------------------------------------------------------------------------
