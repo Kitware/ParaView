@@ -26,8 +26,7 @@
 class vtkMultiBlockDataSet;
 class vtkMultiBlockDataIteratorInternal;
 
-class VTK_EXPORT vtkMultiBlockDataIterator : 
-  public vtkCompositeDataIterator
+class VTK_EXPORT vtkMultiBlockDataIterator : public vtkCompositeDataIterator
 {
 public:
   static vtkMultiBlockDataIterator *New();
