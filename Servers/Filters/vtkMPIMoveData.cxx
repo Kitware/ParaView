@@ -35,7 +35,7 @@
 #include "vtkMPIMToNSocketConnection.h"
 #include "vtkSocketCommunicator.h"
 
-vtkCxxRevisionMacro(vtkMPIMoveData, "1.1");
+vtkCxxRevisionMacro(vtkMPIMoveData, "1.2");
 vtkStandardNewMacro(vtkMPIMoveData);
 
 vtkCxxSetObjectMacro(vtkMPIMoveData,Controller, vtkMultiProcessController);
@@ -55,8 +55,10 @@ vtkMPIMoveData::vtkMPIMoveData()
   this->SetController(vtkMultiProcessController::GetGlobalController());
 
   this->MoveMode = 0;/*vtkMPIMoveData::PASS_THROUGH;*/
+  this->DefineCollectAsClone = 0;
   // This tells which server/client this object is on.
   this->Server = -1;
+
   // This is set on the data server and render server when we are running
   // with a render server.
   this->MPIMToNSocketConnection = 0;
@@ -139,6 +141,12 @@ void vtkMPIMoveData::Execute()
 {
   vtkDataSet* input = this->GetInput();
   vtkDataSet* output = this->GetOutput();
+
+  // A hack to implement an onld API.
+  if (this->DefineCollectAsClone && this->MoveMode == vtkMPIMoveData::COLLECT)
+    {
+    this->MoveMode = vtkMPIMoveData::CLONE;
+    }
 
   // This case deals with everything running as one MPI group
   // Client, Data and render server are all the same program.

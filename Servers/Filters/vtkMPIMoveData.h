@@ -65,6 +65,14 @@ public:
   void SetMoveModeToClone(){this->MoveMode=vtkMPIMoveData::CLONE;}
 
   // Description:
+  // The old classes cloned when mode was collect.  It is easier (and cleaner)
+  // to support this than change the part display superclasses method
+  // "SetCollectionDecision".
+  vtkSetMacro(DefineCollectAsClone,int);
+  vtkGetMacro(DefineCollectAsClone,int);
+  vtkBooleanMacro(DefineCollectAsClone,int);
+
+  // Description:
   // Legacy API for ParaView 1.4
   void SetPassThrough(int v) 
     {if(v){this->SetMoveModeToPassThrough();} else {this->SetMoveModeToClone();}}
@@ -108,6 +116,7 @@ protected:
   int MoveMode;
   int Server;
 
+  int DefineCollectAsClone;
 //BTX
   enum MoveModes {
     PASS_THROUGH=0,
