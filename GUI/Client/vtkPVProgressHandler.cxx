@@ -35,7 +35,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProgressHandler);
-vtkCxxRevisionMacro(vtkPVProgressHandler, "1.4");
+vtkCxxRevisionMacro(vtkPVProgressHandler, "1.5");
 
 //----------------------------------------------------------------------------
 //****************************************************************************
@@ -250,8 +250,8 @@ void vtkPVProgressHandler::InvokeRootNodeProgressEvent(
       }
     else
       {
-      vtkErrorMacro("Internal ParaView error. Got progress from unknown object id" << id << ".");
-      vtkPVApplication::Abort();
+      //vtkErrorMacro("Internal ParaView error. Got progress from unknown object id" << id << ".");
+      //vtkPVApplication::Abort();
       }
     }
 }
@@ -282,8 +282,8 @@ void vtkPVProgressHandler::InvokeRootNodeServerProgressEvent(
     }
   else
     {
-    vtkErrorMacro("Internal ParaView error. Got progress from unknown object id" << id << ".");
-    vtkPVApplication::Abort();
+    //vtkErrorMacro("Internal ParaView error. Got progress from unknown object id" << id << ".");
+    //vtkPVApplication::Abort();
     }
 }
 
@@ -438,7 +438,8 @@ void vtkPVProgressHandler::CleanupPendingProgress(vtkPVApplication* app)
         {
         vtkClientServerID nid;
         nid.ID = id;
-        vtkObjectBase* base = app->GetProcessModule()->GetInterpreter()->GetObjectFromID(nid);
+        vtkObjectBase* base = 
+          app->GetProcessModule()->GetInterpreter()->GetObjectFromID(nid, 1);
         if ( base )
           {
           if ( this->ProgressType == vtkPVProgressHandler::SingleProcessMPI )
@@ -454,14 +455,11 @@ void vtkPVProgressHandler::CleanupPendingProgress(vtkPVApplication* app)
             this->SocketController->Send(buffer, len, 1, PVAPPLICATION_PROGRESS_TAG);
             }
           }
-        else
-          {
-          vtkErrorMacro("Internal ParaView error. Got progress from unknown object id" << id << ".");
-          vtkPVApplication::Abort();
-          }
         }
     }
   this->ReceivingProgressReports = 0;
+  // WARNING
+  // should really synchronize and cleanup all progresses.
 }
 
 //----------------------------------------------------------------------------

@@ -89,7 +89,9 @@ public:
   // Description:
   // Return a pointer to a vtkObjectBase for an ID whose message
   // contains only the one object.
-  vtkObjectBase* GetObjectFromID(vtkClientServerID id);
+  vtkObjectBase* GetObjectFromID(vtkClientServerID id)
+    { return this->GetObjectFromID(id, 0); }
+  vtkObjectBase* GetObjectFromID(vtkClientServerID id, int noerror);
 
   // Description:
   // Return an ID given a pointer to a vtkObjectBase (or 0 if object

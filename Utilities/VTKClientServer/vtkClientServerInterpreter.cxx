@@ -25,7 +25,7 @@
 #include <sys/stat.h>
 
 vtkStandardNewMacro(vtkClientServerInterpreter);
-vtkCxxRevisionMacro(vtkClientServerInterpreter, "1.8");
+vtkCxxRevisionMacro(vtkClientServerInterpreter, "1.9");
 
 //----------------------------------------------------------------------------
 class vtkClientServerInterpreterInternals
@@ -70,7 +70,7 @@ vtkClientServerInterpreter::~vtkClientServerInterpreter()
 
 //----------------------------------------------------------------------------
 vtkObjectBase*
-vtkClientServerInterpreter::GetObjectFromID(vtkClientServerID id)
+vtkClientServerInterpreter::GetObjectFromID(vtkClientServerID id, int noerror)
 {
   // Get the message corresponding to this ID.
   if(const vtkClientServerStream* tmp = this->GetMessageFromID(id))
@@ -83,15 +83,21 @@ vtkClientServerInterpreter::GetObjectFromID(vtkClientServerID id)
       }
     else
       {
-      vtkErrorMacro("Attempt to get an object for ID " << id.ID
-                    << " whose message does not contain exactly one object.");
+      if ( !noerror )
+        {
+        vtkErrorMacro("Attempt to get an object for ID " << id.ID
+          << " whose message does not contain exactly one object.");
+        }
       return 0;
       }
     }
   else
     {
-    vtkErrorMacro("Attempt to get object for ID " << id.ID
-                  << " that is not present in the hash table.");
+    if ( !noerror )
+      {
+      vtkErrorMacro("Attempt to get object for ID " << id.ID
+        << " that is not present in the hash table.");
+      }
     return 0;
     }
 }
