@@ -8,9 +8,6 @@ ClientData vtkKWActorCompositeNewCommand();
 int vtkKWApplicationCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkKWApplicationNewCommand();
-int vtkKWCallbackSpecificationCommand(ClientData cd, Tcl_Interp *interp,
-             int argc, char *argv[]);
-ClientData vtkKWCallbackSpecificationNewCommand();
 int vtkKWChangeColorButtonCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkKWChangeColorButtonNewCommand();
@@ -29,9 +26,6 @@ ClientData vtkKWDialogNewCommand();
 int vtkKWEntryCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkKWEntryNewCommand();
-int vtkKWEventNotifierCommand(ClientData cd, Tcl_Interp *interp,
-             int argc, char *argv[]);
-ClientData vtkKWEventNotifierNewCommand();
 int vtkKWExtentCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkKWExtentNewCommand();
