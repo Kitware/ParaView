@@ -23,6 +23,9 @@ SET (LIBRARY_OUTPUT_PATH ${ParaView_BINARY_DIR}/bin CACHE INTERNAL
 SET (EXECUTABLE_OUTPUT_PATH ${ParaView_BINARY_DIR}/bin CACHE INTERNAL
   "Single output directory for building all executables.")
 
+CONFIGURE_FILE(${ParaView_SOURCE_DIR}/Utilities/Release/ParaView.nsi.in
+  ${ParaView_BINARY_DIR}/Utilities/Release/ParaView.nsi IMMEDIATE @ONLY)
+
 # The client server wrapper macro needs this name for
 # BUILD_SHARED_LIBS so it can work both inside and outside the tree.
 SET(PARAVIEW_BUILD_SHARED_LIBS "${BUILD_SHARED_LIBS}")
