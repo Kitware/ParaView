@@ -2,16 +2,17 @@ PROJECT(KWCommon)
 INCLUDE_REGULAR_EXPRESSION("^(vtk|kw|icons).*$")
 
 SET( KWCommon_SRCS
-vtkKWIcon.cxx
-vtkKWProcessStatistics.cxx
 vtkContainer.cxx
+vtkKWArguments.cxx
 vtkKWDirectoryUtilities.cxx
+vtkKWIcon.cxx
+vtkKWMath.cxx
+vtkKWProcessStatistics.cxx
 vtkKWRegisteryUtilities.cxx
+vtkKWRemoteExecute.cxx
 vtkKWSerializer.cxx
 vtkQueue.cxx
 vtkString.cxx
-vtkKWArguments.cxx
-vtkKWRemoteExecute.cxx
 )
 
 SET_SOURCE_FILES_PROPERTIES(
