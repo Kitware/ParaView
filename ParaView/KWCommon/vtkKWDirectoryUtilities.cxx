@@ -79,7 +79,11 @@ static inline int Chdir(const char* dir)
 }
 #endif
 
-vtkCxxRevisionMacro(vtkKWDirectoryUtilities, "1.13");
+#if defined(_WIN32) && (defined(_MSC_VER) || defined(__BORLANDC__) || defined(__MINGW32__))
+#define _unlink unlink
+#endif
+
+vtkCxxRevisionMacro(vtkKWDirectoryUtilities, "1.14");
 vtkStandardNewMacro(vtkKWDirectoryUtilities);
 
 //----------------------------------------------------------------------------
@@ -731,6 +735,16 @@ int vtkKWDirectoryUtilities::FileHasSignature(const char *filename,
   return res;
 }
 
+//----------------------------------------------------------------------------
+int vtkKWDirectoryUtilities::RemoveFile(const char* filename)
+{
+  if (!vtkKWDirectoryUtilities::FileExists(filename))
+    {
+    return 0;
+    }
+
+  return unlink(filename) ? 0 : 1;
+}
 
 
 

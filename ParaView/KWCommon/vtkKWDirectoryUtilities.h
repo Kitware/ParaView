@@ -146,6 +146,10 @@ public:
   static int FileHasSignature(const char *filename, 
                               const char *signature, unsigned long offset = 0);
   
+  // Description:
+  // Remove file.
+  static int RemoveFile(const char* filename);
+  
 protected:
   vtkKWDirectoryUtilities();
   ~vtkKWDirectoryUtilities();
