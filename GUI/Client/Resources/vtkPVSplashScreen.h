@@ -7,7 +7,7 @@
 #define image_PVSplashScreen_pixel_size    3
 #define image_PVSplashScreen_buffer_length 49464
 
-static unsigned char image_PVSplashScreen1[] = 
+static unsigned char image_PVSplashScreen[] = 
   "eNrsvX+sXVWZN94oDP6oGX2NmtHMRCeYOGJ4MeGdNzFkokKckJkQ/MchYhi1ECSvooUxgG"
   "JwZkRMCYgMLbRgx6lQURiEcluUSitQYK4trUxLjy8HOF423E17aO8X6os6CHw/+3zOec6z"
   "n/Vjr33u7e25nX2zcnLuPnuv/ay11/6sZz3reT7PokXNX/PX/DV/zd/4/j2zcrUU/LtqVd"
@@ -360,9 +360,7 @@ static unsigned char image_PVSplashScreen1[] =
   "GRxuq1Bh89qhoM2m580PZqyF1rG+6CoWKaCc3fuHzI/IvbPbR1Jw1NrltI5P118cc7/iP4"
   "Wd/QMaTDbVUF2ZmkCcI+KhDNXWwN0Zrcte3wFTPHCiAa+jO16Ddf8xZo0cz0LT57mlPdtS"
   "eQfZQqNPcKUcoQrRKFOwyucXtOaEd4iNKhC3PPQsldCBuNC1NJ5hD5ogmyDJS5XqtGrvwc"
-  "tNy10WYN7fNGaY2hQF5nDG+zUyNjWNeQ+WiHjVOHNs9iBmm3+/0v9bTKgqGlaN1VV1+L55";
-
-static unsigned char image_PVSplashScreen2[] = 
+  "tNy10WYN7fNGaY2hQF5nDG+zUyNjWNeQ+WiHjVOHNs9iBmm3+/0v9bTKgqGlaN1VV1+L55"
   "759r9EM9evv3lMWc9kgc4RoPPu5Rl7gh7/WtHF+1JKRN4bjYAXU7+GF84jWRlhqJ1Kb4jZ"
   "KlPKPLEd40fApN2xZgfZX3D7H61WQ6XkscPVh4x/OSjjB8NPHyx7tfXr15hG5wcNce66Ru"
   "7ODhFvQE55mQkkdAdteSIW51v9HCGYuBdSkRCYkqmQD05qFrOGK3/8/Q3hgxn/EfysRUYa"
@@ -717,3 +715,4 @@ static unsigned char image_PVSplashScreen2[] =
   "/XNvq/fqAa+SN9Ulw/caayKeXanmGnn9ITDBE/gDf+AP/AvFP01E6/caPiKBNBh6nFdI3l"
   "SPd/aaVX+jtHmmthN7WeAP/IE/8C8Sf52Ibk+S2qxiL+NFcTbRnuSGsJUZsPT7rmxrZ04N"
   "61/Z+gN/4A/8gX+R+LMiOn7xi1/84jfP3/8BD5/vsg==";
+
