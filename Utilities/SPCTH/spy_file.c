@@ -475,6 +475,7 @@ static void fread_double(SpyFile* spy, double *a, int count, FILE *fp)
     }
 }
 
+#if 0
 /* Routine fread's an array of double's in a machine-independent manner and convert to long*/
 static void fread_offsets(SpyFile* spy, long *a, int count, FILE *fp)
 {
@@ -496,6 +497,7 @@ static void fread_offsets(SpyFile* spy, long *a, int count, FILE *fp)
   /* Free the temporary buffer */
   free(buffer);
 }
+#endif
 
 /* Global variables describing the spy file */
 
