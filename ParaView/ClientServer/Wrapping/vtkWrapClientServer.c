@@ -405,7 +405,7 @@ void vtkParseOutput(FILE *fp, FileInfo *data)
 
   fprintf(fp,
           "\n"
-          "int VTK_CLIENT_SERVER_EXPORT"
+          "int VTK_EXPORT"
           " %sCommand(vtkClientServerInterpreter *arlu, vtkObjectBase *ob,"
           " const char *method, const vtkClientServerStream& msg,"
           " vtkClientServerStream& resultStream)\n"
