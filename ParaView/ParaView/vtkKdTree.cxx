@@ -11,16 +11,17 @@
 =========================================================================*/
 
 #include "vtkKdTree.h"
-#include <algorithm>
-#include <vtkObjectFactory.h>
-#include <vtkDataSet.h>
-#include <vtkCamera.h>
-#include <vtkPolyData.h>
-#include <vtkRenderWindow.h>
-#include <vtkFloatArray.h>
-#include <vtkMath.h>
+#include "vtkObjectFactory.h"
+#include "vtkDataSet.h"
+#include "vtkCamera.h"
+#include "vtkPolyData.h"
+#include "vtkRenderWindow.h"
+#include "vtkFloatArray.h"
+#include "vtkMath.h"
 
-vtkCxxRevisionMacro(vtkKdTree, "1.1.2.2");
+#include <algorithm>
+
+vtkCxxRevisionMacro(vtkKdTree, "1.1.2.3");
 
 // methods for vtkKdNode -------------------------------------------
 
@@ -46,6 +47,16 @@ const char *vtkKdNode::LevelMarker[20]={
 "                  ",
 "                   "
 };
+
+#define makeCompareFunc(name, loc) \
+   static int compareFunc##name(const void *a, const void *b){ \
+      const float *apt = static_cast<const float *>(a); \
+      const float *bpt = static_cast<const float *>(b); \
+      if (apt[loc] < bpt[loc]) return -1;  \
+      else if (apt[loc] > bpt[loc]) return 1; \
+      else return 0;                        \
+   }
+
 
 vtkKdNode::vtkKdNode()
 {  
@@ -2475,6 +2486,11 @@ vtkPlanesIntersection *vtkKdTree::ConvertFrustumToWorld(vtkRenderer *ren,
 void vtkKdTree::PrintTiming(ostream& os, vtkIndent indent)
 {
   vtkTimerLog::DumpLogWithIndents(&os, (float)0.0);
+}
+
+void vtkKdTree::PrintRegion(int id)
+{ 
+  this->RegionList[id]->PrintNode(0);
 }
 
 void vtkKdTree::PrintSelf(ostream& os, vtkIndent indent)

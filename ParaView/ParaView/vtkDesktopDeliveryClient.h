@@ -29,12 +29,9 @@
 #ifndef __vtkDesktopDeliveryClient_h
 #define __vtkDesktopDeliveryClient_h
 
-//#include "vtksnlParallelWin32Header.h"
+#include "vtkParallelRenderManager.h"
 
-#include <vtkParallelRenderManager.h>
-
-class VTK_EXPORT vtkDesktopDeliveryClient
-    : public vtkParallelRenderManager
+class VTK_EXPORT vtkDesktopDeliveryClient : public vtkParallelRenderManager
 {
 public:
   vtkTypeRevisionMacro(vtkDesktopDeliveryClient, vtkParallelRenderManager);

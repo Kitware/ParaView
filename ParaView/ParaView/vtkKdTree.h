@@ -27,70 +27,16 @@
 #ifndef __vtkKdTree_h
 #define __vtkKdTree_h
 
-//#include "vtksnlGraphicsWin32Header.h"
+#include "vtkTimerLog.h"
+#include "vtkLocator.h"
+#include "vtkIdList.h"
+#include "vtkPoints.h"
+#include "vtkCellArray.h"
+#include "vtkRenderer.h"
+#include "vtkVersion.h"
+#include "vtkPlanesIntersection.h"
 
-#include <vtkTimerLog.h>
-#include <vtkLocator.h>
-#include <vtkIdList.h>
-#include <vtkPoints.h>
-#include <vtkCellArray.h>
-#include <vtkRenderer.h>
-#include <vtkVersion.h>
-#include <vtkPlanesIntersection.h>
-
-#define makeCompareFunc(name, loc) \
-   static int compareFunc##name(const void *a, const void *b){ \
-      const float *apt = static_cast<const float *>(a); \
-      const float *bpt = static_cast<const float *>(b); \
-      if (apt[loc] < bpt[loc]) return -1;  \
-      else if (apt[loc] > bpt[loc]) return 1; \
-      else return 0;                        \
-   }
-//BTX
-
-class VTK_EXPORT vtkKdNode{
-public:
-
-  vtkKdNode();
-  ~vtkKdNode();
-
-  void SetDim(int n){this->Dim = n;}
-  int  GetDim(){return this->Dim;}
-
-  void SetNumberOfCells(int n){this->NumCells = n;}
-  int  GetNumberOfCells(){return this->NumCells;}
-
-  void SetBounds(double x1,double x2,double y1,double y2,double z1,double z2);
-  void GetBounds(double *b) const;
-
-  void SetDataBounds(double x1,double x2,double y1,double y2,double z1,double z2);
-  void SetDataBounds(float *b);  
-  void GetDataBounds(double *b) const;
-
-  void PrintNode(int depth);
-  void PrintVerboseNode(int depth);
-  void AddChildNodes(vtkKdNode *left, vtkKdNode *right);
-
-  int IntersectsBox(float x1, float x2, float y1, float y2, float z1, float z2);
-  int IntersectsBox(double x1,double x2,double y1,double y2,double z1,double z2);
-  int IntersectsRegion(vtkPlanesIntersection *pi);
-
-  static const char *LevelMarker[20];
-
-  double Min[3], Max[3];       // spatial bounds of node
-  double MinVal[3], MaxVal[3]; // spatial bounds of data
-  int NumCells;
-  
-  vtkKdNode *Up;
-
-  vtkKdNode *Left;
-  vtkKdNode *Right;
-
-  int Dim;
-
-  int Id;        // region id
-};
-//ETX
+class vtkKdNode;
 
 class VTK_EXPORT vtkKdTree : public vtkLocator
 {
@@ -215,7 +161,7 @@ public:
  
     // Description:
     //    Print out leaf node data for given id
-    void PrintRegion(int id){ this->RegionList[id]->PrintNode(0);}
+    void PrintRegion(int id);
 
     // Description:
     //    Create cell list for a region or regions.  If no DataSet is 
@@ -526,4 +472,48 @@ private:
     int CellCentersSize;
     int RetainCellLocations;
 };
+//BTX
+class vtkKdNode{
+public:
+
+  vtkKdNode();
+  ~vtkKdNode();
+
+  void SetDim(int n){this->Dim = n;}
+  int  GetDim(){return this->Dim;}
+
+  void SetNumberOfCells(int n){this->NumCells = n;}
+  int  GetNumberOfCells(){return this->NumCells;}
+
+  void SetBounds(double x1,double x2,double y1,double y2,double z1,double z2);
+  void GetBounds(double *b) const;
+
+  void SetDataBounds(double x1,double x2,double y1,double y2,double z1,double z2);
+  void SetDataBounds(float *b);  
+  void GetDataBounds(double *b) const;
+
+  void PrintNode(int depth);
+  void PrintVerboseNode(int depth);
+  void AddChildNodes(vtkKdNode *left, vtkKdNode *right);
+
+  int IntersectsBox(float x1, float x2, float y1, float y2, float z1, float z2);
+  int IntersectsBox(double x1,double x2,double y1,double y2,double z1,double z2);
+  int IntersectsRegion(vtkPlanesIntersection *pi);
+
+  static const char *LevelMarker[20];
+
+  double Min[3], Max[3];       // spatial bounds of node
+  double MinVal[3], MaxVal[3]; // spatial bounds of data
+  int NumCells;
+  
+  vtkKdNode *Up;
+
+  vtkKdNode *Left;
+  vtkKdNode *Right;
+
+  int Dim;
+
+  int Id;        // region id
+};
+//ETX
 #endif

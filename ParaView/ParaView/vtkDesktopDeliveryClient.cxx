@@ -29,7 +29,7 @@
 
 //#include <vtkRef.h>
 
-vtkCxxRevisionMacro(vtkDesktopDeliveryClient, "1.1.2.2");
+vtkCxxRevisionMacro(vtkDesktopDeliveryClient, "1.1.2.3");
 vtkStandardNewMacro(vtkDesktopDeliveryClient);
 
 vtkDesktopDeliveryClient::vtkDesktopDeliveryClient()
@@ -341,8 +341,11 @@ void vtkDesktopDeliveryClient::PrintSelf(ostream& os, vtkIndent indent)
      << (this->ReplaceActors ? "on" : "off") << endl;
   os << indent << "RemoteDisplay: "
      << (this->RemoteDisplay ? "on" : "off") << endl;
+  os << indent << "Squirt: "
+     << (this->Squirt? "on" : "off") << endl;
 
   os << indent << "RemoteImageProcessingTime: "
      << this->RemoteImageProcessingTime << endl;
   os << indent << "TransferTime: " << this->TransferTime << endl;
+  os << indent << "SquirtCompressionLevel: " << this->SquirtCompressionLevel << endl;
 }

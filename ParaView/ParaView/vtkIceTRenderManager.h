@@ -47,13 +47,11 @@
 
 #ifndef __vtkIceTRenderManager_h
 #define __vtkIceTRenderManager_h
-
 #include "vtkParallelRenderManager.h"
 
 #include <GL/ice-t.h>
 
-class VTK_EXPORT vtkIceTRenderManager
-    : public vtkParallelRenderManager
+class VTK_EXPORT vtkIceTRenderManager : public vtkParallelRenderManager
 {
 public:
   static vtkIceTRenderManager *New();
