@@ -176,6 +176,9 @@ VTK_WRAP_TCL3(
   ""
   )
 SET(VTK_TCL_HOME "${ParaView_SOURCE_DIR}/GUI")
+IF(NOT WIN32)
+  ADD_DEFINITIONS(-D_HPUX_SOURCE)
+ENDIF(NOT WIN32)
 ADD_LIBRARY(vtkPVServerManagerTCL ${ServerManagerTCL_SRCS}
   ${VTK_TCL_HOME}/vtktcl.c
   vtkPVProcessModuleBatchHelper.cxx)
