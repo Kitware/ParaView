@@ -320,6 +320,7 @@ public:
   // Description:
   // LOD resolution determines how many cells are in decimated model.
   void LODResolutionScaleCallback();
+  void LODResolutionLabelCallback();
 
   // Description:
   // This method sets the resolution without tracing or

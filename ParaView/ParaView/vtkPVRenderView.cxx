@@ -88,7 +88,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.213.2.5");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.213.2.6");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -1043,7 +1043,8 @@ void vtkPVRenderView::CreateViewProperties()
       pvwindow->GetIntRegisteryValue(2, "RunTime", "LODResolution"));
     }
   this->LODResolutionScale->SetValue(150 - this->LODResolution);
-  this->LODResolutionScale->SetCommand(this, "LODResolutionScaleCallback");
+  this->LODResolutionScale->SetCommand(this, "LODResolutionLabelCallback");
+  this->LODResolutionScale->SetEndCommand(this, "LODResolutionScaleCallback");
   this->LODResolutionScale->SetBalloonHelpString(
     "This slider determines the resolution of the decimated level of details.  "
     "The value is the dimension for each axis in the quadric clustering filter. "
@@ -1961,6 +1962,18 @@ void vtkPVRenderView::LODResolutionScaleCallback()
 }
 
 //----------------------------------------------------------------------------
+void vtkPVRenderView::LODResolutionLabelCallback()
+{
+  int resolution = static_cast<int>(this->LODResolutionScale->GetValue());
+  resolution = 170 - resolution;
+
+  char str[256];
+  sprintf(str, " %dx%dx%d", resolution, resolution, resolution);
+  this->LODResolutionValue->SetLabel(str);
+}
+
+
+//----------------------------------------------------------------------------
 void vtkPVRenderView::SetLODResolution(int value)
 {
   this->LODResolutionScale->SetValue(150 - value);
@@ -2369,7 +2382,7 @@ void vtkPVRenderView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVRenderView ";
-  this->ExtractRevision(os,"$Revision: 1.213.2.5 $");
+  this->ExtractRevision(os,"$Revision: 1.213.2.6 $");
 }
 
 //------------------------------------------------------------------------------
