@@ -61,7 +61,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWCornerAnnotation );
-vtkCxxRevisionMacro(vtkKWCornerAnnotation, "1.40");
+vtkCxxRevisionMacro(vtkKWCornerAnnotation, "1.41");
 
 int vtkKWCornerAnnotationCommand(ClientData cd, Tcl_Interp *interp,
                                 int argc, char *argv[]);
@@ -302,7 +302,7 @@ void vtkKWCornerAnnotation::Create(vtkKWApplication *app,
     "Toggle the visibility of the corner annotation text");
   this->CornerVisibilityButton->SetCommand(this, "DisplayCornerCallback");
 
-  this->Script("pack %s -side top -padx 2 -pady 2 -anchor nw",
+  this->Script("pack %s -side top -padx 2 -anchor nw",
                this->CornerVisibilityButton->GetWidgetName());
 
   // Corners text
@@ -310,7 +310,7 @@ void vtkKWCornerAnnotation::Create(vtkKWApplication *app,
   this->CornerFrame->SetParent(this->GetFrame());
   this->CornerFrame->Create(app, 0);
 
-  this->Script("pack %s -side top -padx 2 -pady 2 -expand t -fill x -anchor nw",
+  this->Script("pack %s -side top -padx 2 -expand t -fill x -anchor nw",
                this->CornerFrame->GetWidgetName());
 
   int i;
@@ -351,11 +351,11 @@ void vtkKWCornerAnnotation::Create(vtkKWApplication *app,
     "Set the upper right corner annotation. The text will automatically scale "
     "to fit within the allocated space");
 
-  this->Script("grid %s %s -row 0 -sticky news -padx 2 -pady 2",
+  this->Script("grid %s %s -row 0 -sticky news -padx 2",
                this->CornerText[2]->GetWidgetName(), 
                this->CornerText[3]->GetWidgetName());
 
-  this->Script("grid %s %s -row 1 -sticky news -padx 2 -pady 2",
+  this->Script("grid %s %s -row 1 -sticky news -padx 2",
                this->CornerText[0]->GetWidgetName(), 
                this->CornerText[1]->GetWidgetName());
 
@@ -397,6 +397,7 @@ void vtkKWCornerAnnotation::Create(vtkKWApplication *app,
 
   this->TextPropertyWidget->SetParent(this->GetFrame());
   this->TextPropertyWidget->LongFormatOn();
+  this->TextPropertyWidget->LabelOnTopOff();
   this->TextPropertyWidget->Create(this->Application);
   this->TextPropertyWidget->ShowLabelOn();
   this->TextPropertyWidget->GetLabel()->SetLabel("Text properties:");
@@ -415,7 +416,7 @@ void vtkKWCornerAnnotation::Create(vtkKWApplication *app,
   this->TextPropertyWidget->SetOnColorChangeCommand(oncolorchangecommand.str());
   oncolorchangecommand.rdbuf()->freeze(0);
 
-  this->Script("pack %s -padx 2 -pady 2 -side top -anchor nw -fill y", 
+  this->Script("pack %s -padx 2 -side top -anchor nw -fill y", 
                this->TextPropertyWidget->GetWidgetName());
 
   // Update the GUI according to the Ivar value (i.e. the corner prop, etc.)
@@ -750,7 +751,7 @@ void vtkKWCornerAnnotation::SerializeToken(istream& is,
 void vtkKWCornerAnnotation::SerializeRevision(ostream& os, vtkIndent indent)
 {
   os << indent << "vtkKWCornerAnnotation ";
-  this->ExtractRevision(os,"$Revision: 1.40 $");
+  this->ExtractRevision(os,"$Revision: 1.41 $");
   vtkKWLabeledFrame::SerializeRevision(os,indent);
 }
 
