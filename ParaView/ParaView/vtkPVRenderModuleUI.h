@@ -52,7 +52,7 @@ public:
   
   // Description:
   // This threshold determines the default representation that will be
-  // used for unstructured grid.  The units of this value are mega cells.
+  // used for unstructured grid.  The units of this value are numer of cells.
   vtkGetMacro(OutlineThreshold, float);
 
 protected:

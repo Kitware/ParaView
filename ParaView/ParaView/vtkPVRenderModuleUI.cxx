@@ -21,7 +21,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderModuleUI);
-vtkCxxRevisionMacro(vtkPVRenderModuleUI, "1.6");
+vtkCxxRevisionMacro(vtkPVRenderModuleUI, "1.7");
 
 int vtkPVRenderModuleUICommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -32,7 +32,7 @@ vtkPVRenderModuleUI::vtkPVRenderModuleUI()
 {
   this->CommandFunction = vtkPVRenderModuleUICommand;
 
-  this->OutlineThreshold = 5.0;
+  this->OutlineThreshold = 5000000.0;
 }
 
 
@@ -86,5 +86,7 @@ void vtkPVRenderModuleUI::Create(vtkKWApplication* app, const char *)
 void vtkPVRenderModuleUI::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
+
+  os << indent << "OutlineThreshold: " << this->OutlineThreshold << endl;
 }
 

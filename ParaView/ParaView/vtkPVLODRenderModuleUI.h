@@ -97,6 +97,23 @@ public:
   vtkBooleanMacro(LODResolution, int);
 
   // Description:
+  // Called when user stops moving scale
+  void OutlineThresholdScaleCallback();
+  // Interactive scale callback
+  void OutlineThresholdLabelCallback();
+
+  // Description:
+  // This methods can be used from a script.  
+  // "Set" sets the value of the scale, and adds an entry to the trace.
+  void SetOutlineThreshold(float);
+
+  // Description:
+  // This method sets the threshold without tracing or
+  // changing the UI scale.
+  void SetOutlineThresholdInternal(float threshold);
+
+
+  // Description:
   // Export the render module state to a file.
   virtual void SaveState(ofstream *file);
   
@@ -121,13 +138,16 @@ protected:
   vtkKWCheckButton *RenderInterruptsEnabledCheck;
 
   vtkKWWidget*      LODScalesFrame;
-  vtkKWLabel*       LODResolutionLabel;
-  vtkKWScale*       LODResolutionScale;
-  vtkKWLabel*       LODResolutionValue;
   vtkKWLabel*       LODThresholdLabel;
   vtkKWCheckButton* LODCheck;
   vtkKWScale*       LODThresholdScale;
   vtkKWLabel*       LODThresholdValue;
+  vtkKWLabel*       LODResolutionLabel;
+  vtkKWScale*       LODResolutionScale;
+  vtkKWLabel*       LODResolutionValue;
+  vtkKWLabel*       OutlineThresholdLabel;
+  vtkKWScale*       OutlineThresholdScale;
+  vtkKWLabel*       OutlineThresholdValue;
 
   float LODThreshold;
   int   LODResolution;

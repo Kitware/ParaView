@@ -63,7 +63,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLODRenderModuleUI);
-vtkCxxRevisionMacro(vtkPVLODRenderModuleUI, "1.13");
+vtkCxxRevisionMacro(vtkPVLODRenderModuleUI, "1.14");
 
 int vtkPVLODRenderModuleUICommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -88,6 +88,9 @@ vtkPVLODRenderModuleUI::vtkPVLODRenderModuleUI()
   this->LODResolutionLabel = vtkKWLabel::New();
   this->LODResolutionScale = vtkKWScale::New();
   this->LODResolutionValue = vtkKWLabel::New();
+  this->OutlineThresholdLabel = vtkKWLabel::New();
+  this->OutlineThresholdScale = vtkKWScale::New();
+  this->OutlineThresholdValue = vtkKWLabel::New();
 
   this->LODThreshold = 5.0;
   this->LODResolution = 50;
@@ -107,6 +110,8 @@ vtkPVLODRenderModuleUI::~vtkPVLODRenderModuleUI()
                              this->LODThreshold);
     pvapp->SetRegisteryValue(2, "RunTime", "LODResolution", "%d",
                              this->LODResolution);
+    pvapp->SetRegisteryValue(2, "RunTime", "OutlineThreshold", "%f",
+                             this->OutlineThreshold);
     pvapp->SetRegisteryValue(2, "RunTime", "RenderInterruptsEnabled", "%d",
                              this->RenderInterruptsEnabled);
 
@@ -127,15 +132,22 @@ vtkPVLODRenderModuleUI::~vtkPVLODRenderModuleUI()
   this->LODThresholdScale = NULL;
   this->LODThresholdValue->Delete();
   this->LODThresholdValue = NULL;
+  this->LODCheck->Delete();
+  this->LODCheck = NULL;
 
   this->LODResolutionLabel->Delete();
   this->LODResolutionLabel = NULL;
-  this->LODCheck->Delete();
-  this->LODCheck = NULL;
   this->LODResolutionScale->Delete();
   this->LODResolutionScale = NULL;
   this->LODResolutionValue->Delete();
   this->LODResolutionValue = NULL;
+
+  this->OutlineThresholdLabel->Delete();
+  this->OutlineThresholdLabel = NULL;
+  this->OutlineThresholdScale->Delete();
+  this->OutlineThresholdScale = NULL;
+  this->OutlineThresholdValue->Delete();
+  this->OutlineThresholdValue = NULL;
 
   if (this->LODRenderModule)
     {
@@ -281,6 +293,48 @@ void vtkPVLODRenderModuleUI::Create(vtkKWApplication *app, const char *)
 
   pvapp->Script("grid columnconfigure %s 2 -weight 1",
                 this->LODResolutionScale->GetParent()->GetWidgetName());
+
+  // LOD parameters: resolution
+
+  this->OutlineThresholdLabel->SetParent(this->LODScalesFrame);
+  this->OutlineThresholdLabel->Create(this->Application, "-anchor w");
+  this->OutlineThresholdLabel->SetLabel("Outline Threshold:");
+
+  this->OutlineThresholdScale->SetParent(this->LODScalesFrame);
+  this->OutlineThresholdScale->Create(this->Application, "-orient horizontal");
+  this->OutlineThresholdScale->SetRange(0, 500);
+  this->OutlineThresholdScale->SetResolution(0.1);
+
+  this->OutlineThresholdValue->SetParent(this->LODScalesFrame);
+  this->OutlineThresholdValue->Create(this->Application, "-anchor w");
+
+  if (pvapp &&
+      pvapp->GetRegisteryValue(2, "RunTime", "OutlineThreshold", 0))
+    {
+    this->OutlineThreshold =
+      pvapp->GetFloatRegisteryValue(2, "RunTime", "OutlineThreshold");
+    }
+  this->SetOutlineThreshold(this->OutlineThreshold);
+  this->OutlineThresholdScale->SetValue(this->OutlineThreshold/1000000.0);
+  this->OutlineThresholdScale->SetCommand(this, "OutlineThresholdLabelCallback");
+  this->OutlineThresholdScale->SetEndCommand(this, "OutlineThresholdScaleCallback");
+  this->OutlineThresholdScale->SetBalloonHelpString(
+    "This slider determines the default representation to use "
+    "for unstructured grid data sets.  If the data set has more "
+    "cells than this threshold, then an outline is used.  "
+    "Otherwise, the surface is extracted. " 
+    "\nLeft: Use surface representation as default. "
+    "\nRight: Use outline representation as default. ");
+
+  pvapp->Script("grid %s -row %d -column 2 -sticky news", 
+                this->OutlineThresholdValue->GetWidgetName(), row++);
+  pvapp->Script("grid %s -row %d -column 0 -sticky nws", 
+                this->OutlineThresholdLabel->GetWidgetName(), row);
+  pvapp->Script("grid %s -row %d -column 2 -sticky news", 
+                this->OutlineThresholdScale->GetWidgetName(), row++);
+
+  pvapp->Script("grid columnconfigure %s 2 -weight 1",
+                this->OutlineThresholdScale->GetParent()->GetWidgetName());
 
   // LOD parameters: rendering interrupts
 
@@ -455,6 +509,61 @@ void vtkPVLODRenderModuleUI::SetLODResolutionInternal(int resolution)
 }
 
 //----------------------------------------------------------------------------
+void vtkPVLODRenderModuleUI::OutlineThresholdScaleCallback()
+{
+  float value = static_cast<float>(this->OutlineThresholdScale->GetValue());
+
+  value = value * 1000000.0;  
+
+  // Use internal method so we do not reset the slider.
+  // I do not know if it would cause a problem, but ...
+  this->SetOutlineThresholdInternal(value);
+
+  vtkTimerLog::FormatAndMarkEvent("--- Change Outline Threshold %f.", value);
+  // We use a catch in this trace because the paraview executing
+  // the trace might not have this module
+  this->AddTraceEntry("catch {$kw(%s) SetOutlineThreshold %f}",
+                      this->GetTclName(), value);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVLODRenderModuleUI::OutlineThresholdLabelCallback()
+{
+  float value = static_cast<float>(this->OutlineThresholdScale->GetValue());
+
+  char str[256];
+  sprintf(str, "%0.1f MCells", value);
+  this->OutlineThresholdValue->SetLabel(str);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVLODRenderModuleUI::SetOutlineThreshold(float value)
+{
+  this->OutlineThresholdScale->SetValue(value/1000000.0);
+
+  this->SetOutlineThresholdInternal(value);
+
+  vtkTimerLog::FormatAndMarkEvent("--- Change Outline threshold %f.", value);
+  // We use a catch in this trace because the paraview executing
+  // the trace might not have this module
+  this->AddTraceEntry("catch {$kw(%s) SetOutlineThreshold %f}",
+                      this->GetTclName(), value);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVLODRenderModuleUI::SetOutlineThresholdInternal(float threshold)
+{
+  char str[256];
+
+  sprintf(str, "%0.1f MCells", threshold/1000000.0);
+  this->OutlineThresholdValue->SetLabel(str);
+
+  this->OutlineThreshold = threshold;
+}
+
+
+
+//----------------------------------------------------------------------------
 void vtkPVLODRenderModuleUI::RenderInterruptsEnabledCheckCallback()
 {
   this->SetRenderInterruptsEnabled(
@@ -494,6 +603,9 @@ void vtkPVLODRenderModuleUI::SaveState(ofstream *file)
   *file << "catch {$kw(" << this->GetTclName() << ") SetLODResolution "
         << this->GetLODResolution() << "}" << endl;
   
+  *file << "catch {$kw(" << this->GetTclName() << ") SetOutlineThreshold "
+        << this->GetOutlineThreshold() << "}" << endl;
+
   *file << "catch {$kw(" << this->GetTclName()
         << ") SetRenderInterruptsEnabled "
         << this->GetPVApplication()->GetRenderModule()->GetRenderInterruptsEnabled()
@@ -515,6 +627,10 @@ void vtkPVLODRenderModuleUI::UpdateEnableState()
   this->PropagateEnableState(this->LODCheck);
   this->PropagateEnableState(this->LODThresholdScale);
   this->PropagateEnableState(this->LODThresholdValue);
+
+  this->PropagateEnableState(this->OutlineThresholdLabel);
+  this->PropagateEnableState(this->OutlineThresholdScale);
+  this->PropagateEnableState(this->OutlineThresholdValue);
 }
 //----------------------------------------------------------------------------
 void vtkPVLODRenderModuleUI::PrintSelf(ostream& os, vtkIndent indent)

@@ -82,7 +82,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.254");
+vtkCxxRevisionMacro(vtkPVData, "1.255");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -2095,10 +2095,8 @@ void vtkPVData::Initialize()
     }
   else if (dataSetType == VTK_UNSTRUCTURED_GRID)
     {
-    float outlineThreshold = this->GetPVRenderView()->GetRenderModuleUI()
-                                 ->GetOutlineThreshold();    
     if (this->GetPVSource()->GetDataInformation()->GetNumberOfCells() 
-          < outlineThreshold * 1000000.0)
+        < this->GetPVRenderView()->GetRenderModuleUI()->GetOutlineThreshold())
       {
       this->SetRepresentation(VTK_PV_SURFACE_LABEL);
       }
