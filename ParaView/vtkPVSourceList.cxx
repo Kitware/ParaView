@@ -248,6 +248,7 @@ void vtkPVSourceList::Pick(int compIdx)
 
   comp = vtkPVSource::SafeDownCast(
     this->Sources->GetItemAsObject(compIdx));
+  // I believe just setting the current source shows its properties.
   comp->GetWindow()->SetCurrentPVSource(comp);
   comp->ShowProperties();
   comp->GetNotebook()->Raise(0);

@@ -38,7 +38,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkPVSelectionList.h"
 #include "vtkStringList.h"
 #include "vtkCollection.h"
-#include "vtkPVPolyData.h"
+#include "vtkPVData.h"
 #include "vtkPVSourceInterface.h"
 
 

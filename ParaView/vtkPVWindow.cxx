@@ -43,8 +43,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkImageMandelbrotSource.h"
 
 #include "vtkPVSource.h"
-#include "vtkPVPolyData.h"
-#include "vtkPVImageData.h"
+#include "vtkPVData.h"
 #include "vtkPVSourceList.h"
 #include "vtkPVActorComposite.h"
 #include "vtkSuperquadricSource.h"
@@ -476,6 +475,73 @@ void vtkPVWindow::ReadSourceInterfaces()
   vtkPVMethodInterface *mInt;
   vtkPVSourceInterface *sInt;
 
+  
+  
+  
+  // ============= Image Sources ==============  
+
+  // ---- Fractal Source ----
+  sInt = vtkPVSourceInterface::New();
+  sInt->SetApplication(pvApp);
+  sInt->SetPVWindow(this);
+  sInt->SetSourceClassName("vtkImageMandelbrotSource");
+  sInt->SetRootName("Fractal");
+  sInt->SetOutputClassName("vtkImageData");
+  
+  // Method
+  mInt = vtkPVMethodInterface::New();
+  mInt->SetVariableName("Extent");
+  mInt->SetSetCommand("SetWholeExtent");
+  mInt->SetGetCommand("GetWholeExtent");
+  mInt->AddIntegerArgument();
+  mInt->AddIntegerArgument();
+  mInt->AddIntegerArgument();
+  mInt->AddIntegerArgument();
+  sInt->AddMethodInterface(mInt);
+  mInt->Delete();
+  mInt = NULL;
+  // Method
+  mInt = vtkPVMethodInterface::New();
+  mInt->SetVariableName("SubSpace");
+  mInt->SetSetCommand("SetProjectionAxes");
+  mInt->SetGetCommand("GetProjectionAxes");
+  mInt->AddIntegerArgument();  
+  mInt->AddIntegerArgument();  
+  mInt->AddIntegerArgument();  
+  sInt->AddMethodInterface(mInt);
+  mInt->Delete();
+  mInt = NULL;
+  // Method
+  mInt = vtkPVMethodInterface::New();
+  mInt->SetVariableName("Origin");
+  mInt->SetSetCommand("SetOriginCX");
+  mInt->SetGetCommand("GetOriginCX");
+  mInt->AddFloatArgument();  
+  mInt->AddFloatArgument();  
+  mInt->AddFloatArgument();  
+  mInt->AddFloatArgument();  
+  sInt->AddMethodInterface(mInt);
+  mInt->Delete();
+  mInt = NULL;
+  // Method
+  mInt = vtkPVMethodInterface::New();
+  mInt->SetVariableName("Spacing");
+  mInt->SetSetCommand("SetSampleCX");
+  mInt->SetGetCommand("GetSampleCX");
+  mInt->AddFloatArgument();  
+  mInt->AddFloatArgument();  
+  mInt->AddFloatArgument();  
+  mInt->AddFloatArgument();  
+  sInt->AddMethodInterface(mInt);
+  mInt->Delete();
+  mInt = NULL;
+  // Add it to the list.
+  this->SourceInterfaces->AddItem(sInt);
+  sInt->Delete();
+  sInt = NULL;
+  
+  // ============= PolyData Sources ==============  
+  
   // ---- STL Reader ----
   sInt = vtkPVSourceInterface::New();
   sInt->SetApplication(pvApp);
@@ -709,7 +775,7 @@ void vtkPVWindow::ReadSourceInterfaces()
   sInt->Delete();
   sInt = NULL;
 
-  // PolyData to PolyData Filters
+  // ============= PolyData to PolyData Filters ==============
   
   // ---- PieceScalars ----.
   sInt = vtkPVSourceInterface::New();
@@ -849,361 +915,5 @@ void vtkPVWindow::ReadSourceInterfaces()
   sInt->Delete();
   sInt = NULL;
 
-  //this->CreateMenu->AddCommand("ImageReader", this, "CreateImageReader");
-  //this->CreateMenu->AddCommand("FractalVolume", this, "CreateFractalVolume");
-  //this->CreateMenu->AddCommand("Cube", this, "CreateCube");
-  //this->CreateMenu->AddCommand("Cylinder", this, "CreateCylinder");
-  //this->CreateMenu->AddCommand("Disk", this, "CreateDisk");
-  //this->CreateMenu->AddCommand("Line", this, "CreateLine");
-  //this->CreateMenu->AddCommand("Plane", this, "CreatePlane");
-  //this->CreateMenu->AddCommand("Points", this, "CreatePoints");
-  //this->CreateMenu->AddCommand("Superquadric", this, "CreateSuperQuadric");
 }
 
-
-/*
-
-//----------------------------------------------------------------------------
-vtkPVPolyDataSource *vtkPVWindow::CreateCube()
-{
-  static int instanceCount = 0;
-  vtkPVSource *pvs;
-  vtkPVApplication *pvApp = this->GetPVApplication();
-  
-  // Create the pvSource. Clone the PVSource and the vtkSource,
-  // Linkthe PVSource to the vtkSource.
-  pvs = pvApp->MakePVSource("vtkPVPolyDataSource","vtkCubeSource",
-                            "Cube", ++instanceCount);
-  if (pvs == NULL) {return NULL;}
-  
-  // Add the new Source to the View, and make it current.
-  this->MainView->AddComposite(pvs);
-  this->SetCurrentSource(pvs);
-
-  // Add some source specific widgets.
-  // Normally these would be added in the create method.
-  pvs->AddLabeledEntry("X Length:", "SetXLength", "GetXLength");
-  pvs->AddLabeledEntry("Y Length:", "SetYLength", "GetYLength");
-  pvs->AddLabeledEntry("Z Length:", "SetZLength", "GetZLength");
-  pvs->AddLabeledEntry("Center:", "SetCenter", "GetCenter");
-  pvs->UpdateParameterWidgets();
-
-  // Clean up. (How about on the other processes?)
-  // We cannot create an object in tcl and delete it in C++.
-  //pvs->Delete();
-  return vtkPVPolyDataSource::SafeDownCast(pvs);
-} 
-//----------------------------------------------------------------------------
-vtkPVPolyDataSource *vtkPVWindow::CreateCylinder()
-{
-  static int instanceCount = 0;
-  vtkPVSource *pvs;
-  vtkPVApplication *pvApp = this->GetPVApplication();
-  
-  // Create the pvSource. Clone the PVSource and the vtkSource,
-  // Linkthe PVSource to the vtkSource.
-  pvs = pvApp->MakePVSource("vtkPVPolyDataSource","vtkCylinderSource",
-                            "Cylinder", ++instanceCount);
-  if (pvs == NULL) {return NULL;}
-  
-  // Add the new Source to the View, and make it current.
-  this->MainView->AddComposite(pvs);
-  this->SetCurrentSource(pvs);
-
-  // Add some source specific widgets.
-  // Normally these would be added in the create method.
-  pvs->AddLabeledEntry("Height:", "SetHeight", "GetHeight");
-  pvs->AddLabeledEntry("Radius:", "SetRadius", "GetRadius");
-  pvs->AddLabeledEntry("Resolution:", "SetResolution", "GetResolution");
-  pvs->AddVector3Entry("Center", "X","Y","Z", "SetCenter", "GetCenter");
-  pvs->AddLabeledToggle("Capping:", "SetCapping", "GetCapping");
-  pvs->UpdateParameterWidgets();
-
-  // Clean up. (How about on the other processes?)
-  // We cannot create an object in tcl and delete it in C++.
-  //pvs->Delete();
-  return vtkPVPolyDataSource::SafeDownCast(pvs);
-} 
-//----------------------------------------------------------------------------
-vtkPVPolyDataSource *vtkPVWindow::CreateDisk()
-{
-  static int instanceCount = 0;
-  vtkPVSource *pvs;
-  vtkPVApplication *pvApp = this->GetPVApplication();
-  
-  // Create the pvSource. Clone the PVSource and the vtkSource,
-  // Linkthe PVSource to the vtkSource.
-  pvs = pvApp->MakePVSource("vtkPVPolyDataSource","vtkDiskSource",
-                            "Disk", ++instanceCount);
-  if (pvs == NULL) {return NULL;}
-  
-  // Add the new Source to the View, and make it current.
-  this->MainView->AddComposite(pvs);
-  this->SetCurrentSource(pvs);
-
-  // Add some source specific widgets.
-  // Normally these would be added in the create method.
-  pvs->AddLabeledEntry("InnerRadius:", "SetInnerRadius", "GetInnerRadius");
-  pvs->AddLabeledEntry("OuterRadius:", "SetOuterRadius", "GetOuterRadius");
-  pvs->AddLabeledEntry("Radial Res:", "SetRadialResolution", "GetRadialResolution");
-  pvs->AddLabeledEntry("Circumference Res:", "SetCircumferentialResolution", "GetCircumferentialResolution");
-  pvs->UpdateParameterWidgets();
-
-  // Clean up. (How about on the other processes?)
-  // We cannot create an object in tcl and delete it in C++.
-  //pvs->Delete();
-  return vtkPVPolyDataSource::SafeDownCast(pvs);
-} 
-//----------------------------------------------------------------------------
-vtkPVPolyDataSource *vtkPVWindow::CreateLine()
-{
-  static int instanceCount = 0;
-  vtkPVSource *pvs;
-  vtkPVApplication *pvApp = this->GetPVApplication();
-  
-  // Create the pvSource. Clone the PVSource and the vtkSource,
-  // Linkthe PVSource to the vtkSource.
-  pvs = pvApp->MakePVSource("vtkPVPolyDataSource","vtkLineSource",
-                            "Line", ++instanceCount);
-  if (pvs == NULL) {return NULL;}
-  
-  // Add the new Source to the View, and make it current.
-  this->MainView->AddComposite(pvs);
-  this->SetCurrentSource(pvs);
-
-  // Add some source specific widgets.
-  // Normally these would be added in the create method.
-  pvs->AddVector3Entry("Point1:", "X","Y","Z", "SetPoint1", "GetPoint1");
-  pvs->AddVector3Entry("Point2:", "X","Y","Z", "SetPoint2", "GetPoint2");
-  pvs->AddLabeledEntry("Resolution:", "SetResolution", "GetResolution");
-  pvs->UpdateParameterWidgets();
-
-  // Clean up. (How about on the other processes?)
-  // We cannot create an object in tcl and delete it in C++.
-  //pvs->Delete();
-  return vtkPVPolyDataSource::SafeDownCast(pvs);
-} 
-//----------------------------------------------------------------------------
-vtkPVPolyDataSource *vtkPVWindow::CreatePlane()
-{
-  static int instanceCount = 0;
-  vtkPVSource *pvs;
-  vtkPVApplication *pvApp = this->GetPVApplication();
-  
-  // Create the pvSource. Clone the PVSource and the vtkSource,
-  // Linkthe PVSource to the vtkSource.
-  pvs = pvApp->MakePVSource("vtkPVPolyDataSource","vtkPlaneSource",
-                            "Plane", ++instanceCount);
-  if (pvs == NULL) {return NULL;}
-  
-  // Add the new Source to the View, and make it current.
-  this->MainView->AddComposite(pvs);
-  this->SetCurrentSource(pvs);
-
-  // Add some source specific widgets.
-  // Normally these would be added in the create method.
-  pvs->AddLabeledEntry("X Resolution:", "SetXResolution", "GetXResolution");
-  pvs->AddLabeledEntry("Y Resolution:", "SetYResolution", "GetYResolution");
-  pvs->AddVector3Entry("Origin:","X","Y","Z", "SetOrigin", "GetOrigin");
-  pvs->AddVector3Entry("Point1:","X","Y","Z", "SetPoint1", "GetPoint1");
-  pvs->AddVector3Entry("Point2:","X","Y","Z", "SetPoint2", "GetPoint2");
-
-  // Clean up. (How about on the other processes?)
-  // We cannot create an object in tcl and delete it in C++.
-  //pvs->Delete();
-  return vtkPVPolyDataSource::SafeDownCast(pvs);
-} 
-//----------------------------------------------------------------------------
-vtkPVPolyDataSource *vtkPVWindow::CreatePoints()
-{
-  static int instanceCount = 0;
-  vtkPVSource *pvs;
-  vtkPVApplication *pvApp = this->GetPVApplication();
-  
-  // Create the pvSource. Clone the PVSource and the vtkSource,
-  // Linkthe PVSource to the vtkSource.
-  pvs = pvApp->MakePVSource("vtkPVPolyDataSource","vtkPointSource",
-                            "Points", ++instanceCount);
-  if (pvs == NULL) {return NULL;}
-  
-  // Add the new Source to the View, and make it current.
-  this->MainView->AddComposite(pvs);
-  this->SetCurrentSource(pvs);
-
-  // Add some source specific widgets.
-  // Normally these would be added in the create method.
-  pvs->AddLabeledEntry("NumberOfPoints:", "SetNumberOfPoints", "GetNumberOfPoints");
-  pvs->AddLabeledEntry("Radius:", "SetRadius", "GetRadius");
-  pvs->AddVector3Entry("Center:", "X","Y","Z", "SetCenter", "GetCenter");
-  pvs->AddModeList("Distribution:", "SetDistribution", "GetDistribution");
-  pvs->AddModeListItem("Shell", 0);
-  pvs->AddModeListItem("Uniform", 1);
-  pvs->UpdateParameterWidgets();
-
-  // Clean up. (How about on the other processes?)
-  // We cannot create an object in tcl and delete it in C++.
-  //pvs->Delete();
-  return vtkPVPolyDataSource::SafeDownCast(pvs);
-} 
-
-//----------------------------------------------------------------------------
-vtkPVPolyDataSource *vtkPVWindow::CreateSTLReader()
-{
-  static int instanceCount = 0;
-  vtkPVSource *pvs;
-  vtkPVApplication *pvApp = this->GetPVApplication();
-  
-  // Create the pvSource. Clone the PVSource and the vtkSource,
-  // Link the PVSource to the vtkSource.
-  pvs = pvApp->MakePVSource("vtkPVPolyDataSource","vtkSTLReader",
-                            "STL", ++instanceCount);
-  if (pvs == NULL) {return NULL;}
-  
-  // Set the default file name
-  pvApp->Script("%s SetFileName [tk_getOpenFile -filetypes {{{} {.stl}}}]",
-                pvs->GetVTKSourceTclName());
-
-  // Add the new Source to the View, and make it current.
-  this->MainView->AddComposite(pvs);
-  this->SetCurrentSource(pvs);
-
-  // Add some source specific widgets.
-  // Normally these would be added in the create method.
-  pvs->AddFileEntry("FileName:", "SetFileName", "GetFileName", "stl");
-  pvs->UpdateParameterWidgets();
-
-  // Clean up. (How about on the other processes?)
-  // We cannot create an object in tcl and delete it in C++.
-  //pvs->Delete();
-  return vtkPVPolyDataSource::SafeDownCast(pvs);
-} 
-
-//----------------------------------------------------------------------------
-vtkPVPolyDataSource *vtkPVWindow::CreateSuperQuadric()
-{
-  static int instanceCount = 0;
-  vtkPVSource *pvs;
-  vtkPVApplication *pvApp = this->GetPVApplication();
-  
-  // Create the pvSource. Clone the PVSource and the vtkSource,
-  // Linkthe PVSource to the vtkSource.
-  pvs = pvApp->MakePVSource("vtkPVPolyDataSource","vtkSuperquadricSource",
-                            "Superquadric", ++instanceCount);
-  if (pvs == NULL) {return NULL;}
-  
-  // Add the new Source to the View and make it current.
-  this->MainView->AddComposite(pvs);
-  this->SetCurrentSource(pvs);
-
-  // Add some source specific widgets.
-  // Normally these would be added in the create method.
-  pvs->AddLabeledToggle("Toroidal:","SetToroidal","GetToroidal");
-  pvs->AddVector3Entry("Center:","X","Y","Z","SetCenter","GetCenter");
-  pvs->AddVector3Entry("Scale:","X","Y","Z","SetScale","GetScale");
-  pvs->AddLabeledEntry("ThetaResolution:","SetThetaResolution","GetThetaResolution");
-  pvs->AddLabeledEntry("PhiResolution:","SetPhiResolution","GetPhiResolution");
-  pvs->AddScale("Thickness:","SetThickness","GetThickness",
-                VTK_MIN_SUPERQUADRIC_THICKNESS, 1.0, 0.05);
-  pvs->AddScale("ThetaRoundness:","SetThetaRoundness","GetThetaRoundness",
-                0.0, 1.0, 0.05);
-  pvs->AddScale("PhiRoundness:","SetPhiRoundness","GetPhiRoundness",
-                0.0, 1.0, 0.05);
-  pvs->AddLabeledEntry("Size:","SetSize","GetSize");
-  pvs->UpdateParameterWidgets();
-
-  // Clean up. (How about on the other processes?)
-  // We cannot create an object in tcl and delete it in C++.
-  //pvs->Delete();
-  return vtkPVPolyDataSource::SafeDownCast(pvs);
-}
-
-//----------------------------------------------------------------------------
-// Setup the pipeline
-vtkPVImageSource *vtkPVWindow::CreateImageReader()
-{
-  static int instanceCount = 0;
-  vtkPVSource *pvs;
-  vtkPVApplication *pvApp = this->GetPVApplication();
-  
-  // Create the pvSource. Clone the PVSource and the vtkSource,
-  // Link the PVSource to the vtkSource.
-  pvs = pvApp->MakePVSource("vtkPVImageSource","vtkImageReader",
-                            "ImageReader", ++instanceCount);
-  if (pvs == NULL) {return NULL;}
-  
-  // Add the new Source to the View, and make it current.
-  this->MainView->AddComposite(pvs);
-  this->SetCurrentSource(pvs);
-
-  // Add some source specific widgets.
-  // Normally these would be added in the create method.
-  pvs->AddLabeledEntry("FilePrefix:", "SetFilePrefix", "GetFilePrefix");
-  pvs->AddLabeledEntry("FilePattern:", "SetFilePattern", "GetFilePattern");
-  pvs->AddModeList("ByteOrder", "SetDataByteOrder", "GetDataByteOrder");
-  pvs->AddModeListItem("BigEndian", 0);
-  pvs->AddModeListItem("LittleEndian", 1);
-  pvs->AddVector6Entry("DataExtent:", "X Min", "X Max", "Y Min", "Y Max",
-		       "Z Min", "Z Max", "SetDataExtent", "GetDataExtent");
-  pvs->AddVector3Entry("DataSpacing:", "X", "Y", "Z", "SetDataSpacing", "GetDataSpacing");
-  pvs->UpdateParameterWidgets();
-
-  // Clean up. (How about on the other processes?)
-  // We cannot create an object in tcl and delete it in C++.
-  //pvs->Delete();
-  return vtkPVImageSource::SafeDownCast(pvs);
-}
-
-//----------------------------------------------------------------------------
-// Setup the pipeline
-vtkPVImageSource *vtkPVWindow::CreateFractalVolume()
-{
-  static int instanceCount = 0;
-  vtkPVSource *pvs;
-  vtkPVApplication *pvApp = this->GetPVApplication();
-  vtkImageMandelbrotSource *ms;
-
-  // Create the pvSource. Clone the PVSource and the vtkSource,
-  // Link the PVSource to the vtkSource.
-  pvs = pvApp->MakePVSource("vtkPVImageSource","vtkImageMandelbrotSource",
-                            "Fractal", ++instanceCount);
-  if (pvs == NULL) {return NULL;}
-
-  // Set up the defaults.
-  ms = vtkImageMandelbrotSource::SafeDownCast(pvs->GetVTKSource());
-  ms->SetOriginCX(0, 0, 0, 0);
-  ms->SetSampleCX(0.025, 0.025, 0.025, 0.025);
-  ms->SetWholeExtent(-50, 50, -50, 50, 0, 100);
-  ms->SetProjectionAxes(2, 3, 1);
-  // Small values get munged through tcl?
-  //this->Script("%s SetOriginCX -0.733569 0.24405 0.296116 0.0253163", 
-  //             pvs->GetVTKSourceTclName());
-  //this->Script("%s SetSampleCX 1.38125e-005 1.38125e-005 1.0e-004 1.0e-004", 
-  //             pvs->GetVTKSourceTclName());
-  //this->Script("%s SetWholeExtent -50 50 -50 50 -50 50", 
-  //             pvs->GetVTKSourceTclName());
-  //
-  // Add the new Source to the View, and make it current.
-  this->MainView->AddComposite(pvs);
-  this->SetCurrentSource(pvs);
-
-  // Add some source specific widgets.
-  // Normally these would be added in the create method.
-  pvs->AddVector6Entry("Extent:","X",NULL,"Y",NULL,"Z",NULL,"SetWholeExtent","GetWholeExtent");
-  pvs->AddVector3Entry("SubSpace:","X","Y","Z", "SetProjectionAxes", "GetProjectionAxes");
-  pvs->AddVector4Entry("Origin:","Cr","Ci","Xr","Xi","SetOriginCX","GetOriginCX");
-  pvs->AddVector4Entry("Spacing:","Cr","Ci","Xr","Xi","SetSampleCX","GetSampleCX");
-  pvs->UpdateParameterWidgets();
-
-  // Clean up. (How about on the other processes?)
-  // We cannot create an object in tcl and delete it in C++.
-  //pvs->Delete();
-
-  return vtkPVImageSource::SafeDownCast(pvs);
-}
-
-//----------------------------------------------------------------------------
-void vtkPVWindow::CreateAnimation()
-{
-}
-
-*/
