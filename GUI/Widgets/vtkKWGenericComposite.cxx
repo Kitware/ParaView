@@ -18,7 +18,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWGenericComposite );
-vtkCxxRevisionMacro(vtkKWGenericComposite, "1.11");
+vtkCxxRevisionMacro(vtkKWGenericComposite, "1.12");
 
 
 
@@ -43,11 +43,11 @@ vtkKWGenericComposite::~vtkKWGenericComposite()
 // Define possible mangled names.
 void vtkKWGenericComposite::SetPropA(vtkProp* prop)
 {
-  return this->SetProp(prop);
+  this->SetProp(prop);
 }
 void vtkKWGenericComposite::SetPropW(vtkProp* prop)
 {
-  return this->SetProp(prop);
+  this->SetProp(prop);
 }
 #endif
 vtkSetObjectImplementationMacro(vtkKWGenericComposite, Prop, vtkProp);
