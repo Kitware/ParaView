@@ -161,6 +161,8 @@ void vtkPV3DWidget::Create(vtkKWApplication *kwApp)
     this->Widget3D->SetInteractor(iren);
     this->Widget3D->AddObserver(vtkCommand::InteractionEvent, 
 				this->Observer);
+    this->Widget3D->AddObserver(vtkCommand::PlaceWidgetEvent, 
+				this->Observer);
     this->Widget3D->EnabledOff();
     }
   this->Observer->Execute(this->Widget3D, vtkCommand::InteractionEvent, 0);
