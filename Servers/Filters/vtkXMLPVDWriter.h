@@ -95,7 +95,7 @@ protected:
   void MakeDirectory(const char* name);
   
   // Remove a directory.
-  void RemoveDirectory(const char* name);
+  void RemoveADirectory(const char* name);
   
   // Internal implementation details.
   vtkXMLPVDWriterInternals* Internal;  

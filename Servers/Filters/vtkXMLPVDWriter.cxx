@@ -43,7 +43,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkXMLPVDWriter);
-vtkCxxRevisionMacro(vtkXMLPVDWriter, "1.11");
+vtkCxxRevisionMacro(vtkXMLPVDWriter, "1.12");
 
 class vtkXMLPVDWriterInternals
 {
@@ -186,7 +186,7 @@ int vtkXMLPVDWriter::WriteInternal()
           full += fname;
           kwsys::SystemTools::RemoveFile(full.c_str());
           }
-        this->RemoveDirectory(subdir.c_str());
+        this->RemoveADirectory(subdir.c_str());
         this->SetErrorCode(vtkErrorCode::OutOfDiskSpaceError);
         return 0;
         }
@@ -260,7 +260,7 @@ void vtkXMLPVDWriter::MakeDirectory(const char* name)
 }
 
 //----------------------------------------------------------------------------
-void vtkXMLPVDWriter::RemoveDirectory(const char* name)
+void vtkXMLPVDWriter::RemoveADirectory(const char* name)
 {
   if( !kwsys::SystemTools::RemoveADirectory(name) )
     {

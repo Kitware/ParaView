@@ -26,7 +26,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkXMLPVAnimationWriter);
-vtkCxxRevisionMacro(vtkXMLPVAnimationWriter, "1.4");
+vtkCxxRevisionMacro(vtkXMLPVAnimationWriter, "1.5");
 
 //----------------------------------------------------------------------------
 class vtkXMLPVAnimationWriterInternals
@@ -368,10 +368,10 @@ void vtkXMLPVAnimationWriter::DeleteFiles()
 {
   for (int i = 0; i < this->NumberOfFileNamesCreated; i++)
     {
-    this->DeleteFile(this->FileNamesCreated[i]);
+    this->DeleteAFile(this->FileNamesCreated[i]);
     }
-  this->DeleteFile(this->FileName);
+  this->DeleteAFile(this->FileName);
   vtkstd::string subdir = this->GetFilePath();
   subdir += this->GetFilePrefix();
-  this->RemoveDirectory(subdir.c_str());
+  this->RemoveADirectory(subdir.c_str());
 }
