@@ -14,17 +14,10 @@ OPTION (VTK_WRAP_TCL "wrap classes into the TCL intepreted language" ON)
 
 IF(UNIX)
   IF(RUN_CONFIGURE)
-    CONFIGURE_FILE(
-     ${ParaViewComplete_SOURCE_DIR}/TclConfig.txt.in
-     ${ParaViewComplete_BINARY_DIR}/tcl8.2.3/unix/TclConfig.txt)
 
-    CONFIGURE_FILE(
-     ${ParaViewComplete_SOURCE_DIR}/TclConfig.txt.in
-     ${ParaViewComplete_BINARY_DIR}/tk8.2.3/unix/TclConfig.txt)
-
-    EXEC_PROGRAM("${ParaViewComplete_SOURCE_DIR}/tcl8.2.3/unix/configure --disable-shared --cache-file=TclConfig.txt"
+    EXEC_PROGRAM("${ParaViewComplete_SOURCE_DIR}/tcl8.2.3/unix/configure --disable-shared"
                ${ParaViewComplete_BINARY_DIR}/tcl8.2.3/unix)
-    EXEC_PROGRAM("${ParaViewComplete_SOURCE_DIR}/tk8.2.3/unix/configure --disable-shared --cache-file=TclConfig.txt"
+    EXEC_PROGRAM("${ParaViewComplete_SOURCE_DIR}/tk8.2.3/unix/configure --disable-shared"
                ${ParaViewComplete_BINARY_DIR}/tk8.2.3/unix)
   ENDIF(RUN_CONFIGURE)
   SET(TCL_LIBRARY ${ParaViewComplete_BINARY_DIR}/tcl8.2.3/unix/libtcl8.2.a CACHE FILEPATH
