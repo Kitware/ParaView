@@ -39,6 +39,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkFastGeometryFilter.h"
 #include "vtkTexture.h"
 #include "vtkScalarBarActor.h"
+#include "vtkCubeAxesActor2D.h"
 #include "vtkTimerLog.h"
 #include "vtkPVRenderView.h"
 
@@ -92,6 +93,7 @@ vtkPVActorComposite::vtkPVActorComposite()
   this->CompositeCheck = vtkKWCheckButton::New();
   this->ScalarBarCheck = vtkKWCheckButton::New();
   this->ScalarBarOrientationCheck = vtkKWCheckButton::New();
+  this->CubeAxesCheck = vtkKWCheckButton::New();
   this->ReductionEntry = vtkKWEntry::New();
 
   this->VisibilityCheck = vtkKWCheckButton::New();
@@ -119,6 +121,10 @@ vtkPVActorComposite::vtkPVActorComposite()
   this->ScalarBar->SetOrientationToVertical();
   this->ScalarBar->SetWidth(0.13);
   this->ScalarBar->SetHeight(0.5);
+  
+  this->CubeAxes = vtkCubeAxesActor2D::New();
+  this->CubeAxes->SetFlyModeToOuterEdges();
+  this->CubeAxes->GetProperty()->SetColor(1, 1, 1);
 }
 
 
@@ -231,6 +237,9 @@ vtkPVActorComposite::~vtkPVActorComposite()
   this->ScalarBar->Delete();
   this->ScalarBar = NULL;
   
+  this->CubeAxes->Delete();
+  this->CubeAxes = NULL;
+  
   pvApp->BroadcastScript("%s Delete", this->MapperTclName);
   this->SetMapperTclName(NULL);
   this->Mapper = NULL;
@@ -265,6 +274,9 @@ vtkPVActorComposite::~vtkPVActorComposite()
   
   this->ScalarBarOrientationCheck->Delete();
   this->ScalarBarOrientationCheck = NULL;
+  
+  this->CubeAxesCheck->Delete();
+  this->CubeAxesCheck = NULL;
   
   this->ReductionEntry->Delete();
   this->ReductionEntry = NULL;
@@ -364,6 +376,10 @@ void vtkPVActorComposite::CreateProperties()
   this->ScalarBarOrientationCheck->SetState(1);
   this->ScalarBarOrientationCheck->SetCommand(this, "ScalarBarOrientationCallback");
   
+  this->CubeAxesCheck->SetParent(this->Properties);
+  this->CubeAxesCheck->Create(this->Application, "-text CubeAxes");
+  this->CubeAxesCheck->SetCommand(this, "CubeAxesCheckCallback");
+  
   this->ReductionEntry->SetParent(this->Properties);
   this->ReductionEntry->Create(this->Application, "-text CompositeReduction");
   this->ReductionEntry->SetValue(1);
@@ -406,6 +422,8 @@ void vtkPVActorComposite::CreateProperties()
                this->ScalarBarCheck->GetWidgetName());
   this->Script("pack %s",
                this->ScalarBarOrientationCheck->GetWidgetName());
+  this->Script("pack %s",
+               this->CubeAxesCheck->GetWidgetName());
   this->Script("pack %s",
                this->ReductionEntry->GetWidgetName());
   this->Script("pack %s",
@@ -748,6 +766,7 @@ void vtkPVActorComposite::SetAmbient(float ambient)
 void vtkPVActorComposite::Initialize()
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
+  float bounds[6];
   
   if (this->PVData->GetVTKData()->IsA("vtkPolyData"))
     {
@@ -781,6 +800,10 @@ void vtkPVActorComposite::Initialize()
 
   vtkDebugMacro( << "Initialize --------")
   this->UpdateProperties();
+  
+  this->PVData->GetBounds(bounds);
+  this->CubeAxes->SetBounds(bounds);
+  this->CubeAxes->SetCamera(this->GetView()->GetRenderer()->GetActiveCamera());
   
   // Mapper needs an input, so the mode needs to be set first.
   //this->ResetColorRange();
@@ -1114,12 +1137,46 @@ void vtkPVActorComposite::SetScalarBarVisibility(int val)
     }
 }
 
+void vtkPVActorComposite::SetCubeAxesVisibility(int val)
+{
+  vtkRenderer *ren;
+  
+  if (!this->GetView())
+    {
+    return;
+    }
+  
+  ren = this->GetView()->GetRenderer();
+  
+  if (this->CubeAxesCheck->GetState() != val)
+    {
+    this->CubeAxesCheck->SetState(0);
+    }
+
+  // I am going to add and remove it from the renderer instead of using visibility.
+  // Composites should really have multiple props.
+  
+  if (val)
+    {
+    ren->AddProp(this->CubeAxes);
+    }
+  else
+    {
+    ren->RemoveProp(this->CubeAxes);
+    }
+}
 
 //----------------------------------------------------------------------------
 void vtkPVActorComposite::ScalarBarCheckCallback()
 {
   this->SetScalarBarVisibility(this->ScalarBarCheck->GetState());
   this->GetView()->Render();  
+}
+
+void vtkPVActorComposite::CubeAxesCheckCallback()
+{
+  this->SetCubeAxesVisibility(this->CubeAxesCheck->GetState());
+  this->GetView()->Render();
 }
 
 void vtkPVActorComposite::ScalarBarOrientationCallback()

@@ -50,6 +50,7 @@ class vtkPVApplication;
 class vtkPVData;
 class vtkKWCheckButton;
 class vtkScalarBarActor;
+class vtkCubeAxesActor2D;
 
 
 #define VTK_PV_ACTOR_COMPOSITE_NO_MODE            0
@@ -178,6 +179,9 @@ public:
   void ScalarBarCheckCallback();
   void ScalarBarOrientationCallback();
   
+  void SetCubeAxesVisibility(int val);
+  void CubeAxesCheckCallback();
+  
   // Description:
   // Temporary intoerface for seting the compositing reduction.
   void ReductionCallback();
@@ -266,6 +270,9 @@ protected:
   vtkKWCheckButton *ScalarBarCheck;
   vtkScalarBarActor *ScalarBar;
   vtkKWCheckButton *ScalarBarOrientationCheck;
+  
+  vtkKWCheckButton *CubeAxesCheck;
+  vtkCubeAxesActor2D *CubeAxes;
 };
 
 #endif
