@@ -71,7 +71,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVEnSightReaderModule);
-vtkCxxRevisionMacro(vtkPVEnSightReaderModule, "1.25");
+vtkCxxRevisionMacro(vtkPVEnSightReaderModule, "1.25.2.1");
 
 int vtkPVEnSightReaderModuleCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -746,6 +746,8 @@ int vtkPVEnSightReaderModule::ReadFile(const char* fname, float timeValue,
 
   window->GetMainView()->DisableRenderingFlagOn();
 
+  window->GetSourceList("Sources")->AddItem(pvs);
+
   vtkPVPassThrough* connection;
   vtkPVData* connectionOutput;
   char* extentTranslatorName = 0;
@@ -930,7 +932,6 @@ int vtkPVEnSightReaderModule::ReadFile(const char* fname, float timeValue,
     cellSelect->Delete();
     }
   
-  window->GetSourceList("Sources")->AddItem(pvs);
   pvs->UpdateParameterWidgets();
   vtkPVData *pvOutput;
   
