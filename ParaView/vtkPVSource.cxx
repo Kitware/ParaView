@@ -156,23 +156,23 @@ vtkPVSource::~vtkPVSource()
   this->DeleteButton->Delete();
   this->DeleteButton = NULL;
   
+  this->InputMenuFrame->Delete();
+  this->InputMenuFrame = NULL;
+
   this->InputMenuLabel->Delete();
   this->InputMenuLabel = NULL;
   
   this->InputMenu->Delete();
   this->InputMenu = NULL;
   
-  this->InputMenuFrame->Delete();
-  this->InputMenuFrame = NULL;
-
+  this->ScalarOperationFrame->Delete();
+  this->ScalarOperationFrame = NULL;
+  
   this->ScalarOperationLabel->Delete();
   this->ScalarOperationLabel = NULL;
 
   this->ScalarOperationMenu->Delete();
   this->ScalarOperationMenu = NULL;
-  
-  this->ScalarOperationFrame->Delete();
-  this->ScalarOperationFrame = NULL;
   
   this->DisplayNameLabel->Delete();
   this->DisplayNameLabel = NULL;
@@ -405,6 +405,8 @@ void vtkPVSource::CreateProperties()
   this->Script("pack %s -side left -fill x -expand t",
                this->DeleteButton->GetWidgetName());
 
+  frame->Delete();
+  
   if (this->GetNumberOfPVInputs() > 0)
     {
     this->InputMenuFrame->SetParent(this->ParameterFrame->GetFrame());
