@@ -176,15 +176,16 @@ ENDIF(VTK_USE_MPI)
 
 
 
-SET(ParaViewBinary_SRCS
-  ParaView.cxx)
+SET(ParaViewBinary_SRCS ParaView.cxx)
 
 IF (PARAVIEW_USE_ICE_T)
-  SET( ParaViewClient_SRCS
-    ${ParaViewClient_SRCS}
-    )
-
+  SET( ParaViewClient_SRCS ${ParaViewClient_SRCS})
 ENDIF (PARAVIEW_USE_ICE_T)
+
+IF (WIN32)
+  SET( ParaViewClientNotWrapped_SRCS
+    ${ParaViewClientNotWrapped_SRCS} vtkAVIWriter.cxx)
+ENDIF (WIN32)
 
 SET_SOURCE_FILES_PROPERTIES(
   vtkPVApplicationResources
@@ -291,11 +292,13 @@ CONFIGURE_FILE(${PVGUI_SOURCE_DIR}/Client/vtkPVHelpPaths.h.in
   ${PVGUI_BINARY_DIR}/Client/vtkPVHelpPaths.h
   ESCAPE_QUOTES)
 
-IF(WIN32 AND TK_RESOURCE_FILE)
-  GET_FILENAME_COMPONENT(TK_RESOURCE_PATH ${TK_RESOURCE_FILE} PATH)
-  INCLUDE_DIRECTORIES(${TK_RESOURCE_PATH})
-  SET(ParaViewBinary_SRCS ${ParaViewBinary_SRCS} Resources/ParaView.rc)
-ENDIF(WIN32 AND TK_RESOURCE_FILE)
+IF (WIN32)
+  IF(TK_RESOURCE_FILE)
+    GET_FILENAME_COMPONENT(TK_RESOURCE_PATH ${TK_RESOURCE_FILE} PATH)
+    INCLUDE_DIRECTORIES(${TK_RESOURCE_PATH})
+    SET(ParaViewBinary_SRCS ${ParaViewBinary_SRCS} Resources/ParaView.rc)
+  ENDIF(TK_RESOURCE_FILE)
+ENDIF (WIN32)
 
 ADD_EXECUTABLE(paraview WIN32 ${ParaViewBinary_SRCS}) 
 
