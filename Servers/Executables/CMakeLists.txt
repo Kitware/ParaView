@@ -29,7 +29,10 @@ INSTALL_TARGETS(/bin pvserver pvrenderserver pvdataserver)
 
 IF (PARAVIEW_BUILD_GUI)
   ADD_EXECUTABLE(pvbatch pvbatch.cxx)
-  TARGET_LINK_LIBRARIES(pvbatch ${LIBS} vtkPVServerManagerTCL vtkCommonTCL)
+  TARGET_LINK_LIBRARIES(pvbatch ${LIBS} 
+    vtkPVServerManagerTCL 
+    vtkPVServerCommonTCL
+    vtkCommonTCL)
 
   INSTALL_TARGETS(/bin pvbatch)
 ENDIF (PARAVIEW_BUILD_GUI)
