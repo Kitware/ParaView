@@ -65,7 +65,6 @@
 #include "vtkTexture.h"
 #include "vtkTimerLog.h"
 #include "vtkToolkits.h"
-#include "vtkTreeComposite.h"
 #include "vtkPVGenericRenderWindowInteractor.h"
 #include "vtkPVRenderView.h"
 #include "vtkPVRenderModule.h"
@@ -83,7 +82,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.262");
+vtkCxxRevisionMacro(vtkPVData, "1.263");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
