@@ -144,6 +144,7 @@ class VTK_EXPORT vtkKWEvent
     PluginFilterUndoEvent,
     PrinterDPIChangedEvent,
     ProbeInformationChangedEvent,
+    ProbeInformationOffEvent,
     ProjectionTypeChangedEvent,
     RenderEvent,
     RightMouseOptionChangedEvent,

@@ -134,6 +134,7 @@ static const char *vtkKWEventStrings[] = {
   "PluginFilterUndoEvent",
   "PrinterDPIChangedEvent",
   "ProbeInformationChangedEvent",
+  "ProbeInformationOffEvent",
   "ProjectionTypeChangedEvent",
   "RenderEvent",
   "RightMouseOptionChangedEvent",
