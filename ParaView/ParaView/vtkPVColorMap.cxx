@@ -68,7 +68,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVColorMap);
-vtkCxxRevisionMacro(vtkPVColorMap, "1.24");
+vtkCxxRevisionMacro(vtkPVColorMap, "1.24.2.1");
 
 int vtkPVColorMapCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -551,7 +551,9 @@ void vtkPVColorMap::NameEntryCallback()
 //----------------------------------------------------------------------------
 void vtkPVColorMap::SetScalarBarTitle(const char* name)
 {
-  this->AddTraceEntry("$kw(%s) SetName {%s}", this->GetTclName(), name);
+  this->AddTraceEntry("$kw(%s) SetScalarBarTitle {%s}", 
+                      this->GetTclName(), 
+                      name);
   this->SetScalarBarTitleNoTrace(name);
 }
 
