@@ -88,14 +88,12 @@ public:
   // Can only be called by process 0.  It executes a script on every other process.
   void BroadcastScript(char *EventString, ...);
 //ETX
-  void RemoteSimpleScript(int remoteId, char *str);
   void RemoteSimpleScript(int remoteId, const char *str);
-  void BroadcastSimpleScript(char *str);
   void BroadcastSimpleScript(const char *str);
   
   // Description:
-  // We need to keep the controller in a prominent spot because there is no more 
-  // "RegisterAndGetGlobalController" method.
+  // We need to keep the controller in a prominent spot because there is no
+  // more "RegisterAndGetGlobalController" method.
   void SetController(vtkMultiProcessController *c);
   vtkGetObjectMacro(Controller, vtkMultiProcessController);
   
@@ -226,7 +224,7 @@ protected:
   //BTX
   enum
   {
-    NUM_ARGS=1
+    NUM_ARGS=100
   };
   static const char ArgumentList[vtkPVApplication::NUM_ARGS][128];
   //ETX

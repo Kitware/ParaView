@@ -211,10 +211,6 @@ void vtkPVApplication::SetController(vtkMultiProcessController *c)
   this->Controller = c;
 }
 
-
-
-
-
 //----------------------------------------------------------------------------
 vtkPVApplication::~vtkPVApplication()
 {
@@ -235,26 +231,6 @@ void vtkPVApplication::RemoteScript(int id, char *format, ...)
   this->RemoteSimpleScript(id, event);
 }
 //----------------------------------------------------------------------------
-void vtkPVApplication::RemoteSimpleScript(int remoteId, char *str)
-{
-  int length;
-
-  // send string to evaluate.
-  length = strlen(str) + 1;
-  if (length <= 1)
-    {
-    return;
-    }
-
-  if (this->Controller->GetLocalProcessId() == remoteId)
-    {
-    this->SimpleScript(str);
-    return;
-    }
-  
-  this->Controller->TriggerRMI(remoteId, str, VTK_PV_SLAVE_SCRIPT_RMI_TAG);
-}
-
 void vtkPVApplication::RemoteSimpleScript(int remoteId, const char *str)
 {
   int length;
@@ -290,27 +266,6 @@ void vtkPVApplication::BroadcastScript(char *format, ...)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVApplication::BroadcastSimpleScript(char *str)
-{
-  int id, num;
-  
-  num = this->Controller->GetNumberOfProcesses();
-
-  int len = strlen(str);
-  if (!str || (len < 1))
-    {
-    return;
-    }
-
-  for (id = 1; id < num; ++id)
-    {
-    this->RemoteSimpleScript(id, str);
-    }
-  
-  // Do reverse order, because 0 will block.
-  this->SimpleScript(str);
-}
-
 void vtkPVApplication::BroadcastSimpleScript(const char *str)
 {
   int id, num;
@@ -385,7 +340,7 @@ int vtkPVApplication::CheckForArgument(int argc, char* argv[],
 }
 
 const char vtkPVApplication::ArgumentList[vtkPVApplication::NUM_ARGS][128] = 
-{ "--start-empty" };
+{ "--start-empty" , "--enable-mangled-mesa", "" };
 
 int vtkPVApplication::IsParaViewScriptFile(const char* arg)
 {
@@ -436,19 +391,39 @@ void vtkPVApplication::Start(int argc, char*argv[])
 
   if (!this->RunningParaViewScript)
     {
-    int  j;
     for (i=1; i < argc; i++)
       {
-      for(j=0; j<NUM_ARGS; j++)
+      int valid=0;
+      if (argv[i])
 	{
-	if ( argv[i] && strcmp(argv[i], ArgumentList[j]) != 0 )
+	int  j=0;
+	const char* argument = ArgumentList[j];
+	while (argument && argument[0])
 	  {
-	  vtkErrorMacro("Unrecognized argument " << argv[i] << ".");
-	  this->Exit();
-	  return;
+	  if ( strcmp(argv[i], argument) == 0 )
+	    {
+	    valid = 1;
+	    }
+	  argument = ArgumentList[++j];
 	  }
 	}
+      if (!valid)
+	{
+	vtkErrorMacro("Unrecognized argument " << argv[i] << ".");
+	this->Exit();
+	return;
+	}
       }
+    }
+
+  int index;
+
+  if ( vtkPVApplication::CheckForArgument(argc, argv, "--enable-mangled-mesa",
+					  index) 
+       == VTK_OK )
+    {
+    this->BroadcastScript("vtkGraphicsFactory _graphics_fact\n_graphics_fact SetUseMesaClasses 1\n_graphics_fact Delete");
+    this->BroadcastScript("vtkImagingFactory _imaging_fact\n_imaging_fact SetUseMesaClasses 1\n_imaging_fact Delete");
     }
 
   vtkPVWindow *ui = vtkPVWindow::New();
@@ -456,7 +431,6 @@ void vtkPVApplication::Start(int argc, char*argv[])
 
   this->CreateButtonPhotos();
 
-  int index;
   if ( vtkPVApplication::CheckForArgument(argc, argv, "--start-empty", index) 
        == VTK_OK )
     {
