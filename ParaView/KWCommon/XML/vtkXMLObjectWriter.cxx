@@ -40,7 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkXMLUtilities.h"
 #include "vtkXMLDataElement.h"
 
-vtkCxxRevisionMacro(vtkXMLObjectWriter, "1.6");
+vtkCxxRevisionMacro(vtkXMLObjectWriter, "1.7");
 
 vtkCxxSetObjectMacro(vtkXMLObjectWriter, Object, vtkObject);
 
@@ -49,7 +49,7 @@ vtkXMLObjectWriter::vtkXMLObjectWriter()
 {
   this->Object = 0;
   this->WriteFactored = 1;
-  this->WriteIndented = 1;
+  this->WriteIndented = 0;
 }
 
 //----------------------------------------------------------------------------
