@@ -39,7 +39,7 @@
 #include "vtkSMStringVectorProperty.h"
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMLODPartDisplay);
-vtkCxxRevisionMacro(vtkSMLODPartDisplay, "1.8");
+vtkCxxRevisionMacro(vtkSMLODPartDisplay, "1.9");
 
 
 //----------------------------------------------------------------------------
@@ -486,7 +486,7 @@ void vtkSMLODPartDisplay::SetLODResolution(int res)
       << this->LODDeciProxy->GetID(0) << "SetNumberOfDivisions" 
       << vtkClientServerStream::InsertArray(r, 3)
       << vtkClientServerStream::End;
-    pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::DATA_SERVER);
+    pm->SendStream(vtkProcessModule::DATA_SERVER);
     }
   this->InvalidateGeometry();
 }
