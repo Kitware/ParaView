@@ -28,7 +28,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkKWApplication.h"
 #include "vtkKWMenu.h"
 #include "vtkObjectFactory.h"
-
+#include "vtkKWWindow.h"
 
 //------------------------------------------------------------------------------
 vtkKWMenu* vtkKWMenu::New()
@@ -51,6 +51,7 @@ int vtkKWMenuCommand(ClientData cd, Tcl_Interp *interp,
 
 vtkKWMenu::vtkKWMenu()
 {
+  this->CommandFunction = vtkKWMenuCommand;
 }
 
 vtkKWMenu::~vtkKWMenu()
@@ -66,11 +67,34 @@ void vtkKWMenu::Create(vtkKWApplication* app, const char* args)
     return;
     }
   this->SetApplication(app);
-  this->Script("menu %s %s", this->GetWidgetName(), args);
+  this->Script("menu %s %s", this->GetWidgetName(), args); 
+  this->Script("bind %s <<MenuSelect>> {%s DisplayHelp %%W}", this->GetWidgetName(),
+	       this->GetTclName());
+  
 }
 
-void vtkKWMenu::AddGeneric(const char* addtype, const char* label, vtkKWObject* Object,
-			   const char* MethodAndArgString, const char* extra)
+void vtkKWMenu::DisplayHelp(const char* widget)
+{
+  const char* tname = this->GetTclName();
+  this->Script(
+    "if [catch {set %sTemp $%sHelpArray([%s entrycget active -label])} %sTemp ]"
+    " { set %sTemp \"\"}; set %sTemp", 
+    tname, tname, widget, tname, tname, tname );
+  if(this->GetApplication()->GetMainInterp()->result)
+    {
+    vtkKWWindow* window = this->GetWindow();
+    window->SetStatusText(
+      this->GetApplication()->GetMainInterp()->result);
+    }
+}
+
+
+void vtkKWMenu::AddGeneric(const char* addtype, 
+			   const char* label,
+			   vtkKWObject* Object,
+			   const char* MethodAndArgString,
+			   const char* extra, 
+			   const char* help)
 {
   ostrstream str;
   str << this->GetWidgetName() << " add " 
@@ -85,13 +109,22 @@ void vtkKWMenu::AddGeneric(const char* addtype, const char* label, vtkKWObject* 
   
   this->Application->SimpleScript(str.str());
   delete [] str.str();
+  if(!help)
+    {
+    help = label;
+    }
+  this->Script("set {%sHelpArray(%s)} {%s}", this->GetTclName(), 
+	       label, help);
 }
 
 
 
-void vtkKWMenu::InsertGeneric(int position, const char* addtype, const char* label, 
+void vtkKWMenu::InsertGeneric(int position, const char* addtype, 
+			      const char* label, 
 			      vtkKWObject* Object,
-			      const char* MethodAndArgString, const char* extra)
+			      const char* MethodAndArgString, 
+			      const char* extra, 
+			      const char* help)
 {
   ostrstream str;
   str << this->GetWidgetName() << " insert " << position << " " 
@@ -103,18 +136,32 @@ void vtkKWMenu::InsertGeneric(int position, const char* addtype, const char* lab
     str << extra;
     }
   str << ends;
-
+  if(!help)
+    {
+    help = label;
+    }
   this->Application->SimpleScript(str.str());
   delete [] str.str();
+  this->Script("set {%sHelpArray(%s)} {%s}", this->GetTclName(), 
+	       label, help);
+
 }
 
-void vtkKWMenu::AddCascade(const char* label, vtkKWMenu* menu, int underline)
+void vtkKWMenu::AddCascade(const char* label, vtkKWMenu* menu, 
+			   int underline, const char* help)
 {
   ostrstream str;
   str << this->GetWidgetName() << " add cascade -label \"" << label << "\" -menu " 
       << menu->GetWidgetName() << " -underline " << underline << ends;
   this->Application->SimpleScript(str.str());
   delete [] str.str();
+  if(!help)
+    {
+    help = label;
+    }
+  this->Script("set {%sHelpArray(%s)} {%s}", this->GetTclName(), 
+	       label, help);
+
 }
 
 
@@ -122,7 +169,7 @@ void vtkKWMenu::AddCascade(const char* label, vtkKWMenu* menu, int underline)
 void  vtkKWMenu::InsertCascade(int position, 
 			       const char* label, 
 			       vtkKWMenu* menu, 
-			       int underline)
+			       int underline, const char* help)
 {
   ostrstream str;
   
@@ -130,45 +177,53 @@ void  vtkKWMenu::InsertCascade(int position,
       << " cascade -label \"" << label << "\" -menu " 
       << menu->GetWidgetName() << " -underline " << underline << ends;
   this->Application->SimpleScript(str.str());
-  delete [] str.str();
+  delete [] str.str(); 
+  if(!help)
+    {
+    help = label;
+    }
+  this->Script("set {%sHelpArray(%s)} {%s}", this->GetTclName(), 
+	       label, help);
 }
 
 void  vtkKWMenu::AddCheckButton(const char* label, vtkKWObject* Object, 
-				const char* MethodAndArgString )
+				const char* MethodAndArgString, const char* help )
 { 
   static int count = 0;
   ostrstream str;
   str << "-variable " << this->GetWidgetName() << "TempVar" << count++ << ends;
-  this->AddGeneric("checkbutton", label, Object, MethodAndArgString, str.str());
+  this->AddGeneric("checkbutton", label, Object, MethodAndArgString, str.str(), help);
   delete [] str.str();
 }
 
 
 void vtkKWMenu::InsertCheckButton(int position, 
 				  const char* label, vtkKWObject* Object, 
-				  const char* MethodAndArgString )
+				  const char* MethodAndArgString, const char* help )
 { 
   static int count = 0;
   ostrstream str;
   str << "-variable " << this->GetWidgetName() << count++ << "TempVar " << ends;
   this->InsertGeneric(position, "checkbutton", label, Object, 
-		      MethodAndArgString, str.str());
+		      MethodAndArgString, str.str(), help);
   delete [] str.str();
 }
 
 
 void  vtkKWMenu::AddCommand(const char* label, vtkKWObject* Object,
-							const char* MethodAndArgString )
+			    const char* MethodAndArgString ,
+			    const char* help)
 {
   this->AddGeneric("command", label, Object, 
-		   MethodAndArgString, NULL);
+		   MethodAndArgString, NULL, help);
 }
 
 void vtkKWMenu::InsertCommand(int position, const char* label, vtkKWObject* Object,
-			     const char* MethodAndArgString )
+			      const char* MethodAndArgString,
+			      const char* help)
 {
   this->InsertGeneric(position, "command", label, Object,
-		      MethodAndArgString, NULL);
+		      MethodAndArgString, NULL, help);
 }
 
 char* vtkKWMenu::CreateRadioButtonVariable(vtkKWObject* Object, 
@@ -181,12 +236,13 @@ char* vtkKWMenu::CreateRadioButtonVariable(vtkKWObject* Object,
 
 void vtkKWMenu::AddRadioButton(int value, const char* label, const char* buttonVar, 
 			       vtkKWObject* Object, 
-			       const char* MethodAndArgString)
+			       const char* MethodAndArgString,
+			       const char* help)
 {
   ostrstream str;
   str << "-value " << value << " -variable " << buttonVar << ends;
   this->AddGeneric("radiobutton", label, Object,
-		   MethodAndArgString, str.str());
+		   MethodAndArgString, str.str(), help);
   delete [] str.str();
 }
 
@@ -194,12 +250,13 @@ void vtkKWMenu::AddRadioButton(int value, const char* label, const char* buttonV
 void vtkKWMenu::InsertRadioButton(int position, int value, const char* label, 
                                   const char* buttonVar, 
 				  vtkKWObject* Object, 
-				  const char* MethodAndArgString)
+				  const char* MethodAndArgString,
+				  const char* help)
 {
   ostrstream str;
   str << "-value " << value << " -variable " << buttonVar << ends;
   this->InsertGeneric(position, "radiobutton", label, Object,
-		      MethodAndArgString, str.str());
+		      MethodAndArgString, str.str(), help);
   delete [] str.str();
 }
 
@@ -211,11 +268,15 @@ void vtkKWMenu::Invoke(int position)
 void vtkKWMenu::DeleteMenuItem(int position)
 {
   this->Script("catch {%s delete %d}", this->GetWidgetName(), position);
+  this->Script("set {%sHelpArray([%s entrycget %d -label])} {}", 
+	       this->GetWidgetName(), this->GetWidgetName(), 
+	       position);
 }
 
 void vtkKWMenu::DeleteMenuItem(const char* menuitem)
 {
   this->Script("catch {%s delete {%s}}", this->GetWidgetName(), menuitem);
+  this->Script("set {%sHelpArray(%s)} {}", this->GetWidgetName(), menuitem);
 }
 
 int vtkKWMenu::GetIndex(const char* menuname)

@@ -39,6 +39,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 #include "vtkKWObject.h"
 #include "vtkKWWidgetCollection.h"
+class vtkKWWindow;
 
 class VTK_EXPORT vtkKWWidget : public vtkKWObject
 {
@@ -98,6 +99,10 @@ public:
   void SetBalloonHelpJustificationToRight(){
     this->SetBalloonHelpJustification(2);};
   
+  // Description:
+  // Get the containing vtkKWWindow for this Widget if there is one.
+  // NOTE: this may return NULL if the Widget is not in a window.
+  vtkKWWindow* GetWindow();
 protected:
   vtkKWWidget();
   ~vtkKWWidget();
