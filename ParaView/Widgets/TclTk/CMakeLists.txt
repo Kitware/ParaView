@@ -2,6 +2,7 @@ SET (files
   lib/tcl8.4/tclIndex
   lib/tcl8.4/auto.tcl
   lib/tcl8.4/init.tcl
+  lib/tcl8.4/word.tcl
   lib/tk8.4/tclIndex
   lib/tk8.4/button.tcl
   lib/tk8.4/comdlg.tcl
@@ -24,7 +25,7 @@ IF(CMAKE_CONFIGURATION_TYPES)
 ELSE(CMAKE_CONFIGURATION_TYPES)
   SET(WIDGETS_CONFIG_TYPES .)
 ENDIF(CMAKE_CONFIGURATION_TYPES)
-  
+
 IF (CXX_TEST_PATH)  
   FOREACH(config ${WIDGETS_CONFIG_TYPES})
     FOREACH (file ${files})
