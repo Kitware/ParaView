@@ -73,6 +73,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkWindow.h"
 #include "vtkWindowToImageFilter.h"
 #include "vtkProperty2D.h"
+#include "vtkString.h"
 
 #ifdef _WIN32
 #include "vtkWin32OpenGLRenderWindow.h"
@@ -873,16 +874,16 @@ void vtkKWView::PrintView()
 //----------------------------------------------------------------------------
 void vtkKWView::SaveAsImage() 
 {
-  char *path;
+  char *path = 0;
   
   // first get the file name
   vtkKWSaveImageDialog *dlg = vtkKWSaveImageDialog::New();
   dlg->Create(this->Application,"");  
   dlg->Invoke();
   path = dlg->GetFileName();
-  
+
   // make sure we have a file name
-  if (path && strlen(path) < 1)
+  if (path && vtkString::Length(path) > 1)
     {
     this->SaveAsImage(path);
     }
@@ -1371,7 +1372,7 @@ void vtkKWView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWView ";
-  this->ExtractRevision(os,"$Revision: 1.72 $");
+  this->ExtractRevision(os,"$Revision: 1.73 $");
 }
 
 //----------------------------------------------------------------------------
