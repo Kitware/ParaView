@@ -38,6 +38,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkKWCheckButton.h"
 #include "vtkKWLabel.h"
 #include "vtkKWPushButton.h"
+#include "vtkKWScale.h"
 #include "vtkPVApplication.h"
 #include "vtkDataSetMapper.h"
 
@@ -102,6 +103,11 @@ public:
   vtkGetObjectMacro(Mapper, vtkPolyDataMapper);
   
   void ShowDataNotebook();
+
+  // Description:
+  // to change the ambient component of the light
+  void AmbientChanged();
+  void SetAmbient(float ambient);
   
 protected:
   vtkPVActorComposite();
@@ -118,7 +124,7 @@ protected:
   vtkKWLabel *ZRangeLabel;
   
   vtkKWPushButton *DataNotebookButton;
-  vtkKWCheckButton *DecimateButton;
+  vtkKWScale *AmbientScale;
   
   // the data object that owns this composite
   vtkPVData *PVData;

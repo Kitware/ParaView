@@ -45,6 +45,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkOutlineSource.h"
 #include "vtkMath.h" 
 #include "vtkCellPicker.h"
+#include "vtkTransformFilter.h"
 
 //----------------------------------------------------------------------------
 vtkInteractorStylePlane *vtkInteractorStylePlane::New() 
@@ -73,17 +74,24 @@ void vtkInteractorStylePlaneCallback(void *arg)
 //----------------------------------------------------------------------------
 vtkInteractorStylePlane::vtkInteractorStylePlane() 
 {
-  this->SphereSource    = vtkSphereSource::New();
-  this->SphereMapper    = vtkPolyDataMapper::New();
-  this->SphereMapper->SetInput(this->SphereSource->GetOutput());
-  this->SphereActor     = vtkActor::New();
-  this->SphereActor->SetMapper(this->SphereMapper);
-  this->SphereActor->GetProperty()->SetColor(1.0, 0.7, 0.7);
-
   this->Plane          = vtkPlane::New();
+  
+  this->CrossHair = vtkCursor3D::New();
+  this->CrossHair->SetFocalPoint(this->Plane->GetOrigin());
+  this->CrossHair->AxesOn();
+  this->CrossHair->OutlineOff();
+  this->CrossHair->XShadowsOff();
+  this->CrossHair->YShadowsOff();
+  this->CrossHair->ZShadowsOff();
+  this->CrossHairMapper = vtkPolyDataMapper::New();
+  this->CrossHairMapper->ImmediateModeRenderingOn();
+  this->CrossHairMapper->SetInput(this->CrossHair->GetOutput());
+  this->CrossHairActor = vtkActor::New();
+  this->CrossHairActor->SetMapper(this->CrossHairMapper);
+  this->CrossHairActor->GetProperty()->SetColor(1.0, 0.7, 0.7);
 
   this->Button = -1;
-  this->State = VTK_INTERACTOR_STYLE_PLANE_NONE;
+  this->State = VTK_INTERACTOR_STYLE_PLANE_CENTER;
   this->CallbackMethod = vtkInteractorStylePlaneCallback;
   this->CallbackMethodArg = (void *)this;
   this->CallbackMethodArgDelete = NULL;
@@ -99,18 +107,19 @@ vtkInteractorStylePlane::~vtkInteractorStylePlane()
     { // just in case delete occurs while style is active.
     if (this->State != VTK_INTERACTOR_STYLE_PLANE_NONE)
       {
-      this->CurrentRenderer->RemoveActor(this->SphereActor);
+      this->CurrentRenderer->RemoveActor(this->CrossHairActor);
       }
     }
-  this->SphereSource->Delete();
-  this->SphereSource = NULL;
-  this->SphereMapper->Delete();
-  this->SphereMapper = NULL;
-  this->SphereActor->Delete();
-  this->SphereActor = NULL;
+  
+  this->CrossHair->Delete();
+  this->CrossHair = NULL;
+  this->CrossHairMapper->Delete();
+  this->CrossHairMapper = NULL;
+  this->CrossHairActor->Delete();
+  this->CrossHairActor = NULL;
 
   this->Plane->Delete();
-  this->Plane       = NULL;
+  this->Plane = NULL;
 
   if ((this->CallbackMethodArg)&&(this->CallbackMethodArgDelete))
     {
@@ -204,21 +213,33 @@ void vtkInteractorStylePlane::RotateXY(int dx, int dy)
   cam = this->CurrentRenderer->GetActiveCamera();
   size = this->CurrentRenderer->GetSize();
     
-  // We do not have to translate to center of rotation because we will
-  // apply this transform to the normal.
-  this->Transform->Identity();
-
   // azimuth
   vu = cam->GetViewUp();	
   this->Transform->RotateWXYZ(360.0 * dx / size[0], vu[0], vu[1], vu[2]);
   // Elevation
   vtkMath::Cross(cam->GetViewPlaneNormal(), cam->GetViewUp(), v2);
   this->Transform->RotateWXYZ(360.0 * dy / size[1], v2[0], v2[1], v2[2]);
-    
-  this->Plane->GetNormal(n1);
+  
+  // The default normal for a plane is (0, 0, 1).
+  n1[0] = 0.0;
+  n1[1] = 0.0;
+  n1[2] = 1.0;
   n1[3] = 1.0;
+  
   this->Transform->MultiplyPoint(n1, n2);
   this->Plane->SetNormal(n2);
+
+  vtkTransformFilter *xform = vtkTransformFilter::New();
+  xform->SetInput(this->CrossHair->GetOutput());
+  xform->SetTransform(this->Transform);
+  xform->Update();
+  this->CrossHairMapper->SetInput(xform->GetPolyDataOutput());
+  xform->Delete();
+  
+  if ( this->CallbackMethod )
+    {
+    (*this->CallbackMethod)(this->CallbackMethodArg);
+    }  
 }
 
 
@@ -247,7 +268,7 @@ void vtkInteractorStylePlane::TranslateXY(int dx, int dy)
   world[1] /= world[3];
   world[2] /= world[3];
   this->Plane->SetOrigin(world[0], world[1], world[2]);
-  this->SphereActor->SetPosition(world[0], world[1], world[2]);
+  this->CrossHairActor->SetPosition(world[0], world[1], world[2]);
 
   if ( this->CallbackMethod )
     {
@@ -287,7 +308,7 @@ void vtkInteractorStylePlane::TranslateZ(int vtkNotUsed(dx), int dy)
   v1[2] = v1[2] * dist / (float)(size[1]);
 
   this->Plane->SetOrigin(center[0]+dy*v1[0], center[1]+dy*v1[1], center[2]+dy*v1[2]);
-  this->SphereActor->SetPosition(this->Plane->GetOrigin());
+  this->CrossHairActor->SetPosition(this->Plane->GetOrigin());
     
   if ( this->CallbackMethod )
     {
@@ -304,75 +325,17 @@ void vtkInteractorStylePlane::HandleIndicator(int x, int y)
 {
   int *size;
   float display[3], point[4];
-  float sphereCx, sphereCy, sphereCz;
+  float crossHairCx, crossHairCy, crossHairCz;
   float temp, centerDistDisplay, rad;
   int renderFlag = 0;
 
   this->FindPokedRenderer(x, y);
-  if (this->CurrentRenderer == NULL)
-    {
-    return;
-    }
-
-  // Are we over the center.
-  this->Plane->GetOrigin(point);
-  sphereCx = point[0];
-  sphereCy = point[1];
-  sphereCz = point[2];
-  point[3] = 1.0;
-  this->CurrentRenderer->SetWorldPoint(point);
-  this->CurrentRenderer->WorldToDisplay();
-  this->CurrentRenderer->GetDisplayPoint(display);
-  temp = (float)x - display[0];
-  centerDistDisplay = temp * temp;
-  temp = (float)y - display[1];
-  centerDistDisplay += temp * temp;
-  centerDistDisplay = sqrt(centerDistDisplay);
-
-  // Compute the size of the sphere 
-  // as a fraction of the renderers size.
-  // (Display is set to the origin in display coordinates.)
-  size = this->CurrentRenderer->GetSize();
-  display[0] += (float)(size[0] + size[1]) / 50.0;
-  this->CurrentRenderer->SetDisplayPoint(display);
-  this->CurrentRenderer->DisplayToWorld();
-  this->CurrentRenderer->GetWorldPoint(point);
-  temp = sphereCx - point[0];
-  rad = temp * temp;
-  temp = sphereCy - point[1];
-  rad += temp * temp;
-  temp = sphereCz - point[2];
-  rad += temp * temp;
-  rad = sqrt(rad);
-  this->SphereActor->SetScale(rad);
-
-  // If we are within a couple pixles of the center, turn it on.
-  if (centerDistDisplay < 16.0)
-    { // The center should become active.
-    if (this->State == VTK_INTERACTOR_STYLE_PLANE_NONE)
-      { // Center was previously off. Turn it on.
-      this->CurrentRenderer->AddActor(this->SphereActor);
-      }
-    if (this->State != VTK_INTERACTOR_STYLE_PLANE_CENTER)
+  if (!this->CurrentRenderer->GetActors()->IsItemPresent(this->CrossHairActor))
       {
-      this->SphereActor->SetPosition(sphereCx, sphereCy, sphereCz);
-      this->CurrentRenderer->ResetCameraClippingRange();
-      this->CurrentRenderer->GetRenderWindow()->Render();
+      this->CurrentRenderer->AddActor(this->CrossHairActor);
       }
-    this->State = VTK_INTERACTOR_STYLE_PLANE_CENTER;
-    return;
-    }
-
-  // Neither is on.
-  if (this->State != VTK_INTERACTOR_STYLE_PLANE_NONE)
-    { // Center was previously on. Turn it off.
-    this->CurrentRenderer->RemoveActor(this->SphereActor);
-    this->CurrentRenderer->GetRenderWindow()->Render();
-    this->State = VTK_INTERACTOR_STYLE_PLANE_NONE;
-    }
-
+  
   return;
-
 }
 
 

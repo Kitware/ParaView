@@ -55,10 +55,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkInteractorStyle.h"
 #include "vtkPlane.h"
-#include "vtkSphereSource.h"
+//#include "vtkSphereSource.h"
 #include "vtkPolyDataMapper.h"
 #include "vtkTransform.h"
-
+#include "vtkCursor3D.h"
 
 #define VTK_INTERACTOR_STYLE_PLANE_NONE    0
 #define VTK_INTERACTOR_STYLE_PLANE_CENTER  1
@@ -80,6 +80,8 @@ public:
   // Description:
   // Parameters are accessed through the plane source.
   vtkGetObjectMacro(Plane, vtkPlane);
+  
+  vtkGetObjectMacro(CrossHair, vtkCursor3D);
 
   // Generic event bindings must be overridden in subclasses
   void OnMouseMove  (int ctrl, int shift, int x, int y);
@@ -105,15 +107,21 @@ public:
   // The CallbackMethod
   void DefaultCallback(char *type);
 
+  vtkGetObjectMacro(Test, vtkPolyData);
+  
 protected:
   vtkInteractorStylePlane();
   ~vtkInteractorStylePlane();
   vtkInteractorStylePlane(const vtkInteractorStylePlane&) {};
   void operator=(const vtkInteractorStylePlane&) {};
 
-  vtkSphereSource    *SphereSource;
-  vtkPolyDataMapper  *SphereMapper;
-  vtkActor           *SphereActor;
+//  vtkSphereSource    *SphereSource;
+//  vtkPolyDataMapper  *SphereMapper;
+//  vtkActor           *SphereActor;
+  
+  vtkCursor3D        *CrossHair;
+  vtkPolyDataMapper  *CrossHairMapper;
+  vtkActor           *CrossHairActor;
 
   vtkPlane           *Plane;
 
@@ -140,6 +148,7 @@ protected:
 
   void HandleIndicator(int x, int y);
 
+  vtkPolyData *Test;
 };
 
 #endif

@@ -128,6 +128,11 @@ vtkPVCutter* vtkPVCutter::New()
 //----------------------------------------------------------------------------
 void vtkPVCutter::CreateProperties()
 {
+  float origin[3], normal[3];
+  
+  this->GetPlaneStyle()->GetPlane()->GetOrigin(origin);
+  this->GetPlaneStyle()->GetPlane()->GetNormal(normal);
+  
   this->vtkPVSource::CreateProperties();
   
   this->SourceButton->Create(this->Application, "-text GetSource");
@@ -149,20 +154,20 @@ void vtkPVCutter::CreateProperties()
   this->OriginXLabel->Create(this->Application, "");
   this->OriginXLabel->SetLabel("X: ");
   this->OriginXEntry->SetParent(this->OriginFrame->GetFrame());
-  this->OriginXEntry->Create(this->Application, "-width 5");
-  this->OriginXEntry->SetValue(0, 2);
+  this->OriginXEntry->Create(this->Application, "-width 12");
+  this->OriginXEntry->SetValue(origin[0], 4);
   this->OriginYLabel->SetParent(this->OriginFrame->GetFrame());
   this->OriginYLabel->Create(this->Application, "");
   this->OriginYLabel->SetLabel("Y: ");
   this->OriginYEntry->SetParent(this->OriginFrame->GetFrame());
-  this->OriginYEntry->Create(this->Application, "-width 5");
-  this->OriginYEntry->SetValue(0, 2);
+  this->OriginYEntry->Create(this->Application, "-width 12");
+  this->OriginYEntry->SetValue(origin[1], 4);
   this->OriginZLabel->SetParent(this->OriginFrame->GetFrame());
   this->OriginZLabel->Create(this->Application, "");
   this->OriginZLabel->SetLabel("Z: ");
   this->OriginZEntry->SetParent(this->OriginFrame->GetFrame());
-  this->OriginZEntry->Create(this->Application, "-width 5");
-  this->OriginZEntry->SetValue(0, 2);
+  this->OriginZEntry->Create(this->Application, "-width 12");
+  this->OriginZEntry->SetValue(origin[2], 4);
   this->Script("pack %s %s %s %s %s %s -side left -fill x",
 	       this->OriginXLabel->GetWidgetName(),
 	       this->OriginXEntry->GetWidgetName(),
@@ -175,20 +180,20 @@ void vtkPVCutter::CreateProperties()
   this->NormalXLabel->Create(this->Application, "");
   this->NormalXLabel->SetLabel("X: ");
   this->NormalXEntry->SetParent(this->NormalFrame->GetFrame());
-  this->NormalXEntry->Create(this->Application, "-width 5");
-  this->NormalXEntry->SetValue(0, 2);
+  this->NormalXEntry->Create(this->Application, "-width 12");
+  this->NormalXEntry->SetValue(normal[0], 4);
   this->NormalYLabel->SetParent(this->NormalFrame->GetFrame());
   this->NormalYLabel->Create(this->Application, "");
   this->NormalYLabel->SetLabel("Y: ");
   this->NormalYEntry->SetParent(this->NormalFrame->GetFrame());
-  this->NormalYEntry->Create(this->Application, "-width 5");
-  this->NormalYEntry->SetValue(1, 2);
+  this->NormalYEntry->Create(this->Application, "-width 12");
+  this->NormalYEntry->SetValue(normal[1], 4);
   this->NormalZLabel->SetParent(this->NormalFrame->GetFrame());
   this->NormalZLabel->Create(this->Application, "");
   this->NormalZLabel->SetLabel("Z: ");
   this->NormalZEntry->SetParent(this->NormalFrame->GetFrame());
-  this->NormalZEntry->Create(this->Application, "-width 5");
-  this->NormalZEntry->SetValue(0, 2);
+  this->NormalZEntry->Create(this->Application, "-width 12");
+  this->NormalZEntry->SetValue(normal[2], 4);
   this->Script("pack %s %s %s %s %s %s -side left -fill x",
 	       this->NormalXLabel->GetWidgetName(),
 	       this->NormalXEntry->GetWidgetName(),
@@ -271,6 +276,22 @@ void EndCutterProgress(void *arg)
 }
 
 //----------------------------------------------------------------------------
+void PlaneCallback(void *arg)
+{
+  vtkPVCutter *me = (vtkPVCutter*)arg;
+  float orig[3], norm[3];
+  me->GetPlaneStyle()->GetPlane()->GetOrigin(orig);
+  me->GetPlaneStyle()->GetPlane()->GetNormal(norm);
+  
+  me->GetOriginXEntry()->SetValue(orig[0], 4);
+  me->GetOriginYEntry()->SetValue(orig[1], 4);
+  me->GetOriginZEntry()->SetValue(orig[2], 4);
+  me->GetNormalXEntry()->SetValue(norm[0], 4);
+  me->GetNormalYEntry()->SetValue(norm[1], 4);
+  me->GetNormalZEntry()->SetValue(norm[2], 4);
+}
+
+//----------------------------------------------------------------------------
 void vtkPVCutter::CutterChanged()
 {
   vtkPVApplication *pvApp = (vtkPVApplication *)this->Application;
@@ -291,6 +312,7 @@ void vtkPVCutter::CutterChanged()
     this->GetCutter()->SetStartMethod(StartCutterProgress, this);
     this->GetCutter()->SetProgressMethod(CutterProgress, this);
     this->GetCutter()->SetEndMethod(EndCutterProgress, this);
+    this->GetPlaneStyle()->SetCallbackMethod(PlaneCallback, this);
     pvd = vtkPVPolyData::New();
     pvd->Clone(pvApp);
     this->SetOutput(pvd);
@@ -300,6 +322,7 @@ void vtkPVCutter::CutterChanged()
     this->CreateDataPage();
     ac = this->GetPVData()->GetActorComposite();
     window->GetMainView()->AddComposite(ac);
+//    this->GetPlaneStyle()->GetCrossHair()->SetModelBounds(this->GetInput()->GetData()->GetBounds());
     }
   window->GetMainView()->SetSelectedComposite(this);
   this->GetView()->Render();

@@ -66,6 +66,7 @@ vtkPVActorComposite::vtkPVActorComposite()
   this->ZRangeLabel = vtkKWLabel::New();
   
   this->DataNotebookButton = vtkKWPushButton::New();
+  this->AmbientScale = vtkKWScale::New();
   
   this->PVData = NULL;
 }
@@ -92,6 +93,9 @@ vtkPVActorComposite::~vtkPVActorComposite()
   
   this->DataNotebookButton->Delete();
   this->DataNotebookButton = NULL;
+  
+  this->AmbientScale->Delete();
+  this->AmbientScale = NULL;
   
   this->SetPVData(NULL);
 }
@@ -165,18 +169,47 @@ void vtkPVActorComposite::CreateProperties()
   this->DataNotebookButton->Create(this->Application, "");
   this->DataNotebookButton->SetLabel("Return to Data Notebook");
   this->DataNotebookButton->SetCommand(this, "ShowDataNotebook");
-  this->Script("pack %s %s %s %s %s %s",
+  this->AmbientScale->SetParent(this->Properties);
+  this->AmbientScale->Create(this->Application, "-showvalue 1");
+  this->AmbientScale->DisplayLabel("Ambient Light");
+  this->AmbientScale->SetRange(0.0, 1.0);
+  this->AmbientScale->SetResolution(0.1);
+  this->AmbientScale->SetValue(this->GetActor()->GetProperty()->GetAmbient());
+  this->AmbientScale->SetCommand(this, "AmbientChanged");
+  this->Script("pack %s %s %s %s %s %s %s",
 	       this->NumCellsLabel->GetWidgetName(),
 	       this->BoundsLabel->GetWidgetName(),
 	       this->XRangeLabel->GetWidgetName(),
 	       this->YRangeLabel->GetWidgetName(),
 	       this->ZRangeLabel->GetWidgetName(),
+	       this->AmbientScale->GetWidgetName(),
 	       this->DataNotebookButton->GetWidgetName());
   
   delete [] cellsLabel;
   delete [] xLabel;
   delete [] yLabel;
   delete [] zLabel;
+}
+
+//----------------------------------------------------------------------------
+void vtkPVActorComposite::AmbientChanged()
+{
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  float ambient = this->AmbientScale->GetValue();
+  
+  if (pvApp && pvApp->GetController()->GetLocalProcessId() == 0)
+    {
+    pvApp->BroadcastScript("%s SetAmbient %f", this->GetTclName(), ambient);
+    }
+  
+  this->SetAmbient(ambient);
+  this->GetView()->Render();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVActorComposite::SetAmbient(float ambient)
+{
+  this->GetActor()->GetProperty()->SetAmbient(ambient);
 }
 
 //----------------------------------------------------------------------------

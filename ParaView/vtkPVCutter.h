@@ -72,9 +72,20 @@ public:
   void GetSource();
 
   vtkGetObjectMacro(Cutter, vtkCutter);
+  vtkGetObjectMacro(PlaneStyle, vtkInteractorStylePlane);
   
   void UsePlaneStyle();
 
+  // Description:
+  // Need to be able to get these to be able to change their values from a
+  // callback.
+  vtkGetObjectMacro(OriginXEntry, vtkKWEntry);
+  vtkGetObjectMacro(OriginYEntry, vtkKWEntry);
+  vtkGetObjectMacro(OriginZEntry, vtkKWEntry);
+  vtkGetObjectMacro(NormalXEntry, vtkKWEntry);
+  vtkGetObjectMacro(NormalYEntry, vtkKWEntry);
+  vtkGetObjectMacro(NormalZEntry, vtkKWEntry);
+  
 protected:
   vtkPVCutter();
   ~vtkPVCutter();
