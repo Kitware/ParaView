@@ -48,7 +48,7 @@ const int ICET_INFO_SIZE = sizeof(struct IceTInformation)/sizeof(int);
 // vtkIceTRenderManager implementation.
 //******************************************************************
 
-vtkCxxRevisionMacro(vtkIceTRenderManager, "1.20");
+vtkCxxRevisionMacro(vtkIceTRenderManager, "1.21");
 vtkStandardNewMacro(vtkIceTRenderManager);
 
 vtkCxxSetObjectMacro(vtkIceTRenderManager, SortingKdTree, vtkPKdTree);
@@ -87,6 +87,8 @@ vtkIceTRenderManager::vtkIceTRenderManager()
   this->SetController(vtkMultiProcessController::GetGlobalController());
 }
 
+//-------------------------------------------------------------------------
+
 vtkIceTRenderManager::~vtkIceTRenderManager()
 {
   this->SetController(NULL);
@@ -99,6 +101,8 @@ vtkIceTRenderManager::~vtkIceTRenderManager()
   this->SetDataReplicationGroup(NULL);
   this->SetTileViewportTransform(NULL);
 }
+
+//-------------------------------------------------------------------------
 
 vtkRenderer *vtkIceTRenderManager::MakeRenderer()
 {
@@ -329,6 +333,7 @@ void vtkIceTRenderManager::SetTileDimensions(int tilesX, int tilesY)
   this->TileDimensions[1] = tilesY;
   this->TilesDirty = 1;
 }
+//-----------------------------------------------------------------------------
 
 int vtkIceTRenderManager::GetTileRank(int x, int y)
 {
@@ -343,6 +348,9 @@ int vtkIceTRenderManager::GetTileRank(int x, int y)
 
   return this->TileRanks[x][y];
 }
+
+//-----------------------------------------------------------------------------
+
 void vtkIceTRenderManager::SetTileRank(int x, int y, int rank)
 {
   vtkDebugMacro("SetTileRank " << x << " " << y << " " << rank);
@@ -419,6 +427,8 @@ void vtkIceTRenderManager::SetStrategy(StrategyType strategy)
   this->Strategy = strategy;
   this->StrategyDirty = 1;
 }
+
+//-----------------------------------------------------------------------------
 
 void vtkIceTRenderManager::SetStrategy(const char *strategy)
 {
@@ -502,11 +512,17 @@ double vtkIceTRenderManager::GetRenderTime()
     return 0.0;
     }
 }
+
+//-----------------------------------------------------------------------------
+
 double vtkIceTRenderManager::GetImageProcessingTime()
 {
   return this->ImageProcessingTime + this->GetBufferReadTime()
     + this->GetCompositeTime();
 }
+
+//-----------------------------------------------------------------------------
+
 double vtkIceTRenderManager::GetBufferReadTime()
 {
   if (this->Controller)
@@ -521,6 +537,9 @@ double vtkIceTRenderManager::GetBufferReadTime()
     return 0.0;
     }
 }
+
+//-----------------------------------------------------------------------------
+
 double vtkIceTRenderManager::GetBufferWriteTime()
 {
   if (this->Controller)
@@ -535,6 +554,9 @@ double vtkIceTRenderManager::GetBufferWriteTime()
     return 0.0;
     }
 }
+
+//-----------------------------------------------------------------------------
+
 double vtkIceTRenderManager::GetCompositeTime()
 {
   if (this->Controller)
@@ -568,6 +590,8 @@ void vtkIceTRenderManager::StartRender()
 
   this->Superclass::StartRender();
 }
+
+//-----------------------------------------------------------------------------
 
 void vtkIceTRenderManager::SatelliteStartRender()
 {
@@ -620,6 +644,8 @@ void vtkIceTRenderManager::SendWindowInformation()
       }
     }
 }
+
+//-----------------------------------------------------------------------------
 
 void vtkIceTRenderManager::ReceiveWindowInformation()
 {

@@ -45,7 +45,7 @@
 #endif
 
 
-vtkCxxRevisionMacro(vtkIceTClientCompositeManager, "1.13");
+vtkCxxRevisionMacro(vtkIceTClientCompositeManager, "1.14");
 vtkStandardNewMacro(vtkIceTClientCompositeManager);
 
 vtkCxxSetObjectMacro(vtkIceTClientCompositeManager,IceTManager,vtkIceTRenderManager);
@@ -118,11 +118,8 @@ vtkIceTClientCompositeManager::vtkIceTClientCompositeManager()
 vtkIceTClientCompositeManager::~vtkIceTClientCompositeManager()
 {
   this->SetRenderWindow(NULL);
-  
   this->SetClientController(NULL);
-
   this->SetRenderView(NULL);
-
   this->SetIceTManager(NULL);
 }
 
@@ -347,8 +344,8 @@ void vtkIceTClientCompositeManager::SatelliteStartRender()
   vtkMultiProcessController *controller; 
   int otherId;
 
-    controller = this->ClientController;
-    otherId = 1;
+  controller = this->ClientController;
+  otherId = 1;
   
   vtkInitializeClientRendererInfoMacro(renInfo);
   
@@ -423,7 +420,6 @@ void vtkIceTClientCompositeManager::SatelliteEndRender()
 }
 
 
-
 //-------------------------------------------------------------------------
 void vtkIceTClientCompositeManager::InitializeOffScreen()
 {
@@ -435,8 +431,6 @@ void vtkIceTClientCompositeManager::InitializeOffScreen()
       }
     }
 }
-
-
 
 
 //-------------------------------------------------------------------------
@@ -525,9 +519,6 @@ void vtkIceTClientCompositeManager::InitializeRMIs()
 }
 
 
-
-
-
 //----------------------------------------------------------------------------
 void vtkIceTClientCompositeManager::PrintSelf(ostream& os, vtkIndent indent)
 {
@@ -552,7 +543,7 @@ void vtkIceTClientCompositeManager::PrintSelf(ostream& os, vtkIndent indent)
     os << indent << "Tiled display with dimensions: " 
        << this->TiledDimensions[0] << ", " << this->TiledDimensions[1] << endl;
     }
-  
+
   os << indent << "UseCompositing: " << this->UseCompositing << endl;
   os << indent << "ClientFlag: " << this->ClientFlag << endl;
   os << indent << "UseCompositeCompression: " << this->UseCompositeCompression << endl;
@@ -560,6 +551,10 @@ void vtkIceTClientCompositeManager::PrintSelf(ostream& os, vtkIndent indent)
   if (this->IceTManager)
     {
     os << indent << "IceTManager: " << this->IceTManager << endl;
+    }
+  else
+    {
+    os << indent << "IceTManager: (none)\n";
     }
 }
 
