@@ -1,0 +1,80 @@
+# Application should exit when this script is finished.
+Application ExitOnReturnOn
+
+if {[info exists argc]} { 
+    set argcm1 [expr $argc - 1]
+    for {set i 0} {$i < $argcm1} {incr i} {
+        if {[lindex $argv $i] == "-D" && $i < $argcm1} {
+		set DataDir [lindex $argv [expr $i + 1]]
+        }
+    }
+} 
+
+# Disable popup message dialogs.
+set kw(vtkTemp1) [Application GetMainWindow]
+$kw(vtkTemp1) SetUseMessageDialog 0
+
+# Open the AltIO package.
+$kw(vtkTemp1) OpenPackage "$DataDir/Data/vtkAltIOPackage.xml"
+
+# Open a structured grid data set.
+set kw(vtkTemp257) [$kw(vtkTemp1) CreatePVSource PLOT3DReader]
+set kw(vtkTemp266) [$kw(vtkTemp257) GetPVWidget {XYZFileName}]
+$kw(vtkTemp266) SetValue "$DataDir/Data/combxyz.bin"
+set kw(vtkTemp270) [$kw(vtkTemp257) GetPVWidget {QFileName}]
+$kw(vtkTemp270) SetValue "$DataDir/Data/combq.bin"
+$kw(vtkTemp257) AcceptCallback
+
+# Choose the file name/type based on whether we are in parallel mode.
+set kw(vtkTemp1000) [Application GetController]
+set nprocs [$kw(vtkTemp1000) GetNumberOfProcesses]
+
+set ext "vts"
+if {$nprocs > 1} { set ext "pvts" }
+
+# Write the vtkStructuredGrid.
+$kw(vtkTemp1) WriteVTKFile "testStructuredGrid.$ext"
+
+# Barrier after write.
+Application BroadcastSimpleScript { [Application GetController] Barrier }
+
+# Delete the old pipeline.
+$kw(vtkTemp257) DeleteCallback
+
+# Read the vtkStructuredGrid from the temporary file.
+$kw(vtkTemp1) Open "testStructuredGrid.$ext"
+set kw(vtkTemp306) [$kw(vtkTemp1) GetCurrentPVSource]
+
+# Contour it to produce some actual data for display.
+set kw(vtkTemp336) [$kw(vtkTemp1) CreatePVSource Contour]
+set kw(vtkTemp342) [$kw(vtkTemp336) GetPVWidget {Scalars}]
+$kw(vtkTemp342) SetValue {Density}
+set kw(vtkTemp345) [$kw(vtkTemp336) GetPVWidget {Contour Values}]
+$kw(vtkTemp345) RemoveAllValues
+$kw(vtkTemp345) AddValue 0.4
+$kw(vtkTemp345) AddValue 0.5
+$kw(vtkTemp345) AddValue 0.6
+$kw(vtkTemp345) AddValue 0.7
+$kw(vtkTemp336) AcceptCallback
+
+# Fix the size of the image.
+RenWin1 SetSize 300 300
+RenWin1 Render
+update
+
+for {set i  1} {$i < [expr $argc - 1]} {incr i} {
+    if {[lindex $argv $i] == "-C"} {
+	source [lindex $argv [expr $i + 1]]
+	$Application SetExitStatus [CompareImage [[Application GetMainWindow] GetMainView]]
+    }
+}
+
+# Delete the temporary file.
+#catch { file delete -force "testStructuredGrid.$ext" }
+
+if {$nprocs > 1} {
+  # Delete the temporary file's pieces.
+  for {set i 0} { $i < $nprocs } { incr i } {
+#  catch { file delete -force "testStructuredGrid$i.vts" }
+  }
+}
