@@ -15,9 +15,17 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkXMLPolyDataWriter - Write image data in an XML format.
+// .NAME vtkXMLPolyDataWriter - Write VTK XML PolyData files.
 // .SECTION Description
-// vtkXMLPolyDataWriter 
+// vtkXMLPolyDataWriter writes the VTK XML PolyData file format.  One
+// polygonal data input can be written into one file in any number of
+// streamed pieces (if supported by the rest of the pipeline).  The
+// standard extension for this writer's file format is "vtp".  This
+// writer is also used to write a single piece of the parallel file
+// format.
+
+// .SECTION See Also
+// vtkXMLPPolyDataWriter
 
 #ifndef __vtkXMLPolyDataWriter_h
 #define __vtkXMLPolyDataWriter_h

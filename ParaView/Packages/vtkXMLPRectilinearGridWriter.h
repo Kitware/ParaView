@@ -15,9 +15,17 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkXMLPRectilinearGridWriter - Write image data in a parallel XML format.
+// .NAME vtkXMLPRectilinearGridWriter - Write PVTK XML RectilinearGrid files.
 // .SECTION Description
-// vtkXMLPRectilinearGridWriter
+// vtkXMLPRectilinearGridWriter writes the PVTK XML RectilinearGrid
+// file format.  One rectilinear grid input can be written into a
+// parallel file format with any number of pieces spread across files.
+// The standard extension for this writer's file format is "pvtr".
+// This writer uses vtkXMLRectilinearGridWriter to write the
+// individual piece files.
+
+// .SECTION See Also
+// vtkXMLRectilinearGridWriter
 
 #ifndef __vtkXMLPRectilinearGridWriter_h
 #define __vtkXMLPRectilinearGridWriter_h

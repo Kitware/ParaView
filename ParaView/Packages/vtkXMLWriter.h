@@ -17,7 +17,10 @@
 =========================================================================*/
 // .NAME vtkXMLWriter - Superclass for VTK's XML file writers.
 // .SECTION Description
-// vtkXMLWriter 
+// vtkXMLWriter provides methods implementing most of the
+// functionality needed to write VTK XML file formats.  Concrete
+// subclasses provide actual writer implementations calling upon this
+// functionality.
 
 #ifndef __vtkXMLWriter_h
 #define __vtkXMLWriter_h

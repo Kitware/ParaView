@@ -15,9 +15,17 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkXMLUnstructuredGridWriter - Write image data in an XML format.
+// .NAME vtkXMLUnstructuredGridWriter - Write VTK XML UnstructuredGrid files.
 // .SECTION Description
-// vtkXMLUnstructuredGridWriter 
+// vtkXMLUnstructuredGridWriter writes the VTK XML UnstructuredGrid
+// file format.  One unstructured grid input can be written into one
+// file in any number of streamed pieces (if supported by the rest of
+// the pipeline).  The standard extension for this writer's file
+// format is "vtu".  This writer is also used to write a single piece
+// of the parallel file format.
+
+// .SECTION See Also
+// vtkXMLPUnstructuredGridWriter
 
 #ifndef __vtkXMLUnstructuredGridWriter_h
 #define __vtkXMLUnstructuredGridWriter_h

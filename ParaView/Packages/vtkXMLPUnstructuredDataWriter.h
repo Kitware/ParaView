@@ -15,9 +15,11 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkXMLPUnstructuredDataWriter - Write image data in a parallel XML format.
+// .NAME vtkXMLPUnstructuredDataWriter - Superclass for PVTK XML unstructured data writers.
 // .SECTION Description
-// vtkXMLPUnstructuredDataWriter
+// vtkXMLPUnstructuredDataWriter provides PVTK XML writing
+// functionality that is common among all the parallel unstructured
+// data formats.
 
 #ifndef __vtkXMLPUnstructuredDataWriter_h
 #define __vtkXMLPUnstructuredDataWriter_h

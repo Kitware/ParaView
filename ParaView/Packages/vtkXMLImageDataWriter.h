@@ -15,9 +15,16 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkXMLImageDataWriter - Write image data in an XML format.
+// .NAME vtkXMLImageDataWriter - Write VTK XML ImageData files.
 // .SECTION Description
-// vtkXMLImageDataWriter 
+// vtkXMLImageDataWriter writes the VTK XML ImageData file format.
+// One image data input can be written into one file in any number of
+// streamed pieces.  The standard extension for this writer's file
+// format is "vti".  This writer is also used to write a single piece
+// of the parallel file format.
+
+// .SECTION See Also
+// vtkXMLPImageDataWriter
 
 #ifndef __vtkXMLImageDataWriter_h
 #define __vtkXMLImageDataWriter_h

@@ -15,9 +15,16 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkXMLPDataSetWriter - write any type of vtk dataset to an XML file
+// .NAME vtkXMLPDataSetWriter - Write any type of PVTK XML file.
 // .SECTION Description
-// vtkXMLPDataSetWriter 
+// vtkXMLPDataSetWriter is a wrapper around the PVTK XML file format
+// writers.  Given an input vtkDataSet, the correct writer is
+// automatically selected based on the type of input.
+
+// .SECTION See Also
+// vtkXMLPImageDataWriter vtkXMLPStructuredGridWriter
+// vtkXMLPRectilinearGridWriter vtkXMLPPolyDataWriter
+// vtkXMLPUnstructuredGridWriter
 
 #ifndef __vtkXMLPDataSetWriter_h
 #define __vtkXMLPDataSetWriter_h

@@ -15,9 +15,17 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkXMLPStructuredGridWriter - Write image data in a parallel XML format.
+// .NAME vtkXMLPStructuredGridWriter - Write PVTK XML StructuredGrid files.
 // .SECTION Description
-// vtkXMLPStructuredGridWriter
+// vtkXMLPStructuredGridWriter writes the PVTK XML StructuredGrid
+// file format.  One structured grid input can be written into a
+// parallel file format with any number of pieces spread across files.
+// The standard extension for this writer's file format is "pvts".
+// This writer uses vtkXMLStructuredGridWriter to write the individual
+// piece files.
+
+// .SECTION See Also
+// vtkXMLStructuredGridWriter
 
 #ifndef __vtkXMLPStructuredGridWriter_h
 #define __vtkXMLPStructuredGridWriter_h

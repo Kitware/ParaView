@@ -15,9 +15,10 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkXMLPStructuredDataWriter - Write image data in a parallel XML format.
+// .NAME vtkXMLPStructuredDataWriter - Superclass for PVTK XML structured data writers.
 // .SECTION Description
-// vtkXMLPStructuredDataWriter
+// vtkXMLPStructuredDataWriter provides PVTK XML writing functionality
+// that is common among all the parallel structured data formats.
 
 #ifndef __vtkXMLPStructuredDataWriter_h
 #define __vtkXMLPStructuredDataWriter_h

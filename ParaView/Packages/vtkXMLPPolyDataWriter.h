@@ -15,9 +15,16 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkXMLPPolyDataWriter - Write image data in a parallel XML format.
+// .NAME vtkXMLPPolyDataWriter - Write PVTK XML PolyData files.
 // .SECTION Description
-// vtkXMLPPolyDataWriter
+// vtkXMLPPolyDataWriter writes the PVTK XML PolyData file format.
+// One poly data input can be written into a parallel file format with
+// any number of pieces spread across files.  The standard extension
+// for this writer's file format is "pvtp".  This writer uses
+// vtkXMLPolyDataWriter to write the individual piece files.
+
+// .SECTION See Also
+// vtkXMLPolyDataWriter
 
 #ifndef __vtkXMLPPolyDataWriter_h
 #define __vtkXMLPPolyDataWriter_h

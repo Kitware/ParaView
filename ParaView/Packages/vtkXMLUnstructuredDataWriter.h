@@ -15,9 +15,10 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkXMLUnstructuredDataWriter - Write image data in an XML format.
+// .NAME vtkXMLUnstructuredDataWriter - Superclass for VTK XML unstructured data writers.
 // .SECTION Description
-// vtkXMLUnstructuredDataWriter 
+// vtkXMLUnstructuredDataWriter provides VTK XML writing functionality
+// that is common among all the unstructured data formats.
 
 #ifndef __vtkXMLUnstructuredDataWriter_h
 #define __vtkXMLUnstructuredDataWriter_h

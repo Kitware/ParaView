@@ -15,9 +15,16 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkXMLRectilinearGridWriter - Write rectilinear grid in an XML format.
+// .NAME vtkXMLRectilinearGridWriter - Write VTK XML RectilinearGrid files.
 // .SECTION Description
-// vtkXMLRectilinearGridWriter 
+// vtkXMLRectilinearGridWriter writes the VTK XML RectilinearGrid
+// file format.  One rectilinear grid input can be written into one
+// file in any number of streamed pieces.  The standard extension for
+// this writer's file format is "vtr".  This writer is also used to
+// write a single piece of the parallel file format.
+
+// .SECTION See Also
+// vtkXMLPRectilinearGridWriter
 
 #ifndef __vtkXMLRectilinearGridWriter_h
 #define __vtkXMLRectilinearGridWriter_h

@@ -15,9 +15,12 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkXMLPDataWriter - Write image data in a parallel XML format.
+// .NAME vtkXMLPDataWriter - Write data in a parallel XML format.
 // .SECTION Description
-// vtkXMLPDataWriter
+// vtkXMLPDataWriter is the superclass for all XML parallel data set
+// writers.  It provides functionality needed for writing parallel
+// formats, such as the selection of which writer writes the summary
+// file and what range of pieces are assigned to each serial writer.
 
 #ifndef __vtkXMLPDataWriter_h
 #define __vtkXMLPDataWriter_h

@@ -15,9 +15,10 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkXMLStructuredDataWriter - Write image data in an XML format.
+// .NAME vtkXMLStructuredDataWriter - Superclass for VTK XML structured data writers.
 // .SECTION Description
-// vtkXMLStructuredDataWriter 
+// vtkXMLStructuredDataWriter provides VTK XML writing functionality that
+// is common among all the structured data formats.
 
 #ifndef __vtkXMLStructuredDataWriter_h
 #define __vtkXMLStructuredDataWriter_h

@@ -15,9 +15,16 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkXMLStructuredGridWriter - Write rectilinear grid in an XML format.
+// .NAME vtkXMLStructuredGridWriter - Write VTK XML StructuredGrid files.
 // .SECTION Description
-// vtkXMLStructuredGridWriter 
+// vtkXMLStructuredGridWriter writes the VTK XML StructuredGrid file
+// format.  One structured grid input can be written into one file in
+// any number of streamed pieces.  The standard extension for this
+// writer's file format is "vts".  This writer is also used to write a
+// single piece of the parallel file format.
+
+// .SECTION See Also
+// vtkXMLPStructuredGridWriter
 
 #ifndef __vtkXMLStructuredGridWriter_h
 #define __vtkXMLStructuredGridWriter_h

@@ -15,9 +15,17 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkXMLPUnstructuredGridWriter - Write image data in a parallel XML format.
+// .NAME vtkXMLPUnstructuredGridWriter - Write PVTK XML UnstructuredGrid files.
 // .SECTION Description
-// vtkXMLPUnstructuredGridWriter
+// vtkXMLPUnstructuredGridWriter writes the PVTK XML UnstructuredGrid
+// file format.  One unstructured grid input can be written into a
+// parallel file format with any number of pieces spread across files.
+// The standard extension for this writer's file format is "pvtu".
+// This writer uses vtkXMLUnstructuredGridWriter to write the
+// individual piece files.
+
+// .SECTION See Also
+// vtkXMLUnstructuredGridWriter
 
 #ifndef __vtkXMLPUnstructuredGridWriter_h
 #define __vtkXMLPUnstructuredGridWriter_h
