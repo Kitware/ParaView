@@ -36,10 +36,16 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 int vtkPVScalarBarCommand(ClientData cd, Tcl_Interp *interp,
                           int argc, char *argv[]);
 
+//----------------------------------------------------------------------------
 vtkPVScalarBar::vtkPVScalarBar()
 {
   this->CommandFunction = vtkPVScalarBarCommand;
   this->ScalarBar = vtkScalarBarActor::New();
+  this->ScalarBar->GetPositionCoordinate()->
+    SetCoordinateSystemToNormalizedViewport();
+  this->ScalarBar->GetPositionCoordinate()->
+    SetValue(0.9, 0.1);
+  this->ScalarBar->SetWidth(0.06);
   this->DataNotebookButton = vtkKWPushButton::New();
   this->OrientationMenu = vtkPVMenuButton::New();
   this->VisibilityButton = vtkKWCheckButton::New();
@@ -49,6 +55,7 @@ vtkPVScalarBar::vtkPVScalarBar()
   this->Visibility = 1;
 }
 
+//----------------------------------------------------------------------------
 vtkPVScalarBar::~vtkPVScalarBar()
 {
   this->ScalarBar->Delete();
@@ -67,11 +74,13 @@ vtkPVScalarBar::~vtkPVScalarBar()
   this->Properties = NULL;
 }
 
+//----------------------------------------------------------------------------
 vtkPVScalarBar *vtkPVScalarBar::New()
 {
   return new vtkPVScalarBar();
 }
 
+//----------------------------------------------------------------------------
 void vtkPVScalarBar::Clone(vtkPVApplication *pvApp)
 {
   if (this->Application)
@@ -79,15 +88,16 @@ void vtkPVScalarBar::Clone(vtkPVApplication *pvApp)
     vtkErrorMacro("Application has already been set.");
     }
   this->SetApplication(pvApp);
-
+  
   // Clone this object on every other process.
   pvApp->BroadcastScript("%s %s", this->GetClassName(), this->GetTclName());
-
+  
   // The application is needed by the clones to send scalar ranges back.
   pvApp->BroadcastScript("%s SetApplication %s", this->GetTclName(),
 			 pvApp->GetTclName());
 }
 
+//----------------------------------------------------------------------------
 void vtkPVScalarBar::CreateProperties()
 {
   const char *scalarBarPage;
@@ -115,10 +125,26 @@ void vtkPVScalarBar::CreateProperties()
   this->OrientationMenu->AddCommand("Vertical", this,
                                     "SetOrientationToVertical");
   
-  this->Script("pack %s %s", this->DataNotebookButton->GetWidgetName(),
-               this->OrientationMenu->GetWidgetName());
+  this->VisibilityButton->SetParent(this->Properties);
+  this->VisibilityButton->Create(this->Application, "-text Visibility");
+  this->VisibilityButton->SetCommand(this, "SetScalarBarVisibility");
+  this->VisibilityButton->SetState(this->ScalarBar->GetVisibility());
+  
+  this->TitleEntry->SetParent(this->Properties);
+  this->TitleEntry->Create(this->Application);
+  this->TitleEntry->SetLabel("Scalar Bar Title:");
+  this->Script("bind %s <KeyPress-Return> {%s SetScalarBarTitle}",
+                this->TitleEntry->GetEntry()->GetWidgetName(),
+               this->GetTclName());
+  
+  this->Script("pack %s %s %s %s",
+               this->DataNotebookButton->GetWidgetName(),
+               this->OrientationMenu->GetWidgetName(),
+               this->VisibilityButton->GetWidgetName(),
+               this->TitleEntry->GetWidgetName());
 }
 
+//----------------------------------------------------------------------------
 void vtkPVScalarBar::ShowProperties()
 {
   vtkKWWindow *pw = this->View->GetParentWindow();
@@ -137,10 +163,32 @@ void vtkPVScalarBar::ShowProperties()
                this->Notebook->GetWidgetName());
   this->View->PackProperties();
 }
-
+  
+//----------------------------------------------------------------------------
 vtkProp *vtkPVScalarBar::GetProp()
 {
   return this->ScalarBar;
+}
+
+//----------------------------------------------------------------------------
+void vtkPVScalarBar::SetScalarBarTitle()
+{
+  this->ScalarBar->SetTitle(this->TitleEntry->GetValue());
+  this->GetView()->Render();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVScalarBar::SetScalarBarVisibility()
+{
+  if (this->VisibilityButton->GetState())
+    {
+    this->VisibilityOn();
+    }
+  else
+    {
+    this->VisibilityOff();
+    }
+  this->GetView()->Render();
 }
 
 //----------------------------------------------------------------------------
@@ -180,9 +228,15 @@ void vtkPVScalarBar::SetOrientationToHorizontal()
 void vtkPVScalarBar::SetOrientationToVertical()
 {
   float tmp;
+  float *pos;
   
   if (this->ScalarBar->GetOrientation() == VTK_ORIENT_HORIZONTAL)
     {
+    pos = this->ScalarBar->GetPosition();
+    this->ScalarBar->GetPositionCoordinate()->
+      SetCoordinateSystemToNormalizedViewport();
+    this->ScalarBar->GetPositionCoordinate()->
+      SetValue(1.0 - 2*pos[0], pos[1]);
     tmp = this->ScalarBar->GetHeight();
     this->ScalarBar->SetHeight(this->ScalarBar->GetWidth());
     this->ScalarBar->SetWidth(tmp);

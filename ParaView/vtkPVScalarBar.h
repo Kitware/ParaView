@@ -87,6 +87,16 @@ public:
   int GetVisibility();
   vtkBooleanMacro(Visibility, int);
   
+  // Description:
+  // This method is a callback from the checkbutton that controls the
+  // visibility of the PVScalarBar.
+  void SetScalarBarVisibility();
+  
+  // Description:
+  // This method is a callback from the entry box that controls the
+  // title of the PVScalarBar.
+  void SetScalarBarTitle();
+  
 protected:
   vtkPVScalarBar();
   ~vtkPVScalarBar();

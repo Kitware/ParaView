@@ -67,7 +67,7 @@ public:
   char *GetValue();
   int GetValueAsInt();
   float GetValueAsFloat();
-  
+
 protected:
   vtkKWLabeledEntry();
   ~vtkKWLabeledEntry();

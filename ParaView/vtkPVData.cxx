@@ -35,6 +35,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkPVAssignment.h"
 #include "vtkPVApplication.h"
 #include "vtkPVActorComposite.h"
+#include "vtkPVScalarBar.h"
 #include "vtkPVMenuButton.h"
 #include "vtkElevationFilter.h"
 #include "vtkSingleContourFilter.h"
@@ -58,9 +59,11 @@ vtkPVData::vtkPVData()
   this->Assignment = NULL;
 
   this->ActorCompositeButton = vtkKWPushButton::New();
-  
+  this->ScalarBarButton = vtkKWPushButton::New();
+
   // This is initialized in "Clone();"
   this->ActorComposite = NULL;
+  this->ScalarBar = NULL;
 
   this->PVSourceCollection = vtkPVSourceCollection::New();
 }
@@ -84,6 +87,15 @@ vtkPVData::~vtkPVData()
   this->ActorCompositeButton->Delete();
   this->ActorCompositeButton = NULL;
 
+  if (this->ScalarBar)
+    {
+    this->ScalarBar->Delete();
+    this->ScalarBar = NULL;
+    }
+  
+  this->ScalarBarButton->Delete();
+  this->ScalarBarButton = NULL;
+  
   this->PVSourceCollection->Delete();
   this->PVSourceCollection = NULL;  
 }
@@ -117,6 +129,12 @@ void vtkPVData::Clone(vtkPVApplication *pvApp)
   this->SetActorComposite(c);
   c->Delete();
 
+  vtkPVScalarBar *sb;
+  sb = vtkPVScalarBar::New();
+  sb->Clone(pvApp);
+  this->SetScalarBar(sb);
+  sb->Delete();
+
   // What about deleting the cloned composites?
 }
 
@@ -145,6 +163,9 @@ int vtkPVData::Create(char *args)
     {
     this->Script("%s entryconfigure 3 -state disabled",
 		 this->FiltersMenuButton->GetMenu()->GetWidgetName());
+    // If there are not point scalars, the scalar bar should not be
+    // visible either.
+    this->GetScalarBar()->VisibilityOff();
     }
   else
     {
@@ -166,7 +187,12 @@ int vtkPVData::Create(char *args)
   this->ActorCompositeButton->Create(this->Application, "");
   this->ActorCompositeButton->SetLabel("Get Actor Composite");
   this->ActorCompositeButton->SetCommand(this, "ShowActorComposite");
-  this->Script("pack %s", this->ActorCompositeButton->GetWidgetName());
+  this->ScalarBarButton->SetParent(this);
+  this->ScalarBarButton->Create(this->Application, "");
+  this->ScalarBarButton->SetLabel("Get Scalar Bar Parameters");
+  this->ScalarBarButton->SetCommand(this, "ShowScalarBarParameters");
+  this->Script("pack %s %s", this->ActorCompositeButton->GetWidgetName(),
+               this->ScalarBarButton->GetWidgetName());
 
   return 1;
 }
@@ -176,6 +202,13 @@ void vtkPVData::ShowActorComposite()
 {
   this->GetActorComposite()->ShowProperties();
 }
+
+//----------------------------------------------------------------------------
+void vtkPVData::ShowScalarBarParameters()
+{
+  this->GetScalarBar()->ShowProperties();
+}
+
 
 //----------------------------------------------------------------------------
 void vtkPVData::Contour()
@@ -582,9 +615,47 @@ void vtkPVData::SetActorComposite(vtkPVActorComposite *c)
 }
 
 //----------------------------------------------------------------------------
+void vtkPVData::SetScalarBar(vtkPVScalarBar *sb)
+{
+  vtkPVApplication *pvApp = this->GetPVApplication();
+
+  if (this->ScalarBar == sb)
+    {
+    return;
+    }
+  if (sb == NULL)
+    {
+    vtkErrorMacro("You should not be setting a NULL scalar bar.");
+    return;
+    }
+  this->Modified();
+  
+  // Broadcast to all satellite processes.
+  if (pvApp && pvApp->GetController()->GetLocalProcessId() == 0)
+    {
+    pvApp->BroadcastScript("%s SetScalarBar %s", this->GetTclName(), 
+			                     sb->GetTclName());
+    }
+  
+  if (this->ScalarBar)
+    {
+    this->ScalarBar->UnRegister(this);
+    this->ScalarBar = NULL;
+    }
+  sb->Register(this);
+  this->ScalarBar = sb;
+  this->ScalarBar->SetPVData(this);
+}
+
+//----------------------------------------------------------------------------
 vtkPVActorComposite* vtkPVData::GetActorComposite()
 {
   return this->ActorComposite;
+}
+
+vtkPVScalarBar *vtkPVData::GetScalarBar()
+{
+  return this->ScalarBar;
 }
 
 //----------------------------------------------------------------------------
