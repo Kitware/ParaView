@@ -35,7 +35,9 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 #include "vtkKWWindow.h"
 #include "vtkPVRenderView.h"
+class vtkKWNotebook;
 class vtkKWToolbar;
+class vtkKWScale;
 
 
 class VTK_EXPORT vtkPVWindow : public vtkKWWindow
@@ -62,21 +64,33 @@ public:
   // Access to the RenderView.
   vtkGetObjectMacro(MainView, vtkPVRenderView);
 
+  // Description:
+  // Properties menu call back.
+  void ShowMainNotebook();  
+  
+  void IsoValueChanged();
+  
 protected:
   vtkPVWindow();
   ~vtkPVWindow();
   vtkPVWindow(const vtkPVWindow&) {};
   void operator=(const vtkPVWindow&) {};
 
-  void SetupTest();
+  void SetupCone();
   void SetupVolumeIso();
-
+  void CreateMainNotebook();
+  
   vtkPVRenderView *MainView;
   vtkKWWidget *RetrieveMenu;
   vtkKWWidget *CreateMenu;
 
   vtkKWToolbar *Toolbar;
   vtkKWWidget *ResetCameraButton;
+  
+  vtkKWNotebook *MainNotebook;
+  int MainNotebookCreated;
+  
+  vtkKWScale *IsoScale;
 };
 
 

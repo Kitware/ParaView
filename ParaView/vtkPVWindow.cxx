@@ -31,6 +31,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkOutlineFilter.h"
 #include "vtkObjectFactory.h"
 #include "vtkKWDialog.h"
+#include "vtkKWNotebook.h"
 
 #include "vtkInteractorStylePlaneSource.h"
 #include "vtkInteractorStyleCamera.h"
@@ -41,6 +42,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkSynchronizedTemplates3D.h"
 #include "vtkPolyDataMapper.h"
 #include "vtkActor.h"
+#include "vtkKWScale.h"
 
 
 //----------------------------------------------------------------------------
@@ -67,6 +69,9 @@ vtkPVWindow::vtkPVWindow()
   this->CreateMenu = vtkKWWidget::New();
   this->Toolbar = vtkKWToolbar::New();
   this->ResetCameraButton = vtkKWWidget::New();
+  this->MainNotebook = vtkKWNotebook::New();
+  this->MainNotebookCreated = 0;
+  this->IsoScale = vtkKWScale::New();
 }
 
 //----------------------------------------------------------------------------
@@ -76,6 +81,14 @@ vtkPVWindow::~vtkPVWindow()
   this->Toolbar = NULL;
   this->ResetCameraButton->Delete();
   this->ResetCameraButton = NULL;
+  
+  this->MainNotebook->SetParent(NULL);
+  this->MainNotebook->Delete();
+  this->MainNotebook = NULL;
+
+  this->IsoScale->SetParent(NULL);
+  this->IsoScale->Delete();
+  this->IsoScale = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -150,15 +163,73 @@ void vtkPVWindow::Create(vtkKWApplication *app, char *args)
   this->Script( "wm deiconify %s", this->GetWidgetName());
 
   // Setup an interactor style.
-  //this->SetupTest();
+  //this->SetupCone();
   this->SetupVolumeIso();
 
 }
 
+//----------------------------------------------------------------------------
+void vtkPVWindow::ShowMainNotebook()
+{
+  // make sure we have an applicaiton
+  if (!this->Application)
+    {
+    vtkErrorMacro("attempt to update properties without an application set");
+    }
+  
+  // make sure the variable is set, otherwise set it
+  this->GetMenuProperties()->CheckRadioButton(
+    this->GetMenuProperties(),"Radio",11);
+  
+  // unpack any current children
+  this->Script("catch {eval pack forget [pack slaves %s]}",
+               this->GetPropertiesParent()->GetWidgetName());
+
+  // do we need to create the Notebook ?
+  if ( ! this->MainNotebookCreated)
+    {
+    this->CreateMainNotebook();
+    }
+
+  this->Script("pack %s -pady 2 -padx 2 -fill both -expand yes -anchor n",
+               this->MainNotebook->GetWidgetName());
+}
 
 //----------------------------------------------------------------------------
-// Setup the pipeline
-void vtkPVWindow::SetupTest()
+void vtkPVWindow::CreateMainNotebook()
+{
+  vtkKWApplication *app = this->Application;
+
+  if (this->MainNotebookCreated)
+    {  
+    return;
+    }
+  this->MainNotebookCreated = 1;
+  
+  this->MainNotebook->SetParent(this->GetPropertiesParent());
+  this->MainNotebook->Create(this->Application,"");
+  this->MainNotebook->AddPage("Vol");
+  this->MainNotebook->AddPage("Iso");
+  this->MainNotebook->AddPage("Cut");
+  
+  this->Script("pack %s -pady 2 -padx 2 -fill both -expand yes -anchor n",
+               this->MainNotebook->GetWidgetName());
+  this->MainNotebook->Raise("Iso");  
+  
+  this->IsoScale->SetParent(this->MainNotebook->GetFrame("Iso"));
+  this->IsoScale->Create(this->Application, "");
+  this->IsoScale->SetRange(0, 2000);
+  this->IsoScale->SetValue(1120);
+  this->Script("pack %s -pady 2 -padx 2 -fill x -expand yes",
+               this->IsoScale->GetWidgetName());
+  this->IsoScale->SetCommand(this, "IsoValueChanged");
+}
+
+
+
+//----------------------------------------------------------------------------
+// Setup a cone
+void vtkPVWindow::SetupCone()
 {
   vtkPVApplication *pvApp = (vtkPVApplication *)this->Application;
   int id, num;
@@ -262,7 +333,36 @@ void vtkPVWindow::SetupVolumeIso()
   this->MainView->SetInteractorStyle(style);
   style->Delete();
   
+  // now add property options
+  char *rbv = 
+    this->GetMenuProperties()->CreateRadioButtonVariable(
+      this->GetMenuProperties(),"Radio");
+  this->GetMenuProperties()->AddRadioButton(11,"Main", rbv, this, "ShowMainNotebook");
+  delete [] rbv;
+  
+  this->ShowMainNotebook();
+  
   this->MainView->ResetCamera();
+}
+
+//----------------------------------------------------------------------------
+// Setup the pipeline
+void vtkPVWindow::IsoValueChanged()
+{
+  int id, num;
+  float val;
+  vtkPVApplication *pvApp = (vtkPVApplication *)this->Application;
+  
+  val = this->IsoScale->GetValue();
+  
+  // Tell each of the worker pipelines the new value.
+  num = pvApp->GetController()->GetNumberOfProcesses();
+  for (id = 1; id < num; ++id)
+    {
+    pvApp->RemoteScript(id, "Iso SetValue 0 %f", val);
+    }
+    
+  this->MainView->Render();
 }
 
 

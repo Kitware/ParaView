@@ -54,10 +54,10 @@ int vtkPVRenderSlaveCommand(ClientData cd, Tcl_Interp *interp,
 //----------------------------------------------------------------------------
 vtkPVRenderSlave::vtkPVRenderSlave()
 {
-  vtkMesaRenderWindow *mesaRenderWindow;
+  vtkPVMesaRenderWindow *mesaRenderWindow;
   vtkMesaRenderer *mesaRenderer;
 
-  mesaRenderWindow = vtkMesaRenderWindow::New();
+  mesaRenderWindow = vtkPVMesaRenderWindow::New();
   //mesaRenderWindow->DoubleBufferOff();
   //mesaRenderWindow->SwapBuffersOff();
   mesaRenderWindow->SetOffScreenRendering(1);
@@ -253,8 +253,17 @@ void vtkTreeComposite(vtkRenderWindow *renWin,
     } 
   else 
     {
-    localPdata = (float*)((vtkMesaRenderWindow *)renWin)-> \
-      GetRGBACharPixelData(0,0,windowSize[0]-1,windowSize[1]-1,0);    
+    // Condition is here until we fix the resize bug in vtkMesarenderWindow.
+    if (myId == 0)
+      {
+      localPdata = (float*)((vtkMesaRenderWindow *)renWin)-> \
+	GetRGBACharPixelData(0,0,windowSize[0]-1,windowSize[1]-1,0);    
+      }
+    else
+      {
+      localPdata = (float*)((vtkPVMesaRenderWindow *)renWin)-> \
+	GetRGBACharPixelData(0,0,windowSize[0]-1,windowSize[1]-1,0);    
+      }
     pdata_size = total_pixels;
     }
   

@@ -80,7 +80,7 @@ void vtkPVSlaveStart(vtkMultiProcessController *controller)
     }
   if (Vtkpatentedtcl_Init(interp) == TCL_ERROR) 
     {
-    cerr << "Init Contrib error\n";
+    cerr << "Init Patented error\n";
     }
 
   if (Vtkkwwidgetstcl_Init(interp) == TCL_ERROR) 
@@ -100,7 +100,7 @@ void vtkPVSlaveStart(vtkMultiProcessController *controller)
     }
   int    error;
   vtkPVSlave *slave = (vtkPVSlave *)(vtkTclGetPointerFromObject("Slave","vtkPVSlave",interp,error));
-  cerr << "Interp: " << interp << " has slave " << slave << endl;
+  //cerr << "Interp: " << interp << " has slave " << slave << endl;
   
   if (slave == NULL)
     {
@@ -190,7 +190,7 @@ void vtkPVSlave::SimpleScript(char *event)
   vtkOutputWindow::GetInstance()->DisplayText("\n");
 #endif
   
-  cerr << this->Controller->GetLocalProcessId() << ": interp (" << this->Interp << "): " << event << endl;  
+  //cerr << this->Controller->GetLocalProcessId() << ": interp (" << this->Interp << "): " << event << endl;  
   
   if (Tcl_Eval(this->Interp, event) != TCL_OK)
     {
