@@ -32,7 +32,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectWidget);
-vtkCxxRevisionMacro(vtkPVSelectWidget, "1.33");
+vtkCxxRevisionMacro(vtkPVSelectWidget, "1.34");
 
 int vtkPVSelectWidgetCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -190,6 +190,7 @@ void vtkPVSelectWidget::AcceptInternal(vtkClientServerID sourceId)
       vtkClientServerID id = vtkPVObjectWidget::SafeDownCast(pvwp->GetWidget())
         ->GetObjectByName(this->GetCurrentVTKValue());
       this->Property->SetObjectID(id);
+      this->Property->SetString(this->GetCurrentVTKValue());
       }
     else
       {
