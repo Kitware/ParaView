@@ -54,7 +54,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVSourcesNavigationWindow );
-vtkCxxRevisionMacro(vtkPVSourcesNavigationWindow, "1.7.2.5");
+vtkCxxRevisionMacro(vtkPVSourcesNavigationWindow, "1.7.2.6");
 
 //-----------------------------------------------------------------------------
 vtkPVSourcesNavigationWindow::vtkPVSourcesNavigationWindow()
@@ -373,7 +373,7 @@ void vtkPVSourcesNavigationWindow::ExecuteCommandOnModule(
 char* vtkPVSourcesNavigationWindow::GetTextRepresentation(vtkPVSource* comp)
 {
   char *buffer;
-  if (!comp->GetDescription())
+  if (!comp->GetLabel())
     {
     buffer = new char [strlen(comp->GetName()) + 1];
     sprintf(buffer, "%s", comp->GetName());
@@ -382,17 +382,17 @@ char* vtkPVSourcesNavigationWindow::GetTextRepresentation(vtkPVSource* comp)
     {
     if (this->AlwaysShowName && comp->GetName() && *comp->GetName())
       {
-      buffer = new char [strlen(comp->GetDescription())
+      buffer = new char [strlen(comp->GetLabel())
                         + 2
                         + strlen(comp->GetName()) 
                         + 1
                         + 1];
-      sprintf(buffer, "%s (%s)", comp->GetDescription(), comp->GetName());
+      sprintf(buffer, "%s (%s)", comp->GetLabel(), comp->GetName());
       }
     else
       {
-      buffer = new char [strlen(comp->GetDescription()) + 1];
-      sprintf(buffer, "%s", comp->GetDescription());
+      buffer = new char [strlen(comp->GetLabel()) + 1];
+      sprintf(buffer, "%s", comp->GetLabel());
       }
     }
   return buffer;

@@ -53,7 +53,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectCustomReader);
-vtkCxxRevisionMacro(vtkPVSelectCustomReader, "1.1");
+vtkCxxRevisionMacro(vtkPVSelectCustomReader, "1.1.2.1");
 
 //----------------------------------------------------------------------------
 vtkPVSelectCustomReader::vtkPVSelectCustomReader() 
@@ -122,10 +122,10 @@ vtkPVReaderModule* vtkPVSelectCustomReader::SelectReader(vtkPVWindow* win,
   while(!it->IsDoneWithTraversal())
     {
     vtkPVReaderModule* rm = 0;
-    if ( it->GetData(rm) == VTK_OK && rm && rm->GetDescription() )
+    if ( it->GetData(rm) == VTK_OK && rm && rm->GetLabel() )
       {
       ostrstream str;
-      str << rm->GetDescription() << " Reader" << ends;
+      str << rm->GetLabel() << " Reader" << ends;
       listbox->AppendUnique(str.str());
       str.rdbuf()->freeze(0);
       }

@@ -52,7 +52,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVFileEntry);
-vtkCxxRevisionMacro(vtkPVFileEntry, "1.19.2.2");
+vtkCxxRevisionMacro(vtkPVFileEntry, "1.19.2.3");
 
 //----------------------------------------------------------------------------
 vtkPVFileEntry::vtkPVFileEntry()
@@ -239,7 +239,7 @@ void vtkPVFileEntry::Accept()
     const char* desc = rm->RemovePath(fname);
     if (desc)
       {
-      rm->SetDescriptionNoTrace(desc);
+      rm->SetLabelNoTrace(desc);
       }
     }
 
