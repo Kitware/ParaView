@@ -79,7 +79,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.283");
+vtkCxxRevisionMacro(vtkPVSource, "1.284");
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -481,8 +481,12 @@ void vtkPVSource::GatherDataInformation()
     this->DataInformation->AddInformation(part->GetDataInformation());
     }
   this->DataInformationValid = 1;
-  // This will cause a recursive call, but the Vvlid flag will terminate it.
-  this->GetPVOutput()->UpdateProperties();
+
+  if (this->GetPVOutput())
+    {
+    // This will cause a recursive call, but the Valid flag will terminate it.
+    this->GetPVOutput()->UpdateProperties();
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -2600,7 +2604,7 @@ void vtkPVSource::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVSource ";
-  this->ExtractRevision(os,"$Revision: 1.283 $");
+  this->ExtractRevision(os,"$Revision: 1.284 $");
 }
 
 //----------------------------------------------------------------------------
