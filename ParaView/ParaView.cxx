@@ -222,6 +222,7 @@ int main(int argc, char *argv[])
   controller->SetSingleMethod(Process_Init, (void *)(&pvArgs));
   controller->SingleMethodExecute();
   
+  controller->Finalize();
   controller->Delete();
   
   return 0;
