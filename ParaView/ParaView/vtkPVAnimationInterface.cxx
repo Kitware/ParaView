@@ -180,7 +180,7 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterface);
-vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.92");
+vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.93");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterface,ControlledWidget, vtkPVWidget);
 
@@ -1043,7 +1043,7 @@ void vtkPVAnimationInterface::Play()
       this->SetCurrentTime(t);
       // The stop button can be used here because SetCurrentTime()
       // makes a call to "update"
-      int speed = this->AnimationSpeedScale->GetValue();
+      int speed = static_cast<int>(this->AnimationSpeedScale->GetValue());
       int dev = 10;
       if ( speed < dev && speed > 0 ) 
         {

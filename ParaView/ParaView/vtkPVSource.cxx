@@ -82,7 +82,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.323");
+vtkCxxRevisionMacro(vtkPVSource, "1.324");
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -2408,7 +2408,6 @@ int vtkPVSource::InitializeData()
   char dataName[1024];
   int outputCount = 0;
   vtkPVPart* part;
-  vtkPVSource* input = this->GetPVInput(0);
   vtkPVData* pvd;
 
   // Create the output.

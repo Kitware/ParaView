@@ -77,7 +77,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVApplication.h"
 #include "vtkPVColorMap.h"
 #include "vtkPVConfig.h"
-#include "vtkPVDataInformation.h"
 #include "vtkPVNumberOfOutputsInformation.h"
 #include "vtkPVProcessModule.h"
 #include "vtkPVSource.h"
@@ -104,7 +103,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.225");
+vtkCxxRevisionMacro(vtkPVData, "1.226");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -3168,7 +3167,6 @@ void vtkPVData::UpdatePointLabelObjects(const char *type, const char *name)
     }
 
   // if the mapper doesn't exist, make it 
-  vtkPVDataInformation* dataInfo = source->GetDataInformation();
   if (this->PointLabelMapperTclName == NULL) 
     {
     char mapperTclName[100];
