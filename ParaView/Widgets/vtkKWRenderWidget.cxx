@@ -41,11 +41,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkCornerAnnotation.h"
 #include "vtkKWApplication.h"
 #include "vtkKWEvent.h"
+#include "vtkKWRenderWidgetCallbackCommand.h"
 #include "vtkKWWindow.h"
 #include "vtkObjectFactory.h"
 #include "vtkProperty2D.h"
 #include "vtkRenderWindow.h"
 #include "vtkRenderer.h"
+#include "vtkRendererCollection.h"
 #include "vtkTextActor.h"
 #include "vtkTextProperty.h"
 
@@ -53,32 +55,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkWin32OpenGLRenderWindow.h"
 #endif
 
-vtkCxxRevisionMacro(vtkKWRenderWidget, "1.57");
-
-//----------------------------------------------------------------------------
-class vtkKWRenderWidgetObserver : public vtkCommand
-{
-public:
-  static vtkKWRenderWidgetObserver *New() 
-    {return new vtkKWRenderWidgetObserver;};
-
-  vtkKWRenderWidgetObserver()
-    {
-      this->KWRenderWidget = 0;
-    }
-
-  virtual void Execute(vtkObject* wdg, unsigned long event,  
-                       void* calldata)
-    {
-      if ( this->KWRenderWidget )
-        {
-        this->KWRenderWidget->ExecuteEvent(wdg, event, calldata);
-        this->AbortFlagOn();
-        }
-    }
-
-  vtkKWRenderWidget* KWRenderWidget;
-};
+vtkCxxRevisionMacro(vtkKWRenderWidget, "1.57.2.1");
 
 //----------------------------------------------------------------------------
 vtkKWRenderWidget::vtkKWRenderWidget()
@@ -87,7 +64,11 @@ vtkKWRenderWidget::vtkKWRenderWidget()
   this->VTKWidget->SetParent(this);
   
   this->Renderer = vtkRenderer::New();
+  this->Renderer->SetLayer(1);
+  this->OverlayRenderer = vtkRenderer::New();
   this->RenderWindow = vtkRenderWindow::New();
+  this->RenderWindow->SetNumberOfLayers(2);
+  this->RenderWindow->AddRenderer(this->OverlayRenderer);
   this->RenderWindow->AddRenderer(this->Renderer);
   
   this->Printing = 0;
@@ -105,13 +86,14 @@ vtkKWRenderWidget::vtkKWRenderWidget()
   this->CornerAnnotation->VisibilityOff();
 
   this->HeaderAnnotation = vtkTextActor::New();
+  this->HeaderAnnotation->SetNonLinearFontScale(0.7,10);
   this->HeaderAnnotation->GetTextProperty()->SetJustificationToCentered();
   this->HeaderAnnotation->GetTextProperty()->SetVerticalJustificationToTop();
   this->HeaderAnnotation->GetTextProperty()->ShadowOff();
   this->HeaderAnnotation->ScaledTextOn();
   this->HeaderAnnotation->GetPositionCoordinate()
     ->SetCoordinateSystemToNormalizedViewport();
-  this->HeaderAnnotation->GetPositionCoordinate()->SetValue(0.2, 0.88);
+  this->HeaderAnnotation->GetPositionCoordinate()->SetValue(0.2, 0.84);
   this->HeaderAnnotation->GetPosition2Coordinate()
     ->SetCoordinateSystemToNormalizedViewport();
   this->HeaderAnnotation->GetPosition2Coordinate()->SetValue(0.6, 0.1);
@@ -124,24 +106,48 @@ vtkKWRenderWidget::vtkKWRenderWidget()
     {
     cam->ParallelProjectionOn();
     }
-
+  this->OverlayRenderer->SetActiveCamera(cam);
   this->CollapsingRenders = 0;
   
-  this->Observer = vtkKWRenderWidgetObserver::New();
-  this->Observer->KWRenderWidget = this;
+  this->Observer = vtkKWRenderWidgetCallbackCommand::New();
   
-  this->RenderWindow->AddObserver(vtkCommand::CursorChangedEvent,
-                                  this->Observer);
-
+  this->PreviousRenderMode = vtkKWRenderWidget::STILL_RENDER;
 }
 
 //----------------------------------------------------------------------------
 vtkKWRenderWidget::~vtkKWRenderWidget()
 {
-  this->Renderer->Delete();
-  this->RenderWindow->Delete();
+  if (this->Observer)
+    {
+    this->Observer->Delete();
+    this->Observer = NULL;
+    }
+
+  if (this->Renderer)
+    {
+    this->Renderer->Delete();
+    this->Renderer = NULL;
+    }
+
+  if (this->OverlayRenderer)
+    {
+    this->OverlayRenderer->Delete();
+    this->OverlayRenderer = NULL;
+    }
+
+  if (this->RenderWindow)
+    {
+    this->RenderWindow->Delete();
+    this->RenderWindow = NULL;
+    }
+
   this->SetParentWindow(NULL);
-  this->VTKWidget->Delete();
+
+  if (this->VTKWidget)
+    {
+    this->VTKWidget->Delete();
+    this->VTKWidget = NULL;
+    }
   
   if (this->CornerAnnotation)
     {
@@ -149,12 +155,13 @@ vtkKWRenderWidget::~vtkKWRenderWidget()
     this->CornerAnnotation = NULL;
     }
 
-  this->HeaderAnnotation->Delete();
+  if (this->HeaderAnnotation)
+    {
+    this->HeaderAnnotation->Delete();
+    this->HeaderAnnotation = NULL;
+    }
   
   this->SetDistanceUnits(NULL);
-  
-  this->Observer->Delete();
-  this->Observer = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -275,7 +282,7 @@ void vtkKWRenderWidget::Create(vtkKWApplication *app, const char *args)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWRenderWidget::SetupBindings()
+void vtkKWRenderWidget::AddBindings()
 {
   // First remove the old one so that bindings don't get duplicated
 
@@ -294,6 +301,12 @@ void vtkKWRenderWidget::SetupBindings()
   
     this->Script("bind %s <Enter> {%s Enter %%x %%y}",
                  wname, tname);
+
+    this->Script("bind %s <FocusIn> {%s FocusInCallback}", 
+                 wname, tname);
+
+    this->Script("bind %s <FocusOut> {%s FocusOutCallback}", 
+                 wname, tname);
     }
 
   if (this->IsCreated())
@@ -302,7 +315,7 @@ void vtkKWRenderWidget::SetupBindings()
                  this->GetWidgetName(), tname);
     }
   
-  this->SetupInteractionBindings();
+  this->AddInteractionBindings();
 }
 
 //----------------------------------------------------------------------------
@@ -314,6 +327,9 @@ void vtkKWRenderWidget::RemoveBindings()
   
     this->Script("bind %s <Expose> {}", wname);
     this->Script("bind %s <Enter> {}", wname);
+
+    this->Script("bind %s <FocusIn> {}", wname);
+    this->Script("bind %s <FocusOut> {}", wname);
     }
 
   if (this->IsCreated())
@@ -325,7 +341,7 @@ void vtkKWRenderWidget::RemoveBindings()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWRenderWidget::SetupInteractionBindings()
+void vtkKWRenderWidget::AddInteractionBindings()
 {
   // First remove the old one so that bindings don't get duplicated
 
@@ -470,6 +486,18 @@ void vtkKWRenderWidget::Exposed()
 }
 
 //----------------------------------------------------------------------------
+void vtkKWRenderWidget::FocusInCallback()
+{
+  this->InvokeEvent(vtkKWEvent::FocusInEvent, NULL);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWRenderWidget::FocusOutCallback()
+{
+  this->InvokeEvent(vtkKWEvent::FocusOutEvent, NULL);
+}
+
+//----------------------------------------------------------------------------
 void vtkKWRenderWidget::Render()
 {
   if (this->CollapsingRenders)
@@ -514,6 +542,70 @@ const char* vtkKWRenderWidget::GetRenderModeAsString()
       return "Disabled";
     default:
       return "Unknown (error)";
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWRenderWidget::SetParentWindow(vtkKWWindow *window)
+{
+  if (this->ParentWindow == window)
+    {
+    return;
+    }
+
+  // Remove old observers 
+  // (some of them may use the parent window, to display progress for example)
+
+  if (this->ParentWindow)
+    {
+    this->RemoveObservers();
+    }
+
+  this->ParentWindow = window;
+
+  // Reinstall observers
+
+  if (this->ParentWindow)
+    {
+    this->AddObservers();
+    }
+  
+  this->Modified();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWRenderWidget::SetOffScreenRendering(int val)
+{
+  if (this->GetRenderWindow())
+    {
+    this->GetRenderWindow()->SetOffScreenRendering(val);
+    }
+  this->SetPrinting(val);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWRenderWidget::SetPrinting(int arg)
+{
+  if (arg == this->Printing)
+    {
+    return;
+    }
+
+  this->Printing = arg;
+  this->Modified();
+
+  if (this->Printing)
+    {
+    this->PreviousRenderMode = this->GetRenderMode();
+    this->SetRenderModeToSingle();
+    }
+  else
+    {
+    this->SetRenderMode(this->PreviousRenderMode);
+
+    // SetupPrint will call SetupMemoryRendering().
+    // As convenience, let's call ResumeScreenRendering()
+    this->ResumeScreenRendering();
     }
 }
 
@@ -569,18 +661,6 @@ void vtkKWRenderWidget::SetupPrint(RECT &rcDest, HDC ghdc,
 #endif
 
 //----------------------------------------------------------------------------
-void vtkKWRenderWidget::SetParentWindow(vtkKWWindow *window)
-{
-  if (this->ParentWindow == window)
-    {
-    return;
-    }
-  this->ParentWindow = window;
-  
-  this->Modified();
-}
-
-//----------------------------------------------------------------------------
 void* vtkKWRenderWidget::GetMemoryDC()
 {
 #ifdef _WIN32
@@ -626,45 +706,81 @@ void vtkKWRenderWidget::AddProp(vtkProp *prop)
 }
 
 //----------------------------------------------------------------------------
+void vtkKWRenderWidget::AddOverlayProp(vtkProp *prop)
+{
+  this->OverlayRenderer->AddProp(prop);
+}
+
+//----------------------------------------------------------------------------
 int vtkKWRenderWidget::HasProp(vtkProp *prop)
 {
-  return this->Renderer->GetProps()->IsItemPresent(prop);
+  if (this->Renderer->GetProps()->IsItemPresent(prop) ||
+      this->OverlayRenderer->GetProps()->IsItemPresent(prop))
+    {
+    return 1;
+    }
+  
+  return 0;
 }
 
 //----------------------------------------------------------------------------
 void vtkKWRenderWidget::RemoveProp(vtkProp *prop)
 {
+  // safe to call both, vtkViewport does a check first
   this->Renderer->RemoveProp(prop);
+  this->OverlayRenderer->RemoveProp(prop);
 }
 
 //----------------------------------------------------------------------------
 void vtkKWRenderWidget::RemoveAllProps()
 {
   this->Renderer->RemoveAllProps();
+  this->OverlayRenderer->RemoveAllProps();
 }
 
 //----------------------------------------------------------------------------
 void vtkKWRenderWidget::SetBackgroundColor(float r, float g, float b)
 {
+  float *color = this->GetBackgroundColor();
+  if (!color || (color[0] == r && color[1] == g && color[2] == b))
+    {
+    return;
+    }
+
   if (r < 0 || g < 0 || b < 0)
     {
     return;
     }
   
-  float *ff = this->GetBackgroundColor();
-  if (ff[0] == r && ff[1] == g && ff[2] == b)
+  vtkRendererCollection *renderers = this->RenderWindow->GetRenderers();
+  if (renderers)
     {
-    return;
+    renderers->InitTraversal();
+    vtkRenderer *renderer = renderers->GetNextItem();
+    while (renderer)
+      {
+      renderer->SetBackground(r, g, b);
+      renderer = renderers->GetNextItem();
+      }
     }
-  
-  this->Renderer->SetBackground(r, g, b);
+
   this->Render();
 }
 
 //----------------------------------------------------------------------------
 float* vtkKWRenderWidget::GetBackgroundColor()
 {
-  return this->Renderer->GetBackground();
+  vtkRendererCollection *renderers = this->RenderWindow->GetRenderers();
+  if (renderers)
+    {
+    renderers->InitTraversal();
+    vtkRenderer *renderer = renderers->GetNextItem();
+    if (renderer)
+      {
+      return renderer->GetBackground();
+      }
+    }
+  return NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -678,12 +794,6 @@ void vtkKWRenderWidget::Close()
     {
     this->GetCornerAnnotation()->ClearAllTexts();
     }
-
-  // Why should I hide those ?
-  /*
-  this->SetCornerAnnotationVisibility(0);
-  this->SetHeaderAnnotationVisibility(0);
-  */
 }
 
 //----------------------------------------------------------------------------
@@ -704,8 +814,7 @@ int vtkKWRenderWidget::GetCornerAnnotationVisibility()
 //----------------------------------------------------------------------------
 void vtkKWRenderWidget::SetCornerAnnotationVisibility(int v)
 {
-  if (!this->CornerAnnotation ||
-      this->GetCornerAnnotationVisibility() == v)
+  if (this->GetCornerAnnotationVisibility() == v)
     {
     return;
     }
@@ -715,7 +824,7 @@ void vtkKWRenderWidget::SetCornerAnnotationVisibility(int v)
     this->CornerAnnotation->VisibilityOn();
     if (!this->HasProp(this->CornerAnnotation))
       {
-      this->AddProp(this->CornerAnnotation);
+      this->AddOverlayProp(this->CornerAnnotation);
       }
     }
   else
@@ -733,12 +842,17 @@ void vtkKWRenderWidget::SetCornerAnnotationVisibility(int v)
 //----------------------------------------------------------------------------
 void vtkKWRenderWidget::SetCornerAnnotationColor(float r, float g, float b)
 {
+  float *color = this->GetCornerAnnotationColor();
+  if (!color || (color[0] == r && color[1] == g && color[2] == b))
+    {
+    return;
+    }
+
   if (this->CornerAnnotation && this->CornerAnnotation->GetTextProperty())
     {
-    float *rgb = this->CornerAnnotation->GetTextProperty()->GetColor();
-    if (rgb[0] != r || rgb[1] != g || rgb[2] != b)
+    this->CornerAnnotation->GetTextProperty()->SetColor(r, g, b);
+    if (this->GetCornerAnnotationVisibility())
       {
-      this->CornerAnnotation->GetTextProperty()->SetColor(r, g, b);
       this->Render();
       }
     }
@@ -771,8 +885,7 @@ int vtkKWRenderWidget::GetHeaderAnnotationVisibility()
 //----------------------------------------------------------------------------
 void vtkKWRenderWidget::SetHeaderAnnotationVisibility(int v)
 {
-  if (!this->HeaderAnnotation || 
-      this->GetHeaderAnnotationVisibility() == v)
+  if (this->GetHeaderAnnotationVisibility() == v)
     {
     return;
     }
@@ -782,7 +895,7 @@ void vtkKWRenderWidget::SetHeaderAnnotationVisibility(int v)
     this->HeaderAnnotation->VisibilityOn();
     if (!this->HasProp(this->HeaderAnnotation))
       {
-      this->AddProp(this->HeaderAnnotation);
+      this->AddOverlayProp(this->HeaderAnnotation);
       }
     }
   else
@@ -800,12 +913,17 @@ void vtkKWRenderWidget::SetHeaderAnnotationVisibility(int v)
 //----------------------------------------------------------------------------
 void vtkKWRenderWidget::SetHeaderAnnotationColor(float r, float g, float b)
 {
+  float *color = this->GetHeaderAnnotationColor();
+  if (!color || (color[0] == r && color[1] == g && color[2] == b))
+    {
+    return;
+    }
+
   if (this->HeaderAnnotation && this->HeaderAnnotation->GetTextProperty())
     {
-    float *rgb = this->HeaderAnnotation->GetTextProperty()->GetColor();
-    if (rgb[0] != r || rgb[1] != g || rgb[2] != b)
+    this->HeaderAnnotation->GetTextProperty()->SetColor(r, g, b);
+    if (this->GetHeaderAnnotationVisibility())
       {
-      this->HeaderAnnotation->GetTextProperty()->SetColor(r, g, b);
       this->Render();
       }
     }
@@ -869,61 +987,91 @@ void vtkKWRenderWidget::SetCollapsingRenders(int r)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWRenderWidget::ExecuteEvent(vtkObject*, unsigned long event,
-                                       void *par)
+void vtkKWRenderWidget::AddObservers()
 {
-  if ( event == vtkCommand::CursorChangedEvent )
+  this->Observer->SetRenderWidget(this);
+
+  if (this->RenderWindow)
     {
-    int val = *(static_cast<int*>(par));
-    const char* image = "left_ptr";
-    switch ( val ) 
-      {
-      case VTK_CURSOR_ARROW:
-        image = "arrow";
-        break;
-      case VTK_CURSOR_SIZENE:
+    this->RenderWindow->AddObserver(
+      vtkCommand::CursorChangedEvent, this->Observer);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWRenderWidget::RemoveObservers()
+{
+  this->Observer->SetRenderWidget(NULL);
+
+  if (this->RenderWindow)
+    {
+    this->RenderWindow->RemoveObservers(
+      vtkCommand::CursorChangedEvent, this->Observer);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWRenderWidget::ProcessEvent(vtkObject *vtkNotUsed(caller),
+                                     unsigned long event,
+                                     void *calldata)
+{
+  const char *cptr = 0;
+  
+  switch (event)
+    {
+    case vtkCommand::CursorChangedEvent:
+      cptr = "left_ptr";
+      switch (*(static_cast<int*>(calldata))) 
+        {
+        case VTK_CURSOR_ARROW:
+          cptr = "arrow";
+          break;
+        case VTK_CURSOR_SIZENE:
 #ifdef _WIN32
-        image = "size_ne_sw";
+          cptr = "size_ne_sw";
 #else
-        image = "top_right_corner";
+          cptr = "top_right_corner";
 #endif
-        break;
-      case VTK_CURSOR_SIZENW:
+          break;
+        case VTK_CURSOR_SIZENW:
 #ifdef _WIN32
-        image = "size_nw_se";
+          cptr = "size_nw_se";
 #else
-        image = "top_left_corner";
+          cptr = "top_left_corner";
 #endif
-        break;
-      case VTK_CURSOR_SIZESW:
+          break;
+        case VTK_CURSOR_SIZESW:
 #ifdef _WIN32
-        image = "size_ne_sw";
+          cptr = "size_ne_sw";
 #else
-        image = "bottom_left_corner";
+          cptr = "bottom_left_corner";
 #endif
-        break;
-      case VTK_CURSOR_SIZESE:
+          break;
+        case VTK_CURSOR_SIZESE:
 #ifdef _WIN32
-        image = "size_nw_se";
+          cptr = "size_nw_se";
 #else
-        image = "bottom_right_corner";
+          cptr = "bottom_right_corner";
 #endif
-        break;
-      case VTK_CURSOR_SIZENS:
-        image = "sb_v_double_arrow";
-        break;
-      case VTK_CURSOR_SIZEWE:
-        image = "sb_h_double_arrow";
-        break;
-      case VTK_CURSOR_SIZEALL:
-        image = "fleur";
-        break;
-      case VTK_CURSOR_HAND:
-        image = "hand2";
-        break;
-      }
-    this->Script("%s config -cursor %s", 
-                 this->GetParentWindow()->GetWidgetName(), image);
+          break;
+        case VTK_CURSOR_SIZENS:
+          cptr = "sb_v_double_arrow";
+          break;
+        case VTK_CURSOR_SIZEWE:
+          cptr = "sb_h_double_arrow";
+          break;
+        case VTK_CURSOR_SIZEALL:
+          cptr = "fleur";
+          break;
+        case VTK_CURSOR_HAND:
+          cptr = "hand2";
+          break;
+        }
+      if (this->GetParentWindow())
+        {
+        this->Script("%s config -cursor %s", 
+                     this->GetParentWindow()->GetWidgetName(), cptr);
+        }
     }
 }
 
@@ -936,7 +1084,7 @@ void vtkKWRenderWidget::UpdateEnableState()
 
   if (this->Enabled)
     {
-    this->SetupInteractionBindings();
+    this->AddInteractionBindings();
     }
   else
     {
@@ -971,4 +1119,3 @@ void vtkKWRenderWidget::PrintSelf(ostream& os, vtkIndent indent)
      << (this->DistanceUnits ? this->DistanceUnits : "(none)") << endl;
   os << indent << "EventIdentifier: " << this->EventIdentifier << endl;
 }
-

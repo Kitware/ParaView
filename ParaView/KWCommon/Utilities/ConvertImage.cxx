@@ -186,7 +186,7 @@ int main(int argc, char **argv)
                     data_ptr, nb_of_bytes, 
                     Z_BEST_COMPRESSION) != Z_OK)
         {
-        cerr << "Error: zlib encoding failed." << endl;
+        cerr << "Error: zlib compress2 failed." << endl;
         delete [] zlib_buffer;
         pr->Delete();
         flip->Delete();
@@ -206,7 +206,7 @@ int main(int argc, char **argv)
         vtkBase64Utilities::Encode(data_ptr, nb_of_bytes, base64_buffer);
       if (nb_of_bytes == 0)
         {
-        cerr << "Error: base64 encoding failed." << endl;
+        cerr << "Error: base64 coding failed." << endl;
         if (zlib)
           {
           delete [] zlib_buffer;

@@ -110,19 +110,35 @@ public:
   
   // Description:
   // Transform the string to lowercase (inplace).
+  // ToLowerFirst() will only lowercase the first letter of each word
   // Return a pointer to the string (i.e. 'str').
   static char* ToLower(char* str);
+  static char* ToLowerFirst(char* str);
 
   // Description:
   // Transform the string to uppercase (inplace).
+  // ToUpperFirst() will only uppercase the first letter of each word
   // Return a pointer to the string (i.e. 'str').
   static char* ToUpper(char* str);
+  static char* ToUpperFirst(char* str);
 
   // Description:
   // Replace a character or some characters in the string (inplace).
   // Return a pointer to the string (i.e. 'str').
   static char* ReplaceChar(char* str, char toreplace, char replacement);
-  static char* ReplaceChars(char* str, const char *toreplace, char replacement);
+  static char* ReplaceChars(char* str, const char *toreplace,char replacement);
+
+  // Description:
+  // Remove some characters from a string.
+  // Return a pointer to a new allocated string.
+  static char* RemoveChars(const char* str, const char *toremove);
+
+  // Description:
+  // Remove all but some characters from a string.
+  // RemoveAllButUpperHex remove all but 0->9, A->F
+  // Return a pointer to a new allocated string.
+  static char* RemoveAllButChars(const char* str, const char *tokeep);
+  static char* RemoveAllButUpperHex(const char* str);
 
   // Description:
   // Return the number of occurence of a char.

@@ -62,18 +62,6 @@ public:
   vtkGetObjectMacro(Entry, vtkKWEntry);
   
   // Description:
-  // Convenience method to Set/Get the value of the entry in a few different
-  // formats. In the SetValue method with float, the second argument is the
-  // number of decimal places to display.
-  void SetValue(const char *);
-  void SetValue(int a);
-  void SetValue(float a);
-  void SetValue(float f,int size);
-  char *GetValue();
-  int GetValueAsInt();
-  float GetValueAsFloat();
-
-  // Description:
   // Set the string that enables balloon help for this widget.
   // Override to pass down to children.
   virtual void SetBalloonHelpString(const char *str);

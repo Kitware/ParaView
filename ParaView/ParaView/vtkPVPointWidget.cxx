@@ -62,7 +62,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkRenderer.h"
 
 vtkStandardNewMacro(vtkPVPointWidget);
-vtkCxxRevisionMacro(vtkPVPointWidget, "1.20.4.4");
+vtkCxxRevisionMacro(vtkPVPointWidget, "1.20.4.5");
 
 int vtkPVPointWidgetCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -342,9 +342,9 @@ void vtkPVPointWidget::ActualPlaceWidget()
 void vtkPVPointWidget::SetPositionInternal(float x, float y, float z)
 { 
   vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
-  this->PositionEntry[0]->SetValue(x, 5);
-  this->PositionEntry[1]->SetValue(y, 5);
-  this->PositionEntry[2]->SetValue(z, 5);  
+  this->PositionEntry[0]->SetValue(x);
+  this->PositionEntry[1]->SetValue(y);
+  this->PositionEntry[2]->SetValue(z);  
   if ( this->Widget3DID.ID )
     {
     pm->GetStream() << vtkClientServerStream::Invoke << this->Widget3DID 

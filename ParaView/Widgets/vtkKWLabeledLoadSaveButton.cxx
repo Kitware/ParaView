@@ -42,7 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWLabeledLoadSaveButton);
-vtkCxxRevisionMacro(vtkKWLabeledLoadSaveButton, "1.1");
+vtkCxxRevisionMacro(vtkKWLabeledLoadSaveButton, "1.1.4.1");
 
 int vtkKWLabeledLoadSaveButtonCommand(ClientData cd, Tcl_Interp *interp,
                                       int argc, char *argv[]);

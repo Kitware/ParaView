@@ -67,7 +67,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPart);
-vtkCxxRevisionMacro(vtkPVPart, "1.28.2.5");
+vtkCxxRevisionMacro(vtkPVPart, "1.28.2.6");
 
 
 int vtkPVPartCommand(ClientData cd, Tcl_Interp *interp,
@@ -240,16 +240,18 @@ void vtkPVPart::GatherDataInformation()
 
   // I would like to have all sources generate names and all filters
   // Pass the field data, but until all is working well, this is a default.
-  if (this->Name == NULL)
+  if (this->Name == NULL || this->Name[0] == '\0')
     {
     char str[100];
     if (this->DataInformation->GetDataSetType() == VTK_POLY_DATA)
       {
-      sprintf(str, "Polygonal: %d cells", this->DataInformation->GetNumberOfCells());
+      long nc = this->DataInformation->GetNumberOfCells();
+      sprintf(str, "Polygonal: %ld cells", nc);
       }
     else if (this->DataInformation->GetDataSetType() == VTK_UNSTRUCTURED_GRID)
       {
-      sprintf(str, "Unstructured Grid: %d cells", this->DataInformation->GetNumberOfCells());
+      long nc = this->DataInformation->GetNumberOfCells();
+      sprintf(str, "Unstructured Grid: %ld cells", nc);
       }
     else if (this->DataInformation->GetDataSetType() == VTK_IMAGE_DATA)
       {

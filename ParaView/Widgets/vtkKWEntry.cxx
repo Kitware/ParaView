@@ -73,7 +73,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWEntry );
-vtkCxxRevisionMacro(vtkKWEntry, "1.37");
+vtkCxxRevisionMacro(vtkKWEntry, "1.37.2.1");
 
 //----------------------------------------------------------------------------
 vtkKWEntry::vtkKWEntry()
@@ -113,33 +113,48 @@ vtkKWEntry::~vtkKWEntry()
 //----------------------------------------------------------------------------
 char *vtkKWEntry::GetValue()
 {
-  if ( !this->IsCreated() )
+  if (!this->IsCreated())
     {
-    return 0;
+    return NULL;
     }
-  this->Script("%s get", this->Entry->GetWidgetName());
-  this->SetValueString( this->Application->GetMainInterp()->result );
+
+  const char *val = this->Script("%s get", this->Entry->GetWidgetName());
+  this->SetValueString(this->ConvertTclStringToInternalString(val));
   return this->GetValueString();
 }
 
 //----------------------------------------------------------------------------
 int vtkKWEntry::GetValueAsInt()
 {
-  if ( !this->IsCreated() )
+  if (!this->IsCreated())
     {
     return 0;
     }
-  return atoi(this->GetValue());
+  
+  char *val = this->GetValue();
+  if (!val || !*val)
+    {
+    return 0;
+    }
+
+  return atoi(val);
 }
 
 //----------------------------------------------------------------------------
-float vtkKWEntry::GetValueAsFloat()
+double vtkKWEntry::GetValueAsFloat()
 {
-  if ( !this->IsCreated() )
+  if (!this->IsCreated())
     {
     return 0;
     }
-  return atof(this->GetValue());
+
+  char *val = this->GetValue();
+  if (!val || !*val)
+    {
+    return 0;
+    }
+
+  return atof(val);
 }
 
 //----------------------------------------------------------------------------
@@ -201,7 +216,9 @@ void vtkKWEntry::SetValue(const char *s)
     this->Script("%s delete 0 end", this->Entry->GetWidgetName());
     if (s)
       {
-      this->Script("%s insert 0 {%s}", this->Entry->GetWidgetName(),s);
+      const char *str = this->ConvertInternalStringToTclString(s);
+      this->Script("catch {%s insert 0 {%s}}", 
+                   this->Entry->GetWidgetName(), str ? str : "");
       }
     }
 
@@ -219,25 +236,43 @@ void vtkKWEntry::SetValue(const char *s)
 //----------------------------------------------------------------------------
 void vtkKWEntry::SetValue(int i)
 {
+  char *val = this->GetValue();
+  if (val && *val && i == this->GetValueAsInt())
+    {
+    return;
+    }
+
   char tmp[1024];
   sprintf(tmp, "%d", i);
   this->SetValue(tmp);
 }
 
 //----------------------------------------------------------------------------
-void vtkKWEntry::SetValue(float f)
+void vtkKWEntry::SetValue(double f)
 {
+  char *val = this->GetValue();
+  if (val && *val && f == this->GetValueAsFloat())
+    {
+    return;
+    }
+
   char tmp[1024];
-  sprintf(tmp, "%g", f);
+  sprintf(tmp, "%.5g", f);
   this->SetValue(tmp);
 }
 
 //----------------------------------------------------------------------------
-void vtkKWEntry::SetValue(float f, int size)
+void vtkKWEntry::SetValue(double f, int size)
 {
+  char *val = this->GetValue();
+  if (val && *val && f == this->GetValueAsFloat())
+    {
+    return;
+    }
+
   char tmp[1024];
   char format[1024];
-  sprintf(format,"%%.%df",size);
+  sprintf(format,"%%.%dg",size);
   sprintf(tmp,format, f);
   this->SetValue(tmp);
 }
@@ -408,7 +443,6 @@ void vtkKWEntry::SetReadOnly(int ro)
 //----------------------------------------------------------------------------
 void vtkKWEntry::ValueSelectedCallback()
 {
-  cout << "ValueSelectedCallback: " << this->List->GetSelection() << endl;
   this->SetValue(this->List->GetSelection());
   this->WithdrawPopupCallback();
   this->Script("event generate %s <Return>", this->Entry->GetWidgetName());

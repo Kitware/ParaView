@@ -17,8 +17,13 @@
 =========================================================================*/
 // .NAME vtkCTHData - CTH AMR
 // .SECTION Description
-// vtkCTHData is a collection of image datas.  All have the same dimensions.
-// Each block has a different origin and spacing. 
+// vtkCTHData is a collection of image datas.  
+// Block arrays are concatenated. This structured is limited so the
+// block spacings half at each aditional level.  Blocks are 
+// placed relative to the global origin, level, and extent.
+// Extent is defined by the levels spacing.
+// The methods are currently implement so that all blocks must have 
+// the same dimensions.  I should change that if we keep this class.
 
 #ifndef __vtkCTHData_h
 #define __vtkCTHData_h
@@ -29,6 +34,7 @@
 
 class vtkDataArray;
 class vtkFloatArray;
+class vtkIntArray;
 class vtkLine;
 class vtkPixel;
 class vtkVertex;
@@ -83,27 +89,13 @@ public:
   void ComputeBounds();
   int GetMaxCellSize() {return 8;}; //voxel is the largest
 
-  // Description:
-  // Set dimensions of structured points dataset.
-  void SetDimensions(int i, int j, int k);
-
-  // Description:
-  // Set dimensions of structured points dataset.
-  void SetDimensions(int dims[3]);
-
-  // Description:
-  // Get dimensions of this structured points dataset.
-  // Dimensions are computed from Extents during this call.
-  int *GetDimensions();
-  void GetDimensions(int dims[3]);
-
-  // Description:
-  // Different ways to set the extent of the data array.  The extent
-  // should be set before the "Scalars" are set or allocated.
-  // The Extent is stored  in the order (X, Y, Z).
-  void SetExtent(int extent[6]);
-  void SetExtent(int x1, int x2, int y1, int y2, int z1, int z2);
-  vtkGetVector6Macro(Extent,int);
+  // Dimensions:
+  // Specify blocks relative to this top level block.
+  // For now this has to be set before the blocks are defined.
+  vtkSetVector3Macro(TopLevelSpacing, float);
+  vtkGetVector3Macro(TopLevelSpacing, float);
+  vtkSetVector3Macro(TopLevelOrigin, float);
+  vtkGetVector3Macro(TopLevelOrigin, float);
 
   // Description:
   // Convenience function computes the structured coordinates for a point x[3].
@@ -129,12 +121,42 @@ public:
   // Setting the number of blocks initializes the spacings and origins.
   void SetNumberOfBlocks(int num);
   int GetNumberOfBlocks();
-  void SetBlockOrigin(int blockId, float* origin);
-  void SetBlockOrigin(int blockId, float ox, float oy, float oz);
-  float* GetBlockOrigin(int blockId);
-  void SetBlockSpacing(int blockId, float* spacing);
-  void SetBlockSpacing(int blockId, float sx, float sy, float sz);
   float* GetBlockSpacing(int blockId);
+
+  // I am going to get rid of this origin, because
+  // all blocks now share the same origin.
+  float* GetBlockOrigin(int blockId);
+
+  // Description:
+  // Level is an integer value that specifies the number of refinements
+  // That occured to get to this block.  The spacing of this block
+  // should be SpacingOfHighestLevel/2^level.  With the extent, 
+  // it should no longer be necessary to explicitley store the spacing 
+  // and origin of blocks.
+  int GetBlockLevel(int blockId);
+
+  // Description:
+  // Set the blocks level and extent.
+  void SetBlockCellExtent(int blockId, int level, int *extent);
+  void SetBlockCellExtent(int blockId, int level, 
+                          int eo, int e1, int e2, 
+                          int e3, int e4, int e5);
+  void SetBlockPointExtent(int blockId, int level, int *extent);
+  void SetBlockPointExtent(int blockId, int level, 
+                           int eo, int e1, int e2, 
+                           int e3, int e4, int e5);
+  int* GetBlockPointDimensions(int blockId);
+  void GetBlockPointDimensions(int blockId, int dims[3]);
+  int* GetBlockCellDimensions(int blockId);
+  void GetBlockCellDimensions(int blockId, int dims[3]);
+  int* GetBlockPointExtent(int blockId);
+  void GetBlockPointExtent(int blockId, int ext[3]);
+  int* GetBlockCellExtent(int blockId);
+  void GetBlockCellExtent(int blockId, int ext[3]);
+
+  // Description:
+  // Convenience method that computes bounds from level and extent.
+  void CellExtentToBounds(int level, int* ext, float bds[6]);
 
   // Description:
   // A way to add blocks if you do not know how many there will
@@ -171,15 +193,28 @@ protected:
   vtkPixel *Pixel;
   vtkVoxel *Voxel;
 
-  // The extent of what is currently in the structured grid.
-  // Dimensions is just an array to return a value.
-  // Its contents are out of data until GetDimensions is called.
-  int Dimensions[3];
   int NumberOfGhostLevels;
   int DataDescription;
 
+  // New method of specifing blocks.
+  float TopLevelSpacing[3];
+  float TopLevelOrigin[3];
+
+  vtkIntArray* BlockCellExtents;
   vtkFloatArray* BlockOrigins;
   vtkFloatArray* BlockSpacings;
+  vtkIntArray* BlockLevels;
+
+  // A temporary array used to return dimensions.
+  int TemporaryDimensions[3];
+  int TemporaryExtent[6];
+
+  // Hidden methods
+  void SetUpdateExtent(int, int ,int, int, int, int) {}
+  void SetUpdateExtent(int*) {}
+  void GetUpdateExtent(int &,int &,int &,int &,int &,int &) {}
+  int* GetUpdateExtent() {return this->Superclass::GetUpdateExtent();}
+  void GetUpdateExtent(int*) {}
 
 private:
   void InternalCTHDataCopy(vtkCTHData *src);

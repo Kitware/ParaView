@@ -79,7 +79,11 @@ static inline int Chdir(const char* dir)
 }
 #endif
 
-vtkCxxRevisionMacro(vtkKWDirectoryUtilities, "1.12");
+#if defined(_WIN32) && (defined(_MSC_VER) || defined(__BORLANDC__) || defined(__MINGW32__))
+#define _unlink unlink
+#endif
+
+vtkCxxRevisionMacro(vtkKWDirectoryUtilities, "1.12.2.1");
 vtkStandardNewMacro(vtkKWDirectoryUtilities);
 
 //----------------------------------------------------------------------------
@@ -541,29 +545,52 @@ const char* vtkKWDirectoryUtilities::GetFilenameName(const char *filename,
 }
 
 //----------------------------------------------------------------------------
-const char* vtkKWDirectoryUtilities::GetFilenameExtension(const char *filename, 
-                                                          char *ext)
+const char* vtkKWDirectoryUtilities::GetFilenameExtension(
+  const char *filename, char *ext)
 {
-  if ( !filename || strlen(filename) == 0 )
+  if (!filename)
     {
     ext[0] = 0;
-    return ext;
     }
-  int found = 0;
-  const char *ptr = filename + strlen(filename) - 1;
-  while (ptr > filename)
+  else
     {
-    if (*ptr == '.')
+    char *dot = strrchr(filename, '.');
+    if (dot)
       {
-      found = 1;
-      break;
+      strcpy(ext, dot + 1);
       }
-    ptr--;
+    else
+      {
+      ext[0] = 0;
+      }
     }
 
-  strcpy(ext, ptr + found);
-  
   return ext;
+}
+
+//----------------------------------------------------------------------------
+const char* vtkKWDirectoryUtilities::GetFilenameWithoutExtension(
+  const char *filename, char *name)
+{
+  if (!filename)
+    {
+    name[0] = 0;
+    }
+  else
+    {
+    char *dot = strrchr(filename, '.');
+    if (dot)
+      {
+      strncpy(name, filename, dot - filename);
+      name[dot - filename] = '\0';
+      }
+    else
+      {
+      strcpy(name, filename);
+      }
+    }
+
+  return name;
 }
 
 //----------------------------------------------------------------------------
@@ -708,6 +735,16 @@ int vtkKWDirectoryUtilities::FileHasSignature(const char *filename,
   return res;
 }
 
+//----------------------------------------------------------------------------
+int vtkKWDirectoryUtilities::RemoveFile(const char* filename)
+{
+  if (!vtkKWDirectoryUtilities::FileExists(filename))
+    {
+    return 0;
+    }
+
+  return unlink(filename) ? 0 : 1;
+}
 
 
 

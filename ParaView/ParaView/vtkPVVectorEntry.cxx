@@ -57,7 +57,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVVectorEntry);
-vtkCxxRevisionMacro(vtkPVVectorEntry, "1.36.2.6");
+vtkCxxRevisionMacro(vtkPVVectorEntry, "1.36.2.7");
 
 //-----------------------------------------------------------------------------
 vtkPVVectorEntry::vtkPVVectorEntry()
@@ -460,7 +460,7 @@ void vtkPVVectorEntry::SetValue(float* values, int num)
   for (idx = 0; idx < num; ++idx)
     {
     entry = this->GetEntry(idx);    
-    entry->SetValue(values[idx], 4);
+    entry->SetValue(values[idx]);
     if ( this->EntryValues[idx] )
       {
       delete [] this->EntryValues[idx];

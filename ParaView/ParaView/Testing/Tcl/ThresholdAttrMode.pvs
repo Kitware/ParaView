@@ -32,6 +32,7 @@ $pv(vtkTemp129) AcceptCallback
 
 set pv(vtkTemp304) [$pv(vtkTemp1) CreatePVSource DataSetTriangleFilter]
 $pv(vtkTemp304) AcceptCallback
+[$pv(vtkTemp304) GetPVOutput] DrawSurface
 set pv(vtkTemp321) [$pv(vtkTemp304) GetPVOutput]
 $pv(vtkTemp321) SetVisibility 0
 set pv(vtkTemp158) [$pv(vtkTemp1) CreatePVSource DataSetSurfaceFilter]

@@ -43,7 +43,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWSaveImageDialog );
-vtkCxxRevisionMacro(vtkKWSaveImageDialog, "1.20");
+vtkCxxRevisionMacro(vtkKWSaveImageDialog, "1.20.2.1");
 
 int vtkKWSaveImageDialogCommand(ClientData cd, Tcl_Interp *interp,
                                 int argc, char *argv[]);
@@ -60,7 +60,6 @@ int vtkKWSaveImageDialog::Invoke()
   int res = 0;
 
   this->SaveDialogOn();
-  this->SetTitle("Save As Image");
   this->SetFileTypes("{{Windows Bitmap} {.bmp}} "
                      "{{JPEG Images} {.jpg}} "
                      "{{PNG Images} {.png}} "
@@ -116,4 +115,5 @@ void vtkKWSaveImageDialog::Create(vtkKWApplication *app, const char* /*args*/)
     }
 
   this->SetApplication(app);
+  this->SetTitle("Save As Image");
 }

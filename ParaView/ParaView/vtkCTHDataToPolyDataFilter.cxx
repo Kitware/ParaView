@@ -20,7 +20,7 @@
 #include "vtkCTHData.h"
 #include "vtkObjectFactory.h"
 
-vtkCxxRevisionMacro(vtkCTHDataToPolyDataFilter, "1.1.2.1");
+vtkCxxRevisionMacro(vtkCTHDataToPolyDataFilter, "1.1.2.2");
 vtkStandardNewMacro(vtkCTHDataToPolyDataFilter);
 
 //----------------------------------------------------------------------------

@@ -40,7 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWSplashScreen );
-vtkCxxRevisionMacro(vtkKWSplashScreen, "1.11");
+vtkCxxRevisionMacro(vtkKWSplashScreen, "1.11.4.1");
 
 //----------------------------------------------------------------------------
 vtkKWSplashScreen::vtkKWSplashScreen()
@@ -226,12 +226,16 @@ void vtkKWSplashScreen::SetImageName (const char* _arg)
 //----------------------------------------------------------------------------
 void vtkKWSplashScreen::SetProgressMessage(const char *txt)
 {
-  if (this->Application)
+  if (!this->IsCreated() || !txt)
     {
-    this->Script("%s itemconfigure msg -text {%s}",
-                 this->Canvas->GetWidgetName(), (txt ? txt : ""));
-    this->Show();
+    return;
     }
+
+  const char *str = this->ConvertInternalStringToTclString(txt);;
+  this->Script("catch {%s itemconfigure msg -text {%s}}",
+               this->Canvas->GetWidgetName(), (str ? str : ""));
+
+  this->Show();
 }
 
 //----------------------------------------------------------------------------

@@ -55,7 +55,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWHeaderAnnotation );
-vtkCxxRevisionMacro(vtkKWHeaderAnnotation, "1.3");
+vtkCxxRevisionMacro(vtkKWHeaderAnnotation, "1.3.2.1");
 
 int vtkKWHeaderAnnotationCommand(ClientData cd, Tcl_Interp *interp,
                                  int argc, char *argv[]);
@@ -420,7 +420,7 @@ void vtkKWHeaderAnnotation::SendChangedEvent()
 
   vtkXMLTextActorWriter *xmlw = vtkXMLTextActorWriter::New();
   xmlw->SetObject(this->RenderWidget->GetHeaderAnnotation());
-  xmlw->Write(event);
+  xmlw->WriteToStream(event);
   xmlw->Delete();
 
   event << ends;

@@ -40,7 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkXMLDataElement.h"
 
 vtkStandardNewMacro(vtkXMLColorTransferFunctionWriter);
-vtkCxxRevisionMacro(vtkXMLColorTransferFunctionWriter, "1.3");
+vtkCxxRevisionMacro(vtkXMLColorTransferFunctionWriter, "1.3.4.1");
 
 //----------------------------------------------------------------------------
 char* vtkXMLColorTransferFunctionWriter::GetRootElementName()
@@ -105,7 +105,7 @@ int vtkXMLColorTransferFunctionWriter::AddNestedElements(
     {
     for (int i = 0; i < size; i++, data_ptr += 4)
       {
-      vtkXMLDataElement *point_elem = vtkXMLDataElement::New();
+      vtkXMLDataElement *point_elem = this->NewDataElement();
       elem->AddNestedElement(point_elem);
       point_elem->Delete();
       point_elem->SetName(this->GetPointElementName());

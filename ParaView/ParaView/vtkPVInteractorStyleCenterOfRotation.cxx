@@ -51,7 +51,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVRenderModule.h"
 #include "vtkPVApplication.h"
 
-vtkCxxRevisionMacro(vtkPVInteractorStyleCenterOfRotation, "1.5");
+vtkCxxRevisionMacro(vtkPVInteractorStyleCenterOfRotation, "1.5.4.1");
 vtkStandardNewMacro(vtkPVInteractorStyleCenterOfRotation);
 
 //-------------------------------------------------------------------------
@@ -116,9 +116,9 @@ void vtkPVInteractorStyleCenterOfRotation::SetCenter(float x, float y, float z)
     vtkPVWindow::SafeDownCast(iren->GetPVRenderView()->GetParentWindow());
   if (window)
     {
-    window->GetCenterXEntry()->SetValue(x, 3);
-    window->GetCenterYEntry()->SetValue(y, 3);
-    window->GetCenterZEntry()->SetValue(z, 3);
+    window->GetCenterXEntry()->SetValue(x);
+    window->GetCenterYEntry()->SetValue(y);
+    window->GetCenterZEntry()->SetValue(z);
     window->CenterEntryCallback();
     }
   window->ChangeInteractorStyle(1);

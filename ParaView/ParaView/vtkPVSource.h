@@ -321,7 +321,7 @@ public:
   // current (if makeCurrent is true), 4. creates output (vtkPVData) which
   // contains a vtk data object of type outputDataType, 5. assigns or
   // creates an extent translator to the output.
-  int InitializeClone(vtkPVSource* input, int makeCurrent);
+  virtual int InitializeClone(vtkPVSource* input, int makeCurrent);
 
   // Description:
   // This sets up the PVData.  This method is called when

@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #  define STRCASECMP strcasecmp
 #endif
 
-vtkCxxRevisionMacro(vtkString, "1.16");
+vtkCxxRevisionMacro(vtkString, "1.16.4.1");
 vtkStandardNewMacro(vtkString);
  
 //----------------------------------------------------------------------------
@@ -234,6 +234,24 @@ char* vtkString::ToLower(char *str)
 }
 
 //----------------------------------------------------------------------------
+char* vtkString::ToLowerFirst(char *str)
+{
+  if (str)
+    {
+    char *ptr = str;
+    while (*ptr)
+      {
+      if (isalpha(*ptr) && (ptr == str || isspace(*(ptr - 1))))
+        {
+        *ptr = (char)tolower(*ptr);
+        }
+      ++ptr;
+      }
+    }
+  return str;
+}
+
+//----------------------------------------------------------------------------
 char* vtkString::ToUpper(char *str)
 {
   if (str)
@@ -242,6 +260,24 @@ char* vtkString::ToUpper(char *str)
     while (*ptr)
       {
       *ptr = (char)toupper(*ptr);
+      ++ptr;
+      }
+    }
+  return str;
+}
+
+//----------------------------------------------------------------------------
+char* vtkString::ToUpperFirst(char *str)
+{
+  if (str)
+    {
+    char *ptr = str;
+    while (*ptr)
+      {
+      if (isalpha(*ptr) && (ptr == str || isspace(*(ptr - 1))))
+        {
+        *ptr = (char)toupper(*ptr);
+        }
       ++ptr;
       }
     }
@@ -287,6 +323,85 @@ char* vtkString::ReplaceChars(char* str, const char *toreplace, char replacement
       }
     }
   return str;
+}
+
+//----------------------------------------------------------------------------
+char* vtkString::RemoveChars(const char* str, const char *toremove)
+{
+  if (!str)
+    {
+    return 0;
+    }
+
+  char *clean_str = new char [strlen(str) + 1];
+  char *ptr = clean_str;
+
+  while (*str)
+    {
+    const char *str2 = toremove;
+    while (*str2 && *str != *str2)
+      {
+      ++str2;
+      }
+    if (!*str2)
+      {
+      *ptr++ = *str;
+      }
+    ++str;
+    }
+  *ptr = '\0';
+  return clean_str;
+}
+
+//----------------------------------------------------------------------------
+char* vtkString::RemoveAllButChars(const char* str, const char *tokeep)
+{
+  if (!str)
+    {
+    return 0;
+    }
+
+  char *clean_str = new char [strlen(str) + 1];
+  char *ptr = clean_str;
+
+  while (*str)
+    {
+    const char *str2 = tokeep;
+    while (*str2 && *str != *str2)
+      {
+      ++str2;
+      }
+    if (*str2)
+      {
+      *ptr++ = *str;
+      }
+    ++str;
+    }
+  *ptr = '\0';
+  return clean_str;
+}
+
+//----------------------------------------------------------------------------
+char* vtkString::RemoveAllButUpperHex(const char* str)
+{
+  if (!str)
+    {
+    return 0;
+    }
+
+  char *clean_str = new char [strlen(str) + 1];
+  char *ptr = clean_str;
+
+  while (*str)
+    {
+    if ((*str >= '0' && *str <= '9') || (*str >= 'A' && *str <= 'H'))
+      {
+      *ptr++ = *str;
+      }
+    ++str;
+    }
+  *ptr = '\0';
+  return clean_str;
 }
 
 //----------------------------------------------------------------------------

@@ -32,14 +32,16 @@
 #include "vtkCTHOutlineFilter.h"
 #include "vtkStructuredGrid.h"
 #include "vtkStructuredGridOutlineFilter.h"
+#include "vtkUnstructuredGrid.h"
 
-vtkCxxRevisionMacro(vtkPVGeometryFilter, "1.10.2.1");
+vtkCxxRevisionMacro(vtkPVGeometryFilter, "1.10.2.2");
 vtkStandardNewMacro(vtkPVGeometryFilter);
 
 //----------------------------------------------------------------------------
 vtkPVGeometryFilter::vtkPVGeometryFilter ()
 {
   this->OutlineFlag = 0;
+  this->UseOutline = 1;
   this->NumberOfRequiredInputs = 0;
 }
 
@@ -47,7 +49,6 @@ vtkPVGeometryFilter::vtkPVGeometryFilter ()
 vtkPVGeometryFilter::~vtkPVGeometryFilter ()
 {
 }
-
 
 //----------------------------------------------------------------------------
 void vtkPVGeometryFilter::Execute()
@@ -94,29 +95,8 @@ void vtkPVGeometryFilter::Execute()
     }
   if (input->IsA("vtkPolyData"))
     {
-    vtkPolyData *inPd = vtkPolyData::SafeDownCast(input);
-    vtkPolyData *out = this->GetOutput(); 
-    if (this->UseStrips)
-      {
-      vtkPolyData *inCopy = vtkPolyData::New();
-      vtkStripper *stripper = vtkStripper::New();
-      inCopy->ShallowCopy(inPd);
-      inCopy->RemoveGhostCells(1);
-      stripper->SetInput(inCopy);
-      stripper->Update();
-      out->CopyStructure(stripper->GetOutput());
-      out->GetPointData()->ShallowCopy(stripper->GetOutput()->GetPointData());
-      out->GetCellData()->ShallowCopy(stripper->GetOutput()->GetCellData());
-      inCopy->Delete();
-      stripper->Delete();
-      return;
-      }
-    else
-      {
-      out->ShallowCopy(inPd);
-      out->RemoveGhostCells(1);
-      return;
-      }
+    this->PolyDataExecute((vtkPolyData*)input);
+    return;
     }
 
   // We are not stripping unstructured grids ...
@@ -124,8 +104,6 @@ void vtkPVGeometryFilter::Execute()
   // I think this filter is misbehaving.
   return;
 }
-
-
 
 //----------------------------------------------------------------------------
 void vtkPVGeometryFilter::CTHDataExecute(vtkCTHData *input)
@@ -159,7 +137,9 @@ void vtkPVGeometryFilter::ImageDataExecute(vtkImageData *input)
   ext = input->GetWholeExtent();
 
   // If 2d then default to superclass behavior.
-  if (ext[0] == ext[1] || ext[2] == ext[3] || ext[4] == ext[5])
+//  if (ext[0] == ext[1] || ext[2] == ext[3] || ext[4] == ext[5] ||
+//      !this->UseOutline)
+  if (!this->UseOutline)
     {
     this->vtkDataSetSurfaceFilter::Execute();
     this->OutlineFlag = 0;
@@ -191,10 +171,7 @@ void vtkPVGeometryFilter::ImageDataExecute(vtkImageData *input)
     output->SetLines(outline->GetOutput()->GetLines());
     outline->Delete();
     }
-
 }
-
-
 
 //----------------------------------------------------------------------------
 void vtkPVGeometryFilter::StructuredGridExecute(vtkStructuredGrid *input)
@@ -205,7 +182,9 @@ void vtkPVGeometryFilter::StructuredGridExecute(vtkStructuredGrid *input)
   ext = input->GetWholeExtent();
 
   // If 2d then default to superclass behavior.
-  if (ext[0] == ext[1] || ext[2] == ext[3] || ext[4] == ext[5])
+//  if (ext[0] == ext[1] || ext[2] == ext[3] || ext[4] == ext[5] ||
+//      !this->UseOutline)
+  if (!this->UseOutline)
     {
     this->vtkDataSetSurfaceFilter::Execute();
     this->OutlineFlag = 0;
@@ -230,7 +209,6 @@ void vtkPVGeometryFilter::StructuredGridExecute(vtkStructuredGrid *input)
   outline->Delete();
 }
 
-
 //----------------------------------------------------------------------------
 void vtkPVGeometryFilter::RectilinearGridExecute(vtkRectilinearGrid *input)
 {
@@ -240,7 +218,9 @@ void vtkPVGeometryFilter::RectilinearGridExecute(vtkRectilinearGrid *input)
   ext = input->GetWholeExtent();
 
   // If 2d then default to superclass behavior.
-  if (ext[0] == ext[1] || ext[2] == ext[3] || ext[4] == ext[5])
+//  if (ext[0] == ext[1] || ext[2] == ext[3] || ext[4] == ext[5] ||
+//      !this->UseOutline)
+  if (!this->UseOutline)
     {
     this->vtkDataSetSurfaceFilter::Execute();
     this->OutlineFlag = 0;
@@ -251,7 +231,7 @@ void vtkPVGeometryFilter::RectilinearGridExecute(vtkRectilinearGrid *input)
   //
   // Otherwise, let Outline do all the work
   //
-  
+
   vtkRectilinearGridOutlineFilter *outline = vtkRectilinearGridOutlineFilter::New();
   // Because of streaming, it is important to set the input and not copy it.
   outline->SetInput(input);
@@ -264,13 +244,72 @@ void vtkPVGeometryFilter::RectilinearGridExecute(vtkRectilinearGrid *input)
   outline->Delete();
 }
 
+//----------------------------------------------------------------------------
+void vtkPVGeometryFilter::UnstructuredGridExecute(vtkUnstructuredGrid* input)
+{
+  if (!this->UseOutline)
+    {
+    this->OutlineFlag = 0;
+    this->vtkDataSetSurfaceFilter::Execute();
+    return;
+    }
+  
+  vtkPolyData *output = this->GetOutput();
+  
+  this->OutlineFlag = 1;
+  float bounds[6];
+  input->GetBounds(bounds);
+  
+  vtkOutlineSource *outline = vtkOutlineSource::New();
+  outline->SetBounds(bounds);
+  outline->Update();
+  
+  output->SetPoints(outline->GetOutput()->GetPoints());
+  output->SetLines(outline->GetOutput()->GetLines());
+  outline->Delete();
+}
 
 //----------------------------------------------------------------------------
-void vtkPVGeometryFilter::UnstructuredGridExecute(
-  vtkUnstructuredGrid* vtkNotUsed(input))
+void vtkPVGeometryFilter::PolyDataExecute(vtkPolyData *input)
 {
-  this->OutlineFlag = 0;
-  this->vtkDataSetSurfaceFilter::Execute();
+  vtkPolyData *out = this->GetOutput(); 
+
+  if (!this->UseOutline)
+    {
+    this->OutlineFlag = 0;
+    if (this->UseStrips)
+      {
+      vtkPolyData *inCopy = vtkPolyData::New();
+      vtkStripper *stripper = vtkStripper::New();
+      inCopy->ShallowCopy(input);
+      inCopy->RemoveGhostCells(1);
+      stripper->SetInput(inCopy);
+      stripper->Update();
+      out->CopyStructure(stripper->GetOutput());
+      out->GetPointData()->ShallowCopy(stripper->GetOutput()->GetPointData());
+      out->GetCellData()->ShallowCopy(stripper->GetOutput()->GetCellData());
+      inCopy->Delete();
+      stripper->Delete();
+      }
+    else
+      {
+      out->ShallowCopy(input);
+      out->RemoveGhostCells(1);
+      }
+    return;
+    }
+  
+  this->OutlineFlag = 1;
+  float bounds[6];
+  input->GetBounds(bounds);
+  
+  vtkOutlineSource *outline = vtkOutlineSource::New();
+  outline->SetBounds(bounds);
+  outline->Update();
+  
+  out->SetPoints(outline->GetOutput()->GetPoints());
+  out->SetLines(outline->GetOutput()->GetLines());
+  outline->Delete();
 }
 
 //----------------------------------------------------------------------------
@@ -286,4 +325,6 @@ void vtkPVGeometryFilter::PrintSelf(ostream& os, vtkIndent indent)
     {
     os << indent << "OutlineFlag: Off\n";
     }
+  
+  os << indent << "UseOutline: " << this->UseOutline << endl;
 }

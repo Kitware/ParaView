@@ -260,7 +260,7 @@ void vtkPVSendPolyData(void* arg, void*, int, int)
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVClientServerModule);
-vtkCxxRevisionMacro(vtkPVClientServerModule, "1.44.2.6");
+vtkCxxRevisionMacro(vtkPVClientServerModule, "1.44.2.7");
 
 int vtkPVClientServerModuleCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -349,6 +349,99 @@ void vtkPVClientServerModule::Initialize()
   int numProcs = this->Controller->GetNumberOfProcesses();
   int id;
 
+  this->Connect();
+  if (this->ReturnValue)
+    { // Could not connect.
+    return;
+    } 
+
+  if (this->ClientMode)
+    {
+    // Receive as the hand shake the number of processes available.
+    int numServerProcs = 0;
+    this->SocketController->Receive(&numServerProcs, 1, 1, 8843);
+    this->NumberOfServerProcesses = numServerProcs;
+   
+    // Start the application (UI). 
+    // For SGI pipe option.
+    pvApp->SetNumberOfPipes(numServerProcs);
+    
+#ifdef PV_HAVE_TRAPS_FOR_SIGNALS
+    pvApp->SetupTrapsForSignals(myId);   
+#endif // PV_HAVE_TRAPS_FOR_SIGNALS
+
+    if (pvApp->GetStartGUI())
+      {
+      pvApp->Script("wm withdraw .");
+      pvApp->Start(this->ArgumentCount,this->Arguments);
+      }
+    else
+      {
+      pvApp->Exit();
+      }
+
+    // Exiting:  CLean up.
+    this->ReturnValue = pvApp->GetExitStatus();
+    }
+  else if (myId == 0)
+    { // process 0 of Server
+
+    // send the number of server processes as a handshake.
+    this->SocketController->Send(&numProcs, 1, 1, 8843);
+
+        //
+    this->SocketController->AddRMI(vtkPVClientServerLastResultRMI, (void *)(this),
+                                   VTK_PV_CLIENT_SERVER_LAST_RESULT_TAG);
+    // for SendMessages
+    this->SocketController->AddRMI(vtkPVClientServerSocketRMI, (void *)(this),
+                                   VTK_PV_CLIENTSERVER_RMI_TAG);
+
+    // For root script: Execute script only on process 0 of server.
+    this->SocketController->AddRMI(vtkPVRootScript, (void *)(this), 
+                                   VTK_PV_ROOT_SCRIPT_RMI_TAG);
+    // For root script: Return result back to client.
+    this->SocketController->AddRMI(vtkPVRootResult, (void *)(this), 
+                                   VTK_PV_ROOT_RESULT_RMI_TAG);
+    
+    // For ReceiveRootDataObject: Send data object back to the client.
+    this->SocketController->AddRMI(vtkPVSendPolyData, this,
+                                   VTK_PV_SEND_DATA_OBJECT_TAG);
+    
+    // Loop listening to the socket for RMI's.
+    this->SocketController->AddRMI(vtkPVBroadcastScript, (void *)(this), 
+                                   VTK_PV_BROADCAST_SCRIPT_RMI_TAG);
+    // Remote script is only really for debugging.
+    this->SocketController->AddRMI(vtkPVRelayRemoteScript, (void *)(this), 
+                                   VTK_PV_REMOTE_SCRIPT_RMI_TAG);
+    this->Controller->CreateOutputWindow();
+    this->SocketController->ProcessRMIs();
+    
+    // Exiting.  Relay the break RMI to otehr processes.
+    for (id = 1; id < numProcs; ++id)
+      {
+      this->Controller->TriggerRMI(id, vtkMultiProcessController::BREAK_RMI_TAG);
+      }
+    }
+  else
+    { // Sattelite processes of server.
+    this->Controller->AddRMI(vtkPVServerSlaveScript, (void *)(pvApp), 
+                             VTK_PV_SATELLITE_SCRIPT);
+
+    this->Controller->CreateOutputWindow();
+    // Process rmis until the application exits.
+    this->Controller->ProcessRMIs();    
+    // Now we are exiting.
+    }
+}
+
+
+//----------------------------------------------------------------------------
+void vtkPVClientServerModule::Connect()
+{
+  int myId = this->Controller->GetLocalProcessId();
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  int waitForConnection;
+ 
 #ifdef MPIPROALLOC
   vtkCommunicator::SetUseCopy(1);
 #endif
@@ -379,7 +472,38 @@ void vtkPVClientServerModule::Initialize()
     this->GetStream().Reset();
     }
 
+  // Do not try to connect sockets on MPI processes other than root.
+  if (myId > 0)
+    {
+    return;
+    }
+
+  // I want to be able to switch which process waits, and which connects.
+  // Just a hard way of doing an exclusive or.
   if (this->ClientMode)
+    {
+    if (pvApp->GetReverseConnection())
+      {
+      waitForConnection = 1;
+      }
+    else
+      {
+      waitForConnection = 0;
+      }
+    }
+  else
+    {
+    if (pvApp->GetReverseConnection())
+      {
+      waitForConnection = 0;
+      }
+    else
+      {
+      waitForConnection = 1;
+      }
+    }
+
+  if (waitForConnection == 0)
     {
     vtkSocketController* dummy = vtkSocketController::New();
     dummy->Initialize();
@@ -404,8 +528,19 @@ void vtkPVClientServerModule::Initialize()
       start = 1;
       }
     while (!comm->ConnectTo(this->Hostname, this->Port))
-      {
-      if ( start )
+      {  // Do not bother trying to start the client if reverse connection is specified.
+      if ( ! this->ClientMode)
+        {  // all the following stuff is for starting the server automatically.
+        // This is the "reverse-connection" condition.  
+        // For now just fail if connection is not found.
+        vtkErrorMacro("Server error: Could not connect to the client. " 
+                      << this->Hostname << " " << this->Port);
+        comm->Delete();
+        pvApp->Exit();
+        this->ReturnValue = 1;
+        return;
+        }
+      if ( start)
         {
         char numbuffer[100];
         vtkstd::string runcommand = "eval ${PARAVIEW_SETUP_SCRIPT} ; ";
@@ -456,69 +591,45 @@ void vtkPVClientServerModule::Initialize()
           }
         continue;
         }
-      this->Script("wm withdraw .");
-      vtkPVConnectDialog* dialog =
-        vtkPVConnectDialog::New();
-      dialog->SetHostname(this->Hostname);
-      dialog->SetSSHUser(this->Username);
-      dialog->SetPort(this->Port);
-      dialog->SetNumberOfProcesses(this->NumberOfProcesses);
-      dialog->SetMultiProcessMode(this->MultiProcessMode);
-      dialog->Create(this->GetPVApplication(), 0);
-      int res = dialog->Invoke();
-      if ( res )
+      if (this->ClientMode)
         {
-        this->SetHostname(dialog->GetHostName());
-        this->SetUsername(dialog->GetSSHUser());
-        this->Port = dialog->GetPort();
-        this->NumberOfProcesses = dialog->GetNumberOfProcesses();
-        this->MultiProcessMode = dialog->GetMultiProcessMode();
-        start = 1;
-        }
-      dialog->Delete();
+        this->Script("wm withdraw .");
+        vtkPVConnectDialog* dialog = 
+          vtkPVConnectDialog::New();
+        dialog->SetHostname(this->Hostname);
+        dialog->SetSSHUser(this->Username);
+        dialog->SetPort(this->Port);
+        dialog->SetNumberOfProcesses(this->NumberOfProcesses);
+        dialog->SetMultiProcessMode(this->MultiProcessMode);
+        dialog->Create(this->GetPVApplication(), 0);
+        int res = dialog->Invoke();
+        if ( res )
+          {
+          this->SetHostname(dialog->GetHostName());
+          this->SetUsername(dialog->GetSSHUser());
+          this->Port = dialog->GetPort();
+          this->NumberOfProcesses = dialog->GetNumberOfProcesses();
+          this->MultiProcessMode = dialog->GetMultiProcessMode();
+          start = 1;
+          }
+        dialog->Delete();
 
-      if ( !res )
-        {
-        vtkErrorMacro("Client error: Could not connect to the server.");
-        comm->Delete();
-        pvApp->Exit();
-        this->ReturnValue = 1;
-        return;
+        if ( !res )
+          {
+          vtkErrorMacro("Client error: Could not connect to the server.");
+          comm->Delete();
+          pvApp->Exit();
+          this->ReturnValue = 1;
+          return;
+          }
         }
       }
     this->SocketController = vtkSocketController::New();
     this->SocketController->SetCommunicator(comm);
     comm->Delete();
-    //this->Controller->CreateOutputWindow();
-
-    // Receive as the hand shake the number of processes available.
-    int numServerProcs = 0;
-    this->SocketController->Receive(&numServerProcs, 1, 1, 8843);
-    this->NumberOfServerProcesses = numServerProcs;
-
-    // Start the application (UI).
-    // For SGI pipe option.
-    pvApp->SetNumberOfPipes(numServerProcs);
-
-#ifdef PV_HAVE_TRAPS_FOR_SIGNALS
-    pvApp->SetupTrapsForSignals(myId);
-#endif // PV_HAVE_TRAPS_FOR_SIGNALS
-
-    if (pvApp->GetStartGUI())
-      {
-      pvApp->Script("wm withdraw .");
-      pvApp->Start(this->ArgumentCount,this->Arguments);
-      }
-    else
-      {
-      pvApp->Exit();
-      }
-
-    // Exiting:  CLean up.
-    this->ReturnValue = pvApp->GetExitStatus();
     }
-  else if (myId == 0)
-    { // process 0 of Server
+  else
+    {
     this->SocketController = vtkSocketController::New();
     this->SocketController->Initialize();
     vtkSocketCommunicator* comm = vtkSocketCommunicator::New();
@@ -526,13 +637,9 @@ void vtkPVClientServerModule::Initialize()
     int port= pvApp->GetPort();
 
     // Establish connection
-
-
-
-
-    if (!comm->WaitForConnection(port))
+   if (!comm->WaitForConnection(port))
       {
-      vtkErrorMacro("Server error: Wait timed out or could not initialize socket.");
+      vtkErrorMacro("Wait timed out or could not initialize socket.");
       comm->Delete();
       this->ReturnValue = 1;
       return;
@@ -540,56 +647,6 @@ void vtkPVClientServerModule::Initialize()
     this->SocketController->SetCommunicator(comm);
     comm->Delete();
     comm = NULL;
-
-    // send the number of server processes as a handshake.
-    this->SocketController->Send(&numProcs, 1, 1, 8843);
-
-    //
-    this->SocketController->AddRMI(vtkPVClientServerLastResultRMI, (void *)(this),
-                                   VTK_PV_CLIENT_SERVER_LAST_RESULT_TAG);
-    // for SendMessages
-    this->SocketController->AddRMI(vtkPVClientServerSocketRMI, (void *)(this),
-                                   VTK_PV_CLIENTSERVER_RMI_TAG);
-
-    // For root script: Execute script only on process 0 of server.
-    this->SocketController->AddRMI(vtkPVRootScript, (void *)(this),
-                                   VTK_PV_ROOT_SCRIPT_RMI_TAG);
-    // For root script: Return result back to client.
-    this->SocketController->AddRMI(vtkPVRootResult, (void *)(this),
-                                   VTK_PV_ROOT_RESULT_RMI_TAG);
-
-    // For ReceiveRootDataObject: Send data object back to the client.
-    this->SocketController->AddRMI(vtkPVSendPolyData, this,
-                                   VTK_PV_SEND_DATA_OBJECT_TAG);
-
-    // Loop listening to the socket for RMI's.
-    this->SocketController->AddRMI(vtkPVBroadcastScript, (void *)(this),
-                                   VTK_PV_BROADCAST_SCRIPT_RMI_TAG);
-    // Remote script is only really for debugging.
-    this->SocketController->AddRMI(vtkPVRelayRemoteScript, (void *)(this),
-                                   VTK_PV_REMOTE_SCRIPT_RMI_TAG);
-    this->Controller->CreateOutputWindow();
-    this->SocketController->ProcessRMIs();
-
-    // Exiting.  Relay the break RMI to otehr processes.
-    for (id = 1; id < numProcs; ++id)
-      {
-      this->Controller->TriggerRMI(id, vtkMultiProcessController::BREAK_RMI_TAG);
-      }
-    }
-  else
-    { // Sattelite processes of server.
-    this->Controller->AddRMI(vtkPVServerSlaveScript, (void *)(pvApp),
-                             VTK_PV_SATELLITE_SCRIPT);
-
-    this->Controller->AddRMI(vtkPVClientServerMPIRMI, (void *)(this),
-                             VTK_PV_CLIENTSERVER_RMI_TAG);
-
-
-    this->Controller->CreateOutputWindow();
-    // Process rmis until the application exits.
-    this->Controller->ProcessRMIs();
-    // Now we are exiting.
     }
 }
 

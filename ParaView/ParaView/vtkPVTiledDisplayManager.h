@@ -127,7 +127,7 @@ protected:
   // For managing buffers.
   vtkPVCompositeUtilities* CompositeUtilities;
 
-  int ReductionFactor;
+  int ImageReductionFactor;
   int LODReductionFactor;
 
   unsigned long StartTag;

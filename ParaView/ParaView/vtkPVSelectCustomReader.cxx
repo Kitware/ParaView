@@ -53,7 +53,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectCustomReader);
-vtkCxxRevisionMacro(vtkPVSelectCustomReader, "1.4");
+vtkCxxRevisionMacro(vtkPVSelectCustomReader, "1.4.4.1");
 
 //----------------------------------------------------------------------------
 vtkPVSelectCustomReader::vtkPVSelectCustomReader() 
@@ -127,6 +127,9 @@ vtkPVReaderModule* vtkPVSelectCustomReader::SelectReader(vtkPVWindow* win,
   it->Delete();
   listbox->SetSelectionIndex(0);
   listbox->SetDoubleClickCallback(this, "OK");
+
+  // Set the width to that of the longest string
+  listbox->SetWidth(0);      
 
   // invoke
   int res = this->Invoke();

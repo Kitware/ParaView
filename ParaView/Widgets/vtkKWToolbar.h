@@ -45,6 +45,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWWidget.h"
 
 class vtkKWApplication;
+class vtkKWFrame;
 class vtkKWRadioButton;
 
 //BTX
@@ -64,40 +65,15 @@ public:
   virtual void Create(vtkKWApplication *app);
 
   // Description:
-  // Determines whether the toolbar is resizable. When you use Pack(),
-  // do not provide options like -fill or -expand.
+  // Returns the main frame of the toolbar. Put all the widgets
+  // in the main frame.
+  vtkGetObjectMacro(Frame, vtkKWFrame);
+
+  // Description:
+  // Determines whether the toolbar is resizable. 
   virtual void SetResizable(int);
   vtkGetMacro(Resizable, int);
   vtkBooleanMacro(Resizable, int);
-
-  // Description:
-  // Callbacks to ensure all widgets are visible (only
-  // if the were added with AddWidget)
-  virtual void ScheduleResize();
-  virtual void Resize();
-
-  // Description:
-  // Update/refresh the widgets layout/aspect
-  virtual void UpdateWidgets();
-
-  // Description:
-  // Update/refresh the toolbar layout/aspect (does not include the widgets)
-  virtual void Update();
-
-  // Description:
-  // Update the "enable" state of the object and its internal parts.
-  // Depending on different Ivars (Enabled, the application's 
-  // Limited Edition Mode, etc.), the "enable" state of the object is updated
-  // and propagated to its internal parts subwidgets. This will, for example,
-  // enable disable parts of the widget UI, enable disable the visibility
-  // of 3D widgets, etc.
-  virtual void UpdateEnableState();
-
-  // Description:
-  // Pack the toolbar. Do not use Tk 'pack' since the toolbar has more
-  // fancy things to do after packing.
-  virtual void Pack(const char*);
-  virtual void Pack() { this->Pack(""); };
 
   // Description:
   // Add a widget to the toolbar, insert a widget before 'location' (or at
@@ -119,14 +95,12 @@ public:
                                    const char *extra = 0);
   
   // Description:
-  // Returns the main frame of the toolbar. Put all the widgets
-  // in the main frame.
-  vtkGetObjectMacro(Frame, vtkKWWidget);
+  // Update/refresh the widgets layout/aspect
+  virtual void UpdateWidgets();
 
   // Description:
-  // Returns the separator of the toolbar. No real need to modify
-  // it, but useful for testing.
-  vtkGetObjectMacro(Separator, vtkKWWidget);
+  // Update/refresh the toolbar layout/aspect (does not include the widgets)
+  virtual void Update();
 
   // Description:
   // Set/Get the flat aspect of the toolbar (flat or 3D GUI style)
@@ -168,6 +142,21 @@ public:
   virtual void SetWidgetsFlatAdditionalPadY(int);
   vtkGetMacro(WidgetsFlatAdditionalPadY, int);
 
+  // Description:
+  // Callbacks to ensure all widgets are visible (only
+  // if the were added with AddWidget)
+  virtual void ScheduleResize();
+  virtual void Resize();
+
+  // Description:
+  // Update the "enable" state of the object and its internal parts.
+  // Depending on different Ivars (Enabled, the application's 
+  // Limited Edition Mode, etc.), the "enable" state of the object is updated
+  // and propagated to its internal parts subwidgets. This will, for example,
+  // enable disable parts of the widget UI, enable disable the visibility
+  // of 3D widgets, etc.
+  virtual void UpdateEnableState();
+
 protected:
   vtkKWToolbar();
   ~vtkKWToolbar();
@@ -175,8 +164,8 @@ protected:
   // Height stuf is not working (ask ken)
   int Expanding;
 
-  vtkKWWidget *Frame;
-  vtkKWWidget *Separator;
+  vtkKWFrame *Frame;
+  vtkKWFrame *Handle;
 
   void ConstrainWidgetsLayout();
   void UpdateWidgetsLayout();

@@ -119,6 +119,12 @@ public:
   virtual void NumberOfLabelsEndCallback();
 
   // Description:
+  // Show/Hide the LabelFormat UI, which might be a bit confusion
+  virtual void SetShowLabelFormat(int i);
+  vtkGetMacro(ShowLabelFormat, int);
+  vtkBooleanMacro(ShowLabelFormat, int);
+
+  // Description:
   // Access to sub-widgets
   virtual vtkKWCheckButton* GetScalarBarVisibilityButton()
     { return this->GetCheckButton(); };
@@ -144,6 +150,7 @@ protected:
   int AnnotationChangedEvent;
   int ScalarComponentChangedEvent;
   int NumberOfComponents;
+  int ShowLabelFormat;
 
   vtkScalarBarWidget      *ScalarBarWidget;
   vtkVolumeProperty       *VolumeProperty;
@@ -162,6 +169,7 @@ protected:
   vtkKWThumbWheel                     *MaximumNumberOfColorsThumbWheel;
   vtkKWScale                          *NumberOfLabelsScale;
 
+  virtual void PackLabelFrameChildren();
   virtual void Render();
   virtual void SetScalarBarTitle(const char *txt);
   virtual void SetScalarBarLabelFormat(const char *txt);

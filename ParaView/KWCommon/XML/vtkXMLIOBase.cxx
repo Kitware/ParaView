@@ -40,7 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkXMLDataParser.h"
 #include "vtkXMLUtilities.h"
 
-vtkCxxRevisionMacro(vtkXMLIOBase, "1.1");
+vtkCxxRevisionMacro(vtkXMLIOBase, "1.1.4.1");
 
 vtkCxxSetObjectMacro(vtkXMLIOBase, Object, vtkObject);
 

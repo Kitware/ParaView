@@ -46,10 +46,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define VTK_IOS_NOCREATE | ios::nocreate
 #endif
 
-#define BUFFER_SIZE 1024
+#define BUFFER_SIZE 8192
 
 vtkStandardNewMacro( vtkKWUNIXRegisteryUtilities );
-vtkCxxRevisionMacro(vtkKWUNIXRegisteryUtilities, "1.8");
+vtkCxxRevisionMacro(vtkKWUNIXRegisteryUtilities, "1.8.4.1");
 
 //----------------------------------------------------------------------------
 vtkKWUNIXRegisteryUtilities::vtkKWUNIXRegisteryUtilities()
@@ -139,11 +139,6 @@ int vtkKWUNIXRegisteryUtilities::OpenInternal(const char *toplevel,
         break;
         }
       }
-    if ( !found )
-      {
-      res = 0;
-      }
-    
     }
   ifs->close();
   this->SetSubKey( subkey );

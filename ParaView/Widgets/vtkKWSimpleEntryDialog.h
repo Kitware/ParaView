@@ -58,6 +58,12 @@ public:
   // Access to the entry
   vtkGetObjectMacro(Entry, vtkKWLabeledEntry);
 
+  // Description:
+  // Invoke the dialog and display it in a modal manner. 
+  // This method returns a zero if the dilaog was killed or 
+  // canceled, nonzero otherwise.
+  virtual int Invoke();
+
 protected:
   vtkKWSimpleEntryDialog();
   ~vtkKWSimpleEntryDialog();

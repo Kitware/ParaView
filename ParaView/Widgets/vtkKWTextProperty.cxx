@@ -122,7 +122,7 @@ static unsigned char image_copy[] =
 
 // ----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWTextProperty);
-vtkCxxRevisionMacro(vtkKWTextProperty, "1.24");
+vtkCxxRevisionMacro(vtkKWTextProperty, "1.24.2.1");
 
 int vtkKWTextPropertyCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -249,7 +249,7 @@ void vtkKWTextProperty::Create(vtkKWApplication *app)
   this->FontFamilyOptionMenu->Create(this->Application);
   this->Script("%s config -width 7 -padx 0 -pady 2", 
                this->FontFamilyOptionMenu->GetOptionMenu()->GetWidgetName());
-  this->FontFamilyOptionMenu->SetBalloonHelpString("Select the font family.");
+  this->FontFamilyOptionMenu->SetBalloonHelpString("Select the font.");
 
   this->FontFamilyOptionMenu->GetOptionMenu()->AddEntryWithCommand(
     VTK_KW_TEXT_PROP_ARIAL, this, "FontFamilyCallback");
@@ -265,7 +265,7 @@ void vtkKWTextProperty::Create(vtkKWApplication *app)
   this->StylesCheckButtonSet->SetParent(this);
   this->StylesCheckButtonSet->PackHorizontallyOn();
   this->StylesCheckButtonSet->Create(this->Application);
-  this->StylesCheckButtonSet->SetBalloonHelpString("Select the font styles.");
+  this->StylesCheckButtonSet->SetBalloonHelpString("Select the font style.");
 
   vtkKWCheckButtonSet *cbs = this->StylesCheckButtonSet->GetCheckButtonSet();
   cbs->PackHorizontallyOn();
@@ -377,10 +377,10 @@ void vtkKWTextProperty::Pack()
     this->ChangeColorButton->ShowLabelOn();
 
     this->FontFamilyOptionMenu->GetOptionMenu()->IndicatorOn();
-    this->FontFamilyOptionMenu->SetLabel("Family:");
+    this->FontFamilyOptionMenu->SetLabel("Font:");
     this->FontFamilyOptionMenu->ShowLabelOn();
 
-    this->StylesCheckButtonSet->SetLabel("Styles:");
+    this->StylesCheckButtonSet->SetLabel("Style:");
     this->StylesCheckButtonSet->ShowLabelOn();
 
     this->OpacityScale->DisplayLabel("Opacity:");
@@ -1144,26 +1144,6 @@ void vtkKWTextProperty::UpdateEnableState()
     {
     this->OpacityScale->SetEnabled(this->Enabled);
     }
-}
-
-//----------------------------------------------------------------------------
-void vtkKWTextProperty::SetObjectMethodCommand(
-  char **command, vtkKWObject *object, const char *method)
-{
-  if (*command)
-    {
-    delete [] *command;
-    *command = NULL;
-    }
-
-  if (!object)
-    {
-    return;
-    }
-
-  ostrstream command_str;
-  command_str << object->GetTclName() << " " << method << ends;
-  *command = command_str.str();
 }
 
 //----------------------------------------------------------------------------

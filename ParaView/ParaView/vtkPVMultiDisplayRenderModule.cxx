@@ -53,7 +53,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVMultiDisplayRenderModule);
-vtkCxxRevisionMacro(vtkPVMultiDisplayRenderModule, "1.6.2.2");
+vtkCxxRevisionMacro(vtkPVMultiDisplayRenderModule, "1.6.2.3");
 
 
 
@@ -194,6 +194,12 @@ void vtkPVMultiDisplayRenderModule::StillRender()
       pDisp->SetCollectionDecision(localRender);
       pDisp->Update();
       }
+    }
+
+  if (this->PVApplication && this->CompositeTclName)
+    {
+    this->PVApplication->Script("%s SetImageReductionFactor 1",
+                                this->CompositeTclName);
     }
 
   // Switch the compositer to local/composite mode.

@@ -41,6 +41,7 @@ $kw(vtkTemp291) AcceptCallback
 
 set kw(vtkTemp841) [$kw(vtkTemp1) CreatePVSource DataSetTriangleFilter]
 $kw(vtkTemp841) AcceptCallback
+[$kw(vtkTemp841) GetPVOutput] DrawSurface
 
 update
 

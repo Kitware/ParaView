@@ -52,7 +52,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVRenderModule.h"
 
 vtkStandardNewMacro(vtkPVPivotManipulator);
-vtkCxxRevisionMacro(vtkPVPivotManipulator, "1.6");
+vtkCxxRevisionMacro(vtkPVPivotManipulator, "1.6.4.1");
 
 //-------------------------------------------------------------------------
 vtkPVPivotManipulator::vtkPVPivotManipulator()
@@ -146,9 +146,9 @@ void vtkPVPivotManipulator::SetCenterOfRotationInternal(float x, float y, float 
   vtkPVWindow *window = app->GetMainWindow();
   if (window)
     {
-    window->GetCenterXEntry()->SetValue(x, 3);
-    window->GetCenterYEntry()->SetValue(y, 3);
-    window->GetCenterZEntry()->SetValue(z, 3);
+    window->GetCenterXEntry()->SetValue(x);
+    window->GetCenterYEntry()->SetValue(y);
+    window->GetCenterZEntry()->SetValue(z);
     window->CenterEntryCallback();
     }
   const char* argument = "CenterOfRotation";

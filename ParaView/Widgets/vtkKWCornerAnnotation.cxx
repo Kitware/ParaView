@@ -62,7 +62,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWCornerAnnotation );
-vtkCxxRevisionMacro(vtkKWCornerAnnotation, "1.68.2.2");
+vtkCxxRevisionMacro(vtkKWCornerAnnotation, "1.68.2.3");
 
 int vtkKWCornerAnnotationCommand(ClientData cd, Tcl_Interp *interp,
                                  int argc, char *argv[]);
@@ -786,7 +786,7 @@ void vtkKWCornerAnnotation::SerializeToken(istream& is, const char *token)
 void vtkKWCornerAnnotation::SerializeRevision(ostream& os, vtkIndent indent)
 {
   os << indent << "vtkKWCornerAnnotation ";
-  this->ExtractRevision(os,"$Revision: 1.68.2.2 $");
+  this->ExtractRevision(os,"$Revision: 1.68.2.3 $");
 }
 
 //----------------------------------------------------------------------------
@@ -844,7 +844,7 @@ void vtkKWCornerAnnotation::SendChangedEvent()
 
   vtkXMLCornerAnnotationWriter *xmlw = vtkXMLCornerAnnotationWriter::New();
   xmlw->SetObject(this->CornerAnnotation);
-  xmlw->Write(event);
+  xmlw->WriteToStream(event);
   xmlw->Delete();
 
   event << ends;

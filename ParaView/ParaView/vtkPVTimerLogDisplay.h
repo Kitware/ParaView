@@ -48,6 +48,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkKWWidget.h"
 class vtkKWApplication;
+class vtkPVApplication;
 class vtkKWPushButton;
 class vtkKWEntry;
 class vtkKWLabel;
@@ -55,6 +56,7 @@ class vtkKWText;
 class vtkKWWindow;
 class vtkKWOptionMenu;
 class vtkKWCheckButton;
+class vtkPVTimerInformation;
 
 class VTK_EXPORT vtkPVTimerLogDisplay : public vtkKWWidget
 {
@@ -109,11 +111,18 @@ public:
   // Call back from the EnableCheck that will stop or start loging of events.
   void EnableCheckCallback();
 
+  vtkPVTimerInformation* GetTimerInformation();
+
+  // Description:
+  // A convience method to cast KWApplication to PVApplication.
+  vtkPVApplication* GetPVApplication();
+
 protected:
   vtkPVTimerLogDisplay();
   ~vtkPVTimerLogDisplay();
 
   virtual void Update();
+  void DisplayLog();
 
   // Description:
   // Open log for writing.
@@ -147,6 +156,8 @@ protected:
   char*   Title;
   float   Threshold;
   int     Writable;
+
+  vtkPVTimerInformation* TimerInformation;
 
 private:
   vtkPVTimerLogDisplay(const vtkPVTimerLogDisplay&); // Not implemented

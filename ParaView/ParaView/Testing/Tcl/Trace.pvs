@@ -90,7 +90,7 @@ set pv(vtkTemp334) [$pv(vtkTemp328) GetPVWidget {Plane}]
 $pv(vtkTemp334) SetCenter 0 16 0
 $pv(vtkTemp334) SetNormal 0.57546 0.76627 -0.28578
 $pv(vtkTemp327) AcceptCallback
-
+[$pv(vtkTemp327) GetPVOutput] DrawSurface
 
 
 # OK, turn off the trace so that the file we source is not open.

@@ -62,7 +62,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVProcessModule.h"
 
 vtkStandardNewMacro(vtkPVSphereWidget);
-vtkCxxRevisionMacro(vtkPVSphereWidget, "1.25.4.4");
+vtkCxxRevisionMacro(vtkPVSphereWidget, "1.25.4.5");
 
 int vtkPVSphereWidgetCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -458,9 +458,9 @@ void vtkPVSphereWidget::SetCenterInternal(float x, float y, float z)
 { 
   vtkPVApplication *pvApp = this->GetPVApplication();
   vtkPVProcessModule* pm = pvApp->GetProcessModule();
-  this->CenterEntry[0]->SetValue(x, 5);
-  this->CenterEntry[1]->SetValue(y, 5);
-  this->CenterEntry[2]->SetValue(z, 5);  
+  this->CenterEntry[0]->SetValue(x);
+  this->CenterEntry[1]->SetValue(y);
+  this->CenterEntry[2]->SetValue(z);  
   if ( this->Widget3DID.ID )
     {
     pm->GetStream() << vtkClientServerStream::Invoke << this->Widget3DID
@@ -500,7 +500,7 @@ void vtkPVSphereWidget::SetCenter()
 //----------------------------------------------------------------------------
 void vtkPVSphereWidget::SetRadiusInternal(float r)
 {
-  this->RadiusEntry->SetValue(r, 5); 
+  this->RadiusEntry->SetValue(r); 
   if ( this->Widget3DID.ID )
     {
     vtkPVApplication *pvApp = this->GetPVApplication();

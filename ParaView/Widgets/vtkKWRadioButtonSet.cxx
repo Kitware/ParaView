@@ -45,7 +45,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkKWRadioButtonSet);
-vtkCxxRevisionMacro(vtkKWRadioButtonSet, "1.7");
+vtkCxxRevisionMacro(vtkKWRadioButtonSet, "1.7.4.1");
 
 int vtkvtkKWRadioButtonSetCommand(ClientData cd, Tcl_Interp *interp,
                                   int argc, char *argv[]);
@@ -336,6 +336,59 @@ int vtkKWRadioButtonSet::IsButtonSelected(int id)
 }
 
 //----------------------------------------------------------------------------
+int vtkKWRadioButtonSet::IsAnyButtonSelected()
+{
+  vtkKWRadioButtonSet::ButtonSlot *button_slot = NULL;
+  vtkKWRadioButtonSet::ButtonSlot *found = NULL;
+  vtkKWRadioButtonSet::ButtonsContainerIterator *it = 
+    this->Buttons->NewIterator();
+
+  it->InitTraversal();
+  while (!it->IsDoneWithTraversal())
+    {
+    if (it->GetData(button_slot) == VTK_OK)
+      {
+      if (this->IsButtonSelected(button_slot->Id))
+        {
+        found = button_slot;
+        break;
+        }
+      }
+    it->GoToNextItem();
+    }
+  it->Delete();
+
+  return found ? 1 : 0;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWRadioButtonSet::IsAnyVisibleButtonSelected()
+{
+  vtkKWRadioButtonSet::ButtonSlot *button_slot = NULL;
+  vtkKWRadioButtonSet::ButtonSlot *found = NULL;
+  vtkKWRadioButtonSet::ButtonsContainerIterator *it = 
+    this->Buttons->NewIterator();
+
+  it->InitTraversal();
+  while (!it->IsDoneWithTraversal())
+    {
+    if (it->GetData(button_slot) == VTK_OK)
+      {
+      if (this->IsButtonSelected(button_slot->Id) &&
+          this->GetButtonVisibility(button_slot->Id))
+        {
+        found = button_slot;
+        break;
+        }
+      }
+    it->GoToNextItem();
+    }
+  it->Delete();
+
+  return found ? 1 : 0;
+}
+
+//----------------------------------------------------------------------------
 void vtkKWRadioButtonSet::HideButton(int id)
 {
   this->SetButtonVisibility(id, 0);
@@ -362,6 +415,22 @@ void vtkKWRadioButtonSet::SetButtonVisibility(int id, int flag)
 }
 
 //----------------------------------------------------------------------------
+int vtkKWRadioButtonSet::GetButtonVisibility(int id)
+{
+  vtkKWRadioButtonSet::ButtonSlot *button_slot = 
+    this->GetButtonSlot(id);
+
+  if (button_slot && button_slot->Button && this->Application)
+    {
+    const char *res = 
+      this->Script("grid info %s", button_slot->Button->GetWidgetName());
+    return (res && *res) ? 1 : 0;
+    }
+
+  return 0;
+}
+
+//----------------------------------------------------------------------------
 int vtkKWRadioButtonSet::GetNumberOfVisibleButtons()
 {
   if (!this->IsCreated())
@@ -369,6 +438,29 @@ int vtkKWRadioButtonSet::GetNumberOfVisibleButtons()
     return 0;
     }
   return atoi(this->Script("llength [grid slaves %s]", this->GetWidgetName()));
+}
+
+//----------------------------------------------------------------------------
+void vtkKWRadioButtonSet::SelectFirstVisibleButton()
+{
+  vtkKWRadioButtonSet::ButtonSlot *button_slot = NULL;
+  vtkKWRadioButtonSet::ButtonsContainerIterator *it = 
+    this->Buttons->NewIterator();
+
+  it->InitTraversal();
+  while (!it->IsDoneWithTraversal())
+    {
+    if (it->GetData(button_slot) == VTK_OK)
+      {
+      if (this->GetButtonVisibility(button_slot->Id))
+        {
+        this->SelectButton(button_slot->Id);
+        break;
+        }
+      }
+    it->GoToNextItem();
+    }
+  it->Delete();
 }
 
 //----------------------------------------------------------------------------

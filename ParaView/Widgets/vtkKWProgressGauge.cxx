@@ -41,7 +41,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWProgressGauge );
-vtkCxxRevisionMacro(vtkKWProgressGauge, "1.14");
+vtkCxxRevisionMacro(vtkKWProgressGauge, "1.14.4.1");
 
 int vtkKWProgressGaugeCommand(ClientData cd, Tcl_Interp *interp,
                               int argc, char *argv[]);
@@ -101,9 +101,15 @@ void vtkKWProgressGauge::Create(vtkKWApplication *app, char *args)
 
 void vtkKWProgressGauge::SetValue(int value)
 {
+  if (!this->IsMapped())
+    {
+    return;
+    }
+
   const char* wname = this->GetWidgetName();
 
   this->Value = value;
+
   if(this->Value < 0)
     {
     this->Value = 0;
@@ -112,36 +118,54 @@ void vtkKWProgressGauge::SetValue(int value)
     {
     this->Value = 100;
     }
+
+  ostrstream tk_cmd;
+
   if(this->Value == 0)
     {
     // if the Value is 0, set the text to nothing and the color
     // of the bar to the background (0 0 0 0) rectangles show
     // up as a pixel...
-    this->Script("%s.display itemconfigure value -text {}", wname);
-    this->Script("%s.display coords bar 0 0 0 0", wname);
-    this->Script("%s.display itemconfigure bar -fill {}", 
-                 wname);
+    
+    tk_cmd << wname << ".display itemconfigure value -text {}" << endl
+           << wname << ".display coords bar 0 0 0 0" << endl
+           << wname << ".display itemconfigure bar -fill {}" << endl;
     }
   else
     {
     // if the Value is not 0 then use the BarColor for the bar
-    this->Script("%s.display itemconfigure bar -fill %s", 
-                 wname, this->BarColor);
+
+    tk_cmd << wname << ".display itemconfigure bar -fill " 
+           << this->BarColor << endl;
+
     // Set the text to the percent done
+
     const char* textcolor = "-fill black";
     if(this->Value > 50)
       {
       textcolor = "-fill white";
       }
     
-    this->Script("%s.display itemconfigure value -text {%3.0d%%} %s", 
-                 wname, this->Value, textcolor);
+    char buffer[5];
+    sprintf(buffer, "%3.0d", this->Value);
+
+    tk_cmd << wname << ".display itemconfigure value -text {" << buffer 
+           << "%%} " << textcolor << endl;
+
     // Draw the correct rectangle
-    this->Script("%s.display coords bar 0 0 [expr 0.01 * %d * [winfo width %s.display]] [winfo height %s.display]", 
-                 wname, this->Value, wname, wname);
+
+    tk_cmd << wname << ".display coords bar 0 0 [expr 0.01 * " << this->Value 
+           << " * [winfo width " << wname << ".display]] [winfo height "
+           << wname << ".display]" << endl;
     }
-  // do an update
-  this->Script("update idletasks");
+
+  // Do an update
+
+  tk_cmd << "update idletasks" << endl;
+
+  tk_cmd << ends;
+  this->Script(tk_cmd.str());
+  tk_cmd.rdbuf()->freeze(0);
 }
 
 //----------------------------------------------------------------------------

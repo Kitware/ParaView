@@ -22,6 +22,8 @@ set pv(vtkTemp110) [$pv(vtkTemp98) GetPVWidget {Extent}]
 $pv(vtkTemp110) SetValue 0 250 0 250 100 100
 $pv(vtkTemp98) AcceptCallback
 
+[$pv(vtkTemp98) GetPVOutput] DrawSurface
+
 # Retrace
 #  update
 #  $Application StopRecordingScript

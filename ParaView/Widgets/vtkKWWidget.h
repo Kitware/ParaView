@@ -65,25 +65,34 @@ public:
 
   // Description:
   // Create a Tk widget
-  void Create(vtkKWApplication *app,const char *name, const char *args);
+  void Create(vtkKWApplication *app, const char *name, const char *args);
   int IsCreated() { return (this->Application != 0); }
 
+  // Description:
+  // Query if widget is "alive" (i.e. is created and not deleted as far as
+  // Tk is concered, i.e. 'winfo exists')
+  int IsAlive();
+  
+  // Description:
+  // Query if widget is mapped (on screen)
+  int IsMapped();
+  
   // Description:
   // Get the name of the underlying tk widget being used
   // the parent should be set before calling this method.
   const char *GetWidgetName();
-  vtkKWWidget *GetChildWidgetWithName(const char *);
 
   // Description:
   // Set/Get the parent widget for this widget
   void SetParent(vtkKWWidget *p);
-  vtkGetObjectMacro(Parent,vtkKWWidget);
+  vtkGetObjectMacro(Parent, vtkKWWidget);
 
   // Description:
   // Add/Remove/Get a child to this Widget
   void AddChild(vtkKWWidget *w);
   void RemoveChild(vtkKWWidget *w);
   vtkGetObjectMacro(Children,vtkKWWidgetCollection);
+  vtkKWWidget *GetChildWidgetWithName(const char *);
   
   // Description::
   // Override Unregister since widgets have loops.
@@ -99,11 +108,10 @@ public:
   // the KWObject that will have the method called on it.  The second is the
   // name of the method to be called and any arguments in string form.
   // The calling is done via TCL wrappers for the KWObject.
-  virtual void SetCommand( vtkKWObject* Object, 
-                           const char* MethodAndArgString);
+  virtual void SetCommand(vtkKWObject* Object, const char* MethodAndArgString);
 
   // Description:
-  // Get the string type of a widget.
+  // Get the Tk string type of a widget.
   virtual const char* GetType();
   
   // Description:
@@ -117,10 +125,6 @@ public:
   // This method sets binding:
   // bind this->GetWidgetName() event { command }  
   void SetBind(const char *event, const char *command);
-
-  // Description:
-  // This method unsets the bind for specific event.
-  void UnsetBind(const char *event);
 
   // Description:
   // A method to set binding on the object.
@@ -141,6 +145,10 @@ public:
   void SetBindAll(const char *event, const char *command);
 
   // Description:
+  // This method unsets the bind for specific event.
+  void UnsetBind(const char *event);
+
+  // Description:
   // Set or get enabled state.
   virtual void SetEnabled(int);
   vtkBooleanMacro(Enabled, int);
@@ -150,19 +158,10 @@ public:
   // Set focus to this widget.
   void Focus();
 
-  // Description: a method to create a callback string from a KWObject.
-  // The caller is resposible for deleting the returned string.  
-  char* CreateCommand(vtkKWObject* Object, const char* MethodAndArgString);
-
   // Description:
   // Get the containing vtkKWWindow for this Widget if there is one.
   // NOTE: this may return NULL if the Widget is not in a window.
   vtkKWWindow* GetWindow();
-
-  // Description:
-  // Setting this string enables balloon help for this widget.
-  virtual void SetBalloonHelpString(const char *str);
-  vtkGetStringMacro(BalloonHelpString);
 
   // Description:
   // Convenience method to Set/Get the current background and foreground colors
@@ -177,18 +176,22 @@ public:
   void SetForegroundColor(float r, float g, float b);
   
   // Description:
-  // Query if widget has Tk configuration option, and get the option as int
+  // Query if widget has a given Tk configuration option (ex: "-state"), 
+  // and get the option as int
   int HasConfigurationOption(const char* option);
   int GetConfigurationOptionAsInt(const char* option);
-  
+
   // Description:
-  // Query if widget is "alive" (i.e. is created and 'winfo exists')
-  int IsAlive();
-  
-  // Description:
-  // Query if widget is mapped (on screen)
-  int IsMapped();
-  
+  // Set/Get the textual value of a Tk option (defaut is -text option) given a
+  // pointer to a string.
+  // The characted encoding used in the string will be retrieved by querying
+  // the widget's application CharacterEncoding ivar. Conversion from that
+  // encoding to Tk internal encoding will be performed automatically.
+  //BTX
+  void SetTextOption(const char *text, const char *option = "-text");
+  const char* GetTextOption(const char *option = "-text");
+  //ETX
+
   // Description:
   // Query if widget is packed
   int IsPacked();
@@ -200,6 +203,11 @@ public:
   void UnpackSiblings();
   void UnpackChildren();
   
+  // Description:
+  // Setting this string enables balloon help for this widget.
+  virtual void SetBalloonHelpString(const char *str);
+  vtkGetStringMacro(BalloonHelpString);
+
   // Description:
   // Adjusts the placement of the baloon help
   vtkSetMacro(BalloonHelpJustification,int);
@@ -246,7 +254,8 @@ public:
   // Set a Drag & Drop target callbacks/commands.
   // You have to add a target before settings its commands.
   // The StartCommand of all targets is called when Drag & Drop is initiated.
-  // The PerformCommand of all targets is called while Drag & Drop is performed.
+  // The PerformCommand of all targets is called while Drag & Drop is 
+  // performed.
   // The EndCommand of all targets that contain the drop coordinates is called
   // when Drag & Drop is ended
   // Note that the each command is passed the absolute/screen (x,y) mouse 
@@ -280,18 +289,18 @@ public:
   //BTX
   enum
   {
-    ANCHOR_N,
-    ANCHOR_NE,
-    ANCHOR_E,
-    ANCHOR_SE,
-    ANCHOR_S,
-    ANCHOR_SW,
-    ANCHOR_W,
-    ANCHOR_NW,
-    ANCHOR_CENTER
+    ANCHOR_N      = 0,
+    ANCHOR_NE     = 1,
+    ANCHOR_E      = 2,
+    ANCHOR_SE     = 3,
+    ANCHOR_S      = 4,
+    ANCHOR_SW     = 5,
+    ANCHOR_W      = 6,
+    ANCHOR_NW     = 7,
+    ANCHOR_CENTER = 8
   };
   //ETX
-  virtual const char* GetAnchorAsString(int);
+  static const char* GetAnchorAsString(int);
 
   // Description:
   // Set image option using either icon, predefined icon index (see 
@@ -311,10 +320,12 @@ public:
   virtual void SetImageOption(vtkKWIcon *icon,
                               const char *blend_color_option = 0,
                               const char *image_option = 0);
-  virtual void SetImageOption(const unsigned char* data, 
+  virtual void SetImageOption(const unsigned char *data, 
                               int width, int height, int pixel_size = 4,
                               unsigned long buffer_length = 0,
                               const char *blend_color_option = 0,
+                              const char *image_option = 0);
+  virtual void SetImageOption(const char *image_name,
                               const char *image_option = 0);
   
   // Description:
@@ -393,6 +404,21 @@ protected:
   virtual void SetDragAndDropBindings();
   virtual void RemoveDragAndDropBindings();
   virtual void DeleteDragAndDropTargets();
+
+  // Encoding methods
+  static const char* GetTclCharacterEncodingAsString(int);
+
+  // Description:
+  // Convert a Tcl string (stored internally as UTF-8/Unicode) to another
+  // internal format (given the widget's application CharacterEncoding), 
+  // and vice-versa.
+  // If no_curly_braces is true, curly braces will be removed from the
+  // string, so that the resulting string can be used to set an option
+  // using the usual {%s} syntax.
+  const char* ConvertTclStringToInternalString(
+    const char *str, int no_curly_braces = 1);
+  const char* ConvertInternalStringToTclString(
+    const char *str, int no_curly_braces = 1);
 
 private:
   vtkKWWidget(const vtkKWWidget&); // Not implemented

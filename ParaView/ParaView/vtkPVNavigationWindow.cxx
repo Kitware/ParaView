@@ -54,7 +54,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVNavigationWindow );
-vtkCxxRevisionMacro(vtkPVNavigationWindow, "1.20");
+vtkCxxRevisionMacro(vtkPVNavigationWindow, "1.20.4.1");
 
 //-----------------------------------------------------------------------------
 vtkPVNavigationWindow::vtkPVNavigationWindow()
@@ -110,12 +110,12 @@ void vtkPVNavigationWindow::ChildUpdate(vtkPVSource *currentSource)
         // Draw the name of the assembly.
         
         char *itext = this->GetTextRepresentation(source);
-        const char* res = this->CreateCanvasItem(
+        const char* cres = this->CreateCanvasItem(
           "%s create text %d %d -text {%s} -font %s -anchor e "
           "-tags x -fill blue",
           this->Canvas->GetWidgetName(), bboxSource[0]-50, y, itext, font);
         delete [] itext;
-        tmp = vtkString::Duplicate(res);
+        tmp = vtkString::Duplicate(cres);
         
         this->CalculateBBox(this->Canvas, tmp, bboxIn);
         if (this->CreateSelectionBindings)
@@ -196,12 +196,12 @@ void vtkPVNavigationWindow::ChildUpdate(vtkPVSource *currentSource)
     
     // Draw the name of the assembly .
     char *otext = this->GetTextRepresentation(source);
-    const char* res = this->CreateCanvasItem(
+    const char* nres = this->CreateCanvasItem(
       "%s create text %d %d -text {%s} -font %s -anchor w "
       "-tags x -fill blue",
       this->Canvas->GetWidgetName(), bboxSource[2]+50, y, otext, font);
     delete [] otext;
-    tmp = vtkString::Duplicate(res);
+    tmp = vtkString::Duplicate(nres);
     
     // Get the bounding box for the name.
     this->CalculateBBox(this->Canvas, tmp, bboxOut);

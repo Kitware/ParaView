@@ -43,7 +43,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class vtkCamera;
 class vtkCornerAnnotation;
-class vtkKWRenderWidgetObserver;
+class vtkKWRenderWidgetCallbackCommand;
 class vtkKWWindow;
 class vtkProp;
 class vtkRenderWindow;
@@ -112,18 +112,19 @@ public:
   virtual void Close();
   
   // Description:
-  // Setup/remove the widget bindings.
-  // SetupBindings(), which sets up general bindings like Expose or Configure
-  // events, will ultimately call SetupInteractionBindings() which sets up
+  // Add/remove the widget bindings.
+  // AddBindings(), which sets up general bindings like Expose or Configure
+  // events, will ultimately call AddInteractionBindings() which sets up
   // interaction bindings (mouse events, keyboard events, etc.).
-  virtual void SetupBindings();
+  virtual void AddBindings();
   virtual void RemoveBindings();
-  virtual void SetupInteractionBindings();
+  virtual void AddInteractionBindings();
   virtual void RemoveInteractionBindings();
   
   // Description:
   // Manage props inside this widget renderer(s). Add, remove, query.
   virtual void AddProp(vtkProp *prop);
+  virtual void AddOverlayProp(vtkProp *prop);
   virtual int  HasProp(vtkProp *prop);
   virtual void RemoveProp(vtkProp *prop);
   virtual void RemoveAllProps();
@@ -137,24 +138,29 @@ public:
 
   // Description:
   // Event handlers and useful interactions
-  virtual void MouseMove(int /*num*/, int /*x*/, int /*y*/) {}
+  virtual void MouseMove(int /*num*/, int /*x*/, int /*y*/) {};
   virtual void AButtonPress(int /*num*/, int /*x*/, int /*y*/, int /*ctrl*/,
-                            int /*shift*/) {}
-  virtual void AButtonRelease(int /*num*/, int /*x*/, int /*y*/) {}
+                            int /*shift*/) {};
+  virtual void AButtonRelease(int /*num*/, int /*x*/, int /*y*/) {};
   virtual void AKeyPress(char /*key*/, int /*x*/, int /*y*/, int /*ctrl*/,
-                         int /*shift*/, char* /*keysym*/) {}
+                         int /*shift*/, char* /*keysym*/) {};
   virtual void Exposed();
-  virtual void Configure(int /*width*/, int /*height*/) {}
-  virtual void Enter(int /*x*/, int /*y*/) {}
+  virtual void Configure(int /*width*/, int /*height*/) {};
+  virtual void Enter(int /*x*/, int /*y*/) {};
+
+  virtual void FocusInCallback();
+  virtual void FocusOutCallback();
 
   // Description:
   // Convenience method to set the visibility of all annotations.
   virtual void SetAnnotationsVisibility(int v);
+  vtkBooleanMacro(AnnotationsVisibility, int);
 
   // Description:
   // Get and control the corner annotation.
   virtual void SetCornerAnnotationVisibility(int v);
   virtual int  GetCornerAnnotationVisibility();
+  vtkBooleanMacro(CornerAnnotationVisibility, int);
   virtual void SetCornerAnnotationColor(float r, float g, float b);
   virtual void SetCornerAnnotationColor(float *rgb)
     { this->SetCornerAnnotationColor(rgb[0], rgb[1], rgb[2]); };
@@ -165,6 +171,7 @@ public:
   // Get and control the header annotation.
   virtual void SetHeaderAnnotationVisibility(int v);
   virtual int  GetHeaderAnnotationVisibility();
+  vtkBooleanMacro(HeaderAnnotationVisibility, int);
   virtual void SetHeaderAnnotationColor(float r, float g, float b);
   virtual void SetHeaderAnnotationColor(float *rgb)
     { this->SetHeaderAnnotationColor(rgb[0], rgb[1], rgb[2]); };
@@ -205,7 +212,7 @@ public:
   vtkGetObjectMacro(RenderWindow, vtkRenderWindow);
 
   // Description:
-  // If the widget supports multiple renderers:
+  // If the widget supports multiple renderers (excluding overlay renderers):
   // GetNthRenderer() gets the Nth renderer (or NULL if it does not exist),
   // GetRendererId() gets the id of a given renderer (or -1 if this renderer
   // does not belong to this widget)
@@ -216,6 +223,12 @@ public:
   // Get the VTK widget
   vtkGetObjectMacro(VTKWidget, vtkKWWidget);
   
+  // Description:
+  // Are we printing ?
+  virtual void SetPrinting(int arg);
+  vtkBooleanMacro(Printing, int);
+  vtkGetMacro(Printing, int);
+  
 #ifdef _WIN32
   void SetupPrint(RECT &rcDest, HDC ghdc,
                   int printerPageSizeX, int printerPageSizeY,
@@ -223,14 +236,20 @@ public:
                   float scaleX, float scaleY,
                   int screenSizeX, int screenSizeY);
 #endif
-  vtkSetMacro(Printing, int);
-  vtkGetMacro(Printing, int);
-  
-  virtual void SetupMemoryRendering(int width, int height, void *cd);
-  virtual void ResumeScreenRendering();
+
+  // Description:
+  // Get memory device context (when rendering to memory)
   virtual void* GetMemoryDC();
+
+  // Description:
+  // Setup offscreen rendering (e.g., for screenshots)
+  vtkBooleanMacro(OffScreenRendering, int);
+  virtual void SetOffScreenRendering(int);
   
-  virtual void ExecuteEvent(vtkObject *wdg, unsigned long event, void *calldata);
+  // Description:
+  // Method that processes the events
+  virtual void ProcessEvent(
+    vtkObject *caller, unsigned long event, void *calldata);
 
   // Description:
   // Update the "enable" state of the object and its internal parts.
@@ -251,6 +270,7 @@ protected:
   vtkTextActor        *HeaderAnnotation;
   
   vtkRenderer     *Renderer;
+  vtkRenderer     *OverlayRenderer;
   vtkRenderWindow *RenderWindow;
   vtkKWWindow     *ParentWindow;
   
@@ -267,10 +287,21 @@ protected:
   int CollapsingRenders;
   int CollapsingRendersCount;
 
-  vtkKWRenderWidgetObserver *Observer;
-
   virtual void UpdateAccordingToUnits() {};
 
+  // Description:
+  // Setup memory rendering
+  virtual void SetupMemoryRendering(int width, int height, void *cd);
+  virtual void ResumeScreenRendering();
+  
+  // Description:
+  // Add/remove the observers.
+  virtual void AddObservers();
+  virtual void RemoveObservers();
+  vtkKWRenderWidgetCallbackCommand *Observer;
+  
+  int PreviousRenderMode;
+  
 private:
   vtkKWRenderWidget(const vtkKWRenderWidget&);  // Not implemented
   void operator=(const vtkKWRenderWidget&);  // Not implemented

@@ -42,7 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkXMLKWUserInterfaceNotebookManagerWriter.h"
 
 vtkStandardNewMacro(vtkXMLKWWindowWriter);
-vtkCxxRevisionMacro(vtkXMLKWWindowWriter, "1.4");
+vtkCxxRevisionMacro(vtkXMLKWWindowWriter, "1.4.2.1");
 
 //----------------------------------------------------------------------------
 char* vtkXMLKWWindowWriter::GetRootElementName()
@@ -63,6 +63,12 @@ char* vtkXMLKWWindowWriter::GetUserInterfaceManagerElementName()
 }
 
 //----------------------------------------------------------------------------
+vtkXMLKWWindowWriter::vtkXMLKWWindowWriter()
+{
+  this->OutputUserInterfaceElementOnly = 0;
+}
+
+//----------------------------------------------------------------------------
 int vtkXMLKWWindowWriter::AddNestedElements(vtkXMLDataElement *elem)
 {
   if (!this->Superclass::AddNestedElements(elem))
@@ -79,16 +85,23 @@ int vtkXMLKWWindowWriter::AddNestedElements(vtkXMLDataElement *elem)
 
   // User Interface
 
-  vtkXMLDataElement *ui_elem = vtkXMLDataElement::New();
+  vtkXMLDataElement *ui_elem = this->NewDataElement();
   elem->AddNestedElement(ui_elem);
   ui_elem->Delete();
-  this->WriteUserInterfaceElement(ui_elem);
+  this->CreateUserInterfaceElement(ui_elem);
+
+  if (this->OutputUserInterfaceElementOnly)
+    {
+    return 1;
+    }
+
+  // The rest (to be filled)
 
   return 1;
 }
 
 //----------------------------------------------------------------------------
-int vtkXMLKWWindowWriter::WriteUserInterfaceElement(
+int vtkXMLKWWindowWriter::CreateUserInterfaceElement(
   vtkXMLDataElement *ui_elem)
 {
   if (!ui_elem)
@@ -128,4 +141,13 @@ int vtkXMLKWWindowWriter::WriteUserInterfaceElement(
     }
 
   return 1;
+}
+
+//----------------------------------------------------------------------------
+void vtkXMLKWWindowWriter::PrintSelf(ostream& os, vtkIndent indent)
+{
+  this->Superclass::PrintSelf(os,indent);
+
+  os << indent << "OutputUserInterfaceElementOnly: "
+     << (this->OutputUserInterfaceElementOnly ? "On" : "Off") << endl;
 }

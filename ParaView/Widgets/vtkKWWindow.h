@@ -54,7 +54,7 @@ class vtkKWNotebook;
 class vtkKWProgressGauge;
 class vtkKWSplitFrame;
 class vtkKWTclInteractor;
-class vtkKWToolbar;
+class vtkKWToolbarSet;
 class vtkKWUserInterfaceManager;
 class vtkKWView;
 class vtkKWViewCollection;
@@ -143,7 +143,7 @@ public:
   virtual void SetSelectedView(vtkKWView *);
   vtkGetObjectMacro(SelectedView,vtkKWView);
   vtkKWViewCollection *GetViews() {return this->Views;};
-  vtkGetObjectMacro(ViewFrame,vtkKWWidget);
+  vtkGetObjectMacro(ViewFrame,vtkKWFrame);
   
   // Description:
   // Proiperties may be bound to the window or view or
@@ -195,6 +195,10 @@ public:
   int GetFileMenuIndex();
 
   // Description:
+  // Return the index of the entry above the "About" entry in the help menu.
+  int GetHelpMenuIndex();
+
+  // Description:
   // Install a menu bar into this window.
   void InstallMenu(vtkKWMenu* menu);
 
@@ -206,15 +210,15 @@ public:
   // Description:
   // Allow access to the notebook object.
   vtkGetObjectMacro(Notebook,vtkKWNotebook);
+  virtual void ShowMostRecentPanels(int);
 
   // Description:
-  // This toolbar frame is below the menu. It is empty initially.
-  // Subclasses can add toolbars buttons as necessary.
-  vtkGetObjectMacro(ToolbarFrame, vtkKWWidget);
+  // The toolbar container.
+  vtkGetObjectMacro(Toolbars, vtkKWToolbarSet);
 
   // Description:
   // The status frame.
-  vtkGetObjectMacro(StatusFrame, vtkKWWidget);
+  vtkGetObjectMacro(StatusFrame, vtkKWFrame);
 
   // Description:
   // Get the progress gauge widget.  The progress gauge is displayed
@@ -311,7 +315,7 @@ public:
   // Get/Show the Application Settings Interface. 
   virtual vtkKWApplicationSettingsInterface* GetApplicationSettingsInterface() 
     { return 0; };
-  void ShowApplicationSettingsInterface();
+  int ShowApplicationSettingsInterface();
 
   // Description:
   // Display the tcl interactor.
@@ -334,10 +338,6 @@ public:
   // Description:
   // Update the toolbar aspect once the toolbar settings have been changed
   virtual void UpdateToolbarAspect();
-  virtual void SetToolbarsEnabled(int);
-  //BTX
-  vtkGetObjectMacro(Toolbars, vtkVector<vtkKWToolbar*>);
-  //ETX
 
   // Description:
   // Update the "enable" state of the object and its internal parts.
@@ -394,11 +394,11 @@ protected:
   vtkKWMenu *MenuHelp;
   vtkKWMenu *PageMenu;
 
-  vtkKWWidget *StatusFrame;
-  vtkKWWidget *StatusImage;
+  vtkKWFrame *StatusFrame;
+  vtkKWLabel *StatusImage;
 
   vtkKWProgressGauge *ProgressGauge;
-  vtkKWWidget        *ProgressFrame;
+  vtkKWFrame         *ProgressFrame;
 
   vtkKWFrame      *TrayFrame;
   vtkKWLabel      *TrayImageError;
@@ -408,8 +408,10 @@ protected:
   vtkSetStringMacro(StatusImageName);
 
   vtkKWWidget *PropertiesParent;
-  vtkKWWidget *ViewFrame;
-  vtkKWWidget *ToolbarFrame;
+  vtkKWFrame *ViewFrame;
+  vtkKWToolbarSet *Toolbars;
+
+  vtkKWFrame *MenuBarSeparatorFrame;
 
   vtkKWMessageDialog *ExitDialogWidget;
 
@@ -421,12 +423,6 @@ protected:
   char  *Title;
   int   PromptBeforeClose;
   int   InExit;
-
-  //BTX
-  // Description:
-  // This vector holds the list of toolbars.
-  vtkVector<vtkKWToolbar*> *Toolbars;
-  //ETX
 
   vtkKWTclInteractor *TclInteractor;
 

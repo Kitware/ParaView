@@ -3,10 +3,13 @@ SET (files
   lib/tcl8.4/auto.tcl
   lib/tcl8.4/init.tcl
   lib/tcl8.4/word.tcl
+  lib/tcl8.4/encoding/ascii.enc
+  lib/tcl8.4/encoding/iso8859-1.enc
   lib/tk8.4/tclIndex
   lib/tk8.4/button.tcl
   lib/tk8.4/comdlg.tcl
   lib/tk8.4/entry.tcl
+  lib/tk8.4/focus.tcl
   lib/tk8.4/listbox.tcl
   lib/tk8.4/menu.tcl
   lib/tk8.4/optMenu.tcl
@@ -37,3 +40,8 @@ IF (CXX_TEST_PATH)
     ENDFOREACH (file)
   ENDFOREACH(config)
 ENDIF (CXX_TEST_PATH)
+
+FOREACH(file ${files})
+  GET_FILENAME_COMPONENT(dest ${file} PATH)
+  INSTALL_FILES(${KW_INSTALL_LIB_DIR}/TclTk/${dest} FILES ${file})
+ENDFOREACH(file)

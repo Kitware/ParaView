@@ -60,7 +60,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVProcessModule.h"
 
 vtkStandardNewMacro(vtkPVPlaneWidget);
-vtkCxxRevisionMacro(vtkPVPlaneWidget, "1.34.4.4");
+vtkCxxRevisionMacro(vtkPVPlaneWidget, "1.34.4.5");
 
 int vtkPVPlaneWidgetCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -132,9 +132,15 @@ void vtkPVPlaneWidget::ExecuteEvent(vtkObject* wdg, unsigned long l, void* p)
     {
     float val[3];
     widget->GetCenter(val); 
-    this->SetCenterInternal(val[0], val[1], val[2]);
+    for (cc=0; cc < 3; cc ++ )
+      {
+      this->CenterEntry[cc]->SetValue(val[cc]);
+      }
     widget->GetNormal(val); 
-    this->SetNormalInternal(val[0], val[1], val[2]);
+    for (cc=0; cc < 3; cc ++ )
+      {
+      this->NormalEntry[cc]->SetValue(val[cc]);
+      }
     }
   this->Superclass::ExecuteEvent(wdg, l, p);
 }
@@ -150,9 +156,9 @@ int vtkPVPlaneWidget::ReadXMLAttributes(vtkPVXMLElement* element,
 //----------------------------------------------------------------------------
 void vtkPVPlaneWidget::SetCenter(float x, float y, float z)
 {
-  this->CenterEntry[0]->SetValue(x, 3);
-  this->CenterEntry[1]->SetValue(y, 3);
-  this->CenterEntry[2]->SetValue(z, 3); 
+  this->CenterEntry[0]->SetValue(x);
+  this->CenterEntry[1]->SetValue(y);
+  this->CenterEntry[2]->SetValue(z); 
   this->ModifiedCallback();
   if ( this->Widget3DID.ID )
     { 
@@ -166,9 +172,9 @@ void vtkPVPlaneWidget::SetCenter(float x, float y, float z)
 //----------------------------------------------------------------------------
 void vtkPVPlaneWidget::SetNormal(float x, float y, float z)
 {
-  this->NormalEntry[0]->SetValue(x, 3);
-  this->NormalEntry[1]->SetValue(y, 3);
-  this->NormalEntry[2]->SetValue(z, 3); 
+  this->NormalEntry[0]->SetValue(x);
+  this->NormalEntry[1]->SetValue(y);
+  this->NormalEntry[2]->SetValue(z); 
   this->ModifiedCallback();
   if ( this->Widget3DID.ID )
     {

@@ -49,7 +49,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVMPIRenderModule);
-vtkCxxRevisionMacro(vtkPVMPIRenderModule, "1.4.2.2");
+vtkCxxRevisionMacro(vtkPVMPIRenderModule, "1.4.2.3");
 
 
 
@@ -174,25 +174,27 @@ void vtkPVMPIRenderModule::SetPVApplication(vtkPVApplication *pvApp)
 //----------------------------------------------------------------------------
 void vtkPVMPIRenderModule::SetUseCompositeCompression(int val)
 {
-  if (this->CompositeID.ID)
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  if (strcmp(pvApp->GetRenderModuleName(),"DeskTopRenderModule") != 0)
     {
-    vtkPVApplication *pvApp = this->GetPVApplication();
-    vtkPVProcessModule* pm = pvApp->GetProcessModule();
     vtkClientServerID tmp;
-    if (val)
+    if (this->CompositeID.ID)
       {
-      tmp = pm->NewStreamObject("vtkCompressCompositer");
+      if (val)
+        {
+        tmp = pm->NewStreamObject("vtkCompressCompositer");
+        }
+      else
+        {
+        tmp = pm->NewStreamObject("vtkTreeCompositer");
+        }
+      pm->GetStream()
+        << vtkClientServerStream::Invoke
+        << this->CompositeID << "SetCompositer" << tmp
+        << vtkClientServerStream::End;
+      pm->DeleteStreamObject(tmp);
+      pm->SendStreamToClientAndServer();
       }
-    else
-      {
-      tmp = pm->NewStreamObject("vtkTreeCompositer");
-      }
-    pm->GetStream()
-      << vtkClientServerStream::Invoke
-      << this->CompositeID << "SetCompositer" << tmp
-      << vtkClientServerStream::End;
-    pm->DeleteStreamObject(tmp);
-    pm->SendStreamToClientAndServer();
     }
 }
 

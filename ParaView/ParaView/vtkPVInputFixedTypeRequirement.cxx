@@ -54,7 +54,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVInputFixedTypeRequirement);
-vtkCxxRevisionMacro(vtkPVInputFixedTypeRequirement, "1.5");
+vtkCxxRevisionMacro(vtkPVInputFixedTypeRequirement, "1.5.4.1");
 
 //----------------------------------------------------------------------------
 vtkPVInputFixedTypeRequirement::vtkPVInputFixedTypeRequirement()
@@ -71,34 +71,37 @@ int vtkPVInputFixedTypeRequirement::ReadXMLAttributes(vtkPVXMLElement*,
 
 
 //----------------------------------------------------------------------------
-int vtkPVInputFixedTypeRequirement::GetIsValidInput(vtkPVSource* input, vtkPVSource* pvs)
+int vtkPVInputFixedTypeRequirement::GetIsValidInput(vtkPVSource* newInput, 
+                                                    vtkPVSource* pvs)
 {
-  if (input == NULL)
+  vtkPVDataInformation *info1;
+  vtkPVDataInformation *info2;
+  vtkPVSource* oldInput;
+  int idx, num;
+
+  if (newInput == NULL)
     {
     return 0;
-    }
-  if (pvs->GetPVOutput() == NULL)
-    { // Proto has no output and needs no matching.
-    return 1;
     }
 
-  // Only accept inputs which match part for part.
-  // Well I do not really like this hack, but it will work for DataSetToDataSetFilters.
-  // We really need the old input, but I do not know which input it was.
-  // Better would have been to passed the input property as an argument.
-  // I already spent too long on this, so it will have to wait.
-  int partIdx, numParts;
-  numParts = pvs->GetNumberOfParts(); 
-  if (input->GetNumberOfParts() != numParts)
+  if (pvs->GetNumberOfPVInputs() == 0)
+    {
+    // Must be a prototype.
+    return 1;
+    }
+  // Only worry about the first input for now.
+  // We have no multiple data set to data set filters.
+  oldInput = pvs->GetPVInput(0);
+  num = oldInput->GetNumberOfParts();
+
+  if (newInput->GetNumberOfParts() != num)
     {
     return 0;
     }
-  for (partIdx = 0; partIdx < numParts; ++partIdx)
+  for (idx = 0; idx < num; ++idx)
     {
-    vtkPVDataInformation *info1;
-    vtkPVDataInformation *info2;
-    info1 = input->GetPart(partIdx)->GetDataInformation();
-    info2 = pvs->GetPart(partIdx)->GetDataInformation();
+    info1 = newInput->GetPart(idx)->GetDataInformation();
+    info2 = oldInput->GetPart(idx)->GetDataInformation();
     if (info1->GetDataSetType() != info2->GetDataSetType())
       {
       return 0;

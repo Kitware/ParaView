@@ -16,7 +16,7 @@
 #ifndef _H5Epublic_H
 #define _H5Epublic_H
 
-#undef _PROTOTYPES
+/*THIS IS BAD: #undef _PROTOTYPES*/
 #include <stdio.h>              /*FILE arg of H5Eprint()*/
 
 /* Public headers needed by this file */

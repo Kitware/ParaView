@@ -20,7 +20,7 @@
 #include "vtkCTHData.h"
 
 
-vtkCxxRevisionMacro(vtkCTHSource, "1.1.2.1");
+vtkCxxRevisionMacro(vtkCTHSource, "1.1.2.2");
 vtkStandardNewMacro(vtkCTHSource);
 
 //----------------------------------------------------------------------------

@@ -59,7 +59,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVProcessModule.h"
 
 vtkStandardNewMacro(vtkPVLineWidget);
-vtkCxxRevisionMacro(vtkPVLineWidget, "1.38.2.5");
+vtkCxxRevisionMacro(vtkPVLineWidget, "1.38.2.6");
 
 //----------------------------------------------------------------------------
 vtkPVLineWidget::vtkPVLineWidget()
@@ -158,9 +158,9 @@ void vtkPVLineWidget::SetResolutionLabelTextName(const char* varname)
 //----------------------------------------------------------------------------
 void vtkPVLineWidget::SetPoint1Internal(float x, float y, float z)
 {
-  this->Point1[0]->SetValue(x,5);
-  this->Point1[1]->SetValue(y,5);
-  this->Point1[2]->SetValue(z,5);
+  this->Point1[0]->SetValue(x);
+  this->Point1[1]->SetValue(y);
+  this->Point1[2]->SetValue(z);
  
   int i;
   float pos[3];
@@ -202,9 +202,9 @@ void vtkPVLineWidget::GetPoint1(float pt[3])
 //----------------------------------------------------------------------------
 void vtkPVLineWidget::SetPoint2Internal(float x, float y, float z)
 {
-  this->Point2[0]->SetValue(x,5);
-  this->Point2[1]->SetValue(y,5);
-  this->Point2[2]->SetValue(z,5);
+  this->Point2[0]->SetValue(x);
+  this->Point2[1]->SetValue(y);
+  this->Point2[2]->SetValue(z);
  
   int i;
   float pos[3];
@@ -590,7 +590,7 @@ void vtkPVLineWidget::ExecuteEvent(vtkObject* wdg, unsigned long l, void* p)
   widget->GetPoint1(val);
   for (i=0; i<3; i++)
     {
-    this->Point1[i]->SetValue(val[i],5);
+    this->Point1[i]->SetValue(val[i]);
     }
   
   vtkPVApplication *pvApp = this->GetPVApplication();

@@ -55,7 +55,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVScale);
-vtkCxxRevisionMacro(vtkPVScale, "1.17.2.4");
+vtkCxxRevisionMacro(vtkPVScale, "1.17.2.5");
 
 //----------------------------------------------------------------------------
 vtkPVScale::vtkPVScale()
@@ -64,8 +64,7 @@ vtkPVScale::vtkPVScale()
   this->LabelWidget = vtkKWLabel::New();
   this->Scale = vtkKWScale::New();
   this->Round = 0;
-  this->AcceptedValueInitialized = 0;
-  this->Property = NULL;
+  this->RangeSourceVariable = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -77,6 +76,7 @@ vtkPVScale::~vtkPVScale()
   this->LabelWidget->Delete();
   this->LabelWidget = NULL;
   this->SetProperty(NULL);
+  this->SetRangeSourceVariable(0);
 }
 
 void vtkPVScale::SetLabel(const char* label)
@@ -282,7 +282,17 @@ void vtkPVScale::Trace(ofstream *file)
 //----------------------------------------------------------------------------
 void vtkPVScale::ResetInternal()
 {
-  this->SetValue(this->Property->GetScalar(0));
+ if (this->Property)
+    {
+    this->SetValue(this->Property->GetScalar(0));
+    }
+  if ( this->ObjectTclName && this->RangeSourceVariable )
+    {
+    this->GetPVApplication()->GetProcessModule()->RootScript("%s Get%s",
+                  this->ObjectTclName, this->RangeSourceVariable);
+    this->Script("eval %s SetRange %s", this->Scale->GetTclName(),
+                  this->GetPVApplication()->GetProcessModule()->GetRootResult());                  
+    }
 
   this->ModifiedFlag = 0;
 }
@@ -308,6 +318,7 @@ void vtkPVScale::CopyProperties(vtkPVWidget* clone, vtkPVSource* pvSource,
     pvs->SetRange(min, max);
     pvs->SetResolution(this->Scale->GetResolution());
     pvs->SetLabel(this->EntryLabel);
+    pvs->SetRangeSourceVariable(this->RangeSourceVariable);
     }
   else 
     {
@@ -355,6 +366,11 @@ int vtkPVScale::ReadXMLAttributes(vtkPVXMLElement* element,
     range[1] = 100;
     }
   this->SetRange(range[0], range[1]);
+  const char* range_source = element->GetAttribute("range_source");
+  if(range_source)
+    {
+    this->SetRangeSourceVariable(range_source);
+    }
 
   return 1;
   

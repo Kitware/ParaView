@@ -39,7 +39,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWCheckButton );
-vtkCxxRevisionMacro(vtkKWCheckButton, "1.23");
+vtkCxxRevisionMacro(vtkKWCheckButton, "1.23.4.1");
 
 //----------------------------------------------------------------------------
 vtkKWCheckButton::vtkKWCheckButton() 
@@ -123,15 +123,7 @@ void vtkKWCheckButton::SetIndicator(int ind)
 void vtkKWCheckButton::SetText(const char* txt)
 {
   this->SetMyText(txt);
-  
-  if (this->IsCreated())
-    {
-    if (this->MyText)
-      {
-      this->Script("%s configure -text {%s}", 
-                   this->GetWidgetName(), this->MyText);
-      }
-    }
+  this->SetTextOption(txt);
 }
 
 //----------------------------------------------------------------------------
@@ -201,10 +193,7 @@ void vtkKWCheckButton::Configure()
   this->Script("%s configure -indicatoron %d",
                wname, (this->IndicatorOn ? 1 : 0));
 
-  if (this->MyText)
-    {
-    this->Script("%s configure -text {%s}", wname, this->MyText);
-    }
+  this->SetTextOption(this->MyText);
 
   // Set the variable name if not set already
   if (!this->VariableName)
@@ -264,6 +253,13 @@ void vtkKWCheckButton::SetImageOption(const unsigned char* data,
       data, width, height, pixel_size, buffer_length, 
       "-selectcolor", "-selectimage");
     }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWCheckButton::SetImageOption(const char *image_name,
+                                      const char *image_option)
+{
+  this->Superclass::SetImageOption(image_name, image_option);
 }
 
 //----------------------------------------------------------------------------

@@ -52,6 +52,8 @@ set kw(vtkTemp320) [$kw(vtkTemp300) GetPVWidget {Glyph}]
 $kw(vtkTemp320) SetCurrentValue $kw(vtkTemp97)
 set kw(vtkTemp309) [$kw(vtkTemp300) GetPVWidget {Orient}]
 $kw(vtkTemp309) SetCurrentValue {Off}
+set kw(vtkTemp310) [$kw(vtkTemp300) GetPVWidget {Scale Factor}]
+$kw(vtkTemp310) SetValue "1"
 $kw(vtkTemp300) AcceptCallback
 
 

@@ -55,6 +55,8 @@ set kw(vtkTemp400) [$kw(vtkTemp1) CreatePVSource Glyph]
 set kw(vtkTemp142) [$kw(vtkTemp1) GetPVSource GlyphSources Arrow0]
 set kw(vtkTemp427) [$kw(vtkTemp400) GetPVWidget {Glyph}]
 $kw(vtkTemp427) SetCurrentValue $kw(vtkTemp142)
+set kw(vtkTemp430) [$kw(vtkTemp400) GetPVWidget {Scale Factor}]
+$kw(vtkTemp430) SetValue "1"
 $kw(vtkTemp400) AcceptCallback
 $kw(vtkTemp21) SetCameraState 39.338 4.455 37.614  15.000 15.000 15.000  -0.619 0.201 0.760
 $kw(vtkTemp427) SetCurrentValue $kw(vtkTemp142)

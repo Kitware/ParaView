@@ -62,6 +62,10 @@ public:
   void SetInputMask(int idx, int flag);
   int GetInputMask(int idx);
 
+  // Description:
+  // By default copy the output update extent to the input
+  virtual void ComputeInputUpdateExtents( vtkDataObject *output );
+
 protected:
   vtkSelectInputs();
   ~vtkSelectInputs();

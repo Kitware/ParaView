@@ -41,333 +41,80 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "vtkPVContourEntry.h"
 
-#include "vtkArrayMap.txx"
 #include "vtkContourValues.h"
-#include "vtkKWEntry.h"
-#include "vtkKWLabel.h"
-#include "vtkKWListBox.h"
-#include "vtkKWMenu.h"
-#include "vtkKWPushButton.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVAnimationInterfaceEntry.h"
 #include "vtkPVApplication.h"
+#include "vtkPVArrayInformation.h"
+#include "vtkPVArrayMenu.h"
 #include "vtkPVContourWidgetProperty.h"
+#include "vtkPVScalarRangeLabel.h"
 #include "vtkPVSource.h"
 #include "vtkPVXMLElement.h"
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVContourEntry);
-vtkCxxRevisionMacro(vtkPVContourEntry, "1.28.2.7");
+vtkCxxRevisionMacro(vtkPVContourEntry, "1.28.2.8");
 
+vtkCxxSetObjectMacro(vtkPVContourEntry, ArrayMenu, vtkPVArrayMenu);
+
+//-----------------------------------------------------------------------------
 int vtkPVContourEntryCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
+
 
 //-----------------------------------------------------------------------------
 vtkPVContourEntry::vtkPVContourEntry()
 {
   this->CommandFunction = vtkPVContourEntryCommand;
 
-  this->ContourValues = vtkContourValues::New();  
-  this->ContourValuesLabel = vtkKWLabel::New();
-  this->ContourValuesList = vtkKWListBox::New();
-  this->NewValueFrame = vtkKWWidget::New();
-  this->NewValueLabel = vtkKWLabel::New();
-  this->NewValueEntry = vtkKWEntry::New();
-  this->AddValueButton = vtkKWPushButton::New();
-  this->DeleteValueButton = vtkKWPushButton::New();
-
-  this->ContourValues->SetNumberOfContours(0);
   this->SuppressReset = 1;
   
   this->AcceptCalled = 0;
   this->Property = NULL;
+  
+  this->ArrayMenu = NULL;
 }
 
 //-----------------------------------------------------------------------------
 vtkPVContourEntry::~vtkPVContourEntry()
 {
-  this->ContourValues->Delete();
-  this->ContourValues = NULL;
-  this->ContourValuesLabel->Delete();
-  this->ContourValuesLabel = NULL;
-  this->ContourValuesList->Delete();
-  this->ContourValuesList = NULL;
-  this->NewValueLabel->Delete();
-  this->NewValueLabel = NULL;
-  this->NewValueEntry->Delete();
-  this->NewValueEntry = NULL;
-  this->AddValueButton->Delete();
-  this->AddValueButton = NULL;
-  this->NewValueFrame->Delete();
-  this->NewValueFrame = NULL;
-  this->DeleteValueButton->Delete();
-  this->DeleteValueButton = NULL;
-
   this->SetPVSource(NULL);
-  
   this->SetProperty(NULL);
+  this->SetArrayMenu(NULL);
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVContourEntry::SetLabel(const char* str)
+int vtkPVContourEntry::GetValueRange(float range[2])
 {
-  this->ContourValuesLabel->SetLabel(str);
-  if (str && str[0] &&
-      (this->TraceNameState == vtkPVWidget::Uninitialized ||
-       this->TraceNameState == vtkPVWidget::Default) )
+  if (!this->ArrayMenu)
     {
-    this->SetTraceName(str);
-    this->SetTraceNameState(vtkPVWidget::SelfInitialized);
+    vtkErrorMacro("Array menu has not been set.");
+    return 0;
     }
+
+  vtkPVArrayInformation* ai = this->ArrayMenu->GetArrayInformation();
+  if (ai == NULL || ai->GetName() == NULL)
+    {
+    return 0;
+    }
+
+  ai->GetComponentRange(0, range);
+  return 1;
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVContourEntry::Create(vtkKWApplication *app)
-{
-  if (this->Application != NULL)
-    {
-    vtkErrorMacro("Object has already been created.");
-    return;
-    }
-  this->SetApplication(app);
-
-  // create the top level
-  this->Script("frame %s", this->GetWidgetName());
-  
-  this->ContourValuesLabel->SetParent(this);
-  this->ContourValuesLabel->Create(app, "");
-  
-  this->ContourValuesList->SetParent(this);
-  this->ContourValuesList->Create(app, "");
-  this->ContourValuesList->SetHeight(5);
-  this->Script("bind %s <Delete> {%s DeleteValueCallback}",
-               this->ContourValuesList->GetWidgetName(),
-               this->GetTclName());
-
-  // We need focus for delete binding.
-  this->Script("bind %s <Enter> {focus %s}",
-               this->ContourValuesList->GetWidgetName(),
-               this->ContourValuesList->GetWidgetName());
-  
-  this->NewValueFrame->SetParent(this);
-  this->NewValueFrame->Create(app, "frame", "");
-  
-  this->Script("pack %s %s %s",
-               this->ContourValuesLabel->GetWidgetName(),
-               this->ContourValuesList->GetWidgetName(),
-               this->NewValueFrame->GetWidgetName());
-  
-  this->NewValueLabel->SetParent(this->NewValueFrame);
-  this->NewValueLabel->Create(app, "");
-  this->NewValueLabel->SetLabel("New Value:");
-  this->NewValueLabel->SetBalloonHelpString("Enter a new value");
-  
-  this->NewValueEntry->SetParent(this->NewValueFrame);
-  this->NewValueEntry->Create(app, "");
-  this->NewValueEntry->SetValue("");
-  this->NewValueEntry->SetBalloonHelpString("Enter a new value");
-  this->Script("bind %s <KeyPress-Return> {%s AddValueCallback}",
-               this->NewValueEntry->GetWidgetName(),
-               this->GetTclName());
-  this->Script("bind %s <KeyPress> {%s ModifiedCallback}",
-               this->NewValueEntry->GetWidgetName(), this->GetTclName());
-  
-  this->AddValueButton->SetParent(this->NewValueFrame);
-  this->AddValueButton->Create(app, "-text {Add}");
-  this->AddValueButton->SetCommand(this, "AddValueCallback");
-  this->AddValueButton->SetBalloonHelpString("Add the new value to the list");
-  
-  this->Script("pack %s %s %s -side left",
-               this->NewValueLabel->GetWidgetName(),
-               this->NewValueEntry->GetWidgetName(),
-               this->AddValueButton->GetWidgetName());
-  
-  this->DeleteValueButton->SetParent(this->NewValueFrame);
-  this->DeleteValueButton->Create(app, "-text {Delete}");
-  this->DeleteValueButton->SetCommand(this, "DeleteValueCallback");
-  this->DeleteValueButton->SetBalloonHelpString(
-    "Remove the currently selected  value from the list");
-
-  this->Script("pack %s -side left",
-               this->DeleteValueButton->GetWidgetName());
-
-  this->SetBalloonHelpString(this->BalloonHelpString);
-
-  // Get the default values in the UI.
-  this->Update();
-}
-
-//-----------------------------------------------------------------------------
-void vtkPVContourEntry::Update()
-{
-  int num, idx;
-  char str[256];
-
-  if (this->Application == NULL)
-    {
-    return;
-    }
-
-  this->ContourValuesList->DeleteAll();
-  num = this->ContourValues->GetNumberOfContours();
-  for (idx = 0; idx < num; ++idx)
-    {
-    sprintf(str, "%g", this->ContourValues->GetValue(idx));
-    this->ContourValuesList->AppendUnique(str);
-    }    
-}
-
-//-----------------------------------------------------------------------------
-void vtkPVContourEntry::SetBalloonHelpString(const char *str)
-{
-
-  // A little overkill.
-  if (this->BalloonHelpString == NULL && str == NULL)
-    {
-    return;
-    }
-
-  // This check is needed to prevent errors when using
-  // this->SetBalloonHelpString(this->BalloonHelpString)
-  if (str != this->BalloonHelpString)
-    {
-    // Normal string stuff.
-    if (this->BalloonHelpString)
-      {
-      delete [] this->BalloonHelpString;
-      this->BalloonHelpString = NULL;
-      }
-    if (str != NULL)
-      {
-      this->BalloonHelpString = new char[strlen(str)+1];
-      strcpy(this->BalloonHelpString, str);
-      }
-    }
-  
-  if ( this->Application && !this->BalloonHelpInitialized )
-    {
-    this->ContourValuesList->SetBalloonHelpString(this->BalloonHelpString);
-    this->BalloonHelpInitialized = 1;
-    }
-}
-
-//-----------------------------------------------------------------------------
-void vtkPVContourEntry::AddValueCallback()
-{
-  if (strcmp(this->NewValueEntry->GetValue(), "") == 0)
-    {
-    return;
-    }
-
-  float newVal = this->NewValueEntry->GetValueAsFloat();
-  this->ContourValues->SetValue(this->ContourValues->GetNumberOfContours(),
-                                newVal);
-  this->Update();
-  this->NewValueEntry->SetValue("");
-  this->ModifiedCallback();
-  
-  if (!this->AcceptCalled)
-    {
-    this->UpdateProperty();
-    }
-}
-
-//-----------------------------------------------------------------------------
-void vtkPVContourEntry::DeleteValueCallback()
-{
-  int index;
-  int num, idx;
-  
-  num = this->ContourValues->GetNumberOfContours();
-
-  // First look for selected values in the value list.
-  index = this->ContourValuesList->GetSelectionIndex();
-  if (index == -1)
-    {
-    // Next look for values in the entry box.
-    if (strcmp(this->NewValueEntry->GetValue(), "") != 0)
-      {
-      // Find the index of the value in the entry box.
-      // If the entry value is not in the list,
-      // this will just clear the entry and return.
-      for (idx = 0; idx < num && index < 0; ++idx)
-        {
-        if (this->NewValueEntry->GetValueAsFloat() == 
-              this->ContourValues->GetValue(idx))
-          {
-          index = idx;
-          }
-        }
-      }
-    else
-      {
-      // Finally just delete the last in the list.
-      index = num - 1;
-      }
-    }
-
-  if ( index >= 0 )
-    {
-    for (idx = index+1; idx < num; ++idx)
-      {
-      this->ContourValues->SetValue(idx-1,
-                              this->ContourValues->GetValue(idx));
-      }
-    this->ContourValues->SetNumberOfContours(num-1);
-    if (!this->AcceptCalled)
-      {
-      this->UpdateProperty();
-      }
-    this->Update();
-    this->ModifiedCallback();
-    }
-
-  this->NewValueEntry->SetValue("");
-}
-
-//-----------------------------------------------------------------------------
-void vtkPVContourEntry::AddValueInternal(float val)
-{
-  int num = this->ContourValues->GetNumberOfContours();
-
-  this->ContourValues->SetValue(num, val);
-}
-
-//-----------------------------------------------------------------------------
-void vtkPVContourEntry::AddValue(float val)
-{
-  this->AddValueInternal(val);
-  this->ModifiedCallback();
-}
-
-//-----------------------------------------------------------------------------
-void vtkPVContourEntry::RemoveAllValues()
-{
-  this->ContourValues->SetNumberOfContours(0);
-  this->Update();
-  this->ModifiedCallback();
-}
-
-//-----------------------------------------------------------------------------
-void vtkPVContourEntry::AcceptInternal(vtkClientServerID sourceID)
+void vtkPVContourEntry::AcceptInternal(const char* sourceTclName)
 {
   int i;
   int numContours;
 
-  if (sourceID.ID == 0)
+  if (sourceTclName == NULL)
     {
     return;
     }
 
-  // Hit the add value button incase the user forgot.
-  // This does nothing if there is no value in there.
-  if (strcmp(this->NewValueEntry->GetValue(), "") != 0)
-    {
-    this->ContourValues->SetValue(this->ContourValues->GetNumberOfContours(),
-                                  this->NewValueEntry->GetValueAsFloat());
-    this->Update();
-    this->NewValueEntry->SetValue("");
-    }
+  this->Superclass::AcceptInternal(sourceTclName);
 
   numContours = this->ContourValues->GetNumberOfContours();
 
@@ -387,7 +134,7 @@ void vtkPVContourEntry::AcceptInternal(vtkClientServerID sourceID)
     numScalars[i+1] = 2;
     }
   
-  this->Property->SetVTKSourceID(sourceID);
+  this->Property->SetVTKSourceTclName(sourceTclName);
   this->Property->SetVTKCommands(numContours+1, cmds, numScalars);
   this->Property->AcceptInternal();
   
@@ -399,28 +146,6 @@ void vtkPVContourEntry::AcceptInternal(vtkClientServerID sourceID)
   delete [] numScalars;
   
   this->AcceptCalled = 1;
-}
-
-//-----------------------------------------------------------------------------
-void vtkPVContourEntry::Trace(ofstream *file)
-{
-  int i, numContours;
-  float value;
-
-  if ( ! this->InitializeTrace(file))
-    {
-    return;
-    }
-
-  *file << "$kw(" << this->GetTclName() << ") RemoveAllValues \n";
-
-  numContours = this->ContourValues->GetNumberOfContours();
-  for (i = 0; i < numContours; i++)
-    {
-    value = this->ContourValues->GetValue(i);
-    *file << "$kw(" << this->GetTclName() << ") AddValue "
-          << value << endl;
-    }
 }
 
 //-----------------------------------------------------------------------------
@@ -473,16 +198,6 @@ void vtkPVContourEntry::ResetInternal()
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVContourEntry::AddAnimationScriptsToMenu(vtkKWMenu *menu, 
-                                                  vtkPVAnimationInterfaceEntry *ai)
-{
-  char methodAndArgs[500];
-  
-  sprintf(methodAndArgs, "AnimationMenuCallback %s", ai->GetTclName()); 
-  menu->AddCommand(this->GetTraceName(), this, methodAndArgs, 0,"");
-}
-
-//-----------------------------------------------------------------------------
 void vtkPVContourEntry::AnimationMenuCallback(vtkPVAnimationInterfaceEntry *ai)
 {
   if (ai->InitializeTrace(NULL))
@@ -501,30 +216,23 @@ void vtkPVContourEntry::AnimationMenuCallback(vtkPVAnimationInterfaceEntry *ai)
   ai->Update();
 }
 
-//-----------------------------------------------------------------------------
-vtkPVContourEntry* vtkPVContourEntry::ClonePrototype(vtkPVSource* pvSource,
-                                 vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
+//----------------------------------------------------------------------------
+void vtkPVContourEntry::CopyProperties(
+  vtkPVWidget* clone, 
+  vtkPVSource* pvSource,
+  vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
 {
-  vtkPVWidget* clone = this->ClonePrototypeInternal(pvSource, map);
-  return vtkPVContourEntry::SafeDownCast(clone);
-}
-
-//-----------------------------------------------------------------------------
-void vtkPVContourEntry::CopyProperties(vtkPVWidget* clone, 
-                                       vtkPVSource* pvSource,
-                              vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
-{
-  int idx, num;
-
   this->Superclass::CopyProperties(clone, pvSource, map);
   vtkPVContourEntry* pvce = vtkPVContourEntry::SafeDownCast(clone);
   if (pvce)
     {
-    pvce->SetLabel(this->ContourValuesLabel->GetLabel());
-    num = this->ContourValues->GetNumberOfContours();
-    for (idx = 0; idx < num; ++idx)
+    if (this->ArrayMenu)
       {
-      pvce->AddValue(this->ContourValues->GetValue(idx));
+      // This will either clone or return a previously cloned
+      // object.
+      vtkPVArrayMenu* am = this->ArrayMenu->ClonePrototype(pvSource, map);
+      pvce->SetArrayMenu(am);
+      am->Delete();
       }
     }
   else 
@@ -539,29 +247,30 @@ int vtkPVContourEntry::ReadXMLAttributes(vtkPVXMLElement* element,
 {
   if(!this->Superclass::ReadXMLAttributes(element, parser)) { return 0; }
   
-  const char* attr;
-
-  attr = element->GetAttribute("label");
-  if(!attr)
+  // Setup the ArrayMenu.
+  const char* array_menu = element->GetAttribute("array_menu");
+  if(array_menu)
     {
-    vtkErrorMacro("No label attribute.");
-    return 0;
+    vtkPVXMLElement* ame = element->LookupElement(array_menu);
+    if (!ame)
+      {
+      vtkErrorMacro("Couldn't find ArrayMenu element " << array_menu);
+      return 0;
+      }
+    vtkPVWidget* w = this->GetPVWidgetFromParser(ame, parser);
+    vtkPVArrayMenu* amw = vtkPVArrayMenu::SafeDownCast(w);
+    if(!amw)
+      {
+      if(w) { w->Delete(); }
+      vtkErrorMacro("Couldn't get ArrayMenu widget " << array_menu);
+      return 0;
+      }
+    amw->AddDependent(this);
+    this->SetArrayMenu(amw);
+    amw->Delete();  
     }
-  this->SetLabel(attr);
   
-  attr = element->GetAttribute("initial_value");
-  if(attr)
-    {
-    this->AddValue(atof(attr));
-    }
-
   return 1;
-}
-
-//-----------------------------------------------------------------------------
-const char* vtkPVContourEntry::GetLabel() 
-{
-  return this->ContourValuesLabel->GetLabel();
 }
 
 //-----------------------------------------------------------------------------
@@ -597,4 +306,5 @@ vtkPVWidgetProperty* vtkPVContourEntry::CreateAppropriateProperty()
 void vtkPVContourEntry::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
+  os << indent << "ArrayMenu: " << this->GetArrayMenu() << endl;
 }

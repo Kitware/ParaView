@@ -46,7 +46,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWIcon );
-vtkCxxRevisionMacro(vtkKWIcon, "1.20");
+vtkCxxRevisionMacro(vtkKWIcon, "1.20.4.1");
 
 //----------------------------------------------------------------------------
 vtkKWIcon::vtkKWIcon()
@@ -294,6 +294,14 @@ void vtkKWIcon::SetImage(int image)
         image_axes_buffer_length);
       break;
 
+    case vtkKWIcon::ICON_CONNECTION:
+      this->SetImage(
+        image_connection, 
+        image_connection_width, image_connection_height,
+        image_connection_pixel_size, 
+        image_connection_buffer_length);
+      break;
+
     case vtkKWIcon::ICON_CONTOURS:
       this->SetImage(
         image_contours, 
@@ -454,6 +462,14 @@ void vtkKWIcon::SetImage(int image)
         image_question_buffer_length);
       break;
 
+    case vtkKWIcon::ICON_RELOAD:
+      this->SetImage(
+        image_reload, 
+        image_reload_width, image_reload_height,
+        image_reload_pixel_size, 
+        image_reload_buffer_length);
+      break;
+
     case vtkKWIcon::ICON_SHRINK:
       this->SetImage(
         image_shrink, 
@@ -478,6 +494,14 @@ void vtkKWIcon::SetImage(int image)
         image_smallerrorred_buffer_length);
       break;
 
+    case vtkKWIcon::ICON_STOPWATCH:
+      this->SetImage(
+        image_stopwatch, 
+        image_stopwatch_width, image_stopwatch_height,
+        image_stopwatch_pixel_size, 
+        image_stopwatch_buffer_length);
+      break;
+      
     case vtkKWIcon::ICON_TRANSFER:
       this->SetImage(
         image_transfer, 

@@ -104,7 +104,7 @@ delivered open source. Hence ParaView is available as an open-source system.
      <tr>
       <td>
        <ul>
-       <li> 
+       <li>
             All processing operations (filters) produce datasets. This allows
             the user to either process further or to save as a data file the 
             result of every operation. For example, the user can extract a
@@ -118,7 +118,7 @@ delivered open source. Hence ParaView is available as an open-source system.
      <tr>
       <td>
        <ul>
-       <li> 
+       <li>
             <em>Contours and isosurfaces</em> can be extracted from all data 
             types using scalars or vector components. The results can be 
             colored by any other variable or processed further. When possible,
@@ -153,10 +153,9 @@ delivered open source. Hence ParaView is available as an open-source system.
      <tr>
       <td>
        <ul>
-       <li> 
+       <li>
             <em>Streamlines</em> can be generated using constant step or 
-            adaptive integrators (currently, streamlines are not available
-            in parallel, this feature is under development). The results
+            adaptive integrators. The results
             can be displayed as points, lines, tubes, ribbons etc. and
             can be processed by a multitude of filters.
        </ul>
@@ -174,7 +173,7 @@ delivered open source. Hence ParaView is available as an open-source system.
      <tr>
       <td>
        <ul>
-       <li> 
+       <li>
             With the <em>array calculator</em>, new variables can be computed
             using existing point or cell field arrays. A multitude of
             scalar and vector operations are supported.
@@ -217,16 +216,15 @@ delivered open source. Hence ParaView is available as an open-source system.
        <ul>
        <li> Supports a variety of file formats including:
          <ul>
-          <li> VTK (all types including parallel, ascii and binary, can
-               read and written)
+          <li> VTK (new and legacy, all types including parallel, ascii and
+               binary, can read and written)
           <li> EnSight 6 and EnSight Gold (all types including parallel, 
                ascii and binary; multiple parts are supported -each part 
                is loaded separately and can be processed individually)
                (read only)
           <li> Plot3D (ascii and binary, C or Fortran; support for
-               multiple blocks -each block is loaded separately and
-               can be processed individually-, I blanking is currently
-               partially supported) (read only)
+               multiple blocks, I blanking is currently partially supported)
+               (read only)
           <li> Various polygonal file formats including STL and BYU
                (by default, read only, other VTK writers can be added 
                by writing XML description)
@@ -234,11 +232,12 @@ delivered open source. Hence ParaView is available as an open-source system.
        </ul>
       </td>
      </tr>
+
      <tr>
       <td>
        <ul>
-          <li> Since ParaView is open source, the user can easily provide 
-               her own readers and writers.
+          <li> Many other file formats are supported. See the documentation
+               for details.
        </ul>
       </td>
      </tr>
@@ -246,9 +245,8 @@ delivered open source. Hence ParaView is available as an open-source system.
      <tr>
       <td>
        <ul>
-        <li> New flexible  XML based file formats (which fully
-             support distributed data) are being developed and prototypes
-             are provided with ParaView.
+          <li> Since ParaView is open source, the user can easily provide 
+               her own readers and writers.
        </ul>
       </td>
      </tr>
@@ -282,7 +280,7 @@ delivered open source. Hence ParaView is available as an open-source system.
      <tr>
       <td>
        <ul>
-         <li> 
+         <li>
               Allows changing the parameters of many 
               filters by directly interacting with the 3D view using
               <em>3D widgets (manipulators)</em>. For example, the
@@ -324,6 +322,15 @@ delivered open source. Hence ParaView is available as an open-source system.
       </td>
      <tr>
 
+       <tr>
+      <td>
+       <ul>
+       <li> The user interface can be run either on the root MPI node
+            or on a separate workstation using the client/server mode.
+       </ul>
+      </td>
+     <tr>
+
      <tr>
       <td>
        <ul>
@@ -354,7 +361,16 @@ delivered open source. Hence ParaView is available as an open-source system.
        </ul>
       </td>
      <tr>
-     
+
+     <tr>
+      <td>
+       <ul>
+       <li> ParaView supports tiled displays throught built-in display
+            manager. Support for Sandia's Ice-T library is under development.
+       </ul>
+      </td>
+     <tr>
+       
      </tbody>
     </table>
 
@@ -410,6 +426,17 @@ delivered open source. Hence ParaView is available as an open-source system.
     </table>
 
 <h1><A NAME="Compiling">Compiling ParaView</a></h1>
+
+We highly recommend that you use the ParaViewComplete distribution.
+If you download a paraview source tarball or checkout the
+ParaViewComplete module from CVS, you do not need to get VTK or Tcl/Tk
+separately.  This makes the build significantly simpler.  See the
+instructions at the top level of the ParaViewComplete source tree to
+build it.
+
+If you've chosen to build Tcl/Tk and VTK yourself, continue reading.
+
+<p>
 <b><font size=3>Install CMake, VTK and Tcl/Tk</font></b><br>
 To use ParaView, you will have to download and install VTK and CMake.
 (VTK serves as the visualization engine; CMake is the build environment.) 
@@ -421,13 +448,16 @@ instructions.
 <p>
 <hr>
 <p>
-<u><b>VTK</b></u> can be obtained downloaded from <a href="http://www.vtk.org">http://www.vtk.org</a> or can be obtained via CVS using the following procedure.
+<u><b>VTK</b></u> is included with the ParaViewComplete distribution
+and in the paraview source tarballs.  You need to get VTK separately only
+if you used CVS to checkout the ParaView module.
+VTK can be obtained downloaded from <a href="http://www.vtk.org">http://www.vtk.org</a> or can be obtained via CVS using the following procedure.
 <p>
-<b>cvs -d :pserver:anonymous@public.kitware.com:/cvsroot/VTK login</b><br>
+<b>cvs -d :pserver:anonymous@www.vtk.org:/cvsroot/VTK login</b><br>
 (respond with password vtk)
 <p>
 Follow this command by checking out the source code:<br>
-<b>cvs -d :pserver:anonymous@public.kitware.com:/cvsroot/VTK co -r ParaView-0-6 VTK</b>
+<b>cvs -d :pserver:anonymous@www.vtk.org:/cvsroot/VTK co -r ParaView-1-0 VTK</b>
 <p>
 (Note: CVS is a source code revision control system used by many participants 
 in the open-source community. To use CVS, you must have it installed on your 

@@ -55,7 +55,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkString.h"
 
 vtkStandardNewMacro(vtkPVSourceList);
-vtkCxxRevisionMacro(vtkPVSourceList, "1.31");
+vtkCxxRevisionMacro(vtkPVSourceList, "1.31.4.1");
 
 vtkCxxSetObjectMacro(vtkPVSourceList,Sources,vtkPVSourceCollection);
 
@@ -417,7 +417,7 @@ int vtkPVSourceList::UpdateSource(vtkPVSource *comp, int y, int in,int current)
                in + image_icon_max_width / 2, y);
   if (this->Application->GetMainInterp()->result)
     {
-    char *tmp = 
+    tmp = 
       vtkString::Duplicate(this->Application->GetMainInterp()->result);
     this->Script("%s bind %s <ButtonPress-1> {%s ToggleVisibility %d %s 1}",
                  this->Canvas->GetWidgetName(), tmp,

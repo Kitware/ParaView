@@ -42,105 +42,61 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // .NAME vtkPVContourEntry maintains a list of floats for contouring.
 // .SECTION Description
 // This widget lets the user add or delete floats from a list.
-// It is used for contours, but could be generalized for arbitrary lists.
+// It is used for contours.
 
 #ifndef __vtkPVContourEntry_h
 #define __vtkPVContourEntry_h
 
-#include "vtkPVWidget.h"
+#include "vtkPVValueList.h"
 
-class vtkKWListBox;
-class vtkKWEntry;
-class vtkKWPushButton;
-class vtkKWLabel;
-class vtkContourValues;
+class vtkPVArrayMenu;
 class vtkPVContourWidgetProperty;
 
-class VTK_EXPORT vtkPVContourEntry : public vtkPVWidget
+class VTK_EXPORT vtkPVContourEntry : public vtkPVValueList
 {
 public:
   static vtkPVContourEntry* New();
-  vtkTypeRevisionMacro(vtkPVContourEntry, vtkPVWidget);
+  vtkTypeRevisionMacro(vtkPVContourEntry, vtkPVValueList);
   void PrintSelf(ostream& os, vtkIndent indent);
   
-  // Description:
-  // Create the widget.
-  virtual void Create(vtkKWApplication *app);
-
-  // Description:
-  // Set the label.  The label can be used to get this widget
-  // from a script.
-  void SetLabel (const char* label);
-  const char* GetLabel();
-  
-  // Description:
-  // Access to this widget from a script.
-  void AddValueInternal(float val);
-  void AddValue(float val);
-  void RemoveAllValues();
-
-  // Description:
-  // Button callbacks.
-  void AddValueCallback();
-  void DeleteValueCallback();
-
-  // Description:
-  // adds a script to the menu of the animation interface.
-  virtual void AddAnimationScriptsToMenu(vtkKWMenu *menu, 
-                                         vtkPVAnimationInterfaceEntry *ai);
-
   // Description:
   // We need to make the callback here so the animation selection
   // can be traced properly.
   void AnimationMenuCallback(vtkPVAnimationInterfaceEntry *ai);
 
   // Description:
-  // This class redefines SetBalloonHelpString since it
-  // has to forward the call to a widget it contains.
-  virtual void SetBalloonHelpString(const char *str);
-
-//BTX
-  // Description:
-  // Creates and returns a copy of this widget. It will create
-  // a new instance of the same type as the current object
-  // using NewInstance() and then copy some necessary state 
-  // parameters.
-  vtkPVContourEntry* ClonePrototype(vtkPVSource* pvSource,
-                                 vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
-//ETX
-
-  // Description:
   // Gets called when the accept button is pressed.
-  virtual void AcceptInternal(vtkClientServerID);
+  virtual void AcceptInternal(const char* sourceTclName);
 
   // Description:
   // Gets called when the reset button is pressed.
   virtual void ResetInternal();
 
   // Description:
-  // This serves a dual purpose.  For tracing and for saving state.
-  virtual void Trace(ofstream *file);
+  // This virtual method returns the scalar range of the selected
+  // array for the input.
+  virtual int GetValueRange(float range[2]);
+  
+  // Description:
+  // ArrayMenu is used to obtain the scalar range (it contains an array
+  // information object)
+  virtual void SetArrayMenu(vtkPVArrayMenu*);
+  vtkGetObjectMacro(ArrayMenu, vtkPVArrayMenu);
 
+  // Description:
+  // Set the property to use with this widget.
   virtual void SetProperty(vtkPVWidgetProperty *prop);
+  
+  // Description:
+  // Create the right property for use with this widget.
   virtual vtkPVWidgetProperty* CreateAppropriateProperty();
   
 protected:
   vtkPVContourEntry();
   ~vtkPVContourEntry();
-
-  // Update UI from ContourValues object.
-  void Update();
-
-  vtkContourValues *ContourValues;
-  vtkKWLabel* ContourValuesLabel;
-  vtkKWListBox *ContourValuesList;
-  vtkKWWidget* NewValueFrame;
-  vtkKWLabel* NewValueLabel;
-  vtkKWEntry* NewValueEntry;
-  vtkKWPushButton* AddValueButton;
-  vtkKWPushButton* DeleteValueButton;
-
-  vtkContourValues *LastAcceptedContourValues;
+  
+  vtkPVArrayMenu *ArrayMenu;
+  
   int AcceptCalled;
   void UpdateProperty();
   vtkPVContourWidgetProperty *Property;
@@ -158,7 +114,8 @@ protected:
 
   // Description:
   // The widget saves it state/command in the vtk tcl script.
-  virtual void SaveInBatchScriptForPart(ofstream *file, const char* sourceTclName);
+  virtual void SaveInBatchScriptForPart(ofstream *file, 
+                                        const char* sourceTclName);
 };
 
 #endif

@@ -41,7 +41,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkObjectFactory.h"
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkKWScalarComponentSelectionWidget, "1.1");
+vtkCxxRevisionMacro(vtkKWScalarComponentSelectionWidget, "1.1.2.1");
 vtkStandardNewMacro(vtkKWScalarComponentSelectionWidget);
 
 //----------------------------------------------------------------------------
@@ -281,26 +281,6 @@ void vtkKWScalarComponentSelectionWidget::InvokeSelectedComponentChangedCommand(
 
   this->InvokeEvent(vtkKWEvent::ScalarComponentChangedEvent, 
                     &this->SelectedComponent);
-}
-
-//----------------------------------------------------------------------------
-void vtkKWScalarComponentSelectionWidget::SetObjectMethodCommand(
-  char **command, vtkKWObject *object, const char *method)
-{
-  if (*command)
-    {
-    delete [] *command;
-    *command = NULL;
-    }
-
-  if (!object)
-    {
-    return;
-    }
-
-  ostrstream command_str;
-  command_str << object->GetTclName() << " " << method << ends;
-  *command = command_str.str();
 }
 
 //----------------------------------------------------------------------------

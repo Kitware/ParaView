@@ -61,7 +61,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <ctype.h>
 
-vtkCxxRevisionMacro(vtkPVXMLPackageParser, "1.22");
+vtkCxxRevisionMacro(vtkPVXMLPackageParser, "1.22.4.1");
 vtkStandardNewMacro(vtkPVXMLPackageParser);
 
 #ifndef VTK_NO_EXPLICIT_TEMPLATE_INSTANTIATION
@@ -529,7 +529,7 @@ int vtkPVXMLPackageParser::CreateModule(vtkPVXMLElement* me, vtkPVSource* pvm)
   for(i=0; i < me->GetNumberOfNestedElements(); ++i)
     {
     vtkPVXMLElement* element = me->GetNestedElement(i);
-    const char* name = element->GetName();
+    name = element->GetName();
     if(strcmp(name, "Source") == 0)
       {  // Item describing a VTK source.
       classAttr = element->GetAttribute("class");

@@ -92,6 +92,9 @@ IF(ParaViewComplete_BINARY_DIR)
       SET(HDF5_INCLUDE_DIR)
     ENDIF(NOT PARAVIEW_NO_HDF5)
   ENDIF(PARAVIEW_LINK_XDMF)
+  IF(PARAVIEW_USE_SYSTEM_HDF5 OR XDMF_SYSTEM_HDF5)
+    INCLUDE_DIRECTORIES(${HDF5_INCLUDE_PATH})
+  ENDIF(PARAVIEW_USE_SYSTEM_HDF5 OR XDMF_SYSTEM_HDF5)
 ELSE(ParaViewComplete_BINARY_DIR)
   OPTION (PARAVIEW_LINK_XDMF "Link XDMF library to paraview" OFF)
   IF(PARAVIEW_LINK_XDMF)
@@ -150,8 +153,10 @@ ENDIF(ParaViewComplete_BINARY_DIR)
 OPTION(PARAVIEW_USE_ICE_T "Build paraview using IceT" OFF)
 IF(PARAVIEW_USE_ICE_T)
 	INCLUDE( ${PARAVIEW_SOURCE_DIR}/FindIceT.cmake )
-  INCLUDE(${ICET_USE_FILE})
-ENDIF(PARAVIEW_USE_ICE_T)
+  IF(ICET_USE_FILE)
+    INCLUDE(${ICET_USE_FILE})
+  ENDIF(ICET_USE_FILE)
+ENDIF(PARAVIEW_USE_ICE_T)	 
 
 IF (PARAVIEW_CAN_BUILD)
  IF ( NOT VTK_WRAP_TCL )
@@ -204,8 +209,7 @@ IF (PARAVIEW_CAN_BUILD)
 
  SET (DO_NOT_BUILD_XML_RW 1)
 
- SUBDIRS(KWCommon Widgets Utilities ClientServer ParaView Demos)
-
+ SUBDIRS(Utilities KWCommon Filters Widgets ClientServer ParaView Demos)
  SUBDIRS(Packages)
 
  SUBDIR_DEPENDS(ParaView Widgets)
@@ -241,10 +245,12 @@ IF (PARAVIEW_CAN_BUILD)
                      ${PARAVIEW_SOURCE_DIR}/Widgets
                      ${PARAVIEW_SOURCE_DIR}/ClientServer
                      ${PARAVIEW_BINARY_DIR}/ClientServer
+                     ${PARAVIEW_SOURCE_DIR}/Filters
                      ${PARAVIEW_SOURCE_DIR}/ParaView)
 
  LINK_DIRECTORIES(${PARAVIEW_BINARY_DIR}/KWCommon
                   ${PARAVIEW_BINARY_DIR}/Widgets
+                  ${PARAVIEW_BINARY_DIR}/Filters
                   ${PARAVIEW_BINARY_DIR}/ParaView)
 
  SET (PARAVIEW_EXECUTABLE ${EXECUTABLE_OUTPUT_PATH}/paraview)
@@ -274,3 +280,4 @@ ENDIF (PARAVIEW_CAN_BUILD)
 
 # Tell the KW components where to install their libraries.
 SET(KW_INSTALL_LIB_DIR /lib/paraview-${PARAVIEW_VERSION})
+

@@ -83,11 +83,6 @@ public:
     vtkDataArray *array, int comp, float range[2]);
  
   // Description:
-  // Get the data's scalar minimum difference among all values
-  // Return 1 on success, 0 otherwise.
-  static int GetScalarMinDelta(vtkDataArray *array, int comp, double *delta);
- 
-  // Description:
   // Get the scalar type that will be able to store a given range of data 
   // once it has been scaled and shifted. If any of those parameters is not
   // an integer number, the search will default to float types (float, double)

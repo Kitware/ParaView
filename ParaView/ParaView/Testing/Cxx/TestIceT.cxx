@@ -88,7 +88,11 @@ static void Run(vtkMultiProcessController *controller, void *_prm)
         {
         cam->Print(cout);
         }
+#ifdef _WIN32
+      Sleep(100);
+#else
       usleep(100000);
+#endif
       cc++;
       }
     }

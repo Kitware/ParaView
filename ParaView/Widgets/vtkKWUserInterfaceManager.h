@@ -100,9 +100,11 @@ public:
   virtual int AddPanel(vtkKWUserInterfacePanel *panel);
 
   // Description:
-  // Convenience method to get the panel from its name or ID
-  vtkKWUserInterfacePanel* GetPanel(const char *panel_name);
-  vtkKWUserInterfacePanel* GetPanel(int id);
+  // Convenience method to get the panel from its name or ID, or from a page
+  // ID (return the ID of the panel that holds that page).
+  virtual vtkKWUserInterfacePanel* GetPanel(const char *panel_name);
+  virtual vtkKWUserInterfacePanel* GetPanel(int id);
+  virtual vtkKWUserInterfacePanel* GetPanelFromPageId(int id) = 0;
 
   // Description:
   // Remove a panel from the manager.
@@ -154,8 +156,8 @@ public:
                          const char *title) = 0;
 
   // Description:
-  // Show a panel. It will make sure the pages reserved by the manager for 
-  // this panel are shown.
+  // Show/Hide a panel. It will make sure the pages reserved by the manager
+  // for this panel are shown/hidden.
   // RaisePanel() behaves like ShowPanel(), but it will also try to bring
   // up the first page of the panel to the front (i.e., "select" it).
   // Note that you should use the panel's own API to show/raise a panel: this
@@ -163,8 +165,14 @@ public:
   // (see vtkKWUserInterfacePanel::Show/Raise()).
   // Return 1 on success, 0 on error.
   virtual int ShowPanel(vtkKWUserInterfacePanel *panel) = 0;
+  virtual int HidePanel(vtkKWUserInterfacePanel *panel) = 0;
   virtual int RaisePanel(vtkKWUserInterfacePanel *panel) 
     { return this->ShowPanel(panel); };
+
+  // Description:
+  // Convenience method to show/hide all panels.
+  virtual void ShowAllPanels();
+  virtual void HideAllPanels();
 
   // Description:
   // Update a panel according to the manager settings (i.e., it just performs 
@@ -190,7 +198,8 @@ protected:
   //BTX
 
   // A panel slot associate a panel to a unique Id
-  // No, I don't want to use a map between those two, for the following reasons:
+  // No, I don't want to use a map between those two, for the 
+  // following reasons:
   // a), we might need more information in the future, b) a map 
   // Register/Unregister pointers if they are pointers to VTK objects.
  

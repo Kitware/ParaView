@@ -61,7 +61,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSummaryHelper);
-vtkCxxRevisionMacro(vtkPVSummaryHelper, "1.2");
+vtkCxxRevisionMacro(vtkPVSummaryHelper, "1.2.2.1");
 
 vtkCxxSetObjectMacro(vtkPVSummaryHelper, Writer, vtkXMLWriter);
 vtkCxxSetObjectMacro(vtkPVSummaryHelper, Controller,
@@ -223,12 +223,12 @@ void vtkPVSummaryHelper::DeleteDummyFiles()
 //----------------------------------------------------------------------------
 void vtkPVSummaryHelper::SetWriteSummaryFile(int value)
 {
-  if(vtkXMLPDataWriter* w = vtkXMLPDataWriter::SafeDownCast(this->Writer))
+  if(vtkXMLPDataWriter* wr1 = vtkXMLPDataWriter::SafeDownCast(this->Writer))
     {
-    w->SetWriteSummaryFile(value);
+    wr1->SetWriteSummaryFile(value);
     }
-  else if(vtkXMLPVDWriter* w = vtkXMLPVDWriter::SafeDownCast(this->Writer))
+  else if(vtkXMLPVDWriter* wr2 = vtkXMLPVDWriter::SafeDownCast(this->Writer))
     {
-    w->SetWriteCollectionFile(value);
+    wr2->SetWriteCollectionFile(value);
     }
 }

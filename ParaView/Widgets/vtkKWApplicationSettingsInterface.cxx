@@ -40,7 +40,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWCheckButton.h"
 #include "vtkKWFrame.h"
 #include "vtkKWLabeledFrame.h"
+#include "vtkKWMessageDialog.h"
+#include "vtkKWPushButton.h"
 #include "vtkKWToolbar.h"
+#include "vtkKWToolbarSet.h"
+#include "vtkKWUserInterfaceNotebookManager.h"
 #include "vtkKWWindow.h"
 #include "vtkObjectFactory.h"
 #include "vtkVector.h"
@@ -51,7 +55,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWApplicationSettingsInterface);
-vtkCxxRevisionMacro(vtkKWApplicationSettingsInterface, "1.16");
+vtkCxxRevisionMacro(vtkKWApplicationSettingsInterface, "1.16.2.1");
 
 int vtkKWApplicationSettingsInterfaceCommand(ClientData cd, Tcl_Interp *interp,
                                              int argc, char *argv[]);
@@ -70,6 +74,10 @@ vtkKWApplicationSettingsInterface::vtkKWApplicationSettingsInterface()
   this->SaveWindowGeometryCheckButton = 0;
   this->ShowSplashScreenCheckButton = 0;
   this->ShowBalloonHelpCheckButton = 0;
+  this->ShowMostRecentPanelsCheckButton = 0;
+  this->DragAndDropFrame = 0;
+  this->EnableDragAndDropCheckButton = 0;
+  this->ResetDragAndDropButton = 0;
 
   // Toolbar settings
 
@@ -113,6 +121,30 @@ vtkKWApplicationSettingsInterface::~vtkKWApplicationSettingsInterface()
     {
     this->ShowBalloonHelpCheckButton->Delete();
     this->ShowBalloonHelpCheckButton = NULL;
+    }
+
+  if (this->ShowMostRecentPanelsCheckButton)
+    {
+    this->ShowMostRecentPanelsCheckButton->Delete();
+    this->ShowMostRecentPanelsCheckButton = NULL;
+    }
+
+  if (this->DragAndDropFrame)
+    {
+    this->DragAndDropFrame->Delete();
+    this->DragAndDropFrame = NULL;
+    }
+
+  if (this->EnableDragAndDropCheckButton)
+    {
+    this->EnableDragAndDropCheckButton->Delete();
+    this->EnableDragAndDropCheckButton = NULL;
+    }
+
+  if (this->ResetDragAndDropButton)
+    {
+    this->ResetDragAndDropButton->Delete();
+    this->ResetDragAndDropButton = NULL;
     }
 
   // Toolbar settings
@@ -270,6 +302,82 @@ void vtkKWApplicationSettingsInterface::Create(vtkKWApplication *app)
          << "  -side top -anchor w -expand no -fill none" << endl;
 
   // --------------------------------------------------------------
+  // Interface settings : show most recent panels
+
+  if (!this->ShowMostRecentPanelsCheckButton)
+    {
+    this->ShowMostRecentPanelsCheckButton = vtkKWCheckButton::New();
+    }
+
+  this->ShowMostRecentPanelsCheckButton->SetParent(frame);
+  this->ShowMostRecentPanelsCheckButton->Create(app, 0);
+  this->ShowMostRecentPanelsCheckButton->SetText(
+    "Show most recent panels");
+  this->ShowMostRecentPanelsCheckButton->SetCommand(
+    this, "ShowMostRecentPanelsCallback");
+  this->ShowMostRecentPanelsCheckButton->SetBalloonHelpString(
+    "Show (and maintain) the most recent panels visited by the user.");
+
+  tk_cmd << "pack " << this->ShowMostRecentPanelsCheckButton->GetWidgetName()
+         << "  -side top -anchor w -expand no -fill none" << endl;
+
+  // --------------------------------------------------------------
+  // Interface settings : Drag & Drop
+
+  if (!this->DragAndDropFrame)
+    {
+    this->DragAndDropFrame = vtkKWFrame::New();
+    }
+
+  this->DragAndDropFrame->SetParent(frame);
+  this->DragAndDropFrame->Create(app, 0);
+
+  tk_cmd << "pack " << this->DragAndDropFrame->GetWidgetName()
+         << "  -side top -expand y -fill x" << endl;
+
+  // --------------------------------------------------------------
+  // Interface settings : Drag & Drop : Enable
+
+  if (!this->EnableDragAndDropCheckButton)
+    {
+    this->EnableDragAndDropCheckButton = vtkKWCheckButton::New();
+    }
+
+  this->EnableDragAndDropCheckButton->SetParent(this->DragAndDropFrame);
+  this->EnableDragAndDropCheckButton->Create(app, 0);
+  this->EnableDragAndDropCheckButton->SetText("Enable Interface Drag & Drop");
+  this->EnableDragAndDropCheckButton->SetCommand(
+    this, "EnableDragAndDropCallback");
+  this->EnableDragAndDropCheckButton->SetBalloonHelpString(
+    "When this option is enabled you can drag & drop elements of the "
+    "interface within the same panel or from one panel to the other. "
+    "To do so, drag the title of a labeled frame to reposition it within "
+    "a panel, or drop it on another tab to move it to a different panel.");
+
+  tk_cmd << "pack " << this->EnableDragAndDropCheckButton->GetWidgetName()
+         << "  -side left -anchor w -expand no -fill none" << endl;
+
+  // --------------------------------------------------------------
+  // Interface settings : Drag & Drop : Reset
+
+  if (!this->ResetDragAndDropButton)
+    {
+    this->ResetDragAndDropButton = vtkKWPushButton::New();
+    }
+
+  this->ResetDragAndDropButton->SetParent(this->DragAndDropFrame);
+  this->ResetDragAndDropButton->Create(app, 0);
+  this->ResetDragAndDropButton->SetLabel("Reset Interface");
+  this->ResetDragAndDropButton->SetCommand(this, "ResetDragAndDropCallback");
+  this->ResetDragAndDropButton->SetBalloonHelpString(
+    "Reset the placement of all user interface elements, discarding any "
+    "Drag & Drop events.");
+
+  tk_cmd << "pack " << this->ResetDragAndDropButton->GetWidgetName()
+         << "  -side right -anchor e -padx 4 -ipadx 4 -expand no -fill none" 
+         << endl;
+
+  // --------------------------------------------------------------
   // Toolbar settings : main frame
 
   if (!this->ToolbarSettingsFrame)
@@ -379,6 +487,47 @@ void vtkKWApplicationSettingsInterface::Update()
       this->Application->GetShowBalloonHelp());
     }
 
+  // Interface settings : show most recent panels
+
+  vtkKWUserInterfaceNotebookManager *uim_nb = 
+    vtkKWUserInterfaceNotebookManager::SafeDownCast(
+      this->Window->GetUserInterfaceManager());
+
+  if (this->ShowMostRecentPanelsCheckButton)
+    {
+    if (this->Application->HasRegisteryValue(
+          2, "RunTime", VTK_KW_SHOW_MOST_RECENT_PANELS_REG_KEY))
+      {
+      this->ShowMostRecentPanelsCheckButton->SetState(
+        this->Application->GetIntRegisteryValue(
+          2, "RunTime", VTK_KW_SHOW_MOST_RECENT_PANELS_REG_KEY));
+      }
+    else
+      {
+      this->ShowMostRecentPanelsCheckButton->SetState(1);
+      }
+    if (!uim_nb)
+      {
+      this->ShowMostRecentPanelsCheckButton->SetEnabled(0);
+      }
+    }
+
+  // Interface settings : Drag & Drop : Enable
+
+  if (this->EnableDragAndDropCheckButton)
+    {
+    if (uim_nb)
+      {
+      this->EnableDragAndDropCheckButton->SetState(
+        uim_nb->GetEnableDragAndDrop());
+      }
+    else
+      {
+      this->EnableDragAndDropCheckButton->SetEnabled(0);
+      this->ResetDragAndDropButton->SetEnabled(0);
+      }
+    }
+
   // Toolbar settings : flat frame
 
   if (FlatFrameCheckButton)
@@ -418,7 +567,7 @@ void vtkKWApplicationSettingsInterface::Update()
   // If there is no toolbars, disable the interface
 
   if (!this->Window->GetToolbars() ||
-      !this->Window->GetToolbars()->GetNumberOfItems())
+      !this->Window->GetToolbars()->GetNumberOfToolbars())
     {
     if (this->FlatFrameCheckButton)
       {
@@ -497,6 +646,64 @@ void vtkKWApplicationSettingsInterface::ShowBalloonHelpCallback()
 }
 
 //----------------------------------------------------------------------------
+void vtkKWApplicationSettingsInterface::ShowMostRecentPanelsCallback()
+{
+  if (this->IsCreated())
+    {
+    int flag = this->ShowMostRecentPanelsCheckButton->GetState() ? 1 : 0;
+    this->GetApplication()->SetRegisteryValue(
+      2, "RunTime", VTK_KW_SHOW_MOST_RECENT_PANELS_REG_KEY, "%d", flag);
+    if (this->Window)
+      {
+      this->Window->ShowMostRecentPanels(flag);
+      }
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWApplicationSettingsInterface::EnableDragAndDropCallback()
+{
+  if (this->IsCreated())
+    {
+    int flag = this->EnableDragAndDropCheckButton->GetState() ? 1 : 0;
+    this->GetApplication()->SetRegisteryValue(
+      2, "RunTime", VTK_KW_ENABLE_GUI_DRAG_AND_DROP_REG_KEY, "%d", flag);
+    vtkKWUserInterfaceNotebookManager *uim_nb = 
+      vtkKWUserInterfaceNotebookManager::SafeDownCast(
+        this->Window->GetUserInterfaceManager());
+    if (uim_nb)
+      {
+      uim_nb->SetEnableDragAndDrop(flag);
+      }
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWApplicationSettingsInterface::ResetDragAndDropCallback()
+{
+  if (!this->Window || !this->IsCreated())
+    {
+    return;
+    }
+
+  vtkKWMessageDialog::PopupMessage( 
+        this->Application, this->Window, 
+        "Reset Interface", 
+        "All Drag & Drop events performed so far will be discarded. "
+        "Note that your interface will be reset the next time you "
+        "start this application.",
+        vtkKWMessageDialog::WarningIcon);
+
+  vtkKWUserInterfaceNotebookManager *uim_nb = 
+    vtkKWUserInterfaceNotebookManager::SafeDownCast(
+      this->Window->GetUserInterfaceManager());
+  if (uim_nb)
+    {
+    uim_nb->DeleteAllDragAndDropEntries();
+    }
+}
+
+//----------------------------------------------------------------------------
 void vtkKWApplicationSettingsInterface::FlatFrameCallback()
 {
   if (!this->FlatFrameCheckButton ||
@@ -564,6 +771,26 @@ void vtkKWApplicationSettingsInterface::UpdateEnableState()
   if (this->ShowBalloonHelpCheckButton)
     {
     this->ShowBalloonHelpCheckButton->SetEnabled(this->Enabled);
+    }
+
+  if (this->ShowMostRecentPanelsCheckButton)
+    {
+    this->ShowMostRecentPanelsCheckButton->SetEnabled(this->Enabled);
+    }
+
+  if (this->DragAndDropFrame)
+    {
+    this->DragAndDropFrame->SetEnabled(this->Enabled);
+    }
+
+  if (this->EnableDragAndDropCheckButton)
+    {
+    this->EnableDragAndDropCheckButton->SetEnabled(this->Enabled);
+    }
+
+  if (this->ResetDragAndDropButton)
+    {
+    this->ResetDragAndDropButton->SetEnabled(this->Enabled);
     }
 
   // Toolbar settings

@@ -35,6 +35,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "vtkKWSimpleEntryDialog.h"
 
+#include "vtkKWEntry.h"
+#include "vtkKWFrame.h"
 #include "vtkKWLabel.h"
 #include "vtkKWLabeledEntry.h"
 #include "vtkObjectFactory.h"
@@ -42,7 +44,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //----------------------------------------------------------------------------
 
 vtkStandardNewMacro( vtkKWSimpleEntryDialog );
-vtkCxxRevisionMacro(vtkKWSimpleEntryDialog, "1.2");
+vtkCxxRevisionMacro(vtkKWSimpleEntryDialog, "1.2.4.1");
 
 int vtkKWSimpleEntryDialogCommand(ClientData cd, Tcl_Interp *interp,
                                   int argc, char *argv[]);
@@ -77,6 +79,23 @@ void vtkKWSimpleEntryDialog::Create(vtkKWApplication *app, const char *args)
 
   this->Script("pack %s -side top -after %s -padx 4 -fill x -expand yes", 
                this->Entry->GetWidgetName(), this->Label->GetWidgetName());
+
+  this->Script("bind %s <Return> {%s OK}",
+               this->Entry->GetEntry()->GetWidgetName(), this->GetTclName());
+
+  this->Script("bind %s <Escape> {%s Cancel}",
+               this->Entry->GetEntry()->GetWidgetName(), this->GetTclName());
+}
+
+//----------------------------------------------------------------------------
+int vtkKWSimpleEntryDialog::Invoke()
+{
+  if (this->IsCreated())
+    {
+    this->Entry->GetEntry()->Focus();
+    }
+
+  return this->Superclass::Invoke();
 }
 
 //----------------------------------------------------------------------------

@@ -69,7 +69,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWSplitFrame.h"
 #include "vtkKWTkUtilities.h"
 #include "vtkKWToolbar.h"
+#include "vtkKWToolbarSet.h"
 #include "vtkKWUserInterfaceNotebookManager.h"
+#include "vtkKWWindowCollection.h"
 #include "vtkLinkedList.txx"
 #include "vtkLinkedListIterator.txx"
 #include "vtkMath.h"
@@ -142,7 +144,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.475.2.11");
+vtkCxxRevisionMacro(vtkPVWindow, "1.475.2.12");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -174,7 +176,7 @@ vtkPVWindow::vtkPVWindow()
   // This toolbar contains buttons for modifying user interaction
   // mode
   this->InteractorToolbar = vtkKWToolbar::New();
-  this->Toolbars->AppendItem(this->InteractorToolbar);
+  this->Toolbars->AddToolbar(this->InteractorToolbar);
 
   //this->FlyButton = vtkKWRadioButton::New();
   this->RotateCameraButton = vtkKWRadioButton::New();
@@ -182,7 +184,7 @@ vtkPVWindow::vtkPVWindow()
     
   // This toolbar contains buttons for instantiating new modules
   this->Toolbar = vtkKWToolbar::New();
-  this->Toolbars->AppendItem(this->Toolbar);
+  this->Toolbars->AddToolbar(this->Toolbar);
 
   // Keep a list of the toolbar buttons so that they can be 
   // disabled/enabled in certain situations.
@@ -193,7 +195,7 @@ vtkPVWindow::vtkPVWindow()
   this->CenterOfRotationStyle = vtkPVInteractorStyleCenterOfRotation::New();
   
   this->PickCenterToolbar = vtkKWToolbar::New();
-  this->Toolbars->AppendItem(this->PickCenterToolbar);
+  this->Toolbars->AddToolbar(this->PickCenterToolbar);
 
   this->PickCenterButton = vtkKWPushButton::New();
   this->ResetCenterButton = vtkKWPushButton::New();
@@ -459,12 +461,6 @@ void vtkPVWindow::PrepareForDelete()
     this->InteractorToolbar = NULL;
     }
 
-  //if (this->FlyStyle)
-  //  {
-  //  this->FlyStyle->Delete();
-  //  this->FlyStyle = NULL;
-  //  }
-
   if (this->CameraStyle3D)
     {
     this->CameraStyle3D->Delete();
@@ -558,24 +554,6 @@ void vtkPVWindow::PrepareForDelete()
     this->PickCenterToolbar->Delete();
     this->PickCenterToolbar = NULL;
     }
-
-//   if (this->FlySpeedLabel)
-//     {
-//     this->FlySpeedLabel->Delete();
-//     this->FlySpeedLabel = NULL;
-//     }
-  
-//   if (this->FlySpeedScale)
-//     {
-//     this->FlySpeedScale->Delete();
-//     this->FlySpeedScale = NULL;
-//     }
-  
-//   if (this->FlySpeedToolbar)
-//     {
-//     this->FlySpeedToolbar->Delete();
-//     this->FlySpeedToolbar = NULL;
-//     }
 
   if (this->MainView)
     {
@@ -794,14 +772,12 @@ void vtkPVWindow::InitializeMenus(vtkKWApplication* vtkNotUsed(app))
 //-----------------------------------------------------------------------------
 void vtkPVWindow::InitializeToolbars(vtkKWApplication *app)
 {
-  this->InteractorToolbar->SetParent(this->GetToolbarFrame());
+  this->InteractorToolbar->SetParent(this->Toolbars->GetToolbarsFrame());
   this->InteractorToolbar->Create(app);
-  this->InteractorToolbar->Pack("-side left");
 
-  this->Toolbar->SetParent(this->GetToolbarFrame());
+  this->Toolbar->SetParent(this->Toolbars->GetToolbarsFrame());
   this->Toolbar->Create(app);
   this->Toolbar->ResizableOn();
-  this->Toolbar->Pack("-side left");
 }
 
 //-----------------------------------------------------------------------------
@@ -816,20 +792,6 @@ void vtkPVWindow::InitializeInteractorInterfaces(vtkKWApplication *app)
   reset_cam->SetBalloonHelpString("Reset the view to show everything visible.");
   this->InteractorToolbar->AddWidget(reset_cam);
   reset_cam->Delete();
-
-  // set up the interactor styles
-  // The interactor styles (selection and events) add no trace entries.
-  
-  // Fly interactor style
-
-//   this->FlyButton->SetParent(this->InteractorToolbar->GetFrame());
-//   this->FlyButton->Create(
-//     app, "-indicatoron 0 -highlightthickness 0 -image PVFlyButton -selectimage PVFlyButtonActive");
-//   this->FlyButton->SetBalloonHelpString(
-//     "Fly View Mode\n   Left Button: Fly toward mouse position.\n   Right Button: Fly backward");
-//   this->Script("%s configure -command {%s ChangeInteractorStyle 0}",
-//                this->FlyButton->GetWidgetName(), this->GetTclName());
-//   this->InteractorToolbar->AddWidget(this->FlyButton);
 
   // Rotate camera interactor style
 
@@ -920,14 +882,6 @@ void vtkPVWindow::Create(vtkKWApplication *app, char* vtkNotUsed(args))
   // Hide the main window until after all user interface is initialized.
   this->Script( "wm withdraw %s", this->GetWidgetName());
 
-  // If we have a user interface manager, it's time to create it
-
-  vtkKWUserInterfaceManager *uim = this->GetUserInterfaceManager();
-  if (uim && !uim->IsCreated())
-    {
-    uim->Create(app);
-    }
-
   // Allow the user to interactively resize the properties parent.
   // The left panel size (Frame1) is restored by vtkKWWindow
   this->MiddleFrame->SetSeparatorSize(5);
@@ -949,7 +903,9 @@ void vtkPVWindow::Create(vtkKWApplication *app, char* vtkNotUsed(args))
 
   // Init menus
 
-  if (pvApp->GetShowSplashScreen())
+  int use_splash = 
+    (app->GetShowSplashScreen() && app->GetWindows()->GetNumberOfItems() == 1);
+  if (use_splash)
     {
     pvApp->GetSplashScreen()->SetProgressMessage("Creating UI (menus)...");
     }
@@ -957,7 +913,7 @@ void vtkPVWindow::Create(vtkKWApplication *app, char* vtkNotUsed(args))
 
   // Init toolbars
 
-  if (pvApp->GetShowSplashScreen())
+  if (use_splash)
     {
     pvApp->GetSplashScreen()->SetProgressMessage("Creating UI (toolbars)...");
     }
@@ -966,13 +922,13 @@ void vtkPVWindow::Create(vtkKWApplication *app, char* vtkNotUsed(args))
   // Interface for the preferences.
 
   // Create the main view.
-  if (pvApp->GetShowSplashScreen())
+  if (use_splash)
     {
     pvApp->GetSplashScreen()->SetProgressMessage("Creating UI (main view)...");
     }
   this->CreateMainView(pvApp);
 
-  if (pvApp->GetShowSplashScreen())
+  if (use_splash)
     {
     pvApp->GetSplashScreen()->SetProgressMessage("Creating UI (interactors)...");
     }
@@ -998,7 +954,7 @@ void vtkPVWindow::Create(vtkKWApplication *app, char* vtkNotUsed(args))
   pvApp->BroadcastScript("%s VisibilityOff", this->CenterActorTclName);
   // -------------------------
 
-  this->PickCenterToolbar->SetParent(this->GetToolbarFrame());
+  this->PickCenterToolbar->SetParent(this->Toolbars->GetToolbarsFrame());
   this->PickCenterToolbar->Create(app);
   
   this->PickCenterButton->SetParent(this->PickCenterToolbar->GetFrame());
@@ -1042,7 +998,7 @@ void vtkPVWindow::Create(vtkKWApplication *app, char* vtkNotUsed(args))
   this->Script("bind %s <KeyPress-Return> {%s CenterEntryCallback}",
                this->CenterXEntry->GetWidgetName(), this->GetTclName());
   //this->CenterXEntry->SetValue(this->CameraStyle3D->GetCenter()[0], 3);
-  this->CenterXEntry->SetValue(0.0, 3);
+  this->CenterXEntry->SetValue(0.0);
   
   this->CenterYLabel->SetParent(this->CenterEntryFrame);
   this->CenterYLabel->Create(app, "");
@@ -1053,7 +1009,7 @@ void vtkPVWindow::Create(vtkKWApplication *app, char* vtkNotUsed(args))
   this->Script("bind %s <KeyPress-Return> {%s CenterEntryCallback}",
                this->CenterYEntry->GetWidgetName(), this->GetTclName());
   //this->CenterYEntry->SetValue(this->CameraStyle3D->GetCenter()[1], 3);
-  this->CenterYEntry->SetValue(0.0, 3);
+  this->CenterYEntry->SetValue(0.0);
 
   this->CenterZLabel->SetParent(this->CenterEntryFrame);
   this->CenterZLabel->Create(app, "");
@@ -1064,7 +1020,7 @@ void vtkPVWindow::Create(vtkKWApplication *app, char* vtkNotUsed(args))
   this->Script("bind %s <KeyPress-Return> {%s CenterEntryCallback}",
                this->CenterZEntry->GetWidgetName(), this->GetTclName());
   //this->CenterZEntry->SetValue(this->CameraStyle3D->GetCenter()[2], 3);
-  this->CenterZEntry->SetValue(0.0, 3);
+  this->CenterZEntry->SetValue(0.0);
 
   this->Script("pack %s %s %s %s %s %s -side left",
                this->CenterXLabel->GetWidgetName(),
@@ -1213,6 +1169,20 @@ void vtkPVWindow::Create(vtkKWApplication *app, char* vtkNotUsed(args))
     s.rdbuf()->freeze(0);
     }
     
+    // ==== Line
+    pvs = this->CreatePVSource("LineSource", "GlyphSources", 0, 0);
+    pvs->IsPermanentOn();
+    pvs->HideDisplayPageOn();
+    pvs->HideInformationPageOn();
+    pvs->Accept(1);
+    pvs->SetTraceReferenceObject(this);
+    {
+    ostrstream s;
+    s << "GetPVSource GlyphSources " << pvs->GetName() << ends;
+    pvs->SetTraceReferenceCommand(s.str());
+    s.rdbuf()->freeze(0);
+    }
+    
     // ===== Sphere
     pvs = this->CreatePVSource("SphereSource", "GlyphSources", 0, 0);
     pvs->IsPermanentOn();
@@ -1239,23 +1209,22 @@ void vtkPVWindow::Create(vtkKWApplication *app, char* vtkNotUsed(args))
       }
     }
 
-
-  // The filter buttons are initially disabled.
-  this->DisableToolbarButtons();
-
   // Show glyph sources in menu.
   this->UpdateSelectMenu();
   // Show the sources (in Advanced).
   this->UpdateSourceMenu();
 
   // Update preferences
-  if (pvApp->GetShowSplashScreen())
+  if (use_splash)
     {
     pvApp->GetSplashScreen()->SetProgressMessage("Creating UI (preferences)...");
     }
 
   // Update toolbar aspect
   this->UpdateToolbarAspect();
+
+  // The filter buttons are initially disabled.
+  this->DisableToolbarButtons();
 
   // Make the 3D View Settings the current one.
   this->Script("%s invoke \"%s\"", 
@@ -1332,9 +1301,9 @@ void vtkPVWindow::SetCenterOfRotation(float x, float y, float z)
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
 
-  this->CenterXEntry->SetValue(x, 4);
-  this->CenterYEntry->SetValue(y, 4);
-  this->CenterZEntry->SetValue(z, 4);
+  this->CenterXEntry->SetValue(x);
+  this->CenterYEntry->SetValue(y);
+  this->CenterZEntry->SetValue(z);
   this->CameraStyle3D->SetCenterOfRotation(x, y, z);
   pvApp->BroadcastScript("%s SetPosition %f %f %f", 
                          this->CenterActorTclName,
@@ -1404,9 +1373,9 @@ void vtkPVWindow::ResetCenterCallback()
   center[2] = (bounds[4]+bounds[5])/2.0;
 
   this->SetCenterOfRotation(center[0], center[1], center[2]);
-  this->CenterXEntry->SetValue(center[0], 3);
-  this->CenterYEntry->SetValue(center[1], 3);
-  this->CenterZEntry->SetValue(center[2], 3);
+  this->CenterXEntry->SetValue(center[0]);
+  this->CenterYEntry->SetValue(center[1]);
+  this->CenterZEntry->SetValue(center[2]);
   this->ResizeCenterActor();
   this->MainView->EventuallyRender();
 }
@@ -1477,23 +1446,20 @@ void vtkPVWindow::ResizeCenterActor()
 //-----------------------------------------------------------------------------
 void vtkPVWindow::ChangeInteractorStyle(int index)
 {
-  this->PickCenterToolbar->Unpack();
-  //this->FlySpeedToolbar->Unpack();;
+  int pick_toolbar_vis = 0;
   
   switch (index)
     {
     case 1:
-      //this->FlyButton->SetState(0);
       this->TranslateCameraButton->SetState(0);
       // Camera styles are not duplicated on satellites.
       // Cameras are synchronized before each render.
       this->Interactor->SetInteractorStyle(this->CameraStyle3D);
-      this->PickCenterToolbar->Pack("-side left");
+      pick_toolbar_vis = 1;
       this->ResizeCenterActor();
       this->ShowCenterActor();
       break;
     case 2:
-      //this->FlyButton->SetState(0);
       this->RotateCameraButton->SetState(0);
       this->Interactor->SetInteractorStyle(this->CameraStyle2D);
       this->HideCenterActor();
@@ -1506,6 +1472,10 @@ void vtkPVWindow::ChangeInteractorStyle(int index)
       this->HideCenterActor();
       break;
     }
+
+  this->Toolbars->SetToolbarVisibility(
+    this->PickCenterToolbar, pick_toolbar_vis);
+
   this->MainView->EventuallyRender();
 }
 
@@ -1634,8 +1604,10 @@ void vtkPVWindow::CreateMainView(vtkPVApplication *pvApp)
   this->Script( "pack %s -expand yes -fill both", 
                 this->MainView->GetWidgetName());  
 
-  this->MenuHelp->AddSeparator();
-  this->MenuHelp->AddCommand("Play Demo", this, "PlayDemo", 0);
+  int menu_idx = this->GetHelpMenuIndex();
+  this->MenuHelp->InsertSeparator(menu_idx++);
+  this->MenuHelp->InsertCommand(
+    menu_idx, "Play Demo", this, "PlayDemo", 0);
 }
 
 
@@ -1859,18 +1831,19 @@ int vtkPVWindow::Open(char *openFileName, int store)
       vtkPVReaderModule* reader = dialog->SelectReader(this, openFileName);
       if ( !reader || this->OpenWithReader(openFileName, reader) != VTK_OK )
         {
-        ostrstream error;
-        error << "Can not open file " << openFileName << " for reading." << ends;
+        ostrstream errorstr;
+        errorstr << "Can not open file " << openFileName << " for reading." << ends;
         if (this->UseMessageDialog)
           {
           vtkKWMessageDialog::PopupMessage(
-            this->GetApplication(), this, "Open Error", error.str(), 
+            this->GetApplication(), this, "Open Error", errorstr.str(), 
             vtkKWMessageDialog::ErrorIcon | vtkKWMessageDialog::Beep);
           }
         else
           {
-          vtkErrorMacro(<<error);
+          vtkErrorMacro(<<errorstr);
           }
+        errorstr.rdbuf()->freeze(0);
         }
       else if ( store )
         {
@@ -1954,6 +1927,10 @@ int vtkPVWindow::ReadFileInformation(vtkPVReaderModule* clone,
       "$kw(%s) ReadFileInformation $kw(%s) \"%s\"", 
       this->GetTclName(), clone->GetTclName(), fileName);
     }
+  else
+    {
+    clone->Delete();
+    }
 
   return retVal;
 }
@@ -2016,6 +1993,7 @@ int vtkPVWindow::OpenWithReader(const char *fileName,
   retVal = this->FinalizeRead(clone, fileName);
   if (retVal != VTK_OK)
     {
+    // Clone should delete itself on an error
     return retVal;
     }
   return VTK_OK;
@@ -2249,9 +2227,6 @@ void vtkPVWindow::WriteData()
       dlg->SetMasterWindow(this);
       dlg->SetTitle("Select ghost levels");
 
-      // See if the user wants to save any ghost levels.
-      int ghostLevel = 0;
-
       if ( dlg->Invoke() )
         {
         ghostLevel = dlg->GetGhostLevel();
@@ -2350,7 +2325,7 @@ void vtkPVWindow::SaveBatchScript()
   exportDialog->SaveDialogOn();
   exportDialog->SetTitle("Save Batch Script");
   exportDialog->SetDefaultExtension(".pvb");
-  exportDialog->SetFileTypes("{{ParaView Batch Script} {.pvb}} {{All Files} {.*}}");
+  exportDialog->SetFileTypes("{{ParaView Batch Script} {.pvb}} {{All Files} {*}}");
   if ( exportDialog->Invoke() && 
        vtkString::Length(exportDialog->GetFileName())>0)
     {
@@ -2759,7 +2734,7 @@ void vtkPVWindow::SaveState()
   exportDialog->SaveDialogOn();
   exportDialog->SetTitle("Save State");
   exportDialog->SetDefaultExtension(".pvs");
-  exportDialog->SetFileTypes("{{ParaView State} {.pvs}} {{All Files} {.*}}");
+  exportDialog->SetFileTypes("{{ParaView State} {.pvs}} {{All Files} {*}}");
   if ( exportDialog->Invoke() && 
        vtkString::Length(exportDialog->GetFileName())>0)
     {
@@ -3393,8 +3368,6 @@ void vtkPVWindow::EnableToolbarButtons()
   it->Delete();
 
   this->ToolbarButtonsDisabled = 0;
-
-
 }
 
 //-----------------------------------------------------------------------------
@@ -3535,7 +3508,7 @@ void vtkPVWindow::SaveTrace()
   exportDialog->SaveDialogOn();
   exportDialog->SetTitle("Save ParaView Trace");
   exportDialog->SetDefaultExtension(".pvs");
-  exportDialog->SetFileTypes("{{ParaView Trace} {.pvs}} {{All Files} {.*}}");
+  exportDialog->SetFileTypes("{{ParaView Trace} {.pvs}} {{All Files} {*}}");
   if ( exportDialog->Invoke() && 
        vtkString::Length(exportDialog->GetFileName())>0 &&
        this->SaveTrace(exportDialog->GetFileName()) )
@@ -3721,7 +3694,7 @@ int vtkPVWindow::OpenPackage()
   loadDialog->Create(this->Application,0);
   loadDialog->SetTitle("Open ParaView Package");
   loadDialog->SetDefaultExtension(".xml");
-  loadDialog->SetFileTypes("{{ParaView Package Files} {*.xml}} {{All Files} {*.*}}");
+  loadDialog->SetFileTypes("{{ParaView Package Files} {*.xml}} {{All Files} {*}}");
   if ( loadDialog->Invoke() && this->OpenPackage(loadDialog->GetFileName()) )
     {
     this->SaveLastPath(loadDialog, "PackagePath");
@@ -4014,6 +3987,7 @@ void vtkPVWindow::WarningMessage(const char* message)
 //-----------------------------------------------------------------------------
 void vtkPVWindow::ErrorMessage(const char* message)
 {  
+  cout << "ErrorMessage" << endl;
   this->Script("bell");
   this->CreateErrorLogDisplay();
   char *wmessage = vtkString::Duplicate(message);
@@ -4021,6 +3995,7 @@ void vtkPVWindow::ErrorMessage(const char* message)
   delete [] wmessage;
   this->ErrorLogDisplay->AppendError(message);
   this->SetErrorIcon(2);
+  cout << "ErrorMessage end" << endl;
 }
 
 //-----------------------------------------------------------------------------
@@ -4291,7 +4266,6 @@ void vtkPVWindow::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "SourceMenu: " << this->SourceMenu << endl;
   os << indent << "Toolbar: " << this->GetToolbar() << endl;
   os << indent << "PickCenterToolbar: " << this->GetPickCenterToolbar() << endl;
-//  os << indent << "FlySpeedToolbar: " << this->GetFlySpeedToolbar() << endl;
   os << indent << "Interactor: " << this->Interactor << endl;
   os << indent << "GlyphMenu: " << this->GlyphMenu << endl;
   os << indent << "InitializeDefaultInterfaces: " 

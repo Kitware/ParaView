@@ -127,7 +127,7 @@ public:
   // Reduction factor = 1 means normal (full sized) rendering
   // and compositing.  When ReductionFactor > 1, a small window
   // is rendered (subsampled) and composited.
-  void SetReductionFactor(int f) {this->SetLODReductionFactor(f);}
+  void SetImageReductionFactor(int f) {this->SetLODReductionFactor(f);}
   vtkSetMacro(LODReductionFactor, int);
   vtkGetMacro(LODReductionFactor, int);
 
@@ -188,7 +188,7 @@ protected:
   void SetupCamera(int tileIdx, int reduction);
 
 
-  int ReductionFactor;
+  int ImageReductionFactor;
   int LODReductionFactor;
 
   unsigned long StartTag;

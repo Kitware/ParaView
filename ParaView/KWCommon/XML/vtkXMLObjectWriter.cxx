@@ -44,22 +44,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # include <unistd.h> /* unlink */
 #endif
 
-vtkCxxRevisionMacro(vtkXMLObjectWriter, "1.8");
-
-vtkCxxSetObjectMacro(vtkXMLObjectWriter, Object, vtkObject);
+vtkCxxRevisionMacro(vtkXMLObjectWriter, "1.8.2.1");
 
 //----------------------------------------------------------------------------
 vtkXMLObjectWriter::vtkXMLObjectWriter()
 {
-  this->Object = 0;
   this->WriteFactored = 1;
   this->WriteIndented = 0;
-}
-
-//----------------------------------------------------------------------------
-vtkXMLObjectWriter::~vtkXMLObjectWriter()
-{
-  this->SetObject(0);
 }
 
 //----------------------------------------------------------------------------
@@ -125,7 +116,7 @@ int vtkXMLObjectWriter::CreateInElement(vtkXMLDataElement *parent)
 
   // Don't bother inserting if we can't create the final element
 
-  vtkXMLDataElement *nested_elem = vtkXMLDataElement::New();
+  vtkXMLDataElement *nested_elem = this->NewDataElement();
   if (!this->Create(nested_elem))
     {
     nested_elem->Delete();
@@ -151,7 +142,7 @@ int vtkXMLObjectWriter::CreateInNestedElement(vtkXMLDataElement *grandparent,
 
   // Create the first nested element (parent)
 
-  vtkXMLDataElement *parent = vtkXMLDataElement::New();
+  vtkXMLDataElement *parent = this->NewDataElement();
 
   // Create and insert the element inside the parent
 
@@ -171,11 +162,11 @@ int vtkXMLObjectWriter::CreateInNestedElement(vtkXMLDataElement *grandparent,
 }
 
 //----------------------------------------------------------------------------
-int vtkXMLObjectWriter::Write(ostream &os, vtkIndent *indent)
+int vtkXMLObjectWriter::WriteToStream(ostream &os, vtkIndent *indent)
 {
   // Create the element
 
-  vtkXMLDataElement *elem = vtkXMLDataElement::New();
+  vtkXMLDataElement *elem = this->NewDataElement();
   this->Create(elem);
 
   // Factor it
@@ -214,10 +205,10 @@ int vtkXMLObjectWriter::Write(ostream &os, vtkIndent *indent)
 }
 
 //----------------------------------------------------------------------------
-int vtkXMLObjectWriter::Write(const char *filename)
+int vtkXMLObjectWriter::WriteToFile(const char *filename)
 {
   ofstream os(filename, ios::out);
-  int ret = this->Write(os);
+  int ret = this->WriteToStream(os);
   
   if (!ret)
     {
@@ -233,20 +224,9 @@ void vtkXMLObjectWriter::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
 
-  if (this->Object)
-    {
-    os << indent << "Object: " << this->Object << "\n";
-    }
-  else
-    {
-    os << indent << "Object: (none)\n";
-    }
-
   os << indent << "WriteFactored: " 
      << (this->WriteFactored ? "On" : "Off") << endl;
 
   os << indent << "WriteIndented: " 
      << (this->WriteIndented ? "On" : "Off") << endl;
 }
-
-

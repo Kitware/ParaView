@@ -134,10 +134,10 @@ public:
                          const char *title);
   
   // Description:
-  // Show a panel. It will make sure the pages reserved by the manager for 
-  // this panel are shown.
-  // In this concrete implementation, this shows all notebook's pages belonging
-  // to this panel.
+  // Show/Hide a panel. It will make sure the pages reserved by the manager
+  // for this panel are shown/hidden.
+  // In this concrete implementation, this shows/hides all notebook's pages
+  // belonging to this panel.
   // RaisePanel() behaves like ShowPanel(), but it will also try to bring
   // up the first page of the panel to the front (i.e., "select" it).
   // Note that you should use the panel's own API to show a panel: this
@@ -149,6 +149,7 @@ public:
   // panel to be delayed until it is really needed.
   // Return 1 on success, 0 on error.
   virtual int ShowPanel(vtkKWUserInterfacePanel *panel);
+  virtual int HidePanel(vtkKWUserInterfacePanel *panel);
   virtual int RaisePanel(vtkKWUserInterfacePanel *panel);
   
   // Description:
@@ -159,7 +160,13 @@ public:
   virtual void UpdatePanel(vtkKWUserInterfacePanel *panel);
 
   // Description:
-  // Enable/disable Drag and Drop.
+  // Convenience method to get the panel from a page
+  // ID (return the ID of the panel that holds that page).
+  virtual vtkKWUserInterfacePanel* GetPanelFromPageId(int page_id);
+
+  // Description:
+  // Enable/disable Drag and Drop. If enabled, elements of the user interface
+  // can be drag&drop within the same panel, or between different panels.
   virtual void SetEnableDragAndDrop(int);
   vtkBooleanMacro(EnableDragAndDrop, int);
   vtkGetMacro(EnableDragAndDrop, int);
@@ -169,6 +176,66 @@ public:
   virtual void DragAndDropEndCallback(
     int x, int y, 
     vtkKWWidget *widget, vtkKWWidget *anchor, vtkKWWidget *target);
+
+  // Description:
+  // Get the number of Drag&Drop entries so far.
+  // Delete all Drag&Drop entries.
+  virtual int GetNumberOfDragAndDropEntries();
+  virtual int DeleteAllDragAndDropEntries();
+
+  // Description:
+  // Convenience function used to serialize/save/restore Drag&Drop entries to
+  // a text file. 
+  // GetDragAndDropEntry() can be used to get a Drag&Drop entry parameters 
+  // as plain text string. 
+  // DragAndDropWidget() will perform a Drag&Drop given parameters similar
+  // to those acquired through GetDragAndDropEntry().
+  virtual int GetDragAndDropEntry(
+    int idx, 
+    ostream &widget_label, 
+    ostream &from_panel_name, 
+    ostream &from_page_title, 
+    ostream &from_after_widget_label, 
+    ostream &to_panel_name, 
+    ostream &to_page_title,
+    ostream &to_after_widget_label);
+  virtual int DragAndDropWidget(
+    const char *widget_label, 
+    const char *from_panel_name, 
+    const char *from_page_title, 
+    const char *from_after_widget_label,
+    const char *to_panel_name, 
+    const char *to_page_title,
+    const char *to_after_widget_label);
+
+  //BTX
+  // A Widget location. 
+  // Store both the page the widget is packed in, and the widget it is 
+  // packed after (if any).
+
+  class WidgetLocation
+  {
+  public:
+    WidgetLocation();
+    void Empty();
+
+    int PageId;
+    vtkKWWidget *AfterWidget;
+  };
+
+  // A D&D entry. 
+  // Store the widget source and target location.
+
+  class DragAndDropEntry
+  {
+  public:
+    DragAndDropEntry();
+
+    vtkKWWidget *Widget;
+    WidgetLocation FromLocation;
+    WidgetLocation ToLocation;
+  };
+  // ETX
 
 protected:
   vtkKWUserInterfaceNotebookManager();
@@ -188,6 +255,70 @@ protected:
   // Update Drag And Drop bindings
   virtual void UpdatePanelDragAndDrop(vtkKWUserInterfacePanel *panel);
   int EnableDragAndDrop;
+
+  //BTX
+
+  // Description:
+  // Check if a given widget can be Drag&Dropped given our framework.
+  // At the moment, only labeled frame can be D&D. If **anchor is not NULL,
+  // it will be assigned the widget D&D anchor (i.e. the internal part of
+  // the widget that is actually used to grab the widget).
+  // Return 1 if can be D&D, 0 otherwise.
+  virtual int CanWidgetBeDragAndDropped(
+    vtkKWWidget *widget, vtkKWWidget **anchor = 0);
+
+  // Description:
+  // Assuming that the widget can be Drag&Dropped given our framework, 
+  // return a label that will be used to identify it. This is mostly used to
+  // serialize a D&D event to a text string/file.
+  virtual char* GetDragAndDropWidgetLabel(vtkKWWidget *widget);
+
+  // Description:
+  // Get the location of a widget.
+  virtual int GetDragAndDropWidgetLocation(
+    vtkKWWidget *widget, WidgetLocation *loc);
+
+  // Description:
+  // Get a D&D widget given its label (as returned by 
+  // GetDragAndDropWidgetLabel()) and a hint about its location.
+  virtual vtkKWWidget* GetDragAndDropWidgetFromLabelAndLocation(
+    const char *widget_label, const WidgetLocation *loc_hint);
+
+  // List of D&D entries
+
+  typedef vtkLinkedList<DragAndDropEntry*> DragAndDropEntriesContainer;
+  typedef vtkLinkedListIterator<DragAndDropEntry*>
+  DragAndDropEntriesContainerIterator;
+  DragAndDropEntriesContainer *DragAndDropEntries;
+
+  // Description:
+  // Get the last D&D entry that was added for a given widget
+  DragAndDropEntry* GetLastDragAndDropEntry(vtkKWWidget *Widget);
+
+  // Description:
+  // Check if a widget that was drag & drop has gone back to its previous
+  // location
+  virtual int IsDragAndDropWidgetAtOriginalLocation(vtkKWWidget *widget);
+
+  // Description:
+  // Add a D&D entry to the list of entries, given a widget and its
+  // target location (its current/source location will be computed 
+  // automatically)
+  int AddDragAndDropEntry(
+    vtkKWWidget *Widget, 
+    const WidgetLocation *from_loc,
+    const WidgetLocation *to_loc);
+
+  // Description:
+  // Perform the actual D&D given a widget and its target location.
+  // It will call AddDragAndDropEntry() and pack the widget to its new
+  // location
+  virtual int DragAndDropWidget(
+    vtkKWWidget *widget, 
+    const WidgetLocation *from_loc,
+    const WidgetLocation *to_loc);
+
+  //ETX
 
 private:
 

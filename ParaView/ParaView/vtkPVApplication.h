@@ -226,6 +226,19 @@ public:
   void LogEndEvent(char* str);
 
   // Description:
+  // More timer log access methods.  Static methods are not accessible 
+  // from tcl.  We need a timer object on all procs.
+  void SetLogBufferLength(int length);
+  void ResetLog();
+  void SetEnableLog(int flag);
+
+  // Description:
+  // Time threshold for event (start-end) when getting the log with indents.
+  // We do not have a timer object on all procs.  Statics do not work with Tcl.
+  vtkSetMacro(LogThreshold, float);
+  vtkGetMacro(LogThreshold, float);
+
+  // Description:
   // Flag showing whether the commands are being executed from
   // a ParaView script.
   vtkSetMacro(RunningParaViewScript, int);
@@ -288,6 +301,12 @@ public:
   // Description:
   // The the port for the client/server socket connection.
   vtkGetMacro(Port,int);
+
+  // Description:
+  // The default behavior is for the server to wait and for the client 
+  // to connect to the server.  When this flag is set by the command line 
+  // arguments.  The server tries to connect to the client instead.
+  vtkGetMacro(ReverseConnection,int);
 
   // Description:
   // Variable set by command line arguments --client or -c
@@ -371,12 +390,18 @@ public:
   // We need to get the data path for the demo on the server.
   char* GetDemoPath();
 
+  // Description:
+  // Enable or disable test errors. This refers to wether errors make test fail
+  // or not.
+  void EnableTestErrors();
+  void DisableTestErrors();
+
 protected:
   vtkPVApplication();
   ~vtkPVApplication();
 
   virtual void CreateSplashScreen();
-  virtual void ConfigureAbout();
+  virtual void AddAboutText(ostream &);
 
   void CreateButtonPhotos();
   void CreatePhoto(char *name, 
@@ -415,6 +440,7 @@ protected:
   vtkSetStringMacro(Username);
   int Port;
   int AlwaysSSH;
+  int ReverseConnection;
   int UseSoftwareRendering;
   int UseSatelliteSoftware;
   int UseStereoRendering;
@@ -436,8 +462,6 @@ protected:
   
   vtkPVOutputWindow *OutputWindow;
 
-  static int CheckForArgument(int argc, char* argv[], const char* arg,
-                              int& index);
   static int CheckForExtension(const char* arg, const char* ext);
   char* CreateHelpString();
   int CheckForTraceFile(char* name, unsigned int len);
@@ -464,6 +488,8 @@ protected:
 
   char* DemoPath;
   vtkSetStringMacro(DemoPath);
+
+  float LogThreshold;
 
 private:  
   vtkPVApplication(const vtkPVApplication&); // Not implemented

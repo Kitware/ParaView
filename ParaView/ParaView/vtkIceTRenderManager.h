@@ -6,13 +6,12 @@
   Date:      $Date$
   Version:   $Revision$
 
-  Copyright (c) 1993-2002 Ken Martin, Will Schroeder, Bill Lorensen 
-  All rights reserved.
-  See Copyright.txt or http://www.kitware.com/Copyright.htm for details.
-
-     This software is distributed WITHOUT ANY WARRANTY; without even 
-     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR 
-     PURPOSE.  See the above copyright notice for more information.
+  Copyright 2003 Sandia Coporation
+  Under the terms of Contract DE-AC04-94AL85000, there is a non-exclusive
+  license for use of this work by or on behalf of the U.S. Government.
+  Redistribution and use in source and binary forms, with or without
+  modification, are permitted provided that this Notice and any statement
+  of authorship are reproduced on all copies.
 
 =========================================================================*/
 // .NAME vtkIceTRenderManager - The Image Composition Engine for Tiles (ICE-T) component for VTK.
@@ -49,7 +48,7 @@
 
 #include "vtkParallelRenderManager.h"
 
-#include <GL/ice-t.h> // Needed for IceTContext
+#include <GL/ice-t.h>
 
 class VTK_EXPORT vtkIceTRenderManager : public vtkParallelRenderManager
 {
@@ -60,6 +59,9 @@ public:
 
   virtual vtkRenderer *MakeRenderer();
 
+  virtual void SetTileDimensions(int x, int y) 
+    {this->SetNumTilesX(x); this->SetNumTilesY(y);}
+
   virtual void SetController(vtkMultiProcessController *controller);
 
   // Description:
@@ -69,8 +71,6 @@ public:
   // in the Y direction (vertical) are numbered from top to bottom.
   vtkGetMacro(NumTilesX, int);
   vtkGetMacro(NumTilesY, int);
-
-  void SetTileDimensions(int x, int y);
   virtual void SetNumTilesX(int tilesX);
   virtual void SetNumTilesY(int tilesY);
 
@@ -89,17 +89,46 @@ public:
   };
 //ETX
 
+  // Description:
+  // Methods to set the strategy.  The REDUCE strategy, which is also the
+  // default, is a good all-around strategy.
   vtkGetMacro(Strategy, StrategyType);
   virtual void SetStrategy(StrategyType strategy);
   virtual void SetStrategy(const char *strategy);
 
 //BTX
+  enum ComposeOperationType {
+    CLOSEST, OVER
+  };
+//ETX
+
+  // Description:
+  // Get/Set to operation to use when composing pixels together.  Note that
+  // not all operations are commutative.  That is, for some operations, the
+  // order of composition matters.
+  vtkGetMacro(ComposeOperation, ComposeOperationType);
+  virtual void SetComposeOperation(ComposeOperationType operation);
+  // Description:
+  // Sets the compose operation to pick the pixel color that is closest to
+  // the camera (determined by the z-buffer).  This operation is
+  // commutative.  This is the default operation.
+  void SetComposeOperationToClosest() {
+    this->SetComposeOperation(CLOSEST);
+  }
+  // Description:
+  // Sets the compose operation to blend colors using the Porter and Duff
+  // OVER operator.  This operation is not commutative (order of
+  // composition matters).
+  void SetComposeOperationToOver() {
+    this->SetComposeOperation(OVER);
+  }
+
+//BTX
   enum {
-    TILES_DIRTY_TAG=234551,
+    ICET_INFO_TAG=234551,
     NUM_TILES_X_TAG=234552,
     NUM_TILES_Y_TAG=234553,
-    TILE_RANKS_TAG=234554,
-    STRATEGY_TAG=234555
+    TILE_RANKS_TAG=234554
   };
 //ETX
 
@@ -110,6 +139,9 @@ protected:
   virtual void UpdateIceTContext();
 
   virtual void ChangeTileDims(int tilesX, int tilesY);
+
+  virtual void StartRender();
+  virtual void SatelliteStartRender();
 
   virtual void SendWindowInformation();
   virtual void ReceiveWindowInformation();
@@ -131,16 +163,22 @@ protected:
   StrategyType Strategy;
   int StrategyDirty;
 
+  ComposeOperationType ComposeOperation;
+  int ComposeOperationDirty;
+
   // Description:
   // Used to keep track of when the ImageReductionFactor changes, which
   // means the tiles have gotten dirty.
   int LastKnownImageReductionFactor;
 
+  int FullImageSharesData;
+  int ReducedImageSharesData;
+
   virtual void ReadReducedImage();
 
 private:
-  vtkIceTRenderManager(const vtkIceTRenderManager&); // Not implemented
-  void operator=(const vtkIceTRenderManager&); //Not implemented
+  vtkIceTRenderManager(const vtkIceTRenderManager&);
+  void operator=(const vtkIceTRenderManager&);
 };
 
 

@@ -181,14 +181,14 @@ remote_copy()
 remote_copy_source()
 {
     check_host "$1" || return 1
-    remote_copy "$HOST" "${PROJECT}-${VERSION}.tar*"
+    remote_copy "$HOST" "${PROJECT}-${VERSION}.*"
 }
 
 #-----------------------------------------------------------------------------
 remote_copy_docs()
 {
     check_host "$1" || return 1
-    remote_copy "$HOST" "${PROJECT}-docs-${VERSION}.tar*"
+    remote_copy "$HOST" "${PROJECT}-docs-${VERSION}.*"
 }
 
 #-----------------------------------------------------------------------------
@@ -250,7 +250,12 @@ remote_binary()
 upload()
 {
     echo "------- Copying tarballs to www.paraview.org. -------"
-    scp ${PROJECT}-${VERSION}*tar.* kitware@www.paraview.org:/projects/FTP/pub/paraview
+    files=`ls ${PROJECT}-${VERSION}*tar.* \
+           ${PROJECT}-docs-${VERSION}*tar.* \
+           ${PROJECT}-${VERSION}.zip \
+           ${PROJECT}-docs-${VERSION}.zip`
+
+    scp ${files} kitware@www.paraview.org:/projects/FTP/pub/paraview/v${PARAVIEW_VERSION}
     echo "---- Done copying tarballs to www.paraview.org. -----"
 }
 
@@ -387,6 +392,24 @@ source_tarball()
 }
 
 #-----------------------------------------------------------------------------
+# Create a source zipfile.
+#
+#  source_zipfile
+#
+source_zipfile()
+{
+    [ -z "${DONE_source_zipfile}" ] || return 0 ; DONE_source_zipfile="yes"
+    config || return 1
+    [ -d "${PROJECT}-${VERSION}" ] || checkout || return 1
+    echo "Creating source zipfile ..." &&
+    (
+        mkdir -p Tarballs &&
+        rm -rf Tarballs/${PROJECT}-${VERSION}.zip &&
+        zip -r Tarballs/${PROJECT}-${VERSION}.zip ${PROJECT}-${VERSION}
+    ) >Logs/source_zipfile.log 2>&1 || error_log Logs/source_zipfile.log
+}
+
+#-----------------------------------------------------------------------------
 # Create documentation tarballs.
 #
 #  docs_tarball
@@ -408,6 +431,24 @@ docs_tarball()
 }
 
 #-----------------------------------------------------------------------------
+# Create a documentation zipfile.
+#
+#  docs_zipfile
+#
+docs_zipfile()
+{
+    [ -z "${DONE_docs_zipfile}" ] || return 0 ; DONE_docs_zipfile="yes"
+    config || return 1
+    [ -d "${PROJECT}-docs-${VERSION}" ] || checkout_docs || return 1
+    echo "Creating documentation zipfile ..." &&
+    (
+        mkdir -p Tarballs &&
+        rm -rf Tarballs/${PROJECT}-docs-${VERSION}.zip &&
+        zip -r Tarballs/${PROJECT}-docs-${VERSION}.zip ${PROJECT}-docs-${VERSION}
+    ) >Logs/docs_zipfile.log 2>&1 || error_log Logs/docs_zipfile.log
+}
+
+#-----------------------------------------------------------------------------
 write_standard_cache()
 {
     cat > CMakeCache.txt <<EOF
@@ -418,7 +459,7 @@ CMAKE_BUILD_TYPE:STRING=Release
 CMAKE_INSTALL_PREFIX:PATH=/usr/local
 CMAKE_SKIP_RPATH:BOOL=1
 CMAKE_VERBOSE_MAKEFILE:BOOL=TRUE
-PARAVIEW_LINK_XDMF:BOOL=OFF
+PARAVIEW_LINK_XDMF:BOOL=ON
 USE_INCLUDED_TCLTK:BOOL=ON
 USE_INSTALLED_TCLTK_PACKAGES:BOOL=OFF
 VTK_USE_64BIT_IDS:BOOL=OFF

@@ -82,12 +82,19 @@ public:
   int AddPage(const char *title);
 
   // Description:
+  // Does it have a given page
+  int HasPage(int id);
+  int HasPage(const char *title, int tag);
+  int GetPageId(const char *title, int tag);
+
+  // Description:
   // Accessors
   char* GetPageTitle(int id);
 
   // Description:
   // Return the number of pages in the notebook.
   unsigned int GetNumberOfPages();
+  unsigned int GetNumberOfPagesMatchingTag(int tag);
   
   // Description:
   // Set/Get a page tag. A tag (int) can be associated to a page (given the
@@ -125,6 +132,7 @@ public:
   vtkKWWidget *GetFrame(int id);
   vtkKWWidget *GetFrame(const char *title);
   vtkKWWidget *GetFrame(const char *title, int tag);
+  int GetPageIdFromFrameWidgetName(const char *frame_wname);
 
   // Description:
   // Remove a page from the notebook.
@@ -173,6 +181,7 @@ public:
   // Description:
   // Return the number of visible pages in the notebook.
   unsigned int GetNumberOfVisiblePages();
+  unsigned int GetNumberOfVisiblePagesMatchingTag(int tag);
 
   // Description:
   // Get the n-th visible page id (starting at index 0, i.e. the first visible 

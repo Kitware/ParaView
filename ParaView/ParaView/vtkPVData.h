@@ -207,6 +207,7 @@ public:
   void DrawWireframe();
   void DrawSurface();
   void DrawPoints();
+  void DrawOutline();
   
   // Description:
   // Methods called when item chosen from RepresentationMenu
@@ -305,8 +306,8 @@ public:
   // This determines whether to map array values through a color
   // map or use arrays values as colors directly.  The direct option
   // is only available for unsigned chanr arrays with 1 or 3 components.
-  void SetDirectColorFlag(int val);
-  void DirectColorCheckCallback();
+  void SetMapScalarsFlag(int val);
+  void MapScalarsCheckCallback();
 
 protected:
   vtkPVData();
@@ -339,6 +340,7 @@ protected:
   vtkKWLabel *TypeLabel;
   vtkKWLabel *NumCellsLabel;
   vtkKWLabel *NumPointsLabel;
+  vtkKWLabel *MemorySizeLabel;
   vtkKWLabel *ExtentLabel;
   
   vtkKWBoundsDisplay *BoundsDisplay;
@@ -377,7 +379,7 @@ protected:
 
   vtkKWCheckButton *ScalarBarCheck;
 
-  vtkKWCheckButton *DirectColorCheck;
+  vtkKWCheckButton *MapScalarsCheck;
   
   // For translating actor
   vtkKWLabeledFrame* ActorControlFrame;
@@ -407,7 +409,7 @@ protected:
 
   void UpdatePropertiesInternal();
   void UpdateActorControlResolutions();
-  void UpdateDirectColorCheck(vtkPVDataSetAttributesInformation* info,
+  void UpdateMapScalarsCheck(vtkPVDataSetAttributesInformation* info,
                               const char* name);
 
   vtkPVData(const vtkPVData&); // Not implemented

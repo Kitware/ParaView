@@ -42,19 +42,20 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLoadSaveDialog );
-vtkCxxRevisionMacro(vtkKWLoadSaveDialog, "1.28");
+vtkCxxRevisionMacro(vtkKWLoadSaveDialog, "1.28.4.1");
 
 vtkKWLoadSaveDialog::vtkKWLoadSaveDialog()
 {
-  this->Done = 1;
-  this->FileTypes = 0;
-  this->Title = 0;
-  this->FileName = 0;
-  this->LastPath = 0;
+  this->Done             = 1;
+  this->FileTypes        = NULL;
+  this->InitialFileName  = NULL;
+  this->Title            = NULL;
+  this->FileName         = NULL;
+  this->LastPath         = NULL;
+  this->DefaultExtension = NULL;
 
-  this->SaveDialog = 0;
-  this->ChooseDirectory = 0;
-  this->DefaultExtension = 0;
+  this->SaveDialog       = 0;
+  this->ChooseDirectory  = 0;
 
   this->SetTitle("Open Text Document");
   this->SetFileTypes("{{Text Document} {.txt}}");
@@ -62,11 +63,12 @@ vtkKWLoadSaveDialog::vtkKWLoadSaveDialog()
 
 vtkKWLoadSaveDialog::~vtkKWLoadSaveDialog()
 {
-  this->SetFileTypes(0);
-  this->SetTitle(0);
-  this->SetFileName(0);
-  this->SetDefaultExtension(0);
-  this->SetLastPath(0);
+  this->SetFileTypes(NULL);
+  this->SetInitialFileName(NULL);
+  this->SetTitle(NULL);
+  this->SetFileName(NULL);
+  this->SetDefaultExtension(NULL);
+  this->SetLastPath(NULL);
 }
 
 void vtkKWLoadSaveDialog::Create(vtkKWApplication *app, const char* /*args*/)
@@ -86,7 +88,6 @@ void vtkKWLoadSaveDialog::Create(vtkKWApplication *app, const char* /*args*/)
 int vtkKWLoadSaveDialog::Invoke()
 {
   this->Application->SetDialogUp(1);
-  char *path = NULL;
   ostrstream command;
 
   int support_choose_dir = this->Application->EvaluateBooleanExpression(
@@ -101,7 +102,7 @@ int vtkKWLoadSaveDialog::Invoke()
     command << (this->SaveDialog ? "tk_getSaveFile" : "tk_getOpenFile");
     }
 
-  command << " -title {" << this->Title << "}"
+  command << " -title {" << (this->Title ? this->Title : "") << "}"
           << " -initialdir {" 
           << ((this->LastPath && strlen(this->LastPath)>0)? this->LastPath:".")
           << "}";
@@ -116,9 +117,13 @@ int vtkKWLoadSaveDialog::Invoke()
   else
     {
     command << " -defaultextension {" 
-            << (this->DefaultExtension ? this->DefaultExtension : "")
-            << "}"
-            << " -filetypes {" << this->FileTypes << "}";
+            << (this->DefaultExtension ? this->DefaultExtension : "") << "}"
+#if (TK_MAJOR_VERSION == 8) && (TK_MINOR_VERSION >= 3)
+            << " -initialfile {" 
+            << (this->InitialFileName ? this->InitialFileName : "") << "}"
+#endif
+            << " -filetypes {" 
+            << (this->FileTypes ? this->FileTypes : "") << "}";
     }
   
   vtkKWWindow* window = this->GetWindow();
@@ -127,26 +132,15 @@ int vtkKWLoadSaveDialog::Invoke()
     command << " -parent " << window->GetWidgetName();
     }
   command << ends;
-  this->Script(command.str());
+  const char *path = this->Script(command.str());
   command.rdbuf()->freeze(0);
 
   int res = 0;
 
-  // At this point, the string is encoded as UTF-8, which matches ASCII value
-  // up to 0x7F in hexadecimal). Higher values are encoded as two or 3 bytes.
-  // Example: the file Baumann_Gü_0002 becomes Baumann_GÃ¼_0002
-  // convertfrom identity seems to do the trick to convert back to
-  // an ASCII-8 string that can be understood by the system.
-
-  path = this->Application->GetMainInterp()->result;
-
   if (path && strlen(path))
     {
-    this->Script("encoding convertfrom identity {%s}", 
-                 this->Application->GetMainInterp()->result);
-
-    path = this->Application->GetMainInterp()->result;
-
+    path = this->ConvertTclStringToInternalString(path);
+    
     this->SetFileName(path);
     if (this->ChooseDirectory && support_choose_dir)
       {
@@ -162,8 +156,10 @@ int vtkKWLoadSaveDialog::Invoke()
     {
     this->SetFileName(0);
     }
+
   this->Application->SetDialogUp(0);
   this->Script("update");
+
   return res;
 }
 
@@ -199,6 +195,9 @@ void vtkKWLoadSaveDialog::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "FileName: " << (this->FileName?this->FileName:"none") 
      << endl;
   os << indent << "FileTypes: " << (this->FileTypes?this->FileTypes:"none") 
+     << endl;
+  os << indent << "InitialFileName: " 
+     << (this->InitialFileName?this->InitialFileName:"none") 
      << endl;
   os << indent << "LastPath: " << (this->LastPath?this->LastPath:"none")
      << endl;

@@ -148,10 +148,15 @@ public:
   // GetLimitedEditionModeAndWarn will return the limited edition mode ; if 
   // the mode is true, it will also display a popup warning stating that a
   // feature (string parameter) is not available in this mode.
+  // Also set/Get the name of the Limited Edition Mode, as displayed in the
+  // GUI or after the application name in the title bar 
+  // (default to: limited edition). 
   virtual void SetLimitedEditionMode(int arg);
   vtkBooleanMacro(LimitedEditionMode, int);
   vtkGetMacro(LimitedEditionMode, int);
   virtual int GetLimitedEditionModeAndWarn(const char *feature);
+  vtkSetStringMacro(LimitedEditionModeName);
+  vtkGetStringMacro(LimitedEditionModeName);
 
   // Description:
   // Set/Get the directory in which the current application is supposed
@@ -162,15 +167,16 @@ public:
   // Load script from a file. Resturn if script was successful.
   int LoadScript(const char* filename);
 
-  //BTX
   // Description:
   // A convienience method to invoke some tcl script code and
   // perform arguement substitution.
-  virtual const char* Script(const char* format, ...);
   const char* SimpleScript(const char* script);
+  //BTX
+  virtual const char* Script(const char* format, ...);
   const char* EvaluateString(const char* format, ...);
   const char* ExpandFileName(const char* format, ...);
   int EvaluateBooleanExpression(const char* format, ...);
+  //ETX
   
   // Description:
   // Internal implementation method for Script invocation.  This
@@ -327,6 +333,17 @@ public:
   // level set).
   virtual void GetApplicationSettingsFromRegistery();
 
+  // Description:
+  // Get/Set the internal character encoding of the application.
+  virtual void SetCharacterEncoding(int val);
+  vtkGetMacro(CharacterEncoding, int);
+  
+  // Description:
+  // Test if we have some logic to check for application update and
+  // eventually perform that check.
+  virtual int HasCheckForUpdates();
+  virtual void CheckForUpdates();
+  
 protected:
   vtkKWApplication();
   ~vtkKWApplication();
@@ -372,6 +389,7 @@ protected:
 
   int ExitStatus;
   int LimitedEditionMode;
+  char *LimitedEditionModeName;
 
   ofstream *TraceFile;
 
@@ -395,8 +413,29 @@ protected:
   // About dialog
 
   virtual void ConfigureAbout();
+  virtual void AddAboutText(ostream &);
+  virtual void AddAboutCopyrights(ostream &);
   vtkKWMessageDialog *AboutDialog;
   vtkKWLabel         *AboutDialogImage;
+
+  int CharacterEncoding;
+
+  // Description:
+  // Check for an argument (example: --foo, /C, -bar, etc).
+  // Return VTK_OK if found and set 'index' to the position of the 
+  // argument in argv[].
+  // Return VTK_ERROR if not found.
+  static int CheckForArgument(
+    int argc, char* argv[], const char *arg, int &index);
+
+  // Description:
+  // Check for a valued argument (example: --foo=bar, /C=bar, -bar=foo, etc).
+  // Return VTK_OK if found and set 'index' to the position of the 
+  // argument in argv[], 'value_pos' to the position right after the '='
+  // in that argument.
+  // Return VTK_ERROR if not found.
+  static int CheckForValuedArgument(
+    int argc, char* argv[], const char *arg, int &index, int &value_pos);
 
 private:
   vtkKWApplication(const vtkKWApplication&);   // Not implemented.

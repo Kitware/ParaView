@@ -49,7 +49,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVGhostLevelDialog );
-vtkCxxRevisionMacro(vtkPVGhostLevelDialog, "1.2");
+vtkCxxRevisionMacro(vtkPVGhostLevelDialog, "1.2.4.1");
 
 int vtkPVGhostLevelDialogCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -186,10 +186,6 @@ void vtkPVGhostLevelDialog::SetGhostLevel(int level)
   this->Script("grab release %s",this->GetWidgetName());
   this->GhostLevel = level;  
   this->Done = 2;  
-  if (this->Command && strlen(this->Command) > 0)
-    {
-    this->Script("eval %s",this->Command);
-    }
 }
 
 //----------------------------------------------------------------------------

@@ -40,11 +40,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWApplicationSettingsInterface.h"
 #include "vtkKWBWidgets.h"
 #include "vtkKWDirectoryUtilities.h"
+#include "vtkKWFrame.h"
 #include "vtkKWLabel.h"
 #include "vtkKWMessageDialog.h"
 #include "vtkKWObject.h"
 #include "vtkKWRegisteryUtilities.h"
 #include "vtkKWSplashScreen.h"
+#include "vtkKWTkUtilities.h"
 #include "vtkKWWidgetsConfigure.h"
 #include "vtkKWWindow.h"
 #include "vtkKWWindowCollection.h"
@@ -52,8 +54,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkOutputWindow.h"
 #include "vtkString.h"
 #include "vtkTclUtil.h"
+#ifndef DO_NOT_BUILD_XML_RW
+#include "vtkXMLIOBase.h"
+#endif
 
 #include <stdarg.h>
+
+#define REG_KEY_VALUE_SIZE_MAX 8192
+#define REG_KEY_NAME_SIZE_MAX 100
 
 #if !defined(USE_INSTALLED_TCLTK_PACKAGES) && \
     (TCL_MAJOR_VERSION == 8) && (TCL_MINOR_VERSION < 4)
@@ -67,12 +75,19 @@ static Tcl_Interp *Et_Interp = 0;
 #include "kwappicon.h"
 #endif
 
-int vtkKWApplication::WidgetVisibility = 1;
+// I need those two Tcl functions. They usually are declared in tclIntDecls.h,
+// but Unix build do not have access to VTK's tkInternals include path.
+// Since the signature has not changed for years (at least since 8.2),
+// let's just prototype them.
 
+EXTERN Tcl_Obj* TclGetLibraryPath _ANSI_ARGS_((void));
+EXTERN void TclSetLibraryPath _ANSI_ARGS_((Tcl_Obj * pathPtr));
+
+int vtkKWApplication::WidgetVisibility = 1;
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.137");
+vtkCxxRevisionMacro(vtkKWApplication, "1.137.2.1");
 
 extern "C" int Vtktcl_Init(Tcl_Interp *interp);
 extern "C" int Vtkkwwidgetstcl_Init(Tcl_Interp *interp);
@@ -94,6 +109,9 @@ vtkKWApplication::vtkKWApplication()
   this->ApplicationPrettyName = NULL;
   this->ApplicationInstallationDirectory = NULL;
 
+  this->LimitedEditionModeName = NULL;
+  this->SetLimitedEditionModeName("limited edition");
+
   this->InExit = 0;
   this->DialogUp = 0;
   this->TraceFile = NULL;
@@ -105,6 +123,9 @@ vtkKWApplication::vtkKWApplication()
   this->RegisteryLevel = 10;
 
   this->UseMessageDialogs = 1;  
+
+  this->CharacterEncoding = VTK_ENCODING_UNKNOWN;
+  this->SetCharacterEncoding(VTK_ENCODING_ISO_8859_1);
 
   this->Windows = vtkKWWindowCollection::New();  
 
@@ -175,6 +196,7 @@ vtkKWApplication::vtkKWApplication()
 //----------------------------------------------------------------------------
 vtkKWApplication::~vtkKWApplication()
 {
+  this->SetLimitedEditionModeName(NULL);
   this->SetBalloonHelpPending(NULL);
 
   if (this->BalloonHelpWindow)
@@ -251,11 +273,11 @@ void vtkKWApplication::FindApplicationInstallationDirectory()
     }
   else
     {
-    char setup_key[1024];
+    char setup_key[REG_KEY_NAME_SIZE_MAX];
     sprintf(setup_key, "%s\\Setup", this->GetApplicationVersionName());
     vtkKWRegisteryUtilities *reg 
       = this->GetRegistery(this->GetApplicationName());
-    char installed_path[1024];
+    char installed_path[REG_KEY_VALUE_SIZE_MAX];
     if (reg && reg->ReadValue(setup_key, "InstalledPath", installed_path))
       {
       vtkKWDirectoryUtilities *util = vtkKWDirectoryUtilities::New();
@@ -522,39 +544,66 @@ Tcl_Interp *vtkKWApplication::InitializeTcl(int argc,
 
   (void)err;
 
-  // This is mandatory, it does more than just finding the executable
+  // Set TCL_LIBRARY, TK_LIBRARY for the embedded version of Tk (kind
+  // of deprecated right now)
+
+#if !defined(USE_INSTALLED_TCLTK_PACKAGES) && \
+    (TCL_MAJOR_VERSION == 8) && (TCL_MINOR_VERSION < 4)
+  putenv("TCL_LIBRARY=" ET_TCL_LIBRARY);
+  putenv("TK_LIBRARY=" ET_TK_LIBRARY);
+#endif
+
+  // This is mandatory *now*, it does more than just finding the executable
+  // (like finding the encodings, setting variables depending on the value
+  // of TCL_LIBRARY, TK_LIBRARY
 
   Tcl_FindExecutable(argv[0]);
 
-  // Add the path to our internal Tcl/Tk support library/packages 
-  // to the environment
+  // Find the path to our internal Tcl/Tk support library/packages
+  // if we are not using the installed Tcl/Tk
+  
+#if !defined(USE_INSTALLED_TCLTK_PACKAGES) && \
+    (TCL_MAJOR_VERSION == 8) && (TCL_MINOR_VERSION >= 4)
 
-#if !defined(USE_INSTALLED_TCLTK_PACKAGES)
-#if (TCL_MAJOR_VERSION == 8) && (TCL_MINOR_VERSION < 4)
-  putenv("TCL_LIBRARY=" ET_TCL_LIBRARY);
-  putenv("TK_LIBRARY=" ET_TK_LIBRARY);
-#else
   char tcl_library[1024] = "";
   char tk_library[1024] = "";
+
   const char *nameofexec = Tcl_GetNameOfExecutable();
   if (nameofexec && vtkKWDirectoryUtilities::FileExists(nameofexec))
     {
     char directory[1024], buffer[1024];
+    const char* dir = 0;
     vtkKWDirectoryUtilities *util = vtkKWDirectoryUtilities::New();
-    util->GetFilenamePath(nameofexec, directory);
-    strcpy(directory, util->ConvertToUnixSlashes(directory));
-    util->Delete();
+    dir = util->GetFilenamePath(nameofexec, directory);
+    sprintf(buffer, "%s/..%s/TclTk", dir, KW_INSTALL_LIB_DIR);
+    if (vtkKWDirectoryUtilities::FileExists(buffer) )
+      {
+      // Installed KW application
+      dir = util->CollapseDirectory(buffer);
+      sprintf(tcl_library, "%s/lib/tcl%s", dir, TCL_VERSION);
+      sprintf(tk_library, "%s/lib/tk%s", dir, TK_VERSION);
+      }
+    else
+      {
+      // Build tree or windows
+      strcpy(directory, util->ConvertToUnixSlashes(directory));
+      util->Delete();
 
-    sprintf(tcl_library, "%s/TclTk/lib/tcl%s", directory, TCL_VERSION);
+      sprintf(tcl_library, "%s/TclTk/lib/tcl%s", directory, TCL_VERSION);
+      sprintf(tk_library, "%s/TclTk/lib/tk%s", directory, TK_VERSION);
+      }
+
+    // At this point this is useless, since the call to Tcl_FindExecutable
+    // already used the contents of the env variable. Anyway, let's just
+    // set them to comply with the path that we are about to set
     sprintf(buffer, "TCL_LIBRARY=%s", tcl_library);
     putenv(buffer);
-
-    sprintf(tk_library, "%s/TclTk/lib/tk%s", directory, TK_VERSION);
     sprintf(buffer, "TK_LIBRARY=%s", tk_library);
     putenv(buffer);
     }
 #endif
-#endif
+
+  // Create the interpreter
 
   interp = Tcl_CreateInterp();
   args = Tcl_Merge(argc-1, argv+1);
@@ -565,16 +614,21 @@ Tcl_Interp *vtkKWApplication::InitializeTcl(int argc,
   Tcl_SetVar(interp, "argv0", argv[0], TCL_GLOBAL_ONLY);
   Tcl_SetVar(interp, "tcl_interactive", "0", TCL_GLOBAL_ONLY);
 
+  // Sets the path to the Tcl and Tk library manually
+  // if we are not using the installed Tcl/Tk
+  // (nope, the env variables like TCL_LIBRARY were not used when the
+  // interpreter was created, they were used during the call to 
+  // Tcl_FindExecutable).
+
 #if !defined(USE_INSTALLED_TCLTK_PACKAGES) && \
     (TCL_MAJOR_VERSION == 8) && (TCL_MINOR_VERSION >= 4)
 
-  // It seems the environment is not propagated correctly to the interpreter,
-  // so set the libs explicitly
+  // Tcl lib path
 
   if (tcl_library && *tcl_library)
     {
-    if (!Tcl_SetVar(
-          interp, "tcl_library", tcl_library, TCL_LEAVE_ERR_MSG))
+    if (!Tcl_SetVar(interp, "tcl_library", tcl_library, 
+                    TCL_GLOBAL_ONLY | TCL_LEAVE_ERR_MSG))
       {
       if (err)
         {
@@ -583,10 +637,13 @@ Tcl_Interp *vtkKWApplication::InitializeTcl(int argc,
       return NULL;
       }
     }
+  
+  // Tk lib path
 
   if (tk_library && *tk_library)
     {
-    if (!Tcl_SetVar(interp, "tk_library", tk_library, TCL_LEAVE_ERR_MSG))
+    if (!Tcl_SetVar(interp, "tk_library", tk_library, 
+                    TCL_GLOBAL_ONLY | TCL_LEAVE_ERR_MSG))
       {
       if (err)
         {
@@ -596,8 +653,53 @@ Tcl_Interp *vtkKWApplication::InitializeTcl(int argc,
       }
     }
 
+  // Prepend our Tcl Tk lib path to the library paths
+  // This *is* mandatory if we want encodings files to be found, as they
+  // are searched by browsing TclGetLibraryPath().
+  // (nope, updating the Tcl tcl_libPath var won't do the trick)
+
+  Tcl_Obj *new_libpath = Tcl_NewObj();
+
+  if (tcl_library && *tcl_library)
+    {
+    Tcl_Obj *obj = Tcl_NewStringObj(tcl_library, -1);
+    if (obj && 
+        !Tcl_ListObjAppendElement(interp, new_libpath, obj) != TCL_OK && err)
+      {
+      *err << "Tcl_ListObjAppendElement error: " 
+           << Tcl_GetStringResult(interp) << endl;
+      }
+    }
+  
+  if (tk_library && *tk_library)
+    {
+    Tcl_Obj *obj = Tcl_NewStringObj(tk_library, -1);
+    if (obj && 
+        !Tcl_ListObjAppendElement(interp, new_libpath, obj) != TCL_OK && err)
+      {
+      *err << "Tcl_ListObjAppendElement error: " 
+           << Tcl_GetStringResult(interp) << endl;
+      }
+    }
+  
+  // Actually let's be conservative for now and not use the
+  // predefined lib paths
+#if 0    
+  Tcl_Obj *old_libpath = TclGetLibraryPath();
+  if (old_libpath && 
+      !Tcl_ListObjAppendList(interp, new_libpath, old_libpath) !=TCL_OK && err)
+    {
+    *err << "Tcl_ListObjAppendList error: " 
+         << Tcl_GetStringResult(interp) << endl;
+    }
 #endif
- 
+
+  TclSetLibraryPath(new_libpath);
+
+#endif
+
+  // Init Tcl
+
 #if !defined(USE_INSTALLED_TCLTK_PACKAGES) && \
     (TCL_MAJOR_VERSION == 8) && (TCL_MINOR_VERSION < 4)
 
@@ -619,6 +721,8 @@ Tcl_Interp *vtkKWApplication::InitializeTcl(int argc,
     return NULL;
     }
 
+  // Init Tk
+
   status = Tk_Init(interp);
   if (status != TCL_OK)
     {
@@ -638,10 +742,12 @@ Tcl_Interp *vtkKWApplication::InitializeTcl(int argc,
   ApplicationIcon_DoInit(interp);
 #endif
 
-  // initialize VTK
+  // Initialize VTK
+
   Vtktcl_Init(interp);
 
-  // initialize Widgets
+  // Initialize Widgets
+
   if (vtkKWApplication::WidgetVisibility)
     {
     Vtkkwwidgetstcl_Init(interp);
@@ -993,7 +1099,8 @@ void vtkKWApplication::ConfigureAbout()
       {
       this->CreateSplashScreen();
       }
-    if (this->SplashScreen->GetImageName())
+    const char *img_name = this->SplashScreen->GetImageName();
+    if (img_name)
       {
       if (!this->AboutDialogImage)
         {
@@ -1006,22 +1113,55 @@ void vtkKWApplication::ConfigureAbout()
         }
 
       this->Script("%s config -image {%s}",
-                   this->AboutDialogImage->GetWidgetName(), 
-                   this->SplashScreen->GetImageName());
+                   this->AboutDialogImage->GetWidgetName(), img_name);
       this->Script("pack %s -side top", 
                    this->AboutDialogImage->GetWidgetName());
+      int w = vtkKWTkUtilities::GetPhotoWidth(this->MainInterp, img_name);
+      int h = vtkKWTkUtilities::GetPhotoHeight(this->MainInterp, img_name);
+      this->AboutDialog->GetTopFrame()->SetWidth(w);
+      this->AboutDialog->GetTopFrame()->SetHeight(h);
+      if (w > this->AboutDialog->GetTextWidth())
+        {
+        this->AboutDialog->SetTextWidth(w);
+        }
       }
     }
 
+  ostrstream title;
+  title << "About " << this->GetApplicationPrettyName() << ends;
+  this->AboutDialog->SetTitle(title.str());
+  title.rdbuf()->freeze(0);
+
   ostrstream str;
-  str << this->GetApplicationPrettyName()
-      << "\n  Application : " << this->GetApplicationName() 
-      << "\n  Version : " << this->GetApplicationVersionName() 
-      << "\n  Release : " << this->GetApplicationReleaseName() << ends;
-
+  this->AddAboutText(str);
+  str << endl;
+  this->AddAboutCopyrights(str);
+  str << ends;
   this->AboutDialog->SetText(str.str());
-
   str.rdbuf()->freeze(0);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWApplication::AddAboutText(ostream &os)
+{
+  os << this->GetApplicationPrettyName() 
+     << " (" 
+     << this->GetApplicationVersionName() 
+     << " " 
+     << this->GetApplicationReleaseName()
+     << ")" 
+     << endl;
+}
+
+//----------------------------------------------------------------------------
+void vtkKWApplication::AddAboutCopyrights(ostream &os)
+{
+  os << "Tcl/Tk" << endl
+     << "  - Copyright (c) 1989-1994 The Regents of the University of "
+     << "California." << endl
+     << "  - Copyright (c) 1994 The Australian National University." << endl
+     << "  - Copyright (c) 1994-1998 Sun Microsystems, Inc." << endl
+     << "  - Copyright (c) 1998-2000 Ajuba Solutions." << endl;
 }
 
 //----------------------------------------------------------------------------
@@ -1104,7 +1244,7 @@ void vtkKWApplication::SetBalloonHelpWidget( vtkKWWidget *widget )
 //----------------------------------------------------------------------------
 int vtkKWApplication::GetMessageDialogResponse(const char* dialogname)
 {
-  char buffer[1024];
+  char buffer[REG_KEY_VALUE_SIZE_MAX];
   int retval = 0;
   if ( this->GetRegisteryValue(3, "Dialogs", dialogname, buffer) )
     {
@@ -1132,8 +1272,8 @@ int vtkKWApplication::SetRegisteryValue(int level, const char* subkey,
     return 0;
     }
   int res = 0;
-  char buffer[100];
-  char value[16000];
+  char buffer[REG_KEY_NAME_SIZE_MAX];
+  char value[REG_KEY_VALUE_SIZE_MAX];
   sprintf(buffer, "%s\\%s", 
           this->GetApplication()->GetApplicationVersionName(),
           subkey);
@@ -1153,14 +1293,14 @@ int vtkKWApplication::GetRegisteryValue(int level, const char* subkey,
                                         const char* key, char* value)
 {
   int res = 0;
-  char buff[1024];
+  char buff[REG_KEY_VALUE_SIZE_MAX];
   if ( !this->GetApplication() ||
        this->GetRegisteryLevel() < 0 ||
        this->GetRegisteryLevel() < level )
     {
     return 0;
     }
-  char buffer[1024];
+  char buffer[REG_KEY_NAME_SIZE_MAX];
   sprintf(buffer, "%s\\%s", 
           this->GetApplicationVersionName(),
           subkey);
@@ -1186,7 +1326,7 @@ int vtkKWApplication::DeleteRegisteryValue(int level, const char* subkey,
     return 0;
     }
   int res = 0;
-  char buffer[100];
+  char buffer[REG_KEY_NAME_SIZE_MAX];
   sprintf(buffer, "%s\\%s", 
           this->GetApplicationVersionName(),
           subkey);
@@ -1201,7 +1341,7 @@ int vtkKWApplication::DeleteRegisteryValue(int level, const char* subkey,
 int vtkKWApplication::HasRegisteryValue(int level, const char* subkey, 
                                         const char* key)
 {
-  char buffer[1024];
+  char buffer[REG_KEY_VALUE_SIZE_MAX];
   return this->GetRegisteryValue(level, subkey, key, buffer);
 }
 
@@ -1250,7 +1390,7 @@ float vtkKWApplication::GetFloatRegisteryValue(int level, const char* subkey,
     return 0;
     }
   float res = 0;
-  char buffer[1024];
+  char buffer[REG_KEY_VALUE_SIZE_MAX];
   if ( this->GetRegisteryValue( 
          level, subkey, key, buffer ) )
     {
@@ -1270,7 +1410,7 @@ int vtkKWApplication::GetIntRegisteryValue(int level, const char* subkey,
     }
 
   int res = 0;
-  char buffer[1024];
+  char buffer[REG_KEY_VALUE_SIZE_MAX];
   if ( this->GetRegisteryValue( 
          level, subkey, key, buffer ) )
     {
@@ -1290,7 +1430,7 @@ int vtkKWApplication::BooleanRegisteryCheck(int level,
     {
     return 0;
     }
-  char buffer[1024];
+  char buffer[REG_KEY_VALUE_SIZE_MAX];
   int allset = 0;
   if ( this->GetRegisteryValue(level, subkey, key, buffer) )
     {
@@ -1338,12 +1478,14 @@ int vtkKWApplication::GetLimitedEditionModeAndWarn(const char *feature)
       }
     feature_str << ends;
 
+    const char *lem_name = this->GetLimitedEditionModeName() 
+      ? this->GetLimitedEditionModeName() : "limited edition";
+
     ostrstream msg_str;
     msg_str << this->GetApplicationName() 
-            << " is running in Limited Edition Mode. "
+            << " is running in " << lem_name << " mode. "
             << "The feature you are trying to use" << feature_str.str() 
             << " is not available in this mode. "
-            << "You may consider acquiring the Full Version to unlock it."
             << ends;
 
     vtkKWMessageDialog::PopupMessage(
@@ -1362,14 +1504,116 @@ const char* vtkKWApplication::GetApplicationPrettyName()
 {
   ostrstream pretty_str;
   pretty_str << (this->ApplicationName ? this->ApplicationName : "")
-             << " " << this->MajorVersion << "." << this->MinorVersion
-             << (this->LimitedEditionMode ? " LE" : "")
-             << ends;
+             << " " << this->MajorVersion << "." << this->MinorVersion;
+  if (this->LimitedEditionMode)
+    {
+    const char *lem_name = this->GetLimitedEditionModeName() 
+      ? this->GetLimitedEditionModeName() : "limited edition";
+    char *upfirst = vtkString::Duplicate(lem_name);
+    pretty_str << " " << vtkString::ToUpperFirst(upfirst);
+    delete [] upfirst;
+    }
+  pretty_str << ends;
 
   this->SetApplicationPrettyName(pretty_str.str());
   pretty_str.rdbuf()->freeze(0);
 
   return this->ApplicationPrettyName;
+}
+
+//----------------------------------------------------------------------------
+void vtkKWApplication::SetCharacterEncoding(int val)
+{
+  if (val == this->CharacterEncoding)
+    {
+    return;
+    }
+
+  if (val < VTK_ENCODING_NONE)
+    {
+    val = VTK_ENCODING_NONE;
+    }
+  else if (val > VTK_ENCODING_UNKNOWN)
+    {
+    val = VTK_ENCODING_UNKNOWN;
+    }
+
+  this->CharacterEncoding = val;
+  
+#ifndef DO_NOT_BUILD_XML_RW
+  vtkXMLIOBase::SetDefaultCharacterEncoding(this->CharacterEncoding);
+#endif
+
+  this->Modified();
+}
+
+//----------------------------------------------------------------------------
+int vtkKWApplication::CheckForArgument(
+  int argc, char* argv[], const char *arg, int &index)
+{
+  if (!argc || !argv || !arg)
+    {
+    return VTK_ERROR;
+    }
+
+  // Check each arg
+  // Be careful with valued argument (should not be, but who knows)
+
+  int i;
+  for (i = 0; i < argc; i++)
+    {
+    if (argv[i])
+      {
+      const char *equal = strchr(argv[i], '=');
+      if (equal)
+        {
+        size_t part = equal - argv[i];
+        if (strlen(arg) == part && !strncmp(arg, argv[i], part))
+          {
+          index = i;
+          return VTK_OK;
+          }
+        }
+      else
+        {
+        if (!strcmp(arg, argv[i]))
+          {
+          index = i;
+          return VTK_OK;
+          }
+        }
+      }
+    }
+
+  return VTK_ERROR;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWApplication::CheckForValuedArgument(
+  int argc, char* argv[], const char *arg, int &index, int &value_pos)
+{
+  int found = vtkKWApplication::CheckForArgument(argc, argv, arg, index);
+  if (found == VTK_OK)
+    {
+    const char *equal = strchr(argv[index], '=');
+    if (equal)
+      {
+      value_pos = (equal - argv[index]) + 1;
+      return VTK_OK;
+      }
+    }
+  return VTK_ERROR;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWApplication::HasCheckForUpdates()
+{
+  return 0;
+}
+
+//----------------------------------------------------------------------------
+void vtkKWApplication::CheckForUpdates()
+{
 }
 
 //----------------------------------------------------------------------------
@@ -1411,4 +1655,8 @@ void vtkKWApplication::PrintSelf(ostream& os, vtkIndent indent)
      << (this->SaveWindowGeometry ? "On" : "Off") << endl;
   os << indent << "LimitedEditionMode: " 
      << (this->LimitedEditionMode ? "On" : "Off") << endl;
+  os << indent << "CharacterEncoding: " << this->CharacterEncoding << "\n";
+  os << indent << "LimitedEditionModeName: " 
+     << (this->LimitedEditionModeName ? this->LimitedEditionModeName
+         : "None") << endl;
 }

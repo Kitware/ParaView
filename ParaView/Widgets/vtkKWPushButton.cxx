@@ -39,7 +39,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWPushButton );
-vtkCxxRevisionMacro(vtkKWPushButton, "1.13");
+vtkCxxRevisionMacro(vtkKWPushButton, "1.13.4.1");
 
 //----------------------------------------------------------------------------
 vtkKWPushButton::vtkKWPushButton()
@@ -72,10 +72,14 @@ void vtkKWPushButton::Create(vtkKWApplication *app, const char *args)
 
   wname = this->GetWidgetName();
 
-  this->Script("button %s -text {%s} %s", 
-               wname, 
-               (this->ButtonLabel ? this->ButtonLabel : ""), 
-               (args ? args : ""));
+  this->Script("button %s", wname);
+
+  this->SetTextOption(this->ButtonLabel);
+
+  if (args && *args)
+    {
+    this->Script("%s config %s", wname, args);
+    }
 
   // Update enable state
 
@@ -86,11 +90,13 @@ void vtkKWPushButton::Create(vtkKWApplication *app, const char *args)
 void vtkKWPushButton::SetLabel( const char *name )
 {
   this->SetButtonLabel(name);
+  this->SetTextOption(name);
+}
 
-  if (this->IsCreated())
-    {
-    this->Script("%s configure -text {%s}", this->GetWidgetName(), name);
-    }
+//----------------------------------------------------------------------------
+char* vtkKWPushButton::GetLabel()
+{
+  return this->ButtonLabel;
 }
 
 //----------------------------------------------------------------------------
@@ -100,6 +106,12 @@ void vtkKWPushButton::SetLabelWidth(int width)
     {
     this->Script("%s configure -width %d", this->GetWidgetName(), width);
     }
+}
+
+//----------------------------------------------------------------------------
+int vtkKWPushButton::GetLabelWidth()
+{
+  return this->GetConfigurationOptionAsInt("-width");
 }
 
 //----------------------------------------------------------------------------

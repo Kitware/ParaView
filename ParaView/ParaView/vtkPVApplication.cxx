@@ -126,7 +126,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.221.2.5");
+vtkCxxRevisionMacro(vtkPVApplication, "1.221.2.6");
 vtkCxxSetObjectMacro(vtkPVApplication, RenderModule, vtkPVRenderModule);
 
 
@@ -145,6 +145,7 @@ void vtkPVApplication::SetProcessModule(vtkPVProcessModule *pm)
 //----------------------------------------------------------------------------
 extern "C" int Vtktkrenderwidget_Init(Tcl_Interp *interp);
 extern "C" int Vtkkwparaviewtcl_Init(Tcl_Interp *interp);
+extern "C" int Vtkpvfilterstcl_Init(Tcl_Interp *interp);
 
 #ifdef PARAVIEW_LINK_XDMF
 extern "C" int Vtkxdmftcl_Init(Tcl_Interp *interp);
@@ -223,6 +224,10 @@ public:
         if ( error )
           {
           win->ErrorMessage(buffer);
+          if ( this->TestErrors )
+            {
+            this->ErrorOccurred = 1;
+            }
           }
         else 
           {
@@ -232,10 +237,12 @@ public:
         }
       }
   }
-
+  
   vtkPVOutputWindow()
   {
     this->Windows = 0;
+    this->ErrorOccurred = 0;
+    this->TestErrors = 1;
   }
   
   void SetWindowCollection(vtkKWWindowCollection *windows)
@@ -243,9 +250,17 @@ public:
     this->Windows = windows;
   }
 
+  int GetErrorOccurred()
+    {
+    return this->ErrorOccurred;
+    }
+
+  void EnableTestErrors() { this->TestErrors = 1; }
+  void DisableTestErrors() { this->TestErrors = 0; }
 protected:
   vtkKWWindowCollection *Windows;
-
+  int ErrorOccurred;
+  int TestErrors;
 private:
   vtkPVOutputWindow(const vtkPVOutputWindow&);
   void operator=(const vtkPVOutputWindow&);
@@ -264,6 +279,7 @@ Tcl_Interp *vtkPVApplication::InitializeTcl(int argc,
     return interp;
     }
 
+  Vtkpvfilterstcl_Init(interp);
   //  if (Vtkparalleltcl_Init(interp) == TCL_ERROR) 
   //  {
    // cerr << "Init Parallel error\n";
@@ -344,6 +360,7 @@ vtkPVApplication::vtkPVApplication()
   this->HostName = NULL;
   this->SetHostName("localhost");
   this->Port = 11111;
+  this->ReverseConnection = 0;
   this->Username = 0;
   this->UseSoftwareRendering = 0;
   this->UseSatelliteSoftware = 0;
@@ -381,6 +398,8 @@ vtkPVApplication::vtkPVApplication()
   this->SourcesBrowserAlwaysShowName = 0;
   this->ShowSourcesLongHelp = 1;
   this->DemoPath = NULL;
+
+  this->LogThreshold = 0.01;
 }
 
 //----------------------------------------------------------------------------
@@ -520,53 +539,21 @@ int vtkPVApplication::CheckRegistration()
   return 1;
 }
 
-//----------------------------------------------------------------------------
-int vtkPVApplication::CheckForArgument(int argc, char* argv[], 
-                                       const char* arg, int& index)
-{
-  if (!arg)
-    {
-    return VTK_ERROR;
-    }
-
-  int i;
-  int retVal = VTK_ERROR;
-  for (i=0; i < argc; i++)
-    {
-    char* newarg = vtkString::Duplicate(argv[i]);
-    int len = (int)(strlen(newarg));
-    for (int j=0; j<len; j++)
-      {
-      if (newarg[j] == '=')
-        {
-        newarg[j] = '\0';
-        }
-      }
-    if (newarg && strcmp(arg, newarg) == 0)
-      {
-      index = i;
-      retVal = VTK_OK;
-      delete[] newarg;
-      break;
-      }
-    delete[] newarg;
-    }
-  return retVal;
-}
-
 const char vtkPVApplication::ArgumentList[vtkPVApplication::NUM_ARGS][128] = 
 { "--client" , "-c", 
   "Run ParaView as client (MPI run, 1 process) (ParaView Server must be started first).", 
   "--server" , "-v", 
   "Start ParaView as a server (use MPI run).",
   "--host", "-h",
-  "Tell the client where to look for the server (default: --host=localhost). Use this option only with the --client option.", 
+  "Tell the client where to look for the server (default: localhost). Used with --client option or --server -rc options.", 
   "--user", "",
   "Tell the client what username to send to server when establishing SSH connection.",
   "--always-ssh", "",
   "",
   "--port", "",
   "Specify the port client and server will use (--port=11111).  Client and servers ports must match.", 
+  "--reverse-connection", "-rc",
+  "Have the server connect to the client.", 
   "--stereo", "",
   "Tell the application to enable stero rendering (only when running on a single process).",
   "--render-module", "",
@@ -753,7 +740,7 @@ void vtkPVApplication::SaveTraceFile(const char* fname)
   exportDialog->SaveDialogOn();
   exportDialog->SetTitle("Save ParaView Trace");
   exportDialog->SetDefaultExtension(".pvs");
-  exportDialog->SetFileTypes("{{ParaView Scripts} {.pvs}} {{All Files} {.*}}");
+  exportDialog->SetFileTypes("{{ParaView Scripts} {.pvs}} {{All Files} {*}}");
   if ( exportDialog->Invoke() && 
        vtkString::Length(exportDialog->GetFileName())>0 )
     {
@@ -789,7 +776,6 @@ int vtkPVApplication::ParseCommandLineArguments(int argc, char*argv[])
        vtkPVApplication::CheckForArgument(argc, argv, "-b",
                                           index) == VTK_OK )
     {
-    int i;
     for (i=1; i < argc; i++)
       {
       if (vtkPVApplication::CheckForExtension(argv[i], ".pvb"))
@@ -826,11 +812,11 @@ int vtkPVApplication::ParseCommandLineArguments(int argc, char*argv[])
 
           char* newarg = vtkString::Duplicate(argv[i]);
           int len = (int)(strlen(newarg));
-          for (int i=0; i<len; i++)
+          for (int ik=0; ik<len; ik++)
             {
-            if (newarg[i] == '=')
+            if (newarg[ik] == '=')
               {
-              newarg[i] = '\0';
+              newarg[ik] = '\0';
               }
             }
 
@@ -933,7 +919,7 @@ int vtkPVApplication::ParseCommandLineArguments(int argc, char*argv[])
       // Strip string to equals sign.
       const char* newarg=0;
       int len = (int)(strlen(argv[index]));
-      for (int i=0; i<len; i++)
+      for (i=0; i<len; i++)
         {
         if (argv[index][i] == '=')
           {
@@ -950,7 +936,7 @@ int vtkPVApplication::ParseCommandLineArguments(int argc, char*argv[])
       // Strip string to equals sign.
       const char* newarg=0;
       int len = (int)(strlen(argv[index]));
-      for (int i=0; i<len; i++)
+      for (i=0; i<len; i++)
         {
         if (argv[index][i] == '=')
           {
@@ -976,7 +962,7 @@ int vtkPVApplication::ParseCommandLineArguments(int argc, char*argv[])
       // Strip string to equals sign.
       const char* newarg=0;
       int len = (int)(strlen(argv[index]));
-      for (int i=0; i<len; i++)
+      for (i=0; i<len; i++)
         {
         if (argv[index][i] == '=')
           {
@@ -984,23 +970,6 @@ int vtkPVApplication::ParseCommandLineArguments(int argc, char*argv[])
           }
         }
       this->SetUsername(newarg);
-      }
-    if ( vtkPVApplication::CheckForArgument(argc, argv, "--host",
-                                            index) == VTK_OK ||
-         vtkPVApplication::CheckForArgument(argc, argv, "-h",
-                                          index) == VTK_OK )
-      {
-      // Strip string to equals sign.
-      const char* newarg=0;
-      int len = (int)(strlen(argv[index]));
-      for (int i=0; i<len; i++)
-        {
-        if (argv[index][i] == '=')
-          {
-          newarg = &(argv[index][i+1]);
-          }
-        }
-      this->SetHostName(newarg);
       }
     }
 
@@ -1014,13 +983,31 @@ int vtkPVApplication::ParseCommandLineArguments(int argc, char*argv[])
 
   if (this->ServerMode || this->ClientMode)
     {
+    if ( vtkPVApplication::CheckForArgument(argc, argv, "--host",
+                                            index) == VTK_OK ||
+         vtkPVApplication::CheckForArgument(argc, argv, "-h",
+                                          index) == VTK_OK )
+      {
+      // Strip string to equals sign.
+      const char* newarg=0;
+      int len = (int)(strlen(argv[index]));
+      for (i=0; i<len; i++)
+        {
+        if (argv[index][i] == '=')
+          {
+          newarg = &(argv[index][i+1]);
+          }
+        }
+      this->SetHostName(newarg);
+      }
+
     if ( vtkPVApplication::CheckForArgument(argc, argv, "--port",
                                             index) == VTK_OK)
       {
       // Strip string to equals sign.
       const char* newarg=0;
       int len = (int)(strlen(argv[index]));
-      for (int i=0; i<len; i++)
+      for (i=0; i<len; i++)
         {
         if (argv[index][i] == '=')
           {
@@ -1028,6 +1015,14 @@ int vtkPVApplication::ParseCommandLineArguments(int argc, char*argv[])
           }
         }
       this->Port = atoi(newarg);
+      }
+    // Change behavior so server connects to the client.
+    if ( vtkPVApplication::CheckForArgument(argc, argv, "--reverse-connection",
+                                            index) == VTK_OK ||
+         vtkPVApplication::CheckForArgument(argc, argv, "-rc",
+                                            index) == VTK_OK )
+      {
+      this->ReverseConnection = 1;
       }
     }
 
@@ -1054,7 +1049,7 @@ int vtkPVApplication::ParseCommandLineArguments(int argc, char*argv[])
     // Strip string to equals sign.
     const char* newarg=0;
     int len = (int)(strlen(argv[index]));
-    for (int i=0; i<len; i++)
+    for (i=0; i<len; i++)
       {
       if (argv[index][i] == '=')
         {
@@ -1240,19 +1235,19 @@ void vtkPVApplication::Start(int argc, char*argv[])
   sprintf(rmClassName, "vtkPV%s", this->RenderModuleName);
   vtkObject* o = vtkInstantiator::CreateInstance(rmClassName);
   vtkPVRenderModule* rm = vtkPVRenderModule::SafeDownCast(o);
-  if ( rm )
+  if (rm == NULL)
     {
-    this->SetRenderModule(rm);
-    rm->SetPVApplication(this);
-    o->Delete();
-    o = NULL;
-    rm = NULL;
+    vtkErrorMacro("Could not create render module " << rmClassName);
+    this->SetRenderModuleName("RenderModule");
+    o = vtkInstantiator::CreateInstance("vtkPVRenderModule");
+    rm = vtkPVRenderModule::SafeDownCast(o);
     }
-  else
-    {
-    vtkErrorMacro("Cannot find Render Module: " << this->RenderModuleName);
-    this->Exit();
-    }
+  this->SetRenderModule(rm);
+  rm->SetPVApplication(this);
+  o->Delete();
+  o = NULL;
+  rm = NULL;
+
   delete [] rmClassName;
   rmClassName = NULL;
   if ( !this->RenderModule )
@@ -1302,7 +1297,7 @@ void vtkPVApplication::Start(int argc, char*argv[])
 #endif
 
   vtkPVWindow *ui = vtkPVWindow::New();
-  this->Windows->AddItem(ui);
+  this->AddWindow(ui);
 
   vtkCallbackCommand *ccm = vtkCallbackCommand::New();
   ccm->SetClientData(this);
@@ -1400,6 +1395,10 @@ void vtkPVApplication::Start(int argc, char*argv[])
         this->DeleteTraceFiles(traceName, 0);
         }
       }
+    // Having trouble with tiled display.
+    // Not all tiles rendered properly after this dialoge at startup.
+    // It must have been a race condition.
+    this->GetMainView()->EventuallyRender();
     }
 
   // Open the trace file.
@@ -1533,6 +1532,17 @@ void vtkPVApplication::Exit()
   if (this->InExit)
     {
     return;
+    }
+  
+  // If errors were reported to the output window, return a bad
+  // status.
+  if(vtkPVOutputWindow* w =
+     vtkPVOutputWindow::SafeDownCast(vtkOutputWindow::GetInstance()))
+    {
+    if(w->GetErrorOccurred())
+      {
+      this->SetExitStatus(1);
+      }
     }
   
   // Remove the ParaView output window so errors during exit will
@@ -1858,6 +1868,24 @@ void vtkPVApplication::ErrorExit()
 #endif // PV_HAVE_TRAPS_FOR_SIGNALS
 
 //----------------------------------------------------------------------------
+void vtkPVApplication::SetLogBufferLength(int length)
+{
+  vtkTimerLog::SetMaxEntries(length);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVApplication::ResetLog()
+{
+  vtkTimerLog::ResetLog();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVApplication::SetEnableLog(int flag)
+{
+  vtkTimerLog::SetLogging(flag);
+}
+
+//----------------------------------------------------------------------------
 void vtkPVApplication::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
@@ -1891,11 +1919,13 @@ void vtkPVApplication::PrintSelf(ostream& os, vtkIndent indent)
     os << indent << "Username: " 
        << (this->Username?this->Username:"(none)") << endl;
     os << indent << "AlwaysSSH: " << this->AlwaysSSH << endl;
+    os << indent << "ReverseConnection: " << this->ReverseConnection << endl;
     }
   if (this->ServerMode)
     {
     os << indent << "Running as a server\n";
     os << indent << "Port: " << this->Port << endl;
+    os << indent << "ReverseConnection: " << this->ReverseConnection << endl;
     }
   if (this->UseSoftwareRendering)
     {
@@ -1922,12 +1952,13 @@ void vtkPVApplication::PrintSelf(ostream& os, vtkIndent indent)
      << (this->ShowSourcesLongHelp?"on":"off") << endl;
   os << indent << "SourcesBrowserAlwaysShowName: " 
      << (this->SourcesBrowserAlwaysShowName?"on":"off") << endl;
+
+  os << indent << "LogThreshold: " << this->LogThreshold << endl;
 }
 
 void vtkPVApplication::DisplayTCLError(const char* message)
 {
   vtkErrorMacro("TclTk error: "<<message);
-  abort();
 }
 
 //----------------------------------------------------------------------------
@@ -2085,4 +2116,13 @@ char* vtkPVApplication::GetDemoPath()
   return this->DemoPath;
 }
 
+void vtkPVApplication::EnableTestErrors()
+{
+  this->OutputWindow->EnableTestErrors();
+}
+
+void vtkPVApplication::DisableTestErrors()
+{
+  this->OutputWindow->DisableTestErrors();
+}
 

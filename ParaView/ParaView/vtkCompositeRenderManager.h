@@ -6,14 +6,6 @@
   Date:      $Date$
   Version:   $Revision$
 
-  Copyright (c) 1993-2002 Ken Martin, Will Schroeder, Bill Lorensen 
-  All rights reserved.
-  See Copyright.txt or http://www.kitware.com/Copyright.htm for details.
-
-     This software is distributed WITHOUT ANY WARRANTY; without even 
-     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR 
-     PURPOSE.  See the above copyright notice for more information.
-
 =========================================================================*/
 // .NAME vtkCompositeRenderManager - An object to control sort-last parallel rendering.
 //
@@ -30,7 +22,6 @@
 #include "vtkParallelRenderManager.h"
 
 class vtkCompositer;
-#define USE_ICET
 
 class VTK_EXPORT vtkCompositeRenderManager : public vtkParallelRenderManager
 {
@@ -41,8 +32,12 @@ public:
 
   // Description:
   // Set/Get the composite algorithm.
+  void SetCompositer(vtkCompositer *c);
   vtkGetObjectMacro(Compositer, vtkCompositer);
-  virtual void SetCompositer(vtkCompositer*);
+
+  // Description:
+  // Get rendering metrics.
+  vtkGetMacro(ImageProcessingTime, double);
 
 protected:
   vtkCompositeRenderManager();
@@ -58,8 +53,8 @@ protected:
   vtkFloatArray *TmpDepthData;
 
 private:
-  vtkCompositeRenderManager(const vtkCompositeRenderManager &); //Not implemented
-  void operator=(const vtkCompositeRenderManager &); //Not implemented
+  vtkCompositeRenderManager(const vtkCompositeRenderManager &);//Not implemented
+  void operator=(const vtkCompositeRenderManager &);    //Not implemented
 };
 
 #endif //__vtkCompositeRenderManager_h

@@ -52,6 +52,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWTclInteractor.h"
 #include "vtkKWTkUtilities.h"
 #include "vtkKWToolbar.h"
+#include "vtkKWToolbarSet.h"
+#include "vtkKWUserInterfaceNotebookManager.h"
 #include "vtkKWView.h"
 #include "vtkKWViewCollection.h"
 #include "vtkKWWidgetCollection.h"
@@ -66,7 +68,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define VTK_KW_WINDOW_GEOMETRY_REG_KEY "WindowGeometry"
 #define VTK_KW_WINDOW_FRAME1_SIZE_REG_KEY "WindowFrame1Size"
 
-vtkCxxRevisionMacro(vtkKWWindow, "1.170");
+vtkCxxRevisionMacro(vtkKWWindow, "1.170.2.1");
 vtkCxxSetObjectMacro(vtkKWWindow, PropertiesParent, vtkKWWidget);
 
 #define VTK_KW_RECENT_FILES_MAX 20
@@ -154,86 +156,59 @@ int vtkKWWindowCommand(ClientData cd, Tcl_Interp *interp,
 //----------------------------------------------------------------------------
 vtkKWWindow::vtkKWWindow()
 {
-  this->PropertiesParent = NULL;
-  this->SelectedView = NULL;
-  this->Views = vtkKWViewCollection::New();
+  this->Views                 = vtkKWViewCollection::New();
 
-  this->Menu = vtkKWMenu::New();
-  this->Menu->SetParent(this);
-  
-  this->MenuFile = vtkKWMenu::New();
-  this->MenuFile->SetParent(this->Menu);
+  this->PropertiesParent      = NULL;
+  this->SelectedView          = NULL;
 
-  this->MenuRecentFiles = 0;
+  this->Menu                  = vtkKWMenu::New();
+  this->MenuFile              = vtkKWMenu::New();
+  this->MenuHelp              = vtkKWMenu::New();
+  this->PageMenu              = vtkKWMenu::New();
+  this->MenuRecentFiles       = NULL;
+  this->MenuEdit              = NULL;
+  this->MenuView              = NULL;
+  this->MenuWindow            = NULL;
 
-  this->MenuHelp = vtkKWMenu::New();
-  this->MenuHelp->SetParent(this->Menu);
-  
-  this->PageMenu = vtkKWMenu::New();
-  this->PageMenu->SetParent(this->MenuFile);
-  
-  this->ToolbarFrame = vtkKWWidget::New();
-  this->ToolbarFrame->SetParent(this);  
+  this->Toolbars              = vtkKWToolbarSet::New();
+  this->MenuBarSeparatorFrame = vtkKWFrame::New();
+  this->MiddleFrame           = vtkKWSplitFrame::New();
+  this->ViewFrame             = vtkKWFrame::New();
 
-  this->MiddleFrame = vtkKWSplitFrame::New();
-  this->MiddleFrame->SetParent(this);
+  this->StatusFrame           = vtkKWFrame::New();
+  this->StatusLabel           = vtkKWLabel::New();
+  this->StatusImage           = vtkKWLabel::New();
+  this->StatusImageName       = NULL;
 
-  this->ViewFrame = vtkKWWidget::New();
-  this->ViewFrame->SetParent(this->MiddleFrame->GetFrame2());
+  this->ProgressFrame         = vtkKWFrame::New();
+  this->ProgressGauge         = vtkKWProgressGauge::New();
 
-  this->StatusFrame = vtkKWWidget::New();
-  this->StatusFrame->SetParent(this);
-    
-  this->StatusLabel = vtkKWLabel::New();
-  this->StatusLabel->SetParent(this->StatusFrame);
-  this->StatusImage = vtkKWWidget::New();
-  this->StatusImage->SetParent(this->StatusFrame);
-  this->StatusImageName = NULL;
-  
-  this->ProgressFrame = vtkKWWidget::New();
-  this->ProgressFrame->SetParent(this->StatusFrame);
-  this->ProgressGauge = vtkKWProgressGauge::New();
-  this->ProgressGauge->SetParent(this->ProgressFrame);
+  this->TrayFrame             = vtkKWFrame::New();
+  this->TrayImageError        = vtkKWLabel::New();
 
-  this->TrayFrame = vtkKWFrame::New();
-  this->TrayFrame->SetParent(this->StatusFrame);
+  this->Notebook              = vtkKWNotebook::New();
 
-  this->TrayImageError = vtkKWLabel::New();
-  this->TrayImageError->SetParent(this->TrayFrame);
+  this->ExitDialogWidget      = NULL;
 
-  this->Notebook = vtkKWNotebook::New();
-  
-  this->CommandFunction = vtkKWWindowCommand;
+  this->TclInteractor         = NULL;
 
-  this->MenuEdit = NULL;
-  this->MenuView = NULL;
-  this->MenuWindow = NULL;
-  this->PrintTargetDPI = 100;
+  this->CommandFunction       = vtkKWWindowCommand;
 
-  this->SupportHelp = 1;
+  this->PrintTargetDPI        = 100;
+  this->SupportHelp           = 1;
+  this->WindowClass           = NULL;
+  this->Title                 = NULL;
+  this->PromptBeforeClose     = 1;
+  this->RecentFilesVector     = 0;
+  this->NumberOfRecentFiles   = 10;
+  this->ScriptExtension       = 0;
+  this->ScriptType            = 0;
 
-  this->WindowClass = NULL;
+  this->InExit                = 0;
+
   this->SetWindowClass("KitwareWidget");
-
-  this->Title = NULL;
-
-  this->PromptBeforeClose = 1;
-
-  this->RecentFilesVector = 0;
-  this->NumberOfRecentFiles = 10;
-
-  this->ScriptExtension = 0;
-  this->ScriptType = 0;
   this->SetScriptExtension(".tcl");
   this->SetScriptType("Tcl");
-
-  this->InExit = 0;
-
-  this->ExitDialogWidget = 0;
-
-  this->TclInteractor = NULL;
-
-  this->Toolbars = vtkVector<vtkKWToolbar*>::New();
 }
 
 //----------------------------------------------------------------------------
@@ -289,7 +264,8 @@ vtkKWWindow::~vtkKWWindow()
     this->MenuRecentFiles->Delete();
     }
   this->MenuHelp->Delete();
-  this->ToolbarFrame->Delete();
+  this->Toolbars->Delete();
+  this->MenuBarSeparatorFrame->Delete();
   this->ViewFrame->Delete();
   this->MiddleFrame->Delete();
   this->StatusFrame->Delete();
@@ -318,12 +294,296 @@ vtkKWWindow::~vtkKWWindow()
   this->SetTitle(0);
   this->SetScriptExtension(0);
   this->SetScriptType(0);
+}
 
-  if (this->Toolbars)
+//----------------------------------------------------------------------------
+void vtkKWWindow::Create(vtkKWApplication *app, char *args)
+{
+  const char *wname;
+
+  // Set the application
+
+  if (this->IsCreated())
     {
-    this->Toolbars->Delete();
-    this->Toolbars = NULL;
+    vtkErrorMacro("Window already created");
+    return;
     }
+
+  this->SetApplication(app);
+
+  Tcl_Interp *interp = this->Application->GetMainInterp();
+
+  // Create the top level
+
+  wname = this->GetWidgetName();
+
+  this->Script("toplevel %s -visual best %s -class %s",
+               wname, args, this->WindowClass);
+
+  this->Script("wm title %s {%s}", 
+               wname, this->GetTitle());
+
+  this->Script("wm iconname %s {%s}",
+               wname, app->GetApplicationName());
+
+  // Restore window geometry
+
+  if (this->Application->GetSaveWindowGeometry() &&
+      this->Application->HasRegisteryValue(
+        2, "Geometry", VTK_KW_WINDOW_GEOMETRY_REG_KEY))
+    {
+    char geometry[40];
+    if (this->Application->GetRegisteryValue(
+          2, "Geometry", VTK_KW_WINDOW_GEOMETRY_REG_KEY, geometry))
+      {
+      this->Script("wm geometry %s %s", wname, geometry);
+      }
+    }
+  else
+    {
+    this->Script("wm geometry %s 900x700+0+0", wname);
+    }
+
+  // Set up standard menus
+
+  this->Menu->SetParent(this);
+  this->Menu->SetTearOff(0);
+  this->Menu->Create(app, "");
+
+  this->InstallMenu(this->Menu);
+
+  // Menu : File
+
+  this->MenuFile->SetParent(this->Menu);
+  this->MenuFile->SetTearOff(0);
+  this->MenuFile->Create(app, "");
+
+  // Menu : Print quality
+
+  this->PageMenu->SetParent(this->MenuFile);
+  this->PageMenu->SetTearOff(0);
+  this->PageMenu->Create(this->Application, "");
+
+  char* rbv = 
+    this->PageMenu->CreateRadioButtonVariable(this, "PageSetup");
+
+  this->Script( "set %s 0", rbv );
+  this->PageMenu->AddRadioButton(0, "100 DPI", rbv, this, "OnPrint 1 0", 0);
+  this->PageMenu->AddRadioButton(1, "150 DPI", rbv, this, "OnPrint 1 1", 1);
+  this->PageMenu->AddRadioButton(2, "300 DPI", rbv, this, "OnPrint 1 2", 0);
+  delete [] rbv;
+
+  // Menu : File (cont.)
+
+  this->Menu->AddCascade("File", this->MenuFile, 0);
+
+  this->MenuFile->AddSeparator();
+  this->MenuFile->AddCascade(VTK_KW_PAGE_SETUP_MENU_LABEL, this->PageMenu, 8);
+
+  this->MenuFile->AddSeparator();
+  this->MenuFile->AddCommand("Close", this, "Close", 0);
+  this->MenuFile->AddCommand("Exit", this, "Exit", 1);
+
+  // Menu : Window : Properties panel
+
+  this->GetMenuWindow()->AddCommand(VTK_KW_HIDE_PROPERTIES_LABEL, this,
+                                    "TogglePropertiesVisibilityCallback", 1 );
+
+  // Help menu
+
+  this->MenuHelp->SetParent(this->Menu);
+  this->MenuHelp->SetTearOff(0);
+  this->MenuHelp->Create(app, "");
+
+  if (this->SupportHelp)
+    {
+    this->Menu->AddCascade("Help", this->MenuHelp, 0);
+    }
+  this->MenuHelp->AddCommand("OnLine Help", this, "DisplayHelp", 0);
+
+  if (app->HasCheckForUpdates())
+    {
+    this->MenuHelp->AddCommand("Check For Updates", app, "CheckForUpdates", 0);
+    }
+
+  this->MenuHelp->AddSeparator();
+  ostrstream about_label;
+  about_label << "About " << app->GetApplicationName() << ends;
+  this->MenuHelp->AddCommand(about_label.str(), this, "DisplayAbout", 0);
+  about_label.rdbuf()->freeze(0);
+
+  // Menubar separator
+
+  this->MenuBarSeparatorFrame->SetParent(this);  
+#if defined(_WIN32)
+  this->MenuBarSeparatorFrame->Create(app, "-height 2 -bd 1 -relief groove");
+#else
+  this->MenuBarSeparatorFrame->Create(app, "-height 2 -bd 1 -relief sunken");
+#endif
+
+  this->Script("pack %s -side top -fill x -pady 2",
+               this->MenuBarSeparatorFrame->GetWidgetName());
+
+  // Toolbar frame
+
+  this->Toolbars->SetParent(this);  
+  this->Toolbars->Create(app, "");
+  this->Toolbars->ShowBottomSeparatorOn();
+
+  // Split frame
+
+  // To force the toolbar on top, I am creating a separate "MiddleFrame" 
+  // for the ViewFrame and PropertiesParent
+
+  int min_size = 380;
+
+  this->MiddleFrame->SetSeparatorSize(0);
+  this->MiddleFrame->SetFrame1MinimumSize(min_size);
+
+  if (this->Application->HasRegisteryValue(
+        2, "Geometry", VTK_KW_WINDOW_FRAME1_SIZE_REG_KEY) &&
+      this->Application->GetIntRegisteryValue(
+        2, "Geometry", VTK_KW_WINDOW_FRAME1_SIZE_REG_KEY) >= min_size)
+    {
+    this->MiddleFrame->SetFrame1Size(
+      this->Application->GetIntRegisteryValue(
+        2, "Geometry", VTK_KW_WINDOW_FRAME1_SIZE_REG_KEY));
+    }
+  else
+    {
+    this->MiddleFrame->SetFrame1Size(min_size);
+    }
+
+  this->MiddleFrame->SetParent(this);
+  this->MiddleFrame->Create(app);
+
+  this->Script("pack %s -side top -fill both -expand t",
+               this->MiddleFrame->GetWidgetName());
+
+  // Split frame : view frame
+
+  this->ViewFrame->SetParent(this->MiddleFrame->GetFrame2());
+  this->ViewFrame->Create(app, "");
+
+  this->Script("pack %s -side right -fill both -expand yes",
+               this->ViewFrame->GetWidgetName());
+
+  // Window properties / Application settings (leading to preferences)
+
+  this->CreateDefaultPropertiesParent();
+
+  // Create the notebook
+
+  this->Notebook->SetParent(this->GetPropertiesParent());
+  this->Notebook->Create(this->Application, "");
+  this->Notebook->AlwaysShowTabsOn();
+
+  // Status frame
+
+  this->StatusFrame->SetParent(this);
+  this->StatusFrame->Create(app, "");
+  
+  this->Script("pack %s -side top -fill x -pady 2",
+               this->StatusFrame->GetWidgetName());
+  
+  // Status frame : image
+
+  this->SetStatusImageName(this->Script("image create photo"));
+  this->CreateStatusImage();
+
+  this->StatusImage->SetParent(this->StatusFrame);
+  this->StatusImage->Create(app, "");
+
+  this->Script("%s configure -image %s -relief sunken -bd 1 -fg white "
+               "-bg white -highlightbackground white -highlightcolor white "
+               "-highlightthickness 0 -padx 0 -pady 0", 
+               this->StatusImage->GetWidgetName(),
+               this->StatusImageName);
+
+  this->Script("pack %s -side left -anchor c -ipadx 1 -ipady 1 -fill y", 
+               this->StatusImage->GetWidgetName());
+
+  // Status frame : label
+
+  this->StatusLabel->SetParent(this->StatusFrame);
+  this->StatusLabel->Create(app, "-relief sunken -padx 3 -bd 1 -anchor w");
+
+  this->Script("pack %s -side left -padx 2 -expand yes -fill both",
+               this->StatusLabel->GetWidgetName());
+
+  // Status frame : progress frame
+
+  this->ProgressFrame->SetParent(this->StatusFrame);
+  this->ProgressFrame->Create(app, "-relief sunken -borderwidth 2");
+
+  this->Script("pack %s -side left -padx 2 -fill y", 
+               this->ProgressFrame->GetWidgetName());
+
+  // Status frame : progress frame : gauge
+
+  this->ProgressGauge->SetParent(this->ProgressFrame);
+  this->ProgressGauge->SetLength(200);
+  this->ProgressGauge->SetHeight(
+    vtkKWTkUtilities::GetPhotoHeight(interp, this->StatusImageName) - 4);
+  this->ProgressGauge->Create(app, "");
+
+  this->Script("pack %s -side right -padx 2 -pady 2",
+               this->ProgressGauge->GetWidgetName());
+
+  // Status frame : tray frame
+
+  this->TrayFrame->SetParent(this->StatusFrame);
+  this->TrayFrame->Create(app, "");
+
+  this->Script(
+    "pack %s -side left -ipadx 0 -ipady 0 -padx 0 -pady 0 -fill both", 
+    this->TrayFrame->GetWidgetName());
+
+  // Status frame : tray frame : error image
+
+  this->TrayImageError->SetParent(this->TrayFrame);
+  this->TrayImageError->Create(app, "-relief sunken -bd 2");
+
+  this->TrayImageError->SetImageOption(vtkKWIcon::ICON_SMALLERRORRED);
+  
+  this->TrayImageError->SetBind(this, "<Button-1>", "ProcessErrorClick");
+
+  // If we have a User Interface Manager, it's time to create it
+
+  vtkKWUserInterfaceManager *uim = this->GetUserInterfaceManager();
+  if (uim && !uim->IsCreated())
+    {
+    uim->Create(app);
+    }
+
+  if (this->GetApplication()->HasRegisteryValue(
+        2, "RunTime", VTK_KW_SHOW_MOST_RECENT_PANELS_REG_KEY) &&
+      !this->GetIntRegisteryValue(
+        2, "RunTime", VTK_KW_SHOW_MOST_RECENT_PANELS_REG_KEY))
+    {
+    this->ShowMostRecentPanels(0);
+    }
+  else
+    {
+    this->ShowMostRecentPanels(1);
+    }
+
+  vtkKWUserInterfaceNotebookManager *uim_nb = 
+    vtkKWUserInterfaceNotebookManager::SafeDownCast(uim);
+  if (uim_nb)
+    {
+    if (this->GetApplication()->HasRegisteryValue(
+          2, "RunTime", VTK_KW_ENABLE_GUI_DRAG_AND_DROP_REG_KEY))
+      {
+      uim_nb->SetEnableDragAndDrop(
+        this->GetIntRegisteryValue(
+          2, "RunTime", VTK_KW_ENABLE_GUI_DRAG_AND_DROP_REG_KEY));
+      }
+    }
+
+  // Udpate the enable state
+
+  this->UpdateEnableState();
 }
 
 //----------------------------------------------------------------------------
@@ -421,8 +681,8 @@ void vtkKWWindow::Close()
     this->Script("bell");
     return;
     }
-  if ( this->PromptBeforeClose &&
-       this->Application->GetWindows()->GetNumberOfItems() <= 1 )
+  if (this->PromptBeforeClose &&
+      this->Application->GetWindows()->GetNumberOfItems() <= 1)
     {
     if ( !this->ExitDialog() )
       {
@@ -583,185 +843,6 @@ vtkKWMenu *vtkKWWindow::GetMenuWindow()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWWindow::Create(vtkKWApplication *app, char *args)
-{
-  const char *wname;
-
-  // Set the application
-
-  if (this->IsCreated())
-    {
-    vtkErrorMacro("Window already created");
-    return;
-    }
-
-  this->SetApplication(app);
-  Tcl_Interp *interp = this->Application->GetMainInterp();
-
-  // create the top level
-  wname = this->GetWidgetName();
-  this->Script("toplevel %s -visual best %s -class %s",wname,args,
-               this->WindowClass);
-  this->Script("wm title %s {%s}",wname,
-               this->GetTitle());
-  this->Script("wm iconname %s {%s}",wname,
-               app->GetApplicationName());
-
-  // Restore window geometry
-
-  if (this->Application->GetSaveWindowGeometry() &&
-      this->Application->HasRegisteryValue(
-        2, "Geometry", VTK_KW_WINDOW_GEOMETRY_REG_KEY))
-    {
-    char geometry[40];
-    if (this->Application->GetRegisteryValue(
-          2, "Geometry", VTK_KW_WINDOW_GEOMETRY_REG_KEY, geometry))
-      {
-      this->Script("wm geometry %s %s", wname, geometry);
-      }
-    }
-  else
-    {
-    this->Script("wm geometry %s 900x700+0+0", wname);
-    }
-
-  this->StatusFrame->Create(app,"frame","");
-
-  
-  this->SetStatusImageName(this->Script("image create photo"));
-  this->CreateStatusImage();
-  this->StatusImage->Create(app,"label",
-                            "-relief sunken -bd 1 -fg #ffffff -bg #ffffff -highlightbackground #ffffff -highlightcolor #ffffff -highlightthickness 0 -padx 0 -pady 0");
-  this->Script("%s configure -image %s", 
-               this->StatusImage->GetWidgetName(),
-               this->StatusImageName);
-
-  this->Script("pack %s -side left -anchor c -ipadx 1 -ipady 1 -fill y", 
-               this->StatusImage->GetWidgetName());
-
-  this->StatusLabel->Create(app,"-relief sunken -padx 3 -bd 1 -anchor w");
-  this->Script("pack %s -side left -padx 2 -expand yes -fill both",
-               this->StatusLabel->GetWidgetName());
-
-  this->Script("pack %s -side bottom -fill x -pady 2",
-               this->StatusFrame->GetWidgetName());
-
-  this->ProgressFrame->Create(app, "frame", "-relief sunken -borderwidth 2");
-  this->ProgressGauge->SetLength(200);
-  this->ProgressGauge->SetHeight(
-    vtkKWTkUtilities::GetPhotoHeight(interp, this->StatusImageName) - 4);
-  this->ProgressGauge->Create(app, "");
-
-  this->Script("pack %s -side left -padx 2 -fill y", 
-               this->ProgressFrame->GetWidgetName());
-  this->Script("pack %s -side right -padx 2 -pady 2",
-               this->ProgressGauge->GetWidgetName());
-
-  this->TrayFrame->Create(app, 0);
-  this->Script("%s configure -borderwidth 0", 
-               this->TrayFrame->GetWidgetName());
-  this->Script(
-    "pack %s -side left -ipadx 0 -ipady 0 -padx 0 -pady 0 -fill both", 
-    this->TrayFrame->GetWidgetName());
-  this->TrayImageError->Create(app, "");
-  this->Script("%s configure -relief sunken -bd 2",
-               this->TrayImageError->GetWidgetName());
-
-  this->TrayImageError->SetImageOption(vtkKWIcon::ICON_SMALLERRORRED);
-  this->TrayImageError->SetBind(this, "<Button-1>", "ProcessErrorClick");
-  
-  // To force the toolbar on top, I am creating a separate "MiddleFrame" 
-  // for the ViewFrame and PropertiesParent
-
-  this->MiddleFrame->SetSeparatorSize(0);
-  int min_size = 380;
-  this->MiddleFrame->SetFrame1MinimumSize(min_size);
-
-  if (this->Application->HasRegisteryValue(
-        2, "Geometry", VTK_KW_WINDOW_FRAME1_SIZE_REG_KEY) &&
-      this->Application->GetIntRegisteryValue(
-        2, "Geometry", VTK_KW_WINDOW_FRAME1_SIZE_REG_KEY) >= min_size)
-    {
-    this->MiddleFrame->SetFrame1Size(
-      this->Application->GetIntRegisteryValue(
-        2, "Geometry", VTK_KW_WINDOW_FRAME1_SIZE_REG_KEY));
-    }
-  else
-    {
-    this->MiddleFrame->SetFrame1Size(min_size);
-    }
-
-  this->MiddleFrame->Create(app);
-  this->Script("pack %s -side bottom -fill both -expand t",
-    this->MiddleFrame->GetWidgetName());
-
-  this->ViewFrame->Create(app,"frame","");
-  this->Script("pack %s -side right -fill both -expand yes",
-               this->ViewFrame->GetWidgetName());
-
-  this->ToolbarFrame->Create(app, "frame", "-bd 0");
-  
-  // Set up standard menus
-  this->Menu->SetTearOff(0);
-  this->Menu->Create(app,"");
-  this->MenuFile->SetTearOff(0);
-  this->MenuFile->Create(app,"");
-  this->Menu->AddCascade("File", this->MenuFile, 0);
-
-  // add render quality setting
-  this->PageMenu->SetTearOff(0);
-  this->PageMenu->Create(this->Application,"");
-
-  char* rbv = 
-    this->PageMenu->CreateRadioButtonVariable(this,"PageSetup");
-  // now add our own menu options 
-  this->Script( "set %s 0", rbv );
-  this->PageMenu->AddRadioButton(0,"100 DPI",rbv,this,"OnPrint 1 0", 0);
-  this->PageMenu->AddRadioButton(1,"150 DPI",rbv,this,"OnPrint 1 1", 1);
-  this->PageMenu->AddRadioButton(2,"300 DPI",rbv,this,"OnPrint 1 2", 0);
-  delete [] rbv;
-  // add the Print option
-  this->MenuFile->AddSeparator();
-  this->MenuFile->AddCascade(VTK_KW_PAGE_SETUP_MENU_LABEL, this->PageMenu, 8);
-
-  this->MenuFile->AddSeparator();
-  this->MenuFile->AddCommand("Close", this, "Close", 0);
-  this->MenuFile->AddCommand("Exit", this, "Exit", 1);
-  // install the menu bar into this window
-  this->InstallMenu(this->Menu);
-
-  // Properties panel
-
-  this->GetMenuWindow()->AddCommand(VTK_KW_HIDE_PROPERTIES_LABEL, this,
-                                    "TogglePropertiesVisibilityCallback", 1 );
-
-  // Window properties / Application settings (leading to preferences)
-
-  this->CreateDefaultPropertiesParent();
-
-  // Create the notebook
-
-  this->Notebook->SetParent(this->GetPropertiesParent());
-  this->Notebook->Create(this->Application,"");
-  this->Notebook->AlwaysShowTabsOn();
-
-  // Help menu
-
-  this->MenuHelp->SetTearOff(0);
-  this->MenuHelp->Create(app,"");
-  if ( this->SupportHelp )
-    {
-    this->Menu->AddCascade("Help", this->MenuHelp, 0);
-    }
-  this->MenuHelp->AddCommand("OnLine Help", this, "DisplayHelp", 0);
-  this->MenuHelp->AddCommand("About", this, "DisplayAbout", 0);
-
-  // Udpate the enable state
-
-  this->UpdateEnableState();
-}
-
-//----------------------------------------------------------------------------
 void vtkKWWindow::OnPrint(int propagate, int res)
 {
   int dpis[] = { 100, 150, 300 };
@@ -825,20 +906,39 @@ void vtkKWWindow::ShowWindowProperties()
   
   // Forget current props and pack the notebook
 
-  this->Script("pack forget [pack slaves %s]",
-               this->Notebook->GetParent()->GetWidgetName());  
+  this->Notebook->UnpackSiblings();
 
-  this->Script("pack %s -pady 2 -padx 2 -fill both -expand yes -anchor n",
+  this->Script("pack %s -pady 0 -padx 2 -fill both -expand yes -anchor n",
                this->Notebook->GetWidgetName());
 }
 
 //----------------------------------------------------------------------------
-void vtkKWWindow::ShowApplicationSettingsInterface()
+int vtkKWWindow::ShowApplicationSettingsInterface()
 {
   if (this->GetApplicationSettingsInterface())
     {
     this->ShowWindowProperties();
-    this->GetApplicationSettingsInterface()->Raise();
+    return this->GetApplicationSettingsInterface()->Raise();
+    }
+
+  return 0;
+}
+
+//----------------------------------------------------------------------------
+void vtkKWWindow::ShowMostRecentPanels(int arg)
+{
+  if (arg)
+    {
+    this->Notebook->ShowAllPagesWithSameTagOff();
+    this->Notebook->ShowOnlyPagesWithSameTagOff();
+    this->Notebook->SetNumberOfMostRecentPages(4);
+    this->Notebook->ShowOnlyMostRecentPagesOn();
+    }
+  else
+    {
+    this->Notebook->ShowAllPagesWithSameTagOff();
+    this->Notebook->ShowOnlyMostRecentPagesOff();
+    this->Notebook->ShowOnlyPagesWithSameTagOn();
     }
 }
 
@@ -1220,6 +1320,24 @@ int vtkKWWindow::GetFileMenuIndex()
 }
 
 //----------------------------------------------------------------------------
+int vtkKWWindow::GetHelpMenuIndex()
+{
+  if (!this->IsCreated())
+    {
+    return 0;
+    }
+
+  // Find about
+
+  if (this->MenuHelp->HasItem("About*"))
+    {
+    return this->MenuHelp->GetIndex("About*") - 1;
+    }
+
+  return this->MenuHelp->GetNumberOfItems();
+}
+
+//----------------------------------------------------------------------------
 int vtkKWWindow::ExitDialog()
 {
   this->Application->SetBalloonHelpWidget(0);
@@ -1374,7 +1492,6 @@ void vtkKWWindow::SetErrorIcon(int s)
 //----------------------------------------------------------------------------
 void vtkKWWindow::ErrorMessage(const char* message)
 {
-  //cout << message << endl;
   vtkKWMessageDialog::PopupMessage(
     this->GetApplication(), this, "VTK Error",
     message, vtkKWMessageDialog::ErrorIcon);
@@ -1482,6 +1599,11 @@ void vtkKWWindow::InternalProcessEvent(vtkObject*, unsigned long,
 //----------------------------------------------------------------------------
 void vtkKWWindow::UpdateToolbarAspect()
 {
+  if (!this->Toolbars)
+    {
+    return;
+    }
+
   int flat_frame;
   if (this->Application->HasRegisteryValue(
     2, "RunTime", VTK_KW_TOOLBAR_FLAT_FRAME_REG_KEY))
@@ -1506,60 +1628,27 @@ void vtkKWWindow::UpdateToolbarAspect()
     flat_buttons = vtkKWToolbar::GetGlobalWidgetsFlatAspect();
     }
 
-  if (this->Toolbars)
-    {
-    vtkKWToolbar *tb = NULL;
-    vtkVectorIterator<vtkKWToolbar *> *it = this->Toolbars->NewIterator();
-    it->InitTraversal();
-    while (!it->IsDoneWithTraversal())
-      {
-      if (it->GetData(tb) == VTK_OK)
-        {
-        tb->SetFlatAspect(flat_frame);
-        tb->SetWidgetsFlatAspect(flat_buttons);
-        tb->Update();
-        }
-      it->GoToNextItem();
-      }
-    it->Delete();
-    }
+  this->Toolbars->SetToolbarsFlatAspect(flat_frame);
+  this->Toolbars->SetToolbarsWidgetsFlatAspect(flat_buttons);
 
-  // Now the split frame packing mechanism is so weird that I will have
+  // The split frame packing mechanism is so weird that I will have
   // to unpack the toolbar frame myself in case it's empty, otherwise
   // the middle frame won't claim the space used by the toolbar frame
 
-  if (this->ToolbarFrame && this->ToolbarFrame->IsCreated())
+  if (this->Toolbars->IsCreated())
     {
-    if (this->ToolbarFrame->GetNumberOfPackedChildren())
+    if (this->Toolbars->GetNumberOfVisibleToolbars())
       {
-      this->Script("pack %s -side top -fill x -expand no -before %s",
-                   this->ToolbarFrame->GetWidgetName(),
-                   this->MiddleFrame->GetWidgetName());
+      this->Script(
+        "pack %s -padx 0 -pady 0 -side top -fill x -expand no -after %s",
+        this->Toolbars->GetWidgetName(),
+        this->MenuBarSeparatorFrame->GetWidgetName());
+      this->Toolbars->PackToolbars();
       }
     else
       {
-      this->ToolbarFrame->Unpack();
+      this->Toolbars->Unpack();
       }
-    }
-}
-
-//----------------------------------------------------------------------------
-void vtkKWWindow::SetToolbarsEnabled(int state)
-{
-  if (this->Toolbars)
-    {
-    vtkKWToolbar *tb = NULL;
-    vtkVectorIterator<vtkKWToolbar *> *it = this->Toolbars->NewIterator();
-    it->InitTraversal();
-    while (!it->IsDoneWithTraversal())
-      {
-      if (it->GetData(tb) == VTK_OK)
-        {
-        tb->SetEnabled(state);
-        }
-      it->GoToNextItem();
-      }
-    it->Delete();
     }
 }
 
@@ -1570,7 +1659,7 @@ void vtkKWWindow::UpdateEnableState()
 
   // Update the toolbars
 
-  this->SetToolbarsEnabled(this->Enabled);
+  this->Toolbars->SetEnabled(this->Enabled);
 
   // Update the notebook
 
@@ -1615,7 +1704,6 @@ void vtkKWWindow::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "ScriptType: " << this->GetScriptType() << endl;
   os << indent << "SelectedView: " << this->GetSelectedView() << endl;
   os << indent << "SupportHelp: " << this->GetSupportHelp() << endl;
-  os << indent << "ToolbarFrame: " << this->GetToolbarFrame() << endl;
   os << indent << "StatusFrame: " << this->GetStatusFrame() << endl;
   os << indent << "ViewFrame: " << this->GetViewFrame() << endl;
   os << indent << "WindowClass: " << this->GetWindowClass() << endl;  

@@ -293,29 +293,13 @@ void vtkPVApplication::CreateSplashScreen()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVApplication::ConfigureAbout()
+void vtkPVApplication::AddAboutText(ostream &os)
 {
-  // Configure as if it was a vtkKWApplication, so that the splash
-  // screen eventually makes its way to the dialog. We will
-  // override the text and title anyway here.
-
-  this->Superclass::ConfigureAbout();
-
-  ostrstream str, title;
-
-  str << this->GetApplicationName() << " was developed by Kitware Inc." << endl
-      << "http://www.paraview.org" << endl
-      << "http://www.kitware.com" << endl
-      << "This is version " << this->MajorVersion << "." << this->MinorVersion
-      << ", release " << this->GetApplicationReleaseName() << ends;
-
-  title << "About " << this->GetApplicationName() << ends;
-    
-  this->AboutDialog->SetText(str.str());
-  this->AboutDialog->SetTitle(title.str());
-
-  str.rdbuf()->freeze(0);
-  title.rdbuf()->freeze(0);
+  os << this->GetApplicationName() << " was developed by Kitware Inc." << endl
+     << "http://www.paraview.org" << endl
+     << "http://www.kitware.com" << endl
+     << "This is version " << this->MajorVersion << "." << this->MinorVersion
+     << ", release " << this->GetApplicationReleaseName() << endl;
 }
 
 //----------------------------------------------------------------------------

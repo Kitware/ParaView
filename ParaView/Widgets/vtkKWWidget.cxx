@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWWidget );
-vtkCxxRevisionMacro(vtkKWWidget, "1.76");
+vtkCxxRevisionMacro(vtkKWWidget, "1.76.2.1");
 
 int vtkKWWidgetCommand(ClientData cd, Tcl_Interp *interp,
                        int argc, char *argv[]);
@@ -250,7 +250,10 @@ void vtkKWWidget::UnRegister(vtkObjectBase *o)
 //----------------------------------------------------------------------------
 void vtkKWWidget::Focus()
 {
-  this->Script( "focus %s", this->GetWidgetName() );
+  if (this->IsCreated())
+    {
+    this->Script("focus %s", this->GetWidgetName());
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -293,20 +296,16 @@ void vtkKWWidget::SetBindAll(const char *event, const char *command)
 //----------------------------------------------------------------------------
 void vtkKWWidget::SetCommand(vtkKWObject* CalledObject, const char * CommandString)
 {
-  char* command = this->CreateCommand(CalledObject, CommandString);
-  this->Application->SimpleScript(command);
+  if (!this->IsCreated())
+    {
+    return;
+    }
+
+  char *command = NULL;
+  this->SetObjectMethodCommand(&command, CalledObject, CommandString);
+  this->Script("%s configure -command {%s}",
+               this->GetWidgetName(), command);
   delete [] command;
-}
-
-//----------------------------------------------------------------------------
-char* vtkKWWidget::CreateCommand(vtkKWObject* CalledObject, const char * CommandString)
-{
-  ostrstream event;
-  event << this->GetWidgetName() << " configure -command {" 
-        << (CalledObject?CalledObject->GetTclName():"")
-        << " " << CommandString << "} " << ends;
-
-  return event.str();
 }
 
 //----------------------------------------------------------------------------
@@ -349,7 +348,7 @@ void vtkKWWidget::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkKWWidget ";
-  this->ExtractRevision(os,"$Revision: 1.76 $");
+  this->ExtractRevision(os,"$Revision: 1.76.2.1 $");
 }
 
 //----------------------------------------------------------------------------
@@ -590,6 +589,212 @@ int vtkKWWidget::GetConfigurationOptionAsInt(const char* option)
     }
 
   return atoi(this->Script("%s cget %s", this->GetWidgetName(), option));
+}
+
+//----------------------------------------------------------------------------
+const char* vtkKWWidget::GetTclCharacterEncodingAsString(int encoding)
+{
+  switch (encoding)
+    {
+    case VTK_ENCODING_US_ASCII:
+      return "ascii";
+
+    case VTK_ENCODING_UNICODE:
+      return "unicode";
+
+    case VTK_ENCODING_UTF_8:
+      return "utf-8";
+
+    case VTK_ENCODING_ISO_8859_1:
+      return "iso8859-1";
+
+    case VTK_ENCODING_ISO_8859_2:
+      return "iso8859-2";
+
+    case VTK_ENCODING_ISO_8859_3:
+      return "iso8859-3";
+
+    case VTK_ENCODING_ISO_8859_4:
+      return "iso8859-4";
+
+    case VTK_ENCODING_ISO_8859_5:
+      return "iso8859-5";
+
+    case VTK_ENCODING_ISO_8859_6:
+      return "iso8859-5";
+
+    case VTK_ENCODING_ISO_8859_7:
+      return "iso8859-7";
+
+    case VTK_ENCODING_ISO_8859_8:
+      return "iso8859-8";
+
+    case VTK_ENCODING_ISO_8859_9:
+      return "iso8859-9";
+
+    case VTK_ENCODING_ISO_8859_10:
+      return "iso8859-10";
+
+    case VTK_ENCODING_ISO_8859_11:
+      return "iso8859-11";
+
+    case VTK_ENCODING_ISO_8859_12:
+      return "iso8859-12";
+
+    case VTK_ENCODING_ISO_8859_13:
+      return "iso8859-13";
+
+    case VTK_ENCODING_ISO_8859_14:
+      return "iso8859-14";
+
+    case VTK_ENCODING_ISO_8859_15:
+      return "iso8859-15";
+
+    case VTK_ENCODING_ISO_8859_16:
+      return "iso8859-16";
+
+    default:
+      return "identity";
+    }
+}
+
+//----------------------------------------------------------------------------
+const char* vtkKWWidget::ConvertInternalStringToTclString(
+  const char *str, int no_curly_braces)
+{
+  if (!str || !this->IsCreated())
+    {
+    return NULL;
+    }
+
+  // Shall we remove the curly braces so that we can use the {%s}
+  // syntax to use the string inside this->Script ?
+
+  char *clean_str = NULL;
+  if (no_curly_braces && (strchr(str, '{') || strchr(str, '}')))
+    {
+    clean_str = vtkString::RemoveChars(str, "{}");
+    str = clean_str;
+    }
+
+  // No encoding known ? The fast way, return unchanged
+
+  int app_encoding = this->GetApplication()->GetCharacterEncoding();
+  if (app_encoding != VTK_ENCODING_NONE &&
+      app_encoding != VTK_ENCODING_UNKNOWN)
+    {
+    // Get the Tcl encoding name
+
+    const char *tcl_encoding_name = 
+      vtkKWWidget::GetTclCharacterEncodingAsString(app_encoding);
+
+    // Check if we have that encoding
+    
+    Tcl_Encoding tcl_encoding = 
+      Tcl_GetEncoding(this->Application->GetMainInterp(), tcl_encoding_name);
+    if (tcl_encoding != NULL)
+      {
+      Tcl_FreeEncoding(tcl_encoding);
+      
+      // Convert from that encoding
+      
+      const char *res = 
+        this->Script("encoding convertfrom %s {%s}", tcl_encoding_name, str);
+
+      if (clean_str)
+        {
+        delete [] clean_str;
+        }
+
+      return res;
+      }
+    }
+
+  // Otherwise just return unchanged (or without the braces)
+
+  if (clean_str)
+    {
+    const char *res = this->Script("set __foo__ {%s}", str);
+    delete [] clean_str;
+    return res;
+    }
+  
+  return str;
+}
+
+//----------------------------------------------------------------------------
+const char* vtkKWWidget::ConvertTclStringToInternalString(
+  const char *str, int no_curly_braces)
+{
+  if (!str || !this->IsCreated())
+    {
+    return NULL;
+    }
+
+  // Shall we remove the curly braces so that we can use the {%s}
+  // syntax to use the string inside this->Script ?
+  
+  char *clean_str = NULL;
+  if (no_curly_braces && (strchr(str, '{') || strchr(str, '}')))
+    {
+    clean_str = vtkString::RemoveChars(str, "{}");
+    str = clean_str;
+    }
+
+  // No encoding known ? The fast way, return unchanged
+
+  int app_encoding = this->GetApplication()->GetCharacterEncoding();
+  if (app_encoding != VTK_ENCODING_NONE &&
+      app_encoding != VTK_ENCODING_UNKNOWN)
+    {
+    // Otherwise try to encode/decode
+
+    const char *res = 
+      this->Script("encoding convertfrom identity {%s}", str);
+    
+    if (clean_str)
+      {
+      delete [] clean_str;
+      }
+    
+    return res;
+    }
+  
+  // Otherwise just return unchanged (or without the braces)
+  
+  if (clean_str)
+    {
+    const char *res = this->Script("set __foo__ {%s}", str);
+    delete [] clean_str;
+    return res;
+    }
+  
+  return str;
+}
+
+//----------------------------------------------------------------------------
+void vtkKWWidget::SetTextOption(const char *str, const char *option)
+{
+  if (!option || !this->IsCreated())
+    {
+    return;
+    }
+
+  const char *val = this->ConvertInternalStringToTclString(str);
+  this->Script("catch {%s configure %s {%s}}", 
+               this->GetWidgetName(), option, val ? val : "");
+}
+
+//----------------------------------------------------------------------------
+const char* vtkKWWidget::GetTextOption(const char *option)
+{
+  if (!option || !this->IsCreated())
+    {
+    return "";
+    }
+
+  const char *val = this->Script("%s cget %s", this->GetWidgetName(), option);
+  return this->ConvertTclStringToInternalString(val);
 }
 
 //----------------------------------------------------------------------------
@@ -1256,13 +1461,42 @@ void vtkKWWidget::SetImageOption(const unsigned char* data,
                                      blend_color_option))
     {
     vtkWarningMacro("Error updating Tk photo " << image_name.str());
+    image_name.rdbuf()->freeze(0);
     return;
     }
 
-  this->Script("%s configure %s {%s}", 
-               this->GetWidgetName(), image_option, image_name.str());
+  this->SetImageOption(image_name.str(), image_option);
 
   image_name.rdbuf()->freeze(0);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWWidget::SetImageOption(const char *image_name,
+                                 const char *image_option)
+{
+  if (!this->IsCreated())
+    {
+    vtkWarningMacro("Widget is not created yet !");
+    return;
+    }
+
+  if (!image_option || !*image_option)
+    {
+    image_option = "-image";
+    }
+
+  if (!this->HasConfigurationOption(image_option))
+    {
+    return;
+    }
+
+  if (!image_name)
+    {
+    image_name = "";
+    }
+
+  this->Script("%s configure %s {%s}", 
+               this->GetWidgetName(), image_option, image_name);
 }
 
 //----------------------------------------------------------------------------

@@ -89,7 +89,8 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.313.2.11");
+vtkCxxRevisionMacro(vtkPVSource, "1.313.2.12");
+
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -330,15 +331,16 @@ void vtkPVSource::SetPVInput(int idx, vtkPVSource *pvs)
     {
     inputName = "Input";
     }
+
   numParts = pvs->GetNumberOfParts();
   vtkClientServerStream& stream = pm->GetStream();
-  for (partIdx = 0; partIdx < numParts; ++partIdx)
+  if (this->VTKMultipleInputsFlag)
     {
-    part = pvs->GetPart(partIdx);
-    if (this->VTKMultipleInputsFlag)
+    for (partIdx = 0; partIdx < numParts; ++partIdx)
+      {
+      part = pvs->GetPart(partIdx);
       { // Only one source takes all parts as input.
       sourceID = this->GetVTKSourceID(0);
-      
       if (part->GetVTKDataID().ID == 0 || sourceID.ID == 0)
         { // Sanity check.
         vtkErrorMacro("Missing id.");
@@ -353,9 +355,21 @@ void vtkPVSource::SetPVInput(int idx, vtkPVSource *pvs)
         delete []str.str();
         }      
       }
-    else
-      { // One source for each part.
-      sourceID = this->GetVTKSourceID(partIdx);
+    }
+  else
+    { // One source for each part.
+    int numSources = this->GetNumberOfVTKSources();
+    for (int sourceIdx = 0; sourceIdx < numSources; ++sourceIdx)
+      {
+      sourceID = this->GetVTKSourceID(sourceIdx);
+      // This is to handle the case when there are multiple
+      // inputs and the first one has multiple parts. For
+      // example, in the Glyph filter, when the input has multiple
+      // parts, the glyph source has to be applied to each.
+      // In that case, sourceTclName == glyph input, 
+      // inputName == glyph source.
+      partIdx = sourceIdx % numParts;
+      part = pvs->GetPart(partIdx);
       if (part->GetVTKDataID().ID == 0 || sourceID.ID == 0)
         {
         vtkErrorMacro("Source data mismatch.");
@@ -1154,7 +1168,7 @@ void vtkPVSource::SetLabelNoTrace(const char* arg)
 //----------------------------------------------------------------------------
 void vtkPVSource::LabelEntryCallback()
 {
-  this->SetLabel(this->LabelEntry->GetValue());
+  this->SetLabel(this->LabelEntry->GetEntry()->GetValue());
 }
 
 //----------------------------------------------------------------------------
@@ -1275,7 +1289,6 @@ void vtkPVSource::Accept(int hideFlag, int hideSource)
     { // This is the first time, initialize data.    
     vtkPVData *pvd;
     
-    this->Initialized = 1;
     pvd = this->GetPVOutput();
     if (pvd == NULL)
       { // I suppose we should try and delete the source.
@@ -1316,9 +1329,6 @@ void vtkPVSource::Accept(int hideFlag, int hideSource)
         }
       }
 
-
-    this->UnGrabFocus();
-
     // Set the current data of the window.
     if ( ! hideFlag)
       {
@@ -1353,6 +1363,10 @@ void vtkPVSource::Accept(int hideFlag, int hideSource)
       }
 
     pvd->Initialize();
+    // This causes input to be checked for validity.
+    // I put it at the end so the InputFixedTypeRequirement will work.
+    this->UnGrabFocus();
+    this->Initialized = 1;
     }
 
   window->GetMenuView()->CheckRadioButton(
@@ -1405,7 +1419,7 @@ void vtkPVSource::MarkSourcesForUpdate(int flag)
     this->InvalidateDataInformation();
     this->PipelineModifiedTime.Modified();
     // Get rid of caches.
-    int idx, numParts;
+    int numParts;
     vtkPVPart *part;
     numParts = this->GetNumberOfParts();
     for (idx = 0; idx < numParts; ++idx)
@@ -1546,9 +1560,9 @@ void vtkPVSource::DeleteCallback()
       // Show the 3D View settings
       vtkPVApplication *pvApp = 
         vtkPVApplication::SafeDownCast(this->Application);
-      vtkPVWindow *window = pvApp->GetMainWindow();
+      vtkPVWindow *iwindow = pvApp->GetMainWindow();
       this->Script("%s invoke \"%s\"", 
-                   window->GetMenuView()->GetWidgetName(),
+                   iwindow->GetMenuView()->GetWidgetName(),
                    VTK_PV_VIEW_MENU_LABEL);
       }
     }
@@ -2446,8 +2460,8 @@ int vtkPVSource::InitializeData()
     if(!pm->GetLastServerResult().GetArgument(0, 0, &numOutputs))
       {
       vtkErrorMacro("wrong return type for GetNumberOfOutputs call");
+      numOutputs = 0;
       }
-
     for (idx = 0; idx < numOutputs; ++idx)
       {
       ++outputCount;

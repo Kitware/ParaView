@@ -28,6 +28,7 @@ set pv(vtkTemp589) [$pv(vtkTemp574) GetPVWidget CellArrays]
 $pv(vtkTemp589) SetArrayStatus {cellCScalars} 0
 $pv(vtkTemp589) SetArrayStatus {cellCVectors} 0
 $pv(vtkTemp574) AcceptCallback
+[$pv(vtkTemp574) GetPVOutput] DrawSurface
 
 $pv(vtkTemp1) ResetCameraCallback
 

@@ -88,6 +88,8 @@ $pvGlyph AcceptCallback
 [$pvGlyph GetPVOutput] ColorByProperty
 set GlyphScaleEntry [$pvGlyph GetPVWidget {Scale Factor}]
 $GlyphScaleEntry SetValue 3.0
+set GlyphScaleMode [$pvGlyph GetPVWidget {Scale Mode}]
+$GlyphScaleMode SetCurrentValue "Scalar"
 $pvGlyph AcceptCallback
 [$pvGlyph GetPVOutput] SetVisibility 0
 
@@ -169,6 +171,9 @@ for {set i 55} {$i < 56} {incr i 1} {
     RenWin1 Render
     update
 }
+
+[$pvExtract GetPVOutput] DrawSurface
+update
 
 for {set i  1} {$i < [expr $argc - 1]} {incr i} {
     if {[lindex $argv $i] == "-C"} {

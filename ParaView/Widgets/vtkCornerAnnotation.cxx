@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkCornerAnnotation);
-vtkCxxRevisionMacro(vtkCornerAnnotation, "1.35");
+vtkCxxRevisionMacro(vtkCornerAnnotation, "1.35.4.1");
 
 vtkSetObjectImplementationMacro(vtkCornerAnnotation,ImageActor,vtkImageActor);
 vtkSetObjectImplementationMacro(vtkCornerAnnotation,WindowLevel,
@@ -186,9 +186,9 @@ void vtkCornerAnnotation::ReplaceText(vtkImageActor *ia,
       while (rpos)
         {
         *rpos = '\0';
-        if (ia)
+        if (wl)
           {
-          sprintf(text2,"%sWindow: %.2f%s",text,window,rpos+8);
+          sprintf(text2,"%sWindow: %g%s",text,window,rpos+8);
           }
         else
           {
@@ -203,9 +203,9 @@ void vtkCornerAnnotation::ReplaceText(vtkImageActor *ia,
       while (rpos)
         {
         *rpos = '\0';
-        if (ia)
+        if (wl)
           {
-          sprintf(text2,"%sLevel: %.2f%s",text,level,rpos+7);
+          sprintf(text2,"%sLevel: %g%s",text,level,rpos+7);
           }
         else
           {
@@ -251,7 +251,6 @@ int vtkCornerAnnotation::RenderOpaqueGeometry(vtkViewport *viewport)
   // Check to see whether we have to rebuild everything
   // If the viewport has changed we may - or may not need
   // to rebuild, it depends on if the projected coords chage
-
   int viewport_size_has_changed = 0;
   if (viewport->GetMTime() > this->BuildTime ||
       (viewport->GetVTKWindow() && 
@@ -265,7 +264,6 @@ int vtkCornerAnnotation::RenderOpaqueGeometry(vtkViewport *viewport)
     }
   
   // Is there an image actor ?
-
   vtkImageActor *ia = 0;  
   vtkImageMapToWindowLevelColors *wl = this->WindowLevel;
   vtkPropCollection *pc = viewport->GetProps();
@@ -288,7 +286,6 @@ int vtkCornerAnnotation::RenderOpaqueGeometry(vtkViewport *viewport)
                            this->TextProperty->GetMTime() > this->BuildTime);
 
   // Check to see whether we have to rebuild everything
-
   if (viewport_size_has_changed ||
       tprop_has_changed ||
       (this->GetMTime() > this->BuildTime) ||
@@ -301,16 +298,13 @@ int vtkCornerAnnotation::RenderOpaqueGeometry(vtkViewport *viewport)
     vtkDebugMacro(<<"Rebuilding text");
     
     // Replace text
-
     this->ReplaceText(ia, wl);
     
     // Get the viewport size in display coordinates
-
     this->LastSize[0] = vSize[0];
     this->LastSize[1] = vSize[1];
 
     // Only adjust size then the text changes due to non w/l slice reasons
-
     if (viewport_size_has_changed ||
         tprop_has_changed ||
         this->GetMTime() > this->BuildTime)
@@ -319,7 +313,6 @@ int vtkCornerAnnotation::RenderOpaqueGeometry(vtkViewport *viewport)
       // Perform shallow copy here since each individual corner has a
       // different aligment/size but they share the other this->TextProperty
       // attributes.
-
       fontSize = this->TextMapper[0]->GetTextProperty()->GetFontSize();
 
       if (tprop_has_changed)
@@ -449,7 +442,12 @@ int vtkCornerAnnotation::RenderOpaqueGeometry(vtkViewport *viewport)
         max_width = (width_01 > width_23) ? width_01 : width_23;
         }
 
+      fontSize = static_cast<int>(pow((float)fontSize,0.7f)*pow(10.0f,0.3f));
       this->FontSize = fontSize;
+      for (i = 0; i < 4; i++)
+        {
+        this->TextMapper[i]->GetTextProperty()->SetFontSize(fontSize);
+        }
 
       // Now set the position of the TextActors
 

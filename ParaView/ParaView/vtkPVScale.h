@@ -157,6 +157,10 @@ protected:
   vtkSetStringMacro(EntryLabel);
   vtkGetStringMacro(EntryLabel);
   char* EntryLabel;
+
+  vtkSetStringMacro(RangeSourceVariable);
+  vtkGetStringMacro(RangeSourceVariable);
+  char* RangeSourceVariable;
   
   int Round;
 

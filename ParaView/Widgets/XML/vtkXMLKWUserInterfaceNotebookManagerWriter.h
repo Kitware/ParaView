@@ -66,6 +66,16 @@ public:
   // store a page.
   static char* GetPageElementName();
 
+  // Description:
+  // Return the name of the element used inside that tree to
+  // store the Drag&Drop entries.
+  static char* GetDragAndDropEntriesElementName();
+
+  // Description:
+  // Return the name of the element used inside that tree to
+  // store a Drag&Drop entry.
+  static char* GetDragAndDropEntryElementName();
+
 protected:
   vtkXMLKWUserInterfaceNotebookManagerWriter() {};
   ~vtkXMLKWUserInterfaceNotebookManagerWriter() {};  

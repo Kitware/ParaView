@@ -58,13 +58,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkVector.txx"
 #include "vtkVectorIterator.txx"
 #include "vtkKWListBox.h"
+#include "vtkKWPushButton.h"
 
 #include <vtkstd/string>
 #include <vtkstd/map>
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkXDMFReaderModule);
-vtkCxxRevisionMacro(vtkXDMFReaderModule, "1.10.2.1");
+vtkCxxRevisionMacro(vtkXDMFReaderModule, "1.10.2.2");
 
 int vtkXDMFReaderModuleCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -155,6 +156,7 @@ int vtkXDMFReaderModule::ReadFileInformation(const char* fname)
 
     vtkKWMessageDialog* dlg = vtkKWMessageDialog::New();
     dlg->SetTitle("Domain and Grids Selection");
+    dlg->SetStyleToOkCancel();
     dlg->SetMasterWindow(this->GetPVWindow());
     dlg->Create(pvApp,0);
     dlg->SetText("Select Domain and Grids");
@@ -169,7 +171,6 @@ int vtkXDMFReaderModule::ReadFileInformation(const char* fname)
     this->DomainMenu->Create(pvApp, 0);
     this->UpdateDomains(res);
 
-
     this->GridSelection = vtkKWListBox::New();
     this->GridSelection->SetParent(this->DomainGridFrame->GetFrame());
     this->GridSelection->ScrollbarOn();
@@ -177,18 +178,41 @@ int vtkXDMFReaderModule::ReadFileInformation(const char* fname)
     this->GridSelection->SetHeight(0);
     this->UpdateGrids(res);
 
+
     this->Script("%s configure -height 1", this->DomainMenu->GetWidgetName());
     this->Script("pack %s -expand yes -fill x -side top -pady 2", 
       this->DomainMenu->GetWidgetName());
     this->Script("pack %s -expand yes -fill x -side top -pady 2", 
+
       this->GridSelection->GetWidgetName());
-    this->Script("pack %s -expand yes -fill x -side bottom -pady 2", 
-      this->DomainGridFrame->GetWidgetName());
+
+    if ( this->DomainMenu->GetNumberOfEntries() > 0 )
+      {
+      this->Script("pack %s -expand yes -fill x -side top -pady 2", 
+        this->DomainGridFrame->GetWidgetName());
+      if ( this->GridSelection->GetNumberOfItems() > 1 )
+        {
+        vtkKWPushButton* selectAllButton = vtkKWPushButton::New();
+        selectAllButton->SetParent(this->DomainGridFrame->GetFrame());
+        selectAllButton->SetLabel("Select All Grids");
+        selectAllButton->Create(pvApp, 0);
+        selectAllButton->SetCommand(this, "EnableAllGrids");
+        this->Script("pack %s -expand yes -fill x -side bottom -pady 2", 
+          selectAllButton->GetWidgetName());
+        selectAllButton->Delete();
+        }
+      }
+    else
+      {
+      dlg->SetText("No domains found");
+      dlg->GetOKButton()->EnabledOff();
+      }
+
+    int result = VTK_OK;
 
     if ( dlg->Invoke() )
       {
       this->SetDomain(this->DomainMenu->GetValue());
-
       for ( cc = 0; cc < this->GridSelection->GetNumberOfItems(); cc ++ )
         {
         if ( this->GridSelection->GetSelectState(cc) )
@@ -197,10 +221,13 @@ int vtkXDMFReaderModule::ReadFileInformation(const char* fname)
           }
         }
       }
+    else
+      {
+      result = VTK_ERROR;
+      }
 
     this->DomainMenu->Delete();
     this->DomainMenu = 0;
-
 
     this->GridSelection->Delete();
     this->GridSelection = 0;
@@ -209,7 +236,10 @@ int vtkXDMFReaderModule::ReadFileInformation(const char* fname)
     this->DomainGridFrame = 0;
 
     dlg->Delete();
-
+    if ( result != VTK_OK )
+      {
+      return result;
+      }
     }
 
   pm->ServerScript("%s UpdateInformation", res);
@@ -349,7 +379,7 @@ void vtkXDMFReaderModule::SaveState(ofstream *file)
     mit != this->Internals->GridList.end(); 
     ++mit )
     {
-    *file << "$kw(" << this->GetTclName() << ") EnableGrid " << mit->first.c_str() << endl;
+    *file << "$kw(" << this->GetTclName() << ") EnableGrid {" << mit->first.c_str() << "}" << endl;
     }
   *file << "$kw(" << this->GetPVWindow()->GetTclName() << ") "
         << "ReadFileInformation $kw(" << this->GetTclName() << ") \""
@@ -376,6 +406,16 @@ void vtkXDMFReaderModule::SaveState(ofstream *file)
   *file << "$kw(" << this->GetTclName() << ") AcceptCallback" << endl;
 
   this->VisitedFlag = 1;
+}
+
+//----------------------------------------------------------------------------
+void vtkXDMFReaderModule::EnableAllGrids()
+{
+  int cc;
+  for ( cc = 0; cc < this->GridSelection->GetNumberOfItems(); cc ++ )
+    {
+    this->GridSelection->SetSelectState(cc, 1);
+    }
 }
 
 //----------------------------------------------------------------------------

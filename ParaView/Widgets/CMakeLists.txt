@@ -28,6 +28,7 @@ vtkKWLabeledEntry.cxx
 vtkKWLabeledFrame.cxx 
 vtkKWLabeledLabel.cxx 
 vtkKWLabeledLabelSet.cxx
+vtkKWLabeledLoadSaveButton.cxx
 vtkKWLabeledOptionMenu.cxx 
 vtkKWLabeledPopupButton.cxx 
 vtkKWLabeledPushButton.cxx
@@ -37,6 +38,7 @@ vtkKWLabeledScaleSet.cxx
 vtkKWLabeledText.cxx 
 vtkKWLabeledWidget.cxx 
 vtkKWListBox.cxx 
+vtkKWLoadSaveButton.cxx
 vtkKWLoadSaveDialog.cxx
 vtkKWMenu.cxx 
 vtkKWMenuButton.cxx 
@@ -55,6 +57,7 @@ vtkKWRadioButton.cxx
 vtkKWRadioButtonSet.cxx
 vtkKWRange.cxx 
 vtkKWRenderWidget.cxx 
+vtkKWRenderWidgetCallbackCommand.cxx 
 vtkKWSaveImageDialog.cxx 
 vtkKWScalarBarAnnotation.cxx 
 vtkKWScalarComponentSelectionWidget.cxx
@@ -71,6 +74,7 @@ vtkKWTextProperty.cxx
 vtkKWThumbWheel.cxx
 vtkKWTkUtilities.cxx
 vtkKWToolbar.cxx 
+vtkKWToolbarSet.cxx 
 vtkKWUserInterfaceManager.cxx
 vtkKWUserInterfaceNotebookManager.cxx
 vtkKWUserInterfacePanel.cxx
@@ -93,6 +97,7 @@ SET_SOURCE_FILES_PROPERTIES(
 
 SET_SOURCE_FILES_PROPERTIES(
   ${VTK_TCL_HOME}/vtktcl.c
+  vtkKWRenderWidgetCallbackCommand.cxx 
   vtkKWTkUtilities.cxx
   WRAP_EXCLUDE
   )
@@ -117,6 +122,7 @@ IF (NOT DO_NOT_BUILD_XML_RW)
 ELSE (NOT DO_NOT_BUILD_XML_RW)
   SET_SOURCE_FILES_PROPERTIES(
 	vtkKWScalarBarAnnotation.cxx 
+    vtkKWApplication.cxx 
     vtkKWCornerAnnotation.cxx 
     vtkKWHeaderAnnotation.cxx 
     COMPILE_FLAGS -DDO_NOT_BUILD_XML_RW
@@ -127,22 +133,14 @@ OPTION(USE_INSTALLED_TCLTK_PACKAGES "Use the intalled/system Tcl/Tk packages ins
 MARK_AS_ADVANCED(USE_INSTALLED_TCLTK_PACKAGES)
 
 IF (NOT USE_INSTALLED_TCLTK_PACKAGES)
-  SET (COMPILE_KWINIT 1)
-  IF (WIN32)
-    IF (TK_LIBRARY MATCHES tk84)
-      SET (COMPILE_KWINIT 0)
-    ENDIF (TK_LIBRARY MATCHES tk84)
-  ENDIF (WIN32)
   SUBDIRS(TclTk)
-  IF (COMPILE_KWINIT)
-    SET( KWWidgets_SRCS ${KWWidgets_SRCS}
-      kwinit.c
-    )
-    SET_SOURCE_FILES_PROPERTIES(
-      kwinit 
-      WRAP_EXCLUDE
-    )
-  ENDIF (COMPILE_KWINIT)
+  SET( KWWidgets_SRCS ${KWWidgets_SRCS}
+    kwinit.c
+  )
+  SET_SOURCE_FILES_PROPERTIES(
+    kwinit 
+    WRAP_EXCLUDE
+  )
 ENDIF (NOT USE_INSTALLED_TCLTK_PACKAGES)
 
 IF (WIN32)

@@ -35,30 +35,30 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "vtkKWMessageDialog.h"
 
-#include "vtkObjectFactory.h"
-#include "vtkKWLabel.h"
-#include "vtkKWCheckButton.h"
-#include "vtkKWIcon.h"
 #include "vtkKWApplication.h"
+#include "vtkKWCheckButton.h"
 #include "vtkKWEvent.h"
+#include "vtkKWFrame.h"
+#include "vtkKWIcon.h"
+#include "vtkKWLabel.h"
+#include "vtkObjectFactory.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWMessageDialog );
-vtkCxxRevisionMacro(vtkKWMessageDialog, "1.51");
+vtkCxxRevisionMacro(vtkKWMessageDialog, "1.51.2.1");
 
-
-
-
+//----------------------------------------------------------------------------
 int vtkKWMessageDialogCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
 
+//----------------------------------------------------------------------------
 vtkKWMessageDialog::vtkKWMessageDialog()
 {
-  this->MessageDialogFrame = vtkKWWidget::New();
+  this->MessageDialogFrame = vtkKWFrame::New();
   this->MessageDialogFrame->SetParent(this);
-  this->TopFrame = vtkKWWidget::New();
+  this->TopFrame = vtkKWFrame::New();
   this->TopFrame->SetParent(this->MessageDialogFrame);
-  this->BottomFrame = vtkKWWidget::New();
+  this->BottomFrame = vtkKWFrame::New();
   this->BottomFrame->SetParent(this->MessageDialogFrame);
   
   this->CommandFunction = vtkKWMessageDialogCommand;
@@ -66,16 +66,20 @@ vtkKWMessageDialog::vtkKWMessageDialog()
   this->Label->SetParent(this->MessageDialogFrame);
   this->CheckButton = vtkKWCheckButton::New();
   this->CheckButton->SetParent(this->MessageDialogFrame);
-  this->ButtonFrame = vtkKWWidget::New();
+  this->ButtonFrame = vtkKWFrame::New();
   this->ButtonFrame->SetParent(this->MessageDialogFrame);
-  this->OKFrame = vtkKWWidget::New();
+  this->OKFrame = vtkKWFrame::New();
   this->OKFrame->SetParent(this->ButtonFrame);
-  this->CancelFrame = vtkKWWidget::New();
+  this->CancelFrame = vtkKWFrame::New();
   this->CancelFrame->SetParent(this->ButtonFrame);  
+  this->OtherFrame = vtkKWFrame::New();
+  this->OtherFrame->SetParent(this->ButtonFrame);  
   this->OKButton = vtkKWWidget::New();
   this->OKButton->SetParent(this->OKFrame);
   this->CancelButton = vtkKWWidget::New();
   this->CancelButton->SetParent(this->CancelFrame);
+  this->OtherButton = vtkKWWidget::New();
+  this->OtherButton->SetParent(this->OtherFrame);
   this->Style = vtkKWMessageDialog::Message;
   this->Icon = vtkKWLabel::New();
   this->Icon->SetParent(this);
@@ -86,8 +90,11 @@ vtkKWMessageDialog::vtkKWMessageDialog()
   this->SetOKButtonText("OK");
   this->CancelButtonText = 0;
   this->SetCancelButtonText("Cancel");
+  this->OtherButtonText = 0;
+  this->SetOtherButtonText("Other");
 }
 
+//----------------------------------------------------------------------------
 vtkKWMessageDialog::~vtkKWMessageDialog()
 {
   this->Label->Delete();
@@ -95,8 +102,10 @@ vtkKWMessageDialog::~vtkKWMessageDialog()
   this->ButtonFrame->Delete();
   this->OKFrame->Delete();
   this->CancelFrame->Delete();
+  this->OtherFrame->Delete();
   this->OKButton->Delete();
   this->CancelButton->Delete();
+  this->OtherButton->Delete();
   this->Icon->Delete();
   this->MessageDialogFrame->Delete();
   this->TopFrame->Delete();
@@ -105,6 +114,7 @@ vtkKWMessageDialog::~vtkKWMessageDialog()
   this->SetDialogText(0);
   this->SetOKButtonText(0);
   this->SetCancelButtonText(0);
+  this->SetOtherButtonText(0);
 }
 
 void vtkKWMessageDialog::Create(vtkKWApplication *app, const char *args)
@@ -112,9 +122,9 @@ void vtkKWMessageDialog::Create(vtkKWApplication *app, const char *args)
   // invoke super method
   this->Superclass::Create(app,args);
   
-  this->MessageDialogFrame->Create(app,"frame","");
-  this->TopFrame->Create(app,"frame","");
-  this->BottomFrame->Create(app,"frame","");
+  this->MessageDialogFrame->Create(app, "");
+  this->TopFrame->Create(app, "");
+  this->BottomFrame->Create(app, "");
   this->Label->SetLineType(vtkKWLabel::MultiLine);
   this->Label->SetWidth(300);
   this->Label->Create(app,"");
@@ -123,55 +133,81 @@ void vtkKWMessageDialog::Create(vtkKWApplication *app, const char *args)
     this->Label->SetLabel(this->DialogText);
     }
   this->CheckButton->Create(app, "");
-  this->ButtonFrame->Create(app,"frame","");
+  this->ButtonFrame->Create(app, "");
   
-  switch (this->Style)
+  int one_b = (this->Style == vtkKWMessageDialog::Message) ? 1 : 0;
+  int two_b = (this->Style == vtkKWMessageDialog::YesNo || 
+               this->Style == vtkKWMessageDialog::OkCancel) ? 2 : 0;
+  int three_b = (this->Style == vtkKWMessageDialog::OkOtherCancel)  ? 3 : 0;
+  int nb_buttons = one_b + two_b + three_b;
+
+  if (this->Style == vtkKWMessageDialog::YesNo)
     {
-    case vtkKWMessageDialog::Message :
-      this->OKFrame->Create(app,"frame","-borderwidth 3 -relief flat");
-      this->OKButton->Create(app,"button","-text OK -width 16");
-      this->OKButton->SetCommand(this, "OK");
-      this->Script("pack %s -side left -expand yes",
-                   this->OKButton->GetWidgetName());
-      this->Script("pack %s -side left -padx 2 -expand yes",
-                   this->OKFrame->GetWidgetName());
-      break;
-    case vtkKWMessageDialog::YesNo: 
-      this->SetOKButtonText("Yes");
-      this->SetCancelButtonText("No");
-    case vtkKWMessageDialog::OkCancel:
-      this->OKFrame->Create(app,"frame","-borderwidth 3 -relief flat");
-      ostrstream oktext;
-      oktext << "-text " << this->OKButtonText << " -width 16" << ends;
-      this->OKButton->Create(app, "button", oktext.str());
-      oktext.rdbuf()->freeze(0);
-      this->OKButton->SetCommand(this, "OK");
-      this->CancelFrame->Create(app,"frame","-borderwidth 3 -relief flat");
-      ostrstream canceltext;
-      canceltext << "-text " << this->CancelButtonText << " -width 16" << ends;
-      this->CancelButton->Create(app,"button", canceltext.str());
-      canceltext.rdbuf()->freeze(0);
-      this->CancelButton->SetCommand(this, "Cancel");
-      this->Script("pack %s %s -side left -expand yes",
-                   this->OKButton->GetWidgetName(),
-                   this->CancelButton->GetWidgetName());
-      this->Script("pack %s %s -side left -padx 2 -expand yes",
-                   this->OKFrame->GetWidgetName(),
-                   this->CancelFrame->GetWidgetName());
-      break;
+    this->SetOKButtonText("Yes");
+    this->SetCancelButtonText("No");
+    }
+  else if (this->Style == vtkKWMessageDialog::Message)
+    {
+    this->SetOKButtonText("OK");
     }
 
-  if ( this->OKButton->GetApplication() )
+  ostrstream pack_opt;
+  if (this->Options & vtkKWMessageDialog::PackVertically)
     {
-    this->OKButton->SetBind("<FocusIn>", this->OKFrame->GetWidgetName(), 
-                            "configure -relief groove");
-    this->OKButton->SetBind("<FocusOut>", this->OKFrame->GetWidgetName(), 
-                            "configure -relief flat");
+    pack_opt << "-side top -expand yes -fill x -padx 4" << ends;
+    }
+  else
     {
+    pack_opt << "-side left -expand yes -padx 2" << ends;
+    }
+
+  if (nb_buttons >= 1)
+    {
+    this->OKFrame->Create(app, "-borderwidth 3 -relief flat");
+    this->OKButton->Create(app,"button","-width 16");
+    this->OKButton->SetTextOption(this->OKButtonText);
+    this->OKButton->SetCommand(this, "OK");
+    this->Script("pack %s %s %s",
+                 this->OKButton->GetWidgetName(),
+                 this->OKFrame->GetWidgetName(), pack_opt.str());
+    }
+
+  if (nb_buttons >= 3)
+    {
+    this->OtherFrame->Create(app, "-borderwidth 3 -relief flat");
+    this->OtherButton->Create(app,"button", "-width 16");
+    this->OtherButton->SetTextOption(this->OtherButtonText);
+    this->OtherButton->SetCommand(this, "Other");
+    this->Script("pack %s %s %s",
+                 this->OtherButton->GetWidgetName(),
+                 this->OtherFrame->GetWidgetName(), pack_opt.str());
+    }
+
+  if (nb_buttons >= 2)
+    {
+    this->CancelFrame->Create(app, "-borderwidth 3 -relief flat");
+    this->CancelButton->Create(app,"button", "-width 16");
+    this->CancelButton->SetTextOption(this->CancelButtonText);
+    this->CancelButton->SetCommand(this, "Cancel");
+    this->Script("pack %s %s %s",
+                 this->CancelButton->GetWidgetName(),
+                 this->CancelFrame->GetWidgetName(), pack_opt.str());
+    }
+
+  pack_opt.rdbuf()->freeze(0);
+
+  if (this->OKButton->GetApplication())
+    {
+    this->OKButton->SetBind(
+      "<FocusIn>", this->OKFrame->GetWidgetName(), 
+      "configure -relief groove");
+    this->OKButton->SetBind(
+      "<FocusOut>", this->OKFrame->GetWidgetName(), 
+      "configure -relief flat");
     this->OKButton->SetBind(this, "<Return>", "OK");
     }
-    }
-  if ( this->CancelButton->GetApplication() )
+
+  if (this->CancelButton->GetApplication())
     {
     this->CancelButton->SetBind(
       "<FocusIn>", this->CancelFrame->GetWidgetName(), 
@@ -179,9 +215,18 @@ void vtkKWMessageDialog::Create(vtkKWApplication *app, const char *args)
     this->CancelButton->SetBind(
       "<FocusOut>", this->CancelFrame->GetWidgetName(),
       "configure -relief flat");
-    {
     this->CancelButton->SetBind(this, "<Return>", "Cancel");
     }
+
+  if (this->OtherButton->GetApplication())
+    {
+    this->OtherButton->SetBind(
+      "<FocusIn>", this->OtherFrame->GetWidgetName(), 
+      "configure -relief groove");
+    this->OtherButton->SetBind(
+      "<FocusOut>", this->OtherFrame->GetWidgetName(),
+      "configure -relief flat");
+    this->OtherButton->SetBind(this, "<Return>", "Other");
     }
   
   this->Script("pack %s -side right -fill both -expand true -pady 4",
@@ -199,7 +244,7 @@ void vtkKWMessageDialog::Create(vtkKWApplication *app, const char *args)
 
   this->Script("pack %s -side top -fill both -expand true",
                this->BottomFrame->GetWidgetName());
-  this->Script("pack %s -side top -fill x -pady 2",
+  this->Script("pack %s -side top -fill x -pady 2 -expand y",
                this->ButtonFrame->GetWidgetName());
   this->Icon->Create(app,"-width 0 -pady 0 -padx 0 -borderwidth 0");
   this->Script("pack %s -side left -fill y",
@@ -214,15 +259,36 @@ void vtkKWMessageDialog::Create(vtkKWApplication *app, const char *args)
 #endif
 }
 
+//----------------------------------------------------------------------------
 void vtkKWMessageDialog::SetText(const char *txt)
 {
   this->SetDialogText(txt);
-  if ( this->Label )
+  if (this->Label)
     {
     this->Label->SetLabel(this->DialogText);
     }
 }
 
+//----------------------------------------------------------------------------
+void vtkKWMessageDialog::SetTextWidth(int w)
+{
+  if (this->Label)
+    {
+    this->Label->SetWidth(w);
+    }
+}
+
+//----------------------------------------------------------------------------
+int vtkKWMessageDialog::GetTextWidth()
+{
+  if (this->Label)
+    {
+    return this->Label->GetWidth();
+    }
+  return 0;
+}
+
+//----------------------------------------------------------------------------
 int vtkKWMessageDialog::Invoke()
 {
   if ( !this->Application )
@@ -259,14 +325,23 @@ int vtkKWMessageDialog::Invoke()
     {
     this->OKButton->Focus();
     }
-  if ( this->OKButton->IsCreated() && this->CancelButton->IsCreated() )
+  if (this->OKButton->IsCreated() && this->CancelButton->IsCreated())
     {
     this->OKButton->SetBind("<Right>", "focus [ tk_focusNext %W ]");
     this->OKButton->SetBind("<Left>",  "focus [ tk_focusPrev %W ]");
     this->CancelButton->SetBind("<Right>", "focus [ tk_focusNext %W ]");
     this->CancelButton->SetBind("<Left>",  "focus [ tk_focusPrev %W ]");
+    if (this->OtherButton->IsCreated())
+      {
+      this->OtherButton->SetBind("<Right>", "focus [ tk_focusNext %W ]");
+      this->OtherButton->SetBind("<Left>",  "focus [ tk_focusPrev %W ]");
+      }
     }
-  
+  if (this->Options & vtkKWMessageDialog::InvokeAtPointer)
+    {
+    this->InvokeAtPointerOn();
+    }
+
   this->Script("wm resizable %s 0 0", this->GetWidgetName());
 
   int res = vtkKWDialog::Invoke();
@@ -293,6 +368,7 @@ int vtkKWMessageDialog::Invoke()
   return res;
 }
 
+//----------------------------------------------------------------------------
 void vtkKWMessageDialog::SetIcon()
 {
   if ( this->Options & vtkKWMessageDialog::ErrorIcon )
@@ -322,6 +398,7 @@ void vtkKWMessageDialog::SetIcon()
                this->Icon->GetWidgetName());
 }
 
+//----------------------------------------------------------------------------
 void vtkKWMessageDialog::PopupMessage(vtkKWApplication *app, vtkKWWindow *win,
                                       const char* title, 
                                       const char*message, int options)
@@ -339,6 +416,7 @@ void vtkKWMessageDialog::PopupMessage(vtkKWApplication *app, vtkKWWindow *win,
   dlg2->Delete();
 }
 
+//----------------------------------------------------------------------------
 int vtkKWMessageDialog::PopupYesNo(vtkKWApplication *app, vtkKWWindow *win,
                                    const char* name, 
                                    const char* title, const char* message,
@@ -360,6 +438,7 @@ int vtkKWMessageDialog::PopupYesNo(vtkKWApplication *app, vtkKWWindow *win,
   return ret;
 }
 
+//----------------------------------------------------------------------------
 int vtkKWMessageDialog::PopupYesNo(vtkKWApplication *app, vtkKWWindow *win,
                                    const char* title, 
                                    const char*message, int options)
@@ -368,6 +447,7 @@ int vtkKWMessageDialog::PopupYesNo(vtkKWApplication *app, vtkKWWindow *win,
                                         options);
 }
 
+//----------------------------------------------------------------------------
 int vtkKWMessageDialog::PopupOkCancel(vtkKWApplication *app, vtkKWWindow *win,
                                       const char* title, 
                                       const char*message, int options)
@@ -386,10 +466,107 @@ int vtkKWMessageDialog::PopupOkCancel(vtkKWApplication *app, vtkKWWindow *win,
   return ret;
 }
 
+//----------------------------------------------------------------------------
 int vtkKWMessageDialog::GetRememberMessage()
 {
   int res = this->CheckButton->GetState();
   return res;
+}
+
+//----------------------------------------------------------------------------
+void vtkKWMessageDialog::Other()
+{
+  this->Script("wm withdraw %s",this->GetWidgetName());
+  this->ReleaseGrab();
+  this->Done = 3;  
+}
+
+//----------------------------------------------------------------------------
+int vtkKWMessageDialog::GetWidth()
+{
+  int width = this->Superclass::GetWidth();
+
+  if (!this->IsCreated())
+    {
+    return width;
+    }
+
+  // GetWidth() is called by vtkKWDialog when it's time to center the
+  // dialog. Unfortunately, since the widget has not been mapped at that
+  // time, 'winfo width' will most probably return 1, and 'winfo reqwidth'
+  // will return the default size of the toplevel. Let's try to help a bit
+  // by checking the size of the internal frames (which width can be set
+  // explicitly).
+
+  if (this->TopFrame)
+    {
+    int iwidth = atoi(this->Script("winfo reqwidth %s", 
+                                   this->TopFrame->GetWidgetName()));
+    if (iwidth > width)
+      {
+      width = iwidth;
+      }
+    }
+
+  if (this->MessageDialogFrame)
+    {
+    int iwidth = atoi(this->Script("winfo reqwidth %s", 
+                                   this->MessageDialogFrame->GetWidgetName()));
+    if (iwidth > width)
+      {
+      width = iwidth;
+      }
+    }
+
+  if (this->BottomFrame)
+    {
+    int iwidth = atoi(this->Script("winfo reqwidth %s", 
+                                   this->BottomFrame->GetWidgetName()));
+    if (iwidth > width)
+      {
+      width = iwidth;
+      }
+    }
+
+  return width;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWMessageDialog::GetHeight()
+{
+  int height = this->Superclass::GetHeight();
+
+  if (!this->IsCreated())
+    {
+    return height;
+    }
+
+  // GetHeight() is called by vtkKWDialog when it's time to center the
+  // dialog. Unfortunately, since the widget has not been mapped at that
+  // time, 'winfo height' will most probably return 1, and 'winfo reqheight'
+  // will return the default size of the toplevel. Let's try to help a bit
+  // by checking the size of the internal frames (which height can be set
+  // explicitly).
+
+  if (this->TopFrame)
+    {
+    height += atoi(this->Script("winfo reqheight %s", 
+                                this->TopFrame->GetWidgetName()));
+    }
+
+  if (this->MessageDialogFrame)
+    {
+    height += atoi(this->Script("winfo reqheight %s", 
+                                this->MessageDialogFrame->GetWidgetName()));
+    }
+
+  if (this->BottomFrame)
+    {
+    height += atoi(this->Script("winfo reqheight %s", 
+                                this->BottomFrame->GetWidgetName()));
+    }
+
+  return height;
 }
 
 //----------------------------------------------------------------------------
@@ -405,9 +582,14 @@ void vtkKWMessageDialog::PrintSelf(ostream& os, vtkIndent indent)
                                        this->OKButtonText:"none") << endl;
   os << indent << "CancelButtonText: " << (this->CancelButtonText?
                                        this->CancelButtonText:"none") << endl;
+  os << indent << "OtherButtonText: " << (this->OtherButtonText?
+                                       this->OtherButtonText:"none") << endl;
   os << indent << "DialogName: " << (this->DialogName?this->DialogName:"none")
      << endl;
   os << indent << "TopFrame: " << this->TopFrame << endl;
   os << indent << "BottomFrame: " << this->BottomFrame << endl;
+  os << indent << "OKButton: " << this->OKButton << endl;
+  os << indent << "CancelButton: " << this->CancelButton << endl;
+  os << indent << "OtherButton: " << this->OtherButton << endl;
 }
 

@@ -286,8 +286,6 @@ protected:
   char        *EndCommand;
   char        *EntryCommand;
 
-  int         EntryResolution;
-
   float       ThumbWheelShift;
 
   int         InteractionModes[3];

@@ -72,11 +72,17 @@ public:
   vtkGetMacro(OutputShadingOnly, int);
   vtkSetMacro(OutputShadingOnly, int);
 
+  // Description:
+  // Output a given number of components only
+  vtkSetClampMacro(NumberOfComponents, int, 1, VTK_MAX_VRCOMP);
+  vtkGetMacro(NumberOfComponents, int);
+
 protected:
   vtkXMLVolumePropertyWriter();
   ~vtkXMLVolumePropertyWriter() {};  
   
   int OutputShadingOnly;
+  int NumberOfComponents;
 
   // Description:
   // Add the root element attributes.

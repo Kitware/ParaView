@@ -58,15 +58,19 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVProcessModule.h"
 #include "vtkString.h"
 #include "vtkStringList.h"
+#include "vtkTclUtil.h"
 
 #include <vtkstd/string>
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVServerFileDialog );
-vtkCxxRevisionMacro(vtkPVServerFileDialog, "1.22");
+vtkCxxRevisionMacro(vtkPVServerFileDialog, "1.22.2.1");
 
 int vtkPVServerFileDialogCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
+int vtkStringListCommand(ClientData cd, Tcl_Interp *interp,
+                         int argc, char *argv[]);
+
 
 // Taken from source selection list  we need ne images.
 /* 
@@ -581,9 +585,24 @@ void vtkPVServerFileDialog::LoadSaveCallback()
     newdir.rdbuf()->freeze(0);
     this->SetSelectedDirectory(0);
     return;
-    } 
-
+    }
+  
   vtkstd::string fileName = this->FileNameEntry->GetValue();
+  
+  vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
+  if(fileName[0] == '/' || fileName[1] == ':')
+    {
+    pm->RootScript("file isdirectory {%s}", fileName.c_str());
+    if(atoi(pm->GetRootResult()) == 1)
+      {
+      this->FileNameEntry->SetValue("");
+      this->SetLastPath(fileName.c_str());
+      this->ConvertLastPath();
+      this->Update();
+      return;
+      }
+    }
+  
   vtkstd::string::size_type pos = fileName.find_last_of("/.");
   if(!(pos != fileName.npos && fileName[pos] == '.'))
     {
@@ -637,12 +656,23 @@ void vtkPVServerFileDialog::CancelCallback()
 //----------------------------------------------------------------------------
 void vtkPVServerFileDialog::DownDirectoryCallback()
 {
-  // If this is the top-level directory on a Windows drive letter,
-  // present a list of drive letters.
-  if((this->LastPath[0] != '/') &&
-     (this->LastPath[1] == ':') &&
-     (this->LastPath[2] == '/') &&
-     (this->LastPath[3] == 0))
+  // If this is the top-level directory on a Windows drive letter or
+  // network drive, present a list of drive letters.
+  int numSlashes=0;
+  for(const char* lpp = this->LastPath; *lpp; ++lpp)
+    {
+    if(*lpp == '/')
+      {
+      ++numSlashes;
+      }
+    }
+  if(((this->LastPath[0] != '/') &&
+      (this->LastPath[1] == ':') &&
+      (this->LastPath[2] == '/') &&
+      (this->LastPath[3] == 0)) ||
+     ((this->LastPath[0] == '/') &&
+      (this->LastPath[1] == '/') &&
+      (numSlashes == 3)))
     {
     this->SetLastPath("<GET_DRIVE_LETTERS>");
     this->Update();
@@ -680,78 +710,44 @@ void vtkPVServerFileDialog::DownDirectoryCallback()
 //----------------------------------------------------------------------------
 void vtkPVServerFileDialog::ExtensionsMenuButtonCallback(int typeIdx)
 {
-  const char *extensions;
-  char *extensionsCopy;
-  char *ptr;
-  char *extensionStart;
-  
-  extensions = this->FileTypeStrings->GetString(typeIdx);
-
-  // Make a copy of the extensions string 
-  // so we can change characters while we parse.
-  extensionsCopy = new char[strlen(extensions) + 1];
-  strcpy(extensionsCopy, extensions);
-
   // Clear previous extensions.
   this->ExtensionStrings->RemoveAllItems();
 
-  // Find the first extension after the parenthesis.
-  ptr = extensionsCopy;
-  while (*ptr != '(')
+  vtkstd::string extensions = this->FileTypeStrings->GetString(typeIdx);
+  for(unsigned int i = 0; i < extensions.length(); ++i)
     {
-    if (*ptr == '\0')
+    if(i < extensions.length() && extensions[i] == '*')
       {
-      delete [] extensionsCopy;
-      this->Update();
-      return;
+      ++i;
       }
-    ++ptr;
+    if(i < extensions.length() && extensions[i] == '.')
+      {
+      ++i;
+      }
+    
+    unsigned int extensionStart = i;
+#ifdef _WIN32
+    while(i < extensions.length() && extensions[i] != ';')
+#else
+    while(i < extensions.length() && extensions[i] != ' ')
+#endif
+      {
+      ++i;
+      }
+    
+    if(i > extensionStart)
+      {
+      vtkstd::string ext = extensions.substr(extensionStart,
+                                             i - extensionStart);
+      this->ExtensionStrings->AddString(ext.c_str());
+      }
     }
-  // Pass the parenthesis.
-  ++ptr;
-
-  while (*ptr != ')' && *ptr != '\0')
-    {
-    // Since we formated the string, we know that extensions always start with "*."
-    // But, lets be general and handle spaces.
-    while (*ptr == ' ')
-      {
-      ++ptr;
-      }
-    if (ptr[0] != '*' && ptr[1] != '.')
-      {
-      vtkErrorMacro("All extensions should start with *.");
-      delete [] extensionsCopy;
-      this->Update();
-      return;
-      }
-    ptr += 2;
   
-    extensionStart = ptr;
-    while (*ptr != ';' && *ptr != ')') 
-      {
-      if (*ptr == '\0')
-        { // Handle unexpected end of string properly.
-        delete [] extensionsCopy;
-        this->Update();
-        return;
-        }
-      ++ptr;
-      }
-    // Add end of string character to terminate extension.
-    *ptr = '\0';
-    ++ptr;
-    // Add extension to the extension list.
-    this->ExtensionStrings->AddString(extensionStart);
-    }
-
-  delete [] extensionsCopy;
-
   ostrstream label;
   label << this->FileTypeDescriptions->GetString(typeIdx) << " ";
   if (this->ExtensionStrings->GetNumberOfStrings() <= 1)
     {
-    label << extensions;
+    label << extensions.c_str();
     }
   label << ends;
 
@@ -765,174 +761,72 @@ void vtkPVServerFileDialog::ExtensionsMenuButtonCallback(int typeIdx)
 //----------------------------------------------------------------------------
 void vtkPVServerFileDialog::UpdateExtensionsMenu()
 {
-  int extensionsFinished, extensionCount;
-  int typesFinished;
-  int typeIdx;
   char methodAndArgString[256];
-  char* ptr1;
-  char* fileTypeDescription;
-  char* fileExtension;
-  char* fileTypesCopy;
 
   if (this->FileTypes == NULL)
     {
     return;
     }
   this->FileTypeStrings->RemoveAllItems();
-
-  // Make a copy of the file type so we can modify the string.
-  fileTypesCopy = new char[strlen(this->FileTypes) + 1];
-  strcpy(fileTypesCopy, this->FileTypes);
   this->ExtensionsMenuButton->GetMenu()->DeleteAllMenuItems();
-
-  ptr1 = fileTypesCopy;
-
-  char separator;
-#ifdef _WIN32
-  separator = ';';
-#else
-  separator = ' ';
-#endif
   
-  typesFinished = 0;
-  typeIdx = 0;
-  while ( ! typesFinished)
+  vtkTclGetObjectFromPointer(this->Application->GetMainInterp(),
+                             this->FileTypeStrings, vtkStringListCommand);
+  char* stringsTcl = vtkString::Duplicate(
+    Tcl_GetStringResult(this->Application->GetMainInterp()));
+  vtkTclGetObjectFromPointer(this->Application->GetMainInterp(),
+                             this->FileTypeDescriptions, vtkStringListCommand);
+  char* descriptionsTcl = vtkString::Duplicate(
+    Tcl_GetStringResult(this->Application->GetMainInterp()));
+  this->Script(
+    "namespace eval ::paraview::vtkPVServerFileDialog {\n"
+    "  proc ParseFileTypes {types extensions descriptions} {\n"
+    "    $extensions RemoveAllItems\n"
+    "    $descriptions RemoveAllItems\n"
+    "    foreach t $types {\n"
+    "      $descriptions AddString [lindex $t 0]\n"
+    "      $extensions AddString [lindex $t 1]\n"
+    "    }\n"
+    "  }\n"
+    "  ParseFileTypes {%s} %s %s\n"
+    "}\n", this->FileTypes, stringsTcl, descriptionsTcl);
+  delete [] stringsTcl;
+  delete [] descriptionsTcl;
+  
+  const unsigned int maxExtensionsLength = 16;
+  for(int i=0; i < this->FileTypeStrings->GetNumberOfStrings(); ++i)
     {
     ostrstream label;
-    ostrstream extensions;
-    // Take off first and second Parenthesis for type.
-    while (*ptr1 == ' ' || *ptr1 == '{')
+    vtkstd::string exts = this->FileTypeStrings->GetString(i);
+    if(exts.length() > maxExtensionsLength)
       {
-      ++ptr1;
-      }
-    fileTypeDescription = ptr1;
-    // find end of file type description (paren).
-    while ( ! typesFinished && *ptr1 != '}')
-      {
-      if (*ptr1 == '\0')
-        { // No more types.
-        typesFinished = 1;
-        }
-      else
+      vtkstd::string::size_type pos = exts.rfind(";", maxExtensionsLength);
+      if(pos != vtkstd::string::npos)
         {
-        ++ptr1;
+        exts = exts.substr(0, pos);
+        exts += ";...";
         }
       }
-    // Put a end of string character to terminate the fileTypeDescription.
-    // It overwrites the parenthesis.
-    *ptr1 = '\0';
-    ++ptr1; // Skip the string termination we put in.
-    // Put the file type in the new string/description/label.
-    label << fileTypeDescription << " (";
-    extensions << "(";
-
-    // Pick out all of the extensions.
-    extensionsFinished = 0;
-    extensionCount = 0;
-    while ( ! typesFinished && ! extensionsFinished)
-      {
-      // Find the start of the first extension.
-      while ( ! extensionsFinished && 
-             (*ptr1==' ' || *ptr1=='{' || *ptr1=='.' || *ptr1=='*'))
-        {
-        if (*ptr1 == '\0' || *ptr1 == '}' )
-          {
-          extensionsFinished = 1;
-          }
-        ++ptr1;
-        }
-      fileExtension = ptr1;
-      // Now find the end of the extension
-      while ( ! extensionsFinished && *ptr1!='}' && *ptr1!= separator )
-        {
-        if (*ptr1 == '\0')
-          {
-          extensionsFinished = 1;
-          }
-        ++ptr1;
-        }
-      if ( ! extensionsFinished)
-        {
-        if (*ptr1 == '}')
-          { // last extension.
-          extensionsFinished = 1;
-          }
-        // Record the extension
-        *ptr1 = '\0';
-        ++ptr1; // Skip the string termination we put in.
-        if (extensionCount > 0)
-          {
-          if (extensionCount < 3)
-            { // hack to get "..."
-            label << ";";
-            }
-          if (extensionCount == 3)
-            {
-            label << "...";
-            }
-          extensions << ";";
-          }
-        if (fileExtension[0] == '\0')
-          { // special case happens with "all files" "*.*".  
-          // Will also happen with an empty list which I do not think is valid.
-          if (extensionCount < 2)
-            { // hack to get "..."
-            label << "*.*";
-            }
-          extensions << "*.*";
-          }
-        else
-          {
-          if (extensionCount < 2)
-            { // hack to get "..."
-            label << "*." << fileExtension;
-            }
-           extensions << "*." << fileExtension;
-          }
-        ++extensionCount;
-        }
-      }
-    // Pass the last bracket for type
-    while ( ! typesFinished && *ptr1 != '}')
-      {
-      if ( *ptr1 == '\0')
-        {
-        vtkErrorMacro("Missing last type bracket.");
-        typesFinished = 1;
-        }
-      ++ptr1;
-      }
-    ++ptr1;
     
-    if ( ! typesFinished)
+    if(exts[0] == '.')
       {
-      label << ")" << ends;
-      extensions << ")" << ends;
-      sprintf(methodAndArgString, "ExtensionsMenuButtonCallback %d", typeIdx);
-      this->ExtensionsMenuButton->GetMenu()->AddCommand(label.str(), this,
-                                                        methodAndArgString);
-      this->FileTypeStrings->AddString(extensions.str());
-      this->FileTypeDescriptions->AddString(fileTypeDescription);
-      ++typeIdx;
+      exts = "*"+exts;
       }
+    
+    label << this->FileTypeDescriptions->GetString(i) << " ("
+          << exts.c_str() << ")" << ends;
+    sprintf(methodAndArgString, "ExtensionsMenuButtonCallback %d", i);
+    this->ExtensionsMenuButton->GetMenu()->AddCommand(
+      label.str(), this, methodAndArgString);
     label.rdbuf()->freeze(0);
-    extensions.rdbuf()->freeze(0);
-    }
-
+    }  
+  
   // Default file type is the first in the list.
-  if (typeIdx > 0)
+  if (this->FileTypeStrings->GetNumberOfStrings() > 0)
     {
     this->ExtensionsMenuButtonCallback(0);
     }
-
-  if (fileTypesCopy)
-    {
-    delete [] fileTypesCopy;
-    fileTypesCopy = NULL;
-    }
 }
-
-
 
 //----------------------------------------------------------------------------
 int vtkPVServerFileDialog::CheckExtension(const char* name)
@@ -969,7 +863,6 @@ int vtkPVServerFileDialog::CheckExtension(const char* name)
     {
     return 0;
     }
-
   for (idx = 0; idx < num; ++idx)
     {
     ext = this->ExtensionStrings->GetString(idx);
@@ -1017,7 +910,6 @@ void vtkPVServerFileDialog::Update()
        ->GetDirectoryListing(this->LastPath, dirs, files, perm)))
     {
     // Directory did not exist, use current directory instead.
-    vtkErrorMacro("Cannot open directory: " << this->LastPath);
     pm->RootScript("pwd");
     this->SetLastPath(pm->GetRootResult());
     this->ConvertLastPath();
@@ -1076,7 +968,7 @@ int vtkPVServerFileDialog::Insert(const char* name, int y, int directory)
                x + image_icon_max_width / 2, y);
   if (this->Application->GetMainInterp()->result)
     {
-    char *tmp = 
+    tmp = 
       vtkString::Duplicate(this->Application->GetMainInterp()->result);
     if (directory)
       {

@@ -48,11 +48,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVArrayInformation.h"
 #include "vtkCollection.h"
 #include "vtkPVInputRequirement.h"
+#include "vtkCTHData.h"
 
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVInputProperty);
-vtkCxxRevisionMacro(vtkPVInputProperty, "1.3");
+vtkCxxRevisionMacro(vtkPVInputProperty, "1.3.4.1");
 
 //----------------------------------------------------------------------------
 vtkPVInputProperty::vtkPVInputProperty()
@@ -152,6 +153,11 @@ int vtkPVInputProperty::GetIsValidInput(vtkPVSource *input, vtkPVSource *pvs)
     }
   if (strcmp(this->Type, "vtkStructuredGrid") == 0 &&
       info->GetDataSetType() == VTK_STRUCTURED_GRID)
+    {
+    return 1;
+    }
+  if (strcmp(this->Type, "vtkCTHData") == 0 &&
+      info->GetDataSetType() == VTK_CTH_DATA)
     {
     return 1;
     }

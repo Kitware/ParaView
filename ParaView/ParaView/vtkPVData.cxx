@@ -101,7 +101,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.210.2.7");
+vtkCxxRevisionMacro(vtkPVData, "1.210.2.8");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -136,6 +136,7 @@ vtkPVData::vtkPVData()
   this->TypeLabel = vtkKWLabel::New();
   this->NumCellsLabel = vtkKWLabel::New();
   this->NumPointsLabel = vtkKWLabel::New();
+  this->MemorySizeLabel = vtkKWLabel::New();
   
   this->BoundsDisplay = vtkKWBoundsDisplay::New();
   this->BoundsDisplay->ShowHideFrameOn();
@@ -148,7 +149,7 @@ vtkPVData::vtkPVData()
   this->ColorMenuLabel = vtkKWLabel::New();
   this->ColorMenu = vtkKWOptionMenu::New();
 
-  this->DirectColorCheck = vtkKWCheckButton::New();
+  this->MapScalarsCheck = vtkKWCheckButton::New();
   this->EditColorMapButton = vtkKWPushButton::New();
   
   this->ColorButton = vtkKWChangeColorButton::New();
@@ -234,6 +235,9 @@ vtkPVData::~vtkPVData()
   this->NumPointsLabel->Delete();
   this->NumPointsLabel = NULL;
   
+  this->MemorySizeLabel->Delete();
+  this->MemorySizeLabel = NULL;
+  
   this->BoundsDisplay->Delete();
   this->BoundsDisplay = NULL;
   
@@ -252,8 +256,8 @@ vtkPVData::~vtkPVData()
   this->EditColorMapButton->Delete();
   this->EditColorMapButton = NULL;
 
-  this->DirectColorCheck->Delete();
-  this->DirectColorCheck = NULL;  
+  this->MapScalarsCheck->Delete();
+  this->MapScalarsCheck = NULL;  
     
   this->ColorButton->Delete();
   this->ColorButton = NULL;
@@ -569,14 +573,14 @@ void vtkPVData::CreateProperties()
     "Edit the constant color for the geometry.");
 
 
-  this->DirectColorCheck->SetParent(this->ColorFrame->GetFrame());
-  this->DirectColorCheck->Create(this->Application, "-text {Map Scalars}");
-  this->DirectColorCheck->SetState(1);
-  this->DirectColorCheck->SetBalloonHelpString(
-    "Toggle the visibility of the scalar bar for this data.");
+  this->MapScalarsCheck->SetParent(this->ColorFrame->GetFrame());
+  this->MapScalarsCheck->Create(this->Application, "-text {Map Scalars}");
+  this->MapScalarsCheck->SetState(0);
+  this->MapScalarsCheck->SetBalloonHelpString(
+    "Pass attriubte through color map or use unsigned char values as color.");
   this->Application->Script(
-    "%s configure -command {%s DirectColorCheckCallback}",
-    this->DirectColorCheck->GetWidgetName(),
+    "%s configure -command {%s MapScalarsCheckCallback}",
+    this->MapScalarsCheck->GetWidgetName(),
     this->GetTclName());
 
   this->EditColorMapButton->SetParent(this->ColorFrame->GetFrame());
@@ -601,13 +605,13 @@ void vtkPVData::CreateProperties()
   this->ColorButton->EnabledOff();
 
   this->Script("grid %s %s -sticky wns",
-               this->DirectColorCheck->GetWidgetName(),
+               this->MapScalarsCheck->GetWidgetName(),
                this->EditColorMapButton->GetWidgetName());
 
   this->Script("grid %s -sticky news -padx %d -pady %d",
                this->EditColorMapButton->GetWidgetName(),
                col_1_padx, button_pady);
-  this->DirectColorCheck->EnabledOff();
+  this->MapScalarsCheck->EnabledOff();
   this->EditColorMapButton->EnabledOff();
 
   // Display style
@@ -631,13 +635,14 @@ void vtkPVData::CreateProperties()
 
   this->RepresentationMenu->SetParent(this->DisplayStyleFrame->GetFrame());
   this->RepresentationMenu->Create(this->Application, "");
-  this->RepresentationMenu->AddEntryWithCommand("Wireframe", this,
-                                                "DrawWireframe");
+  this->RepresentationMenu->AddEntryWithCommand("Outline", this,
+                                                "DrawOutline");
   this->RepresentationMenu->AddEntryWithCommand("Surface", this,
                                                 "DrawSurface");
-  this->RepresentationMenu->AddEntryWithCommand("Points", this,
+  this->RepresentationMenu->AddEntryWithCommand("Wireframe of Surface", this,
+                                                "DrawWireframe");
+  this->RepresentationMenu->AddEntryWithCommand("Points of Surface", this,
                                                 "DrawPoints");
-  this->RepresentationMenu->SetValue("Surface");
   this->RepresentationMenu->SetBalloonHelpString(
     "Choose what geometry should be used to represent the dataset.");
 
@@ -987,6 +992,9 @@ void vtkPVData::CreateProperties()
   this->NumPointsLabel->SetParent(this->StatsFrame->GetFrame());
   this->NumPointsLabel->Create(this->Application, "");
   
+  this->MemorySizeLabel->SetParent(this->StatsFrame->GetFrame());
+  this->MemorySizeLabel->Create(this->Application, "");
+
   this->BoundsDisplay->SetParent(this->InformationFrame->GetFrame());
   this->BoundsDisplay->Create(this->Application, "");
   
@@ -994,10 +1002,11 @@ void vtkPVData::CreateProperties()
   this->ExtentDisplay->Create(this->Application, "");
   this->ExtentDisplay->SetLabel("Extents");
   
-  this->Script("pack %s %s %s -side top -anchor nw",
+  this->Script("pack %s %s %s %s -side top -anchor nw",
                this->TypeLabel->GetWidgetName(),
                this->NumCellsLabel->GetWidgetName(),
-               this->NumPointsLabel->GetWidgetName());
+               this->NumPointsLabel->GetWidgetName(),
+               this->MemorySizeLabel->GetWidgetName());
 
   this->Script("pack %s %s -fill x -expand t -pady 2", 
                this->StatsFrame->GetWidgetName(),
@@ -1144,13 +1153,21 @@ void vtkPVData::UpdatePropertiesInternal()
   this->TypeLabel->SetLabel(type.str());
   type.rdbuf()->freeze(0);
   
-  sprintf(tmp, "Number of cells: %d", 
-          dataInfo->GetNumberOfCells());
-  this->NumCellsLabel->SetLabel(tmp);
-  sprintf(tmp, "Number of points: %d", 
-          dataInfo->GetNumberOfPoints());
-  this->NumPointsLabel->SetLabel(tmp);
+  ostrstream numcells;
+  numcells << "Number of cells: " << dataInfo->GetNumberOfCells() << ends;
+  this->NumCellsLabel->SetLabel(numcells.str());
+  numcells.rdbuf()->freeze(0);
+
+  ostrstream numpts;
+  numpts << "Number of points: " << dataInfo->GetNumberOfPoints() << ends;
+  this->NumPointsLabel->SetLabel(numpts.str());
+  numpts.rdbuf()->freeze(0);
   
+  ostrstream memsize;
+  memsize << "Memory: " << ((float)(dataInfo->GetMemorySize())/1000.0) << " MBytes" << ends;
+  this->NumCellsLabel->SetLabel(memsize.str());
+  memsize.rdbuf()->freeze(0);
+
   dataInfo->GetBounds(bounds);
   this->BoundsDisplay->SetBounds(bounds);
   if (this->CubeAxesTclName)
@@ -1357,7 +1374,7 @@ void vtkPVData::ColorByPropertyInternal()
 
   this->SetPVColorMap(NULL);
 
-  this->DirectColorCheck->EnabledOff();
+  this->MapScalarsCheck->EnabledOff();
   this->EditColorMapButton->EnabledOff();
   this->ScalarBarCheck->EnabledOff();
 
@@ -1419,7 +1436,7 @@ void vtkPVData::ColorByPointFieldInternal(const char *name, int numComps)
     part->GetPartDisplay()->ColorByArray(this->PVColorMap, VTK_POINT_DATA_FIELD);
     } 
   this->ColorButton->EnabledOff();
-  this->UpdateDirectColorCheck(
+  this->UpdateMapScalarsCheck(
            this->PVSource->GetDataInformation()->GetPointDataInformation(),
            name);
 
@@ -1479,7 +1496,7 @@ void vtkPVData::ColorByCellFieldInternal(const char *name, int numComps)
     }
 
   this->ColorButton->EnabledOff();
-  this->UpdateDirectColorCheck(
+  this->UpdateMapScalarsCheck(
            this->PVSource->GetDataInformation()->GetCellDataInformation(),
            name);
 
@@ -1491,7 +1508,7 @@ void vtkPVData::ColorByCellFieldInternal(const char *name, int numComps)
 
 
 //----------------------------------------------------------------------------
-void vtkPVData::UpdateDirectColorCheck(vtkPVDataSetAttributesInformation* info,
+void vtkPVData::UpdateMapScalarsCheck(vtkPVDataSetAttributesInformation* info,
                                        const char* name)
 {
   vtkPVArrayInformation* arrayInfo;
@@ -1502,35 +1519,37 @@ void vtkPVData::UpdateDirectColorCheck(vtkPVDataSetAttributesInformation* info,
   if (arrayInfo == NULL || 
       arrayInfo->GetDataType() != VTK_UNSIGNED_CHAR)
     { // Direct mapping not an option.
-    this->DirectColorCheck->EnabledOff();
+    this->MapScalarsCheck->SetState(1);
+    this->MapScalarsCheck->EnabledOff();
     this->ScalarBarCheck->EnabledOn();
     this->EditColorMapButton->EnabledOn();
     return;
     }
 
   // Number of component restriction.
-  if (arrayInfo->GetNumberOfComponents() != 1 &&
-      arrayInfo->GetNumberOfComponents() != 3)
+  if (arrayInfo->GetNumberOfComponents() != 3)
     { // I would like to have two as an option also ...
-    this->DirectColorCheck->EnabledOff();
+    // One component causes more trouble than it is worth.
+    this->MapScalarsCheck->SetState(1);
+    this->MapScalarsCheck->EnabledOff();
     this->ScalarBarCheck->EnabledOn();
     this->EditColorMapButton->EnabledOn();
     return;
     }
 
   // Direct color map is an option.
-  this->DirectColorCheck->EnabledOn();
+  this->MapScalarsCheck->EnabledOn();
 
   // I might like to store the default in another variable.
-  if (this->DirectColorCheck->GetState())
-    {
-    this->ScalarBarCheck->EnabledOff();
-    this->EditColorMapButton->EnabledOff();
-    }
-  else
+  if (this->MapScalarsCheck->GetState())
     {
     this->ScalarBarCheck->EnabledOn();
     this->EditColorMapButton->EnabledOn();
+    }
+  else
+    {
+    this->ScalarBarCheck->EnabledOff();
+    this->EditColorMapButton->EnabledOff();
     }
     
 }
@@ -1538,7 +1557,7 @@ void vtkPVData::UpdateDirectColorCheck(vtkPVDataSetAttributesInformation* info,
 //----------------------------------------------------------------------------
 void vtkPVData::SetRepresentation(const char* repr)
 {
-  if ( vtkString::Equals(repr, "Wireframe") )
+  if ( vtkString::Equals(repr, "Wireframe of Surface") )
     {
     this->DrawWireframe();
     }
@@ -1546,9 +1565,13 @@ void vtkPVData::SetRepresentation(const char* repr)
     {
     this->DrawSurface();
     }
-  else if ( vtkString::Equals(repr, "Points") )
+  else if ( vtkString::Equals(repr, "Points of Surface") )
     {
     this->DrawPoints();
+    }
+  else if ( vtkString::Equals(repr, "Outline") )
+    {
+    this->DrawOutline();
     }
   else
     {
@@ -1564,8 +1587,12 @@ void vtkPVData::DrawWireframe()
   vtkPVPart *part;
   int idx, num;
   
-  this->AddTraceEntry("$kw(%s) DrawWireframe", this->GetTclName());
-
+  if (this->GetPVSource()->GetInitialized())
+    {
+    this->AddTraceEntry("$kw(%s) DrawWireframe", this->GetTclName());
+    }
+  this->RepresentationMenu->SetValue("Wireframe of Surface");
+  
   // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   // We could move the property into vtkPVData so parts would share one object.
   // Well, this would complicate initialization.  We would have to pass
@@ -1590,6 +1617,16 @@ void vtkPVData::DrawWireframe()
       pvApp->BroadcastScript("%s SetRepresentationToWireframe",
                              part->GetPartDisplay()->GetPropertyTclName());
       }
+    if (part->GetGeometryTclName())
+      {
+      this->Script("%s GetUseOutline", part->GetGeometryTclName());
+      if (vtkKWObject::GetIntegerResult(pvApp))
+        {
+        pvApp->BroadcastScript("%s SetUseOutline 0",
+                               part->GetGeometryTclName());
+        part->GetPartDisplay()->InvalidateGeometry();
+        }
+      }
     }
 
   if ( this->GetPVRenderView() )
@@ -1605,9 +1642,12 @@ void vtkPVData::DrawPoints()
   vtkPVPart *part;
   int idx, num;
 
-  this->AddTraceEntry("$kw(%s) DrawPoints", this->GetTclName());
-  this->RepresentationMenu->SetValue("Points");
-
+  if (this->GetPVSource()->GetInitialized())
+    {
+    this->AddTraceEntry("$kw(%s) DrawPoints", this->GetTclName());
+    }
+  this->RepresentationMenu->SetValue("Points of Surface");
+  
   num = this->GetPVSource()->GetNumberOfParts();
   for (idx = 0; idx < num; ++idx)
     {
@@ -1627,6 +1667,16 @@ void vtkPVData::DrawPoints()
       pvApp->BroadcastScript("%s SetRepresentationToPoints",
                              part->GetPartDisplay()->GetPropertyTclName());
       }
+    if (part->GetGeometryTclName())
+      {
+      this->Script("%s GetUseOutline", part->GetGeometryTclName());
+      if (vtkKWObject::GetIntegerResult(pvApp))
+        {
+        pvApp->BroadcastScript("%s SetUseOutline 0",
+                               part->GetGeometryTclName());
+        part->GetPartDisplay()->InvalidateGeometry();
+        }
+      }
     }
   
   if ( this->GetPVRenderView() )
@@ -1642,9 +1692,11 @@ void vtkPVData::DrawSurface()
   vtkPVPart *part;
   int num, idx;
   
-  this->AddTraceEntry("$kw(%s) DrawSurface", this->GetTclName());
+  if (this->GetPVSource()->GetInitialized())
+    {
+    this->AddTraceEntry("$kw(%s) DrawSurface", this->GetTclName());
+    }
   this->RepresentationMenu->SetValue("Surface");
-
 
   num = this->GetPVSource()->GetNumberOfParts();
   for (idx = 0; idx < num; ++idx)
@@ -1664,8 +1716,66 @@ void vtkPVData::DrawSurface()
                                part->GetPartDisplay()->GetPropertyTclName());
         }
       }
+    if (part->GetGeometryTclName())
+      {
+      this->Script("%s GetUseOutline", part->GetGeometryTclName());
+      if (vtkKWObject::GetIntegerResult(pvApp))
+        {
+        pvApp->BroadcastScript("%s SetUseOutline 0",
+                               part->GetGeometryTclName());
+        part->GetPartDisplay()->InvalidateGeometry();
+        }
+      }
     }
   this->PreviousWasSolid = 1;
+
+  if ( this->GetPVRenderView() )
+    {
+    this->GetPVRenderView()->EventuallyRender();
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVData::DrawOutline()
+{
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  vtkPVPart *part;
+  int num, idx;
+  
+  if (this->GetPVSource()->GetInitialized())
+    {
+    this->AddTraceEntry("$kw(%s) DrawOutline", this->GetTclName());
+    }
+  this->RepresentationMenu->SetValue("Outline");
+
+  num = this->GetPVSource()->GetNumberOfParts();
+  for (idx = 0; idx < num; ++idx)
+    {
+    part = this->GetPVSource()->GetPart(idx);
+    if (part->GetPartDisplay()->GetPropertyTclName())
+      {
+      if (this->PreviousWasSolid)
+        {
+        this->PreviousAmbient = part->GetPartDisplay()->GetProperty()->GetAmbient();
+        this->PreviousDiffuse = part->GetPartDisplay()->GetProperty()->GetDiffuse();
+        this->PreviousSpecular = part->GetPartDisplay()->GetProperty()->GetSpecular();
+        }
+      this->PreviousWasSolid = 0;
+      pvApp->BroadcastScript("%s SetAmbient 1",
+                             part->GetPartDisplay()->GetPropertyTclName());
+      pvApp->BroadcastScript("%s SetDiffuse 0",
+                             part->GetPartDisplay()->GetPropertyTclName());
+      pvApp->BroadcastScript("%s SetSpecular 0",
+                             part->GetPartDisplay()->GetPropertyTclName());
+      pvApp->BroadcastScript("%s SetRepresentationToSurface",
+                             part->GetPartDisplay()->GetPropertyTclName());
+      }
+    if (part->GetGeometryTclName())
+      {
+      pvApp->BroadcastScript("%s SetUseOutline 1", part->GetGeometryTclName());
+      part->GetPartDisplay()->InvalidateGeometry();
+      }
+    }
 
   if ( this->GetPVRenderView() )
     {
@@ -1784,10 +1894,7 @@ void vtkPVData::SetAmbient(float ambient)
 
 
 //----------------------------------------------------------------------------
-// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-// I would like to get rid of this method.  
-// It is no longer needed to set scalar range.
-// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+// Set up the default UI values.  Data information is valid by this time.
 void vtkPVData::Initialize()
 {
 #if 0
@@ -1817,6 +1924,44 @@ void vtkPVData::Initialize()
   this->Script("%s SetInertia 20", this->GetCubeAxesTclName());
 #endif
   
+  // Choose the representation based on the data.
+  // Polydata is always surface.
+  // Structured data is surface when 2d, outline when 3d.
+  int dataSetType = this->GetPVSource()->GetDataInformation()->GetDataSetType();
+  if (dataSetType == VTK_POLY_DATA)
+    {
+    this->SetRepresentation("Surface");
+    }
+  else if (dataSetType == VTK_STRUCTURED_GRID || 
+           dataSetType == VTK_RECTILINEAR_GRID ||
+           dataSetType == VTK_IMAGE_DATA)
+    {
+    int* ext = this->GetPVSource()->GetDataInformation()->GetExtent();
+    if (ext[0] == ext[1] || ext[2] == ext[3] || ext[4] == ext[5])
+      {
+      this->SetRepresentation("Surface");
+      }
+    else
+      {
+      this->SetRepresentation("Outline");
+      }
+    }
+  else if (dataSetType == VTK_UNSTRUCTURED_GRID)
+    {
+    if (this->GetPVSource()->GetDataInformation()->GetNumberOfCells() < 1000000)
+      {
+      this->SetRepresentation("Surface");
+      }
+    else
+      {
+      this->GetPVApplication()->GetMainWindow()->SetStatusText("Using outline for large unstructured grid.");
+      this->SetRepresentation("Outline");
+      }
+    }
+  else
+    {
+    this->SetRepresentation("Outline");
+    }
 }
 
 
@@ -1981,9 +2126,9 @@ void vtkPVData::CubeAxesCheckCallback()
 
 
 //----------------------------------------------------------------------------
-void vtkPVData::DirectColorCheckCallback()
+void vtkPVData::MapScalarsCheckCallback()
 {
-  this->SetDirectColorFlag(this->DirectColorCheck->GetState());
+  this->SetMapScalarsFlag(this->MapScalarsCheck->GetState());
   if ( this->GetPVRenderView() )
     {
     this->GetPVRenderView()->EventuallyRender();
@@ -1991,30 +2136,30 @@ void vtkPVData::DirectColorCheckCallback()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVData::SetDirectColorFlag(int val)
+void vtkPVData::SetMapScalarsFlag(int val)
 {
-  if (this->DirectColorCheck->GetState() != val)
+  if (this->MapScalarsCheck->GetState() != val)
     {
-    this->AddTraceEntry("$kw(%s) SetDirectColorFlag %d", this->GetTclName(), val);
-    this->DirectColorCheck->SetState(val);
+    this->AddTraceEntry("$kw(%s) SetMapScalarsFlag %d", this->GetTclName(), val);
+    this->MapScalarsCheck->SetState(val);
     }
 
   if (val)
     {
-    this->EditColorMapButton->EnabledOff();
-    this->ScalarBarCheck->EnabledOff();
+    this->EditColorMapButton->EnabledOn();
+    this->ScalarBarCheck->EnabledOn();
     }
   else
     {
-    this->EditColorMapButton->EnabledOn();
-    this->ScalarBarCheck->EnabledOn();
+    this->EditColorMapButton->EnabledOff();
+    this->ScalarBarCheck->EnabledOff();
     }
 
   int num, idx;
   num = this->PVSource->GetNumberOfParts();
   for (idx = 0; idx < num; ++idx)
     {
-    this->PVSource->GetPart(idx)->GetPartDisplay()->SetDirectColorFlag(val);
+    this->PVSource->GetPart(idx)->GetPartDisplay()->SetDirectColorFlag(!val);
     }
 }
 
@@ -2822,8 +2967,8 @@ void vtkPVData::UpdateActorControlResolutions()
     else
       {
       oneh = log10(delta * 0.051234);
-      half = 0.5 * pow((float)10, ceil(oneh));
-      res = (oneh > log10(half) ? half : pow((float)10, floor(oneh)));
+      half = 0.5 * pow(10.0f, ceil(oneh));
+      res = (oneh > log10(half) ? half : pow(10.0f, floor(oneh)));
       // cout << "up i: " << i << ", delta: " << delta << ", oneh: " << oneh << ", half: " << half << ", res: " << res << endl;
       }
     this->TranslateThumbWheel[i]->SetResolution(res);

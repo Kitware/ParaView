@@ -42,12 +42,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWLabeledLabel.h"
 #include "vtkKWTkUtilities.h"
 #include "vtkObjectFactory.h"
-
-#include <ctype.h>
+#include "vtkString.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLabeledFrame );
-vtkCxxRevisionMacro(vtkKWLabeledFrame, "1.29");
+vtkCxxRevisionMacro(vtkKWLabeledFrame, "1.29.2.1");
 
 int vtkKWLabeledFrameCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -123,27 +122,15 @@ void vtkKWLabeledFrame::SetLabel(const char *text)
     }
   else
     {
-    size_t length = strlen(text);
-    buffer = new char [length + 1];
-    strcpy(buffer, text);
-    char *convert = buffer + 1;
-    const char *convert_end = buffer + length - 1;
-    while (convert < convert_end)
+    buffer = vtkString::Duplicate(text);
+    switch (vtkKWLabeledFrame::LabelCase)
       {
-      if (isspace(convert[0]) && isalpha(convert[1]))
-        {
-        switch (vtkKWLabeledFrame::LabelCase)
-          {
-          case VTK_KW_LABEL_CASE_UPPERCASE_FIRST:
-            convert[1] = toupper(convert[1]);
-            break;
-          case VTK_KW_LABEL_CASE_LOWERCASE_FIRST:
-            convert[1] = tolower(convert[1]);
-            break;
-          }
-        convert++;
-        }
-      convert++;
+      case VTK_KW_LABEL_CASE_UPPERCASE_FIRST:
+        vtkString::ToUpperFirst(buffer);
+        break;
+      case VTK_KW_LABEL_CASE_LOWERCASE_FIRST:
+        vtkString::ToLowerFirst(buffer);
+        break;
       }
     ptr = buffer;
     }
@@ -248,7 +235,7 @@ void vtkKWLabeledFrame::Create(vtkKWApplication *app, const char* args)
   this->LabelFrame->Create(app, "");
 
   this->Label->SetParent(this->LabelFrame);
-  this->Label->Create(app, "-bd 0 -pady 0 -padx 2");
+  this->Label->Create(app, "-bd 0");
 
   this->Script("%s config -bd 1 -pady 0 -padx 0", 
                this->GetLabel()->GetWidgetName());
@@ -257,8 +244,15 @@ void vtkKWLabeledFrame::Create(vtkKWApplication *app, const char* args)
                this->GetLabelIcon()->GetWidgetName());
 
   this->GetLabelIcon()->SetImageOption(vtkKWIcon::ICON_LOCK);
-  this->GetLabelIcon()->SetBalloonHelpString(
-    "This feature is not available in Limited Edition Mode.");
+
+  const char *lem_name = app->GetLimitedEditionModeName() 
+    ? app->GetLimitedEditionModeName() : "limited edition";
+  
+  ostrstream balloon_str;
+  balloon_str << "This feature is not available in " << lem_name 
+              << " mode." << ends;
+  this->GetLabelIcon()->SetBalloonHelpString(balloon_str.str());
+  balloon_str.rdbuf()->freeze(0);
 
   if (vtkKWLabeledFrame::BoldLabel)
     {
@@ -279,8 +273,9 @@ void vtkKWLabeledFrame::Create(vtkKWApplication *app, const char* args)
   this->Script("pack %s -fill x -side top", this->Border2->GetWidgetName());
   this->Script("pack %s -padx 2 -pady 2 -fill both -expand yes",
                this->Frame->GetWidgetName());
-  this->Script("pack %s -anchor nw -side left -fill both -expand y",
-               this->Label->GetWidgetName());
+  this->Script(
+    "pack %s -anchor nw -side left -fill both -expand y -padx 2 -pady 0",
+    this->Label->GetWidgetName());
   this->Script("place %s -relx 0 -x 5 -y 0 -anchor nw",
                this->LabelFrame->GetWidgetName());
 

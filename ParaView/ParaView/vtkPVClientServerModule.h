@@ -186,9 +186,11 @@ protected:
   vtkPVClientServerModule();
   ~vtkPVClientServerModule();
 
-    // Description:
+  // Description:
   // Send the last client server result to the client called from an RMI
   void SendLastClientServerResult();
+
+  void Connect();
 
   int NumberOfServerProcesses;
   int ClientMode;

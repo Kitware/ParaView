@@ -52,7 +52,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplicationSettingsInterface);
-vtkCxxRevisionMacro(vtkPVApplicationSettingsInterface, "1.11");
+vtkCxxRevisionMacro(vtkPVApplicationSettingsInterface, "1.11.2.1");
 
 int vtkPVApplicationSettingsInterfaceCommand(ClientData cd, Tcl_Interp *interp,
                                              int argc, char *argv[]);
@@ -167,9 +167,9 @@ void vtkPVApplicationSettingsInterface::Create(vtkKWApplication *app)
   this->ShowTraceFilesCheckButton->SetCommand(
     this, "ShowTraceFilesCallback");
   this->ShowTraceFilesCheckButton->SetBalloonHelpString(
-    "When this advanced option is on, tracefiles will be detected and reported "
-    "during startup. Turn this off to avoid unnecessary popup messages during "
-    "startup.");
+    "When this advanced option is on, tracefiles will be detected and "
+    "reported during startup. Turn this off to avoid unnecessary popup "
+    "messages during startup.");
 
   if (!app->GetRegisteryValue(2,"RunTime", 
       VTK_PV_ASI_SHOW_TRACE_FILES_REG_KEY,0)||
@@ -181,8 +181,26 @@ void vtkPVApplicationSettingsInterface::Create(vtkKWApplication *app)
     {
     this->ShowTraceFilesCheckButton->SetState(0);
     }
+
   tk_cmd << "pack " << this->ShowTraceFilesCheckButton->GetWidgetName()
     << "  -side top -anchor w -expand no -fill none" << endl;
+
+  // --------------------------------------------------------------
+  // Interface settings : show most recent panels
+
+  // Not really supported by ParaView... (only in App Settings notebook)
+
+  tk_cmd << "pack forget " 
+         << this->ShowMostRecentPanelsCheckButton->GetWidgetName() << endl;
+
+  // --------------------------------------------------------------
+  // Interface settings : Drag & Drop
+
+  // Not really supported by ParaView... (only in App Settings notebook)
+
+  tk_cmd << "pack forget " 
+         << this->DragAndDropFrame->GetWidgetName() << endl;
+
   // --------------------------------------------------------------
   // Pack 
 

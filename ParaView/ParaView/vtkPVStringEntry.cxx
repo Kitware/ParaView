@@ -48,10 +48,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVApplication.h"
 #include "vtkPVStringWidgetProperty.h"
 #include "vtkPVXMLElement.h"
+#include "vtkPVProcessModule.h"
+
+#include <vtkstd/string>
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVStringEntry);
-vtkCxxRevisionMacro(vtkPVStringEntry, "1.19.2.5");
+vtkCxxRevisionMacro(vtkPVStringEntry, "1.19.2.6");
 
 //----------------------------------------------------------------------------
 vtkPVStringEntry::vtkPVStringEntry()
