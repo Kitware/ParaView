@@ -91,7 +91,7 @@ ENDIF(PARAVIEW_SOURCE_DIR)
 SUBDIRS(Wrapping)
 
 # Build vtkClientServer wrappers for VTK kits.
-SUBDIRS(Common Filtering Imaging Graphics IO Rendering Hybrid Parallel)
+SUBDIRS(Common Filtering GenericFiltering Imaging Graphics IO Rendering Hybrid Parallel)
 IF(VTK_USE_PATENTED)
   SUBDIRS(Patented)
 ENDIF(VTK_USE_PATENTED)
