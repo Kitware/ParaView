@@ -27,6 +27,14 @@
         default_values="0" > 
        <BooleanDomain name="bool"/>
      </IntVectorProperty>
+
+     <DoubleVectorProperty
+        name="Center"
+        command="SetCenter"
+        number_of_elements="3"
+        default_values="0.0 0.0 0.0" >
+       <DoubleRangeDomain name="range"/>
+     </DoubleVectorProperty>
    <!-- End 2DGlyph -->
    </SourceProxy>
 
@@ -91,7 +99,6 @@
          command="SetScaleFactor"
          number_of_elements="1"
          default_values="1.0" >
-<!-- TODO Is Inf the best way? -->
         <DoubleRangeDomain name="range" min="0" />
       </DoubleVectorProperty>
 
