@@ -3,6 +3,7 @@ PROJECT(ServerManager)
 SET( ServerManagerCommon_SRCS
   vtkSMApplication.cxx
   vtkSMArrayListDomain.cxx
+  vtkSMArrayRangeDomain.cxx
   vtkSMBooleanDomain.cxx
   vtkSMDataTypeDomain.cxx
   vtkSMDomain.cxx
@@ -10,7 +11,9 @@ SET( ServerManagerCommon_SRCS
   vtkSMDoubleRangeDomain.cxx
   vtkSMDoubleVectorProperty.cxx
   vtkSMEnumerationDomain.cxx
+  vtkSMFieldDataDomain.cxx
   vtkSMFixedTypeDomain.cxx
+  vtkSMIdTypeVectorProperty.cxx
   vtkSMInputArrayDomain.cxx
   vtkSMInputProperty.cxx
   vtkSMIntRangeDomain.cxx

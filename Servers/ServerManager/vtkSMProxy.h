@@ -289,7 +289,7 @@ protected:
   vtkSMProperty* NewProperty(const char* name);
 
   // Description:
-  vtkSMProperty* GetProperty(const char* name, int selfOnly);
+  virtual vtkSMProperty* GetProperty(const char* name, int selfOnly);
 
   // Description:
   int ReadXMLAttributes(vtkSMProxyManager* pm, vtkPVXMLElement* element);
@@ -299,6 +299,7 @@ protected:
   char* XMLName;
   int ObjectsCreated;
   vtkTypeUInt32 Servers;
+  int DoNotModifyProperty;
 
   vtkClientServerID SelfID;
 

@@ -45,7 +45,7 @@ public:
   // Description:
   // Update self checking the "unchecked" values of all required
   // properties. Overwritten by sub-classes.
-  virtual void Update() {};
+  virtual void Update(vtkSMProperty*) {};
 
 protected:
   vtkSMDomain();
@@ -56,10 +56,10 @@ protected:
 //ETX
 
   // Description:
-  unsigned int GetNumberOfRequiredProperties();
+  vtkSMProperty* GetRequiredProperty(const char* function);
 
   // Description:
-  vtkSMProperty* GetRequiredProperty(unsigned int idx);
+  void RemoveRequiredProperty(vtkSMProperty* prop);
 
   // Description:
   // Set the appropriate ivars from the xml element. Should

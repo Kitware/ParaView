@@ -22,7 +22,7 @@
 #include "vtkStdString.h"
 
 vtkStandardNewMacro(vtkSMStringVectorProperty);
-vtkCxxRevisionMacro(vtkSMStringVectorProperty, "1.10");
+vtkCxxRevisionMacro(vtkSMStringVectorProperty, "1.11");
 
 struct vtkSMStringVectorPropertyInternals
 {
@@ -178,6 +178,11 @@ const char* vtkSMStringVectorProperty::GetUncheckedElement(unsigned int idx)
 void vtkSMStringVectorProperty::SetUncheckedElement(
   unsigned int idx, const char* value)
 {
+  if (!value)
+    {
+    value = "";
+    }
+
   if (idx >= this->GetNumberOfUncheckedElements())
     {
     this->SetNumberOfUncheckedElements(idx+1);

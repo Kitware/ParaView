@@ -46,7 +46,9 @@ public:
   int IsInDomain(vtkSMSourceProxy* proxy);
 
   // Description:
-  int IsFieldValid(vtkPVArrayInformation* arrayInfo);
+  int IsFieldValid(vtkSMSourceProxy* proxy, vtkPVArrayInformation* arrayInfo);
+  int IsFieldValid(
+    vtkSMSourceProxy* proxy, vtkPVArrayInformation* arrayInfo, int bypass);
   
   // Description:
   vtkSetMacro(AttributeType, unsigned char);
@@ -79,7 +81,10 @@ protected:
 
   virtual void SaveState(const char* name, ofstream* file, vtkIndent indent);
 
-  int AttributeInfoContainsArray(vtkPVDataSetAttributesInformation* attrInfo);
+  int AttributeInfoContainsArray(vtkSMSourceProxy* proxy,
+                                 vtkPVDataSetAttributesInformation* attrInfo);
+  int CheckForArray(vtkPVArrayInformation* arrayInfo, 
+                    vtkPVDataSetAttributesInformation* attrInfo);
 
   unsigned char AttributeType;
   int NumberOfComponents;

@@ -27,10 +27,6 @@ class vtkSMInputArrayDomain;
 class vtkSMProxyProperty;
 class vtkSMSourceProxy;
 
-//BTX
-struct vtkSMArrayListDomainInternals;
-//ETX
-
 class VTK_EXPORT vtkSMArrayListDomain : public vtkSMStringListDomain
 {
 public:
@@ -43,19 +39,36 @@ public:
   // a property of class vtkSMProxyProperty which points to a
   // vtkSMSourceProxy and contains a vtkSMInputArrayDomain. Only
   // the first proxy and domain are used.
-  virtual void Update();
+  virtual void Update(vtkSMProperty* prop);
+
+  // Description:
+  vtkGetMacro(DefaultElement, unsigned int);
 
 protected:
   vtkSMArrayListDomain();
   ~vtkSMArrayListDomain();
 
   // Description:
+  // Set the appropriate ivars from the xml element. Should
+  // be overwritten by subclass if adding ivars.
+  virtual int ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement* element);
+
+  // Description:
   // Utility functions called by Update()
-  void AddArrays(vtkPVDataSetAttributesInformation* info, 
+  void AddArrays(vtkSMSourceProxy* sp,
+                 vtkPVDataSetAttributesInformation* info, 
                  vtkSMInputArrayDomain* iad);
   void Update(vtkSMSourceProxy* sp, vtkSMInputArrayDomain* iad);
   void Update(vtkSMProxyProperty* pp, vtkSMSourceProxy* sp);
   void Update(vtkSMProxyProperty* pp);
+
+  vtkSetMacro(AttributeType, int);
+  vtkGetMacro(AttributeType, int);
+
+  vtkSetMacro(DefaultElement, unsigned int);
+
+  int AttributeType;
+  unsigned int DefaultElement;
 
 private:
   vtkSMArrayListDomain(const vtkSMArrayListDomain&); // Not implemented

@@ -30,7 +30,7 @@
 #include "vtkSMPropertyInternals.h"
 
 vtkStandardNewMacro(vtkSMProperty);
-vtkCxxRevisionMacro(vtkSMProperty, "1.11");
+vtkCxxRevisionMacro(vtkSMProperty, "1.12");
 
 vtkCxxSetObjectMacro(vtkSMProperty, Proxy, vtkSMProxy);
 
@@ -142,6 +142,12 @@ void vtkSMProperty::AddDependant(vtkSMDomain* dom)
 //---------------------------------------------------------------------------
 void vtkSMProperty::RemoveAllDependants()
 {
+  vtkSMPropertyInternals::DependantsVector::iterator iter =
+    this->PInternals->Dependants.begin();
+  for (; iter != this->PInternals->Dependants.end(); iter++)
+    {
+    iter->GetPointer()->RemoveRequiredProperty(this);
+    }
   this->PInternals->Dependants.erase(
     this->PInternals->Dependants.begin(), this->PInternals->Dependants.end());
 }
@@ -152,7 +158,7 @@ void vtkSMProperty::UpdateDependantDomains()
   this->DomainIterator->Begin();
   while(!this->DomainIterator->IsAtEnd())
     {
-    this->DomainIterator->GetDomain()->Update();
+    this->DomainIterator->GetDomain()->Update(this);
     this->DomainIterator->Next();
     }
 
@@ -160,7 +166,7 @@ void vtkSMProperty::UpdateDependantDomains()
     this->PInternals->Dependants.begin();
   for (; iter != this->PInternals->Dependants.end(); iter++)
     {
-    iter->GetPointer()->Update();
+    iter->GetPointer()->Update(this);
     }
 }
 
@@ -260,6 +266,13 @@ int vtkSMProperty::ReadXMLAttributes(vtkSMProxy* proxy,
   if(retVal) 
     { 
     this->SetUpdateSelf(update_self); 
+    }
+
+  int read_only;
+  retVal = element->GetScalarAttribute("read_only", &read_only);
+  if(retVal) 
+    { 
+    this->SetIsReadOnly(read_only); 
     }
 
   for(unsigned int i=0; i < element->GetNumberOfNestedElements(); ++i)

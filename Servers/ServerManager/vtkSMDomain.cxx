@@ -18,13 +18,16 @@
 #include "vtkSMProperty.h"
 #include "vtkSmartPointer.h"
 
-#include <vtkstd/vector>
+#include <vtkstd/map>
+#include "vtkStdString.h"
 
-vtkCxxRevisionMacro(vtkSMDomain, "1.3");
+vtkCxxRevisionMacro(vtkSMDomain, "1.4");
 
 struct vtkSMDomainInternals
 {
-  vtkstd::vector<vtkSmartPointer<vtkSMProperty> > RequiredProperties;
+  typedef 
+  vtkstd::map<vtkStdString, vtkSmartPointer<vtkSMProperty> > PropertyMap;
+  PropertyMap RequiredProperties;
 };
 
 //---------------------------------------------------------------------------
@@ -42,15 +45,31 @@ vtkSMDomain::~vtkSMDomain()
 }
 
 //---------------------------------------------------------------------------
-unsigned int vtkSMDomain::GetNumberOfRequiredProperties()
+vtkSMProperty* vtkSMDomain::GetRequiredProperty(const char* function)
 {
-  return this->Internals->RequiredProperties.size();
+  vtkSMDomainInternals::PropertyMap::iterator iter =
+    this->Internals->RequiredProperties.find(function);
+  if (iter != this->Internals->RequiredProperties.end())
+    {
+    return iter->second.GetPointer();
+    }
+  return 0;
 }
 
 //---------------------------------------------------------------------------
-vtkSMProperty* vtkSMDomain::GetRequiredProperty(unsigned int idx)
+void vtkSMDomain::RemoveRequiredProperty(vtkSMProperty* prop)
 {
-  return this->Internals->RequiredProperties[idx];
+  vtkSMDomainInternals::PropertyMap::iterator iter = 
+    this->Internals->RequiredProperties.begin();
+
+  for(; iter != this->Internals->RequiredProperties.end(); iter++)
+    {
+    if ( iter->second.GetPointer() == prop )
+      {
+      this->Internals->RequiredProperties.erase(iter);
+      break;
+      }
+    }
 }
 
 //---------------------------------------------------------------------------
@@ -73,11 +92,19 @@ int vtkSMDomain::ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement* element
             }
           else
             {
-            vtkSMProperty* req = prop->NewProperty(name);
-            if (req)
+            const char* function = reqEl->GetAttribute("function");
+            if (!function)
               {
-              req->AddDependant(this);
-              this->Internals->RequiredProperties.push_back(req);
+              vtkErrorMacro("Missing required attribute: function");
+              }
+            else
+              {
+              vtkSMProperty* req = prop->NewProperty(name);
+              if (req)
+                {
+                req->AddDependant(this);
+                this->Internals->RequiredProperties[function] = req;
+                }
               }
             }
           }

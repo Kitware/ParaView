@@ -21,7 +21,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMDoubleRangeDomain);
-vtkCxxRevisionMacro(vtkSMDoubleRangeDomain, "1.3");
+vtkCxxRevisionMacro(vtkSMDoubleRangeDomain, "1.4");
 
 struct vtkSMDoubleRangeDomainInternals
 {
@@ -97,6 +97,18 @@ int vtkSMDoubleRangeDomain::IsInDomain(unsigned int idx, double val)
 }
 
 //---------------------------------------------------------------------------
+unsigned int vtkSMDoubleRangeDomain::GetNumberOfEntries()
+{
+  return this->DRInternals->Entries.size();
+}
+
+//---------------------------------------------------------------------------
+void vtkSMDoubleRangeDomain::SetNumberOfEntries(unsigned int size)
+{
+  return this->DRInternals->Entries.resize(size);
+}
+
+//---------------------------------------------------------------------------
 double vtkSMDoubleRangeDomain::GetMinimum(unsigned int idx, int& exists)
 {
   exists = 0;
@@ -141,6 +153,16 @@ void vtkSMDoubleRangeDomain::RemoveMinimum(unsigned int idx)
 }
 
 //---------------------------------------------------------------------------
+void vtkSMDoubleRangeDomain::RemoveAllMinima()
+{
+  unsigned int numEntries = this->GetNumberOfEntries();
+  for(unsigned int idx=0; idx<numEntries; idx++)
+    {
+    this->SetEntry(idx, vtkSMDoubleRangeDomain::MIN, 0, 0);
+    }
+}
+
+//---------------------------------------------------------------------------
 void vtkSMDoubleRangeDomain::AddMaximum(unsigned int idx, double val)
 {
   this->SetEntry(idx, vtkSMDoubleRangeDomain::MAX, 1, val);
@@ -150,6 +172,16 @@ void vtkSMDoubleRangeDomain::AddMaximum(unsigned int idx, double val)
 void vtkSMDoubleRangeDomain::RemoveMaximum(unsigned int idx)
 {
   this->SetEntry(idx, vtkSMDoubleRangeDomain::MAX, 0, 0);
+}
+
+//---------------------------------------------------------------------------
+void vtkSMDoubleRangeDomain::RemoveAllMaxima()
+{
+  unsigned int numEntries = this->GetNumberOfEntries();
+  for(unsigned int idx=0; idx<numEntries; idx++)
+    {
+    this->SetEntry(idx, vtkSMDoubleRangeDomain::MAX, 0, 0);
+    }
 }
 
 //---------------------------------------------------------------------------
@@ -222,7 +254,8 @@ void vtkSMDoubleRangeDomain::SaveState(
 }
 
 //---------------------------------------------------------------------------
-int vtkSMDoubleRangeDomain::ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement* element)
+int vtkSMDoubleRangeDomain::ReadXMLAttributes(
+  vtkSMProperty* prop, vtkPVXMLElement* element)
 {
   this->Superclass::ReadXMLAttributes(prop, element);
   const int MAX_NUM = 128;

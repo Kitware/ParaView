@@ -58,10 +58,16 @@ public:
   void RemoveMinimum(unsigned int idx);
 
   // Description:
+  void RemoveAllMinima();
+
+  // Description:
   void AddMaximum(unsigned int idx, double value);
 
   // Description:
   void RemoveMaximum(unsigned int idx);
+
+  // Description:
+  void RemoveAllMaxima();
 
 protected:
   vtkSMDoubleRangeDomain();
@@ -75,6 +81,9 @@ protected:
   virtual void SaveState(const char* name, ofstream* file, vtkIndent indent);
 
   void SetEntry(unsigned int idx, int minOrMax, int set, double value);
+
+  unsigned int GetNumberOfEntries();
+  void SetNumberOfEntries(unsigned int size);
 
   vtkSMDoubleRangeDomainInternals* DRInternals;
 

@@ -51,7 +51,7 @@ public:
   const char* GetString(unsigned int idx);
 
   // Description:
-  void AddString(const char* string);
+  unsigned int AddString(const char* string);
 
   // Description:
   void RemoveString(const char* string);

@@ -54,6 +54,12 @@ public:
   // Description:
   const char* GetEntryText(unsigned int idx);
 
+  // Description:
+  void AddEntry(const char* text, int value);
+
+  // Description:
+  void RemoveAllEntries();
+
 protected:
   vtkSMEnumerationDomain();
   ~vtkSMEnumerationDomain();

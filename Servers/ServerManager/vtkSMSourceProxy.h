@@ -27,7 +27,9 @@
 #include "vtkSMProxy.h"
 #include "vtkClientServerID.h" // Needed for ClientServerID
 
+class vtkPVArrayInformation;
 class vtkPVDataInformation;
+class vtkPVDataSetAttributesInformation;
 //BTX
 struct vtkSMSourceProxyInternals;
 //ETX
@@ -92,6 +94,12 @@ public:
 
   // Description:
   virtual void MarkConsumersAsModified();
+
+  // Description:
+  vtkSMProperty* GetProperty(const char* name) 
+    {
+      return this->Superclass::GetProperty(name);
+    }
   
 protected:
   vtkSMSourceProxy();
@@ -104,6 +112,11 @@ protected:
   // Description:
   void ConvertDataInformationToProperty(
     vtkPVDataInformation* info, vtkSMProperty* prop);
+  void ConvertFieldDataInformationToProperty(
+    vtkPVDataSetAttributesInformation* info, vtkSMProperty* prop);
+  void ConvertArrayInformationToProperty(
+    vtkPVArrayInformation* info, vtkSMProperty* prop);
+
 
   int PartsCreated;
 
@@ -113,6 +126,9 @@ protected:
 
   // Description:
   void InvalidateDataInformation();
+
+  // Description:
+  virtual vtkSMProperty* GetProperty(const char* name, int selfOnly);
 
   vtkPVDataInformation *DataInformation;
   int DataInformationValid;

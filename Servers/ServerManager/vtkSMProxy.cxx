@@ -30,7 +30,7 @@
 #include <vtkstd/algorithm>
 
 vtkStandardNewMacro(vtkSMProxy);
-vtkCxxRevisionMacro(vtkSMProxy, "1.15");
+vtkCxxRevisionMacro(vtkSMProxy, "1.16");
 
 vtkCxxSetObjectMacro(vtkSMProxy, XMLElement, vtkPVXMLElement);
 
@@ -124,6 +124,7 @@ vtkSMProxy::vtkSMProxy()
     }
 
   this->XMLElement = 0;
+  this->DoNotModifyProperty = 0;
 }
 
 //---------------------------------------------------------------------------
@@ -442,6 +443,11 @@ void vtkSMProxy::PushProperty(
 //---------------------------------------------------------------------------
 void vtkSMProxy::SetPropertyModifiedFlag(const char* name, int flag)
 {
+  if (this->DoNotModifyProperty)
+    {
+    return;
+    }
+
   vtkSMProxyInternals::PropertyInfoMap::iterator it =
     this->Internals->Properties.find(name);
   if (it == this->Internals->Properties.end())
@@ -779,12 +785,15 @@ vtkSMProperty* vtkSMProxy::NewProperty(const char* name)
   property = vtkSMProperty::SafeDownCast(object);
   if (property)
     {
+    this->DoNotModifyProperty = 1;
+    this->AddProperty(name, property);
     if (!property->ReadXMLAttributes(this, propElement))
       {
       vtkErrorMacro("Could not parse property: " << propElement->GetName());
+      this->DoNotModifyProperty = 0;
       return 0;
       }
-    this->AddProperty(name, property);
+    this->DoNotModifyProperty = 0;
     property->Delete();
     }
   else

@@ -24,10 +24,12 @@
 
 #include "vtkProcessModule.h"
 
+// Needed for VTK_USE_PATENTED
+#include "vtkToolkits.h"
 #include "vtkSMGeneratedModules.h"
 
 vtkStandardNewMacro(vtkSMApplication);
-vtkCxxRevisionMacro(vtkSMApplication, "1.7");
+vtkCxxRevisionMacro(vtkSMApplication, "1.8");
 
 //---------------------------------------------------------------------------
 vtkSMApplication::vtkSMApplication()

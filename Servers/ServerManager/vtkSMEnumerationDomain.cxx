@@ -23,7 +23,7 @@
 #include "vtkStdString.h"
 
 vtkStandardNewMacro(vtkSMEnumerationDomain);
-vtkCxxRevisionMacro(vtkSMEnumerationDomain, "1.3");
+vtkCxxRevisionMacro(vtkSMEnumerationDomain, "1.4");
 
 struct vtkSMEnumerationDomainInternals
 {
@@ -133,6 +133,20 @@ void vtkSMEnumerationDomain::SaveState(
 }
 
 //---------------------------------------------------------------------------
+void vtkSMEnumerationDomain::AddEntry(const char* text, int value)
+{
+  this->EInternals->Entries.push_back(
+    vtkSMEnumerationDomainInternals::EntryType(text, value));
+}
+
+//---------------------------------------------------------------------------
+void vtkSMEnumerationDomain::RemoveAllEntries()
+{
+  this->EInternals->Entries.erase(
+    this->EInternals->Entries.begin(), this->EInternals->Entries.end());
+}
+
+//---------------------------------------------------------------------------
 int vtkSMEnumerationDomain::ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement* element)
 {
   this->Superclass::ReadXMLAttributes(prop, element);
@@ -144,9 +158,7 @@ int vtkSMEnumerationDomain::ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLEleme
     vtkPVXMLElement* selement = element->GetNestedElement(i);
     if ( strcmp("Entry", selement->GetName()) != 0 )
       {
-      vtkErrorMacro(<< "Unknown element type: " << selement->GetName()
-                    << ". Can not parse domain xml.");
-      return 0;
+      continue;
       }
     const char* text = selement->GetAttribute("text");
     if (!text)
@@ -164,9 +176,7 @@ int vtkSMEnumerationDomain::ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLEleme
       return 0;
       }
 
-    this->EInternals->Entries.push_back(
-      vtkSMEnumerationDomainInternals::EntryType(text, value));
-    
+    this->AddEntry(text, value);
     }
   return 1;
 }
