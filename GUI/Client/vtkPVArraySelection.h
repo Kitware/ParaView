@@ -38,10 +38,12 @@ public:
   vtkTypeRevisionMacro(vtkPVArraySelection, vtkPVWidget);
   void PrintSelf(ostream& os, vtkIndent indent);
   
+//BTX
   // Description:
   // Methods for setting the value of the VTKReader from the widget.
   // User internally when user hits Accept.
   virtual void AcceptInternal(vtkClientServerID id);
+//ETX
 
   // Description:
   // Methods for setting the value of the widget from the VTKReader.
