@@ -34,6 +34,10 @@ CONFIGURE_FILE(
 ${PARAVIEW_SOURCE_DIR}/ParaView/Testing/Tcl/Extrusion.tcl.in
 ${PARAVIEW_BINARY_DIR}/ParaView/Testing/Tcl/Extrusion.tcl)
 
+CONFIGURE_FILE(
+${PARAVIEW_SOURCE_DIR}/ParaView/Testing/Tcl/EnSight.tcl.in
+${PARAVIEW_BINARY_DIR}/ParaView/Testing/Tcl/EnSight.tcl)
+
 ADD_TEST(BlowTest ${PARAVIEW_EXECUTABLE}
                   ${PARAVIEW_BINARY_DIR}/ParaView/Testing/Tcl/BlowTest.tcl)
 
@@ -61,6 +65,5 @@ ADD_TEST(Mandelbrot ${PARAVIEW_EXECUTABLE}
 ADD_TEST(Extrusion ${PARAVIEW_EXECUTABLE}
                     ${PARAVIEW_BINARY_DIR}/ParaView/Testing/Tcl/Extrusion.tcl)
 
-
-
-
+ADD_TEST(EnSight ${PARAVIEW_EXECUTABLE}
+                   ${PARAVIEW_BINARY_DIR}/ParaView/Testing/Tcl/EnSight.tcl)
