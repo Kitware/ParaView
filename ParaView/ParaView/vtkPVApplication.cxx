@@ -82,6 +82,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkUnsignedShortArray.h"
 
 #include "vtkOutputWindow.h"
+#include <sys/stat.h>
 
 #ifdef _WIN32
 #include "htmlhelp.h"
@@ -143,6 +144,18 @@ vtkPVApplication::vtkPVApplication()
   this->Controller = NULL;
   this->Log = NULL;
   this->LogFileName = NULL;
+
+  struct stat fs;
+
+  if (stat("ParaViewTrace1.pvs", &fs) == 0) 
+    {
+    rename("ParaViewTrace1.pvs", "ParaViewTrace2.pvs");
+    }
+
+  if (stat("ParaViewTrace.pvs", &fs) == 0) 
+    {
+    rename("ParaViewTrace.pvs", "ParaViewTrace1.pvs");
+    }
 
   this->TraceFile = new ofstream("ParaViewTrace.pvs", ios::out);
   if (this->TraceFile && this->TraceFile->fail())

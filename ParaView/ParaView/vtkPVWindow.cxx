@@ -77,6 +77,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWTranslateCameraInteractor.h"
 #include "vtkKWSplitFrame.h"
 #include "vtkKWTclInteractor.h"
+#include "vtkKWCompositeCollection.h"
 
 #include "vtkPVSourceInterfaceDirectories.h"
 #include "vtkPVAnimationInterface.h"
@@ -85,6 +86,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVDemoPaths.h"
 
 #include <ctype.h>
+#include <sys/stat.h>
 
 #ifdef _WIN32
 #include "vtkKWRegisteryUtilities.h"
@@ -835,6 +837,8 @@ void vtkPVWindow::PlayDemo()
   char temp1[1024];
   char temp2[1024];
 
+  struct stat fs;
+
 #ifdef _WIN32  
 
   // First look in the registery
@@ -850,18 +854,16 @@ void vtkPVWindow::PlayDemo()
     sprintf(temp2,"%s/Data/blow.vtk",loc);
     }
 
-  ifstream fptr2(temp2, ios::in  PV_NOCREATE);
-  if (!fptr2.fail())
+  // first make sure the file exists, this prevents an empty file from
+  // being created on older compilers
+  if (stat(temp2, &fs) == 0) 
     {
-    fptr2.close();
     foundData=1;
     this->Application->Script("set tmpPvDataDir [string map {\\\\ /} {%s/Data}]", loc);
     }
 
-  ifstream fptr(temp1, ios::in  PV_NOCREATE);
-  if (!fptr.fail())
+  if (stat(temp1, &fs) == 0) 
     {
-    fptr.close();
     this->LoadScript(temp1);
     found=1;
     }
@@ -876,10 +878,8 @@ void vtkPVWindow::PlayDemo()
     if (!foundData)
       {
       sprintf(temp2, "%s/Data/blow.vtk", *dir);
-      ifstream fptr2(temp2, ios::in  PV_NOCREATE);
-      if (!fptr2.fail())
+      if (stat(temp2, &fs) == 0) 
 	{
-	fptr2.close();
 	foundData=1;
 	this->Application->Script("set tmpPvDataDir %s/Data", *dir);
 	}
@@ -889,10 +889,8 @@ void vtkPVWindow::PlayDemo()
   for(dir=VTK_PV_DEMO_PATHS; !found && *dir; ++dir)
     {
     sprintf(temp1, "%s/Demos/Demo1.pvs", *dir);
-    ifstream fptr(temp1, ios::in  PV_NOCREATE);
-    if (!fptr.fail())
+    if (stat(temp1, &fs) == 0) 
       {
-      fptr.close();
       this->LoadScript(temp1);
       found=1;
       }
@@ -900,14 +898,12 @@ void vtkPVWindow::PlayDemo()
 
   if (!found)
     {
-    vtkKWMessageDialog *dlg = vtkKWMessageDialog::New();
-    dlg->Create(this->Application,"");
-    dlg->SetText(
+    vtkKWMessageDialog::PopupMessage(this->Application, this,
+				     vtkKWMessageDialog::Warning,
+				     "Warning", 
       "Could not find Demo1.pvs in the installation or\n"
       "build directory. Please make sure that ParaView\n"
       "is installed properly.");
-    dlg->Invoke();  
-    dlg->Delete();
     }
 }
 
@@ -915,7 +911,6 @@ void vtkPVWindow::PlayDemo()
 void vtkPVWindow::OpenCallback()
 {
   char *openFileName = NULL;
-  istream *input;
 #ifdef _WIN32  
   this->Script("set openFileName [tk_getOpenFile -filetypes {{{ParaView Files} {*.vtk;*.pvtk;*.stl;*.pop;*.case}}  {{VTK files} {.vtk}} {{PVTK files} {.pvtk}} {{EnSight files} {.case}} {{POP files} {.pop}} {{STL files} {.stl}}}]");
 #else
@@ -930,15 +925,19 @@ void vtkPVWindow::OpenCallback()
     return;
     }
 
-  input = new ifstream(openFileName, ios::in PV_NOCREATE );
-  if (input->fail())
+  ifstream input(openFileName, ios::in);
+  if (input.fail())
     {
-    vtkErrorMacro("Permission denied for opening " << openFileName);
-    delete input;
+    char* error = new char[strlen("Permission denied for opening ")
+			  + strlen(openFileName) + 2];
+    sprintf(error,"Permission denied for opening %s", openFileName);
+    vtkKWMessageDialog::PopupMessage(this->Application, this,
+				     vtkKWMessageDialog::Error,
+				     "Error",  error);
+    delete [] error;
     return;
     }
-  
-  delete input;
+
   
   this->Open(openFileName);
   delete [] openFileName;

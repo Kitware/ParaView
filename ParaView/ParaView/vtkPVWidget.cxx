@@ -43,6 +43,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkObjectFactory.h"
 #include "vtkKWApplication.h"
 #include "vtkKWEvent.h"
+#include "vtkCollection.h"
 
 //----------------------------------------------------------------------------
 vtkPVWidget* vtkPVWidget::New()

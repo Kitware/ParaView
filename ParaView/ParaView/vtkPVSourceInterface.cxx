@@ -47,6 +47,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVData.h"
 #include "vtkPVWindow.h"
 #include "vtkPVRenderView.h"
+#include "vtkKWCompositeCollection.h"
+
 int vtkPVSourceInterfaceCommand(ClientData cd, Tcl_Interp *interp,
 			        int argc, char *argv[]);
 

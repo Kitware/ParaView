@@ -39,17 +39,13 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkKWLabel.h"
 #include "vtkKWMenuButton.h"
 #include "vtkPVWindow.h"
-
+#include "vtkKWCompositeCollection.h"
 
 // We need to:
 // Format min/max/resolution entries better.
 // Add callbacks to take the place of accept button.
 // Handle methods with multiple entries.
 // Handle special sources (contour, probe, threshold).
-
-
-
-
 
 
 int vtkPVAnimationInterfaceCommand(ClientData cd, Tcl_Interp *interp,

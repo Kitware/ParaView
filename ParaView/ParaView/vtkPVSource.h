@@ -74,6 +74,7 @@ class vtkKWLabel;
 class vtkPVWidget;
 class vtkPVBoundsDisplay;
 class vtkPVScalarRangeLabel;
+class vtkCollection;
 
 class VTK_EXPORT vtkPVSource : public vtkKWComposite
 {
