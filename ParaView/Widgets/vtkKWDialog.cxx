@@ -59,6 +59,7 @@ vtkKWDialog::vtkKWDialog()
   this->TitleString = 0;
   this->SetTitleString("Kitware Dialog");
   this->Beep = 0;
+  this->BeepType = 0;
   this->MasterWindow = 0;
 }
 

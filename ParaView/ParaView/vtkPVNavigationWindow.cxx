@@ -39,13 +39,16 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-#include "vtkKWApplication.h"
 #include "vtkPVNavigationWindow.h"
-#include "vtkObjectFactory.h"
+
+#include "vtkKWApplication.h"
 #include "vtkKWLabeledFrame.h"
-#include "vtkPVSource.h"
+#include "vtkObjectFactory.h"
 #include "vtkPVData.h"
+#include "vtkPVSource.h"
 #include "vtkPVWindow.h"
+
+#include <stdarg.h>
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVNavigationWindow );

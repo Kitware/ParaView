@@ -143,6 +143,11 @@ vtkPVRenderView::vtkPVRenderView()
   this->RendererTclName     = 0;
   this->CompositeTclName    = 0;
   this->RenderWindowTclName = 0;
+  this->InteractiveCompositeTime = 0;
+  this->InteractiveRenderTime    = 0;
+  this->StillRenderTime          = 0;
+  this->StillCompositeTime       = 0;
+  this->Composite                = 0;
 }
 
 //----------------------------------------------------------------------------
