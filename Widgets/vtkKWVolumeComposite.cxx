@@ -104,8 +104,7 @@ vtkKWVolumeComposite::vtkKWVolumeComposite()
   this->VolumeProperty->SetSpecularPower(1.0);
   this->VolumeProperty->ShadeOff();
   this->RayCastMapper->SetVolumeRayCastFunction(this->Composite);
-
-
+  
   this->HiResTextureID = 
     this->LODVolume->AddLOD( this->HiResTextureMapper,
 			     this->VolumeProperty, 0.0 );
@@ -179,13 +178,13 @@ vtkKWVolumeComposite::~vtkKWVolumeComposite()
   this->MedResTextureMapper->Delete();
   this->HiResTextureMapper->Delete();
   this->VolumeProperty->Delete();
+  this->LowResVolumeProMapper->Delete();
   
   this->LowResResampler->Delete();
   this->MedResResampler->Delete();
-  this->VProResampler->Delete();
-  
-  this->LowResVolumeProMapper->Delete();
+
   this->VolumeProMapper->Delete();
+  this->VProResampler->Delete();
 }
 
 void vtkKWVolumeComposite::SetInput(vtkImageData *input)
@@ -459,5 +458,5 @@ void vtkKWVolumeComposite::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWComposite::SerializeRevision(os,indent);
   os << indent << "vtkKWVolumeComposite ";
-  this->ExtractRevision(os,"$Revision: 1.18 $");
+  this->ExtractRevision(os,"$Revision: 1.19 $");
 }
