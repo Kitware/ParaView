@@ -42,7 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWLabeledPopupButton);
-vtkCxxRevisionMacro(vtkKWLabeledPopupButton, "1.3");
+vtkCxxRevisionMacro(vtkKWLabeledPopupButton, "1.4");
 
 int vtkKWLabeledPopupButtonCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -51,6 +51,8 @@ int vtkKWLabeledPopupButtonCommand(ClientData cd, Tcl_Interp *interp,
 vtkKWLabeledPopupButton::vtkKWLabeledPopupButton()
 {
   this->CommandFunction = vtkKWLabeledPopupButtonCommand;
+
+  this->PackLabelLast = 0;
 
   this->PopupButton = vtkKWPopupButton::New();
 }
@@ -110,13 +112,22 @@ void vtkKWLabeledPopupButton::Pack()
 
   ostrstream tk_cmd;
 
+  if (this->PackLabelLast)
+    {
+    tk_cmd << "pack " << this->PopupButton->GetWidgetName() 
+           << " -side left -fill x -expand t" << endl;
+    }
+
   if (this->ShowLabel)
     {
     tk_cmd << "pack " << this->Label->GetWidgetName() << " -side left" << endl;
     }
 
-  tk_cmd << "pack " << this->PopupButton->GetWidgetName() 
-         << " -side left -fill x -expand t" << endl;
+  if (!this->PackLabelLast)
+    {
+    tk_cmd << "pack " << this->PopupButton->GetWidgetName() 
+           << " -side left -fill x -expand t" << endl;
+    }
   
   tk_cmd << ends;
   this->Script(tk_cmd.str());
@@ -130,6 +141,20 @@ void vtkKWLabeledPopupButton::SetPopupButtonLabel(const char *text)
     {
     this->PopupButton->SetLabel(text);
     }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWLabeledPopupButton::SetPackLabelLast(int arg)
+{
+  if (this->PackLabelLast == arg)
+    {
+    return;
+    }
+
+  this->PackLabelLast = arg;
+  this->Modified();
+
+  this->Pack();
 }
 
 //----------------------------------------------------------------------------

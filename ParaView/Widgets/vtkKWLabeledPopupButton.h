@@ -70,9 +70,17 @@ public:
   virtual void SetBalloonHelpString(const char *str);
   virtual void SetBalloonHelpJustification(int j);
 
+  // Description:
+  // Pack the label last
+  virtual void SetPackLabelLast(int);
+  vtkGetMacro(PackLabelLast, int);
+  vtkBooleanMacro(PackLabelLast, int);
+
 protected:
   vtkKWLabeledPopupButton();
   ~vtkKWLabeledPopupButton();
+
+  int PackLabelLast;
 
   vtkKWPopupButton *PopupButton;
 
