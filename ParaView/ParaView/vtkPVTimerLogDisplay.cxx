@@ -57,7 +57,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVTimerLogDisplay );
-vtkCxxRevisionMacro(vtkPVTimerLogDisplay, "1.9.2.2");
+vtkCxxRevisionMacro(vtkPVTimerLogDisplay, "1.9.2.3");
 
 int vtkPVTimerLogDisplayCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -438,8 +438,28 @@ void vtkPVTimerLogDisplay::Append(const char* msg)
     this->EnableWrite();
     }
 
+  if (msg == NULL)
+    {
+    return;
+    }
+
+  char* str;
+  char* newStr = new char[strlen(msg) + 1];
+  memcpy(newStr, msg, strlen(msg)+1);
+  // Get Rid of problem characters
+  str = newStr;
+  while (*str != '\0')
+    {
+    if (*str == '{' || *str == '}' || *str == '\\')
+      {
+      *str = ' ';
+      }
+    ++str;
+    }
   this->Script("%s insert end {%s%c}",
-               this->DisplayText->GetWidgetName(), msg, '\n');
+               this->DisplayText->GetWidgetName(), newStr, '\n');
+  delete [] newStr;
+
   if ( !w )
     {
     this->DisableWrite();

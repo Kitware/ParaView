@@ -62,7 +62,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWCornerAnnotation );
-vtkCxxRevisionMacro(vtkKWCornerAnnotation, "1.64");
+vtkCxxRevisionMacro(vtkKWCornerAnnotation, "1.64.2.1");
 
 int vtkKWCornerAnnotationCommand(ClientData cd, Tcl_Interp *interp,
                                 int argc, char *argv[]);
@@ -589,6 +589,8 @@ void vtkKWCornerAnnotation::Create(vtkKWApplication *app,
 //----------------------------------------------------------------------------
 void vtkKWCornerAnnotation::Update()
 {
+  char* str;
+
   this->UpdateEnableState();
 
   // If no widget or view, let's disable everything
@@ -616,8 +618,27 @@ void vtkKWCornerAnnotation::Update()
     {
     if (this->CornerText[i])
       {
-      this->CornerText[i]->GetText()->SetValue(
-        this->CornerProp ? this->CornerProp->GetText(i) : "");
+      if (this->CornerProp && (str = this->CornerProp->GetText(i)) )
+        {
+        char* newStr = new char[strlen(str) + 1];
+        memcpy(newStr, str, strlen(str)+1);
+        // Get Rid of problem characters
+        str = newStr;
+        while (*str != '\0')
+          {
+          if (*str == '{' || *str == '}' || *str == '\\')
+            {
+            *str = ' ';
+            }
+          ++str;
+          }
+        this->CornerText[i]->GetText()->SetValue(newStr);
+        delete [] newStr;
+        }
+      else
+        {
+        this->CornerText[i]->GetText()->SetValue("");
+        }
       }
     }
 
@@ -970,7 +991,7 @@ void vtkKWCornerAnnotation::SerializeToken(istream& is, const char *token)
 void vtkKWCornerAnnotation::SerializeRevision(ostream& os, vtkIndent indent)
 {
   os << indent << "vtkKWCornerAnnotation ";
-  this->ExtractRevision(os,"$Revision: 1.64 $");
+  this->ExtractRevision(os,"$Revision: 1.64.2.1 $");
 }
 
 //----------------------------------------------------------------------------
