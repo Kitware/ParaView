@@ -89,7 +89,10 @@ ADD_DEFINITIONS(-DPARAVIEW_NEW_SOURCE_ORGANIZATION)
 #########################################################################
 # Configure HDF5
 SET(PARAVIEW_HDF5_LIBRARIES vtkhdf5)
-SET(VTK_ZLIB_LIBRARIES 1)
+SET(VTK_ZLIB_LIBRARIES vtkzlib)
+SET(VTK_ZLIB_INCLUDE_DIRS
+  ${ParaView_SOURCE_DIR}/VTK/Utilities/zlib
+  ${ParaView_BINARY_DIR}/VTK/Utilities/zlib)
 SUBDIRS(Utilities/hdf5)
 
 #########################################################################
