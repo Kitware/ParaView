@@ -28,7 +28,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMSourceProxy);
-vtkCxxRevisionMacro(vtkSMSourceProxy, "1.13");
+vtkCxxRevisionMacro(vtkSMSourceProxy, "1.14");
 
 struct vtkSMSourceProxyInternals
 {
@@ -368,7 +368,8 @@ void vtkSMSourceProxy::ConvertDataInformationToProperty(
     num->Delete();
     }
   num->SetNumberOfElements(6);
-  for (int i=0; i<6; i++)
+  int i;
+  for (i=0; i<6; i++)
     {
     num->SetElement(i, info->GetExtent()[i]);
     }
@@ -383,7 +384,7 @@ void vtkSMSourceProxy::ConvertDataInformationToProperty(
     bounds->Delete();
     }
   bounds->SetNumberOfElements(6);
-  for (int i=0; i<6; i++)
+  for (i=0; i<6; i++)
     {
     bounds->SetElement(i, info->GetBounds()[i]);
     }
