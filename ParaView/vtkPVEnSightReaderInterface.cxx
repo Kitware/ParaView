@@ -65,7 +65,7 @@ vtkPVSource *vtkPVEnSightReaderInterface::CreateCallback()
     vtkErrorMacro("Could not get pointer from object.");
     return NULL;
     }
-  pvApp->Script("%s SetCaseFileName [tk_getOpenFile]", tclName);
+  pvApp->Script("%s SetCaseFileName [tk_getOpenFile -filetypes {{{EnSight Case files} {.case}} {{All Files} {.*}}}]", tclName);
 
   if (strcmp(reader->GetCaseFileName(), "") == 0)
     {

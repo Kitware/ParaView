@@ -65,7 +65,7 @@ vtkPVSource *vtkPVDataSetReaderInterface::CreateCallback()
     return NULL;
     }
   // Use dialog to get file name on just prrocess 0
-  pvApp->Script("%s SetFileName [tk_getOpenFile]", tclName);
+  pvApp->Script("%s SetFileName [tk_getOpenFile -filetypes {{{VTK Data Sets} {.vtk}} {{All Files} {.*}}}]", tclName);
 
   // No file name?  Just abort.
   if (strcmp(reader->GetFileName(), "") == 0)
