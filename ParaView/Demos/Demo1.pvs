@@ -1418,6 +1418,7 @@ proc iso_run {} {
     $iso(vtkTemp529) SetScalarBarVisibility 0
 }
 
+
 proc stream_init {} {
     global DemoDir  pvDemoShouldStop Application streams
 
@@ -1572,6 +1573,254 @@ proc stream_run { } {
 
     # fly
     $streams(vtkTemp697) SetVisibility 0
+
+    if $pvDemoShouldStop {
+        return
+    }
+    stream_fly
+
+    if $pvDemoShouldStop {
+        return
+    }
+    after 1000
+
+    $streams(vtkTemp24) SetCameraState -22.309 -24.774 24.133  29.259 32.476 -26.065  0.404996 0.367997 0.836992 
+    update
+
+    # show tubes
+    $streams(vtkTemp786) SetVisibility 0
+    $streams(vtkTemp679) AcceptCallback
+
+    $streams(vtkTemp900) SetVisibility 1
+    $streams(vtkTemp679) AcceptCallback
+
+    after 2000
+
+    $streams(vtkTemp700) SetCurrentValue {Line}
+
+    if $pvDemoShouldStop {
+        return
+    }
+    set streams(vtkTemp899) [$streams(vtkTemp700) GetPVWidget {Line}]
+    set streams(vtkTemp699) [$streams(vtkTemp899) GetLineWidget]
+    $streams(vtkTemp699) SetPoint1 -5.99623 -4.36920 2.68942
+    $streams(vtkTemp699) SetPoint2 -5.99623 3.45009 3.07720
+    $streams(vtkTemp699) SetResolution 20
+    # line widget
+    $streams(vtkTemp699) SetVisibility 1
+    $streams(vtkTemp679) AcceptCallback
+
+    if $pvDemoShouldStop {
+        return
+    }
+    after 2000
+
+    set streams(vtkTemp711) [$streams(vtkTemp679) GetPVWidget {IntegrationDirection}]
+    $streams(vtkTemp711) SetCurrentValue {1}
+    $streams(vtkTemp679) AcceptCallback
+
+    if $pvDemoShouldStop {
+        return
+    }
+    after 2000
+
+    $streams(vtkTemp704) SetValue 5
+    $streams(vtkTemp711) SetCurrentValue {0}
+    $streams(vtkTemp679) AcceptCallback
+
+    if $pvDemoShouldStop {
+        return
+    }
+    after 2000
+
+    $streams(vtkTemp699) SetPoint1 -5.99623 -4.36920 2.68942
+    $streams(vtkTemp699) SetPoint2 -5.99623 3.45009 3.07720
+    $streams(vtkTemp699) SetResolution 10
+    $streams(vtkTemp704) SetValue 20
+    $streams(vtkTemp679) AcceptCallback
+
+    if $pvDemoShouldStop {
+        return
+    }
+    after 2000
+
+    # outline
+    $streams(vtkTemp384) SetVisibility 0
+    # extract
+    $streams(vtkTemp478) SetVisibility 0
+    $streams(vtkTemp597) SetVisibility 0
+    # tube
+    $streams(vtkTemp900) SetVisibility 0
+    # line widget
+    $streams(vtkTemp699) SetVisibility 0
+
+    $streams(vtkTemp24) EventuallyRender
+
+}
+
+# Show the fly sequence even if running parallel
+proc stream2_init {} {
+    global DemoDir  pvDemoShouldStop Application streams
+
+    if $pvDemoShouldStop {
+        return
+    }
+    set streams(vtkTemp1) [$Application GetMainWindow]
+    set streams(vtkTemp24) [$streams(vtkTemp1) GetMainView]
+    $streams(vtkTemp1) OpenCustom "PLOT3D Files" "$DemoDir/postbin.xyz"
+    set streams(vtkTemp384) [$streams(vtkTemp1) GetCurrentPVSource]
+    set streams(vtkTemp398) [$streams(vtkTemp384) GetPVWidget {QFileName}]
+    $streams(vtkTemp398) SetValue "$DemoDir/postbin.q"
+    set streams(vtkTemp411) [$streams(vtkTemp384) GetPVWidget {IBlanking}]
+    $streams(vtkTemp411) SetState 1
+    $streams(vtkTemp384) AcceptCallback
+
+    if $pvDemoShouldStop {
+        return
+    }
+    set streams(vtkTemp478) [$streams(vtkTemp1) CreatePVSource ExtractGrid]
+    set streams(vtkTemp496) [$streams(vtkTemp478) GetPVWidget {VOI}]
+    $streams(vtkTemp496) SetValue 0 0 0 75 0 37 
+    $streams(vtkTemp478) AcceptCallback
+
+    if $pvDemoShouldStop {
+        return
+    }
+    $streams(vtkTemp1) SetCurrentPVSourceCallback $streams(vtkTemp384)
+    set streams(vtkTemp597) [$streams(vtkTemp1) CreatePVSource ExtractGrid]
+    set streams(vtkTemp614) [$streams(vtkTemp597) GetPVWidget {VOI}]
+    $streams(vtkTemp614) SetValue 0 37 0 75 0 0 
+    $streams(vtkTemp597) AcceptCallback
+    set streams(vtkTemp632) [$streams(vtkTemp597) GetPVOutput]
+    $streams(vtkTemp632) DrawWireframe
+    $streams(vtkTemp632) ColorByProperty
+    $streams(vtkTemp632) ChangeActorColor 0.517647 0.494118 0.486275
+    $streams(vtkTemp597) AcceptCallback
+
+    if $pvDemoShouldStop {
+        return
+    }
+
+    $streams(vtkTemp1) Open "$DemoDir/stream.vtk"
+    set streams(vtkTemp679) [vtkTemp1 GetCurrentPVSource]
+
+    if $pvDemoShouldStop {
+        return
+    }
+    set streams(vtkTemp786) [$streams(vtkTemp1) CreatePVSource RibbonFilter]
+    set streams(vtkTemp798) [$streams(vtkTemp786) GetPVWidget {Vectors}]
+    $streams(vtkTemp798) SetValue {Normals}
+    set streams(vtkTemp799) [$streams(vtkTemp786) GetPVWidget {Width}]
+    $streams(vtkTemp799) SetValue 0.1
+    $streams(vtkTemp786) AcceptCallback
+    set streams(vtkTemp816) [$streams(vtkTemp786) GetPVOutput]
+    $streams(vtkTemp816) ColorByPointFieldComponent {IntegrationTime} 0
+    $streams(vtkTemp786) AcceptCallback
+
+    if $pvDemoShouldStop {
+        return
+    }
+    $streams(vtkTemp1) SetCurrentPVSourceCallback $streams(vtkTemp679)
+    set streams(vtkTemp900) [$streams(vtkTemp1) CreatePVSource TubeFilter]
+    set streams(vtkTemp912) [$streams(vtkTemp900) GetPVWidget {NumberOfSides}]
+    $streams(vtkTemp912) SetValue 8
+    set streams(vtkTemp918) [$streams(vtkTemp900) GetPVWidget {Radius}]
+    $streams(vtkTemp918) SetValue 0.1
+    $streams(vtkTemp900) AcceptCallback
+    set streams(vtkTemp930) [$streams(vtkTemp900) GetPVOutput]
+    $streams(vtkTemp930) ColorByPointFieldComponent {IntegrationTime} 0
+    $streams(vtkTemp900) AcceptCallback
+
+    if $pvDemoShouldStop {
+        return
+    }
+    # outline
+    $streams(vtkTemp384) SetVisibility 0
+    # extract
+    $streams(vtkTemp478) SetVisibility 0
+    $streams(vtkTemp597) SetVisibility 0
+    # sline
+    $streams(vtkTemp679) SetVisibility 0
+    # ribbon
+    $streams(vtkTemp786) SetVisibility 0
+    # tube
+    $streams(vtkTemp900) SetVisibility 0
+
+    $streams(vtkTemp24) EventuallyRender
+}
+
+proc stream2_run { } {
+    global DemoDir  pvDemoShouldStop Application streams
+
+    if $pvDemoShouldStop {
+        return
+    }
+
+    $Application BroadcastSimpleScript {catch {TDispManager1 SetScale 1.0}}
+
+    ChangeDemoText "Running Streamtraces Demo :\n Streamlines can be generated using constant step or adaptive integrators (currently, streamlines are not available in parallel, this feature is under development). The results can be displayed as points, lines, tubes, ribbons etc. and can be processed by a multitude of filters. "
+
+    # outline
+    $streams(vtkTemp384) SetVisibility 1
+    # extract
+    $streams(vtkTemp478) SetVisibility 1
+    $streams(vtkTemp597) SetVisibility 1
+
+    $streams(vtkTemp24) SetCameraState -22.309 -24.774 24.133  29.259 32.476 -26.065  0.405 0.368 0.837
+
+    if $pvDemoShouldStop {
+        return
+    }
+
+    # show ribbons
+    $streams(vtkTemp786) SetVisibility 1
+    #$streams(vtkTemp679) AcceptCallback
+
+    if $pvDemoShouldStop {
+        return
+    }
+    after 1000
+
+    # fly
+    $streams(vtkTemp679) SetVisibility 0
+
+    if $pvDemoShouldStop {
+        return
+    }
+    stream_fly
+
+    if $pvDemoShouldStop {
+        return
+    }
+    after 1000
+
+    $streams(vtkTemp24) SetCameraState -22.309 -24.774 24.133  29.259 32.476 -26.065  0.404996 0.367997 0.836992 
+    update
+
+    # show tubes
+    $streams(vtkTemp786) SetVisibility 0
+    $streams(vtkTemp679) AcceptCallback
+
+    $streams(vtkTemp900) SetVisibility 1
+    $streams(vtkTemp679) AcceptCallback
+
+    after 2000
+
+    # outline
+    $streams(vtkTemp384) SetVisibility 0
+    # extract
+    $streams(vtkTemp478) SetVisibility 0
+    $streams(vtkTemp597) SetVisibility 0
+    # tube
+    $streams(vtkTemp900) SetVisibility 0
+
+    $streams(vtkTemp24) EventuallyRender
+
+}
+
+
+proc stream_fly {} {
+    global DemoDir  pvDemoShouldStop Application streams
 
     vtkTemp24 SetCameraState -22.309 -24.774 24.133  29.259 32.476 -26.065  0.404996 0.367997 0.836992 
     update
@@ -3246,86 +3495,13 @@ proc stream_run { } {
     update
     $streams(vtkTemp24) SetCameraState 4.88703 -0.0941609 2.72411  96.3804 8.62383 5.82342  -0.0528386 0.207249 0.97686 
     update
-
-
-    if $pvDemoShouldStop {
-        return
-    }
-    after 1000
-
-    $streams(vtkTemp24) SetCameraState -22.309 -24.774 24.133  29.259 32.476 -26.065  0.404996 0.367997 0.836992 
-    update
-
-    # show tubes
-    $streams(vtkTemp786) SetVisibility 0
-    $streams(vtkTemp679) AcceptCallback
-
-    $streams(vtkTemp900) SetVisibility 1
-    $streams(vtkTemp679) AcceptCallback
-
-    after 2000
-
-    $streams(vtkTemp700) SetCurrentValue {Line}
-
-    if $pvDemoShouldStop {
-        return
-    }
-    set streams(vtkTemp899) [$streams(vtkTemp700) GetPVWidget {Line}]
-    set streams(vtkTemp699) [$streams(vtkTemp899) GetLineWidget]
-    $streams(vtkTemp699) SetPoint1 -5.99623 -4.36920 2.68942
-    $streams(vtkTemp699) SetPoint2 -5.99623 3.45009 3.07720
-    $streams(vtkTemp699) SetResolution 20
-    # line widget
-    $streams(vtkTemp699) SetVisibility 1
-    $streams(vtkTemp679) AcceptCallback
-
-    if $pvDemoShouldStop {
-        return
-    }
-    after 2000
-
-    set streams(vtkTemp711) [$streams(vtkTemp679) GetPVWidget {IntegrationDirection}]
-    $streams(vtkTemp711) SetCurrentValue {1}
-    $streams(vtkTemp679) AcceptCallback
-
-    if $pvDemoShouldStop {
-        return
-    }
-    after 2000
-
-    $streams(vtkTemp704) SetValue 5
-    $streams(vtkTemp711) SetCurrentValue {0}
-    $streams(vtkTemp679) AcceptCallback
-
-    if $pvDemoShouldStop {
-        return
-    }
-    after 2000
-
-    $streams(vtkTemp699) SetPoint1 -5.99623 -4.36920 2.68942
-    $streams(vtkTemp699) SetPoint2 -5.99623 3.45009 3.07720
-    $streams(vtkTemp699) SetResolution 10
-    $streams(vtkTemp704) SetValue 20
-    $streams(vtkTemp679) AcceptCallback
-
-    if $pvDemoShouldStop {
-        return
-    }
-    after 2000
-
-    # outline
-    $streams(vtkTemp384) SetVisibility 0
-    # extract
-    $streams(vtkTemp478) SetVisibility 0
-    $streams(vtkTemp597) SetVisibility 0
-    # tube
-    $streams(vtkTemp900) SetVisibility 0
-    # line widget
-    $streams(vtkTemp699) SetVisibility 0
-
-    $streams(vtkTemp24) EventuallyRender
-
 }
+
+
+
+
+
+
 
 proc threshold_init {} {
     global DemoDir  pvDemoShouldStop Application threshold
@@ -3508,7 +3684,7 @@ if ![info exists DemoDir] {
         wm deiconify .control
         .control.main.stop configure -state normal
         .control.main.info configure -text "ParaView demo initializing.\n Please wait." 
-        grab .control.main.stop
+        #grab .control.main.stop
 
         clip_init
         extract_init
@@ -3517,6 +3693,8 @@ if ![info exists DemoDir] {
         warp_init
         if {[[$Application GetController] GetNumberOfProcesses] == 1} {
             stream_init
+        } else {
+	    stream2_init
         }
 
         while {1} {
@@ -3524,6 +3702,8 @@ if ![info exists DemoDir] {
             warp_run
             if {[[$Application GetController] GetNumberOfProcesses] == 1} {
                 stream_run
+            } else {
+                stream2_run
             }
             extract_run
             clip_run
@@ -3573,7 +3753,7 @@ if ![info exists DemoDir] {
 
         catch {$clip(vtkTemp24) EventuallyRender}
 
-        grab release .control.main.stop
+        #grab release .control.main.stop
         wm withdraw .control
 
         wm protocol .paraview WM_DELETE_WINDOW { [$Application GetMainWindow] Exit }
