@@ -52,7 +52,7 @@ hbool_t H5_MPEinit_g = FALSE;   /* MPE Library hasn't been initialized */
 
 char                    H5_lib_vers_info_g[] = H5_VERS_INFO;
 hbool_t                 dont_atexit_g = FALSE;
-H5_debug_t              H5_debug_g;             /*debugging info        */
+H5_debug_t              H5_debug_g={};         /*debugging info        */
 static void             H5_debug_mask(const char*);
 
 /* Interface initialization */
