@@ -18,10 +18,10 @@
 ==Set of Core Widgets==
 
 Given a core widget type T, a set S(T) of widgets T is a basic container that
-allows developpers to delegate allocation, deletion, creation and packing to a
-single object S(T). Sets of widgets are useful in situations that require 
-dynamic numbers of widgets. They can also be used to group related widgets 
-together without maintaining ivars for each one of them. 
+allows developers to delegate allocation, deletion, creation and packing of
+multiple objects T to a single object S(T). Sets of widgets are useful in
+situations that require dynamic numbers of widgets. They can also be used to
+group related widgets together without maintaining ivars for each one of them. 
 
 Sets of widgets are created automatically as subclasses of vtkKWWidgetSet 
 by configuring the files Templates/vtkKWWidgetSetSubclass.[h|cxx].in. 
@@ -41,7 +41,7 @@ complete list of sets. At the moment:
 ==Labeled Widgets==
 
 Given a core widget type T, a labeled widget L(T) is a composite widget that
-allows developpers to associate a label (vtkKWLabel) to a widget T. Despite 
+allows developers to associate a label (vtkKWLabel) to a widget T. Despite 
 the fact that many core widgets already provide some sort of labelling
 framework, labeled widgets are useful in situations that require more
 flexibility in terms of rendering and positioning.
@@ -86,9 +86,9 @@ complete list of labeled widgets. At the moment:
   And so forth for each type T. These methods are now AddWidget(), GetWidget(),
   HasWidget(), etc. for all types T. Check the header or the online 
   documentation of vtkKWWidgetSet and each vtkKW*Set for more.
-* The SetLabel(const char *) and SetText(const char *) methods where mixed and
-  matched among the core widgets. Some classes even had inconsistent Set/Get
-  pairs, vtkKWLabel* GetLabel(), and SetLabel(const char*). The SetText()
+* The SetLabel(const char *) and SetText(const char *) methods were mixed and
+  matched among the core widgets. Some classes had inconsistent Set/Get pairs, 
+  e.g. vtkKWLabel* GetLabel(), and SetLabel(const char*). The SetText()
   is now the only one in use for the core widgets. Composite widgets, including
-  the labeled widgets above, may provide a SetLabelText() method as a shortcut
-  to GetLabel()->SetText() for example.
+  the labeled widgets mentioned above, may provide a SetLabelText() method as
+  a shortcut to GetLabel()->SetText() for example.
