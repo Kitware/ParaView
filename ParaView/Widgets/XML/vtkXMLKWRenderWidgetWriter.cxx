@@ -39,12 +39,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkCornerAnnotation.h"
 #include "vtkKWRenderWidget.h"
 #include "vtkObjectFactory.h"
+#include "vtkTextActor.h"
 #include "vtkXMLCameraWriter.h"
 #include "vtkXMLCornerAnnotationWriter.h"
 #include "vtkXMLDataElement.h"
+#include "vtkXMLTextActorWriter.h"
 
 vtkStandardNewMacro(vtkXMLKWRenderWidgetWriter);
-vtkCxxRevisionMacro(vtkXMLKWRenderWidgetWriter, "1.4");
+vtkCxxRevisionMacro(vtkXMLKWRenderWidgetWriter, "1.5");
 
 //----------------------------------------------------------------------------
 char* vtkXMLKWRenderWidgetWriter::GetRootElementName()
@@ -131,14 +133,14 @@ int vtkXMLKWRenderWidgetWriter::AddNestedElements(vtkXMLDataElement *elem)
 
   // Header Annotation
 
-  vtkXMLDataElement *ha_elem = vtkXMLDataElement::New();
-  elem->AddNestedElement(ha_elem);
-  ha_elem->Delete();
-  ha_elem->SetName(this->GetHeaderAnnotationElementName());
-  ha_elem->SetIntAttribute("Visibility", 
-                           obj->GetHeaderAnnotationVisibility());
-  ha_elem->SetVectorAttribute("Color", 3, obj->GetHeaderAnnotationColor());
-  ha_elem->SetAttribute("Text", obj->GetHeaderAnnotationText());
+  vtkTextActor *texta = obj->GetHeaderAnnotation();
+  if (texta)
+    {
+    vtkXMLTextActorWriter *xmlw = vtkXMLTextActorWriter::New();
+    xmlw->SetObject(texta);
+    xmlw->CreateInNestedElement(elem, this->GetHeaderAnnotationElementName());
+    xmlw->Delete();
+    }
   
   return 1;
 }

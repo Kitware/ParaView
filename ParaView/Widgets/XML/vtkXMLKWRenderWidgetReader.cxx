@@ -39,13 +39,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkCornerAnnotation.h"
 #include "vtkKWRenderWidget.h"
 #include "vtkObjectFactory.h"
+#include "vtkTextActor.h"
 #include "vtkXMLCameraReader.h"
 #include "vtkXMLCornerAnnotationReader.h"
 #include "vtkXMLDataElement.h"
 #include "vtkXMLKWRenderWidgetWriter.h"
+#include "vtkXMLTextActorReader.h"
 
 vtkStandardNewMacro(vtkXMLKWRenderWidgetReader);
-vtkCxxRevisionMacro(vtkXMLKWRenderWidgetReader, "1.4");
+vtkCxxRevisionMacro(vtkXMLKWRenderWidgetReader, "1.5");
 
 //----------------------------------------------------------------------------
 char* vtkXMLKWRenderWidgetReader::GetRootElementName()
@@ -72,7 +74,6 @@ int vtkXMLKWRenderWidgetReader::Parse(vtkXMLDataElement *elem)
 
   float fbuffer3[3];
   const char *cptr;
-  int ival;
 
   if (elem->GetVectorAttribute("BackgroundColor", 3, fbuffer3) == 3)
     {
@@ -116,23 +117,17 @@ int vtkXMLKWRenderWidgetReader::Parse(vtkXMLDataElement *elem)
 
   // Header Annotation
 
-  vtkXMLDataElement *ha_elem = elem->FindNestedElementWithName(
-    vtkXMLKWRenderWidgetWriter::GetHeaderAnnotationElementName());
-  if (ha_elem)
+  vtkTextActor *texta = obj->GetHeaderAnnotation();
+  if (texta)
     {
-    if (ha_elem->GetScalarAttribute("Visibility", ival))
+    vtkXMLTextActorReader *xmlr = vtkXMLTextActorReader::New();
+    xmlr->SetObject(texta);
+    if (xmlr->ParseInNestedElement(
+          elem, vtkXMLKWRenderWidgetWriter::GetHeaderAnnotationElementName()))
       {
-      obj->SetHeaderAnnotationVisibility(ival);
+      obj->SetHeaderAnnotationVisibility(texta->GetVisibility()); // add prop
       }
-    if (ha_elem->GetVectorAttribute("Color", 3, fbuffer3) == 3)
-      {
-      obj->SetHeaderAnnotationColor(fbuffer3);
-      }
-    cptr = ha_elem->GetAttribute("Text");
-    if (cptr)
-      {
-      obj->SetHeaderAnnotationText(cptr);
-      }
+    xmlr->Delete();
     }
   
   return 1;
