@@ -41,6 +41,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __vtkKWTclInteractor_h
 
 #include "vtkKWWidget.h"
+
 class vtkKWApplication;
 class vtkKWPushButton;
 class vtkKWEntry;
@@ -92,6 +93,15 @@ public:
   // debugging information to the command prompt when no standard
   // output is available.
   void AppendText(const char* text);
+
+  // Description:
+  // Update the "enable" state of the object and its internal parts.
+  // Depending on different Ivars (this->Enabled, the application's 
+  // Limited Edition Mode, etc.), the "enable" state of the object is updated
+  // and propagated to its internal parts/subwidgets. This will, for example,
+  // enable/disable parts of the widget UI, enable/disable the visibility
+  // of 3D widgets, etc.
+  virtual void UpdateEnableState();
 
 protected:
   vtkKWTclInteractor();

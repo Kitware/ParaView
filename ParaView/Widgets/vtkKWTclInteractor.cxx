@@ -45,11 +45,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWTclInteractor );
-vtkCxxRevisionMacro(vtkKWTclInteractor, "1.16");
+vtkCxxRevisionMacro(vtkKWTclInteractor, "1.16.2.1");
 
 int vtkKWTclInteractorCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
 
+//----------------------------------------------------------------------------
 vtkKWTclInteractor::vtkKWTclInteractor()
 {
   this->CommandFunction = vtkKWTclInteractorCommand;
@@ -73,6 +74,7 @@ vtkKWTclInteractor::vtkKWTclInteractor()
   this->MasterWindow = 0;
 }
 
+//----------------------------------------------------------------------------
 vtkKWTclInteractor::~vtkKWTclInteractor()
 {
   this->DismissButton->Delete();
@@ -98,6 +100,7 @@ vtkKWTclInteractor::~vtkKWTclInteractor()
   this->SetMasterWindow(0);
 }
 
+//----------------------------------------------------------------------------
 void vtkKWTclInteractor::SetMasterWindow(vtkKWWindow* win)
 {
   if (this->MasterWindow != win) 
@@ -121,6 +124,7 @@ void vtkKWTclInteractor::SetMasterWindow(vtkKWWindow* win)
   
 }
 
+//----------------------------------------------------------------------------
 void vtkKWTclInteractor::Create(vtkKWApplication *app)
 {
   const char *wname;
@@ -218,11 +222,13 @@ void vtkKWTclInteractor::Create(vtkKWApplication *app)
   this->Script("wm withdraw %s", wname);
 }
 
+//----------------------------------------------------------------------------
 void vtkKWTclInteractor::Display()
 {
   this->Script("wm deiconify %s", this->GetWidgetName());
 }
 
+//----------------------------------------------------------------------------
 void vtkKWTclInteractor::Evaluate()
 {
   this->CommandIndex = this->TagNumber;
@@ -257,6 +263,7 @@ void vtkKWTclInteractor::Evaluate()
   this->CommandEntry->SetValue("");
 }
 
+//----------------------------------------------------------------------------
 void vtkKWTclInteractor::AppendText(const char* text)
 {
   this->Script("%s insert end {%s}", 
@@ -266,6 +273,7 @@ void vtkKWTclInteractor::AppendText(const char* text)
                this->DisplayText->GetWidgetName());
 }
 
+//----------------------------------------------------------------------------
 void vtkKWTclInteractor::DownCallback()
 {
   if ( ! this->Application)
@@ -288,6 +296,7 @@ void vtkKWTclInteractor::DownCallback()
     }
 }
 
+//----------------------------------------------------------------------------
 void vtkKWTclInteractor::UpCallback()
 {
   if ( ! this->Application)
@@ -303,6 +312,52 @@ void vtkKWTclInteractor::UpCallback()
     this->Script("%s delete 0 end", this->CommandEntry->GetWidgetName());
     this->Script("%s insert end $commandString",
                  this->CommandEntry->GetWidgetName());
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWTclInteractor::UpdateEnableState()
+{
+  this->Superclass::UpdateEnableState();
+
+  if (this->ButtonFrame)
+    {
+    this->ButtonFrame->SetEnabled(this->Enabled);
+    }
+
+  if (this->DismissButton)
+    {
+    this->DismissButton->SetEnabled(this->Enabled);
+    }
+
+  if (this->CommandFrame)
+    {
+    this->CommandFrame->SetEnabled(this->Enabled);
+    }
+
+  if (this->CommandLabel)
+    {
+    this->CommandLabel->SetEnabled(this->Enabled);
+    }
+
+  if (this->CommandEntry)
+    {
+    this->CommandEntry->SetEnabled(this->Enabled);
+    }
+
+  if (this->DisplayFrame)
+    {
+    this->DisplayFrame->SetEnabled(this->Enabled);
+    }
+
+  if (this->DisplayText)
+    {
+    this->DisplayText->SetEnabled(this->Enabled);
+    }
+
+  if (this->DisplayScrollBar)
+    {
+    this->DisplayScrollBar->SetEnabled(this->Enabled);
     }
 }
 
