@@ -20,7 +20,7 @@
 
 #include "vtkRenderWindowInteractor.h"
 
-class vtkPVRenderView;
+class vtkPVRenderViewProxy;
 class vtkRenderer;
 
 class VTK_EXPORT vtkPVGenericRenderWindowInteractor : public vtkRenderWindowInteractor
@@ -30,8 +30,8 @@ public:
   vtkTypeRevisionMacro(vtkPVGenericRenderWindowInteractor, vtkRenderWindowInteractor);
   void PrintSelf(ostream& os, vtkIndent indent);
   
-  void SetPVRenderView(vtkPVRenderView *view);
-  vtkGetObjectMacro(PVRenderView, vtkPVRenderView);
+  void SetPVRenderView(vtkPVRenderViewProxy *view);
+  vtkGetObjectMacro(PVRenderView, vtkPVRenderViewProxy);
 
   // Description:
   // Fire various events, SetEventInformation should be called just prior
@@ -80,7 +80,7 @@ protected:
 
   int CalculateReductionFactor(int winSize1, int renSize1);
   
-  vtkPVRenderView *PVRenderView;
+  vtkPVRenderViewProxy *PVRenderView;
   int ReductionFactor;
   int InteractiveRenderEnabled;
   vtkRenderer* Renderer;

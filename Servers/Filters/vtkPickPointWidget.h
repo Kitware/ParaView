@@ -31,7 +31,7 @@
 #include "vtkPointWidget.h"
 
 
-class vtkPVRenderModule;
+class vtkPVRenderModuleProxy;
 
 
 class VTK_EXPORT vtkPickPointWidget : public vtkPointWidget
@@ -44,8 +44,8 @@ public:
     
   // Description:
   // The render module is for picking.
-  void SetRenderModule(vtkPVRenderModule* rm);
-  vtkPVRenderModule* GetRenderModule() { return this->RenderModule;}
+  void SetRenderModuleProxy(vtkPVRenderModuleProxy* rm);
+  vtkPVRenderModuleProxy* GetRenderModule() { return this->RenderModuleProxy;}
 
   // Description:
   // We have to look for key press events too.
@@ -56,7 +56,7 @@ protected:
   ~vtkPickPointWidget();
 
   // For picking.  Use a proxy in the future.
-  vtkPVRenderModule* RenderModule;
+  vtkPVRenderModuleProxy* RenderModuleProxy;
 
   virtual void OnChar();
 

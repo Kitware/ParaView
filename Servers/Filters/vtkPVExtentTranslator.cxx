@@ -20,7 +20,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVExtentTranslator);
-vtkCxxRevisionMacro(vtkPVExtentTranslator, "1.15");
+vtkCxxRevisionMacro(vtkPVExtentTranslator, "1.1");
 
 //vtkCxxSetObjectMacro(vtkPVExtentTranslator, OriginalSource, vtkDataSet);
 

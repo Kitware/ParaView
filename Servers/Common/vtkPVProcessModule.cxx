@@ -45,7 +45,7 @@ int vtkPVProcessModule::GlobalLODFlag = 0;
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProcessModule);
-vtkCxxRevisionMacro(vtkPVProcessModule, "1.11");
+vtkCxxRevisionMacro(vtkPVProcessModule, "1.12");
 
 //----------------------------------------------------------------------------
 vtkPVProcessModule::vtkPVProcessModule()
@@ -326,7 +326,7 @@ void vtkPVProcessModule::SetLocalProgress(const char* filter, int progress)
 {
  if(!this->GUIHelper)
     {
-    vtkErrorMacro("GUIHelper must be set, for SetLocalProgress.");
+    vtkErrorMacro("GUIHelper must be set, for SetLocalProgress.  " << filter << " " << progress);
     return;
     }
  this->GUIHelper->SetLocalProgress(filter, progress);

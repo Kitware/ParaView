@@ -78,7 +78,6 @@ public:
 protected:
   vtkPVLODActor();
   ~vtkPVLODActor();
-
   vtkActor            *Device;
   vtkMapper           *LODMapper;
 

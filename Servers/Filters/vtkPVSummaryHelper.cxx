@@ -34,7 +34,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSummaryHelper);
-vtkCxxRevisionMacro(vtkPVSummaryHelper, "1.4");
+vtkCxxRevisionMacro(vtkPVSummaryHelper, "1.1");
 
 vtkCxxSetObjectMacro(vtkPVSummaryHelper, Writer, vtkXMLWriter);
 vtkCxxSetObjectMacro(vtkPVSummaryHelper, Controller,

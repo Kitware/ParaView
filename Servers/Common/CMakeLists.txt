@@ -9,6 +9,7 @@ SET(Common_SRCS
   vtkProcessModuleGUIHelper.cxx
   vtkStringList.cxx  
   vtkPVInformation.cxx
+  vtkPVTimerInformation.cxx
   vtkPVNumberOfOutputsInformation.cxx
   vtkPVLODPartDisplayInformation.cxx
   vtkPVDataSetAttributesInformation.cxx

@@ -99,7 +99,7 @@
 #include "vtkClientServerStream.h"
 #include "vtkTimerLog.h"
 #include "vtkPVPluginsDialog.h"
-
+#include "vtkPVRenderViewProxyImplementation.h"
 #include <vtkstd/map>
 
 #ifdef _WIN32
@@ -127,7 +127,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.590");
+vtkCxxRevisionMacro(vtkPVWindow, "1.591");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -184,7 +184,7 @@ vtkPVWindow::vtkPVWindow()
   this->CameraStyle3D = vtkPVInteractorStyle::New();
   this->CameraStyle2D = vtkPVInteractorStyle::New();
   this->CenterOfRotationStyle = vtkPVInteractorStyleCenterOfRotation::New();
-  
+
   this->PickCenterToolbar = vtkKWToolbar::New();
   this->Toolbars->AddToolbar(this->PickCenterToolbar);
 
@@ -908,7 +908,10 @@ void vtkPVWindow::Create(vtkKWApplication *app, const char* vtkNotUsed(args))
     vtkErrorMacro("vtkPVWindow::Create needs a vtkPVApplication.");
     return;
     }
-
+  // Set the render module on the CenterOfRotationStyle
+  this->CenterOfRotationStyle->SetRenderModule(pvApp->GetRenderModule());
+  this->CenterOfRotationStyle->SetPVWindow(this);
+ 
   // Make sure the widget is name appropriately: paraview instead of a number.
   // On X11, the window name is the same as the widget name.
 
@@ -1115,7 +1118,10 @@ void vtkPVWindow::Create(vtkKWApplication *app, const char* vtkNotUsed(args))
                   << vtkClientServerStream::End;
   pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
 
-  this->Interactor->SetPVRenderView(this->MainView);
+  vtkPVRenderViewProxyImplementation* proxy = vtkPVRenderViewProxyImplementation::New();
+  proxy->SetPVRenderView(this->MainView);
+  this->Interactor->SetPVRenderView(proxy);
+  proxy->Delete();
   this->ChangeInteractorStyle(1);
 
   // Configure the window, i.e. setup the interactors

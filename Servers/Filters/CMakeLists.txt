@@ -2,6 +2,20 @@ PROJECT(PVFilters)
 INCLUDE_REGULAR_EXPRESSION("^vtk.*$")
 
 SET(Filters_SRCS
+  vtkPVServerArraySelection.cxx
+  vtkPVServerFileListing.cxx
+  vtkPVServerObject.cxx
+  vtkPVServerProbe.cxx
+  vtkPVServerSelectTimeSet.cxx
+  vtkPVServerXDMFParameters.cxx
+  vtkPVExtentTranslator.cxx
+  vtkPickPointWidget.cxx
+  vtkPVSummaryHelper.cxx
+
+  vtkPVLODActor.cxx
+  vtkPVGenericRenderWindowInteractor.cxx
+  vtkPVRenderModuleProxy.cxx
+  vtkPVRenderViewProxy.cxx
   vtkPVGeometryFilter.cxx
   vtkPVXMLElement.cxx
   vtkPVXMLParser.cxx
@@ -60,7 +74,8 @@ SET(Filters_SRCS
 	vtkTempTessellatorFilter.cxx # Remove after ParaView 1.4
   )
 
-SET_SOURCE_FILES_PROPERTIES( vtkSubdivisionAlgorithm.cxx ABSTRACT)
+SET_SOURCE_FILES_PROPERTIES( vtkSubdivisionAlgorithm.cxx 
+  vtkPVRenderModuleProxy.cxx vtkPVRenderViewProxy.cxx ABSTRACT)
 
 IF(VTK_USE_MPI)
   SET(Filters_SRCS ${Filters_SRCS}
@@ -113,6 +128,7 @@ INCLUDE_DIRECTORIES(
   ${KWCOMMON_INCLUDE_DIR}
   ${HDF5_INCLUDE_DIR}
   ${VTK_INCLUDE_DIR}
+  ${XDMF_INCLUDE_DIRS}
   )
 
 IF(VTK_USE_MPI)
@@ -133,7 +149,7 @@ VTK_MAKE_INSTANTIATOR3(vtkPVFiltersInstantiator FiltersInst_SRCS
 
 # Create filters library.
 ADD_LIBRARY(vtkPVFilters ${Filters_SRCS} ${FiltersInst_SRCS})
-TARGET_LINK_LIBRARIES(vtkPVFilters vtkKWCommon vtkPVCommon vtkPVCommonCS vtkHybridCS vtkParallelCS vtkKWCommon)
+TARGET_LINK_LIBRARIES(vtkPVFilters vtkKWCommon vtkPVCommon vtkPVCommonCS vtkXdmfCS vtkHybridCS vtkParallelCS vtkKWCommon)
 IF (VTK_USE_PATENTED)
   TARGET_LINK_LIBRARIES(vtkPVFilters vtkPatented)
 ENDIF (VTK_USE_PATENTED)

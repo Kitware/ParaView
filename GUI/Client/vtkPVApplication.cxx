@@ -111,7 +111,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.301");
+vtkCxxRevisionMacro(vtkPVApplication, "1.302");
 vtkCxxSetObjectMacro(vtkPVApplication, RenderModule, vtkPVRenderModule);
 
 
@@ -166,19 +166,8 @@ extern "C" int Blt_Init(Tcl_Interp *interp);
 extern "C" int Vtkpvdevelopmenttcl_Init(Tcl_Interp *interp);
 #endif
 
-#ifdef PARAVIEW_NEW_SOURCE_ORGANIZATION
 extern "C" int Vtkkwparaview_Init(Tcl_Interp *interp);
 extern "C" int Vtkpvservermanagertcl_Init(Tcl_Interp *interp); 
-#else
-extern "C" int Vtkkwparaviewtcl_Init(Tcl_Interp *interp);
-#endif
-
-#ifndef PARAVIEW_NEW_SOURCE_ORGANIZATION
-extern "C" int Vtkpvfilterstcl_Init(Tcl_Interp *interp);
-#ifdef PARAVIEW_LINK_XDMF
-extern "C" int Vtkxdmftcl_Init(Tcl_Interp *interp);
-#endif
-#endif
 
 vtkPVApplication* vtkPVApplication::MainApplication = 0;
 
@@ -369,10 +358,6 @@ Tcl_Interp *vtkPVApplication::InitializeTcl(int argc,
     return interp;
     }
 
-#ifndef PARAVIEW_NEW_SOURCE_ORGANIZATION
-  Vtkpvfilterstcl_Init(interp);
-#endif
-
 #ifdef PARAVIEW_BUILD_DEVELOPMENT
   Vtkpvdevelopmenttcl_Init(interp);
 #endif
@@ -385,18 +370,9 @@ Tcl_Interp *vtkPVApplication::InitializeTcl(int argc,
 #endif
     }
    
-#ifdef PARAVIEW_NEW_SOURCE_ORGANIZATION
   Vtkkwparaview_Init(interp);
   Vtkpvservermanagertcl_Init(interp); 
-#else
-  Vtkkwparaviewtcl_Init(interp);
-#endif
 
-#ifndef PARAVIEW_NEW_SOURCE_ORGANIZATION
-#ifdef PARAVIEW_LINK_XDMF
-  Vtkxdmftcl_Init(interp);
-#endif
-#endif
   char* script = vtkString::Duplicate(vtkPVApplication::ExitProc);  
   if (Tcl_GlobalEval(interp, script) != TCL_OK)
     {

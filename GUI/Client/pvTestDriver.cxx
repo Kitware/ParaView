@@ -81,7 +81,15 @@ void pvTestDriver::CollectConfiguredOptions()
   this->ParaView  += "/" CMAKE_INTDIR;
 #endif
   this->ParaView += "/paraview";
-
+  // Find the location of the paraview render server
+  this->ParaViewRenderServer = this->ParaView;
+  // Find the location of the paraview server
+  this->ParaViewServer = PARAVIEW_BINARY_DIR;
+#ifdef  CMAKE_INTDIR
+    this->ParaViewServer  += "/" CMAKE_INTDIR;
+#endif
+    // To test pvserver, change the following to pvserver
+    this->ParaViewServer += "/paraview";
   // now find all the mpi information if mpi run is set
 #ifdef VTK_USE_MPI
 #ifdef VTK_MPIRUN_EXE
@@ -185,6 +193,7 @@ int pvTestDriver::ProcessCommandLine(int argc, char* argv[])
 
 void 
 pvTestDriver::CreateCommandLine(kwsys_stl::vector<const char*>& commandLine,
+                                const char* paraView,
                                 const char* paraviewFlags, 
                                 const char* numProc,
                                 int argStart,
@@ -201,7 +210,7 @@ pvTestDriver::CreateCommandLine(kwsys_stl::vector<const char*>& commandLine,
        commandLine.push_back(this->MPIFlags[i].c_str());
        }
     }
-  commandLine.push_back(this->ParaView.c_str());
+  commandLine.push_back(paraView);
   if(strlen(paraviewFlags) > 0)
     {
     commandLine.push_back(paraviewFlags);
@@ -302,12 +311,24 @@ int pvTestDriver::OutputStringHasError(const char* pname, vtkstd::string& output
 //----------------------------------------------------------------------------
 int pvTestDriver::Main(int argc, char* argv[])
 {
+  // temporary hack
+  // when pvserver supports -rc option then this can be removed
+  // until then, ReverseConnection must be set before CollectConfiguredOptions
+  // is called.
+  for(int k =0; k < argc; k++)
+    {
+    if(strcmp(argv[k],"--test-rc") == 0)
+      {
+      this->ReverseConnection = 1;
+      }
+    }
   this->CollectConfiguredOptions();
   if(!this->ProcessCommandLine(argc, argv))
     {
     return 1;
-    }
-  // mpi code
+    } 
+  
+ // mpi code
   // Allocate process managers.
   kwsysProcess* renderServer = 0;
   if(this->TestRenderServer)
@@ -349,6 +370,7 @@ int pvTestDriver::Main(int argc, char* argv[])
   if(renderServer)
     {
     this->CreateCommandLine(renderServerCommand,
+                            this->ParaView.c_str(),
                             "--render-server",
                             this->MPIRenderServerNumProcessFlag.c_str());
     ReportCommand(&renderServerCommand[0], "renderserver");
@@ -359,6 +381,7 @@ int pvTestDriver::Main(int argc, char* argv[])
   if(server)
     {
     this->CreateCommandLine(serverCommand,
+                            this->ParaViewServer.c_str(),
                             "--server",
                             this->MPIServerNumProcessFlag.c_str());
     ReportCommand(&serverCommand[0], "server");
@@ -392,6 +415,7 @@ int pvTestDriver::Main(int argc, char* argv[])
       }
     }
   this->CreateCommandLine(clientCommand,
+                          this->ParaView.c_str(),
                           clientFlag.c_str(),
                           this->MPIClientNumProcessFlag.c_str(),
                           this->ArgStart, argc, argv);

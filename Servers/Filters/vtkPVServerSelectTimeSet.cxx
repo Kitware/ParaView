@@ -26,7 +26,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVServerSelectTimeSet);
-vtkCxxRevisionMacro(vtkPVServerSelectTimeSet, "1.4");
+vtkCxxRevisionMacro(vtkPVServerSelectTimeSet, "1.1");
 
 //----------------------------------------------------------------------------
 class vtkPVServerSelectTimeSetInternals

@@ -8,24 +8,14 @@ SET( ParaViewSharedNotWrapped_SRCS
   )
 
 SET(ParaViewSharedNotTclWrapped_SRCS
-  vtkPickPointWidget.cxx
   vtkPVProcessModuleGUIHelper.cxx
-  vtkPVLODActor.cxx
-  vtkPVTimerInformation.cxx
-  vtkPVExtentTranslator.cxx
-  vtkPVGenericRenderWindowInteractor.cxx
+  vtkPVRenderViewProxyImplementation.cxx
+  vtkPVRenderModuleProxyImplementation.cxx
   )
 
 SET( ParaViewServer_SRCS
   vtkCaveRenderManager.cxx
   vtkMultiDisplayManager.cxx
-  vtkPVServerArraySelection.cxx
-  vtkPVServerFileListing.cxx
-  vtkPVServerObject.cxx
-  vtkPVServerProbe.cxx
-  vtkPVServerSelectTimeSet.cxx
-  vtkPVSummaryHelper.cxx
-  vtkPVServerXDMFParameters.cxx
   )
 
 IF(PARAVIEW_BUILD_DEVELOPMENT)

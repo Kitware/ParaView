@@ -24,12 +24,14 @@
 #include "vtkPVRenderModule.h"
 #include "vtkPVApplication.h"
 
-vtkCxxRevisionMacro(vtkPVInteractorStyleCenterOfRotation, "1.9");
+vtkCxxRevisionMacro(vtkPVInteractorStyleCenterOfRotation, "1.10");
 vtkStandardNewMacro(vtkPVInteractorStyleCenterOfRotation);
 
 //-------------------------------------------------------------------------
 vtkPVInteractorStyleCenterOfRotation::vtkPVInteractorStyleCenterOfRotation()
 {
+  this->RenderModule = 0;
+  this->PVWindow = 0;
   this->UseTimers = 0;
   this->Picker = vtkPVWorldPointPicker::New();
 
@@ -40,6 +42,18 @@ vtkPVInteractorStyleCenterOfRotation::vtkPVInteractorStyleCenterOfRotation()
 vtkPVInteractorStyleCenterOfRotation::~vtkPVInteractorStyleCenterOfRotation()
 {
   this->Picker->Delete();
+}
+
+//-------------------------------------------------------------------------
+void vtkPVInteractorStyleCenterOfRotation::SetPVWindow(vtkPVWindow* w)
+{
+  this->PVWindow = w;
+}
+
+//-------------------------------------------------------------------------
+void vtkPVInteractorStyleCenterOfRotation::SetRenderModule(vtkPVRenderModule* w)
+{
+  this->RenderModule = w;
 }
 
 //-------------------------------------------------------------------------
@@ -67,12 +81,7 @@ void vtkPVInteractorStyleCenterOfRotation::Pick()
   
   if ( ! this->Picker->GetRenderModule())
     {
-    vtkPVRenderView *view =
-      ((vtkPVGenericRenderWindowInteractor*)this->Interactor)->GetPVRenderView();
-    if (view)
-      {
-      this->Picker->SetRenderModule(view->GetPVApplication()->GetRenderModule());
-      }
+    this->Picker->SetRenderModule(this->GetRenderModule());
     }
   int x = this->Interactor->GetEventPosition()[0];
   int y = this->Interactor->GetEventPosition()[1];
@@ -85,10 +94,7 @@ void vtkPVInteractorStyleCenterOfRotation::Pick()
 //-------------------------------------------------------------------------
 void vtkPVInteractorStyleCenterOfRotation::SetCenter(float x, float y, float z)
 {
-  vtkPVGenericRenderWindowInteractor *iren =
-    vtkPVGenericRenderWindowInteractor::SafeDownCast(this->Interactor);
-  vtkPVWindow *window =
-    vtkPVWindow::SafeDownCast(iren->GetPVRenderView()->GetParentWindow());
+  vtkPVWindow *window = this->PVWindow;
   if (window)
     {
     window->GetCenterXEntry()->SetValue(x);
@@ -107,6 +113,8 @@ void vtkPVInteractorStyleCenterOfRotation::SetCenter(float x, float y, float z)
 void vtkPVInteractorStyleCenterOfRotation::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+  os << indent << "RenderModule" << this->RenderModule << endl;
+  os << indent << "PVWindow" << this->PVWindow << endl;
   
   os << indent << "Center: (" << this->Center[0] << ", " << this->Center[1]
      << ", " << this->Center[2] << ")" << endl;

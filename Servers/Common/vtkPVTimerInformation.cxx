@@ -23,7 +23,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVTimerInformation);
-vtkCxxRevisionMacro(vtkPVTimerInformation, "1.7");
+vtkCxxRevisionMacro(vtkPVTimerInformation, "1.1");
 
 
 

@@ -18,19 +18,19 @@
 #include "vtkMath.h"
 #include "vtkMatrix4x4.h"
 #include "vtkObjectFactory.h"
-#include "vtkPVApplication.h"
 #include "vtkProperty.h"
 #include "vtkRenderWindow.h"
 #include "vtkRenderer.h"
 #include "vtkTexture.h"
 #include "vtkTimerLog.h"
 #include "vtkTransform.h"
+#include "vtkPVProcessModule.h"
 
 #include <math.h>
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLODActor);
-vtkCxxRevisionMacro(vtkPVLODActor, "1.20");
+vtkCxxRevisionMacro(vtkPVLODActor, "1.1");
 
 vtkCxxSetObjectMacro(vtkPVLODActor, LODMapper, vtkMapper);
 
@@ -70,7 +70,7 @@ vtkMapper *vtkPVLODActor::SelectMapper()
     return this->Mapper;
     }
 
-  if (vtkPVApplication::GetGlobalLODFlag())
+  if (vtkPVProcessModule::GetGlobalLODFlag())
     {
     return this->LODMapper;
     }
@@ -296,6 +296,7 @@ void vtkPVLODActor::ShallowCopy(vtkProp *prop)
   // Now do superclass
   this->vtkActor::ShallowCopy(prop);
 }
+
 
 //----------------------------------------------------------------------------
 void vtkPVLODActor::PrintSelf(ostream& os, vtkIndent indent)

@@ -14,7 +14,7 @@
 =========================================================================*/
 #include "vtkPVGenericRenderWindowInteractor.h"
 #include "vtkRenderer.h"
-#include "vtkPVRenderView.h"
+#include "vtkPVRenderViewProxy.h"
 #include "vtkObjectFactory.h"
 #include "vtkRenderWindow.h"
 #include "vtkRendererCollection.h"
@@ -22,7 +22,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVGenericRenderWindowInteractor);
-vtkCxxRevisionMacro(vtkPVGenericRenderWindowInteractor, "1.18");
+vtkCxxRevisionMacro(vtkPVGenericRenderWindowInteractor, "1.1");
 vtkCxxSetObjectMacro(vtkPVGenericRenderWindowInteractor,Renderer,vtkRenderer);
 
 //----------------------------------------------------------------------------
@@ -52,14 +52,19 @@ void vtkPVGenericRenderWindowInteractor::ConfigureEvent()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVGenericRenderWindowInteractor::SetPVRenderView(vtkPVRenderView *view)
+void vtkPVGenericRenderWindowInteractor::SetPVRenderView(vtkPVRenderViewProxy *view)
 {
   if (this->PVRenderView != view)
     {
+    if(this->PVRenderView)
+      {
+      this->PVRenderView->UnRegister(this);
+      }
     // to avoid circular references
     this->PVRenderView = view;
     if (this->PVRenderView != NULL)
       {
+      this->PVRenderView->Register(this);
       this->SetRenderWindow(this->PVRenderView->GetRenderWindow());
       }
     }

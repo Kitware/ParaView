@@ -24,7 +24,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVServerXDMFParameters);
-vtkCxxRevisionMacro(vtkPVServerXDMFParameters, "1.4");
+vtkCxxRevisionMacro(vtkPVServerXDMFParameters, "1.1");
 
 //----------------------------------------------------------------------------
 class vtkPVServerXDMFParametersInternals

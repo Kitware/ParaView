@@ -159,8 +159,6 @@ SET(ICET_MPI_MAX_NUMPROCS "${VTK_MPI_MAX_NUMPROCS}"  CACHE INTERNAL
 
 
 
-# This is a hack for now. Once the transition is over, this macro goes aways
-ADD_DEFINITIONS(-DPARAVIEW_NEW_SOURCE_ORGANIZATION)
 SET(VTK_INCLUDE_DIR
   ${ParaView_SOURCE_DIR}/VTK
   ${ParaView_BINARY_DIR}/VTK
@@ -323,6 +321,7 @@ SUBDIRS(Servers)
 SUBDIRS(GUI)
 
 
+SUBDIRS(Servers/Executables)
 
 #-----------------------------------------------------------------------------
 # Help outside projects build ParaView plugin packages.

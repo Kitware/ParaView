@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    vtkPVDemoPaths.h.in
+  Module:    vtkPVRenderViewProxy.cxx
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -12,9 +12,5 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-#ifndef VTK_DEMO_PATHS
-#define VTK_DEMO_PATHS
-
-static const char* VTK_PV_DEMO_PATHS[] = { "@PVGUI_SOURCE_DIR@/Demos", "@CMAKE_INSTALL_PREFIX@/share/paraview-@PARAVIEW_VERSION@/Demos", 0};
-
-#endif
+#include "vtkPVRenderViewProxy.h"
+vtkCxxRevisionMacro(vtkPVRenderViewProxy, "1.1");

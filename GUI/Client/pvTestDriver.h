@@ -41,6 +41,7 @@ protected:
   int ProcessCommandLine(int argc, char* argv[]);
   void CollectConfiguredOptions();
   void CreateCommandLine(kwsys_stl::vector<const char*>& commandLine,
+                         const char* paraView,
                          const char* paraviewFlags, 
                          const char* numProc,
                          int argStart=0,
@@ -60,6 +61,8 @@ protected:
                           int* foundWaiting);
 private:
   vtkstd::string ParaView;
+  vtkstd::string ParaViewServer;
+  vtkstd::string ParaViewRenderServer;
   vtkstd::string MPIRun;
   vtkstd::vector<vtkstd::string> MPIFlags;
   vtkstd::vector<vtkstd::string> MPIPostFlags;

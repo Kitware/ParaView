@@ -19,7 +19,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVServerObject);
-vtkCxxRevisionMacro(vtkPVServerObject, "1.3");
+vtkCxxRevisionMacro(vtkPVServerObject, "1.1");
 vtkCxxSetObjectMacro(vtkPVServerObject, ProcessModule, vtkPVProcessModule);
 
 //----------------------------------------------------------------------------
