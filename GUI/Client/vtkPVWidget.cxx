@@ -44,7 +44,7 @@ template class VTK_EXPORT vtkArrayMapIterator<vtkPVWidget*, vtkPVWidget*>;
 vtkCxxSetObjectMacro(vtkPVWidget, SMProperty, vtkSMProperty);
 
 //-----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkPVWidget, "1.53");
+vtkCxxRevisionMacro(vtkPVWidget, "1.54");
 
 //-----------------------------------------------------------------------------
 vtkPVWidget::vtkPVWidget()
@@ -123,6 +123,8 @@ void vtkPVWidget::Accept()
     {
     this->AcceptInternal(this->PVSource->GetVTKSourceID(idx));
     }
+
+  this->ModifiedFlag = 0;
 
   // I put this after the accept internal, because
   // vtkPVGroupWidget inactivates and builds an input list ...

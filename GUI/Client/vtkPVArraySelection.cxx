@@ -42,7 +42,7 @@ class vtkPVArraySelectionArraySet: public vtkPVArraySelectionArraySetBase {};
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVArraySelection);
-vtkCxxRevisionMacro(vtkPVArraySelection, "1.59");
+vtkCxxRevisionMacro(vtkPVArraySelection, "1.60");
 
 //----------------------------------------------------------------------------
 int vtkDataArraySelectionCommand(ClientData cd, Tcl_Interp *interp,
@@ -335,33 +335,15 @@ void vtkPVArraySelection::Trace(ofstream *file)
 //----------------------------------------------------------------------------
 void vtkPVArraySelection::Accept()
 {
-  int modFlag = this->GetModifiedFlag();
-
   // Create new check buttons.
   if (!this->PVSource->GetVTKSourceID(0).ID)
     {
     vtkErrorMacro("VTKReader has not been set.");
     }
 
-  this->AcceptCalled = 1;
-
   this->SetPropertyFromGUI();
 
-  this->ModifiedFlag = 0;
-  
-  // I put this after the accept internal, because
-  // vtkPVGroupWidget inactivates and builds an input list ...
-  // Putting this here simplifies subclasses AcceptInternal methods.
-  if (modFlag)
-    {
-    vtkPVApplication *pvApp = this->GetPVApplication();
-    ofstream* file = pvApp->GetTraceFile();
-    if (file)
-      {
-      this->Trace(file);
-      }
-    }
-
+  this->Superclass::Accept();
 }
 
 //----------------------------------------------------------------------------

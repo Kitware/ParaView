@@ -39,7 +39,7 @@
 #include "vtkSMStringVectorProperty.h"
 
 vtkStandardNewMacro(vtkPVOrientScaleWidget);
-vtkCxxRevisionMacro(vtkPVOrientScaleWidget, "1.21");
+vtkCxxRevisionMacro(vtkPVOrientScaleWidget, "1.22");
 
 vtkCxxSetObjectMacro(vtkPVOrientScaleWidget, SMScalarProperty, vtkSMProperty);
 vtkCxxSetObjectMacro(vtkPVOrientScaleWidget, SMVectorProperty, vtkSMProperty);
@@ -768,8 +768,6 @@ void vtkPVOrientScaleWidget::OrientModeMenuCallback()
 //----------------------------------------------------------------------------
 void vtkPVOrientScaleWidget::Accept()
 {
-  int modFlag = this->GetModifiedFlag();
-
   vtkSMStringVectorProperty *scalarProp =
     vtkSMStringVectorProperty::SafeDownCast(this->GetSMScalarProperty());
   vtkSMStringVectorProperty *vectorProp =
@@ -804,22 +802,7 @@ void vtkPVOrientScaleWidget::Accept()
     scaleFactorProp->SetElement(0, this->ScaleFactorEntry->GetValueAsFloat());
     }
 
-  this->ModifiedFlag = 0;
-  
-  // I put this after the accept internal, because
-  // vtkPVGroupWidget inactivates and builds an input list ...
-  // Putting this here simplifies subclasses AcceptInternal methods.
-  if (modFlag)
-    {
-    vtkPVApplication *pvApp = this->GetPVApplication();
-    ofstream* file = pvApp->GetTraceFile();
-    if (file)
-      {
-      this->Trace(file);
-      }
-    }
-
-  this->AcceptCalled = 1;
+  this->Superclass::Accept();
 }
 
 //----------------------------------------------------------------------------

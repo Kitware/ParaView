@@ -33,7 +33,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectTimeSet);
-vtkCxxRevisionMacro(vtkPVSelectTimeSet, "1.45");
+vtkCxxRevisionMacro(vtkPVSelectTimeSet, "1.46");
 
 //-----------------------------------------------------------------------------
 int vtkDataArrayCollectionCommand(ClientData cd, Tcl_Interp *interp,
@@ -263,22 +263,7 @@ void vtkPVSelectTimeSet::Accept()
       << " for widget: " << this->GetTraceName());
     }
 
-  this->ModifiedFlag = 0;
-  
-  // I put this after the accept internal, because
-  // vtkPVGroupWidget inactivates and builds an input list ...
-  // Putting this here simplifies subclasses AcceptInternal methods.
-  if (modFlag)
-    {
-    vtkPVApplication *pvApp = this->GetPVApplication();
-    ofstream* file = pvApp->GetTraceFile();
-    if (file)
-      {
-      this->Trace(file);
-      }
-    }
-
-  this->AcceptCalled = 1;
+  this->Superclass::Accept();
 }
 
 //---------------------------------------------------------------------------

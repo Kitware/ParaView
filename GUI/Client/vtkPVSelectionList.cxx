@@ -26,7 +26,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectionList);
-vtkCxxRevisionMacro(vtkPVSelectionList, "1.49");
+vtkCxxRevisionMacro(vtkPVSelectionList, "1.50");
 
 int vtkPVSelectionListCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -196,8 +196,6 @@ void vtkPVSelectionList::SaveInBatchScript(ofstream *file)
 //----------------------------------------------------------------------------
 void vtkPVSelectionList::Accept()
 {
-  int modFlag = this->GetModifiedFlag();
-  
   vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
     this->GetSMProperty());
   
@@ -214,23 +212,7 @@ void vtkPVSelectionList::Accept()
       << " for widget: " << this->GetTraceName());
     }
   
-  this->ModifiedFlag = 0;
-
-  
-  // I put this after the accept internal, because
-  // vtkPVGroupWidget inactivates and builds an input list ...
-  // Putting this here simplifies subclasses AcceptInternal methods.
-  if (modFlag)
-    {
-    vtkPVApplication *pvApp = this->GetPVApplication();
-    ofstream* file = pvApp->GetTraceFile();
-    if (file)
-      {
-      this->Trace(file);
-      }
-    }
-
-  this->AcceptCalled = 1;
+  this->Superclass::Accept();
 }
 
 

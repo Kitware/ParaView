@@ -28,7 +28,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVContourEntry);
-vtkCxxRevisionMacro(vtkPVContourEntry, "1.52");
+vtkCxxRevisionMacro(vtkPVContourEntry, "1.53");
 
 vtkCxxSetObjectMacro(vtkPVContourEntry, ArrayMenu, vtkPVArrayMenu);
 
@@ -90,8 +90,6 @@ int vtkPVContourEntry::ComputeWidgetRange()
 //-----------------------------------------------------------------------------
 void vtkPVContourEntry::Accept()
 {
-  int modFlag = this->GetModifiedFlag();
-
   this->Superclass::Accept();
 
   vtkSMDoubleVectorProperty* prop = vtkSMDoubleVectorProperty::SafeDownCast(
@@ -113,23 +111,10 @@ void vtkPVContourEntry::Accept()
       << " for widget: " << this->GetTraceName());
     }
 
-  this->ModifiedFlag = 0;
-
-  // I put this after the accept internal, because
-  // vtkPVGroupWidget inactivates and builds an input list ...
-  // Putting this here simplifies subclasses AcceptInternal methods.
-  if (modFlag)
-    {
-    vtkPVApplication *pvApp = this->GetPVApplication();
-    ofstream* file = pvApp->GetTraceFile();
-    if (file)
-      {
-      this->Trace(file);
-      }
-    }
-
-  this->AcceptCalled = 1;
-
+  // The superclass (vtkPVValueList) uses Accept for moving value from
+  // NewValueEntry to ContourValues if ContourValues has no contours, so
+  // explicitly call vtkPVWidget::Accept() here.
+  this->vtkPVWidget::Accept();
 }
 
 //-----------------------------------------------------------------------------

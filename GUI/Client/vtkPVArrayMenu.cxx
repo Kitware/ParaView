@@ -37,7 +37,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVArrayMenu);
-vtkCxxRevisionMacro(vtkPVArrayMenu, "1.63");
+vtkCxxRevisionMacro(vtkPVArrayMenu, "1.64");
 
 vtkCxxSetObjectMacro(vtkPVArrayMenu, InputMenu, vtkPVInputMenu);
 vtkCxxSetObjectMacro(vtkPVArrayMenu, FieldMenu, vtkPVFieldMenu);
@@ -152,8 +152,6 @@ void vtkPVArrayMenu::SetValue(const char* name)
 //----------------------------------------------------------------------------
 void vtkPVArrayMenu::Accept()
 {
-  int modFlag = this->GetModifiedFlag();
-
   vtkSMStringVectorProperty* svp = vtkSMStringVectorProperty::SafeDownCast(
     this->GetSMProperty());
   
@@ -170,22 +168,7 @@ void vtkPVArrayMenu::Accept()
       << " for widget: " << this->GetTraceName());
     }
 
-  this->ModifiedFlag = 0;
-
-  // I put this after the accept internal, because
-  // vtkPVGroupWidget inactivates and builds an input list ...
-  // Putting this here simplifies subclasses AcceptInternal methods.
-  if (modFlag)
-    {
-    vtkPVApplication *pvApp = this->GetPVApplication();
-    ofstream* file = pvApp->GetTraceFile();
-    if (file)
-      {
-      this->Trace(file);
-      }
-    }
-
-  this->AcceptCalled = 1;
+  this->Superclass::Accept();
 }
 
 //---------------------------------------------------------------------------

@@ -36,7 +36,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVScale);
-vtkCxxRevisionMacro(vtkPVScale, "1.52");
+vtkCxxRevisionMacro(vtkPVScale, "1.53");
 
 //----------------------------------------------------------------------------
 vtkPVScale::vtkPVScale()
@@ -277,7 +277,6 @@ void vtkPVScale::SaveInBatchScript(ofstream *file)
 //----------------------------------------------------------------------------
 void vtkPVScale::Accept()
 {
-  int modFlag = this->GetModifiedFlag();
   vtkSMDoubleVectorProperty *dvp = vtkSMDoubleVectorProperty::SafeDownCast(
     this->GetSMProperty());
   vtkSMIntVectorProperty *ivp = vtkSMIntVectorProperty::SafeDownCast(
@@ -310,22 +309,7 @@ void vtkPVScale::Accept()
     ivp->SetElement(0, this->RoundValue(this->GetValue()));
     }
 
-  this->ModifiedFlag = 0;
-
-  // I put this after the accept internal, because
-  // vtkPVGroupWidget inactivates and builds an input list ...
-  // Putting this here simplifies subclasses AcceptInternal methods.
-  if (modFlag)
-    {
-    vtkPVApplication *pvApp = this->GetPVApplication();
-    ofstream* file = pvApp->GetTraceFile();
-    if (file)
-      {
-      this->Trace(file);
-      }
-    }
-
-  this->AcceptCalled = 1;
+  this->Superclass::Accept();
 }
 
 //---------------------------------------------------------------------------

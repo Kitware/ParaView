@@ -38,7 +38,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectWidget);
-vtkCxxRevisionMacro(vtkPVSelectWidget, "1.57");
+vtkCxxRevisionMacro(vtkPVSelectWidget, "1.58");
 
 int vtkPVSelectWidgetCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -258,9 +258,6 @@ void vtkPVSelectWidget::PostAccept()
 //-----------------------------------------------------------------------------
 void vtkPVSelectWidget::Accept()
 {
-  // Command to update the UI.
-  int modFlag = this->GetModifiedFlag();
-  
   const char* value = this->GetCurrentVTKValue();
   if (!value)
     {
@@ -310,24 +307,19 @@ void vtkPVSelectWidget::Accept()
     {
     svp->SetElement(0, this->GetCurrentVTKValue());
     }
-  
+
+  // Make sure that the modified flag of this widget is set if any of its
+  // subwidgets has it set. The flag in the subwidgets will be set to 0 once
+  // Accept or AcceptInternal is called on them.
+  this->ModifiedFlag = this->GetModifiedFlag();
+
   if (this->CurrentIndex >= 0)
     {
     vtkPVWidget *widget = (vtkPVWidget*)this->Widgets->GetItemAsObject(this->CurrentIndex);
     widget->Accept();
     }
 
-  this->ModifiedFlag = 0;
-  if (modFlag)
-    {
-    vtkPVApplication *pvApp = this->GetPVApplication();
-    ofstream* file = pvApp->GetTraceFile();
-    if (file)
-      {
-      this->Trace(file);
-      }
-    }
-  this->AcceptCalled = 1;
+  this->Superclass::Accept();
 }
 
 //-----------------------------------------------------------------------------

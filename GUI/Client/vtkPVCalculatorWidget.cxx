@@ -46,7 +46,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCalculatorWidget);
-vtkCxxRevisionMacro(vtkPVCalculatorWidget, "1.26");
+vtkCxxRevisionMacro(vtkPVCalculatorWidget, "1.27");
 
 int vtkPVCalculatorWidgetCommand(ClientData cd, Tcl_Interp *interp,
                                 int argc, char *argv[]);
@@ -780,11 +780,6 @@ void vtkPVCalculatorWidget::Trace(ofstream *file)
 //----------------------------------------------------------------------------
 void vtkPVCalculatorWidget::Accept()
 {
-  int modFlag = this->GetModifiedFlag();
-  
-  // Format a command to move value from widget to vtkObjects (on all
-  // processes).  The VTK objects do not yet have to have the same Tcl
-  // name!
   int i;
 
   vtkPVProcessModule *pm = this->GetPVApplication()->GetProcessModule();
@@ -848,22 +843,7 @@ void vtkPVCalculatorWidget::Accept()
     functionProp->SetElement(0, this->FunctionLabel->GetValue());
     }
 
-  this->ModifiedFlag = 0;
-  
-  // I put this after the accept internal, because
-  // vtkPVGroupWidget inactivates and builds an input list ...
-  // Putting this here simplifies subclasses AcceptInternal methods.
-  if (modFlag)
-    {
-    vtkPVApplication *pvApp = this->GetPVApplication();
-    ofstream* file = pvApp->GetTraceFile();
-    if (file)
-      {
-      this->Trace(file);
-      }
-    }
-
-  this->AcceptCalled = 1;
+  this->Superclass::Accept();
 }
 
 //----------------------------------------------------------------------------

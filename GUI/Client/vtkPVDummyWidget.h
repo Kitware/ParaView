@@ -47,7 +47,6 @@ public:
   // Description:
   // Trying out a ne protocal.
   virtual void Accept() { this->ModifiedFlag = 0; }
-  virtual void AcceptInternal(vtkClientServerID) { this->ModifiedFlag = 0;}
   virtual void ResetIntenral(vtkClientServerID) { this->ModifiedFlag = 0;}
   //ETX
 

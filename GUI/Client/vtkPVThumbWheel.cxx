@@ -32,7 +32,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVThumbWheel);
-vtkCxxRevisionMacro(vtkPVThumbWheel, "1.9");
+vtkCxxRevisionMacro(vtkPVThumbWheel, "1.10");
 
 //-----------------------------------------------------------------------------
 vtkPVThumbWheel::vtkPVThumbWheel()
@@ -261,8 +261,6 @@ void vtkPVThumbWheel::AnimationMenuCallback(vtkPVAnimationInterfaceEntry *ai)
 //-----------------------------------------------------------------------------
 void vtkPVThumbWheel::Accept()
 {
-  int modFlag = this->GetModifiedFlag();
-  
   float scalar = this->ThumbWheel->GetValue();
   float entryValue = this->ThumbWheel->GetEntry()->GetValueAsFloat();
   if (entryValue != scalar)
@@ -285,22 +283,7 @@ void vtkPVThumbWheel::Accept()
     ivp->SetElement(0, static_cast<int>(this->GetValue()));
     }
 
-  this->ModifiedFlag = 0;
-  
-  // I put this after the accept internal, because
-  // vtkPVGroupWidget inactivates and builds an input list ...
-  // Putting this here simplifies subclasses AcceptInternal methods.
-  if (modFlag)
-    {
-    vtkPVApplication *pvApp = this->GetPVApplication();
-    ofstream* file = pvApp->GetTraceFile();
-    if (file)
-      {
-      this->Trace(file);
-      }
-    }
-
-  this->AcceptCalled = 1;
+  this->Superclass::Accept();
 }
 
 //-----------------------------------------------------------------------------

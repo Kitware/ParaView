@@ -35,7 +35,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVInputMenu);
-vtkCxxRevisionMacro(vtkPVInputMenu, "1.63");
+vtkCxxRevisionMacro(vtkPVInputMenu, "1.64");
 
 
 //----------------------------------------------------------------------------
@@ -319,7 +319,7 @@ vtkSMInputProperty* vtkPVInputMenu::GetInputProperty()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVInputMenu::AcceptInternal(vtkClientServerID)
+void vtkPVInputMenu::Accept()
 {
   // Since this is done on PVSource and not vtk source,
   // We can ignore the sourceTclName and return after the first call.
@@ -360,8 +360,7 @@ void vtkPVInputMenu::AcceptInternal(vtkClientServerID)
                  this->GetPVInputIndex());
     }
 
-  // ??? used to be set to one ???
-  this->ModifiedFlag=0;
+  this->Superclass::Accept();
 }
 
 

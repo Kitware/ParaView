@@ -72,7 +72,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVFileEntry);
-vtkCxxRevisionMacro(vtkPVFileEntry, "1.93");
+vtkCxxRevisionMacro(vtkPVFileEntry, "1.94");
 
 //----------------------------------------------------------------------------
 vtkPVFileEntry::vtkPVFileEntry()
@@ -683,8 +683,6 @@ void vtkPVFileEntry::Trace(ofstream *file)
 //----------------------------------------------------------------------------
 void vtkPVFileEntry::Accept()
 {
-  int modFlag = this->GetModifiedFlag();
-
   const char* fname = this->Entry->GetValue();
   
   this->TimeStep = static_cast<int>(this->Timestep->GetValue());
@@ -733,23 +731,8 @@ void vtkPVFileEntry::Accept()
     }
 
   this->UpdateAvailableFiles();
-  
-  this->ModifiedFlag = 0;
-  
-  // I put this after the accept internal, because
-  // vtkPVGroupWidget inactivates and builds an input list ...
-  // Putting this here simplifies subclasses AcceptInternal methods.
-  if (modFlag)
-    {
-    vtkPVApplication *pvApp = this->GetPVApplication();
-    ofstream* file = pvApp->GetTraceFile();
-    if (file)
-      {
-      this->Trace(file);
-      }
-    }
 
-  this->AcceptCalled = 1;
+  this->Superclass::Accept();
 }
 
 

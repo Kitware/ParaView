@@ -32,7 +32,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPointSourceWidget);
-vtkCxxRevisionMacro(vtkPVPointSourceWidget, "1.35");
+vtkCxxRevisionMacro(vtkPVPointSourceWidget, "1.36");
 
 int vtkPVPointSourceWidgetCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -275,22 +275,10 @@ void vtkPVPointSourceWidget::Accept()
     this->SourceProxy->UpdateVTKObjects();
     this->SourceProxy->UpdatePipeline();
     }
-  this->ModifiedFlag = 0;
 
-  // I put this after the accept internal, because
-  // vtkPVGroupWidget inactivates and builds an input list ...
-  // Putting this here simplifies subclasses AcceptInternal methods.
-  if (modFlag)
-    {
-    vtkPVApplication *pvApp = this->GetPVApplication();
-    ofstream* file = pvApp->GetTraceFile();
-    if (file)
-      {
-      this->Trace(file);
-      }
-    }
-
-  this->AcceptCalled = 1;
+  // I actually want to call vtkPVWidget::Accept, not the Accept method of
+  // the superclass (vtkPVLineWidget).
+  this->vtkPVWidget::Accept();
 }
 
 //-----------------------------------------------------------------------------

@@ -32,7 +32,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVMinMax);
-vtkCxxRevisionMacro(vtkPVMinMax, "1.38");
+vtkCxxRevisionMacro(vtkPVMinMax, "1.39");
 
 vtkCxxSetObjectMacro(vtkPVMinMax, ArrayMenu, vtkPVArrayMenu);
 
@@ -245,8 +245,6 @@ void vtkPVMinMax::SaveInBatchScript(ofstream *file)
 //----------------------------------------------------------------------------
 void vtkPVMinMax::Accept()
 {
-  int modFlag = this->GetModifiedFlag();
-
   vtkSMDoubleVectorProperty* dprop = vtkSMDoubleVectorProperty::SafeDownCast(
     this->GetSMProperty());
   vtkSMIntVectorProperty* iprop = vtkSMIntVectorProperty::SafeDownCast(
@@ -271,22 +269,7 @@ void vtkPVMinMax::Accept()
       << " for widget: " << this->GetTraceName());
     }
 
-  this->ModifiedFlag = 0;
-
-  // I put this after the accept internal, because
-  // vtkPVGroupWidget inactivates and builds an input list ...
-  // Putting this here simplifies subclasses AcceptInternal methods.
-  if (modFlag)
-    {
-    vtkPVApplication *pvApp = this->GetPVApplication();
-    ofstream* file = pvApp->GetTraceFile();
-    if (file)
-      {
-      this->Trace(file);
-      }
-    }
-
-  this->AcceptCalled = 1;
+  this->Superclass::Accept();
 }
 
 //---------------------------------------------------------------------------

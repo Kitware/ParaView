@@ -16,12 +16,13 @@
 #include "vtkObjectFactory.h"
 #include "vtkArrayMap.txx"
 #include "vtkCollectionIterator.h"
+#include "vtkPVSource.h"
 #include "vtkPVWidgetCollection.h"
 #include "vtkPVXMLElement.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVContainerWidget);
-vtkCxxRevisionMacro(vtkPVContainerWidget, "1.28");
+vtkCxxRevisionMacro(vtkPVContainerWidget, "1.29");
 
 int vtkPVContainerWidgetCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -134,14 +135,14 @@ void vtkPVContainerWidget::PostAccept()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVContainerWidget::AcceptInternal(vtkClientServerID sourceID)
+void vtkPVContainerWidget::Accept()
 {
   vtkCollectionIterator *it = this->Widgets->NewIterator();
   it->InitTraversal();
-  
+
   vtkPVWidget* widget;
   int i;
-  
+
   for (i = 0; i < this->Widgets->GetNumberOfItems(); i++)
     {
     widget = static_cast<vtkPVWidget*>(it->GetObject());
@@ -151,13 +152,13 @@ void vtkPVContainerWidget::AcceptInternal(vtkClientServerID sourceID)
       }
     else
       {
-      widget->AcceptInternal(sourceID);
+      widget->AcceptInternal(this->PVSource->GetVTKSourceID(0));
       }
     it->GoToNextItem();
     }
   it->Delete();
 
-  this->ModifiedFlag = 0;
+  this->Superclass::Accept();
 }
 
 //-----------------------------------------------------------------------------

@@ -34,7 +34,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVTempTessellatorEntry);
-vtkCxxRevisionMacro(vtkPVTempTessellatorEntry, "1.14");
+vtkCxxRevisionMacro(vtkPVTempTessellatorEntry, "1.15");
 
 //-----------------------------------------------------------------------------
 class vtkTessellatorEntryData
@@ -458,8 +458,6 @@ void vtkPVTempTessellatorEntry::AnimationMenuCallback( vtkPVAnimationInterfaceEn
 
 void vtkPVTempTessellatorEntry::Accept()
 {
-  int modFlag = this->GetModifiedFlag();
-
   vtkClientServerID sourceID = this->PVSource->GetVTKSourceID(0);
   if (!sourceID.ID)
     {
@@ -474,22 +472,7 @@ void vtkPVTempTessellatorEntry::Accept()
   
   this->UpdateProperty();
 
-  this->ModifiedFlag = 0;
-  
-  // I put this after the accept internal, because
-  // vtkPVGroupWidget inactivates and builds an input list ...
-  // Putting this here simplifies subclasses AcceptInternal methods.
-  if (modFlag)
-    {
-    vtkPVApplication *pvApp = this->GetPVApplication();
-    ofstream* file = pvApp->GetTraceFile();
-    if (file)
-      {
-      this->Trace(file);
-      }
-    }
-
-  this->AcceptCalled = 1;
+  this->Superclass::Accept();
 }
 
 void vtkPVTempTessellatorEntry::Trace( ofstream *file )

@@ -34,7 +34,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVVectorEntry);
-vtkCxxRevisionMacro(vtkPVVectorEntry, "1.63");
+vtkCxxRevisionMacro(vtkPVVectorEntry, "1.64");
 
 //-----------------------------------------------------------------------------
 vtkPVVectorEntry::vtkPVVectorEntry()
@@ -227,7 +227,6 @@ void vtkPVVectorEntry::CheckModifiedCallback(const char* key)
 //-----------------------------------------------------------------------------
 void vtkPVVectorEntry::Accept()
 {
-  int modFlag = this->GetModifiedFlag();
   int i;
   vtkKWEntry *entry;
 
@@ -281,22 +280,7 @@ void vtkPVVectorEntry::Accept()
       << " for widget: " << this->GetTraceName());
     }
 
-  this->ModifiedFlag = 0;
-  
-  // I put this after the accept internal, because
-  // vtkPVGroupWidget inactivates and builds an input list ...
-  // Putting this here simplifies subclasses AcceptInternal methods.
-  if (modFlag)
-    {
-    vtkPVApplication *pvApp = this->GetPVApplication();
-    ofstream* file = pvApp->GetTraceFile();
-    if (file)
-      {
-      this->Trace(file);
-      }
-    }
-
-  this->AcceptCalled = 1;
+  this->Superclass::Accept();
 }
 
 //-----------------------------------------------------------------------------

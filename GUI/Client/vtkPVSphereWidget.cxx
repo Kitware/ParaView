@@ -43,7 +43,7 @@
 #include "vtkSMProxy.h"
 #include "vtkSMSourceProxy.h" 
 vtkStandardNewMacro(vtkPVSphereWidget);
-vtkCxxRevisionMacro(vtkPVSphereWidget, "1.43");
+vtkCxxRevisionMacro(vtkPVSphereWidget, "1.44");
 
 vtkCxxSetObjectMacro(vtkPVSphereWidget, InputMenu, vtkPVInputMenu);
 
@@ -261,8 +261,6 @@ void vtkPVSphereWidget::Trace(ofstream *file)
         << val[0] << " " << val[1] << " " << val[2] << endl;
 
   rad = atof(this->RadiusEntry->GetValue());
-  this->AddTraceEntry("$kw(%s) SetRadius %f", 
-                      this->GetTclName(), rad);
   *file << "$kw(" << this->GetTclName() << ") SetRadius "
         << rad << endl;
 }

@@ -38,7 +38,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVExtentEntry);
-vtkCxxRevisionMacro(vtkPVExtentEntry, "1.45");
+vtkCxxRevisionMacro(vtkPVExtentEntry, "1.46");
 
 vtkCxxSetObjectMacro(vtkPVExtentEntry, InputMenu, vtkPVInputMenu);
 
@@ -255,7 +255,6 @@ void vtkPVExtentEntry::SaveInBatchScript(ofstream *file)
 //-----------------------------------------------------------------------------
 void vtkPVExtentEntry::Accept()
 {
-  int modFlag = this->GetModifiedFlag();
   int i;
   
   vtkSMIntVectorProperty *ivp = vtkSMIntVectorProperty::SafeDownCast(
@@ -277,23 +276,7 @@ void vtkPVExtentEntry::Accept()
       << " for widget: " << this->GetTraceName());
     }
 
-  
-  this->ModifiedFlag = 0;
-  
-  // I put this after the accept internal, because
-  // vtkPVGroupWidget inactivates and builds an input list ...
-  // Putting this here simplifies subclasses AcceptInternal methods.
-  if (modFlag)
-    {
-    vtkPVApplication *pvApp = this->GetPVApplication();
-    ofstream* file = pvApp->GetTraceFile();
-    if (file)
-      {
-      this->Trace(file);
-      }
-    }
-
-  this->AcceptCalled = 1;
+  this->Superclass::Accept();
 }
 
 //-----------------------------------------------------------------------------
