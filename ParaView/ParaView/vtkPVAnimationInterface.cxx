@@ -170,7 +170,7 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterface);
-vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.116");
+vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.117");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterface,ControlledWidget, vtkPVWidget);
 
@@ -1348,7 +1348,7 @@ void vtkPVAnimationInterface::SaveGeometryCallback()
 void vtkPVAnimationInterface::SaveGeometry(const char* fileName, 
                                            int numPartitions) 
 {
-  this->AddTraceEntry("$kw(%s) SaveGeometry {%s} {%s}",
+  this->AddTraceEntry("$kw(%s) SaveGeometry {%s} {%d}",
                       this->GetTclName(), fileName, numPartitions);
   
   vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
