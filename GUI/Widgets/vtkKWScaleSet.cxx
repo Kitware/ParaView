@@ -25,7 +25,7 @@
 //----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkKWScaleSet);
-vtkCxxRevisionMacro(vtkKWScaleSet, "1.6");
+vtkCxxRevisionMacro(vtkKWScaleSet, "1.7");
 
 int vtkvtkKWScaleSetCommand(ClientData cd, Tcl_Interp *interp,
                                   int argc, char *argv[]);
@@ -123,6 +123,16 @@ int vtkKWScaleSet::HasScale(int id)
 }
 
 //----------------------------------------------------------------------------
+int vtkKWScaleSet::GetNumberOfScales()
+{
+  if (this->Scales)
+    {
+    return this->Scales->GetNumberOfItems();
+    }
+  return 0;
+}
+
+//----------------------------------------------------------------------------
 void vtkKWScaleSet::Create(vtkKWApplication *app, const char *args)
 {
   // Call the superclass to create the widget and set the appropriate flags
@@ -165,6 +175,27 @@ int vtkKWScaleSet::AddScale(int id,
                             const char *method_and_arg_string,
                             const char *balloonhelp_string)
 {
+  return this->AddScaleInternal(
+    id, 0, object, method_and_arg_string, balloonhelp_string);
+}
+
+//----------------------------------------------------------------------------
+int vtkKWScaleSet::AddPopupScale(int id, 
+                                 vtkKWObject *object, 
+                                 const char *method_and_arg_string,
+                                 const char *balloonhelp_string)
+{
+  return this->AddScaleInternal(
+    id, 1, object, method_and_arg_string, balloonhelp_string);
+}
+
+//----------------------------------------------------------------------------
+int vtkKWScaleSet::AddScaleInternal(int id,
+                                    int popup_mode,
+                                    vtkKWObject *object, 
+                                    const char *method_and_arg_string,
+                                    const char *balloonhelp_string)
+{
   // Widget must have been created
 
   if (!this->IsCreated())
@@ -201,6 +232,7 @@ int vtkKWScaleSet::AddScale(int id,
   scale_slot->Id = id;
 
   scale_slot->Scale->SetParent(this);
+  scale_slot->Scale->SetPopupScale(popup_mode ? 1 : 0);
   scale_slot->Scale->Create(this->GetApplication(), 0);
   scale_slot->Scale->SetEnabled(this->Enabled);
 

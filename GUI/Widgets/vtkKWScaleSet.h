@@ -45,7 +45,7 @@ public:
   virtual void Create(vtkKWApplication *app, const char *args);
 
   // Description:
-  // Add a scale to the set.
+  // Add a scale (or popup scale) to the set.
   // The id has to be unique among the set.
   // Object and method parameters, if any, will be used to set the command.
   // A help string will be used, if any, to set the baloon help. 
@@ -54,6 +54,10 @@ public:
                vtkKWObject *object = 0, 
                const char *method_and_arg_string = 0,
                const char *balloonhelp_string = 0);
+  int AddPopupScale(int id, 
+                    vtkKWObject *object = 0, 
+                    const char *method_and_arg_string = 0,
+                    const char *balloonhelp_string = 0);
 
   // Description:
   // Get a scale from the set, given its unique id.
@@ -61,6 +65,7 @@ public:
   // Return a pointer to the scale, or NULL on error.
   vtkKWScale* GetScale(int id);
   int HasScale(int id);
+  int GetNumberOfScales();
 
   // Description:
   // Convenience method to hide/show a scale
@@ -146,6 +151,11 @@ protected:
   //ETX
 
   void Pack();
+  int AddScaleInternal(int id, 
+                       int popup_mode,
+                       vtkKWObject *object, 
+                       const char *method_and_arg_string, 
+                       const char *balloonhelp_string);
 
 private:
   vtkKWScaleSet(const vtkKWScaleSet&); // Not implemented
