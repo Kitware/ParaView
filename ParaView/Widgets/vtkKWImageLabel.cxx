@@ -73,7 +73,7 @@ void vtkKWImageLabel::SetImageData(const unsigned char* data,
 {
   int r, g, b;
   this->GetBackgroundColor(&r, &g, &b);
-  this->Script("image create photo -height %d -width %d", width, height);
+  this->Script("image create photo -width %d -height %d", width, height);
   this->SetImageDataLabel(this->Application->GetMainInterp()->result);
   Tk_PhotoHandle photo;
   Tk_PhotoImageBlock sblock;
