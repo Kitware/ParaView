@@ -45,6 +45,11 @@ public:
   virtual void Start(int argc, char *argv[]);
 
   // Description:
+  // Script which is executed in the remot processes.
+  // If a result string is passed in, the results are place in it. 
+  void RemoteScript(int remoteId, char *str, char *result, int resultMax);
+  
+  // Description:
   // Display the on-line help and about dialog for this application.
   virtual void DisplayAbout(vtkKWWindow *);
 
@@ -53,6 +58,10 @@ public:
   int AcceptLicense();
   int AcceptEvaluation();
 
+  // Description:
+  // We need to kill the slave processes
+  void Exit();
+  
 protected:
   vtkPVApplication();
   ~vtkPVApplication() {};

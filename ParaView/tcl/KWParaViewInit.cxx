@@ -1,4 +1,7 @@
 #include "vtkTclUtil.h"
+int vtkDummyRenderWindowInteractorCommand(ClientData cd, Tcl_Interp *interp,
+             int argc, char *argv[]);
+ClientData vtkDummyRenderWindowInteractorNewCommand();
 int vtkInteractorStyleGridExtentCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkInteractorStyleGridExtentNewCommand();
@@ -23,6 +26,9 @@ ClientData vtkPVApplicationNewCommand();
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkPVRenderViewNewCommand();
+int vtkPVSlaveCommand(ClientData cd, Tcl_Interp *interp,
+             int argc, char *argv[]);
+ClientData vtkPVSlaveNewCommand();
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkPVWindowNewCommand();
@@ -54,6 +60,8 @@ int VTK_EXPORT Vtkkwparaviewtcl_SafeInit(Tcl_Interp *interp)
 
 int VTK_EXPORT Vtkkwparaviewtcl_Init(Tcl_Interp *interp)
 {
+  vtkTclCreateNew(interp,"vtkDummyRenderWindowInteractor", vtkDummyRenderWindowInteractorNewCommand,
+                  vtkDummyRenderWindowInteractorCommand);
   vtkTclCreateNew(interp,"vtkInteractorStyleGridExtent", vtkInteractorStyleGridExtentNewCommand,
                   vtkInteractorStyleGridExtentCommand);
   vtkTclCreateNew(interp,"vtkInteractorStyleImageExtent", vtkInteractorStyleImageExtentNewCommand,
@@ -70,6 +78,8 @@ int VTK_EXPORT Vtkkwparaviewtcl_Init(Tcl_Interp *interp)
                   vtkPVApplicationCommand);
   vtkTclCreateNew(interp,"vtkPVRenderView", vtkPVRenderViewNewCommand,
                   vtkPVRenderViewCommand);
+  vtkTclCreateNew(interp,"vtkPVSlave", vtkPVSlaveNewCommand,
+                  vtkPVSlaveCommand);
   vtkTclCreateNew(interp,"vtkPVWindow", vtkPVWindowNewCommand,
                   vtkPVWindowCommand);
   return TCL_OK;

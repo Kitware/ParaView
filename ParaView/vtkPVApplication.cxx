@@ -30,13 +30,14 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkKWDialog.h"
 #include "vtkKWWindowCollection.h"
 
+#include "vtkMultiProcessController.h"
 #include "vtkRenderer.h"
 #include "vtkRenderWindow.h"
 #include "vtkKWMessageDialog.h"
 #include "vtkTimerLog.h"
 #include "vtkObjectFactory.h"
 
-
+#include "vtkPVSlave.h"
 
 //----------------------------------------------------------------------------
 vtkPVApplication* vtkPVApplication::New()
@@ -56,6 +57,44 @@ vtkPVApplication::vtkPVApplication()
 {
   this->SetApplicationName("ParaView");
 }
+
+//----------------------------------------------------------------------------
+void vtkPVApplication::RemoteScript(int remoteId, char *str, char *result, int resultMax)
+{
+  int length;
+  vtkMultiProcessController *controller;
+
+  controller = vtkMultiProcessController::RegisterAndGetGlobalController(this);
+
+  // send string to evaluate.
+  length = strlen(str) + 1;
+  if (length <= 1)
+    {
+    return;
+    }
+
+  controller->TriggerRMI(remoteId, VTK_PV_SLAVE_SCRIPT_RMI_TAG);
+
+  controller->Send(&length, 1, remoteId, VTK_PV_SLAVE_SCRIPT_COMMAND_LENGTH_TAG);
+  controller->Send(str, length, remoteId, VTK_PV_SLAVE_SCRIPT_COMMAND_TAG);
+
+  // Receive the result.
+  controller->Receive(&length, 1, remoteId, VTK_PV_SLAVE_SCRIPT_RESULT_LENGTH_TAG);
+  str = new char[length];
+  controller->Receive(str, length, remoteId, VTK_PV_SLAVE_SCRIPT_RESULT_TAG);
+
+  cerr << "Master: " << length << " " << str << endl;
+
+  if (result && resultMax > 0)
+    { 
+    strncpy(result, str, resultMax-1);
+    }
+  
+  controller->UnRegister(this);
+  delete [] str;
+}
+
+
 
 //----------------------------------------------------------------------------
 int vtkPVApplication::AcceptLicense()
@@ -130,4 +169,26 @@ void vtkPVApplication::DisplayAbout(vtkKWWindow *win)
     {
     this->Exit();
     }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVApplication::Exit()
+{
+  int id, myId, num;
+  vtkMultiProcessController *controller;
+  
+  // Send a break RMI to each of the slaves.
+  controller = vtkMultiProcessController::RegisterAndGetGlobalController(this);
+  num = controller->GetNumberOfProcesses();
+  myId = controller->GetLocalProcessId();
+  
+  for (id = 0; id < num; ++id)
+    {
+    if (id != myId)
+      {
+      controller->TriggerRMI(id, VTK_BREAK_RMI_TAG);
+      }
+    }
+  
+  this->vtkKWApplication::Exit();
 }

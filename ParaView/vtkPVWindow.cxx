@@ -30,6 +30,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkOutlineFilter.h"
 #include "vtkObjectFactory.h"
 #include "vtkKWDialog.h"
+#include "vtkPVApplication.h"
 
 #include "vtkInteractorStylePlaneSource.h"
 
@@ -68,6 +69,15 @@ void vtkPVWindow::Create(vtkKWApplication *app, char *args)
 {
   // invoke super method first
   this->vtkKWWindow::Create(app,"");
+
+  // Test the slave process.
+  vtkPVApplication *pvApp = (vtkPVApplication *)(app);
+  char result[255];
+  pvApp->RemoteScript(0, "vtkConeSource cone", NULL, 0);
+  pvApp->RemoteScript(0, "cone Update", NULL, 0);
+  pvApp->RemoteScript(0, "[cone GetOutput] GetNumberOfPoints", result, 255);
+  cerr << "The slave process gave this result: " << result << endl;
+  
   this->Script("wm geometry %s 900x700+0+0",
                       this->GetWidgetName());
   
@@ -122,7 +132,9 @@ void vtkPVWindow::Create(vtkKWApplication *app, char *args)
   
   this->Script( "wm deiconify %s", this->GetWidgetName());
 
+  // Setup an interactor style.
   this->SetupTest();
+
 }
 
 
