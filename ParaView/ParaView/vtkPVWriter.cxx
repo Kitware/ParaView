@@ -53,7 +53,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWriter);
-vtkCxxRevisionMacro(vtkPVWriter, "1.8.2.2");
+vtkCxxRevisionMacro(vtkPVWriter, "1.8.2.3");
 
 //----------------------------------------------------------------------------
 vtkPVWriter::vtkPVWriter()
@@ -178,12 +178,9 @@ void vtkPVWriter::WriteOneFile(const char* fileName, vtkPVSource* pvs,
       }
     pm->ServerScript("writer SetNumberOfPieces %d", numProcs);
     pm->ServerScript("writer SetGhostLevel %d", ghostLevel);    
-    pm->RootScript("writer SetStartPiece 0 ; writer SetEndPiece 0");
-    for(i=1; i < numProcs; ++i)
-      {
-      pm->RemoteScript(i, "writer SetStartPiece %d", i);
-      pm->RemoteScript(i, "writer SetEndPiece %d", i);
-      }
+    pm->ServerScript(
+      "writer SetStartPiece [[$Application GetProcessModule] GetPartitionId]\n"
+      "writer SetEndPiece [[$Application GetProcessModule] GetPartitionId]");
     
     // Tell each process's writer whether it should write the summary
     // file.  This assumes that the writer is a vtkXMLWriter.  When we
