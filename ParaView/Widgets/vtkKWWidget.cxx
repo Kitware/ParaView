@@ -49,7 +49,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWWidget );
-vtkCxxRevisionMacro(vtkKWWidget, "1.46");
+vtkCxxRevisionMacro(vtkKWWidget, "1.47");
 
 int vtkKWWidgetCommand(ClientData cd, Tcl_Interp *interp,
                        int argc, char *argv[]);
@@ -344,7 +344,7 @@ void vtkKWWidget::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkKWWidget ";
-  this->ExtractRevision(os,"$Revision: 1.46 $");
+  this->ExtractRevision(os,"$Revision: 1.47 $");
 }
 
 //------------------------------------------------------------------------------
@@ -439,20 +439,6 @@ int vtkKWWidget::InitializeTrace()
 }  
 
 //------------------------------------------------------------------------------
-void vtkKWWidget::GetRGBColor(const char* color,
-                              int *rr, int *gg, int *bb)
-{
-  this->Script("winfo rgb %s %s",
-               this->GetWidgetName(), color);
-  int r, g, b;
-  sscanf( this->Application->GetMainInterp()->result, "%d %d %d",
-          &r, &g, &b );
-  *rr = static_cast<int>((static_cast<float>(r) / 65535.0)*255.0);
-  *gg = static_cast<int>((static_cast<float>(g) / 65535.0)*255.0);
-  *bb = static_cast<int>((static_cast<float>(b) / 65535.0)*255.0); 
-}
-
-//------------------------------------------------------------------------------
 const char* vtkKWWidget::GetType()
 {
   if ( this->Application )
@@ -492,14 +478,21 @@ void vtkKWWidget::SetEnabled(int e)
 }
 
 //------------------------------------------------------------------------------
+void vtkKWWidget::GetRGBColor(const char* color,
+                              int *rr, int *gg, int *bb)
+{
+  vtkKWObject::GetRGBColor(this->Application->GetMainInterp(),
+                           this->GetWidgetName(), 
+                           color, 
+                           rr, gg, bb);
+}
+
+//------------------------------------------------------------------------------
 void vtkKWWidget::GetBackgroundColor(int *r, int *g, int *b)
 {
-  ostrstream str;
-  str << "lindex [ " << this->GetWidgetName() 
-      << " configure -bg ] end" << ends;
-  this->Script(str.str());
-  this->GetRGBColor(this->Application->GetMainInterp()->result, r, g, b);
-  str.rdbuf()->freeze(0);
+  vtkKWObject::GetBackgroundColor(this->Application->GetMainInterp(),
+                                  this->GetWidgetName(), 
+                                  r, g, b);
 }
 
 //------------------------------------------------------------------------------
