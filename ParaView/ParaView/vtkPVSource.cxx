@@ -1021,7 +1021,11 @@ void vtkPVSource::UpdateVTKSourceParameters()
     {
     widget = this->Widgets->GetNextKWWidget();
     pvw = vtkPVWidget::SafeDownCast(widget);
-    if (pvw && pvw->GetModifiedFlag())
+
+    // We should be calling Accept on the widgets regardless of whether they
+    // were modified.
+//    if (pvw && pvw->GetModifiedFlag())
+    if (pvw)
       {
       if ( ! pvw->GetTraceVariableInitialized())
         {

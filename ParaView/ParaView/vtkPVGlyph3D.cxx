@@ -170,8 +170,8 @@ void vtkPVGlyph3D::CreateProperties()
                      this->GetPVWindow()->GetGlyphSources());
 
   // Set the default so Reset behaves properly.  There are other options.
-  //this->GetPVWindow()->GetGlyphSources()->InitTraversal();
-  //this->SetGlyphSource(((vtkPVSource*)(this->GetPVWindow()->GetGlyphSources()->GetNextItemAsObject()))->GetNthPVOutput(0));
+//  this->GetPVWindow()->GetGlyphSources()->InitTraversal();
+//  this->SetGlyphSource(((vtkPVSource*)(this->GetPVWindow()->GetGlyphSources()->GetNextItemAsObject()))->GetNthPVOutput(0));
   // Now the input menu handles setting the default here.
                                       
   this->ScaleModeFrame->SetParent(this->GetParameterFrame()->GetFrame());

@@ -209,10 +209,12 @@ void vtkPVInputMenu::Accept()
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
 
-  if ( ! this->ModifiedFlag)
-    {
-    return;
-    }
+  // Why does the widget have to be modified in order to execute this method???
+  
+//  if ( ! this->ModifiedFlag)
+//    {
+//    return;
+//    }
 
   if (this->PVSource == NULL)
     {
