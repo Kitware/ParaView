@@ -27,7 +27,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkXMLPVAnimationWriter);
-vtkCxxRevisionMacro(vtkXMLPVAnimationWriter, "1.6");
+vtkCxxRevisionMacro(vtkXMLPVAnimationWriter, "1.7");
 
 //----------------------------------------------------------------------------
 class vtkXMLPVAnimationWriterInternals
@@ -265,7 +265,7 @@ void vtkXMLPVAnimationWriter::Finish()
   this->FinishCalled = 1;
   
   // Just write the output file with the current set of entries.
-  this->Write();
+  this->WriteInternal();
 
   if (this->ErrorCode == vtkErrorCode::OutOfDiskSpaceError)
     {
