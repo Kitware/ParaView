@@ -177,12 +177,14 @@ vtkPVWindow::vtkPVWindow()
 
   this->TclInteractor = NULL;
 
+
   this->SetScriptExtension(".pvs");
   this->SetScriptType("ParaView");
 
   this->SetMenuPropertiesTitle("View");
 
   this->Modules = vtkStringList::New();
+  this->ReaderInterfaces = vtkStringList::New();
   this->FileExtensions = NULL;
   this->FileDescriptions = NULL;
   this->AddFileType("VTK Files", "vtk");
@@ -210,6 +212,9 @@ vtkPVWindow::~vtkPVWindow()
   this->TclInteractor = NULL;
 
   this->Modules->Delete();
+  this->Modules = NULL;
+  this->ReaderInterfaces->Delete();
+  this->ReaderInterfaces = NULL;
 
   if (this->FileExtensions)
     {
@@ -795,6 +800,8 @@ void vtkPVWindow::Create(vtkKWApplication *app, char* vtkNotUsed(args))
   if (this->LoadModule("vtkARLTCL.pvm"))
     {
     this->AddFileType("CTH Files", "xml");
+    this->Script("vtkARLXDMFReaderInterface cthReaderInterface");
+    this->ReaderInterfaces->AddString("cthReaderInterface");
     // Load Modules should really look for wizards.
     this->AdvancedMenu->InsertCommand(2, "CTH Wizard", this, "WizardCallback",0);
     }
@@ -1048,15 +1055,21 @@ vtkPVSource *vtkPVWindow::Open(char *openFileName)
     {
     sInt = this->GetSourceInterface("vtkSTLReader");
     }
-  else if (this->GetModuleLoaded("vtkARLTCL.pvm") && strcmp(extension, ".xml") == 0)
-    {
-    return this->OpenXML(openFileName, rootName);
-    }
   else
     {
-    vtkErrorMacro("Unknown file extension");
-    sInt = NULL;
+    // Loop through all of the module readers seeing if they can open the file.
+    int num, idx;
+    const char *rInt;
+    num = this->ReaderInterfaces->GetLength();
+    pvs = NULL;
+    for (idx = 0; idx < num && pvs == NULL; ++idx)
+      {
+      rInt = this->ReaderInterfaces->GetString(idx);
+      pvs = this->OpenWithReaderInterface(openFileName, rootName, rInt);
+      }
+    return pvs;
     }
+
   if (sInt == NULL)
     {
     vtkErrorMacro("Could not find interface.");
@@ -1084,26 +1097,41 @@ vtkPVSource *vtkPVWindow::Open(char *openFileName)
 }
 
 //----------------------------------------------------------------------------
-vtkPVSource *vtkPVWindow::OpenXML(const char *openFileName,
-                                  const char *rootName)
+vtkPVSource *vtkPVWindow::OpenWithReaderInterface(const char *openFileName,
+                                                  const char *rootName,
+                                                  const char *rIntName)
 {
   static int        count = 0;
+  char              sourceClassName[200];
   char              sourceTclName[200];
+  char              outputClassName[200];
   char              outputTclName[200];
   char              tmp[200];
   vtkPVApplication* pvApp = this->GetPVApplication();
   vtkPVSource*      pvs;
   vtkPVData*        pvd;
   vtkDataSet*       d;
+  int               idx, num;
+
+  // First see if this type of reader can read this file.
+  this->Script("%s CanReadFile {%s}", rIntName, openFileName);
+  if (this->GetIntegerResult(this->Application) == 0)
+    {
+    return NULL;
+    }
 
   ++count;
   sprintf(sourceTclName, "%s_%d", rootName, count);
 
   // Create the reader and output.
-  pvApp->BroadcastScript("vtkARLXDMFReader %s", sourceTclName);
+  this->Script("%s GetReaderClassName", rIntName);
+  strcpy(sourceClassName, this->Application->GetMainInterp()->result);
+  pvApp->BroadcastScript("%s %s", sourceClassName, sourceTclName);
   pvApp->BroadcastScript("%s SetFileName {%s}", sourceTclName, openFileName);
+  pvApp->Script("[%s GetOutput] GetClassName", sourceTclName);
+  strcpy(outputClassName, this->Application->GetMainInterp()->result);
   sprintf(outputTclName, "%sOutput", sourceTclName);
-  d = (vtkDataSet *)(pvApp->MakeTclObject("vtkRectilinearGrid", outputTclName));
+  d = (vtkDataSet *)(pvApp->MakeTclObject(outputClassName, outputTclName));
   pvApp->BroadcastScript("%s SetOutput %s", sourceTclName, outputTclName);   
   // Set the special extent translator.
   // I do not beleive we really have to hold onto the translators tcl name ...
@@ -1129,14 +1157,15 @@ vtkPVSource *vtkPVWindow::OpenXML(const char *openFileName,
   pvs->SetView(this->GetMainView());
   pvs->CreateProperties();
 
-  // Create the widgets.  
-  pvs->AddFileEntry("FileName", "FileName","xml", 
-                    "XML may support different file types in the future.");
-  pvs->AddVector3Entry("Stride", "X", "Y", "Z", "Stride", 
-                       "Integer values for subsampling the volume.");
-  pvs->AddArraySelection("Cell", "Choose which arrays to load"); 
+  // Temporary method of creating a UI from the interface.
+  this->Script("%s GetNumberOfInterfaceStrings", rIntName);
+  num = this->GetIntegerResult(this->Application);
+  for (idx = 0; idx < num; ++idx)
+    {
+    this->Script("eval %s [%s GetInterfaceString %d]", pvs->GetTclName(), 
+                 rIntName, idx);
+    }
 
-  // The location/order of this is important.  (Geoemtry empty input.)
   this->SetCurrentPVSource(pvs);
   this->ShowCurrentSourceProperties();
 
@@ -2905,7 +2934,7 @@ void vtkPVWindow::AddFileType(const char *description, const char *ext)
     }
   else
     {
-    sprintf(newStr, "%s .%s", this->FileExtentsions, ext);
+    sprintf(newStr, "%s .%s", this->FileExtensions, ext);
     }
 #endif
   if (this->FileExtensions)

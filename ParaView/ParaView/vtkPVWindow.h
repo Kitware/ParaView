@@ -367,6 +367,7 @@ protected:
   char *FileExtensions;
   char *FileDescriptions;
   void AddFileType(const char* description, const char* ext);
+  vtkStringList *ReaderInterfaces;
 
 private:
   static const char* StandardSourceInterfaces;
@@ -374,7 +375,8 @@ private:
 
   // Modules.
   vtkStringList *Modules;
-  vtkPVSource *OpenXML(const char *openFileName, const char *rootName);
+  vtkPVSource *OpenWithReaderInterface(const char *openFileName, const char *rootName,
+                                       const char *rIntName);
 };
 
 
