@@ -64,13 +64,7 @@ protected:
   
   // Reads 4 bytes from the input stream and decodes them into 3 bytes.
   int DecodeTriplet(unsigned char& c0, unsigned char& c1, unsigned char& c2);
-  
-  // Decode table lookup function.
-  static unsigned char Decode(unsigned char c)
-    { return vtkBase64InputStream::DecodeTable[c]; }
-  
-  // The decoding table.
-  static const unsigned char DecodeTable[256];
+
 private:
   vtkBase64InputStream(const vtkBase64InputStream&);  // Not implemented.
   void operator=(const vtkBase64InputStream&);  // Not implemented.

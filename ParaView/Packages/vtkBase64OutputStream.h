@@ -62,12 +62,6 @@ protected:
   int EncodeEnding(unsigned char c0, unsigned char c1);
   int EncodeEnding(unsigned char c0);
   
-  // Encode table lookup function.
-  static unsigned char Encode(unsigned char c)
-    { return vtkBase64OutputStream::EncodeTable[c]; }
-  
-  // The encoding table.
-  static const unsigned char EncodeTable[65];
 private:
   vtkBase64OutputStream(const vtkBase64OutputStream&);  // Not implemented.
   void operator=(const vtkBase64OutputStream&);  // Not implemented.

@@ -20,7 +20,7 @@
 #include "vtkXMLDataReader.h"
 #include "vtkDataSet.h"
 
-vtkCxxRevisionMacro(vtkXMLPDataReader, "1.1");
+vtkCxxRevisionMacro(vtkXMLPDataReader, "1.2");
 
 //----------------------------------------------------------------------------
 vtkXMLPDataReader::vtkXMLPDataReader()
@@ -244,13 +244,13 @@ int vtkXMLPDataReader::ReadPiece(vtkXMLDataElement* ePiece)
   
   // The file name is relative to the summary file.  Convert it to
   // something we can use.
-  fileName = this->CreatePieceFileName(fileName);
+  char *pieceFileName = this->CreatePieceFileName(fileName);
   
   vtkXMLDataReader* reader = this->CreatePieceReader();
   this->PieceReaders[this->Piece] = reader;
-  reader->SetFileName(fileName);
+  reader->SetFileName(pieceFileName);
   
-  delete [] fileName;
+  delete [] pieceFileName;
   
   return 1;
 }

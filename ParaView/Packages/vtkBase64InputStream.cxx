@@ -18,8 +18,12 @@
 #include "vtkBase64InputStream.h"
 #include "vtkObjectFactory.h"
 
-vtkCxxRevisionMacro(vtkBase64InputStream, "1.1");
+//----------------------------------------------------------------------------
+vtkCxxRevisionMacro(vtkBase64InputStream, "1.2");
 vtkStandardNewMacro(vtkBase64InputStream);
+
+//----------------------------------------------------------------------------
+static unsigned char vtkBase64InputStreamDecode(unsigned char c);
 
 //----------------------------------------------------------------------------
 vtkBase64InputStream::vtkBase64InputStream()
@@ -152,10 +156,10 @@ inline int vtkBase64InputStream::DecodeTriplet(unsigned char& c0,
   // Read the 4 bytes encoding this triplet from the stream.
   this->Stream->read(in, 4);
   if(this->Stream->gcount() < 4) { return 0; }
-  d[0] = this->Decode(in[0]);
-  d[1] = this->Decode(in[1]);
-  d[2] = this->Decode(in[2]);
-  d[3] = this->Decode(in[3]);
+  d[0] = vtkBase64InputStreamDecode(in[0]);
+  d[1] = vtkBase64InputStreamDecode(in[1]);
+  d[2] = vtkBase64InputStreamDecode(in[2]);
+  d[3] = vtkBase64InputStreamDecode(in[3]);
   
   // Make sure all characters were valid.
   if((d[0] == 0xFF) || (d[1] == 0xFF) || (d[2] == 0xFF) || (d[3] == 0xFF))
@@ -173,7 +177,7 @@ inline int vtkBase64InputStream::DecodeTriplet(unsigned char& c0,
 }
 
 //----------------------------------------------------------------------------
-const unsigned char vtkBase64InputStream::DecodeTable[256] =
+static const unsigned char vtkBase64InputStreamDecodeTable[256] =
 {
   0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,
   0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,
@@ -209,3 +213,11 @@ const unsigned char vtkBase64InputStream::DecodeTable[256] =
   0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,
   0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
 };
+
+  
+//----------------------------------------------------------------------------
+unsigned char vtkBase64InputStreamDecode(unsigned char c)
+{ 
+  // Decode table lookup function.
+  return vtkBase64InputStreamDecodeTable[c]; 
+}
