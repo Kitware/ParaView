@@ -1,6 +1,8 @@
 PROJECT(KWWidgets)
 INCLUDE_REGULAR_EXPRESSION("^(vtk|kw|icons).*$")
 
+SET(CMAKE_C_FLAGS "${CMAKE_ANSI_CFLAGS} ${CMAKE_C_FLAGS}")
+
 SET( KWWidgets_SRCS
   ${VTK_TCL_HOME}/vtktcl.c
   vtkCornerAnnotation.cxx
