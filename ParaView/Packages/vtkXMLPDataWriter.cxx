@@ -18,7 +18,7 @@
 #include "vtkXMLPDataWriter.h"
 #include "vtkDataSet.h"
 
-vtkCxxRevisionMacro(vtkXMLPDataWriter, "1.4");
+vtkCxxRevisionMacro(vtkXMLPDataWriter, "1.5");
 
 //----------------------------------------------------------------------------
 vtkXMLPDataWriter::vtkXMLPDataWriter()
@@ -105,14 +105,6 @@ int vtkXMLPDataWriter::Write()
     }
   
   return 1;
-}
-
-//----------------------------------------------------------------------------
-void vtkXMLPDataWriter::WriteFileAttributes()
-{
-  this->Superclass::WriteFileAttributes();
-  ostream& os = *(this->Stream);
-  os << " type=\"" << this->GetDataSetName() << "\""; 
 }
 
 //----------------------------------------------------------------------------
