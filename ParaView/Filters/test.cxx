@@ -19,7 +19,6 @@
 #include "vtkPVImageGradient.h"
 #include "vtkPVImageGradientMagnitude.h"
 #include "vtkPVImageMedian3D.h"
-#include "vtkPVKitwareContourFilter.h"
 #include "vtkPVRibbonFilter.h"
 #include "vtkPVThresholdFilter.h"
 #include "vtkPVUpdateSuppressor.h"
@@ -28,6 +27,10 @@
 #include "vtkStructuredCacheFilter.h"
 #include "vtkVRMLSource.h"
 #include "vtkXMLPVDWriter.h"
+
+#ifdef VTK_USE_PATENTED
+# include "vtkPVKitwareContourFilter.h"
+#endif
 
 #ifdef VTK_USE_MPI
 # include "vtkDistributedDataFilter.h"
@@ -63,7 +66,9 @@ int main()
   c = vtkPVImageGradient::New(); c->Print(cout); c->Delete();
   c = vtkPVImageGradientMagnitude::New(); c->Print(cout); c->Delete();
   c = vtkPVImageMedian3D::New(); c->Print(cout); c->Delete();
+#ifdef VTK_USE_PATENTED
   c = vtkPVKitwareContourFilter::New(); c->Print(cout); c->Delete();
+#endif
   c = vtkPVRibbonFilter::New(); c->Print(cout); c->Delete();
   c = vtkPVThresholdFilter::New(); c->Print(cout); c->Delete();
   c = vtkPVUpdateSuppressor::New(); c->Print(cout); c->Delete();
