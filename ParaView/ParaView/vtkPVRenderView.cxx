@@ -109,7 +109,7 @@ static unsigned char image_properties[] =
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.243");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.244");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -952,7 +952,7 @@ void vtkPVRenderView::SwitchBackAndForthToViewProperties()
     return;
     }
 
-  if (!viewmenu->IsItemPresent(VTK_PV_VIEW_MENU_LABEL))
+  if (!viewmenu->HasItem(VTK_PV_VIEW_MENU_LABEL))
     {
     return;
     }
@@ -978,7 +978,7 @@ void vtkPVRenderView::SwitchBackAndForthToViewProperties()
   else
     {
     if (this->MenuLabelSwitchBackAndForthToViewProperties &&
-        viewmenu->IsItemPresent(this->MenuLabelSwitchBackAndForthToViewProperties))
+        viewmenu->HasItem(this->MenuLabelSwitchBackAndForthToViewProperties))
       {
       viewmenu->Invoke(
         viewmenu->GetIndex(this->MenuLabelSwitchBackAndForthToViewProperties));
@@ -2642,7 +2642,7 @@ void vtkPVRenderView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVRenderView ";
-  this->ExtractRevision(os,"$Revision: 1.243 $");
+  this->ExtractRevision(os,"$Revision: 1.244 $");
 }
 
 //------------------------------------------------------------------------------

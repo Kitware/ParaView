@@ -58,7 +58,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkXDMFReaderModule);
-vtkCxxRevisionMacro(vtkXDMFReaderModule, "1.3");
+vtkCxxRevisionMacro(vtkXDMFReaderModule, "1.4");
 
 int vtkXDMFReaderModuleCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -253,7 +253,7 @@ void vtkXDMFReaderModule::UpdateDomains(const char* ob)
     {
     char* dname = vtkString::Duplicate(this->Script("%s GetDomainName %d", ob, cc));
     sprintf(buffer, "UpdateGrids %s", ob);
-    this->DomainMenu->AddEntryWithCommand(dname, this->GetTclName(), buffer);
+    this->DomainMenu->AddEntryWithCommand(dname, this, buffer);
     if ( !cc )
       {
       this->DomainMenu->SetValue(dname);
