@@ -45,7 +45,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkXMLVolumePropertyWriter.h"
 
 vtkStandardNewMacro(vtkXMLVolumePropertyReader);
-vtkCxxRevisionMacro(vtkXMLVolumePropertyReader, "1.6");
+vtkCxxRevisionMacro(vtkXMLVolumePropertyReader, "1.7");
 
 //----------------------------------------------------------------------------
 char* vtkXMLVolumePropertyReader::GetRootElementName()
@@ -141,6 +141,11 @@ int vtkXMLVolumePropertyReader::Parse(vtkXMLDataElement *elem)
     if (comp_elem->GetScalarAttribute("ComponentWeight", fval))
       {
       obj->SetComponentWeight(c_idx, fval);
+      }
+
+    if (comp_elem->GetScalarAttribute("ScalarOpacityUnitDistance", fval))
+      {
+      obj->SetScalarOpacityUnitDistance(c_idx, fval);
       }
 
     // Gray or Color Transfer Function

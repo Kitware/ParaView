@@ -44,7 +44,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkXMLPiecewiseFunctionWriter.h"
 
 vtkStandardNewMacro(vtkXMLVolumePropertyWriter);
-vtkCxxRevisionMacro(vtkXMLVolumePropertyWriter, "1.7");
+vtkCxxRevisionMacro(vtkXMLVolumePropertyWriter, "1.8");
 
 //----------------------------------------------------------------------------
 char* vtkXMLVolumePropertyWriter::GetRootElementName()
@@ -171,6 +171,9 @@ int vtkXMLVolumePropertyWriter::AddNestedElements(vtkXMLDataElement *elem)
 
     comp_elem->SetFloatAttribute(
       "ComponentWeight", obj->GetComponentWeight(c_idx));
+    
+    comp_elem->SetFloatAttribute(
+      "ScalarOpacityUnitDistance", obj->GetScalarOpacityUnitDistance(c_idx));
     
     // Gray or Color Transfer Function
 
