@@ -1,6 +1,7 @@
 .git*            export-ignore
 
 *.bat           -crlf
+*.sh.in          crlf=input
 CreateConverters.tcl  crlf=input
 JavaWrap.tcl     crlf=input
 SwigIt           crlf=input
