@@ -39,7 +39,7 @@
 #include "vtkSMStringVectorProperty.h"
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMLODPartDisplay);
-vtkCxxRevisionMacro(vtkSMLODPartDisplay, "1.7");
+vtkCxxRevisionMacro(vtkSMLODPartDisplay, "1.8");
 
 
 //----------------------------------------------------------------------------
@@ -53,6 +53,8 @@ vtkSMLODPartDisplay::vtkSMLODPartDisplay()
   this->LODInformationIsValid = 0;
   this->LODInformation = vtkPVLODPartDisplayInformation::New();
   this->LODResolution = 50;
+
+  this->LODGeometryIsValid = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -503,21 +505,42 @@ void vtkSMLODPartDisplay::Update()
     for (i = 0; i < num; ++i)
       {
       this->GeometryInformationIsValid = 0;
-      this->LODInformationIsValid = 0;
       pm->GetStream()
         << vtkClientServerStream::Invoke
         << this->UpdateSuppressorProxy->GetID(i) << "ForceUpdate"
         << vtkClientServerStream::End;
+      }
+    this->SendForceUpdate();
+    this->GeometryIsValid = 1;
+    }
+
+  // Try delaying the update of the LOD path if it is not necessary.
+  if ( ! this->LODGeometryIsValid && pm->GetGlobalLODFlag() && 
+       this->LODUpdateSuppressorProxy )
+    {
+    int i, num;
+    num = this->UpdateSuppressorProxy->GetNumberOfIDs();
+    for (i = 0; i < num; ++i)
+      {
+      this->LODInformationIsValid = 0;
       pm->GetStream()
         << vtkClientServerStream::Invoke
         << this->LODUpdateSuppressorProxy->GetID(i) << "ForceUpdate"
         << vtkClientServerStream::End;
       }
     this->SendForceUpdate();
-    this->GeometryIsValid = 1;
+    this->LODGeometryIsValid = 1;
     }
 }
 
+
+//----------------------------------------------------------------------------
+void vtkSMLODPartDisplay::InvalidateGeometry()
+{
+  this->LODGeometryIsValid = 0;
+  this->GeometryIsValid = 0;
+  this->RemoveAllCaches();
+}
 
 //----------------------------------------------------------------------------
 void vtkSMLODPartDisplay::RemoveAllCaches()

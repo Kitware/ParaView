@@ -26,7 +26,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLODRenderModule);
-vtkCxxRevisionMacro(vtkPVLODRenderModule, "1.5");
+vtkCxxRevisionMacro(vtkPVLODRenderModule, "1.6");
 
 //----------------------------------------------------------------------------
 vtkPVLODRenderModule::vtkPVLODRenderModule()
@@ -106,6 +106,9 @@ void vtkPVLODRenderModule::InteractiveRender()
   if (this->GetTotalVisibleGeometryMemorySize() > this->LODThreshold*1000)
     {
     this->ProcessModule->SetGlobalLODFlag(1);
+    // We call this again because the LOD branches
+    // may not have been updated.
+    this->UpdateAllDisplays();
     }
   else
     {

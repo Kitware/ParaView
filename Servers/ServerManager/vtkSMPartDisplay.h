@@ -146,7 +146,7 @@ public:
   
   // Description:
   // PVSource calls this when it gets modified.
-  void InvalidateGeometry();
+  virtual void InvalidateGeometry();
 
   // Description:
   // Select a point field to use for volume rendering

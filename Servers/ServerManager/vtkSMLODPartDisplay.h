@@ -84,6 +84,10 @@ public:
   vtkPVLODPartDisplayInformation* GetLODInformation();
   //ETX
 
+  // Description:
+  // PVSource calls this when it gets modified.
+  virtual void InvalidateGeometry();
+  
 protected:
   vtkSMLODPartDisplay();
   ~vtkSMLODPartDisplay();
@@ -103,7 +107,8 @@ protected:
 
   vtkPVLODPartDisplayInformation* LODInformation;
   int LODInformationIsValid;
-
+  int LODGeometryIsValid;
+  
   vtkSMLODPartDisplay(const vtkSMLODPartDisplay&); // Not implemented
   void operator=(const vtkSMLODPartDisplay&); // Not implemented
 };
