@@ -38,7 +38,7 @@ class vtkPVArraySelectionArraySet: public vtkPVArraySelectionArraySetBase {};
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVArraySelection);
-vtkCxxRevisionMacro(vtkPVArraySelection, "1.34");
+vtkCxxRevisionMacro(vtkPVArraySelection, "1.35");
 
 //----------------------------------------------------------------------------
 int vtkDataArraySelectionCommand(ClientData cd, Tcl_Interp *interp,
@@ -212,22 +212,12 @@ void vtkPVArraySelection::SetLocalSelectionsFromReader()
   vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
   this->SetupSelectionTclName();
   this->Selection->RemoveAllArrays();
-  int point = 0;
-  if(strcmp(this->AttributeName, "Point") == 0)
-    {
-    point = 1;
-    }
-  else if(!(strcmp(this->AttributeName, "Cell") == 0))
-    {
-    vtkErrorMacro("AttributeName must be \"Point\" or \"Cell\".");
-    return;
-    }
   if(this->VTKReaderID.ID)
     {
     this->CreateServerSide();
     pm->GetStream() << vtkClientServerStream::Invoke
                     << this->ServerSideID << "GetArraySettings"
-                    << this->VTKReaderID << point
+                    << this->VTKReaderID << this->AttributeName
                     << vtkClientServerStream::End;
     pm->SendStreamToServerRoot();
     vtkClientServerStream arrays;

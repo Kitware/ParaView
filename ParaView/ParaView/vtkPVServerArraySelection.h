@@ -33,9 +33,8 @@ public:
 
   // Description:
   // Get a list of array names that can be read by the given reader
-  // object.  If the second argument is 0, cell arrays will be listed.
-  // Otherwise, point arrays will be listed.
-  const vtkClientServerStream& GetArraySettings(vtkSource*, int point);
+  // object.  The second argument has to be the name of array.
+  const vtkClientServerStream& GetArraySettings(vtkSource*, const char* arrayname);
 
 protected:
   vtkPVServerArraySelection();

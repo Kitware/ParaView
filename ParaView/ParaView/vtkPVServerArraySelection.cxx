@@ -24,7 +24,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVServerArraySelection);
-vtkCxxRevisionMacro(vtkPVServerArraySelection, "1.4");
+vtkCxxRevisionMacro(vtkPVServerArraySelection, "1.5");
 
 //----------------------------------------------------------------------------
 class vtkPVServerArraySelectionInternals
@@ -53,7 +53,7 @@ void vtkPVServerArraySelection::PrintSelf(ostream& os, vtkIndent indent)
 
 //----------------------------------------------------------------------------
 const vtkClientServerStream&
-vtkPVServerArraySelection::GetArraySettings(vtkSource* source, int point)
+vtkPVServerArraySelection::GetArraySettings(vtkSource* source, const char* arrayname)
 {
   // Reset the stream for a new list of array names.
   this->Internal->Result.Reset();
@@ -70,12 +70,16 @@ vtkPVServerArraySelection::GetArraySettings(vtkSource* source, int point)
     vtkClientServerID readerID = interp->GetIDFromObject(source);
     if(readerID.ID)
       {
+      ostrstream aname;
+      aname << "GetNumberOf" << arrayname << "Arrays" << ends;
+
       // Get the number of arrays.
       vtkClientServerStream stream;
       stream << vtkClientServerStream::Invoke
              << readerID
-             << (point? "GetNumberOfPointArrays":"GetNumberOfCellArrays")
+             << aname.str()
              << vtkClientServerStream::End;
+      aname.rdbuf()->freeze(0); 
       interp->ProcessStream(stream);
       stream.Reset();
       int numArrays = 0;
@@ -87,11 +91,16 @@ vtkPVServerArraySelection::GetArraySettings(vtkSource* source, int point)
       // For each array, get its name and status.
       for(int i=0; i < numArrays; ++i)
         {
+        ostrstream naname;
+        naname << "Get" << arrayname << "ArrayName" << ends;
+
         // Get the array name.
         stream << vtkClientServerStream::Invoke
                << readerID
-               << (point? "GetPointArrayName":"GetCellArrayName") << i
+               << naname.str()
+               << i
                << vtkClientServerStream::End;
+        naname.rdbuf()->freeze(0); 
         if(!interp->ProcessStream(stream))
           {
           break;
@@ -105,12 +114,15 @@ vtkPVServerArraySelection::GetArraySettings(vtkSource* source, int point)
           }
         vtkstd::string name = pname;
 
+        ostrstream saname;
+        saname << "Get" << arrayname << "ArrayStatus" << ends;
         // Get the array status.
         stream << vtkClientServerStream::Invoke
-               << readerID
-               << (point? "GetPointArrayStatus":"GetCellArrayStatus")
-               << name.c_str()
-               << vtkClientServerStream::End;
+          << readerID
+          << saname.str()
+          << name.c_str()
+          << vtkClientServerStream::End;
+        saname.rdbuf()->freeze(0); 
         if(!interp->ProcessStream(stream))
           {
           break;
