@@ -89,7 +89,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.313.2.25");
+vtkCxxRevisionMacro(vtkPVSource, "1.313.2.26");
 
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
@@ -2415,7 +2415,6 @@ int vtkPVSource::InitializeData()
   int numOutputs, idx;
   int outputCount = 0;
   vtkPVPart* part;
-  vtkPVSource* input = this->GetPVInput(0);
   vtkPVData* pvd;
 
   // Create the output.

@@ -325,7 +325,7 @@
          output="vtkUnstructuredGrid" 
          class="vtkPVAdvancedReaderModule" module_type="Reader" 
          extensions=".e .ex2 .exo .gen .0 .00 .000" 
-         file_description="Exodus Reader">
+         file_description="Exodus">
   <Source class="vtkPExodusReader"/>
   <ArraySelection trace_name="point_array_sel" attribute_name="Cell" />
   <ArraySelection trace_name="cell_array_sel" attribute_name="Point" />

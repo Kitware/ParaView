@@ -55,7 +55,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCompositeRenderModule);
-vtkCxxRevisionMacro(vtkPVCompositeRenderModule, "1.7.2.6");
+vtkCxxRevisionMacro(vtkPVCompositeRenderModule, "1.7.2.7");
 
 
 
@@ -435,7 +435,7 @@ void vtkPVCompositeRenderModule::ComputeReductionFactor()
       renderTime = renderTime / (float)(this->ReductionFactor);
       // Compute time for each pixel on the last render.
       area = windowSize[0] * windowSize[1];
-      reductionFactor = this->Composite->GetReductionFactor();
+      reductionFactor = this->Composite->GetImageReductionFactor();
       reducedArea = area / (reductionFactor * reductionFactor);
       getBuffersTime = this->Composite->GetGetBuffersTime();
       setBuffersTime = this->Composite->GetSetBuffersTime();

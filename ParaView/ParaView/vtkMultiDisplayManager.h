@@ -28,7 +28,7 @@
 #ifndef __vtkMultiDisplayManager_h
 #define __vtkMultiDisplayManager_h
 
-#include "vtkObject.h"
+#include "vtkParallelRenderManager.h"
 
 class vtkRenderWindow;
 class vtkMultiProcessController;
@@ -42,17 +42,16 @@ class vtkUnsignedCharArray;
 class vtkPVMultiDisplayInfo;
 class vtkPVCompositeBuffer;
 
-class VTK_EXPORT vtkMultiDisplayManager : public vtkObject
+class VTK_EXPORT vtkMultiDisplayManager : public vtkParallelRenderManager
 {
 public:
   static vtkMultiDisplayManager *New();
-  vtkTypeRevisionMacro(vtkMultiDisplayManager,vtkObject);
+  vtkTypeRevisionMacro(vtkMultiDisplayManager,vtkParallelRenderManager);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
   // Set/Get the RenderWindow to use for compositing.
   // We add a start and end observer to the window.
-  vtkGetObjectMacro(RenderWindow, vtkRenderWindow);
   virtual void SetRenderWindow(vtkRenderWindow *renWin);
 
   // Description:
@@ -70,16 +69,11 @@ public:
   // If not using the default, this must be called before any
   // other methods.
   void SetController(vtkMultiProcessController* controller);
-  vtkGetObjectMacro(Controller, vtkMultiProcessController);
 
   // Description:
   // Set/Get the controller use to send final image to client
   void SetSocketController(vtkSocketController* controller);
   vtkGetObjectMacro(SocketController, vtkSocketController);
-
-  // Description:
-  // Methods that are not used at the moment.
-  virtual void SetRenderView(vtkObject*);
 
   // Description:
   // Set/Get dimensions (in number of displays) of the
@@ -113,14 +107,6 @@ public:
   vtkSetMacro(UseCompositeCompression, int);
   vtkGetMacro(UseCompositeCompression, int);
   vtkBooleanMacro(UseCompositeCompression, int);
-
-  // Description:
-  // This flag is ignored (Not used at the moment).
-  // It will switch between compositing the tiled displays
-  // and distributing the polydata to each tile to render.
-  vtkSetMacro(UseCompositing, int);
-  vtkGetMacro(UseCompositing, int);
-  vtkBooleanMacro(UseCompositing, int);
 
   // Description:
   // This value is only used for interactive rendering.
@@ -158,7 +144,7 @@ public:
 //BTX
   void ClientStartRender();
   void RootStartRender(vtkPVMultiDisplayInfo info);
-  void SatelliteStartRender(vtkPVMultiDisplayInfo info);
+  void SatelliteStartRender();
 
 //ETX
 protected:
@@ -167,8 +153,6 @@ protected:
 
   int ClientFlag;
   
-  vtkRenderWindow* RenderWindow;
-  vtkMultiProcessController* Controller;
   vtkSocketController* SocketController;
 
   // For managing buffers.
@@ -194,8 +178,6 @@ protected:
   unsigned long StartTag;
   unsigned long EndTag;
   
-  vtkObject *RenderView;
-
   // Any processes can display the tiles.
   // There can be more processes than tiles.
   int TileDimensions[2];
@@ -204,13 +186,14 @@ protected:
   vtkTiledDisplaySchedule* Schedule;
   int ZeroEmpty;
 
-  // On: Composite, Off, assume geometry copied to all tile procs.
-  int UseCompositing;
-
   int UseCompositeCompression;
 
   void Composite();
 
+  void PreRenderProcessing() {}
+  void PostRenderProcessing() {}
+  void InternalSatelliteStartRender(vtkPVMultiDisplayInfo info);
+  
 private:
   vtkMultiDisplayManager(const vtkMultiDisplayManager&); // Not implemented
   void operator=(const vtkMultiDisplayManager&); // Not implemented

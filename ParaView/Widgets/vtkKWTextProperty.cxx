@@ -122,7 +122,7 @@ static unsigned char image_copy[] =
 
 // ----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWTextProperty);
-vtkCxxRevisionMacro(vtkKWTextProperty, "1.24.2.1");
+vtkCxxRevisionMacro(vtkKWTextProperty, "1.24.2.2");
 
 int vtkKWTextPropertyCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -1083,7 +1083,7 @@ void vtkKWTextProperty::CopyValuesFrom(vtkKWTextProperty *widget)
 
 //----------------------------------------------------------------------------
 void vtkKWTextProperty::SaveInTclScript(ofstream *file, 
-                                        const char *tcl_name)
+                                        const char *tcl_name, int tabify)
 {
   static int instance_count = 0;
 
@@ -1101,17 +1101,41 @@ void vtkKWTextProperty::SaveInTclScript(ofstream *file,
     }
 
   vtkTextProperty *tprop = this->TextProperty;
+
   if (tprop)
     {
     float *rgb = this->GetColor();
-    *file << "\t" << name << " SetColor " 
-          << rgb[0] << " "  << rgb[1] << " "  << rgb[2] << endl;
-    *file << "\t" << name << " SetFontFamily " 
-          << tprop->GetFontFamily() << endl;
-    *file << "\t" << name << " SetBold " << tprop->GetBold() << endl;
-    *file << "\t" << name << " SetItalic " << tprop->GetItalic() << endl;
-    *file << "\t" << name << " SetShadow " << tprop->GetShadow() << endl;
-    *file << "\t" << name << " SetOpacity " << this->GetOpacity() << endl;
+    if (tabify)
+      {
+      *file << "\t";
+      }
+    *file << name << " SetColor " << rgb[0] << " "  << rgb[1] << " "  << rgb[2]
+          << endl;
+    if (tabify)
+      {
+      *file << "\t";
+      }
+    *file << name << " SetFontFamily " << tprop->GetFontFamily() << endl;
+    if (tabify)
+      {
+      *file << "\t";
+      }
+    *file << name << " SetBold " << tprop->GetBold() << endl;
+    if (tabify)
+      {
+      *file << "\t";
+      }
+    *file << name << " SetItalic " << tprop->GetItalic() << endl;
+    if (tabify)
+      {
+      *file << "\t";
+      }
+    *file << name << " SetShadow " << tprop->GetShadow() << endl;
+    if (tabify)
+      {
+      *file << "\t";
+      }
+    *file << name << " SetOpacity " << this->GetOpacity() << endl;
     }
 }
 

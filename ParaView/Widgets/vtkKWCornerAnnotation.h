@@ -161,6 +161,14 @@ public:
   // of 3D widgets, etc.
   virtual void UpdateEnableState();
 
+  // Description:
+  // Export the corner annotation to a file.
+  void SaveState(ofstream *file);
+
+  // Description:
+  // Access to the TextPropertyWidget from a script.
+  vtkGetObjectMacro(TextPropertyWidget, vtkKWTextProperty);
+  
 protected:
   vtkKWCornerAnnotation();
   ~vtkKWCornerAnnotation();

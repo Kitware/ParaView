@@ -74,7 +74,7 @@ static char * makeEntry(char *s)
 
 // Timing data ---------------------------------------------
 
-vtkCxxRevisionMacro(vtkPKdTree, "1.5.4.2");
+vtkCxxRevisionMacro(vtkPKdTree, "1.5.4.3");
 vtkStandardNewMacro(vtkPKdTree);
 
 const int vtkPKdTree::NoRegionAssignment = 0;   // default
@@ -2172,10 +2172,10 @@ int vtkPKdTree::AllocateAndZeroProcessDataLists()
 
   if (iNumCellArrays > 0)
     {
-    MakeList(this->CellDataMin, float, iNumCellArrays);
+    MakeList(this->CellDataMin, double, iNumCellArrays);
     if (this->CellDataMin == NULL) goto doneError3;
 
-    MakeList(this->CellDataMax, float, iNumCellArrays);
+    MakeList(this->CellDataMax, double, iNumCellArrays);
     if (this->CellDataMax == NULL) goto doneError3;
     }
 
@@ -2183,10 +2183,10 @@ int vtkPKdTree::AllocateAndZeroProcessDataLists()
 
   if (iNumPointArrays > 0)
     {
-    MakeList(this->PointDataMin, float, iNumPointArrays);
+    MakeList(this->PointDataMin, double, iNumPointArrays);
     if (this->PointDataMin == NULL) goto doneError3;
 
-    MakeList(this->PointDataMax, float, iNumPointArrays);
+    MakeList(this->PointDataMax, double, iNumPointArrays);
     if (this->PointDataMax == NULL) goto doneError3;
     }
 
@@ -2378,7 +2378,7 @@ int vtkPKdTree::BuildRegionProcessTables()
   TIMER("Get global ranges (global)");
   
   int ar;
-  float range[2];
+  double range[2];
   ncells = this->NumCellArrays;
   npoints = this->NumPointArrays;
 
@@ -2797,7 +2797,7 @@ void vtkPKdTree::BuildRegionListsForProcesses()
 //--------------------------------------------------------------------
 // Queries
 //--------------------------------------------------------------------
-int vtkPKdTree::GetCellArrayGlobalRange(int arrayIndex, float range[2])
+int vtkPKdTree::GetCellArrayGlobalRange(int arrayIndex, double range[2])
 {
   if ((arrayIndex < 0) || (arrayIndex >= this->NumCellArrays))
     {
@@ -2810,7 +2810,7 @@ int vtkPKdTree::GetCellArrayGlobalRange(int arrayIndex, float range[2])
 
   return 0;
 }
-int vtkPKdTree::GetPointArrayGlobalRange(int arrayIndex, float range[2])
+int vtkPKdTree::GetPointArrayGlobalRange(int arrayIndex, double range[2])
 {
   if ((arrayIndex < 0) || (arrayIndex >= this->NumPointArrays))
     {
@@ -3419,8 +3419,10 @@ int vtkSubGroup::Reduce##name(Type *data, Type *to, int size, int root) \
 
 REDUCE(int, Min, MINOP)
 REDUCE(float, Min, MINOP)
+REDUCE(double, Min, MINOP)
 REDUCE(int, Max, MAXOP)
 REDUCE(float, Max, MAXOP)
+REDUCE(double, Max, MAXOP)
 REDUCE(int, Sum, SUMOP)
 
 #define BROADCAST(Type) \
@@ -3445,6 +3447,7 @@ int vtkSubGroup::Broadcast(Type *data, int length, int root) \
 BROADCAST(char)
 BROADCAST(int)
 BROADCAST(float)
+BROADCAST(double)
 
 #define GATHER(Type)\
 int vtkSubGroup::Gather(Type *data, Type *to, int length, int root)\

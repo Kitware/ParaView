@@ -181,7 +181,7 @@ class VTK_EXPORT vtkKWView : public vtkKWWidget
   virtual void AddComposite(vtkKWComposite *c);
   virtual void Add2DComposite(vtkKWComposite *) {}
   virtual void RemoveComposite(vtkKWComposite *c);
-  virtual void Remove2DComposite(vtkKWComposite *c) {}
+  virtual void Remove2DComposite(vtkKWComposite *) {}
   virtual int HasComposite(vtkKWComposite *c);
   vtkKWCompositeCollection *GetComposites() {return this->Composites;};
   

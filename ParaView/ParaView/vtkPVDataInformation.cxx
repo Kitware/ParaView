@@ -45,6 +45,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkCellData.h"
 #include "vtkClientServerStream.h"
 #include "vtkCollection.h"
+#include "vtkPVConfig.h" // needed for PARAVIEW_BUILD_DEVELOPMENT
 #ifdef PARAVIEW_BUILD_DEVELOPMENT
 #include "vtkCompositeDataSet.h"
 #include "vtkCompositeDataIterator.h"
@@ -61,7 +62,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkPVDataInformation);
-vtkCxxRevisionMacro(vtkPVDataInformation, "1.12.4.2");
+vtkCxxRevisionMacro(vtkPVDataInformation, "1.12.4.3");
 
 //----------------------------------------------------------------------------
 vtkPVDataInformation::vtkPVDataInformation()
@@ -215,6 +216,10 @@ void vtkPVDataInformation::CopyFromDataSet(vtkDataSet* data)
   int *ext = NULL;
 
   this->NumberOfPoints = data->GetNumberOfPoints();
+  if (!this->NumberOfPoints)
+    {
+    return;
+    }
   this->NumberOfCells = data->GetNumberOfCells();
   bds = data->GetBounds();
   for (idx = 0; idx < 6; ++idx)

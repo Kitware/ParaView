@@ -181,7 +181,7 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterface);
-vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.86.2.8");
+vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.86.2.9");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterface,ControlledWidget, vtkPVWidget);
 
@@ -231,6 +231,7 @@ vtkPVAnimationInterface::vtkPVAnimationInterface()
   this->NumberOfFramesEntry = vtkKWLabeledEntry::New();
 
   this->TimeScale = vtkKWScale::New();
+  this->AnimationSpeedScale = vtkKWScale::New();
   this->TimeRange = vtkKWRange::New();
 
   // Action and script editing
@@ -317,6 +318,11 @@ vtkPVAnimationInterface::~vtkPVAnimationInterface()
     {
     this->TimeScale->Delete();
     this->TimeScale = NULL;
+    }
+  if (this->AnimationSpeedScale)
+    {
+    this->AnimationSpeedScale->Delete();
+    this->AnimationSpeedScale = 0;
     }
   if (this->TimeFrame)
     {
@@ -553,6 +559,15 @@ void vtkPVAnimationInterface::Create(vtkKWApplication *app, char *frameArgs)
   //this->Script("pack %s -side top -expand t -fill x", 
   //             this->TimeRange->GetWidgetName());
 
+  this->AnimationSpeedScale->SetParent(this->ControlFrame->GetFrame());
+  this->AnimationSpeedScale->Create(this->Application, "");
+  this->AnimationSpeedScale->DisplayEntry();
+  this->AnimationSpeedScale->DisplayEntryAndLabelOnTopOff();
+  this->AnimationSpeedScale->DisplayLabel("Speed:");
+  this->AnimationSpeedScale->SetRange(0, 5000);
+
+  this->Script("pack %s -side top -expand t -fill x", 
+               this->AnimationSpeedScale->GetWidgetName());
   // New Interface ----------------------------------------------------
   this->AnimationEntriesFrame->SetParent(this->TopFrame->GetFrame());
   this->AnimationEntriesFrame->ShowHideFrameOn();
@@ -682,6 +697,8 @@ void vtkPVAnimationInterface::Create(vtkKWApplication *app, char *frameArgs)
     "Current frame of the animation.");
   this->NumberOfFramesEntry->SetBalloonHelpString(
     "Total number of frames for the animation.");
+  this->AnimationSpeedScale->SetBalloonHelpString(
+    "Set the speed of animation.");
   this->AnimationEntriesMenu->SetBalloonHelpString(
     "Select an animation action to edit.");
   this->AddItemButton->SetBalloonHelpString(
@@ -1009,6 +1026,7 @@ void vtkPVAnimationInterface::Play()
 
   this->Register(this);
 
+  int cc = 0;
   this->StopFlag = 0;
   do
     {
@@ -1029,6 +1047,20 @@ void vtkPVAnimationInterface::Play()
       this->SetCurrentTime(t);
       // The stop button can be used here because SetCurrentTime()
       // makes a call to "update"
+      int speed = static_cast<int>(this->AnimationSpeedScale->GetValue());
+      int dev = 10;
+      if ( speed < dev && speed > 0 ) 
+        {
+        if ( cc % (dev - speed) == 0 )
+          {
+          Tcl_Sleep(1);
+          }
+        }
+      else
+        {
+        Tcl_Sleep(speed/dev);
+        }
+      cc ++;
       }
     } while (this->Loop && !this->StopFlag);
 

@@ -257,8 +257,8 @@ public:
   //    calculate the global range for each cell array and each point
   //    array across all processes.  Returns 1 on error, 0 otherwise.
 
-  int GetCellArrayGlobalRange(int arrayIndex, float range[2]);
-  int GetPointArrayGlobalRange(int arrayIndex, float range[2]);
+  int GetCellArrayGlobalRange(int arrayIndex, double range[2]);
+  int GetPointArrayGlobalRange(int arrayIndex, double range[2]);
 
   // Description:
   //   This is a useful function that probably belongs in some
@@ -313,10 +313,10 @@ private:
 
   int **CellCountList;                // indexed by region ID
 
-  float *CellDataMin;           // global range for data arrays
-  float *CellDataMax;
-  float *PointDataMin;
-  float *PointDataMax;
+  double *CellDataMin;           // global range for data arrays
+  double *CellDataMax;
+  double *PointDataMin;
+  double *PointDataMax;
   int NumCellArrays;
   int NumPointArrays; 
 
@@ -427,12 +427,15 @@ public:
   int Gather(int *data, int *to, int length, int root);
   int Gather(char *data, char *to, int length, int root);
   int Gather(float *data, float *to, int length, int root);
+  int Broadcast(double *data, int length, int root);
   int Broadcast(float *data, int length, int root);
   int Broadcast(int *data, int length, int root);
   int Broadcast(char *data, int length, int root);
   int ReduceSum(int *data, int *to, int length, int root);
+  int ReduceMax(double *data, double *to, int length, int root);
   int ReduceMax(float *data, float *to, int length, int root);
   int ReduceMax(int *data, int *to, int length, int root);
+  int ReduceMin(double *data, double *to, int length, int root);
   int ReduceMin(float *data, float *to, int length, int root);
   int ReduceMin(int *data, int *to, int length, int root);
 

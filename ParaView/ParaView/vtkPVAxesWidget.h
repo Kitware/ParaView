@@ -47,6 +47,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkInteractorObserver.h"
 
+class vtkActor2D;
+class vtkPolyData;
 class vtkPVAxesActor;
 class vtkPVAxesWidgetObserver;
 class vtkRenderer;
@@ -57,15 +59,36 @@ public:
   static vtkPVAxesWidget* New();
   vtkTypeRevisionMacro(vtkPVAxesWidget, vtkInteractorObserver);
   void PrintSelf(ostream& os, vtkIndent indent);
-  
+
+  // Description:
+  // Set/get the axes actor to be displayed in this 3D widget.
   void SetAxesActor(vtkPVAxesActor *actor);
   vtkGetObjectMacro(AxesActor, vtkPVAxesActor);
 
+  // Description:
+  // Enable the 3D widget.
   virtual void SetEnabled(int);
 
+  // Description:
+  // Set the renderer this 3D widget will be contained in.
   void SetParentRenderer(vtkRenderer *ren);
 
+  // Description:
+  // Callback to keep the camera for the axes actor up to date with the
+  // camera in the parent renderer
   void ExecuteEvent(vtkObject *o, unsigned long event, void *calldata);
+
+  // Description:
+  // Set/get whether to allow this 3D widget to be interactively moved/scaled.
+  void SetInteractive(int state);
+  vtkGetMacro(Interactive, int);
+  vtkBooleanMacro(Interactive, int);
+  
+  // Description:
+  // Set/get the color of the outline of this widget.  The outline is visible
+  // when (in interactive mode) the cursor is over this 3D widget.
+  void SetOutlineColor(float r, float g, float b);
+  float *GetOutlineColor();
   
 protected:
   vtkPVAxesWidget();
@@ -75,15 +98,20 @@ protected:
   vtkRenderer *ParentRenderer;
   
   vtkPVAxesActor *AxesActor;
+  vtkPolyData *Outline;
+  vtkActor2D *OutlineActor;
   
   static void ProcessEvents(vtkObject *object, unsigned long event,
                             void *clientdata, void *calldata);
 
   vtkPVAxesWidgetObserver *Observer;
+  int StartTag;
   
   int MouseCursorState;
   int Moving;
   int StartPosition[2];
+
+  int Interactive;
   
   void UpdateCursorIcon();
   void SetMouseCursor(int cursorState);

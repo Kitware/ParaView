@@ -40,11 +40,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkObjectFactory.h"
 #include "vtkPiecewiseFunction.h"
 
-vtkCxxRevisionMacro(vtkKWMath, "1.4.4.3");
+vtkCxxRevisionMacro(vtkKWMath, "1.4.4.4");
 vtkStandardNewMacro(vtkKWMath);
 
 //----------------------------------------------------------------------------
-int vtkKWMath::GetScalarRange(vtkDataArray *array, int comp, float range[2])
+int vtkKWMath::GetScalarRange(vtkDataArray *array, int comp, double range[2])
 {
   if (!array || comp < 0 || comp >= array->GetNumberOfComponents())
     {
@@ -55,95 +55,10 @@ int vtkKWMath::GetScalarRange(vtkDataArray *array, int comp, float range[2])
   return 1;
 }
 
-//----------------------------------------------------------------------------
-template <class T>
-void vtkKWMathGetScalarRange(
-  vtkDataArray *array, int comp, double range[2], T *)
-{
-  if (!array || comp < 0 || comp >= array->GetNumberOfComponents())
-    {
-    return;
-    }
-
-  vtkIdType nb_of_scalars = array->GetNumberOfTuples();
-  int nb_of_components = array->GetNumberOfComponents();
-
-  T *data = (T*)array->GetVoidPointer(0) + comp;
-  T *data_end = data + nb_of_scalars * nb_of_components;
-
-  double min = VTK_DOUBLE_MAX;
-  double max = VTK_DOUBLE_MIN;
-
-  if (nb_of_components > 1)
-    {
-    while (data < data_end)
-      {
-      if (*data < min)
-        {
-        min = *data;
-        }
-      if (*data > max)
-        {
-        max = *data;
-        }
-      data += nb_of_components;
-      }
-    }
-  else
-    {
-    while (data < data_end)
-      {
-      if (*data < min)
-        {
-        min = *data;
-        }
-      if (*data > max)
-        {
-        max = *data;
-        }
-      data++;
-      }
-    }
-
-  range[0] = min;
-  range[1] = max;
-}
-
-//----------------------------------------------------------------------------
-int vtkKWMath::GetScalarRange(vtkDataArray *array, int comp, double range[2])
-{
-  if (!array || comp < 0 || comp >= array->GetNumberOfComponents())
-    {
-    return 0;
-    }
-
-  // for performance on simple types use the fast cached versions
-  // LONG and INT are not in this list due to precision issues
-  // that float cannot represent
-  if (array->GetDataType() == VTK_UNSIGNED_CHAR ||
-      array->GetDataType() == VTK_CHAR ||
-      array->GetDataType() == VTK_UNSIGNED_SHORT ||
-      array->GetDataType() == VTK_SHORT ||
-      array->GetDataType() == VTK_FLOAT)
-    {
-    float tmpf[2];
-    array->GetRange(tmpf, comp);
-    range[0] = tmpf[0];
-    range[1] = tmpf[1];
-    } 
-  
-  switch (array->GetDataType())
-    {
-    vtkTemplateMacro4(vtkKWMathGetScalarRange,
-                      array, comp, range, static_cast<VTK_TT *>(0));
-    }
-  
-  return 1;
-}
 
 //----------------------------------------------------------------------------
 int vtkKWMath::GetAdjustedScalarRange(
-  vtkDataArray *array, int comp, float range[2])
+  vtkDataArray *array, int comp, double range[2])
 {
   if (!vtkKWMath::GetScalarRange(array, comp, range))
     {
@@ -153,12 +68,12 @@ int vtkKWMath::GetAdjustedScalarRange(
   switch (array->GetDataType())
     {
     case VTK_UNSIGNED_CHAR:
-      range[0] = (float)array->GetDataTypeMin();
-      range[1] = (float)array->GetDataTypeMax();
+      range[0] = (double)array->GetDataTypeMin();
+      range[1] = (double)array->GetDataTypeMax();
       break;
 
     case VTK_UNSIGNED_SHORT:
-      range[0] = (float)array->GetDataTypeMin();
+      range[0] = (double)array->GetDataTypeMin();
       if (range[1] <= 4095.0)
         {
         if (range[1] > VTK_UNSIGNED_CHAR_MAX)
@@ -168,7 +83,7 @@ int vtkKWMath::GetAdjustedScalarRange(
         }
       else
         {
-        range[1] = (float)array->GetDataTypeMax();
+        range[1] = (double)array->GetDataTypeMax();
         }
       break;
     }
@@ -244,14 +159,14 @@ int vtkKWMath::GetScalarTypeFittingRange(
 
 //----------------------------------------------------------------------------
 int vtkKWMath::FixTransferFunctionPointsOutOfRange(
-  vtkPiecewiseFunction *func, float range[2])
+  vtkPiecewiseFunction *func, double range[2])
 {
   if (!func || !range)
     {
     return 0;
     }
 
-  float *function_range = func->GetRange();
+  double *function_range = func->GetRange();
   
   // Make sure we have points at each end of the range
 
@@ -276,12 +191,12 @@ int vtkKWMath::FixTransferFunctionPointsOutOfRange(
   // Remove all points out-of-range
 
   int func_size = func->GetSize();
-  float *func_ptr = func->GetDataPointer();
+  double *func_ptr = func->GetDataPointer();
   
   int i;
   for (i = func_size - 1; i >= 0; i--)
     {
-    float x = func_ptr[i * 2];
+    double x = func_ptr[i * 2];
     if (x < range[0] || x > range[1])
       {
       func->RemovePoint(x);
@@ -293,18 +208,18 @@ int vtkKWMath::FixTransferFunctionPointsOutOfRange(
 
 //----------------------------------------------------------------------------
 int vtkKWMath::FixTransferFunctionPointsOutOfRange(
-  vtkColorTransferFunction *func, float range[2])
+  vtkColorTransferFunction *func, double range[2])
 {
   if (!func || !range)
     {
     return 0;
     }
 
-  float *function_range = func->GetRange();
+  double *function_range = func->GetRange();
   
   // Make sure we have points at each end of the range
 
-  float rgb[3];
+  double rgb[3];
   if (function_range[0] < range[0])
     {
     func->GetColor(range[0], rgb);
@@ -330,12 +245,12 @@ int vtkKWMath::FixTransferFunctionPointsOutOfRange(
   // Remove all points out-of-range
 
   int func_size = func->GetSize();
-  float *func_ptr = func->GetDataPointer();
+  double *func_ptr = func->GetDataPointer();
   
   int i;
   for (i = func_size - 1; i >= 0; i--)
     {
-    float x = func_ptr[i * 4];
+    double x = func_ptr[i * 4];
     if (x < range[0] || x > range[1])
       {
       func->RemovePoint(x);

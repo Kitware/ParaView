@@ -205,9 +205,7 @@ IF (PARAVIEW_USE_ICE_T)
     #vtkIceTComposite.cxx
     vtkIceTRenderer.cxx
     vtkIceTRenderManager.cxx
-    #vtkParallelRenderManager.cxx
     vtkIceTFactory.cxx
-    #vtkCompositeRenderManager.cxx
     vtkPVIceTDisplayRenderModuleUI.cxx
     vtkPVIceTDisplayRenderModule.cxx
     vtkPVIceTRenderModuleUI.cxx
@@ -215,7 +213,6 @@ IF (PARAVIEW_USE_ICE_T)
     vtkIceTClientCompositeManager.cxx
     )
   SET_SOURCE_FILES_PROPERTIES(
-    #vtkParallelRenderManager.cxx
     vtkIceTFactory.cxx
     ABSTRACT
     )

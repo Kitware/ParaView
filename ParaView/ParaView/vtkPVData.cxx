@@ -46,7 +46,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkCubeAxesActor2D.h"
 #include "vtkDataSetAttributes.h"
 #include "vtkDataSetSurfaceFilter.h"
-#include "vtkPVAxesWidget.h"
 #include "vtkPVProcessModule.h"
 #include "vtkPVPart.h"
 #include "vtkPVPartDisplay.h"
@@ -54,6 +53,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVDataInformation.h"
 #include "vtkPVDataSetAttributesInformation.h"
 #include "vtkPVArrayInformation.h"
+#include "vtkPVAxesWidget.h"
 #include "vtkImageData.h"
 #include "vtkKWBoundsDisplay.h"
 #include "vtkKWChangeColorButton.h"
@@ -77,7 +77,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVApplication.h"
 #include "vtkPVColorMap.h"
 #include "vtkPVConfig.h"
-#include "vtkPVDataInformation.h"
 #include "vtkPVNumberOfOutputsInformation.h"
 #include "vtkPVProcessModule.h"
 #include "vtkPVSource.h"
@@ -106,7 +105,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.210.2.18");
+vtkCxxRevisionMacro(vtkPVData, "1.210.2.19");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -175,7 +174,6 @@ vtkPVData::vtkPVData()
   this->ScalarBarCheck = vtkKWCheckButton::New();
   this->CubeAxesCheck = vtkKWCheckButton::New();
   this->AxesWidgetCheck = vtkKWCheckButton::New();
-  
   this->VisibilityCheck = vtkKWCheckButton::New();
   this->Visibility = 1;
 
@@ -317,9 +315,6 @@ vtkPVData::~vtkPVData()
   this->ScalarBarCheck->Delete();
   this->ScalarBarCheck = NULL;  
 
-  this->AxesWidgetCheck->Delete();
-  this->AxesWidgetCheck = NULL;
-  
   this->CubeAxesCheck->Delete();
   this->CubeAxesCheck = NULL;
   
@@ -540,12 +535,6 @@ void vtkPVData::CreateProperties()
   this->CubeAxesCheck->SetParent(this->ViewFrame->GetFrame());
   this->CubeAxesCheck->Create(this->Application, "-text CubeAxes");
   this->CubeAxesCheck->SetCommand(this, "CubeAxesCheckCallback");
-  this->AxesWidgetCheck->SetParent(this->ViewFrame->GetFrame());
-  this->AxesWidgetCheck->Create(this->Application, "-text \"Orientation Axes\"");
-  this->AxesWidgetCheck->SetCommand(this, "AxesWidgetCheckCallback");
-  this->AxesWidgetCheck->SetBalloonHelpString(
-    "Toggle the visibility of the orientation axes.");
-  
   this->CubeAxesCheck->SetBalloonHelpString(
     "Toggle the visibility of X,Y,Z scales for this dataset.");
 
@@ -560,10 +549,6 @@ void vtkPVData::CreateProperties()
   this->Script("grid %s -sticky wns",
                this->ScalarBarCheck->GetWidgetName());
   
-  this->Script("grid %s -sticky wns",
-               this->AxesWidgetCheck->GetWidgetName());
-  
-
   this->Script("grid %s -sticky wns",
                this->CubeAxesCheck->GetWidgetName());
 
@@ -2104,6 +2089,7 @@ void vtkPVData::VisibilityCheckCallback()
   this->GetPVSource()->SetVisibility(this->VisibilityCheck->GetState());
   if ( this->GetPVRenderView() )
     {
+    this->GetPVRenderView()->UpdateNavigationWindow(this->GetPVSource(), 0);
     this->GetPVRenderView()->EventuallyRender();
     }
 }
@@ -2419,7 +2405,8 @@ void vtkPVData::SetPropertiesParent(vtkKWWidget *parent)
 //----------------------------------------------------------------------------
 void vtkPVData::SaveInBatchScript(ofstream *file)
 {
-  float range[2];
+  int fixme; // range is not used
+  double range[2];
   const char* scalarMode;
   vtkPVPart *part;
   int partIdx, numParts;
@@ -2712,7 +2699,6 @@ void vtkPVData::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "PropertiesCreated: " << this->PropertiesCreated << endl;
   os << indent << "CubeAxesCheck: " << this->CubeAxesCheck << endl;
   os << indent << "ScalarBarCheck: " << this->ScalarBarCheck << endl;
-  os << indent << "AxesWidgetCheck: " << this->AxesWidgetCheck << endl;
   os << indent << "RepresentationMenu: " << this->RepresentationMenu << endl;
   os << indent << "InterpolationMenu: " << this->InterpolationMenu << endl;
   os << indent << "Visibility: " << this->Visibility << endl;

@@ -45,11 +45,8 @@
  #include <mpi.h>
 #endif
 
-vtkCxxRevisionMacro(vtkMultiDisplayManager, "1.9.2.2");
+vtkCxxRevisionMacro(vtkMultiDisplayManager, "1.9.2.3");
 vtkStandardNewMacro(vtkMultiDisplayManager);
-
-vtkCxxSetObjectMacro(vtkMultiDisplayManager, RenderView, vtkObject);
-
 
 // Structures to communicate render info.
 // Marshaling is easier if we use all floats. (24)
@@ -109,7 +106,6 @@ vtkMultiDisplayManager::vtkMultiDisplayManager()
   this->LODReductionFactor = 4;
   this->UseCompositeCompression = 1;
 
-  this->RenderWindow = NULL;
   this->Controller = vtkMultiProcessController::GetGlobalController();
   this->SocketController = NULL;
   this->NumberOfProcesses = this->Controller->GetNumberOfProcesses();
@@ -122,7 +118,6 @@ vtkMultiDisplayManager::vtkMultiDisplayManager()
   this->StartTag = this->EndTag = 0;
   this->TileDimensions[0] = 1;
   this->TileDimensions[1] = 1;
-  this->RenderView = NULL;
 
   this->Schedule = NULL;
   this->ZeroEmpty = 1;
@@ -143,8 +138,6 @@ vtkMultiDisplayManager::vtkMultiDisplayManager()
 //-------------------------------------------------------------------------
 vtkMultiDisplayManager::~vtkMultiDisplayManager()
 {
-  this->SetRenderWindow(NULL);
-  
   if (this->Controller)
     {
     this->Controller->UnRegister(this);
@@ -226,12 +219,7 @@ void vtkMultiDisplayManagerSatelliteStartRender(void *localArg,
                                                 void *, int, int)
 {
   vtkMultiDisplayManager *self = (vtkMultiDisplayManager *)localArg;
-  vtkMultiProcessController *controller = self->GetController();
-  vtkPVMultiDisplayInfo info;  
-
-  controller->Receive((float*)(&info), 24, 0, 
-                     vtkMultiDisplayManager::INFO_TAG);
-  self->SatelliteStartRender(info);
+  self->SatelliteStartRender();
 }
 
 
@@ -411,14 +399,22 @@ void vtkMultiDisplayManager::RootStartRender(vtkPVMultiDisplayInfo info)
     }
   if ( this->SocketController)
     { // Root is not client, it participates also.
-    this->SatelliteStartRender(info);
+    this->InternalSatelliteStartRender(info);
     }
 }
 
+//-------------------------------------------------------------------------
+void vtkMultiDisplayManager::SatelliteStartRender()
+{
+  vtkPVMultiDisplayInfo info;
 
+  this->SocketController->Receive((float*)(&info), 24, 0, 
+                                  vtkMultiDisplayManager::INFO_TAG);
+  this->InternalSatelliteStartRender(info);
+}
 
 //-------------------------------------------------------------------------
-void vtkMultiDisplayManager::SatelliteStartRender(vtkPVMultiDisplayInfo info)
+void vtkMultiDisplayManager::InternalSatelliteStartRender(vtkPVMultiDisplayInfo info)
 {
   vtkRendererCollection *rens;
   vtkRenderer* ren;

@@ -76,7 +76,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVProcessModule.h"
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVColorMap);
-vtkCxxRevisionMacro(vtkPVColorMap, "1.63.2.6");
+vtkCxxRevisionMacro(vtkPVColorMap, "1.63.2.7");
 
 int vtkPVColorMapCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -1520,8 +1520,8 @@ void vtkPVColorMap::ResetScalarRange()
 //----------------------------------------------------------------------------
 void vtkPVColorMap::ResetScalarRangeInternal()
 {
-  float range[2];
-  float tmp[2];
+  double range[2];
+  double tmp[2];
   vtkPVSourceCollection *sourceList;
   vtkPVSource *pvs;
   int component = this->VectorComponent;
@@ -1536,8 +1536,8 @@ void vtkPVColorMap::ResetScalarRangeInternal()
     return;
     }
 
-  range[0] = VTK_LARGE_FLOAT;
-  range[1] = -VTK_LARGE_FLOAT;
+  range[0] = VTK_DOUBLE_MAX;
+  range[1] = -VTK_DOUBLE_MAX;
 
   // Compute global scalar range ...
   sourceList = this->PVRenderView->GetPVWindow()->GetSourceList("Sources");
@@ -2054,8 +2054,8 @@ void vtkPVColorMap::UpdateMap(int width, int height)
 {
   int size;
   int i, j;
-  float *range;
-  float val, step;
+  double *range;
+  double val, step;
   unsigned char *rgba;  
   unsigned char *ptr;  
 
@@ -2078,13 +2078,13 @@ void vtkPVColorMap::UpdateMap(int width, int height)
     }
 
   range = this->LookupTable->GetRange();
-  step = (range[1]-range[0])/(float)(width);
+  step = (range[1]-range[0])/(double)(width);
   ptr = this->MapData;
   for (j = 0; j < height; ++j)
     {
     for (i = 0; i < width; ++i)
       {
-      val = range[0] + ((float)(i)*step);
+      val = range[0] + ((double)(i)*step);
       rgba = this->LookupTable->MapValue(val);
       
       ptr[0] = rgba[0];

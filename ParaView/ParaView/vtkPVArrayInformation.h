@@ -85,7 +85,6 @@ public:
     { this->SetComponentRange(comp, range[0], range[1]);}
   double *GetComponentRange(int component);
   void GetComponentRange(int comp, double *range);
-  void GetComponentRange(int comp, float *range);
 
   // Description:
   // Returns 1 if the array can be combined.

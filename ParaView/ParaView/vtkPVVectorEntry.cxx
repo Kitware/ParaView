@@ -57,7 +57,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVVectorEntry);
-vtkCxxRevisionMacro(vtkPVVectorEntry, "1.36.2.10");
+vtkCxxRevisionMacro(vtkPVVectorEntry, "1.36.2.11");
 
 //-----------------------------------------------------------------------------
 vtkPVVectorEntry::vtkPVVectorEntry()
@@ -764,7 +764,7 @@ int vtkPVVectorEntry::ReadXMLAttributes(vtkPVXMLElement* element,
   const char *range = element->GetAttribute("data_range");
   if (range)
     {
-    sscanf(range, "%f %f", &this->WidgetRange[0], &this->WidgetRange[1]);
+    sscanf(range, "%lf %lf", &this->WidgetRange[0], &this->WidgetRange[1]);
     this->UseWidgetRange = 1;
     }
   

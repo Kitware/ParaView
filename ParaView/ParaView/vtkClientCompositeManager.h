@@ -29,7 +29,7 @@
 #ifndef __vtkClientCompositeManager_h
 #define __vtkClientCompositeManager_h
 
-#include "vtkObject.h"
+#include "vtkParallelRenderManager.h"
 
 class vtkRenderWindow;
 class vtkMultiProcessController;
@@ -41,22 +41,21 @@ class vtkFloatArray;
 class vtkUnsignedCharArray;
 class vtkImageData;
 
-class VTK_EXPORT vtkClientCompositeManager : public vtkObject
+class VTK_EXPORT vtkClientCompositeManager : public vtkParallelRenderManager
 {
 public:
   static vtkClientCompositeManager *New();
-  vtkTypeRevisionMacro(vtkClientCompositeManager,vtkObject);
+  vtkTypeRevisionMacro(vtkClientCompositeManager,vtkParallelRenderManager);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
   // Set/Get the RenderWindow to use for compositing.
   // We add a start and end observer to the window.
-  vtkGetObjectMacro(RenderWindow, vtkRenderWindow);
   virtual void SetRenderWindow(vtkRenderWindow *renWin);
 
   // Description:
   // Used to get satellite windows rendering off screen.
-  void InitializeOffScreen();
+  virtual void InitializeOffScreen();
 
   // Description:
   // Callbacks that initialize and finish the compositing.
@@ -74,8 +73,7 @@ public:
   // the global controller by default)
   // If not using the default, this must be called before any
   // other methods.
-  void SetCompositeController(vtkMultiProcessController* controller);
-  vtkGetObjectMacro(CompositeController, vtkMultiProcessController);
+  void SetController(vtkMultiProcessController* controller);
 
   // Description:
   // Set/Get the controller use to communicate to client.
@@ -109,11 +107,6 @@ public:
   // For values larger than 1, render a smaller image and display the
   // result using pixel replication.
   vtkSetMacro(ImageReductionFactor, int);
-  vtkGetMacro(ImageReductionFactor, int);
-
-  // Description:
-  // Methods that are not used at the moment.
-  virtual void SetRenderView(vtkObject*) {};
 
   // Description:
   // When the server has more than one process, this object
@@ -143,12 +136,6 @@ public:
 //ETX
 
   // Description:
-  // Switch between local client rendering and distributed compositing.
-  vtkSetMacro(UseCompositing, int);
-  vtkGetMacro(UseCompositing, int);
-  vtkBooleanMacro(UseCompositing, int);
-
-  // Description:
   // Get the z buffer value at a pixel.  GatherZBufferValue is
   // an internal method.
   float GetZBufferValue(int x, int y);
@@ -164,13 +151,9 @@ protected:
   vtkClientCompositeManager();
   ~vtkClientCompositeManager();
   
-  vtkRenderWindow* RenderWindow;
-  vtkMultiProcessController* CompositeController;
   vtkSocketController* ClientController;
   vtkCompositer *Compositer;
 
-  vtkRenderWindow *RenWin;
-  
   int Tiled;
   int TiledDimensions[2];
 
@@ -183,10 +166,12 @@ protected:
   virtual void SatelliteStartRender();
   virtual void SatelliteEndRender();
 
+  void PreRenderProcessing() {}
+  void PostRenderProcessing() {}
   vtkImageData *CompositeData;
 
   // Same method that is in vtkComposite manager.
-  // We should find a way to shar this method. !!!!
+  // We should find a way to share this method. !!!!
   void MagnifyBuffer(vtkDataArray* localP, 
                      vtkDataArray* magP,
                      int windowSize[2]);
@@ -200,7 +185,6 @@ protected:
   void ReceiveAndSetColorBuffer();
 
   vtkObject *RenderView;
-  int ImageReductionFactor;
   int InternalReductionFactor;
 
   vtkDataArray *PData;
@@ -230,7 +214,6 @@ protected:
 
   int UseChar;
   int UseRGB;
-  int UseCompositing;
 
 private:
   vtkClientCompositeManager(const vtkClientCompositeManager&); // Not implemented

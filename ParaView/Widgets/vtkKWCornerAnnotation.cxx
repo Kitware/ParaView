@@ -62,7 +62,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWCornerAnnotation );
-vtkCxxRevisionMacro(vtkKWCornerAnnotation, "1.68.2.4");
+vtkCxxRevisionMacro(vtkKWCornerAnnotation, "1.68.2.5");
 
 int vtkKWCornerAnnotationCommand(ClientData cd, Tcl_Interp *interp,
                                  int argc, char *argv[]);
@@ -786,7 +786,7 @@ void vtkKWCornerAnnotation::SerializeToken(istream& is, const char *token)
 void vtkKWCornerAnnotation::SerializeRevision(ostream& os, vtkIndent indent)
 {
   os << indent << "vtkKWCornerAnnotation ";
-  this->ExtractRevision(os,"$Revision: 1.68.2.4 $");
+  this->ExtractRevision(os,"$Revision: 1.68.2.5 $");
 }
 
 //----------------------------------------------------------------------------
@@ -852,6 +852,32 @@ void vtkKWCornerAnnotation::SendChangedEvent()
   this->InvokeEvent(this->AnnotationChangedEvent, event.str());
   event.rdbuf()->freeze(0);
 #endif
+}
+
+//----------------------------------------------------------------------------
+void vtkKWCornerAnnotation::SaveState(ofstream *file)
+{
+  *file << "$kw(" << this->GetTclName() << ") SetVisibility "
+        << this->GetVisibility() << endl;
+  
+  int i;
+  for (i = 0; i < 4; i++)
+    {
+    *file << "$kw(" << this->GetTclName() << ") SetCornerText {"
+          << this->GetCornerText(i) << "} " << i << endl;
+    }
+  
+  *file << "$kw(" << this->GetTclName() << ") SetMaximumLineHeight "
+        << this->GetCornerAnnotation()->GetMaximumLineHeight() << endl;
+  
+  *file << "set kw(" << this->TextPropertyWidget->GetTclName()
+        << ") [$kw(" << this->GetTclName() << ") GetTextPropertyWidget]"
+        << endl;
+  char *tclName =
+    new char[10 + strlen(this->TextPropertyWidget->GetTclName())];
+  sprintf(tclName, "$kw(%s)", this->TextPropertyWidget->GetTclName());
+  this->TextPropertyWidget->SaveInTclScript(file, tclName, 0);
+  delete [] tclName;
 }
 
 //----------------------------------------------------------------------------

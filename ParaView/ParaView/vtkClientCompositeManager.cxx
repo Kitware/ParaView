@@ -60,7 +60,7 @@
 #endif
 
 
-vtkCxxRevisionMacro(vtkClientCompositeManager, "1.18.2.5");
+vtkCxxRevisionMacro(vtkClientCompositeManager, "1.18.2.6");
 vtkStandardNewMacro(vtkClientCompositeManager);
 
 vtkCxxSetObjectMacro(vtkClientCompositeManager,Compositer,vtkCompositer);
@@ -108,18 +108,16 @@ struct vtkClientRendererInfo
 vtkClientCompositeManager::vtkClientCompositeManager()
 {
   this->SquirtLevel = 0;
-  this->RenderWindow = NULL;
-  this->CompositeController = vtkMultiProcessController::GetGlobalController();
-  if (this->CompositeController)
+  this->Controller = vtkMultiProcessController::GetGlobalController();
+  if (this->Controller)
     {
-    this->CompositeController->Register(this);
+    this->Controller->Register(this);
     }
 
   this->ClientController = NULL;
   this->ClientFlag = 1;
 
   this->StartTag = 0;
-  this->RenderView = NULL;
 
   this->InternalReductionFactor = 2;
   this->ImageReductionFactor = 2;
@@ -131,7 +129,6 @@ vtkClientCompositeManager::vtkClientCompositeManager()
   this->ZData2 = NULL;
   this->SquirtArray = NULL;
   this->MagnifiedPData = NULL;
-  this->RenderView = NULL;
 
   this->Compositer = vtkCompressCompositer::New();
   //this->Compositer = vtkTreeCompositer::New();
@@ -146,7 +143,6 @@ vtkClientCompositeManager::vtkClientCompositeManager()
 
   this->UseCompositing = 0;
   
-  this->RenWin = vtkRenderWindow::New();
   this->CompositeData = vtkImageData::New();
 }
 
@@ -154,11 +150,9 @@ vtkClientCompositeManager::vtkClientCompositeManager()
 //-------------------------------------------------------------------------
 vtkClientCompositeManager::~vtkClientCompositeManager()
 {
-  this->SetRenderWindow(NULL);
-
   this->SetPDataSize(0,0);
   
-  this->SetCompositeController(NULL);
+  this->SetController(NULL);
   this->SetClientController(NULL);
 
   if (this->PData)
@@ -193,7 +187,6 @@ vtkClientCompositeManager::~vtkClientCompositeManager()
     vtkCompositeManager::DeleteArray(this->MagnifiedPData);
     this->MagnifiedPData = NULL;
     }
-  this->SetRenderView(NULL);
   this->SetCompositer(NULL);
 
 
@@ -202,7 +195,6 @@ vtkClientCompositeManager::~vtkClientCompositeManager()
     this->BaseArray->Delete();
     }
   
-  this->RenWin->Delete();
   this->CompositeData->Delete();
 }
 
@@ -284,22 +276,22 @@ void vtkClientCompositeManager::GatherZBufferValueRMI(int x, int y)
     delete [] tmp;
     }
 
-  int myId = this->CompositeController->GetLocalProcessId();
+  int myId = this->Controller->GetLocalProcessId();
   if (myId == 0)
     {
-    int numProcs = this->CompositeController->GetNumberOfProcesses();
+    int numProcs = this->Controller->GetNumberOfProcesses();
     int idx;
     pArg[0] = 1;
     pArg[1] = x;
     pArg[2] = y;
     for (idx = 1; idx < numProcs; ++idx)
       {
-      this->CompositeController->TriggerRMI(1, (void*)pArg, sizeof(int)*3, 
+      this->Controller->TriggerRMI(1, (void*)pArg, sizeof(int)*3, 
                           vtkClientCompositeManager::GATHER_Z_RMI_TAG);
       }
     for (idx = 1; idx < numProcs; ++idx)
       {
-      this->CompositeController->Receive(&otherZ, 1, idx, vtkClientCompositeManager::SERVER_Z_TAG);
+      this->Controller->Receive(&otherZ, 1, idx, vtkClientCompositeManager::SERVER_Z_TAG);
       if (otherZ < z)
         {
         z = otherZ;
@@ -311,7 +303,7 @@ void vtkClientCompositeManager::GatherZBufferValueRMI(int x, int y)
   else
     {
     // Send z to the root server node..
-    this->CompositeController->Send(&z, 1, 1, vtkClientCompositeManager::SERVER_Z_TAG);
+    this->Controller->Send(&z, 1, 1, vtkClientCompositeManager::SERVER_Z_TAG);
     }
 }
 
@@ -843,12 +835,12 @@ void vtkClientCompositeManager::RenderRMI()
     }
 
   // If this is root of server, trigger RenderRMI on satellites.
-  if (this->CompositeController->GetLocalProcessId() == 0)
+  if (this->Controller->GetLocalProcessId() == 0)
     {
-    int numProcs = this->CompositeController->GetNumberOfProcesses();
+    int numProcs = this->Controller->GetNumberOfProcesses();
     for (i = 1; i < numProcs; ++i)
       {
-      this->CompositeController->TriggerRMI(i, 
+      this->Controller->TriggerRMI(i, 
                                     vtkClientCompositeManager::RENDER_RMI_TAG);
       }
     }
@@ -875,8 +867,8 @@ void vtkClientCompositeManager::SatelliteStartRender()
   vtkMultiProcessController *controller; 
   int otherId;
 
-  myId = this->CompositeController->GetLocalProcessId();
-  numProcs = this->CompositeController->GetNumberOfProcesses();
+  myId = this->Controller->GetLocalProcessId();
+  numProcs = this->Controller->GetNumberOfProcesses();
 
   if (myId == 0)
     { // server root receives from client.
@@ -885,7 +877,7 @@ void vtkClientCompositeManager::SatelliteStartRender()
     }
   else
     { // Server satellite processes receive from server root.
-    controller = this->CompositeController;
+    controller = this->Controller;
     otherId = 0;
     }
   
@@ -901,10 +893,10 @@ void vtkClientCompositeManager::SatelliteStartRender()
     {  // Relay info to server satellite processes.
     for (j = 1; j < numProcs; ++j)
       {
-      //this->CompositeController->Send((char*)(&winInfo), 
+      //this->Controller->Send((char*)(&winInfo), 
       //                sizeof(struct vtkClientRenderWindowInfo), j,
       //                vtkCompositeManager::WIN_INFO_TAG);
-      this->CompositeController->Send((float*)(&winInfo), 5, j,
+      this->Controller->Send((float*)(&winInfo), 5, j,
                       vtkCompositeManager::WIN_INFO_TAG);
       }
     }
@@ -943,10 +935,10 @@ void vtkClientCompositeManager::SatelliteStartRender()
       {  // Relay info to server satellite processes.
       for (j = 1; j < numProcs; ++j)
         {
-        //this->CompositeController->Send((char*)(&renInfo), 
+        //this->Controller->Send((char*)(&renInfo), 
         //                sizeof(struct vtkClientRendererInfo), 
         //                j, vtkCompositeManager::REN_INFO_TAG);
-        this->CompositeController->Send((float*)(&renInfo), 22, j, 
+        this->Controller->Send((float*)(&renInfo), 22, j, 
                                         vtkCompositeManager::REN_INFO_TAG);
         }
       }
@@ -964,7 +956,7 @@ void vtkClientCompositeManager::SatelliteStartRender()
         {
         int x, y;
         // Figure out the tile indexes.
-        i = this->CompositeController->GetLocalProcessId() - 1;
+        i = this->Controller->GetLocalProcessId() - 1;
         y = i/this->TiledDimensions[0];
         x = i - y*this->TiledDimensions[0];
 
@@ -1027,8 +1019,8 @@ void vtkClientCompositeManager::SatelliteEndRender()
     return;
     }
 
-  myId = this->CompositeController->GetLocalProcessId();
-  numProcs = this->CompositeController->GetNumberOfProcesses();
+  myId = this->Controller->GetLocalProcessId();
+  numProcs = this->Controller->GetNumberOfProcesses();
 
   // Get the color buffer (pixel data).
   if (this->UseChar) 
@@ -1124,9 +1116,6 @@ void vtkClientCompositeManager::InitializeOffScreen()
 // Only process 0 needs start and end render callbacks.
 void vtkClientCompositeManager::SetRenderWindow(vtkRenderWindow *renWin)
 {
-  vtkRendererCollection *rens;
-  vtkRenderer *ren = 0;
-
   if (this->RenderWindow == renWin)
     {
     return;
@@ -1135,15 +1124,6 @@ void vtkClientCompositeManager::SetRenderWindow(vtkRenderWindow *renWin)
 
   if (this->RenderWindow)
     {
-    // Remove all of the observers.
-    if (this->ClientFlag)
-      {
-//      this->RenderWindow->RemoveObserver(this->StartTag);
-      // Will make do with first renderer. (Assumes renderer does not change.)
-      rens = this->RenderWindow->GetRenderers();
-      rens->InitTraversal();
-      ren = rens->GetNextItem();
-      }
     // Delete the reference.
     this->RenderWindow->UnRegister(this);
     this->RenderWindow =  NULL;
@@ -1152,36 +1132,17 @@ void vtkClientCompositeManager::SetRenderWindow(vtkRenderWindow *renWin)
     {
     renWin->Register(this);
     this->RenderWindow = renWin;
-    if (this->ClientFlag)
-      {
-      vtkCallbackCommand *cbc;
-      
-      cbc= vtkCallbackCommand::New();
-      cbc->SetCallback(vtkClientCompositeManagerStartRender);
-      cbc->SetClientData((void*)this);
-      // renWin will delete the cbc when the observer is removed.
-//      this->StartTag = renWin->AddObserver(vtkCommand::StartEvent,cbc);
-      cbc->Delete();
-
-      // Will make do with first renderer. (Assumes renderer does
-      // not change.)
-      rens = this->RenderWindow->GetRenderers();
-      rens->InitTraversal();
-      ren = rens->GetNextItem();
-      }
-     if (this->Tiled && this->ClientFlag == 0)
+    if (this->Tiled && this->ClientFlag == 0)
       { 
       renWin->FullScreenOn();
       }
     }
 }
 
-
-//-------------------------------------------------------------------------
-void vtkClientCompositeManager::SetCompositeController(
+void vtkClientCompositeManager::SetController(
                                           vtkMultiProcessController *mpc)
 {
-  if (this->CompositeController == mpc)
+  if (this->Controller == mpc)
     {
     return;
     }
@@ -1189,13 +1150,12 @@ void vtkClientCompositeManager::SetCompositeController(
     {
     mpc->Register(this);
     }
-  if (this->CompositeController)
+  if (this->Controller)
     {
-    this->CompositeController->UnRegister(this);
+    this->Controller->UnRegister(this);
     }
-  this->CompositeController = mpc;
+  this->Controller = mpc;
 }
-
 
 //-------------------------------------------------------------------------
 void vtkClientCompositeManager::SetClientController(
@@ -1268,7 +1228,7 @@ void vtkClientCompositeManager::ReallocPDataArrays()
 
   if ( ! this->ClientFlag)
     {
-    numProcs = this->CompositeController->GetNumberOfProcesses();
+    numProcs = this->Controller->GetNumberOfProcesses();
     }
 
   if (this->UseRGB)
@@ -1300,7 +1260,7 @@ void vtkClientCompositeManager::ReallocPDataArrays()
   // Allocate squirt compressed array.
   if (this->UseChar && ! this->UseRGB)
     {
-    if (this->ClientFlag || this->CompositeController->GetLocalProcessId() == 0)
+    if (this->ClientFlag || this->Controller->GetLocalProcessId() == 0)
       {
       if (this->SquirtArray == NULL)
         {
@@ -1365,7 +1325,7 @@ void vtkClientCompositeManager::SetPDataSize(int x, int y)
 
   if ( ! this->ClientFlag)
     {
-    numProcs = this->CompositeController->GetNumberOfProcesses();
+    numProcs = this->Controller->GetNumberOfProcesses();
     }
 
   if (x < 0)
@@ -1430,7 +1390,7 @@ void vtkClientCompositeManager::SetPDataSize(int x, int y)
   // Allocate squirt compressed array.
   if (this->UseChar && ! this->UseRGB)
     {
-    if (this->ClientFlag || this->CompositeController->GetLocalProcessId() == 0)
+    if (this->ClientFlag || this->Controller->GetLocalProcessId() == 0)
       {
       if ( this->SquirtArray == NULL)
         {
@@ -1541,7 +1501,7 @@ void vtkClientCompositeManager::InitializeRMIs()
     { // Just in case.
     return;
     }
-  if (this->CompositeController->GetLocalProcessId() == 0)
+  if (this->Controller->GetLocalProcessId() == 0)
     { // Root on server waits for RMIs triggered by client.
     if (this->ClientController == NULL)
       {
@@ -1556,9 +1516,9 @@ void vtkClientCompositeManager::InitializeRMIs()
     }
   else
     { // Other satellite processes wait for RMIs for root.
-    this->CompositeController->AddRMI(vtkClientCompositeManagerRenderRMI, (void*)this, 
+    this->Controller->AddRMI(vtkClientCompositeManagerRenderRMI, (void*)this, 
                                       vtkClientCompositeManager::RENDER_RMI_TAG); 
-    this->CompositeController->AddRMI(vtkClientCompositeManagerGatherZBufferValueRMI, 
+    this->Controller->AddRMI(vtkClientCompositeManagerGatherZBufferValueRMI, 
                                       (void*)this, 
                                       vtkClientCompositeManager::GATHER_Z_RMI_TAG); 
     }
@@ -1782,21 +1742,11 @@ void vtkClientCompositeManager::DeltaDecode(vtkUnsignedCharArray *buf)
 //----------------------------------------------------------------------------
 void vtkClientCompositeManager::PrintSelf(ostream& os, vtkIndent indent)
 {
-  this->vtkObject::PrintSelf(os, indent);
+  this->Superclass::PrintSelf(os, indent);
   
-  if ( this->RenderWindow )
-    {
-    os << indent << "RenderWindow: " << this->RenderWindow << "\n";
-    }
-  else
-    {
-    os << indent << "RenderWindow: (none)\n";
-    }
-  os << indent << "ImageReductionFactor: " 
-     << this->ImageReductionFactor << endl;
+  os << indent << "ImageReductionFactor: " << this->ImageReductionFactor
+     << endl;
   
-  os << indent << "CompositeController: (" 
-     << this->CompositeController << ")\n"; 
   os << indent << "ClientController: (" << this->ClientController << ")\n"; 
 
   if (this->Tiled)
@@ -1805,7 +1755,6 @@ void vtkClientCompositeManager::PrintSelf(ostream& os, vtkIndent indent)
        << this->TiledDimensions[0] << ", " << this->TiledDimensions[1] << endl;
     }
   
-  os << indent << "UseCompositing: " << this->UseCompositing << endl;
   os << indent << "UseChar: " << this->UseChar << endl;
   os << indent << "UseRGB: " << this->UseRGB << endl;
   os << indent << "SquirtLevel: " << this->SquirtLevel << endl;
