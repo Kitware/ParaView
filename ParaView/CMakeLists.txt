@@ -190,7 +190,7 @@ IF (PARAVIEW_CAN_BUILD)
 
  SET (DO_NOT_BUILD_XML_RW 1)
 
- SUBDIRS(KWCommon Widgets Utilities ParaView Demos)
+ SUBDIRS(Utilities KWCommon Filters Widgets ParaView Demos)
 
  SUBDIRS(Packages)
 

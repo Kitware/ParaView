@@ -1,7 +1,5 @@
 SET( ParaView_SRCS
-  vtkCleanUnstructuredGrid.cxx
   vtkClientCompositeManager.cxx
-  vtkColorByPart.cxx
   vtkCompleteArrays.cxx
   vtkCompositeProp.cxx
   vtkCTHData.cxx
@@ -11,14 +9,8 @@ SET( ParaView_SRCS
   vtkCTHOutlineFilter.cxx
   vtkCTHSource.cxx
   vtkExtractCTHPart.cxx
-  vtkGroup.cxx
   vtkKWBoundsDisplay.cxx
-  vtkKWExtractGeometryByScalar.cxx
-  vtkMergeArrays.cxx
   vtkMultiDisplayManager.cxx
-  vtkMultiOut.cxx
-  vtkMultiOut2.cxx
-  vtkMultiOut3.cxx
   vtkPV3DWidget.cxx
   vtkPVAdvancedReaderModule.cxx
   vtkPVAnimationInterface.cxx
@@ -29,7 +21,6 @@ SET( ParaView_SRCS
   vtkPVArrayInformation.cxx
   vtkPVArrayMenu.cxx 
   vtkPVArraySelection.cxx
-  vtkPVArrowSource.cxx
   vtkPVBatchCompositeManager.cxx
   vtkPVBoundsDisplay.cxx
   vtkPVBoxWidget.cxx
@@ -37,7 +28,6 @@ SET( ParaView_SRCS
   vtkPVCameraIcon.cxx
   vtkPVCameraManipulator.cxx
   vtkPVClientServerModule.cxx
-  vtkPVClipDataSet.cxx
   vtkPVColorMap.cxx
   vtkPVComponentSelection.cxx
   vtkPVCompositeBuffer.cxx
@@ -46,10 +36,8 @@ SET( ParaView_SRCS
   vtkPVCompositeRenderModuleUI.cxx
   vtkPVCompositeUtilities.cxx
   vtkPVConnectDialog.cxx
-  vtkPVConnectivityFilter.cxx
   vtkPVContainerWidget.cxx
   vtkPVContourEntry.cxx 
-  vtkPVContourFilter.cxx
   vtkPVDReaderModule.cxx
   vtkPVDWriter.cxx
   vtkPVData.cxx 
@@ -58,9 +46,6 @@ SET( ParaView_SRCS
   vtkPVDataSetFileEntry.cxx
   vtkPVDataSetReaderModule.cxx
   vtkPVDummyWidget.cxx
-  vtkPVDuplicatePolyData.cxx
-  vtkPVEnSightMasterServerReader.cxx
-  vtkPVEnSightMasterServerTranslator.cxx
   vtkPVEnSightReaderModule.cxx
   vtkPVErrorLogDisplay.cxx
   vtkPVExtentEntry.cxx
@@ -72,13 +57,7 @@ SET( ParaView_SRCS
   vtkPVGenericRenderWindowInteractor.cxx
   vtkPVGeometryFilter.cxx
   vtkPVGhostLevelDialog.cxx
-  vtkPVGlyphFilter.cxx
   vtkPVGroupInputsWidget.cxx
-  vtkPVImageContinuousDilate3D.cxx
-  vtkPVImageContinuousErode3D.cxx
-  vtkPVImageGradient.cxx
-  vtkPVImageGradientMagnitude.cxx
-  vtkPVImageMedian3D.cxx
   vtkPVImplicitPlaneWidget.cxx
   vtkPVInformation.cxx
   vtkPVInitialize.cxx
@@ -129,7 +108,6 @@ SET( ParaView_SRCS
   vtkPVRenderModule.cxx
   vtkPVRenderModuleUI.cxx
   vtkPVRenderView.cxx 
-  vtkPVRibbonFilter.cxx
   vtkPVSaveBatchScriptDialog.cxx
   vtkPVScalarRangeLabel.cxx 
   vtkPVScale.cxx 
@@ -148,7 +126,6 @@ SET( ParaView_SRCS
   vtkPVSphereWidget.cxx
   vtkPVStringEntry.cxx
   vtkPVSummaryHelper.cxx
-  vtkPVThresholdFilter.cxx
   vtkPVTiledDisplayManager.cxx
   vtkPVTimerInformation.cxx
   vtkPVTimerLogDisplay.cxx
@@ -159,10 +136,7 @@ SET( ParaView_SRCS
   vtkPVTrackballRotate.cxx
   vtkPVTrackballZoom.cxx
   vtkPVTreeComposite.cxx 
-  vtkPVUpdateSuppressor.cxx
   vtkPVVectorEntry.cxx
-  vtkPVWarpScalar.cxx
-  vtkPVWarpVector.cxx
   vtkPVWidget.cxx
   vtkPVWidgetCollection.cxx
   vtkPVWindow.cxx 
@@ -172,35 +146,15 @@ SET( ParaView_SRCS
   vtkPVXMLElement.cxx
   vtkPVXMLPackageParser.cxx
   vtkPVXMLParser.cxx
-#  vtkRedistributePolyData.cxx
   vtkSelectInputs.cxx
   vtkStringList.cxx 
-  vtkStructuredCacheFilter.cxx
   vtkTiledDisplaySchedule.cxx
-  vtkVRMLSource.cxx
 #  vtkWeightedRedistributePolyData.cxx
   vtkPVXDMFParameters.cxx
   vtkXDMFReaderModule.cxx
   vtkXMLCollectionReader.cxx
   vtkXMLPVAnimationWriter.cxx
-  vtkXMLPVDWriter.cxx
   )
-
-IF(VTK_USE_MPI)
-  SET(ParaView_SRCS
-    ${ParaView_SRCS}
-    vtkDistributedDataFilter.cxx
-    vtkPKdTree.cxx
-    vtkExtractCells.cxx
-    vtkKdTree.cxx
-    vtkMergeCells.cxx
-    vtkPlanesIntersection.cxx
-    vtkPointsProjectedHull.cxx
-#  vtkAllToNRedistributePolyData.cxx
-#  vtkBalancedRedistributePolyData.cxx
-    )
-ENDIF(VTK_USE_MPI)
-
 
 IF (PARAVIEW_USE_ICE_T)
   SET( ParaView_SRCS
@@ -227,12 +181,6 @@ IF (PARAVIEW_USE_ICE_T)
     ABSTRACT
     )
 ENDIF (PARAVIEW_USE_ICE_T)
-
-IF (VTK_USE_PATENTED)
-  SET( ParaView_SRCS
-    ${ParaView_SRCS}
-    vtkPVKitwareContourFilter.cxx)
-ENDIF (VTK_USE_PATENTED)
 
 IF(NOT PARAVIEW_NO_HDF5)
   SET(ParaView_SRCS ${ParaView_SRCS} vtkHDF5RawImageReader.cxx)
@@ -323,6 +271,7 @@ IF(PARAVIEW_USE_EXODUS)
 ENDIF(PARAVIEW_USE_EXODUS)
 
 TARGET_LINK_LIBRARIES (vtkKWParaViewTCL
+  vtkFiltersTCL
   vtkKWWidgetsTCL 
   vtkParallel)
 IF(XDMF_FOUND)
