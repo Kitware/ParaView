@@ -47,15 +47,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __vtkPVIceTDisplayRenderModule_h
 #define __vtkPVIceTDisplayRenderModule_h
 
-#include "vtkPVRenderModule.h"
+#include "vtkPVLODRenderModule.h"
 
 class vtkCompositeRenderManager;
 
-class VTK_EXPORT vtkPVIceTDisplayRenderModule : public vtkPVRenderModule
+class VTK_EXPORT vtkPVIceTDisplayRenderModule : public vtkPVLODRenderModule
 {
 public:
   static vtkPVIceTDisplayRenderModule* New();
-  vtkTypeRevisionMacro(vtkPVIceTDisplayRenderModule,vtkPVRenderModule);
+  vtkTypeRevisionMacro(vtkPVIceTDisplayRenderModule,vtkPVLODRenderModule);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

@@ -51,15 +51,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __vtkPVIceTDisplayRenderModuleUI_h
 #define __vtkPVIceTDisplayRenderModuleUI_h
 
-#include "vtkPVRenderModuleUI.h"
+#include "vtkPVLODRenderModuleUI.h"
 
 class vtkPVIceTDisplayRenderModule;
 
-class VTK_EXPORT vtkPVIceTDisplayRenderModuleUI : public vtkPVRenderModuleUI
+class VTK_EXPORT vtkPVIceTDisplayRenderModuleUI : public vtkPVLODRenderModuleUI
 {
 public:
   static vtkPVIceTDisplayRenderModuleUI* New();
-  vtkTypeRevisionMacro(vtkPVIceTDisplayRenderModuleUI,vtkPVRenderModuleUI);
+  vtkTypeRevisionMacro(vtkPVIceTDisplayRenderModuleUI,vtkPVLODRenderModuleUI);
   void PrintSelf(ostream& os, vtkIndent indent);
 
 protected:
