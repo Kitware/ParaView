@@ -45,13 +45,14 @@ class vtkPVCameraIcon;
 class vtkPVCameraControl;
 class vtkPVData;
 class vtkPVInteractorStyleControl;
-class vtkPVRenderViewObserver;
 class vtkPVSource;
 class vtkPVSourceList;
 class vtkPVSourcesNavigationWindow;
 class vtkPVTreeComposite;
 class vtkPVWindow;
 class vtkPVRenderModuleUI;
+class vtkPVRenderViewObserver;
+class vtkPVRenderModule;
 
 #define VTK_PV_VIEW_MENU_LABEL       " 3D View Properties"
 
@@ -114,11 +115,6 @@ public:
   void Exposed();
   void Configured();
   
-  // Description:
-  // My version.
-  vtkRenderer *GetRenderer();
-  vtkRenderWindow *GetRenderWindow();
-
   // Description:
   // Update the navigation window for a particular source
   void UpdateNavigationWindow(vtkPVSource *currentSource, int nobind);
@@ -225,11 +221,6 @@ public:
   void ExecuteEvent(vtkObject* wdg, unsigned long event, void* calldata);
 
   // Description:
-  // This method is called when the 3D renderer renders so that the 2D window
-  // can stay in sync
-  void StartRenderEvent();
-
-  // Description:
   // Store current camera at a specified position. This stores all the
   // camera parameters and generates a small icon.
   void StoreCurrentCamera(int position);
@@ -253,8 +244,11 @@ public:
 
   // Description:
   // Access to the overlay renderer.
-  vtkGetObjectMacro(Renderer2D, vtkRenderer);
-  
+  // fixme make me private
+  vtkRenderWindow *GetRenderWindow();
+  vtkRenderer *GetRenderer();
+  vtkRenderer *GetRenderer2D();
+
   // Description:
   // Add/remove composites to/from the overlay renderer.
   virtual void Add2DComposite(vtkKWComposite *c);
@@ -343,15 +337,17 @@ protected:
   vtkKWLabeledFrame *CameraControlFrame;
   vtkPVCameraControl *CameraControl;
 
-  vtkPVRenderViewObserver* Observer;
-
   vtkKWPushButton *PropertiesButton;
 
   char *MenuLabelSwitchBackAndForthToViewProperties;
   vtkSetStringMacro(MenuLabelSwitchBackAndForthToViewProperties);
-
-  vtkRenderer *Renderer2D;
   
+  vtkPVRenderViewObserver* Observer;
+
+  // Need to make sure it destructs right before this view does.
+  // It's the whole TKRenderWidget destruction pain.
+  vtkPVRenderModule* RenderModule;
+
 private:
   vtkPVRenderView(const vtkPVRenderView&); // Not implemented
   void operator=(const vtkPVRenderView&); // Not implemented

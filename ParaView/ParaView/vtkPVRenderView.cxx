@@ -103,12 +103,7 @@ static unsigned char image_properties[] =
   "eNrdkcENgDAMAxk9gzBMRmCjACqR3NSO4Islv5pz3dTdNxe+FMzjzOJ2x8axU48czSfbZ9"
   "jjtR+yKgP5lGJrBvZPfpoVWWx/OI9dVOa8J1uYqvo+uuuX6njsT//kx/d/ceVPtN4Pmg==";
 
-//----------------------------------------------------------------------------
-vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.300");
 
-int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
-                             int argc, char *argv[]);
 
 //===========================================================================
 //***************************************************************************
@@ -128,28 +123,30 @@ public:
     {
       if ( this->PVRenderView )
         {
-        if (event == vtkCommand::StartEvent &&
-            vtkRenderer::SafeDownCast(wdg))
-          {
-          this->PVRenderView->StartRenderEvent();
-          }
-        else
-          {
-          this->PVRenderView->ExecuteEvent(wdg, event, calldata);
-          this->AbortFlagOn();
-          }
+        this->PVRenderView->ExecuteEvent(wdg, event, calldata);
+        this->AbortFlagOn();
         }
     }
 
   vtkPVRenderView* PVRenderView;
 };
-
 //***************************************************************************
 //===========================================================================
 
 //----------------------------------------------------------------------------
+vtkStandardNewMacro(vtkPVRenderView);
+vtkCxxRevisionMacro(vtkPVRenderView, "1.301");
+
+int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
+                             int argc, char *argv[]);
+
+
+
+//----------------------------------------------------------------------------
 vtkPVRenderView::vtkPVRenderView()
 {
+  this->RenderModule = NULL;
+
   if (getenv("PV_SEPARATE_RENDER_WINDOW") != NULL)
     {
     this->TopLevelRenderWindow = vtkKWWidget::New();
@@ -222,32 +219,44 @@ vtkPVRenderView::vtkPVRenderView()
     }
   this->CameraIconsFrame = vtkKWLabeledFrame::New();
 
-  this->Observer = vtkPVRenderViewObserver::New();
-  this->Observer->PVRenderView = this;
-
   this->PropertiesButton = vtkKWPushButton::New();
   this->MenuLabelSwitchBackAndForthToViewProperties = 0;
-  
-  this->Renderer2D = vtkRenderer::New();
-  // Keep the zbuffer for picking.
-  this->Renderer2D->EraseOff();
+
+  this->Observer = vtkPVRenderViewObserver::New();
+  this->Observer->PVRenderView = this;
 }
 
 //----------------------------------------------------------------------------
-void vtkPVRenderView::StartRenderEvent()
+vtkRenderWindow* vtkPVRenderView::GetRenderWindow()
 {
-  // make the overlay renderer match the view of the 3d renderer
-  if (this->Renderer2D)
+  if (this->RenderModule == NULL)
     {
-    this->Renderer2D->GetActiveCamera()->SetClippingRange(
-      this->Renderer->GetActiveCamera()->GetClippingRange());
-    this->Renderer2D->GetActiveCamera()->SetPosition(
-      this->Renderer->GetActiveCamera()->GetPosition());
-    this->Renderer2D->GetActiveCamera()->SetFocalPoint(
-      this->Renderer->GetActiveCamera()->GetFocalPoint());
-    this->Renderer2D->GetActiveCamera()->SetViewUp(
-      this->Renderer->GetActiveCamera()->GetViewUp());
+    vtkErrorMacro("Missing renderModule.");
+    return NULL;
     }
+  return this->RenderModule->GetRenderWindow();
+}
+
+//----------------------------------------------------------------------------
+vtkRenderer* vtkPVRenderView::GetRenderer()
+{
+  if (this->RenderModule == NULL)
+    {
+    vtkErrorMacro("Missing renderModule.");
+    return NULL;
+    }
+  return this->RenderModule->GetRenderer();
+}
+
+//----------------------------------------------------------------------------
+vtkRenderer* vtkPVRenderView::GetRenderer2D()
+{
+  if (this->RenderModule == NULL)
+    {
+    vtkErrorMacro("Missing renderModule.");
+    return NULL;
+    }
+  return this->RenderModule->GetRenderer2D();
 }
 
 //----------------------------------------------------------------------------
@@ -297,6 +306,12 @@ void vtkPVRenderView::ShowSelectionWindowCallback(int registery)
 //----------------------------------------------------------------------------
 vtkPVRenderView::~vtkPVRenderView()
 {
+  if (this->RenderModule)
+    {
+    this->RenderModule->UnRegister(this);
+    this->RenderModule = NULL;
+    }
+
   this->InterfaceSettingsFrame->Delete();
   this->Display3DWidgets->Delete();
   this->Display3DWidgets = NULL;
@@ -327,21 +342,6 @@ vtkPVRenderView::~vtkPVRenderView()
     {
     this->RenderModuleUI->Delete();
     this->RenderModuleUI = NULL;
-    }
-
-  if (this->Renderer)
-    {
-    this->Renderer->UnRegister(this);
-    this->Renderer = NULL;
-    }
-  
-  this->Renderer2D->Delete();
-  this->Renderer2D = NULL;
-  
-  if (this->RenderWindow)
-    {
-    this->RenderWindow->UnRegister(this);
-    this->RenderWindow = NULL;
     }
   
   // undo the binding we set up
@@ -407,7 +407,9 @@ vtkPVRenderView::~vtkPVRenderView()
       this->CameraIcons[cc] = 0;
       }
     }
+
   this->Observer->Delete();
+  this->Observer = NULL;
 
   this->PropertiesButton->Delete();
   this->PropertiesButton = NULL;
@@ -443,11 +445,6 @@ void PVRenderViewAbortCheck(vtkObject*, unsigned long, void* arg, void*)
 //----------------------------------------------------------------------------
 void vtkPVRenderView::CreateRenderObjects(vtkPVApplication *pvApp)
 {
-  // Get rid of renderer created by the superclass
-  this->Renderer->Delete();
-  this->Renderer = pvApp->GetRenderModule()->GetRenderer();
-  this->Renderer->Register(this);
-
   // Create the call back that looks for events to abort rendering.
   pvApp->GetRenderModule()->RemoveObservers(vtkCommand::AbortCheckEvent);
   vtkCallbackCommand* abc = vtkCallbackCommand::New();
@@ -455,21 +452,6 @@ void vtkPVRenderView::CreateRenderObjects(vtkPVApplication *pvApp)
   abc->SetClientData(this);
   pvApp->GetRenderModule()->AddObserver(vtkCommand::AbortCheckEvent, abc);
   abc->Delete();
-
-  // Get rid of render window created by the superclass
-  this->RenderWindow->Delete();
-  this->RenderWindow = pvApp->GetRenderModule()->GetRenderWindow();
-  this->RenderWindow->Register(this);
-  this->RenderWindow->AddRenderer(this->Renderer2D);
-  this->RenderWindow->SetNumberOfLayers(3);
-  this->Renderer2D->SetLayer(2);
-  
-  // the 2d renderer must be kept in sync with the main renderer
-  this->Renderer->AddObserver(
-    vtkCommand::StartEvent, this->Observer);  
-
-  this->RenderWindow->AddObserver(
-    vtkCommand::CursorChangedEvent, this->Observer);
 }
 
 
@@ -541,18 +523,6 @@ void vtkPVRenderView::Close()
 
 
 //----------------------------------------------------------------------------
-vtkRenderer *vtkPVRenderView::GetRenderer()
-{
-  return this->Renderer;
-}
-
-//----------------------------------------------------------------------------
-vtkRenderWindow *vtkPVRenderView::GetRenderWindow()
-{
-  return this->RenderWindow;
-}
-
-//----------------------------------------------------------------------------
 void vtkPVRenderView::Create(vtkKWApplication *app, const char *args)
 {
   char *local;
@@ -575,7 +545,13 @@ void vtkPVRenderView::Create(vtkKWApplication *app, const char *args)
     }
   this->SetApplication(app);
 
-
+  // Need to make sure it destructs right before this view does.
+  // It's the whole TKRenderWidget destruction pain.
+  if (this->RenderModule == NULL)
+    {
+    this->RenderModule = this->GetPVApplication()->GetRenderModule();
+    this->RenderModule->Register(this);
+    }
 
   // Create the frames
 
@@ -646,7 +622,7 @@ void vtkPVRenderView::Create(vtkKWApplication *app, const char *args)
 
   // Add the -rw argument
 
-  sprintf(local,"%s -rw Addr=%p",args,this->RenderWindow);
+  sprintf(local,"%s -rw Addr=%p",args,this->GetRenderWindow());
   this->Script("vtkTkRenderWidget %s %s",
                this->VTKWidget->GetWidgetName(),local);
 
@@ -759,6 +735,12 @@ void vtkPVRenderView::Create(vtkKWApplication *app, const char *args)
   this->SetSourcesBrowserAlwaysShowName(
     this->GetPVApplication()->GetSourcesBrowserAlwaysShowName());
 
+  // This belongs in vtkPVRenderView.
+  // I copied it from vtkPVRenderView when I moved the observer over.
+  // fixme : Try to remove it.
+  this->GetRenderWindow()->AddObserver(
+                 vtkCommand::CursorChangedEvent, this->Observer);
+
   this->EventuallyRender();
   delete [] local;
 }
@@ -859,10 +841,24 @@ void vtkPVRenderView::CreateViewProperties()
 {
   this->vtkKWView::CreateViewProperties();
 
-  this->BackgroundColor->SetBalloonHelpString("Change the background color of the 3D View window");
-
+  double rgb[3];
   vtkPVWindow* pvwindow = this->GetPVWindow();
   vtkPVApplication* pvapp = this->GetPVApplication();
+
+  this->BackgroundColor->SetBalloonHelpString("Change the background color of the 3D View window");
+  // This used to be in vtkPVWindow.
+  // I moved it here because I had to move Save color to this class.
+  // I also think it belongs here.
+  // Don't you think that save and retrieve color should really be in
+  // the class vtkPVApplication?
+  pvwindow->RetrieveColor(2, "RenderViewBG", rgb); 
+  if (rgb[0] == -1)
+    {
+    rgb[0] = 0.33;
+    rgb[1] = 0.35;
+    rgb[2] = 0.43;
+    }
+  this->SetBackgroundColor(rgb);
 
   // Render parameters
 
@@ -1061,7 +1057,6 @@ void vtkPVRenderView::CreateViewProperties()
   this->OrientationAxesOutlineColor->SetText("Set Outline Color");
   this->OrientationAxesOutlineColor->Create(this->Application, 0);
   this->OrientationAxesOutlineColor->SetCommand(this, "SetOrientationAxesOutlineColor");
-  float rgb[3];
   if (pvapp && pvwindow)
     {
     pvwindow->RetrieveColor(2, "OrientationAxesOutline", rgb);
@@ -1090,7 +1085,7 @@ void vtkPVRenderView::CreateViewProperties()
 
   // Orientation axes widget
   
-  this->OrientationAxes->SetParentRenderer(this->Renderer);
+  this->OrientationAxes->SetParentRenderer(this->GetRenderer());
 
   char buffer[1024];
   double vp[4];
@@ -1265,7 +1260,7 @@ void vtkPVRenderView::StandardViewCallback(float x, float y, float z)
   this->AddTraceEntry("$kw(%s) StandardViewCallback %f %f %f",
                       this->GetTclName(), x, y, z);
   
-  vtkCamera *cam = this->Renderer->GetActiveCamera();
+  vtkCamera *cam = this->GetRenderer()->GetActiveCamera();
   cam->SetFocalPoint(0.0, 0.0, 0.0);
   cam->SetPosition(x, y, z);
   if (y == 0.0)
@@ -1301,7 +1296,18 @@ void vtkPVRenderView::UpdateNavigationWindow(vtkPVSource *currentSource,
 void vtkPVRenderView::SetBackgroundColor(double r, double g, double b)
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
-  
+ 
+  // Save the color in registry here because there is no good place to do 
+  // it upon exiting or destruction.  We have to delete the render window
+  // before the TKRenderWidget, so we loose access to the background color.
+  // The other option is to change vtkKWView to get the background color
+  // locally from the color button.
+  // This used to be in vtkPVWindow.  I had to move it here because
+  // the renderer was destructing before the vtkPVWindow.
+  double rgb[3];
+  rgb[0] = r; rgb[1] = g; rgb[2] = b;
+  this->GetPVWindow()->SaveColor(2, "RenderViewBG", rgb); 
+ 
   // Set the color of the interface button.
   this->BackgroundColor->SetColor(r, g, b);
   // Since setting the color of the button from a script does
@@ -1587,7 +1593,7 @@ void vtkPVRenderView::ParallelProjectionOn()
     {
     this->ParallelProjectionCheck->SetState(1);
     }
-  this->Renderer->GetActiveCamera()->ParallelProjectionOn();
+  this->GetRenderer()->GetActiveCamera()->ParallelProjectionOn();
   this->EventuallyRender();
 }
 
@@ -1599,7 +1605,7 @@ void vtkPVRenderView::ParallelProjectionOff()
     {
     this->ParallelProjectionCheck->SetState(0);
     }
-  this->Renderer->GetActiveCamera()->ParallelProjectionOff();
+  this->GetRenderer()->GetActiveCamera()->ParallelProjectionOff();
   this->EventuallyRender();
 }
 
@@ -1697,9 +1703,9 @@ void vtkPVRenderView::SaveInBatchScript(ofstream* file)
   double *color;
   int *size;
 
-  size = this->RenderWindow->GetSize();
+  size = this->GetRenderWindow()->GetSize();
   *file << "vtkRenderer " << "Ren1" << "\n\t";
-  color = this->Renderer->GetBackground();
+  color = this->GetRenderer()->GetBackground();
   *file << "Ren1" << " SetBackground "
         << color[0] << " " << color[1] << " " << color[2] << endl;
   *file << "vtkRenderWindow " << "RenWin1" << "\n\t"
@@ -1737,7 +1743,7 @@ void vtkPVRenderView::SaveState(ofstream* file)
   double viewUp[3];
   double *color;
 
-  color = this->Renderer->GetBackground();
+  color = this->GetRenderer()->GetBackground();
   *file << "$kw(" << this->GetTclName() << ") SetBackgroundColor " 
         << color[0] << " " << color[1] << " " << color[2] << endl;
 
@@ -1998,6 +2004,8 @@ void vtkPVRenderView::ExecuteEvent(vtkObject*, unsigned long event, void* par)
 //----------------------------------------------------------------------------
 void vtkPVRenderView::Add2DComposite(vtkKWComposite *c)
 {
+  //int fixme;  // this should be in render module.
+
   c->SetView(this);
   // never allow a composite to be added twice
   if (this->Composites->IsItemPresent(c))
@@ -2014,10 +2022,14 @@ void vtkPVRenderView::Add2DComposite(vtkKWComposite *c)
 //----------------------------------------------------------------------------
 void vtkPVRenderView::Remove2DComposite(vtkKWComposite *c)
 {
+  //int fixme;  // this should be in render module.
+
   c->SetView(NULL);
   this->GetRenderer2D()->RemoveProp(c->GetProp());
   this->Composites->RemoveItem(c);
 }
+
+
 
 //----------------------------------------------------------------------------
 void vtkPVRenderView::Enable3DWidget(vtkInteractorObserver *o)
@@ -2082,7 +2094,7 @@ void vtkPVRenderView::SetOrientationAxesVisibility(int val)
     }
   if (!this->OrientationAxes->GetParentRenderer())
     {
-    this->OrientationAxes->SetParentRenderer(this->Renderer);
+    this->OrientationAxes->SetParentRenderer(this->GetRenderer());
     }
 
   this->OrientationAxes->SetEnabled(val);
@@ -2274,7 +2286,6 @@ void vtkPVRenderView::PrintSelf(ostream& os, vtkIndent indent)
      << this->ManipulatorControl2D << endl;
   os << indent << "ManipulatorControl3D: " 
      << this->ManipulatorControl3D << endl;
-  os << indent << "Renderer2D: " << this->Renderer2D << endl;
   os << indent << "RenderModuleUI: " << this->RenderModuleUI << endl;
   os << indent << "CameraControl: " << this->CameraControl << endl;
 }

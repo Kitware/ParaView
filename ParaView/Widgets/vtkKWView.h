@@ -335,17 +335,18 @@ class VTK_EXPORT vtkKWView : public vtkKWWidget
   vtkGetMacro( SupportControlFrame, int );
   vtkBooleanMacro( SupportControlFrame, int );
 
-  // Description::
+  // Description:
   // Get the control frame to put custom controls within
   vtkGetObjectMacro( ControlFrame, vtkKWWidget );
   
-  vtkGetObjectMacro(Renderer, vtkRenderer);
-  virtual vtkRenderer* GetRenderer2D() { return NULL; }
-  
   // Description:
-  // Get the render window used by this widget
-  vtkGetObjectMacro(RenderWindow,vtkRenderWindow);
-  
+  // This class now longer owns these objects.
+  // I am providing these methods as temporary access to these objects.
+  // I plan to make these private.
+  virtual vtkRenderWindow* GetRenderWindow() { return NULL; }
+  virtual vtkRenderer* GetRenderer() { return NULL; }
+  virtual vtkRenderer* GetRenderer2D() { return NULL; }
+    
   // Description:
   // The guts of the abort check method. Made public so that it can
   // be accessed by the render timer callback.
@@ -404,8 +405,8 @@ protected:
   vtkKWLabeledFrame      *ColorsFrame;
   vtkKWChangeColorButton *BackgroundColor;
 
-  vtkRenderer            *Renderer;
-  vtkRenderWindow        *RenderWindow;
+  //vtkRenderer            *Renderer;
+  //vtkRenderWindow        *RenderWindow;
   
   int              PropertiesCreated;
 

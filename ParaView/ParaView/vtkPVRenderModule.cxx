@@ -43,12 +43,36 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderModule);
-vtkCxxRevisionMacro(vtkPVRenderModule, "1.20");
+vtkCxxRevisionMacro(vtkPVRenderModule, "1.21");
 
-//int vtkPVRenderModuleCommand(ClientData cd, Tcl_Interp *interp,
-//                             int argc, char *argv[]);
+//===========================================================================
+//***************************************************************************
+class vtkPVRenderModuleObserver : public vtkCommand
+{
+public:
+  static vtkPVRenderModuleObserver *New() 
+    {return new vtkPVRenderModuleObserver;};
 
+  vtkPVRenderModuleObserver()
+    {
+      this->PVRenderModule = 0;
+    }
 
+  virtual void Execute(vtkObject* wdg, unsigned long event,  
+                       void* calldata)
+    {
+      if ( this->PVRenderModule )
+        {
+        if (event == vtkCommand::StartEvent &&
+            vtkRenderer::SafeDownCast(wdg))
+          {
+          this->PVRenderModule->StartRenderEvent();
+          }
+        }
+    }
+
+  vtkPVRenderModule* PVRenderModule;
+};
 //***************************************************************************
 //===========================================================================
 
@@ -61,8 +85,10 @@ vtkPVRenderModule::vtkPVRenderModule()
   this->PartDisplays = vtkCollection::New();
 
   this->Renderer = 0;
+  this->Renderer2D = 0;
   this->RenderWindow = 0;
   this->RendererID.ID     = 0;
+  this->Renderer2DID.ID   = 0;
   this->RenderWindowID.ID = 0;
   this->InteractiveRenderTime    = 0;
   this->StillRenderTime          = 0;
@@ -71,6 +97,8 @@ vtkPVRenderModule::vtkPVRenderModule()
 
   this->RenderInterruptsEnabled = 1;
 
+  this->Observer = vtkPVRenderModuleObserver::New();
+  this->Observer->PVRenderModule = this;
 }
 
 //----------------------------------------------------------------------------
@@ -108,6 +136,15 @@ vtkPVRenderModule::~vtkPVRenderModule()
     this->RendererID.ID = 0;
     }
   
+  if (this->Renderer2D)
+    {
+    if ( pm )
+      {
+      pm->DeleteStreamObject(this->Renderer2DID);
+      }
+    this->Renderer2DID.ID = 0;
+    }
+
   if (this->RenderWindow)
     {
     if ( pm )
@@ -121,6 +158,9 @@ vtkPVRenderModule::~vtkPVRenderModule()
     pm->SendStreamToClientAndServer();
     }
   
+  this->Observer->Delete();
+  this->Observer = NULL;
+
   this->SetPVApplication(NULL);
 }
 
@@ -164,6 +204,24 @@ void vtkPVRenderModuleResetCameraClippingRange(
 
 
 //----------------------------------------------------------------------------
+void vtkPVRenderModule::StartRenderEvent()
+{
+  // make the overlay renderer match the view of the 3d renderer
+  if (this->Renderer2D)
+    {
+    this->Renderer2D->GetActiveCamera()->SetClippingRange(
+      this->Renderer->GetActiveCamera()->GetClippingRange());
+    this->Renderer2D->GetActiveCamera()->SetPosition(
+      this->Renderer->GetActiveCamera()->GetPosition());
+    this->Renderer2D->GetActiveCamera()->SetFocalPoint(
+      this->Renderer->GetActiveCamera()->GetFocalPoint());
+    this->Renderer2D->GetActiveCamera()->SetViewUp(
+      this->Renderer->GetActiveCamera()->GetViewUp());
+    }
+}
+
+
+//----------------------------------------------------------------------------
 void vtkPVRenderModule::SetPVApplication(vtkPVApplication *pvApp)
 {
   if (this->PVApplication)
@@ -189,25 +247,48 @@ void vtkPVRenderModule::SetPVApplication(vtkPVApplication *pvApp)
   this->PVApplication->Register(this);
 
   this->RendererID = pm->NewStreamObject("vtkRenderer");
+  this->Renderer2DID = pm->NewStreamObject("vtkRenderer");
   this->RenderWindowID = pm->NewStreamObject("vtkRenderWindow");
   pm->SendStreamToClientAndServer();
   this->Renderer = 
     vtkRenderer::SafeDownCast(
       pm->GetObjectFromID(this->RendererID));
+  this->Renderer2D = 
+    vtkRenderer::SafeDownCast(
+      pm->GetObjectFromID(this->Renderer2DID));
   this->RenderWindow = 
     vtkRenderWindow::SafeDownCast(
       pm->GetObjectFromID(this->RenderWindowID));
-  
+
+
   if (pvApp->GetUseStereoRendering())
     {
     this->RenderWindow->StereoCapableWindowOn();
     this->RenderWindow->StereoRenderOn();
     }
+
+  // We cannot erase the zbuffer.  We need it for picking.  
+  stream << vtkClientServerStream::Invoke
+         << this->Renderer2DID << "EraseOff" 
+         << vtkClientServerStream::End;
+  stream << vtkClientServerStream::Invoke
+         << this->Renderer2DID << "SetLayer" << 2 
+         << vtkClientServerStream::End;
+  stream << vtkClientServerStream::Invoke
+         << this->RenderWindowID << "SetNumberOfLayers" << 3
+         << vtkClientServerStream::End;
   stream << vtkClientServerStream::Invoke
          << this->RenderWindowID << "AddRenderer" << this->RendererID
          << vtkClientServerStream::End;
+  stream << vtkClientServerStream::Invoke
+         << this->RenderWindowID << "AddRenderer" << this->Renderer2DID
+         << vtkClientServerStream::End;
   pm->SendStreamToClientAndServer();
-  
+    
+  // the 2d renderer must be kept in sync with the main renderer
+  this->Renderer->AddObserver(
+    vtkCommand::StartEvent, this->Observer);  
+
   // Make sure we have a chance to set the clipping range properly.
   vtkCallbackCommand* cbc;
   cbc = vtkCallbackCommand::New();
@@ -219,6 +300,11 @@ void vtkPVRenderModule::SetPVApplication(vtkPVApplication *pvApp)
   cbc->Delete();
 }
 
+//----------------------------------------------------------------------------
+vtkRenderWindow *vtkPVRenderModule::GetRenderWindow()
+{
+  return this->RenderWindow;
+}
 
 //----------------------------------------------------------------------------
 vtkRenderer *vtkPVRenderModule::GetRenderer()
@@ -227,11 +313,10 @@ vtkRenderer *vtkPVRenderModule::GetRenderer()
 }
 
 //----------------------------------------------------------------------------
-vtkRenderWindow *vtkPVRenderModule::GetRenderWindow()
+vtkRenderer *vtkPVRenderModule::GetRenderer2D()
 {
-  return this->RenderWindow;
+  return this->Renderer2D;
 }
-
 
 //----------------------------------------------------------------------------
 void vtkPVRenderModule::SetBackgroundColor(float r, float g, float b)

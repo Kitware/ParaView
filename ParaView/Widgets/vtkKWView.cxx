@@ -85,7 +85,7 @@ Bool vtkKWRenderViewPredProc(Display *vtkNotUsed(disp), XEvent *event,
 }
 #endif
 
-vtkCxxRevisionMacro(vtkKWView, "1.122");
+vtkCxxRevisionMacro(vtkKWView, "1.123");
 
 //----------------------------------------------------------------------------
 int vtkKWViewCommand(ClientData cd, Tcl_Interp *interp,
@@ -189,32 +189,35 @@ vtkKWView::vtkKWView()
   this->MenuEntryHelp = NULL;
   this->MenuEntryUnderline = -1;
   
-  this->Renderer = vtkRenderer::New();
-  this->RenderWindow = vtkRenderWindow::New();
-  this->RenderWindow->AddRenderer(this->Renderer);
+  // Since paraview is the only user of this class
+  // We can start reorganizing it.  Render module now
+  // keeps the render window and renderers.
+  //this->Renderer = vtkRenderer::New();
+  //this->RenderWindow = vtkRenderWindow::New();
+  //this->RenderWindow->AddRenderer(this->Renderer);
 
-  vtkCallbackCommand* abc = vtkCallbackCommand::New();
-  abc->SetCallback(KWViewAbortCheckMethod);
-  abc->SetClientData(this);
-  this->RenderWindow->AddObserver(vtkCommand::AbortCheckEvent, abc);
-  abc->Delete();
+  //vtkCallbackCommand* abc = vtkCallbackCommand::New();
+  //abc->SetCallback(KWViewAbortCheckMethod);
+  //abc->SetClientData(this);
+  //this->RenderWindow->AddObserver(vtkCommand::AbortCheckEvent, abc);
+  //abc->Delete();
 
 }
 
 //----------------------------------------------------------------------------
 vtkKWView::~vtkKWView()
 {
-  if (this->Renderer)
-    {
-    this->Renderer->Delete();
-    this->Renderer = NULL;
-    }
+  //if (this->Renderer)
+  //  {
+  //  this->Renderer->Delete();
+  //  this->Renderer = NULL;
+  //  }
   
-  if (this->RenderWindow)
-    {
-    this->RenderWindow->Delete();
-    this->RenderWindow = NULL;
-    }
+  //if (this->RenderWindow)
+  //  {
+  //  this->RenderWindow->Delete();
+  //  this->RenderWindow = NULL;
+  //  }
     
   // Remove all binding
   const char *wname = this->VTKWidget->GetWidgetName();
@@ -1551,7 +1554,7 @@ void vtkKWView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWView ";
-  this->ExtractRevision(os,"$Revision: 1.122 $");
+  this->ExtractRevision(os,"$Revision: 1.123 $");
 }
 
 //----------------------------------------------------------------------------
@@ -1566,10 +1569,10 @@ void vtkKWView::SetupMemoryRendering(
 #ifdef PARAVIEW_USE_WIN32_RW
   if (!cd)
     {
-    cd = this->RenderWindow->GetGenericContext();
+    cd = this->GetRenderWindow()->GetGenericContext();
     }
   vtkWin32OpenGLRenderWindow::
-    SafeDownCast(this->RenderWindow)->SetupMemoryRendering(x,y,(HDC)cd);
+    SafeDownCast(this->GetRenderWindow())->SetupMemoryRendering(x,y,(HDC)cd);
 #endif
 }
 
@@ -1578,7 +1581,7 @@ void vtkKWView::ResumeScreenRendering()
 {
 #ifdef PARAVIEW_USE_WIN32_RW
   vtkWin32OpenGLRenderWindow::
-    SafeDownCast(this->RenderWindow)->ResumeScreenRendering();
+    SafeDownCast(this->GetRenderWindow())->ResumeScreenRendering();
 #endif
 }
 
@@ -1587,7 +1590,7 @@ void *vtkKWView::GetMemoryDC()
 {
 #ifdef PARAVIEW_USE_WIN32_RW
   return (void *)vtkWin32OpenGLRenderWindow::
-    SafeDownCast(this->RenderWindow)->GetMemoryDC();
+    SafeDownCast(this->GetRenderWindow())->GetMemoryDC();
 #else
   return NULL;
 #endif
@@ -1598,7 +1601,7 @@ unsigned char *vtkKWView::GetMemoryData()
 {
 #ifdef PARAVIEW_USE_WIN32_RW
   return vtkWin32OpenGLRenderWindow::
-    SafeDownCast(this->RenderWindow)->GetMemoryData();
+    SafeDownCast(this->GetRenderWindow())->GetMemoryData();
 #else
   return NULL;
 #endif
@@ -1611,14 +1614,14 @@ void vtkKWView::SetBackgroundColor( double r, double g, double b )
     {
     return;
     }
-  double *ff = this->Renderer->GetBackground( );
+  double *ff = this->GetRenderer()->GetBackground( );
   if ( ff[0] == r && ff[1] == g && ff[2] == b )
     {
     return;
     }
 
   this->BackgroundColor->SetColor( r, g, b );
-  this->Renderer->SetBackground( r, g, b );
+  this->GetRenderer()->SetBackground( r, g, b );
   this->Render();
   float color[3];
   color[0] = r;
@@ -1630,13 +1633,13 @@ void vtkKWView::SetBackgroundColor( double r, double g, double b )
 //----------------------------------------------------------------------------
 double* vtkKWView::GetBackgroundColor( )
 {
-  return this->Renderer->GetBackground( );
+  return this->GetRenderer()->GetBackground( );
 }
 
 //----------------------------------------------------------------------------
 void vtkKWView::GetBackgroundColor( double *r, double *g, double *b )
 {
-  double *ff = this->Renderer->GetBackground( );
+  double *ff = this->GetRenderer()->GetBackground( );
   *r = ff[0];
   *g = ff[1];
   *b = ff[2];
@@ -1663,13 +1666,13 @@ double *vtkKWView::GetCornerTextColor()
 //----------------------------------------------------------------------------
 vtkWindow *vtkKWView::GetVTKWindow() 
 { 
-  return this->RenderWindow; 
+  return this->GetRenderWindow(); 
 }
 
 //----------------------------------------------------------------------------
 vtkViewport *vtkKWView::GetViewport() 
 { 
-  return this->Renderer; 
+  return this->GetRenderer(); 
 }
 
 //----------------------------------------------------------------------------
@@ -1704,8 +1707,8 @@ void vtkKWView::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "ProgressGauge: " << this->ProgressGauge << endl;
   os << indent << "RenderMode: " << this->GetRenderMode() << endl;
   os << indent << "RenderState: " << this->GetRenderState() << endl;
-  os << indent << "RenderWindow: " << this->GetRenderWindow() << endl;
-  os << indent << "Renderer: " << this->GetRenderer() << endl;
+  //os << indent << "RenderWindow: " << this->GetRenderWindow() << endl;
+  //os << indent << "Renderer: " << this->GetRenderer() << endl;
   os << indent << "SelectedComposite: " << this->GetSelectedComposite() 
      << endl;
   os << indent << "SupportControlFrame: " << this->GetSupportControlFrame() 

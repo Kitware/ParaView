@@ -123,7 +123,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.516");
+vtkCxxRevisionMacro(vtkPVWindow, "1.517");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -550,9 +550,6 @@ void vtkPVWindow::PrepareForDelete()
 
   if (this->MainView)
     {
-    // At exit, save the background colour in the registery.
-    this->SaveColor(2, "RenderViewBG", 
-                    this->MainView->GetBackgroundColor());
     this->MainView->PrepareForDelete();
     this->MainView->Delete();
     this->MainView = NULL;
@@ -1603,15 +1600,6 @@ void vtkPVWindow::CreateMainView(vtkPVApplication *pvApp)
   iscontrol2D->SetManipulatorCollection(
     this->CameraStyle2D->GetCameraManipulators());
   
-  double rgb[3];
-  this->RetrieveColor(2, "RenderViewBG", rgb); 
-  if (rgb[0] == -1)
-    {
-    rgb[0] = 0.33;
-    rgb[1] = 0.35;
-    rgb[2] = 0.43;
-    }
-  this->MainView->SetBackgroundColor(rgb);
   this->Script( "pack %s -expand yes -fill both", 
                 this->MainView->GetWidgetName());  
 

@@ -43,6 +43,7 @@ class vtkRenderer;
 class vtkRenderWindow;
 class vtkCollection;
 class vtkPVPartDisplay;
+class vtkPVRenderModuleObserver;
 
 class VTK_EXPORT vtkPVRenderModule : public vtkObject
 {
@@ -76,9 +77,11 @@ public:
   //int IsInteractive() { return this->Interactive; }
   
   // Description:
-  // My version.
-  vtkRenderer *GetRenderer();
+  // I do not know why we cannot do everything through
+  // server stream messages.
   vtkRenderWindow *GetRenderWindow();
+  vtkRenderer *GetRenderer();
+  vtkRenderer *GetRenderer2D();
 
   // Description:
   // Change the background color.
@@ -128,8 +131,15 @@ public:
   // Calls InvalidateGeometry() on all part displays. For flip books.
   void InvalidateAllGeometries();
   
-  vtkClientServerID GetRendererID() { return this->RendererID;}
+  // Description:
+  // This method is called when the 3D renderer renders so that the 2D window
+  // can stay in sync
+  void StartRenderEvent();
+
   vtkClientServerID GetRenderWindowID() { return this->RenderWindowID;}
+  vtkClientServerID GetRendererID() { return this->RendererID;}
+  vtkClientServerID GetRenderer2DID() { return this->Renderer2DID;}
+
 protected:
   vtkPVRenderModule();
   ~vtkPVRenderModule();
@@ -147,14 +157,16 @@ protected:
   virtual void UpdateAllPVData();
  
   vtkPVApplication* PVApplication;
-  vtkRenderer*      Renderer;
   vtkRenderWindow*  RenderWindow;
+  vtkRenderer*      Renderer;
+  vtkRenderer*      Renderer2D;
 
   //int Interactive;
   int TotalVisibleMemorySizeValid;
   
-  vtkClientServerID RendererID;
   vtkClientServerID RenderWindowID;
+  vtkClientServerID RendererID;
+  vtkClientServerID Renderer2DID;
     
   double StillRenderTime;
   double InteractiveRenderTime;
@@ -163,6 +175,8 @@ protected:
   int RenderInterruptsEnabled;
 
   unsigned long ResetCameraClippingRangeTag;
+
+  vtkPVRenderModuleObserver* Observer;
 
   vtkPVRenderModule(const vtkPVRenderModule&); // Not implemented
   void operator=(const vtkPVRenderModule&); // Not implemented
