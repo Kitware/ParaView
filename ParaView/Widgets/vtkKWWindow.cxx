@@ -70,7 +70,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define VTK_KW_WINDOW_GEOMETRY_REG_KEY "WindowGeometry"
 #define VTK_KW_WINDOW_FRAME1_SIZE_REG_KEY "WindowFrame1Size"
 
-vtkCxxRevisionMacro(vtkKWWindow, "1.122.2.6");
+vtkCxxRevisionMacro(vtkKWWindow, "1.122.2.7");
 vtkCxxSetObjectMacro(vtkKWWindow, PropertiesParent, vtkKWWidget);
 
 class vtkKWWindowMenuEntry
@@ -298,6 +298,7 @@ vtkKWWindow::vtkKWWindow()
   this->InterfaceSettingsConfirmExitCheck = 0;
   this->InterfaceSettingsSaveWindowGeometry = 0;
   this->InterfaceSettingsShowSplashScreenCheck = 0;
+  this->InterfaceSettingsShowBalloonHelpCheck = 0;
 }
 
 vtkKWWindow::~vtkKWWindow()
@@ -391,6 +392,10 @@ vtkKWWindow::~vtkKWWindow()
   if (this->InterfaceSettingsShowSplashScreenCheck)
     {
     this->InterfaceSettingsShowSplashScreenCheck->Delete();
+    }
+  if (this->InterfaceSettingsShowBalloonHelpCheck)
+    {
+    this->InterfaceSettingsShowBalloonHelpCheck->Delete();
     }
 }
 
@@ -965,8 +970,42 @@ void vtkKWWindow::CreatePreferencesProperties()
     "Display the splash information screen at startup.");
 
     this->Script("pack %s -side top -anchor w -expand no -fill none",
-                 this->InterfaceSettingsShowSplashScreenCheck->GetWidgetName());
+                this->InterfaceSettingsShowSplashScreenCheck->GetWidgetName());
     }
+
+  // Show balloon help ?
+
+  if (!this->InterfaceSettingsShowBalloonHelpCheck)
+    {
+    this->InterfaceSettingsShowBalloonHelpCheck = vtkKWCheckButton::New();
+    }
+
+  this->InterfaceSettingsShowBalloonHelpCheck->SetParent(
+    this->InterfaceSettingsFrame->GetFrame());
+  this->InterfaceSettingsShowBalloonHelpCheck->Create(
+    this->Application, "-text {Show balloon help}");
+
+  if (this->Application->HasRegisteryValue(
+    2, "RunTime", VTK_KW_BALLOON_HELP_REG_KEY))
+    {
+    this->InterfaceSettingsShowBalloonHelpCheck->SetState(
+      this->Application->GetIntRegisteryValue(
+        2, "RunTime", VTK_KW_BALLOON_HELP_REG_KEY));
+    }
+  else
+    {
+    this->InterfaceSettingsShowBalloonHelpCheck->SetState(
+      this->Application->GetShowBalloonHelp());
+    }
+
+  this->InterfaceSettingsShowBalloonHelpCheck->SetCommand(
+    this, "OnInterfaceSettingsChange");
+  this->InterfaceSettingsShowBalloonHelpCheck->SetBalloonHelpString(
+    "Display help in a yellow popup-box on the screen when you rest the "
+    "mouse over an item that supports it.");
+
+  this->Script("pack %s -side top -anchor w -expand no -fill none",
+               this->InterfaceSettingsShowBalloonHelpCheck->GetWidgetName());
 
   // Pack the frame
 
@@ -998,6 +1037,15 @@ void vtkKWWindow::OnInterfaceSettingsChange()
      "%d", this->InterfaceSettingsShowSplashScreenCheck->GetState());
    this->Application->SetShowSplashScreen(
      this->InterfaceSettingsShowSplashScreenCheck->GetState());
+   }
+
+ if (this->InterfaceSettingsShowBalloonHelpCheck)
+   {
+   this->Application->SetRegisteryValue(
+     2, "RunTime", VTK_KW_BALLOON_HELP_REG_KEY,
+     "%d", this->InterfaceSettingsShowBalloonHelpCheck->GetState());
+   this->Application->SetShowBalloonHelp(
+     this->InterfaceSettingsShowBalloonHelpCheck->GetState());
    }
 }
 
@@ -1254,7 +1302,7 @@ void vtkKWWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWWindow ";
-  this->ExtractRevision(os,"$Revision: 1.122.2.6 $");
+  this->ExtractRevision(os,"$Revision: 1.122.2.7 $");
 }
 
 int vtkKWWindow::ExitDialog()

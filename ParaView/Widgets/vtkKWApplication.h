@@ -64,6 +64,7 @@ template<class KeyType,class DataType> class vtkAbstractMap;
 //ETX
 
 #define VTK_KW_SPLASH_SCREEN_REG_KEY "ShowSplashScreen"
+#define VTK_KW_BALLOON_HELP_REG_KEY "ShowBalloonHelp"
 
 class VTK_EXPORT vtkKWApplication : public vtkKWObject
 {
@@ -75,9 +76,8 @@ public:
   virtual vtkKWApplication *GetApplication()  { return this;  }
   virtual void SetApplication (vtkKWApplication*) 
     { 
-    vtkErrorMacro( << "Do not set the Application on an Application" << endl ); 
+    vtkErrorMacro( << "Do not set the Application on an Application" << endl); 
     }
-  
   
   // Description:
   // Start running the main application.
@@ -167,6 +167,12 @@ public:
   // To disable balloon help, set it to 0.
   vtkSetClampMacro(BalloonHelpDelay, int, 0, 5);
   vtkGetMacro(BalloonHelpDelay, int);
+
+  // Description:
+  // Show balloon help.
+  virtual void SetShowBalloonHelp(int);
+  vtkGetMacro(ShowBalloonHelp, int);
+  vtkBooleanMacro(ShowBalloonHelp, int);
 
   // Description:
   // This variable can be used to hide the user interface.  
@@ -266,6 +272,7 @@ public:
   vtkGetMacro(HasSplashScreen, int);
   vtkGetMacro(ShowSplashScreen, int);
   vtkSetMacro(ShowSplashScreen, int);
+  vtkBooleanMacro(ShowSplashScreen, int);
 
 protected:
   vtkKWApplication();
@@ -284,6 +291,7 @@ protected:
   char *BalloonHelpPending;
   vtkSetStringMacro(BalloonHelpPending);
   vtkKWWidget *BalloonHelpWidget;
+  int ShowBalloonHelp;
 
   static int WidgetVisibility;
   int InExit;

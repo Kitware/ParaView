@@ -386,6 +386,7 @@ protected:
   vtkKWCheckButton  *InterfaceSettingsConfirmExitCheck;
   vtkKWCheckButton  *InterfaceSettingsSaveWindowGeometry;
   vtkKWCheckButton  *InterfaceSettingsShowSplashScreenCheck;
+  vtkKWCheckButton  *InterfaceSettingsShowBalloonHelpCheck;
   
 //BTX
   // Description:

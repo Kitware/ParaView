@@ -71,12 +71,9 @@ static Tcl_Interp *Et_Interp = 0;
 int vtkKWApplication::WidgetVisibility = 1;
 
 
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.96.2.1");
-
-
-
+vtkCxxRevisionMacro(vtkKWApplication, "1.96.2.2");
 
 extern "C" int Vtktcl_Init(Tcl_Interp *interp);
 extern "C" int Vtkkwwidgetstcl_Init(Tcl_Interp *interp);
@@ -154,6 +151,17 @@ vtkKWApplication::vtkKWApplication()
 
   this->HasSplashScreen = 0;
   this->ShowSplashScreen = 1;
+
+  if (this->HasRegisteryValue(
+    2, "RunTime", VTK_KW_BALLOON_HELP_REG_KEY))
+    {
+    this->ShowBalloonHelp = this->GetIntRegisteryValue(
+      2, "RunTime", VTK_KW_BALLOON_HELP_REG_KEY);
+    }
+  else
+    {
+    this->ShowBalloonHelp = 1;
+    }
 }
 
 vtkKWApplication::~vtkKWApplication()
@@ -557,12 +565,28 @@ void vtkKWApplication::Start()
     }
   delete [] argv;
 }
+
 void vtkKWApplication::Start(char *arg)
 { 
   this->Start(1,&arg);
 }
+
 void vtkKWApplication::Start(int /*argc*/, char ** /*argv*/)
 { 
+  // Go to set it here since we do not have the application name in the
+  // constructor.
+
+  if (this->HasRegisteryValue(
+    2, "RunTime", VTK_KW_BALLOON_HELP_REG_KEY))
+    {
+    this->ShowBalloonHelp = this->GetIntRegisteryValue(
+      2, "RunTime", VTK_KW_BALLOON_HELP_REG_KEY);
+    }
+  else
+    {
+    this->ShowBalloonHelp = 1;
+    }
+
   while (this->Windows && this->Windows->GetNumberOfItems())
     {
     Tcl_DoOneEvent(0);
@@ -570,7 +594,6 @@ void vtkKWApplication::Start(int /*argc*/, char ** /*argv*/)
   
   //Tk_MainLoop();
 }
-
 
 void vtkKWApplication::DisplayHelp(vtkKWWindow* master)
 {
@@ -634,7 +657,10 @@ void vtkKWApplication::BalloonHelpTrigger(vtkKWWidget *widget)
   char *result;
 
   // If there is no help string, return
-  if ( !widget->GetBalloonHelpString() || this->BalloonHelpDelay <= 0 )
+
+  if (!this->ShowBalloonHelp || 
+      !widget->GetBalloonHelpString() || 
+      this->BalloonHelpDelay <= 0)
     {
     this->SetBalloonHelpPending(NULL);
     return;
@@ -657,8 +683,10 @@ void vtkKWApplication::BalloonHelpDisplay(vtkKWWidget *widget)
     {
     return;
     }
-  if ( !this->BalloonHelpLabel || !this->BalloonHelpWindow ||
-       !widget->GetParent() )
+  if (!this->ShowBalloonHelp ||
+      !this->BalloonHelpLabel || 
+      !this->BalloonHelpWindow ||
+      !widget->GetParent())
     {
     return;
     }
@@ -734,10 +762,6 @@ void vtkKWApplication::BalloonHelpDisplay(vtkKWWidget *widget)
     {
     this->Script("wm deiconify %s", this->BalloonHelpWindow->GetWidgetName());
     this->Script("raise %s", this->BalloonHelpWindow->GetWidgetName());
-    
-    // remove the balloon help if the mouse moves
-    //this->Script("bind %s <Motion> {%s BalloonHelpWithdraw}", 
-    //             widget->GetWidgetName(), this->GetTclName() );
     }
   
   this->SetBalloonHelpPending(NULL);
@@ -780,6 +804,22 @@ void vtkKWApplication::BalloonHelpWithdraw()
   if ( this->BalloonHelpWidget )
     {
     this->BalloonHelpTrigger(this->BalloonHelpWidget);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWApplication::SetShowBalloonHelp(int v)
+{
+  if (this->ShowBalloonHelp == v)
+    {
+    return;
+    }
+  this->ShowBalloonHelp = v;
+  this->Modified();
+
+  if (!this->ShowBalloonHelp)
+    {
+    this->BalloonHelpCancel();
     }
 }
 
@@ -1093,6 +1133,7 @@ void vtkKWApplication::PrintSelf(ostream& os, vtkIndent indent)
      << this->GetApplicationReleaseName() << endl;
   os << indent << "ApplicationVersionName: " 
      << this->GetApplicationVersionName() << endl;
+  os << indent << "ShowBalloonHelp: " << (this->ShowBalloonHelp ? "on":"off") << endl;
   os << indent << "BalloonHelpDelay: " << this->GetBalloonHelpDelay() << endl;
   os << indent << "DialogUp: " << this->GetDialogUp() << endl;
   os << indent << "ExitStatus: " << this->GetExitStatus() << endl;
