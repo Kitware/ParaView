@@ -55,7 +55,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVScale);
-vtkCxxRevisionMacro(vtkPVScale, "1.21");
+vtkCxxRevisionMacro(vtkPVScale, "1.22");
 
 //----------------------------------------------------------------------------
 vtkPVScale::vtkPVScale()
@@ -69,6 +69,8 @@ vtkPVScale::vtkPVScale()
   this->Property = NULL;
 
   this->RangeSourceVariable = 0;
+
+  this->DefaultValue = 0.0;
 }
 
 //----------------------------------------------------------------------------
@@ -223,6 +225,12 @@ void vtkPVScale::SetValue(float val)
     newVal = val;
     }
   
+  if (this->Property && !this->AcceptedValueInitialized)
+    {
+    this->Property->SetScalars(1, &newVal);
+    this->AcceptedValueInitialized = 1;
+    }
+  
   oldVal = this->Scale->GetValue();
   if (newVal == oldVal)
     {
@@ -230,12 +238,6 @@ void vtkPVScale::SetValue(float val)
     }
 
   this->Scale->SetValue(newVal);
-  
-  if (!this->AcceptedValueInitialized)
-    {
-    this->Property->SetScalars(1, &newVal);
-    this->AcceptedValueInitialized = 1;
-    }
   
   this->ModifiedCallback();
 }
@@ -321,6 +323,7 @@ void vtkPVScale::CopyProperties(vtkPVWidget* clone, vtkPVSource* pvSource,
     float min, max;
     this->Scale->GetRange(min, max);
     pvs->SetRange(min, max);
+    pvs->SetDefaultValue(this->GetDefaultValue());
     pvs->SetResolution(this->Scale->GetResolution());
     pvs->SetLabel(this->EntryLabel);
     pvs->SetRangeSourceVariable(this->RangeSourceVariable);
@@ -371,6 +374,29 @@ int vtkPVScale::ReadXMLAttributes(vtkPVXMLElement* element,
     range[1] = 100;
     }
   this->SetRange(range[0], range[1]);
+
+  // Setup the default value.
+  float default_value;
+  if(!element->GetScalarAttribute("default_value",&default_value))
+    {
+    this->SetDefaultValue(range[0]);
+    }
+  else
+    {
+    if (default_value < range[0] )
+      {
+      this->SetDefaultValue(range[0]);
+      }
+    else if (default_value > range[1])
+      {
+      this->SetDefaultValue(range[1]);
+      }
+    else
+      {
+      this->SetDefaultValue(default_value);
+      }
+    }
+
   const char* range_source = element->GetAttribute("range_source");
   if(range_source)
     {
@@ -436,6 +462,10 @@ int vtkPVScale::RoundValue(float val)
 void vtkPVScale::SetProperty(vtkPVWidgetProperty *prop)
 {
   this->Property = vtkPVScalarListWidgetProperty::SafeDownCast(prop);
+  if (this->Property)
+    {
+    this->Property->SetScalars(1, &this->DefaultValue);
+    }
 }
 
 //----------------------------------------------------------------------------

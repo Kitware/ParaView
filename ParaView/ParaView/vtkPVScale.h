@@ -173,6 +173,11 @@ protected:
   int AcceptedValueInitialized;
 
   vtkPVScalarListWidgetProperty *Property;
+
+  vtkSetMacro(DefaultValue, float);
+  vtkGetMacro(DefaultValue, float);
+
+  float DefaultValue;
   
 //BTX
   virtual void CopyProperties(vtkPVWidget* clone, vtkPVSource* pvSource,
