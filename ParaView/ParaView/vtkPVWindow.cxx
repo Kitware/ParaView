@@ -141,7 +141,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.474");
+vtkCxxRevisionMacro(vtkPVWindow, "1.475");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -3695,11 +3695,11 @@ void vtkPVWindow::LoadScript(const char *name)
 {
   vtkPVApplication *pvApp = vtkPVApplication::SafeDownCast(this->Application);
 
+  this->AddRecentFile(name, this, "LoadScript");
+
   pvApp->SetRunningParaViewScript(1);
   this->vtkKWWindow::LoadScript(name);
   pvApp->SetRunningParaViewScript(0);
-
-  this->AddRecentFile(name, this, "LoadScript");
 }
 
 //-----------------------------------------------------------------------------
