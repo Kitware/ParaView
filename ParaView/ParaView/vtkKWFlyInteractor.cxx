@@ -114,6 +114,7 @@ void vtkKWFlyInteractor::Create(vtkKWApplication *app, char *args)
 
   this->Toolbar->SetParent(this->GetParent());
   this->Toolbar->Create(app);
+  this->Toolbar->SetHeight(25);
 
   this->Label->Create(app,"label","-text {Fly Speed} -bd 2");
   this->Label->SetBalloonHelpString("Change the flying speed");

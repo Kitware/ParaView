@@ -131,6 +131,7 @@ void vtkKWRotateCameraInteractor::Create(vtkKWApplication *app, char *args)
 
   this->Toolbar->SetParent(this->GetParent());
   this->Toolbar->Create(app);
+  this->Toolbar->SetHeight(25);
 
   // create the main frame for this widget
   this->Script( "frame %s", this->GetWidgetName());

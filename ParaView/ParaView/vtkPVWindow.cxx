@@ -471,9 +471,11 @@ void vtkPVWindow::Create(vtkKWApplication *app, char *args)
 
   this->InteractorToolbar->SetParent(this->GetToolbarFrame());
   this->InteractorToolbar->Create(app);
+  this->InteractorToolbar->SetHeight(25);
 
   this->Toolbar->SetParent(this->GetToolbarFrame());
   this->Toolbar->Create(app);
+  this->Toolbar->SetHeight(25);
   
   this->CalculatorButton->SetParent(this->Toolbar);
   this->CalculatorButton->Create(app, "-image PVCalculatorButton");
