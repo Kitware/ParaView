@@ -96,7 +96,6 @@ int main()
       }
     }
   cout << "Remove all " << pa->GetSize() << " elements..." << endl;
-  unsigned int cnt = pa->GetSize();
   for ( ; pa->GetSize(); )
     {
     int res = pa->Remove(0);

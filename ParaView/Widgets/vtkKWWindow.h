@@ -187,8 +187,8 @@ public:
 
   //Description:
   // Set/Get Number of recent files in the menu.
-  vtkSetClampMacro(NumberOfRecentFiles, int, 4, 10);
-  vtkGetMacro(NumberOfRecentFiles, int);
+  vtkSetClampMacro(NumberOfRecentFiles, unsigned int, 4, 10);
+  vtkGetMacro(NumberOfRecentFiles, unsigned int);
   
 protected:
   vtkKWWindow();
@@ -203,7 +203,7 @@ protected:
   void UpdateRecentMenu();
   void StoreRecentMenuToRegistry(char *key);
 
-  int NumberOfRecentFiles;
+  unsigned int NumberOfRecentFiles;
   
   int ExitDialog();
 

@@ -46,7 +46,6 @@ int main()
 
   for ( cc=0; cc<10; cc++ )
     {
-    unsigned long key = vtkKWHashTable::HashString( names[cc] );
     ht->Remove( names[cc] );
     }
 

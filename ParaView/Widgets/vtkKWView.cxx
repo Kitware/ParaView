@@ -745,7 +745,8 @@ void vtkKWView::Print()
   int DPI;
   if (this->GetParentWindow())
     {
-    DPI = this->GetParentWindow()->GetPrintTargetDPI();
+    // Is this right? Should DPI be int or float?
+    DPI = static_cast<int>( this->GetParentWindow()->GetPrintTargetDPI() );
     }
   if (DPI >= 150)
     {
@@ -1243,7 +1244,7 @@ void vtkKWView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWView ";
-  this->ExtractRevision(os,"$Revision: 1.46 $");
+  this->ExtractRevision(os,"$Revision: 1.47 $");
 }
 
 void vtkKWView::SetupMemoryRendering(int x, int y, void *cd) 
