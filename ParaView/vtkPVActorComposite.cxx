@@ -504,8 +504,13 @@ void vtkPVActorComposite::DrawWireframe()
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
   
-  pvApp->BroadcastScript("[[%s GetActor] GetProperty] SetRepresentationToWireframe",
-                         this->GetTclName());
+  if (this->ActorTclName)
+    {
+    pvApp->BroadcastScript("[%s GetProperty] SetRepresentationToWireframe",
+			   this->ActorTclName);
+    }
+  
+  this->GetActor()->GetProperty()->SetRepresentationToWireframe();
   this->GetView()->Render();
 }
 
@@ -514,8 +519,13 @@ void vtkPVActorComposite::DrawSurface()
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
   
-  pvApp->BroadcastScript("[[%s GetActor] GetProperty] SetRepresentationToSurface",
-                         this->GetTclName());
+  if (this->ActorTclName)
+    {
+    pvApp->BroadcastScript("[%s GetProperty] SetRepresentationToSurface",
+			   this->ActorTclName);
+    }
+  
+  this->GetActor()->GetProperty()->SetRepresentationToSurface();
   this->GetView()->Render();
 }
 
@@ -524,8 +534,13 @@ void vtkPVActorComposite::DrawPoints()
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
   
-  pvApp->BroadcastScript("[[%s GetActor] GetProperty] SetRepresentationToPoints",
-                         this->GetTclName());
+  if (this->ActorTclName)
+    {
+    pvApp->BroadcastScript("[%s GetProperty] SetRepresentationToPoints",
+			   this->ActorTclName);
+    }
+  
+  this->GetActor()->GetProperty()->SetRepresentationToPoints();
   this->GetView()->Render();
 }
 
