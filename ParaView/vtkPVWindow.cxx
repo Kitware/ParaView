@@ -112,6 +112,8 @@ vtkPVWindow::vtkPVWindow()
 vtkPVWindow::~vtkPVWindow()
 {
   this->PrepareForDelete();
+  this->Sources->Delete();
+  this->Sources = NULL;
 }
 
 //----------------------------------------------------------------------------

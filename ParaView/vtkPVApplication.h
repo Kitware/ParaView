@@ -114,7 +114,7 @@ public:
   
 protected:
   vtkPVApplication();
-  ~vtkPVApplication() {};
+  ~vtkPVApplication();
   vtkPVApplication(const vtkPVApplication&) {};
   void operator=(const vtkPVApplication&) {};
   

@@ -42,7 +42,7 @@ class vtkPVRenderView;
 class VTK_EXPORT vtkKWFlyInteractor : public vtkKWInteractor
 {
 public:
-  static vtkKWFlyInteractor* New() {return new vtkKWFlyInteractor;};
+  static vtkKWFlyInteractor* New();
   vtkTypeMacro(vtkKWFlyInteractor,vtkKWInteractor);
 
   // Description:

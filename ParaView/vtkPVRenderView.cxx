@@ -57,7 +57,14 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 //----------------------------------------------------------------------------
 vtkPVRenderView* vtkPVRenderView::New()
 {
-  return new vtkPVRenderView();
+  // First try to create the object from the vtkObjectFactory
+  vtkObject* ret = vtkObjectFactory::CreateInstance("vtkPVRenderView");
+  if(ret)
+    {
+    return (vtkPVRenderView*)ret;
+    }
+  // If the factory was unable to create the object, then create it here.
+  return new vtkPVRenderView;
 }
 
 

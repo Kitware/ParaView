@@ -46,7 +46,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 vtkPVTreeComposite* vtkPVTreeComposite::New()
 {
   // First try to create the object from the vtkObjectFactory
-  vtkObject* ret = vtkObjectFactory::CreateInstance("vtkPVTreeCompssite");
+  vtkObject* ret = vtkObjectFactory::CreateInstance("vtkPVTreeComposite");
   if(ret)
     {
     return (vtkPVTreeComposite*)ret;

@@ -37,6 +37,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkCamera.h"
 #include "vtkActor.h"
 #include "vtkTreeComposite.h"
+#include "vtkObjectFactory.h"
 
 
 int vtkKWCenterOfRotationCommand(ClientData cd, Tcl_Interp *interp,
@@ -96,6 +97,20 @@ vtkKWCenterOfRotation::vtkKWCenterOfRotation()
 
   this->DefaultFlag = 1;
 }
+
+//----------------------------------------------------------------------------
+vtkKWCenterOfRotation *vtkKWCenterOfRotation::New()
+{
+  // First try to create the object from the vtkObjectFactory
+  vtkObject* ret = vtkObjectFactory::CreateInstance("vtkKWCenterOfRotation");
+  if(ret)
+    {
+    return (vtkKWCenterOfRotation*)ret;
+    }
+  // If the factory was unable to create the object, then create it here.
+  return new vtkKWCenterOfRotation;
+}
+
 
 //----------------------------------------------------------------------------
 vtkKWCenterOfRotation::~vtkKWCenterOfRotation()

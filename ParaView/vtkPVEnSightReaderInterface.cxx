@@ -28,6 +28,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 #include "vtkPVEnSightReaderInterface.h"
 #include "vtkGenericEnSightReader.h"
+#include "vtkObjectFactory.h"
 #include <ctype.h>
 
 int vtkPVEnSightReaderInterfaceCommand(ClientData cd, Tcl_Interp *interp,
@@ -43,7 +44,14 @@ vtkPVEnSightReaderInterface::vtkPVEnSightReaderInterface()
 //----------------------------------------------------------------------------
 vtkPVEnSightReaderInterface* vtkPVEnSightReaderInterface::New()
 {
-  return new vtkPVEnSightReaderInterface();
+  // First try to create the object from the vtkObjectFactory
+  vtkObject* ret = vtkObjectFactory::CreateInstance("vtkPVEnSightReaderInterface");
+  if(ret)
+    {
+    return (vtkPVEnSightReaderInterface*)ret;
+    }
+  // If the factory was unable to create the object, then create it here.
+  return new vtkPVEnSightReaderInterface;
 }
 
 //----------------------------------------------------------------------------

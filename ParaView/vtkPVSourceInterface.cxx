@@ -29,6 +29,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkPVSourceInterface.h"
 #include "vtkStringList.h"
 #include "vtkPVExtentTranslator.h"
+#include "vtkObjectFactory.h"
 
 int vtkPVSourceInterfaceCommand(ClientData cd, Tcl_Interp *interp,
 			        int argc, char *argv[]);
@@ -73,7 +74,14 @@ vtkPVSourceInterface::~vtkPVSourceInterface()
 //----------------------------------------------------------------------------
 vtkPVSourceInterface* vtkPVSourceInterface::New()
 {
-  return new vtkPVSourceInterface();
+  // First try to create the object from the vtkObjectFactory
+  vtkObject* ret = vtkObjectFactory::CreateInstance("vtkPVSourceInterface");
+  if(ret)
+    {
+    return (vtkPVSourceInterface*)ret;
+    }
+  // If the factory was unable to create the object, then create it here.
+  return new vtkPVSourceInterface;
 }
 
 //----------------------------------------------------------------------------
@@ -293,6 +301,7 @@ vtkPVSource *vtkPVSourceInterface::CreateCallback()
   pvs->UpdateParameterWidgets();
   
   pvs->Delete();
+  pvd->Delete();
 
   ++this->InstanceCount;
   return pvs;

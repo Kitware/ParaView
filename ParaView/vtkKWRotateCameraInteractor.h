@@ -40,7 +40,7 @@ class vtkKWCenterOfRotation;
 class VTK_EXPORT vtkKWRotateCameraInteractor : public vtkKWInteractor
 {
 public:
-  static vtkKWRotateCameraInteractor* New() {return new vtkKWRotateCameraInteractor;};
+  static vtkKWRotateCameraInteractor* New();
   vtkTypeMacro(vtkKWRotateCameraInteractor,vtkKWInteractor);
 
   // Description:

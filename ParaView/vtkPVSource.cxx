@@ -41,6 +41,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkPVData.h"
 #include "vtkPVSourceInterface.h"
 #include "vtkPVGlyph3D.h"
+#include "vtkObjectFactory.h"
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
 			   int argc, char *argv[]);
@@ -213,7 +214,14 @@ vtkPVSource::~vtkPVSource()
 //----------------------------------------------------------------------------
 vtkPVSource* vtkPVSource::New()
 {
-  return new vtkPVSource();
+  // First try to create the object from the vtkObjectFactory
+  vtkObject* ret = vtkObjectFactory::CreateInstance("vtkPVSource");
+  if(ret)
+    {
+    return (vtkPVSource*)ret;
+    }
+  // If the factory was unable to create the object, then create it here.
+  return new vtkPVSource;
 }
 
 //----------------------------------------------------------------------------

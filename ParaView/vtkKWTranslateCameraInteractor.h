@@ -43,7 +43,7 @@ class vtkPVRenderView;
 class VTK_EXPORT vtkKWTranslateCameraInteractor : public vtkKWInteractor
 {
 public:
-  static vtkKWTranslateCameraInteractor* New() {return new vtkKWTranslateCameraInteractor;};
+  static vtkKWTranslateCameraInteractor* New();
   vtkTypeMacro(vtkKWTranslateCameraInteractor,vtkKWInteractor);
 
   // Description:

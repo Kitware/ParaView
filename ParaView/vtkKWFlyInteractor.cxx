@@ -30,6 +30,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkKWFlyInteractor.h"
 #include "vtkKWToolbar.h"
 #include "vtkPVRenderView.h"
+#include "vtkObjectFactory.h"
 
 int vtkKWFlyInteractorCommand(ClientData cd, Tcl_Interp *interp,
                        int argc, char *argv[]);
@@ -52,6 +53,20 @@ vtkKWFlyInteractor::vtkKWFlyInteractor()
   this->RenderTkWindow = NULL;
   this->PlaneCursor = NULL;
 }
+
+//----------------------------------------------------------------------------
+vtkKWFlyInteractor *vtkKWFlyInteractor::New()
+{
+  // First try to create the object from the vtkObjectFactory
+  vtkObject* ret = vtkObjectFactory::CreateInstance("vtkKWFlyInteractor");
+  if(ret)
+    {
+    return (vtkKWFlyInteractor*)ret;
+    }
+  // If the factory was unable to create the object, then create it here.
+  return new vtkKWFlyInteractor;
+}
+
 
 //----------------------------------------------------------------------------
 vtkKWFlyInteractor::~vtkKWFlyInteractor()

@@ -35,6 +35,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkAxes.h"
 #include "vtkPolyDataMapper.h"
 #include "vtkActor.h"
+#include "vtkObjectFactory.h"
 
 
 
@@ -56,6 +57,20 @@ vtkCameraInteractor::vtkCameraInteractor()
   //this->CenterActor->GetProperty()->SetAmbient(0.6);
   this->CenterActor->VisibilityOff();
 }
+
+//----------------------------------------------------------------------------
+vtkCameraInteractor *vtkCameraInteractor::New()
+{
+  // First try to create the object from the vtkObjectFactory
+  vtkObject* ret = vtkObjectFactory::CreateInstance("vtkCameraInteractor");
+  if(ret)
+    {
+    return (vtkCameraInteractor*)ret;
+    }
+  // If the factory was unable to create the object, then create it here.
+  return new vtkCameraInteractor;
+}
+
 
 //----------------------------------------------------------------------------
 vtkCameraInteractor::~vtkCameraInteractor()

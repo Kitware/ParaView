@@ -29,6 +29,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkKWTranslateCameraInteractor.h"
 #include "vtkPVRenderView.h"
 #include "vtkKWWindow.h"
+#include "vtkObjectFactory.h"
 
 int vtkKWTranslateCameraInteractorCommand(ClientData cd, Tcl_Interp *interp,
                        int argc, char *argv[]);
@@ -49,6 +50,20 @@ vtkKWTranslateCameraInteractor::vtkKWTranslateCameraInteractor()
   this->ZoomCursorName = NULL;
   this->CursorState = 0;
 }
+
+//----------------------------------------------------------------------------
+vtkKWTranslateCameraInteractor *vtkKWTranslateCameraInteractor::New()
+{
+  // First try to create the object from the vtkObjectFactory
+  vtkObject* ret = vtkObjectFactory::CreateInstance("vtkKWTranslateCameraInteractor");
+  if(ret)
+    {
+    return (vtkKWTranslateCameraInteractor*)ret;
+    }
+  // If the factory was unable to create the object, then create it here.
+  return new vtkKWTranslateCameraInteractor;
+}
+
 
 //----------------------------------------------------------------------------
 vtkKWTranslateCameraInteractor::~vtkKWTranslateCameraInteractor()

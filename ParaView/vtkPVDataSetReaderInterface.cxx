@@ -28,6 +28,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 #include "vtkPVDataSetReaderInterface.h"
 #include "vtkDataSetReader.h"
+#include "vtkObjectFactory.h"
 #include <ctype.h>
 
 int vtkPVDataSetReaderInterfaceCommand(ClientData cd, Tcl_Interp *interp,
@@ -43,8 +44,16 @@ vtkPVDataSetReaderInterface::vtkPVDataSetReaderInterface()
 //----------------------------------------------------------------------------
 vtkPVDataSetReaderInterface* vtkPVDataSetReaderInterface::New()
 {
-  return new vtkPVDataSetReaderInterface();
+  // First try to create the object from the vtkObjectFactory
+  vtkObject* ret = vtkObjectFactory::CreateInstance("vtkPVDataSetReaderInterface");
+  if(ret)
+    {
+    return (vtkPVDataSetReaderInterface*)ret;
+    }
+  // If the factory was unable to create the object, then create it here.
+  return new vtkPVDataSetReaderInterface;
 }
+
 
 //----------------------------------------------------------------------------
 vtkPVSource *vtkPVDataSetReaderInterface::CreateCallback()

@@ -128,9 +128,6 @@ Tcl_Interp *vtkPVInitializeTcl()
 
 
 
-#include "vtkOutputWindow.h"
-
-
 // Each process starts with this method.  One process is designated as "master" 
 // and starts the application.  The other processes are slaves to the application.
 void Process_Init(vtkMultiProcessController *controller, void *arg )
@@ -141,8 +138,6 @@ void Process_Init(vtkMultiProcessController *controller, void *arg )
   myId = controller->GetLocalProcessId();
   numProcs = controller->GetNumberOfProcesses();
 
-  vtkOutputWindow::GetInstance()->PromptUserOn();
-  
   if (myId ==  0)
     { // The last process is for UI.
 

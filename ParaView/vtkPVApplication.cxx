@@ -109,6 +109,12 @@ vtkPVApplication::vtkPVApplication()
   //strcpy(this->TclName,"Application");
 }
 
+//----------------------------------------------------------------------------
+vtkPVApplication::~vtkPVApplication()
+{
+  this->SetController(NULL);
+}
+
 
 //----------------------------------------------------------------------------
 void vtkPVApplication::RemoteScript(int id, char *format, ...)

@@ -32,6 +32,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkPVApplication.h"
 #include "vtkPVActorComposite.h"
 #include "vtkKWMenuButton.h"
+#include "vtkObjectFactory.h"
 
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
@@ -53,17 +54,32 @@ vtkPVData::vtkPVData()
 //----------------------------------------------------------------------------
 vtkPVData::~vtkPVData()
 {
+  // Get rid of the circular reference created by the extent translator.
+  if (this->VTKDataTclName)
+    {
+    this->GetPVApplication()->BroadcastScript("%s SetExtentTranslator {}",
+					      this->VTKDataTclName);
+    }  
+    
   this->SetVTKData(NULL, NULL);
   this->SetPVSource(NULL);
 
   this->PVSourceCollection->Delete();
   this->PVSourceCollection = NULL;  
+  
 }
 
 //----------------------------------------------------------------------------
 vtkPVData* vtkPVData::New()
 {
-  return new vtkPVData();
+  // First try to create the object from the vtkObjectFactory
+  vtkObject* ret = vtkObjectFactory::CreateInstance("vtkPVData");
+  if(ret)
+    {
+    return (vtkPVData*)ret;
+    }
+  // If the factory was unable to create the object, then create it here.
+  return new vtkPVData;
 }
 
 
@@ -219,8 +235,8 @@ int vtkPVData::GetNumberOfPoints()
 }
 
 //----------------------------------------------------------------------------
-// MAYBE WE SHOULD NOT REFERENCE COUNT HERE BECAUSE NO ONE BUT THE 
-// SOURCE WIDGET WILL REFERENCE THE DATA WIDGET.
+// WE DO NOT REFERENCE COUNT HERE BECAUSE OF CIRCULAR REFERENCES.
+// THE SOURCE OWNS THE DATA.
 void vtkPVData::SetPVSource(vtkPVSource *source)
 {
   if (this->PVSource == source)
@@ -229,20 +245,12 @@ void vtkPVData::SetPVSource(vtkPVSource *source)
     }
   this->Modified();
 
-  if (this->PVSource)
-    {
-    vtkPVSource *tmp = this->PVSource;
-    this->PVSource = NULL;
-    tmp->UnRegister(this);
-    }
-  if (source)
-    {
-    this->PVSource = source;
-    source->Register(this);
-    }
+  this->PVSource = source;
 }
 
 //----------------------------------------------------------------------------
+// Reference counting here should not be a problem.
+// (Unless we have a circular pipeline.)
 void vtkPVData::AddPVSourceToUsers(vtkPVSource *s)
 {
   this->PVSourceCollection->AddItem(s);

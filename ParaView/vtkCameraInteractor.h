@@ -49,7 +49,7 @@ class vtkActor;
 class VTK_EXPORT vtkCameraInteractor : public vtkInteractor
 {
  public:
-  static vtkCameraInteractor *New() {return new vtkCameraInteractor;};
+  static vtkCameraInteractor *New();
   vtkTypeMacro(vtkCameraInteractor,vtkInteractor);
   void PrintSelf(ostream& os, vtkIndent indent);
 

@@ -48,7 +48,7 @@ class vtkPVWorldPointPicker;
 class VTK_EXPORT vtkKWCenterOfRotation : public vtkKWInteractor
 {
 public:
-  static vtkKWCenterOfRotation* New() {return new vtkKWCenterOfRotation;};
+  static vtkKWCenterOfRotation* New();
   vtkTypeMacro(vtkKWCenterOfRotation,vtkKWInteractor);
 
   // Description:

@@ -27,6 +27,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 =========================================================================*/
 #include "vtkPVMethodInterface.h"
 #include "vtkStringList.h"
+#include "vtkObjectFactory.h"
 
 
 //----------------------------------------------------------------------------
@@ -66,7 +67,14 @@ vtkPVMethodInterface::~vtkPVMethodInterface()
 //----------------------------------------------------------------------------
 vtkPVMethodInterface* vtkPVMethodInterface::New()
 {
-  return new vtkPVMethodInterface();
+  // First try to create the object from the vtkObjectFactory
+  vtkObject* ret = vtkObjectFactory::CreateInstance("vtkPVMethodInterface");
+  if(ret)
+    {
+    return (vtkPVMethodInterface*)ret;
+    }
+  // If the factory was unable to create the object, then create it here.
+  return new vtkPVMethodInterface;
 }
 
 //----------------------------------------------------------------------------

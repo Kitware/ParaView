@@ -30,6 +30,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkKWToolbar.h"
 #include "vtkKWCenterOfRotation.h"
 #include "vtkPVRenderView.h"
+#include "vtkObjectFactory.h"
 
 int vtkKWRotateCameraInteractorCommand(ClientData cd, Tcl_Interp *interp,
                        int argc, char *argv[]);
@@ -62,6 +63,20 @@ vtkKWRotateCameraInteractor::vtkKWRotateCameraInteractor()
 
   this->CursorState = 0;
 }
+
+//----------------------------------------------------------------------------
+vtkKWRotateCameraInteractor *vtkKWRotateCameraInteractor::New()
+{
+  // First try to create the object from the vtkObjectFactory
+  vtkObject* ret = vtkObjectFactory::CreateInstance("vtkKWRotateCameraInteractor");
+  if(ret)
+    {
+    return (vtkKWRotateCameraInteractor*)ret;
+    }
+  // If the factory was unable to create the object, then create it here.
+  return new vtkKWRotateCameraInteractor;
+}
+
 
 //----------------------------------------------------------------------------
 vtkKWRotateCameraInteractor::~vtkKWRotateCameraInteractor()

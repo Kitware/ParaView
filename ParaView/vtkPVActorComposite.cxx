@@ -274,8 +274,17 @@ vtkPVActorComposite::~vtkPVActorComposite()
   delete [] this->ScalarBarTclName;
   this->ScalarBarTclName = NULL;
   
-  delete [] this->CubeAxesTclName;
-  this->CubeAxesTclName = NULL;
+  if (this->ScalarBarTclName)
+    {
+    pvApp->BroadcastScript("%s Delete", this->ScalarBarTclName);
+    this->SetScalarBarTclName(NULL);
+    }
+  
+  if (this->CubeAxesTclName)
+    {
+    pvApp->BroadcastScript("%s Delete", this->CubeAxesTclName);
+    this->SetCubeAxesTclName(NULL);
+    }
   
   pvApp->BroadcastScript("%s Delete", this->MapperTclName);
   this->SetMapperTclName(NULL);
@@ -301,6 +310,12 @@ vtkPVActorComposite::~vtkPVActorComposite()
     {
     pvApp->BroadcastScript("%s Delete", this->AppendPolyDataTclName);
     this->SetAppendPolyDataTclName(NULL);
+    }
+  
+  if (this->LODDeciTclName)
+    {
+    pvApp->BroadcastScript("%s Delete", this->LODDeciTclName);
+    this->SetLODDeciTclName(NULL);
     }
   
   this->ScalarBarCheck->Delete();
@@ -1013,6 +1028,8 @@ void vtkPVActorComposite::Initialize()
 }
 
 //----------------------------------------------------------------------------
+// No reference counting because the PVData owns this actor composite.
+// In fact is it the same object.
 void vtkPVActorComposite::SetInput(vtkPVData *data)
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
@@ -1024,21 +1041,7 @@ void vtkPVActorComposite::SetInput(vtkPVData *data)
     }
   this->Modified();
   
-  if (this->PVData)
-    {
-    // extra careful for circular references
-    vtkPVData *tmp = this->PVData;
-    this->PVData = NULL;
-    tmp->UnRegister(this);
-    }
-  
-  if (data)
-    {
-    this->PVData = data;
-    data->Register(this);
-    vtkDataTclName = data->GetVTKDataTclName();
-    }
-    
+  this->PVData = data;
 }
 
 //----------------------------------------------------------------------------
