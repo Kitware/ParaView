@@ -32,9 +32,6 @@
 #include "vtkOutputWindow.h"
 #include "vtkString.h"
 #include "vtkTclUtil.h"
-#ifndef DO_NOT_BUILD_XML_RW
-#include "vtkXMLIOBase.h"
-#endif
 
 #include <stdarg.h>
 
@@ -62,7 +59,7 @@ int vtkKWApplication::WidgetVisibility = 1;
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.161");
+vtkCxxRevisionMacro(vtkKWApplication, "1.162");
 
 extern "C" int Vtktcl_Init(Tcl_Interp *interp);
 extern "C" int Vtkkwwidgetstcl_Init(Tcl_Interp *interp);
@@ -1488,10 +1485,6 @@ void vtkKWApplication::SetCharacterEncoding(int val)
 
   this->CharacterEncoding = val;
   
-#ifndef DO_NOT_BUILD_XML_RW
-  vtkXMLIOBase::SetDefaultCharacterEncoding(this->CharacterEncoding);
-#endif
-
   this->Modified();
 }
 
