@@ -221,7 +221,7 @@ static unsigned char image_prev[] =
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.629");
+vtkCxxRevisionMacro(vtkPVWindow, "1.630");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -606,13 +606,7 @@ void vtkPVWindow::PrepareForDelete()
     this->InteractorToolbar->Delete();
     this->InteractorToolbar = NULL;
     }
-  
-  if (this->AnimationToolbar)
-    {
-    this->AnimationToolbar->Delete();
-    this->AnimationToolbar = NULL;
-    }
-  
+    
   if (this->PlayButton)
     {
     this->PlayButton->Delete();
@@ -649,6 +643,12 @@ void vtkPVWindow::PrepareForDelete()
     this->GotoNextButton = NULL;
     }
   
+  if (this->AnimationToolbar)
+    {
+    this->AnimationToolbar->Delete();
+    this->AnimationToolbar = NULL;
+    }
+
   if (this->CameraStyle3D)
     {
     this->CameraStyle3D->Delete();
@@ -3722,24 +3722,25 @@ void vtkPVWindow::AddPVSource(const char* listname, vtkPVSource *pvs)
   if (col && col->IsItemPresent(pvs) == 0)
     {
     col->AddItem(pvs);
-    }
-  vtkPVReaderModule* clone = vtkPVReaderModule::SafeDownCast(pvs);
-  int numOfTimeSteps;
-  if (clone && (numOfTimeSteps = clone->GetNumberOfTimeSteps()) > 0)
-    {
-    int i = this->AnimationInterface->IsAnimationValid();
-    
-    vtkPVAnimationInterfaceEntry* entry = this->AnimationInterface->GetEmptySourceItem();
-    entry->SetPVSource(clone);
-    entry->SetCurrentMethodIndex(0);
-    if (i == 0)
+
+    vtkPVReaderModule* clone = vtkPVReaderModule::SafeDownCast(pvs);
+    int numOfTimeSteps;
+    if (this->AnimationInterface && clone && (numOfTimeSteps = clone->GetNumberOfTimeSteps()) > 1)
       {
-      // implying that is the only animation entry. In which case we set the number of
-      // frames to the number of timesteps.
-      this->AnimationInterface->SetNumberOfFrames(numOfTimeSteps);
+      int i = this->AnimationInterface->IsAnimationValid();
+
+      vtkPVAnimationInterfaceEntry* entry = this->AnimationInterface->GetEmptySourceItem();
+      entry->SetPVSource(clone);
+      entry->SetCurrentMethodIndex(0);
+      if (i == 0)
+        {
+        // implying that is the only animation entry. In which case we set the number of
+        // frames to the number of timesteps.
+        this->AnimationInterface->SetNumberOfFrames(numOfTimeSteps);
+        }
+      this->AnimationInterface->UpdateEntries();
+      this->ShowToolbar(this->AnimationToolbar,"Animation");
       }
-    this->AnimationInterface->UpdateEntries();
-    this->ShowToolbar(this->AnimationToolbar,"Animation");
     }
 }
 
