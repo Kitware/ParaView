@@ -23,7 +23,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLineSourceWidget);
-vtkCxxRevisionMacro(vtkPVLineSourceWidget, "1.14");
+vtkCxxRevisionMacro(vtkPVLineSourceWidget, "1.15");
 
 int vtkPVLineSourceWidgetCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -152,7 +152,7 @@ void vtkPVLineSourceWidget::SaveInBatchScript(ofstream *file)
 
   *file << endl;
   *file << "set pvTemp" <<  this->OutputID.ID
-        << " [$proxyManager NewProxy source LineSource]"
+        << " [$proxyManager NewProxy sources LineSource]"
         << endl;
   this->LineWidget->GetPoint1(pt);
   *file << "  [$pvTemp" << this->OutputID.ID << " GetProperty Point1] "
@@ -162,6 +162,7 @@ void vtkPVLineSourceWidget::SaveInBatchScript(ofstream *file)
         << "SetElements3 " << pt[0] << " " << pt[1] << " " << pt[2] << endl;
   *file << "  [$pvTemp" << this->OutputID.ID << " GetProperty Resolution] "
         << "SetElements1 " << this->LineWidget->GetResolution() << endl;
+  *file << "  $pvTemp" << this->OutputID.ID << " UpdateVTKObjects" << endl;
   *file << endl;
 }
 

@@ -29,7 +29,7 @@ int vtkPVPointSourceWidget::InstanceCount = 0;
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPointSourceWidget);
-vtkCxxRevisionMacro(vtkPVPointSourceWidget, "1.19");
+vtkCxxRevisionMacro(vtkPVPointSourceWidget, "1.20");
 
 int vtkPVPointSourceWidgetCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -102,7 +102,7 @@ void vtkPVPointSourceWidget::SaveInBatchScript(ofstream *file)
 
   *file << endl;
   *file << "set pvTemp" <<  this->OutputID.ID
-        << " [$proxyManager NewProxy source PointSource]"
+        << " [$proxyManager NewProxy sources PointSource]"
         << endl;
   this->PointWidget->GetPosition(pt);
   *file << "  [$pvTemp" << this->OutputID.ID << " GetProperty Center] "
@@ -113,6 +113,7 @@ void vtkPVPointSourceWidget::SaveInBatchScript(ofstream *file)
   this->RadiusWidget->GetValue(&rad, 1);
   *file << "  [$pvTemp" << this->OutputID.ID << " GetProperty Radius] "
         << "SetElements1 " << rad << endl;
+  *file << "  $pvTemp" << this->OutputID.ID << " UpdateVTKObjects" << endl;
   *file << endl;
 }
 
