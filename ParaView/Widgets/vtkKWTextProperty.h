@@ -133,10 +133,10 @@ public:
   virtual void CopyValuesFrom(vtkKWTextProperty*);
 
   // GUI components callbacks
-  void ChangeColorButtonCallback(float, float, float);
-  void SetColor(float, float, float);
-  void SetColor(float *v) { this->SetColor(v[0], v[1], v[2]); };
-  float* GetColor();
+  void ChangeColorButtonCallback(double, double, double);
+  void SetColor(double, double, double);
+  void SetColor(double *v) { this->SetColor(v[0], v[1], v[2]); };
+  double* GetColor();
   void FontFamilyCallback();
   void SetFontFamily(int);
   void BoldCallback();

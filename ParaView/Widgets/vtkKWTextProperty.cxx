@@ -100,7 +100,7 @@ static unsigned char image_copy[] =
 
 // ----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWTextProperty);
-vtkCxxRevisionMacro(vtkKWTextProperty, "1.29");
+vtkCxxRevisionMacro(vtkKWTextProperty, "1.30");
 
 int vtkKWTextPropertyCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -560,9 +560,9 @@ void vtkKWTextProperty::SetShowColor(int _arg)
 }
 
 // ----------------------------------------------------------------------------
-void vtkKWTextProperty::SetColor(float r, float g, float b) 
+void vtkKWTextProperty::SetColor(double r, double g, double b) 
 {
-  float *rgb = this->GetColor();
+  double *rgb = this->GetColor();
   if (rgb[0] == r && rgb[1] == g && rgb[2] == b)
     {
     return;
@@ -579,7 +579,7 @@ void vtkKWTextProperty::SetColor(float r, float g, float b)
 
   this->UpdateColorButton();
 
-  this->AddTraceEntry("$kw(%s) SetColor %f %f %f", this->GetTclName(), r,g,b);
+  this->AddTraceEntry("$kw(%s) SetColor %lf %lf %lf", this->GetTclName(), r,g,b);
 
   if (this->ColorChangedCommand)
     {
@@ -593,7 +593,7 @@ void vtkKWTextProperty::SetColor(float r, float g, float b)
 }
 
 // ----------------------------------------------------------------------------
-float* vtkKWTextProperty::GetColor() 
+double* vtkKWTextProperty::GetColor() 
 {
   int use_actor_color = 0;
   if (!this->TextProperty)
@@ -606,7 +606,7 @@ float* vtkKWTextProperty::GetColor()
     // vtkOpenGL...TextMapper). The default vtkTextProperty color is
     // -1, -1, -1 so that the mappers know that they have to use
     // the actor's color instead.
-    float *rgb = this->TextProperty->GetColor();
+    double *rgb = this->TextProperty->GetColor();
     if (rgb[0] < 0.0 && rgb[1] < 0.0 && rgb[2] < 0.0)
       {
       use_actor_color = 1;
@@ -641,7 +641,7 @@ void vtkKWTextProperty::UpdateColorButton()
 }
 
 // ----------------------------------------------------------------------------
-void vtkKWTextProperty::ChangeColorButtonCallback(float r, float g, float b) 
+void vtkKWTextProperty::ChangeColorButtonCallback(double r, double g, double b) 
 {
   this->SetColor(r, g, b);
 }
@@ -1082,7 +1082,7 @@ void vtkKWTextProperty::SaveInTclScript(ofstream *file,
 
   if (tprop)
     {
-    float *rgb = this->GetColor();
+    double *rgb = this->GetColor();
     if (tabify)
       {
       *file << "\t";

@@ -139,10 +139,10 @@ public:
   virtual void SetCornerAnnotationVisibility(int v);
   virtual int  GetCornerAnnotationVisibility();
   vtkBooleanMacro(CornerAnnotationVisibility, int);
-  virtual void SetCornerAnnotationColor(float r, float g, float b);
-  virtual void SetCornerAnnotationColor(float *rgb)
+  virtual void SetCornerAnnotationColor(double r, double g, double b);
+  virtual void SetCornerAnnotationColor(double *rgb)
     { this->SetCornerAnnotationColor(rgb[0], rgb[1], rgb[2]); };
-  virtual float* GetCornerAnnotationColor();
+  virtual double* GetCornerAnnotationColor();
   vtkGetObjectMacro(CornerAnnotation, vtkCornerAnnotation);
 
   // Description:
@@ -150,10 +150,10 @@ public:
   virtual void SetHeaderAnnotationVisibility(int v);
   virtual int  GetHeaderAnnotationVisibility();
   vtkBooleanMacro(HeaderAnnotationVisibility, int);
-  virtual void SetHeaderAnnotationColor(float r, float g, float b);
-  virtual void SetHeaderAnnotationColor(float *rgb)
+  virtual void SetHeaderAnnotationColor(double r, double g, double b);
+  virtual void SetHeaderAnnotationColor(double *rgb)
     { this->SetHeaderAnnotationColor(rgb[0], rgb[1], rgb[2]); };
-  virtual float* GetHeaderAnnotationColor();
+  virtual double* GetHeaderAnnotationColor();
   virtual void SetHeaderAnnotationText(const char*);
   virtual char* GetHeaderAnnotationText();
   vtkGetObjectMacro(HeaderAnnotation, vtkTextActor);

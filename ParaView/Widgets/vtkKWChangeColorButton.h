@@ -33,9 +33,9 @@ public:
 
   // Description:
   // Set/Get the current color
-  void SetColor(float c[3]) {this->SetColor(c[0], c[1], c[2]);};
-  void SetColor(float r, float g, float b);
-  virtual float *GetColor() {return this->Color;};
+  void SetColor(double c[3]) {this->SetColor(c[0], c[1], c[2]);};
+  void SetColor(double r, double g, double b);
+  virtual double *GetColor() {return this->Color;};
 
   // Description:
   // Set the label to be used on the button.
@@ -107,7 +107,7 @@ protected:
   char        *Command;
   char        *Text;
   char        *DialogText;
-  float       Color[3];
+  double      Color[3];
   int         LabelAfterColor;
   int         LabelOutsideButton;
 

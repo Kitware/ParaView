@@ -86,10 +86,10 @@ public:
 
   // Description:
   // Change the color of the annotation
-  virtual void SetTextColor(float r, float g, float b);
-  virtual void SetTextColor(float *rgb)
+  virtual void SetTextColor(double r, double g, double b);
+  virtual void SetTextColor(double *rgb)
                { this->SetTextColor(rgb[0], rgb[1], rgb[2]); }
-  virtual float *GetTextColor();
+  virtual double *GetTextColor();
 
   // Description:
   // Set/Get the maximum line height.

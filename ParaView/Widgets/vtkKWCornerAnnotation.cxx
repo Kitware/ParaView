@@ -40,7 +40,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWCornerAnnotation );
-vtkCxxRevisionMacro(vtkKWCornerAnnotation, "1.73");
+vtkCxxRevisionMacro(vtkKWCornerAnnotation, "1.74");
 
 int vtkKWCornerAnnotationCommand(ClientData cd, Tcl_Interp *interp,
                                  int argc, char *argv[]);
@@ -619,7 +619,7 @@ void vtkKWCornerAnnotation::MaximumLineHeightEndCallback()
 }
 
 //----------------------------------------------------------------------------
-float *vtkKWCornerAnnotation::GetTextColor() 
+double *vtkKWCornerAnnotation::GetTextColor() 
 {
   if (this->TextPropertyWidget)
     {
@@ -630,12 +630,12 @@ float *vtkKWCornerAnnotation::GetTextColor()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWCornerAnnotation::SetTextColor(float r, float g, float b)
+void vtkKWCornerAnnotation::SetTextColor(double r, double g, double b)
 {
   // The following call with eventually trigger the TextPropertyCallback 
   // (see Create()).
 
-  float *rgb = this->GetTextColor();
+  double *rgb = this->GetTextColor();
 
   if (rgb && 
       (rgb[0] != r || rgb[1] != g || rgb[2] != b) &&
@@ -764,7 +764,7 @@ void vtkKWCornerAnnotation::SerializeToken(istream& is, const char *token)
 void vtkKWCornerAnnotation::SerializeRevision(ostream& os, vtkIndent indent)
 {
   os << indent << "vtkKWCornerAnnotation ";
-  this->ExtractRevision(os,"$Revision: 1.73 $");
+  this->ExtractRevision(os,"$Revision: 1.74 $");
 }
 
 //----------------------------------------------------------------------------

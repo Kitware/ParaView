@@ -25,7 +25,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWWidget );
-vtkCxxRevisionMacro(vtkKWWidget, "1.88");
+vtkCxxRevisionMacro(vtkKWWidget, "1.89");
 
 int vtkKWWidgetCommand(ClientData cd, Tcl_Interp *interp,
                        int argc, char *argv[]);
@@ -326,7 +326,7 @@ void vtkKWWidget::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkKWWidget ";
-  this->ExtractRevision(os,"$Revision: 1.88 $");
+  this->ExtractRevision(os,"$Revision: 1.89 $");
 }
 
 //----------------------------------------------------------------------------
@@ -493,18 +493,18 @@ void vtkKWWidget::SetBackgroundColor(int r, int g, int b)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWWidget::GetBackgroundColor(float *r, float *g, float *b)
+void vtkKWWidget::GetBackgroundColor(double *r, double *g, double *b)
 {
   int ir, ig, ib;
   this->GetBackgroundColor(&ir, &ig, &ib);
 
-  *r = (float)ir / 255.0;
-  *g = (float)ig / 255.0;
-  *b = (float)ib / 255.0;
+  *r = (double)ir / 255.0;
+  *g = (double)ig / 255.0;
+  *b = (double)ib / 255.0;
 }
 
 //----------------------------------------------------------------------------
-void vtkKWWidget::SetBackgroundColor(float r, float g, float b)
+void vtkKWWidget::SetBackgroundColor(double r, double g, double b)
 {
   char color[10];
   sprintf(color, "#%02x%02x%02x", 
@@ -530,18 +530,18 @@ void vtkKWWidget::SetForegroundColor(int r, int g, int b)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWWidget::GetForegroundColor(float *r, float *g, float *b)
+void vtkKWWidget::GetForegroundColor(double *r, double *g, double *b)
 {
   int ir, ig, ib;
   this->GetForegroundColor(&ir, &ig, &ib);
 
-  *r = (float)ir / 255.0;
-  *g = (float)ig / 255.0;
-  *b = (float)ib / 255.0;
+  *r = (double)ir / 255.0;
+  *g = (double)ig / 255.0;
+  *b = (double)ib / 255.0;
 }
 
 //----------------------------------------------------------------------------
-void vtkKWWidget::SetForegroundColor(float r, float g, float b)
+void vtkKWWidget::SetForegroundColor(double r, double g, double b)
 {
   char color[10];
   sprintf(color, "#%02x%02x%02x", 

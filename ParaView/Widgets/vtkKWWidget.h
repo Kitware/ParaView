@@ -150,12 +150,12 @@ public:
   // of the widget (either using 0 -> 255 int, or normalized 0.0 -> 1.0 float).
   void GetBackgroundColor(int *r, int *g, int *b);
   void SetBackgroundColor(int r, int g, int b);
-  void GetBackgroundColor(float *r, float *g, float *b);
-  void SetBackgroundColor(float r, float g, float b);
+  void GetBackgroundColor(double *r, double *g, double *b);
+  void SetBackgroundColor(double r, double g, double b);
   void GetForegroundColor(int *r, int *g, int *b);
   void SetForegroundColor(int r, int g, int b);
-  void GetForegroundColor(float *r, float *g, float *b);
-  void SetForegroundColor(float r, float g, float b);
+  void GetForegroundColor(double *r, double *g, double *b);
+  void SetForegroundColor(double r, double g, double b);
   
   // Description:
   // Query if widget has a given Tk configuration option (ex: "-state"), 

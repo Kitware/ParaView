@@ -281,16 +281,16 @@ class VTK_EXPORT vtkKWView : public vtkKWWidget
 
   // Description:
   // Change the color of the annotation text
-  virtual void SetHeaderTextColor( float r, float g, float b );
-  virtual void SetHeaderTextColor( float rgb[3] )
+  virtual void SetHeaderTextColor( double r, double g, double b );
+  virtual void SetHeaderTextColor( double rgb[3] )
     { this->SetHeaderTextColor( rgb[0], rgb[1], rgb[2] ); }
-  virtual void GetHeaderTextColor( float *r, float *g, float *b );
-  virtual float *GetHeaderTextColor();
+  virtual void GetHeaderTextColor( double *r, double *g, double *b );
+  virtual double *GetHeaderTextColor();
 
   // Description:
   // Change the color of the corner annotation text
-  virtual void SetCornerTextColor( float rgb[3] );
-  virtual float *GetCornerTextColor();
+  virtual void SetCornerTextColor( double rgb[3] );
+  virtual double *GetCornerTextColor();
 
   // Description:
   // Turn interactivity on / off - used for UI components that want 

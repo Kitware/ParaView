@@ -19,7 +19,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWChangeColorButton);
-vtkCxxRevisionMacro(vtkKWChangeColorButton, "1.41");
+vtkCxxRevisionMacro(vtkKWChangeColorButton, "1.42");
 
 int vtkKWChangeColorButtonCommand(ClientData cd, Tcl_Interp *interp,
                                   int argc, char *argv[]);
@@ -73,7 +73,7 @@ vtkKWChangeColorButton::~vtkKWChangeColorButton()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWChangeColorButton::SetColor(float r, float g, float b)
+void vtkKWChangeColorButton::SetColor(double r, double g, double b)
 {
   if ( this->Color[0] == r && this->Color[1] == g && this->Color[2] == b )
     {
@@ -414,15 +414,15 @@ void vtkKWChangeColorButton::QueryUserForColor()
     tmp[1] = result[6];
     sscanf(tmp, "%x", &b);
     
-    this->Color[0] = (float)r / 255.0;
-    this->Color[1] = (float)g / 255.0;
-    this->Color[2] = (float)b / 255.0;
+    this->Color[0] = (double)r / 255.0;
+    this->Color[1] = (double)g / 255.0;
+    this->Color[2] = (double)b / 255.0;
 
     this->UpdateColorButton();
 
     if ( this->Command )
       {
-      this->Script("eval %s %f %f %f", 
+      this->Script("eval %s %lf %lf %lf", 
                    this->Command, 
                    this->Color[0], this->Color[1], this->Color[2]);
       }
@@ -457,14 +457,14 @@ void vtkKWChangeColorButton::SerializeSelf(ostream& os, vtkIndent indent)
 //----------------------------------------------------------------------------
 void vtkKWChangeColorButton::SerializeToken(istream& is, const char *token)
 {
-  float clr[3];
+  double clr[3];
   if (!strcmp(token,"Color"))
     {
     is >> clr[0] >> clr[1] >> clr[2];
     this->SetColor(clr);
     if ( this->Command )
       {
-      this->Script("eval %s %f %f %f", this->Command, 
+      this->Script("eval %s %lf %lf %lf", this->Command, 
                    clr[0], clr[1], clr[2]);
       }
     return;
@@ -477,7 +477,7 @@ void vtkKWChangeColorButton::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWChangeColorButton ";
-  this->ExtractRevision(os,"$Revision: 1.41 $");
+  this->ExtractRevision(os,"$Revision: 1.42 $");
 }
 
 //----------------------------------------------------------------------------

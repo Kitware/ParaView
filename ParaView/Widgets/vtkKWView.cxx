@@ -84,7 +84,7 @@ Bool vtkKWRenderViewPredProc(Display *vtkNotUsed(disp), XEvent *event,
 }
 #endif
 
-vtkCxxRevisionMacro(vtkKWView, "1.120");
+vtkCxxRevisionMacro(vtkKWView, "1.121");
 
 //----------------------------------------------------------------------------
 int vtkKWViewCommand(ClientData cd, Tcl_Interp *interp,
@@ -521,7 +521,7 @@ void vtkKWView::CreateViewProperties()
   this->Script("pack %s -padx 2 -pady 2 -fill x -expand yes -anchor w",
                this->ColorsFrame->GetWidgetName());
 
-  float c[3];  c[0] = 0.0;  c[1] = 0.0;  c[2] = 0.0;
+  double c[3];  c[0] = 0.0;  c[1] = 0.0;  c[2] = 0.0;
   this->BackgroundColor->SetParent( this->ColorsFrame->GetFrame() );
   this->BackgroundColor->SetColor( c );
   this->BackgroundColor->SetText("Set Background Color");
@@ -536,13 +536,13 @@ void vtkKWView::CreateViewProperties()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWView::SetHeaderTextColor( float r, float g, float b )
+void vtkKWView::SetHeaderTextColor( double r, double g, double b )
 {
   if ( r < 0 || g < 0 || b < 0 )
     {
     return;
     }
-  float *ff = this->GetHeaderTextColor();
+  double *ff = this->GetHeaderTextColor();
   if ( ff[0] == r && ff[1] == g && ff[2] == b )
     {
     return;
@@ -558,15 +558,15 @@ void vtkKWView::SetHeaderTextColor( float r, float g, float b )
 }
 
 //----------------------------------------------------------------------------
-float* vtkKWView::GetHeaderTextColor()
+double* vtkKWView::GetHeaderTextColor()
 {
   return this->HeaderProp->GetProperty()->GetColor( );
 }
 
 //----------------------------------------------------------------------------
-void vtkKWView::GetHeaderTextColor( float *r, float *g, float *b )
+void vtkKWView::GetHeaderTextColor( double *r, double *g, double *b )
 {
-  float *ff = this->GetHeaderTextColor();
+  double *ff = this->GetHeaderTextColor();
   *r = ff[0];
   *g = ff[1];
   *b = ff[2];
@@ -1550,7 +1550,7 @@ void vtkKWView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWView ";
-  this->ExtractRevision(os,"$Revision: 1.120 $");
+  this->ExtractRevision(os,"$Revision: 1.121 $");
 }
 
 //----------------------------------------------------------------------------
@@ -1643,7 +1643,7 @@ void vtkKWView::GetBackgroundColor( double *r, double *g, double *b )
 
 
 //----------------------------------------------------------------------------
-void vtkKWView::SetCornerTextColor( float rgb[3] )
+void vtkKWView::SetCornerTextColor( double rgb[3] )
 {
   if ( rgb[0] < 0 || rgb[1] < 0 || rgb[2] < 0 )
     {
@@ -1654,7 +1654,7 @@ void vtkKWView::SetCornerTextColor( float rgb[3] )
 }
 
 //----------------------------------------------------------------------------
-float *vtkKWView::GetCornerTextColor()
+double *vtkKWView::GetCornerTextColor()
 {
   return this->CornerAnnotation->GetTextColor();
 }

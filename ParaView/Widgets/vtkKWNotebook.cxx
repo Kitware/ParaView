@@ -59,7 +59,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWNotebook);
-vtkCxxRevisionMacro(vtkKWNotebook, "1.59");
+vtkCxxRevisionMacro(vtkKWNotebook, "1.60");
 
 //----------------------------------------------------------------------------
 int vtkKWNotebookCommand(ClientData cd, Tcl_Interp *interp,
@@ -2001,10 +2001,10 @@ void vtkKWNotebook::UpdatePageTabBackgroundColor(vtkKWNotebook::Page *page,
     {
     // Compute the shaded color based on the current frame background color
 
-    float fr, fg, fb;
+    double fr, fg, fb;
     page->Frame->GetBackgroundColor(&fr, &fg, &fb);
 
-    float fh, fs, fv;
+    double fh, fs, fv;
     if (fr == fg && fg == fb)
       {
       fh = fs = 0.0;
@@ -2015,7 +2015,7 @@ void vtkKWNotebook::UpdatePageTabBackgroundColor(vtkKWNotebook::Page *page,
       vtkMath::RGBToHSV(fr, fg, fb, &fh, &fs, &fv);
       }
 
-    float r, g, b;
+    double r, g, b;
     fv *= VTK_KW_NB_TAB_UNSELECTED_VALUE;
     vtkMath::HSVToRGB(fh, fs, fv, &r, &g, &b);
 
@@ -2042,9 +2042,9 @@ void vtkKWNotebook::UpdatePageTabBackgroundColor(vtkKWNotebook::Page *page,
       }
     else
       {
-      fr = (float)VTK_KW_NB_TAB_PIN_R / 255.0;
-      fg = (float)VTK_KW_NB_TAB_PIN_G / 255.0;
-      fb = (float)VTK_KW_NB_TAB_PIN_B / 255.0;
+      fr = (double)VTK_KW_NB_TAB_PIN_R / 255.0;
+      fg = (double)VTK_KW_NB_TAB_PIN_G / 255.0;
+      fb = (double)VTK_KW_NB_TAB_PIN_B / 255.0;
 
       if (fr == fg && fg == fb)
         {

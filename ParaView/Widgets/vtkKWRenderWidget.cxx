@@ -33,7 +33,7 @@
 #include "vtkWin32OpenGLRenderWindow.h"
 #endif
 
-vtkCxxRevisionMacro(vtkKWRenderWidget, "1.70");
+vtkCxxRevisionMacro(vtkKWRenderWidget, "1.71");
 
 //----------------------------------------------------------------------------
 vtkKWRenderWidget::vtkKWRenderWidget()
@@ -818,9 +818,9 @@ void vtkKWRenderWidget::SetCornerAnnotationVisibility(int v)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWRenderWidget::SetCornerAnnotationColor(float r, float g, float b)
+void vtkKWRenderWidget::SetCornerAnnotationColor(double r, double g, double b)
 {
-  float *color = this->GetCornerAnnotationColor();
+  double *color = this->GetCornerAnnotationColor();
   if (!color || (color[0] == r && color[1] == g && color[2] == b))
     {
     return;
@@ -837,14 +837,14 @@ void vtkKWRenderWidget::SetCornerAnnotationColor(float r, float g, float b)
 }
 
 //----------------------------------------------------------------------------
-float* vtkKWRenderWidget::GetCornerAnnotationColor()
+double* vtkKWRenderWidget::GetCornerAnnotationColor()
 {
   if (!this->CornerAnnotation ||
       !this->CornerAnnotation->GetTextProperty())
     {
     return 0;
     }
-  float *color = this->CornerAnnotation->GetTextProperty()->GetColor();
+  double *color = this->CornerAnnotation->GetTextProperty()->GetColor();
   if (color[0] < 0 || color[1] < 0 || color[2] < 0)
     {
     color = this->CornerAnnotation->GetProperty()->GetColor();
@@ -889,9 +889,9 @@ void vtkKWRenderWidget::SetHeaderAnnotationVisibility(int v)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWRenderWidget::SetHeaderAnnotationColor(float r, float g, float b)
+void vtkKWRenderWidget::SetHeaderAnnotationColor(double r, double g, double b)
 {
-  float *color = this->GetHeaderAnnotationColor();
+  double *color = this->GetHeaderAnnotationColor();
   if (!color || (color[0] == r && color[1] == g && color[2] == b))
     {
     return;
@@ -908,14 +908,14 @@ void vtkKWRenderWidget::SetHeaderAnnotationColor(float r, float g, float b)
 }
 
 //----------------------------------------------------------------------------
-float* vtkKWRenderWidget::GetHeaderAnnotationColor()
+double* vtkKWRenderWidget::GetHeaderAnnotationColor()
 {
   if (!this->HeaderAnnotation ||
       !this->HeaderAnnotation->GetTextProperty())
     {
     return 0;
     }
-  float *color = this->HeaderAnnotation->GetTextProperty()->GetColor();
+  double *color = this->HeaderAnnotation->GetTextProperty()->GetColor();
   if (color[0] < 0 || color[1] < 0 || color[2] < 0)
     {
     color = this->HeaderAnnotation->GetProperty()->GetColor();
