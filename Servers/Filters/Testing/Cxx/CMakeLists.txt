@@ -8,6 +8,7 @@ SET(ServersFilters_SRCS
   TestCTH
   TestPVFilters
   TestMPI
+  TestCave
   )
 
 FOREACH(name ${ServersFilters_SRCS})
