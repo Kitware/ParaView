@@ -46,7 +46,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 vtkStandardNewMacro( vtkKWSplitFrame );
-vtkCxxRevisionMacro(vtkKWSplitFrame, "1.14");
+vtkCxxRevisionMacro(vtkKWSplitFrame, "1.15");
 
 
 
@@ -111,8 +111,9 @@ void vtkKWSplitFrame::Create(vtkKWApplication *app)
 {
   const char *wname;
   
-  // must set the application
-  if (this->Application)
+  // Set the application
+
+  if (this->IsCreated())
     {
     vtkErrorMacro("SplitFrame already created");
     return;
@@ -161,6 +162,10 @@ void vtkKWSplitFrame::Create(vtkKWApplication *app)
                  this->Separator->GetWidgetName());
     }
 #endif
+
+  // Update enable state
+
+  this->UpdateEnableState();
 }
 
 //----------------------------------------------------------------------------
