@@ -21,8 +21,9 @@
 #include "vtkSMProperty.h"
 #include "vtkSMAnimationCueManipulatorProxy.h"
 #include "vtkSMDomainIterator.h"
+#include "vtkClientServerID.h"
 
-vtkCxxRevisionMacro(vtkSMAnimationCueProxy, "1.1");
+vtkCxxRevisionMacro(vtkSMAnimationCueProxy, "1.2");
 vtkStandardNewMacro(vtkSMAnimationCueProxy);
 
 vtkCxxSetObjectMacro(vtkSMAnimationCueProxy, AnimatedProxy, vtkSMProxy);

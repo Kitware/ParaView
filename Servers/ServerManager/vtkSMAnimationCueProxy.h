@@ -28,7 +28,7 @@ class vtkAnimationCue;
 class vtkSMProperty;
 class vtkSMDomain;
 class vtkSMAnimationCueManipulatorProxy;
-class vtkClientServerID;
+struct vtkClientServerID;
 
 class VTK_EXPORT vtkSMAnimationCueProxy : public vtkSMProxy
 {

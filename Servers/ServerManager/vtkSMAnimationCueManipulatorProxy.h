@@ -23,7 +23,7 @@
 
 #include "vtkSMProxy.h"
 class vtkSMAnimationCueProxy;
-class vtkClientServerID;
+struct vtkClientServerID;
 
 class VTK_EXPORT vtkSMAnimationCueManipulatorProxy : public vtkSMProxy
 {
