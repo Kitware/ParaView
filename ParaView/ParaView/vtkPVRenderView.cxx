@@ -112,7 +112,7 @@ static unsigned char image_properties[] =
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.256");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.257");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -1246,10 +1246,6 @@ void vtkPVRenderView::Render()
       }
     return;
     }
-
-  cout << "------------" << endl;
-  cout << this->GetPVApplication() << endl;
-  cout << this->GetPVApplication()->GetRenderModule() << endl << endl;
 
   this->GetPVApplication()->GetRenderModule()->InteractiveRender();
 }
