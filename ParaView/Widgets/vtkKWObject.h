@@ -66,6 +66,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <stdarg.h> // Needed for "va_list" argument of EstimateFormatLength.
 
 class vtkKWApplication;
+class vtkImageData;
 
 class VTK_EXPORT vtkKWObject : public vtkObject
 {

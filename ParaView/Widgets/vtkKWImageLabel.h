@@ -64,9 +64,9 @@ public:
   virtual void Create(vtkKWApplication *app, const char *args);
 
   // Description:
-  // Set image data.
-  void SetImageData(const unsigned char* data, int width, int height);
+  // Set image data (either using icon, or pixel data).
   void SetImageData(vtkKWIcon *icon);
+  void SetImageData(const unsigned char* data, int width, int height, int pixel_size = 4);
   
 protected:
   vtkKWImageLabel();

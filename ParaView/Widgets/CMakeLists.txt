@@ -36,6 +36,7 @@ vtkKWSaveImageDialog.cxx
 vtkKWScale.cxx 
 vtkKWSplitFrame.cxx
 vtkKWTclInteractor.cxx
+vtkKWTkUtilities.cxx
 vtkKWText.cxx 
 vtkKWToolbar.cxx 
 vtkKWView.cxx 
@@ -56,6 +57,7 @@ vtkKWView
 WRAP_EXCLUDE_FILES(
   vtktcl 
   vtkKWEvent
+  vtkKWTkUtilities
 )
 
 OPTION(USE_INSTALLED_TCLTK_PACKAGES "Use the intalled Tcl/Tk packages instead of kwinit." OFF)

@@ -39,15 +39,16 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-#include "vtkKWApplication.h"
 #include "vtkKWImageLabel.h"
-#include "vtkObjectFactory.h"
-#include "vtkKWIcon.h"
 
+#include "vtkKWApplication.h"
+#include "vtkKWIcon.h"
+#include "vtkKWTkUtilities.h"
+#include "vtkObjectFactory.h"
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWImageLabel );
-vtkCxxRevisionMacro(vtkKWImageLabel, "1.14");
+vtkCxxRevisionMacro(vtkKWImageLabel, "1.15");
 
 vtkKWImageLabel::vtkKWImageLabel()
 {
@@ -70,55 +71,26 @@ void vtkKWImageLabel::SetImageData(vtkKWIcon* icon)
 }
 
 void vtkKWImageLabel::SetImageData(const unsigned char* data, 
-                                   int width, int height)
+                                   int width, int height,
+                                   int pixel_size)
 {
-  int r, g, b;
-  this->GetBackgroundColor(&r, &g, &b);
   this->Script("image create photo -width %d -height %d", width, height);
   this->SetImageDataLabel(this->Application->GetMainInterp()->result);
-  Tk_PhotoHandle photo;
-  Tk_PhotoImageBlock sblock;
-  photo = Tk_FindPhoto(this->Application->GetMainInterp(),
-                       this->ImageDataLabel);
-  Tk_PhotoBlank(photo);
-  const unsigned char *dd = data;
-  int xx, yy;
 
-  sblock.width     = width;
-  sblock.height    = height;
-  sblock.pixelSize = 3;
-  sblock.pitch     = width * sblock.pixelSize;
-  sblock.offset[0] = 0;
-  sblock.offset[1] = 1;
-  sblock.offset[2] = 2;
-  unsigned char *array = new unsigned char[ width * height * sblock.pixelSize ];
-  sblock.pixelPtr  = array;
-
-  unsigned char *pp = sblock.pixelPtr;
-  
-  for ( yy=0; yy < height; yy++ )
+  if (!vtkKWTkUtilities::UpdatePhoto(this->GetApplication()->GetMainInterp(),
+                                     this->ImageDataLabel,
+                                     data, 
+                                     width, height, pixel_size,
+                                     this->GetWidgetName()))
     {
-    for ( xx=0; xx < width; xx++ )
-      {
-      float alpha = static_cast<float>(*(dd+3)) / 255.0;
-      
-      *(pp)   = static_cast<int>(r*(1-alpha) + *(dd) * alpha);
-      *(pp+1) = static_cast<int>(g*(1-alpha) + *(dd+1) * alpha);
-      *(pp+2) = static_cast<int>(b*(1-alpha) + *(dd+2) * alpha);
-      dd+=4;
-      pp+=3;
-      }
+    vtkWarningMacro("Error updating Tk photo " << this->ImageDataLabel);
+    return;
     }
-#if (TK_MAJOR_VERSION == 8) && (TK_MINOR_VERSION >= 4)
-  Tk_PhotoPutBlock(photo, &sblock, 0, 0, width, height, TK_PHOTO_COMPOSITE_SET);
-#else
-  Tk_PhotoPutBlock(photo, &sblock, 0, 0, width, height);
-#endif
-  this->Script("%s configure -image %s", this->GetWidgetName(),
-               this->ImageDataLabel);
-  delete [] array;
-}
 
+  this->Script("%s configure -image %s", 
+               this->GetWidgetName(), 
+               this->ImageDataLabel);
+}
 
 //----------------------------------------------------------------------------
 void vtkKWImageLabel::PrintSelf(ostream& os, vtkIndent indent)
