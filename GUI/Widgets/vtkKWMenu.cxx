@@ -20,7 +20,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWMenu );
-vtkCxxRevisionMacro(vtkKWMenu, "1.53");
+vtkCxxRevisionMacro(vtkKWMenu, "1.54");
 
 
 
@@ -525,12 +525,12 @@ char* vtkKWMenu::CreateCheckButtonVariable(vtkKWObject* Object,
   
 //----------------------------------------------------------------------------
 int vtkKWMenu::GetCheckButtonValue(vtkKWObject* Object, 
-                                   const char* varname)
+                                   const char* name)
 {
   int res;
   
   char *rbv = 
-    this->CreateCheckButtonVariable(Object,varname);
+    this->CreateCheckButtonVariable(Object,name);
   this->Script("set %s",rbv);
   res = this->GetIntegerResult(this->GetApplication());
   delete [] rbv;
@@ -539,10 +539,10 @@ int vtkKWMenu::GetCheckButtonValue(vtkKWObject* Object,
     
 //----------------------------------------------------------------------------
 void vtkKWMenu::CheckCheckButton(vtkKWObject* Object, 
-                                 const char* varname, int id)
+                                 const char* name, int id)
 {
   char *rbv = 
-    this->CreateCheckButtonVariable(Object,varname);
+    this->CreateCheckButtonVariable(Object,name);
   this->Script("set %s",rbv);
   if (this->GetIntegerResult(this->GetApplication()) != id)
     {

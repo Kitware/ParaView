@@ -61,9 +61,9 @@ public:
 
   // Description: 
   // Append/Insert a CheckButton menu item to the current menu.
-  char* CreateCheckButtonVariable(vtkKWObject* Object, const char* varname);
-  int   GetCheckButtonValue(vtkKWObject* Object, const char* varname);
-  void  CheckCheckButton(vtkKWObject *Object, const char *varname, int id);
+  char* CreateCheckButtonVariable(vtkKWObject* Object, const char* name);
+  int   GetCheckButtonValue(vtkKWObject* Object, const char* name);
+  void  CheckCheckButton(vtkKWObject *Object, const char *name, int val);
   void AddCheckButton(const char* label, const char* ButtonVar, 
                       vtkKWObject* Object, 
                       const char* MethodAndArgString , const char* help = 0);
