@@ -96,8 +96,13 @@ public:
   
   // Description:
   // Methods to indicate when this source is selected in the window..
+  // The second version of Deselect allows to user to specify whether
+  // the main frame of the source parameters should be unpacked or
+  // not. It was necessary to add this option to work around some
+  // Tk packing problems.
   virtual void Select();
-  virtual void Deselect();
+  virtual void Deselect() { this->Deselect(1); }
+  virtual void Deselect(int doPackForget);
 
   // Description: 
   // This flag turns the visibility of the prop on and off.

@@ -467,7 +467,7 @@ void vtkPVRenderView::Create(vtkKWApplication *app, const char *args)
   this->NavigationWindow->SetWidth(341);
   this->NavigationWindow->SetHeight(45);
   this->NavigationWindow->Create(this->Application, ""); 
-  this->Script("pack %s -fill both -expand t -side top", this->NavigationWindow->GetWidgetName());
+  this->Script("pack %s -fill both -expand t -side top -anchor n", this->NavigationWindow->GetWidgetName());
   
   this->EventuallyRender();
   delete [] local;

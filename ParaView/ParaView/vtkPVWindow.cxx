@@ -2018,7 +2018,17 @@ void vtkPVWindow::SetCurrentPVSource(vtkPVSource *pvs)
   // Handle selection.
   if (this->CurrentPVSource)
     {
-    this->CurrentPVSource->Deselect();
+    // If there is a new current source, we tell the old one
+    // not to unpack itself, since the new one will do this
+    // anyway. This is a work-around for some packing problems.
+    if (pvs)
+      {
+      this->CurrentPVSource->Deselect(0);
+      }
+    else
+      {
+      this->CurrentPVSource->Deselect(1);
+      }
     }
   if (pvs)
     {
@@ -2391,7 +2401,7 @@ void vtkPVWindow::ShowAnimationProperties()
   this->Script("catch {eval pack forget [pack slaves %s]}",
                this->MainView->GetPropertiesParent()->GetWidgetName());
   // Put our page in.
-  this->Script("pack %s -side top -expand t -fill x -ipadx 3 -ipady 3",
+  this->Script("pack %s -anchor n -side top -expand t -fill x -ipadx 3 -ipady 3",
                this->AnimationInterface->GetWidgetName());
 }
 
