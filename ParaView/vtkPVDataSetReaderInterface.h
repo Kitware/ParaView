@@ -48,7 +48,7 @@ public:
 
   vtkPVSource* CreateCallback();
   
-  void Save(ofstream *file, const char *sourceName);
+  void SaveInTclScript(ofstream *file, const char *sourceName);
   
 protected:
   vtkPVDataSetReaderInterface();

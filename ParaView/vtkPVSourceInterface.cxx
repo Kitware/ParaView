@@ -340,7 +340,7 @@ int vtkPVSourceInterface::GetIsValidInput(vtkPVData *pvd)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVSourceInterface::Save(ofstream *file, const char *sourceName)
+void vtkPVSourceInterface::SaveInTclScript(ofstream *file, const char *sourceName)
 {
   vtkCollection *methods;
   vtkPVMethodInterface *currentMethod;

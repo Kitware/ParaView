@@ -184,7 +184,7 @@ public:
   
   // Description:
   // Save out the mapper and actor to a file.
-  void Save(ofstream *file, const char *sourceName);
+  void SaveInTclScript(ofstream *file, const char *sourceName);
   
   // Description:
   // Callback for the change color button.

@@ -172,7 +172,7 @@ vtkPVSource *vtkPVEnSightReaderInterface::CreateCallback()
   return pvs;
 }
 
-void vtkPVEnSightReaderInterface::Save(ofstream *file, const char *sourceName)
+void vtkPVEnSightReaderInterface::SaveInTclScript(ofstream *file, const char *sourceName)
 {
   static int sourceCount = 0;
   

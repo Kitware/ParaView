@@ -101,7 +101,7 @@ public:
 
   // Description:
   // Save this interface to a file.
-  virtual void Save(ofstream *file, const char* sourceName);
+  virtual void SaveInTclScript(ofstream *file, const char* sourceName);
   
 protected:
   vtkPVSourceInterface();

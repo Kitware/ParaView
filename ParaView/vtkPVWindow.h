@@ -106,7 +106,7 @@ public:
   
   // Description:
   // Save the pipeline as a tcl script.
-  void Save();
+  void SaveInTclScript();
 
   // Description:
   // Open a data file.

@@ -251,7 +251,7 @@ void vtkPVThreshold::ChangeAttributeMode(const char* newMode)
   this->LowerValueScale->SetValue(range[0]);
 }
 
-void vtkPVThreshold::Save(ofstream *file)
+void vtkPVThreshold::SaveInTclScript(ofstream *file)
 {
   char sourceTclName[256];
   char* tempName;
@@ -355,5 +355,5 @@ void vtkPVThreshold::Save(ofstream *file)
         << this->VTKSourceTclName << " SetAllScalars "
         << this->AllScalarsCheck->GetState() << "\n\n";
   
-  this->GetPVOutput(0)->Save(file, this->VTKSourceTclName);
+  this->GetPVOutput(0)->SaveInTclScript(file, this->VTKSourceTclName);
 }

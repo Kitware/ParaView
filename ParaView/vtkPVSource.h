@@ -233,7 +233,7 @@ public:
   
   // Description:
   // Used to save the source into a file.
-  void Save(ofstream *file);
+  void SaveInTclScript(ofstream *file);
 
   // Description:
   // This will be the new way the source gets specified.  It will use the

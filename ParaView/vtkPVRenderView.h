@@ -142,8 +142,8 @@ public:
 
   // Description:
   // Save the renderer and render window to a file.
-  void Save(ofstream *file);
-  void AddActorsToFile(ofstream *file);
+  void SaveInTclScript(ofstream *file);
+  void AddActorsToTclScript(ofstream *file);
 
   // Description:
   // Change the background color.

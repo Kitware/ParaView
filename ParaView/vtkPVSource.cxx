@@ -915,7 +915,12 @@ void vtkPVSource::AcceptCallback()
       input->SetVisibility(0);
       input->GetVisibilityCheck()->SetState(0);
       }
-    window->GetMainView()->ResetCamera();
+    // The best test I could come up with to only reset
+    // the camera when the first source is created.
+    if (window->GetSources()->GetNumberOfItems() == 1)
+      {
+      window->GetMainView()->ResetCamera();
+      }
 
     // Set the current data of the window.
     window->SetCurrentPVData(this->GetNthPVOutput(0));
@@ -1395,7 +1400,7 @@ vtkPVData *vtkPVSource::GetNthPVOutput(int idx)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVSource::Save(ofstream *file)
+void vtkPVSource::SaveInTclScript(ofstream *file)
 {
   char tclName[256];
   char sourceTclName[256];
@@ -1467,8 +1472,8 @@ void vtkPVSource::Save(ofstream *file)
     pos = extension - this->Name;
     strncpy(tclName, this->Name, pos);
     tclName[pos] = '\0';
-    this->Interface->Save(file, tclName);
-    this->GetPVOutput(0)->Save(file, tclName);
+    this->Interface->SaveInTclScript(file, tclName);
+    this->GetPVOutput(0)->SaveInTclScript(file, tclName);
     return;
     }
   else if (strcmp(this->GetInterface()->GetSourceClassName(),
@@ -1518,12 +1523,12 @@ void vtkPVSource::Save(ofstream *file)
   
   if (this->Interface)
     {
-    this->Interface->Save(file, tclName);
+    this->Interface->SaveInTclScript(file, tclName);
     }
   
   *file << "\n";
 
-  this->GetPVOutput(0)->Save(file, tclName);
+  this->GetPVOutput(0)->SaveInTclScript(file, tclName);
 }
 
 

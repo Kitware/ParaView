@@ -61,7 +61,7 @@ public:
 
   // Description:
   // Save this source to a file.
-  void Save(ofstream *file);
+  void SaveInTclScript(ofstream *file);
   
 protected:
   vtkPVContour();

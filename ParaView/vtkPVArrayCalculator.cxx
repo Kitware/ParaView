@@ -602,7 +602,7 @@ void vtkPVArrayCalculator::AddVectorVariable(const char* variableName,
                          variableName, arrayName);
 }
 
-void vtkPVArrayCalculator::Save(ofstream *file)
+void vtkPVArrayCalculator::SaveInTclScript(ofstream *file)
 {
   char sourceTclName[256];
   char* tempName;
@@ -677,5 +677,5 @@ void vtkPVArrayCalculator::Save(ofstream *file)
         << ((vtkArrayCalculator*)this->GetVTKSource())->
     GetResultArrayName() << "\n\n";
   
-  this->GetPVOutput(0)->Save(file, this->VTKSourceTclName);
+  this->GetPVOutput(0)->SaveInTclScript(file, this->VTKSourceTclName);
 }

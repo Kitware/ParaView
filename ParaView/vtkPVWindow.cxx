@@ -287,7 +287,7 @@ void vtkPVWindow::Create(vtkKWApplication *app, char *args)
 
   // create the top level
   this->MenuFile->InsertCommand(0, "Open Data File", this, "Open");
-  this->MenuFile->InsertCommand(1, "Save Tcl script", this, "Save");
+  this->MenuFile->InsertCommand(1, "Save Tcl script", this, "SaveInTclScript");
   
   // Log stuff
   this->MenuFile->InsertCommand(4, "Open Log File", this, "StartLog");
@@ -633,7 +633,7 @@ void vtkPVWindow::Open()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVWindow::Save()
+void vtkPVWindow::SaveInTclScript()
 {
   ofstream *file;
   vtkCollection *sources;
@@ -664,7 +664,7 @@ void vtkPVWindow::Save()
         << "source $VTK_TCL/vtkInt.tcl\n\n"
         << "# create a rendering window and renderer\n";
   
-  this->GetMainView()->Save(file);
+  this->GetMainView()->SaveInTclScript(file);
   
   // Loop through sources ...
   sources = this->GetSources();
@@ -678,32 +678,32 @@ void vtkPVWindow::Save()
     if (strcmp(sources->GetItemAsObject(sourceCount)->GetClassName(),
                "vtkPVArrayCalculator") == 0)
       {
-      ((vtkPVArrayCalculator*)sources->GetItemAsObject(sourceCount))->Save(file);
+      ((vtkPVArrayCalculator*)sources->GetItemAsObject(sourceCount))->SaveInTclScript(file);
       }
     else if (strcmp(sources->GetItemAsObject(sourceCount)->GetClassName(),
                     "vtkPVContour") == 0)
       {
-      ((vtkPVContour*)sources->GetItemAsObject(sourceCount))->Save(file);
+      ((vtkPVContour*)sources->GetItemAsObject(sourceCount))->SaveInTclScript(file);
       }
     else if (strcmp(sources->GetItemAsObject(sourceCount)->GetClassName(),
                     "vtkPVGlyph3D") == 0)
       {
-      ((vtkPVGlyph3D*)sources->GetItemAsObject(sourceCount))->Save(file);
+      ((vtkPVGlyph3D*)sources->GetItemAsObject(sourceCount))->SaveInTclScript(file);
       }
     else if (strcmp(sources->GetItemAsObject(sourceCount)->GetClassName(),
                     "vtkPVThreshold") == 0)
       {
-      ((vtkPVThreshold*)sources->GetItemAsObject(sourceCount))->Save(file);
+      ((vtkPVThreshold*)sources->GetItemAsObject(sourceCount))->SaveInTclScript(file);
       }
     else
       {
       pvs = (vtkPVSource*)sources->GetItemAsObject(sourceCount);
-      pvs->Save(file);
+      pvs->SaveInTclScript(file);
       }
     sourceCount++;
     }
 
-  this->GetMainView()->AddActorsToFile(file);
+  this->GetMainView()->AddActorsToTclScript(file);
     
   *file << "# enable user interface interactor\n"
         << "iren SetUserMethod {wm deiconify .vtkInteract}\n"

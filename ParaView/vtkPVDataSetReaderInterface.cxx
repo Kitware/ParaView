@@ -171,7 +171,7 @@ vtkPVSource *vtkPVDataSetReaderInterface::CreateCallback()
   return pvs;
 } 
 
-void vtkPVDataSetReaderInterface::Save(ofstream *file, const char* sourceName)
+void vtkPVDataSetReaderInterface::SaveInTclScript(ofstream *file, const char* sourceName)
 {
   *file << "\t" << sourceName << " SetFileName " << this->FileName << "\n";
 }

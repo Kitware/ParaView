@@ -256,7 +256,7 @@ void vtkPVContour::ContourValuesResetCallback()
     }
 }
 
-void vtkPVContour::Save(ofstream* file)
+void vtkPVContour::SaveInTclScript(ofstream* file)
 {
   char sourceTclName[256];
   char* tempName;
@@ -362,5 +362,5 @@ void vtkPVContour::Save(ofstream* file)
         << this->VTKSourceTclName << " SetComputeScalars "
         << this->ComputeScalarsCheck->GetState() << "\n\n";
   
-  this->GetPVOutput(0)->Save(file, this->VTKSourceTclName);
+  this->GetPVOutput(0)->SaveInTclScript(file, this->VTKSourceTclName);
 }
