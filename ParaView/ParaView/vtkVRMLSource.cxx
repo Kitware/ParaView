@@ -1,3 +1,7 @@
+
+
+
+
 /*=========================================================================
 
   Program:   Visualization Toolkit
@@ -20,12 +24,14 @@
 #include "vtkPolyData.h"
 #include "vtkActorCollection.h"
 #include "vtkActor.h"
+#include "vtkPointData.h"
+#include "vtkCellData.h"
 #include "vtkPolyDataMapper.h"
 #include "vtkRenderer.h"
 #include "vtkVRMLImporter.h"
 
 
-vtkCxxRevisionMacro(vtkVRMLSource, "1.1");
+vtkCxxRevisionMacro(vtkVRMLSource, "1.2");
 vtkStandardNewMacro(vtkVRMLSource);
 
 //------------------------------------------------------------------------------
@@ -123,7 +129,13 @@ void vtkVRMLSource::CopyImporterToOutputs()
   vtkActorCollection* actors;
   vtkActor* actor;
   vtkPolyDataMapper* mapper;
-  int idx;  
+  vtkPolyData* input;
+  vtkPolyData* output;
+  int idx;
+  int numArrays, arrayIdx, numPoints, numCells;
+  vtkDataArray* array;
+  int arrayCount = 0;
+  char name[256];
 
   if (this->Importer == NULL)
     {
@@ -139,9 +151,41 @@ void vtkVRMLSource::CopyImporterToOutputs()
     mapper = vtkPolyDataMapper::SafeDownCast(actor->GetMapper());
     if (mapper)
       {
-      //mapper->GetInput()->Update();
-      vtkPolyData *output = this->GetOutput(idx);
-      output->ShallowCopy(mapper->GetInput());
+      input = mapper->GetInput();
+      output = this->GetOutput(idx);
+      output->CopyStructure(input);
+      // Only copy well formed arrays.
+      numPoints = input->GetNumberOfPoints();
+      numArrays = input->GetPointData()->GetNumberOfArrays();
+      for ( arrayIdx = 0; arrayIdx < numArrays; ++arrayIdx)
+        {
+        array = input->GetPointData()->GetArray(arrayIdx);
+        if (array->GetNumberOfTuples() == numPoints)
+          {
+          if (array->GetName() == NULL)
+            {
+            sprintf(name, "VRMLArray%d", ++arrayCount);
+            array->SetName(name);
+            }
+          output->GetPointData()->AddArray(array);
+          } 
+        }
+      // Only copy well formed arrays.
+      numCells = input->GetNumberOfCells();
+      numArrays = input->GetCellData()->GetNumberOfArrays();
+      for ( arrayIdx = 0; arrayIdx < numArrays; ++arrayIdx)
+        {
+        array = input->GetCellData()->GetArray(arrayIdx);
+        if (array->GetNumberOfTuples() == numCells)
+          {
+          if (array->GetName() == NULL)
+            {
+            sprintf(name, "VRMLArray%d", ++arrayCount);
+            array->SetName(name);
+            }
+          output->GetCellData()->AddArray(array);
+          } 
+        }
       ++idx;
       }
     }
