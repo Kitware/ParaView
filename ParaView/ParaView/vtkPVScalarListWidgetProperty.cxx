@@ -48,7 +48,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkClientServerStream.h"
 
 vtkStandardNewMacro(vtkPVScalarListWidgetProperty);
-vtkCxxRevisionMacro(vtkPVScalarListWidgetProperty, "1.6");
+vtkCxxRevisionMacro(vtkPVScalarListWidgetProperty, "1.7");
 
 vtkPVScalarListWidgetProperty::vtkPVScalarListWidgetProperty()
 {
@@ -102,6 +102,13 @@ void vtkPVScalarListWidgetProperty::SetVTKCommands(int numCmds, char **cmd,
       }
     this->VTKCommands = new char*[numCmds];
     this->NumberOfScalarsPerCommand = new int[numCmds];
+    }
+  else
+    {
+    for (i = 0; i < this->NumberOfCommands; i++)
+      {
+      delete [] this->VTKCommands[i];
+      }
     }
   
   this->NumberOfCommands = numCmds;
