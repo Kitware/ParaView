@@ -271,7 +271,14 @@ IF(WIN32)
   SET(ParaViewBinary_SRCS ${ParaViewBinary_SRCS} ParaView.rc)
 ENDIF(WIN32)
 
-ADD_EXECUTABLE(paraview WIN32 ${ParaViewBinary_SRCS}) 
+# Work-around for CMake 1.6 bug.  Executables added on UNIX with the
+# WIN32 marker do not use proper flags when linking to shared
+# libraries.  Just leave the WIN32 marker off for UNIX.
+IF(UNIX)
+  ADD_EXECUTABLE(paraview ${ParaViewBinary_SRCS})      
+ELSE(UNIX)
+  ADD_EXECUTABLE(paraview WIN32 ${ParaViewBinary_SRCS})
+ENDIF(UNIX)
 
 TARGET_LINK_LIBRARIES (paraview
   vtkKWParaViewTCL)
