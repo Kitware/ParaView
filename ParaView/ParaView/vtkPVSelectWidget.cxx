@@ -52,7 +52,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectWidget);
-vtkCxxRevisionMacro(vtkPVSelectWidget, "1.14");
+vtkCxxRevisionMacro(vtkPVSelectWidget, "1.15");
 
 int vtkPVSelectWidgetCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -417,20 +417,16 @@ void vtkPVSelectWidget::SetCurrentIndex(int idx)
 //----------------------------------------------------------------------------
 void vtkPVSelectWidget::SaveInTclScript(ofstream *file)
 {
-  char* currentValue;
-  char* tmp;
   vtkPVWidget *pvw;
   pvw = (vtkPVWidget*)(this->Widgets->GetItemAsObject(this->CurrentIndex));
   pvw->SaveInTclScript(file);
  
   this->Script("%s Get%s",this->ObjectTclName,this->VariableName);
-  tmp = Tcl_GetStringResult(this->Application->GetMainInterp());
+  const char *tmp = Tcl_GetStringResult(this->Application->GetMainInterp());
   if (tmp && strlen(tmp) > 0)
     {
-    currentValue = new char[strlen(tmp)+1];
-    strcpy(currentValue, tmp);
     *file << "\t" << this->ObjectTclName << " Set" << this->VariableName
-          << " {" << currentValue << "}" << endl;
+          << " {" << tmp << "}" << endl;
     }
 }
 
