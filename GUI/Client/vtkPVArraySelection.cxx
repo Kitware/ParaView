@@ -38,7 +38,7 @@ class vtkPVArraySelectionArraySet: public vtkPVArraySelectionArraySetBase {};
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVArraySelection);
-vtkCxxRevisionMacro(vtkPVArraySelection, "1.37");
+vtkCxxRevisionMacro(vtkPVArraySelection, "1.38");
 
 //----------------------------------------------------------------------------
 int vtkDataArraySelectionCommand(ClientData cd, Tcl_Interp *interp,
@@ -66,7 +66,6 @@ vtkPVArraySelection::vtkPVArraySelection()
 
   this->NoArraysLabel = vtkKWLabel::New();
   this->Selection = vtkDataArraySelection::New();
-  this->SelectionTclName = 0;
   this->ServerSideID.ID = 0;
 }
 
@@ -97,7 +96,6 @@ vtkPVArraySelection::~vtkPVArraySelection()
   this->NoArraysLabel = 0;
 
   this->Selection->Delete();
-  this->SetSelectionTclName(0);
 
   if(this->ServerSideID.ID)
     {
@@ -195,22 +193,9 @@ void vtkPVArraySelection::Create(vtkKWApplication *app)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVArraySelection::SetupSelectionTclName()
-{
-  if(!this->SelectionTclName)
-    {
-    vtkTclGetObjectFromPointer(this->Application->GetMainInterp(),
-                               this->Selection, vtkDataArraySelectionCommand);
-    this->SetSelectionTclName(
-      Tcl_GetStringResult(this->Application->GetMainInterp()));
-    }
-}
-
-//----------------------------------------------------------------------------
 void vtkPVArraySelection::SetLocalSelectionsFromReader()
 {
   vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
-  this->SetupSelectionTclName();
   this->Selection->RemoveAllArrays();
   if(this->VTKReaderID.ID)
     {

@@ -47,6 +47,7 @@ public:
   void SetLabel (const char* label);
   const char* GetLabel();
 
+  //BTX
   // Description:
   // This is the source collection as possible inputs.
   // If the collection gets modified, it will be reflected
@@ -55,6 +56,10 @@ public:
   // and memory leaks.  We may wnet to fix his later.
   void SetSources(vtkPVSourceCollection *sources);
   vtkPVSourceCollection *GetSources();
+  //ETX
+  
+  int GetNumberOfSources();
+  vtkPVSource* GetSource(int i);
   
   // Description:
   // The input name is usually "Input", but can be something else

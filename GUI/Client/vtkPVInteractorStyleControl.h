@@ -78,11 +78,13 @@ public:
   void SetCurrentManipulator(int pos, const char*);
   void SetCurrentManipulator(int mouse, int key, const char*);
 
+  //BTX
   // Description:
   // In order for manipulators to work, you have to set them
   // on the window. This method sets the window.
   void SetManipulatorCollection(vtkCollection*);
   vtkGetObjectMacro(ManipulatorCollection, vtkCollection);
+  //ETX
 
   // Description:
   // Set or get the default manipulator. The default manipulator is

@@ -76,6 +76,11 @@ public:
   // Description:
   // This method is called when canvas size changes.
   virtual void Reconfigure();
+
+  // Description:
+  //
+  void AddDescriptionString(const char*);
+  void AddExtensionString(const char*);
  
 protected:
   vtkPVServerFileDialog();

@@ -49,9 +49,11 @@ public:
   // Access to adding or removing manipulators.
   void AddManipulator(vtkPVCameraManipulator *m);
 
+  //BTX
   // Description:
   // Accessor for the collection of camera manipulators.
   vtkGetObjectMacro(CameraManipulators, vtkCollection);
+  //ETX
 
   // Description:
   // Propagates the center to the manipulators.

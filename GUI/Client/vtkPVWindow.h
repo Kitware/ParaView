@@ -278,6 +278,7 @@ public:
   vtkPVSource *CreatePVSource(const char *className, const char* sourceList,
                               int addTraceEntry, int grabFocus);
   
+  //BTX
   // Description:
   // Access to the interactor styles from tcl.
   vtkGetObjectMacro(CameraStyle3D, vtkPVInteractorStyle);
@@ -287,6 +288,7 @@ public:
   // Get the source list called "listname". The default source
   // lists are "Sources" and "GlyphSources".
   vtkPVSourceCollection *GetSourceList(const char* listname);
+  //ETX
 
   // Description: 
   // Re-populate the select menu from the list of existing data
@@ -410,9 +412,11 @@ public:
     { this->SetCenterOfRotation(f[0], f[1], f[2]); }
   void SetCenterOfRotation(float x, float y, float z);
 
+  //BTX
   // Description:
   // Access to this style from outside vtkPVWindow
   vtkGetObjectMacro(CenterOfRotationStyle, vtkPVInteractorStyleCenterOfRotation);
+  //ETX
   
   // Description:
   // These methods enable and disable the navigation window and
@@ -447,10 +451,12 @@ public:
   // Get the Application Settings Interface. 
   virtual vtkKWApplicationSettingsInterface *GetApplicationSettingsInterface();
 
+  //BTX
   // Description:
   // I am using this method instead of MakeTclObject.
   void SetInteractor(vtkPVGenericRenderWindowInteractor *iren);
   vtkPVGenericRenderWindowInteractor* GetInteractor() {return this->Interactor;}
+  //ETX
 
   vtkClientServerID GetInteractorID(){ return this->InteractorID;}
 

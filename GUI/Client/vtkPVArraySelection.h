@@ -103,7 +103,6 @@ protected:
   // This serves a dual purpose.  For tracing and for saving state.
   virtual void Trace(ofstream *file);
 
-  void SetupSelectionTclName();
   virtual void SetWidgetSelectionsFromLocal();
   virtual void SetLocalSelectionsFromReader();
   virtual void SetReaderSelectionsFromWidgets();
@@ -122,8 +121,6 @@ protected:
   vtkKWLabel *NoArraysLabel;
 
   vtkDataArraySelection* Selection;
-  vtkSetStringMacro(SelectionTclName);
-  char* SelectionTclName;
   
   vtkPVArraySelectionArraySet* ArraySet;
 

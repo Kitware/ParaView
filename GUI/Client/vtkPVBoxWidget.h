@@ -118,9 +118,11 @@ public:
     { this->SetOrientation(p[0], p[1], p[2]); }
   void SetOrientation(float px, float py, float pz);
 
+  //BTX
   vtkBoxWidget* GetBoxWidget();
 
   vtkGetObjectMacro(BoxTransform, vtkTransform);
+  //ETX
 
   // Description:
   // If update is specified, then it is updated from the gui, otherwise from

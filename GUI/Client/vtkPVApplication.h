@@ -52,6 +52,7 @@ public:
   // Returns 0 if all went well.
   int ParseCommandLineArguments(int argc, char*argv[]);
 
+  //BTX
   // Description:
   // Process module contains all methods for managing 
   // processes and communication.
@@ -64,6 +65,7 @@ public:
   // It also creates part displays which handle level of details.
   void SetRenderModule(vtkPVRenderModule *module);
   vtkPVRenderModule* GetRenderModule() { return this->RenderModule;}
+  //ETX
 
   // Description:
   // Start running the main application.
@@ -76,6 +78,7 @@ public:
   // Description:
   // We need to keep the controller in a prominent spot because there is no
   // more "RegisterAndGetGlobalController" method.
+//BTX
   vtkMultiProcessController *GetController();
   
   // Description:
@@ -83,6 +86,7 @@ public:
   // the socket controller used for client server communication.
   // It will only be set on the client and process 0 of the server.
   vtkSocketController *GetSocketController();
+//ETX
 
   // Description:
   // No licence required.
@@ -372,6 +376,15 @@ public:
   // This method is called after force update to clenaup all the pending
   // progresses.
   void CleanupPendingProgress();
+
+  // Description:
+  // Get number of partitions.
+  int GetNumberOfPartitions();
+  
+  // Description:
+  // Send string to client and server. This is here so that tcl scripts can
+  // access it.
+  void SendStringToClientAndServer(const char*);
 
 protected:
   vtkPVApplication();

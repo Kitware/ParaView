@@ -82,9 +82,11 @@ public:
   // Needed to connect actor to 3D widget.
   vtkClientServerID GetXYPlotActorID() { return this->XYPlotActorID;}
 
+  //BTX
   // Description:
   // The Probe needs access to this to fill in the UI point values.
   vtkPolyData *GetCollectedData();
+  //ETX
 
 protected:
   vtkPVPlotDisplay();

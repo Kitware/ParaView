@@ -225,9 +225,11 @@ public:
   void ChangeActorColor(double r, double g, double b);
   double* GetActorColor();
     
+  //BTX
   // Description:
   // Get the name of the cube axes actor.
   vtkGetObjectMacro(CubeAxes, vtkCubeAxesActor2D);
+  //ETX
 
   // Description:
   // Access to pointSize for scripting.

@@ -43,7 +43,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPlotDisplay);
-vtkCxxRevisionMacro(vtkPVPlotDisplay, "1.3");
+vtkCxxRevisionMacro(vtkPVPlotDisplay, "1.4");
 
 
 //----------------------------------------------------------------------------
@@ -140,7 +140,7 @@ void vtkPVPlotDisplay::CreateParallelTclObjects(vtkPVApplication *pvApp)
   // Handle collection setup with client server.
   pm->GetStream()
     << vtkClientServerStream::Invoke
-    << pm->GetApplicationID() << "GetSocketController"
+    << pm->GetProcessModuleID() << "GetSocketController"
     << vtkClientServerStream::End
     << vtkClientServerStream::Invoke
     << this->DuplicatePolyDataID << "SetSocketController"

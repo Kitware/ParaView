@@ -152,6 +152,7 @@ public:
   void SetTipTypeToUserDefined()
     { this->SetTipType( vtkPVAxesActor::USER_DEFINED_TIP ); }
 
+  //BTX
   // Description:
   // Set the user defined tip polydata.
   void SetUserDefinedTip( vtkPolyData * );
@@ -173,18 +174,19 @@ public:
   vtkProperty *GetXAxisShaftProperty();
   vtkProperty *GetYAxisShaftProperty();
   vtkProperty *GetZAxisShaftProperty();
-  
-  // Description:
-  // Set the label text.
-  vtkSetStringMacro( XAxisLabelText );
-  vtkSetStringMacro( YAxisLabelText );
-  vtkSetStringMacro( ZAxisLabelText );
 
   // Description:
   // Get the label properties.
   vtkProperty *GetXAxisLabelProperty();
   vtkProperty *GetYAxisLabelProperty();
   vtkProperty *GetZAxisLabelProperty();
+  //ETX
+  //
+  // Description:
+  // Set the label text.
+  vtkSetStringMacro( XAxisLabelText );
+  vtkSetStringMacro( YAxisLabelText );
+  vtkSetStringMacro( ZAxisLabelText );
   
 //BTX
   enum

@@ -55,11 +55,13 @@ public:
   vtkGetMacro(CollectID, vtkClientServerID);
   vtkGetMacro(LODCollectID, vtkClientServerID);
 
+  //BTX
   // Description:
   // This is a little different than superclass 
   // because it updates the geometry if it is out of date.
   //  Collection flag gets turned off if it needs to update.
   vtkPVLODPartDisplayInformation* GetInformation();
+  //ETX
     
 protected:
   vtkPVCompositePartDisplay();

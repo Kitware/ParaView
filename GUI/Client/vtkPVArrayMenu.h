@@ -108,9 +108,11 @@ public:
   void SetValue(const char* name);
   const char* GetValue() { return this->ArrayName;}
 
+  //BTX
   // Description:
   // A convenience method that reutrns the VTK array selected.
   vtkPVArrayInformation *GetArrayInformation();
+  //ETX
 
   // Description:
   // This is the number of components the selected array has.

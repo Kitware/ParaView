@@ -227,8 +227,10 @@ public:
 
   vtkGetObjectMacro(DeleteButton, vtkKWPushButton);
   vtkGetObjectMacro(AcceptButton, vtkKWPushButton);
-  
+
+  //BTX
   vtkGetObjectMacro(WidgetProperties, vtkCollection);
+  //ETX
   
   vtkGetObjectMacro(ParameterFrame, vtkKWFrame);
   vtkGetObjectMacro(MainParameterFrame, vtkKWWidget);
@@ -432,9 +434,11 @@ public:
   void GrabFocus();
   void UnGrabFocus();
 
+  //BTX
   // Description:
   // Moving away from direct access to VTK data objects.
   vtkPVDataInformation* GetDataInformation();
+  //ETX
   
   // Description:
   // Called by source EndEvent to schedule another Gather.
@@ -450,10 +454,12 @@ public:
   // interface will use this method to stop updates too (flag)?
   void MarkSourcesForUpdate(int flag);
 
+  //BTX
   // Description:
   // Access to the vtkPVNumberOfOutputsInformation object.
   vtkGetObjectMacro(NumberOfOutputsInformation,
                     vtkPVNumberOfOutputsInformation);
+  //ETX
 
   // Description:
   // Update the "enable" state of the object and its internal parts.

@@ -54,9 +54,11 @@ public:
   // Access to the ShowXYPlotToggle from Tcl
   vtkGetObjectMacro(ShowXYPlotToggle, vtkKWCheckButton);
 
+  //BTX
   // Description:
   // Get the XY Plot widget.
   vtkGetObjectMacro(XYPlotWidget, vtkXYPlotWidget);
+  //ETX
   
   // Description:
   // This method is called when event is triggered on the XYPlotWidget.
