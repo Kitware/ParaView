@@ -86,7 +86,7 @@ Bool vtkKWRenderViewPredProc(Display *vtkNotUsed(disp), XEvent *event,
 }
 #endif
 
-vtkCxxRevisionMacro(vtkKWView, "1.133");
+vtkCxxRevisionMacro(vtkKWView, "1.134");
 
 //----------------------------------------------------------------------------
 int vtkKWViewCommand(ClientData cd, Tcl_Interp *interp,
@@ -269,10 +269,7 @@ vtkKWView::~vtkKWView()
   this->Frame->Delete();
   this->Frame2->Delete();
   this->ControlFrame->Delete();
-  if (this->PropertiesParent)
-    {
-    this->PropertiesParent->Delete();
-    }
+  this->SetPropertiesParent(0);
 
   this->ProgressGauge->Delete();
   
@@ -1568,7 +1565,7 @@ void vtkKWView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWView ";
-  this->ExtractRevision(os,"$Revision: 1.133 $");
+  this->ExtractRevision(os,"$Revision: 1.134 $");
 }
 
 //----------------------------------------------------------------------------
