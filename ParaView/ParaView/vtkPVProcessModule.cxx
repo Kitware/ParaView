@@ -83,7 +83,7 @@ struct vtkPVArgs
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProcessModule);
-vtkCxxRevisionMacro(vtkPVProcessModule, "1.18");
+vtkCxxRevisionMacro(vtkPVProcessModule, "1.19");
 
 int vtkPVProcessModuleCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -493,7 +493,6 @@ int vtkPVProcessModule::GetDirectoryListing(const char* dir,
 vtkKWLoadSaveDialog* vtkPVProcessModule::NewLoadSaveDialog()
 {
   vtkKWLoadSaveDialog* dialog = vtkKWLoadSaveDialog::New();
-  dialog->SetParent(this->GetPVApplication()->GetMainWindow());
   return dialog;
 }
 
