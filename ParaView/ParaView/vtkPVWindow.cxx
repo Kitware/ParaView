@@ -1365,6 +1365,35 @@ void vtkPVWindow::ReductionCheckCallback()
 
 
 //----------------------------------------------------------------------------
+void vtkPVWindow::UpdateSelectMenu()
+{
+  int i, numSources;
+  vtkPVSource *source;
+  char methodAndArg[512];
+
+  this->GetSelectMenu()->DeleteAllMenuItems();
+  numSources = this->GetSources()->GetNumberOfItems();
+  for (i = 0; i < numSources; i++)
+    {
+    source = (vtkPVSource*)this->GetSources()->GetItemAsObject(i);
+    sprintf(methodAndArg, "SetCurrentPVSource %s", source->GetTclName());
+    this->GetSelectMenu()->AddCommand(source->GetName(), this, methodAndArg);
+    }
+
+  // Disable or enable the menu.
+  if (numSources == 0)
+    {
+    this->Script("%s entryconfigure Select -state disabled",
+                 this->Menu->GetWidgetName());
+    }
+  else
+    {
+    this->Script("%s entryconfigure Select -state normal",
+                 this->Menu->GetWidgetName());
+    }
+}
+
+//----------------------------------------------------------------------------
 void vtkPVWindow::DisableMenus()
 {
   int numMenus;

@@ -896,9 +896,6 @@ void vtkPVSource::AcceptCallback()
 {
   int i;
   vtkPVWindow *window;
-  char methodAndArg[256];
-  int numSources;
-  vtkPVSource *source;
   
   // This adds an extract filter only when the MaximumNumberOfPieces is 1.
   // This is only the case the first time the accept is called.
@@ -982,16 +979,7 @@ void vtkPVSource::AcceptCallback()
   this->GetPVRenderView()->EventuallyRender();
 
   // Update the selection menu.
-  window->GetSelectMenu()->DeleteAllMenuItems();
-  numSources = window->GetSources()->GetNumberOfItems();
-  
-  for (i = 0; i < numSources; i++)
-    {
-    source = (vtkPVSource*)window->GetSources()->GetItemAsObject(i);
-    sprintf(methodAndArg, "SetCurrentPVSource %s", source->GetTclName());
-    window->GetSelectMenu()->AddCommand(source->GetName(), window,
-                                        methodAndArg);
-    }
+  window->UpdateSelectMenu();
   
   // Regenerate the data property page in case something has changed.
   if (this->NumberOfPVOutputs > 0)
@@ -1038,9 +1026,6 @@ void vtkPVSource::DeleteCallback()
   vtkPVData *ac;
   vtkPVSource *prev;
   int i;
-  int numSources;
-  char methodAndArg[256];
-  vtkPVSource *source;
   vtkPVWindow *window = this->GetWindow();
 
   // Just in case cursor was left in a funny state.
@@ -1093,16 +1078,7 @@ void vtkPVSource::DeleteCallback()
       
   // We need to remove this source from the SelectMenu
   this->GetWindow()->GetSources()->RemoveItem(this);
-  this->GetWindow()->GetSelectMenu()->DeleteAllMenuItems();
-  numSources = this->GetWindow()->GetSources()->GetNumberOfItems();
-  for (i = 0; i < numSources; i++)
-    {
-    source = (vtkPVSource*)this->GetWindow()->GetSources()->GetItemAsObject(i);
-    sprintf(methodAndArg, "SetCurrentPVSource %s", source->GetTclName());
-    this->GetWindow()->GetSelectMenu()->AddCommand(source->GetName(),
-                                                   this->GetWindow(),
-                                                   methodAndArg);
-    }
+  this->GetWindow()->UpdateSelectMenu();
   
   // Remove all of the actors mappers. from the renderer.
   for (i = 0; i < this->NumberOfPVOutputs; ++i)
