@@ -30,6 +30,10 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkKWObject.h"
 #include "vtkObjectFactory.h"
 
+// Required for va_start on HPUX
+#include <stdio.h>
+#include <stdarg.h>
+
 
 
 //------------------------------------------------------------------------------
@@ -103,7 +107,7 @@ void vtkKWObject::ExtractRevision(ostream& os,const char *revIn)
 void vtkKWObject::SerializeRevision(ostream& os, vtkIndent indent)
 {
   os << indent << "vtkKWObject ";
-  this->ExtractRevision(os,"$Revision: 1.8 $");
+  this->ExtractRevision(os,"$Revision: 1.9 $");
 }
 
 void vtkKWObject::Serialize(istream& is)
