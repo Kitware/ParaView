@@ -110,7 +110,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.344");
+vtkCxxRevisionMacro(vtkPVWindow, "1.345");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -266,6 +266,8 @@ vtkPVWindow::vtkPVWindow()
   this->ToolbarSettingsFrame = 0;
   this->ToolbarSettingsFlatFrameCheck = 0;
   this->ToolbarSettingsFlatButtonsCheck = 0;
+
+  this->CenterActorVisibility = 1;
 }
 
 //----------------------------------------------------------------------------
@@ -536,6 +538,9 @@ void vtkPVWindow::PrepareForDelete()
     this->MainView = NULL;
     }
   
+  this->Application->SetRegisteryValue(2, "RunTime", "CenterActorVisibility",
+                                       "%d", this->CenterActorVisibility);
+
   if (this->SourceMenu)
     {
     this->SourceMenu->Delete();
@@ -883,7 +888,7 @@ void vtkPVWindow::Create(vtkKWApplication *app, char* vtkNotUsed(args))
   this->HideCenterButton->SetParent(this->PickCenterToolbar->GetFrame());
   this->HideCenterButton->Create(app, "");
   this->HideCenterButton->SetLabel("Hide");
-  this->HideCenterButton->SetCommand(this, "HideCenterCallback");
+  this->HideCenterButton->SetCommand(this, "ToggleCenterActorCallback");
   this->HideCenterButton->SetBalloonHelpString(
     "Hide the center of rotation to the center of the current data set.");
   this->PickCenterToolbar->AddWidget(this->HideCenterButton);
@@ -939,6 +944,19 @@ void vtkPVWindow::Create(vtkKWApplication *app, char* vtkNotUsed(args))
                this->CenterZLabel->GetWidgetName(),
                this->CenterZEntry->GetWidgetName());
 
+  if (pvApp->GetRegisteryValue(2, "RunTime", "CenterActorVisibility", 0))
+    {
+    if (
+      (this->CenterActorVisibility = 
+       pvApp->GetIntRegisteryValue(2, "RunTime", "CenterActorVisibility")))
+      {
+      this->ShowCenterActor();
+      }
+    else
+      {
+      this->HideCenterActor();
+      }
+    }
   this->MainView->GetRenderer()->AddActor(this->CenterActor);
   
   this->FlySpeedToolbar->SetParent(this->GetToolbarFrame());
@@ -1010,9 +1028,14 @@ void vtkPVWindow::Create(vtkKWApplication *app, char* vtkNotUsed(args))
     this->ReadSourceInterfaces();
     
     // Create the extract grid button
-    this->AddToolbarButton("ExtractGrid", "PVExtractGridButton", 0,
-                           "ExtractGridCallback",
-                           "Extract a sub grid from a structured data set.");
+    vtkPVSource* extract;
+    if (this->Prototypes->GetItem("ExtractGrid", extract) == VTK_OK)
+      {
+      extract->SetToolbarModule(1);
+      this->AddToolbarButton("ExtractGrid", "PVExtractGridButton", 0,
+                             "ExtractGridCallback",
+                             "Extract a sub grid from a structured data set.");
+      }
 
     vtkPVSource *pvs=0;
     
@@ -1161,20 +1184,40 @@ void vtkPVWindow::SetCenterOfRotation(float x, float y, float z)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVWindow::HideCenterCallback()
+void vtkPVWindow::HideCenterActor()
 {
-  if (this->CenterActor->GetVisibility())
-    {
-    this->Script("%s configure -text Show", 
-                 this->HideCenterButton->GetWidgetName() );
-    this->CenterActor->VisibilityOff();
-    }
-  else
+  this->Script("%s configure -text Show", 
+               this->HideCenterButton->GetWidgetName() );
+  this->CenterActor->VisibilityOff();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVWindow::ShowCenterActor()
+{
+  if (this->CenterActorVisibility)
     {
     this->Script("%s configure -text Hide", 
                  this->HideCenterButton->GetWidgetName() );
     this->CenterActor->VisibilityOn();
     }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVWindow::ToggleCenterActorCallback()
+{
+  if (this->CenterActor->GetVisibility())
+    {
+    this->CenterActorVisibility=0;
+    this->HideCenterActor();
+    }
+  else
+    {
+    this->CenterActorVisibility=1;
+    this->ShowCenterActor();
+    }
+
+  this->AddTraceEntry("$kw(%s) ToggleCenterActorCallback", this->GetTclName());
+
   this->MainView->EventuallyRender();
 }
 
@@ -1246,7 +1289,7 @@ void vtkPVWindow::ChangeInteractorStyle(int index)
     case 0:
       this->RotateCameraButton->SetState(0);
       this->TranslateCameraButton->SetState(0);
-      this->CenterActor->VisibilityOff();
+      this->HideCenterActor();
       this->GenericInteractor->SetInteractorStyle(this->FlyStyle);
       this->FlySpeedToolbar->Pack("-side left");
       break;
@@ -1256,20 +1299,20 @@ void vtkPVWindow::ChangeInteractorStyle(int index)
       this->GenericInteractor->SetInteractorStyle(this->CameraStyle3D);
       this->PickCenterToolbar->Pack("-side left");
       this->ResizeCenterActor();
-      this->CenterActor->VisibilityOn();
+      this->ShowCenterActor();
       break;
     case 2:
       this->FlyButton->SetState(0);
       this->RotateCameraButton->SetState(0);
       this->GenericInteractor->SetInteractorStyle(this->CameraStyle2D);
-      this->CenterActor->VisibilityOff();
+      this->HideCenterActor();
       break;
     case 3:
       vtkErrorMacro("Trackball no longer suported.");
       break;
     case 4:
       this->GenericInteractor->SetInteractorStyle(this->CenterOfRotationStyle);
-      this->CenterActor->VisibilityOff();
+      this->HideCenterActor();
       break;
     }
   this->MainView->EventuallyRender();
@@ -2314,7 +2357,7 @@ void vtkPVWindow::UpdateSourceMenu()
       {
       // Check if this is a source. We do not want to add filters
       // to the source lists.
-      if (proto && !proto->GetInputClassName())
+      if (proto && !proto->GetInputClassName() && !proto->GetToolbarModule())
         {
         numFilters++;
         char methodAndArgs[150];
@@ -2370,22 +2413,29 @@ void vtkPVWindow::UpdateFilterMenu()
         // it's input type with the current data object's type.
         if (proto && proto->GetIsValidInput(this->CurrentPVData))
           {
-          numSources++;
-          char methodAndArgs[150];
           it->GetKey(key);
-          sprintf(methodAndArgs, "CreatePVSource %s", key);
 
-          if (numSources % 30 == 0 )
+          if (!proto->GetToolbarModule())
             {
-            this->FilterMenu->AddGeneric("command", key, this, methodAndArgs,
-                                         "-columnbreak 1", 0);
+            numSources++;
+            char methodAndArgs[150];
+            sprintf(methodAndArgs, "CreatePVSource %s", key);
+
+            if (numSources % 30 == 0 )
+              {
+              this->FilterMenu->AddGeneric("command", key, this, methodAndArgs,
+                                           "-columnbreak 1", 0);
+              }
+            else
+              {
+              this->FilterMenu->AddGeneric("command", key, this, methodAndArgs,
+                                           0, 0);
+              }
             }
           else
             {
-            this->FilterMenu->AddGeneric("command", key, this, methodAndArgs,
-                                         0, 0);
+            this->EnableToolbarButton(key);
             }
-          this->EnableToolbarButton(key);
           }
         }
       it->GoToNextItem();
@@ -3076,6 +3126,10 @@ vtkPVSource *vtkPVWindow::CreatePVSource(const char* className,
       }
     clone->Delete();
     }
+  else
+    {
+    vtkErrorMacro("Prototype for " << className << " could not be found.");
+    }
   
   return clone;
 }
@@ -3472,7 +3526,7 @@ void vtkPVWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVWindow ";
-  this->ExtractRevision(os,"$Revision: 1.344 $");
+  this->ExtractRevision(os,"$Revision: 1.345 $");
 }
 
 //----------------------------------------------------------------------------

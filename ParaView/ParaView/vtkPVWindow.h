@@ -394,7 +394,7 @@ public:
   void CenterEntryCloseCallback();
   void CenterEntryCallback();
   void ResetCenterCallback();
-  void HideCenterCallback();
+  void ToggleCenterActorCallback();
 
   // Description
   // Access to these widgets from outside vtkPVWindow
@@ -609,6 +609,11 @@ protected:
   void CreateErrorLogDisplay();
 
   void UpdateToolbarAspect();
+
+  void HideCenterActor();
+  void ShowCenterActor();
+
+  int CenterActorVisibility;
 
 private:
   static const char* StandardReaderInterfaces;
