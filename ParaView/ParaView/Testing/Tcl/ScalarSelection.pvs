@@ -19,6 +19,9 @@ set pv(vtkTemp89) [$pv(vtkTemp1) GetGlyphSource Arrow]
 set pv(vtkTemp93) [$pv(vtkTemp1) GetGlyphSource Cone]
 set pv(vtkTemp97) [$pv(vtkTemp1) GetGlyphSource Sphere]
 set pv(vtkTemp100) [$pv(vtkTemp1) Open $DataDir/Data/vox8_bin.vtk]
+set pv(vtkTemp101) [$pv(vtkTemp100) GetPVOutput]
+$pv(vtkTemp101) DrawWireframe
+$pv(vtkTemp101) ColorByProperty
 set pv(vtkTemp136) [$pv(vtkTemp1) ContourCallback]
 set pv(vtkTemp142) [$pv(vtkTemp136) GetPVWidget {Input}]
 $pv(vtkTemp142) SetCurrentValue $pv(vtkTemp100)
@@ -236,7 +239,7 @@ $pv(vtkTemp1) SetCurrentPVSource $pv(vtkTemp136)
 $pv(vtkTemp1) ShowCurrentSourceProperties
 $pv(vtkTemp1) SetCurrentPVSource $pv(vtkTemp100)
 $pv(vtkTemp1) ShowCurrentSourceProperties
-set pv(vtkTemp261) [$pv(vtkTemp1) ClipPlaneCallback]
+set pv(vtkTemp261) [$pv(vtkTemp1) ClipCallback]
 $pv(vtkTemp261) DeleteCallback
 $pv(vtkTemp1) SetCurrentPVSource $pv(vtkTemp100)
 $pv(vtkTemp1) ShowCurrentSourceProperties

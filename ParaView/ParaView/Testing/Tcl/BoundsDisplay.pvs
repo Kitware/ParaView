@@ -39,7 +39,7 @@ $kw(vtkTemp194) SetValue 24
 $kw(vtkTemp167) AcceptCallback
 $kw(vtkTemp1) ResetCameraCallback
 
-set kw(vtkTemp209) [$kw(vtkTemp1) ClipPlaneCallback]
+set kw(vtkTemp209) [$kw(vtkTemp1) ClipCallback]
 
 $kw(vtkTemp44) SetBackgroundColor 1.000000 0.000000 0.501961
 

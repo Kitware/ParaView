@@ -21,6 +21,9 @@ $kw(vtkTemp137) SetLineWidth 1
 $kw(vtkTemp137) SetPointSize 1
 $kw(vtkTemp137) ChangeActorColor 0.501961 1.000000 0.000000
 set kw(vtkTemp171) [$kw(vtkTemp1) Open "$DataDir/Data/vox8_bin.vtk"]
+set kw(vtkTemp172) [$kw(vtkTemp171) GetPVOutput]
+$kw(vtkTemp172) DrawWireframe
+$kw(vtkTemp172) ColorByProperty
 $kw(vtkTemp1) ResetCameraCallback
 set kw(vtkTemp186) [$kw(vtkTemp1) ContourCallback]
 set kw(vtkTemp193) [$kw(vtkTemp186) GetPVWidget {Scalars}]

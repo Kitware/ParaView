@@ -18,7 +18,7 @@ set pv(vtkTemp98) [$pv(vtkTemp1) CreatePVSource vtkSphereSource]
 set pv(vtkTemp110) [$pv(vtkTemp98) GetPVWidget {Center}]
 $pv(vtkTemp110) SetValue 0 0 4
 $pv(vtkTemp98) AcceptCallback
-set pv(vtkTemp182) [$pv(vtkTemp1) ClipPlaneCallback]
+set pv(vtkTemp182) [$pv(vtkTemp1) ClipCallback]
 $pv(vtkTemp182) AcceptCallback
 
 set pv(vtkTemp192) [$pv(vtkTemp182) GetPVWidget {Clip Function}]
@@ -34,7 +34,7 @@ $pv(vtkTemp194) SetValue 0.5
 $pv(vtkTemp182) AcceptCallback
 $pv(vtkTemp194) SetValue -0.5
 $pv(vtkTemp182) AcceptCallback
-set pv(vtkTemp213) [$pv(vtkTemp1) CutPlaneCallback]
+set pv(vtkTemp213) [$pv(vtkTemp1) CutCallback]
 set pv(vtkTemp214) [$pv(vtkTemp213) GetPVWidget {Cut Function}]
 set pv(vtkTemp222) [$pv(vtkTemp214) GetPVWidget {Plane}]
 set pv(vtkTemp224) [$pv(vtkTemp222) GetNormalEntry]

@@ -14,6 +14,9 @@ set pv(vtkTemp89) [$pv(vtkTemp1) GetGlyphSource Arrow]
 set pv(vtkTemp93) [$pv(vtkTemp1) GetGlyphSource Cone]
 set pv(vtkTemp97) [$pv(vtkTemp1) GetGlyphSource Sphere]
 set pv(vtkTemp100) [$pv(vtkTemp1) Open $DataDir/Data/vox8_bin.vtk]
+set pv(vtkTemp101) [$pv(vtkTemp100) GetPVOutput]
+$pv(vtkTemp101) DrawWireframe
+$pv(vtkTemp101) ColorByProperty
 set pv(vtkTemp138) [$pv(vtkTemp1) ProbeCallback]
 $pv(vtkTemp138) UseLine
 [$pv(vtkTemp138) GetPVWidget {Scalars}] SetValue scalars

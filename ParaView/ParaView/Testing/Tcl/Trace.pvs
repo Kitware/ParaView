@@ -82,7 +82,7 @@ $kw(vtkTemp285) AcceptCallback
 
 $pv(vtkTemp1) ResetCameraCallback
 
-set kw(vtkTemp327) [$pv(vtkTemp1) ClipPlaneCallback]
+set kw(vtkTemp327) [$pv(vtkTemp1) ClipCallback]
 set kw(vtkTemp328) [$kw(vtkTemp327) GetPVWidget {Clip Function}]
 set kw(vtkTemp334) [$kw(vtkTemp328) GetPVWidget {Plane}]
 set kw(vtkTemp335) [$kw(vtkTemp334) GetCenterEntry]

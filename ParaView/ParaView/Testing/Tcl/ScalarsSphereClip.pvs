@@ -13,7 +13,7 @@ set kw(vtkTemp1) [Application GetMainWindow]
 set kw(vtkTemp29) [$kw(vtkTemp1) GetMainView]
 set kw(vtkTemp224) [$kw(vtkTemp1) CreatePVSource vtkRTAnalyticSource]
 $kw(vtkTemp224) AcceptCallback
-set kw(vtkTemp288) [$kw(vtkTemp1) ClipPlaneCallback]
+set kw(vtkTemp288) [$kw(vtkTemp1) ClipCallback]
 set kw(vtkTemp303) [$kw(vtkTemp288) GetPVWidget {Clip Function}]
 $kw(vtkTemp303) SetCurrentValue {Scalars}
 set kw(vtkTemp313) [$kw(vtkTemp303) GetPVWidget {Scalars}]
@@ -23,7 +23,7 @@ $kw(vtkTemp314) SetValue 200
 $kw(vtkTemp288) AcceptCallback
 set kw(vtkTemp75) [$kw(vtkTemp1) GetRotateCameraInteractor]
 $kw(vtkTemp75) SetCameraState -33.506 28.392 54.140  0.000 0.000 0.000  0.071 0.901 -0.428
-set kw(vtkTemp337) [$kw(vtkTemp1) ClipPlaneCallback]
+set kw(vtkTemp337) [$kw(vtkTemp1) ClipCallback]
 set kw(vtkTemp351) [$kw(vtkTemp337) GetPVWidget {Clip Function}]
 $kw(vtkTemp351) SetCurrentValue {Sphere}
 set kw(vtkTemp358) [$kw(vtkTemp351) GetPVWidget {Sphere}]

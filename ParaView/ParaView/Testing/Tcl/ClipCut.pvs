@@ -44,7 +44,7 @@ set pv(vtkTemp281) [$pv(vtkTemp250) GetPVWidget {Size}]
 $pv(vtkTemp281) SetValue 1.2 1.2 1.0 1.0
 $pv(vtkTemp250) AcceptCallback
 
-set pv(vtkTemp294) [$pv(vtkTemp1) ClipPlaneCallback]
+set pv(vtkTemp294) [$pv(vtkTemp1) ClipCallback]
 set pv(vtkTemp296) [$pv(vtkTemp294) GetPVWidget {Clip Function}]
 set pv(vtkTemp295) [$pv(vtkTemp296) GetPVWidget {Plane}]
 set pv(vtkTemp303) [$pv(vtkTemp295) GetCenterEntry]
@@ -59,7 +59,7 @@ $pv(vtkTemp1) SetCurrentPVSource $pv(vtkTemp207)
 $pv(vtkTemp1) ShowCurrentSourceProperties
 
 
-set pv(vtkTemp366) [$pv(vtkTemp1) ClipPlaneCallback]
+set pv(vtkTemp366) [$pv(vtkTemp1) ClipCallback]
 set pv(vtkTemp368) [$pv(vtkTemp366) GetPVWidget {Clip Function}]
 set pv(vtkTemp367) [$pv(vtkTemp368) GetPVWidget {Plane}]
 set pv(vtkTemp375) [$pv(vtkTemp367) GetCenterEntry]
@@ -76,7 +76,7 @@ $pv(vtkTemp1) SetCurrentPVSource $pv(vtkTemp164)
 $pv(vtkTemp1) ShowCurrentSourceProperties
 
 
-set pv(vtkTemp416) [$pv(vtkTemp1) CutPlaneCallback]
+set pv(vtkTemp416) [$pv(vtkTemp1) CutCallback]
 set pv(vtkTemp418) [$pv(vtkTemp416) GetPVWidget {Cut Function}]
 set pv(vtkTemp417) [$pv(vtkTemp418) GetPVWidget {Plane}]
 set pv(vtkTemp425) [$pv(vtkTemp417) GetCenterEntry]
@@ -86,7 +86,7 @@ $pv(vtkTemp1) SetCurrentPVSource $pv(vtkTemp98)
 $pv(vtkTemp1) ShowCurrentSourceProperties
 
 
-set pv(vtkTemp446) [$pv(vtkTemp1) CutPlaneCallback]
+set pv(vtkTemp446) [$pv(vtkTemp1) CutCallback]
 set pv(vtkTemp449) [$pv(vtkTemp446) GetPVWidget {Cut Function}]
 set pv(vtkTemp448) [$pv(vtkTemp449) GetPVWidget {Plane}]
 set pv(vtkTemp455) [$pv(vtkTemp448) GetCenterEntry]
