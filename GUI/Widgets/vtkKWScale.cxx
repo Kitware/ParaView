@@ -22,7 +22,7 @@
 
 // ---------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWScale );
-vtkCxxRevisionMacro(vtkKWScale, "1.77");
+vtkCxxRevisionMacro(vtkKWScale, "1.78");
 
 int vtkKWScaleCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -767,6 +767,7 @@ void vtkKWScale::SetEndCommand(vtkKWObject* Object,
   if (this->EndCommand)
     {
     delete [] this->EndCommand;
+    this->EndCommand = NULL;
     }
 
   if (!Object)
@@ -786,6 +787,7 @@ void vtkKWScale::SetEntryCommand(vtkKWObject* Object,
   if (this->EntryCommand)
     {
     delete [] this->EntryCommand;
+    this->EntryCommand = NULL;
     }
 
   if (!Object)
@@ -805,6 +807,7 @@ void vtkKWScale::SetCommand(vtkKWObject* Object,
   if (this->Command)
     {
     delete [] this->Command;
+    this->Command = NULL;
     }
 
   if (!Object)
