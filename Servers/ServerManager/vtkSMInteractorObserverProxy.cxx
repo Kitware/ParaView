@@ -24,7 +24,7 @@
 
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkSMInteractorObserverProxy, "1.4");
+vtkCxxRevisionMacro(vtkSMInteractorObserverProxy, "1.5");
 
 //===========================================================================
 //***************************************************************************
@@ -113,6 +113,10 @@ void vtkSMInteractorObserverProxy::ExecuteEvent(vtkObject*, unsigned long event,
   else if ( event == vtkCommand::EndInteractionEvent )
     {
     this->InvokeEvent(vtkCommand::EndInteractionEvent);
+    }
+  else if ( event == vtkCommand::PlaceWidgetEvent )
+    {
+    this->InvokeEvent(vtkCommand::PlaceWidgetEvent);
     }
   else
     {
