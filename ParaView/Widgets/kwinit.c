@@ -10362,7 +10362,7 @@ static char zBgerror[] =
 ** This routine is called after the interpreter is created, but
 ** before Et_PreInit() or Et_AppInit() have been run.
 */
-int Et_DoInit(Tcl_Interp *interp){
+int Et_DoInit(Tcl_Interp *interp, int enable_tk){
   int i;
   extern int Et_PreInit(Tcl_Interp*);
   extern int Et_AppInit(Tcl_Interp*);
@@ -10429,11 +10429,13 @@ int Et_DoInit(Tcl_Interp *interp){
   }
   Et_GlobalEvalF(interp,"set dir $tcl_library;source $dir/tclIndex;unset dir");
 #if ET_ENABLE_TK
-  if( Tk_Init(interp) == TCL_ERROR ){
-    goto initerr;
+  if (enable_tk){
+    if( Tk_Init(interp) == TCL_ERROR ){
+      goto initerr;
+    }
+    Tcl_StaticPackage(interp,"Tk", Tk_Init, 0);
+    Et_GlobalEvalF(interp,"set dir $tk_library;source $dir/tclIndex;unset dir");
   }
-  Tcl_StaticPackage(interp,"Tk", Tk_Init, 0);
-  Et_GlobalEvalF(interp,"set dir $tk_library;source $dir/tclIndex;unset dir");
 #endif
   /* Tcl_SetVar(interp, "tcl_rcFileName", "~/.wishrc", TCL_GLOBAL_ONLY); */
   for(i=0; i<((int)(sizeof(Et_CmdSet)/sizeof(Et_CmdSet[0]) - 1)); i++){
@@ -10497,7 +10499,7 @@ static int Et_Local_Init(int argc, char **argv){
   Tcl_SetVar(interp, "argc", buf, TCL_GLOBAL_ONLY);
   Tcl_SetVar(interp, "argv0", argv[0], TCL_GLOBAL_ONLY);
   Tcl_SetVar(interp, "tcl_interactive", "0", TCL_GLOBAL_ONLY);
-  Et_DoInit(interp);
+  Et_DoInit(interp,1);
 #if ET_HAVE_CUSTOM_MAINLOOP
   Et_CustomMainLoop(interp);
 #else

@@ -71,7 +71,7 @@ int vtkKWApplication::WidgetVisibility = 1;
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.130.2.2");
+vtkCxxRevisionMacro(vtkKWApplication, "1.130.2.3");
 
 extern "C" int Vtktcl_Init(Tcl_Interp *interp);
 extern "C" int Vtkkwwidgetstcl_Init(Tcl_Interp *interp);
@@ -605,7 +605,7 @@ Tcl_Interp *vtkKWApplication::InitializeTcl(int argc,
 #if !defined(USE_INSTALLED_TCLTK_PACKAGES) && \
     (TCL_MAJOR_VERSION == 8) && (TCL_MINOR_VERSION < 4)
 
-  Et_DoInit(interp);
+  Et_DoInit(interp, vtkKWApplication::WidgetVisibility);
 
 #else
 

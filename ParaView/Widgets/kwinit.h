@@ -10,7 +10,7 @@
 ET_EXTERN int Et_Init(int,char *[]);
 ET_EXTERN char *mprintf(const char*,...);
 ET_EXTERN char *vmprintf(const char*,...);
-ET_EXTERN int Et_DoInit(Tcl_Interp *interp);
+ET_EXTERN int Et_DoInit(Tcl_Interp *interp, int enable_tk);
 ET_EXTERN int Et_EvalF(Tcl_Interp*,const char *,...);
 ET_EXTERN int Et_GlobalEvalF(Tcl_Interp*,const char *,...);
 ET_EXTERN int Et_DStringAppendF(Tcl_DString*,const char*,...);
