@@ -33,6 +33,8 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 #ifdef VTK_USE_MPI
 # include <mpi.h>
+#else
+# include "vtkDummyController.h"
 #endif
 
 
@@ -330,8 +332,7 @@ int main(int argc, char *argv[])
   vtkMultiProcessController *controller = vtkMultiProcessController::New();  
   controller->Initialize(&argc, &argv, 1);
 #else
-  vtkMultiProcessController *controller = vtkMultiProcessController::New();  
-  controller->Initialize(&argc, &argv);
+  vtkDummyController *controller = vtkDummyController::New();  
 #endif
 
   int retVal = 0;

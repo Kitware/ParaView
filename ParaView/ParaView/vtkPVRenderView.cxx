@@ -310,8 +310,6 @@ void vtkPVRenderView::CreateRenderObjects(vtkPVApplication *pvApp)
     pvApp->BroadcastScript("%s SetMultiSamples 0", this->RenderWindowTclName);
     }
 
-  this->Composite = 0;
-#ifdef VTK_USE_MPI
   // Create the compositer.
   this->Composite = static_cast<vtkPVTreeComposite*>(pvApp->MakeTclObject("vtkPVTreeComposite", "TreeComp1"));
 
@@ -337,14 +335,6 @@ void vtkPVRenderView::CreateRenderObjects(vtkPVApplication *pvApp)
     pvApp->BroadcastScript("%s InitializeOffScreen", this->CompositeTclName);
     }
 
-#else
-
-  pvApp->BroadcastScript("%s AddRenderer %s", this->RenderWindowTclName,
-			 this->RendererTclName);
-  // Tree compositer handles aborts now.
-  this->RenderWindow->SetAbortCheckMethod(PVRenderViewAbortCheck, (void*)this);
-#endif
-  
 }
 
 
