@@ -19,41 +19,47 @@
 #include "vtkMultiProcessController.h"
 #include "vtkPolyData.h"
 
-vtkCxxRevisionMacro(vtkPVGlyphFilter, "1.7");
+vtkCxxRevisionMacro(vtkPVGlyphFilter, "1.8");
 vtkStandardNewMacro(vtkPVGlyphFilter);
 
+//-----------------------------------------------------------------------------
 vtkPVGlyphFilter::vtkPVGlyphFilter()
 {
   this->SetColorModeToColorByScalar();
   this->SetScaleModeToScaleByVector();
   this->MaskPoints = vtkMaskPoints::New();
   this->MaximumNumberOfPoints = 5000;
-  this->NumberOfProcesses =
-    vtkMultiProcessController::GetGlobalController()->GetNumberOfProcesses();
+  this->NumberOfProcesses = vtkMultiProcessController::GetGlobalController() ?
+    vtkMultiProcessController::GetGlobalController()->GetNumberOfProcesses() : 0;
   this->UseMaskPoints = 1;
 }
 
+//-----------------------------------------------------------------------------
 vtkPVGlyphFilter::~vtkPVGlyphFilter()
 {
   this->MaskPoints->Delete();
 }
 
+//-----------------------------------------------------------------------------
 void vtkPVGlyphFilter::SetInput(vtkDataSet *input)
 {
   this->MaskPoints->SetInput(input);
   this->Superclass::SetInput(this->MaskPoints->GetOutput());
 }
 
+//-----------------------------------------------------------------------------
 void vtkPVGlyphFilter::SetRandomMode(int mode)
 {
   this->MaskPoints->SetRandomMode(mode);
 }
 
+//-----------------------------------------------------------------------------
 int vtkPVGlyphFilter::GetRandomMode()
 {
   return this->MaskPoints->GetRandomMode();
 }
 
+//-----------------------------------------------------------------------------
 void vtkPVGlyphFilter::Execute()
 {
   if (this->UseMaskPoints)
@@ -75,6 +81,7 @@ void vtkPVGlyphFilter::Execute()
   this->Superclass::Execute();
 }
 
+//-----------------------------------------------------------------------------
 void vtkPVGlyphFilter::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
