@@ -90,7 +90,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLODRenderModuleUI);
-vtkCxxRevisionMacro(vtkPVLODRenderModuleUI, "1.5.2.1");
+vtkCxxRevisionMacro(vtkPVLODRenderModuleUI, "1.5.2.2");
 
 int vtkPVLODRenderModuleUICommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -133,6 +133,8 @@ vtkPVLODRenderModuleUI::~vtkPVLODRenderModuleUI()
                              this->LODThreshold);
     pvapp->SetRegisteryValue(2, "RunTime", "LODResolution", "%d",
                              this->LODResolution);
+    pvapp->SetRegisteryValue(2, "RunTime", "RenderInterruptsEnabled", "%d",
+                             this->RenderInterruptsEnabled);
 
     }
 
@@ -303,7 +305,7 @@ void vtkPVLODRenderModuleUI::Create(vtkKWApplication *app, const char *)
                                         "RenderInterruptsEnabled", 0))
     {
     this->RenderInterruptsEnabled = 
-      pvapp->GetIntRegisteryValue(2, "RunTime", "InterruptRender");
+      pvapp->GetIntRegisteryValue(2, "RunTime", "RenderInterruptsEnabled");
     }
   this->RenderInterruptsEnabledCheck->SetState(this->RenderInterruptsEnabled);
   // This call just forwards the value to the render module.
