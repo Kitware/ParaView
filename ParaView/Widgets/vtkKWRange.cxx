@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkObjectFactory.h"
 
 vtkStandardNewMacro( vtkKWRange );
-vtkCxxRevisionMacro(vtkKWRange, "1.21");
+vtkCxxRevisionMacro(vtkKWRange, "1.22");
 
 #define VTK_KW_RANGE_MIN_SLIDER_SIZE        2
 #define VTK_KW_RANGE_MIN_THICKNESS          (2*VTK_KW_RANGE_MIN_SLIDER_SIZE+1)
@@ -288,7 +288,7 @@ void vtkKWRange::CreateZoomButtons()
     button = this->ZoomButtons->GetButton(0);
     if (button)
       {
-      button->SetImageData(vtkKWIcon::ICON_PLUS);
+      button->SetImageOption(vtkKWIcon::ICON_PLUS);
       }
 
     this->ZoomButtons->AddButton(
@@ -298,7 +298,7 @@ void vtkKWRange::CreateZoomButtons()
     button = this->ZoomButtons->GetButton(1);
     if (button)
       {
-      button->SetImageData(vtkKWIcon::ICON_MINUS);
+      button->SetImageOption(vtkKWIcon::ICON_MINUS);
       }
 
     this->ZoomButtons->SetBorderWidth(0);

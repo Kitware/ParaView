@@ -44,7 +44,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWMessageDialog );
-vtkCxxRevisionMacro(vtkKWMessageDialog, "1.49");
+vtkCxxRevisionMacro(vtkKWMessageDialog, "1.50");
 
 
 
@@ -297,15 +297,15 @@ void vtkKWMessageDialog::SetIcon()
 {
   if ( this->Options & vtkKWMessageDialog::ErrorIcon )
     {
-    this->Icon->SetImageData(vtkKWIcon::ICON_ERROR);
+    this->Icon->SetImageOption(vtkKWIcon::ICON_ERROR);
     }
   else if ( this->Options & vtkKWMessageDialog::QuestionIcon )
     {
-    this->Icon->SetImageData(vtkKWIcon::ICON_QUESTION);
+    this->Icon->SetImageOption(vtkKWIcon::ICON_QUESTION);
     }
   else if ( this->Options & vtkKWMessageDialog::WarningIcon )
     {
-    this->Icon->SetImageData(vtkKWIcon::ICON_WARNING);
+    this->Icon->SetImageOption(vtkKWIcon::ICON_WARNING);
     }
   else
     {

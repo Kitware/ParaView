@@ -290,7 +290,7 @@ public:
   virtual const char* GetAnchorAsString(int);
 
   // Description:
-  // Set image data using either icon, predefined icon index (see 
+  // Set image option using either icon, predefined icon index (see 
   // vtkKWIcon.h) or pixel data (pixels and the structure of the
   // image, i.e. width, height, pixel_size ; if buffer_length = 0, it
   // is computed using width * height * pixel_size, otherwise used as 
@@ -301,17 +301,17 @@ public:
   // (ex: -fg, -selectcolor)
   // An image is created and associated to the Tk -image option, 
   // or image_option if not NULL (ex: -selectimage).
-  virtual void SetImageData(int icon_index,
-                            const char *blend_color_option = 0,
-                            const char *image_option = 0);
-  virtual void SetImageData(vtkKWIcon *icon,
-                            const char *blend_color_option = 0,
-                            const char *image_option = 0);
-  virtual void SetImageData(const unsigned char* data, 
-                            int width, int height, int pixel_size = 4,
-                            unsigned long buffer_length = 0,
-                            const char *blend_color_option = 0,
-                            const char *image_option = 0);
+  virtual void SetImageOption(int icon_index,
+                              const char *blend_color_option = 0,
+                              const char *image_option = 0);
+  virtual void SetImageOption(vtkKWIcon *icon,
+                              const char *blend_color_option = 0,
+                              const char *image_option = 0);
+  virtual void SetImageOption(const unsigned char* data, 
+                              int width, int height, int pixel_size = 4,
+                              unsigned long buffer_length = 0,
+                              const char *blend_color_option = 0,
+                              const char *image_option = 0);
   
 protected:
   vtkKWWidget();

@@ -46,7 +46,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLabeledFrame );
-vtkCxxRevisionMacro(vtkKWLabeledFrame, "1.27");
+vtkCxxRevisionMacro(vtkKWLabeledFrame, "1.28");
 
 int vtkKWLabeledFrameCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -71,7 +71,7 @@ vtkKWLabeledFrame::vtkKWLabeledFrame()
   this->Icon = vtkKWLabel::New();
   this->Icon->SetParent(this);
   this->IconData = vtkKWIcon::New();
-  this->IconData->SetImageData(vtkKWIcon::ICON_SHRINK);
+  this->IconData->SetImage(vtkKWIcon::ICON_SHRINK);
   this->Displayed = 1;
   this->ShowHideFrame = 0;
 
@@ -236,7 +236,7 @@ void vtkKWLabeledFrame::Create(vtkKWApplication *app, const char* args)
     }
 
   this->Icon->Create(app,"");
-  this->Icon->SetImageData(this->IconData);
+  this->Icon->SetImageOption(this->IconData);
   this->Icon->SetBalloonHelpString("Shrink or expand the frame");
   
   this->Script("pack %s -fill x -side top", this->Border->GetWidgetName());
@@ -275,16 +275,16 @@ void vtkKWLabeledFrame::PerformShowHideFrame()
     {
     this->Script("pack forget %s", this->Frame->GetWidgetName());
     this->Displayed = 0;
-    this->IconData->SetImageData(vtkKWIcon::ICON_EXPAND);
+    this->IconData->SetImage(vtkKWIcon::ICON_EXPAND);
     }
   else
     {
     this->Script("pack %s -fill both -expand yes",
                  this->Frame->GetWidgetName());
     this->Displayed = 1;
-    this->IconData->SetImageData(vtkKWIcon::ICON_SHRINK);
+    this->IconData->SetImage(vtkKWIcon::ICON_SHRINK);
    }
-  this->Icon->SetImageData(this->IconData);
+  this->Icon->SetImageOption(this->IconData);
 }
 
 //----------------------------------------------------------------------------

@@ -101,7 +101,7 @@ Bool vtkKWRenderViewPredProc(Display *vtkNotUsed(disp), XEvent *event,
 }
 #endif
 
-vtkCxxRevisionMacro(vtkKWView, "1.111");
+vtkCxxRevisionMacro(vtkKWView, "1.112");
 
 //----------------------------------------------------------------------------
 int vtkKWViewCommand(ClientData cd, Tcl_Interp *interp,
@@ -456,10 +456,10 @@ void vtkKWView::CreateViewProperties()
   this->Notebook->Create(this->Application,"");
 
   vtkKWIcon *ico = vtkKWIcon::New();
-  ico->SetImageData(vtkKWIcon::ICON_GENERAL);
+  ico->SetImage(vtkKWIcon::ICON_GENERAL);
   this->Notebook->AddPage(
     "General", "Set the general properties of the image view", ico);
-  ico->SetImageData(vtkKWIcon::ICON_ANNOTATE);
+  ico->SetImage(vtkKWIcon::ICON_ANNOTATE);
   this->Notebook->AddPage(
     "Annotate", "Set the header and corner annotation", ico);
   ico->Delete();
@@ -1524,7 +1524,7 @@ void vtkKWView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWView ";
-  this->ExtractRevision(os,"$Revision: 1.111 $");
+  this->ExtractRevision(os,"$Revision: 1.112 $");
 }
 
 //----------------------------------------------------------------------------

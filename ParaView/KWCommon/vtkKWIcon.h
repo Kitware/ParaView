@@ -56,10 +56,6 @@ public:
   vtkTypeRevisionMacro(vtkKWIcon,vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // Select an icon based on the icon name.
-  void SetImageData(int image);
-
   //BTX
   // Description:
   // There are several predefined icons in the icons.h. Since we
@@ -101,24 +97,23 @@ public:
   //ETX
 
   // Description:
+  // Select an icon based on the icon name.
+  void SetImage(int image);
+
+  // Description:
   // Set image data from vtkImageData. 
   // Pixel data is converted/padded to RGBA for backward compatibility.
-  void SetImageData(vtkImageData*);
+  void SetImage(vtkImageData*);
 
   // Description:
   // Set image data from another vtkKWIcon.
-  void SetImageData(vtkKWIcon*);
+  void SetImage(vtkKWIcon*);
 
   // Description:
   // Set image data from pixel data, eventually zlib and base64.
-  void SetImageData(const unsigned char* data, 
-                    int width, int height, int pixel_size, 
-                    unsigned long buffer_length);
-
-  // Description:
-  // Set icon to the custom data.
-  void SetData(const unsigned char* data, 
-               int width, int height, int pixel_size);
+  void SetImage(const unsigned char* data, 
+                int width, int height, int pixel_size, 
+                unsigned long buffer_length);
 
   // Description:
   // Get the raw image data.
@@ -139,6 +134,11 @@ public:
 protected:
   vtkKWIcon();
   ~vtkKWIcon();
+
+  // Description:
+  // Set icon to the custom data.
+  void SetData(const unsigned char* data, 
+               int width, int height, int pixel_size);
 
   unsigned char* Data;
   int Width;

@@ -66,7 +66,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define VTK_KW_WINDOW_GEOMETRY_REG_KEY "WindowGeometry"
 #define VTK_KW_WINDOW_FRAME1_SIZE_REG_KEY "WindowFrame1Size"
 
-vtkCxxRevisionMacro(vtkKWWindow, "1.158");
+vtkCxxRevisionMacro(vtkKWWindow, "1.159");
 vtkCxxSetObjectMacro(vtkKWWindow, PropertiesParent, vtkKWWidget);
 
 class vtkKWWindowMenuEntry
@@ -697,7 +697,7 @@ void vtkKWWindow::Create(vtkKWApplication *app, char *args)
   this->Script("%s configure -relief sunken -bd 2",
                this->TrayImageError->GetWidgetName());
 
-  this->TrayImageError->SetImageData(vtkKWIcon::ICON_SMALLERRORRED);
+  this->TrayImageError->SetImageOption(vtkKWIcon::ICON_SMALLERRORRED);
   this->TrayImageError->SetBind(this, "<Button-1>", "ProcessErrorClick");
   
   // To force the toolbar on top, I am creating a separate "MiddleFrame" 
@@ -1369,11 +1369,11 @@ void vtkKWWindow::SetErrorIcon(int s)
                  this->TrayImageError->GetWidgetName());
     if ( s > 1 )
       {
-      this->TrayImageError->SetImageData(vtkKWIcon::ICON_SMALLERRORRED);
+      this->TrayImageError->SetImageOption(vtkKWIcon::ICON_SMALLERRORRED);
       }
     else
       {
-      this->TrayImageError->SetImageData(vtkKWIcon::ICON_SMALLERROR);
+      this->TrayImageError->SetImageOption(vtkKWIcon::ICON_SMALLERROR);
       }
     }
   else

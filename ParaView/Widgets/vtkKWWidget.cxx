@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWWidget );
-vtkCxxRevisionMacro(vtkKWWidget, "1.71");
+vtkCxxRevisionMacro(vtkKWWidget, "1.72");
 
 int vtkKWWidgetCommand(ClientData cd, Tcl_Interp *interp,
                        int argc, char *argv[]);
@@ -341,7 +341,7 @@ void vtkKWWidget::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkKWWidget ";
-  this->ExtractRevision(os,"$Revision: 1.71 $");
+  this->ExtractRevision(os,"$Revision: 1.72 $");
 }
 
 //----------------------------------------------------------------------------
@@ -1174,43 +1174,43 @@ const char* vtkKWWidget::GetAnchorAsString(int anchor)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWWidget::SetImageData(int icon_index,
-                               const char *blend_color_option,
-                               const char *image_option)
+void vtkKWWidget::SetImageOption(int icon_index,
+                                 const char *blend_color_option,
+                                 const char *image_option)
 {
   vtkKWIcon *icon = vtkKWIcon::New();
-  icon->SetImageData(icon_index);
-  this->SetImageData(icon, blend_color_option, image_option);
+  icon->SetImage(icon_index);
+  this->SetImageOption(icon, blend_color_option, image_option);
   icon->Delete();
 }
 
 //----------------------------------------------------------------------------
-void vtkKWWidget::SetImageData(vtkKWIcon* icon,
-                               const char *blend_color_option,
-                               const char *image_option)
+void vtkKWWidget::SetImageOption(vtkKWIcon* icon,
+                                 const char *blend_color_option,
+                                 const char *image_option)
 {
   if (!icon)
     {
     return;
     }
 
-  this->SetImageData(icon->GetData(), 
-                     icon->GetWidth(), 
-                     icon->GetHeight(), 
-                     icon->GetPixelSize(),
-                     0,
-                     blend_color_option, 
-                     image_option);
+  this->SetImageOption(icon->GetData(), 
+                       icon->GetWidth(), 
+                       icon->GetHeight(), 
+                       icon->GetPixelSize(),
+                       0,
+                       blend_color_option, 
+                       image_option);
 }
 
 //----------------------------------------------------------------------------
-void vtkKWWidget::SetImageData(const unsigned char* data, 
-                               int width, 
-                               int height,
-                               int pixel_size,
-                               unsigned long buffer_length,
-                               const char *blend_color_option,
-                               const char *image_option)
+void vtkKWWidget::SetImageOption(const unsigned char* data, 
+                                 int width, 
+                                 int height,
+                                 int pixel_size,
+                                 unsigned long buffer_length,
+                                 const char *blend_color_option,
+                                 const char *image_option)
 {
   if (!this->IsCreated())
     {

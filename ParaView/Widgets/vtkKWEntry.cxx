@@ -73,7 +73,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWEntry );
-vtkCxxRevisionMacro(vtkKWEntry, "1.28");
+vtkCxxRevisionMacro(vtkKWEntry, "1.29");
 
 //----------------------------------------------------------------------------
 vtkKWEntry::vtkKWEntry()
@@ -220,7 +220,7 @@ void vtkKWEntry::Create(vtkKWApplication *app, const char *args)
     vtkKWLabel *label = vtkKWLabel::New();
     label->SetParent(this);
     label->Create(app, "-relief raised");
-    label->SetImageData(vtkKWIcon::ICON_EXPAND);
+    label->SetImageOption(vtkKWIcon::ICON_EXPAND);
     this->Script("pack %s -fill y -expand 0 -side left", label->GetWidgetName());
     label->SetBind(this, "<ButtonPress>", "DisplayPopupCallback");
     label->Delete();

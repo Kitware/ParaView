@@ -44,7 +44,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // ---------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWScale );
-vtkCxxRevisionMacro(vtkKWScale, "1.54");
+vtkCxxRevisionMacro(vtkKWScale, "1.55");
 
 int vtkKWScaleCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -219,11 +219,11 @@ void vtkKWScale::Create(vtkKWApplication *app, const char *args)
     this->PopupPushButton->SetParent(this);
     this->PopupPushButton->Create(app, "-padx 0 -pady 0");
 
-    this->PopupPushButton->SetImageData(image_arrow, 
-                                        image_arrow_width, 
-                                        image_arrow_height, 
-                                        image_arrow_pixel_size,
-                                        image_arrow_buffer_length);
+    this->PopupPushButton->SetImageOption(image_arrow, 
+                                          image_arrow_width, 
+                                          image_arrow_height, 
+                                          image_arrow_pixel_size,
+                                          image_arrow_buffer_length);
 
     this->Scale->SetParent(this->TopLevel);
     }

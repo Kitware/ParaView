@@ -80,17 +80,17 @@ public:
   // parameters but blend_color_option = -selectcolor, 
   // image_option = -selectimage, so that the aspect is correct when the
   // button is checked.
-  virtual void SetImageData(int icon_index,
-                            const char *blend_color_option = 0,
-                            const char *image_option = 0);
-  virtual void SetImageData(vtkKWIcon *icon,
-                            const char *blend_color_option = 0,
-                            const char *image_option = 0);
-  virtual void SetImageData(const unsigned char* data, 
-                            int width, int height, int pixel_size = 4,
-                            unsigned long buffer_length = 0,
-                            const char *blend_color_option = 0,
-                            const char *image_option = 0);
+  virtual void SetImageOption(int icon_index,
+                              const char *blend_color_option = 0,
+                              const char *image_option = 0);
+  virtual void SetImageOption(vtkKWIcon *icon,
+                              const char *blend_color_option = 0,
+                              const char *image_option = 0);
+  virtual void SetImageOption(const unsigned char* data, 
+                              int width, int height, int pixel_size = 4,
+                              unsigned long buffer_length = 0,
+                              const char *blend_color_option = 0,
+                              const char *image_option = 0);
 
 protected:
 

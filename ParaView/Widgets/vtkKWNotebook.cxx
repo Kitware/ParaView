@@ -80,7 +80,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWNotebook);
-vtkCxxRevisionMacro(vtkKWNotebook, "1.52");
+vtkCxxRevisionMacro(vtkKWNotebook, "1.53");
 
 //----------------------------------------------------------------------------
 int vtkKWNotebookCommand(ClientData cd, Tcl_Interp *interp,
@@ -692,12 +692,12 @@ int vtkKWNotebook::AddPage(const char *title,
   if (icon && icon->GetData())
     {
     page->Icon = vtkKWIcon::New();
-    page->Icon->SetImageData(icon);
+    page->Icon->SetImage(icon);
 
     page->ImageLabel = vtkKWLabel::New();
     page->ImageLabel->SetParent(page->TabFrame);
     page->ImageLabel->Create(this->Application, "");
-    page->ImageLabel->SetImageData(page->Icon);
+    page->ImageLabel->SetImageOption(page->Icon);
 
     cmd << "bind " << page->ImageLabel->GetWidgetName() << " <Button-1> {" 
         << this->GetTclName() << " Raise " << page->Id << "}" << endl;
@@ -1694,7 +1694,7 @@ void vtkKWNotebook::UpdatePageTabBackgroundColor(vtkKWNotebook::Page *page,
                    page->ImageLabel->GetWidgetName(), 
                    page->Frame->GetWidgetName());
       // Reset the imagelabel so that the icon is blended with the background
-      page->ImageLabel->SetImageData(page->Icon);
+      page->ImageLabel->SetImageOption(page->Icon);
       }
 
     // If the tab is pinned, use a color for the border of the tab
@@ -1751,7 +1751,7 @@ void vtkKWNotebook::UpdatePageTabBackgroundColor(vtkKWNotebook::Page *page,
       {
       this->Script("%s config -bg %s", page->ImageLabel->GetWidgetName(), shade);
       // Reset the imagelabel so that the icon is blended with the background
-      page->ImageLabel->SetImageData(page->Icon);
+      page->ImageLabel->SetImageOption(page->Icon);
       }
 
     // If the tab is pinned, use a different hue for the border of the tab

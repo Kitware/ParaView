@@ -122,7 +122,7 @@ static unsigned char image_copy[] =
 
 // ----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWTextProperty);
-vtkCxxRevisionMacro(vtkKWTextProperty, "1.19");
+vtkCxxRevisionMacro(vtkKWTextProperty, "1.20");
 
 int vtkKWTextPropertyCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -270,11 +270,11 @@ void vtkKWTextProperty::Create(vtkKWApplication *app)
   cb = cbs->GetButton(VTK_KW_TEXT_PROP_BOLD_ID);
   this->Script("%s configure %s", cb->GetWidgetName(), styles_options);
 
-  cb->SetImageData(image_bold, 
-                   image_bold_width, 
-                   image_bold_height, 
-                   image_bold_pixel_size,
-                   image_bold_buffer_length);
+  cb->SetImageOption(image_bold, 
+                     image_bold_width, 
+                     image_bold_height, 
+                     image_bold_pixel_size,
+                     image_bold_buffer_length);
 
   cbs->AddButton(VTK_KW_TEXT_PROP_ITALIC_ID, 
                  0, 
@@ -283,11 +283,11 @@ void vtkKWTextProperty::Create(vtkKWApplication *app)
   cb = cbs->GetButton(VTK_KW_TEXT_PROP_ITALIC_ID);
   this->Script("%s configure %s", cb->GetWidgetName(), styles_options);
 
-  cb->SetImageData(image_italic, 
-                   image_italic_width, 
-                   image_italic_height, 
-                   image_italic_pixel_size,
-                   image_italic_buffer_length);
+  cb->SetImageOption(image_italic, 
+                     image_italic_width, 
+                     image_italic_height, 
+                     image_italic_pixel_size,
+                     image_italic_buffer_length);
 
   cbs->AddButton(VTK_KW_TEXT_PROP_SHADOW_ID, 
                  0, 
@@ -296,11 +296,11 @@ void vtkKWTextProperty::Create(vtkKWApplication *app)
   cb = cbs->GetButton(VTK_KW_TEXT_PROP_SHADOW_ID);
   this->Script("%s configure %s", cb->GetWidgetName(), styles_options);
 
-  cb->SetImageData(image_shadow, 
-                   image_shadow_width, 
-                   image_shadow_height, 
-                   image_shadow_pixel_size,
-                   image_shadow_buffer_length);
+  cb->SetImageOption(image_shadow, 
+                     image_shadow_width, 
+                     image_shadow_height, 
+                     image_shadow_pixel_size,
+                     image_shadow_buffer_length);
 
   // Opacity
 
@@ -334,11 +334,11 @@ void vtkKWTextProperty::Create(vtkKWApplication *app)
   pbs->AddButton(VTK_KW_TEXT_PROP_COPY_ID);
   pb = pbs->GetButton(VTK_KW_TEXT_PROP_COPY_ID);
 
-  pb->SetImageData(image_copy, 
-                   image_copy_width, 
-                   image_copy_height, 
-                   image_copy_pixel_size,
-                   image_copy_buffer_length);
+  pb->SetImageOption(image_copy, 
+                     image_copy_width, 
+                     image_copy_height, 
+                     image_copy_pixel_size,
+                     image_copy_buffer_length);
 
   // Pack
 

@@ -53,7 +53,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // ---------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWThumbWheel );
-vtkCxxRevisionMacro(vtkKWThumbWheel, "1.8");
+vtkCxxRevisionMacro(vtkKWThumbWheel, "1.9");
 
 // ---------------------------------------------------------------------------
 int vtkKWThumbWheelCommand(ClientData cd, 
@@ -219,11 +219,11 @@ void vtkKWThumbWheel::Create(vtkKWApplication *app,
     this->PopupPushButton->SetParent(this);
     this->PopupPushButton->Create(app, "-padx 0 -pady 0");
 
-    this->PopupPushButton->SetImageData(image_arrow, 
-                                        image_arrow_width, 
-                                        image_arrow_height, 
-                                        image_arrow_pixel_size,
-                                        image_arrow_buffer_length);
+    this->PopupPushButton->SetImageOption(image_arrow, 
+                                          image_arrow_width, 
+                                          image_arrow_height, 
+                                          image_arrow_pixel_size,
+                                          image_arrow_buffer_length);
 
     this->ThumbWheel->SetParent(this->TopLevel);
     }
@@ -1571,10 +1571,10 @@ void vtkKWThumbWheel::UpdateThumbWheelImage(float pos)
 
   // Update the Tk photo
 
-  this->ThumbWheel->SetImageData(img_buffer,
-                                 this->ThumbWheelWidth, 
-                                 this->ThumbWheelHeight, 
-                                 img_pixel_size);
+  this->ThumbWheel->SetImageOption(img_buffer,
+                                   this->ThumbWheelWidth, 
+                                   this->ThumbWheelHeight, 
+                                   img_pixel_size);
 
   delete [] img_buffer;
 }
