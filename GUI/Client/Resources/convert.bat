@@ -17,6 +17,7 @@ SET OPTIONS=ZLIB BASE64 %1
 %CONVERTIMAGE% vtkPVPickButton.h PVPickButton.png %OPTIONS%
 %CONVERTIMAGE% vtkPVProbeButton.h PVProbeButton.png %OPTIONS%
 %CONVERTIMAGE% vtkPVPullDownArrow.h PVPullDownArrrow.png %OPTIONS%
+%CONVERTIMAGE% vtkPVToolbarPullDownArrow.h PVToolbarPullDownArrrow.png %OPTIONS%
 %CONVERTIMAGE% vtkPVIntegrateFlowButton.h PVIntegrateFlowButton.png %OPTIONS%
 %CONVERTIMAGE% vtkPVSurfaceVectorsButton.h PVSurfaceVectorsButton.png %OPTIONS%
 %CONVERTIMAGE% vtkPVResetCenterButton.h PVResetCenterButton.png %OPTIONS%
@@ -30,6 +31,16 @@ SET OPTIONS=ZLIB BASE64 %1
 %CONVERTIMAGE% vtkPVTranslateViewButton.h PVTranslateViewButton.png PVTranslateViewButtonActive.png %OPTIONS%
 %CONVERTIMAGE% vtkPVVectorDisplacementButton.h PVVectorDisplacementButton.png %OPTIONS%
 %CONVERTIMAGE% vtkPVSelectionWindowButton.h PVSelectionWindowButton.png PVNavigationWindowButton.png %OPTIONS%
+
+%CONVERTIMAGE% vtkPVMandelbrotButton.h PVMandelbrotButton.png %OPTIONS%
+%CONVERTIMAGE% vtkPVWaveletButton.h PVWaveletButton.png %OPTIONS%
+%CONVERTIMAGE% vtkPVSphereSourceButton.h PVSphereSourceButton.png %OPTIONS%
+%CONVERTIMAGE% vtkPVSuperquadricButton.h PVSuperquadricButton.png %OPTIONS%
+%CONVERTIMAGE% vtkPVGroupButton.h PVGroupButton.png %OPTIONS%
+%CONVERTIMAGE% vtkPVUngroupButton.h PVUngroupButton.png %OPTIONS%
+
+%CONVERTIMAGE% vtkPVLockButton.h PVUnlockedButton.png PVLockedButton.png %OPTIONS%
+
 
 
 

@@ -55,9 +55,18 @@
 #include "Resources/vtkPVRulerButton.h"
 #include "Resources/vtkPVIntegrateFlowButton.h"
 #include "Resources/vtkPVSurfaceVectorsButton.h"
-
 #include "Resources/vtkPVSelectionWindowButton.h"
 #include "Resources/vtkPVPullDownArrow.h"
+#include "Resources/vtkPVToolbarPullDownArrow.h"
+#include "Resources/vtkPVMandelbrotButton.h"
+#include "Resources/vtkPVWaveletButton.h"
+#include "Resources/vtkPVSphereSourceButton.h"
+#include "Resources/vtkPVSuperquadricButton.h"
+#include "Resources/vtkPVGroupButton.h"
+#include "Resources/vtkPVUngroupButton.h"
+#include "Resources/vtkPVLockButton.h"
+
+
 
 // Splash screen
 
@@ -66,12 +75,33 @@
 //----------------------------------------------------------------------------
 void vtkPVApplication::CreateButtonPhotos()
 {
+  this->CreatePhoto("PVLockedButton",
+                    image_PVLockedButton , 
+                    image_PVLockedButton_width, 
+                    image_PVLockedButton_height,
+                    image_PVLockedButton_pixel_size,
+                    image_PVLockedButton_buffer_length);
+
+  this->CreatePhoto("PVUnlockedButton",
+                    image_PVUnlockedButton , 
+                    image_PVUnlockedButton_width, 
+                    image_PVUnlockedButton_height,
+                    image_PVUnlockedButton_pixel_size,
+                    image_PVUnlockedButton_buffer_length);
+
   this->CreatePhoto("PVPullDownArrow",
                     image_PVPullDownArrow , 
                     image_PVPullDownArrow_width, 
                     image_PVPullDownArrow_height,
                     image_PVPullDownArrow_pixel_size,
                     image_PVPullDownArrow_buffer_length);
+
+  this->CreatePhoto("PVToolbarPullDownArrow",
+                    image_PVToolbarPullDownArrow , 
+                    image_PVToolbarPullDownArrow_width, 
+                    image_PVToolbarPullDownArrow_height,
+                    image_PVToolbarPullDownArrow_pixel_size,
+                    image_PVToolbarPullDownArrow_buffer_length);
 
   this->CreatePhoto("PVResetViewButton", 
                     image_PVResetViewButton, 
@@ -289,6 +319,48 @@ void vtkPVApplication::CreateButtonPhotos()
                     image_PVSurfaceVectorsButton_height,
                     image_PVSurfaceVectorsButton_pixel_size,
                     image_PVSurfaceVectorsButton_buffer_length);
+
+  this->CreatePhoto("PVMandelbrotButton", 
+                    image_PVMandelbrotButton, 
+                    image_PVMandelbrotButton_width, 
+                    image_PVMandelbrotButton_height,
+                    image_PVMandelbrotButton_pixel_size,
+                    image_PVMandelbrotButton_buffer_length);
+
+  this->CreatePhoto("PVWaveletButton", 
+                    image_PVWaveletButton, 
+                    image_PVWaveletButton_width, 
+                    image_PVWaveletButton_height,
+                    image_PVWaveletButton_pixel_size,
+                    image_PVWaveletButton_buffer_length);
+
+  this->CreatePhoto("PVSphereSourceButton", 
+                    image_PVSphereSourceButton, 
+                    image_PVSphereSourceButton_width, 
+                    image_PVSphereSourceButton_height,
+                    image_PVSphereSourceButton_pixel_size,
+                    image_PVSphereSourceButton_buffer_length);
+
+  this->CreatePhoto("PVSuperquadricButton", 
+                    image_PVSuperquadricButton, 
+                    image_PVSuperquadricButton_width, 
+                    image_PVSuperquadricButton_height,
+                    image_PVSuperquadricButton_pixel_size,
+                    image_PVSuperquadricButton_buffer_length);
+
+  this->CreatePhoto("PVGroupButton", 
+                    image_PVGroupButton, 
+                    image_PVGroupButton_width, 
+                    image_PVGroupButton_height,
+                    image_PVGroupButton_pixel_size,
+                    image_PVGroupButton_buffer_length);
+
+  this->CreatePhoto("PVUngroupButton", 
+                    image_PVUngroupButton, 
+                    image_PVUngroupButton_width, 
+                    image_PVUngroupButton_height,
+                    image_PVUngroupButton_pixel_size,
+                    image_PVUngroupButton_buffer_length);
 
 }
 
