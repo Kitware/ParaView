@@ -2,6 +2,7 @@ SET(ServersFilters_SRCS
   TestContinuousClose3D
   ServersFiltersPrintSelf
   TestCTH
+  TestPVFilters
   )
 
 FOREACH(name ${ServersFilters_SRCS})
