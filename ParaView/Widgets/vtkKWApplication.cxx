@@ -89,7 +89,7 @@ int vtkKWApplication::WidgetVisibility = 1;
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.149");
+vtkCxxRevisionMacro(vtkKWApplication, "1.150");
 
 extern "C" int Vtktcl_Init(Tcl_Interp *interp);
 extern "C" int Vtkkwwidgetstcl_Init(Tcl_Interp *interp);
@@ -1974,10 +1974,10 @@ void vtkKWApplication::EmailFeedback()
     return;
     }
 
-  // Recipient To:
+  // Recipient To: (no SMTP: for Mozilla)
 
   ostrstream recip_to_address;
-  recip_to_address << "smtp:" << this->EmailFeedbackAddress << ends;
+  recip_to_address << this->EmailFeedbackAddress << ends;
 
   MapiRecipDesc recip_to = 
     {
@@ -2023,7 +2023,7 @@ void vtkKWApplication::EmailFeedback()
     0L,
     0L,
     &email,
-    MAPI_DIALOG,
+    MAPI_DIALOG | MAPI_LOGON_UI,
     0L);
 
   if (err != SUCCESS_SUCCESS)
@@ -2031,7 +2031,12 @@ void vtkKWApplication::EmailFeedback()
     vtkKWMessageDialog::PopupMessage(
       this, 0, 
       email_subject.str(), 
-      "Sorry, an error occurred while trying to email feedback.", 
+      "Sorry, an error occurred while trying to email feedback. "
+      "Please make sure that your default email client has been configured "
+      "properly. The Microsoft Simple MAPI (Messaging Application Program "
+      "Interface) is used to perform this operation and it might not be "
+      "accessible as long as your default email client is not running "
+      "simultaneously.",
       vtkKWMessageDialog::ErrorIcon);
     }
 
