@@ -36,12 +36,6 @@ $pv(vtkTemp1) SetCurrentPVSource $pv(vtkTemp364)
 $pv(vtkTemp1) ShowCurrentSourceProperties
 $pv(vtkTemp364) AcceptCallback
 
-set pv(vtkTemp384) [$pv(vtkTemp1) CreatePVSource vtkDelaunay3D]
-$pv(vtkTemp1) SetCurrentPVSource $pv(vtkTemp384)
-$pv(vtkTemp1) ShowCurrentSourceProperties
-$pv(vtkTemp384) AcceptCallback
-
-
 set pv(vtkTemp416) [$pv(vtkTemp1) CreatePVSource vtkCylinderSource]
 $pv(vtkTemp1) SetCurrentPVSource $pv(vtkTemp416)
 $pv(vtkTemp1) ShowCurrentSourceProperties
