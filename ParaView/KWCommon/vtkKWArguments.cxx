@@ -42,6 +42,7 @@ public:
   vtkKWArgumentsString(const StdString& s, size_type pos=0, size_type n=npos):
     StdString(s, pos, n) {}
 };
+
 class vtkKWArgumentsVectorOfStrings : 
   public vtkstd::vector<vtkKWArgumentsString> {};
 class vtkKWArgumentsSetOfStrings :
@@ -49,6 +50,10 @@ class vtkKWArgumentsSetOfStrings :
 class vtkKWArgumentsMapOfStrucs : 
   public vtkstd::map<vtkKWArgumentsString,
     vtkKWArguments::CallbackStructure> {};
+class vtkKWArgumentsMapOfStrings:
+  public vtkstd::map<vtkKWArgumentsString,
+    vtkKWArgumentsString> {};
+
 class vtkKWArgumentsInternal
 {
 public:
@@ -63,9 +68,11 @@ public:
   typedef vtkKWArgumentsMapOfStrucs CallbacksMap;
   typedef vtkKWArgumentsString String;
   typedef vtkKWArgumentsSetOfStrings SetOfStrings;
+  typedef vtkKWArgumentsMapOfStrings MapOfStrings;
 
   VectorOfStrings Argv;
   CallbacksMap Callbacks;
+  MapOfStrings ArgumentValues;
 
   vtkKWArguments::ErrorCallbackType UnknownArgumentCallback;
   void*             ClientData;
@@ -77,7 +84,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWArguments );
-vtkCxxRevisionMacro(vtkKWArguments, "1.17");
+vtkCxxRevisionMacro(vtkKWArguments, "1.18");
 
 //----------------------------------------------------------------------------
 vtkKWArguments::vtkKWArguments()
@@ -99,12 +106,24 @@ void vtkKWArguments::Initialize(int argc, char* argv[])
 {
   int cc;
 
-  this->Internals->Argv.clear();
+  this->Initialize();
   for ( cc = 1; cc < argc; cc ++ )
     {
-    this->Internals->Argv.push_back(argv[cc]);
+    this->AddArgument(argv[cc]);
     }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWArguments::Initialize()
+{
+  this->Internals->Argv.clear();
   this->Internals->LastArgument = 0;
+}
+
+//----------------------------------------------------------------------------
+void vtkKWArguments::AddArgument(const char* arg)
+{
+  this->Internals->Argv.push_back(arg);
 }
 
 //----------------------------------------------------------------------------
@@ -180,6 +199,8 @@ int vtkKWArguments::Parse()
         {
         value = arg.c_str() + sarg.size();
         }
+
+      this->Internals->ArgumentValues[sarg.c_str()] = (value?value:"1");
       if ( !cs->Callback(sarg.c_str(), value, cs->CallData) )
         {
         return 0;
@@ -273,11 +294,35 @@ void vtkKWArguments::SetUnknownArgumentCallback(
 }
 
 //----------------------------------------------------------------------------
+const char* vtkKWArguments::GetHelp(const char* arg)
+{
+  vtkKWArguments::Internal::CallbacksMap::iterator it 
+    = this->Internals->Callbacks.find(arg);
+  if ( it == this->Internals->Callbacks.end() )
+    {
+    return 0;
+    }
+  vtkKWArguments::CallbackStructure *cs = &(it->second);
+  while ( 1 )
+    {
+    vtkKWArguments::Internal::CallbacksMap::iterator hit 
+      = this->Internals->Callbacks.find(cs->Help);
+    if ( hit == this->Internals->Callbacks.end() )
+      {
+      return cs->Help;
+      }
+    cs = &(hit->second);
+    }
+  return 0;
+}
+
+//----------------------------------------------------------------------------
 void vtkKWArguments::GenerateHelp()
 {
   ostrstream str;
   vtkKWArguments::Internal::CallbacksMap::iterator it;
-  typedef vtkstd::map<vtkKWArguments::Internal::String, vtkKWArguments::Internal::SetOfStrings > MapArgs;
+  typedef vtkstd::map<vtkKWArguments::Internal::String, 
+     vtkKWArguments::Internal::SetOfStrings > MapArgs;
   MapArgs mp;
   MapArgs::iterator mpit, smpit;
   for ( it = this->Internals->Callbacks.begin();
@@ -403,7 +448,6 @@ void vtkKWArguments::GenerateHelp()
           skip = cc;
           }
         }
-      cout << "Using skip: " << skip << endl;
       str.write(ptr, skip);
       str << endl;
       ptr += skip;
@@ -414,6 +458,30 @@ void vtkKWArguments::GenerateHelp()
   str << ends;
   this->SetHelp(str.str());
   str.rdbuf()->freeze(0);
+}
+
+//----------------------------------------------------------------------------
+int vtkKWArguments::IsSpecified(const char* name)
+{
+  vtkKWArguments::Internal::MapOfStrings::iterator it
+    = this->Internals->ArgumentValues.find(name);
+  if ( it == this->Internals->ArgumentValues.end() )
+    {
+    return 0;
+    }
+  return 1;
+}
+
+//----------------------------------------------------------------------------
+const char* vtkKWArguments::GetValue(const char* name)
+{
+  vtkKWArguments::Internal::MapOfStrings::iterator it
+    = this->Internals->ArgumentValues.find(name);
+  if ( it == this->Internals->ArgumentValues.end() )
+    {
+    return 0;
+    }
+  return it->second.c_str();
 }
 
 //----------------------------------------------------------------------------

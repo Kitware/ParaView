@@ -63,6 +63,13 @@ public:
   // Description:
   // Initialize internal data structures. This should be called before parsing.
   void Initialize(int argc, char* argv[]);
+  
+  // Description:
+  // Initialize internal data structure and pass arguments one by one. This is
+  // convinience method for use from scripting languages where argc and argv
+  // are not available.
+  void Initialize();
+  void AddArgument(const char* arg);
 
   // Description:
   // This method will parse arguments and call apropriate methods. 
@@ -71,9 +78,14 @@ public:
   // Description:
   // This method will add a callback for a specific argument. The arguments to
   // it are argument, argument type, callback method, and call data. The
-  // argument help specifies the help string used with this option.
+  // argument help specifies the help string used with this option. The
+  // callback and call_data can be skipped.
   void AddCallback(const char* argument, int type, CallbackType callback, 
                    void* call_data, const char* help);
+  void AddCallback(const char* argument, int type, const char* help)
+    {
+    this->AddCallback(argument, type, 0, 0, help);
+    }
 
   // Description:
   // This method registers callbacks for argument types from array of
@@ -91,13 +103,21 @@ public:
   void GetRemainingArguments(int* argc, char*** argv);
 
   // Description:
-  // Return string containing help.
+  // Return string containing help. If the argument is specified, only return
+  // help for that argument.
   vtkGetStringMacro(Help);
+  const char* GetHelp(const char* arg);
 
   // Description:
   // Get / Set the line length. Default length is 80.
   vtkSetMacro(LineLength, unsigned int);
   vtkGetMacro(LineLength, unsigned int);
+
+  // Description:
+  // This are methods for map interface. After calling ->Parse(), the program
+  // can ask the map for its entries.
+  int IsSpecified(const char* arg);
+  const char* GetValue(const char* arg);
 
 protected:
   vtkKWArguments();

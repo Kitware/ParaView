@@ -50,6 +50,23 @@ int main(int argc, char* argv[])
     res = 1;
     }
   cout << "Help: " << arg->GetHelp() << endl;
+
+  int cc;
+  for ( cc = 0; callbacks[cc].Argument; cc ++ )
+    {
+    const char* carg = callbacks[cc].Argument;
+    cout << "Argument " << carg << " is ";
+    if ( arg->IsSpecified(carg) )
+      {
+      cout << "specified value is: " << arg->GetValue(carg);
+      }
+    else
+      {
+      cout << "not specified";
+      }
+    cout << " - Help: [" << arg->GetHelp(carg) << "]";
+    cout << endl;
+    }
   arg->Delete();
   return res;
 }
