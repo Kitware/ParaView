@@ -35,7 +35,7 @@
 #include "vtkMPIMToNSocketConnection.h"
 #include "vtkSocketCommunicator.h"
 
-vtkCxxRevisionMacro(vtkMPIMoveData, "1.2");
+vtkCxxRevisionMacro(vtkMPIMoveData, "1.3");
 vtkStandardNewMacro(vtkMPIMoveData);
 
 vtkCxxSetObjectMacro(vtkMPIMoveData,Controller, vtkMultiProcessController);
@@ -358,9 +358,9 @@ void vtkMPIMoveData::DataServerGatherAll(vtkDataSet* input,
 
   this->ReconstructDataFromBuffer(output);
   
-  int fixme; // Do not clear buffers here
+  //int fixme; // Do not clear buffers here
   this->ClearBuffer();
-#ifdef VTK_USE_MPI
+#endif
 }
 
 //-----------------------------------------------------------------------------
@@ -422,7 +422,7 @@ void vtkMPIMoveData::DataServerGatherToZero(vtkDataSet* input,
     this->ReconstructDataFromBuffer(output);
     }
 
-  int fixme; // Do not clear buffers here
+  //int fixme; // Do not clear buffers here
   this->ClearBuffer();
 
   delete [] inBuffer;
@@ -446,7 +446,7 @@ void vtkMPIMoveData::DataServerSendToRenderServer(vtkDataSet* output)
     return;
     }
 
-  int fixme;
+  //int fixme;
   // We might be able to eliminate this marshal.
   this->ClearBuffer();
   this->MarshalDataToBuffer(output);
@@ -483,7 +483,7 @@ void vtkMPIMoveData::RenderServerReceiveFromDataServer(vtkDataSet* output)
   this->Buffers = new char[this->BufferTotalLength];
   com->Receive(this->Buffers, this->BufferTotalLength, 1, 23482);
 
-  int fixme;  // Can we avoid this?
+  //int fixme;  // Can we avoid this?
   this->ReconstructDataFromBuffer(output);
   this->ClearBuffer();
 }
@@ -505,7 +505,7 @@ void vtkMPIMoveData::DataServerZeroSendToRenderServerZero(vtkDataSet* data)
       return;
       }
 
-    int fixme;
+    //int fixme;
     // We might be able to eliminate this marshal.
     this->ClearBuffer();
     this->MarshalDataToBuffer(data);
@@ -547,7 +547,7 @@ void vtkMPIMoveData::RenderServerZeroReceiveFromDataServerZero(vtkDataSet* data)
     this->Buffers = new char[this->BufferTotalLength];
     com->Receive(this->Buffers, this->BufferTotalLength, 1, 23482);
 
-    int fixme;  // Can we avoid this?
+    //int fixme;  // Can we avoid this?
     this->ReconstructDataFromBuffer(data);
     this->ClearBuffer();
     }
