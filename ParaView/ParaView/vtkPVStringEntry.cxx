@@ -47,10 +47,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
 #include "vtkPVXMLElement.h"
+#include "vtkPVProcessModule.h"
+
+#include <vtkstd/string>
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVStringEntry);
-vtkCxxRevisionMacro(vtkPVStringEntry, "1.18");
+vtkCxxRevisionMacro(vtkPVStringEntry, "1.18.2.1");
 
 //----------------------------------------------------------------------------
 vtkPVStringEntry::vtkPVStringEntry()
@@ -213,8 +216,10 @@ void vtkPVStringEntry::ResetInternal(const char* sourceTclName)
     }
 
   // Command to update the UI.
-  this->Script("%s SetValue [%s Get%s]", this->Entry->GetTclName(), 
-               sourceTclName, this->VariableName); 
+  vtkPVProcessModule *pm = this->GetPVApplication()->GetProcessModule();
+  pm->RootScript("%s Get%s", sourceTclName, this->VariableName); 
+  vtkstd::string value = pm->GetRootResult()?pm->GetRootResult():"";
+  this->Script("%s SetValue {%s}", this->Entry->GetTclName(), value.c_str());
 
   this->ModifiedFlag = 0;
 }
