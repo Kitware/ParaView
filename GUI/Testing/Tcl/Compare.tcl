@@ -14,15 +14,16 @@ proc Compare {Application argv argc} {
    }
 
    if { ![$Application GetExitStatus] } {
-       set colorMaps [[$Application GetMainWindow] GetPVColorMaps]
-       $colorMaps InitTraversal
-       while { 1 } {
-           set colorMap [$colorMaps GetNextItemAsObject]
-           if { $colorMap == {} } {
-               break
-           }
-           $colorMap SetScalarBarVisibility 0
-       }
+       #no need to hide the colormaps for batch testing anymore
+       #set colorMaps [[$Application GetMainWindow] GetPVColorMaps]
+       #$colorMaps InitTraversal
+       #while { 1 } {
+       #    set colorMap [$colorMaps GetNextItemAsObject]
+       #    if { $colorMap == {} } {
+       #        break
+       #    }
+       #    $colorMap SetScalarBarVisibility 0
+       #}
        [ $MainView GetCornerAnnotation ] SetVisibility 0
        [ $MainView GetHeaderButton ] SetState 0
        $MainView HeaderChanged

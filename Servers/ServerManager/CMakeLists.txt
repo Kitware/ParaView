@@ -13,6 +13,7 @@ SET( ServerManagerCommon_SRCS
   vtkSMArrayRangeDomain.cxx
   vtkSMArraySelectionDomain.cxx
   vtkSMArraySelectionInformationHelper.cxx
+  vtkSMAxesProxy.cxx
   vtkSMBooleanDomain.cxx
   vtkSMBoundsDomain.cxx
   vtkSMBoxProxy.cxx
@@ -46,8 +47,10 @@ SET( ServerManagerCommon_SRCS
   vtkSMProxyIterator.cxx
   vtkSMProxyManager.cxx
   vtkSMProxyProperty.cxx
+  vtkSMScalarBarWidgetProxy.cxx
   vtkSMSimpleIntInformationHelper.cxx
   vtkSMSimpleDoubleInformationHelper.cxx
+  vtkSMSimpleProxyInformationHelper.cxx
   vtkSMSimpleStringInformationHelper.cxx
   vtkSMSourceProxy.cxx
   vtkSMStringListDomain.cxx
@@ -78,9 +81,6 @@ SET( ServerManagerNonWrapped_SRCS
   vtkPVLODRenderModule.cxx
   vtkPVMPIRenderModule.cxx
   vtkPVSimpleRenderModule.cxx
-  vtkRMObject.cxx
-  vtkRMScalarBarWidget.cxx
-
   vtkSMXMLParser.cxx
   )
 
@@ -95,7 +95,6 @@ SET_SOURCE_FILES_PROPERTIES(
   vtkSMDomain.cxx
   vtkSMInformationHelper.cxx
   vtkSMVectorProperty.cxx
-  vtkRMObject.cxx 
   vtkSMDisplay.cxx
   ABSTRACT
   )

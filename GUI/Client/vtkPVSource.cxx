@@ -68,7 +68,7 @@
 
 
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.400");
+vtkCxxRevisionMacro(vtkPVSource, "1.401");
 vtkCxxSetObjectMacro(vtkPVSource,Notebook,vtkPVSourceNotebook);
 vtkCxxSetObjectMacro(vtkPVSource,PartDisplay,vtkSMPartDisplay);
 
@@ -1238,7 +1238,7 @@ void vtkPVSource::SetDefaultColorParameters()
       colorMap = this->GetPVWindow()->GetPVColorMap(arrayInfo->GetName(), 
                                         arrayInfo->GetNumberOfComponents());
       this->SetPVColorMap(colorMap);                                   
-      this->PartDisplay->ColorByArray(colorMap->GetRMScalarBarWidget(), 
+      this->PartDisplay->ColorByArray(colorMap->GetProxyByName("LookupTable"), 
                                       vtkDataSet::POINT_DATA_FIELD);
       return;
       }
@@ -1259,7 +1259,7 @@ void vtkPVSource::SetDefaultColorParameters()
       colorMap = this->GetPVWindow()->GetPVColorMap(arrayInfo->GetName(), 
                                         arrayInfo->GetNumberOfComponents());
       this->SetPVColorMap(colorMap);                                   
-      this->PartDisplay->ColorByArray(colorMap->GetRMScalarBarWidget(), 
+      this->PartDisplay->ColorByArray(colorMap->GetProxyByName("LookupTable"), 
                                       vtkDataSet::CELL_DATA_FIELD);
       return;
       }
@@ -1283,7 +1283,7 @@ void vtkPVSource::SetDefaultColorParameters()
                                        arrayInfo->GetNumberOfComponents()))
             {  
             this->SetPVColorMap(colorMap);                                   
-            this->PartDisplay->ColorByArray(colorMap->GetRMScalarBarWidget(), 
+            this->PartDisplay->ColorByArray(colorMap->GetProxyByName("LookupTable"), 
                                             vtkDataSet::POINT_DATA_FIELD);
             return;
             }
@@ -1295,7 +1295,7 @@ void vtkPVSource::SetDefaultColorParameters()
                                        arrayInfo->GetNumberOfComponents()))
             {  
             this->SetPVColorMap(colorMap);                                   
-            this->PartDisplay->ColorByArray(colorMap->GetRMScalarBarWidget(), 
+            this->PartDisplay->ColorByArray(colorMap->GetProxyByName("LookupTable"), 
                                             vtkDataSet::CELL_DATA_FIELD);
             return;
             }

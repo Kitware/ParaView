@@ -35,7 +35,6 @@ class vtkSMPart;
 class vtkSMSourceProxy;
 class vtkSMIntVectorProperty;
 class vtkSMDoubleVectorProperty;
-class vtkRMScalarBarWidget;
 class vtkVolume;
 class vtkVolumeProperty;
 class vtkPiecewiseFunction;
@@ -86,11 +85,12 @@ public:
   // use unsigned char arrays directly.
   // MapScalarsOff only works when coloring by an array 
   // on unsigned chars with 1 or 3 components.
+  // The colorMap proxy must be vtkSMLookupTableProxy
   virtual void SetDirectColorFlag(int val);
   int GetDirectColorFlag();
   virtual void SetScalarVisibility(int val);
   int GetScalarVisibility();
-  virtual void ColorByArray(vtkRMScalarBarWidget *colorMap, int field);
+  virtual void ColorByArray(vtkSMProxy* colorMap, int field);
   vtkGetMacro(ColorField,int);
 
   // Description:
@@ -229,7 +229,7 @@ protected:
   void SendForceUpdate();
 
   vtkSMSourceProxy* Source;
-  vtkRMScalarBarWidget* ColorMap;
+  vtkSMProxy* ColorMap;
   vtkPVProcessModule *ProcessModule;
   
   vtkSMIntVectorProperty* ScalarVisibilityProperty;

@@ -41,15 +41,15 @@ class vtkKWPushButton;
 class vtkKWScale;
 class vtkKWTextProperty;
 class vtkKWWidget;
-class vtkLookupTable;
 class vtkPVApplication;
 class vtkPVRenderView;
-class vtkScalarBarWidget;
-class vtkRMScalarBarWidgetObserver;
-class vtkRMScalarBarWidget;
+class vtkPVColorMapObserver;
 class vtkPVSource;
 class vtkKWRange;
-
+class vtkTextProperty;
+class vtkSMScalarBarWidgetProxy;
+class vtkSMLookupTableProxy;
+class vtkSMProxy;
 class VTK_EXPORT vtkPVColorMap : public vtkKWWidget
 {
 public:
@@ -74,8 +74,7 @@ public:
   // (e.g. Temperature). Currently it also indicates the arrays mapped
   // by this color map object.
   void SetScalarBarTitle(const char* Name);
-  void SetScalarBarTitleInternal(const char* Name);
-  const char* GetScalarBarTitle();
+  vtkGetStringMacro(ScalarBarTitle);
 
   // Description:
   // This map is used for arrays with this name 
@@ -84,6 +83,7 @@ public:
   void SetArrayName(const char* name);
   const char* GetArrayName();
   int MatchArrayName(const char* name, int numberOfComponents);
+
   void SetNumberOfVectorComponents(int num);
   int GetNumberOfVectorComponents();
 
@@ -134,16 +134,11 @@ public:
   // Description:
   // Choose which component to color with.
   void SetVectorComponent(int component);
-  int GetVectorComponent();
-
+  vtkGetMacro(VectorComponent,int);
 
   // Description:
   // Save out the mapper and actor to a file.
   void SaveInBatchScript(ofstream *file);
-
-  // Description:
-  // The data needs to lookup table name to set the lookup table of the mapper.
-  vtkClientServerID GetLookupTableID();
 
   // --- UI Stuff ---
 
@@ -259,20 +254,46 @@ public:
   // of 3D widgets, etc.
   virtual void UpdateEnableState();
 
-//BTX 
   // Description:
-  // This object is the server equivalent of a ColorMap.
-  vtkGetObjectMacro(RMScalarBarWidget,vtkRMScalarBarWidget);
-//ETX
+  // Callback when the text property for the title is changed
+  void TitleTextPropertyWidgetCallback();
+
+  // Description:
+  // Methods to modify the Title text property.
+  virtual void SetTitleColor(double r, double g, double b);
+  virtual void SetTitleOpacity(double opacity);
+  virtual void SetTitleFontFamily(int font);
+  virtual void SetTitleBold(int bold);
+  virtual void SetTitleItalic(int italic);
+  virtual void SetTitleShadow(int shadow); 
+  
+  // Description:
+  // Callback when the text property for the labels is changed
+  void LabelTextPropertyWidgetCallback();
+
+  // Description:
+  // Methods to modify the Labels text property.
+  virtual void SetLabelColor(double r, double g, double b);
+  virtual void SetLabelOpacity(double opacity);
+  virtual void SetLabelFontFamily(int font);
+  virtual void SetLabelBold(int bold);
+  virtual void SetLabelItalic(int italic);
+  virtual void SetLabelShadow(int shadow); 
+
+  // Description:
+  // Get proxies:
+  // name = 
+  //  LookupTable:- vtkSMLookupTableProxy
+  //  ScalarBarWidget:- vtkSMScalarBarWidgetProxy
+  vtkSMProxy* GetProxyByName(const char* name);
 
 protected:
   vtkPVColorMap();
   ~vtkPVColorMap();
 
-  vtkRMScalarBarWidget *RMScalarBarWidget;
-    
-  vtkRMScalarBarWidgetObserver* RMScalarBarObserver;
+  vtkPVColorMapObserver* ScalarBarObserver;
 
+  void InitializeObservers();
   void UpdateVectorComponentMenu();
   // Visibility depends on check and UseCount.
   void UpdateInternalScalarBarVisibility();
@@ -331,10 +352,151 @@ protected:
   int MapWidth;
   int MapHeight;
   void UpdateMap(int width, int height);
+  void UpdateMap();
 
   vtkKWMenuButton* PresetsMenuButton;  
   vtkKWPushButton*   BackButton;
 
+  vtkSMScalarBarWidgetProxy *ScalarBarProxy;
+  char *ScalarBarProxyName;
+  vtkSetStringMacro(ScalarBarProxyName);
+
+  vtkSMLookupTableProxy* LookupTableProxy;
+  char* LookupTableProxyName;
+  vtkSetStringMacro(LookupTableProxyName);
+
+  // TextProperty dummies for the label and title property
+  vtkTextProperty* LabelTextProperty;
+  vtkTextProperty* TitleTextProperty;
+
+  // For creating a proper title for the scalar bar.
+  char *ScalarBarTitle;
+  char *ScalarBarVectorTitle;
+  char *VectorMagnitudeTitle;
+  char **VectorComponentTitles;
+  int NumberOfVectorComponents;
+  int VectorComponent;
+  void UpdateScalarBarTitle();
+  char* ArrayName; 
+
+
+  // Description:
+  // Get/Set the Title color from/to the Proxy
+  void SetTitleColorInternal(double r, double g, double b);
+ 
+  // Description:
+  // Get/Set the Title opacity from/to the Proxy
+  void SetTitleOpacityInternal(double opacity);
+
+  // Description:
+  // Get/Set teh Title font family from/to the Proxy
+  void SetTitleFontFamilyInternal(int font);
+
+  // Description:
+  // Get/Set teh Title bold from/to the Proxy
+  void SetTitleBoldInternal(int bold);
+
+  // Description:
+  // Get/Set teh Title italic from/to the Proxy
+  void SetTitleItalicInternal(int italic);
+
+  // Description:
+  // Get/Set teh Title shadow from/to the Proxy
+  void SetTitleShadowInternal(int shadow);
+
+    // Description:
+  // Get/Set the Label color from/to the Proxy
+  void SetLabelColorInternal(double r, double g, double b);
+ 
+  // Description:
+  // Get/Set the Label opacity from/to the Proxy
+  void SetLabelOpacityInternal(double opacity);
+
+  // Description:
+  // Get/Set teh Label font family from/to the Proxy
+  void SetLabelFontFamilyInternal(int font);
+
+  // Description:
+  // Get/Set teh Label bold from/to the Proxy
+  void SetLabelBoldInternal(int bold);
+
+  // Description:
+  // Get/Set teh Label italic from/to the Proxy
+  void SetLabelItalicInternal(int italic);
+
+  // Description:
+  // Get/Set teh Label shadow from/to the Proxy
+  void SetLabelShadowInternal(int shadow);
+
+  // Description:
+  // Get/Set the complete Title for the Proxy
+  void SetTitleInternal(const char* name);
+  
+  // Description:
+  // Get/Set the Vector mode from the Scalar bar Proxy
+  int GetVectorModeInternal();
+  void SetVectorModeInternal(int mode);
+
+  // Description:
+  // Get/Set the Label format from the Scalarbar Proxy
+  const char* GetLabelFormatInternal();
+  void SetLabelFormatInternal(const char* format);
+
+  // Description:
+  // Get/Set ArrayName from the Scalarbar Proxy
+  const char* GetArrayNameInternal();
+  void SetArrayNameInternal(const char* name);
+
+  // Description:
+  // Get/Set Hue/Saturation/Value ranges for the lookuptable
+  void GetHueRangeInternal(double range[2]);
+  void GetSaturationRangeInternal(double range[2]);
+  void GetValueRangeInternal(double range[2]);
+  void SetHSVRangesInternal(double hrange[2],
+    double srange[2], double vrange[2]);
+  //void SetSaturationRangeInternal(double range[2]);
+  //void SetValueRangeInternal(double range[2]);
+ 
+  // Description:
+  // Set the number of colors for the Proxy
+  void SetNumberOfColorsInternal(int num);
+  int GetNumberOfColorsInternal();
+  
+  // Description:
+  // Get the vector mode from the property of the ScalarBarProxy
+  void GetLabelTextPropertyInternal();
+  void GetTitleTextPropertyInternal();
+  
+  void SetVisibilityInternal(int visible);
+  void SetVectorComponentInternal(int component);
+
+  // Description:
+  // Get/Set the positions for the scalar bar Proxy
+  // ScalarBarProxy->UpdateInformation() must be called
+  // before calling the Get method.
+  void SetPosition1Internal(double x, double y);
+  void GetPosition1Internal(double pos[2]);
+  
+  // Description:
+  // Get/Set the positions for the scalar bar Proxy
+  // ScalarBarProxy->UpdateInformation() must be called
+  // before calling the Get method.
+  void SetPosition2Internal(double x, double y);
+  void GetPosition2Internal(double pos[2]);
+ 
+  // Description:
+  // Get/Set the orientation for the Proxy
+  // ScalarBarProxy->UpdateInformation() must be called
+  // before calling the Get method
+  void SetOrientationInternal(int orientation);
+  int GetOrientationInternal();
+
+  // Leaving this name for this function for the timebeing
+  // till we can move the code from SetScalarRangeInternal
+  // somewhere. All ...Internal methods push values onto 
+  // proxies.
+  void SetScalarBarWidgetScalarRangeInternal(double min, double max);
+  
   // For Saving into a tcl script.
   int VisitedFlag;
 

@@ -23,7 +23,7 @@
 #include "vtkInteractorObserver.h"
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkSM3DWidgetProxy, "1.6");
+vtkCxxRevisionMacro(vtkSM3DWidgetProxy, "1.7");
 
 //----------------------------------------------------------------------------
 vtkSM3DWidgetProxy::vtkSM3DWidgetProxy()
@@ -68,7 +68,7 @@ void vtkSM3DWidgetProxy::UpdateVTKObjects()
         << this->Bounds[0] << this->Bounds[1] << this->Bounds[2] 
         << this->Bounds[3] 
         << this->Bounds[4] << this->Bounds[5] << vtkClientServerStream::End;
-      pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
+      pm->SendStream(this->Servers);
       } 
     this->Placed = 1;
     }

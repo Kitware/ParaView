@@ -107,6 +107,9 @@
 #include "vtkSMApplication.h"
 #include "vtkPVGUIClientOptions.h"
 #include <vtkstd/map>
+#include "vtkSMAxesProxy.h"
+#include "vtkSMDoubleVectorProperty.h"
+#include "vtkSMIntVectorProperty.h"
 
 #ifdef _WIN32
 # include "vtkKWRegisteryUtilities.h"
@@ -133,7 +136,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.625");
+vtkCxxRevisionMacro(vtkPVWindow, "1.626");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -217,10 +220,9 @@ vtkPVWindow::vtkPVWindow()
   this->CenterZLabel = vtkKWLabel::New();
   this->CenterZEntry = vtkKWEntry::New();
   
-  this->CenterSourceID.ID = 0;
-  this->CenterMapperID.ID = 0;
-  this->CenterActorID.ID = 0;
-    
+  this->CenterAxesProxy = 0;
+  this->CenterAxesProxyName = 0;
+
   this->CurrentPVSource = NULL;
 
   // Frame used for animations.
@@ -411,6 +413,18 @@ vtkPVWindow::~vtkPVWindow()
     this->VolumeAppearanceEditor = NULL;
     }
 
+  if (this->CenterAxesProxyName)
+    {
+    vtkSMObject::GetProxyManager()->UnRegisterProxy("axes",
+      this->CenterAxesProxyName);
+    this->SetCenterAxesProxyName(0);
+    }
+
+  if (this->CenterAxesProxy)
+    {
+    this->CenterAxesProxy->Delete();
+    this->CenterAxesProxy = 0;
+    }
   #ifdef PARAVIEW_USE_LOOKMARKS
   if(this->PVLookmarkManager)
     {
@@ -470,26 +484,6 @@ void vtkPVWindow::PrepareForDelete()
     pvApp->SetRegisteryValue(2, "RunTime", "ResetViewResetsCenterOfRotation", 
                              "%d", state);
     }
-
-  if (pvApp && this->CenterSourceID.ID)
-    {
-    pm->DeleteStreamObject(this->CenterSourceID);
-    pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
-    }
-  this->CenterSourceID.ID = 0;
-  if (pvApp && this->CenterMapperID.ID)
-    {
-    pm->DeleteStreamObject(this->CenterMapperID);
-    pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
-    }
-  this->CenterMapperID.ID = 0;
-
-  if (pvApp && this->CenterActorID.ID)
-    {
-    pm->DeleteStreamObject(this->CenterActorID);
-    pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
-    }
-  this->CenterActorID.ID = 0;
 
   if (this->AnimationInterface)
     {
@@ -1181,26 +1175,19 @@ void vtkPVWindow::Create(vtkKWApplication *app, const char* vtkNotUsed(args))
 
   // Creating the center of rotation actor here because we have the
   // application here.
-  this->CenterSourceID = pm->NewStreamObject("vtkAxes");
-  pm->GetStream() << vtkClientServerStream::Invoke <<  this->CenterSourceID
-                  << "SymmetricOn" << vtkClientServerStream::End;
-  pm->GetStream() << vtkClientServerStream::Invoke <<  this->CenterSourceID
-                  << "ComputeNormalsOff" << vtkClientServerStream::End;
-
-  this->CenterMapperID = pm->NewStreamObject("vtkPolyDataMapper");
-  pm->GetStream() << vtkClientServerStream::Invoke <<  this->CenterSourceID
-                    << "GetOutput" << vtkClientServerStream::End;
-  pm->GetStream() << vtkClientServerStream::Invoke <<  this->CenterMapperID
-                  << "SetInput" << vtkClientServerStream::LastResult
-                  << vtkClientServerStream::End;
-  this->CenterActorID = pm->NewStreamObject("vtkActor");
-  pm->GetStream() << vtkClientServerStream::Invoke <<  this->CenterActorID
-                  << "SetMapper" <<  this->CenterMapperID
-                  << vtkClientServerStream::End;
-  pm->GetStream() << vtkClientServerStream::Invoke <<  this->CenterActorID
-                  << "VisibilityOff"
-                  << vtkClientServerStream::End;
-  pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
+  // Create Axes proxy
+  vtkSMProxyManager *pxm = vtkSMObject::GetProxyManager();
+  static int proxyNum = 0;
+  this->CenterAxesProxy = vtkSMAxesProxy::SafeDownCast(
+    pxm->NewProxy("axes","Axes"));
+  
+  ostrstream str;
+  str << "vtkPVWindow_Axes" << proxyNum << ends;
+  proxyNum++;
+  this->SetCenterAxesProxyName(str.str());
+  str.rdbuf()->freeze(0);
+  pxm->RegisterProxy("axes",this->CenterAxesProxyName, this->CenterAxesProxy);
+  this->CenterAxesProxy->CreateVTKObjects(1);
   
   this->CenterEntryFrame->SetParent(this->PickCenterToolbar->GetFrame());
   this->CenterEntryFrame->Create(app, "frame", "");
@@ -1266,12 +1253,6 @@ void vtkPVWindow::Create(vtkKWApplication *app, const char* vtkNotUsed(args))
       this->HideCenterActor();
       }
     }
-  pm->GetStream() << vtkClientServerStream::Invoke
-                  << pm->GetRenderModule()->GetRendererID()
-                  << "AddActor" << this->CenterActorID 
-                  << vtkClientServerStream::End;
-  pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
-
   vtkPVRenderViewProxyImplementation* proxy = vtkPVRenderViewProxyImplementation::New();
   proxy->SetPVRenderView(this->MainView);
   this->Interactor->SetPVRenderView(proxy);
@@ -1541,9 +1522,6 @@ void vtkPVWindow::CenterEntryCallback()
 //-----------------------------------------------------------------------------
 void vtkPVWindow::SetCenterOfRotation(float x, float y, float z)
 {
-  vtkPVApplication *pvApp = this->GetPVApplication();
-  vtkPVProcessModule* pm = pvApp->GetProcessModule();
-  
   this->AddTraceEntry("$kw(%s) SetCenterOfRotation %f %f %f",
                       this->GetTclName(), x, y, z);
   
@@ -1552,43 +1530,59 @@ void vtkPVWindow::SetCenterOfRotation(float x, float y, float z)
   this->CenterZEntry->SetValue(z);
   this->CameraStyle3D->SetCenterOfRotation(x, y, z);
   this->CameraStyle2D->SetCenterOfRotation(x, y, z);
-  pm->GetStream() << vtkClientServerStream::Invoke <<  this->CenterActorID
-                  << "SetPosition" << x << y << z
-                  << vtkClientServerStream::End;
-  pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
+  
+  vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+    this->CenterAxesProxy->GetProperty("Position"));
+  if (!dvp)
+    {
+    vtkErrorMacro("CenterAxesProxy does not have property Position");
+    return;
+    }
+  dvp->SetElement(0, x);
+  dvp->SetElement(1, y);
+  dvp->SetElement(2, z);
+  this->CenterAxesProxy->UpdateVTKObjects(); 
   this->MainView->EventuallyRender();
 }
 
 //-----------------------------------------------------------------------------
 void vtkPVWindow::HideCenterActor()
 {
-  vtkPVApplication *pvApp = this->GetPVApplication();
-  vtkPVProcessModule* pm = pvApp->GetProcessModule();
   this->Script("%s configure -image PVShowCenterButton", 
                this->HideCenterButton->GetWidgetName() );
   this->HideCenterButton->SetBalloonHelpString(
     "Show the center of rotation to the center of the current data set.");
-  pm->GetStream() << vtkClientServerStream::Invoke <<  this->CenterActorID
-                  << "VisibilityOff"
-                  << vtkClientServerStream::End;
-  pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
+
+  vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
+    this->CenterAxesProxy->GetProperty("Visibility"));
+  if (!ivp)
+    {
+    vtkErrorMacro("CenterAxesProxy does not have property Visibility");
+    return;
+    }
+  ivp->SetElement(0, 0);
+  this->CenterAxesProxy->UpdateVTKObjects();
 }
 
 //-----------------------------------------------------------------------------
 void vtkPVWindow::ShowCenterActor()
 {
-  vtkPVApplication *pvApp = this->GetPVApplication();
-  vtkPVProcessModule* pm = pvApp->GetProcessModule();
   if (this->CenterActorVisibility)
     {
     this->Script("%s configure -image PVHideCenterButton", 
-                 this->HideCenterButton->GetWidgetName() );
+      this->HideCenterButton->GetWidgetName() );
     this->HideCenterButton->SetBalloonHelpString(
       "Hide the center of rotation to the center of the current data set.");
-    pm->GetStream() << vtkClientServerStream::Invoke <<  this->CenterActorID
-                    << "VisibilityOn"
-                    << vtkClientServerStream::End;
-    pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
+
+    vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
+      this->CenterAxesProxy->GetProperty("Visibility"));
+    if (!ivp)
+      {
+      vtkErrorMacro("CenterAxesProxy does not have property Visibility");
+      return;
+      }
+    ivp->SetElement(0, 1);
+    this->CenterAxesProxy->UpdateVTKObjects();
     }
 }
 
@@ -1644,8 +1638,6 @@ void vtkPVWindow::ResetCenterCallback()
 //-----------------------------------------------------------------------------
 void vtkPVWindow::ResizeCenterActor()
 {
-  vtkPVApplication *pvApp = this->GetPVApplication();
-  vtkPVProcessModule* pm = pvApp->GetProcessModule();
   int first = 1;
   double bounds[6];
   double tmp[6];
@@ -1684,24 +1676,26 @@ void vtkPVWindow::ResizeCenterActor()
     }
 
   it->Delete();
+  vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+    this->CenterAxesProxy->GetProperty("Scale"));
+  if (!dvp)
+    {
+    vtkErrorMacro("CenterAxesProxy does not have property Scale");
+    return;
+    }
+      
   if ((! first) && (bounds[0] <= bounds[1]) && 
       (bounds[2] <= bounds[3]) && (bounds[4] <= bounds[5]))
     {
-    pm->GetStream() << vtkClientServerStream::Invoke <<  this->CenterActorID
-                    << "SetScale" 
-                    <<  0.25 * (bounds[1]-bounds[0])
-                    << 0.25 * (bounds[3]-bounds[2])
-                    << 0.25 * (bounds[5]-bounds[4])
-                    << vtkClientServerStream::End;
+    dvp->SetElements3(0.25 * (bounds[1]-bounds[0]),
+      0.25 * (bounds[3]-bounds[2]),  0.25 * (bounds[5]-bounds[4]));
     }
   else
     {
-    pm->GetStream() << vtkClientServerStream::Invoke <<  this->CenterActorID
-                    << "SetScale" << 1 << 1 << 1
-                    << vtkClientServerStream::End;
+    dvp->SetElements3(1,1,1);
     this->MainView->ResetCamera();
     }
-  pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
+  this->CenterAxesProxy->UpdateVTKObjects();
 }
 
 //-----------------------------------------------------------------------------
@@ -2774,7 +2768,7 @@ void vtkPVWindow::SaveBatchScript(const char *filename, int offScreenFlag, const
     }
   cit->Delete();
   cit = 0;
-
+  this->CenterAxesProxy->SaveInBatchScript(file);
 // TODO replace this
 //   if (geometryFileName)
 //     {
@@ -4402,11 +4396,11 @@ vtkPVColorMap* vtkPVWindow::GetPVColorMap(const char* parameterName,
   cm = vtkPVColorMap::New();
   cm->SetParent(this->GetMainView()->GetPropertiesParent());
   cm->SetPVRenderView(this->GetMainView());
-  cm->SetArrayName(parameterName);
   cm->SetNumberOfVectorComponents(numberOfComponents);
   cm->Create(this->GetPVApplication());
   cm->SetTraceReferenceObject(this);
-  cm->SetScalarBarTitleInternal(parameterName);
+  cm->SetArrayName(parameterName);
+  cm->SetScalarBarTitle(parameterName);
   cm->ResetScalarRangeInternal();
 
   this->PVColorMaps->AddItem(cm);

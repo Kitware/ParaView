@@ -95,6 +95,7 @@ class vtkPVWriter;
 class vtkPVXMLPackageParser;
 class vtkPolyDataMapper;
 class vtkPVPluginsDialog;
+class vtkSMAxesProxy;
 
 //BTX
 template <class key, class data> 
@@ -602,11 +603,6 @@ protected:
   vtkKWLabel *CenterZLabel;
   vtkKWEntry *CenterZEntry;
     
-  //vtkAxes *CenterSource;
-  vtkClientServerID CenterSourceID;
-  vtkClientServerID CenterMapperID;
-  vtkClientServerID CenterActorID;
-
   void ResizeCenterActor();
   
   // Used internally.  Down casts vtkKWApplication to vtkPVApplication
@@ -714,6 +710,11 @@ protected:
   vtkKWUserInterfaceNotebookManager *UserInterfaceManager;
 
   vtkClientServerID ServerFileListingID;
+
+  vtkSMAxesProxy *CenterAxesProxy; 
+  char* CenterAxesProxyName;
+  vtkSetStringMacro(CenterAxesProxyName);
+
 private:
 
 #ifdef PARAVIEW_USE_LOOKMARKS

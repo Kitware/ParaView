@@ -21,17 +21,42 @@
 #include "vtkSMDoubleVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMLookupTableProxy);
-vtkCxxRevisionMacro(vtkSMLookupTableProxy, "1.4");
+vtkCxxRevisionMacro(vtkSMLookupTableProxy, "1.5");
 
 //---------------------------------------------------------------------------
 vtkSMLookupTableProxy::vtkSMLookupTableProxy()
 {
   this->SetVTKClassName("vtkLookupTable");
+  this->ArrayName = 0;
 }
 
 //---------------------------------------------------------------------------
 vtkSMLookupTableProxy::~vtkSMLookupTableProxy()
 {
+  if (this->ArrayName)
+    {
+    delete [] this->ArrayName;
+    this->ArrayName = 0;
+    }
+}
+
+//---------------------------------------------------------------------------
+void vtkSMLookupTableProxy::CreateVTKObjects(int numObjects)
+{
+  if (this->ObjectsCreated)
+    {
+    return;
+    }
+  this->SetServers(vtkProcessModule::CLIENT | 
+    vtkProcessModule::RENDER_SERVER);
+  this->Superclass::CreateVTKObjects(numObjects);
+}
+
+//---------------------------------------------------------------------------
+void vtkSMLookupTableProxy::UpdateVTKObjects()
+{
+  this->Superclass::UpdateVTKObjects();
+  this->Build();
 }
 
 //---------------------------------------------------------------------------
@@ -75,7 +100,7 @@ void vtkSMLookupTableProxy::Build()
     if (hueRange[0]<1.1) // Hack to deal with sandia color map.
       { // not Sandia interpolation.
       stream << vtkClientServerStream::Invoke << this->GetID(i)
-             << "Build" << vtkClientServerStream::End;
+             << "ForceBuild" << vtkClientServerStream::End;
       }
     else
       {
@@ -117,7 +142,28 @@ void vtkSMLookupTableProxy::Build()
   pm->SendStream(this->Servers, stream, 0);
 }
 
-
+//----------------------------------------------------------------------------
+void vtkSMLookupTableProxy::SetArrayName(const char* str)
+{
+  if (this->ArrayName == NULL && str == NULL)
+    {
+    return;
+    }
+  if (this->ArrayName && str && (!strcmp(this->ArrayName,str)))
+    {
+    return;
+    }
+  if (this->ArrayName)
+    {
+    delete [] this->ArrayName;
+    this->ArrayName = NULL;
+    }
+  if (str)
+    {
+    this->ArrayName = new char[strlen(str) + 1];
+    strcpy(this->ArrayName,str);
+    }
+}
 
 //----------------------------------------------------------------------------
 void vtkSMLookupTableProxy::LabToXYZ(double Lab[3], double xyz[3])
@@ -183,11 +229,83 @@ void vtkSMLookupTableProxy::XYZToRGB(double xyz[3], double rgb[3])
 }
 
 
+//---------------------------------------------------------------------------
+void vtkSMLookupTableProxy::SaveInBatchScript(ofstream* file)
+{
+  *file << endl;
+  unsigned int cc;
+  unsigned numObjects = this->GetNumberOfIDs();
+  vtkSMIntVectorProperty* ivp;
+  vtkSMDoubleVectorProperty* dvp;
+
+  for (cc=0; cc < numObjects; cc++)
+    {
+    vtkClientServerID id = this->GetID(cc);
+    *file << "set pvTemp" << id.ID
+      << " [$proxyManager NewProxy lookup_tables LookupTable]" << endl;
+    *file << "  $proxyManager RegisterProxy lookup_tables pvTemp"
+      << id.ID << " $pvTemp" << id.ID << endl;
+    *file << "  $pvTemp" << id.ID << " UnRegister {}" << endl;
+
+    //Set ArrayName
+    *file << "  [$pvTemp" << id.ID << " GetProperty ArrayName]"
+      << " SetElement 0 {"
+      << this->ArrayName << "}" << endl;
+
+    // Set number of colors
+    ivp = vtkSMIntVectorProperty::SafeDownCast(
+      this->GetProperty("NumberOfTableValues"));
+    *file << "  [$pvTemp" << id.ID << " GetProperty "
+      << "NumberOfTableValues] SetElements1 "
+      << ivp->GetElement(0) << endl;
+
+    // Set color ranges
+    dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+      this->GetProperty("HueRange"));
+    *file << "  [$pvTemp" << id.ID << " GetProperty "
+      << "HueRange] SetElements2 "
+      << dvp->GetElement(0) << " " << dvp->GetElement(1) << endl;
+
+    dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+      this->GetProperty("SaturationRange"));
+    *file << "  [$pvTemp" << id.ID << " GetProperty "
+      << "SaturationRange] SetElements2 "
+      << dvp->GetElement(0) << " " << dvp->GetElement(1) << endl;
+
+    dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+      this->GetProperty("ValueRange"));
+    *file << "  [$pvTemp" << id.ID << " GetProperty "
+      << "ValueRange] SetElements2 "
+      << dvp->GetElement(0) << " " << dvp->GetElement(1) << endl;
+
+    //Set scalar range
+    dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+      this->GetProperty("ScalarRange"));
+    *file << "  [$pvTemp" << id.ID << " GetProperty "
+      << "ScalarRange] SetElements2 "
+      << dvp->GetElement(0) << " " << dvp->GetElement(1) << endl;
+
+    //Set Vector component and mode
+    ivp = vtkSMIntVectorProperty::SafeDownCast(
+      this->GetProperty("VectorComponent"));
+    *file << "  [$pvTemp" << id.ID << " GetProperty "
+      << "VectorComponent] SetElements1 " << ivp->GetElement(0) << endl;
+
+    ivp = vtkSMIntVectorProperty::SafeDownCast(
+      this->GetProperty("VectorMode"));
+    *file << "  [$pvTemp" << id.ID << " GetProperty "
+      << "VectorMode] SetElements1 " << ivp->GetElement(0) << endl;
+    *file << "  $pvTemp" << id.ID << " UpdateVTKObjects" << endl;
+    *file << endl;
+    }
+}
 
 //---------------------------------------------------------------------------
 void vtkSMLookupTableProxy::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+  os << indent << "ArrayName: " <<
+    ((this->ArrayName)? this->ArrayName : "NULL") <<endl;
 }
 
 

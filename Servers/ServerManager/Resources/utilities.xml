@@ -5,7 +5,7 @@
          name="NumberOfTableValues"
          command="SetNumberOfTableValues"
          number_of_elements="1"
-         default_values="32" >
+         default_values="256" >
         <IntRangeDomain name="range" min="1" />
       </IntVectorProperty>
 
@@ -62,9 +62,52 @@
           <Entry value="1" text="Component" />
        </EnumerationDomain>
       </IntVectorProperty>
+
+      <StringVectorProperty
+        name="ArrayName"
+        command="SetArrayName"
+        number_of_elements="1"
+        update_self="1"
+        default_values="">
+      </StringVectorProperty>
+
     </LookupTableProxy>
   </ProxyGroup>
 
+  <ProxyGroup name="axes">
+    <AxesProxy name="Axes" class="vtkAxes">
+      <SubProxy>
+        <Proxy name="mapper" class="vtkPolyDataMapper">
+        </Proxy>
+      </SubProxy>
+
+      <SubProxy>
+        <Proxy name="actor" class="vtkActor">
+          <IntVectorProperty
+             name="Visibility"
+             command="SetVisibility"
+             number_of_elements="1"
+             default_values="1">
+             <BooleanDomain name="bool"/>
+          </IntVectorProperty>
+
+          <DoubleVectorProperty
+             name="Position"
+             command="SetPosition"
+             number_of_elements="3"
+             default_values="0 0 0">
+           </DoubleVectorProperty>
+
+          <DoubleVectorProperty
+             name="Scale"
+             command="SetScale"
+             number_of_elements="3"
+             default_values="1 1 1">
+          </DoubleVectorProperty>
+        </Proxy>
+      </SubProxy>
+    </AxesProxy>
+  </ProxyGroup>
   <ProxyGroup name="implicit_functions">
     <ImplicitPlaneProxy name="Plane" class="vtkPlane">
       <DoubleVectorProperty
@@ -110,20 +153,6 @@
       </ProxyProperty>
     </Proxy>
 
-    <Proxy name="BoxOld" class="vtkBox">
-      <DoubleVectorProperty
-        name="Transform"
-        command="SetTransform"
-        number_of_elements="16"
-        argument_is_array="1"
-        default_values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0" />
-      <DoubleVectorProperty
-        name="Bounds"
-        command="SetBounds"
-        number_of_elements="6"
-        default_values="0 1 0 1 0 1" />
-    </Proxy>
-    
     <BoxProxy name="Box" class="vtkBox">
       <DoubleVectorProperty
         name="Bounds"
@@ -256,6 +285,226 @@
     </Proxy>
   </ProxyGroup>
 
+  <ProxyGroup name="scalarbar_widget">
+    <ScalarBarWidgetProxy name="ScalarBarWidget" class="vtkScalarBarWidget">
+      <DoubleVectorProperty
+        name="Position1Info"
+        command="GetPosition1"
+        update_self="1"
+        number_of_elements="2"
+        information_only="1"
+        default_values="0.82 0.1">
+        <SimpleDoubleInformationHelper/>
+      </DoubleVectorProperty>
+      
+      <DoubleVectorProperty
+        name="Position2Info"
+        command="GetPosition2"
+        update_self="1"
+        information_only="1"
+        number_of_elements="2"
+        default_values="0.17 0.7">
+        <SimpleDoubleInformationHelper/>
+      </DoubleVectorProperty>
+
+      <IntVectorProperty
+        name="OrientationInfo"
+        command="GetOrientation"
+        update_self="1"
+        information_only="1"
+        number_of_elements="1"
+        default_values="1" >
+        <SimpleIntInformationHelper/>
+        <EnumerationDomain name="enum">
+          <Entry value="0" text="Horizontal"/>
+          <Entry value="1" text="Vertical"/>
+        </EnumerationDomain>
+      </IntVectorProperty>
+
+      <IntVectorProperty
+        name="Orientation"
+        command="SetOrientation"
+        update_self="1"
+        information_property="OrientationInfo"
+        number_of_elements="1"
+        default_values="1">
+        <EnumerationDomain name="enum">
+          <Entry value="0" text="Horizontal"/>
+          <Entry value="1" text="Vertical"/>
+        </EnumerationDomain>
+      </IntVectorProperty>
+
+      <DoubleVectorProperty
+        name="Position1"
+        command="SetPosition1"
+        number_of_elements="2"
+        update_self="1"
+        information_property="Position1Info"
+        default_values="0.81 0.25">
+      </DoubleVectorProperty>
+      
+      <DoubleVectorProperty
+        name="Position2"
+        command="SetPosition2"
+        number_of_elements="2"
+        update_self="1"
+        information_property="Position2Info"
+        default_values="0.13 0.5">
+      </DoubleVectorProperty>
+      
+      <StringVectorProperty
+        name="Title"
+        command="SetTitle"
+        number_of_elements="1"
+        update_self="1"
+        default_values="">
+      </StringVectorProperty>
+      
+      <StringVectorProperty
+        name="LabelFormat"
+        command="SetLabelFormat"
+        number_of_elements="1"
+        update_self="1"
+        default_values="%-#6.3g">
+      </StringVectorProperty>
+
+      <!--label text property -->
+      <DoubleVectorProperty
+        name="LabelFormatColor"
+        command="SetLabelFormatColor"
+        number_of_elements="3"
+        update_self="1"
+        argument_is_array="1"
+        default_values="1.0 1.0 1.0">
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty
+        name="LabelFormatOpacity"
+        command="SetLabelFormatOpacity"
+        update_self="1"
+        number_of_elements="1"
+        default_values="1.0">
+      </DoubleVectorProperty>
+
+      <IntVectorProperty
+        name="LabelFormatFont"
+        command="SetLabelFormatFont"
+        update_self="1"
+        number_of_elements="1"
+        default_values="0">
+        <EnumerationDomain name="enum">
+          <Entry value="0" text="Arial"/>
+          <Entry value="1" text="Courier"/>
+          <Entry value="2" text="Times"/>
+        </EnumerationDomain>
+      </IntVectorProperty>
+
+      <IntVectorProperty
+        name="LabelFormatBold"
+        command="SetLabelFormatBold"
+        update_self="1"
+        number_of_elements="1"
+        default_values="1">
+        <BooleanDomain name="bool"/>
+      </IntVectorProperty>
+      
+      <IntVectorProperty
+        name="LabelFormatItalic"
+        command="SetLabelFormatItalic"
+        update_self="1"
+        number_of_elements="1"
+        default_values="1">
+        <BooleanDomain name="bool"/>
+      </IntVectorProperty>
+
+      <IntVectorProperty
+        name="LabelFormatShadow"
+        command="SetLabelFormatShadow"
+        update_self="1"
+        number_of_elements="1"
+        default_values="1">
+        <BooleanDomain name="bool"/>
+      </IntVectorProperty>
+
+      <!--title text property -->
+      <DoubleVectorProperty
+        name="TitleFormatColor"
+        command="SetTitleFormatColor"
+        number_of_elements="3"
+        update_self="1"
+        argument_is_array="1"
+        default_values="1.0 1.0 1.0">
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty
+        name="TitleFormatOpacity"
+        command="SetTitleFormatOpacity"
+        update_self="1"
+        number_of_elements="1"
+        default_values="1.0">
+      </DoubleVectorProperty>
+
+      <IntVectorProperty
+        name="TitleFormatFont"
+        command="SetTitleFormatFont"
+        update_self="1"
+        number_of_elements="1"
+        default_values="0">
+        <EnumerationDomain name="enum">
+          <Entry value="0" text="Arial"/>
+          <Entry value="1" text="Courier"/>
+          <Entry value="2" text="Times"/>
+        </EnumerationDomain>
+      </IntVectorProperty>
+
+      <IntVectorProperty
+        name="TitleFormatBold"
+        command="SetTitleFormatBold"
+        update_self="1"
+        number_of_elements="1"
+        default_values="1">
+        <BooleanDomain name="bool"/>
+      </IntVectorProperty>
+      
+      <IntVectorProperty
+        name="TitleFormatItalic"
+        command="SetTitleFormatItalic"
+        update_self="1"
+        number_of_elements="1"
+        default_values="1">
+        <BooleanDomain name="bool"/>
+      </IntVectorProperty>
+
+      <IntVectorProperty
+        name="TitleFormatShadow"
+        command="SetTitleFormatShadow"
+        update_self="1"
+        number_of_elements="1"
+        default_values="1">
+        <BooleanDomain name="bool"/>
+      </IntVectorProperty>
+
+      <ProxyProperty
+        name="LookupTable"
+        command="SetLookupTable"
+        update_self="1"
+        number_of_elements="1">
+        <ProxyGroupDomain name="groups">
+          <Group name="lookup_tables"/>
+        </ProxyGroupDomain>
+      </ProxyProperty>
+      
+      <IntVectorProperty
+        name="Visibility"
+        command="SetVisibility"
+        number_of_elements="1"
+        update_self="1"
+        default_values="1">
+        <BooleanDomain name="bool"/>
+      </IntVectorProperty>
+    </ScalarBarWidgetProxy>
+  </ProxyGroup>
+  
   <ProxyGroup name="3d_widgets">
     <LineWidgetProxy name="LineWidgetProxy" class="vtkPickLineWidget">
       <IntVectorProperty

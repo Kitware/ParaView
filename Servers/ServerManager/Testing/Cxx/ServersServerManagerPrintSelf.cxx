@@ -14,6 +14,7 @@
 =========================================================================*/
 
 #include "vtkPVCaveRenderModule.h"
+#include "vtkSMAxesProxy.h"
 #include "vtkSMCompositePartDisplay.h"
 #include "vtkPVCompositeRenderModule.h"
 #include "vtkSMDisplay.h"
@@ -26,8 +27,7 @@
 #include "vtkSMPointLabelDisplay.h"
 #include "vtkSMPlotDisplay.h"
 #include "vtkPVSimpleRenderModule.h"
-#include "vtkRMObject.h"
-#include "vtkRMScalarBarWidget.h"
+#include "vtkSMScalarBarWidgetProxy.h"
 #include "vtkSM3DWidgetProxy.h"
 #include "vtkSMBoxWidgetProxy.h"
 #include "vtkSMImplicitPlaneWidgetProxy.h"
@@ -97,6 +97,7 @@ int main(int , char *[])
 {
   vtkObject *c;
   c = vtkPVCaveRenderModule::New(); c->Print( cout ); c->Delete();
+  c = vtkSMAxesProxy::New(); c->Print( cout ); c->Delete();
   c = vtkSMCompositePartDisplay::New(); c->Print( cout ); c->Delete();
   c = vtkPVCompositeRenderModule::New(); c->Print( cout ); c->Delete();
   c = vtkSMDisplay::New(); c->Print( cout ); c->Delete();
@@ -109,8 +110,7 @@ int main(int , char *[])
   c = vtkSMPointLabelDisplay::New(); c->Print( cout ); c->Delete();
   c = vtkSMPlotDisplay::New(); c->Print( cout ); c->Delete();
   c = vtkPVSimpleRenderModule::New(); c->Print( cout ); c->Delete();
-  c = vtkRMObject::New(); c->Print( cout ); c->Delete();
-  c = vtkRMScalarBarWidget::New(); c->Print( cout ); c->Delete();
+  c = vtkSMScalarBarWidgetProxy::New(); c->Print( cout ); c->Delete();
   c = vtkSM3DWidgetProxy::New(); c->Print( cout ); c->Delete();
   c = vtkSMBoxWidgetProxy::New(); c->Print( cout ); c->Delete();
   c = vtkSMImplicitPlaneWidgetProxy::New(); c->Print( cout ); c->Delete();

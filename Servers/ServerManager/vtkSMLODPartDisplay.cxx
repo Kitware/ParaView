@@ -18,7 +18,6 @@
 #include "vtkImageData.h"
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
-#include "vtkRMScalarBarWidget.h"
 #include "vtkPVConfig.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVLODPartDisplayInformation.h"
@@ -36,10 +35,11 @@
 #include "vtkStructuredGrid.h"
 #include "vtkTimerLog.h"
 #include "vtkToolkits.h"
-
+#include "vtkSMProxy.h"
+#include "vtkSMStringVectorProperty.h"
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMLODPartDisplay);
-vtkCxxRevisionMacro(vtkSMLODPartDisplay, "1.6");
+vtkCxxRevisionMacro(vtkSMLODPartDisplay, "1.7");
 
 
 //----------------------------------------------------------------------------
@@ -293,7 +293,7 @@ void vtkSMLODPartDisplay::CreateVTKObjects(int num)
 }
 
 //----------------------------------------------------------------------------
-void vtkSMLODPartDisplay::ColorByArray(vtkRMScalarBarWidget *colorMap,
+void vtkSMLODPartDisplay::ColorByArray(vtkSMProxy* colorMap,
                                        int field)
 {
   vtkPVProcessModule* pm = this->GetProcessModule();
@@ -323,9 +323,9 @@ void vtkSMLODPartDisplay::ColorByArray(vtkRMScalarBarWidget *colorMap,
       << vtkClientServerStream::End;
     pm->GetStream()
       << vtkClientServerStream::Invoke
-      << this->MapperProxy->GetID(i) << "SetLookupTable" << colorMap->GetLookupTableID()
+      << this->MapperProxy->GetID(i) << "SetLookupTable" 
+      << colorMap->GetID(0)
       << vtkClientServerStream::End;
-
     if (field == vtkDataSet::CELL_DATA_FIELD)
       {
       pm->GetStream()
@@ -352,19 +352,25 @@ void vtkSMLODPartDisplay::ColorByArray(vtkRMScalarBarWidget *colorMap,
       {
       vtkErrorMacro("Only point or cell field please.");
       }
-
-    pm->GetStream()
-      << vtkClientServerStream::Invoke
-      << this->MapperProxy->GetID(i) << "SelectColorArray" << colorMap->GetArrayName()
-      << vtkClientServerStream::End;
-    pm->GetStream()
-      << vtkClientServerStream::Invoke
-      << this->LODMapperProxy->GetID(i) << "SetLookupTable" << colorMap->GetLookupTableID()
-      << vtkClientServerStream::End;
-    pm->GetStream()
-      << vtkClientServerStream::Invoke
-      << this->LODMapperProxy->GetID(i) << "SelectColorArray" << colorMap->GetArrayName()
-      << vtkClientServerStream::End;
+    
+    vtkSMStringVectorProperty* svp = vtkSMStringVectorProperty::SafeDownCast(
+      colorMap->GetProperty("ArrayName"));
+    if (svp)
+      {
+      pm->GetStream()
+        << vtkClientServerStream::Invoke
+        << this->MapperProxy->GetID(i) << "SelectColorArray" << svp->GetElement(0)
+        << vtkClientServerStream::End;
+      pm->GetStream()
+        << vtkClientServerStream::Invoke
+        << this->LODMapperProxy->GetID(i) << "SetLookupTable" 
+        << colorMap->GetID(0)
+        << vtkClientServerStream::End;
+      pm->GetStream()
+        << vtkClientServerStream::Invoke
+        << this->LODMapperProxy->GetID(i) << "SelectColorArray" << svp->GetElement(0)
+        << vtkClientServerStream::End;
+      }
     pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
     }
 }

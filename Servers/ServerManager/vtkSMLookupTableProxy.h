@@ -33,12 +33,38 @@ public:
   // Create the lookup table values.
   void Build();
 
+  // Description:
+  // push properties to VTK object.
+  // Also call Build(), hence rebuilds the lookup table.
+  virtual void UpdateVTKObjects();
+
+  // Description:
+  // Given the number of objects (numObjects), class name 
+  // (VTKClassName) and server ids ( this->GetServerIDs()), 
+  // this methods instantiates the objects on the server(s)
+  // This method is overridden to change the servers.
+  virtual void CreateVTKObjects(int numObjects);
+  
+  // Description:
+  // This map is used for arrays with this name 
+  // and this number of components.  In the future, they may
+  // handle more than one type of array.
+  // 
+  // This used to be in the ScalarBarWidget. However,
+  // since it is used almost everytime Lookup table is needed,
+  // I put ArrayName as an Ivar in this class. 
+  virtual void SetArrayName(const char* name);
+  vtkGetStringMacro(ArrayName);
+ 
+  virtual void SaveInBatchScript(ofstream* file);
 protected:
   vtkSMLookupTableProxy();
   ~vtkSMLookupTableProxy();
 
   void LabToXYZ(double Lab[3], double xyz[3]);
   void XYZToRGB(double xyz[3], double rgb[3]);
+
+  char* ArrayName;
 
 private:
   vtkSMLookupTableProxy(const vtkSMLookupTableProxy&); // Not implemented

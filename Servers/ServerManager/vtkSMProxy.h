@@ -168,6 +168,7 @@ protected:
   friend class vtkPVImplicitPlaneWidget;
   friend class vtkPVSphereWidget;
   friend class vtkPVBoxWidget;
+  friend class vtkPVColorMap;
   friend class vtkSMBoxWidgetProxy;
   // Temporary
   friend class vtkPVSource;

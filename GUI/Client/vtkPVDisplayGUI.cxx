@@ -86,7 +86,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVDisplayGUI);
-vtkCxxRevisionMacro(vtkPVDisplayGUI, "1.15");
+vtkCxxRevisionMacro(vtkPVDisplayGUI, "1.16");
 
 int vtkPVDisplayGUICommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -1691,7 +1691,7 @@ void vtkPVDisplayGUI::ColorByPointFieldInternal(const char *name, int numComps)
   this->PVSource->SetPVColorMap(colorMap);
 
   this->PVSource->GetPartDisplay()->ColorByArray(
-            colorMap->GetRMScalarBarWidget(), 
+            colorMap->GetProxyByName("LookupTable"), 
             vtkDataSet::POINT_DATA_FIELD);
   this->UpdateColorGUI();
 
@@ -1746,7 +1746,7 @@ void vtkPVDisplayGUI::ColorByCellFieldInternal(const char *name, int numComps)
   this->PVSource->SetPVColorMap(colorMap);
 
   this->PVSource->GetPartDisplay()->ColorByArray(
-                      colorMap->GetRMScalarBarWidget(), 
+                      colorMap->GetProxyByName("LookupTable"), 
                       vtkDataSet::CELL_DATA_FIELD);
 
   // These three shoiuld be combined into a single method.

@@ -50,12 +50,20 @@
 #include "vtkPVRenderModule.h"
 #include "vtkKWRange.h"
 
-#include "vtkRMScalarBarWidget.h"
+#include "vtkTextProperty.h"
+#include "vtkSMIntVectorProperty.h"
+#include "vtkSMDoubleVectorProperty.h"
+#include "vtkSMStringVectorProperty.h"
+#include "vtkSMProxyProperty.h"
+#include "vtkSMScalarBarWidgetProxy.h"
+#include "vtkSMLookupTableProxy.h"
+#include "vtkSMProxyManager.h"
+#include "vtkSMProxy.h"
 #include "vtkKWEvent.h"
 #include "vtkMath.h"
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVColorMap);
-vtkCxxRevisionMacro(vtkPVColorMap, "1.107");
+vtkCxxRevisionMacro(vtkPVColorMap, "1.108");
 
 int vtkPVColorMapCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -77,13 +85,13 @@ static unsigned char image_presets[] =
 
 //===========================================================================
 //***************************************************************************
-class vtkRMScalarBarWidgetObserver : public vtkCommand
+class vtkPVColorMapObserver : public vtkCommand
 {
 public:
-  static vtkRMScalarBarWidgetObserver *New() 
-    {return new vtkRMScalarBarWidgetObserver;};
+  static vtkPVColorMapObserver* New() 
+    {return new vtkPVColorMapObserver;};
 
-  vtkRMScalarBarWidgetObserver()
+  vtkPVColorMapObserver()
     {
     this->PVColorMap = 0;
     }
@@ -132,13 +140,11 @@ vtkPVColorMap::vtkPVColorMap()
 
   this->UseCount = 0;
   
-  this->RMScalarBarWidget = vtkRMScalarBarWidget::New();
-
   this->ScalarBarVisibility = 0;
   this->InternalScalarBarVisibility = 0;
   this->Initialized = 0;
   this->PVRenderView = NULL;
-  this->RMScalarBarObserver = NULL;
+  this->ScalarBarObserver = NULL;
 
   // User interaface.
   this->ColorMapFrame = vtkKWLabeledFrame::New();
@@ -186,20 +192,36 @@ vtkPVColorMap::vtkPVColorMap()
 
   this->TitleTextPropertyWidget = vtkKWTextProperty::New();
   this->LabelTextPropertyWidget = vtkKWTextProperty::New();
+
+  this->LabelTextProperty = vtkTextProperty::New();
+  this->TitleTextProperty = vtkTextProperty::New();
+  
+  this->ScalarBarProxy = 0;
+  this->ScalarBarProxyName = 0;
+
+  this->LookupTableProxy = 0;
+  this->LookupTableProxyName = 0;
+  
+  this->ScalarBarTitle = NULL;
+  this->VectorMagnitudeTitle = new char[12];
+  strcpy(this->VectorMagnitudeTitle, "Magnitude");
+  this->VectorComponentTitles = NULL;
+  this->ScalarBarVectorTitle = NULL;
+  this->NumberOfVectorComponents = 0;
+  this->VectorComponent = 0;
 }
 
 //----------------------------------------------------------------------------
 vtkPVColorMap::~vtkPVColorMap()
 {
   // Used to be in vtkPVActorComposite........
-  this->RMScalarBarWidget->Delete();
 
   this->SetPVRenderView(NULL);
 
-  if (this->RMScalarBarObserver)
+  if (this->ScalarBarObserver)
     {
-    this->RMScalarBarObserver->Delete();
-    this->RMScalarBarObserver = NULL;
+    this->ScalarBarObserver->Delete();
+    this->ScalarBarObserver = NULL;
     }
     
   this->VectorFrame->Delete();
@@ -273,6 +295,52 @@ vtkPVColorMap::~vtkPVColorMap()
 
   this->LabelTextPropertyWidget->Delete();
   this->LabelTextPropertyWidget = NULL;
+  
+  
+  if (this->ScalarBarProxyName)
+    {
+    vtkSMObject::GetProxyManager()->UnRegisterProxy("scalarbar_widget", this->ScalarBarProxyName);
+    }
+  this->SetScalarBarProxyName(0);
+  if (this->ScalarBarProxy)
+    {
+    this->ScalarBarProxy->Delete();
+    this->ScalarBarProxy = 0;
+    }
+ 
+  if (this->LookupTableProxyName)
+    {
+    vtkSMObject::GetProxyManager()->UnRegisterProxy("lookup_tables", 
+      this->LookupTableProxyName);
+    }
+  this->SetLookupTableProxyName(0);
+  
+  if (this->LookupTableProxy)
+    {
+    this->LookupTableProxy->Delete();
+    this->LookupTableProxy = 0;
+    }
+  
+  if (this->ScalarBarTitle)
+    {
+    delete [] this->ScalarBarTitle;
+    this->ScalarBarTitle = 0;
+    }
+  if (this->VectorMagnitudeTitle)
+    {
+    delete [] this->VectorMagnitudeTitle;
+    this->VectorMagnitudeTitle = 0;
+    }
+  if (this->ScalarBarVectorTitle)
+    {
+    delete[] this->ScalarBarVectorTitle;
+    this->ScalarBarVectorTitle = 0;
+    }
+  // This will delete the vector component titles
+  this->SetNumberOfVectorComponents(0);
+
+  this->LabelTextProperty->Delete();
+  this->TitleTextProperty->Delete();
 }
 
 
@@ -403,7 +471,8 @@ void vtkPVColorMap::Create(vtkKWApplication *app)
   this->NumberOfColorsScale->SetParent(this->ColorMapFrame->GetFrame());
   this->NumberOfColorsScale->Create(app, "");
   this->NumberOfColorsScale->SetRange(2, 256);
-  this->NumberOfColorsScale->SetValue(256);
+  this->NumberOfColorsScale->SetValue(
+    this->GetNumberOfColorsInternal());
   this->NumberOfColorsScale->DisplayLabel("Resolution:");
   this->NumberOfColorsScale->DisplayEntry();
   this->NumberOfColorsScale->DisplayEntryAndLabelOnTopOff();
@@ -423,7 +492,7 @@ void vtkPVColorMap::Create(vtkKWApplication *app)
                this->NumberOfColorsScale->GetWidgetName());
 
 
-  if (this->RMScalarBarWidget->GetNumberOfVectorComponents() > 1)
+  if (this->NumberOfVectorComponents > 1)
     {
     this->VectorFrame->SetParent(this);
     this->VectorFrame->ShowHideFrameOn();
@@ -497,12 +566,11 @@ void vtkPVColorMap::Create(vtkKWApplication *app)
                this->GetTclName()); 
 
   this->TitleTextPropertyWidget->SetParent(this->ScalarBarTitleFrame);
+  this->GetTitleTextPropertyInternal();
   this->TitleTextPropertyWidget->SetTextProperty(
-    this->RMScalarBarWidget->GetScalarBar()->GetScalarBarActor()->GetTitleTextProperty());
-  this->TitleTextPropertyWidget->SetActor2D(
-    this->RMScalarBarWidget->GetScalarBar()->GetScalarBarActor());
+    this->TitleTextProperty);
   this->TitleTextPropertyWidget->Create(app);
-  this->TitleTextPropertyWidget->SetChangedCommand(this, "RenderView");
+  this->TitleTextPropertyWidget->SetChangedCommand(this, "TitleTextPropertyWidgetCallback");
   this->TitleTextPropertyWidget->SetTraceReferenceObject(this);
   this->TitleTextPropertyWidget->SetTraceReferenceCommand(
     "GetTitleTextPropertyWidget");
@@ -519,7 +587,7 @@ void vtkPVColorMap::Create(vtkKWApplication *app)
                this->TitleTextPropertyWidget->GetWidgetName(),
                grid_settings);
 
-  if (this->RMScalarBarWidget->GetNumberOfVectorComponents()> 1)
+  if (this->NumberOfVectorComponents > 1)
     {
     this->Script("grid %s -row 0 -column 2 -sticky news %s",
                  this->ScalarBarVectorTitleEntry->GetWidgetName(),
@@ -550,16 +618,18 @@ void vtkPVColorMap::Create(vtkKWApplication *app)
   this->ScalarBarLabelFormatEntry->SetBalloonHelpString(
     "Set the labels format (printf() style).");
 
-  //this->SetScalarBarLabelFormat(
-  //  this->RMScalarBarWidget->GetScalarBar->GetScalarBarActor()->GetLabelFormat());
+  this->SetScalarBarLabelFormat(
+    this->GetLabelFormatInternal());
 
   this->LabelTextPropertyWidget->SetParent(this->ScalarBarLabelFormatFrame);
+
+  // this will update this->LabelTextProperty
+  this->GetLabelTextPropertyInternal();
   this->LabelTextPropertyWidget->SetTextProperty(
-    this->RMScalarBarWidget->GetScalarBar()->GetScalarBarActor()->GetLabelTextProperty());
-  this->LabelTextPropertyWidget->SetActor2D(
-    this->RMScalarBarWidget->GetScalarBar()->GetScalarBarActor());
+    this->LabelTextProperty);
   this->LabelTextPropertyWidget->Create(app);
-  this->LabelTextPropertyWidget->SetChangedCommand(this, "RenderView");
+  this->LabelTextPropertyWidget->SetChangedCommand(this, 
+    "LabelTextPropertyWidgetCallback");
   this->LabelTextPropertyWidget->SetTraceReferenceObject(this);
   this->LabelTextPropertyWidget->SetTraceReferenceCommand(
     "GetLabelTextPropertyWidget");
@@ -598,7 +668,7 @@ void vtkPVColorMap::Create(vtkKWApplication *app)
 
   // Scalar bar: synchronize all those grids to have them aligned
 
-  const char *widgets[2];
+  const char *widgets[2];this->PVRenderView->EventuallyRender();
   widgets[0] = this->ScalarBarTitleFrame->GetWidgetName();
   widgets[1] = this->ScalarBarLabelFormatFrame->GetWidgetName();
 
@@ -632,7 +702,7 @@ void vtkPVColorMap::Create(vtkKWApplication *app)
 
   this->Script("pack %s -side top -anchor n -fill x -padx 2 -pady 2", 
                this->ColorMapFrame->GetWidgetName());
-  if (this->RMScalarBarWidget->GetNumberOfVectorComponents() > 1)
+  if (this->NumberOfVectorComponents > 1)
     {
     this->Script("pack %s -side top -anchor n -fill x -padx 2 -pady 2", 
                  this->VectorFrame->GetWidgetName());
@@ -645,43 +715,160 @@ void vtkPVColorMap::Create(vtkKWApplication *app)
 }
 
 //----------------------------------------------------------------------------
+void vtkPVColorMap::TitleTextPropertyWidgetCallback()
+{
+  double *color = this->TitleTextProperty->GetColor();
+  this->SetTitleColor(color[0],color[1],color[2]);
+  this->SetTitleOpacity(this->TitleTextProperty->GetOpacity());
+  this->SetTitleFontFamily(this->TitleTextProperty->GetFontFamily());
+  this->SetTitleBold(this->TitleTextProperty->GetBold());
+  this->SetTitleItalic(this->TitleTextProperty->GetItalic());
+  this->SetTitleShadow(this->TitleTextProperty->GetShadow());
+}
+
+//----------------------------------------------------------------------------
+void vtkPVColorMap::LabelTextPropertyWidgetCallback()
+{
+  double *color = this->LabelTextProperty->GetColor();
+  this->SetLabelColor(color[0],color[1],color[2]);
+  this->SetLabelOpacity(this->LabelTextProperty->GetOpacity());
+  this->SetLabelFontFamily(this->LabelTextProperty->GetFontFamily());
+  this->SetLabelBold(this->LabelTextProperty->GetBold());
+  this->SetLabelItalic(this->LabelTextProperty->GetItalic());
+  this->SetLabelShadow(this->LabelTextProperty->GetShadow());
+}
+
+//----------------------------------------------------------------------------
+void vtkPVColorMap::GetLabelTextPropertyInternal()
+{
+  vtkSMDoubleVectorProperty* dvp;
+  vtkSMIntVectorProperty* ivp;
+  
+  dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+    this->ScalarBarProxy->GetProperty("LabelFormatColor"));
+  if (dvp)
+    {
+    this->LabelTextProperty->SetColor(dvp->GetElements());
+    }
+  
+  dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+    this->ScalarBarProxy->GetProperty("LabelFormatOpacity"));
+  if (dvp)
+    {
+    this->LabelTextProperty->SetOpacity(dvp->GetElement(0));
+    }
+  
+  ivp = vtkSMIntVectorProperty::SafeDownCast(
+    this->ScalarBarProxy->GetProperty("LabelFormatFont"));
+  if (ivp)
+    {
+    this->LabelTextProperty->SetFontFamily(ivp->GetElement(0));
+    }
+
+  ivp = vtkSMIntVectorProperty::SafeDownCast(
+    this->ScalarBarProxy->GetProperty("LabelFormatBold"));
+  if (ivp)
+    {
+    this->LabelTextProperty->SetBold(ivp->GetElement(0));
+    }
+
+  ivp = vtkSMIntVectorProperty::SafeDownCast(
+    this->ScalarBarProxy->GetProperty("LabelFormatItalic"));
+  if (ivp)
+    {
+    this->LabelTextProperty->SetItalic(ivp->GetElement(0));
+    }
+
+  ivp = vtkSMIntVectorProperty::SafeDownCast(
+    this->ScalarBarProxy->GetProperty("LabelFormatShadow"));
+  if (ivp)
+    {
+    this->LabelTextProperty->SetShadow(ivp->GetElement(0));
+    }
+}
+
+
+//----------------------------------------------------------------------------
+void vtkPVColorMap::GetTitleTextPropertyInternal()
+{
+  vtkSMDoubleVectorProperty* dvp;
+  vtkSMIntVectorProperty* ivp;
+  
+  dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+    this->ScalarBarProxy->GetProperty("TitleFormatColor"));
+  if (dvp)
+    {
+    this->TitleTextProperty->SetColor(dvp->GetElements());
+    }
+  
+  dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+    this->ScalarBarProxy->GetProperty("TitleFormatOpacity"));
+  if (dvp)
+    {
+    this->TitleTextProperty->SetOpacity(dvp->GetElement(0));
+    }
+  
+  ivp = vtkSMIntVectorProperty::SafeDownCast(
+    this->ScalarBarProxy->GetProperty("TitleFormatFont"));
+  if (ivp)
+    {
+    this->TitleTextProperty->SetFontFamily(ivp->GetElement(0));
+    }
+
+  ivp = vtkSMIntVectorProperty::SafeDownCast(
+    this->ScalarBarProxy->GetProperty("TitleFormatBold"));
+  if (ivp)
+    {
+    this->TitleTextProperty->SetBold(ivp->GetElement(0));
+    }
+
+  ivp = vtkSMIntVectorProperty::SafeDownCast(
+    this->ScalarBarProxy->GetProperty("TitleFormatItalic"));
+  if (ivp)
+    {
+    this->TitleTextProperty->SetItalic(ivp->GetElement(0));
+    }
+
+  ivp = vtkSMIntVectorProperty::SafeDownCast(
+    this->ScalarBarProxy->GetProperty("TitleFormatShadow"));
+  if (ivp)
+    {
+    this->TitleTextProperty->SetShadow(ivp->GetElement(0));
+    }
+
+}
+
+//----------------------------------------------------------------------------
 void vtkPVColorMap::UpdateVectorComponentMenu()
 {
   int idx;
   char numStr[5];
-  int numberOfVectorComponents;
-  char **vectorComponentTitles;
-  int vectorComponent;
 
-  numberOfVectorComponents = this->RMScalarBarWidget->GetNumberOfVectorComponents();
-  if (numberOfVectorComponents  == 1)
+  if (this->NumberOfVectorComponents  == 1)
     {
     return;
     }
 
-  vectorComponentTitles = this->RMScalarBarWidget->GetVectorComponentTitles();
-  vectorComponent = this->RMScalarBarWidget->GetVectorComponent();
-
   this->VectorComponentMenu->DeleteAllEntries();
-  if ( *(vectorComponentTitles[vectorComponent]) != '\0')
+  if ( *(this->VectorComponentTitles[this->VectorComponent]) != '\0')
     {
     this->VectorComponentMenu->SetValue(
-                         vectorComponentTitles[vectorComponent]);
+                         this->VectorComponentTitles[this->VectorComponent]);
     }
   else
     {
-    sprintf(numStr, "%d", vectorComponent + 1);
+    sprintf(numStr, "%d", this->VectorComponent + 1);
     this->VectorComponentMenu->SetValue(numStr);
     } 
 
-  for (idx = 0; idx < numberOfVectorComponents; ++idx)
+  for (idx = 0; idx < this->NumberOfVectorComponents; ++idx)
     {
     char command[64];
     sprintf(command, "VectorComponentCallback %d", idx);
-    if (*(vectorComponentTitles[idx]) != '\0')
+    if (*(this->VectorComponentTitles[idx]) != '\0')
       {                                       
       this->VectorComponentMenu->AddEntryWithCommand(
-                                           vectorComponentTitles[idx], 
+                                           this->VectorComponentTitles[idx], 
                                            this, command);
       }
     else
@@ -695,14 +882,65 @@ void vtkPVColorMap::UpdateVectorComponentMenu()
 //----------------------------------------------------------------------------
 void vtkPVColorMap::SetNumberOfVectorComponents(int  num)
 {
-  this->RMScalarBarWidget->SetNumberOfVectorComponents(num);
-  const char *arrayname = this->RMScalarBarWidget->GetArrayName();
+  int idx;
+
+  if (this->IsCreated() && num != 0)
+    {
+    vtkErrorMacro("You must set the number of vector components before "
+      "you create this color map.");
+    return;
+    }
+
+  if (num == this->NumberOfVectorComponents)
+    {
+    return;
+    }
+
+  // Get rid of old arrays.
+  // Use for delete.  This number shold not be changed after creation.
+  if (this->VectorComponentTitles)
+    {
+    for (idx = 0; idx < this->NumberOfVectorComponents; ++idx)
+      {
+      delete [] this->VectorComponentTitles[idx];
+      this->VectorComponentTitles[idx] = NULL;
+      }
+    }
+
+  delete[] this->VectorComponentTitles;
+  this->VectorComponentTitles = NULL;
+
+  this->NumberOfVectorComponents = num;
+
+  // Set defaults for component titles.
+  if (num > 0)
+    {
+    this->VectorComponentTitles = new char* [num];
+    }
+  for (idx = 0; idx < num; ++idx)
+    {
+    this->VectorComponentTitles[idx] = new char[4];  
+    }
+  if (num == 3)
+    { // Use XYZ for default of three component vectors.
+    strcpy(this->VectorComponentTitles[0], "X");
+    strcpy(this->VectorComponentTitles[1], "Y");
+    strcpy(this->VectorComponentTitles[2], "Z");
+    }
+  else
+    {
+    for (idx = 0; idx < num; ++idx)
+      {
+      sprintf(this->VectorComponentTitles[idx], "%d", idx+1);
+      }
+    }
+  const char* arrayname = this->GetArrayName();
   if ( arrayname != NULL)
     {
     char *str2;
     str2 = new char [strlen(arrayname) + 128];
     sprintf(str2, "GetPVColorMap {%s} %d", arrayname, 
-            this->RMScalarBarWidget->GetNumberOfVectorComponents());
+      this->NumberOfVectorComponents);
     this->SetTraceReferenceCommand(str2);
     delete [] str2;
     }
@@ -712,32 +950,84 @@ void vtkPVColorMap::SetNumberOfVectorComponents(int  num)
 void vtkPVColorMap::CreateParallelTclObjects(vtkPVApplication *pvApp)
 {
   this->vtkKWObject::SetApplication(pvApp);
+  
+  vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
   vtkPVProcessModule* pm = pvApp->GetProcessModule();
-  this->RMScalarBarWidget->Create(pm,pm->GetRenderModule()->GetRenderer2DID(),
-    this->PVRenderView->GetPVWindow()->GetInteractorID());
+  static int proxyNum = 0;
+  // Create LookupTableProxy
+  this->LookupTableProxy = vtkSMLookupTableProxy::SafeDownCast(
+    pxm->NewProxy("lookup_tables","LookupTable"));
+  if (!this->LookupTableProxy)
+    {
+    vtkErrorMacro("Failed to create LookupTableProxy");
+    return;
+    }
+  ostrstream str1;
+  str1 << "PVColorMap_LookupTable" << proxyNum << ends;
+  this->SetLookupTableProxyName(str1.str());
+  str1.rdbuf()->freeze(0);
+  proxyNum++;
+  pxm->RegisterProxy("lookup_tables", this->LookupTableProxyName , 
+    this->LookupTableProxy);
+  this->LookupTableProxy->CreateVTKObjects(1);
+    
+  // Create ScalarBarProxy
+  this->ScalarBarProxy = vtkSMScalarBarWidgetProxy::SafeDownCast(
+    pxm->NewProxy("scalarbar_widget","ScalarBarWidget"));
+  if (!this->ScalarBarProxy)
+    {
+    vtkErrorMacro("Failed to create ScalarBarWidget proxy");
+    return;
+    }
+  ostrstream str;
+  str << "PVColorMap_ScalarBarWidget" << proxyNum << ends;
+  this->SetScalarBarProxyName(str.str());
+  str.rdbuf()->freeze(0);
+  proxyNum++;
+  pxm->RegisterProxy("scalarbar_widget",this->ScalarBarProxyName,this->ScalarBarProxy);
+  this->ScalarBarProxy->CreateVTKObjects(1);
+  this->InitializeObservers();
 
-  //this->ScalarBar = vtkScalarBarWidget::New();
-  //this->ScalarBar->SetCurrentRenderer(pvApp->GetRenderModule()->GetRenderer2D());
-  //
-  //// Actor will be in server manager.  Widget will be in UI.
-  //this->ScalarBar->SetScalarBarActor(
-  //  vtkScalarBarActor::SafeDownCast(pm->GetObjectFromID(
-  //  this->RMScalarBarWidget->GetScalarBarActorID())));
-  //
-  //this->ScalarBar->SetInteractor(
-  //  this->PVRenderView->GetPVWindow()->GetInteractor());
+  vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
+    this->ScalarBarProxy->GetProperty("LookupTable"));
+  if (!pp)
+    {
+    vtkErrorMacro("ScalarBarProxy does not have property LookupTable");
+    return;
+    }
+  pp->RemoveAllProxies();
+  pp->AddProxy(this->LookupTableProxy);
+  this->ScalarBarProxy->UpdateVTKObjects();
+}
 
-  this->RMScalarBarObserver = vtkRMScalarBarWidgetObserver::New();
-  this->RMScalarBarObserver->PVColorMap = this;
+//----------------------------------------------------------------------------
+vtkSMProxy* vtkPVColorMap::GetProxyByName(const char* name)
+{
+  if (strcmp(name,"LookupTable") == 0)
+    {
+    return this->LookupTableProxy;
+    }
+  if (strcmp(name,"ScalarBarWidget") == 0)
+    {
+    return this->ScalarBarProxy;
+    }
+  vtkErrorMacro("Unknow proxy name : " << name);
+  return NULL;
+}
+//----------------------------------------------------------------------------
+void vtkPVColorMap::InitializeObservers()
+{
+  this->ScalarBarObserver = vtkPVColorMapObserver::New();
+  this->ScalarBarObserver->PVColorMap = this;
 
-  this->RMScalarBarWidget->AddObserver(vtkCommand::InteractionEvent,
-                                       this->RMScalarBarObserver);
-  this->RMScalarBarWidget->AddObserver(vtkCommand::StartInteractionEvent, 
-                                       this->RMScalarBarObserver);
-  this->RMScalarBarWidget->AddObserver(vtkCommand::EndInteractionEvent, 
-                                       this->RMScalarBarObserver);
-  this->RMScalarBarWidget->AddObserver(vtkKWEvent::WidgetModifiedEvent,
-                                       this->RMScalarBarObserver);
+  this->ScalarBarProxy->AddObserver(vtkCommand::InteractionEvent,
+    this->ScalarBarObserver);
+  this->ScalarBarProxy->AddObserver(vtkCommand::StartInteractionEvent, 
+    this->ScalarBarObserver);
+  this->ScalarBarProxy->AddObserver(vtkCommand::EndInteractionEvent, 
+    this->ScalarBarObserver);
+  this->ScalarBarProxy->AddObserver(vtkKWEvent::WidgetModifiedEvent,
+    this->ScalarBarObserver);
 }
 
 //----------------------------------------------------------------------------
@@ -766,9 +1056,8 @@ void vtkPVColorMap::BackButtonCallback()
 //----------------------------------------------------------------------------
 void vtkPVColorMap::SetArrayName(const char* str)
 {
-  this->RMScalarBarWidget->SetArrayName(str);
-  str = this->RMScalarBarWidget->GetArrayName();
 
+  this->SetArrayNameInternal(str);
   if (str)
     {
     char *tmp;
@@ -782,18 +1071,41 @@ void vtkPVColorMap::SetArrayName(const char* str)
     {
     char *str2;
     str2 = new char [strlen(str) + 128];
-    sprintf(str2, "GetPVColorMap {%s} %d", str, 
-      this->RMScalarBarWidget->GetNumberOfVectorComponents());
+    sprintf(str2, "GetPVColorMap {%s} %d", str, this->NumberOfVectorComponents);
     this->SetTraceReferenceCommand(str2);
     delete [] str2;
     }
-  //this->Modified();
+  this->Modified();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVColorMap::SetArrayNameInternal(const char* str)
+{
+  vtkSMStringVectorProperty* svp = vtkSMStringVectorProperty::SafeDownCast(
+    this->LookupTableProxy->GetProperty("ArrayName"));
+  if (!svp)
+    {
+    vtkErrorMacro("LookupTableProxy does not have property ArrayName");
+    return;
+    }
+  svp->SetElement(0,str);
+  this->ScalarBarProxy->UpdateVTKObjects();
 }
 
 //----------------------------------------------------------------------------
 int vtkPVColorMap::MatchArrayName(const char* str, int numberOfComponents)
 {
-  return this->RMScalarBarWidget->MatchArrayName(str,numberOfComponents);
+  const char* arrayname = this->GetArrayName();
+  if (str == NULL || arrayname == NULL)
+    {
+    return 0;
+    }
+  if (strcmp(str, arrayname) == 0 &&
+    numberOfComponents == this->NumberOfVectorComponents)
+    {
+    return 1;
+    }
+  return 0;
 }
 
 //----------------------------------------------------------------------------
@@ -805,18 +1117,48 @@ void vtkPVColorMap::ScalarBarTitleEntryCallback()
 //----------------------------------------------------------------------------
 void vtkPVColorMap::SetScalarBarTitle(const char* name)
 {
-  this->SetScalarBarTitleInternal(name);
+  if (this->ScalarBarTitle == NULL && name == NULL) 
+    { 
+    return;
+    }
+
+  if (this->ScalarBarTitle && name && (!strcmp(this->ScalarBarTitle, name))) 
+    { 
+    return;
+    }
+
+  if (this->ScalarBarTitle) 
+    { 
+    delete [] this->ScalarBarTitle; 
+    this->ScalarBarTitle = NULL;
+    }
+
+  if (name)
+    {
+    this->ScalarBarTitle = new char[strlen(name) + 1];
+    strcpy(this->ScalarBarTitle, name);
+    } 
+  this->ScalarBarTitleEntry->SetValue(this->ScalarBarTitle);
+  this->UpdateScalarBarTitle();
   this->AddTraceEntry("$kw(%s) SetScalarBarTitle {%s}", 
-                      this->GetTclName(), name);
+    this->GetTclName(), name);
+  this->RenderView();
+  this->Modified();
 }
 
 //----------------------------------------------------------------------------
-void vtkPVColorMap::SetScalarBarTitleInternal(const char* name)
+void vtkPVColorMap::SetTitleInternal(const char* title)
 {
-
-  this->RMScalarBarWidget->SetScalarBarTitle(name);
+  vtkSMStringVectorProperty *svp = vtkSMStringVectorProperty::SafeDownCast(
+    this->ScalarBarProxy->GetProperty("Title"));
+  if (!svp)
+    {
+    vtkErrorMacro("ScalarBarProxy does not have property Title");
+    return;
+    }
+  svp->SetElement(0,title);
+  this->ScalarBarProxy->UpdateVTKObjects();
 }
-
 
 //----------------------------------------------------------------------------
 void vtkPVColorMap::ScalarBarVectorTitleEntryCallback()
@@ -827,7 +1169,80 @@ void vtkPVColorMap::ScalarBarVectorTitleEntryCallback()
 //----------------------------------------------------------------------------
 void vtkPVColorMap::SetScalarBarVectorTitle(const char* name)
 {
-  this->RMScalarBarWidget->SetScalarBarVectorTitle(name);
+  if (this->GetVectorModeInternal() == vtkLookupTable::MAGNITUDE)
+    {
+    if (this->VectorMagnitudeTitle == NULL && name == NULL) 
+      { 
+      return;
+      }
+
+    if (this->VectorMagnitudeTitle && name && 
+      (!strcmp(this->VectorMagnitudeTitle, name)))
+      {
+      return;
+      }
+
+    if (this->VectorMagnitudeTitle)
+      {
+      delete [] this->VectorMagnitudeTitle;
+      this->VectorMagnitudeTitle = NULL;
+      }
+
+    if (name)
+      {
+      this->VectorMagnitudeTitle = new char[strlen(name) + 1];
+      strcpy(this->VectorMagnitudeTitle, name);
+      }
+
+    this->ScalarBarVectorTitleEntry->SetValue(name);
+
+    this->AddTraceEntry("$kw(%s) SetScalarBarVectorTitle {%s}", 
+      this->GetTclName(), name);
+    }
+  else
+    {
+    if (this->VectorComponentTitles == NULL)
+      {
+      return;
+      }
+
+    if (this->VectorComponentTitles[this->VectorComponent] == NULL && 
+      name == NULL) 
+      { 
+      return;
+      }
+
+    if (this->VectorComponentTitles[this->VectorComponent] && 
+      name && 
+      (!strcmp(this->VectorComponentTitles[this->VectorComponent], name)))
+      {
+      return;
+      }
+
+    if (this->VectorComponentTitles[this->VectorComponent])
+      {
+      delete [] this->VectorComponentTitles[this->VectorComponent];
+      this->VectorComponentTitles[this->VectorComponent] = NULL;
+      }
+
+    if (name)
+      {
+      this->VectorComponentTitles[this->VectorComponent] = 
+        new char[strlen(name) + 1];
+      strcpy(this->VectorComponentTitles[this->VectorComponent], name);
+      }
+
+    this->ScalarBarVectorTitleEntry->SetValue(name);
+
+    this->AddTraceEntry("$kw(%s) SetScalarBarVectorTitle {%s}", 
+      this->GetTclName(), name);
+
+    this->UpdateVectorComponentMenu();
+
+    }
+    this->UpdateScalarBarTitle();
+    this->Modified();
+    this->RenderView();
 }
 
 //----------------------------------------------------------------------------
@@ -839,26 +1254,33 @@ void vtkPVColorMap::ScalarBarLabelFormatEntryCallback()
 //----------------------------------------------------------------------------
 void vtkPVColorMap::SetScalarBarLabelFormat(const char* name)
 {
-  this->RMScalarBarWidget->SetScalarBarLabelFormat(name);
-
+  this->ScalarBarLabelFormatEntry->SetValue(name);
+  this->SetLabelFormatInternal(name);
   this->AddTraceEntry("$kw(%s) SetScalarBarLabelFormat {%s}", 
                       this->GetTclName(), name);
+  this->RenderView();
+  this->Modified();
+}
 
+//----------------------------------------------------------------------------
+void vtkPVColorMap::SetLabelFormatInternal(const char* format)
+{
+  vtkSMStringVectorProperty *svp = vtkSMStringVectorProperty::SafeDownCast(
+    this->ScalarBarProxy->GetProperty("LabelFormat"));
+  if (!svp)
+    {
+    vtkErrorMacro("ScalarBarProxy does not have property LabelFormat");
+    return;
+    }
+  svp->SetElement(0,format);
+  this->ScalarBarProxy->UpdateVTKObjects();
 }
 
 //----------------------------------------------------------------------------
 void vtkPVColorMap::NumberOfColorsScaleCallback()
 {
   int num = (int)(this->NumberOfColorsScale->GetValue());
-
-  if (num == this->RMScalarBarWidget->GetNumberOfColors())
-    {
-    return;
-    }
-
-  this->AddTraceEntry("$kw(%s) SetNumberOfColors %d", this->GetTclName(),
-                      num);
-  this->RMScalarBarWidget->SetNumberOfColors(num);
+  this->SetNumberOfColors(num);
 }
 
 //----------------------------------------------------------------------------
@@ -866,93 +1288,143 @@ void vtkPVColorMap::NumberOfColorsScaleCallback()
 void vtkPVColorMap::SetNumberOfColors(int num)
 {
   this->NumberOfColorsScale->SetValue(num);
-  this->NumberOfColorsScaleCallback();
+
+  this->SetNumberOfColorsInternal(num);
+  this->AddTraceEntry("$kw(%s) SetNumberOfColors %d", this->GetTclName(),
+    num);
+  this->UpdateMap();
+  this->Modified();
+  this->RenderView();
 }
 
 //----------------------------------------------------------------------------
+void vtkPVColorMap::SetNumberOfColorsInternal(int num)
+{
+  vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
+    this->LookupTableProxy->GetProperty("NumberOfTableValues"));
+  if (!ivp)
+    {
+    vtkErrorMacro("LookupTableProxy does not have property NumberOfTableValues");
+    return;
+    }
+  ivp->SetElement(0,num);
+  this->LookupTableProxy->UpdateVTKObjects();
+}
+
+//----------------------------------------------------------------------------
+int vtkPVColorMap::GetNumberOfColorsInternal()
+{
+  vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
+    this->LookupTableProxy->GetProperty("NumberOfTableValues"));
+  if (!ivp)
+    {
+    vtkErrorMacro("LookupTableProxy does not have property NumberOfTableValues");
+    return 0;
+    }
+  return ivp->GetElement(0);
+}
+//----------------------------------------------------------------------------
 void vtkPVColorMap::SetColorSchemeToRedBlue()
 {
-  double startHSV[3];
-  double endHSV[3];
-  startHSV[0] = VTK_PV_COLOR_MAP_RED_HUE;
-  startHSV[1] = VTK_PV_COLOR_MAP_RED_SATURATION;
-  startHSV[2] = VTK_PV_COLOR_MAP_RED_VALUE;
-  endHSV[0] = VTK_PV_COLOR_MAP_BLUE_HUE;
-  endHSV[1] = VTK_PV_COLOR_MAP_BLUE_SATURATION;
-  endHSV[2] = VTK_PV_COLOR_MAP_BLUE_VALUE;
+  double hr[2],sr[2],vr[2];
+  hr[0] = VTK_PV_COLOR_MAP_RED_HUE;
+  sr[0] = VTK_PV_COLOR_MAP_RED_SATURATION;
+  vr[0] = VTK_PV_COLOR_MAP_RED_VALUE;
+  
+  hr[1] = VTK_PV_COLOR_MAP_BLUE_HUE;
+  sr[1] = VTK_PV_COLOR_MAP_BLUE_SATURATION;
+  vr[1] = VTK_PV_COLOR_MAP_BLUE_VALUE;
 
   this->StartColorButton->SetColor(1.0, 0.0, 0.0);
   this->EndColorButton->SetColor(0.0, 0.0, 1.0);
 
-  this->RMScalarBarWidget->SetStartHSV(startHSV);
-  this->RMScalarBarWidget->SetEndHSV(endHSV);
+  /*this->SetHueRangeInternal(hr);
+  this->SetSaturationRangeInternal(sr);
+  this->SetValueRangeInternal(vr);*/
+  this->SetHSVRangesInternal(hr,sr,vr);
+
   this->AddTraceEntry("$kw(%s) SetColorSchemeToRedBlue", this->GetTclName());
+  this->UpdateMap();
+  this->Modified();
+  this->RenderView();
 }
 
 //----------------------------------------------------------------------------
 void vtkPVColorMap::SetColorSchemeToBlueRed()
 {
-  double startHSV[3];
-  double endHSV[3];
-  startHSV[0] = VTK_PV_COLOR_MAP_BLUE_HUE;
-  startHSV[1] = VTK_PV_COLOR_MAP_BLUE_SATURATION;
-  startHSV[2] = VTK_PV_COLOR_MAP_BLUE_VALUE;
-  endHSV[0] = VTK_PV_COLOR_MAP_RED_HUE;
-  endHSV[1] = VTK_PV_COLOR_MAP_RED_SATURATION;
-  endHSV[2] = VTK_PV_COLOR_MAP_RED_VALUE;
+  double hr[2],sr[2],vr[2];
+  hr[0] = VTK_PV_COLOR_MAP_BLUE_HUE;
+  sr[0] = VTK_PV_COLOR_MAP_BLUE_SATURATION;
+  vr[0] = VTK_PV_COLOR_MAP_BLUE_VALUE;
+  hr[1] = VTK_PV_COLOR_MAP_RED_HUE;
+  sr[1] = VTK_PV_COLOR_MAP_RED_SATURATION;
+  vr[1] = VTK_PV_COLOR_MAP_RED_VALUE;
 
   this->StartColorButton->SetColor(0.0, 0.0, 1.0);
   this->EndColorButton->SetColor(1.0, 0.0, 0.0);
 
-  this->RMScalarBarWidget->SetStartHSV(startHSV);
-  this->RMScalarBarWidget->SetEndHSV(endHSV);
+  /*this->SetHueRangeInternal(hr);
+  this->SetSaturationRangeInternal(sr);
+  this->SetValueRangeInternal(vr);*/
+  this->SetHSVRangesInternal(hr,sr,vr);
+
   this->AddTraceEntry("$kw(%s) SetColorSchemeToBlueRed", this->GetTclName());
+  this->UpdateMap();
+  this->Modified();
+  this->RenderView();
 }
 
 //----------------------------------------------------------------------------
 void vtkPVColorMap::SetColorSchemeToGrayscale()
 {
-  double startHSV[3];
-  double endHSV[3];
-  startHSV[0] = VTK_PV_COLOR_MAP_BLACK_HUE;
-  startHSV[1] = VTK_PV_COLOR_MAP_BLACK_SATURATION;
-  startHSV[2] = VTK_PV_COLOR_MAP_BLACK_VALUE;
-  endHSV[0] = VTK_PV_COLOR_MAP_WHITE_HUE;
-  endHSV[1] = VTK_PV_COLOR_MAP_WHITE_SATURATION;
-  endHSV[2] = VTK_PV_COLOR_MAP_WHITE_VALUE;
+  double hr[2],sr[2],vr[2];
+  hr[0] = VTK_PV_COLOR_MAP_BLACK_HUE;
+  sr[0] = VTK_PV_COLOR_MAP_BLACK_SATURATION;
+  vr[0] = VTK_PV_COLOR_MAP_BLACK_VALUE;
+  hr[1] = VTK_PV_COLOR_MAP_WHITE_HUE;
+  sr[1] = VTK_PV_COLOR_MAP_WHITE_SATURATION;
+  vr[1] = VTK_PV_COLOR_MAP_WHITE_VALUE;
 
   this->StartColorButton->SetColor(0.0, 0.0, 0.0);
   this->EndColorButton->SetColor(1.0, 1.0, 1.0);
 
-  this->RMScalarBarWidget->SetStartHSV(startHSV);
-  this->RMScalarBarWidget->SetEndHSV(endHSV);
+/*  this->SetHueRangeInternal(hr);
+  this->SetSaturationRangeInternal(sr);
+  this->SetValueRangeInternal(vr);*/
+  this->SetHSVRangesInternal(hr,sr,vr);
+
   this->AddTraceEntry("$kw(%s) SetColorSchemeToGrayscale", this->GetTclName());
+  this->UpdateMap();
+  this->Modified();
+  this->RenderView();
 }
 
 //----------------------------------------------------------------------------
 void vtkPVColorMap::SetColorSchemeToLabBlueRed()
 {
+  double hr[2],sr[2],vr[2];
   double startHSV[3];
   double endHSV[3];
-
   //first calculate the gradient values
   //LabBlue[0]=83.91;
   //LabBlue[1]=-8.65;
   //LabBlue[2]=-12.18;
-  startHSV[0]=57.93;
-  startHSV[1]=-26.85;
-  startHSV[2]=-30.21;
-
+  hr[0]=57.93;
+  sr[0]=-26.85;
+  vr[0]=-30.21;
+  startHSV[0] = hr[0];
+  startHSV[1] = sr[0];
+  startHSV[2] = vr[0];
   //LabRed[0]=83.91;
   //LabRed[1]=8.65;
   //LabRed[2]=12.18;
   
-  endHSV[0]=57.93;
-  endHSV[1]=26.85;
-  endHSV[2]=30.21;
-  
-  //this->StartColorButton->SetColor(0.0, 0.0, 1.0);
-  //this->EndColorButton->SetColor(1.0, 0.0, 0.0);
+  hr[1]=57.93;
+  sr[1]=26.85;
+  vr[1]=30.21;
+  endHSV[0] = hr[1];
+  endHSV[1] = sr[1];
+  endHSV[2] = vr[1];
 
   double rgb[3];
   double xyz[3];
@@ -963,10 +1435,15 @@ void vtkPVColorMap::SetColorSchemeToLabBlueRed()
   this->XYZToRGB(xyz,rgb);
   this->EndColorButton->SetColor(rgb[0],rgb[1],rgb[2]);
 
-  this->RMScalarBarWidget->SetStartHSV(startHSV);
-  this->RMScalarBarWidget->SetEndHSV(endHSV);
+/*  this->SetHueRangeInternal(hr);
+  this->SetSaturationRangeInternal(sr);
+  this->SetValueRangeInternal(vr);*/
+  this->SetHSVRangesInternal(hr,sr,vr);
 
   this->AddTraceEntry("$kw(%s) SetColorSchemeToLabBlueRed", this->GetTclName());
+  this->UpdateMap();
+  this->Modified();
+  this->RenderView();
 }
 
 //----------------------------------------------------------------------------
@@ -985,8 +1462,9 @@ void vtkPVColorMap::StartColorButtonCallback(double r, double g, double b)
   
   // Lab color map uses hue > 1.1 as a flag.
   // We need to make sure the end color hue is not > 1.
-  this->RMScalarBarWidget->GetEndHSV(hsv);
-  if (hsv[0] > 1.1)
+  double hrange[2];
+  this->GetHueRangeInternal(hrange);
+  if (hrange[1] > 1.1)
     {
     double *tmp = this->EndColorButton->GetColor();
     vtkMath::RGBToHSV(tmp, hsv);
@@ -998,12 +1476,15 @@ void vtkPVColorMap::StartColorButtonCallback(double r, double g, double b)
 // Access for trace files.
 void vtkPVColorMap::SetStartHSV(double h, double s, double v)
 {
+  double hr[2],sr[2],vr[2];
   double hsv[3];
   double rgb[3];
 
-  this->RMScalarBarWidget->GetStartHSV(hsv);
-  if ( hsv[0] == h && 
-       hsv[1] == s && hsv[2] == v)
+  this->GetHueRangeInternal(hr);
+  this->GetSaturationRangeInternal(sr);
+  this->GetValueRangeInternal(vr);
+
+  if ( h == hr[0] && s == sr[0] && v == vr[0])
     {
     return;
     }
@@ -1022,12 +1503,77 @@ void vtkPVColorMap::SetStartHSV(double h, double s, double v)
     vtkMath::HSVToRGB(hsv, rgb);
     this->StartColorButton->SetColor(rgb);
     }
+  hr[0] = h; sr[0] = s; vr[0] = v;
+/*  this->SetHueRangeInternal(hr);
+  this->SetSaturationRangeInternal(sr);
+  this->SetValueRangeInternal(vr);*/
+  this->SetHSVRangesInternal(hr,sr,vr);
+
   this->AddTraceEntry("$kw(%s) SetStartHSV %g %g %g", 
                       this->GetTclName(), h, s, v);
 
-  this->RMScalarBarWidget->SetStartHSV(h,s,v);
+  this->UpdateMap();
+  this->Modified();
+  this->RenderView();
 }
 
+//----------------------------------------------------------------------------
+void vtkPVColorMap::SetHSVRangesInternal(double hrange[2],
+  double srange[2], double vrange[2])
+{
+  vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+    this->LookupTableProxy->GetProperty("HueRange"));
+  if (!dvp)
+    {
+    vtkErrorMacro("LookupTableProxy does not have property HueRange");
+    }
+  dvp->SetElements(hrange);
+
+  dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+    this->LookupTableProxy->GetProperty("SaturationRange"));
+  if (!dvp)
+    {
+    vtkErrorMacro("LookupTableProxy does not have property SaturationRange");
+    }
+  dvp->SetElements(srange);
+
+  dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+    this->LookupTableProxy->GetProperty("ValueRange"));
+  if (!dvp)
+    {
+    vtkErrorMacro("LookupTableProxy does not have property ValueRange");
+    }
+  dvp->SetElements(vrange);
+
+  this->LookupTableProxy->UpdateVTKObjects();
+}
+
+//----------------------------------------------------------------------------
+/*void vtkPVColorMap::SetSaturationRangeInternal(double range[2])
+{
+  vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+    this->ScalarBarProxy->GetProperty("SaturationRange"));
+  if (!dvp)
+    {
+    vtkErrorMacro("ScalarBarProxy does not have propery SaturationRange");
+    }
+  dvp->SetElements(range);
+  this->ScalarBarProxy->UpdateVTKObjects();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVColorMap::SetValueRangeInternal(double range[2])
+{
+  vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+    this->ScalarBarProxy->GetProperty("ValueRange"));
+  if (!dvp)
+    {
+    vtkErrorMacro("ScalarBarProxy does not have propery ValueRange");
+    }
+  dvp->SetElements(range);
+  this->ScalarBarProxy->UpdateVTKObjects();
+}
+*/
 //----------------------------------------------------------------------------
 void vtkPVColorMap::EndColorButtonCallback(double r, double g, double b)
 {
@@ -1043,9 +1589,10 @@ void vtkPVColorMap::EndColorButtonCallback(double r, double g, double b)
   this->SetEndHSV(hsv[0], hsv[1], hsv[2]);
 
   // Lab color map uses hue > 1.1 as a flag.
-  // We need to make sure the end color hue is not > 1.
-  this->RMScalarBarWidget->GetStartHSV(hsv);
-  if (hsv[0] > 1.1)
+  // We need to make sure the start color hue is not > 1.
+  double hrange[2];
+  this->GetHueRangeInternal(hrange);
+  if (hrange[0] > 1.1)
     {
     double *tmp = this->StartColorButton->GetColor();
     vtkMath::RGBToHSV(tmp, hsv);
@@ -1058,12 +1605,15 @@ void vtkPVColorMap::EndColorButtonCallback(double r, double g, double b)
 // Access for trace files.
 void vtkPVColorMap::SetEndHSV(double h, double s, double v)
 {
+  double hr[2],sr[2],vr[2];
   double hsv[3];
   double rgb[3];
-
-  this->RMScalarBarWidget->GetEndHSV(hsv);
-  if ( hsv[0] == h && 
-       hsv[1] == s && hsv[2] == v)
+  
+  this->GetHueRangeInternal(hr);
+  this->GetSaturationRangeInternal(sr);
+  this->GetValueRangeInternal(vr);
+  
+  if ( hr[1] == h && sr[1] == s && vr[1] == v)
     {
     return;
     }
@@ -1082,10 +1632,16 @@ void vtkPVColorMap::SetEndHSV(double h, double s, double v)
     vtkMath::HSVToRGB(hsv, rgb);
     this->EndColorButton->SetColor(rgb);
     }
+  hr[1] = h; sr[1] = s; vr[1] = v;
+  this->SetHSVRangesInternal(hr,sr,vr);
+  //this->SetHueRangeInternal(hr);
+  //this->SetSaturationRangeInternal(sr);
+  //this->SetValueRangeInternal(vr);
   this->AddTraceEntry("$kw(%s) SetEndHSV %g %g %g", 
                       this->GetTclName(), h, s, v);
-
-  this->RMScalarBarWidget->SetEndHSV(h,s,v);
+  this->UpdateMap();
+  this->Modified();
+  this->RenderView();
 }
 
 //----------------------------------------------------------------------------
@@ -1126,9 +1682,26 @@ void vtkPVColorMap::SetScalarRangeLock(int val)
 //----------------------------------------------------------------------------
 void vtkPVColorMap::SetVectorComponent(int component)
 {
-  this->RMScalarBarWidget->SetVectorComponent(component);
+  this->SetVectorComponentInternal(component);
+  this->UpdateVectorComponentMenu();
+  this->UpdateScalarBarTitle();
   this->AddTraceEntry("$kw(%s) SetVectorComponent %d", 
                       this->GetTclName(), component);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVColorMap::SetVectorComponentInternal(int component)
+{
+  vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
+    this->LookupTableProxy->GetProperty("VectorComponent"));
+  if (!ivp)
+    {
+    vtkErrorMacro("LookupTableProxy does not have property VectorComponent");
+    return;
+    }
+  ivp->SetElement(0,component);
+  this->VectorComponent = component;
+  this->LookupTableProxy->UpdateVTKObjects();
 }
 
 //----------------------------------------------------------------------------
@@ -1226,16 +1799,22 @@ void vtkPVColorMap::UpdateInternalScalarBarVisibility()
     {
     return;
     }
-  this->RMScalarBarWidget->SetVisibility(visible);
-  if (visible)
-    {
-    // This removes all renderers from the render window before enabling 
-    // the widget. It then adds them back into the render window.
-    // I assume the widget needs to know which renderer it uses.
-    // It's the old poked renderer problem.
-    this->GetPVRenderView()->Enable3DWidget(this->RMScalarBarWidget->GetScalarBar());
-    }
+  this->SetVisibilityInternal(visible);
   this->Modified();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVColorMap::SetVisibilityInternal(int visible)
+{
+  vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
+    this->ScalarBarProxy->GetProperty("Visibility"));
+  if (!ivp)
+    {
+    vtkErrorMacro("ScalarBarProxy does not have property Visibility");
+    return;
+    }
+  ivp->SetElement(0,visible);
+  this->ScalarBarProxy->UpdateVTKObjects();
 }
 
 //----------------------------------------------------------------------------
@@ -1246,49 +1825,101 @@ void vtkPVColorMap::SaveInBatchScript(ofstream *file)
     return;
     }
   this->VisitedFlag = 1;
-
-  vtkClientServerID lookupTableID = this->RMScalarBarWidget->GetLookupTableID();
-  double startHSV[3], endHSV[3];
-  this->RMScalarBarWidget->GetStartHSV(startHSV);
-  this->RMScalarBarWidget->GetEndHSV(endHSV);
-
-  *file << endl;
-  *file << "set pvTemp" <<  lookupTableID 
-        << " [$proxyManager NewProxy lookup_tables LookupTable]"
-        << endl;
-  *file << "  $proxyManager RegisterProxy lookup_tables pvTemp"
-        << lookupTableID << " $pvTemp" << lookupTableID 
-        << endl;
-  *file << "  $pvTemp" << lookupTableID << " UnRegister {}" << endl;
-  *file << "  [$pvTemp" << lookupTableID << " GetProperty "
-        << "NumberOfTableValues] SetElements1 "
-        << this->RMScalarBarWidget->GetNumberOfColors() << endl;
-  *file << "  [$pvTemp" << lookupTableID << " GetProperty "
-        << "HueRange] SetElements2 "
-        << startHSV[0] << " " << endHSV[0] << endl;
-
-  *file << "  [$pvTemp" << lookupTableID << " GetProperty "
-        << "SaturationRange] SetElements2 "
-        << startHSV[1] << " " << endHSV[1] << endl;
-  *file << "  [$pvTemp" << lookupTableID << " GetProperty "
-        << "ValueRange] SetElements2 "
-        << startHSV[2] << " " << endHSV[2] << endl;
-  *file << "  [$pvTemp" << lookupTableID << " GetProperty "
-        << "ScalarRange] SetElements2 "
-        << this->RMScalarBarWidget->GetScalarRange()[0] << " " << this->RMScalarBarWidget->GetScalarRange()[1] << endl;
-  *file << "  [$pvTemp" << lookupTableID << " GetProperty "
-        << "VectorComponent] SetElements1 "
-        << this->RMScalarBarWidget->GetVectorComponent() << endl;
-  *file << "  [$pvTemp" << lookupTableID << " GetProperty "
-        << "VectorMode] SetElements1 "
-        << this->RMScalarBarWidget->GetVectorMode() << endl;
-  *file << "  $pvTemp" << lookupTableID << " UpdateVTKObjects"
-        << endl;
-  *file << "  $pvTemp" << lookupTableID << " Build"
-        << endl;
-  *file << endl;
+  this->LookupTableProxy->SaveInBatchScript(file);
+  this->ScalarBarProxy->SaveInBatchScript(file);
 }
 
+//----------------------------------------------------------------------------
+void vtkPVColorMap::GetHueRangeInternal(double range[2])
+{
+  vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+    this->LookupTableProxy->GetProperty("HueRange"));
+  if (!dvp || dvp->GetNumberOfElements() != 2)
+    {
+    vtkErrorMacro("LookupTableProxy does not have property HueRange");
+    range[0] = range[1] = 0.0;
+    return;
+    }
+  range[0] = dvp->GetElement(0);
+  range[1] = dvp->GetElement(1);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVColorMap::GetSaturationRangeInternal(double range[2])
+{
+  vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+    this->LookupTableProxy->GetProperty("SaturationRange"));
+  if (!dvp || dvp->GetNumberOfElements() != 2)
+    {
+    vtkErrorMacro("LookupTableProxy does not have property SaturationRange");
+    range[0] = range[1] = 0.0;
+    return;
+    }
+  range[0] = dvp->GetElement(0);
+  range[1] = dvp->GetElement(1);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVColorMap::GetValueRangeInternal(double range[2])
+{
+  vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+    this->LookupTableProxy->GetProperty("ValueRange"));
+  if (!dvp || dvp->GetNumberOfElements() != 2)
+    {
+    vtkErrorMacro("LookupTableProxy does not have property ValueRange");
+    range[0] = range[1] = 0.0;
+    return;
+    }
+  range[0] = dvp->GetElement(0);
+  range[1] = dvp->GetElement(1);
+}
+
+//----------------------------------------------------------------------------
+int vtkPVColorMap::GetVectorModeInternal()
+{
+  vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
+    this->LookupTableProxy->GetProperty("VectorMode"));
+  if (!ivp)
+    {
+    vtkErrorMacro("LookupTableProxy does not have property VectorMode");
+    return 0;
+    }
+  return ivp->GetElement(0);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVColorMap::UpdateScalarBarTitle()
+{
+  if (this->ScalarBarTitle == NULL || this->GetPVApplication() == NULL)
+    {
+    return;
+    }
+  
+  if (this->GetVectorModeInternal() == vtkLookupTable::MAGNITUDE &&
+      this->NumberOfVectorComponents > 1)
+    {
+    ostrstream ostr;
+    ostr << this->ScalarBarTitle << " " << this->VectorMagnitudeTitle << ends;
+    this->SetTitleInternal(ostr.str()); 
+    ostr.rdbuf()->freeze(0);    
+    this->ScalarBarVectorTitleEntry->SetValue(this->VectorMagnitudeTitle);
+    }
+  else if (this->NumberOfVectorComponents == 1)
+    {
+    this->SetTitleInternal(this->ScalarBarTitle);
+    }
+  else
+    {
+    ostrstream ostr;
+    ostr << this->ScalarBarTitle << " " 
+         << this->VectorComponentTitles[this->VectorComponent] << ends;
+    this->SetTitleInternal(ostr.str());
+    ostr.rdbuf()->freeze(0);    
+    this->ScalarBarVectorTitleEntry->SetValue(
+      this->VectorComponentTitles[this->VectorComponent]);
+    }
+  
+}
 //----------------------------------------------------------------------------
 void vtkPVColorMap::ScalarRangeWidgetCallback()
 {
@@ -1373,14 +2004,31 @@ void vtkPVColorMap::MapConfigureCallback(int width, int height)
 }
 
 //----------------------------------------------------------------------------
+void vtkPVColorMap::SetVectorModeInternal(int mode)
+{
+  vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
+    this->LookupTableProxy->GetProperty("VectorMode"));
+  if (!ivp)
+    {
+    vtkErrorMacro("LookupTableProxy does not have property VectorMode");
+    return;
+    }
+  ivp->SetElement(0,mode);
+  this->LookupTableProxy->UpdateVTKObjects();
+}
+
+//----------------------------------------------------------------------------
 void vtkPVColorMap::VectorModeMagnitudeCallback()
 {
   this->AddTraceEntry("$kw(%s) VectorModeMagnitudeCallback", 
                       this->GetTclName());
-  this->RMScalarBarWidget->SetVectorModeToMagnitude();
+  this->SetVectorModeInternal(vtkLookupTable::MAGNITUDE);
   this->Script("pack forget %s",
                this->VectorComponentMenu->GetWidgetName());
+  this->VectorModeMenu->SetValue("Magnitude");
+  this->UpdateScalarBarTitle();
   this->ResetScalarRangeInternal();
+  this->RenderView();
 }
 
 //----------------------------------------------------------------------------
@@ -1394,16 +2042,29 @@ void vtkPVColorMap::VectorModeComponentCallback()
   this->AddTraceEntry("$kw(%s) VectorModeComponentCallback", 
                       this->GetTclName());
 
-  this->RMScalarBarWidget->SetVectorModeToComponent();
+  this->SetVectorModeInternal(vtkLookupTable::COMPONENT);
   this->Script("pack %s -side left -expand f -fill both -padx 2",
                this->VectorComponentMenu->GetWidgetName());
+  this->VectorModeMenu->SetValue("Component");
+  this->UpdateScalarBarTitle();
   this->ResetScalarRangeInternal();
+  this->RenderView();
 }
 
 //----------------------------------------------------------------------------
 void vtkPVColorMap::VectorComponentCallback(int component)
 {
   this->SetVectorComponent(component);
+  this->RenderView();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVColorMap::UpdateMap()
+{
+  if (this->MapWidth && this->MapHeight)
+    {
+    this->UpdateMap(this->MapWidth,this->MapHeight);
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -1430,7 +2091,14 @@ void vtkPVColorMap::UpdateMap(int width, int height)
   this->MapWidth = width;
   this->MapHeight = height;
 
-  if (this->RMScalarBarWidget->GetLookupTable() == NULL)
+  vtkProcessModule* pm =vtkProcessModule::GetProcessModule();
+  vtkLookupTable* lut;
+  if (this->LookupTableProxy)
+    {
+    lut = vtkLookupTable::SafeDownCast(
+      pm->GetObjectFromID(this->LookupTableProxy->GetID(0)));
+    }
+  if (!lut)
     {
     return;
     }
@@ -1471,7 +2139,7 @@ void vtkPVColorMap::UpdateMap(int width, int height)
         val = range[1];
         }
         
-      rgba = this->RMScalarBarWidget->GetLookupTable()->MapValue(val);
+      rgba = lut->MapValue(val);
       ptr[0] = rgba[0];
       ptr[1] = rgba[1];
       ptr[2] = rgba[2];
@@ -1488,60 +2156,458 @@ void vtkPVColorMap::UpdateMap(int width, int height)
 //----------------------------------------------------------------------------
 void vtkPVColorMap::SetScalarBarPosition1(float x, float y)
 {
-  this->RMScalarBarWidget->SetScalarBarPosition1(x,y);
+  this->SetPosition1Internal(x,y);
   this->AddTraceEntry("$kw(%s) SetScalarBarPosition1 %f %f", 
                       this->GetTclName(), x, y);
   this->RenderView();
 }
 
 //----------------------------------------------------------------------------
+void vtkPVColorMap::SetPosition1Internal(double x, double y)
+{
+  vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+    this->ScalarBarProxy->GetProperty("Position1"));
+  if (!dvp)
+    {
+    vtkErrorMacro("ScalarBarProxy does not have property Position1");
+    return;
+    }
+  dvp->SetElement(0, x);
+  dvp->SetElement(1, y);
+  this->ScalarBarProxy->UpdateVTKObjects();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVColorMap::GetPosition1Internal(double pos[2])
+{
+  vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+    this->ScalarBarProxy->GetProperty("Position1Info"));
+  if (!dvp && dvp->GetNumberOfElements() != 2 )
+    {
+    vtkErrorMacro("ScalarBarProxy does not have property Position1Info"
+      " or it does not have two elements");
+    return;
+    }
+  pos[0] = dvp->GetElement(0);
+  pos[1] = dvp->GetElement(1);
+}
+  
+
+//----------------------------------------------------------------------------
 void vtkPVColorMap::SetScalarBarPosition2(float x, float y)
 {
-  this->RMScalarBarWidget->SetScalarBarPosition2(x,y);
+  this->SetPosition2Internal(x,y);
   this->AddTraceEntry("$kw(%s) SetScalarBarPosition2 %f %f", 
                       this->GetTclName(), x, y);
   this->RenderView();
 }
 
 //----------------------------------------------------------------------------
+void vtkPVColorMap::SetPosition2Internal(double x, double y)
+{
+  vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+    this->ScalarBarProxy->GetProperty("Position2"));
+  if (!dvp)
+    {
+    vtkErrorMacro("ScalarBarProxy does not have property Position2");
+    return;
+    }
+  dvp->SetElement(0, x);
+  dvp->SetElement(1, y);
+  this->ScalarBarProxy->UpdateVTKObjects();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVColorMap::GetPosition2Internal(double pos[2])
+{
+  vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+    this->ScalarBarProxy->GetProperty("Position2Info"));
+  if (!dvp && dvp->GetNumberOfElements() != 2 )
+    {
+    vtkErrorMacro("ScalarBarProxy does not have property Position2Info"
+      " or it does not have two elements");
+    return;
+    }
+  pos[0] = dvp->GetElement(0);
+  pos[1] = dvp->GetElement(1);
+}
+
+//----------------------------------------------------------------------------
 void vtkPVColorMap::SetScalarBarOrientation(int o)
 {
-  this->RMScalarBarWidget->SetScalarBarOrientation(o);
+  this->SetOrientationInternal(o);
   this->AddTraceEntry("$kw(%s) SetScalarBarOrientation %d", 
                       this->GetTclName(), o);
   this->RenderView();
 }
 
 //----------------------------------------------------------------------------
-const char* vtkPVColorMap::GetScalarBarTitle() 
+void vtkPVColorMap::SetOrientationInternal(int orientation)
 {
-  return this->RMScalarBarWidget->GetScalarBarTitle();
+  vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
+    this->ScalarBarProxy->GetProperty("Orientation"));
+  if (!ivp)
+    {
+    vtkErrorMacro("ScalarBarProxy does not have property Orientation");
+    return;
+    }
+  ivp->SetElement(0, orientation);
+  this->ScalarBarProxy->UpdateVTKObjects();
 }
+
+//----------------------------------------------------------------------------
+int vtkPVColorMap::GetOrientationInternal()
+{
+  vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
+    this->ScalarBarProxy->GetProperty("OrientationInfo"));
+  if (!ivp && ivp->GetNumberOfElements() != 1 )
+    {
+    vtkErrorMacro("ScalarBarProxy does not have property OrientationInfo"
+      " or it does not have 1 element");
+    return 0;
+    }
+  return ivp->GetElement(0); 
+}
+  
 //----------------------------------------------------------------------------
 const char* vtkPVColorMap::GetArrayName() 
 { 
-  return this->RMScalarBarWidget->GetArrayName();
+  if (this->GetPVApplication() && this->ScalarBarProxy)
+    {
+    return this->GetArrayNameInternal();
+    }
+  return NULL;
 }
+
+//----------------------------------------------------------------------------
+const char* vtkPVColorMap::GetArrayNameInternal()
+{
+  vtkSMStringVectorProperty* svp = vtkSMStringVectorProperty::SafeDownCast(
+    this->LookupTableProxy->GetProperty("ArrayName"));
+  if (!svp || svp->GetNumberOfElements() != 1)
+    {
+    vtkErrorMacro("LookupTableProxy does not have property ArrayName");
+    return NULL;
+    }
+  return svp->GetElement(0);
+}
+
 //----------------------------------------------------------------------------
 int vtkPVColorMap::GetNumberOfVectorComponents()
 {
-  return this->RMScalarBarWidget->GetNumberOfVectorComponents();
+  return this->NumberOfVectorComponents;
 }
 //----------------------------------------------------------------------------
 const char* vtkPVColorMap::GetScalarBarLabelFormat()
 {
-  return this->RMScalarBarWidget->GetScalarBarLabelFormat();
+  return this->GetLabelFormatInternal();
 }
+
 //----------------------------------------------------------------------------
-int vtkPVColorMap::GetVectorComponent()
+const char* vtkPVColorMap::GetLabelFormatInternal()
 {
-  return this->RMScalarBarWidget->GetVectorComponent();
+  vtkSMStringVectorProperty* svp = vtkSMStringVectorProperty::SafeDownCast(
+    this->ScalarBarProxy->GetProperty("LabelFormat"));
+  if (!svp)
+    {
+    vtkErrorMacro("ScalarBarProxy does not have property LabelFormat");
+    return "";
+    }
+  return svp->GetElement(0);
 }
+
 //----------------------------------------------------------------------------
-vtkClientServerID vtkPVColorMap::GetLookupTableID()
+void vtkPVColorMap::SetTitleColor(double r, double g, double b)
 {
-  return this->RMScalarBarWidget->GetLookupTableID();
+  this->SetTitleColorInternal(r,g,b);
+  this->AddTraceEntry("$kw(%s) SetTitleColor %g %g %g", this->GetTclName(),
+                      r, g, b);
+  this->Modified();
+  this->RenderView();
 }
+
+//----------------------------------------------------------------------------
+void vtkPVColorMap::SetTitleOpacity(double opacity)
+{
+  this->SetTitleOpacityInternal(opacity);
+  this->AddTraceEntry("$kw(%s) SetTitleOpacity %g ", this->GetTclName(),
+                      opacity);
+  this->Modified();
+  this->RenderView();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVColorMap::SetTitleFontFamily(int font)
+{
+  this->SetTitleFontFamilyInternal(font);
+  this->AddTraceEntry("$kw(%s) SetTitleFontFamily %d ", this->GetTclName(),
+                      font);
+  this->Modified();
+  this->RenderView();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVColorMap::SetTitleBold(int bold)
+{
+  this->SetTitleBoldInternal(bold);
+  this->AddTraceEntry("$kw(%s) SetTitleBold %d ", this->GetTclName(),
+                      bold);
+  this->Modified();
+  this->RenderView();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVColorMap::SetTitleItalic(int italic)
+{
+  this->SetTitleItalicInternal(italic);
+  this->AddTraceEntry("$kw(%s) SetTitleItalic %d ", this->GetTclName(),
+                      italic);
+  this->Modified();
+  this->RenderView();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVColorMap::SetTitleShadow(int shadow)
+{
+  this->SetTitleShadowInternal(shadow);
+  this->AddTraceEntry("$kw(%s) SetTitleShadow %d ", this->GetTclName(),
+                      shadow);
+  this->Modified();
+  this->RenderView();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVColorMap::SetTitleColorInternal(double r, double g, double b)
+{
+  vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+    this->ScalarBarProxy->GetProperty("TitleFormatColor"));
+  if (!dvp)
+    {
+    vtkErrorMacro("ScalarBarProxy does not have property TitleFormatColor");
+    return;
+    }
+  dvp->SetElement(0,r);
+  dvp->SetElement(1,g);
+  dvp->SetElement(2,b);
+  this->ScalarBarProxy->UpdateVTKObjects();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVColorMap::SetTitleOpacityInternal(double opacity)
+{
+  vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+    this->ScalarBarProxy->GetProperty("TitleFormatOpacity"));
+  if (!dvp)
+    {
+    vtkErrorMacro("ScalarBarProxy does not have property TitleFormatOpacity");
+    return;
+    }
+  dvp->SetElement(0,opacity);
+  this->ScalarBarProxy->UpdateVTKObjects();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVColorMap::SetTitleFontFamilyInternal(int font)
+{
+  vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
+    this->ScalarBarProxy->GetProperty("TitleFormatFont"));
+  if (!ivp)
+    {
+    vtkErrorMacro("ScalarBarProxy does not have property TitleFormatFont");
+    return;
+    }
+  ivp->SetElement(0,font);
+  this->ScalarBarProxy->UpdateVTKObjects();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVColorMap::SetTitleBoldInternal(int bold)
+{
+  vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
+    this->ScalarBarProxy->GetProperty("TitleFormatBold"));
+  if (!ivp)
+    {
+    vtkErrorMacro("ScalarBarProxy does not have property TitleFormatBold");
+    return;
+    }
+  ivp->SetElement(0,bold);
+  this->ScalarBarProxy->UpdateVTKObjects();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVColorMap::SetTitleItalicInternal(int italic)
+{
+  vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
+    this->ScalarBarProxy->GetProperty("TitleFormatItalic"));
+  if (!ivp)
+    {
+    vtkErrorMacro("ScalarBarProxy does not have property TitleFormatItalic");
+    return;
+    }
+  ivp->SetElement(0,italic);
+  this->ScalarBarProxy->UpdateVTKObjects();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVColorMap::SetTitleShadowInternal(int shadow)
+{
+  vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
+    this->ScalarBarProxy->GetProperty("TitleFormatShadow"));
+  if (!ivp)
+    {
+    vtkErrorMacro("ScalarBarProxy does not have property TitleFormatShadow");
+    return;
+    }
+  ivp->SetElement(0,shadow);
+  this->ScalarBarProxy->UpdateVTKObjects();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVColorMap::SetLabelColor(double r, double g, double b)
+{
+  this->SetLabelColorInternal(r,g,b);
+  this->AddTraceEntry("$kw(%s) SetLabelColor %g %g %g", this->GetTclName(),
+                      r, g, b);
+  this->Modified();
+  this->RenderView();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVColorMap::SetLabelOpacity(double opacity)
+{
+  this->SetLabelOpacityInternal(opacity);
+  this->AddTraceEntry("$kw(%s) SetLabelOpacity %g ", this->GetTclName(),
+                      opacity);
+  this->Modified();
+  this->RenderView();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVColorMap::SetLabelFontFamily(int font)
+{
+  this->SetLabelFontFamilyInternal(font);
+  this->AddTraceEntry("$kw(%s) SetLabelFontFamily %d ", this->GetTclName(),
+                      font);
+  this->Modified();
+  this->RenderView();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVColorMap::SetLabelBold(int bold)
+{
+  this->SetLabelBoldInternal(bold);
+  this->AddTraceEntry("$kw(%s) SetLabelBold %d ", this->GetTclName(),
+                      bold);
+  this->Modified();
+  this->RenderView();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVColorMap::SetLabelItalic(int italic)
+{
+  this->SetLabelItalicInternal(italic);
+  this->AddTraceEntry("$kw(%s) SetLabelItalic %d ", this->GetTclName(),
+                      italic);
+  this->Modified();
+  this->RenderView();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVColorMap::SetLabelShadow(int shadow)
+{
+  this->SetLabelShadowInternal(shadow);
+  this->AddTraceEntry("$kw(%s) SetLabelShadow %d ", this->GetTclName(),
+                      shadow);
+  this->Modified();
+  this->RenderView();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVColorMap::SetLabelColorInternal(double r, double g, double b)
+{
+  vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+    this->ScalarBarProxy->GetProperty("LabelFormatColor"));
+  if (!dvp)
+    {
+    vtkErrorMacro("ScalarBarProxy does not have property LabelFormatColor");
+    return;
+    }
+  dvp->SetElement(0,r);
+  dvp->SetElement(1,g);
+  dvp->SetElement(2,b);
+  this->ScalarBarProxy->UpdateVTKObjects();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVColorMap::SetLabelOpacityInternal(double opacity)
+{
+  vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+    this->ScalarBarProxy->GetProperty("LabelFormatOpacity"));
+  if (!dvp)
+    {
+    vtkErrorMacro("ScalarBarProxy does not have property LabelFormatOpacity");
+    return;
+    }
+  dvp->SetElement(0,opacity);
+  this->ScalarBarProxy->UpdateVTKObjects();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVColorMap::SetLabelFontFamilyInternal(int font)
+{
+  vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
+    this->ScalarBarProxy->GetProperty("LabelFormatFont"));
+  if (!ivp)
+    {
+    vtkErrorMacro("ScalarBarProxy does not have property LabelFormatFont");
+    return;
+    }
+  ivp->SetElement(0,font);
+  this->ScalarBarProxy->UpdateVTKObjects();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVColorMap::SetLabelBoldInternal(int bold)
+{
+  vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
+    this->ScalarBarProxy->GetProperty("LabelFormatBold"));
+  if (!ivp)
+    {
+    vtkErrorMacro("ScalarBarProxy does not have property LabelFormatBold");
+    return;
+    }
+  ivp->SetElement(0,bold);
+  this->ScalarBarProxy->UpdateVTKObjects();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVColorMap::SetLabelItalicInternal(int italic)
+{
+  vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
+    this->ScalarBarProxy->GetProperty("LabelFormatItalic"));
+  if (!ivp)
+    {
+    vtkErrorMacro("ScalarBarProxy does not have property LabelFormatItalic");
+    return;
+    }
+  ivp->SetElement(0,italic);
+  this->ScalarBarProxy->UpdateVTKObjects();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVColorMap::SetLabelShadowInternal(int shadow)
+{
+  vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
+    this->ScalarBarProxy->GetProperty("LabelFormatShadow"));
+  if (!ivp)
+    {
+    vtkErrorMacro("ScalarBarProxy does not have property LabelFormatShadow");
+    return;
+    }
+  ivp->SetElement(0,shadow);
+  this->ScalarBarProxy->UpdateVTKObjects();
+}
+
 //----------------------------------------------------------------------------
 void vtkPVColorMap::ExecuteEvent(vtkObject* vtkNotUsed(wdg), 
                                  unsigned long event,  
@@ -1550,42 +2616,32 @@ void vtkPVColorMap::ExecuteEvent(vtkObject* vtkNotUsed(wdg),
   switch ( event )
     {
     case vtkKWEvent::WidgetModifiedEvent:
-      this->UpdateVectorComponentMenu();
-      this->ScalarBarVectorTitleEntry->SetValue(
-        this->RMScalarBarWidget->GetScalarBarVectorTitle());
-      this->ScalarBarLabelFormatEntry->SetValue(
-        this->RMScalarBarWidget->GetScalarBarLabelFormat());
-      this->ScalarBarTitleEntry->SetValue(
-        this->RMScalarBarWidget->GetScalarBarTitle());
-
-      double range[2];
-      this->RMScalarBarWidget->GetScalarRange(range);
-      this->SetScalarRange(range[0], range[1]);      
-      if (this->MapWidth > 0 && this->MapHeight > 0)
-          {
-          this->UpdateMap(this->MapWidth, this->MapHeight);
-          }
+      // the only things that have changed are the positions.
+      // since we have no GUI for positions, we don't have any work to do here.
       this->RenderView();
       this->Modified();
       break;
 
     case vtkCommand::StartInteractionEvent:
       this->PVRenderView->GetPVWindow()->InteractiveRenderEnabledOn();
+      this->RenderView();
       break;
 
     case vtkCommand::EndInteractionEvent:
       this->PVRenderView->GetPVWindow()->InteractiveRenderEnabledOff();
       this->RenderView();
-      vtkScalarBarActor* sact = this->RMScalarBarWidget->GetScalarBar()->GetScalarBarActor();
-      double *pos1 = sact->GetPositionCoordinate()->GetValue();
-      double *pos2 = sact->GetPosition2Coordinate()->GetValue();
+      
+      double pos1[2], pos2[2];
+      this->ScalarBarProxy->UpdateInformation();
+      this->GetPosition1Internal(pos1);
+      this->GetPosition2Internal(pos2);
+      
       this->AddTraceEntry("$kw(%s) SetScalarBarPosition1 %lf %lf", 
                           this->GetTclName(), pos1[0], pos1[1]);
       this->AddTraceEntry("$kw(%s) SetScalarBarPosition2 %lf %lf", 
                           this->GetTclName(), pos2[0], pos2[1]);
       this->AddTraceEntry("$kw(%s) SetScalarBarOrientation %d",
-                          this->GetTclName(), sact->GetOrientation());
-
+                          this->GetTclName(), this->GetOrientationInternal());
       break;
     }
 }
@@ -1593,67 +2649,49 @@ void vtkPVColorMap::ExecuteEvent(vtkObject* vtkNotUsed(wdg),
 //----------------------------------------------------------------------------
 void vtkPVColorMap::SaveState(ofstream *file)
 {
-  // Just manually initialize.
+
   *file << "set kw(" << this->GetTclName() << ") [$kw(" 
         << this->PVRenderView->GetPVWindow()->GetTclName() 
-        << ") GetPVColorMap {" << this->RMScalarBarWidget->GetArrayName() << "} " 
-        << this->RMScalarBarWidget->GetNumberOfVectorComponents() << "]\n";
+        << ") GetPVColorMap {" 
+        << this->GetArrayNameInternal() << "} " 
+        << this->NumberOfVectorComponents << "]\n";
 
-  if (strcmp(this->RMScalarBarWidget->GetScalarBarTitle(), 
-             this->RMScalarBarWidget->GetArrayName()) != 0)
-    {
-    *file << "$kw(" << this->GetTclName() << ") SetScalarBarTitle {" 
-          << this->RMScalarBarWidget->GetScalarBarTitle() << "}\n"; 
-    }
-
-  if (strcmp(this->RMScalarBarWidget->GetVectorMagnitudeTitle(), "Magnitude") != 0)
-    {
-    *file << "$kw(" << this->GetTclName() << ") SetScalarBarVectorTitle {" 
-          << this->RMScalarBarWidget->GetVectorMagnitudeTitle() << "}\n"; 
-    }
-
-
-  if (strcmp(this->RMScalarBarWidget->GetScalarBarLabelFormat(), "%-#6.3g") != 0)
-    {
-    *file << "$kw(" << this->GetTclName() << ") SetScalarBarLabelFormat {" 
-          << this->RMScalarBarWidget->GetScalarBarLabelFormat()<< "}\n"; 
-    }
-
-  double startHSV[3];
-  double endHSV[3];
-  this->RMScalarBarWidget->GetStartHSV(startHSV);
-  this->RMScalarBarWidget->GetEndHSV(endHSV);
+  *file << "$kw(" << this->GetTclName() << ") SetScalarBarTitle {"
+    << this->ScalarBarTitle << "}\n";
+  
+  *file << "$kw(" << this->GetTclName() << ") SetScalarBarVectorTitle {" 
+    << this->VectorMagnitudeTitle << "}\n"; 
+  
+  *file << "$kw(" << this->GetTclName() << ") SetScalarBarLabelFormat {" 
+    << this->GetLabelFormatInternal() << "}\n"; 
+ 
+  double hr[2],sr[2],vr[2];
+  this->GetHueRangeInternal(hr);
+  this->GetSaturationRangeInternal(sr);
+  this->GetValueRangeInternal(vr);
 
   *file << "$kw(" << this->GetTclName() << ") SetStartHSV " 
-        << startHSV[0] << " " << startHSV[1] << " " 
-        << startHSV[2] << endl;
+    << hr[0] << " " << sr[0] << " " << vr[0] << endl;
   *file << "$kw(" << this->GetTclName() << ") SetEndHSV " 
-        << endHSV[0] << " " << endHSV[1] << " " 
-        << endHSV[2] << endl;
+    << hr[1] << " " << sr[1] << " " << vr[1] << endl;
 
-  if (this->RMScalarBarWidget->GetNumberOfColors() != 256)
-    {
-    *file << "$kw(" << this->GetTclName() << ") SetNumberOfColors " 
-          << this->RMScalarBarWidget->GetNumberOfColors() << endl;
-    }
-  if (this->RMScalarBarWidget->GetVectorMode() == vtkRMScalarBarWidget::MAGNITUDE)
+  *file << "$kw(" << this->GetTclName() << ") SetNumberOfColors " 
+    << this->GetNumberOfColorsInternal() << endl;
+  
+  if (this->GetVectorModeInternal() == vtkLookupTable::MAGNITUDE)
     {
     *file << "$kw(" << this->GetTclName() << ") VectorModeMagnitudeCallback\n";
     }
-  if (this->RMScalarBarWidget->GetVectorMode() == vtkRMScalarBarWidget::COMPONENT 
-    && this->RMScalarBarWidget->GetNumberOfVectorComponents() > 1)
+  else if (this->GetVectorModeInternal() == vtkLookupTable::COMPONENT 
+    && this->NumberOfVectorComponents > 1)
     {
     *file << "$kw(" << this->GetTclName() << ") VectorModeComponentCallback\n";
-    if (this->RMScalarBarWidget->GetVectorComponent() != 0)
-      {
-      *file << "$kw(" << this->GetTclName() << ") SetVectorComponent " 
-            << this->RMScalarBarWidget->GetVectorComponent() << endl;
-      }
+    *file << "$kw(" << this->GetTclName() << ") SetVectorComponent " 
+      << this->VectorComponent << endl;
     }
 
   *file << "$kw(" << this->GetTclName() << ") SetScalarRange " 
-        << this->RMScalarBarWidget->GetScalarRange()[0] << " " << 
-        this->RMScalarBarWidget->GetScalarRange()[1] << endl;
+    << this->ScalarRange[0] << " " << this->ScalarRange[1] << endl;
         
   *file << "$kw(" << this->GetTclName() << ") SetScalarRangeLock " 
         << this->ScalarRangeLock << "\n"; 
@@ -1661,25 +2699,17 @@ void vtkPVColorMap::SaveState(ofstream *file)
   *file << "$kw(" << this->GetTclName() << ") SetScalarBarVisibility " 
         << this->ScalarBarVisibility << endl;
 
-  vtkScalarBarActor* sact = this->RMScalarBarWidget->GetScalarBar()->GetScalarBarActor();
-  double *pos1 = sact->GetPositionCoordinate()->GetValue();
-  double *pos2 = sact->GetPosition2Coordinate()->GetValue();
+  this->ScalarBarProxy->UpdateInformation();
+  double pos1[2], pos2[2];
+  this->GetPosition1Internal(pos1);
+  this->GetPosition2Internal(pos2);
 
-  if (pos1[0] != 0.87 || pos1[1] != 0.25)
-    {    
-    *file << "$kw(" << this->GetTclName() << ") SetScalarBarPosition1 " 
-          << pos1[0] << " " << pos1[1] << endl; 
-    }
-  if (pos2[0] != 0.13 || pos2[1] != 0.5)
-    {
-    *file << "$kw(" << this->GetTclName() << ") SetScalarBarPosition2 " 
-          << pos2[0] << " " << pos2[1] << endl;
-    }
-  if (sact->GetOrientation() != 1)
-    {
-    *file << "$kw(" << this->GetTclName() << ") SetScalarBarOrientation " 
-         << sact->GetOrientation() << endl;
-    }
+  *file << "$kw(" << this->GetTclName() << ") SetScalarBarPosition1 " 
+    << pos1[0] << " " << pos1[1] << endl; 
+  *file << "$kw(" << this->GetTclName() << ") SetScalarBarPosition2 " 
+    << pos2[0] << " " << pos2[1] << endl;
+  *file << "$kw(" << this->GetTclName() << ") SetScalarBarOrientation " 
+    << this->GetOrientationInternal() << endl;
 }
 
 
@@ -1770,8 +2800,8 @@ void vtkPVColorMap::ComputeScalarRangeForSource(vtkPVSource* pvs,
                                                 double* range)
 {
   double tmp[2];
-  int component = this->RMScalarBarWidget->GetVectorComponent();
-  if (this->RMScalarBarWidget->GetVectorMode() == vtkRMScalarBarWidget::MAGNITUDE)
+  int component = this->VectorComponent;
+  if (this->GetVectorModeInternal() == vtkLookupTable::MAGNITUDE)
     {
     component = -1;
     }
@@ -1785,10 +2815,11 @@ void vtkPVColorMap::ComputeScalarRangeForSource(vtkPVSource* pvs,
   range[0] = VTK_DOUBLE_MAX;
   range[1] = -VTK_DOUBLE_MAX;
 
+  const char* arrayname = this->GetArrayName();
   // For point data ...
   vtkPVArrayInformation *ai;
   ai = pvs->GetDataInformation()->GetPointDataInformation()->
-    GetArrayInformation(this->RMScalarBarWidget->GetArrayName());
+    GetArrayInformation(arrayname);
   if (ai)
     {
     ai->GetComponentRange(component, tmp);
@@ -1803,7 +2834,7 @@ void vtkPVColorMap::ComputeScalarRangeForSource(vtkPVSource* pvs,
     }
   // For cell data ...
   ai = pvs->GetDataInformation()->GetCellDataInformation()->
-    GetArrayInformation(this->RMScalarBarWidget->GetArrayName());
+    GetArrayInformation(arrayname);
   if (ai)
     {  
     ai->GetComponentRange(component, tmp);
@@ -1833,6 +2864,21 @@ void vtkPVColorMap::SetScalarRange(double min, double max)
 }
 
 //----------------------------------------------------------------------------
+void vtkPVColorMap::SetScalarBarWidgetScalarRangeInternal(double min, double max)
+{
+  vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+    this->LookupTableProxy->GetProperty("ScalarRange"));
+  if (!dvp)
+    {
+    vtkErrorMacro("LookupTableProxy does not have property ScalarRange");
+    return;
+    }
+  dvp->SetElement(0,min);
+  dvp->SetElement(1,max);
+  this->LookupTableProxy->UpdateVTKObjects();
+}
+
+//----------------------------------------------------------------------------
 void vtkPVColorMap::SetScalarRangeInternal(double min, double max)
 {
   // Make sure new whole range does not cause problems. 
@@ -1853,7 +2899,7 @@ void vtkPVColorMap::SetScalarRangeInternal(double min, double max)
     }
   this->ScalarRange[0] = min;
   this->ScalarRange[1] = max;
-  this->RMScalarBarWidget->SetScalarRange(min,max);    
+  this->SetScalarBarWidgetScalarRangeInternal(min,max);    
   this->ScalarRangeWidget->SetRange(min,max);    
   
   // Expand whole range if necessary.
@@ -1988,7 +3034,7 @@ void vtkPVColorMap::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os,indent);
   os << indent << "UseCount: " << this->UseCount << endl;
 
-  os << indent << "RMScalarBarWidget: " << this->RMScalarBarWidget << endl;
+  os << indent << "ScalarBarProxy: " << this->ScalarBarProxy << endl;
   os << indent << "ScalarBarCheck: " << this->ScalarBarCheck << endl;
   os << indent << "TitleTextPropertyWidget: " << this->TitleTextPropertyWidget << endl;
   os << indent << "LabelTextPropertyWidget: " << this->LabelTextPropertyWidget << endl;
@@ -2001,5 +3047,9 @@ void vtkPVColorMap::PrintSelf(ostream& os, vtkIndent indent)
      << this->ScalarRange[1] << endl;
   os << indent << "WholeScalarRange: " << this->WholeScalarRange[0] << ", " 
      << this->WholeScalarRange[1] << endl;
+  os << indent << "VectorComponent: " << this->VectorComponent << endl;
+  os << indent << "ScalarBarTitle: " << ((this->ScalarBarTitle)?
+    this->ScalarBarTitle : "NULL") << endl;
+
 }
 

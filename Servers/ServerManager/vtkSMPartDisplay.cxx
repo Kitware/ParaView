@@ -18,7 +18,6 @@
 #include "vtkImageData.h"
 #include "vtkObjectFactory.h"
 #include "vtkPolyData.h"
-#include "vtkRMScalarBarWidget.h"
 #include "vtkPVConfig.h"
 #include "vtkPVProcessModule.h"
 #include "vtkPVRenderModule.h"
@@ -42,10 +41,11 @@
 #include "vtkPVGeometryInformation.h"
 #include "vtkPVProcessModule.h"
 #include "vtkPVClassNameInformation.h"
+#include "vtkSMStringVectorProperty.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMPartDisplay);
-vtkCxxRevisionMacro(vtkSMPartDisplay, "1.15");
+vtkCxxRevisionMacro(vtkSMPartDisplay, "1.16");
 
 
 //----------------------------------------------------------------------------s
@@ -881,7 +881,7 @@ int vtkSMPartDisplay::GetInterpolation()
 }
 
 //----------------------------------------------------------------------------
-void vtkSMPartDisplay::ColorByArray(vtkRMScalarBarWidget *colorMap,
+void vtkSMPartDisplay::ColorByArray(vtkSMProxy* colorMap,
                                     int field)
 {
   vtkPVProcessModule *pm = this->GetProcessModule();
@@ -908,10 +908,17 @@ void vtkSMPartDisplay::ColorByArray(vtkRMScalarBarWidget *colorMap,
     {
     stream << vtkClientServerStream::Invoke << this->PropertyProxy->GetID(i)
           << "SetSpecular" << 0.0 << vtkClientServerStream::End;
+    if (colorMap->GetSubProxy("LookupTable"))
+      {
     stream << vtkClientServerStream::Invoke << this->MapperProxy->GetID(i)
-          << "SetLookupTable" << colorMap->GetLookupTableID()
+          << "SetLookupTable" 
+          << colorMap->GetSubProxy("LookupTable")->GetID(0)
           << vtkClientServerStream::End;
-    
+      }
+    else
+      {
+      vtkErrorMacro("LookupTable not present as a subproxy for colorMap");
+      }
     if (field == vtkDataSet::CELL_DATA_FIELD)
       { 
       stream << vtkClientServerStream::Invoke << this->MapperProxy->GetID(i)
@@ -1056,8 +1063,11 @@ void vtkSMPartDisplay::SaveInBatchScript(ofstream *file, vtkSMSourceProxy* pvs)
    if (this->ColorMap && this->GetScalarVisibility())
     {
     *file << "  [$pvTemp" << this->GeometryProxy->GetID(0) 
-          << " GetProperty LookupTable] AddProxy $pvTemp" 
-          << this->ColorMap->GetLookupTableID() << endl;
+          << " GetProperty LookupTable] AddProxy" 
+          << " $pvTemp" << this->ColorMap->GetID(0)
+         // << " [[$pvTemp" << this->ColorMap->GetID(0)
+         // << " GetProperty LookupTableProxy] GetProxy 0]"
+          << endl;
     int scalarMode = VTK_SCALAR_MODE_USE_POINT_FIELD_DATA;
     if (this->ColorField == vtkDataSet::CELL_DATA_FIELD)
       {
@@ -1066,12 +1076,18 @@ void vtkSMPartDisplay::SaveInBatchScript(ofstream *file, vtkSMSourceProxy* pvs)
     *file << "  [$pvTemp" << this->GeometryProxy->GetID(0) 
           << " GetProperty ScalarMode] SetElement 0 " 
           << scalarMode << endl;
-    *file << "  [$pvTemp" << this->GeometryProxy->GetID(0) 
-          << " GetProperty ColorArray] SetElement 0 {" 
-          << this->ColorMap->GetArrayName()
-          << "}" << endl;
+   
+    vtkSMStringVectorProperty* svp = vtkSMStringVectorProperty::SafeDownCast(
+      this->ColorMap->GetProperty("ArrayName"));
+    if (svp)
+      {
+      *file << "  [$pvTemp" << this->GeometryProxy->GetID(0) 
+        << " GetProperty ColorArray] SetElement 0 {" 
+        << svp->GetElement(0)
+        << "}" << endl;
+      }
     }
-      
+
   *file << "  $pvTemp" << this->GeometryProxy->GetID(0) << " UpdateVTKObjects" 
         << endl;
 }

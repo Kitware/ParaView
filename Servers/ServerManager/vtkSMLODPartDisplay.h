@@ -29,7 +29,6 @@ class vtkPolyDataMapper;
 class vtkProp;
 class vtkProperty;
 class vtkPVPart;
-class vtkRMScalarBarWidget;
 
 class VTK_EXPORT vtkSMLODPartDisplay : public vtkSMPartDisplay
 {
@@ -51,9 +50,10 @@ public:
   // use unsigned char arrays directly.
   // MapScalarsOff only works when coloring by an array 
   // on unsigned chars with 1 or 3 components.
+  // the colorMap proxy must be vtkSMLookupTableProxy
   virtual void SetDirectColorFlag(int val);
   virtual void SetScalarVisibility(int val);
-  virtual void ColorByArray(vtkRMScalarBarWidget *colorMap, int field);
+  virtual void ColorByArray(vtkSMProxy* colorMap, int field);
 
   // Description:
   // Option to use a 1d texture map for the attribute color.
