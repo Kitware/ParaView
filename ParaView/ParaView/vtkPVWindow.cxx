@@ -127,7 +127,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.391.2.23");
+vtkCxxRevisionMacro(vtkPVWindow, "1.391.2.24");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -3118,10 +3118,6 @@ void vtkPVWindow::EnableMenus()
 //----------------------------------------------------------------------------
 void vtkPVWindow::DisableToolbarButtons()
 {
-  if (this->ToolbarButtonsDisabled)
-    {
-    return;
-    }
   this->ToolbarButtonsDisabled = 1;
   vtkArrayMapIterator<const char*, vtkKWPushButton*>* it = 
     this->ToolbarButtons->NewIterator();
@@ -3162,7 +3158,7 @@ void vtkPVWindow::DisableToolbarButton(const char* buttonName)
 //----------------------------------------------------------------------------
 void vtkPVWindow::EnableToolbarButtons()
 {
-  if (this->CurrentPVData == NULL || !this->ToolbarButtonsDisabled)
+  if (this->CurrentPVData == NULL)
     {
     return;
     }
@@ -3913,7 +3909,7 @@ void vtkPVWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVWindow ";
-  this->ExtractRevision(os,"$Revision: 1.391.2.23 $");
+  this->ExtractRevision(os,"$Revision: 1.391.2.24 $");
 }
 
 //----------------------------------------------------------------------------
