@@ -57,7 +57,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCameraIcon);
-vtkCxxRevisionMacro(vtkPVCameraIcon, "1.9");
+vtkCxxRevisionMacro(vtkPVCameraIcon, "1.9.2.1");
 
 vtkCxxSetObjectMacro(vtkPVCameraIcon,RenderView,vtkPVRenderView);
 
@@ -89,7 +89,8 @@ void vtkPVCameraIcon::Create(vtkKWApplication *pvApp, const char *args)
   this->SetBind(this, "<Button-1>", "RestoreCamera");
   this->SetBind(this, "<Button-3>", "StoreCamera");
   this->SetBalloonHelpString(
-    "Click left mouse button to retrieve the camera position, right mouse button to store a camera position.");
+    "Click left mouse button to retrieve the camera position, "
+    "right mouse button to store a camera position.");
 
   // Get the size of the label, and try to adjust the padding so that
   // its width/height match the expect icon size (cannot be done
@@ -125,7 +126,8 @@ void vtkPVCameraIcon::RestoreCamera()
 
   if ( this->RenderView && this->Camera )
     {
-    renTclName = this->RenderView->GetPVApplication()->GetRenderModule()->GetRendererTclName();
+    renTclName = this->RenderView->GetPVApplication()->GetRenderModule()
+      ->GetRendererTclName();
     ostrstream str;
     str << "eval [" << renTclName 
         << " GetActiveCamera ] SetParallelScale [[ "
@@ -181,12 +183,11 @@ void vtkPVCameraIcon::StoreCamera()
     float width = dim[0];
     float height = dim[1];
 
-
     vtkImageResample *resample = vtkImageResample::New();    
-    resample->SetAxisMagnificationFactor(0, 
-                                         static_cast<float>(this->Width)/width);
-    resample->SetAxisMagnificationFactor(1, 
-                                         static_cast<float>(this->Height)/height);
+    resample->SetAxisMagnificationFactor(
+      0, static_cast<float>(this->Width)/width);
+    resample->SetAxisMagnificationFactor(
+      1, static_cast<float>(this->Height)/height);
     resample->SetInput(w2i->GetOutput());
     resample->Update();
 
@@ -196,10 +197,7 @@ void vtkPVCameraIcon::StoreCamera()
     icon->Delete();    
     resample->Delete();
     w2i->Delete();
-    // Fix label
-    char buff[100];
-    sprintf(buff, "%p", this->Camera);
-    this->SetLabel(buff);
+
     this->Script("%s configure -padx 0 -pady 0 -anchor center", 
                  this->GetWidgetName());
     }
