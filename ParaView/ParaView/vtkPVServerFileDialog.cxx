@@ -63,7 +63,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVServerFileDialog );
-vtkCxxRevisionMacro(vtkPVServerFileDialog, "1.13");
+vtkCxxRevisionMacro(vtkPVServerFileDialog, "1.14");
 
 int vtkPVServerFileDialogCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -525,10 +525,22 @@ void vtkPVServerFileDialog::ConvertLastPath()
 //----------------------------------------------------------------------------
 void vtkPVServerFileDialog::LoadSaveCallback()
 {
+  int last;
+  const char* dir;
+  dir = this->DirectoryDisplay->GetLabel();
+  last = static_cast<int>(strlen(dir))-1;
+
   if (this->SelectedDirectory)
     {
     ostrstream newdir;
-    newdir << this->DirectoryDisplay->GetLabel() << "/" << this->SelectedDirectory << ends;
+    if (last >= 0 && dir[last] == '/')
+      { // special case for root. Avoid "//" in path.
+      newdir << dir << this->SelectedDirectory << ends;
+      }
+    else
+      {
+      newdir << dir << "/" << this->SelectedDirectory << ends;
+      }
     this->SetLastPath(newdir.str());
     this->ConvertLastPath();
     this->Update();
@@ -537,7 +549,14 @@ void vtkPVServerFileDialog::LoadSaveCallback()
     } 
 
   ostrstream fullpath;
-  fullpath << this->DirectoryDisplay->GetLabel() << "/" << this->FileNameEntry->GetValue() << ends;
+  if (last >= 0 && dir[last] == '/')
+    { // special case for root. Avoid "//" in path.
+    fullpath << dir << this->FileNameEntry->GetValue() << ends;
+    }
+  else
+    {
+    fullpath << dir << "/" << this->FileNameEntry->GetValue() << ends;
+    }
   this->SetFileName(fullpath.str());
   fullpath.rdbuf()->freeze(0);
    

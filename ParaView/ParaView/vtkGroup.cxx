@@ -23,7 +23,7 @@
 #include "vtkCellData.h"
 #include "vtkFieldData.h"
 
-vtkCxxRevisionMacro(vtkGroup, "1.1");
+vtkCxxRevisionMacro(vtkGroup, "1.2");
 vtkStandardNewMacro(vtkGroup);
 
 //----------------------------------------------------------------------------
@@ -107,6 +107,7 @@ void vtkGroup::ExecuteInformation()
     {
     input = this->GetInput(idx);
     output = this->GetOutput(idx);
+    output->SetExtentTranslator(input->GetExtentTranslator());
     if (input == NULL || output == NULL ||
         input->GetDataObjectType() != output->GetDataObjectType())
       {
