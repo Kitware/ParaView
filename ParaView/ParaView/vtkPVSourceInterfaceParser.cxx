@@ -294,6 +294,7 @@ void vtkPVSourceInterfaceParser::FilterElementBegin(const char** atts)
   const char* root=0;
   const char* input=0;
   const char* output=0;
+  const char* replace_input=0;
   const char* the_default=0;
   
   for(int i=0; atts[i] && atts[i+1]; i+=2)
@@ -302,6 +303,7 @@ void vtkPVSourceInterfaceParser::FilterElementBegin(const char** atts)
     else if(strcmp(atts[i], "root") == 0) { root = atts[i+1]; }
     else if(strcmp(atts[i], "input") == 0) { input = atts[i+1]; }
     else if(strcmp(atts[i], "output") == 0) { output = atts[i+1]; }
+    else if(strcmp(atts[i], "replace_input") == 0) { replace_input = atts[i+1]; }
     else if(strcmp(atts[i], "default") == 0) { the_default = atts[i+1]; }
     else { this->ReportStrayAttribute("Source", atts[i], atts[i+1]); }
     }
@@ -326,6 +328,16 @@ void vtkPVSourceInterfaceParser::FilterElementBegin(const char** atts)
       { this->PVSourceInterface->DefaultVectorsOn(); }
     else
       { this->ReportBadAttribute("Filter", "default", the_default); }
+    }
+
+  if (replace_input)
+    {
+    if(strcmp(replace_input, "1") == 0)
+      { this->PVSourceInterface->ReplaceInputOn(); }    
+    else if(strcmp(replace_input, "0") == 0)
+      { this->PVSourceInterface->ReplaceInputOff(); }
+    else
+      { this->ReportBadAttribute("Filter", "replace_input", replace_input); }
     }
 }
 
