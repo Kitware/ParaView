@@ -145,7 +145,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.496");
+vtkCxxRevisionMacro(vtkPVWindow, "1.497");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -3124,6 +3124,7 @@ void vtkPVWindow::RemovePVSource(const char* listname, vtkPVSource *pvs)
     if (col)
       {
       col->RemoveItem(pvs);
+      this->MainView->UpdateNavigationWindow(this->CurrentPVSource, 0);
       this->UpdateSelectMenu();
       }
     }
