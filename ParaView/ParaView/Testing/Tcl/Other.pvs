@@ -1,16 +1,38 @@
 $Application ExitOnReturnOn
+
+if {[info exists argc]} { 
+    set argcm1 [expr $argc - 1]
+    for {set i 0} {$i < $argcm1} {incr i} {
+        if {[lindex $argv $i] == "-D" && $i < $argcm1} {
+		set DataDir [lindex $argv [expr $i + 1]]
+        }
+    }
+} 
+
+after 1 { This will test TCL error reporting }
+
+set pvWindow [lindex [vtkPVWindow ListInstances] 0]
+
+$pvWindow OpenPackage "$DataDir/Data/Package.xml"
+
+set kw(vtkTemp1) [$Application GetMainWindow]
+set kw(vtkTemp21) [$kw(vtkTemp1) GetMainView]
+set kw(vtkTemp285) [$kw(vtkTemp1) CreatePVSource testConeSource]
+$kw(vtkTemp285) AcceptCallback
+
+$pvWindow SaveSessionFile "vtkParaViewOtherTest.pvs"
+$pvWindow DeleteAllSources
+$pvWindow LoadSessionFile "vtkParaViewOtherTest.pvs"
+
 $Application StartRecordingScript none.pvs
 $Application AcceptLicense
 $Application AcceptEvaluation
-set pvWindow [lindex [vtkPVWindow ListInstances] 0]
 $pvWindow UseMessageDialogOff
 $pvWindow ErrorMessage "This is an error"
 $pvWindow WarningMessage "This is a warning"
 $pvWindow DisableToolbarButtons
 $pvWindow EnableToolbarButtons
 $pvWindow PrintRecentFiles
-$pvWindow SaveSessionFile "vtkParaViewOtherTest.pvs"
-$pvWindow LoadSessionFile "vtkParaViewOtherTest.pvs"
 
 $pvWindow CenterEntryOpenCallback
 $pvWindow CenterEntryCloseCallback
@@ -28,6 +50,36 @@ $pvWindow EnableNavigationWindow
 $pvWindow EnableToolbarButton "PVProbeButton"
 $pvWindow DisableToolbarButton "PVProbeButton"
 $pvWindow EnableToolbarButton "PVProbeButton"
+
+$pvWindow ProcessErrorClick
+$pvWindow DisplayCommandPrompt
+$pvWindow ShowTimerLog
+
+set view [ $pvWindow GetMainView ]
+
+$view ShowNavigationWindowCallback 0
+$view ShowSelectionWindowCallback 0
+
+$view StandardViewCallback 1 0 0
+$view StandardViewCallback -1 0 0
+$view StandardViewCallback 0 1 0
+$view StandardViewCallback 0 -1 0
+$view StandardViewCallback 0 0 1
+$view StandardViewCallback 0 0 -1
+
+$view FrameRateScaleCallback
+$view ReductionCheckCallback
+$view TriangleStripsCallback
+$view ImmediateModeCallback
+$view LODResolutionScaleCallback
+$view CollectThresholdScaleCallback
+$view InterruptRenderCallback
+$view CompositeWithFloatCallback
+$view CompositeWithRGBACallback
+$view CompositeCompressionCallback
+$view StoreCurrentCamera 0
+$view RestoreCurrentCamera 0
+$view Print
 
 foreach control { 1 2 } {
     foreach shift { 1 2 } {

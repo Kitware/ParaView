@@ -83,4 +83,5 @@ ADD_TEST(otherPrint ${PARAVIEW_EXECUTABLE}
 
 ADD_TEST(OtherTests ${PARAVIEW_EXECUTABLE} --start-empty
          ${PARAVIEW_SOURCE_DIR}/ParaView/Testing/Tcl/Other.pvs
+         -D ${PARAVIEW_SOURCE_DIR}/Data 
          -A ${VTK_SOURCE_DIR}/Wrapping/Tcl)
