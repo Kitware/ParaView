@@ -333,7 +333,7 @@
           class="vtkPVRawReaderModule"
           extensions=".raw"
           file_description="Raw (binary) Files"
-          long_help="Read raw regular rectilinear grid data from a file. The dimensions and type of the data must be specified."
+          long_help="Read raw regular rectilinear grid data from a file. The dimensions and type of the data must be specified.">
     <Source class="vtkImageReader"/>
     <StringEntry label="File pattern"
                  trace_name="FilePattern"
