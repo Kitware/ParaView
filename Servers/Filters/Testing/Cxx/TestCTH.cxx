@@ -13,23 +13,40 @@
 
 =========================================================================*/
 #include "vtkCTHFractal.h"
+#include "vtkCTHData.h"
+#include "vtkPlane.h"
 #include "vtkCTHExtractAMRPart.h"
 #include "vtkCTHOutlineFilter.h"
 #include "vtkPolyDataMapper.h"
 #include "vtkActor.h"
 #include "vtkRenderer.h"
 #include "vtkRenderWindow.h"
+#include "vtkRenderWindowInteractor.h"
+#include "vtkRegressionTestImage.h"
 
-int main()
+int main(int argc, char * argv[])
 {
   vtkCTHFractal *fractal = vtkCTHFractal::New();
   fractal->SetDimensions( 10 );
   fractal->SetFractalValue( 9.5 );
   fractal->SetMaximumLevel( 5 );
   fractal->SetGhostLevels( 0 );
+  fractal->Update();
   
+  vtkCTHData* data = fractal->GetOutput();
+
+  // Just for coverage:
+  double origin[3];
+  data->GetTopLevelOrigin ( origin );
+  data->Print( cout );
+  
+  vtkPlane *clipPlane = vtkPlane::New();
+  clipPlane->SetNormal ( 1, 1, 1);
+  clipPlane->SetOrigin ( origin );
+
   vtkCTHExtractAMRPart *extract = vtkCTHExtractAMRPart::New();
   extract->SetInput( fractal->GetOutput());
+  extract->SetClipPlane (clipPlane);
   
   vtkCTHOutlineFilter *outline = vtkCTHOutlineFilter::New();
   outline->SetInput( fractal->GetOutput());
@@ -53,9 +70,22 @@ int main()
   vtkRenderWindow *renWin = vtkRenderWindow::New();
   renWin->AddRenderer( ren );
 
+  vtkRenderWindowInteractor *iren = vtkRenderWindowInteractor::New();
+  iren->SetRenderWindow(renWin);
+
+   // interact with data
   renWin->Render();
-  
+
+  int retVal = vtkRegressionTestImage( renWin );
+ 
+  if ( retVal == vtkTesting::DO_INTERACTOR)
+    {
+    iren->Start();
+    }
+
+  // Clean up
   fractal->Delete();
+  clipPlane->Delete();
   extract->Delete();
   outline->Delete();
   outlineMapper->Delete();
@@ -64,6 +94,7 @@ int main()
   actor->Delete();
   ren->Delete();
   renWin->Delete();
+  iren->Delete();
 
   return 0;
 }

@@ -13,6 +13,7 @@
 
 =========================================================================*/
 #include "vtkMazeSource.h"
+#include "vtkPickFilter.h"
 #include "vtkMPIDuplicatePolyData.h"
 #include "vtkPVConnectivityFilter.h"
 #include "vtkMPIDuplicateUnstructuredGrid.h"
@@ -23,6 +24,10 @@
 int main(int , char* [])
 {
   vtkMazeSource *maze = vtkMazeSource::New();
+  
+  vtkPickFilter *pick = vtkPickFilter::New();
+  pick->SetInput( maze->GetOutput() );
+  pick->Update();
 
   vtkMPIDuplicatePolyData *duplicate = vtkMPIDuplicatePolyData::New();
   duplicate->SetInput( maze->GetOutput() );

@@ -1,3 +1,7 @@
+INCLUDE_DIRECTORIES(
+  ${ParaView_SOURCE_DIR}/VTK/Common/Testing/Cxx/
+  )
+
 SET(ServersFilters_SRCS
   TestContinuousClose3D
   ServersFiltersPrintSelf
