@@ -229,6 +229,19 @@ vtkPVWindow::vtkPVWindow()
   // created by calling ReadFile() on these.
   this->ReaderList = vtkLinkedList<vtkPVReaderModule*>::New();
 
+  // The writers (used in SaveInTclScript) mapped to the extensions
+  this->Writers = vtkArrayMap<const char*, const char*>::New();
+  this->Writers->SetItem(".jpg", "vtkJPEGWriter");
+  this->Writers->SetItem(".JPG", "vtkJPEGWriter");
+  this->Writers->SetItem(".png", "vtkPNGWriter");
+  this->Writers->SetItem(".PNG", "vtkPNGWriter");
+  this->Writers->SetItem(".ppm", "vtkPNMWriter");
+  this->Writers->SetItem(".PPM", "vtkPNMWriter");
+  this->Writers->SetItem(".pnm", "vtkPNMWriter");
+  this->Writers->SetItem(".PNM", "vtkPNMWriter");
+  this->Writers->SetItem(".tif", "vtkTIFFWriter");
+  this->Writers->SetItem(".TIF", "vtkTIFFWriter");
+
   // Map <name> -> <source collection>
   // These contain the sources and filters which the user manipulate.
   this->SourceLists = vtkArrayMap<const char*, vtkPVSourceCollection*>::New();
@@ -310,6 +323,7 @@ vtkPVWindow::~vtkPVWindow()
     }
   this->Prototypes->Delete();
   this->ReaderList->Delete();
+  this->Writers->Delete();
 }
 
 //----------------------------------------------------------------------------
@@ -1656,6 +1670,26 @@ void vtkPVWindow::ExportVTKScript()
 }
 
 //----------------------------------------------------------------------------
+const char* vtkPVWindow::ExtractFileExtension(const char* fname)
+{
+  if (!fname)
+    {
+    return 0;
+    }
+
+  int pos = strlen(fname)-1;
+  while (pos > 0)
+    {
+    if ( fname[pos] == '.' )
+      {
+      return fname+pos;
+      }
+    pos--;
+    }
+  return 0;
+}
+
+//----------------------------------------------------------------------------
 void vtkPVWindow::SaveInTclScript(const char* filename, int vtkFlag)
 {
   ofstream *file;
@@ -1740,9 +1774,37 @@ void vtkPVWindow::SaveInTclScript(const char* filename, int vtkFlag)
       this->Application->GetMainInterp()->result);
     }
 
+  const char* extension = 0;
+  const char* writerName = 0;
   if (path && strlen(path) > 0)
     {
-    if (vtkKWMessageDialog::PopupYesNo(this->Application, this, "Offscreen", 
+    extension = this->ExtractFileExtension(path);
+    if ( !extension)
+      {
+      vtkKWMessageDialog::PopupMessage(this->Application, this,
+				       "Error",  "Filename has no extension."
+				       " Can not requested identify file"
+				       " format."
+				       " No image file will be generated.",
+				       vtkKWMessageDialog::ErrorIcon);
+      }
+    else
+      {
+      if ( this->Writers->GetItem(extension, writerName) != VTK_OK )
+	{
+	writerName = 0;
+	ostrstream err;
+	err << "Unrecognized extension: " << extension << "." 
+	    << " No image file will be generated." << ends;
+	vtkKWMessageDialog::PopupMessage(this->Application, this,
+					 "Error",  err.str(),
+					 vtkKWMessageDialog::ErrorIcon);
+	err.rdbuf()->freeze(0);
+	}
+      }
+
+    if (extension && writerName &&
+	vtkKWMessageDialog::PopupYesNo(this->Application, this, "Offscreen", 
 				       "Do you want offscreen rendering?", 
 				       vtkKWMessageDialog::QuestionIcon))
       {
@@ -1786,11 +1848,15 @@ void vtkPVWindow::SaveInTclScript(const char* filename, int vtkFlag)
   if (path && strlen(path) > 0)
     {
     *file << "compManager ManualOn\n\t";
-    *file << "if {[catch {set myProcId [[compManager GetController] GetLocalProcessId]}]} {set myProcId 0 } \n\n";
-    *file << "vtkWindowToImageFilter WinToImage\n\t";
-    *file << "WinToImage SetInput RenWin1\n";
-    *file << "vtkJPEGWriter Writer\n\t";
-    *file << "Writer SetInput [WinToImage GetOutput]\n\n";
+    *file << "if {[catch {set myProcId [[compManager GetController] "
+      "GetLocalProcessId]}]} {set myProcId 0 } \n\n";
+    if ( extension && writerName)
+      {
+      *file << "vtkWindowToImageFilter WinToImage\n\t";
+      *file << "WinToImage SetInput RenWin1\n\t";
+      *file << writerName << " Writer\n\t";
+      *file << "Writer SetInput [WinToImage GetOutput]\n\n";
+      }
     if (offScreenFlag)
       {
       *file << "RenWin1 SetOffScreenRendering 1\n\n";
@@ -1800,21 +1866,29 @@ void vtkPVWindow::SaveInTclScript(const char* filename, int vtkFlag)
       {
       *file << "if {$myProcId != 0} {compManager RenderRMI} else {\n\t";
       *file << "RenWin1 Render\n\t";
-      *file << "Writer SetFileName {" << path << "}\n\t";
-      *file << "Writer Write\n";
-      *file << "}\n\n";
+      if ( extension && writerName)
+	{
+	*file << "Writer SetFileName {" << path << "}\n\t";
+	*file << "Writer Write\n";
+	*file << "}\n\n";
+	}
       }
     if (animationFlag)
       {
       *file << "# prevent the tk window from showing up then start "
 	"the event loop\n";
-      *file << "wm withdraw .\n";
+      *file << "wm withdraw .\n\n\n";
       int length = strlen(path);
-      if (strcmp(path+length-4, ".jpg") == 0)
+      if ( path[length-4] == '.')
         {
-        path[length-4] = '\0';
+	char* tmpStr = new char[length-3];
+	strncpy(tmpStr, path, length-4);
+	tmpStr[length-4] = '\0';
+	delete [] path;
+	path = tmpStr;
         }
-      this->AnimationInterface->SaveInTclScript(file, path);
+      this->AnimationInterface->SaveInTclScript(file, path, extension,
+						writerName);
       }
     delete [] path;
     *file << "vtkCommand DeleteAllObjects\n";

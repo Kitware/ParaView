@@ -478,6 +478,7 @@ protected:
   vtkArrayMap<const char*, vtkPVSource*>* Prototypes;
   vtkArrayMap<const char*, vtkPVSourceCollection*>* SourceLists;
   vtkArrayMap<const char*, vtkKWPushButton*>* ToolbarButtons;
+  vtkArrayMap<const char*, const char*>* Writers;
   vtkLinkedList<vtkPVReaderModule*>* ReaderList;
   vtkLinkedList<const char*>* PackageNames;
 
@@ -490,6 +491,10 @@ protected:
 
   // Whether or not to read the default interfaces.
   int InitializeDefaultInterfaces;
+
+  // Utility function which return the position of the first '.'
+  // from the right.
+  const char* ExtractFileExtension(const char* fname);
 
 private:
   static const char* StandardReaderInterfaces;

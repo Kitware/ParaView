@@ -688,7 +688,9 @@ void vtkPVAnimationInterface::SetView(vtkPVRenderView *renderView)
 
 //----------------------------------------------------------------------------
 void vtkPVAnimationInterface::SaveInTclScript(ofstream *file, 
-                                              const char *fileRoot)
+                                              const char* fileRoot,
+					      const char* extension,
+					      const char* writerName)
 {
   float t;
   float sgn;
@@ -706,11 +708,20 @@ void vtkPVAnimationInterface::SaveInTclScript(ofstream *file,
   *file << this->GetScript() << endl;
   *file << "if {$myProcId} {treeComp RenderRMI} else {\n\t";  
   sprintf(countStr, "%05d", (int)(t));
-  // Not necessary because WinToImage causes a render.
-  //*file << "RenWin1 Render\n\t";
-  *file << "WinToImage Modified\n\t";
-  *file << "Writer SetFileName {" << fileRoot << countStr << ".jpg}\n";
-  *file << "Writer Write\n";
+  if ( extension && writerName )
+    {
+    *file << "# This update is necessary to resolve some exposure event\n\t";
+    *file << "# problems which occur with certain cards on Windows.\n\t";
+    *file << "update\n\t";
+    *file << "WinToImage Modified\n\t";
+    *file << "Writer SetFileName {" << fileRoot << countStr << extension
+	  << "}\n\t";
+    *file << "Writer Write\n";
+    }
+  else
+    {
+    *file << "RenWin1 Render\n";
+    }
   *file << "}\n\n"; 
 
   while ((sgn*t) < (sgn*this->TimeEnd))
@@ -730,7 +741,8 @@ void vtkPVAnimationInterface::SaveInTclScript(ofstream *file,
     *file << "# problems which occur with certain cards on Windows.\n\t";
     *file << "update\n\t";
     *file << "WinToImage Modified\n\t";
-    *file << "Writer SetFileName {" << fileRoot << countStr << ".jpg}\n\t";
+    *file << "Writer SetFileName {" << fileRoot << countStr << extension
+	  << "}\n\t";
     *file << "Writer Write\n"; 
     *file << "}\n\n";
     }
