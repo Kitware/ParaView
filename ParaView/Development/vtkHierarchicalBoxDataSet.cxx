@@ -24,7 +24,7 @@
 #include "vtkUniformGrid.h"
 #include "vtkUnsignedCharArray.h"
 
-vtkCxxRevisionMacro(vtkHierarchicalBoxDataSet, "1.1");
+vtkCxxRevisionMacro(vtkHierarchicalBoxDataSet, "1.2");
 vtkStandardNewMacro(vtkHierarchicalBoxDataSet);
 
 //----------------------------------------------------------------------------
@@ -183,16 +183,22 @@ void vtkHierarchicalBoxDataSet::GenerateVisibilityArrays()
 //----------------------------------------------------------------------------
 void vtkHierarchicalBoxDataSet::ShallowCopy(vtkDataObject *src)
 {
+  if (src == this)
+    {
+    return;
+    }
   this->InitializeDataSets();
-  // If the source is a vtkHierarchicalBoxDataSet, do not call
-  // superclass' ShallowCopy, instead skip to vtkCompositeDataSet's
-  // constructor
-  this->vtkCompositeDataSet::ShallowCopy(src);
+  this->Modified();
 
   vtkHierarchicalBoxDataSet* from = 
     vtkHierarchicalBoxDataSet::SafeDownCast(src);
   if (from)
     {
+    // If the source is a vtkHierarchicalBoxDataSet, do not call
+    // superclass' ShallowCopy, instead skip to vtkCompositeDataSet's
+    // constructor
+    this->vtkCompositeDataSet::ShallowCopy(src);
+
     unsigned int numLevels = from->GetNumberOfLevels();
     this->SetNumberOfLevels(numLevels);
     for (unsigned int i=0; i<numLevels; i++)
@@ -216,16 +222,22 @@ void vtkHierarchicalBoxDataSet::ShallowCopy(vtkDataObject *src)
 //----------------------------------------------------------------------------
 void vtkHierarchicalBoxDataSet::DeepCopy(vtkDataObject *src)
 {
+  if (src == this)
+    {
+    return;
+    }
   this->InitializeDataSets();
-  // If the source is a vtkHierarchicalBoxDataSet, do not call
-  // superclass' DeepCopy, instead skip to vtkCompositeDataSet's
-  // constructor
-  this->vtkCompositeDataSet::ShallowCopy(src);
+  this->Modified();
 
   vtkHierarchicalBoxDataSet* from = 
     vtkHierarchicalBoxDataSet::SafeDownCast(src);
   if (from)
     {
+    // If the source is a vtkHierarchicalBoxDataSet, do not call
+    // superclass' DeepCopy, instead skip to vtkCompositeDataSet's
+    // constructor
+    this->vtkCompositeDataSet::ShallowCopy(src);
+
     unsigned int numLevels = from->GetNumberOfLevels();
     this->SetNumberOfLevels(numLevels);
     for (unsigned int i=0; i<numLevels; i++)
