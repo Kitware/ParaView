@@ -47,55 +47,82 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkObjectFactory.h"
 
 //----------------------------------------------------------------------------
-vtkStandardNewMacro( vtkKWLabeledOptionMenu );
-vtkCxxRevisionMacro(vtkKWLabeledOptionMenu, "1.2");
+vtkStandardNewMacro(vtkKWLabeledOptionMenu);
+vtkCxxRevisionMacro(vtkKWLabeledOptionMenu, "1.3");
 
 int vtkKWLabeledOptionMenuCommand(ClientData cd, Tcl_Interp *interp,
-                             int argc, char *argv[]);
+                                  int argc, char *argv[]);
 
 //----------------------------------------------------------------------------
 vtkKWLabeledOptionMenu::vtkKWLabeledOptionMenu()
 {
   this->CommandFunction = vtkKWLabeledOptionMenuCommand;
 
-  this->Label = vtkKWLabel::New();
   this->OptionMenu = vtkKWOptionMenu::New();
 }
 
 //----------------------------------------------------------------------------
 vtkKWLabeledOptionMenu::~vtkKWLabeledOptionMenu()
 {
-  this->Label->Delete();
-  this->Label = NULL;
-
-  this->OptionMenu->Delete();
-  this->OptionMenu = NULL;
+  if (this->OptionMenu)
+    {
+    this->OptionMenu->Delete();
+    this->OptionMenu = NULL;
+    }
 }
 
 //----------------------------------------------------------------------------
-void vtkKWLabeledOptionMenu::Create(vtkKWApplication *app)
+void vtkKWLabeledOptionMenu::Create(vtkKWApplication *app, const char *args)
 {
+  // Check if already created
+
   if (this->IsCreated())
     {
-    vtkErrorMacro("LabeledLabel already created");
+    vtkErrorMacro("LabeledOptionMenu already created");
     return;
     }
 
-  this->SetApplication(app);
+  // Call the superclass, this will set the application and create the Label
 
-  // create the top level
-  const char *wname = this->GetWidgetName();
-  this->Script("frame %s -borderwidth 0 -relief flat", wname);
+  this->Superclass::Create(app, args);
 
-  this->Label->SetParent(this);
-  this->Label->Create(app, "");
+  // Create the option menu
 
   this->OptionMenu->SetParent(this);
   this->OptionMenu->Create(app, "");
 
-  this->Script("pack %s %s -side left -anchor nw", 
-               this->Label->GetWidgetName(),
-               this->OptionMenu->GetWidgetName());
+  // Pack the label and the option menu
+
+  this->Pack();
+}
+
+// ----------------------------------------------------------------------------
+void vtkKWLabeledOptionMenu::Pack()
+{
+  if (!this->IsCreated())
+    {
+    return;
+    }
+
+  // Unpack everything
+
+  this->Label->UnpackSiblings();
+
+  // Repack everything
+
+  ostrstream tk_cmd;
+
+  tk_cmd << "pack ";
+  if (this->ShowLabel)
+    {
+    tk_cmd << this->Label->GetWidgetName() << " ";
+    }
+  tk_cmd << this->OptionMenu->GetWidgetName() 
+         << " -side left -anchor nw -fill both" << endl;
+  
+  tk_cmd << ends;
+  this->Script(tk_cmd.str());
+  tk_cmd.rdbuf()->freeze(0);
 }
 
 //----------------------------------------------------------------------------
@@ -106,28 +133,19 @@ void vtkKWLabeledOptionMenu::SetEnabled(int e)
 
   if (this->IsCreated())
     {
-    this->Label->SetEnabled(e);
     this->OptionMenu->SetEnabled(e);
     }
 
-  // Then update internal Enabled ivar, although it is not of much use here
+  // Then call superclass, which will call SetEnabled on the label and 
+  // update the internal Enabled ivar (although it is not of much use here)
 
-  if (this->Enabled == e)
-    {
-    return;
-    }
-
-  this->Enabled = e;
-  this->Modified();
+  this->Superclass::SetEnabled(e);
 }
 
 // ---------------------------------------------------------------------------
 void vtkKWLabeledOptionMenu::SetBalloonHelpString(const char *string)
 {
-  if (this->Label)
-    {
-    this->Label->SetBalloonHelpString(string);
-    }
+  this->Superclass::SetBalloonHelpString(string);
 
   if (this->OptionMenu)
     {
@@ -138,10 +156,7 @@ void vtkKWLabeledOptionMenu::SetBalloonHelpString(const char *string)
 // ---------------------------------------------------------------------------
 void vtkKWLabeledOptionMenu::SetBalloonHelpJustification(int j)
 {
-  if (this->Label)
-    {
-    this->Label->SetBalloonHelpJustification(j);
-    }
+  this->Superclass::SetBalloonHelpJustification(j);
 
   if (this->OptionMenu)
     {
@@ -154,6 +169,5 @@ void vtkKWLabeledOptionMenu::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
 
-  os << indent << "Label: " << this->Label << endl;
   os << indent << "OptionMenu: " << this->OptionMenu << endl;
 }

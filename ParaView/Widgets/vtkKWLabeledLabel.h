@@ -48,34 +48,30 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __vtkKWLabeledLabel_h
 #define __vtkKWLabeledLabel_h
 
-#include "vtkKWWidget.h"
+#include "vtkKWLabeledWidget.h"
 
-class vtkKWLabel;
-
-class vtkKWApplication;
-
-class VTK_EXPORT vtkKWLabeledLabel : public vtkKWWidget
+class VTK_EXPORT vtkKWLabeledLabel : public vtkKWLabeledWidget
 {
 public:
   static vtkKWLabeledLabel* New();
-  vtkTypeRevisionMacro(vtkKWLabeledLabel, vtkKWWidget);
+  vtkTypeRevisionMacro(vtkKWLabeledLabel, vtkKWLabeledWidget);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Create a Tk widget
-  virtual void Create(vtkKWApplication *app);
+  // Create the widget
+  virtual void Create(vtkKWApplication *app, const char *args = 0);
 
   // Description:
-  // Get the internal objects
-  vtkGetObjectMacro(Label1, vtkKWLabel);
+  // Get the internal object
   vtkGetObjectMacro(Label2, vtkKWLabel);
 
   // Description:
+  // Set/Get the enabled state.
   // Override to pass down to children.
   virtual void SetEnabled(int);
 
   // Description:
-  // Setting this string enables balloon help for this widget.
+  // Set the string that enables balloon help for this widget.
   // Override to pass down to children.
   virtual void SetBalloonHelpString(const char *str);
   virtual void SetBalloonHelpJustification(int j);
@@ -84,13 +80,15 @@ protected:
   vtkKWLabeledLabel();
   ~vtkKWLabeledLabel();
 
-  vtkKWLabel *Label1;
   vtkKWLabel *Label2;
+
+  // Pack or repack the widget
+
+  virtual void Pack();
 
 private:
   vtkKWLabeledLabel(const vtkKWLabeledLabel&); // Not implemented
   void operator=(const vtkKWLabeledLabel&); // Not implemented
 };
-
 
 #endif

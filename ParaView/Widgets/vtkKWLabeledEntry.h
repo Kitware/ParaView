@@ -48,36 +48,28 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __vtkKWLabeledEntry_h
 #define __vtkKWLabeledEntry_h
 
-#include "vtkKWWidget.h"
+#include "vtkKWLabeledWidget.h"
 
-class vtkKWLabel;
 class vtkKWEntry;
 
-class vtkKWApplication;
-
-class VTK_EXPORT vtkKWLabeledEntry : public vtkKWWidget
+class VTK_EXPORT vtkKWLabeledEntry : public vtkKWLabeledWidget
 {
 public:
   static vtkKWLabeledEntry* New();
-  vtkTypeRevisionMacro(vtkKWLabeledEntry, vtkKWWidget);
+  vtkTypeRevisionMacro(vtkKWLabeledEntry, vtkKWLabeledWidget);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Create a Tk widget
-  virtual void Create(vtkKWApplication *app);
+  // Create the widget
+  virtual void Create(vtkKWApplication *app, const char *args = 0);
 
   // Description:
-  // Set the label for the frame.
-  void SetLabel(const char *);
-  
-  // Description:
-  // Get the internal objects
-  vtkGetObjectMacro(Label, vtkKWLabel);
+  // Get the internal object
   vtkGetObjectMacro(Entry, vtkKWEntry);
   
   // Description:
-  // Set/Get the value of the entry in a few different formats.
-  // In the SetValue method with float, the second argument is the
+  // Convenience method to Set/Get the value of the entry in a few different
+  // formats. In the SetValue method with float, the second argument is the
   // number of decimal places to display.
   void SetValue(const char *);
   void SetValue(int a);
@@ -87,12 +79,12 @@ public:
   float GetValueAsFloat();
 
   // Description:
-  // Set or get enabled state.
+  // Set/Get the enabled state.
   // Override to pass down to children.
   virtual void SetEnabled(int);
 
   // Description:
-  // Setting this string enables balloon help for this widget.
+  // Set the string that enables balloon help for this widget.
   // Override to pass down to children.
   virtual void SetBalloonHelpString(const char *str);
   virtual void SetBalloonHelpJustification(int j);
@@ -101,12 +93,15 @@ protected:
   vtkKWLabeledEntry();
   ~vtkKWLabeledEntry();
 
-  vtkKWLabel *Label;
   vtkKWEntry *Entry;
+
+  // Pack or repack the widget
+
+  virtual void Pack();
+
 private:
   vtkKWLabeledEntry(const vtkKWLabeledEntry&); // Not implemented
   void operator=(const vtkKWLabeledEntry&); // Not implemented
 };
-
 
 #endif

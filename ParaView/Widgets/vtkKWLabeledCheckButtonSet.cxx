@@ -42,13 +42,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkKWLabeledCheckButtonSet.h"
 
-#include "vtkKWLabel.h"
 #include "vtkKWCheckButtonSet.h"
+#include "vtkKWLabel.h"
 #include "vtkObjectFactory.h"
 
 //----------------------------------------------------------------------------
-vtkStandardNewMacro( vtkKWLabeledCheckButtonSet );
-vtkCxxRevisionMacro(vtkKWLabeledCheckButtonSet, "1.1");
+vtkStandardNewMacro(vtkKWLabeledCheckButtonSet);
+vtkCxxRevisionMacro(vtkKWLabeledCheckButtonSet, "1.2");
 
 int vtkKWLabeledCheckButtonSetCommand(ClientData cd, Tcl_Interp *interp,
                                       int argc, char *argv[]);
@@ -58,19 +58,14 @@ vtkKWLabeledCheckButtonSet::vtkKWLabeledCheckButtonSet()
 {
   this->CommandFunction = vtkKWLabeledCheckButtonSetCommand;
 
-  this->Label = vtkKWLabel::New();
+  this->PackHorizontally = 0;
+
   this->CheckButtonSet = vtkKWCheckButtonSet::New();
 }
 
 //----------------------------------------------------------------------------
 vtkKWLabeledCheckButtonSet::~vtkKWLabeledCheckButtonSet()
 {
-  if (this->Label)
-    {
-    this->Label->Delete();
-    this->Label = NULL;
-    }
-
   if (this->CheckButtonSet)
     {
     this->CheckButtonSet->Delete();
@@ -79,35 +74,83 @@ vtkKWLabeledCheckButtonSet::~vtkKWLabeledCheckButtonSet()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWLabeledCheckButtonSet::Create(vtkKWApplication *app)
+void vtkKWLabeledCheckButtonSet::Create(vtkKWApplication *app, const char *args)
 {
-  // Set the application
+  // Check if already created
 
   if (this->IsCreated())
     {
-    vtkErrorMacro("LabeledLabel already created");
+    vtkErrorMacro("LabeledCheckButtonSet already created");
     return;
     }
 
-  this->SetApplication(app);
+  // Call the superclass, this will set the application and create the Label
 
-  // Create the frame
+  this->Superclass::Create(app, args);
 
-  this->Script("frame %s", this->GetWidgetName());
-
-  // Create the label and the checkbutton set
-
-  this->Label->SetParent(this);
-  this->Label->Create(app, 0);
+  // Create the checkbutton set
 
   this->CheckButtonSet->SetParent(this);
   this->CheckButtonSet->Create(app, 0);
 
-  this->Script("pack %s -side top -anchor nw", 
-               this->Label->GetWidgetName());
+  // Pack the label and the checkbutton
 
-  this->Script("pack %s -side top -anchor nw -padx 10", 
-               this->CheckButtonSet->GetWidgetName());
+  this->Pack();
+}
+
+// ----------------------------------------------------------------------------
+void vtkKWLabeledCheckButtonSet::Pack()
+{
+  if (!this->IsCreated())
+    {
+    return;
+    }
+
+  // Unpack everything
+
+  this->Label->UnpackSiblings();
+
+  // Repack everything
+
+  ostrstream tk_cmd;
+
+  if (this->PackHorizontally)
+    {
+    tk_cmd << "pack ";
+    if (this->ShowLabel)
+      {
+      tk_cmd << this->Label->GetWidgetName() << " ";
+      }
+    tk_cmd << this->CheckButtonSet->GetWidgetName() 
+           << " -side left -anchor nw" << endl;
+    }
+  else
+    {
+    if (this->ShowLabel)
+      {
+      tk_cmd << "pack " << this->Label->GetWidgetName() 
+             << " -side top -anchor nw" << endl;
+      }
+    tk_cmd << "pack " << this->CheckButtonSet->GetWidgetName() 
+           << " -side top -anchor nw -padx 10" << endl;
+    }
+  
+  tk_cmd << ends;
+  this->Script(tk_cmd.str());
+  tk_cmd.rdbuf()->freeze(0);
+}
+
+// ----------------------------------------------------------------------------
+void vtkKWLabeledCheckButtonSet::SetPackHorizontally(int _arg)
+{
+  if (this->PackHorizontally == _arg)
+    {
+    return;
+    }
+  this->PackHorizontally = _arg;
+  this->Modified();
+
+  this->Pack();
 }
 
 //----------------------------------------------------------------------------
@@ -118,19 +161,35 @@ void vtkKWLabeledCheckButtonSet::SetEnabled(int e)
 
   if (this->IsCreated())
     {
-    this->Label->SetEnabled(e);
     this->CheckButtonSet->SetEnabled(e);
     }
 
-  // Then update internal Enabled ivar, although it is not of much use here
+  // Then call superclass, which will call SetEnabled on the label and 
+  // update the internal Enabled ivar (although it is not of much use here)
 
-  if (this->Enabled == e)
+  this->Superclass::SetEnabled(e);
+}
+
+// ---------------------------------------------------------------------------
+void vtkKWLabeledCheckButtonSet::SetBalloonHelpString(const char *string)
+{
+  this->Superclass::SetBalloonHelpString(string);
+
+  if (this->CheckButtonSet)
     {
-    return;
+    this->CheckButtonSet->SetBalloonHelpString(string);
     }
+}
 
-  this->Enabled = e;
-  this->Modified();
+// ---------------------------------------------------------------------------
+void vtkKWLabeledCheckButtonSet::SetBalloonHelpJustification(int j)
+{
+  this->Superclass::SetBalloonHelpJustification(j);
+
+  if (this->CheckButtonSet)
+    {
+    this->CheckButtonSet->SetBalloonHelpJustification(j);
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -138,6 +197,8 @@ void vtkKWLabeledCheckButtonSet::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
 
-  os << indent << "Label: " << this->Label << endl;
   os << indent << "CheckButtonSet: " << this->CheckButtonSet << endl;
+
+  os << indent << "PackHorizontally: " 
+     << (this->PackHorizontally ? "On" : "Off") << endl;
 }

@@ -39,15 +39,16 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-//#include "vtkKWApplication.h"
+
 #include "vtkKWLabeledEntry.h"
-#include "vtkObjectFactory.h"
-#include "vtkKWLabel.h"
+
 #include "vtkKWEntry.h"
+#include "vtkKWLabel.h"
+#include "vtkObjectFactory.h"
 
 //----------------------------------------------------------------------------
-vtkStandardNewMacro( vtkKWLabeledEntry );
-vtkCxxRevisionMacro(vtkKWLabeledEntry, "1.9");
+vtkStandardNewMacro(vtkKWLabeledEntry);
+vtkCxxRevisionMacro(vtkKWLabeledEntry, "1.10");
 
 int vtkKWLabeledEntryCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -57,56 +58,71 @@ vtkKWLabeledEntry::vtkKWLabeledEntry()
 {
   this->CommandFunction = vtkKWLabeledEntryCommand;
 
-  this->Label = vtkKWLabel::New();
   this->Entry = vtkKWEntry::New();
 }
 
 //----------------------------------------------------------------------------
 vtkKWLabeledEntry::~vtkKWLabeledEntry()
 {
-  this->Label->Delete();
-  this->Label = NULL;
-
-  this->Entry->Delete();
-  this->Entry = NULL;
+  if (this->Entry)
+    {
+    this->Entry->Delete();
+    this->Entry = NULL;
+    }
 }
 
 //----------------------------------------------------------------------------
-void vtkKWLabeledEntry::SetLabel(const char *text)
+void vtkKWLabeledEntry::Create(vtkKWApplication *app, const char *args)
 {
-  this->Script("%s configure -text {%s}",
-               this->Label->GetWidgetName(), text);  
-}
+  // Check if already created
 
-//----------------------------------------------------------------------------
-void vtkKWLabeledEntry::Create(vtkKWApplication *app)
-{
   if (this->IsCreated())
     {
     vtkErrorMacro("LabeledEntry already created");
     return;
     }
 
-  this->SetApplication(app);
+  // Call the superclass, this will set the application and create the Label
 
-  // Create the top level
+  this->Superclass::Create(app, args);
 
-  const char *wname = this->GetWidgetName();
-  this->Script("frame %s -borderwidth 0 -relief flat", wname);
-
-  this->Label->SetParent(this);
-  this->Label->Create(app, "");
+  // Create the entry
 
   this->Entry->SetParent(this);
   this->Entry->Create(app, "");
 
-  // Usually you will want the entry to expand itself
+  // Pack the label and the entry
 
-  this->Script("pack %s -side left", 
-               this->Label->GetWidgetName());
+  this->Pack();
+}
 
-  this->Script("pack %s -side left -fill x -expand t", 
-               this->Entry->GetWidgetName());
+// ----------------------------------------------------------------------------
+void vtkKWLabeledEntry::Pack()
+{
+  if (!this->IsCreated())
+    {
+    return;
+    }
+
+  // Unpack everything
+
+  this->Label->UnpackSiblings();
+
+  // Repack everything
+
+  ostrstream tk_cmd;
+
+  if (this->ShowLabel)
+    {
+    tk_cmd << "pack " << this->Label->GetWidgetName() << " -side left" << endl;
+    }
+
+  tk_cmd << "pack " << this->Entry->GetWidgetName() 
+         << " -side left -fill x -expand t" << endl;
+  
+  tk_cmd << ends;
+  this->Script(tk_cmd.str());
+  tk_cmd.rdbuf()->freeze(0);
 }
 
 //----------------------------------------------------------------------------
@@ -154,27 +170,18 @@ void vtkKWLabeledEntry::SetEnabled(int e)
   if (this->IsCreated())
     {
     this->Entry->SetEnabled(e);
-    this->Label->SetEnabled(e);
     }
 
-  // Then update internal Enabled ivar, although it is not of much use here
+  // Then call superclass, which will call SetEnabled on the label and 
+  // update the internal Enabled ivar (although it is not of much use here)
 
-  if (this->Enabled == e)
-    {
-    return;
-    }
-
-  this->Enabled = e;
-  this->Modified();
+  this->Superclass::SetEnabled(e);
 }
 
 // ---------------------------------------------------------------------------
 void vtkKWLabeledEntry::SetBalloonHelpString(const char *string)
 {
-  if (this->Label)
-    {
-    this->Label->SetBalloonHelpString(string);
-    }
+  this->Superclass::SetBalloonHelpString(string);
 
   if (this->Entry)
     {
@@ -185,10 +192,7 @@ void vtkKWLabeledEntry::SetBalloonHelpString(const char *string)
 // ---------------------------------------------------------------------------
 void vtkKWLabeledEntry::SetBalloonHelpJustification(int j)
 {
-  if (this->Label)
-    {
-    this->Label->SetBalloonHelpJustification(j);
-    }
+  this->Superclass::SetBalloonHelpJustification(j);
 
   if (this->Entry)
     {
@@ -201,6 +205,5 @@ void vtkKWLabeledEntry::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
 
-  os << indent << "Label: " << this->Label << endl;
   os << indent << "Entry: " << this->Entry << endl;
 }

@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   Visualization Toolkit
-  Module:    vtkKWLabeledOptionMenu.h
+  Module:    vtkKWLabeledWidget.h
   Language:  C++
   Date:      $Date$
   Version:   $Revision$
@@ -39,34 +39,45 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-// .NAME vtkKWLabeledOptionMenu - an option menu with a label
+// .NAME vtkKWLabeledWidget - an abstract class widget with a label
 // .SECTION Description
-// This class creates an option menu with another label in front of it; both are
-// contained in a frame
+// This class creates a superclass for composite widgets associating a label to 
+// a widget.
 // .SECTION See Also
-// vtkKWOptionMenu
+// vtkKWLabeledEntry
 
-#ifndef __vtkKWLabeledOptionMenu_h
-#define __vtkKWLabeledOptionMenu_h
+#ifndef __vtkKWLabeledWidget_h
+#define __vtkKWLabeledWidget_h
 
-#include "vtkKWLabeledWidget.h"
+#include "vtkKWWidget.h"
 
-class vtkKWOptionMenu;
+class vtkKWApplication;
+class vtkKWLabel;
 
-class VTK_EXPORT vtkKWLabeledOptionMenu : public vtkKWLabeledWidget
+class VTK_EXPORT vtkKWLabeledWidget : public vtkKWWidget
 {
 public:
-  static vtkKWLabeledOptionMenu* New();
-  vtkTypeRevisionMacro(vtkKWLabeledOptionMenu, vtkKWLabeledWidget);
+  static vtkKWLabeledWidget* New();
+  vtkTypeRevisionMacro(vtkKWLabeledWidget, vtkKWWidget);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Create the widget
+  // Create a Tk widget
   virtual void Create(vtkKWApplication *app, const char *args = 0);
 
   // Description:
-  // Get the internal object
-  vtkGetObjectMacro(OptionMenu, vtkKWOptionMenu);
+  // Get the internal label
+  vtkGetObjectMacro(Label, vtkKWLabel);
+
+  // Description:
+  // Convenience method to set the contents label.
+  void SetLabel(const char *);
+  
+  // Description:
+  // Show/Hide the label.
+  virtual void SetShowLabel(int);
+  vtkBooleanMacro(ShowLabel, int);
+  vtkGetMacro(ShowLabel, int);
 
   // Description:
   // Set/Get the enabled state.
@@ -80,18 +91,20 @@ public:
   virtual void SetBalloonHelpJustification(int j);
 
 protected:
-  vtkKWLabeledOptionMenu();
-  ~vtkKWLabeledOptionMenu();
+  vtkKWLabeledWidget();
+  ~vtkKWLabeledWidget();
 
-  vtkKWOptionMenu *OptionMenu;
+  vtkKWLabel      *Label;
 
-  // Pack or repack the widget
+  int ShowLabel;
 
-  virtual void Pack();
+  // Pack or repack the widget. To be implemented by subclasses.
+
+  virtual void Pack() {};
 
 private:
-  vtkKWLabeledOptionMenu(const vtkKWLabeledOptionMenu&); // Not implemented
-  void operator=(const vtkKWLabeledOptionMenu&); // Not implemented
+  vtkKWLabeledWidget(const vtkKWLabeledWidget&); // Not implemented
+  void operator=(const vtkKWLabeledWidget&); // Not implemented
 };
 
 

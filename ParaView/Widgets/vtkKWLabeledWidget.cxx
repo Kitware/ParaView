@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   Visualization Toolkit
-  Module:    vtkKWLabeledLabel.cxx
+  Module:    vtkKWLabeledWidget.cxx
   Language:  C++
   Date:      $Date$
   Version:   $Revision$
@@ -40,135 +40,138 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#include "vtkKWLabeledLabel.h"
+#include "vtkKWLabeledWidget.h"
 
 #include "vtkKWLabel.h"
 #include "vtkObjectFactory.h"
 
 //----------------------------------------------------------------------------
-vtkStandardNewMacro(vtkKWLabeledLabel);
-vtkCxxRevisionMacro(vtkKWLabeledLabel, "1.5");
+vtkStandardNewMacro(vtkKWLabeledWidget);
+vtkCxxRevisionMacro(vtkKWLabeledWidget, "1.1");
 
-int vtkKWLabeledLabelCommand(ClientData cd, Tcl_Interp *interp,
-                             int argc, char *argv[]);
+int vtkKWLabeledWidgetCommand(ClientData cd, Tcl_Interp *interp,
+                              int argc, char *argv[]);
 
 //----------------------------------------------------------------------------
-vtkKWLabeledLabel::vtkKWLabeledLabel()
+vtkKWLabeledWidget::vtkKWLabeledWidget()
 {
-  this->CommandFunction = vtkKWLabeledLabelCommand;
+  this->CommandFunction = vtkKWLabeledWidgetCommand;
 
-  this->Label2 = vtkKWLabel::New();
+  this->ShowLabel = 1;
+
+  this->Label = vtkKWLabel::New();
 }
 
 //----------------------------------------------------------------------------
-vtkKWLabeledLabel::~vtkKWLabeledLabel()
+vtkKWLabeledWidget::~vtkKWLabeledWidget()
 {
-  if (this->Label2)
+  if (this->Label)
     {
-    this->Label2->Delete();
-    this->Label2 = NULL;
+    this->Label->Delete();
+    this->Label = NULL;
     }
 }
 
 //----------------------------------------------------------------------------
-void vtkKWLabeledLabel::Create(vtkKWApplication *app, const char *args)
+void vtkKWLabeledWidget::Create(vtkKWApplication *app, const char *args)
 {
-  // Check if already created
+  // Set the application
 
   if (this->IsCreated())
     {
-    vtkErrorMacro("LabeledLabel already created");
+    vtkErrorMacro("LabeledWidget widget already created");
     return;
     }
 
-  // Call the superclass, this will set the application and create the Label
+  this->SetApplication(app);
 
-  this->Superclass::Create(app, args);
+  // Create the container frame
 
-  // Create the 2nd label
+  this->Script("frame %s -relief flat -bd 0 -highlightthickness	0 %s", 
+               this->GetWidgetName(), args ? args : "");
 
-  this->Label2->SetParent(this);
-  this->Label2->Create(app, "");
+  // Create the label. If the parent has been set before (i.e. by the subclass)
+  // do not set it.
+  
+  if (!this->Label->GetParent())
+    {
+    this->Label->SetParent(this);
+    }
 
-  // Pack the labels
+  this->Label->Create(app, "");
+
+  // Subclasses will call this->Pack() here
+}
+
+//----------------------------------------------------------------------------
+void vtkKWLabeledWidget::SetLabel(const char *text)
+{
+  if (this->Label)
+    {
+    this->Label->SetLabel(text);
+    }
+}
+
+// ----------------------------------------------------------------------------
+void vtkKWLabeledWidget::SetShowLabel(int _arg)
+{
+  if (this->ShowLabel == _arg)
+    {
+    return;
+    }
+  this->ShowLabel = _arg;
+  this->Modified();
 
   this->Pack();
 }
 
-// ----------------------------------------------------------------------------
-void vtkKWLabeledLabel::Pack()
-{
-  if (!this->IsCreated())
-    {
-    return;
-    }
-
-  // Unpack everything
-
-  this->Label->UnpackSiblings();
-
-  // Repack everything
-
-  ostrstream tk_cmd;
-
-  tk_cmd << "pack ";
-
-  if (this->ShowLabel)
-    {
-    tk_cmd << this->Label->GetWidgetName() << " ";
-    }
-
-  tk_cmd << this->Label2->GetWidgetName() 
-         << " -side left -anchor nw" << endl;
-  
-  tk_cmd << ends;
-  this->Script(tk_cmd.str());
-  tk_cmd.rdbuf()->freeze(0);
-}
-
 //----------------------------------------------------------------------------
-void vtkKWLabeledLabel::SetEnabled(int e)
+void vtkKWLabeledWidget::SetEnabled(int e)
 {
   // Propagate first (since objects can be modified externally, they might
   // not be in synch with this->Enabled)
 
   if (this->IsCreated())
     {
-    this->Label2->SetEnabled(e);
+    this->Label->SetEnabled(e);
     }
 
-  // Then call superclass, which will call SetEnabled on the label and 
-  // update the internal Enabled ivar (although it is not of much use here)
+  // Then update internal Enabled ivar, although it is not of much use here
 
-  this->Superclass::SetEnabled(e);
+  if (this->Enabled == e)
+    {
+    return;
+    }
+
+  this->Enabled = e;
+  this->Modified();
 }
 
 // ---------------------------------------------------------------------------
-void vtkKWLabeledLabel::SetBalloonHelpString(const char *string)
+void vtkKWLabeledWidget::SetBalloonHelpString(const char *string)
 {
-  this->Superclass::SetBalloonHelpString(string);
-
-  if (this->Label2)
+  if (this->Label)
     {
-    this->Label2->SetBalloonHelpString(string);
+    this->Label->SetBalloonHelpString(string);
     }
 }
 
 // ---------------------------------------------------------------------------
-void vtkKWLabeledLabel::SetBalloonHelpJustification(int j)
+void vtkKWLabeledWidget::SetBalloonHelpJustification(int j)
 {
-  this->Superclass::SetBalloonHelpJustification(j);
-
-  if (this->Label2)
+  if (this->Label)
     {
-    this->Label2->SetBalloonHelpJustification(j);
+    this->Label->SetBalloonHelpJustification(j);
     }
 }
 
 //----------------------------------------------------------------------------
-void vtkKWLabeledLabel::PrintSelf(ostream& os, vtkIndent indent)
+void vtkKWLabeledWidget::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
 
-  os << indent << "Label2: " << this->Label2 << endl;
+  os << indent << "Label: " << this->Label << endl;
+
+  os << indent << "ShowLabel: " 
+     << (this->ShowLabel ? "On" : "Off") << endl;
 }

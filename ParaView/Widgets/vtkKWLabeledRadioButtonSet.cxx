@@ -47,8 +47,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkObjectFactory.h"
 
 //----------------------------------------------------------------------------
-vtkStandardNewMacro( vtkKWLabeledRadioButtonSet );
-vtkCxxRevisionMacro(vtkKWLabeledRadioButtonSet, "1.1");
+vtkStandardNewMacro(vtkKWLabeledRadioButtonSet);
+vtkCxxRevisionMacro(vtkKWLabeledRadioButtonSet, "1.2");
 
 int vtkKWLabeledRadioButtonSetCommand(ClientData cd, Tcl_Interp *interp,
                                       int argc, char *argv[]);
@@ -58,19 +58,14 @@ vtkKWLabeledRadioButtonSet::vtkKWLabeledRadioButtonSet()
 {
   this->CommandFunction = vtkKWLabeledRadioButtonSetCommand;
 
-  this->Label = vtkKWLabel::New();
+  this->PackHorizontally = 0;
+
   this->RadioButtonSet = vtkKWRadioButtonSet::New();
 }
 
 //----------------------------------------------------------------------------
 vtkKWLabeledRadioButtonSet::~vtkKWLabeledRadioButtonSet()
 {
-  if (this->Label)
-    {
-    this->Label->Delete();
-    this->Label = NULL;
-    }
-
   if (this->RadioButtonSet)
     {
     this->RadioButtonSet->Delete();
@@ -79,35 +74,83 @@ vtkKWLabeledRadioButtonSet::~vtkKWLabeledRadioButtonSet()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWLabeledRadioButtonSet::Create(vtkKWApplication *app)
+void vtkKWLabeledRadioButtonSet::Create(vtkKWApplication *app, const char *args)
 {
-  // Set the application
+  // Check if already created
 
   if (this->IsCreated())
     {
-    vtkErrorMacro("LabeledLabel already created");
+    vtkErrorMacro("LabeledRadioButtonSet already created");
     return;
     }
 
-  this->SetApplication(app);
+  // Call the superclass, this will set the application and create the Label
 
-  // Create the frame
+  this->Superclass::Create(app, args);
 
-  this->Script("frame %s", this->GetWidgetName());
-
-  // Create the label and the radiobutton set
-
-  this->Label->SetParent(this);
-  this->Label->Create(app, 0);
+  // Create the radiobutton set
 
   this->RadioButtonSet->SetParent(this);
   this->RadioButtonSet->Create(app, 0);
 
-  this->Script("pack %s -side top -anchor nw", 
-               this->Label->GetWidgetName());
+  // Pack the label and the checkbutton
 
-  this->Script("pack %s -side top -anchor nw -padx 10", 
-               this->RadioButtonSet->GetWidgetName());
+  this->Pack();
+}
+
+// ----------------------------------------------------------------------------
+void vtkKWLabeledRadioButtonSet::Pack()
+{
+  if (!this->IsCreated())
+    {
+    return;
+    }
+
+  // Unpack everything
+
+  this->Label->UnpackSiblings();
+
+  // Repack everything
+
+  ostrstream tk_cmd;
+
+  if (this->PackHorizontally)
+    {
+    tk_cmd << "pack ";
+    if (this->ShowLabel)
+      {
+      tk_cmd << this->Label->GetWidgetName() << " ";
+      }
+    tk_cmd << this->RadioButtonSet->GetWidgetName() 
+           << " -side left -anchor nw" << endl;
+    }
+  else
+    {
+    if (this->ShowLabel)
+      {
+      tk_cmd << "pack " << this->Label->GetWidgetName() 
+             << " -side top -anchor nw" << endl;
+      }
+    tk_cmd << "pack " << this->RadioButtonSet->GetWidgetName() 
+           << " -side top -anchor nw -padx 10" << endl;
+    }
+  
+  tk_cmd << ends;
+  this->Script(tk_cmd.str());
+  tk_cmd.rdbuf()->freeze(0);
+}
+
+// ----------------------------------------------------------------------------
+void vtkKWLabeledRadioButtonSet::SetPackHorizontally(int _arg)
+{
+  if (this->PackHorizontally == _arg)
+    {
+    return;
+    }
+  this->PackHorizontally = _arg;
+  this->Modified();
+
+  this->Pack();
 }
 
 //----------------------------------------------------------------------------
@@ -118,19 +161,35 @@ void vtkKWLabeledRadioButtonSet::SetEnabled(int e)
 
   if (this->IsCreated())
     {
-    this->Label->SetEnabled(e);
     this->RadioButtonSet->SetEnabled(e);
     }
 
-  // Then update internal Enabled ivar, although it is not of much use here
+  // Then call superclass, which will call SetEnabled on the label and 
+  // update the internal Enabled ivar (although it is not of much use here)
 
-  if (this->Enabled == e)
+  this->Superclass::SetEnabled(e);
+}
+
+// ---------------------------------------------------------------------------
+void vtkKWLabeledRadioButtonSet::SetBalloonHelpString(const char *string)
+{
+  this->Superclass::SetBalloonHelpString(string);
+
+  if (this->RadioButtonSet)
     {
-    return;
+    this->RadioButtonSet->SetBalloonHelpString(string);
     }
+}
 
-  this->Enabled = e;
-  this->Modified();
+// ---------------------------------------------------------------------------
+void vtkKWLabeledRadioButtonSet::SetBalloonHelpJustification(int j)
+{
+  this->Superclass::SetBalloonHelpJustification(j);
+
+  if (this->RadioButtonSet)
+    {
+    this->RadioButtonSet->SetBalloonHelpJustification(j);
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -138,6 +197,8 @@ void vtkKWLabeledRadioButtonSet::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
 
-  os << indent << "Label: " << this->Label << endl;
   os << indent << "RadioButtonSet: " << this->RadioButtonSet << endl;
+
+  os << indent << "PackHorizontally: " 
+     << (this->PackHorizontally ? "On" : "Off") << endl;
 }
