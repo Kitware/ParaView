@@ -39,7 +39,6 @@ class vtkKWNotebook;
 class vtkKWToolbar;
 class vtkKWScale;
 
-
 class VTK_EXPORT vtkPVWindow : public vtkKWWindow
 {
 public:
@@ -69,6 +68,8 @@ public:
   void ShowMainNotebook();  
   
   void IsoValueChanged();
+  void XPlaneChanged();
+  void ZPlaneChanged();
   
 protected:
   vtkPVWindow();
@@ -89,8 +90,10 @@ protected:
   
   vtkKWNotebook *MainNotebook;
   int MainNotebookCreated;
-  
+
   vtkKWScale *IsoScale;
+  vtkKWScale *XPlaneScale;
+  vtkKWScale *ZPlaneScale;
 };
 
 

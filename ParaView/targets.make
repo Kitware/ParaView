@@ -21,8 +21,8 @@ vtkDummyRenderWindowInteractor.o : ./vtkDummyRenderWindowInteractor.cxx  \
   /home/lawcc/vtk/graphics/vtkCamera.h \
   /home/lawcc/vtk/common/vtkTransform.h \
   /home/lawcc/vtk/common/vtkLinearTransform.h \
-  /home/lawcc/vtk/common/vtkPerspectiveTransform.h \
-  /home/lawcc/vtk/common/vtkGeneralTransform.h \
+  /home/lawcc/vtk/common/vtkHomogenousTransform.h \
+  /home/lawcc/vtk/common/vtkAbstractTransform.h \
   /home/lawcc/vtk/common/vtkPoints.h \
   /home/lawcc/vtk/common/vtkAttributeData.h \
   /home/lawcc/vtk/common/vtkDataArray.h \
@@ -30,11 +30,13 @@ vtkDummyRenderWindowInteractor.o : ./vtkDummyRenderWindowInteractor.cxx  \
   /home/lawcc/vtk/common/vtkNormals.h \
   /home/lawcc/vtk/common/vtkVectors.h \
   /home/lawcc/vtk/common/vtkMutexLock.h \
-  /home/lawcc/vtk/common/vtkProjectionTransform.h \
+  /home/lawcc/vtk/common/vtkPerspectiveTransform.h \
   /home/lawcc/vtk/graphics/vtkActor.h \
   /home/lawcc/vtk/graphics/vtkProp3D.h \
   /home/lawcc/vtk/common/vtkProp.h \
   /home/lawcc/vtk/common/vtkRayCastStructures.h \
+  /home/lawcc/vtk/common/vtkAssemblyPaths.h \
+  /home/lawcc/vtk/common/vtkAssemblyPath.h \
   /home/lawcc/vtk/graphics/vtkProperty.h \
   /home/lawcc/vtk/graphics/vtkRender.h \
   /home/lawcc/vtk/common/vtkStructuredPoints.h \
@@ -67,14 +69,15 @@ vtkDummyRenderWindowInteractor.o : ./vtkDummyRenderWindowInteractor.cxx  \
   /home/lawcc/vtk/common/vtkPlaneCollection.h \
   /home/lawcc/vtk/common/vtkPlane.h \
   /home/lawcc/vtk/common/vtkImplicitFunction.h \
-  /home/lawcc/vtk/graphics/vtkAssemblyPaths.h \
-  /home/lawcc/vtk/graphics/vtkActorCollection.h \
   /home/lawcc/vtk/common/vtkActor2D.h \
   /home/lawcc/vtk/common/vtkCoordinate.h \
   /home/lawcc/vtk/common/vtkProperty2D.h \
   /home/lawcc/vtk/common/vtkViewport.h \
   /home/lawcc/vtk/common/vtkActor2DCollection.h \
+  /home/lawcc/vtk/graphics/vtkActorCollection.h \
   /home/lawcc/vtk/graphics/vtkGraphicsFactory.h \
+  /home/lawcc/vtk/graphics/vtkAbstractPropPicker.h \
+  /home/lawcc/vtk/graphics/vtkAbstractPicker.h \
   ./vtkPVRenderView.h \
   ./vtkKWRenderView.h \
   ../Widgets/vtkKWView.h \
@@ -124,8 +127,8 @@ vtkInteractorStyleCamera.o : ./vtkInteractorStyleCamera.cxx  \
   /home/lawcc/vtk/graphics/vtkCamera.h \
   /home/lawcc/vtk/common/vtkTransform.h \
   /home/lawcc/vtk/common/vtkLinearTransform.h \
-  /home/lawcc/vtk/common/vtkPerspectiveTransform.h \
-  /home/lawcc/vtk/common/vtkGeneralTransform.h \
+  /home/lawcc/vtk/common/vtkHomogenousTransform.h \
+  /home/lawcc/vtk/common/vtkAbstractTransform.h \
   /home/lawcc/vtk/common/vtkPoints.h \
   /home/lawcc/vtk/common/vtkAttributeData.h \
   /home/lawcc/vtk/common/vtkDataArray.h \
@@ -133,11 +136,13 @@ vtkInteractorStyleCamera.o : ./vtkInteractorStyleCamera.cxx  \
   /home/lawcc/vtk/common/vtkNormals.h \
   /home/lawcc/vtk/common/vtkVectors.h \
   /home/lawcc/vtk/common/vtkMutexLock.h \
-  /home/lawcc/vtk/common/vtkProjectionTransform.h \
+  /home/lawcc/vtk/common/vtkPerspectiveTransform.h \
   /home/lawcc/vtk/graphics/vtkActor.h \
   /home/lawcc/vtk/graphics/vtkProp3D.h \
   /home/lawcc/vtk/common/vtkProp.h \
   /home/lawcc/vtk/common/vtkRayCastStructures.h \
+  /home/lawcc/vtk/common/vtkAssemblyPaths.h \
+  /home/lawcc/vtk/common/vtkAssemblyPath.h \
   /home/lawcc/vtk/graphics/vtkProperty.h \
   /home/lawcc/vtk/graphics/vtkRender.h \
   /home/lawcc/vtk/common/vtkStructuredPoints.h \
@@ -170,14 +175,15 @@ vtkInteractorStyleCamera.o : ./vtkInteractorStyleCamera.cxx  \
   /home/lawcc/vtk/common/vtkPlaneCollection.h \
   /home/lawcc/vtk/common/vtkPlane.h \
   /home/lawcc/vtk/common/vtkImplicitFunction.h \
-  /home/lawcc/vtk/graphics/vtkAssemblyPaths.h \
-  /home/lawcc/vtk/graphics/vtkActorCollection.h \
   /home/lawcc/vtk/common/vtkActor2D.h \
   /home/lawcc/vtk/common/vtkCoordinate.h \
   /home/lawcc/vtk/common/vtkProperty2D.h \
   /home/lawcc/vtk/common/vtkViewport.h \
   /home/lawcc/vtk/common/vtkActor2DCollection.h \
+  /home/lawcc/vtk/graphics/vtkActorCollection.h \
   /home/lawcc/vtk/graphics/vtkGraphicsFactory.h \
+  /home/lawcc/vtk/graphics/vtkAbstractPropPicker.h \
+  /home/lawcc/vtk/graphics/vtkAbstractPicker.h \
   /home/lawcc/vtk/common/vtkObjectFactory.h
 
 vtkInteractorStyleGridExtent.o : ./vtkInteractorStyleGridExtent.cxx  \
@@ -205,8 +211,8 @@ vtkInteractorStyleGridExtent.o : ./vtkInteractorStyleGridExtent.cxx  \
   /home/lawcc/vtk/graphics/vtkCamera.h \
   /home/lawcc/vtk/common/vtkTransform.h \
   /home/lawcc/vtk/common/vtkLinearTransform.h \
-  /home/lawcc/vtk/common/vtkPerspectiveTransform.h \
-  /home/lawcc/vtk/common/vtkGeneralTransform.h \
+  /home/lawcc/vtk/common/vtkHomogenousTransform.h \
+  /home/lawcc/vtk/common/vtkAbstractTransform.h \
   /home/lawcc/vtk/common/vtkPoints.h \
   /home/lawcc/vtk/common/vtkAttributeData.h \
   /home/lawcc/vtk/common/vtkDataArray.h \
@@ -214,11 +220,13 @@ vtkInteractorStyleGridExtent.o : ./vtkInteractorStyleGridExtent.cxx  \
   /home/lawcc/vtk/common/vtkNormals.h \
   /home/lawcc/vtk/common/vtkVectors.h \
   /home/lawcc/vtk/common/vtkMutexLock.h \
-  /home/lawcc/vtk/common/vtkProjectionTransform.h \
+  /home/lawcc/vtk/common/vtkPerspectiveTransform.h \
   /home/lawcc/vtk/graphics/vtkActor.h \
   /home/lawcc/vtk/graphics/vtkProp3D.h \
   /home/lawcc/vtk/common/vtkProp.h \
   /home/lawcc/vtk/common/vtkRayCastStructures.h \
+  /home/lawcc/vtk/common/vtkAssemblyPaths.h \
+  /home/lawcc/vtk/common/vtkAssemblyPath.h \
   /home/lawcc/vtk/graphics/vtkProperty.h \
   /home/lawcc/vtk/graphics/vtkRender.h \
   /home/lawcc/vtk/common/vtkStructuredPoints.h \
@@ -251,14 +259,15 @@ vtkInteractorStyleGridExtent.o : ./vtkInteractorStyleGridExtent.cxx  \
   /home/lawcc/vtk/common/vtkPlaneCollection.h \
   /home/lawcc/vtk/common/vtkPlane.h \
   /home/lawcc/vtk/common/vtkImplicitFunction.h \
-  /home/lawcc/vtk/graphics/vtkAssemblyPaths.h \
-  /home/lawcc/vtk/graphics/vtkActorCollection.h \
   /home/lawcc/vtk/common/vtkActor2D.h \
   /home/lawcc/vtk/common/vtkCoordinate.h \
   /home/lawcc/vtk/common/vtkProperty2D.h \
   /home/lawcc/vtk/common/vtkViewport.h \
   /home/lawcc/vtk/common/vtkActor2DCollection.h \
+  /home/lawcc/vtk/graphics/vtkActorCollection.h \
   /home/lawcc/vtk/graphics/vtkGraphicsFactory.h \
+  /home/lawcc/vtk/graphics/vtkAbstractPropPicker.h \
+  /home/lawcc/vtk/graphics/vtkAbstractPicker.h \
   /home/lawcc/vtk/common/vtkPolyData.h \
   /home/lawcc/vtk/common/vtkPointSet.h \
   /home/lawcc/vtk/common/vtkPointLocator.h \
@@ -274,7 +283,8 @@ vtkInteractorStyleGridExtent.o : ./vtkInteractorStyleGridExtent.cxx  \
   /home/lawcc/vtk/graphics/vtkOutlineSource.h \
   /home/lawcc/vtk/common/vtkMath.h \
   /home/lawcc/vtk/graphics/vtkCellPicker.h \
-  /home/lawcc/vtk/graphics/vtkPicker.h
+  /home/lawcc/vtk/graphics/vtkPicker.h \
+  /home/lawcc/vtk/graphics/vtkProp3DCollection.h
 
 vtkInteractorStyleImageExtent.o : ./vtkInteractorStyleImageExtent.cxx  \
   ./vtkInteractorStyleImageExtent.h \
@@ -301,8 +311,8 @@ vtkInteractorStyleImageExtent.o : ./vtkInteractorStyleImageExtent.cxx  \
   /home/lawcc/vtk/graphics/vtkCamera.h \
   /home/lawcc/vtk/common/vtkTransform.h \
   /home/lawcc/vtk/common/vtkLinearTransform.h \
-  /home/lawcc/vtk/common/vtkPerspectiveTransform.h \
-  /home/lawcc/vtk/common/vtkGeneralTransform.h \
+  /home/lawcc/vtk/common/vtkHomogenousTransform.h \
+  /home/lawcc/vtk/common/vtkAbstractTransform.h \
   /home/lawcc/vtk/common/vtkPoints.h \
   /home/lawcc/vtk/common/vtkAttributeData.h \
   /home/lawcc/vtk/common/vtkDataArray.h \
@@ -310,11 +320,13 @@ vtkInteractorStyleImageExtent.o : ./vtkInteractorStyleImageExtent.cxx  \
   /home/lawcc/vtk/common/vtkNormals.h \
   /home/lawcc/vtk/common/vtkVectors.h \
   /home/lawcc/vtk/common/vtkMutexLock.h \
-  /home/lawcc/vtk/common/vtkProjectionTransform.h \
+  /home/lawcc/vtk/common/vtkPerspectiveTransform.h \
   /home/lawcc/vtk/graphics/vtkActor.h \
   /home/lawcc/vtk/graphics/vtkProp3D.h \
   /home/lawcc/vtk/common/vtkProp.h \
   /home/lawcc/vtk/common/vtkRayCastStructures.h \
+  /home/lawcc/vtk/common/vtkAssemblyPaths.h \
+  /home/lawcc/vtk/common/vtkAssemblyPath.h \
   /home/lawcc/vtk/graphics/vtkProperty.h \
   /home/lawcc/vtk/graphics/vtkRender.h \
   /home/lawcc/vtk/common/vtkStructuredPoints.h \
@@ -347,14 +359,15 @@ vtkInteractorStyleImageExtent.o : ./vtkInteractorStyleImageExtent.cxx  \
   /home/lawcc/vtk/common/vtkPlaneCollection.h \
   /home/lawcc/vtk/common/vtkPlane.h \
   /home/lawcc/vtk/common/vtkImplicitFunction.h \
-  /home/lawcc/vtk/graphics/vtkAssemblyPaths.h \
-  /home/lawcc/vtk/graphics/vtkActorCollection.h \
   /home/lawcc/vtk/common/vtkActor2D.h \
   /home/lawcc/vtk/common/vtkCoordinate.h \
   /home/lawcc/vtk/common/vtkProperty2D.h \
   /home/lawcc/vtk/common/vtkViewport.h \
   /home/lawcc/vtk/common/vtkActor2DCollection.h \
+  /home/lawcc/vtk/graphics/vtkActorCollection.h \
   /home/lawcc/vtk/graphics/vtkGraphicsFactory.h \
+  /home/lawcc/vtk/graphics/vtkAbstractPropPicker.h \
+  /home/lawcc/vtk/graphics/vtkAbstractPicker.h \
   /home/lawcc/vtk/common/vtkPolyData.h \
   /home/lawcc/vtk/common/vtkPointSet.h \
   /home/lawcc/vtk/common/vtkPointLocator.h \
@@ -369,7 +382,8 @@ vtkInteractorStyleImageExtent.o : ./vtkInteractorStyleImageExtent.cxx  \
   /home/lawcc/vtk/graphics/vtkOutlineSource.h \
   /home/lawcc/vtk/common/vtkMath.h \
   /home/lawcc/vtk/graphics/vtkCellPicker.h \
-  /home/lawcc/vtk/graphics/vtkPicker.h
+  /home/lawcc/vtk/graphics/vtkPicker.h \
+  /home/lawcc/vtk/graphics/vtkProp3DCollection.h
 
 vtkInteractorStylePlane.o : ./vtkInteractorStylePlane.cxx  \
   ./vtkInteractorStylePlane.h \
@@ -395,8 +409,8 @@ vtkInteractorStylePlane.o : ./vtkInteractorStylePlane.cxx  \
   /home/lawcc/vtk/graphics/vtkCamera.h \
   /home/lawcc/vtk/common/vtkTransform.h \
   /home/lawcc/vtk/common/vtkLinearTransform.h \
-  /home/lawcc/vtk/common/vtkPerspectiveTransform.h \
-  /home/lawcc/vtk/common/vtkGeneralTransform.h \
+  /home/lawcc/vtk/common/vtkHomogenousTransform.h \
+  /home/lawcc/vtk/common/vtkAbstractTransform.h \
   /home/lawcc/vtk/common/vtkPoints.h \
   /home/lawcc/vtk/common/vtkAttributeData.h \
   /home/lawcc/vtk/common/vtkDataArray.h \
@@ -404,11 +418,13 @@ vtkInteractorStylePlane.o : ./vtkInteractorStylePlane.cxx  \
   /home/lawcc/vtk/common/vtkNormals.h \
   /home/lawcc/vtk/common/vtkVectors.h \
   /home/lawcc/vtk/common/vtkMutexLock.h \
-  /home/lawcc/vtk/common/vtkProjectionTransform.h \
+  /home/lawcc/vtk/common/vtkPerspectiveTransform.h \
   /home/lawcc/vtk/graphics/vtkActor.h \
   /home/lawcc/vtk/graphics/vtkProp3D.h \
   /home/lawcc/vtk/common/vtkProp.h \
   /home/lawcc/vtk/common/vtkRayCastStructures.h \
+  /home/lawcc/vtk/common/vtkAssemblyPaths.h \
+  /home/lawcc/vtk/common/vtkAssemblyPath.h \
   /home/lawcc/vtk/graphics/vtkProperty.h \
   /home/lawcc/vtk/graphics/vtkRender.h \
   /home/lawcc/vtk/common/vtkStructuredPoints.h \
@@ -441,14 +457,15 @@ vtkInteractorStylePlane.o : ./vtkInteractorStylePlane.cxx  \
   /home/lawcc/vtk/common/vtkPlaneCollection.h \
   /home/lawcc/vtk/common/vtkPlane.h \
   /home/lawcc/vtk/common/vtkImplicitFunction.h \
-  /home/lawcc/vtk/graphics/vtkAssemblyPaths.h \
-  /home/lawcc/vtk/graphics/vtkActorCollection.h \
   /home/lawcc/vtk/common/vtkActor2D.h \
   /home/lawcc/vtk/common/vtkCoordinate.h \
   /home/lawcc/vtk/common/vtkProperty2D.h \
   /home/lawcc/vtk/common/vtkViewport.h \
   /home/lawcc/vtk/common/vtkActor2DCollection.h \
+  /home/lawcc/vtk/graphics/vtkActorCollection.h \
   /home/lawcc/vtk/graphics/vtkGraphicsFactory.h \
+  /home/lawcc/vtk/graphics/vtkAbstractPropPicker.h \
+  /home/lawcc/vtk/graphics/vtkAbstractPicker.h \
   /home/lawcc/vtk/graphics/vtkSphereSource.h \
   /home/lawcc/vtk/graphics/vtkPolyDataSource.h \
   /home/lawcc/vtk/common/vtkPolyData.h \
@@ -463,7 +480,8 @@ vtkInteractorStylePlane.o : ./vtkInteractorStylePlane.cxx  \
   /home/lawcc/vtk/graphics/vtkOutlineSource.h \
   /home/lawcc/vtk/common/vtkMath.h \
   /home/lawcc/vtk/graphics/vtkCellPicker.h \
-  /home/lawcc/vtk/graphics/vtkPicker.h
+  /home/lawcc/vtk/graphics/vtkPicker.h \
+  /home/lawcc/vtk/graphics/vtkProp3DCollection.h
 
 vtkInteractorStylePlaneSource.o : ./vtkInteractorStylePlaneSource.cxx  \
   ./vtkInteractorStylePlaneSource.h \
@@ -489,8 +507,8 @@ vtkInteractorStylePlaneSource.o : ./vtkInteractorStylePlaneSource.cxx  \
   /home/lawcc/vtk/graphics/vtkCamera.h \
   /home/lawcc/vtk/common/vtkTransform.h \
   /home/lawcc/vtk/common/vtkLinearTransform.h \
-  /home/lawcc/vtk/common/vtkPerspectiveTransform.h \
-  /home/lawcc/vtk/common/vtkGeneralTransform.h \
+  /home/lawcc/vtk/common/vtkHomogenousTransform.h \
+  /home/lawcc/vtk/common/vtkAbstractTransform.h \
   /home/lawcc/vtk/common/vtkPoints.h \
   /home/lawcc/vtk/common/vtkAttributeData.h \
   /home/lawcc/vtk/common/vtkDataArray.h \
@@ -498,11 +516,13 @@ vtkInteractorStylePlaneSource.o : ./vtkInteractorStylePlaneSource.cxx  \
   /home/lawcc/vtk/common/vtkNormals.h \
   /home/lawcc/vtk/common/vtkVectors.h \
   /home/lawcc/vtk/common/vtkMutexLock.h \
-  /home/lawcc/vtk/common/vtkProjectionTransform.h \
+  /home/lawcc/vtk/common/vtkPerspectiveTransform.h \
   /home/lawcc/vtk/graphics/vtkActor.h \
   /home/lawcc/vtk/graphics/vtkProp3D.h \
   /home/lawcc/vtk/common/vtkProp.h \
   /home/lawcc/vtk/common/vtkRayCastStructures.h \
+  /home/lawcc/vtk/common/vtkAssemblyPaths.h \
+  /home/lawcc/vtk/common/vtkAssemblyPath.h \
   /home/lawcc/vtk/graphics/vtkProperty.h \
   /home/lawcc/vtk/graphics/vtkRender.h \
   /home/lawcc/vtk/common/vtkStructuredPoints.h \
@@ -535,14 +555,15 @@ vtkInteractorStylePlaneSource.o : ./vtkInteractorStylePlaneSource.cxx  \
   /home/lawcc/vtk/common/vtkPlaneCollection.h \
   /home/lawcc/vtk/common/vtkPlane.h \
   /home/lawcc/vtk/common/vtkImplicitFunction.h \
-  /home/lawcc/vtk/graphics/vtkAssemblyPaths.h \
-  /home/lawcc/vtk/graphics/vtkActorCollection.h \
   /home/lawcc/vtk/common/vtkActor2D.h \
   /home/lawcc/vtk/common/vtkCoordinate.h \
   /home/lawcc/vtk/common/vtkProperty2D.h \
   /home/lawcc/vtk/common/vtkViewport.h \
   /home/lawcc/vtk/common/vtkActor2DCollection.h \
+  /home/lawcc/vtk/graphics/vtkActorCollection.h \
   /home/lawcc/vtk/graphics/vtkGraphicsFactory.h \
+  /home/lawcc/vtk/graphics/vtkAbstractPropPicker.h \
+  /home/lawcc/vtk/graphics/vtkAbstractPicker.h \
   /home/lawcc/vtk/graphics/vtkPlaneSource.h \
   /home/lawcc/vtk/graphics/vtkPolyDataSource.h \
   /home/lawcc/vtk/common/vtkPolyData.h \
@@ -558,7 +579,8 @@ vtkInteractorStylePlaneSource.o : ./vtkInteractorStylePlaneSource.cxx  \
   /home/lawcc/vtk/graphics/vtkOutlineSource.h \
   /home/lawcc/vtk/common/vtkMath.h \
   /home/lawcc/vtk/graphics/vtkCellPicker.h \
-  /home/lawcc/vtk/graphics/vtkPicker.h
+  /home/lawcc/vtk/graphics/vtkPicker.h \
+  /home/lawcc/vtk/graphics/vtkProp3DCollection.h
 
 vtkInteractorStyleSphere.o : ./vtkInteractorStyleSphere.cxx  \
   ./vtkInteractorStyleSphere.h \
@@ -584,8 +606,8 @@ vtkInteractorStyleSphere.o : ./vtkInteractorStyleSphere.cxx  \
   /home/lawcc/vtk/graphics/vtkCamera.h \
   /home/lawcc/vtk/common/vtkTransform.h \
   /home/lawcc/vtk/common/vtkLinearTransform.h \
-  /home/lawcc/vtk/common/vtkPerspectiveTransform.h \
-  /home/lawcc/vtk/common/vtkGeneralTransform.h \
+  /home/lawcc/vtk/common/vtkHomogenousTransform.h \
+  /home/lawcc/vtk/common/vtkAbstractTransform.h \
   /home/lawcc/vtk/common/vtkPoints.h \
   /home/lawcc/vtk/common/vtkAttributeData.h \
   /home/lawcc/vtk/common/vtkDataArray.h \
@@ -593,11 +615,13 @@ vtkInteractorStyleSphere.o : ./vtkInteractorStyleSphere.cxx  \
   /home/lawcc/vtk/common/vtkNormals.h \
   /home/lawcc/vtk/common/vtkVectors.h \
   /home/lawcc/vtk/common/vtkMutexLock.h \
-  /home/lawcc/vtk/common/vtkProjectionTransform.h \
+  /home/lawcc/vtk/common/vtkPerspectiveTransform.h \
   /home/lawcc/vtk/graphics/vtkActor.h \
   /home/lawcc/vtk/graphics/vtkProp3D.h \
   /home/lawcc/vtk/common/vtkProp.h \
   /home/lawcc/vtk/common/vtkRayCastStructures.h \
+  /home/lawcc/vtk/common/vtkAssemblyPaths.h \
+  /home/lawcc/vtk/common/vtkAssemblyPath.h \
   /home/lawcc/vtk/graphics/vtkProperty.h \
   /home/lawcc/vtk/graphics/vtkRender.h \
   /home/lawcc/vtk/common/vtkStructuredPoints.h \
@@ -630,14 +654,15 @@ vtkInteractorStyleSphere.o : ./vtkInteractorStyleSphere.cxx  \
   /home/lawcc/vtk/common/vtkPlaneCollection.h \
   /home/lawcc/vtk/common/vtkPlane.h \
   /home/lawcc/vtk/common/vtkImplicitFunction.h \
-  /home/lawcc/vtk/graphics/vtkAssemblyPaths.h \
-  /home/lawcc/vtk/graphics/vtkActorCollection.h \
   /home/lawcc/vtk/common/vtkActor2D.h \
   /home/lawcc/vtk/common/vtkCoordinate.h \
   /home/lawcc/vtk/common/vtkProperty2D.h \
   /home/lawcc/vtk/common/vtkViewport.h \
   /home/lawcc/vtk/common/vtkActor2DCollection.h \
+  /home/lawcc/vtk/graphics/vtkActorCollection.h \
   /home/lawcc/vtk/graphics/vtkGraphicsFactory.h \
+  /home/lawcc/vtk/graphics/vtkAbstractPropPicker.h \
+  /home/lawcc/vtk/graphics/vtkAbstractPicker.h \
   /home/lawcc/vtk/graphics/vtkSphereSource.h \
   /home/lawcc/vtk/graphics/vtkPolyDataSource.h \
   /home/lawcc/vtk/common/vtkPolyData.h \
@@ -653,7 +678,8 @@ vtkInteractorStyleSphere.o : ./vtkInteractorStyleSphere.cxx  \
   /home/lawcc/vtk/graphics/vtkOutlineSource.h \
   /home/lawcc/vtk/common/vtkMath.h \
   /home/lawcc/vtk/graphics/vtkCellPicker.h \
-  /home/lawcc/vtk/graphics/vtkPicker.h
+  /home/lawcc/vtk/graphics/vtkPicker.h \
+  /home/lawcc/vtk/graphics/vtkProp3DCollection.h
 
 vtkKWRenderView.o : ./vtkKWRenderView.cxx  \
   ../Widgets/vtkKWApplication.h \
@@ -679,6 +705,8 @@ vtkKWRenderView.o : ./vtkKWRenderView.cxx  \
   ../Widgets/vtkKWGenericComposite.h \
   /home/lawcc/vtk/common/vtkProp.h \
   /home/lawcc/vtk/common/vtkRayCastStructures.h \
+  /home/lawcc/vtk/common/vtkAssemblyPaths.h \
+  /home/lawcc/vtk/common/vtkAssemblyPath.h \
   /home/lawcc/vtk/imaging/vtkTextMapper.h \
   /home/lawcc/vtk/common/vtkMapper2D.h \
   /home/lawcc/vtk/common/vtkAbstractMapper.h \
@@ -709,14 +737,14 @@ vtkKWRenderView.o : ./vtkKWRenderView.cxx  \
   /home/lawcc/vtk/graphics/vtkCamera.h \
   /home/lawcc/vtk/common/vtkTransform.h \
   /home/lawcc/vtk/common/vtkLinearTransform.h \
-  /home/lawcc/vtk/common/vtkPerspectiveTransform.h \
-  /home/lawcc/vtk/common/vtkGeneralTransform.h \
+  /home/lawcc/vtk/common/vtkHomogenousTransform.h \
+  /home/lawcc/vtk/common/vtkAbstractTransform.h \
   /home/lawcc/vtk/common/vtkPoints.h \
   /home/lawcc/vtk/common/vtkAttributeData.h \
   /home/lawcc/vtk/common/vtkNormals.h \
   /home/lawcc/vtk/common/vtkVectors.h \
   /home/lawcc/vtk/common/vtkMutexLock.h \
-  /home/lawcc/vtk/common/vtkProjectionTransform.h \
+  /home/lawcc/vtk/common/vtkPerspectiveTransform.h \
   /home/lawcc/vtk/graphics/vtkActor.h \
   /home/lawcc/vtk/graphics/vtkProp3D.h \
   /home/lawcc/vtk/graphics/vtkProperty.h \
@@ -747,12 +775,13 @@ vtkKWRenderView.o : ./vtkKWRenderView.cxx  \
   /home/lawcc/vtk/common/vtkPlaneCollection.h \
   /home/lawcc/vtk/common/vtkPlane.h \
   /home/lawcc/vtk/common/vtkImplicitFunction.h \
-  /home/lawcc/vtk/graphics/vtkAssemblyPaths.h \
   /home/lawcc/vtk/graphics/vtkActorCollection.h \
   /home/lawcc/vtk/graphics/vtkGraphicsFactory.h \
   ../Widgets/vtkKWRadioButton.h \
   ../Widgets/vtkKWMenu.h \
   /home/lawcc/vtk/graphics/vtkRenderWindowInteractor.h \
+  /home/lawcc/vtk/graphics/vtkAbstractPropPicker.h \
+  /home/lawcc/vtk/graphics/vtkAbstractPicker.h \
   ../Widgets/vtkKWWindow.h \
   ../Widgets/vtkKWProgressGauge.h \
   ../Widgets/vtkKWViewCollection.h \
@@ -797,6 +826,8 @@ vtkPVApplication.o : ./vtkPVApplication.cxx  \
   ../Widgets/vtkKWGenericComposite.h \
   /home/lawcc/vtk/common/vtkProp.h \
   /home/lawcc/vtk/common/vtkRayCastStructures.h \
+  /home/lawcc/vtk/common/vtkAssemblyPaths.h \
+  /home/lawcc/vtk/common/vtkAssemblyPath.h \
   /home/lawcc/vtk/imaging/vtkTextMapper.h \
   /home/lawcc/vtk/common/vtkMapper2D.h \
   /home/lawcc/vtk/common/vtkAbstractMapper.h \
@@ -823,14 +854,14 @@ vtkPVApplication.o : ./vtkPVApplication.cxx  \
   /home/lawcc/vtk/graphics/vtkCamera.h \
   /home/lawcc/vtk/common/vtkTransform.h \
   /home/lawcc/vtk/common/vtkLinearTransform.h \
-  /home/lawcc/vtk/common/vtkPerspectiveTransform.h \
-  /home/lawcc/vtk/common/vtkGeneralTransform.h \
+  /home/lawcc/vtk/common/vtkHomogenousTransform.h \
+  /home/lawcc/vtk/common/vtkAbstractTransform.h \
   /home/lawcc/vtk/common/vtkPoints.h \
   /home/lawcc/vtk/common/vtkAttributeData.h \
   /home/lawcc/vtk/common/vtkNormals.h \
   /home/lawcc/vtk/common/vtkVectors.h \
   /home/lawcc/vtk/common/vtkMutexLock.h \
-  /home/lawcc/vtk/common/vtkProjectionTransform.h \
+  /home/lawcc/vtk/common/vtkPerspectiveTransform.h \
   /home/lawcc/vtk/graphics/vtkActor.h \
   /home/lawcc/vtk/graphics/vtkProp3D.h \
   /home/lawcc/vtk/graphics/vtkProperty.h \
@@ -861,18 +892,111 @@ vtkPVApplication.o : ./vtkPVApplication.cxx  \
   /home/lawcc/vtk/common/vtkPlaneCollection.h \
   /home/lawcc/vtk/common/vtkPlane.h \
   /home/lawcc/vtk/common/vtkImplicitFunction.h \
-  /home/lawcc/vtk/graphics/vtkAssemblyPaths.h \
   /home/lawcc/vtk/graphics/vtkActorCollection.h \
   /home/lawcc/vtk/graphics/vtkGraphicsFactory.h \
   ../Widgets/vtkKWRadioButton.h \
   /home/lawcc/vtk/graphics/vtkInteractorStyle.h \
   /home/lawcc/vtk/graphics/vtkRenderWindowInteractor.h \
+  /home/lawcc/vtk/graphics/vtkAbstractPropPicker.h \
+  /home/lawcc/vtk/graphics/vtkAbstractPicker.h \
   ../Widgets/vtkKWDialog.h \
   ../Widgets/vtkKWWindowCollection.h \
   ../Widgets/vtkKWMessageDialog.h \
   /home/lawcc/vtk/common/vtkTimerLog.h \
   /home/lawcc/vtk/common/vtkObjectFactory.h \
   ./vtkPVSlave.h
+
+vtkPVImagePlaneComponent.o : ./vtkPVImagePlaneComponent.cxx  \
+  /home/lawcc/vtk/graphics/vtkPVImagePlaneComponent.h \
+  /home/lawcc/vtk/common/vtkImageData.h \
+  /home/lawcc/vtk/common/vtkDataSet.h \
+  /home/lawcc/vtk/common/vtkDataObject.h \
+  /home/lawcc/vtk/common/vtkObject.h \
+  /home/lawcc/vtk/common/vtkIndent.h \
+  /home/lawcc/vtk/common/vtkWin32Header.h \
+  /home/lawcc/vtk/common/vtkSystemIncludes.h \
+  /home/lawcc/vtk/common/vtkTimeStamp.h \
+  /home/lawcc/vtk/common/vtkSetGet.h \
+  /home/lawcc/vtk/common/vtkFieldData.h \
+  /home/lawcc/vtk/common/vtkDataArray.h \
+  /home/lawcc/vtk/common/vtkIdList.h \
+  /home/lawcc/vtk/common/vtkCellData.h \
+  /home/lawcc/vtk/common/vtkDataSetAttributes.h \
+  /home/lawcc/vtk/common/vtkScalars.h \
+  /home/lawcc/vtk/common/vtkAttributeData.h \
+  /home/lawcc/vtk/common/vtkVectors.h \
+  /home/lawcc/vtk/common/vtkNormals.h \
+  /home/lawcc/vtk/common/vtkTCoords.h \
+  /home/lawcc/vtk/common/vtkTensors.h \
+  /home/lawcc/vtk/common/vtkTensor.h \
+  /home/lawcc/vtk/common/vtkPointData.h \
+  /home/lawcc/vtk/common/vtkGenericCell.h \
+  /home/lawcc/vtk/common/vtkCell.h \
+  /home/lawcc/vtk/common/vtkPoints.h \
+  /home/lawcc/vtk/common/vtkCellType.h \
+  /home/lawcc/vtk/common/vtkCellTypes.h \
+  /home/lawcc/vtk/common/vtkStructuredData.h \
+  /home/lawcc/vtk/graphics/vtkActor.h \
+  /home/lawcc/vtk/graphics/vtkProp3D.h \
+  /home/lawcc/vtk/common/vtkProp.h \
+  /home/lawcc/vtk/common/vtkRayCastStructures.h \
+  /home/lawcc/vtk/common/vtkAssemblyPaths.h \
+  /home/lawcc/vtk/common/vtkCollection.h \
+  /home/lawcc/vtk/common/vtkAssemblyPath.h \
+  /home/lawcc/vtk/common/vtkTransform.h \
+  /home/lawcc/vtk/common/vtkLinearTransform.h \
+  /home/lawcc/vtk/common/vtkHomogenousTransform.h \
+  /home/lawcc/vtk/common/vtkAbstractTransform.h \
+  /home/lawcc/vtk/common/vtkMatrix4x4.h \
+  /home/lawcc/vtk/common/vtkMutexLock.h \
+  /home/lawcc/vtk/graphics/vtkProperty.h \
+  /home/lawcc/vtk/graphics/vtkRender.h \
+  /home/lawcc/vtk/common/vtkStructuredPoints.h \
+  /home/lawcc/vtk/graphics/vtkTexture.h \
+  /home/lawcc/vtk/common/vtkLookupTable.h \
+  /home/lawcc/vtk/common/vtkScalarsToColors.h \
+  /home/lawcc/vtk/common/vtkUnsignedCharArray.h \
+  /home/lawcc/vtk/common/vtkImageToStructuredPoints.h \
+  /home/lawcc/vtk/common/vtkSource.h \
+  /home/lawcc/vtk/common/vtkProcessObject.h \
+  /home/lawcc/vtk/graphics/vtkMapper.h \
+  /home/lawcc/vtk/graphics/vtkAbstractMapper3D.h \
+  /home/lawcc/vtk/common/vtkAbstractMapper.h \
+  /home/lawcc/vtk/common/vtkPlaneCollection.h \
+  /home/lawcc/vtk/common/vtkPlane.h \
+  /home/lawcc/vtk/common/vtkImplicitFunction.h \
+  /home/lawcc/vtk/common/vtkObjectFactory.h \
+  /home/lawcc/vtk/imaging/vtkImageClip.h \
+  /home/lawcc/vtk/imaging/vtkImageToImageFilter.h \
+  /home/lawcc/vtk/common/vtkImageSource.h \
+  /home/lawcc/vtk/common/vtkMultiThreader.h \
+  /home/lawcc/vtk/graphics/vtkExtractVOI.h \
+  /home/lawcc/vtk/graphics/vtkStructuredPointsToStructuredPointsFilter.h \
+  /home/lawcc/vtk/graphics/vtkStructuredPointsSource.h \
+  /home/lawcc/vtk/graphics/vtkPlaneSource.h \
+  /home/lawcc/vtk/graphics/vtkPolyDataSource.h \
+  /home/lawcc/vtk/common/vtkPolyData.h \
+  /home/lawcc/vtk/common/vtkPointSet.h \
+  /home/lawcc/vtk/common/vtkPointLocator.h \
+  /home/lawcc/vtk/common/vtkLocator.h \
+  /home/lawcc/vtk/common/vtkCellArray.h \
+  /home/lawcc/vtk/common/vtkIntArray.h \
+  /home/lawcc/vtk/common/vtkCellLinks.h \
+  /home/lawcc/vtk/graphics/vtkPolyDataMapper.h \
+  /home/lawcc/vtk/graphics/vtkRenderer.h \
+  /home/lawcc/vtk/graphics/vtkLightCollection.h \
+  /home/lawcc/vtk/graphics/vtkLight.h \
+  /home/lawcc/vtk/graphics/vtkVolumeCollection.h \
+  /home/lawcc/vtk/common/vtkPropCollection.h \
+  /home/lawcc/vtk/graphics/vtkCullerCollection.h \
+  /home/lawcc/vtk/graphics/vtkCamera.h \
+  /home/lawcc/vtk/common/vtkPerspectiveTransform.h \
+  /home/lawcc/vtk/common/vtkActor2D.h \
+  /home/lawcc/vtk/common/vtkCoordinate.h \
+  /home/lawcc/vtk/common/vtkProperty2D.h \
+  /home/lawcc/vtk/common/vtkViewport.h \
+  /home/lawcc/vtk/common/vtkActor2DCollection.h \
+  /home/lawcc/vtk/graphics/vtkActorCollection.h
 
 vtkPVRenderSlave.o : ./vtkPVRenderSlave.cxx  \
   ./vtkPVRenderSlave.h \
@@ -904,18 +1028,20 @@ vtkPVRenderSlave.o : ./vtkPVRenderSlave.cxx  \
   /home/lawcc/vtk/graphics/vtkCamera.h \
   /home/lawcc/vtk/common/vtkTransform.h \
   /home/lawcc/vtk/common/vtkLinearTransform.h \
-  /home/lawcc/vtk/common/vtkPerspectiveTransform.h \
-  /home/lawcc/vtk/common/vtkGeneralTransform.h \
+  /home/lawcc/vtk/common/vtkHomogenousTransform.h \
+  /home/lawcc/vtk/common/vtkAbstractTransform.h \
   /home/lawcc/vtk/common/vtkPoints.h \
   /home/lawcc/vtk/common/vtkAttributeData.h \
   /home/lawcc/vtk/common/vtkNormals.h \
   /home/lawcc/vtk/common/vtkVectors.h \
   /home/lawcc/vtk/common/vtkMutexLock.h \
-  /home/lawcc/vtk/common/vtkProjectionTransform.h \
+  /home/lawcc/vtk/common/vtkPerspectiveTransform.h \
   /home/lawcc/vtk/graphics/vtkActor.h \
   /home/lawcc/vtk/graphics/vtkProp3D.h \
   /home/lawcc/vtk/common/vtkProp.h \
   /home/lawcc/vtk/common/vtkRayCastStructures.h \
+  /home/lawcc/vtk/common/vtkAssemblyPaths.h \
+  /home/lawcc/vtk/common/vtkAssemblyPath.h \
   /home/lawcc/vtk/graphics/vtkProperty.h \
   /home/lawcc/vtk/graphics/vtkRender.h \
   /home/lawcc/vtk/common/vtkStructuredPoints.h \
@@ -946,13 +1072,12 @@ vtkPVRenderSlave.o : ./vtkPVRenderSlave.cxx  \
   /home/lawcc/vtk/common/vtkPlaneCollection.h \
   /home/lawcc/vtk/common/vtkPlane.h \
   /home/lawcc/vtk/common/vtkImplicitFunction.h \
-  /home/lawcc/vtk/graphics/vtkAssemblyPaths.h \
-  /home/lawcc/vtk/graphics/vtkActorCollection.h \
   /home/lawcc/vtk/common/vtkActor2D.h \
   /home/lawcc/vtk/common/vtkCoordinate.h \
   /home/lawcc/vtk/common/vtkProperty2D.h \
   /home/lawcc/vtk/common/vtkViewport.h \
   /home/lawcc/vtk/common/vtkActor2DCollection.h \
+  /home/lawcc/vtk/graphics/vtkActorCollection.h \
   /home/lawcc/vtk/graphics/vtkGraphicsFactory.h \
   ./vtkPVMesaRenderWindow.h \
   /home/lawcc/vtk/graphics/vtkMesaRenderWindow.h \
@@ -985,6 +1110,8 @@ vtkPVRenderView.o : ./vtkPVRenderView.cxx  \
   ../Widgets/vtkKWGenericComposite.h \
   /home/lawcc/vtk/common/vtkProp.h \
   /home/lawcc/vtk/common/vtkRayCastStructures.h \
+  /home/lawcc/vtk/common/vtkAssemblyPaths.h \
+  /home/lawcc/vtk/common/vtkAssemblyPath.h \
   /home/lawcc/vtk/imaging/vtkTextMapper.h \
   /home/lawcc/vtk/common/vtkMapper2D.h \
   /home/lawcc/vtk/common/vtkAbstractMapper.h \
@@ -1015,14 +1142,14 @@ vtkPVRenderView.o : ./vtkPVRenderView.cxx  \
   /home/lawcc/vtk/graphics/vtkCamera.h \
   /home/lawcc/vtk/common/vtkTransform.h \
   /home/lawcc/vtk/common/vtkLinearTransform.h \
-  /home/lawcc/vtk/common/vtkPerspectiveTransform.h \
-  /home/lawcc/vtk/common/vtkGeneralTransform.h \
+  /home/lawcc/vtk/common/vtkHomogenousTransform.h \
+  /home/lawcc/vtk/common/vtkAbstractTransform.h \
   /home/lawcc/vtk/common/vtkPoints.h \
   /home/lawcc/vtk/common/vtkAttributeData.h \
   /home/lawcc/vtk/common/vtkNormals.h \
   /home/lawcc/vtk/common/vtkVectors.h \
   /home/lawcc/vtk/common/vtkMutexLock.h \
-  /home/lawcc/vtk/common/vtkProjectionTransform.h \
+  /home/lawcc/vtk/common/vtkPerspectiveTransform.h \
   /home/lawcc/vtk/graphics/vtkActor.h \
   /home/lawcc/vtk/graphics/vtkProp3D.h \
   /home/lawcc/vtk/graphics/vtkProperty.h \
@@ -1053,13 +1180,14 @@ vtkPVRenderView.o : ./vtkPVRenderView.cxx  \
   /home/lawcc/vtk/common/vtkPlaneCollection.h \
   /home/lawcc/vtk/common/vtkPlane.h \
   /home/lawcc/vtk/common/vtkImplicitFunction.h \
-  /home/lawcc/vtk/graphics/vtkAssemblyPaths.h \
   /home/lawcc/vtk/graphics/vtkActorCollection.h \
   /home/lawcc/vtk/graphics/vtkGraphicsFactory.h \
   ../Widgets/vtkKWRadioButton.h \
   ../Widgets/vtkKWMenu.h \
   /home/lawcc/vtk/graphics/vtkInteractorStyle.h \
   /home/lawcc/vtk/graphics/vtkRenderWindowInteractor.h \
+  /home/lawcc/vtk/graphics/vtkAbstractPropPicker.h \
+  /home/lawcc/vtk/graphics/vtkAbstractPicker.h \
   ./vtkPVApplication.h \
   ../Widgets/vtkKWApplication.h \
   /home/lawcc/vtk/contrib/vtkMultiProcessController.h \
@@ -1067,6 +1195,8 @@ vtkPVRenderView.o : ./vtkPVRenderView.cxx  \
   /home/lawcc/vtk/common/vtkObjectFactory.h \
   ./vtkPVRenderSlave.h \
   ./vtkPVSlave.h \
+  /home/lawcc/vtk/graphics/vtkMesaRenderWindow.h \
+  /home/lawcc/vtk/graphics/vtkXRenderWindow.h \
   /home/lawcc/vtk/common/vtkTimerLog.h
 
 vtkPVSlave.o : ./vtkPVSlave.cxx  \
@@ -1125,6 +1255,8 @@ vtkPVWindow.o : ./vtkPVWindow.cxx  \
   ../Widgets/vtkKWGenericComposite.h \
   /home/lawcc/vtk/common/vtkProp.h \
   /home/lawcc/vtk/common/vtkRayCastStructures.h \
+  /home/lawcc/vtk/common/vtkAssemblyPaths.h \
+  /home/lawcc/vtk/common/vtkAssemblyPath.h \
   /home/lawcc/vtk/imaging/vtkTextMapper.h \
   /home/lawcc/vtk/common/vtkMapper2D.h \
   /home/lawcc/vtk/common/vtkAbstractMapper.h \
@@ -1151,14 +1283,14 @@ vtkPVWindow.o : ./vtkPVWindow.cxx  \
   /home/lawcc/vtk/graphics/vtkCamera.h \
   /home/lawcc/vtk/common/vtkTransform.h \
   /home/lawcc/vtk/common/vtkLinearTransform.h \
-  /home/lawcc/vtk/common/vtkPerspectiveTransform.h \
-  /home/lawcc/vtk/common/vtkGeneralTransform.h \
+  /home/lawcc/vtk/common/vtkHomogenousTransform.h \
+  /home/lawcc/vtk/common/vtkAbstractTransform.h \
   /home/lawcc/vtk/common/vtkPoints.h \
   /home/lawcc/vtk/common/vtkAttributeData.h \
   /home/lawcc/vtk/common/vtkNormals.h \
   /home/lawcc/vtk/common/vtkVectors.h \
   /home/lawcc/vtk/common/vtkMutexLock.h \
-  /home/lawcc/vtk/common/vtkProjectionTransform.h \
+  /home/lawcc/vtk/common/vtkPerspectiveTransform.h \
   /home/lawcc/vtk/graphics/vtkActor.h \
   /home/lawcc/vtk/graphics/vtkProp3D.h \
   /home/lawcc/vtk/graphics/vtkProperty.h \
@@ -1189,12 +1321,13 @@ vtkPVWindow.o : ./vtkPVWindow.cxx  \
   /home/lawcc/vtk/common/vtkPlaneCollection.h \
   /home/lawcc/vtk/common/vtkPlane.h \
   /home/lawcc/vtk/common/vtkImplicitFunction.h \
-  /home/lawcc/vtk/graphics/vtkAssemblyPaths.h \
   /home/lawcc/vtk/graphics/vtkActorCollection.h \
   /home/lawcc/vtk/graphics/vtkGraphicsFactory.h \
   ../Widgets/vtkKWRadioButton.h \
   /home/lawcc/vtk/graphics/vtkInteractorStyle.h \
   /home/lawcc/vtk/graphics/vtkRenderWindowInteractor.h \
+  /home/lawcc/vtk/graphics/vtkAbstractPropPicker.h \
+  /home/lawcc/vtk/graphics/vtkAbstractPicker.h \
   /home/lawcc/vtk/graphics/vtkOutlineFilter.h \
   /home/lawcc/vtk/graphics/vtkDataSetToPolyDataFilter.h \
   /home/lawcc/vtk/graphics/vtkPolyDataSource.h \
@@ -1211,7 +1344,15 @@ vtkPVWindow.o : ./vtkPVWindow.cxx  \
   /home/lawcc/vtk/graphics/vtkPlaneSource.h \
   /home/lawcc/vtk/graphics/vtkSphereSource.h \
   /home/lawcc/vtk/graphics/vtkPolyDataMapper.h \
-  ./vtkInteractorStyleCamera.h
+  ./vtkInteractorStyleCamera.h \
+  /home/lawcc/vtk/common/vtkMath.h \
+  /home/lawcc/vtk/imaging/vtkImageReader.h \
+  /home/lawcc/vtk/common/vtkImageSource.h \
+  /home/lawcc/vtk/graphics/vtkOutlineSource.h \
+  /home/lawcc/vtk/patented/vtkSynchronizedTemplates3D.h \
+  /home/lawcc/vtk/common/vtkContourValues.h \
+  /home/lawcc/vtk/common/vtkMultiThreader.h \
+  ../Widgets/vtkKWScale.h
 
 vtkPVMesaRenderWindow.o : ./vtkPVMesaRenderWindow.cxx  \
   ./vtkPVMesaRenderWindow.h \
@@ -1235,8 +1376,8 @@ vtkPVMesaRenderWindow.o : ./vtkPVMesaRenderWindow.cxx  \
   /home/lawcc/vtk/graphics/vtkCamera.h \
   /home/lawcc/vtk/common/vtkTransform.h \
   /home/lawcc/vtk/common/vtkLinearTransform.h \
-  /home/lawcc/vtk/common/vtkPerspectiveTransform.h \
-  /home/lawcc/vtk/common/vtkGeneralTransform.h \
+  /home/lawcc/vtk/common/vtkHomogenousTransform.h \
+  /home/lawcc/vtk/common/vtkAbstractTransform.h \
   /home/lawcc/vtk/common/vtkPoints.h \
   /home/lawcc/vtk/common/vtkAttributeData.h \
   /home/lawcc/vtk/common/vtkDataArray.h \
@@ -1244,11 +1385,13 @@ vtkPVMesaRenderWindow.o : ./vtkPVMesaRenderWindow.cxx  \
   /home/lawcc/vtk/common/vtkNormals.h \
   /home/lawcc/vtk/common/vtkVectors.h \
   /home/lawcc/vtk/common/vtkMutexLock.h \
-  /home/lawcc/vtk/common/vtkProjectionTransform.h \
+  /home/lawcc/vtk/common/vtkPerspectiveTransform.h \
   /home/lawcc/vtk/graphics/vtkActor.h \
   /home/lawcc/vtk/graphics/vtkProp3D.h \
   /home/lawcc/vtk/common/vtkProp.h \
   /home/lawcc/vtk/common/vtkRayCastStructures.h \
+  /home/lawcc/vtk/common/vtkAssemblyPaths.h \
+  /home/lawcc/vtk/common/vtkAssemblyPath.h \
   /home/lawcc/vtk/graphics/vtkProperty.h \
   /home/lawcc/vtk/graphics/vtkRender.h \
   /home/lawcc/vtk/common/vtkStructuredPoints.h \
@@ -1281,13 +1424,12 @@ vtkPVMesaRenderWindow.o : ./vtkPVMesaRenderWindow.cxx  \
   /home/lawcc/vtk/common/vtkPlaneCollection.h \
   /home/lawcc/vtk/common/vtkPlane.h \
   /home/lawcc/vtk/common/vtkImplicitFunction.h \
-  /home/lawcc/vtk/graphics/vtkAssemblyPaths.h \
-  /home/lawcc/vtk/graphics/vtkActorCollection.h \
   /home/lawcc/vtk/common/vtkActor2D.h \
   /home/lawcc/vtk/common/vtkCoordinate.h \
   /home/lawcc/vtk/common/vtkProperty2D.h \
   /home/lawcc/vtk/common/vtkViewport.h \
   /home/lawcc/vtk/common/vtkActor2DCollection.h \
+  /home/lawcc/vtk/graphics/vtkActorCollection.h \
   /home/lawcc/vtk/graphics/vtkGraphicsFactory.h \
   /home/lawcc/vtk/graphics/vtkMesaRenderer.h \
   /home/lawcc/vtk/graphics/vtkMesaProperty.h \
@@ -1329,8 +1471,8 @@ vtkInteractorStyleExtent.o : ./vtkInteractorStyleExtent.cxx  \
   /home/lawcc/vtk/graphics/vtkCamera.h \
   /home/lawcc/vtk/common/vtkTransform.h \
   /home/lawcc/vtk/common/vtkLinearTransform.h \
-  /home/lawcc/vtk/common/vtkPerspectiveTransform.h \
-  /home/lawcc/vtk/common/vtkGeneralTransform.h \
+  /home/lawcc/vtk/common/vtkHomogenousTransform.h \
+  /home/lawcc/vtk/common/vtkAbstractTransform.h \
   /home/lawcc/vtk/common/vtkPoints.h \
   /home/lawcc/vtk/common/vtkAttributeData.h \
   /home/lawcc/vtk/common/vtkDataArray.h \
@@ -1338,11 +1480,13 @@ vtkInteractorStyleExtent.o : ./vtkInteractorStyleExtent.cxx  \
   /home/lawcc/vtk/common/vtkNormals.h \
   /home/lawcc/vtk/common/vtkVectors.h \
   /home/lawcc/vtk/common/vtkMutexLock.h \
-  /home/lawcc/vtk/common/vtkProjectionTransform.h \
+  /home/lawcc/vtk/common/vtkPerspectiveTransform.h \
   /home/lawcc/vtk/graphics/vtkActor.h \
   /home/lawcc/vtk/graphics/vtkProp3D.h \
   /home/lawcc/vtk/common/vtkProp.h \
   /home/lawcc/vtk/common/vtkRayCastStructures.h \
+  /home/lawcc/vtk/common/vtkAssemblyPaths.h \
+  /home/lawcc/vtk/common/vtkAssemblyPath.h \
   /home/lawcc/vtk/graphics/vtkProperty.h \
   /home/lawcc/vtk/graphics/vtkRender.h \
   /home/lawcc/vtk/common/vtkStructuredPoints.h \
@@ -1375,14 +1519,15 @@ vtkInteractorStyleExtent.o : ./vtkInteractorStyleExtent.cxx  \
   /home/lawcc/vtk/common/vtkPlaneCollection.h \
   /home/lawcc/vtk/common/vtkPlane.h \
   /home/lawcc/vtk/common/vtkImplicitFunction.h \
-  /home/lawcc/vtk/graphics/vtkAssemblyPaths.h \
-  /home/lawcc/vtk/graphics/vtkActorCollection.h \
   /home/lawcc/vtk/common/vtkActor2D.h \
   /home/lawcc/vtk/common/vtkCoordinate.h \
   /home/lawcc/vtk/common/vtkProperty2D.h \
   /home/lawcc/vtk/common/vtkViewport.h \
   /home/lawcc/vtk/common/vtkActor2DCollection.h \
+  /home/lawcc/vtk/graphics/vtkActorCollection.h \
   /home/lawcc/vtk/graphics/vtkGraphicsFactory.h \
+  /home/lawcc/vtk/graphics/vtkAbstractPropPicker.h \
+  /home/lawcc/vtk/graphics/vtkAbstractPicker.h \
   /home/lawcc/vtk/common/vtkPolyData.h \
   /home/lawcc/vtk/common/vtkPointSet.h \
   /home/lawcc/vtk/common/vtkPointLocator.h \
@@ -1397,6 +1542,7 @@ vtkInteractorStyleExtent.o : ./vtkInteractorStyleExtent.cxx  \
   /home/lawcc/vtk/common/vtkMath.h \
   /home/lawcc/vtk/graphics/vtkCellPicker.h \
   /home/lawcc/vtk/graphics/vtkPicker.h \
+  /home/lawcc/vtk/graphics/vtkProp3DCollection.h \
   /home/lawcc/vtk/common/vtkObjectFactory.h
 
 
@@ -1423,8 +1569,8 @@ tcl/vtkDummyRenderWindowInteractorTcl.cxx : ./vtkDummyRenderWindowInteractor.h /
   /home/lawcc/vtk/graphics/vtkCamera.h \
   /home/lawcc/vtk/common/vtkTransform.h \
   /home/lawcc/vtk/common/vtkLinearTransform.h \
-  /home/lawcc/vtk/common/vtkPerspectiveTransform.h \
-  /home/lawcc/vtk/common/vtkGeneralTransform.h \
+  /home/lawcc/vtk/common/vtkHomogenousTransform.h \
+  /home/lawcc/vtk/common/vtkAbstractTransform.h \
   /home/lawcc/vtk/common/vtkPoints.h \
   /home/lawcc/vtk/common/vtkAttributeData.h \
   /home/lawcc/vtk/common/vtkDataArray.h \
@@ -1432,11 +1578,13 @@ tcl/vtkDummyRenderWindowInteractorTcl.cxx : ./vtkDummyRenderWindowInteractor.h /
   /home/lawcc/vtk/common/vtkNormals.h \
   /home/lawcc/vtk/common/vtkVectors.h \
   /home/lawcc/vtk/common/vtkMutexLock.h \
-  /home/lawcc/vtk/common/vtkProjectionTransform.h \
+  /home/lawcc/vtk/common/vtkPerspectiveTransform.h \
   /home/lawcc/vtk/graphics/vtkActor.h \
   /home/lawcc/vtk/graphics/vtkProp3D.h \
   /home/lawcc/vtk/common/vtkProp.h \
   /home/lawcc/vtk/common/vtkRayCastStructures.h \
+  /home/lawcc/vtk/common/vtkAssemblyPaths.h \
+  /home/lawcc/vtk/common/vtkAssemblyPath.h \
   /home/lawcc/vtk/graphics/vtkProperty.h \
   /home/lawcc/vtk/graphics/vtkRender.h \
   /home/lawcc/vtk/common/vtkStructuredPoints.h \
@@ -1469,14 +1617,15 @@ tcl/vtkDummyRenderWindowInteractorTcl.cxx : ./vtkDummyRenderWindowInteractor.h /
   /home/lawcc/vtk/common/vtkPlaneCollection.h \
   /home/lawcc/vtk/common/vtkPlane.h \
   /home/lawcc/vtk/common/vtkImplicitFunction.h \
-  /home/lawcc/vtk/graphics/vtkAssemblyPaths.h \
-  /home/lawcc/vtk/graphics/vtkActorCollection.h \
   /home/lawcc/vtk/common/vtkActor2D.h \
   /home/lawcc/vtk/common/vtkCoordinate.h \
   /home/lawcc/vtk/common/vtkProperty2D.h \
   /home/lawcc/vtk/common/vtkViewport.h \
   /home/lawcc/vtk/common/vtkActor2DCollection.h \
-  /home/lawcc/vtk/graphics/vtkGraphicsFactory.h
+  /home/lawcc/vtk/graphics/vtkActorCollection.h \
+  /home/lawcc/vtk/graphics/vtkGraphicsFactory.h \
+  /home/lawcc/vtk/graphics/vtkAbstractPropPicker.h \
+  /home/lawcc/vtk/graphics/vtkAbstractPicker.h
 
 tcl/vtkInteractorStyleCameraTcl.cxx : ./vtkInteractorStyleCamera.h /home/lawcc/vtk/common/vtkTclUtil.h /home/lawcc/vtk/wrap/vtkParse.y /home/lawcc/vtk/wrap/vtkWrapTcl.c \
   /home/lawcc/vtk/graphics/vtkInteractorStyle.h \
@@ -1501,8 +1650,8 @@ tcl/vtkInteractorStyleCameraTcl.cxx : ./vtkInteractorStyleCamera.h /home/lawcc/v
   /home/lawcc/vtk/graphics/vtkCamera.h \
   /home/lawcc/vtk/common/vtkTransform.h \
   /home/lawcc/vtk/common/vtkLinearTransform.h \
-  /home/lawcc/vtk/common/vtkPerspectiveTransform.h \
-  /home/lawcc/vtk/common/vtkGeneralTransform.h \
+  /home/lawcc/vtk/common/vtkHomogenousTransform.h \
+  /home/lawcc/vtk/common/vtkAbstractTransform.h \
   /home/lawcc/vtk/common/vtkPoints.h \
   /home/lawcc/vtk/common/vtkAttributeData.h \
   /home/lawcc/vtk/common/vtkDataArray.h \
@@ -1510,11 +1659,13 @@ tcl/vtkInteractorStyleCameraTcl.cxx : ./vtkInteractorStyleCamera.h /home/lawcc/v
   /home/lawcc/vtk/common/vtkNormals.h \
   /home/lawcc/vtk/common/vtkVectors.h \
   /home/lawcc/vtk/common/vtkMutexLock.h \
-  /home/lawcc/vtk/common/vtkProjectionTransform.h \
+  /home/lawcc/vtk/common/vtkPerspectiveTransform.h \
   /home/lawcc/vtk/graphics/vtkActor.h \
   /home/lawcc/vtk/graphics/vtkProp3D.h \
   /home/lawcc/vtk/common/vtkProp.h \
   /home/lawcc/vtk/common/vtkRayCastStructures.h \
+  /home/lawcc/vtk/common/vtkAssemblyPaths.h \
+  /home/lawcc/vtk/common/vtkAssemblyPath.h \
   /home/lawcc/vtk/graphics/vtkProperty.h \
   /home/lawcc/vtk/graphics/vtkRender.h \
   /home/lawcc/vtk/common/vtkStructuredPoints.h \
@@ -1547,14 +1698,15 @@ tcl/vtkInteractorStyleCameraTcl.cxx : ./vtkInteractorStyleCamera.h /home/lawcc/v
   /home/lawcc/vtk/common/vtkPlaneCollection.h \
   /home/lawcc/vtk/common/vtkPlane.h \
   /home/lawcc/vtk/common/vtkImplicitFunction.h \
-  /home/lawcc/vtk/graphics/vtkAssemblyPaths.h \
-  /home/lawcc/vtk/graphics/vtkActorCollection.h \
   /home/lawcc/vtk/common/vtkActor2D.h \
   /home/lawcc/vtk/common/vtkCoordinate.h \
   /home/lawcc/vtk/common/vtkProperty2D.h \
   /home/lawcc/vtk/common/vtkViewport.h \
   /home/lawcc/vtk/common/vtkActor2DCollection.h \
-  /home/lawcc/vtk/graphics/vtkGraphicsFactory.h
+  /home/lawcc/vtk/graphics/vtkActorCollection.h \
+  /home/lawcc/vtk/graphics/vtkGraphicsFactory.h \
+  /home/lawcc/vtk/graphics/vtkAbstractPropPicker.h \
+  /home/lawcc/vtk/graphics/vtkAbstractPicker.h
 
 tcl/vtkInteractorStyleGridExtentTcl.cxx : ./vtkInteractorStyleGridExtent.h /home/lawcc/vtk/common/vtkTclUtil.h /home/lawcc/vtk/wrap/vtkParse.y /home/lawcc/vtk/wrap/vtkWrapTcl.c \
   ./vtkInteractorStyleExtent.h \
@@ -1580,8 +1732,8 @@ tcl/vtkInteractorStyleGridExtentTcl.cxx : ./vtkInteractorStyleGridExtent.h /home
   /home/lawcc/vtk/graphics/vtkCamera.h \
   /home/lawcc/vtk/common/vtkTransform.h \
   /home/lawcc/vtk/common/vtkLinearTransform.h \
-  /home/lawcc/vtk/common/vtkPerspectiveTransform.h \
-  /home/lawcc/vtk/common/vtkGeneralTransform.h \
+  /home/lawcc/vtk/common/vtkHomogenousTransform.h \
+  /home/lawcc/vtk/common/vtkAbstractTransform.h \
   /home/lawcc/vtk/common/vtkPoints.h \
   /home/lawcc/vtk/common/vtkAttributeData.h \
   /home/lawcc/vtk/common/vtkDataArray.h \
@@ -1589,11 +1741,13 @@ tcl/vtkInteractorStyleGridExtentTcl.cxx : ./vtkInteractorStyleGridExtent.h /home
   /home/lawcc/vtk/common/vtkNormals.h \
   /home/lawcc/vtk/common/vtkVectors.h \
   /home/lawcc/vtk/common/vtkMutexLock.h \
-  /home/lawcc/vtk/common/vtkProjectionTransform.h \
+  /home/lawcc/vtk/common/vtkPerspectiveTransform.h \
   /home/lawcc/vtk/graphics/vtkActor.h \
   /home/lawcc/vtk/graphics/vtkProp3D.h \
   /home/lawcc/vtk/common/vtkProp.h \
   /home/lawcc/vtk/common/vtkRayCastStructures.h \
+  /home/lawcc/vtk/common/vtkAssemblyPaths.h \
+  /home/lawcc/vtk/common/vtkAssemblyPath.h \
   /home/lawcc/vtk/graphics/vtkProperty.h \
   /home/lawcc/vtk/graphics/vtkRender.h \
   /home/lawcc/vtk/common/vtkStructuredPoints.h \
@@ -1626,14 +1780,15 @@ tcl/vtkInteractorStyleGridExtentTcl.cxx : ./vtkInteractorStyleGridExtent.h /home
   /home/lawcc/vtk/common/vtkPlaneCollection.h \
   /home/lawcc/vtk/common/vtkPlane.h \
   /home/lawcc/vtk/common/vtkImplicitFunction.h \
-  /home/lawcc/vtk/graphics/vtkAssemblyPaths.h \
-  /home/lawcc/vtk/graphics/vtkActorCollection.h \
   /home/lawcc/vtk/common/vtkActor2D.h \
   /home/lawcc/vtk/common/vtkCoordinate.h \
   /home/lawcc/vtk/common/vtkProperty2D.h \
   /home/lawcc/vtk/common/vtkViewport.h \
   /home/lawcc/vtk/common/vtkActor2DCollection.h \
+  /home/lawcc/vtk/graphics/vtkActorCollection.h \
   /home/lawcc/vtk/graphics/vtkGraphicsFactory.h \
+  /home/lawcc/vtk/graphics/vtkAbstractPropPicker.h \
+  /home/lawcc/vtk/graphics/vtkAbstractPicker.h \
   /home/lawcc/vtk/common/vtkPolyData.h \
   /home/lawcc/vtk/common/vtkPointSet.h \
   /home/lawcc/vtk/common/vtkPointLocator.h \
@@ -1669,8 +1824,8 @@ tcl/vtkInteractorStyleImageExtentTcl.cxx : ./vtkInteractorStyleImageExtent.h /ho
   /home/lawcc/vtk/graphics/vtkCamera.h \
   /home/lawcc/vtk/common/vtkTransform.h \
   /home/lawcc/vtk/common/vtkLinearTransform.h \
-  /home/lawcc/vtk/common/vtkPerspectiveTransform.h \
-  /home/lawcc/vtk/common/vtkGeneralTransform.h \
+  /home/lawcc/vtk/common/vtkHomogenousTransform.h \
+  /home/lawcc/vtk/common/vtkAbstractTransform.h \
   /home/lawcc/vtk/common/vtkPoints.h \
   /home/lawcc/vtk/common/vtkAttributeData.h \
   /home/lawcc/vtk/common/vtkDataArray.h \
@@ -1678,11 +1833,13 @@ tcl/vtkInteractorStyleImageExtentTcl.cxx : ./vtkInteractorStyleImageExtent.h /ho
   /home/lawcc/vtk/common/vtkNormals.h \
   /home/lawcc/vtk/common/vtkVectors.h \
   /home/lawcc/vtk/common/vtkMutexLock.h \
-  /home/lawcc/vtk/common/vtkProjectionTransform.h \
+  /home/lawcc/vtk/common/vtkPerspectiveTransform.h \
   /home/lawcc/vtk/graphics/vtkActor.h \
   /home/lawcc/vtk/graphics/vtkProp3D.h \
   /home/lawcc/vtk/common/vtkProp.h \
   /home/lawcc/vtk/common/vtkRayCastStructures.h \
+  /home/lawcc/vtk/common/vtkAssemblyPaths.h \
+  /home/lawcc/vtk/common/vtkAssemblyPath.h \
   /home/lawcc/vtk/graphics/vtkProperty.h \
   /home/lawcc/vtk/graphics/vtkRender.h \
   /home/lawcc/vtk/common/vtkStructuredPoints.h \
@@ -1715,14 +1872,15 @@ tcl/vtkInteractorStyleImageExtentTcl.cxx : ./vtkInteractorStyleImageExtent.h /ho
   /home/lawcc/vtk/common/vtkPlaneCollection.h \
   /home/lawcc/vtk/common/vtkPlane.h \
   /home/lawcc/vtk/common/vtkImplicitFunction.h \
-  /home/lawcc/vtk/graphics/vtkAssemblyPaths.h \
-  /home/lawcc/vtk/graphics/vtkActorCollection.h \
   /home/lawcc/vtk/common/vtkActor2D.h \
   /home/lawcc/vtk/common/vtkCoordinate.h \
   /home/lawcc/vtk/common/vtkProperty2D.h \
   /home/lawcc/vtk/common/vtkViewport.h \
   /home/lawcc/vtk/common/vtkActor2DCollection.h \
+  /home/lawcc/vtk/graphics/vtkActorCollection.h \
   /home/lawcc/vtk/graphics/vtkGraphicsFactory.h \
+  /home/lawcc/vtk/graphics/vtkAbstractPropPicker.h \
+  /home/lawcc/vtk/graphics/vtkAbstractPicker.h \
   /home/lawcc/vtk/common/vtkPolyData.h \
   /home/lawcc/vtk/common/vtkPointSet.h \
   /home/lawcc/vtk/common/vtkPointLocator.h \
@@ -1756,8 +1914,8 @@ tcl/vtkInteractorStylePlaneTcl.cxx : ./vtkInteractorStylePlane.h /home/lawcc/vtk
   /home/lawcc/vtk/graphics/vtkCamera.h \
   /home/lawcc/vtk/common/vtkTransform.h \
   /home/lawcc/vtk/common/vtkLinearTransform.h \
-  /home/lawcc/vtk/common/vtkPerspectiveTransform.h \
-  /home/lawcc/vtk/common/vtkGeneralTransform.h \
+  /home/lawcc/vtk/common/vtkHomogenousTransform.h \
+  /home/lawcc/vtk/common/vtkAbstractTransform.h \
   /home/lawcc/vtk/common/vtkPoints.h \
   /home/lawcc/vtk/common/vtkAttributeData.h \
   /home/lawcc/vtk/common/vtkDataArray.h \
@@ -1765,11 +1923,13 @@ tcl/vtkInteractorStylePlaneTcl.cxx : ./vtkInteractorStylePlane.h /home/lawcc/vtk
   /home/lawcc/vtk/common/vtkNormals.h \
   /home/lawcc/vtk/common/vtkVectors.h \
   /home/lawcc/vtk/common/vtkMutexLock.h \
-  /home/lawcc/vtk/common/vtkProjectionTransform.h \
+  /home/lawcc/vtk/common/vtkPerspectiveTransform.h \
   /home/lawcc/vtk/graphics/vtkActor.h \
   /home/lawcc/vtk/graphics/vtkProp3D.h \
   /home/lawcc/vtk/common/vtkProp.h \
   /home/lawcc/vtk/common/vtkRayCastStructures.h \
+  /home/lawcc/vtk/common/vtkAssemblyPaths.h \
+  /home/lawcc/vtk/common/vtkAssemblyPath.h \
   /home/lawcc/vtk/graphics/vtkProperty.h \
   /home/lawcc/vtk/graphics/vtkRender.h \
   /home/lawcc/vtk/common/vtkStructuredPoints.h \
@@ -1802,14 +1962,15 @@ tcl/vtkInteractorStylePlaneTcl.cxx : ./vtkInteractorStylePlane.h /home/lawcc/vtk
   /home/lawcc/vtk/common/vtkPlaneCollection.h \
   /home/lawcc/vtk/common/vtkPlane.h \
   /home/lawcc/vtk/common/vtkImplicitFunction.h \
-  /home/lawcc/vtk/graphics/vtkAssemblyPaths.h \
-  /home/lawcc/vtk/graphics/vtkActorCollection.h \
   /home/lawcc/vtk/common/vtkActor2D.h \
   /home/lawcc/vtk/common/vtkCoordinate.h \
   /home/lawcc/vtk/common/vtkProperty2D.h \
   /home/lawcc/vtk/common/vtkViewport.h \
   /home/lawcc/vtk/common/vtkActor2DCollection.h \
+  /home/lawcc/vtk/graphics/vtkActorCollection.h \
   /home/lawcc/vtk/graphics/vtkGraphicsFactory.h \
+  /home/lawcc/vtk/graphics/vtkAbstractPropPicker.h \
+  /home/lawcc/vtk/graphics/vtkAbstractPicker.h \
   /home/lawcc/vtk/graphics/vtkSphereSource.h \
   /home/lawcc/vtk/graphics/vtkPolyDataSource.h \
   /home/lawcc/vtk/common/vtkPolyData.h \
@@ -1844,8 +2005,8 @@ tcl/vtkInteractorStylePlaneSourceTcl.cxx : ./vtkInteractorStylePlaneSource.h /ho
   /home/lawcc/vtk/graphics/vtkCamera.h \
   /home/lawcc/vtk/common/vtkTransform.h \
   /home/lawcc/vtk/common/vtkLinearTransform.h \
-  /home/lawcc/vtk/common/vtkPerspectiveTransform.h \
-  /home/lawcc/vtk/common/vtkGeneralTransform.h \
+  /home/lawcc/vtk/common/vtkHomogenousTransform.h \
+  /home/lawcc/vtk/common/vtkAbstractTransform.h \
   /home/lawcc/vtk/common/vtkPoints.h \
   /home/lawcc/vtk/common/vtkAttributeData.h \
   /home/lawcc/vtk/common/vtkDataArray.h \
@@ -1853,11 +2014,13 @@ tcl/vtkInteractorStylePlaneSourceTcl.cxx : ./vtkInteractorStylePlaneSource.h /ho
   /home/lawcc/vtk/common/vtkNormals.h \
   /home/lawcc/vtk/common/vtkVectors.h \
   /home/lawcc/vtk/common/vtkMutexLock.h \
-  /home/lawcc/vtk/common/vtkProjectionTransform.h \
+  /home/lawcc/vtk/common/vtkPerspectiveTransform.h \
   /home/lawcc/vtk/graphics/vtkActor.h \
   /home/lawcc/vtk/graphics/vtkProp3D.h \
   /home/lawcc/vtk/common/vtkProp.h \
   /home/lawcc/vtk/common/vtkRayCastStructures.h \
+  /home/lawcc/vtk/common/vtkAssemblyPaths.h \
+  /home/lawcc/vtk/common/vtkAssemblyPath.h \
   /home/lawcc/vtk/graphics/vtkProperty.h \
   /home/lawcc/vtk/graphics/vtkRender.h \
   /home/lawcc/vtk/common/vtkStructuredPoints.h \
@@ -1890,14 +2053,15 @@ tcl/vtkInteractorStylePlaneSourceTcl.cxx : ./vtkInteractorStylePlaneSource.h /ho
   /home/lawcc/vtk/common/vtkPlaneCollection.h \
   /home/lawcc/vtk/common/vtkPlane.h \
   /home/lawcc/vtk/common/vtkImplicitFunction.h \
-  /home/lawcc/vtk/graphics/vtkAssemblyPaths.h \
-  /home/lawcc/vtk/graphics/vtkActorCollection.h \
   /home/lawcc/vtk/common/vtkActor2D.h \
   /home/lawcc/vtk/common/vtkCoordinate.h \
   /home/lawcc/vtk/common/vtkProperty2D.h \
   /home/lawcc/vtk/common/vtkViewport.h \
   /home/lawcc/vtk/common/vtkActor2DCollection.h \
+  /home/lawcc/vtk/graphics/vtkActorCollection.h \
   /home/lawcc/vtk/graphics/vtkGraphicsFactory.h \
+  /home/lawcc/vtk/graphics/vtkAbstractPropPicker.h \
+  /home/lawcc/vtk/graphics/vtkAbstractPicker.h \
   /home/lawcc/vtk/graphics/vtkPlaneSource.h \
   /home/lawcc/vtk/graphics/vtkPolyDataSource.h \
   /home/lawcc/vtk/common/vtkPolyData.h \
@@ -1933,8 +2097,8 @@ tcl/vtkInteractorStyleSphereTcl.cxx : ./vtkInteractorStyleSphere.h /home/lawcc/v
   /home/lawcc/vtk/graphics/vtkCamera.h \
   /home/lawcc/vtk/common/vtkTransform.h \
   /home/lawcc/vtk/common/vtkLinearTransform.h \
-  /home/lawcc/vtk/common/vtkPerspectiveTransform.h \
-  /home/lawcc/vtk/common/vtkGeneralTransform.h \
+  /home/lawcc/vtk/common/vtkHomogenousTransform.h \
+  /home/lawcc/vtk/common/vtkAbstractTransform.h \
   /home/lawcc/vtk/common/vtkPoints.h \
   /home/lawcc/vtk/common/vtkAttributeData.h \
   /home/lawcc/vtk/common/vtkDataArray.h \
@@ -1942,11 +2106,13 @@ tcl/vtkInteractorStyleSphereTcl.cxx : ./vtkInteractorStyleSphere.h /home/lawcc/v
   /home/lawcc/vtk/common/vtkNormals.h \
   /home/lawcc/vtk/common/vtkVectors.h \
   /home/lawcc/vtk/common/vtkMutexLock.h \
-  /home/lawcc/vtk/common/vtkProjectionTransform.h \
+  /home/lawcc/vtk/common/vtkPerspectiveTransform.h \
   /home/lawcc/vtk/graphics/vtkActor.h \
   /home/lawcc/vtk/graphics/vtkProp3D.h \
   /home/lawcc/vtk/common/vtkProp.h \
   /home/lawcc/vtk/common/vtkRayCastStructures.h \
+  /home/lawcc/vtk/common/vtkAssemblyPaths.h \
+  /home/lawcc/vtk/common/vtkAssemblyPath.h \
   /home/lawcc/vtk/graphics/vtkProperty.h \
   /home/lawcc/vtk/graphics/vtkRender.h \
   /home/lawcc/vtk/common/vtkStructuredPoints.h \
@@ -1979,14 +2145,15 @@ tcl/vtkInteractorStyleSphereTcl.cxx : ./vtkInteractorStyleSphere.h /home/lawcc/v
   /home/lawcc/vtk/common/vtkPlaneCollection.h \
   /home/lawcc/vtk/common/vtkPlane.h \
   /home/lawcc/vtk/common/vtkImplicitFunction.h \
-  /home/lawcc/vtk/graphics/vtkAssemblyPaths.h \
-  /home/lawcc/vtk/graphics/vtkActorCollection.h \
   /home/lawcc/vtk/common/vtkActor2D.h \
   /home/lawcc/vtk/common/vtkCoordinate.h \
   /home/lawcc/vtk/common/vtkProperty2D.h \
   /home/lawcc/vtk/common/vtkViewport.h \
   /home/lawcc/vtk/common/vtkActor2DCollection.h \
+  /home/lawcc/vtk/graphics/vtkActorCollection.h \
   /home/lawcc/vtk/graphics/vtkGraphicsFactory.h \
+  /home/lawcc/vtk/graphics/vtkAbstractPropPicker.h \
+  /home/lawcc/vtk/graphics/vtkAbstractPicker.h \
   /home/lawcc/vtk/graphics/vtkSphereSource.h \
   /home/lawcc/vtk/graphics/vtkPolyDataSource.h \
   /home/lawcc/vtk/common/vtkPolyData.h \
@@ -2021,6 +2188,8 @@ tcl/vtkKWRenderViewTcl.cxx : ./vtkKWRenderView.h /home/lawcc/vtk/common/vtkTclUt
   ../Widgets/vtkKWGenericComposite.h \
   /home/lawcc/vtk/common/vtkProp.h \
   /home/lawcc/vtk/common/vtkRayCastStructures.h \
+  /home/lawcc/vtk/common/vtkAssemblyPaths.h \
+  /home/lawcc/vtk/common/vtkAssemblyPath.h \
   /home/lawcc/vtk/imaging/vtkTextMapper.h \
   /home/lawcc/vtk/common/vtkMapper2D.h \
   /home/lawcc/vtk/common/vtkAbstractMapper.h \
@@ -2051,14 +2220,14 @@ tcl/vtkKWRenderViewTcl.cxx : ./vtkKWRenderView.h /home/lawcc/vtk/common/vtkTclUt
   /home/lawcc/vtk/graphics/vtkCamera.h \
   /home/lawcc/vtk/common/vtkTransform.h \
   /home/lawcc/vtk/common/vtkLinearTransform.h \
-  /home/lawcc/vtk/common/vtkPerspectiveTransform.h \
-  /home/lawcc/vtk/common/vtkGeneralTransform.h \
+  /home/lawcc/vtk/common/vtkHomogenousTransform.h \
+  /home/lawcc/vtk/common/vtkAbstractTransform.h \
   /home/lawcc/vtk/common/vtkPoints.h \
   /home/lawcc/vtk/common/vtkAttributeData.h \
   /home/lawcc/vtk/common/vtkNormals.h \
   /home/lawcc/vtk/common/vtkVectors.h \
   /home/lawcc/vtk/common/vtkMutexLock.h \
-  /home/lawcc/vtk/common/vtkProjectionTransform.h \
+  /home/lawcc/vtk/common/vtkPerspectiveTransform.h \
   /home/lawcc/vtk/graphics/vtkActor.h \
   /home/lawcc/vtk/graphics/vtkProp3D.h \
   /home/lawcc/vtk/graphics/vtkProperty.h \
@@ -2089,7 +2258,6 @@ tcl/vtkKWRenderViewTcl.cxx : ./vtkKWRenderView.h /home/lawcc/vtk/common/vtkTclUt
   /home/lawcc/vtk/common/vtkPlaneCollection.h \
   /home/lawcc/vtk/common/vtkPlane.h \
   /home/lawcc/vtk/common/vtkImplicitFunction.h \
-  /home/lawcc/vtk/graphics/vtkAssemblyPaths.h \
   /home/lawcc/vtk/graphics/vtkActorCollection.h \
   /home/lawcc/vtk/graphics/vtkGraphicsFactory.h \
   ../Widgets/vtkKWRadioButton.h \
@@ -2110,6 +2278,65 @@ tcl/vtkPVApplicationTcl.cxx : ./vtkPVApplication.h /home/lawcc/vtk/common/vtkTcl
   /home/lawcc/vtk/common/vtkFieldData.h \
   /home/lawcc/vtk/common/vtkDataArray.h \
   /home/lawcc/vtk/common/vtkIdList.h
+
+tcl/vtkPVImagePlaneComponentTcl.cxx : ./vtkPVImagePlaneComponent.h /home/lawcc/vtk/common/vtkTclUtil.h /home/lawcc/vtk/wrap/vtkParse.y /home/lawcc/vtk/wrap/vtkWrapTcl.c \
+  /home/lawcc/vtk/common/vtkImageData.h \
+  /home/lawcc/vtk/common/vtkDataSet.h \
+  /home/lawcc/vtk/common/vtkDataObject.h \
+  /home/lawcc/vtk/common/vtkObject.h \
+  /home/lawcc/vtk/common/vtkIndent.h \
+  /home/lawcc/vtk/common/vtkWin32Header.h \
+  /home/lawcc/vtk/common/vtkSystemIncludes.h \
+  /home/lawcc/vtk/common/vtkTimeStamp.h \
+  /home/lawcc/vtk/common/vtkSetGet.h \
+  /home/lawcc/vtk/common/vtkFieldData.h \
+  /home/lawcc/vtk/common/vtkDataArray.h \
+  /home/lawcc/vtk/common/vtkIdList.h \
+  /home/lawcc/vtk/common/vtkCellData.h \
+  /home/lawcc/vtk/common/vtkDataSetAttributes.h \
+  /home/lawcc/vtk/common/vtkScalars.h \
+  /home/lawcc/vtk/common/vtkAttributeData.h \
+  /home/lawcc/vtk/common/vtkVectors.h \
+  /home/lawcc/vtk/common/vtkNormals.h \
+  /home/lawcc/vtk/common/vtkTCoords.h \
+  /home/lawcc/vtk/common/vtkTensors.h \
+  /home/lawcc/vtk/common/vtkTensor.h \
+  /home/lawcc/vtk/common/vtkPointData.h \
+  /home/lawcc/vtk/common/vtkGenericCell.h \
+  /home/lawcc/vtk/common/vtkCell.h \
+  /home/lawcc/vtk/common/vtkPoints.h \
+  /home/lawcc/vtk/common/vtkCellType.h \
+  /home/lawcc/vtk/common/vtkCellTypes.h \
+  /home/lawcc/vtk/common/vtkStructuredData.h \
+  /home/lawcc/vtk/graphics/vtkActor.h \
+  /home/lawcc/vtk/graphics/vtkProp3D.h \
+  /home/lawcc/vtk/common/vtkProp.h \
+  /home/lawcc/vtk/common/vtkRayCastStructures.h \
+  /home/lawcc/vtk/common/vtkAssemblyPaths.h \
+  /home/lawcc/vtk/common/vtkCollection.h \
+  /home/lawcc/vtk/common/vtkAssemblyPath.h \
+  /home/lawcc/vtk/common/vtkTransform.h \
+  /home/lawcc/vtk/common/vtkLinearTransform.h \
+  /home/lawcc/vtk/common/vtkHomogenousTransform.h \
+  /home/lawcc/vtk/common/vtkAbstractTransform.h \
+  /home/lawcc/vtk/common/vtkMatrix4x4.h \
+  /home/lawcc/vtk/common/vtkMutexLock.h \
+  /home/lawcc/vtk/graphics/vtkProperty.h \
+  /home/lawcc/vtk/graphics/vtkRender.h \
+  /home/lawcc/vtk/common/vtkStructuredPoints.h \
+  /home/lawcc/vtk/graphics/vtkTexture.h \
+  /home/lawcc/vtk/common/vtkLookupTable.h \
+  /home/lawcc/vtk/common/vtkScalarsToColors.h \
+  /home/lawcc/vtk/common/vtkUnsignedCharArray.h \
+  /home/lawcc/vtk/common/vtkImageToStructuredPoints.h \
+  /home/lawcc/vtk/common/vtkSource.h \
+  /home/lawcc/vtk/common/vtkProcessObject.h \
+  /home/lawcc/vtk/graphics/vtkMapper.h \
+  /home/lawcc/vtk/graphics/vtkAbstractMapper3D.h \
+  /home/lawcc/vtk/common/vtkAbstractMapper.h \
+  /home/lawcc/vtk/common/vtkPlaneCollection.h \
+  /home/lawcc/vtk/common/vtkPlane.h \
+  /home/lawcc/vtk/common/vtkImplicitFunction.h
 
 tcl/vtkPVRenderSlaveTcl.cxx : ./vtkPVRenderSlave.h /home/lawcc/vtk/common/vtkTclUtil.h /home/lawcc/vtk/wrap/vtkParse.y /home/lawcc/vtk/wrap/vtkWrapTcl.c \
   ../Widgets/vtkKWObject.h \
@@ -2140,18 +2367,20 @@ tcl/vtkPVRenderSlaveTcl.cxx : ./vtkPVRenderSlave.h /home/lawcc/vtk/common/vtkTcl
   /home/lawcc/vtk/graphics/vtkCamera.h \
   /home/lawcc/vtk/common/vtkTransform.h \
   /home/lawcc/vtk/common/vtkLinearTransform.h \
-  /home/lawcc/vtk/common/vtkPerspectiveTransform.h \
-  /home/lawcc/vtk/common/vtkGeneralTransform.h \
+  /home/lawcc/vtk/common/vtkHomogenousTransform.h \
+  /home/lawcc/vtk/common/vtkAbstractTransform.h \
   /home/lawcc/vtk/common/vtkPoints.h \
   /home/lawcc/vtk/common/vtkAttributeData.h \
   /home/lawcc/vtk/common/vtkNormals.h \
   /home/lawcc/vtk/common/vtkVectors.h \
   /home/lawcc/vtk/common/vtkMutexLock.h \
-  /home/lawcc/vtk/common/vtkProjectionTransform.h \
+  /home/lawcc/vtk/common/vtkPerspectiveTransform.h \
   /home/lawcc/vtk/graphics/vtkActor.h \
   /home/lawcc/vtk/graphics/vtkProp3D.h \
   /home/lawcc/vtk/common/vtkProp.h \
   /home/lawcc/vtk/common/vtkRayCastStructures.h \
+  /home/lawcc/vtk/common/vtkAssemblyPaths.h \
+  /home/lawcc/vtk/common/vtkAssemblyPath.h \
   /home/lawcc/vtk/graphics/vtkProperty.h \
   /home/lawcc/vtk/graphics/vtkRender.h \
   /home/lawcc/vtk/common/vtkStructuredPoints.h \
@@ -2182,13 +2411,12 @@ tcl/vtkPVRenderSlaveTcl.cxx : ./vtkPVRenderSlave.h /home/lawcc/vtk/common/vtkTcl
   /home/lawcc/vtk/common/vtkPlaneCollection.h \
   /home/lawcc/vtk/common/vtkPlane.h \
   /home/lawcc/vtk/common/vtkImplicitFunction.h \
-  /home/lawcc/vtk/graphics/vtkAssemblyPaths.h \
-  /home/lawcc/vtk/graphics/vtkActorCollection.h \
   /home/lawcc/vtk/common/vtkActor2D.h \
   /home/lawcc/vtk/common/vtkCoordinate.h \
   /home/lawcc/vtk/common/vtkProperty2D.h \
   /home/lawcc/vtk/common/vtkViewport.h \
   /home/lawcc/vtk/common/vtkActor2DCollection.h \
+  /home/lawcc/vtk/graphics/vtkActorCollection.h \
   /home/lawcc/vtk/graphics/vtkGraphicsFactory.h
 
 tcl/vtkPVRenderViewTcl.cxx : ./vtkPVRenderView.h /home/lawcc/vtk/common/vtkTclUtil.h /home/lawcc/vtk/wrap/vtkParse.y /home/lawcc/vtk/wrap/vtkWrapTcl.c \
@@ -2214,6 +2442,8 @@ tcl/vtkPVRenderViewTcl.cxx : ./vtkPVRenderView.h /home/lawcc/vtk/common/vtkTclUt
   ../Widgets/vtkKWGenericComposite.h \
   /home/lawcc/vtk/common/vtkProp.h \
   /home/lawcc/vtk/common/vtkRayCastStructures.h \
+  /home/lawcc/vtk/common/vtkAssemblyPaths.h \
+  /home/lawcc/vtk/common/vtkAssemblyPath.h \
   /home/lawcc/vtk/imaging/vtkTextMapper.h \
   /home/lawcc/vtk/common/vtkMapper2D.h \
   /home/lawcc/vtk/common/vtkAbstractMapper.h \
@@ -2244,14 +2474,14 @@ tcl/vtkPVRenderViewTcl.cxx : ./vtkPVRenderView.h /home/lawcc/vtk/common/vtkTclUt
   /home/lawcc/vtk/graphics/vtkCamera.h \
   /home/lawcc/vtk/common/vtkTransform.h \
   /home/lawcc/vtk/common/vtkLinearTransform.h \
-  /home/lawcc/vtk/common/vtkPerspectiveTransform.h \
-  /home/lawcc/vtk/common/vtkGeneralTransform.h \
+  /home/lawcc/vtk/common/vtkHomogenousTransform.h \
+  /home/lawcc/vtk/common/vtkAbstractTransform.h \
   /home/lawcc/vtk/common/vtkPoints.h \
   /home/lawcc/vtk/common/vtkAttributeData.h \
   /home/lawcc/vtk/common/vtkNormals.h \
   /home/lawcc/vtk/common/vtkVectors.h \
   /home/lawcc/vtk/common/vtkMutexLock.h \
-  /home/lawcc/vtk/common/vtkProjectionTransform.h \
+  /home/lawcc/vtk/common/vtkPerspectiveTransform.h \
   /home/lawcc/vtk/graphics/vtkActor.h \
   /home/lawcc/vtk/graphics/vtkProp3D.h \
   /home/lawcc/vtk/graphics/vtkProperty.h \
@@ -2282,13 +2512,14 @@ tcl/vtkPVRenderViewTcl.cxx : ./vtkPVRenderView.h /home/lawcc/vtk/common/vtkTclUt
   /home/lawcc/vtk/common/vtkPlaneCollection.h \
   /home/lawcc/vtk/common/vtkPlane.h \
   /home/lawcc/vtk/common/vtkImplicitFunction.h \
-  /home/lawcc/vtk/graphics/vtkAssemblyPaths.h \
   /home/lawcc/vtk/graphics/vtkActorCollection.h \
   /home/lawcc/vtk/graphics/vtkGraphicsFactory.h \
   ../Widgets/vtkKWRadioButton.h \
   ../Widgets/vtkKWMenu.h \
   /home/lawcc/vtk/graphics/vtkInteractorStyle.h \
-  /home/lawcc/vtk/graphics/vtkRenderWindowInteractor.h
+  /home/lawcc/vtk/graphics/vtkRenderWindowInteractor.h \
+  /home/lawcc/vtk/graphics/vtkAbstractPropPicker.h \
+  /home/lawcc/vtk/graphics/vtkAbstractPicker.h
 
 tcl/vtkPVSlaveTcl.cxx : ./vtkPVSlave.h /home/lawcc/vtk/common/vtkTclUtil.h /home/lawcc/vtk/wrap/vtkParse.y /home/lawcc/vtk/wrap/vtkWrapTcl.c \
   ../Widgets/vtkKWObject.h \
@@ -2333,6 +2564,8 @@ tcl/vtkPVWindowTcl.cxx : ./vtkPVWindow.h /home/lawcc/vtk/common/vtkTclUtil.h /ho
   ../Widgets/vtkKWGenericComposite.h \
   /home/lawcc/vtk/common/vtkProp.h \
   /home/lawcc/vtk/common/vtkRayCastStructures.h \
+  /home/lawcc/vtk/common/vtkAssemblyPaths.h \
+  /home/lawcc/vtk/common/vtkAssemblyPath.h \
   /home/lawcc/vtk/imaging/vtkTextMapper.h \
   /home/lawcc/vtk/common/vtkMapper2D.h \
   /home/lawcc/vtk/common/vtkAbstractMapper.h \
@@ -2363,14 +2596,14 @@ tcl/vtkPVWindowTcl.cxx : ./vtkPVWindow.h /home/lawcc/vtk/common/vtkTclUtil.h /ho
   /home/lawcc/vtk/graphics/vtkCamera.h \
   /home/lawcc/vtk/common/vtkTransform.h \
   /home/lawcc/vtk/common/vtkLinearTransform.h \
-  /home/lawcc/vtk/common/vtkPerspectiveTransform.h \
-  /home/lawcc/vtk/common/vtkGeneralTransform.h \
+  /home/lawcc/vtk/common/vtkHomogenousTransform.h \
+  /home/lawcc/vtk/common/vtkAbstractTransform.h \
   /home/lawcc/vtk/common/vtkPoints.h \
   /home/lawcc/vtk/common/vtkAttributeData.h \
   /home/lawcc/vtk/common/vtkNormals.h \
   /home/lawcc/vtk/common/vtkVectors.h \
   /home/lawcc/vtk/common/vtkMutexLock.h \
-  /home/lawcc/vtk/common/vtkProjectionTransform.h \
+  /home/lawcc/vtk/common/vtkPerspectiveTransform.h \
   /home/lawcc/vtk/graphics/vtkActor.h \
   /home/lawcc/vtk/graphics/vtkProp3D.h \
   /home/lawcc/vtk/graphics/vtkProperty.h \
@@ -2401,12 +2634,13 @@ tcl/vtkPVWindowTcl.cxx : ./vtkPVWindow.h /home/lawcc/vtk/common/vtkTclUtil.h /ho
   /home/lawcc/vtk/common/vtkPlaneCollection.h \
   /home/lawcc/vtk/common/vtkPlane.h \
   /home/lawcc/vtk/common/vtkImplicitFunction.h \
-  /home/lawcc/vtk/graphics/vtkAssemblyPaths.h \
   /home/lawcc/vtk/graphics/vtkActorCollection.h \
   /home/lawcc/vtk/graphics/vtkGraphicsFactory.h \
   ../Widgets/vtkKWRadioButton.h \
   /home/lawcc/vtk/graphics/vtkInteractorStyle.h \
-  /home/lawcc/vtk/graphics/vtkRenderWindowInteractor.h
+  /home/lawcc/vtk/graphics/vtkRenderWindowInteractor.h \
+  /home/lawcc/vtk/graphics/vtkAbstractPropPicker.h \
+  /home/lawcc/vtk/graphics/vtkAbstractPicker.h
 
 tcl/vtkPVMesaRenderWindowTcl.cxx : ./vtkPVMesaRenderWindow.h /home/lawcc/vtk/common/vtkTclUtil.h /home/lawcc/vtk/wrap/vtkParse.y /home/lawcc/vtk/wrap/vtkWrapTcl.c \
   /home/lawcc/vtk/graphics/vtkRenderWindow.h \
@@ -2429,8 +2663,8 @@ tcl/vtkPVMesaRenderWindowTcl.cxx : ./vtkPVMesaRenderWindow.h /home/lawcc/vtk/com
   /home/lawcc/vtk/graphics/vtkCamera.h \
   /home/lawcc/vtk/common/vtkTransform.h \
   /home/lawcc/vtk/common/vtkLinearTransform.h \
-  /home/lawcc/vtk/common/vtkPerspectiveTransform.h \
-  /home/lawcc/vtk/common/vtkGeneralTransform.h \
+  /home/lawcc/vtk/common/vtkHomogenousTransform.h \
+  /home/lawcc/vtk/common/vtkAbstractTransform.h \
   /home/lawcc/vtk/common/vtkPoints.h \
   /home/lawcc/vtk/common/vtkAttributeData.h \
   /home/lawcc/vtk/common/vtkDataArray.h \
@@ -2438,11 +2672,13 @@ tcl/vtkPVMesaRenderWindowTcl.cxx : ./vtkPVMesaRenderWindow.h /home/lawcc/vtk/com
   /home/lawcc/vtk/common/vtkNormals.h \
   /home/lawcc/vtk/common/vtkVectors.h \
   /home/lawcc/vtk/common/vtkMutexLock.h \
-  /home/lawcc/vtk/common/vtkProjectionTransform.h \
+  /home/lawcc/vtk/common/vtkPerspectiveTransform.h \
   /home/lawcc/vtk/graphics/vtkActor.h \
   /home/lawcc/vtk/graphics/vtkProp3D.h \
   /home/lawcc/vtk/common/vtkProp.h \
   /home/lawcc/vtk/common/vtkRayCastStructures.h \
+  /home/lawcc/vtk/common/vtkAssemblyPaths.h \
+  /home/lawcc/vtk/common/vtkAssemblyPath.h \
   /home/lawcc/vtk/graphics/vtkProperty.h \
   /home/lawcc/vtk/graphics/vtkRender.h \
   /home/lawcc/vtk/common/vtkStructuredPoints.h \
@@ -2475,13 +2711,12 @@ tcl/vtkPVMesaRenderWindowTcl.cxx : ./vtkPVMesaRenderWindow.h /home/lawcc/vtk/com
   /home/lawcc/vtk/common/vtkPlaneCollection.h \
   /home/lawcc/vtk/common/vtkPlane.h \
   /home/lawcc/vtk/common/vtkImplicitFunction.h \
-  /home/lawcc/vtk/graphics/vtkAssemblyPaths.h \
-  /home/lawcc/vtk/graphics/vtkActorCollection.h \
   /home/lawcc/vtk/common/vtkActor2D.h \
   /home/lawcc/vtk/common/vtkCoordinate.h \
   /home/lawcc/vtk/common/vtkProperty2D.h \
   /home/lawcc/vtk/common/vtkViewport.h \
   /home/lawcc/vtk/common/vtkActor2DCollection.h \
+  /home/lawcc/vtk/graphics/vtkActorCollection.h \
   /home/lawcc/vtk/graphics/vtkGraphicsFactory.h
 
 tcl/vtkInteractorStyleExtentTcl.cxx : ./vtkInteractorStyleExtent.h /home/lawcc/vtk/common/vtkTclUtil.h /home/lawcc/vtk/wrap/vtkParse.y /home/lawcc/vtk/wrap/vtkWrapTcl.c \
@@ -2507,8 +2742,8 @@ tcl/vtkInteractorStyleExtentTcl.cxx : ./vtkInteractorStyleExtent.h /home/lawcc/v
   /home/lawcc/vtk/graphics/vtkCamera.h \
   /home/lawcc/vtk/common/vtkTransform.h \
   /home/lawcc/vtk/common/vtkLinearTransform.h \
-  /home/lawcc/vtk/common/vtkPerspectiveTransform.h \
-  /home/lawcc/vtk/common/vtkGeneralTransform.h \
+  /home/lawcc/vtk/common/vtkHomogenousTransform.h \
+  /home/lawcc/vtk/common/vtkAbstractTransform.h \
   /home/lawcc/vtk/common/vtkPoints.h \
   /home/lawcc/vtk/common/vtkAttributeData.h \
   /home/lawcc/vtk/common/vtkDataArray.h \
@@ -2516,11 +2751,13 @@ tcl/vtkInteractorStyleExtentTcl.cxx : ./vtkInteractorStyleExtent.h /home/lawcc/v
   /home/lawcc/vtk/common/vtkNormals.h \
   /home/lawcc/vtk/common/vtkVectors.h \
   /home/lawcc/vtk/common/vtkMutexLock.h \
-  /home/lawcc/vtk/common/vtkProjectionTransform.h \
+  /home/lawcc/vtk/common/vtkPerspectiveTransform.h \
   /home/lawcc/vtk/graphics/vtkActor.h \
   /home/lawcc/vtk/graphics/vtkProp3D.h \
   /home/lawcc/vtk/common/vtkProp.h \
   /home/lawcc/vtk/common/vtkRayCastStructures.h \
+  /home/lawcc/vtk/common/vtkAssemblyPaths.h \
+  /home/lawcc/vtk/common/vtkAssemblyPath.h \
   /home/lawcc/vtk/graphics/vtkProperty.h \
   /home/lawcc/vtk/graphics/vtkRender.h \
   /home/lawcc/vtk/common/vtkStructuredPoints.h \
@@ -2553,14 +2790,15 @@ tcl/vtkInteractorStyleExtentTcl.cxx : ./vtkInteractorStyleExtent.h /home/lawcc/v
   /home/lawcc/vtk/common/vtkPlaneCollection.h \
   /home/lawcc/vtk/common/vtkPlane.h \
   /home/lawcc/vtk/common/vtkImplicitFunction.h \
-  /home/lawcc/vtk/graphics/vtkAssemblyPaths.h \
-  /home/lawcc/vtk/graphics/vtkActorCollection.h \
   /home/lawcc/vtk/common/vtkActor2D.h \
   /home/lawcc/vtk/common/vtkCoordinate.h \
   /home/lawcc/vtk/common/vtkProperty2D.h \
   /home/lawcc/vtk/common/vtkViewport.h \
   /home/lawcc/vtk/common/vtkActor2DCollection.h \
+  /home/lawcc/vtk/graphics/vtkActorCollection.h \
   /home/lawcc/vtk/graphics/vtkGraphicsFactory.h \
+  /home/lawcc/vtk/graphics/vtkAbstractPropPicker.h \
+  /home/lawcc/vtk/graphics/vtkAbstractPicker.h \
   /home/lawcc/vtk/common/vtkPolyData.h \
   /home/lawcc/vtk/common/vtkPointSet.h \
   /home/lawcc/vtk/common/vtkPointLocator.h \
@@ -2583,6 +2821,7 @@ vtkInteractorStylePlaneSource.o \
 vtkInteractorStyleSphere.o \
 vtkKWRenderView.o \
 vtkPVApplication.o \
+vtkPVImagePlaneComponent.o \
 vtkPVRenderSlave.o \
 vtkPVRenderView.o \
 vtkPVSlave.o \
@@ -2600,6 +2839,7 @@ tcl/vtkInteractorStylePlaneSourceTcl.o \
 tcl/vtkInteractorStyleSphereTcl.o \
 tcl/vtkKWRenderViewTcl.o \
 tcl/vtkPVApplicationTcl.o \
+tcl/vtkPVImagePlaneComponentTcl.o \
 tcl/vtkPVRenderSlaveTcl.o \
 tcl/vtkPVRenderViewTcl.o \
 tcl/vtkPVSlaveTcl.o \
@@ -2617,6 +2857,7 @@ vtkInteractorStylePlaneSource.h \
 vtkInteractorStyleSphere.h \
 vtkKWRenderView.h \
 vtkPVApplication.h \
+vtkPVImagePlaneComponent.h \
 vtkPVRenderSlave.h \
 vtkPVRenderView.h \
 vtkPVSlave.h \
@@ -2641,6 +2882,8 @@ tcl/vtkKWRenderViewTcl.cxx: vtkKWRenderView.h ${VTK_OBJ}/wrap/vtkWrapTcl ../wrap
 	rm -f tcl/vtkKWRenderViewTcl.cxx; ${VTK_OBJ}/wrap/vtkWrapTcl ${srcdir}/vtkKWRenderView.h ${srcdir}/../wrap/hints 1 > tcl/vtkKWRenderViewTcl.cxx
 tcl/vtkPVApplicationTcl.cxx: vtkPVApplication.h ${VTK_OBJ}/wrap/vtkWrapTcl ../wrap/hints
 	rm -f tcl/vtkPVApplicationTcl.cxx; ${VTK_OBJ}/wrap/vtkWrapTcl ${srcdir}/vtkPVApplication.h ${srcdir}/../wrap/hints 1 > tcl/vtkPVApplicationTcl.cxx
+tcl/vtkPVImagePlaneComponentTcl.cxx: vtkPVImagePlaneComponent.h ${VTK_OBJ}/wrap/vtkWrapTcl ../wrap/hints
+	rm -f tcl/vtkPVImagePlaneComponentTcl.cxx; ${VTK_OBJ}/wrap/vtkWrapTcl ${srcdir}/vtkPVImagePlaneComponent.h ${srcdir}/../wrap/hints 1 > tcl/vtkPVImagePlaneComponentTcl.cxx
 tcl/vtkPVRenderSlaveTcl.cxx: vtkPVRenderSlave.h ${VTK_OBJ}/wrap/vtkWrapTcl ../wrap/hints
 	rm -f tcl/vtkPVRenderSlaveTcl.cxx; ${VTK_OBJ}/wrap/vtkWrapTcl ${srcdir}/vtkPVRenderSlave.h ${srcdir}/../wrap/hints 1 > tcl/vtkPVRenderSlaveTcl.cxx
 tcl/vtkPVRenderViewTcl.cxx: vtkPVRenderView.h ${VTK_OBJ}/wrap/vtkWrapTcl ../wrap/hints
@@ -2663,6 +2906,7 @@ JAVA_CLASSES = \
 ../java/vtk/vtkInteractorStyleSphere.java \
 ../java/vtk/vtkKWRenderView.java \
 ../java/vtk/vtkPVApplication.java \
+../java/vtk/vtkPVImagePlaneComponent.java \
 ../java/vtk/vtkPVRenderSlave.java \
 ../java/vtk/vtkPVRenderView.java \
 ../java/vtk/vtkPVSlave.java \
@@ -2680,6 +2924,7 @@ JAVA_CODE = \
 ../java/vtk/vtkInteractorStyleSphere.class \
 ../java/vtk/vtkKWRenderView.class \
 ../java/vtk/vtkPVApplication.class \
+../java/vtk/vtkPVImagePlaneComponent.class \
 ../java/vtk/vtkPVRenderSlave.class \
 ../java/vtk/vtkPVRenderView.class \
 ../java/vtk/vtkPVSlave.class \
@@ -2697,6 +2942,7 @@ java/vtkInteractorStylePlaneSourceJava.o \
 java/vtkInteractorStyleSphereJava.o \
 java/vtkKWRenderViewJava.o \
 java/vtkPVApplicationJava.o \
+java/vtkPVImagePlaneComponentJava.o \
 java/vtkPVRenderSlaveJava.o \
 java/vtkPVRenderViewJava.o \
 java/vtkPVSlaveJava.o \
@@ -2740,6 +2986,10 @@ java/vtkKWRenderViewJava.cxx: vtkKWRenderView.h ${VTK_OBJ}/wrap/vtkWrapJava ../w
 	rm -f ../java/vtk/vtkPVApplication.java; ${VTK_OBJ}/wrap/vtkParseJava ${srcdir}/vtkPVApplication.h ${srcdir}/../wrap/hints 1 > ../java/vtk/vtkPVApplication.java
 java/vtkPVApplicationJava.cxx: vtkPVApplication.h ${VTK_OBJ}/wrap/vtkWrapJava ../wrap/hints
 	rm -f java/vtkPVApplicationJava.cxx; ${VTK_OBJ}/wrap/vtkWrapJava ${srcdir}/vtkPVApplication.h ${srcdir}/../wrap/hints 1 > java/vtkPVApplicationJava.cxx
+../java/vtk/vtkPVImagePlaneComponent.java: vtkPVImagePlaneComponent.h ${VTK_OBJ}/wrap/vtkParseJava ../wrap/hints
+	rm -f ../java/vtk/vtkPVImagePlaneComponent.java; ${VTK_OBJ}/wrap/vtkParseJava ${srcdir}/vtkPVImagePlaneComponent.h ${srcdir}/../wrap/hints 1 > ../java/vtk/vtkPVImagePlaneComponent.java
+java/vtkPVImagePlaneComponentJava.cxx: vtkPVImagePlaneComponent.h ${VTK_OBJ}/wrap/vtkWrapJava ../wrap/hints
+	rm -f java/vtkPVImagePlaneComponentJava.cxx; ${VTK_OBJ}/wrap/vtkWrapJava ${srcdir}/vtkPVImagePlaneComponent.h ${srcdir}/../wrap/hints 1 > java/vtkPVImagePlaneComponentJava.cxx
 ../java/vtk/vtkPVRenderSlave.java: vtkPVRenderSlave.h ${VTK_OBJ}/wrap/vtkParseJava ../wrap/hints
 	rm -f ../java/vtk/vtkPVRenderSlave.java; ${VTK_OBJ}/wrap/vtkParseJava ${srcdir}/vtkPVRenderSlave.h ${srcdir}/../wrap/hints 1 > ../java/vtk/vtkPVRenderSlave.java
 java/vtkPVRenderSlaveJava.cxx: vtkPVRenderSlave.h ${VTK_OBJ}/wrap/vtkWrapJava ../wrap/hints
@@ -2774,6 +3024,7 @@ python/vtkInteractorStylePlaneSourcePython.o \
 python/vtkInteractorStyleSpherePython.o \
 python/vtkKWRenderViewPython.o \
 python/vtkPVApplicationPython.o \
+python/vtkPVImagePlaneComponentPython.o \
 python/vtkPVRenderSlavePython.o \
 python/vtkPVRenderViewPython.o \
 python/vtkPVSlavePython.o \
@@ -2799,6 +3050,8 @@ python/vtkKWRenderViewPython.cxx: vtkKWRenderView.h ${VTK_OBJ}/wrap/vtkWrapPytho
 	rm -f python/vtkKWRenderViewPython.cxx; ${VTK_OBJ}/wrap/vtkWrapPython ${srcdir}/vtkKWRenderView.h ${srcdir}/../wrap/hints 0 > python/vtkKWRenderViewPython.cxx
 python/vtkPVApplicationPython.cxx: vtkPVApplication.h ${VTK_OBJ}/wrap/vtkWrapPython ../wrap/hints
 	rm -f python/vtkPVApplicationPython.cxx; ${VTK_OBJ}/wrap/vtkWrapPython ${srcdir}/vtkPVApplication.h ${srcdir}/../wrap/hints 0 > python/vtkPVApplicationPython.cxx
+python/vtkPVImagePlaneComponentPython.cxx: vtkPVImagePlaneComponent.h ${VTK_OBJ}/wrap/vtkWrapPython ../wrap/hints
+	rm -f python/vtkPVImagePlaneComponentPython.cxx; ${VTK_OBJ}/wrap/vtkWrapPython ${srcdir}/vtkPVImagePlaneComponent.h ${srcdir}/../wrap/hints 0 > python/vtkPVImagePlaneComponentPython.cxx
 python/vtkPVRenderSlavePython.cxx: vtkPVRenderSlave.h ${VTK_OBJ}/wrap/vtkWrapPython ../wrap/hints
 	rm -f python/vtkPVRenderSlavePython.cxx; ${VTK_OBJ}/wrap/vtkWrapPython ${srcdir}/vtkPVRenderSlave.h ${srcdir}/../wrap/hints 0 > python/vtkPVRenderSlavePython.cxx
 python/vtkPVRenderViewPython.cxx: vtkPVRenderView.h ${VTK_OBJ}/wrap/vtkWrapPython ../wrap/hints

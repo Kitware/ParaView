@@ -72,6 +72,8 @@ vtkPVWindow::vtkPVWindow()
   this->MainNotebook = vtkKWNotebook::New();
   this->MainNotebookCreated = 0;
   this->IsoScale = vtkKWScale::New();
+  this->XPlaneScale = vtkKWScale::New();
+  this->ZPlaneScale = vtkKWScale::New();
 }
 
 //----------------------------------------------------------------------------
@@ -89,6 +91,14 @@ vtkPVWindow::~vtkPVWindow()
   this->IsoScale->SetParent(NULL);
   this->IsoScale->Delete();
   this->IsoScale = NULL;
+
+  this->XPlaneScale->SetParent(NULL);
+  this->XPlaneScale->Delete();
+  this->XPlaneScale = NULL;
+
+  this->ZPlaneScale->SetParent(NULL);
+  this->ZPlaneScale->Delete();
+  this->ZPlaneScale = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -223,6 +233,23 @@ void vtkPVWindow::CreateMainNotebook()
   this->Script("pack %s -pady 2 -padx 2 -fill x -expand yes",
                this->IsoScale->GetWidgetName());
   this->IsoScale->SetCommand(this, "IsoValueChanged");
+  
+  this->XPlaneScale->SetParent(this->MainNotebook->GetFrame("Cut"));
+  this->XPlaneScale->Create(this->Application, "");
+  this->XPlaneScale->SetRange(0, 64);
+  this->XPlaneScale->SetValue(20);
+  this->Script("pack %s -pady 2 -padx 2 -fill x -expand yes",
+               this->XPlaneScale->GetWidgetName());
+  this->XPlaneScale->SetCommand(this, "XPlaneChanged");
+  
+  this->ZPlaneScale->SetParent(this->MainNotebook->GetFrame("Cut"));
+  this->ZPlaneScale->Create(this->Application, "");
+  this->ZPlaneScale->SetRange(0, 64);
+  this->ZPlaneScale->SetValue(20);
+  this->Script("pack %s -pady 2 -padx 2 -fill x -expand yes",
+               this->ZPlaneScale->GetWidgetName());
+  this->ZPlaneScale->SetCommand(this, "ZPlaneChanged");
+  
 }
 
 
@@ -322,6 +349,20 @@ void vtkPVWindow::SetupVolumeIso()
     
     pvApp->RemoteSimpleScript(id, "IsoActor SetMapper IsoMapper");
     pvApp->RemoteSimpleScript(id, "[RenderSlave GetRenderer] AddActor IsoActor");
+    
+    // Z Plane geomtery
+    pvApp->RemoteSimpleScript(id, "vtkPVImagePlaneComponent ImagePlaneZ");
+    pvApp->RemoteSimpleScript(id, "ImagePlaneZ SetInput [ImageReader GetOutput]");
+    pvApp->RemoteScript(id, "ImagePlaneZ SetPiece %d %d", id-1, num-1);
+    pvApp->RemoteSimpleScript(id, "ImagePlaneZ SetPlaneExtent 0 63 0 63 20 20");
+    pvApp->RemoteSimpleScript(id, "[RenderSlave GetRenderer] AddActor [ImagePlaneZ GetActor]");
+
+    // X Plane geomtery
+    pvApp->RemoteSimpleScript(id, "vtkPVImagePlaneComponent ImagePlaneX");
+    pvApp->RemoteSimpleScript(id, "ImagePlaneX SetInput [ImageReader GetOutput]");
+    pvApp->RemoteScript(id, "ImagePlaneX SetPiece %d %d", id-1, num-1);
+    pvApp->RemoteSimpleScript(id, "ImagePlaneX SetPlaneExtent 20 20 0 63 0 92");
+    pvApp->RemoteSimpleScript(id, "[RenderSlave GetRenderer] AddActor [ImagePlaneX GetActor]");
     }
   
   // Setup an interactor style
@@ -346,7 +387,6 @@ void vtkPVWindow::SetupVolumeIso()
 }
 
 //----------------------------------------------------------------------------
-// Setup the pipeline
 void vtkPVWindow::IsoValueChanged()
 {
   int id, num;
@@ -360,6 +400,46 @@ void vtkPVWindow::IsoValueChanged()
   for (id = 1; id < num; ++id)
     {
     pvApp->RemoteScript(id, "Iso SetValue 0 %f", val);
+    }
+    
+  this->MainView->Render();
+}
+
+
+//----------------------------------------------------------------------------
+void vtkPVWindow::XPlaneChanged()
+{
+  int id, num;
+  float val;
+  vtkPVApplication *pvApp = (vtkPVApplication *)this->Application;
+  
+  val = this->XPlaneScale->GetValue();
+  
+  // Tell each of the worker pipelines the new value.
+  num = pvApp->GetController()->GetNumberOfProcesses();
+  for (id = 1; id < num; ++id)
+    {
+    pvApp->RemoteScript(id, "ImagePlaneX SetPosition %d", (int)val);
+    }
+    
+  this->MainView->Render();
+}
+
+
+//----------------------------------------------------------------------------
+void vtkPVWindow::ZPlaneChanged()
+{
+  int id, num;
+  float val;
+  vtkPVApplication *pvApp = (vtkPVApplication *)this->Application;
+  
+  val = this->ZPlaneScale->GetValue();
+  
+  // Tell each of the worker pipelines the new value.
+  num = pvApp->GetController()->GetNumberOfProcesses();
+  for (id = 1; id < num; ++id)
+    {
+    pvApp->RemoteScript(id, "ImagePlaneZ SetPosition %d", (int)val);
     }
     
   this->MainView->Render();

@@ -23,6 +23,7 @@ vtkInteractorStylePlaneSource \
 vtkInteractorStyleSphere \
 vtkKWRenderView \
 vtkPVApplication \
+vtkPVImagePlaneComponent \
 vtkPVRenderSlave \
 vtkPVRenderView \
 vtkPVSlave \

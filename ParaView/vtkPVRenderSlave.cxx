@@ -54,10 +54,10 @@ int vtkPVRenderSlaveCommand(ClientData cd, Tcl_Interp *interp,
 //----------------------------------------------------------------------------
 vtkPVRenderSlave::vtkPVRenderSlave()
 {
-  vtkPVMesaRenderWindow *mesaRenderWindow;
+  vtkMesaRenderWindow *mesaRenderWindow;
   vtkMesaRenderer *mesaRenderer;
 
-  mesaRenderWindow = vtkPVMesaRenderWindow::New();
+  mesaRenderWindow = vtkMesaRenderWindow::New();
   //mesaRenderWindow->DoubleBufferOff();
   //mesaRenderWindow->SwapBuffersOff();
   mesaRenderWindow->SetOffScreenRendering(1);
@@ -261,7 +261,7 @@ void vtkTreeComposite(vtkRenderWindow *renWin,
       }
     else
       {
-      localPdata = (float*)((vtkPVMesaRenderWindow *)renWin)-> \
+      localPdata = (float*)((vtkMesaRenderWindow *)renWin)-> \
 	GetRGBACharPixelData(0,0,windowSize[0]-1,windowSize[1]-1,0);    
       }
     pdata_size = total_pixels;
