@@ -50,7 +50,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkObjectFactory.h"
 
 vtkStandardNewMacro( vtkKWRange );
-vtkCxxRevisionMacro(vtkKWRange, "1.2");
+vtkCxxRevisionMacro(vtkKWRange, "1.3");
 
 #define VTK_KW_RANGE_MIN_SLIDER_SIZE        2
 #define VTK_KW_RANGE_MIN_THICKNESS          (2*VTK_KW_RANGE_MIN_SLIDER_SIZE+1)
@@ -64,6 +64,9 @@ vtkCxxRevisionMacro(vtkKWRange, "1.2");
 #define VTK_KW_RANGE_SLIDER1_TAG            "slider1"
 #define VTK_KW_RANGE_SLIDER2_TAG            "slider2"
 #define VTK_KW_RANGE_SLIDERS_TAG            "sliders"
+
+#define LSTRANGE 0
+#define RSTRANGE 1
 
 //----------------------------------------------------------------------------
 vtkKWRange::vtkKWRange()
@@ -842,6 +845,7 @@ void vtkKWRange::GetWholeRangeColor(int type, int &r, int &g, int &b)
     {
     case vtkKWRange::DARK_SHADOW_COLOR:
     case vtkKWRange::LIGHT_SHADOW_COLOR:
+    case vtkKWRange::HIGHLIGHT_COLOR:
 
       this->GetWholeRangeColor(vtkKWRange::BACKGROUND_COLOR, r, g, b);
 
@@ -863,9 +867,13 @@ void vtkKWRange::GetWholeRangeColor(int type, int &r, int &g, int &b)
         {
         fv *= 0.3;
         }
-      else
+      else if (type == vtkKWRange::LIGHT_SHADOW_COLOR)
         {
         fv *= 0.6;
+        }
+      else
+        {
+        fv = 1.0;
         }
 
       vtkMath::HSVToRGB(fh, fs, fv, &fr, &fg, &fb);
@@ -873,16 +881,6 @@ void vtkKWRange::GetWholeRangeColor(int type, int &r, int &g, int &b)
       r = (int)(fr * 255.0);
       g = (int)(fg * 255.0);
       b = (int)(fb * 255.0);
-
-      break;
-
-    case vtkKWRange::HIGHLIGHT_COLOR:
-
-      vtkKWTkUtilities::GetOptionColor(
-        this->GetApplication()->GetMainInterp(),
-        this->Canvas->GetWidgetName(),
-        "-selectforeground",
-        &r, &g, &b);
 
       break;
 
@@ -1265,8 +1263,6 @@ void vtkKWRange::RedrawWholeRange()
 
   // Draw depending on the orientation
 
-  #define STRANGE 1
-
   if (this->Orientation == vtkKWRange::ORIENTATION_HORIZONTAL)
     {
     x_min = 0;
@@ -1287,51 +1283,51 @@ void vtkKWRange::RedrawWholeRange()
   if (!was_created)
     {
     tk_cmd << canv << " create rectangle 0 0 0 0 "
-           << "-tag {wbgc " << tag << " " << tag << "b1}\n";
+           << "-tag {rtag wbgc " << tag << " " << tag << "b1}\n";
     }
     
   tk_cmd << canv << " coords " << tag << "b1 "
          << x_min + 1 << " " << y_min + 1 << " " 
-         << x_max - 1 + STRANGE << " " << y_max - 1 + STRANGE << endl;
+         << x_max - 1 + RSTRANGE << " " << y_max - 1 + RSTRANGE << endl;
 
   // 'D' part (dark shadow)
 
   if (!was_created)
     {
     tk_cmd << canv << " create line 0 0 0 0 "
-           << "-tag {wdsc " << tag << " " << tag << "l1}\n";
+           << "-tag {ltag wdsc " << tag << " " << tag << "l1}\n";
     }
 
   tk_cmd << canv << " coords " << tag << "l1 "
          << x_min << " " << y_max - 1 << " "
          << x_min << " " << y_min << " " 
-         << x_max - 1 + STRANGE << " " << y_min << endl;
+         << x_max - 1 + LSTRANGE << " " << y_min << endl;
 
   // 'H' part (highlight)
 
   if (!was_created)
     {
     tk_cmd << canv << " create line 0 0 0 0 "
-           << "-tag {whlc " << tag << " " << tag << "l2}\n";
+           << "-tag {ltag whlc " << tag << " " << tag << "l2}\n";
     }
 
   tk_cmd << canv << " coords " << tag << "l2 "
-         << x_min << " " << y_max << " "
+         << x_max << " " << y_min << " "
          << x_max << " " << y_max << " "
-         << x_max << " " << y_min - STRANGE << endl;
+         << x_min - LSTRANGE << " " << y_max << endl;
 
   // 'L' part (light shadow)
 
   if (!was_created)
     {
     tk_cmd << canv << " create line 0 0 0 0 "
-           << "-tag {wlsc " << tag << " " << tag << "l3}\n";
+           << "-tag {ltag wlsc " << tag << " " << tag << "l3}\n";
     }
 
   tk_cmd << canv << " coords " << tag << "l3 "
          << x_min + 1 << " " << y_max - 2 << " "
          << x_min + 1 << " " << y_min + 1 << " " 
-         << x_max - 2 + STRANGE << " " << y_min + 1 << endl;
+         << x_max - 2 + LSTRANGE << " " << y_min + 1 << endl;
 
   tk_cmd << ends;
   this->Script(tk_cmd.str());
@@ -1408,27 +1404,25 @@ void vtkKWRange::RedrawRange()
     // '.' part (background)
   
     tk_cmd << canv << " create rectangle 0 0 0 0 "
-           << "-tag {rbgc " << tag << " " << tag << "b1}\n";
+           << "-tag {rtag rbgc " << tag << " " << tag << "b1}\n";
     
     // 'D' part (dark shadow)
 
     tk_cmd << canv << " create line 0 0 0 0 "
-           << "-tag {rdsc " << tag << " " << tag << "l1}\n";
+           << "-tag {ltag rdsc " << tag << " " << tag << "l1}\n";
 
     // 'H' part (highlight)
 
     tk_cmd << canv << " create line 0 0 0 0 "
-           << "-tag {rhlc " << tag << " " << tag << "l2}\n";
+           << "-tag {ltag rhlc " << tag << " " << tag << "l2}\n";
   
     // 'L' part (light shadow)
   
     tk_cmd << canv << " create line 0 0 0 0 "
-           << "-tag {rlsc " << tag << " " << tag << "l3}\n";
+           << "-tag {ltag rlsc " << tag << " " << tag << "l3}\n";
     }
 
   // Draw depending on the orientation
-
-  #define STRANGE 1
 
   int min = (this->Thickness - in_thick) / 2;
   int max = min + in_thick - 1;
@@ -1450,25 +1444,25 @@ void vtkKWRange::RedrawRange()
   
     tk_cmd << canv << " coords " << tag << "b1 "
            << pos[0] << " " << min + 1 << " " 
-           << pos[1] + STRANGE << " " << max - 2 + STRANGE << endl;
+           << pos[1] + RSTRANGE << " " << max - 2 + RSTRANGE << endl;
 
     // 'D' part (dark shadow)
 
     tk_cmd << canv << " coords " << tag << "l1 "
            << pos[0] << " " << max << " "
-           << pos[1]  + STRANGE << " " << max << endl;
+           << pos[1]  + LSTRANGE << " " << max << endl;
 
     // 'H' part (highlight)
 
     tk_cmd << canv << " coords " << tag << "l2 "
            << pos[0] << " " << min << " "
-           << pos[1]  + STRANGE << " " << min << endl;
+           << pos[1]  + LSTRANGE << " " << min << endl;
 
     // 'L' part (light shadow)
 
     tk_cmd << canv << " coords " << tag << "l3 "
            << pos[0] << " " << max - 1 << " "
-           << pos[1]  + STRANGE << " " << max - 1 << endl;
+           << pos[1]  + LSTRANGE << " " << max - 1 << endl;
     }
   else
     {
@@ -1486,25 +1480,25 @@ void vtkKWRange::RedrawRange()
   
     tk_cmd << canv << " coords " << tag << "b1 "
            << min + 2 << " " << pos[0] << " " 
-           << max - 1 + STRANGE << " " << pos[1] + STRANGE << endl;
+           << max - 1 + RSTRANGE << " " << pos[1] + RSTRANGE << endl;
 
     // 'D' part (dark shadow)
 
     tk_cmd << canv << " coords " << tag << "l1 "
            << min << " " << pos[0] << " "
-           << min << " " << pos[1] + STRANGE << endl;
+           << min << " " << pos[1] + LSTRANGE << endl;
 
     // 'H' part (highlight)
 
     tk_cmd << canv << " coords " << tag << "l2 "
            << max << " " << pos[0] << " "
-           << max << " " << pos[1] + STRANGE << endl;
+           << max << " " << pos[1] + LSTRANGE << endl;
 
     // 'L' part (light shadow)
 
     tk_cmd << canv << " coords " << tag << "l3 "
            << min + 1 << " " << pos[0] << " "
-           << min + 1 << " " << pos[1] + STRANGE << endl;
+           << min + 1 << " " << pos[1] + LSTRANGE << endl;
     }
 
   tk_cmd << ends;
@@ -1577,8 +1571,6 @@ void vtkKWRange::RedrawSlider(int pos, int slider_idx)
 
   // Draw depending on the orientation
 
-  #define STRANGE 1
-
   x_min = pos - sw;
   x_max = pos + sw;
 #if 1
@@ -1608,33 +1600,35 @@ void vtkKWRange::RedrawSlider(int pos, int slider_idx)
     if (!this->HasTag(tag, "b1"))
       {
       tk_cmd << canv << " create rectangle 0 0 0 0 "
-             << "-tag {sbgc " << tag << " " << stag << " " << tag << "b1}\n";
+          << "-tag {rtag sbgc " << tag << " " << stag << " " << tag << "b1}\n";
 
       tk_cmd << canv << " create rectangle 0 0 0 0 "
-             << "-tag {sbgc " << tag << " " << stag << " " << tag << "b2}\n";
+          << "-tag {rtag sbgc " << tag << " " << stag << " " << tag << "b2}\n";
 
       tk_cmd << canv << " create rectangle 0 0 0 0 "
-             << "-tag {sbgc " << tag << " " << stag << " " << tag << "b3}\n";
+          << "-tag {rtag sbgc " << tag << " " << stag << " " << tag << "b3}\n";
 
       tk_cmd << canv << " create rectangle 0 0 0 0 "
-             << "-tag {sbgc " << tag << " " << stag << " " << tag << "b4}\n";
+          << "-tag {rtag sbgc " << tag << " " << stag << " " << tag << "b4}\n";
       }
 
     tk_cmd << canv << " coords " << tag << "b1 "
            << x_min + 1 << " " << y_min + 1 << " "
-           << x_min + sw - 2 + STRANGE << " " << y_max - 1 + STRANGE << endl;
+           << x_min + sw - 2 + RSTRANGE << " " << y_max - 1 + RSTRANGE << endl;
 
     tk_cmd << canv << " coords " << tag << "b2 "
            << x_max - sw + 2 << " " << y_min + 1 << " "
-           << x_max - 1 + STRANGE << " " << y_max - 1 + STRANGE << endl;
+           << x_max - 1 + RSTRANGE << " " << y_max - 1 + RSTRANGE << endl;
 
     tk_cmd << canv << " coords " << tag << "b3 "
            << x_min + sw - 1 << " " << y_min + 1 << " "
-           << x_max - sw + 1 + STRANGE << " " << y_min + sw - 2+ STRANGE<<endl;
+           << x_max - sw + 1 + RSTRANGE << " " << y_min + sw - 2 + RSTRANGE
+           << endl;
 
     tk_cmd << canv << " coords " << tag << "b4 "
            << x_min + sw - 1 << " " << y_max - sw + 2 << " "
-           << x_max - sw + 1 + STRANGE << " " << y_max - 1 + STRANGE << endl;
+           << x_max - sw + 1 + RSTRANGE << " " << y_max - 1 + RSTRANGE 
+           << endl;
     }
     
   // 'D' part (dark shadow)
@@ -1642,42 +1636,42 @@ void vtkKWRange::RedrawSlider(int pos, int slider_idx)
   if (!was_created)
     {
     tk_cmd << canv << " create line 0 0 0 0 "
-           << " -tag {sdsc " << tag << " " << stag << " " << tag << "l1}\n";
+         << " -tag {ltag sdsc " << tag << " " << stag << " " << tag << "l1}\n";
         
     tk_cmd << canv << " create line 0 0 0 0 "
-           << " -tag {sdsc " << tag << " " << stag << " " << tag << "l2}\n";
+        << " -tag {ltag sdsc " << tag << " " << stag << " " << tag << "l2}\n";
     }
 
   tk_cmd << canv << " coords " << tag << "l1 "
-         << x_min << " " << y_max << " "
+         << x_max << " " << y_min << " "
          << x_max << " " << y_max << " " 
-         << x_max << " " << y_min - STRANGE << endl;
+         << x_min - LSTRANGE << " " << y_max << endl;
 
   tk_cmd << canv << " coords " << tag << "l2 "
          << x_min + sw - 1 << " " << y_max - sw << " "
          << x_min + sw - 1 << " " << y_min + sw - 1 << " " 
-         << x_max - sw + STRANGE << " " << y_min + sw - 1 << endl;
+         << x_max - sw + LSTRANGE << " " << y_min + sw - 1 << endl;
 
   // 'H' part (highlight)
 
   if (!was_created)
     {
     tk_cmd << canv << " create line 0 0 0 0 "
-           << " -tag {shlc " << tag << " " << stag << " " << tag << "l3}\n";
+        << " -tag {ltag shlc " << tag << " " << stag << " " << tag << "l3}\n";
 
     tk_cmd << canv << " create line 0 0 0 0 "
-           << " -tag {shlc " << tag << " " << stag << " " << tag << "l4}\n";
+        << " -tag {ltag shlc " << tag << " " << stag << " " << tag << "l4}\n";
     }
 
   tk_cmd << canv << " coords " << tag << "l3 "
          << x_min << " " << y_max - 1 << " "
          << x_min << " " << y_min << " "
-         << x_max - 1 + STRANGE << " " << y_min << endl;
+         << x_max - 1 + LSTRANGE << " " << y_min << endl;
 
   tk_cmd << canv << " coords " << tag << "l4 "
-         << x_min + sw - 1 << " " << y_max - sw + 1 << " "
+         << x_max - sw + 1 << " " << y_min + sw - 1 << " "
          << x_max - sw + 1 << " " << y_max - sw + 1 << " " 
-         << x_max - sw + 1 << " " << y_min + sw - 1 - STRANGE << endl;
+         << x_min + sw - 1 - LSTRANGE << " " << y_max - sw + 1 << endl;
 
   tk_cmd << ends;
   this->Script(tk_cmd.str());
@@ -1773,6 +1767,10 @@ void vtkKWRange::UpdateColors()
   tk_cmd << canv << " itemconfigure sbgc -outline {} -fill "<< bgcolor << endl;
   tk_cmd << canv << " itemconfigure sdsc -fill " << dscolor << endl;
   tk_cmd << canv << " itemconfigure shlc -fill " << hlcolor << endl;
+
+  // Set line style
+
+  tk_cmd << canv << " itemconfigure ltag -capstyle round " << endl;
 
   tk_cmd << ends;
   this->Script(tk_cmd.str());
