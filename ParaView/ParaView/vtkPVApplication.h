@@ -189,6 +189,7 @@ protected:
   int MinorVersion;
 
   vtkMultiProcessController *Controller;
+
 };
 
 #endif

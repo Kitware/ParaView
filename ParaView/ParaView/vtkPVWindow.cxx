@@ -899,6 +899,8 @@ vtkPVSource *vtkPVWindow::Open(char *openFileName)
   int position;
   char *endingSlash = NULL;
   char *newRootName;
+
+  this->Application->AddTraceEntry("%s Open %s", this->GetTclName(), openFileName);
   
   extension = strrchr(openFileName, '.');
   position = extension - openFileName;
@@ -995,7 +997,9 @@ void vtkPVWindow::WriteData()
       delete [] filename;
       return;
       }
-  
+ 
+    this->Application->AddTraceEntry("# write1 %s", filename);  
+
     pvApp->MakeTclObject("vtkDataSetWriter", "writer");
     pvApp->BroadcastScript("writer SetFileName %s", filename);
     pvApp->BroadcastScript("writer SetInput %s",
@@ -1026,6 +1030,8 @@ void vtkPVWindow::WriteData()
       delete [] filename;
       return;
       }
+
+    this->Application->AddTraceEntry("# writeN %s", filename);
 
     pvApp->BroadcastScript("vtkPDataSetWriter writer");
     pvApp->BroadcastScript("writer SetFileName %s", filename);
@@ -1076,6 +1082,8 @@ void vtkPVWindow::SaveInTclScript()
     file = NULL;
     return;
     }
+
+  this->Application->AddTraceEntry("# SaveInTclScript filename", filename);
 
   *file << "# ParaView Version " << this->GetPVApplication()->GetMajorVersion()
 	<< "." << this->GetPVApplication()->GetMinorVersion() << "\n\n";
@@ -1310,10 +1318,16 @@ void vtkPVWindow::SetCurrentPVSource(vtkPVSource *comp)
   this->MainView->SetSelectedComposite(comp);  
   if (comp)
     {
+    this->Application->AddTraceEntry("%s SetCurrentPVSource %s", 
+                                     this->GetTclName(), comp->GetTclName());
+    this->Application->AddTraceEntry("# %s", comp->GetVTKSourceTclName()); 
+
     this->SetCurrentPVData(comp->GetNthPVOutput(0));
     }
   else
     {
+    this->Application->AddTraceEntry("%s SetCurrentPVSource {}", 
+                                     this->GetTclName());
     this->SetCurrentPVData(NULL);
     }
   
@@ -1355,6 +1369,7 @@ vtkKWCompositeCollection* vtkPVWindow::GetGlyphSources()
 //----------------------------------------------------------------------------
 void vtkPVWindow::ResetCameraCallback()
 {
+  this->Application->AddTraceEntry("%s ResetCameraCallback", this->GetTclName());
   this->MainView->ResetCamera();
   this->MainView->EventuallyRender();
 }
@@ -1367,13 +1382,22 @@ void vtkPVWindow::FrameRateScaleCallback()
     {
     newRate = 0.00001;
     }
+
+  this->Application->AddTraceEntry("%s SetInteractiveUpdateRate %f", 
+                                   this->GetMainView()->GetTclName(), newRate);
+
   this->GetMainView()->SetInteractiveUpdateRate(newRate);
 }
 
 //----------------------------------------------------------------------------
 void vtkPVWindow::ReductionCheckCallback()
 {
+  this->Application->AddTraceEntry("# ReductionCheckCallback");
   int reduce = this->ReductionCheck->GetState();
+
+  this->Application->AddTraceEntry("%s SetUseReductionFactor %d", 
+                                   this->GetMainView()->GetTclName(), reduce);
+
   this->GetMainView()->SetUseReductionFactor(reduce);
 }
 
@@ -1501,6 +1525,8 @@ vtkPVSource *vtkPVWindow::CalculatorCallback()
   vtkPVData *current;
   const char* outputDataType;
   
+  this->Application->AddTraceEntry("%s CalculatorCallback", this->GetTclName());
+  
   // Before we do anything, let's see if we can determine the output type.
   current = this->GetCurrentPVData();
   if (current == NULL)
@@ -1578,6 +1604,8 @@ vtkPVSource *vtkPVWindow::CutPlaneCallback()
   vtkPVData *pvd;
   const char* outputDataType;
   vtkPVData *current;
+
+  this->Application->AddTraceEntry("%s CutPlaneCallback", this->GetTclName());
   
   current = this->GetCurrentPVData();
   if (current == NULL)
@@ -1664,6 +1692,8 @@ vtkPVSource *vtkPVWindow::ThresholdCallback()
   const char* outputDataType;
   vtkPVData *current;
   
+  this->Application->AddTraceEntry("%s ThresholdCallback", this->GetTclName());
+
   // Before we do anything, let's see if we can determine the output type.
   current = this->GetCurrentPVData();
   if (current == NULL)
@@ -1744,6 +1774,8 @@ vtkPVSource *vtkPVWindow::ClipPlaneCallback()
   const char* outputDataType;
   vtkPVData *current;
   
+  this->Application->AddTraceEntry("%s ClipPlaneCallback", this->GetTclName());
+
   // Before we do anything, let's see if we can determine the output type.
   current = this->GetCurrentPVData();
   if (current == NULL)
@@ -1830,6 +1862,8 @@ vtkPVSource *vtkPVWindow::ContourCallback()
   vtkPVData *current;
   const char* outputDataType;
   
+  this->Application->AddTraceEntry("%s ContourCallback", this->GetTclName());
+
   // Before we do anything, let's see if we can determine the output type.
   current = this->GetCurrentPVData();
   if (current == NULL)
@@ -1913,6 +1947,8 @@ vtkPVSource *vtkPVWindow::GlyphCallback()
   vtkPVData *pvd;
   vtkPVData *current;
   const char* outputDataType;
+
+  this->Application->AddTraceEntry("%s GlyphCallback", this->GetTclName());
   
   // Before we do anything, let's see if we can determine the output type.
   current = this->GetCurrentPVData();
@@ -1994,6 +2030,8 @@ vtkPVSource *vtkPVWindow::ProbeCallback()
   vtkPVData *current;
   const char* outputDataType;
   
+  this->Application->AddTraceEntry("%s ProbeCallback", this->GetTclName());
+
   current = this->GetCurrentPVData();
   if (current == NULL)
     {
@@ -2079,6 +2117,8 @@ void vtkPVWindow::ShowWindowProperties()
 //----------------------------------------------------------------------------
 void vtkPVWindow::ShowCurrentSourceProperties()
 {
+  this->Application->AddTraceEntry("%s ShowCurrentSourceProperties", this->GetTclName());
+
   this->ShowProperties();
   
   // We need to update the properties-menu radio button too!
@@ -2109,6 +2149,8 @@ void vtkPVWindow::ShowCurrentSourceProperties()
 //----------------------------------------------------------------------------
 void vtkPVWindow::ShowAnimationProperties()
 {
+  this->Application->AddTraceEntry("%s ShowAnimationProperties", this->GetTclName());
+
   this->AnimationInterface->UpdateSourceMenu();
 
   // Try to find a good default value for the source.

@@ -124,6 +124,14 @@ vtkKWApplication::vtkKWApplication()
   this->EventNotifier->SetApplication( this );
 
   this->InExit = 0;
+
+  this->TraceFile = new ofstream("ParaViewTrace.txt", ios::out);
+  if (this->TraceFile && this->TraceFile->fail())
+    {
+    delete this->TraceFile;
+    this->TraceFile = NULL;
+    }
+
 }
 
 vtkKWApplication::~vtkKWApplication()
@@ -139,11 +147,36 @@ vtkKWApplication::~vtkKWApplication()
   this->SetApplicationName(NULL);
   this->SetApplicationVersionName(NULL);
   this->SetApplicationReleaseName(NULL);
+
+  if (this->TraceFile)
+    {
+    this->TraceFile->close();
+    delete this->TraceFile;
+    this->TraceFile = NULL;
+    }
 }
+
+//----------------------------------------------------------------------------
+void vtkKWApplication::AddTraceEntry(char *format, ...)
+{
+  if (this->TraceFile == NULL)
+    {
+    return;
+    }
+  char event[6000];
+
+  va_list var_args;
+  va_start(var_args, format);
+  vsprintf(event, format, var_args);
+  va_end(var_args);
+
+  *(this->TraceFile) << event << endl;
+}
+
 
 void vtkKWApplication::Script(const char *format, ...)
 {
-  static char event[16000];
+  char event[16000];
   
   va_list var_args;
   va_start(var_args, format);

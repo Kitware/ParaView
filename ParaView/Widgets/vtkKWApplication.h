@@ -147,6 +147,12 @@ public:
   // Get the event notifier so that callback can be set or events invoked.
   vtkGetObjectMacro( EventNotifier, vtkKWEventNotifier );
 
+//BTX
+  // Description:
+  // Used to trace the actions of the user.
+  void AddTraceEntry(char *format, ...);
+//ETX
+
 protected:
   vtkKWApplication();
   ~vtkKWApplication();
@@ -172,6 +178,8 @@ protected:
   int InExit;
   
   vtkKWEventNotifier *EventNotifier;
+
+  ofstream *TraceFile;
 };
 
 #endif

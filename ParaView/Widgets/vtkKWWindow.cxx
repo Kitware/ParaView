@@ -555,6 +555,7 @@ void vtkKWWindow::LoadScript()
 
 void vtkKWWindow::LoadScript(char *path)
 {
+  this->Application->AddTraceEntry("Load Script : %s", path);
   // add this window as a variable
   this->Script("set InitialWindow %s", this->GetTclName());
   this->Script("source {%s}",path);
@@ -810,5 +811,5 @@ void vtkKWWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWWindow ";
-  this->ExtractRevision(os,"$Revision: 1.27.2.5 $");
+  this->ExtractRevision(os,"$Revision: 1.27.2.6 $");
 }

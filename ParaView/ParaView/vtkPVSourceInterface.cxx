@@ -149,6 +149,8 @@ vtkPVSource *vtkPVSourceInterface::CreateCallback()
     vtkErrorMacro("Could not get pointer from object.");
     return NULL;
     }
+
+  this->Application->AddTraceEntry("# CreateCallback %s", tclName);
   
   pvs = vtkPVSource::New();
   pvs->SetReplaceInput(this->ReplaceInput);

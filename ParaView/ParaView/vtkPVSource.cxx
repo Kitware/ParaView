@@ -662,6 +662,11 @@ void vtkPVSource::UpdateScalars()
   pvApp->BroadcastScript("%s SetScalarComponent 0 %s 0",
                          this->ChangeScalarsFilterTclName,
                          this->DefaultScalarsName);
+
+  this->Application->AddTraceEntry("# %s ChangeScalars PointData %s", 
+                                   this->GetVTKSourceTclName(),
+                                   this->DefaultScalarsName);
+
 }
 
 //----------------------------------------------------------------------------
@@ -774,6 +779,9 @@ void vtkPVSource::ChangeInput(const char *inputTclName)
   vtkPVApplication *pvApp = this->GetPVApplication();
   
   this->ChangeAcceptButtonColor();
+
+  this->Application->AddTraceEntry("%s SetNthPVInput 0 %s", 
+                                   this->GetTclName(), inputTclName);
   
   pvApp->Script("%s SetNthPVInput 0 %s", this->GetTclName(), inputTclName);
 }
@@ -917,12 +925,13 @@ void vtkPVSource::AcceptCallback()
   this->Script("%s configure -background #d9d9d9",
                this->AcceptButton->GetWidgetName());
 #endif
-  
+
   // Call the commands to set ivars from widget values.
   for (i = 0; i < this->AcceptCommands->GetLength(); ++i)
     {
     this->Script(this->AcceptCommands->GetString(i));
     }  
+  this->Application->AddTraceEntry("%s AcceptCallback", this->GetTclName());
   
   // Initialize the output if necessary.
   if ( ! this->Initialized)
@@ -1008,6 +1017,8 @@ void vtkPVSource::ResetCallback()
     return;
     }
 
+  this->Application->AddTraceEntry("%s ResetCallback", this->GetTclName());
+
   this->UpdateParameterWidgets();
   this->Script("update");
 
@@ -1027,6 +1038,8 @@ void vtkPVSource::DeleteCallback()
   vtkPVSource *prev;
   int i;
   vtkPVWindow *window = this->GetWindow();
+
+  this->Application->AddTraceEntry("%s DeleteCallback", this->GetTclName());
 
   // Just in case cursor was left in a funny state.
 #ifdef _WIN32
@@ -1138,6 +1151,8 @@ void vtkPVSource::AcceptHelper2(char *name, char *method, char *args)
   vtkPVApplication *pvApp = this->GetPVApplication();
 
   vtkDebugMacro("AcceptHelper2 " << name << ", " << method << ", " << args);
+
+  this->Application->AddTraceEntry("%s %s %s", name, method, args);
 
   pvApp->BroadcastScript("catch {%s %s %s}", name,  method, args);
 }

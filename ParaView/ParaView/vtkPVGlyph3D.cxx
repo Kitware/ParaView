@@ -388,6 +388,8 @@ void vtkPVGlyph3D::ChangeSource()
     pvApp->BroadcastScript("%s SetSource %s",
                            this->GetVTKSourceTclName(), tclName);
     }
+  pvApp->AddTraceEntry("%s SetSource %s",
+                       this->GetVTKSourceTclName(), tclName);
 }
 
 void vtkPVGlyph3D::SaveInTclScript(ofstream *file)

@@ -910,9 +910,15 @@ void vtkPVRenderView::SetInteractor(vtkKWInteractor *interactor)
     {
     return;
     }
+
   if (interactor)
     {
+    this->Application->AddTraceEntry("# SetInteractor %s", interactor->GetClassName());
     interactor->Register(this);
+    }
+  else 
+    {
+    this->Application->AddTraceEntry("# SetInteractor NULL");
     }
   this->CurrentInteractor = interactor;
 

@@ -264,6 +264,9 @@ void vtkPVContour::ContourValuesAcceptCallback()
   int numContours = this->ContourValuesList->GetNumberOfItems();
   vtkPVApplication *pvApp = this->GetPVApplication();
 
+  pvApp->AddTraceEntry("%s SetNumberOfContours %d",
+                         this->GetVTKSourceTclName(), numContours);
+
   pvApp->BroadcastScript("%s SetNumberOfContours %d",
                          this->GetVTKSourceTclName(), numContours);
   
@@ -273,6 +276,9 @@ void vtkPVContour::ContourValuesAcceptCallback()
     pvApp->BroadcastScript("%s SetValue %d %f",
                            this->GetVTKSourceTclName(),
                            i, value);
+    pvApp->AddTraceEntry("%s SetValue %d %f",
+                         this->GetVTKSourceTclName(),
+                         i, value);
     }
 }
 

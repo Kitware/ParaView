@@ -492,7 +492,7 @@ void vtkPVProbe::AcceptCallback()
         }
       else
         {
-	sprintf(arrayData, "%s: %f\n", array->GetName(),
+        sprintf(arrayData, "%s: %f\n", array->GetName(),
                 array->GetComponent(0, 0));
         strcat(label, arrayData);
         }
@@ -518,6 +518,14 @@ void vtkPVProbe::AcceptCallback()
     pvApp->BroadcastScript("%s SetOutputAttributeDataToPointData",
                            this->ChangeScalarsFilterTclName);
     pvApp->BroadcastScript("%s SetScalarComponent 0 %s 0",
+                           this->ChangeScalarsFilterTclName,
+                           this->DefaultScalarsName);
+
+    pvApp->AddTraceEntry("%s SetInputFieldToPointDataField",
+                           this->ChangeScalarsFilterTclName);
+    pvApp->AddTraceEntry("%s SetOutputAttributeDataToPointData",
+                           this->ChangeScalarsFilterTclName);
+    pvApp->AddTraceEntry("%s SetScalarComponent 0 %s 0",
                            this->ChangeScalarsFilterTclName,
                            this->DefaultScalarsName);
 
