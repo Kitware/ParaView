@@ -62,7 +62,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.347");
+vtkCxxRevisionMacro(vtkPVSource, "1.348");
 
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
@@ -108,9 +108,9 @@ vtkPVSource::vtkPVSource()
   this->PVConsumers = 0;
 
 
-  // The underlying VTK objects. PVSource supports multiple VTK sources/filters.
+  // The underlying VTK objects. PVSource supports multiple VTK
+  // sources/filters.
   this->VTKSourceIDs = new vtkClientServerIDList;
-  
   
   // The frame which contains the parameters related to the data source
   // and the Accept/Reset/Delete buttons.
@@ -184,6 +184,7 @@ vtkPVSource::~vtkPVSource()
 
   // We need to delete the Tcl object too.  This call does it.
   this->RemoveAllVTKSources();
+  delete this->VTKSourceIDs;
 
   // Do not use SetName() or SetLabel() here. These make
   // the navigation window update when it should not.
@@ -679,7 +680,7 @@ void vtkPVSource::RemoveAllVTKSources()
     }
   pm->SendStreamToServer();
 
-  delete this->VTKSourceIDs;
+  this->VTKSourceIDs->clear();
 }
 
 //----------------------------------------------------------------------------

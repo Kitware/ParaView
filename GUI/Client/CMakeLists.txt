@@ -11,7 +11,6 @@ SET( ParaViewSharedNotWrapped_SRCS
 SET(ParaViewSharedNotTclWrapped_SRCS
   vtkPickPointWidget.cxx
   vtkPVProcessModule.cxx
-  vtkPVPolyDataMapper.cxx
   vtkPVLODActor.cxx
   vtkPVTimerInformation.cxx
   vtkMPIMToNSocketConnection.cxx

@@ -19,7 +19,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWProgressGauge );
-vtkCxxRevisionMacro(vtkKWProgressGauge, "1.18");
+vtkCxxRevisionMacro(vtkKWProgressGauge, "1.19");
 
 int vtkKWProgressGaugeCommand(ClientData cd, Tcl_Interp *interp,
                               int argc, char *argv[]);
@@ -38,6 +38,7 @@ vtkKWProgressGauge::vtkKWProgressGauge()
 
 vtkKWProgressGauge::~vtkKWProgressGauge()
 {
+  this->SetBackgroundColor(0);
   delete [] this->BarColor;
   this->BarColor = NULL;
 }
