@@ -57,6 +57,7 @@
 #include "Resources/vtkPVSurfaceVectorsButton.h"
 
 #include "Resources/vtkPVSelectionWindowButton.h"
+#include "Resources/vtkPVPullDownArrow.h"
 
 // Splash screen
 
@@ -65,6 +66,13 @@
 //----------------------------------------------------------------------------
 void vtkPVApplication::CreateButtonPhotos()
 {
+  this->CreatePhoto("PVPullDownArrow",
+                    image_PVPullDownArrow , 
+                    image_PVPullDownArrow_width, 
+                    image_PVPullDownArrow_height,
+                    image_PVPullDownArrow_pixel_size,
+                    image_PVPullDownArrow_buffer_length);
+
   this->CreatePhoto("PVResetViewButton", 
                     image_PVResetViewButton, 
                     image_PVResetViewButton_width, 
