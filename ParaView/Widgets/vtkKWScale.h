@@ -48,10 +48,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __vtkKWScale_h
 
 #include "vtkKWWidget.h"
+
 class vtkKWApplication;
 class vtkKWEntry;
-
-#define VTK_
+class vtkKWPushButton;
 
 class VTK_EXPORT vtkKWScale : public vtkKWWidget
 {
@@ -65,25 +65,46 @@ public:
   void Create(vtkKWApplication *app, const char *args);
 
   // Description:
-  // Set/Get the value of the scale.  If you are changing the default
-  // resoltion of the scale, set it before setting the value.
-  void SetValue(float v);
-  virtual float GetValue() {return this->Value;};
-
-  /// Description:
-  // Set the range for this scale.
-  void SetRange(float min, float max);
-  void GetRange(float &min, float &max);
+  // Method to set/get the resolution of the slider.  Be sure to set the
+  // resolution of the scale prior to setting the scale value.
+  virtual void SetResolution(float r);
+  vtkGetMacro(Resolution, float);
+  
+  // Description:
+  // Set/Get the value of the scale. If you are changing the default
+  // resolution of the scale, set it before setting the value.
+  virtual void SetValue(float v);
+  vtkGetMacro(Value, float);
 
   // Description:
-  // Display a label and or a text entry box. These are options. 
+  // Set the range for this scale.
+  virtual void SetRange(float min, float max);
+  virtual void SetRange(float *range) { this->SetRange(range[0], range[1]); };
+  vtkGetVector2Macro(Range, float);
+
+  // Description:
+  // Display a label and/or a text entry box. These are optional.
+  // Get the corresponding internal objects.
   void DisplayEntry();  
   void DisplayLabel(const char *l);  
+  vtkGetObjectMacro(Label, vtkKWWidget);
+  vtkGetObjectMacro(Entry, vtkKWEntry);
+
+  // Description:
+  // Set/Get the position of the label and/or entry (on top, or on the side).
   virtual void SetDisplayEntryAndLabelOnTop(int flag);
   vtkGetMacro(DisplayEntryAndLabelOnTop, int);
   vtkBooleanMacro(DisplayEntryAndLabelOnTop, int);  
-  vtkGetObjectMacro(Label, vtkKWWidget);
-  vtkGetObjectMacro(Entry, vtkKWEntry);
+
+  // Description:
+  // Set/Get a popup scale. 
+  // WARNING: must be set *before* Create() is called.
+  vtkSetMacro(PopupScale, int);
+  vtkGetMacro(PopupScale, int);
+  vtkBooleanMacro(PopupScale, int);  
+  void DisplayPopupScaleCallback();
+  void WithdrawPopupScaleCallback();
+  vtkGetObjectMacro(PopupPushButton, vtkKWPushButton);
 
   // Description:
   // Method that gets invoked when the sliders value has changed.
@@ -94,29 +115,27 @@ public:
   virtual void InvokeEntryCommand();
 
   // Description:
-  // Method to set / get the resolution of the slider.  Be sure to set the
-  // resolution of the scale prior to setting the scale value.
-  vtkGetMacro( Resolution, float );
-  void SetResolution( float r );
-  
-  // Description:
   // A method to set callback functions on objects.  The first argument is
   // the KWObject that will have the method called on it.  The second is the
   // name of the method to be called and any arguments in string form.
   // The calling is done via TCL wrappers for the KWObject.
-  virtual void SetCommand(vtkKWObject* Object, const char *MethodAndArgString);
-  virtual void SetStartCommand(vtkKWObject* Object, const char *MethodAndArgString);
-  virtual void SetEndCommand(vtkKWObject* Object, const char *MethodAndArgString);
-  virtual void SetEntryCommand(vtkKWObject* Object, const char *MethodAndArgString);
+  virtual void SetCommand      (vtkKWObject* Object, 
+                                const char *MethodAndArgString);
+  virtual void SetStartCommand (vtkKWObject* Object, 
+                                const char *MethodAndArgString);
+  virtual void SetEndCommand   (vtkKWObject* Object, 
+                                const char *MethodAndArgString);
+  virtual void SetEntryCommand (vtkKWObject* Object, 
+                                const char *MethodAndArgString);
 
   // Description:
   // Setting this string enables balloon help for this widget.
   // Override to pass down to children for cleaner behavior
   virtual void SetBalloonHelpString(const char *str);
-  virtual void SetBalloonHelpJustification( int j );
+  virtual void SetBalloonHelpJustification(int j);
 
   // Description:
-  // Set or get enabled state.
+  // Set/get enabled state.
   virtual void SetEnabled(int);
 
   // Description:
@@ -130,17 +149,22 @@ protected:
   ~vtkKWScale();
 
   int         DisplayEntryAndLabelOnTop;
+  int         PopupScale;
 
   char        *Command;
   char        *StartCommand;
   char        *EndCommand;
   char        *EntryCommand;
+
   float       Value;
   float       Resolution;
-  vtkKWWidget *ScaleWidget;
+  float       Range[2];
+
+  vtkKWWidget *Scale;
   vtkKWEntry  *Entry;
   vtkKWWidget *Label;
-  float Range[2];
+  vtkKWWidget *TopLevel;
+  vtkKWPushButton *PopupPushButton;
 
   void PackWidget();
 
