@@ -82,7 +82,7 @@ public:
   virtual void AKeyPress(char key, int x, int y, int ctrl, int shift);
   virtual void Exposed();
   virtual void Configure(int width, int height);
-  virtual void Enter(int x, int y) {}
+  virtual void Enter(int /*x*/, int /*y*/) {}
   
   virtual void Render();
   virtual void Reset() = 0;
