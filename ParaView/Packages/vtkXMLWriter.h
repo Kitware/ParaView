@@ -234,7 +234,7 @@ protected:
   void WritePointDataAppendedData(vtkPointData* pd, unsigned long* pdPositions);
   unsigned long* WriteCellDataAppended(vtkCellData* cd, vtkIndent indent);
   void WriteCellDataAppendedData(vtkCellData* cd, unsigned long* cdPositions);
-  void WriteAttributeIndices(vtkDataSetAttributes* dsa);  
+  void WriteAttributeIndices(vtkDataSetAttributes* dsa, char** names);
   unsigned long WritePointsAppended(vtkPoints* points, vtkIndent indent);
   void WritePointsAppendedData(vtkPoints* points, unsigned long pointsPosition);
   void WritePointsInline(vtkPoints* points, vtkIndent indent);
@@ -251,7 +251,8 @@ protected:
   void WritePPointData(vtkPointData* pd, vtkIndent indent);
   void WritePCellData(vtkCellData* cd, vtkIndent indent);
   void WritePPoints(vtkPoints* points, vtkIndent indent);
-  void WritePDataArray(vtkDataArray* a, vtkIndent indent);  
+  void WritePDataArray(vtkDataArray* a, vtkIndent indent,
+                       const char* alternateName=0);
   
   // Internal utility methods.
   int WriteBinaryDataInternal(void* data, unsigned long size);
@@ -261,6 +262,9 @@ protected:
   int WriteCompressionHeader();
   unsigned long GetWordTypeSize(int dataType);
   const char* GetWordTypeName(int dataType);
+  
+  char** CreateStringArray(int numStrings);
+  void DestroyStringArray(int numStrings, char** strings);
   
 private:
   vtkXMLWriter(const vtkXMLWriter&);  // Not implemented.

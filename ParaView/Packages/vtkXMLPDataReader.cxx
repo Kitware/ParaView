@@ -20,7 +20,7 @@
 #include "vtkXMLDataReader.h"
 #include "vtkDataSet.h"
 
-vtkCxxRevisionMacro(vtkXMLPDataReader, "1.4");
+vtkCxxRevisionMacro(vtkXMLPDataReader, "1.5");
 
 //----------------------------------------------------------------------------
 vtkXMLPDataReader::vtkXMLPDataReader()
@@ -100,19 +100,8 @@ void vtkXMLPDataReader::SetupOutputInformation()
     }
   
   // Setup attribute indices for the point data and cell data.
-  for(i=0;i < vtkDataSetAttributes::NUM_ATTRIBUTES;++i)
-    {
-    const char* attrName = vtkDataSetAttributes::GetAttributeTypeAsString(i);
-    int attrIndex;
-    if(ePointData && ePointData->GetScalarAttribute(attrName, attrIndex))
-      {
-      pointData->SetActiveAttribute(attrIndex, i);
-      }
-    if(eCellData && eCellData->GetScalarAttribute(attrName, attrIndex))
-      {
-      cellData->SetActiveAttribute(attrIndex, i);
-      }
-    }
+  this->ReadAttributeIndices(ePointData, pointData);
+  this->ReadAttributeIndices(eCellData, cellData);
 }
 
 //----------------------------------------------------------------------------

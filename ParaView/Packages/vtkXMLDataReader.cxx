@@ -22,7 +22,7 @@
 #include "vtkCellData.h"
 #include "vtkDataSet.h"
 
-vtkCxxRevisionMacro(vtkXMLDataReader, "1.1");
+vtkCxxRevisionMacro(vtkXMLDataReader, "1.2");
 
 //----------------------------------------------------------------------------
 vtkXMLDataReader::vtkXMLDataReader()
@@ -141,22 +141,11 @@ void vtkXMLDataReader::SetupOutputInformation()
       cellData->AddArray(array);
       array->Delete();
       }
-    }
+    }  
   
   // Setup attribute indices for the point data and cell data.
-  for(i=0;i < vtkDataSetAttributes::NUM_ATTRIBUTES;++i)
-    {
-    const char* attrName = vtkDataSetAttributes::GetAttributeTypeAsString(i);
-    int attrIndex;
-    if(ePointData && ePointData->GetScalarAttribute(attrName, attrIndex))
-      {
-      pointData->SetActiveAttribute(attrIndex, i);
-      }
-    if(eCellData && eCellData->GetScalarAttribute(attrName, attrIndex))
-      {
-      cellData->SetActiveAttribute(attrIndex, i);
-      }
-    }
+  this->ReadAttributeIndices(ePointData, pointData);
+  this->ReadAttributeIndices(eCellData, cellData);
 }
 
 //----------------------------------------------------------------------------

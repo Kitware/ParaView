@@ -27,6 +27,7 @@
 class vtkXMLDataParser;
 class vtkXMLDataElement;
 class vtkDataSet;
+class vtkDataSetAttributes;
 class vtkDataArray;
 
 class VTK_EXPORT vtkXMLReader : public vtkSource
@@ -103,6 +104,8 @@ protected:
   void ComputeIncrements(int* extent, int* increments, int isPoint);
   unsigned int GetStartTuple(int* extent, int* increments,
                              int i, int j, int k);
+  void ReadAttributeIndices(vtkXMLDataElement* eDSA,
+                            vtkDataSetAttributes* dsa);
   
   // The vtkXMLDataParser instance used to hide XML reading details.
   vtkXMLDataParser* XMLParser;

@@ -27,7 +27,7 @@
 #include "vtkPoints.h"
 #include "vtkUnsignedCharArray.h"
 
-vtkCxxRevisionMacro(vtkXMLWriter, "1.5");
+vtkCxxRevisionMacro(vtkXMLWriter, "1.6");
 vtkCxxSetObjectMacro(vtkXMLWriter, Compressor, vtkDataCompressor);
 
 //----------------------------------------------------------------------------
@@ -899,40 +899,46 @@ void vtkXMLWriter::WriteInlineData(void* data, int numWords, int wordType,
 void vtkXMLWriter::WritePointDataInline(vtkPointData* pd, vtkIndent indent)
 {
   ostream& os = *(this->Stream);
+  char** names = this->CreateStringArray(pd->GetNumberOfArrays());
   
   os << indent << "<PointData";
-  this->WriteAttributeIndices(pd);
+  this->WriteAttributeIndices(pd, names);
   os << ">\n";
-
+  
   int i;
   for(i=0; i < pd->GetNumberOfArrays(); ++i)
     {
     vtkDataArray* a = this->CreateArrayForPoints(pd->GetArray(i));
-    this->WriteDataArrayInline(a, indent.GetNextIndent());
+    this->WriteDataArrayInline(a, indent.GetNextIndent(), names[i]);
     a->Delete();
     }
   
   os << indent << "</PointData>\n";  
+  
+  this->DestroyStringArray(pd->GetNumberOfArrays(), names);
 }
 
 //----------------------------------------------------------------------------
 void vtkXMLWriter::WriteCellDataInline(vtkCellData* cd, vtkIndent indent)
 {  
   ostream& os = *(this->Stream);
+  char** names = this->CreateStringArray(cd->GetNumberOfArrays());
   
   os << indent << "<CellData";
-  this->WriteAttributeIndices(cd);
+  this->WriteAttributeIndices(cd, names);
   os << ">\n";
 
   int i;
   for(i=0; i < cd->GetNumberOfArrays(); ++i)
     {
     vtkDataArray* a = this->CreateArrayForCells(cd->GetArray(i));
-    this->WriteDataArrayInline(a, indent.GetNextIndent());
+    this->WriteDataArrayInline(a, indent.GetNextIndent(), names[i]);
     a->Delete();
     }
   
-  os << indent << "</CellData>\n";  
+  os << indent << "</CellData>\n";
+  
+  this->DestroyStringArray(cd->GetNumberOfArrays(), names);
 }
 
 //----------------------------------------------------------------------------
@@ -941,19 +947,23 @@ unsigned long* vtkXMLWriter::WritePointDataAppended(vtkPointData* pd,
 {
   ostream& os = *(this->Stream);
   unsigned long* pdPositions = new unsigned long[pd->GetNumberOfArrays()];
+  char** names = this->CreateStringArray(pd->GetNumberOfArrays());
   
   os << indent << "<PointData";
-  this->WriteAttributeIndices(pd);
+  this->WriteAttributeIndices(pd, names);
   os << ">\n";  
   
   int i;
   for(i=0; i < pd->GetNumberOfArrays(); ++i)
     {
     pdPositions[i] = this->WriteDataArrayAppended(pd->GetArray(i),
-                                                  indent.GetNextIndent());
+                                                  indent.GetNextIndent(),
+                                                  names[i]);
     }
   
   os << indent << "</PointData>\n";
+  
+  this->DestroyStringArray(pd->GetNumberOfArrays(), names);
   
   return pdPositions;
 }
@@ -978,19 +988,23 @@ unsigned long* vtkXMLWriter::WriteCellDataAppended(vtkCellData* cd,
 {
   ostream& os = *(this->Stream);
   unsigned long* cdPositions = new unsigned long[cd->GetNumberOfArrays()];
+  char** names = this->CreateStringArray(cd->GetNumberOfArrays());
   
   os << indent << "<CellData";
-  this->WriteAttributeIndices(cd);
+  this->WriteAttributeIndices(cd, names);
   os << ">\n";  
   
   int i;
   for(i=0; i < cd->GetNumberOfArrays(); ++i)
     {
     cdPositions[i] = this->WriteDataArrayAppended(cd->GetArray(i),
-                                                  indent.GetNextIndent());
+                                                  indent.GetNextIndent(),
+                                                  names[i]);
     }
   
   os << indent << "</CellData>\n";
+  
+  this->DestroyStringArray(cd->GetNumberOfArrays(), names);
   
   return cdPositions;
 }
@@ -1010,7 +1024,8 @@ void vtkXMLWriter::WriteCellDataAppendedData(vtkCellData* cd,
 }
 
 //----------------------------------------------------------------------------
-void vtkXMLWriter::WriteAttributeIndices(vtkDataSetAttributes* dsa)
+void vtkXMLWriter::WriteAttributeIndices(vtkDataSetAttributes* dsa,
+                                         char** names)
 {
   int i;
   int attributeIndices[vtkDataSetAttributes::NUM_ATTRIBUTES];
@@ -1019,8 +1034,18 @@ void vtkXMLWriter::WriteAttributeIndices(vtkDataSetAttributes* dsa)
     {
     if(attributeIndices[i] >= 0)
       {
-      const char* aName = dsa->GetAttributeTypeAsString(i);
-      this->WriteScalarAttribute(aName, attributeIndices[i]);
+      const char* attrName = dsa->GetAttributeTypeAsString(i);
+      vtkDataArray* a = dsa->GetArray(attributeIndices[i]);
+      const char* arrayName = a->GetName();
+      if(!arrayName)
+        {
+        // Assign a name to the array.
+        names[attributeIndices[i]] = new char[strlen(attrName)+2];
+        strcpy(names[attributeIndices[i]], attrName);
+        strcat(names[attributeIndices[i]], "_");
+        arrayName = names[attributeIndices[i]];
+        }
+      this->WriteStringAttribute(attrName, arrayName);
       }
     }  
 }
@@ -1141,17 +1166,21 @@ void vtkXMLWriter::WritePPointData(vtkPointData* pd, vtkIndent indent)
     return;
     }
   ostream& os = *(this->Stream);
+  char** names = this->CreateStringArray(pd->GetNumberOfArrays());
+  
   os << indent << "<PPointData";
-  this->WriteAttributeIndices(pd);
+  this->WriteAttributeIndices(pd, names);
   os << ">\n";
   
   int i;
   for(i=0; i < pd->GetNumberOfArrays(); ++i)
     {
-    this->WritePDataArray(pd->GetArray(i), indent.GetNextIndent());
+    this->WritePDataArray(pd->GetArray(i), indent.GetNextIndent(), names[i]);
     }  
   
   os << indent << "</PPointData>\n";
+  
+  this->DestroyStringArray(pd->GetNumberOfArrays(), names);
 }
 
 //----------------------------------------------------------------------------
@@ -1162,17 +1191,21 @@ void vtkXMLWriter::WritePCellData(vtkCellData* cd, vtkIndent indent)
     return;
     }
   ostream& os = *(this->Stream);
+  char** names = this->CreateStringArray(cd->GetNumberOfArrays());
+  
   os << indent << "<PCellData";
-  this->WriteAttributeIndices(cd);
+  this->WriteAttributeIndices(cd, names);
   os << ">\n";
   
   int i;
   for(i=0; i < cd->GetNumberOfArrays(); ++i)
     {
-    this->WritePDataArray(cd->GetArray(i), indent.GetNextIndent());
+    this->WritePDataArray(cd->GetArray(i), indent.GetNextIndent(), names[i]);
     }
   
   os << indent << "</PCellData>\n";
+  
+  this->DestroyStringArray(cd->GetNumberOfArrays(), names);
 }
 
 //----------------------------------------------------------------------------
@@ -1187,17 +1220,51 @@ void vtkXMLWriter::WritePPoints(vtkPoints* points, vtkIndent indent)
 }
 
 //----------------------------------------------------------------------------
-void vtkXMLWriter::WritePDataArray(vtkDataArray* a, vtkIndent indent)
+void vtkXMLWriter::WritePDataArray(vtkDataArray* a, vtkIndent indent,
+                                   const char* alternateName)
 {
   ostream& os = *(this->Stream);
   os << indent << "<DataArray";
   this->WriteWordTypeAttribute("type", a->GetDataType());
-  const char* arrayName = a->GetName();
-  if(arrayName) { this->WriteStringAttribute("Name", arrayName); }
+  if(alternateName)
+    {
+    this->WriteStringAttribute("Name", alternateName);
+    }
+  else
+    {
+    const char* arrayName = a->GetName();
+    if(arrayName) { this->WriteStringAttribute("Name", arrayName); }
+    }
   if(a->GetNumberOfComponents() > 1)
     {
     this->WriteScalarAttribute("NumberOfComponents",
                                a->GetNumberOfComponents());
     }
   os << "/>\n";
+}
+
+//----------------------------------------------------------------------------
+char** vtkXMLWriter::CreateStringArray(int numStrings)
+{
+  char** strings = new char*[numStrings];
+  int i;
+  for(i=0; i < numStrings; ++i)
+    {
+    strings[i] = 0;
+    }
+  return strings;
+}
+
+//----------------------------------------------------------------------------
+void vtkXMLWriter::DestroyStringArray(int numStrings, char** strings)
+{
+  int i;
+  for(i=0; i < numStrings; ++i)
+    {
+    if(strings[i])
+      {
+      delete [] strings[i];
+      }
+    }
+  delete strings;
 }

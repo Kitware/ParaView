@@ -20,6 +20,7 @@
 #include "vtkDataArray.h"
 #include "vtkDataCompressor.h"
 #include "vtkDataSet.h"
+#include "vtkDataSetAttributes.h"
 #include "vtkInstantiator.h"
 #include "vtkObjectFactory.h"
 #include "vtkXMLDataElement.h"
@@ -28,7 +29,7 @@
 
 #include <sys/stat.h>
 
-vtkCxxRevisionMacro(vtkXMLReader, "1.2");
+vtkCxxRevisionMacro(vtkXMLReader, "1.3");
 
 //----------------------------------------------------------------------------
 vtkXMLReader::vtkXMLReader()
@@ -435,4 +436,20 @@ unsigned int vtkXMLReader::GetStartTuple(int* extent, int* increments,
   offset += (j - extent[2]) * increments[1];
   offset += (k - extent[4]) * increments[2];
   return offset;
+}
+
+//----------------------------------------------------------------------------
+void vtkXMLReader::ReadAttributeIndices(vtkXMLDataElement* eDSA,
+                                        vtkDataSetAttributes* dsa)
+{
+  // Setup attribute indices.
+  int i;
+  for(i=0;i < vtkDataSetAttributes::NUM_ATTRIBUTES;++i)
+    {
+    const char* attrName = vtkDataSetAttributes::GetAttributeTypeAsString(i);
+    if(eDSA && eDSA->GetAttribute(attrName))
+      {
+      dsa->SetActiveAttribute(eDSA->GetAttribute(attrName), i);
+      }
+    }
 }
