@@ -93,7 +93,7 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterfaceEntry);
-vtkCxxRevisionMacro(vtkPVAnimationInterfaceEntry, "1.1");
+vtkCxxRevisionMacro(vtkPVAnimationInterfaceEntry, "1.2");
 
 //-----------------------------------------------------------------------------
 vtkPVAnimationInterfaceEntry::vtkPVAnimationInterfaceEntry()
@@ -218,6 +218,17 @@ void vtkPVAnimationInterfaceEntry::Create(vtkPVApplication* pvApp, const char*)
 
   this->SourceMenuButton->SetBalloonHelpString(
     "Select the filter/source whose instance varible will change with time.");
+  this->MethodMenuButton->SetBalloonHelpString(
+    "Select the method that will be called.");
+  this->StartTimeEntry->SetBalloonHelpString(
+    "This is the value of the source at the time frame 0."
+    " When time frame is between 0 and maximum, the value "
+    "will be interpolated between Start Value and End Value.");
+  this->EndTimeEntry->SetBalloonHelpString(
+    "This is the value of the source at the minimum time frame."
+    " When time frame is between 0 and maximum, the value "
+    "will be interpolated between Start Value and End Value.");
+
   if (this->PVSource)
     {
     this->SourceMenuButton->SetButtonText(this->PVSource->GetName());
@@ -226,8 +237,6 @@ void vtkPVAnimationInterfaceEntry::Create(vtkPVApplication* pvApp, const char*)
     {
     this->SourceMenuButton->SetButtonText("None");
     }
-  this->MethodMenuButton->SetBalloonHelpString(
-    "Select the method that will be called.");
 
 
   this->SourceLabel->SetLabel("Source");
@@ -270,7 +279,6 @@ vtkPVAnimationInterfaceEntry::~vtkPVAnimationInterfaceEntry()
   this->MethodMenuButton->Delete();
   this->StartTimeEntry->Delete();
   this->EndTimeEntry->Delete();
-  this->SetPVSource(0);
   this->SetScript(0);
   this->SetCurrentMethod(0);
   this->SetTimeEquation(0);
@@ -286,6 +294,7 @@ const char* vtkPVAnimationInterfaceEntry::GetWidgetName()
 //-----------------------------------------------------------------------------
 void vtkPVAnimationInterfaceEntry::SetPVSource(vtkPVSource* src)
 {
+  //cout << "SetPVSource(" << src << ")  -- replace (" << this->PVSource << ")" << endl;
   //cout << "SetPVSource: " << (src?src->GetName():"<none>") << endl;
   if ( src == this->PVSource )
     {
@@ -293,16 +302,15 @@ void vtkPVAnimationInterfaceEntry::SetPVSource(vtkPVSource* src)
     }
   if ( this->PVSource )
     {
-    cout << "Remove observer: " << this->DeleteEventTag << endl;
-    this->PVSource->RemoveObservers(this->DeleteEventTag);
-    this->DeleteEventTag = -1;
+    //cout << "Remove observer: " << this->DeleteEventTag << " (" << this->PVSource << ")" << endl;
+    //this->PVSource->RemoveObservers(this->DeleteEventTag);
     }
   this->PVSource = src;
   vtkKWMenuButton* button = this->GetSourceMenuButton();
   if ( this->PVSource )
     {
-    this->DeleteEventTag = this->PVSource->AddObserver(vtkCommand::DeleteEvent, this->Observer);
-    cout << "Add observer: " << this->DeleteEventTag << endl;
+    //this->DeleteEventTag = this->PVSource->AddObserver(vtkCommand::DeleteEvent, this->Observer);
+    //cout << "Add observer: " << this->DeleteEventTag << " (" << this->PVSource << ")" << endl;
     button->SetButtonText(this->PVSource->GetName());
     //cout << "-- PV source was set to: " << (src?src->GetName():"<none>") << endl;
     if (this->PVSource->InitializeTrace(NULL))
@@ -398,7 +406,7 @@ void vtkPVAnimationInterfaceEntry::SetTimeStart(float f)
 //-----------------------------------------------------------------------------
 void vtkPVAnimationInterfaceEntry::SetTimeEnd(float f)
 {
-  cout << "Set Time end to: " << f << endl;
+  //cout << "Set Time end to: " << f << endl;
   if ( this->TimeEnd == f )
     {
     return;
@@ -415,7 +423,7 @@ void vtkPVAnimationInterfaceEntry::SetTimeEnd(float f)
 //-----------------------------------------------------------------------------
 void vtkPVAnimationInterfaceEntry::UpdateStartEndValueFromEntry()
 {
-  cout << "UpdateStartEndValueFromEntry" << endl;
+  //cout << "UpdateStartEndValueFromEntry" << endl;
   if (this->UpdatingEntries)
     {
     return;
@@ -458,6 +466,7 @@ const char* vtkPVAnimationInterfaceEntry::GetTimeEquation(float vtkNotUsed(tmax)
 {
   if ( this->Dirty )
     {
+    //cout << "GetTimeEquation; type is: " << this->TypeIsInt << endl;
     this->UpdateStartEndValueFromEntry();
     float cmax = this->TimeEnd;
     float cmin = this->TimeStart;
@@ -498,23 +507,28 @@ const char* vtkPVAnimationInterfaceEntry::GetTimeEquation(float vtkNotUsed(tmax)
 //-----------------------------------------------------------------------------
 void vtkPVAnimationInterfaceEntry::SetupBinds()
 {
-  vtkPVAnimationInterface* ai = this->Parent;
-  this->StartTimeEntry->GetEntry()->SetBind(ai, "<FocusOut>", "UpdateNewScript");
-  this->StartTimeEntry->GetEntry()->SetBind(ai, "<KeyPress-Return>", "UpdateNewScript");
-  this->EndTimeEntry->GetEntry()->SetBind(ai, "<FocusOut>", "UpdateNewScript");
-  this->EndTimeEntry->GetEntry()->SetBind(ai, "<KeyPress-Return>", "UpdateNewScript");
+  this->StartTimeEntry->GetEntry()->SetBind(this, "<FocusOut>",
+    "UpdateStartEndValueFromEntry");
+  this->StartTimeEntry->GetEntry()->SetBind(this, "<KeyPress-Return>",
+    "UpdateStartEndValueFromEntry");
+  this->EndTimeEntry->GetEntry()->SetBind(this, "<FocusOut>",
+    "UpdateStartEndValueFromEntry");
+  this->EndTimeEntry->GetEntry()->SetBind(this, "<KeyPress-Return>",
+    "UpdateStartEndValueFromEntry"); 
 }
 
 //-----------------------------------------------------------------------------
 void vtkPVAnimationInterfaceEntry::SetTypeToFloat()
 {
   this->TypeIsInt = 0;
+  this->Dirty = 1;
 }
 
 //-----------------------------------------------------------------------------
 void vtkPVAnimationInterfaceEntry::SetTypeToInt()
 {
   this->TypeIsInt = 1;
+  this->Dirty = 1;
 }
 
 //-----------------------------------------------------------------------------
@@ -552,6 +566,7 @@ void vtkPVAnimationInterfaceEntry::SetLabelAndScript(const char* label,
 //-----------------------------------------------------------------------------
 void vtkPVAnimationInterfaceEntry::Update()
 {
+  //cout << "Type is: " << this->TypeIsInt << endl;
   this->Parent->UpdateNewScript();
   this->Parent->ShowEntryInFrame(this);
 }
@@ -560,5 +575,18 @@ void vtkPVAnimationInterfaceEntry::Update()
 void vtkPVAnimationInterfaceEntry::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
+  os << indent << "Label: " << (this->Label?this->Label:"(none)") << endl;
+  os << indent << "Script: " << (this->Script?this->Script:"(none)") << endl;
+  os << indent << "CurrentMethod: " 
+    << (this->CurrentMethod?this->CurrentMethod:"(none)") << endl;
+  os << indent << "TimeEquation: " 
+    << (this->TimeEquation?this->TimeEquation:"(none)") << endl;
+  os << indent << "TimeStart: " << this->TimeStart << endl;
+  os << indent << "TimeEnd: " << this->TimeEnd<< endl;
+  os << indent << "Dirty: " << this->Dirty<< endl;
+
+  os << indent << "SourceMenuButton: " << this->SourceMenuButton << endl;
+  os << indent << "MethodMenuButton: " << this->MethodMenuButton << endl;
+  os << indent << "PVSource: " << this->PVSource<< endl;
 }
 

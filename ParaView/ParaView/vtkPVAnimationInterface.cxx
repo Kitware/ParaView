@@ -143,7 +143,7 @@ static unsigned char image_goto_end[] =
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterface);
-vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.68");
+vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.69");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterface,ControlledWidget, vtkPVWidget);
 
@@ -398,7 +398,6 @@ void vtkPVAnimationInterface::Create(vtkKWApplication *app, char *frameArgs)
   this->PlayButton->SetParent(this->ControlButtonFrame);
   this->PlayButton->Create(this->Application, "");
   this->PlayButton->SetCommand(this, "Play");
-  this->PlayButton->SetBalloonHelpString("Play animation");
 
   this->PlayButton->SetImageOption(image_play, 
                                    image_play_width, 
@@ -411,7 +410,6 @@ void vtkPVAnimationInterface::Create(vtkKWApplication *app, char *frameArgs)
   this->StopButton->SetParent(this->ControlButtonFrame);
   this->StopButton->Create(this->Application, "");
   this->StopButton->SetCommand(this, "Stop");
-  this->StopButton->SetBalloonHelpString("Stop animation");
   
   this->StopButton->SetImageOption(image_stop, 
                                    image_stop_width, 
@@ -424,8 +422,6 @@ void vtkPVAnimationInterface::Create(vtkKWApplication *app, char *frameArgs)
   this->GoToBeginningButton->SetParent(this->ControlButtonFrame);
   this->GoToBeginningButton->Create(this->Application, "");
   this->GoToBeginningButton->SetCommand(this, "GoToBeginning");
-  this->GoToBeginningButton->SetBalloonHelpString(
-    "Go to the beginning of the animation");
 
   this->GoToBeginningButton->SetImageOption(
     image_goto_beginning, 
@@ -439,8 +435,6 @@ void vtkPVAnimationInterface::Create(vtkKWApplication *app, char *frameArgs)
   this->GoToEndButton->SetParent(this->ControlButtonFrame);
   this->GoToEndButton->Create(this->Application, "");
   this->GoToEndButton->SetCommand(this, "GoToEnd");
-  this->GoToEndButton->SetBalloonHelpString(
-    "Go to the end of the animation");
 
   this->GoToEndButton->SetImageOption(image_goto_end, 
                                       image_goto_end_width, 
@@ -455,8 +449,6 @@ void vtkPVAnimationInterface::Create(vtkKWApplication *app, char *frameArgs)
   this->LoopCheckButton->SetCommand(this, "LoopCheckButtonCallback");
   this->LoopCheckButton->SetState(this->Loop ? 1 : 0);
   this->LoopCheckButton->SetIndicator(0);
-  this->LoopCheckButton->SetBalloonHelpString(
-    "Enable/Disable animation loop.");
 
   this->LoopCheckButton->SetImageOption(image_loop, 
                                         image_loop_width, 
@@ -497,6 +489,7 @@ void vtkPVAnimationInterface::Create(vtkKWApplication *app, char *frameArgs)
   this->NumberOfFramesEntry->GetEntry()->SetWidth(6);
   this->NumberOfFramesEntry->SetLabel("Number Of Frames:");
   this->NumberOfFramesEntry->SetValue(this->NumberOfFrames);
+
 
   this->Script("bind %s <KeyPress-Return> {%s NumberOfFramesEntryCallback}",
                this->NumberOfFramesEntry->GetEntry()->GetWidgetName(),
@@ -539,6 +532,7 @@ void vtkPVAnimationInterface::Create(vtkKWApplication *app, char *frameArgs)
     this->AnimationEntryInformation->GetWidgetName(),
     frame->GetWidgetName());
 
+
   vtkKWFrame* fr = vtkKWFrame::New();
   fr->SetParent(frame->GetFrame());
   fr->Create(this->Application, 0);
@@ -566,6 +560,7 @@ void vtkPVAnimationInterface::Create(vtkKWApplication *app, char *frameArgs)
 
   this->ScriptCheckButtonFrame->SetParent(this->ActionFrame->GetFrame());
   this->ScriptCheckButtonFrame->Create(this->Application, "frame", "");
+
 
   this->Script("pack %s -side top -expand t -fill x", 
                this->ScriptCheckButtonFrame->GetWidgetName());
@@ -626,6 +621,35 @@ void vtkPVAnimationInterface::Create(vtkKWApplication *app, char *frameArgs)
   this->UpdateInterface();
 
   this->AddEmptySourceItem();
+
+  this->PlayButton->SetBalloonHelpString("Play animation");
+  this->StopButton->SetBalloonHelpString("Stop animation");
+  this->GoToBeginningButton->SetBalloonHelpString(
+    "Go to the beginning of the animation");
+  this->GoToEndButton->SetBalloonHelpString(
+    "Go to the end of the animation");
+  this->LoopCheckButton->SetBalloonHelpString(
+    "Enable/Disable animation loop.");
+  this->TimeScale->SetBalloonHelpString(
+    "Current frame of the animation");
+  this->NumberOfFramesEntry->SetBalloonHelpString(
+    "Total number of frames for the animation.");
+  this->AnimationEntriesMenu->SetBalloonHelpString(
+    "Switch between animation actions");
+  this->AddItemButton->SetBalloonHelpString(
+    "Add additional action to the animation");
+  this->DeleteItemButton->SetBalloonHelpString(
+    "Delete current action from the animation");
+  this->ScriptCheckButtonFrame->SetBalloonHelpString(
+    "Open/Close the Tcl script editor for manually editing animation");
+  this->SaveImagesButton->SetBalloonHelpString(
+    "Save images resulting from the animation");
+  this->SaveGeometryButton->SetBalloonHelpString(
+    "Save geometry resulting from the animation");
+  this->CacheGeometryCheck->SetBalloonHelpString(
+    "Cache geometry when doing animation. This will "
+    "speedup animation when generating geometry is a slow operation.");
+
 }
 
 //-----------------------------------------------------------------------------

@@ -164,7 +164,7 @@ protected:
 
   int Dirty;
 
-  int DeleteEventTag;
+  unsigned long DeleteEventTag;
   vtkPVAnimationInterfaceEntryObserver* Observer;
 
   vtkPVAnimationInterfaceEntry(const vtkPVAnimationInterfaceEntry&); // Not implemented

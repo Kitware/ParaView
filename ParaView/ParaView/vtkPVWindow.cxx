@@ -138,7 +138,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.460");
+vtkCxxRevisionMacro(vtkPVWindow, "1.461");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -4292,4 +4292,5 @@ void vtkPVWindow::PrintSelf(ostream& os, vtkIndent indent)
      << (this->InteractiveRenderEnabled?"on":"off") << endl;
   os << indent << "ShowSourcesLongHelp: " 
      << (this->ShowSourcesLongHelp?"on":"off") << endl;
+  os << indent << "AnimationInterface: " << this->AnimationInterface << endl;
 }
