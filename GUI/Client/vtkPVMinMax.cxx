@@ -28,10 +28,11 @@
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMDoubleRangeDomain.h"
 #include "vtkSMDoubleVectorProperty.h"
+#include "vtkSMSourceProxy.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVMinMax);
-vtkCxxRevisionMacro(vtkPVMinMax, "1.43");
+vtkCxxRevisionMacro(vtkPVMinMax, "1.44");
 
 vtkCxxSetObjectMacro(vtkPVMinMax, ArrayMenu, vtkPVArrayMenu);
 
@@ -345,6 +346,9 @@ void vtkPVMinMax::ResetInternal()
 //----------------------------------------------------------------------------
 void vtkPVMinMax::Update()
 {
+  vtkPVSource* source = this->GetPVSource();
+  source->GetProxy()->UpdateInformation();
+
   double range[2];
   double oldRange[2];
 
