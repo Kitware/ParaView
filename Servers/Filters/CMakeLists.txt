@@ -13,6 +13,9 @@ SET(Filters_SRCS
   vtkPickLineWidget.cxx
   vtkPickPointWidget.cxx
   vtkPVSummaryHelper.cxx
+  vtkSurfaceVectors.cxx
+  vtkIntegrateAttributes.cxx
+  vtkIntegrateFlowThroughSurface.cxx
   vtkPVLODActor.cxx
   vtkPVLODVolume.cxx
   vtkPVGenericRenderWindowInteractor.cxx
