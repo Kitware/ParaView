@@ -126,7 +126,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.404");
+vtkCxxRevisionMacro(vtkPVWindow, "1.405");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -1799,9 +1799,9 @@ void vtkPVWindow::SetShowSourcesLongHelp(int v)
   vtkPVApplicationSettingsInterface *asi = 
     vtkPVApplicationSettingsInterface::SafeDownCast(
       this->GetApplicationSettingsInterface());
-  if (asi && asi->GetShowSourcesDescriptionCheckButton())
+  if (asi)
     {
-    asi->GetShowSourcesDescriptionCheckButton()->SetState(v ? 1 : 0);
+    asi->SetShowSourcesDescription(v ? 1 : 0);
     }
 
   if (this->ShowSourcesLongHelp == v)
@@ -3832,7 +3832,7 @@ void vtkPVWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVWindow ";
-  this->ExtractRevision(os,"$Revision: 1.404 $");
+  this->ExtractRevision(os,"$Revision: 1.405 $");
 }
 
 //----------------------------------------------------------------------------

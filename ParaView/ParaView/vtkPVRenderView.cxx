@@ -108,7 +108,7 @@ static unsigned char image_properties[] =
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.224");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.225");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -1002,9 +1002,9 @@ void vtkPVRenderView::SetSourcesBrowserAlwaysShowName(int s)
     vtkPVApplicationSettingsInterface *asi = 
       vtkPVApplicationSettingsInterface::SafeDownCast(
         this->GetPVWindow()->GetApplicationSettingsInterface());
-    if (asi && asi->GetShowSourcesNameCheckButton())
+    if (asi)
       {
-      asi->GetShowSourcesNameCheckButton()->SetState(s ? 1 : 0);
+      asi->SetShowSourcesName(s ? 1 : 0);
       }
     }
 
@@ -2599,7 +2599,7 @@ void vtkPVRenderView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVRenderView ";
-  this->ExtractRevision(os,"$Revision: 1.224 $");
+  this->ExtractRevision(os,"$Revision: 1.225 $");
 }
 
 //------------------------------------------------------------------------------
