@@ -72,6 +72,7 @@ void vtkKWCheckButton::SetIndicator(int ind)
 	}
       }
     }
+  this->SetMyText(0);
 }
 
 void vtkKWCheckButton::SetText(const char* txt)

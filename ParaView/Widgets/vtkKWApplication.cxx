@@ -142,6 +142,10 @@ vtkKWApplication::vtkKWApplication()
 
 vtkKWApplication::~vtkKWApplication()
 {
+  if ( this->BalloonHelpWindow )
+    {
+    this->BalloonHelpWindow->Delete();
+    }
   this->SetBalloonHelpWidget(0);
   if (this->Windows)
     {
@@ -259,7 +263,7 @@ void vtkKWApplication::SimpleScript(const char *event)
 void vtkKWApplication::SetApplicationName(const char *_arg)
 {
   vtkDebugMacro(<< this->GetClassName() << " (" << this << "): setting ApplicationName to " << _arg ); 
-  if ( this->ApplicationName && _arg && (!strcmp(this->ApplicationName,_arg)))
+  if ( _arg && vtkString::Equals(this->ApplicationName,_arg) )
     { 
     return;
     } 

@@ -3004,7 +3004,7 @@ vtkPVColorMap* vtkPVWindow::GetPVColorMap(const char* parameterName)
   this->PVColorMaps->InitTraversal();
   while ( (cm = (vtkPVColorMap*)(this->PVColorMaps->GetNextItemAsObject())) )
     {
-    if (strcmp(parameterName, cm->GetName()) == 0)
+    if (vtkString::Equals(parameterName, cm->GetName()))
       {
       return cm;
       }

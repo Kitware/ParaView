@@ -78,6 +78,7 @@ vtkPVColorMap::vtkPVColorMap()
   this->InstanceCount = instanceCount;    
   
   this->NumberOfVectorComponents = 1;
+  this->VectorComponent = 0;
 }
 
 //----------------------------------------------------------------------------

@@ -317,6 +317,10 @@ void vtkPVApplication::SetController(vtkMultiProcessController *c)
 vtkPVApplication::~vtkPVApplication()
 {
   this->SetController(NULL);
+  if ( this->TraceFile )
+    {
+    delete this->TraceFile;
+    }
 }
 
 
