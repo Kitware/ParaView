@@ -161,7 +161,11 @@ vtkKWView::vtkKWView()
   this->HeaderMapper->SetFontSize(15);  
   this->HeaderMapper->ShadowOff();  
   this->HeaderProp = vtkTextActor::New();
+  this->HeaderProp->ScaledTextOn();
+  this->HeaderProp->GetPositionCoordinate()->SetCoordinateSystemToNormalizedViewport();
   this->HeaderProp->GetPositionCoordinate()->SetValue(0.2,0.88);
+  this->HeaderProp->GetPosition2Coordinate()->SetValue(0.6, 0.1);
+
   this->HeaderProp->SetMapper(this->HeaderMapper);
   this->HeaderComposite = vtkKWGenericComposite::New();
   this->HeaderComposite->SetProp(this->HeaderProp);
@@ -1318,7 +1322,7 @@ void vtkKWView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWView ";
-  this->ExtractRevision(os,"$Revision: 1.64 $");
+  this->ExtractRevision(os,"$Revision: 1.65 $");
 }
 
 void vtkKWView::SetupMemoryRendering(
