@@ -77,7 +77,7 @@ void vtkGetRemoteGhostCells::Execute()
   vtkPolyData *input = this->GetInput();
   vtkPolyData *output = this->GetOutput();
   int i = 0, j, k, l;
-  int id;
+  int id, insertCell = 1;
   vtkPoints *points = vtkPoints::New();
   vtkPoints *cellPoints;
   vtkCellArray *polys;
@@ -204,13 +204,20 @@ void vtkGetRemoteGhostCells::Execute()
 	      pointIds[k] = this->Locator->InsertNextPoint(point);
 	      points->InsertPoint(pointIds[k], point);
 	      } // point not in my data already
+	    if (pointIds[k] < i)
+	      {
+	      insertCell = 0;
+	      }
 	    } // for all points in this cell
-	  polys->InsertNextCell(numCellPoints, pointIds);
 	  output->SetPoints(points);
-	  output->SetPolys(polys);
+	  if (insertCell)
+	    {
+	    polys->InsertNextCell(numCellPoints, pointIds);
+	    output->SetPolys(polys);
+	    ghostLevels->InsertNextGhostLevel(1);
+	    }
 	  output->DeleteCells();
 	  output->BuildLinks();
-	  ghostLevels->InsertNextGhostLevel(1);
 	  delete [] pointIds;
 	  } // for all cells sent by this process
 	} // if not my process
