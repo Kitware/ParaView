@@ -27,7 +27,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVIceTRenderModule);
-vtkCxxRevisionMacro(vtkPVIceTRenderModule, "1.7");
+vtkCxxRevisionMacro(vtkPVIceTRenderModule, "1.8");
 
 
 
@@ -139,7 +139,7 @@ void vtkPVIceTRenderModule::SetPVApplication(vtkPVApplication *pvApp)
     
 
   this->DisplayManagerID = pm->NewStreamObject("vtkIceTRenderManager");
-  pm->SendStreamToClientAndServer();
+  pm->SendStreamToServer();
   int *tileDim = pvApp->GetTileDimensions();
   cout << "Size: " << tileDim[0] << ", " << tileDim[1] << endl;
   pm->GetStream() <<  vtkClientServerStream::Invoke
