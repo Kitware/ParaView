@@ -78,6 +78,10 @@ public:
   // Description:
   // Get the length of the list.
   int GetLength() { return this->NumberOfStrings;}
+
+  // Description:
+  // Get the index of a string.
+  int GetIndex(const char* str);
   
   // Description:
   // Get a command from its index.
