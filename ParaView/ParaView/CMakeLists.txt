@@ -146,7 +146,6 @@ SET( ParaViewClient_SRCS
   vtkPVPLOT3DReaderModule.cxx
   vtkPVPart.cxx
   vtkPVPartDisplay.cxx
-  vtkPVPlaneWidget.cxx
   vtkPVPointSourceWidget.cxx
   vtkPVPointWidget.cxx
   vtkPVProbe.cxx
