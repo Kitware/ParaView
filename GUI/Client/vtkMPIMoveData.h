@@ -87,6 +87,7 @@ protected:
   void RenderServerReceiveFromDataServer(vtkDataSet* output);
   void DataServerZeroSendToRenderServerZero(vtkDataSet* data);
   void RenderServerZeroReceiveFromDataServerZero(vtkDataSet* data);
+  void RenderServerZeroBroadcast(vtkDataSet* data);
   void DataServerSendToClient(vtkDataSet* output);
   void ClientReceiveFromDataServer(vtkDataSet* output);
 

@@ -35,7 +35,7 @@
 #include "vtkMPIMToNSocketConnection.h"
 #include "vtkSocketCommunicator.h"
 
-vtkCxxRevisionMacro(vtkMPIMoveData, "1.7");
+vtkCxxRevisionMacro(vtkMPIMoveData, "1.8");
 vtkStandardNewMacro(vtkMPIMoveData);
 
 vtkCxxSetObjectMacro(vtkMPIMoveData,Controller, vtkMultiProcessController);
@@ -238,6 +238,7 @@ void vtkMPIMoveData::Execute()
     if (this->Server == 2/*vtkMPIMoveData::RENDER_SERVER*/)
       {
       this->RenderServerZeroReceiveFromDataServerZero(output);
+      this->RenderServerZeroBroadcast(output);
       }
     }
   
@@ -624,6 +625,66 @@ void vtkMPIMoveData::ClientReceiveFromDataServer(vtkDataSet* output)
                                   1, 23492);
   this->ReconstructDataFromBuffer(output);
   this->ClearBuffer();
+}
+
+
+//-----------------------------------------------------------------------------
+void vtkMPIMoveData::RenderServerZeroBroadcast(vtkDataSet* data)
+{
+  int numProcs= this->Controller->GetNumberOfProcesses();
+  int myId= this->Controller->GetLocalProcessId();
+
+  if (numProcs <= 1)
+    {
+    return;
+    }
+
+
+#ifdef VTK_USE_MPI
+  int idx;
+  vtkMPICommunicator* com = vtkMPICommunicator::SafeDownCast(
+                                         this->Controller->GetCommunicator()); 
+
+  if (com == 0)
+    {
+    vtkErrorMacro("MPICommunicator neededfor this operation.");
+    return;
+    }
+
+  int bufferLength = 0;
+  if (myId == 0)
+    {
+    this->ClearBuffer();
+    this->MarshalDataToBuffer(data);
+    bufferLength = this->BufferLengths[0];
+    }
+  
+  // Broadcast the size of the buffer.
+  com->Broadcast(&bufferLength, 1, 0);
+
+  // Allocate buffers for all receiving nodes.
+  if (myId != 0)
+    {
+    this->NumberOfBuffers = 1;
+    this->BufferLengths = new int[1];
+    this->BufferLengths[0] = bufferLength;
+    this->BufferOffsets = new int[1];
+    this->BufferOffsets[0] = 0;
+    this->BufferTotalLength = this->BufferLengths[0];
+    this->Buffers = new char[bufferLength];
+    }
+
+  // Broadcast the buffer.
+  com->Broadcast(this->Buffers, bufferLength, 0);
+
+  // Reconstruct the output on nodes other than 0.
+  if (myId != 0)
+    {
+    this->ReconstructDataFromBuffer(data);
+    }
+  
+  this->ClearBuffer();
+#endif
 }
 
 
