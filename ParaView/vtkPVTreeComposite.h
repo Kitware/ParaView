@@ -84,13 +84,20 @@ protected:
   int LocalProcessId;
   int RenderAborted;
   vtkPVRenderView *RenderView;
+  int Printing;
+  // Flag used to indicate the first call for a render.
+  // There is no initialize method.
+  int Initialized;
   
 //BTX 
 #ifdef VTK_USE_MPI 
-  int SatelliteFinalAbortCheck();
-  int SatelliteAbortCheck();
-  int RootAbortCheck();
-  int RootFinalAbortCheck();
+  void SatelliteFinalAbortCheck();
+  void SatelliteAbortCheck();
+  void RootAbortCheck();
+  void RootFinalAbortCheck();
+  void RootWaitForSatelliteToFinish(int satelliteId);
+  void RootSendFinalCompositeDescision();
+  
   // For the asynchronous receives.
   vtkMPIController *MPIController;
   vtkMPICommunicator::Request ReceiveRequest;

@@ -78,6 +78,8 @@ vtkPVTreeComposite::vtkPVTreeComposite()
   this->RenderAborted = 0;
   
   this->RenderView = NULL;
+  this->Printing = 0;
+  this->Initialized = 0;
 }
 
   
@@ -108,24 +110,31 @@ void vtkPVTreeComposite::PrintSelf(ostream& os, vtkIndent indent)
 void vtkPVTreeComposite::CheckForAbortRender()
 {
   int abort;
+
   
-  if (this->RenderAborted)
+  if ( ! this->Initialized)
     {
-    return;
+    // Never abort while printing.
+    if (this->RenderView != NULL && this->RenderView->GetPrinting())
+      {
+      this->Printing = 1;
+      }
+    else
+      {
+      this->Printing = 0;
+      }
     }
+  
+  this->Initialized = 1;
+  
   
   if (this->LocalProcessId == 0)
     {
-    abort = this->RootAbortCheck();
+    this->RootAbortCheck();
     }
   else
     {
-    abort = this->SatelliteAbortCheck();
-    }
-  
-  if (abort)
-    {
-    this->RenderAborted = 1;
+    this->SatelliteAbortCheck();
     }
 }
 
@@ -134,277 +143,386 @@ int vtkPVTreeComposite::CheckForAbortComposite()
 {
   int abort;
   
+  // Check for abort render has to be called at least once.
+  if ( ! this->Initialized)
+    {
+    this->CheckForAbortRender();
+    }
+  
   if (this->LocalProcessId == 0)
     {
-    abort = this->RootFinalAbortCheck();
+    this->RootFinalAbortCheck();
     }
   else
     {
-    abort = this->SatelliteFinalAbortCheck();
+    this->SatelliteFinalAbortCheck();
     }
   
-  // Reset this for the next render
+  // Reset this for the next render.
+  abort = this->RenderAborted;
   this->RenderAborted = 0;
+  this->Initialized = 0;
+  
+  // Does this method really need to return a value?
   return abort;
 }
 
 
 
 
-#define STATUS_TAG  548934
+#define VTK_STATUS_TAG           548934
+
+
+// Root ------>>>>>>>> Satellite
+// Exaclty one of these two methods will be sent (by the root) 
+// to each satelite process.  They terminate the non blocking receive.  
+// The second message is also used as a barrier to ensure all
+// processes start compositing at the same time (Satellites wait for the request).
+// Although this barrier is less efficient, I did not want the mess of 
+// cancelling compositing.
+#define  VTK_ABORT_RENDER              0
+#define  VTK_COMPOSITE                 1
+
+
+// Root ------>>>>>>>> Satellite
+// When the root process has finished rendering, it waits for each of the satellite
+// processes (one by one) to finish rendering.  This root sends this message
+// to inform a satellite process that is waiting for it.  In a normal render 
+// (not aborted) each satellite process will get exactly one of these messages.  
+// If rendering has been aborted, the the root does not bother sending
+// this message to the remaining satellites.
+#define  VTK_ROOT_WAITING              2
+
+// Root <<<<<<<<------ Satellite
+// This message may be sent from any satellite processes to the root processes.
+// It is used to ping the root process when it has finished rendering and is waiting 
+// in a blocking receive for a "Finshed" message.  Only the processes that is currently 
+// being waited on can send these messages.  Any number of them can be sent (including 0).
+#define  VTK_CHECK_ABORT               3
+
+// Root <<<<<<<<------ Satellite
+// This message is sent from the satellite (the root is actively waiting for) 
+// to signal that is done rendering and is waiting to composite.  
+// In a normal (not aborted) render, every satellite process sends this 
+// message exactly once to the root.
+#define  VTK_FINISHED                  4
 
 
 
-// Messages sent from satellite processes to process 0.
-// Used to ping the root process.
-#define  VTK_CHECK_ABORT       0
-// Tells the root that rendering is finished.
-#define  VTK_FINISHED          1
+//------------- Methods for Root Processes --------------
 
-// Messages sent from the root to the satellite processes.
-// Abort rendering as soon as possible.
-#define  VTK_ABORT_RENDER      2
-// Root is waiting for you to finish and expects to be pinged.
-#define  VTK_ROOT_WAITING      3
-// Abort the composite message.  RootWaiting will always come before this message.
-#define  VTK_ABORT_COMPOSITE   4
-// Go ahead and composite.  RootWaiting will always come before this message.
-#define  VTK_COMPOSITE         5
+// Two satellites, possible message traces.
+// Root:
+// No Abort,
+//----------
+// send 1 ROOT_WAITING
+// [rec 1 CHECK_ABORT]
+// ... repeat any number of times ...               
+// rec  1 FINISHED    
+// send 2 ROOT_WAITING
+// [rec 2 CHECK_ABORT]
+// ... repeat any number of times ...               
+// rec  2 FINISHED    
+// send 1 COMPOSITE    
+// send 2 COMPOSITE    
+
+// Abort during waiting for 2.
+//----------
+// send 1 ROOT_WAITING
+// [rec 1 CHECK_ABORT]
+// ... repeat any number of times ...               
+// rec  1 FINISHED    
+// send 2 ROOT_WAITING
+// [rec 2 CHECK_ABORT]
+// ... repeat any number of times ...
+// send 1 ABORT
+// send 2 ABORT
+// rec  2 FINISHED    
+
+// Abort during waiting for 1.
+//----------
+// send 1 ROOT_WAITING
+// [rec 1 CHECK_ABORT]
+// ... repeat any number of times ...               
+// send 1 ABORT
+// send 2 ABORT
+// rec  1 FINISHED    
+
+// Abort during render.
+//----------
+// send 1 ABORT
+// send 2 ABORT
+
+//            Abort during waiting.    Abort during render
+
+
+//-------------------------------------------------------------------------
+// Count is temporary for testing.
+void vtkPVTreeComposite::RootAbortCheck()
+{
+  //sleep(5);
+
+  // If the render has already been aborted, then we need do nothing else.
+  if (this->RenderAborted)
+    {
+    return;
+    }
+
+  // This checks for events to decide whether to abort.
+  if ( ! this->Printing && this->RenderView && this->RenderView->ShouldIAbort())
+    { // Yes, abort.
+    int idx;
+    int message;
+    int num = this->MPIController->GetNumberOfProcesses();
+
+    cout << "Root  ---------- ABORT ----------- \n";
+
+    // Tell the satellite processes they need to abort.
+    for (idx = 1; idx < num; ++idx)
+      {
+      //cout << "0 send to 1, message: " << message << endl;
+      message = VTK_ABORT_RENDER;
+      this->MPIController->Send(&message, 1, idx, VTK_STATUS_TAG);
+      }
+    
+    // abort our own render.
+    this->RenderWindow->SetAbortRender(1);
+    this->RenderAborted = 1;
+    }
+}
+
+
+//-------------------------------------------------------------------------
+// "abort" is true if rendering was previously aborted.
+void vtkPVTreeComposite::RootFinalAbortCheck()
+{
+  int idx;
+  int num;
+
+  // If the render has already been aborted, then we need do nothing else.
+  if (this->RenderAborted)
+    {
+    return;
+    }
+  
+  // Wait for all the satelite processes to finish.
+  num = this->MPIController->GetNumberOfProcesses();
+  for (idx = 1; idx < num; ++idx)
+    {
+    // An abort could have occured while waiting for a satellite.
+    if ( ! this->RenderAborted)
+      {
+      this->RootWaitForSatelliteToFinish(idx);
+      }
+    }
+
+  // Sends the final message to all satellites.
+  this->RootSendFinalCompositeDescision();
+}
+
+
+
+//-------------------------------------------------------------------------
+// This only gets called when there has not been an abort. 
+// If an abort occured during the call, then this method returns 1.
+// It returns 0 if no abort occured.
+void vtkPVTreeComposite::RootWaitForSatelliteToFinish(int satelliteId)
+{
+  int message;
+
+  // Send a message to the process that informs it 
+  // that we are waiting for it to finish rendering,
+  // and expect to be pinged every so often.
+  message = VTK_ROOT_WAITING;
+  this->MPIController->Send(&message, 1, satelliteId, VTK_STATUS_TAG);
+  
+  // Wait for the process to finish.
+  while (1)
+    {
+    this->MPIController->Receive(&message, 1, satelliteId, VTK_STATUS_TAG);
+
+    // Even if we abort, We still expect the "FINISHED" message because
+    // the satellite might sned the "FINISHED" message before it receives
+    // the "ABORT" message.
+    if (message == VTK_FINISHED)
+      {
+      return;
+      }
+    else if (message == VTK_CHECK_ABORT)
+      {
+      // The satellite is in the middle of a long render and has pinged us to
+      // check for an abort.  This call sends the abort messages internally.
+      this->RootAbortCheck();
+      }
+    else 
+      {
+      vtkErrorMacro("Sanity check failed: Expecting CheckAbort or Finished message.");
+      }
+    }
+}
+
+
+
+//-------------------------------------------------------------------------
+// This method has simplified to the point that it could be eliminated.
+void vtkPVTreeComposite::RootSendFinalCompositeDescision()
+{
+  int message;
+  int idx, num;
+  
+  // If ABORT was already sent, then we do not need to worry about the
+  // composite.  It is already cancelled.
+  num = this->MPIController->GetNumberOfProcesses();
+  if ( ! this->RenderAborted)
+    {
+    for (idx = 1; idx < num; ++idx)
+      {
+      // In order to get rid of the abort asych receive still pending.
+      message = VTK_COMPOSITE;
+      this->MPIController->Send(&message, 1, idx, VTK_STATUS_TAG);
+      }
+    }
+}
 
 
 
 //------------- Methods for Satellite Processes --------------
 
 
-// Out process is finished rendering now and will wait for the final status message from root.
-int vtkPVTreeComposite::SatelliteFinalAbortCheck()
+//-------------------------------------------------------------------------
+void vtkPVTreeComposite::SatelliteAbortCheck()
 {
-  int status = VTK_FINISHED;
+  int message;
 
-  //cout << this->LocalProcessId << ": SatelliteFinalAbortCheck\n";
-
-  // Get rid of any un resolved receives.
-  // Only AbortRender and RootWaiting messages can be received before the "Finished" message.
-  // We can ignore both.
-  if (this->ReceivePending)
+  if (this->RenderAborted)
     {
-    //cout << "1: Cancel last qued receive.\n";
-    MPI_Cancel(&this->ReceiveRequest.Req);
-    this->ReceivePending = 0;
-    }  
-  
-  // We might want to wait to send this until after the root says it is waiting for us to finish.
-  //cout << "1 send to 0, message: " << status << endl;
-  this->MPIController->Send(&status, 1, 0, STATUS_TAG);
-  
-  // Wait for a confirmation to continue or abort.
-  while (1)
-    {
-    //cout << "1: Entering blocking receive\n";
-    this->MPIController->Receive(&status, 1, 0, STATUS_TAG);
-
-    // Ignore AbortRender message:  Rendering is complete.
-    // Ignore RootWaiting message:  We have already sent a "Finished" message to root.
-  
-    //cout << "1: Received from 0, message: " << status << endl;
-    
-    if (status == VTK_COMPOSITE)
-      {
-      //cout << this->LocalProcessId << ": SatelliteFinalAbortCheck: Returning: 0\n";
-      // Reset the rootWaiting folag for the next render.
-      this->RootWaiting = 0;
-      return 0;
-      }
-    else if (status == VTK_ABORT_COMPOSITE)
-      {
-      //cout << this->LocalProcessId << ": SatelliteFinalAbortCheck: Returning: 1\n";
-      // Reset the rootWaiting flag for the next render.
-      this->RootWaiting = 0;
-      return 1;
-      }
-    else
-      {
-      //cout << "1: ignore message: " << status << endl;
-      }
-    //cout << "1: end while\n";
+    return;
     }
-}
-
-
-int vtkPVTreeComposite::SatelliteAbortCheck()
-{
-  int status;
-
-  //cout << this->LocalProcessId << ": SatelliteAbortCheck\n";
   
   // If the root is waiting on us, then ping it so that it can check for an abort.
   if (this->RootWaiting)
     {
     //cout << "1: Ping root\n";
     vtkMPICommunicator::Request sendRequest;
-    status = VTK_CHECK_ABORT;
+    message = VTK_CHECK_ABORT;
     //cout << "1 noBlockSend to 0, message: " << status << endl;
-    this->MPIController->NoBlockSend(&status, 1, 0, STATUS_TAG, sendRequest);
+    this->MPIController->NoBlockSend(&message, 1, 0, VTK_STATUS_TAG, sendRequest);
     }
   
   // If this is the first call for this render, 
   // then we need to setup the receive message.
   if ( ! this->ReceivePending)
     {
-    //cout << "1: Que no Block Receive from 0\n";
-    this->MPIController->NoBlockReceive(&this->ReceiveMessage, 1, 0, STATUS_TAG, 
-				       this->ReceiveRequest);
+    this->MPIController->NoBlockReceive(&this->ReceiveMessage, 1, 0, VTK_STATUS_TAG, 
+					this->ReceiveRequest);
     this->ReceivePending = 1;
     }
   
   if (this->ReceivePending && this->ReceiveRequest.Test())
     { // Received a message from the root.
     this->ReceivePending = 0;
-    //cout << "1 NoBlockReceived from 0, message: " << this->ReceiveMessage << endl;
+    
+    // It could be ABORT, or ROOT_WAITING.  It could not be COMPOSITE
+    // because that can only be called after root receives our FINISHED message.
+    
     if (this->ReceiveMessage == VTK_ABORT_RENDER)
       {  // Root is telling us to short circuit the render.
-      //cout << this->LocalProcessId << ": Statelite received an abort message.\n";
       // .... set abort flag of render window.....
       this->RenderWindow->SetAbortRender(1);
-      // Rearm the receive to get another message.
-      //cout << "1: Que no Block Receive from 0\n";
-      this->MPIController->NoBlockReceive(&this->ReceiveMessage, 1, 0, STATUS_TAG, 
-					  this->ReceiveRequest);
-      this->ReceivePending = 1;
-      //cout << this->LocalProcessId << ": SatelliteAbortCheck Returning: 1\n";
-      return 1;
+      this->RenderAborted = 1;
+      // Do NOT rearm to asynchronous receive.
+      return;
       }
-    
-    if (this->ReceiveMessage == VTK_ROOT_WAITING)
-      { // Root is finished rendering, and is waiting for this process.  It wants to be pinged.
-      //cout << this->LocalProcessId << ": Statelite received a RootWaiting message.\n";
+    else if (this->ReceiveMessage == VTK_ROOT_WAITING)
+      { // Root is finished rendering, and is waiting for this process.  
+      // It wants to be pinged occasionally so it can check for aborts.
       this->RootWaiting = 1;
       // Rearm the receive to get a possible abort.
-      //cout << "1: Que no Block Receive from 0\n";
-      this->MPIController->NoBlockReceive(&this->ReceiveMessage, 1, 0, STATUS_TAG, this->ReceiveRequest);
+      this->MPIController->NoBlockReceive(&this->ReceiveMessage, 1, 0, 
+					  VTK_STATUS_TAG, this->ReceiveRequest);
       this->ReceivePending = 1;
       }
-    }
-  
-  //cout << this->LocalProcessId << ": SatelliteAbortCheck Returning: 0\n";
-  return 0;
-}
-
-
-
-
-
-
-
-
-//------------- Methods for Root Processes --------------
-
-// Count is temporary for testing.
-int vtkPVTreeComposite::RootAbortCheck()
-{
-  //sleep(5);
-  
-  //cout << this->LocalProcessId << ": RootAbortCheck\n";
-
-  // Never abort while printing.
-  if (this->RenderView->GetPrinting())
-    {
-    //cout << this->LocalProcessId << ": RootAbortCheck Return 0 (print)\n";
-    return 0;
-    }
-  
-  // This checks for events to decide whether to abort.
-  if (this->RenderView->ShouldIAbort())
-    { // Yes, abort.
-    int idx;
-    int status = VTK_ABORT_RENDER;
-    int num = this->MPIController->GetNumberOfProcesses();
-    // Tell the satellite processes they need to abort.
-
-    //cout << "Root  ---------- ABORT ----------- \n";
-
-    for (idx = 1; idx < num; ++idx)
+    else
       {
-      //cout << "0 send to 1, message: " << status << endl;
-      this->MPIController->Send(&status, 1, idx, STATUS_TAG);
+      vtkErrorMacro("Expecting ABORT or WAITING from root.");
       }
-    // abort our own render.
-    this->RenderWindow->SetAbortRender(1);
-
-    //cout << this->LocalProcessId << ": RootAbortCheck Return 1\n";
-    return 1;
     }
-
-  //cout << this->LocalProcessId << ": RootAbortCheck Return 0\n";
-  return 0;
+  
+  return;
 }
 
 
-// "abort" is true if rendering was previously aborted.
-int vtkPVTreeComposite::RootFinalAbortCheck()
+
+
+
+//-------------------------------------------------------------------------
+// Out process is finished rendering now and will wait for the final status 
+// message from root.
+void vtkPVTreeComposite::SatelliteFinalAbortCheck()
 {
-  int waitingFlag;
-  int idx;
-  int num;
-  int status;
-  int abort = this->RenderAborted;
-
-  //sleep(2);
-
-  //cout << this->LocalProcessId << ": RootFinalAbortCheck\n";
+  int message;
   
-  // Wait for all the satelite processes to finish.
-  num = this->MPIController->GetNumberOfProcesses();
-  for (idx = 1; idx < num; ++idx)
+  // We can not send a FINISHED message until the root is WAITING.
+  if ( ! this->RootWaiting && ! this->RenderAborted)
     {
-    // Send a message to the next process that informs it that we are waiting for it to render.
-    status = VTK_ROOT_WAITING;
-    //cout << "0 send to 1, message: " << status << endl;
-    this->MPIController->Send(&status, 1, idx, STATUS_TAG);
-    // Wait for the process to finish.
-    waitingFlag = 1;
-    while ( waitingFlag)
+    // Wait for one of these messages: ROOT_WAITING, or ABORT
+    if (this->ReceivePending)
       {
-      this->MPIController->Receive(&status, 1, idx, STATUS_TAG);
-      //cout << "0 Received from 1: message: " << status << endl;
-      if (status == VTK_FINISHED)
-	{
-	waitingFlag = 0;
+      this->ReceiveRequest.Wait();
+      this->ReceivePending = 0;
+      if (this->ReceiveMessage == VTK_ABORT_RENDER)
+	{  // Root is telling us to short circuit the render.
+	// We we have received a ROOT_WAITING message, then we have to send
+	// a FINISHED message (event if an ABORT has been received meanwhile).
+	this->RenderAborted = 1;
+	}      
+      else if (this->ReceiveMessage == VTK_ROOT_WAITING)
+	{ 
+	this->RootWaiting = 1;
+	// Rearm the receive to put in a consistent state.
+	this->MPIController->NoBlockReceive(&this->ReceiveMessage, 1, 0, 
+					    VTK_STATUS_TAG, this->ReceiveRequest);
+	this->ReceivePending = 1;
 	}
-      else if (status != VTK_CHECK_ABORT)
+      else 
 	{
-	//cout << "Sanity check failed: Expective CheckAbort or Finished message.\n";
-	}
-      else if ( ! abort)
-	{
-	//cout << "Root pinged !!!\n";
-	// Keep checking for aborts.  
-	// It is OK to send an abort message to processes after they are finished.
-	abort = this->RootAbortCheck();
+	vtkErrorMacro("Expecting ROOT_WAITING or ABORT message from root.");
 	}
       }
     }
   
-  // Now send the final message to all of the satelite processes.
-  // It will cause them to composite or skip the compositing step.
-  if (abort)
+  
+  // We we have received a ROOT_WAITING message, then we have to send
+  // a FINISHED message (event if an ABORT has been received meanwhile).
+  if ( this->RootWaiting)
     {
-    //cout << "Root  ---------- ABORT Composite----------- \n";
-    status = VTK_ABORT_COMPOSITE;
-    }
-  else
-    {
-    status = VTK_COMPOSITE;
-    }
-  for (idx = 1; idx < num; ++idx)
-    {
-    //cout << "0 send to 1, message: " << status << endl;
-    this->MPIController->Send(&status, 1, idx, STATUS_TAG);
+    message = VTK_FINISHED;
+    this->MPIController->Send(&message, 1, 0, VTK_STATUS_TAG);
+    // Reset the RootWaiting flag for the next render.
+    this->RootWaiting = 0;
     }
   
-  //cout << this->LocalProcessId << ": RootFinalAbortCheck, Returning: " << abort << "\n";
-  return abort;
+  // If there has already been an ABORT, then receive will no longer be pending.
+  
+  // Now tie up any loose ends.
+  // Wait for one of these messages: COMPOSITE, or ABORT
+  // We are gaurenteed to get exactly on of these two.
+  // The receive would not still be pending if we received one already.
+  if (this->ReceivePending)
+    {
+    this->ReceiveRequest.Wait();
+    this->ReceivePending = 0;
+    if (this->ReceiveMessage == VTK_ABORT_RENDER)
+      {  // Root is telling us to short circuit the render.
+      this->RenderAborted = 1;
+      }
+    else if (this->ReceiveMessage == VTK_COMPOSITE)
+      {
+      // We do not need to do anything here.
+      }
+    }
 }
+
 
 
 // end VTK_USE_MPI
@@ -444,6 +562,17 @@ void vtkPVTreeComposite::CheckForAbortRender()
 int vtkPVTreeComposite::CheckForAbortComposite()
 {
   return this->vtkTreeComposite::CheckForAbortComposite();
+}
+
+//-------------------------------------------------------------------------
+int vtkPVTreeComposite::RootWaitForSateliteToFinish(int satelliteId)
+{
+  satelliteId = satelliteId;
+}
+
+//----------------------------------------------------------------------------
+void vtkPVTreeComposite::RootSendFinalCompositeDescision()
+{
 }
 
 
