@@ -35,7 +35,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSourceNotebook);
-vtkCxxRevisionMacro(vtkPVSourceNotebook, "1.3");
+vtkCxxRevisionMacro(vtkPVSourceNotebook, "1.4");
 
 //----------------------------------------------------------------------------
 int vtkPVSourceNotebookCommand(ClientData cd, Tcl_Interp *interp,
@@ -169,6 +169,7 @@ void vtkPVSourceNotebook::UpdateEnableStateWithSource(vtkPVSource* pvs)
 
 void vtkPVSourceNotebook::UpdateEnableState()
 {
+  this->PropagateEnableState(this->Notebook);
   this->PropagateEnableState(this->DisplayGUI);
   this->PropagateEnableState(this->InformationGUI);
   this->PropagateEnableState(this->DescriptionFrame);
