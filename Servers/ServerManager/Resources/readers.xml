@@ -434,6 +434,7 @@
         command="SetMultiGrid" 
         number_of_elements="1"
         default_values="0" > 
+       <BooleanDomain name="bool"/>
      </IntVectorProperty>
 
      <IntVectorProperty 
@@ -441,6 +442,7 @@
         command="SetHasByteCount" 
         number_of_elements="1"
         default_values="0" > 
+       <BooleanDomain name="bool"/>
      </IntVectorProperty>
 
      <IntVectorProperty 
@@ -448,6 +450,7 @@
         command="SetIBlanking" 
         number_of_elements="1"
         default_values="0" > 
+       <BooleanDomain name="bool"/>
      </IntVectorProperty>
 
      <IntVectorProperty 
@@ -455,6 +458,7 @@
         command="SetTwoDimensionalGeometry" 
         number_of_elements="1"
         default_values="0" > 
+       <BooleanDomain name="bool"/>
      </IntVectorProperty>
 
      <IntVectorProperty 
@@ -462,6 +466,7 @@
         command="SetForceRead" 
         number_of_elements="1"
         default_values="0" > 
+       <BooleanDomain name="bool"/>
      </IntVectorProperty>
 
      <IntVectorProperty 
