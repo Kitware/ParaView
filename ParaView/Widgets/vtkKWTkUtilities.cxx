@@ -53,7 +53,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWTkUtilities);
-vtkCxxRevisionMacro(vtkKWTkUtilities, "1.34");
+vtkCxxRevisionMacro(vtkKWTkUtilities, "1.35");
 
 //----------------------------------------------------------------------------
 void vtkKWTkUtilities::GetRGBColor(Tcl_Interp *interp,
@@ -1243,11 +1243,12 @@ int vtkKWTkUtilities::GetSlaves(
 }
 
 //----------------------------------------------------------------------------
-int vtkKWTkUtilities::GetPreviousSlave(
+int vtkKWTkUtilities::GetPreviousAndNextSlave(
   Tcl_Interp *interp,
   const char *widget,
   const char *slave,
-  ostream &previous_slave)
+  ostream &previous_slave,
+  ostream &next_slave)
 {
   // Search (and allocate) the slaves
 
@@ -1268,8 +1269,12 @@ int vtkKWTkUtilities::GetPreviousSlave(
       if (i > 0)
         {
         previous_slave << slaves[i - 1];
-        found = 1;
         }
+      if (i < nb_slaves - 1)
+        {
+        next_slave << slaves[i + 1];
+        }
+      found = 1;
       break;
       }
     }

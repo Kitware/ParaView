@@ -207,11 +207,13 @@ public:
 
   // Description:
   // Browse all the slaves (packed) of widget and store the slave packed
-  // before 'slave' in 'previous_slave'.
-  static int GetPreviousSlave(Tcl_Interp *interp,
-                              const char *widget,
-                              const char *slave,
-                              ostream &previous_slave);
+  // before 'slave' in 'previous_slave', after 'slave' in 'next_slave'
+  // Return 1 if 'slave' was found, 0 otherwise
+  static int GetPreviousAndNextSlave(Tcl_Interp *interp,
+                                     const char *widget,
+                                     const char *slave,
+                                     ostream &previous_slave,
+                                     ostream &next_slave);
 
   //ETX
 
