@@ -342,8 +342,6 @@ public:
   vtkSetMacro(TotalVisibleMemorySizeValid, int);
   vtkGetMacro(TotalVisibleMemorySizeValid, int);
 
-  virtual void FindApplicationInstallationDirectory();
-
 protected:
   vtkPVApplication();
   ~vtkPVApplication();
