@@ -64,7 +64,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVServerFileDialog );
-vtkCxxRevisionMacro(vtkPVServerFileDialog, "1.23");
+vtkCxxRevisionMacro(vtkPVServerFileDialog, "1.24");
 
 int vtkPVServerFileDialogCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -968,7 +968,7 @@ int vtkPVServerFileDialog::Insert(const char* name, int y, int directory)
                x + image_icon_max_width / 2, y);
   if (this->Application->GetMainInterp()->result)
     {
-    char *tmp = 
+    tmp = 
       vtkString::Duplicate(this->Application->GetMainInterp()->result);
     if (directory)
       {

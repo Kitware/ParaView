@@ -31,8 +31,7 @@
 
 #include "vtkParallelRenderManager.h"
 
-class VTK_EXPORT vtkDesktopDeliveryServer
-    : public vtkParallelRenderManager
+class VTK_EXPORT vtkDesktopDeliveryServer : public vtkParallelRenderManager
 {
 public:
   vtkTypeRevisionMacro(vtkDesktopDeliveryServer, vtkParallelRenderManager);

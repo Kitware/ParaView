@@ -72,7 +72,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVMPIProcessModule);
-vtkCxxRevisionMacro(vtkPVMPIProcessModule, "1.15");
+vtkCxxRevisionMacro(vtkPVMPIProcessModule, "1.16");
 
 int vtkPVMPIProcessModuleCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -333,9 +333,6 @@ void vtkPVMPIProcessModule::GatherInformationInternal(char* infoClassName,
   
   if (myId != 0)
     {
-    int msgLength;
-    unsigned char* msg;
-
     tmpInfo->CopyFromObject(object);
     msgLength = tmpInfo->GetMessageLength();
     msg = new unsigned char[msgLength];

@@ -65,7 +65,7 @@
 #include "H5TBprivate.h"        /*threaded, balanced, binary trees        */
 
 #define KEYcmp(k1,k2,a) ((NULL!=compar) ? (*compar)( k1, k2, a) \
-                 : HDmemcmp( k1, k2, 0<(a) ? (a) : HDstrlen(k1) )  )
+                 : HDmemcmp( k1, k2, (0<(int)(a) ? (int)(a) : (int)HDstrlen(k1)) )  )
 
 /* Return maximum of two scalar values (use arguments w/o side effects): */
 #define   Max(a,b)  ( (a) > (b) ? (a) : (b) )

@@ -41,7 +41,7 @@
 #include "vtkVoxel.h"
 #include "vtkImageData.h"
 
-vtkCxxRevisionMacro(vtkCTHData, "1.5");
+vtkCxxRevisionMacro(vtkCTHData, "1.6");
 vtkStandardNewMacro(vtkCTHData);
 
 //----------------------------------------------------------------------------
@@ -310,6 +310,11 @@ int* vtkCTHData::GetBlockPointExtent(int blockId)
 void vtkCTHData::GetBlockPointDimensions(int blockId, int dim[3])
 {
   int* ce = this->GetBlockCellExtent(blockId);
+  if ( !ce )
+    {
+    vtkErrorMacro("Block Cell Extent not defined");
+    return;
+    }
   dim[0] = ce[1]-ce[0]+2;
   dim[1] = ce[3]-ce[2]+2;
   dim[2] = ce[5]-ce[4]+2;
@@ -1289,7 +1294,7 @@ void vtkCTHData::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "TopLevelOrigin: (" << this->TopLevelOrigin[0] << ", "
                                   << this->TopLevelOrigin[1] << ", "
                                   << this->TopLevelOrigin[2] << ")\n";
-  os << indent << "NumberOfGhostLevels: " << this-> NumberOfGhostLevels << endl;
+  os << indent << "NumberOfGhostLevels: " << this->NumberOfGhostLevels << endl;
 
   os << indent << "NumberOfBlocks: "  << numBlocks << endl;
   for (idx = 0; idx < numBlocks; ++idx)

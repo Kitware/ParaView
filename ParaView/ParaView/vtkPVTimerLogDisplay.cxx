@@ -57,7 +57,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVTimerLogDisplay );
-vtkCxxRevisionMacro(vtkPVTimerLogDisplay, "1.10");
+vtkCxxRevisionMacro(vtkPVTimerLogDisplay, "1.11");
 
 int vtkPVTimerLogDisplayCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -315,10 +315,14 @@ void vtkPVTimerLogDisplay::Display()
 //----------------------------------------------------------------------------
 void vtkPVTimerLogDisplay::SetThreshold(float val)
 {
-  vtkPVApplication* pvApp = this->GetPVApplication();
-
   this->Modified();
-  pvApp->BroadcastScript("$Application SetLogThreshold %f", val);
+
+  vtkPVApplication* pvApp = this->GetPVApplication();
+  if ( pvApp )
+    {
+    pvApp->BroadcastScript("$Application SetLogThreshold %f", val);
+    }
+
   this->Threshold = val;
   this->Update();
 }

@@ -213,8 +213,8 @@ protected:
   void SetUpdateExtent(int, int ,int, int, int, int) {}
   void SetUpdateExtent(int*) {}
   void GetUpdateExtent(int &,int &,int &,int &,int &,int &) {}
-  int* GetUpdateExtent() {return NULL;}
-  void GetUpdateExtenent(int*) {}
+  int* GetUpdateExtent() {return this->Superclass::GetUpdateExtent();}
+  void GetUpdateExtent(int*) {}
 
 private:
   void InternalCTHDataCopy(vtkCTHData *src);

@@ -143,7 +143,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.480");
+vtkCxxRevisionMacro(vtkPVWindow, "1.481");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -1827,18 +1827,19 @@ int vtkPVWindow::Open(char *openFileName, int store)
       vtkPVReaderModule* reader = dialog->SelectReader(this, openFileName);
       if ( !reader || this->OpenWithReader(openFileName, reader) != VTK_OK )
         {
-        ostrstream error;
-        error << "Can not open file " << openFileName << " for reading." << ends;
+        ostrstream errorstr;
+        errorstr << "Can not open file " << openFileName << " for reading." << ends;
         if (this->UseMessageDialog)
           {
           vtkKWMessageDialog::PopupMessage(
-            this->GetApplication(), this, "Open Error", error.str(), 
+            this->GetApplication(), this, "Open Error", errorstr.str(), 
             vtkKWMessageDialog::ErrorIcon | vtkKWMessageDialog::Beep);
           }
         else
           {
-          vtkErrorMacro(<<error);
+          vtkErrorMacro(<<errorstr);
           }
+        errorstr.rdbuf()->freeze(0);
         }
       else if ( store )
         {
@@ -3964,6 +3965,7 @@ void vtkPVWindow::WarningMessage(const char* message)
 //-----------------------------------------------------------------------------
 void vtkPVWindow::ErrorMessage(const char* message)
 {  
+  cout << "ErrorMessage" << endl;
   this->Script("bell");
   this->CreateErrorLogDisplay();
   char *wmessage = vtkString::Duplicate(message);
@@ -3971,6 +3973,7 @@ void vtkPVWindow::ErrorMessage(const char* message)
   delete [] wmessage;
   this->ErrorLogDisplay->AppendError(message);
   this->SetErrorIcon(2);
+  cout << "ErrorMessage end" << endl;
 }
 
 //-----------------------------------------------------------------------------

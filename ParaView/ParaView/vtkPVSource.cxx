@@ -81,7 +81,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.315");
+vtkCxxRevisionMacro(vtkPVSource, "1.316");
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -1416,7 +1416,7 @@ void vtkPVSource::MarkSourcesForUpdate(int flag)
     this->InvalidateDataInformation();
     this->PipelineModifiedTime.Modified();
     // Get rid of caches.
-    int idx, numParts;
+    int numParts;
     vtkPVPart *part;
     numParts = this->GetNumberOfParts();
     for (idx = 0; idx < numParts; ++idx)
@@ -1557,9 +1557,9 @@ void vtkPVSource::DeleteCallback()
       // Show the 3D View settings
       vtkPVApplication *pvApp = 
         vtkPVApplication::SafeDownCast(this->Application);
-      vtkPVWindow *window = pvApp->GetMainWindow();
+      vtkPVWindow *iwindow = pvApp->GetMainWindow();
       this->Script("%s invoke \"%s\"", 
-                   window->GetMenuView()->GetWidgetName(),
+                   iwindow->GetMenuView()->GetWidgetName(),
                    VTK_PV_VIEW_MENU_LABEL);
       }
     }

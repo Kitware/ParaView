@@ -56,7 +56,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCompositeRenderModuleUI);
-vtkCxxRevisionMacro(vtkPVCompositeRenderModuleUI, "1.4");
+vtkCxxRevisionMacro(vtkPVCompositeRenderModuleUI, "1.5");
 
 int vtkPVCompositeRenderModuleUICommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -362,9 +362,9 @@ void vtkPVCompositeRenderModuleUI::Create(vtkKWApplication *app, const char *)
       pvapp->Script("grid %s -row %d -column 2 -sticky news", 
                     this->SquirtLevelScale->GetWidgetName(), row++);
       // Force initialize.
-      int tmp = this->SquirtLevel;
+      int sqlevel = this->SquirtLevel;
       this->SquirtLevel = -1;
-      this->SetSquirtLevel(tmp);
+      this->SetSquirtLevel(sqlevel);
       }
     else
       {

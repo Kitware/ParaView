@@ -163,7 +163,7 @@ vtkStandardNewMacro(vtkPVXDMFParametersInternals);
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVXDMFParameters);
-vtkCxxRevisionMacro(vtkPVXDMFParameters, "1.8");
+vtkCxxRevisionMacro(vtkPVXDMFParameters, "1.9");
 
 //----------------------------------------------------------------------------
 vtkPVXDMFParameters::vtkPVXDMFParameters()
@@ -276,9 +276,9 @@ void vtkPVXDMFParameters::AcceptInternal(const char* vtkNotUsed(sourceTclName))
     vtkKWScale* scale = (vtkKWScale*)it->GetObject();
     const char* label = scale->GetShortLabel();
     //cout << "Looking at scale: " << label << endl;
-    vtkPVXDMFParametersInternals::Parameter* pm = this->Internals->GetParameter(label);
-    pm->Value = static_cast<int>(scale->GetValue());
-    str << " {" << label << "} " << pm->Value;
+    vtkPVXDMFParametersInternals::Parameter* par = this->Internals->GetParameter(label);
+    par->Value = static_cast<int>(scale->GetValue());
+    str << " {" << label << "} " << par->Value;
     some = 1;
     }
   str << " }" << ends;

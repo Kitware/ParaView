@@ -123,7 +123,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.224");
+vtkCxxRevisionMacro(vtkPVApplication, "1.225");
 vtkCxxSetObjectMacro(vtkPVApplication, RenderModule, vtkPVRenderModule);
 
 
@@ -771,7 +771,6 @@ int vtkPVApplication::ParseCommandLineArguments(int argc, char*argv[])
        vtkPVApplication::CheckForArgument(argc, argv, "-b",
                                           index) == VTK_OK )
     {
-    int i;
     for (i=1; i < argc; i++)
       {
       if (vtkPVApplication::CheckForExtension(argv[i], ".pvb"))
@@ -808,11 +807,11 @@ int vtkPVApplication::ParseCommandLineArguments(int argc, char*argv[])
 
           char* newarg = vtkString::Duplicate(argv[i]);
           int len = (int)(strlen(newarg));
-          for (int i=0; i<len; i++)
+          for (int ik=0; ik<len; ik++)
             {
-            if (newarg[i] == '=')
+            if (newarg[ik] == '=')
               {
-              newarg[i] = '\0';
+              newarg[ik] = '\0';
               }
             }
 
@@ -958,7 +957,7 @@ int vtkPVApplication::ParseCommandLineArguments(int argc, char*argv[])
       // Strip string to equals sign.
       const char* newarg=0;
       int len = (int)(strlen(argv[index]));
-      for (int i=0; i<len; i++)
+      for (i=0; i<len; i++)
         {
         if (argv[index][i] == '=')
           {
@@ -987,7 +986,7 @@ int vtkPVApplication::ParseCommandLineArguments(int argc, char*argv[])
       // Strip string to equals sign.
       const char* newarg=0;
       int len = (int)(strlen(argv[index]));
-      for (int i=0; i<len; i++)
+      for (i=0; i<len; i++)
         {
         if (argv[index][i] == '=')
           {
@@ -1003,7 +1002,7 @@ int vtkPVApplication::ParseCommandLineArguments(int argc, char*argv[])
       // Strip string to equals sign.
       const char* newarg=0;
       int len = (int)(strlen(argv[index]));
-      for (int i=0; i<len; i++)
+      for (i=0; i<len; i++)
         {
         if (argv[index][i] == '=')
           {
@@ -1045,7 +1044,7 @@ int vtkPVApplication::ParseCommandLineArguments(int argc, char*argv[])
     // Strip string to equals sign.
     const char* newarg=0;
     int len = (int)(strlen(argv[index]));
-    for (int i=0; i<len; i++)
+    for (i=0; i<len; i++)
       {
       if (argv[index][i] == '=')
         {
@@ -1947,7 +1946,6 @@ void vtkPVApplication::PrintSelf(ostream& os, vtkIndent indent)
 void vtkPVApplication::DisplayTCLError(const char* message)
 {
   vtkErrorMacro("TclTk error: "<<message);
-  abort();
 }
 
 //----------------------------------------------------------------------------
