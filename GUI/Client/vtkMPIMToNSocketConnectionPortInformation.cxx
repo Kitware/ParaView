@@ -34,7 +34,7 @@ public:
 
 
 vtkStandardNewMacro(vtkMPIMToNSocketConnectionPortInformation);
-vtkCxxRevisionMacro(vtkMPIMToNSocketConnectionPortInformation, "1.3");
+vtkCxxRevisionMacro(vtkMPIMToNSocketConnectionPortInformation, "1.4");
 
 //----------------------------------------------------------------------------
 vtkMPIMToNSocketConnectionPortInformation::vtkMPIMToNSocketConnectionPortInformation()
@@ -92,6 +92,10 @@ void vtkMPIMToNSocketConnectionPortInformation::SetPortNumber(unsigned int proce
     {
     this->Internals->ServerInformation.resize(this->NumberOfConnections);
     }
+  if(processNumber >= this->Internals->ServerInformation.size())
+    {
+    return;
+    }
   this->Internals->ServerInformation[processNumber].PortNumber = port;
 }
 
@@ -101,6 +105,10 @@ void vtkMPIMToNSocketConnectionPortInformation::SetHostName(unsigned int process
   if(this->Internals->ServerInformation.size() == 0)
     {
     this->Internals->ServerInformation.resize(this->NumberOfConnections);
+    }
+  if(processNumber >= this->Internals->ServerInformation.size())
+    {
+    return;
     }
   this->Internals->ServerInformation[processNumber].HostName = hostname;
 }
