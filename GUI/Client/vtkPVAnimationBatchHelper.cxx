@@ -20,7 +20,7 @@
 #include "vtkSMStringListDomain.h"
 
 vtkStandardNewMacro(vtkPVAnimationBatchHelper);
-vtkCxxRevisionMacro(vtkPVAnimationBatchHelper, "1.1");
+vtkCxxRevisionMacro(vtkPVAnimationBatchHelper, "1.2");
 
 //---------------------------------------------------------------------------
 void vtkPVAnimationBatchHelper::SetAnimationValueInBatch(
@@ -47,7 +47,7 @@ void vtkPVAnimationBatchHelper::SetAnimationValueInBatch(
       return;
       }
  
-    int animValue = (int)(floor(value));
+    int animValue = (int)floor(value + 0.5);
     int compare;
     *file << "  [$pvTemp" << sourceID << " GetProperty "
           << property->GetXMLName() << "] SetElement " << idx << " "
@@ -83,7 +83,7 @@ void vtkPVAnimationBatchHelper::SetAnimationValueInBatch(
     {
     *file << "  [$pvTemp" << sourceID << " GetProperty "
           << property->GetXMLName() << "] SetElement " << idx << " "
-          << (int)(floor(value)) << endl;
+          << (int)(floor(value + 0.5)) << endl;
     }
   else if (!strcmp(domain->GetClassName(), "vtkSMStringListDomain"))
     {
@@ -94,12 +94,12 @@ void vtkPVAnimationBatchHelper::SetAnimationValueInBatch(
       }
     *file << "  [$pvTemp" << sourceID << " GetProperty "
           << property->GetXMLName() << "] SetElement " << idx << " {"
-          << sld->GetString((int)(floor(value))) << "}" << endl;
+          << sld->GetString((int)(floor(value + 0.5))) << "}" << endl;
     }
   else if (!strcmp(domain->GetClassName(), "vtkSMStringListRangeDomain"))
     {
     char val[128];
-    sprintf(val, "%d", static_cast<int>(floor(value)));
+    sprintf(val, "%d", static_cast<int>(floor(value + 0.5)));
     *file << "  [$pvTemp" << sourceID << " GetProperty "
           << property->GetXMLName() << "] SetElement " << 2*idx+1 << " " << val
           << endl;
