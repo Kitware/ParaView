@@ -312,7 +312,8 @@ void vtkPVWindow::Create(vtkKWApplication *app, char *args)
 
   // create the top level
   this->MenuFile->InsertCommand(0, "Open Data File", this, "Open");
-  this->MenuFile->InsertCommand(1, "Save Tcl script", this, "SaveInTclScript");
+  this->MenuFile->InsertCommand(2, "Export Tcl Script", this, "SaveInTclScript");
+  //this->MenuFile->InsertCommand(3, "Save Workspace", this, "SaveWorkspace");
   
   // Log stuff
   this->MenuFile->InsertCommand(4, "Open Log File", this, "StartLog");
@@ -669,6 +670,11 @@ void vtkPVWindow::Open()
     }
 }
 
+
+//============================================================================
+// These methods have things in common, 
+// and may in the future use the same methods.
+
 //----------------------------------------------------------------------------
 void vtkPVWindow::SaveInTclScript()
 {
@@ -758,6 +764,90 @@ void vtkPVWindow::SaveInTclScript()
 }
 
 //----------------------------------------------------------------------------
+void vtkPVWindow::SaveWorkspace()
+{
+  ofstream *file;
+  vtkCollection *sources;
+  vtkPVSource *pvs;
+  char *filename;
+  
+  this->Script("tk_getSaveFile -filetypes {{{ParaView Files} {.pv}} {{All Files} {.*}}} -defaultextension .tcl");
+  filename = this->Application->GetMainInterp()->result;
+  
+  if (strcmp(filename, "") == 0)
+    {
+    return;
+    }
+  
+  file = new ofstream(filename, ios::out);
+  if (file->fail())
+    {
+    vtkErrorMacro("Could not open file pipeline.pv");
+    delete file;
+    file = NULL;
+    return;
+    }
+
+  *file << "# ParaView Workspace Version 0.1\n\n";
+
+  
+  this->GetMainView()->SaveInTclScript(file);
+  
+  // Loop through sources ...
+  sources = this->GetSources();
+  sources->InitTraversal();
+
+  int numSources = sources->GetNumberOfItems();
+  int sourceCount = 0;
+
+  while (sourceCount < numSources)
+    {
+    if (strcmp(sources->GetItemAsObject(sourceCount)->GetClassName(),
+               "vtkPVArrayCalculator") == 0)
+      {
+      ((vtkPVArrayCalculator*)sources->GetItemAsObject(sourceCount))->SaveInTclScript(file);
+      }
+    else if (strcmp(sources->GetItemAsObject(sourceCount)->GetClassName(),
+                    "vtkPVContour") == 0)
+      {
+      ((vtkPVContour*)sources->GetItemAsObject(sourceCount))->SaveInTclScript(file);
+      }
+    else if (strcmp(sources->GetItemAsObject(sourceCount)->GetClassName(),
+                    "vtkPVGlyph3D") == 0)
+      {
+      ((vtkPVGlyph3D*)sources->GetItemAsObject(sourceCount))->SaveInTclScript(file);
+      }
+    else if (strcmp(sources->GetItemAsObject(sourceCount)->GetClassName(),
+                    "vtkPVThreshold") == 0)
+      {
+      ((vtkPVThreshold*)sources->GetItemAsObject(sourceCount))->SaveInTclScript(file);
+      }
+    else
+      {
+      pvs = (vtkPVSource*)sources->GetItemAsObject(sourceCount);
+      pvs->SaveInTclScript(file);
+      }
+    sourceCount++;
+    }
+
+  this->GetMainView()->AddActorsToTclScript(file);
+    
+  *file << "# enable user interface interactor\n"
+        << "iren SetUserMethod {wm deiconify .vtkInteract}\n"
+        << "iren Initialize\n\n"
+        << "# prevent the tk window from showing up then start the event loop\n"
+        << "wm withdraw .\n";
+
+  if (file)
+    {
+    file->close();
+    delete file;
+    file = NULL;
+    }
+
+}
+
+//----------------------------------------------------------------------------
 // Description:
 // Chaining method to serialize an object and its superclasses.
 void vtkPVWindow::SerializeSelf(ostream& os, vtkIndent indent)
@@ -780,6 +870,13 @@ void vtkPVWindow::SerializeToken(istream& is, const char token[1024])
 
   vtkKWWindow::SerializeToken(is,token);
 }
+
+
+//============================================================================
+
+
+
+
 
 //----------------------------------------------------------------------------
 void vtkPVWindow::SetCurrentPVData(vtkPVData *pvd)
@@ -1308,6 +1405,22 @@ void vtkPVWindow::StartLog()
 void vtkPVWindow::StopLog()
 {
   this->GetPVApplication()->StopLog();
+}
+
+//----------------------------------------------------------------------------
+vtkPVSourceInterface *vtkPVWindow::GetSourceInterface(const char *className)
+{
+  vtkPVSourceInterface *sInt;  
+  this->SourceInterfaces->InitTraversal();
+
+  while ( (sInt = (vtkPVSourceInterface*)this->SourceInterfaces->GetNextItemAsObject()) )
+    {
+    if (strcmp(sInt->GetSourceClassName(), className) == 0)
+      {
+      return sInt;
+      }
+    }
+  return NULL;
 }
 
 //----------------------------------------------------------------------------

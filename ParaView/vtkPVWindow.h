@@ -113,6 +113,10 @@ public:
   void SaveInTclScript();
 
   // Description:
+  // Save the pipeline ParaView Tcl script
+  void SaveWorkspace();
+
+  // Description:
   // Open a data file.
   void Open();
   
@@ -155,6 +159,11 @@ public:
   vtkGetObjectMacro(ContourButton, vtkKWPushButton);
   vtkGetObjectMacro(GlyphButton, vtkKWPushButton);
   vtkGetObjectMacro(ProbeButton, vtkKWPushButton);
+
+  // Description:
+  // Get a source interface from the calss name.
+  // Useful for writing scripts that create sources.
+  vtkPVSourceInterface *GetSourceInterface(const char *className);
   
 protected:
   vtkPVWindow();
