@@ -11,7 +11,7 @@ if {[info exists argc]} {
 set kw(vtkTemp1) [$Application GetMainWindow]
 set kw(vtkTemp21) [$kw(vtkTemp1) GetMainView]
 $kw(vtkTemp1) Open "$DataDir/Data/ironProt.vtk"
-set kw(vtkTemp285) [vtkTemp1 GetCurrentPVSource]
+set kw(vtkTemp285) [$kw(vtkTemp1) GetCurrentPVSource]
 
 set kw(vtkTemp318) [$kw(vtkTemp1) CreatePVSource ImageClip]
 set kw(vtkTemp330) [$kw(vtkTemp318) GetPVWidget {OutputWholeExtent}]
