@@ -23,7 +23,7 @@
 #include "vtkPolyData.h"
 #include "vtkUnstructuredGrid.h"
 
-vtkCxxRevisionMacro(vtkPVUpdateSuppressor, "1.21");
+vtkCxxRevisionMacro(vtkPVUpdateSuppressor, "1.21.2.1");
 vtkStandardNewMacro(vtkPVUpdateSuppressor);
 vtkCxxSetObjectMacro(vtkPVUpdateSuppressor,Input,vtkDataSet);
 
@@ -227,6 +227,9 @@ void vtkPVUpdateSuppressor::CacheUpdate(int idx, int num)
     this->ForceUpdate();
     pd = output->NewInstance();
     pd->ShallowCopy(output);
+    //  Compositing seems to update the input properly.
+    //  But this update is needed when doing animation without compositing.
+    pd->Update(); 
     this->CachedGeometry[idx] = pd;
     pd->Register(this);
     pd->Delete();
