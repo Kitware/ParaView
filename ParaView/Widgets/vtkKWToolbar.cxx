@@ -82,7 +82,7 @@ void vtkKWToolbar::SetGlobalWidgetsFlatAspect(int val)
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWToolbar );
-vtkCxxRevisionMacro(vtkKWToolbar, "1.22");
+vtkCxxRevisionMacro(vtkKWToolbar, "1.23");
 
 
 int vtkKWToolbarCommand(ClientData cd, Tcl_Interp *interp,
@@ -265,7 +265,9 @@ void vtkKWToolbar::UpdateWidgetsAspect()
       else
         {
         // Can not use -relief, try to hack -bd by specifying
-        // an empty border using the negative current value
+        // an empty border using the negative current value (i.e.
+        // the negative value will be handled as 0, but still enable
+        // us to retrieve the old value using abs().
         if (widget->HasConfigurationOption("-bd"))
           {
           this->Script("%s cget -bd", widget->GetWidgetName());
@@ -274,17 +276,32 @@ void vtkKWToolbar::UpdateWidgetsAspect()
             << (this->WidgetsFlatAspect ? -abs(bd) : abs(bd)) << endl;
           }
         }
+      // If radiobutton, remove the select color border in flat aspect
       if (widget->HasConfigurationOption("-selectcolor"))
         {
         if (this->WidgetsFlatAspect)
           {
-          this->Script("%s configure -selectcolor [%s cget -bg]", 
-                       widget->GetWidgetName(), widget->GetWidgetName());
+          s << widget->GetWidgetName() << " config -selectcolor [" 
+            << widget->GetWidgetName() << " cget -bg]" << endl; 
           }
         else
           {
-          this->Script("%s configure -selectcolor [lindex [%s configure -selectcolor] 3]", 
-                       widget->GetWidgetName(), widget->GetWidgetName());
+          s << widget->GetWidgetName() << " config -selectcolor [lindex [" 
+            << widget->GetWidgetName() << " config -selectcolor] 3]" << endl;
+          }
+        }
+      // Do not use active background in flat mode either
+      if (widget->HasConfigurationOption("-activebackground"))
+        {
+        if (this->WidgetsFlatAspect)
+          {
+          s << widget->GetWidgetName() << " config -activebackground [" 
+            << widget->GetWidgetName() << " cget -bg]" << endl; 
+          }
+        else
+          {
+          s << widget->GetWidgetName() << " config -activebackground [lindex [" 
+            << widget->GetWidgetName() << " config -activebackground] 3]" << endl;
           }
         }
       }
