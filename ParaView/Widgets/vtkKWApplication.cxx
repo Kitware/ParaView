@@ -72,7 +72,7 @@ int vtkKWApplication::WidgetVisibility = 1;
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.93");
+vtkCxxRevisionMacro(vtkKWApplication, "1.94");
 
 
 
@@ -146,17 +146,18 @@ vtkKWApplication::vtkKWApplication()
     this->Script("wm overrideredirect %s 1", 
                  this->BalloonHelpWindow->GetWidgetName());
     this->Script("wm withdraw %s", this->BalloonHelpWindow->GetWidgetName());
+    this->SplashScreen = vtkKWSplashScreen::New();
     }
 
   this->ExitOnReturn = 0;
 
-  this->SplashScreen = vtkKWSplashScreen::New();
   this->HasSplashScreen = 0;
   this->ShowSplashScreen = 1;
 }
 
 vtkKWApplication::~vtkKWApplication()
 {
+  cout << "Fooo" << endl;
   if ( this->BalloonHelpWindow )
     {
     this->BalloonHelpWindow->Delete();
