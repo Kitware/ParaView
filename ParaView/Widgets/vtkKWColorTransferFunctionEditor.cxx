@@ -45,7 +45,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkObjectFactory.h"
 
 vtkStandardNewMacro(vtkKWColorTransferFunctionEditor);
-vtkCxxRevisionMacro(vtkKWColorTransferFunctionEditor, "1.7");
+vtkCxxRevisionMacro(vtkKWColorTransferFunctionEditor, "1.8");
 
 #define VTK_KW_CTF_EDITOR_RGB_LABEL "RGB"
 #define VTK_KW_CTF_EDITOR_HSV_LABEL "HSV"
@@ -119,9 +119,11 @@ unsigned long vtkKWColorTransferFunctionEditor::GetFunctionMTime()
 }
 
 //----------------------------------------------------------------------------
-int vtkKWColorTransferFunctionEditor::FunctionPointValueIsLocked(int)
+int vtkKWColorTransferFunctionEditor::FunctionPointValueIsLocked(int id)
 {
-  return 1;
+  // We have no control on the vaue space, so always lock it
+
+  return this->Superclass::FunctionPointValueIsLocked(id) || 1;
 }
 
 //----------------------------------------------------------------------------
@@ -191,7 +193,9 @@ int vtkKWColorTransferFunctionEditor::GetFunctionPointCanvasCoordinates(
 int vtkKWColorTransferFunctionEditor::AddFunctionPointAtCanvasCoordinates(
   int x, int vtkNotUsed(y), int &id)
 {
-  if (!this->IsCreated() || !this->HasFunction() || this->DisableAddAndRemove)
+  if (!this->IsCreated() || 
+      !this->HasFunction() || 
+      !this->FunctionPointCanBeAdded())
     {
     return 0;
     }
@@ -223,7 +227,7 @@ int vtkKWColorTransferFunctionEditor::AddFunctionPointAtCanvasCoordinates(
 int vtkKWColorTransferFunctionEditor::AddFunctionPointAtParameter(
   float parameter, int &id)
 {
-  if (!this->IsCreated() || !this->HasFunction() || this->DisableAddAndRemove)
+  if (!this->HasFunction() || !this->FunctionPointCanBeAdded())
     {
     return 0;
     }
@@ -359,7 +363,7 @@ int vtkKWColorTransferFunctionEditor::RemoveFunctionPoint(int id)
 {
   if (!this->IsCreated() || 
       !this->HasFunction() || id < 0 || id >= this->GetFunctionSize() ||
-      !this->FunctionPointIsRemovable(id))
+      !this->FunctionPointCanBeRemoved(id))
     {
     return 0;
     }
