@@ -146,10 +146,10 @@ void vtkPVActorComposite::CreateParallelTclObjects(vtkPVApplication *pvApp)
   numProcs = pvApp->GetController()->GetNumberOfProcesses() ;
   for (id = 0; id < numProcs; ++id)
     {
-    //pvApp->RemoteScript(id, "%s SetNumberOfPieces %d", this->MapperTclName, numProcs);
-    //pvApp->RemoteScript(id, "%s SetPiece %d", this->MapperTclName, id);
-    pvApp->RemoteScript(id, "%s SetNumberOfPieces 2", this->MapperTclName);
-    pvApp->RemoteScript(id, "%s SetPiece 1", this->MapperTclName);
+    pvApp->RemoteScript(id, "%s SetNumberOfPieces %d", this->MapperTclName, numProcs);
+    pvApp->RemoteScript(id, "%s SetPiece %d", this->MapperTclName, id);
+    //pvApp->RemoteScript(id, "%s SetNumberOfPieces 2", this->MapperTclName);
+    //pvApp->RemoteScript(id, "%s SetPiece 1", this->MapperTclName);
     }
 }
 
