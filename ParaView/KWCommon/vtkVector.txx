@@ -24,6 +24,8 @@
 #include "vtkAbstractList.txx"
 #include "vtkVectorIterator.txx"
 
+#include <stdlib.h>
+
 template <class DType>
 vtkVector<DType> *vtkVector<DType>::New()
 { 
@@ -376,6 +378,12 @@ void vtkVector<DType>::CopyItems(vtkVector<DType> *in)
     in->GetItem(i,iref);
     this->AppendItem(iref);
     }
+}
+
+template <class DType>
+void vtkVector<DType>::Sort(int (*func)(const void *, const void *))
+{
+  qsort((void *)this->Array, this->GetNumberOfItems(), sizeof(DType), func);
 }
 
 #if defined ( _MSC_VER )
