@@ -41,7 +41,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLODPartDisplay);
-vtkCxxRevisionMacro(vtkPVLODPartDisplay, "1.19");
+vtkCxxRevisionMacro(vtkPVLODPartDisplay, "1.20");
 
 
 //----------------------------------------------------------------------------
@@ -211,7 +211,7 @@ void vtkPVLODPartDisplay::CreateParallelTclObjects(vtkPVApplication *pvApp)
   pm->SendStreamToClientAndServer();
 
   // ===== LOD branch:
-  this->LODMapperID = pm->NewStreamObject("vtkPVPolyDataMapper");
+  this->LODMapperID = pm->NewStreamObject("vtkPolyDataMapper");
   pm->GetStream()
     << vtkClientServerStream::Invoke
     << this->LODMapperID << "UseLookupTableScalarRangeOn"
