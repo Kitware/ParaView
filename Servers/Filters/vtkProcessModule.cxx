@@ -26,7 +26,7 @@ vtkProcessModule* vtkProcessModule::ProcessModule = 0;
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkProcessModule);
-vtkCxxRevisionMacro(vtkProcessModule, "1.2");
+vtkCxxRevisionMacro(vtkProcessModule, "1.3");
 
 //----------------------------------------------------------------------------
 vtkProcessModule::vtkProcessModule()
@@ -306,10 +306,6 @@ void vtkProcessModule::FinalizeInterpreter()
 
   // Delete the standard IDs.
   vtkClientServerStream css;
-  // TODO move this to subclass
-//   css << vtkClientServerStream::Delete
-//       << this->GetApplicationID()
-//       << vtkClientServerStream::End;
   css << vtkClientServerStream::Delete
       << this->GetProcessModuleID()
       << vtkClientServerStream::End;
