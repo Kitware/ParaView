@@ -46,17 +46,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 //------------------------------------------------------------------------------
-vtkKWChangeColorButton* vtkKWChangeColorButton::New()
-{
-  // First try to create the object from the vtkObjectFactory
-  vtkObject* ret = vtkObjectFactory::CreateInstance("vtkKWChangeColorButton");
-  if(ret)
-    {
-    return (vtkKWChangeColorButton*)ret;
-    }
-  // If the factory was unable to create the object, then create it here.
-  return new vtkKWChangeColorButton;
-}
+vtkStandardNewMacro( vtkKWChangeColorButton );
 
 
 int vtkKWChangeColorButtonCommand(ClientData cd, Tcl_Interp *interp,
@@ -271,5 +261,5 @@ void vtkKWChangeColorButton::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWChangeColorButton ";
-  this->ExtractRevision(os,"$Revision: 1.11 $");
+  this->ExtractRevision(os,"$Revision: 1.12 $");
 }

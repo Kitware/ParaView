@@ -46,17 +46,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 //------------------------------------------------------------------------------
-vtkKWRadioButton* vtkKWRadioButton::New()
-{
-  // First try to create the object from the vtkObjectFactory
-  vtkObject* ret = vtkObjectFactory::CreateInstance("vtkKWRadioButton");
-  if(ret)
-    {
-    return (vtkKWRadioButton*)ret;
-    }
-  // If the factory was unable to create the object, then create it here.
-  return new vtkKWRadioButton;
-}
+vtkStandardNewMacro( vtkKWRadioButton );
 
 
 

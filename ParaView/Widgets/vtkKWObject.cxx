@@ -47,17 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 //------------------------------------------------------------------------------
-vtkKWObject* vtkKWObject::New()
-{
-  // First try to create the object from the vtkObjectFactory
-  vtkObject* ret = vtkObjectFactory::CreateInstance("vtkKWObject");
-  if(ret)
-    {
-    return (vtkKWObject*)ret;
-    }
-  // If the factory was unable to create the object, then create it here.
-  return new vtkKWObject;
-}
+vtkStandardNewMacro( vtkKWObject );
 
 
 
@@ -117,7 +107,7 @@ void vtkKWObject::ExtractRevision(ostream& os,const char *revIn)
 void vtkKWObject::SerializeRevision(ostream& os, vtkIndent indent)
 {
   os << indent << "vtkKWObject ";
-  this->ExtractRevision(os,"$Revision: 1.12 $");
+  this->ExtractRevision(os,"$Revision: 1.13 $");
 }
 
 void vtkKWObject::Serialize(istream& is)

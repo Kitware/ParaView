@@ -46,17 +46,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 //------------------------------------------------------------------------------
-vtkKWText* vtkKWText::New()
-{
-  // First try to create the object from the vtkObjectFactory
-  vtkObject* ret = vtkObjectFactory::CreateInstance("vtkKWText");
-  if(ret)
-    {
-    return (vtkKWText*)ret;
-    }
-  // If the factory was unable to create the object, then create it here.
-  return new vtkKWText;
-}
+vtkStandardNewMacro( vtkKWText );
 
 vtkKWText::vtkKWText()
 {

@@ -46,17 +46,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 //------------------------------------------------------------------------------
-vtkKWExtent* vtkKWExtent::New()
-{
-  // First try to create the object from the vtkObjectFactory
-  vtkObject* ret = vtkObjectFactory::CreateInstance("vtkKWExtent");
-  if(ret)
-    {
-    return (vtkKWExtent*)ret;
-    }
-  // If the factory was unable to create the object, then create it here.
-  return new vtkKWExtent;
-}
+vtkStandardNewMacro( vtkKWExtent );
 
 
 

@@ -47,17 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkObjectFactory.h"
 
 //-------------------------------------------------------------------------
-vtkKWTclInteractor* vtkKWTclInteractor::New()
-{
-  // First try to create the object from the vtkObjectFactory
-  vtkObject* ret = vtkObjectFactory::CreateInstance("vtkKWTclInteractor");
-  if (ret)
-    {
-    return (vtkKWTclInteractor*)ret;
-    }
-  // If the factory was unable to create the object, then create it here.
-  return new vtkKWTclInteractor;
-}
+vtkStandardNewMacro( vtkKWTclInteractor );
 
 int vtkKWTclInteractorCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);

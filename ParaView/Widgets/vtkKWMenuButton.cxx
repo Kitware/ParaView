@@ -43,6 +43,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWMenuButton.h"
 #include "vtkObjectFactory.h"
 
+vtkStandardNewMacro( vtkKWMenuButton );
+
 int vtkKWMenuButtonCommand(ClientData cd, Tcl_Interp *interp,
 		      int argc, char *argv[]);
 
@@ -59,18 +61,6 @@ vtkKWMenuButton::~vtkKWMenuButton()
   this->Menu = NULL;
 }
 
-
-vtkKWMenuButton* vtkKWMenuButton::New()
-{
-  // First try to create the object from the vtkObjectFactory
-  vtkObject* ret = vtkObjectFactory::CreateInstance("vtkKWMenuButton");
-  if(ret)
-    {
-    return (vtkKWMenuButton*)ret;
-    }
-  // If the factory was unable to create the object, then create it here.
-  return new vtkKWMenuButton;
-}
 
 void vtkKWMenuButton::Create(vtkKWApplication *app, char *args)
 { 

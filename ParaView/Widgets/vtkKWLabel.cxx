@@ -46,17 +46,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 //------------------------------------------------------------------------------
-vtkKWLabel* vtkKWLabel::New()
-{
-  // First try to create the object from the vtkObjectFactory
-  vtkObject* ret = vtkObjectFactory::CreateInstance("vtkKWLabel");
-  if(ret)
-    {
-    return (vtkKWLabel*)ret;
-    }
-  // If the factory was unable to create the object, then create it here.
-  return new vtkKWLabel;
-}
+vtkStandardNewMacro( vtkKWLabel );
 
 vtkKWLabel::vtkKWLabel()
 {

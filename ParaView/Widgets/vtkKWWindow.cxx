@@ -191,17 +191,7 @@ int vtkKWWindowMenuEntry::InsertToMenu( int pos, vtkKWMenu *menu )
 }
 
 //------------------------------------------------------------------------------
-vtkKWWindow* vtkKWWindow::New()
-{
-  // First try to create the object from the vtkObjectFactory
-  vtkObject* ret = vtkObjectFactory::CreateInstance("vtkKWWindow");
-  if(ret)
-    {
-    return (vtkKWWindow*)ret;
-    }
-  // If the factory was unable to create the object, then create it here.
-  return new vtkKWWindow;
-}
+vtkStandardNewMacro(vtkKWWindow );
 
 int vtkKWWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -923,7 +913,7 @@ void vtkKWWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWWindow ";
-  this->ExtractRevision(os,"$Revision: 1.47 $");
+  this->ExtractRevision(os,"$Revision: 1.48 $");
 }
 
 int vtkKWWindow::ExitDialog()

@@ -58,17 +58,7 @@ int vtkKWApplication::WidgetVisibility = 1;
 
 
 //------------------------------------------------------------------------------
-vtkKWApplication* vtkKWApplication::New()
-{
-  // First try to create the object from the vtkObjectFactory
-  vtkObject* ret = vtkObjectFactory::CreateInstance("vtkKWApplication");
-  if(ret)
-    {
-    return (vtkKWApplication*)ret;
-    }
-  // If the factory was unable to create the object, then create it here.
-  return new vtkKWApplication;
-}
+vtkStandardNewMacro( vtkKWApplication );
 
 
 

@@ -46,6 +46,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkObjectFactory.h"
 
 
+//------------------------------------------------------------------------------
+vtkStandardNewMacro( vtkKWHashTable );
+
 // Hash table vtkKWHashTableItem structure
 class vtkKWHashTableItem
 {
@@ -84,19 +87,6 @@ void vtkKWHashTableItem::Set( vtkKWHashTableItem *item )
   this->Key   = item->Key;
   this->Next  = item->Next;
   this->Valid = item->Valid;  
-}
-
-//------------------------------------------------------------------------------
-vtkKWHashTable* vtkKWHashTable::New()
-{
-  // First try to create the object from the vtkObjectFactory
-  vtkObject* ret = vtkObjectFactory::CreateInstance("vtkKWHashTable");
-  if(ret)
-    {
-    return (vtkKWHashTable*)ret;
-    }
-  // If the factory was unable to create the object, then create it here.
-  return new vtkKWHashTable;
 }
 
 vtkKWHashTable::vtkKWHashTable()

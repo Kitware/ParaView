@@ -46,17 +46,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 //------------------------------------------------------------------------------
-vtkKWLoadSaveDialog* vtkKWLoadSaveDialog::New()
-{
-  // First try to create the object from the vtkObjectFactory
-  vtkObject* ret = vtkObjectFactory::CreateInstance("vtkKWLoadSaveDialog");
-  if(ret)
-    {
-    return (vtkKWLoadSaveDialog*)ret;
-    }
-  // If the factory was unable to create the object, then create it here.
-  return new vtkKWLoadSaveDialog;
-}
+vtkStandardNewMacro( vtkKWLoadSaveDialog );
 
 vtkKWLoadSaveDialog::vtkKWLoadSaveDialog()
 {

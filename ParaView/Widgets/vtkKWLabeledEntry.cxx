@@ -44,17 +44,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkObjectFactory.h"
 
 //----------------------------------------------------------------------------
-vtkKWLabeledEntry* vtkKWLabeledEntry::New()
-{
-  // First try to create the object from the vtkObjectFactory
-  vtkObject* ret = vtkObjectFactory::CreateInstance("vtkKWLabeledEntry");
-  if(ret)
-    {
-    return (vtkKWLabeledEntry*)ret;
-    }
-  // If the factory was unable to create the object, then create it here.
-  return new vtkKWLabeledEntry;
-}
+vtkStandardNewMacro( vtkKWLabeledEntry );
 
 int vtkKWLabeledEntryCommand(ClientData cd, Tcl_Interp *interp,
 			     int argc, char *argv[]);

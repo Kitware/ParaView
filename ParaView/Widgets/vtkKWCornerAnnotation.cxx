@@ -47,17 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWApplication.h"
 
 //-----------------------------------------------------------------------------
-vtkKWCornerAnnotation* vtkKWCornerAnnotation::New()
-{
-  // First try to create the object from the vtkObjectFactory
-  vtkObject* ret = vtkObjectFactory::CreateInstance("vtkKWCornerAnnotation");
-  if(ret)
-    {
-    return (vtkKWCornerAnnotation*)ret;
-    }
-  // If the factory was unable to create the object, then create it here.
-  return new vtkKWCornerAnnotation;
-}
+vtkStandardNewMacro( vtkKWCornerAnnotation );
 
 
 
@@ -340,6 +330,6 @@ void vtkKWCornerAnnotation::SerializeToken(istream& is,
 void vtkKWCornerAnnotation::SerializeRevision(ostream& os, vtkIndent indent)
 {
   os << indent << "vtkKWCornerAnnotation ";
-  this->ExtractRevision(os,"$Revision: 1.18 $");
+  this->ExtractRevision(os,"$Revision: 1.19 $");
   vtkKWLabeledFrame::SerializeRevision(os,indent);
 }

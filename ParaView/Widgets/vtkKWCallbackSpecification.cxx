@@ -43,6 +43,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkObjectFactory.h"
 
 //--------------------------------------------------------------------------
+vtkStandardNewMacro( vtkKWCallbackSpecification );
+
 
 int vtkKWCallbackSpecificationCommand(ClientData cd, Tcl_Interp *interp,
 				      int argc, char *argv[]);
@@ -72,16 +74,4 @@ vtkKWCallbackSpecification::~vtkKWCallbackSpecification()
     }
 }
 
-vtkKWCallbackSpecification* vtkKWCallbackSpecification::New()
-{
-  // First try to create the object from the vtkObjectFactory
-  vtkObject* ret = 
-    vtkObjectFactory::CreateInstance("vtkKWCallbackSpecification");
-  if(ret)
-    {
-    return (vtkKWCallbackSpecification*)ret;
-    }
-  // If the factory was unable to create the object, then create it here.
-  return new vtkKWCallbackSpecification;
-}
 

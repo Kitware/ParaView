@@ -43,14 +43,4 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWViewCollection.h"
 #include "vtkObjectFactory.h"
 
-vtkKWViewCollection* vtkKWViewCollection::New()
-{
-  // First try to create the object from the vtkObjectFactory
-  vtkObject* ret = vtkObjectFactory::CreateInstance("vtkKWViewCollection");
-  if(ret)
-    {
-      return (vtkKWViewCollection*)ret;
-    }
-  // If the factory was unable to create the object, then create it here.
-  return new vtkKWViewCollection;
-}
+vtkStandardNewMacro( vtkKWViewCollection );

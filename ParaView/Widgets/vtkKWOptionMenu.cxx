@@ -46,17 +46,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 //------------------------------------------------------------------------------
-vtkKWOptionMenu* vtkKWOptionMenu::New()
-{
-  // First try to create the object from the vtkObjectFactory
-  vtkObject* ret = vtkObjectFactory::CreateInstance("vtkKWOptionMenu");
-  if(ret)
-    {
-    return (vtkKWOptionMenu*)ret;
-    }
-  // If the factory was unable to create the object, then create it here.
-  return new vtkKWOptionMenu;
-}
+vtkStandardNewMacro( vtkKWOptionMenu );
 
 
 

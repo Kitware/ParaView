@@ -61,20 +61,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWProgressGauge.h"
 
 //------------------------------------------------------------------------------
-vtkKWVolumeComposite* vtkKWVolumeComposite::New()
-{
-  // First try to create the object from the vtkObjectFactory
-  vtkObject* ret = vtkObjectFactory::CreateInstance("vtkKWVolumeComposite");
-  if(ret)
-    {
-    return (vtkKWVolumeComposite*)ret;
-    }
-  // If the factory was unable to create the object, then create it here.
-  return new vtkKWVolumeComposite;
-}
-
-
-
+vtkStandardNewMacro( vtkKWVolumeComposite );
 
 int vtkKWVolumeCompositeCommand(ClientData cd, Tcl_Interp *interp,
 				int argc, char *argv[]);
@@ -500,5 +487,5 @@ void vtkKWVolumeComposite::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWComposite::SerializeRevision(os,indent);
   os << indent << "vtkKWVolumeComposite ";
-  this->ExtractRevision(os,"$Revision: 1.24 $");
+  this->ExtractRevision(os,"$Revision: 1.25 $");
 }

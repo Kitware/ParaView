@@ -3,7 +3,7 @@
 
 int main()
 {
-  int cc;
+  unsigned int cc;
   char names[][10] = {
     "Andy",
     "Amy",
