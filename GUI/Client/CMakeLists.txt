@@ -199,6 +199,7 @@ INCLUDE_DIRECTORIES(
   ${ParaView_BINARY_DIR}/Utilities/VTKClientServer
   ${ParaView_SOURCE_DIR}/Servers/Filters
   ${ParaView_SOURCE_DIR}/GUI/Widgets
+  ${ParaView_SOURCE_DIR}/GUI/Client
   ${ParaView_BINARY_DIR}/Utilities/KWSys
   ${VTK_BINARY_DIR}
   )
