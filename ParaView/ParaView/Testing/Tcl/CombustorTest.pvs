@@ -25,20 +25,17 @@ $pv(vtkTemp43) SetBackgroundColor 0 0 0
 #change to rotate camera interactor style
 $pvWindow ChangeInteractorStyle 1
 
-# Create the reader
-set pvPlot3D [$pvWindow CreatePVSource PLOT3DReader]
-
-set XYZFileEntry [$pvPlot3D GetPVWidget {XYZFileName}]
-$XYZFileEntry SetValue $DataDir/Data/combxyz.bin
-set QFileEntry [$pvPlot3D GetPVWidget {QFileName}]
-$QFileEntry SetValue $DataDir/Data/combq.bin
-$pvPlot3D AcceptCallback
+$pvWindow OpenCustom "PLOT3D Files" "$DataDir/Data/combxyz.bin"
+set kw(vtkTemp292) [$pvWindow GetCurrentPVSource]
+set kw(vtkTemp305) [$kw(vtkTemp292) GetPVWidget {QFileName}]
+$kw(vtkTemp305) SetValue "$DataDir/Data/combq.bin"
+$kw(vtkTemp292) AcceptCallback
 
 # Create the contour filter
 set cInt [$pvWindow CreatePVSource Contour]
 $cInt AcceptCallback
 
-$pvWindow SetCurrentPVSource $pvPlot3D
+$pvWindow SetCurrentPVSource $kw(vtkTemp292)
 
 set pvExtract [$pvWindow CreatePVSource ExtractGrid]
 set VOIEntry [$pvExtract GetPVWidget {VOI}]
@@ -70,7 +67,7 @@ $camera SetClippingRange 34.7159 82.3051
 
 # Vary isosuface
 $cntOutput SetVisibility 1
-[$pvPlot3D GetPVOutput] SetVisibility 1
+[$kw(vtkTemp292) GetPVOutput] SetVisibility 1
 
 set start 0.2
 set end 0.7
