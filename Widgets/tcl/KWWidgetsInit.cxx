@@ -59,15 +59,15 @@ ClientData vtkKWWidgetCollectionNewCommand();
 int vtkKWViewCollectionCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkKWViewCollectionNewCommand();
+int vtkKWVolumeCompositeCommand(ClientData cd, Tcl_Interp *interp,
+             int argc, char *argv[]);
+ClientData vtkKWVolumeCompositeNewCommand();
 int vtkKWWindowCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkKWWindowNewCommand();
 int vtkKWWindowCollectionCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkKWWindowCollectionNewCommand();
-int vtkKWVolumeCompositeCommand(ClientData cd, Tcl_Interp *interp,
-             int argc, char *argv[]);
-ClientData vtkKWVolumeCompositeNewCommand();
 
 extern Tcl_HashTable vtkInstanceLookup;
 extern Tcl_HashTable vtkPointerLookup;
@@ -136,11 +136,11 @@ int VTK_EXPORT Vtkkwwidgetstcl_Init(Tcl_Interp *interp)
                   vtkKWWidgetCollectionCommand);
   vtkTclCreateNew(interp,"vtkKWViewCollection", vtkKWViewCollectionNewCommand,
                   vtkKWViewCollectionCommand);
+  vtkTclCreateNew(interp,"vtkKWVolumeComposite", vtkKWVolumeCompositeNewCommand,
+                  vtkKWVolumeCompositeCommand);
   vtkTclCreateNew(interp,"vtkKWWindow", vtkKWWindowNewCommand,
                   vtkKWWindowCommand);
   vtkTclCreateNew(interp,"vtkKWWindowCollection", vtkKWWindowCollectionNewCommand,
                   vtkKWWindowCollectionCommand);
-  vtkTclCreateNew(interp,"vtkKWVolumeComposite", vtkKWVolumeCompositeNewCommand,
-                  vtkKWVolumeCompositeCommand);
   return TCL_OK;
 }

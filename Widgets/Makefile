@@ -35,6 +35,7 @@ vtkKWText \
 vtkKWWidget \
 vtkKWWidgetCollection \
 vtkKWViewCollection \
+vtkKWVolumeComposite \
 vtkKWWindow \
 vtkKWWindowCollection
 
