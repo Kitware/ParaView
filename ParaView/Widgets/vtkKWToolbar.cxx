@@ -77,7 +77,7 @@ void vtkKWToolbar::SetGlobalWidgetsFlatAspect(int val)
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWToolbar );
-vtkCxxRevisionMacro(vtkKWToolbar, "1.31");
+vtkCxxRevisionMacro(vtkKWToolbar, "1.32");
 
 
 int vtkKWToolbarCommand(ClientData cd, Tcl_Interp *interp,
@@ -187,6 +187,44 @@ void vtkKWToolbar::RemoveWidget(vtkKWWidget *widget)
 }
 
 //----------------------------------------------------------------------------
+vtkKWWidget* vtkKWToolbar::GetWidget(const char *name)
+{
+  vtkKWWidget *found = 0;
+
+  if (name && this->Widgets)
+    {
+    const char *options[4] = { "-label", "-text", "-image", "-selectimage" };
+
+    vtkVectorIterator<vtkKWWidget*>* it = this->Widgets->NewIterator();
+    it->InitTraversal();
+    while (!it->IsDoneWithTraversal())
+      {
+      vtkKWWidget* widget = 0;
+      if (it->GetData(widget) == VTK_OK)
+        {
+        for (int i = 0; i < 4; i++)
+          {
+          if (widget->HasConfigurationOption(options[i]))
+            {
+            const char *option = 
+              this->Script("%s cget %s", widget->GetWidgetName(), options[i]);
+            if (!strcmp(name, option))
+              {
+              found = widget;
+              break;
+              }
+            }
+          }
+        }
+      it->GoToNextItem();
+      }
+    it->Delete();
+    }
+
+  return found;
+}
+
+//----------------------------------------------------------------------------
 vtkKWWidget* vtkKWToolbar::AddRadioButtonImage(int value, 
                                                const char *image_name, 
                                                const char *select_image_name, 
@@ -208,10 +246,11 @@ vtkKWWidget* vtkKWToolbar::AddRadioButtonImage(int value,
   rb->SetValue(value);
   if (image_name)
     {
-    this->Script("%s configure -highlightthickness 0 -image %s -selectimage %s", 
-                 rb->GetWidgetName(), 
-                 image_name, 
-                 select_image_name ? select_image_name : image_name);
+    this->Script(
+      "%s configure -highlightthickness 0 -image %s -selectimage %s", 
+      rb->GetWidgetName(), 
+      image_name, 
+      select_image_name ? select_image_name : image_name);
     }
   if (object && method)
     {
@@ -518,6 +557,7 @@ void vtkKWToolbar::UpdateWidgets()
 {
   this->UpdateWidgetsAspect();
   this->UpdateWidgetsLayout();
+  this->UpdateEnableState();
 }
 
 //----------------------------------------------------------------------------
@@ -608,6 +648,8 @@ void vtkKWToolbar::Update()
       "pack %s -ipadx 2 -ipady 2 -padx 1 -pady 0 -side left -anchor nw -fill both -expand n",
       this->Frame->GetWidgetName());
     }
+
+  this->UpdateEnableState();
 }
 
 //----------------------------------------------------------------------------

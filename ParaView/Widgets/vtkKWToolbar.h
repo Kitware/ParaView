@@ -105,6 +105,7 @@ public:
   virtual void AddWidget(vtkKWWidget* widget);
   virtual void InsertWidget(vtkKWWidget* location, vtkKWWidget* widget);
   virtual void RemoveWidget(vtkKWWidget* widget);
+  virtual vtkKWWidget* GetWidget(const char *name);
 
   // Description:
   // Convenience method to create and add a specific type of widget 
