@@ -632,8 +632,15 @@ void vtkPVRenderView::Update()
 
 //----------------------------------------------------------------------------
 void vtkPVRenderView::ComputeVisiblePropBounds(float bounds[6])
-{  
-  this->GetRenderer()->ComputeVisiblePropBounds(bounds);
+{ 
+  if (this->Composite)
+    {
+    this->Composite->ComputeVisiblePropBounds(this->GetRenderer(), bounds);
+    }
+  else
+    {
+    this->GetRenderer()->ComputeVisiblePropBounds(bounds);
+    }
 }
 
 //----------------------------------------------------------------------------
