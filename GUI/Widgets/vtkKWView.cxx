@@ -86,7 +86,7 @@ Bool vtkKWRenderViewPredProc(Display *vtkNotUsed(disp), XEvent *event,
 }
 #endif
 
-vtkCxxRevisionMacro(vtkKWView, "1.126");
+vtkCxxRevisionMacro(vtkKWView, "1.127");
 
 //----------------------------------------------------------------------------
 int vtkKWViewCommand(ClientData cd, Tcl_Interp *interp,
@@ -351,6 +351,7 @@ int vtkKWView::ShouldIAbort()
       flag = 1;
       }
     }
+  
 #elif defined(PARAVIEW_USE_X_RW)
   XEvent report;
   
@@ -1555,7 +1556,7 @@ void vtkKWView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWView ";
-  this->ExtractRevision(os,"$Revision: 1.126 $");
+  this->ExtractRevision(os,"$Revision: 1.127 $");
 }
 
 //----------------------------------------------------------------------------
