@@ -36,7 +36,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVScale);
-vtkCxxRevisionMacro(vtkPVScale, "1.51");
+vtkCxxRevisionMacro(vtkPVScale, "1.52");
 
 //----------------------------------------------------------------------------
 vtkPVScale::vtkPVScale()
@@ -217,10 +217,10 @@ void vtkPVScale::Create(vtkKWApplication *pvApp)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVScale::SetValue(float val)
+void vtkPVScale::SetValue(double val)
 {
-  float newVal;
-  float oldVal;
+  double newVal;
+  double oldVal;
   
   vtkSMIntVectorProperty *ivp = vtkSMIntVectorProperty::SafeDownCast(
     this->GetSMProperty());
@@ -293,7 +293,7 @@ void vtkPVScale::Accept()
 
   if (this->EntryFlag)
     {
-    float entryValue;
+    double entryValue;
     entryValue = this->Scale->GetEntry()->GetValueAsFloat();
     if (entryValue != this->GetValue())
       {
@@ -440,7 +440,7 @@ void vtkPVScale::CopyProperties(vtkPVWidget* clone, vtkPVSource* pvSource,
 }
 
 //----------------------------------------------------------------------------
-float vtkPVScale::GetValue() 
+double vtkPVScale::GetValue() 
 { 
   return this->Scale->GetValue(); 
 }
