@@ -51,7 +51,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkPVProcessModule.h"
 #include "vtkPVRenderModule.h"
-
+#include "vtkInstantiator.h"
 #include "vtkCallbackCommand.h"
 #include "vtkCellData.h"
 #include "vtkCharArray.h"
@@ -118,7 +118,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.192");
+vtkCxxRevisionMacro(vtkPVApplication, "1.193");
 vtkCxxSetObjectMacro(vtkPVApplication, RenderModule, vtkPVRenderModule);
 
 
@@ -300,6 +300,8 @@ vtkPVApplication::vtkPVApplication()
 
   this->ProcessModule = NULL;
   this->RenderModule = NULL;
+  this->RenderModuleName = NULL;
+  this->SetRenderModuleName("LODRenderModule");
   this->CommandFunction = vtkPVApplicationCommand;
   this->MajorVersion = 0;
   this->MinorVersion = 7;
@@ -373,6 +375,7 @@ vtkPVApplication::~vtkPVApplication()
     }
   this->SetProcessModule(NULL);
   this->SetRenderModule(NULL);
+  this->SetRenderModuleName(NULL);
   if ( this->TraceFile )
     {
     delete this->TraceFile;
@@ -1009,11 +1012,18 @@ void vtkPVApplication::Start(int argc, char*argv[])
     }
 
   // Create the rendering module here.
-  vtkPVRenderModule* rm = vtkPVRenderModule::New();
+  char* rmClassName;
+  rmClassName = new char[strlen(this->RenderModuleName) + 20];
+  sprintf(rmClassName, "vtkPV%s", this->RenderModuleName);
+  vtkObject* o = vtkInstantiator::CreateInstance(rmClassName);
+  vtkPVRenderModule* rm = vtkPVRenderModule::SafeDownCast(o);
   this->SetRenderModule(rm);
   rm->SetPVApplication(this);
-  rm->Delete();
+  o->Delete();
+  o = NULL;
   rm = NULL;
+  delete [] rmClassName;
+  rmClassName = NULL;
 
   vtkstd::vector<vtkstd::string> open_files;
   // If any of the arguments has a .pvs extension, load it as a script.

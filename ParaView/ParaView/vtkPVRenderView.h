@@ -197,10 +197,6 @@ public:
   void PrepareForDelete();
   
   // Description:
-  // Get the tcl name of the renderer.
-  //vtkGetStringMacro(RendererTclName);
-  
-  // Description:
   // Callback for toggling between parallel and perspective.
   void ParallelProjectionCallback();
   

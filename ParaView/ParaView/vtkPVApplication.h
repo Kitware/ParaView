@@ -90,9 +90,11 @@ public:
   vtkPVProcessModule* GetProcessModule() { return this->ProcessModule;}
   
   // Description:
-  // RenderingModule has the rendering abstraction.  It creates the render window
-  // and any composit manager.  It also creates part displays which
-  // handle level of details.
+  // RenderingModule has the rendering abstraction.  
+  // It creates the render window and any composit manager.  
+  // It also creates part displays which handle level of details.
+  vtkSetStringMacro(RenderModuleName);
+  vtkGetStringMacro(RenderModuleName);
   void SetRenderModule(vtkPVRenderModule *module);
   vtkPVRenderModule* GetRenderModule() { return this->RenderModule;}
 
@@ -347,6 +349,7 @@ protected:
 
   vtkPVProcessModule *ProcessModule;
   vtkPVRenderModule *RenderModule;
+  char* RenderModuleName;
 
   // For running with SGI pipes.
   int NumberOfPipes;

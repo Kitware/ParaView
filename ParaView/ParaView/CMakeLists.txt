@@ -81,6 +81,7 @@ SET( ParaView_SRCS
   vtkPVJoystickFlyIn.cxx
   vtkPVJoystickFlyOut.cxx
   vtkPVLODActor.cxx
+  vtkPVLODRenderModule.cxx
   vtkPVLODRenderModuleUI.cxx
   vtkPVLabel.cxx
   vtkPVLabeledToggle.cxx
