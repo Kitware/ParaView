@@ -87,7 +87,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.200");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.201");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -756,18 +756,28 @@ void vtkPVRenderView::Create(vtkKWApplication *app, const char *args)
   this->SelectionWindow->SetHeight(545);
   this->SelectionWindow->Create(this->Application, 0); 
 
-  if ( this->Application->BooleanRegisteryCheck(2, "SourcesBrowser",
-                                                "SelectionWindow") )
+  if (this->Application->GetRegisteryValue(2, 
+                                           "SourcesBrowser", 
+                                           "SelectionWindow", 0))
     {
-    this->ShowSelectionWindowCallback(0);
+    if ( this->Application->BooleanRegisteryCheck(2, "SourcesBrowser",
+                                                  "SelectionWindow") )
+      {
+      this->ShowSelectionWindowCallback(0);
+      }
+    else
+      {
+      this->ShowNavigationWindowCallback(0);
+      }
     }
   else
     {
-    this->ShowNavigationWindowCallback(0);
+    this->ShowSelectionWindowCallback(0);
     }
 
-  if ( !this->Application->GetRegisteryValue(2, "RunTime", "Display3DWidgets", 0) ||
-       this->GetPVWindow()->GetIntRegisteryValue(2, "RunTime", "Display3DWidgets") )
+  if ( 
+    !this->Application->GetRegisteryValue(2, "RunTime", "Display3DWidgets", 0) ||
+    this->GetPVWindow()->GetIntRegisteryValue(2, "RunTime", "Display3DWidgets") )
     {
     this->SetDisplay3DWidgets(1);
     }
@@ -859,6 +869,7 @@ void vtkPVRenderView::CreateViewProperties()
   this->ImmediateModeCheck->SetParent(this->RenderParametersFrame->GetFrame());
   this->ImmediateModeCheck->Create(this->Application, 
                                    "-text \"Use Immediate Mode Rendering\"");
+  this->ImmediateModeCheck->SetCommand(this, "ImmediateModeCallback");
   if (pvapp && pvwindow && 
       pvapp->GetRegisteryValue(2, "RunTime", "UseImmediateMode", 0))
     {
@@ -867,9 +878,8 @@ void vtkPVRenderView::CreateViewProperties()
     }
   else
     {
-    this->ImmediateModeCheck->SetState(0);
+    this->ImmediateModeCheck->SetState(1);
     }
-  this->ImmediateModeCheck->SetCommand(this, "ImmediateModeCallback");
   this->ImmediateModeCheck->SetBalloonHelpString("Toggle the use of immediate mode rendering (when off, display lists are used)");
 
   this->ReductionCheck->SetParent(this->RenderParametersFrame->GetFrame());
@@ -1012,10 +1022,9 @@ void vtkPVRenderView::CreateViewProperties()
     "Toggle the use of  render interrupts (when using MPI, this uses "
     "asynchronous messaging). When off, renders can not be interrupted.");
 
-  this->Script("pack %s %s %s -side top -anchor w",
+  this->Script("pack %s %s -side top -anchor w",
                this->LODResolutionFrame->GetWidgetName(),
-               this->LODThresholdFrame->GetWidgetName(),
-               this->InterruptRenderCheck->GetWidgetName());
+               this->LODThresholdFrame->GetWidgetName());
 
   if (pvapp->GetController()->GetNumberOfProcesses() > 1)
     {
@@ -1054,6 +1063,9 @@ void vtkPVRenderView::CreateViewProperties()
     this->Script("pack %s -side top -anchor w", 
                  this->CollectThresholdFrame->GetWidgetName());
     }
+
+  this->Script("pack %s -side top -anchor w",
+               this->InterruptRenderCheck->GetWidgetName());
 
 
   if (pvapp->GetController()->GetNumberOfProcesses() > 1)
@@ -2370,7 +2382,7 @@ void vtkPVRenderView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVRenderView ";
-  this->ExtractRevision(os,"$Revision: 1.200 $");
+  this->ExtractRevision(os,"$Revision: 1.201 $");
 }
 
 //------------------------------------------------------------------------------
