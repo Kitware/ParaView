@@ -66,6 +66,13 @@ public:
   void SetImageData(vtkImageData *image);
   vtkGetObjectMacro(ImageData, vtkImageData);
 
+  // Description:
+  // set flag for whether to constrain the spheres to the corners of the
+  // image slice when one of the axes is collapsed
+  vtkSetMacro(ConstrainSpheres, int);
+  vtkGetMacro(ConstrainSpheres, int);
+  vtkBooleanMacro(ConstrainSpheres, int);
+  
 protected:
 
   vtkInteractorStyleImageExtent();
@@ -74,13 +81,12 @@ protected:
   void operator=(const vtkInteractorStyleImageExtent&) {};
 
   vtkImageData *ImageData;
-
+  int ConstrainSpheres;
+  
   void GetWorldSpot(int spotId, float spot[3]); 
   void GetSpotAxes(int spotId, double *v0, 
                    double *v1, double *v2);
-  int *GetWholeExtent(); 
-
-
+  int *GetWholeExtent();
 };
 
 #endif

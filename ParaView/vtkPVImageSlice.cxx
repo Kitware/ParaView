@@ -66,6 +66,7 @@ vtkPVImageSlice::vtkPVImageSlice()
   this->SliceAxis = 3;
   
   this->SliceStyle = vtkInteractorStyleImageExtent::New();
+  this->SliceStyle->ConstrainSpheresOn();
   this->SliceStyleButton = vtkKWPushButton::New();
   this->SliceStyleCreated = 0;
 }

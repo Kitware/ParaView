@@ -64,6 +64,7 @@ vtkInteractorStyleImageExtent *vtkInteractorStyleImageExtent::New()
 vtkInteractorStyleImageExtent::vtkInteractorStyleImageExtent() 
 {
   this->ImageData = NULL;
+  this->ConstrainSpheresOff();
 }
 
 //----------------------------------------------------------------------------
@@ -116,6 +117,7 @@ void vtkInteractorStyleImageExtent::GetWorldSpot(int spotId, float spot[3])
   float *origin;
   float *spacing;
   int *ext;
+  int corner[3];
   
   if (this->ImageData == NULL)
     {
@@ -124,37 +126,43 @@ void vtkInteractorStyleImageExtent::GetWorldSpot(int spotId, float spot[3])
     }
 
   this->ImageData->UpdateInformation();
+  ext = this->ImageData->GetWholeExtent();
 
   // Decode the corner from the spot id.
   if (spotId >= 4)
     {
     iz = this->Extent[5];
+    corner[2] = ext[5];
     spotId -= 4;
     }
   else
     {
     iz = this->Extent[4];
+    corner[2] = ext[4];
     }
   if (spotId >= 2)
     {
     iy = this->Extent[3];
+    corner[1] = ext[3];
     spotId -= 2;
     }
   else
     {
     iy = this->Extent[2];
+    corner[1] = ext[2];
     }
   if (spotId >= 1)
     {
     ix = this->Extent[1];
+    corner[0] = ext[1];
     }
   else
     {
     ix = this->Extent[0];
+    corner[0] = ext[0];
     }
 
   // Make sure the spot is in bounds.
-  ext = this->ImageData->GetWholeExtent();
   if (ix < ext[0])
     {
     ix = ext[0];
@@ -184,9 +192,31 @@ void vtkInteractorStyleImageExtent::GetWorldSpot(int spotId, float spot[3])
 
   origin = this->ImageData->GetOrigin();
   spacing = this->ImageData->GetSpacing();
-  spot[0] = origin[0] + (float)(ix) * spacing[0];
-  spot[1] = origin[1] + (float)(iy) * spacing[1];
-  spot[2] = origin[2] + (float)(iz) * spacing[2];
+
+  if (this->ConstrainSpheres && this->Constraint0)
+    {
+    spot[0] = origin[0] + (float)(ix) * spacing[0];
+    spot[1] = (float)(corner[1]) * spacing[1];
+    spot[2] = (float)(corner[2]) * spacing[2];
+    }
+  else if (this->ConstrainSpheres && this->Constraint1)
+    {
+    spot[0] = (float)(corner[0]) * spacing[0];
+    spot[1] = origin[1] + (float)(iy) * spacing[1];
+    spot[2] = (float)(corner[2]) * spacing[2];
+    }
+  else if (this->ConstrainSpheres && this->Constraint2)
+    {
+    spot[0] = float(corner[0]) * spacing[0];
+    spot[1] = float(corner[1]) * spacing[1];
+    spot[2] = origin[2] + (float)(iz) * spacing[2];
+    }
+  else
+    {
+    spot[0] = origin[0] + (float)(ix) * spacing[0];
+    spot[1] = origin[1] + (float)(iy) * spacing[1];
+    spot[2] = origin[2] + (float)(iz) * spacing[2];
+    }
 }
 
 //--------------------------------------------------------------------------
