@@ -298,6 +298,7 @@
          command="SetPoint1"
          number_of_elements="3"
          default_values="0.0 0.0 0.0" >
+         <DoubleRangeDomain name="range"/>
       </DoubleVectorProperty>
 
       <DoubleVectorProperty
@@ -305,6 +306,7 @@
          command="SetPoint2"
          number_of_elements="3"
          default_values="0.0 0.0 0.0" >
+         <DoubleRangeDomain name="range"/>
       </DoubleVectorProperty>
 
       <IntVectorProperty
@@ -460,6 +462,7 @@
          command="SetCenter"
          number_of_elements="3"
          default_values="0.0 0.0 0.0" >
+         <DoubleRangeDomain name="range"/>
       </DoubleVectorProperty>
 
       <IntVectorProperty
@@ -467,6 +470,7 @@
          command="SetNumberOfPoints"
          number_of_elements="1"
          default_values="1" >
+         <IntRangeDomain name="range" min="1"/>
       </IntVectorProperty>
 
       <DoubleVectorProperty
