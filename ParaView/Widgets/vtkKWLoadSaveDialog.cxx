@@ -48,7 +48,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLoadSaveDialog );
-vtkCxxRevisionMacro(vtkKWLoadSaveDialog, "1.16");
+vtkCxxRevisionMacro(vtkKWLoadSaveDialog, "1.17");
 
 vtkKWLoadSaveDialog::vtkKWLoadSaveDialog()
 {
@@ -113,17 +113,20 @@ int vtkKWLoadSaveDialog::Invoke()
   this->Script(command.str());
   command.rdbuf()->freeze(0);
 
+  int res = 0;
   path = this->Application->GetMainInterp()->result;
-  if ( path && strlen(path) )
+  if (path && strlen(path))
     {
     this->SetFileName(path);
     this->GenerateLastPath(path);
-    this->Application->SetDialogUp(0);
-    return 1;
     }
-  this->SetFileName(0);
+  else
+    {
+    this->SetFileName(0);
+    }
   this->Application->SetDialogUp(0);
-  return 0;
+  this->Script("update");
+  return res;
 }
 
 //----------------------------------------------------------------------------
