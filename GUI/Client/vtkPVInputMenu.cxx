@@ -33,7 +33,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVInputMenu);
-vtkCxxRevisionMacro(vtkPVInputMenu, "1.56");
+vtkCxxRevisionMacro(vtkPVInputMenu, "1.57");
 
 
 //----------------------------------------------------------------------------
@@ -311,7 +311,9 @@ void vtkPVInputMenu::AcceptInternal(vtkClientServerID)
     if (
       this->CurrentValue != this->PVSource->GetPVInput(this->GetPVInputIndex()))
       {
-      this->Script("%s SetPVInput %d %s", this->PVSource->GetTclName(), 
+      this->Script("%s SetPVInput %s %d %s", 
+                   this->PVSource->GetTclName(), 
+                   this->InputName,
                    this->GetPVInputIndex(),
                    this->CurrentValue->GetTclName());
       // Turn visibility of ne input off.
@@ -325,7 +327,9 @@ void vtkPVInputMenu::AcceptInternal(vtkClientServerID)
     }
   else
     {
-    this->Script("%s SetPVInput %d {}", this->PVSource->GetTclName(), 
+    this->Script("%s SetPVInput %s %d {}", 
+                 this->InputName,
+                 this->PVSource->GetTclName(), 
                  this->GetPVInputIndex());
     }
 

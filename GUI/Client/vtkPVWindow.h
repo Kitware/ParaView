@@ -187,6 +187,10 @@ public:
   void SaveBatchScript(const char *filename, int offScreenFlag, const char* imageFileName, const char* geometryFileName);
   
   // Description:
+  // Save the state of the server manager.
+  void SaveSMState();
+
+  // Description:
   // Display the plug-in window.
   void DisplayPluginWindow();
 

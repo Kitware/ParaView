@@ -45,6 +45,12 @@
 #include "vtkPVSourceCollection.h"
 #include "vtkPVWidgetProperty.h"
 #include "vtkPVWindow.h"
+#include "vtkSMInputProperty.h"
+#include "vtkSMPart.h"
+#include "vtkSMPropertyIterator.h"
+#include "vtkSMProxyManager.h"
+#include "vtkSMSourceProxy.h"
+#include "vtkSMProxyProperty.h"
 #include "vtkSource.h"
 #include "vtkString.h"
 #include "vtkRenderer.h"
@@ -54,15 +60,9 @@
 #include "vtkPVAnimationInterface.h"
 #include <vtkstd/vector>
 
-class vtkClientServerIDList : public vtkstd::vector<vtkClientServerID>
-{
-public:
-};
-
-
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.360");
+vtkCxxRevisionMacro(vtkPVSource, "1.361");
 
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
@@ -76,8 +76,6 @@ vtkPVSource::vtkPVSource()
   this->CommandFunction = vtkPVSourceCommand;
 
   this->Parts = vtkCollection::New();
-  this->DataInformation = vtkPVDataInformation::New();
-  this->DataInformationValid = 0;
 
   this->NumberOfOutputsInformation = vtkPVNumberOfOutputsInformation::New();
   
@@ -108,10 +106,6 @@ vtkPVSource::vtkPVSource()
   this->PVConsumers = 0;
 
 
-  // The underlying VTK objects. PVSource supports multiple VTK
-  // sources/filters.
-  this->VTKSourceIDs = new vtkClientServerIDList;
-  
   // The frame which contains the parameters related to the data source
   // and the Accept/Reset/Delete buttons.
   this->Parameters = vtkKWWidget::New();
@@ -161,6 +155,8 @@ vtkPVSource::vtkPVSource()
   this->UpdateSourceInBatch = 0;
 
   this->LabelSetByUser = 0;
+
+  this->Proxy = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -171,8 +167,6 @@ vtkPVSource::~vtkPVSource()
 
   this->Parts->Delete();
   this->Parts = NULL;
-  this->DataInformation->Delete();
-  this->DataInformation = NULL;
 
   this->NumberOfOutputsInformation->Delete();
   this->NumberOfOutputsInformation = NULL;
@@ -184,9 +178,11 @@ vtkPVSource::~vtkPVSource()
     this->NumberOfPVConsumers = 0;
     }
 
-  // We need to delete the Tcl object too.  This call does it.
-  this->RemoveAllVTKSources();
-  delete this->VTKSourceIDs;
+  vtkSMProxyManager* proxm = vtkSMObject::GetProxyManager();
+  if (proxm)
+    {
+    proxm->UnRegisterProxy(this->GetName());
+    }
 
   // Do not use SetName() or SetLabel() here. These make
   // the navigation window update when it should not.
@@ -256,28 +252,26 @@ vtkPVSource::~vtkPVSource()
   this->InputProperties = NULL;
 
   this->SetModuleName(0);
+
 }
 
 //----------------------------------------------------------------------------
 void vtkPVSource::AddPVInput(vtkPVSource *pvs)
 {
-  this->SetPVInputInternal(this->NumberOfPVInputs, pvs, 0);
+  this->SetPVInputInternal("Input", this->NumberOfPVInputs, pvs, 0);
 }
 
 //----------------------------------------------------------------------------
-void vtkPVSource::SetPVInput(int idx, vtkPVSource *pvs)
+void vtkPVSource::SetPVInput(const char* name, int idx, vtkPVSource *pvs)
 {
-  this->SetPVInputInternal(idx, pvs, 1);
+  this->SetPVInputInternal(name, idx, pvs, 1);
 }
 
 //----------------------------------------------------------------------------
-void vtkPVSource::SetPVInputInternal(int idx, vtkPVSource *pvs, int doInit)
+void vtkPVSource::SetPVInputInternal(
+  const char* iname, int idx, vtkPVSource *pvs, int doInit)
 {
-  int partIdx, numParts;
-  vtkPVPart *part;
   vtkPVApplication *pvApp = this->GetPVApplication();
-  vtkClientServerID sourceID;
-  const char* inputName;
 
   if (pvApp == NULL)
     {
@@ -285,7 +279,6 @@ void vtkPVSource::SetPVInputInternal(int idx, vtkPVSource *pvs, int doInit)
       "No Application. Create the source before setting the input.");
     return;
     }
-  vtkPVProcessModule* pm = pvApp->GetProcessModule();
   // Handle visibility of old and new input.
   if (this->ReplaceInput)
     {
@@ -297,6 +290,20 @@ void vtkPVSource::SetPVInputInternal(int idx, vtkPVSource *pvs, int doInit)
       }
     }
 
+  if (this->Proxy)
+    {
+    vtkSMProxyProperty* inputp = vtkSMProxyProperty::SafeDownCast(
+      this->Proxy->GetProperty(iname));
+    if (inputp)
+      {
+      if (doInit)
+        {
+        inputp->RemoveAllProxies();
+        }
+      inputp->AddProxy(pvs->GetProxy());
+      }
+    }
+
   // Set the paraview reference to the new input.
   this->SetNthPVInput(idx, pvs);
   if (pvs == NULL)
@@ -304,79 +311,6 @@ void vtkPVSource::SetPVInputInternal(int idx, vtkPVSource *pvs, int doInit)
     return;
     }
 
-  // Set the VTK reference to the new input.
-  vtkPVInputProperty* ip = this->GetInputProperty(idx);
-  if (ip)
-    {
-    inputName = ip->GetName();
-    }
-  else
-    {
-    inputName = "Input";
-    }
-
-  numParts = pvs->GetNumberOfParts();
-  vtkClientServerStream& stream = pm->GetStream();
-  if (this->VTKMultipleInputsFlag)
-    {
-    sourceID = this->GetVTKSourceID(0);
-    if (doInit)
-      {
-      stream << vtkClientServerStream::Invoke 
-             << sourceID << "RemoveAllInputs"
-             << vtkClientServerStream::End;
-      pm->SendStream(vtkProcessModule::DATA_SERVER);
-      }
-    for (partIdx = 0; partIdx < numParts; ++partIdx)
-      {
-      part = pvs->GetPart(partIdx);
-      // Only one source takes all parts as input.
-      if (part->GetVTKDataID().ID == 0 || sourceID.ID == 0)
-        { // Sanity check.
-        vtkErrorMacro("Missing id.");
-        }
-      else
-        {
-        ostrstream str;
-        str << "Add" << inputName << ends;
-        stream << vtkClientServerStream::Invoke 
-               << sourceID << str.str() << part->GetVTKDataID() 
-               << vtkClientServerStream::End;
-        pm->SendStream(vtkProcessModule::DATA_SERVER);
-        delete []str.str();
-        }      
-      }
-    }
-  else
-    { // One source for each part.
-    int numSources = this->GetNumberOfVTKSources();
-    for (int sourceIdx = 0; sourceIdx < numSources; ++sourceIdx)
-      {
-      sourceID = this->GetVTKSourceID(sourceIdx);
-      // This is to handle the case when there are multiple
-      // inputs and the first one has multiple parts. For
-      // example, in the Glyph filter, when the input has multiple
-      // parts, the glyph source has to be applied to each.
-      // In that case, sourceTclName == glyph input, 
-      // inputName == glyph source.
-      partIdx = sourceIdx % numParts;
-      part = pvs->GetPart(partIdx);
-      if (part->GetVTKDataID().ID == 0 || sourceID.ID == 0)
-        {
-        vtkErrorMacro("Source data mismatch.");
-        }
-      else
-        {
-        ostrstream str;
-        str << "Set" << inputName << ends;
-        stream << vtkClientServerStream::Invoke 
-               << sourceID << str.str() << part->GetVTKDataID() 
-               << vtkClientServerStream::End;
-        pm->SendStream(vtkProcessModule::DATA_SERVER);
-        delete [] str.str();
-        }
-      }
-    }
   this->GetPVRenderView()->UpdateNavigationWindow(this, 0);
 }
 
@@ -499,21 +433,13 @@ vtkPVDataInformation* vtkPVSource::GetDataInformation()
     {
     this->GatherDataInformation();
     }
-  return this->DataInformation;
+  return this->Proxy->GetDataInformation();
 }
 
 //----------------------------------------------------------------------------
 void vtkPVSource::InvalidateDataInformation()
 {
-  vtkPVPart* part;
   this->DataInformationValid = 0;
-
-  // All parts get invalidated too.
-  this->Parts->InitTraversal();
-  while ( ( part = (vtkPVPart*)(this->Parts->GetNextItemAsObject())) )
-    {
-    part->InvalidateDataInformation();
-    }
 }
 
 //----------------------------------------------------------------------------
@@ -521,12 +447,10 @@ void vtkPVSource::GatherDataInformation()
 {
   vtkPVPart *part;
 
-  this->DataInformation->Initialize();
   this->Parts->InitTraversal();
   while ( ( part = (vtkPVPart*)(this->Parts->GetNextItemAsObject())) )
     {
     part->GatherDataInformation();
-    this->DataInformation->AddInformation(part->GetDataInformation());
     }
   this->DataInformationValid = 1;
 
@@ -657,38 +581,13 @@ void vtkPVSourceEndProgress(void* vtkNotUsed(arg))
 }
 
 
-//----------------------------------------------------------------------------
-void vtkPVSource::AddVTKSource(vtkClientServerID id)
-{
-  this->VTKSourceIDs->push_back(id);
-}
-
-//----------------------------------------------------------------------------
-void vtkPVSource::RemoveAllVTKSources()
-{
-  vtkPVApplication *pvApp = this->GetPVApplication();
-  if(!pvApp)
-    {
-    return;
-    }
-  vtkPVProcessModule* pm = pvApp->GetProcessModule();
-  int num, idx;
-
-  num = this->GetNumberOfVTKSources();
-  for (idx = 0; idx < num; ++ idx)
-    {
-    vtkClientServerID id = this->GetVTKSourceID(idx);
-    pm->DeleteStreamObject(id);
-    }
-  pm->SendStream(vtkProcessModule::DATA_SERVER);
-
-  this->VTKSourceIDs->clear();
-}
-
-//----------------------------------------------------------------------------
 int vtkPVSource::GetNumberOfVTKSources()
 {
-  return this->VTKSourceIDs->size();
+  if (!this->Proxy)
+    {
+    return 0;
+    }
+  return this->Proxy->GetNumberOfIDs();
 }
 
 //----------------------------------------------------------------------------
@@ -701,12 +600,12 @@ unsigned int vtkPVSource::GetVTKSourceIDAsInt(int idx)
 //----------------------------------------------------------------------------
 vtkClientServerID vtkPVSource::GetVTKSourceID(int idx)
 {
-  if(static_cast<size_t>(idx) >= this->VTKSourceIDs->size())
+  if(idx >= this->GetNumberOfVTKSources() || !this->Proxy)
     {
     vtkClientServerID id = {0};
     return id;
     }
-  return (*this->VTKSourceIDs)[idx];
+  return this->Proxy->GetID(idx);
 }
 
 //----------------------------------------------------------------------------
@@ -1307,7 +1206,7 @@ void vtkPVSource::Accept(int hideFlag, int hideSource)
   // the VTK source.  (The vtkPLOT3DReader is a good example of this.)
   this->UpdateVTKSourceParameters();
 
-  this->MarkSourcesForUpdate(1);
+  this->MarkSourcesForUpdate();
 
   // Moved from creation of the source. (InitializeClone)
   // Initialize the output if necessary.
@@ -1434,29 +1333,28 @@ void vtkPVSource::Accept(int hideFlag, int hideSource)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVSource::MarkSourcesForUpdate(int flag)
+void vtkPVSource::MarkSourcesForUpdate()
 {
   int idx;
   vtkPVSource* consumer;
 
-  if (flag)
+  this->InvalidateDataInformation();
+  this->Proxy->MarkConsumersAsModified();
+
+  // Get rid of caches.
+  int numParts;
+  vtkPVPart *part;
+  numParts = this->GetNumberOfParts();
+  for (idx = 0; idx < numParts; ++idx)
     {
-    this->InvalidateDataInformation();
-    // Get rid of caches.
-    int numParts;
-    vtkPVPart *part;
-    numParts = this->GetNumberOfParts();
-    for (idx = 0; idx < numParts; ++idx)
-      {
-      part = this->GetPart(idx);
-      part->MarkForUpdate();
-      }
+    part = this->GetPart(idx);
+    part->MarkForUpdate();
     }
 
   for (idx = 0; idx < this->NumberOfPVConsumers; ++idx)
     {
     consumer = this->GetPVConsumer(idx);
-    consumer->MarkSourcesForUpdate(flag);
+    consumer->MarkSourcesForUpdate();
     }  
 }
 
@@ -1806,6 +1704,24 @@ void vtkPVSource::RemoveAllPVInputs()
                << vtkClientServerStream::End;
         }
       pm->SendStream(vtkProcessModule::DATA_SERVER);
+
+      if (this->Proxy)
+        {
+        vtkSMPropertyIterator* iter = this->Proxy->NewPropertyIterator();
+        iter->Begin();
+        while (!iter->IsAtEnd())
+          {
+          vtkSMInputProperty* ip = vtkSMInputProperty::SafeDownCast(
+            iter->GetProperty());
+          if (ip)
+            {
+            ip->RemoveAllProxies();
+            }
+          iter->Next();
+          }
+        iter->Delete();
+        }
+
       }
 
     this->Modified();
@@ -2314,18 +2230,36 @@ int vtkPVSource::ClonePrototypeInternal(vtkPVSource*& clone)
     numSources = 1;
     }
 
+  vtkSMProxyManager* proxm = vtkSMObject::GetProxyManager();
+
+  const char* module_group = 0;
+  if (this->GetNumberOfInputProperties() > 0)
+    {
+    module_group = "filters";
+    }
+  else
+    {
+    module_group = "sources";
+    }
+
+  pvs->Proxy = vtkSMSourceProxy::SafeDownCast(
+    proxm->NewProxy(module_group, this->GetModuleName()));
+  if (!pvs->Proxy)
+    {
+    vtkErrorMacro("Can not create " 
+                  << (this->GetModuleName()?this->GetModuleName():"(nil)")
+                  << " : " << module_group);
+    pvs->Delete();
+    return VTK_ERROR;
+    }
+  proxm->RegisterProxy(module_group, pvs->GetName(), pvs->Proxy);
+  pvs->Proxy->Delete();
+  pvs->Proxy->CreateVTKObjects(numSources);
+
   for (idx = 0; idx < numSources; ++idx)
     {
-    if (numSources > 1)
-      {
-      // Create a (unique) name for the source.
-      // Beware: If two prototypes have the same name, the name 
-      // will not be unique.
-      sprintf(tclName, "%s_%d", pvs->GetName(), idx);
-      }
-
     // Create a vtkSource
-    vtkClientServerID sourceId = pm->NewStreamObject(this->SourceClassName);
+    vtkClientServerID sourceId = pvs->Proxy->GetID(idx);
 
     // Keep track of how long each filter takes to execute.
     ostrstream filterName_with_warning_C4701;
@@ -2356,7 +2290,6 @@ int vtkPVSource::ClonePrototypeInternal(vtkPVSource*& clone)
                     << sourceId << sourceId.ID
                     << vtkClientServerStream::End;
     
-    pvs->AddVTKSource(sourceId);
     }
   pm->SendStream(vtkProcessModule::DATA_SERVER);
   pvs->SetView(this->GetPVWindow()->GetMainView());
@@ -2400,7 +2333,16 @@ int vtkPVSource::InitializeClone(vtkPVSource* input,
   // Set the input if necessary.
   if (this->GetNumberOfInputProperties() > 0)
     {
-    this->SetPVInput(0, input);
+    // Set the VTK reference to the new input.
+    vtkPVInputProperty* ip = this->GetInputProperty(0);
+    if (ip)
+      {
+      this->SetPVInput(ip->GetName(), 0, input);
+      }
+    else
+      {
+      this->SetPVInput("Input",  0, input);
+      }
     }
 
   // Create the properties frame etc.
@@ -2422,10 +2364,6 @@ int vtkPVSource::InitializeClone(vtkPVSource* input,
 int vtkPVSource::InitializeData()
 {
   vtkPVApplication* pvApp = this->GetPVApplication();
-  vtkPVProcessModule* pm = pvApp->GetProcessModule();
-  int numSources, sourceIdx;
-  int numOutputs, idx;
-  int outputCount = 0;
   vtkPVPart* part;
   vtkPVData* pvd;
 
@@ -2433,43 +2371,17 @@ int vtkPVSource::InitializeData()
   pvd = vtkPVData::New();
   pvd->SetPVApplication(pvApp);
 
-  numSources = this->GetNumberOfVTKSources();
-  vtkClientServerStream& stream = pm->GetStream();
-  for (sourceIdx = 0; sourceIdx < numSources; ++sourceIdx)
-    {
-    vtkClientServerID sourceID = this->GetVTKSourceID(sourceIdx);
-    stream.Reset();
-    stream << vtkClientServerStream::Invoke << sourceID <<
-      "GetNumberOfOutputs" << vtkClientServerStream::End;
-    pm->SendStream(vtkProcessModule::DATA_SERVER);
-    if(!pm->GetLastServerResult().GetArgument(0, 0, &numOutputs))
-      {
-      vtkErrorMacro("wrong return type for GetNumberOfOutputs call");
-      numOutputs = 0;
-      }
-    for (idx = 0; idx < numOutputs; ++idx)
-      {
-      ++outputCount;
-      stream << vtkClientServerStream::Invoke << sourceID
-             << "GetOutput" << idx <<  vtkClientServerStream::End;
-      vtkClientServerID dataID = pm->GetUniqueID();
-      stream << vtkClientServerStream::Assign << dataID
-             << vtkClientServerStream::LastResult
-             << vtkClientServerStream::End;
-      pm->SendStream(vtkProcessModule::DATA_SERVER);
-      part = vtkPVPart::New();
-      part->SetPVApplication(pvApp);
-      part->SetVTKDataID(dataID);
-      part->SetVTKSourceIndex(sourceIdx);
-      part->SetVTKOutputIndex(idx);
-      this->AddPart(part);
+  this->Proxy->CreateParts();
 
-      // Create the extent translator (sources with no inputs only).
-      // Needs to be before "ExtractPieces" because translator propagates.
-      part->CreateTranslatorIfNecessary();
-      part->InsertExtractPiecesIfNecessary();
-      part->Delete();
-      }
+  unsigned int numParts = this->Proxy->GetNumberOfParts();
+  for (unsigned int i=0; i<numParts; i++)
+    {
+    vtkSMPart* smpart = this->Proxy->GetPart(i); 
+    part = vtkPVPart::New();
+    part->SetPVApplication(pvApp);
+    part->SetSMPart(smpart);
+    this->AddPart(part);
+    part->Delete();
     }
 
   this->SetPVOutput(pvd);

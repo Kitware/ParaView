@@ -28,6 +28,7 @@
 
 #include "vtkClientServerID.h" // Needed For Set Get VTKDataID
 
+class vtkCollection;
 class vtkDataSet;
 class vtkPVApplication;
 class vtkPVClassNameInformation;
@@ -35,7 +36,7 @@ class vtkPVDataInformation;
 class vtkPVPartDisplay;
 class vtkPVDisplay;
 class vtkPolyDataMapper;
-class vtkCollection;
+class vtkSMPart;
 
 class VTK_EXPORT vtkPVPart : public vtkKWObject
 {
@@ -64,22 +65,8 @@ public:
   // source.  We could change the object so that it creates its own
   // data (during initia but then we would have to tell it what type
   // of data to create.
-  virtual void SetVTKDataID(vtkClientServerID id);
-  vtkClientServerID GetVTKDataID() {return this->VTKDataID;}
+  vtkClientServerID GetVTKDataID();
   //ETX
-
-  // Description:
-  // This method is called on creation.  If the data object is unstructured and 
-  // has a maximum number of pieces, then a extract piece filter is inserted
-  // before the data object.  This will give parallel pipelines at the
-  // expense of initial generation (reading) of the data.
-  void InsertExtractPiecesIfNecessary();
-  
-  // Description:
-  // Create the extent translator (sources with no inputs only).
-  // Needs to be before "ExtractPieces" because translator propagates.
-  void CreateTranslatorIfNecessary();
-
 
   //===================
           
@@ -101,10 +88,6 @@ public:
   void GatherDataInformation();
 
   // Description:
-  // Called by source EndEvent to schedule another Gather.
-  void InvalidateDataInformation();
-
-  // Description:
   // The name is just a string that will be used in the extract part UI.
   vtkSetStringMacro(Name);
   vtkGetStringMacro(Name);
@@ -123,26 +106,6 @@ public:
   void AddDisplay(vtkPVDisplay* disp);
 
   // Description:
-  // VTKSourceIndex points to the VTKSourceID in this
-  // part's PVSource. The tcl name of the VTK source that produced
-  // the data in this part can be obtained with
-  // source->GetVTKSourceID(part->GetVTKSourceIndex())
-  // This is used during batch file generation.
-  vtkGetMacro(VTKSourceIndex, int);
-  vtkSetMacro(VTKSourceIndex, int);
-
-  // Description:
-  // VTKOutputIndex together with  VTKSourceID is used
-  // to obtain the source of the data object in this part.
-  // For example, the output in this data object is obtained
-  // with "%s GetOutput %d",
-  // source->GetVTKSourceID(part->GetVTKSourceIndex()),
-  // part->GetVTKOutputIndex()
-  // This is used during batch file generation.
-  vtkGetMacro(VTKOutputIndex, int);
-  vtkSetMacro(VTKOutputIndex, int);
-
-  // Description:
   // Update the data and geometry.
   void Update();
 
@@ -155,6 +118,9 @@ public:
   // I would like to remove this method once the properties are finished.
   // UI would directly manipulate the displays.
   void SetVisibility(int v);
+
+  // Description:
+  void SetSMPart(vtkSMPart* smpart);
 
 protected:
   vtkPVPart();
@@ -171,16 +137,8 @@ protected:
   // We are also going to allow expresion matching.
   char *Name;
 
-  vtkPVDataInformation *DataInformation;
-  int DataInformationValid;
-  
   vtkPVClassNameInformation *ClassNameInformation;
   
-  vtkClientServerID VTKDataID;
-  
-  // Here to create unique names.
-  int InstanceCount;
-
   // Description:
   // This method should be called immediately after the object is constructed.
   // It create VTK objects which have to exeist on all processes.
@@ -189,9 +147,9 @@ protected:
   // If the data changes, we need to change to.
   vtkTimeStamp UpdateTime;
 
-  int VTKSourceIndex;
-  int VTKOutputIndex;
+  vtkSMPart* SMPart;
 
+private:
   vtkPVPart(const vtkPVPart&); // Not implemented
   void operator=(const vtkPVPart&); // Not implemented
 };

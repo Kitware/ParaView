@@ -89,6 +89,7 @@
 #include "vtkRectilinearGrid.h"
 #include "vtkRenderWindow.h"
 #include "vtkRenderer.h"
+#include "vtkSMProxyManager.h"
 #include "vtkStdString.h"
 #include "vtkString.h"
 #include "vtkStructuredGrid.h"
@@ -126,7 +127,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.576");
+vtkCxxRevisionMacro(vtkPVWindow, "1.577");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -710,6 +711,10 @@ void vtkPVWindow::InitializeMenus(vtkKWApplication* vtkNotUsed(app))
                                 "SaveBatchScript", 7,
                                 "Write a script which can run "
                                 "in batch by ParaView");
+  this->MenuFile->InsertCommand(clidx++, "Save SM State", this,
+                                "SaveSMState", 7,
+                                "Server the server manager state "
+                                "as xml.");
   this->MenuFile->InsertCommand(clidx++,
                                 "Import Package", this, 
                                 "OpenPackage", 3,
@@ -2341,6 +2346,30 @@ vtkPVWriter* vtkPVWindow::FindPVWriter(const char* fileName, int parallel,
 }
 
 //-----------------------------------------------------------------------------
+void vtkPVWindow::SaveSMState()
+{
+  vtkKWLoadSaveDialog* exportDialog = vtkKWLoadSaveDialog::New();
+  this->RetrieveLastPath(exportDialog, "SaveSMStatePath");
+  exportDialog->SetParent(this);
+  exportDialog->Create(this->Application,0);
+  exportDialog->SaveDialogOn();
+  exportDialog->SetTitle("Save SM State");
+  exportDialog->SetDefaultExtension(".pvsm");
+  exportDialog->SetFileTypes("{{ParaView Server Manager State} {.pvsm}} {{All Files} {*}}");
+  int enabled = this->GetEnabled();
+  this->SetEnabled(0);
+  if ( exportDialog->Invoke() && 
+       vtkString::Length(exportDialog->GetFileName())>0)
+    {
+    vtkSMProxyManager* proxm = vtkSMObject::GetProxyManager();
+    proxm->SaveState(exportDialog->GetFileName());
+    this->SaveLastPath(exportDialog, "SaveSMStatePath");
+    }
+  this->SetEnabled(enabled);
+  exportDialog->Delete();
+}
+
+//-----------------------------------------------------------------------------
 void vtkPVWindow::SaveBatchScript()
 {
   vtkKWLoadSaveDialog* exportDialog = vtkKWLoadSaveDialog::New();
@@ -2508,9 +2537,6 @@ void vtkPVWindow::SaveBatchScript(const char *filename, int offScreenFlag, const
 
   *file << endl << "#Initialization" << endl;
 
-  *file << endl << "vtkSMApplication app" << endl;
-  *file << "app Initialize" << endl;
-
   *file << endl << "vtkSMObject foo" << endl;
   *file << "set proxyManager [foo GetProxyManager]" << endl;
   *file << "foo Delete" << endl << endl;
@@ -2634,8 +2660,6 @@ void vtkPVWindow::SaveBatchScript(const char *filename, int offScreenFlag, const
 
   *file << "$proxyManager UnRegisterProxies" << endl;
   *file << endl;
-  *file << "app Finalize" << endl;
-  *file << "app Delete" << endl;
    
 //   else
 //     { // Just do one frame.

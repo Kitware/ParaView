@@ -45,12 +45,12 @@ class vtkPVSourceCollection;
 class vtkPVWidget;
 class vtkPVWidgetProperty;
 class vtkPVWindow;
+class vtkSMSourceProxy;
 class vtkSource;
 class vtkStringList;
 class vtkCollection;
 class vtkPVPart;
 class vtkPVDataInformation;
-class vtkClientServerIDList;
 class vtkPVNumberOfOutputsInformation;
 
 class VTK_EXPORT vtkPVSource : public vtkKWWidget
@@ -100,7 +100,7 @@ public:
   // See vtkPVGroupInputsWidgets for an example of how
   // AddPVInput() is used.
   void AddPVInput(vtkPVSource *input);
-  void SetPVInput(int idx, vtkPVSource *input);
+  void SetPVInput(const char* name, int idx, vtkPVSource *input);
 
   // Description:
   // Return an input given idx.
@@ -205,12 +205,6 @@ public:
   // VTK sources.
   void AddVTKSource(vtkClientServerID);
   //ETX
-
-  // Description:
-  // Given and ID, remove a VTK source to the list of maintained
-  // VTK source. This call also removes the reference of this PVSource
-  // on the VTK source residing on the server.
-  void RemoveAllVTKSources();
 
   // Description:
   // Returns the number of VTK sources referenced by the PVSource.
@@ -464,12 +458,6 @@ public:
   // Convenience method for rendering.
   vtkPVRenderView *GetPVRenderView();
 
-  // Description:
-  // This used to be private, but now the animation
-  // interface uses it to force an update.  Animation
-  // interface will use this method to stop updates too (flag)?
-  void MarkSourcesForUpdate(int flag);
-
   //BTX
   // Description:
   // Access to the vtkPVNumberOfOutputsInformation object.
@@ -496,9 +484,15 @@ protected:
 
   vtkCollection *Parts;
 
-  void SetPVInputInternal(int idx, vtkPVSource *input, int doInit);
+  void SetPVInputInternal(const char* name, 
+                          int idx, 
+                          vtkPVSource *input, 
+                          int doInit);
 
   void SaveFilterInBatchScript(ofstream *file);
+
+  // Description:
+  void MarkSourcesForUpdate();
 
   // Description:
   // This method collects data information from all processes.
@@ -522,9 +516,6 @@ protected:
   // If this is on, no Information page (from vtkPVData) is displayed
   // for this source. Used by sources like Glyphs
   int HideInformationPage;
-//BTX
-  vtkClientServerIDList* VTKSourceIDs;
-//ETX
   // One output. Now used only to hold UI
   vtkPVData *PVOutput;
   
@@ -575,6 +566,9 @@ protected:
   vtkKWLabeledLabel *LongHelpLabel;
 
   char *SourceClassName;
+
+  vtkGetObjectMacro(Proxy, vtkSMSourceProxy);
+  vtkSMSourceProxy* Proxy;
 
   // Whether the source should make its input invisible.
   int ReplaceInput;
