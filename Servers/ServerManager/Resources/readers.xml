@@ -1507,6 +1507,12 @@
         default_values="1" > 
        <DoubleRangeDomain name="range"/>
      </DoubleVectorProperty>
+
+     <DoubleVectorProperty 
+        name="TimestepValues"
+        information_only="1">
+        <TimeStepsInformationHelper/>
+     </DoubleVectorProperty>
    <!-- End ExodusReader -->
    </SourceProxy>
 
