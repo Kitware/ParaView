@@ -61,6 +61,12 @@ public:
   // of 3D widgets, etc.
   virtual void UpdateEnableState();
 
+  // Description:
+  // Set and get the command that is called when the popup is withdrawed.
+  virtual void SetWithdrawCommand(vtkKWObject* obj, const char* command);
+  vtkSetStringMacro(WithdrawCommand);
+  vtkGetStringMacro(WithdrawCommand);
+
 protected:
   vtkKWPopupButton();
   ~vtkKWPopupButton();
@@ -70,6 +76,8 @@ protected:
   vtkKWPushButton *PopupCloseButton;
 
   char* PopupTitle;
+
+  char* WithdrawCommand;
 
   virtual void Bind();
   virtual void UnBind();

@@ -22,7 +22,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWPopupButton);
-vtkCxxRevisionMacro(vtkKWPopupButton, "1.11");
+vtkCxxRevisionMacro(vtkKWPopupButton, "1.12");
 
 int vtkKWPopupButtonCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -39,6 +39,8 @@ vtkKWPopupButton::vtkKWPopupButton()
   this->PopupCloseButton = vtkKWPushButton::New();
 
   this->PopupTitle = 0;
+
+  this->WithdrawCommand = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -63,6 +65,8 @@ vtkKWPopupButton::~vtkKWPopupButton()
     this->PopupCloseButton->Delete();
     this->PopupCloseButton = NULL;
     }
+
+  this->SetWithdrawCommand(0);
 }
 
 //----------------------------------------------------------------------------
@@ -272,6 +276,19 @@ void vtkKWPopupButton::WithdrawPopupCallback()
 
   this->Script("wm withdraw %s",
                this->PopupTopLevel->GetWidgetName());
+  if ( this->WithdrawCommand )
+    {
+    this->Script(this->WithdrawCommand);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWPopupButton::SetWithdrawCommand(vtkKWObject* obj, const char* command)
+{
+  ostrstream ostr;
+  ostr << obj->GetTclName() << " " << command;
+  this->SetWithdrawCommand(ostr.str());
+  ostr.rdbuf()->freeze(0);
 }
 
 //----------------------------------------------------------------------------
@@ -319,5 +336,7 @@ void vtkKWPopupButton::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "PopupCloseButton: " << this->PopupCloseButton << endl;
   os << indent << "PopupTitle: " 
      << (this->PopupTitle ? this->PopupTitle : "(none)") << endl;
+  os << indent << "WithdrawCommand: "
+     << (this->WithdrawCommand ? this->WithdrawCommand : "(none)") << endl;
 }
 
