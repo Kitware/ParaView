@@ -67,7 +67,7 @@ template class VTK_EXPORT vtkArrayMapIterator<vtkPVWidget*, vtkPVWidget*>;
 #endif
 
 //-----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkPVWidget, "1.36");
+vtkCxxRevisionMacro(vtkPVWidget, "1.36.2.1");
 
 //-----------------------------------------------------------------------------
 vtkPVWidget::vtkPVWidget()
@@ -185,6 +185,7 @@ void vtkPVWidget::Reset()
     return;
     }
   this->ResetInternal(this->PVSource->GetVTKSourceTclName(0));
+  this->ResetInternal();
 }
 
 //-----------------------------------------------------------------------------

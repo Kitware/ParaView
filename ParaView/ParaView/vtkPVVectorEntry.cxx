@@ -56,7 +56,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVVectorEntry);
-vtkCxxRevisionMacro(vtkPVVectorEntry, "1.36");
+vtkCxxRevisionMacro(vtkPVVectorEntry, "1.36.2.1");
 
 //-----------------------------------------------------------------------------
 vtkPVVectorEntry::vtkPVVectorEntry()
@@ -78,7 +78,9 @@ vtkPVVectorEntry::vtkPVVectorEntry()
   for ( cc = 0; cc < 6; cc ++ )
     {
     this->EntryValues[cc] = 0;
+    this->LastAcceptedValues[cc] = 0;
     }
+  this->AcceptCalled = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -295,13 +297,17 @@ void vtkPVVectorEntry::AcceptInternal(const char* sourceTclName)
 
   // finish all the arguments for the trace file and the accept command.
   this->Entries->InitTraversal();
+  int count = 0;
   while ( (entry = (vtkKWEntry*)(this->Entries->GetNextItemAsObject())) )
     {
     strcat(acceptCmd, entry->GetValue());
     strcat(acceptCmd, " ");
+    this->LastAcceptedValues[count] = entry->GetValueAsFloat();
+    count++;
     }
   pvApp->BroadcastScript(acceptCmd);
 
+  this->AcceptCalled = 1;
   this->ModifiedFlag = 0;  
 }
 
@@ -329,7 +335,7 @@ void vtkPVVectorEntry::Trace(ofstream *file)
 
 
 //-----------------------------------------------------------------------------
-void vtkPVVectorEntry::ResetInternal(const char* sourceTclName)
+void vtkPVVectorEntry::ResetInternal()
 {
   int count = 0;
 
@@ -341,9 +347,10 @@ void vtkPVVectorEntry::ResetInternal(const char* sourceTclName)
   // Set each entry to the appropriate value.
   for( count = 0; count < this->Entries->GetNumberOfItems(); count ++ )
     {
-    this->Script("%s SetEntryValue %d [lindex [%s Get%s] %d]",
-      this->GetTclName(), count, sourceTclName, 
-      this->VariableName, count); 
+    ostrstream val;
+    val << this->LastAcceptedValues[count] << ends;
+    this->SetEntryValue(count, val.str());
+    val.rdbuf()->freeze(0);
     }
 
   this->ModifiedFlag = 0;
@@ -404,6 +411,10 @@ void vtkPVVectorEntry::SetValue(char** values, int num)
       delete [] this->EntryValues[idx];
       }
     this->EntryValues[idx] = vtkString::Duplicate(values[idx]);
+    if (!this->AcceptCalled)
+      {
+      sscanf(values[idx], "%f", &this->LastAcceptedValues[idx]);
+      }
     }
   this->ModifiedCallback();
 }
@@ -428,6 +439,10 @@ void vtkPVVectorEntry::SetValue(float* values, int num)
       delete [] this->EntryValues[idx];
       }
     this->EntryValues[idx] = vtkString::Duplicate(entry->GetValue());
+    if (!this->AcceptCalled)
+      {
+      this->LastAcceptedValues[idx] = entry->GetValueAsFloat();
+      }
     }
   this->ModifiedCallback();
 }
@@ -617,6 +632,7 @@ void vtkPVVectorEntry::CopyProperties(vtkPVWidget* clone,
       {
       pvve->SubLabelTxts->SetString(i, this->SubLabelTxts->GetString(i));
       }
+    pvve->SetLastAcceptedValues(this->LastAcceptedValues);
     }
   else 
     {
@@ -695,5 +711,40 @@ int vtkPVVectorEntry::ReadXMLAttributes(vtkPVXMLElement* element,
       }
     }
 
+  const char *defaultValue = element->GetAttribute("default_value");
+  if (defaultValue)
+    {
+    switch(this->VectorLength)
+      {
+      case 1:
+        sscanf(defaultValue, "%f", &this->LastAcceptedValues[0]);
+        break;
+      case 2:
+        sscanf(defaultValue, "%f %f", &this->LastAcceptedValues[0],
+               &this->LastAcceptedValues[1]);
+        break;
+      case 3:
+        sscanf(defaultValue, "%f %f %f", &this->LastAcceptedValues[0],
+               &this->LastAcceptedValues[1], &this->LastAcceptedValues[2]);
+        break;
+      case 4:
+        sscanf(defaultValue, "%f %f %f %f", &this->LastAcceptedValues[0],
+               &this->LastAcceptedValues[1], &this->LastAcceptedValues[2],
+               &this->LastAcceptedValues[3]);
+        break;
+      case 5:
+        sscanf(defaultValue, "%f %f %f %f %f", &this->LastAcceptedValues[0],
+               &this->LastAcceptedValues[1], &this->LastAcceptedValues[2],
+               &this->LastAcceptedValues[3], &this->LastAcceptedValues[4]);
+        break;
+      case 6:
+        sscanf(defaultValue, "%f %f %f %f %f %f", &this->LastAcceptedValues[0],
+               &this->LastAcceptedValues[1], &this->LastAcceptedValues[2],
+               &this->LastAcceptedValues[3], &this->LastAcceptedValues[4],
+               &this->LastAcceptedValues[5]);
+        break;
+      }
+    }
+  
   return 1;
 }

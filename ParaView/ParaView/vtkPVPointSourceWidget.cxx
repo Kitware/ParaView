@@ -51,7 +51,7 @@ int vtkPVPointSourceWidget::InstanceCount = 0;
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPointSourceWidget);
-vtkCxxRevisionMacro(vtkPVPointSourceWidget, "1.10");
+vtkCxxRevisionMacro(vtkPVPointSourceWidget, "1.10.4.1");
 
 int vtkPVPointSourceWidgetCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -214,8 +214,8 @@ void vtkPVPointSourceWidget::ResetInternal(const char* vtkNotUsed(sourceTclName)
   // Ignore the source passed in.  We are updating our
   // own point source.
   this->PointWidget->ResetInternal(this->SourceTclName);
-  this->RadiusWidget->ResetInternal(this->SourceTclName);
-  this->NumberOfPointsWidget->ResetInternal(this->SourceTclName);
+  this->RadiusWidget->ResetInternal();
+  this->NumberOfPointsWidget->ResetInternal();
   this->ModifiedFlag = 0;
 }
 

@@ -50,7 +50,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLabeledToggle);
-vtkCxxRevisionMacro(vtkPVLabeledToggle, "1.18");
+vtkCxxRevisionMacro(vtkPVLabeledToggle, "1.18.4.1");
 
 //----------------------------------------------------------------------------
 vtkPVLabeledToggle::vtkPVLabeledToggle()
@@ -59,6 +59,8 @@ vtkPVLabeledToggle::vtkPVLabeledToggle()
   this->Label->SetParent(this);
   this->CheckButton = vtkKWCheckButton::New();
   this->CheckButton->SetParent(this);
+  this->LastAcceptedValue = 0;
+  this->AcceptCalled = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -133,6 +135,8 @@ void vtkPVLabeledToggle::Create(vtkKWApplication *pvApp)
     this->SetBalloonHelpString(this->BalloonHelpString);
     }
   this->Script("pack %s -side left", this->CheckButton->GetWidgetName());
+  
+  this->SetState(this->LastAcceptedValue);
 }
 
 //----------------------------------------------------------------------------
@@ -146,7 +150,13 @@ void vtkPVLabeledToggle::SetState(int val)
     return;
     }
 
-  this->CheckButton->SetState(val); 
+  this->CheckButton->SetState(val);
+  
+  if (!this->AcceptCalled)
+    {
+    this->LastAcceptedValue = val;
+    }
+  
   this->ModifiedCallback();
 }
 
@@ -183,19 +193,20 @@ void vtkPVLabeledToggle::AcceptInternal(const char* sourceTclName)
                          this->VariableName, this->GetState());
 
   this->ModifiedFlag = 0;
-
+  this->LastAcceptedValue = this->GetState();
+  
+  this->AcceptCalled = 1;
 }
 
 //----------------------------------------------------------------------------
-void vtkPVLabeledToggle::ResetInternal(const char* sourceTclName)
+void vtkPVLabeledToggle::ResetInternal()
 {
   if ( ! this->ModifiedFlag)
     {
     return;
     }
 
-  this->Script("%s SetState [%s Get%s]", this->CheckButton->GetTclName(),
-               sourceTclName, this->VariableName);
+  this->SetState(this->LastAcceptedValue);
 
   this->ModifiedFlag = 0;
 }
@@ -226,7 +237,7 @@ void vtkPVLabeledToggle::CopyProperties(vtkPVWidget* clone,
       pvlt->SetTraceName(label);
       pvlt->SetTraceNameState(vtkPVWidget::SelfInitialized);
       }
-      
+    pvlt->SetLastAcceptedValue(this->LastAcceptedValue);
     }
   else 
     {
@@ -250,6 +261,9 @@ int vtkPVLabeledToggle::ReadXMLAttributes(vtkPVXMLElement* element,
     {
     this->Label->SetLabel(this->VariableName);
     }
+
+  const char* defaultValue = element->GetAttribute("default_value");
+  this->LastAcceptedValue = atoi(defaultValue);
   
   return 1;
 }

@@ -61,7 +61,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVExtentEntry);
-vtkCxxRevisionMacro(vtkPVExtentEntry, "1.25");
+vtkCxxRevisionMacro(vtkPVExtentEntry, "1.25.2.1");
 
 vtkCxxSetObjectMacro(vtkPVExtentEntry, InputMenu, vtkPVInputMenu);
 
@@ -82,6 +82,12 @@ vtkPVExtentEntry::vtkPVExtentEntry()
 
   this->Range[0] = this->Range[2] = this->Range[4] = -VTK_LARGE_INTEGER;
   this->Range[1] = this->Range[3] = this->Range[5] = VTK_LARGE_INTEGER;
+  
+  this->LastAcceptedValues[0] = this->LastAcceptedValues[2] =
+    this->LastAcceptedValues[4] = -VTK_LARGE_INTEGER;
+  this->LastAcceptedValues[1] = this->LastAcceptedValues[3] =
+    this->LastAcceptedValues[5] = VTK_LARGE_INTEGER;
+  this->AcceptCalled = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -113,11 +119,13 @@ void vtkPVExtentEntry::Update()
   if (input == NULL)
     {
     this->SetRange(0, 0, 0, 0, 0, 0);
+    this->SetValue(0, 0, 0, 0, 0, 0);
     }
   else
     {
     int *ext = input->GetDataInformation()->GetExtent();
     this->SetRange(ext[0], ext[1], ext[2], ext[3], ext[4], ext[5]);
+    this->SetValue(ext[0], ext[1], ext[2], ext[3], ext[4], ext[5]);
     }
 }
 
@@ -245,7 +253,21 @@ void vtkPVExtentEntry::AcceptInternal(const char* sourceTclName)
                          static_cast<int>(this->MinMax[2]->GetMinValue()), 
                          static_cast<int>(this->MinMax[2]->GetMaxValue()));
 
-  this->ModifiedFlag = 0;  
+  this->LastAcceptedValues[0] =
+    static_cast<int>(this->MinMax[0]->GetMinValue());
+  this->LastAcceptedValues[1] =
+    static_cast<int>(this->MinMax[0]->GetMaxValue());
+  this->LastAcceptedValues[2] =
+    static_cast<int>(this->MinMax[1]->GetMinValue());
+  this->LastAcceptedValues[3] =
+    static_cast<int>(this->MinMax[1]->GetMaxValue());
+  this->LastAcceptedValues[4] =
+    static_cast<int>(this->MinMax[2]->GetMinValue());
+  this->LastAcceptedValues[5] =
+    static_cast<int>(this->MinMax[2]->GetMaxValue());
+
+  this->ModifiedFlag = 0;
+  this->AcceptCalled = 1;
 }
 
 //-----------------------------------------------------------------------------
@@ -266,16 +288,17 @@ void vtkPVExtentEntry::Trace(ofstream *file)
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVExtentEntry::ResetInternal(const char* sourceTclName)
+void vtkPVExtentEntry::ResetInternal()
 {
   if ( ! this->ModifiedFlag)
     {
     return;
     }
 
-  this->Script("eval %s SetValue [%s Get%s]",
-               this->GetTclName(), sourceTclName,  this->VariableName);
-
+  this->SetValue(this->LastAcceptedValues[0], this->LastAcceptedValues[1],
+                 this->LastAcceptedValues[2], this->LastAcceptedValues[3],
+                 this->LastAcceptedValues[4], this->LastAcceptedValues[5]);
+  
   this->ModifiedFlag = 0;
 }
 
@@ -329,11 +352,21 @@ void vtkPVExtentEntry::SetValue(int v0, int v1, int v2,
       {
       this->MinMax[0]->SetMinValue(v0);
       this->MinMax[0]->SetMaxValue(v1);
+      if (!this->AcceptCalled)
+        {
+        this->LastAcceptedValues[0] = v0;
+        this->LastAcceptedValues[1] = v1;
+        }
       }
     else
       {
       this->MinMax[0]->SetMaxValue(v1);
       this->MinMax[0]->SetMinValue(v0);
+      if (!this->AcceptCalled)
+        {
+        this->LastAcceptedValues[0] = v1;
+        this->LastAcceptedValues[1] = v0;
+        }
       }
     }
 
@@ -343,11 +376,21 @@ void vtkPVExtentEntry::SetValue(int v0, int v1, int v2,
       {
       this->MinMax[1]->SetMinValue(v2);
       this->MinMax[1]->SetMaxValue(v3);
+      if (!this->AcceptCalled)
+        {
+        this->LastAcceptedValues[2] = v2;
+        this->LastAcceptedValues[3] = v3;
+        }
       }
     else
       {
       this->MinMax[1]->SetMaxValue(v3);
       this->MinMax[1]->SetMinValue(v2);
+      if (!this->AcceptCalled)
+        {
+        this->LastAcceptedValues[2] = v3;
+        this->LastAcceptedValues[3] = v2;
+        }
       }
     }
 
@@ -357,11 +400,21 @@ void vtkPVExtentEntry::SetValue(int v0, int v1, int v2,
       {
       this->MinMax[2]->SetMinValue(v4);
       this->MinMax[2]->SetMaxValue(v5);
+      if (!this->AcceptCalled)
+        {
+        this->LastAcceptedValues[4] = v4;
+        this->LastAcceptedValues[5] = v5;
+        }
       }
     else
       {
       this->MinMax[2]->SetMaxValue(v5);
       this->MinMax[2]->SetMinValue(v4);
+      if (!this->AcceptCalled)
+        {
+        this->LastAcceptedValues[4] = v5;
+        this->LastAcceptedValues[5] = v4;
+        }
       }
     }
 
@@ -481,6 +534,7 @@ void vtkPVExtentEntry::CopyProperties(vtkPVWidget* clone,
       pvee->SetInputMenu(im);
       im->Delete();
       }
+    pvee->SetLastAcceptedValues(this->LastAcceptedValues);
     }
   else 
     {

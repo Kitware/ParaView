@@ -51,10 +51,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVSource.h"
 #include "vtkPVData.h"
 #include "vtkPVPart.h"
+#include "vtkUnsignedCharArray.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVExtractPartsWidget);
-vtkCxxRevisionMacro(vtkPVExtractPartsWidget, "1.6");
+vtkCxxRevisionMacro(vtkPVExtractPartsWidget, "1.6.4.1");
 
 int vtkPVExtractPartsWidgetCommand(ClientData cd, Tcl_Interp *interp,
                                 int argc, char *argv[]);
@@ -70,6 +71,9 @@ vtkPVExtractPartsWidget::vtkPVExtractPartsWidget()
 
   this->PartSelectionList = vtkKWListBox::New();
   this->PartLabelCollection = vtkCollection::New();
+  
+  this->AcceptCalled = 0;
+  this->LastAcceptedPartStates = vtkUnsignedCharArray::New();
 }
 
 //----------------------------------------------------------------------------
@@ -86,6 +90,8 @@ vtkPVExtractPartsWidget::~vtkPVExtractPartsWidget()
   this->PartSelectionList = NULL;
   this->PartLabelCollection->Delete();
   this->PartLabelCollection = NULL;
+  
+  this->LastAcceptedPartStates->Delete();
 }
 
 //----------------------------------------------------------------------------
@@ -135,6 +141,13 @@ void vtkPVExtractPartsWidget::Create(vtkKWApplication *app)
   this->Script("pack %s -side top -fill both -expand t",
                this->PartSelectionList->GetWidgetName());
 
+  int num = this->PVSource->GetPVInput(0)->GetNumberOfParts();
+  int i;
+  for (i = 0; i < num; i++)
+    {
+    this->LastAcceptedPartStates->InsertValue(i, 1);
+    }
+  
   // There is no current way to get a modified call back, so assume
   // the user will change the list.  This widget will only be used once anyway.
   this->ModifiedCallback();
@@ -188,9 +201,11 @@ void vtkPVExtractPartsWidget::AcceptInternal(const char* vtkSourceTclName)
     state = this->PartSelectionList->GetSelectState(idx);    
     pvApp->BroadcastScript("%s SetInputMask %d %d",
                            vtkSourceTclName, idx, state);
+    this->LastAcceptedPartStates->InsertValue(idx, state);
     }
 
   this->ModifiedFlag = 0;
+  this->AcceptCalled = 1;
 }
 
 
@@ -198,6 +213,11 @@ void vtkPVExtractPartsWidget::AcceptInternal(const char* vtkSourceTclName)
 void vtkPVExtractPartsWidget::SetSelectState(int idx, int val)
 {
   this->PartSelectionList->SetSelectState(idx, val);
+  
+  if (!this->AcceptCalled)
+    {
+    this->LastAcceptedPartStates->InsertValue(idx, val);
+    }
 }
 
 
@@ -220,7 +240,7 @@ void vtkPVExtractPartsWidget::Trace(ofstream *file)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVExtractPartsWidget::ResetInternal(const char* vtkSourceTclName)
+void vtkPVExtractPartsWidget::ResetInternal()
 {
   vtkPVSource *input;
   vtkPVPart *part;
@@ -239,9 +259,11 @@ void vtkPVExtractPartsWidget::ResetInternal(const char* vtkSourceTclName)
   // Now loop through the input mask setting the selection states.
   for (idx = 0; idx < num; ++idx)
     {
-    this->Script("%s SetSelectState %d [%s GetInputMask %d]",
-                 this->PartSelectionList->GetTclName(),
-                 idx, vtkSourceTclName, idx);
+//    this->Script("%s SetSelectState %d [%s GetInputMask %d]",
+//                 this->PartSelectionList->GetTclName(),
+//                 idx, vtkSourceTclName, idx);
+    this->PartSelectionList->SetSelectState(
+      idx, this->LastAcceptedPartStates->GetValue(idx));
     }
 
   // Because list box does not notify us when it is modified ...

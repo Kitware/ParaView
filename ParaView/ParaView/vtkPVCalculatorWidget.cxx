@@ -67,7 +67,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCalculatorWidget);
-vtkCxxRevisionMacro(vtkPVCalculatorWidget, "1.7");
+vtkCxxRevisionMacro(vtkPVCalculatorWidget, "1.7.4.1");
 
 int vtkPVCalculatorWidgetCommand(ClientData cd, Tcl_Interp *interp,
                                 int argc, char *argv[]);
@@ -126,6 +126,8 @@ vtkPVCalculatorWidget::vtkPVCalculatorWidget()
   this->ButtonRightParenthesis = vtkKWPushButton::New();
   this->ScalarsMenu = vtkKWMenuButton::New();
   this->VectorsMenu = vtkKWMenuButton::New();
+  
+  this->LastAcceptedFunction = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -227,6 +229,8 @@ vtkPVCalculatorWidget::~vtkPVCalculatorWidget()
   this->VectorsMenu = NULL;
   this->CalculatorFrame->Delete();
   this->CalculatorFrame = NULL;
+  
+  this->SetLastAcceptedFunction(NULL);
 }
 
 //----------------------------------------------------------------------------
@@ -723,18 +727,19 @@ void vtkPVCalculatorWidget::AcceptInternal(const char* vtkSourceTclName)
   // name!
   pvApp->BroadcastScript("%s SetFunction {%s}", vtkSourceTclName,
                          this->FunctionLabel->GetLabel());
+  
+  this->SetLastAcceptedFunction(this->FunctionLabel->GetLabel());
+  
   this->ModifiedFlag = 0;
 }
 
 
 //----------------------------------------------------------------------------
-void vtkPVCalculatorWidget::ResetInternal(const char* vtkSourceTclName)
+void vtkPVCalculatorWidget::ResetInternal()
 {
   if ( this->FunctionLabel->IsCreated() )
     {
-    this->Script("%s SetLabel [%s GetFunction]", 
-                 this->FunctionLabel->GetTclName(), 
-                 vtkSourceTclName);
+    this->FunctionLabel->SetLabel(this->LastAcceptedFunction);
     }
   
   this->ModifiedFlag = 0;

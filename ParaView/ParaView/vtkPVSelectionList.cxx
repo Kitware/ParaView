@@ -50,7 +50,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectionList);
-vtkCxxRevisionMacro(vtkPVSelectionList, "1.34");
+vtkCxxRevisionMacro(vtkPVSelectionList, "1.34.4.1");
 
 int vtkPVSelectionListCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -70,6 +70,9 @@ vtkPVSelectionList::vtkPVSelectionList()
   this->Names = vtkStringList::New();
 
   this->OptionWidth = 0;
+  
+  this->LastAcceptedValue = 0;
+  this->AcceptCalled = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -179,6 +182,7 @@ void vtkPVSelectionList::Create(vtkKWApplication *app)
     }
   this->SetBalloonHelpString(this->BalloonHelpString);
 
+  this->SetCurrentValue(this->LastAcceptedValue);
 }
 
 
@@ -215,6 +219,8 @@ void vtkPVSelectionList::AcceptInternal(const char* sourceTclName)
                          this->CurrentValue); 
 
   this->ModifiedFlag = 0;
+  this->SetLastAcceptedValue(this->CurrentValue);
+  this->AcceptCalled = 1;
 }
 
 
@@ -232,14 +238,10 @@ void vtkPVSelectionList::Trace(ofstream *file)
 
 
 //----------------------------------------------------------------------------
-void vtkPVSelectionList::ResetInternal(const char* sourceTclName)
+void vtkPVSelectionList::ResetInternal()
 {
-
-  this->Script("%s SetCurrentValue [%s Get%s]",
-               this->GetTclName(),
-               sourceTclName,
-               this->VariableName);
-
+  this->SetCurrentValue(this->LastAcceptedValue);
+  
   this->ModifiedFlag = 0;
 }
 
@@ -283,6 +285,11 @@ void vtkPVSelectionList::SetCurrentValue(int value)
     this->Menu->SetValue(name);
     this->SelectCallback(name, value);
     }
+  
+  if (!this->AcceptCalled)
+    {
+    this->SetLastAcceptedValue(value);
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -322,6 +329,7 @@ void vtkPVSelectionList::CopyProperties(vtkPVWidget* clone,
         pvsl->Names->SetString(i, name);
         }
       }
+    pvsl->SetLastAcceptedValue(this->LastAcceptedValue);
     }
   else 
     {
@@ -350,6 +358,12 @@ int vtkPVSelectionList::ReadXMLAttributes(vtkPVXMLElement* element,
   else
     {
     this->Label->SetLabel(this->VariableName);
+    }
+
+  const char* defaultValue = element->GetAttribute("default_value");
+  if (defaultValue)
+    {
+    sscanf(defaultValue, "%d", &this->LastAcceptedValue);
     }
   
   // Extract the list of items.

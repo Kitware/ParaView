@@ -52,7 +52,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVMinMax);
-vtkCxxRevisionMacro(vtkPVMinMax, "1.20");
+vtkCxxRevisionMacro(vtkPVMinMax, "1.20.4.1");
 
 vtkCxxSetObjectMacro(vtkPVMinMax, ArrayMenu, vtkPVArrayMenu);
 
@@ -88,6 +88,10 @@ vtkPVMinMax::vtkPVMinMax()
   // We do not want the filter default value.
   // We use the range of the scalars instead.
   this->SuppressReset = 1;
+  
+  this->AcceptCalled = 0;
+  this->LastAcceptedValues[0] = VTK_FLOAT_MIN;
+  this->LastAcceptedValues[1] = VTK_FLOAT_MAX;
 }
 
 //----------------------------------------------------------------------------
@@ -256,11 +260,19 @@ void vtkPVMinMax::Create(vtkKWApplication *pvApp)
 void vtkPVMinMax::SetMinValue(float val)
 {
   this->MinScale->SetValue(val);
+  if (!this->AcceptCalled)
+    {
+    this->LastAcceptedValues[0] = val;
+    }
   if (val > this->MaxScale->GetValue())
     {
     this->MaxScale->SetValue(val);
+    if (!this->AcceptCalled)
+      {
+      this->LastAcceptedValues[1] = val;
+      }
     }
-  
+
   this->ModifiedCallback();
 }
 
@@ -268,9 +280,17 @@ void vtkPVMinMax::SetMinValue(float val)
 void vtkPVMinMax::SetMaxValue(float val)
 {
   this->MaxScale->SetValue(val);
+  if (!this->AcceptCalled)
+    {
+    this->LastAcceptedValues[1] = val;
+    }
   if (val < this->MinScale->GetValue())
     {
     this->MinScale->SetValue(val);
+    if (!this->AcceptCalled)
+      {
+      this->LastAcceptedValues[0] = val;
+      }
     }
   
   this->ModifiedCallback();
@@ -285,7 +305,11 @@ void vtkPVMinMax::AcceptInternal(const char* sourceTclName)
                          sourceTclName, this->SetCommand,
                          this->GetMinValue(), this->GetMaxValue());
 
+  this->LastAcceptedValues[0] = this->GetMinValue();
+  this->LastAcceptedValues[1] = this->GetMaxValue();
+  
   this->ModifiedFlag = 0;
+  this->AcceptCalled = 1;
 }
 
 //---------------------------------------------------------------------------
@@ -304,15 +328,13 @@ void vtkPVMinMax::Trace(ofstream *file)
 
 
 //----------------------------------------------------------------------------
-void vtkPVMinMax::ResetInternal(const char* sourceTclName)
+void vtkPVMinMax::ResetInternal()
 {
   if ( this->MinScale->IsCreated() )
     {
     // Command to update the UI.
-    this->Script("%s SetValue [%s %s]", this->MinScale->GetTclName(), 
-                 sourceTclName, this->GetMinCommand); 
-    this->Script("%s SetValue [%s %s]", this->MaxScale->GetTclName(), 
-                 sourceTclName, this->GetMaxCommand); 
+    this->SetMinValue(this->LastAcceptedValues[0]);
+    this->SetMaxValue(this->LastAcceptedValues[1]);
     }
   this->ModifiedFlag = 0;
 }
@@ -351,8 +373,8 @@ void vtkPVMinMax::Update()
     this->MinScale->SetRange(range);
     this->MaxScale->SetRange(range);
 
-    this->MinScale->SetValue(range[0]);
-    this->MaxScale->SetValue(range[1]);
+    this->SetMinValue(range[0]);
+    this->SetMaxValue(range[1]);
     return;
     }
 
@@ -376,8 +398,8 @@ void vtkPVMinMax::Update()
     this->MaxScale->SetResolution(resolution);
     this->MaxScale->SetRange(range);
 
-    this->MinScale->SetValue(range[0]);
-    this->MaxScale->SetValue(range[1]);
+    this->SetMinValue(range[0]);
+    this->SetMaxValue(range[1]);
     }
 }
 
@@ -478,6 +500,7 @@ void vtkPVMinMax::CopyProperties(vtkPVWidget* clone, vtkPVSource* pvSource,
     pvmm->SetSetCommand(this->SetCommand);
     pvmm->SetGetMinCommand(this->GetMinCommand);
     pvmm->SetGetMaxCommand(this->GetMaxCommand);
+    pvmm->SetLastAcceptedValues(this->LastAcceptedValues);
     }
   else 
     {

@@ -103,7 +103,7 @@ public:
   
   // Description:
   // This method resets the widget values from the VTK filter.
-  virtual void ResetInternal(const char* vtkSourceTclName);
+  virtual void ResetInternal();
     
   // Description:
   // Save this source to a file.  We need more than just the source tcl name.
@@ -167,6 +167,9 @@ protected:
   vtkKWMenuButton* ScalarsMenu;
   vtkKWMenuButton* VectorsMenu;
 
+  char *LastAcceptedFunction;
+  vtkSetStringMacro(LastAcceptedFunction);
+  
   vtkPVCalculatorWidget(const vtkPVCalculatorWidget&); // Not implemented
   void operator=(const vtkPVCalculatorWidget&); // Not implemented
 };

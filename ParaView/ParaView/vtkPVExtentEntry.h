@@ -124,7 +124,7 @@ public:
   // Called when the reset button is pushed.
   // Sets widget's value to the object-variable's value.
   // Side effect is to turn the modified flag off.
-  virtual void ResetInternal(const char* sourceTclName);
+  virtual void ResetInternal();
 
   // Description:
   // This serves a dual purpose.  For tracing and for saving state.
@@ -150,6 +150,10 @@ protected:
   int ReadXMLAttributes(vtkPVXMLElement* element,
                         vtkPVXMLPackageParser* parser);
 
+  int LastAcceptedValues[6];
+  vtkSetVector6Macro(LastAcceptedValues, int);
+  int AcceptCalled;
+  
 private:
   vtkPVExtentEntry(const vtkPVExtentEntry&); // Not implemented
   void operator=(const vtkPVExtentEntry&); // Not implemented

@@ -163,7 +163,7 @@ public:
   // Description:
   // Move widget state to vtk object or back.
   virtual void AcceptInternal(const char* sourceTclName);
-  virtual void ResetInternal(const char* sourceTclName);
+  virtual void ResetInternal();
 
   // Description:
   // This serves a dual purpose.  For tracing and for saving state.
@@ -199,6 +199,10 @@ protected:
 
   vtkStringList* SubLabelTxts;
 
+  float LastAcceptedValues[6];
+  vtkSetVector6Macro(LastAcceptedValues, float);
+  int AcceptCalled;
+  
 //BTX
   virtual void CopyProperties(vtkPVWidget* clone, vtkPVSource* pvSource,
                               vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);

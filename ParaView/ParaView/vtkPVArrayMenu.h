@@ -195,7 +195,7 @@ protected:
   virtual void AcceptInternal(const char* sourceTclName);
 
   // Gets called when the reset button is pressed.
-  virtual void ResetInternal(const char* sourceTclName);
+  virtual void ResetInternal();
 
 
   // The selected array name in the menu.  Current value of the widget.
@@ -228,6 +228,12 @@ protected:
 
   // Resets the values based on the array.
   void UpdateComponentMenu();
+  
+  char* LastAcceptedArrayName;
+  int LastAcceptedComponent;
+  vtkSetStringMacro(LastAcceptedArrayName);
+  vtkSetMacro(LastAcceptedComponent, int);
+  int AcceptCalled;
 
 //BTX
   virtual vtkPVWidget* ClonePrototypeInternal(vtkPVSource* pvSource,

@@ -50,7 +50,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVStringEntry);
-vtkCxxRevisionMacro(vtkPVStringEntry, "1.19");
+vtkCxxRevisionMacro(vtkPVStringEntry, "1.19.2.1");
 
 //----------------------------------------------------------------------------
 vtkPVStringEntry::vtkPVStringEntry()
@@ -60,6 +60,8 @@ vtkPVStringEntry::vtkPVStringEntry()
   this->Entry = vtkKWEntry::New();
   this->Entry->SetParent(this);
   this->EntryLabel = 0;
+  this->LastAcceptedString = 0;
+  this->AcceptCalled = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -70,6 +72,7 @@ vtkPVStringEntry::~vtkPVStringEntry()
   this->LabelWidget->Delete();
   this->LabelWidget = NULL;
   this->SetEntryLabel(0);
+  this->SetLastAcceptedString(NULL);
 }
 
 void vtkPVStringEntry::SetLabel(const char* label)
@@ -156,7 +159,7 @@ void vtkPVStringEntry::Create(vtkKWApplication *pvApp)
     }
   this->Script("pack %s -side left -fill x -expand t",
                this->Entry->GetWidgetName());
-
+  this->SetValue(this->GetLastAcceptedString());
 }
 
 
@@ -180,6 +183,12 @@ void vtkPVStringEntry::SetValue(const char* fileName)
     }
 
   this->Entry->SetValue(fileName); 
+
+  if (!this->AcceptCalled)
+    {
+    this->SetLastAcceptedString(fileName);
+    }
+  
   this->ModifiedCallback();
 }
 
@@ -194,6 +203,9 @@ void vtkPVStringEntry::AcceptInternal(const char* sourceTclName)
                          this->GetValue());
 
   this->ModifiedFlag = 0;
+  
+  this->SetLastAcceptedString(this->GetValue());
+  this->AcceptCalled = 1;
 }
 
 //---------------------------------------------------------------------------
@@ -208,7 +220,7 @@ void vtkPVStringEntry::Trace(ofstream *file)
 
 
 //----------------------------------------------------------------------------
-void vtkPVStringEntry::ResetInternal(const char* sourceTclName)
+void vtkPVStringEntry::ResetInternal()
 {
   if ( ! this->ModifiedFlag)
     {
@@ -216,8 +228,7 @@ void vtkPVStringEntry::ResetInternal(const char* sourceTclName)
     }
 
   // Command to update the UI.
-  this->Script("%s SetValue [%s Get%s]", this->Entry->GetTclName(), 
-               sourceTclName, this->VariableName); 
+  this->SetValue(this->GetLastAcceptedString());
 
   this->ModifiedFlag = 0;
 }
@@ -239,6 +250,7 @@ void vtkPVStringEntry::CopyProperties(vtkPVWidget* clone,
   if (pvse)
     {
     pvse->SetLabel(this->EntryLabel);
+    pvse->SetLastAcceptedString(this->LastAcceptedString);
     }
   else 
     {
@@ -262,6 +274,10 @@ int vtkPVStringEntry::ReadXMLAttributes(vtkPVXMLElement* element,
     {
     this->SetLabel(this->VariableName);
     }
+  
+  // Set the default value.
+  const char* defaultValue = element->GetAttribute("default_value");
+  this->SetLastAcceptedString(defaultValue);
   
   return 1;
 }

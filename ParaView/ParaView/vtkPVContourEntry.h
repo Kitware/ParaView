@@ -114,7 +114,7 @@ public:
 
   // Description:
   // Gets called when the reset button is pressed.
-  virtual void ResetInternal(const char* sourceTclName);
+  virtual void ResetInternal();
 
   // Description:
   // This serves a dual purpose.  For tracing and for saving state.
@@ -136,6 +136,9 @@ protected:
   vtkKWPushButton* AddValueButton;
   vtkKWPushButton* DeleteValueButton;
 
+  vtkContourValues *LastAcceptedContourValues;
+  int AcceptCalled;
+  
   vtkPVContourEntry(const vtkPVContourEntry&); // Not implemented
   void operator=(const vtkPVContourEntry&); // Not implemented
 

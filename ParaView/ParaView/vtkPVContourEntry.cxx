@@ -56,7 +56,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVContourEntry);
-vtkCxxRevisionMacro(vtkPVContourEntry, "1.28");
+vtkCxxRevisionMacro(vtkPVContourEntry, "1.28.2.1");
 
 int vtkPVContourEntryCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -77,6 +77,9 @@ vtkPVContourEntry::vtkPVContourEntry()
 
   this->ContourValues->SetNumberOfContours(0);
   this->SuppressReset = 1;
+  
+  this->LastAcceptedContourValues = vtkContourValues::New();
+  this->AcceptCalled = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -100,6 +103,8 @@ vtkPVContourEntry::~vtkPVContourEntry()
   this->DeleteValueButton = NULL;
 
   this->SetPVSource(NULL);
+  
+  this->LastAcceptedContourValues->Delete();
 }
 
 //-----------------------------------------------------------------------------
@@ -262,6 +267,13 @@ void vtkPVContourEntry::AddValueCallback()
   this->Update();
   this->NewValueEntry->SetValue("");
   this->ModifiedCallback();
+  
+  if (!this->AcceptCalled)
+    {
+    this->LastAcceptedContourValues->SetValue(
+      this->ContourValues->GetNumberOfContours(),
+      this->NewValueEntry->GetValueAsFloat());
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -304,8 +316,17 @@ void vtkPVContourEntry::DeleteValueCallback()
       {
       this->ContourValues->SetValue(idx-1,
                               this->ContourValues->GetValue(idx));
+      if (!this->AcceptCalled)
+        {
+        this->LastAcceptedContourValues->SetValue(
+          idx-1, this->ContourValues->GetValue(idx));
+        }
       }
     this->ContourValues->SetNumberOfContours(num-1);
+    if (!this->AcceptCalled)
+      {
+      this->LastAcceptedContourValues->SetNumberOfContours(num-1);
+      }
     this->Update();
     this->ModifiedCallback();
     }
@@ -363,13 +384,17 @@ void vtkPVContourEntry::AcceptInternal(const char* sourceTclName)
 
   pvApp->BroadcastScript("%s SetNumberOfContours %d",
                          sourceTclName, numContours);
-  
   for (i = 0; i < numContours; i++)
     {
     value = this->ContourValues->GetValue(i);
     pvApp->BroadcastScript("%s SetValue %d %f",
                            sourceTclName, i, value);
+    this->LastAcceptedContourValues->SetValue(i, value);
     }
+  
+  this->LastAcceptedContourValues->SetNumberOfContours(numContours);
+  
+  this->AcceptCalled = 1;
 }
 
 
@@ -417,7 +442,7 @@ void vtkPVContourEntry::SaveInBatchScriptForPart(ofstream *file,
 //-----------------------------------------------------------------------------
 // If we had access to the ContourValues object of the filter,
 // this would be much easier.  We would not have to rely on Tcl calls.
-void vtkPVContourEntry::ResetInternal(const char* sourceTclName)
+void vtkPVContourEntry::ResetInternal()
 {
   int i;
   int numContours;
@@ -427,18 +452,18 @@ void vtkPVContourEntry::ResetInternal(const char* sourceTclName)
     vtkErrorMacro("PVSource not set.");
     return;
     }
-  this->Script("%s GetNumberOfContours", 
-               sourceTclName);
-  numContours = this->GetIntegerResult(this->Application);
+
+  numContours = this->LastAcceptedContourValues->GetNumberOfContours();
 
   // The widget has been modified.  
   // Now set the widget back to reflect the contours in the filter.
   this->ContourValues->SetNumberOfContours(0);
   for (i = 0; i < numContours; i++)
     {
-    this->Script("%s AddValueInternal [%s GetValue %d]", 
-                 this->GetTclName(),
-                 sourceTclName, i);
+//    this->Script("%s AddValueInternal [%s GetValue %d]", 
+//                 this->GetTclName(),
+//                 sourceTclName, i);
+    this->AddValueInternal(this->LastAcceptedContourValues->GetValue(i));
     }
   this->Update();
 

@@ -62,7 +62,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVArrayMenu);
-vtkCxxRevisionMacro(vtkPVArrayMenu, "1.40");
+vtkCxxRevisionMacro(vtkPVArrayMenu, "1.40.2.1");
 
 vtkCxxSetObjectMacro(vtkPVArrayMenu, InputMenu, vtkPVInputMenu);
 vtkCxxSetObjectMacro(vtkPVArrayMenu, FieldMenu, vtkPVFieldMenu);
@@ -90,6 +90,9 @@ vtkPVArrayMenu::vtkPVArrayMenu()
   this->InputMenu = NULL;
   this->FieldMenu = NULL;
 
+  this->AcceptCalled = 0;
+  this->LastAcceptedArrayName = 0;
+  this->LastAcceptedComponent = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -119,6 +122,7 @@ vtkPVArrayMenu::~vtkPVArrayMenu()
   this->SetInputMenu(NULL);
   this->SetFieldMenu(NULL);
 
+  this->SetLastAcceptedArrayName(NULL);
 }
 
 //----------------------------------------------------------------------------
@@ -271,6 +275,11 @@ void vtkPVArrayMenu::SetValue(const char* name)
   this->SetArrayName(name);
   this->ModifiedCallback();
   this->Update();
+  
+  if (!this->AcceptCalled)
+    {
+    this->SetLastAcceptedArrayName(name);
+    }
 }
 
 
@@ -373,6 +382,7 @@ void vtkPVArrayMenu::AcceptInternal(const char* sourceTclName)
                            this->InputName,
                            attributeName,
                            this->ArrayName);
+    this->SetLastAcceptedArrayName(this->ArrayName);
     }
   else
     {
@@ -380,6 +390,7 @@ void vtkPVArrayMenu::AcceptInternal(const char* sourceTclName)
                            sourceTclName,
                            this->InputName,
                            attributeName);
+    this->SetLastAcceptedArrayName(NULL);
     }
 
   if (this->ShowComponentMenu)
@@ -389,9 +400,11 @@ void vtkPVArrayMenu::AcceptInternal(const char* sourceTclName)
                            this->InputName,
                            attributeName,
                            this->SelectedComponent);
+    this->SetLastAcceptedComponent(this->SelectedComponent);
     }
 
   this->ModifiedFlag = 0;
+  this->AcceptCalled = 1;
 }
 
 //---------------------------------------------------------------------------
@@ -422,7 +435,7 @@ void vtkPVArrayMenu::Trace(ofstream *file)
 
 
 //----------------------------------------------------------------------------
-void vtkPVArrayMenu::ResetInternal(const char* sourceTclName)
+void vtkPVArrayMenu::ResetInternal()
 {
   const char* attributeName;
 
@@ -434,28 +447,19 @@ void vtkPVArrayMenu::ResetInternal(const char* sourceTclName)
     return;
     }
 
-  if (this->InputName == NULL || sourceTclName == NULL)
+  if (this->InputName == NULL || this->LastAcceptedArrayName == NULL)
     {
     vtkDebugMacro("Access names have not all been set.");
     return;
     }
 
-  // Get the selected array form the VTK filter.
-  this->Script("%s SetArrayName [%s Get%s%sSelection]",
-               this->GetTclName(), 
-               sourceTclName,
-               this->InputName,
-               attributeName);
-  
+  // Get the selected array.
+  this->SetValue(this->LastAcceptedArrayName);
 
   // Get the selected array form the VTK filter.
   if (this->ShowComponentMenu)
     {
-    this->Script("%s SetSelectedComponent [%s Get%s%sComponentSelection]",
-                 this->GetTclName(), 
-                 sourceTclName,
-                 this->InputName,
-                 attributeName);
+    this->SetSelectedComponent(this->LastAcceptedComponent);
     }
 
   this->ModifiedFlag = 0;
@@ -730,6 +734,8 @@ void vtkPVArrayMenu::CopyProperties(vtkPVWidget* clone, vtkPVSource* pvSource,
       pvam->SetFieldMenu(im);
       im->Delete();
       }
+    pvam->SetLastAcceptedArrayName(this->LastAcceptedArrayName);
+    pvam->SetLastAcceptedComponent(this->LastAcceptedComponent);
     }
   else 
     {
