@@ -3282,5 +3282,39 @@
    <!-- End LevelScalars -->
    </SourceProxy>
 
+   <SourceProxy name="ExtractLevel" class="vtkHierarchicalDataExtractLevel">
+     <InputProperty
+        name="Input"
+        command="SetInput">
+           <ProxyGroupDomain name="groups">
+             <Group name="sources"/>
+             <Group name="filters"/>
+           </ProxyGroupDomain>
+           <DataTypeDomain name="input_type">
+             <DataType value="vtkHierarchicalDataSet"/>
+           </DataTypeDomain>
+     </InputProperty>
+
+     <IntVectorProperty 
+        name="LevelRange" 
+        command="SetLevelRange" 
+        number_of_elements="2"
+        default_values="0 0" > 
+       <IntRangeDomain name="range">
+          <RequiredProperties>
+             <Property name="InputLevels" function="Range"/>
+          </RequiredProperties>
+       </IntRangeDomain>
+     </IntVectorProperty>
+
+     <IntVectorProperty 
+        name="InputLevels"
+        command="GetInputLevels"
+        information_only="1">
+        <SimpleIntInformationHelper/>
+     </IntVectorProperty>
+   <!-- End ExtractLevel -->
+   </SourceProxy>
+
   </ProxyGroup>
 </ServerManagerConfiguration>
