@@ -26,7 +26,12 @@ vtkPVApplication \
 vtkPVComposite \
 vtkPVConeSource \
 vtkPVContourFilter \
+vtkPVData \
 vtkPVElevationFilter \
+vtkPVImage \
+vtkPVImageClip \
+vtkPVImageReader \
+vtkPVImageSlice \
 vtkPVMenuButton \
 vtkPVPolyData \
 vtkPVRenderSlave \
