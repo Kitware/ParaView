@@ -175,7 +175,10 @@ void vtkPVVectorEntry::Create(vtkKWApplication *pvApp)
     }
   
   // For getting the widget in a script.
-  this->SetTraceName(this->EntryLabel);
+  if ( this->EntryLabel && this->EntryLabel[0] != '\0' )
+    {
+    this->SetTraceName(this->EntryLabel);
+    }
 
   this->SetApplication(pvApp);
 
