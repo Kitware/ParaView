@@ -917,7 +917,8 @@ void vtkPVSource::DeleteCallback()
       }
     }
   
-  this->GetView()->Render();
+  this->GetPVRenderView()->EventuallyRender();
+
   // I hope this will delete this source.
   this->GetWindow()->GetMainView()->RemoveComposite(this);
 }

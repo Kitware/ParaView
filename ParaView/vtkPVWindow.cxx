@@ -38,8 +38,6 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 #include "vtkMath.h"
 #include "vtkSynchronizedTemplates3D.h"
-#include "vtkSuperquadricSource.h"
-#include "vtkImageMandelbrotSource.h"
 
 #include "vtkPVSource.h"
 #include "vtkPVData.h"
@@ -1262,6 +1260,16 @@ void vtkPVWindow::ReadSourceInterfaces()
   sInt->SetOutputClassName("vtkPolyData");
   // Method
   mInt = vtkPVMethodInterface::New();
+  mInt->SetVariableName("Resolution");
+  mInt->SetSetCommand("SetResolution");
+  mInt->SetGetCommand("GetResolution");
+  mInt->AddIntegerArgument();
+  mInt->SetBalloonHelp("The number of facets used to define the cylinder.");
+  sInt->AddMethodInterface(mInt);
+  mInt->Delete();
+  mInt = NULL;
+  // Method
+  mInt = vtkPVMethodInterface::New();
   mInt->SetVariableName("Height");
   mInt->SetSetCommand("SetHeight");
   mInt->SetGetCommand("GetHeight");
@@ -1439,6 +1447,44 @@ void vtkPVWindow::ReadSourceInterfaces()
   sInt->Delete();
   sInt = NULL;  
   
+  // ---- OutlineCornerSource ----.
+  sInt = vtkPVSourceInterface::New();
+  sInt->SetApplication(pvApp);
+  sInt->SetPVWindow(this);
+  sInt->SetSourceClassName("vtkOutlineCornerSource");
+  sInt->SetRootName("Corners");
+  sInt->SetOutputClassName("vtkPolyData");
+  // Method
+  mInt = vtkPVMethodInterface::New();
+  mInt->SetVariableName("Bounds");
+  mInt->SetSetCommand("SetBounds");
+  mInt->SetGetCommand("GetBounds");
+  mInt->AddFloatArgument();
+  mInt->AddFloatArgument();
+  mInt->AddFloatArgument();
+  mInt->AddFloatArgument();
+  mInt->AddFloatArgument();
+  mInt->AddFloatArgument();
+  mInt->SetBalloonHelp("Bounds of the outline.");
+  sInt->AddMethodInterface(mInt);
+  mInt->Delete();
+  mInt = NULL;
+  // Method
+  mInt = vtkPVMethodInterface::New();
+  mInt->SetVariableName("CornerFactor");
+  mInt->SetSetCommand("SetCornerFactor");
+  mInt->SetGetCommand("GetCornerFactor");
+  mInt->AddFloatArgument();
+  mInt->SetBalloonHelp("The relative size of the corners
+  // to the length of the corresponding bounds. (0.001 -> 0.5)");
+  sInt->AddMethodInterface(mInt);
+  mInt->Delete();
+  mInt = NULL;
+  // Add it to the list.
+  this->SourceInterfaces->AddItem(sInt);
+  sInt->Delete();
+  sInt = NULL;
+
   // ---- POP Reader ----
   sInt = vtkPVSourceInterface::New();
   sInt->SetApplication(pvApp);
@@ -1589,6 +1635,112 @@ void vtkPVWindow::ReadSourceInterfaces()
   sInt->Delete();
   sInt = NULL;
 
+  // ---- SupderQuadricSource ----.
+  sInt = vtkPVSourceInterface::New();
+  sInt->SetApplication(pvApp);
+  sInt->SetPVWindow(this);
+  sInt->SetSourceClassName("vtkSuperquadricSource");
+  sInt->SetRootName("SQuad");
+  sInt->SetOutputClassName("vtkPolyData");
+  // Method
+  mInt = vtkPVMethodInterface::New();
+  mInt->SetVariableName("Center");
+  mInt->SetSetCommand("SetCenter");
+  mInt->SetGetCommand("GetCenter");
+  mInt->AddFloatArgument();
+  mInt->AddFloatArgument();
+  mInt->AddFloatArgument();
+  mInt->SetBalloonHelp("Set the center of the superquadric");
+  sInt->AddMethodInterface(mInt);
+  mInt->Delete();
+  mInt = NULL;
+  // Method
+  mInt = vtkPVMethodInterface::New();
+  mInt->SetVariableName("Scale");
+  mInt->SetSetCommand("SetScale");
+  mInt->SetGetCommand("GetScale");
+  mInt->AddFloatArgument();
+  mInt->AddFloatArgument();
+  mInt->AddFloatArgument();
+  mInt->SetBalloonHelp("Set the scale of the superquadric");
+  sInt->AddMethodInterface(mInt);
+  mInt->Delete();
+  mInt = NULL;
+  // Method
+  mInt = vtkPVMethodInterface::New();
+  mInt->SetVariableName("ThetaResolution");
+  mInt->SetSetCommand("SetThetaResolution");
+  mInt->SetGetCommand("GetThetaResolution");
+  mInt->AddIntegerArgument();
+  mInt->SetBalloonHelp("The number of points in the longitude direction.");
+  sInt->AddMethodInterface(mInt);
+  mInt->Delete();
+  mInt = NULL;
+  // Method
+  mInt = vtkPVMethodInterface::New();
+  mInt->SetVariableName("PhiResolution");
+  mInt->SetSetCommand("SetPhiResolution");
+  mInt->SetGetCommand("GetPhiResolution");
+  mInt->AddIntegerArgument();
+  mInt->SetBalloonHelp("The number of points in the latitude direction.");
+  sInt->AddMethodInterface(mInt);
+  mInt->Delete();
+  mInt = NULL;
+  // Method
+  mInt = vtkPVMethodInterface::New();
+  mInt->SetVariableName("Thickness");
+  mInt->SetSetCommand("SetThickness");
+  mInt->SetGetCommand("GetThickness");
+  mInt->AddFloatArgument();
+  mInt->SetBalloonHelp("Changing thickness maintains the outside diameter of the toroid.");
+  sInt->AddMethodInterface(mInt);
+  mInt->Delete();
+  mInt = NULL;
+  // Method
+  mInt = vtkPVMethodInterface::New();
+  mInt->SetVariableName("ThetaRoundness");
+  mInt->SetSetCommand("SetThetaRoundness");
+  mInt->SetGetCommand("GetThetaRoundness");
+  mInt->AddFloatArgument();
+  mInt->SetBalloonHelp("Values range from 0 (rectangular) to 1 (circular) to higher order.");
+  sInt->AddMethodInterface(mInt);
+  mInt->Delete();
+  mInt = NULL;
+  // Method
+  mInt = vtkPVMethodInterface::New();
+  mInt->SetVariableName("PhiRoundness");
+  mInt->SetSetCommand("SetPhiRoundness");
+  mInt->SetGetCommand("GetPhiRoundness");
+  mInt->AddFloatArgument();
+  mInt->SetBalloonHelp("Values range from 0 (rectangular) to 1 (circular) to higher order.");
+  sInt->AddMethodInterface(mInt);
+  mInt->Delete();
+  mInt = NULL;
+  // Method
+  mInt = vtkPVMethodInterface::New();
+  mInt->SetVariableName("Size");
+  mInt->SetSetCommand("SetSize");
+  mInt->SetGetCommand("GetSize");
+  mInt->AddFloatArgument();
+  mInt->SetBalloonHelp("Isotropic size");
+  sInt->AddMethodInterface(mInt);
+  mInt->Delete();
+  mInt = NULL;
+  // Method
+  mInt = vtkPVMethodInterface::New();
+  mInt->SetVariableName("Toroidal");
+  mInt->SetSetCommand("SetToroidal");
+  mInt->SetGetCommand("GetToroidal");
+  mInt->SetWidgetTypeToToggle();
+  mInt->SetBalloonHelp("Whether or not the superquadric is toroidal or ellipsoidal");
+  sInt->AddMethodInterface(mInt);
+  mInt->Delete();
+  mInt = NULL;
+  // Add it to the list.
+  this->SourceInterfaces->AddItem(sInt);
+  sInt->Delete();
+  sInt = NULL;
+
   // ---- VectorText ----
   sInt = vtkPVSourceInterface::New();
   sInt->SetApplication(pvApp);
@@ -1674,7 +1826,7 @@ void vtkPVWindow::ReadSourceInterfaces()
   sInt->SetApplication(pvApp);
   sInt->SetPVWindow(this);
   sInt->SetSourceClassName("vtkCellCenters");
-  sInt->SetRootName("BFSubDiv");
+  sInt->SetRootName("Centers");
   sInt->SetInputClassName("vtkDataSet");
   sInt->SetOutputClassName("vtkPolyData");
   // Method
@@ -1707,6 +1859,45 @@ void vtkPVWindow::ReadSourceInterfaces()
   mInt->SetGetCommand("GetPassCellData");
   mInt->SetWidgetTypeToToggle();
   mInt->SetBalloonHelp(" Control whether the input cell data is to be passed to the output. If on, then the input cell data is passed through to the output; otherwise, only generated point data is placed into the output.");
+  sInt->AddMethodInterface(mInt);
+  mInt->Delete();
+  mInt = NULL;
+  // Add it to the list.
+  this->SourceInterfaces->AddItem(sInt);
+  sInt->Delete();
+  sInt = NULL;
+
+  // ---- CellDerivatives ----.
+  sInt = vtkPVSourceInterface::New();
+  sInt->SetApplication(pvApp);
+  sInt->SetPVWindow(this);
+  sInt->SetSourceClassName("vtkCellDerivatives");
+  sInt->SetRootName("CellDeriv");
+  sInt->SetInputClassName("vtkDataSet");
+  sInt->SetOutputClassName("vtkDataSet");
+  // Method
+  mInt = vtkPVMethodInterface::New();
+  mInt->SetVariableName("VectorMode");
+  mInt->SetSetCommand("SetVectorMode");
+  mInt->SetGetCommand("GetVectorMode");
+  mInt->SetWidgetTypeToSelection();
+  mInt->AddSelectionEntry(0, "Pass");
+  mInt->AddSelectionEntry(1, "Vorticity");
+  mInt->AddSelectionEntry(2, "Gradient");
+  mInt->SetBalloonHelp("Value to put in vector cell data");
+  sInt->AddMethodInterface(mInt);
+  mInt->Delete();
+  mInt = NULL;
+  // Method
+  mInt = vtkPVMethodInterface::New();
+  mInt->SetVariableName("TensorMode");
+  mInt->SetSetCommand("SetTensorMode");
+  mInt->SetGetCommand("GetTensorMode");
+  mInt->SetWidgetTypeToSelection();
+  mInt->AddSelectionEntry(0, "Pass");
+  mInt->AddSelectionEntry(1, "Strain");
+  mInt->AddSelectionEntry(2, "Gradient");
+  mInt->SetBalloonHelp("Value to put in tensaor cell data");
   sInt->AddMethodInterface(mInt);
   mInt->Delete();
   mInt = NULL;
@@ -2526,7 +2717,7 @@ void vtkPVWindow::ReadSourceInterfaces()
   sInt->Delete();
   sInt = NULL;
 
-  // ---- Dicer ----.
+  // ---- OBB Dicer ----.
   sInt = vtkPVSourceInterface::New();
   sInt->SetApplication(pvApp);
   sInt->SetPVWindow(this);
@@ -2569,6 +2760,30 @@ void vtkPVWindow::ReadSourceInterfaces()
   sInt->Delete();
   sInt = NULL;
 
+  // ---- OutlineCornerFilter ----.
+  sInt = vtkPVSourceInterface::New();
+  sInt->SetApplication(pvApp);
+  sInt->SetPVWindow(this);
+  sInt->SetSourceClassName("vtkOutlineCornerFilter");
+  sInt->SetRootName("COutline");
+  sInt->SetInputClassName("vtkDataSet");
+  sInt->SetOutputClassName("vtkPolyData");
+  // Method
+  mInt = vtkPVMethodInterface::New();
+  mInt->SetVariableName("CornerFactor");
+  mInt->SetSetCommand("SetCornerFactor");
+  mInt->SetGetCommand("GetCornerFactor");
+  mInt->AddFloatArgument();
+  mInt->SetBalloonHelp("The relative size of the corners
+  // to the length of the corresponding bounds. (0.001 -> 0.5)");
+  sInt->AddMethodInterface(mInt);
+  mInt->Delete();
+  mInt = NULL;
+  // Add it to the list.
+  this->SourceInterfaces->AddItem(sInt);
+  sInt->Delete();
+  sInt = NULL;
+
   // ---- PieceScalars ----.
   sInt = vtkPVSourceInterface::New();
   sInt->SetApplication(pvApp);
@@ -2592,7 +2807,122 @@ void vtkPVWindow::ReadSourceInterfaces()
   sInt->Delete();
   sInt = NULL;
 
-  // ---- Stream ----.
+  // ---- PointDataToCellData ----.
+  sInt = vtkPVSourceInterface::New();
+  sInt->SetApplication(pvApp);
+  sInt->SetPVWindow(this);
+  sInt->SetSourceClassName("vtkPointDataToCellData");
+  sInt->SetRootName("PtToCell");
+  sInt->SetInputClassName("vtkDataSet");
+  sInt->SetOutputClassName("vtkDataSet");
+  // Method
+  mInt = vtkPVMethodInterface::New();
+  mInt->SetVariableName("PassPointData");
+  mInt->SetSetCommand("SetPassPointData");
+  mInt->SetGetCommand("GetPassPointData");
+  mInt->SetWidgetTypeToToggle();
+  sInt->AddMethodInterface(mInt);
+  mInt->Delete();
+  mInt = NULL;
+  // Add it to the list.
+  this->SourceInterfaces->AddItem(sInt);
+  sInt->Delete();
+  sInt = NULL;
+
+  // ---- PolyDataNormals ----.
+  sInt = vtkPVSourceInterface::New();
+  sInt->SetApplication(pvApp);
+  sInt->SetPVWindow(this);
+  sInt->SetSourceClassName("vtkPolyDataNormals");
+  sInt->SetRootName("PDNormals");
+  sInt->SetInputClassName("vtkPolyData");
+  sInt->SetOutputClassName("vtkPolyData");
+  // Method
+  mInt = vtkPVMethodInterface::New();
+  mInt->SetVariableName("FeatureAngle");
+  mInt->SetSetCommand("SetFeatureAngle");
+  mInt->SetGetCommand("GetFeatureAngle");
+  mInt->AddFloatArgument();
+  mInt->SetBalloonHelp("Points are duplicated along features over this angle (0->180)");
+  sInt->AddMethodInterface(mInt);
+  mInt->Delete();
+  mInt = NULL;
+  // Method
+  mInt = vtkPVMethodInterface::New();
+  mInt->SetVariableName("Splitting");
+  mInt->SetSetCommand("SetSplitting");
+  mInt->SetGetCommand("GetSplitting");
+  mInt->SetWidgetTypeToToggle();
+  mInt->SetBalloonHelp("Turn on/off the splitting of sharp edges.");
+  sInt->AddMethodInterface(mInt);
+  mInt->Delete();
+  mInt = NULL;
+  // Method
+  mInt = vtkPVMethodInterface::New();
+  mInt->SetVariableName("Consistency");
+  mInt->SetSetCommand("SetConsistency");
+  mInt->SetGetCommand("GetConsistency");
+  mInt->SetWidgetTypeToToggle();
+  mInt->SetBalloonHelp("Turn on/off the enforcement of consistent polygon ordering.");
+  sInt->AddMethodInterface(mInt);
+  mInt->Delete();
+  mInt = NULL;
+  // Method
+  mInt = vtkPVMethodInterface::New();
+  mInt->SetVariableName("Consistency");
+  mInt->SetSetCommand("SetConsistency");
+  mInt->SetGetCommand("GetConsistency");
+  mInt->SetWidgetTypeToToggle();
+  mInt->SetBalloonHelp("Turn on/off the enforcement of consistent polygon ordering.");
+  sInt->AddMethodInterface(mInt);
+  mInt->Delete();
+  mInt = NULL;
+  // Method
+  mInt = vtkPVMethodInterface::New();
+  mInt->SetVariableName("CellNormals");
+  mInt->SetSetCommand("SetComputeCellNormals");
+  mInt->SetGetCommand("GetComputeCellNormals");
+  mInt->SetWidgetTypeToToggle();
+  mInt->SetBalloonHelp("Turn on/off the computation of cell normals.");
+  sInt->AddMethodInterface(mInt);
+  mInt->Delete();
+  mInt = NULL;
+  // Method
+  mInt = vtkPVMethodInterface::New();
+  mInt->SetVariableName("Consistency");
+  mInt->SetSetCommand("SetConsistency");
+  mInt->SetGetCommand("GetConsistency");
+  mInt->SetWidgetTypeToToggle();
+  mInt->SetBalloonHelp("Turn on/off the enforcement of consistent polygon ordering.");
+  sInt->AddMethodInterface(mInt);
+  mInt->Delete();
+  mInt = NULL;
+  // Method
+  mInt = vtkPVMethodInterface::New();
+  mInt->SetVariableName("FlipNormals");
+  mInt->SetSetCommand("SetFlipNormals");
+  mInt->SetGetCommand("GetFlipNormals");
+  mInt->SetWidgetTypeToToggle();
+  mInt->SetBalloonHelp("Flipping reverves the meaning of front and back.");
+  sInt->AddMethodInterface(mInt);
+  mInt->Delete();
+  mInt = NULL;
+  // Method
+  mInt = vtkPVMethodInterface::New();
+  mInt->SetVariableName("NonManifold");
+  mInt->SetSetCommand("SetNonManifoldTraversal");
+  mInt->SetGetCommand("GetNonManifoldTraversal");
+  mInt->SetWidgetTypeToToggle();
+  mInt->SetBalloonHelp("Turn on/off traversal across non-manifold edges. This will prevent problems where the consistency of polygonal ordering is corrupted due to topological loops.");
+  sInt->AddMethodInterface(mInt);
+  mInt->Delete();
+  mInt = NULL;
+  // Add it to the list.
+  this->SourceInterfaces->AddItem(sInt);
+  sInt->Delete();
+  sInt = NULL;
+
+  // ---- PolyDataStreamer ----.
   sInt = vtkPVSourceInterface::New();
   sInt->SetApplication(pvApp);
   sInt->SetPVWindow(this);
@@ -2615,7 +2945,154 @@ void vtkPVWindow::ReadSourceInterfaces()
   sInt->Delete();
   sInt = NULL;
 
-  // ---- Deci ----.
+  // ---- ReverseSense ----.
+  sInt = vtkPVSourceInterface::New();
+  sInt->SetApplication(pvApp);
+  sInt->SetPVWindow(this);
+  sInt->SetSourceClassName("vtkReverseSense");
+  sInt->SetRootName("RevSense");
+  sInt->SetInputClassName("vtkPolyData");
+  sInt->SetOutputClassName("vtkPolyData");
+  // Method
+  mInt = vtkPVMethodInterface::New();
+  mInt->SetVariableName("CellOrder");
+  mInt->SetSetCommand("SetReverseCells");
+  mInt->SetGetCommand("GetReverseCells");
+  mInt->SetWidgetTypeToToggle();
+  sInt->AddMethodInterface(mInt);
+  mInt->Delete();
+  mInt = NULL;
+  // Method
+  mInt = vtkPVMethodInterface::New();
+  mInt->SetVariableName("ReverseNormals");
+  mInt->SetSetCommand("SetReverseNormals");
+  mInt->SetGetCommand("GetReverseNormals");
+  mInt->SetWidgetTypeToToggle();
+  sInt->AddMethodInterface(mInt);
+  mInt->Delete();
+  mInt = NULL;
+  // Add it to the list.
+  this->SourceInterfaces->AddItem(sInt);
+  sInt->Delete();
+  sInt = NULL;
+
+  // ---- RibbonFilter ----.
+  sInt = vtkPVSourceInterface::New();
+  sInt->SetApplication(pvApp);
+  sInt->SetPVWindow(this);
+  sInt->SetSourceClassName("vtkRibbonFilter");
+  sInt->SetRootName("Ribbon");
+  sInt->SetInputClassName("vtkPolyData");
+  sInt->SetOutputClassName("vtkPolyData");
+  // Method
+  mInt = vtkPVMethodInterface::New();
+  mInt->SetVariableName("Width");
+  mInt->SetSetCommand("SetWidth");
+  mInt->SetGetCommand("GetWidth");
+  mInt->AddFloatArgument();
+  mInt->SetBalloonHelp("The half width of the ribbon (or minimum).");
+  sInt->AddMethodInterface(mInt);
+  mInt->Delete();
+  mInt = NULL;
+  // Method
+  mInt = vtkPVMethodInterface::New();
+  mInt->SetVariableName("Angle");
+  mInt->SetSetCommand("SetAngle");
+  mInt->SetGetCommand("GetAngle");
+  mInt->AddFloatArgument();
+  mInt->SetBalloonHelp("The offset angle of the ribbon from the line normal (0->360).");
+  sInt->AddMethodInterface(mInt);
+  mInt->Delete();
+  mInt = NULL;
+  // Method
+  mInt = vtkPVMethodInterface::New();
+  mInt->SetVariableName("DefaultNormal");
+  mInt->SetSetCommand("SetDefaultNormal");
+  mInt->SetGetCommand("GetDefaultNormal");
+  mInt->AddFloatArgument();
+  mInt->AddFloatArgument();
+  mInt->AddFloatArgument();
+  mInt->SetBalloonHelp("If no normals are supplied");
+  sInt->AddMethodInterface(mInt);
+  mInt->Delete();
+  mInt = NULL;
+  // Method
+  mInt = vtkPVMethodInterface::New();
+  mInt->SetVariableName("VaryWidth");
+  mInt->SetSetCommand("SetVaryWidth");
+  mInt->SetGetCommand("GetVaryWidth");
+  mInt->SetWidgetTypeToToggle();
+  mInt->SetBalloonHelp("Turn on/off the variation of ribbon width with scalar value.");
+  sInt->AddMethodInterface(mInt);
+  mInt->Delete();
+  mInt = NULL;
+  // Add it to the list.
+  this->SourceInterfaces->AddItem(sInt);
+  sInt->Delete();
+  sInt = NULL;
+
+  // ---- RotationalExtrusion ----.
+  sInt = vtkPVSourceInterface::New();
+  sInt->SetApplication(pvApp);
+  sInt->SetPVWindow(this);
+  sInt->SetSourceClassName("vtkRotationalExtrusionFilter");
+  sInt->SetRootName("RotExtrude");
+  sInt->SetInputClassName("vtkPolyData");
+  sInt->SetOutputClassName("vtkPolyData");
+  // Method
+  mInt = vtkPVMethodInterface::New();
+  mInt->SetVariableName("Resoultion");
+  mInt->SetSetCommand("SetResolution");
+  mInt->SetGetCommand("GetResolution");
+  mInt->AddIntegerArgument();
+  sInt->AddMethodInterface(mInt);
+  mInt->Delete();
+  mInt = NULL;
+  // Method
+  mInt = vtkPVMethodInterface::New();
+  mInt->SetVariableName("Capping");
+  mInt->SetSetCommand("SetCapping");
+  mInt->SetGetCommand("GetCapping");
+  mInt->SetWidgetTypeToToggle();
+  sInt->AddMethodInterface(mInt);
+  mInt->Delete();
+  mInt = NULL;
+  // Method
+  mInt = vtkPVMethodInterface::New();
+  mInt->SetVariableName("Angle");
+  mInt->SetSetCommand("SetAngle");
+  mInt->SetGetCommand("GetAngle");
+  mInt->AddFloatArgument();
+  mInt->SetBalloonHelp("Set the angle of rotation.");
+  sInt->AddMethodInterface(mInt);
+  mInt->Delete();
+  mInt = NULL;
+  // Method
+  mInt = vtkPVMethodInterface::New();
+  mInt->SetVariableName("Translation");
+  mInt->SetSetCommand("SetTranslation");
+  mInt->SetGetCommand("GetTranslation");
+  mInt->AddFloatArgument();
+  mInt->SetBalloonHelp("The total amount of translation along the z-axis.");
+  sInt->AddMethodInterface(mInt);
+  mInt->Delete();
+  mInt = NULL;
+  // Method
+  mInt = vtkPVMethodInterface::New();
+  mInt->SetVariableName("DeltaRadius");
+  mInt->SetSetCommand("SetDeltaRadius");
+  mInt->SetGetCommand("GetDeltaRadius");
+  mInt->AddFloatArgument();
+  mInt->SetBalloonHelp("The change in radius during sweep process.");
+  sInt->AddMethodInterface(mInt);
+  mInt->Delete();
+  mInt = NULL; 
+  // Add it to the list.
+  this->SourceInterfaces->AddItem(sInt);
+  sInt->Delete();
+  sInt = NULL;
+
+  // ---- Quadric Clustering ----.
   sInt = vtkPVSourceInterface::New();
   sInt->SetApplication(pvApp);
   sInt->SetPVWindow(this);
@@ -2701,17 +3178,6 @@ void vtkPVWindow::ReadSourceInterfaces()
   sInt->SetRootName("FieldToAttr");
   sInt->SetInputClassName("vtkDataSet");
   sInt->SetOutputClassName("vtkDataSet");
-  // Method
-  //mInt = vtkPVMethodInterface::New();
-  //mInt->SetVariableName("AttributeType");
-  //mInt->SetSetCommand("SetAttributeType");
-  //mInt->SetGetCommand("GetAttributeType");
-  //mInt->SetWidgetTypeToSelection();
-  //mInt->AddSelectionEntry(0, "Point");
-  //mInt->AddSelectionEntry(1, "Cell");
-  //sInt->AddMethodInterface(mInt);
-  //mInt->Delete();
-  //mInt = NULL;  
   // Method
   mInt = vtkPVMethodInterface::New();
   mInt->SetVariableName("Attribute");
