@@ -118,7 +118,7 @@ void vtkPVGlyph3D::CreateProperties()
 {
   this->vtkPVSource::CreateProperties();
     
-  this->AddInputMenu("Input", "PVInput", "vtkPolyData",
+  this->AddInputMenu("Input", "PVInput", "vtkDataSet",
                      "Select the input for the filter.", 
                      this->GetPVWindow()->GetSources());                            
 
