@@ -19,10 +19,11 @@
 #include "vtkPVProcessModule.h"
 #include "vtkClientServerStream.h"
 #include "vtkKWEvent.h"
+#include "vtkCommand.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMImplicitPlaneWidgetProxy);
-vtkCxxRevisionMacro(vtkSMImplicitPlaneWidgetProxy, "1.1");
+vtkCxxRevisionMacro(vtkSMImplicitPlaneWidgetProxy, "1.2");
 
 //----------------------------------------------------------------------------
 vtkSMImplicitPlaneWidgetProxy::vtkSMImplicitPlaneWidgetProxy()
@@ -105,7 +106,7 @@ void vtkSMImplicitPlaneWidgetProxy::ExecuteEvent(vtkObject *wdg, unsigned long e
   this->SetCenter(val[0], val[1], val[2]);
   widget->GetNormal(val);
   this->SetNormal(val[0], val[1], val[2]);
-  if (!widget->GetDrawPlane())
+  if (!widget->GetDrawPlane() && event == vtkCommand::InteractionEvent)
     { 
     this->SetDrawPlane(1);
     }
