@@ -77,6 +77,7 @@ int vtkKWApplicationCommand(ClientData cd, Tcl_Interp *interp,
 
 vtkKWApplication::vtkKWApplication()
 {
+  this->BalloonHelpWidget = 0;
   this->CommandFunction = vtkKWApplicationCommand;
   
   this->ApplicationName = new char[strlen("Kitware")+1];
@@ -87,25 +88,41 @@ vtkKWApplication::vtkKWApplication()
 
   this->ApplicationReleaseName = new char[strlen("unknown")+1];
   strcpy(this->ApplicationReleaseName, "unknown" );
+  
+  this->InExit = 0;
+  this->DialogUp = 0;
+  this->TraceFile = NULL;
 
-  // setup tcl stuff
-  this->MainInterp = Et_Interp;
+  this->ExitStatus = 0;
+
+  this->Registery = 0;
+  this->RegisteryLevel = 10;
+
+  this->UseMessageDialogs = 1;  
+
   this->Windows = vtkKWWindowCollection::New();  
   
   // add the application as $app
-
-  //vtkTclGetObjectFromPointer(this->MainInterp, (void *)this, 
-  //                           vtkKWApplicationCommand);
-
-  //this->Script("set Application %s",this->MainInterp->result);
-  this->Script("set Application %s",this->GetTclName());
 
   this->BalloonHelpWindow = vtkKWWidget::New();
   this->BalloonHelpLabel = vtkKWWidget::New();
   this->BalloonHelpLabel->SetParent(this->BalloonHelpWindow);
   this->BalloonHelpPending = NULL;
   this->BalloonHelpDelay = 2;
-  this->BalloonHelpWidget = 0;
+
+  // setup tcl stuff
+  this->MainInterp = Et_Interp;
+  if ( !this->MainInterp )
+    {
+    vtkErrorMacro("Interpreter not set. This probably means that Tcl was not initialized properly...");
+    return;
+    }
+
+  //vtkTclGetObjectFromPointer(this->MainInterp, (void *)this, 
+  //                           vtkKWApplicationCommand);
+
+  //this->Script("set Application %s",this->MainInterp->result);  
+  this->Script("set Application %s",this->GetTclName());
 
   if (vtkKWApplication::WidgetVisibility)
     {
@@ -119,17 +136,6 @@ vtkKWApplication::vtkKWApplication()
 		 this->BalloonHelpWindow->GetWidgetName());
     this->Script("wm withdraw %s", this->BalloonHelpWindow->GetWidgetName());
     }
-  
-  this->InExit = 0;
-  this->DialogUp = 0;
-  this->TraceFile = NULL;
-
-  this->ExitStatus = 0;
-
-  this->Registery = 0;
-  this->RegisteryLevel = 10;
-
-  this->UseMessageDialogs = 1;  
 }
 
 vtkKWApplication::~vtkKWApplication()
