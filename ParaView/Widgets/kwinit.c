@@ -21,8 +21,13 @@
 //# define ET_HAVE_MAIN 0
 //#endif
 #define ET_HAVE_CUSTOM_MAINLOOP 0
+#ifdef HAVE_TCL8_3
+#define ET_TCL_LIBRARY "C:/Program Files/Tcl/lib/tcl8.3"
+#define ET_TK_LIBRARY "C:/Program Files/Tcl/lib/tk8.3"
+#else /* HAVE_TCL8_3 */
 #define ET_TCL_LIBRARY "C:/Program Files/Tcl/lib/tcl8.2"
 #define ET_TK_LIBRARY "C:/Program Files/Tcl/lib/tk8.2"
+#endif /* HAVE_TCL8_3 */
 #define ET_EXTENSION 0
 #define ET_SHROUD_KEY 0
 #define ET_READ_STDIN 0
@@ -557,7 +562,11 @@ static char Et_zFile2[] =
 "if {[info commands package] == \"\"} {\n"
 "error \"version mismatch: library\\nscripts expect Tcl version 7.5b1 or later but the loaded version is\\nonly [info patchlevel]\"\n"
 "}\n"
+#ifdef HAVE_TCL8_3
+"package require -exact Tcl 8.3\n"
+#else /* HAVE_TCL8_3 */
 "package require -exact Tcl 8.2\n"
+#endif /* HAVE_TCL8_3 */
 "if {![info exists auto_path]} {\n"
 "if {[info exist env(TCLLIBPATH)]} {\n"
 "set auto_path $env(TCLLIBPATH)\n"
@@ -6797,8 +6806,13 @@ static char Et_zFile27[] =
 "}\n"
 ;
 static char Et_zFile28[] = 
+#ifdef HAVE_TCL8_3
+"package require -exact Tk 8.3\n"
+"package require -exact Tcl 8.3\n"
+#else /* HAVE_TCL8_3 */
 "package require -exact Tk 8.2\n"
 "package require -exact Tcl 8.2\n"
+#endif /* HAVE_TCL8_3 */
 "if {[info exists auto_path] && [string compare {} $tk_library] && \\\n"
 "[lsearch -exact $auto_path $tk_library] < 0} {\n"
 "lappend auto_path $tk_library\n"
@@ -8400,6 +8414,42 @@ struct EtFile {
   int shrouded;
   struct EtFile *pNext;
 };
+#ifdef HAVE_TCL8_3
+static struct EtFile Et_FileSet[] = {
+  { "C:/Program Files/Tcl/lib/tcl8.3/auto.tcl", Et_zFile0, sizeof(Et_zFile0)-1, 0, 0 },
+  { "C:/Program Files/Tcl/lib/tcl8.3/history.tcl", Et_zFile1, sizeof(Et_zFile1)-1, 0, 0 },
+  { "C:/Program Files/Tcl/lib/tcl8.3/init.tcl", Et_zFile2, sizeof(Et_zFile2)-1, 0, 0 },
+  { "C:/Program Files/Tcl/lib/tcl8.3/package.tcl", Et_zFile3, sizeof(Et_zFile3)-1, 0, 0 },
+  { "C:/Program Files/Tcl/lib/tcl8.3/parray.tcl", Et_zFile4, sizeof(Et_zFile4)-1, 0, 0 },
+  { "C:/Program Files/Tcl/lib/tcl8.3/safe.tcl", Et_zFile5, sizeof(Et_zFile5)-1, 0, 0 },
+  { "C:/Program Files/Tcl/lib/tcl8.3/tclIndex", Et_zFile6, sizeof(Et_zFile6)-1, 0, 0 },
+  { "C:/Program Files/Tcl/lib/tcl8.3/word.tcl", Et_zFile7, sizeof(Et_zFile7)-1, 0, 0 },
+  { "C:/Program Files/Tcl/lib/tk8.3/bgerror.tcl", Et_zFile8, sizeof(Et_zFile8)-1, 0, 0 },
+  { "C:/Program Files/Tcl/lib/tk8.3/button.tcl", Et_zFile9, sizeof(Et_zFile9)-1, 0, 0 },
+  { "C:/Program Files/Tcl/lib/tk8.3/clrpick.tcl", Et_zFile10, sizeof(Et_zFile10)-1, 0, 0 },
+  { "C:/Program Files/Tcl/lib/tk8.3/comdlg.tcl", Et_zFile11, sizeof(Et_zFile11)-1, 0, 0 },
+  { "C:/Program Files/Tcl/lib/tk8.3/console.tcl", Et_zFile12, sizeof(Et_zFile12)-1, 0, 0 },
+  { "C:/Program Files/Tcl/lib/tk8.3/dialog.tcl", Et_zFile13, sizeof(Et_zFile13)-1, 0, 0 },
+  { "C:/Program Files/Tcl/lib/tk8.3/entry.tcl", Et_zFile14, sizeof(Et_zFile14)-1, 0, 0 },
+  { "C:/Program Files/Tcl/lib/tk8.3/focus.tcl", Et_zFile15, sizeof(Et_zFile15)-1, 0, 0 },
+  { "C:/Program Files/Tcl/lib/tk8.3/listbox.tcl", Et_zFile16, sizeof(Et_zFile16)-1, 0, 0 },
+  { "C:/Program Files/Tcl/lib/tk8.3/menu.tcl", Et_zFile17, sizeof(Et_zFile17)-1, 0, 0 },
+  { "C:/Program Files/Tcl/lib/tk8.3/msgbox.tcl", Et_zFile18, sizeof(Et_zFile18)-1, 0, 0 },
+  { "C:/Program Files/Tcl/lib/tk8.3/obsolete.tcl", Et_zFile19, sizeof(Et_zFile19)-1, 0, 0 },
+  { "C:/Program Files/Tcl/lib/tk8.3/optMenu.tcl", Et_zFile20, sizeof(Et_zFile20)-1, 0, 0 },
+  { "C:/Program Files/Tcl/lib/tk8.3/palette.tcl", Et_zFile21, sizeof(Et_zFile21)-1, 0, 0 },
+  { "C:/Program Files/Tcl/lib/tk8.3/safetk.tcl", Et_zFile22, sizeof(Et_zFile22)-1, 0, 0 },
+  { "C:/Program Files/Tcl/lib/tk8.3/scale.tcl", Et_zFile23, sizeof(Et_zFile23)-1, 0, 0 },
+  { "C:/Program Files/Tcl/lib/tk8.3/scrlbar.tcl", Et_zFile24, sizeof(Et_zFile24)-1, 0, 0 },
+  { "C:/Program Files/Tcl/lib/tk8.3/tclIndex", Et_zFile25, sizeof(Et_zFile25)-1, 0, 0 },
+  { "C:/Program Files/Tcl/lib/tk8.3/tearoff.tcl", Et_zFile26, sizeof(Et_zFile26)-1, 0, 0 },
+  { "C:/Program Files/Tcl/lib/tk8.3/text.tcl", Et_zFile27, sizeof(Et_zFile27)-1, 0, 0 },
+  { "C:/Program Files/Tcl/lib/tk8.3/tk.tcl", Et_zFile28, sizeof(Et_zFile28)-1, 0, 0 },
+  { "C:/Program Files/Tcl/lib/tk8.3/tkfbox.tcl", Et_zFile29, sizeof(Et_zFile29)-1, 0, 0 },
+  { "C:/Program Files/Tcl/lib/tk8.3/xmfbox.tcl", Et_zFile30, sizeof(Et_zFile30)-1, 0, 0 },
+  { "D:/Kw/vv.tcl", Et_zFile31, sizeof(Et_zFile31)-1, 0, 0 },
+{0, 0}};
+#else /* HAVE_TCL8_3 */
 static struct EtFile Et_FileSet[] = {
   { "C:/Program Files/Tcl/lib/tcl8.2/auto.tcl", Et_zFile0, sizeof(Et_zFile0)-1, 0, 0 },
   { "C:/Program Files/Tcl/lib/tcl8.2/history.tcl", Et_zFile1, sizeof(Et_zFile1)-1, 0, 0 },
@@ -8434,6 +8484,7 @@ static struct EtFile Et_FileSet[] = {
   { "C:/Program Files/Tcl/lib/tk8.2/xmfbox.tcl", Et_zFile30, sizeof(Et_zFile30)-1, 0, 0 },
   { "D:/Kw/vv.tcl", Et_zFile31, sizeof(Et_zFile31)-1, 0, 0 },
 {0, 0}};
+#endif /* HAVE_TCL8_3 */
 static struct EtFile *Et_FileHashTable[71];
 /* The following copyright notice applies to code generated by
 ** "mktclapp".  The "mktclapp" program itself is covered by the
