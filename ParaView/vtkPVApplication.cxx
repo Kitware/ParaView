@@ -43,6 +43,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkKWRotateViewButton.h"
 #include "vtkKWTranslateViewButton.h"
 #include "vtkKWPickCenterButton.h"
+#include "vtkPVCalculatorButton.h"
 #include "vtkTimerLog.h"
 #include "vtkPVOutputWindow.h"
 #include "vtkOutputWindow.h"
@@ -420,6 +421,9 @@ void vtkPVApplication::CreateButtonPhotos()
               KW_ACTIVE_ROTATE_VIEW_BUTTON_WIDTH, KW_ACTIVE_ROTATE_VIEW_BUTTON_HEIGHT);
   this->CreatePhoto("KWPickCenterButton", KW_PICK_CENTER_BUTTON, 
               KW_PICK_CENTER_BUTTON_WIDTH, KW_PICK_CENTER_BUTTON_HEIGHT);
+  
+  this->CreatePhoto("PVCalculatorButton", PV_CALCULATOR_BUTTON,
+                    PV_CALCULATOR_BUTTON_WIDTH, PV_CALCULATOR_BUTTON_WIDTH);
 }
 
 //----------------------------------------------------------------------------

@@ -358,7 +358,7 @@ void vtkPVWindow::Create(vtkKWApplication *app, char *args)
   this->Toolbar->Create(app);
   
   this->CalculatorButton->SetParent(this->Toolbar);
-  this->CalculatorButton->Create(app, "-text Calculator");
+  this->CalculatorButton->Create(app, "-image PVCalculatorButton");
   this->CalculatorButton->SetCommand(this, "CalculatorCallback");
   
   this->ThresholdButton->SetParent(this->Toolbar);
