@@ -66,7 +66,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWCornerAnnotation );
-vtkCxxRevisionMacro(vtkKWCornerAnnotation, "1.50");
+vtkCxxRevisionMacro(vtkKWCornerAnnotation, "1.51");
 
 int vtkKWCornerAnnotationCommand(ClientData cd, Tcl_Interp *interp,
                                 int argc, char *argv[]);
@@ -391,10 +391,14 @@ void vtkKWCornerAnnotation::Create(vtkKWApplication *app,
                                      : this->Frame->GetFrame());
     }
 
-  this->CornerVisibilityButton->Create(
-    this->Application, "-bd 0 -highlightthickness 0 -padx 0 -pady 0");
+  this->CornerVisibilityButton->Create(this->Application, "");
 
-  if (!put_visibility_button_in_title)
+  if (put_visibility_button_in_title)
+    {
+    this->Script("%s config -bd 0 -highlightthickness 0 -padx 0 -pady 0",
+                 this->CornerVisibilityButton->GetWidgetName());
+    }
+  else
     {
     this->CornerVisibilityButton->SetText("Display corner annotation");
     }
@@ -947,7 +951,7 @@ void vtkKWCornerAnnotation::SerializeToken(istream& is,
 void vtkKWCornerAnnotation::SerializeRevision(ostream& os, vtkIndent indent)
 {
   os << indent << "vtkKWCornerAnnotation ";
-  this->ExtractRevision(os,"$Revision: 1.50 $");
+  this->ExtractRevision(os,"$Revision: 1.51 $");
 }
 
 //----------------------------------------------------------------------------
