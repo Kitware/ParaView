@@ -70,7 +70,7 @@ int vtkKWApplication::WidgetVisibility = 1;
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.117");
+vtkCxxRevisionMacro(vtkKWApplication, "1.118");
 
 extern "C" int Vtktcl_Init(Tcl_Interp *interp);
 extern "C" int Vtkkwwidgetstcl_Init(Tcl_Interp *interp);
@@ -218,7 +218,7 @@ void vtkKWApplication::FindApplicationInstallationDirectory()
   const char *nameofexec = this->Script("info nameofexecutable");
   if (nameofexec && vtkKWDirectoryUtilities::FileExists(nameofexec))
     {
-    char directory[MAX_PATH];
+    char directory[1024];
     vtkKWDirectoryUtilities::GetFilenamePath(nameofexec, directory);
     vtkKWDirectoryUtilities *util = vtkKWDirectoryUtilities::New();
     this->SetApplicationInstallationDirectory(
@@ -231,7 +231,7 @@ void vtkKWApplication::FindApplicationInstallationDirectory()
     sprintf(setup_key, "%s\\Setup", this->GetApplicationVersionName());
     vtkKWRegisteryUtilities *reg 
       = this->GetRegistery(this->GetApplicationName());
-    char installed_path[MAX_PATH];
+    char installed_path[1024];
     if (reg && reg->ReadValue(setup_key, "InstalledPath", installed_path))
       {
       vtkKWDirectoryUtilities *util = vtkKWDirectoryUtilities::New();
