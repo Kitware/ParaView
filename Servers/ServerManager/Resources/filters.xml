@@ -18,6 +18,7 @@
         name="ShrinkFactors" 
         command="SetShrinkFactors" 
         number_of_elements="3"
+        animateable="1"
         default_values="1 1 1" > 
        <IntRangeDomain name="range" min="1" max="100"/>
      </IntVectorProperty>
@@ -309,6 +310,7 @@
         name="Tolerance"
         command="SetTolerance"
         number_of_elements="1"
+        animateable="1"
         default_values="0.0" >
        <DoubleRangeDomain name="range" min="0" max="1" />
      </DoubleVectorProperty>
@@ -492,6 +494,7 @@
          name="TargetReduction"
          command="SetTargetReduction"
          number_of_elements="1"
+         animateable="1"
          default_values="0.9" >
         <DoubleRangeDomain name="range" min="0" max="1" />
       </DoubleVectorProperty>
@@ -587,6 +590,7 @@
          name="LowPoint"
          command="SetLowPoint"
          number_of_elements="3"
+         animateable="1"
          default_values="0 0 0" >
       </DoubleVectorProperty>
 
@@ -594,6 +598,7 @@
          name="HighPoint"
          command="SetHighPoint"
          number_of_elements="3"
+         animateable="1"
          default_values="0 0 1" >
       </DoubleVectorProperty>
    <!-- End ElevationFilter -->
@@ -1137,6 +1142,7 @@
         name="ScaleFactor"
         command="SetScaleFactor"
         number_of_elements="1"
+        animateable="1"
         default_values="1.0" >
        <DoubleRangeDomain name="range"/>
      </DoubleVectorProperty>
@@ -1184,6 +1190,7 @@
         name="NumberOfSubdivisions" 
         command="SetNumberOfSubdivisions" 
         number_of_elements="1"
+        animateable="1"
         default_values="1" > 
        <IntRangeDomain name="range" min="1" max="4"/>
      </IntVectorProperty>
@@ -1223,6 +1230,7 @@
         name="Offset" 
         command="SetOffset" 
         number_of_elements="1"
+        animateable="1"
         default_values="0" > 
        <IntRangeDomain name="range" min="0"/>
      </IntVectorProperty>
@@ -1614,6 +1622,7 @@
         name="Center"
         command="SetCenter"
         number_of_elements="1"
+        animateable="1"
         default_values="0.0" >
        <DoubleRangeDomain name="range"/>
      </DoubleVectorProperty>
@@ -1749,6 +1758,7 @@
         name="Angle"
         command="SetAngle"
         number_of_elements="1"
+        animateable="1"
         default_values="360" >
        <DoubleRangeDomain name="range"/>
      </DoubleVectorProperty>
@@ -1757,6 +1767,7 @@
         name="Translation"
         command="SetTranslation"
         number_of_elements="1"
+        animateable="1"
         default_values="0" >
        <DoubleRangeDomain name="range"/>
      </DoubleVectorProperty>
@@ -1788,6 +1799,7 @@
          name="ShrinkFactor"
          command="SetShrinkFactor"
          number_of_elements="1"
+         animateable="1"
          default_values="0.5" >
         <DoubleRangeDomain name="range" min="0" max="1" />
       </DoubleVectorProperty>
@@ -1811,6 +1823,7 @@
         name="NumberOfIterations" 
         command="SetNumberOfIterations" 
         number_of_elements="1"
+        animateable="1"
         default_values="20" > 
        <IntRangeDomain name="range" min="0"/>
      </IntVectorProperty>
@@ -1987,6 +2000,7 @@
         name="NumberOfSides" 
         command="SetNumberOfSides" 
         number_of_elements="1"
+        animateable="1"
         default_values="6" > 
        <IntRangeDomain name="range" min="3"/>
      </IntVectorProperty>
@@ -2063,6 +2077,7 @@
         name="ScaleFactor"
         command="SetScaleFactor"
         number_of_elements="1"
+        animateable="1"
         default_values="1.0" >
        <DoubleRangeDomain name="range"/>
      </DoubleVectorProperty>
@@ -2535,6 +2550,7 @@
      <IntVectorProperty 
         name="SampleRateI" 
         command="SetSampleRateI"
+        animateable="1"
         number_of_elements="1" default_values="1">
        <IntRangeDomain name="range" min="1"/>
      </IntVectorProperty>
@@ -2542,12 +2558,14 @@
      <IntVectorProperty 
         name="SampleRateJ" 
         command="SetSampleRateJ"
+        animateable="1"
         number_of_elements="1" default_values="1">
        <IntRangeDomain name="range" min="1"/>
      </IntVectorProperty>
 
      <IntVectorProperty 
         name="SampleRateK" 
+        animateable="1"
         command="SetSampleRateK"
         number_of_elements="1" default_values="1">
        <IntRangeDomain name="range" min="1"/>

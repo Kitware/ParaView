@@ -95,6 +95,7 @@
              name="Position"
              command="SetPosition"
              number_of_elements="3"
+             animateable="1"
              default_values="0 0 0">
            </DoubleVectorProperty>
 
@@ -132,6 +133,7 @@
          command="SetOffset"
          update_self="1"
          number_of_elements="1"
+         animateable="1"
          default_values="0.0" >
         <BoundsDomain name="range" mode="oriented_magnitude">
          <RequiredProperties>
@@ -167,6 +169,7 @@
         command="SetPosition"
         number_of_elements="3"
         update_self="1"
+        animateable="1"
         default_values="0.0 0.0 0.0" >
         <DoubleRangeDomain name="range" />
       </DoubleVectorProperty>
@@ -175,6 +178,7 @@
         command="SetRotation"
         number_of_elements="3"
         update_self="1"
+        animateable="1"
         default_values="0.0 0.0 0.0" >
         <DoubleRangeDomain name="range" />
       </DoubleVectorProperty>
@@ -182,6 +186,7 @@
         name="Scale"
         command="SetScale"
         number_of_elements="3"
+        animateable="1"
         update_self="1"
         default_values="0.0 0.0 0.0" >
         <DoubleRangeDomain name="range" />
@@ -193,6 +198,7 @@
         name="Center"
         command="SetCenter"
         number_of_elements="3"
+        animateable="1"
         default_values="0.0 0.0 0.0" >
         <DoubleRangeDomain name="range" />
       </DoubleVectorProperty>
@@ -201,6 +207,7 @@
         name="Radius"
         command="SetRadius"
         number_of_elements="1"
+        animateable="1"
         default_values="1.0" >
         <DoubleRangeDomain name="range" min="0" />
       </DoubleVectorProperty>
@@ -229,6 +236,7 @@
         command="SetPosition"
         number_of_elements="3"
         update_self="1"
+        animateable="1"
         default_values="0.0 0.0 0.0" >
         <DoubleRangeDomain name="range" />
       </DoubleVectorProperty>
@@ -237,6 +245,7 @@
         command="SetRotation"
         number_of_elements="3"
         update_self="1"
+        animateable="1"
         default_values="0.0 0.0 0.0" >
         <DoubleRangeDomain name="range" />
       </DoubleVectorProperty>
@@ -245,6 +254,7 @@
         command="SetScale"
         number_of_elements="3"
         update_self="1"
+        animateable="1"
         default_values="0.0 0.0 0.0" >
         <DoubleRangeDomain name="range" />
       </DoubleVectorProperty>

@@ -31,6 +31,9 @@
 // set of acceptable values the property can have. An Attempt to set a
 // value outside the domain will fail. If more than one domain is specified,
 // the actual domain is the intersection of all domains.
+// A property can be marked "animateable". In which case, it is shown
+// in the key frame animation interface in the non-advanced mode.
+// Other non-information properties are only visible in the advanced mode.
 // .SECTION See Also
 // vtkSMProxyProperty vtkSMInputProperty vtkSMVectorProperty
 // vtkSMDoubleVectorPropery vtkSMIntVectorPropery vtkSMStringVectorProperty
@@ -170,6 +173,12 @@ public:
   void SetControllerProxy(vtkSMProxy* proxy);
   void SetControllerProperty(vtkSMProperty* property);
 
+  // Description:
+  // Get/Set if the property is animateable. Non-animateable properties are shown in the
+  // GUI only in advanced mode.
+  vtkSetMacro(Animateable, int);
+  vtkGetMacro(Animateable, int);
+
 protected:
   vtkSMProperty();
   ~vtkSMProperty();
@@ -256,6 +265,7 @@ protected:
 
   int ImmediateUpdate;
   int UpdateSelf;
+  int Animateable;
 
   char* XMLName;
 
