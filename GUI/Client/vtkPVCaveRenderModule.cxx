@@ -30,7 +30,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCaveRenderModule);
-vtkCxxRevisionMacro(vtkPVCaveRenderModule, "1.4");
+vtkCxxRevisionMacro(vtkPVCaveRenderModule, "1.5");
 
 
 
@@ -179,9 +179,20 @@ void vtkPVCaveRenderModule::LoadConfigurationFile(int numDisplays)
 
   for (idx = 0; idx < numDisplays; ++idx)
     { // Just a test case.  Configuration file later.
+    char displayName[256];
     double o[3];
     double x[3];
     double y[3];
+
+    File->getline(displayName,256);
+    if (File->fail())
+      {
+      File->close();
+      delete File;
+      vtkErrorMacro(<< "Could not read display " << idx);
+      return;
+      }
+    pm->SetProcessEnvironmentVariable(idx, displayName); 
 
     *File >> o[0];
     *File >> o[1];

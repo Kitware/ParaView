@@ -111,7 +111,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.300");
+vtkCxxRevisionMacro(vtkPVApplication, "1.301");
 vtkCxxSetObjectMacro(vtkPVApplication, RenderModule, vtkPVRenderModule);
 
 
@@ -760,14 +760,6 @@ int vtkPVApplication::CheckForExtension(const char* arg,
     return 1;
     }
   return 0;
-}
-
-
-//----------------------------------------------------------------------------
-void vtkPVApplication::SetEnvironmentVariable(const char* str)
-{ 
-  char* envstr = vtkString::Duplicate(str);
-  putenv(envstr);
 }
 
 //----------------------------------------------------------------------------

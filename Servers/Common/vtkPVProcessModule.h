@@ -192,6 +192,13 @@ public:
   vtkSetMacro(ProgressEnabled, int);
   vtkGetMacro(ProgressEnabled, int);
   
+  // Description:  
+  // This method leaks memory.  It is a quick and dirty way to set different 
+  // DISPLAY environment variables on the render server.  I think the string 
+  // cannot be deleted until paraview exits.  The var should have the form:
+  // "DISPLAY=amber1"
+  virtual void SetProcessEnvironmentVariable(int processId, const char* var);
+
 protected:
   vtkPVProcessModule();
   ~vtkPVProcessModule();

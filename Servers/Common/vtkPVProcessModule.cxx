@@ -45,7 +45,7 @@ int vtkPVProcessModule::GlobalLODFlag = 0;
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProcessModule);
-vtkCxxRevisionMacro(vtkPVProcessModule, "1.9");
+vtkCxxRevisionMacro(vtkPVProcessModule, "1.10");
 
 //----------------------------------------------------------------------------
 vtkPVProcessModule::vtkPVProcessModule()
@@ -392,14 +392,27 @@ int vtkPVProcessModule::GetGlobalLODFlag()
 }
 
 
+//----------------------------------------------------------------------------
 const char* vtkPVProcessModule::GetDemoPath()
 {
   return this->DemoPath;
 }
 
+//----------------------------------------------------------------------------
 void vtkPVProcessModule::SetGUIHelper(vtkProcessModuleGUIHelper* h)
 {
   this->GUIHelper = h;
   h->Register(this);
 }
 
+//----------------------------------------------------------------------------
+// This method leaks memory.  It is a quick and dirty way to set different 
+// DISPLAY environment variables on the render server.  I think the string 
+// cannot be deleted until paraview exits.  The var should have the form:
+// "DISPLAY=amber1"
+void vtkPVProcessModule::SetProcessEnvironmentVariable(int processId,
+                                                       const char* var)
+{
+  char* envstr = vtkString::Duplicate(var);
+  putenv(envstr);
+}

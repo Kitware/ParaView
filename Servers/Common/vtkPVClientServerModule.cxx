@@ -132,7 +132,7 @@ void vtkPVSendStreamToClientServerNodeRMI(void *localArg, void *remoteArg,
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVClientServerModule);
-vtkCxxRevisionMacro(vtkPVClientServerModule, "1.7");
+vtkCxxRevisionMacro(vtkPVClientServerModule, "1.8");
 
 
 //----------------------------------------------------------------------------
@@ -1305,4 +1305,19 @@ int vtkPVClientServerModule::LoadModuleInternal(const char* name,
 #else
   return localResult;
 #endif
+}
+
+//----------------------------------------------------------------------------
+// This method leaks memory.  It is a quick and dirty way to set different 
+// DISPLAY environment variables on the render server.  I think the string 
+// cannot be deleted until paraview exits.  The var should have the form:
+// "DISPLAY=amber1"
+void vtkPVClientServerModule::SetProcessEnvironmentVariable(int processId,
+                                                            const char* var)
+{
+  vtkMultiProcessController* controller = this->GetController();
+  if (controller && controller->GetLocalProcessId() == processId)
+    {
+    this->Superclass::SetProcessEnvironmentVariable(processId, var);
+    }
 }

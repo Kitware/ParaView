@@ -195,12 +195,6 @@ public:
 
   void DisplayTCLError(const char* message);
 
-  // Description:
-  // A method used to set environment variables in the satellite
-  // processes. This method leaks memory and for now should be called
-  // only once.
-  void SetEnvironmentVariable(const char* string);
-
   // Description: 
   // Set or get the display 3D widgets flag.  When this flag is set,
   // the 3D widgets will be displayed when they are created. Otherwise
