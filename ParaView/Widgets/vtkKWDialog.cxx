@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWDialog );
-vtkCxxRevisionMacro(vtkKWDialog, "1.25.2.1");
+vtkCxxRevisionMacro(vtkKWDialog, "1.25.2.2");
 
 int vtkKWDialogCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -107,13 +107,11 @@ int vtkKWDialog::Invoke()
     y = sh / 2;
     }
 
-  this->Script("update idletasks");
+  sscanf(this->Script("winfo reqwidth %s", this->GetWidgetName() ), 
+         "%d", &width);
+  sscanf(this->Script("winfo reqheight %s", this->GetWidgetName()), 
+         "%d", &height);
 
-  // map the window
-  this->Script("wm deiconify %s",this->GetWidgetName());
-
-  sscanf(this->Script("wm geometry %s", this->GetWidgetName()),  "%dx%d+",
-         &width, &height);
   if ( x > width/2 )
     {
     x -= width/2;
@@ -125,6 +123,10 @@ int vtkKWDialog::Invoke()
 
   this->Script("wm geometry %s +%d+%d", this->GetWidgetName(),
                x, y);
+
+  // map the window
+  this->Script("wm deiconify %s",this->GetWidgetName());
+
 
   this->Script("focus %s",this->GetWidgetName());
   this->Script("update idletasks");
