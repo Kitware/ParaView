@@ -28,7 +28,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVContourEntry);
-vtkCxxRevisionMacro(vtkPVContourEntry, "1.45");
+vtkCxxRevisionMacro(vtkPVContourEntry, "1.46");
 
 vtkCxxSetObjectMacro(vtkPVContourEntry, ArrayMenu, vtkPVArrayMenu);
 
@@ -91,7 +91,7 @@ void vtkPVContourEntry::AcceptInternal(vtkClientServerID sourceID)
 
   this->Superclass::AcceptInternal(sourceID);
 
-  numContours = this->ContourValuesList->GetNumberOfItems();
+  numContours = this->ContourValues->GetNumberOfContours();
 
   char **cmds = new char*[numContours+1];
   int *numScalars = new int[numContours+1];
@@ -160,6 +160,7 @@ void vtkPVContourEntry::ResetInternal()
   // The widget has been modified.  
   // Now set the widget back to reflect the contours in the filter.
   this->ContourValuesList->DeleteAll();
+  this->ContourValues->SetNumberOfContours(0);
   for (i = 0; i < numContours; i++)
     {
     this->AddValue(scalars[2*(i+1)]);
@@ -256,7 +257,7 @@ int vtkPVContourEntry::ReadXMLAttributes(vtkPVXMLElement* element,
 //-----------------------------------------------------------------------------
 void vtkPVContourEntry::UpdateProperty()
 {
-  int numContours = this->ContourValuesList->GetNumberOfItems();
+  int numContours = this->ContourValues->GetNumberOfContours();
   float *scalars = new float[2*numContours+1];
   scalars[0] = numContours;
   int i;
@@ -264,7 +265,7 @@ void vtkPVContourEntry::UpdateProperty()
   for (i = 0; i < numContours; i++)
     {
     scalars[2*i+1] = i;
-    scalars[2*(i+1)] = atof(this->ContourValuesList->GetItem(i));
+    scalars[2*(i+1)] = this->ContourValues->GetValue(i);
     }
   this->Property->SetScalars(2*numContours+1, scalars);
   delete [] scalars;

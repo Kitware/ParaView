@@ -22,6 +22,7 @@
 
 #include "vtkPVWidget.h"
 
+class vtkContourValues;
 class vtkKWFrame;
 class vtkKWLabel;
 class vtkKWLabeledFrame;
@@ -50,8 +51,7 @@ public:
   
   // Description:
   // Access to this widget from a script.
-  void AddValue(float val);
-  void RemoveAllValues();
+  void AddValue(double val);
 
   // Description:
   // Button callbacks.
@@ -103,6 +103,8 @@ protected:
   static const int MAX_NUMBER_ENTRIES;
 
   vtkPVContourWidgetProperty *Property;
+
+  vtkContourValues *ContourValues;
   
   vtkKWLabeledFrame* ContourValuesFrame;
   vtkKWFrame* ContourValuesFrame2;
