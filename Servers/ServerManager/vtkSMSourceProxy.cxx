@@ -33,7 +33,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMSourceProxy);
-vtkCxxRevisionMacro(vtkSMSourceProxy, "1.17");
+vtkCxxRevisionMacro(vtkSMSourceProxy, "1.18");
 
 struct vtkSMSourceProxyInternals
 {
@@ -114,6 +114,8 @@ void vtkSMSourceProxy::UpdatePipeline()
 
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   pm->SendStream(this->Servers, command, 0);
+
+  this->CreateParts();
 }
 
 //---------------------------------------------------------------------------
@@ -338,7 +340,9 @@ void vtkSMSourceProxy::UpdateDataInformation()
     // it's ref. count
     prop->Delete();
     }
+  property->SetInformationOnly(0);
   this->ConvertDataInformationToProperty(info, property);
+  property->SetInformationOnly(1);
 }
 
 //---------------------------------------------------------------------------
@@ -443,15 +447,24 @@ void vtkSMSourceProxy::ConvertFieldDataInformationToProperty(
 {
   int i;
 
+  vtkSMProperty* arrays = prop->GetSubProperty("Arrays");
+  if (!arrays)
+    {
+    arrays = vtkSMProperty::New();
+    prop->AddSubProperty("Arrays", arrays);
+    // This is OK. AddSubProperty increments ref count
+    arrays->Delete();
+    }
+
   int numArrays = info->GetNumberOfArrays();
   for (i=0; i<numArrays; i++)
     {
     vtkPVArrayInformation* ainfo = info->GetArrayInformation(i);
-    vtkSMProperty* array = prop->GetSubProperty(ainfo->GetName());
+    vtkSMProperty* array = arrays->GetSubProperty(ainfo->GetName());
     if (!array)
       {
       array = vtkSMProperty::New();
-      prop->AddSubProperty(ainfo->GetName(), array);
+      arrays->AddSubProperty(ainfo->GetName(), array);
       // This is OK. AddSubProperty increments ref count
       array->Delete();
       }
