@@ -71,7 +71,7 @@ int vtkKWApplication::WidgetVisibility = 1;
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.135");
+vtkCxxRevisionMacro(vtkKWApplication, "1.136");
 
 extern "C" int Vtktcl_Init(Tcl_Interp *interp);
 extern "C" int Vtkkwwidgetstcl_Init(Tcl_Interp *interp);
@@ -90,6 +90,7 @@ vtkKWApplication::vtkKWApplication()
   this->MinorVersion = 0;
   this->ApplicationVersionName = vtkString::Duplicate("Kitware10");
   this->ApplicationReleaseName = vtkString::Duplicate("unknown");
+  this->ApplicationPrettyName = NULL;
   this->ApplicationInstallationDirectory = NULL;
 
   this->InExit = 0;
@@ -212,6 +213,7 @@ vtkKWApplication::~vtkKWApplication()
   this->SetApplicationName(NULL);
   this->SetApplicationVersionName(NULL);
   this->SetApplicationReleaseName(NULL);
+  this->SetApplicationPrettyName(NULL);
   this->SetApplicationInstallationDirectory(NULL);
 
   if (this->TraceFile)
@@ -1011,9 +1013,10 @@ void vtkKWApplication::ConfigureAbout()
     }
 
   ostrstream str;
-  str << "Application : " << this->GetApplicationName() 
-      << "\nVersion : " << this->GetApplicationVersionName() 
-      << "\nRelease : " << this->GetApplicationReleaseName() << ends;
+  str << this->GetApplicationPrettyName()
+      << "\n  Application : " << this->GetApplicationName() 
+      << "\n  Version : " << this->GetApplicationVersionName() 
+      << "\n  Release : " << this->GetApplicationReleaseName() << ends;
 
   this->AboutDialog->SetText(str.str());
 
@@ -1316,9 +1319,6 @@ int vtkKWApplication::GetLimitedEditionModeAndWarn(const char *feature)
 {
   if (this->LimitedEditionMode)
     {
-    ostrstream title_str;
-    title_str << this->GetApplicationName() << " Limited Edition" << ends;
-
     ostrstream feature_str;
     if (feature)
       {
@@ -1335,15 +1335,29 @@ int vtkKWApplication::GetLimitedEditionModeAndWarn(const char *feature)
             << ends;
 
     vtkKWMessageDialog::PopupMessage(
-      this, 0, title_str.str(), msg_str.str(), 
+      this, 0, this->GetApplicationPrettyName(), msg_str.str(), 
       vtkKWMessageDialog::WarningIcon);
 
-    title_str.rdbuf()->freeze(0);
     feature_str.rdbuf()->freeze(0);
     msg_str.rdbuf()->freeze(0);
     }
 
   return this->LimitedEditionMode;
+}
+
+//----------------------------------------------------------------------------
+const char* vtkKWApplication::GetApplicationPrettyName()
+{
+  ostrstream pretty_str;
+  pretty_str << (this->ApplicationName ? this->ApplicationName : "")
+             << " " << this->MajorVersion << "." << this->MinorVersion
+             << (this->LimitedEditionMode ? " LE" : "")
+             << ends;
+
+  this->SetApplicationPrettyName(pretty_str.str());
+  pretty_str.rdbuf()->freeze(0);
+
+  return this->ApplicationPrettyName;
 }
 
 //----------------------------------------------------------------------------
@@ -1357,6 +1371,8 @@ void vtkKWApplication::PrintSelf(ostream& os, vtkIndent indent)
      << this->GetApplicationReleaseName() << endl;
   os << indent << "ApplicationVersionName: " 
      << this->GetApplicationVersionName() << endl;
+  os << indent << "ApplicationPrettyName: " 
+     << this->GetApplicationPrettyName() << endl;
   os << indent << "ShowBalloonHelp: " << (this->ShowBalloonHelp ? "on":"off") << endl;
   os << indent << "BalloonHelpDelay: " << this->GetBalloonHelpDelay() << endl;
   os << indent << "DialogUp: " << this->GetDialogUp() << endl;

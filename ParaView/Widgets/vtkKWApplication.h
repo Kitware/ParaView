@@ -126,15 +126,33 @@ public:
 
   // Description:
   // Set/Get the ApplicationVersionName - this is the name + version number
+  // (no spaces, usually used as the master key to store registery settings,
+  //  ex: VolView20, ParaView1.1, etc)
   vtkSetStringMacro(ApplicationVersionName);
   vtkGetStringMacro(ApplicationVersionName);
 
   // Description:
   // Set/Get the ApplicationReleaseName - this is the release of the 
-  // application version, typically beta 1, beta 2, final, patch 1, patch 2
+  // application version, typically: beta1, beta2, final, patch1, patch2
   vtkSetStringMacro(ApplicationReleaseName);
   vtkGetStringMacro(ApplicationReleaseName);
-  
+
+  // Description:
+  // Get the "pretty" name for the application. This is most of the time
+  // used as windows/dialog title, About box, etc. It combines the application
+  // name, its mode (limited edition or not) and its version.
+  virtual const char* GetApplicationPrettyName();
+
+  // Descrition:
+  // Set/Get if the application is running in limited edition mode.
+  // GetLimitedEditionModeAndWarn will return the limited edition mode ; if 
+  // the mode is true, it will also display a popup warning stating that a
+  // feature (string parameter) is not available in this mode.
+  virtual void SetLimitedEditionMode(int arg);
+  vtkBooleanMacro(LimitedEditionMode, int);
+  vtkGetMacro(LimitedEditionMode, int);
+  virtual int GetLimitedEditionModeAndWarn(const char *feature);
+
   // Description:
   // Set/Get the directory in which the current application is supposed
   // to be installed.
@@ -309,16 +327,6 @@ public:
   // level set).
   virtual void GetApplicationSettingsFromRegistery();
 
-  // Descrition:
-  // Set/Get if the application is running in limited edition mode.
-  // GetLimitedEditionModeAndWarn will return the limited edition mode ; if 
-  // the mode is true, it will also display a popup warning stating that a
-  // feature (string parameter) is not available in this mode.
-  virtual void SetLimitedEditionMode(int arg);
-  vtkBooleanMacro(LimitedEditionMode, int);
-  vtkGetMacro(LimitedEditionMode, int);
-  virtual int GetLimitedEditionModeAndWarn(const char *feature);
-
 protected:
   vtkKWApplication();
   ~vtkKWApplication();
@@ -340,6 +348,9 @@ protected:
   char *ApplicationReleaseName;
   int MajorVersion;
   int MinorVersion;
+
+  char *ApplicationPrettyName;
+  vtkSetStringMacro(ApplicationPrettyName);
 
   vtkSetStringMacro(ApplicationInstallationDirectory);
   char *ApplicationInstallationDirectory;
