@@ -128,7 +128,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.240");
+vtkCxxRevisionMacro(vtkPVApplication, "1.241");
 vtkCxxSetObjectMacro(vtkPVApplication, RenderModule, vtkPVRenderModule);
 
 
@@ -261,7 +261,7 @@ public:
   ~vtkPVOutputWindow()
     {
     ostrstream str;
-    int cc;
+    unsigned int cc;
     for ( cc = 0; cc < this->Errors.size(); cc ++ )
       {
       str << this->Errors[cc].c_str() << endl;
@@ -282,7 +282,7 @@ public:
     if ( !win && this->Windows )
       {
       ostrstream str;
-      int cc;
+      unsigned int cc;
       for ( cc = 0; cc < this->Errors.size(); cc ++ )
         {
         str << this->Errors[cc].c_str() << endl;
