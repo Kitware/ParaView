@@ -18,7 +18,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWListBox );
-vtkCxxRevisionMacro(vtkKWListBox, "1.25");
+vtkCxxRevisionMacro(vtkKWListBox, "1.26");
 
 
 //----------------------------------------------------------------------------
@@ -138,6 +138,12 @@ void vtkKWListBox::SetSelectState(int idx, int state)
     {
     return;
     }
+
+  int was_disabled = !this->Enabled;
+  if (was_disabled)
+    {
+    this->SetEnabled(1);
+    }
   if (state)
     {
     this->Script("%s selection set %d", this->Listbox->GetWidgetName(), idx);
@@ -145,6 +151,10 @@ void vtkKWListBox::SetSelectState(int idx, int state)
   else
     {
     this->Script("%s selection clear %d", this->Listbox->GetWidgetName(), idx);
+    }
+  if (was_disabled)
+    {
+    this->SetEnabled(0);
     }
 }
 
