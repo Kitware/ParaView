@@ -48,6 +48,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkTk.h" // Needed for Tk_Window
 
 class vtkKWLabel;
+class vtkKWMessageDialog;
+class vtkKWMessageDialog;
 class vtkKWRegisteryUtilities;
 class vtkKWSplashScreen;
 class vtkKWWidget;
@@ -342,9 +344,18 @@ protected:
 
   int ExitOnReturn;
 
+  // Splash screen
+
+  virtual void CreateSplashScreen() {};
   vtkKWSplashScreen *SplashScreen;
   int HasSplashScreen;
   int ShowSplashScreen;
+
+  // About dialog
+
+  virtual void ConfigureAbout();
+  vtkKWMessageDialog *AboutDialog;
+  vtkKWLabel         *AboutDialogImage;
 
 private:
   vtkKWApplication(const vtkKWApplication&);   // Not implemented.
@@ -352,11 +363,3 @@ private:
 };
 
 #endif
-
-
-
-
-
-
-
-

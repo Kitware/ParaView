@@ -71,7 +71,7 @@ int vtkKWApplication::WidgetVisibility = 1;
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.126");
+vtkCxxRevisionMacro(vtkKWApplication, "1.127");
 
 extern "C" int Vtktcl_Init(Tcl_Interp *interp);
 extern "C" int Vtkkwwidgetstcl_Init(Tcl_Interp *interp);
@@ -79,6 +79,7 @@ extern "C" int Vtkkwwidgetstcl_Init(Tcl_Interp *interp);
 int vtkKWApplicationCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
 
+//----------------------------------------------------------------------------
 vtkKWApplication::vtkKWApplication()
 {
   this->BalloonHelpWidget = 0;
@@ -103,7 +104,10 @@ vtkKWApplication::vtkKWApplication()
   this->UseMessageDialogs = 1;  
 
   this->Windows = vtkKWWindowCollection::New();  
-  
+
+  this->AboutDialog      = 0;
+  this->AboutDialogImage = 0;
+
   // add the application as $app
 
   if (vtkKWApplication::WidgetVisibility)
@@ -173,17 +177,37 @@ vtkKWApplication::vtkKWApplication()
   this->ApplicationExited = 0;
 }
 
+//----------------------------------------------------------------------------
 vtkKWApplication::~vtkKWApplication()
 {
-  if ( this->BalloonHelpWindow )
+  this->SetBalloonHelpPending(NULL);
+
+  if (this->BalloonHelpWindow)
     {
     this->BalloonHelpWindow->Delete();
+    this->BalloonHelpWindow = NULL;
     }
-  if ( this->BalloonHelpLabel )
+
+  if (this->BalloonHelpLabel)
     {
     this->BalloonHelpLabel->Delete();
+    this->BalloonHelpLabel = NULL;
     }
+
   this->SetBalloonHelpWidget(0);
+
+  if (this->AboutDialogImage)
+    {
+    this->AboutDialogImage->Delete();
+    this->AboutDialogImage = NULL;
+    }
+
+  if (this->AboutDialog)
+    {
+    this->AboutDialog->Delete();
+    this->AboutDialog = NULL;
+    }
+
   if (this->Windows)
     {
     this->Windows->Delete();
@@ -203,12 +227,14 @@ vtkKWApplication::~vtkKWApplication()
     delete this->TraceFile;
     this->TraceFile = NULL;
     }
+
   if (this->Registery )
     {
     this->Registery->Delete();
     }
 }
 
+//----------------------------------------------------------------------------
 void vtkKWApplication::SetApplication(vtkKWApplication*) 
 { 
   vtkErrorMacro( << "Do not set the Application on an Application" << endl); 
@@ -404,25 +430,42 @@ void vtkKWApplication::Close(vtkKWWindow *win)
     }
 }
 
+//----------------------------------------------------------------------------
 vtkKWWindowCollection *vtkKWApplication::GetWindows()
 {
   return this->Windows;
 }
 
 
+//----------------------------------------------------------------------------
 void vtkKWApplication::AddWindow(vtkKWWindow *w)
 {
   this->Windows->AddItem(w);
 }
 
+//----------------------------------------------------------------------------
 void vtkKWApplication::Exit()
 {
   // Avoid a recursive exit.
+
   if (this->InExit)
     {
     return;
     }
   this->InExit = 1;
+
+  if (this->AboutDialogImage)
+    {
+    this->AboutDialogImage->Delete();
+    this->AboutDialogImage = NULL;
+    }
+
+  if (this->AboutDialog)
+    {
+    this->AboutDialog->Delete();
+    this->AboutDialog = NULL;
+    }
+
   vtkKWWindow* win = 0;
   this->Windows->InitTraversal();
   
@@ -437,17 +480,18 @@ void vtkKWApplication::Exit()
     }
   
   this->SetBalloonHelpPending(NULL);
+
   if (this->BalloonHelpWindow)
     {
     this->BalloonHelpWindow->Delete();
     this->BalloonHelpWindow = NULL;
     }
+
   if (this->BalloonHelpLabel)
     {
     this->BalloonHelpLabel->Delete();
     this->BalloonHelpLabel = NULL;
     }
-//  this->SetBalloonHelpPending(NULL);
 
   if (this->SplashScreen)
     {
@@ -472,6 +516,7 @@ void vtkKWApplication::Exit()
 #define ET_TK_LIBRARY "/ThisIsNotAPath/Tcl/lib/tk8.2"
 #endif
 
+//----------------------------------------------------------------------------
 Tcl_Interp *vtkKWApplication::InitializeTcl(int argc, 
                                             char *argv[], 
                                             ostream *err)
@@ -612,6 +657,7 @@ Tcl_Interp *vtkKWApplication::InitializeTcl(int argc,
   return interp;
 }
 
+//----------------------------------------------------------------------------
 void vtkKWApplication::Start()
 { 
   int i;
@@ -638,11 +684,13 @@ void vtkKWApplication::Start()
   delete [] argv;
 }
 
+//----------------------------------------------------------------------------
 void vtkKWApplication::Start(char *arg)
 { 
   this->Start(1,&arg);
 }
 
+//----------------------------------------------------------------------------
 void vtkKWApplication::Start(int /*argc*/, char ** /*argv*/)
 { 
   // Go to set it here since we do not have the application name in the
@@ -667,11 +715,13 @@ void vtkKWApplication::Start(int /*argc*/, char ** /*argv*/)
   //Tk_MainLoop();
 }
 
+//----------------------------------------------------------------------------
 void vtkKWApplication::DoOneTclEvent()
 {
   Tcl_DoOneEvent(0);
 }
 
+//----------------------------------------------------------------------------
 void vtkKWApplication::DisplayHelp(vtkKWWindow* master)
 {
 #ifdef _WIN32
@@ -708,7 +758,6 @@ void vtkKWApplication::DisplayHelp(vtkKWWindow* master)
 #endif
 }
 
-
 //----------------------------------------------------------------------------
 void vtkKWApplication::BalloonHelpTrigger(vtkKWWidget *widget)
 {
@@ -736,7 +785,6 @@ void vtkKWApplication::BalloonHelpTrigger(vtkKWWidget *widget)
   result = this->GetMainInterp()->result;
   this->SetBalloonHelpPending(result);
 }
-
 
 //----------------------------------------------------------------------------
 void vtkKWApplication::BalloonHelpDisplay(vtkKWWidget *widget)
@@ -828,7 +876,6 @@ void vtkKWApplication::BalloonHelpDisplay(vtkKWWidget *widget)
 
 }
 
-
 //----------------------------------------------------------------------------
 void vtkKWApplication::BalloonHelpCancel()
 {
@@ -847,7 +894,6 @@ void vtkKWApplication::BalloonHelpCancel()
     }
   this->SetBalloonHelpWidget(0);
 }
-
 
 //----------------------------------------------------------------------------
 void vtkKWApplication::BalloonHelpWithdraw()
@@ -898,25 +944,66 @@ int vtkKWApplication::GetWidgetVisibility()
 //----------------------------------------------------------------------------
 void vtkKWApplication::DisplayAbout(vtkKWWindow* master)
 {
-  if ( this->InExit )
+  if (this->InExit)
     {
     return;
     }
+
+  if (!this->AboutDialog)
+    {
+    this->AboutDialog = vtkKWMessageDialog::New();
+    }
+
+  if (!this->AboutDialog->IsCreated())
+    {
+    this->AboutDialog->SetMasterWindow(master);
+    this->AboutDialog->Create(this, "");
+    }
+
+  this->ConfigureAbout();
+
+  this->AboutDialog->Invoke();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWApplication::ConfigureAbout()
+{
+  if (this->HasSplashScreen && 
+      this->SplashScreen)
+    {
+    if (!this->SplashScreen->GetImageName())
+      {
+      this->CreateSplashScreen();
+      }
+    if (this->SplashScreen->GetImageName())
+      {
+      if (!this->AboutDialogImage)
+        {
+        this->AboutDialogImage = vtkKWLabel::New();
+        }
+      if (!this->AboutDialogImage->IsCreated())
+        {
+        this->AboutDialogImage->SetParent(this->AboutDialog->GetTopFrame());
+        this->AboutDialogImage->Create(this, 0);
+        }
+
+      this->Script("%s config -image {%s}",
+                   this->AboutDialogImage->GetWidgetName(), 
+                   this->SplashScreen->GetImageName());
+      this->Script("pack %s -side top", 
+                   this->AboutDialogImage->GetWidgetName());
+      }
+    }
+
   ostrstream str;
   str << "Application : " << this->GetApplicationName() 
       << "\nVersion : " << this->GetApplicationVersionName() 
       << "\nRelease : " << this->GetApplicationReleaseName() << ends;
 
-  char* msg = str.str();
-  vtkKWMessageDialog *dlg = vtkKWMessageDialog::New();
-  dlg->SetMasterWindow(master);
-  dlg->Create(this,"");
-  dlg->SetText(msg);
-  dlg->Invoke();  
-  dlg->Delete(); 
-  delete[] msg;
-}
+  this->AboutDialog->SetText(str.str());
 
+  str.rdbuf()->freeze(0);
+}
 
 //----------------------------------------------------------------------------
 void vtkKWApplication::AddTraceEntry(const char *format, ...)
@@ -952,6 +1039,7 @@ void vtkKWApplication::AddTraceEntry(const char *format, ...)
     }
 }
 
+//----------------------------------------------------------------------------
 vtkKWRegisteryUtilities *vtkKWApplication::GetRegistery( const char*toplevel )
 {
   this->GetRegistery();
@@ -959,6 +1047,7 @@ vtkKWRegisteryUtilities *vtkKWApplication::GetRegistery( const char*toplevel )
   return this->Registery;
 }
 
+//----------------------------------------------------------------------------
 vtkKWRegisteryUtilities *vtkKWApplication::GetRegistery()
 {
   if ( !this->Registery )
@@ -968,6 +1057,7 @@ vtkKWRegisteryUtilities *vtkKWApplication::GetRegistery()
   return this->Registery;
 }
 
+//----------------------------------------------------------------------------
 void vtkKWApplication::SetBalloonHelpWidget( vtkKWWidget *widget )
 {
   if ( this->InExit && widget )
@@ -986,7 +1076,7 @@ void vtkKWApplication::SetBalloonHelpWidget( vtkKWWidget *widget )
     }  
 }
 
-
+//----------------------------------------------------------------------------
 int vtkKWApplication::GetMessageDialogResponse(const char* dialogname)
 {
   char buffer[1024];
@@ -998,6 +1088,7 @@ int vtkKWApplication::GetMessageDialogResponse(const char* dialogname)
   return retval;
 }
 
+//----------------------------------------------------------------------------
 void vtkKWApplication::SetMessageDialogResponse(const char* dialogname, 
                                                int response)
 {
@@ -1005,6 +1096,7 @@ void vtkKWApplication::SetMessageDialogResponse(const char* dialogname,
 }
 
 
+//----------------------------------------------------------------------------
 int vtkKWApplication::SetRegisteryValue(int level, const char* subkey, 
                                         const char* key, 
                                         const char* format, ...)
@@ -1031,6 +1123,7 @@ int vtkKWApplication::SetRegisteryValue(int level, const char* subkey,
   return res;
 }
 
+//----------------------------------------------------------------------------
 int vtkKWApplication::GetRegisteryValue(int level, const char* subkey, 
                                         const char* key, char* value)
 {
@@ -1058,6 +1151,7 @@ int vtkKWApplication::GetRegisteryValue(int level, const char* subkey,
   return res;
 }
 
+//----------------------------------------------------------------------------
 int vtkKWApplication::DeleteRegisteryValue(int level, const char* subkey, 
                                       const char* key)
 {
