@@ -40,7 +40,7 @@
 #include "vtkObject.h"
 
 #include "vtkDataSetAttributes.h" // Needed for FieldList
-#include <map> // Needed for GlobalIdMap
+#include <vtkstd/map> // Needed for GlobalIdMap
 
 class vtkDataSet;
 class vtkUnstructuredGrid;

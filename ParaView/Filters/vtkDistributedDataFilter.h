@@ -53,7 +53,7 @@ class vtkDataArray;
 class vtkIntArray;
 class vtkIdList;
 class vtkUnstructuredGrid;
-#include <map>
+#include <vtkstd/map> // used for declaration
 
 class VTK_EXPORT vtkDistributedDataFilter: public vtkDataSetToUnstructuredGridFilter
 {
