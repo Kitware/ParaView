@@ -41,6 +41,8 @@ public:
   vtkSetMacro(DataType, int);
   vtkGetMacro(DataType, int);
 
+  // Description:
+  // Set/get array's name
   vtkSetStringMacro(Name);
   vtkGetStringMacro(Name);
 
@@ -58,6 +60,13 @@ public:
     { this->SetComponentRange(comp, range[0], range[1]);}
   double *GetComponentRange(int component);
   void GetComponentRange(int comp, double *range);
+
+  // Description:
+  // This method return the Min and Max possible range of the native
+  // data type. For example if a vtkScalars consists of unsigned char
+  // data these will return (0,255). 
+  // Nothing particular for 12bits data is done
+  void GetDataTypeRange(double range[2]);
 
   // Description:
   // Returns 1 if the array can be combined.

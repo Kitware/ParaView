@@ -19,7 +19,7 @@
 #include "vtkObjectFactory.h"
 
 vtkStandardNewMacro(vtkPVArrayInformation);
-vtkCxxRevisionMacro(vtkPVArrayInformation, "1.2");
+vtkCxxRevisionMacro(vtkPVArrayInformation, "1.3");
 
 //----------------------------------------------------------------------------
 vtkPVArrayInformation::vtkPVArrayInformation()
@@ -156,6 +156,63 @@ void vtkPVArrayInformation::GetComponentRange(int comp, double *range)
   range[1] = ptr[1];
 }
 
+//----------------------------------------------------------------------------
+void vtkPVArrayInformation::GetDataTypeRange(double range[2])
+{
+  int dataType = this->GetDataType();
+  switch (dataType)
+    {
+    case VTK_BIT:
+      range[0] = VTK_BIT_MAX;
+      range[1] = VTK_BIT_MAX;
+      break;
+    case VTK_UNSIGNED_CHAR:
+      range[0] = VTK_UNSIGNED_CHAR_MIN;
+      range[1] = VTK_UNSIGNED_CHAR_MAX;
+      break;
+    case VTK_CHAR:
+      range[0] = VTK_CHAR_MIN;
+      range[1] = VTK_CHAR_MAX;
+      break;
+    case VTK_UNSIGNED_SHORT:
+      range[0] = VTK_UNSIGNED_SHORT_MIN;
+      range[1] = VTK_UNSIGNED_SHORT_MAX;
+      break;
+    case VTK_SHORT:
+      range[0] = VTK_SHORT_MIN;
+      range[1] = VTK_SHORT_MAX;
+      break;
+    case VTK_UNSIGNED_INT:
+      range[0] = VTK_UNSIGNED_INT_MIN;
+      range[1] = VTK_UNSIGNED_INT_MAX;
+      break;
+    case VTK_INT:
+      range[0] = VTK_INT_MIN;
+      range[1] = VTK_INT_MAX;
+      break;
+    case VTK_UNSIGNED_LONG:
+      range[0] = VTK_UNSIGNED_LONG_MIN;
+      range[1] = VTK_UNSIGNED_LONG_MAX;
+      break;
+    case VTK_LONG:
+      range[0] = VTK_LONG_MIN;
+      range[1] = VTK_LONG_MAX;
+      break;
+    case VTK_FLOAT:
+      range[0] = VTK_FLOAT_MIN;
+      range[1] = VTK_FLOAT_MAX;
+      break;
+    case VTK_DOUBLE:
+      range[0] = VTK_DOUBLE_MIN;
+      range[1] = VTK_DOUBLE_MAX;
+      break;
+    default:
+      // Default value:
+      range[0] = 0;
+      range[1] = 1;
+      break;
+    }
+}
 //----------------------------------------------------------------------------
 void vtkPVArrayInformation::AddRanges(vtkPVArrayInformation *info)
 {
