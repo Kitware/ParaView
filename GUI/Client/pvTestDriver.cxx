@@ -97,7 +97,7 @@ void pvTestDriver::CollectConfiguredOptions()
 #ifdef VTK_MPIRUN_EXE
   this->MPIRun = VTK_MPIRUN_EXE;
 #else
-  cerr << "Error: VTK_MPIRUN_EXE must be set of VTK_USE_MPI is on.\n";
+  cerr << "Error: VTK_MPIRUN_EXE must be set when VTK_USE_MPI is on.\n";
   return;
 #endif
   int serverNumProc = 1;
