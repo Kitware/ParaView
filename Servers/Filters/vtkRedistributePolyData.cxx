@@ -43,7 +43,7 @@
 #include "vtkMultiProcessController.h"
 
 vtkStandardNewMacro(vtkRedistributePolyData);
-vtkCxxRevisionMacro(vtkRedistributePolyData, "1.15");
+vtkCxxRevisionMacro(vtkRedistributePolyData, "1.16");
 
 vtkCxxSetObjectMacro(vtkRedistributePolyData, Controller, 
                      vtkMultiProcessController);
@@ -58,7 +58,10 @@ vtkRedistributePolyData::vtkRedistributePolyData()
 {
   this->Controller = NULL;
   this->Controller = vtkMultiProcessController::GetGlobalController();
-  this->Controller->Register(this);
+  if( this->Controller )
+    {
+    this->Controller->Register(this);
+    }
   //this->Locator = vtkPointLocator::New();
   this->colorProc = 0;
 }
