@@ -1,3 +1,9 @@
+IF (EXECUTABLE_OUTPUT_PATH)
+  SET (VTK_EXECUTABLE ${EXECUTABLE_OUTPUT_PATH}/vtk)
+ELSE (EXECUTABLE_OUTPUT_PATH)
+  SET (VTK_EXECUTABLE ${VTK_BINARY_DIR}/Wrapping/Tcl/${CMAKE_CFG_INTDIR}/vtk)
+ENDIF (EXECUTABLE_OUTPUT_PATH)
+
 IF (VTK_USE_MPI)
   IF (UNIX)
     IF (MPIRUN)
@@ -85,3 +91,11 @@ FOREACH (tfile
             -V ${PARAVIEW_SOURCE_DIR}/Data/Baseline/${tfile}.png)
 ENDFOREACH (tfile)
 
+ADD_TEST(PrintSelf-Widgets ${TCL_TCLSH}
+         ${VTK_SOURCE_DIR}/Common/Testing/Tcl/PrintSelfCheck.tcl  
+         ${PARAVIEW_SOURCE_DIR}/ParaView)
+
+ADD_TEST(TestSetObjectMacro-Widgets ${TCL_TCLSH}
+         ${KWCommon_SOURCE_DIR}/Testing/Tcl/FindString.tcl
+	 "${PARAVIEW_SOURCE_DIR}/ParaView/vtk\\\\*.h"
+	 "vtkSetObjectMacro")
