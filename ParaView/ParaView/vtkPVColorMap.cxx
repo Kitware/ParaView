@@ -75,7 +75,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVColorMap);
-vtkCxxRevisionMacro(vtkPVColorMap, "1.48");
+vtkCxxRevisionMacro(vtkPVColorMap, "1.49");
 
 int vtkPVColorMapCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -802,7 +802,7 @@ void vtkPVColorMap::SetNumberOfVectorComponents(int  num)
 {
   int idx;
 
-  if (this->Application)
+  if (this->Application && num != 0)
     {
     vtkErrorMacro("You must set the number of vector components before "
                   "you create this color map.");
