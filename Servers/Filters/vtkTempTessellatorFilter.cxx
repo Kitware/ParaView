@@ -32,7 +32,7 @@
 #include "vtkDataSetSubdivisionAlgorithm.h"
 #include "vtkSubdivisionAlgorithm.h"
 
-vtkCxxRevisionMacro(vtkTempTessellatorFilter, "1.8");
+vtkCxxRevisionMacro(vtkTempTessellatorFilter, "1.9");
 vtkStandardNewMacro(vtkTempTessellatorFilter);
 
 // ========================================
@@ -373,6 +373,7 @@ void vtkTempTessellatorFilter::Teardown()
     delete [] this->OutputAttributeIndices;
     }
   this->Subdivider->ResetFieldList();
+  this->Subdivider->SetMesh(0);
 }
 
 // ========================================
