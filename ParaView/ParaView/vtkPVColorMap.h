@@ -218,8 +218,8 @@ public:
   // Description:
   // GUI components access
   vtkGetObjectMacro(ScalarBarCheck, vtkKWCheckButton);
-  vtkGetObjectMacro(TitleTextProperty, vtkKWTextProperty);
-  vtkGetObjectMacro(LabelTextProperty, vtkKWTextProperty);
+  vtkGetObjectMacro(TitleTextPropertyWidget, vtkKWTextProperty);
+  vtkGetObjectMacro(LabelTextPropertyWidget, vtkKWTextProperty);
 
 protected:
   vtkPVColorMap();
@@ -275,8 +275,8 @@ protected:
   vtkKWLabel*        ScalarBarLabelFormatLabel;
   vtkKWEntry*        ScalarBarLabelFormatEntry;
   
-  vtkKWTextProperty *TitleTextProperty;
-  vtkKWTextProperty *LabelTextProperty;
+  vtkKWTextProperty *TitleTextPropertyWidget;
+  vtkKWTextProperty *LabelTextPropertyWidget;
   
   // For the map image.
   unsigned char *MapData;
