@@ -54,7 +54,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVSourcesNavigationWindow );
-vtkCxxRevisionMacro(vtkPVSourcesNavigationWindow, "1.6");
+vtkCxxRevisionMacro(vtkPVSourcesNavigationWindow, "1.7");
 
 //-----------------------------------------------------------------------------
 vtkPVSourcesNavigationWindow::vtkPVSourcesNavigationWindow()
@@ -179,6 +179,7 @@ void vtkPVSourcesNavigationWindow::Create(vtkKWApplication *app, const char *arg
     opts << " -height " << this->Height;
     }
 
+  opts << " -highlightthickness 0";
   opts << " -bg white" << ends;
 
   char* optstr = opts.str();
