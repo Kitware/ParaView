@@ -43,7 +43,7 @@
 
 
 
-vtkCxxRevisionMacro(vtkCTHExtractAMRPart, "1.13");
+vtkCxxRevisionMacro(vtkCTHExtractAMRPart, "1.14");
 vtkStandardNewMacro(vtkCTHExtractAMRPart);
 vtkCxxSetObjectMacro(vtkCTHExtractAMRPart,ClipPlane,vtkPlane);
 
@@ -149,13 +149,13 @@ const char* vtkCTHExtractAMRPart::GetVolumeArrayName(int idx)
 //--------------------------------------------------------------------------
 void vtkCTHExtractAMRPart::SetOutput(int idx, vtkPolyData* d)
 {
-  this->vtkSource::SetNthOutput(idx, d);  
+  this->Superclass::SetNthOutput(idx, d);  
 }
 
 //----------------------------------------------------------------------------
 vtkPolyData* vtkCTHExtractAMRPart::GetOutput(int idx)
 {
-  return (vtkPolyData *) this->vtkSource::GetOutput(idx); 
+  return (vtkPolyData *) this->Superclass::GetOutput(idx); 
 }
 
 //----------------------------------------------------------------------------
@@ -214,15 +214,20 @@ void vtkCTHExtractAMRPart::Execute()
     tmps[idx] = vtkPolyData::New();
     }
 
+  this->UpdateProgress(.05);
+
   // Loops over all blocks.
   // It would be easier to loop over parts frist, but them we would
   // have to extract the blocks more than once. 
   numBlocks = inputCopy->GetNumberOfBlocks();
   for (blockId = 0; blockId < numBlocks; ++blockId)
     {
+    double startProg = .05 + .9 * static_cast<double>(blockId)/static_cast<double>(numBlocks); 
+    double endProg = .05 + .9 * static_cast<double>(blockId+1)/static_cast<double>(numBlocks); 
+    this->UpdateProgress(startProg);
     block = vtkImageData::New();
     inputCopy->GetBlock(blockId, block);
-    this->ExecuteBlock(block, tmps);
+    this->ExecuteBlock(block, tmps, startProg, endProg);
     block->Delete();
     block = NULL;
     }
@@ -230,6 +235,7 @@ void vtkCTHExtractAMRPart::Execute()
   // Copy appends to output (one part per output).
   for (idx = 0; idx < num; ++idx)
     {
+    this->UpdateProgress(.95 + .05 * static_cast<double>(idx)/static_cast<double>(num));
     output = this->GetOutput(idx);
     output->ShallowCopy(tmps[idx]);
     tmps[idx]->Delete();
@@ -272,7 +278,8 @@ void vtkCTHExtractAMRPart::Execute()
 
 //-----------------------------------------------------------------------------
 void vtkCTHExtractAMRPart::ExecuteBlock(vtkImageData* block, 
-                                        vtkPolyData** tmps)
+                                        vtkPolyData** tmps,
+                                        double startProg, double endProg)
 {
   vtkFloatArray* pointVolumeFraction;
   int idx, num;
@@ -283,6 +290,7 @@ void vtkCTHExtractAMRPart::ExecuteBlock(vtkImageData* block,
   num = this->VolumeArrayNames->GetNumberOfStrings();
   for (idx = 0; idx < num; ++idx)
     {
+    this->UpdateProgress(startProg + .3 * (endProg - startProg) * static_cast<double>(idx)/static_cast<double>(num));
     arrayName = this->VolumeArrayNames->GetString(idx);
     pointVolumeFraction = (vtkFloatArray*)(block->GetPointData()->GetArray(arrayName));
     if (pointVolumeFraction == NULL)
@@ -337,6 +345,7 @@ void vtkCTHExtractAMRPart::ExecuteBlock(vtkImageData* block,
   // Loop over parts extracting surfaces.
   for (idx = 0; idx < num; ++idx)
     {
+    this->UpdateProgress(startProg + .7 * (endProg - startProg) * static_cast<double>(idx)/static_cast<double>(num));
     arrayName = this->VolumeArrayNames->GetString(idx);
     this->ExecutePart(arrayName, block, tmps[idx]);
     } 

@@ -36,7 +36,7 @@
 
 
 
-vtkCxxRevisionMacro(vtkCTHAMRCellToPointData, "1.2");
+vtkCxxRevisionMacro(vtkCTHAMRCellToPointData, "1.3");
 vtkStandardNewMacro(vtkCTHAMRCellToPointData);
 
 //----------------------------------------------------------------------------
@@ -91,6 +91,7 @@ void vtkCTHAMRCellToPointData::Execute()
   vtkCTHData* output = this->GetOutput();
 
   this->CreateOutputGeometry(input, output);
+  this->UpdateProgress(.2);
 
   // If there are no ghost cells, then try our fancy way of
   // computing cell volume fractions.  It finds all point cells
@@ -107,6 +108,7 @@ void vtkCTHAMRCellToPointData::Execute()
     numArrayNames = this->VolumeArrayNames->GetNumberOfStrings();
     for (arrayNamesIdx = 0; arrayNamesIdx < numArrayNames; ++arrayNamesIdx)
       {
+      this->UpdateProgress(.2 + .6 * static_cast<double>(arrayNamesIdx)/static_cast<double>(numArrayNames));
       arrayName = this->VolumeArrayNames->GetString(arrayNamesIdx);
       vtkDataArray* cellVolumeFraction;
       vtkFloatArray* pointVolumeFraction;
@@ -134,6 +136,7 @@ void vtkCTHAMRCellToPointData::Execute()
         }
       }
     }
+  this->UpdateProgress(.8);
   this->CopyCellData(input, output);
 }
 
@@ -359,6 +362,7 @@ void vtkCTHAMRCellToPointData::ExecuteCellDataToPointData2(
   int level = 0;
   while (blocksFinished < numBlocks)
     { // Look for all blocks with level.
+    this->UpdateProgress(.2 + .6 * static_cast<double>(blocksFinished)/static_cast<double>(numBlocks));
     for (blockId = 0; blockId < numBlocks; ++blockId)
       {
       // We should really have level a better part of the data set structure.
@@ -802,6 +806,7 @@ void vtkCTHAMRCellToPointData::CopyCellData(vtkCTHData* input, vtkCTHData* outpu
   
   for (i = 0; i < numArrays; ++i)
     {
+    this->UpdateProgress(.8 + .2 * static_cast<double>(i)/static_cast<double>(numArrays));
     inArray = input->GetCellData()->GetArray(i);
     outArray = inArray->NewInstance();
     outArray->SetName(inArray->GetName());

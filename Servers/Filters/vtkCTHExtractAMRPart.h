@@ -81,7 +81,7 @@ protected:
 
   virtual void Execute();
 
-  void ExecuteBlock(vtkImageData* block, vtkPolyData** appendCaches);
+  void ExecuteBlock(vtkImageData* block, vtkPolyData** appendCaches, double startProgress, double stopProgress);
   void ExecutePart(const char* arrayName, vtkImageData* block, 
                    vtkPolyData* appendCache);
   void ExecuteCellDataToPointData(vtkDataArray *cellVolumeFraction, 
