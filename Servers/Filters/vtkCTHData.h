@@ -123,6 +123,7 @@ public:
   // I am going to get rid of this origin, because
   // all blocks now share the same origin.
   double* GetBlockOrigin(int blockId);
+  void GetBlockOrigin(int blockId, double origin[6]);
 
   // Description:
   // Level is an integer value that specifies the number of refinements
