@@ -50,14 +50,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWWidget.h"
 
 class vtkKWApplication;
-class vtkKWSplitFrame;
-class vtkKWNotebook;
-class vtkKWViewCollection;
-class vtkKWMenu;
-class vtkKWProgressGauge;
-class vtkKWView;
+class vtkKWFrame;
+class vtkKWImageLabel;
 class vtkKWLabel;
 class vtkKWLoadSaveDialog;
+class vtkKWMenu;
+class vtkKWNotebook;
+class vtkKWProgressGauge;
+class vtkKWSplitFrame;
+class vtkKWView;
+class vtkKWViewCollection;
 
 //BTX
 class vtkKWWindowMenuEntry;
@@ -111,6 +113,16 @@ public:
   // Description:
   // Popup the vtk error message
   virtual void ErrorMessage(const char* message);
+
+  // Description:
+  // Show or hide the error / warning icon in the tray.
+  // 2 - red icon, 1 - icon, 0 - hide.
+  virtual void SetErrorIcon(int);
+  vtkBooleanMacro(ErrorIcon, int); 
+
+  // Description:
+  // Process the click on the error icon.
+  virtual void ProcessErrorClick();
   
   // Description:
   // Allow windows to get at the different menu entries. In some
@@ -320,6 +332,8 @@ protected:
   vtkKWLabel *StatusLabel;
   vtkKWProgressGauge* ProgressGauge;
   vtkKWWidget* ProgressFrame;
+  vtkKWFrame*  TrayFrame;
+  vtkKWImageLabel* TrayImage;
   char        *StatusImageName;
   vtkKWSplitFrame *MiddleFrame; // Contains view frame and properties parent.
   vtkKWWidget *PropertiesParent;

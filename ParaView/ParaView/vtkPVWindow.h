@@ -167,6 +167,10 @@ public:
   // Find a data source with name "sourcename" in the source list called
   // "listname"
   vtkPVSource *GetPVSource(const char* listname, char* sourcename);
+
+  // Description:
+  // This method is called when error icon is clicked.
+  void ProcessErrorClick();
     
   // Description:
   // Access methods to ParaView specific menus.

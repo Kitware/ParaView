@@ -44,6 +44,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "KitwareLogo.h"
 #include "vtkKWApplication.h"
 #include "vtkKWEvent.h"
+#include "vtkKWFrame.h"
+#include "vtkKWIcon.h"
+#include "vtkKWImageLabel.h"
 #include "vtkKWLabel.h"
 #include "vtkKWLoadSaveDialog.h"
 #include "vtkKWMenu.h"
@@ -249,6 +252,12 @@ vtkKWWindow::vtkKWWindow()
   this->ProgressGauge = vtkKWProgressGauge::New();
   this->ProgressGauge->SetParent(this->ProgressFrame);
 
+  this->TrayFrame = vtkKWFrame::New();
+  this->TrayFrame->SetParent(this->StatusFrame);
+
+  this->TrayImage = vtkKWImageLabel::New();
+  this->TrayImage->SetParent(this->TrayFrame);
+
   this->Notebook = vtkKWNotebook::New();
   
   this->CommandFunction = vtkKWWindowCommand;
@@ -322,6 +331,8 @@ vtkKWWindow::~vtkKWWindow()
   this->StatusLabel->Delete();
   this->ProgressFrame->Delete();
   this->ProgressGauge->Delete();
+  this->TrayFrame->Delete();
+  this->TrayImage->Delete();
   
   if (this->MenuEdit)
     {
@@ -630,15 +641,28 @@ void vtkKWWindow::Create(vtkKWApplication *app, char *args)
   this->Script("pack %s -side left -padx 2 -expand yes -fill both",
                this->StatusLabel->GetWidgetName());
   this->Script("pack %s -side bottom -fill x -pady 2",
-    this->StatusFrame->GetWidgetName());
+	       this->StatusFrame->GetWidgetName());
   this->ProgressFrame->Create(app, "frame", "-relief sunken -borderwidth 2");
   this->ProgressGauge->SetLength(200);
   this->ProgressGauge->SetHeight(30);
   this->ProgressGauge->Create(app, "");
-  this->Script("pack %s -side right -padx 2 -fill y", 
+
+  this->Script("pack %s -side left -padx 2 -fill y", 
 	       this->ProgressFrame->GetWidgetName());
   this->Script("pack %s -side right -padx 2 -pady 2",
                this->ProgressGauge->GetWidgetName());
+
+  this->TrayFrame->Create(app, 0);
+  this->Script("%s configure -borderwidth 0", this->TrayFrame->GetWidgetName());
+  this->TrayImage->Create(app, "");
+  this->Script("%s configure -relief sunken -bd 2 -bg red",
+	       this->TrayImage->GetWidgetName());
+  vtkKWIcon *ico = vtkKWIcon::New();
+  ico->SetImageData(vtkKWIcon::ICON_GENERAL);
+  this->TrayImage->SetImageData(ico);
+  ico->Delete();
+  this->TrayImage->SetBind(this, "<Button-1>", "ProcessErrorClick");
+  
   // To force the toolbar on top, I am create a separate "MiddleFrame" for the ViewFrame and PropertiesParent
   this->MiddleFrame->Create(app);
   this->Script("pack %s -side bottom -fill both -expand t",
@@ -990,7 +1014,7 @@ void vtkKWWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWWindow ";
-  this->ExtractRevision(os,"$Revision: 1.97 $");
+  this->ExtractRevision(os,"$Revision: 1.98 $");
 }
 
 int vtkKWWindow::ExitDialog()
@@ -1240,21 +1264,57 @@ int vtkKWWindow::BooleanRegisteryCheck(int level, const char* key,
 }
 
 
+//----------------------------------------------------------------------------
 void vtkKWWindow::WarningMessage(const char* message)
 {
   vtkKWMessageDialog::PopupMessage(
     this->GetApplication(), this, "VTK Warning",
     message, vtkKWMessageDialog::WarningIcon);
+  this->SetErrorIcon(2);
 }
 
+//----------------------------------------------------------------------------
+void vtkKWWindow::SetErrorIcon(int s)
+{
+  if (s) 
+    {
+    this->Script("pack %s -side left -ipady 0 -padx 2 -fill both", 
+	       this->TrayFrame->GetWidgetName());
+    this->Script("pack %s -fill both -ipadx 4 -expand yes", 
+		 this->TrayImage->GetWidgetName());
+    if ( s > 1 )
+      {
+      //cout << "Configure with color red" << endl;
+      this->Script("%s configure -bg red", this->TrayImage->GetWidgetName());
+      }
+    else
+      {
+      int r, g, b;
+      this->TrayFrame->GetBackgroundColor(&r, &g, &b);
+      //cout << "Configure with color: " << r << g <<  b << endl;
+      this->Script("%s configure -bg #%03d%03d%03d", 
+		   this->TrayImage->GetWidgetName(),
+		   r, g, b);
+      }
+    }
+  else
+    {
+    this->Script("pack forget %s", this->TrayImage->GetWidgetName());
+    this->Script("pack forget %s", this->TrayFrame->GetWidgetName());
+    }
+}
+
+//----------------------------------------------------------------------------
 void vtkKWWindow::ErrorMessage(const char* message)
 {
   //cout << message << endl;
   vtkKWMessageDialog::PopupMessage(
     this->GetApplication(), this, "VTK Error",
     message, vtkKWMessageDialog::ErrorIcon);
+  this->SetErrorIcon(2);
 }
 
+//----------------------------------------------------------------------------
 void vtkKWWindow::PrintRecentFiles()
 {
   cout << "PrintRecentFiles" << endl;
@@ -1276,6 +1336,12 @@ void vtkKWWindow::PrintRecentFiles()
       cout << "Item: " << kc << endl;
       }
     }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWWindow::ProcessErrorClick()
+{
+  this->SetErrorIcon(1);
 }
 
 //----------------------------------------------------------------------------

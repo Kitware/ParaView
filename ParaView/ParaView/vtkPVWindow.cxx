@@ -3060,6 +3060,7 @@ void vtkPVWindow::WarningMessage(const char* message)
   this->InvokeEvent(vtkKWEvent::WarningMessageEvent, wmessage);
   delete [] wmessage;
   this->ErrorLogDisplay->AppendError(message);
+  this->SetErrorIcon(2);
 }
 
 //----------------------------------------------------------------------------
@@ -3070,8 +3071,15 @@ void vtkPVWindow::ErrorMessage(const char* message)
   this->InvokeEvent(vtkKWEvent::ErrorMessageEvent, wmessage);
   delete [] wmessage;
   this->ErrorLogDisplay->AppendError(message);
+  this->SetErrorIcon(2);
 }
 
+//----------------------------------------------------------------------------
+void vtkPVWindow::ProcessErrorClick()
+{
+  this->Superclass::ProcessErrorClick();
+  this->ShowErrorLog();
+}
 
 //----------------------------------------------------------------------------
 vtkPVColorMap* vtkPVWindow::GetPVColorMap(const char* parameterName)
