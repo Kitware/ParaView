@@ -35,7 +35,6 @@ public:
   static vtkPVOptions* New();
   vtkTypeRevisionMacro(vtkPVOptions,vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);
-  void AboutPrintSelf(ostream& os, vtkIndent indent);
 
   int Parse(int argc, const char* const argv[]);
   const char* GetHelp();

@@ -31,7 +31,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVOptions);
-vtkCxxRevisionMacro(vtkPVOptions, "1.6");
+vtkCxxRevisionMacro(vtkPVOptions, "1.7");
 
 //----------------------------------------------------------------------------
 vtkPVOptions::vtkPVOptions()
@@ -323,48 +323,15 @@ void vtkPVOptions::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os, indent);
   os << indent << "UnknownArgument: " << (this->UnknownArgument?this->UnknownArgument:"(none)") << endl;
   os << indent << "ErrorMessage: " << (this->ErrorMessage?this->ErrorMessage:"(none)") << endl;
-
-  os << indent << "ServerMode: " << this->ServerMode << endl;
-  os << indent << "RenderServerMode: " << this->RenderServerMode << endl;
-  os << indent << "ConnectID: " << this->ConnectID << endl;
-  os << indent << "UseOffscreenRendering: " << this->UseOffscreenRendering << endl;
   os << indent << "PlayDemoFlag: " << this->PlayDemoFlag << endl;
   os << indent << "DisableRegistry: " << this->DisableRegistry << endl;
-  os << indent << "UseStereoRendering: " << this->UseStereoRendering << endl;
-  os << indent << "ClientMode: " << this->ClientMode << endl;
-  os << indent << "ClientRenderServer: " << this->ClientRenderServer << endl;
-  os << indent << "Port: " << this->Port << endl;
-  os << indent << "RenderNodePort: " << this->RenderNodePort << endl;
-  os << indent << "RenderServerPort: " << this->RenderServerPort << endl;
-  os << indent << "RenderModuleName: " << (this->RenderModuleName?this->RenderModuleName:"(none)") << endl;
-  os << indent << "CaveConfigurationFileName: " << (this->CaveConfigurationFileName?this->CaveConfigurationFileName:"(none)") << endl;
-  os << indent << "BatchScriptName: " << (this->BatchScriptName?this->BatchScriptName:"(none)") << endl;
-  os << indent << "Username: " << (this->Username?this->Username:"(none)") << endl;
-  os << indent << "HostName: " << (this->HostName?this->HostName:"(none)") << endl;
-  os << indent << "RenderServerHostName: " << (this->RenderServerHostName?this->RenderServerHostName:"(none)") << endl;
-  os << indent << "MachinesFileName: " << (this->MachinesFileName?this->MachinesFileName:"(none)") << endl;
-
-  os << indent << "TileDimensions: " << this->TileDimensions[0] << " " << this->TileDimensions[1] << endl;
-  os << indent << "AlwaysSSH: " << this->AlwaysSSH << endl;
-  os << indent << "UseSatelliteSoftwareRendering: " << this->UseSatelliteSoftwareRendering << endl;
-  os << indent << "UseRenderingGroup: " << this->UseRenderingGroup << endl;
-  os << indent << "UseSoftwareRendering: " << this->UseSoftwareRendering << endl;
-  os << indent << "UseTiledDisplay: " << this->UseTiledDisplay << endl;
   os << indent << "CrashOnErrors: " << this->CrashOnErrors << endl;
   os << indent << "StartEmpty: " << this->StartEmpty << endl;
   os << indent << "HelpSelected: " << this->HelpSelected << endl;
-  os << indent << "DisableComposite: " << this->DisableComposite << endl;
-  os << indent << "ReverseConnection: " << this->ReverseConnection << endl;
-  os << indent << "GroupFileName: " << (this->GroupFileName?this->UnknownArgument:"(none)") << endl;
+  os << indent << "GroupFileName: " << (this->GroupFileName?this->GroupFileName:"(none)") << endl;
 
-}
+  os << indent << "Runtime information:" << endl; //important please leave it here, for more info: vtkPVApplication::AddAboutText
 
-//----------------------------------------------------------------------------
-// AboutPrintSelf used to be called within the real PrintSelf, but this breaks
-// the PrintSelf test, so we'll have to maintain the two *PrintSelf code
-// separately until we find a better solution
-void vtkPVOptions::AboutPrintSelf(ostream& os, vtkIndent indent)
-{
   if (this->ClientMode)
     {
     os << indent << "Running as a client\n";
