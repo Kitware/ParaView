@@ -69,6 +69,7 @@ class vtkKWScale;
 class vtkKWThumbWheel;
 class vtkKWWidget;
 class vtkPVApplication;
+class vtkPVAxesWidget;
 class vtkPVColorMap;
 class vtkPVSource;
 class vtkPVRenderView;
@@ -238,6 +239,11 @@ public:
   void CubeAxesCheckCallback();
   vtkGetObjectMacro(CubeAxesCheck, vtkKWCheckButton);
 
+  void SetAxesWidgetVisibility(int val);
+  void AxesWidgetCheckCallback();
+  vtkGetObjectMacro(AxesWidgetCheck, vtkKWCheckButton);
+  vtkGetStringMacro(AxesWidgetTclName);
+  
   void CenterCamera();
   
   // Description:
@@ -396,6 +402,10 @@ protected:
   char* CubeAxesTclName;
   vtkSetStringMacro(CubeAxesTclName);
 
+  vtkKWCheckButton *AxesWidgetCheck;
+  char *AxesWidgetTclName;
+  vtkSetStringMacro(AxesWidgetTclName);
+  
   vtkKWPushButton *ResetCameraButton;
 
   float PreviousAmbient;

@@ -231,7 +231,6 @@ public:
   vtkGetObjectMacro(DeleteButton, vtkKWPushButton);
   vtkGetObjectMacro(AcceptButton, vtkKWPushButton);
   
-//  vtkGetObjectMacro(Widgets, vtkPVWidgetCollection);
   vtkGetObjectMacro(WidgetProperties, vtkCollection);
   
   vtkGetObjectMacro(ParameterFrame, vtkKWFrame);

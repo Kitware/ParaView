@@ -55,7 +55,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCompositeRenderModule);
-vtkCxxRevisionMacro(vtkPVCompositeRenderModule, "1.7");
+vtkCxxRevisionMacro(vtkPVCompositeRenderModule, "1.7.2.1");
 
 
 
@@ -204,8 +204,20 @@ void vtkPVCompositeRenderModule::StillRender()
 
   this->GetPVApplication()->SetGlobalLODFlag(0);
   vtkTimerLog::MarkStartEvent("Still Render");
-  this->RenderWindow->Render();
+  if (this->CompositeTclName && !strcmp(this->CompositeTclName, "CCompositeManager1"))
+    {
+    this->PVApplication->Script("%s StartRender", this->CompositeTclName);
+    }
+  else
+    {
+    this->RenderWindow->Render();
+    }
   vtkTimerLog::MarkEndEvent("Still Render");
+  
+//  if (this->CompositeTclName && !strcmp(this->CompositeTclName, "CCompositeManager1") && !localRender)
+//    {
+//    this->PVApplication->Script("%s EndRender", this->CompositeTclName);
+//    }
 }
 
 
@@ -316,7 +328,14 @@ void vtkPVCompositeRenderModule::InteractiveRender()
     }
 
   vtkTimerLog::MarkStartEvent("Interactive Render");
-  this->RenderWindow->Render();
+  if (this->CompositeTclName && !strcmp(this->CompositeTclName, "CCompositeManager1"))
+    {
+    this->PVApplication->Script("%s StartRender", this->CompositeTclName);
+    }
+  else
+    {
+    this->RenderWindow->Render();
+    }
   vtkTimerLog::MarkEndEvent("Interactive Render");
 
   // These times are used to determine reduction factor.
@@ -328,6 +347,20 @@ void vtkPVCompositeRenderModule::InteractiveRender()
       + this->Composite->GetGetBuffersTime()
       + this->Composite->GetSetBuffersTime();
     }
+
+  /*
+  if (this->CompositeTclName && !strcmp(this->CompositeTclName, "CCompositeManager1"))
+    {
+    int composite;
+    this->PVApplication->Script("%s GetUseCompositing",
+                                this->CompositeTclName);
+    composite = vtkKWObject::GetIntegerResult(this->PVApplication);
+    if (composite)
+      {
+      this->PVApplication->Script("%s EndRender", this->CompositeTclName);
+      }
+    }
+  */
 }
 
 
