@@ -73,7 +73,7 @@ include targets.make
 KIT_LIBS = 
 
 # standard stuff here
-KIT_OBJ = ${SRC_OBJ} kwinit.o
+KIT_OBJ = ${SRC_OBJ} kwinit.o vtktcl.o
 KIT_TCL_OBJ = ${TCL_OBJ}
 KIT_NEWS = ${TCL_NEWS}
 KIT_FLAGS = 
@@ -88,4 +88,6 @@ TCL_LIB_FILE  = vtk${ME}Tcl${VTK_LIB_EXT}
 
 include ../Kits.make
 
+vtktcl.o: ${VTKBIN}/common/vtkToolkits.h ${VTKSRC}/tcl/vtktcl.c
+	$(CC) $(CC_FLAGS) -c -o vtktcl.o $(VTKSRC)/tcl/vtktcl.c
 
