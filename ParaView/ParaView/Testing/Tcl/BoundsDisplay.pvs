@@ -23,9 +23,9 @@ set kw(vtkTemp44) [$kw(vtkTemp1) GetMainView]
 set kw(vtkTemp90) [$kw(vtkTemp1) GetGlyphSource Arrow]
 set kw(vtkTemp94) [$kw(vtkTemp1) GetGlyphSource Cone]
 set kw(vtkTemp98) [$kw(vtkTemp1) GetGlyphSource Sphere]
+
+
 set kw(vtkTemp99) [$kw(vtkTemp1) CreatePVSource vtkSphereSource]
-
-
 $kw(vtkTemp1) ShowCurrentSourceProperties
 $kw(vtkTemp99) AcceptCallback
 set kw(vtkTemp167) [$kw(vtkTemp1) CreatePVSource vtkSphereSource]
@@ -44,6 +44,7 @@ $kw(vtkTemp1) ResetCameraCallback
 set kw(vtkTemp209) [$kw(vtkTemp1) ClipPlaneCallback]
 $kw(vtkTemp1) ShowCurrentSourceProperties
 
+$kw(vtkTemp44) SetBackgroundColor 1.000000 0.000000 0.501961
 
 set BoundsDisplay [$kw(vtkTemp209) GetPVWidget {BoundsDisplay}]
 puts $fp [[$BoundsDisplay GetWidget] GetBounds]
