@@ -18,9 +18,6 @@ SET( KWCommon_SRCS
   vtkContainer.cxx
   vtkKWArguments.cxx
   vtkKWGenericMovieWriter.cxx
-  vtkKWHistogram.cxx
-  vtkKWHistogramSet.cxx
-  vtkKWIcon.cxx
   vtkKWMath.cxx
   vtkKWProcessStatistics.cxx
   vtkKWRegisteryUtilities.cxx
@@ -68,8 +65,6 @@ TARGET_LINK_LIBRARIES (KWCommon
   vtkRendering
   ${KWCommon_LINK_LIBS}
   )
-
-SUBDIRS(Utilities)
 
 INCLUDE_DIRECTORIES(${KWSYS_INCLUDE_DIR}
   ${KWCommon_BINARY_DIR}
