@@ -176,7 +176,7 @@ void vtkPVSphereSource::SetThetaResolution(int res)
   
   this->GetSphereSource()->SetThetaResolution(res);
   
-  if (pvApp && pvApp->GetController()->GetLocalProccesId() == 0)
+  if (pvApp && pvApp->GetController()->GetLocalProcessId() == 0)
     {
     pvApp->BroadcastScript("%s SetThetaResolution %d", this->GetTclName(), res);
     }
