@@ -315,7 +315,7 @@ public:
   // Get/Show the Application Settings Interface. 
   virtual vtkKWApplicationSettingsInterface* GetApplicationSettingsInterface() 
     { return 0; };
-  void ShowApplicationSettingsInterface();
+  int ShowApplicationSettingsInterface();
 
   // Description:
   // Display the tcl interactor.

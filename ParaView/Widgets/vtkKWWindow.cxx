@@ -68,7 +68,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define VTK_KW_WINDOW_GEOMETRY_REG_KEY "WindowGeometry"
 #define VTK_KW_WINDOW_FRAME1_SIZE_REG_KEY "WindowFrame1Size"
 
-vtkCxxRevisionMacro(vtkKWWindow, "1.176");
+vtkCxxRevisionMacro(vtkKWWindow, "1.177");
 vtkCxxSetObjectMacro(vtkKWWindow, PropertiesParent, vtkKWWidget);
 
 #define VTK_KW_RECENT_FILES_MAX 20
@@ -681,8 +681,8 @@ void vtkKWWindow::Close()
     this->Script("bell");
     return;
     }
-  if ( this->PromptBeforeClose &&
-       this->Application->GetWindows()->GetNumberOfItems() <= 1 )
+  if (this->PromptBeforeClose &&
+      this->Application->GetWindows()->GetNumberOfItems() <= 1)
     {
     if ( !this->ExitDialog() )
       {
@@ -913,13 +913,15 @@ void vtkKWWindow::ShowWindowProperties()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWWindow::ShowApplicationSettingsInterface()
+int vtkKWWindow::ShowApplicationSettingsInterface()
 {
   if (this->GetApplicationSettingsInterface())
     {
     this->ShowWindowProperties();
-    this->GetApplicationSettingsInterface()->Raise();
+    return this->GetApplicationSettingsInterface()->Raise();
     }
+
+  return 0;
 }
 
 //----------------------------------------------------------------------------

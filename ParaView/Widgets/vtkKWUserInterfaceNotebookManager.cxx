@@ -52,7 +52,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWUserInterfaceNotebookManager);
-vtkCxxRevisionMacro(vtkKWUserInterfaceNotebookManager, "1.18");
+vtkCxxRevisionMacro(vtkKWUserInterfaceNotebookManager, "1.19");
 
 int vtkKWUserInterfaceNotebookManagerCommand(ClientData cd, Tcl_Interp *interp,
                                              int argc, char *argv[]);
@@ -373,6 +373,16 @@ int vtkKWUserInterfaceNotebookManager::ShowPanel(
     this->Notebook->ShowPagesMatchingTag(tag);
     }
 
+  // If there were pages matching that tag, but we end up with no pages
+  // visible for that tag, then we failed (maybe because of the notebook
+  // constraints, the number of pages already pinned, etc).
+
+  if (this->Notebook->GetNumberOfPagesMatchingTag(tag) && 
+      !this->Notebook->GetNumberOfVisiblePagesMatchingTag(tag))
+    {
+    return 0;
+    }
+
   return 1;
 }
 
@@ -429,7 +439,6 @@ int vtkKWUserInterfaceNotebookManager::RaisePanel(
 
   int tag = this->GetPanelId(panel);
   int current_id = this->Notebook->GetRaisedPageId();
-
   if (current_id && tag == this->Notebook->GetPageTag(current_id))
     {
     return 1;
@@ -438,6 +447,18 @@ int vtkKWUserInterfaceNotebookManager::RaisePanel(
   // Otherwise raise the first page
 
   this->Notebook->RaiseFirstPageMatchingTag(tag);
+
+  // If there were pages matching that tag, but we end up with the raised
+  // page not matching that tag, then we failed (maybe because of the notebook
+  // constraints, the number of pages already pinned, etc).
+
+  current_id = this->Notebook->GetRaisedPageId();
+  if (current_id && 
+      this->Notebook->GetNumberOfPagesMatchingTag(tag) &&
+      this->Notebook->GetPageTag(current_id) != tag)
+    {
+    return 0;
+    }
 
   return 1;
 }
