@@ -62,7 +62,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkPVDataInformation);
-vtkCxxRevisionMacro(vtkPVDataInformation, "1.18");
+vtkCxxRevisionMacro(vtkPVDataInformation, "1.19");
 
 //----------------------------------------------------------------------------
 vtkPVDataInformation::vtkPVDataInformation()
@@ -215,6 +215,16 @@ void vtkPVDataInformation::CopyFromDataSet(vtkDataSet* data)
   float *bds;
   int *ext = NULL;
 
+  this->DataSetType = data->GetDataObjectType();
+
+  // Look for a name stored in Field Data.
+  vtkDataArray *nameArray = data->GetFieldData()->GetArray("Name");
+  if (nameArray)
+    {
+    char* str = static_cast<char*>(nameArray->GetVoidPointer(0));
+    this->SetName(str);
+    }
+
   this->NumberOfPoints = data->GetNumberOfPoints();
   if (!this->NumberOfPoints)
     {
@@ -228,7 +238,6 @@ void vtkPVDataInformation::CopyFromDataSet(vtkDataSet* data)
     }
   this->MemorySize = data->GetActualMemorySize();
 
-  this->DataSetType = data->GetDataObjectType();
   if (this->DataSetType == VTK_IMAGE_DATA)
     {
     ext = static_cast<vtkImageData*>(data)->GetExtent();
@@ -255,13 +264,6 @@ void vtkPVDataInformation::CopyFromDataSet(vtkDataSet* data)
   // Copy Cell Data information
   this->CellDataInformation->CopyFromDataSetAttributes(data->GetCellData());
 
-  // Look for a name stored in Field Data.
-  vtkDataArray *nameArray = data->GetFieldData()->GetArray("Name");
-  if (nameArray)
-    {
-    char* str = static_cast<char*>(nameArray->GetVoidPointer(0));
-    this->SetName(str);
-    }
 }
 
 //----------------------------------------------------------------------------
