@@ -546,13 +546,12 @@
           module_type="Reader" extensions=".saf"
           file_description="SAF Reader">
     <Source class="vtkSAFPVReader"/>
-    <Scale label="TimeStep"
-           trace_name="TimeStep"
-           property="TimeStep"
-           type="int"
+
+    <Scale property="TimeStep"
            label="Time step" trace_name="TimeStep"
            help="Set the current timestep."
            range_source="TimeStepRange" />
+
     <ArraySelection trace_name="variable_sel"
                     property="VariableArrayStatus"
                     attribute_name="Variable"  />
