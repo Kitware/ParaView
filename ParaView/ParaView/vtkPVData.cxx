@@ -80,7 +80,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.173");
+vtkCxxRevisionMacro(vtkPVData, "1.174");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -1619,7 +1619,7 @@ void vtkPVData::UpdateProperties()
   vtkDataSetAttributes *fieldData;
   vtkPVApplication *pvApp = this->GetPVApplication();  
   vtkDataArray *array;
-  char *currentColorBy;
+  const char *currentColorBy;
   int currentColorByFound = 0;
   vtkPVWindow *window;
   int defPoint = 0;
@@ -3292,7 +3292,7 @@ void vtkPVData::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVData ";
-  this->ExtractRevision(os,"$Revision: 1.173 $");
+  this->ExtractRevision(os,"$Revision: 1.174 $");
 }
 
 //----------------------------------------------------------------------------
