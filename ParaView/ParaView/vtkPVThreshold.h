@@ -77,6 +77,8 @@ public:
   // Description:
   // Save this source to a file.
   void SaveInTclScript(ofstream *file);
+
+  virtual void UpdateScalars();
   
 protected:
   vtkPVThreshold();

@@ -85,6 +85,8 @@ public:
   // Access for scripting.
   vtkGetObjectMacro(NewValueEntry, vtkKWEntry);
 
+  virtual void UpdateScalars();
+
 protected:
   vtkPVContour();
   ~vtkPVContour();
@@ -103,7 +105,6 @@ protected:
   vtkKWCheckButton* ComputeScalarsCheck;
   vtkKWLabel *ScalarRangeLabel;
   
-  virtual void UpdateScalars();
   void GetDataArrayRange(float range[2]);
 };
 

@@ -52,7 +52,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWComposite.h"
 
 class vtkKWPushButton;
-class vtkKWOptionMenu;
+class vtkPVArraySelection;
 class vtkPVApplication;
 class vtkPVInputMenu;
 class vtkSource;
@@ -281,8 +281,11 @@ public:
 
   // Description:
   // Access for scripting
-  vtkGetObjectMacro(ScalarOperationMenu, vtkKWOptionMenu);
-  vtkGetObjectMacro(VectorOperationMenu, vtkKWOptionMenu);
+  vtkGetObjectMacro(ScalarOperationMenu, vtkPVArraySelection);
+  vtkGetObjectMacro(VectorOperationMenu, vtkPVArraySelection);
+
+  virtual void      UpdateScalars();
+  void              UpdateVectors();
 
 protected:
   vtkPVSource();
@@ -316,10 +319,6 @@ protected:
 
   vtkKWWidget       *Properties;
   void              UpdateProperties();
-  virtual void      UpdateScalarsMenu();
-  virtual void      UpdateScalars();
-  void              UpdateVectorsMenu();
-  void              UpdateVectors();
 
   vtkKWLabeledFrame *ParameterFrame;
   
@@ -331,12 +330,14 @@ protected:
   vtkPVInputMenu *InputMenu;
   vtkKWLabel *InputMenuLabel;
   vtkKWWidget *InputMenuFrame;
-  vtkKWOptionMenu *ScalarOperationMenu;
-  vtkKWLabel *ScalarOperationLabel;
+//  vtkKWOptionMenu *ScalarOperationMenu;
+//  vtkKWLabel *ScalarOperationLabel;
   vtkKWWidget *ScalarOperationFrame;
-  vtkKWOptionMenu *VectorOperationMenu;
-  vtkKWLabel *VectorOperationLabel;
+  vtkPVArraySelection *ScalarOperationMenu;
+//  vtkKWOptionMenu *VectorOperationMenu;
+//  vtkKWLabel *VectorOperationLabel;
   vtkKWWidget *VectorOperationFrame;
+  vtkPVArraySelection *VectorOperationMenu;
   vtkKWLabel *DisplayNameLabel;
   
   char *ChangeScalarsFilterTclName;

@@ -122,15 +122,14 @@ public:
   // Write out the part of the tcl script cooresponding to vtkPVProbe
   void SaveInTclScript(ofstream *file);
   
+  virtual void UpdateScalars();
+  
 protected:
   vtkPVProbe();
   ~vtkPVProbe();
   vtkPVProbe(const vtkPVProbe&) {};
   void operator=(const vtkPVProbe&) {};
 
-  virtual void UpdateScalarsMenu();
-  virtual void UpdateScalars();
-  
   char *ProbeSourceTclName;
   
   vtkKWLabel *DimensionalityLabel;

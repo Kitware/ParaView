@@ -13,6 +13,7 @@ vtkPVActorComposite
 vtkPVAnimationInterface
 vtkPVApplication 
 vtkPVArrayCalculator 
+vtkPVArraySelection
 vtkPVClipPlane
 vtkPVCutPlane
 vtkPVContour 

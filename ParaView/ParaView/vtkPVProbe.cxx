@@ -48,6 +48,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWToolbar.h"
 #include "vtkPVRenderView.h"
 #include "vtkPVWindow.h"
+#include "vtkPVArraySelection.h"
+
 int vtkPVProbeCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
 
@@ -388,9 +390,6 @@ void vtkPVProbe::CreateProperties()
   this->Script("%s configure -xscrollcommand {%s EntryChanged}",
                this->DivisionsEntry->GetEntry()->GetWidgetName(), this->GetTclName());
   
-  this->AcceptCommands->AddString("%s UpdateProbe",
-                                  this->GetTclName());
-  
   this->Script("grab release %s", this->ParameterFrame->GetWidgetName());
 
   this->UsePoint();
@@ -432,6 +431,11 @@ void vtkPVProbe::AcceptCallback()
 {
   int i;
 
+  // This can't be an accept command because this calls SetInput for the
+  // vtkProbeFilter, and vtkPVSource::AcceptCallback expects that the the
+  // input has already been set.
+  this->UpdateProbe();
+  
   // call the superclass's method
   this->vtkPVSource::AcceptCallback();
   
@@ -730,6 +734,15 @@ void vtkPVProbe::UsePoint()
 
 void vtkPVProbe::UseLine()
 {
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  int error;
+  vtkDataSet *dataSet = 
+    (vtkDataSet*)(vtkTclGetPointerFromObject(this->ProbeSourceTclName,
+                                             "vtkDataSet",
+                                             pvApp->GetMainInterp(),
+                                             error));
+  this->ScalarOperationMenu->SetVTKData(dataSet);
+  
   this->Dimensionality = 1;
   this->Script("catch {eval pack forget [pack slaves %s]}",
                this->ProbeFrame->GetWidgetName());
@@ -738,6 +751,8 @@ void vtkPVProbe::UseLine()
                this->EndPoint1Frame->GetWidgetName(),
                this->EndPoint2Frame->GetWidgetName(),
 	       this->DivisionsEntry->GetWidgetName());
+
+  
   this->PackScalarsMenu();
   
   char* endPt = this->EndPointMenu->GetValue();
@@ -891,57 +906,6 @@ void vtkPVProbe::ChangeZPosition()
     }
   
   this->Interactor->SetSelectedPointZ(entry->GetValueAsFloat());
-}
-
-void vtkPVProbe::UpdateScalarsMenu()
-{
-  int i, defaultSet = 0;
-  vtkFieldData *fd;
-  const char *arrayName;
-  vtkDataSet *dataSet;
-  vtkPVApplication *pvApp = this->GetPVApplication();
-  int error;
-  
-  // Set up some logic to set the default array if this is the first pass.
-  // Retain previous value if not.
-  arrayName = this->ScalarOperationMenu->GetValue();
-  if (arrayName && arrayName[0] != '\0')
-    {
-    defaultSet = 1;
-    } 
-  
-  dataSet = (vtkDataSet*)(vtkTclGetPointerFromObject(this->ProbeSourceTclName,
-                                                     "vtkDataSet",
-                                                     pvApp->GetMainInterp(),
-                                                     error));
-  fd = dataSet->GetPointData();
-  
-  if (fd)
-    {
-    this->ScalarOperationMenu->ClearEntries();
-    for (i = 0; i < fd->GetNumberOfArrays(); i++)
-      {
-      if ((fd->GetArray(i)->GetNumberOfComponents() == 1) &&
-          (fd->GetArrayName(i)))
-        {
-        this->ScalarOperationMenu->AddEntryWithCommand(fd->GetArrayName(i),
-                                                       this, "ChangeScalars");
-        if (!defaultSet)
-          {
-          arrayName = fd->GetArrayName(i);
-          if (arrayName && arrayName[0] != '\0')
-            {
-            defaultSet = 1;
-            } 
-          }
-        }
-      }
-    }
-  if (defaultSet)
-    {
-    this->ScalarOperationMenu->SetValue(arrayName);
-    this->SetDefaultScalarsName(arrayName);
-    }
 }
 
 void vtkPVProbe::UpdateScalars()
