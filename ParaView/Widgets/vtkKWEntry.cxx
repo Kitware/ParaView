@@ -33,7 +33,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWEntry );
-vtkCxxRevisionMacro(vtkKWEntry, "1.51");
+vtkCxxRevisionMacro(vtkKWEntry, "1.52");
 
 //----------------------------------------------------------------------------
 vtkKWEntry::vtkKWEntry()
@@ -328,6 +328,10 @@ void vtkKWEntry::AddValue(const char* value)
 //----------------------------------------------------------------------------
 int vtkKWEntry::GetNumberOfValues()
 {
+  if ( !this->Entry )
+    {
+    return 0;
+    }
   if ( !this->PullDown )
     {
     return 1;
