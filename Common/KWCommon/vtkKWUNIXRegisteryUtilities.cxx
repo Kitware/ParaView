@@ -28,7 +28,7 @@
 #define BUFFER_SIZE 8192
 
 vtkStandardNewMacro( vtkKWUNIXRegisteryUtilities );
-vtkCxxRevisionMacro(vtkKWUNIXRegisteryUtilities, "1.14");
+vtkCxxRevisionMacro(vtkKWUNIXRegisteryUtilities, "1.15");
 
 //----------------------------------------------------------------------------
 //****************************************************************************
@@ -107,7 +107,8 @@ int vtkKWUNIXRegisteryUtilities::OpenInternal(const char *toplevel,
       // Comment
       continue;
       }   
-    for ( cc = 0; cc< static_cast<int>(strlen(line)); cc++ )
+    int linelen = static_cast<int>(strlen(line));
+    for ( cc = 0; cc < linelen; cc++ )
       {
       if ( line[cc] == '=' )
         {
