@@ -857,8 +857,11 @@ void vtkPVWindow::OpenCallback()
 {
   char *openFileName = NULL;
   istream *input;
-  
-  this->Script("set openFileName [tk_getOpenFile -filetypes {{{VTK files} {.vtk}} {{PVTK files} {.pvtk}} {{EnSight files} {.case}} {{POP files} {.pop}} {{STL files} {.stl}}}]");
+#ifdef _WIN32  
+  this->Script("set openFileName [tk_getOpenFile -filetypes {{{ParaView Files} {*.vtk;*.pvtk;*.stl;*.pop;*.case}}  {{VTK files} {.vtk}} {{PVTK files} {.pvtk}} {{EnSight files} {.case}} {{POP files} {.pop}} {{STL files} {.stl}}}]");
+#else
+  this->Script("set openFileName [tk_getOpenFile -filetypes {{{ParaView Files} {.(vtk|pvtk|stl|pop|case)}}  {{VTK files} {.vtk}} {{PVTK files} {.pvtk}} {{EnSight files} {.case}} {{POP files} {.pop}} {{STL files} {.stl}}}]");
+#endif
   openFileName = this->GetPVApplication()->GetMainInterp()->result;
 
   if (strcmp(openFileName, "") == 0)
