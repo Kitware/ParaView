@@ -66,6 +66,8 @@ vtkPVActorComposite::vtkPVActorComposite()
   this->ZRangeLabel = vtkKWLabel::New();
   
   this->DataNotebookButton = vtkKWPushButton::New();
+  
+  this->PVData = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -90,6 +92,8 @@ vtkPVActorComposite::~vtkPVActorComposite()
   
   this->DataNotebookButton->Delete();
   this->DataNotebookButton = NULL;
+  
+  this->SetPVData(NULL);
 }
 
 //----------------------------------------------------------------------------
@@ -184,11 +188,28 @@ void vtkPVActorComposite::ShowDataNotebook()
 //----------------------------------------------------------------------------
 void vtkPVActorComposite::SetPVData(vtkPVData *data)
 {
-  //There's probably more we're supposed to do here.
+  if (this->PVData == data)
+    {
+    return;
+    }
+  this->Modified();
+  
+  if (this->PVData)
+    {
+    // extra careful for circular references
+    vtkPVData *tmp = this->PVData;
+    this->PVData = NULL;
+    // Manage double pointer.
+    tmp->SetActorComposite(NULL);
+    tmp->UnRegister(this);
+    }
   
   if (data)
     {
     this->PVData = data;
+    data->Register(this);
+    // Manage double pointer.
+    data->SetActorComposite(this);
     }
 }
 
