@@ -1,6 +1,6 @@
 PLATFORM="irix64"
 CC="cc"
 CXX="CC"
-CMAKE="/home/sci/itk/CMake-CC-dashboard/bin/cmake"
+CMAKE="/home/sci/itk/CMake-CC64-dashboard/bin/cmake"
 MAKE="gmake -j 20"
 DISPLAY=:0.0
