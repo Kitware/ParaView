@@ -63,7 +63,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPart);
-vtkCxxRevisionMacro(vtkPVPart, "1.14");
+vtkCxxRevisionMacro(vtkPVPart, "1.15");
 
 int vtkPVPartCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -581,6 +581,7 @@ void vtkPVPart::SetPVApplication(vtkPVApplication *pvApp)
 void vtkPVPart::SetVTKDataTclName(const char* tclName)
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
+  vtkPVProcessModule* pm = pvApp->GetProcessModule();
   
   if (pvApp == NULL)
     {
@@ -598,16 +599,9 @@ void vtkPVPart::SetVTKDataTclName(const char* tclName)
     this->VTKDataTclName = new char[strlen(tclName)+1];
     strcpy(this->VTKDataTclName, tclName);
     // Connect the data to the pipeline for displaying the data.
-    pvApp->BroadcastScript("%s SetInput %s",
-                           this->GeometryTclName,
-                           this->VTKDataTclName);
-    // Disconnect the client dataDisplay/renderer from the
-    // Pipeline.  We had trouble with ExecuteInfomration being called
-    // on the client for readers.
-    if (pvApp->GetClientMode())
-      {
-      this->Script("%s SetInput {}", this->GeometryTclName);
-      }
+    pm->ServerScript("%s SetInput %s",
+                     this->GeometryTclName,
+                     this->VTKDataTclName);
     }
 }
 
@@ -648,11 +642,11 @@ void vtkPVPart::InsertExtractPiecesIfNecessary()
     // It will hang if all procs do not  call execute.
     if (getenv("PV_LOCK_SAFE") != NULL)
       {
-      pvApp->BroadcastSimpleScript("vtkExtractPolyDataPiece pvTemp");
+      pm->ServerSimpleScript("vtkExtractPolyDataPiece pvTemp");
       }
     else
       {
-      pvApp->BroadcastSimpleScript("vtkTransmitPolyDataPiece pvTemp");
+      pm->ServerSimpleScript("vtkTransmitPolyDataPiece pvTemp");
       }
     }
   else if((pm->RootScript("%s IsA vtkUnstructuredGrid", this->VTKDataTclName),
@@ -662,11 +656,11 @@ void vtkPVPart::InsertExtractPiecesIfNecessary()
     // It will hang if all procs do not  call execute.
     if (getenv("PV_LOCK_SAFE") != NULL)
       {
-      pvApp->BroadcastSimpleScript("vtkExtractUnstructuredGridPiece pvTemp");
+      pm->ServerSimpleScript("vtkExtractUnstructuredGridPiece pvTemp");
       }
     else
       {
-      pvApp->BroadcastSimpleScript("vtkTransmitUnstructuredGridPiece pvTemp");
+      pm->ServerSimpleScript("vtkTransmitUnstructuredGridPiece pvTemp");
       }
     }
   else
@@ -675,16 +669,16 @@ void vtkPVPart::InsertExtractPiecesIfNecessary()
     }
 
   // Connect the filter to the pipeline.
-  pvApp->BroadcastScript("pvTemp SetInput %s", this->VTKDataTclName);
+  pm->ServerScript("pvTemp SetInput %s", this->VTKDataTclName);
   // Set the output name to point to the new data object.
   // This is a bit of a hack because we have to strip the '$' off of the current name.
-  pvApp->BroadcastScript("set %s [pvTemp GetOutput]", this->VTKDataTclName+1);
+  pm->ServerScript("set %s [pvTemp GetOutput]", this->VTKDataTclName+1);
   
   this->Script("%s SetVTKDataTclName {%s}", this->GetTclName(),
                this->VTKDataTclName);
   
   // Now delete Tcl's reference to the piece filter.
-  pvApp->BroadcastSimpleScript("pvTemp Delete");
+  pm->ServerSimpleScript("pvTemp Delete");
 }
 
 

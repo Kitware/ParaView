@@ -79,7 +79,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.289");
+vtkCxxRevisionMacro(vtkPVSource, "1.290");
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -2318,6 +2318,7 @@ int vtkPVSource::InitializeClone(vtkPVSource* input,
 int vtkPVSource::InitializeData()
 {
   vtkPVApplication* pvApp = this->GetPVApplication();
+  vtkPVProcessModule* pm = pvApp->GetProcessModule();
   int numSources, sourceIdx;
   vtkSource* source;
   const char* sourceTclName;
@@ -2346,13 +2347,13 @@ int vtkPVSource::InitializeData()
       {
       ++outputCount;
       sprintf(dataName, "%sOutput%d", this->GetName(), outputCount);
-      pvApp->BroadcastScript("set %s [%s GetOutput %d]", dataName, 
-                             sourceTclName, idx);
+      pm->ServerScript("set %s [%s GetOutput %d]", dataName, 
+                       sourceTclName, idx);
       part = vtkPVPart::New();
       part->SetPVApplication(pvApp);
       this->Script("%s SetVTKDataTclName {${%s}}", part->GetTclName(),
                    dataName);
-      pvApp->GetProcessModule()->InitializePVPartPartition(part);
+      pm->InitializePVPartPartition(part);
       this->AddPVPart(part);
       // This initialization should be done by a render module.
       part->SetCollectionDecision(this->GetPVWindow()->MakeCollectionDecision());
@@ -2365,9 +2366,9 @@ int vtkPVSource::InitializeData()
       if ( ! input)
         {
         sprintf(translatorTclName, "%sTranslator%d", this->GetName(), idx);
-        pvApp->BroadcastScript("vtkPVExtentTranslator %s", translatorTclName);
-        pvApp->BroadcastScript("${%s} SetExtentTranslator %s",
-                               dataName, translatorTclName);
+        pm->ServerScript("vtkPVExtentTranslator %s", translatorTclName);
+        pm->ServerScript("${%s} SetExtentTranslator %s",
+                         dataName, translatorTclName);
         }
 
       part->InsertExtractPiecesIfNecessary();
@@ -2377,9 +2378,9 @@ int vtkPVSource::InitializeData()
         // Translator has to be set on source because it is propagated.
         // Original source is set after transmit so reference
         // loop can be broken when pvPart is deleted.
-        pvApp->BroadcastScript("%s SetOriginalSource ${%s}",
-                               translatorTclName, dataName);
-        pvApp->BroadcastScript("%s Delete", translatorTclName);
+        pm->ServerScript("%s SetOriginalSource ${%s}",
+                         translatorTclName, dataName);
+        pm->ServerScript("%s Delete", translatorTclName);
         }
 
       part->Delete();  
@@ -2607,7 +2608,7 @@ void vtkPVSource::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVSource ";
-  this->ExtractRevision(os,"$Revision: 1.289 $");
+  this->ExtractRevision(os,"$Revision: 1.290 $");
 }
 
 //----------------------------------------------------------------------------
