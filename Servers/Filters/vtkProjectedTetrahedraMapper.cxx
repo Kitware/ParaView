@@ -60,7 +60,7 @@ static int tet_edges[6][2] = { {0,1}, {1,2}, {2,0},
 
 //-----------------------------------------------------------------------------
 
-vtkCxxRevisionMacro(vtkProjectedTetrahedraMapper, "1.3");
+vtkCxxRevisionMacro(vtkProjectedTetrahedraMapper, "1.4");
 vtkStandardNewMacro(vtkProjectedTetrahedraMapper);
 
 vtkCxxSetObjectMacro(vtkProjectedTetrahedraMapper,
@@ -218,7 +218,7 @@ void vtkProjectedTetrahedraMapper::Render(vtkRenderer *renderer,
         texture[(depthi*TEXRES + attenuationi)] = alpha;
         }
       }
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_ALPHA, TEXRES, TEXRES, 1, GL_ALPHA,
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_INTENSITY, TEXRES, TEXRES, 1, GL_RED,
                  GL_FLOAT, texture);
     delete[] texture;
 
@@ -433,7 +433,7 @@ void vtkProjectedTetrahedraMapper::ProjectTetrahedra(vtkRenderer *renderer,
   glBindTexture(GL_TEXTURE_2D, this->OpacityTexture);
   glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 
-  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+  glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
 
   // Establish vertex arrays.
   float tet_points[5*3];
