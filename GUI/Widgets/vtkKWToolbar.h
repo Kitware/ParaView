@@ -25,7 +25,7 @@
 class vtkKWApplication;
 class vtkKWFrame;
 class vtkKWRadioButton;
-class vtkKWWidgetSetInternals;
+class vtkKWToolbarInternals;
 
 class VTK_EXPORT vtkKWToolbar : public vtkKWWidget
 {
@@ -165,7 +165,7 @@ protected:
 
   // PIMPL Encapsulation for STL containers
 
-  vtkKWWidgetSetInternals *Internals;
+  vtkKWToolbarInternals *Internals;
 
   //ETX
 

@@ -49,13 +49,13 @@ void vtkKWToolbar::SetGlobalWidgetsFlatAspect(int val)
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWToolbar );
-vtkCxxRevisionMacro(vtkKWToolbar, "1.40");
+vtkCxxRevisionMacro(vtkKWToolbar, "1.41");
 
 int vtkKWToolbarCommand(ClientData cd, Tcl_Interp *interp,
                        int argc, char *argv[]);
 
 //----------------------------------------------------------------------------
-class vtkKWWidgetSetInternals
+class vtkKWToolbarInternals
 {
 public:
 
@@ -95,7 +95,7 @@ vtkKWToolbar::vtkKWToolbar()
 
   // Internal structs
 
-  this->Internals = new vtkKWWidgetSetInternals;
+  this->Internals = new vtkKWToolbarInternals;
 }
 
 //----------------------------------------------------------------------------
@@ -121,9 +121,9 @@ vtkKWToolbar::~vtkKWToolbar()
 
   if (this->Internals)
     {
-    vtkKWWidgetSetInternals::WidgetsContainerIterator it = 
+    vtkKWToolbarInternals::WidgetsContainerIterator it = 
       this->Internals->Widgets.begin();
-    vtkKWWidgetSetInternals::WidgetsContainerIterator end = 
+    vtkKWToolbarInternals::WidgetsContainerIterator end = 
       this->Internals->Widgets.end();
     for (; it != end; ++it)
       {
@@ -218,7 +218,7 @@ void vtkKWToolbar::InsertWidget(vtkKWWidget *location, vtkKWWidget *widget)
     }
   else
     {
-    vtkKWWidgetSetInternals::WidgetsContainerIterator location_pos = 
+    vtkKWToolbarInternals::WidgetsContainerIterator location_pos = 
       vtkstd::find(this->Internals->Widgets.begin(),
                    this->Internals->Widgets.end(),
                    location);
@@ -246,7 +246,7 @@ void vtkKWToolbar::RemoveWidget(vtkKWWidget *widget)
     return;
     }
 
-  vtkKWWidgetSetInternals::WidgetsContainerIterator location_pos = 
+  vtkKWToolbarInternals::WidgetsContainerIterator location_pos = 
     vtkstd::find(this->Internals->Widgets.begin(),
                  this->Internals->Widgets.end(),
                  widget);
@@ -271,9 +271,9 @@ vtkKWWidget* vtkKWToolbar::GetWidget(const char *name)
     {
     const char *options[4] = { "-label", "-text", "-image", "-selectimage" };
 
-    vtkKWWidgetSetInternals::WidgetsContainerIterator it = 
+    vtkKWToolbarInternals::WidgetsContainerIterator it = 
       this->Internals->Widgets.begin();
-    vtkKWWidgetSetInternals::WidgetsContainerIterator end = 
+    vtkKWToolbarInternals::WidgetsContainerIterator end = 
       this->Internals->Widgets.end();
     for (; it != end; ++it)
       {
@@ -432,9 +432,9 @@ void vtkKWToolbar::UpdateWidgetsAspect()
 
   ostrstream s;
 
-  vtkKWWidgetSetInternals::WidgetsContainerIterator it = 
+  vtkKWToolbarInternals::WidgetsContainerIterator it = 
     this->Internals->Widgets.begin();
-  vtkKWWidgetSetInternals::WidgetsContainerIterator end = 
+  vtkKWToolbarInternals::WidgetsContainerIterator end = 
     this->Internals->Widgets.end();
   for (; it != end; ++it)
     {
@@ -523,9 +523,9 @@ void vtkKWToolbar::ConstrainWidgetsLayout()
 
   int totReqWidth = 0;
 
-  vtkKWWidgetSetInternals::WidgetsContainerIterator it = 
+  vtkKWToolbarInternals::WidgetsContainerIterator it = 
     this->Internals->Widgets.begin();
-  vtkKWWidgetSetInternals::WidgetsContainerIterator end = 
+  vtkKWToolbarInternals::WidgetsContainerIterator end = 
     this->Internals->Widgets.end();
   for (; it != end; ++it)
     {
@@ -601,9 +601,9 @@ void vtkKWToolbar::UpdateWidgetsLayout()
   ostrstream s;
   s << "grid "; 
 
-  vtkKWWidgetSetInternals::WidgetsContainerIterator it = 
+  vtkKWToolbarInternals::WidgetsContainerIterator it = 
     this->Internals->Widgets.begin();
-  vtkKWWidgetSetInternals::WidgetsContainerIterator end = 
+  vtkKWToolbarInternals::WidgetsContainerIterator end = 
     this->Internals->Widgets.end();
   for (; it != end; ++it)
     {
@@ -771,9 +771,9 @@ void vtkKWToolbar::UpdateEnableState()
 {
   this->Superclass::UpdateEnableState();
 
-  vtkKWWidgetSetInternals::WidgetsContainerIterator it = 
+  vtkKWToolbarInternals::WidgetsContainerIterator it = 
     this->Internals->Widgets.begin();
-  vtkKWWidgetSetInternals::WidgetsContainerIterator end = 
+  vtkKWToolbarInternals::WidgetsContainerIterator end = 
     this->Internals->Widgets.end();
   for (; it != end; ++it)
     {
