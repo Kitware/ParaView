@@ -47,7 +47,7 @@
 #include "vtkKWEvent.h"
 
 vtkStandardNewMacro(vtkPVBoxWidget);
-vtkCxxRevisionMacro(vtkPVBoxWidget, "1.34");
+vtkCxxRevisionMacro(vtkPVBoxWidget, "1.35");
 
 int vtkPVBoxWidgetCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -316,11 +316,6 @@ void vtkPVBoxWidget::ChildCreate(vtkPVApplication* )
     this->TranslateThumbWheel[cc]->DisplayEntryAndLabelOnTopOff();
     this->TranslateThumbWheel[cc]->ExpandEntryOn();
     this->TranslateThumbWheel[cc]->GetEntry()->SetWidth(5);
-    this->TranslateThumbWheel[cc]->SetCommand(this, "TranslateCallback");
-    this->TranslateThumbWheel[cc]->SetEndCommand(this, 
-                                                 "TranslateEndCallback");
-    this->TranslateThumbWheel[cc]->SetEntryCommand(this,
-                                                   "TranslateEndCallback");
     this->TranslateThumbWheel[cc]->GetEntry()->SetBind(this,
       "<KeyRelease>", "TranslateKeyPressCallback");
     this->TranslateThumbWheel[cc]->SetBalloonHelpString(
@@ -329,17 +324,12 @@ void vtkPVBoxWidget::ChildCreate(vtkPVApplication* )
     this->ScaleThumbWheel[cc]->SetParent(this->ControlFrame->GetFrame());
     this->ScaleThumbWheel[cc]->PopupModeOn();
     this->ScaleThumbWheel[cc]->SetValue(1.0);
-    this->ScaleThumbWheel[cc]->SetMinimumValue(0.0);
-    this->ScaleThumbWheel[cc]->ClampMinimumValueOn();
     this->ScaleThumbWheel[cc]->SetResolution(0.001);
     this->ScaleThumbWheel[cc]->Create(this->GetApplication(), 0);
     this->ScaleThumbWheel[cc]->DisplayEntryOn();
     this->ScaleThumbWheel[cc]->DisplayEntryAndLabelOnTopOff();
     this->ScaleThumbWheel[cc]->ExpandEntryOn();
     this->ScaleThumbWheel[cc]->GetEntry()->SetWidth(5);
-    this->ScaleThumbWheel[cc]->SetCommand(this, "ScaleCallback");
-    this->ScaleThumbWheel[cc]->SetEndCommand(this, "ScaleEndCallback");
-    this->ScaleThumbWheel[cc]->SetEntryCommand(this, "ScaleEndCallback");
     this->ScaleThumbWheel[cc]->GetEntry()->SetBind(this,
       "<KeyRelease>", "ScaleKeyPressCallback");
     this->ScaleThumbWheel[cc]->SetBalloonHelpString(
@@ -355,18 +345,13 @@ void vtkPVBoxWidget::ChildCreate(vtkPVApplication* )
     this->OrientationScale[cc]->DisplayEntryAndLabelOnTopOff();
     this->OrientationScale[cc]->ExpandEntryOn();
     this->OrientationScale[cc]->GetEntry()->SetWidth(5);
-    this->OrientationScale[cc]->SetCommand(this, "OrientationCallback");
-    this->OrientationScale[cc]->SetEndCommand(this, 
-                                              "OrientationEndCallback");
-    this->OrientationScale[cc]->SetEntryCommand(this, 
-                                                "OrientationEndCallback");
     this->OrientationScale[cc]->GetEntry()->SetBind(this,
       "<KeyRelease>", "OrientationKeyPressCallback");
     this->OrientationScale[cc]->SetBalloonHelpString(
       "Orient the geometry relative to the dataset origin.");
 
     }
-
+  this->EnableCallbacks();
   int button_pady = 1;
   this->Script("grid %s %s %s %s -sticky news -pady %d",
                this->TranslateLabel->GetWidgetName(),
@@ -423,7 +408,46 @@ void vtkPVBoxWidget::ChildCreate(vtkPVApplication* )
 
   this->SetBalloonHelpString(this->BalloonHelpString);
 }
+//----------------------------------------------------------------------------
+void vtkPVBoxWidget::EnableCallbacks()
+{
+  int cc;
+  for(cc=0 ; cc < 3 ; cc++)
+    {
+    this->TranslateThumbWheel[cc]->SetCommand(this, "TranslateCallback");
+    this->TranslateThumbWheel[cc]->SetEndCommand(this, "TranslateEndCallback");
+    this->TranslateThumbWheel[cc]->SetEntryCommand(this,"TranslateEndCallback");
 
+    this->ScaleThumbWheel[cc]->SetCommand(this, "ScaleCallback");
+    this->ScaleThumbWheel[cc]->SetEndCommand(this, "ScaleEndCallback");
+    this->ScaleThumbWheel[cc]->SetEntryCommand(this, "ScaleEndCallback");
+
+    this->OrientationScale[cc]->SetCommand(this, "OrientationCallback");
+    this->OrientationScale[cc]->SetEndCommand(this, 
+                                              "OrientationEndCallback");
+    this->OrientationScale[cc]->SetEntryCommand(this, 
+                                                "OrientationEndCallback");
+    }
+}
+//----------------------------------------------------------------------------
+void vtkPVBoxWidget::DisableCallbacks()
+{
+  int cc;
+  for(cc=0; cc < 3; cc++)
+    {
+    this->TranslateThumbWheel[cc]->SetCommand(NULL, NULL);
+    this->TranslateThumbWheel[cc]->SetEndCommand(NULL, NULL);
+    this->TranslateThumbWheel[cc]->SetEntryCommand(NULL,NULL);
+
+    this->ScaleThumbWheel[cc]->SetCommand(NULL, NULL);
+    this->ScaleThumbWheel[cc]->SetEndCommand(NULL, NULL);
+    this->ScaleThumbWheel[cc]->SetEntryCommand(NULL, NULL);
+
+    this->OrientationScale[cc]->SetCommand(NULL, NULL);
+    this->OrientationScale[cc]->SetEndCommand(NULL,NULL);
+    this->OrientationScale[cc]->SetEntryCommand(NULL,NULL);
+    }
+}
 //----------------------------------------------------------------------------
 void vtkPVBoxWidget::ScaleCallback()
 {
@@ -597,10 +621,12 @@ void vtkPVBoxWidget::UpdateFromBox()
   double orientation[3];
   double scale[3];
   double position[3];
+
+  this->DisableCallbacks();
+  static_cast<vtkRMBoxWidget*>(this->RM3DWidget)->GetScale(scale);
   static_cast<vtkRMBoxWidget*>(this->RM3DWidget)->GetRotation(orientation);
   static_cast<vtkRMBoxWidget*>(this->RM3DWidget)->GetPosition(position);
-  static_cast<vtkRMBoxWidget*>(this->RM3DWidget)->GetScale(scale);
-
+  
   this->GetScaleFromGUI();
   if ( !( scale[0] == this->ScaleGUI[0] && 
       scale[1] == this->ScaleGUI[1] && 
@@ -633,6 +659,7 @@ void vtkPVBoxWidget::UpdateFromBox()
     this->OrientationScale[1]->SetValue(orientation[1]);
     this->OrientationScale[2]->SetValue(orientation[2]);
     }
+  this->EnableCallbacks();
 }
 
 //----------------------------------------------------------------------------

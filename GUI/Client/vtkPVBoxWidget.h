@@ -110,10 +110,6 @@ public:
   //ETX
 
   // Description:
-  // Get iVar values from vtkRMBoxWidget object and update the GUI.
-  void UpdateFromBox();
-
-  // Description:
   // Return a contained object by name as follows:
   // Box == BoxID
   // BoxTransform == BoxTransformID
@@ -142,6 +138,20 @@ protected:
   virtual void ExecuteEvent(vtkObject*, unsigned long, void*);
 
   void UpdateVTKObject(const char* sourceTclName);
+
+  // Description:
+  // Get iVar values from vtkRMBoxWidget object and update the GUI.
+  void UpdateFromBox();
+
+  // Description:
+  // Enables/Disables invoking of callbacks of the ThumbWheel/Scale.
+  // It makes sense to disable callbacks (which are responsible to update
+  // the internal state of the widget) when the ThumbWheel/Scale values 
+  // are being updated using the internal state itself i.e. UpdateFromBox()
+  // EnableCallbacks() sets the callback methods, while
+  // DisableCallbacks() sets them to NULL
+  void EnableCallbacks();
+  void DisableCallbacks();
 
   vtkKWFrame*        ControlFrame;
   vtkKWLabel*        TranslateLabel;
