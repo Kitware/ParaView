@@ -52,7 +52,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVMinMax);
-vtkCxxRevisionMacro(vtkPVMinMax, "1.20.4.1");
+vtkCxxRevisionMacro(vtkPVMinMax, "1.20.4.2");
 
 vtkCxxSetObjectMacro(vtkPVMinMax, ArrayMenu, vtkPVArrayMenu);
 
@@ -85,10 +85,6 @@ vtkPVMinMax::vtkPVMinMax()
 
   this->ArrayMenu = NULL;
 
-  // We do not want the filter default value.
-  // We use the range of the scalars instead.
-  this->SuppressReset = 1;
-  
   this->AcceptCalled = 0;
   this->LastAcceptedValues[0] = VTK_FLOAT_MIN;
   this->LastAcceptedValues[1] = VTK_FLOAT_MAX;
