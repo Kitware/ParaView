@@ -57,7 +57,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCameraIcon);
-vtkCxxRevisionMacro(vtkPVCameraIcon, "1.8");
+vtkCxxRevisionMacro(vtkPVCameraIcon, "1.9");
 
 vtkCxxSetObjectMacro(vtkPVCameraIcon,RenderView,vtkPVRenderView);
 
@@ -191,8 +191,8 @@ void vtkPVCameraIcon::StoreCamera()
     resample->Update();
 
     vtkKWIcon* icon = vtkKWIcon::New();
-    icon->SetImageData(resample->GetOutput());
-    this->SetImageData(icon);
+    icon->SetImage(resample->GetOutput());
+    this->SetImageOption(icon);
     icon->Delete();    
     resample->Delete();
     w2i->Delete();

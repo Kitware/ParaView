@@ -63,7 +63,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVServerFileDialog );
-vtkCxxRevisionMacro(vtkPVServerFileDialog, "1.20");
+vtkCxxRevisionMacro(vtkPVServerFileDialog, "1.21");
 
 int vtkPVServerFileDialogCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -345,7 +345,7 @@ void vtkPVServerFileDialog::Create(vtkKWApplication *app, const char *)
 
   this->DownDirectoryButton->SetParent(this->TopFrame);
   this->DownDirectoryButton->Create(app, "");
-  this->DownDirectoryButton->SetImageData(
+  this->DownDirectoryButton->SetImageOption(
     image_PVUpDirectoryButton, 
     image_PVUpDirectoryButton_width,
     image_PVUpDirectoryButton_height,

@@ -111,7 +111,7 @@ static unsigned char image_properties[] =
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.261");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.262");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -566,11 +566,11 @@ void vtkPVRenderView::Create(vtkKWApplication *app, const char *args)
     "Switch back and forth between the current view properties and the" 
     VTK_PV_VIEW_MENU_LABEL ".");
 
-  this->PropertiesButton->SetImageData(image_properties, 
-                                       image_properties_width, 
-                                       image_properties_height, 
-                                       image_properties_pixel_size,
-                                       image_properties_buffer_length);
+  this->PropertiesButton->SetImageOption(image_properties, 
+                                         image_properties_width, 
+                                         image_properties_height, 
+                                         image_properties_pixel_size,
+                                         image_properties_buffer_length);
 
   this->Script("pack %s %s -side left -anchor w -padx 2",
                this->Label->GetWidgetName(),

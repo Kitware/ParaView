@@ -143,7 +143,7 @@ static unsigned char image_goto_end[] =
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterface);
-vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.62");
+vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.63");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterface,ControlledWidget, vtkPVWidget);
 
@@ -693,11 +693,11 @@ void vtkPVAnimationInterface::Create(vtkKWApplication *app, char *frameArgs)
   this->PlayButton->SetCommand(this, "Play");
   this->PlayButton->SetBalloonHelpString("Play animation");
 
-  this->PlayButton->SetImageData(image_play, 
-                                 image_play_width, 
-                                 image_play_height, 
-                                 image_play_pixel_size,
-                                 image_play_buffer_length);
+  this->PlayButton->SetImageOption(image_play, 
+                                   image_play_width, 
+                                   image_play_height, 
+                                   image_play_pixel_size,
+                                   image_play_buffer_length);
   
   // Animation Control: Stop button to stop the animation.
 
@@ -706,11 +706,11 @@ void vtkPVAnimationInterface::Create(vtkKWApplication *app, char *frameArgs)
   this->StopButton->SetCommand(this, "Stop");
   this->StopButton->SetBalloonHelpString("Stop animation");
   
-  this->StopButton->SetImageData(image_stop, 
-                                 image_stop_width, 
-                                 image_stop_height, 
-                                 image_stop_pixel_size,
-                                 image_stop_buffer_length);
+  this->StopButton->SetImageOption(image_stop, 
+                                   image_stop_width, 
+                                   image_stop_height, 
+                                   image_stop_pixel_size,
+                                   image_stop_buffer_length);
 
   // Animation Control: "go to beginning" button.
 
@@ -720,11 +720,12 @@ void vtkPVAnimationInterface::Create(vtkKWApplication *app, char *frameArgs)
   this->GoToBeginningButton->SetBalloonHelpString(
     "Go to the beginning of the animation");
 
-  this->GoToBeginningButton->SetImageData(image_goto_beginning, 
-                                          image_goto_beginning_width, 
-                                          image_goto_beginning_height, 
-                                          image_goto_beginning_pixel_size,
-                                          image_goto_beginning_buffer_length);
+  this->GoToBeginningButton->SetImageOption(
+    image_goto_beginning, 
+    image_goto_beginning_width, 
+    image_goto_beginning_height, 
+    image_goto_beginning_pixel_size,
+    image_goto_beginning_buffer_length);
 
   // Animation Control: "go to beginning" button.
 
@@ -734,11 +735,11 @@ void vtkPVAnimationInterface::Create(vtkKWApplication *app, char *frameArgs)
   this->GoToEndButton->SetBalloonHelpString(
     "Go to the end of the animation");
 
-  this->GoToEndButton->SetImageData(image_goto_end, 
-                                    image_goto_end_width, 
-                                    image_goto_end_height, 
-                                    image_goto_end_pixel_size,
-                                    image_goto_end_buffer_length);
+  this->GoToEndButton->SetImageOption(image_goto_end, 
+                                      image_goto_end_width, 
+                                      image_goto_end_height, 
+                                      image_goto_end_pixel_size,
+                                      image_goto_end_buffer_length);
 
   //  Animation Control: loop button to loop the animation.
 
@@ -750,11 +751,11 @@ void vtkPVAnimationInterface::Create(vtkKWApplication *app, char *frameArgs)
   this->LoopCheckButton->SetBalloonHelpString(
     "Enable/Disable animation loop.");
 
-  this->LoopCheckButton->SetImageData(image_loop, 
-                                      image_loop_width, 
-                                      image_loop_height, 
-                                      image_loop_pixel_size,
-                                      image_loop_buffer_length);
+  this->LoopCheckButton->SetImageOption(image_loop, 
+                                        image_loop_width, 
+                                        image_loop_height, 
+                                        image_loop_pixel_size,
+                                        image_loop_buffer_length);
 
   //  Animation Control: pack the transport buttons
 

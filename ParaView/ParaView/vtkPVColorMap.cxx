@@ -74,7 +74,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVColorMap);
-vtkCxxRevisionMacro(vtkPVColorMap, "1.58");
+vtkCxxRevisionMacro(vtkPVColorMap, "1.59");
 
 int vtkPVColorMapCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -471,11 +471,11 @@ void vtkPVColorMap::Create(vtkKWApplication *app)
     "Grayscale", 
     this, "SetColorSchemeToGrayscale", "Set Color Scheme to Grayscale");
 
-  this->PresetsMenuButton->SetImageData(image_presets, 
-                                        image_presets_width, 
-                                        image_presets_height, 
-                                        image_presets_pixel_size,
-                                        image_presets_buffer_length);
+  this->PresetsMenuButton->SetImageOption(image_presets, 
+                                          image_presets_width, 
+                                          image_presets_height, 
+                                          image_presets_pixel_size,
+                                          image_presets_buffer_length);
 
   this->Script("grid %s %s %s %s -sticky news -padx 1 -pady 2",
                this->PresetsMenuButton->GetWidgetName(),
@@ -2018,7 +2018,7 @@ void vtkPVColorMap::UpdateMap(int width, int height)
 
   if (size > 0)
     {
-    this->Map->SetImageData(this->MapData, width, height, 3);
+    this->Map->SetImageOption(this->MapData, width, height, 3);
     }
 }
 
