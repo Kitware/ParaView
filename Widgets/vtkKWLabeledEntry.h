@@ -54,6 +54,10 @@ public:
   void SetLabel(const char *);
   
   // Description:
+  // get the internal entry
+  vtkKWEntry *GetEntry() { return this->Entry; }
+  
+  // Description:
   // Set/Get the value of the entry in a few different formats.
   // In the SetValue method with float, the second argument is the
   // number of decimal places to display.
@@ -76,5 +80,3 @@ protected:
 
 
 #endif
-
-

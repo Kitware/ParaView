@@ -29,8 +29,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #ifndef __vtkPVImageReader_h
 #define __vtkPVImageReader_h
 
-#include "vtkKWLabel.h"
-#include "vtkKWEntry.h"
+#include "vtkKWLabeledEntry.h"
 #include "vtkKWPushButton.h"
 #include "vtkImageReader.h"
 #include "vtkPVImageSource.h"
@@ -71,12 +70,9 @@ protected:
   
   vtkKWPushButton *Accept;
   vtkKWPushButton *Open;
-  vtkKWLabel *XLabel;
-  vtkKWEntry *XDimension;
-  vtkKWLabel *YLabel;
-  vtkKWEntry *YDimension;
-  vtkKWLabel *ZLabel;
-  vtkKWEntry *ZDimension;
+  vtkKWLabeledEntry *XDimension;
+  vtkKWLabeledEntry *YDimension;
+  vtkKWLabeledEntry *ZDimension;
 };
 
 #endif

@@ -52,9 +52,7 @@ vtkPVPolyDataNormals::vtkPVPolyDataNormals()
   this->Splitting = vtkKWCheckButton::New();
   this->Splitting->SetParent(this->Properties);
 
-  this->FeatureAngleLabel = vtkKWLabel::New();
-  this->FeatureAngleLabel->SetParent(this->Properties);
-  this->FeatureAngleEntry = vtkKWEntry::New();
+  this->FeatureAngleEntry = vtkKWLabeledEntry::New();
   this->FeatureAngleEntry->SetParent(this->Properties);
   
   this->PolyDataNormals = vtkPolyDataNormals::New();
@@ -72,8 +70,6 @@ vtkPVPolyDataNormals::~vtkPVPolyDataNormals()
   this->Splitting->Delete();
   this->Splitting = NULL;
   
-  this->FeatureAngleLabel->Delete();
-  this->FeatureAngleLabel = NULL;
   this->FeatureAngleEntry->Delete();
   this->FeatureAngleEntry = NULL;
   
@@ -102,17 +98,14 @@ void vtkPVPolyDataNormals::CreateProperties()
   this->Splitting->Create(this->Application, "-text Splitting");
   this->Splitting->SetState(0);
   
-  this->FeatureAngleLabel->Create(this->Application, "");
-  this->FeatureAngleLabel->SetLabel("Feature Angle:");
-  
-  this->FeatureAngleEntry->Create(this->Application, "");
+  this->FeatureAngleEntry->Create(this->Application);
+  this->FeatureAngleEntry->SetLabel("Feature Angle:");
   this->FeatureAngleEntry->SetValue(this->GetPolyDataNormals()->GetFeatureAngle());
   
-  this->Script("pack %s %s %s %s %s",
+  this->Script("pack %s %s %s %s",
 	       this->SourceButton->GetWidgetName(),
 	       this->Accept->GetWidgetName(),
 	       this->Splitting->GetWidgetName(),
-	       this->FeatureAngleLabel->GetWidgetName(),
 	       this->FeatureAngleEntry->GetWidgetName());
 }
 

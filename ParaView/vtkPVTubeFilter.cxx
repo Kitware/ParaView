@@ -45,13 +45,9 @@ vtkPVTubeFilter::vtkPVTubeFilter()
   this->Accept->SetParent(this->Properties);
   this->SourceButton = vtkKWPushButton::New();
   this->SourceButton->SetParent(this->Properties);
-  this->RadiusLabel = vtkKWLabel::New();
-  this->RadiusLabel->SetParent(this->Properties);
-  this->RadiusEntry = vtkKWEntry::New();
+  this->RadiusEntry = vtkKWLabeledEntry::New();
   this->RadiusEntry->SetParent(this->Properties);
-  this->SidesLabel = vtkKWLabel::New();
-  this->SidesLabel->SetParent(this->Properties);
-  this->SidesEntry = vtkKWEntry::New();
+  this->SidesEntry = vtkKWLabeledEntry::New();
   this->SidesEntry->SetParent(this->Properties);
   
   vtkTubeFilter *tube = vtkTubeFilter::New();
@@ -67,12 +63,8 @@ vtkPVTubeFilter::~vtkPVTubeFilter()
   this->SourceButton->Delete();
   this->SourceButton = NULL;
   
-  this->RadiusLabel->Delete();
-  this->RadiusLabel = NULL;
   this->RadiusEntry->Delete();
   this->RadiusEntry = NULL;
-  this->SidesLabel->Delete();
-  this->SidesLabel = NULL;
   this->SidesEntry->Delete();
   this->SidesEntry = NULL;
 }
@@ -89,25 +81,21 @@ void vtkPVTubeFilter::CreateProperties()
   // must set the application
   this->vtkPVSource::CreateProperties();
   
-  this->RadiusLabel->Create(this->Application, "");
-  this->RadiusLabel->SetLabel("radius:");
-  this->RadiusEntry->Create(this->Application, "");
+  this->RadiusEntry->Create(this->Application);
+  this->RadiusEntry->SetLabel("Radius: ");
   this->RadiusEntry->SetValue(this->GetTubeFilter()->GetRadius(), 2);
-  this->SidesLabel->Create(this->Application, "");
-  this->SidesLabel->SetLabel("number of sides:");
-  this->SidesEntry->Create(this->Application, "");
+  this->SidesEntry->Create(this->Application);
+  this->SidesEntry->SetLabel("Number of Sides: ");
   this->SidesEntry->SetValue(this->GetTubeFilter()->GetNumberOfSides());
   
   this->SourceButton->Create(this->Application, "-text GetSource");
   this->SourceButton->SetCommand(this, "SelectInputSource");
   this->Accept->Create(this->Application, "-text Accept");
   this->Accept->SetCommand(this, "TubeFilterChanged");
-  this->Script("pack %s %s %s %s %s %s",
+  this->Script("pack %s %s %s %s",
 	       this->SourceButton->GetWidgetName(),
 	       this->Accept->GetWidgetName(),
-	       this->RadiusLabel->GetWidgetName(),
 	       this->RadiusEntry->GetWidgetName(),
-	       this->SidesLabel->GetWidgetName(),
 	       this->SidesEntry->GetWidgetName());
 }
 

@@ -41,17 +41,11 @@ vtkPVConeSource::vtkPVConeSource()
 {
   this->CommandFunction = vtkPVConeSourceCommand;
   
-  this->HeightLabel = vtkKWLabel::New();
-  this->HeightLabel->SetParent(this->Properties);
-  this->RadiusLabel = vtkKWLabel::New();
-  this->RadiusLabel->SetParent(this->Properties);
-  this->ResolutionLabel = vtkKWLabel::New();
-  this->ResolutionLabel->SetParent(this->Properties);
-  this->HeightEntry = vtkKWEntry::New();
+  this->HeightEntry = vtkKWLabeledEntry::New();
   this->HeightEntry->SetParent(this->Properties);
-  this->RadiusEntry = vtkKWEntry::New();
+  this->RadiusEntry = vtkKWLabeledEntry::New();
   this->RadiusEntry->SetParent(this->Properties);
-  this->ResolutionEntry = vtkKWEntry::New();
+  this->ResolutionEntry = vtkKWLabeledEntry::New();
   this->ResolutionEntry->SetParent(this->Properties);
   this->Accept = vtkKWPushButton::New();
   this->Accept->SetParent(this->Properties);
@@ -64,13 +58,6 @@ vtkPVConeSource::vtkPVConeSource()
 //----------------------------------------------------------------------------
 vtkPVConeSource::~vtkPVConeSource()
 {
-  this->HeightLabel->Delete();
-  this->HeightLabel = NULL;
-  this->RadiusLabel->Delete();
-  this->RadiusLabel = NULL;
-  this->ResolutionLabel->Delete();
-  this->ResolutionLabel = NULL;
-  
   this->HeightEntry->Delete();
   this->HeightEntry = NULL;
   this->RadiusEntry->Delete();
@@ -95,27 +82,21 @@ void vtkPVConeSource::CreateProperties()
 {  
   this->vtkPVPolyDataSource::CreateProperties();
   
-  this->RadiusLabel->Create(this->Application, "");
-  this->RadiusLabel->SetLabel("Radius:");
-  this->HeightLabel->Create(this->Application, "");
-  this->HeightLabel->SetLabel("Height:");
-  this->ResolutionLabel->Create(this->Application, "");
-  this->ResolutionLabel->SetLabel("Resolution:");
-  this->RadiusEntry->Create(this->Application, "");
+  this->RadiusEntry->Create(this->Application);
+  this->RadiusEntry->SetLabel("Radius:");
   this->RadiusEntry->SetValue(this->GetConeSource()->GetRadius(), 2);
-  this->HeightEntry->Create(this->Application, "");
+  this->HeightEntry->Create(this->Application);
+  this->HeightEntry->SetLabel("Height:");
   this->HeightEntry->SetValue(this->GetConeSource()->GetHeight(), 2);
-  this->ResolutionEntry->Create(this->Application, "");
+  this->ResolutionEntry->Create(this->Application);
+  this->ResolutionEntry->SetLabel("Resolution:");
   this->ResolutionEntry->SetValue(this->GetConeSource()->GetResolution());
   this->Accept->Create(this->Application, "-text Accept");
   this->Accept->SetCommand(this, "ConeParameterChanged");
-  this->Script("pack %s %s %s %s %s %s %s",
+  this->Script("pack %s %s %s %s",
 	       this->Accept->GetWidgetName(),
-               this->RadiusLabel->GetWidgetName(),
                this->RadiusEntry->GetWidgetName(),
-               this->HeightLabel->GetWidgetName(),
                this->HeightEntry->GetWidgetName(),
-               this->ResolutionLabel->GetWidgetName(),
                this->ResolutionEntry->GetWidgetName());
 }
 

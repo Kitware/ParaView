@@ -29,9 +29,6 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #ifndef __vtkPVImageSource_h
 #define __vtkPVImageSource_h
 
-#include "vtkKWLabel.h"
-#include "vtkKWEntry.h"
-#include "vtkKWPushButton.h"
 #include "vtkImageReader.h"
 #include "vtkPVSource.h"
 

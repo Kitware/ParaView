@@ -41,17 +41,11 @@ vtkPVSphereSource::vtkPVSphereSource()
 {
   this->CommandFunction = vtkPVSphereSourceCommand;
   
-  this->RadiusLabel = vtkKWLabel::New();
-  this->RadiusLabel->SetParent(this->Properties);
-  this->PhiResolutionLabel = vtkKWLabel::New();
-  this->PhiResolutionLabel->SetParent(this->Properties);
-  this->ThetaResolutionLabel = vtkKWLabel::New();
-  this->ThetaResolutionLabel->SetParent(this->Properties);
-  this->RadiusEntry = vtkKWEntry::New();
+  this->RadiusEntry = vtkKWLabeledEntry::New();
   this->RadiusEntry->SetParent(this->Properties);
-  this->PhiResolutionEntry = vtkKWEntry::New();
+  this->PhiResolutionEntry = vtkKWLabeledEntry::New();
   this->PhiResolutionEntry->SetParent(this->Properties);
-  this->ThetaResolutionEntry = vtkKWEntry::New();
+  this->ThetaResolutionEntry = vtkKWLabeledEntry::New();
   this->ThetaResolutionEntry->SetParent(this->Properties);
   this->Accept = vtkKWPushButton::New();
   this->Accept->SetParent(this->Properties);
@@ -64,13 +58,6 @@ vtkPVSphereSource::vtkPVSphereSource()
 //----------------------------------------------------------------------------
 vtkPVSphereSource::~vtkPVSphereSource()
 {
-  this->RadiusLabel->Delete();
-  this->RadiusLabel = NULL;
-  this->PhiResolutionLabel->Delete();
-  this->PhiResolutionLabel = NULL;
-  this->ThetaResolutionLabel->Delete();
-  this->ThetaResolutionLabel = NULL;
-  
   this->RadiusEntry->Delete();
   this->RadiusEntry = NULL;
   this->PhiResolutionEntry->Delete();
@@ -93,27 +80,21 @@ void vtkPVSphereSource::CreateProperties()
 {  
   this->vtkPVPolyDataSource::CreateProperties();
   
-  this->RadiusLabel->Create(this->Application, "");
-  this->RadiusLabel->SetLabel("Radius:");
-  this->PhiResolutionLabel->Create(this->Application, "");
-  this->PhiResolutionLabel->SetLabel("Phi Resolution:");
-  this->ThetaResolutionLabel->Create(this->Application, "");
-  this->ThetaResolutionLabel->SetLabel("Theta Resolution:");
-  this->RadiusEntry->Create(this->Application, "");
+  this->RadiusEntry->Create(this->Application);
   this->RadiusEntry->SetValue(this->GetSphereSource()->GetRadius(), 2);
-  this->PhiResolutionEntry->Create(this->Application, "");
+  this->RadiusEntry->SetLabel("Radius:");
+  this->PhiResolutionEntry->Create(this->Application);
   this->PhiResolutionEntry->SetValue(this->GetSphereSource()->GetPhiResolution());
-  this->ThetaResolutionEntry->Create(this->Application, "");
+  this->PhiResolutionEntry->SetLabel("Phi Resolution:");
+  this->ThetaResolutionEntry->Create(this->Application);
   this->ThetaResolutionEntry->SetValue(this->GetSphereSource()->GetThetaResolution());
+  this->ThetaResolutionEntry->SetLabel("ThetaResolution:");
   this->Accept->Create(this->Application, "-text Accept");
   this->Accept->SetCommand(this, "SphereParameterChanged");
-  this->Script("pack %s %s %s %s %s %s %s",
+  this->Script("pack %s %s %s %s",
 	       this->Accept->GetWidgetName(),
-               this->RadiusLabel->GetWidgetName(),
                this->RadiusEntry->GetWidgetName(),
-               this->PhiResolutionLabel->GetWidgetName(),
                this->PhiResolutionEntry->GetWidgetName(),
-               this->ThetaResolutionLabel->GetWidgetName(),
                this->ThetaResolutionEntry->GetWidgetName());
 }
 
@@ -207,7 +188,6 @@ void vtkPVSphereSource::SetThetaResolution(int res)
     pvApp->BroadcastScript("%s SetThetaResolution %d", this->GetTclName(), res);
     }
 }
-
 
 //----------------------------------------------------------------------------
 vtkSphereSource *vtkPVSphereSource::GetSphereSource()

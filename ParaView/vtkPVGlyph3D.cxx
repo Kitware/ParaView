@@ -45,10 +45,8 @@ vtkPVGlyph3D::vtkPVGlyph3D()
   
   this->GlyphSourceButton = vtkKWPushButton::New();
   this->GlyphSourceButton->SetParent(this->Properties);
-  this->ScaleFactorEntry = vtkKWEntry::New();
+  this->ScaleFactorEntry = vtkKWLabeledEntry::New();
   this->ScaleFactorEntry->SetParent(this->Properties);
-  this->ScaleFactorLabel = vtkKWLabel::New();
-  this->ScaleFactorLabel->SetParent(this->Properties);
   this->SourceButton = vtkKWPushButton::New();
   this->SourceButton->SetParent(this->Properties);
   this->Accept = vtkKWPushButton::New();
@@ -64,8 +62,6 @@ vtkPVGlyph3D::~vtkPVGlyph3D()
   this->GlyphSourceButton = NULL;
   this->ScaleFactorEntry->Delete();
   this->ScaleFactorEntry = NULL;
-  this->ScaleFactorLabel->Delete();
-  this->ScaleFactorLabel = NULL;
   this->SourceButton->Delete();
   this->SourceButton = NULL;
   this->Accept->Delete();
@@ -90,20 +86,18 @@ void vtkPVGlyph3D::CreateProperties()
   this->GlyphSourceButton->Create(this->Application, "-text GetGlyphSource");
   this->GlyphSourceButton->SetCommand(this, "ShowGlyphSource");
   
-  this->ScaleFactorEntry->Create(this->Application, "");
+  this->ScaleFactorEntry->Create(this->Application);
   this->ScaleFactorEntry->SetValue(1, 2);
-  this->ScaleFactorLabel->Create(this->Application, "");
-  this->ScaleFactorLabel->SetLabel("Scale Factor:");
+  this->ScaleFactorEntry->SetLabel("Scale Factor:");
   this->Accept->Create(this->Application, "-text Accept");
   this->Accept->SetCommand(this, "ScaleFactorChanged");
   this->SourceButton->Create(this->Application, "-text GetSource");
   this->SourceButton->SetCommand(this, "GetSource");
   
-  this->Script("pack %s %s %s %s %s",
+  this->Script("pack %s %s %s %s",
 	       this->SourceButton->GetWidgetName(),
 	       this->GlyphSourceButton->GetWidgetName(),
 	       this->Accept->GetWidgetName(),
-	       this->ScaleFactorLabel->GetWidgetName(),
 	       this->ScaleFactorEntry->GetWidgetName());
 }
 

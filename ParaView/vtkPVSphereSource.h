@@ -33,12 +33,10 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #ifndef __vtkPVSphereSource_h
 #define __vtkPVSphereSource_h
 
-#include "vtkKWLabel.h"
 #include "vtkSphereSource.h"
 #include "vtkShrinkPolyData.h"
-#include "vtkKWEntry.h"
-#include "vtkKWScale.h"
 #include "vtkKWPushButton.h"
+#include "vtkKWLabeledEntry.h"
 #include "vtkPVPolyDataSource.h"
 
 class vtkPVPolyData;
@@ -76,12 +74,9 @@ protected:
   vtkPVSphereSource(const vtkPVSphereSource&) {};
   void operator=(const vtkPVSphereSource&) {};
   
-  vtkKWLabel *RadiusLabel;
-  vtkKWEntry *RadiusEntry;
-  vtkKWLabel *PhiResolutionLabel;
-  vtkKWEntry *PhiResolutionEntry;
-  vtkKWLabel *ThetaResolutionLabel;
-  vtkKWEntry *ThetaResolutionEntry;
+  vtkKWLabeledEntry *RadiusEntry;
+  vtkKWLabeledEntry *PhiResolutionEntry;
+  vtkKWLabeledEntry *ThetaResolutionEntry;
   vtkKWPushButton *Accept;
 };
 

@@ -45,9 +45,7 @@ vtkPVGetRemoteGhostCells::vtkPVGetRemoteGhostCells()
   this->Accept->SetParent(this->Properties);
   this->SourceButton = vtkKWPushButton::New();
   this->SourceButton->SetParent(this->Properties);
-  this->GhostLevelLabel = vtkKWLabel::New();
-  this->GhostLevelLabel->SetParent(this->Properties);
-  this->GhostLevelEntry = vtkKWEntry::New();
+  this->GhostLevelEntry = vtkKWLabeledEntry::New();
   this->GhostLevelEntry->SetParent(this->Properties);
 
   vtkGetRemoteGhostCells *rgc = vtkGetRemoteGhostCells::New();
@@ -62,8 +60,6 @@ vtkPVGetRemoteGhostCells::~vtkPVGetRemoteGhostCells()
   this->Accept = NULL;
   this->SourceButton->Delete();
   this->SourceButton = NULL;
-  this->GhostLevelLabel->Delete();
-  this->GhostLevelLabel = NULL;
   this->GhostLevelEntry->Delete();
   this->GhostLevelEntry = NULL;
 }
@@ -80,9 +76,8 @@ void vtkPVGetRemoteGhostCells::CreateProperties()
   // must set the application
   this->vtkPVSource::CreateProperties();
   
-  this->GhostLevelLabel->Create(this->Application, "");
-  this->GhostLevelLabel->SetLabel("Ghost Level: ");
-  this->GhostLevelEntry->Create(this->Application, "");
+  this->GhostLevelEntry->Create(this->Application);
+  this->GhostLevelEntry->SetLabel("Ghost Level: ");
   this->GhostLevelEntry->SetValue(this->GetRemoteGhostCells()->GetOutput()->
 				  GetUpdateGhostLevel());
   
@@ -90,10 +85,9 @@ void vtkPVGetRemoteGhostCells::CreateProperties()
   this->SourceButton->SetCommand(this, "SelectInputSource");
   this->Accept->Create(this->Application, "-text Accept");
   this->Accept->SetCommand(this, "GhostLevelChanged");
-  this->Script("pack %s %s %s %s",
+  this->Script("pack %s %s %s",
 	       this->SourceButton->GetWidgetName(),
 	       this->Accept->GetWidgetName(),
-	       this->GhostLevelLabel->GetWidgetName(),
 	       this->GhostLevelEntry->GetWidgetName());
 }
 

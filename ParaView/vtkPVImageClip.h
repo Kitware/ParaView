@@ -28,10 +28,9 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #ifndef __vtkPVImageClip_h
 #define __vtkPVImageClip_h
 
-#include "vtkKWLabel.h"
 #include "vtkKWPushButton.h"
 #include "vtkImageClip.h"
-#include "vtkKWEntry.h"
+#include "vtkKWLabeledEntry.h"
 #include "vtkPVSource.h"
 #include "vtkInteractorStyleImageExtent.h"
 
@@ -78,12 +77,12 @@ public:
   // Description:
   // need to be able to access the entry widgets from the interactor style's
   // callback
-  vtkGetObjectMacro(ClipXMinEntry, vtkKWEntry);
-  vtkGetObjectMacro(ClipXMaxEntry, vtkKWEntry);
-  vtkGetObjectMacro(ClipYMinEntry, vtkKWEntry);
-  vtkGetObjectMacro(ClipYMaxEntry, vtkKWEntry);
-  vtkGetObjectMacro(ClipZMinEntry, vtkKWEntry);
-  vtkGetObjectMacro(ClipZMaxEntry, vtkKWEntry);
+  vtkGetObjectMacro(ClipXMinEntry, vtkKWLabeledEntry);
+  vtkGetObjectMacro(ClipXMaxEntry, vtkKWLabeledEntry);
+  vtkGetObjectMacro(ClipYMinEntry, vtkKWLabeledEntry);
+  vtkGetObjectMacro(ClipYMaxEntry, vtkKWLabeledEntry);
+  vtkGetObjectMacro(ClipZMinEntry, vtkKWLabeledEntry);
+  vtkGetObjectMacro(ClipZMaxEntry, vtkKWLabeledEntry);
   
   void UseExtentStyle();
   
@@ -95,18 +94,12 @@ protected:
   
   vtkKWPushButton *Accept;
   vtkKWPushButton *SourceButton;
-  vtkKWEntry *ClipXMinEntry;
-  vtkKWLabel *ClipXMinLabel;
-  vtkKWEntry *ClipXMaxEntry;
-  vtkKWLabel *ClipXMaxLabel;
-  vtkKWEntry *ClipYMinEntry;
-  vtkKWLabel *ClipYMinLabel;
-  vtkKWEntry *ClipYMaxEntry;
-  vtkKWLabel *ClipYMaxLabel;
-  vtkKWEntry *ClipZMinEntry;
-  vtkKWLabel *ClipZMinLabel;
-  vtkKWEntry *ClipZMaxEntry;
-  vtkKWLabel *ClipZMaxLabel;
+  vtkKWLabeledEntry *ClipXMinEntry;
+  vtkKWLabeledEntry *ClipXMaxEntry;
+  vtkKWLabeledEntry *ClipYMinEntry;
+  vtkKWLabeledEntry *ClipYMaxEntry;
+  vtkKWLabeledEntry *ClipZMinEntry;
+  vtkKWLabeledEntry *ClipZMaxEntry;
 
   vtkKWPushButton *ExtentStyleButton;
   

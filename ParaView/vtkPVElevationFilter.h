@@ -30,11 +30,9 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #define __vtkPVElevationFilter_h
 
 #include "vtkPVDataSetToDataSetFilter.h"
-#include "vtkKWLabel.h"
 #include "vtkElevationFilter.h"
-#include "vtkKWEntry.h"
-#include "vtkKWScale.h"
 #include "vtkKWPushButton.h"
+#include "vtkKWLabeledEntry.h"
 #include "vtkPVSource.h"
 
 class vtkPVPolyData;
@@ -65,6 +63,7 @@ public:
   void SetHighPoint(float x, float y, float z);
   void SetScalarRange(float min, float max);
 
+  void GetSource();
   
 protected:
   vtkPVElevationFilter();
@@ -79,22 +78,14 @@ protected:
   vtkKWWidget *HighPointFrame;
   vtkKWWidget *RangeFrame;
   
-  vtkKWEntry *LowPointXEntry;
-  vtkKWEntry *LowPointYEntry;
-  vtkKWEntry *LowPointZEntry;
-  vtkKWEntry *HighPointXEntry;
-  vtkKWEntry *HighPointYEntry;
-  vtkKWEntry *HighPointZEntry;
-  vtkKWEntry *RangeMinEntry;
-  vtkKWEntry *RangeMaxEntry;
-  vtkKWLabel *LowPointXLabel;
-  vtkKWLabel *LowPointYLabel;
-  vtkKWLabel *LowPointZLabel;
-  vtkKWLabel *HighPointXLabel;
-  vtkKWLabel *HighPointYLabel;
-  vtkKWLabel *HighPointZLabel;
-  vtkKWLabel *RangeMinLabel;
-  vtkKWLabel *RangeMaxLabel;
+  vtkKWLabeledEntry *LowPointXEntry;
+  vtkKWLabeledEntry *LowPointYEntry;
+  vtkKWLabeledEntry *LowPointZEntry;
+  vtkKWLabeledEntry *HighPointXEntry;
+  vtkKWLabeledEntry *HighPointYEntry;
+  vtkKWLabeledEntry *HighPointZEntry;
+  vtkKWLabeledEntry *RangeMinEntry;
+  vtkKWLabeledEntry *RangeMaxEntry;
   
   vtkKWPushButton *Accept;
   vtkKWPushButton *SourceButton;

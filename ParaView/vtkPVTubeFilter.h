@@ -29,9 +29,8 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #ifndef __vtkPVTubeFilter_h
 #define __vtkPVTubeFilter_h
 
-#include "vtkKWLabel.h"
 #include "vtkTubeFilter.h"
-#include "vtkKWEntry.h"
+#include "vtkKWLabeledEntry.h"
 #include "vtkKWPushButton.h"
 #include "vtkPVPolyDataToPolyDataFilter.h"
 
@@ -69,10 +68,8 @@ protected:
   
   vtkKWPushButton *Accept;
   vtkKWPushButton *SourceButton;
-  vtkKWLabel *RadiusLabel;
-  vtkKWEntry *RadiusEntry;
-  vtkKWLabel *SidesLabel;
-  vtkKWEntry *SidesEntry;
+  vtkKWLabeledEntry *RadiusEntry;
+  vtkKWLabeledEntry *SidesEntry;
 };
 
 #endif

@@ -48,31 +48,18 @@ vtkPVImageClip::vtkPVImageClip()
   this->Accept = vtkKWPushButton::New();
   this->Accept->SetParent(this->Properties);
   
-  this->ClipXMinEntry = vtkKWEntry::New();
+  this->ClipXMinEntry = vtkKWLabeledEntry::New();
   this->ClipXMinEntry->SetParent(this->Properties);
-  this->ClipXMaxEntry = vtkKWEntry::New();
+  this->ClipXMaxEntry = vtkKWLabeledEntry::New();
   this->ClipXMaxEntry->SetParent(this->Properties);
-  this->ClipYMinEntry = vtkKWEntry::New();
+  this->ClipYMinEntry = vtkKWLabeledEntry::New();
   this->ClipYMinEntry->SetParent(this->Properties);
-  this->ClipYMaxEntry = vtkKWEntry::New();
+  this->ClipYMaxEntry = vtkKWLabeledEntry::New();
   this->ClipYMaxEntry->SetParent(this->Properties);
-  this->ClipZMinEntry = vtkKWEntry::New();
+  this->ClipZMinEntry = vtkKWLabeledEntry::New();
   this->ClipZMinEntry->SetParent(this->Properties);
-  this->ClipZMaxEntry = vtkKWEntry::New();
+  this->ClipZMaxEntry = vtkKWLabeledEntry::New();
   this->ClipZMaxEntry->SetParent(this->Properties);
-  
-  this->ClipXMinLabel = vtkKWLabel::New();
-  this->ClipXMinLabel->SetParent(this->Properties);
-  this->ClipXMaxLabel = vtkKWLabel::New();
-  this->ClipXMaxLabel->SetParent(this->Properties);
-  this->ClipYMinLabel = vtkKWLabel::New();
-  this->ClipYMinLabel->SetParent(this->Properties);
-  this->ClipYMaxLabel = vtkKWLabel::New();
-  this->ClipYMaxLabel->SetParent(this->Properties);
-  this->ClipZMinLabel = vtkKWLabel::New();
-  this->ClipZMinLabel->SetParent(this->Properties);
-  this->ClipZMaxLabel = vtkKWLabel::New();
-  this->ClipZMaxLabel->SetParent(this->Properties);
   
   this->ExtentStyleButton = vtkKWPushButton::New();
   
@@ -105,19 +92,6 @@ vtkPVImageClip::~vtkPVImageClip()
   this->ClipZMaxEntry->Delete();
   this->ClipZMaxEntry = NULL;
   
-  this->ClipXMinLabel->Delete();
-  this->ClipXMinLabel = NULL;
-  this->ClipXMaxLabel->Delete();
-  this->ClipXMaxLabel = NULL;
-  this->ClipYMinLabel->Delete();
-  this->ClipYMinLabel = NULL;
-  this->ClipYMaxLabel->Delete();
-  this->ClipYMaxLabel = NULL;
-  this->ClipZMinLabel->Delete();
-  this->ClipZMinLabel = NULL;
-  this->ClipZMaxLabel->Delete();
-  this->ClipZMaxLabel = NULL;
-  
   this->ExtentStyleButton->Delete();
   this->ExtentStyleButton = NULL;
   
@@ -148,49 +122,37 @@ void vtkPVImageClip::CreateProperties()
     SetImageData((vtkImageData*)this->GetInput()->GetData());
   this->GetExtentStyle()->SetExtent(extents);
   
-  this->ClipXMinLabel->Create(this->Application, "");
-  this->ClipXMinLabel->SetLabel("X Min.:");
-  this->ClipXMinEntry->Create(this->Application, "");
+  this->ClipXMinEntry->Create(this->Application);
+  this->ClipXMinEntry->SetLabel("X Min.:");
   this->ClipXMinEntry->SetValue(extents[0]);
-  this->ClipXMaxLabel->Create(this->Application, "");
-  this->ClipXMaxLabel->SetLabel("X Max.:");
-  this->ClipXMaxEntry->Create(this->Application, "");
+  this->ClipXMaxEntry->Create(this->Application);
+  this->ClipXMaxEntry->SetLabel("X Max.:");
   this->ClipXMaxEntry->SetValue(extents[1]);
-  this->ClipYMinLabel->Create(this->Application, "");
-  this->ClipYMinLabel->SetLabel("Y Min.:");
-  this->ClipYMinEntry->Create(this->Application, "");
+  this->ClipYMinEntry->Create(this->Application);
+  this->ClipYMinEntry->SetLabel("Y Min.:");
   this->ClipYMinEntry->SetValue(extents[2]);
-  this->ClipYMaxLabel->Create(this->Application, "");
-  this->ClipYMaxLabel->SetLabel("Y Max.:");
-  this->ClipYMaxEntry->Create(this->Application, "");
+  this->ClipYMaxEntry->Create(this->Application);
+  this->ClipYMaxEntry->SetLabel("Y Max.:");
   this->ClipYMaxEntry->SetValue(extents[3]);
-  this->ClipZMinLabel->Create(this->Application, "");
-  this->ClipZMinLabel->SetLabel("Z Min.:");
-  this->ClipZMinEntry->Create(this->Application, "");
+  this->ClipZMinEntry->Create(this->Application);
+  this->ClipZMinEntry->SetLabel("Z Min.:");
   this->ClipZMinEntry->SetValue(extents[4]);
-  this->ClipZMaxLabel->Create(this->Application, "");
-  this->ClipZMaxLabel->SetLabel("Z Max.:");
-  this->ClipZMaxEntry->Create(this->Application, "");
+  this->ClipZMaxEntry->Create(this->Application);
+  this->ClipZMaxEntry->SetLabel("Z Max.:");
   this->ClipZMaxEntry->SetValue(extents[5]);
   
   this->SourceButton->Create(this->Application, "-text GetSource");
   this->SourceButton->SetCommand(this, "GetSource");
   this->Accept->Create(this->Application, "-text Accept");
   this->Accept->SetCommand(this, "ExtentsChanged");
-  this->Script("pack %s %s %s %s %s %s %s %s %s %s %s %s %s %s",
+  this->Script("pack %s %s %s %s %s %s %s %s",
 	       this->SourceButton->GetWidgetName(),
 	       this->Accept->GetWidgetName(),
-	       this->ClipXMinLabel->GetWidgetName(),
 	       this->ClipXMinEntry->GetWidgetName(),
-	       this->ClipXMaxLabel->GetWidgetName(),
 	       this->ClipXMaxEntry->GetWidgetName(),
-	       this->ClipYMinLabel->GetWidgetName(),
 	       this->ClipYMinEntry->GetWidgetName(),
-	       this->ClipYMaxLabel->GetWidgetName(),
 	       this->ClipYMaxEntry->GetWidgetName(),
-	       this->ClipZMinLabel->GetWidgetName(),
 	       this->ClipZMinEntry->GetWidgetName(),
-	       this->ClipZMaxLabel->GetWidgetName(),
 	       this->ClipZMaxEntry->GetWidgetName());
 }
 

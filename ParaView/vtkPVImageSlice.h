@@ -30,8 +30,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #define __vtkPVImageSlice_h
 
 #include "vtkImageClip.h"
-#include "vtkKWEntry.h"
-#include "vtkKWLabel.h"
+#include "vtkKWLabeledEntry.h"
 #include "vtkKWPushButton.h"
 #include "vtkKWRadioButton.h"
 #include "vtkPVSource.h"
@@ -101,7 +100,7 @@ public:
   virtual void Deselect(vtkKWView *view);
   
   void UseSliceStyle();
-  vtkGetObjectMacro(SliceEntry, vtkKWEntry);
+  vtkGetObjectMacro(SliceEntry, vtkKWLabeledEntry);
   
 protected:
   vtkPVImageSlice();
@@ -115,8 +114,7 @@ protected:
   
   vtkKWPushButton *Accept;
   vtkKWPushButton *SourceButton;
-  vtkKWEntry *SliceEntry;
-  vtkKWLabel *SliceLabel;
+  vtkKWLabeledEntry *SliceEntry;
   vtkKWRadioButton *XDimension;
   vtkKWRadioButton *YDimension;
   vtkKWRadioButton *ZDimension;

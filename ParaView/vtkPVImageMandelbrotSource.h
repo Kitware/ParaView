@@ -29,9 +29,8 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #ifndef __vtkPVImageMandelbrotSource_h
 #define __vtkPVImageMandelbrotSource_h
 
-#include "vtkKWLabel.h"
 #include "vtkKWLabeledFrame.h"
-#include "vtkKWEntry.h"
+#include "vtkKWLabeledEntry.h"
 #include "vtkKWPushButton.h"
 #include "vtkImageMandelbrotSource.h"
 #include "vtkPVImageSource.h"
@@ -71,28 +70,19 @@ protected:
   vtkKWPushButton *Accept;
 
   vtkKWLabeledFrame *DimensionsFrame;
-  vtkKWLabel *XDimLabel;
-  vtkKWEntry *XDimension;
-  vtkKWLabel *YDimLabel;
-  vtkKWEntry *YDimension;
-  vtkKWLabel *ZDimLabel;
-  vtkKWEntry *ZDimension;
+  vtkKWLabeledEntry *XDimension;
+  vtkKWLabeledEntry *YDimension;
+  vtkKWLabeledEntry *ZDimension;
 
   vtkKWLabeledFrame *CenterFrame;
-  vtkKWLabel *CRealLabel;
-  vtkKWEntry *CRealEntry;
-  vtkKWLabel *CImaginaryLabel;
-  vtkKWEntry *CImaginaryEntry;
-  vtkKWLabel *XRealLabel;
-  vtkKWEntry *XRealEntry;
-  vtkKWLabel *XImaginaryLabel;
-  vtkKWEntry *XImaginaryEntry;
+  vtkKWLabeledEntry *CRealEntry;
+  vtkKWLabeledEntry *CImaginaryEntry;
+  vtkKWLabeledEntry *XRealEntry;
+  vtkKWLabeledEntry *XImaginaryEntry;
   
-  vtkKWLabel *CSpacingLabel;
-  vtkKWEntry *CSpacingEntry;
+  vtkKWLabeledEntry *CSpacingEntry;
   
-  vtkKWLabel *XSpacingLabel;
-  vtkKWEntry *XSpacingEntry;
+  vtkKWLabeledEntry *XSpacingEntry;
   
   
 };

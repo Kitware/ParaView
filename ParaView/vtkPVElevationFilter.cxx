@@ -47,50 +47,33 @@ vtkPVElevationFilter::vtkPVElevationFilter()
   this->LowPointLabel->SetParent(this->Properties);
   this->LowPointFrame = vtkKWWidget::New();
   this->LowPointFrame->SetParent(this->Properties);
-  this->LowPointXEntry = vtkKWEntry::New();
+  this->LowPointXEntry = vtkKWLabeledEntry::New();
   this->LowPointXEntry->SetParent(this->LowPointFrame);
-  this->LowPointYEntry = vtkKWEntry::New();
+  this->LowPointYEntry = vtkKWLabeledEntry::New();
   this->LowPointYEntry->SetParent(this->LowPointFrame);
-  this->LowPointZEntry = vtkKWEntry::New();
+  this->LowPointZEntry = vtkKWLabeledEntry::New();
   this->LowPointZEntry->SetParent(this->LowPointFrame);
 
   this->HighPointLabel = vtkKWLabel::New();
   this->HighPointLabel->SetParent(this->Properties);
   this->HighPointFrame = vtkKWWidget::New();
   this->HighPointFrame->SetParent(this->Properties);
-  this->HighPointXEntry = vtkKWEntry::New();
+  this->HighPointXEntry = vtkKWLabeledEntry::New();
   this->HighPointXEntry->SetParent(this->HighPointFrame);
-  this->HighPointYEntry = vtkKWEntry::New();
+  this->HighPointYEntry = vtkKWLabeledEntry::New();
   this->HighPointYEntry->SetParent(this->HighPointFrame);
-  this->HighPointZEntry = vtkKWEntry::New();
+  this->HighPointZEntry = vtkKWLabeledEntry::New();
   this->HighPointZEntry->SetParent(this->HighPointFrame);
 
   this->RangeLabel = vtkKWLabel::New();
   this->RangeLabel->SetParent(this->Properties);
   this->RangeFrame = vtkKWWidget::New();
   this->RangeFrame->SetParent(this->Properties);
-  this->RangeMinEntry = vtkKWEntry::New();
+  this->RangeMinEntry = vtkKWLabeledEntry::New();
   this->RangeMinEntry->SetParent(this->RangeFrame);
-  this->RangeMaxEntry = vtkKWEntry::New();
+  this->RangeMaxEntry = vtkKWLabeledEntry::New();
   this->RangeMaxEntry->SetParent(this->RangeFrame);
 
-  this->LowPointXLabel = vtkKWLabel::New();
-  this->LowPointXLabel->SetParent(this->LowPointFrame);
-  this->LowPointYLabel = vtkKWLabel::New();
-  this->LowPointYLabel->SetParent(this->LowPointFrame);
-  this->LowPointZLabel = vtkKWLabel::New();
-  this->LowPointZLabel->SetParent(this->LowPointFrame);
-  this->HighPointXLabel = vtkKWLabel::New();
-  this->HighPointXLabel->SetParent(this->HighPointFrame);
-  this->HighPointYLabel = vtkKWLabel::New();
-  this->HighPointYLabel->SetParent(this->HighPointFrame);
-  this->HighPointZLabel = vtkKWLabel::New();
-  this->HighPointZLabel->SetParent(this->HighPointFrame);
-  this->RangeMinLabel = vtkKWLabel::New();
-  this->RangeMinLabel->SetParent(this->RangeFrame);
-  this->RangeMaxLabel = vtkKWLabel::New();
-  this->RangeMaxLabel->SetParent(this->RangeFrame);
-  
   this->Accept = vtkKWPushButton::New();
   this->Accept->SetParent(this->Properties);
   
@@ -128,23 +111,6 @@ vtkPVElevationFilter::~vtkPVElevationFilter()
   this->RangeMaxEntry->Delete();
   this->RangeMaxEntry = NULL;
   
-  this->LowPointXLabel->Delete();
-  this->LowPointXLabel = NULL;
-  this->LowPointYLabel->Delete();
-  this->LowPointYLabel = NULL;
-  this->LowPointZLabel->Delete();
-  this->LowPointZLabel = NULL;
-  this->HighPointXLabel->Delete();
-  this->HighPointXLabel = NULL;
-  this->HighPointYLabel->Delete();
-  this->HighPointYLabel = NULL;
-  this->HighPointZLabel->Delete();
-  this->HighPointZLabel = NULL;
-  this->RangeMinLabel->Delete();
-  this->RangeMinLabel = NULL;
-  this->RangeMaxLabel->Delete();
-  this->RangeMaxLabel = NULL;
-
   this->LowPointFrame->Delete();
   this->LowPointFrame = NULL;
   this->HighPointFrame->Delete();
@@ -193,28 +159,25 @@ void vtkPVElevationFilter::CreateProperties()
   this->LowPointLabel->Create(this->Application, "-pady 6");
   this->LowPointLabel->SetLabel("LowPoint");
   this->LowPointFrame->Create(this->Application, "frame", "-bd 0");
-  this->LowPointXLabel->Create(this->Application, "-padx 4");
-  this->LowPointXLabel->SetLabel("X:");
-  this->LowPointXEntry->Create(this->Application, "-width 10");
+  this->LowPointXEntry->Create(this->Application);
+  this->LowPointXEntry->SetLabel("X:");
   this->LowPointXEntry->SetValue(low[0], 2);
-  this->Script("pack %s -side left -anchor w -expand no",
-	       this->LowPointXLabel->GetWidgetName());
+  this->Script("%s configure -width 10",
+	       this->LowPointXEntry->GetEntry()->GetWidgetName());
   this->Script("pack %s -side left -anchor w -expand yes",
 	       this->LowPointXEntry->GetWidgetName());
-  this->LowPointYLabel->Create(this->Application, "-padx 4");
-  this->LowPointYLabel->SetLabel("Y:");
-  this->LowPointYEntry->Create(this->Application, "-width 10");
+  this->LowPointYEntry->Create(this->Application);
+  this->LowPointYEntry->SetLabel("Y:");
   this->LowPointYEntry->SetValue(low[1], 2);
-  this->Script("pack %s -side left -anchor w -expand no",
-	       this->LowPointYLabel->GetWidgetName());
+  this->Script("%s configure -width 10",
+	       this->LowPointYEntry->GetEntry()->GetWidgetName());
   this->Script("pack %s -side left -anchor w -expand yes",
 	       this->LowPointYEntry->GetWidgetName());
-  this->LowPointZLabel->Create(this->Application, "-padx 4");
-  this->LowPointZLabel->SetLabel("Z:");
-  this->LowPointZEntry->Create(this->Application, "-width 10");
+  this->LowPointZEntry->Create(this->Application);
+  this->LowPointZEntry->SetLabel("Z:");
   this->LowPointZEntry->SetValue(low[2], 2);
-  this->Script("pack %s -side left -anchor w -expand no",
-	       this->LowPointZLabel->GetWidgetName());
+  this->Script("%s configure -width 10",
+	       this->LowPointZEntry->GetEntry()->GetWidgetName());
   this->Script("pack %s -side left -anchor w -expand yes",
 	       this->LowPointZEntry->GetWidgetName());
   this->Script("pack %s %s %s",
@@ -225,28 +188,25 @@ void vtkPVElevationFilter::CreateProperties()
   this->HighPointFrame->Create(this->Application, "frame", "-bd 0");
   this->HighPointLabel->Create(this->Application, "-pady 6");
   this->HighPointLabel->SetLabel("High Point");
-  this->HighPointXLabel->Create(this->Application, "-padx 4");
-  this->HighPointXLabel->SetLabel("X:");
-  this->HighPointXEntry->Create(this->Application, "-width 10");
+  this->HighPointXEntry->Create(this->Application);
+  this->HighPointXEntry->SetLabel("X:");
   this->HighPointXEntry->SetValue(high[0], 2);
-  this->Script("pack %s -side left -anchor w -expand no",
-	       this->HighPointXLabel->GetWidgetName());
+  this->Script("%s configure -width 10",
+	       this->HighPointXEntry->GetEntry()->GetWidgetName());
   this->Script("pack %s -side left -anchor w -expand yes",
 	       this->HighPointXEntry->GetWidgetName());
-  this->HighPointYLabel->Create(this->Application, "-padx 4");
-  this->HighPointYLabel->SetLabel("Y:");
-  this->HighPointYEntry->Create(this->Application, "-width 10");
+  this->HighPointYEntry->Create(this->Application);
+  this->HighPointYEntry->SetLabel("Y:");
   this->HighPointYEntry->SetValue(high[1], 2);
-  this->Script("pack %s -side left -anchor w -expand no",
-	       this->HighPointYLabel->GetWidgetName());
+  this->Script("%s configure -width 10",
+	       this->HighPointYEntry->GetEntry()->GetWidgetName());
   this->Script("pack %s -side left -anchor w -expand yes",
 	       this->HighPointYEntry->GetWidgetName());
-  this->HighPointZLabel->Create(this->Application, "-padx 4");
-  this->HighPointZLabel->SetLabel("Z:");
-  this->HighPointZEntry->Create(this->Application, "-width 10");
+  this->HighPointZEntry->Create(this->Application);
+  this->HighPointZEntry->SetLabel("Z:");
   this->HighPointZEntry->SetValue(high[2], 2);
-  this->Script("pack %s -side left -anchor w -expand no",
-	       this->HighPointZLabel->GetWidgetName());
+  this->Script("%s configure -width 10",
+	       this->HighPointZEntry->GetEntry()->GetWidgetName());
   this->Script("pack %s -side left -anchor w -expand yes",
 	       this->HighPointZEntry->GetWidgetName());
   this->Script("pack %s %s",
@@ -256,20 +216,18 @@ void vtkPVElevationFilter::CreateProperties()
   this->RangeFrame->Create(this->Application, "frame", "-bd 0");
   this->RangeLabel->Create(this->Application, "-pady 6");
   this->RangeLabel->SetLabel("Scalar Range");
-  this->RangeMinLabel->Create(this->Application, "-padx 4");
-  this->RangeMinLabel->SetLabel("Min.:");
-  this->RangeMinEntry->Create(this->Application, "-width 10");
+  this->RangeMinEntry->Create(this->Application);
+  this->RangeMinEntry->SetLabel("Min.:");
   this->RangeMinEntry->SetValue(range[0], 2);
-  this->Script("pack %s -side left -anchor w -expand no",
-	       this->RangeMinLabel->GetWidgetName());
+  this->Script("%s configure -width 10",
+	       this->RangeMinEntry->GetEntry()->GetWidgetName());
   this->Script("pack %s -side left -anchor w -expand yes",
 	       this->RangeMinEntry->GetWidgetName());
-  this->RangeMaxLabel->Create(this->Application, "-padx 4");
-  this->RangeMaxLabel->SetLabel("Max.:");
-  this->RangeMaxEntry->Create(this->Application, "-width 10");
+  this->RangeMaxEntry->Create(this->Application);
+  this->RangeMaxEntry->SetLabel("Max.:");
   this->RangeMaxEntry->SetValue(range[1], 2);
-  this->Script("pack %s -side left -anchor w -expand no",
-	       this->RangeMaxLabel->GetWidgetName());
+  this->Script("%s configure -width 10",
+	       this->RangeMaxEntry->GetEntry()->GetWidgetName());
   this->Script("pack %s -side left -anchor w -expand yes",
 	       this->RangeMaxEntry->GetWidgetName());
   this->Script("pack %s %s",
@@ -374,3 +332,13 @@ void vtkPVElevationFilter::SetScalarRange(float min, float max)
   this->GetElevation()->SetScalarRange(min, max);
 }
 
+//----------------------------------------------------------------------------
+void vtkPVElevationFilter::GetSource()
+{
+  this->GetPVData()->GetActorComposite()->VisibilityOff();
+  this->GetWindow()->GetMainView()->
+    SetSelectedComposite(this->GetInput()->GetPVSource());
+  this->GetInput()->GetActorComposite()->VisibilityOn();
+  this->GetView()->Render();
+  this->GetWindow()->GetMainView()->ResetCamera();
+}

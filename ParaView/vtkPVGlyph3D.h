@@ -29,8 +29,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #ifndef __vtkPVGlyph3D_h
 #define __vtkPVGlyph3D_h
 
-#include "vtkKWLabel.h"
-#include "vtkKWEntry.h"
+#include "vtkKWLabeledEntry.h"
 #include "vtkKWPushButton.h"
 #include "vtkGlyph3D.h"
 #include "vtkPVSource.h"
@@ -83,8 +82,7 @@ protected:
   void operator=(const vtkPVGlyph3D&) {};
   
   vtkKWPushButton *GlyphSourceButton;
-  vtkKWLabel *ScaleFactorLabel;
-  vtkKWEntry *ScaleFactorEntry;
+  vtkKWLabeledEntry *ScaleFactorEntry;
   vtkKWPushButton *Accept;
   vtkKWPushButton *SourceButton;
 

@@ -51,18 +51,12 @@ vtkPVCutter::vtkPVCutter()
   this->OriginFrame->SetParent(this->Properties);
   this->NormalFrame = vtkKWLabeledFrame::New();
   this->NormalFrame->SetParent(this->Properties);
-  this->OriginXLabel = vtkKWLabel::New();
-  this->OriginYLabel = vtkKWLabel::New();
-  this->OriginZLabel = vtkKWLabel::New();
-  this->NormalXLabel = vtkKWLabel::New();
-  this->NormalYLabel = vtkKWLabel::New();
-  this->NormalZLabel = vtkKWLabel::New();
-  this->OriginXEntry = vtkKWEntry::New();
-  this->OriginYEntry = vtkKWEntry::New();
-  this->OriginZEntry = vtkKWEntry::New();
-  this->NormalXEntry = vtkKWEntry::New();
-  this->NormalYEntry = vtkKWEntry::New();
-  this->NormalZEntry = vtkKWEntry::New();
+  this->OriginXEntry = vtkKWLabeledEntry::New();
+  this->OriginYEntry = vtkKWLabeledEntry::New();
+  this->OriginZEntry = vtkKWLabeledEntry::New();
+  this->NormalXEntry = vtkKWLabeledEntry::New();
+  this->NormalYEntry = vtkKWLabeledEntry::New();
+  this->NormalZEntry = vtkKWLabeledEntry::New();
   this->ShowCrosshairButton = vtkKWCheckButton::New();
   this->ShowCrosshairButton->SetParent(this->Properties);
 
@@ -83,18 +77,6 @@ vtkPVCutter::~vtkPVCutter()
   this->SourceButton->Delete();
   this->SourceButton = NULL;
   
-  this->OriginXLabel->Delete();
-  this->OriginXLabel = NULL;
-  this->OriginYLabel->Delete();
-  this->OriginYLabel = NULL;
-  this->OriginZLabel->Delete();
-  this->OriginZLabel = NULL;
-  this->NormalXLabel->Delete();
-  this->NormalXLabel = NULL;
-  this->NormalYLabel->Delete();
-  this->NormalYLabel = NULL;
-  this->NormalZLabel->Delete();
-  this->NormalZLabel = NULL;
   this->OriginXEntry->Delete();
   this->OriginXEntry = NULL;
   this->OriginYEntry->Delete();
@@ -155,58 +137,51 @@ void vtkPVCutter::CreateProperties()
   this->Script("pack %s %s", this->OriginFrame->GetWidgetName(),
 	       this->NormalFrame->GetWidgetName());
   
-  this->OriginXLabel->SetParent(this->OriginFrame->GetFrame());
-  this->OriginXLabel->Create(this->Application, "");
-  this->OriginXLabel->SetLabel("X: ");
   this->OriginXEntry->SetParent(this->OriginFrame->GetFrame());
-  this->OriginXEntry->Create(this->Application, "-width 12");
+  this->OriginXEntry->Create(this->Application);
+  this->Script("%s configure -width 12",
+	       this->OriginXEntry->GetEntry()->GetWidgetName());
+  this->OriginXEntry->SetLabel("X: ");
   this->OriginXEntry->SetValue(origin[0], 4);
-  this->OriginYLabel->SetParent(this->OriginFrame->GetFrame());
-  this->OriginYLabel->Create(this->Application, "");
-  this->OriginYLabel->SetLabel("Y: ");
   this->OriginYEntry->SetParent(this->OriginFrame->GetFrame());
-  this->OriginYEntry->Create(this->Application, "-width 12");
+  this->OriginYEntry->Create(this->Application);
+  this->Script("%s configure -width 12",
+	       this->OriginYEntry->GetEntry()->GetWidgetName());
+  this->OriginYEntry->SetLabel("Y: ");
   this->OriginYEntry->SetValue(origin[1], 4);
-  this->OriginZLabel->SetParent(this->OriginFrame->GetFrame());
-  this->OriginZLabel->Create(this->Application, "");
-  this->OriginZLabel->SetLabel("Z: ");
   this->OriginZEntry->SetParent(this->OriginFrame->GetFrame());
-  this->OriginZEntry->Create(this->Application, "-width 12");
+  this->OriginZEntry->Create(this->Application);
+  this->Script("%s configure -width 12",
+	       this->OriginZEntry->GetEntry()->GetWidgetName());
+  this->OriginZEntry->SetLabel("Z: ");
   this->OriginZEntry->SetValue(origin[2], 4);
-  this->Script("pack %s %s %s %s %s %s -side left -fill x",
-	       this->OriginXLabel->GetWidgetName(),
+  this->Script("pack %s %s %s -side left -fill x",
 	       this->OriginXEntry->GetWidgetName(),
-	       this->OriginYLabel->GetWidgetName(),
 	       this->OriginYEntry->GetWidgetName(),
-	       this->OriginZLabel->GetWidgetName(),
 	       this->OriginZEntry->GetWidgetName());
   
-  this->NormalXLabel->SetParent(this->NormalFrame->GetFrame());
-  this->NormalXLabel->Create(this->Application, "");
-  this->NormalXLabel->SetLabel("X: ");
   this->NormalXEntry->SetParent(this->NormalFrame->GetFrame());
-  this->NormalXEntry->Create(this->Application, "-width 12");
+  this->NormalXEntry->Create(this->Application);
+  this->Script("%s configure -width 12",
+	       this->NormalXEntry->GetEntry()->GetWidgetName());
+  this->NormalXEntry->SetLabel("X: ");
   this->NormalXEntry->SetValue(normal[0], 4);
-  this->NormalYLabel->SetParent(this->NormalFrame->GetFrame());
-  this->NormalYLabel->Create(this->Application, "");
-  this->NormalYLabel->SetLabel("Y: ");
   this->NormalYEntry->SetParent(this->NormalFrame->GetFrame());
-  this->NormalYEntry->Create(this->Application, "-width 12");
+  this->NormalYEntry->Create(this->Application);
+  this->Script("%s configure -width 12",
+	       this->NormalYEntry->GetEntry()->GetWidgetName());
+  this->NormalYEntry->SetLabel("Y: ");
   this->NormalYEntry->SetValue(normal[1], 4);
-  this->NormalZLabel->SetParent(this->NormalFrame->GetFrame());
-  this->NormalZLabel->Create(this->Application, "");
-  this->NormalZLabel->SetLabel("Z: ");
   this->NormalZEntry->SetParent(this->NormalFrame->GetFrame());
-  this->NormalZEntry->Create(this->Application, "-width 12");
+  this->NormalZEntry->Create(this->Application);
+  this->Script("%s configure -width 12",
+	       this->NormalZEntry->GetEntry()->GetWidgetName());
+  this->NormalZEntry->SetLabel("Z: ");
   this->NormalZEntry->SetValue(normal[2], 4);
-  this->Script("pack %s %s %s %s %s %s -side left -fill x",
-	       this->NormalXLabel->GetWidgetName(),
+  this->Script("pack %s %s %s -side left -fill x",
 	       this->NormalXEntry->GetWidgetName(),
-	       this->NormalYLabel->GetWidgetName(),
 	       this->NormalYEntry->GetWidgetName(),
-	       this->NormalZLabel->GetWidgetName(),
-	       this->NormalZEntry->GetWidgetName());
-  
+	       this->NormalZEntry->GetWidgetName());  
 }
 
 //----------------------------------------------------------------------------

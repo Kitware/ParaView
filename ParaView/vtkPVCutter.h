@@ -30,10 +30,9 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #define __vtkPVCutter_h
 
 #include "vtkCutter.h"
-#include "vtkKWEntry.h"
-#include "vtkKWLabel.h"
 #include "vtkKWPushButton.h"
 #include "vtkKWLabeledFrame.h"
+#include "vtkKWLabeledEntry.h"
 #include "vtkKWPushButton.h"
 #include "vtkKWCheckButton.h"
 #include "vtkPVSource.h"
@@ -80,12 +79,12 @@ public:
   // Description:
   // Need to be able to get these to be able to change their values from a
   // callback.
-  vtkGetObjectMacro(OriginXEntry, vtkKWEntry);
-  vtkGetObjectMacro(OriginYEntry, vtkKWEntry);
-  vtkGetObjectMacro(OriginZEntry, vtkKWEntry);
-  vtkGetObjectMacro(NormalXEntry, vtkKWEntry);
-  vtkGetObjectMacro(NormalYEntry, vtkKWEntry);
-  vtkGetObjectMacro(NormalZEntry, vtkKWEntry);
+  vtkGetObjectMacro(OriginXEntry, vtkKWLabeledEntry);
+  vtkGetObjectMacro(OriginYEntry, vtkKWLabeledEntry);
+  vtkGetObjectMacro(OriginZEntry, vtkKWLabeledEntry);
+  vtkGetObjectMacro(NormalXEntry, vtkKWLabeledEntry);
+  vtkGetObjectMacro(NormalYEntry, vtkKWLabeledEntry);
+  vtkGetObjectMacro(NormalZEntry, vtkKWLabeledEntry);
   
   // Description:
   // need to pack/unpack the plane interactor style button depending on
@@ -109,18 +108,12 @@ protected:
 
   vtkKWLabeledFrame *OriginFrame;
   vtkKWLabeledFrame *NormalFrame;
-  vtkKWLabel *OriginXLabel;
-  vtkKWLabel *OriginYLabel;
-  vtkKWLabel *OriginZLabel;
-  vtkKWLabel *NormalXLabel;
-  vtkKWLabel *NormalYLabel;
-  vtkKWLabel *NormalZLabel;
-  vtkKWEntry *OriginXEntry;
-  vtkKWEntry *OriginYEntry;
-  vtkKWEntry *OriginZEntry;
-  vtkKWEntry *NormalXEntry;
-  vtkKWEntry *NormalYEntry;
-  vtkKWEntry *NormalZEntry;
+  vtkKWLabeledEntry *OriginXEntry;
+  vtkKWLabeledEntry *OriginYEntry;
+  vtkKWLabeledEntry *OriginZEntry;
+  vtkKWLabeledEntry *NormalXEntry;
+  vtkKWLabeledEntry *NormalYEntry;
+  vtkKWLabeledEntry *NormalZEntry;
   vtkKWCheckButton *ShowCrosshairButton;
 
   vtkKWPushButton *PlaneStyleButton;

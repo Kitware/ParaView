@@ -32,8 +32,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkPolyDataNormals.h"
 #include "vtkKWPushButton.h"
 #include "vtkKWCheckButton.h"
-#include "vtkKWLabel.h"
-#include "vtkKWEntry.h"
+#include "vtkKWLabeledEntry.h"
 #include "vtkPVSource.h"
 
 class vtkPVPolyData;
@@ -80,8 +79,7 @@ protected:
   vtkKWPushButton *Accept;
   vtkKWPushButton *SourceButton;
   vtkKWCheckButton *Splitting;
-  vtkKWLabel *FeatureAngleLabel;
-  vtkKWEntry *FeatureAngleEntry;
+  vtkKWLabeledEntry *FeatureAngleEntry;
   
   vtkPolyDataNormals *PolyDataNormals;
 };

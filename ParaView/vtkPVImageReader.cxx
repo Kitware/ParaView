@@ -41,17 +41,11 @@ vtkPVImageReader::vtkPVImageReader()
   this->Open = vtkKWPushButton::New();
   this->Open->SetParent(this->Properties);
   
-  this->XLabel = vtkKWLabel::New();
-  this->XLabel->SetParent(this->Properties);
-  this->XDimension = vtkKWEntry::New();
+  this->XDimension = vtkKWLabeledEntry::New();
   this->XDimension->SetParent(this->Properties);
-  this->YLabel = vtkKWLabel::New();
-  this->YLabel->SetParent(this->Properties);
-  this->YDimension = vtkKWEntry::New();
+  this->YDimension = vtkKWLabeledEntry::New();
   this->YDimension->SetParent(this->Properties);
-  this->ZLabel = vtkKWLabel::New();
-  this->ZLabel->SetParent(this->Properties);
-  this->ZDimension = vtkKWEntry::New();
+  this->ZDimension = vtkKWLabeledEntry::New();
   this->ZDimension->SetParent(this->Properties);
   
   vtkImageReader *r = vtkImageReader::New();
@@ -66,16 +60,10 @@ vtkPVImageReader::~vtkPVImageReader()
   this->Accept = NULL;
   this->Open->Delete();
   this->Open = NULL;
-  this->XLabel->Delete();
-  this->XLabel = NULL;
   this->XDimension->Delete();
   this->XDimension = NULL;
-  this->YLabel->Delete();
-  this->YLabel = NULL;
   this->YDimension->Delete();
   this->YDimension = NULL;
-  this->ZLabel->Delete();
-  this->ZLabel = NULL;
   this->ZDimension->Delete();
   this->ZDimension = NULL;
 }
@@ -99,23 +87,17 @@ void vtkPVImageReader::CreateProperties()
   this->Open->SetCommand(this, "OpenFile");
   this->Script("pack %s", this->Open->GetWidgetName());
   
-  this->XLabel->Create(this->Application, "");
-  this->XLabel->SetLabel("X Dim.");
-  this->XDimension->Create(this->Application, "");
+  this->XDimension->Create(this->Application);
+  this->XDimension->SetLabel("X Dim.:");
   this->XDimension->SetValue(63);
-  this->YLabel->Create(this->Application, "");
-  this->YLabel->SetLabel("Y Dim.");
-  this->YDimension->Create(this->Application, "");
+  this->YDimension->Create(this->Application);
+  this->YDimension->SetLabel("Y Dim.:");
   this->YDimension->SetValue(63);
-  this->ZLabel->Create(this->Application, "");
-  this->ZLabel->SetLabel("Z Dim.");
-  this->ZDimension->Create(this->Application, "");
+  this->ZDimension->Create(this->Application);
+  this->ZDimension->SetLabel("Z Dim.:");
   this->ZDimension->SetValue(93);
-  this->Script("pack %s %s %s %s %s %s", this->XLabel->GetWidgetName(),
-	       this->XDimension->GetWidgetName(),
-	       this->YLabel->GetWidgetName(),
+  this->Script("pack %s %s %s", this->XDimension->GetWidgetName(),
 	       this->YDimension->GetWidgetName(),
-	       this->ZLabel->GetWidgetName(),
 	       this->ZDimension->GetWidgetName());
 }
 

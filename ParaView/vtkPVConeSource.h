@@ -33,11 +33,9 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #ifndef __vtkPVConeSource_h
 #define __vtkPVConeSource_h
 
-#include "vtkKWLabel.h"
 #include "vtkConeSource.h"
 #include "vtkShrinkPolyData.h"
-#include "vtkKWEntry.h"
-#include "vtkKWScale.h"
+#include "vtkKWLabeledEntry.h"
 #include "vtkKWPushButton.h"
 #include "vtkPVPolyDataSource.h"
 
@@ -76,12 +74,9 @@ protected:
   vtkPVConeSource(const vtkPVConeSource&) {};
   void operator=(const vtkPVConeSource&) {};
   
-  vtkKWLabel *HeightLabel;
-  vtkKWEntry *HeightEntry;
-  vtkKWLabel *RadiusLabel;
-  vtkKWEntry *RadiusEntry;
-  vtkKWLabel *ResolutionLabel;
-  vtkKWEntry *ResolutionEntry;
+  vtkKWLabeledEntry *HeightEntry;
+  vtkKWLabeledEntry *RadiusEntry;
+  vtkKWLabeledEntry *ResolutionEntry;
   vtkKWPushButton *Accept;
 };
 

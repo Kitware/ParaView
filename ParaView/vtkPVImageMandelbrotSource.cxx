@@ -41,46 +41,28 @@ vtkPVImageMandelbrotSource::vtkPVImageMandelbrotSource()
   
   this->DimensionsFrame = vtkKWLabeledFrame::New();
   this->DimensionsFrame->SetParent(this->Properties);
-  this->XDimLabel = vtkKWLabel::New();
-  this->XDimLabel->SetParent(this->DimensionsFrame->GetFrame());
-  this->XDimension = vtkKWEntry::New();
+  this->XDimension = vtkKWLabeledEntry::New();
   this->XDimension->SetParent(this->DimensionsFrame->GetFrame());
-  this->YDimLabel = vtkKWLabel::New();
-  this->YDimLabel->SetParent(this->DimensionsFrame->GetFrame());
-  this->YDimension = vtkKWEntry::New();
+  this->YDimension = vtkKWLabeledEntry::New();
   this->YDimension->SetParent(this->DimensionsFrame->GetFrame());
-  this->ZDimLabel = vtkKWLabel::New();
-  this->ZDimLabel->SetParent(this->DimensionsFrame->GetFrame());
-  this->ZDimension = vtkKWEntry::New();
+  this->ZDimension = vtkKWLabeledEntry::New();
   this->ZDimension->SetParent(this->DimensionsFrame->GetFrame());
 
   this->CenterFrame = vtkKWLabeledFrame::New();
   this->CenterFrame->SetParent(this->Properties);
-  this->CRealLabel = vtkKWLabel::New();
-  this->CRealLabel->SetParent(this->CenterFrame->GetFrame());
-  this->CRealEntry = vtkKWEntry::New();
+  this->CRealEntry = vtkKWLabeledEntry::New();
   this->CRealEntry->SetParent(this->CenterFrame->GetFrame());
-  this->CImaginaryLabel = vtkKWLabel::New();
-  this->CImaginaryLabel->SetParent(this->CenterFrame->GetFrame());
-  this->CImaginaryEntry = vtkKWEntry::New();
+  this->CImaginaryEntry = vtkKWLabeledEntry::New();
   this->CImaginaryEntry->SetParent(this->CenterFrame->GetFrame());
-  this->XRealLabel = vtkKWLabel::New();
-  this->XRealLabel->SetParent(this->CenterFrame->GetFrame());
-  this->XRealEntry = vtkKWEntry::New();
+  this->XRealEntry = vtkKWLabeledEntry::New();
   this->XRealEntry->SetParent(this->CenterFrame->GetFrame());
-  this->XImaginaryLabel = vtkKWLabel::New();
-  this->XImaginaryLabel->SetParent(this->CenterFrame->GetFrame());
-  this->XImaginaryEntry = vtkKWEntry::New();
+  this->XImaginaryEntry = vtkKWLabeledEntry::New();
   this->XImaginaryEntry->SetParent(this->CenterFrame->GetFrame());
   
-  this->CSpacingLabel = vtkKWLabel::New();
-  this->CSpacingLabel->SetParent(this->Properties);
-  this->CSpacingEntry = vtkKWEntry::New();
+  this->CSpacingEntry = vtkKWLabeledEntry::New();
   this->CSpacingEntry->SetParent(this->Properties);
   
-  this->XSpacingLabel = vtkKWLabel::New();
-  this->XSpacingLabel->SetParent(this->Properties);
-  this->XSpacingEntry = vtkKWEntry::New();
+  this->XSpacingEntry = vtkKWLabeledEntry::New();
   this->XSpacingEntry->SetParent(this->Properties);
   
   vtkImageMandelbrotSource *s = vtkImageMandelbrotSource::New();
@@ -96,33 +78,21 @@ vtkPVImageMandelbrotSource::~vtkPVImageMandelbrotSource()
   this->Accept = NULL;
 
   this->DimensionsFrame->Delete();
-  this->XDimLabel->Delete();
-  this->XDimLabel = NULL;
   this->XDimension->Delete();
   this->XDimension = NULL;
-  this->YDimLabel->Delete();
-  this->YDimLabel = NULL;
   this->YDimension->Delete();
   this->YDimension = NULL;
-  this->ZDimLabel->Delete();
-  this->ZDimLabel = NULL;
   this->ZDimension->Delete();
   this->ZDimension = NULL;
   
   this->CenterFrame->Delete();
-  this->CRealLabel->Delete();
   this->CRealEntry->Delete();
-  this->CImaginaryLabel->Delete();
   this->CImaginaryEntry->Delete();
-  this->XRealLabel->Delete();
   this->XRealEntry->Delete();
-  this->XImaginaryLabel->Delete();
   this->XImaginaryEntry->Delete();
   
-  this->CSpacingLabel->Delete();
   this->CSpacingEntry->Delete();  
 
-  this->XSpacingLabel->Delete();
   this->XSpacingEntry->Delete();  
 }
 
@@ -145,69 +115,67 @@ void vtkPVImageMandelbrotSource::CreateProperties()
   this->DimensionsFrame->SetLabel("Dimensions");
   this->Script("pack %s", this->DimensionsFrame->GetWidgetName());
   
-  this->XDimLabel->Create(this->Application, "");
-  this->XDimLabel->SetLabel("X:");
-  this->XDimension->Create(this->Application, "-width 4");
-  this->YDimLabel->Create(this->Application, "");
-  this->YDimLabel->SetLabel("Y:");
-  this->YDimension->Create(this->Application, "-width 4");
-  this->ZDimLabel->Create(this->Application, "");
-  this->ZDimLabel->SetLabel("Z:");
-  this->ZDimension->Create(this->Application, "-width 4");
-  this->Script("pack %s %s %s %s %s %s -side left", 
-	       this->XDimLabel->GetWidgetName(),
+  this->XDimension->Create(this->Application);
+  this->Script("%s configure -width 4",
+	       this->XDimension->GetEntry()->GetWidgetName());
+  this->XDimension->SetLabel("X:");
+  this->YDimension->Create(this->Application);
+  this->Script("%s configure -width 4",
+	       this->YDimension->GetEntry()->GetWidgetName());
+  this->YDimension->SetLabel("Y:");
+  this->ZDimension->Create(this->Application);
+  this->Script("%s configure -width 4");
+  this->ZDimension->SetLabel("Z:");
+  this->Script("pack %s %s %s -side left", 
 	       this->XDimension->GetWidgetName(),
-	       this->YDimLabel->GetWidgetName(),
 	       this->YDimension->GetWidgetName(),
-	       this->ZDimLabel->GetWidgetName(),
 	       this->ZDimension->GetWidgetName());
 
   this->CenterFrame->Create(this->Application);
   this->CenterFrame->SetLabel("Center Parameters");
   this->Script("pack %s", this->CenterFrame->GetWidgetName());
   
-  this->CRealLabel->Create(this->Application, "");
-  this->CRealLabel->SetLabel("C: ");
-  this->CRealEntry->Create(this->Application, "-width 7");
+  this->CRealEntry->Create(this->Application);
+  this->Script("%s configure -width 7",
+	       this->CRealEntry->GetEntry()->GetWidgetName());
+  this->CRealEntry->SetLabel("C: ");
   this->CRealEntry->SetValue(0.0);
-  this->CImaginaryLabel->Create(this->Application, "");
-  this->CImaginaryLabel->SetLabel(" + i");
-  this->CImaginaryEntry->Create(this->Application, "-width 7");
+  this->CImaginaryEntry->Create(this->Application);
+  this->Script("%s configure -width 7",
+	       this->CImaginaryEntry->GetEntry()->GetWidgetName());
+  this->CImaginaryEntry->SetLabel(" + i");
   this->CImaginaryEntry->SetValue(0.0);  
-  this->XRealLabel->Create(this->Application, "");
-  this->XRealLabel->SetLabel("X: ");
-  this->XRealEntry->Create(this->Application, "-width 7");
+  this->XRealEntry->Create(this->Application);
+  this->Script("%s configure -width 7",
+	       this->XRealEntry->GetEntry()->GetWidgetName());
+  this->XRealEntry->SetLabel("X: ");
   this->XRealEntry->SetValue(0.0);
-  this->XImaginaryLabel->Create(this->Application, "");
-  this->XImaginaryLabel->SetLabel(" + i");
-  this->XImaginaryEntry->Create(this->Application, "-width 7");
+  this->XImaginaryEntry->Create(this->Application);
+  this->Script("%s configure -width 7",
+	       this->XImaginaryEntry->GetEntry()->GetWidgetName());
+  this->XImaginaryEntry->SetLabel(" + i");
   this->XImaginaryEntry->SetValue(0.0);
   
-  this->Script("pack %s %s %s %s %s %s %s %s -side left", 
-	       this->CRealLabel->GetWidgetName(),
+  this->Script("pack %s %s %s %s -side left", 
 	       this->CRealEntry->GetWidgetName(),
-	       this->CImaginaryLabel->GetWidgetName(),
 	       this->CImaginaryEntry->GetWidgetName(),
-	       this->XRealLabel->GetWidgetName(),
 	       this->XRealEntry->GetWidgetName(),
-	       this->XImaginaryLabel->GetWidgetName(),
 	       this->XImaginaryEntry->GetWidgetName());
   
-  
-  this->CSpacingLabel->Create(this->Application, "");
-  this->CSpacingLabel->SetLabel("C Spacing: ");
-  this->CSpacingEntry->Create(this->Application, "-width 12");
+  this->CSpacingEntry->Create(this->Application);
+  this->Script("%s configure -width 12",
+	       this->CSpacingEntry->GetEntry()->GetWidgetName());
+  this->CSpacingEntry->SetLabel("C Spacing: ");
   this->CSpacingEntry->SetValue(0.1);
   
-  this->XSpacingLabel->Create(this->Application, "");
-  this->XSpacingLabel->SetLabel("X Spacing: ");
-  this->XSpacingEntry->Create(this->Application, "-width 12");
+  this->XSpacingEntry->Create(this->Application);
+  this->Script("%s configure -width 12",
+	       this->XSpacingEntry->GetEntry()->GetWidgetName());
+  this->XSpacingEntry->SetLabel("X Spacing: ");
   this->XSpacingEntry->SetValue(0.1);
   
-  this->Script("pack %s %s %s %s", 
-	       this->CSpacingLabel->GetWidgetName(),
+  this->Script("pack %s %s", 
 	       this->CSpacingEntry->GetWidgetName(),
-	       this->XSpacingLabel->GetWidgetName(),
 	       this->XSpacingEntry->GetWidgetName());
   
   // initialize parameters

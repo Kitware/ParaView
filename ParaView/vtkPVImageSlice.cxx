@@ -49,10 +49,8 @@ vtkPVImageSlice::vtkPVImageSlice()
   this->SourceButton = vtkKWPushButton::New();
   this->SourceButton->SetParent(this->Properties);
   
-  this->SliceEntry = vtkKWEntry::New();
+  this->SliceEntry = vtkKWLabeledEntry::New();
   this->SliceEntry->SetParent(this->Properties);
-  this->SliceLabel = vtkKWLabel::New();
-  this->SliceLabel->SetParent(this->Properties);
   this->XDimension = vtkKWRadioButton::New();
   this->XDimension->SetParent(this->Properties);
   this->YDimension = vtkKWRadioButton::New();
@@ -82,8 +80,6 @@ vtkPVImageSlice::~vtkPVImageSlice()
   
   this->SliceEntry->Delete();
   this->SliceEntry = NULL;
-  this->SliceLabel->Delete();
-  this->SliceLabel = NULL;
   this->XDimension->Delete();
   this->XDimension = NULL;
   this->YDimension->Delete();
@@ -131,18 +127,16 @@ void vtkPVImageSlice::CreateProperties()
   this->ZDimension->Create(this->Application, "-text Z");
   this->ZDimension->SetCommand(this, "SelectZCallback");
 
-  this->SliceLabel->Create(this->Application, "");
-  this->SliceLabel->SetLabel("Slice:");
-  this->SliceEntry->Create(this->Application, "");
+  this->SliceEntry->Create(this->Application);
+  this->SliceEntry->SetLabel("Slice:");
   
   this->SourceButton->Create(this->Application, "-text GetSource");
   this->SourceButton->SetCommand(this, "GetSource");
   this->Accept->Create(this->Application, "-text Accept");
   this->Accept->SetCommand(this, "SliceChanged");
-  this->Script("pack %s %s %s %s %s %s %s",
+  this->Script("pack %s %s %s %s %s %s",
 	       this->SourceButton->GetWidgetName(),
 	       this->Accept->GetWidgetName(),
-	       this->SliceLabel->GetWidgetName(),
 	       this->SliceEntry->GetWidgetName(),
 	       this->XDimension->GetWidgetName(),
 	       this->YDimension->GetWidgetName(),
@@ -154,28 +148,49 @@ void vtkPVImageSlice::CreateProperties()
 //----------------------------------------------------------------------------
 void vtkPVImageSlice::SelectXCallback()
 {
+  int ext[6];
+  ((vtkImageData*)this->GetInput()->GetData())->GetWholeExtent(ext);
+  int sliceNum = this->GetSliceEntry()->GetValueAsInt();
+  
   this->YDimension->SetState(0);
   this->ZDimension->SetState(0);
+  this->GetSliceStyle()->SetConstraint0ToCollapse();
   this->GetSliceStyle()->SetConstraint1ToNone();
   this->GetSliceStyle()->SetConstraint2ToNone();
+  this->GetSliceStyle()->SetExtent(sliceNum, sliceNum, ext[2], ext[3], ext[4],
+				   ext[5]);
 }
 
 //----------------------------------------------------------------------------
 void vtkPVImageSlice::SelectYCallback()
 {
+  int ext[6];
+  ((vtkImageData*)this->GetInput()->GetData())->GetWholeExtent(ext);
+  int sliceNum = this->GetSliceEntry()->GetValueAsInt();
+  
   this->XDimension->SetState(0);
   this->ZDimension->SetState(0);
   this->GetSliceStyle()->SetConstraint0ToNone();
+  this->GetSliceStyle()->SetConstraint1ToCollapse();
   this->GetSliceStyle()->SetConstraint2ToNone();
+  this->GetSliceStyle()->SetExtent(ext[0], ext[1], sliceNum, sliceNum, ext[4],
+				   ext[5]);
 }
 
 //----------------------------------------------------------------------------
 void vtkPVImageSlice::SelectZCallback()
 {
+  int ext[6];
+  ((vtkImageData*)this->GetInput()->GetData())->GetWholeExtent(ext);
+  int sliceNum = this->GetSliceEntry()->GetValueAsInt();
+  
   this->XDimension->SetState(0);
   this->YDimension->SetState(0);
   this->GetSliceStyle()->SetConstraint0ToNone();
   this->GetSliceStyle()->SetConstraint1ToNone();
+  this->GetSliceStyle()->SetConstraint2ToCollapse();
+  this->GetSliceStyle()->SetExtent(ext[0], ext[1], ext[2], ext[3], sliceNum,
+				   sliceNum);
 }
 
 //----------------------------------------------------------------------------
@@ -276,7 +291,7 @@ void EndImageSliceProgress(void *arg)
 void SliceCallback(void *arg)
 {
   vtkPVImageSlice *me = (vtkPVImageSlice*)arg;
-  int *extent = new int[6];
+  int *extent;
   
   me->GetSliceStyle()->DefaultCallback(me->GetSliceStyle()->GetCallbackType());
   
@@ -390,6 +405,8 @@ void vtkPVImageSlice::SliceChanged()
     ac = this->GetPVData()->GetActorComposite();
     window->GetMainView()->AddComposite(ac);
 
+    this->GetSliceStyle()->SetExtent(this->GetSlice()->GetOutputWholeExtent());
+    
     // Lets try to pick a reasonable scalar range.
     float range[2];
     // The GetScalarRange is in vtkPVActorComposite instead of vtkPVData,

@@ -29,9 +29,8 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #ifndef __vtkPVGetRemoteGhostCells_h
 #define __vtkPVGetRemoteGhostCells_h
 
-#include "vtkKWLabel.h"
+#include "vtkKWLabeledEntry.h"
 #include "vtkGetRemoteGhostCells.h"
-#include "vtkKWScale.h"
 #include "vtkKWPushButton.h"
 #include "vtkPVPolyDataToPolyDataFilter.h"
 
@@ -72,8 +71,7 @@ protected:
   
   vtkKWPushButton *Accept;
   vtkKWPushButton *SourceButton;
-  vtkKWLabel *GhostLevelLabel;
-  vtkKWEntry *GhostLevelEntry;
+  vtkKWLabeledEntry *GhostLevelEntry;
 };
 
 #endif
