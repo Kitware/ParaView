@@ -94,7 +94,7 @@ static char * makeEntry(const char *s)
 
 // Timing data ---------------------------------------------
 
-vtkCxxRevisionMacro(vtkDistributedDataFilter, "1.23");
+vtkCxxRevisionMacro(vtkDistributedDataFilter, "1.24");
 
 vtkStandardNewMacro(vtkDistributedDataFilter);
 
@@ -427,7 +427,7 @@ void vtkDistributedDataFilter::SetDivideBoundaryCells(int val)
 // Execute
 //-------------------------------------------------------------------------
 
-void vtkDistributedDataFilter::ComputeInputUpdateExtents( vtkDataObject *o)
+void vtkDistributedDataFilter::ComputeInputUpdateExtents( vtkDataObject *)
 {
   // Since this filter redistibutes data, ghost cells computed upstream
   // will not be valid.
