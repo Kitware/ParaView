@@ -40,15 +40,20 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 // .NAME vtkKWIcon - simple wrapper for icons
+// .SECTION Description
+// A simple icon wrapper. It can either be used with file icons.h to 
+// provide a unified interface for internal icons or a wrapper for 
+// custom icons. The icons are defined with width, height, and array
+// of unsigned char values; four values per pixel (RGBA).
 
 #ifndef __vtkKWIcon_h
 #define __vtkKWIcon_h
 
-#include "vtkKWLabel.h"
+#include "vtkKWObject.h"
 class vtkKWApplication;
 class vtkKWIcon;
 
-class VTK_EXPORT vtkKWIcon : public vtkKWLabel
+class VTK_EXPORT vtkKWIcon : public vtkKWObject
 {
 public:
   static vtkKWIcon* New();
@@ -59,6 +64,10 @@ public:
   void SetImageData(const unsigned char* data, int width, int height);
 
 //BTX
+  // Description:
+  // There are several predefined icons in the icons.h. Since we
+  // want to save space, we only incldue that file to vtkKWIcons.cxx.
+  // These constnats specify different icons.
   enum { 
     ICON_NOICON = 0,
     ICON_ANNOTATE,
@@ -78,11 +87,11 @@ public:
 //ETX
 
   // Description:
-  // Set image data for specific icon
+  // Select an icon based on the icon name.
   void SetImageData(int image);
 
   // Description:
-  // Set icon to the custom image.
+  // Set icon to the custom data.
   void SetData(const unsigned char* data, int width, int height);
 
   // Description:

@@ -67,54 +67,6 @@ void vtkKWImageLabel::SetImageData(vtkKWIcon* icon)
 {
   this->SetImageData(icon->GetData(), icon->GetWidth(), icon->GetHeight());
 }
-/*
-void vtkKWImageLabel::SetImageData(const unsigned char* data, 
-				   int width, int height)
-{
-  int r, g, b;
-  this->GetBackgroundColor(&r, &g, &b);
-  this->Script("image create photo -height %d -width %d", width, height);
-  this->SetImageDataLabel(this->Application->GetMainInterp()->result);
-  Tk_PhotoHandle photo;
-  Tk_PhotoImageBlock block, sblock;
-
-  block.width = width;
-  block.height = height;
-  block.pixelSize = 4;
-  block.pitch = block.width*block.pixelSize;
-  block.offset[0] = 0;
-  block.offset[1] = 1;
-  block.offset[2] = 2;
-  block.pixelPtr = new unsigned char [block.pitch*block.height];
-
-  photo = Tk_FindPhoto(this->Application->GetMainInterp(),
-		       this->ImageDataLabel);
-
-  unsigned char *pp = block.pixelPtr;
-  const unsigned char *dd = data;
-  int cc;
-  int xx, yy;
-  for ( yy=0; yy < block.width; yy++ )
-    {
-    for ( xx=0; xx < block.width; xx++ )
-      {
-      float alpha = static_cast<float>(*(dd+3)) / 255.0;
-      
-      *(pp)   = static_cast<int>(r*(1-alpha) + *(dd) * alpha);
-      *(pp+1) = static_cast<int>(g*(1-alpha) + *(dd+1) * alpha);
-      *(pp+2) = static_cast<int>(b*(1-alpha) + *(dd+2) * alpha);
-      *(pp+3) = *(dd+3);
-      
-      pp+=4;
-      dd+=4;
-      }
-    }
-  Tk_PhotoPutBlock(photo, &block, 0, 0, block.width, block.height);
-  delete [] block.pixelPtr;
-  this->Script("%s configure -image %s", this->GetWidgetName(),
-	       this->ImageDataLabel);
-}
-*/
 
 void vtkKWImageLabel::SetImageData(const unsigned char* data, 
 				   int width, int height)
