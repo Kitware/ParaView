@@ -95,7 +95,7 @@ static char * makeEntry(const char *s)
 
 // Timing data ---------------------------------------------
 
-vtkCxxRevisionMacro(vtkDistributedDataFilter, "1.27")
+vtkCxxRevisionMacro(vtkDistributedDataFilter, "1.28")
 
 vtkStandardNewMacro(vtkDistributedDataFilter)
 
@@ -469,8 +469,10 @@ void vtkDistributedDataFilter::SetDivideBoundaryCells(int val)
 // Execute
 //-------------------------------------------------------------------------
 
-void vtkDistributedDataFilter::ComputeInputUpdateExtents( vtkDataObject *)
+void vtkDistributedDataFilter::ComputeInputUpdateExtents( vtkDataObject *o)
 {
+  vtkDataSetToUnstructuredGridFilter::ComputeInputUpdateExtents(o);
+
   // Since this filter redistibutes data, ghost cells computed upstream
   // will not be valid.
 
