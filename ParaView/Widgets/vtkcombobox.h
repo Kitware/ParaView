@@ -1038,7 +1038,9 @@ const char* vtkcomboboxwidget1 =
 "\n"
 "    return \"\"\n"
 "}\n"
-"\n"
+"\n";
+
+const char* vtkcomboboxwidget2 =
 "# ::combobox::ComputeGeometry --\n"
 "#\n"
 "#    computes the geometry of the dropdown list based on the size of the\n"
@@ -2059,7 +2061,9 @@ const char* vtkcomboboxwidget1 =
 "    }\n"
 "    return $result\n"
 "}\n"
-"\n"
+"\n";
+
+const char* vtkcomboboxwidget3 =
 "# ::combobox::Canonize --\n"
 "#\n"
 "#    takes a (possibly abbreviated) option or command name and either \n"

@@ -45,7 +45,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWBWidgets );
-vtkCxxRevisionMacro(vtkKWBWidgets, "1.14");
+vtkCxxRevisionMacro(vtkKWBWidgets, "1.15");
 
 int vtkKWBWidgetsCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -279,21 +279,29 @@ void vtkKWBWidgets::Initialize(Tcl_Interp* interp)
     return;
     }
 
-  vtkKWBWidgets::Execute(interp, bwidgets1, "BWidgets");
-  vtkKWBWidgets::Execute(interp, bwidgets2, "BWidgets");
-  vtkKWBWidgets::Execute(interp, bwidgets3, "BWidgets");
-  vtkKWBWidgets::Execute(interp, bwidgets4, "BWidgets");
-  vtkKWBWidgets::Execute(interp, vtkcomboboxwidget1, "ComboBox");
+  vtkKWBWidgets::Execute(interp, bwidgets1, "BWidgets1");
+  vtkKWBWidgets::Execute(interp, bwidgets2, "BWidgets2");
+  vtkKWBWidgets::Execute(interp, bwidgets3, "BWidgets3");
+  vtkKWBWidgets::Execute(interp, bwidgets4, "BWidgets4");
+  vtkKWBWidgets::Execute(interp, bwidgets5, "BWidgets5");
+  vtkKWBWidgets::Execute(interp, bwidgets6, "BWidgets6");
+  vtkKWBWidgets::Execute(interp, vtkcomboboxwidget1, "ComboBox1");
+  vtkKWBWidgets::Execute(interp, vtkcomboboxwidget2, "ComboBox2");
+  vtkKWBWidgets::Execute(interp, vtkcomboboxwidget3, "ComboBox2");
 }
 
 //----------------------------------------------------------------------------
 void vtkKWBWidgets::Execute(Tcl_Interp* interp, const char* str, const char* module)
 {
-  if ( strlen(str) > 65000 )
+  const unsigned int maxlen = 32000;
+  if ( strlen(str) > maxlen )
     {
     cout << "The size of tcl string for module " << module << " is " << strlen(str) 
-      << " (higher than 65000), so compilers that cannot "
+      << " (higher than " << maxlen << "), so compilers that cannot "
       "handle such a large strings might not compile this." << endl;
+    cout << "The line is: [";
+    cout.write(str+32000, 100);
+    cout << "]" << endl;
     }
   char* script = new char[strlen(str)+1];
   strcpy(script, str);
