@@ -83,13 +83,14 @@ public:
 protected:
   vtkPVScalarRangeLabel();
   ~vtkPVScalarRangeLabel();
-  vtkPVScalarRangeLabel(const vtkPVScalarRangeLabel&) {};
-  void operator=(const vtkPVScalarRangeLabel&) {};
 
   vtkPVArrayMenu *ArrayMenu;
   vtkKWLabel *Label;
 
   float Range[2];
+
+  vtkPVScalarRangeLabel(const vtkPVScalarRangeLabel&); // Not implemented
+  void operator=(const vtkPVScalarRangeLabel&); // Not implemented
 };
 
 

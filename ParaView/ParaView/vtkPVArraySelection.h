@@ -103,8 +103,6 @@ public:
 protected:
   vtkPVArraySelection();
   ~vtkPVArraySelection();
-  vtkPVArraySelection(const vtkPVArraySelection&) {};
-  void operator=(const vtkPVArraySelection&) {};
 
   char* AttributeName;
   char* VTKReaderTclName;
@@ -122,6 +120,9 @@ protected:
   // Stores the file name to descide when to rebuild the array check list.
   vtkSetStringMacro(FileName);
   char *FileName;
+
+  vtkPVArraySelection(const vtkPVArraySelection&); // Not implemented
+  void operator=(const vtkPVArraySelection&); // Not implemented
 };
 
 #endif

@@ -90,8 +90,6 @@ public:
 protected:
   vtkPVExtentEntry();
   ~vtkPVExtentEntry();
-  vtkPVExtentEntry(const vtkPVExtentEntry&) {};
-  void operator=(const vtkPVExtentEntry&) {};
   
   vtkKWLabel *Label;
   vtkKWEntry *XMinEntry;
@@ -100,6 +98,9 @@ protected:
   vtkKWEntry *YMaxEntry;
   vtkKWEntry *ZMinEntry;
   vtkKWEntry *ZMaxEntry;
+
+  vtkPVExtentEntry(const vtkPVExtentEntry&); // Not implemented
+  void operator=(const vtkPVExtentEntry&); // Not implemented
 };
 
 #endif

@@ -89,12 +89,13 @@ public:
 protected:
   vtkPVBoundsDisplay();
   ~vtkPVBoundsDisplay();
-  vtkPVBoundsDisplay(const vtkPVBoundsDisplay&) {};
-  void operator=(const vtkPVBoundsDisplay&) {};
 
   int ShowHideFrame;
   vtkKWBoundsDisplay *Widget;
   vtkPVInputMenu *InputMenu;
+
+  vtkPVBoundsDisplay(const vtkPVBoundsDisplay&); // Not implemented
+  void operator=(const vtkPVBoundsDisplay&); // Not implemented
 };
 
 

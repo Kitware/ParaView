@@ -105,6 +105,6 @@ void vtkPVExtractGeometryByScalar::CreateProperties()
 }
 
 //---------------------------------------------------------------------------
-void vtkPVExtractGeometryByScalar::SaveInTclScript(ofstream *file)
+void vtkPVExtractGeometryByScalar::SaveInTclScript(ofstream* vtkNotUsed(file))
 {
 }

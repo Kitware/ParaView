@@ -83,11 +83,12 @@ public:
 protected:
   vtkPVLabeledToggle();
   ~vtkPVLabeledToggle();
-  vtkPVLabeledToggle(const vtkPVLabeledToggle&) {};
-  void operator=(const vtkPVLabeledToggle&) {};
   
   vtkKWLabel *Label;
   vtkKWCheckButton *CheckButton;
+
+  vtkPVLabeledToggle(const vtkPVLabeledToggle&); // Not implemented
+  void operator=(const vtkPVLabeledToggle&); // Not implemented
 };
 
 #endif

@@ -76,10 +76,11 @@ public:
 protected:
   vtkPVExtentTranslator();
   ~vtkPVExtentTranslator();
-  vtkPVExtentTranslator(const vtkPVExtentTranslator&) {};
-  void operator=(const vtkPVExtentTranslator&) {};
 
   vtkDataSet *OriginalSource;
+
+  vtkPVExtentTranslator(const vtkPVExtentTranslator&); // Not implemented
+  void operator=(const vtkPVExtentTranslator&); // Not implemented
 };
 
 #endif

@@ -121,9 +121,7 @@ public:
 protected:
   vtkPVProbe();
   ~vtkPVProbe();
-  vtkPVProbe(const vtkPVProbe&) {};
-  void operator=(const vtkPVProbe&) {};
-  
+
   vtkKWLabel *DimensionalityLabel;
   vtkKWOptionMenu *DimensionalityMenu;
   vtkKWWidget *ProbeFrame;
@@ -160,6 +158,9 @@ protected:
   vtkSetStringMacro(XYPlotTclName);
 
   int InstanceCount;
+
+  vtkPVProbe(const vtkPVProbe&); // Not implemented
+  void operator=(const vtkPVProbe&); // Not implemented
 };
 
 #endif

@@ -102,13 +102,12 @@ public:
 
   // Description:
   // adds a script to the menu of the animation interface.
-  virtual void AddAnimationScriptsToMenu(vtkKWMenu *menu, vtkPVAnimationInterface *ai);
+  virtual void AddAnimationScriptsToMenu(vtkKWMenu *menu, 
+					 vtkPVAnimationInterface *ai);
 
 protected:
   vtkPVContourEntry();
   ~vtkPVContourEntry();
-  vtkPVContourEntry(const vtkPVContourEntry&) {};
-  void operator=(const vtkPVContourEntry&) {};
 
   vtkKWLabel* ContourValuesLabel;
   vtkKWListBox *ContourValuesList;
@@ -120,6 +119,9 @@ protected:
 
   // I would like to get rid of this reference.
   vtkPVSource *PVSource;
+
+  vtkPVContourEntry(const vtkPVContourEntry&); // Not implemented
+  void operator=(const vtkPVContourEntry&); // Not implemented
 };
 
 #endif

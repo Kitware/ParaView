@@ -62,8 +62,9 @@ public:
 protected:
   vtkPVCut();
   ~vtkPVCut();
-  vtkPVCut(const vtkPVCut&) {};
-  void operator=(const vtkPVCut&) {};
+
+  vtkPVCut(const vtkPVCut&); // Not implemented
+  void operator=(const vtkPVCut&); // Not implemented
 };
 
 

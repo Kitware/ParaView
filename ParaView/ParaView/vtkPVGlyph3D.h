@@ -66,10 +66,11 @@ public:
 protected:
   vtkPVGlyph3D();
   ~vtkPVGlyph3D();
-  vtkPVGlyph3D(const vtkPVGlyph3D&) {};
-  void operator=(const vtkPVGlyph3D&) {};
 
   vtkPVData *GlyphSource;
+
+  vtkPVGlyph3D(const vtkPVGlyph3D&); // Not implemented
+  void operator=(const vtkPVGlyph3D&); // Not implemented
 };
 
 #endif

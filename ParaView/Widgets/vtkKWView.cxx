@@ -77,7 +77,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 int vtkKWViewFoundMatch;
 Bool vtkKWRenderViewPredProc(Display *vtkNotUsed(disp), XEvent *event, 
-			     char *arg)
+			     char * vtkNotUsed(arg))
 {  
   if (event->type == Expose)
     {
@@ -1317,10 +1317,16 @@ void vtkKWView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWView ";
-  this->ExtractRevision(os,"$Revision: 1.61 $");
+  this->ExtractRevision(os,"$Revision: 1.62 $");
 }
 
-void vtkKWView::SetupMemoryRendering(int x, int y, void *cd) 
+void vtkKWView::SetupMemoryRendering(
+#ifdef _WIN32
+  int x, int y, void *cd
+#else
+  int, int, void*
+#endif
+  ) 
 {
 #ifdef _WIN32
   if (!cd)

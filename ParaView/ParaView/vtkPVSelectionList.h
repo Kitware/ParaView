@@ -104,8 +104,6 @@ public:
 protected:
   vtkPVSelectionList();
   ~vtkPVSelectionList();
-  vtkPVSelectionList(const vtkPVSelectionList&) {};
-  void operator=(const vtkPVSelectionList&) {};
 
   vtkKWLabel *Label;
   vtkKWOptionMenu *Menu;
@@ -118,6 +116,8 @@ protected:
 
   vtkSetStringMacro(CurrentName);
   
+  vtkPVSelectionList(const vtkPVSelectionList&); // Not implemented
+  void operator=(const vtkPVSelectionList&); // Not implemented
 };
 
 #endif

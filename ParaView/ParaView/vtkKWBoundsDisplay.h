@@ -72,8 +72,6 @@ public:
 protected:
   vtkKWBoundsDisplay();
   ~vtkKWBoundsDisplay();
-  vtkKWBoundsDisplay(const vtkKWBoundsDisplay&) {};
-  void operator=(const vtkKWBoundsDisplay&) {};
 
   void UpdateWidgets();
 
@@ -83,6 +81,8 @@ protected:
 
   float Bounds[6];
 
+  vtkKWBoundsDisplay(const vtkKWBoundsDisplay&); // Not implemented
+  void operator=(const vtkKWBoundsDisplay&); // Not implemented
 };
 
 

@@ -74,12 +74,13 @@ public:
 protected:
   vtkPVInteractorStyleTranslateCamera();
   ~vtkPVInteractorStyleTranslateCamera();
-  vtkPVInteractorStyleTranslateCamera(const vtkPVInteractorStyleTranslateCamera&) {};
-  void operator=(const vtkPVInteractorStyleTranslateCamera&) {};
 
   void ResetLights();
 
   float ZoomScale;
+
+  vtkPVInteractorStyleTranslateCamera(const vtkPVInteractorStyleTranslateCamera&); // Not implemented
+  void operator=(const vtkPVInteractorStyleTranslateCamera&); // Not implemented
 };
 
 #endif

@@ -105,8 +105,6 @@ public:
 protected:
   vtkPVArrayCalculator();
   ~vtkPVArrayCalculator();
-  vtkPVArrayCalculator(const vtkPVArrayCalculator&) {};
-  void operator=(const vtkPVArrayCalculator&) {};
 
   vtkKWWidget* AttributeModeFrame;
   vtkKWLabel* AttributeModeLabel;
@@ -158,6 +156,9 @@ protected:
   vtkKWMenuButton* VectorsMenu;
   
   int ModifiedFlag;
+
+  vtkPVArrayCalculator(const vtkPVArrayCalculator&); // Not implemented
+  void operator=(const vtkPVArrayCalculator&); // Not implemented
 };
 
 #endif

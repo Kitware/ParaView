@@ -87,8 +87,6 @@ public:
 protected:
   vtkPVThreshold();
   ~vtkPVThreshold();
-  vtkPVThreshold(const vtkPVThreshold&) {};
-  void operator=(const vtkPVThreshold&) {};
 
   void UpdateMinMaxScale();
 
@@ -100,6 +98,9 @@ protected:
   vtkPVLabeledToggle* AllScalarsCheck;
   
   int TraceInitialized;
+
+  vtkPVThreshold(const vtkPVThreshold&); // Not implemented
+  void operator=(const vtkPVThreshold&); // Not implemented
 };
 
 #endif

@@ -89,8 +89,6 @@ public:
 protected:
   vtkPVFileEntry();
   ~vtkPVFileEntry();
-  vtkPVFileEntry(const vtkPVFileEntry&) {};
-  void operator=(const vtkPVFileEntry&) {};
   
   vtkKWLabel *LabelWidget;
   vtkKWPushButton *BrowseButton;
@@ -98,6 +96,9 @@ protected:
 
   char* Extension;
   vtkSetStringMacro(Extension);
+
+  vtkPVFileEntry(const vtkPVFileEntry&); // Not implemented
+  void operator=(const vtkPVFileEntry&); // Not implemented
 };
 
 #endif

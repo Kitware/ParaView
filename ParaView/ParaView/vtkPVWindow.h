@@ -331,8 +331,6 @@ public:
 protected:
   vtkPVWindow();
   ~vtkPVWindow();
-  vtkPVWindow(const vtkPVWindow&) {};
-  void operator=(const vtkPVWindow&) {};
 
   vtkPVRenderView *MainView;
   vtkKWMenu *AdvancedMenu;
@@ -438,8 +436,12 @@ private:
 
   // Modules.
   vtkStringList *Modules;
-  vtkPVSource *OpenWithReaderInterface(const char *openFileName, const char *rootName,
+  vtkPVSource *OpenWithReaderInterface(const char *openFileName, 
+				       const char *rootName,
                                        const char *rIntName);
+
+  vtkPVWindow(const vtkPVWindow&); // Not implemented
+  void operator=(const vtkPVWindow&); // Not implemented
 };
 
 

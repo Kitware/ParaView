@@ -329,8 +329,6 @@ public:
 protected:
   vtkPVSource();
   ~vtkPVSource();
-  vtkPVSource(const vtkPVSource&) {};
-  void operator=(const vtkPVSource&) {};
 
   // What did this do ??? ... 
   char *DefaultScalarsName;
@@ -403,6 +401,9 @@ protected:
 
   int InstanceCount;
   int VisitedFlag;
+
+  vtkPVSource(const vtkPVSource&); // Not implemented
+  void operator=(const vtkPVSource&); // Not implemented
 };
 
 #endif

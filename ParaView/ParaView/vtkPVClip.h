@@ -62,8 +62,9 @@ public:
 protected:
   vtkPVClip();
   ~vtkPVClip();
-  vtkPVClip(const vtkPVClip&) {};
-  void operator=(const vtkPVClip&) {};
+
+  vtkPVClip(const vtkPVClip&); // Not implemented
+  void operator=(const vtkPVClip&); // Not implemented
 
 };
 

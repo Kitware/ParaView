@@ -196,8 +196,6 @@ public:
 protected:
   vtkPVArrayMenu();
   ~vtkPVArrayMenu();
-  vtkPVArrayMenu(const vtkPVArrayMenu&) {};
-  void operator=(const vtkPVArrayMenu&) {};
 
   // The selected array name in the menu.  Current value of the widget.
   char *ArrayName;
@@ -234,6 +232,8 @@ protected:
   vtkPVScalarRangeLabel *ScalarRangeLabel;
   int ShowScalarRangeLabel;
 
+  vtkPVArrayMenu(const vtkPVArrayMenu&); // Not implemented
+  void operator=(const vtkPVArrayMenu&); // Not implemented
 };
 
 #endif

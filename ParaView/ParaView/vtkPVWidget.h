@@ -133,8 +133,6 @@ public:
 protected:
   vtkPVWidget();
   ~vtkPVWidget();
-  vtkPVWidget(const vtkPVWidget&) {};
-  void operator=(const vtkPVWidget&) {};
 
   char *ModifiedCommandObjectTclName;
   char *ModifiedCommandMethod;
@@ -149,6 +147,8 @@ protected:
   // This sets up a widget tree of dependancies.
   vtkCollection *DependantCollection;
 
+  vtkPVWidget(const vtkPVWidget&); // Not implemented
+  void operator=(const vtkPVWidget&); // Not implemented
 };
 
 #endif

@@ -67,12 +67,13 @@ public:
 protected:
   vtkPVDataSetReaderInterface();
   ~vtkPVDataSetReaderInterface();
-  vtkPVDataSetReaderInterface(const vtkPVDataSetReaderInterface&) {};
-  void operator=(const vtkPVDataSetReaderInterface&) {};
   
   // necessary for writing out pipeline
   vtkSetStringMacro(FileName);
   char* FileName;
+
+  vtkPVDataSetReaderInterface(const vtkPVDataSetReaderInterface&); // Not implemented
+  void operator=(const vtkPVDataSetReaderInterface&); // Not implemented
 };
 
 #endif

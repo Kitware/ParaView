@@ -71,10 +71,11 @@ public:
 protected:
   vtkPVContour();
   ~vtkPVContour();
-  vtkPVContour(const vtkPVContour&) {};
-  void operator=(const vtkPVContour&) {};
   
   vtkPVArrayMenu* ArrayMenu;
+
+  vtkPVContour(const vtkPVContour&); // Not implemented
+  void operator=(const vtkPVContour&); // Not implemented
 };
 
 #endif

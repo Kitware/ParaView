@@ -84,8 +84,6 @@ public:
 protected:
   vtkStringList();
   ~vtkStringList();
-  vtkStringList(const vtkStringList&) {};
-  void operator=(const vtkStringList&) {};
   
   int NumberOfStrings;
   int StringArrayLength;
@@ -93,6 +91,8 @@ protected:
   void Reallocate(int num);
   void DeleteStrings();
 
+  vtkStringList(const vtkStringList&); // Not implemented
+  void operator=(const vtkStringList&); // Not implemented
 };
 
 #endif

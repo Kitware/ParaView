@@ -282,8 +282,5 @@ void vtkKWHashTable::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "Size:              " << this->GetSize() << endl
      << indent << "Number of buckets: " << this->GetNumberOfBuckets() << endl
      << indent << "Hash function:     " 
-     << ((this->HashFunction == vtkKWHashTable::HashString) ? 
-	 "Hash String" : "Custom hash function")
-     << ((this->HashFunction == vtkKWHashTable::HashString) ? 
-	 "" : (void *)this->HashFunction) << endl;
+     << (void*)this->HashFunction << endl;
 }

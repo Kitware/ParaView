@@ -147,8 +147,6 @@ public:
 protected:
   vtkPVInputMenu();
   ~vtkPVInputMenu();
-  vtkPVInputMenu(const vtkPVInputMenu&) {};
-  void operator=(const vtkPVInputMenu&) {};
 
   char* InputType;
   char* InputName;
@@ -178,6 +176,8 @@ protected:
   // The sources are filtered by "InputType".
   void AddSources(vtkCollection *sources);
 
+  vtkPVInputMenu(const vtkPVInputMenu&); // Not implemented
+  void operator=(const vtkPVInputMenu&); // Not implemented
 };
 
 #endif

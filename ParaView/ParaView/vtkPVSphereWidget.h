@@ -102,8 +102,6 @@ public:
 protected:
   vtkPVSphereWidget();
   ~vtkPVSphereWidget();
-  vtkPVSphereWidget(const vtkPVSphereWidget&) {};
-  void operator=(const vtkPVSphereWidget&) {};
 
   vtkPVSource *PVSource;
 
@@ -118,6 +116,9 @@ protected:
   char *VariableName;
   vtkSetStringMacro(ObjectTclName);
   vtkSetStringMacro(VariableName);
+
+  vtkPVSphereWidget(const vtkPVSphereWidget&); // Not implemented
+  void operator=(const vtkPVSphereWidget&); // Not implemented
 };
 
 #endif

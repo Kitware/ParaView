@@ -108,8 +108,6 @@ public:
 protected:
   vtkPVTreeComposite();
   ~vtkPVTreeComposite();
-  vtkPVTreeComposite(const vtkPVTreeComposite&) {};
-  void operator=(const vtkPVTreeComposite&) {};
 
   int  CheckForData();
   int  ShouldIComposite();
@@ -155,11 +153,10 @@ protected:
   int ReceiveMessage;
 #endif
 //ETX  
-  
-  
+    
+  vtkPVTreeComposite(const vtkPVTreeComposite&); // Not implemented
+  void operator=(const vtkPVTreeComposite&); // Not implemented
 };
-
-
 
 // ifndef __vtkPVTreeComposite_h
 #endif

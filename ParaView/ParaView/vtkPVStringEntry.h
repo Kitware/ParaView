@@ -79,11 +79,12 @@ public:
 protected:
   vtkPVStringEntry();
   ~vtkPVStringEntry();
-  vtkPVStringEntry(const vtkPVStringEntry&) {};
-  void operator=(const vtkPVStringEntry&) {};
   
   vtkKWLabel *Label;
   vtkKWEntry *Entry;
+
+  vtkPVStringEntry(const vtkPVStringEntry&); // Not implemented
+  void operator=(const vtkPVStringEntry&); // Not implemented
 };
 
 #endif

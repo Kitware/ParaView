@@ -63,8 +63,9 @@ public:
 protected:
   vtkPVExtractGeometryByScalar();
   ~vtkPVExtractGeometryByScalar();
-  vtkPVExtractGeometryByScalar(const vtkPVExtractGeometryByScalar&) {};
-  void operator=(const vtkPVExtractGeometryByScalar&) {};
+
+  vtkPVExtractGeometryByScalar(const vtkPVExtractGeometryByScalar&); // Not implemented
+  void operator=(const vtkPVExtractGeometryByScalar&); // Not implemented
 };
 
 #endif

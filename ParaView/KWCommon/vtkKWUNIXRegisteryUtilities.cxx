@@ -309,7 +309,7 @@ int vtkKWUNIXRegisteryUtilities::ReadValueInternal(const char *skey,
   return res;
 }
 
-int vtkKWUNIXRegisteryUtilities::DeleteKeyInternal(const char *key)
+int vtkKWUNIXRegisteryUtilities::DeleteKeyInternal(const char* vtkNotUsed(key))
 {
   int res = 0;
   return res;

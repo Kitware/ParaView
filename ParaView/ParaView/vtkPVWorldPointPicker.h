@@ -73,10 +73,11 @@ public:
 protected:
   vtkPVWorldPointPicker();
   ~vtkPVWorldPointPicker();
-  vtkPVWorldPointPicker(const vtkPVWorldPointPicker&) {};
-  void operator=(const vtkPVWorldPointPicker&) {};
 
   vtkPVTreeComposite *Composite;
+
+  vtkPVWorldPointPicker(const vtkPVWorldPointPicker&); // Not implemented
+  void operator=(const vtkPVWorldPointPicker&); // Not implemented
 };
 
 #endif

@@ -71,13 +71,14 @@ public:
 protected:
   vtkPVObjectWidget();
   ~vtkPVObjectWidget();
-  vtkPVObjectWidget(const vtkPVObjectWidget&) {};
-  void operator=(const vtkPVObjectWidget&) {};
 
   char *ObjectTclName;
   char *VariableName;
   vtkSetStringMacro(ObjectTclName);
   vtkSetStringMacro(VariableName);
+
+  vtkPVObjectWidget(const vtkPVObjectWidget&); // Not implemented
+  void operator=(const vtkPVObjectWidget&); // Not implemented
 };
 
 #endif

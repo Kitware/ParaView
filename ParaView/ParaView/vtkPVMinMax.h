@@ -98,8 +98,6 @@ public:
 protected:
   vtkPVMinMax();
   ~vtkPVMinMax();
-  vtkPVMinMax(const vtkPVMinMax&) {};
-  void operator=(const vtkPVMinMax&) {};
   
   vtkKWLabel *MinLabel;
   vtkKWLabel *MaxLabel;
@@ -115,6 +113,9 @@ protected:
   vtkSetStringMacro(GetMinCommand);
   vtkSetStringMacro(GetMaxCommand);
   vtkSetStringMacro(SetCommand);
+
+  vtkPVMinMax(const vtkPVMinMax&); // Not implemented
+  void operator=(const vtkPVMinMax&); // Not implemented
 };
 
 #endif

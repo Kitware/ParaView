@@ -77,10 +77,11 @@ public:
 protected:
   vtkPVLabel();
   ~vtkPVLabel();
-  vtkPVLabel(const vtkPVLabel&) {};
-  void operator=(const vtkPVLabel&) {};
   
   vtkKWLabel *Label;
+
+  vtkPVLabel(const vtkPVLabel&); // Not implemented
+  void operator=(const vtkPVLabel&); // Not implemented
 };
 
 #endif

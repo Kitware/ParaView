@@ -83,8 +83,6 @@ public:
 protected:
   vtkPVComponentSelection();
   ~vtkPVComponentSelection();
-  vtkPVComponentSelection(const vtkPVComponentSelection&) {};
-  void operator=(const vtkPVComponentSelection&) {};
   
   vtkKWWidgetCollection *CheckButtons;
   vtkPVSource *PVSource;
@@ -94,6 +92,9 @@ protected:
   char *VariableName;
   vtkSetStringMacro(ObjectTclName);
   vtkSetStringMacro(VariableName);
+
+  vtkPVComponentSelection(const vtkPVComponentSelection&); // Not implemented
+  void operator=(const vtkPVComponentSelection&); // Not implemented
 };
 
 #endif

@@ -116,8 +116,6 @@ public:
 protected:
   vtkPVPlaneWidget();
   ~vtkPVPlaneWidget();
-  vtkPVPlaneWidget(const vtkPVPlaneWidget&) {};
-  void operator=(const vtkPVPlaneWidget&) {};
 
   vtkPVSource *PVSource;
 
@@ -139,6 +137,9 @@ protected:
   char *VariableName;
   vtkSetStringMacro(ObjectTclName);
   vtkSetStringMacro(VariableName);
+
+  vtkPVPlaneWidget(const vtkPVPlaneWidget&); // Not implemented
+  void operator=(const vtkPVPlaneWidget&); // Not implemented
 };
 
 #endif

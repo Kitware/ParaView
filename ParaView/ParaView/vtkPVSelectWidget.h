@@ -120,8 +120,6 @@ public:
 protected:
   vtkPVSelectWidget();
   ~vtkPVSelectWidget();
-  vtkPVSelectWidget(const vtkPVSelectWidget&) {};
-  void operator=(const vtkPVSelectWidget&) {};
 
   int FindIndex(const char* str, vtkStringList *list);
   void SetCurrentIndex(int idx);
@@ -135,6 +133,9 @@ protected:
   vtkCollection *Widgets;
 
   int CurrentIndex;
+
+  vtkPVSelectWidget(const vtkPVSelectWidget&); // Not implemented
+  void operator=(const vtkPVSelectWidget&); // Not implemented
 };
 
 #endif

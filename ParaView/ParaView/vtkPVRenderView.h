@@ -239,8 +239,6 @@ protected:
 
   vtkPVRenderView();
   ~vtkPVRenderView();
-  vtkPVRenderView(const vtkPVRenderView&) {};
-  void operator=(const vtkPVRenderView&) {};
 
   void CalculateBBox(char* name, int bbox[4]);
 
@@ -286,6 +284,9 @@ protected:
 
   // For the renderer in a separate toplevel window.
   vtkKWWidget *TopLevelRenderWindow;
+
+  vtkPVRenderView(const vtkPVRenderView&); // Not implemented
+  void operator=(const vtkPVRenderView&); // Not implemented
 };
 
 

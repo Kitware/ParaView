@@ -126,8 +126,6 @@ public:
 protected:
   vtkPVMethodInterface();
   ~vtkPVMethodInterface();
-  vtkPVMethodInterface(const vtkPVMethodInterface&) {};
-  void operator=(const vtkPVMethodInterface&) {};
 
   char *Label;
   char *VariableName;
@@ -140,6 +138,9 @@ protected:
   char *FileExtension;
   
   char *BalloonHelp;
+
+  vtkPVMethodInterface(const vtkPVMethodInterface&); // Not implemented
+  void operator=(const vtkPVMethodInterface&); // Not implemented
 };
 
 #endif

@@ -72,14 +72,15 @@ public:
 protected:
   vtkPVInteractorStyleCenterOfRotation();
   ~vtkPVInteractorStyleCenterOfRotation();
-  vtkPVInteractorStyleCenterOfRotation(const vtkPVInteractorStyleCenterOfRotation&) {};
-  void operator=(const vtkPVInteractorStyleCenterOfRotation&) {};
   
   // Description:
   // Set the center of rotation.
   void SetCenter(float x, float y, float z);
   
   vtkPVWorldPointPicker *Picker;
+
+  vtkPVInteractorStyleCenterOfRotation(const vtkPVInteractorStyleCenterOfRotation&); // Not implemented
+  void operator=(const vtkPVInteractorStyleCenterOfRotation&); // Not implemented
 };
 
 #endif

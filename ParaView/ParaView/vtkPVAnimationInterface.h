@@ -157,8 +157,6 @@ public:
 protected:
   vtkPVAnimationInterface();
   ~vtkPVAnimationInterface();
-  vtkPVAnimationInterface(const vtkPVAnimationInterface&) {};
-  void operator=(const vtkPVAnimationInterface&) {};
 
   vtkPVRenderView *View;
   vtkPVWindow *Window;
@@ -203,6 +201,9 @@ protected:
 
   // The formated string to evaluate.
   char *ScriptString;
+
+  vtkPVAnimationInterface(const vtkPVAnimationInterface&); // Not implemented
+  void operator=(const vtkPVAnimationInterface&); // Not implemented
 };
 
 #endif

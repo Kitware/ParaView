@@ -82,8 +82,6 @@ public:
 protected:
   vtkPVInteractorStyleRotateCamera();
   ~vtkPVInteractorStyleRotateCamera();
-  vtkPVInteractorStyleRotateCamera(const vtkPVInteractorStyleRotateCamera&) {};
-  void operator=(const vtkPVInteractorStyleRotateCamera&) {};
 
   void ResetLights();
   void TransformCamera(vtkTransform *transform, vtkCamera *camera);
@@ -91,6 +89,9 @@ protected:
   float ZoomScale;
   float Center[3];
   float DisplayCenter[2];
+
+  vtkPVInteractorStyleRotateCamera(const vtkPVInteractorStyleRotateCamera&); // Not implemented
+  void operator=(const vtkPVInteractorStyleRotateCamera&); // Not implemented
 };
 
 #endif

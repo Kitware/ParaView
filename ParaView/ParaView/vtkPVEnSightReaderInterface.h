@@ -61,11 +61,12 @@ public:
 protected:
   vtkPVEnSightReaderInterface();
   ~vtkPVEnSightReaderInterface();
-  vtkPVEnSightReaderInterface(const vtkPVEnSightReaderInterface&) {};
-  void operator=(const vtkPVEnSightReaderInterface&) {};
 
   vtkSetStringMacro(CaseFileName);
   char* CaseFileName;
+
+  vtkPVEnSightReaderInterface(const vtkPVEnSightReaderInterface&); // Not implemented
+  void operator=(const vtkPVEnSightReaderInterface&); // Not implemented
 };
 
 #endif

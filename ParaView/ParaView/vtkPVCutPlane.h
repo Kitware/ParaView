@@ -62,8 +62,9 @@ public:
 protected:
   vtkPVCutPlane();
   ~vtkPVCutPlane();
-  vtkPVCutPlane(const vtkPVCutPlane&) {};
-  void operator=(const vtkPVCutPlane&) {};
+
+  vtkPVCutPlane(const vtkPVCutPlane&); // Not implemented
+  void operator=(const vtkPVCutPlane&); // Not implemented
 };
 
 

@@ -67,11 +67,12 @@ public:
 protected:
   vtkPVDataSetFileEntry();
   ~vtkPVDataSetFileEntry();
-  vtkPVDataSetFileEntry(const vtkPVDataSetFileEntry&) {};
-  void operator=(const vtkPVDataSetFileEntry&) {};
   
   vtkDataSetReader *TypeReader;
   int Type;
+
+  vtkPVDataSetFileEntry(const vtkPVDataSetFileEntry&); // Not implemented
+  void operator=(const vtkPVDataSetFileEntry&); // Not implemented
 };
 
 #endif

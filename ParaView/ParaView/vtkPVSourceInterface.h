@@ -135,8 +135,6 @@ public:
 protected:
   vtkPVSourceInterface();
   ~vtkPVSourceInterface();
-  vtkPVSourceInterface(const vtkPVSourceInterface&) {};
-  void operator=(const vtkPVSourceInterface&) {};
 
   char *RootName;
   char *SourceClassName;
@@ -155,6 +153,9 @@ protected:
   int InstanceCount;
 
   int ReplaceInput;
+
+  vtkPVSourceInterface(const vtkPVSourceInterface&); // Not implemented
+  void operator=(const vtkPVSourceInterface&); // Not implemented
 };
 
 #endif

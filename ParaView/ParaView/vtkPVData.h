@@ -313,8 +313,6 @@ public:
 protected:
   vtkPVData();
   ~vtkPVData();
-  vtkPVData(const vtkPVData&) {};
-  void operator=(const vtkPVData&) {};
   
   vtkDataSet *VTKData;
   char *VTKDataTclName;
@@ -433,7 +431,8 @@ protected:
 
   vtkPolyDataMapper *Mapper;
 
-
+  vtkPVData(const vtkPVData&); // Not implemented
+  void operator=(const vtkPVData&); // Not implemented
 };
 
 #endif

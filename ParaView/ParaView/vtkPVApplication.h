@@ -190,9 +190,6 @@ public:
 protected:
   vtkPVApplication();
   ~vtkPVApplication();
-  vtkPVApplication(const vtkPVApplication&) {};
-  void operator=(const vtkPVApplication&) {};
-
   
   void *Log;
   char *LogFileName;
@@ -207,6 +204,9 @@ protected:
   int MinorVersion;
 
   vtkMultiProcessController *Controller;
+
+  vtkPVApplication(const vtkPVApplication&); // Not implemented
+  void operator=(const vtkPVApplication&); // Not implemented
 };
 
 #endif

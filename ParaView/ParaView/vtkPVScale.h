@@ -80,11 +80,12 @@ public:
 protected:
   vtkPVScale();
   ~vtkPVScale();
-  vtkPVScale(const vtkPVScale&) {};
-  void operator=(const vtkPVScale&) {};
   
   vtkKWLabel *Label;
   vtkKWScale *Scale;
+
+  vtkPVScale(const vtkPVScale&); // Not implemented
+  void operator=(const vtkPVScale&); // Not implemented
 };
 
 #endif

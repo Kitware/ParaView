@@ -114,8 +114,6 @@ public:
 protected:
   vtkPVVectorEntry();
   ~vtkPVVectorEntry();
-  vtkPVVectorEntry(const vtkPVVectorEntry&) {};
-  void operator=(const vtkPVVectorEntry&) {};
   
   vtkKWLabel *Label;
   vtkKWWidgetCollection *SubLabels;
@@ -124,6 +122,9 @@ protected:
   int DataType;
 
   char *ScriptValue;
+
+  vtkPVVectorEntry(const vtkPVVectorEntry&); // Not implemented
+  void operator=(const vtkPVVectorEntry&); // Not implemented
 };
 
 #endif

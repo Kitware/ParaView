@@ -75,8 +75,6 @@ public:
 protected:
   vtkPVInteractorStyleFly();
   ~vtkPVInteractorStyleFly();
-  vtkPVInteractorStyleFly(const vtkPVInteractorStyleFly&) {};
-  void operator=(const vtkPVInteractorStyleFly&) {};
   
   void ComputeCameraAxes();
   void ResetLights();
@@ -87,6 +85,9 @@ protected:
   double CameraXAxis[3];
   double CameraYAxis[3];
   double CameraZAxis[3];
+
+  vtkPVInteractorStyleFly(const vtkPVInteractorStyleFly&); // Not implemented
+  void operator=(const vtkPVInteractorStyleFly&); // Not implemented
 };
 
 #endif
