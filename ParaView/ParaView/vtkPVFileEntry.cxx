@@ -61,7 +61,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVFileEntry);
-vtkCxxRevisionMacro(vtkPVFileEntry, "1.30");
+vtkCxxRevisionMacro(vtkPVFileEntry, "1.31");
 
 //----------------------------------------------------------------------------
 vtkPVFileEntry::vtkPVFileEntry()
@@ -420,20 +420,22 @@ void vtkPVFileEntry::SetValue(const char* fileName)
       }
     this->Timestep->SetValue(med);
     ostrstream str;
-    str << "set " << this->GetPVSource()->GetVTKSourceTclName() << "_files { ";
+    str << "set " << this->GetPVSource()->GetVTKSourceTclName() << "_files {";
     char* name = new char [ this->FileNameLength ];
     for ( cc = min; cc <= max; cc ++ )
       {
       sprintf(name, this->Format, this->Path, this->Prefix, cc, this->Ext);
-      if ( cc < max )
+      if ( cc > min )
         {
-        str << " " << name;
+        str << " ";
         }
+      str << name;
       }
     delete [] name;
     str << "}" << ends;
     cout << str.str() << endl;
     this->Script(str.str());
+    str.rdbuf()->freeze(0);
     }
 
   dirs->Delete();
