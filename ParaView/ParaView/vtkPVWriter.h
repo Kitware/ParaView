@@ -96,7 +96,7 @@ public:
   
   // Description:
   // Check whether this writer supports the given VTK data set's type.
-  int CanWriteData(vtkDataSet* data, int parallel);
+  virtual int CanWriteData(vtkDataSet* data, int parallel);
   
   // Description:
   // This just returns the application typecast correctly.
@@ -105,8 +105,8 @@ public:
   // Description:
   // Write use this writer to store the given data set to the given
   // file.
-  void Write(const char* fileName, const char* dataTclName, int numProcs,
-             int ghostLevel);
+  virtual void Write(const char* fileName, const char* dataTclName,
+                     int numProcs, int ghostLevel);
   
 protected:
   vtkPVWriter();
