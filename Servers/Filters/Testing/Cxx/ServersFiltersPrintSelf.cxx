@@ -97,7 +97,7 @@
 #include "vtkPVDuplicatePolyData.h"
 #include "vtkPVTiledDisplayManager.h"
 #include "vtkRedistributePolyData.h"
-#include "vtkStructuredCacheFilter.h"
+//#include "vtkStructuredCacheFilter.h"
 #include "vtkWeightedRedistributePolyData.h"
 #endif //VTK_USE_MPI
 
@@ -192,7 +192,7 @@ int main(int , char *[])
   c = vtkPVDuplicatePolyData::New(); c->Print(cout); c->Delete();
   c = vtkPVTiledDisplayManager::New(); c->Print(cout); c->Delete();
   c = vtkRedistributePolyData::New(); c->Print(cout); c->Delete();
-  c = vtkStructuredCacheFilter::New(); c->Print(cout); c->Delete();
+//  c = vtkStructuredCacheFilter::New(); c->Print(cout); c->Delete();
   c = vtkWeightedRedistributePolyData::New(); c->Print(cout); c->Delete();
 #endif //VTK_USE_MPI
 
