@@ -84,12 +84,6 @@ public:
   virtual void GetRange(float array[2]) {
     this->GetRange(array[0], array[1]);
     }
-  virtual void GetRange(float range[2]) {
-    double drange[2];
-    this->GetRange(drange);
-    range[0] = (float)drange[0];
-    range[1] = (float)drange[1];
-    }
   virtual double GetRangeMin() { return this->GetRange()[0]; };
   virtual double GetRangeMax() { return this->GetRange()[1]; };
 
