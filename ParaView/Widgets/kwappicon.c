@@ -46,6 +46,8 @@ int SetApplicationIconCmd(ClientData clientdata,
   int iconID, error, set_small;
   char cmd[1024];
 
+  clientdata = 0; // To avoid warning: unreferenced formal parameter
+
   // Check usage
 
   if (argc < 3)
