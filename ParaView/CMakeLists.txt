@@ -5,17 +5,8 @@ INCLUDE_REGULAR_EXPRESSION("^(vtk).*$")
 # load the ClientServer command
 IF (COMMAND VTK_WRAP_ClientServer)
 ELSE (COMMAND VTK_WRAP_ClientServer)
-    TRY_COMPILE(COMPILE_OK
-         ${PARAVIEW_BINARY_DIR}/ClientServer/CMake
-         ${PARAVIEW_SOURCE_DIR}/ClientServer/CMake
-         ClientServer_LOADED_COMMANDS OUTPUT_VARIABLE TRYOUT)
-    IF (COMPILE_OK)
-         LOAD_COMMAND(VTK_WRAP_ClientServer
-            ${PARAVIEW_BINARY_DIR}/ClientServer/CMake
-            ${PARAVIEW_BINARY_DIR}/ClientServer/CMake/Debug)
-    ELSE (COMPILE_OK)
-         MESSAGE("failed to compile ParaView ClientServer extensions to CMake:\n${TRYOUT}")
-    ENDIF (COMPILE_OK)
+  SET (VTKCS_SOURCE_DIR ${PARAVIEW_SOURCE_DIR}/ClientServer)
+  INCLUDE (${VTKCS_SOURCE_DIR}/CMake/vtkWrapCLientServer.cmake)
 ENDIF (COMMAND VTK_WRAP_ClientServer)
 UTILITY_SOURCE(VTK_WRAP_ClientServer_EXE vtkWrapClientServer ClientServer/Wrapping vtkWrapClientServer.c)
 MARK_AS_ADVANCED(VTK_WRAP_ClientServer_EXE)
