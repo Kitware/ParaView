@@ -1,6 +1,12 @@
 #include "vtkPNGReader.h"
 #include "vtkImageFlip.h"
 
+#ifdef VTK_USE_ANSI_STDLIB
+#define VTK_IOS_NOCREATE 
+#else
+#define VTK_IOS_NOCREATE | ios::nocreate
+#endif
+
 
 int main(int argc, char **argv)
 {
@@ -10,7 +16,7 @@ int main(int argc, char **argv)
     return 1;
     }
 
-  ifstream in(argv[1], ios::in | ios::nocreate );
+  ifstream in(argv[1], ios::in VTK_IOS_NOCREATE );
   if ( in.fail() )
     {
     cerr << "Cannot open: " << argv[1] << " for reading" << endl;
