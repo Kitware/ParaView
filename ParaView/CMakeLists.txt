@@ -34,6 +34,7 @@ vtkPVInputMenu
 vtkPVLODActor
 vtkPVMethodInterface 
 vtkPVOutputWindow
+vtkPVPicker
 vtkPVProbe
 vtkPVRenderView 
 vtkPVSelectionList 
