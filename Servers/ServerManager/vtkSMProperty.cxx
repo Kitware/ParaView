@@ -26,7 +26,7 @@
 #include "vtkSMPropertyInternals.h"
 
 vtkStandardNewMacro(vtkSMProperty);
-vtkCxxRevisionMacro(vtkSMProperty, "1.7");
+vtkCxxRevisionMacro(vtkSMProperty, "1.8");
 
 //---------------------------------------------------------------------------
 vtkSMProperty::vtkSMProperty()
@@ -179,4 +179,5 @@ void vtkSMProperty::PrintSelf(ostream& os, vtkIndent indent)
      << (this->Command ? this->Command : "(null)") << endl;
   os << indent << "ImmediateUpdate:" << this->ImmediateUpdate << endl;
   os << indent << "UpdateSelf:" << this->UpdateSelf << endl;
+  os << indent << "IsReadOnly:" << this->IsReadOnly << endl;
 }
