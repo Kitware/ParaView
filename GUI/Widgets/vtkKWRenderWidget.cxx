@@ -36,7 +36,7 @@
 #endif
 
 vtkStandardNewMacro(vtkKWRenderWidget);
-vtkCxxRevisionMacro(vtkKWRenderWidget, "1.82");
+vtkCxxRevisionMacro(vtkKWRenderWidget, "1.83");
 
 //----------------------------------------------------------------------------
 vtkKWRenderWidget::vtkKWRenderWidget()
@@ -287,6 +287,10 @@ void vtkKWRenderWidget::Create(vtkKWApplication *app, const char *args)
   // Make the corner annotation visibile
 
   this->SetCornerAnnotationVisibility(1);
+
+  // Add the bindings
+
+  this->AddBindings();
 
   // Update enable state
 
