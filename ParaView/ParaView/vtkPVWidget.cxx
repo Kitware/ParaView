@@ -116,7 +116,7 @@ void vtkPVWidget::Reset()
 void vtkPVWidget::Update()
 {
   vtkLinkedListIterator<void*>* it = this->Dependents->NewIterator();
-  while ( it->IsDoneWithTraversal() != VTK_OK )
+  while ( !it->IsDoneWithTraversal() )
     {
     void* pvwp = 0;
     if (it->GetData(pvwp) == VTK_OK && pvwp)
@@ -219,7 +219,7 @@ void vtkPVWidget::CopyProperties(vtkPVWidget* clone, vtkPVSource* pvSource,
   vtkPVWidget* clonedep;
 
   vtkLinkedListIterator<void*>* it = this->Dependents->NewIterator();
-  while ( it->IsDoneWithTraversal() != VTK_OK )
+  while ( !it->IsDoneWithTraversal() )
     {
     void* pvwp = 0;
     if (it->GetData(pvwp) == VTK_OK && pvwp)

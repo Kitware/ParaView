@@ -1513,7 +1513,7 @@ int vtkPVWindow::Open(char *openFileName)
   // one which says OK gets to read the file.
   vtkLinkedListIterator<vtkPVReaderModule*>* it = 
     this->ReaderList->NewIterator();
-  while(it->IsDoneWithTraversal() != VTK_OK)
+  while(!it->IsDoneWithTraversal())
     {
     vtkPVReaderModule* rm = 0;
     int retVal = it->GetData(rm);
@@ -1741,7 +1741,7 @@ void vtkPVWindow::SaveInTclScript(const char* filename, int vtkFlag)
     {
     *file << vtkPVApplication::LoadComponentProc << endl;
     vtkLinkedListIterator<const char*>* it = this->PackageNames->NewIterator();
-    while (it->IsDoneWithTraversal() != VTK_OK)
+    while (!it->IsDoneWithTraversal())
       {
       const char* name = 0;
       if (it->GetData(name) == VTK_OK && name)
@@ -1843,7 +1843,7 @@ void vtkPVWindow::SaveInTclScript(const char* filename, int vtkFlag)
     this->SourceLists->NewIterator();
 
   // Mark all sources as not visited.
-  while( it->IsDoneWithTraversal() != VTK_OK )
+  while( !it->IsDoneWithTraversal() )
     {
     vtkPVSourceCollection* col = 0;
     if (it->GetData(col) == VTK_OK && col)
@@ -1969,7 +1969,7 @@ void vtkPVWindow::UpdateSourceMenu()
   vtkPVSource* proto;
   const char* key;
   int numFilters = 0;
-  while ( it->IsDoneWithTraversal() != VTK_OK )
+  while ( !it->IsDoneWithTraversal() )
     {
     proto = 0;
     if (it->GetData(proto) == VTK_OK)
@@ -2023,7 +2023,7 @@ void vtkPVWindow::UpdateFilterMenu()
     vtkPVSource* proto;
     const char* key;
     int numSources = 0;
-    while ( it->IsDoneWithTraversal() != VTK_OK )
+    while ( !it->IsDoneWithTraversal() )
       {
       proto = 0;
       if (it->GetData(proto) == VTK_OK)
@@ -2369,7 +2369,7 @@ void vtkPVWindow::DisableToolbarButtons()
 {
   vtkArrayMapIterator<const char*, vtkKWPushButton*>* it = 
     this->ToolbarButtons->NewIterator();
-  while ( it->IsDoneWithTraversal() != VTK_OK )
+  while ( !it->IsDoneWithTraversal() )
     {
     vtkKWPushButton* button = 0;
     if (it->GetData(button) == VTK_OK && button)
@@ -2391,7 +2391,7 @@ void vtkPVWindow::EnableToolbarButtons()
 
   vtkArrayMapIterator<const char*, vtkKWPushButton*>* it = 
     this->ToolbarButtons->NewIterator();
-  while ( it->IsDoneWithTraversal() != VTK_OK )
+  while ( !it->IsDoneWithTraversal() )
     {
     vtkKWPushButton* button = 0;
     if (it->GetData(button) == VTK_OK && button)

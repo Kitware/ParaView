@@ -98,7 +98,7 @@ void vtkPVContainerWidget::Create(vtkKWApplication *app)
 
   vtkLinkedListIterator<vtkPVWidget*>* it = this->Widgets->NewIterator();
   vtkPVWidget* widget;
-  while ( it->IsDoneWithTraversal() != VTK_OK )
+  while ( !it->IsDoneWithTraversal() )
     {
     widget = 0;
     it->GetData(widget);
@@ -120,7 +120,7 @@ void vtkPVContainerWidget::Accept()
 {
   vtkLinkedListIterator<vtkPVWidget*>* it = this->Widgets->NewIterator();
   vtkPVWidget* widget;
-  while ( it->IsDoneWithTraversal() != VTK_OK )
+  while ( !it->IsDoneWithTraversal() )
     {
     widget = 0;
     it->GetData(widget);
@@ -142,7 +142,7 @@ void vtkPVContainerWidget::Reset()
 
   vtkLinkedListIterator<vtkPVWidget*>* it = this->Widgets->NewIterator();
   vtkPVWidget* widget;
-  while ( it->IsDoneWithTraversal() != VTK_OK )
+  while ( !it->IsDoneWithTraversal() )
     {
     widget = 0;
     it->GetData(widget);
@@ -195,7 +195,7 @@ vtkPVWidget* vtkPVContainerWidget::GetPVWidget(const char* traceName)
 
   vtkLinkedListIterator<vtkPVWidget*>* it = this->Widgets->NewIterator();
   vtkPVWidget* widget;
-  while ( it->IsDoneWithTraversal() != VTK_OK )
+  while ( !it->IsDoneWithTraversal() )
     {
     widget = 0;
     it->GetData(widget);
@@ -248,7 +248,7 @@ vtkPVWidget* vtkPVContainerWidget::ClonePrototypeInternal(
     vtkLinkedListIterator<vtkPVWidget*>* it = this->Widgets->NewIterator();
     vtkPVWidget* widget;
     vtkPVWidget* clone;
-    while ( it->IsDoneWithTraversal() != VTK_OK )
+    while ( !it->IsDoneWithTraversal() )
       {
       widget = 0;
       it->GetData(widget);

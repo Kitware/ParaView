@@ -128,7 +128,7 @@ int vtkPVReaderModule::CanReadFile(const char* fname)
   const char* ext = this->ExtractExtension(fname);
   const char* val = 0;
   this->Iterator->GoToFirstItem();
-  while(this->Iterator->IsDoneWithTraversal() != VTK_OK)
+  while(!this->Iterator->IsDoneWithTraversal())
     {
     this->Iterator->GetData(val);
     if (strcmp(ext, val) == 0)

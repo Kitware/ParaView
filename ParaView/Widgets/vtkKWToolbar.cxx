@@ -130,7 +130,7 @@ void vtkKWToolbar::UpdateWidgets()
     vtkVectorIterator<vtkKWWidget*>* it = this->Widgets->NewIterator();
     
     int totReqWidth=0;
-    while ( it->IsDoneWithTraversal() != VTK_OK )
+    while ( !it->IsDoneWithTraversal() )
       {
       vtkKWWidget* widget = 0;
       if (it->GetData(widget) == VTK_OK)
@@ -153,7 +153,7 @@ void vtkKWToolbar::UpdateWidgets()
       ostrstream s;
       it->InitTraversal();
       int num = 0;
-      while ( it->IsDoneWithTraversal() != VTK_OK )
+      while ( !it->IsDoneWithTraversal() )
 	{
 	vtkKWWidget* widget = 0;
 	if (it->GetData(widget) == VTK_OK)
