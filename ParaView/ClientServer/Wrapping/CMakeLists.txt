@@ -1,3 +1,2 @@
 ADD_EXECUTABLE(vtkWrapClientServer vtkWrapClientServer.c vtkParse.tab.c)
-INSTALL_TARGETS(/bin vtkWrapClientServer)
-
+INSTALL_TARGETS(/lib/paraview-${PARAVIEW_VERSION} vtkWrapClientServer)
