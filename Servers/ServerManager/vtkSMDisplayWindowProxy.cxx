@@ -31,7 +31,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMDisplayWindowProxy);
-vtkCxxRevisionMacro(vtkSMDisplayWindowProxy, "1.20");
+vtkCxxRevisionMacro(vtkSMDisplayWindowProxy, "1.21");
 vtkCxxSetObjectMacro(vtkSMDisplayWindowProxy,RenderModule,vtkPVRenderModule);
 
 struct vtkSMDisplayWindowProxyInternals
@@ -458,10 +458,9 @@ void vtkSMDisplayWindowProxy::StillRender()
       << vtkClientServerStream::End;
     }
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  // Call render on the client only. The composite manager should
+  // Call render on root only. The composite manager should
   // take care of the rest.
-  //pm->SendStream(vtkProcessModule::CLIENT, str, 0);
-  pm->SendStream(vtkProcessModule::DATA_SERVER, str, 0);
+  pm->SendStream(vtkProcessModule::RENDER_SERVER_ROOT, str, 0);
   str.Reset();
 }
 
