@@ -67,7 +67,7 @@ public:
   // Description:
   // Write an XML serialized representation of the object
   // Return 1 on success, 0 otherwise.
-  virtual int Write(ostream &os, vtkIndent indent);
+  virtual int Write(ostream &os, vtkIndent *indent = 0);
   virtual int Write(const char *filename);
 
   // Description:

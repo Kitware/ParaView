@@ -40,7 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkXMLUtilities.h"
 #include "vtkXMLDataElement.h"
 
-vtkCxxRevisionMacro(vtkXMLObjectWriter, "1.5");
+vtkCxxRevisionMacro(vtkXMLObjectWriter, "1.6");
 
 vtkCxxSetObjectMacro(vtkXMLObjectWriter, Object, vtkObject);
 
@@ -167,7 +167,7 @@ int vtkXMLObjectWriter::CreateInNestedElement(vtkXMLDataElement *grandparent,
 }
 
 //----------------------------------------------------------------------------
-int vtkXMLObjectWriter::Write(ostream &os, vtkIndent indent)
+int vtkXMLObjectWriter::Write(ostream &os, vtkIndent *indent)
 {
   // Create the element
 
@@ -182,8 +182,21 @@ int vtkXMLObjectWriter::Write(ostream &os, vtkIndent indent)
     }
 
   // Output the element
-  
-  vtkXMLUtilities::FlattenElement(elem, os, this->WriteIndented ? &indent : 0);
+
+  vtkIndent internal_indent;
+  if (this->WriteIndented)
+    {
+    if (!indent)
+      {
+      indent = &internal_indent;
+      }
+    }
+  else
+    {
+    indent = 0;
+    }
+
+  vtkXMLUtilities::FlattenElement(elem, os, indent);
 
   elem->Delete();
 
@@ -194,9 +207,7 @@ int vtkXMLObjectWriter::Write(ostream &os, vtkIndent indent)
 int vtkXMLObjectWriter::Write(const char *filename)
 {
   ofstream os(filename, ios::out);
-  vtkIndent indent;
-
-  return this->Write(os, indent);
+  return this->Write(os);
 }
 
 //----------------------------------------------------------------------------
