@@ -95,7 +95,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVFileEntry);
-vtkCxxRevisionMacro(vtkPVFileEntry, "1.64");
+vtkCxxRevisionMacro(vtkPVFileEntry, "1.65");
 
 //----------------------------------------------------------------------------
 vtkPVFileEntry::vtkPVFileEntry()
@@ -876,12 +876,15 @@ void vtkPVFileEntry::ExecuteEvent(vtkObject *o, unsigned long event, void* calld
 void vtkPVFileEntry::UpdateTimeStep()
 {
   const char* fileName = this->Entry->GetValue();
-  if ( !fileName )
+  if ( !fileName || !fileName[0] )
     {
     return;
     }
+
+  this->IgnoreFileListEvents = 1;
   char* file = new char[ strlen(fileName) + 1 ];
   vtkKWDirectoryUtilities::GetFilenameName(fileName, file);
+  this->FileListSelect->AddFinalElement(file, 1);
   this->TimeStep = this->FileListSelect->GetElementIndexFromFinalList(file);
   if ( this->TimeStep < 0 )
     {
@@ -903,6 +906,12 @@ void vtkPVFileEntry::UpdateTimeStep()
     this->Timestep->SetRange(0, 
       this->FileListSelect->GetNumberOfElementsOnFinalList()-1);
     }
+  else
+    {
+    this->Script("pack forget %s", 
+      this->TimestepFrame->GetWidgetName());
+    }
+  this->IgnoreFileListEvents = 0;
 }
 
 //----------------------------------------------------------------------------
