@@ -19,6 +19,7 @@
 #define __vtkPVTraceHelper_h
 
 #include "vtkObject.h"
+#include <stdarg.h> // Needed for "va_list" argument 
 
 class vtkKWObject;
 

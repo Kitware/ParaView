@@ -35,6 +35,7 @@ public:
   // Description:
   // GUI components callbacks (overriden to provide trace)
   virtual void SetColor(double, double, double);
+  virtual void SetColor(double *v) { this->SetColor(v[0], v[1], v[2]); };
   virtual void SetFontFamily(int);
   virtual void SetBold(int);
   virtual void SetItalic(int);
