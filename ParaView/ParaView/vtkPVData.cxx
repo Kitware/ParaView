@@ -88,6 +88,7 @@ vtkPVData::vtkPVData()
 {
   this->CommandFunction = vtkPVDataCommand;
 
+  this->Initialized = 0;
   this->VTKData = NULL;
   this->VTKDataTclName = NULL;
   this->PVSource = NULL;
@@ -686,7 +687,7 @@ void vtkPVData::CreateParallelTclObjects(vtkPVApplication *pvApp)
 //----------------------------------------------------------------------------
 void vtkPVData::ForceUpdate(vtkPVApplication* pvApp)
 {
-  if ( this->UpdateSupressorTclName )
+  if ( this->Initialized && this->UpdateSupressorTclName )
     {
     pvApp->BroadcastScript("%s ForceUpdate", this->UpdateSupressorTclName);
     pvApp->BroadcastScript("%s ForceUpdate", this->LODUpdateSupressorTclName);
@@ -1854,12 +1855,6 @@ void vtkPVData::SetRepresentation(const char* repr)
 //----------------------------------------------------------------------------
 void vtkPVData::DrawWireframe()
 {
-  if ( vtkString::Equals(this->RepresentationMenu->GetValue(),
-                         "Wireframe") )
-    {
-    return;
-    }
-
   vtkPVApplication *pvApp = this->GetPVApplication();
   
   this->AddTraceEntry("$kw(%s) DrawWireframe", this->GetTclName());
@@ -1890,12 +1885,6 @@ void vtkPVData::DrawWireframe()
 //----------------------------------------------------------------------------
 void vtkPVData::DrawPoints()
 {
-  if ( vtkString::Equals(this->RepresentationMenu->GetValue(),
-                         "Points") )
-    {
-    return;
-    }
-
   vtkPVApplication *pvApp = this->GetPVApplication();
   
   this->AddTraceEntry("$kw(%s) DrawPoints", this->GetTclName());
@@ -1926,12 +1915,6 @@ void vtkPVData::DrawPoints()
 //----------------------------------------------------------------------------
 void vtkPVData::DrawSurface()
 {
-  if ( vtkString::Equals(this->RepresentationMenu->GetValue(),
-                         "Surface") )
-    {
-    return;
-    }
-
   vtkPVApplication *pvApp = this->GetPVApplication();
   
   this->AddTraceEntry("$kw(%s) DrawSurface", this->GetTclName());
@@ -1980,11 +1963,6 @@ void vtkPVData::SetInterpolation(const char* repr)
 //----------------------------------------------------------------------------
 void vtkPVData::SetInterpolationToFlat()
 {
-  if ( vtkString::Equals(this->InterpolationMenu->GetValue(), "Flat") )
-    {
-    return;
-    }
-
   vtkPVApplication *pvApp = this->GetPVApplication();
   
   this->AddTraceEntry("$kw(%s) SetInterpolationToFlat", 
@@ -2007,11 +1985,6 @@ void vtkPVData::SetInterpolationToFlat()
 //----------------------------------------------------------------------------
 void vtkPVData::SetInterpolationToGouraud()
 {
-  if ( vtkString::Equals(this->InterpolationMenu->GetValue(), "Gouraud") )
-    {
-    return;
-    }
-
   vtkPVApplication *pvApp = this->GetPVApplication();
   
   this->AddTraceEntry("$kw(%s) SetInterpolationToGouraud", 
@@ -2189,7 +2162,7 @@ void vtkPVData::Initialize()
                          this->LODMapperTclName,
                          static_cast<vtkPVRenderView*>(
                            this->GetView())->GetImmediateModeCheck()->GetState());
-
+  this->Initialized = 1;
 }
 
 
@@ -2766,7 +2739,7 @@ void vtkPVData::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVData ";
-  this->ExtractRevision(os,"$Revision: 1.129 $");
+  this->ExtractRevision(os,"$Revision: 1.130 $");
 }
 
 //----------------------------------------------------------------------------
