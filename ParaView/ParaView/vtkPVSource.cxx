@@ -71,7 +71,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.248.2.4");
+vtkCxxRevisionMacro(vtkPVSource, "1.248.2.5");
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -730,6 +730,19 @@ void vtkPVSource::SetName (const char* arg)
     this->GetPVRenderView()->UpdateNavigationWindow(this, this->SourceGrabbed);
     }
 } 
+
+//----------------------------------------------------------------------------
+char* vtkPVSource::GetDescription() 
+{ 
+  // Design choice: if the description is empty, initialize it with the
+  // Tcl name, so that the user knows what to overrides in the nav window.
+
+  if (this->Description == NULL)
+    {
+    this->SetDescriptionNoTrace(this->GetName());
+    }
+  return this->Description;
+}
 
 //----------------------------------------------------------------------------
 void vtkPVSource::SetDescription(const char* arg) 
@@ -2067,7 +2080,7 @@ void vtkPVSource::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVSource ";
-  this->ExtractRevision(os,"$Revision: 1.248.2.4 $");
+  this->ExtractRevision(os,"$Revision: 1.248.2.5 $");
 }
 
 //----------------------------------------------------------------------------

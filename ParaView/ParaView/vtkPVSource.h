@@ -143,10 +143,12 @@ public:
     
   // Description:
   // The (short) description that can be used to give a more descriptive
-  // name to the object.
+  // name to the object. Note that if the description is empty when
+  // GetDescription() is called, the Ivar is automatically initialized to
+  // the name of the composite (GetName()).
   virtual void SetDescriptionNoTrace(const char *description);
   virtual void SetDescription(const char *description);
-  vtkGetStringMacro(Description);
+  virtual char* GetDescription();
   vtkGetObjectMacro(DescriptionFrame, vtkKWWidget);
 
   // Description:
