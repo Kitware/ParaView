@@ -37,6 +37,7 @@ class vtkPVApplication;
 class vtkPVPart;
 class vtkSocketController;
 class vtkSource;
+class vtkSocketCommunicator;
 
 class VTK_EXPORT vtkPVClientServerModule : public vtkPVProcessModule
 {
@@ -154,11 +155,35 @@ protected:
   // Description:
   // Send the last client server result to the client called from an RMI
   void SendLastClientServerResult();
-
+  // Description:
+  // Actually send a stream to the server with the socket connection.
   void SendStreamToServerInternal();
+  // Description:
+  // Send a stream to the root node of the server
   void SendStreamToServerRootInternal();
+  // Description:
+  // Connect to servers or clients, this will either set up a wait
+  // loop waiting for a connection, or it will create a 
   void Connect();
-
+  // Description:
+  // Connect to a remote server or client already waiting for us.
+  void ConnectToRemote();
+  // Description:
+  // Setup a wait connection that is waiting for a remote process to
+  // connect to it.  This can be either the client or the server.
+  void SetupWaitForConnection();
+  // Description:
+  // Return 1 if the connection should wait, and 0 if the connet
+  int ShouldWaitForConnection();
+  // Description:
+  // Start a remote paraview server process.  Return 0 if connection failed.
+  int StartRemoteParaView(vtkSocketCommunicator* comm);
+  // Description:
+  // Open a dialog to enter server information, if the start
+  // variable is set to 1 in this function, then a remote paraview
+  // should be started with StartRemoteParaView.
+  int OpenConnectionDialog(int* start);
+  
   int NumberOfServerProcesses;
   int ClientMode;
   vtkSocketController* SocketController;

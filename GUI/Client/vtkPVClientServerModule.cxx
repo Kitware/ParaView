@@ -144,7 +144,7 @@ void vtkPVSendStreamToClientServerNodeRMI(void *localArg, void *remoteArg,
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVClientServerModule);
-vtkCxxRevisionMacro(vtkPVClientServerModule, "1.59");
+vtkCxxRevisionMacro(vtkPVClientServerModule, "1.60");
 
 int vtkPVClientServerModuleCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -298,11 +298,244 @@ void vtkPVClientServerModule::Initialize()
 
 
 //----------------------------------------------------------------------------
+int vtkPVClientServerModule::ShouldWaitForConnection()
+{  
+  int myId = this->Controller->GetLocalProcessId();
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  // if client mode then return reverse connection
+  if(this->ClientMode)
+    {
+    // if in client mode, it should not wait for a connection
+    // unless reverse is 1, so just return reverse connection value
+    return pvApp->GetReverseConnection();
+    }
+  // if server mode, then by default wait for the connection
+  // so return not getreverseconnection
+  return !pvApp->GetReverseConnection();
+  
+}
+
+//----------------------------------------------------------------------------
+int vtkPVClientServerModule::OpenConnectionDialog(int* start)
+{
+  int myId = this->Controller->GetLocalProcessId();
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  char servers[1024];
+  servers[0] = 0;
+  pvApp->GetRegisteryValue(2, "RunTime", "Servers", servers);
+  this->Script("wm withdraw .");
+  vtkPVConnectDialog* dialog = 
+    vtkPVConnectDialog::New();
+  dialog->SetHostname(this->Hostname);
+  dialog->SetSSHUser(this->Username);
+  dialog->SetPort(this->Port);
+  dialog->SetNumberOfProcesses(this->NumberOfProcesses);
+  dialog->SetMultiProcessMode(this->MultiProcessMode);
+  dialog->Create(this->GetPVApplication(), 0);
+  dialog->SetListOfServers(servers);
+  int res = dialog->Invoke();
+  if ( res )
+    {
+    this->SetHostname(dialog->GetHostName());
+    this->SetUsername(dialog->GetSSHUser());
+    this->Port = dialog->GetPort();
+    this->NumberOfProcesses = dialog->GetNumberOfProcesses();
+    this->MultiProcessMode = dialog->GetMultiProcessMode();
+    *start = 1;
+    }
+  pvApp->SetRegisteryValue(2, "RunTime", "Servers",
+                           dialog->GetListOfServers());
+  dialog->Delete();
+  
+  if ( !res )
+    {
+    return 0;
+    }
+  return 1;
+}
+
+//----------------------------------------------------------------------------
+int vtkPVClientServerModule::StartRemoteParaView(vtkSocketCommunicator* comm)
+{ 
+  int myId = this->Controller->GetLocalProcessId();
+  vtkPVApplication *pvApp = this->GetPVApplication();
+
+  char numbuffer[100];
+  vtkstd::string runcommand = "eval ${PARAVIEW_SETUP_SCRIPT} ; ";
+  // Add mpi
+  if ( this->MultiProcessMode == vtkPVClientServerModule::MPI_MODE )
+    {
+    sprintf(numbuffer, "%d", this->NumberOfProcesses);
+    runcommand += "mpirun -np ";
+    runcommand += numbuffer;
+    runcommand += " ";
+    }
+  runcommand += "eval ${PARAVIEW_EXECUTABLE} --server --port=";
+  sprintf(numbuffer, "%d", this->Port);
+  runcommand += numbuffer;
+  this->RemoteExecution->SetRemoteHost(this->Hostname);
+  if ( this->Username && this->Username[0] )
+    {
+    this->RemoteExecution->SetSSHUser(this->Username);
+    }
+  else
+    {
+    this->RemoteExecution->SetSSHUser(0);
+    }
+  this->RemoteExecution->RunRemoteCommand(runcommand.c_str());
+  int cc;
+  const int max_try = 10;
+  for ( cc = 0; cc < max_try; cc ++ )
+    {
+#ifdef _WIN32
+    Sleep(1000);
+#else
+    sleep(1);
+#endif
+    if ( this->RemoteExecution->GetResult() != vtkKWRemoteExecute::RUNNING )
+      {
+      cc = max_try;
+      break;
+      }
+    if (comm->ConnectTo(this->Hostname, this->Port))
+      {
+      break;
+      }
+    }
+  if ( cc < max_try )
+    {
+    return 1;
+    }
+  return 0;
+}
+
+  
+
+//----------------------------------------------------------------------------
+void vtkPVClientServerModule::ConnectToRemote()
+{
+  int myId = this->Controller->GetLocalProcessId();
+  vtkPVApplication *pvApp = this->GetPVApplication();
+
+  // according to the cvs logs this stops a memory leak
+  vtkSocketController* dummy = vtkSocketController::New();
+  dummy->Initialize();
+  dummy->Delete();
+  
+  // create a socket communicator
+  vtkSocketCommunicator *comm = vtkSocketCommunicator::New();
+  
+  // Get the host name from the command line arguments
+  this->SetHostname(pvApp->GetHostName());
+  this->SetUsername(pvApp->GetUsername());
+  vtkCallbackCommand* cb = vtkCallbackCommand::New();
+  cb->SetCallback(vtkPVClientServerModule::ErrorCallback);
+  cb->SetClientData(this);
+  comm->AddObserver(vtkCommand::ErrorEvent, cb);
+  cb->Delete();
+
+  // Get the port from the command line arguments
+  this->Port = pvApp->GetPort();
+  // Establish connection
+  int start = 0;
+  if ( pvApp->GetAlwaysSSH() )
+    {
+    start = 1;
+    }
+  while (!comm->ConnectTo(this->Hostname, this->Port))
+    {  
+    // Do not bother trying to start the client if reverse connection is specified.
+    // only try the ConnectTo once if it is a server in reverse mode
+    if ( ! this->ClientMode)
+      {  
+      // This is the "reverse-connection" server condition.  
+      // For now just fail if connection is not found.
+      vtkErrorMacro("Server error: Could not connect to the client. " 
+                    << this->Hostname << " " << this->Port);
+      comm->Delete();
+      pvApp->Exit();
+      this->ReturnValue = 1;
+      return;
+      }
+    if ( start)
+      {
+      start = 0;
+      if(this->StartRemoteParaView(comm))
+        {
+        // if a remote paraview was successfuly started
+        // the connection would be made in StartRemoteParaView
+        // so break from the connect while loop 
+        break;
+        }
+      continue;
+      }
+    if (this->ClientMode)
+      {
+      if(!this->OpenConnectionDialog(&start))
+        {
+        // if the user canceled then just quit
+        vtkErrorMacro("Client error: Could not connect to the server.");
+        comm->Delete();
+        pvApp->Exit();
+        this->ReturnValue = 1;
+        return;
+        }
+      }
+    }
+  // if you make it this far, then the connection
+  // was made.
+  this->SocketController = vtkSocketController::New();
+  this->SocketController->SetCommunicator(comm);
+  comm->Delete();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVClientServerModule::SetupWaitForConnection()
+{
+  int myId = this->Controller->GetLocalProcessId();
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  if ( this->ClientMode )
+    {
+    cout << "Waiting for server..." << endl;
+    }
+  else
+    {
+    cout << "Waiting for client..." << endl;
+    }
+  this->SocketController = vtkSocketController::New();
+  this->SocketController->Initialize();
+  vtkSocketCommunicator* comm = vtkSocketCommunicator::New();
+  
+  int port= pvApp->GetPort();
+  
+  // Establish connection
+  if (!comm->WaitForConnection(port))
+    {
+    vtkErrorMacro("Wait timed out or could not initialize socket.");
+    comm->Delete();
+    this->ReturnValue = 1;
+    return;
+    }
+  if ( this->ClientMode )
+    {
+    cout << "Server connected." << endl;
+    }
+  else
+    {
+    cout << "Client connected." << endl;
+    }
+  this->SocketController->SetCommunicator(comm);
+  comm->Delete();
+  comm = NULL;
+}
+
+
+
+//----------------------------------------------------------------------------
 void vtkPVClientServerModule::Connect()
 {
   int myId = this->Controller->GetLocalProcessId();
   vtkPVApplication *pvApp = this->GetPVApplication();
-  int waitForConnection;
  
 #ifdef MPIPROALLOC
   vtkCommunicator::SetUseCopy(1);
@@ -316,197 +549,13 @@ void vtkPVClientServerModule::Connect()
     return;
     }
 
-  // I want to be able to switch which process waits, and which connects.
-  // Just a hard way of doing an exclusive or.
-  if (this->ClientMode)
+  if ( this->ShouldWaitForConnection())
     {
-    if (pvApp->GetReverseConnection())
-      {
-      waitForConnection = 1;
-      }
-    else
-      {
-      waitForConnection = 0;
-      }
+    this->SetupWaitForConnection();
     }
   else
     {
-    if (pvApp->GetReverseConnection())
-      {
-      waitForConnection = 0;
-      }
-    else
-      {
-      waitForConnection = 1;
-      }
-    }
-
-  if (waitForConnection == 0)
-    {
-    vtkSocketController* dummy = vtkSocketController::New();
-    dummy->Initialize();
-    dummy->Delete();
-    vtkSocketCommunicator *comm = vtkSocketCommunicator::New();
-
-    // Get the host name from the command line arguments
-    this->SetHostname(pvApp->GetHostName());
-    this->SetUsername(pvApp->GetUsername());
-    vtkCallbackCommand* cb = vtkCallbackCommand::New();
-    cb->SetCallback(vtkPVClientServerModule::ErrorCallback);
-    cb->SetClientData(this);
-    comm->AddObserver(vtkCommand::ErrorEvent, cb);
-    cb->Delete();
-
-    // Get the port from the command line arguments
-    this->Port = pvApp->GetPort();
-    // Establish connection
-    int start = 0;
-    if ( pvApp->GetAlwaysSSH() )
-      {
-      start = 1;
-      }
-    while (!comm->ConnectTo(this->Hostname, this->Port))
-      {  // Do not bother trying to start the client if reverse connection is specified.
-      if ( ! this->ClientMode)
-        {  // all the following stuff is for starting the server automatically.
-        // This is the "reverse-connection" condition.  
-        // For now just fail if connection is not found.
-        vtkErrorMacro("Server error: Could not connect to the client. " 
-                      << this->Hostname << " " << this->Port);
-        comm->Delete();
-        pvApp->Exit();
-        this->ReturnValue = 1;
-        return;
-        }
-      if ( start)
-        {
-        char numbuffer[100];
-        vtkstd::string runcommand = "eval ${PARAVIEW_SETUP_SCRIPT} ; ";
-        // Add mpi
-        if ( this->MultiProcessMode == vtkPVClientServerModule::MPI_MODE )
-          {
-          sprintf(numbuffer, "%d", this->NumberOfProcesses);
-          runcommand += "mpirun -np ";
-          runcommand += numbuffer;
-          runcommand += " ";
-          }
-        runcommand += "eval ${PARAVIEW_EXECUTABLE} --server --port=";
-        sprintf(numbuffer, "%d", this->Port);
-        runcommand += numbuffer;
-        this->RemoteExecution->SetRemoteHost(this->Hostname);
-        if ( this->Username && this->Username[0] )
-          {
-          this->RemoteExecution->SetSSHUser(this->Username);
-          }
-        else
-          {
-          this->RemoteExecution->SetSSHUser(0);
-          }
-        this->RemoteExecution->RunRemoteCommand(runcommand.c_str());
-        start = 0;
-        int cc;
-        const int max_try = 10;
-        for ( cc = 0; cc < max_try; cc ++ )
-          {
-#ifdef _WIN32
-          Sleep(1000);
-#else
-          sleep(1);
-#endif
-          if ( this->RemoteExecution->GetResult() != vtkKWRemoteExecute::RUNNING )
-            {
-            cc = max_try;
-            break;
-            }
-          if (comm->ConnectTo(this->Hostname, this->Port))
-            {
-            break;
-            }
-          }
-        if ( cc < max_try )
-          {
-          break;
-          }
-        continue;
-        }
-      if (this->ClientMode)
-        {
-        char servers[1024];
-        servers[0] = 0;
-        pvApp->GetRegisteryValue(2, "RunTime", "Servers", servers);
-        this->Script("wm withdraw .");
-        vtkPVConnectDialog* dialog = 
-          vtkPVConnectDialog::New();
-        dialog->SetHostname(this->Hostname);
-        dialog->SetSSHUser(this->Username);
-        dialog->SetPort(this->Port);
-        dialog->SetNumberOfProcesses(this->NumberOfProcesses);
-        dialog->SetMultiProcessMode(this->MultiProcessMode);
-        dialog->Create(this->GetPVApplication(), 0);
-        dialog->SetListOfServers(servers);
-        int res = dialog->Invoke();
-        if ( res )
-          {
-          this->SetHostname(dialog->GetHostName());
-          this->SetUsername(dialog->GetSSHUser());
-          this->Port = dialog->GetPort();
-          this->NumberOfProcesses = dialog->GetNumberOfProcesses();
-          this->MultiProcessMode = dialog->GetMultiProcessMode();
-          start = 1;
-          }
-        pvApp->SetRegisteryValue(2, "RunTime", "Servers",
-          dialog->GetListOfServers());
-        dialog->Delete();
-
-        if ( !res )
-          {
-          vtkErrorMacro("Client error: Could not connect to the server.");
-          comm->Delete();
-          pvApp->Exit();
-          this->ReturnValue = 1;
-          return;
-          }
-        }
-      }
-    this->SocketController = vtkSocketController::New();
-    this->SocketController->SetCommunicator(comm);
-    comm->Delete();
-    }
-  else
-    {
-    if ( this->ClientMode )
-      {
-      cout << "Waiting for server..." << endl;
-      }
-    else
-      {
-      cout << "Waiting for client..." << endl;
-      }
-    this->SocketController = vtkSocketController::New();
-    this->SocketController->Initialize();
-    vtkSocketCommunicator* comm = vtkSocketCommunicator::New();
-
-    int port= pvApp->GetPort();
-
-    // Establish connection
-   if (!comm->WaitForConnection(port))
-      {
-      vtkErrorMacro("Wait timed out or could not initialize socket.");
-      comm->Delete();
-      this->ReturnValue = 1;
-      return;
-      }
-    if ( this->ClientMode )
-      {
-      cout << "Server connected." << endl;
-      }
-    else
-      {
-      cout << "Client connected." << endl;
-      }
-    this->SocketController->SetCommunicator(comm);
-    comm->Delete();
-    comm = NULL;
+    this->ConnectToRemote();
     }
 }
 
