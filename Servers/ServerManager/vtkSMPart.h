@@ -39,7 +39,15 @@ public:
   // Description:
   vtkPVDataInformation* GetDataInformation();
   //ETX
-  
+
+  //BTX
+  // Description:
+  vtkPVClassNameInformation* GetClassNameInformation();
+  //ETX
+
+  // Description:
+  void GatherClassNameInformation();
+
   // Description:
   void GatherDataInformation();
 
@@ -70,6 +78,7 @@ protected:
   void operator=(const vtkSMPart&); // Not implemented
 
   vtkPVClassNameInformation* ClassNameInformation;
+  int ClassNameInformationValid;
   vtkPVDataInformation* DataInformation;
   int DataInformationValid;
 

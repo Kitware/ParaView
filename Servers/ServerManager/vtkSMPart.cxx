@@ -25,7 +25,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMPart);
-vtkCxxRevisionMacro(vtkSMPart, "1.12");
+vtkCxxRevisionMacro(vtkSMPart, "1.13");
 
 
 //----------------------------------------------------------------------------
@@ -35,6 +35,7 @@ vtkSMPart::vtkSMPart()
 
   this->ClassNameInformation = vtkPVClassNameInformation::New();
   this->DataInformation = vtkPVDataInformation::New();
+  this->ClassNameInformationValid = 0;
   this->DataInformationValid = 0;
   this->UpdateNeeded = 1;
 }
@@ -54,6 +55,16 @@ vtkPVDataInformation* vtkSMPart::GetDataInformation()
     this->GatherDataInformation();
     }
   return this->DataInformation;
+}
+
+//----------------------------------------------------------------------------
+vtkPVClassNameInformation* vtkSMPart::GetClassNameInformation()
+{
+  if(this->ClassNameInformationValid == 0)
+    {
+    this->GatherClassNameInformation();
+    }
+  return this->ClassNameInformation;
 }
 
 //----------------------------------------------------------------------------
@@ -125,6 +136,19 @@ void vtkSMPart::GatherDataInformation()
 }
 
 //----------------------------------------------------------------------------
+void vtkSMPart::GatherClassNameInformation()
+{
+  if (this->GetNumberOfIDs() < 1)
+    {
+    vtkErrorMacro("Part has no associated object, can not gather info.");
+    return;
+    }
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  pm->GatherInformation(this->ClassNameInformation, this->GetID(0));
+  this->ClassNameInformationValid = 1;
+}
+
+//----------------------------------------------------------------------------
 void vtkSMPart::InsertExtractPiecesIfNecessary()
 {
   if (this->GetNumberOfIDs() < 1)
@@ -138,8 +162,7 @@ void vtkSMPart::InsertExtractPiecesIfNecessary()
   // The vtkData object will be moved to the output of the piece filter.
   // This must use class name information and not data information
   // to avoid executing the filter early.
-  pm->GatherInformation(this->ClassNameInformation, this->GetID(0));
-  const char *className = this->ClassNameInformation->GetVTKClassName();
+  const char* className = this->GetClassNameInformation()->GetVTKClassName();
   vtkClientServerStream stream;
   vtkClientServerID tempDataPiece = {0};
   if (className == NULL)
@@ -295,8 +318,7 @@ void vtkSMPart::CreateTranslatorIfNecessary()
   // The vtkData object will be moved to the output of the piece filter.
   // This must use class name information and not data information
   // to avoid executing the filter early.
-  pm->GatherInformation(this->ClassNameInformation, this->GetID(0));
-  const char *className = this->ClassNameInformation->GetVTKClassName();
+  const char* className = this->GetClassNameInformation()->GetVTKClassName();
   if (className == NULL)
     {
     vtkErrorMacro("Missing data information.");
