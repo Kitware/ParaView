@@ -20,7 +20,7 @@
 #include "vtkPointsProjectedHull.h"
 #include "vtkObjectFactory.h"
 
-vtkCxxRevisionMacro(vtkPointsProjectedHull, "1.11");
+vtkCxxRevisionMacro(vtkPointsProjectedHull, "1.12");
 vtkStandardNewMacro(vtkPointsProjectedHull);
 
 static const int xdim=0, ydim=1, zdim=2;
@@ -215,8 +215,11 @@ int vtkPointsProjectedHull::rectangleIntersection(double hmin, double hmax,
 //
 // Algorithm comes from Graphics Gems IV
 //
-extern "C" static int incrVertAxis(const void *p1, const void *p2);
-extern "C" static int ccw(const void *p1, const void *p2);
+extern "C" 
+{
+  static int incrVertAxis(const void *p1, const void *p2);
+  static int ccw(const void *p1, const void *p2);
+}
 int vtkPointsProjectedHull::grahamScanAlgorithm(int dir)
 {
 int horizAxis = 0, vertAxis = 0;
@@ -675,34 +678,35 @@ int vtkPointsProjectedHull::rectangleOutside1DPolygon(double hmin, double hmax,
 // The sort functions
 
 extern "C"
-static int incrVertAxis(const void *p1, const void *p2)
 {
-double *a, *b;
+  static int incrVertAxis(const void *p1, const void *p2)
+  {
+  double *a, *b;
 
-    a = (double *)p1;
-    b = (double *)p2;
+      a = (double *)p1;
+      b = (double *)p2;
 
-    if (a[1] < b[1])       return -1;
-    else if (a[1] == b[1]) return 0;
-    else                   return 1;
-}
+      if (a[1] < b[1])       return -1;
+      else if (a[1] == b[1]) return 0;
+      else                   return 1;
+  }
 
-extern "C"
-static int ccw(const void *p1, const void *p2)
-{
-double *a, *b;
-double val;
+  static int ccw(const void *p1, const void *p2)
+  {
+  double *a, *b;
+  double val;
 
-    a = (double *)p1;
-    b = (double *)p2;
+      a = (double *)p1;
+      b = (double *)p2;
 
-    // sort in counter clockwise order from first point 
+      // sort in counter clockwise order from first point 
 
-    val = VTK_ISLEFT(firstPt, a, b);
+      val = VTK_ISLEFT(firstPt, a, b);
 
-    if (val < 0)       return 1;   // b is right of line firstPt->a
-    else if (val == 0) return 0;   // b is on line firstPt->a
-    else               return -1;  // b is left of line firstPt->a
+      if (val < 0)       return 1;   // b is right of line firstPt->a
+      else if (val == 0) return 0;   // b is on line firstPt->a
+      else               return -1;  // b is left of line firstPt->a
+  }
 }
 
 void vtkPointsProjectedHull::PrintSelf(ostream& os, vtkIndent indent)
