@@ -142,7 +142,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.675");
+vtkCxxRevisionMacro(vtkPVWindow, "1.676");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -4205,6 +4205,7 @@ vtkPVSource *vtkPVWindow::CreatePVSource(const char* moduleName,
     vtkPVSource *current = NULL;
     if( pvs->GetOverideAutoAccept() )
       {
+      current = this->CurrentPVSource;
       overideautoaccept = current->GetOverideAutoAccept();
       current->SetOverideAutoAccept(1);
       }
