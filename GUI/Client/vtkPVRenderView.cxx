@@ -130,7 +130,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.357.2.3");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.357.2.4");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -1855,74 +1855,13 @@ vtkPVWindow *vtkPVRenderView::GetPVWindow()
 //----------------------------------------------------------------------------
 void vtkPVRenderView::SaveInBatchScript(ofstream* file)
 {
-  int i;
-
-  *file << "set Ren1 [$proxyManager NewProxy rendering DefaultDisplayWindow]" 
-        << endl;
-  *file << "  $proxyManager RegisterProxy rendering Ren1 $Ren1" 
-        << endl;
-  *file << "  $Ren1 UnRegister {}" << endl;
-
-  double* color = this->GetRenderer()->GetBackground();
-  *file << "  [$Ren1 GetProperty BackgroundColor] SetElements3 "; 
-  for(i=0; i<3; i++)
+  *file << "# RenderModule Proxy ---------- " << endl;
+  if (this->RenderModuleProxy)
     {
-    *file << color[i] << " ";
+    this->RenderModuleProxy->SaveInBatchScript(file);
     }
-  *file << endl;
-  int *size = this->GetRenderWindow()->GetSize();
-  *file << "  [$Ren1 GetProperty Size] SetElements2 "; 
-  for(i=0; i<2; i++)
-    {
-    *file << size[i] << " ";
-    }
-  *file << endl;
-
-  vtkCamera *camera;
-  camera = this->GetRenderer()->GetActiveCamera();
-
-  double position[3];
-  camera->GetPosition(position);
-  *file << "  [$Ren1 GetProperty CameraPosition] SetElements3 ";
-  for(i=0; i<3; i++)
-    {
-    *file << position[i] << " ";
-    }
-  *file << endl;
-  
-  double focalPoint[3];
-  camera->GetFocalPoint(focalPoint);
-  *file << "  [$Ren1 GetProperty CameraFocalPoint] SetElements3 ";
-  for(i=0; i<3; i++)
-    {
-    *file << focalPoint[i] << " ";
-    }
-  *file << endl;
-
-  double viewUp[3];
-  camera->GetViewUp(viewUp);
-  *file << "  [$Ren1 GetProperty CameraViewUp] SetElements3 "; 
-  for(i=0; i<3; i++)
-    {
-    *file << viewUp[i] << " ";
-    }
-  *file << endl;
-
-  double viewAngle;
-  viewAngle = camera->GetViewAngle();
-  *file << "  [$Ren1 GetProperty CameraViewAngle] SetElements1 "
-        << viewAngle << endl;
-
-  double clippingRange[2];
-  camera->GetClippingRange(clippingRange);
-  *file << "  [$Ren1 GetProperty CameraClippingRange] SetElements2 ";
-  for(i=0; i<2; i++)
-    {
-    *file << clippingRange[i] << " ";
-    }
-  *file << endl;
+  *file << "# End of RenderModuleProxy ---- " << endl;
 }
-
 
 //----------------------------------------------------------------------------
 void vtkPVRenderView::SaveState(ofstream* file)

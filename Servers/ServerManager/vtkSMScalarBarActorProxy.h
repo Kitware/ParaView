@@ -36,11 +36,15 @@ public:
   void SetPosition(double x, double y);
   void SetPosition2(double x, double y);
 
+  // Saves the Text property proxies in batch script.
+  void SaveTextPropertiesInBatchScript(ofstream* file);
+
 protected:
   vtkSMScalarBarActorProxy();
   ~vtkSMScalarBarActorProxy();
 
   virtual void CreateVTKObjects(int numObjects);
+  void SaveTextPropertiesInBatchScript(ofstream* file, vtkSMProxy* tp);
 private:
   vtkSMScalarBarActorProxy(const vtkSMScalarBarActorProxy&); // Not implemented.
   void operator=(const vtkSMScalarBarActorProxy&); // Not implemented.

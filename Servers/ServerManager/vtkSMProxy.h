@@ -170,6 +170,10 @@ public:
   vtkClientServerID GetID(unsigned int idx);
 
   // Description:
+  // Returns the Self ID of the proxy.
+  vtkClientServerID GetSelfID() { return this->SelfID; }
+
+  // Description:
   // Returns the number of server ids (same as the number of server objects
   // if CreateVTKObjects() has already been called)
   unsigned int GetNumberOfIDs();
@@ -201,6 +205,12 @@ public:
   // configuration. Can be used to figure out the origin of the
   // proxy.
   vtkGetStringMacro(XMLName);
+
+  // Description:
+  // Assigned by the XML parser. The group in the XML configuration that
+  // this proxy belongs to. Can be used to figure out the origin of the
+  // proxy.
+  vtkGetStringMacro(XMLGroup);
 
   // Description:
   // Updates all property informations by calling UpdateInformation()
@@ -281,7 +291,6 @@ protected:
   // this proxy belongs to. Can be used to figure out the origin of the
   // proxy.
   vtkSetStringMacro(XMLGroup);
-  vtkGetStringMacro(XMLGroup);
 
   // Description:
   // Given the number of objects (numObjects), class name (VTKClassName)

@@ -570,6 +570,14 @@
       </DoubleVectorProperty>
 
       <IntVectorProperty
+        name="OffScreenRendering"
+        command="SetOffScreenRendering"
+        number_of_elements="1"
+        default_values="0">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
+      <IntVectorProperty
         name="FullScreen"
         command="SetFullScreen"
         number_of_elements="1"
@@ -1178,6 +1186,10 @@
       <SubProxy>
         <Proxy name="RenderWindow" proxyname="RenderWindow" proxygroup="renderwindow">
         </Proxy>
+        <ExposedProperties>
+          <Property name="OffScreenRendering" />
+          <Property name="FullScreen" />
+        </ExposedProperties>
       </SubProxy>
       <SubProxy>
         <Proxy name="Interactor" proxyname="GenericRenderWindowInteractor" 
@@ -1269,6 +1281,9 @@
         <Proxy name="CompositeManager" proxygroup="composite_managers"
           proxyname="DesktopDeliveryClient">
         </Proxy>
+        <ExposedProperties>
+          <Property name="InitializeOffScreen" />
+        </ExposedProperties>
       </SubProxy>
     </IceTDesktopRenderModuleProxy>
 
@@ -1857,14 +1872,9 @@
           proxygroup="mappers" 
           proxyname="UnstructuredGridVolumeRayCastMapper">
         </Proxy>
-
         <ShareProperties subproxy="Mapper">
           <Exception name="Input" />
         </ShareProperties>
-        
-        <ExposedProperties>
-          <Property name="ScalarMode" />
-        </ExposedProperties>
       </SubProxy>
 
       <SubProxy>

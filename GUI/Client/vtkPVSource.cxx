@@ -64,7 +64,7 @@
 
 
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.427.2.4");
+vtkCxxRevisionMacro(vtkPVSource, "1.427.2.5");
 vtkCxxSetObjectMacro(vtkPVSource,Notebook,vtkPVSourceNotebook);
 #if defined(PARAVIEW_USE_SERVERMANAGER_RENDERING)
   vtkCxxSetObjectMacro(vtkPVSource,DisplayProxy, vtkSMDisplayProxy);
@@ -2142,10 +2142,24 @@ void vtkPVSource::SaveInBatchScript(ofstream *file)
       {
       this->PVColorMap->SaveInBatchScript(file);
       }
+    
     vtkSMDisplayProxy* pDisp = this->GetDisplayProxy();
     if (pDisp)
       {
+      *file << "#Display Proxy" << endl;
       pDisp->SaveInBatchScript(file);
+      }
+    
+    if (this->GetCubeAxesVisibility())
+      {
+      *file << "#Cube Axes Display" << endl;
+      this->CubeAxesDisplayProxy->SaveInBatchScript(file);
+      }
+
+    if (this->GetPointLabelVisibility())
+      {
+      *file << "#Point Label display" << endl;
+      this->PointLabelDisplayProxy->SaveInBatchScript(file);
       }
     }
 }  

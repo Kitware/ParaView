@@ -19,7 +19,8 @@
 #include "vtkPVProcessModule.h"
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMDoubleVectorProperty.h"
-#include "vtkSMProxyProperty.h"
+#include "vtkSMInputProperty.h"
+#include "vtkSMStringVectorProperty.h"
 #include "vtkPVOptions.h"
 #include "vtkCommand.h"
 #include "vtkRenderWindow.h"
@@ -36,8 +37,9 @@
 #include "vtkPVGeometryInformation.h"
 #include "vtkCamera.h"
 #include "vtkFloatArray.h"
+#include "vtkSMPropertyIterator.h"
 
-vtkCxxRevisionMacro(vtkSMRenderModuleProxy, "1.1.2.7");
+vtkCxxRevisionMacro(vtkSMRenderModuleProxy, "1.1.2.8");
 //-----------------------------------------------------------------------------
 // This is a bit of a pain.  I do ResetCameraClippingRange as a call back
 // because the PVInteractorStyles call ResetCameraClippingRange 
@@ -769,6 +771,135 @@ void vtkSMRenderModuleProxy::RemovePropFromRenderer2D(vtkSMProxy* proxy)
     vtkProcessModule::GetProcessModule()->SendStream(
       this->RendererProxy->GetServers(), stream);
     }
+}
+
+//-----------------------------------------------------------------------------
+void vtkSMRenderModuleProxy::SynchronizeCameraProperties()
+{
+  this->ActiveCameraProxy->UpdateInformation();
+  vtkSMPropertyIterator* iter = this->ActiveCameraProxy->NewPropertyIterator();
+  for (iter->Begin(); !iter->IsAtEnd(); iter->Next())
+    {
+    vtkSMProperty *cur_property = iter->GetProperty();
+    vtkSMProperty *info_property = cur_property->GetInformationProperty();
+    if (!info_property)
+      {
+      continue;
+      }
+    vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+      cur_property);
+    vtkSMDoubleVectorProperty* info_dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+      info_property);
+    if (dvp && info_dvp)
+      {
+      dvp->SetElements(info_dvp->GetElements());
+      }
+    }
+  iter->Delete();
+}
+
+//-----------------------------------------------------------------------------
+void vtkSMRenderModuleProxy::SaveInBatchScript(ofstream* file)
+{
+  if (!this->ObjectsCreated)
+    {
+    vtkErrorMacro("Render module not created yet!");
+    return;
+    }
+  this->SynchronizeCameraProperties();
+
+  *file << "set Ren1 [$proxyManager NewProxy "
+    << this->GetXMLGroup() << " " << this->GetXMLName() << "]" << endl;
+  *file << "  $proxyManager RegisterProxy " << this->GetXMLGroup()
+    << " Ren1 $Ren1" << endl;
+  *file << "  $Ren1 UnRegister {}" << endl;
+
+  // Now, we save all the properties that are not Input.
+  // Also note that only exposed properties are getting saved.
+  vtkSMPropertyIterator* iter = this->NewPropertyIterator();
+  for (iter->Begin(); !iter->IsAtEnd(); iter->Next())
+    {
+    vtkSMProperty* p = iter->GetProperty();
+    if (vtkSMInputProperty::SafeDownCast(p))
+      {
+      continue;
+      }
+
+    if (!p->GetSaveable() || p->GetInformationOnly())
+      {
+      *file << "  # skipping proxy property " << p->GetXMLName() << endl;
+      continue;
+      }
+
+    vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(p);
+    vtkSMDoubleVectorProperty* dvp = 
+      vtkSMDoubleVectorProperty::SafeDownCast(p);
+    vtkSMStringVectorProperty* svp = 
+      vtkSMStringVectorProperty::SafeDownCast(p);
+    vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(p);
+    if (ivp)
+      {
+      for (unsigned int i=0; i < ivp->GetNumberOfElements(); i++)
+        {
+        *file << "  [$Ren1 GetProperty "
+          << ivp->GetXMLName() << "] SetElement "
+          << i << " " << ivp->GetElement(i) 
+          << endl;
+        }
+      }
+    else if (dvp)
+      {
+      for (unsigned int i=0; i < dvp->GetNumberOfElements(); i++)
+        {
+        *file << "  [$Ren1 GetProperty "
+          << dvp->GetXMLName() << "] SetElement "
+          << i << " " << dvp->GetElement(i) 
+          << endl;
+        }
+      }
+    else if (svp)
+      {
+      for (unsigned int i=0; i < svp->GetNumberOfElements(); i++)
+        {
+        *file << "  [$Ren1 GetProperty "
+          << svp->GetXMLName() << "] SetElement "
+          << i << " {" << svp->GetElement(i) << "}"
+          << endl;
+        }
+      }
+    else if (pp)
+      {
+      // the only proxy property the RenderModule exposes is
+      // Displays.
+      for (unsigned int i=0; i < pp->GetNumberOfProxies(); i++)
+        {
+        vtkSMProxy* proxy = pp->GetProxy(i);
+        vtkSMDisplayProxy* pDisp = vtkSMDisplayProxy::SafeDownCast(proxy);
+        if (pDisp && !pDisp->cmGetVisibility())
+          {
+          continue;
+          }
+        *file << "  [$Ren1 GetProperty "
+          << pp->GetXMLName() << "] AddProxy $pvTemp";
+        if (pDisp || proxy->GetNumberOfIDs() == 0) 
+          // all displays always use SelfIDs while saving in batch script.
+          {
+          *file << proxy->GetSelfID() ;
+          }
+        else
+          {
+         *file  << proxy->GetID(0);
+          }
+        *file << "  ;#--- " << proxy->GetXMLName() << endl;
+        *file << endl;
+        }
+      }
+    else
+      {
+      *file << "  # skipping property " << p->GetXMLName() << endl;
+      }
+    }
+  iter->Delete();
 }
 
 //-----------------------------------------------------------------------------

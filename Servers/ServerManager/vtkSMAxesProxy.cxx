@@ -24,7 +24,7 @@
 #include "vtkSMInputProperty.h"
 
 vtkStandardNewMacro(vtkSMAxesProxy);
-vtkCxxRevisionMacro(vtkSMAxesProxy, "1.1.4.2");
+vtkCxxRevisionMacro(vtkSMAxesProxy, "1.1.4.3");
 //---------------------------------------------------------------------------
 vtkSMAxesProxy::vtkSMAxesProxy()
 {
@@ -144,6 +144,7 @@ void vtkSMAxesProxy::RemoveFromRenderModule(vtkSMRenderModuleProxy* rm)
 //---------------------------------------------------------------------------
 void vtkSMAxesProxy::SaveInBatchScript(ofstream* file)
 {
+  /*
   *file << endl;
   unsigned int cc;
   unsigned int numObjects = this->GetNumberOfIDs();
@@ -186,6 +187,8 @@ void vtkSMAxesProxy::SaveInBatchScript(ofstream* file)
       }
     *file << "  $pvTemp" << id << " UpdateVTKObjects" << endl;
     }
+    */
+  this->Superclass::SaveInBatchScript(file);
 }
 
 //---------------------------------------------------------------------------

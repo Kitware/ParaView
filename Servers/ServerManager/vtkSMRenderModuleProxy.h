@@ -112,6 +112,18 @@ public:
   // Description:
   // Reset camera to the given bounds.
   void ResetCamera(double bds[6]);
+  
+  // Description:
+  // Save the display in batch script. This will eventually get 
+  // removed as we will generate batch script from ServerManager
+  // state. However, until then.
+  virtual void SaveInBatchScript(ofstream* file);
+
+  // Description:
+  // This method calls UpdateInformation on the Camera Proxy
+  // and sets the Camera properties according to the info
+  // properties.
+  void SynchronizeCameraProperties();
 
 protected:
   vtkSMRenderModuleProxy();

@@ -19,7 +19,7 @@
 #include "vtkSMProxyInternals.h"
 
 vtkStandardNewMacro(vtkSMPropertyIterator);
-vtkCxxRevisionMacro(vtkSMPropertyIterator, "1.5.6.2");
+vtkCxxRevisionMacro(vtkSMPropertyIterator, "1.5.6.3");
 
 struct vtkSMPropertyIteratorInternals
 {
@@ -76,13 +76,30 @@ void vtkSMPropertyIterator::Begin()
   if (this->TraverseSubProxies)
     {
     // Go to the first sub-proxy that is not empty.
+    // And to the first exposed property.
     while (this->Internals->ProxyIterator != 
            this->Proxy->Internals->SubProxies.end())
       {
       this->Internals->SubPropertyIterator = 
         this->Internals->ProxyIterator->second->Internals->Properties.begin();
-      if ( this->Internals->SubPropertyIterator !=
+     
+      int found_exposed = 0;
+      while ( this->Internals->SubPropertyIterator !=
            this->Internals->ProxyIterator->second->Internals->Properties.end())
+        {
+        // iterate until an exposed property is found.
+        if (this->Internals->ProxyIterator->second->Internals->
+          ExposedPropertyNames.find(
+            this->Internals->SubPropertyIterator->first.c_str()) !=
+          this->Internals->ProxyIterator->second->Internals->
+          ExposedPropertyNames.end())
+          {
+          found_exposed = 1;
+          break;
+          }
+        this->Internals->SubPropertyIterator++;
+        }
+      if (found_exposed)
         {
         break;
         }
@@ -130,8 +147,13 @@ void vtkSMPropertyIterator::Next()
     this->Proxy->Internals->Properties.end())
     {
     this->Internals->PropertyIterator++;
-    return;
+    if (this->Internals->PropertyIterator !=
+      this->Proxy->Internals->Properties.end())
+      {
+      return;
+      }
     }
+
 
   if (!this->TraverseSubProxies)
     {

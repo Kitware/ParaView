@@ -350,7 +350,7 @@
         command="SetVisibility"
         number_of_elements="1"
         update_self="1"
-        default_values="1">
+        default_values="0">
         <BooleanDomain name="bool"/>
       </IntVectorProperty>
     </LineWidgetProxy>
@@ -394,7 +394,7 @@
         command="SetVisibility"
         number_of_elements="1"
         update_self="1"
-        default_values="1" >
+        default_values="0" >
         <BooleanDomain name="bool"/>
       </IntVectorProperty>
     </PointWidgetProxy>
@@ -452,7 +452,7 @@
         command="SetVisibility"
         number_of_elements="1"
         update_self="1"
-        default_values="1" >
+        default_values="0" >
         <BooleanDomain name="bool"/>
       </IntVectorProperty>
     </SphereWidgetProxy>
@@ -518,7 +518,7 @@
         command="SetVisibility"
         number_of_elements="1"
         update_self="1"
-        default_values="1" >
+        default_values="0" >
         <BooleanDomain name="bool"/>
       </IntVectorProperty>
     </ImplicitPlaneWidgetProxy>
@@ -592,7 +592,7 @@
         command="SetVisibility"
         number_of_elements="1"
         update_self="1"
-        default_values="1" >
+        default_values="0" >
         <BooleanDomain name="bool"/>
       </IntVectorProperty> 
       <SubProxy>

@@ -28,7 +28,7 @@
 #include "vtkPVGenericRenderWindowInteractor.h"
 #include "vtkRenderer.h"
 #include "vtkCommand.h"
-
+#include "vtkSMScalarBarActorProxy.h"
 
 class vtkSMScalarBarWidgetProxyObserver : public vtkCommand
 {
@@ -55,7 +55,7 @@ protected:
 //----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkSMScalarBarWidgetProxy);
-vtkCxxRevisionMacro(vtkSMScalarBarWidgetProxy, "1.6.2.3");
+vtkCxxRevisionMacro(vtkSMScalarBarWidgetProxy, "1.6.2.4");
 
 //----------------------------------------------------------------------------
 vtkSMScalarBarWidgetProxy::vtkSMScalarBarWidgetProxy()
@@ -271,7 +271,16 @@ void vtkSMScalarBarWidgetProxy::ExecuteEvent(vtkObject*,
 void vtkSMScalarBarWidgetProxy::SaveInBatchScript(ofstream* file)
 {
   *file << endl;
+  // Okay, the way I am saving the Text properties in batch is crooked.
+  // But this is the most convenient way without having to 
+  // reassign names to properties of the two TextProeprties.
+
+  vtkSMScalarBarActorProxy::SafeDownCast(this->ScalarBarActorProxy)
+    ->SaveTextPropertiesInBatchScript(file);
+  
+  this->Superclass::SaveInBatchScript(file);
 /*
+  *file << endl;
   unsigned int cc;
   unsigned int numObjects = this->GetNumberOfIDs();
   vtkSMStringVectorProperty* svp;

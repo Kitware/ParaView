@@ -137,7 +137,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.678.2.6");
+vtkCxxRevisionMacro(vtkPVWindow, "1.678.2.7");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -2881,17 +2881,6 @@ void vtkPVWindow::SaveBatchScript(const char *filename, int offScreenFlag, const
   *file << "foo SetCheckDomains 0" << endl;
   *file << "foo Delete" << endl << endl;
 
-  // Save the renderer stuff.
-  this->GetMainView()->SaveInBatchScript(file);
-  if (offScreenFlag)
-    {
-    *file << "  [$Ren1 GetProperty OffScreenRendering] SetElement 0 1\n";
-    }    
-  else
-    {
-    *file << "  [$Ren1 GetProperty OffScreenRendering] SetElement 0 0\n";
-    }
-
   // Save out the VTK data pipeline.
   vtkArrayMapIterator<const char*, vtkPVSourceCollection*>* it =
     this->SourceLists->NewIterator();
@@ -2934,6 +2923,18 @@ void vtkPVWindow::SaveBatchScript(const char *filename, int offScreenFlag, const
   cit->Delete();
   cit = 0;
   this->CenterAxesProxy->SaveInBatchScript(file);
+
+  // Save the renderer stuff.
+  this->GetMainView()->SaveInBatchScript(file);
+  if (offScreenFlag)
+    {
+    *file << "  [$Ren1 GetProperty OffScreenRendering] SetElement 0 1\n";
+    }    
+  else
+    {
+    *file << "  [$Ren1 GetProperty OffScreenRendering] SetElement 0 0\n";
+    }
+
   this->AnimationManager->SaveInBatchScript(file);
 // TODO replace this
 //   if (geometryFileName)
@@ -2958,7 +2959,6 @@ void vtkPVWindow::SaveBatchScript(const char *filename, int offScreenFlag, const
 //     }
 
   *file << endl;
-
   *file << "set saveState 0" << endl;
   *file << "for {set i  0} {$i < [expr $argc - 1]} {incr i} {" << endl;
   *file << "  if {[lindex $argv $i] == \"-XML\"} {" << endl;

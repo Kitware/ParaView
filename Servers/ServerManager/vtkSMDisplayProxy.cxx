@@ -17,7 +17,10 @@
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMStringVectorProperty.h"
 #include "vtkPVGeometryInformation.h"
-vtkCxxRevisionMacro(vtkSMDisplayProxy, "1.1.2.5");
+
+#include "vtkSMPropertyIterator.h"
+#include "vtkSMInputProperty.h"
+vtkCxxRevisionMacro(vtkSMDisplayProxy, "1.1.2.6");
 //-----------------------------------------------------------------------------
 vtkSMDisplayProxy::vtkSMDisplayProxy()
 {
@@ -515,8 +518,108 @@ int vtkSMDisplayProxy::cmGetImmediateModeRendering()
 //-----------------------------------------------------------------------------
 void vtkSMDisplayProxy::SaveInBatchScript(ofstream* file)
 {
-  *file << "# SaveInBatchScript not defined for " << this->GetClassName()
-    << endl;
+  if (!this->ObjectsCreated)
+    {
+    vtkErrorMacro("Display Proxy not created!");
+    return;
+    }
+
+  *file << endl;
+  *file << "set pvTemp" << this->SelfID
+    << " [$proxyManager NewProxy " << this->GetXMLGroup() << " "
+    << this->GetXMLName() << "]" << endl;
+  *file << "  $proxyManager RegisterProxy " << this->GetXMLGroup()
+    << " pvTemp" << this->SelfID <<" $pvTemp" << this->SelfID << endl;
+  *file << "  $pvTemp" << this->SelfID << " UnRegister {}" << endl;
+
+  //First set the input to the display.
+  vtkSMInputProperty* ipp;
+  ipp = vtkSMInputProperty::SafeDownCast(
+    this->GetProperty("Input"));
+  if (ipp && ipp->GetNumberOfProxies() > 0)
+    {
+    *file << "  [$pvTemp" << this->SelfID << " GetProperty Input] "
+      " AddProxy $pvTemp" << ipp->GetProxy(0)->GetID(0)
+      << endl;
+    }
+  else
+    {
+    *file << "# Input to Display Proxy not set properly or takes no Input." 
+      << endl;
+    }
+
+  // Now, we save all the properties that are not Input.
+  // Also note that only exposed properties are getting saved.
+
+  vtkSMPropertyIterator* iter = this->NewPropertyIterator();
+  for (iter->Begin(); !iter->IsAtEnd(); iter->Next())
+    {
+    vtkSMProperty* p = iter->GetProperty();
+    if (vtkSMInputProperty::SafeDownCast(p))
+      {
+      // Input property has already been saved...so skip it.
+      continue;
+      }
+
+    if (!p->GetSaveable())
+      {
+      *file << "  # skipping not-saveable property " << p->GetXMLName() << endl;
+      continue;
+      }
+
+    vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(p);
+    vtkSMDoubleVectorProperty* dvp = 
+      vtkSMDoubleVectorProperty::SafeDownCast(p);
+    vtkSMStringVectorProperty* svp = 
+      vtkSMStringVectorProperty::SafeDownCast(p);
+    vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(p);
+    if (ivp)
+      {
+      for (unsigned int i=0; i < ivp->GetNumberOfElements(); i++)
+        {
+        *file << "  [$pvTemp" << this->SelfID << " GetProperty "
+          << ivp->GetXMLName() << "] SetElement "
+          << i << " " << ivp->GetElement(i) 
+          << endl;
+        }
+      }
+    else if (dvp)
+      {
+      for (unsigned int i=0; i < dvp->GetNumberOfElements(); i++)
+        {
+        *file << "  [$pvTemp" << this->SelfID << " GetProperty "
+          << dvp->GetXMLName() << "] SetElement "
+          << i << " " << dvp->GetElement(i) 
+          << endl;
+        }
+      }
+    else if (svp)
+      {
+      for (unsigned int i=0; i < svp->GetNumberOfElements(); i++)
+        {
+        *file << "  [$pvTemp" << this->SelfID << " GetProperty "
+          << svp->GetXMLName() << "] SetElement "
+          << i << " {" << svp->GetElement(i) << "}"
+          << endl;
+        }
+      }
+    else if (pp)
+      {
+      for (unsigned int i=0; i < pp->GetNumberOfProxies(); i++)
+        {
+        *file << "  [$pvTemp" << this->SelfID << " GetProperty "
+          << pp->GetXMLName() << "] AddProxy $pvTemp"
+          << pp->GetProxy(i)->GetID(0) << endl;
+        }
+      }
+    else
+      {
+      *file << "  # skipping property " << p->GetXMLName() << endl;
+      }
+    }
+
+  iter->Delete();
+  *file << "  $pvTemp" << this->SelfID << " UpdateVTKObjects" << endl;
 }
 
 //-----------------------------------------------------------------------------
