@@ -34,14 +34,13 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkObjectFactory.h"
 #include "vtkProcessObject.h"
 #include "vtkSource.h"
-#include "vtkTimerLog.h"
 
 #include <vtkstd/vector>
 
 #include <numeric>
 
 vtkStandardNewMacro(vtkClientServerInterpreter);
-vtkCxxRevisionMacro(vtkClientServerInterpreter, "1.1.2.3");
+vtkCxxRevisionMacro(vtkClientServerInterpreter, "1.1.2.4");
 
 //----------------------------------------------------------------------------
 // Internal container instantiations.
@@ -71,34 +70,28 @@ vtkClientServerInterpreter::vtkClientServerInterpreter()
   this->ClassToFunctionMap = ClassToFunctionMapType::New();
   this->LastResultMessage = new vtkClientServerStream;
   this->LogStream = 0;
-  
-  this->ServerProgressTimer = vtkTimerLog::New();
-  this->ClientProgressTimer = vtkTimerLog::New();
 }
 
 //----------------------------------------------------------------------------
 vtkClientServerInterpreter::~vtkClientServerInterpreter()
-{  
+{
   // Delete any remaining messages.
-  vtkHashMapIterator<vtkTypeUInt32, vtkClientServerStream*>* hi = 
+  vtkHashMapIterator<vtkTypeUInt32, vtkClientServerStream*>* hi =
     this->IDToMessageMap->NewIterator();
   vtkClientServerStream* tmp;
   while(!hi->IsDoneWithTraversal())
     {
-    hi->GetData(tmp);    
+    hi->GetData(tmp);
     delete tmp;
     hi->GoToNextItem();
     }
   hi->Delete();
-  
+
   this->IDToMessageMap->Delete();
   this->ClassToFunctionMap->Delete();
-  
+
   delete this->LastResultMessage;
-  
-  this->ServerProgressTimer->Delete();
-  this->ClientProgressTimer->Delete();
-  
+
   delete this->Internal;
 }
 
@@ -133,7 +126,7 @@ vtkClientServerID
 vtkClientServerInterpreter::GetIDFromObject(vtkObjectBase* key)
 {
   // Search the hash table for the given object.
-  vtkHashMapIterator<vtkTypeUInt32, vtkClientServerStream*>* hi = 
+  vtkHashMapIterator<vtkTypeUInt32, vtkClientServerStream*>* hi =
     this->IDToMessageMap->NewIterator();
   vtkClientServerStream* msg;
   vtkTypeUInt32 id = 0;
@@ -149,7 +142,7 @@ vtkClientServerInterpreter::GetIDFromObject(vtkObjectBase* key)
     hi->GoToNextItem();
     }
   hi->Delete();
-  
+
   // Convert the result to an ID object.
   vtkClientServerID result = {id};
   return result;
@@ -197,7 +190,7 @@ vtkClientServerInterpreter::ProcessOneMessage(const vtkClientServerStream& css,
     default:
       break;
     }
-  
+
   vtkGenericWarningMacro("Received unknown messgae type");
   return 0;
 }
@@ -215,7 +208,7 @@ vtkClientServerInterpreter
       "Attempt to use vtkClientServerInterpreter with no NewInstanceFunctions set");
     return 0;
     }
-  
+
   // Get the class name and desired ID for the instance.
   const char* cname = 0;
   vtkClientServerID id;
@@ -257,7 +250,7 @@ vtkClientServerInterpreter
   // Create a message with all known id_value arguments expanded.
   vtkClientServerStream msg;
   this->ExpandMessage(css, midx, msg);
-  
+
   // Get the object and method to be invoked.
   vtkObjectBase* obj;
   const char* method;
@@ -270,7 +263,7 @@ vtkClientServerInterpreter
       *this->LogStream << "----------------------------------------------\n";
       msg.Print(*this->LogStream);
       }
-    
+
     // Find the command function for this object's type.
     if(vtkClientServerCommandFunction func = this->GetCommandFunction(obj))
       {
@@ -294,7 +287,7 @@ vtkClientServerInterpreter
         }
       return 1;
       }
-    }  
+    }
   return 0;
 }
 
@@ -314,7 +307,7 @@ vtkClientServerInterpreter
       info.ID = id.ID;
       this->InvokeEvent(vtkCommand::UserEvent+2, &info);
       }
-    
+
     // Remove the ID from the map.
     vtkClientServerStream* item;
     this->IDToMessageMap->GetItem(id.ID, item);
@@ -322,7 +315,7 @@ vtkClientServerInterpreter
     delete item;
     return 1;
     }
-  
+
   return 0;
 }
 
@@ -350,10 +343,10 @@ int vtkClientServerInterpreter::ExpandMessage(const vtkClientServerStream& in,
     {
     return 0;
     }
-  
+
   // Copy the command.
   out << in.GetCommand(inIndex);
-  
+
   // Copy all arguments while expanding id_value arguments.
   for(int a=0; a < in.GetNumberOfArguments(inIndex); ++a)
     {
@@ -361,7 +354,7 @@ int vtkClientServerInterpreter::ExpandMessage(const vtkClientServerStream& in,
       {
       vtkClientServerID id;
       in.GetArgument(inIndex, a, &id);
-      
+
       // If the ID is in the map, expand it.  Otherwise, leave it.
       const vtkClientServerStream* tmp = this->GetMessageFromID(id);
       if(tmp)
@@ -381,10 +374,10 @@ int vtkClientServerInterpreter::ExpandMessage(const vtkClientServerStream& in,
       out << in.GetArgument(inIndex, a);
       }
     }
-  
+
   // End the message.
   out << vtkClientServerStream::End;
-  
+
   return 1;
 }
 
@@ -399,7 +392,7 @@ int vtkClientServerInterpreter::AssignResultToID(vtkClientServerID id)
       "attempt to create an ID that is already in the hash table: " << id.ID);
     return 0;
     }
-  
+
   // Copy the result to store it in the map.
   vtkClientServerStream& lrm = *this->LastResultMessage;
   vtkClientServerStream* copy = new vtkClientServerStream(lrm);
@@ -416,7 +409,7 @@ vtkClientServerInterpreter::GetMessageFromID(vtkClientServerID id)
     {
     return this->LastResultMessage;
     }
-  
+
   // Find the message in the map.
   vtkClientServerStream* tmp;
   if(this->IDToMessageMap->GetItem(id.ID, tmp) != VTK_OK)
@@ -436,11 +429,11 @@ int vtkClientServerInterpreter::NewInstance(vtkObjectBase* obj,
   vtkClientServerStream& lrm = *this->LastResultMessage;
   lrm.Reset();
   lrm << vtkClientServerStream::Reply << obj << vtkClientServerStream::End;
-  
+
   // Last result holds a reference.  Remove reference from ::New()
   // call in generated code.
   obj->Delete();
-  
+
   // Enter the last result into the map with the given id.
   return this->AssignResultToID(id);
 }

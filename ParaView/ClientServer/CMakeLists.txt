@@ -1,7 +1,7 @@
 
-SET(ClientServer_SRCS 
+SET(ClientServer_SRCS
   vtkClientServerID.h
-  vtkClientServerInterpreter.cxx 
+  vtkClientServerInterpreter.cxx
   vtkClientServerInterpreter.h
   vtkClientServerStream.cxx
   vtkClientServerStream.h
@@ -12,7 +12,12 @@ SET(ClientServer_SRCS
 ADD_LIBRARY(vtkClientServer ${ClientServer_SRCS})
 TARGET_LINK_LIBRARIES(vtkClientServer vtkKWCommonTCL vtkCommon)
 
-INCLUDE_DIRECTORIES(${PARAVIEW_SOURCE_DIR}/ClientServer)
+SET(VTK_CLIENT_SERVER_BUILD_SHARED ${BUILD_SHARED_LIBS})
+CONFIGURE_FILE(
+  ${PARAVIEW_SOURCE_DIR}/ClientServer/vtkClientServerConfigure.h.in
+  ${PARAVIEW_BINARY_DIR}/ClientServer/vtkClientServerConfigure.h
+  @ONLY IMMEDIATE
+  )
 
 SET (ClientServer_WRAP_CLASSES
 #
@@ -46,7 +51,7 @@ SET (ClientServer_WRAP_CLASSES
 #
  vtkExtractGrid
  vtkStructuredGridToStructuredGridFilter
- vtkStructuredGridSource 
+ vtkStructuredGridSource
 #
  vtkStructuredGridOutlineFilter
  vtkStructuredGridToPolyDataFilter
@@ -62,7 +67,7 @@ SET (ClientServer_WRAP_CLASSES
  vtkInteractorObserver
 )
 
-FIND_FILE(VTK_WRAP_HINTS hints 
+FIND_FILE(VTK_WRAP_HINTS hints
           ${VTK_DIR}/../VTK/Wrapping
           ${VTK_DIR}/../vtknew/Wrapping )
 

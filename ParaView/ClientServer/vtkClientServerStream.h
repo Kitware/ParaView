@@ -6,18 +6,23 @@
   Date:      $Date$
   Version:   $Revision$
 
-  Copyright (c) 1993-2002 Ken Martin, Will Schroeder, Bill Lorensen 
+  Copyright (c) 1993-2002 Ken Martin, Will Schroeder, Bill Lorensen
   All rights reserved.
   See Copyright.txt or http://www.kitware.com/Copyright.htm for details.
 
-     This software is distributed WITHOUT ANY WARRANTY; without even 
-     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR 
+     This software is distributed WITHOUT ANY WARRANTY; without even
+     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkClientServerStream -
+// .NAME vtkClientServerStream - Store messages for the interpreter.
 // .SECTION Description
-// vtkClientServerStream
+// vtkClientServerStream will store zero or more almost arbitrary
+// messages in a platform-independent manner.  The stream's data may
+// be copied from one platform to another via GetData/SetData methods,
+// and the message represented will remain unchanged.  Messages are
+// used to represent both commands and results for
+// vtkClientServerInterpreter, but they may be used for any purpose.
 
 #ifndef __vtkClientServerStream_h
 #define __vtkClientServerStream_h
@@ -26,17 +31,27 @@
 
 class vtkClientServerStreamInternals;
 
-class VTK_EXPORT vtkClientServerStream
+class VTK_CLIENT_SERVER_EXPORT vtkClientServerStream
 {
 public:
+  // Description:
+  // Constructor/Destructor manage references of vtk objects stored in
+  // the stream along with the rest of the stream data.
   vtkClientServerStream();
   ~vtkClientServerStream();
+
+  // Description:
+  // Copy constructor and assignment operator copy all stream data.
   vtkClientServerStream(const vtkClientServerStream&);
   vtkClientServerStream& operator=(const vtkClientServerStream&);
-  
-  enum { BigEndian, LittleEndian };
+
+  // Description:
+  // Enumeration of message types.
   enum Commands { New, Invoke, Delete, AssignResult,
                   Reply, Error, EndOfCommands};
+
+  // Description:
+  // Enumeration of data types that may be stored in a stream.
   enum Types {
     int8_value, int8_array,
     int16_value, int16_array,
@@ -53,41 +68,43 @@ public:
     vtk_object_pointer,
     End
   };
-  
-  struct Array
-  {
-    Types Type;
-    vtkTypeUInt32 Length;
-    vtkTypeUInt32 Size;
-    const void* Data;
-  };
-  
-  struct Argument
-  {
-    const unsigned char* Data;
-    size_t Size;
-  };
-  
+
+  // Description:
+  // Ask the stream to allocate at least the given size in memory to
+  // avoid too many reallocations during stream construction.
+  void Reserve(size_t size);
+
+  // Description:
+  // Reset the stream to an empty state.
+  void Reset();
+
+  // Description:
+  // Copy the stream contents from another stream.
+  void Copy(const vtkClientServerStream* source);
+
+  //--------------------------------------------------------------------------
+  // Stream reading methods:
+
   // Description:
   // Get the number of complete messages currently stored in the
   // stream.
   int GetNumberOfMessages() const;
-  
+
   // Description:
   // Get the command in the message with the given index.  Returns
   // EndOfCommands if the given index is out of range.
   vtkClientServerStream::Commands GetCommand(int message) const;
-  
+
   // Description:
   // Get the number of arguments in the message with the given index.
   // Returns a value less than 0 if the given index is out of range.
   int GetNumberOfArguments(int message) const;
-  
+
   // Description:
   // Get the type of the given argument in the given message.  Returns
   // End if either index is out of range.
   vtkClientServerStream::Types GetArgumentType(int message, int argument) const;
-  
+
   // Description:
   // Get the value of the given argument in the given message.
   // Returns whether the argument could be converted to the requested
@@ -126,38 +143,56 @@ public:
   int GetArgument(int message, int argument, char** value) const;
   int GetArgument(int message, int argument, vtkClientServerID* value) const;
   int GetArgument(int message, int argument, vtkObjectBase** value) const;
-  
+
   // Description:
   // Get the length of an argument of an array type.  Returns whether
   // the argument is really an array type.
   int GetArgumentLength(int message, int argument, vtkTypeUInt32* length) const;
-  
+
   // Description:
   // Get the given argument in the given message as an object of a
   // particular vtkObjectBase type.  Returns whether the argument is
   // really of the requested type.
   int GetArgumentObject(int message, int argument, vtkObjectBase** value,
                         const char* type) const;
-  
+
+  // Description:
+  // Proxy-object returned by the two-argument form of GetArgument.
+  // This is suitable to be stored in another stream.
+  struct Argument
+  {
+    const unsigned char* Data;
+    size_t Size;
+  };
+
   // Description:
   // Get the given argument of the given message in a form that can be
   // sent to another stream.  Returns an empty argument if it either
   // index is out of range.
-  vtkClientServerStream::Argument GetArgument(int message, int argument) const;
-  
+  vtkClientServerStream::Argument GetArgument(int message,
+                                              int argument) const;
+
   // Description:
-  // Copy the stream contents from another stream.
-  void Copy(const vtkClientServerStream* source);  
-  
+  // Get a pointer to the stream data and its length.  The values are
+  // suitable for passing to another stream's SetData method, but are
+  // invalidated when any further writing to the stream is done.
+  // Returns whether the stream is currently valid.
+  int GetData(const unsigned char** data, size_t* length) const;
+
+  //--------------------------------------------------------------------------
+  // Stream writing methods:
+
   // Description:
-  // Ask the stream to allocate at least the given size in memory to
-  // avoid too many reallocations during stream construction.
-  void Reserve(size_t size);
-  
-  // Description:
-  // Reset the stream to an empty state.
-  void Reset();
-  
+  // Proxy-object returned by InsertArray and used to insert
+  // array data into the stream.
+  struct Array
+  {
+    Types Type;
+    vtkTypeUInt32 Length;
+    vtkTypeUInt32 Size;
+    const void* Data;
+  };
+
   // Description:
   // Stream operators for special types.
   vtkClientServerStream & operator << (vtkClientServerStream::Commands);
@@ -166,7 +201,7 @@ public:
   vtkClientServerStream & operator << (vtkClientServerStream::Array);
   vtkClientServerStream & operator << (vtkClientServerID);
   vtkClientServerStream & operator << (vtkObjectBase*);
-  
+
   // Description:
   // Stream operators for native types.
   vtkClientServerStream & operator << (short x) ; // integers
@@ -180,7 +215,7 @@ public:
   vtkClientServerStream & operator << (float fl ) ;  // floats
   vtkClientServerStream & operator << (double dbl);  // double floats
   vtkClientServerStream & operator << (const char *str);   // strings
-  
+
   // Description:
   // Allow arrays to be passed into the stream.
   static vtkClientServerStream::Array InsertArray(const char*, int);
@@ -193,35 +228,32 @@ public:
   static vtkClientServerStream::Array InsertArray(const unsigned long*, int);
   static vtkClientServerStream::Array InsertArray(const float*, int);
   static vtkClientServerStream::Array InsertArray(const double*, int);
-  
+
   // Description:
   // Construct the entire stream from the given data.  This destroys
   // any data already in the stream.  Returns whether the stream is
   // deemed valid.  In the case of 0, the stream will have been reset.
   int SetData(const unsigned char* data, size_t length);
-  
-  // Description:
-  // Get a pointer to the stream data and its length.  The values are
-  // suitable for passing to another stream's SetData method, but are
-  // invalidated when any further writing to the stream is done.
-  // Returns whether the stream is currently valid.
-  int GetData(const unsigned char** data, size_t* length) const;
-  
+
+  //--------------------------------------------------------------------------
+  // Utility methods:
+
   // Description:
   // Get a string describing the given type.
   const char* GetStringFromType(vtkClientServerStream::Types type) const;
-  
+
   // Description:
   // Get the type named by the given string.
   vtkClientServerStream::Types GetTypeFromString(const char* name) const;
-  
+
   // Description:
   // Print the contents of the stream in a human-readable form.
   void Print(ostream&) const;
+
 protected:
   // Write arbitrary data to the stream.  Used internally.
   vtkClientServerStream& Write(const void* data, size_t length);
-  
+
   // Data parsing utilities for SetData.
   int ParseData();
   unsigned char* ParseCommand(int order, unsigned char* data,
@@ -236,16 +268,19 @@ protected:
                             unsigned char* end, unsigned int wordSize);
   unsigned char* ParseString(int order, unsigned char* data,
                              unsigned char* end);
-  
+
+  // Enumeration of possible byte orderings of data in the stream.
+  enum { BigEndian, LittleEndian };
+
   // Byte swap data in the given byte order to match the current
   // machine's byte order.
   void PerformByteSwap(int dataByteOrder, unsigned char* data,
                        unsigned int numWords, unsigned int wordSize);
-  
+
   // Get a pointer to the given value within the given message.
   // Returns 0 if either index is out of range.
   const unsigned char* GetValue(int message, int value) const;
-  
+
   // Get the number of values in the given message.  The count
   // includes the Command and End portions of the message.  Returns 0
   // if the given index is out of range.

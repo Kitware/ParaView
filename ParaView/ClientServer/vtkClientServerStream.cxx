@@ -6,12 +6,12 @@
   Date:      $Date$
   Version:   $Revision$
 
-  Copyright (c) 1993-2002 Ken Martin, Will Schroeder, Bill Lorensen 
+  Copyright (c) 1993-2002 Ken Martin, Will Schroeder, Bill Lorensen
   All rights reserved.
   See Copyright.txt or http://www.kitware.com/Copyright.htm for details.
 
-     This software is distributed WITHOUT ANY WARRANTY; without even 
-     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR 
+     This software is distributed WITHOUT ANY WARRANTY; without even
+     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
@@ -119,28 +119,28 @@ public:
   // Actual binary data in the stream.
   typedef vtkstd::vector<unsigned char> DataType;
   DataType Data;
-  
+
   // Offset to each value stored in the stream.
   typedef vtkstd::vector<DataType::difference_type> ValueOffsetsType;
   ValueOffsetsType ValueOffsets;
-  
+
   // Index into ValueOffsets of the first value corresponding to each
   // message.
   typedef vtkstd::vector<ValueOffsetsType::size_type> MessageIndexesType;
   MessageIndexesType MessageIndexes;
-  
+
   // Hold references to vtkObjectBase instances stored in the stream.
   typedef vtkstd::vector< vtkSmartPointer<vtkObjectBase> > ObjectsType;
   ObjectsType Objects;
-  
+
   // Index into ValueOffsets where the last Command started.  Used to
   // detect valid message completion.
   enum { InvalidStartIndex = 0xFFFFFFFF };
   ValueOffsetsType::size_type StartIndex;
-  
+
   // Whether the stream has been constructed improperly.
   int Invalid;
-  
+
   // Access to protected members of vtkClientServerStream.
   vtkClientServerStream& Write(vtkClientServerStream& css,
                                const void* data, size_t length)
@@ -189,7 +189,7 @@ void vtkClientServerStream::Copy(const vtkClientServerStream* source)
 //----------------------------------------------------------------------------
 vtkClientServerStream&
 vtkClientServerStream::Write(const void* data, size_t length)
-{  
+{
   // Copy the value into the data.
   this->Internal->Data.resize(this->Internal->Data.size() + length);
   memcpy(&*this->Internal->Data.end() - length, data, length);
@@ -204,7 +204,7 @@ void vtkClientServerStream::Reserve(size_t size)
 
 //----------------------------------------------------------------------------
 void vtkClientServerStream::Reset()
-{  
+{
   // Empty the entire stream.
   this->Internal->Data.erase(this->Internal->Data.begin(),
                              this->Internal->Data.end());
@@ -214,12 +214,12 @@ void vtkClientServerStream::Reset()
                                        this->Internal->MessageIndexes.end());
   this->Internal->Objects.erase(this->Internal->Objects.begin(),
                                 this->Internal->Objects.end());
-  
+
   // No message has yet been started.
   this->Internal->Invalid = 0;
   this->Internal->StartIndex =
     vtkClientServerStreamInternals::InvalidStartIndex;
-  
+
   // Store the byte order of data to come.
 #ifdef VTK_WORDS_BIGENDIAN
   this->Internal->Data.push_back(vtkClientServerStream::BigEndian);
@@ -242,14 +242,14 @@ vtkClientServerStream::operator << (vtkClientServerStream::Commands t)
     this->Internal->Invalid = 1;
     return *this;
     }
-  
+
   // Save where this message starts.
   this->Internal->StartIndex = this->Internal->ValueOffsets.size();
-  
+
   // The command counts as the first value in the message.
   this->Internal->ValueOffsets.push_back(
     this->Internal->Data.end()-this->Internal->Data.begin());
-  
+
   // Store the command in the stream.
   vtkTypeUInt32 data = static_cast<vtkTypeUInt32>(t);
   return this->Write(&data, sizeof(data));
@@ -271,20 +271,20 @@ vtkClientServerStream::operator << (vtkClientServerStream::Types t)
       this->Internal->Invalid = 1;
       return *this;
       }
-    
+
     // Store the value index where this command started.
     this->Internal->MessageIndexes.push_back(this->Internal->StartIndex);
-    
+
     // No current Command is being constructed.
     this->Internal->StartIndex =
       vtkClientServerStreamInternals::InvalidStartIndex;
     }
-  
+
   // All values write their type first.  Mark the start of this type
   // and optional value.
   this->Internal->ValueOffsets.push_back(
     this->Internal->Data.end()-this->Internal->Data.begin());
-  
+
   // Store the type in the stream.
   vtkTypeUInt32 data = static_cast<vtkTypeUInt32>(t);
   return this->Write(&data, sizeof(data));
@@ -299,7 +299,7 @@ vtkClientServerStream::operator << (vtkClientServerStream::Argument a)
     // Mark the start of this type and optional value.
     this->Internal->ValueOffsets.push_back(
       this->Internal->Data.end()-this->Internal->Data.begin());
-    
+
     // Write the data to the stream.
     return this->Write(a.Data, a.Size);
     }
@@ -331,7 +331,7 @@ vtkClientServerStream::operator << (vtkObjectBase* obj)
 {
   // The stream will now hold a reference to the object.
   this->Internal->Objects.push_back(obj);
-  
+
   // Store the vtk_object_pointer type and then the pointer value itself.
   *this << vtkClientServerStream::vtk_object_pointer;
   return this->Write(&obj, sizeof(obj));
@@ -609,7 +609,7 @@ vtkClientServerStreamGetArgumentValue(const vtkClientServerStream* self,
     vtkTypeUInt32 tp;
     memcpy(&tp, data, sizeof(tp));
     data += sizeof(tp);
-    
+
     /* Call the type conversion function for this type. */
     return vtkClientServerStreamGetArgument(
       static_cast<vtkClientServerStream::Types>(tp), data,
@@ -624,7 +624,7 @@ vtkClientServerStreamGetArgumentValue(const vtkClientServerStream* self,
   {                                                                         \
     return vtkClientServerStreamGetArgumentValue(this, this->Internal,      \
                                                  message, argument, value); \
-  } 
+  }
 VTK_CSS_GET_ARGUMENT(signed char)
 VTK_CSS_GET_ARGUMENT(char)
 VTK_CSS_GET_ARGUMENT(int)
@@ -658,12 +658,12 @@ vtkClientServerStreamGetArgumentArray(const vtkClientServerStream* self,
     vtkTypeUInt32 tp;
     memcpy(&tp, data, sizeof(tp));
     data += sizeof(tp);
-    
+
     /* Get the length of the value in the stream. */
     vtkTypeUInt32 len;
     memcpy(&len, data, sizeof(len));
     data += sizeof(len);
-    
+
     /* If the type and length of the array match, use it. */
     if(static_cast<vtkClientServerStream::Types>(tp) ==
        vtkClientServerTypeTraits<Type>::Array() && len == length)
@@ -713,10 +713,10 @@ int vtkClientServerStream::GetArgument(int message, int argument,
     vtkTypeUInt32 tp;
     memcpy(&tp, data, sizeof(tp));
     data += sizeof(tp);
-    
+
     // Skip the length value.
     data += sizeof(vtkTypeUInt32);
-    
+
     // Make sure the type is a string.
     if(static_cast<vtkClientServerStream::Types>(tp) ==
        vtkClientServerStream::string_value)
@@ -753,7 +753,7 @@ int vtkClientServerStream::GetArgument(int message, int argument,
     vtkTypeUInt32 tp;
     memcpy(&tp, data, sizeof(tp));
     data += sizeof(tp);
-    
+
     // Make sure the type is an id_value.
     if(static_cast<vtkClientServerStream::Types>(tp) ==
        vtkClientServerStream::id_value)
@@ -777,7 +777,7 @@ int vtkClientServerStream::GetArgument(int message, int argument,
     vtkTypeUInt32 tp;
     memcpy(&tp, data, sizeof(tp));
     data += sizeof(tp);
-    
+
     // Make sure the type is a vtk_object_pointer.
     if(static_cast<vtkClientServerStream::Types>(tp) ==
        vtkClientServerStream::vtk_object_pointer)
@@ -801,7 +801,7 @@ int vtkClientServerStream::GetArgumentLength(int message, int argument,
     vtkTypeUInt32 tp;
     memcpy(&tp, data, sizeof(tp));
     data += sizeof(tp);
-    
+
     // Make sure the type is an array type.
     switch(static_cast<vtkClientServerStream::Types>(tp))
       {
@@ -848,12 +848,12 @@ int vtkClientServerStream::GetData(const unsigned char** data,
     {
     *data = &*this->Internal->Data.begin();
     }
-  
+
   if(length)
     {
     *length = this->Internal->Data.size();
     }
-  
+
   // Return whether the stream is valid.
   return this->Internal->Invalid? 0:1;
 }
@@ -865,13 +865,13 @@ int vtkClientServerStream::SetData(const unsigned char* data, size_t length)
   this->Reset();
   this->Internal->Data.erase(this->Internal->Data.begin(),
                              this->Internal->Data.end());
-  
+
   // Store the given data in the stream.
   if(data)
     {
     this->Internal->Data.insert(this->Internal->Data.begin(), data, data+length);
     }
-  
+
   // Parse the stream to fill in ValueOffsets and MessageIndexes and
   // to perform byte-swapping if necessary.
   if(this->ParseData())
@@ -889,7 +889,7 @@ int vtkClientServerStream::SetData(const unsigned char* data, size_t length)
     // Data are invalid.  Reset the stream and report failure.
     this->Reset();
     return 0;
-    }  
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -899,23 +899,23 @@ int vtkClientServerStream::ParseData()
   // into it.
   unsigned char* begin = &*this->Internal->Data.begin();
   unsigned char* end = &*this->Internal->Data.end();
-  
+
   // Make sure we have at least one byte.
   if(begin == end)
     {
     return 0;
     }
-  
+
   // Save the byte order.
   int order = *begin;
-  
+
   // Traverse the data until no more commands are found.
   unsigned char* data = begin+1;
   while(data && data < end)
     {
     // Parse the command.
     data = this->ParseCommand(order, data, begin, end);
-    
+
     // Parse the arguments until End is reached.
     int foundEnd = 0;
     while(!foundEnd && data && data < end)
@@ -927,7 +927,7 @@ int vtkClientServerStream::ParseData()
         {
         break;
         }
-      
+
       // Process the rest of the value based on its type.
       switch(type)
         {
@@ -964,16 +964,16 @@ int vtkClientServerStream::ParseData()
           data = this->ParseString(order, data, end); break;
         case vtkClientServerStream::End:
           this->ParseEnd(); foundEnd = 1; break;
-          
+
         // An object pointer cannot be safely transferred in a buffer.
         case vtkClientServerStream::vtk_object_pointer:
         default: /* ERROR */
           data = 0;
           break;
         }
-      }    
+      }
     }
-  
+
   // Return whether parsing finished.
   return (data == end)? 1:0;
 }
@@ -991,12 +991,12 @@ unsigned char* vtkClientServerStream::ParseCommand(int order,
     return 0;
     }
   this->PerformByteSwap(order, data, 1, sizeof(vtkTypeUInt32));
-  
+
   // Mark the start of the command.
   this->Internal->StartIndex =
     this->Internal->ValueOffsets.end()-this->Internal->ValueOffsets.begin();
   this->Internal->ValueOffsets.push_back(data - begin);
-  
+
   // Return the position after the command identifier.
   return data + sizeof(vtkTypeUInt32);
 }
@@ -1025,10 +1025,10 @@ vtkClientServerStream::ParseType(int order, unsigned char* data,
   this->PerformByteSwap(order, data, 1, sizeof(tp));
   memcpy(&tp, data, sizeof(tp));
   *type = static_cast<vtkClientServerStream::Types>(tp);
-  
+
   // Record the start of this type and optional value.
   this->Internal->ValueOffsets.push_back(data - begin);
-  
+
   // Return the position after the type identifier.
   return data + sizeof(vtkTypeUInt32);
 }
@@ -1046,7 +1046,7 @@ unsigned char* vtkClientServerStream::ParseValue(int order,
     return 0;
     }
   this->PerformByteSwap(order, data, 1, wordSize);
-  
+
   // Return the position after the value.
   return data+wordSize;
 }
@@ -1067,10 +1067,10 @@ unsigned char* vtkClientServerStream::ParseArray(int order,
   this->PerformByteSwap(order, data, 1, sizeof(length));
   memcpy(&length, data, sizeof(length));
   data += sizeof(length);
-  
+
   // Calculate the size of the array data.
   vtkTypeUInt32 size = length*wordSize;
-  
+
   // Byte-swap the array data.
   if(data > end-size)
     {
@@ -1078,7 +1078,7 @@ unsigned char* vtkClientServerStream::ParseArray(int order,
     return 0;
     }
   this->PerformByteSwap(order, data, length, wordSize);
-  
+
   // Return the position after the array.
   return data+size;
 }
@@ -1098,14 +1098,14 @@ unsigned char* vtkClientServerStream::ParseString(int order,
   this->PerformByteSwap(order, data, 1, sizeof(length));
   memcpy(&length, data, sizeof(length));
   data += sizeof(length);
-  
+
   // Skip the string data.  It does not need swapping.
   if(data > end-length)
     {
     /* ERROR */
     return 0;
-    }  
-  
+    }
+
   // Return the position after the string.
   return data+length;
 }
@@ -1146,7 +1146,7 @@ int vtkClientServerStream::GetNumberOfMessages() const
 {
   return static_cast<int>(this->Internal->MessageIndexes.size());
 }
-  
+
 //----------------------------------------------------------------------------
 int vtkClientServerStream::GetNumberOfValues(int message) const
 {
@@ -1192,7 +1192,7 @@ vtkClientServerStream::GetValue(int message, int value) const
     // Get the index to the beginning of the requested message.
     vtkClientServerStreamInternals::ValueOffsetsType::size_type index =
       this->Internal->MessageIndexes[message];
-    
+
     // Return a pointer to the value-th value in the message.
     const unsigned char* data = &*this->Internal->Data.begin();
     return data + this->Internal->ValueOffsets[index + value];
@@ -1220,18 +1220,18 @@ vtkClientServerStream::GetArgument(int message, int argument) const
 {
   // Prepare a return value.
   vtkClientServerStream::Argument result = {0, 0};
-  
+
   // Get a pointer to the type/value pair in the stream.
   if(const unsigned char* data = this->GetValue(message, 1+argument))
     {
     // Store the starting location of the value.
     result.Data = data;
-    
+
     // Get the type of the value in the stream.
     vtkTypeUInt32 tp;
     memcpy(&tp, data, sizeof(tp));
     data += sizeof(tp);
-    
+
     // Find the length of the argument's data based on its type.
     switch(tp)
       {
@@ -1252,7 +1252,7 @@ vtkClientServerStream::GetArgument(int message, int argument) const
       case vtkClientServerStream::vtk_object_pointer:
         {
         result.Size = sizeof(tp) + sizeof(vtkObjectBase*);
-        } break;      
+        } break;
       case vtkClientServerStream::End:
       default:
         result.Data = 0;

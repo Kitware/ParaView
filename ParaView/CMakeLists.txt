@@ -1,13 +1,13 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 1.4)
-PROJECT(PARAVIEW) 
+PROJECT(PARAVIEW)
 INCLUDE_REGULAR_EXPRESSION("^(vtk).*$")
 
 # load the ClientServer command
 IF (COMMAND VTK_WRAP_ClientServer)
 ELSE (COMMAND VTK_WRAP_ClientServer)
-    TRY_COMPILE(COMPILE_OK 
-         ${PARAVIEW_BINARY_DIR}/ClientServer/CMake 
-         ${PARAVIEW_SOURCE_DIR}/ClientServer/CMake 
+    TRY_COMPILE(COMPILE_OK
+         ${PARAVIEW_BINARY_DIR}/ClientServer/CMake
+         ${PARAVIEW_SOURCE_DIR}/ClientServer/CMake
          ClientServer_LOADED_COMMANDS OUTPUT_VARIABLE TRYOUT)
     IF (COMPILE_OK)
          LOAD_COMMAND(VTK_WRAP_ClientServer
@@ -40,16 +40,16 @@ SET (PARAVIEW_CAN_BUILD 1)
 
 IF (WIN32)
 
- FIND_PATH( HTML_HELP_PATH htmlhelp.h 
-           "c:/program files/html help workshop"  
-           "c:/program files/html help workshop/include" 
+ FIND_PATH( HTML_HELP_PATH htmlhelp.h
+           "c:/program files/html help workshop"
+           "c:/program files/html help workshop/include"
            "[HKEY_CURRENT_USER\\Software\\Microsoft\\HTML Help Workshop;InstallDir]/include" )
 
  IF (HTML_HELP_PATH)
    INCLUDE_DIRECTORIES(${HTML_HELP_PATH})
  ELSE (HTML_HELP_PATH)
    SET (PARAVIEW_CAN_BUILD 0)
-   MESSAGE("ParaView requires htmlhelp to build. Please install html help." 
+   MESSAGE("ParaView requires htmlhelp to build. Please install html help."
            "You can find html help on the msdn web site here:\n"
            "http://msdn.microsoft.com/\n"
            "http://msdn.microsoft.com/library/default.asp?url=/library/en-us/htmlhelp/html/vsconwhtshw.asp")
@@ -57,13 +57,13 @@ IF (WIN32)
 
 
  FIND_LIBRARY( HTML_HELP_LIBRARY htmlhelp
-              "c:/program files/html help workshop"  
+              "c:/program files/html help workshop"
               "c:/program files/html help workshop/LIB"
               "[HKEY_CURRENT_USER\\Software\\Microsoft\\HTML Help Workshop;InstallDir]/lib")
 
- IF (HTML_HELP_LIBRARY)   
+ IF (HTML_HELP_LIBRARY)
    LINK_LIBRARIES( ${HTML_HELP_LIBRARY} )
- ELSE (HTML_HELP_LIBRARY)         
+ ELSE (HTML_HELP_LIBRARY)
    SET (PARAVIEW_CAN_BUILD 0)
    MESSAGE("ParaView requires htmlhelp to build. Please set HTML_HELP_PATH")
  ENDIF (HTML_HELP_LIBRARY)
@@ -99,7 +99,7 @@ ELSE(ParaViewComplete_BINARY_DIR)
     IF(XDMF_FOUND)
       INCLUDE(${XDMF_USE_FILE})
       IF(NOT XDMF_VTK_DIR)
-        MESSAGE(FATAL_ERROR 
+        MESSAGE(FATAL_ERROR
           "Xdmf was not build with VTK support. "
           "Either rebuild Xdmf with VTK support or turn off "
           "linking XDMF library to ParaView")
@@ -147,11 +147,11 @@ ELSE(ParaViewComplete_BINARY_DIR)
   ENDIF (VTK_FOUND)
 ENDIF(ParaViewComplete_BINARY_DIR)
 
-OPTION(PARAVIEW_USE_ICE_T "Build paraview using IceT" OFF)	 
-IF(PARAVIEW_USE_ICE_T)	 
+OPTION(PARAVIEW_USE_ICE_T "Build paraview using IceT" OFF)
+IF(PARAVIEW_USE_ICE_T)
 	INCLUDE( ${PARAVIEW_SOURCE_DIR}/FindIceT.cmake )
   INCLUDE(${ICET_USE_FILE})
-ENDIF(PARAVIEW_USE_ICE_T)	 
+ENDIF(PARAVIEW_USE_ICE_T)
 
 IF (PARAVIEW_CAN_BUILD)
  IF ( NOT VTK_WRAP_TCL )
@@ -236,10 +236,11 @@ IF (PARAVIEW_CAN_BUILD)
    INCLUDE_DIRECTORIES(${VTK_TK_INTERNAL_DIR})
  ENDIF(VTK_TK_INTERNAL_DIR)
 
- INCLUDE_DIRECTORIES(${PARAVIEW_BINARY_DIR} 
+ INCLUDE_DIRECTORIES(${PARAVIEW_BINARY_DIR}
                      ${PARAVIEW_SOURCE_DIR}/KWCommon
                      ${PARAVIEW_SOURCE_DIR}/Widgets
                      ${PARAVIEW_SOURCE_DIR}/ClientServer
+                     ${PARAVIEW_BINARY_DIR}/ClientServer
                      ${PARAVIEW_SOURCE_DIR}/ParaView)
 
  LINK_DIRECTORIES(${PARAVIEW_BINARY_DIR}/KWCommon
