@@ -41,7 +41,7 @@ class vtkPVArraySelectionArraySet: public vtkPVArraySelectionArraySetBase {};
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVArraySelection);
-vtkCxxRevisionMacro(vtkPVArraySelection, "1.54");
+vtkCxxRevisionMacro(vtkPVArraySelection, "1.55");
 
 //----------------------------------------------------------------------------
 int vtkDataArraySelectionCommand(ClientData cd, Tcl_Interp *interp,
@@ -400,7 +400,7 @@ void vtkPVArraySelection::SetReaderSelectionsFromProperty()
       ostrstream str;
       str << check->GetState() << ends;
       svp->SetElement(elemCount++, str.str());
-      str.rdbuf()->freeze();
+      str.rdbuf()->freeze(0);
       }
     it->Delete();
     }
