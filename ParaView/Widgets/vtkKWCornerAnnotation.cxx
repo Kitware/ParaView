@@ -56,11 +56,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkProperty2D.h"
 #include "vtkString.h"
 #include "vtkTextProperty.h"
+#ifndef DO_NOT_BUILD_XML_RW
 #include "vtkXMLCornerAnnotationWriter.h"
+#endif
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWCornerAnnotation );
-vtkCxxRevisionMacro(vtkKWCornerAnnotation, "1.62");
+vtkCxxRevisionMacro(vtkKWCornerAnnotation, "1.63");
 
 int vtkKWCornerAnnotationCommand(ClientData cd, Tcl_Interp *interp,
                                 int argc, char *argv[]);
@@ -968,7 +970,7 @@ void vtkKWCornerAnnotation::SerializeToken(istream& is, const char *token)
 void vtkKWCornerAnnotation::SerializeRevision(ostream& os, vtkIndent indent)
 {
   os << indent << "vtkKWCornerAnnotation ";
-  this->ExtractRevision(os,"$Revision: 1.62 $");
+  this->ExtractRevision(os,"$Revision: 1.63 $");
 }
 
 //----------------------------------------------------------------------------
@@ -1034,6 +1036,9 @@ void vtkKWCornerAnnotation::SendChangedEvent()
     return;
     }
 
+#ifdef DO_NOT_BUILD_XML_RW
+  this->InvokeEvent(this->AnnotationChangedEvent, NULL);
+#else
   ostrstream event;
 
   vtkXMLCornerAnnotationWriter *xmlw = vtkXMLCornerAnnotationWriter::New();
@@ -1047,6 +1052,7 @@ void vtkKWCornerAnnotation::SendChangedEvent()
 
   this->InvokeEvent(this->AnnotationChangedEvent, event.str());
   event.rdbuf()->freeze(0);
+#endif
 }
 
 //----------------------------------------------------------------------------

@@ -23,32 +23,13 @@ SET_SOURCE_FILES_PROPERTIES(
   WRAP_EXCLUDE
   )
 
-INCLUDE_DIRECTORIES(
-  ${KWCommon_SOURCE_DIR}/XML
-)
-
-SET (KWCommon_SRCS ${KWCommon_SRCS}
-  ${KWCommon_SOURCE_DIR}/XML/vtkXMLActor2DReader.cxx
-  ${KWCommon_SOURCE_DIR}/XML/vtkXMLActor2DWriter.cxx
-  ${KWCommon_SOURCE_DIR}/XML/vtkXMLObjectReader.cxx
-  ${KWCommon_SOURCE_DIR}/XML/vtkXMLObjectWriter.cxx
-  ${KWCommon_SOURCE_DIR}/XML/vtkXMLPropReader.cxx
-  ${KWCommon_SOURCE_DIR}/XML/vtkXMLPropWriter.cxx
-  ${KWCommon_SOURCE_DIR}/XML/vtkXMLProperty2DReader.cxx
-  ${KWCommon_SOURCE_DIR}/XML/vtkXMLProperty2DWriter.cxx
-  ${KWCommon_SOURCE_DIR}/XML/vtkXMLTextPropertyReader.cxx
-  ${KWCommon_SOURCE_DIR}/XML/vtkXMLTextPropertyWriter.cxx
-  ${KWCommon_SOURCE_DIR}/XML/vtkXMLUtilities.cxx
-)
-
-SET_SOURCE_FILES_PROPERTIES(
-  ${KWCommon_SOURCE_DIR}/XML/vtkXMLObjectReader.cxx
-  ${KWCommon_SOURCE_DIR}/XML/vtkXMLObjectWriter.cxx
-  ABSTRACT
-)
-
 IF (NOT DO_NOT_BUILD_XML_RW)
+  INCLUDE_DIRECTORIES(
+    ${KWCommon_SOURCE_DIR}/XML
+  )
   SET (KWCommon_SRCS ${KWCommon_SRCS}
+    ${KWCommon_SOURCE_DIR}/XML/vtkXMLActor2DReader.cxx
+    ${KWCommon_SOURCE_DIR}/XML/vtkXMLActor2DWriter.cxx
     ${KWCommon_SOURCE_DIR}/XML/vtkXMLActorReader.cxx
     ${KWCommon_SOURCE_DIR}/XML/vtkXMLActorWriter.cxx
     ${KWCommon_SOURCE_DIR}/XML/vtkXMLCameraReader.cxx
@@ -59,10 +40,16 @@ IF (NOT DO_NOT_BUILD_XML_RW)
     ${KWCommon_SOURCE_DIR}/XML/vtkXMLInteractorObserverWriter.cxx
     ${KWCommon_SOURCE_DIR}/XML/vtkXMLLightReader.cxx
     ${KWCommon_SOURCE_DIR}/XML/vtkXMLLightWriter.cxx
+    ${KWCommon_SOURCE_DIR}/XML/vtkXMLObjectReader.cxx
+    ${KWCommon_SOURCE_DIR}/XML/vtkXMLObjectWriter.cxx
     ${KWCommon_SOURCE_DIR}/XML/vtkXMLPiecewiseFunctionReader.cxx
     ${KWCommon_SOURCE_DIR}/XML/vtkXMLPiecewiseFunctionWriter.cxx
     ${KWCommon_SOURCE_DIR}/XML/vtkXMLProp3DReader.cxx
     ${KWCommon_SOURCE_DIR}/XML/vtkXMLProp3DWriter.cxx
+    ${KWCommon_SOURCE_DIR}/XML/vtkXMLPropReader.cxx
+    ${KWCommon_SOURCE_DIR}/XML/vtkXMLPropWriter.cxx
+    ${KWCommon_SOURCE_DIR}/XML/vtkXMLProperty2DReader.cxx
+    ${KWCommon_SOURCE_DIR}/XML/vtkXMLProperty2DWriter.cxx
     ${KWCommon_SOURCE_DIR}/XML/vtkXMLPropertyReader.cxx
     ${KWCommon_SOURCE_DIR}/XML/vtkXMLPropertyWriter.cxx
     ${KWCommon_SOURCE_DIR}/XML/vtkXMLScalarBarActorReader.cxx
@@ -71,6 +58,9 @@ IF (NOT DO_NOT_BUILD_XML_RW)
     ${KWCommon_SOURCE_DIR}/XML/vtkXMLScalarsToColorsWriter.cxx
     ${KWCommon_SOURCE_DIR}/XML/vtkXMLTextActorReader.cxx
     ${KWCommon_SOURCE_DIR}/XML/vtkXMLTextActorWriter.cxx
+    ${KWCommon_SOURCE_DIR}/XML/vtkXMLTextPropertyReader.cxx
+    ${KWCommon_SOURCE_DIR}/XML/vtkXMLTextPropertyWriter.cxx
+    ${KWCommon_SOURCE_DIR}/XML/vtkXMLUtilities.cxx
     ${KWCommon_SOURCE_DIR}/XML/vtkXMLVolumePropertyReader.cxx
     ${KWCommon_SOURCE_DIR}/XML/vtkXMLVolumePropertyWriter.cxx
   )
@@ -86,6 +76,11 @@ IF (NOT DO_NOT_BUILD_XML_RW)
       ${KWCommon_SOURCE_DIR}/XML/vtkXMLScalarBarWidgetWriter.cxx
     )
   ENDIF (VTK_USE_HYBRID)
+  SET_SOURCE_FILES_PROPERTIES(
+    ${KWCommon_SOURCE_DIR}/XML/vtkXMLObjectReader.cxx
+    ${KWCommon_SOURCE_DIR}/XML/vtkXMLObjectWriter.cxx
+    ABSTRACT
+  )
 ENDIF (NOT DO_NOT_BUILD_XML_RW)
 
 IF (WIN32)
