@@ -66,7 +66,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPart);
-vtkCxxRevisionMacro(vtkPVPart, "1.25.2.11");
+vtkCxxRevisionMacro(vtkPVPart, "1.25.2.12");
 
 
 int vtkPVPartCommand(ClientData cd, Tcl_Interp *interp,
@@ -230,11 +230,11 @@ void vtkPVPart::GatherDataInformation()
     char str[100];
     if (this->DataInformation->GetDataSetType() == VTK_POLY_DATA)
       {
-      sprintf(str, "Polygonal: %d cells", this->DataInformation->GetNumberOfCells());
+      sprintf(str, "Polygonal: %d cells", (int)(this->DataInformation->GetNumberOfCells()));
       }
     else if (this->DataInformation->GetDataSetType() == VTK_UNSTRUCTURED_GRID)
       {
-      sprintf(str, "Unstructured Grid: %d cells", this->DataInformation->GetNumberOfCells());
+      sprintf(str, "Unstructured Grid: %d cells", (int)(this->DataInformation->GetNumberOfCells()));
       }
     else if (this->DataInformation->GetDataSetType() == VTK_IMAGE_DATA)
       {
@@ -436,6 +436,8 @@ void vtkPVPart::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "Name: " << (this->Name?this->Name:"none") << endl;
   os << indent << "GeometryTclName: " << (this->GeometryTclName?this->GeometryTclName:"none") << endl;
   os << indent << "VTKDataTclName: " << (this->VTKDataTclName?this->VTKDataTclName:"none") << endl;
+  os << indent << "VTKSourceIndex: " << this->VTKSourceIndex << endl;
+  os << indent << "VTKOutputIndex: " << this->VTKOutputIndex << endl;
 
 }
 
