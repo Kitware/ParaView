@@ -145,7 +145,7 @@ void vtkPVSendStreamToClientServerNodeRMI(void *localArg, void *remoteArg,
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVClientServerModule);
-vtkCxxRevisionMacro(vtkPVClientServerModule, "1.78");
+vtkCxxRevisionMacro(vtkPVClientServerModule, "1.79");
 
 int vtkPVClientServerModuleCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -1257,6 +1257,11 @@ void vtkPVClientServerModule::SendLastClientServerResult()
 //----------------------------------------------------------------------------
 void vtkPVClientServerModule::SendStreamToRenderServerInternal()
 {
+  if (this->ClientServerStream->GetNumberOfMessages() < 1)
+    {
+    return;
+    }
+
   if(!this->RenderServerMode)
     {
     this->SendStreamToServerInternal();
@@ -1265,6 +1270,7 @@ void vtkPVClientServerModule::SendStreamToRenderServerInternal()
   const unsigned char* data;
   size_t len;
   this->ClientServerStream->GetData(&data, &len);
+  if ( len == 1 ) abort();
   this->RenderServerSocket->TriggerRMI(1, (void*)(data), len,
                                        VTK_PV_CLIENTSERVER_RMI_TAG);
 }
@@ -1272,6 +1278,11 @@ void vtkPVClientServerModule::SendStreamToRenderServerInternal()
 //----------------------------------------------------------------------------
 void vtkPVClientServerModule::SendStreamToRenderServerRootInternal()
 {
+  if (this->ClientServerStream->GetNumberOfMessages() < 1)
+    {
+    return;
+    }
+
   if(!this->RenderServerMode)
     {
     this->SendStreamToServerRootInternal();
@@ -1280,6 +1291,7 @@ void vtkPVClientServerModule::SendStreamToRenderServerRootInternal()
   const unsigned char* data;
   size_t len;
   this->ClientServerStream->GetData(&data, &len);
+  if ( len == 1 ) abort();
   this->RenderServerSocket->TriggerRMI(1, (void*)(data), len,
                                      VTK_PV_CLIENTSERVER_ROOT_RMI_TAG);
 }
@@ -1287,6 +1299,10 @@ void vtkPVClientServerModule::SendStreamToRenderServerRootInternal()
 //----------------------------------------------------------------------------
 void vtkPVClientServerModule::SendStreamToServerInternal()
 {
+  if (this->ClientServerStream->GetNumberOfMessages() < 1)
+    {
+    return;
+    }
   const unsigned char* data;
   size_t len;
   this->ClientServerStream->GetData(&data, &len);
@@ -1297,6 +1313,11 @@ void vtkPVClientServerModule::SendStreamToServerInternal()
 //----------------------------------------------------------------------------
 void vtkPVClientServerModule::SendStreamToServerRootInternal()
 {
+  if (this->ClientServerStream->GetNumberOfMessages() < 1)
+    {
+    return;
+    }
+
   const unsigned char* data;
   size_t len;
   this->ClientServerStream->GetData(&data, &len);

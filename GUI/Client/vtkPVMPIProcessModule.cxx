@@ -49,7 +49,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVMPIProcessModule);
-vtkCxxRevisionMacro(vtkPVMPIProcessModule, "1.26");
+vtkCxxRevisionMacro(vtkPVMPIProcessModule, "1.27");
 
 int vtkPVMPIProcessModuleCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -310,6 +310,11 @@ void vtkPVMPIProcessModule::SendStreamToServerInternal()
 void
 vtkPVMPIProcessModule::SendStreamToServerNodeInternal(int remoteId)
 {
+  if (this->ClientServerStream->GetNumberOfMessages() < 1)
+    {
+    return;
+    }
+
   if(remoteId == this->Controller->GetLocalProcessId())
     {
     this->Interpreter->ProcessStream(*this->ClientServerStream);
