@@ -35,7 +35,7 @@
 #include "vtkMPIMToNSocketConnection.h"
 #include "vtkSocketCommunicator.h"
 
-vtkCxxRevisionMacro(vtkMPIMoveData, "1.3");
+vtkCxxRevisionMacro(vtkMPIMoveData, "1.4");
 vtkStandardNewMacro(vtkMPIMoveData);
 
 vtkCxxSetObjectMacro(vtkMPIMoveData,Controller, vtkMultiProcessController);
@@ -262,7 +262,6 @@ void vtkMPIMoveData::DataServerAllToN(vtkDataSet* inData,
   vtkMultiProcessController* controller = this->Controller;
   vtkPolyData* input = vtkPolyData::SafeDownCast(inData);
   vtkPolyData* output = vtkPolyData::SafeDownCast(outData);
-  vtkPolyData* tmp;
   int m;
 
   if (controller == 0)
@@ -290,6 +289,7 @@ void vtkMPIMoveData::DataServerAllToN(vtkDataSet* inData,
 
   // Perform the M to N operation.
 #ifdef VTK_USE_MPI
+  vtkPolyData* tmp;
    vtkAllToNRedistributePolyData* AllToN = NULL;
    vtkPolyData* inputCopy = vtkPolyData::New();
    inputCopy->ShallowCopy(input);
