@@ -21,7 +21,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWSaveImageDialog );
-vtkCxxRevisionMacro(vtkKWSaveImageDialog, "1.22.2.1");
+vtkCxxRevisionMacro(vtkKWSaveImageDialog, "1.22.2.2");
 
 int vtkKWSaveImageDialogCommand(ClientData cd, Tcl_Interp *interp,
                                 int argc, char *argv[]);

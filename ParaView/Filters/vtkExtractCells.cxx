@@ -33,7 +33,7 @@
 #include <algorithm>
 #include <vtkstd/set>
 
-vtkCxxRevisionMacro(vtkExtractCells, "1.6");
+vtkCxxRevisionMacro(vtkExtractCells, "1.6.2.1");
 vtkStandardNewMacro(vtkExtractCells);
 
 vtkExtractCells::vtkExtractCells()
@@ -325,7 +325,7 @@ vtkIdList *vtkExtractCells::reMapPointIds(vtkDataSet *grid)
     this->SubSetUGridCellArraySize = 0;
   
     vtkIdType *cellArray = ugrid->GetCells()->GetPointer();
-    int *locs = ugrid->GetCellLocationsArray()->GetPointer(0);
+    vtkIdType *locs = ugrid->GetCellLocationsArray()->GetPointer(0);
 
     this->SubSetUGridCellArraySize = 0;
          
@@ -427,7 +427,7 @@ void vtkExtractCells::CopyCellsUnstructuredGrid(vtkIdList *ptMap)
   cellArray->SetCells(numCells, newcells);
   int cellArrayIdx = 0;
 
-  vtkIntArray *locationArray = vtkIntArray::New();
+  vtkIdTypeArray *locationArray = vtkIdTypeArray::New();
   locationArray->SetNumberOfValues(numCells);
 
   vtkUnsignedCharArray *typeArray = vtkUnsignedCharArray::New();
@@ -437,7 +437,7 @@ void vtkExtractCells::CopyCellsUnstructuredGrid(vtkIdList *ptMap)
 
   vtkstd::set<vtkIdType>::iterator cellPtr;                           // input
   vtkIdType *cells = ugrid->GetCells()->GetPointer();
-  int *locs = ugrid->GetCellLocationsArray()->GetPointer(0);
+  vtkIdType *locs = ugrid->GetCellLocationsArray()->GetPointer(0);
   vtkUnsignedCharArray *types = ugrid->GetCellTypesArray();
 
   for (cellPtr = this->CellList.begin();

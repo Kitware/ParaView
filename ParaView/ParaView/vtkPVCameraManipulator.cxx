@@ -25,7 +25,7 @@
 #include "vtkRenderer.h"
 #include "vtkTransform.h"
 
-vtkCxxRevisionMacro(vtkPVCameraManipulator, "1.9");
+vtkCxxRevisionMacro(vtkPVCameraManipulator, "1.9.2.1");
 vtkStandardNewMacro(vtkPVCameraManipulator);
 
 vtkCxxSetObjectMacro(vtkPVCameraManipulator,Application,vtkPVApplication);
@@ -36,8 +36,6 @@ vtkPVCameraManipulator::vtkPVCameraManipulator()
   this->Button = 1;
   this->Shift = 0;
   this->Control = 0;
-
-  this->LastX = this->LastY = 0;
 
   this->Center[0] = this->Center[1] = this->Center[2] = 0.0;
   this->DisplayCenter[0] = this->DisplayCenter[1] = 0.0;

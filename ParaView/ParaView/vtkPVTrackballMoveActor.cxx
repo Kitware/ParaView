@@ -25,7 +25,7 @@
 #include "vtkRenderWindowInteractor.h"
 #include "vtkRenderer.h"
 
-vtkCxxRevisionMacro(vtkPVTrackballMoveActor, "1.8");
+vtkCxxRevisionMacro(vtkPVTrackballMoveActor, "1.8.2.1");
 vtkStandardNewMacro(vtkPVTrackballMoveActor);
 
 //-------------------------------------------------------------------------
@@ -39,20 +39,16 @@ vtkPVTrackballMoveActor::~vtkPVTrackballMoveActor()
 }
 
 //-------------------------------------------------------------------------
-void vtkPVTrackballMoveActor::OnButtonDown(int x, int y, vtkRenderer *,
+void vtkPVTrackballMoveActor::OnButtonDown(int, int, vtkRenderer *,
                                            vtkRenderWindowInteractor *)
 {
-  this->LastX = x;
-  this->LastY = y;
 }
 
 
 //-------------------------------------------------------------------------
-void vtkPVTrackballMoveActor::OnButtonUp(int x, int y, vtkRenderer *,
+void vtkPVTrackballMoveActor::OnButtonUp(int, int, vtkRenderer *,
                                          vtkRenderWindowInteractor *)
 {
-  this->LastX = x;
-  this->LastY = y;
 }
 
 //-------------------------------------------------------------------------
@@ -96,7 +92,8 @@ void vtkPVTrackballMoveActor::OnMouseMove(int x, int y, vtkRenderer *ren,
     ren->GetDisplayPoint(dpoint1);
 
     // Convert start point to world coordinate
-    ren->SetDisplayPoint(this->LastX, this->LastY, dpoint1[2]);
+    ren->SetDisplayPoint(rwi->GetLastEventPosition()[0],
+                         rwi->GetLastEventPosition()[1], dpoint1[2]);
     ren->DisplayToWorld();
     ren->GetWorldPoint(startpoint);
     
@@ -124,9 +121,6 @@ void vtkPVTrackballMoveActor::OnMouseMove(int x, int y, vtkRenderer *ren,
     ren->ResetCameraClippingRange();
     rwi->Render();
     }
-
-  this->LastX = x;
-  this->LastY = y;
 }
 
 //-------------------------------------------------------------------------

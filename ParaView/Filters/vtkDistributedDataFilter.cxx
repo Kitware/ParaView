@@ -92,7 +92,7 @@ static char * makeEntry(const char *s)
 
 // Timing data ---------------------------------------------
 
-vtkCxxRevisionMacro(vtkDistributedDataFilter, "1.13.2.1");
+vtkCxxRevisionMacro(vtkDistributedDataFilter, "1.13.2.2");
 
 vtkStandardNewMacro(vtkDistributedDataFilter);
 
@@ -297,6 +297,7 @@ vtkPKdTree *vtkDistributedDataFilter::GetKdtree()
     {
     this->Kdtree = vtkPKdTree::New();
     this->Kdtree->SetController(this->Controller);
+    this->Kdtree->SetTiming(this->Timing);
     }
 
   return this->Kdtree;
@@ -419,7 +420,6 @@ void vtkDistributedDataFilter::SetDivideBoundaryCells(int val)
 //-------------------------------------------------------------------------
 // Execute
 //-------------------------------------------------------------------------
-
 void vtkDistributedDataFilter::ExecuteInformation()
 {
   vtkDataSet* input = this->GetInput();
@@ -481,6 +481,8 @@ void vtkDistributedDataFilter::Execute()
     {
     this->Kdtree = vtkPKdTree::New();
     this->Kdtree->SetController(this->Controller);
+    this->Kdtree->SetTiming(this->Timing);
+    this->Kdtree->SetNumRegionsOrMore(this->NumProcesses);
     }
 
   // Stage (1) - use vtkPKdTree to...
@@ -1523,7 +1525,7 @@ vtkUnstructuredGrid *vtkDistributedDataFilter::ReduceUgridMerge(
     }
 
   int *member = new int [nParticipants];
-  int myLocalRank;
+  int myLocalRank=0;
 
   member[0] = root;
 
@@ -1643,7 +1645,7 @@ void vtkDistributedDataFilter::ComputeFanIn(int *member,
   int nTo = 0;
   int nFrom = 0;
 
-  int fanInTo;
+  int fanInTo=0;
   int *fanInFrom = new int [20];
 
   for (int i = 1; i < nParticipants; i <<= 1)
@@ -2484,10 +2486,12 @@ vtkUnstructuredGrid *
                              vtkDistributedDataFilter::TemporaryGlobalNodeIds);
 
     mc->MergeDataSet(myGrid);
-    mc->MergeDataSet(ghostCellsToGrid);
-
     myGrid->Delete();
+
+    mc->MergeDataSet(ghostCellsToGrid);
     ghostCellsToGrid->Delete();
+
+    mc->Finish();
     mc->Delete();
     }
   else
@@ -2514,12 +2518,22 @@ vtkUnstructuredGrid *vtkDistributedDataFilter::AddGhostLevel(
 
   vtkDistributedDataFilter::FreeIdArrays(myPtIds, this->NumProcesses);
 
+  if (yourPtIds == NULL)
+    {
+    return NULL;
+    }
+
   TIMER("Build ghost grids");
   vtkUnstructuredGrid **subGrids =
     this->BuildRequestedGrids(yourPtIds, myGrid, globalToLocalMap);
   TIMERDONE("Build ghost grids");
 
   vtkDistributedDataFilter::FreeIdArrays(yourPtIds, this->NumProcesses);
+
+  if (subGrids == NULL)
+    {
+    return NULL;
+    }
 
   TIMER("Exchange ghost grids");
   vtkUnstructuredGrid *newGhostCellGrid =
@@ -2830,17 +2844,7 @@ vtkUnstructuredGrid **vtkDistributedDataFilter::BuildRequestedGrids(
 
       if (imap == ptIdMap->end())
         {
-        // error - I don't have this point
-        vtkErrorMacro(<< 
-          "vtkDistributedDataFilter::BuildRequestedGrids - invalid request");
-
-        cellList->Delete();
-        for (proc = 0; proc < nprocs; proc++)
-          {
-          if (procCellList[proc]) procCellList[proc]->Delete();
-          }
-        delete [] procCellList;
-        return NULL;
+        continue; // I don't have this point
         }
 
       vtkIdType myPtId = (vtkIdType)imap->second;   // convert to my local point Id
@@ -3181,7 +3185,7 @@ void vtkDistributedDataFilter::FixGhostLevels(vtkUnstructuredGrid *ugrid)
 
   vtkCellArray *cellArray = ugrid->GetCells();
 
-  vtkIntArray *locs = ugrid->GetCellLocationsArray();
+  vtkIdTypeArray *locs = ugrid->GetCellLocationsArray();
   vtkIdTypeArray *cells = cellArray->GetData();
 
   int numLeveledCells = 0;

@@ -48,7 +48,7 @@
 #endif
 
 
-vtkCxxRevisionMacro(vtkIceTClientCompositeManager, "1.7");
+vtkCxxRevisionMacro(vtkIceTClientCompositeManager, "1.7.2.1");
 vtkStandardNewMacro(vtkIceTClientCompositeManager);
 
 vtkCxxSetObjectMacro(vtkIceTClientCompositeManager,IceTManager,vtkIceTRenderManager);
@@ -201,12 +201,6 @@ void vtkIceTClientCompositeManagerStartRender(vtkObject *caller,
 {
   vtkIceTClientCompositeManager *self = (vtkIceTClientCompositeManager *)clientData;
   
-  if (caller != self->GetRenderWindow())
-    { // Sanity check.
-    vtkGenericWarningMacro("Caller mismatch.");
-    return;
-    }
-  
   self->StartRender();
 }
 
@@ -296,12 +290,10 @@ void vtkIceTClientCompositeManager::StartRender()
       }
     ren->GetBackground(renInfo.Background);
     ren->Clear();
-    //controller->Send((char*)(&renInfo),
-    //                 sizeof(struct vtkClientRendererInfo), 1, 
-    //                 vtkCompositeManager::REN_INFO_TAG);
     // Let the socket controller deal with byte swapping.
-    controller->Send((float*)(&renInfo), 22, 1,
-                     vtkCompositeManager::REN_INFO_TAG);
+    controller->Send((double*)(&renInfo), 
+                     sizeof(struct vtkClientRendererInfo)/sizeof(double), 
+                     1, vtkCompositeManager::REN_INFO_TAG);
 //    }
   int i = 0;
   controller->Receive(&i, 1, 1, vtkIceTClientCompositeManager::ACKNOWLEDGE_RMI);
@@ -391,12 +383,9 @@ void vtkIceTClientCompositeManager::SatelliteStartRender()
       {
       cam = ren->GetActiveCamera();
       }
-
-    //controller->Receive((char*)(&renInfo), 
-    //                    sizeof(struct vtkClientRendererInfo), 
-    //                    otherId, vtkCompositeManager::REN_INFO_TAG);
-    controller->Receive((float*)(&renInfo), 22, otherId, 
-                        vtkCompositeManager::REN_INFO_TAG);
+    controller->Receive((double*)(&renInfo), 
+                        sizeof(struct vtkClientRendererInfo)/sizeof(double),
+                        otherId, vtkCompositeManager::REN_INFO_TAG);
     if (ren == NULL)
       {
       vtkErrorMacro("Renderer mismatch.");
@@ -470,11 +459,15 @@ void vtkIceTClientCompositeManager::SetRenderWindow(vtkRenderWindow *renWin)
     // Remove all of the observers.
     if (this->ClientFlag)
       {
-      this->RenderWindow->RemoveObserver(this->StartTag);
-      // Will make do with first renderer. (Assumes renderer does not change.)
+      // Will make do with first renderer. (Assumes renderer does
+      // not change.)
       rens = this->RenderWindow->GetRenderers();
       rens->InitTraversal();
       ren = rens->GetNextItem();
+      if (ren)
+        {
+        ren->RemoveObserver(this->StartTag);
+        }
       }
     // Delete the reference.
     this->RenderWindow->UnRegister(this);
@@ -486,20 +479,24 @@ void vtkIceTClientCompositeManager::SetRenderWindow(vtkRenderWindow *renWin)
     this->RenderWindow = renWin;
     if (this->ClientFlag)
       {
+      // Will make do with first renderer. (Assumes renderer does
+      // not change.)
+      rens = this->RenderWindow->GetRenderers();
+      rens->InitTraversal();
+      ren = rens->GetNextItem();
+
+      if (ren)
+        {
       vtkCallbackCommand *cbc;
       
       cbc= vtkCallbackCommand::New();
       cbc->SetCallback(vtkIceTClientCompositeManagerStartRender);
       cbc->SetClientData((void*)this);
       // renWin will delete the cbc when the observer is removed.
-      this->StartTag = renWin->AddObserver(vtkCommand::StartEvent,cbc);
+        this->StartTag = ren->AddObserver(vtkCommand::StartEvent,cbc);
       cbc->Delete();
+        }
 
-      // Will make do with first renderer. (Assumes renderer does
-      // not change.)
-      rens = this->RenderWindow->GetRenderers();
-      rens->InitTraversal();
-      ren = rens->GetNextItem();
       }
      if (this->Tiled && this->ClientFlag == 0)
       { 

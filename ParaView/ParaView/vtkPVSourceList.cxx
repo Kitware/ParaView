@@ -28,7 +28,7 @@
 #include "vtkString.h"
 
 vtkStandardNewMacro(vtkPVSourceList);
-vtkCxxRevisionMacro(vtkPVSourceList, "1.33");
+vtkCxxRevisionMacro(vtkPVSourceList, "1.33.2.1");
 
 vtkCxxSetObjectMacro(vtkPVSourceList,Sources,vtkPVSourceCollection);
 

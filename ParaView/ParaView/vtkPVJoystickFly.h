@@ -42,7 +42,6 @@ public:
 
   // Description:
   // Set and get the speed of flying.
-  //virtual void SetFlySpeed(double);
   vtkSetClampMacro(FlySpeed, double, 1, 30);  
   vtkGetMacro(FlySpeed, double);  
 

@@ -22,7 +22,7 @@
 #include "vtkRenderWindow.h"
 #include "vtkTransform.h"
 
-vtkCxxRevisionMacro(vtkPVTrackballRoll, "1.5");
+vtkCxxRevisionMacro(vtkPVTrackballRoll, "1.5.2.1");
 vtkStandardNewMacro(vtkPVTrackballRoll);
 
 //-------------------------------------------------------------------------
@@ -36,22 +36,16 @@ vtkPVTrackballRoll::~vtkPVTrackballRoll()
 }
 
 //-------------------------------------------------------------------------
-void vtkPVTrackballRoll::OnButtonDown(int x, int y, vtkRenderer *ren,
+void vtkPVTrackballRoll::OnButtonDown(int, int, vtkRenderer *,
                                       vtkRenderWindowInteractor *)
 {
-  this->LastX = x;
-  this->LastY = y;
-
-  this->ComputeDisplayCenter(ren);
 }
 
 
 //-------------------------------------------------------------------------
-void vtkPVTrackballRoll::OnButtonUp(int x, int y, vtkRenderer *,
+void vtkPVTrackballRoll::OnButtonUp(int, int, vtkRenderer *,
                                     vtkRenderWindowInteractor *)
 {
-  this->LastX = x;
-  this->LastY = y;
 }
 
 //-------------------------------------------------------------------------
@@ -77,10 +71,12 @@ void vtkPVTrackballRoll::OnMouseMove(int x, int y, vtkRenderer *ren,
   
   // compute the angle of rotation
   // - first compute the two vectors (center to mouse)
+  this->ComputeDisplayCenter(ren);
+
   int x1, x2, y1, y2;
-  x1 = this->LastX - (int)this->DisplayCenter[0];
+  x1 = rwi->GetLastEventPosition()[0] - (int)this->DisplayCenter[0];
   x2 = x - (int)this->DisplayCenter[0];
-  y1 = this->LastY - (int)this->DisplayCenter[1];
+  y1 = rwi->GetLastEventPosition()[1] - (int)this->DisplayCenter[1];
   y2 = y - (int)this->DisplayCenter[1];
   
   // - compute cross product (only need z component)
@@ -107,9 +103,6 @@ void vtkPVTrackballRoll::OnMouseMove(int x, int y, vtkRenderer *ren,
   
   rwi->Render();
   transform->Delete();
-
-  this->LastX = x;
-  this->LastY = y;
 }
 
 //-------------------------------------------------------------------------

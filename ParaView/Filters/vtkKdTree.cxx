@@ -39,7 +39,7 @@
 #include <algorithm>
 #include <vtkstd/set>
 
-vtkCxxRevisionMacro(vtkKdTree, "1.15");
+vtkCxxRevisionMacro(vtkKdTree, "1.15.2.1");
 
 // methods for vtkKdNode -------------------------------------------
 
@@ -223,8 +223,8 @@ float
     min = this->Min; max = this->Max;   // region itself
     }
 
-  double *outerBoundaryMin;
-  double *outerBoundaryMax;
+  double *outerBoundaryMin=NULL;
+  double *outerBoundaryMax=NULL;
 
   if (innerBoundaryOnly)
     {
@@ -256,7 +256,7 @@ float
   int withinY = !yless && !ymore;
   int withinZ = !zless && !zmore;
 
-  int mindim;
+  int mindim=0;
 
   if (withinX && withinY && withinZ)  // point is inside the box
     {
@@ -1488,7 +1488,7 @@ int vtkKdTree::ComputeLevel(vtkKdNode *kd)
 }
 int vtkKdTree::SelectCutDirection(vtkKdNode *kd)
 {
-  int dim, i;
+  int dim=0, i;
 
   int xdir = 1 << vtkKdTree::xdim;
   int ydir = 1 << vtkKdTree::ydim;
@@ -2516,7 +2516,7 @@ vtkIdType vtkKdTree::FindClosestPointInRegion(int regionId,
 int vtkKdTree::_FindClosestPointInRegion(int regionId, 
                                      float x, float y, float z, float &dist2)
 {
-  int minId;
+  int minId=0;
 
   float minDistance2 = 4 * this->MaxWidth * this->MaxWidth;
 

@@ -40,7 +40,7 @@
 #include <stdlib.h>
 #include <algorithm>
 
-vtkCxxRevisionMacro(vtkMergeCells, "1.9");
+vtkCxxRevisionMacro(vtkMergeCells, "1.9.2.1");
 vtkStandardNewMacro(vtkMergeCells);
 
 vtkCxxSetObjectMacro(vtkMergeCells, UnstructuredGrid, vtkUnstructuredGrid);
@@ -319,7 +319,7 @@ vtkIdType vtkMergeCells::AddNewCellsUnstructuredGrid(vtkDataSet *set,
       
   vtkCellArray *newCellArray = newUgrid->GetCells();
   vtkIdType *newCells = newCellArray->GetPointer();
-  int *newLocs = newUgrid->GetCellLocationsArray()->GetPointer(0);
+  vtkIdType *newLocs = newUgrid->GetCellLocationsArray()->GetPointer(0);
   unsigned char *newTypes = newUgrid->GetCellTypesArray()->GetPointer(0);
     
   int newNumCells = newUgrid->GetNumberOfCells();
@@ -378,7 +378,7 @@ vtkIdType vtkMergeCells::AddNewCellsUnstructuredGrid(vtkDataSet *set,
   
   vtkCellArray *cellArray = NULL;
   vtkIdType *cells = NULL;
-  int *locs = NULL;
+  vtkIdType *locs = NULL;
   unsigned char *types = NULL;
 
   int numCells = 0;
@@ -417,10 +417,10 @@ vtkIdType vtkMergeCells::AddNewCellsUnstructuredGrid(vtkDataSet *set,
 
   //           LOCATION ARRAY
 
-  vtkIntArray *locationArray = vtkIntArray::New();
+  vtkIdTypeArray *locationArray = vtkIdTypeArray::New();
   locationArray->SetNumberOfValues(totalNumCells);
 
-  int *iptr = locationArray->GetPointer(0);  // new output dataset
+  vtkIdType *iptr = locationArray->GetPointer(0);  // new output dataset
 
   if (!firstSet)
     {

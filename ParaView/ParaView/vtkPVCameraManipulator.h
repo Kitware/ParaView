@@ -90,9 +90,6 @@ protected:
   int Shift;
   int Control;
 
-  int LastX;
-  int LastY;
-
   float Center[3];
   float DisplayCenter[2];
   void ComputeDisplayCenter(vtkRenderer *ren);

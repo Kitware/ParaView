@@ -45,7 +45,7 @@ const int ICET_INFO_SIZE = sizeof(struct IceTInformation)/sizeof(int);
 // vtkIceTRenderManager implementation.
 //******************************************************************
 
-vtkCxxRevisionMacro(vtkIceTRenderManager, "1.7");
+vtkCxxRevisionMacro(vtkIceTRenderManager, "1.7.2.1");
 vtkStandardNewMacro(vtkIceTRenderManager);
 
 vtkCxxSetObjectMacro(vtkIceTRenderManager, SortingKdTree, vtkPKdTree);
@@ -605,18 +605,13 @@ void vtkIceTRenderManager::PreRenderProcessing()
                        viewport[3]*this->ImageReductionFactor);
       }
     }
-
-  this->RenderWindow->SwapBuffersOff();
 }
 
 void vtkIceTRenderManager::PostRenderProcessing()
 {
   vtkDebugMacro("PostRenderProcessing");
 
-  this->RenderWindow->SwapBuffersOn();
   this->Controller->Barrier();
-
-  this->RenderWindow->Frame();
 
   if (this->WriteBackImages)
     {

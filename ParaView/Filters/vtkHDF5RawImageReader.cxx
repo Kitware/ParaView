@@ -35,7 +35,7 @@
 #include <hdf5.h>
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkHDF5RawImageReader, "1.10");
+vtkCxxRevisionMacro(vtkHDF5RawImageReader, "1.10.2.1");
 vtkStandardNewMacro(vtkHDF5RawImageReader);
 
 //----------------------------------------------------------------------------
@@ -51,6 +51,7 @@ public:
 
 class vtkHDF5RawImageReaderDataSetsType: public vtkstd::vector<vtkHDF5RawImageReaderDataSet> {};
 
+extern "C"
 int vtkHDF5RawImageReaderVisit(hid_t, const char*, void* opdata);
 int vtkHDF5RawImageReaderTraverseGroup(vtkHDF5RawImageReader*,
                                        hid_t loc_id, const char*);

@@ -21,7 +21,7 @@
 #include "vtkRenderer.h"
 #include "vtkMath.h"
 
-vtkCxxRevisionMacro(vtkPVTrackballPan, "1.4");
+vtkCxxRevisionMacro(vtkPVTrackballPan, "1.4.2.1");
 vtkStandardNewMacro(vtkPVTrackballPan);
 
 //-------------------------------------------------------------------------
@@ -35,20 +35,16 @@ vtkPVTrackballPan::~vtkPVTrackballPan()
 }
 
 //-------------------------------------------------------------------------
-void vtkPVTrackballPan::OnButtonDown(int x, int y, vtkRenderer *,
+void vtkPVTrackballPan::OnButtonDown(int, int, vtkRenderer *,
                                      vtkRenderWindowInteractor *)
 {
-  this->LastX = x;
-  this->LastY = y;
 }
 
 
 //-------------------------------------------------------------------------
-void vtkPVTrackballPan::OnButtonUp(int x, int y, vtkRenderer *,
+void vtkPVTrackballPan::OnButtonUp(int, int, vtkRenderer *,
                                     vtkRenderWindowInteractor *)
 {
-  this->LastX = x;
-  this->LastY = y;
 }
 
 //-------------------------------------------------------------------------
@@ -62,8 +58,8 @@ void vtkPVTrackballPan::OnMouseMove(int x, int y, vtkRenderer *ren,
 
   // These are different because y is flipped.
   int *size = ren->GetSize();
-  float dx = (float)(x - this->LastX) / (float)(size[1]);
-  float dy = (float)(this->LastY - y) / (float)(size[1]);
+  float dx = (float)(x - rwi->GetLastEventPosition()[0]) / (float)(size[1]);
+  float dy = (float)(rwi->GetLastEventPosition()[1] - y) / (float)(size[1]);
 
   vtkCamera *camera = ren->GetActiveCamera();
   if (camera->GetParallelProjection())
@@ -105,9 +101,6 @@ void vtkPVTrackballPan::OnMouseMove(int x, int y, vtkRenderer *ren,
     }
   ren->ResetCameraClippingRange();
   rwi->Render();
-
-  this->LastX = x;
-  this->LastY = y;
 }
 
 //-------------------------------------------------------------------------

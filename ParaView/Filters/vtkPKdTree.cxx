@@ -67,7 +67,7 @@ static char * makeEntry(const char *s)
 
 // Timing data ---------------------------------------------
 
-vtkCxxRevisionMacro(vtkPKdTree, "1.12.2.1");
+vtkCxxRevisionMacro(vtkPKdTree, "1.12.2.2");
 vtkStandardNewMacro(vtkPKdTree);
 
 const int vtkPKdTree::NoRegionAssignment = 0;   // default
@@ -882,9 +882,9 @@ void vtkPKdTree::_select(int L, int R, int K, int dim)
       I = K - L + 1;
       Z = log(float(N)); 
       S = static_cast<int>(.5 * exp(2*Z/3));
-      SD = static_cast<int>(.5 * sqrt(Z*S*(N-S)/N) * sign(1 - N/2));
-      LL = max(L, K - (I*S/N) + SD);
-      RR = min(R, K + (N-1) * S/N + SD);
+      SD = static_cast<int>(.5 * sqrt(Z*S*((N-S)/N)) * sign(1 - N/2));
+      LL = max(L, K - (I*(S/N)) + SD);
+      RR = min(R, K + (N-1) * (S/N) + SD);
       this->_select(LL, RR, K, dim);
       }
 
@@ -1203,7 +1203,7 @@ int vtkPKdTree::PartitionSubArray(int L, int R, int K, int dim, int p1, int p2)
 
   int need, have, take;
 
-  int FirstRightArrayElementLocation;
+  int FirstRightArrayElementLocation=0;
   int FirstRight = 1;
 
   if ( (myL > this->StartVal[me]) || (myR < this->EndVal[me]))
