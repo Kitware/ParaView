@@ -129,6 +129,10 @@ public:
                            const char* title, 
                            const char* message, int options = 0);
 
+  // Description:
+  // Retrieve the frame where the message is.
+  vtkGetObjectMacro(MessageDialogFrame, vtkKWWidget);
+
 protected:
   vtkKWMessageDialog();
   ~vtkKWMessageDialog();
