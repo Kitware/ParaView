@@ -68,7 +68,7 @@
 #endif
 
 vtkStandardNewMacro(vtkPVAnimationScene);
-vtkCxxRevisionMacro(vtkPVAnimationScene, "1.18");
+vtkCxxRevisionMacro(vtkPVAnimationScene, "1.19");
 #define VTK_PV_PLAYMODE_SEQUENCE_TITLE "Sequence"
 #define VTK_PV_PLAYMODE_REALTIME_TITLE "Real Time"
 
@@ -315,10 +315,12 @@ void vtkPVAnimationScene::Create(vtkKWApplication* app, const char* args)
   this->DurationThumbWheel->ExpandEntryOn();
   this->DurationThumbWheel->SetEntryCommand(this, "DurationChangedCallback");
   this->DurationThumbWheel->SetEndCommand(this, "DurationChangedCallback");
-  this->DurationThumbWheel->SetBalloonHelpString("Adjust the duration for "
-    "the animation (in seconds).");
   this->DurationThumbWheel->GetEntry()->BindCommand(this, 
     "DurationChangedCallback");
+  this->DurationThumbWheel->GetEntry()->SetBind("<KeyRelease>", this->GetTclName(),
+    "DurationChangedKeyReleaseCallback");
+  this->DurationThumbWheel->SetBalloonHelpString("Adjust the duration for "
+    "the animation (in seconds).");
   this->SetDuration(10.0);
   this->Script("grid %s %s -sticky ew",
     this->DurationLabel->GetWidgetName(),
@@ -332,6 +334,8 @@ void vtkPVAnimationScene::Create(vtkKWApplication* app, const char* args)
   this->FrameRateThumbWheel->SetParent(this);
   this->FrameRateThumbWheel->PopupModeOn();
   this->FrameRateThumbWheel->SetResolution(0.01);
+  this->FrameRateThumbWheel->SetMinimumValue(0.0);
+  this->FrameRateThumbWheel->ClampMinimumValueOn();
   this->FrameRateThumbWheel->SetValue(this->AnimationSceneProxy->GetFrameRate());
   this->FrameRateThumbWheel->Create(app, NULL);
   this->FrameRateThumbWheel->DisplayEntryOn();
@@ -342,6 +346,8 @@ void vtkPVAnimationScene::Create(vtkKWApplication* app, const char* args)
   this->FrameRateThumbWheel->SetEndCommand(this, "FrameRateChangedCallback");
   this->FrameRateThumbWheel->GetEntry()->BindCommand(this,
     "FrameRateChangedCallback");
+  this->FrameRateThumbWheel->GetEntry()->SetBind("<KeyRelease>", this->GetTclName(),
+    "FrameRateChangedKeyReleaseCallback");
   this->FrameRateThumbWheel->SetBalloonHelpString("Adjust the frame rate for the "
     "animation.");
   this->Script("grid %s %s -sticky ew",
@@ -687,6 +693,16 @@ void vtkPVAnimationScene::SaveGeometry(double time)
 }
 
 //-----------------------------------------------------------------------------
+void vtkPVAnimationScene::FrameRateChangedKeyReleaseCallback()
+{
+  double fps =  this->FrameRateThumbWheel->GetEntry()->GetValueAsFloat();
+  if (fps > 0)
+    {
+    this->SetFrameRate(fps);
+    }
+}
+
+//-----------------------------------------------------------------------------
 void vtkPVAnimationScene::DurationChangedCallback()
 {
   double duration = this->DurationThumbWheel->GetEntry()->GetValueAsFloat();
@@ -706,11 +722,25 @@ void vtkPVAnimationScene::SaveAnimationCallback()
 }
 
 //-----------------------------------------------------------------------------
+void vtkPVAnimationScene::DurationChangedKeyReleaseCallback()
+{
+  double duration = this->DurationThumbWheel->GetEntry()->GetValueAsFloat();
+  if (duration >= 1.0)
+    {
+    this->SetDuration(duration);
+    }
+}
+
+//-----------------------------------------------------------------------------
 void vtkPVAnimationScene::SetDuration(double duration)
 {
   if (this->GetDuration() == duration)
     {
     return;
+    }
+  if (duration < 1.0)
+    {
+    duration = this->GetDuration();
     }
   double ntime = this->GetNormalizedCurrentTime();
   
@@ -913,6 +943,10 @@ void vtkPVAnimationScene::SetFrameRate(double fps)
   if (this->GetFrameRate() == fps)
     {
     return;
+    }
+  if (fps <= 0 )
+    {
+    fps = this->GetFrameRate();
     }
   this->AnimationSceneProxy->SetFrameRate(fps);
   this->FrameRateThumbWheel->SetValue(fps);

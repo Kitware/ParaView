@@ -53,10 +53,12 @@ public:
   void SetPlayModeToSequence();
   void SetPlayModeToRealTime();
   void DurationChangedCallback();
+  void DurationChangedKeyReleaseCallback();
   void LoopCheckButtonCallback();
   void ToolbarLoopCheckButtonCallback();
   void TimeScaleCallback();
   void FrameRateChangedCallback();
+  void FrameRateChangedKeyReleaseCallback();
   void ToolbarRecordCheckButtonCallback();
   void RecordCheckCallback();
   void SaveAnimationCallback();
