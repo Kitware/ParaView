@@ -484,6 +484,8 @@ int vtkPVApplication::CheckForArgument(int argc, char* argv[],
 const char vtkPVApplication::ArgumentList[vtkPVApplication::NUM_ARGS][128] = 
 { "--start-empty" , "-e", 
   "Start ParaView without any default modules.", 
+  "--disable-registery", "-d", 
+  "Do not use registery when running ParaView (for testing).", 
 #ifdef VTK_MANGLE_MESA
   "--use-software-rendering", "-r", 
   "Use software (Mesa) rendering (supports off-screen rendering).", 
@@ -625,6 +627,14 @@ void vtkPVApplication::Start(int argc, char*argv[])
     delete[] error;
     this->Exit();
     return;
+    }
+
+  if ( vtkPVApplication::CheckForArgument(argc, argv, "--disable-registery",
+                                          index) == VTK_OK ||
+       vtkPVApplication::CheckForArgument(argc, argv, "-d",
+                                          index) == VTK_OK )
+    {
+    this->RegisteryLevel = 0;
     }
 
 #ifdef VTK_MANGLE_MESA
