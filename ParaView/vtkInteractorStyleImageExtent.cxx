@@ -453,9 +453,9 @@ void vtkInteractorStyleImageExtent::OnMiddleButtonUp(int ctrl, int shift,
   //
   this->UpdateInternalState(ctrl, shift, X, Y);
   //
-  if (this->MiddleButtonReleaseMethod) 
+  if (this->HasObserver(vtkCommand::MiddleButtonReleaseEvent)) 
     {
-    (*this->MiddleButtonReleaseMethod)(this->MiddleButtonReleaseMethodArg);
+    this->InvokeEvent(vtkCommand::MiddleButtonReleaseEvent,NULL);
     }
   else 
     {
