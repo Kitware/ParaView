@@ -604,6 +604,11 @@ void vtkPVSource::PreAcceptCallback()
 //----------------------------------------------------------------------------
 void vtkPVSource::AcceptCallback()
 {
+  // I had trouble with this object destructing too early
+  // in this method, because of an unregistered reference ...
+  // It was an error condition (no output was created).
+  this->Register(this);
+
   int dialogAlreadyUp=0;
   // This is here to prevent the user from killing the
   // application from inside the accept callback.
@@ -622,6 +627,11 @@ void vtkPVSource::AcceptCallback()
     {
     this->Application->SetDialogUp(0);
     }
+
+
+  // I had trouble with this object destructing too early
+  // in this method, because of an unregistered reference ...
+  this->UnRegister(this);
 }
 
 //----------------------------------------------------------------------------
