@@ -144,6 +144,7 @@ static const char *vtkKWEventStrings[] = {
   "SplineSurfaceActiveChangedEvent",
   "SplineSurfaceColorChangedEvent",
   "SplineSurfaceLineWidthChangedEvent",
+  "SplineSurfaceNumberOfHandlesChangedEvent",
   "SplineSurfaceOpacityChangedEvent",
   "SplineSurfacePropertyChangedEvent",
   "SplineSurfaceQualityChangedEvent",

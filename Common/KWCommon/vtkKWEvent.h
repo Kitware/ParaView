@@ -154,6 +154,7 @@ class VTK_EXPORT vtkKWEvent
     SplineSurfaceActiveChangedEvent,
     SplineSurfaceColorChangedEvent,
     SplineSurfaceLineWidthChangedEvent,
+    SplineSurfaceNumberOfHandlesChangedEvent,
     SplineSurfaceOpacityChangedEvent,
     SplineSurfacePropertyChangedEvent,
     SplineSurfaceQualityChangedEvent,
