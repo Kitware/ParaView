@@ -72,12 +72,12 @@ $kw(vtkTemp21) SetCameraState -4.208 17.411 -13.986  15.000 15.000 15.000  0.631
 $kw(vtkTemp21) SetCameraState 4.397 21.006 -17.657  15.000 15.000 15.000  0.743 0.658 -0.120
 $kw(vtkTemp1) SetCurrentPVSourceCallback $kw(vtkTemp400)
 set kw(vtkTemp411) [$kw(vtkTemp400) GetPVWidget {Scale Mode}]
-$kw(vtkTemp411) SetCurrentValue {1}
+$kw(vtkTemp411) SetCurrentValue {Vector Magnitude}
 $kw(vtkTemp400) AcceptCallback
 $kw(vtkTemp21) SetCameraState 33.941 -12.690 24.459  15.000 15.000 15.000  0.777 0.598 0.197
-$kw(vtkTemp411) SetCurrentValue {2}
+$kw(vtkTemp411) SetCurrentValue {Scalar}
 $kw(vtkTemp400) AcceptCallback
-$kw(vtkTemp411) SetCurrentValue {3}
+$kw(vtkTemp411) SetCurrentValue {Data Scaling Off}
 $kw(vtkTemp400) AcceptCallback
 $kw(vtkTemp21) SetCameraState -6.310 29.823 38.262  15.000 15.000 15.000  0.267 0.905 -0.332
 $kw(vtkTemp21) SetCameraState 4.621 22.219 26.330  25.931 7.397 3.067  0.267 0.905 -0.332

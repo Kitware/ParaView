@@ -57,7 +57,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVGlyph3D);
-vtkCxxRevisionMacro(vtkPVGlyph3D, "1.73.2.1");
+vtkCxxRevisionMacro(vtkPVGlyph3D, "1.73.2.2");
 
 int vtkPVGlyph3DCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -121,9 +121,11 @@ void vtkPVGlyph3D::CreateProperties()
 
 void vtkPVGlyph3D::InitializePrototype()
 {
-  vtkPVInputMenu *inputMenu;
   vtkPVInputMenu *sourceMenu;
   
+  this->Superclass::InitializePrototype();
+
+  /*
   inputMenu = this->AddInputMenu(
     "Input", "PVInput", "vtkDataSet",
     "Select the input for the filter.",
@@ -131,6 +133,7 @@ void vtkPVGlyph3D::InitializePrototype()
   inputMenu->SetVTKInputName("Input");
   inputMenu->SetModifiedCommand(this->GetTclName(), 
                                 "SetAcceptButtonColorToRed");
+  */
 
   sourceMenu = this->AddInputMenu(
     "Glyph", "GlyphSource", "vtkPolyData",
@@ -156,6 +159,7 @@ void vtkPVGlyph3D::InitializePrototype()
   sl->Delete();
   */
 
+  /*
   vtkPVLabeledToggle *toggle = vtkPVLabeledToggle::New();
   toggle->SetParent(this->ParameterFrame->GetFrame());
   toggle->SetObjectVariable(this->GetVTKSourceTclName(), "Orient");
@@ -176,7 +180,9 @@ void vtkPVGlyph3D::InitializePrototype()
   this->AddPVWidget(am);
   am->Delete();
   am = NULL;
+  */
 
+  /*
   vtkPVSelectionList *sl = vtkPVSelectionList::New();  
   sl->SetParent(this->ParameterFrame->GetFrame());
   sl->SetLabel("Scale Mode");
@@ -190,6 +196,7 @@ void vtkPVGlyph3D::InitializePrototype()
   sl->AddItem("Data Scalaing Off", 3);
   this->AddPVWidget(sl);
   sl->Delete();
+  */
 
   /* Scaling off can be achieved with DataScaling Off and scale factor of 1.
   toggle = vtkPVLabeledToggle::New();
@@ -203,6 +210,7 @@ void vtkPVGlyph3D::InitializePrototype()
   toggle->Delete();
   */
 
+  /*
   vtkPVVectorEntry *entry = vtkPVVectorEntry::New();
   entry->SetParent(this->ParameterFrame->GetFrame());
   entry->SetObjectVariable(this->GetVTKSourceTclName(), "ScaleFactor");
@@ -213,6 +221,7 @@ void vtkPVGlyph3D::InitializePrototype()
   entry->Create(this->Application);
   this->AddPVWidget(entry);
   entry->Delete();
+  */
 }
 
 //----------------------------------------------------------------------------
