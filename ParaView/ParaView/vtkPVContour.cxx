@@ -119,7 +119,7 @@ void vtkPVContour::CreateProperties()
   entry->SetPVSource(this);
   entry->SetParent(this->GetParameterFrame()->GetFrame());
   entry->SetLabel("Contour Values");
-  entry->SetModifiedCommand(this->GetTclName(), "ChangeAcceptButtonColor");
+  entry->SetModifiedCommand(this->GetTclName(), "SetAcceptButtonColorToRed");
   entry->Create(pvApp);
   this->AddPVWidget(entry);
   this->Script("pack %s", entry->GetWidgetName());
@@ -132,7 +132,7 @@ void vtkPVContour::CreateProperties()
   computeNormalsCheck->SetObjectVariable(this->GetVTKSourceTclName(), 
                                          "ComputeNormals");
   computeNormalsCheck->SetModifiedCommand(this->GetTclName(), 
-                                          "ChangeAcceptButtonColor");
+                                          "SetAcceptButtonColorToRed");
   computeNormalsCheck->Create(pvApp, "Select whether to compute normals");
   computeNormalsCheck->SetState(1);
   this->AddPVWidget(computeNormalsCheck);
@@ -143,7 +143,7 @@ void vtkPVContour::CreateProperties()
   computeGradientsCheck->SetObjectVariable(this->GetVTKSourceTclName(), 
                                            "ComputeGradients");
   computeGradientsCheck->SetModifiedCommand(this->GetTclName(), 
-                                            "ChangeAcceptButtonColor");
+                                            "SetAcceptButtonColorToRed");
   computeGradientsCheck->Create(pvApp, "Select whether to compute gradients");
   computeGradientsCheck->SetState(0);
   this->AddPVWidget(computeGradientsCheck);
@@ -154,7 +154,7 @@ void vtkPVContour::CreateProperties()
   computeScalarsCheck->SetObjectVariable(this->GetVTKSourceTclName(), 
                                          "ComputeScalars");
   computeScalarsCheck->SetModifiedCommand(this->GetTclName(), 
-                                          "ChangeAcceptButtonColor");
+                                          "SetAcceptButtonColorToRed");
   computeScalarsCheck->Create(pvApp, "Select whether to compute scalars");
   computeScalarsCheck->SetState(1);
   this->AddPVWidget(computeScalarsCheck);

@@ -50,6 +50,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVData.h"
+#include "vtkPVNavigationWindow.h"
 #include "vtkPVWindow.h"
 
 #ifdef _WIN32
@@ -107,9 +108,9 @@ vtkPVRenderView::vtkPVRenderView()
   
   this->RenderWindow->SetDesiredUpdateRate(1.0);  
 
+  this->NavigationWindow = vtkPVNavigationWindow::New();
   this->NavigationFrame = vtkKWLabeledFrame::New();
-  this->NavigationCanvas = vtkKWWidget::New();
-  
+
   this->CurrentInteractor = NULL;
   this->EventuallyRenderFlag = 0;
   this->RenderPending = NULL;
@@ -135,8 +136,9 @@ vtkPVRenderView::~vtkPVRenderView()
   
   this->NavigationFrame->Delete();
   this->NavigationFrame = NULL;
-  this->NavigationCanvas->Delete();
-  this->NavigationCanvas = NULL;
+
+  this->NavigationWindow->Delete();
+  this->NavigationWindow = NULL;
 
   if (this->CurrentInteractor != NULL)
     {
@@ -231,30 +233,6 @@ void vtkPVRenderView::CreateRenderObjects(vtkPVApplication *pvApp)
   this->RendererTclName = NULL;
   this->SetRendererTclName("Ren1");
   
-  //pvApp->BroadcastScript("vtkLight pvLight0");
-  //pvApp->BroadcastScript("pvLight0 SetPosition 0 0 1000");
-  //pvApp->BroadcastScript("pvLight0 SetFocalPoint 0 0 0");
-  //pvApp->BroadcastScript("pvLight0 SetIntensity 1.0");
-  //pvApp->BroadcastScript("pvLight0 SetLightTypeToHeadlight");
-  //pvApp->BroadcastScript("Ren1 AddLight pvLight0");
-  //pvApp->BroadcastScript("pvLight0 Delete");
-
-  //pvApp->BroadcastScript("vtkLight pvLight1");
-  //pvApp->BroadcastScript("pvLight1 SetPosition 0 0 -1000");
-  //pvApp->BroadcastScript("pvLight1 SetFocalPoint 0 0 0");
-  //pvApp->BroadcastScript("pvLight1 SetIntensity 1.0");
-  //pvApp->BroadcastScript("pvLight1 SetLightTypeToCameraLight");
-  //pvApp->BroadcastScript("Ren1 AddLight pvLight1");
-  //pvApp->BroadcastScript("pvLight1 Delete");
-
-  //pvApp->BroadcastScript("vtkLight pvLight2");
-  //pvApp->BroadcastScript("pvLight2 SetPosition 100 1000 -500");
-  //pvApp->BroadcastScript("pvLight2 SetFocalPoint 0 0 0");
-  //pvApp->BroadcastScript("pvLight2 SetIntensity 0.3");
-  //pvApp->BroadcastScript("pvLight2 SetLightTypeToCameraLight");
-  //pvApp->BroadcastScript("Ren1 AddLight pvLight2");
-  //pvApp->BroadcastScript("pvLight2 Delete");
-
   // Get rid of render window created by the superclass
   this->RenderWindow->Delete();
   this->RenderWindow = (vtkRenderWindow*)pvApp->MakeTclObject("vtkRenderWindow", "RenWin1");
@@ -298,7 +276,6 @@ void vtkPVRenderView::CreateRenderObjects(vtkPVApplication *pvApp)
   this->RenderWindow->SetAbortCheckMethod(PVRenderViewAbortCheck, (void*)this);
 #endif
   
-  // The only call that should not be a broadcast is render.
 }
 
 
@@ -311,21 +288,6 @@ void vtkPVRenderView::PrepareForDelete()
     {
     this->Composite->SetRenderView(NULL);
     }
-
-  //if (this->CornerAnnotation)
-  //  {
-  //  this->CornerAnnotation->SetView(NULL);
-  //  }
-
-
-  //if (this->Frame)
-  //  {
-  //  this->Frame->SetParent(NULL);
-  //  this->Frame->Delete();
-  //  this->Frame = NULL;
-  //  }
-
-  //this->SetParent(NULL);
 }
 
 
@@ -433,25 +395,15 @@ void vtkPVRenderView::Create(vtkKWApplication *app, const char *args)
   this->NavigationFrame->Create(this->Application);
   this->NavigationFrame->SetLabel("Navigation");
   this->Script("pack %s -fill x -expand t -side top", this->NavigationFrame->GetWidgetName());
-  this->NavigationCanvas->SetParent(this->NavigationFrame->GetFrame());
 
-  // 360
-  this->NavigationCanvas->Create(this->Application, "canvas", "-height 45 -width 356 -bg white"); 
-  this->Script("pack %s -fill x -expand t -side top", this->NavigationCanvas->GetWidgetName());
+  this->NavigationWindow->SetParent(this->NavigationFrame->GetFrame());
+  this->NavigationWindow->SetWidth(341);
+  this->NavigationWindow->SetHeight(45);
+  this->NavigationWindow->Create(this->Application, ""); 
+  this->Script("pack %s -fill both -expand t -side top", this->NavigationWindow->GetWidgetName());
   
   this->EventuallyRender();
   delete [] local;
-}
-
-void vtkPVRenderView::CalculateBBox(char* name, int bbox[4])
-{
-  char *result;
-
-  // Get the bounding box for the name. We may need to highlight it.
-  this->Script("%s bbox %s", this->NavigationCanvas->GetWidgetName(), name);
-  result = this->Application->GetMainInterp()->result;
-  sscanf(result, "%d %d %d %d", bbox, bbox+1, bbox+2, bbox+3);
-
 }
 
 void vtkPVRenderView::CreateViewProperties()
@@ -503,216 +455,9 @@ void vtkPVRenderView::CreateViewProperties()
 
 void vtkPVRenderView::UpdateNavigationWindow(vtkPVSource *currentSource)
 {
-  vtkPVSource *source;
-  vtkPVData **inputs = currentSource->GetPVInputs();
-  vtkPVData **outputs;
-  int numInputs, xMid, yMid, y, i;
-  char *result, *tmp;
-  int bboxIn[4], bboxOut[4], bboxSource[4], bboxLine[4];
-  int leftOverlap = 0;
-  vtkPVData *moreOut;
-  static char *font = "-adobe-helvetica-medium-r-normal-*-14-100-100-100-p-76-iso8859-1";  
-  
-  // Clear the canvas
-  this->Script("%s delete all",
-               this->NavigationCanvas->GetWidgetName());
-
-  // Draw the name of the assembly.
-  this->Script(
-    "%s create text %d %d -text {%s} -font %s -anchor w -tags x",
-    this->NavigationCanvas->GetWidgetName(), 130, 10, currentSource->GetName(),
-    font);
-  result = this->Application->GetMainInterp()->result;
-  tmp = new char[strlen(result)+1];
-  strcpy(tmp,result);
-  // Get the bounding box for the name. We may need to highlight it.
-  this->CalculateBBox(tmp, bboxSource);
-  delete [] tmp;
-  tmp = NULL;
-
-  // Put the inputs in the canvas.
-  if (inputs)
+  if (this->NavigationWindow)
     {
-    y = 10;
-    numInputs = currentSource->GetNumberOfPVInputs();
-    for (i = 0; i < numInputs; i++)
-      {
-      if (inputs[i] && (source = inputs[i]->GetPVSource()) )
-        {
-        // Draw the name of the assembly.
-        this->Script(
-          "%s create text %d %d -text {%s} -font %s -anchor w -tags x -fill blue",
-          this->NavigationCanvas->GetWidgetName(), 20, y,
-          source->GetName(), font);
-        
-        result = this->Application->GetMainInterp()->result;
-        tmp = new char[strlen(result)+1];
-        strcpy(tmp,result);
-	this->CalculateBBox(tmp, bboxIn);
-	// Check for overlap
-	if ( bboxIn[2] >= bboxSource[0] )
-	  {
-	  // If there is overlap, delete the input and move it left
-	  this->Script("%s delete %s",this->NavigationCanvas->GetWidgetName(),tmp);
-	  delete [] tmp;
-	  tmp = NULL;
-	  this->Script(
-	   "%s create text %d %d -text {%s} -font %s -anchor w -tags x -fill blue",
-	   this->NavigationCanvas->GetWidgetName(), 
-	   5 + ( bboxSource[0] - bboxIn[2] ), y, source->GetName(), font);
-	  tmp = new char[strlen(result)+1];
-	  strcpy(tmp,result);
-	  this->CalculateBBox(tmp, bboxIn);
-	  leftOverlap = 1;
-	  }
-
-        this->Script("%s bind %s <ButtonPress-1> {%s SetCurrentPVSource %s}",
-                     this->NavigationCanvas->GetWidgetName(), tmp,
-                     this->GetParentWindow()->GetTclName(), source->GetTclName());
-        
-        delete [] tmp;
-        tmp = NULL;
-
-        if (i == 0)
-          {
-          // only want to set xMid and yMid once
-          yMid = (int)(0.5 * (bboxIn[1]+bboxIn[3]));
-          xMid = (int)(0.5 * (bboxIn[2]+120));
-          }
-        
-        // Draw a line from input to source.
-        if (y == 10)
-          {
-          this->Script("%s create line %d %d %d %d -fill gray50 -arrow last",
-                       this->NavigationCanvas->GetWidgetName(), bboxIn[2], yMid,
-                       125, yMid);
-
-	  result = this->Application->GetMainInterp()->result;
-	  tmp = new char[strlen(result)+1];
-	  strcpy(tmp,result);
-	  this->CalculateBBox(tmp, bboxLine);
-
-	  this->Script("%s bind %s <ButtonPress-1> {%s SetCurrentPVSource %s}",
-		       this->NavigationCanvas->GetWidgetName(), tmp,
-		       this->GetParentWindow()->GetTclName(), source->GetTclName());
-	  
-	  delete [] tmp;
-	  tmp = NULL;
-          }
-        else
-          {
-          this->Script("%s create line %d %d %d %d -fill gray50 -arrow none",
-                       this->NavigationCanvas->GetWidgetName(), xMid, yMid,
-                       xMid, yMid+15);
-          yMid += 15;
-          this->Script("%s create line %d %d %d %d -fill gray50 -arrow none",
-                       this->NavigationCanvas->GetWidgetName(), bboxIn[2],
-                       yMid, xMid, yMid);
-          }
-        
-        if (!leftOverlap && source->GetPVInputs())
-          {
-          if (source->GetPVInput()->GetPVSource())
-            {
-            // Draw ellipsis indicating that this source has a source.
-	    // Don't draw if there was overlap between input and source
-            this->Script("%s create line %d %d %d %d",
-                         this->NavigationCanvas->GetWidgetName(), 6, yMid, 8,
-                         yMid);
-            this->Script("%s create line %d %d %d %d",
-                         this->NavigationCanvas->GetWidgetName(), 10, yMid, 12,
-                         yMid);
-            this->Script("%s create line %d %d %d %d",
-                         this->NavigationCanvas->GetWidgetName(), 14, yMid, 16,
-                         yMid);
-            }
-          }
-        }
-      y += 15;
-      }
-    }
-
-  yMid = (int)(0.5 * (bboxSource[1]+bboxSource[3]));
-
-  // Put the outputs in the canvas.
-  outputs = currentSource->GetPVOutputs();
-  if (outputs)
-    {
-    y = 10;
-    if (outputs[0])
-      {
-      for (i = 0; i < outputs[0]->GetNumberOfPVConsumers(); i++)
-	{
-        source = outputs[0]->GetPVConsumer(i);
-        
-        // Draw the name of the assembly.
-        this->Script(
-          "%s create text %d %d -text {%s} -font %s -anchor w -tags x -fill blue",
-          this->NavigationCanvas->GetWidgetName(), 250, y,
-          source->GetName(), font);
-        
-        result = this->Application->GetMainInterp()->result;
-        tmp = new char[strlen(result)+1];
-        strcpy(tmp, result);
-        // Get the bounding box for the name. We may need to highlight it.
-	this->CalculateBBox(tmp, bboxOut);
-	// Check for overlap
-	if ( bboxOut[0] <= (bboxSource[2]+20) )
-	  {
-	  // If there is overlap, delete the output and move it right
-	  this->Script("%s delete %s",this->NavigationCanvas->GetWidgetName(),tmp);
-	  delete [] tmp;
-	  tmp = NULL;
-	  this->Script(
-	   "%s create text %d %d -text {%s} -font %s -anchor w -tags x -fill blue",
-	   this->NavigationCanvas->GetWidgetName(), 
-	   265 - (bboxOut[0]-bboxSource[2]), y, source->GetName(), font);
-	  tmp = new char[strlen(result)+1];
-	  strcpy(tmp,result);
-	  this->CalculateBBox(tmp, bboxOut);
-	  }
-        this->Script("%s bind %s <ButtonPress-1> {%s SetCurrentPVSource %s}",
-                     this->NavigationCanvas->GetWidgetName(), tmp,
-                     this->GetParentWindow()->GetTclName(), source->GetTclName());
-        delete [] tmp;
-        tmp = NULL;
-        
-        // Draw to output.
-        if (y == 10)
-          { // first is a special case (single line).
-          this->Script("%s create line %d %d %d %d -fill gray50 -arrow last",
-                       this->NavigationCanvas->GetWidgetName(), bboxSource[2],
-                       yMid, bboxOut[0], yMid);
-          }
-        else
-          {
-	  xMid = (int)(0.5 * (bboxSource[2] + bboxOut[0]));
-          this->Script("%s create line %d %d %d %d -fill gray50 -arrow none",
-                       this->NavigationCanvas->GetWidgetName(), xMid, yMid,
-                       xMid, yMid+15);
-          yMid += 15;
-          this->Script("%s create line %d %d %d %d -fill gray50 -arrow last",
-                       this->NavigationCanvas->GetWidgetName(), xMid, yMid,
-                       bboxOut[0], yMid);
-          }
-        if ((moreOut = source->GetPVOutput(0)))
-          {
-          if (moreOut->GetNumberOfPVConsumers() > 0)
-            {
-            this->Script("%s create line %d %d %d %d",
-                         this->NavigationCanvas->GetWidgetName(),
-                         bboxOut[2]+10, yMid, bboxOut[2]+12, yMid);
-            this->Script("%s create line %d %d %d %d",
-                         this->NavigationCanvas->GetWidgetName(),
-                         bboxOut[2]+14, yMid, bboxOut[2]+16, yMid);
-            this->Script("%s create line %d %d %d %d",
-                         this->NavigationCanvas->GetWidgetName(),
-                         bboxOut[2]+18, yMid, bboxOut[2]+20, yMid);
-            }
-          }
-        y += 15;
-	}
-      }
+    this->NavigationWindow->Update(currentSource);
     }
 }
 
@@ -1120,7 +865,7 @@ void vtkPVRenderView::TriangleStripsCallback()
     {
     pvd = pvs->GetPVOutput();
     pvApp->BroadcastScript("%s SetUseStrips %d",
-                           pvd->GetMapperTclName(),
+                           pvd->GetGeometryTclName(),
                            this->TriangleStripsCheck->GetState());
     }
 }
@@ -1252,24 +997,5 @@ void vtkPVRenderView::AddActorsToTclScript(ofstream *file)
   *file << this->RenderWindowTclName << " SetSize "
         << windowSize[0] << " " << windowSize[1] << "\n";
 
-  // No longer necessary because the above loop does all props. 
-  //for (i = 0; i < this->GetRenderer()->GetActors2D()->GetNumberOfItems(); i++)
-  //  {
-  //  this->Script("set tempValue [[%s GetActors2D] GetItemAsObject %d]",
-  //               this->RendererTclName, i);
-  //  result = this->Application->GetMainInterp()->result;
-  //  sprintf(tclName, result);
-  //  if (strncmp(result, "vtkTemp", 7) != 0)
-  //    {
-  //    this->Script("set vis [%s GetVisibility]", result);
-  //    result = this->Application->GetMainInterp()->result;
-  //    if (strncmp(result, "1", 1) == 0)
-  //      {
-  //      *file << this->RendererTclName << " AddActor ";
-  //      *file << tclName << "\n";
-  //      }
-  //    }
-  //  }
-  
   *file << "\n";
 }

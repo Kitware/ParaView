@@ -1533,6 +1533,7 @@ void vtkPVWindow::SetCurrentPVSourceCallback(vtkPVSource *pvs)
 
   if (pvs)
     {
+    pvs->SetAcceptButtonColorToWhite();
     if (pvs->InitializeTrace())
       {
       this->GetPVApplication()->AddTraceEntry("$kw(%s) SetCurrentPVSourceCallback $kw(%s)", 
@@ -2203,6 +2204,8 @@ vtkPVSource *vtkPVWindow::ContourCallback()
 
   this->DisableMenus();
   this->DisableFilterButtons();
+  // Isolate events to this window until accept or reset is pressed.
+  this->Script("grab set %s", contour->GetParameterFrame()->GetWidgetName());
 
   // It has not really been deleted.
   return contour;
@@ -2363,6 +2366,8 @@ vtkPVSource *vtkPVWindow::ProbeCallback()
   
   this->DisableMenus();
   this->DisableFilterButtons();
+
+  probe->AcceptCallback();
 
   return probe;
 }

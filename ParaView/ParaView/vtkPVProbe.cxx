@@ -246,7 +246,7 @@ void vtkPVProbe::CreateProperties()
   this->ScalarArrayMenu->SetAttributeType(vtkDataSetAttributes::SCALARS);
   this->ScalarArrayMenu->SetParent(this->ParameterFrame->GetFrame());
   this->ScalarArrayMenu->SetLabel("Scalars");
-  this->ScalarArrayMenu->SetModifiedCommand(this->GetTclName(), "ChangeAcceptButtonColor");
+  this->ScalarArrayMenu->SetModifiedCommand(this->GetTclName(), "SetAcceptButtonColorToRed");
   this->ScalarArrayMenu->Create(this->Application);
   this->ScalarArrayMenu->SetBalloonHelpString("Choose the scalar array to graph.");
   this->AddPVWidget(this->ScalarArrayMenu);
@@ -307,7 +307,7 @@ void vtkPVProbe::CreateProperties()
   this->SelectedXEntry->SetParent(this->SelectedPointFrame);
   this->SelectedXEntry->Create(pvApp);
   this->SelectedXEntry->SetLabel("X:");
-  this->Script("bind %s <KeyPress> {%s ChangeAcceptButtonColor}",
+  this->Script("bind %s <KeyPress> {%s SetAcceptButtonColorToRed}",
                this->SelectedXEntry->GetEntry()->GetWidgetName(), this->GetTclName());
   this->Script("%s configure -width 10",
                this->SelectedXEntry->GetEntry()->GetWidgetName());
@@ -319,7 +319,7 @@ void vtkPVProbe::CreateProperties()
   this->SelectedYEntry->SetParent(this->SelectedPointFrame);
   this->SelectedYEntry->Create(pvApp);
   this->SelectedYEntry->SetLabel("Y:");
-  this->Script("bind %s <KeyPress> {%s ChangeAcceptButtonColor}",
+  this->Script("bind %s <KeyPress> {%s SetAcceptButtonColorToRed}",
                this->SelectedYEntry->GetEntry()->GetWidgetName(), this->GetTclName());
   this->Script("%s configure -width 10",
                this->SelectedYEntry->GetEntry()->GetWidgetName());
@@ -331,7 +331,7 @@ void vtkPVProbe::CreateProperties()
   this->SelectedZEntry->SetParent(this->SelectedPointFrame);
   this->SelectedZEntry->Create(pvApp);
   this->SelectedZEntry->SetLabel("Z:");
-  this->Script("bind %s <KeyPress> {%s ChangeAcceptButtonColor}",
+  this->Script("bind %s <KeyPress> {%s SetAcceptButtonColorToRed}",
                this->SelectedZEntry->GetEntry()->GetWidgetName(), this->GetTclName());
   this->Script("%s configure -width 10",
                this->SelectedZEntry->GetEntry()->GetWidgetName());
@@ -375,7 +375,7 @@ void vtkPVProbe::CreateProperties()
   this->End1XEntry->SetParent(this->EndPoint1Frame);
   this->End1XEntry->Create(pvApp);
   this->End1XEntry->SetLabel("X:");
-  this->Script("bind %s <KeyPress> {%s ChangeAcceptButtonColor}",
+  this->Script("bind %s <KeyPress> {%s SetAcceptButtonColorToRed}",
                this->End1XEntry->GetEntry()->GetWidgetName(), this->GetTclName());
   this->Script("%s configure -width 10",
                this->End1XEntry->GetEntry()->GetWidgetName());
@@ -387,7 +387,7 @@ void vtkPVProbe::CreateProperties()
   this->End1YEntry->SetParent(this->EndPoint1Frame);
   this->End1YEntry->Create(pvApp);
   this->End1YEntry->SetLabel("Y:");
-  this->Script("bind %s <KeyPress> {%s ChangeAcceptButtonColor}",
+  this->Script("bind %s <KeyPress> {%s SetAcceptButtonColorToRed}",
                this->End1YEntry->GetEntry()->GetWidgetName(), this->GetTclName());
   this->Script("%s configure -width 10",
                this->End1YEntry->GetEntry()->GetWidgetName());
@@ -399,7 +399,7 @@ void vtkPVProbe::CreateProperties()
   this->End1ZEntry->SetParent(this->EndPoint1Frame);
   this->End1ZEntry->Create(pvApp);
   this->End1ZEntry->SetLabel("Z:");
-  this->Script("bind %s <KeyPress> {%s ChangeAcceptButtonColor}",
+  this->Script("bind %s <KeyPress> {%s SetAcceptButtonColorToRed}",
                this->End1ZEntry->GetEntry()->GetWidgetName(), this->GetTclName());
   this->Script("%s configure -width 10",
                this->End1ZEntry->GetEntry()->GetWidgetName());
@@ -423,7 +423,7 @@ void vtkPVProbe::CreateProperties()
   this->End2XEntry->SetParent(this->EndPoint2Frame);
   this->End2XEntry->Create(pvApp);
   this->End2XEntry->SetLabel("X:");
-  this->Script("bind %s <KeyPress> {%s ChangeAcceptButtonColor}",
+  this->Script("bind %s <KeyPress> {%s SetAcceptButtonColorToRed}",
                this->End2XEntry->GetEntry()->GetWidgetName(), this->GetTclName());
   this->Script("%s configure -width 10",
                this->End2XEntry->GetEntry()->GetWidgetName());
@@ -435,7 +435,7 @@ void vtkPVProbe::CreateProperties()
   this->End2YEntry->SetParent(this->EndPoint2Frame);
   this->End2YEntry->Create(pvApp);
   this->End2YEntry->SetLabel("Y:");
-  this->Script("bind %s <KeyPress> {%s ChangeAcceptButtonColor}",
+  this->Script("bind %s <KeyPress> {%s SetAcceptButtonColorToRed}",
                this->End2YEntry->GetEntry()->GetWidgetName(), this->GetTclName());
   this->Script("%s configure -width 10",
                this->End2YEntry->GetEntry()->GetWidgetName());
@@ -447,7 +447,7 @@ void vtkPVProbe::CreateProperties()
   this->End2ZEntry->SetParent(this->EndPoint2Frame);
   this->End2ZEntry->Create(pvApp);
   this->End2ZEntry->SetLabel("Z:");
-  this->Script("bind %s <KeyPress> {%s ChangeAcceptButtonColor}",
+  this->Script("bind %s <KeyPress> {%s SetAcceptButtonColorToRed}",
                this->End2ZEntry->GetEntry()->GetWidgetName(), this->GetTclName());
   this->Script("%s configure -width 10",
                this->End2ZEntry->GetEntry()->GetWidgetName());
@@ -466,13 +466,13 @@ void vtkPVProbe::CreateProperties()
   this->DivisionsEntry->Create(pvApp);
   this->DivisionsEntry->SetLabel("Number of Line Divisions:");
   this->DivisionsEntry->SetValue(10);
-  this->Script("bind %s <KeyPress> {%s ChangeAcceptButtonColor}",
+  this->Script("bind %s <KeyPress> {%s SetAcceptButtonColorToRed}",
                this->DivisionsEntry->GetEntry()->GetWidgetName(), this->GetTclName());
   
   this->ShowXYPlotToggle->SetParent(this->ProbeFrame);
   this->ShowXYPlotToggle->Create(pvApp, "-text \"Show XY-Plot\"");
   this->ShowXYPlotToggle->SetState(1);
-  this->Script("%s configure -command {%s ChangeAcceptButtonColor}",
+  this->Script("%s configure -command {%s SetAcceptButtonColorToRed}",
                this->ShowXYPlotToggle->GetWidgetName(), this->GetTclName());
   
   this->Script("grab release %s", this->ParameterFrame->GetWidgetName());
@@ -842,7 +842,7 @@ void vtkPVProbe::UsePoint()
                this->SelectedPointFrame->GetWidgetName(),
                this->PointDataLabel->GetWidgetName());
   this->Script("pack forget %s", this->ScalarArrayMenu->GetWidgetName());
-  this->ChangeAcceptButtonColor();
+  this->SetAcceptButtonColorToRed();
 }
 
 void vtkPVProbe::UseLine()
@@ -872,7 +872,7 @@ void vtkPVProbe::UseLine()
     {
     this->SetCurrentEndPoint(2);
     }
-  this->ChangeAcceptButtonColor();
+  this->SetAcceptButtonColorToRed();
 }
 
 void vtkPVProbe::SetSelectedPoint(float point[3])

@@ -31,6 +31,7 @@ vtkPVInputMenu
 vtkPVLabeledToggle
 vtkPVLODActor
 vtkPVMethodInterface 
+vtkPVNavigationWindow
 vtkPVObjectWidget
 vtkPVPlaneWidget
 vtkPVMinMax

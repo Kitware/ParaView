@@ -139,7 +139,7 @@ void vtkPVThreshold::CreateProperties()
   
   this->MinMaxScale->SetParent(this->GetParameterFrame()->GetFrame());
   this->MinMaxScale->SetObjectVariable(this->GetVTKSourceTclName(), "");
-  this->MinMaxScale->SetModifiedCommand(this->GetTclName(), "ChangeAcceptButtonColor");
+  this->MinMaxScale->SetModifiedCommand(this->GetTclName(), "SetAcceptButtonColorToRed");
   this->MinMaxScale->Create(pvApp, "Lower Threshold", "Upper Threshold",
                             range[0], range[1], (range[1] - range[0]) / 100.0,
                             "ThresholdBetween", "GetLowerThreshold",
@@ -153,7 +153,7 @@ void vtkPVThreshold::CreateProperties()
   this->AllScalarsCheck->SetObjectVariable(this->GetVTKSourceTclName(), 
                                            "AllScalars");
   this->AllScalarsCheck->SetModifiedCommand(this->GetTclName(), 
-                                           "ChangeAcceptButtonColor");
+                                           "SetAcceptButtonColorToRed");
   this->AllScalarsCheck->Create(pvApp, "If AllScalars is checked, then a cell is only included if all its points are within the threshold. This is only relevant for point data.");
   this->AddPVWidget(this->AllScalarsCheck);
   this->AllScalarsCheck->SetState(1);
@@ -230,7 +230,7 @@ void vtkPVThreshold::ChangeAttributeMode(const char* newMode)
   pvApp->AddTraceEntry("$kw(%s) ChangeAttributeMode %s",
                        this->GetTclName(), newMode);
   
-  this->ChangeAcceptButtonColor();
+  this->SetAcceptButtonColorToRed();
   
   if (strcmp(newMode, "point") == 0)
     {

@@ -63,6 +63,7 @@ class vtkPVApplication;
 class vtkKWInteractor;
 class vtkLabeledFrame;
 class vtkPVTreeComposite;
+class vtkPVNavigationWindow;
 class vtkPVWindow;
 
 class VTK_EXPORT vtkPVRenderView : public vtkKWView
@@ -252,6 +253,7 @@ protected:
   
   vtkKWLabeledFrame *NavigationFrame;
   vtkKWWidget       *NavigationCanvas;
+  vtkKWWidget       *NavScrollBar;
 
   vtkKWInteractor *CurrentInteractor;
 
@@ -260,6 +262,8 @@ protected:
   vtkKWCheckButton *ImmediateModeCheck;
   vtkKWCheckButton *InterruptRenderCheck;
   vtkKWCheckButton *UseCharCheck;
+
+  vtkPVNavigationWindow *NavigationWindow;
   
   int EventuallyRenderFlag;
   char* RenderPending;

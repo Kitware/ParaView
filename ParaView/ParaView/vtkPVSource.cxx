@@ -119,7 +119,6 @@ vtkPVSource::vtkPVSource()
   this->ReplaceInput = 1;
 
   this->InputMenu = NULL; 
-
   this->PropertiesParent = NULL;
   this->View = NULL;
 
@@ -566,7 +565,6 @@ void vtkPVSource::SetVisibility(int v)
     }
 }
 
-
 //----------------------------------------------------------------------------
 void vtkPVSource::PreAcceptCallback()
 {
@@ -591,13 +589,7 @@ void vtkPVSource::Accept(int hideFlag)
 
   window = this->GetPVWindow();
 
-#ifdef _WIN32
-  this->Script("%s configure -background SystemButtonFace",
-               this->AcceptButton->GetWidgetName());
-#else
-  this->Script("%s configure -background #d9d9d9",
-               this->AcceptButton->GetWidgetName());
-#endif
+  this->SetAcceptButtonColorToWhite();
   
   // We need to pass the parameters from the UI to the VTK objects before
   // we check whether to insert ExtractPieces.  Otherwise, we'll get errors
@@ -689,6 +681,7 @@ void vtkPVSource::Accept(int hideFlag)
 #else
   this->Script("%s configure -cursor left_ptr", window->GetWidgetName());
 #endif  
+
 }
 
 //----------------------------------------------------------------------------
@@ -704,13 +697,7 @@ void vtkPVSource::ResetCallback()
   this->UpdateParameterWidgets();
   this->Script("update");
 
-#ifdef _WIN32
-  this->Script("%s configure -background SystemButtonFace",
-               this->AcceptButton->GetWidgetName());
-#else
-  this->Script("%s configure -background #d9d9d9",
-               this->AcceptButton->GetWidgetName());
-#endif
+  this->SetAcceptButtonColorToWhite();
 }
 
 //---------------------------------------------------------------------------
@@ -1220,7 +1207,7 @@ vtkPVInputMenu *vtkPVSource::AddInputMenu(char *label, char *inputName, char *in
   inputMenu->SetSources(sources);
   inputMenu->SetParent(this->ParameterFrame->GetFrame());
   inputMenu->SetLabel(label);
-  inputMenu->SetModifiedCommand(this->GetTclName(), "ChangeAcceptButtonColor");
+  inputMenu->SetModifiedCommand(this->GetTclName(), "SetAcceptButtonColorToRed");
   inputMenu->Create(this->Application);
   inputMenu->SetInputName(inputName);
   inputMenu->SetInputType(inputType);
@@ -1315,7 +1302,7 @@ vtkPVArrayMenu *vtkPVSource::AddArrayMenu(const char *label,
 
   arrayMenu->SetParent(this->ParameterFrame->GetFrame());
   arrayMenu->SetLabel(label);
-  arrayMenu->SetModifiedCommand(this->GetTclName(), "ChangeAcceptButtonColor");
+  arrayMenu->SetModifiedCommand(this->GetTclName(), "SetAcceptButtonColorToRed");
   arrayMenu->Create(this->Application);
   arrayMenu->SetBalloonHelpString(help);
 
@@ -1344,7 +1331,7 @@ vtkPVArraySelection *vtkPVSource::AddArraySelection(const char *attributeName,
   pvw->SetTraceName(traceName);
 
   pvw->SetParent(this->ParameterFrame->GetFrame());
-  pvw->SetModifiedCommand(this->GetTclName(), "ChangeAcceptButtonColor");
+  pvw->SetModifiedCommand(this->GetTclName(), "SetAcceptButtonColorToRed");
   pvw->Create(this->Application);
   pvw->SetBalloonHelpString(help);
 
@@ -1363,7 +1350,7 @@ vtkPVLabeledToggle *vtkPVSource::AddLabeledToggle(char *label, char *varName,
 
   toggle->SetParent(this->ParameterFrame->GetFrame());
   toggle->SetObjectVariable(this->GetVTKSourceTclName(), varName);
-  toggle->SetModifiedCommand(this->GetTclName(), "ChangeAcceptButtonColor");
+  toggle->SetModifiedCommand(this->GetTclName(), "SetAcceptButtonColorToRed");
   toggle->SetLabel(label);
   toggle->Create(this->Application, help);
 
@@ -1385,7 +1372,7 @@ vtkPVFileEntry *vtkPVSource::AddFileEntry(char *label, char *varName,
   entry = vtkPVFileEntry::New();
   entry->SetParent(this->ParameterFrame->GetFrame());
   entry->SetObjectVariable(this->GetVTKSourceTclName(), varName);
-  entry->SetModifiedCommand(this->GetTclName(), "ChangeAcceptButtonColor");
+  entry->SetModifiedCommand(this->GetTclName(), "SetAcceptButtonColorToRed");
   entry->Create(this->Application, label, ext, help);
 
   this->Script("pack %s -fill x -expand t", entry->GetWidgetName());
@@ -1406,7 +1393,7 @@ vtkPVStringEntry *vtkPVSource::AddStringEntry(char *label, char *varName,
   entry = vtkPVStringEntry::New();
   entry->SetParent(this->ParameterFrame->GetFrame());
   entry->SetObjectVariable(this->GetVTKSourceTclName(), varName);
-  entry->SetModifiedCommand(this->GetTclName(), "ChangeAcceptButtonColor");
+  entry->SetModifiedCommand(this->GetTclName(), "SetAcceptButtonColorToRed");
   entry->Create(this->Application, label, help);
 
   this->Script("pack %s -fill x -expand t", entry->GetWidgetName());
@@ -1427,7 +1414,7 @@ vtkPVVectorEntry *vtkPVSource::AddLabeledEntry(char *label, char *varName,
   entry = vtkPVVectorEntry::New();
   entry->SetParent(this->ParameterFrame->GetFrame());
   entry->SetObjectVariable(this->GetVTKSourceTclName(), varName);
-  entry->SetModifiedCommand(this->GetTclName(), "ChangeAcceptButtonColor");
+  entry->SetModifiedCommand(this->GetTclName(), "SetAcceptButtonColorToRed");
   entry->Create(this->Application, label, 1, NULL, help);
   this->Script("pack %s -fill x -expand t", entry->GetWidgetName());
 
@@ -1453,7 +1440,7 @@ vtkPVVectorEntry* vtkPVSource::AddVector2Entry(char *label, char *l1, char *l2,
   entry = vtkPVVectorEntry::New();
   entry->SetParent(this->ParameterFrame->GetFrame());
   entry->SetObjectVariable(this->GetVTKSourceTclName(), varName);
-  entry->SetModifiedCommand(this->GetTclName(), "ChangeAcceptButtonColor");
+  entry->SetModifiedCommand(this->GetTclName(), "SetAcceptButtonColorToRed");
   entry->Create(this->Application, label, 2, subLabels, help);
 
   this->Script("pack %s -fill x -expand t", entry->GetWidgetName());
@@ -1486,7 +1473,7 @@ vtkPVVectorEntry* vtkPVSource::AddVector3Entry(char *label, char *l1, char *l2,
   entry = vtkPVVectorEntry::New();
   entry->SetParent(this->ParameterFrame->GetFrame());
   entry->SetObjectVariable(this->GetVTKSourceTclName(), varName);
-  entry->SetModifiedCommand(this->GetTclName(), "ChangeAcceptButtonColor");
+  entry->SetModifiedCommand(this->GetTclName(), "SetAcceptButtonColorToRed");
   entry->Create(this->Application, label, 3, subLabels, help);
 
   this->Script("pack %s -fill x -expand t", entry->GetWidgetName());
@@ -1523,7 +1510,7 @@ vtkPVVectorEntry* vtkPVSource::AddVector4Entry(char *label, char *l1, char *l2,
   entry = vtkPVVectorEntry::New();
   entry->SetParent(this->ParameterFrame->GetFrame());
   entry->SetObjectVariable(this->GetVTKSourceTclName(), varName);
-  entry->SetModifiedCommand(this->GetTclName(), "ChangeAcceptButtonColor");
+  entry->SetModifiedCommand(this->GetTclName(), "SetAcceptButtonColorToRed");
   entry->Create(this->Application, label, 4, subLabels, help);
 
   this->Script("pack %s -fill x -expand t", entry->GetWidgetName());
@@ -1567,7 +1554,7 @@ vtkPVVectorEntry* vtkPVSource::AddVector6Entry(char *label, char *l1, char *l2,
   entry = vtkPVVectorEntry::New();
   entry->SetParent(this->ParameterFrame->GetFrame());
   entry->SetObjectVariable(this->GetVTKSourceTclName(), varName);
-  entry->SetModifiedCommand(this->GetTclName(), "ChangeAcceptButtonColor");
+  entry->SetModifiedCommand(this->GetTclName(), "SetAcceptButtonColorToRed");
   entry->Create(this->Application, label, 6, subLabels, help);
 
   this->Script("pack %s -fill x -expand t", entry->GetWidgetName());
@@ -1593,7 +1580,7 @@ vtkPVScale *vtkPVSource::AddScale(char *label, char *varName,
   scale = vtkPVScale::New();
   scale->SetParent(this->ParameterFrame->GetFrame());
   scale->SetObjectVariable(this->GetVTKSourceTclName(), varName);
-  scale->SetModifiedCommand(this->GetTclName(), "ChangeAcceptButtonColor");
+  scale->SetModifiedCommand(this->GetTclName(), "SetAcceptButtonColorToRed");
   scale->Create(this->Application, label, min, max, resolution, help);
 
   this->Script("pack %s -fill x -expand t", scale->GetWidgetName());
@@ -1613,7 +1600,7 @@ vtkPVSelectionList *vtkPVSource::AddModeList(char *label, char *varName,
   sl->SetParent(this->ParameterFrame->GetFrame());
   sl->SetLabel(label);
   sl->SetObjectVariable(this->GetVTKSourceTclName(), varName);
-  sl->SetModifiedCommand(this->GetTclName(), "ChangeAcceptButtonColor");
+  sl->SetModifiedCommand(this->GetTclName(), "SetAcceptButtonColorToRed");
   sl->Create(this->Application);
 
   if (help)
@@ -1650,10 +1637,21 @@ void vtkPVSource::AddModeListItem(char *name, int value)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVSource::ChangeAcceptButtonColor()
+void vtkPVSource::SetAcceptButtonColorToRed()
 {
   this->Script("%s configure -background red1",
                this->AcceptButton->GetWidgetName());
+}
+
+void vtkPVSource::SetAcceptButtonColorToWhite()
+{
+#ifdef _WIN32
+  this->Script("%s configure -background SystemButtonFace",
+               this->AcceptButton->GetWidgetName());
+#else
+  this->Script("%s configure -background #d9d9d9",
+               this->AcceptButton->GetWidgetName());
+#endif
 }
 
 //----------------------------------------------------------------------------

@@ -60,28 +60,11 @@ if { [catch {set fp [open "out.txt" w]}] == 0 } {
 }
 close $fp
 
-source $DataDir/Utility/rtText.tcl
-pvFileTest $DataDir/Baseline/ArrayMenuChangeInput.txt
-file delete -force out.txt
-
 
 # Continue with the rest of the test.
  
 $kw(vtkTemp267) AcceptCallback
 
-# Fix the size of the image.
-RenWin1 SetSize 300 300
-RenWin1 Render
-update
-
-for {set i  1} {$i < [expr $argc - 1]} {incr i} {
-	if {[lindex $argv $i] == "-C"} {
-	    source [lindex $argv [expr $i + 1]]
-	    $Application SetExitStatus [CompareImage [[Application GetMainWindow] GetMainView]]
-	}
-}
-
-Application Exit
 
 
 

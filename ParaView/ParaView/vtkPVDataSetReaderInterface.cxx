@@ -236,7 +236,7 @@ vtkPVSource *vtkPVDataSetReaderInterface::CreateCallback(const char* name,
   entry = vtkPVDataSetFileEntry::New();
   entry->SetParent(pvs->GetParameterFrame()->GetFrame());
   entry->SetObjectVariable(pvs->GetVTKSourceTclName(), "FileName");
-  entry->SetModifiedCommand(pvs->GetTclName(), "ChangeAcceptButtonColor");
+  entry->SetModifiedCommand(pvs->GetTclName(), "SetAcceptButtonColorToRed");
   entry->Create(this->Application, "File Name", "vtk", "New file must have same type of output.");
   this->Script("pack %s -fill x -expand t", entry->GetWidgetName());
   pvs->AddPVWidget(entry);

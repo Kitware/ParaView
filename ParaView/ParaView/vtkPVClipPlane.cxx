@@ -98,7 +98,7 @@ void vtkPVClipPlane::CreateProperties()
   planeWidget = vtkPVPlaneWidget::New();
   planeWidget->SetParent(this->GetParameterFrame()->GetFrame());
   planeWidget->SetPVSource(this);
-  planeWidget->SetModifiedCommand(this->GetTclName(),"ChangeAcceptButtonColor");
+  planeWidget->SetModifiedCommand(this->GetTclName(),"SetAcceptButtonColorToRed");
   planeWidget->Create(this->Application);
   this->Script("pack %s -side top -fill x", planeWidget->GetWidgetName());
   planeWidget->SetTraceName("Plane");
@@ -125,7 +125,7 @@ void vtkPVClipPlane::CreateProperties()
   offsetEntry->SetParent(this->GetParameterFrame()->GetFrame());
   offsetEntry->SetObjectVariable(this->GetVTKSourceTclName(), "Value");
   offsetEntry->SetModifiedCommand(this->GetTclName(), 
-                                  "ChangeAcceptButtonColor");
+                                  "SetAcceptButtonColorToRed");
   offsetEntry->Create(this->Application, "Offset", 1, NULL, NULL);
   this->AddPVWidget(offsetEntry);
   this->Script("pack %s -side top -fill x", offsetEntry->GetWidgetName());

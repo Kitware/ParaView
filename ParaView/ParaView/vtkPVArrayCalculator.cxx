@@ -254,7 +254,7 @@ void vtkPVArrayCalculator::CreateProperties()
   this->ArrayNameEntry->SetObjectVariable(this->GetVTKSourceTclName(), 
                                           "ResultArrayName");
   this->ArrayNameEntry->SetModifiedCommand(this->GetTclName(), 
-                                            "ChangeAcceptButtonColor");
+                                            "SetAcceptButtonColorToRed");
   this->ArrayNameEntry->Create(pvApp, "Result Array Name:",
                                "Set the name of the array to hold the results of this computation");
   this->AddPVWidget(this->ArrayNameEntry);
@@ -499,7 +499,7 @@ void vtkPVArrayCalculator::UpdateFunction(const char* newSymbol)
 {
   char* newFunction;
   const char* currentFunction = this->FunctionLabel->GetLabel();
-  this->ChangeAcceptButtonColor();
+  this->SetAcceptButtonColorToRed();
   newFunction = new char[strlen(currentFunction)+strlen(newSymbol)+1];
   sprintf(newFunction, "%s%s", currentFunction, newSymbol);
   this->FunctionLabel->SetLabel(newFunction);
@@ -512,7 +512,7 @@ void vtkPVArrayCalculator::ClearFunction()
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
   
-  this->ChangeAcceptButtonColor();
+  this->SetAcceptButtonColorToRed();
   this->FunctionLabel->SetLabel("");
   pvApp->BroadcastScript("%s RemoveAllVariables",
                          this->GetVTKSourceTclName());
@@ -529,7 +529,7 @@ void vtkPVArrayCalculator::ChangeAttributeMode(const char* newMode)
   char menuEntry[256];
   vtkPVApplication *pvApp = this->GetPVApplication();
   
-  this->ChangeAcceptButtonColor();
+  this->SetAcceptButtonColorToRed();
   
   this->ScalarsMenu->GetMenu()->DeleteAllMenuItems();
   this->VectorsMenu->GetMenu()->DeleteAllMenuItems();

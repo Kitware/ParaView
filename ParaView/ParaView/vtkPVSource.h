@@ -254,8 +254,10 @@ public:
   vtkPVSourceInterface *GetInterface() {return this->Interface;}
 
   // Description:
-  // Make the Accept button turn red when one of the parameters has changed.
-  void ChangeAcceptButtonColor();
+  // Make the Accept button turn red/white when one of the parameters 
+  // has changed.
+  void SetAcceptButtonColorToRed();
+  void SetAcceptButtonColorToWhite();
   
   // Description:
   // Needed to clean up properly.

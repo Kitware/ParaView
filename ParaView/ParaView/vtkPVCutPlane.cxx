@@ -98,7 +98,7 @@ void vtkPVCutPlane::CreateProperties()
   planeWidget = vtkPVPlaneWidget::New();
   planeWidget->SetParent(this->GetParameterFrame()->GetFrame());
   planeWidget->SetPVSource(this);
-  planeWidget->SetModifiedCommand(this->GetTclName(), "ChangeAcceptButtonColor");
+  planeWidget->SetModifiedCommand(this->GetTclName(), "SetAcceptButtonColorToRed");
   planeWidget->Create(this->Application);
   this->Script("pack %s -side top -fill x", planeWidget->GetWidgetName());
   planeWidget->SetTraceName("Plane");
@@ -121,7 +121,7 @@ void vtkPVCutPlane::CreateProperties()
   contourEntry->SetPVSource(this);
   contourEntry->SetParent(this->GetParameterFrame()->GetFrame());
   contourEntry->SetLabel("Cut Values");
-  contourEntry->SetModifiedCommand(this->GetTclName(), "ChangeAcceptButtonColor");
+  contourEntry->SetModifiedCommand(this->GetTclName(), "SetAcceptButtonColorToRed");
   contourEntry->Create(this->Application);
   this->AddPVWidget(contourEntry);
   this->Script("pack %s", contourEntry->GetWidgetName());
@@ -133,7 +133,7 @@ void vtkPVCutPlane::CreateProperties()
   //this->OffsetEntry->SetObjectVariable(this->GetVTKSourceTclName(), 
   //                                     "Value");
   //this->OffsetEntry->SetModifiedCommand(this->GetTclName(), 
-  //                                      "ChangeAcceptButtonColor");
+  //                                      "SetAcceptButtonColorToRed");
   //this->OffsetEntry->Create(this->Application, "Offset", 1, NULL, NULL);
   //this->AddPVWidget(this->OffsetEntry);
   //this->Script("pack %s -side top -fill x",
