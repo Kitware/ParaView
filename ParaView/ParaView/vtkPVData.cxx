@@ -96,7 +96,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.194");
+vtkCxxRevisionMacro(vtkPVData, "1.195");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -2452,7 +2452,113 @@ void vtkPVData::SaveInBatchScript(ofstream *file)
 //----------------------------------------------------------------------------
 void vtkPVData::SaveState(ofstream *file)
 {
-  // ............. fill in later .........
+  float *pf;
+  float f1, f2, f3;
+  int   i1;
+
+  *file << "set kw(" << this->GetTclName() << ") [$kw(" 
+        << this->PVSource->GetTclName() << ") GetPVOutput]\n";
+
+  pf = this->ColorButton->GetColor();
+  if (pf[0] != 1.0 || pf[1] != 1.0 || pf[2] != 1.0)
+    {
+    *file << "$kw(" << this->GetTclName() << ") ChangeActorColor " << pf[0]
+          << " " << pf[1] << " " << pf[2] << endl;
+    }
+
+  if (strcmp (this->ColorMenu->GetValue(),"Property") != 0)
+    {
+    const char* name = this->PVColorMap->GetArrayName();
+    int comps = this->PVColorMap->GetNumberOfVectorComponents();
+    if (strncmp (this->ColorMenu->GetValue(),"Point",5) == 0)
+      {
+      *file << "$kw(" << this->GetTclName() << ") ColorByPointField {" 
+            << name << "} " << comps << endl;
+      }
+    if (strncmp (this->ColorMenu->GetValue(),"Cell",4) == 0)
+      {
+      *file << "$kw(" << this->GetTclName() << ") ColorByCellField {" 
+            << name << "} " << comps << endl;
+      }
+    }
+
+
+  if (strcmp(this->RepresentationMenu->GetValue(),"Wireframe") == 0)
+    {
+    *file << "$kw(" << this->GetTclName() << ") DrawWireframe\n";
+    }
+  if (strcmp(this->RepresentationMenu->GetValue(),"Points") == 0)
+    {
+    *file << "$kw(" << this->GetTclName() << ") DrawPoints\n";
+    }
+
+  if (strcmp(this->InterpolationMenu->GetValue(),"Flat") == 0)
+    {
+    *file << "$kw(" << this->GetTclName() << ") SetInterpolationToFlat\n";
+    }
+
+
+  if (this->CubeAxesCheck->GetState())
+    {
+    *file << "$kw(" << this->GetTclName() << ") SetCubeAxesVisibility 1\n";
+    }
+
+  i1 = this->PointSizeThumbWheel->GetValue();
+  if (i1 != 1)
+    {
+    *file << "$kw(" << this->GetTclName() << ") SetPointSize " << i1 << endl;
+    }
+    
+  i1 = this->LineWidthThumbWheel->GetValue();
+  if (i1 != 1)
+    {
+    *file << "$kw(" << this->GetTclName() << ") SetLineWidth " << i1 << endl;
+    }
+ 
+
+  f1 = this->OpacityScale->GetValue();
+  if (f1 != 1.0)
+    {
+    *file << "$kw(" << this->GetTclName() << ") SetOpacity " << f1 << endl;
+    }
+
+  f1 = this->TranslateThumbWheel[0]->GetValue();
+  f2 = this->TranslateThumbWheel[1]->GetValue();
+  f3 = this->TranslateThumbWheel[2]->GetValue();
+  if (f1 != 0.0 || f2 != 0.0 || f3 != 0.0)
+    {
+    *file << "$kw(" << this->GetTclName() << ") SetActorTranslate "
+          << f1 << " " << f2 << " " << f3 << endl;
+    }
+
+  f1 = this->ScaleThumbWheel[0]->GetValue();
+  f2 = this->ScaleThumbWheel[1]->GetValue();
+  f3 = this->ScaleThumbWheel[2]->GetValue();
+  if (f1 != 1.0 || f2 != 1.0 || f3 != 1.0)
+    {
+    *file << "$kw(" << this->GetTclName() << ") SetActorScale " 
+          << f1 << " " << f2 << " " << f3 << endl;
+    }
+
+  f1 = this->OrientationScale[0]->GetValue();
+  f2 = this->OrientationScale[1]->GetValue();
+  f3 = this->OrientationScale[2]->GetValue();
+  if (f1 != 0.0 || f2 != 0.0 || f3 != 0.0)
+    {
+    *file << "$kw(" << this->GetTclName() << ") SetActorOrientation "
+          << f1 << " " << f2 << " " << f3 << endl;
+    }
+
+
+  f1 = this->OriginThumbWheel[0]->GetValue();
+  f2 = this->OriginThumbWheel[1]->GetValue();
+  f3 = this->OriginThumbWheel[2]->GetValue();
+  if (f1 != 0.0 || f2 != 0.0 || f3 != 0.0)
+    {
+    *file << "$kw(" << this->GetTclName() << ") SetActorOrigin "
+          << f1 << " " << f2 << " " << f3 << endl;
+    }
+
 }
 
 //----------------------------------------------------------------------------
@@ -2935,7 +3041,7 @@ void vtkPVData::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVData ";
-  this->ExtractRevision(os,"$Revision: 1.194 $");
+  this->ExtractRevision(os,"$Revision: 1.195 $");
 }
 
 //----------------------------------------------------------------------------
