@@ -128,7 +128,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.395");
+vtkCxxRevisionMacro(vtkPVWindow, "1.396");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -1048,9 +1048,12 @@ void vtkPVWindow::Create(vtkKWApplication *app, char* vtkNotUsed(args))
   
   this->GenericInteractor->SetPVRenderView(this->MainView);
   this->ChangeInteractorStyle(1);
-  int *windowSize = this->MainView->GetRenderWindowSize();
 
   // Configure the window, i.e. setup the interactors
+  // We need this update or the window size will be invalid.
+  // This fixes the small initial window bug.
+  this->Script("update");
+  int *windowSize = this->MainView->GetRenderWindowSize();
   this->Configure(windowSize[0], windowSize[1]);
  
   // set up bindings for the interactor  
@@ -3908,7 +3911,7 @@ void vtkPVWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVWindow ";
-  this->ExtractRevision(os,"$Revision: 1.395 $");
+  this->ExtractRevision(os,"$Revision: 1.396 $");
 }
 
 //----------------------------------------------------------------------------
