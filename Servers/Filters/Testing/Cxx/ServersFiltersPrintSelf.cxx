@@ -62,7 +62,6 @@
 #include "vtkPVServerArraySelection.h"
 #include "vtkPVServerFileListing.h"
 #include "vtkPVServerObject.h"
-#include "vtkPVServerProbe.h"
 #include "vtkPVServerSelectTimeSet.h"
 #include "vtkPVServerXDMFParameters.h"
 #include "vtkPVSummaryHelper.h"
@@ -158,7 +157,6 @@ int main(int , char *[])
   c = vtkPVServerArraySelection::New(); c->Print(cout); c->Delete();
   c = vtkPVServerFileListing::New(); c->Print(cout); c->Delete();
   c = vtkPVServerObject::New(); c->Print(cout); c->Delete();
-  c = vtkPVServerProbe::New(); c->Print(cout); c->Delete();
   c = vtkPVServerSelectTimeSet::New(); c->Print(cout); c->Delete();
   c = vtkPVServerXDMFParameters::New(); c->Print(cout); c->Delete();
   c = vtkPVSummaryHelper::New(); c->Print(cout); c->Delete();
