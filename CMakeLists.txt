@@ -127,16 +127,30 @@ SET(VTKEXPAT_INCLUDE_DIR
 
 #########################################################################
 # Configure HDF5
-SET(PARAVIEW_HDF5_LIBRARIES vtkhdf5)
-SET(VTK_ZLIB_LIBRARIES vtkzlib)
-SET(VTK_ZLIB_INCLUDE_DIRS
-  ${ParaView_SOURCE_DIR}/VTK/Utilities/zlib
-  ${ParaView_BINARY_DIR}/VTK/Utilities/zlib)
-SET(HDF5_INCLUDE_DIR 
-  ${ParaView_SOURCE_DIR}/Utilities/hdf5
-  ${ParaView_BINARY_DIR}/Utilities/hdf5)
+OPTION(PARAVIEW_USE_SYSTEM_HDF5 "Use system installed HDF5. Has to be version 1.6 or higher" OFF)
+IF(PARAVIEW_USE_SYSTEM_HDF5)
 
-SUBDIRS(Utilities/hdf5)
+  INCLUDE(${ParaView_SOURCE_DIR}/CMake/FindHDF5.cmake)
+  INCLUDE(${ParaView_SOURCE_DIR}/CMake/FindZLIB.cmake)
+  SET(VTK_USE_SYSTEM_ZLIB 1)
+  SET(PARAVIEW_HDF5_LIBRARIES ${HDF5_LIBRARIES})
+  SET(VTK_ZLIB_LIBRARIES ${ZLIB_LIBRARIES})
+  SET(VTK_ZLIB_INCLUDE_DIRS ${ZLIB_INCLUDE_DIR})
+
+ELSE(PARAVIEW_USE_SYSTEM_HDF5)
+
+  SET(PARAVIEW_HDF5_LIBRARIES vtkhdf5)
+  SET(VTK_ZLIB_LIBRARIES vtkzlib)
+  SET(VTK_ZLIB_INCLUDE_DIRS
+    ${ParaView_SOURCE_DIR}/VTK/Utilities/zlib
+    ${ParaView_BINARY_DIR}/VTK/Utilities/zlib)
+  SET(HDF5_INCLUDE_DIR 
+    ${ParaView_SOURCE_DIR}/Utilities/hdf5
+    ${ParaView_BINARY_DIR}/Utilities/hdf5)
+
+  SUBDIRS(Utilities/hdf5)
+
+ENDIF(PARAVIEW_USE_SYSTEM_HDF5)
 
 #########################################################################
 # Configure Xdmf
