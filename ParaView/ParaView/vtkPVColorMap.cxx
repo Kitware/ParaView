@@ -70,7 +70,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVColorMap);
-vtkCxxRevisionMacro(vtkPVColorMap, "1.24.2.12");
+vtkCxxRevisionMacro(vtkPVColorMap, "1.24.2.13");
 
 int vtkPVColorMapCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -1184,49 +1184,62 @@ void vtkPVColorMap::SaveInTclScript(ofstream *file, int interactiveFlag,
     {
     char scalarBarTclName[128];
     sprintf(scalarBarTclName, "ScalarBar%d", this->InstanceCount);
+    ostrstream actor;
+
     if (interactiveFlag && vtkFlag)
       {
       *file << "vtkScalarBarWidget " << scalarBarTclName << "\n";
       *file << "\t" << scalarBarTclName << " SetInteractor iren" << "\n";
-      *file << "\t[" << scalarBarTclName << " GetScalarBarActor] SetLookupTable " 
-            << this->LookupTableTclName << "\n";
-      if (this->ScalarBar->GetScalarBarActor()->GetOrientation() == VTK_ORIENT_HORIZONTAL)
-        {
-        *file << "\t[" << scalarBarTclName << " GetScalarBarActor] SetOrientationToHorizontal" 
-              << endl; 
-        }
-      *file << "\t[" << scalarBarTclName << " GetScalarBarActor] SetWidth " 
-            << this->ScalarBar->GetScalarBarActor()->GetWidth() << "\n";
-      *file << "\t[" << scalarBarTclName << " GetScalarBarActor] SetHeight " 
-            << this->ScalarBar->GetScalarBarActor()->GetHeight() << "\n";
-      const float *pos = this->ScalarBar->GetScalarBarActor()->GetPositionCoordinate()->GetValue(); 
-      *file << "\t[[" << scalarBarTclName << " GetScalarBarActor] GetPositionCoordinate] SetValue " 
-            << pos[0] << " " << pos[1] << "\n";
-      *file << "\t[" << scalarBarTclName << " GetScalarBarActor] SetTitle {" 
-            << this->ScalarBar->GetScalarBarActor()->GetTitle() << "}\n";
-      *file << "\t" << scalarBarTclName << " EnabledOn\n";
+      actor << "[" << scalarBarTclName << " GetScalarBarActor]" << ends;
       }
-    else  
+    else
       {
       *file << "vtkScalarBarActor " << scalarBarTclName << "\n";
-      *file << "\t" << scalarBarTclName << " SetLookupTable " 
-            << this->LookupTableTclName << "\n";
-      if (this->ScalarBar->GetScalarBarActor()->GetOrientation() == VTK_ORIENT_HORIZONTAL)
-        {
-        *file << "\t" << scalarBarTclName << " SetOrientationToHorizontal" 
-              << endl; 
-        }
-      *file << "\t" << scalarBarTclName << " SetWidth " 
-            << this->ScalarBar->GetScalarBarActor()->GetWidth() << "\n";
-      *file << "\t" << scalarBarTclName << " SetHeight " 
-            << this->ScalarBar->GetScalarBarActor()->GetHeight() << "\n";
-      const float *pos = this->ScalarBar->GetScalarBarActor()->GetPositionCoordinate()->GetValue(); 
-      *file << "\t[" << scalarBarTclName << " GetPositionCoordinate] SetValue " 
-            << pos[0] << " " << pos[1] << "\n";
-      *file << "\t" << scalarBarTclName << " SetTitle {" 
-            << this->ScalarBar->GetScalarBarActor()->GetTitle() << "}\n";
+      actor << scalarBarTclName << ends;
+      }
+
+    *file << "\t" << actor.str() << " SetLookupTable " 
+          << this->LookupTableTclName << "\n";
+
+    *file << "\t" << actor.str() << " SetOrientation "
+          << this->ScalarBar->GetScalarBarActor()->GetOrientation() << "\n";
+
+    *file << "\t" << actor.str() << " SetWidth " 
+          << this->ScalarBar->GetScalarBarActor()->GetWidth() << "\n";
+
+    *file << "\t" << actor.str() << " SetHeight " 
+          << this->ScalarBar->GetScalarBarActor()->GetHeight() << "\n";
+
+    const float *pos = 
+     this->ScalarBar->GetScalarBarActor()->GetPositionCoordinate()->GetValue();
+    *file << "\t[" << actor.str() << " GetPositionCoordinate] SetValue " 
+          << pos[0] << " " << pos[1] << "\n";
+
+    *file << "\t" << actor.str() << " SetTitle {" 
+          << this->ScalarBar->GetScalarBarActor()->GetTitle() << "}\n";
+
+    *file << "\t" << actor.str() << " SetLabelFormat {" 
+          << this->ScalarBar->GetScalarBarActor()->GetLabelFormat() << "}\n";
+
+    ostrstream ttprop, tlprop;
+    ttprop << "[" << actor.str() << " GetTitleTextProperty]" << ends;
+    this->TitleTextProperty->SaveInTclScript(file, ttprop.str());
+    ttprop.rdbuf()->freeze(0);
+
+    tlprop << "[" << actor.str() << " GetLabelTextProperty]" << ends;
+    this->LabelTextProperty->SaveInTclScript(file, tlprop.str());
+    tlprop.rdbuf()->freeze(0);
+
+    if (interactiveFlag && vtkFlag)
+      {
+      *file << "\t" << scalarBarTclName << " EnabledOn\n";
+      }
+    else
+      {
       *file << "Ren1 AddActor " << scalarBarTclName << endl;
       }
+
+    actor.rdbuf()->freeze(0);
     }
 }
 
