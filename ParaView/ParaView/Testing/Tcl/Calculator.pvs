@@ -1,3 +1,5 @@
+Application ExitOnReturnOn
+
 if {[info exists argc]} { 
     set argcm1 [expr $argc - 1]
     for {set i 0} {$i < $argcm1} {incr i} {
@@ -20,6 +22,17 @@ $pv(vtkTemp156) SetFunctionLabel {mag(displacement6)*thickness6}
 set pv(vtkTemp168) [$pv(vtkTemp156) GetPVWidget {Result Array Name:}]
 $pv(vtkTemp168) SetValue {outputArray}
 $pv(vtkTemp156) AcceptCallback
+
+# Retrace
+update
+Application StopRecordingScript
+[ Application GetMainWindow ] DeleteAllSources
+# Source the trace to regenerate the sources.
+if {[catch {set channel [open test.tmp w]}] == 0 } {
+   close $channel
+   file delete -force test.tmp
+   source "ParaViewTrace.pvs"
+}
 
 # Fix the size of the image.
 RenWin1 SetSize 300 300

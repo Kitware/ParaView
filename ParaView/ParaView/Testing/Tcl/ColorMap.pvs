@@ -74,22 +74,14 @@ $kw(vtkTemp67) CurrentTimeCallback
 $kw(vtkTemp16) ResetCameraClippingRange
 update
 
-# OK, turn off the trace so that the file we source is not open.
-
+# Retrace
+update
 Application StopRecordingScript
-
-# Delete all the sources
-
-foreach source { $kw(vtkTemp300) $kw(vtkTemp260) $kw(vtkTemp224) } {
-	eval $kw(vtkTemp1) SetCurrentPVSource $source
-	eval $source DeleteCallback
-}
-
+[ Application GetMainWindow ] DeleteAllSources
 # Source the trace to regenerate the sources.
 if {[catch {set channel [open test.tmp w]}] == 0 } {
    close $channel
    file delete -force test.tmp
-
    source "ParaViewTrace.pvs"
 }
 
