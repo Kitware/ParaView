@@ -116,6 +116,7 @@ void vtkKWLabeledFrame::Create(vtkKWApplication *app)
   this->Frame->Create(app,"frame","-borderwidth 0 -relief flat");
   this->Icon->Create(app,"");
   this->Icon->SetImageData(this->IconData);
+  this->Icon->SetBalloonHelpString("Shrink or expand the frame");
   
   this->Script("pack %s -fill x -side top", this->Border->GetWidgetName());
   this->Script("pack %s -fill x -side top", this->Groove->GetWidgetName());

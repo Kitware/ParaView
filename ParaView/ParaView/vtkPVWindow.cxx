@@ -421,6 +421,8 @@ void vtkPVWindow::Create(vtkKWApplication *app, char* vtkNotUsed(args))
     return;
     }
 
+  pvApp->SetBalloonHelpDelay(1);
+
   // invoke super method first
   // Make sure the widget is name appropriately: paraview instead of a number
   // On X11, the window name is the same as the widget name.
