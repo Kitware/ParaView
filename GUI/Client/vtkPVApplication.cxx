@@ -112,7 +112,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.303");
+vtkCxxRevisionMacro(vtkPVApplication, "1.304");
 vtkCxxSetObjectMacro(vtkPVApplication, RenderModule, vtkPVRenderModule);
 
 
@@ -683,6 +683,8 @@ const char vtkPVApplication::ArgumentList[vtkPVApplication::NUM_ARGS][128] =
   "Run the ParaView demo.",
   "--disable-composite", "-dc",
   "Use this option when redering resources are not available on the server.",
+  "--connect_id", "",
+  "",
   "--help", "",
   "Displays available command line arguments.",
   "" 

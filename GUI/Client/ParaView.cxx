@@ -205,6 +205,31 @@ int MyMain(int argc, char *argv[])
   if (app->GetClientMode() || serverMode || renderServerMode) 
     {
     vtkPVClientServerModule *processModule = vtkPVClientServerModule::New();
+
+    int idx;
+    for (idx = 0; idx < argc; ++idx)
+      {
+      const char* arg = "--connect_id";
+      if (strncmp(argv[idx], arg, strlen(arg)) == 0)
+        {
+        // Strip string to equals sign.
+        const char* newarg=0;
+        int len = (int)(strlen(argv[idx]));
+        for (int i=0; i<len; i++)
+          {
+          if (argv[idx][i] == '=')
+            {
+            newarg = &(argv[idx][i+1]);
+            }
+          }
+        if (newarg)
+          {
+          processModule->SetConnectID(atoi(newarg));
+          break;
+          }
+        }
+      }
+
     pm = processModule;
     }
   else

@@ -129,7 +129,18 @@ public:
   // cannot be deleted until paraview exits.  The var should have the form:
   // "DISPLAY=amber1"
   virtual void SetProcessEnvironmentVariable(int processId, const char* var);
-  
+
+  // Description:
+  // ConnectID is used as a very simple security check. It is usually
+  // specified on the command line of the server and the client.
+  // The server will exit unless the ids match.
+  vtkSetMacro(ConnectID, int);
+  vtkGetMacro(ConnectID, int);
+
+  // Description:  
+  // Internal use. Made public to allow callbacks access.
+  vtkGetMacro(Enabled, int);
+
 protected:
   vtkPVClientServerModule();
   ~vtkPVClientServerModule();
@@ -201,6 +212,9 @@ protected:
   vtkClientServerStream* LastServerResultStream;
   
   vtkKWRemoteExecute* RemoteExecution;
+
+  int Enabled;
+  int ConnectID;
 private:  
   vtkPVClientServerModule(const vtkPVClientServerModule&); // Not implemented
   void operator=(const vtkPVClientServerModule&); // Not implemented

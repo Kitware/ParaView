@@ -99,13 +99,20 @@ void vtkPVClientServerSocketRMI(void *localArg, void *remoteArg,
                                 int remoteProcessId)
 {
   vtkPVClientServerModule *self = (vtkPVClientServerModule *)(localArg);
-  vtkMultiProcessController* controler = self->GetController();
-  for(int i = 1; i < controler->GetNumberOfProcesses(); ++i)
+  // Do not execute the RMI if Enabled flag is set to false. This
+  // flag is set at start up if the client does not have the right
+  // credentials
+  if (self->GetEnabled())
     {
-    controler->TriggerRMI(
-      i, remoteArg, remoteArgLength, VTK_PV_SLAVE_CLIENTSERVER_RMI_TAG);
+    vtkMultiProcessController* controler = self->GetController();
+    for(int i = 1; i < controler->GetNumberOfProcesses(); ++i)
+      {
+      controler->TriggerRMI(
+        i, remoteArg, remoteArgLength, VTK_PV_SLAVE_CLIENTSERVER_RMI_TAG);
+      }
+    vtkPVClientServerMPIRMI(
+      localArg, remoteArg, remoteArgLength, remoteProcessId);
     }
-  vtkPVClientServerMPIRMI(localArg, remoteArg, remoteArgLength, remoteProcessId);
 }
 
 
@@ -115,7 +122,15 @@ void vtkPVClientServerRootRMI(void *localArg, void *remoteArg,
                               int remoteArgLength,
                               int remoteProcessId)
 {
-  vtkPVClientServerMPIRMI(localArg, remoteArg, remoteArgLength, remoteProcessId);
+  vtkPVClientServerModule *self = (vtkPVClientServerModule *)(localArg);
+  // Do not execute the RMI if Enabled flag is set to false. This
+  // flag is set at start up if the client does not have the right
+  // credentials
+  if (self->GetEnabled())
+    {
+    vtkPVClientServerMPIRMI(
+      localArg, remoteArg, remoteArgLength, remoteProcessId);
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -132,7 +147,7 @@ void vtkPVSendStreamToClientServerNodeRMI(void *localArg, void *remoteArg,
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVClientServerModule);
-vtkCxxRevisionMacro(vtkPVClientServerModule, "1.9");
+vtkCxxRevisionMacro(vtkPVClientServerModule, "1.10");
 
 
 //----------------------------------------------------------------------------
@@ -155,6 +170,9 @@ vtkPVClientServerModule::vtkPVClientServerModule()
   this->NumberOfProcesses = 2;
   this->GatherRenderServer = 0;
   this->RemoteExecution = vtkKWRemoteExecute::New();
+
+  this->Enabled = 1;
+  this->ConnectID = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -242,6 +260,12 @@ void vtkPVClientServerModule::Initialize()
       return;
       }
   
+    // The client sends the connect id to data server
+    this->SocketController->Send(&this->ConnectID, 1, 1, 8843);
+    int dsmatch = 1, rsmatch = 1;
+    // Check if it matched
+    this->SocketController->Receive(&dsmatch, 1, 1, 8843);
+
     // Receive as the hand shake the number of processes available.
     int numServerProcs = 0;
     this->SocketController->Receive(&numServerProcs, 1, 1, 8843);
@@ -249,33 +273,57 @@ void vtkPVClientServerModule::Initialize()
    
     if(this->RenderServerMode)
       { 
+      // The client sends the connect id to data server
+      this->RenderServerSocket->Send(&this->ConnectID, 1, 1, 8843);
+      // Check if it matched
+      this->RenderServerSocket->Receive(&rsmatch, 1, 1, 8843);
       this->RenderServerSocket->Receive(&numServerProcs, 1, 1, 8843);
       this->NumberOfRenderServerProcesses = numServerProcs;
       }
 
-    // attempt to initialize render server connection to data server
-    this->InitializeRenderServer();
-    // Juggle the compositing flag to let server in on the decision
-    // whether to allow compositing / rendering on the server.
-    // This might better be handled in the render module initialize method.
-    // Find out if the server supports compositing.
-    vtkPVServerInformation* serverInfo = vtkPVServerInformation::New();
-    this->GatherInformation(serverInfo, this->GetProcessModuleID());
-    this->ServerInformation->AddInformation(serverInfo);
-    serverInfo->Delete();
-    serverInfo = NULL;
+    // Continue only if both ids match. Otherwise, the servers
+    // will exit anyway.
+    if (dsmatch && rsmatch)
+      {
+      // attempt to initialize render server connection to data server
+      this->InitializeRenderServer();
+      // Juggle the compositing flag to let server in on the decision
+      // whether to allow compositing / rendering on the server.
+      // This might better be handled in the render module initialize method.
+      // Find out if the server supports compositing.
+      vtkPVServerInformation* serverInfo = vtkPVServerInformation::New();
+      this->GatherInformation(serverInfo, this->GetProcessModuleID());
+      this->ServerInformation->AddInformation(serverInfo);
+      serverInfo->Delete();
+      serverInfo = NULL;
       
-    this->ReturnValue = this->GUIHelper->
-      RunGUIStart(this->ArgumentCount, this->Arguments, numServerProcs, myId);
+      this->ReturnValue = this->GUIHelper->
+        RunGUIStart(this->ArgumentCount, this->Arguments, numServerProcs, myId);
+      }
     cout << "Exit Client\n";
     cout.flush();
     }
   else if (myId == 0)
     { // process 0 of Server
+    int connectID;
+    // Receive the connect id from client
+    this->SocketController->Receive(&connectID, 1, 1, 8843);
+    int match = 1;
+    if ( (this->ConnectID != 0) && (connectID != this->ConnectID) )
+      {
+      // If the ids do not match, disable all rmis by setting
+      // this->Enabled to 0.
+      match = 0;
+      vtkErrorMacro("Connection ID mismatch.");
+      this->Enabled = 0;
+      }
+    // Tell the client the result of id check
+    this->SocketController->Send(&match, 1, 1, 8843);
+
     // send the number of server processes as a handshake. 
     this->SocketController->Send(&numProcs, 1, 1, 8843);
-
-        //
+    
+    //
     this->SocketController->AddRMI(vtkPVClientServerLastResultRMI, (void *)(this),
                                    VTK_PV_CLIENT_SERVER_LAST_RESULT_TAG);
     // for SendMessages
@@ -296,7 +344,7 @@ void vtkPVClientServerModule::Initialize()
       cout << "Exit Data Server.\n";
       cout.flush();
       }
-      
+    
     
     // Exiting.  Relay the break RMI to otehr processes.
     for (id = 1; id < numProcs; ++id)
@@ -1032,6 +1080,8 @@ void vtkPVClientServerModule::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "MultiProcessMode: " << this->MultiProcessMode << endl;
   os << indent << "RenderServerMode: " << this->RenderServerMode << endl;
   os << indent << "NumberOfServerProcesses: " << this->NumberOfServerProcesses << endl;
+  os << indent << "ConnectID: " << this->ConnectID << endl;
+  os << indent << "Enabled: " << this->Enabled << endl;
 }
 
 //----------------------------------------------------------------------------
