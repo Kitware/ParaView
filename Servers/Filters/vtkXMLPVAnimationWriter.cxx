@@ -16,6 +16,7 @@
 
 #include "vtkDataSet.h"
 #include "vtkErrorCode.h"
+#include "vtkExecutive.h"
 #include "vtkObjectFactory.h"
 #include "vtkSmartPointer.h"
 #include "vtkXMLWriter.h"
@@ -26,7 +27,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkXMLPVAnimationWriter);
-vtkCxxRevisionMacro(vtkXMLPVAnimationWriter, "1.5");
+vtkCxxRevisionMacro(vtkXMLPVAnimationWriter, "1.6");
 
 //----------------------------------------------------------------------------
 class vtkXMLPVAnimationWriterInternals
@@ -81,12 +82,12 @@ vtkXMLPVAnimationWriter::~vtkXMLPVAnimationWriter()
 void vtkXMLPVAnimationWriter::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-  if(this->GetNumberOfInputs() > 0)
+  if(this->GetNumberOfInputConnections(0) > 0)
     {
     os << indent << "Input Detail:\n";
     vtkIndent nextIndent = indent.GetNextIndent();
     int i;
-    for(i=0; i < this->GetNumberOfInputs(); ++i)
+    for(i=0; i < this->GetNumberOfInputConnections(0); ++i)
       {
       os << nextIndent << i << ": group \""
          << this->Internal->InputGroupNames[i].c_str()
@@ -100,7 +101,7 @@ void vtkXMLPVAnimationWriter::PrintSelf(ostream& os, vtkIndent indent)
 void vtkXMLPVAnimationWriter::AddInput(vtkDataSet* pd, const char* group)
 {
   // Add the input to the pipeline structure.
-  this->vtkProcessObject::AddInput(pd);
+  this->Superclass::AddInput(pd);
   
   // Find the part number for this input.
   int partNum = 0;
@@ -158,7 +159,7 @@ void vtkXMLPVAnimationWriter::Start()
   
   // Initialize input change tables.
   int i;
-  for(i=0; i < this->GetNumberOfInputs(); ++i)
+  for(i=0; i < this->GetNumberOfInputConnections(0); ++i)
     {
     this->Internal->InputMTimes[i] = 0;
     this->Internal->InputChangeCounts[i] = 0;
@@ -195,17 +196,21 @@ void vtkXMLPVAnimationWriter::WriteTime(double time)
   
   // Consider every input.
   int i;
-  for(i=0; i < this->GetNumberOfInputs(); ++i)
+  vtkExecutive *exec = this->GetExecutive();
+  
+  for(i=0; i < this->GetNumberOfInputConnections(0); ++i)
     {
     // Make sure the pipeline mtime is up to date.
-    this->Inputs[i]->UpdateInformation();
+    exec->GetInputData(0, i)->UpdateInformation();
     
     // If the input has been modified since the last animation step,
     // increment its file number.
     int changed = 0;
-    if(this->Inputs[i]->GetPipelineMTime() > this->Internal->InputMTimes[i])
+    if(exec->GetInputData(0, i)->GetPipelineMTime() > 
+       this->Internal->InputMTimes[i])
       {
-      this->Internal->InputMTimes[i] = this->Inputs[i]->GetPipelineMTime();
+      this->Internal->InputMTimes[i] = 
+        exec->GetInputData(0, i)->GetPipelineMTime();
       this->Internal->InputChangeCounts[i] += 1;
       changed = 1;
       }

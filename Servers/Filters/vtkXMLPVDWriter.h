@@ -37,10 +37,6 @@ public:
   virtual const char* GetDefaultFileExtension();
   
   // Description:
-  // Add the given data set as an input.
-  void AddInput(vtkDataSet* ds);
-  
-  // Description:
   // Get/Set the piece number to write.  The same piece number is used
   // for all inputs.
   vtkGetMacro(Piece, int);
@@ -58,6 +54,10 @@ public:
   vtkSetMacro(GhostLevel, int);
   
   // Description:
+  // Add an input of this algorithm.
+  void AddInput(vtkDataObject *);
+
+  // Description:
   // Get/Set whether this instance will write the main collection
   // file.
   vtkGetMacro(WriteCollectionFile, int);
@@ -66,10 +66,9 @@ protected:
   vtkXMLPVDWriter();
   ~vtkXMLPVDWriter();
   
-  // Override vtkProcessObject's AddInput method to prevent compiler
-  // warnings.
-  virtual void AddInput(vtkDataObject*);
-  
+  // see algorithm for more info
+  virtual int FillInputPortInformation(int port, vtkInformation* info);
+
   // Replace vtkXMLWriter's writing driver method.
   virtual int WriteInternal();
   virtual int WriteData();
@@ -117,7 +116,7 @@ protected:
   static void ProgressCallbackFunction(vtkObject*, unsigned long, void*,
                                        void*);
   // Progress callback from internal writer.
-  virtual void ProgressCallback(vtkProcessObject* w);
+  virtual void ProgressCallback(vtkAlgorithm* w);
   
   // The observer to report progress from the internal writer.
   vtkCallbackCommand* ProgressObserver;  

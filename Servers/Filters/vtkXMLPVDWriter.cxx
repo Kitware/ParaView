@@ -15,9 +15,11 @@
 #include "vtkXMLPVDWriter.h"
 
 #include "vtkCallbackCommand.h"
+#include "vtkExecutive.h"
 #include "vtkErrorCode.h"
 #include "vtkGarbageCollector.h"
 #include "vtkImageData.h"
+#include "vtkInformation.h"
 #include "vtkObjectFactory.h"
 #include "vtkPolyData.h"
 #include "vtkRectilinearGrid.h"
@@ -43,7 +45,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkXMLPVDWriter);
-vtkCxxRevisionMacro(vtkXMLPVDWriter, "1.12");
+vtkCxxRevisionMacro(vtkXMLPVDWriter, "1.13");
 
 class vtkXMLPVDWriterInternals
 {
@@ -69,6 +71,7 @@ vtkXMLPVDWriter::vtkXMLPVDWriter()
   this->ProgressObserver = vtkCallbackCommand::New();
   this->ProgressObserver->SetCallback(&vtkXMLPVDWriter::ProgressCallbackFunction);
   this->ProgressObserver->SetClientData(this);
+
 }
 
 //----------------------------------------------------------------------------
@@ -89,26 +92,6 @@ void vtkXMLPVDWriter::PrintSelf(ostream& os, vtkIndent indent)
 }
 
 //----------------------------------------------------------------------------
-void vtkXMLPVDWriter::AddInput(vtkDataSet* ds)
-{
-  this->vtkProcessObject::AddInput(ds);
-}
-
-//----------------------------------------------------------------------------
-void vtkXMLPVDWriter::AddInput(vtkDataObject* d)
-{
-  vtkDataSet* ds = vtkDataSet::SafeDownCast(d);
-  if(ds)
-    {
-    this->AddInput(ds);
-    }
-  else
-    {
-    vtkWarningMacro("Attempt to add NULL or non vtkDataSet input.");
-    }
-}
-
-//----------------------------------------------------------------------------
 void vtkXMLPVDWriter::SetWriteCollectionFile(int flag)
 {
   this->WriteCollectionFileInitialized = 1;
@@ -118,6 +101,15 @@ void vtkXMLPVDWriter::SetWriteCollectionFile(int flag)
     {
     this->WriteCollectionFile = flag;
     this->Modified();
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkXMLPVDWriter::AddInput(vtkDataObject *input)
+{
+  if(input)
+    {
+    this->AddInputConnection(0, input->GetProducerPort());
     }
 }
 
@@ -152,10 +144,10 @@ int vtkXMLPVDWriter::WriteInternal()
   // Write each input.
   int i, j;
   this->DeleteAllEntries();
-  for(i=0; i < this->GetNumberOfInputs(); ++i)
+  for(i=0; i < this->GetNumberOfInputConnections(0); ++i)
     {
     this->SetProgressRange(progressRange, i,
-                           this->GetNumberOfInputs()+writeCollection);
+                           GetNumberOfInputConnections(0)+writeCollection);
     if(vtkXMLWriter* w = this->GetWriter(i))
       {
       // Set the file name.
@@ -196,8 +188,9 @@ int vtkXMLPVDWriter::WriteInternal()
   // Write the collection file if requested.
   if(writeCollection)
     {
-    this->SetProgressRange(progressRange, this->GetNumberOfInputs(),
-                           this->GetNumberOfInputs()+writeCollection);
+    this->SetProgressRange(progressRange, this->GetNumberOfInputConnections(0),
+                           this->GetNumberOfInputConnections(0)
+                           + writeCollection);
     return this->WriteCollectionFileIfRequested();
     }
   return 1;  
@@ -287,11 +280,14 @@ const char* vtkXMLPVDWriter::GetDataSetName()
 void vtkXMLPVDWriter::CreateWriters()
 {
   int i;
-  this->Internal->Writers.resize(this->GetNumberOfInputs());
-  for(i=0; i < this->GetNumberOfInputs(); ++i)
+  vtkExecutive *exec = this->GetExecutive();
+  
+  this->Internal->Writers.resize(this->GetNumberOfInputConnections(0));
+  for(i=0; i < GetNumberOfInputConnections(0); ++i)
     {
     // Create a writer based on the type of this input.
-    switch (this->Inputs[i]->GetDataObjectType())
+    
+    switch (exec->GetInputData(0, i)->GetDataObjectType())
       {
       case VTK_POLY_DATA:    
         if(this->NumberOfPieces > 1)
@@ -305,7 +301,7 @@ void vtkXMLPVDWriter::CreateWriters()
             w->Delete();
             }
           vtkXMLPPolyDataWriter::SafeDownCast(this->Internal->Writers[i].GetPointer())
-            ->SetInput(vtkPolyData::SafeDownCast(this->Inputs[i]));
+            ->SetInput(exec->GetInputData(0, i));
           }
         else
           {
@@ -318,7 +314,7 @@ void vtkXMLPVDWriter::CreateWriters()
             w->Delete();
             }
           vtkXMLPolyDataWriter::SafeDownCast(this->Internal->Writers[i].GetPointer())
-            ->SetInput(vtkPolyData::SafeDownCast(this->Inputs[i]));
+            ->SetInput(exec->GetInputData(0, i));
           }
         break;
       case VTK_STRUCTURED_POINTS:
@@ -334,7 +330,7 @@ void vtkXMLPVDWriter::CreateWriters()
             w->Delete();
             }
           vtkXMLPImageDataWriter::SafeDownCast(this->Internal->Writers[i].GetPointer())
-            ->SetInput(vtkImageData::SafeDownCast(this->Inputs[i]));
+            ->SetInput(exec->GetInputData(0, i));
           }
         else
           {
@@ -347,7 +343,7 @@ void vtkXMLPVDWriter::CreateWriters()
             w->Delete();
             }
           vtkXMLImageDataWriter::SafeDownCast(this->Internal->Writers[i].GetPointer())
-            ->SetInput(vtkImageData::SafeDownCast(this->Inputs[i]));
+            ->SetInput(exec->GetInputData(0, i));
           }
         break;
       case VTK_UNSTRUCTURED_GRID:
@@ -362,7 +358,7 @@ void vtkXMLPVDWriter::CreateWriters()
             w->Delete();
             }
           vtkXMLPUnstructuredGridWriter::SafeDownCast(this->Internal->Writers[i].GetPointer())
-            ->SetInput(vtkUnstructuredGrid::SafeDownCast(this->Inputs[i]));
+            ->SetInput(exec->GetInputData(0, i));
           }
         else
           {
@@ -375,7 +371,7 @@ void vtkXMLPVDWriter::CreateWriters()
             w->Delete();
             }
           vtkXMLUnstructuredGridWriter::SafeDownCast(this->Internal->Writers[i].GetPointer())
-            ->SetInput(vtkUnstructuredGrid::SafeDownCast(this->Inputs[i]));
+            ->SetInput(exec->GetInputData(0, i));
           }
         break;
       case VTK_STRUCTURED_GRID:
@@ -390,7 +386,7 @@ void vtkXMLPVDWriter::CreateWriters()
             w->Delete();
             }
           vtkXMLPStructuredGridWriter::SafeDownCast(this->Internal->Writers[i].GetPointer())
-            ->SetInput(vtkStructuredGrid::SafeDownCast(this->Inputs[i]));
+            ->SetInput(exec->GetInputData(0, i));
           }
         else
           {
@@ -403,7 +399,7 @@ void vtkXMLPVDWriter::CreateWriters()
             w->Delete();
             }
           vtkXMLStructuredGridWriter::SafeDownCast(this->Internal->Writers[i].GetPointer())
-            ->SetInput(vtkStructuredGrid::SafeDownCast(this->Inputs[i]));
+            ->SetInput(exec->GetInputData(0, i));
           }
         break;
       case VTK_RECTILINEAR_GRID:
@@ -418,7 +414,7 @@ void vtkXMLPVDWriter::CreateWriters()
             w->Delete();
             }
           vtkXMLPRectilinearGridWriter::SafeDownCast(this->Internal->Writers[i].GetPointer())
-            ->SetInput(vtkRectilinearGrid::SafeDownCast(this->Inputs[i]));
+            ->SetInput(exec->GetInputData(0, i));
           }
         else
           {
@@ -431,7 +427,7 @@ void vtkXMLPVDWriter::CreateWriters()
             w->Delete();
             }
           vtkXMLRectilinearGridWriter::SafeDownCast(this->Internal->Writers[i].GetPointer())
-            ->SetInput(vtkRectilinearGrid::SafeDownCast(this->Inputs[i]));
+            ->SetInput(exec->GetInputData(0, i));
           }
         break;
       }
@@ -531,7 +527,7 @@ void vtkXMLPVDWriter::ProgressCallbackFunction(vtkObject* caller,
                                                         void* clientdata,
                                                         void*)
 {
-  vtkProcessObject* w = vtkProcessObject::SafeDownCast(caller);
+  vtkAlgorithm* w = vtkAlgorithm::SafeDownCast(caller);
   if(w)
     {
     reinterpret_cast<vtkXMLPVDWriter*>(clientdata)->ProgressCallback(w);
@@ -539,7 +535,7 @@ void vtkXMLPVDWriter::ProgressCallbackFunction(vtkObject* caller,
 }
 
 //----------------------------------------------------------------------------
-void vtkXMLPVDWriter::ProgressCallback(vtkProcessObject* w)
+void vtkXMLPVDWriter::ProgressCallback(vtkAlgorithm* w)
 {
   float width = this->ProgressRange[1]-this->ProgressRange[0];
   float internalProgress = w->GetProgress();
@@ -586,4 +582,12 @@ void vtkXMLPVDWriter::ReportReferences(vtkGarbageCollector* collector)
     {
     vtkGarbageCollectorReport(collector, this->Internal->Writers[i], "Writer");
     }
+}
+
+int vtkXMLPVDWriter::FillInputPortInformation(
+  int vtkNotUsed(port), vtkInformation* info)
+{
+  info->Set(vtkAlgorithm::INPUT_IS_REPEATABLE(), 1);
+  info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkDataSet");
+  return 1;
 }
