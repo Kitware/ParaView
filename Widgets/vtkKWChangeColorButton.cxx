@@ -57,6 +57,10 @@ vtkKWChangeColorButton::vtkKWChangeColorButton()
   this->Color[2] = 1.0;
   this->Text = NULL;
   this->SetText("Set Color");
+  this->Label1 = vtkKWWidget::New();
+  this->Label1->SetParent(this);
+  this->Label2 = vtkKWWidget::New();
+  this->Label2->SetParent(this);
 }
 
 vtkKWChangeColorButton::~vtkKWChangeColorButton()
@@ -69,6 +73,8 @@ vtkKWChangeColorButton::~vtkKWChangeColorButton()
     {
     delete [] this->Text;
     }
+  this->Label1->Delete();
+  this->Label2->Delete();
 }
 
 void vtkKWChangeColorButton::SetColor(float c[3])
@@ -109,19 +115,58 @@ void vtkKWChangeColorButton::Create(vtkKWApplication *app, char *args)
 	   (int)(this->Color[0]*255.5), 
 	   (int)(this->Color[1]*255.5), 
 	   (int)(this->Color[2]*255.5) );
-  if ( this->Color[0] < 0.6 && this->Color[1] < 0.6 && this->Color[2] < 0.6 )
-    {
-    this->Script("button %s -bg %s -fg #ffffff -text {%s} %s", 
-		 wname, color, this->Text, args);
-    }
-  else
-    {
-    this->Script("button %s -bg %s -fg #000000 -text {%s} %s", 
-		 wname, color, this->Text, args);
-    }
-  this->Script("%s configure -command {%s ChangeColor}",
-	       wname, this->GetTclName() );
 
+  this->Script("frame %s -relief raised -bd 2 %s", wname, args);
+  this->Label1->Create(this->Application,"label","-text {Set Color}");
+  this->Label2->Create(this->Application,
+                       "label","-width 2 -height 1");
+  this->Script("pack %s -padx 3 -pady 3 -ipadx 2 -side right",this->Label2->GetWidgetName());
+  this->Script("pack %s -padx 3 -pady 3 -ipadx 2 -side left -fill x -expand yes", 
+               this->Label1->GetWidgetName());
+  
+  this->Script("%s configure -bg %s",this->Label2->GetWidgetName(),color);
+  
+  // bind button presses
+  this->Script("bind %s <Any-ButtonPress> {%s AButtonPress %%X %%Y}",
+               wname, this->GetTclName());
+  this->Script("bind %s <Any-ButtonRelease> {%s AButtonRelease %%X %%Y}",
+               wname, this->GetTclName());
+  this->Script("bind %s <Any-ButtonPress> {%s AButtonPress %%X %%Y}",
+               this->Label1->GetWidgetName(), this->GetTclName());
+  this->Script("bind %s <Any-ButtonRelease> {%s AButtonRelease %%X %%Y}",
+               this->Label1->GetWidgetName(), this->GetTclName());
+  this->Script("bind %s <Any-ButtonPress> {%s AButtonPress %%X %%Y}",
+               this->Label2->GetWidgetName(), this->GetTclName());
+  this->Script("bind %s <Any-ButtonRelease> {%s AButtonRelease %%X %%Y}",
+               this->Label2->GetWidgetName(), this->GetTclName());
+
+}
+
+void vtkKWChangeColorButton::AButtonPress(int x, int y)
+{  
+  this->Script("%s configure -relief sunken", this->GetWidgetName());  
+}
+
+void vtkKWChangeColorButton::AButtonRelease(int x, int y)
+{  
+  this->Script("%s configure -relief raised", this->GetWidgetName());  
+
+  // was it released over the button ?
+  this->Script( "winfo rootx %s", this->GetWidgetName());
+  int xw = vtkKWObject::GetIntegerResult(this->Application);
+  this->Script( "winfo rooty %s", this->GetWidgetName());
+  int yw = vtkKWObject::GetIntegerResult(this->Application);
+
+  // get the size and of the window
+  this->Script( "winfo width %s", this->GetWidgetName());
+  int dxw = vtkKWObject::GetIntegerResult(this->Application);
+  this->Script( "winfo height %s", this->GetWidgetName());
+  int dyw = vtkKWObject::GetIntegerResult(this->Application);
+
+  if ((x >= xw) && (x<= xw+dxw) && (y >= yw) && (y <= yw + dyw))
+    {
+    this->ChangeColor();
+    }  
 }
 
 void vtkKWChangeColorButton::ChangeColor()
@@ -147,16 +192,8 @@ void vtkKWChangeColorButton::ChangeColor()
     tmp[0] = result[5];
     tmp[1] = result[6];
     sscanf(tmp, "%x", &b);
-    if ( r < 154 && g < 154 && b < 154 )
-      {
-      this->Script( "%s configure -bg %s -fg #ffffff", 
-		    this->GetWidgetName(), result );
-      }
-    else
-      {
-      this->Script( "%s configure -bg %s -fg #000000", 
-		    this->GetWidgetName(), result );
-      }
+    
+    this->Script("%s configure -bg %s",this->Label2->GetWidgetName(),result);
     this->Script( "update idletasks");
     if ( this->Command )
       {
@@ -166,7 +203,6 @@ void vtkKWChangeColorButton::ChangeColor()
     this->Color[0] = (float)r/255.0;
     this->Color[1] = (float)g/255.0;
     this->Color[2] = (float)b/255.0;
-
     }
 }
 

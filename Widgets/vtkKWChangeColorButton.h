@@ -55,6 +55,12 @@ public:
   // Set the label to be used on the button
   vtkSetStringMacro(Text);
   vtkGetStringMacro(Text);
+
+  
+  // Description:
+  // Handle button press and release events
+  void AButtonPress(int x, int y);
+  void AButtonRelease(int x, int y);
   
   // Description:
   // Set the command that is called when the color is changed - the object is
@@ -71,6 +77,8 @@ protected:
   vtkKWChangeColorButton(const vtkKWChangeColorButton&) {};
   void operator=(const vtkKWChangeColorButton&) {};
 
+  vtkKWWidget *Label1;
+  vtkKWWidget *Label2;
   char        *Command;
   char        *Text;
   float       Color[3];
