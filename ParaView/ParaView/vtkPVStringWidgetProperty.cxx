@@ -47,12 +47,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVWidget.h"
 
 vtkStandardNewMacro(vtkPVStringWidgetProperty);
-vtkCxxRevisionMacro(vtkPVStringWidgetProperty, "1.1.2.5");
+vtkCxxRevisionMacro(vtkPVStringWidgetProperty, "1.1.2.6");
 
 vtkPVStringWidgetProperty::vtkPVStringWidgetProperty()
 {
   this->String = NULL;
   this->VTKCommand = NULL;
+  this->ElementType = vtkPVSelectWidget::STRING;
 }
 
 vtkPVStringWidgetProperty::~vtkPVStringWidgetProperty()
