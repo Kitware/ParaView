@@ -31,7 +31,7 @@
 #  define VTK_TESSELLATOR_INCR_SUBCASE_COUNT(cs,sc)
 #endif // PARAVIEW_DEBUG_TESSELLATOR
 
-vtkCxxRevisionMacro(vtkStreamingTessellator,"1.9");
+vtkCxxRevisionMacro(vtkStreamingTessellator,"1.10");
 vtkStandardNewMacro(vtkStreamingTessellator);
 
 void vtkStreamingTessellator::PrintSelf( ostream& os, vtkIndent indent )
@@ -61,7 +61,7 @@ vtkStreamingTessellator::vtkStreamingTessellator()
   this->Callback1 = 0;
   this->Callback2 = 0;
   this->Callback3 = 0;
-  this->MaximumNumberOfSubdivisions = 8;
+  this->MaximumNumberOfSubdivisions = 3;
   for ( int i=0; i<4; ++i )
     {
     this->EmbeddingDimension[i] = i;
@@ -250,7 +250,7 @@ bool compareHopfCrossStringDist( const double* a0, const double* a1, const doubl
 }
 
 
-  int vtkStreamingTessellator::BestTets( int* vtkNotUsed(connOffsets), double** vtkNotUsed(verts), int vtkNotUsed(permOffset), int vtkNotUsed(sgn) ) const
+int vtkStreamingTessellator::BestTets( int* vtkNotUsed(connOffsets), double** vtkNotUsed(verts), int vtkNotUsed(permOffset), int vtkNotUsed(sgn) ) const
 {
   // Re-run vtkStreamingTessellatorGenerator.py with QualityThang=1
   // to get this implemented (along with on-the-fly quality improvement)

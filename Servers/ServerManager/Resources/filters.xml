@@ -1926,7 +1926,7 @@
         name="MaximumNumberOfSubdivisions"
         command="SetMaximumNumberOfSubdivisions"
         number_of_elements="1"
-        default_values="8">
+        default_values="3">
        <IntRangeDomain name="range" min="0" max="8"/>
      </IntVectorProperty>
    <!-- End TempTessellatorFilter -->
