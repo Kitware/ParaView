@@ -26,7 +26,7 @@ vtkProcessModule* vtkProcessModule::ProcessModule = 0;
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkProcessModule);
-vtkCxxRevisionMacro(vtkProcessModule, "1.7");
+vtkCxxRevisionMacro(vtkProcessModule, "1.8");
 
 //----------------------------------------------------------------------------
 vtkProcessModule::vtkProcessModule()
@@ -85,7 +85,7 @@ void vtkProcessModule::GatherInformation(vtkPVInformation* info,
     << this->GetProcessModuleID()
     << "GatherInformationInternal" << info->GetClassName() << id
     << vtkClientServerStream::End;
-  this->SendStreamToClientAndServer();
+  this->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::DATA_SERVER);
   this->TemporaryInformation = NULL;
 }
 
@@ -195,12 +195,6 @@ int vtkProcessModule::SendStreamToRenderServerRoot(vtkClientServerStream&)
 
 
 //----------------------------------------------------------------------------
-void vtkProcessModule::SendStreamToClient()
-{
-  this->SendStream(vtkProcessModule::CLIENT);
-}
-
-//----------------------------------------------------------------------------
 void vtkProcessModule::SendStreamToServerTemp(vtkClientServerStream* stream)
 {
   this->SendStream(vtkProcessModule::DATA_SERVER, *stream);
@@ -210,74 +204,6 @@ void vtkProcessModule::SendStreamToServerTemp(vtkClientServerStream* stream)
 void vtkProcessModule::SendStreamToServerRootTemp(vtkClientServerStream* stream)
 {
   this->SendStream(vtkProcessModule::DATA_SERVER_ROOT, *stream);
-}
-
-//----------------------------------------------------------------------------
-void vtkProcessModule::SendStreamToServer()
-{
-  this->SendStream(vtkProcessModule::DATA_SERVER);
-}
-
-//----------------------------------------------------------------------------
-void vtkProcessModule::SendStreamToServerRoot()
-{
-  this->SendStream(vtkProcessModule::DATA_SERVER_ROOT);
-}
-
-//----------------------------------------------------------------------------
-void vtkProcessModule::SendStreamToClientAndServer()
-{
-  this->SendStream(vtkProcessModule::CLIENT | vtkProcessModule::DATA_SERVER);
-}
-
-//----------------------------------------------------------------------------
-void vtkProcessModule::SendStreamToClientAndServerRoot()
-{
-  this->SendStream(vtkProcessModule::CLIENT | vtkProcessModule::DATA_SERVER_ROOT);
-}
-
-//----------------------------------------------------------------------------
-void vtkProcessModule::SendStreamToRenderServerRoot()
-{
-  this->SendStream(vtkProcessModule::RENDER_SERVER_ROOT);
-}
-
-
-//----------------------------------------------------------------------------
-void vtkProcessModule::SendStreamToRenderServer()
-{
-  this->SendStream(vtkProcessModule::RENDER_SERVER);
-}
-
-
-//----------------------------------------------------------------------------
-void vtkProcessModule::SendStreamToRenderServerAndServerRoot()
-{ 
-  this->SendStream(vtkProcessModule::RENDER_SERVER_ROOT | vtkProcessModule::DATA_SERVER_ROOT);
-}
-
-//----------------------------------------------------------------------------
-void vtkProcessModule::SendStreamToRenderServerAndServer()
-{
-  this->SendStream(vtkProcessModule::RENDER_SERVER | vtkProcessModule::DATA_SERVER);
-}
-
-//----------------------------------------------------------------------------
-void vtkProcessModule::SendStreamToClientAndRenderServer()
-{
-  this->SendStream(vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);
-}
-
-//----------------------------------------------------------------------------
-void vtkProcessModule::SendStreamToRenderServerClientAndServer()
-{
-  this->SendStream(vtkProcessModule::CLIENT_AND_SERVERS);
-}
-
-//----------------------------------------------------------------------------
-void vtkProcessModule::SendStreamToClientAndRenderServerRoot()
-{
-  this->SendStream(vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER_ROOT);
 }
 
 //----------------------------------------------------------------------------
@@ -463,7 +389,7 @@ int vtkProcessModule::SendStringToClient(const char* str)
     {
     return 0;
     }
-  this->SendStreamToClient();
+  this->SendStream(vtkProcessModule::CLIENT);
   return 1;
 }
 
@@ -474,7 +400,7 @@ int vtkProcessModule::SendStringToClientAndServer(const char* str)
     {
     return 0;
     }
-  this->SendStreamToClientAndServer();
+  this->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::DATA_SERVER);
   return 1;
 }
 
@@ -485,7 +411,7 @@ int vtkProcessModule::SendStringToClientAndServerRoot(const char* str)
     {
     return 0;
     }
-  this->SendStreamToClientAndServerRoot();
+  this->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::DATA_SERVER_ROOT);
   return 1;
 }
 
@@ -496,7 +422,7 @@ int vtkProcessModule::SendStringToServer(const char* str)
     {
     return 0;
     }
-  this->SendStreamToServer();
+  this->SendStream(vtkProcessModule::DATA_SERVER);
   return 1;
 }
 
@@ -507,7 +433,7 @@ int vtkProcessModule::SendStringToServerRoot(const char* str)
     {
     return 0;
     }
-  this->SendStreamToServerRoot();
+  this->SendStream(vtkProcessModule::DATA_SERVER_ROOT);
   return 1;
 }
 

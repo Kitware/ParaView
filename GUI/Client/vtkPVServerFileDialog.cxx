@@ -39,7 +39,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVServerFileDialog );
-vtkCxxRevisionMacro(vtkPVServerFileDialog, "1.30");
+vtkCxxRevisionMacro(vtkPVServerFileDialog, "1.31");
 
 int vtkPVServerFileDialogCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -203,7 +203,7 @@ vtkPVServerFileDialog::~vtkPVServerFileDialog()
     {
     vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
     pm->DeleteStreamObject(this->ServerSideID);
-    pm->SendStreamToServerRoot();
+    pm->SendStream(vtkProcessModule::DATA_SERVER_ROOT);
     }
 }
 
@@ -214,7 +214,7 @@ void vtkPVServerFileDialog::CreateServerSide()
     {
     vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
     this->ServerSideID = pm->NewStreamObject("vtkPVServerFileListing");
-    pm->SendStreamToServerRoot();
+    pm->SendStream(vtkProcessModule::DATA_SERVER_ROOT);
     }
 }
 
@@ -591,7 +591,7 @@ void vtkPVServerFileDialog::LoadSaveCallback()
                     << this->ServerSideID << "FileIsDirectory"
                     << fileName.c_str()
                     << vtkClientServerStream::End;
-    pm->SendStreamToServerRoot();
+    pm->SendStream(vtkProcessModule::DATA_SERVER_ROOT);
     int isdir = 0;
     if(!pm->GetLastServerResult().GetArgument(0, 0, &isdir))
       {
@@ -894,7 +894,7 @@ void vtkPVServerFileDialog::Update()
     pm->GetStream() << vtkClientServerStream::Invoke
                     << this->ServerSideID << "GetCurrentWorkingDirectory"
                     << vtkClientServerStream::End;
-    pm->SendStreamToServerRoot();
+    pm->SendStream(vtkProcessModule::DATA_SERVER_ROOT);
     const char* cwd;
     if(!pm->GetLastServerResult().GetArgument(0, 0, &cwd))
       {
@@ -913,7 +913,7 @@ void vtkPVServerFileDialog::Update()
     pm->GetStream() << vtkClientServerStream::Invoke
                     << this->ServerSideID << "GetCurrentWorkingDirectory"
                     << vtkClientServerStream::End;
-    pm->SendStreamToServerRoot();
+    pm->SendStream(vtkProcessModule::DATA_SERVER_ROOT);
     const char* cwd;
     if(!pm->GetLastServerResult().GetArgument(0, 0, &cwd))
       {

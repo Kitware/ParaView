@@ -32,7 +32,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCameraIcon);
-vtkCxxRevisionMacro(vtkPVCameraIcon, "1.16");
+vtkCxxRevisionMacro(vtkPVCameraIcon, "1.17");
 
 vtkCxxSetObjectMacro(vtkPVCameraIcon,RenderView,vtkPVRenderView);
 
@@ -143,7 +143,7 @@ void vtkPVCameraIcon::RestoreCamera()
                     << "SetViewUp"
                     << vtkClientServerStream::InsertArray(a, 3)
                     << vtkClientServerStream::End;
-    pm->SendStreamToClientAndServer();
+    pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::DATA_SERVER);
     this->RenderView->EventuallyRender();
     }
 }

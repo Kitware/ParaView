@@ -40,7 +40,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPart);
-vtkCxxRevisionMacro(vtkPVPart, "1.48");
+vtkCxxRevisionMacro(vtkPVPart, "1.49");
 
 
 int vtkPVPartCommand(ClientData cd, Tcl_Interp *interp,
@@ -95,7 +95,7 @@ vtkPVPart::~vtkPVPart()
     vtkClientServerStream& stream = pm->GetStream();
     stream << vtkClientServerStream::Invoke << this->VTKDataID << "SetExtentTranslator" << 0 
            << vtkClientServerStream::End;
-    pm->SendStreamToServer();
+    pm->SendStream(vtkProcessModule::DATA_SERVER);
     }
 
   this->SetName(NULL);
@@ -323,7 +323,7 @@ void vtkPVPart::CreateTranslatorIfNecessary()
                     << vtkClientServerStream::LastResult
                     << "GetClassName"
                     << vtkClientServerStream::End;
-    pm->SendStreamToServerRoot();
+    pm->SendStream(vtkProcessModule::DATA_SERVER_ROOT);
     char* classname = 0;
     if(!pm->GetLastServerResult().GetArgument(0,0,&classname))
       {
@@ -343,7 +343,7 @@ void vtkPVPart::CreateTranslatorIfNecessary()
                       << this->VTKDataID
                       << vtkClientServerStream::End;
       pm->DeleteStreamObject(translatorID);
-      pm->SendStreamToServer();
+      pm->SendStream(vtkProcessModule::DATA_SERVER);
       }
    }
 
@@ -379,11 +379,11 @@ void vtkPVPart::InsertExtractPiecesIfNecessary()
     pm->GetStream() << vtkClientServerStream::Invoke 
                     << this->VTKDataID << "UpdateInformation"
                     << vtkClientServerStream::End;
-    pm->SendStreamToServer();
+    pm->SendStream(vtkProcessModule::DATA_SERVER);
     pm->GetStream() << vtkClientServerStream::Invoke 
                     << this->VTKDataID << "GetMaximumNumberOfPieces"
                     << vtkClientServerStream::End;
-    pm->SendStreamToServerRoot();
+    pm->SendStream(vtkProcessModule::DATA_SERVER_ROOT);
     int num =0;
     pm->GetLastServerResult().GetArgument(0,0,&num);
     if (num != 1)
@@ -431,11 +431,11 @@ void vtkPVPart::InsertExtractPiecesIfNecessary()
     pm->GetStream() << vtkClientServerStream::Invoke 
                     << this->VTKDataID << "UpdateInformation"
                     << vtkClientServerStream::End;
-    pm->SendStreamToServer();
+    pm->SendStream(vtkProcessModule::DATA_SERVER);
     pm->GetStream() << vtkClientServerStream::Invoke 
                     << this->VTKDataID << "GetMaximumNumberOfPieces"
                     << vtkClientServerStream::End;
-    pm->SendStreamToServerRoot();
+    pm->SendStream(vtkProcessModule::DATA_SERVER_ROOT);
     int num =0;
     pm->GetLastServerResult().GetArgument(0,0,&num);
     if (num != 1)
@@ -510,7 +510,7 @@ void vtkPVPart::InsertExtractPiecesIfNecessary()
                   << vtkClientServerStream::LastResult
                   << vtkClientServerStream::End;
   pm->DeleteStreamObject(tempDataPiece);
-  pm->SendStreamToServer();
+  pm->SendStream(vtkProcessModule::DATA_SERVER);
   this->SetVTKDataID(this->VTKDataID);
 }
 

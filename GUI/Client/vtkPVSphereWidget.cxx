@@ -35,7 +35,7 @@
 #include "vtkPVProcessModule.h"
 
 vtkStandardNewMacro(vtkPVSphereWidget);
-vtkCxxRevisionMacro(vtkPVSphereWidget, "1.37");
+vtkCxxRevisionMacro(vtkPVSphereWidget, "1.38");
 
 int vtkPVSphereWidgetCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -68,7 +68,7 @@ vtkPVSphereWidget::~vtkPVSphereWidget()
     vtkPVProcessModule* pv = this->GetPVApplication()->GetProcessModule();
     pv->DeleteStreamObject(this->SphereID);
     this->SphereID.ID = 0;
-    pv->SendStreamToRenderServerClientAndServer();
+    pv->SendStream(vtkProcessModule::CLIENT_AND_SERVERS);
     }
   int i;
   this->Labels[0]->Delete();
@@ -167,7 +167,7 @@ void vtkPVSphereWidget::AcceptInternal(vtkClientServerID sourceID)
     pm->GetStream() << vtkClientServerStream::Invoke << this->SphereID
                     << "SetRadius" << rad
                     << vtkClientServerStream::End;
-    pm->SendStreamToRenderServerClientAndServer();
+    pm->SendStream(vtkProcessModule::CLIENT_AND_SERVERS);
     this->SetLastAcceptedCenter(val);
     this->SetLastAcceptedRadius(rad);
     }
@@ -304,9 +304,9 @@ void vtkPVSphereWidget::ChildCreate(vtkPVApplication* pvApp)
   pm->GetStream() << vtkClientServerStream::Invoke << this->Widget3DID
                   << "PlaceWidget" << 0 << 1 << 0 << 1 << 0 << 1 
                   << vtkClientServerStream::End;
-  pm->SendStreamToClientAndRenderServer();
+  pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
   this->SphereID = pm->NewStreamObject("vtkSphere");
-  pm->SendStreamToRenderServerClientAndServer();
+  pm->SendStream(vtkProcessModule::CLIENT_AND_SERVERS);
   
   this->SetFrameLabel("Sphere Widget");
   this->Labels[0]->SetParent(this->Frame->GetFrame());
@@ -399,7 +399,7 @@ void vtkPVSphereWidget::ChildCreate(vtkPVApplication* pvApp)
                       << 0.5*(bds[2]+bds[3])
                       << 0.5*(bds[4]+bds[5]) 
                       << vtkClientServerStream::End;
-      pm->SendStreamToClientAndRenderServer();
+      pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
       this->SetCenter(0.5*(bds[0]+bds[1]), 0.5*(bds[2]+bds[3]),
                       0.5*(bds[4]+bds[5]));
       this->SetLastAcceptedCenter(0.5*(bds[0]+bds[1]), 0.5*(bds[2]+bds[3]),
@@ -407,7 +407,7 @@ void vtkPVSphereWidget::ChildCreate(vtkPVApplication* pvApp)
       pm->GetStream() << vtkClientServerStream::Invoke << this->SphereID 
                       << "SetRadius"  << 0.5*(bds[1]-bds[0])
                       << vtkClientServerStream::End;
-      pm->SendStreamToClientAndRenderServer();
+      pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
       this->SetRadius(0.5*(bds[1]-bds[0]));
       this->SetLastAcceptedRadius(0.5*(bds[1]-bds[0]));
       }
@@ -452,7 +452,7 @@ void vtkPVSphereWidget::SetCenterInternal(double x, double y, double z)
     pm->GetStream() << vtkClientServerStream::Invoke << this->Widget3DID
                     << "SetCenter" << x << y << z
                     << vtkClientServerStream::End;
-    pm->SendStreamToClientAndRenderServer();
+    pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
     }
 }
 
@@ -477,7 +477,7 @@ void vtkPVSphereWidget::SetCenter()
   pm->GetStream() << vtkClientServerStream::Invoke << this->Widget3DID
                   << "SetCenter" << val[0] << val[1] << val[2]
                   << vtkClientServerStream::End;
-  pm->SendStreamToClientAndRenderServer();
+  pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
   this->Render();
   this->ModifiedCallback();
   this->ValueChanged = 0;
@@ -494,7 +494,7 @@ void vtkPVSphereWidget::SetRadiusInternal(double r)
     pm->GetStream() << vtkClientServerStream::Invoke << this->Widget3DID
                   << "SetRadius" << r
                   << vtkClientServerStream::End;
-    pm->SendStreamToClientAndRenderServer();
+    pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
     }
 }
 
@@ -516,7 +516,7 @@ void vtkPVSphereWidget::SetRadius()
   pm->GetStream() << vtkClientServerStream::Invoke << this->SphereID
                   << "SetRadius" << val
                   << vtkClientServerStream::End;
-  pm->SendStreamToClientAndRenderServer();
+  pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
   this->Render();
   this->ModifiedCallback();
   this->ValueChanged = 0;

@@ -21,7 +21,7 @@
 #include "vtkClientServerStream.h"
 
 vtkStandardNewMacro(vtkPVIndexWidgetProperty);
-vtkCxxRevisionMacro(vtkPVIndexWidgetProperty, "1.5");
+vtkCxxRevisionMacro(vtkPVIndexWidgetProperty, "1.6");
 
 vtkPVIndexWidgetProperty::vtkPVIndexWidgetProperty()
 {
@@ -39,7 +39,7 @@ void vtkPVIndexWidgetProperty::AcceptInternal()
   vtkPVProcessModule* pm = this->Widget->GetPVApplication()->GetProcessModule();
   pm->GetStream() << vtkClientServerStream::Invoke << this->VTKSourceID
                     << this->VTKCommand << this->Index << vtkClientServerStream::End;
-  pm->SendStreamToServer();
+  pm->SendStream(vtkProcessModule::DATA_SERVER);
 }
 
 void vtkPVIndexWidgetProperty::PrintSelf(ostream &os, vtkIndent indent)

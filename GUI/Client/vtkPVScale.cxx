@@ -33,7 +33,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVScale);
-vtkCxxRevisionMacro(vtkPVScale, "1.38");
+vtkCxxRevisionMacro(vtkPVScale, "1.39");
 
 //----------------------------------------------------------------------------
 vtkPVScale::vtkPVScale()
@@ -348,7 +348,7 @@ void vtkPVScale::ResetInternal()
     str << "Get" << this->RangeSourceVariable << ends;
     pm->GetStream() << vtkClientServerStream::Invoke << this->ObjectID
                     << str.str() << vtkClientServerStream::End;
-    pm->SendStreamToServerRoot();
+    pm->SendStream(vtkProcessModule::DATA_SERVER_ROOT);
     int range[2] = { 0, 0 };
     pm->GetLastServerResult().GetArgument(0,0, range, 2);
     this->Script("eval %s SetRange %i %i", this->Scale->GetTclName(), 
@@ -596,6 +596,6 @@ void vtkPVScale::UpdateVTKSourceInternal(vtkClientServerID sourceID,
   pm->GetStream() << vtkClientServerStream::Invoke
                   << sourceID << method.c_str() << value
                   << vtkClientServerStream::End;
-  pm->SendStreamToServer();
+  pm->SendStream(vtkProcessModule::DATA_SERVER);
   this->Property->SetScalars(1, &value);
 }

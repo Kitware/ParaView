@@ -24,7 +24,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVMPIRenderModule);
-vtkCxxRevisionMacro(vtkPVMPIRenderModule, "1.10");
+vtkCxxRevisionMacro(vtkPVMPIRenderModule, "1.11");
 
 
 
@@ -59,7 +59,7 @@ void vtkPVMPIRenderModule::SetPVApplication(vtkPVApplication *pvApp)
       << vtkClientServerStream::Invoke
       << this->RenderWindowID << "SetMultiSamples" << 0
       << vtkClientServerStream::End;
-    pm->SendStreamToClientAndRenderServer();
+    pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
     }
 
   if (pvApp->GetClientMode() || pvApp->GetServerMode())
@@ -82,13 +82,13 @@ void vtkPVMPIRenderModule::SetPVApplication(vtkPVApplication *pvApp)
     pm->GetStream()
       << vtkClientServerStream::Invoke << this->CompositeID << "SetClientFlag"
       << vtkClientServerStream::LastResult << vtkClientServerStream::End;
-    pm->SendStreamToClientAndRenderServer();
+    pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
     }
   else
     {
     // Create the compositer.
     this->CompositeID = pm->NewStreamObject("vtkPVTreeComposite");
-    pm->SendStreamToClientAndRenderServer();
+    pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
     this->Composite = vtkPVTreeComposite::SafeDownCast(
       pm->GetObjectFromID(this->CompositeID));
 
@@ -110,7 +110,7 @@ void vtkPVMPIRenderModule::SetPVApplication(vtkPVApplication *pvApp)
     pm->GetStream()
       << vtkClientServerStream::Delete << tmp
       << vtkClientServerStream::End;
-    pm->SendStreamToClientAndRenderServer();
+    pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
 
     // If we are using SGI pipes, create a new Controller/Communicator/Group
     // to use for compositing.
@@ -122,7 +122,7 @@ void vtkPVMPIRenderModule::SetPVApplication(vtkPVApplication *pvApp)
       pm->GetStream()
         << vtkClientServerStream::Invoke << this->CompositeID
         << "SetNumberOfProcesses" << numPipes << vtkClientServerStream::End;
-      pm->SendStreamToClientAndRenderServer();
+      pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
       }
     }
 
@@ -147,7 +147,7 @@ void vtkPVMPIRenderModule::SetPVApplication(vtkPVApplication *pvApp)
       << vtkClientServerStream::Invoke << this->CompositeID
       << "InitializeOffScreen" << vtkClientServerStream::End;
     }
-  pm->SendStreamToClientAndRenderServer();
+  pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
 }
 
 //----------------------------------------------------------------------------
@@ -173,7 +173,7 @@ void vtkPVMPIRenderModule::SetUseCompositeCompression(int val)
         << this->CompositeID << "SetCompositer" << tmp
         << vtkClientServerStream::End;
       pm->DeleteStreamObject(tmp);
-      pm->SendStreamToClientAndRenderServer();
+      pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
       }
     }
 }

@@ -47,7 +47,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProcessModule);
-vtkCxxRevisionMacro(vtkPVProcessModule, "1.47");
+vtkCxxRevisionMacro(vtkPVProcessModule, "1.48");
 
 vtkCxxSetObjectMacro(vtkPVProcessModule, Application, vtkKWApplication);
 
@@ -133,17 +133,17 @@ int vtkPVProcessModule::GetDirectoryListing(const char* dir,
   this->GetStream() << vtkClientServerStream::Invoke
                     << lid << "GetFileListing" << dir << save
                     << vtkClientServerStream::End;
-  this->SendStreamToServerRoot();
+  this->SendStream(vtkProcessModule::DATA_SERVER_ROOT);
   vtkClientServerStream result;
   if(!this->GetLastServerResult().GetArgument(0, 0, &result))
     {
     vtkErrorMacro("Error getting file list result from server.");
     this->DeleteStreamObject(lid);
-    this->SendStreamToServerRoot();
+    this->SendStream(vtkProcessModule::DATA_SERVER_ROOT);
     return 0;
     }
   this->DeleteStreamObject(lid);
-  this->SendStreamToServerRoot();
+  this->SendStream(vtkProcessModule::DATA_SERVER_ROOT);
 
   // Parse the listing.
   if ( dirs )
@@ -278,7 +278,7 @@ int vtkPVProcessModule::LoadModule(const char* name, const char* directory)
     << this->GetProcessModuleID()
     << "LoadModuleInternal" << name << directory
     << vtkClientServerStream::End;
-  this->SendStreamToServer();
+  this->SendStream(vtkProcessModule::DATA_SERVER);
   int result = 0;
   if(!this->GetLastServerResult().GetArgument(0, 0, &result))
     {

@@ -27,7 +27,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVIceTDisplayRenderModule);
-vtkCxxRevisionMacro(vtkPVIceTDisplayRenderModule, "1.11");
+vtkCxxRevisionMacro(vtkPVIceTDisplayRenderModule, "1.12");
 
 
 
@@ -60,15 +60,15 @@ vtkPVIceTDisplayRenderModule::~vtkPVIceTDisplayRenderModule()
   if (this->DisplayManagerID.ID && pvApp && pm)
     { 
     pm->DeleteStreamObject(this->DisplayManagerID);
-    pm->SendStreamToRenderServer(); 
+    pm->SendStream(vtkProcessModule::RENDER_SERVER); 
     this->DisplayManagerID.ID = 0;
     }
    if (this->CompositeID.ID && pvApp && pm)
     {  
     pm->DeleteStreamObject(this->CompositeID);
-    pm->SendStreamToClient(); 
+    pm->SendStream(vtkProcessModule::CLIENT); 
     pm->DeleteStreamObject(this->CompositeID);
-    pm->SendStreamToRenderServerRoot(); 
+    pm->SendStream(vtkProcessModule::RENDER_SERVER_ROOT); 
     this->CompositeID.ID = 0;
     this->Composite = 0;
     }
@@ -107,7 +107,7 @@ void vtkPVIceTDisplayRenderModule::SetPVApplication(vtkPVApplication *pvApp)
   this->RendererID = pm->NewStreamObject("vtkIceTRenderer");
   this->RenderWindowID = pm->NewStreamObject("vtkRenderWindow");
   
-  pm->SendStreamToClientAndRenderServer();
+  pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
   this->Renderer = 
     vtkRenderer::SafeDownCast(
       pm->GetObjectFromID(this->RendererID));
@@ -118,7 +118,7 @@ void vtkPVIceTDisplayRenderModule::SetPVApplication(vtkPVApplication *pvApp)
                   << this->RenderWindowID
                   << "FullScreenOn"
                   << vtkClientServerStream::End;
-  pm->SendStreamToRenderServer();
+  pm->SendStream(vtkProcessModule::RENDER_SERVER);
   if (pvApp->GetUseStereoRendering())
     {
     this->RenderWindow->StereoCapableWindowOn();
@@ -128,11 +128,11 @@ void vtkPVIceTDisplayRenderModule::SetPVApplication(vtkPVApplication *pvApp)
   pm->GetStream() << vtkClientServerStream::Invoke
                   << this->RenderWindowID << "AddRenderer" << this->RendererID
                   << vtkClientServerStream::End;
-  pm->SendStreamToClientAndRenderServer();
+  pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
 
   this->Composite = NULL;
   this->DisplayManagerID = pm->NewStreamObject("vtkIceTRenderManager");
-  pm->SendStreamToClientAndRenderServer();
+  pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
   int *tileDim = pvApp->GetTileDimensions();
   cout << "Size: " << tileDim[0] << ", " << tileDim[1] << endl;
   pm->GetStream() <<  vtkClientServerStream::Invoke
@@ -145,7 +145,7 @@ void vtkPVIceTDisplayRenderModule::SetPVApplication(vtkPVApplication *pvApp)
                   << this->DisplayManagerID << "SetRenderWindow"
                   << this->RenderWindowID
                   << vtkClientServerStream::End;
-  pm->SendStreamToRenderServer();
+  pm->SendStream(vtkProcessModule::RENDER_SERVER);
   pm->GetStream() << vtkClientServerStream::Invoke
                   << pm->GetProcessModuleID()
                   << "GetController"
@@ -158,12 +158,12 @@ void vtkPVIceTDisplayRenderModule::SetPVApplication(vtkPVApplication *pvApp)
                   << this->DisplayManagerID 
                   << "InitializeRMIs"
                   << vtkClientServerStream::End;
-  pm->SendStreamToRenderServer();
+  pm->SendStream(vtkProcessModule::RENDER_SERVER);
 
 
   // **********************************************************
   this->CompositeID = pm->NewStreamObject("vtkIceTClientCompositeManager");
-  pm->SendStreamToClientAndRenderServerRoot();
+  pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER_ROOT);
 
   // Clean up this mess !!!!!!!!!!!!!
   // Even a cast to vtkPVClientServerModule would be better than this.
@@ -191,9 +191,9 @@ void vtkPVIceTDisplayRenderModule::SetPVApplication(vtkPVApplication *pvApp)
                   << vtkClientServerStream::End;
   // copy the stream before it is sent and reset
   vtkClientServerStream copy = pm->GetStream();
-  pm->SendStreamToClient(); // send the stream to the client
+  pm->SendStream(vtkProcessModule::CLIENT); // send the stream to the client
   pm->GetStream() = copy; // now copy the copy into the current stream
-  pm->SendStreamToRenderServerRoot(); // send the same stream to the server root
+  pm->SendStream(vtkProcessModule::RENDER_SERVER_ROOT); // send the same stream to the server root
 }
 
 //----------------------------------------------------------------------------
@@ -206,7 +206,7 @@ void vtkPVIceTDisplayRenderModule::StillRender()
     pm->GetStream() << vtkClientServerStream::Invoke << this->DisplayManagerID
                     << "SetImageReductionFactor" << 1 
                     << vtkClientServerStream::End;
-    pm->SendStreamToClientAndRenderServer();
+    pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
     }
 
   this->Superclass::StillRender();
@@ -221,7 +221,7 @@ void vtkPVIceTDisplayRenderModule::InteractiveRender()
     pm->GetStream() << vtkClientServerStream::Invoke << this->DisplayManagerID
                     << "SetImageReductionFactor" << 1 
                     << vtkClientServerStream::End;
-    pm->SendStreamToClientAndRenderServer();
+    pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
     }
 
   this->Superclass::InteractiveRender();

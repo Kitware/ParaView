@@ -179,7 +179,7 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterface);
-vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.127");
+vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.128");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterface,ControlledWidget, vtkPVWidget);
 
@@ -1550,7 +1550,7 @@ void vtkPVAnimationInterface::SaveGeometry(const char* fileName,
   pm->GetStream() << vtkClientServerStream::Invoke << pvAnimWriterID
                   << "Start"
                   << vtkClientServerStream::End;
-  pm->SendStreamToServer();
+  pm->SendStream(vtkProcessModule::DATA_SERVER);
   int retVal, success = 1;
   vtkPVApplication *pvApp = this->GetPVApplication();
   
@@ -1569,7 +1569,7 @@ void vtkPVAnimationInterface::SaveGeometry(const char* fileName,
     pm->GetStream() << vtkClientServerStream::Invoke << pvAnimWriterID
                     << "GetErrorCode" 
                     << vtkClientServerStream::End;
-    pm->SendStreamToServer();
+    pm->SendStream(vtkProcessModule::DATA_SERVER);
     pm->GetLastServerResult().GetArgument(0, 0, &retVal);
     if (retVal == vtkErrorCode::OutOfDiskSpaceError)
       {
@@ -1591,7 +1591,7 @@ void vtkPVAnimationInterface::SaveGeometry(const char* fileName,
     pm->GetStream() << vtkClientServerStream::Invoke << pvAnimWriterID
                     << "GetErrorCode" 
                     << vtkClientServerStream::End;
-    pm->SendStreamToServer();
+    pm->SendStream(vtkProcessModule::DATA_SERVER);
     pm->GetLastServerResult().GetArgument(0, 0, &retVal);
     if (retVal == vtkErrorCode::OutOfDiskSpaceError)
       {
@@ -1602,7 +1602,7 @@ void vtkPVAnimationInterface::SaveGeometry(const char* fileName,
       }
     }
   pm->DeleteStreamObject(pvAnimWriterID);
-  pm->SendStreamToServer();
+  pm->SendStream(vtkProcessModule::DATA_SERVER);
   
   if(numPartitions > 1)
     {
@@ -1612,7 +1612,7 @@ void vtkPVAnimationInterface::SaveGeometry(const char* fileName,
       {
       pm->DeleteStreamObject(*i);
       }
-    pm->SendStreamToServer();
+    pm->SendStream(vtkProcessModule::DATA_SERVER);
     }  
   this->SavingData = 0;
   this->GetWindow()->UpdateEnableState();

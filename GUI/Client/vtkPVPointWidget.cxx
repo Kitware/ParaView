@@ -35,7 +35,7 @@
 #include "vtkRenderer.h"
 
 vtkStandardNewMacro(vtkPVPointWidget);
-vtkCxxRevisionMacro(vtkPVPointWidget, "1.29");
+vtkCxxRevisionMacro(vtkPVPointWidget, "1.30");
 
 int vtkPVPointWidgetCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -174,7 +174,7 @@ void vtkPVPointWidget::UpdateVTKObject()
                     << this->PositionEntry[1]->GetValueAsFloat()
                     << this->PositionEntry[2]->GetValueAsFloat()
                     << vtkClientServerStream::End;
-    pm->SendStreamToServer();
+    pm->SendStream(vtkProcessModule::DATA_SERVER);
     }
   
   this->SetLastAcceptedPosition(this->PositionEntry[0]->GetValueAsFloat(),
@@ -227,7 +227,7 @@ void vtkPVPointWidget::ChildCreate(vtkPVApplication* pvApp)
   this->Widget3DID = pm->NewStreamObject("vtkPickPointWidget");
   pm->GetStream() << vtkClientServerStream::Invoke << this->Widget3DID << "AllOff" 
                   << vtkClientServerStream::End;
-  pm->SendStreamToClientAndRenderServer();
+  pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
 
   // Widget needs the RenderModule for picking.
   vtkPickPointWidget *widget = vtkPickPointWidget::SafeDownCast(
@@ -352,7 +352,7 @@ void vtkPVPointWidget::SetPositionInternal(double x, double y, double z)
     {
     pm->GetStream() << vtkClientServerStream::Invoke << this->Widget3DID 
                     << "SetPosition" << x << y << z << vtkClientServerStream::End;
-    pm->SendStreamToClientAndRenderServer();
+    pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
     }
   this->Render();
 }

@@ -27,7 +27,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPickDisplay);
-vtkCxxRevisionMacro(vtkPVPickDisplay, "1.3");
+vtkCxxRevisionMacro(vtkPVPickDisplay, "1.4");
 
 
 //----------------------------------------------------------------------------
@@ -57,13 +57,13 @@ vtkPVPickDisplay::~vtkPVPickDisplay()
     if (pm && this->DuplicateID.ID)
       {
       pm->DeleteStreamObject(this->DuplicateID);
-      pm->SendStreamToRenderServerClientAndServer();
+      pm->SendStream(vtkProcessModule::CLIENT_AND_SERVERS);
       }
     this->DuplicateID.ID = 0;
     if (pm && this->UpdateSuppressorID.ID)
       {
       pm->DeleteStreamObject(this->UpdateSuppressorID);
-      pm->SendStreamToRenderServerClientAndServer();
+      pm->SendStream(vtkProcessModule::CLIENT_AND_SERVERS);
       }
     this->UpdateSuppressorID.ID = 0;
     if (this->PointLabelMapperID.ID)
@@ -77,7 +77,7 @@ vtkPVPickDisplay::~vtkPVPickDisplay()
       this->PointLabelActorID.ID = 0;
       }
     // Is this necessary?
-    pm->SendStreamToClientAndRenderServer();
+    pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
     }
 
   this->SetPart(NULL);
@@ -118,7 +118,7 @@ void vtkPVPickDisplay::CreateParallelTclObjects(vtkPVApplication *pvApp)
 
   // Create the fliter wich duplicates the data on all processes.
   this->DuplicateID = pm->NewStreamObject("vtkMPIMoveData");
-  pm->SendStreamToRenderServerClientAndServer();
+  pm->SendStream(vtkProcessModule::CLIENT_AND_SERVERS);
 
   // A rather complex mess to set the correct server variable 
   // on all of the remote duplication filters.
@@ -130,7 +130,7 @@ void vtkPVPickDisplay::CreateParallelTclObjects(vtkPVApplication *pvApp)
       << vtkClientServerStream::Invoke
       << this->DuplicateID << "SetServerToClient"
       << vtkClientServerStream::End;
-    pm->SendStreamToClient();
+    pm->SendStream(vtkProcessModule::CLIENT);
     }
   // pvApp->ClientMode is only set when there is a server.
   if(pvApp->GetClientMode())
@@ -139,7 +139,7 @@ void vtkPVPickDisplay::CreateParallelTclObjects(vtkPVApplication *pvApp)
       << vtkClientServerStream::Invoke
       << this->DuplicateID << "SetServerToDataServer"
       << vtkClientServerStream::End;
-    pm->SendStreamToServer();
+    pm->SendStream(vtkProcessModule::DATA_SERVER);
     }
   // if running in render server mode
   if(pvApp->GetRenderServerMode())
@@ -148,7 +148,7 @@ void vtkPVPickDisplay::CreateParallelTclObjects(vtkPVApplication *pvApp)
       << vtkClientServerStream::Invoke
       << this->DuplicateID << "SetServerToRenderServer"
       << vtkClientServerStream::End;
-    pm->SendStreamToRenderServer();
+    pm->SendStream(vtkProcessModule::RENDER_SERVER);
     }  
 
 
@@ -161,25 +161,25 @@ void vtkPVPickDisplay::CreateParallelTclObjects(vtkPVApplication *pvApp)
     << this->DuplicateID << "SetClientDataServerSocketController"
     << vtkClientServerStream::LastResult
     << vtkClientServerStream::End;
-  pm->SendStreamToClientAndServer();
+  pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::DATA_SERVER);
 
   pm->GetStream()
     << vtkClientServerStream::Invoke
     << this->DuplicateID << "SetMPIMToNSocketConnection" 
     << pm->GetMPIMToNSocketConnectionID()
     << vtkClientServerStream::End;
-  pm->SendStreamToRenderServerAndServer();
+  pm->SendStream(vtkProcessModule::RENDER_SERVER|vtkProcessModule::DATA_SERVER);
 
   stream << vtkClientServerStream::Invoke << this->DuplicateID 
          << "SetMoveModeToClone" << vtkClientServerStream::End;
-  pm->SendStreamToRenderServerClientAndServer();
+  pm->SendStream(vtkProcessModule::CLIENT_AND_SERVERS);
 
 
   // Now create the update supressors which keep the renderers/mappers
   // from updating the pipeline.  These are here to ensure that all
   // processes get updated at the same time.
   this->UpdateSuppressorID = pm->NewStreamObject("vtkPVUpdateSuppressor");
-  pm->SendStreamToRenderServerClientAndServer();
+  pm->SendStream(vtkProcessModule::CLIENT_AND_SERVERS);
 
   // Set the output of the duplicate on all nodes.
   // Only the data server has an input and
@@ -196,7 +196,7 @@ void vtkPVPickDisplay::CreateParallelTclObjects(vtkPVApplication *pvApp)
                   << "SetInput" << vtkClientServerStream::LastResult 
                   << vtkClientServerStream::End;
   pm->DeleteStreamObject(id);
-  pm->SendStreamToRenderServerClientAndServer();
+  pm->SendStream(vtkProcessModule::CLIENT_AND_SERVERS);
 
   // Create point labels.
   this->PointLabelMapperID = pm->NewStreamObject("vtkLabeledDataMapper");
@@ -211,7 +211,7 @@ void vtkPVPickDisplay::CreateParallelTclObjects(vtkPVApplication *pvApp)
     << vtkClientServerStream::Invoke << this->PointLabelMapperID
     << "SetInput" << vtkClientServerStream::LastResult
     << vtkClientServerStream::End;
-  pm->SendStreamToClientAndRenderServer();
+  pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
 
   // Tell the update suppressor to produce the correct partition.
   pm->GetStream()
@@ -230,7 +230,7 @@ void vtkPVPickDisplay::CreateParallelTclObjects(vtkPVApplication *pvApp)
     << this->UpdateSuppressorID << "SetUpdatePiece"
     << vtkClientServerStream::LastResult
     << vtkClientServerStream::End;
-  pm->SendStreamToRenderServerClientAndServer();
+  pm->SendStream(vtkProcessModule::CLIENT_AND_SERVERS);
 }
 
 
@@ -277,7 +277,7 @@ void vtkPVPickDisplay::SetPointLabelVisibility(int val)
       << pvApp->GetRenderModule()->GetRendererID() << "RemoveProp"
       << this->PointLabelActorID << vtkClientServerStream::End;
     }
-  pm->SendStreamToClientAndRenderServer();
+  pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
 }
 
 
@@ -301,7 +301,7 @@ void vtkPVPickDisplay::SetInput(vtkPVPart* input)
                   << "SetInput" << input->GetVTKDataID() 
                   << vtkClientServerStream::End;
   // Only the server has data.
-  pm->SendStreamToServer();
+  pm->SendStream(vtkProcessModule::DATA_SERVER);
 }
 
 //----------------------------------------------------------------------------
@@ -329,7 +329,7 @@ void vtkPVPickDisplay::Update()
     vtkClientServerStream& stream = pm->GetStream();
     stream << vtkClientServerStream::Invoke << this->UpdateSuppressorID 
            << "ForceUpdate" << vtkClientServerStream::End;
-    pm->SendStreamToRenderServerClientAndServer();
+    pm->SendStream(vtkProcessModule::CLIENT_AND_SERVERS);
     this->GeometryIsValid = 1;
     }
 }
@@ -366,7 +366,7 @@ void vtkPVPickDisplay::RemoveAllCaches()
   vtkClientServerStream& stream = pm->GetStream();
   stream << vtkClientServerStream::Invoke << this->UpdateSuppressorID 
          << "RemoveAllCaches" << vtkClientServerStream::End; 
-  pm->SendStreamToRenderServerClientAndServer();
+  pm->SendStream(vtkProcessModule::CLIENT_AND_SERVERS);
 }
 
 
@@ -380,7 +380,7 @@ void vtkPVPickDisplay::CacheUpdate(int idx, int total)
   vtkClientServerStream& stream = pm->GetStream();
   stream << vtkClientServerStream::Invoke << this->UpdateSuppressorID 
          << "CacheUpdate" << idx << total << vtkClientServerStream::End;
-  pm->SendStreamToRenderServerClientAndServer();
+  pm->SendStream(vtkProcessModule::CLIENT_AND_SERVERS);
 }
 
 

@@ -21,7 +21,7 @@
 #include "vtkClientServerStream.h"
 
 vtkStandardNewMacro(vtkPVStringWidgetProperty);
-vtkCxxRevisionMacro(vtkPVStringWidgetProperty, "1.6");
+vtkCxxRevisionMacro(vtkPVStringWidgetProperty, "1.7");
 
 vtkPVStringWidgetProperty::vtkPVStringWidgetProperty()
 {
@@ -76,7 +76,7 @@ void vtkPVStringWidgetProperty::AcceptInternal()
     }
   
   pm->GetStream() << vtkClientServerStream::End;
-  pm->SendStreamToServer();
+  pm->SendStream(vtkProcessModule::DATA_SERVER);
 }
 
 void vtkPVStringWidgetProperty::PrintSelf(ostream& os, vtkIndent indent)

@@ -36,7 +36,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectCTHArrays);
-vtkCxxRevisionMacro(vtkPVSelectCTHArrays, "1.11");
+vtkCxxRevisionMacro(vtkPVSelectCTHArrays, "1.12");
 vtkCxxSetObjectMacro(vtkPVSelectCTHArrays, InputMenu, vtkPVInputMenu);
 
 int vtkPVSelectCTHArraysCommand(ClientData cd, Tcl_Interp *interp,
@@ -190,7 +190,7 @@ void vtkPVSelectCTHArrays::AcceptInternal(vtkClientServerID vtkSourceID)
   pm->GetStream() << vtkClientServerStream::Invoke <<  vtkSourceID
                   << "RemoveAllVolumeArrayNames"
                   << vtkClientServerStream::End;
-  pm->SendStreamToServer();
+  pm->SendStream(vtkProcessModule::DATA_SERVER);
 
   // Now loop through the input mask setting the selection states.
   for (idx = 0; idx < num; ++idx)
@@ -203,7 +203,7 @@ void vtkPVSelectCTHArrays::AcceptInternal(vtkClientServerID vtkSourceID)
                       << "AddVolumeArrayName"
                       << arrayName
                       << vtkClientServerStream::End;   
-      pm->SendStreamToServer();
+      pm->SendStream(vtkProcessModule::DATA_SERVER);
       }
     }
 

@@ -29,7 +29,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWriter);
-vtkCxxRevisionMacro(vtkPVWriter, "1.14");
+vtkCxxRevisionMacro(vtkPVWriter, "1.15");
 
 //----------------------------------------------------------------------------
 vtkPVWriter::vtkPVWriter()
@@ -193,7 +193,7 @@ int vtkPVWriter::WriteOneFile(const char* fileName, vtkPVSource* pvs,
   pm->GetStream() << vtkClientServerStream::Invoke
                   << writerID << "GetErrorCode"
                   << vtkClientServerStream::End;
-  pm->SendStreamToServer();
+  pm->SendStream(vtkProcessModule::DATA_SERVER);
   int retVal;
   if(pm->GetLastServerResult().GetArgument(0, 0, &retVal) &&
      retVal == vtkErrorCode::OutOfDiskSpaceError)
@@ -207,6 +207,6 @@ int vtkPVWriter::WriteOneFile(const char* fileName, vtkPVSource* pvs,
 
   // Cleanup.
   pm->DeleteStreamObject(writerID);
-  pm->SendStreamToServer();
+  pm->SendStream(vtkProcessModule::DATA_SERVER);
   return success;
 }

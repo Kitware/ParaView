@@ -34,7 +34,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPLOT3DReaderModule);
-vtkCxxRevisionMacro(vtkPVPLOT3DReaderModule, "1.22");
+vtkCxxRevisionMacro(vtkPVPLOT3DReaderModule, "1.23");
 
 int vtkPVPLOT3DReaderModuleCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -66,7 +66,7 @@ void vtkPVPLOT3DReaderModule::Accept(int hideFlag, int hideSource)
   pm->GetStream() << vtkClientServerStream::Invoke << this->GetVTKSourceID(0) 
                   << "CanReadBinaryFile" << vtkClientServerStream::LastResult
                   << vtkClientServerStream::End;
-  pm->SendStreamToServerRoot();
+  pm->SendStream(vtkProcessModule::DATA_SERVER_ROOT);
   int canread = 0;
   if(!pm->GetLastServerResult().GetArgument(0,0,&canread))
     {

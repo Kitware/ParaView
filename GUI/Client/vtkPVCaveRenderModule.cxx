@@ -30,7 +30,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCaveRenderModule);
-vtkCxxRevisionMacro(vtkPVCaveRenderModule, "1.3");
+vtkCxxRevisionMacro(vtkPVCaveRenderModule, "1.4");
 
 
 
@@ -72,7 +72,7 @@ void vtkPVCaveRenderModule::SetPVApplication(vtkPVApplication *pvApp)
 
   this->Composite = NULL;
   this->CompositeID = pm->NewStreamObject("vtkCaveRenderManager");
-  pm->SendStreamToClientAndRenderServer();
+  pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
 
   if (pvApp->GetClientMode())
     {
@@ -80,7 +80,7 @@ void vtkPVCaveRenderModule::SetPVApplication(vtkPVApplication *pvApp)
       << vtkClientServerStream::Invoke
       << this->CompositeID << "SetClientFlag" << 1
       << vtkClientServerStream::End;
-    pm->SendStreamToClient();
+    pm->SendStream(vtkProcessModule::CLIENT);
 
     pm->GetStream()
       << vtkClientServerStream::Invoke
@@ -91,7 +91,7 @@ void vtkPVCaveRenderModule::SetPVApplication(vtkPVApplication *pvApp)
       << this->CompositeID << "SetSocketController"
       << vtkClientServerStream::LastResult
       << vtkClientServerStream::End;
-    pm->SendStreamToClientAndRenderServer();
+    pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
 
     // Timing of this set is important for server.
     // It has to be after the SocketController has been set,
@@ -100,7 +100,7 @@ void vtkPVCaveRenderModule::SetPVApplication(vtkPVApplication *pvApp)
       << vtkClientServerStream::Invoke
       << this->CompositeID << "InitializeRMIs"
       << vtkClientServerStream::End;
-    pm->SendStreamToClientAndRenderServer();
+    pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
 
     // Setup the tiles.
     // We need a better way to retreive the number of processes
@@ -124,7 +124,7 @@ void vtkPVCaveRenderModule::SetPVApplication(vtkPVApplication *pvApp)
       << vtkClientServerStream::Invoke
       << this->CompositeID << "InitializeRMIs"
       << vtkClientServerStream::End;
-    pm->SendStreamToClientAndRenderServer();
+    pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
     }
 
   pm->GetStream() 
@@ -133,7 +133,7 @@ void vtkPVCaveRenderModule::SetPVApplication(vtkPVApplication *pvApp)
     << "SetRenderWindow"
     << this->RenderWindowID
     << vtkClientServerStream::End;
-  pm->SendStreamToClientAndRenderServer();
+  pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
 }
 
 //----------------------------------------------------------------------------

@@ -38,7 +38,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkXDMFReaderModule);
-vtkCxxRevisionMacro(vtkXDMFReaderModule, "1.18");
+vtkCxxRevisionMacro(vtkXDMFReaderModule, "1.19");
 
 int vtkXDMFReaderModuleCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -102,7 +102,7 @@ int vtkXDMFReaderModule::Initialize(const char* fname,
   pm->GetStream() << vtkClientServerStream::Invoke
                   << clone->GetVTKSourceID(0) << "SetFileName" << fname
                   << vtkClientServerStream::End;
-  pm->SendStreamToServer();
+  pm->SendStream(vtkProcessModule::DATA_SERVER);
   this->Internals->GridList.erase(
     this->Internals->GridList.begin(),
     this->Internals->GridList.end());
@@ -128,7 +128,7 @@ int vtkXDMFReaderModule::ReadFileInformation(const char* fname)
     pm->GetStream() << vtkClientServerStream::Invoke
                     << this->GetVTKSourceID(0) << "UpdateInformation"
                     << vtkClientServerStream::End;
-    pm->SendStreamToServer();
+    pm->SendStream(vtkProcessModule::DATA_SERVER);
 
     vtkKWMessageDialog* dlg = vtkKWMessageDialog::New();
     dlg->SetTitle("Domain and Grids Selection");
@@ -252,7 +252,7 @@ int vtkXDMFReaderModule::ReadFileInformation(const char* fname)
   pm->GetStream() << vtkClientServerStream::Invoke
                   << this->GetVTKSourceID(0) << "UpdateInformation"
                   << vtkClientServerStream::End;
-  pm->SendStreamToServer();
+  pm->SendStream(vtkProcessModule::DATA_SERVER);
 
   int retVal = this->InitializeClone(0, 1);
   if (retVal != VTK_OK)
@@ -294,11 +294,11 @@ void vtkXDMFReaderModule::UpdateGrids()
   pm->GetStream() << vtkClientServerStream::Invoke
                   << this->GetVTKSourceID(0) << "UpdateInformation"
                   << vtkClientServerStream::End;
-  pm->SendStreamToServer();
+  pm->SendStream(vtkProcessModule::DATA_SERVER);
   pm->GetStream() << vtkClientServerStream::Invoke
                   << this->GetVTKSourceID(0) << "GetNumberOfGrids"
                   << vtkClientServerStream::End;
-  pm->SendStreamToServerRoot();
+  pm->SendStream(vtkProcessModule::DATA_SERVER_ROOT);
   int numGrids = 0;
   if(!pm->GetLastServerResult().GetArgument(0, 0, &numGrids))
     {
@@ -312,7 +312,7 @@ void vtkXDMFReaderModule::UpdateGrids()
     pm->GetStream() << vtkClientServerStream::Invoke
                     << this->GetVTKSourceID(0) << "GetGridName" << i
                     << vtkClientServerStream::End;
-    pm->SendStreamToServerRoot();
+    pm->SendStream(vtkProcessModule::DATA_SERVER_ROOT);
     const char* gname;
     if(pm->GetLastServerResult().GetArgument(0, 0, &gname))
       {
@@ -347,11 +347,11 @@ void vtkXDMFReaderModule::UpdateDomains()
   pm->GetStream() << vtkClientServerStream::Invoke
                   << this->GetVTKSourceID(0) << "UpdateInformation"
                   << vtkClientServerStream::End;
-  pm->SendStreamToServer();
+  pm->SendStream(vtkProcessModule::DATA_SERVER);
   pm->GetStream() << vtkClientServerStream::Invoke
                   << this->GetVTKSourceID(0) << "GetNumberOfDomains"
                   << vtkClientServerStream::End;
-  pm->SendStreamToServerRoot();
+  pm->SendStream(vtkProcessModule::DATA_SERVER_ROOT);
   int numDomains = 0;
   if(!pm->GetLastServerResult().GetArgument(0, 0, &numDomains))
     {
@@ -365,7 +365,7 @@ void vtkXDMFReaderModule::UpdateDomains()
     pm->GetStream() << vtkClientServerStream::Invoke
                     << this->GetVTKSourceID(0) << "GetDomainName" << i
                     << vtkClientServerStream::End;
-    pm->SendStreamToServerRoot();
+    pm->SendStream(vtkProcessModule::DATA_SERVER_ROOT);
     const char* dname;
     if(pm->GetLastServerResult().GetArgument(0, 0, &dname))
       {

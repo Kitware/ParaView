@@ -31,7 +31,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVTimerLogDisplay );
-vtkCxxRevisionMacro(vtkPVTimerLogDisplay, "1.15");
+vtkCxxRevisionMacro(vtkPVTimerLogDisplay, "1.16");
 
 int vtkPVTimerLogDisplayCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -300,7 +300,7 @@ void vtkPVTimerLogDisplay::SetThreshold(float val)
                     << "SetLogThreshold"
                     << val
                     << vtkClientServerStream::End;
-    pm->SendStreamToClientAndServer();
+    pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::DATA_SERVER);
     }
 
   this->Threshold = val;
@@ -323,7 +323,7 @@ void vtkPVTimerLogDisplay::SetBufferLength(int length)
                   << "SetLogBufferLength"
                   << length
                   << vtkClientServerStream::End;
-  pm->SendStreamToClientAndServer();
+  pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::DATA_SERVER);
   this->Update();
 }
 
@@ -344,7 +344,7 @@ void vtkPVTimerLogDisplay::Clear()
                   << pm->GetApplicationID()
                   << "ResetLog"
                   << vtkClientServerStream::End;
-  pm->SendStreamToClientAndServer();
+  pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::DATA_SERVER);
   this->Update();
 }
 
@@ -360,7 +360,7 @@ void vtkPVTimerLogDisplay::EnableCheckCallback()
                   << "SetEnableLog"
                   << this->EnableCheck->GetState()
                   << vtkClientServerStream::End;
-  pm->SendStreamToClientAndServer();
+  pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::DATA_SERVER);
 }
 
 //----------------------------------------------------------------------------

@@ -29,7 +29,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVGroupInputsWidget);
-vtkCxxRevisionMacro(vtkPVGroupInputsWidget, "1.21");
+vtkCxxRevisionMacro(vtkPVGroupInputsWidget, "1.22");
 
 int vtkPVGroupInputsWidgetCommand(ClientData cd, Tcl_Interp *interp,
                                 int argc, char *argv[]);
@@ -180,7 +180,7 @@ void vtkPVGroupInputsWidget::AcceptInternal(vtkClientServerID )
   this->Inputs->RemoveAllItems();
 
   // Now loop through the input mask setting the selection states.
-  pvApp->GetProcessModule()->SendStreamToServer();
+  pvApp->GetProcessModule()->SendStream(vtkProcessModule::DATA_SERVER);
   this->PVSource->RemoveAllPVInputs();  
   sources->InitTraversal();
   for (idx = 0; idx < num; ++idx)

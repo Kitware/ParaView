@@ -122,24 +122,6 @@ public:
 //ETX
 
   
-  // Description:
-  // Send the current ClientServerStream data to different places and 
-  // combinations of places.  Possible places are the Client, the 
-  // Server (data server), or the RenderServer.  Also the stream
-  // can be sent to the root of the render and data servers.
-  // Most combinations are possible.
-  virtual void SendStreamToClient();
-  virtual void SendStreamToServer();
-  virtual void SendStreamToRenderServer();
-  virtual void SendStreamToServerRoot();
-  virtual void SendStreamToRenderServerRoot(); 
-  virtual void SendStreamToClientAndServerRoot();
-  virtual void SendStreamToRenderServerAndServerRoot();
-  virtual void SendStreamToClientAndRenderServerRoot(); 
-  virtual void SendStreamToClientAndServer();
-  virtual void SendStreamToClientAndRenderServer();
-  virtual void SendStreamToRenderServerAndServer();
-  virtual void SendStreamToRenderServerClientAndServer();
 //BTX
   virtual void SendStreamToServerTemp(vtkClientServerStream* stream);
   virtual void SendStreamToServerRootTemp(vtkClientServerStream* stream);

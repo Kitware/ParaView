@@ -22,7 +22,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVEnSightReaderModule);
-vtkCxxRevisionMacro(vtkPVEnSightReaderModule, "1.50");
+vtkCxxRevisionMacro(vtkPVEnSightReaderModule, "1.51");
 
 //----------------------------------------------------------------------------
 vtkPVEnSightReaderModule::vtkPVEnSightReaderModule()
@@ -62,7 +62,7 @@ int vtkPVEnSightReaderModule::InitializeData()
                     << "Update" 
                     << vtkClientServerStream::End;
     }
-  pm->SendStreamToServer();
+  pm->SendStream(vtkProcessModule::DATA_SERVER);
   return this->Superclass::InitializeData();
 }
 
@@ -100,7 +100,7 @@ int vtkPVEnSightReaderModule::ReadFileInformation(const char* fname)
                       << "SetController"
                       << vtkClientServerStream::LastResult
                       << vtkClientServerStream::End;
-      pm->SendStreamToServer();
+      pm->SendStream(vtkProcessModule::DATA_SERVER);
       }
     }
   return this->Superclass::ReadFileInformation(fname);

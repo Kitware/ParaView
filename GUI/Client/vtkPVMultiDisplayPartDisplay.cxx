@@ -23,7 +23,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVMultiDisplayPartDisplay);
-vtkCxxRevisionMacro(vtkPVMultiDisplayPartDisplay, "1.12");
+vtkCxxRevisionMacro(vtkPVMultiDisplayPartDisplay, "1.13");
 
 
 //----------------------------------------------------------------------------
@@ -74,7 +74,7 @@ void vtkPVMultiDisplayPartDisplay::CreateParallelTclObjects(vtkPVApplication *pv
       << vtkClientServerStream::Invoke
       << this->LODCollectID << "SetServerToClient"
       << vtkClientServerStream::End;
-    pm->SendStreamToClient();
+    pm->SendStream(vtkProcessModule::CLIENT);
     pm->GetStream()
       << vtkClientServerStream::Invoke
       << this->CollectID << "SetServerToDataServer"
@@ -83,7 +83,7 @@ void vtkPVMultiDisplayPartDisplay::CreateParallelTclObjects(vtkPVApplication *pv
       << vtkClientServerStream::Invoke
       << this->LODCollectID << "SetServerToDataServer"
       << vtkClientServerStream::End;
-    pm->SendStreamToServer();
+    pm->SendStream(vtkProcessModule::DATA_SERVER);
     }
   else
     {
@@ -101,7 +101,7 @@ void vtkPVMultiDisplayPartDisplay::CreateParallelTclObjects(vtkPVApplication *pv
       << vtkClientServerStream::Invoke
       << this->LODCollectID << "SetServerToRenderServer"
       << vtkClientServerStream::End;
-    pm->SendStreamToRenderServer();
+    pm->SendStream(vtkProcessModule::RENDER_SERVER);
     }  
 }
 

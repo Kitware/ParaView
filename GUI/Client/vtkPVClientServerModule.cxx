@@ -145,7 +145,7 @@ void vtkPVSendStreamToClientServerNodeRMI(void *localArg, void *remoteArg,
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVClientServerModule);
-vtkCxxRevisionMacro(vtkPVClientServerModule, "1.81");
+vtkCxxRevisionMacro(vtkPVClientServerModule, "1.82");
 
 int vtkPVClientServerModuleCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -655,7 +655,7 @@ void vtkPVClientServerModule::InitializeRenderServer()
   // data and render servers
   vtkClientServerID id = this->NewStreamObject("vtkMPIMToNSocketConnection");
   this->MPIMToNSocketConnectionID = id;
-  this->SendStreamToRenderServerAndServer();
+  this->SendStream(vtkProcessModule::RENDER_SERVER|vtkProcessModule::DATA_SERVER);
   
   // now tell the render server to find out what ports it is going
   // to use
@@ -687,7 +687,7 @@ void vtkPVClientServerModule::InitializeRenderServer()
     << vtkClientServerStream::Invoke << id 
     << "SetNumberOfConnections" << info->GetNumberOfConnections()
     << vtkClientServerStream::End;
-  this->SendStreamToServer();
+  this->SendStream(vtkProcessModule::DATA_SERVER);
   
   // Set up the port information for each process on the data server
   // to match those found on the render server
@@ -701,7 +701,7 @@ void vtkPVClientServerModule::InitializeRenderServer()
       << info->GetProcessHostName(i)
       << vtkClientServerStream::End;
     } 
-  this->SendStreamToServer();
+  this->SendStream(vtkProcessModule::DATA_SERVER);
   
   // now tell the render server to wait for the connection
   this->GetStream() 
@@ -713,7 +713,7 @@ void vtkPVClientServerModule::InitializeRenderServer()
   this->GetStream() 
     << vtkClientServerStream::Invoke << id << "Connect"
     << vtkClientServerStream::End;
-  this->SendStreamToServer();
+  this->SendStream(vtkProcessModule::DATA_SERVER);
   info->Delete();
 }
 
@@ -760,7 +760,7 @@ void vtkPVClientServerModule::Exit()
   if (this->MPIMToNSocketConnectionID.ID)
     {    
     this->DeleteStreamObject(this->MPIMToNSocketConnectionID);
-    this->SendStreamToRenderServerAndServer();
+    this->SendStream(vtkProcessModule::RENDER_SERVER|vtkProcessModule::DATA_SERVER);
     this->MPIMToNSocketConnectionID.ID = 0;
     }
  
@@ -844,7 +844,7 @@ void vtkPVClientServerModule::GatherInformation(vtkPVInformation* info,
     << this->GetProcessModuleID()
     << "GatherInformationInternal" << info->GetClassName() << id
     << vtkClientServerStream::End;
-  this->SendStreamToServer();
+  this->SendStream(vtkProcessModule::DATA_SERVER);
 
   // Gather on the client.
   this->GatherInformationInternal(NULL, NULL);

@@ -39,7 +39,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVVolumeAppearanceEditor);
-vtkCxxRevisionMacro(vtkPVVolumeAppearanceEditor, "1.4");
+vtkCxxRevisionMacro(vtkPVVolumeAppearanceEditor, "1.5");
 
 int vtkPVVolumeAppearanceEditorCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -569,7 +569,7 @@ void vtkPVVolumeAppearanceEditor::ScalarOpacityRampChangedInternal()
              << "AddPoint" << range[0] << startValue << vtkClientServerStream::End;
       stream << vtkClientServerStream::Invoke << volumeOpacityID 
              << "AddPoint" << range[1] << endValue << vtkClientServerStream::End;
-      pm->SendStreamToClientAndRenderServer();
+      pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
       }
     this->RenderView();
     }
@@ -633,7 +633,7 @@ void vtkPVVolumeAppearanceEditor::ColorRampChangedInternal()
              << "AddRGBPoint" << range[1] 
              << endColor[0] << endColor[1] << endColor[2] 
              << vtkClientServerStream::End;
-      pm->SendStreamToClientAndRenderServer();
+      pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
       }
     this->RenderView();
     }

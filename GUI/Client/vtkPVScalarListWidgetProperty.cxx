@@ -25,7 +25,7 @@
 #include "vtkPVSource.h"
 
 vtkStandardNewMacro(vtkPVScalarListWidgetProperty);
-vtkCxxRevisionMacro(vtkPVScalarListWidgetProperty, "1.11");
+vtkCxxRevisionMacro(vtkPVScalarListWidgetProperty, "1.12");
 
 vtkPVScalarListWidgetProperty::vtkPVScalarListWidgetProperty()
 {
@@ -135,7 +135,7 @@ void vtkPVScalarListWidgetProperty::AcceptInternal()
       }
     pm->GetStream() << vtkClientServerStream::End;
     }
-  pm->SendStreamToServer();
+  pm->SendStream(vtkProcessModule::DATA_SERVER);
 }
 
 void vtkPVScalarListWidgetProperty::SetAnimationTime(float time)

@@ -23,7 +23,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLineSourceWidget);
-vtkCxxRevisionMacro(vtkPVLineSourceWidget, "1.19");
+vtkCxxRevisionMacro(vtkPVLineSourceWidget, "1.20");
 
 int vtkPVLineSourceWidgetCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -65,7 +65,7 @@ void vtkPVLineSourceWidget::Create(vtkKWApplication *app)
     this->OutputID = pm->NewStreamObject("vtkPolyData");
     pm->GetStream() << vtkClientServerStream::Invoke << this->SourceID 
                     << "SetOutput" << this->OutputID << vtkClientServerStream::End;
-    pm->SendStreamToServer();
+    pm->SendStream(vtkProcessModule::DATA_SERVER);
     }
 
 

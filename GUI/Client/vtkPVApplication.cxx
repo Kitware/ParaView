@@ -81,7 +81,7 @@
 #include "vtkSocketController.h"
 #include "vtkMPIMToNSocketConnectionPortInformation.h"
 #include "vtkPVProgressHandler.h"
-
+#include "vtkProcessModule.h"
 // #include "vtkPVRenderGroupDialog.h"
 
 #include <sys/stat.h>
@@ -106,7 +106,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.282");
+vtkCxxRevisionMacro(vtkPVApplication, "1.283");
 vtkCxxSetObjectMacro(vtkPVApplication, RenderModule, vtkPVRenderModule);
 
 
@@ -1359,7 +1359,7 @@ void vtkPVApplication::Initialize()
                     << imf << "SetUseMesaClasses" << 1
                     << vtkClientServerStream::End;
     pm->DeleteStreamObject(imf);
-    pm->SendStreamToClientAndServer();
+    pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::DATA_SERVER);
 
     if (this->UseSatelliteSoftware)
       {
@@ -1885,7 +1885,7 @@ void vtkPVApplication::SetGlobalLODFlag(int val)
                   << "SetGlobalLODFlagInternal"
                   << val
                   << vtkClientServerStream::End;
-  pm->SendStreamToClientAndServer();
+  pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::DATA_SERVER);
 }
 
  
@@ -2320,7 +2320,7 @@ void vtkPVApplication::SendPrepareProgress()
   vtkClientServerStream& stream = pm->GetStream();
   stream << vtkClientServerStream::Invoke << pm->GetApplicationID()
     << "PrepareProgress" << vtkClientServerStream::End;
-  pm->SendStreamToClientAndServer();
+  pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::DATA_SERVER);
   if ( this->ProgressRequests == 0 )
     {
     this->ProgressEnabled = this->GetMainWindow()->GetEnabled();
@@ -2345,7 +2345,7 @@ void vtkPVApplication::SendCleanupPendingProgress()
   vtkClientServerStream& stream = pm->GetStream();
   stream << vtkClientServerStream::Invoke << pm->GetApplicationID()
          << "CleanupPendingProgress" << vtkClientServerStream::End;
-  pm->SendStreamToClientAndServer();
+  pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::DATA_SERVER);
   this->GetMainWindow()->EndProgress(this->ProgressEnabled);
 }
 
@@ -2399,7 +2399,7 @@ void vtkPVApplication::PlayDemo(int fromDashboard)
   pm->GetStream() << vtkClientServerStream::Invoke
                   << pm->GetApplicationID() << "GetDemoPath"
                   << vtkClientServerStream::End;
-  pm->SendStreamToServerRoot();
+  pm->SendStream(vtkProcessModule::DATA_SERVER_ROOT);
   if(!pm->GetLastServerResult().GetArgument(0, 0, &demoDataPath))
     {
     demoDataPath = 0;

@@ -44,7 +44,7 @@
 #include "vtkPlane.h"
 
 vtkStandardNewMacro(vtkPVBoxWidget);
-vtkCxxRevisionMacro(vtkPVBoxWidget, "1.30");
+vtkCxxRevisionMacro(vtkPVBoxWidget, "1.31");
 
 int vtkPVBoxWidgetCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -120,7 +120,7 @@ vtkPVBoxWidget::~vtkPVBoxWidget()
     }
   if(pm)
     {
-    pm->SendStreamToRenderServerClientAndServer();
+    pm->SendStream(vtkProcessModule::CLIENT_AND_SERVERS);
     }
 }
 
@@ -170,12 +170,12 @@ void vtkPVBoxWidget::ActualPlaceWidget()
                   << "PlaceWidget" 
                   << bds[0] << bds[1] << bds[2] << bds[3] 
                   << bds[4] << bds[5] << vtkClientServerStream::End;
-  pvApp->GetProcessModule()->SendStreamToServer();
+  pvApp->GetProcessModule()->SendStream(vtkProcessModule::DATA_SERVER);
   
   pm->GetStream() << vtkClientServerStream::Invoke 
                   << this->Widget3DID << "GetPlanes" << this->BoxID 
                   << vtkClientServerStream::End;
-  pm->SendStreamToRenderServerClientAndServer();
+  pm->SendStream(vtkProcessModule::CLIENT_AND_SERVERS);
 }
 
 //----------------------------------------------------------------------------
@@ -197,7 +197,7 @@ void vtkPVBoxWidget::AcceptInternal(vtkClientServerID sourceID)
     this->SetStoredPosition(this->PositionGUI);
     this->SetStoredRotation(this->RotationGUI);
     this->SetStoredScale(this->ScaleGUI);
-    pm->SendStreamToRenderServerClientAndServer(); 
+    pm->SendStream(vtkProcessModule::CLIENT_AND_SERVERS); 
     }
   this->Superclass::AcceptInternal(sourceID);
   this->Initialized = 1;
@@ -372,11 +372,11 @@ void vtkPVBoxWidget::ChildCreate(vtkPVApplication* pvApp)
   pm->GetStream() << vtkClientServerStream::Invoke << this->Widget3DID << "PlaceWidget"
                   << 0 << 1 << 0 << 1 << 0 << 1
                   << vtkClientServerStream::End;
-  pm->SendStreamToRenderServerClientAndServer();
+  pm->SendStream(vtkProcessModule::CLIENT_AND_SERVERS);
   this->BoxID = pm->NewStreamObject("vtkPlanes");
   this->BoxMatrixID = pm->NewStreamObject("vtkMatrix4x4");
   this->BoxTransformID = pm->NewStreamObject("vtkTransform");
-  pm->SendStreamToRenderServerClientAndServer();
+  pm->SendStream(vtkProcessModule::CLIENT_AND_SERVERS);
   
   this->Box = vtkPlanes::SafeDownCast(pm->GetObjectFromID(this->BoxID));
   this->BoxTransform = vtkTransform::SafeDownCast(pm->GetObjectFromID(this->BoxTransformID));
@@ -730,10 +730,10 @@ void vtkPVBoxWidget::UpdateBox(int update)
                   << vtkClientServerStream::End;
   pm->GetStream() << vtkClientServerStream::Invoke << this->BoxTransformID
                   << "SetMatrix" << this->BoxMatrixID << vtkClientServerStream::End;
-  pm->SendStreamToRenderServerClientAndServer();
+  pm->SendStream(vtkProcessModule::CLIENT_AND_SERVERS);
   pm->GetStream() << vtkClientServerStream::Invoke << this->Widget3DID
                   << "SetTransform" << this->BoxTransformID << vtkClientServerStream::End;
-  pm->SendStreamToRenderServerClientAndServer();
+  pm->SendStream(vtkProcessModule::CLIENT_AND_SERVERS);
   this->SetValueChanged();
 }
 

@@ -62,7 +62,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.359");
+vtkCxxRevisionMacro(vtkPVSource, "1.360");
 
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
@@ -325,7 +325,7 @@ void vtkPVSource::SetPVInputInternal(int idx, vtkPVSource *pvs, int doInit)
       stream << vtkClientServerStream::Invoke 
              << sourceID << "RemoveAllInputs"
              << vtkClientServerStream::End;
-      pm->SendStreamToServer();
+      pm->SendStream(vtkProcessModule::DATA_SERVER);
       }
     for (partIdx = 0; partIdx < numParts; ++partIdx)
       {
@@ -342,7 +342,7 @@ void vtkPVSource::SetPVInputInternal(int idx, vtkPVSource *pvs, int doInit)
         stream << vtkClientServerStream::Invoke 
                << sourceID << str.str() << part->GetVTKDataID() 
                << vtkClientServerStream::End;
-        pm->SendStreamToServer();
+        pm->SendStream(vtkProcessModule::DATA_SERVER);
         delete []str.str();
         }      
       }
@@ -372,7 +372,7 @@ void vtkPVSource::SetPVInputInternal(int idx, vtkPVSource *pvs, int doInit)
         stream << vtkClientServerStream::Invoke 
                << sourceID << str.str() << part->GetVTKDataID() 
                << vtkClientServerStream::End;
-        pm->SendStreamToServer();
+        pm->SendStream(vtkProcessModule::DATA_SERVER);
         delete [] str.str();
         }
       }
@@ -680,7 +680,7 @@ void vtkPVSource::RemoveAllVTKSources()
     vtkClientServerID id = this->GetVTKSourceID(idx);
     pm->DeleteStreamObject(id);
     }
-  pm->SendStreamToServer();
+  pm->SendStream(vtkProcessModule::DATA_SERVER);
 
   this->VTKSourceIDs->clear();
 }
@@ -1805,7 +1805,7 @@ void vtkPVSource::RemoveAllPVInputs()
                << sourceID << "RemoveAllInputs"
                << vtkClientServerStream::End;
         }
-      pm->SendStreamToServer();
+      pm->SendStream(vtkProcessModule::DATA_SERVER);
       }
 
     this->Modified();
@@ -2358,7 +2358,7 @@ int vtkPVSource::ClonePrototypeInternal(vtkPVSource*& clone)
     
     pvs->AddVTKSource(sourceId);
     }
-  pm->SendStreamToServer();
+  pm->SendStream(vtkProcessModule::DATA_SERVER);
   pvs->SetView(this->GetPVWindow()->GetMainView());
 
   pvs->PrototypeInstanceCount = this->PrototypeInstanceCount;
@@ -2441,7 +2441,7 @@ int vtkPVSource::InitializeData()
     stream.Reset();
     stream << vtkClientServerStream::Invoke << sourceID <<
       "GetNumberOfOutputs" << vtkClientServerStream::End;
-    pm->SendStreamToServer();
+    pm->SendStream(vtkProcessModule::DATA_SERVER);
     if(!pm->GetLastServerResult().GetArgument(0, 0, &numOutputs))
       {
       vtkErrorMacro("wrong return type for GetNumberOfOutputs call");
@@ -2456,7 +2456,7 @@ int vtkPVSource::InitializeData()
       stream << vtkClientServerStream::Assign << dataID
              << vtkClientServerStream::LastResult
              << vtkClientServerStream::End;
-      pm->SendStreamToServer();
+      pm->SendStream(vtkProcessModule::DATA_SERVER);
       part = vtkPVPart::New();
       part->SetPVApplication(pvApp);
       part->SetVTKDataID(dataID);

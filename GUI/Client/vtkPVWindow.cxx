@@ -126,7 +126,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.575");
+vtkCxxRevisionMacro(vtkPVWindow, "1.576");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -297,7 +297,7 @@ vtkPVWindow::~vtkPVWindow()
     vtkPVApplication *pvApp = this->GetPVApplication();
     vtkPVProcessModule *pm = pvApp->GetProcessModule();
     pm->DeleteStreamObject(this->ServerFileListingID);
-    pm->SendStreamToServerRoot();
+    pm->SendStream(vtkProcessModule::DATA_SERVER_ROOT);
     }
 
   if (this->InteractorID.ID)
@@ -310,7 +310,7 @@ vtkPVWindow::~vtkPVWindow()
     stream << vtkClientServerStream::Invoke << this->InteractorID << "SetRenderer" 
            << 0 << vtkClientServerStream::End;
     pm->DeleteStreamObject(this->InteractorID);
-    pm->SendStreamToClientAndRenderServer();
+    pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
     this->InteractorID.ID = 0;
     this->SetInteractor(NULL);
     }
@@ -423,20 +423,20 @@ void vtkPVWindow::PrepareForDelete()
   if (pvApp && this->CenterSourceID.ID)
     {
     pm->DeleteStreamObject(this->CenterSourceID);
-    pm->SendStreamToClientAndRenderServerRoot();
+    pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER_ROOT);
     }
   this->CenterSourceID.ID = 0;
   if (pvApp && this->CenterMapperID.ID)
     {
     pm->DeleteStreamObject(this->CenterMapperID);
-    pm->SendStreamToClientAndRenderServerRoot();
+    pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER_ROOT);
     }
   this->CenterMapperID.ID = 0;
 
   if (pvApp && this->CenterActorID.ID)
     {
     pm->DeleteStreamObject(this->CenterActorID);
-    pm->SendStreamToClientAndRenderServerRoot();
+    pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER_ROOT);
     }
   this->CenterActorID.ID = 0;
 
@@ -963,7 +963,7 @@ void vtkPVWindow::Create(vtkKWApplication *app, const char* vtkNotUsed(args))
          << vtkClientServerStream::End;
   stream << vtkClientServerStream::Invoke << this->InteractorID 
          << "SetInteractorStyle" << 0 << vtkClientServerStream::End;
-  pm->SendStreamToClientAndRenderServer();
+  pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
   this->SetInteractor(
     vtkPVGenericRenderWindowInteractor::SafeDownCast(
       pvApp->GetProcessModule()->GetObjectFromID(this->InteractorID)));
@@ -1033,7 +1033,7 @@ void vtkPVWindow::Create(vtkKWApplication *app, const char* vtkNotUsed(args))
   pm->GetStream() << vtkClientServerStream::Invoke <<  this->CenterActorID
                   << "VisibilityOff"
                   << vtkClientServerStream::End;
-  pm->SendStreamToClientAndRenderServerRoot();
+  pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER_ROOT);
   
   this->CenterEntryFrame->SetParent(this->PickCenterToolbar->GetFrame());
   this->CenterEntryFrame->Create(app, "frame", "");
@@ -1096,7 +1096,7 @@ void vtkPVWindow::Create(vtkKWApplication *app, const char* vtkNotUsed(args))
                   << pvApp->GetRenderModule()->GetRendererID()
                   << "AddActor" << this->CenterActorID 
                   << vtkClientServerStream::End;
-  pm->SendStreamToClientAndRenderServerRoot();
+  pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER_ROOT);
 
   this->Interactor->SetPVRenderView(this->MainView);
   this->ChangeInteractorStyle(1);
@@ -1360,7 +1360,7 @@ void vtkPVWindow::SetCenterOfRotation(float x, float y, float z)
   pm->GetStream() << vtkClientServerStream::Invoke <<  this->CenterActorID
                   << "SetPosition" << x << y << z
                   << vtkClientServerStream::End;
-  pm->SendStreamToClientAndRenderServerRoot();
+  pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER_ROOT);
   this->MainView->EventuallyRender();
 }
 
@@ -1376,7 +1376,7 @@ void vtkPVWindow::HideCenterActor()
   pm->GetStream() << vtkClientServerStream::Invoke <<  this->CenterActorID
                   << "VisibilityOff"
                   << vtkClientServerStream::End;
-  pm->SendStreamToClientAndRenderServerRoot();
+  pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER_ROOT);
 }
 
 //-----------------------------------------------------------------------------
@@ -1393,7 +1393,7 @@ void vtkPVWindow::ShowCenterActor()
     pm->GetStream() << vtkClientServerStream::Invoke <<  this->CenterActorID
                     << "VisibilityOn"
                     << vtkClientServerStream::End;
-    pm->SendStreamToClientAndRenderServerRoot();
+    pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER_ROOT);
     }
 }
 
@@ -1506,7 +1506,7 @@ void vtkPVWindow::ResizeCenterActor()
                     << vtkClientServerStream::End;
     this->MainView->ResetCamera();
     }
-  pm->SendStreamToClientAndRenderServerRoot();
+  pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER_ROOT);
 }
 
 //-----------------------------------------------------------------------------
@@ -1706,7 +1706,7 @@ int vtkPVWindow::CheckIfFileIsReadable(const char* fileName)
                   << this->ServerFileListingID << "FileIsReadable"
                   << fileName
                   << vtkClientServerStream::End;
-  pm->SendStreamToServerRoot();
+  pm->SendStream(vtkProcessModule::DATA_SERVER_ROOT);
   int readable = 0;
   if(!pm->GetLastServerResult().GetArgument(0, 0, &readable))
     {

@@ -29,7 +29,7 @@ int vtkPVPointSourceWidget::InstanceCount = 0;
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPointSourceWidget);
-vtkCxxRevisionMacro(vtkPVPointSourceWidget, "1.25");
+vtkCxxRevisionMacro(vtkPVPointSourceWidget, "1.26");
 
 int vtkPVPointSourceWidgetCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -197,7 +197,7 @@ void vtkPVPointSourceWidget::Create(vtkKWApplication *app)
     pm->GetStream() << vtkClientServerStream::Invoke 
                     << this->SourceID << "SetOutput" << this->OutputID 
                     << vtkClientServerStream::End;
-    pm->SendStreamToClientAndServer();
+    pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::DATA_SERVER);
     }
 
   this->PointWidget->SetObjectID(this->SourceID);

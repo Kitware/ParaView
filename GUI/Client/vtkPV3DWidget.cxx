@@ -33,7 +33,7 @@
 #include "vtkPVProcessModule.h"
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkPV3DWidget, "1.50");
+vtkCxxRevisionMacro(vtkPV3DWidget, "1.51");
 
 //===========================================================================
 //***************************************************************************
@@ -89,7 +89,7 @@ vtkPV3DWidget::~vtkPV3DWidget()
     pm->GetStream() << vtkClientServerStream::Invoke << this->Widget3DID
                     << "EnabledOff" << vtkClientServerStream::End;
     pm->DeleteStreamObject(this->Widget3DID);
-    pm->SendStreamToClientAndRenderServer();
+    pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
     this->Widget3DID.ID = 0;
     }
   this->Observer->Delete();
@@ -174,7 +174,7 @@ void vtkPV3DWidget::Create(vtkKWApplication *kwApp)
                     << "SetInteractor" 
                     << this->PVSource->GetPVWindow()->GetInteractorID()
                     << vtkClientServerStream::End;
-    pm->SendStreamToClientAndRenderServer();
+    pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
     this->InitializeObservers(
       vtk3DWidget::SafeDownCast(pm->GetObjectFromID(this->Widget3DID)));
     }
@@ -266,7 +266,7 @@ void vtkPV3DWidget::SetVisibility(int visibility)
   this->Widget3D->SetCurrentRenderer(this->PVSource->GetPVWindow()->GetMainView()->GetRenderer());
   pm->GetStream() << vtkClientServerStream::Invoke << this->Widget3DID
                   << "SetEnabled" << visibility << vtkClientServerStream::End;
-  pm->SendStreamToClientAndRenderServer();
+  pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
   this->AddTraceEntry("$kw(%s) SetVisibility %d", 
                       this->GetTclName(), visibility);
   this->Visibility->SetState(visibility);
@@ -295,7 +295,7 @@ void vtkPV3DWidget::SetVisibilityNoTrace(int visibility)
   vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
   pm->GetStream() << vtkClientServerStream::Invoke << this->Widget3DID
                   << "SetEnabled" << visibility << vtkClientServerStream::End;
-  pm->SendStreamToClientAndRenderServer();
+  pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
 }
 
 //----------------------------------------------------------------------------
@@ -327,7 +327,7 @@ void vtkPV3DWidget::ActualPlaceWidget()
                   << "PlaceWidget" 
                   << bds[0] << bds[1] << bds[2] << bds[3] 
                   << bds[4] << bds[5] << vtkClientServerStream::End;
-  pm->SendStreamToClientAndRenderServer();
+  pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
 }
 
 //----------------------------------------------------------------------------

@@ -30,7 +30,7 @@
 #include <vtkstd/string>
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVReaderModule);
-vtkCxxRevisionMacro(vtkPVReaderModule, "1.42");
+vtkCxxRevisionMacro(vtkPVReaderModule, "1.43");
 
 int vtkPVReaderModuleCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -145,14 +145,14 @@ int vtkPVReaderModule::CanReadFile(const char* fname)
     pm->GetStream() << vtkClientServerStream::Invoke
                     << tmpID << "CanReadFile" << fname
                     << vtkClientServerStream::End;
-    pm->SendStreamToServer();
+    pm->SendStream(vtkProcessModule::DATA_SERVER);
     pm->GetLastServerResult().GetArgument(0, 0, &canRead);
     pm->DeleteStreamObject(tmpID);
     pm->GetStream() << vtkClientServerStream::Invoke
                     << pm->GetProcessModuleID()
                     << "SetReportInterpreterErrors" << 1
                     << vtkClientServerStream::End;
-    pm->SendStreamToServer();
+    pm->SendStream(vtkProcessModule::DATA_SERVER);
     }
   return canRead;
 }
@@ -218,7 +218,7 @@ int vtkPVReaderModule::ReadFileInformation(const char* fname)
   // VTKSource. Hence, the use of index 0.
   pm->GetStream() << vtkClientServerStream::Invoke <<  this->GetVTKSourceID(0)
                   << "UpdateInformation" << vtkClientServerStream::End;
-  pm->SendStreamToServer();
+  pm->SendStream(vtkProcessModule::DATA_SERVER);
   return VTK_OK;
 }
 
@@ -361,7 +361,7 @@ void vtkPVReaderModule::SetReaderFileName(const char* fname)
                         + vtkstd::string(this->FileEntry->GetVariableName())).c_str()
                     << fname
                     << vtkClientServerStream::End;
-    pm->SendStreamToServer();
+    pm->SendStream(vtkProcessModule::DATA_SERVER);
     const char* ext = this->ExtractExtension(fname);
     if (ext)
       {

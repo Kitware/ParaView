@@ -35,7 +35,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCompositePartDisplay);
-vtkCxxRevisionMacro(vtkPVCompositePartDisplay, "1.23");
+vtkCxxRevisionMacro(vtkPVCompositePartDisplay, "1.24");
 
 
 //----------------------------------------------------------------------------
@@ -61,7 +61,7 @@ vtkPVCompositePartDisplay::~vtkPVCompositePartDisplay()
       {
       vtkPVProcessModule* pm = pvApp->GetProcessModule();
       pm->DeleteStreamObject(this->CollectID);
-      pm->SendStreamToRenderServerClientAndServer();
+      pm->SendStream(vtkProcessModule::CLIENT_AND_SERVERS);
       }
     this->CollectID.ID = 0;
     }
@@ -71,7 +71,7 @@ vtkPVCompositePartDisplay::~vtkPVCompositePartDisplay()
       {
       vtkPVProcessModule* pm = pvApp->GetProcessModule();
       pm->DeleteStreamObject(this->LODCollectID);
-      pm->SendStreamToRenderServerClientAndServer();
+      pm->SendStream(vtkProcessModule::CLIENT_AND_SERVERS);
       }
     this->LODCollectID.ID = 0;
     }
@@ -86,7 +86,7 @@ vtkClientServerID vtkPVCompositePartDisplay::CreateCollectionFilter(vtkPVApplica
     << vtkClientServerStream::Invoke
     << id << "SetPassThrough" << 1
     << vtkClientServerStream::End;
-  pm->SendStreamToRenderServerClientAndServer();
+  pm->SendStream(vtkProcessModule::CLIENT_AND_SERVERS);
   pm->GetStream()
     << vtkClientServerStream::Invoke
     << id << "SetMPIMToNSocketConnection" 
@@ -94,13 +94,13 @@ vtkClientServerID vtkPVCompositePartDisplay::CreateCollectionFilter(vtkPVApplica
     << vtkClientServerStream::End;
   // create, SetPassThrough, and set the mToN connection
   // object on all servers and client
-  pm->SendStreamToRenderServerAndServer();
+  pm->SendStream(vtkProcessModule::RENDER_SERVER|vtkProcessModule::DATA_SERVER);
   // always set client mode
   pm->GetStream()
     << vtkClientServerStream::Invoke
     << id << "SetClientMode" << 1
     << vtkClientServerStream::End;
-  pm->SendStreamToClient();
+  pm->SendStream(vtkProcessModule::CLIENT);
   // if running in client mode
   // then set the server to be servermode
   if(pvApp->GetClientMode())
@@ -109,7 +109,7 @@ vtkClientServerID vtkPVCompositePartDisplay::CreateCollectionFilter(vtkPVApplica
       << vtkClientServerStream::Invoke
       << id << "SetServerMode" << 1
       << vtkClientServerStream::End;
-    pm->SendStreamToServer();
+    pm->SendStream(vtkProcessModule::DATA_SERVER);
     }
   // if running in render server mode
   if(pvApp->GetRenderServerMode())
@@ -118,7 +118,7 @@ vtkClientServerID vtkPVCompositePartDisplay::CreateCollectionFilter(vtkPVApplica
       << vtkClientServerStream::Invoke
       << id << "SetRenderServerMode" << 1
       << vtkClientServerStream::End;
-    pm->SendStreamToRenderServer();
+    pm->SendStream(vtkProcessModule::RENDER_SERVER);
     }
   
   return id;
@@ -143,7 +143,7 @@ void vtkPVCompositePartDisplay::CreateParallelTclObjects(vtkPVApplication *pvApp
       << this->CollectID << "SetNumberOfProcesses"
       << pvApp->GetNumberOfPipes()
       << vtkClientServerStream::End;
-    pm->SendStreamToRenderServerClientAndServer();
+    pm->SendStream(vtkProcessModule::CLIENT_AND_SERVERS);
     }
   else if (pvApp->GetUseTiledDisplay() || pvApp->GetCaveConfigurationFileName())
     { 
@@ -160,7 +160,7 @@ void vtkPVCompositePartDisplay::CreateParallelTclObjects(vtkPVApplication *pvApp
                     << "SetInput" << id 
                     <<  vtkClientServerStream::End;
     pm->DeleteStreamObject(id);
-    pm->SendStreamToRenderServerClientAndServer();
+    pm->SendStream(vtkProcessModule::CLIENT_AND_SERVERS);
 
     // For the render server feature.
     pm->GetStream()
@@ -168,7 +168,7 @@ void vtkPVCompositePartDisplay::CreateParallelTclObjects(vtkPVApplication *pvApp
       << this->CollectID << "SetMPIMToNSocketConnection" 
       << pm->GetMPIMToNSocketConnectionID()
       << vtkClientServerStream::End;
-    pm->SendStreamToRenderServerAndServer();
+    pm->SendStream(vtkProcessModule::RENDER_SERVER|vtkProcessModule::DATA_SERVER);
     }
   else
     { 
@@ -191,7 +191,7 @@ void vtkPVCompositePartDisplay::CreateParallelTclObjects(vtkPVApplication *pvApp
     << vtkClientServerStream::Invoke
     << this->CollectID << "AddObserver" << "EndEvent" << cmd
     << vtkClientServerStream::End;
-  pm->SendStreamToRenderServerClientAndServer();
+  pm->SendStream(vtkProcessModule::CLIENT_AND_SERVERS);
 
   // ===== LOD branch:
   // Different filter for pipe redistribution.
@@ -203,7 +203,7 @@ void vtkPVCompositePartDisplay::CreateParallelTclObjects(vtkPVApplication *pvApp
       << this->LODCollectID << "SetNumberOfProcesses"
       << pvApp->GetNumberOfPipes()
       << vtkClientServerStream::End;
-    pm->SendStreamToRenderServerClientAndServer();
+    pm->SendStream(vtkProcessModule::CLIENT_AND_SERVERS);
     }
   else if (pvApp->GetUseTiledDisplay() || pvApp->GetCaveConfigurationFileName())
     { // This should be in subclass.
@@ -220,7 +220,7 @@ void vtkPVCompositePartDisplay::CreateParallelTclObjects(vtkPVApplication *pvApp
                     << "SetInput" << id 
                     <<  vtkClientServerStream::End;
     pm->DeleteStreamObject(id);
-    pm->SendStreamToRenderServerClientAndServer();
+    pm->SendStream(vtkProcessModule::CLIENT_AND_SERVERS);
 
     // For the render server feature.
     pm->GetStream()
@@ -228,7 +228,7 @@ void vtkPVCompositePartDisplay::CreateParallelTclObjects(vtkPVApplication *pvApp
       << this->LODCollectID << "SetMPIMToNSocketConnection" 
       << pm->GetMPIMToNSocketConnectionID()
       << vtkClientServerStream::End;
-    pm->SendStreamToRenderServerAndServer();
+    pm->SendStream(vtkProcessModule::RENDER_SERVER|vtkProcessModule::DATA_SERVER);
     }
   else
     {
@@ -259,7 +259,7 @@ void vtkPVCompositePartDisplay::CreateParallelTclObjects(vtkPVApplication *pvApp
     << vtkClientServerStream::Invoke
     << this->LODCollectID << "AddObserver" << "EndEvent" << cmd
     << vtkClientServerStream::End;
-  pm->SendStreamToRenderServerClientAndServer();
+  pm->SendStream(vtkProcessModule::CLIENT_AND_SERVERS);
 
   // Handle collection setup with client server.
   pm->GetStream()
@@ -278,7 +278,7 @@ void vtkPVCompositePartDisplay::CreateParallelTclObjects(vtkPVApplication *pvApp
     << this->LODCollectID << "SetSocketController"
     << vtkClientServerStream::LastResult
     << vtkClientServerStream::End;
-  pm->SendStreamToRenderServerClientAndServer();
+  pm->SendStream(vtkProcessModule::CLIENT_AND_SERVERS);
 
   // Special condition to signal the client.
   // Because both processes of the Socket controller think they are 0!!!!
@@ -292,7 +292,7 @@ void vtkPVCompositePartDisplay::CreateParallelTclObjects(vtkPVApplication *pvApp
       << vtkClientServerStream::Invoke
       << this->LODCollectID << "SetController" << 0
       << vtkClientServerStream::End;
-    pm->SendStreamToClient();
+    pm->SendStream(vtkProcessModule::CLIENT);
     }
 
   // Insert collection filters into pipeline.
@@ -306,7 +306,7 @@ void vtkPVCompositePartDisplay::CreateParallelTclObjects(vtkPVApplication *pvApp
       << this->UpdateSuppressorID << "SetInput"
       << vtkClientServerStream::LastResult
       << vtkClientServerStream::End;
-    pm->SendStreamToRenderServerClientAndServer();
+    pm->SendStream(vtkProcessModule::CLIENT_AND_SERVERS);
     }
 
   if (this->LODCollectID.ID)
@@ -319,7 +319,7 @@ void vtkPVCompositePartDisplay::CreateParallelTclObjects(vtkPVApplication *pvApp
       << this->LODUpdateSuppressorID << "SetInput"
       << vtkClientServerStream::LastResult
       << vtkClientServerStream::End;
-    pm->SendStreamToRenderServerClientAndServer();
+    pm->SendStream(vtkProcessModule::CLIENT_AND_SERVERS);
     }
 
   // We need to connect the geometry filter 
@@ -340,7 +340,7 @@ void vtkPVCompositePartDisplay::CreateParallelTclObjects(vtkPVApplication *pvApp
     << this->CollectID << "SetInput"
     << vtkClientServerStream::LastResult
     << vtkClientServerStream::End;
-  pm->SendStreamToClientAndServer();
+  pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::DATA_SERVER);
 }
 
 
@@ -429,7 +429,7 @@ void vtkPVCompositePartDisplay::SetCollectionDecision(int v)
     << vtkClientServerStream::Invoke
     << this->UpdateSuppressorID << "RemoveAllCaches"
     << vtkClientServerStream::End;
-  pm->SendStreamToRenderServerClientAndServer();
+  pm->SendStream(vtkProcessModule::CLIENT_AND_SERVERS);
 }
 
 
@@ -475,7 +475,7 @@ void vtkPVCompositePartDisplay::SetLODCollectionDecision(int v)
     << vtkClientServerStream::Invoke
     << this->LODUpdateSuppressorID << "RemoveAllCaches"
     << vtkClientServerStream::End;
-  pm->SendStreamToRenderServerClientAndServer();
+  pm->SendStream(vtkProcessModule::CLIENT_AND_SERVERS);
 }
 
 //----------------------------------------------------------------------------

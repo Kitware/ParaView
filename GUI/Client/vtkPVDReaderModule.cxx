@@ -23,7 +23,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVDReaderModule);
-vtkCxxRevisionMacro(vtkPVDReaderModule, "1.9");
+vtkCxxRevisionMacro(vtkPVDReaderModule, "1.10");
 
 //----------------------------------------------------------------------------
 vtkPVDReaderModule::vtkPVDReaderModule()
@@ -75,12 +75,12 @@ int vtkPVDReaderModule::ReadFileInformation(const char* fname)
     // we use index 0.
     << this->GetVTKSourceID(0) << "UpdateAttributes"
     << vtkClientServerStream::End;
-  pm->SendStreamToServer();
+  pm->SendStream(vtkProcessModule::DATA_SERVER);
   pm->GetStream()
     << vtkClientServerStream::Invoke
     << this->GetVTKSourceID(0) << "GetAttributeIndex" << "timestep"
     << vtkClientServerStream::End;
-  pm->SendStreamToServerRoot();
+  pm->SendStream(vtkProcessModule::DATA_SERVER_ROOT);
   int index = -1;
   this->HaveTime = (pm->GetLastServerResult().GetArgument(0, 0, &index) &&
                     index >= 0)? 1 : 0;
@@ -93,12 +93,12 @@ int vtkPVDReaderModule::ReadFileInformation(const char* fname)
       << this->GetVTKSourceID(0) << "SetRestrictionAsIndex"
       << "timestep" << 0
       << vtkClientServerStream::End;
-    pm->SendStreamToServer();
+    pm->SendStream(vtkProcessModule::DATA_SERVER);
     pm->GetStream()
       << vtkClientServerStream::Invoke
       << this->GetVTKSourceID(0) << "GetNumberOfAttributeValues" << index
       << vtkClientServerStream::End;
-    pm->SendStreamToServerRoot();
+    pm->SendStream(vtkProcessModule::DATA_SERVER_ROOT);
     int numValues = 0;
     if(!pm->GetLastServerResult().GetArgument(0, 0, &numValues))
       {

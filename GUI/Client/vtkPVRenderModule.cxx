@@ -43,7 +43,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderModule);
-vtkCxxRevisionMacro(vtkPVRenderModule, "1.32");
+vtkCxxRevisionMacro(vtkPVRenderModule, "1.33");
 
 //===========================================================================
 //***************************************************************************
@@ -155,7 +155,7 @@ vtkPVRenderModule::~vtkPVRenderModule()
     }
   if(pm)
     {
-    pm->SendStreamToClientAndRenderServer();
+    pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
     }
   
   this->Observer->Delete();
@@ -254,7 +254,7 @@ void vtkPVRenderModule::SetPVApplication(vtkPVApplication *pvApp)
   this->RendererID = pm->NewStreamObject("vtkRenderer");
   this->Renderer2DID = pm->NewStreamObject("vtkRenderer");
   this->RenderWindowID = pm->NewStreamObject("vtkRenderWindow");
-  pm->SendStreamToClientAndRenderServer();
+  pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
   this->Renderer = 
     vtkRenderer::SafeDownCast(
       pm->GetObjectFromID(this->RendererID));
@@ -276,7 +276,7 @@ void vtkPVRenderModule::SetPVApplication(vtkPVApplication *pvApp)
     //pm->GetStream() << vtkClientServerStream::Invoke << this->RenderWindowID 
     //                << "SetStereoTypeToCrystalEyes" 
     //                << vtkClientServerStream::End;
-    pm->SendStreamToRenderServer();
+    pm->SendStream(vtkProcessModule::RENDER_SERVER);
     }
 
   if (pvApp->GetUseStereoRendering())
@@ -301,7 +301,7 @@ void vtkPVRenderModule::SetPVApplication(vtkPVApplication *pvApp)
   stream << vtkClientServerStream::Invoke
          << this->RenderWindowID << "AddRenderer" << this->Renderer2DID
          << vtkClientServerStream::End;
-  pm->SendStreamToClientAndRenderServer();
+  pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
     
   // the 2d renderer must be kept in sync with the main renderer
   this->Renderer->AddObserver(
@@ -344,7 +344,7 @@ void vtkPVRenderModule::SetBackgroundColor(float r, float g, float b)
   vtkClientServerStream& stream = pm->GetStream();
   stream << vtkClientServerStream::Invoke << this->RendererID << "SetBackground"
          << r << g << b << vtkClientServerStream::End;
-  pm->SendStreamToClientAndRenderServer();
+  pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
 }
 
 //-----------------------------------------------------------------------------
@@ -461,7 +461,7 @@ void vtkPVRenderModule::AddPVSource(vtkPVSource *pvs)
              << pDisp->GetPropID() << vtkClientServerStream::End;
       stream << vtkClientServerStream::Invoke << this->RendererID << "AddProp"
              << pDisp->GetVolumeID() << vtkClientServerStream::End;
-      pm->SendStreamToClientAndRenderServer();
+      pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
       }
     pDisp->Delete();
     }
@@ -498,7 +498,7 @@ void vtkPVRenderModule::RemovePVSource(vtkPVSource *pvs)
         stream << vtkClientServerStream::Invoke << this->RendererID 
                << "RemoveProp"
                << pDisp->GetVolumeID() << vtkClientServerStream::End;
-        pm->SendStreamToClientAndRenderServer();
+        pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
         }
       part->SetPartDisplay(NULL);
       }
@@ -575,7 +575,7 @@ void vtkPVRenderModule::SetUseTriangleStrips(int val)
       vtkClientServerStream& stream = pm->GetStream();
       stream << vtkClientServerStream::Invoke << pDisp->GetGeometryID()
              <<  "SetUseStrips" << val << vtkClientServerStream::End;
-      pm->SendStreamToClientAndRenderServer();
+      pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
       }
     }
 

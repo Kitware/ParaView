@@ -38,7 +38,7 @@ class vtkPVArraySelectionArraySet: public vtkPVArraySelectionArraySetBase {};
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVArraySelection);
-vtkCxxRevisionMacro(vtkPVArraySelection, "1.42");
+vtkCxxRevisionMacro(vtkPVArraySelection, "1.43");
 
 //----------------------------------------------------------------------------
 int vtkDataArraySelectionCommand(ClientData cd, Tcl_Interp *interp,
@@ -101,7 +101,7 @@ vtkPVArraySelection::~vtkPVArraySelection()
     {
     vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
     pm->DeleteStreamObject(this->ServerSideID);
-    pm->SendStreamToServerRoot();
+    pm->SendStream(vtkProcessModule::DATA_SERVER_ROOT);
     }
 
   delete this->ArraySet;
@@ -204,7 +204,7 @@ void vtkPVArraySelection::SetLocalSelectionsFromReader()
                     << this->ServerSideID << "GetArraySettings"
                     << this->VTKReaderID << this->AttributeName
                     << vtkClientServerStream::End;
-    pm->SendStreamToServerRoot();
+    pm->SendStream(vtkProcessModule::DATA_SERVER_ROOT);
     vtkClientServerStream arrays;
     if(pm->GetLastServerResult().GetArgument(0, 0, &arrays))
       {
@@ -370,7 +370,7 @@ void vtkPVArraySelection::SetReaderSelectionsFromWidgets()
       }
     }
   it->Delete();
-  pm->SendStreamToServer();
+  pm->SendStream(vtkProcessModule::DATA_SERVER);
 }
 
 //----------------------------------------------------------------------------
@@ -556,7 +556,7 @@ void vtkPVArraySelection::CreateServerSide()
                     << this->ServerSideID << "SetProcessModule"
                     << pm->GetProcessModuleID()
                     << vtkClientServerStream::End;
-    pm->SendStreamToServerRoot();
+    pm->SendStream(vtkProcessModule::DATA_SERVER_ROOT);
     }
 }
 

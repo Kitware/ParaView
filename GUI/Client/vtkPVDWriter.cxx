@@ -27,7 +27,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVDWriter);
-vtkCxxRevisionMacro(vtkPVDWriter, "1.6");
+vtkCxxRevisionMacro(vtkPVDWriter, "1.7");
 
 //----------------------------------------------------------------------------
 vtkPVDWriter::vtkPVDWriter()
@@ -106,7 +106,7 @@ void vtkPVDWriter::Write(const char* fileName, vtkPVSource* pvs,
                     << vtkClientServerStream::End;
     pm->DeleteStreamObject(helperID);
     }
-  pm->SendStreamToServer();
+  pm->SendStream(vtkProcessModule::DATA_SERVER);
 
   if(timeSeries)
     {
@@ -125,7 +125,7 @@ void vtkPVDWriter::Write(const char* fileName, vtkPVSource* pvs,
     pm->GetStream() << vtkClientServerStream::Invoke
                     << writerID << "Start"
                     << vtkClientServerStream::End;
-    pm->SendStreamToServer();
+    pm->SendStream(vtkProcessModule::DATA_SERVER);
 
     // Loop through all of the time steps.
     for(int t = 0; t < rm->GetNumberOfTimeSteps(); ++t)
@@ -137,14 +137,14 @@ void vtkPVDWriter::Write(const char* fileName, vtkPVSource* pvs,
       pm->GetStream() << vtkClientServerStream::Invoke
                       << writerID << "WriteTime" << t
                       << vtkClientServerStream::End;
-      pm->SendStreamToServer();
+      pm->SendStream(vtkProcessModule::DATA_SERVER);
       }
 
     // Finish the animation.
     pm->GetStream() << vtkClientServerStream::Invoke
                     << writerID << "Finish"
                     << vtkClientServerStream::End;
-    pm->SendStreamToServer();
+    pm->SendStream(vtkProcessModule::DATA_SERVER);
     }
   else
     {
@@ -165,7 +165,7 @@ void vtkPVDWriter::Write(const char* fileName, vtkPVSource* pvs,
     pm->GetStream() << vtkClientServerStream::Invoke
                     << writerID << "GetErrorCode"
                     << vtkClientServerStream::End;
-    pm->SendStreamToServer();
+    pm->SendStream(vtkProcessModule::DATA_SERVER);
     int retVal;
     if(pm->GetLastServerResult().GetArgument(0, 0, &retVal) &&
        retVal == vtkErrorCode::OutOfDiskSpaceError)
@@ -179,5 +179,5 @@ void vtkPVDWriter::Write(const char* fileName, vtkPVSource* pvs,
 
   // Delete the writer.
   pm->DeleteStreamObject(writerID);
-  pm->SendStreamToServer();
+  pm->SendStream(vtkProcessModule::DATA_SERVER);
 }

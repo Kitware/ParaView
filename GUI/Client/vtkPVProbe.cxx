@@ -50,7 +50,7 @@
  
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProbe);
-vtkCxxRevisionMacro(vtkPVProbe, "1.122");
+vtkCxxRevisionMacro(vtkPVProbe, "1.123");
 
 int vtkPVProbeCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -168,7 +168,7 @@ void vtkPVProbe::CreateProperties()
   pm->GetStream() << vtkClientServerStream::Invoke <<  this->GetVTKSourceID(0)
                   << "SetSpatialMatch" << 2
                   << vtkClientServerStream::End;
-  pm->SendStreamToServer();
+  pm->SendStream(vtkProcessModule::DATA_SERVER);
 
   this->ProbeFrame->SetParent(this->GetParameterFrame()->GetFrame());
   this->ProbeFrame->Create(pvApp, "frame", "");
@@ -271,7 +271,7 @@ void vtkPVProbe::ExecuteEvent(vtkObject* vtkNotUsed(wdg),
                       << vtkClientServerStream::LastResult 
                       << "SetValue" << pos2[0] << pos2[1]
                       << vtkClientServerStream::End;
-      pm->SendStreamToRenderServer();
+      pm->SendStream(vtkProcessModule::RENDER_SERVER);
 
       break;
     }
@@ -394,7 +394,7 @@ void vtkPVProbe::AcceptCallbackInternal()
                     << "AddActor"
                     << this->PlotDisplay->GetXYPlotActorID() 
                     << vtkClientServerStream::End;
-    pm->SendStreamToRenderServer();
+    pm->SendStream(vtkProcessModule::RENDER_SERVER);
     }
   else
     {
@@ -428,7 +428,7 @@ int vtkPVProbe::GetDimensionality()
                   << vtkClientServerStream::LastResult 
                   << "GetClassName"
                   << vtkClientServerStream::End;
-  pm->SendStreamToClient();
+  pm->SendStream(vtkProcessModule::CLIENT);
   const char* name = 0;
   pm->GetLastClientResult().GetArgument(0,0,&name);
   if ( name && vtkString::Equals(name, "vtkLineSource") )

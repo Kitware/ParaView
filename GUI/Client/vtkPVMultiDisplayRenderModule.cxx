@@ -27,7 +27,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVMultiDisplayRenderModule);
-vtkCxxRevisionMacro(vtkPVMultiDisplayRenderModule, "1.16");
+vtkCxxRevisionMacro(vtkPVMultiDisplayRenderModule, "1.17");
 
 
 
@@ -74,7 +74,7 @@ void vtkPVMultiDisplayRenderModule::SetPVApplication(vtkPVApplication *pvApp)
     << this->CompositeID << "SetTileDimensions"
     << tileDim[0] << tileDim[1]
     << vtkClientServerStream::End;
-  pm->SendStreamToClientAndRenderServer();
+  pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
 
   if (pvApp->GetClientMode())
     {
@@ -82,7 +82,7 @@ void vtkPVMultiDisplayRenderModule::SetPVApplication(vtkPVApplication *pvApp)
       << vtkClientServerStream::Invoke
       << this->CompositeID << "SetClientFlag" << 1
       << vtkClientServerStream::End;
-    pm->SendStreamToClient();
+    pm->SendStream(vtkProcessModule::CLIENT);
 
     pm->GetStream()
       << vtkClientServerStream::Invoke
@@ -97,7 +97,7 @@ void vtkPVMultiDisplayRenderModule::SetPVApplication(vtkPVApplication *pvApp)
       << vtkClientServerStream::Invoke
       << this->CompositeID << "SetZeroEmpty" << 0
       << vtkClientServerStream::End;
-    pm->SendStreamToClientAndRenderServer();
+    pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
     }
   else
     {
@@ -105,7 +105,7 @@ void vtkPVMultiDisplayRenderModule::SetPVApplication(vtkPVApplication *pvApp)
       << vtkClientServerStream::Invoke
       << this->CompositeID << "SetZeroEmpty" << 1
       << vtkClientServerStream::End;
-    pm->SendStreamToClientAndRenderServer();
+    pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
     }
 
   // Have to initialize after ZeroEmpty, and tile dimensions have been set.
@@ -123,7 +123,7 @@ void vtkPVMultiDisplayRenderModule::SetPVApplication(vtkPVApplication *pvApp)
     << "SetRenderWindow"
     << this->RenderWindowID
     << vtkClientServerStream::End;
-  pm->SendStreamToClientAndRenderServer();
+  pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
 }
 
 //----------------------------------------------------------------------------
@@ -183,7 +183,7 @@ void vtkPVMultiDisplayRenderModule::StillRender()
       << this->CompositeID
       << "SetImageReductionFactor" << 1 
       << vtkClientServerStream::End;
-    pm->SendStreamToClient();
+    pm->SendStream(vtkProcessModule::CLIENT);
     }
 
   // Switch the compositer to local/composite mode.
@@ -197,7 +197,7 @@ void vtkPVMultiDisplayRenderModule::StillRender()
         << vtkClientServerStream::Invoke
         << this->CompositeID << "UseCompositingOff"
         << vtkClientServerStream::End;
-      pm->SendStreamToClient();
+      pm->SendStream(vtkProcessModule::CLIENT);
       }
     else
       {
@@ -205,7 +205,7 @@ void vtkPVMultiDisplayRenderModule::StillRender()
         << vtkClientServerStream::Invoke
         << this->CompositeID << "UseCompositingOn"
         << vtkClientServerStream::End;
-      pm->SendStreamToClient();
+      pm->SendStream(vtkProcessModule::CLIENT);
       }
     }  
 
@@ -333,7 +333,7 @@ void vtkPVMultiDisplayRenderModule::InteractiveRender()
           << vtkClientServerStream::Invoke
           << this->CompositeID << "UseCompositingOff"
           << vtkClientServerStream::End;
-        pm->SendStreamToClient();
+        pm->SendStream(vtkProcessModule::CLIENT);
         }
       else
         {
@@ -341,7 +341,7 @@ void vtkPVMultiDisplayRenderModule::InteractiveRender()
           << vtkClientServerStream::Invoke
           << this->CompositeID << "UseCompositingOn"
           << vtkClientServerStream::End;
-        pm->SendStreamToClient();
+        pm->SendStream(vtkProcessModule::CLIENT);
         }
       this->LocalRender = localRender;
       }
@@ -398,7 +398,7 @@ void vtkPVMultiDisplayRenderModule::SetUseCompositeCompression(int val)
       << vtkClientServerStream::Invoke
       << this->CompositeID << "SetUseCompositeCompression" << val
       << vtkClientServerStream::End;
-    pm->SendStreamToClientAndRenderServer();
+    pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
     }
 }
 

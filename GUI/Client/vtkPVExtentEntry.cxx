@@ -36,7 +36,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVExtentEntry);
-vtkCxxRevisionMacro(vtkPVExtentEntry, "1.36");
+vtkCxxRevisionMacro(vtkPVExtentEntry, "1.37");
 
 vtkCxxSetObjectMacro(vtkPVExtentEntry, InputMenu, vtkPVInputMenu);
 
@@ -448,7 +448,7 @@ void vtkPVExtentEntry::AnimationMenuCallback(vtkPVAnimationInterfaceEntry *ai,
                   << vtkClientServerStream::Invoke
                   << vtkClientServerStream::LastResult << "GetWholeExtent"
                   << vtkClientServerStream::End;
-  pm->SendStreamToServerRoot();
+  pm->SendStream(vtkProcessModule::DATA_SERVER_ROOT);
   if(!pm->GetLastServerResult().GetArgument(0, 0, ext, 6))
     {
     vtkErrorMacro("Bad return value from GetWholeExtent");

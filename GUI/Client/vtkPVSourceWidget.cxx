@@ -18,7 +18,7 @@
 #include "vtkPVProcessModule.h"
 #include "vtkClientServerStream.h"
 
-vtkCxxRevisionMacro(vtkPVSourceWidget, "1.11");
+vtkCxxRevisionMacro(vtkPVSourceWidget, "1.12");
 
 //----------------------------------------------------------------------------
 vtkPVSourceWidget::vtkPVSourceWidget()
@@ -38,7 +38,7 @@ vtkPVSourceWidget::~vtkPVSourceWidget()
     if (pvApp)
       {
       pvApp->GetProcessModule()->DeleteStreamObject(this->OutputID);
-      pvApp->GetProcessModule()->SendStreamToServer();
+      pvApp->GetProcessModule()->SendStream(vtkProcessModule::DATA_SERVER);
       }
     }
 
@@ -49,7 +49,7 @@ vtkPVSourceWidget::~vtkPVSourceWidget()
     if (pvApp)
       {  
       pvApp->GetProcessModule()->DeleteStreamObject(this->SourceID);
-      pvApp->GetProcessModule()->SendStreamToServer();
+      pvApp->GetProcessModule()->SendStream(vtkProcessModule::DATA_SERVER);
       }
     }
 
@@ -69,7 +69,7 @@ void vtkPVSourceWidget::SaveInBatchScript(ofstream *)
 //   pm->GetStream() << vtkClientServerStream::Invoke 
 //                   << this->SourceID << "GetClassName" 
 //                   << vtkClientServerStream::End;
-//   pm->SendStreamToClient();
+//   pm->SendStream(vtkProcessModule::CLIENT);
 //   const char* dataClassName;
 //   if(pm->GetLastClientResult().GetArgument(0, 0, &dataClassName))
 //     {

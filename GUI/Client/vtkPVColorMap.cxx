@@ -50,7 +50,7 @@
 #include "vtkPVRenderModule.h"
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVColorMap);
-vtkCxxRevisionMacro(vtkPVColorMap, "1.89");
+vtkCxxRevisionMacro(vtkPVColorMap, "1.90");
 
 int vtkPVColorMapCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -239,7 +239,7 @@ vtkPVColorMap::~vtkPVColorMap()
       {
       vtkPVProcessModule* pm = pvApp->GetProcessModule();
       pm->DeleteStreamObject(this->LookupTableID);
-      pm->SendStreamToClientAndRenderServer();
+      pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
       }
     this->LookupTableID.ID = 0;
     this->LookupTable = NULL;
@@ -257,7 +257,7 @@ vtkPVColorMap::~vtkPVColorMap()
       {
       vtkPVProcessModule* pm = pvApp->GetProcessModule();
       pm->DeleteStreamObject(this->ScalarBarActorID);
-      pm->SendStreamToClientAndRenderServer();
+      pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
       }
     this->ScalarBarActorID.ID = 0;
     }
@@ -853,7 +853,7 @@ void vtkPVColorMap::CreateParallelTclObjects(vtkPVApplication *pvApp)
   vtkPVProcessModule* pm = pvApp->GetProcessModule();
   
   this->LookupTableID = pm->NewStreamObject("vtkLookupTable");
-  pm->SendStreamToClientAndRenderServer();
+  pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
   this->LookupTable =
     vtkLookupTable::SafeDownCast(pm->GetObjectFromID(this->LookupTableID));
   pm->GetStream() << vtkClientServerStream::Invoke 
@@ -865,7 +865,7 @@ void vtkPVColorMap::CreateParallelTclObjects(vtkPVApplication *pvApp)
   
   // Actor will be in server manager.  Widget will be in UI.
   this->ScalarBarActorID = pm->NewStreamObject("vtkScalarBarActor");
-  pm->SendStreamToClientAndRenderServer();
+  pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
   this->ScalarBar->SetScalarBarActor(vtkScalarBarActor::SafeDownCast(
                                  pm->GetObjectFromID(this->ScalarBarActorID)));
   
@@ -888,7 +888,7 @@ void vtkPVColorMap::CreateParallelTclObjects(vtkPVApplication *pvApp)
                   << this->ScalarBarActorID 
                   << "SetHeight" << 0.5 
                   << vtkClientServerStream::End;
-  pm->SendStreamToClientAndRenderServer();
+  pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
 
   this->ScalarBarObserver = vtkScalarBarWidgetObserver::New();
   this->ScalarBarObserver->PVColorMap = this;
@@ -905,7 +905,7 @@ void vtkPVColorMap::CreateParallelTclObjects(vtkPVApplication *pvApp)
                   << this->ScalarBarActorID 
                   << "SetLookupTable" << this->LookupTableID
                   << vtkClientServerStream::End;
-  pm->SendStreamToClientAndRenderServer();
+  pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
 }
 
 //----------------------------------------------------------------------------
@@ -1168,7 +1168,7 @@ void vtkPVColorMap::SetScalarBarLabelFormat(const char* name)
                     << this->ScalarBarActorID << "SetLabelFormat"
                     << this->ScalarBarLabelFormat
                     << vtkClientServerStream::End;
-    pm->SendStreamToClientAndRenderServer();
+    pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
     this->RenderView();
     }
 
@@ -1210,7 +1210,7 @@ void vtkPVColorMap::UpdateLookupTable()
   pm->GetStream() << vtkClientServerStream::Invoke
                   << this->LookupTableID << "ForceBuild"
                   << vtkClientServerStream::End;
-  pm->SendStreamToClientAndRenderServer();
+  pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
   
   if (this->MapWidth > 0 && this->MapHeight > 0)
     {
@@ -1434,7 +1434,7 @@ void vtkPVColorMap::SetScalarRangeInternal(double min, double max)
                   << min << max
                   << vtkClientServerStream::End;
 
-  pm->SendStreamToClientAndRenderServer();
+  pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
 
   this->Modified();
 }
@@ -1474,7 +1474,7 @@ void vtkPVColorMap::SetVectorComponent(int component)
                   << this->LookupTableID << "SetVectorComponent"
                   << component
                   << vtkClientServerStream::End;
-  pm->SendStreamToClientAndRenderServer();
+  pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
   this->Modified();
 }
 
@@ -1667,7 +1667,7 @@ void vtkPVColorMap::UpdateInternalScalarBarVisibility()
                     << rm->GetRenderer2DID() << "AddActor"
                     << this->ScalarBarActorID 
                     << vtkClientServerStream::End;
-    pm->SendStreamToRenderServer();
+    pm->SendStream(vtkProcessModule::RENDER_SERVER);
     
     // This is here in case a process has no geometry.  
     // We have to explicitly build the color map.  The mapper
@@ -1679,7 +1679,7 @@ void vtkPVColorMap::UpdateInternalScalarBarVisibility()
     pm->GetStream() << vtkClientServerStream::Invoke 
                     << this->LookupTableID << "Modified"
                     << vtkClientServerStream::End; 
-    pm->SendStreamToRenderServer();
+    pm->SendStream(vtkProcessModule::RENDER_SERVER);
     }
   else
     {
@@ -1690,7 +1690,7 @@ void vtkPVColorMap::UpdateInternalScalarBarVisibility()
                     << rm->GetRenderer2DID() << "RemoveActor"
                     << this->ScalarBarActorID 
                     << vtkClientServerStream::End;
-    pm->SendStreamToRenderServer();
+    pm->SendStream(vtkProcessModule::RENDER_SERVER);
     }
 
   this->Modified();
@@ -1809,7 +1809,7 @@ void vtkPVColorMap::UpdateScalarBarTitle()
     pm->GetStream() << vtkClientServerStream::Invoke
                     << this->ScalarBarActorID << "SetTitle" << ostr.str()
                     << vtkClientServerStream::End;
-    pm->SendStreamToClientAndRenderServer();
+    pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
     this->ScalarBarVectorTitleEntry->SetValue(this->VectorMagnitudeTitle),
     ostr.rdbuf()->freeze(0);    
     }
@@ -1819,7 +1819,7 @@ void vtkPVColorMap::UpdateScalarBarTitle()
                     << this->ScalarBarActorID << "SetTitle" 
                     << this->ScalarBarTitle
                     << vtkClientServerStream::End;
-    pm->SendStreamToClientAndRenderServer();
+    pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
     }
   else
     {
@@ -1829,7 +1829,7 @@ void vtkPVColorMap::UpdateScalarBarTitle()
     pm->GetStream() << vtkClientServerStream::Invoke
                     << this->ScalarBarActorID << "SetTitle" << ostr.str()
                     << vtkClientServerStream::End;
-    pm->SendStreamToClientAndRenderServer();
+    pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
     this->ScalarBarVectorTitleEntry->SetValue(
                         this->VectorComponentTitles[this->VectorComponent]);
     ostr.rdbuf()->freeze(0);    
@@ -2043,7 +2043,7 @@ void vtkPVColorMap::VectorModeMagnitudeCallback()
   pm->GetStream() << vtkClientServerStream::Invoke 
                   << this->LookupTableID << "SetVectorModeToMagnitude"
                   << vtkClientServerStream::End;
-  pm->SendStreamToClientAndRenderServer();
+  pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
   this->VectorMode = vtkPVColorMap::MAGNITUDE;
   this->Script("pack forget %s",
                this->VectorComponentMenu->GetWidgetName());
@@ -2068,7 +2068,7 @@ void vtkPVColorMap::VectorModeComponentCallback()
   pm->GetStream() << vtkClientServerStream::Invoke 
                   << this->LookupTableID << "SetVectorModeToComponent"
                   << vtkClientServerStream::End;
-  pm->SendStreamToClientAndRenderServer();
+  pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
   this->VectorMode = vtkPVColorMap::COMPONENT;
   this->Script("pack %s -side left -expand f -fill both -padx 2",
                this->VectorComponentMenu->GetWidgetName());
@@ -2146,7 +2146,7 @@ void vtkPVColorMap::SetScalarBarPosition1(float x, float y)
                   << vtkClientServerStream::LastResult << "SetValue"
                   << x << y
                   << vtkClientServerStream::End;  
-  pm->SendStreamToClientAndRenderServer();
+  pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
   
   this->AddTraceEntry("$kw(%s) SetScalarBarPosition1 %f %f", 
                       this->GetTclName(), x, y);
@@ -2165,7 +2165,7 @@ void vtkPVColorMap::SetScalarBarPosition2(float x, float y)
                   << vtkClientServerStream::LastResult << "SetValue"
                   << x << y
                   << vtkClientServerStream::End;  
-  pm->SendStreamToClientAndRenderServer();
+  pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
   
   this->AddTraceEntry("$kw(%s) SetScalarBarPosition2 %f %f", 
                       this->GetTclName(), x, y);
@@ -2180,7 +2180,7 @@ void vtkPVColorMap::SetScalarBarOrientation(int o)
   pm->GetStream() << vtkClientServerStream::Invoke 
                   << this->ScalarBarActorID << "SetOrientation" << o
                   << vtkClientServerStream::End;
-  pm->SendStreamToClientAndRenderServer();
+  pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
 
   this->AddTraceEntry("$kw(%s) SetScalarBarOrientation %d", 
                       this->GetTclName(), o);
@@ -2238,7 +2238,7 @@ void vtkPVColorMap::ExecuteEvent(vtkObject* vtkNotUsed(wdg),
                       << "SetHeight" 
                       << this->ScalarBar->GetScalarBarActor()->GetHeight() 
                       << vtkClientServerStream::End;
-      pm->SendStreamToRenderServer();
+      pm->SendStream(vtkProcessModule::RENDER_SERVER);
 
       break;
     }

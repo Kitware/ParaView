@@ -146,7 +146,7 @@ vtkStandardNewMacro(vtkPVXDMFParametersInternals);
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVXDMFParameters);
-vtkCxxRevisionMacro(vtkPVXDMFParameters, "1.18");
+vtkCxxRevisionMacro(vtkPVXDMFParameters, "1.19");
 
 //----------------------------------------------------------------------------
 vtkPVXDMFParameters::vtkPVXDMFParameters()
@@ -177,7 +177,7 @@ vtkPVXDMFParameters::~vtkPVXDMFParameters()
     {
     vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
     pm->DeleteStreamObject(this->ServerSideID);
-    pm->SendStreamToServerRoot();
+    pm->SendStream(vtkProcessModule::DATA_SERVER_ROOT);
     }
 }
 
@@ -228,7 +228,7 @@ void vtkPVXDMFParameters::UpdateFromReader()
                     << this->ServerSideID << "GetParameters"
                     << this->VTKReaderID
                     << vtkClientServerStream::End;
-    pm->SendStreamToServerRoot();
+    pm->SendStream(vtkProcessModule::DATA_SERVER_ROOT);
     vtkClientServerStream parameters;
     if(!pm->GetLastServerResult().GetArgument(0, 0, &parameters))
       {
@@ -411,7 +411,7 @@ void vtkPVXDMFParameters::SetParameterIndex(const char* label, int value)
                   << this->VTKReaderID << "SetParameterIndex"
                   << label << value
                   << vtkClientServerStream::End;
-  pm->SendStreamToServer();
+  pm->SendStream(vtkProcessModule::DATA_SERVER);
 }
 
 //---------------------------------------------------------------------------

@@ -135,7 +135,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.326");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.327");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -1690,7 +1690,7 @@ void vtkPVRenderView::SetUseTriangleStrips(int state)
       pvs->GetPart(partIdx)->GetPartDisplay()->InvalidateGeometry();
       }
     }
-  pm->SendStreamToServer();
+  pm->SendStream(vtkProcessModule::DATA_SERVER);
 
   this->EventuallyRender();
 }

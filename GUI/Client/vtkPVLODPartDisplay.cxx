@@ -41,7 +41,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLODPartDisplay);
-vtkCxxRevisionMacro(vtkPVLODPartDisplay, "1.23");
+vtkCxxRevisionMacro(vtkPVLODPartDisplay, "1.24");
 
 
 //----------------------------------------------------------------------------
@@ -91,7 +91,7 @@ vtkPVLODPartDisplay::~vtkPVLODPartDisplay()
       pm->DeleteStreamObject(this->PointLabelActorID);
       this->PointLabelActorID.ID = 0;
       }
-    pm->SendStreamToClientAndRenderServer();
+    pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
     }
 
   this->Information->Delete();
@@ -171,7 +171,7 @@ void vtkPVLODPartDisplay::CreateParallelTclObjects(vtkPVApplication *pvApp)
     << this->LODDeciID << "SetNumberOfDivisions"
     << vtkClientServerStream::InsertArray(res, 3)
     << vtkClientServerStream::End;
-  pm->SendStreamToRenderServerClientAndServer();
+  pm->SendStream(vtkProcessModule::CLIENT_AND_SERVERS);
 
 
   // ===== LOD branch:
@@ -182,7 +182,7 @@ void vtkPVLODPartDisplay::CreateParallelTclObjects(vtkPVApplication *pvApp)
     << vtkClientServerStream::Invoke << this->LODUpdateSuppressorID
     << "SetInput" << vtkClientServerStream::LastResult
     << vtkClientServerStream::End;
-  pm->SendStreamToRenderServerClientAndServer();
+  pm->SendStream(vtkProcessModule::CLIENT_AND_SERVERS);
 
   // ===== LOD branch:
   this->LODMapperID = pm->NewStreamObject("vtkPolyDataMapper");
@@ -206,7 +206,7 @@ void vtkPVLODPartDisplay::CreateParallelTclObjects(vtkPVApplication *pvApp)
     << vtkClientServerStream::Invoke
     << this->PropID << "SetLODMapper" << this->LODMapperID
     << vtkClientServerStream::End;
-  pm->SendStreamToClientAndRenderServer();
+  pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
 
   // Broadcast for subclasses.
   pm->GetStream()
@@ -225,7 +225,7 @@ void vtkPVLODPartDisplay::CreateParallelTclObjects(vtkPVApplication *pvApp)
     << this->LODUpdateSuppressorID << "SetUpdatePiece"
     << vtkClientServerStream::LastResult
     << vtkClientServerStream::End;
-  pm->SendStreamToRenderServerClientAndServer();
+  pm->SendStream(vtkProcessModule::CLIENT_AND_SERVERS);
 
   if ( pm->GetNumberOfPartitions() == 1 && !pvApp->GetClientMode() )
     {
@@ -237,7 +237,7 @@ void vtkPVLODPartDisplay::CreateParallelTclObjects(vtkPVApplication *pvApp)
       << vtkClientServerStream::End;
     // Sending to client is enough here since this works only for single
     // node.
-    pm->SendStreamToClient();
+    pm->SendStream(vtkProcessModule::CLIENT);
     }
 
   // Now that geometry in in this object, we must
@@ -247,7 +247,7 @@ void vtkPVLODPartDisplay::CreateParallelTclObjects(vtkPVApplication *pvApp)
   pm->GetStream() 
     << vtkClientServerStream::Invoke << this->LODDeciID << "SetInput" 
     << vtkClientServerStream::LastResult << vtkClientServerStream::End;
-  pm->SendStreamToClientAndServer();
+  pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::DATA_SERVER);
 
 }
 
@@ -316,7 +316,7 @@ void vtkPVLODPartDisplay::ColorByArray(vtkPVColorMap *colorMap,
     << vtkClientServerStream::Invoke
     << this->LODMapperID << "SelectColorArray" << colorMap->GetArrayName()
     << vtkClientServerStream::End;
-  pm->SendStreamToClientAndRenderServer();
+  pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
 }
 
 
@@ -333,7 +333,7 @@ void vtkPVLODPartDisplay::SetScalarVisibility(int val)
     << vtkClientServerStream::Invoke
     << this->LODMapperID << "SetScalarVisibility" << val
     << vtkClientServerStream::End;
-  pm->SendStreamToClientAndRenderServer();
+  pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
 }
 
 //----------------------------------------------------------------------------
@@ -347,7 +347,7 @@ void vtkPVLODPartDisplay::SetUseImmediateMode(int val)
     << vtkClientServerStream::Invoke
     << this->LODMapperID << "SetImmediateModeRendering" << val
     << vtkClientServerStream::End;
-  pm->SendStreamToClientAndRenderServer();
+  pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
 }
 
 //----------------------------------------------------------------------------
@@ -369,7 +369,7 @@ void vtkPVLODPartDisplay::SetLODResolution(int res)
       << this->LODDeciID << "SetNumberOfDivisions" 
       << vtkClientServerStream::InsertArray(r, 3)
       << vtkClientServerStream::End;
-    pm->SendStreamToClientAndServer();
+    pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::DATA_SERVER);
     }
   this->InvalidateGeometry();
 }
@@ -413,7 +413,7 @@ void vtkPVLODPartDisplay::RemoveAllCaches()
       << vtkClientServerStream::Invoke
       << this->LODUpdateSuppressorID << "RemoveAllCaches"
       << vtkClientServerStream::End;
-    pm->SendStreamToRenderServerClientAndServer();
+    pm->SendStream(vtkProcessModule::CLIENT_AND_SERVERS);
     }
 }
 
@@ -432,7 +432,7 @@ void vtkPVLODPartDisplay::CacheUpdate(int idx, int total)
     << vtkClientServerStream::Invoke
     << this->LODUpdateSuppressorID << "CacheUpdate" << idx << total
     << vtkClientServerStream::End; 
-  pm->SendStreamToRenderServerClientAndServer();
+  pm->SendStream(vtkProcessModule::CLIENT_AND_SERVERS);
   // I don't like calling Modified directly, but I need the scalars to be
   // remapped through the lookup table, and this causes that to happen.
   pm->GetStream()
@@ -443,7 +443,7 @@ void vtkPVLODPartDisplay::CacheUpdate(int idx, int total)
     << vtkClientServerStream::Invoke
     << this->LODMapperID << "Modified"
     << vtkClientServerStream::End;
-  pm->SendStreamToClientAndRenderServer();
+  pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
 }
 
 
@@ -472,7 +472,7 @@ void vtkPVLODPartDisplay::SetDirectColorFlag(int val)
       << vtkClientServerStream::Invoke
       << this->LODMapperID << "SetColorModeToDefault"
       << vtkClientServerStream::End;
-    pm->SendStreamToClientAndRenderServer();
+    pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
     }
   else
     {
@@ -484,7 +484,7 @@ void vtkPVLODPartDisplay::SetDirectColorFlag(int val)
       << vtkClientServerStream::Invoke
       << this->LODMapperID << "SetColorModeToMapScalars"
       << vtkClientServerStream::End;
-    pm->SendStreamToClientAndRenderServer();
+    pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
     }
 }
 
@@ -534,7 +534,7 @@ void vtkPVLODPartDisplay::SetPointLabelVisibility(int val)
         << pvApp->GetRenderModule()->GetRendererID() << "RemoveProp"
         << this->PointLabelActorID << vtkClientServerStream::End;
       }
-    pm->SendStreamToRenderServer();
+    pm->SendStream(vtkProcessModule::RENDER_SERVER);
     }
 }
 

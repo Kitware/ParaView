@@ -24,7 +24,7 @@
 #include "vtkClientServerStream.h"
 
 vtkStandardNewMacro(vtkPVStringAndScalarListWidgetProperty);
-vtkCxxRevisionMacro(vtkPVStringAndScalarListWidgetProperty, "1.9");
+vtkCxxRevisionMacro(vtkPVStringAndScalarListWidgetProperty, "1.10");
 
 vtkPVStringAndScalarListWidgetProperty::vtkPVStringAndScalarListWidgetProperty()
 {
@@ -64,7 +64,7 @@ void vtkPVStringAndScalarListWidgetProperty::AcceptInternal()
       }
     stream << vtkClientServerStream::End;
     }
-  this->Widget->GetPVApplication()->GetProcessModule()->SendStreamToServer();
+  this->Widget->GetPVApplication()->GetProcessModule()->SendStream(vtkProcessModule::DATA_SERVER);
 }
 
 void vtkPVStringAndScalarListWidgetProperty::SetVTKCommands(
