@@ -63,6 +63,10 @@ public:
   // Standard vtkDataSet API methods. See vtkDataSet for more information.
   vtkIdType GetNumberOfCells();
   vtkIdType GetNumberOfPoints();
+
+  // Description:
+  // Athough CTH has a contant number of cells per block, we would have to get
+  // rid of this method if this data object were used for anything else.
   vtkIdType GetNumberOfCellsPerBlock();
   vtkIdType GetNumberOfPointsPerBlock();
   double *GetPoint(vtkIdType ptId);

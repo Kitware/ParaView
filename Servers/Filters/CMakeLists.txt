@@ -29,14 +29,17 @@ SET(Filters_SRCS
   vtkPVXMLElement.cxx
   vtkPVXMLParser.cxx
   vtkCellCenterDepthSort.cxx
+  vtkCellIdAttribute.cxx
   vtkCleanUnstructuredGrid.cxx
   vtkColorByPart.cxx
   vtkCTHData.cxx
   vtkCTHDataToCTHDataFilter.cxx
   vtkCTHDataToPolyDataFilter.cxx
   vtkCTHExtractAMRPart.cxx
+  vtkCTHAMRBlockIdScalars.cxx
   vtkCTHAMRCellToPointData.cxx
   vtkCTHAMRContour.cxx
+  vtkCTHAMRExtractPart.cxx
   vtkCTHAMRSurface.cxx
   vtkCTHFractal.cxx
   vtkCTHOutlineFilter.cxx
@@ -47,6 +50,7 @@ SET(Filters_SRCS
   vtkMPIDuplicateUnstructuredGrid.cxx
   vtkMazeSource.cxx
   vtkMergeArrays.cxx
+  vtkPClustering.cxx
   vtkPickFilter.cxx
   vtkProjectedTetrahedraMapper.cxx
   vtkPVArrowSource.cxx

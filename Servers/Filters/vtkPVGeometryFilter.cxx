@@ -39,8 +39,10 @@
 #include "vtkUnstructuredGrid.h"
 #include "vtkCallbackCommand.h"
 #include "vtkGarbageCollector.h"
+#include "vtkCTHAMRSurface.h"
+#include "vtkCTHData.h"
 
-vtkCxxRevisionMacro(vtkPVGeometryFilter, "1.45");
+vtkCxxRevisionMacro(vtkPVGeometryFilter, "1.46");
 vtkStandardNewMacro(vtkPVGeometryFilter);
 
 vtkCxxSetObjectMacro(vtkPVGeometryFilter, Controller, vtkMultiProcessController);
@@ -218,6 +220,12 @@ void vtkPVGeometryFilter::Execute()
     this->ExecuteCellNormals(this->GetOutput());
     return;
     }
+  if (input->IsA("vtkCTHData"))
+    {
+    this->CTHDataExecute(static_cast<vtkCTHData*>(input));
+    this->ExecuteCellNormals(this->GetOutput());
+    return;
+    }
   if (input->IsA("vtkDataSet"))
     {
     this->DataSetExecute(static_cast<vtkDataSet*>(input));
@@ -354,6 +362,11 @@ void vtkPVGeometryFilter::DataSetExecute(vtkDataSet *input)
   double bds[6];
   int procid = 0;
   int numProcs = 1;
+
+  if (input->GetNumberOfPoints() == 0)
+    {
+    return;
+    }
 
   if (this->Controller )
     {
@@ -553,6 +566,37 @@ void vtkPVGeometryFilter::RectilinearGridExecute(vtkRectilinearGrid *input)
   output->CopyStructure(outline->GetOutput());
   outline->Delete();
 }
+
+//----------------------------------------------------------------------------
+void vtkPVGeometryFilter::CTHDataExecute(vtkCTHData *input)
+{
+  if (!this->UseOutline)
+    {
+    vtkPolyData *output = this->GetOutput();
+    vtkCTHData* inCopy = vtkCTHData::New();
+    inCopy->ShallowCopy(input);
+    vtkCTHAMRSurface *surface = vtkCTHAMRSurface::New();
+    surface->SetInput(inCopy);
+    surface->Update();
+    output->CopyStructure(surface->GetOutput());
+    output->GetCellData()->PassData(surface->GetOutput()->GetCellData());
+    output->GetPointData()->PassData(surface->GetOutput()->GetPointData());
+    surface->SetInput(0);
+    surface->Delete();
+    surface = 0;
+    inCopy->Delete();
+    inCopy = 0;
+    this->OutlineFlag = 0;
+    return;
+    }  
+  this->OutlineFlag = 1;
+
+  //
+  // Otherwise, let Outline do all the work
+  //
+  this->DataSetExecute(input);
+}
+
 
 //----------------------------------------------------------------------------
 void vtkPVGeometryFilter::UnstructuredGridExecute(vtkUnstructuredGrid* input)

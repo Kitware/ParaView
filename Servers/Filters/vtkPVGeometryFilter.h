@@ -28,6 +28,7 @@ class vtkDataSetSurfaceFilter;
 class vtkHierarchicalBoxDataSet;
 //class vtkHierarchicalBoxOutlineFilter;
 class vtkImageData;
+class vtkCTHData;
 class vtkStructuredGrid;
 class vtkRectilinearGrid;
 class vtkUnstructuredGrid;
@@ -91,6 +92,7 @@ protected:
   void RectilinearGridExecute(vtkRectilinearGrid *input);
   void UnstructuredGridExecute(vtkUnstructuredGrid *input);
   void PolyDataExecute(vtkPolyData *input);
+  void CTHDataExecute(vtkCTHData *input);
   void DataSetSurfaceExecute(vtkDataSet *input);
   void ExecuteCellNormals(vtkPolyData *output);
   void HierarchicalBoxExecute(vtkHierarchicalBoxDataSet *input);

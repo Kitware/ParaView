@@ -69,6 +69,10 @@ protected:
   vtkCTHFractal();
   ~vtkCTHFractal();
 
+  int StartBlock;
+  int EndBlock;
+  int BlockCount;
+  virtual void ExecuteInformation();
   virtual void Execute();
   void Traverse(int &blockId, int level, vtkCTHData* output, 
                 int x0, int y0, int z0);

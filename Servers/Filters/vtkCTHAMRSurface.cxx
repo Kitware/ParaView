@@ -28,7 +28,7 @@
 #include "vtkCellArray.h"
 
 
-vtkCxxRevisionMacro(vtkCTHAMRSurface, "1.1");
+vtkCxxRevisionMacro(vtkCTHAMRSurface, "1.2");
 vtkStandardNewMacro(vtkCTHAMRSurface);
 
 //----------------------------------------------------------------------------
@@ -73,9 +73,9 @@ void vtkCTHAMRSurface::Execute()
     for (idx = 1; idx < numProcs; ++idx)
       {
       controller->Receive(numProcBlocks+idx, 1, idx, 534598);
-      procBlockInfo[idx] = new int(7*numProcBlocks[idx]);
-      procVisibleBlockFaces[idx] = new int(numProcBlocks[idx]);
-      controller->Receive(procBlockInfo[idx], 7*numProcBlocks[myId], idx, 534599);
+      procBlockInfo[idx] = new int[7*numProcBlocks[idx]];
+      procVisibleBlockFaces[idx] = new int[numProcBlocks[idx]];
+      controller->Receive(procBlockInfo[idx], 7*numProcBlocks[idx], idx, 534599);
       }
     this->ComputeOutsideFacesFromInformation(numGhostLevels, numProcs, 
                                              numProcBlocks, procBlockInfo, 

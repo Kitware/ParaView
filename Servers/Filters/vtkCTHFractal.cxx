@@ -26,7 +26,7 @@
 
 
 
-vtkCxxRevisionMacro(vtkCTHFractal, "1.12");
+vtkCxxRevisionMacro(vtkCTHFractal, "1.13");
 vtkStandardNewMacro(vtkCTHFractal);
 
 //----------------------------------------------------------------------------
@@ -146,9 +146,17 @@ int vtkCTHFractal::MandelbrotTest(double x, double y)
 }
 
 //----------------------------------------------------------------------------
+void vtkCTHFractal::ExecuteInformation()
+{
+  this->GetOutput()->SetMaximumNumberOfPieces(-1);
+}
+
+//----------------------------------------------------------------------------
 void vtkCTHFractal::Execute()
 {
   vtkCTHData* output = this->GetOutput();
+  int numPieces = output->GetUpdateNumberOfPieces();
+  int piece = output->GetUpdatePiece();
   float ox = -1.75;
   float oy = -1.25;
   float oz = 0.0;
@@ -170,6 +178,18 @@ void vtkCTHFractal::Execute()
     {
     output->SetNumberOfGhostLevels(0);
     }
+
+  // Get a global (across all processes) count of the blocks.
+  // Do not create the blocks.
+  this->StartBlock = 0;
+  this->EndBlock = -1;
+  this->BlockCount = 0;;
+  this->Traverse(blockId, 0, output, 0, 0, 0);
+
+  // Generate our share of the blocks.
+  this->StartBlock = (int)((float)(piece*this->BlockCount)/(float)(numPieces));
+  this->EndBlock = (int)((float)((piece+1)*this->BlockCount)/(float)(numPieces)) - 1;
+  this->BlockCount = 0;
 
   this->Levels->Initialize();
   this->Traverse(blockId, 0, output, 0, 0, 0);
@@ -362,13 +382,17 @@ void vtkCTHFractal::Traverse(int &blockId, int level, vtkCTHData* output,
       }
     else
       {
-      if (output->InsertNextBlock() != blockId)
+      if (this->BlockCount >= this->StartBlock && this->BlockCount <= this->EndBlock)
         {
-        vtkErrorMacro("blockId wrong.")
-        return;
+        if (output->InsertNextBlock() != blockId)
+          {
+          vtkErrorMacro("blockId wrong.")
+          return;
+          }
+        this->Levels->InsertValue(blockId, level);
+        this->SetBlockInfo(blockId++, level, x0, y0, z0);
         }
-      this->Levels->InsertValue(blockId, level);
-      this->SetBlockInfo(blockId++, level, x0, y0, z0);
+      ++this->BlockCount;
       }
     }
   else
@@ -392,13 +416,17 @@ void vtkCTHFractal::Traverse(int &blockId, int level, vtkCTHData* output,
       }
     else
       {
-      if (output->InsertNextBlock() != blockId)
+      if (this->BlockCount >= this->StartBlock && this->BlockCount <= this->EndBlock)
         {
-        vtkErrorMacro("blockId wrong.")
-        return;
+        if (output->InsertNextBlock() != blockId)
+          {
+          vtkErrorMacro("blockId wrong.")
+          return;
+          }
+        this->Levels->InsertValue(blockId, level);
+        this->SetBlockInfo(blockId++, level, x0, y0, z0);
         }
-      this->Levels->InsertValue(blockId, level);
-      this->SetBlockInfo(blockId++, level, x0, y0, z0);
+      ++this->BlockCount;
       }
     }
 }
