@@ -45,7 +45,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWBWidgets );
-vtkCxxRevisionMacro(vtkKWBWidgets, "1.15");
+vtkCxxRevisionMacro(vtkKWBWidgets, "1.16");
 
 int vtkKWBWidgetsCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -300,7 +300,7 @@ void vtkKWBWidgets::Execute(Tcl_Interp* interp, const char* str, const char* mod
       << " (higher than " << maxlen << "), so compilers that cannot "
       "handle such a large strings might not compile this." << endl;
     cout << "The line is: [";
-    cout.write(str+32000, 100);
+    cout.write(str+maxlen, 100);
     cout << "]" << endl;
     }
   char* script = new char[strlen(str)+1];

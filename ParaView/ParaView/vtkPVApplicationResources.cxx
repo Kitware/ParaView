@@ -279,8 +279,12 @@ void vtkPVApplication::CreateButtonPhotos()
 //----------------------------------------------------------------------------
 void vtkPVApplication::CreateSplashScreen()
 {
+  unsigned char *buffer = new unsigned char [ image_PVSplashScreen_buffer_length ];
+  memcpy(buffer, image_PVSplashScreen1, sizeof(image_PVSplashScreen1));
+  memcpy(buffer+sizeof(image_PVSplashScreen1), image_PVSplashScreen2, 
+    sizeof(image_PVSplashScreen2));
   this->CreatePhoto("PVSplashScreen", 
-                    image_PVSplashScreen, 
+                    buffer, 
                     image_PVSplashScreen_width, 
                     image_PVSplashScreen_height,
                     image_PVSplashScreen_pixel_size,
@@ -290,6 +294,7 @@ void vtkPVApplication::CreateSplashScreen()
   this->SplashScreen->SetProgressMessageVerticalOffset(-17);
   this->SplashScreen->SetImageName("PVSplashScreen");
   // this->SplashScreen->Show();
+  delete [] buffer;
 }
 
 //----------------------------------------------------------------------------
