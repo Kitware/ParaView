@@ -55,7 +55,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectWidget);
-vtkCxxRevisionMacro(vtkPVSelectWidget, "1.23.4.4");
+vtkCxxRevisionMacro(vtkPVSelectWidget, "1.23.4.5");
 
 int vtkPVSelectWidgetCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -77,6 +77,7 @@ vtkPVSelectWidget::vtkPVSelectWidget()
   this->UseWidgetCommand = 0;
 
   this->Property = NULL;
+  this->AcceptCalled = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -218,6 +219,7 @@ void vtkPVSelectWidget::AcceptInternal(const char* sourceTclName)
     pvwp->GetWidget()->AcceptInternal(sourceTclName);
     }
 
+  this->AcceptCalled = 1;
   this->ModifiedFlag = 0;
 }
 
@@ -248,10 +250,7 @@ void vtkPVSelectWidget::ResetInternal()
   const char* value;
   char* currentValue;
 
-//  this->Script("%s Get%s",sourceTclName,this->VariableName);
-//  tmp = Tcl_GetStringResult(this->Application->GetMainInterp());
-  if (this->Property && this->Property->GetString() &&
-      strlen(this->Property->GetString()) > 0)
+  if (this->AcceptCalled)
     {
     currentValue = new char[strlen(this->Property->GetString())+1];
     strcpy(currentValue, this->Property->GetString());

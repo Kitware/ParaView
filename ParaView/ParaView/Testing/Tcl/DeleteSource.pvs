@@ -36,12 +36,12 @@ proc decipadString { str before total } {
 set pvWindow [lindex [vtkPVWindow ListInstances] 0]
 
 set pvSphere [$pvWindow CreatePVSource SphereSource]
-[$pvSphere GetVTKSource] SetThetaResolution 16
+[$pvSphere GetVTKSourceTclName 0] SetThetaResolution 16
 $pvSphere UpdateParameterWidgets
 $pvSphere AcceptCallback
 
 set pvShrink [$pvWindow CreatePVSource ShrinkFilter]
-[$pvShrink GetVTKSource] SetShrinkFactor 0.9
+[$pvShrink GetVTKSourceTclName 0] SetShrinkFactor 0.9
 $pvShrink UpdateParameterWidgets
 $pvShrink AcceptCallback
 

@@ -63,7 +63,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVArrayMenu);
-vtkCxxRevisionMacro(vtkPVArrayMenu, "1.40.2.3");
+vtkCxxRevisionMacro(vtkPVArrayMenu, "1.40.2.4");
 
 vtkCxxSetObjectMacro(vtkPVArrayMenu, InputMenu, vtkPVInputMenu);
 vtkCxxSetObjectMacro(vtkPVArrayMenu, FieldMenu, vtkPVFieldMenu);
@@ -371,6 +371,9 @@ void vtkPVArrayMenu::AcceptInternal(const char* sourceTclName)
     {
     cmds[0] = new char[strlen(this->InputName)+strlen(attributeName)+7];
     sprintf(cmds[0], "Select%s%s", this->InputName, attributeName);
+    numScalars[0] = this->ShowComponentMenu;
+    numStrings[0] = 1;
+    this->Property->SetVTKCommands(1, cmds, numStrings, numScalars);
     string = new char[strlen(this->ArrayName)+1];
     sprintf(string, this->ArrayName);
     this->Property->SetStrings(1, &this->ArrayName);
@@ -388,6 +391,9 @@ void vtkPVArrayMenu::AcceptInternal(const char* sourceTclName)
     this->Property->SetScalars(1, &scalar);
     }
 
+  this->Property->SetVTKSourceTclName(sourceTclName);
+  this->Property->AcceptInternal();
+  
   this->ModifiedFlag = 0;
   this->AcceptCalled = 1;
 }
@@ -577,7 +583,7 @@ void vtkPVArrayMenu::UpdateArrayMenu()
     // Now set the menu's value.
     this->ArrayMenu->SetValue(this->ArrayName);
 
-    if (!this->AcceptCalled)
+    if (!this->AcceptCalled && this->ArrayName)
       {
       char *str = new char[strlen(this->ArrayName)+1];
       strcpy(str, this->ArrayName);

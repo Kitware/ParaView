@@ -37,6 +37,8 @@ set pv(vtkTemp204) [$pv(vtkTemp187) GetPVWidget {Compute Normals}]
 $pv(vtkTemp204) SetState 0
 $pv(vtkTemp187) AcceptCallback
 
+[$pv(vtkTemp187) GetPVOutput] SetColorRange 0 3926
+
 set activeCamera [Ren1 GetActiveCamera]
 $activeCamera SetPosition 31.5 250.821 20.5266
 $activeCamera SetFocalPoint 31.5 31.5 31.5

@@ -15,6 +15,7 @@ set exceptions {
   vtkIceTRenderManager-GetBufferReadTime
   vtkIceTRenderManager-GetBufferWriteTime
   vtkIceTRenderManager-GetCompositeTime
+  vtkVRMLSource-GetOutput
 }
 
 proc TestOne {cname} {

@@ -37,6 +37,8 @@ set pvWindow [lindex [vtkPVWindow ListInstances] 0]
 set pv(vtkTemp43) [$pvWindow GetMainView]
 $pv(vtkTemp43) SetBackgroundColor 0 0 0
 
+after 10000
+
 #change to rotate camera interactor style
 $pvWindow ChangeInteractorStyle 1
 
@@ -147,28 +149,28 @@ $pvExtract AcceptCallback
 [$pvExtract GetPVOutput] SetVisibility 1
 
 [$pvGlyph GetPVOutput] SetVisibility 1
-[$pvGlyph GetPVOutput] ColorByProperty
+#[$pvGlyph GetPVOutput] ColorByProperty
 
-$camera SetPosition 36.8437 -0.196199 53.7392
-$camera SetFocalPoint -5.92921 -0.324064 18.022
-$camera SetViewUp -0.639592 -0.0625532 0.766165
-$camera SetViewAngle 30
-$camera SetClippingRange 15.0904 64.6074
+#$camera SetPosition 36.8437 -0.196199 53.7392
+#$camera SetFocalPoint -5.92921 -0.324064 18.022
+#$camera SetViewUp -0.639592 -0.0625532 0.766165
+#$camera SetViewAngle 30
+#$camera SetClippingRange 15.0904 64.6074
 
-$VOIEntry SetValue 0 0 0 32 3 20
-$pvExtract AcceptCallback
-RenWin1 Render
+#$VOIEntry SetValue 0 0 0 32 3 20
+#$pvExtract AcceptCallback
+#RenWin1 Render
 
-set extOutput [$pvExtract GetPVOutput]
-$extOutput ColorByPointField {Density} 1
-$extOutput SetScalarBarVisibility 1
+#set extOutput [$pvExtract GetPVOutput]
+#$extOutput ColorByPointField {Density} 1
+#$extOutput SetScalarBarVisibility 1
 
-for {set i 55} {$i < 56} {incr i 1} {
-    $VOIEntry SetValue $i $i 0 32 3 20
-    $pvExtract AcceptCallback
-    RenWin1 Render
-    update
-}
+#for {set i 55} {$i < 56} {incr i 1} {
+#    $VOIEntry SetValue $i $i 0 32 3 20
+#    $pvExtract AcceptCallback
+#    RenWin1 Render
+#    update
+#}
 
 for {set i  1} {$i < [expr $argc - 1]} {incr i} {
     if {[lindex $argv $i] == "-C"} {

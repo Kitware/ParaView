@@ -194,6 +194,7 @@ protected:
   int UseWidgetCommand;
 
   vtkPVStringWidgetProperty *Property;
+  int AcceptCalled;
   
 //BTX
   virtual vtkPVWidget* ClonePrototypeInternal(vtkPVSource* pvSource,
