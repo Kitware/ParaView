@@ -49,6 +49,10 @@ SPCTH_EXPORT int spcth_getNumTimeSteps(SPCTH* spcth);
 SPCTH_EXPORT double spcth_getTimeStepValue(SPCTH* spcth, int index);
 SPCTH_EXPORT int spcth_setTimeStep(SPCTH* spcth, double time_val);
 
+/*******************************
+ * Check if the dataset is AMR
+ *******************************/
+SPCTH_EXPORT int spcth_isAMR(SPCTH* spcth);
 
 /********************************************************************
  * Note: You must call openSpyFile && setTimeStep before
@@ -61,6 +65,8 @@ SPCTH_EXPORT int spcth_setTimeStep(SPCTH* spcth, double time_val);
 SPCTH_EXPORT int spcth_getNumberOfDataBlocksForCurrentTime(SPCTH* spcth);
 SPCTH_EXPORT void spcth_getDataBlockDimensions(SPCTH* spcth, int block_index, int *x, int *y, int *z);
 SPCTH_EXPORT int spcth_getDataBlockLevel(SPCTH* spcth, int block_index);
+SPCTH_EXPORT int spcth_getDataBlockVectors(SPCTH* spcth, int block_index,
+  double *vx, double *vy, double *vz);
 SPCTH_EXPORT int spcth_getDataBlockBounds(SPCTH* spcth, int block_index, double *bounds);
 
 /*******************************

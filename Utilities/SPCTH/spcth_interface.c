@@ -70,6 +70,12 @@ int spcth_setTimeStep(SPCTH* spcth, double time_val) {
   return spy_file_in(spcth->Spy, time_val);
 }
 
+/********************************************************************/
+int spcth_isAMR(SPCTH* spcth)
+{
+  return spcth_getNumberOfDataBlocksForCurrentTime(spcth) != 1;
+}
+
 /********************************************************************
  * Data Block accessors
  ********************************************************************/
@@ -111,6 +117,30 @@ int spcth_getDataBlockLevel(SPCTH* spcth, int block_index) {
 }
 
 /********************************************************************/
+int spcth_getDataBlockVectors(SPCTH* spcth, int block_index,
+  double *vx, double *vy, double *vz)
+{
+  Structured_Block_Data *blk;
+  int count=0;
+
+  /* Sanity check */
+  if (!vx || !vy || !vz) return 0;
+
+  /* Step through blocks until the right index */
+  for (blk=spy_FirstBlock(spcth->Spy);
+    blk!=NULL && count<block_index;
+    blk=spy_NextBlock(spcth->Spy), ++count )
+    {
+    }
+
+  vx = blk->x;
+  vy = blk->y;
+  vz = blk->z;
+
+  /* Successfully populated bounds */
+  return 1;
+}
+/********************************************************************/
 int spcth_getDataBlockBounds(SPCTH* spcth, int block_index, double *bounds) {
 
   Structured_Block_Data *blk;
@@ -120,14 +150,18 @@ int spcth_getDataBlockBounds(SPCTH* spcth, int block_index, double *bounds) {
   if (bounds == NULL) return 0;
 
   /* Step through blocks until the right index */
-  for (blk=spy_FirstBlock(spcth->Spy); blk!=NULL && count<block_index; blk=spy_NextBlock(spcth->Spy), ++count );
+  for (blk=spy_FirstBlock(spcth->Spy);
+    blk!=NULL && count<block_index;
+    blk=spy_NextBlock(spcth->Spy), ++count )
+    {
+    }
 
   bounds[0] = blk->x[0];
-  bounds[1] = blk->x[blk->Nx];
+  bounds[1] = blk->x[blk->Nx+1];
   bounds[2] = blk->y[0];
-  bounds[3] = blk->y[blk->Ny];
+  bounds[3] = blk->y[blk->Ny+1];
   bounds[4] = blk->z[0];
-  bounds[5] = blk->z[blk->Nz];
+  bounds[5] = blk->z[blk->Nz+1];
 
   /* Successfully populated bounds */
   return 1;
