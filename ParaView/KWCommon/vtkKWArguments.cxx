@@ -59,8 +59,8 @@ public:
     this->LastArgument = 0;
     }
 
-  typedef vtkstd::vector<std::string> VectorOfStrings;
-  typedef vtkstd::map<std::string,
+  typedef vtkstd::vector<vtkstd::string> VectorOfStrings;
+  typedef vtkstd::map<vtkstd::string,
     vtkKWArguments::CallbackStructure> CallbacksMap;
 
   VectorOfStrings Argv;
@@ -76,7 +76,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWArguments );
-vtkCxxRevisionMacro(vtkKWArguments, "1.1");
+vtkCxxRevisionMacro(vtkKWArguments, "1.2");
 
 //----------------------------------------------------------------------------
 vtkKWArguments::vtkKWArguments()
@@ -111,14 +111,14 @@ int vtkKWArguments::Parse()
   for ( cc = 0; cc < this->Internals->Argv.size(); cc ++ )
     {
     matches.clear();
-    std::string& arg = this->Internals->Argv[cc];
+    vtkstd::string& arg = this->Internals->Argv[cc];
     vtkKWArgumentsInternal::CallbacksMap::iterator it;
 
     for ( it = this->Internals->Callbacks.begin();
       it != this->Internals->Callbacks.end();
       it ++ )
       {
-      const std::string& parg = it->first;
+      const vtkstd::string& parg = it->first;
       vtkKWArguments::CallbackStructure *cs = &it->second;
       if (cs->ArgumentType == vtkKWArguments::NO_ARGUMENT ||
         cs->ArgumentType == vtkKWArguments::SPACE_ARGUMENT) 
@@ -137,7 +137,7 @@ int vtkKWArguments::Parse()
       {
       vtkKWArgumentsInternal::VectorOfStrings::size_type kk;
       vtkKWArgumentsInternal::VectorOfStrings::size_type maxidx = 0;
-      std::string::size_type maxlen = 0;
+      vtkstd::string::size_type maxlen = 0;
       for ( kk = 0; kk < matches.size(); kk ++ )
         {
         //cout << "Possible argument: " << matches[kk] << endl;
