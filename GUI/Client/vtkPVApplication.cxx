@@ -111,7 +111,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.338");
+vtkCxxRevisionMacro(vtkPVApplication, "1.339");
 
 
 int vtkPVApplicationCommand(ClientData cd, Tcl_Interp *interp,
@@ -1059,7 +1059,7 @@ void vtkPVApplication::Start(int argc, char*argv[])
     "    }\n"
     "    set retVal [smGetAdaptor GetRangeValue $index]\n"
     "    smGetAdaptor Delete\n"
-    "    return [format %$form $retVal]\n"
+    "    return [format %%$form $retVal]\n"
     "}\n");
 
   // Check if there is an existing ParaViewTrace file.
