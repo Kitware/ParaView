@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWLabeledWidget);
-vtkCxxRevisionMacro(vtkKWLabeledWidget, "1.4");
+vtkCxxRevisionMacro(vtkKWLabeledWidget, "1.5");
 
 int vtkKWLabeledWidgetCommand(ClientData cd, Tcl_Interp *interp,
                               int argc, char *argv[]);
@@ -99,6 +99,7 @@ void vtkKWLabeledWidget::Create(vtkKWApplication *app, const char *args)
     }
 
   this->Label->Create(app, "-anchor w");
+  // -bd 0 -highlightthickness 0 -padx 0 -pady 0");
 
   // Subclasses will call this->Pack() here
   // this->Pack();

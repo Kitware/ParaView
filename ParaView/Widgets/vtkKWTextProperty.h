@@ -88,45 +88,45 @@ public:
   // Description:
   // Set the widget aspect to be long, i.e. the widgets will be packed on several
   // rows, with description labels. The default is short (all widgets on a row).
-  void SetLongFormat(int);
+  virtual void SetLongFormat(int);
   vtkBooleanMacro(LongFormat, int);
   vtkGetMacro(LongFormat, int);
 
   // Description:
-  // Show the label on top (default0, otherwise on left. 
+  // Show the label on top (default, otherwise on left. 
   // Valid if LongFormat is On.
-  void SetLabelOnTop(int);
+  virtual void SetLabelOnTop(int);
   vtkBooleanMacro(LabelOnTop, int);
   vtkGetMacro(LabelOnTop, int);
 
   // Description:
   // Show label.
-  void SetShowLabel(int);
+  virtual void SetShowLabel(int);
   vtkBooleanMacro(ShowLabel, int);
   vtkGetMacro(ShowLabel, int);
   vtkGetObjectMacro(Label, vtkKWLabel);
 
   // Description:
   // Show color.
-  void SetShowColor(int);
+  virtual void SetShowColor(int);
   vtkBooleanMacro(ShowColor, int);
   vtkGetMacro(ShowColor, int);
 
   // Description:
   // Show font family.
-  void SetShowFontFamily(int);
+  virtual void SetShowFontFamily(int);
   vtkBooleanMacro(ShowFontFamily, int);
   vtkGetMacro(ShowFontFamily, int);
 
   // Description:
   // Show style.
-  void SetShowStyles(int);
+  virtual void SetShowStyles(int);
   vtkBooleanMacro(ShowStyles, int);
   vtkGetMacro(ShowStyles, int);
 
   // Description:
   // Show opacity.
-  void SetShowOpacity(int);
+  virtual void SetShowOpacity(int);
   vtkBooleanMacro(ShowOpacity, int);
   vtkGetMacro(ShowOpacity, int);
 
@@ -145,14 +145,14 @@ public:
   // Description:
   // Show copy button. This button can be used to synchronize different
   // text property widgets.
-  void SetShowCopy(int);
+  virtual void SetShowCopy(int);
   vtkBooleanMacro(ShowCopy, int);
   vtkGetMacro(ShowCopy, int);
   virtual vtkKWPushButton* GetCopyButton();
 
   // Description:
   // Copy the values from another text widget
-  void CopyValuesFrom(vtkKWTextProperty*);
+  virtual void CopyValuesFrom(vtkKWTextProperty*);
 
   // GUI components callbacks
   void ChangeColorButtonCallback(float, float, float);
@@ -181,7 +181,7 @@ protected:
   vtkKWTextProperty();
   ~vtkKWTextProperty();
 
-  void Pack();
+  virtual void Pack();
 
   void UpdateInterface();
   void UpdateLabel();

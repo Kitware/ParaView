@@ -129,7 +129,7 @@ static unsigned char image_copy[] =
 
 // ----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWTextProperty);
-vtkCxxRevisionMacro(vtkKWTextProperty, "1.13");
+vtkCxxRevisionMacro(vtkKWTextProperty, "1.14");
 
 int vtkKWTextPropertyCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -223,10 +223,9 @@ void vtkKWTextProperty::Create(vtkKWApplication *app)
     }
   this->SetApplication(app);
 
-  // Create the top level widget
+  // Create container
 
-  const char *wname = this->GetWidgetName();
-  this->Script("frame %s -borderwidth 0 -relief flat", wname);
+  this->Script("frame %s -borderwidth 0 -relief flat", this->GetWidgetName());
 
   // Label
 
@@ -488,8 +487,7 @@ void vtkKWTextProperty::Pack()
 
   ostrstream tk_cmd;
 
-  tk_cmd << "catch {eval grid forget [grid slaves " << this->GetWidgetName() 
-         << "]}" << endl;
+  this->ChangeColorButton->UnpackSiblings();
 
   if (this->LongFormat)
     {
