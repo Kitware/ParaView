@@ -63,7 +63,7 @@ vtkPVData::vtkPVData()
 
   // This is initialized in "Clone();"
   this->ActorComposite = NULL;
-  this->ScalarBar = NULL;
+  this->PVScalarBar = NULL;
 
   this->PVSourceCollection = vtkPVSourceCollection::New();
 }
@@ -87,10 +87,10 @@ vtkPVData::~vtkPVData()
   this->ActorCompositeButton->Delete();
   this->ActorCompositeButton = NULL;
 
-  if (this->ScalarBar)
+  if (this->PVScalarBar)
     {
-    this->ScalarBar->Delete();
-    this->ScalarBar = NULL;
+    this->PVScalarBar->Delete();
+    this->PVScalarBar = NULL;
     }
   
   this->ScalarBarButton->Delete();
@@ -139,7 +139,7 @@ void vtkPVData::Clone(vtkPVApplication *pvApp)
   vtkPVScalarBar *sb;
   sb = vtkPVScalarBar::New();
   sb->Clone(pvApp);
-  this->SetScalarBar(sb);
+  this->SetPVScalarBar(sb);
   sb->Delete();
 
   // What about deleting the cloned composites?
@@ -172,7 +172,7 @@ int vtkPVData::Create(char *args)
 		 this->FiltersMenuButton->GetMenu()->GetWidgetName());
     // If there are not point scalars, the scalar bar should not be
     // visible either.
-    this->GetScalarBar()->VisibilityOff();
+    this->GetPVScalarBar()->VisibilityOff();
     }
   else
     {
@@ -213,7 +213,7 @@ void vtkPVData::ShowActorComposite()
 //----------------------------------------------------------------------------
 void vtkPVData::ShowScalarBarParameters()
 {
-  this->GetScalarBar()->ShowProperties();
+  this->GetPVScalarBar()->ShowProperties();
 }
 
 
@@ -623,11 +623,11 @@ void vtkPVData::SetActorComposite(vtkPVActorComposite *c)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVData::SetScalarBar(vtkPVScalarBar *sb)
+void vtkPVData::SetPVScalarBar(vtkPVScalarBar *sb)
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
 
-  if (this->ScalarBar == sb)
+  if (this->PVScalarBar == sb)
     {
     return;
     }
@@ -641,18 +641,18 @@ void vtkPVData::SetScalarBar(vtkPVScalarBar *sb)
   // Broadcast to all satellite processes.
   if (pvApp && pvApp->GetController()->GetLocalProcessId() == 0)
     {
-    pvApp->BroadcastScript("%s SetScalarBar %s", this->GetTclName(), 
-			                     sb->GetTclName());
+    pvApp->BroadcastScript("%s SetPVScalarBar %s", this->GetTclName(), 
+			   sb->GetTclName());
     }
   
-  if (this->ScalarBar)
+  if (this->PVScalarBar)
     {
-    this->ScalarBar->UnRegister(this);
-    this->ScalarBar = NULL;
+    this->PVScalarBar->UnRegister(this);
+    this->PVScalarBar = NULL;
     }
   sb->Register(this);
-  this->ScalarBar = sb;
-  this->ScalarBar->SetPVData(this);
+  this->PVScalarBar = sb;
+  this->PVScalarBar->SetPVData(this);
 }
 
 //----------------------------------------------------------------------------
@@ -662,9 +662,9 @@ vtkPVActorComposite* vtkPVData::GetActorComposite()
 }
 
 //----------------------------------------------------------------------------
-vtkPVScalarBar *vtkPVData::GetScalarBar()
+vtkPVScalarBar *vtkPVData::GetPVScalarBar()
 {
-  return this->ScalarBar;
+  return this->PVScalarBar;
 }
 
 //----------------------------------------------------------------------------
