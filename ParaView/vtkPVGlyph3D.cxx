@@ -31,6 +31,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkKWCompositeCollection.h"
 #include "vtkPVWindow.h"
 #include "vtkObjectFactory.h"
+#include "vtkPVSourceInterface.h"
 
 int vtkPVGlyph3DCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -385,28 +386,24 @@ void vtkPVGlyph3D::SaveInTclScript(ofstream *file)
     *file << "vtkFieldDataToAttributeDataFilter "
           << this->ChangeScalarsFilterTclName << "\n\t"
           << this->ChangeScalarsFilterTclName << " SetInput [";
-    if (strncmp(this->GetNthPVInput(0)->GetVTKDataTclName(),
-                "EnSight", 7) == 0)
+    if (strcmp(this->GetNthPVInput(0)->GetPVSource()->GetInterface()->
+               GetSourceClassName(), "vtkGenericEnSightReader") == 0)
       {
       char *charFound;
       int pos;
       char *dataName = this->GetNthPVInput(0)->GetVTKDataTclName();
       
-      sprintf(sourceTclName, "EnSightReader");
-      tempName = strtok(dataName, "O");
-      strcat(sourceTclName, tempName+7);
-      *file << sourceTclName << " GetOutput ";
       charFound = strrchr(dataName, 't');
+      tempName = strtok(dataName, "O");
+      *file << tempName << " GetOutput ";
       pos = charFound - dataName + 1;
       *file << dataName+pos << "]\n\t";
       }
-    else if (strncmp(this->GetNthPVInput(0)->GetVTKDataTclName(),
-                     "DataSet", 7) == 0)
+    else if (strcmp(this->GetNthPVInput(0)->GetPVSource()->GetInterface()->
+                    GetSourceClassName(), "vtkDataSetReader") == 0)
       {
-      sprintf(sourceTclName, "DataSetReader");
       tempName = strtok(this->GetNthPVInput(0)->GetVTKDataTclName(), "O");
-      strcat(sourceTclName, tempName+7);
-      *file << sourceTclName << " GetOutput]\n\t";
+      *file << tempName << " GetOutput]\n\t";
       }
     else
       {
@@ -441,26 +438,22 @@ void vtkPVGlyph3D::SaveInTclScript(ofstream *file)
 
   if (!this->ChangeScalarsFilterTclName)
     {
-    if (strncmp(this->GetNthPVInput(0)->GetVTKDataTclName(),
-                "EnSight", 7) == 0)
+    if (strcmp(this->GetNthPVInput(0)->GetPVSource()->GetInterface()->
+               GetSourceClassName(), "vtkGenericEnSightReader") == 0)
       {
       char *dataName = this->GetNthPVInput(0)->GetVTKDataTclName();
       
-      sprintf(sourceTclName, "EnSightReader");
-      tempName = strtok(dataName, "O");
-      strcat(sourceTclName, tempName+7);
-      *file << sourceTclName << " GetOutput ";
       charFound = strrchr(dataName, 't');
+      tempName = strtok(dataName, "O");
+      *file << tempName << " GetOutput ";
       pos = charFound - dataName + 1;
       *file << dataName+pos << "]\n\t";
       }
-    else if (strncmp(this->GetNthPVInput(0)->GetVTKDataTclName(),
-                     "DataSet", 7) == 0)
+    else if (strcmp(this->GetNthPVInput(0)->GetPVSource()->GetInterface()->
+                    GetSourceClassName(), "vtkDataSetReader") == 0)
       {
-      sprintf(sourceTclName, "DataSetReader");
       tempName = strtok(this->GetNthPVInput(0)->GetVTKDataTclName(), "O");
-      strcat(sourceTclName, tempName+7);
-      *file << sourceTclName << " GetOutput]\n\t";
+      *file << tempName << " GetOutput]\n\t";
       }
     else
       {

@@ -28,6 +28,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkPVContour.h"
 #include "vtkPVApplication.h"
 #include "vtkStringList.h"
+#include "vtkPVSourceInterface.h"
 
 int vtkPVContourCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -258,7 +259,6 @@ void vtkPVContour::ContourValuesResetCallback()
 
 void vtkPVContour::SaveInTclScript(ofstream* file)
 {
-  char sourceTclName[256];
   char* tempName;
   int i;
   vtkKitwareContourFilter *source =
@@ -269,28 +269,24 @@ void vtkPVContour::SaveInTclScript(ofstream* file)
     *file << "vtkFieldDataToAttributeDataFilter "
           << this->ChangeScalarsFilterTclName << "\n\t"
           << this->ChangeScalarsFilterTclName << " SetInput [";
-    if (strncmp(this->GetNthPVInput(0)->GetVTKDataTclName(),
-                "EnSight", 7) == 0)
+    if (strcmp(this->GetNthPVInput(0)->GetPVSource()->GetInterface()->
+               GetSourceClassName(), "vtkGenericEnSightReader") == 0)
       {
       char *charFound;
       int pos;
       char *dataName = this->GetNthPVInput(0)->GetVTKDataTclName();
       
-      sprintf(sourceTclName, "EnSightReader");
-      tempName = strtok(dataName, "O");
-      strcat(sourceTclName, tempName+7);
-      *file << sourceTclName << " GetOutput ";
       charFound = strrchr(dataName, 't');
+      tempName = strtok(dataName, "O");
+      *file << tempName << " GetOutput ";
       pos = charFound - dataName + 1;
       *file << dataName+pos << "]\n\t";
       }
-    else if (strncmp(this->GetNthPVInput(0)->GetVTKDataTclName(),
-                     "DataSet", 7) == 0)
+    else if (strcmp(this->GetNthPVInput(0)->GetPVSource()->GetInterface()->
+                    GetSourceClassName(), "vtkDataSetReader") == 0)
       {
-      sprintf(sourceTclName, "DataSetReader");
       tempName = strtok(this->GetNthPVInput(0)->GetVTKDataTclName(), "O");
-      strcat(sourceTclName, tempName+7);
-      *file << sourceTclName << " GetOutput]\n\t";
+      *file << tempName << " GetOutput]\n\t";
       }
     else
       {
@@ -312,28 +308,24 @@ void vtkPVContour::SaveInTclScript(ofstream* file)
 
   if (!this->DefaultScalarsName)
     {
-    if (strncmp(this->GetNthPVInput(0)->GetVTKDataTclName(),
-                "EnSight", 7) == 0)
+    if (strcmp(this->GetNthPVInput(0)->GetPVSource()->GetInterface()->
+               GetSourceClassName(), "vtkGenericEnSightReader") == 0)
       {
       char *charFound;
       int pos;
       char *dataName = this->GetNthPVInput(0)->GetVTKDataTclName();
       
-      sprintf(sourceTclName, "EnSightReader");
-      tempName = strtok(dataName, "O");
-      strcat(sourceTclName, tempName+7);
-      *file << sourceTclName << " GetOutput ";
       charFound = strrchr(dataName, 't');
+      tempName = strtok(dataName, "O");
+      *file << tempName << " GetOutput ";
       pos = charFound - dataName + 1;
       *file << dataName+pos << "]\n\t";
       }
-    else if (strncmp(this->GetNthPVInput(0)->GetVTKDataTclName(),
-                     "DataSet", 7) == 0)
+    else if (strcmp(this->GetNthPVInput(0)->GetPVSource()->GetInterface()->
+                    GetSourceClassName(), "vtkDataSetReader") == 0)
       {
-      sprintf(sourceTclName, "DataSetReader");
       tempName = strtok(this->GetNthPVInput(0)->GetVTKDataTclName(), "O");
-      strcat(sourceTclName, tempName+7);
-      *file << sourceTclName << " GetOutput]\n\t";
+      *file << tempName << " GetOutput]\n\t";
       }
     else
       {

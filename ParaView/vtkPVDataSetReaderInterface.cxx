@@ -99,7 +99,7 @@ vtkPVSource *vtkPVDataSetReaderInterface::CreateCallback()
     }
   if (isdigit(tclName[0]))
     {
-    // A VTK object names beginning with a digit is invalid.
+    // A VTK object name beginning with a digit is invalid.
     newTclName = new char[strlen(tclName) + 3];
     sprintf(newTclName, "PV%s", tclName);
     strcpy(tclName, "");

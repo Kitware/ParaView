@@ -28,6 +28,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkPVArrayCalculator.h"
 #include "vtkPVApplication.h"
 #include "vtkStringList.h"
+#include "vtkPVSourceInterface.h"
 
 int vtkPVArrayCalculatorCommand(ClientData cd, Tcl_Interp *interp,
                                 int argc, char *argv[]);
@@ -604,36 +605,30 @@ void vtkPVArrayCalculator::AddVectorVariable(const char* variableName,
 
 void vtkPVArrayCalculator::SaveInTclScript(ofstream *file)
 {
-  char sourceTclName[256];
   char* tempName;
   int i;
   
   *file << this->VTKSource->GetClassName() << " "
         << this->VTKSourceTclName << "\n\t"
         << this->VTKSourceTclName << " SetInput [";
-  if (strncmp(this->GetNthPVInput(0)->GetVTKDataTclName(),
-              "EnSight", 7) == 0)
+  if (strcmp(this->GetNthPVInput(0)->GetPVSource()->GetInterface()->
+             GetSourceClassName(), "vtkGenericEnSightReader") == 0)
     {
     char *charFound;
     int pos;
     char *dataName = this->GetNthPVInput(0)->GetVTKDataTclName();
-    
-    sprintf(sourceTclName, "EnSightReader");
-    tempName = strtok(dataName, "O");
-    strcat(sourceTclName, tempName+7);
-    *file << sourceTclName
-          << " GetOutput ";
+
     charFound = strrchr(dataName, 't');
+    tempName = strtok(dataName, "O");
+    *file << dataName << " GetOutput ";
     pos = charFound - dataName + 1;
     *file << dataName+pos << "]\n";
     }
-  else if (strncmp(this->GetNthPVInput(0)->GetVTKDataTclName(),
-                   "DataSet", 7) == 0)
+  else if (strcmp(this->GetNthPVInput(0)->GetPVSource()->GetInterface()->
+                   GetSourceClassName(), "vtkDataSetReader") == 0)
     {
-    sprintf(sourceTclName, "DataSetReader");
     tempName = strtok(this->GetNthPVInput(0)->GetVTKDataTclName(), "O");
-    strcat(sourceTclName, tempName+7);
-    *file << sourceTclName << " GetOutput]\n";
+    *file << tempName << " GetOutput]\n";
     }
   else
     {

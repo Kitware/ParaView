@@ -1407,6 +1407,8 @@ void vtkPVSource::SaveInTclScript(ofstream *file)
   char* tempName;
   char* extension;
   int pos;
+  char *charFound;
+  char *dataName;
   
   if (this->ChangeScalarsFilterTclName)
     {
@@ -1416,45 +1418,42 @@ void vtkPVSource::SaveInTclScript(ofstream *file)
     if (strcmp(this->GetNthPVInput(0)->GetPVSource()->GetInterface()->
                GetSourceClassName(), "vtkGenericEnSightReader") == 0)
       {
-      char *charFound;
-      int pos;
-      char *dataName = this->GetNthPVInput(0)->GetVTKDataTclName();
-      
-      sprintf(sourceTclName, "EnSightReader");
-      tempName = strtok(dataName, "O");
-      strcat(sourceTclName, tempName+7);
-      *file << sourceTclName << " GetOutput ";
+      dataName = this->GetNthPVInput(0)->GetVTKDataTclName();
       charFound = strrchr(dataName, 't');
+      tempName = strtok(dataName, "O");
+      *file << tempName << " GetOutput ";
       pos = charFound - dataName + 1;
-      *file << dataName+pos << "]\n";
+      *file << dataName+pos << "]\n\t";
       }
     else if (strcmp(this->GetNthPVInput(0)->GetPVSource()->GetInterface()->
                     GetSourceClassName(), "vtkDataSetReader") == 0)
       {
-      *file << this->Name << " GetOutput]\n";
+      dataName = this->GetNthPVInput(0)->GetVTKDataTclName();      
+      tempName = strtok(dataName, "O");
+      *file << tempName << " GetOutput]\n\t";
       }
     else
       {
       *file << this->GetNthPVInput(0)->GetPVSource()->GetVTKSourceTclName()
-            << " GetOutput]\n";
+            << " GetOutput]\n\t";
       }
     *file << this->ChangeScalarsFilterTclName
-          << " SetInputFieldToPointDataField\n";
+          << " SetInputFieldToPointDataField\n\t";
     *file << this->ChangeScalarsFilterTclName
-          << " SetOutputAttributeDataToPointData\n";
+          << " SetOutputAttributeDataToPointData\n\t";
     if (this->DefaultScalarsName)
       {
       *file << this->ChangeScalarsFilterTclName << " SetScalarComponent 0 "
-            << this->DefaultScalarsName << " 0\n";
+            << this->DefaultScalarsName << " 0\n\t";
       }
     if (this->DefaultVectorsName)
       {
       *file << this->ChangeScalarsFilterTclName << " SetVectorComponent 0 "
-            << this->DefaultVectorsName << " 0\n";
+            << this->DefaultVectorsName << " 0\n\t";
       *file << this->ChangeScalarsFilterTclName << " SetVectorComponent 1 "
-            << this->DefaultVectorsName << " 1\n";
+            << this->DefaultVectorsName << " 1\n\t";
       *file << this->ChangeScalarsFilterTclName << " SetVectorComponent 2 "
-            << this->DefaultVectorsName << " 2\n";
+            << this->DefaultVectorsName << " 2\n\t";
       }
     *file << "\n";
     }
@@ -1493,11 +1492,9 @@ void vtkPVSource::SaveInTclScript(ofstream *file)
       int pos;
       char *dataName = this->GetNthPVInput(0)->GetVTKDataTclName();
       
-      sprintf(sourceTclName, "EnSightReader");
-      tempName = strtok(dataName, "O");
-      strcat(sourceTclName, tempName+7);
-      *file << sourceTclName << " GetOutput ";
       charFound = strrchr(dataName, 't');
+      tempName = strtok(dataName, "O");
+      *file << dataName << " GetOutput ";
       pos = charFound - dataName + 1;
       *file << dataName+pos << "]\n";
       }
@@ -1517,7 +1514,7 @@ void vtkPVSource::SaveInTclScript(ofstream *file)
     }
   else if (this->ChangeScalarsFilterTclName)
     {
-    *file << this->VTKSourceTclName << " SetInput ["
+    *file << "\t" << this->VTKSourceTclName << " SetInput ["
           << this->ChangeScalarsFilterTclName << " GetOutput]\n";
     }
   
