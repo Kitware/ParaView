@@ -35,9 +35,6 @@ protected:
   void SeparateArguments(const char* str, 
                          vtkstd::vector<vtkstd::string>& flags);
   
-  int WaitForAndPrintData(const char* pname, kwsysProcess* process, double timeout,
-                          vtkstd::string* output=0 );
-  void PrintData(const char* pname, const char* data, int length);
   void ReportCommand(const char* const* command, const char* name);
   int ReportStatus(kwsysProcess* process, const char* name);
   int ProcessCommandLine(int argc, char* argv[]);
@@ -49,8 +46,17 @@ protected:
                          int argCount=0,
                          char* argv[]=0);
   
-  int StartServer(kwsysProcess* server, const char* name);
+  int StartServer(kwsysProcess* server, const char* name,
+                  vtkstd::vector<char>& out, vtkstd::vector<char>& err);
   int OutputStringHasError(const char* pname, vtkstd::string& output);
+
+  int WaitForLine(kwsysProcess* process, vtkstd::string& line, double timeout,
+                  vtkstd::vector<char>& out, vtkstd::vector<char>& err);
+  void PrintLine(const char* pname, const char* line);
+  int WaitForAndPrintLine(const char* pname, kwsysProcess* process,
+                          vtkstd::string& line, double timeout,
+                          vtkstd::vector<char>& out, vtkstd::vector<char>& err,
+                          int* foundWaiting);
 private:
   vtkstd::string ParaView;
   vtkstd::string MPIRun;

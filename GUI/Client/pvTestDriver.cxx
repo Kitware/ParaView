@@ -41,43 +41,6 @@ pvTestDriver::pvTestDriver()
 
 // now implement the pvTestDriver class
 
-int pvTestDriver::WaitForAndPrintData(const char* pname, 
-                                      kwsysProcess* process,
-                                      double timeout,
-                                      vtkstd::string* output)
-{
-  if(!process)
-    {
-    return 0;
-    }
-  char* data;
-  int length;
-  // Look for process output.
-  int processPipe = kwsysProcess_WaitForData(process, &data, 
-                                             &length, &timeout);
-  if(processPipe == kwsysProcess_Pipe_STDOUT ||
-     processPipe == kwsysProcess_Pipe_STDERR)
-    {
-    vtkstd::string str(data, data+length);
-    if(output)
-      {
-      *output += str;
-      }
-    this->PrintData(pname, data, length);
-    }
-  return processPipe;
-}
-
-void pvTestDriver::PrintData(const char* pname, const char* data, int length)
-{
-  cerr << "\n-------------- " << pname
-       << " output chunk begin --------------\n";
-  cerr.write(data, length);
-  cerr << "\n-------------- " << pname
-       << " output chunk end   --------------\n\n";
-  cerr.flush();
-}
-
 void pvTestDriver::SeparateArguments(const char* str, 
                                      vtkstd::vector<vtkstd::string>& flags)
 {
@@ -228,7 +191,9 @@ pvTestDriver::CreateCommandLine(kwsys_stl::vector<const char*>& commandLine,
   commandLine.push_back(0);
 }
 
-int pvTestDriver::StartServer(kwsysProcess* server, const char* name)
+int pvTestDriver::StartServer(kwsysProcess* server, const char* name,
+                              vtkstd::vector<char>& out,
+                              vtkstd::vector<char>& err)
 {
   if(!server)
     {
@@ -237,48 +202,29 @@ int pvTestDriver::StartServer(kwsysProcess* server, const char* name)
   cerr << "pvTestDirver: starting process " << name << "\n";
   kwsysProcess_SetTimeout(server, this->TimeOut);
   kwsysProcess_Execute(server);
-  const char* waiting = "Waiting";
-  const char* waiting_cur = waiting;
-  const char* waiting_end = waiting_cur + strlen(waiting);
-  while(waiting_cur != waiting_end)
+  int foundWaiting = 0;
+  vtkstd::string output;
+  while(!foundWaiting)
     {
-    // Search for the "Waiting" string in the server output.
-    double timeout = 30.0;
-    char* data;
-    int length;
-    int pipe = kwsysProcess_WaitForData(server, &data, &length, &timeout);
-    if(pipe == kwsysProcess_Pipe_STDOUT)
+    int pipe = this->WaitForAndPrintLine(name, server, output, 30.0, out, err,
+                                         &foundWaiting);
+    if(pipe == kwsysProcess_Pipe_None ||
+       pipe == kwsysProcess_Pipe_Timeout)
       {
-      // Search for the "Waiting" string starting from where the
-      // previous search left off.  It is possible that the string
-      // will be received in pieces.
-      const char* data_end = data+length;
-      for(const char* data_cur = data;
-          data_cur != data_end && waiting_cur != waiting_end; ++data_cur)
-        {
-        if(*waiting_cur != *data_cur)
-          {
-          waiting_cur = waiting;
-          }
-        if(*waiting_cur == *data_cur)
-          {
-          ++waiting_cur;
-          }
-        }
-      }
-    if(pipe == kwsysProcess_Pipe_STDOUT || pipe == kwsysProcess_Pipe_STDERR)
-      {
-      this->PrintData(name, data, length);
-      }
-    else
-      {
-      cerr << "pvTestDirver: " << name << " never started.\n";
-      kwsysProcess_Kill(server);
-      return 0;
+      break;
       }
     }
-  cerr << "pvTestDirver: " << name << " sucessfully started.\n";
-  return 1;
+  if(foundWaiting)
+    {
+    cerr << "pvTestDirver: " << name << " sucessfully started.\n";
+    return 1;
+    }
+  else
+    {
+    cerr << "pvTestDirver: " << name << " never started.\n";
+    kwsysProcess_Kill(server);
+    return 0;
+    }
 }
 
 int pvTestDriver::OutputStringHasError(const char* pname, vtkstd::string& output)
@@ -360,6 +306,13 @@ int pvTestDriver::Main(int argc, char* argv[])
     return 1;
     }
 
+  vtkstd::vector<char> ClientStdOut;
+  vtkstd::vector<char> ClientStdErr;
+  vtkstd::vector<char> ServerStdOut;
+  vtkstd::vector<char> ServerStdErr;
+  vtkstd::vector<char> RenderServerStdOut;
+  vtkstd::vector<char> RenderServerStdErr;
+
   // Construct the render server process command line
   kwsys_stl::vector<const char*> renderServerCommand;
   if(renderServer)
@@ -414,13 +367,15 @@ int pvTestDriver::Main(int argc, char* argv[])
     kwsysProcess_SetTimeout(server, this->TimeOut);
     }
   // Start the render server if there is one
-  if(!this->StartServer(renderServer, "Render Server"))
+  if(!this->StartServer(renderServer, "Render Server",
+                        RenderServerStdOut, RenderServerStdErr))
     {
     cerr << "pvTestDriver: Render server never started.\n";
     return -1;
     }
   // Start the data server if there is one
-  if(!this->StartServer(server, "Server"))
+  if(!this->StartServer(server, "Server",
+                        ServerStdOut, ServerStdErr))
     {
     cerr << "pvTestDriver: Server never started.\n";
     return -1;
@@ -436,19 +391,23 @@ int pvTestDriver::Main(int argc, char* argv[])
   int mpiError = 0;
   while(clientPipe || serverPipe || renderServerPipe)
     {
-    clientPipe = WaitForAndPrintData("client", client, 0.1, &output);
+    clientPipe = this->WaitForAndPrintLine("client", client, output, 0.1,
+                                           ClientStdOut, ClientStdErr, 0);
     if(!mpiError && this->OutputStringHasError("client", output))
       {
       mpiError = 1;
       }
     output = "";
-    serverPipe = WaitForAndPrintData("server", server, 0.1, &output);
+    serverPipe = this->WaitForAndPrintLine("server", server, output, 0.1,
+                                           ServerStdOut, ServerStdErr, 0);
     if(!mpiError && this->OutputStringHasError("server", output))
       {
       mpiError = 1;
       }
     output = "";
-    renderServerPipe = WaitForAndPrintData("renderServer", renderServer, 0.1, &output);
+    renderServerPipe =
+      this->WaitForAndPrintLine("renderServer", renderServer, output, 0.1,
+                                RenderServerStdOut, RenderServerStdErr, 0);
     if(!mpiError && this->OutputStringHasError("renderServer", output))
       {
       mpiError = 1;
@@ -592,4 +551,137 @@ int pvTestDriver::ReportStatus(kwsysProcess* process, const char* name)
       } break;
     }
   return result;
+}
+
+//----------------------------------------------------------------------------
+int pvTestDriver::WaitForLine(kwsysProcess* process, vtkstd::string& line,
+                              double timeout,
+                              vtkstd::vector<char>& out,
+                              vtkstd::vector<char>& err)
+{
+  line = "";
+  vtkstd::vector<char>::iterator outiter = out.begin();
+  vtkstd::vector<char>::iterator erriter = err.begin();
+  while(1)
+    {
+    // Check for a newline in stdout.
+    for(;outiter != out.end(); ++outiter)
+      {
+      if((*outiter == '\r') && ((outiter+1) == out.end()))
+        {
+        break;
+        }
+      else if(*outiter == '\n' || *outiter == '\0')
+        {
+        int length = outiter-out.begin();
+        if(length > 1 && *(outiter-1) == '\r')
+          {
+          --length;
+          }
+        if(length > 0)
+          {
+          line.append(&out[0], length);
+          }
+        out.erase(out.begin(), outiter+1);
+        return kwsysProcess_Pipe_STDOUT;
+        }
+      }
+
+    // Check for a newline in stderr.
+    for(;erriter != err.end(); ++erriter)
+      {
+      if((*erriter == '\r') && ((erriter+1) == err.end()))
+        {
+        break;
+        }
+      else if(*erriter == '\n' || *erriter == '\0')
+        {
+        int length = erriter-err.begin();
+        if(length > 1 && *(erriter-1) == '\r')
+          {
+          --length;
+          }
+        if(length > 0)
+          {
+          line.append(&err[0], length);
+          }
+        err.erase(err.begin(), erriter+1);
+        return kwsysProcess_Pipe_STDERR;
+        }
+      }
+
+    // No newlines found.  Wait for more data from the process.
+    int length;
+    char* data;
+    int pipe = kwsysProcess_WaitForData(process, &data, &length, &timeout);
+    if(pipe == kwsysProcess_Pipe_Timeout)
+      {
+      // Timeout has been exceeded.
+      return pipe;
+      }
+    else if(pipe == kwsysProcess_Pipe_STDOUT)
+      {
+      // Append to the stdout buffer.
+      vtkstd::vector<char>::size_type size = out.size();
+      out.insert(out.end(), data, data+length);
+      outiter = out.begin()+size;
+      }
+    else if(pipe == kwsysProcess_Pipe_STDERR)
+      {
+      // Append to the stderr buffer.
+      vtkstd::vector<char>::size_type size = err.size();
+      err.insert(err.end(), data, data+length);
+      erriter = err.begin()+size;
+      }
+    else if(pipe == kwsysProcess_Pipe_None)
+      {
+      // Both stdout and stderr pipes have broken.  Return leftover data.
+      if(!out.empty())
+        {
+        line.append(&out[0], outiter-out.begin());
+        out.erase(out.begin(), out.end());
+        return kwsysProcess_Pipe_STDOUT;
+        }
+      else if(!err.empty())
+        {
+        line.append(&err[0], erriter-err.begin());
+        err.erase(err.begin(), err.end());
+        return kwsysProcess_Pipe_STDERR;
+        }
+      else
+        {
+        return kwsysProcess_Pipe_None;
+        }
+      }
+    }
+}
+
+//----------------------------------------------------------------------------
+void pvTestDriver::PrintLine(const char* pname, const char* line)
+{
+  cerr << "\n-------------- " << pname
+       << " output line begin --------------\n";
+  cerr << line;
+  cerr << "\n-------------- " << pname
+       << " output line end   --------------\n";
+  cerr.flush();
+}
+
+//----------------------------------------------------------------------------
+int pvTestDriver::WaitForAndPrintLine(const char* pname, kwsysProcess* process,
+                                      vtkstd::string& line, double timeout,
+                                      vtkstd::vector<char>& out,
+                                      vtkstd::vector<char>& err,
+                                      int* foundWaiting)
+{
+  int pipe = this->WaitForLine(process, line, timeout, out, err);
+  if(pipe == kwsysProcess_Pipe_STDOUT || pipe == kwsysProcess_Pipe_STDERR)
+    {
+    this->PrintLine(pname, line.c_str());
+    if(foundWaiting && (line.find("Waiting") != line.npos))
+      {
+      *foundWaiting = 1;
+      }
+    }
+  return pipe;
 }
