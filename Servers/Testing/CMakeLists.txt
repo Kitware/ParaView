@@ -4,6 +4,7 @@ IF(PYTHON_EXECUTABLE AND VTK_HEADER_TESTING_PY)
       ${VTK_HEADER_TESTING_PY}
       "${PVServer_SOURCE_DIR}/${part}"
       vtkSMProxyInternals.h
+      vtkSMProxyManagerInternals.h      
       )
   ENDFOREACH(part)
 ENDIF(PYTHON_EXECUTABLE AND VTK_HEADER_TESTING_PY)
