@@ -240,7 +240,9 @@ public:
 
   // Description:
   // Callback for color map menu.
-  void ChangeColorMap();
+  void ChangeColorMapToRedBlue();
+  void ChangeColorMapToBlueRed();
+  void ChangeColorMapToGrayscale();
 
 protected:
 
@@ -249,6 +251,11 @@ protected:
   vtkPVActorComposite(const vtkPVActorComposite&) {};
   void operator=(const vtkPVActorComposite&) {};
   
+  // Internal versions that do not add to the trace.
+  void ColorByPropertyInternal();
+  void ColorByPointFieldComponentInternal(const char *name, int comp);
+  void ColorByCellFieldComponentInternal(const char *name, int comp);
+
   // Problems with vtkLODActor led me to use these.
   vtkProperty *Property;
   vtkProp *Prop;

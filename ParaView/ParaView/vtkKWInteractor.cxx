@@ -133,3 +133,30 @@ void vtkKWInteractor::Deselect()
     }
   this->SelectedState = 0;
 }
+
+//----------------------------------------------------------------------------
+void vtkKWInteractor::SetCameraState(float p0, float p1, float p2,
+                                     float fp0, float fp1, float fp2,
+                                     float up0, float up1, float up2)
+{
+  vtkCamera *cam;
+
+  if (this->RenderView == NULL)
+    {
+    return;
+    }
+
+  // This is to trace effects of loaded scripts.
+  this->AddTraceEntry("$kw(%s) SetCameraState %.3f %.3f %.3f  %.3f %.3f %.3f  %.3f %.3f %.3f",
+                      this->GetTclName(), p0, p1, p2, fp0, fp1, fp2, up0, up1, up2);
+
+  cam = this->RenderView->GetRenderer()->GetActiveCamera();
+  cam->SetPosition(p0, p1, p2);
+  cam->SetFocalPoint(fp0, fp1, fp2);
+  cam->SetViewUp(up0, up1, up2);
+
+  this->RenderView->EventuallyRender();
+}
+
+
+

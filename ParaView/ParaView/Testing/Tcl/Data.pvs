@@ -1,0 +1,89 @@
+if {[info exists argc]} { 
+    set argcm1 [expr $argc - 1]
+    for {set i 0} {$i < $argcm1} {incr i} {
+        if {[lindex $argv $i] == "-D" && $i < $argcm1} {
+		set DataDir [lindex $argv [expr $i + 1]]
+        }
+    }
+} 
+
+set kw(vtkTemp1) [Application GetMainWindow]
+set kw(vtkTemp44) [$kw(vtkTemp1) GetMainView]
+set kw(vtkTemp92) [$kw(vtkTemp1) GetGlyphSource Arrow]
+set kw(vtkTemp96) [$kw(vtkTemp1) GetGlyphSource Cone]
+set kw(vtkTemp100) [$kw(vtkTemp1) GetGlyphSource Sphere]
+set kw(vtkTemp101) [$kw(vtkTemp1) CreatePVSource vtkSphereSource]
+$kw(vtkTemp1) ShowCurrentSourceProperties
+set kw(vtkTemp111) [$kw(vtkTemp101) GetPVWidget {Center}]
+$kw(vtkTemp111) SetValue 0 0 2
+$kw(vtkTemp101) AcceptCallback
+set kw(vtkTemp137) [$kw(vtkTemp101) GetPVOutput]
+$kw(vtkTemp137) SetLineWidth 1
+$kw(vtkTemp137) SetPointSize 1
+$kw(vtkTemp137) ChangeActorColor 0.501961 1.000000 0.000000
+$kw(vtkTemp1) ShowCurrentSourceProperties
+set kw(vtkTemp171) [$kw(vtkTemp1) Open "$DataDir/Data/vox8_bin.vtk"]
+$kw(vtkTemp1) ResetCameraCallback
+set kw(vtkTemp186) [$kw(vtkTemp1) ContourCallback]
+$kw(vtkTemp1) ShowCurrentSourceProperties
+set kw(vtkTemp193) [$kw(vtkTemp186) GetPVWidget {Scalars}]
+$kw(vtkTemp193) SetValue scalars
+set kw(vtkTemp196) [$kw(vtkTemp186) GetPVWidget {Contour Values}]
+$kw(vtkTemp196) RemoveAllValues
+$kw(vtkTemp196) AddValue 0.100000
+$kw(vtkTemp196) AddValue 0.300000
+$kw(vtkTemp196) AddValue 0.500000
+$kw(vtkTemp196) AddValue 0.700000
+$kw(vtkTemp196) AddValue 0.900000
+set kw(vtkTemp202) [$kw(vtkTemp186) GetPVWidget {Compute Normals}]
+$kw(vtkTemp202) SetState 0
+$kw(vtkTemp186) AcceptCallback
+set kw(vtkTemp214) [$kw(vtkTemp186) GetPVOutput]
+$kw(vtkTemp214) SetLineWidth 1
+$kw(vtkTemp214) SetPointSize 1
+$kw(vtkTemp214) ColorByCellFieldComponent scalars 0
+$kw(vtkTemp214) ColorByCellFieldComponent ramp1 0
+set kw(vtkTemp220) [$kw(vtkTemp1) CreatePVSource vtkCubeSource]
+$kw(vtkTemp1) ShowCurrentSourceProperties
+set kw(vtkTemp239) [$kw(vtkTemp220) GetPVWidget {Center}]
+$kw(vtkTemp239) SetValue 0 2 2
+$kw(vtkTemp220) AcceptCallback
+set kw(vtkTemp245) [$kw(vtkTemp220) GetPVOutput]
+$kw(vtkTemp245) SetLineWidth 1
+$kw(vtkTemp245) SetPointSize 1
+$kw(vtkTemp245) DrawWireframe
+$kw(vtkTemp245) SetLineWidth 2
+$kw(vtkTemp245) SetLineWidth 3
+$kw(vtkTemp245) SetLineWidth 4
+set kw(vtkTemp251) [$kw(vtkTemp1) CreatePVSource vtkSphereSource]
+$kw(vtkTemp1) ShowCurrentSourceProperties
+set kw(vtkTemp261) [$kw(vtkTemp251) GetPVWidget {Center}]
+$kw(vtkTemp261) SetValue 2 0 2
+$kw(vtkTemp251) AcceptCallback
+set kw(vtkTemp287) [$kw(vtkTemp251) GetPVOutput]
+$kw(vtkTemp287) SetLineWidth 1
+$kw(vtkTemp287) SetPointSize 1
+$kw(vtkTemp287) SetInterpolationToFlat
+
+
+set kw(vtkTemp80) [$kw(vtkTemp1) GetRotateCameraInteractor]
+$kw(vtkTemp80) SetCameraState 4.145 5.676 5.818  0.124 -0.063 0.701  -0.232 0.733 -0.640
+
+
+# Fix the size of the image.
+RenWin1 SetSize 300 300
+RenWin1 Render
+update
+
+for {set i  1} {$i < [expr $argc - 1]} {incr i} {
+    if {[lindex $argv $i] == "-C"} {
+	source [lindex $argv [expr $i + 1]]
+	$Application SetExitStatus [CompareImage [[Application GetMainWindow] GetMainView]]
+    }
+}
+   
+Application Exit
+
+
+
+

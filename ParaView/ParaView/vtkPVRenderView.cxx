@@ -651,6 +651,7 @@ void vtkPVRenderView::ComputeVisiblePropBounds(float bounds[6])
     }
 }
 
+
 //----------------------------------------------------------------------------
 void vtkPVRenderView::ResetCamera()
 {

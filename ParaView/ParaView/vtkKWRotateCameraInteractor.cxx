@@ -254,17 +254,30 @@ void vtkKWRotateCameraInteractor::AButtonPress(int num, int x, int y)
 //----------------------------------------------------------------------------
 void vtkKWRotateCameraInteractor::AButtonRelease(int num, int x, int y)
 {
-  if (this->Tracing)
-    {
-    this->AddTraceEntry("$kw(%s) AButtonRelease %d %d %d",
-                         this->GetTclName(), num, x, y);
-    }
-
   if (num == 2)
     {
     return;
     }
   this->RenderView->EventuallyRender(); 
+
+  if (this->Tracing)
+    {
+    this->AddTraceEntry("$kw(%s) AButtonRelease %d %d %d",
+                         this->GetTclName(), num, x, y);
+    }
+  else
+    {
+    vtkCamera *cam;
+    double *pos, *fp, *up;
+    // Lets always save the camera in the state on still render.
+    cam = this->RenderView->GetRenderer()->GetActiveCamera();
+    pos = cam->GetPosition();
+    fp = cam->GetFocalPoint();
+    up = cam->GetViewUp();
+    this->AddTraceEntry("$kw(%s) SetCameraState %.3f %.3f %.3f  %.3f %.3f %.3f  %.3f %.3f %.3f",
+                        this->GetTclName(), pos[0],pos[1],pos[2], 
+                        fp[0],fp[1],fp[2], up[0],up[1],up[2]);
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -451,22 +464,3 @@ void vtkKWRotateCameraInteractor::UpdateRollCursor(double px, double py)
 #endif
 }
 
-int vtkKWRotateCameraInteractor::InitializeTrace()
-{
-  vtkKWWindow *kwWin = this->GetWindow();
-  
-  if (this->TraceInitialized)
-    {
-    return 1;
-    }
-
-  if (kwWin && this->Application)
-    {
-    // Set the variable becasue AddTraceEntry also calls InitializeTrace.
-    this->TraceInitialized = 1;
-    this->AddTraceEntry("set kw(%s) [$kw(%s) GetRotateCameraInteractor]",
-                         this->GetTclName(), kwWin->GetTclName());
-    return 1;
-    }
-  return 0;
-}

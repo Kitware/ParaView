@@ -570,11 +570,11 @@ void vtkPVSource::PreAcceptCallback()
 void vtkPVSource::AcceptCallback()
 {
   this->Accept();
-
   this->GetPVApplication()->AddTraceEntry("$kw(%s) AcceptCallback",
                                           this->GetTclName());
 }
 
+//----------------------------------------------------------------------------
 void vtkPVSource::Accept()
 {
   vtkPVWindow *window;

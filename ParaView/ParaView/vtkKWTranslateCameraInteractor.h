@@ -95,8 +95,6 @@ protected:
   vtkSetStringMacro(PanCursorName);
   vtkSetStringMacro(ZoomCursorName);
   int CursorState;
-  
-  virtual int InitializeTrace();
 };
 
 

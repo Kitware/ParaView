@@ -212,6 +212,19 @@ void vtkKWTranslateCameraInteractor::AButtonRelease(int num, int x, int y)
     this->AddTraceEntry("$kw(%s) AButtonRelease %d %d %d",
                          this->GetTclName(), num, x, y);
     }
+  else
+    {
+    vtkCamera *cam;
+    double *pos, *fp, *up;
+    // Lets always save the camera in the state on still render.
+    cam = this->RenderView->GetRenderer()->GetActiveCamera();
+    pos = cam->GetPosition();
+    fp = cam->GetFocalPoint();
+    up = cam->GetViewUp();
+    this->AddTraceEntry("$kw(%s) SetCameraState %.3f %.3f %.3f  %.3f %.3f %.3f  %.3f %.3f %.3f",
+                        this->GetTclName(), pos[0],pos[1],pos[2], 
+                        fp[0],fp[1],fp[2], up[0],up[1],up[2]);
+    }
 
   if (this->RenderView == NULL)
     {
@@ -278,21 +291,3 @@ void vtkKWTranslateCameraInteractor::InitializeCursors()
   this->SetPanCursorName("fleur");
 }
 
-int vtkKWTranslateCameraInteractor::InitializeTrace()
-{
-  vtkKWWindow *pvWindow = this->GetWindow();
-  
-  if (this->TraceInitialized)
-    {
-    return 1;
-    }
-
-  if (this->Application && pvWindow)
-    {
-    this->TraceInitialized = 1;
-    this->AddTraceEntry("set kw(%s) [$kw(%s) GetTranslateCameraInteractor]",
-                         this->GetTclName(), pvWindow->GetTclName());
-    return 1;
-    }
-  return 0;
-}

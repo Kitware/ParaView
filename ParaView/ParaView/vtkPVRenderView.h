@@ -91,6 +91,7 @@ public:
   // visible actors. This ensures that no props are cut off
   void ResetCameraClippingRange();
 
+
   // Description:
   // This method is executed in all processes.
   void AddComposite(vtkKWComposite *c);

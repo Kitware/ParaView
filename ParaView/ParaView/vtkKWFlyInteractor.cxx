@@ -225,7 +225,18 @@ void vtkKWFlyInteractor::AButtonRelease(int num, int x, int y)
     }
 
   this->FlyFlag = 0;
-  this->RenderView->EventuallyRender(); 
+  this->RenderView->EventuallyRender();
+  
+  vtkCamera *cam;
+  double *pos, *fp, *up;
+  // Lets always save the camera in the state on still render.
+  cam = this->RenderView->GetRenderer()->GetActiveCamera();
+  pos = cam->GetPosition();
+  fp = cam->GetFocalPoint();
+  up = cam->GetViewUp();
+  this->AddTraceEntry("$kw(%s) SetCameraState %.3f %.3f %.3f  %.3f %.3f %.3f  %.3f %.3f %.3f",
+                      this->GetTclName(), pos[0],pos[1],pos[2], 
+                      fp[0],fp[1],fp[2], up[0],up[1],up[2]);
 }
 
 
@@ -276,7 +287,4 @@ void vtkKWFlyInteractor::CreateCursor()
     vtkWarningMacro("Could not define cursor.");
     }
 }
-
-
-
 

@@ -104,6 +104,12 @@ public:
   vtkSetClampMacro(Tracing, int, 0, 1);
   vtkGetMacro(Tracing, int);
   vtkBooleanMacro(Tracing, int);
+
+  // Description:
+  // This method is for tracing the camera movements.
+  void SetCameraState(float p0, float p1, float p2,
+                      float fp0, float fp1, float fp2,
+                      float up0, float up1, float up2);
   
 protected:
   vtkKWInteractor();

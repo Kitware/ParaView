@@ -128,8 +128,14 @@ vtkPVWindow::vtkPVWindow()
   this->InteractorToolbar = vtkKWToolbar::New();
 
   this->FlyInteractor = vtkKWFlyInteractor::New();
+  this->FlyInteractor->SetTraceReferenceObject(this);
+  this->FlyInteractor->SetTraceReferenceCommand("GetFlyInteractor");
   this->RotateCameraInteractor = vtkKWRotateCameraInteractor::New();
+  this->RotateCameraInteractor->SetTraceReferenceObject(this);
+  this->RotateCameraInteractor->SetTraceReferenceCommand("GetRotateCameraInteractor");
   this->TranslateCameraInteractor = vtkKWTranslateCameraInteractor::New();
+  this->TranslateCameraInteractor->SetTraceReferenceObject(this);
+  this->TranslateCameraInteractor->SetTraceReferenceCommand("GetTranslateCameraInteractor");
   this->SelectPointInteractor = vtkKWSelectPointInteractor::New();
   
   this->Toolbar = vtkKWToolbar::New();
@@ -606,6 +612,7 @@ void vtkPVWindow::Create(vtkKWApplication *app, char *args)
   // Initialize a couple of variables in the trace file.
   pvApp->AddTraceEntry("set kw(%s) [Application GetMainWindow]",
                        this->GetTclName());
+  this->SetTraceInitialized(1);
   // We have to set this variable after the window variable is set,
   // so it has to be done here.
   pvApp->AddTraceEntry("set kw(%s) [$kw(%s) GetMainView]",

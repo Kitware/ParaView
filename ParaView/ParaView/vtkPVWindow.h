@@ -233,13 +233,13 @@ public:
   vtkPVSource *CreatePVSource(const char *className);
   
   // Description:
-  // Access to the RotateCamera interactor for things like setting its center of roation.
+  // Access to the interactors from tcl.
+  // This is required for things like setting its center of rotation,
+  // and tracing.
   vtkKWRotateCameraInteractor *GetRotateCameraInteractor()
     {return this->RotateCameraInteractor;}
-
-  // Description:
-  // Access to the TranslateCameraInteractor from Tcl
   vtkGetObjectMacro(TranslateCameraInteractor, vtkKWInteractor);
+  vtkGetObjectMacro(FlyInteractor, vtkKWInteractor);
   
   // Description:
   // This list contains all the sources created by the user.

@@ -508,11 +508,11 @@ void vtkPVActorComposite::CreateProperties()
   this->ColorMapMenu->SetParent(this->ScalarBarCheckFrame);
   this->ColorMapMenu->Create(this->Application, "");
   this->ColorMapMenu->AddEntryWithCommand("Red to Blue", this,
-                                          "ChangeColorMap");
+                                          "ChangeColorMapToRedBlue");
   this->ColorMapMenu->AddEntryWithCommand("Blue to Red", this,
-                                          "ChangeColorMap");
+                                          "ChangeColorMapToBlueRed");
   this->ColorMapMenu->AddEntryWithCommand("Grayscale", this,
-                                          "ChangeColorMap");
+                                          "ChangeColorMapToGrayscale");
   this->ColorMapMenu->SetValue("Red to Blue");
   
   this->ColorRangeFrame->SetParent(this->ScalarBarFrame->GetFrame());
@@ -825,7 +825,7 @@ void vtkPVActorComposite::UpdateProperties()
   if ( ! currentColorByFound)
     {
     this->ColorMenu->SetValue("Property");
-    this->ColorByProperty();
+    this->ColorByPropertyInternal();
     }
 }
 
@@ -838,48 +838,65 @@ void vtkPVActorComposite::ChangeActorColor(float r, float g, float b)
     {
     return;
     }
-  
+
+  this->AddTraceEntry("$kw(%s) ChangeActorColor %f %f %f",
+                      this->GetTclName(), r, g, b);
+
   pvApp->BroadcastScript("%s SetColor %f %f %f",
                          this->PropertyTclName, r, g, b);
   this->GetPVRenderView()->EventuallyRender();
 }
 
 //----------------------------------------------------------------------------
-void vtkPVActorComposite::ChangeColorMap()
+void vtkPVActorComposite::ChangeColorMapToRedBlue()
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
+
+  this->AddTraceEntry("$kw(%s) ChanceColorMapToRedBlue",
+                      this->GetTclName());
   
-  // LODMapper shares a lookup table with Mapper.
-  if (strcmp(this->ColorMapMenu->GetValue(), "Red to Blue") == 0)
-    {
-    pvApp->BroadcastScript("[%s GetLookupTable] SetHueRange 0 0.666667",
-                           this->MapperTclName);
-    pvApp->BroadcastScript("[%s GetLookupTable] SetSaturationRange 1 1",
-                           this->MapperTclName);
-    pvApp->BroadcastScript("[%s GetLookupTable] SetValueRange 1 1",
-                           this->MapperTclName);
-    }
-  else if (strcmp(this->ColorMapMenu->GetValue(), "Blue to Red") == 0)
-    {
-    pvApp->BroadcastScript("[%s GetLookupTable] SetHueRange 0.666667 0",
-                           this->MapperTclName);
-    pvApp->BroadcastScript("[%s GetLookupTable] SetSaturationRange 1 1",
-                           this->MapperTclName);
-    pvApp->BroadcastScript("[%s GetLookupTable] SetValueRange 1 1",
-                           this->MapperTclName);
-    }
-  else
-    {
-    pvApp->BroadcastScript("[%s GetLookupTable] SetHueRange 0 0",
-                           this->MapperTclName);
-    pvApp->BroadcastScript("[%s GetLookupTable] SetSaturationRange 0 0",
-                           this->MapperTclName);
-    pvApp->BroadcastScript("[%s GetLookupTable] SetValueRange 0 1",
-                           this->MapperTclName);
-    }
-  
-  this->GetPVRenderView()->EventuallyRender();
+  pvApp->BroadcastScript("[%s GetLookupTable] SetHueRange 0 0.666667",
+                         this->MapperTclName);
+  pvApp->BroadcastScript("[%s GetLookupTable] SetSaturationRange 1 1",
+                         this->MapperTclName);
+  pvApp->BroadcastScript("[%s GetLookupTable] SetValueRange 1 1",
+                         this->MapperTclName);
 }
+
+
+//----------------------------------------------------------------------------
+void vtkPVActorComposite::ChangeColorMapToBlueRed()
+{
+  vtkPVApplication *pvApp = this->GetPVApplication();
+
+  this->AddTraceEntry("$kw(%s) ChanceColorMapToBlueRed",
+                      this->GetTclName());
+
+  pvApp->BroadcastScript("[%s GetLookupTable] SetHueRange 0.666667 0",
+                         this->MapperTclName);
+  pvApp->BroadcastScript("[%s GetLookupTable] SetSaturationRange 1 1",
+                         this->MapperTclName);
+  pvApp->BroadcastScript("[%s GetLookupTable] SetValueRange 1 1",
+                         this->MapperTclName);
+}
+
+
+//----------------------------------------------------------------------------
+void vtkPVActorComposite::ChangeColorMapToGrayscale()
+{
+  vtkPVApplication *pvApp = this->GetPVApplication();
+
+  this->AddTraceEntry("$kw(%s) ChanceColorMapToGrayscale",
+                      this->GetTclName());
+
+  pvApp->BroadcastScript("[%s GetLookupTable] SetHueRange 0 0",
+                         this->MapperTclName);
+  pvApp->BroadcastScript("[%s GetLookupTable] SetSaturationRange 0 0",
+                         this->MapperTclName);
+  pvApp->BroadcastScript("[%s GetLookupTable] SetValueRange 0 1",
+                         this->MapperTclName);
+}
+
 
 //----------------------------------------------------------------------------
 void vtkPVActorComposite::SetColorRange(float min, float max)
@@ -965,6 +982,13 @@ void vtkPVActorComposite::GetColorRange(float range[2])
 //----------------------------------------------------------------------------
 void vtkPVActorComposite::ColorByProperty()
 {
+  this->AddTraceEntry("$kw(%s) ColorByProperty", this->GetTclName());
+  this->ColorByPropertyInternal();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVActorComposite::ColorByPropertyInternal()
+{
   vtkPVApplication *pvApp = this->GetPVApplication();
   pvApp->BroadcastScript("%s ScalarVisibilityOff", this->MapperTclName);
   pvApp->BroadcastScript("%s ScalarVisibilityOff", this->LODMapperTclName);
@@ -987,6 +1011,15 @@ void vtkPVActorComposite::ColorByProperty()
 
 //----------------------------------------------------------------------------
 void vtkPVActorComposite::ColorByPointFieldComponent(const char *name, int comp)
+{
+  this->AddTraceEntry("$kw(%s) ColorByPointFieldComponent %s %d", 
+                      this->GetTclName(), name, comp);
+  this->ColorByPointFieldComponentInternal(name, comp);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVActorComposite::ColorByPointFieldComponentInternal(const char *name, 
+                                                             int comp)
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
 
@@ -1016,6 +1049,15 @@ void vtkPVActorComposite::ColorByPointFieldComponent(const char *name, int comp)
 
 //----------------------------------------------------------------------------
 void vtkPVActorComposite::ColorByCellFieldComponent(const char *name, int comp)
+{
+  this->AddTraceEntry("$kw(%s) ColorByCellFieldComponent %s %d", 
+                      this->GetTclName(), name, comp);
+  this->ColorByCellFieldComponentInternal(name, comp);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVActorComposite::ColorByCellFieldComponentInternal(const char *name, 
+                                                            int comp)
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
 
@@ -1048,6 +1090,8 @@ void vtkPVActorComposite::DrawWireframe()
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
   
+  this->AddTraceEntry("$kw(%s) DrawWireframe", this->GetTclName());
+
   if (this->PropertyTclName)
     {
     if (this->PreviousWasSolid)
@@ -1072,6 +1116,8 @@ void vtkPVActorComposite::DrawPoints()
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
   
+  this->AddTraceEntry("$kw(%s) DrawPoints", this->GetTclName());
+
   if (this->PropertyTclName)
     {
     if (this->PreviousWasSolid)
@@ -1096,6 +1142,8 @@ void vtkPVActorComposite::DrawSurface()
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
   
+  this->AddTraceEntry("$kw(%s) DrawSurface", this->GetTclName());
+
   if (this->PropertyTclName)
     {
     if (!this->PreviousWasSolid)
@@ -1122,6 +1170,8 @@ void vtkPVActorComposite::SetInterpolationToFlat()
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
   
+  this->AddTraceEntry("$kw(%s) SetInterpolationToFlat", this->GetTclName());
+
   if (this->PropertyTclName)
     {
     pvApp->BroadcastScript("%s SetInterpolationToFlat",
@@ -1137,6 +1187,8 @@ void vtkPVActorComposite::SetInterpolationToGouraud()
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
   
+  this->AddTraceEntry("$kw(%s) SetInterpolationToGouraud", this->GetTclName());
+
   if (this->PropertyTclName)
     {
     pvApp->BroadcastScript("%s SetInterpolationToGouraud",
@@ -1278,7 +1330,7 @@ void vtkPVActorComposite::Initialize()
     char *arrayName = (char*)array->GetName();
     char tmp[350];
     sprintf(tmp, "Point %s", arrayName);
-    this->ColorByPointFieldComponent(arrayName, 0);
+    this->ColorByPointFieldComponentInternal(arrayName, 0);
     this->ColorMenu->SetValue(tmp);
     }
   else if ((array =
@@ -1288,12 +1340,12 @@ void vtkPVActorComposite::Initialize()
     char *arrayName = (char*)array->GetName();
     char tmp[350];
     sprintf(tmp, "Cell %s", arrayName);
-    this->ColorByCellFieldComponent(arrayName, 0);
+    this->ColorByCellFieldComponentInternal(arrayName, 0);
     this->ColorMenu->SetValue(tmp);
     }
   else
     {
-    this->ColorByProperty();
+    this->ColorByPropertyInternal();
     this->ColorMenu->SetValue("Property");
     }
 }
@@ -1402,6 +1454,8 @@ void vtkPVActorComposite::CenterCamera()
 //----------------------------------------------------------------------------
 void vtkPVActorComposite::VisibilityCheckCallback()
 {
+  this->AddTraceEntry("$kw(%s) SetVisibility %d", this->GetTclName(), 
+                      this->VisibilityCheck->GetState());
   this->SetVisibility(this->VisibilityCheck->GetState());
   this->GetPVRenderView()->EventuallyRender();
 }
@@ -1423,6 +1477,8 @@ void vtkPVActorComposite::SetVisibility(int v)
   if (this->VisibilityCheck->GetState() != v)
     {
     this->VisibilityCheck->SetState(v);
+    // Here incase this is called from a script.
+    this->AddTraceEntry("$kw(%s) SetVisibility %d", this->GetTclName(), v);
     }
 
 }
@@ -1523,6 +1579,8 @@ void vtkPVActorComposite::SetScalarBarVisibility(int val)
   if (this->ScalarBarCheck->GetState() != val)
     {
     this->ScalarBarCheck->SetState(val);
+    // Here incase this is called from a script.
+    this->AddTraceEntry("$kw(%s) SetScalarBarVisibility %d", this->GetTclName(), val);
     }
 
   // I am going to add and remove it from the renderer instead of using visibility.
@@ -1541,6 +1599,7 @@ void vtkPVActorComposite::SetScalarBarVisibility(int val)
     }
 }
 
+//----------------------------------------------------------------------------
 void vtkPVActorComposite::SetCubeAxesVisibility(int val)
 {
   vtkRenderer *ren;
@@ -1561,7 +1620,8 @@ void vtkPVActorComposite::SetCubeAxesVisibility(int val)
   
   if (this->CubeAxesCheck->GetState() != val)
     {
-    this->CubeAxesCheck->SetState(0);
+    this->AddTraceEntry("$kw(%s) SetCubeAxesVisibility %d", this->GetTclName(), val);
+    this->CubeAxesCheck->SetState(val);
     }
 
   // I am going to add and remove it from the renderer instead of using visibility.
@@ -1583,16 +1643,22 @@ void vtkPVActorComposite::SetCubeAxesVisibility(int val)
 //----------------------------------------------------------------------------
 void vtkPVActorComposite::ScalarBarCheckCallback()
 {
+  this->AddTraceEntry("$kw(%s) SetScalarBarVisibility %d", this->GetTclName(),
+                      this->ScalarBarCheck->GetState());
   this->SetScalarBarVisibility(this->ScalarBarCheck->GetState());
   this->GetPVRenderView()->EventuallyRender();  
 }
 
+//----------------------------------------------------------------------------
 void vtkPVActorComposite::CubeAxesCheckCallback()
 {
+  this->AddTraceEntry("$kw(%s) SetCubeAxesVisibility %d", this->GetTclName(),
+                      this->CubeAxesCheck->GetState());
   this->SetCubeAxesVisibility(this->CubeAxesCheck->GetState());
   this->GetPVRenderView()->EventuallyRender();  
 }
 
+//----------------------------------------------------------------------------
 void vtkPVActorComposite::ScalarBarOrientationCallback()
 {
   int state = this->ScalarBarOrientationCheck->GetState();
@@ -1604,6 +1670,7 @@ void vtkPVActorComposite::ScalarBarOrientationCallback()
     this->Script("%s SetOrientationToVertical", this->GetScalarBarTclName());
     this->Script("%s SetHeight 0.5", this->GetScalarBarTclName());
     this->Script("%s SetWidth 0.13", this->GetScalarBarTclName());
+    this->AddTraceEntry("$kw(%s) SetScalarBarOrientationToVertical", this->GetTclName());
     }
   else
     {
@@ -1612,34 +1679,40 @@ void vtkPVActorComposite::ScalarBarOrientationCallback()
     this->Script("%s SetOrientationToHorizontal", this->GetScalarBarTclName());
     this->Script("%s SetHeight 0.13", this->GetScalarBarTclName());
     this->Script("%s SetWidth 0.5", this->GetScalarBarTclName());
+    this->AddTraceEntry("$kw(%s) SetScalarBarOrientationToHorizontal", this->GetTclName());
     }
   this->GetPVRenderView()->EventuallyRender();
 }
 
+//----------------------------------------------------------------------------
 void vtkPVActorComposite::SetScalarBarOrientationToVertical()
 {
   this->ScalarBarOrientationCheck->SetState(1);
   this->ScalarBarOrientationCallback();
 }
 
+//----------------------------------------------------------------------------
 void vtkPVActorComposite::SetScalarBarOrientationToHorizontal()
 {
   this->ScalarBarOrientationCheck->SetState(0);
   this->ScalarBarOrientationCallback();
 }
 
+//----------------------------------------------------------------------------
 void vtkPVActorComposite::SetPointSize(int size)
 {
   this->PointSizeScale->SetValue(size);
   this->ChangePointSize();
 }
 
+//----------------------------------------------------------------------------
 void vtkPVActorComposite::SetLineWidth(int width)
 {
   this->LineWidthScale->SetValue(width);
   this->ChangeLineWidth();
 }
 
+//----------------------------------------------------------------------------
 void vtkPVActorComposite::ChangePointSize()
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
@@ -1651,9 +1724,13 @@ void vtkPVActorComposite::ChangePointSize()
                            this->PointSizeScale->GetValue());
     }
   
-  this->GetPVRenderView()->EventuallyRender();
-}
+  this->AddTraceEntry("$kw(%s) SetPointSize %d", this->GetTclName(),
+                      (int)(this->PointSizeScale->GetValue()));
 
+  this->GetPVRenderView()->EventuallyRender();
+} 
+
+//----------------------------------------------------------------------------
 void vtkPVActorComposite::ChangeLineWidth()
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
@@ -1665,9 +1742,13 @@ void vtkPVActorComposite::ChangeLineWidth()
                            this->LineWidthScale->GetValue());
     }
 
+  this->AddTraceEntry("$kw(%s) SetLineWidth %d", this->GetTclName(),
+                      (int)(this->LineWidthScale->GetValue()));
+
   this->GetPVRenderView()->EventuallyRender();
 }
 
+//----------------------------------------------------------------------------
 void vtkPVActorComposite::SaveInTclScript(ofstream *file, const char *sourceName)
 {
   char* charFound;

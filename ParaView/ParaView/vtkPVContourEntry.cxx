@@ -192,10 +192,41 @@ void vtkPVContourEntry::AddValueCallback()
 void vtkPVContourEntry::DeleteValueCallback()
 {
   int index;
+  int num, idx;
   
+  // First look for slected values in the value list.
   index = this->ContourValuesList->GetSelectionIndex();
-  this->ContourValuesList->DeleteRange(index, index);
+  if (index == -1)
+    {
+    num = this->ContourValuesList->GetNumberOfItems();
+    // Next look for values in the entry box.
+    if (strcmp(this->NewValueEntry->GetValue(), "") != 0)
+      {
+      // Find the index of the value in the entry box.
+      // If the entry value is not in the list,
+      // this will just clear the entry and return.
+      for (idx = 0; idx < num && index < 0; ++idx)
+        {
+        if (strcmp(this->NewValueEntry->GetValue(),
+                   this->ContourValuesList->GetItem(idx)) == 0)
+          {
+          index = idx;
+          }
+        }
+      }
+    else
+      {
+      // Finally just delete the last in the list.
+      index = num - 1;
+      }
+    }
+
+  if ( index >= 0 )
+    {
+    this->ContourValuesList->DeleteRange(index, index);
+    }
   this->ModifiedCallback();
+  this->NewValueEntry->SetValue("");
 }
 
 //----------------------------------------------------------------------------

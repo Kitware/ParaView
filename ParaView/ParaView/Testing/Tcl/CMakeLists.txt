@@ -13,6 +13,7 @@ IF (VTK_USE_MPI)
                CombustorTest
                ConeCubeCylSQ
                CutContours
+	       Data
                Delete
                DeleteSource
                EnSight
@@ -56,6 +57,7 @@ FOREACH (tfile
          CombustorTest
          ConeCubeCylSQ
          CutContours
+	 Data
          Delete
          DeleteSource
          EnSight

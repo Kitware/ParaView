@@ -322,6 +322,9 @@ void vtkPVData::SetPVSource(vtkPVSource *source)
   this->Modified();
 
   this->PVSource = source;
+
+  this->SetTraceReferenceObject(source);
+  this->SetTraceReferenceCommand("GetPVOutput");
 }
 
 //----------------------------------------------------------------------------
