@@ -394,7 +394,7 @@ protected:
   ~vtkPVApplication();
 
   virtual void CreateSplashScreen();
-  virtual void ConfigureAbout();
+  virtual void AddAboutText(ostream &);
 
   void CreateButtonPhotos();
   void CreatePhoto(char *name, 
