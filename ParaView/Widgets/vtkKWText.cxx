@@ -17,7 +17,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWText );
-vtkCxxRevisionMacro(vtkKWText, "1.20");
+vtkCxxRevisionMacro(vtkKWText, "1.21");
 
 //----------------------------------------------------------------------------
 vtkKWText::vtkKWText()
@@ -52,12 +52,21 @@ void vtkKWText::SetValue(const char *s)
     {
     return;
     }
+  int enabled = this->Enabled;
+  if ( !enabled )
+    {
+    this->SetEnabled(1);
+    }
   this->Script("%s delete 1.0 end", this->GetWidgetName());
   if (s)
     {
     const char *str = this->ConvertInternalStringToTclString(s);
     this->Script("catch {%s insert 1.0 {%s}}", 
                  this->GetWidgetName(), str ? str : "");
+    }
+  if ( !enabled )
+    {
+    this->SetEnabled(0);
     }
 }
 

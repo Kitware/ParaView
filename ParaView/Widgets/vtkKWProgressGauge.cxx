@@ -19,7 +19,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWProgressGauge );
-vtkCxxRevisionMacro(vtkKWProgressGauge, "1.17");
+vtkCxxRevisionMacro(vtkKWProgressGauge, "1.18");
 
 int vtkKWProgressGaugeCommand(ClientData cd, Tcl_Interp *interp,
                               int argc, char *argv[]);
@@ -83,6 +83,11 @@ void vtkKWProgressGauge::SetValue(int value)
     {
     return;
     }
+  int enabled = this->Enabled;
+  if ( !enabled )
+    {
+    this->EnabledOn();
+    }
 
   const char* wname = this->GetWidgetName();
 
@@ -144,6 +149,11 @@ void vtkKWProgressGauge::SetValue(int value)
   tk_cmd << ends;
   this->Script(tk_cmd.str());
   tk_cmd.rdbuf()->freeze(0);
+
+  if ( !enabled )
+    {
+    this->EnabledOff();
+    }
 }
 
 //----------------------------------------------------------------------------
