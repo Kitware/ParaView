@@ -143,6 +143,7 @@ vtkPVWindow::vtkPVWindow()
   this->FrameRateLabel = vtkKWLabel::New();
   this->FrameRateScale = vtkKWScale::New();
 
+  this->ReductionLabel = vtkKWLabel::New();
   this->ReductionCheck = vtkKWCheckButton::New();
   
   this->Sources = vtkKWCompositeCollection::New();
@@ -279,6 +280,13 @@ void vtkPVWindow::PrepareForDelete()
     {
     this->FrameRateScale->Delete();
     this->FrameRateScale = NULL;
+    }
+
+
+  if (this->ReductionLabel)
+    {
+    this->ReductionLabel->Delete();
+    this->ReductionLabel = NULL;
     }
 
   if (this->ReductionCheck)
@@ -470,7 +478,7 @@ void vtkPVWindow::Create(vtkKWApplication *app, char *args)
   this->CalculatorButton->SetParent(this->Toolbar);
   this->CalculatorButton->Create(app, "-image PVCalculatorButton");
   this->CalculatorButton->SetCommand(this, "CalculatorCallback");
-  this->CalculatorButton->SetBalloonHelpString("Calculator");
+  this->CalculatorButton->SetBalloonHelpString("Array calculator. Allows user to create new arrays using mathematical operations and existing arrays.");
   
   this->CutPlaneButton->SetParent(this->Toolbar);
   this->CutPlaneButton->Create(app, "-image PVCutPlaneButton");
@@ -531,12 +539,20 @@ void vtkPVWindow::Create(vtkKWApplication *app, char *args)
 
   // No trace
   this->ReductionCheck->SetParent(this->GetToolbarFrame());
-  this->ReductionCheck->Create(app, "-text Reduction");
+  this->ReductionCheck->Create(app, "");
   this->ReductionCheck->SetState(1);
   this->ReductionCheck->SetCommand(this, "ReductionCheckCallback");
   this->ReductionCheck->SetBalloonHelpString("If selected, tree compositing will scale the size of the render window based on how long the previous render took.");
   this->Script("pack %s -side right -fill none -expand no",
                this->ReductionCheck->GetWidgetName());
+
+  this->ReductionLabel->SetParent(this->GetToolbarFrame());
+  this->ReductionLabel->Create(app, "");
+  this->ReductionLabel->SetLabel("Reduction");
+  this->ReductionLabel->SetBalloonHelpString("If selected, tree compositing will scale the size of the render window based on how long the previous render took.");
+  this->Script("pack %s -side right -fill none -expand no",
+               this->ReductionLabel->GetWidgetName());
+
   
   this->Script("pack %s %s -side left -pady 0 -fill none -expand no",
                this->InteractorToolbar->GetWidgetName(),

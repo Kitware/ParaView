@@ -56,6 +56,7 @@ class vtkKWNotebook;
 class vtkKWToolbar;
 class vtkKWScale;
 class vtkKWPushButton;
+class vtkKWLabel;
 class vtkKWCheckButton;
 class vtkKWInteractor;
 class vtkPVAnimationInterface;
@@ -295,6 +296,7 @@ protected:
   vtkKWLabel *FrameRateLabel;
   vtkKWScale *FrameRateScale;
 
+  vtkKWLabel *ReductionLabel;
   vtkKWCheckButton *ReductionCheck;
   
   vtkKWCompositeCollection *Sources;
