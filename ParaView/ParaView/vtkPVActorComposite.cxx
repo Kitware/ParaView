@@ -278,7 +278,8 @@ void vtkPVActorComposite::CreateParallelTclObjects(vtkPVApplication *pvApp)
       pvApp->RemoteScript(id, "%s SetPiece %d", this->LODMapperTclName, id-1);
       }
     }
-  else {
+  else 
+    {
     if (getenv("PV_DEBUG_HALF") != NULL)
       {
       debugNum *= 2;
