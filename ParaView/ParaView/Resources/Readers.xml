@@ -209,6 +209,11 @@
   <ArraySelection attribute_name="Point" />
   <ArraySelection attribute_name="Cell" />
  </Module>
+ <Module name="XMLCollectionReader" class="vtkPVReaderModule"
+         root_name="XMLCollectionReader" module_type="Reader"
+         extensions=".vtc" file_description="VTK Collection Files">
+  <Source class="vtkXMLCollectionReader"/>
+ </Module>
  <Module name="HDF5RawImageReader"
          root_name="HDF5RawImageReader"
          output="vtkImageData"

@@ -150,6 +150,7 @@ SET( ParaView_SRCS
   vtkVRMLSource.cxx
   vtkWeightedRedistributePolyData.cxx
   vtkXDMFReaderModule.cxx
+  vtkXMLCollectionReader.cxx
   )
 
 IF (VTK_USE_PATENTED)
