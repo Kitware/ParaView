@@ -124,7 +124,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.234");
+vtkCxxRevisionMacro(vtkPVApplication, "1.235");
 vtkCxxSetObjectMacro(vtkPVApplication, RenderModule, vtkPVRenderModule);
 
 
@@ -2015,6 +2015,7 @@ void vtkPVApplication::PrintSelf(ostream& os, vtkIndent indent)
      << (this->SourcesBrowserAlwaysShowName?"on":"off") << endl;
 
   os << indent << "LogThreshold: " << this->LogThreshold << endl;
+  os << indent << "CrashOnErrors: " << (this->CrashOnErrors?"on":"off") << endl;
 }
 
 void vtkPVApplication::DisplayTCLError(const char* message)

@@ -38,7 +38,7 @@
 #include "vtkStructuredGridOutlineFilter.h"
 #include "vtkUnstructuredGrid.h"
 
-vtkCxxRevisionMacro(vtkPVGeometryFilter, "1.17");
+vtkCxxRevisionMacro(vtkPVGeometryFilter, "1.18");
 vtkStandardNewMacro(vtkPVGeometryFilter);
 
 //----------------------------------------------------------------------------
@@ -413,5 +413,6 @@ void vtkPVGeometryFilter::PrintSelf(ostream& os, vtkIndent indent)
     os << indent << "OutlineFlag: Off\n";
     }
   
-  os << indent << "UseOutline: " << this->UseOutline << endl;
+  os << indent << "UseOutline: " << (this->UseOutline?"on":"off") << endl;
+  os << indent << "UseStrips: " << (this->UseStrips?"on":"off") << endl;
 }
