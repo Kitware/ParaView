@@ -34,7 +34,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCompositePartDisplay);
-vtkCxxRevisionMacro(vtkPVCompositePartDisplay, "1.10");
+vtkCxxRevisionMacro(vtkPVCompositePartDisplay, "1.11");
 
 
 //----------------------------------------------------------------------------
@@ -126,7 +126,14 @@ void vtkPVCompositePartDisplay::CreateParallelTclObjects(vtkPVApplication *pvApp
     }
   else if (pvApp->GetUseTiledDisplay())
     { // I would like to get this condition into the subclass.
+#ifdef USE_MPI
+    int fixme;
+    // It would be better to hide MPI in vtkPVDuplicatePolyData.
+    this->CollectID = pm->NewStreamObject("vtkMPIDuplicatePolyData");
+#else
+    // We should never use a composite part display without MPI, but ...
     this->CollectID = pm->NewStreamObject("vtkPVDuplicatePolyData");
+#endif    
     pm->GetStream()
       << vtkClientServerStream::Invoke
       << this->CollectID << "SetPassThrough" << 1
@@ -177,14 +184,16 @@ void vtkPVCompositePartDisplay::CreateParallelTclObjects(vtkPVApplication *pvApp
     { // This should be in subclass.
     //int numProcs = pvApp->GetController()->GetNumberOfProcesses();
     int* dims = pvApp->GetTileDimensions();
+#ifdef USE_MPI
+    // It would be better to hide MPI in vtkPVDuplicatePolyData.
+    this->LODCollectID = pm->NewStreamObject("vtkMPIDuplicatePolyData");
+#else
+    // We should never use a composite part display without MPI, but ...
     this->LODCollectID = pm->NewStreamObject("vtkPVDuplicatePolyData");
+#endif    
     pm->GetStream()
       << vtkClientServerStream::Invoke
       << this->LODCollectID << "SetPassThrough" << 1
-      << vtkClientServerStream::End;
-    pm->GetStream()
-      << vtkClientServerStream::Invoke
-      << this->LODCollectID << "InitializeSchedule" << (dims[0]*dims[1])
       << vtkClientServerStream::End;
     pm->SendStreamToClientAndServer();
     }
@@ -385,7 +394,7 @@ void vtkPVCompositePartDisplay::SetLODCollectionDecision(int v)
     {
     return;
     }
-  this->CollectionDecision = v;
+  this->LODCollectionDecision = v;
 
   if ( !this->LODUpdateSuppressorID.ID )
     {
