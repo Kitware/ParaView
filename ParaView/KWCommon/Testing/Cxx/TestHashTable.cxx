@@ -50,7 +50,7 @@ int main()
     }
 
   // Try the iterator
-  vtkAbstractIterator<int,char*> *nit = am->NewIterator();
+  vtkArrayMap<int,char*>::IteratorType *nit = am->NewIterator();
   //cout << "Try iterator" << endl;
   while ( nit->IsDoneWithTraversal() != VTK_OK )
     {

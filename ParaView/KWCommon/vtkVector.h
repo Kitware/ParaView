@@ -54,6 +54,8 @@ class vtkVector : public vtkAbstractList<DType>
   friend class vtkVectorIterator<DType>;
 
 public:
+  typedef vtkVectorIterator<DType> IteratorType;
+
   vtkContainerTypeMacro(vtkVector<DType>, vtkAbstractList<DType>);
   
   static vtkVector<DType> *New() { return new vtkVector<DType>(); }  
@@ -65,71 +67,71 @@ public:
   
   // Description:
   // Append an Item to the end of the vector.
-  virtual int AppendItem(DType a);
+  int AppendItem(DType a);
   
   // Description:
   // Insert an Item to the front of the linked list.
-  virtual int PrependItem(DType a);
+  int PrependItem(DType a);
   
   // Description:
   // Insert an Item to the specific location in the vector.
-  virtual int InsertItem(vtkIdType loc, DType a);
+  int InsertItem(vtkIdType loc, DType a);
   
   // Description:
   // Sets the Item at the specific location in the list to a new value.
   // It also checks if the item can be set.
   // It returns VTK_OK if successfull.
-  virtual int SetItem(vtkIdType loc, DType a);
+  int SetItem(vtkIdType loc, DType a);
 
   // Description:
   // Sets the Item at the specific location in the list to a new value.
   // This method does not perform any error checking.
-  virtual void SetItemNoCheck(vtkIdType loc, DType a);
+  void SetItemNoCheck(vtkIdType loc, DType a);
 
    // Description:
   // Remove an Item from the vector
-  virtual int RemoveItem(vtkIdType id);
+  int RemoveItem(vtkIdType id);
   
   // Description:
   // Return an item that was previously added to this vector. 
-  virtual int GetItem(vtkIdType id, DType& ret);
+  int GetItem(vtkIdType id, DType& ret);
       
   // Description:
   // Return an item that was previously added to this vector. 
-  virtual void GetItemNoCheck(vtkIdType id, DType& ret);
+  void GetItemNoCheck(vtkIdType id, DType& ret);
       
   // Description:
   // Find an item in the vector. Return one if it was found, zero if it was
   // not found. The location of the item is returned in res.
-  virtual int FindItem(DType a, vtkIdType &res);
+  int FindItem(DType a, vtkIdType &res);
 
   // Description:
   // Find an item in the vector using a comparison routine. 
   // Return VTK_OK if it was found, VTK_ERROR if it was
   // not found. The location of the item is returned in res.
-  virtual int FindItem(DType a, 
-		       vtkAbstractListCompareFunction(DType, compare), 
-		       vtkIdType &res);
+  int FindItem(DType a, 
+	       vtkAbstractListCompareFunction(DType, compare), 
+	       vtkIdType &res);
   
   // Description:
   // Return the number of items currently held in this container. This
   // different from GetSize which is provided for some containers. GetSize
   // will return how many items the container can currently hold.
-  virtual vtkIdType GetNumberOfItems() { return this->NumberOfItems; }
+  vtkIdType GetNumberOfItems() { return this->NumberOfItems; }
   
   // Description:
   // Returns the number of items the container can currently hold.
-  virtual vtkIdType GetSize() { return this->Size; }
+  vtkIdType GetSize() { return this->Size; }
 
   // Description:
   // Removes all items from the container.
-  virtual void RemoveAllItems();
+  void RemoveAllItems();
 
   // Description:
   // Set the capacity of the vector.
   // It returns VTK_OK if successfull.
   // If capacity is set, the vector will not resize.
-  virtual int SetSize(vtkIdType size);
+  int SetSize(vtkIdType size);
 
   // Description:
   // Allow or disallow resizing. If resizing is disallowed, when

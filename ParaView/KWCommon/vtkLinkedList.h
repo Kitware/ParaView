@@ -55,6 +55,8 @@ class vtkLinkedList : public vtkAbstractList<DType>
   friend class vtkLinkedListIterator<DType>;
 
 public:
+  typedef vtkLinkedListIterator<DType> IteratorType;
+
   vtkContainerTypeMacro(vtkLinkedList<DType>, vtkAbstractList<DType>);
   
   static vtkLinkedList<DType> *New() { return new vtkLinkedList<DType>(); }  
@@ -66,72 +68,72 @@ public:
   
   // Description:
   // Append an Item to the end of the linked list.
-  virtual int AppendItem(DType a);
+  int AppendItem(DType a);
   
   // Description:
   // Insert an Item to the front of the linked list.
-  virtual int PrependItem(DType a);
+  int PrependItem(DType a);
   
   // Description:
   // Insert an Item to the specific location in the linked list.
-  virtual int InsertItem(vtkIdType loc, DType a);
+  int InsertItem(vtkIdType loc, DType a);
   
   // Description:
   // Sets the Item at the specific location in the list to a new value.
   // It also checks if the item can be set.
   // It returns VTK_OK if successfull.
-  virtual int SetItem(vtkIdType loc, DType a);
+  int SetItem(vtkIdType loc, DType a);
 
   // Description:
   // Sets the Item at the specific location in the list to a new value.
   // This method does not perform any error checking.
-  virtual void SetItemNoCheck(vtkIdType loc, DType a);
+  void SetItemNoCheck(vtkIdType loc, DType a);
 
    // Description:
   // Remove an Item from the linked list
-  virtual int RemoveItem(vtkIdType id);
+  int RemoveItem(vtkIdType id);
   
   // Description:
   // Return an item that was previously added to this linked list. 
-  virtual int GetItem(vtkIdType id, DType& ret);
+  int GetItem(vtkIdType id, DType& ret);
       
   // Description:
   // Find an item in the linked list. Return VTK_OK if it was found
   // od VTK_ERROR if not found. The location of the item is returned in res.
-  virtual int FindItem(DType a, vtkIdType &res);
+  int FindItem(DType a, vtkIdType &res);
 
   // Description:
   // Find an item in the linked list using a comparison routine. 
   // Return VTK_OK if it was found
   // od VTK_ERROR if not found. The location of the item is returned in res.
-  virtual int FindItem(DType a, 
-		       vtkAbstractListCompareFunction(DType, compare), 
-		       vtkIdType &res);
+  int FindItem(DType a, 
+	       vtkAbstractListCompareFunction(DType, compare), 
+	       vtkIdType &res);
   
   // Description:
   // Return the number of items currently held in this container. This
   // different from GetSize which is provided for some containers. GetSize
   // will return how many items the container can currently hold.
-  virtual vtkIdType GetNumberOfItems() { return this->NumberOfItems; }
+  vtkIdType GetNumberOfItems() { return this->NumberOfItems; }
   
   // Description:
   // Returns the number of items the container can currently hold.
   // Since capacity is arbitrary for the linked list, this will 
   // always return the current number of elements.
-  virtual vtkIdType GetSize() { return this->NumberOfItems; }
+  vtkIdType GetSize() { return this->NumberOfItems; }
 
   // Description:
   // Removes all items from the container.
-  virtual void RemoveAllItems();
+  void RemoveAllItems();
 
   // Description:
   // Since linked list does not have the notion of capacity,
   // this method always return VTK_ERROR.
-  virtual int SetSize(vtkIdType ) { return VTK_ERROR; }
+  int SetSize(vtkIdType ) { return VTK_ERROR; }
 
   // Description:
   // This method dumps debug of the linked list.
-  virtual void DebugList();
+  void DebugList();
 
 protected:
   vtkLinkedList() {
@@ -142,7 +144,7 @@ protected:
 
   // Description:
   // Find a node with given index.
-  virtual vtkLinkedListNode<DType>* FindNode(vtkIdType i);
+  vtkLinkedListNode<DType>* FindNode(vtkIdType i);
 
   vtkIdType NumberOfItems;
   vtkLinkedListNode<DType> *Head;

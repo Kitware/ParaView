@@ -191,7 +191,7 @@ int TestList(DType*)
 
 
   // Try the iterator
-  vtkAbstractIterator<vtkIdType,char*> *it = strings->NewIterator();
+  typename DType::IteratorType *it = strings->NewIterator();
   //cout << "Try iterator" << endl;
   while ( it->IsDoneWithTraversal() != VTK_OK )
     {
