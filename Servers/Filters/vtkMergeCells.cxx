@@ -39,7 +39,7 @@
 #include <stdlib.h>
 #include <algorithm>
 
-vtkCxxRevisionMacro(vtkMergeCells, "1.12");
+vtkCxxRevisionMacro(vtkMergeCells, "1.13");
 vtkStandardNewMacro(vtkMergeCells);
 
 vtkCxxSetObjectMacro(vtkMergeCells, UnstructuredGrid, vtkUnstructuredGrid);
@@ -423,7 +423,7 @@ vtkIdType vtkMergeCells::AddNewCellsUnstructuredGrid(vtkDataSet *set,
 
   if (!firstSet)
     {
-    memcpy(iptr, locs, numCells * sizeof(int));   // existing set
+    memcpy(iptr, locs, numCells * sizeof(vtkIdType));   // existing set
     }
 
   //           TYPE ARRAY
@@ -441,7 +441,7 @@ vtkIdType vtkMergeCells::AddNewCellsUnstructuredGrid(vtkDataSet *set,
   // set up new cell data
   
   vtkIdType finalCellId = numCells;
-  int nextCellArrayIndex = numConnections;
+  vtkIdType nextCellArrayIndex = static_cast<vtkIdType>(numConnections);
   vtkCellData *cellArrays = set->GetCellData();
   
   vtkIdType oldPtId, finalPtId;

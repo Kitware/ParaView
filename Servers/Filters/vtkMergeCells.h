@@ -23,6 +23,11 @@
 // .SECTION Description
 //    Designed to work with distributed vtkDataSets, this class will take
 //    vtkDataSets and merge them back into a single vtkUnstructuredGrid.
+//
+//    The vtkPoints object of the unstructured grid will have data type
+//    VTK_FLOAT, regardless of the data type of the points of the
+//    input vtkDataSets.  If this is a problem, someone must let me know.
+//
 //    It is assumed the different DataSets have the same field arrays.  If
 //    the name of a global point ID array is provided, this class will
 //    refrain from including duplicate points in the merged Ugrid.  This
@@ -58,6 +63,7 @@ public:
   // Description:
   //    Set the vtkUnstructuredGrid object that will become the
   //    union of the DataSets specified in MergeDataSet calls.
+  //    vtkMergeCells assumes this grid is empty at first.
 
   virtual void SetUnstructuredGrid(vtkUnstructuredGrid*);
   vtkGetObjectMacro(UnstructuredGrid, vtkUnstructuredGrid);
@@ -123,7 +129,7 @@ public:
   // Description:
   //    Provide a DataSet to be merged in to the final UnstructuredGrid.
   //    This call returns after the merge has completed.  Be sure to call
-  //    SetTotalCells, SetTotalPoints, and SetTotalNumberOfDataSets
+  //    SetTotalNumberOfCells, SetTotalNumberOfPoints, and SetTotalNumberOfDataSets
   //    before making this call.  Return 0 if OK, -1 if error.
 
   int MergeDataSet(vtkDataSet *set);
