@@ -57,7 +57,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVTimerLogDisplay );
-vtkCxxRevisionMacro(vtkPVTimerLogDisplay, "1.9.2.1");
+vtkCxxRevisionMacro(vtkPVTimerLogDisplay, "1.9.2.2");
 
 int vtkPVTimerLogDisplayCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -569,10 +569,18 @@ vtkPVApplication* vtkPVTimerLogDisplay::GetPVApplication()
 void vtkPVTimerLogDisplay::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-  
+
   os << indent << "Title: " << (this->Title ? this->Title : "(none)") << endl;
   os << indent << "Threshold: " << this->Threshold << endl;
   vtkIndent i2 = indent.GetNextIndent();
-  os << indent << "TimerInformation: \n";
-  this->TimerInformation->PrintSelf(os, i2);
+  os << indent << "TimerInformation:";
+  if ( this->TimerInformation )
+    {
+    os << "\n";
+    this->TimerInformation->PrintSelf(os, i2);
+    }
+  else
+    {
+    os << " (none)" << endl;
+    }
 }
