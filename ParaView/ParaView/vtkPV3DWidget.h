@@ -79,8 +79,9 @@ public:
   virtual void Reset() = 0;
 
   // Description:
-  // Set the line visibility.
+  // Set the widget visibility.
   void SetVisibility();
+  void SetVisibility(int val);
 
   // Description:
   // Set modified to 1 when value has changed.

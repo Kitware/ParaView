@@ -188,7 +188,15 @@ void vtkPV3DWidget::SetValueChanged()
 void vtkPV3DWidget::SetVisibility()
 {
   int visibility = this->Visibility->GetState();
+  this->SetVisibility(visibility);
+}
+
+//----------------------------------------------------------------------------
+void vtkPV3DWidget::SetVisibility(int visibility)
+{
   this->Widget3D->SetEnabled(visibility);
+  this->AddTraceEntry("$kw(%s) SetVisibility %d", 
+		      this->GetTclName(), visibility);
 }
 
 //----------------------------------------------------------------------------
