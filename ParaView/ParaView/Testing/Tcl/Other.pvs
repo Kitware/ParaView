@@ -39,10 +39,6 @@ $pvWindow DisableToolbarButtons
 $pvWindow EnableToolbarButtons
 $pvWindow PrintRecentFiles
 
-$pvWindow OnToggleProperties
-$pvWindow OnToggleProperties
-$pvWindow OnToggleProperties
-$pvWindow OnToggleProperties
 $pvWindow HideProperties
 $pvWindow ShowProperties
 
