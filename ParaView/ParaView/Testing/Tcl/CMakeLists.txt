@@ -4,10 +4,16 @@ ELSE (EXECUTABLE_OUTPUT_PATH)
   SET (VTK_EXECUTABLE ${VTK_BINARY_DIR}/Wrapping/Tcl/${CMAKE_CFG_INTDIR}/vtk)
 ENDIF (EXECUTABLE_OUTPUT_PATH)
 
+SET(RUN_WITH_MPI 0)
 IF (VTK_USE_MPI)
   IF (UNIX)
     IF (MPIRUN)
-      FOREACH (tfile
+      SET(RUN_WITH_MPI 1)
+    ENDIF (MPIRUN)
+  ENDIF (UNIX)
+ENDIF (VTK_USE_MPI)
+
+FOREACH (tfile
                ArrayMenuChangeInput
                Arrow
                Axes
@@ -41,62 +47,21 @@ IF (VTK_USE_MPI)
                Trace
                VectorTextSpace
                Write
-               )
-
-         ADD_TEST(${tfile}-MPI ${MPIRUN} ${MPI_PREFLAGS} ${PARAVIEW_EXECUTABLE}
-                  ${PARAVIEW_SOURCE_DIR}/ParaView/Testing/Tcl/${tfile}.pvs
-                  -D ${PARAVIEW_SOURCE_DIR}/Data 
-                  -C ${PARAVIEW_SOURCE_DIR}/Widgets/Testing/Tcl/CompareImages.tcl
-                  -V ${PARAVIEW_SOURCE_DIR}/Data/Baseline/${tfile}.png
-                  ${MPI_POSTFLAGS})
-      ENDFOREACH (tfile)
-
-
-    ENDIF (MPIRUN)
-  ENDIF (UNIX)
-ENDIF (VTK_USE_MPI)
-
-FOREACH (tfile
-         ArrayMenuChangeInput
-         Arrow
-         Axes
-         BlowTest
-         BoundsDisplay
-         CalcInput
-         Calculator
-         ClipCut
-	 ColorMap
-         CombustorTest
-         ConeCubeCylSQ
-         CutContours
-         Data
-         Delete
-         DeleteSource
-         EnSight
-         Extrusion
-         Glyph
-         ImageReader
-         Mandelbrot
-         ProbeLine
-         ProbePoint
-#         RotateTranslate
-         ScalarRangeLabel
-         ScalarSelection
-         ScalarsSphereClip
-         SphereTest
-	 TestPackage
-         Threshold
-         ThresholdAttrMode
-         Trace
-         VectorTextSpace
-         Write
          )
-
-   ADD_TEST(${tfile} ${PARAVIEW_EXECUTABLE}
-            ${PARAVIEW_SOURCE_DIR}/ParaView/Testing/Tcl/${tfile}.pvs
-            -D ${PARAVIEW_SOURCE_DIR}/Data 
-            -C ${PARAVIEW_SOURCE_DIR}/Widgets/Testing/Tcl/CompareImages.tcl
-            -V ${PARAVIEW_SOURCE_DIR}/Data/Baseline/${tfile}.png)
+  IF(RUN_WITH_MPI)
+    ADD_TEST(${tfile}-MPI ${MPIRUN} ${MPI_PREFLAGS} ${PARAVIEW_EXECUTABLE}
+             ${PARAVIEW_SOURCE_DIR}/Packages/Testing/Tcl/${tfile}.pvs
+               -D ${PARAVIEW_SOURCE_DIR}/Data 
+               -C ${PARAVIEW_SOURCE_DIR}/Widgets/Testing/Tcl/CompareImages.tcl
+               -V ${PARAVIEW_SOURCE_DIR}/Data/Baseline/${tfile}.png
+                  ${MPI_POSTFLAGS})
+  ELSE(RUN_WITH_MPI)
+    ADD_TEST(${tfile} ${PARAVIEW_EXECUTABLE}
+             ${PARAVIEW_SOURCE_DIR}/Packages/Testing/Tcl/${tfile}.pvs
+               -D ${PARAVIEW_SOURCE_DIR}/Data 
+               -C ${PARAVIEW_SOURCE_DIR}/Widgets/Testing/Tcl/CompareImages.tcl
+               -V ${PARAVIEW_SOURCE_DIR}/Data/Baseline/${tfile}.png)
+  ENDIF(RUN_WITH_MPI)
 ENDFOREACH (tfile)
 
 ADD_TEST(PrintSelf-ParaView ${TCL_TCLSH}
