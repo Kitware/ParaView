@@ -123,6 +123,11 @@ template <class value>
 class vtkLinkedList;
 //ETX
 
+#define VTK_PV_SOURCE_MENU_INDEX       2
+#define VTK_PV_SOURCE_MENU_LABEL       " Source"
+#define VTK_PV_ANIMATION_MENU_INDEX    3
+#define VTK_PV_ANIMATION_MENU_LABEL    " Animation"
+
 class VTK_EXPORT vtkPVWindow : public vtkKWWindow
 {
 public:

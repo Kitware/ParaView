@@ -116,10 +116,9 @@ vtkPVRenderView::vtkPVRenderView()
   this->EventuallyRenderFlag = 0;
   this->RenderPending = NULL;
 
-  this->MenuPropertiesUnderline = 4;
-
-  this->SetMenuPropertiesName(" 3D View Settings");
-  this->SetMenuPropertiesHelp("Show global view parameters (background color, annoations2 etc.)");
+  this->MenuEntryUnderline = 4;
+  this->SetMenuEntryName(VTK_PV_VIEW_MENU_LABEL);
+  this->SetMenuEntryHelp("Show global view parameters (background color, annoations2 etc.)");
 
   this->StandardViewsFrame = vtkKWLabeledFrame::New();
   this->XMaxViewButton = vtkKWPushButton::New();
@@ -1852,7 +1851,7 @@ void vtkPVRenderView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVRenderView ";
-  this->ExtractRevision(os,"$Revision: 1.177 $");
+  this->ExtractRevision(os,"$Revision: 1.178 $");
 }
 
 //------------------------------------------------------------------------------

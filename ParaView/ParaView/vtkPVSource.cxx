@@ -777,8 +777,8 @@ void vtkPVSource::Accept(int hideFlag, int hideSource)
     this->Initialized = 1;
     }
 
-  window->GetMenuProperties()->CheckRadioButton(
-                                  window->GetMenuProperties(), "Radio", 2);
+  window->GetMenuView()->CheckRadioButton(
+                                  window->GetMenuView(), "Radio", 2);
   this->UpdateProperties();
   this->GetPVRenderView()->EventuallyRender();
 
@@ -921,8 +921,9 @@ void vtkPVSource::DeleteCallback()
     // Show the 3D View settings
     vtkPVApplication *pvApp = vtkPVApplication::SafeDownCast(this->Application);
     vtkPVWindow *window = pvApp->GetMainWindow();
-    this->Script("%s invoke \" 3D View Settings\"", 
-                 window->GetMenuProperties()->GetWidgetName());    
+    this->Script("%s invoke \"%s\"", 
+                 window->GetMenuView()->GetWidgetName(),
+                 VTK_PV_VIEW_MENU_LABEL);
     }
   else
     {
@@ -1827,7 +1828,7 @@ void vtkPVSource::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVSource ";
-  this->ExtractRevision(os,"$Revision: 1.224 $");
+  this->ExtractRevision(os,"$Revision: 1.225 $");
 }
 
 //----------------------------------------------------------------------------

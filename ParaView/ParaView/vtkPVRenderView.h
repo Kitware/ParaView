@@ -74,6 +74,8 @@ class vtkPVWindow;
 class vtkPVSourcesNavigationWindow;
 class vtkPVCameraIcon;
 
+#define VTK_PV_VIEW_MENU_LABEL       " 3D View Properties"
+
 class VTK_EXPORT vtkPVRenderView : public vtkKWView
 {
 public:

@@ -204,11 +204,6 @@ vtkPVWindow::vtkPVWindow()
   this->SetScriptExtension(".pvs");
   this->SetScriptType("ParaView");
 
-  // Set the title of the properties menu (for some reason, the
-  // menus are named MenuProperties, MenuFile etc. instead of
-  // FileMenu, PropertiesMenu etc. in vtkKWMenu).
-  this->SetMenuPropertiesTitle("View");
-
   // Used to store the extensions and descriptions for supported
   // file formats (in Tk dialog format i.e. {ext1 ext2 ...} 
   // {{desc1} {desc2} ...}
@@ -566,19 +561,33 @@ void vtkPVWindow::InitializeMenus(vtkKWApplication* vtkNotUsed(app))
   // Add view options.
 
   // Shows the notebook for the current source and data object.
+
   char *rbv = 
-    this->GetMenuProperties()->CreateRadioButtonVariable(
-      this->GetMenuProperties(),"Radio");
-  this->GetMenuProperties()->AddRadioButton(
-    2, " Source", rbv, this, "ShowCurrentSourcePropertiesCallback", 1,
+    this->GetMenuView()->CreateRadioButtonVariable(
+      this->GetMenuView(),"Radio");
+
+  this->GetMenuView()->AddRadioButton(
+    VTK_PV_SOURCE_MENU_INDEX, 
+    VTK_PV_SOURCE_MENU_LABEL, 
+    rbv, 
+    this, 
+    "ShowCurrentSourcePropertiesCallback", 
+    1,
     "Display the properties of the current data source or filter");
   delete [] rbv;
 
   // Shows the animation tool.
-  rbv = this->GetMenuProperties()->CreateRadioButtonVariable(
-           this->GetMenuProperties(),"Radio");
-  this->GetMenuProperties()->AddRadioButton(
-    3, " Animation", rbv, this, "ShowAnimationProperties", 1,
+
+  rbv = this->GetMenuView()->CreateRadioButtonVariable(
+           this->GetMenuView(),"Radio");
+
+  this->GetMenuView()->AddRadioButton(
+    VTK_PV_ANIMATION_MENU_INDEX, 
+    VTK_PV_ANIMATION_MENU_LABEL, 
+    rbv, 
+    this, 
+    "ShowAnimationProperties", 
+    1,
     "Display the interface for creating animations by varying variables "
     "in a loop");
   delete [] rbv;
@@ -769,6 +778,8 @@ void vtkPVWindow::Create(vtkKWApplication *app, char* vtkNotUsed(args))
   this->InitializeMenus(app);
   this->InitializeToolbars(app);
   this->CreateDefaultPropertiesParent();
+
+  // Interface for the preferences.
 
   // Create the main properties notebook.
   // The notebook does not create trace entries.
@@ -1004,8 +1015,10 @@ void vtkPVWindow::Create(vtkKWApplication *app, char* vtkNotUsed(args))
   this->UpdateSourceMenu();
 
   // Make the 3D View Settings the current one.
-  this->Script("%s invoke \" 3D View Settings\"", 
-               this->MenuProperties->GetWidgetName());
+  this->Script("%s invoke \"%s\"", 
+               this->GetMenuView()->GetWidgetName(),
+               VTK_PV_VIEW_MENU_LABEL);
+
   this->Script( "wm deiconify %s", this->GetWidgetName());
 
   this->Script("wm protocol %s WM_DELETE_WINDOW { %s Exit }",
@@ -2431,12 +2444,14 @@ void vtkPVWindow::EnableSelectMenu()
   if (numSources == 0)
     {
     this->Menu->SetState("Select", vtkKWMenu::Disabled);
-    this->MenuProperties->SetState(" Source", vtkKWMenu::Disabled);
+    this->GetMenuView()->SetState(VTK_PV_SOURCE_MENU_LABEL, 
+                                  vtkKWMenu::Disabled);
     }
   else
     {
     this->Menu->SetState("Select", vtkKWMenu::Normal);
-    this->MenuProperties->SetState(" Source", vtkKWMenu::Normal);
+    this->GetMenuView()->SetState(VTK_PV_SOURCE_MENU_LABEL, 
+                                  vtkKWMenu::Normal);
     }
 }
 
@@ -2604,9 +2619,10 @@ void vtkPVWindow::ShowCurrentSourceProperties()
 {
   this->ShowProperties();
   
-  // We need to update the properties-menu radio button too!
-  this->GetMenuProperties()->CheckRadioButton(
-    this->GetMenuProperties(), "Radio", 2);
+  // We need to update the view-menu radio button too!
+
+  this->GetMenuView()->CheckRadioButton(
+    this->GetMenuView(), "Radio", VTK_PV_SOURCE_MENU_INDEX);
 
   this->Script("catch {eval pack forget [pack slaves %s]}",
                this->MainView->GetPropertiesParent()->GetWidgetName());
@@ -2645,8 +2661,8 @@ void vtkPVWindow::ShowAnimationProperties()
   this->ShowProperties();
   
   // We need to update the properties-menu radio button too!
-  this->GetMenuProperties()->CheckRadioButton(
-    this->GetMenuProperties(), "Radio", 3);
+  this->GetMenuView()->CheckRadioButton(
+    this->GetMenuView(), "Radio", VTK_PV_ANIMATION_MENU_INDEX);
 
   // Get rid of the page already packed.
   this->Script("catch {eval pack forget [pack slaves %s]}",
@@ -3229,7 +3245,7 @@ void vtkPVWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVWindow ";
-  this->ExtractRevision(os,"$Revision: 1.334 $");
+  this->ExtractRevision(os,"$Revision: 1.335 $");
 }
 
 //----------------------------------------------------------------------------

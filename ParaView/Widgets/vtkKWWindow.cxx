@@ -64,6 +64,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkString.h"
 #include "vtkVector.txx"
 
+#define VTK_KW_HIDE_PROPERTIES_LABEL "Hide Left Panel" 
+#define VTK_KW_SHOW_PROPERTIES_LABEL "Show Left Panel"
+
 vtkCxxSetObjectMacro(vtkKWWindow, PropertiesParent, vtkKWWidget);
 
 class vtkKWWindowMenuEntry
@@ -208,7 +211,6 @@ int vtkKWWindowCommand(ClientData cd, Tcl_Interp *interp,
 
 vtkKWWindow::vtkKWWindow()
 {
-  this->UseMenuProperties = 1;
   this->PropertiesParent = NULL;
   this->SelectedView = NULL;
   this->Views = vtkKWViewCollection::New();
@@ -265,9 +267,6 @@ vtkKWWindow::vtkKWWindow()
   this->MenuEdit = NULL;
   this->MenuView = NULL;
   this->MenuWindow = NULL;
-  this->MenuProperties = NULL;
-  this->MenuPropertiesTitle = NULL;
-  this->SetMenuPropertiesTitle("Properties");
   this->NumberOfMRUFiles = 0;
   this->RealNumberOfMRUFiles = 0;
   this->PrintTargetDPI = 100;
@@ -340,10 +339,6 @@ vtkKWWindow::~vtkKWWindow()
     {
     this->MenuEdit->Delete();
     }
-  if (this->MenuProperties)
-    {
-    this->MenuProperties->Delete();
-    }
   if (this->MenuView)
     {
     this->MenuView->Delete();
@@ -360,9 +355,6 @@ vtkKWWindow::~vtkKWWindow()
   this->SetWindowClass(0);
   this->SetScriptExtension(0);
   this->SetScriptType(0);
-
-  this->SetMenuPropertiesTitle(0);
-
 }
 
 void vtkKWWindow::DisplayHelp()
@@ -569,41 +561,6 @@ vtkKWMenu *vtkKWWindow::GetMenuWindow()
   return this->MenuWindow;
 }
 
-vtkKWMenu *vtkKWWindow::GetMenuProperties()
-{
-  if ( !this->GetUseMenuProperties() )
-    {
-    return 0;
-    }
-
-  if (this->MenuProperties)
-    {
-    return this->MenuProperties;
-    }
-  
-  this->MenuProperties = vtkKWMenu::New();
-  this->MenuProperties->SetParent(this->GetMenu());
-  this->MenuProperties->SetTearOff(0);
-  this->MenuProperties->Create(this->Application,"");
-  // make sure Help menu is on the right
-  if (this->MenuView && this->MenuEdit)
-    {
-    this->Menu->InsertCascade(3, this->MenuPropertiesTitle, 
-                              this->MenuProperties, 0);
-    }
-  else if (this->MenuView || this->MenuEdit)
-    {
-    this->Menu->InsertCascade(2, this->MenuPropertiesTitle, 
-                              this->MenuProperties, 0);
-    }
-  else
-    { 
-    this->Menu->InsertCascade(1, this->MenuPropertiesTitle, 
-                              this->MenuProperties, 0);
-    }
-  return this->MenuProperties;
-}
-
 void vtkKWWindow::Create(vtkKWApplication *app, char *args)
 {
   const char *wname;
@@ -705,6 +662,14 @@ void vtkKWWindow::Create(vtkKWApplication *app, char *args)
   this->MenuFile->AddCommand("Exit", this, "Exit", 1);
   // install the menu bar into this window
   this->InstallMenu(this->Menu);
+
+  // Properties panel
+
+  this->PropertiesHidden = 0;
+  this->GetMenuWindow()->AddCommand(VTK_KW_HIDE_PROPERTIES_LABEL, this,
+                                    "OnToggleProperties", 1 );
+  // Help menu
+
   this->MenuHelp->SetTearOff(0);
   this->MenuHelp->Create(app,"");
   if ( this->SupportHelp )
@@ -714,16 +679,6 @@ void vtkKWWindow::Create(vtkKWApplication *app, char *args)
   this->MenuHelp->AddCommand("OnLine Help", this, "DisplayHelp", 0);
   this->MenuHelp->AddCommand("About", this, "DisplayAbout", 0);
 
-  if ( this->UseMenuProperties )
-    {
-    rbv = 
-      this->GetMenuProperties()->CreateRadioButtonVariable(
-        this->GetMenuProperties(),"Radio");
-    this->GetMenuProperties()->AddRadioButton(0," Hide Properties", 
-                                              rbv, this, "HideProperties", 1,
-                                              "Hide the properties frame");
-    delete [] rbv;
-    }
 }
 
 void vtkKWWindow::OnPrint(int propagate, int res)
@@ -744,20 +699,40 @@ void vtkKWWindow::OnPrint(int propagate, int res)
 
 void vtkKWWindow::ShowProperties()
 {
-  this->MiddleFrame->SetFrame1MinimumSize(360);
-  //this->MiddleFrame->SetFrame1Size(360);
+  if (this->PropertiesHidden)
+    {
+    this->MiddleFrame->SetFrame1MinimumSize(360);
+    //this->MiddleFrame->SetFrame1Size(360);
+    this->PropertiesHidden = 0;
+    this->Script("%s entryconfigure 0 -label {%s}",
+                 this->GetMenuWindow()->GetWidgetName(),
+                 VTK_KW_HIDE_PROPERTIES_LABEL);
+    }
 }
 
 void vtkKWWindow::HideProperties()
 {
-  // make sure the variable is set, otherwise set it
-  if ( this->UseMenuProperties )
+  if (!this->PropertiesHidden)
     {
-    this->GetMenuProperties()->CheckRadioButton(
-      this->GetMenuProperties(),"Radio",0);
+    this->MiddleFrame->SetFrame1MinimumSize(0);
+    this->MiddleFrame->SetFrame1Size(0);
+    this->PropertiesHidden = 1;
+    this->Script("%s entryconfigure 0 -label {%s}",
+                 this->GetMenuWindow()->GetWidgetName(),
+                 VTK_KW_SHOW_PROPERTIES_LABEL);
     }
-  this->MiddleFrame->SetFrame1MinimumSize(0);
-  this->MiddleFrame->SetFrame1Size(0);
+}
+
+void vtkKWWindow::OnToggleProperties()
+{
+  if (this->PropertiesHidden)
+    {
+    this->ShowProperties();
+    }
+  else
+    {
+    this->HideProperties();
+    }
 }
 
 void vtkKWWindow::InstallMenu(vtkKWMenu* menu)
@@ -996,7 +971,7 @@ void vtkKWWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWWindow ";
-  this->ExtractRevision(os,"$Revision: 1.106 $");
+  this->ExtractRevision(os,"$Revision: 1.107 $");
 }
 
 int vtkKWWindow::ExitDialog()
@@ -1312,8 +1287,6 @@ void vtkKWWindow::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os,indent);
   os << indent << "Menu: " << this->GetMenu() << endl;
   os << indent << "MenuFile: " << this->GetMenuFile() << endl;
-  os << indent << "MenuPropertiesTitle: " << this->GetMenuPropertiesTitle() 
-     << endl;
   os << indent << "Notebook: " << this->GetNotebook() << endl;
   os << indent << "NumberOfRecentFiles: " << this->GetNumberOfRecentFiles() 
      << endl;
@@ -1327,8 +1300,6 @@ void vtkKWWindow::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "SelectedView: " << this->GetSelectedView() << endl;
   os << indent << "SupportHelp: " << this->GetSupportHelp() << endl;
   os << indent << "ToolbarFrame: " << this->GetToolbarFrame() << endl;
-  os << indent << "UseMenuProperties: " << this->GetUseMenuProperties() 
-     << endl;
   os << indent << "ViewFrame: " << this->GetViewFrame() << endl;
   os << indent << "WindowClass: " << this->GetWindowClass() << endl;  
 }

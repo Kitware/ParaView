@@ -134,7 +134,6 @@ public:
   vtkKWMenu *GetMenuEdit();
   vtkKWMenu *GetMenuView();
   vtkKWMenu *GetMenuWindow();
-  vtkKWMenu *GetMenuProperties();
   
   // Description:
   // Operations on the views.
@@ -154,8 +153,12 @@ public:
   void SetPropertiesParent(vtkKWWidget*);
   
   void CreateDefaultPropertiesParent();
+
+  // Description:
+  // Provide hide/show functionality of properties
   void HideProperties();
   void ShowProperties();
+  void OnToggleProperties();
   
   // Description::
   // Override Unregister since widgets have loops.
@@ -210,11 +213,6 @@ public:
   vtkSetStringMacro(WindowClass);
   vtkGetStringMacro(WindowClass);
 
-  // Description:
-  // The title of the properties menu button
-  vtkSetStringMacro(MenuPropertiesTitle);
-  vtkGetStringMacro(MenuPropertiesTitle);
-
   //Description:
   // Set/Get PromptBeforeClose
   vtkSetMacro(PromptBeforeClose, int);
@@ -229,12 +227,6 @@ public:
   // The type name used in LoadScript. Default is Tcl.
   vtkSetStringMacro(ScriptType);
   vtkGetStringMacro(ScriptType);
-
-  // Description:
-  // Use or not use the Properties menu. By default is set to use.
-  vtkSetMacro(UseMenuProperties, int);
-  vtkBooleanMacro(UseMenuProperties, int);
-  vtkGetMacro(UseMenuProperties, int);
 
   // Description:
   // Call render on all views
@@ -325,7 +317,6 @@ protected:
   vtkKWViewCollection *Views;
   vtkKWMenu *Menu;
   vtkKWMenu *MenuFile;
-  vtkKWMenu *MenuProperties;
   vtkKWMenu *MenuEdit;
   vtkKWMenu *MenuView;
   vtkKWMenu *MenuWindow;
@@ -349,13 +340,13 @@ protected:
 
   int SupportHelp;
   char *WindowClass;
-  char *MenuPropertiesTitle;
   int PromptBeforeClose;
 
   int InExit;
-  int UseMenuProperties;
 
   vtkKWMessageDialog *ExitDialogWidget;
+
+  int PropertiesHidden;
 
 //BTX
   // Description:

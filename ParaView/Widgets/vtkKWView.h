@@ -54,6 +54,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define VTK_KW_DISABLED_RENDER     2
 #define VTK_KW_SINGLE_RENDER       3
 
+#define VTK_KW_VIEW_MENU_INDEX     10
+
 #include "vtkKWWidget.h"
 
 class vtkKWApplication;
@@ -313,14 +315,14 @@ class VTK_EXPORT vtkKWView : public vtkKWWidget
   virtual float* GetBackgroundColor();
   
   // Description:
-  // Set the name to be used in the Properties menu for the view properties
+  // Set the name to be used in the menu for the view properties
   // sheet entry
-  vtkSetStringMacro( MenuPropertiesName );
-  vtkGetStringMacro( MenuPropertiesName );
-  vtkSetStringMacro( MenuPropertiesHelp );
-  vtkGetStringMacro( MenuPropertiesHelp );
-  vtkSetMacro( MenuPropertiesUnderline, int );
-  vtkGetMacro( MenuPropertiesUnderline, int );
+  vtkSetStringMacro(MenuEntryName);
+  vtkGetStringMacro(MenuEntryName);
+  vtkSetStringMacro(MenuEntryHelp);
+  vtkGetStringMacro(MenuEntryHelp);
+  vtkSetMacro(MenuEntryUnderline, int);
+  vtkGetMacro(MenuEntryUnderline, int);
 
   // Description:
   // Options to enable / disable UI elements. Should be set before the
@@ -401,9 +403,9 @@ class VTK_EXPORT vtkKWView : public vtkKWWidget
   int              RenderMode;
   int              RenderState;
   
-  char             *MenuPropertiesName;
-  char             *MenuPropertiesHelp;
-  int              MenuPropertiesUnderline;
+  char             *MenuEntryName;
+  char             *MenuEntryHelp;
+  int              MenuEntryUnderline;
   
   int              Printing;
   

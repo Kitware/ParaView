@@ -202,10 +202,9 @@ vtkKWView::vtkKWView()
 
   this->Printing = 0;
   
-  this->MenuPropertiesName = NULL;
-  this->MenuPropertiesHelp = NULL;
-  this->MenuPropertiesUnderline = -1;
-  this->SetMenuPropertiesName(" View");
+  this->MenuEntryName = NULL;
+  this->MenuEntryHelp = NULL;
+  this->MenuEntryUnderline = -1;
   
   this->Renderer = vtkRenderer::New();
   this->RenderWindow = vtkRenderWindow::New();
@@ -276,8 +275,8 @@ vtkKWView::~vtkKWView()
 
   delete [] this->StillUpdateRates;
   
-  this->SetMenuPropertiesName(NULL);
-  this->SetMenuPropertiesHelp(NULL);
+  this->SetMenuEntryName(NULL);
+  this->SetMenuEntryHelp(NULL);
   
 }
 
@@ -604,12 +603,12 @@ void vtkKWView::ShowViewProperties()
     {
     vtkErrorMacro("attempt to update properties without an application set");
     }
-  
-  // make sure the variable is set, otherwise set it
-  if ( this->ParentWindow->GetUseMenuProperties() )
+
+  if (this->MenuEntryName)
     {
-    this->ParentWindow->GetMenuProperties()->CheckRadioButton(
-      this->ParentWindow->GetMenuProperties(),"Radio",10);
+    // make sure the variable is set, otherwise set it
+    this->ParentWindow->GetMenuView()->CheckRadioButton(
+      this->ParentWindow->GetMenuView(), "Radio", VTK_KW_VIEW_MENU_INDEX);
     }
 
   // unpack any current children
@@ -1014,19 +1013,22 @@ void vtkKWView::EditCopy()
 //----------------------------------------------------------------------------
 void vtkKWView::Select(vtkKWWindow *pw)
 {
-  // now add property options
-  if ( pw->GetUseMenuProperties() )
+  if (this->MenuEntryName)
     {
+    // now add property options
     char *rbv = 
-      pw->GetMenuProperties()->CreateRadioButtonVariable(
-        pw->GetMenuProperties(),"Radio");
-    pw->GetMenuProperties()->AddRadioButton(10, 
-                                            this->MenuPropertiesName, 
-                                            rbv, this, "ShowViewProperties", 
-                                            this->GetMenuPropertiesUnderline(),
-                                            this->MenuPropertiesHelp ? 
-                                            this->MenuPropertiesHelp :
-                                            this->MenuPropertiesName
+      pw->GetMenuView()->CreateRadioButtonVariable(
+        pw->GetMenuView(),"Radio");
+
+    pw->GetMenuView()->AddRadioButton(VTK_KW_VIEW_MENU_INDEX, 
+                                      this->MenuEntryName, 
+                                      rbv, 
+                                      this, 
+                                      "ShowViewProperties", 
+                                      this->GetMenuEntryUnderline(),
+                                      this->MenuEntryHelp ? 
+                                      this->MenuEntryHelp :
+                                      this->MenuEntryName
       );
     delete [] rbv;
     }
@@ -1061,17 +1063,14 @@ void vtkKWView::Select(vtkKWWindow *pw)
   
   
   // map the property sheet as needed
-  if (this->SharedPropertiesParent)
+  if (this->SharedPropertiesParent && this->MenuEntryName)
     {
-    if ( this->ParentWindow->GetUseMenuProperties() )
+    // if the window prop is empty then pack this one
+    if (this->ParentWindow->GetMenuView()->GetRadioButtonValue(
+      this->ParentWindow->GetMenuView(), "Radio") >= VTK_KW_VIEW_MENU_INDEX)
       {
-      // if the window prop is empty then pack this one
-      if (this->ParentWindow->GetMenuProperties()->GetRadioButtonValue(
-        this->ParentWindow->GetMenuProperties(),"Radio") >= 10)
-        {
-        this->Script("pack %s -side left -anchor nw -fill y",
-                     this->PropertiesParent->GetWidgetName());
-        }
+      this->Script("pack %s -side left -anchor nw -fill y",
+                   this->PropertiesParent->GetWidgetName());
       }
     }
   this->InvokeEvent(vtkKWEvent::ViewSelectedEvent, 0);
@@ -1082,9 +1081,9 @@ void vtkKWView::Select(vtkKWWindow *pw)
 //----------------------------------------------------------------------------
 void vtkKWView::Deselect(vtkKWWindow *pw)
 {
-  if ( this->ParentWindow->GetUseMenuProperties() )
-    {      
-    pw->GetMenuProperties()->DeleteMenuItem( this->MenuPropertiesName );
+  if (this->MenuEntryName)
+    {
+    pw->GetMenuView()->DeleteMenuItem(this->MenuEntryName);
     }
       
   if ( this->SupportPrint )
@@ -1373,7 +1372,7 @@ void vtkKWView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWView ";
-  this->ExtractRevision(os,"$Revision: 1.74 $");
+  this->ExtractRevision(os,"$Revision: 1.75 $");
 }
 
 //----------------------------------------------------------------------------
@@ -1512,12 +1511,12 @@ void vtkKWView::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "InteractiveUpdateRate: " 
      << this->GetInteractiveUpdateRate() << endl;
   os << indent << "LastPosition: " << this->GetLastPosition() << endl;
-  os << indent << "MenuPropertiesHelp: " << this->GetMenuPropertiesHelp() 
+  os << indent << "MenuEntryHelp: " << this->GetMenuEntryHelp() 
      << endl;
-  os << indent << "MenuPropertiesName: " << this->GetMenuPropertiesName() 
+  os << indent << "MenuEntryName: " << this->GetMenuEntryName() 
      << endl;
-  os << indent << "MenuPropertiesUnderline: " 
-     << this->GetMenuPropertiesUnderline() << endl;
+  os << indent << "MenuEntryUnderline: " 
+     << this->GetMenuEntryUnderline() << endl;
   os << indent << "Notebook: " << this->GetNotebook() << endl;
   os << indent << "NumberOfStillUpdates: " << this->GetNumberOfStillUpdates()
      << endl;

@@ -188,12 +188,9 @@ void vtkKWComposite::CreateProperties()
 
 void vtkKWComposite::Deselect(vtkKWView *v)
 {
-  if ( v->GetParentWindow()->GetUseMenuProperties() )
-    {
-    this->LastSelectedProperty = 
-      v->GetParentWindow()->GetMenuProperties()->GetRadioButtonValue(
-        v->GetParentWindow()->GetMenuProperties(),"Radio");
-    }
+  this->LastSelectedProperty = 
+    v->GetParentWindow()->GetMenuView()->GetRadioButtonValue(
+      v->GetParentWindow()->GetMenuView(),"Radio");
 }
 
 void vtkKWComposite::Select(vtkKWView* /*v*/)
@@ -216,7 +213,7 @@ void vtkKWComposite::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWObject::SerializeRevision(os,indent);
   os << indent << "vtkKWComposite ";
-  this->ExtractRevision(os,"$Revision: 1.16 $");
+  this->ExtractRevision(os,"$Revision: 1.17 $");
 }
 
 //----------------------------------------------------------------------------
