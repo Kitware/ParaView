@@ -27,7 +27,7 @@
 #include "vtkSocketController.h"
 #include "vtkTimerLog.h"
 
-vtkCxxRevisionMacro(vtkMPIDuplicatePolyData, "1.5");
+vtkCxxRevisionMacro(vtkMPIDuplicatePolyData, "1.6");
 vtkStandardNewMacro(vtkMPIDuplicatePolyData);
 
 vtkCxxSetObjectMacro(vtkMPIDuplicatePolyData,Controller, vtkMultiProcessController);
@@ -51,6 +51,7 @@ vtkMPIDuplicatePolyData::vtkMPIDuplicatePolyData()
 vtkMPIDuplicatePolyData::~vtkMPIDuplicatePolyData()
 {
   this->SetController(0);
+  this->SetSocketController(0);
 }
 
 
