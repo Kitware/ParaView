@@ -36,6 +36,7 @@ IF (NOT DO_NOT_BUILD_XML_RW)
     ${KWCommon_SOURCE_DIR}/XML/vtkXMLCameraWriter.cxx
     ${KWCommon_SOURCE_DIR}/XML/vtkXMLColorTransferFunctionReader.cxx
     ${KWCommon_SOURCE_DIR}/XML/vtkXMLColorTransferFunctionWriter.cxx
+    ${KWCommon_SOURCE_DIR}/XML/vtkXMLIOBase.cxx
     ${KWCommon_SOURCE_DIR}/XML/vtkXMLInteractorObserverReader.cxx
     ${KWCommon_SOURCE_DIR}/XML/vtkXMLInteractorObserverWriter.cxx
     ${KWCommon_SOURCE_DIR}/XML/vtkXMLLightReader.cxx
@@ -60,7 +61,6 @@ IF (NOT DO_NOT_BUILD_XML_RW)
     ${KWCommon_SOURCE_DIR}/XML/vtkXMLTextActorWriter.cxx
     ${KWCommon_SOURCE_DIR}/XML/vtkXMLTextPropertyReader.cxx
     ${KWCommon_SOURCE_DIR}/XML/vtkXMLTextPropertyWriter.cxx
-    ${KWCommon_SOURCE_DIR}/XML/vtkXMLUtilities.cxx
     ${KWCommon_SOURCE_DIR}/XML/vtkXMLVolumePropertyReader.cxx
     ${KWCommon_SOURCE_DIR}/XML/vtkXMLVolumePropertyWriter.cxx
   )
@@ -77,6 +77,7 @@ IF (NOT DO_NOT_BUILD_XML_RW)
     )
   ENDIF (VTK_USE_HYBRID)
   SET_SOURCE_FILES_PROPERTIES(
+    ${KWCommon_SOURCE_DIR}/XML/vtkXMLIOBase.cxx
     ${KWCommon_SOURCE_DIR}/XML/vtkXMLObjectReader.cxx
     ${KWCommon_SOURCE_DIR}/XML/vtkXMLObjectWriter.cxx
     ABSTRACT
