@@ -73,22 +73,24 @@ public:
   vtkGetMacro(InteractiveRenderEnabled,int);
   vtkBooleanMacro(InteractiveRenderEnabled,int);
   virtual void Render();
-  
+
   // Description:
   // Methods broadcasted to the satellites to synchronize 3D widgets.
-  void SatelliteLeftPress(int x, int y, int control, int shift);
-  void SatelliteMiddlePress(int x, int y, int control, int shift);
-  void SatelliteRightPress(int x, int y, int control, int shift);
-  void SatelliteLeftRelease(int x, int y, int control, int shift);
-  void SatelliteMiddleRelease(int x, int y, int control, int shift);
-  void SatelliteRightRelease(int x, int y, int control, int shift);
-  void SatelliteMove(int x, int y);
+  void SatelliteLeftPress(float x, float y, float z, int control, int shift);
+  void SatelliteMiddlePress(float x, float y, float z, int control, int shift);
+  void SatelliteRightPress(float x, float y, float z, int control, int shift);
+  void SatelliteLeftRelease(float x, float y, float z, int control, int shift);
+  void SatelliteMiddleRelease(float x, float y, float z, int control, int shift);
+  void SatelliteRightRelease(float x, float y, float z, int control, int shift);
+  void SatelliteMove(float x, float y, float z);
 
 protected:
   vtkPVGenericRenderWindowInteractor();
   ~vtkPVGenericRenderWindowInteractor();
 
   int CalculateReductionFactor(int winSize1, int renSize1);
+  void PrepareForEvent(float wx, float wy, float wz, float xy[3],
+    int* reductionFactor, int* renSize);
   
   vtkPVRenderView *PVRenderView;
   int ReductionFactor;
