@@ -190,6 +190,10 @@ public:
   virtual const vtkClientServerStream& GetLastClientResult();
   friend void vtkPVClientServerLastResultRMI(  void *, void* , int ,int );
   //ETX
+
+  // Description:
+  // Used internally.  Do not call.  Use LoadModule instead.
+  int LoadModuleInternal(const char* name);
 protected:
   vtkPVClientServerModule();
   ~vtkPVClientServerModule();

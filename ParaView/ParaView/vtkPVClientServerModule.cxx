@@ -270,7 +270,7 @@ void vtkPVSendPolyData(void* arg, void*, int, int)
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVClientServerModule);
-vtkCxxRevisionMacro(vtkPVClientServerModule, "1.44.2.15");
+vtkCxxRevisionMacro(vtkPVClientServerModule, "1.44.2.16");
 
 int vtkPVClientServerModuleCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -1282,4 +1282,45 @@ void vtkPVClientServerModule::SendStreamToServerInternal()
   this->ClientServerStream->GetData(&data, &len);
   this->SocketController->TriggerRMI(1, (void*)(data), len,
                                      VTK_PV_CLIENTSERVER_RMI_TAG);
+}
+
+//----------------------------------------------------------------------------
+int vtkPVClientServerModule::LoadModuleInternal(const char* name)
+{
+  // Try to load the module on the local process.
+  int localResult = this->Interpreter->Load(name);
+
+  // Make sure we have a communicator.
+#ifdef VTK_USE_MPI
+  vtkMPICommunicator* communicator = vtkMPICommunicator::SafeDownCast(
+    this->Controller->GetCommunicator());
+  if(!communicator)
+    {
+    return 0;
+    }
+
+  // Gather load results to process 0.
+  int numProcs = this->Controller->GetNumberOfProcesses();
+  int myid = this->Controller->GetLocalProcessId();
+  int* results = new int[numProcs];
+  communicator->Gather(&localResult, results, numProcs, 0);
+
+  int globalResult = 1;
+  if(myid == 0)
+    {
+    for(int i=0; i < numProcs; ++i)
+      {
+      if(!results[i])
+        {
+        globalResult = 0;
+        }
+      }
+    }
+
+  delete [] results;
+
+  return globalResult;
+#else
+  return localResult;
+#endif
 }

@@ -76,7 +76,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVMPIProcessModule);
-vtkCxxRevisionMacro(vtkPVMPIProcessModule, "1.15.4.9");
+vtkCxxRevisionMacro(vtkPVMPIProcessModule, "1.15.4.10");
 
 int vtkPVMPIProcessModuleCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -456,4 +456,41 @@ vtkPVMPIProcessModule::GatherInformationInternal(const char* infoClassName,
       }
     }
   tmpInfo->Delete();
+}
+
+//----------------------------------------------------------------------------
+int vtkPVMPIProcessModule::LoadModuleInternal(const char* name)
+{
+  // Make sure we have a communicator.
+  vtkMPICommunicator* communicator = vtkMPICommunicator::SafeDownCast(
+    this->Controller->GetCommunicator());
+  if(!communicator)
+    {
+    return 0;
+    }
+
+  // Try to load the module on the local process.
+  int localResult = this->Interpreter->Load(name);
+
+  // Gather load results to process 0.
+  int numProcs = this->Controller->GetNumberOfProcesses();
+  int myid = this->Controller->GetLocalProcessId();
+  int* results = new int[numProcs];
+  communicator->Gather(&localResult, results, numProcs, 0);
+
+  int globalResult = 1;
+  if(myid == 0)
+    {
+    for(int i=0; i < numProcs; ++i)
+      {
+      if(!results[i])
+        {
+        globalResult = 0;
+        }
+      }
+    }
+
+  delete [] results;
+
+  return globalResult;
 }

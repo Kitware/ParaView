@@ -86,7 +86,7 @@ struct vtkPVArgs
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProcessModule);
-vtkCxxRevisionMacro(vtkPVProcessModule, "1.24.2.20");
+vtkCxxRevisionMacro(vtkPVProcessModule, "1.24.2.21");
 
 int vtkPVProcessModuleCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -678,6 +678,19 @@ void vtkPVProcessModule::FinalizeInterpreter()
 
 //----------------------------------------------------------------------------
 int vtkPVProcessModule::LoadModule(const char* name)
+{
+  this->GetStream()
+    << vtkClientServerStream::Invoke
+    << this->GetProcessModuleID() << "LoadModuleInternal" << name
+    << vtkClientServerStream::End;
+  this->SendStreamToServer();
+  int result = 0;
+  this->GetLastServerResult().GetArgument(0, 0, &result);
+  return result;
+}
+
+//----------------------------------------------------------------------------
+int vtkPVProcessModule::LoadModuleInternal(const char* name)
 {
   return this->Interpreter->Load(name);
 }

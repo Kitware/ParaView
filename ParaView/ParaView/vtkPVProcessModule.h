@@ -223,9 +223,14 @@ public:
   //ETX
 
   // Description:
-  // Load a ClientServer wrapper module dynamically in the current
-  // process.  Returns 1 for success and 0 for failure.
-  int LoadModule(const char* name);
+  // Load a ClientServer wrapper module dynamically in the server
+  // processes.  Returns 1 if all server nodes loaded the module and 0
+  // otherwise.
+  virtual int LoadModule(const char* name);
+
+  // Description:
+  // Used internally.  Do not call.  Use LoadModule instead.
+  virtual int LoadModuleInternal(const char* name);
 
   vtkClientServerID GetUniqueID();
   vtkClientServerID GetApplicationID();

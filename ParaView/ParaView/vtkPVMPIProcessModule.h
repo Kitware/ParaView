@@ -120,7 +120,10 @@ public:
   // Description:
   // Get the number of processes participating in sharing the data.
   virtual int GetNumberOfPartitions();
-  
+
+  // Description:
+  // Used internally.  Do not call.  Use LoadModule instead.
+  virtual int LoadModuleInternal(const char* name);
 protected:
   vtkPVMPIProcessModule();
   ~vtkPVMPIProcessModule();
