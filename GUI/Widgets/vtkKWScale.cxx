@@ -22,7 +22,7 @@
 
 // ---------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWScale );
-vtkCxxRevisionMacro(vtkKWScale, "1.73");
+vtkCxxRevisionMacro(vtkKWScale, "1.74");
 
 int vtkKWScaleCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -86,6 +86,8 @@ vtkKWScale::vtkKWScale()
   
   this->PackEntry = 1;
   this->PackRange = 1;
+
+  this->ClampValue = 1;
 }
 
 // ---------------------------------------------------------------------------
@@ -599,26 +601,29 @@ void vtkKWScale::SetResolution(double r)
 // ---------------------------------------------------------------------------
 void vtkKWScale::SetValue(double num)
 {
-  if (this->Range[1] > this->Range[0])
+  if (this->ClampValue)
     {
-    if (num > this->Range[1]) 
-      { 
-      num = this->Range[1]; 
-      }
-    else if (num < this->Range[0])
+    if (this->Range[1] > this->Range[0])
       {
-      num = this->Range[0];
+      if (num > this->Range[1]) 
+        { 
+        num = this->Range[1]; 
+        }
+      else if (num < this->Range[0])
+        {
+        num = this->Range[0];
+        }
       }
-    }
-  else
-    {
-    if (num < this->Range[1]) 
-      { 
-      num = this->Range[1]; 
-      }
-    else if (num > this->Range[0])
+    else
       {
-      num = this->Range[0];
+      if (num < this->Range[1]) 
+        { 
+        num = this->Range[1]; 
+        }
+      else if (num > this->Range[0])
+        {
+        num = this->Range[0];
+        }
       }
     }
 

@@ -26,7 +26,7 @@
 #include "vtkObjectFactory.h"
 
 vtkStandardNewMacro( vtkKWRange );
-vtkCxxRevisionMacro(vtkKWRange, "1.31");
+vtkCxxRevisionMacro(vtkKWRange, "1.32");
 
 #define VTK_KW_RANGE_MIN_SLIDER_SIZE        2
 #define VTK_KW_RANGE_MIN_THICKNESS          (2*VTK_KW_RANGE_MIN_SLIDER_SIZE+1)
@@ -111,6 +111,8 @@ vtkKWRange::vtkKWRange()
   this->ConstrainRanges();
 
   this->ConstrainResolution();
+
+  this->ClampRange = 1;
 }
 
 //----------------------------------------------------------------------------
@@ -759,15 +761,18 @@ void vtkKWRange::ConstrainRangeToWholeRange(
 
   // Resolution OK for this ? Is it out of WholeRange ?
 
-  for (i = 0; i <= 1; i++)
+  if (this->ClampRange)
     {
-    if (range[i] < whole_range[wmin_idx])
+    for (i = 0; i <= 1; i++)
       {
-      range[i] = whole_range[wmin_idx];
-      }
-    else if (range[i] > whole_range[wmax_idx])
-      {
-      range[i] = whole_range[wmax_idx];
+      if (range[i] < whole_range[wmin_idx])
+        {
+        range[i] = whole_range[wmin_idx];
+        }
+      else if (range[i] > whole_range[wmax_idx])
+        {
+        range[i] = whole_range[wmax_idx];
+        }
       }
     }
 

@@ -184,6 +184,13 @@ public:
   virtual void UpdateEnableState();
 
   // Description:
+  // Turn on/off the automatic clamping of the end values when the 
+  // user types a value beyond the range. Default is on.
+  vtkSetMacro(ClampValue, int);
+  vtkGetMacro(ClampValue, int);
+  vtkBooleanMacro(ClampValue, int);
+
+  // Description:
   // Internal
   vtkSetMacro(DisableScaleValueCallback, int);
   vtkBooleanMacro(DisableScaleValueCallback, int);
@@ -226,7 +233,9 @@ protected:
   int ShortWidth;
   int PackEntry;
   int PackRange;
-  
+
+  int ClampValue;
+
   vtkSetStringMacro(NormalLabel);
   
   void PackWidget();
