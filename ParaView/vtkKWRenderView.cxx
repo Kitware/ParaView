@@ -37,6 +37,8 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #ifdef _WIN32
 #include "vtkWin32OpenGLRenderWindow.h"
 #else
+#include "vtkMesaRenderWindow.h"
+#include "vtkMesaRenderer.h"
 #include "vtkXRenderWindow.h"
 
 int vtkKWRenderViewFoundMatch;
@@ -678,5 +680,5 @@ void vtkKWRenderView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWView::SerializeRevision(os,indent);
   os << indent << "vtkKWRenderView ";
-  this->ExtractRevision(os,"$Revision: 1.6 $");
+  this->ExtractRevision(os,"$Revision: 1.7 $");
 }

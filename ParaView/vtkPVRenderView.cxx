@@ -35,7 +35,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkDummyRenderWindowInteractor.h"
 #include "vtkObjectFactory.h"
 
-#ifdef WIN32
+#ifdef _WIN32
 #include "vtkWin32OpenGLRenderWindow.h"
 #else
 #include "vtkMesaRenderWindow.h"
