@@ -141,7 +141,10 @@ void return_result(FILE *fp)
       use_hints(fp);
       break;
     default:
-      fprintf(fp,"    Tcl_SetResult(interp, (char *) \"unable to return result.\", TCL_VOLATILE);\n");
+      fprintf(fp,
+              "      resultStream << vtkClientServerStream::Reply\n"
+              "                   << \"unable to return result.\"\n"
+              "                   << vtkClientServerStream::End;\n");
       break;
     }
 }
