@@ -48,7 +48,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWImageLabel );
-vtkCxxRevisionMacro(vtkKWImageLabel, "1.18");
+vtkCxxRevisionMacro(vtkKWImageLabel, "1.19");
 
 vtkKWImageLabel::vtkKWImageLabel()
 {
@@ -120,7 +120,7 @@ void vtkKWImageLabel::SetImageDataName (const char* _arg)
 
   this->Modified();
 
-  if (this->Application)
+  if (this->Application && this->ImageDataName)
     {
     this->Script("%s configure -image %s", 
                  this->GetWidgetName(), 

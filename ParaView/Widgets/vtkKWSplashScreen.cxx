@@ -46,7 +46,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWSplashScreen );
-vtkCxxRevisionMacro(vtkKWSplashScreen, "1.6");
+vtkCxxRevisionMacro(vtkKWSplashScreen, "1.7");
 
 //-----------------------------------------------------------------------------
 vtkKWSplashScreen::vtkKWSplashScreen()
@@ -265,6 +265,8 @@ void vtkKWSplashScreen::SetProgressMessageVerticalOffset(int _arg)
 void vtkKWSplashScreen::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
-  os << indent << "ProgressMessageVerticalOffset: " << this->ProgressMessageVerticalOffset << endl;
-  os << indent << "ImageName: " << this->ImageName << endl;
+  os << indent << "ProgressMessageVerticalOffset: " 
+     << this->ProgressMessageVerticalOffset << endl;
+  os << indent << "ImageName: " 
+     << (this->ImageName ? this->ImageName : "(none)") << endl;
 }
