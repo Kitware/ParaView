@@ -48,7 +48,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWImageLabel );
-vtkCxxRevisionMacro(vtkKWImageLabel, "1.16");
+vtkCxxRevisionMacro(vtkKWImageLabel, "1.17");
 
 vtkKWImageLabel::vtkKWImageLabel()
 {
@@ -96,4 +96,5 @@ void vtkKWImageLabel::SetImageData(const unsigned char* data,
 void vtkKWImageLabel::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
+  os << indent << "ImageDataName: " << ( this->ImageDataName ?  this->ImageDataName : "(none)") << endl;
 }
