@@ -83,7 +83,7 @@ void vtkKWToolbar::SetGlobalWidgetsFlatAspect(int val)
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWToolbar );
-vtkCxxRevisionMacro(vtkKWToolbar, "1.25");
+vtkCxxRevisionMacro(vtkKWToolbar, "1.26");
 
 
 int vtkKWToolbarCommand(ClientData cd, Tcl_Interp *interp,
@@ -183,6 +183,52 @@ void vtkKWToolbar::RemoveWidget(vtkKWWidget *widget)
       }
     }
   vtkErrorMacro("Unable to remove widget from toolbar");
+}
+
+//----------------------------------------------------------------------------
+vtkKWWidget* vtkKWToolbar::AddRadioButtonImage(int value, 
+                                               const char *image_name, 
+                                               const char *select_image_name, 
+                                               const char *variable_name, 
+                                               vtkKWObject *object, 
+                                               const char *method,
+                                               const char *help)
+{
+  if (!this->IsCreated())
+    {
+    return 0;
+    }
+
+  vtkKWRadioButton *rb = vtkKWRadioButton::New();
+  rb->SetParent(this->GetFrame());
+  rb->Create(this->Application, "");
+  rb->SetIndicator(0);
+  rb->SetValue(value);
+  if (image_name)
+    {
+    this->Script("%s configure -highlightthickness 0 -image %s -selectimage %s", 
+                 rb->GetWidgetName(), 
+                 image_name, 
+                 select_image_name ? select_image_name : image_name);
+    }
+  if (object && method)
+    {
+    rb->SetCommand(object, method);
+    }
+  if (variable_name)
+    {
+    rb->SetVariableName(variable_name);
+    }
+  if (help)
+    {
+    rb->SetBalloonHelpString(help);
+    }
+
+  this->AddWidget(rb);
+
+  rb->Delete();
+
+  return rb;
 }
 
 //----------------------------------------------------------------------------
@@ -546,6 +592,25 @@ void vtkKWToolbar::SetResizable(int r)
     {
     this->Pack();
     }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWToolbar::UpdateEnableState()
+{
+  this->Superclass::UpdateEnableState();
+
+  vtkVectorIterator<vtkKWWidget*>* it = this->Widgets->NewIterator();
+  it->InitTraversal();
+  while (!it->IsDoneWithTraversal())
+    {
+    vtkKWWidget* widget = 0;
+    if (it->GetData(widget) == VTK_OK)
+      {
+      widget->SetEnabled(this->Enabled);
+      }
+    it->GoToNextItem();
+    }
+  it->Delete();
 }
 
 //----------------------------------------------------------------------------
