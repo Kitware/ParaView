@@ -33,7 +33,7 @@
 
 #include <vtkstd/string>
 
-vtkCxxRevisionMacro(vtkKWParameterValueFunctionEditor, "1.28");
+vtkCxxRevisionMacro(vtkKWParameterValueFunctionEditor, "1.29");
 
 int vtkKWParameterValueFunctionEditorCommand(ClientData cd, Tcl_Interp *interp, int argc, char *argv[]);
 
@@ -6529,9 +6529,8 @@ void vtkKWParameterValueFunctionEditor::EndInteractionCallback(int x, int y)
 }
 
 //----------------------------------------------------------------------------
-void 
-vtkKWParameterValueFunctionEditor::ParameterCursorStartInteractionCallback(
-  int x)
+void vtkKWParameterValueFunctionEditor
+::ParameterCursorStartInteractionCallback( int vtkNotUsed(x) )
 {
   if (this->IsCreated() && this->ChangeMouseCursor)
     {
