@@ -58,7 +58,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPLOT3DReaderModule);
-vtkCxxRevisionMacro(vtkPVPLOT3DReaderModule, "1.2");
+vtkCxxRevisionMacro(vtkPVPLOT3DReaderModule, "1.3");
 
 int vtkPVPLOT3DReaderModuleCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -150,10 +150,8 @@ void vtkPVPLOT3DReaderModule::Accept(int hideFlag, int hideSource)
 
   if ( !this->Initialized || numOutputs > numPVOutputs )
     {
-    cout << "Number of outputs: " << numOutputs << endl;
     vtkPVSource* connection;
     vtkPVData* connectionOutput;
-    char* extentTranslatorName = 0;
     for (i = begin; i < numOutputs; i++)
       {
       // ith output (PVData)
