@@ -87,7 +87,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.208");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.209");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -774,6 +774,8 @@ void vtkPVRenderView::Create(vtkKWApplication *app, const char *args)
     "Switch to navigation window mode.");
   this->NavigationWindowButton->SetCommand(
     this, "ShowNavigationWindowCallback 1");
+
+  this->NavigationFrame->SetMargin(this->NavigationFrame->GetMargin() + 2);
 
   this->Script("pack %s %s -side left -anchor w -before %s -padx 1 -pady 2",
                this->SelectionWindowButton->GetWidgetName(),
@@ -2346,7 +2348,7 @@ void vtkPVRenderView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVRenderView ";
-  this->ExtractRevision(os,"$Revision: 1.208 $");
+  this->ExtractRevision(os,"$Revision: 1.209 $");
 }
 
 //------------------------------------------------------------------------------
