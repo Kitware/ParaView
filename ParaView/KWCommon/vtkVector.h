@@ -18,6 +18,11 @@
 
 #include "vtkAbstractList.h"
 
+extern "C" 
+{ 
+  typedef int (*vtkVectorSortFunctionType)(const void *, const void *);
+}
+
 template <class DType> class vtkVectorIterator;
 
 template <class DType>
@@ -133,8 +138,8 @@ public:
 
   // Description:
   // Sort the content of the list.
-  // Provide a comparison function.
-  void Sort(int (*func)(const void *, const void *));
+  // Provide a comparison function (see def of vtkVectorSortFunctionType).
+  void Sort(vtkVectorSortFunctionType);
 
 protected:
   vtkVector() {
