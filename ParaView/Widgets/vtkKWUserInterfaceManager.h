@@ -167,6 +167,10 @@ public:
     { return this->ShowPanel(panel); };
 
   // Description:
+  // Convenience method to show all panels.
+  virtual void ShowAllPanels();
+
+  // Description:
   // Update a panel according to the manager settings (i.e., it just performs 
   // manager-specific changes on the panel). Note that it does not call the
   // panel's Update() method, on the opposite the panel's Update() will call
