@@ -185,7 +185,7 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterface);
-vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.148");
+vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.149");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterface,ControlledWidget, vtkPVWidget);
 
@@ -1279,7 +1279,8 @@ void vtkPVAnimationInterface::SaveImagesCallback()
       {
       dlg->SetText(
         "Specify the width and aspect ratio of the images to be saved from "
-        "this animation.");
+        "this animation. The images will be scaled so that they are no larger "
+        "than the size of the display area.");
       }
     else
       { 
@@ -1287,7 +1288,8 @@ void vtkPVAnimationInterface::SaveImagesCallback()
         "Specify the width and height of the images to be saved from this "
         "animation. Each dimension must be a multiple of 4. Each will be "
         "resized to the next smallest multiple of 4 if it does not meet this "
-        "criterion.");
+        "criterion. The images will also be scaled so that they are no "
+        "larger than the size of the display area.");
       }
     vtkKWWidget *frame = vtkKWWidget::New();
     frame->SetParent(dlg->GetTopFrame());
@@ -1359,6 +1361,28 @@ void vtkPVAnimationInterface::SaveImagesCallback()
       {
       height = heightEntry->GetEntry()->GetValueAsInt();
       }
+
+    // For now, the image size for the animations cannot be larger than
+    // the size of the render window. The problem is that tiling doesn't
+    // work with multiple processes.
+    vtkPVApplication *pvApp = this->GetPVApplication();
+    if (width > origWidth || height > origHeight)
+      {
+      int diffX = width - origWidth;
+      int diffY = height - origHeight;
+      double aspect = width / (double)height;
+      if (diffX > diffY)
+        {
+        width = origWidth;
+        height = (int)(width / aspect);
+        }
+      else
+        {
+        height = origHeight;
+        width = (int)(height * aspect);
+        }
+      }    
+    
     if ((width % 4) > 0)
       {
       width -= width % 4;
