@@ -1,0 +1,313 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="sources">
+
+   <SourceProxy name="PVDReader" 
+                class="vtkPVDReader">
+     <StringVectorProperty
+        name="FileName"
+        command="SetFileName"
+        number_of_elements="1" />
+     <IntVectorProperty 
+        name="TimestepAsIndex"
+        command="SetTimestepAsIndex"
+        number_of_elements="1" />
+   <!-- End PVDReader -->
+   </SourceProxy>
+                    
+   <SourceProxy name="XMLPolyDataReader" 
+                class="vtkXMLPolyDataReader">
+     <StringVectorProperty
+        name="FileName"
+        command="SetFileName"
+        number_of_elements="1" />
+     <StringVectorProperty
+        name="CellArrayStatus"
+        command="SetCellArrayStatus"
+        number_of_elements="2" 
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        element_types="2 0" /> 
+     <StringVectorProperty
+        name="PointArrayStatus"
+        command="SetPointArrayStatus"
+        number_of_elements="2" 
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        element_types="2 0" /> 
+   <!-- End XMLRectilinearGridReader -->
+   </SourceProxy>
+
+   <SourceProxy name="XMLUnstructuredGridReader" 
+                class="vtkXMLUnstructuredGridReader">
+     <StringVectorProperty
+        name="FileName"
+        command="SetFileName"
+        number_of_elements="1" />
+     <StringVectorProperty
+        name="CellArrayStatus"
+        command="SetCellArrayStatus"
+        number_of_elements="2" 
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        element_types="2 0" /> 
+     <StringVectorProperty
+        name="PointArrayStatus"
+        command="SetPointArrayStatus"
+        number_of_elements="2" 
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        element_types="2 0" /> 
+   <!-- End XMLRectilinearGridReader -->
+   </SourceProxy>
+
+   <SourceProxy name="XMLImageDataReader" 
+                class="vtkXMLImageDataReader">
+     <StringVectorProperty
+        name="FileName"
+        command="SetFileName"
+        number_of_elements="1" />
+     <StringVectorProperty
+        name="CellArrayStatus"
+        command="SetCellArrayStatus"
+        number_of_elements="2" 
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        element_types="2 0" /> 
+     <StringVectorProperty
+        name="PointArrayStatus"
+        command="SetPointArrayStatus"
+        number_of_elements="2" 
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        element_types="2 0" /> 
+   <!-- End XMLRectilinearGridReader -->
+   </SourceProxy>
+
+   <SourceProxy name="XMLStructuredGridReader" 
+                class="vtkXMLStructuredGridReader">
+     <StringVectorProperty
+        name="FileName"
+        command="SetFileName"
+        number_of_elements="1" />
+     <StringVectorProperty
+        name="CellArrayStatus"
+        command="SetCellArrayStatus"
+        number_of_elements="2" 
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        element_types="2 0" /> 
+     <StringVectorProperty
+        name="PointArrayStatus"
+        command="SetPointArrayStatus"
+        number_of_elements="2" 
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        element_types="2 0" /> 
+   <!-- End XMLRectilinearGridReader -->
+   </SourceProxy>
+
+   <SourceProxy name="XMLRectilinearGridReader" 
+                class="vtkXMLRectilinearGridReader">
+     <StringVectorProperty
+        name="FileName"
+        command="SetFileName"
+        number_of_elements="1" />
+     <StringVectorProperty
+        name="CellArrayStatus"
+        command="SetCellArrayStatus"
+        number_of_elements="2" 
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        element_types="2 0" /> 
+     <StringVectorProperty
+        name="PointArrayStatus"
+        command="SetPointArrayStatus"
+        number_of_elements="2" 
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        element_types="2 0" /> 
+   <!-- End XMLRectilinearGridReader -->
+   </SourceProxy>
+
+   <SourceProxy name="XMLPPolyDataReader" 
+                class="vtkPXMLPolyDataReader">
+     <StringVectorProperty
+        name="FileName"
+        command="SetFileName"
+        number_of_elements="1" />
+     <StringVectorProperty
+        name="CellArrayStatus"
+        command="SetCellArrayStatus"
+        number_of_elements="2" 
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        element_types="2 0" /> 
+     <StringVectorProperty
+        name="PointArrayStatus"
+        command="SetPointArrayStatus"
+        number_of_elements="2" 
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        element_types="2 0" /> 
+   <!-- End XMLRectilinearGridReader -->
+   </SourceProxy>
+
+   <SourceProxy name="XMLPUnstructuredGridReader" 
+                class="vtkXMLPUnstructuredGridReader">
+     <StringVectorProperty
+        name="FileName"
+        command="SetFileName"
+        number_of_elements="1" />
+     <StringVectorProperty
+        name="CellArrayStatus"
+        command="SetCellArrayStatus"
+        number_of_elements="2" 
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        element_types="2 0" /> 
+     <StringVectorProperty
+        name="PointArrayStatus"
+        command="SetPointArrayStatus"
+        number_of_elements="2" 
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        element_types="2 0" /> 
+   <!-- End XMLRectilinearGridReader -->
+   </SourceProxy>
+
+   <SourceProxy name="XMLPImageDataReader" 
+                class="vtkXMLPImageDataReader">
+     <StringVectorProperty
+        name="FileName"
+        command="SetFileName"
+        number_of_elements="1" />
+     <StringVectorProperty
+        name="CellArrayStatus"
+        command="SetCellArrayStatus"
+        number_of_elements="2" 
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        element_types="2 0" /> 
+     <StringVectorProperty
+        name="PointArrayStatus"
+        command="SetPointArrayStatus"
+        number_of_elements="2" 
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        element_types="2 0" /> 
+   <!-- End XMLRectilinearGridReader -->
+   </SourceProxy>
+
+   <SourceProxy name="XMLPStructuredGridReader" 
+                class="vtkXMLPStructuredGridReader">
+     <StringVectorProperty
+        name="FileName"
+        command="SetFileName"
+        number_of_elements="1" />
+     <StringVectorProperty
+        name="CellArrayStatus"
+        command="SetCellArrayStatus"
+        number_of_elements="2" 
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        element_types="2 0" /> 
+     <StringVectorProperty
+        name="PointArrayStatus"
+        command="SetPointArrayStatus"
+        number_of_elements="2" 
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        element_types="2 0" /> 
+   <!-- End XMLRectilinearGridReader -->
+   </SourceProxy>
+
+   <SourceProxy name="XMLPRectilinearGridReader" 
+                class="vtkXMLPRectilinearGridReader">
+     <StringVectorProperty
+        name="FileName"
+        command="SetFileName"
+        number_of_elements="1" />
+     <StringVectorProperty
+        name="CellArrayStatus"
+        command="SetCellArrayStatus"
+        number_of_elements="2" 
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        element_types="2 0" /> 
+     <StringVectorProperty
+        name="PointArrayStatus"
+        command="SetPointArrayStatus"
+        number_of_elements="2" 
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        element_types="2 0" /> 
+   <!-- End XMLRectilinearGridReader -->
+   </SourceProxy>
+
+   <SourceProxy name="P3DReader" class="vtkPLOT3DReader">
+     <StringVectorProperty
+        name="FileName"
+        command="SetFileName"
+        number_of_elements="1" />
+
+     <StringVectorProperty
+        name="QFileName"
+        command="SetQFileName"
+        number_of_elements="1" />
+
+     <IntVectorProperty 
+        name="BinaryFile" 
+        command="SetBinaryFile" 
+        number_of_elements="1"
+        default_values="1" > 
+       <BooleanDomain/>
+     </IntVectorProperty>
+
+     <IntVectorProperty 
+        name="MultiGrid" 
+        command="SetMultiGrid" 
+        number_of_elements="1"
+        default_values="0" > 
+     </IntVectorProperty>
+
+     <IntVectorProperty 
+        name="HasByteCount" 
+        command="SetHasByteCount" 
+        number_of_elements="1"
+        default_values="0" > 
+     </IntVectorProperty>
+
+     <IntVectorProperty 
+        name="IBlanking" 
+        command="SetIBlanking" 
+        number_of_elements="1"
+        default_values="0" > 
+     </IntVectorProperty>
+
+     <IntVectorProperty 
+        name="TwoDimensionalGeometry" 
+        command="SetTwoDimensionalGeometry" 
+        number_of_elements="1"
+        default_values="0" > 
+     </IntVectorProperty>
+
+     <IntVectorProperty 
+        name="ForceRead" 
+        command="SetForceRead" 
+        number_of_elements="1"
+        default_values="0" > 
+     </IntVectorProperty>
+
+     <IntVectorProperty 
+        name="ByteOrder" 
+        command="SetByteOrder" 
+        number_of_elements="1"
+        default_values="0" >
+       <EnumarationDomain 
+          values="BigEndian:0 LittleEndian:1" />
+     </IntVectorProperty>
+   <!-- End P3DReader -->
+   </SourceProxy>
+
+  </ProxyGroup>
+</ServerManagerConfiguration>

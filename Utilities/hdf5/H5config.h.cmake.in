@@ -1,0 +1,559 @@
+/* src/H5config.h.in.  Generated from configure.in by autoheader.  */
+
+/* Define if your system can handle converting denormalized floating-point
+   values. */
+#cmakedefine CONVERT_DENORMAL_FLOAT ${CONVERT_DENORMAL_FLOAT}
+
+/* Define if `dev_t' is a scalar */
+#cmakedefine DEV_T_IS_SCALAR ${DEV_T_IS_SCALAR}
+
+/* Define if the __attribute__(()) extension is present */
+#cmakedefine HAVE_ATTRIBUTE ${HAVE_ATTRIBUTE}
+
+/* Define to 1 if you have the `BSDgettimeofday' function. */
+#cmakedefine HAVE_BSDGETTIMEOFDAY ${HAVE_BSDGETTIMEOFDAY}
+
+/* Define to 1 if you have the `difftime' function. */
+#cmakedefine HAVE_DIFFTIME ${HAVE_DIFFTIME}
+
+/* Define to 1 if you have the <dlfcn.h> header file. */
+#cmakedefine HAVE_DLFCN_H ${HAVE_DLFCN_H}
+
+/* Define to 1 if you have the <dmalloc.h> header file. */
+#cmakedefine HAVE_DMALLOC_H ${HAVE_DMALLOC_H}
+
+/* Define to 1 if you have the <features.h> header file. */
+#cmakedefine HAVE_FEATURES_H ${HAVE_FEATURES_H}
+
+/* Define if support for deflate filter is enabled */
+#cmakedefine HAVE_FILTER_DEFLATE ${HAVE_FILTER_DEFLATE}
+
+/* Define if support for Fletcher32 checksum is enabled */
+#cmakedefine HAVE_FILTER_FLETCHER32 ${HAVE_FILTER_FLETCHER32}
+
+/* Define if support for shuffle filter is enabled */
+#cmakedefine HAVE_FILTER_SHUFFLE ${HAVE_FILTER_SHUFFLE}
+
+/* Define if support for szip filter is enabled */
+#cmakedefine HAVE_FILTER_SZIP ${HAVE_FILTER_SZIP}
+
+/* Define to 1 if you have the `fork' function. */
+#cmakedefine HAVE_FORK ${HAVE_FORK}
+
+/* Define to 1 if you have the `frexpf' function. */
+#cmakedefine HAVE_FREXPF ${HAVE_FREXPF}
+
+/* Define to 1 if you have the `frexpl' function. */
+#cmakedefine HAVE_FREXPL ${HAVE_FREXPL}
+
+/* Define to 1 if you have the `fseek64' function. */
+#cmakedefine HAVE_FSEEK64 ${HAVE_FSEEK64}
+
+/* Define if the function stack tracing code is to be compiled in */
+#cmakedefine HAVE_FUNCSTACK ${HAVE_FUNCSTACK}
+
+/* Define if the compiler understand the __FUNCTION__ keyword */
+#cmakedefine HAVE_FUNCTION ${HAVE_FUNCTION}
+
+/* Define if the Globus GASS is defined */
+#cmakedefine HAVE_GASS ${HAVE_GASS}
+
+/* Define to 1 if you have the `GetConsoleScreenBufferInfo' function. */
+#cmakedefine HAVE_GETCONSOLESCREENBUFFERINFO ${HAVE_GETCONSOLESCREENBUFFERINFO}
+
+/* Define to 1 if you have the `gethostname' function. */
+#cmakedefine HAVE_GETHOSTNAME ${HAVE_GETHOSTNAME}
+
+/* Define to 1 if you have the `getpwuid' function. */
+#cmakedefine HAVE_GETPWUID ${HAVE_GETPWUID}
+
+/* Define to 1 if you have the `getrusage' function. */
+#cmakedefine HAVE_GETRUSAGE ${HAVE_GETRUSAGE}
+
+/* Define to 1 if you have the `gettextinfo' function. */
+#cmakedefine HAVE_GETTEXTINFO ${HAVE_GETTEXTINFO}
+
+/* Define to 1 if you have the `gettimeofday' function. */
+#cmakedefine HAVE_GETTIMEOFDAY ${HAVE_GETTIMEOFDAY}
+
+/* Define to 1 if you have the `get_fpc_csr' function. */
+#cmakedefine HAVE_GET_FPC_CSR ${HAVE_GET_FPC_CSR}
+
+/* Define to 1 if you have the <globus_common.h> header file. */
+#cmakedefine HAVE_GLOBUS_COMMON_H ${HAVE_GLOBUS_COMMON_H}
+
+/* Define if we have GPFS support */
+#cmakedefine HAVE_GPFS ${HAVE_GPFS}
+
+/* Define to 1 if you have the <gpfs.h> header file. */
+#cmakedefine HAVE_GPFS_H ${HAVE_GPFS_H}
+
+/* Define to 1 if you have the <inttypes.h> header file. */
+#cmakedefine HAVE_INTTYPES_H ${HAVE_INTTYPES_H}
+
+/* Define to 1 if you have the `ioctl' function. */
+#cmakedefine HAVE_IOCTL ${HAVE_IOCTL}
+
+/* Define to 1 if you have the <io.h> header file. */
+#cmakedefine HAVE_IO_H ${HAVE_IO_H}
+
+/* Define if it's safe to use `long long' for hsize_t and hssize_t */
+#cmakedefine HAVE_LARGE_HSIZET ${HAVE_LARGE_HSIZET}
+
+/* Define to 1 if you have the `crypto' library (-lcrypto). */
+#cmakedefine HAVE_LIBCRYPTO ${HAVE_LIBCRYPTO}
+
+/* Define to 1 if you have the `dmalloc' library (-ldmalloc). */
+#cmakedefine HAVE_LIBDMALLOC ${HAVE_LIBDMALLOC}
+
+/* Define to 1 if you have the `elf' library (-lelf). */
+#cmakedefine HAVE_LIBELF ${HAVE_LIBELF}
+
+/* Define to 1 if you have the `globus_common' library (-lglobus_common). */
+#cmakedefine HAVE_LIBGLOBUS_COMMON ${HAVE_LIBGLOBUS_COMMON}
+
+/* Define to 1 if you have the `globus_gaa' library (-lglobus_gaa). */
+#cmakedefine HAVE_LIBGLOBUS_GAA ${HAVE_LIBGLOBUS_GAA}
+
+/* Define to 1 if you have the `globus_gass_cache' library
+   (-lglobus_gass_cache). */
+#cmakedefine HAVE_LIBGLOBUS_GASS_CACHE ${HAVE_LIBGLOBUS_GASS_CACHE}
+
+/* Define to 1 if you have the `globus_gass_file' library
+   (-lglobus_gass_file). */
+#cmakedefine HAVE_LIBGLOBUS_GASS_FILE ${HAVE_LIBGLOBUS_GASS_FILE}
+
+/* Define to 1 if you have the `globus_gass_transfer' library
+   (-lglobus_gass_transfer). */
+#cmakedefine HAVE_LIBGLOBUS_GASS_TRANSFER ${HAVE_LIBGLOBUS_GASS_TRANSFER}
+
+/* Define to 1 if you have the `globus_gass_transfer_assist' library
+   (-lglobus_gass_transfer_assist). */
+#cmakedefine HAVE_LIBGLOBUS_GASS_TRANSFER_ASSIST ${HAVE_LIBGLOBUS_GASS_TRANSFER_ASSIST}
+
+/* Define to 1 if you have the `globus_gss' library (-lglobus_gss). */
+#cmakedefine HAVE_LIBGLOBUS_GSS ${HAVE_LIBGLOBUS_GSS}
+
+/* Define to 1 if you have the `globus_gss_assist' library
+   (-lglobus_gss_assist). */
+#cmakedefine HAVE_LIBGLOBUS_GSS_ASSIST ${HAVE_LIBGLOBUS_GSS_ASSIST}
+
+/* Define to 1 if you have the `globus_io' library (-lglobus_io). */
+#cmakedefine HAVE_LIBGLOBUS_IO ${HAVE_LIBGLOBUS_IO}
+
+/* Define to 1 if you have the `lmpe' library (-llmpe). */
+#cmakedefine HAVE_LIBLMPE ${HAVE_LIBLMPE}
+
+/* Define to 1 if you have the `m' library (-lm). */
+#cmakedefine HAVE_LIBM ${HAVE_LIBM}
+
+/* Define to 1 if you have the `mpe' library (-lmpe). */
+#cmakedefine HAVE_LIBMPE ${HAVE_LIBMPE}
+
+/* Define to 1 if you have the `mpi' library (-lmpi). */
+#cmakedefine HAVE_LIBMPI ${HAVE_LIBMPI}
+
+/* Define to 1 if you have the `mpio' library (-lmpio). */
+#cmakedefine HAVE_LIBMPIO ${HAVE_LIBMPIO}
+
+/* Define to 1 if you have the `nsl' library (-lnsl). */
+#cmakedefine HAVE_LIBNSL ${HAVE_LIBNSL}
+
+/* Define to 1 if you have the `pdb' library (-lpdb). */
+#cmakedefine HAVE_LIBPDB ${HAVE_LIBPDB}
+
+/* Define to 1 if you have the `pthread' library (-lpthread). */
+#cmakedefine HAVE_LIBPTHREAD ${HAVE_LIBPTHREAD}
+
+/* Define to 1 if you have the `silo' library (-lsilo). */
+#cmakedefine HAVE_LIBSILO ${HAVE_LIBSILO}
+
+/* Define to 1 if you have the `socket' library (-lsocket). */
+#cmakedefine HAVE_LIBSOCKET ${HAVE_LIBSOCKET}
+
+/* Define to 1 if you have the `SrbClient' library (-lSrbClient). */
+#cmakedefine HAVE_LIBSRBCLIENT ${HAVE_LIBSRBCLIENT}
+
+/* Define to 1 if you have the `ssl' library (-lssl). */
+#cmakedefine HAVE_LIBSSL ${HAVE_LIBSSL}
+
+/* Define to 1 if you have the `sz' library (-lsz). */
+#cmakedefine HAVE_LIBSZ ${HAVE_LIBSZ}
+
+/* Define to 1 if you have the `z' library (-lz). */
+#cmakedefine HAVE_LIBZ ${HAVE_LIBZ}
+
+/* Define to 1 if you have the `longjmp' function. */
+#cmakedefine HAVE_LONGJMP ${HAVE_LONGJMP}
+
+/* Define to 1 if you have the `lseek64' function. */
+#cmakedefine HAVE_LSEEK64 ${HAVE_LSEEK64}
+
+/* Define to 1 if you have the <memory.h> header file. */
+#cmakedefine HAVE_MEMORY_H ${HAVE_MEMORY_H}
+
+/* Define if we have MPE support */
+#cmakedefine HAVE_MPE ${HAVE_MPE}
+
+/* Define to 1 if you have the <mpe.h> header file. */
+#cmakedefine HAVE_MPE_H ${HAVE_MPE_H}
+
+/* Define to 1 if you have the <netinet/tcp.h> header file. */
+#cmakedefine HAVE_NETINET_TCP_H ${HAVE_NETINET_TCP_H}
+
+/* Define if we have parallel support */
+#cmakedefine HAVE_PARALLEL ${HAVE_PARALLEL}
+
+/* Define to 1 if you have the <pdb.h> header file. */
+#cmakedefine HAVE_PDB_H ${HAVE_PDB_H}
+
+/* Define to 1 if you have the <pthread.h> header file. */
+#cmakedefine HAVE_PTHREAD_H ${HAVE_PTHREAD_H}
+
+/* Define to 1 if you have the <setjmp.h> header file. */
+#cmakedefine HAVE_SETJMP_H ${HAVE_SETJMP_H}
+
+/* Define to 1 if you have the `setsysinfo' function. */
+#cmakedefine HAVE_SETSYSINFO ${HAVE_SETSYSINFO}
+
+/* Define to 1 if you have the `sigaction' function. */
+#cmakedefine HAVE_SIGACTION ${HAVE_SIGACTION}
+
+/* Define to 1 if you have the `signal' function. */
+#cmakedefine HAVE_SIGNAL ${HAVE_SIGNAL}
+
+/* Define to 1 if you have the `snprintf' function. */
+#cmakedefine HAVE_SNPRINTF ${HAVE_SNPRINTF}
+
+/* Define if `socklen_t' is defined */
+#cmakedefine HAVE_SOCKLEN_T ${HAVE_SOCKLEN_T}
+
+/* Define if the SRB is defined */
+#cmakedefine HAVE_SRB ${HAVE_SRB}
+
+/* Define to 1 if you have the <srbClient.h> header file. */
+#cmakedefine HAVE_SRBCLIENT_H ${HAVE_SRBCLIENT_H}
+
+/* Define if `struct stat' has the `st_blocks' field */
+#cmakedefine HAVE_STAT_ST_BLOCKS ${HAVE_STAT_ST_BLOCKS}
+
+/* Define to 1 if you have the <stddef.h> header file. */
+#cmakedefine HAVE_STDDEF_H ${HAVE_STDDEF_H}
+
+/* Define to 1 if you have the <stdint.h> header file. */
+#cmakedefine HAVE_STDINT_H ${HAVE_STDINT_H}
+
+/* Define to 1 if you have the <stdlib.h> header file. */
+#cmakedefine HAVE_STDLIB_H ${HAVE_STDLIB_H}
+
+/* Define to 1 if you have the `strdup' function. */
+#cmakedefine HAVE_STRDUP ${HAVE_STRDUP}
+
+/* Define if the stream virtual file driver should be compiled */
+#cmakedefine HAVE_STREAM ${HAVE_STREAM}
+
+/* Define to 1 if you have the <strings.h> header file. */
+#cmakedefine HAVE_STRINGS_H ${HAVE_STRINGS_H}
+
+/* Define to 1 if you have the <string.h> header file. */
+#cmakedefine HAVE_STRING_H ${HAVE_STRING_H}
+
+/* Define if `struct text_info' is defined */
+#cmakedefine HAVE_STRUCT_TEXT_INFO ${HAVE_STRUCT_TEXT_INFO}
+
+/* Define if `timezone' is a global variable */
+#cmakedefine HAVE_TIMEZONE ${HAVE_TIMEZONE}
+
+/* Define if `struct timezone' is defined */
+#cmakedefine HAVE_STRUCT_TIMEZONE ${HAVE_STRUCT_TIMEZONE}
+
+/* Define to 1 if `tm_zone' is member of `struct tm'. */
+#cmakedefine HAVE_STRUCT_TM_TM_ZONE ${HAVE_STRUCT_TM_TM_ZONE}
+
+/* Define if `struct videoconfig' is defined */
+#cmakedefine HAVE_STRUCT_VIDEOCONFIG ${HAVE_STRUCT_VIDEOCONFIG}
+
+/* Define to 1 if you have the `system' function. */
+#cmakedefine HAVE_SYSTEM ${HAVE_SYSTEM}
+
+/* Define to 1 if you have the <sys/filio.h> header file. */
+#cmakedefine HAVE_SYS_FILIO_H ${HAVE_SYS_FILIO_H}
+
+/* Define to 1 if you have the <sys/fpu.h> header file. */
+#cmakedefine HAVE_SYS_FPU_H ${HAVE_SYS_FPU_H}
+
+/* Define to 1 if you have the <sys/ioctl.h> header file. */
+#cmakedefine HAVE_SYS_IOCTL_H ${HAVE_SYS_IOCTL_H}
+
+/* Define to 1 if you have the <sys/proc.h> header file. */
+#cmakedefine HAVE_SYS_PROC_H ${HAVE_SYS_PROC_H}
+
+/* Define to 1 if you have the <sys/resource.h> header file. */
+#cmakedefine HAVE_SYS_RESOURCE_H ${HAVE_SYS_RESOURCE_H}
+
+/* Define to 1 if you have the <sys/socket.h> header file. */
+#cmakedefine HAVE_SYS_SOCKET_H ${HAVE_SYS_SOCKET_H}
+
+/* Define to 1 if you have the <sys/stat.h> header file. */
+#cmakedefine HAVE_SYS_STAT_H ${HAVE_SYS_STAT_H}
+
+/* Define to 1 if you have the <sys/sysinfo.h> header file. */
+#cmakedefine HAVE_SYS_SYSINFO_H ${HAVE_SYS_SYSINFO_H}
+
+/* Define to 1 if you have the <sys/timeb.h> header file. */
+#cmakedefine HAVE_SYS_TIMEB_H ${HAVE_SYS_TIMEB_H}
+
+/* Define to 1 if you have the <sys/time.h> header file. */
+#cmakedefine HAVE_SYS_TIME_H ${HAVE_SYS_TIME_H}
+
+/* Define to 1 if you have the <sys/types.h> header file. */
+#cmakedefine HAVE_SYS_TYPES_H ${HAVE_SYS_TYPES_H}
+
+/* Define to 1 if you have the <szlib.h> header file. */
+#cmakedefine HAVE_SZLIB_H ${HAVE_SZLIB_H}
+
+/* Define if we have thread safe support */
+#cmakedefine HAVE_THREADSAFE ${HAVE_THREADSAFE}
+
+/* Define if the ioctl TIOCGETD is defined */
+#cmakedefine HAVE_TIOCGETD ${HAVE_TIOCGETD}
+
+/* Define if the ioctl TIOGWINSZ is defined */
+#cmakedefine HAVE_TIOCGWINSZ ${HAVE_TIOCGWINSZ}
+
+/* Define if `tm_gmtoff' is a member of `struct tm' */
+#cmakedefine HAVE_TM_GMTOFF ${HAVE_TM_GMTOFF}
+
+/* Define to 1 if your `struct tm' has `tm_zone'. Deprecated, use
+   `HAVE_STRUCT_TM_TM_ZONE' instead. */
+#cmakedefine HAVE_TM_ZONE ${HAVE_TM_ZONE}
+
+/* Define to 1 if you don't have `tm_zone' but do have the external array
+   `tzname'. */
+#cmakedefine HAVE_TZNAME ${HAVE_TZNAME}
+
+/* Define to 1 if you have the <unistd.h> header file. */
+#cmakedefine HAVE_UNISTD_H ${HAVE_UNISTD_H}
+
+/* Define to 1 if you have the `vsnprintf' function. */
+#cmakedefine HAVE_VSNPRINTF ${HAVE_VSNPRINTF}
+
+/* Define to 1 if you have the `waitpid' function. */
+#cmakedefine HAVE_WAITPID ${HAVE_WAITPID}
+
+/* Define to 1 if you have the <winsock.h> header file. */
+#cmakedefine HAVE_WINSOCK_H ${HAVE_WINSOCK_H}
+
+/* Define to 1 if you have the <zlib.h> header file. */
+#cmakedefine HAVE_ZLIB_H ${HAVE_ZLIB_H}
+
+/* Define to 1 if you have the `_getvideoconfig' function. */
+#cmakedefine HAVE__GETVIDEOCONFIG ${HAVE__GETVIDEOCONFIG}
+
+/* Define to 1 if you have the `_scrsize' function. */
+#cmakedefine HAVE__SCRSIZE ${HAVE__SCRSIZE}
+
+/* Define if `__tm_gmtoff' is a member of `struct tm' */
+#cmakedefine HAVE___TM_GMTOFF ${HAVE___TM_GMTOFF}
+
+/* Define if your system's `MPI_File_set_size' function works for files over
+   2GB. */
+#cmakedefine MPI_FILE_SET_SIZE_BIG ${MPI_FILE_SET_SIZE_BIG}
+
+/* Define if shared writing must be disabled (CodeWarrior only) */
+#cmakedefine NO_SHARED_WRITING ${NO_SHARED_WRITING}
+
+/* Define to the address where bug reports for this package should be sent. */
+#cmakedefine PACKAGE_BUGREPORT ${PACKAGE_BUGREPORT}
+
+/* Define to the full name of this package. */
+#cmakedefine PACKAGE_NAME ${PACKAGE_NAME}
+
+/* Define to the full name and version of this package. */
+#cmakedefine PACKAGE_STRING ${PACKAGE_STRING}
+
+/* Define to the one symbol short name of this package. */
+#cmakedefine PACKAGE_TARNAME ${PACKAGE_TARNAME}
+
+/* Define to the version of this package. */
+#cmakedefine PACKAGE_VERSION ${PACKAGE_VERSION}
+
+/* Width for printf() for type `long long' or `__int64', use `ll' */
+#cmakedefine PRINTF_LL_WIDTH ${PRINTF_LL_WIDTH}
+
+/* The size of a `char', as computed by sizeof. */
+#cmakedefine SIZEOF_CHAR ${SIZEOF_CHAR}
+
+/* The size of a `double', as computed by sizeof. */
+#cmakedefine SIZEOF_DOUBLE ${SIZEOF_DOUBLE}
+
+/* The size of a `float', as computed by sizeof. */
+#cmakedefine SIZEOF_FLOAT ${SIZEOF_FLOAT}
+
+/* The size of a `int', as computed by sizeof. */
+#cmakedefine SIZEOF_INT ${SIZEOF_INT}
+
+/* The size of a `int16_t', as computed by sizeof. */
+#cmakedefine SIZEOF_INT16_T ${SIZEOF_INT16_T}
+
+/* The size of a `int32_t', as computed by sizeof. */
+#cmakedefine SIZEOF_INT32_T ${SIZEOF_INT32_T}
+
+/* The size of a `int64_t', as computed by sizeof. */
+#cmakedefine SIZEOF_INT64_T ${SIZEOF_INT64_T}
+
+/* The size of a `int8_t', as computed by sizeof. */
+#cmakedefine SIZEOF_INT8_T ${SIZEOF_INT8_T}
+
+/* The size of a `int_fast16_t', as computed by sizeof. */
+#cmakedefine SIZEOF_INT_FAST16_T ${SIZEOF_INT_FAST16_T}
+
+/* The size of a `int_fast32_t', as computed by sizeof. */
+#cmakedefine SIZEOF_INT_FAST32_T ${SIZEOF_INT_FAST32_T}
+
+/* The size of a `int_fast64_t', as computed by sizeof. */
+#cmakedefine SIZEOF_INT_FAST64_T ${SIZEOF_INT_FAST64_T}
+
+/* The size of a `int_fast8_t', as computed by sizeof. */
+#cmakedefine SIZEOF_INT_FAST8_T ${SIZEOF_INT_FAST8_T}
+
+/* The size of a `int_least16_t', as computed by sizeof. */
+#cmakedefine SIZEOF_INT_LEAST16_T ${SIZEOF_INT_LEAST16_T}
+
+/* The size of a `int_least32_t', as computed by sizeof. */
+#cmakedefine SIZEOF_INT_LEAST32_T ${SIZEOF_INT_LEAST32_T}
+
+/* The size of a `int_least64_t', as computed by sizeof. */
+#cmakedefine SIZEOF_INT_LEAST64_T ${SIZEOF_INT_LEAST64_T}
+
+/* The size of a `int_least8_t', as computed by sizeof. */
+#cmakedefine SIZEOF_INT_LEAST8_T ${SIZEOF_INT_LEAST8_T}
+
+/* The size of a `long', as computed by sizeof. */
+#cmakedefine SIZEOF_LONG ${SIZEOF_LONG}
+
+/* The size of a `long double', as computed by sizeof. */
+#cmakedefine SIZEOF_LONG_DOUBLE ${SIZEOF_LONG_DOUBLE}
+
+/* The size of a `long long', as computed by sizeof. */
+#cmakedefine SIZEOF_LONG_LONG ${SIZEOF_LONG_LONG}
+
+/* The size of a `off_t', as computed by sizeof. */
+#cmakedefine SIZEOF_OFF_T ${SIZEOF_OFF_T}
+
+/* The size of a `short', as computed by sizeof. */
+#cmakedefine SIZEOF_SHORT ${SIZEOF_SHORT}
+
+/* The size of a `size_t', as computed by sizeof. */
+#cmakedefine SIZEOF_SIZE_T ${SIZEOF_SIZE_T}
+
+/* The size of a `ssize_t', as computed by sizeof. */
+#cmakedefine SIZEOF_SSIZE_T ${SIZEOF_SSIZE_T}
+
+/* The size of a `uint16_t', as computed by sizeof. */
+#cmakedefine SIZEOF_UINT16_T ${SIZEOF_UINT16_T}
+
+/* The size of a `uint32_t', as computed by sizeof. */
+#cmakedefine SIZEOF_UINT32_T ${SIZEOF_UINT32_T}
+
+/* The size of a `uint64_t', as computed by sizeof. */
+#cmakedefine SIZEOF_UINT64_T ${SIZEOF_UINT64_T}
+
+/* The size of a `uint8_t', as computed by sizeof. */
+#cmakedefine SIZEOF_UINT8_T ${SIZEOF_UINT8_T}
+
+/* The size of a `uint_fast16_t', as computed by sizeof. */
+#cmakedefine SIZEOF_UINT_FAST16_T ${SIZEOF_UINT_FAST16_T}
+
+/* The size of a `uint_fast32_t', as computed by sizeof. */
+#cmakedefine SIZEOF_UINT_FAST32_T ${SIZEOF_UINT_FAST32_T}
+
+/* The size of a `uint_fast64_t', as computed by sizeof. */
+#cmakedefine SIZEOF_UINT_FAST64_T ${SIZEOF_UINT_FAST64_T}
+
+/* The size of a `uint_fast8_t', as computed by sizeof. */
+#cmakedefine SIZEOF_UINT_FAST8_T ${SIZEOF_UINT_FAST8_T}
+
+/* The size of a `uint_least16_t', as computed by sizeof. */
+#cmakedefine SIZEOF_UINT_LEAST16_T ${SIZEOF_UINT_LEAST16_T}
+
+/* The size of a `uint_least32_t', as computed by sizeof. */
+#cmakedefine SIZEOF_UINT_LEAST32_T ${SIZEOF_UINT_LEAST32_T}
+
+/* The size of a `uint_least64_t', as computed by sizeof. */
+#cmakedefine SIZEOF_UINT_LEAST64_T ${SIZEOF_UINT_LEAST64_T}
+
+/* The size of a `uint_least8_t', as computed by sizeof. */
+#cmakedefine SIZEOF_UINT_LEAST8_T ${SIZEOF_UINT_LEAST8_T}
+
+/* The size of a `__int64', as computed by sizeof. */
+#cmakedefine SIZEOF___INT64 ${SIZEOF___INT64}
+
+/* Define to 1 if you have the ANSI C header files. */
+#cmakedefine STDC_HEADERS ${STDC_HEADERS}
+
+/* Define if your system supports pthread_attr_setscope(&attribute,
+   PTHREAD_SCOPE_SYSTEM) call. */
+#cmakedefine SYSTEM_SCOPE_THREADS ${SYSTEM_SCOPE_THREADS}
+
+/* Define to 1 if you can safely include both <sys/time.h> and <time.h>. */
+#cmakedefine TIME_WITH_SYS_TIME ${TIME_WITH_SYS_TIME}
+
+/* Define to 1 if your <sys/time.h> declares `struct tm'. */
+#cmakedefine TM_IN_SYS_TIME ${TM_IN_SYS_TIME}
+
+/* Define if the HDF5 v1.4 compatibility functions are to be compiled in */
+#cmakedefine WANT_H5_V1_4_COMPAT ${WANT_H5_V1_4_COMPAT}
+
+/* Define to 1 if your processor stores words with the most significant byte
+   first (like Motorola and SPARC, unlike Intel and VAX). */
+#cmakedefine WORDS_BIGENDIAN ${WORDS_BIGENDIAN}
+
+/* Define to empty if `const' does not conform to ANSI C. */
+#cmakedefine const ${const}
+
+/* Define as `__inline' if that's what the C compiler calls it, or to nothing
+   if it is not supported. */
+#cmakedefine inline ${inline}
+
+/* Define to `long' if <sys/types.h> does not define. */
+#cmakedefine off_t ${off_t}
+
+/* Define to `unsigned long' if <sys/types.h> does not define. */
+#cmakedefine size_t ${size_t}
+
+/* Define to `long' if <sys/types.h> does not define. */
+#cmakedefine ssize_t ${ssize_t}
+
+#if defined(__cplusplus) && defined(inline)
+#undef inline
+#endif
+
+#if defined ( _MSC_VER )
+#pragma warning ( disable : 4057 )
+#pragma warning ( disable : 4100 )
+#pragma warning ( disable : 4115 )
+#pragma warning ( disable : 4127 )
+#pragma warning ( disable : 4189 )
+#pragma warning ( disable : 4244 )
+#pragma warning ( disable : 4251 )
+#pragma warning ( disable : 4273 )
+#pragma warning ( disable : 4305 )
+#pragma warning ( disable : 4309 )
+#pragma warning ( disable : 4505 )
+#pragma warning ( disable : 4701 )
+#pragma warning ( disable : 4706 )
+#pragma warning ( disable : 4786 )
+#endif
+
+#cmakedefine BUILD_SHARED_LIBS
+#if defined(BUILD_SHARED_LIBS) || defined(H5_BUILD_SHARED_LIBS)
+#  if defined (vtkhdf5_EXPORTS)
+#    define _HDF5DLL_
+#  else
+#    define _HDF5USEDLL_
+#  endif
+#endif
+
+
+

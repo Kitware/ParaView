@@ -1,0 +1,14 @@
+INCLUDE_DIRECTORIES(
+  ${VTK_SOURCE_DIR}
+  ${VTK_BINARY_DIR}
+  ${VTK_SOURCE_DIR}/Common
+  ${VTK_BINARY_DIR}/Common
+  ${VTK_SOURCE_DIR}/IO
+  ${VTK_BINARY_DIR}/IO
+  ${VTK_SOURCE_DIR}/Filtering
+  ${VTK_BINARY_DIR}/Filtering
+  ${VTK_SOURCE_DIR}/Imaging
+  ${VTK_BINARY_DIR}/Imaging
+  )
+
+SUBDIRS(KWCommon)

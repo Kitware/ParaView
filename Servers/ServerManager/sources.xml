@@ -1,0 +1,589 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="sources">
+   <SourceProxy name="GlyphSource2D" class="vtkGlyphSource2D">
+     <IntVectorProperty 
+        name="GlyphType" 
+        command="SetGlyphType" 
+        number_of_elements="1"
+        default_values="9" >
+       <EnumarationDomain 
+          values="Vertex:1 Dash:2 Cross:3 
+                  ThickCross:4 Triangle:5 Square:6
+                  Circle:7 Diamond:8 Arrow:9
+                  ThickArrow:10" />
+     </IntVectorProperty>
+
+     <IntVectorProperty 
+        name="Filled" 
+        command="SetFilled" 
+        number_of_elements="1"
+        default_values="0" > 
+       <BooleanDomain/>
+     </IntVectorProperty>
+   <!-- End 2DGlyph -->
+   </SourceProxy>
+
+   <SourceProxy name="VectorText" class="vtkVectorText">
+<!-- TODO is the {} the best way? -->
+     <StringVectorProperty
+        name="Text"
+        command="SetText"
+        number_of_elements="1"
+        default_values="{3D Text}" />
+   <!-- End 3DText -->
+   </SourceProxy>
+
+   <SourceProxy name="ArrowSource" class="vtkPVArrowSource">
+      <IntVectorProperty
+         name="TipResolution"
+         command="SetTipResolution"
+         number_of_elements="1"
+         default_values="6" >
+        <IntRangeDomain min="1" max="128" />
+      </IntVectorProperty>
+
+<!-- TODO Why the arbitrary ranges? Check the arrow sources-->
+      <DoubleVectorProperty
+         name="TipRadius"
+         command="SetTipRadius"
+         number_of_elements="1"
+         default_values="0.1" >
+        <DoubleRangeDomain min="0" max="10" />
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty
+         name="TipLength"
+         command="SetTipLength"
+         number_of_elements="1"
+         default_values="0.35" >
+        <DoubleRangeDomain min="0" max="1" />
+      </DoubleVectorProperty>
+
+      <IntVectorProperty
+         name="ShaftResolution"
+         command="SetShaftResolution"
+         number_of_elements="1"
+         default_values="6" >
+        <IntRangeDomain min="0" max="128" />
+      </IntVectorProperty>
+
+      <DoubleVectorProperty
+         name="ShaftRadius"
+         command="SetShaftRadius"
+         number_of_elements="1"
+         default_values="0.03" >
+        <DoubleRangeDomain min="0" max="5" />
+      </DoubleVectorProperty>
+   <!-- End Arrow -->
+   </SourceProxy>
+
+   <SourceProxy name="Axes" class="vtkAxes">
+      <DoubleVectorProperty
+         name="ScaleFactor"
+         command="SetScaleFactor"
+         number_of_elements="1"
+         default_values="1.0" >
+<!-- TODO Is Inf the best way? -->
+        <DoubleRangeDomain min="0" />
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty
+         name="Origin"
+         command="SetOrigin"
+         number_of_elements="3"
+         default_values="0.0 0.0 0.0" >
+      </DoubleVectorProperty>
+
+     <IntVectorProperty 
+        name="Symmetric" 
+        command="SetSymmetric" 
+        number_of_elements="1"
+        default_values="0" > 
+       <BooleanDomain/>
+     </IntVectorProperty>
+   <!-- End Axes -->
+   </SourceProxy>
+
+   <SourceProxy name="CubeSource" class="vtkCubeSource">
+      <DoubleVectorProperty
+         name="XLength"
+         command="SetXLength"
+         number_of_elements="1"
+         default_values="1.0" >
+        <DoubleRangeDomain min="0" />
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty
+         name="YLength"
+         command="SetYLength"
+         number_of_elements="1"
+         default_values="1.0" >
+        <DoubleRangeDomain min="0" />
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty
+         name="ZLength"
+         command="SetZLength"
+         number_of_elements="1"
+         default_values="1.0" >
+        <DoubleRangeDomain min="0" />
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty
+         name="Center"
+         command="SetCenter"
+         number_of_elements="3"
+         default_values="0.0 0.0 0.0" >
+      </DoubleVectorProperty>
+   <!-- End Box -->
+   </SourceProxy>
+
+   <SourceProxy name="ConeSource" class="vtkConeSource">
+      <IntVectorProperty
+         name="Resolution"
+         command="SetResolution"
+         number_of_elements="1"
+         default_values="6" >
+        <IntRangeDomain min="0" max="512" />
+      </IntVectorProperty>
+
+      <DoubleVectorProperty
+         name="Radius"
+         command="SetRadius"
+         number_of_elements="1"
+         default_values="0.5" >
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty
+         name="Height"
+         command="SetHeight"
+         number_of_elements="1"
+         default_values="1.0" >
+        <DoubleRangeDomain min="0" />
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty
+         name="Center"
+         command="SetCenter"
+         number_of_elements="3"
+         default_values="0.0 0.0 0.0" >
+      </DoubleVectorProperty>
+
+     <IntVectorProperty 
+        name="Capping" 
+        command="SetCapping" 
+        number_of_elements="1"
+        default_values="0" > 
+       <BooleanDomain/>
+     </IntVectorProperty>
+   <!-- End Cone -->
+   </SourceProxy>
+
+   <SourceProxy name="CylinderSource" class="vtkCylinderSource">
+      <IntVectorProperty
+         name="Resolution"
+         command="SetResolution"
+         number_of_elements="1"
+         default_values="6" >
+        <IntRangeDomain min="2" max="512" />
+      </IntVectorProperty>
+
+      <DoubleVectorProperty
+         name="Height"
+         command="SetHeight"
+         number_of_elements="1"
+         default_values="1.0" >
+        <DoubleRangeDomain min="0" />
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty
+         name="Radius"
+         command="SetRadius"
+         number_of_elements="1"
+         default_values="0.5" >
+        <DoubleRangeDomain min="0" />
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty
+         name="Center"
+         command="SetCenter"
+         number_of_elements="3"
+         default_values="0.0 0.0 0.0" >
+      </DoubleVectorProperty>
+
+     <IntVectorProperty 
+        name="Capping" 
+        command="SetCapping" 
+        number_of_elements="1"
+        default_values="0" > 
+       <BooleanDomain/>
+     </IntVectorProperty>
+   <!-- End Cylinder -->
+   </SourceProxy>
+
+   <SourceProxy name="LineSource" class="vtkLineSource">
+      <DoubleVectorProperty
+         name="Point1"
+         command="SetPoint1"
+         number_of_elements="3"
+         default_values="0.0 0.0 0.0" >
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty
+         name="Point2"
+         command="SetPoint2"
+         number_of_elements="3"
+         default_values="0.0 0.0 0.0" >
+      </DoubleVectorProperty>
+
+      <IntVectorProperty
+         name="Resolution"
+         command="SetResolution"
+         number_of_elements="1"
+         default_values="6" >
+        <IntRangeDomain min="1" />
+      </IntVectorProperty>
+   <!-- End Line -->
+   </SourceProxy>
+
+   <SourceProxy name="ImageMandelbrotSource" class="vtkImageMandelbrotSource">
+      <IntVectorProperty
+         name="WholeExtent"
+         command="SetWholeExtent"
+         number_of_elements="6"
+         default_values="0 250 0 250 0 0" >
+      </IntVectorProperty>
+
+      <IntVectorProperty
+         name="ProjectionAxes"
+         command="SetProjectionAxes"
+         number_of_elements="3"
+         default_values="0 1 2" >
+      </IntVectorProperty>
+
+      <DoubleVectorProperty
+         name="OriginCX"
+         command="SetOriginCX"
+         number_of_elements="4"
+         default_values="-1.75 -1.25 0.0 0.0" >
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty
+         name="SizeCX"
+         command="SetSizeCX"
+         number_of_elements="4"
+         default_values="2.5 2.5 2.0 1.5" >
+      </DoubleVectorProperty>
+
+      <IntVectorProperty
+         name="MaximumNumberOfIterations"
+         command="SetMaximumNumberOfIterations"
+         number_of_elements="1"
+         default_values="100" >
+        <IntRangeDomain min="1" max="5000" />
+      </IntVectorProperty>
+   <!-- End Mandelbrot -->
+   </SourceProxy>
+
+   <SourceProxy name="MazeSource" class="vtkMazeSource">
+      <IntVectorProperty
+         name="XSize"
+         command="SetXSize"
+         number_of_elements="1"
+         default_values="20" >
+        <IntRangeDomain min="1" />
+      </IntVectorProperty>
+
+      <IntVectorProperty
+         name="YSize"
+         command="SetYSize"
+         number_of_elements="1"
+         default_values="20" >
+        <IntRangeDomain min="1" />
+      </IntVectorProperty>
+
+      <IntVectorProperty
+         name="RunFactor"
+         command="SetRunFactor"
+         number_of_elements="1"
+         default_values="20" >
+        <IntRangeDomain min="1" />
+      </IntVectorProperty>
+
+      <IntVectorProperty
+         name="MagnetFactor"
+         command="SetMagnetFactor"
+         number_of_elements="1"
+         default_values="4" >
+        <IntRangeDomain min="1" />
+      </IntVectorProperty>
+
+      <IntVectorProperty
+         name="RandomSeed"
+         command="SetRandomSeed"
+         number_of_elements="1"
+         default_values="111" >
+        <IntRangeDomain min="1" />
+      </IntVectorProperty>
+
+     <IntVectorProperty 
+        name="ShowSolution" 
+        command="SetShowSolution" 
+        number_of_elements="1"
+        default_values="0" > 
+       <BooleanDomain/>
+     </IntVectorProperty>
+   <!-- End Maze -->
+   </SourceProxy>
+
+   <SourceProxy name="PlaneSource" class="vtkPlaneSource">
+      <DoubleVectorProperty
+         name="Origin"
+         command="SetOrigin"
+         number_of_elements="3"
+         default_values="-0.5 -0.5 0.0" >
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty
+         name="Point1"
+         command="SetPoint1"
+         number_of_elements="3"
+         default_values="0.5 -0.5 0.0" >
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty
+         name="Point2"
+         command="SetPoint2"
+         number_of_elements="3"
+         default_values="-0.5 0.5 0.0" >
+      </DoubleVectorProperty>
+
+      <IntVectorProperty
+         name="XResolution"
+         command="SetXResolution"
+         number_of_elements="1"
+         default_values="1" >
+        <IntRangeDomain min="1" />
+      </IntVectorProperty>
+
+      <IntVectorProperty
+         name="YResolution"
+         command="SetYResolution"
+         number_of_elements="1"
+         default_values="1" >
+        <IntRangeDomain min="1" />
+      </IntVectorProperty>
+   <!-- End Plane -->
+   </SourceProxy>
+
+   <SourceProxy name="SphereSource" class="vtkSphereSource">
+      <DoubleVectorProperty
+         name="Center"
+         command="SetCenter"
+         number_of_elements="3"
+         default_values="0.0 0.0 0.0" >
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty
+         name="Radius"
+         command="SetRadius"
+         number_of_elements="1"
+         default_values="0.5" >
+      </DoubleVectorProperty>
+
+      <IntVectorProperty
+         name="ThetaResolution"
+         command="SetThetaResolution"
+         number_of_elements="1"
+         default_values="8" >
+        <IntRangeDomain min="3" max="1024" />
+      </IntVectorProperty>
+
+      <DoubleVectorProperty
+         name="StartTheta"
+         command="SetStartTheta"
+         number_of_elements="1"
+         default_values="0" >
+        <DoubleRangeDomain min="0" max="360" />
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty
+         name="EndTheta"
+         command="SetEndTheta"
+         number_of_elements="1"
+         default_values="0" >
+        <DoubleRangeDomain min="0" max="360" />
+      </DoubleVectorProperty>
+
+      <IntVectorProperty
+         name="PhiResolution"
+         command="SetPhiResolution"
+         number_of_elements="1"
+         default_values="8" >
+        <IntRangeDomain min="3" max="1024" />
+      </IntVectorProperty>
+
+      <DoubleVectorProperty
+         name="StartPhi"
+         command="SetStartPhi"
+         number_of_elements="1"
+         default_values="0" >
+        <DoubleRangeDomain min="0" max="360" />
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty
+         name="EndPhi"
+         command="SetEndPhi"
+         number_of_elements="1"
+         default_values="0" >
+        <DoubleRangeDomain min="0" max="360" />
+      </DoubleVectorProperty>
+   <!-- End Sphere -->
+   </SourceProxy>
+
+   <SourceProxy name="SuperquadricSource" class="vtkSuperquadricSource">
+      <DoubleVectorProperty
+         name="Center"
+         command="SetCenter"
+         number_of_elements="3"
+         default_values="0.0 0.0 0.0" >
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty
+         name="Scale"
+         command="SetScale"
+         number_of_elements="3"
+         default_values="1.0 1.0 1.0" >
+      </DoubleVectorProperty>
+
+      <IntVectorProperty
+         name="ThetaResolution"
+         command="SetThetaResolution"
+         number_of_elements="1"
+         default_values="16" >
+        <IntRangeDomain min="8" max="1024" />
+      </IntVectorProperty>
+
+      <IntVectorProperty
+         name="PhiResolution"
+         command="SetPhiResolution"
+         number_of_elements="1"
+         default_values="16" >
+        <IntRangeDomain min="4" max="1024" />
+      </IntVectorProperty>
+
+      <DoubleVectorProperty
+         name="Thickness"
+         command="SetThickness"
+         number_of_elements="1"
+         default_values="0.3333" >
+        <DoubleRangeDomain min="0.0001" max="1" />
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty
+         name="ThetaRoundness"
+         command="SetThetaRoundness"
+         number_of_elements="1"
+         default_values="1" >
+        <DoubleRangeDomain min="0" max="1" />
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty
+         name="PhiRoundness"
+         command="SetPhiRoundness"
+         number_of_elements="1"
+         default_values="1" >
+        <DoubleRangeDomain min="0" max="1" />
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty
+         name="Size"
+         command="SetSize"
+         number_of_elements="1"
+         default_values="0.5" >
+      </DoubleVectorProperty>
+
+     <IntVectorProperty 
+        name="Toroidal" 
+        command="SetToroidal" 
+        number_of_elements="1"
+        default_values="0" > 
+       <BooleanDomain/>
+     </IntVectorProperty>
+   <!-- End SuperQuadric -->
+   </SourceProxy>
+
+   <SourceProxy name="RTAnalyticSource" class="vtkRTAnalyticSource">
+      <IntVectorProperty
+         name="WholeExtent"
+         command="SetWholeExtent"
+         number_of_elements="6"
+         default_values="-10 10 -10 10 -10 10" >
+      </IntVectorProperty>
+
+      <DoubleVectorProperty
+         name="Center"
+         command="SetCenter"
+         number_of_elements="3"
+         default_values="0.0 0.0 0.0" >
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty
+         name="Maximum"
+         command="SetMaximum"
+         number_of_elements="1"
+         default_values="255.0" >
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty
+         name="XFreq"
+         command="SetXFreq"
+         number_of_elements="1"
+         default_values="60.0" >
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty
+         name="YFreq"
+         command="SetYFreq"
+         number_of_elements="1"
+         default_values="30.0" >
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty
+         name="ZFreq"
+         command="SetZFreq"
+         number_of_elements="1"
+         default_values="40.0" >
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty
+         name="XMag"
+         command="SetXMag"
+         number_of_elements="1"
+         default_values="10.0" >
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty
+         name="YMag"
+         command="SetYMag"
+         number_of_elements="1"
+         default_values="18.0" >
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty
+         name="ZMag"
+         command="SetZMag"
+         number_of_elements="1"
+         default_values="5.0" >
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty
+         name="StandardDeviation"
+         command="SetStandardDeviation"
+         number_of_elements="1"
+         default_values="0.5" >
+      </DoubleVectorProperty>
+   <!-- End Wavelet -->
+   </SourceProxy>
+  </ProxyGroup>
+</ServerManagerConfiguration>
