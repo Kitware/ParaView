@@ -234,6 +234,14 @@ SOURCE=.\vtkKWMenu.cxx
 # End Source File
 # Begin Source File
 
+SOURCE=.\vtkKWXtEmbeddedWidget.cxx
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkKWXtEmbeddedWidgetTcl.cxx
+# End Source File
+# Begin Source File
+
 SOURCE=.\vtkKWMenuTcl.cxx
 # End Source File
 # Begin Source File
@@ -603,10 +611,6 @@ InputName=vtkKWCompositeCollection
 
 SOURCE=.\vtkKWCornerAnnotation.h
 
-!IF  "$(CFG)" == "Widgets - Win32 Release"
-
-!ELSEIF  "$(CFG)" == "Widgets - Win32 Debug"
-
 # Begin Custom Build
 InputPath=.\vtkKWCornerAnnotation.h
 InputName=vtkKWCornerAnnotation
@@ -615,8 +619,6 @@ InputName=vtkKWCornerAnnotation
 	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx
 
 # End Custom Build
-
-!ENDIF 
 
 # End Source File
 # Begin Source File
@@ -855,10 +857,6 @@ InputName=vtkKWListBox
 
 SOURCE=.\vtkKWMenu.h
 
-!IF  "$(CFG)" == "Widgets - Win32 Release"
-
-!ELSEIF  "$(CFG)" == "Widgets - Win32 Debug"
-
 # Begin Custom Build
 InputPath=.\vtkKWMenu.h
 InputName=vtkKWMenu
@@ -868,16 +866,27 @@ InputName=vtkKWMenu
 
 # End Custom Build
 
-!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkKWXtEmbeddedWidget.h
+
+# Begin Custom Build
+InputPath=.\vtkKWXtEmbeddedWidget.h
+InputName=vtkKWXtEmbeddedWidget
+
+"$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx
+
+# End Custom Build
+
 
 # End Source File
 # Begin Source File
 
 SOURCE=.\vtkKWMessageDialog.h
 
-!IF  "$(CFG)" == "Widgets - Win32 Release"
-
-!ELSEIF  "$(CFG)" == "Widgets - Win32 Debug"
 
 # Begin Custom Build
 InputPath=.\vtkKWMessageDialog.h
@@ -887,8 +896,6 @@ InputName=vtkKWMessageDialog
 	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx
 
 # End Custom Build
-
-!ENDIF 
 
 # End Source File
 # Begin Source File
@@ -1156,10 +1163,6 @@ InputName=vtkKWSerializer
 
 SOURCE=.\vtkKWText.h
 
-!IF  "$(CFG)" == "Widgets - Win32 Release"
-
-!ELSEIF  "$(CFG)" == "Widgets - Win32 Debug"
-
 # Begin Custom Build
 InputPath=.\vtkKWText.h
 InputName=vtkKWText
@@ -1169,16 +1172,10 @@ InputName=vtkKWText
 
 # End Custom Build
 
-!ENDIF 
-
 # End Source File
 # Begin Source File
 
 SOURCE=.\vtkKWToolbar.h
-
-!IF  "$(CFG)" == "Widgets - Win32 Release"
-
-!ELSEIF  "$(CFG)" == "Widgets - Win32 Debug"
 
 # Begin Custom Build
 InputPath=.\vtkKWToolbar.h
@@ -1188,8 +1185,6 @@ InputName=vtkKWToolbar
 	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx
 
 # End Custom Build
-
-!ENDIF 
 
 # End Source File
 # Begin Source File
