@@ -65,12 +65,25 @@ public:
   void SetState(int );
   virtual int GetState();
 
+  // Description:
+  // Tell the widget whether it should use an indicator (check box)
+  void SetIndicator(int ind);
+
+  // Description:
+  // Set the text.
+  void SetText(const char* txt);
+
 protected:
-  vtkKWCheckButton() {};
+
+  vtkSetStringMacro(MyText);
+
+  vtkKWCheckButton();
   ~vtkKWCheckButton() {};
   vtkKWCheckButton(const vtkKWCheckButton&) {};
   void operator=(const vtkKWCheckButton&) {};
-  
+
+  int IndicatorOn;
+  char* MyText;
 };
 
 

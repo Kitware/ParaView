@@ -59,6 +59,43 @@ vtkKWCheckButton* vtkKWCheckButton::New()
 }
 
 
+vtkKWCheckButton::vtkKWCheckButton() 
+{
+  this->IndicatorOn = 1;
+  this->MyText = 0;
+}
+
+void vtkKWCheckButton::SetIndicator(int ind)
+{
+  if (ind != this->IndicatorOn)
+    {
+    this->IndicatorOn = ind;
+    if (this->Application)
+      {
+      if (ind)
+	{
+	this->Script("%s configure -indicatoron 1", this->GetWidgetName());
+	}
+      else
+	{
+	this->Script("%s configure -indicatoron 0", this->GetWidgetName());
+	}
+      }
+    }
+}
+
+void vtkKWCheckButton::SetText(const char* txt)
+{
+  this->SetMyText(txt);
+  
+  if (this->Application)
+    {
+    if (this->MyText)
+      {
+      this->Script("%s configure -text %s", this->GetWidgetName(), this->MyText);
+      }
+    }
+}
 
 
 int vtkKWCheckButton::GetState()
@@ -96,7 +133,21 @@ void vtkKWCheckButton::Create(vtkKWApplication *app, const char *args)
 
   // create the top level
   wname = this->GetWidgetName();
-  this->Script("checkbutton %s -variable %sValue %s",
-               wname,wname,args);
+  if (!this->IndicatorOn)
+    {
+    this->Script("checkbutton %s -indicatoron 0 -variable %sValue %s",
+		 wname,wname,args);
+    }
+  else
+    {
+    this->Script("checkbutton %s -variable %sValue %s",
+		 wname,wname,args);
+    }
+
+  if (this->MyText)
+    {
+    this->Script("%s configure -text %s", this->GetWidgetName(), this->MyText);
+    }
+
 }
 
