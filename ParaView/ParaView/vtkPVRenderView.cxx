@@ -135,7 +135,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.315");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.316");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -1390,6 +1390,11 @@ void vtkPVRenderView::Exposed()
 void vtkPVRenderView::Configured()
 {
   vtkPVRenderModule* rm = this->GetPVApplication()->GetRenderModule();
+  if (this->BlockRender)
+    {
+    this->BlockRender = 2;
+    return;
+    }
   if (rm)
     {
     rm->InteractiveRender();
@@ -1462,6 +1467,11 @@ vtkPVApplication* vtkPVRenderView::GetPVApplication()
 void vtkPVRenderView::Render()
 {
   int abort;
+  if (this->BlockRender)
+    {
+    this->BlockRender = 2;
+    return;
+    }
 
   // Some aborts require us to que another render.
   abort = this->ShouldIAbort();
@@ -1638,6 +1648,7 @@ void vtkPVRenderView::SetUseTriangleStrips(int state)
     }
 
   pvApp = this->GetPVApplication();
+  vtkPVProcessModule* pm = pvApp->GetProcessModule();
   pvWin = this->GetPVWindow();
   if (pvWin == NULL)
     {
@@ -1645,22 +1656,22 @@ void vtkPVRenderView::SetUseTriangleStrips(int state)
     return;
     }
   sources = pvWin->GetSourceList("Sources");
-  
+
+  // It would be nice to get the displays through the render module.  
   sources->InitTraversal();
   while ( (pvs = sources->GetNextPVSource()) )
     {
     numParts = pvs->GetNumberOfParts();
     for (partIdx = 0; partIdx < numParts; ++partIdx)
       {
-      vtkPVProcessModule* pm = pvApp->GetProcessModule();
       vtkClientServerStream& stream = pm->GetStream();
       stream << vtkClientServerStream::Invoke
              << pvs->GetPart(partIdx)->GetPartDisplay()->GetGeometryID()
              <<  "SetUseStrips" << state << vtkClientServerStream::End;
-      pm->SendStreamToServer();
       pvs->GetPart(partIdx)->GetPartDisplay()->InvalidateGeometry();
       }
     }
+  pm->SendStreamToServer();
 
   this->EventuallyRender();
 }
