@@ -68,7 +68,7 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterfaceEntry);
-vtkCxxRevisionMacro(vtkPVAnimationInterfaceEntry, "1.30");
+vtkCxxRevisionMacro(vtkPVAnimationInterfaceEntry, "1.31");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterfaceEntry, CurrentProperty,
                      vtkPVWidgetProperty);
@@ -97,6 +97,7 @@ vtkPVAnimationInterfaceEntry::vtkPVAnimationInterfaceEntry()
   this->PVSource = 0;
   this->Script = 0;
   this->CurrentMethod = 0;
+  this->TraceName = 0;
   this->TimeStart = 0;
   this->TimeEnd = 100;
   this->TimeEquation = 0;
@@ -314,7 +315,7 @@ void vtkPVAnimationInterfaceEntry::Create(vtkPVApplication* pvApp, const char*)
   this->UpdateStartEndValueToEntry();
   this->SetupBinds();
 
-  this->SetLabelAndScript("None", 0);
+  this->SetLabelAndScript("None", 0, 0);
   this->SwitchScriptTime(-1);
 }
 
@@ -322,6 +323,7 @@ void vtkPVAnimationInterfaceEntry::Create(vtkPVApplication* pvApp, const char*)
 vtkPVAnimationInterfaceEntry::~vtkPVAnimationInterfaceEntry()
 {
   this->SetCurrentMethod(0);
+  this->SetTraceName(0);
   this->SetLabel(0);
   this->SetPVSource(0);
   this->SetSaveStateObject(0);
@@ -436,7 +438,7 @@ void vtkPVAnimationInterfaceEntry::NoMethodCallback()
   this->Dirty = 1;
   this->SetCurrentMethod(0);
   this->SetScript(0);
-  this->SetLabelAndScript(0, 0);
+  this->SetLabelAndScript(0, 0, 0);
   this->SwitchScriptTime(-1);
 
   vtkPVApplication* app = this->GetPVApplication();
@@ -455,7 +457,7 @@ void vtkPVAnimationInterfaceEntry::ScriptMethodCallback()
   this->UpdateMethodMenu();
   if ( vtkString::Length(this->Script) == 0 )
     {
-    this->SetLabelAndScript("Script", 0);
+    this->SetLabelAndScript("Script", 0, 0);
     }
   this->Parent->UpdateNewScript();
   this->SwitchScriptTime(0);
@@ -752,7 +754,8 @@ void vtkPVAnimationInterfaceEntry::SetParent(vtkPVAnimationInterface* ai)
 
 //-----------------------------------------------------------------------------
 void vtkPVAnimationInterfaceEntry::SetLabelAndScript(const char* label,
-                                                const char* script)
+                                                     const char* script,
+                                                     const char* traceName)
 {
   vtkstd::string new_script;
   if ( this->GetPVSource() && this->GetPVSource()->GetTclName() )
@@ -790,6 +793,8 @@ void vtkPVAnimationInterfaceEntry::SetLabelAndScript(const char* label,
     //  this->GetTclName(), label, script);
     }
   this->Parent->UpdateNewScript();
+
+  this->SetTraceName(traceName);
 }
 
 //-----------------------------------------------------------------------------
@@ -814,10 +819,11 @@ void vtkPVAnimationInterfaceEntry::SaveState(ofstream* file)
             << this->CurrentMethod << "}" << endl;
       *file << "$kw(" << this->GetTclName() << ") SetCurrentProperty [["
             << "$kw(" << this->GetPVSource()->GetTclName()
-            << ") GetPVWidget {" << this->CurrentMethod << "}] GetProperty]"
+            << ") GetPVWidget {" << this->GetTraceName() << "}] GetProperty]"
             << endl;
       *file << "$kw(" << this->GetTclName() << ") SetLabelAndScript {"
-            << this->CurrentMethod << "} \"\"" << endl;
+            << this->CurrentMethod << "} \"\" " 
+            << this->GetTraceName() << endl;
       *file << "$kw(" << this->GetTclName() << ") SetTimeStart " << this->TimeStart << endl;
       *file << "$kw(" << this->GetTclName() << ") SetTimeEnd " << this->TimeEnd << endl;
       *file << "$kw(" << this->GetTclName() << ") Update" << endl;
