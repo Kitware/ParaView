@@ -44,7 +44,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // ---------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWScale );
-vtkCxxRevisionMacro(vtkKWScale, "1.66");
+vtkCxxRevisionMacro(vtkKWScale, "1.67");
 
 int vtkKWScaleCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -450,6 +450,11 @@ void vtkKWScale::Bind()
     this->Script("bind %s <ButtonRelease> {%s InvokeEndCommand}",
                  this->Scale->GetWidgetName(), this->GetTclName());
 
+    this->Script("bind %s <ButtonPress> {+%s DisableScaleValueCallbackOff}",
+                 this->Scale->GetWidgetName(), this->GetTclName());
+    this->Script("bind %s <ButtonRelease> {+%s DisableScaleValueCallbackOn}",
+                 this->Scale->GetWidgetName(), this->GetTclName());
+
     // If in popup mode, leaving the toplevel will withdraw it, unless 
     // the user is interacting with the scale.
 
@@ -459,7 +464,8 @@ void vtkKWScale::Bind()
       this->Script("bind %s <Leave> {%s WithdrawPopupScaleCallback}",
                    this->TopLevel->GetWidgetName(), this->GetTclName());
       this->Script("bind %s <ButtonPress> {+bind %s <Leave> {}}",
-                   this->Scale->GetWidgetName(), this->TopLevel->GetWidgetName());
+                   this->Scale->GetWidgetName(), 
+                   this->TopLevel->GetWidgetName());
       this->Script("bind %s <ButtonRelease> "
                    "{+bind %s <Leave> {%s WithdrawPopupScaleCallback}}",
                    this->Scale->GetWidgetName(), 
@@ -665,15 +671,8 @@ void vtkKWScale::RefreshValue()
       {
       this->Scale->SetEnabled(1);
       }
-    // Disable the callback, since set will trigget the -command although
-    // we are doing something non-interactively
-    double value = atof(this->Script("%s get", this->Scale->GetWidgetName()));
-    if ( value != this->Value )
-      {
-      this->DisableScaleValueCallback = 1;
-      this->Script("%s set %g", 
-                   this->Scale->GetWidgetName(), this->Value);
-      }
+    this->Script("%s set %g", 
+                 this->Scale->GetWidgetName(), this->Value);
     if (was_disabled)
       {
       this->Scale->SetEnabled(0);
@@ -720,7 +719,6 @@ void vtkKWScale::ScaleValueCallback(double num)
 {
   if (this->DisableScaleValueCallback)
     {
-    this->DisableScaleValueCallback = 0;
     return;
     }
 

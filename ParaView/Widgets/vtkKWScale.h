@@ -204,6 +204,11 @@ public:
   // of 3D widgets, etc.
   virtual void UpdateEnableState();
 
+  // Description:
+  // Internal
+  vtkSetMacro(DisableScaleValueCallback, int);
+  vtkBooleanMacro(DisableScaleValueCallback, int);
+
 protected:
   vtkKWScale();
   ~vtkKWScale();
