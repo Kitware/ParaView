@@ -86,6 +86,8 @@ ENDIF (PARAVIEW_CAN_BUILD)
 
 IF (PARAVIEW_CAN_BUILD)
 
+ SET (KWWIDGETS_SOURCE_DIR ${PARAVIEW_SOURCE_DIR}/Widgets)
+ SET (KWWIDGETS_BINARY_DIR ${PARAVIEW_BINARY_DIR}/Widgets)
  SUBDIRS(Widgets Utilities/Expat ParaView Demos)
  SUBDIR_DEPENDS(ParaView Widgets Utilities/Expat)
  SUBDIRS(Config Documentation)
