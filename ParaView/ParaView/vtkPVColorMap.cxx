@@ -48,6 +48,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWWidget.h"
 #include "vtkKWCheckButton.h"
 #include "vtkKWPushButton.h"
+#include "vtkLookupTable.h"
 #include "vtkPVRenderView.h"
 #include "vtkPVApplication.h"
 #include "vtkPVWindow.h"
@@ -55,10 +56,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVData.h"
 #include "vtkPVSourceCollection.h"
 #include "vtkObjectFactory.h"
+#include "vtkRenderer.h"
+#include "vtkScalarBarActor.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVColorMap);
-vtkCxxRevisionMacro(vtkPVColorMap, "1.12");
+vtkCxxRevisionMacro(vtkPVColorMap, "1.13");
 
 int vtkPVColorMapCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -89,7 +92,8 @@ vtkPVColorMap::vtkPVColorMap()
 
   this->PVRenderView = NULL;
   this->LookupTableTclName = NULL;
-  this->ScalarBarTclName = NULL;
+  this->LookupTable = NULL;
+  this->ScalarBar = NULL;
 
   // Create a unique id for creating tcl names.
   ++instanceCount;
@@ -151,15 +155,13 @@ vtkPVColorMap::~vtkPVColorMap()
       pvApp->BroadcastScript("%s Delete", this->LookupTableTclName);
       }
     this->SetLookupTableTclName(NULL);
+    this->LookupTable = NULL;
     }
 
-  if (this->ScalarBarTclName)
+  if (this->ScalarBar)
     {
-    if ( pvApp )
-      {
-      pvApp->Script("%s Delete", this->ScalarBarTclName);
-      }
-    this->SetScalarBarTclName(NULL);
+    this->ScalarBar->Delete();
+    this->ScalarBar = NULL;
     }
     
   // User interaface.
@@ -331,28 +333,21 @@ void vtkPVColorMap::CreateParallelTclObjects(vtkPVApplication *pvApp)
   
   sprintf(tclName, "LookupTable%d", this->InstanceCount);
   this->SetLookupTableTclName(tclName);
-  pvApp->BroadcastScript("vtkLookupTable %s", this->LookupTableTclName);
+  this->LookupTable = static_cast<vtkLookupTable*>(
+    pvApp->MakeTclObject("vtkLookupTable", this->LookupTableTclName));
   
 
-  // Not actually parallel.  Only on process 0.
-  sprintf(tclName, "ScalarBar%d", this->InstanceCount);
-  this->SetScalarBarTclName(tclName);
-  this->Script("vtkScalarBarActor %s", this->ScalarBarTclName);
-  this->Script("[%s GetPositionCoordinate] SetCoordinateSystemToNormalizedViewport",
-               this->ScalarBarTclName);
-  this->Script("[%s GetPositionCoordinate] SetValue 0.87 0.25",
-               this->ScalarBarTclName);
-  this->Script("%s SetOrientationToVertical",
-               this->ScalarBarTclName);
-  this->Script("%s SetWidth 0.13", this->ScalarBarTclName);
-  this->Script("%s SetHeight 0.5", this->ScalarBarTclName);
+  this->ScalarBar = vtkScalarBarActor::New();
+  this->ScalarBar->GetPositionCoordinate()
+    ->SetCoordinateSystemToNormalizedViewport();
+  this->ScalarBar->GetPositionCoordinate()->SetValue(0.87, 0.25);
+  this->ScalarBar->SetOrientationToVertical();
+  this->ScalarBar->SetWidth(0.13);
+  this->ScalarBar->SetHeight(0.5);
 
   this->UpdateScalarBarTitle();
-  
-  this->Script("%s SetLookupTable %s",
-               this->ScalarBarTclName, 
-               this->LookupTableTclName);
-  
+
+  this->ScalarBar->SetLookupTable(this->LookupTable);
 }
 
 //----------------------------------------------------------------------------
@@ -694,7 +689,6 @@ vtkPVApplication* vtkPVColorMap::GetPVApplication()
 void vtkPVColorMap::SetScalarBarVisibility(int val)
 {
   vtkRenderer *ren;
-  char *tclName;
 
   if (this->ScalarBarVisibility == val)
     {
@@ -719,29 +713,28 @@ void vtkPVColorMap::SetScalarBarVisibility(int val)
     }
   
   ren = this->GetPVRenderView()->GetRenderer();
-  tclName = this->GetPVRenderView()->GetRendererTclName();
   
   if (ren == NULL)
     {
     return;
     }
   
-  // I am going to add and remove it from the renderer instead of using visibility.
-  // Composites should really have multiple props.
+  // I am going to add and remove it from the renderer instead of using
+  // visibility.  Composites should really have multiple props.
   
   if (ren)
     {
     if (val)
       {
-      this->Script("%s AddActor %s", tclName, this->ScalarBarTclName);
+      ren->AddActor(this->ScalarBar);
       // This is here in case process 0 has not geometry.  
       // We have to explicitly build the color map.
-      this->Script("%s Build", this->LookupTableTclName);
-      this->Script("%s Modified", this->LookupTableTclName);
+      this->LookupTable->Build();
+      this->LookupTable->Modified();
       }
     else
       {
-      this->Script("%s RemoveActor %s", tclName, this->ScalarBarTclName);
+      ren->RemoveActor(this->ScalarBar);
       }
     }
 
@@ -762,20 +755,18 @@ void vtkPVColorMap::SetScalarBarOrientation(int vertical)
   if (vertical)
     {
     this->ScalarBarOrientationCheck->SetState(1);
-    this->Script("[%s GetPositionCoordinate] SetValue 0.87 0.25",
-                 this->ScalarBarTclName);
-    this->Script("%s SetOrientationToVertical", this->ScalarBarTclName);
-    this->Script("%s SetHeight 0.5", this->ScalarBarTclName);
-    this->Script("%s SetWidth 0.13", this->ScalarBarTclName);
+    this->ScalarBar->GetPositionCoordinate()->SetValue(0.87, 0.25);
+    this->ScalarBar->SetOrientationToVertical();
+    this->ScalarBar->SetHeight(0.5);
+    this->ScalarBar->SetWidth(0.13);
     }
   else
     {
     this->ScalarBarOrientationCheck->SetState(0);
-    this->Script("[%s GetPositionCoordinate] SetValue 0.25 0.13",
-                 this->ScalarBarTclName);
-    this->Script("%s SetOrientationToHorizontal", this->ScalarBarTclName);
-    this->Script("%s SetHeight 0.13", this->ScalarBarTclName);
-    this->Script("%s SetWidth 0.5", this->ScalarBarTclName);
+    this->ScalarBar->GetPositionCoordinate()->SetValue(0.25, 0.13);
+    this->ScalarBar->SetOrientationToHorizontal();
+    this->ScalarBar->SetHeight(0.13);
+    this->ScalarBar->SetWidth(0.5);
     }
   this->GetPVRenderView()->EventuallyRender();
 
@@ -799,29 +790,25 @@ void vtkPVColorMap::SetScalarBarOrientationToHorizontal()
 //----------------------------------------------------------------------------
 void vtkPVColorMap::SaveInTclScript(ofstream *file)
 {
-  float position[2];
+  float* position;
   char* result;
   char* renTclName;
 
+  char scalarBarTclName[128];
+  sprintf(scalarBarTclName, "ScalarBar%d", this->InstanceCount);
   renTclName = this->GetPVRenderView()->GetRendererTclName();
 
   if (this->ScalarBarVisibility)
     {
-    *file << "vtkScalarBarActor " << this->ScalarBarTclName << "\n\t"
-          << "[" << this->ScalarBarTclName
+    *file << "vtkScalarBarActor " << scalarBarTclName << "\n\t"
+          << "[" << scalarBarTclName
           << " GetPositionCoordinate] SetCoordinateSystemToNormalizedViewport\n\t"
-          << "[" << this->ScalarBarTclName
+          << "[" << scalarBarTclName
           << " GetPositionCoordinate] SetValue ";
-    this->Script("set tempResult [[%s GetPositionCoordinate] GetValue]",
-                 this->ScalarBarTclName);
-    result = this->GetPVApplication()->GetMainInterp()->result;
-    sscanf(result, "%f %f", &position[0], &position[1]);
+    position = this->ScalarBar->GetPositionCoordinate()->GetValue();
     *file << position[0] << " " << position[1] << "\n\t"
-          << this->ScalarBarTclName << " SetOrientationTo";
-    this->Script("set tempResult [%s GetOrientation]",
-                 this->ScalarBarTclName);
-    result = this->GetPVApplication()->GetMainInterp()->result;
-    if (strncmp(result, "0", 1) == 0)
+          << scalarBarTclName << " SetOrientationTo";
+    if (this->ScalarBar->GetOrientation() == 0)
       {
       *file << "Horizontal\n\t";
       }
@@ -829,21 +816,15 @@ void vtkPVColorMap::SaveInTclScript(ofstream *file)
       {
       *file << "Vertical\n\t";
       }
-    *file << this->ScalarBarTclName << " SetWidth ";
-    this->Script("set tempResult [%s GetWidth]",
-                 this->ScalarBarTclName);
-    result = this->GetPVApplication()->GetMainInterp()->result;
-    *file << result << "\n\t";
-    *file << this->ScalarBarTclName << " SetHeight ";
-    this->Script("set tempResult [%s GetHeight]",
-                 this->ScalarBarTclName);
-    result = this->GetPVApplication()->GetMainInterp()->result;
-    *file << result << "\n\t"
-          << this->ScalarBarTclName << " SetLookupTable "
+    *file << scalarBarTclName << " SetWidth " 
+          << this->ScalarBar->GetWidth() << "\n\t";
+    *file << scalarBarTclName << " SetHeight "
+          << this->ScalarBar->GetHeight() << "\n\t";
+    *file << scalarBarTclName << " SetLookupTable "
           << this->LookupTableTclName << "\n\t"
-          << this->ScalarBarTclName << " SetTitle {" 
+          << scalarBarTclName << " SetTitle {" 
           << this->ArrayName << "}\n";
-    *file << renTclName << " AddProp " << this->ScalarBarTclName << "\n";
+    *file << renTclName << " AddProp " << scalarBarTclName << "\n";
     }
 
 
@@ -853,7 +834,7 @@ void vtkPVColorMap::SaveInTclScript(ofstream *file)
 //----------------------------------------------------------------------------
 void vtkPVColorMap::UpdateScalarBarTitle()
 {
-  if (this->ScalarBarTclName == NULL || this->ScalarBarTitle == NULL)
+  if (this->ScalarBar == NULL || this->ScalarBarTitle == NULL)
     {
     return;
     }
@@ -862,29 +843,39 @@ void vtkPVColorMap::UpdateScalarBarTitle()
     {
     if (this->VectorComponent == 0)
       {
-      this->Script("%s SetTitle {%s X}", this->ScalarBarTclName,
-                   this->ScalarBarTitle);
+      ostrstream ostr;
+      ostr << this->ScalarBarTitle << " X" << ends;
+      this->ScalarBar->SetTitle(ostr.str());
+      ostr.rdbuf()->freeze(0);
       }
     if (this->VectorComponent == 1)
       {
-      this->Script("%s SetTitle {%s Y}", this->ScalarBarTclName,
-                   this->ScalarBarTitle);
+      ostrstream ostr;
+      ostr << this->ScalarBarTitle << " Y" << ends;
+      this->ScalarBar->SetTitle(ostr.str());
+      ostr.rdbuf()->freeze(0);
       }
     if (this->VectorComponent == 2)
       {
-      this->Script("%s SetTitle {%s Z}", this->ScalarBarTclName,
-                   this->ScalarBarTitle);
+      ostrstream ostr;
+      ostr << this->ScalarBarTitle << " Z" << ends;
+      this->ScalarBar->SetTitle(ostr.str());
+      ostr.rdbuf()->freeze(0);
       }
     }
   else if (this->NumberOfVectorComponents > 1)
     {
-    this->Script("%s SetTitle {%s %d}", this->ScalarBarTclName,
-                 this->ScalarBarTitle, this->VectorComponent);
+    ostrstream ostr;
+    ostr << this->ScalarBarTitle << " " << this->VectorComponent << ends;
+    this->ScalarBar->SetTitle(ostr.str());
+    ostr.rdbuf()->freeze(0);
     }
   else
     {
-    this->Script("%s SetTitle {%s}", this->ScalarBarTclName,
-                 this->ScalarBarTitle);
+    ostrstream ostr;
+    ostr << this->ScalarBarTitle<< ends;
+    this->ScalarBar->SetTitle(ostr.str());
+    ostr.rdbuf()->freeze(0);
     }
   if (this->PVRenderView)
     {
@@ -929,9 +920,7 @@ void vtkPVColorMap::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "LookupTableTclName: " 
      << (this->LookupTableTclName ? this->LookupTableTclName : "none" )
      << endl;
-  os << indent << "ScalarBarTclName: " 
-     << (this->ScalarBarTclName ? this->ScalarBarTclName : "none" )
-     << endl;
+  os << indent << "ScalarBar: " << this->ScalarBar << endl;
   
   os << indent << "ScalarBarVisibility: " << this->ScalarBarVisibility << endl;
   if (this->ScalarBarOrientation)

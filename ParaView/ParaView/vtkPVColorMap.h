@@ -55,6 +55,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkKWWidget.h"
 
+class vtkLookupTable;
 class vtkScalarBarActor;
 class vtkPVApplication;
 class vtkPVRenderView;
@@ -65,10 +66,6 @@ class vtkKWLabeledEntry;
 class vtkKWWidget;
 class vtkKWCheckButton;
 class vtkKWPushButton;
-
-
-
-
 
 class VTK_EXPORT vtkPVColorMap : public vtkKWWidget
 {
@@ -189,11 +186,11 @@ protected:
   int VectorComponent;
   int NumberOfVectorComponents;
 
-  char* ScalarBarTclName;
-  vtkSetStringMacro(ScalarBarTclName);
+  vtkScalarBarActor* ScalarBar;
 
   void UpdateScalarBarTitle();
 
+  vtkLookupTable* LookupTable;
   char* LookupTableTclName;
   vtkSetStringMacro(LookupTableTclName);
 
