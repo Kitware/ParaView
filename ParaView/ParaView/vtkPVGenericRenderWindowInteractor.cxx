@@ -48,7 +48,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVGenericRenderWindowInteractor);
-vtkCxxRevisionMacro(vtkPVGenericRenderWindowInteractor, "1.9");
+vtkCxxRevisionMacro(vtkPVGenericRenderWindowInteractor, "1.10");
 
 //----------------------------------------------------------------------------
 vtkPVGenericRenderWindowInteractor::vtkPVGenericRenderWindowInteractor()
@@ -120,7 +120,7 @@ void vtkPVGenericRenderWindowInteractor::SatelliteLeftPress(int x, int y,
   rc->InitTraversal();
   vtkRenderer *aren = rc->GetNextItem();
   renSize = aren->GetSize();
-  int reductionFactor = (int)(0.5 + ((float)winSize[1]/(float)renSize[1]));
+  int reductionFactor = this->CalculateReductionFactor(winSize[1], renSize[1]);
   x = (int)((float)x / (float)(reductionFactor));
   y = (int)((float)(winSize[1]-y) / (float)(reductionFactor));
   this->SetEventInformation(x, y, control, shift);
@@ -148,7 +148,7 @@ void vtkPVGenericRenderWindowInteractor::SatelliteMiddlePress(int x, int y,
   rc->InitTraversal();
   vtkRenderer *aren = rc->GetNextItem();
   renSize = aren->GetSize();
-  int reductionFactor = (int)(0.5 + ((float)winSize[1]/(float)renSize[1]));
+  int reductionFactor = this->CalculateReductionFactor(winSize[1], renSize[1]);
   x = (int)((float)x / (float)(reductionFactor));
   y = (int)((float)(winSize[1]-y) / (float)(reductionFactor));
   this->SetEventInformation(x, y, control, shift);
@@ -176,7 +176,7 @@ void vtkPVGenericRenderWindowInteractor::SatelliteRightPress(int x, int y,
   rc->InitTraversal();
   vtkRenderer *aren = rc->GetNextItem();
   renSize = aren->GetSize();
-  int reductionFactor = (int)(0.5 + ((float)winSize[1]/(float)renSize[1]));
+  int reductionFactor = this->CalculateReductionFactor(winSize[1], renSize[1]);
   x = (int)((float)x / (float)(reductionFactor));
   y = (int)((float)(winSize[1]-y) / (float)(reductionFactor));
   this->SetEventInformation(x, y, control, shift);
@@ -204,7 +204,7 @@ void vtkPVGenericRenderWindowInteractor::SatelliteLeftRelease(int x, int y,
   rc->InitTraversal();
   vtkRenderer *aren = rc->GetNextItem();
   renSize = aren->GetSize();
-  int reductionFactor = (int)(0.5 + ((float)winSize[1]/(float)renSize[1]));
+  int reductionFactor = this->CalculateReductionFactor(winSize[1], renSize[1]);
   x = (int)((float)x / (float)(reductionFactor));
   y = (int)((float)(winSize[1]-y) / (float)(reductionFactor));
   this->SetEventInformation(x, y, control, shift);
@@ -232,7 +232,7 @@ void vtkPVGenericRenderWindowInteractor::SatelliteMiddleRelease(int x, int y,
   rc->InitTraversal();
   vtkRenderer *aren = rc->GetNextItem();
   renSize = aren->GetSize();
-  int reductionFactor = (int)(0.5 + ((float)winSize[1]/(float)renSize[1]));
+  int reductionFactor = this->CalculateReductionFactor(winSize[1], renSize[1]);
   x = (int)((float)x / (float)(reductionFactor));
   y = (int)((float)(winSize[1]-y) / (float)(reductionFactor));
   this->SetEventInformation(x, y, control, shift);
@@ -260,7 +260,7 @@ void vtkPVGenericRenderWindowInteractor::SatelliteRightRelease(int x, int y,
   rc->InitTraversal();
   vtkRenderer *aren = rc->GetNextItem();
   renSize = aren->GetSize();
-  int reductionFactor = (int)(0.5 + ((float)winSize[1]/(float)renSize[1]));
+  int reductionFactor = this->CalculateReductionFactor(winSize[1], renSize[1]);
   x = (int)((float)x / (float)(reductionFactor));
   y = (int)((float)(winSize[1]-y) / (float)(reductionFactor));
   this->SetEventInformation(x, y, control, shift);
@@ -286,12 +286,8 @@ void vtkPVGenericRenderWindowInteractor::SatelliteMove(int x, int y)
   vtkRendererCollection *rc = this->RenderWindow->GetRenderers();
   rc->InitTraversal();
   vtkRenderer *aren = rc->GetNextItem();
-  renSize = aren->GetSize();
-  int reductionFactor = 1;
-  if(winSize[1] > 0 && renSize[1] > 0)
-    {
-    reductionFactor = (int)(0.5 + ((float)winSize[1]/(float)renSize[1]));
-    }
+  renSize = aren->GetSize(); 
+  int reductionFactor = this->CalculateReductionFactor(winSize[1], renSize[1]);
   x = (int)((float)x / (float)(reductionFactor));
   y = (int)((float)(winSize[1]-y) / (float)(reductionFactor));
   this->SetEventInformation(x, y, this->ControlKey, this->ShiftKey,
@@ -311,6 +307,19 @@ void vtkPVGenericRenderWindowInteractor::SatelliteMove(int x, int y)
 }
 
 
+//----------------------------------------------------------------------------
+int vtkPVGenericRenderWindowInteractor::CalculateReductionFactor(int winSize1,
+                                                                 int renSize1)
+{
+  if(winSize1 > 0 && renSize1 > 0)
+    {
+    return (int)(0.5 + ((float)winSize1/(float)renSize1));
+    }
+  else
+    {
+    return 1;
+    }
+}
 
 
 //----------------------------------------------------------------------------

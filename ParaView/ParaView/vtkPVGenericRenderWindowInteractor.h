@@ -81,6 +81,8 @@ public:
 protected:
   vtkPVGenericRenderWindowInteractor();
   ~vtkPVGenericRenderWindowInteractor();
+
+  int CalculateReductionFactor(int winSize1, int renSize1);
   
   vtkPVRenderView *PVRenderView;
   int ReductionFactor;
