@@ -154,7 +154,7 @@ void vtkPVRelayRemoteScript(void *localArg, void *remoteArg,
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVClientServerModule);
-vtkCxxRevisionMacro(vtkPVClientServerModule, "1.17");
+vtkCxxRevisionMacro(vtkPVClientServerModule, "1.18");
 
 int vtkPVClientServerModuleCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -802,10 +802,10 @@ void vtkPVClientServerModule::PrintSelf(ostream& os, vtkIndent indent)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVClientServerModule::GetDirectoryListing(const char* dir,
-                                                  vtkStringList* dirs,
-                                                  vtkStringList* files,
-                                                  const char* perm)
+int vtkPVClientServerModule::GetDirectoryListing(const char* dir,
+                                                 vtkStringList* dirs,
+                                                 vtkStringList* files,
+                                                 const char* perm)
 {
   if(this->ClientMode)
     {
@@ -813,6 +813,13 @@ void vtkPVClientServerModule::GetDirectoryListing(const char* dir,
       "::paraview::vtkPVProcessModule::GetDirectoryListing {%s} {%s}",
       dir, perm);
     char* result = result = this->NewRootResult();    
+    if(strcmp(result, "<NO_SUCH_DIRECTORY>") == 0)
+      {
+      dirs->RemoveAllItems();
+      files->RemoveAllItems();
+      delete [] result;
+      return 0;
+      }
     vtkTclGetObjectFromPointer(this->Application->GetMainInterp(), dirs,
                                vtkStringListCommand);
     char* dirsTcl = vtkString::Duplicate(
@@ -828,9 +835,10 @@ void vtkPVClientServerModule::GetDirectoryListing(const char* dir,
     delete [] dirsTcl;
     delete [] filesTcl;
     delete [] result;
+    return 1;
     }
   else
     {
-    this->Superclass::GetDirectoryListing(dir, dirs, files, perm);
+    return this->Superclass::GetDirectoryListing(dir, dirs, files, perm);
     }
 }

@@ -135,11 +135,12 @@ public:
   virtual void SetApplication (vtkKWApplication* arg);
   
   // Description:
-  // Get a directory listing for the given directory.
-  void GetDirectoryListing(const char* dir, vtkStringList* dirs,
-                           vtkStringList* files);
-  virtual void GetDirectoryListing(const char* dir, vtkStringList* dirs,
-                                   vtkStringList* files, const char* perm);
+  // Get a directory listing for the given directory.  Returns 1 for
+  // success, and 0 for failure (when the directory does not exist).
+  int GetDirectoryListing(const char* dir, vtkStringList* dirs,
+                          vtkStringList* files);
+  virtual int GetDirectoryListing(const char* dir, vtkStringList* dirs,
+                                  vtkStringList* files, const char* perm);
   
 protected:
   vtkPVProcessModule();

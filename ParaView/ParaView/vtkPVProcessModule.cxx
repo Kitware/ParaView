@@ -60,6 +60,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkUnsignedShortArray.h"
 #include "vtkMapper.h"
 #include "vtkString.h"
+#include "vtkStringList.h"
 #include "vtkTclUtil.h"
 #include "vtkPVPart.h"
 
@@ -76,7 +77,7 @@ struct vtkPVArgs
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProcessModule);
-vtkCxxRevisionMacro(vtkPVProcessModule, "1.8");
+vtkCxxRevisionMacro(vtkPVProcessModule, "1.9");
 
 int vtkPVProcessModuleCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -405,22 +406,29 @@ void vtkPVProcessModule::SetApplication(vtkKWApplication* arg)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVProcessModule::GetDirectoryListing(const char* dir,
-                                             vtkStringList* dirs,
-                                             vtkStringList* files)
+int vtkPVProcessModule::GetDirectoryListing(const char* dir,
+                                            vtkStringList* dirs,
+                                            vtkStringList* files)
 {
-  this->GetDirectoryListing(dir, dirs, files, "r w");
+  return this->GetDirectoryListing(dir, dirs, files, "r w");
 }
 
 //----------------------------------------------------------------------------
-void vtkPVProcessModule::GetDirectoryListing(const char* dir,
-                                             vtkStringList* dirs,
-                                             vtkStringList* files,
-                                             const char* perm)
+int vtkPVProcessModule::GetDirectoryListing(const char* dir,
+                                            vtkStringList* dirs,
+                                            vtkStringList* files,
+                                            const char* perm)
 {
   char* result = vtkString::Duplicate(this->Application->Script(
     "::paraview::vtkPVProcessModule::GetDirectoryListing {%s} {%s}",
     dir, perm));
+  if(strcmp(result, "<NO_SUCH_DIRECTORY>") == 0)
+    {
+    dirs->RemoveAllItems();
+    files->RemoveAllItems();
+    delete [] result;
+    return 0;
+    }
   vtkTclGetObjectFromPointer(this->Application->GetMainInterp(), dirs,
                              vtkStringListCommand);
   char* dirsTcl = vtkString::Duplicate(
@@ -436,6 +444,7 @@ void vtkPVProcessModule::GetDirectoryListing(const char* dir,
   delete [] dirsTcl;
   delete [] filesTcl;
   delete [] result;
+  return 1;
 }
 
 //----------------------------------------------------------------------------
@@ -446,7 +455,12 @@ void vtkPVProcessModule::InitializeTclMethodImplementations()
     "  proc GetDirectoryListing { dir perm {exp {[A-Za-z0-9]*}} } {\n"
     "    set files {}\n"
     "    set dirs {}\n"
-    "    if {$dir != {}} { set cwd [pwd]; cd $dir }\n"
+    "    if {$dir != {}} {\n"
+    "      set cwd [pwd]\n"
+    "      if {[catch {cd $dir}]} {\n"
+    "        return {<NO_SUCH_DIRECTORY>}\n"
+    "      }\n"
+    "    }\n"
     "    set entries [glob -nocomplain -type \"d f l $perm\" $exp]\n"
     "    foreach f [lsort -dictionary $entries] {\n"
     "      if {[file isfile $f]} {\n"

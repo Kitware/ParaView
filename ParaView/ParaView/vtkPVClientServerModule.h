@@ -132,8 +132,8 @@ public:
   // Description:
   // Get a directory listing for the given directory.  This
   // implementation will always give a listing on the server side.
-  virtual void GetDirectoryListing(const char* dir, vtkStringList* dirs,
-                                   vtkStringList* files, const char* perm);
+  virtual int GetDirectoryListing(const char* dir, vtkStringList* dirs,
+                                  vtkStringList* files, const char* perm);
 protected:
   vtkPVClientServerModule();
   ~vtkPVClientServerModule();
