@@ -71,7 +71,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.253");
+vtkCxxRevisionMacro(vtkPVSource, "1.254");
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -476,7 +476,7 @@ void vtkPVSource::CreateProperties()
                this->NameLabel->GetLabel1()->GetWidgetName(), label1_opt);
   this->Script("pack %s -fill x -expand t", 
                this->NameLabel->GetLabel2()->GetWidgetName());
-  vtkKWTkUtilities::ChangeFontToBold(
+  vtkKWTkUtilities::ChangeFontWeightToBold(
     this->Application->GetMainInterp(),
     this->NameLabel->GetLabel2()->GetWidgetName());
 
@@ -2326,7 +2326,7 @@ void vtkPVSource::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVSource ";
-  this->ExtractRevision(os,"$Revision: 1.253 $");
+  this->ExtractRevision(os,"$Revision: 1.254 $");
 }
 
 //----------------------------------------------------------------------------

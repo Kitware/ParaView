@@ -58,7 +58,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWTkUtilities);
-vtkCxxRevisionMacro(vtkKWTkUtilities, "1.19");
+vtkCxxRevisionMacro(vtkKWTkUtilities, "1.20");
 
 //----------------------------------------------------------------------------
 void vtkKWTkUtilities::GetRGBColor(Tcl_Interp *interp,
@@ -424,16 +424,20 @@ int vtkKWTkUtilities::GetPhotoWidth(Tcl_Interp *interp,
 }
 
 //----------------------------------------------------------------------------
-int vtkKWTkUtilities::ChangeFontToBold(Tcl_Interp *interp,
-                                       const char *widget)
+int vtkKWTkUtilities::ChangeFontWeight(Tcl_Interp *interp,
+                                       const char *widget,
+                                       int weight)
 {
   int res;
 
   // First try to modify the old -foundry-family-weigth-*-*-... form
+  // Catch the weight field, replace it with bold or medium.
 
   ostrstream regsub;
-  regsub << "regsub -- {(-[^-]*-[^-]*-)([^-]*)(-.*)} [" << widget 
-          << " cget -font] {\\1bold\\3} __temp__" << ends;
+  regsub << "regsub -- {(-[^-]*\\S-[^-]*\\S-)([^-]*)(-.*)} [" << widget 
+         << " cget -font] {\\1" << (weight ? "bold" : "medium") 
+         << "\\3} __temp__" << ends;
+
   res = Tcl_GlobalEval(interp, regsub.str());
   regsub.rdbuf()->freeze(0);
   if (res != TCL_OK)
@@ -449,17 +453,19 @@ int vtkKWTkUtilities::ChangeFontToBold(Tcl_Interp *interp,
     replace.rdbuf()->freeze(0);
     if (res != TCL_OK)
       {
-      vtkGenericWarningMacro(<< "Unable to replace result of regsub!");
+      vtkGenericWarningMacro(<< "Unable to replace result of regsub! ("
+                             << interp->result << ")");
       return 0;
       }
     return 1;
     }
 
-  // Otherwise replace the -weight parameter
+  // Otherwise replace the -weight parameter with either bold or normal
 
   ostrstream regsub2;
   regsub2 << "regsub -- {(.* -weight )(\\w*\\M)(.*)} [font actual [" << widget 
-          << " cget -font]] {\\1bold\\3} __temp__" << ends;
+          << " cget -font]] {\\1" << (weight ? "bold" : "normal") 
+          << "\\3} __temp__" << ends;
   res = Tcl_GlobalEval(interp, regsub2.str());
   regsub2.rdbuf()->freeze(0);
   if (res != TCL_OK)
@@ -475,13 +481,110 @@ int vtkKWTkUtilities::ChangeFontToBold(Tcl_Interp *interp,
     replace2.rdbuf()->freeze(0);
     if (res != TCL_OK)
       {
-      vtkGenericWarningMacro(<< "Unable to replace result of regsub (2)!");
+      vtkGenericWarningMacro(<< "Unable to replace result of regsub (2) ! ("
+                             << interp->result << ")");
       return 0;
       }
     return 1;
     }
 
   return 1;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWTkUtilities::ChangeFontWeightToBold(Tcl_Interp *interp,
+                                       const char *widget)
+{
+  return vtkKWTkUtilities::ChangeFontWeight(interp, widget, 1);
+}
+
+//----------------------------------------------------------------------------
+int vtkKWTkUtilities::ChangeFontWeightToNormal(Tcl_Interp *interp,
+                                               const char *widget)
+{
+  return vtkKWTkUtilities::ChangeFontWeight(interp, widget, 0);
+}
+
+//----------------------------------------------------------------------------
+int vtkKWTkUtilities::ChangeFontSlant(Tcl_Interp *interp,
+                                      const char *widget,
+                                      int slant)
+{
+  int res;
+
+  // First try to modify the old -foundry-family-weigth-slant-*-*-... form
+  // Catch the slant field, replace it with i (italic) or r (roman).
+
+  ostrstream regsub;
+  regsub << "regsub -- {(-[^-]*\\S-[^-]*\\S-[^-]*\\S-)([^-]*)(-.*)} [" << widget 
+         << " cget -font] {\\1" << (slant ? "i" : "r") 
+         << "\\3} __temp__" << ends;
+
+  res = Tcl_GlobalEval(interp, regsub.str());
+  regsub.rdbuf()->freeze(0);
+  if (res != TCL_OK)
+    {
+    vtkGenericWarningMacro(<< "Unable to regsub!");
+    return 0;
+    }
+  if (atoi(Tcl_GetStringResult(interp)) == 1)
+    {
+    ostrstream replace;
+    replace << widget << " config -font $__temp__" << ends;
+    res = Tcl_GlobalEval(interp, replace.str());
+    replace.rdbuf()->freeze(0);
+    if (res != TCL_OK)
+      {
+      vtkGenericWarningMacro(<< "Unable to replace result of regsub! ("
+                             << interp->result << ")");
+      return 0;
+      }
+    return 1;
+    }
+
+  // Otherwise replace the -slant parameter with either bold or normal
+
+  ostrstream regsub2;
+  regsub2 << "regsub -- {(.* -slant )(\\w*\\M)(.*)} [font actual [" << widget 
+          << " cget -font]] {\\1" << (slant ? "italic" : "roman") 
+          << "\\3} __temp__" << ends;
+  res = Tcl_GlobalEval(interp, regsub2.str());
+  regsub2.rdbuf()->freeze(0);
+  if (res != TCL_OK)
+    {
+    vtkGenericWarningMacro(<< "Unable to regsub (2)!");
+    return 0;
+    }
+  if (atoi(Tcl_GetStringResult(interp)) == 1)
+    {
+    ostrstream replace2;
+    replace2 << widget << " config -font $__temp__" << ends;
+    res = Tcl_GlobalEval(interp, replace2.str());
+    replace2.rdbuf()->freeze(0);
+    if (res != TCL_OK)
+      {
+      vtkGenericWarningMacro(<< "Unable to replace result of regsub (2) ! ("
+                             << interp->result << ")");
+      return 0;
+      }
+    return 1;
+    }
+
+  return 1;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWTkUtilities::ChangeFontSlantToItalic(Tcl_Interp *interp,
+                                              const char *widget)
+{
+  return vtkKWTkUtilities::ChangeFontSlant(interp, widget, 1);
+}
+
+//----------------------------------------------------------------------------
+int vtkKWTkUtilities::ChangeFontSlantToRoman(Tcl_Interp *interp,
+                                             const char *widget)
+{
+  return vtkKWTkUtilities::ChangeFontSlant(interp, widget, 0);
 }
 
 //----------------------------------------------------------------------------

@@ -51,7 +51,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLabeledFrame );
-vtkCxxRevisionMacro(vtkKWLabeledFrame, "1.20");
+vtkCxxRevisionMacro(vtkKWLabeledFrame, "1.21");
 
 
 
@@ -231,8 +231,8 @@ void vtkKWLabeledFrame::Create(vtkKWApplication *app, const char* args)
 
   if (vtkKWLabeledFrame::BoldLabel)
     {
-    vtkKWTkUtilities::ChangeFontToBold(this->Application->GetMainInterp(),
-                                       this->Label->GetWidgetName());
+    vtkKWTkUtilities::ChangeFontWeightToBold(this->Application->GetMainInterp(),
+                                             this->Label->GetWidgetName());
     }
 
   this->Icon->Create(app,"");
