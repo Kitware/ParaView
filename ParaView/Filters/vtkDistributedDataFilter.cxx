@@ -91,7 +91,7 @@ static char * makeEntry(char *s)
 
 // Timing data ---------------------------------------------
 
-vtkCxxRevisionMacro(vtkDistributedDataFilter, "1.9");
+vtkCxxRevisionMacro(vtkDistributedDataFilter, "1.10");
 
 vtkStandardNewMacro(vtkDistributedDataFilter);
 
@@ -870,9 +870,9 @@ int vtkDistributedDataFilter::PairWiseDataExchange(int *yourSize,
 
   delete [] myData;
   delete [] mySize;
+#endif
 
   return 0;
-#endif
 }
 
 #ifdef VTK_USE_MPI
