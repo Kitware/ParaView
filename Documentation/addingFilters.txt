@@ -1,0 +1,185 @@
+
+* Describing Source and Filter Interfaces in Initialization Files
+
+In ParaView, data processing is done by putting together pipelines which
+consist of VTK filters and sources. By default, ParaView features a handful
+of VTK filters or sources. The interface descriptions of these filters are
+hard coded into the ParaView executable. It is possible to add filters to
+ParaView by describing their interfaces using XML. At start-up, ParaView
+looks for interface files (with .xml extension) in the following directories:
+
+1. Config in the build tree (applicable only if you compiled ParaView from 
+   source),
+2. Config in the source tree (applicable only if you compiled ParaView from 
+   source),
+3. Config in the installation directory (by default 
+   /usr/local/share/ParaView/Config on Unix/Linux, 
+   c:\Program Files\ParaView\Config on Windows) (applicable only if you
+   install ParaView with 'make install' or from a binary distribution),
+4. A directory given by the PV_INTERFACE_PATH environmental variable.
+
+The source and filters described in XML files contained in these directories
+will appear in the VTK -> Sources or VTK -> Filters menus.
+
+* Interface File Format
+
+** Introduction
+
+To add a filter, simply describe the interface for changing options and
+parameters which control the behavior of a filter. Here is an example
+(from standardSources.xml in ParaView/Config in the source distribution) :
+
+<Interfaces>
+ <!-- Define local system-wide source interfaces here. -->
+ <Source class="vtkDiskSource" root="DiskSource" output="vtkPolyData">
+   <Scalar name="InnerRadius" type="float" help="Set the inner radius of the disk"/>
+   <Scalar name="OuterRadius" type="float" help="Set the outer radius of the disk"/>
+   <Scalar name="RadialResolution" type="int" help="Set the number of edges in the radial direction"/>
+   <Scalar name="CircumferentialResolution" type="int" help="Set the number of edges in the circumferential direction"/>
+ </Source>
+</Interfaces>
+
+This file starts by describing the interface of vtkDiskSource which is
+vtkPolyDataSource. The instances of vtkDiskSource will be called DiskSource1,
+DiskSource2, etc. (from the tag DiskSource). The next three elements describe
+the interface for setting three scalar variables which control the behavior
+of the source: InnerRadius and OuterRadius which are real numbers,
+RadialResolution and CircumferentialResolution which are integers. The
+help tags allow the balloon help text to be set. 
+
+** XML elements and tags
+
+A Document Type Definition (DTD) for the ParaView configuration XML files
+can be found in the file dtdInterfaces.xml in the documentation directory
+of the distribution. Here is a summary of different elements and tags
+which can be used in describing the user interfaces:
+
+- Interfaces : This has to be the main element for all interface description
+  files.
+
+- Source: Element which described a VTK source. Available tags are:
+  - class  (required) : VTK class name.
+  - root   (required) : Root of the name given to each instance of the source. 
+    These instances will be called root1, root2 etc.
+  - output (required) : Data type of the output. This can be found by looking
+    at the superclass of the current source in the VTK documentation
+    (http://public.kitware.com/VTK/doc/nightly/html/). For example, 
+    vtkDiskSource is a sub-class of vtkPolyDataSource, therefore it produces
+    output of type vtkPolyData.
+
+- Filter: Element which described a VTK filter. Available tags are:
+  - class  (required) : VTK class name.
+  - root   (required) : Root of the name given to each instance of the filter. 
+    These instances will be called root1, root2 etc.
+  - input (required) : Data type of the input. 
+  - output (required) : Data type of the output. 
+
+- Boolean: Variable which be either on or off. Represented by a check box.
+  Available tags are:
+  - name (required) : Text to be displayed next to the check box.
+  - set  (optional) : The method to be used in setting the value of the
+    variable. If not given, a method with name Setname will be used.
+  - get  (optional) : The method to be used in getting the value of the
+    variable. If not given, a method with name Getname will be used.
+  - help (optional) : Sets the balloon help.
+
+- Scalar: A number. Represented by an entry widget.
+  Available tags are:
+  - name (required) : Text to be displayed next to the entry widget.
+  - type (required) : Data type (int or float).
+  - set  (optional) : The method to be used in setting the value of the
+    variable. If not given, a method with name Setname will be used.
+  - get  (optional) : The method to be used in getting the value of the
+    variable. If not given, a method with name Getname will be used.
+  - help (optional) : Sets the balloon help.
+
+- String : A string. Represented by an entry widget.
+  Available tags are:
+  - name (required) : Text to be displayed next to the entry widget.
+  - set  (optional) : The method to be used in setting the value of the
+    variable. If not given, a method with name Setname will be used.
+  - get  (optional) : The method to be used in getting the value of the
+    variable. If not given, a method with name Getname will be used.
+  - help (optional) : Sets the balloon help.
+
+- Vector : A vector of numbers. Represented by multiple entry widgets.
+  Available tags are:
+  - name   (required) : Text to be displayed next to the entry widgets.
+  - type   (required) : Data type (int or float).
+  - length (required) : The length of the vector.
+  - set    (optional) : The method to be used in setting the value of the
+    variable. If not given, a method with name Setname will be used.
+  - get    (optional) : The method to be used in getting the value of the
+    variable. If not given, a method with name Getname will be used.
+  - help   (optional) : Sets the balloon help.
+
+- Extent : A special form of Vector. It is a vector of integers of length
+  6. See VTK documentation for description of extents
+  Available tags are:
+  - name   (required) : Text to be displayed next to the entry widgets.
+  - set    (optional) : The method to be used in setting the value of the
+    variable. If not given, the method for setting the extent of the
+    output is used.
+  - get    (optional) : The method to be used in getting the value of the
+    variable. If not given, the method for setting the extent of the
+    output is used.
+  - help   (optional) : Sets the balloon help.
+
+- File : A filename. Represented by an entry widget and a Browse button.
+  Available tags are:
+  - name      (required) : Text to be displayed next to the entry widget.
+  - extension (required) : File extension for the data file.
+  - set       (optional) : The method to be used in setting the value of the
+    variable. If not given, a method with name Setname will be used.
+  - get       (optional) : The method to be used in getting the value of the
+    variable. If not given, a method with name Getname will be used.
+  - help      (optional) : Sets the balloon help.
+
+- Selection : A list of items. Represented by a menu.
+  Available tags are:
+  - name (required) : Text to be displayed next to the menu.
+  - set  (optional) : The method to be used in setting the value of the
+    variable. If not given, a method with name Setname will be used.
+  - get  (optional) : The method to be used in getting the value of the
+    variable. If not given, a method with name Getname will be used.
+  - help (optional) : Sets the balloon help.
+
+- Choice : An entry in a selection.
+  - name  (required) : Text to be displayed.
+  - value (required) : Value which corresponds to this choice.
+
+
+** Examples
+
+<Interfaces>
+  <Source class="vtkAxes" root="Axes" output="vtkPolyData">
+    <Scalar name="Scale" set="SetScaleFactor" get="GetScaleFactor" 
+            type="float" help="Set the size of the axes"/>
+    <Vector name="Origin" type="float" length="3" 
+            help="Set the x, y, z coordinates of the origin of the axes"/>
+    <Boolean name="Symmetric" 
+             help="Select whether to display the negative axes"/>
+  </Source>
+  <Source class="vtkPLOT3DReader" root="Plot3D" output="vtkStructuredGrid">
+    <File name="XYZFileName" extension="bin" 
+          help="Set the geometry file to read."/>
+    <File name="QFileName" extension="bin" help="Set the data file to read."/>
+    <Scalar name="ScalarFunctionNumber" type="int" 
+            help="PLOT3D number for scalars"/>
+    <Scalar name="VectorFunctionNumber" type="int" 
+            help="PLOT3D number for vectors"/>
+  </Source>
+</Interfaces>
+
+
+<Interfaces>
+  <Filter class="vtkExtractGrid" root="ExtractGrid" input="vtkStructuredGrid" 
+          output="vtkStructuredGrid">
+    <Extent name="VOI" 
+            help="Set the min/max values of the volume of interest (VOI)"/>
+    <Vector name="SampleRate" type="int" length="3" 
+            help="Set the sampling rate for each dimension"/>
+    <Boolean name="IncludeBoundary" 
+             help="Select whether to always include the boundary of the grid in the output"/>
+  </Filter>
+</Interfaces>
