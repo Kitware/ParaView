@@ -102,7 +102,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.156.2.16");
+vtkCxxRevisionMacro(vtkPVApplication, "1.156.2.17");
 
 int vtkPVApplicationCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -962,12 +962,10 @@ void vtkPVApplication::Start(int argc, char*argv[])
 
   // Application Icon 
 #ifdef _WIN32
-  this->Script("SetApplicationIcon %s.exe %d big",
-               this->GetApplicationName(),
+  this->Script("SetApplicationIcon {} %d big",
                IDI_PARAVIEWICO32);
   // No, we can't set the same icon, even if it has both 32x32 and 16x16
-  this->Script("SetApplicationIcon %s.exe %d small",
-               this->GetApplicationName(),
+  this->Script("SetApplicationIcon {} %d small",
                IDI_PARAVIEWICO16);
 #endif
 
