@@ -46,6 +46,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWChangeColorButton.h"
 #include "vtkKWCheckButton.h"
 #include "vtkKWEntry.h"
+#include "vtkKWLabel.h"
 #include "vtkKWPushButton.h"
 #include "vtkKWOptionMenu.h"
 #include "vtkKWScale.h"
@@ -117,7 +118,7 @@ static unsigned char image_copy[] =
 
 // ----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWTextProperty);
-vtkCxxRevisionMacro(vtkKWTextProperty, "1.2");
+vtkCxxRevisionMacro(vtkKWTextProperty, "1.3");
 
 int vtkKWTextPropertyCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -129,6 +130,9 @@ vtkKWTextProperty::vtkKWTextProperty()
 {
   this->TextProperty = NULL;
   this->Actor2D = NULL;
+
+  this->ShowLabel = 0;
+  this->Label = vtkKWLabel::New();
 
   this->ShowColor = 1;
   this->ChangeColorButton = vtkKWChangeColorButton::New();
@@ -162,6 +166,9 @@ vtkKWTextProperty::~vtkKWTextProperty()
 {
   this->SetTextProperty(NULL);
   this->SetActor2D(NULL);
+
+  this->Label->Delete();
+  this->Label = NULL;
 
   this->ChangeColorButton->Delete();
   this->ChangeColorButton = NULL;
@@ -209,6 +216,11 @@ void vtkKWTextProperty::Create(vtkKWApplication *app)
 
   const char *wname = this->GetWidgetName();
   this->Script("frame %s -borderwidth 0 -relief flat", wname);
+
+  // Label
+
+  this->Label->SetParent(this);
+  this->Label->Create(this->Application, "");
 
   // Color
 
@@ -428,7 +440,8 @@ void vtkKWTextProperty::Create(vtkKWApplication *app)
 
   // Pack
 
-  this->Script("grid %s %s %s %s %s -sticky news -padx 1",
+  this->Script("grid %s %s %s %s %s %s -sticky news -padx 1",
+               this->Label->GetWidgetName(),
                this->ChangeColorButton->GetWidgetName(),
                this->FontFamilyOptionMenu->GetWidgetName(),
                this->StylesFrame->GetWidgetName(),
@@ -443,6 +456,7 @@ void vtkKWTextProperty::Create(vtkKWApplication *app)
 // ----------------------------------------------------------------------------
 void vtkKWTextProperty::UpdateInterface()
 {
+  this->UpdateLabel();
   this->UpdateColorButton();
   this->UpdateFontFamilyOptionMenu();
   this->UpdateStylesFrame();
@@ -466,6 +480,30 @@ void vtkKWTextProperty::SetTextProperty(vtkTextProperty *_arg)
     }
 
   this->Modified();
+}
+
+// ----------------------------------------------------------------------------
+void vtkKWTextProperty::SetShowLabel(int _arg)
+{
+  if (this->ShowLabel == _arg)
+    {
+    return;
+    }
+  this->ShowLabel = _arg;
+  this->Modified();
+
+  this->UpdateLabel();
+}
+
+// ----------------------------------------------------------------------------
+void vtkKWTextProperty::UpdateLabel()
+{
+  if (this->Label->IsCreated())
+    {
+    this->Script("grid %s %s",
+                 (this->ShowLabel ? "" : "remove"), 
+                 this->Label->GetWidgetName());
+    }
 }
 
 // ----------------------------------------------------------------------------
@@ -904,6 +942,7 @@ void vtkKWTextProperty::UpdateCopyButton()
     }
 }
 
+// ----------------------------------------------------------------------------
 void vtkKWTextProperty::CopyValuesFrom(vtkKWTextProperty *widget)
 {
   if (widget)
@@ -992,4 +1031,5 @@ void vtkKWTextProperty::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "OnChangeCommand: " 
      << (this->OnChangeCommand ? this->OnChangeCommand : "None") << endl;
   os << indent << "CopyButton: " << this->CopyButton << endl;
+  os << indent << "Label: " << this->Label << endl;
 }

@@ -39,10 +39,10 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-// .NAME vtkKWTextProperty - a frame with a grooved border and a label
+// .NAME vtkKWTextProperty - a GUI component that can be used to edit vtkTextProperty objects
 // .SECTION Description
-// The LabeledFrame creates a frame with a grooved border, and a label
-// embedded in the upper left corner of the grooved border.
+// The vtkKWTextProperty creates a set of GUI components that can be displayed
+// and used selectively to edit all or part of a vtkTextProperty object.
 
 
 #ifndef __vtkKWTextProperty_h
@@ -54,6 +54,7 @@ class vtkActor2D;
 class vtkKWApplication;
 class vtkKWChangeColorButton;
 class vtkKWCheckButton;
+class vtkKWLabel;
 class vtkKWOptionMenu;
 class vtkKWPushButton;
 class vtkKWScale;
@@ -82,6 +83,13 @@ public:
   // that the vtkActor2D color has to be used instead.
   virtual void SetActor2D(vtkActor2D*);
   vtkGetObjectMacro(Actor2D, vtkActor2D);
+
+  // Description:
+  // Show label.
+  void SetShowLabel(int);
+  vtkBooleanMacro(ShowLabel, int);
+  vtkGetMacro(ShowLabel, int);
+  vtkGetObjectMacro(Label, vtkKWLabel);
 
   // Description:
   // Show color.
@@ -165,6 +173,7 @@ protected:
   ~vtkKWTextProperty();
 
   void UpdateInterface();
+  void UpdateLabel();
   void UpdateColorButton();
   void UpdateFontFamilyOptionMenu();
   void UpdateStylesFrame();
@@ -176,6 +185,9 @@ protected:
 
   vtkTextProperty *TextProperty;
   vtkActor2D *Actor2D;
+
+  int ShowLabel;
+  vtkKWLabel *Label;
 
   int ShowColor;
   vtkKWChangeColorButton *ChangeColorButton;
