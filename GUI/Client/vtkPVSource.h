@@ -24,7 +24,6 @@
 
 #include "vtkKWWidget.h"
 #include "vtkClientServerStream.h"  // needed for vtkClientServerID
-class vtkCollection;
 class vtkDataSet;
 class vtkKWEntry;
 class vtkKWFrame;
@@ -42,7 +41,7 @@ class vtkPVInputProperty;
 class vtkPVRenderView;
 class vtkPVSourceCollection;
 class vtkPVWidget;
-class vtkPVWidgetProperty;
+class vtkPVWidgetCollection;
 class vtkPVWindow;
 class vtkSMSourceProxy;
 class vtkSource;
@@ -222,7 +221,7 @@ public:
   vtkGetObjectMacro(AcceptButton, vtkKWPushButton);
 
   //BTX
-  vtkGetObjectMacro(WidgetProperties, vtkCollection);
+  vtkGetObjectMacro(Widgets, vtkPVWidgetCollection);
   //ETX
   
   vtkGetObjectMacro(ParameterFrame, vtkKWFrame);
@@ -561,7 +560,7 @@ protected:
   vtkKWWidget *ButtonFrame;
   vtkKWFrame *ParameterFrame;
   
-  vtkCollection *WidgetProperties;
+  vtkPVWidgetCollection *Widgets;
 
   vtkKWPushButton *AcceptButton;
   vtkKWPushButton *ResetButton;

@@ -14,7 +14,6 @@
 =========================================================================*/
 #include "vtkXDMFReaderModule.h"
 
-#include "vtkCollection.h"
 #include "vtkCollectionIterator.h"
 #include "vtkKWFrame.h"
 #include "vtkKWLabeledFrame.h"
@@ -25,7 +24,7 @@
 #include "vtkPVData.h"
 #include "vtkPVFileEntry.h"
 #include "vtkPVProcessModule.h"
-#include "vtkPVWidgetProperty.h"
+#include "vtkPVWidgetCollection.h"
 #include "vtkPVWindow.h"
 #include "vtkString.h"
 #include "vtkVector.txx"
@@ -38,7 +37,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkXDMFReaderModule);
-vtkCxxRevisionMacro(vtkXDMFReaderModule, "1.20");
+vtkCxxRevisionMacro(vtkXDMFReaderModule, "1.21");
 
 int vtkXDMFReaderModuleCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -267,12 +266,11 @@ int vtkXDMFReaderModule::ReadFileInformation(const char* fname)
     }
 
   // We called UpdateInformation, we need to update the widgets.
-  vtkCollectionIterator* it = this->GetWidgetProperties()->NewIterator();
+  vtkCollectionIterator* it = this->GetWidgets()->NewIterator();
   for ( it->InitTraversal(); !it->IsDoneWithTraversal(); it->GoToNextItem())
     {
-    vtkPVWidgetProperty *pvwProp =
-      static_cast<vtkPVWidgetProperty*>(it->GetObject());
-    pvwProp->GetWidget()->ModifiedCallback();
+    vtkPVWidget *pvw = static_cast<vtkPVWidget*>(it->GetObject());
+    pvw->ModifiedCallback();
     }
   it->Delete();
   this->UpdateParameterWidgets();
@@ -416,15 +414,14 @@ void vtkXDMFReaderModule::SaveState(ofstream *file)
         << this->FileEntry->GetValue() << "\"" << endl;
 
   // Let the PVWidgets set up the object.
-  vtkCollectionIterator *it = this->WidgetProperties->NewIterator();
+  vtkCollectionIterator *it = this->Widgets->NewIterator();
   it->InitTraversal();
   
-  int numWidgets = this->WidgetProperties->GetNumberOfItems();
+  int numWidgets = this->Widgets->GetNumberOfItems();
   for (int i = 0; i < numWidgets; i++)
     {
-    vtkPVWidgetProperty* pvwProp = 
-      static_cast<vtkPVWidgetProperty*>(it->GetObject());
-    pvwProp->GetWidget()->SaveState(file);
+    vtkPVWidget* pvw = static_cast<vtkPVWidget*>(it->GetObject());
+    pvw->SaveState(file);
     it->GoToNextItem();
     }
   it->Delete();

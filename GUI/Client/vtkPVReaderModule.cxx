@@ -23,7 +23,7 @@
 #include "vtkPVFileEntry.h"
 #include "vtkPVProcessModule.h"
 #include "vtkPVRenderView.h"
-#include "vtkPVWidgetProperty.h"
+#include "vtkPVWidgetCollection.h"
 #include "vtkPVWindow.h"
 #include "vtkSMProperty.h"
 #include "vtkSMSourceProxy.h"
@@ -32,7 +32,7 @@
 #include <vtkstd/string>
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVReaderModule);
-vtkCxxRevisionMacro(vtkPVReaderModule, "1.48");
+vtkCxxRevisionMacro(vtkPVReaderModule, "1.49");
 
 int vtkPVReaderModuleCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -284,15 +284,14 @@ void vtkPVReaderModule::SaveState(ofstream *file)
         << this->FileEntry->GetValue() << "\"" << endl;
 
   // Let the PVWidgets set up the object.
-  vtkCollectionIterator *it = this->WidgetProperties->NewIterator();
+  vtkCollectionIterator *it = this->Widgets->NewIterator();
   it->InitTraversal();
   
-  int numWidgets = this->WidgetProperties->GetNumberOfItems();
+  int numWidgets = this->Widgets->GetNumberOfItems();
   for (int i = 0; i < numWidgets; i++)
     {
-    vtkPVWidgetProperty* prop =
-      static_cast<vtkPVWidgetProperty*>(it->GetObject());
-    prop->GetWidget()->SaveState(file);
+    vtkPVWidget* widget = static_cast<vtkPVWidget*>(it->GetObject());
+    widget->SaveState(file);
     it->GoToNextItem();
     }
   it->Delete();
@@ -309,24 +308,22 @@ void vtkPVReaderModule::SaveState(ofstream *file)
 //----------------------------------------------------------------------------
 void vtkPVReaderModule::AddPVFileEntry(vtkPVFileEntry* fileEntry)
 {
-  vtkPVWidgetProperty* pvwProp;
   // How to add to the begining of a collection?
   // Just make a new one.
-  vtkCollection *newWidgetProperties = vtkCollection::New();
-  vtkPVWidgetProperty *prop = fileEntry->CreateAppropriateProperty();
-  prop->SetWidget(fileEntry);
-  newWidgetProperties->AddItem(prop);
-  prop->Delete();
+  vtkPVWidgetCollection *newWidgets = vtkPVWidgetCollection::New();
+  newWidgets->AddItem(fileEntry);
   
-  vtkCollectionIterator *it = this->WidgetProperties->NewIterator();
+  vtkPVWidget *pvw;
+
+  vtkCollectionIterator *it = this->Widgets->NewIterator();
   it->InitTraversal();
-  while ( (pvwProp = static_cast<vtkPVWidgetProperty*>(it->GetObject())) )
+  while ( (pvw = static_cast<vtkPVWidget*>(it->GetObject())) )
     {
-    newWidgetProperties->AddItem(pvwProp);
+    newWidgets->AddItem(pvw);
     it->GoToNextItem();
     }
-  this->WidgetProperties->Delete();
-  this->WidgetProperties = newWidgetProperties;
+  this->Widgets->Delete();
+  this->Widgets = newWidgets;
   it->Delete();
   
   // Just doing what is in vtkPVSource::AddPVWidget(pvw);
