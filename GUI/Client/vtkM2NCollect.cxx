@@ -29,12 +29,13 @@
 #ifdef VTK_USE_MPI
 #include "vtkMPICommunicator.h"
 #endif
+#include "vtkMPIMToNSocketConnection.h"
+#include "vtkSocketCommunicator.h"
 
-vtkCxxRevisionMacro(vtkM2NCollect, "1.1");
+vtkCxxRevisionMacro(vtkM2NCollect, "1.2");
 vtkStandardNewMacro(vtkM2NCollect);
 
-//vtkCxxSetObjectMacro(vtkM2NCollect,Controller, vtkMultiProcessController);
-//vtkCxxSetObjectMacro(vtkM2NCollect,SocketController, vtkSocketController);
+vtkCxxSetObjectMacro(vtkM2NCollect,MPIMToNSocketConnection, vtkMPIMToNSocketConnection);
 
 //-----------------------------------------------------------------------------
 vtkM2NCollect::vtkM2NCollect()
@@ -44,6 +45,7 @@ vtkM2NCollect::vtkM2NCollect()
   this->ServerMode =0;
   this->RenderServerMode =0;
   this->ClientMode = 0;
+  this->MPIMToNSocketConnection = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -158,36 +160,43 @@ void vtkM2NCollect::Execute()
 //-----------------------------------------------------------------------------
 int vtkM2NCollect::ShuffleSizes(int size)
 {
- //  if(server)
-//     {
-//     rsSocket->Send(size);
-//     return 0;
-//     }
-//   if(renderServer)
-//     {
-//     rsSocket->Receive(val);
-//     return val;
-//     }
-//   return 0;
-//   // if I am a server process size will have a non-zero value
-//   // need to send that to the render server process if there is one
-//   // render server process returns the one it gets from the receive
+  vtkSocketCommunicator* socket = this->MPIMToNSocketConnection->GetSocketCommunicator();
+  if(!socket)
+    {
+    return 0;
+    }
+  if(this->ServerMode)
+     {
+     socket->Send(&size, 1, 1, 98234);
+     return 0;
+     }
+  if(this->RenderServerMode)
+    {
+    int val;
+    socket->Receive(&val, 1, 1, 98234);
+    return val;
+    }
   return 0;
 }
 
+
 //-----------------------------------------------------------------------------
 void vtkM2NCollect::Shuffle(int inSize, char* inBuf, int outSize, char* outBuf)
-{
-//   if(server)
-//     {
-//     rsSocket->Send(inBuf, inSize);
-//     return;
-//     }
-//   if(renderServer)
-//     {
-//     rsSocket->Receive(outSize, outBuf);
-//     return;
-//     }
+{ 
+  vtkSocketCommunicator* socket = this->MPIMToNSocketConnection->GetSocketCommunicator();
+  if(!socket)
+    {
+    return;
+    }
+  if(this->ServerMode)
+     {
+     socket->Send(inBuf, inSize, 1, 38723);
+     }
+  if(this->RenderServerMode)
+    {
+    socket->Receive(outBuf, outSize, 1, 38723);
+    }
+  return;
 }
 
 //-----------------------------------------------------------------------------
