@@ -66,7 +66,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPart);
-vtkCxxRevisionMacro(vtkPVPart, "1.25.2.8");
+vtkCxxRevisionMacro(vtkPVPart, "1.25.2.9");
 
 
 int vtkPVPartCommand(ClientData cd, Tcl_Interp *interp,
@@ -342,17 +342,11 @@ void vtkPVPart::InsertExtractPiecesIfNecessary()
       }
     else
       {
-      pm->ServerSimpleScript("vtkDistributedDataFilter pvTemp");
+      pm->ServerSimpleScript("vtkTransmitUnstructuredGridPiece pvTemp");
       pm->ServerSimpleScript(
-        "pvTemp AddObserver StartEvent {$Application LogStartEvent {Execute D3}}");
+        "pvTemp AddObserver StartEvent {$Application LogStartEvent {Execute TransmitUGrid}}");
       pm->ServerSimpleScript(
-        "pvTemp AddObserver EndEvent {$Application LogEndEvent {Execute D3}}");
-
-      //pm->ServerSimpleScript("vtkTransmitUnstructuredGridPiece pvTemp");
-      //pm->ServerSimpleScript(
-      //  "pvTemp AddObserver StartEvent {$Application LogStartEvent {Execute TransmitUGrid}}");
-      //pm->ServerSimpleScript(
-      //  "pvTemp AddObserver EndEvent {$Application LogEndEvent {Execute TransmitUGrid}}");
+        "pvTemp AddObserver EndEvent {$Application LogEndEvent {Execute TransmitUGrid}}");
       }
     }
     else if((pm->RootScript("%s IsA vtkImageData", this->VTKDataTclName),
