@@ -21,7 +21,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMIntRangeDomain);
-vtkCxxRevisionMacro(vtkSMIntRangeDomain, "1.13");
+vtkCxxRevisionMacro(vtkSMIntRangeDomain, "1.14");
 
 struct vtkSMIntRangeDomainInternals
 {
@@ -29,10 +29,12 @@ struct vtkSMIntRangeDomainInternals
   {
     int Min;
     int Max;
+    int Resolution;
     int MinSet;
     int MaxSet;
-    
-    EntryType() : Min(0), Max(0), MinSet(0), MaxSet(0) {}
+    int ResolutionSet;
+
+    EntryType() : Min(0), Max(0), Resolution(0), MinSet(0), MaxSet(0), ResolutionSet(0) {}
   };
   vtkstd::vector<EntryType> Entries;
 };
@@ -81,6 +83,7 @@ int vtkSMIntRangeDomain::IsInDomain(vtkSMProperty* property)
 //---------------------------------------------------------------------------
 int vtkSMIntRangeDomain::IsInDomain(unsigned int idx, int val)
 {
+  // User has not put any condition so domains is always valid
   if (idx >= this->IRInternals->Entries.size())
     {
     return 1;
@@ -96,6 +99,17 @@ int vtkSMIntRangeDomain::IsInDomain(unsigned int idx, int val)
     {
     return 0;
     }
+
+  if ( this->IRInternals->Entries[idx].ResolutionSet )
+    {
+    // check if value is a multiple of resolution + min:
+    int exists;
+    int min = this->GetMinimum(idx,exists); //set to 0 if necesseary
+    int res = this->IRInternals->Entries[idx].Resolution;
+    int multi = (int)((val - min) / res);
+    return (multi*res + min - val) == 0.;
+    }
+  //else the resolution is not taken into account
 
   return 1;
 }
@@ -145,6 +159,22 @@ int vtkSMIntRangeDomain::GetMaximum(unsigned int idx, int& exists)
 }
 
 //---------------------------------------------------------------------------
+int vtkSMIntRangeDomain::GetResolution(unsigned int idx, int& exists)
+{
+  exists = 0;
+  if (idx >= this->IRInternals->Entries.size())
+    {
+    return 0;
+    }
+  if (this->IRInternals->Entries[idx].ResolutionSet)
+    {
+    exists=1;
+    return this->IRInternals->Entries[idx].Resolution;
+    }
+  return 0;
+}
+
+//---------------------------------------------------------------------------
 void vtkSMIntRangeDomain::AddMinimum(unsigned int idx, int val)
 {
   this->SetEntry(idx, vtkSMIntRangeDomain::MIN, 1, val);
@@ -189,14 +219,36 @@ void vtkSMIntRangeDomain::RemoveAllMaxima()
 }
 
 //---------------------------------------------------------------------------
+void vtkSMIntRangeDomain::AddResolution(unsigned int idx, int val)
+{
+  this->SetEntry(idx, vtkSMIntRangeDomain::RESOLUTION, 1, val);
+}
+
+//---------------------------------------------------------------------------
+void vtkSMIntRangeDomain::RemoveResolution(unsigned int idx)
+{
+  this->SetEntry(idx, vtkSMIntRangeDomain::RESOLUTION, 0, 0);
+}
+
+//---------------------------------------------------------------------------
+void vtkSMIntRangeDomain::RemoveAllResolutions()
+{
+  unsigned int numEntries = this->GetNumberOfEntries();
+  for(unsigned int idx=0; idx<numEntries; idx++)
+    {
+    this->SetEntry(idx, vtkSMIntRangeDomain::RESOLUTION, 0, 0);
+    }
+}
+
+//---------------------------------------------------------------------------
 void vtkSMIntRangeDomain::SetEntry(
-  unsigned int idx, int minOrMax, int set, int value)
+  unsigned int idx, int minOrMaxOrRes, int set, int value)
 {
   if (idx >= this->IRInternals->Entries.size())
     {
     this->IRInternals->Entries.resize(idx+1);
     }
-  if (minOrMax == MIN)
+  if (minOrMaxOrRes == MIN)
     {
     if (set)
       {
@@ -208,7 +260,7 @@ void vtkSMIntRangeDomain::SetEntry(
       this->IRInternals->Entries[idx].MinSet = 0;
       }
     }
-  else
+  else if(minOrMaxOrRes == MAX)
     {
     if (set)
       {
@@ -218,6 +270,18 @@ void vtkSMIntRangeDomain::SetEntry(
     else
       {
       this->IRInternals->Entries[idx].MaxSet = 0;
+      }
+    }
+  else //if (minOrMaxOrRes == RESOLUTION)
+    {
+    if (set)
+      {
+      this->IRInternals->Entries[idx].ResolutionSet = 1;
+      this->IRInternals->Entries[idx].Resolution = value;
+      }
+    else
+      {
+      this->IRInternals->Entries[idx].ResolutionSet = 0;
       }
     }
 }
@@ -251,6 +315,16 @@ void vtkSMIntRangeDomain::SaveState(
             << "\"/>" << endl;
       }
     }
+  for(i=0; i<size; i++)
+    {
+    if (this->IRInternals->Entries[i].ResolutionSet)
+      {
+      *file << indent.GetNextIndent() 
+            << "<Resolution index=\"" << i << "\" value=\"" 
+            << this->IRInternals->Entries[i].Resolution
+            << "\"/>" << endl;
+      }
+    }
       
   *file << indent
         << "</Domain>" << endl;
@@ -261,7 +335,6 @@ void vtkSMIntRangeDomain::SaveState(
 int vtkSMIntRangeDomain::ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement* element)
 {
   this->Superclass::ReadXMLAttributes(prop, element);
-
   const int MAX_NUM = 128;
   int values[MAX_NUM];
 
@@ -287,6 +360,17 @@ int vtkSMIntRangeDomain::ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement*
       }
     }
 
+  numRead = element->GetVectorAttribute("resolution",
+                                        MAX_NUM,
+                                        values);
+  if (numRead > 0)
+    {
+    for (unsigned int i=0; i<(unsigned int)numRead; i++)
+      {
+      this->AddResolution(i, values[i]);
+      }
+    }
+
   return 1;
 }
 
@@ -298,6 +382,7 @@ void vtkSMIntRangeDomain::Update(vtkSMProperty* prop)
     {
     this->RemoveAllMinima();
     this->RemoveAllMaxima();
+    this->RemoveAllResolutions();
 
     unsigned int numEls = ivp->GetNumberOfElements();
     for (unsigned int i=0; i<numEls; i++)

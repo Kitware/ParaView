@@ -21,7 +21,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMDoubleRangeDomain);
-vtkCxxRevisionMacro(vtkSMDoubleRangeDomain, "1.11");
+vtkCxxRevisionMacro(vtkSMDoubleRangeDomain, "1.12");
 
 struct vtkSMDoubleRangeDomainInternals
 {
@@ -33,7 +33,7 @@ struct vtkSMDoubleRangeDomainInternals
     int MinSet;
     int MaxSet;
     int ResolutionSet;
-    
+
     EntryType() : Min(0), Max(0), Resolution(0), MinSet(0), MaxSet(0), ResolutionSet(0) {}
   };
   vtkstd::vector<EntryType> Entries;
@@ -103,7 +103,12 @@ int vtkSMDoubleRangeDomain::IsInDomain(unsigned int idx, double val)
   
   if ( this->DRInternals->Entries[idx].ResolutionSet )
     {
-    // Ambiguous case
+    // check if value is a multiple of resolution + min:
+    int exists;
+    double min = this->GetMinimum(idx,exists); //set to 0 if necesseary
+    double res = this->DRInternals->Entries[idx].Resolution;
+    int multi = (int)((val - min) / res);
+    return (multi*res + min - val) == 0.;
     }
   //else the resolution is not taken into account
 
@@ -289,7 +294,7 @@ void vtkSMDoubleRangeDomain::SaveState(
   *file << indent 
         << "<Domain name=\"" << this->XMLName << "\" id=\"" << name << "\">"
         << endl;
-  unsigned int size = this->DRInternals->Entries.size();
+  unsigned int size = this->GetNumberOfEntries();
   unsigned int i;
   for(i=0; i<size; i++)
     {
@@ -308,6 +313,16 @@ void vtkSMDoubleRangeDomain::SaveState(
       *file << indent.GetNextIndent() 
             << "<Max index=\"" << i << "\" value=\"" 
             << this->DRInternals->Entries[i].Max
+            << "\"/>" << endl;
+      }
+    }
+  for(i=0; i<size; i++)
+    {
+    if (this->DRInternals->Entries[i].ResolutionSet)
+      {
+      *file << indent.GetNextIndent() 
+            << "<Resolution index=\"" << i << "\" value=\"" 
+            << this->DRInternals->Entries[i].Resolution
             << "\"/>" << endl;
       }
     }

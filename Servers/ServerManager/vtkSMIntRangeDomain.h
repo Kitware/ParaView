@@ -68,6 +68,12 @@ public:
   int GetMaximum(unsigned int idx, int& exists);
 
   // Description:
+  // Return a resolution. value if it exists. If the resolution. exists
+  // exists is set to 1. Otherwise, it is set to 0.
+  // An unspecified max. is equivalent to 1
+  int GetResolution(unsigned int idx, int& exists);
+
+  // Description:
   // Set a min. of a given index.
   void AddMinimum(unsigned int idx, int value);
 
@@ -92,6 +98,19 @@ public:
   // Description:
   // Clear all maximum values.
   void RemoveAllMaxima();
+
+  // Description:
+  // Set a resolution. of a given index.
+  void AddResolution(unsigned int idx, int value);
+
+  // Description:
+  // Remove a resolution. of a given index.
+  // An unspecified resolution. is equivalent to 1
+  void RemoveResolution(unsigned int idx);
+
+  // Description:
+  // Clear all resolution values.
+  void RemoveAllResolutions();
 
   // Description:
   // Returns the number of entries in the internal
@@ -135,7 +154,8 @@ protected:
   enum
   {
     MIN = 0,
-    MAX = 1
+    MAX = 1,
+    RESOLUTION = 2
   };
 //ETX
 
