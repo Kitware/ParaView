@@ -473,6 +473,7 @@
                input_name="Input"/>
     <StringEntry variable="ResultArrayName"
                  trace_name="ResultArray"
+                 label="Result Array Name"
                  help="Set the name of the array to hold the results of this computation"
                  default_value="Result"/>
     <CalculatorWidget trace_name="Equation"
@@ -578,6 +579,11 @@
                    trace_name="Dimensionality"
                    default_value="3"
                    help="Select whether to perform a 2d or 3d gradient magnitude">
+      <Item name="2"
+            value="2"/>
+      <Item name="3"
+            value="3"/>
+    </SelectionList>
   </Module>
   <Module name="GroupParts"
           menu_name="Group Parts"
