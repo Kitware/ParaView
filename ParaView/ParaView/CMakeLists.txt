@@ -45,7 +45,7 @@ SET( ParaView_SRCS
   vtkPVDataSetAttributesInformation.cxx
   vtkPVDataSetFileEntry.cxx
   vtkPVDataSetReaderModule.cxx
-  ${CMAKE_CURRENT_SOURCE_DIR}/../Filters/vtkPVDuplicatePolyData.cxx
+  ${PARAVIEW_SOURCE_DIR}/Filters/vtkPVDuplicatePolyData.cxx
   vtkPVDummyWidget.cxx
   vtkPVEnSightReaderModule.cxx
   vtkPVErrorLogDisplay.cxx
@@ -297,7 +297,8 @@ CONFIGURE_FILE(${PARAVIEW_SOURCE_DIR}/ParaView/vtkPVConfig.h.in
   ${PARAVIEW_BINARY_DIR}/ParaView/vtkPVConfig.h
   ESCAPE_QUOTES)
 
-INCLUDE_DIRECTORIES(${PARAVIEW_BINARY_DIR}/ParaView)
+INCLUDE_DIRECTORIES(${PARAVIEW_BINARY_DIR}/ParaView
+  ${PARAVIEW_SOURCE_DIR}/Filters)
 
 SET(ParaViewBinary_SRCS
   ParaView.cxx)
