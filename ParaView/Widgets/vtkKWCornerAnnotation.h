@@ -82,9 +82,12 @@ public:
   // Description:
   // Callback functions used by the pro sheet
   virtual void SetCornerText(const char *txt, int corner);
+  virtual void SetCornerTextNoPropagate(const char *txt, int corner);
   virtual char *GetCornerText(int i){return this->CornerText[i]->GetValue();};
   virtual void CornerChanged(int i);
+  virtual void CornerChangedNoPropagate(int i);
   virtual void OnDisplayCorner();
+  virtual void OnDisplayCornerNoPropagate();
   virtual void SetVisibility(int i);
   virtual int  GetVisibility();
   vtkBooleanMacro(Visibility,int);
@@ -98,6 +101,7 @@ public:
   // Description:
   // Change the color of the annotation
   void SetTextColor(float r, float g, float b);
+  void SetTextColorNoPropagate(float r, float g, float b);
   float *GetTextColor() {return this->CornerProp->GetProperty()->GetColor();};
 
   // Description:
