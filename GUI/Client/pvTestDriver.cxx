@@ -240,9 +240,9 @@ int pvTestDriver::ProcessCommandLine(int argc, char* argv[])
   // This test should allow error to be in the output of the test.
   for(i =1; i < argc; ++i)
     {
-    int len = strlen(argv[i]) - 9;
-    if(len > 0 && (strncmp(argv[i]+len, "Other.pvs", 9) == 0 ||
-                   strncmp(argv[i]+len, "ByteOrder.pvs", 13)))
+    int len = strlen(argv[i]);
+    if((len > 9 && strncmp(argv[i]+len-9, "Other.pvs", 9) == 0) ||
+      (len > 13 && strncmp(argv[i]+len-13, "ByteOrder.pvs", 13) == 0))
       {
       this->AllowErrorInOutput = 1;
       }
