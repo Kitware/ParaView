@@ -67,7 +67,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkTransform.h"
 
 vtkStandardNewMacro(vtkPVBoxWidget);
-vtkCxxRevisionMacro(vtkPVBoxWidget, "1.3");
+vtkCxxRevisionMacro(vtkPVBoxWidget, "1.4");
 
 int vtkPVBoxWidgetCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -212,6 +212,8 @@ void vtkPVBoxWidget::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os,indent);
   os << indent << "BoxTclName: " 
      << (this->BoxTclName?this->BoxTclName:"none") << endl;
+  os << indent << "BoxTransform: " 
+    << this->BoxTransform << endl;
 }
 
 //----------------------------------------------------------------------------
