@@ -24,7 +24,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVDataSetAttributesInformation);
-vtkCxxRevisionMacro(vtkPVDataSetAttributesInformation, "1.1");
+vtkCxxRevisionMacro(vtkPVDataSetAttributesInformation, "1.2");
 
 //----------------------------------------------------------------------------
 vtkPVDataSetAttributesInformation::vtkPVDataSetAttributesInformation()
@@ -32,7 +32,7 @@ vtkPVDataSetAttributesInformation::vtkPVDataSetAttributesInformation()
   int idx;
 
   this->ArrayInformation = vtkCollection::New();
-  for (idx = 0; idx < 5; ++idx)
+  for (idx = 0; idx < vtkDataSetAttributes::NUM_ATTRIBUTES; ++idx)
     {
     this->AttributeIndices[idx] = -1;
     }
@@ -69,7 +69,7 @@ void vtkPVDataSetAttributesInformation::Initialize()
   int idx;
 
   this->ArrayInformation->RemoveAllItems();
-  for (idx = 0; idx < 5; ++idx)
+  for (idx = 0; idx < vtkDataSetAttributes::NUM_ATTRIBUTES; ++idx)
     {
     this->AttributeIndices[idx] = -1;
     }
@@ -97,7 +97,7 @@ vtkPVDataSetAttributesInformation
     newArrayInfo = NULL;
     }
   // Now the default attributes.
-  for (idx = 0; idx < 5; ++idx)
+  for (idx = 0; idx < vtkDataSetAttributes::NUM_ATTRIBUTES; ++idx)
     {
     this->AttributeIndices[idx] = dataInfo->AttributeIndices[idx];
     }
@@ -116,7 +116,7 @@ vtkPVDataSetAttributesInformation
 
   // Clear array information.
   this->ArrayInformation->RemoveAllItems();
-  for (idx = 0; idx < 5; ++idx)
+  for (idx = 0; idx < vtkDataSetAttributes::NUM_ATTRIBUTES; ++idx)
     {
     this->AttributeIndices[idx] = -1;
     }
@@ -149,68 +149,69 @@ void
 vtkPVDataSetAttributesInformation
 ::AddInformation(vtkPVDataSetAttributesInformation *info)
 {
-  int                    num1, num2, idx1, idx2;
-  vtkPVArrayInformation* ai1;
-  vtkPVArrayInformation* ai2;
-  int                    attribute1, attribute2;
-  short                  infoArrayIndex;
-  short                  newAttributeIndices[5];
-  vtkCollection*         newArrayInformation;
+  int idx1, idx2;
+  int num1 = this->GetNumberOfArrays();
+  int num2 = info->GetNumberOfArrays();
+  short  newAttributeIndices[vtkDataSetAttributes::NUM_ATTRIBUTES];
 
-  for (idx1 = 0; idx1 < 5; ++idx1)
+  for (idx1 = 0; idx1 < vtkDataSetAttributes::NUM_ATTRIBUTES; ++idx1)
     {
     newAttributeIndices[idx1] = -1;
     }
 
-  // Combine point array information.
-  infoArrayIndex = 0;
-  newArrayInformation = vtkCollection::New();
-  num1 = this->GetNumberOfArrays();
-  num2 = info->GetNumberOfArrays();
+  // First add ranges from all common arrays
   for (idx1 = 0; idx1 < num1; ++idx1)
     {
-    ai1 = this->GetArrayInformation(idx1);
-    // First find a match for array1 in info.
-    idx2 = idx1;
-    ai2 = info->GetArrayInformation(idx1);
-    if ( ai1->Compare(ai2) == 0 )
-      { // Arrays are not in the same order.  Try to find a match.
-      for (idx2 = 0; idx2 < num2; ++idx2)
+    int found=0;
+    vtkPVArrayInformation* ai1 = this->GetArrayInformation(idx1);
+    for (idx2 = 0; idx2 < num2; ++idx2)
+      {
+      vtkPVArrayInformation* ai2 = info->GetArrayInformation(idx2);
+      if ( ai1->Compare(ai2) )
         {
-        ai2 = info->GetArrayInformation(idx2);
-        if ( ai1->Compare(ai2) )
+        // Take union of range.
+        ai1->AddRanges(ai2);
+        found = 1;
+        // Record default attributes.
+        int attribute1 = this->IsArrayAnAttribute(idx1);
+        int attribute2 = info->IsArrayAnAttribute(idx2);
+        if (attribute1 > -1 && attribute1 == attribute2)
           {
-          break;
+          newAttributeIndices[attribute1] = idx1;
           }
-        else
-          {
-          ai2 = NULL;
-          }
+        break;
         }
       }
-    // If match, save.
-    if (ai2)
+    if (!found)
       {
-      // Take union of range.
-      ai1->AddRanges(ai2);
-      // Now add to new collection.
-      newArrayInformation->AddItem(ai1);
-      // Record default attributes.
-      attribute1 = this->IsArrayAnAttribute(idx1);
-      attribute2 = info->IsArrayAnAttribute(idx2);
-      if (attribute1 > -1 && attribute1 == attribute2)
-        {
-        newAttributeIndices[attribute1] = infoArrayIndex;
-        }
-      ++infoArrayIndex;
+      ai1->SetIsPartial(1);
       }
     }
-  // Now set the new array information and attributes.
-  this->ArrayInformation->Delete();
-  this->ArrayInformation = newArrayInformation;
-  for (idx1  = 0; idx1 < 5; ++idx1)
+
+  for (idx1 = 0; idx1 < vtkDataSetAttributes::NUM_ATTRIBUTES; ++idx1)
     {
     this->AttributeIndices[idx1] = newAttributeIndices[idx1];
+    }
+
+  // Now add arrays that don't exist
+  for (idx2 = 0; idx2 < num2; ++idx2)
+    {
+    vtkPVArrayInformation* ai2 = info->GetArrayInformation(idx2);
+    int found=0;
+    for (idx1 = 0; idx1 < this->GetNumberOfArrays(); ++idx1)
+      {
+      vtkPVArrayInformation* ai1 = this->GetArrayInformation(idx1);
+      if ( ai1->Compare(ai2) )
+        {
+        found=1;
+        break;
+        }
+      }
+    if (!found)
+      {
+      ai2->SetIsPartial(1);
+      this->ArrayInformation->AddItem(ai2);
+      }
     }
 }
 
@@ -248,7 +249,7 @@ int vtkPVDataSetAttributesInformation::IsArrayAnAttribute(int arrayIndex)
 {
   int i;
 
-  for (i = 0; i < 5; ++i)
+  for (i = 0; i < vtkDataSetAttributes::NUM_ATTRIBUTES; ++i)
     {
     if (this->AttributeIndices[i] == arrayIndex)
       {
@@ -315,7 +316,7 @@ vtkPVDataSetAttributesInformation
   *css << vtkClientServerStream::Reply;
 
   // Default attributes.
-  *css << vtkClientServerStream::InsertArray(this->AttributeIndices, 5);
+  *css << vtkClientServerStream::InsertArray(this->AttributeIndices, vtkDataSetAttributes::NUM_ATTRIBUTES);
 
   // Number of arrays.
   *css << this->GetNumberOfArrays();
@@ -343,7 +344,7 @@ vtkPVDataSetAttributesInformation
   this->ArrayInformation->RemoveAllItems();
 
   // Default attributes.
-  if(!css->GetArgument(0, 0, this->AttributeIndices, 5))
+  if(!css->GetArgument(0, 0, this->AttributeIndices, vtkDataSetAttributes::NUM_ATTRIBUTES))
     {
     vtkErrorMacro("Error parsing default attributes from message.");
     return;

@@ -24,6 +24,7 @@
 #define __vtkPVDataSetAttributesInformation_h
 
 #include "vtkPVInformation.h"
+#include "vtkDataSetAttributes.h" // needed for NUM_ATTRIBUTES
 
 class vtkCollection;
 class vtkDataSetAttributes;
@@ -81,7 +82,7 @@ protected:
   // Data information collected from remote processes.
   vtkCollection* ArrayInformation;
   // Standard cell attributes.
-  short          AttributeIndices[5];
+  short          AttributeIndices[vtkDataSetAttributes::NUM_ATTRIBUTES];
 
   vtkPVDataSetAttributesInformation(const vtkPVDataSetAttributesInformation&); // Not implemented
   void operator=(const vtkPVDataSetAttributesInformation&); // Not implemented

@@ -37,7 +37,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVArrayMenu);
-vtkCxxRevisionMacro(vtkPVArrayMenu, "1.65");
+vtkCxxRevisionMacro(vtkPVArrayMenu, "1.66");
 
 vtkCxxSetObjectMacro(vtkPVArrayMenu, InputMenu, vtkPVInputMenu);
 vtkCxxSetObjectMacro(vtkPVArrayMenu, FieldMenu, vtkPVFieldMenu);
@@ -143,7 +143,38 @@ void vtkPVArrayMenu::SetValue(const char* name)
     return;
     }
 
-  this->ArrayMenu->SetValue(name);
+  if (name)
+    {
+    ostrstream aname;
+    aname << name;
+    vtkSMProperty* property = this->GetSMProperty();
+    if (property)
+      {
+      vtkSMArrayListDomain* dom = vtkSMArrayListDomain::SafeDownCast(
+        property->GetDomain("array_list"));
+      
+      unsigned int numStrings = dom->GetNumberOfStrings();
+      for (unsigned int i=0; i<numStrings; i++)
+        {
+        const char* arrayName = dom->GetString(i);
+        if (strcmp(arrayName, this->ArrayName) == 0)
+          {
+          if (dom->IsArrayPartial(i))
+            {
+            aname << " (partial)"; 
+            }
+          break;
+          }
+        }
+      }
+    aname << ends;
+    this->ArrayMenu->SetValue(aname.str());
+    delete[] aname.str();
+    }
+  else
+    {
+    this->ArrayMenu->SetValue("None");
+    }
   this->SetArrayName(name);
   this->ModifiedCallback();
   this->Update();
@@ -318,16 +349,43 @@ void vtkPVArrayMenu::UpdateArrayMenu()
       }
     unsigned int numStrings = dom->GetNumberOfStrings();
     
-    for (unsigned int i=0; i<numStrings; i++)
+    unsigned int i;
+    for (i=0; i<numStrings; i++)
       {
+      ostrstream aname;
       const char* arrayName = dom->GetString(i);
+      aname << arrayName;
+      if (dom->IsArrayPartial(i))
+        {
+        aname << " (partial)"; 
+        }
+      aname << ends;
       sprintf(methodAndArgs, "ArrayMenuEntryCallback {%s}", arrayName);
-      this->ArrayMenu->AddEntryWithCommand(arrayName, this, methodAndArgs);
+      this->ArrayMenu->AddEntryWithCommand(aname.str(), this, methodAndArgs);
+      delete[] aname.str();
       }
 
     if (this->ArrayName)
       {
-      this->ArrayMenu->SetValue(this->ArrayName);
+      ostrstream aname;
+
+      aname << this->ArrayName;
+
+      for (i=0; i<numStrings; i++)
+        {
+        const char* arrayName = dom->GetString(i);
+        if (strcmp(arrayName, this->ArrayName) == 0)
+          {
+          if (dom->IsArrayPartial(i))
+            {
+            aname << " (partial)"; 
+            }
+          break;
+          }
+        }
+      aname << ends;
+      this->ArrayMenu->SetValue(aname.str());
+      delete[] aname.str();
       }
     else
       {
