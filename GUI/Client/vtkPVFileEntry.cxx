@@ -71,7 +71,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVFileEntry);
-vtkCxxRevisionMacro(vtkPVFileEntry, "1.79");
+vtkCxxRevisionMacro(vtkPVFileEntry, "1.80");
 
 //----------------------------------------------------------------------------
 vtkPVFileEntry::vtkPVFileEntry()
@@ -308,6 +308,7 @@ void vtkPVFileEntry::SetTimeStep(int ts)
       str.rdbuf()->freeze(0);
       }
     }
+  this->Timestep->SetValue(this->TimeStep);
 }
 
 //----------------------------------------------------------------------------
@@ -603,6 +604,19 @@ void vtkPVFileEntry::SetValue(const char* fileName)
       {
       this->Property->AddFile(this->FileListSelect->GetElementFromFinalList(kk));
       }
+    char* cfile = new char[ strlen(fileName) + 1];
+    vtkKWDirectoryUtilities::GetFilenameName(fileName, cfile);
+    for ( cc = 0; cc < this->Property->GetNumberOfFiles(); cc ++ )
+      {
+
+      if ( strcmp(cfile, this->Property->GetFile(cc)) == 0 )
+        {
+        this->Property->SetTimeStep(cc);
+        this->SetTimeStep(cc);
+        break;
+        }
+      }
+    delete [] cfile;
     this->Initialized = 1;
     }
 
