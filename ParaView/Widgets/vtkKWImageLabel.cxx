@@ -66,15 +66,16 @@ void vtkKWImageLabel::Create(vtkKWApplication *app, const char *args)
 void vtkKWImageLabel::SetImageData(const unsigned char* data, 
 				   int width, int height)
 {
-  this->Script("winfo rgb %s [ lindex [ %s configure -bg ] end-1 ]", 
-	       this->GetParent()->GetWidgetName(), this->GetParent()->GetWidgetName());
+  this->Script("winfo rgb %s [ lindex [ %s configure -bg ] end ]", 
+               this->GetParent()->GetWidgetName(), 
+               this->GetParent()->GetWidgetName());
   int r, g, b;
   sscanf( this->Application->GetMainInterp()->result, "%d %d %d",
 	  &r, &g, &b );
-  r = (r / 65535.0)*255;
-  g = (g / 65535.0)*255;
-  b = (b / 65535.0)*255;
-  //cout << "RGB: #" << r << ", " << g << ", " << b << endl;
+  
+  r = (static_cast<float>(r) / 65535.0)*255.0;
+  g = (static_cast<float>(g) / 65535.0)*255.0;
+  b = (static_cast<float>(b) / 65535.0)*255.0;
   this->Script("image create photo -height %d -width %d", width, height);
   this->SetImageDataLabel(this->Application->GetMainInterp()->result);
   Tk_PhotoHandle photo;
@@ -97,25 +98,13 @@ void vtkKWImageLabel::SetImageData(const unsigned char* data,
   int cc;
   for ( cc=0; cc < block.width * block.height; cc++ )
     {
-    /*
-    cout << "Color: " << (unsigned int)*(pp) << ", " 
-	 << (unsigned int)*(pp) << ", " << (unsigned int)*(pp) << ", " 
-	 << (unsigned int)*(pp) << endl;
-    */
-    if ( *(dd+3) > 0 )
-      {
-      *(pp)   = *(dd);
-      *(pp+1) = *(dd+1);
-      *(pp+2) = *(dd+2);
-      *(pp+3) = *(dd+3);
-      }
-    else
-      {
-      *(pp)   = r;
-      *(pp+1) = g;
-      *(pp+2) = b;
-      *(pp+3) = 0;
-      }
+    float alpha = static_cast<float>(*(dd+3)) / 255.0;
+
+    *(pp)   = r*(1-alpha) + *(dd) * alpha;
+    *(pp+1) = r*(1-alpha) + *(dd+1) * alpha;
+    *(pp+2) = r*(1-alpha) + *(dd+2) * alpha;
+    *(pp+3) = *(dd+3);
+
     pp+=4;
     dd+=4;
     }
