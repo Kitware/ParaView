@@ -47,7 +47,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCalculatorWidget);
-vtkCxxRevisionMacro(vtkPVCalculatorWidget, "1.24");
+vtkCxxRevisionMacro(vtkPVCalculatorWidget, "1.25");
 
 int vtkPVCalculatorWidgetCommand(ClientData cd, Tcl_Interp *interp,
                                 int argc, char *argv[]);
@@ -870,29 +870,27 @@ void vtkPVCalculatorWidget::Accept()
 //----------------------------------------------------------------------------
 void vtkPVCalculatorWidget::ResetInternal()
 {
-  if ( this->FunctionLabel->IsCreated() )
+  vtkSMIntVectorProperty *ivp = vtkSMIntVectorProperty::SafeDownCast(
+    this->GetSMAttributeModeProperty());
+  if (ivp)
     {
-    vtkSMStringVectorProperty *svp = vtkSMStringVectorProperty::SafeDownCast(
-      this->GetSMFunctionProperty());
-    if (svp)
+    int mode = ivp->GetElement(0);
+    switch (mode)
       {
-      this->FunctionLabel->SetValue(svp->GetElement(0));
+      case 0:
+        this->ChangeAttributeMode("point");
+        break;
+      case 1:
+        this->ChangeAttributeMode("cell");
+        break;
       }
-    vtkSMIntVectorProperty *ivp = vtkSMIntVectorProperty::SafeDownCast(
-      this->GetSMAttributeModeProperty());
-    if (ivp)
-      {
-      int mode = ivp->GetElement(0);
-      switch (mode)
-        {
-        case 0:
-          this->ChangeAttributeMode("point");
-          break;
-        case 1:
-          this->ChangeAttributeMode("cell");
-          break;
-        }
-      }
+    }
+  
+  vtkSMStringVectorProperty *svp = vtkSMStringVectorProperty::SafeDownCast(
+    this->GetSMFunctionProperty());
+  if (svp)
+    {
+    this->FunctionLabel->SetValue(svp->GetElement(0));
     }
   
   if (this->AcceptCalled)
