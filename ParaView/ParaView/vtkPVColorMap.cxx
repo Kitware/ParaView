@@ -68,7 +68,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVColorMap);
-vtkCxxRevisionMacro(vtkPVColorMap, "1.20");
+vtkCxxRevisionMacro(vtkPVColorMap, "1.21");
 
 int vtkPVColorMapCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -546,7 +546,7 @@ void vtkPVColorMap::NameEntryCallback()
 //----------------------------------------------------------------------------
 void vtkPVColorMap::SetScalarBarTitle(const char* name)
 {
-  this->AddTraceEntry("$kw(%s) SetName {%s}", name);
+  this->AddTraceEntry("$kw(%s) SetName {%s}", this->GetTclName(), name);
   this->SetScalarBarTitleNoTrace(name);
 }
 
@@ -1139,6 +1139,36 @@ void vtkPVColorMap::UpdateMap(int width, int height)
 }
 
 //----------------------------------------------------------------------------
+void vtkPVColorMap::SetScalarBarPosition1(float x, float y)
+{
+  vtkScalarBarActor* sact = this->ScalarBar->GetScalarBarActor();
+  sact->GetPositionCoordinate()->SetValue(x, y);
+  this->AddTraceEntry("$kw(%s) SetScalarBarPosition1 %f %f", 
+                      this->GetTclName(), x, y);
+  this->PVRenderView->EventuallyRender();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVColorMap::SetScalarBarPosition2(float x, float y)
+{
+  vtkScalarBarActor* sact = this->ScalarBar->GetScalarBarActor();
+  sact->GetPosition2Coordinate()->SetValue(x,y);
+  this->AddTraceEntry("$kw(%s) SetScalarBarPosition2 %f %f", 
+                      this->GetTclName(), x, y);
+  this->PVRenderView->EventuallyRender();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVColorMap::SetScalarBarOrientation(int o)
+{
+  vtkScalarBarActor* sact = this->ScalarBar->GetScalarBarActor();
+  sact->SetOrientation(o);
+  this->AddTraceEntry("$kw(%s) SetScalarBarOrientation %d", 
+                      this->GetTclName(), o);
+  this->PVRenderView->EventuallyRender();  
+}
+
+//----------------------------------------------------------------------------
 void vtkPVColorMap::ExecuteEvent(vtkObject* wdg, unsigned long event,  
                                  void* calldata)
 {
@@ -1150,6 +1180,15 @@ void vtkPVColorMap::ExecuteEvent(vtkObject* wdg, unsigned long event,
     case vtkCommand::EndInteractionEvent:
       this->PVRenderView->GetPVWindow()->InteractionOff();
       this->PVRenderView->EventuallyRender();
+      vtkScalarBarActor* sact = this->ScalarBar->GetScalarBarActor();
+      float *pos1 = sact->GetPositionCoordinate()->GetValue();
+      float *pos2 = sact->GetPosition2Coordinate()->GetValue();
+      this->AddTraceEntry("$kw(%s) SetScalarBarPosition1 %f %f", 
+                          this->GetTclName(), pos1[0], pos1[1]);
+      this->AddTraceEntry("$kw(%s) SetScalarBarPosition2 %f %f", 
+                          this->GetTclName(), pos2[0], pos2[1]);
+      this->AddTraceEntry("$kw(%s) SetScalarBarOrientation %d",
+                          this->GetTclName(), sact->GetOrientation());
       break;
     }
 }

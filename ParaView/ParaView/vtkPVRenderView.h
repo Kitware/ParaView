@@ -57,22 +57,23 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkKWView.h"
 
-class vtkMultiProcessController;
 class vtkKWLabel;
 class vtkKWPushButton;
 class vtkKWRadioButton;
-class vtkKWSplitFrame;
 class vtkKWScale;
+class vtkKWSplitFrame;
 class vtkLabeledFrame;
+class vtkMultiProcessController;
 class vtkPVApplication;
+class vtkPVCameraIcon;
 class vtkPVData;
 class vtkPVInteractorStyleControl;
+class vtkPVRenderViewObserver;
 class vtkPVSource;
 class vtkPVSourceList;
+class vtkPVSourcesNavigationWindow;
 class vtkPVTreeComposite;
 class vtkPVWindow;
-class vtkPVSourcesNavigationWindow;
-class vtkPVCameraIcon;
 
 #define VTK_PV_VIEW_MENU_LABEL       " 3D View Properties"
 
@@ -326,7 +327,10 @@ public:
   vtkGetMacro(LODResolution, int);
   vtkBooleanMacro(LODResolution, int);
 
-
+  // Description:
+  // This method is called when an event is called that PVRenderView
+  // is interested in.
+  void ExecuteEvent(vtkObject* wdg, unsigned long event, void* calldata);
 
   // Description:
   // Threshold for collecting data to a single process (MBytes).
@@ -464,6 +468,8 @@ protected:
   // Camera icons
   vtkKWLabeledFrame* CameraIconsFrame;
   vtkPVCameraIcon* CameraIcons[6];
+
+  vtkPVRenderViewObserver* Observer;
 
   vtkPVRenderView(const vtkPVRenderView&); // Not implemented
   void operator=(const vtkPVRenderView&); // Not implemented

@@ -132,6 +132,12 @@ public:
   // Adds and removes scalar bar from renderer.
   void SetScalarBarVisibility(int val);
   int GetScalarBarVisibility() { return this->ScalarBarVisibility;}  
+
+  // Descriptions:
+  // Set the position, the size, and orientation of scalar bar.
+  void SetScalarBarPosition1(float x, float y);
+  void SetScalarBarPosition2(float x, float y);
+  void SetScalarBarOrientation(int);
   
   // Description:
   // Choose preset color schemes.

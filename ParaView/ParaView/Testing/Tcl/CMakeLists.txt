@@ -38,6 +38,7 @@ SET(PROJECT_TESTS ArrayMenuChangeInput
                Mandelbrot
                ProbeLine
                ProbePoint
+               ScalarBar
                ScalarRangeLabel
                ScalarSelection
                ScalarsSphereClip

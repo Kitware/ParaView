@@ -1,0 +1,160 @@
+$Application ExitOnReturnOn
+if {[info exists argc]} { 
+    set argcm1 [expr $argc - 1]
+    for {set i 0} {$i < $argcm1} {incr i} {
+        if {[lindex $argv $i] == "-D" && $i < $argcm1} {
+		set DataDir [lindex $argv [expr $i + 1]]
+        }
+    }
+} 
+
+set kw(vtkTemp1) [$Application GetMainWindow]
+set kw(vtkTemp21) [$kw(vtkTemp1) GetMainView]
+$kw(vtkTemp1) Open "/home/andy/vtk/ParaView/Data/Data/vox8_bin.vtk"
+set kw(vtkTemp285) [vtkTemp1 GetCurrentPVSource]
+set kw(vtkTemp321) [$kw(vtkTemp1) GetPVColorMap {scalars}]
+$kw(vtkTemp321) SetScalarBarVisibility 1
+$kw(vtkTemp321) SetScalarBarPosition1 0.593485 0.250000
+$kw(vtkTemp321) SetScalarBarPosition2 0.406515 0.500000
+$kw(vtkTemp321) SetScalarBarOrientation 1
+$kw(vtkTemp21) EventuallyRender
+update
+
+$kw(vtkTemp21) SetCameraState 1.000 1.000 7.971  1.000 1.000 1.000  0.000 1.000 0.000
+$kw(vtkTemp321) SetScalarBarPosition1 0.389545 0.703580
+$kw(vtkTemp321) SetScalarBarPosition2 0.500000 0.406515
+$kw(vtkTemp321) SetScalarBarOrientation 0
+$kw(vtkTemp21) EventuallyRender
+update
+
+$kw(vtkTemp21) SetCameraState 1.000 1.000 7.971  1.000 1.000 1.000  0.000 1.000 0.000
+$kw(vtkTemp321) SetScalarBarPosition1 -0.020153 0.181625
+$kw(vtkTemp321) SetScalarBarPosition2 0.406516 0.499998
+$kw(vtkTemp321) SetScalarBarOrientation 1
+$kw(vtkTemp21) EventuallyRender
+update
+
+$kw(vtkTemp21) SetCameraState 1.000 1.000 7.971  1.000 1.000 1.000  0.000 1.000 0.000
+$kw(vtkTemp321) SetScalarBarPosition1 0.361135 -0.132317
+$kw(vtkTemp321) SetScalarBarPosition2 0.499998 0.406515
+$kw(vtkTemp321) SetScalarBarOrientation 0
+$kw(vtkTemp21) EventuallyRender
+update
+
+$kw(vtkTemp21) SetCameraState 1.000 1.000 7.971  1.000 1.000 1.000  0.000 1.000 0.000
+$kw(vtkTemp321) SetScalarBarPosition1 0.688181 0.279061
+$kw(vtkTemp321) SetScalarBarPosition2 0.406515 0.499999
+$kw(vtkTemp321) SetScalarBarOrientation 1
+$kw(vtkTemp21) EventuallyRender
+update
+
+$kw(vtkTemp21) SetCameraState 1.000 1.000 7.971  1.000 1.000 1.000  0.000 1.000 0.000
+$kw(vtkTemp321) SetScalarBarPosition1 0.349772 0.681358
+$kw(vtkTemp321) SetScalarBarPosition2 0.499998 0.406516
+$kw(vtkTemp321) SetScalarBarOrientation 0
+$kw(vtkTemp21) EventuallyRender
+update
+
+$kw(vtkTemp21) SetCameraState 1.000 1.000 7.971  1.000 1.000 1.000  0.000 1.000 0.000
+$kw(vtkTemp321) SetScalarBarPosition1 -0.099699 0.270514
+$kw(vtkTemp321) SetScalarBarPosition2 0.406516 0.499998
+$kw(vtkTemp321) SetScalarBarOrientation 1
+$kw(vtkTemp21) EventuallyRender
+update
+
+$kw(vtkTemp21) SetCameraState 1.000 1.000 7.971  1.000 1.000 1.000  0.000 1.000 0.000
+$kw(vtkTemp321) SetScalarBarPosition1 0.256969 -0.009240
+$kw(vtkTemp321) SetScalarBarPosition2 0.499998 0.406516
+$kw(vtkTemp321) SetScalarBarOrientation 0
+$kw(vtkTemp21) EventuallyRender
+update
+
+$kw(vtkTemp21) SetCameraState 1.000 1.000 7.971  1.000 1.000 1.000  0.000 1.000 0.000
+$kw(vtkTemp321) SetScalarBarPosition1 0.693861 0.366241
+$kw(vtkTemp321) SetScalarBarPosition2 0.406516 0.499998
+$kw(vtkTemp321) SetScalarBarOrientation 1
+$kw(vtkTemp21) EventuallyRender
+update
+
+$kw(vtkTemp21) SetCameraState 1.000 1.000 7.971  1.000 1.000 1.000  0.000 1.000 0.000
+$kw(vtkTemp321) SetScalarBarPosition1 0.291059 0.732640
+$kw(vtkTemp321) SetScalarBarPosition2 0.499998 0.406516
+$kw(vtkTemp321) SetScalarBarOrientation 0
+$kw(vtkTemp21) EventuallyRender
+update
+
+$kw(vtkTemp21) SetCameraState 1.000 1.000 7.971  1.000 1.000 1.000  0.000 1.000 0.000
+$kw(vtkTemp321) SetScalarBarPosition1 -0.054244 0.349147
+$kw(vtkTemp321) SetScalarBarPosition2 0.406515 0.499998
+$kw(vtkTemp321) SetScalarBarOrientation 1
+$kw(vtkTemp21) EventuallyRender
+update
+
+$kw(vtkTemp21) SetCameraState 1.000 1.000 7.971  1.000 1.000 1.000  0.000 1.000 0.000
+$kw(vtkTemp321) SetScalarBarPosition1 0.260757 -0.038300
+$kw(vtkTemp321) SetScalarBarPosition2 0.499998 0.406515
+$kw(vtkTemp321) SetScalarBarOrientation 0
+$kw(vtkTemp21) EventuallyRender
+update
+
+$kw(vtkTemp21) SetCameraState 1.000 1.000 7.971  1.000 1.000 1.000  0.000 1.000 0.000
+$kw(vtkTemp321) SetScalarBarPosition1 0.627573 0.292736
+$kw(vtkTemp321) SetScalarBarPosition2 0.406516 0.499998
+$kw(vtkTemp321) SetScalarBarOrientation 1
+$kw(vtkTemp21) EventuallyRender
+update
+
+$kw(vtkTemp21) SetCameraState 1.000 1.000 7.971  1.000 1.000 1.000  0.000 1.000 0.000
+$kw(vtkTemp321) SetScalarBarPosition1 0.171741 0.746315
+$kw(vtkTemp321) SetScalarBarPosition2 0.499997 0.406516
+$kw(vtkTemp321) SetScalarBarOrientation 0
+$kw(vtkTemp21) EventuallyRender
+update
+
+$kw(vtkTemp21) SetCameraState 1.000 1.000 7.971  1.000 1.000 1.000  0.000 1.000 0.000
+$kw(vtkTemp321) SetScalarBarPosition1 -0.099700 0.304703
+$kw(vtkTemp321) SetScalarBarPosition2 0.406515 0.499997
+$kw(vtkTemp321) SetScalarBarOrientation 1
+$kw(vtkTemp21) EventuallyRender
+update
+
+$kw(vtkTemp21) SetCameraState 1.000 1.000 7.971  1.000 1.000 1.000  0.000 1.000 0.000
+$kw(vtkTemp321) SetScalarBarPosition1 0.722270 0.238036
+$kw(vtkTemp321) SetScalarBarPosition2 0.406516 0.499997
+$kw(vtkTemp321) SetScalarBarOrientation 1
+$kw(vtkTemp21) EventuallyRender
+update
+
+$kw(vtkTemp21) SetCameraState 1.000 1.000 7.971  1.000 1.000 1.000  0.000 1.000 0.000
+$kw(vtkTemp321) SetScalarBarPosition1 0.300529 0.286486
+$kw(vtkTemp321) SetScalarBarPosition2 0.499996 0.406516
+$kw(vtkTemp321) SetScalarBarOrientation 0
+$kw(vtkTemp21) EventuallyRender
+update
+
+$kw(vtkTemp21) SetCameraState 1.000 1.000 7.971  1.000 1.000 1.000  0.000 1.000 0.000
+
+# Retrace
+update
+$Application StopRecordingScript
+[ $Application GetMainWindow ] DeleteAllSources
+# Source the trace to regenerate the sources.
+if {[catch {set channel [open test.tmp w]}] == 0 } {
+   close $channel
+   file delete -force test.tmp
+   source "ParaViewTrace.pvs"
+}
+
+# Fix the size of the image.
+RenWin1 SetSize 300 300
+RenWin1 Render
+update
+
+for {set i  1} {$i < [expr $argc - 1]} {incr i} {
+    if {[lindex $argv $i] == "-C"} {
+	source [lindex $argv [expr $i + 1]]
+	$Application SetExitStatus [CompareImage [[$Application GetMainWindow] GetMainView]]
+    }
+}
+
+$Application Exit

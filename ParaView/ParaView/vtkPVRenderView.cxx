@@ -43,6 +43,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkCamera.h"
 #include "vtkCollectionIterator.h"
+#include "vtkCommand.h"
 #include "vtkKWChangeColorButton.h"
 #include "vtkKWCheckButton.h"
 #include "vtkKWCornerAnnotation.h"
@@ -86,10 +87,39 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.198");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.199");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
+
+//===========================================================================
+//***************************************************************************
+class vtkPVRenderViewObserver : public vtkCommand
+{
+public:
+  static vtkPVRenderViewObserver *New() 
+    {return new vtkPVRenderViewObserver;};
+
+  vtkPVRenderViewObserver()
+    {
+      this->PVRenderView = 0;
+    }
+
+  virtual void Execute(vtkObject* wdg, unsigned long event,  
+                       void* calldata)
+    {
+      if ( this->PVRenderView )
+        {
+        this->PVRenderView->ExecuteEvent(wdg, event, calldata);
+        this->AbortFlagOn();
+        }
+    }
+
+  vtkPVRenderView* PVRenderView;
+};
+
+//***************************************************************************
+//===========================================================================
 
 //----------------------------------------------------------------------------
 vtkPVRenderView::vtkPVRenderView()
@@ -199,6 +229,9 @@ vtkPVRenderView::vtkPVRenderView()
     this->CameraIcons[cc] = vtkPVCameraIcon::New();
     }
   this->CameraIconsFrame = vtkKWLabeledFrame::New();
+
+  this->Observer = vtkPVRenderViewObserver::New();
+  this->Observer->PVRenderView = this;
 }
 
 //----------------------------------------------------------------------------
@@ -430,6 +463,7 @@ vtkPVRenderView::~vtkPVRenderView()
       this->CameraIcons[cc] = 0;
       }
     }
+  this->Observer->Delete();
 }
 
 //----------------------------------------------------------------------------
@@ -470,6 +504,7 @@ void vtkPVRenderView::CreateRenderObjects(vtkPVApplication *pvApp)
   // Get rid of render window created by the superclass
   this->RenderWindow->Delete();
   this->RenderWindow = (vtkRenderWindow*)pvApp->MakeTclObject("vtkRenderWindow", "RenWin1");
+  this->RenderWindow->AddObserver(vtkCommand::CursorChangedEvent, this->Observer);
 
   this->RenderWindowTclName = NULL;
   this->SetRenderWindowTclName("RenWin1");
@@ -2319,7 +2354,7 @@ void vtkPVRenderView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVRenderView ";
-  this->ExtractRevision(os,"$Revision: 1.198 $");
+  this->ExtractRevision(os,"$Revision: 1.199 $");
 }
 
 //------------------------------------------------------------------------------
@@ -2404,6 +2439,48 @@ void vtkPVRenderView::SerializeToken(istream& is, const char token[1024])
     //     << token << endl;
     this->Superclass::SerializeToken(is,token);  
     }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::ExecuteEvent(vtkObject*, unsigned long event, void* par)
+{
+  if ( event == vtkCommand::CursorChangedEvent )
+    {
+    int val = *(static_cast<int*>(par));
+    const char* image = "left_ptr";
+    switch ( val ) 
+      {
+      case VTK_CURSOR_ARROW:
+        image = "arror";
+        break;
+      case VTK_CURSOR_SIZENE:
+        image = "top_right_corner";
+        break;
+      case VTK_CURSOR_SIZENW:        
+        image = "top_left_corner";
+        break;
+      case VTK_CURSOR_SIZESW:
+        image = "bottom_left_corner";
+        break;
+      case VTK_CURSOR_SIZESE:
+        image = "bottom_right_corner";
+        break;
+      case VTK_CURSOR_SIZENS:
+        image = "sb_v_double_arrow";
+        break;
+      case VTK_CURSOR_SIZEWE:
+        image = "sb_h_double_arrow";
+        break;
+      case VTK_CURSOR_SIZEALL:
+        image = "hand2";
+        break;
+      case VTK_CURSOR_HAND:
+        image = "hand2";
+        break;
+      }
+    this->Script("%s config -cursor %s", 
+                 this->GetPVWindow()->GetWidgetName(), image);
+    } 
 }
 
 //----------------------------------------------------------------------------
