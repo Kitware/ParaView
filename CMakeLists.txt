@@ -64,9 +64,6 @@ IF(USE_INCLUDED_TCLTK)
      "Path to tcl library")
     SET(TK_INCLUDE_PATH ${ParaViewComplete_SOURCE_DIR}/TclTk8.3.2Win/include 
         CACHE PATH "Path to tcl include")
-    SET(TK_INTERNAL_PATH 
-        ${ParaViewComplete_SOURCE_DIR}/VTK/Rendering/tkInternals 
-        CACHE PATH "Path to tcl include")
   # copy the tcl/tk dll's to Release Debug MinSizeRel and RelWithDebInfo bin 
   # directory so no paths are needed to run this.
     CONFIGURE_FILE(${ParaViewComplete_SOURCE_DIR}/TclTk8.3.2Win/bin/tcl83.dll
