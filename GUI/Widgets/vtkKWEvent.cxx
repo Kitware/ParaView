@@ -14,7 +14,8 @@
 #include "vtkKWEvent.h"
 #include "vtkCommand.h"
 
-static const char *vtkKWEventStrings[] = {
+static const char *vtkKWEventStrings[] = 
+{
   "KWWidgetEvents",
   "MessageDialogInvokeEvent",
   "FocusInEvent",
@@ -215,30 +216,34 @@ static const char *vtkKWEventStrings[] = {
   0
 };
 
+//----------------------------------------------------------------------------
 unsigned long vtkKWEvent::GetEventIdFromString(const char* cevent)
 {
   unsigned long event = vtkCommand::GetEventIdFromString(cevent);
-  if ( event != vtkCommand::NoEvent )
+  if (event != vtkCommand::NoEvent)
     {
     return event;
     }
   
   int cc;
-  for ( cc = 0; vtkKWEventStrings[cc] != 0; cc ++ )
+  for (cc = 0; vtkKWEventStrings[cc] != 0; cc++)
     {
-    if ( strcmp(cevent, vtkKWEventStrings[cc]) == 0 )
+    if (strcmp(cevent, vtkKWEventStrings[cc]) == 0)
       {
       return cc + vtkKWEvent::KWWidgetEvents;
       }
     }
+
   return vtkCommand::NoEvent;
 }
 
+//----------------------------------------------------------------------------
 const char *vtkKWEvent::GetStringFromEventId(unsigned long event)
 {
   static unsigned long numevents = 0;
   
-  // find length of table
+  // Find length of table
+
   if (!numevents)
     {
     while (vtkKWEventStrings[numevents] != NULL)
@@ -246,12 +251,13 @@ const char *vtkKWEvent::GetStringFromEventId(unsigned long event)
       numevents++;
       }
     }
-  if ( event < vtkKWEvent::KWWidgetEvents ) 
+
+  if (event < vtkKWEvent::KWWidgetEvents) 
     {
     return vtkCommand::GetStringFromEventId(event);
     }
 
-  event -= 2000;
+  event -= vtkKWEvent::KWWidgetEvents;
 
   if (event < numevents)
     {
@@ -262,5 +268,3 @@ const char *vtkKWEvent::GetStringFromEventId(unsigned long event)
     return "UnknownEvent";
     }
 }
-
-

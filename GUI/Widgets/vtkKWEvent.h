@@ -16,15 +16,17 @@
 #ifndef __vtkKWEvent_h
 #define __vtkKWEvent_h
 
-
 #include "vtkObject.h"
 
 class VTK_EXPORT vtkKWEvent
 {
   public:
+
   static const char* GetStringFromEventId(unsigned long event);
   static unsigned long GetEventIdFromString(const char* event);
-  enum {
+
+  enum 
+  {
     KWWidgetEvents = 2000,
     MessageDialogInvokeEvent,
     FocusInEvent,
