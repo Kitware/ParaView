@@ -1,94 +1,98 @@
-    if {[info exists argc]} { 
-        set argcm1 [expr $argc - 1]
-        for {set i 0} {$i < $argcm1} {incr i} {
-            if {[lindex $argv $i] == "-D" && $i < $argcm1} {
+if {[info exists argc]} { 
+    set argcm1 [expr $argc - 1]
+    for {set i 0} {$i < $argcm1} {incr i} {
+        if {[lindex $argv $i] == "-D" && $i < $argcm1} {
 		set DataDir [lindex $argv [expr $i + 1]]
-            }
         }
-    } 
+    }
+} 
 
-    # hack to get the window.
-    set pvWindow [lindex [vtkPVWindow ListInstances] 0]
+# hack to get the window.
+set pvWindow [lindex [vtkPVWindow ListInstances] 0]
 
-    set reader [$pvWindow Open "$DataDir/Data/blow.vtk"]
-    
-    set wInt [$pvWindow GetSourceInterface "vtkWarpVector"]
-    set pvWarp [$wInt CreateCallback]
-    $pvWarp UpdateParameterWidgets
-    $pvWarp AcceptCallback
+set reader [$pvWindow Open "$DataDir/Data/blow.vtk"]
 
-    set lsInt [$pvWindow GetSourceInterface "vtkLoopSubdivisionFilter"]
-    set pvSub [$lsInt CreateCallback] 
-    [$pvSub GetVTKSource] SetNumberOfSubdivisions 2
-    $pvSub UpdateParameterWidgets
-    $pvSub AcceptCallback
+set wInt [$pvWindow GetSourceInterface "vtkWarpVector"]
+set pvWarp [$wInt CreateCallback]
+$pvWarp UpdateParameterWidgets
+$pvWarp AcceptCallback
 
-    set nInt [$pvWindow GetSourceInterface "vtkPPolyDataNormals"]
-    set pvNormals [$nInt CreateCallback]
-    [$pvNormals GetVTKSource] SetFeatureAngle 60
-    $pvNormals UpdateParameterWidgets
-    $pvNormals AcceptCallback
-    
-    set warpOutput [$pvWarp GetPVOutput]
-    $warpOutput SetVisibility 0
+set lsInt [$pvWindow GetSourceInterface "vtkLoopSubdivisionFilter"]
+set pvSub [$lsInt CreateCallback] 
+[$pvSub GetVTKSource] SetNumberOfSubdivisions 2
+$pvSub UpdateParameterWidgets
+$pvSub AcceptCallback
 
-    set subOutput [$pvSub GetPVOutput]
-    $subOutput SetVisibility 0
+set nInt [$pvWindow GetSourceInterface "vtkPPolyDataNormals"]
+set pvNormals [$nInt CreateCallback]
+[$pvNormals GetVTKSource] SetFeatureAngle 60
+$pvNormals UpdateParameterWidgets
+$pvNormals AcceptCallback
 
-    set normalsOutput [$pvNormals GetPVOutput]
-    $normalsOutput SetVisibility 0
+set warpOutput [$pvWarp GetPVOutput]
+$warpOutput SetVisibility 0
+
+set subOutput [$pvSub GetPVOutput]
+$subOutput SetVisibility 0
+
+set normalsOutput [$pvNormals GetPVOutput]
+$normalsOutput SetVisibility 0
 
 
-    set pvWindow [lindex [vtkPVWindow ListInstances] 0]
-    $pvWindow SetCurrentPVSource $pvWarp
-    
-    set camera [Ren1 GetActiveCamera]
-    $camera SetPosition 143.632 4.67034 -39.8384
-    $camera SetFocalPoint 2 12 4.1578e-15
-    $camera SetViewUp 0.270701 -0.00149368 0.962662
-    $camera SetViewAngle 30
-    $camera SetClippingRange 127.006 167.567
+set pvWindow [lindex [vtkPVWindow ListInstances] 0]
+$pvWindow SetCurrentPVSource $pvWarp
 
-    set normalsOutput [$pvNormals GetPVOutput]
-    $normalsOutput SetVisibility 1
+set camera [Ren1 GetActiveCamera]
+$camera SetPosition 143.632 4.67034 -39.8384
+$camera SetFocalPoint 2 12 4.1578e-15
+$camera SetViewUp 0.270701 -0.00149368 0.962662
+$camera SetViewAngle 30
+$camera SetClippingRange 127.006 167.567
 
-    [$pvWarp GetPVWidget {Vectors}] SetValue displacement1
-    $pvWarp AcceptCallback
-    $normalsOutput ColorByPointFieldComponent thickness1 0
+set normalsOutput [$pvNormals GetPVOutput]
+$normalsOutput SetVisibility 1
 
-    RenWin1 SetSize 300 300
+[$pvWarp GetPVWidget {Vectors}] SetValue displacement1
+$pvWarp AcceptCallback
+$normalsOutput ColorByPointFieldComponent thickness1 0
 
-    for {set i 1} {$i <= 10} {incr i 1} {
+RenWin1 SetSize 300 300
+
+for {set i 1} {$i <= 10} {incr i 1} {
 	[$pvWarp GetPVWidget {Vectors}] SetValue displacement$i
 	$normalsOutput ColorByPointFieldComponent thickness$i 0
-        $pvWarp AcceptCallback
-	#RenWin1 Render
-	update
-
-    }
-
-    $normalsOutput SetVisibility 0
-
-    set warpOutput [$pvWarp GetPVOutput]
-
-    [$pvWarp GetPVWidget {Vectors}] SetValue displacement1
-    [$warpOutput GetColorMenu] SetValue "Point thickness1"
-    $warpOutput ColorByPointFieldComponent thickness1 0
     $pvWarp AcceptCallback
-
-    $warpOutput SetVisibility 1
-
-    for {set i 1} {$i <= 10} {incr i 1} {
-	[$pvWarp GetPVWidget {Vectors}] SetValue displacement$i
-        [$warpOutput GetColorMenu] SetValue "Point thickness$i"
-	$warpOutput ColorByPointFieldComponent thickness$i 0
-        $pvWarp AcceptCallback
 	#RenWin1 Render
 	update
 
+}
+
+$normalsOutput SetVisibility 0
+
+set warpOutput [$pvWarp GetPVOutput]
+
+[$pvWarp GetPVWidget {Vectors}] SetValue displacement1
+[$warpOutput GetColorMenu] SetValue "Point thickness1"
+$warpOutput ColorByPointFieldComponent thickness1 0
+$pvWarp AcceptCallback
+
+$warpOutput SetVisibility 1
+
+for {set i 1} {$i <= 10} {incr i 1} {
+    [$pvWarp GetPVWidget {Vectors}] SetValue displacement$i
+    [$warpOutput GetColorMenu] SetValue "Point thickness$i"
+    $warpOutput ColorByPointFieldComponent thickness$i 0
+    $pvWarp AcceptCallback
+    #RenWin1 Render
+    update
+
+}
+
+for {set i  1} {$i < [expr $argc - 1]} {incr i} {
+    if {[lindex $argv $i] == "-C"} {
+	source [lindex $argv [expr $i + 1]]
+	$Application SetExitStatus [CompareImage [[Application GetMainWindow] GetMainView]]
     }
+}
 
-    source $DataDir/Utility/rtImage.tcl
-    pvImageTest $DataDir/Baseline/BlowTest.png 10
-
-    Application Exit
+Application Exit

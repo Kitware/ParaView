@@ -1,64 +1,68 @@
-    if {[info exists argc]} { 
-        set argcm1 [expr $argc - 1]
-        for {set i 0} {$i < $argcm1} {incr i} {
-            if {[lindex $argv $i] == "-D" && $i < $argcm1} {
+if {[info exists argc]} { 
+    set argcm1 [expr $argc - 1]
+    for {set i 0} {$i < $argcm1} {incr i} {
+        if {[lindex $argv $i] == "-D" && $i < $argcm1} {
 		set DataDir [lindex $argv [expr $i + 1]]
-            }
         }
-    } 
-    
-    # hack to get the window.
-    set pvWindow [lindex [vtkPVWindow ListInstances] 0]
-    
-    set sInt [$pvWindow GetSourceInterface "vtkSphereSource"]
-    set pvSphere [$sInt CreateCallback]
-    [$pvSphere GetPVWidget {Theta Resolution}] SetValue 16
-    $pvSphere AcceptCallback
-    
-    set sInt2 [$pvWindow GetSourceInterface "vtkShrinkPolyData"]
-    set pvShrink [$sInt2 CreateCallback]
-    [$pvShrink GetPVWidget {ShrinkFactor}] SetValue 0.9
-    $pvShrink AcceptCallback
+    }
+} 
 
-    set eInt [$pvWindow GetSourceInterface "vtkElevationFilter"]
-    set pvElevation [$eInt CreateCallback]
-    $pvElevation AcceptCallback
+# hack to get the window.
+set pvWindow [lindex [vtkPVWindow ListInstances] 0]
 
-    set eInt2 [$pvWindow GetSourceInterface "vtkExtractEdges"]
-    set pvExtract [$eInt2 CreateCallback]
-    $pvExtract AcceptCallback
+set sInt [$pvWindow GetSourceInterface "vtkSphereSource"]
+set pvSphere [$sInt CreateCallback]
+[$pvSphere GetPVWidget {Theta Resolution}] SetValue 16
+$pvSphere AcceptCallback
 
-    set extractOutput [$pvExtract GetPVOutput]
-    $extractOutput ColorByProperty
+set sInt2 [$pvWindow GetSourceInterface "vtkShrinkPolyData"]
+set pvShrink [$sInt2 CreateCallback]
+[$pvShrink GetPVWidget {ShrinkFactor}] SetValue 0.9
+$pvShrink AcceptCallback
 
-    set elevOutput [$pvElevation GetPVOutput]
-    $elevOutput SetVisibility 1
+set eInt [$pvWindow GetSourceInterface "vtkElevationFilter"]
+set pvElevation [$eInt CreateCallback]
+$pvElevation AcceptCallback
+
+set eInt2 [$pvWindow GetSourceInterface "vtkExtractEdges"]
+set pvExtract [$eInt2 CreateCallback]
+$pvExtract AcceptCallback
+
+set extractOutput [$pvExtract GetPVOutput]
+$extractOutput ColorByProperty
+
+set elevOutput [$pvElevation GetPVOutput]
+$elevOutput SetVisibility 1
 
 
-    set pvWindow [lindex [vtkPVWindow ListInstances] 0]
-    $pvWindow SetCurrentPVSource $pvSphere
-    
-    set camera [Ren1 GetActiveCamera]
-    $camera SetPosition 0 0 3.41078
-    $camera SetFocalPoint 0 0 0
-    $camera SetViewUp 0 1 0
-    $camera SetViewAngle 30
-    $camera SetClippingRange 2.38825 4.70618
-    
-    $elevOutput SetVisibility 1
-    $extractOutput SetVisibility 1
-    
-    RenWin1 SetSize 300 300
-    for {set i 0} {$i < 100} {incr i 1} {
+set pvWindow [lindex [vtkPVWindow ListInstances] 0]
+$pvWindow SetCurrentPVSource $pvSphere
+
+set camera [Ren1 GetActiveCamera]
+$camera SetPosition 0 0 3.41078
+$camera SetFocalPoint 0 0 0
+$camera SetViewUp 0 1 0
+$camera SetViewAngle 30
+$camera SetClippingRange 2.38825 4.70618
+
+$elevOutput SetVisibility 1
+$extractOutput SetVisibility 1
+
+RenWin1 SetSize 300 300
+for {set i 0} {$i < 100} {incr i 1} {
 	set camera [Ren1 GetActiveCamera]
 	$camera Azimuth 10
 	RenWin1 Render
 	update
-    }
-    
-    source $DataDir/Utility/rtImage.tcl
-    pvImageTest $DataDir/Baseline/SphereTest.png 10
-   
-    Application Exit
+}
+
+for {set i  1} {$i < [expr $argc - 1]} {incr i} {
+	if {[lindex $argv $i] == "-C"} {
+	    source [lindex $argv [expr $i + 1]]
+	    $Application SetExitStatus [CompareImage [[Application GetMainWindow] GetMainView]]
+	}
+}
+
+Application Exit
 
 

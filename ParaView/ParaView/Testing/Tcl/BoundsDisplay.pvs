@@ -1,11 +1,11 @@
-    if {[info exists argc]} { 
-        set argcm1 [expr $argc - 1]
-        for {set i 0} {$i < $argcm1} {incr i} {
-            if {[lindex $argv $i] == "-D" && $i < $argcm1} {
+if {[info exists argc]} { 
+    set argcm1 [expr $argc - 1]
+    for {set i 0} {$i < $argcm1} {incr i} {
+        if {[lindex $argv $i] == "-D" && $i < $argcm1} {
 		set DataDir [lindex $argv [expr $i + 1]]
-            }
         }
-    } 
+    }
+} 
 
 
 # This test is to see if the bounds menu gets updated properly
@@ -74,9 +74,13 @@ RenWin1 SetSize 300 300
 RenWin1 Render
 update
 
-source $DataDir/Utility/rtImage.tcl
-pvImageTest $DataDir/Baseline/BoundsDisplay.png 10
-   
+for {set i  1} {$i < [expr $argc - 1]} {incr i} {
+    if {[lindex $argv $i] == "-C"} {
+	source [lindex $argv [expr $i + 1]]
+	$Application SetExitStatus [CompareImage [[Application GetMainWindow] GetMainView]]
+    }
+}
+ 
 Application Exit
 
 
