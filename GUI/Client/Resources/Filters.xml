@@ -3058,4 +3058,30 @@ Tessellate a higher-order dataset.
     </Documentation>
   </Module>
 
+  <Module name="ExtractLevel"
+          menu_name="Extract Level"
+          root_name="ExtLevel"
+          module_type="Filter"
+          long_help="This filter extracts a range of levels from a hierarchical dataset."
+          short_help="Extract level.">
+    <Filter class="vtkHierarchicalDataExtractLevel">
+      <Input name="Input"
+             class="vtkHierarchicalDataSet"/>
+    </Filter>
+    <InputMenu trace_name="Input" property="Input"
+               label="Input"
+               help="Set the input to this filter."
+               input_name="Input"/>
+
+    <MinMax trace_name="MinMax"
+            property="LevelRange"
+            min_label="Min Level"
+            max_label="Max Level"
+            min_help="Choose the level range to extract"
+            max_help="Choose the level range to extract"/>
+
+    <Documentation>
+    </Documentation>
+  </Module>
+
 </ModuleInterfaces>
