@@ -45,23 +45,27 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 
-//------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLabel );
-vtkCxxRevisionMacro(vtkKWLabel, "1.12");
+vtkCxxRevisionMacro(vtkKWLabel, "1.12.2.1");
 
+//-----------------------------------------------------------------------------
 vtkKWLabel::vtkKWLabel()
 {
   this->Label    = new char[1];
   this->Label[0] = 0;
   this->LineType = vtkKWLabel::SingleLine;
   this->Width    = 0;
+  this->AdjustWrapLengthToWidth = 0;
 }
 
+//-----------------------------------------------------------------------------
 vtkKWLabel::~vtkKWLabel()
 {
   delete [] this->Label;
 }
 
+//-----------------------------------------------------------------------------
 void vtkKWLabel::SetLabel(const char* l)
 {
   if(!l)
@@ -79,7 +83,7 @@ void vtkKWLabel::SetLabel(const char* l)
     }
 }
 
-
+//-----------------------------------------------------------------------------
 void vtkKWLabel::Create(vtkKWApplication *app, const char *args)
 {
   const char *wname;
@@ -102,10 +106,12 @@ void vtkKWLabel::Create(vtkKWApplication *app, const char *args)
     }
   else
     {
-    this->Script("label %s -text {%s} %s", wname, this->Label, (args?args:""));
+    this->Script("label %s -text {%s} -justify left %s", 
+                 wname, this->Label, (args?args:""));
     }
 }
 
+//-----------------------------------------------------------------------------
 void vtkKWLabel::SetLineType( int type )
 {
   if ( this->Application )
@@ -123,7 +129,7 @@ void vtkKWLabel::SetLineType( int type )
         }
       else
         {
-        this->Script("label %s -text {%s}", 
+        this->Script("label %s -text {%s} -justify left", 
                      this->GetWidgetName(), str);
         }                  
       }
@@ -131,9 +137,63 @@ void vtkKWLabel::SetLineType( int type )
   this->LineType = type;
 }
 
+//-----------------------------------------------------------------------------
+void vtkKWLabel::SetAdjustWrapLengthToWidth(int v)
+{
+  if (this->AdjustWrapLengthToWidth == v)
+    {
+    return;
+    }
+
+  this->AdjustWrapLengthToWidth = v;
+  this->Modified();
+
+  if (this->IsCreated())
+    {
+    if (this->AdjustWrapLengthToWidth)
+      {
+      this->Script("bind %s <Configure> {%s AdjustWrapLengthToWidthCallback}",
+                   this->GetWidgetName(), this->GetTclName());
+      }
+    else
+      {
+      this->Script("bind %s <Configure>", this->GetWidgetName());
+      }
+    }
+}
+
+//-----------------------------------------------------------------------------
+void vtkKWLabel::AdjustWrapLengthToWidthCallback()
+{
+  if (!this->IsCreated() || !this->AdjustWrapLengthToWidth)
+    {
+    return;
+    }
+
+  // Get the widget width and the current wraplength
+
+  this->Script("concat [winfo width %s] [%s cget -wraplength]", 
+               this->GetWidgetName(), this->GetWidgetName());
+
+  int width, wraplength;
+  sscanf(this->Application->GetMainInterp()->result, 
+         "%d %d", 
+         &width, &wraplength);
+
+  // Adjust the wraplength to width (within a tolerance so that it does
+  // not put too much stress on the GUI).
+
+  if (width < (wraplength - 5) || width > (wraplength + 5))
+    {
+    this->Script("%s config -wraplength %d", this->GetWidgetName(), width);
+    }
+}
+
 //----------------------------------------------------------------------------
 void vtkKWLabel::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
   os << indent << "Width: " << this->GetWidth() << endl;
+  os << indent << "AdjustWrapLengthToWidth: " 
+     << (this->AdjustWrapLengthToWidth ? "On" : "Off") << endl;
 }

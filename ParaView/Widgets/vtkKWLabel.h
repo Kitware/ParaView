@@ -81,6 +81,14 @@ public:
   vtkSetMacro(Width, int);
   vtkGetMacro(Width, int);
 
+  // Description:
+  // Adjust the -wraplength argument so that it matches the width of
+  // the widget automatically (through the <Configure> event).
+  virtual void SetAdjustWrapLengthToWidth(int);
+  vtkGetMacro(AdjustWrapLengthToWidth, int);
+  vtkBooleanMacro(AdjustWrapLengthToWidth, int);
+  void AdjustWrapLengthToWidthCallback();
+
 //BTX
   enum {
     SingleLine,
@@ -91,10 +99,12 @@ public:
 protected:
   vtkKWLabel();
   ~vtkKWLabel();
+
 private:
   char* Label;
   int LineType;
   int Width;
+  int AdjustWrapLengthToWidth;
   vtkKWLabel(const vtkKWLabel&); // Not implemented
   void operator=(const vtkKWLabel&); // Not implemented
 };
