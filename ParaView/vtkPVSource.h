@@ -213,7 +213,7 @@ public:
   // Description:
   // This will be the new way the source gets specified.  It will use the
   // interface directly.
-  void SetInterface(vtkPVSourceInterface *interface);
+  void SetInterface(vtkPVSourceInterface *pvsi);
   vtkPVSourceInterface *GetInterface() {return this->Interface;}
   
 protected:

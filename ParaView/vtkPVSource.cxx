@@ -234,9 +234,9 @@ void vtkPVSource::SetVTKSource(vtkSource *source)
 
 //----------------------------------------------------------------------------
 // Need to avoid circular includes in header.
-void vtkPVSource::SetInterface(vtkPVSourceInterface *interface)
+void vtkPVSource::SetInterface(vtkPVSourceInterface *pvsi)
 {
-  if (this->Interface == interface)
+  if (this->Interface == pvsi)
     {
     return;
     }
@@ -250,10 +250,10 @@ void vtkPVSource::SetInterface(vtkPVSourceInterface *interface)
     this->Interface = NULL;
     tmp->UnRegister(this);
     }
-  if (interface)
+  if (pvsi)
     {
-    this->Interface = interface;
-    interface->Register(this);
+    this->Interface = pvsi;
+    pvsi->Register(this);
     }
 }
 
@@ -1415,8 +1415,6 @@ void vtkPVSource::AcceptCallback()
 void vtkPVSource::CancelCallback()
 {
   vtkPVApplication *pvApp = (vtkPVApplication*)this->Application;
-  vtkPVSource *prev;
-  int i;
   
   if (this->PVOutputs == NULL || this->PVOutputs[0] == NULL)
     { // Accept has not been called yet.  Delete the object.

@@ -248,7 +248,7 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
     }
 
   vtkMultiProcessController *controller = vtkMultiProcessController::New();
-  controller->Initialize(argc, argv);
+  controller->Initialize(&argc, (char***)(&argv));
   
   Tcl_Interp *interp = vtkPVApplication::InitializeTcl(argc,argv);
   vtkPVApplication *app = vtkPVApplication::New();
