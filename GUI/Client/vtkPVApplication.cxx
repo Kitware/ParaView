@@ -110,7 +110,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.325");
+vtkCxxRevisionMacro(vtkPVApplication, "1.326");
 
 
 int vtkPVApplicationCommand(ClientData cd, Tcl_Interp *interp,
@@ -1357,7 +1357,7 @@ void vtkPVApplication::DisplayHelp(vtkKWWindow* master)
   dlg->SetTitle("ParaView Help");
   dlg->SetMasterWindow(master);
   dlg->Create(this,"");
-  dlg->SetText("ParaView documentation is available from the Download section of the ParaView web site: www.paraview.org/HTML/Download.html.");
+  dlg->SetText("\"The ParaView Guide\", covering both the use and development of ParaView, is available for purchase from Kitware's online store at http://store.yahoo.com/kitware/paraviewguide.html");
   dlg->Invoke();  
   dlg->Delete();
 }
