@@ -86,8 +86,7 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Construct object with LowPoint=(0,0,0) and HighPoint=(0,0,1). Scalar
-  // range is (0,1).
+  // Construct object.
   static vtkWeightedRedistributePolyData *New();
 
   void SetWeights (int, int, float );
