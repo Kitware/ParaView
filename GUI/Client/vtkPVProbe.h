@@ -29,8 +29,6 @@ class vtkKWWidget;
 class vtkXYPlotWidget;
 class vtkSMPlotDisplay;
 class vtkXYPlotWidgetObserver;
-class vtkKWLabeledLoadSaveButton;
-class vtkKWListBox;
 
 class VTK_EXPORT vtkPVProbe : public vtkPVSource
 {
@@ -47,27 +45,22 @@ public:
   // Access to the ShowXYPlotToggle from Tcl
   vtkGetObjectMacro(ShowXYPlotToggle, vtkKWCheckButton);
 
+  //BTX
   // Description:
   // Get the XY Plot widget.
   vtkGetObjectMacro(XYPlotWidget, vtkXYPlotWidget);
-
+  //ETX
+  
   // Description:
   // This method is called when event is triggered on the XYPlotWidget.
+//BTX
   virtual void ExecuteEvent(vtkObject* wdg, unsigned long event,  
                             void* calldata);
+//ETX
 
   // Description:
   // Control the visibility of the pick display as well.
-  void SetVisibilityNoTrace(int val);
-
-  // Callback for the dialog save box
-  void SaveDialogCallback();
-
-  // Callback when user select fields
-  void FieldsSelectCallback();
-
-  // From a PVInformation object fill in a ListBox object
-  void FillList(vtkKWListBox* list);
+  virtual void SetVisibilityNoTrace(int val);
 
 protected:
   vtkPVProbe();
@@ -78,22 +71,21 @@ protected:
   // The real AcceptCallback method.
   virtual void AcceptCallbackInternal();  
 
-  vtkKWLabel   *DimensionalityLabel;
+  vtkKWLabel *DimensionalityLabel;
   vtkKWOptionMenu *DimensionalityMenu;
-  vtkKWWidget  *ProbeFrame;
-  vtkKWListBox *FieldsSelection;
+  vtkKWWidget *ProbeFrame;
 
   vtkKWWidget *SelectedPointFrame;
-  vtkKWLabel  *SelectedPointLabel;
-  vtkKWLabel  *PointDataLabel;
+  vtkKWLabel *SelectedPointLabel;
+  vtkKWLabel *PointDataLabel;
   
   vtkKWCheckButton *ShowXYPlotToggle;
-  vtkKWLabeledLoadSaveButton *SaveButton;
   
-  vtkXYPlotWidget *XYPlotWidget;
-  vtkXYPlotWidgetObserver *XYPlotObserver;
+  vtkXYPlotWidget* XYPlotWidget;
+  vtkXYPlotWidgetObserver* XYPlotObserver;
 
-private:
+  int InstanceCount;
+  
   vtkPVProbe(const vtkPVProbe&); // Not implemented
   void operator=(const vtkPVProbe&); // Not implemented
 };

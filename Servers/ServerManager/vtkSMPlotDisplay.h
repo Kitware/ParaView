@@ -21,11 +21,18 @@
 #ifndef __vtkSMPlotDisplay_h
 #define __vtkSMPlotDisplay_h
 
+
 #include "vtkSMDisplay.h"
 
+
+class vtkDataSet;
 class vtkPVProcessModule;
+class vtkPVDataInformation;
+class vtkPolyDataMapper;
+class vtkProp;
 class vtkSMSourceProxy;
 class vtkSMProxy;
+class vtkPVColorMap;
 class vtkPolyData;
 class vtkXYPlotWidget;
 
@@ -41,7 +48,6 @@ public:
   // All point data arrays are ploted for now.
   // Data must already be updated.
   virtual void SetInput(vtkSMSourceProxy* input);
-  void UpdateInput(vtkSMSourceProxy* input, int *selection);
 
   // Description:
   // Not implemented yet.  Client still does this.
@@ -88,12 +94,11 @@ public:
   // Description:
   // Callback for when the plot moves needs access to this display.
   // Maybe callback should be part of this object?
-  vtkGetObjectMacro(XYPlotActorProxy,vtkSMProxy);
+  vtkSMProxy* GetXYPlotActorProxy(){return this->XYPlotActorProxy;}
 
   //BTX
   // Description:
   // The Probe needs access to this to fill in the UI point values.
-  // Only needed when probing one point only
   vtkPolyData *GetCollectedData();
   //ETX
 
