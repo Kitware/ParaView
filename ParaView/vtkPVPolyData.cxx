@@ -116,6 +116,7 @@ void vtkPVPolyData::Glyph()
   vtkPVGlyph3D *glyph;
   vtkPVPolyData *pvd;
   vtkPVPolyData *glyphOut;
+  vtkPVAssignment *a;
   vtkPVWindow *window = this->GetComposite()->GetWindow();
 
   newComp = vtkPVComposite::New();
@@ -145,6 +146,8 @@ void vtkPVPolyData::Glyph()
   glyph->SetSource(glyphOut);
   glyph->SetGlyphComposite(glyphComp);
   glyph->SetScaleModeToDataScalingOff();
+  a = this->GetAssignment();
+  glyph->SetAssignment(a);
   
   glyphComp->VisibilityOff();
     
