@@ -22,6 +22,8 @@
 
 #include "vtkSMProxy.h"
 
+class vtkSMSourceProxy;
+
 class VTK_EXPORT vtkSMWriterProxy : public vtkSMProxy
 {
 public:
