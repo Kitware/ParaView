@@ -252,7 +252,7 @@ int vtkCornerAnnotation::RenderOpaqueGeometry(vtkViewport *viewport)
        (this->WindowLevel && this->WindowLevel->GetMTime() > this->BuildTime))
     {
     int *vSize = viewport->GetSize();
-    int maxX, maxY;
+    int maxX, Y1, Y2;
     vtkDebugMacro(<<"Rebuilding text");
     
     // replace text
@@ -273,8 +273,8 @@ int vtkCornerAnnotation::RenderOpaqueGeometry(vtkViewport *viewport)
         {
         this->TextMapper[i]->GetSize(viewport,tempi+i*2);
         }
-      maxY = (tempi[1] + tempi[5]) > (tempi[3] + tempi[7]) ?
-        tempi[1] + tempi[5] : tempi[3] + tempi[7];
+      Y1 = tempi[1] + tempi[5];
+      Y2 = tempi[3] + tempi[7];
       maxX = (tempi[0] + tempi[2]) > (tempi[4] + tempi[6]) ?
         tempi[0] + tempi[2] : tempi[4] + tempi[6];
       
@@ -283,8 +283,10 @@ int vtkCornerAnnotation::RenderOpaqueGeometry(vtkViewport *viewport)
       int numLines2 = this->TextMapper[1]->GetNumberOfLines() + 
         this->TextMapper[3]->GetNumberOfLines();
       
-      int lineMax = (int)(vSize[1]*this->MaximumLineHeight) * 
-        (numLines1 > numLines2 ? numLines1 : numLines2);
+      int lineMax1 = (int)(vSize[1]*this->MaximumLineHeight) * 
+        (numLines1 ? numLines1 : 1);
+      int lineMax2 = (int)(vSize[1]*this->MaximumLineHeight) * 
+        (numLines2 ? numLines2 : 1);
       
       // target size is to use 90% of x and y
       int tSize[2];
@@ -292,9 +294,11 @@ int vtkCornerAnnotation::RenderOpaqueGeometry(vtkViewport *viewport)
       tSize[1] = (int)(0.9*vSize[1]);    
       
       // while the size is too small increase it
-      while (maxY < tSize[1] && 
-             maxX < tSize[0] && 
-             maxY < lineMax &&
+      while (Y1 < tSize[1] && 
+             Y2 < tSize[1] &&
+             maxX < tSize[0] &&
+             Y1 < lineMax1 &&
+             Y2 < lineMax2 &&
              fontSize < 100)
         {
         fontSize++;
@@ -303,14 +307,14 @@ int vtkCornerAnnotation::RenderOpaqueGeometry(vtkViewport *viewport)
           this->TextMapper[i]->SetFontSize(fontSize);
           this->TextMapper[i]->GetSize(viewport,tempi+i*2);
           }
-        maxY = (tempi[1] + tempi[5]) > (tempi[3] + tempi[7]) ?
-          tempi[1] + tempi[5] : tempi[3] + tempi[7];
+        Y1 = tempi[1] + tempi[5];
+        Y2 = tempi[3] + tempi[7];
         maxX = (tempi[0] + tempi[2]) > (tempi[4] + tempi[6]) ?
           tempi[0] + tempi[2] : tempi[4] + tempi[6];
         }
       // while the size is too large decrease it
-      while ((maxY > tSize[1] || maxX > tSize[0] || 
-              maxY > lineMax) && fontSize > 0)
+      while ((Y1 > tSize[1] || Y2 > tSize[1] || maxX > tSize[0] ||
+              Y1 > lineMax1 || Y2 > lineMax2) && fontSize > 0)
         {
         fontSize--;
         for (i = 0; i < 4; i++)
@@ -318,8 +322,8 @@ int vtkCornerAnnotation::RenderOpaqueGeometry(vtkViewport *viewport)
           this->TextMapper[i]->SetFontSize(fontSize);
           this->TextMapper[i]->GetSize(viewport,tempi+i*2);
           }
-        maxY = (tempi[1] + tempi[5]) > (tempi[3] + tempi[7]) ?
-          tempi[1] + tempi[5] : tempi[3] + tempi[7];
+        Y1 = tempi[1] + tempi[5];
+        Y2 = tempi[3] + tempi[7];
         maxX = (tempi[0] + tempi[2]) > (tempi[4] + tempi[6]) ?
           tempi[0] + tempi[2] : tempi[4] + tempi[6];
         }
