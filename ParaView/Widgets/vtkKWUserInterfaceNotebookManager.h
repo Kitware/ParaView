@@ -40,10 +40,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // concrete implementation of a vtkKWUserInterfaceManager. It uses a notebook
 // under the hood and delivers a notebook's page when one of its managed panels
 // request a "page" (i.e. a section within a panel). Within the notebook, each
-// page will be associated to a tag corresponding to its panel's ID. This allows
-// panels to be shown once at a time, or grouped, or displayed using more 
-// advanced combination (like most recently used pages among all panels, pinned 
-// pages, etc.).
+// page will be associated to a tag corresponding to its panel's ID. This 
+// allows panels to be shown once at a time, or grouped, or displayed using 
+// more advanced combination (like most recently used pages among all panels, 
+// pinned pages, etc.).
 // This class is not a widget, the notebook is. Besides packing the notebook, 
 // you will just have to set each panel's UserInterfaceManager ivar to point
 // to this manager, and the rest should be taken care of (i.e. you do not 
@@ -87,8 +87,8 @@ public:
   // Instruct the manager to reserve a page for a given panel. 
   // In this concrete implementation, this adds a page to the notebook, 
   // and sets the page tag to be the panel's ID.
-  // Note that you should use the panel's own API to add a page to a panel: this
-  // will automatically call this method with the proper panel parameter 
+  // Note that you should use the panel's own API to add a page to a panel: 
+  // this will automatically call this method with the proper panel parameter 
   // (see vtkKWUserInterfacePanel::AddPage()).
   // Return a unique positive ID, or < 0 on error.
   virtual int AddPage(vtkKWUserInterfacePanel *panel, 
@@ -154,8 +154,8 @@ public:
   // Description:
   // Update a panel according to the manager settings (i.e., it just performs 
   // manager-specific changes on the panel). Note that it does not call the
-  // panel's Update() method, on the opposite the panel's Update() will call this
-  // method if the panel has a UIM set.
+  // panel's Update() method, on the opposite the panel's Update() will call 
+  // this method if the panel has a UIM set.
   virtual void UpdatePanel(vtkKWUserInterfacePanel *panel);
 
   // Description:
@@ -169,12 +169,6 @@ public:
   virtual void DragAndDropEndCallback(
     int x, int y, 
     vtkKWWidget *widget, vtkKWWidget *anchor, vtkKWWidget *target);
-
-  // Description:
-  // Write the list of visible pages to a stream, parse the same kind of
-  // list from a stream (and show the pages). Pinned status is saved too.
-  virtual void WriteVisiblePagesString(ostream &os);
-  virtual void ParseVisiblePagesString(istream &is);
 
 protected:
   vtkKWUserInterfaceNotebookManager();

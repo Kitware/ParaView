@@ -99,6 +99,11 @@ public:
   virtual int AddPanel(vtkKWUserInterfacePanel *panel);
 
   // Description:
+  // Convenience method to get the panel from its name or ID
+  vtkKWUserInterfacePanel* GetPanel(const char *panel_name);
+  vtkKWUserInterfacePanel* GetPanel(int id);
+
+  // Description:
   // Remove a panel from the manager.
   // Note that you most probably do not need to call this method, since setting
   // a panel's UserInterfaceManager ivar to NULL will remove the panel 
@@ -108,8 +113,8 @@ public:
 
   // Description:
   // Instruct the manager to reserve a page for a given panel.
-  // Note that you should use the panel's own API to add a page to a panel: this
-  // will automatically call this method with the proper panel parameter 
+  // Note that you should use the panel's own API to add a page to a panel: 
+  // this will automatically call this method with the proper panel parameter 
   // (see vtkKWUserInterfacePanel::AddPage()).
   // Return a unique positive ID, or < 0 on error.
   virtual int AddPage(vtkKWUserInterfacePanel *panel, 
@@ -135,7 +140,7 @@ public:
   // Note that you should use the panel's own API to get the page parent: this
   // will automatically call this method with the proper panel parameter
   // (see vtkKWUserInterfacePanel::GetPagesParentWidget()).
-  virtual vtkKWWidget *GetPagesParentWidget(vtkKWUserInterfacePanel *panel) = 0;
+  virtual vtkKWWidget *GetPagesParentWidget(vtkKWUserInterfacePanel *panel)= 0;
 
   // Description:
   // Raise a page reserved by the manager. This can be done through the unique 
@@ -163,8 +168,8 @@ public:
   // Description:
   // Update a panel according to the manager settings (i.e., it just performs 
   // manager-specific changes on the panel). Note that it does not call the
-  // panel's Update() method, on the opposite the panel's Update() will call this
-  // method if the panel has a UIM set.
+  // panel's Update() method, on the opposite the panel's Update() will call
+  // this method if the panel has a UIM set.
   virtual void UpdatePanel(vtkKWUserInterfacePanel *panel) = 0;
 
 protected:
@@ -208,8 +213,6 @@ protected:
   PanelSlot* GetPanelSlot(const char *panel_name);
   int HasPanel(vtkKWUserInterfacePanel *panel);
   int GetPanelId(vtkKWUserInterfacePanel *panel);
-  vtkKWUserInterfacePanel* GetPanel(int id);
-  vtkKWUserInterfacePanel* GetPanel(const char *panel_name);
 
   //ETX
 
