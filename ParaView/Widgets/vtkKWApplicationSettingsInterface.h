@@ -53,8 +53,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //------------------------------------------------------------------------------
 
-#define VTK_KW_APPLICATION_SETTINGS_UIP_LABEL "Application Settings"
-
 #define VTK_KW_SAVE_WINDOW_GEOMETRY_REG_KEY   "SaveWindowGeometry"
 #define VTK_KW_SHOW_SPLASH_SCREEN_REG_KEY     "ShowSplashScreen"
 #define VTK_KW_SHOW_TOOLTIPS_REG_KEY          "ShowBalloonHelp"

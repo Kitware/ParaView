@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWUserInterfacePanel);
-vtkCxxRevisionMacro(vtkKWUserInterfacePanel, "1.4");
+vtkCxxRevisionMacro(vtkKWUserInterfacePanel, "1.5");
 
 int vtkKWUserInterfacePanelCommand(ClientData cd, Tcl_Interp *interp,
                                    int argc, char *argv[]);
@@ -57,12 +57,14 @@ vtkKWUserInterfacePanel::vtkKWUserInterfacePanel()
 {
   this->UserInterfaceManager = NULL;
   this->Enabled = 1;
+  this->Name = NULL;
 }
 
 //----------------------------------------------------------------------------
 vtkKWUserInterfacePanel::~vtkKWUserInterfacePanel()
 {
   this->SetUserInterfaceManager(NULL);
+  this->SetName(NULL);
 }
 
 //----------------------------------------------------------------------------
@@ -216,7 +218,7 @@ int vtkKWUserInterfacePanel::Show()
     return 0;
     }
 
-  return this->UserInterfaceManager->Show(this);
+  return this->UserInterfaceManager->ShowPanel(this);
 }
 
 //----------------------------------------------------------------------------
@@ -224,7 +226,7 @@ int vtkKWUserInterfacePanel::Raise()
 {
   if (this->Show() && this->UserInterfaceManager)
     {
-    return this->UserInterfaceManager->Raise(this);
+    return this->UserInterfaceManager->RaisePanel(this);
     }
   return 0;
 }
@@ -235,6 +237,13 @@ void vtkKWUserInterfacePanel::Update()
   // Update the enable state
 
   this->UpdateEnableState();
+
+  // Update the panel according to the manager (i.e. manager-specific changes)
+
+  if (this->UserInterfaceManager)
+    {
+    this->UserInterfaceManager->UpdatePanel(this);
+    }
 }
 
 //------------------------------------------------------------------------------
@@ -255,8 +264,9 @@ void vtkKWUserInterfacePanel::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
 
-  os << indent << "UserInterfaceManager: " 
-     << this->UserInterfaceManager << endl;
+  os << indent << "UserInterfaceManager: " << this->UserInterfaceManager << endl;
 
   os << indent << "Enabled: " << (this->Enabled ? "On" : "Off") << endl;
+
+  os << indent << "Name: " << (this->Name ? this->Name : "(none)") << endl;
 }

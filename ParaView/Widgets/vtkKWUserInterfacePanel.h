@@ -89,7 +89,12 @@ public:
   // the manager to NULL (it is done automatically by the destructor).
   virtual void SetUserInterfaceManager(vtkKWUserInterfaceManager*);
   vtkGetObjectMacro(UserInterfaceManager, vtkKWUserInterfaceManager);
-  
+
+  // Description:
+  // Set the panel name. Can be used to add the panel to a menu, etc.
+  vtkGetStringMacro(Name);
+  vtkSetStringMacro(Name);
+
   // Description:
   // Create the interface objects. Note that if the panel is not created 
   // the first time one if its pages is shown or raised, this method is 
@@ -157,6 +162,8 @@ protected:
   ~vtkKWUserInterfacePanel();
 
   vtkKWUserInterfaceManager *UserInterfaceManager;
+
+  char *Name;
 
   // Update the enable state. This should propagate similar calls to the
   // internal widgets.

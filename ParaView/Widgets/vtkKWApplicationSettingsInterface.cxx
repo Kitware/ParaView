@@ -52,9 +52,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkObjectFactory.h"
 #include "vtkVector.h"
 
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------------
+
+#define VTK_KW_APPLICATION_SETTINGS_UIP_LABEL "Application Settings"
+
+//----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWApplicationSettingsInterface);
-vtkCxxRevisionMacro(vtkKWApplicationSettingsInterface, "1.11");
+vtkCxxRevisionMacro(vtkKWApplicationSettingsInterface, "1.12");
 
 int vtkKWApplicationSettingsInterfaceCommand(ClientData cd, Tcl_Interp *interp,
                                              int argc, char *argv[]);
@@ -62,6 +66,8 @@ int vtkKWApplicationSettingsInterfaceCommand(ClientData cd, Tcl_Interp *interp,
 //----------------------------------------------------------------------------
 vtkKWApplicationSettingsInterface::vtkKWApplicationSettingsInterface()
 {
+  this->SetName(VTK_KW_APPLICATION_SETTINGS_UIP_LABEL);
+
   this->Window = 0;
 
   // Interface settings
@@ -172,12 +178,10 @@ void vtkKWApplicationSettingsInterface::Create(vtkKWApplication *app)
 
   vtkKWIcon *ico = vtkKWIcon::New();
   ico->SetImageData(vtkKWIcon::ICON_PREFERENCES);
-  this->AddPage(VTK_KW_APPLICATION_SETTINGS_UIP_LABEL, 
-                "Change the application settings", 
-                ico);
+  this->AddPage(this->GetName(), "Change the application settings", ico);
   ico->Delete();
 
-  page = this->GetPageWidget(VTK_KW_APPLICATION_SETTINGS_UIP_LABEL);
+  page = this->GetPageWidget(this->GetName());
   
   // --------------------------------------------------------------
   // Interface settings : main frame
