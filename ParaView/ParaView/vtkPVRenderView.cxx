@@ -42,6 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVRenderView.h"
 
 #include "vtkCamera.h"
+#include "vtkPVConfig.h"
 #include "vtkCollectionIterator.h"
 #include "vtkDummyRenderWindow.h"
 #include "vtkDummyRenderer.h"
@@ -1774,7 +1775,7 @@ void vtkPVRenderView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVRenderView ";
-  this->ExtractRevision(os,"$Revision: 1.170 $");
+  this->ExtractRevision(os,"$Revision: 1.171 $");
 }
 
 //----------------------------------------------------------------------------

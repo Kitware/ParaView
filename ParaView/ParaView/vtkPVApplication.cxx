@@ -40,6 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 #include "vtkToolkits.h"
+#include "vtkPVConfig.h"
 #ifdef VTK_USE_MPI
 # include <mpi.h>
 #include "vtkMPIController.h"
@@ -654,17 +655,25 @@ void vtkPVApplication::Start(int argc, char*argv[])
   // Handle setting up the SGI pipes.
 #ifdef PV_USE_SGI_PIPES
   int numPipes = 1;
+  int numProcs = this->Controller->GetNumberOfProcesses();
+  int myId = this->Controller->GetLocalProcessId();
   // Until I add a user interface to set the number of pipes,
   // just read it from a file.
-  //ifstream ifs("pipes.inp",ios::in);
-  //ifs >> numPipes;
-  //if (numPipes > numProcs) numPipes = numProcs;
-  //if (numPipes < 1) numPipes = 1;
-  numPipes = 2;
+  ifstream ifs("pipes.inp",ios::in);
+  if (ifs.fail())
+    {
+    vtkErrorMacro("Could not find the file pipes.inp");
+    numPipes = numProcs;
+    }
+  else
+    {
+    ifs >> numPipes;
+    if (numPipes > numProcs) numPipes = numProcs;
+    if (numPipes < 1) numPipes = 1;
+    }
   this->BroadcastScript("Application SetNumberOfPipes %d", numPipes);
 
   // assuming that the number of pipes is the same as the number of procs
-  /*
   char *displayString;
   int startRenderProc = 0;
   int stopRenderProc = numProcs - 1;
@@ -676,35 +685,37 @@ void vtkPVApplication::Start(int argc, char*argv[])
     char displayStringRoot[80];
     displayString = getenv("DISPLAY");
 
-    int len = -1;
-    int j, i = 0;
-    while (i < 80)
+    if (displayString)
       {
-      if (displayString[i] == ':')
+      int len = -1;
+      int j, i = 0;
+      while (i < 80)
         {
-        j = i+1;
-        while (j < 80)
+        if (displayString[i] == ':')
           {
-          if (displayString[j] == '.')
+          j = i+1;
+          while (j < 80)
             {
-            len = j+1;
-            break;
+            if (displayString[j] == '.')
+              {
+              len = j+1;
+              break;
+              }
+            j++;
             }
-          j++;
+          break;
           }
-        break;
+        i++;
         }
-      i++;
+      strncpy(displayStringRoot, displayString, len);
+      displayStringRoot[len] = '\0';
+      //    cerr << "display string root = " << displayStringRoot << endl;
+      sprintf(displayCommand, "DISPLAY=%s%d", displayStringRoot, 
+              myId-startRenderProc);
+      //    cerr << "display command = " << displayCommand << endl;
+      putenv(displayCommand);
       }
-    strncpy(displayStringRoot, displayString, len);
-    displayStringRoot[len] = '\0';
-    //    cerr << "display string root = " << displayStringRoot << endl;
-    sprintf(displayCommand, "DISPLAY=%s%d", displayStringRoot, 
-            myId-startRenderProc);
-    //    cerr << "display command = " << displayCommand << endl;
-    putenv(displayCommand);
     }
-  */
 #endif
 
   vtkPVWindow *ui = vtkPVWindow::New();

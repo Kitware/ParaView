@@ -26,6 +26,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 =========================================================================*/
 #include "vtkToolkits.h"
+#include "vtkPVConfig.h"
 #ifdef VTK_USE_MPI
 # include <mpi.h>
 #else

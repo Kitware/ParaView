@@ -41,6 +41,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "vtkPVData.h"
 #include "vtkToolkits.h"
+#include "vtkPVConfig.h"
 
 #include "vtkCubeAxesActor2D.h"
 #include "vtkDataSetSurfaceFilter.h"
@@ -2616,7 +2617,7 @@ void vtkPVData::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVData ";
-  this->ExtractRevision(os,"$Revision: 1.123 $");
+  this->ExtractRevision(os,"$Revision: 1.124 $");
 }
 
 //----------------------------------------------------------------------------

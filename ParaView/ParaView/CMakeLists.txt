@@ -119,6 +119,10 @@ CONFIGURE_FILE(${PARAVIEW_SOURCE_DIR}/ParaView/vtkPVDemoPaths.h.in
                ${PARAVIEW_BINARY_DIR}/ParaView/vtkPVDemoPaths.h
                ESCAPE_QUOTES)
 
+CONFIGURE_FILE(${PARAVIEW_SOURCE_DIR}/ParaView/vtkPVConfig.h.in
+               ${PARAVIEW_BINARY_DIR}/ParaView/vtkPVConfig.h
+               ESCAPE_QUOTES)
+
 INCLUDE_DIRECTORIES(${PARAVIEW_BINARY_DIR}/ParaView)
 
 #  INCLUDE_DIRECTORIES(${VTKEXPAT_SOURCE_DIR})
