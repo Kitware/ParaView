@@ -20,7 +20,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWDialog );
-vtkCxxRevisionMacro(vtkKWDialog, "1.41");
+vtkCxxRevisionMacro(vtkKWDialog, "1.42");
 
 int vtkKWDialogCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -47,8 +47,6 @@ vtkKWDialog::~vtkKWDialog()
   this->SetTitleString(0);
   this->SetMasterWindow(0);
 }
-
-#include "vtkKWMessageDialog.h"
 
 //----------------------------------------------------------------------------
 int vtkKWDialog::Invoke()
