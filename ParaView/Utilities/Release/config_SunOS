@@ -1,21 +1,14 @@
-PLATFORM="sparc-sunos57-static"
-CC="/disk2/home/hoffman/gcc322-install/bin/gcc"
-CXX="/disk2/home/hoffman/gcc322-install/bin/c++"
+PLATFORM="sparc-sunos57"
+CC="cc"
+CXX="CC"
 CMAKE="/space/berk/Dashboards/CMake-CC/bin/cmake"
 DISPLAY=:0.0
 export DISPLAY
 
 write_cache()
 {
-    BINDIR=`pwd`
-
-    cat > UserMakeRules.cmake <<EOF
-SET(CMAKE_DL_LIBS "")
-EOF
-
     write_standard_cache
     cat >> CMakeCache.txt <<EOF
-CMAKE_EXE_LINKER_FLAGS:STRING=-Wl,-Bdynamic -ldl -Wl,-Bstatic
-CMAKE_USER_MAKE_RULES_OVERRIDE:STRING=${BINDIR}/UserMakeRules.cmake
+VTK_USE_ANSI_STDLIB:BOOL=OFF
 EOF
 }
