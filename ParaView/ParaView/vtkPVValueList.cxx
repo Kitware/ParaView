@@ -35,7 +35,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVValueList);
-vtkCxxRevisionMacro(vtkPVValueList, "1.12");
+vtkCxxRevisionMacro(vtkPVValueList, "1.13");
 
 int vtkPVValueListCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -187,7 +187,7 @@ void vtkPVValueList::Create(vtkKWApplication *app)
   this->DeleteAllButton->SetParent(
     this->ContourValuesButtonsFrame->GetFrame());
   this->DeleteAllButton->Create(app, "-text {Delete All}");
-  this->DeleteAllButton->SetCommand(this, "DeleteAllValuesCallback");
+  this->DeleteAllButton->SetCommand(this, "RemoveAllValues");
   this->DeleteAllButton->SetBalloonHelpString(
     "Remove all entries from the list");
 
@@ -449,7 +449,7 @@ void vtkPVValueList::AddValueCallback()
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVValueList::DeleteAllValuesCallback()
+void vtkPVValueList::RemoveAllValues()
 {
   this->ContourValues->SetNumberOfContours(0);
   this->ContourValuesList->DeleteAll();
@@ -579,7 +579,7 @@ void vtkPVValueList::Trace(ofstream *file)
     return;
     }
 
-  *file << "$kw(" << this->GetTclName() << ") DeleteAllValuesCallback \n";
+  *file << "$kw(" << this->GetTclName() << ") RemoveAllValues\n";
 
   numContours = (this->Property->GetNumberOfScalars() - 1) / 2;
   for (i = 0; i < numContours; i++)
