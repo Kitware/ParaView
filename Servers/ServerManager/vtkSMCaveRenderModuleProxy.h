@@ -49,7 +49,7 @@ protected:
 
   // Description:
   // For Cave composition is always collect.
-  virtual int GetLocalRenderDecision(unsigned long);
+  virtual int GetLocalRenderDecision(unsigned long, int);
 private:
   vtkSMCaveRenderModuleProxy(const vtkSMCaveRenderModuleProxy&); // Not implemented.
   void operator=(const vtkSMCaveRenderModuleProxy&); // Not implemented.

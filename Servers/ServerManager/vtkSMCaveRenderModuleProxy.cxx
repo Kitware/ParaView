@@ -27,7 +27,7 @@
 #include "vtkSMProxyManager.h"
 
 vtkStandardNewMacro(vtkSMCaveRenderModuleProxy);
-vtkCxxRevisionMacro(vtkSMCaveRenderModuleProxy, "1.1.2.1");
+vtkCxxRevisionMacro(vtkSMCaveRenderModuleProxy, "1.1.2.2");
 //-----------------------------------------------------------------------------
 vtkSMCaveRenderModuleProxy::vtkSMCaveRenderModuleProxy()
 {
@@ -220,7 +220,8 @@ void vtkSMCaveRenderModuleProxy::LoadConfigurationFile(int numDisplays)
 
 
 //-----------------------------------------------------------------------------
-int vtkSMCaveRenderModuleProxy::GetLocalRenderDecision(unsigned long)
+int vtkSMCaveRenderModuleProxy::GetLocalRenderDecision(unsigned long,
+   int vtkNotUsed(stillRender))
 {
   return 1; // for Cave, always 1.
 }
