@@ -290,17 +290,17 @@ SUBDIRS(Utilities/VTKClientServer)
 SUBDIRS(Utilities/VTKTclWrapping)
 
 #########################################################################
-# Configure ParaViewPro
-IF(EXISTS "${ParaView_SOURCE_DIR}/ParaViewPro")
-  OPTION(PARAVIEW_PRO_BUILD "Build ParaViewPro part. Requires Kitware License and ParaViewPro source" OFF)
+# Configure ParaViewPlus
+IF(EXISTS "${ParaView_SOURCE_DIR}/ParaViewPlus")
+  OPTION(PARAVIEW_PRO_BUILD "Build ParaViewPlus part. Requires Kitware License and ParaViewPlus source" OFF)
   MARK_AS_ADVANCED(PARAVIEW_PRO_BUILD)
   IF(PARAVIEW_PRO_BUILD)
-    SUBDIRS(ParaViewPro)
+    SUBDIRS(ParaViewPlus)
     SET(PARAVIEW_PRO_INCLUDE_DIRS
-      ${ParaView_SOURCE_DIR}/ParaViewPro/IO
+      ${ParaView_SOURCE_DIR}/ParaViewPlus/IO
       )
   ENDIF(PARAVIEW_PRO_BUILD)
-ENDIF(EXISTS "${ParaView_SOURCE_DIR}/ParaViewPro")
+ENDIF(EXISTS "${ParaView_SOURCE_DIR}/ParaViewPlus")
 
 #########################################################################
 # Configure Server
