@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWLabeledLabel);
-vtkCxxRevisionMacro(vtkKWLabeledLabel, "1.6");
+vtkCxxRevisionMacro(vtkKWLabeledLabel, "1.7");
 
 int vtkKWLabeledLabelCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -138,6 +138,15 @@ void vtkKWLabeledLabel::UpdateEnableState()
   if (this->Label2)
     {
     this->Label2->SetEnabled(this->Enabled);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWLabeledLabel::SetLabel2(const char *text)
+{
+  if (this->Label2)
+    {
+    this->Label2->SetLabel(text);
     }
 }
 

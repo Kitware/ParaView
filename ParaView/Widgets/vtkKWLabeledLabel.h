@@ -66,6 +66,10 @@ public:
   vtkGetObjectMacro(Label2, vtkKWLabel);
 
   // Description:
+  // Convenience method to set the contents label2.
+  void SetLabel2(const char *);
+  
+  // Description:
   // Set the string that enables balloon help for this widget.
   // Override to pass down to children.
   virtual void SetBalloonHelpString(const char *str);
