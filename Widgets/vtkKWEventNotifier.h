@@ -41,17 +41,28 @@ public:
   static vtkKWEventNotifier* New();
   vtkTypeMacro(vtkKWEventNotifier,vtkKWObject);
 
+  // Description:
+  // Add a callback for a specified event occurring in a specified
+  // window. The command of the object will be called.
   void AddCallback( const char *event,   vtkKWWindow *window,
 		    vtkKWObject *object, const char *command );
 
+  // Description:
+  // Remove a specific callback
   void RemoveCallback( const char *event,   vtkKWWindow *window,
 		       vtkKWObject *object, const char *command );
 
+  // Description:
+  // Remove all callbacks associated with this object
+  void RemoveCallbacks( vtkKWObject *object );
+
+  // Description:
   // This version invokes all callbacks of the specified type for
   // the specified window - even its own callback if it has one
   void InvokeCallbacks( const char *event, vtkKWWindow *window,
 			const char *args );
 
+  // Description:
   // This version won't invoke callbacks on the specified object 
   // Usually the calling object uses this to avoid calling itself
   void InvokeCallbacks( vtkKWObject *object, const char *event, 

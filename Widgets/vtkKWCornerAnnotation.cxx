@@ -30,7 +30,8 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkKWView.h"
 #include "vtkObjectFactory.h"
 #include "vtkCornerAnnotation.h"
-
+#include "vtkKWApplication.h"
+#include "vtkKWEventNotifier.h"
 
 //-----------------------------------------------------------------------------
 vtkKWCornerAnnotation* vtkKWCornerAnnotation::New()
@@ -83,7 +84,9 @@ vtkKWCornerAnnotation::vtkKWCornerAnnotation()
   this->CornerProp->SetMaximumLineHeight(0.08);
   this->CornerComposite = vtkKWGenericComposite::New();
   this->CornerComposite->SetProp(this->CornerProp);
-  
+
+  this->LightboxID = -1;
+  this->MasterCornerAnnotation = NULL;
 }
 
 vtkKWCornerAnnotation::~vtkKWCornerAnnotation()
@@ -102,6 +105,7 @@ vtkKWCornerAnnotation::~vtkKWCornerAnnotation()
     }
   this->CornerComposite->Delete();
   this->CornerProp->Delete();
+
 }
 
 void vtkKWCornerAnnotation::ShowProperties()
@@ -118,6 +122,7 @@ void vtkKWCornerAnnotation::Close()
     this->View->RemoveComposite(this->CornerComposite);
     this->CornerButton->SetState(0);
     }
+  this->Application->GetEventNotifier()->RemoveCallbacks(this);
 }
 
 void vtkKWCornerAnnotation::Create(vtkKWApplication *app)
@@ -178,13 +183,32 @@ void vtkKWCornerAnnotation::Create(vtkKWApplication *app)
     this->Script("pack %s -side top -anchor w -padx 4 -pady 2 -expand yes -fill x",
                  this->CornerText[i]->GetWidgetName());
     }
-  
+
+  // Register the events we are interested. 
+
+  // If we are part of a lightbox, but not the master lightbox view, we
+  // have to update ourselves if the master lightbox corner anno changes in
+  // any way.
+
+  if ( this->LightboxID > 0 )
+    {
+    this->Application->GetEventNotifier()->
+      AddCallback( "LightboxCornerAnnoChanged", this->View->GetWindow(),
+		   this, "UpdateFromMaster" );
+    }
 }
 
 void vtkKWCornerAnnotation::SetTextColor( float r, float g, float b )
 {
   this->CornerProp->GetProperty()->SetColor( r, g, b );
   this->View->Render();
+
+  if ( this->LightboxID == 0 )
+    {
+    this->Application->GetEventNotifier()->
+      InvokeCallbacks( this, "LightboxCornerAnnoChanged",  
+		       this->View->GetWindow(), "" );
+    }
 }
 
 void vtkKWCornerAnnotation::OnDisplayCorner() 
@@ -202,6 +226,13 @@ void vtkKWCornerAnnotation::OnDisplayCorner()
     {
     this->View->RemoveComposite(this->CornerComposite);
     this->View->Render();
+    }
+
+  if ( this->LightboxID == 0 )
+    {
+    this->Application->GetEventNotifier()->
+      InvokeCallbacks( this, "LightboxCornerAnnoChanged",  
+		       this->View->GetWindow(), "" );
     }
 }
 
@@ -233,8 +264,34 @@ void vtkKWCornerAnnotation::CornerChanged(int i)
     {
     this->View->Render();
     }
+
+  if ( this->LightboxID == 0 )
+    {
+    this->Application->GetEventNotifier()->
+      InvokeCallbacks( this, "LightboxCornerAnnoChanged",  
+		       this->View->GetWindow(), "" );
+    }
 }
 
+void vtkKWCornerAnnotation::UpdateFromMaster()
+{
+  if ( this->MasterCornerAnnotation )
+    {
+    this->CornerProp->
+      SetText(0, this->MasterCornerAnnotation->CornerText[0]->GetValue());
+    this->CornerProp->
+      SetText(1, this->MasterCornerAnnotation->CornerText[1]->GetValue());
+    this->CornerProp->
+      SetText(2, this->MasterCornerAnnotation->CornerText[2]->GetValue());
+    this->CornerProp->
+      SetText(3, this->MasterCornerAnnotation->CornerText[3]->GetValue());
+
+    this->CornerProp->GetProperty()->
+      SetColor( this->MasterCornerAnnotation->GetTextColor() );
+
+    this->SetVisibility( this->MasterCornerAnnotation->GetVisibility() );
+    }
+}
 
 // Description:
 // Chaining method to serialize an object and its superclasses.
@@ -314,6 +371,6 @@ void vtkKWCornerAnnotation::SerializeToken(istream& is,
 void vtkKWCornerAnnotation::SerializeRevision(ostream& os, vtkIndent indent)
 {
   os << indent << "vtkKWCornerAnnotation ";
-  this->ExtractRevision(os,"$Revision: 1.4 $");
+  this->ExtractRevision(os,"$Revision: 1.5 $");
   vtkKWLabeledFrame::SerializeRevision(os,indent);
 }

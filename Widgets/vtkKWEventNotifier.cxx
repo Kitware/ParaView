@@ -112,6 +112,91 @@ void vtkKWEventNotifier::AddCallback( const char *event,
   tmp1->Delete();
 }
 
+void vtkKWEventNotifier::RemoveCallbacks( vtkKWObject *object ) 
+{
+  int                         index, done = 0;
+  vtkKWCallbackSpecification  *tmp1, *tmp2, *tmp3;
+
+
+  // Keep going until we don't find any more
+  while ( !done )
+    {
+    done = 1;
+    // check in all lists
+    for ( index = 0; index < 26; index++ )
+      {
+      // Are there any callbacks in the right list? If not, this must not
+      // be a callback that we have - just ignore it. If so, then find it in
+      // that list, and remove it.
+      if ( this->Callbacks[index] )
+	{
+	// Is it the first callback? Treat this case specially
+	if ( this->Callbacks[index]->GetCalledObject() == object )
+	  {
+	  done = 0;
+	  // Get the next callback
+	  tmp1 = this->Callbacks[index]->GetNextCallback();
+
+	  // Is the next one non-null? If so, we need to register it so
+	  // that it is not deleted when unregister is called on 
+	  // this->Callbacks[index].
+	  if ( tmp1 )
+	    {
+	    tmp1->Register( this );
+	    this->Callbacks[index]->UnRegister(this);
+	    this->Callbacks[index] = tmp1;
+	    }
+	  // If the next one is null, then this whole list becomes null after
+	  // we delete its only entry
+	  else
+	    {
+	    this->Callbacks[index]->UnRegister(this);
+	    this->Callbacks[index] = NULL;
+	    }
+	  }
+	// Otherwise, it is not the first callback and we have to keep
+	// looking for it.
+	else
+	  {
+	  tmp1 = this->Callbacks[index];
+	  tmp2 = this->Callbacks[index]->GetNextCallback();
+	  while ( tmp2 && tmp2->GetCalledObject() != object )
+	    {
+	    tmp1 = tmp2;
+	    tmp2 = tmp2->GetNextCallback();
+	    }
+
+	  // If tmp2 is null, then we can't find the callback to remove,
+	  // so just silently ignore it. If tmp2 is non null, then this
+	  // is the callback we have to remove, and tmp1 is the one right
+	  // before it in the list.
+	  if ( tmp2 )
+	    {
+	    done = 0;
+	    // If there is another callback after the one we are deleting,
+	    // reconnect the list
+	    if ( tmp2->GetNextCallback() )
+	      {
+	      // Hang on to it so it isn't deleted when the event before it
+	      // is unregistered. Then when we set it as the next event it
+	      // is registered so we can unregister it again.
+	      tmp3 = tmp2->GetNextCallback();
+	      tmp3->Register(this);
+	      tmp1->SetNextCallback( tmp2->GetNextCallback() );
+	      tmp3->UnRegister(this);
+	      }
+	    // Otherwise we are removing the last callback in the list.
+	    else
+	      {
+	      tmp1->SetNextCallback(NULL);
+	      }
+	    }
+	  }
+	}
+      }
+    }
+}
+
 void vtkKWEventNotifier::RemoveCallback( const char *event, 
 					 vtkKWWindow *window,
 					 vtkKWObject *object, 
