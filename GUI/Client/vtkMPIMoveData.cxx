@@ -35,7 +35,7 @@
 #include "vtkMPIMToNSocketConnection.h"
 #include "vtkSocketCommunicator.h"
 
-vtkCxxRevisionMacro(vtkMPIMoveData, "1.8");
+vtkCxxRevisionMacro(vtkMPIMoveData, "1.9");
 vtkStandardNewMacro(vtkMPIMoveData);
 
 vtkCxxSetObjectMacro(vtkMPIMoveData,Controller, vtkMultiProcessController);
@@ -641,7 +641,6 @@ void vtkMPIMoveData::RenderServerZeroBroadcast(vtkDataSet* data)
 
 
 #ifdef VTK_USE_MPI
-  int idx;
   vtkMPICommunicator* com = vtkMPICommunicator::SafeDownCast(
                                          this->Controller->GetCommunicator()); 
 
