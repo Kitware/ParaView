@@ -47,7 +47,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPartDisplay);
-vtkCxxRevisionMacro(vtkPVPartDisplay, "1.28");
+vtkCxxRevisionMacro(vtkPVPartDisplay, "1.29");
 
 
 //----------------------------------------------------------------------------
@@ -258,7 +258,7 @@ void vtkPVPartDisplay::CreateParallelTclObjects(vtkPVApplication *pvApp)
   this->MapperID = pm->NewStreamObject("vtkPolyDataMapper");
   stream << vtkClientServerStream::Invoke << this->MapperID << "UseLookupTableScalarRangeOn" 
          << vtkClientServerStream::End;
-  stream << vtkClientServerStream::Invoke << this->UpdateSuppressorID << "GetOutput" 
+  stream << vtkClientServerStream::Invoke << this->UpdateSuppressorID << "GetPolyDataOutput" 
          <<  vtkClientServerStream::End;
   stream << vtkClientServerStream::Invoke << this->MapperID << "SetInput" 
          << vtkClientServerStream::LastResult << vtkClientServerStream::End;

@@ -91,7 +91,7 @@ public:
   // processes.
   void SetVisibility(int v);
   int GetVisibility();
-  void SetVisibilityInternal(int v);
+  virtual void SetVisibilityInternal(int v);
 
   // Description:
   // Connect an input to this pvsource. 

@@ -41,7 +41,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLODPartDisplay);
-vtkCxxRevisionMacro(vtkPVLODPartDisplay, "1.21");
+vtkCxxRevisionMacro(vtkPVLODPartDisplay, "1.22");
 
 
 //----------------------------------------------------------------------------
@@ -218,7 +218,7 @@ void vtkPVLODPartDisplay::CreateParallelTclObjects(vtkPVApplication *pvApp)
     << vtkClientServerStream::End;
   pm->GetStream()
     << vtkClientServerStream::Invoke
-    << this->LODUpdateSuppressorID << "GetOutput"
+    << this->LODUpdateSuppressorID << "GetPolyDataOutput"
     << vtkClientServerStream::End
     << vtkClientServerStream::Invoke
     << this->LODMapperID << "SetInput" << vtkClientServerStream::LastResult

@@ -1031,23 +1031,6 @@ The Part Id Scalars filter assigns a unique scalar value to each part in the inp
 The Process Id Scalars filter assigns a unique scalar value to each piece of the input according to which processor it resides on.
     </Documentation>
   </Module>
-    <!--
-  <Module name="Pick"
-          root_name="Pick"
-          button_help="Pick cell or point closest to the widget"
-          module_type="Filter">
-    <Filter class="vtkPickDataSetFilter">
-      <Input name="Input"
-             class="vtkDataSet" />
-    </Filter>
-    <LabeledToggle label="Search cells"
-                   trace_name="SearchCells"
-                   variable="SearchCells"
-                   help="Set when cells are supposed to be searched. Otherwise points will be searched."/>
-    <PointWidget variable="SamplePoint"
-                 help="Sample point that we are picking."/>
-  </Module>
-    -->
   <Module name="PointDataToCellData"
           root_name="PointToCell"
           menu_name="Point Data to Cell Data"
@@ -1971,6 +1954,29 @@ The Scale Mode menu determines how the scale of the glyphs will be determined. T
 The Scalars and Vectors menus list the point-centered scalar (single-component) and vector (three-component) arrays in the input data set. These menus are enabled and disabled depending on the current Orient and Scale Mode selections.
 The Glyph Parameters tab also contains controls for masking the input points before glyphing. (This is a simplified version of the Mask Points filter interface.) To enable point masking, turn on the Mask Points option. When this is selected, the Max. Number of Glyphs thumbwheel sets an upper limit on the number of glyphs to display. If the Random Masking option is on, the input points to glyph will be randomly selected; otherwise every second point will be glyphed, starting from the first point id.
 The Glyph filter operates on any type of data set. Its output is polygonal. This filter is available on the toolbar.
+    </Documentation>
+  </Module>
+  <Module name="Pick"
+          class="vtkPVPick"
+          root_name="Pick"
+          module_type="Filter"
+          long_help="Find the cell or point closest to the input point."
+          short_help="Pick cells or points.">
+    <Filter class="vtkPickFilter">
+      <Input name="Input"
+             class="vtkDataSet">
+      </Input>
+    </Filter>
+    <PointWidget trace_name="Point" variable="WorldPoint"/>
+    <SelectionList variable="PickCell"
+                   label="Pick Type"
+                   trace_name="PickType"
+                   help="Select whether to pick cells or points."
+                   default_value="1">
+      <Item name="Point" value="0"/>
+      <Item name="Cell" value="1"/>
+    </SelectionList>
+    <Documentation>
     </Documentation>
   </Module>
   <Module name="Probe"
