@@ -111,7 +111,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.125");
+vtkCxxRevisionMacro(vtkPVApplication, "1.126");
 
 int vtkPVApplicationCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -289,6 +289,16 @@ vtkPVApplication::vtkPVApplication()
     }
 
   vtkKWLabeledFrame::AllowShowHideOn();
+  
+  // The following is necessary to make sure that the tcl object
+  // created has the right command function. Without this,
+  // the tcl object has the vtkKWApplication's command function
+  // since it is first created in vtkKWApplication's constructor
+  // (in vtkKWApplication's constructor GetClassName() returns
+  // the wrong value because the virtual table is not setup yet)
+  char* tclname = vtkString::Duplicate(this->GetTclName());
+  vtkTclUpdateCommand(this->MainInterp, tclname, this);
+  delete[] tclname;
 }
 
 
