@@ -51,7 +51,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWMessageDialog );
-vtkCxxRevisionMacro(vtkKWMessageDialog, "1.34");
+vtkCxxRevisionMacro(vtkKWMessageDialog, "1.35");
 
 
 
@@ -236,15 +236,17 @@ int vtkKWMessageDialog::Invoke()
       }
     }
   
-  if ( this->Options & vtkKWMessageDialog::YesDefault )
-    {
-    this->OKButton->Focus();
-    }
-  else if( this->Options & vtkKWMessageDialog::NoDefault )
+  if( this->Options & vtkKWMessageDialog::NoDefault ||
+           this->Options & vtkKWMessageDialog::CancelDefault )
     {
     this->CancelButton->Focus();
     } 
-  else
+  else if ( this->Options & vtkKWMessageDialog::YesDefault ||
+            this->Options & vtkKWMessageDialog::OkDefault )
+    {
+    this->OKButton->Focus();
+    }
+  else 
     {
     this->SetBind("<Right>", "focus [ tk_focusNext %W ]");
     this->SetBind("<Left>", "focus [ tk_focusPrev %W ]");
