@@ -101,6 +101,13 @@ vtkPVGenericRenderWindowInteractor
 vtkPVGeometryFilter
 vtkPVUpdateSuppressor
 vtkPVLODActor
+vtkClientCompositeManager
+vtkPVApplication
+vtkPVProcessModule
+vtkPVClientServerModule
+vtkPVMPIPRocessModule
+vtkKWObject
+vtkKWApplication
 )
 
 IF(VTK_USE_X)
@@ -127,7 +134,7 @@ FIND_FILE(VTK_WRAP_HINTS hints
 #
 FOREACH(CLASS ${ClientServer_WRAP_CLASSES})
   SET(ClientServer_CLASS_FOUND 0)
-  FOREACH(DIR ${VTK_INCLUDE_DIRS} ${PARAVIEW_SOURCE_DIR}/ParaView)
+  FOREACH(DIR ${VTK_INCLUDE_DIRS} ${PARAVIEW_SOURCE_DIR}/ParaView ${PARAVIEW_SOURCE_DIR}/Widgets)
     IF (NOT ClientServer_CLASS_FOUND)
       IF (EXISTS ${DIR}/${CLASS}.h)
         SET(ClientServer_RESOLVED_CLASSES ${ClientServer_RESOLVED_CLASSES} ${DIR}/${CLASS}.h)
