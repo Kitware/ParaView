@@ -1,0 +1,228 @@
+TclTkAqua README 
+----------------
+
+RCS: @(#) Id
+
+This is the README file for the Mac OS X native versions of Tcl & Tk.
+
+
+1. General
+----------
+
+- The tcl-mac mailing list on sourceforge is the canonical place for questions
+specific to Tcl & Tk on Mac OS X:
+	http://lists.sourceforge.net/lists/listinfo/tcl-mac
+(this page also has a link to searchable archives of the list, please check them
+before asking on the list, many questions have already been answered).
+
+- For general tcl/tk questions, the newsgroup comp.lang.tcl is your best bet,
+but also check the Tcl'ers Wiki for a wealth of information:
+	http://wiki.tcl.tk/
+
+- The wiki has a page listing known bugs in Mac OS X Tcl/Tk (and other tips)
+	http://wiki.tcl.tk/MacOS%20X
+as well as a page with info on building Tcl/Tk on Mac OS X
+	http://wiki.tcl.tk/Steps%20to%20build%20Tcl/Tk%208.4.0%20on%20MacOS%20X
+
+- You should report bugs to the sourceforge bug trackers as usual: 
+	Tcl: https://sourceforge.net/tracker/?func=add&group_id=10894&atid=110894
+	Tk:  https://sourceforge.net/tracker/?func=add&group_id=12997&atid=112997
+please make sure that your report Tk specific bugs to the tktoolkit bug
+tracker and not the tcl one.
+
+
+2. Using TclTkAqua
+------------------
+
+- Mac OS X 10.1 (or higher) is required to run TclTkAqua.
+
+- Tcl built on Mac OS X 10.2 or higher will not run on 10.1 due to missing
+symbols in libSystem, however Tcl built on 10.1 will run on 10.2 (but without
+prebinding and other optimizations).
+
+- Wish checks the Resources/Scripts directory in its application bundle for a
+file called AppMain.tcl, if found it is used as the startup script and the
+Scripts folder is added to the auto_path. This can be used to emulate the old
+OS9 TclTk droplets.
+
+- If standard input is a special file of zero length (e.g. /dev/null), Wish
+brings up the tk console window at startup. This is the case when double
+clicking Wish in the Finder (or using 'open Wish\ Shell.app' from the Terminal).
+
+- Tcl extensions will be found in any of:
+	$HOME/Library/Tcl /Library/Tcl /Network/Library/Tcl /System/Library/Tcl
+	$HOME/Library/Frameworks /Library/Frameworks /Network/Library/Frameworks
+	/System/Library/Frameworks (searched in that order).
+Given a potential package directory $pkg, Tcl on OSX checks for the file
+$pkg/Resources/Scripts/pkgIndex.tcl as well as the usual $pkg/pkgIndex.tcl.
+This allows building extensions as frameworks with all script files contained
+in the Resources/Scripts directory of the framework.
+
+- The Tcl and Tk frameworks contain documentation in html format in the
+standard location for frameworks:
+	Tcl.framework/Resources/English.lproj/Documentation/Reference/Tcl
+	Tk.framework/Resources/English.lproj/Documentation/Reference/Tk
+No manpages are installed by default for either tcl or tk.
+
+- the frameworks Tcl.framework and Tk.framework can be placed in any of the
+system's standard framework directories:
+	$HOME/Library/Frameworks /Library/Frameworks
+	/Network/Library/Frameworks /System/Library/Frameworks
+and 'Wish Shell' as well as /usr/bin/tclsh will work.
+
+- /usr/bin/wish is a script that calls a copy of 'Wish Shell' contained in
+	Tk.framework/Resources
+
+- if 'Wish Shell' is started from the Finder or via 'open', $argv contains a
+"-psn_XXXX" argument. This is the Wish's carbon process serial number, you may
+need to filter it out for cross platform compatibility of your scripts.
+
+- the env array is different when Wish is started from the Finder than when
+it (or tclsh) is invoked from the Terminal, in particular PATH may not be what
+you expect. (Wish started from the Finder inherits the Finder's environment
+variables, which are essentially those set in $HOME/.MacOSX/environment.plist
+and not those set by your shell configuration files).
+
+- Quickdraw text antialiasing is enabled by default when available (from 10.1.5
+onwards). Changing the global boolean variable '::tk::mac::antialiasedtext'
+allows to dis/enable antialiasing on the fly from tcl (even for existing text).
+
+- the format of binary extensions expected by [load] is that of ordinary shared
+libraries (.dylib) and not MachO bundles, at present loading of MachO bundles is
+not supported.
+
+- Scrollbars: There are two scrollbar variants in Aqua, normal & small.  The 
+normal scrollbar has a small dimension of 16, the small variant 12.  Access
+to the small variant was added in Tk 8.4.2.
+
+- Cursors: You can now put up and spin the Classic MacOS spinner, and the 
+counting hands and watch cursor.  The way this is done is each of the spinners
+have a base name:
+    spinning: The circular B&W circular spinner
+    countinguphand: The counting up hand
+    countingdownhand: The counting down hand
+    countingupanddownhand: The counting up then down hand
+    watch: The watch cursor
+Then to get the sequential variants, add an integer to the end of the base 
+name.  So, for instance this code will spin the spinner:
+    proc spinCursor {widget count} {
+        $widget configure -cursor spinning$count
+        after 100 spinCursor [incr count]
+    }
+This was added in Tk 8.4.2
+
+
+3. Building TclTkAqua
+---------------------
+
+- Mac OS X 10.1.5 (or higher) is required to build TclTkAqua.
+
+- Apple's Developer Tools CD needs to be installed (the version matching your OS
+release, but no earlier than April 2002). This CD should have come with Mac OS X
+retail or should be present as a disk image on new macs that came with OSX
+preinstalled. It can also be downloaded from http://connect.apple.com (after you
+register for free ADC membership).
+
+- Tcl is built as a Mac OS X framework via the Makefile in tcl/macosx, but can
+also be built from Apple's ProjectBuilder IDE using the Tcl.pbproj project (which
+calls through to the Makefile).
+
+- TkAqua is built as a Mac OS X frameworks using Apple's ProjectBuilder
+IDE, but you do not have to deal with the IDE if you don't want to, the
+Makefile in tk/macosx takes care of calling the ProjectBuilder command line tool
+with all the details taken care of. 
+
+- Unpack the tcl and tk source release archives and place the tcl and tk source
+trees in a common parent directory.
+[ If you don't want have the two source trees in one directory, you'll need to ]
+[ create the following symbolic link for the build to work as setup by default ]
+[      ln -fs /path_to_tcl/build /path_to_tk/build                             ]
+[ (where /path_to_{tcl,tk} is the directory containing the tcl resp. tk tree)  ]
+[ or you can pass an argument of BUILD_DIR=/somewhere to the tcl and tk make.  ]
+
+- The following instructions assume the tcl and tk source trees are named
+"tcl${ver}" and "tk${ver}", respectively, where ${ver} is a shell variable
+containing the tcl and tk version number (for example '8.4.2').
+Setup the shell variable as follows:
+	set ver="8.4.2" ;: if your shell is csh
+	ver="8.4.2"     ;: if your shell is sh
+The source trees will be named this way only if you are building from a release
+archive, if you are building from CVS, the version numbers will be missing; so
+set ${ver} to the empty string instead:
+	set ver=""     ;: if your shell is csh
+	ver=""         ;: if your shell is sh
+
+- If you're only interested in _building_ TclTkAqua and don't plan on doing
+development with the ProjectBuilder projects, using the Makefiles is easiest.
+The following steps will build Tcl and Tk from the Terminal, assuming you are
+located in the directory containing the tcl and tk source trees:
+	make -C tcl${ver}/macosx
+	make -C tk${ver}/macosx
+and the following will then install Tcl and Tk onto the root volume (admin
+password required):
+	sudo make -C tcl${ver}/macosx install
+	sudo make -C tk${ver}/macosx  install
+if you don't have the admin password, you can install into your home directory,
+instead by passing an INSTALL_ROOT argument to make:
+	make -C tcl${ver}/macosx install INSTALL_ROOT="${HOME}/"
+	make -C tk${ver}/macosx  install INSTALL_ROOT="${HOME}/"
+
+- The default Makefile targets will build _both_ debug and optimized versions of
+the Tcl and Tk frameworks with the standard convention of naming the debug
+library Tcl.framework/Tcl_debug resp. Tk.framework/Tk_debug.
+This allows you to dynamically link to the debug libraries at runtime by setting
+	setenv DYLD_IMAGE_SUFFIX _debug
+(c.f. man dyld for more details)
+
+If you only want to build and install the debug or optimized build, use the
+'develop' or 'deploy' target variants of the Makefiles, respectively.
+For example, to build and install only the optimized versions:
+	make -C tcl${ver}/macosx deploy
+	make -C tk${ver}/macosx deploy
+	sudo make -C tcl${ver}/macosx install-deploy
+	sudo make -C tk${ver}/macosx  install-deploy
+
+- The Makefiles can also build a version of 'Wish Shell' that has the Tcl and Tk
+frameworks embedded in its application package. This allows for standalone
+deployment of the application with no installation required, e.g. from read-only
+media. To build & install in this manner, use the 'embedded' target variants of
+the Makefiles. For example, to build a standalone 'Wish Shell.app'
+in ./embedded/Applications/Utilities:
+	make -C tcl${ver}/macosx embedded
+	make -C tk${ver}/macosx embedded
+	sudo make -C tcl${ver}/macosx install-embedded INSTALL_ROOT=`pwd`/embedded/
+	sudo make -C tk${ver}/macosx  install-embedded INSTALL_ROOT=`pwd`/embedded/
+Notes:
+  * if you've already built standard TclTkAqua, building embedded does not
+  require any new compiling or linking, so you can skip the first two makes.
+  (making relinking unnecessary was added in 8.4.2)
+  * the embedded frameworks include only optimized builds and no documentation.
+  * the standalone Wish has the directory Wish\ Shell.app/Contents/lib in its
+  auto_path. Thus you can place tcl extensions in this directory (i.e. embed
+  them in the app package) and load them with [package require].
+
+- It is possible to build Tk without without the tcl sourcetree; but in that
+case you need to tell the Tk Makefile where the copies of 'Tcl.framework' and 
+'tclsh8.4' are located that you want to build & link against 
+(their default location is ${BUILD_DIR}/tcl).
+
+For instance to use their default systemwide install locations:
+	make -C tk${ver}/macosx \
+	    TCL_FRAMEWORK_DIR=/Library/Frameworks TCLSH_DIR=/usr/bin
+	sudo make -C tk${ver}/macosx install \
+	    TCL_FRAMEWORK_DIR=/Library/Frameworks TCLSH_DIR=/usr/bin
+[ of course this will only work if /Library/Frameworks does indeed contain a  ]
+[ Tcl.framework corresponding in version to the Tk.framework you're trying to ]
+[ build, and if TCLSH_DIR contains a corresponding /usr/bin/tclsh8.4          ]
+
+or to use an earlier install of Tcl into INSTALL_ROOT="${TCLTK}/" :
+	make -C tk${ver}/macosx \
+	    TCL_FRAMEWORK_DIR=${TCLTK}/Library/Frameworks TCLSH_DIR=${TCLTK}/usr/bin
+	sudo make -C tk${ver}/macosx install INSTALL_ROOT="${TCLTK}/" \
+	    TCL_FRAMEWORK_DIR=${TCLTK}/Library/Frameworks TCLSH_DIR=${TCLTK}/usr/bin
+
+The Makefile variables TCL_FRAMEWORK_DIR and TCLSH_DIR were added in Tk 8.4.3.
+
+Note that html help in Tk.framework is only built if TCL_FRAMEWORK_DIR contains
+the tcl Makefile (as is the case for the default value of TCL_FRAMEWORK_DIR).
+

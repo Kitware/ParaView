@@ -1,0 +1,155 @@
+'\"
+'\" Copyright (c) 1998-2000 by Scriptics Corporation.
+'\" All rights reserved.
+'\" 
+'\" RCS: @(#) Id
+'\" 
+'\"
+.so man.macros
+.TH cursors n 8.3 Tk "Tk Built-In Commands"
+.BS
+'\" Note:  do not modify the .SH NAME line immediately below!
+.SH NAME
+cursors \- mouse cursors available in Tk
+.BE
+
+.SH DESCRIPTION
+.PP
+The \fB-cursor\fR widget option allows a Tk programmer to change the
+mouse cursor for a particular widget.  The cursor names recognized by
+Tk on all platforms are:
+.CS
+X_cursor
+arrow
+based_arrow_down
+based_arrow_up
+boat
+bogosity
+bottom_left_corner
+bottom_right_corner
+bottom_side
+bottom_tee
+box_spiral
+center_ptr
+circle
+clock
+coffee_mug
+cross
+cross_reverse
+crosshair
+diamond_cross
+dot
+dotbox
+double_arrow
+draft_large
+draft_small
+draped_box
+exchange
+fleur
+gobbler
+gumby
+hand1
+hand2
+heart
+icon
+iron_cross
+left_ptr
+left_side
+left_tee
+leftbutton
+ll_angle
+lr_angle
+man
+middlebutton
+mouse
+pencil
+pirate
+plus
+question_arrow
+right_ptr
+right_side
+right_tee
+rightbutton
+rtl_logo
+sailboat
+sb_down_arrow
+sb_h_double_arrow
+sb_left_arrow
+sb_right_arrow
+sb_up_arrow
+sb_v_double_arrow
+shuttle
+sizing
+spider
+spraycan
+star
+target
+tcross
+top_left_arrow
+top_left_corner
+top_right_corner
+top_side
+top_tee
+trek
+ul_angle
+umbrella
+ur_angle
+watch
+xterm
+.CE
+
+.SH "PORTABILITY ISSUES"
+
+.TP
+\fBWindows\fR
+On Windows systems, the following cursors are mapped to native cursors:
+.RS
+.CS
+arrow
+center_ptr
+crosshair
+fleur
+ibeam
+icon
+sb_h_double_arrow
+sb_v_double_arrow
+watch
+xterm
+.CE
+And the following additional cursors are available:
+.CS
+no
+starting
+size
+size_ne_sw
+size_ns
+size_nw_se
+size_we
+uparrow
+wait
+.CE
+The \fBno\fR cursor can be specified to eliminate the cursor.
+.RE
+
+.TP
+\fBMacintosh\fR
+On Macintosh systems, the following cursors are mapped to native cursors:
+.RS
+.CS
+arrow
+cross
+crosshair
+ibeam
+plus
+watch
+xterm
+.CE
+And the following additional cursors are available:
+.CS
+text
+cross-hair
+.CE
+.RE
+
+.SH KEYWORDS
+cursor, option

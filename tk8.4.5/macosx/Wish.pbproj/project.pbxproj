@@ -1,0 +1,3843 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 38;
+	objects = {
+		4C3B4CF6040B18B200C916F0 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			path = tkMacOSXAETE.r;
+			refType = 4;
+		};
+		4C3B4CF7040B18B200C916F0 = {
+			fileRef = 4C3B4CF6040B18B200C916F0;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+//4C0
+//4C1
+//4C2
+//4C3
+//4C4
+//F50
+//F51
+//F52
+//F53
+//F54
+		F50D96120196176E01DC9062 = {
+			isa = PBXFrameworkReference;
+			name = ApplicationServices.framework;
+			path = /System/Library/Frameworks/ApplicationServices.framework;
+			refType = 0;
+		};
+		F50D96130196176E01DC9062 = {
+			fileRef = F50D96120196176E01DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F50D96140196176E01DC9062 = {
+			fileRef = F50D96120196176E01DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F51D903E0181474301DC9062 = {
+			fileRef = F5875C7B016FEF1D01DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F51D903F018149BD01DC9062 = {
+			buildActionMask = 2147483647;
+			dstPath = "Versions/$(FRAMEWORK_VERSION)/Headers/X11";
+			dstSubfolderSpec = 1;
+			files = (
+				F51D9040018149FD01DC9062,
+				F51D9041018149FD01DC9062,
+				F51D9042018149FD01DC9062,
+				F51D9043018149FD01DC9062,
+				F51D9044018149FD01DC9062,
+				F51D9045018149FD01DC9062,
+				F51D9046018149FD01DC9062,
+				F51D9047018149FD01DC9062,
+				F51D9048018149FD01DC9062,
+			);
+			isa = PBXCopyFilesBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F51D9040018149FD01DC9062 = {
+			fileRef = F53755CE016C389901DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F51D9041018149FD01DC9062 = {
+			fileRef = F53755CF016C389901DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F51D9042018149FD01DC9062 = {
+			fileRef = F53755D0016C389901DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F51D9043018149FD01DC9062 = {
+			fileRef = F53755D1016C389901DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F51D9044018149FD01DC9062 = {
+			fileRef = F53755D2016C389901DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F51D9045018149FD01DC9062 = {
+			fileRef = F53755D3016C389901DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F51D9046018149FD01DC9062 = {
+			fileRef = F53755D4016C389901DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F51D9047018149FD01DC9062 = {
+			fileRef = F53755D5016C389901DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F51D9048018149FD01DC9062 = {
+			fileRef = F53755D6016C389901DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F52D38C5031F4259016F146B = {
+			buildActionMask = 2147483647;
+			files = (
+			);
+			generatedFileNames = (
+			);
+			isa = PBXShellScriptBuildPhase;
+			neededFileNames = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "if [ \"${BUILD_STYLE}\" = \"Development\" ]; then\n\t# keep copy of debug library around, so that\n\t# Deployment build can be installed on top\n\t# of Development build without overwriting it\n\tcd \"${TARGET_BUILD_DIR}/${PRODUCT_NAME}.${WRAPPER_EXTENSION}/Versions/${FRAMEWORK_VERSION}\"\n\tcp -fp \"${PRODUCT_NAME}\" \"${PRODUCT_NAME}_debug\"\n\tln -fs \"Versions/Current/${PRODUCT_NAME}_debug\" ../..\n\tcp -fp \"libtkstub${FRAMEWORK_VERSION}.a\" \"libtkstub${FRAMEWORK_VERSION}g.a\"\n\n\t# force Deployment build to be relinked next time\n\tif [ -f \"${OBJROOT}/Deployment.build/${PROJECT_NAME}.build/${TARGET_NAME}.build/Objects-normal/LinkFileList\" ]; then\n\t    touch -t `date -r \\`expr \\\\\\`date +\"%s\"\\\\\\` + 30\\` +\"%Y%m%d%H%M.%S\"` \"${OBJROOT}/Deployment.build/${PROJECT_NAME}.build/${TARGET_NAME}.build/Objects-normal/LinkFileList\"\n\tfi\nelse\n\t# force Development build to be relinked next time\n\tif [ -f \"${OBJROOT}/Development.build/${PROJECT_NAME}.build/${TARGET_NAME}.build/Objects-normal/LinkFileList\" ]; then\n\t    touch -t `date -r \\`expr \\\\\\`date +\"%s\"\\\\\\` + 30\\` +\"%Y%m%d%H%M.%S\"` \"${OBJROOT}/Development.build/${PROJECT_NAME}.build/${TARGET_NAME}.build/Objects-normal/LinkFileList\"\n\tfi\nfi\n\n# fixup Framework structure\ncd \"${TARGET_BUILD_DIR}/${PRODUCT_NAME}.${WRAPPER_EXTENSION}/Versions/${FRAMEWORK_VERSION}\"\nln -fs `ls libtkstub* | sed -e \"s|.*|Versions/${FRAMEWORK_VERSION}/&|\"` ../..\nln -fs \"Versions/Current/tkConfig.sh\" ../..\nranlib libtkstub${FRAMEWORK_VERSION}*.a";
+		};
+		F537552A016C352C01DC9062 = {
+			buildStyles = (
+				F537552C016C352C01DC9062,
+				F537552D016C352C01DC9062,
+			);
+			hasScannedForEncodings = 1;
+			isa = PBXProject;
+			mainGroup = F537552B016C352C01DC9062;
+			productRefGroup = F53755DD016C38D201DC9062;
+			projectDirPath = "";
+			targets = (
+				F53756A0016C4DD401DC9062,
+				F53755DF016C38D201DC9062,
+				F548F8CE0313CEF0016F146B,
+			);
+		};
+		F537552B016C352C01DC9062 = {
+			children = (
+				F92ED9910403D0F0006F146B,
+				F5C88659017D625C01DC9062,
+				F5DF07A7016CD03801DC9062,
+				F5375688016C3F1001DC9062,
+				F5375531016C376E01DC9062,
+				F537552E016C376E01DC9062,
+				F537553C016C376E01DC9062,
+				F53755C9016C389901DC9062,
+				F53755CC016C389901DC9062,
+				F537567C016C3ADB01DC9062,
+				F53755DD016C38D201DC9062,
+			);
+			isa = PBXGroup;
+			refType = 4;
+		};
+		F537552C016C352C01DC9062 = {
+			buildRules = (
+			);
+			buildSettings = {
+				OTHER_LDFLAGS = "\U0001-prebind";
+				TEMP_DIR = "${OBJROOT}/Development.build/$(PROJECT_NAME).build/$(TARGET_NAME).build";
+				UNSTRIPPED_PRODUCT = YES;
+			};
+			isa = PBXBuildStyle;
+			name = Development;
+		};
+		F537552D016C352C01DC9062 = {
+			buildRules = (
+			);
+			buildSettings = {
+				DEBUGGING_SYMBOLS = NO;
+				OPTIMIZATION_CFLAGS = "-Os";
+				OTHER_LDFLAGS = "\U0001-prebind";
+				TEMP_DIR = "${OBJROOT}/Deployment.build/$(PROJECT_NAME).build/$(TARGET_NAME).build";
+			};
+			isa = PBXBuildStyle;
+			name = Deployment;
+		};
+		F537552E016C376E01DC9062 = {
+			children = (
+				F537552F016C376E01DC9062,
+				F5375530016C376E01DC9062,
+			);
+			isa = PBXGroup;
+			name = Generic;
+			refType = 4;
+		};
+		F537552F016C376E01DC9062 = {
+			children = (
+				F5375569016C37A601DC9062,
+				F537556A016C37A601DC9062,
+				F537556B016C37A601DC9062,
+				F537556C016C37A601DC9062,
+				F537556D016C37A601DC9062,
+				F537556E016C37A601DC9062,
+				F537556F016C37A601DC9062,
+				F5375570016C37A601DC9062,
+				F5375571016C37A601DC9062,
+				F5375572016C37A601DC9062,
+				F5375573016C37A601DC9062,
+				F5375574016C37A601DC9062,
+				F5375575016C37A601DC9062,
+				F5375576016C37A601DC9062,
+				F5375577016C37A601DC9062,
+				F5375578016C37A601DC9062,
+				F5375579016C37A601DC9062,
+				F537557A016C37A601DC9062,
+				F537557B016C37A601DC9062,
+				F537557C016C37A601DC9062,
+				F537557D016C37A601DC9062,
+				F537557E016C37A601DC9062,
+				F537557F016C37A601DC9062,
+				F5BFE58F02F8C45B01DC9062,
+			);
+			isa = PBXGroup;
+			name = Headers;
+			refType = 4;
+		};
+		F5375530016C376E01DC9062 = {
+			children = (
+				F5375580016C389901DC9062,
+				F5375581016C389901DC9062,
+				F5375582016C389901DC9062,
+				F5375583016C389901DC9062,
+				F5375584016C389901DC9062,
+				F5375585016C389901DC9062,
+				F5375586016C389901DC9062,
+				F5375587016C389901DC9062,
+				F5375588016C389901DC9062,
+				F5375589016C389901DC9062,
+				F537558A016C389901DC9062,
+				F537558B016C389901DC9062,
+				F537558C016C389901DC9062,
+				F537558D016C389901DC9062,
+				F537558E016C389901DC9062,
+				F537558F016C389901DC9062,
+				F5375590016C389901DC9062,
+				F5375591016C389901DC9062,
+				F5375592016C389901DC9062,
+				F5375593016C389901DC9062,
+				F5375594016C389901DC9062,
+				F5375595016C389901DC9062,
+				F5375596016C389901DC9062,
+				F5375597016C389901DC9062,
+				F5375598016C389901DC9062,
+				F5375599016C389901DC9062,
+				F537559A016C389901DC9062,
+				F537559B016C389901DC9062,
+				F537559C016C389901DC9062,
+				F537559D016C389901DC9062,
+				F537559E016C389901DC9062,
+				F537559F016C389901DC9062,
+				F53755A0016C389901DC9062,
+				F53755A1016C389901DC9062,
+				F53755A2016C389901DC9062,
+				F53755A3016C389901DC9062,
+				F53755A4016C389901DC9062,
+				F53755A5016C389901DC9062,
+				F53755A6016C389901DC9062,
+				F53755A7016C389901DC9062,
+				F53755A8016C389901DC9062,
+				F53755A9016C389901DC9062,
+				F53755AA016C389901DC9062,
+				F53755AB016C389901DC9062,
+				F53755AC016C389901DC9062,
+				F53755AD016C389901DC9062,
+				F53755AE016C389901DC9062,
+				F53755AF016C389901DC9062,
+				F53755B0016C389901DC9062,
+				F53755B1016C389901DC9062,
+				F53755B2016C389901DC9062,
+				F55BC46802B2D38B01DC9062,
+				F53755B3016C389901DC9062,
+				F53755B4016C389901DC9062,
+				F53755B5016C389901DC9062,
+				F53755B6016C389901DC9062,
+				F53755B7016C389901DC9062,
+				F53755B8016C389901DC9062,
+				F53755B9016C389901DC9062,
+				F53755BA016C389901DC9062,
+				F53755BB016C389901DC9062,
+				F5BFE58B02F8C41501DC9062,
+				F53755BC016C389901DC9062,
+				F53755BD016C389901DC9062,
+				F53755BE016C389901DC9062,
+				F53755BF016C389901DC9062,
+				F53755C0016C389901DC9062,
+				F53755C1016C389901DC9062,
+				F53755C2016C389901DC9062,
+				F53755C3016C389901DC9062,
+				F53755C4016C389901DC9062,
+				F53755C5016C389901DC9062,
+				F5BFE58C02F8C41501DC9062,
+				F53755C6016C389901DC9062,
+				F53755C7016C389901DC9062,
+				F53755C8016C389901DC9062,
+			);
+			isa = PBXGroup;
+			name = Source;
+			refType = 4;
+		};
+		F5375531016C376E01DC9062 = {
+			children = (
+				F5375532016C376E01DC9062,
+				F537553B016C376E01DC9062,
+			);
+			isa = PBXGroup;
+			name = Resources;
+			refType = 4;
+		};
+		F5375532016C376E01DC9062 = {
+			children = (
+				F5375533016C376E01DC9062,
+				4C3B4CF6040B18B200C916F0,
+				F5375535016C376E01DC9062,
+				F5375538016C376E01DC9062,
+				F537553A016C376E01DC9062,
+			);
+			isa = PBXGroup;
+			name = "Resource Manager Resources";
+			refType = 4;
+		};
+		F5375533016C376E01DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			path = tkAboutDlg.r;
+			refType = 4;
+		};
+		F5375535016C376E01DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			path = tkMacOSXCursors.r;
+			refType = 4;
+		};
+		F5375538016C376E01DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			path = tkMacOSXMenu.r;
+			refType = 4;
+		};
+		F537553A016C376E01DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			path = tkMacOSXXCursors.r;
+			refType = 4;
+		};
+		F537553B016C376E01DC9062 = {
+			isa = PBXFileReference;
+			path = Wish.icns;
+			refType = 4;
+		};
+		F537553C016C376E01DC9062 = {
+			children = (
+				F537553D016C376E01DC9062,
+				F5375546016C376E01DC9062,
+			);
+			isa = PBXGroup;
+			name = "MacOS X";
+			refType = 4;
+		};
+		F537553D016C376E01DC9062 = {
+			children = (
+				F537553E016C376E01DC9062,
+				F537553F016C376E01DC9062,
+				F5375540016C376E01DC9062,
+				F5375541016C376E01DC9062,
+				F5375542016C376E01DC9062,
+				F5375543016C376E01DC9062,
+				F5375545016C376E01DC9062,
+			);
+			isa = PBXGroup;
+			name = Headers;
+			refType = 4;
+		};
+		F537553E016C376E01DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			path = tkMacOSX.h;
+			refType = 2;
+		};
+		F537553F016C376E01DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			path = tkMacOSXDebug.h;
+			refType = 2;
+		};
+		F5375540016C376E01DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			path = tkMacOSXDefault.h;
+			refType = 2;
+		};
+		F5375541016C376E01DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			path = tkMacOSXEvent.h;
+			refType = 2;
+		};
+		F5375542016C376E01DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			path = tkMacOSXInt.h;
+			refType = 2;
+		};
+		F5375543016C376E01DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			path = tkMacOSXPort.h;
+			refType = 2;
+		};
+		F5375545016C376E01DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			path = tkMacOSXWm.h;
+			refType = 2;
+		};
+		F5375546016C376E01DC9062 = {
+			children = (
+				F5375548016C376E01DC9062,
+				F5375549016C376E01DC9062,
+				F537554A016C376E01DC9062,
+				F537554B016C376E01DC9062,
+				F537554C016C376E01DC9062,
+				F537554D016C376E01DC9062,
+				F537554E016C376E01DC9062,
+				F537554F016C376E01DC9062,
+				F5375550016C376E01DC9062,
+				F5375551016C376E01DC9062,
+				F5375552016C376E01DC9062,
+				F5375553016C376E01DC9062,
+				F5375554016C376E01DC9062,
+				F5375555016C376E01DC9062,
+				F5375556016C376E01DC9062,
+				F5375557016C376E01DC9062,
+				F5375558016C376E01DC9062,
+				F5375559016C376E01DC9062,
+				F537555A016C376E01DC9062,
+				F537555B016C376E01DC9062,
+				F537555C016C376E01DC9062,
+				F537555D016C376E01DC9062,
+				F537555E016C376E01DC9062,
+				F5375560016C376E01DC9062,
+				F5375561016C376E01DC9062,
+				F5375562016C376E01DC9062,
+				F5375563016C376E01DC9062,
+				F5375565016C376E01DC9062,
+				F5375567016C376E01DC9062,
+				F5375568016C376E01DC9062,
+			);
+			isa = PBXGroup;
+			name = Source;
+			refType = 4;
+		};
+		F5375548016C376E01DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			path = tkMacOSXAppInit.c;
+			refType = 4;
+		};
+		F5375549016C376E01DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			path = tkMacOSXBitmap.c;
+			refType = 4;
+		};
+		F537554A016C376E01DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			path = tkMacOSXButton.c;
+			refType = 4;
+		};
+		F537554B016C376E01DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			path = tkMacOSXClipboard.c;
+			refType = 4;
+		};
+		F537554C016C376E01DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			path = tkMacOSXColor.c;
+			refType = 4;
+		};
+		F537554D016C376E01DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			path = tkMacOSXConfig.c;
+			refType = 4;
+		};
+		F537554E016C376E01DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			path = tkMacOSXCursor.c;
+			refType = 4;
+		};
+		F537554F016C376E01DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			path = tkMacOSXDebug.c;
+			refType = 4;
+		};
+		F5375550016C376E01DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			path = tkMacOSXDialog.c;
+			refType = 4;
+		};
+		F5375551016C376E01DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			path = tkMacOSXDraw.c;
+			refType = 4;
+		};
+		F5375552016C376E01DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			path = tkMacOSXEmbed.c;
+			refType = 4;
+		};
+		F5375553016C376E01DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			path = tkMacOSXEvent.c;
+			refType = 4;
+		};
+		F5375554016C376E01DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			path = tkMacOSXFont.c;
+			refType = 4;
+		};
+		F5375555016C376E01DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			path = tkMacOSXHLEvents.c;
+			refType = 4;
+		};
+		F5375556016C376E01DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			path = tkMacOSXInit.c;
+			refType = 4;
+		};
+		F5375557016C376E01DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			path = tkMacOSXKeyboard.c;
+			refType = 4;
+		};
+		F5375558016C376E01DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			path = tkMacOSXKeyEvent.c;
+			refType = 4;
+		};
+		F5375559016C376E01DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			path = tkMacOSXMenu.c;
+			refType = 4;
+		};
+		F537555A016C376E01DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			path = tkMacOSXMenubutton.c;
+			refType = 4;
+		};
+		F537555B016C376E01DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			path = tkMacOSXMenus.c;
+			refType = 4;
+		};
+		F537555C016C376E01DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			path = tkMacOSXMouseEvent.c;
+			refType = 4;
+		};
+		F537555D016C376E01DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			path = tkMacOSXNotify.c;
+			refType = 4;
+		};
+		F537555E016C376E01DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			path = tkMacOSXRegion.c;
+			refType = 4;
+		};
+		F5375560016C376E01DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			path = tkMacOSXScrlbr.c;
+			refType = 4;
+		};
+		F5375561016C376E01DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			path = tkMacOSXSend.c;
+			refType = 4;
+		};
+		F5375562016C376E01DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			path = tkMacOSXSubwindows.c;
+			refType = 4;
+		};
+		F5375563016C376E01DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			path = tkMacOSXTest.c;
+			refType = 4;
+		};
+		F5375565016C376E01DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			path = tkMacOSXWindowEvent.c;
+			refType = 4;
+		};
+		F5375567016C376E01DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			path = tkMacOSXWm.c;
+			refType = 4;
+		};
+		F5375568016C376E01DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			path = tkMacOSXXStubs.c;
+			refType = 4;
+		};
+		F5375569016C37A601DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			name = default.h;
+			path = ../generic/default.h;
+			refType = 2;
+		};
+		F537556A016C37A601DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			name = ks_names.h;
+			path = ../generic/ks_names.h;
+			refType = 2;
+		};
+		F537556B016C37A601DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			name = tk.h;
+			path = ../generic/tk.h;
+			refType = 2;
+		};
+		F537556C016C37A601DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			name = tk3d.h;
+			path = ../generic/tk3d.h;
+			refType = 2;
+		};
+		F537556D016C37A601DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			name = tkButton.h;
+			path = ../generic/tkButton.h;
+			refType = 2;
+		};
+		F537556E016C37A601DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			name = tkCanvas.h;
+			path = ../generic/tkCanvas.h;
+			refType = 2;
+		};
+		F537556F016C37A601DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			name = tkColor.h;
+			path = ../generic/tkColor.h;
+			refType = 2;
+		};
+		F5375570016C37A601DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			name = tkDecls.h;
+			path = ../generic/tkDecls.h;
+			refType = 2;
+		};
+		F5375571016C37A601DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			name = tkFileFilter.h;
+			path = ../generic/tkFileFilter.h;
+			refType = 2;
+		};
+		F5375572016C37A601DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			name = tkFont.h;
+			path = ../generic/tkFont.h;
+			refType = 2;
+		};
+		F5375573016C37A601DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			name = tkInitScript.h;
+			path = ../generic/tkInitScript.h;
+			refType = 2;
+		};
+		F5375574016C37A601DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			name = tkInt.h;
+			path = ../generic/tkInt.h;
+			refType = 2;
+		};
+		F5375575016C37A601DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			name = tkIntDecls.h;
+			path = ../generic/tkIntDecls.h;
+			refType = 2;
+		};
+		F5375576016C37A601DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			name = tkIntPlatDecls.h;
+			path = ../generic/tkIntPlatDecls.h;
+			refType = 2;
+		};
+		F5375577016C37A601DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			name = tkIntXlibDecls.h;
+			path = ../generic/tkIntXlibDecls.h;
+			refType = 2;
+		};
+		F5375578016C37A601DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			name = tkMenu.h;
+			path = ../generic/tkMenu.h;
+			refType = 2;
+		};
+		F5375579016C37A601DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			name = tkMenubutton.h;
+			path = ../generic/tkMenubutton.h;
+			refType = 2;
+		};
+		F537557A016C37A601DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			name = tkPlatDecls.h;
+			path = ../generic/tkPlatDecls.h;
+			refType = 2;
+		};
+		F537557B016C37A601DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			name = tkPort.h;
+			path = ../generic/tkPort.h;
+			refType = 2;
+		};
+		F537557C016C37A601DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			name = tkScale.h;
+			path = ../generic/tkScale.h;
+			refType = 2;
+		};
+		F537557D016C37A601DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			name = tkScrollbar.h;
+			path = ../generic/tkScrollbar.h;
+			refType = 2;
+		};
+		F537557E016C37A601DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			name = tkSelect.h;
+			path = ../generic/tkSelect.h;
+			refType = 2;
+		};
+		F537557F016C37A601DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			name = tkText.h;
+			path = ../generic/tkText.h;
+			refType = 2;
+		};
+		F5375580016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			name = tk3d.c;
+			path = ../generic/tk3d.c;
+			refType = 2;
+		};
+		F5375581016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			name = tkArgv.c;
+			path = ../generic/tkArgv.c;
+			refType = 2;
+		};
+		F5375582016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			name = tkAtom.c;
+			path = ../generic/tkAtom.c;
+			refType = 2;
+		};
+		F5375583016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			name = tkBind.c;
+			path = ../generic/tkBind.c;
+			refType = 2;
+		};
+		F5375584016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			name = tkBitmap.c;
+			path = ../generic/tkBitmap.c;
+			refType = 2;
+		};
+		F5375585016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			name = tkButton.c;
+			path = ../generic/tkButton.c;
+			refType = 2;
+		};
+		F5375586016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			name = tkCanvArc.c;
+			path = ../generic/tkCanvArc.c;
+			refType = 2;
+		};
+		F5375587016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			name = tkCanvas.c;
+			path = ../generic/tkCanvas.c;
+			refType = 2;
+		};
+		F5375588016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			name = tkCanvBmap.c;
+			path = ../generic/tkCanvBmap.c;
+			refType = 2;
+		};
+		F5375589016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			name = tkCanvImg.c;
+			path = ../generic/tkCanvImg.c;
+			refType = 2;
+		};
+		F537558A016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			name = tkCanvLine.c;
+			path = ../generic/tkCanvLine.c;
+			refType = 2;
+		};
+		F537558B016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			name = tkCanvPoly.c;
+			path = ../generic/tkCanvPoly.c;
+			refType = 2;
+		};
+		F537558C016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			name = tkCanvPs.c;
+			path = ../generic/tkCanvPs.c;
+			refType = 2;
+		};
+		F537558D016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			name = tkCanvText.c;
+			path = ../generic/tkCanvText.c;
+			refType = 2;
+		};
+		F537558E016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			name = tkCanvUtil.c;
+			path = ../generic/tkCanvUtil.c;
+			refType = 2;
+		};
+		F537558F016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			name = tkCanvWind.c;
+			path = ../generic/tkCanvWind.c;
+			refType = 2;
+		};
+		F5375590016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			name = tkClipboard.c;
+			path = ../generic/tkClipboard.c;
+			refType = 2;
+		};
+		F5375591016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			name = tkCmds.c;
+			path = ../generic/tkCmds.c;
+			refType = 2;
+		};
+		F5375592016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			name = tkColor.c;
+			path = ../generic/tkColor.c;
+			refType = 2;
+		};
+		F5375593016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			name = tkConfig.c;
+			path = ../generic/tkConfig.c;
+			refType = 2;
+		};
+		F5375594016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			name = tkConsole.c;
+			path = ../generic/tkConsole.c;
+			refType = 2;
+		};
+		F5375595016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			name = tkCursor.c;
+			path = ../generic/tkCursor.c;
+			refType = 2;
+		};
+		F5375596016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			name = tkEntry.c;
+			path = ../generic/tkEntry.c;
+			refType = 2;
+		};
+		F5375597016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			name = tkError.c;
+			path = ../generic/tkError.c;
+			refType = 2;
+		};
+		F5375598016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			name = tkEvent.c;
+			path = ../generic/tkEvent.c;
+			refType = 2;
+		};
+		F5375599016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			name = tkFileFilter.c;
+			path = ../generic/tkFileFilter.c;
+			refType = 2;
+		};
+		F537559A016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			name = tkFocus.c;
+			path = ../generic/tkFocus.c;
+			refType = 2;
+		};
+		F537559B016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			name = tkFont.c;
+			path = ../generic/tkFont.c;
+			refType = 2;
+		};
+		F537559C016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			name = tkFrame.c;
+			path = ../generic/tkFrame.c;
+			refType = 2;
+		};
+		F537559D016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			name = tkGC.c;
+			path = ../generic/tkGC.c;
+			refType = 2;
+		};
+		F537559E016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			name = tkGeometry.c;
+			path = ../generic/tkGeometry.c;
+			refType = 2;
+		};
+		F537559F016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			name = tkGet.c;
+			path = ../generic/tkGet.c;
+			refType = 2;
+		};
+		F53755A0016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			name = tkGrab.c;
+			path = ../generic/tkGrab.c;
+			refType = 2;
+		};
+		F53755A1016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			name = tkGrid.c;
+			path = ../generic/tkGrid.c;
+			refType = 2;
+		};
+		F53755A2016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			name = tkImage.c;
+			path = ../generic/tkImage.c;
+			refType = 2;
+		};
+		F53755A3016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			name = tkImgBmap.c;
+			path = ../generic/tkImgBmap.c;
+			refType = 2;
+		};
+		F53755A4016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			name = tkImgGIF.c;
+			path = ../generic/tkImgGIF.c;
+			refType = 2;
+		};
+		F53755A5016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			name = tkImgPhoto.c;
+			path = ../generic/tkImgPhoto.c;
+			refType = 2;
+		};
+		F53755A6016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			name = tkImgPPM.c;
+			path = ../generic/tkImgPPM.c;
+			refType = 2;
+		};
+		F53755A7016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			name = tkImgUtil.c;
+			path = ../generic/tkImgUtil.c;
+			refType = 2;
+		};
+		F53755A8016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			name = tkListbox.c;
+			path = ../generic/tkListbox.c;
+			refType = 2;
+		};
+		F53755A9016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			name = tkMacWinMenu.c;
+			path = ../generic/tkMacWinMenu.c;
+			refType = 2;
+		};
+		F53755AA016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			name = tkMain.c;
+			path = ../generic/tkMain.c;
+			refType = 2;
+		};
+		F53755AB016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			name = tkMenu.c;
+			path = ../generic/tkMenu.c;
+			refType = 2;
+		};
+		F53755AC016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			name = tkMenubutton.c;
+			path = ../generic/tkMenubutton.c;
+			refType = 2;
+		};
+		F53755AD016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			name = tkMenuDraw.c;
+			path = ../generic/tkMenuDraw.c;
+			refType = 2;
+		};
+		F53755AE016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			name = tkMessage.c;
+			path = ../generic/tkMessage.c;
+			refType = 2;
+		};
+		F53755AF016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			name = tkObj.c;
+			path = ../generic/tkObj.c;
+			refType = 2;
+		};
+		F53755B0016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			name = tkOldConfig.c;
+			path = ../generic/tkOldConfig.c;
+			refType = 2;
+		};
+		F53755B1016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			name = tkOption.c;
+			path = ../generic/tkOption.c;
+			refType = 2;
+		};
+		F53755B2016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			name = tkPack.c;
+			path = ../generic/tkPack.c;
+			refType = 2;
+		};
+		F53755B3016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			name = tkPlace.c;
+			path = ../generic/tkPlace.c;
+			refType = 2;
+		};
+		F53755B4016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			name = tkPointer.c;
+			path = ../generic/tkPointer.c;
+			refType = 2;
+		};
+		F53755B5016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			name = tkRectOval.c;
+			path = ../generic/tkRectOval.c;
+			refType = 2;
+		};
+		F53755B6016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			name = tkScale.c;
+			path = ../generic/tkScale.c;
+			refType = 2;
+		};
+		F53755B7016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			name = tkScrollbar.c;
+			path = ../generic/tkScrollbar.c;
+			refType = 2;
+		};
+		F53755B8016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			name = tkSelect.c;
+			path = ../generic/tkSelect.c;
+			refType = 2;
+		};
+		F53755B9016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			name = tkStubImg.c;
+			path = ../generic/tkStubImg.c;
+			refType = 2;
+		};
+		F53755BA016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			name = tkStubInit.c;
+			path = ../generic/tkStubInit.c;
+			refType = 2;
+		};
+		F53755BB016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			name = tkStubLib.c;
+			path = ../generic/tkStubLib.c;
+			refType = 2;
+		};
+		F53755BC016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			name = tkTest.c;
+			path = ../generic/tkTest.c;
+			refType = 2;
+		};
+		F53755BD016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			name = tkText.c;
+			path = ../generic/tkText.c;
+			refType = 2;
+		};
+		F53755BE016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			name = tkTextBTree.c;
+			path = ../generic/tkTextBTree.c;
+			refType = 2;
+		};
+		F53755BF016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			name = tkTextDisp.c;
+			path = ../generic/tkTextDisp.c;
+			refType = 2;
+		};
+		F53755C0016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			name = tkTextImage.c;
+			path = ../generic/tkTextImage.c;
+			refType = 2;
+		};
+		F53755C1016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			name = tkTextIndex.c;
+			path = ../generic/tkTextIndex.c;
+			refType = 2;
+		};
+		F53755C2016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			name = tkTextMark.c;
+			path = ../generic/tkTextMark.c;
+			refType = 2;
+		};
+		F53755C3016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			name = tkTextTag.c;
+			path = ../generic/tkTextTag.c;
+			refType = 2;
+		};
+		F53755C4016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			name = tkTextWind.c;
+			path = ../generic/tkTextWind.c;
+			refType = 2;
+		};
+		F53755C5016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			name = tkTrig.c;
+			path = ../generic/tkTrig.c;
+			refType = 2;
+		};
+		F53755C6016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			name = tkUtil.c;
+			path = ../generic/tkUtil.c;
+			refType = 2;
+		};
+		F53755C7016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			name = tkVisual.c;
+			path = ../generic/tkVisual.c;
+			refType = 2;
+		};
+		F53755C8016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			name = tkWindow.c;
+			path = ../generic/tkWindow.c;
+			refType = 2;
+		};
+		F53755C9016C389901DC9062 = {
+			children = (
+				F53755CA016C389901DC9062,
+				F53755CB016C389901DC9062,
+			);
+			isa = PBXGroup;
+			name = Unix;
+			refType = 4;
+		};
+		F53755CA016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			name = tkUnix3d.c;
+			path = ../unix/tkUnix3d.c;
+			refType = 2;
+		};
+		F53755CB016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			name = tkUnixScale.c;
+			path = ../unix/tkUnixScale.c;
+			refType = 2;
+		};
+		F53755CC016C389901DC9062 = {
+			children = (
+				F53755CD016C389901DC9062,
+				F53755D7016C389901DC9062,
+			);
+			isa = PBXGroup;
+			name = "X Emulation";
+			refType = 4;
+		};
+		F53755CD016C389901DC9062 = {
+			children = (
+				F53755CE016C389901DC9062,
+				F53755CF016C389901DC9062,
+				F53755D0016C389901DC9062,
+				F53755D1016C389901DC9062,
+				F53755D2016C389901DC9062,
+				F53755D3016C389901DC9062,
+				F53755D4016C389901DC9062,
+				F53755D5016C389901DC9062,
+				F53755D6016C389901DC9062,
+			);
+			isa = PBXGroup;
+			name = Headers;
+			refType = 4;
+		};
+		F53755CE016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			name = xbytes.h;
+			path = ../xlib/xbytes.h;
+			refType = 2;
+		};
+		F53755CF016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			name = cursorfont.h;
+			path = ../xlib/X11/cursorfont.h;
+			refType = 2;
+		};
+		F53755D0016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			name = keysym.h;
+			path = ../xlib/X11/keysym.h;
+			refType = 2;
+		};
+		F53755D1016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			name = keysymdef.h;
+			path = ../xlib/X11/keysymdef.h;
+			refType = 2;
+		};
+		F53755D2016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			name = X.h;
+			path = ../xlib/X11/X.h;
+			refType = 2;
+		};
+		F53755D3016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			name = Xatom.h;
+			path = ../xlib/X11/Xatom.h;
+			refType = 2;
+		};
+		F53755D4016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			name = Xfuncproto.h;
+			path = ../xlib/X11/Xfuncproto.h;
+			refType = 2;
+		};
+		F53755D5016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			name = Xlib.h;
+			path = ../xlib/X11/Xlib.h;
+			refType = 2;
+		};
+		F53755D6016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			name = Xutil.h;
+			path = ../xlib/X11/Xutil.h;
+			refType = 2;
+		};
+		F53755D7016C389901DC9062 = {
+			children = (
+				F53755D8016C389901DC9062,
+				F53755D9016C389901DC9062,
+				F53755DA016C389901DC9062,
+				F53755DB016C389901DC9062,
+				F53755DC016C389901DC9062,
+			);
+			isa = PBXGroup;
+			name = Source;
+			refType = 4;
+		};
+		F53755D8016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			name = xcolors.c;
+			path = ../xlib/xcolors.c;
+			refType = 2;
+		};
+		F53755D9016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			name = xdraw.c;
+			path = ../xlib/xdraw.c;
+			refType = 2;
+		};
+		F53755DA016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			name = xgc.c;
+			path = ../xlib/xgc.c;
+			refType = 2;
+		};
+		F53755DB016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			name = ximage.c;
+			path = ../xlib/ximage.c;
+			refType = 2;
+		};
+		F53755DC016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			name = xutil.c;
+			path = ../xlib/xutil.c;
+			refType = 2;
+		};
+		F53755DD016C38D201DC9062 = {
+			children = (
+				F53755DE016C38D201DC9062,
+				F537569F016C4DD401DC9062,
+				F548F8CF0313CEF0016F146B,
+			);
+			isa = PBXGroup;
+			name = Products;
+			refType = 4;
+		};
+		F53755DE016C38D201DC9062 = {
+			isa = PBXFrameworkReference;
+			path = Tk.framework;
+			refType = 3;
+		};
+		F53755DF016C38D201DC9062 = {
+			buildPhases = (
+				F5877FB7031F97ED016F146B,
+				F53755E0016C38D201DC9062,
+				F53755E1016C38D301DC9062,
+				F53755E2016C38D301DC9062,
+				F53755E3016C38D301DC9062,
+				F53755E4016C38D301DC9062,
+				F5B1FC08016FFE3501DC9062,
+				F51D903F018149BD01DC9062,
+				F548F8C80313C9E0016F146B,
+				F5C1D51901B88F9A01DC9062,
+				F52D38C5031F4259016F146B,
+				F5877FBC031FA968016F146B,
+				F9A61D2F04C2C861006F5A0B,
+			);
+			buildSettings = {
+				DOCDIR = "${INSTALL_PATH}/${PRODUCT_NAME}.${WRAPPER_EXTENSION}/Versions/${FRAMEWORK_VERSION}/Resources/English.lproj/Documentation/Reference";
+				DYLIB_COMPATIBILITY_VERSION = 8.4;
+				DYLIB_CURRENT_VERSION = "$(FRAMEWORK_VERSION)";
+				DYLIB_INSTALL_PATH = /Library/Frameworks;
+				FRAMEWORK_SEARCH_PATHS = "\"$(TCL_FRAMEWORK_DIR)\"";
+				FRAMEWORK_VERSION = 8.4;
+				GLOBAL_CFLAGS = "`source \"${TCL_FRAMEWORK_DIR}/Tcl.framework/tclConfig.sh\"; echo $${}{TCL_EXTRA_CFLAGS} $${}{TCL_DEFS} | sed -e 's|\\\\\\\\\\\\\\\"|\\\"|g' | sed -e 's| -DTCL_WIDE_INT_TYPE=long. long||'` -U_REENTRANT";
+				HEADER_SEARCH_PATHS = "\"$(TCL_FRAMEWORK_DIR)/Tcl.framework/Headers\" \"$(TCL_FRAMEWORK_DIR)/Tcl.framework/PrivateHeaders\" ../bitmaps ../generic ../xlib";
+				INSTALL_PATH = "${DYLIB_INSTALL_PATH}";
+				LIBRARY_SEARCH_PATHS = "";
+				OPTIMIZATION_CFLAGS = "-O0";
+				OTHER_CFLAGS = "-DMAC_OSX_TK -DTCL_WIDE_INT_TYPE=\"long long\"";
+				OTHER_LDFLAGS = "-seg1addr 0xb000000";
+				OTHER_LIBTOOL_FLAGS = "";
+				OTHER_REZFLAGS = "-i \"$(TCL_FRAMEWORK_DIR)/Tcl.framework/Headers\" -i \"../generic\"";
+				PRECOMPILE_PREFIX_HEADER = YES;
+				PRINCIPAL_CLASS = "";
+				PRODUCT_NAME = Tk;
+				SECTORDER_FLAGS = "";
+				SYMROOT = "${SRCROOT}/../../build/tk";
+				TCLSH_DIR = "$(TCL_FRAMEWORK_DIR)";
+				TCL_FRAMEWORK_DIR = "$(SYMROOT)/../tcl";
+				USE_GCC3_PFE_SUPPORT = YES;
+				WARNING_CFLAGS = "-Wmost -Wno-four-char-constants -Wno-unknown-pragmas";
+				WRAPPER_EXTENSION = framework;
+			};
+			dependencies = (
+				F548F8D20313CF93016F146B,
+			);
+			isa = PBXFrameworkTarget;
+			name = TkLibrary;
+			productInstallPath = /Library/Frameworks;
+			productName = TkLibrary;
+			productReference = F53755DE016C38D201DC9062;
+			productSettingsXML = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>
+<!DOCTYPE plist PUBLIC \"-//Apple Computer//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">
+<plist version=\"1.0\">
+<dict>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>English</string>
+	<key>CFBundleExecutable</key>
+	<string>Tk</string>
+	<key>CFBundleGetInfoString</key>
+	<string>Tk Library 8.4, Copyright © 2003 Tcl Core Team.
+MacOS X Port by Jim Ingham &lt;jingham@apple.com&gt; &amp; Ian Reid, Copyright © 2001-2002, Apple Computer, Inc.</string>
+	<key>CFBundleIconFile</key>
+	<string></string>
+	<key>CFBundleIdentifier</key>
+	<string>com.tcltk.tklibrary</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleName</key>
+	<string>Tk Library 8.4</string>
+	<key>CFBundlePackageType</key>
+	<string>FMWK</string>
+	<key>CFBundleShortVersionString</key>
+	<string>8.4.5</string>
+	<key>CFBundleSignature</key>
+	<string>WiSH</string>
+	<key>CFBundleVersion</key>
+	<string>8.4.5</string>
+</dict>
+</plist>
+";
+		};
+		F53755E0016C38D201DC9062 = {
+			buildActionMask = 2147483647;
+			files = (
+				F53755E5016C390401DC9062,
+				F53755E6016C390401DC9062,
+				F53755E7016C390401DC9062,
+				F53755E8016C390401DC9062,
+				F53755E9016C390401DC9062,
+				F53755EA016C390401DC9062,
+				F53755EB016C390401DC9062,
+				F53755EC016C390401DC9062,
+				F53755ED016C390401DC9062,
+				F53755EE016C390401DC9062,
+				F53755EF016C390401DC9062,
+				F53755F0016C390401DC9062,
+				F53755F1016C390401DC9062,
+				F53755F2016C390401DC9062,
+				F53755F3016C390401DC9062,
+				F53755F4016C390401DC9062,
+				F53755F5016C390401DC9062,
+				F53755F6016C390401DC9062,
+				F53755F7016C390401DC9062,
+				F53755F8016C390401DC9062,
+				F53755F9016C390401DC9062,
+				F53755FA016C390401DC9062,
+				F53755FB016C390401DC9062,
+				F53755FC016C397D01DC9062,
+				F53755FD016C397D01DC9062,
+				F53755FE016C397D01DC9062,
+				F53755FF016C397D01DC9062,
+				F5375600016C397D01DC9062,
+				F5375601016C397D01DC9062,
+				F5375603016C397D01DC9062,
+				F537566E016C3A1F01DC9062,
+				F537566F016C3A1F01DC9062,
+				F5375670016C3A1F01DC9062,
+				F5375671016C3A1F01DC9062,
+				F5375672016C3A1F01DC9062,
+				F5375673016C3A1F01DC9062,
+				F5375674016C3A1F01DC9062,
+				F5375675016C3A1F01DC9062,
+				F5375676016C3A1F01DC9062,
+				F5375693016C3F1001DC9062,
+				F5375694016C3F1001DC9062,
+				F5375695016C3F1001DC9062,
+				F5375696016C3F1001DC9062,
+				F5375697016C3F1001DC9062,
+				F5375698016C3F1001DC9062,
+				F5375699016C3F1001DC9062,
+				F537569A016C3F1001DC9062,
+				F537569B016C3F1001DC9062,
+				F537569C016C3F1001DC9062,
+				F5BFE59002F8C45B01DC9062,
+			);
+			isa = PBXHeadersBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F53755E1016C38D301DC9062 = {
+			buildActionMask = 2147483647;
+			files = (
+				F5C2EA34034D71B2016F146B,
+			);
+			isa = PBXResourcesBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F53755E2016C38D301DC9062 = {
+			buildActionMask = 2147483647;
+			files = (
+				F5375604016C397D01DC9062,
+				F5375605016C397D01DC9062,
+				F5375606016C397D01DC9062,
+				F5375607016C397D01DC9062,
+				F5375608016C397D01DC9062,
+				F5375609016C397D01DC9062,
+				F537560A016C397D01DC9062,
+				F537560B016C397D01DC9062,
+				F537560C016C397D01DC9062,
+				F537560D016C397D01DC9062,
+				F537560E016C397D01DC9062,
+				F537560F016C397D01DC9062,
+				F5375610016C397D01DC9062,
+				F5375611016C397D01DC9062,
+				F5375612016C397D01DC9062,
+				F5375613016C397D01DC9062,
+				F5375614016C397D01DC9062,
+				F5375615016C397D01DC9062,
+				F5375616016C397D01DC9062,
+				F5375617016C397D01DC9062,
+				F5375618016C397D01DC9062,
+				F5375619016C397D01DC9062,
+				F537561A016C397D01DC9062,
+				F537561B016C397D01DC9062,
+				F537561C016C397D01DC9062,
+				F537561D016C397D01DC9062,
+				F537561E016C397D01DC9062,
+				F537561F016C397D01DC9062,
+				F5375620016C397D01DC9062,
+				F5375621016C397D01DC9062,
+				F5375622016C397D01DC9062,
+				F5375623016C397D01DC9062,
+				F5375624016C397D01DC9062,
+				F5375625016C397D01DC9062,
+				F5375626016C397D01DC9062,
+				F5375627016C397D01DC9062,
+				F5375628016C397D01DC9062,
+				F5375629016C397D01DC9062,
+				F537562A016C397D01DC9062,
+				F537562B016C397D01DC9062,
+				F537562C016C397D01DC9062,
+				F537562D016C397D01DC9062,
+				F537562E016C397D01DC9062,
+				F537562F016C397D01DC9062,
+				F5375630016C397D01DC9062,
+				F5375631016C397D01DC9062,
+				F5375632016C397D01DC9062,
+				F5375633016C397D01DC9062,
+				F5375634016C397D01DC9062,
+				F5375635016C397D01DC9062,
+				F5375636016C397D01DC9062,
+				F5375637016C397D01DC9062,
+				F5375638016C397D01DC9062,
+				F5375639016C397D01DC9062,
+				F537563A016C397D01DC9062,
+				F537563B016C397D01DC9062,
+				F537563C016C397D01DC9062,
+				F537563D016C397D01DC9062,
+				F537563F016C397D01DC9062,
+				F5375640016C397D01DC9062,
+				F5375641016C397D01DC9062,
+				F5375642016C397D01DC9062,
+				F5375643016C397D01DC9062,
+				F5375644016C397D01DC9062,
+				F5375645016C397D01DC9062,
+				F5375646016C397D01DC9062,
+				F5375647016C397D01DC9062,
+				F5375648016C397D01DC9062,
+				F5375649016C397D01DC9062,
+				F537564A016C397D01DC9062,
+				F537564D016C39A101DC9062,
+				F537564E016C39A101DC9062,
+				F537564F016C39A101DC9062,
+				F5375650016C39A101DC9062,
+				F5375651016C39A101DC9062,
+				F5375652016C39A101DC9062,
+				F5375653016C39A101DC9062,
+				F5375654016C39A101DC9062,
+				F5375655016C39A101DC9062,
+				F5375656016C39A101DC9062,
+				F5375657016C39A101DC9062,
+				F5375658016C39A101DC9062,
+				F5375659016C39A101DC9062,
+				F537565A016C39A101DC9062,
+				F537565B016C39A101DC9062,
+				F537565C016C39A101DC9062,
+				F537565D016C39A101DC9062,
+				F537565E016C39A101DC9062,
+				F537565F016C39A101DC9062,
+				F5375660016C39A101DC9062,
+				F5375661016C39A101DC9062,
+				F5375662016C39A101DC9062,
+				F5375664016C39A101DC9062,
+				F5375665016C39A101DC9062,
+				F5375666016C39A101DC9062,
+				F5375668016C39A101DC9062,
+				F537566A016C39A101DC9062,
+				F537566B016C39A101DC9062,
+				F537566C016C39F201DC9062,
+				F537566D016C39F201DC9062,
+				F5375677016C3A6D01DC9062,
+				F5375678016C3A6D01DC9062,
+				F5375679016C3A6D01DC9062,
+				F537567A016C3A6D01DC9062,
+				F537567B016C3A6D01DC9062,
+				F537569E016C49C301DC9062,
+				F55BC46902B2D38B01DC9062,
+				F5BFE58D02F8C41501DC9062,
+				F5BFE58E02F8C41501DC9062,
+			);
+			isa = PBXSourcesBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F53755E3016C38D301DC9062 = {
+			buildActionMask = 2147483647;
+			files = (
+				F51D903E0181474301DC9062,
+				F537567E016C3ADB01DC9062,
+				F50D96130196176E01DC9062,
+			);
+			isa = PBXFrameworksBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F53755E4016C38D301DC9062 = {
+			buildActionMask = 2147483647;
+			files = (
+				F537567F016C3ADB01DC9062,
+				F5375680016C3ADB01DC9062,
+				F5375681016C3ADB01DC9062,
+				F5375682016C3ADB01DC9062,
+			);
+			isa = PBXRezBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F53755E5016C390401DC9062 = {
+			fileRef = F5375569016C37A601DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F53755E6016C390401DC9062 = {
+			fileRef = F537556A016C37A601DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F53755E7016C390401DC9062 = {
+			fileRef = F537556B016C37A601DC9062;
+			isa = PBXBuildFile;
+			settings = {
+				ATTRIBUTES = (
+					Public,
+				);
+			};
+		};
+		F53755E8016C390401DC9062 = {
+			fileRef = F537556C016C37A601DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F53755E9016C390401DC9062 = {
+			fileRef = F537556D016C37A601DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F53755EA016C390401DC9062 = {
+			fileRef = F537556E016C37A601DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F53755EB016C390401DC9062 = {
+			fileRef = F537556F016C37A601DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F53755EC016C390401DC9062 = {
+			fileRef = F5375570016C37A601DC9062;
+			isa = PBXBuildFile;
+			settings = {
+				ATTRIBUTES = (
+					Public,
+				);
+			};
+		};
+		F53755ED016C390401DC9062 = {
+			fileRef = F5375571016C37A601DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F53755EE016C390401DC9062 = {
+			fileRef = F5375572016C37A601DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F53755EF016C390401DC9062 = {
+			fileRef = F5375573016C37A601DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F53755F0016C390401DC9062 = {
+			fileRef = F5375574016C37A601DC9062;
+			isa = PBXBuildFile;
+			settings = {
+				ATTRIBUTES = (
+					Private,
+				);
+			};
+		};
+		F53755F1016C390401DC9062 = {
+			fileRef = F5375575016C37A601DC9062;
+			isa = PBXBuildFile;
+			settings = {
+				ATTRIBUTES = (
+					Private,
+				);
+			};
+		};
+		F53755F2016C390401DC9062 = {
+			fileRef = F5375576016C37A601DC9062;
+			isa = PBXBuildFile;
+			settings = {
+				ATTRIBUTES = (
+					Private,
+				);
+			};
+		};
+		F53755F3016C390401DC9062 = {
+			fileRef = F5375577016C37A601DC9062;
+			isa = PBXBuildFile;
+			settings = {
+				ATTRIBUTES = (
+					Public,
+				);
+			};
+		};
+		F53755F4016C390401DC9062 = {
+			fileRef = F5375578016C37A601DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F53755F5016C390401DC9062 = {
+			fileRef = F5375579016C37A601DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F53755F6016C390401DC9062 = {
+			fileRef = F537557A016C37A601DC9062;
+			isa = PBXBuildFile;
+			settings = {
+				ATTRIBUTES = (
+					Public,
+				);
+			};
+		};
+		F53755F7016C390401DC9062 = {
+			fileRef = F537557B016C37A601DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F53755F8016C390401DC9062 = {
+			fileRef = F537557C016C37A601DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F53755F9016C390401DC9062 = {
+			fileRef = F537557D016C37A601DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F53755FA016C390401DC9062 = {
+			fileRef = F537557E016C37A601DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F53755FB016C390401DC9062 = {
+			fileRef = F537557F016C37A601DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F53755FC016C397D01DC9062 = {
+			fileRef = F537553E016C376E01DC9062;
+			isa = PBXBuildFile;
+			settings = {
+				ATTRIBUTES = (
+					Public,
+				);
+			};
+		};
+		F53755FD016C397D01DC9062 = {
+			fileRef = F537553F016C376E01DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F53755FE016C397D01DC9062 = {
+			fileRef = F5375540016C376E01DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F53755FF016C397D01DC9062 = {
+			fileRef = F5375541016C376E01DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5375600016C397D01DC9062 = {
+			fileRef = F5375542016C376E01DC9062;
+			isa = PBXBuildFile;
+			settings = {
+				ATTRIBUTES = (
+					Private,
+				);
+			};
+		};
+		F5375601016C397D01DC9062 = {
+			fileRef = F5375543016C376E01DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5375603016C397D01DC9062 = {
+			fileRef = F5375545016C376E01DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5375604016C397D01DC9062 = {
+			fileRef = F5375580016C389901DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5375605016C397D01DC9062 = {
+			fileRef = F5375581016C389901DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5375606016C397D01DC9062 = {
+			fileRef = F5375582016C389901DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5375607016C397D01DC9062 = {
+			fileRef = F5375583016C389901DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5375608016C397D01DC9062 = {
+			fileRef = F5375584016C389901DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5375609016C397D01DC9062 = {
+			fileRef = F5375585016C389901DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F537560A016C397D01DC9062 = {
+			fileRef = F5375586016C389901DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F537560B016C397D01DC9062 = {
+			fileRef = F5375587016C389901DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F537560C016C397D01DC9062 = {
+			fileRef = F5375588016C389901DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F537560D016C397D01DC9062 = {
+			fileRef = F5375589016C389901DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F537560E016C397D01DC9062 = {
+			fileRef = F537558A016C389901DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F537560F016C397D01DC9062 = {
+			fileRef = F537558B016C389901DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5375610016C397D01DC9062 = {
+			fileRef = F537558C016C389901DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5375611016C397D01DC9062 = {
+			fileRef = F537558D016C389901DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5375612016C397D01DC9062 = {
+			fileRef = F537558E016C389901DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5375613016C397D01DC9062 = {
+			fileRef = F537558F016C389901DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5375614016C397D01DC9062 = {
+			fileRef = F5375590016C389901DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5375615016C397D01DC9062 = {
+			fileRef = F5375591016C389901DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5375616016C397D01DC9062 = {
+			fileRef = F5375592016C389901DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5375617016C397D01DC9062 = {
+			fileRef = F5375593016C389901DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5375618016C397D01DC9062 = {
+			fileRef = F5375594016C389901DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5375619016C397D01DC9062 = {
+			fileRef = F5375595016C389901DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F537561A016C397D01DC9062 = {
+			fileRef = F5375596016C389901DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F537561B016C397D01DC9062 = {
+			fileRef = F5375597016C389901DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F537561C016C397D01DC9062 = {
+			fileRef = F5375598016C389901DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F537561D016C397D01DC9062 = {
+			fileRef = F5375599016C389901DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F537561E016C397D01DC9062 = {
+			fileRef = F537559A016C389901DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F537561F016C397D01DC9062 = {
+			fileRef = F537559B016C389901DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5375620016C397D01DC9062 = {
+			fileRef = F537559C016C389901DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5375621016C397D01DC9062 = {
+			fileRef = F537559D016C389901DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5375622016C397D01DC9062 = {
+			fileRef = F537559E016C389901DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5375623016C397D01DC9062 = {
+			fileRef = F537559F016C389901DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5375624016C397D01DC9062 = {
+			fileRef = F53755A0016C389901DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5375625016C397D01DC9062 = {
+			fileRef = F53755A1016C389901DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5375626016C397D01DC9062 = {
+			fileRef = F53755A2016C389901DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5375627016C397D01DC9062 = {
+			fileRef = F53755A3016C389901DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5375628016C397D01DC9062 = {
+			fileRef = F53755A4016C389901DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5375629016C397D01DC9062 = {
+			fileRef = F53755A5016C389901DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F537562A016C397D01DC9062 = {
+			fileRef = F53755A6016C389901DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F537562B016C397D01DC9062 = {
+			fileRef = F53755A7016C389901DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F537562C016C397D01DC9062 = {
+			fileRef = F53755A8016C389901DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F537562D016C397D01DC9062 = {
+			fileRef = F53755A9016C389901DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F537562E016C397D01DC9062 = {
+			fileRef = F53755AA016C389901DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F537562F016C397D01DC9062 = {
+			fileRef = F53755AB016C389901DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5375630016C397D01DC9062 = {
+			fileRef = F53755AC016C389901DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5375631016C397D01DC9062 = {
+			fileRef = F53755AD016C389901DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5375632016C397D01DC9062 = {
+			fileRef = F53755AE016C389901DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5375633016C397D01DC9062 = {
+			fileRef = F53755AF016C389901DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5375634016C397D01DC9062 = {
+			fileRef = F53755B0016C389901DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5375635016C397D01DC9062 = {
+			fileRef = F53755B1016C389901DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5375636016C397D01DC9062 = {
+			fileRef = F53755B2016C389901DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5375637016C397D01DC9062 = {
+			fileRef = F53755B3016C389901DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5375638016C397D01DC9062 = {
+			fileRef = F53755B4016C389901DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5375639016C397D01DC9062 = {
+			fileRef = F53755B5016C389901DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F537563A016C397D01DC9062 = {
+			fileRef = F53755B6016C389901DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F537563B016C397D01DC9062 = {
+			fileRef = F53755B7016C389901DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F537563C016C397D01DC9062 = {
+			fileRef = F53755B8016C389901DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F537563D016C397D01DC9062 = {
+			fileRef = F53755BA016C389901DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F537563F016C397D01DC9062 = {
+			fileRef = F53755BD016C389901DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5375640016C397D01DC9062 = {
+			fileRef = F53755BE016C389901DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5375641016C397D01DC9062 = {
+			fileRef = F53755BF016C389901DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5375642016C397D01DC9062 = {
+			fileRef = F53755C0016C389901DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5375643016C397D01DC9062 = {
+			fileRef = F53755C1016C389901DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5375644016C397D01DC9062 = {
+			fileRef = F53755C2016C389901DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5375645016C397D01DC9062 = {
+			fileRef = F53755C3016C389901DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5375646016C397D01DC9062 = {
+			fileRef = F53755C4016C389901DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5375647016C397D01DC9062 = {
+			fileRef = F53755C5016C389901DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5375648016C397D01DC9062 = {
+			fileRef = F53755C6016C389901DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5375649016C397D01DC9062 = {
+			fileRef = F53755C7016C389901DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F537564A016C397D01DC9062 = {
+			fileRef = F53755C8016C389901DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F537564D016C39A101DC9062 = {
+			fileRef = F5375549016C376E01DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F537564E016C39A101DC9062 = {
+			fileRef = F537554A016C376E01DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F537564F016C39A101DC9062 = {
+			fileRef = F537554B016C376E01DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5375650016C39A101DC9062 = {
+			fileRef = F537554C016C376E01DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5375651016C39A101DC9062 = {
+			fileRef = F537554D016C376E01DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5375652016C39A101DC9062 = {
+			fileRef = F537554E016C376E01DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5375653016C39A101DC9062 = {
+			fileRef = F537554F016C376E01DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5375654016C39A101DC9062 = {
+			fileRef = F5375550016C376E01DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5375655016C39A101DC9062 = {
+			fileRef = F5375551016C376E01DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5375656016C39A101DC9062 = {
+			fileRef = F5375552016C376E01DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5375657016C39A101DC9062 = {
+			fileRef = F5375553016C376E01DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5375658016C39A101DC9062 = {
+			fileRef = F5375554016C376E01DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5375659016C39A101DC9062 = {
+			fileRef = F5375555016C376E01DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F537565A016C39A101DC9062 = {
+			fileRef = F5375556016C376E01DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F537565B016C39A101DC9062 = {
+			fileRef = F5375557016C376E01DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F537565C016C39A101DC9062 = {
+			fileRef = F5375558016C376E01DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F537565D016C39A101DC9062 = {
+			fileRef = F5375559016C376E01DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F537565E016C39A101DC9062 = {
+			fileRef = F537555A016C376E01DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F537565F016C39A101DC9062 = {
+			fileRef = F537555B016C376E01DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5375660016C39A101DC9062 = {
+			fileRef = F537555C016C376E01DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5375661016C39A101DC9062 = {
+			fileRef = F537555D016C376E01DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5375662016C39A101DC9062 = {
+			fileRef = F537555E016C376E01DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5375664016C39A101DC9062 = {
+			fileRef = F5375560016C376E01DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5375665016C39A101DC9062 = {
+			fileRef = F5375561016C376E01DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5375666016C39A101DC9062 = {
+			fileRef = F5375562016C376E01DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5375668016C39A101DC9062 = {
+			fileRef = F5375565016C376E01DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F537566A016C39A101DC9062 = {
+			fileRef = F5375567016C376E01DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F537566B016C39A101DC9062 = {
+			fileRef = F5375568016C376E01DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F537566C016C39F201DC9062 = {
+			fileRef = F53755CA016C389901DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F537566D016C39F201DC9062 = {
+			fileRef = F53755CB016C389901DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F537566E016C3A1F01DC9062 = {
+			fileRef = F53755CE016C389901DC9062;
+			isa = PBXBuildFile;
+			settings = {
+				ATTRIBUTES = (
+				);
+			};
+		};
+		F537566F016C3A1F01DC9062 = {
+			fileRef = F53755CF016C389901DC9062;
+			isa = PBXBuildFile;
+			settings = {
+				ATTRIBUTES = (
+				);
+			};
+		};
+		F5375670016C3A1F01DC9062 = {
+			fileRef = F53755D0016C389901DC9062;
+			isa = PBXBuildFile;
+			settings = {
+				ATTRIBUTES = (
+				);
+			};
+		};
+		F5375671016C3A1F01DC9062 = {
+			fileRef = F53755D1016C389901DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5375672016C3A1F01DC9062 = {
+			fileRef = F53755D2016C389901DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5375673016C3A1F01DC9062 = {
+			fileRef = F53755D3016C389901DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5375674016C3A1F01DC9062 = {
+			fileRef = F53755D4016C389901DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5375675016C3A1F01DC9062 = {
+			fileRef = F53755D5016C389901DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5375676016C3A1F01DC9062 = {
+			fileRef = F53755D6016C389901DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5375677016C3A6D01DC9062 = {
+			fileRef = F53755D8016C389901DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5375678016C3A6D01DC9062 = {
+			fileRef = F53755D9016C389901DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5375679016C3A6D01DC9062 = {
+			fileRef = F53755DA016C389901DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F537567A016C3A6D01DC9062 = {
+			fileRef = F53755DB016C389901DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F537567B016C3A6D01DC9062 = {
+			fileRef = F53755DC016C389901DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F537567C016C3ADB01DC9062 = {
+			children = (
+				F50D96120196176E01DC9062,
+				F5875C7B016FEF1D01DC9062,
+				F537567D016C3ADB01DC9062,
+			);
+			isa = PBXGroup;
+			name = "External Frameworks";
+			refType = 4;
+		};
+		F537567D016C3ADB01DC9062 = {
+			isa = PBXFrameworkReference;
+			name = Carbon.framework;
+			path = /System/Library/Frameworks/Carbon.framework;
+			refType = 0;
+		};
+		F537567E016C3ADB01DC9062 = {
+			fileRef = F537567D016C3ADB01DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F537567F016C3ADB01DC9062 = {
+			fileRef = F5375533016C376E01DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5375680016C3ADB01DC9062 = {
+			fileRef = F5375535016C376E01DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5375681016C3ADB01DC9062 = {
+			fileRef = F5375538016C376E01DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5375682016C3ADB01DC9062 = {
+			fileRef = F537553A016C376E01DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5375688016C3F1001DC9062 = {
+			children = (
+				F5375689016C3F1001DC9062,
+				F537568A016C3F1001DC9062,
+				F537568B016C3F1001DC9062,
+				F537568C016C3F1001DC9062,
+				F537568D016C3F1001DC9062,
+				F537568E016C3F1001DC9062,
+				F537568F016C3F1001DC9062,
+				F5375690016C3F1001DC9062,
+				F5375691016C3F1001DC9062,
+				F5375692016C3F1001DC9062,
+			);
+			isa = PBXGroup;
+			name = Bitmaps;
+			refType = 4;
+		};
+		F5375689016C3F1001DC9062 = {
+			isa = PBXFileReference;
+			name = error.bmp;
+			path = ../bitmaps/error.bmp;
+			refType = 2;
+		};
+		F537568A016C3F1001DC9062 = {
+			isa = PBXFileReference;
+			name = gray12.bmp;
+			path = ../bitmaps/gray12.bmp;
+			refType = 2;
+		};
+		F537568B016C3F1001DC9062 = {
+			isa = PBXFileReference;
+			name = gray25.bmp;
+			path = ../bitmaps/gray25.bmp;
+			refType = 2;
+		};
+		F537568C016C3F1001DC9062 = {
+			isa = PBXFileReference;
+			name = gray50.bmp;
+			path = ../bitmaps/gray50.bmp;
+			refType = 2;
+		};
+		F537568D016C3F1001DC9062 = {
+			isa = PBXFileReference;
+			name = gray75.bmp;
+			path = ../bitmaps/gray75.bmp;
+			refType = 2;
+		};
+		F537568E016C3F1001DC9062 = {
+			isa = PBXFileReference;
+			name = hourglass.bmp;
+			path = ../bitmaps/hourglass.bmp;
+			refType = 2;
+		};
+		F537568F016C3F1001DC9062 = {
+			isa = PBXFileReference;
+			name = info.bmp;
+			path = ../bitmaps/info.bmp;
+			refType = 2;
+		};
+		F5375690016C3F1001DC9062 = {
+			isa = PBXFileReference;
+			name = questhead.bmp;
+			path = ../bitmaps/questhead.bmp;
+			refType = 2;
+		};
+		F5375691016C3F1001DC9062 = {
+			isa = PBXFileReference;
+			name = question.bmp;
+			path = ../bitmaps/question.bmp;
+			refType = 2;
+		};
+		F5375692016C3F1001DC9062 = {
+			isa = PBXFileReference;
+			name = warning.bmp;
+			path = ../bitmaps/warning.bmp;
+			refType = 2;
+		};
+		F5375693016C3F1001DC9062 = {
+			fileRef = F5375689016C3F1001DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5375694016C3F1001DC9062 = {
+			fileRef = F537568A016C3F1001DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5375695016C3F1001DC9062 = {
+			fileRef = F537568B016C3F1001DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5375696016C3F1001DC9062 = {
+			fileRef = F537568C016C3F1001DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5375697016C3F1001DC9062 = {
+			fileRef = F537568D016C3F1001DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5375698016C3F1001DC9062 = {
+			fileRef = F537568E016C3F1001DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5375699016C3F1001DC9062 = {
+			fileRef = F537568F016C3F1001DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F537569A016C3F1001DC9062 = {
+			fileRef = F5375690016C3F1001DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F537569B016C3F1001DC9062 = {
+			fileRef = F5375691016C3F1001DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F537569C016C3F1001DC9062 = {
+			fileRef = F5375692016C3F1001DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F537569E016C49C301DC9062 = {
+			fileRef = F53755BB016C389901DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F537569F016C4DD401DC9062 = {
+			isa = PBXApplicationReference;
+			path = "Wish Shell.app";
+			refType = 3;
+		};
+		F53756A0016C4DD401DC9062 = {
+			buildPhases = (
+				F5877FB8031F982D016F146B,
+				F53756A1016C4DD401DC9062,
+				F53756A2016C4DD401DC9062,
+				F53756A4016C4DD401DC9062,
+				F53756A6016C4DD401DC9062,
+				F53756AA016C4DD401DC9062,
+				F5EEA7050324680B016F146B,
+				F55A164E032A11B1016F146B,
+				F5877FBD031FAC6A016F146B,
+			);
+			buildSettings = {
+				APPLICATION_INSTALL_PATH = "${SYSTEM_ADMIN_APPS_DIR}";
+				BINDIR = /usr/bin;
+				DYLIB_INSTALL_PATH = /Library/Frameworks;
+				FRAMEWORK_SEARCH_PATHS = "\"$(TCL_FRAMEWORK_DIR)\" \"$(SYMROOT)\"";
+				FRAMEWORK_VERSION = 8.4;
+				GLOBAL_CFLAGS = "`source \"${TCL_FRAMEWORK_DIR}/Tcl.framework/tclConfig.sh\"; echo $${}{TCL_EXTRA_CFLAGS} $${}{TCL_DEFS} | sed -e 's|\\\\\\\\\\\\\\\"|\\\"|g' | sed -e 's| -DTCL_WIDE_INT_TYPE=long. long||'` -U_REENTRANT";
+				HEADER_SEARCH_PATHS = "\"$(TCL_FRAMEWORK_DIR)/Tcl.framework/Headers\" \"$(TCL_FRAMEWORK_DIR)/Tcl.framework/PrivateHeaders\" ../generic ../xlib";
+				INSTALL_PATH = "${APPLICATION_INSTALL_PATH}";
+				LIBRARY_SEARCH_PATHS = "";
+				OPTIMIZATION_CFLAGS = "-O0";
+				OTHER_CFLAGS = "-DMAC_OSX_TK -DTCL_WIDE_INT_TYPE=\"long long\"";
+				OTHER_LDFLAGS = "-sectcreate __TEXT __info_plist \"$TEMP_DIR/Info.plist\" -headerpad_max_install_names";
+				OTHER_REZFLAGS = "-i \"$(TCL_FRAMEWORK_DIR)/Tcl.framework/Headers\" -i \"../generic\"";
+				PRODUCT_NAME = "Wish Shell";
+				SECTORDER_FLAGS = "";
+				SYMROOT = "${SRCROOT}/../../build/tk";
+				TCL_FRAMEWORK_DIR = "$(SYMROOT)/../tcl";
+				USE_GCC3_PFE_SUPPORT = NO;
+				WARNING_CFLAGS = "-Wmost -Wno-four-char-constants -Wno-unknown-pragmas";
+				WRAPPER_EXTENSION = app;
+			};
+			dependencies = (
+				F53756B2016C525F01DC9062,
+			);
+			isa = PBXApplicationTarget;
+			name = Wish;
+			productInstallPath = /Applications/Utilities;
+			productName = "Wish Shell";
+			productReference = F537569F016C4DD401DC9062;
+			productSettingsXML = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>
+<!DOCTYPE plist PUBLIC \"-//Apple Computer//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">
+<plist version=\"1.0\">
+<dict>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>English</string>
+	<key>CFBundleDocumentTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeExtensions</key>
+			<array>
+				<string>*</string>
+			</array>
+			<key>CFBundleTypeName</key>
+			<string>NSStringPboardType</string>
+			<key>CFBundleTypeOSTypes</key>
+			<array>
+				<string>TEXT</string>
+			</array>
+			<key>CFBundleTypeRole</key>
+			<string>Viewer</string>
+		</dict>
+	</array>
+	<key>CFBundleExecutable</key>
+	<string>Wish Shell</string>
+	<key>CFBundleGetInfoString</key>
+	<string>Wish Shell 8.4, Copyright © 2003 Tcl Core Team.
+MacOS X Port by Jim Ingham &lt;jingham@apple.com&gt; &amp; Ian Reid, Copyright © 2001-2002, Apple Computer, Inc.</string>
+	<key>CFBundleIconFile</key>
+	<string>Wish.icns</string>
+	<key>CFBundleIdentifier</key>
+	<string>com.tcltk.wish</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleName</key>
+	<string>Wish</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>CFBundleShortVersionString</key>
+	<string>8.4.5</string>
+	<key>CFBundleSignature</key>
+	<string>WiSH</string>
+	<key>CFBundleVersion</key>
+	<string>8.4.5</string>
+</dict>
+</plist>
+";
+		};
+		F53756A1016C4DD401DC9062 = {
+			buildActionMask = 2147483647;
+			files = (
+				F53756AC016C4E1D01DC9062,
+				F53756AD016C4E1D01DC9062,
+				F53756AE016C4E1D01DC9062,
+			);
+			isa = PBXHeadersBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F53756A2016C4DD401DC9062 = {
+			buildActionMask = 2147483647;
+			files = (
+				F53756A3016C4DD401DC9062,
+			);
+			isa = PBXResourcesBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F53756A3016C4DD401DC9062 = {
+			fileRef = F537553B016C376E01DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F53756A4016C4DD401DC9062 = {
+			buildActionMask = 2147483647;
+			files = (
+				F53756A5016C4DD401DC9062,
+			);
+			isa = PBXSourcesBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F53756A5016C4DD401DC9062 = {
+			fileRef = F5375548016C376E01DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F53756A6016C4DD401DC9062 = {
+			buildActionMask = 2147483647;
+			files = (
+				F53756A8016C4DD401DC9062,
+				F5875C7D016FEF1D01DC9062,
+				F53756A7016C4DD401DC9062,
+				F50D96140196176E01DC9062,
+				F5877FB9031F9F49016F146B,
+			);
+			isa = PBXFrameworksBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F53756A7016C4DD401DC9062 = {
+			fileRef = F53755DE016C38D201DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F53756A8016C4DD401DC9062 = {
+			fileRef = F537567D016C3ADB01DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F53756AA016C4DD401DC9062 = {
+			buildActionMask = 2147483647;
+			files = (
+				4C3B4CF7040B18B200C916F0,
+			);
+			isa = PBXRezBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F53756AC016C4E1D01DC9062 = {
+			fileRef = F537556B016C37A601DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F53756AD016C4E1D01DC9062 = {
+			fileRef = F5375570016C37A601DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F53756AE016C4E1D01DC9062 = {
+			fileRef = F537553E016C376E01DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F53756B2016C525F01DC9062 = {
+			isa = PBXTargetDependency;
+			target = F53755DF016C38D201DC9062;
+		};
+		F548F8C80313C9E0016F146B = {
+			buildActionMask = 2147483647;
+			dstPath = "Versions/$(FRAMEWORK_VERSION)";
+			dstSubfolderSpec = 1;
+			files = (
+				F5877FBA031F9F4B016F146B,
+			);
+			isa = PBXCopyFilesBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F548F8CA0313CEF0016F146B = {
+			buildActionMask = 2147483647;
+			files = (
+			);
+			isa = PBXHeadersBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F548F8CB0313CEF0016F146B = {
+			buildActionMask = 2147483647;
+			files = (
+				F548F8D10313CF14016F146B,
+				F548F8D00313CF11016F146B,
+			);
+			isa = PBXSourcesBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F548F8CC0313CEF0016F146B = {
+			buildActionMask = 2147483647;
+			files = (
+			);
+			isa = PBXFrameworksBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F548F8CE0313CEF0016F146B = {
+			buildPhases = (
+				F548F8CA0313CEF0016F146B,
+				F548F8CB0313CEF0016F146B,
+				F548F8CC0313CEF0016F146B,
+				F59D847903390D7E016F146B,
+			);
+			buildSettings = {
+				GLOBAL_CFLAGS = "`source \"${TCL_FRAMEWORK_DIR}/Tcl.framework/tclConfig.sh\"; echo $${}{TCL_EXTRA_CFLAGS} $${}{TCL_DEFS} | sed -e 's|\\\\\\\\\\\\\\\"|\\\"|g' | sed -e 's| -DTCL_WIDE_INT_TYPE=long. long||'` -U_REENTRANT";
+				HEADER_SEARCH_PATHS = "\"$(TCL_FRAMEWORK_DIR)/Tcl.framework/Headers\" \"$(TCL_FRAMEWORK_DIR)/Tcl.framework/PrivateHeaders\" ../generic ../xlib";
+				LIBRARY_STYLE = STATIC;
+				OPTIMIZATION_CFLAGS = "-O0";
+				OTHER_CFLAGS = "-DMAC_OSX_TK -DTCL_WIDE_INT_TYPE=\"long long\"";
+				OTHER_LDFLAGS = "";
+				OTHER_LIBTOOL_FLAGS = "";
+				PRODUCT_NAME = libtkstub8.4.a;
+				REZ_EXECUTABLE = YES;
+				SECTORDER_FLAGS = "";
+				SYMROOT = "${SRCROOT}/../../build/tk";
+				TCL_FRAMEWORK_DIR = "$(SYMROOT)/../tcl";
+				WARNING_CFLAGS = "-Wmost -Wno-four-char-constants -Wno-unknown-pragmas";
+			};
+			dependencies = (
+			);
+			isa = PBXLibraryTarget;
+			name = TkStubLibrary;
+			productInstallPath = /usr/local/lib;
+			productName = TkStub;
+			productReference = F548F8CF0313CEF0016F146B;
+		};
+		F548F8CF0313CEF0016F146B = {
+			isa = PBXLibraryReference;
+			path = libtkstub8.4.a;
+			refType = 3;
+		};
+		F548F8D00313CF11016F146B = {
+			fileRef = F53755B9016C389901DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F548F8D10313CF14016F146B = {
+			fileRef = F53755BB016C389901DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F548F8D20313CF93016F146B = {
+			isa = PBXTargetDependency;
+			target = F548F8CE0313CEF0016F146B;
+		};
+		F55A164E032A11B1016F146B = {
+			buildActionMask = 2147483647;
+			files = (
+			);
+			generatedFileNames = (
+			);
+			isa = PBXShellScriptBuildPhase;
+			neededFileNames = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "if [ -n \"${EMBEDDED_BUILD:-}\" ]; then\ncd \"${TARGET_BUILD_DIR}/${PRODUCT_NAME}.${WRAPPER_EXTENSION}/Contents\"\n\n# if we are embedding frameworks, copy them into the app\nrm -rf \"Frameworks\"\nmkdir -p \"Frameworks\"\nif [ \"${DEPLOYMENT_LOCATION:-}\" = \"YES\" -o \"${ACTION}\" = \"install\" ]; then\n    FWKDIR=\"${INSTALL_ROOT}${DYLIB_INSTALL_PATH}\"\nelse\n    FWKDIR=\"${TARGET_BUILD_DIR}\"\nfi\ncp -fpRPH \"${FWKDIR}/Tcl.framework\" \"Frameworks\"\ncp -fpRPH \"${FWKDIR}/Tk.framework\" \"Frameworks\"\n\n# fix install names when embedding\nfix_install_id ( ) {\n    chmod -RH a+w \"$1\"\n    install_name_tool -id $(otool -L \"$1\" | awk \"/$(basename \"$1\")\\.framework.*[^:]\\$/ {sub(\\\"^.*/Frameworks\\\",\\\"@executable_path/../Frameworks\\\",\\$1); print \\$1}\") \"$1\"\n    chmod -RH a-w \"$1\"   \n}\nfix_install_name ( ) {\n    chmod -RH a+w \"$1\"\n    install_name_tool -change $(otool -L \"$1\" | awk \"/$2\\.framework.*[^:]\\$/ {print \\$1; sub(\\\"^.*/Frameworks\\\",\\\"@executable_path/../Frameworks\\\",\\$1); print \\$1}\") \"$1\"\n    chmod -RH a-w \"$1\"   \n}\nfix_install_id Frameworks/Tcl.framework/Tcl\nfix_install_id Frameworks/Tk.framework/Tk\nfix_install_name Frameworks/Tk.framework/Tk Tcl\nfix_install_name \"MacOS/${PRODUCT_NAME}\" Tcl\nfix_install_name \"MacOS/${PRODUCT_NAME}\" Tk\n\nfi";
+		};
+		F55BC46802B2D38B01DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			name = tkPanedWindow.c;
+			path = ../generic/tkPanedWindow.c;
+			refType = 2;
+		};
+		F55BC46902B2D38B01DC9062 = {
+			fileRef = F55BC46802B2D38B01DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F55BC46A02B2D3F301DC9062 = {
+			isa = PBXFileReference;
+			name = panedwindow.tcl;
+			path = ../library/panedwindow.tcl;
+			refType = 2;
+		};
+		F55BC46B02B2D3F301DC9062 = {
+			fileRef = F55BC46A02B2D3F301DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5875C7B016FEF1D01DC9062 = {
+			isa = PBXFrameworkReference;
+			name = Tcl.framework;
+			path = ../tcl/Tcl.framework;
+			refType = 3;
+		};
+		F5875C7D016FEF1D01DC9062 = {
+			fileRef = F5875C7B016FEF1D01DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5877FB7031F97ED016F146B = {
+			buildActionMask = 8;
+			files = (
+			);
+			generatedFileNames = (
+			);
+			isa = PBXShellScriptBuildPhase;
+			neededFileNames = (
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+			shellPath = /bin/sh;
+			shellScript = "# ensure we can overwrite a previous install\nif [ -d \"${INSTALL_ROOT}${INSTALL_PATH}/${PRODUCT_NAME}.${WRAPPER_EXTENSION}\" ]; then\n    chmod -RH u+w \"${INSTALL_ROOT}${INSTALL_PATH}/${PRODUCT_NAME}.${WRAPPER_EXTENSION}\"\nfi";
+		};
+		F5877FB8031F982D016F146B = {
+			buildActionMask = 8;
+			files = (
+			);
+			generatedFileNames = (
+			);
+			isa = PBXShellScriptBuildPhase;
+			neededFileNames = (
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+			shellPath = /bin/sh;
+			shellScript = "# ensure we can overwrite a previous install\nif [ -d \"${INSTALL_ROOT}${INSTALL_PATH}/${PRODUCT_NAME}.${WRAPPER_EXTENSION}\" ]; then\n    chmod -RH u+w \"${INSTALL_ROOT}${INSTALL_PATH}/${PRODUCT_NAME}.${WRAPPER_EXTENSION}\"\nfi";
+		};
+		F5877FB9031F9F49016F146B = {
+			fileRef = F548F8CF0313CEF0016F146B;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5877FBA031F9F4B016F146B = {
+			fileRef = F548F8CF0313CEF0016F146B;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5877FBC031FA968016F146B = {
+			buildActionMask = 8;
+			files = (
+			);
+			generatedFileNames = (
+			);
+			isa = PBXShellScriptBuildPhase;
+			neededFileNames = (
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+			shellPath = /bin/sh;
+			shellScript = "# redo prebinding\ncd \"${INSTALL_ROOT}/\"\nif [ ! -d usr/lib ]; then mkdir -p usr; ln -fs /usr/lib usr/; RM_USRLIB=1; fi\nif [ ! -d System ]; then ln -fs /System .; RM_SYSTEM=1; fi\nif [ ! -d Library/Frameworks/Tcl.framework ]; then ln -fs ${TCL_FRAMEWORK_DIR}/Tcl.framework Library/Frameworks; RM_TCL=1; fi\nredo_prebinding -r . \"./${INSTALL_PATH}/${PRODUCT_NAME}.${WRAPPER_EXTENSION}/Versions/${FRAMEWORK_VERSION}/${PRODUCT_NAME}\"\nif [ -n \"${RM_USRLIB:-}\" ]; then rm -f usr/lib; rmdir -p usr 2>&-; fi\nif [ -n \"${RM_SYSTEM:-}\" ]; then rm -f System; fi\nif [ -n \"${RM_TCL:-}\" ]; then rm -f Library/Frameworks/Tcl.framework; fi\n\n# fix permissions on uninstalled products\nchmod a+w \"${TEMP_ROOT}/UninstalledProducts\"\nchmod a+w \"${TEMP_ROOT}\"/UninstalledProducts/libtkstub*.a";
+		};
+		F5877FBD031FAC6A016F146B = {
+			buildActionMask = 8;
+			files = (
+			);
+			generatedFileNames = (
+			);
+			isa = PBXShellScriptBuildPhase;
+			neededFileNames = (
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+			shellPath = /bin/sh;
+			shellScript = "# redo prebinding\ncd \"${INSTALL_ROOT}/\"\nAPP_DIR=\"${PRODUCT_NAME}.${WRAPPER_EXTENSION}\"\nEXECUTABLE_DIR=\"${APP_DIR}/Contents/MacOS\"\nEXECUTABLE=\"${EXECUTABLE_DIR}/${PRODUCT_NAME}\"\nFWK_RSRC_DIR=\"${DYLIB_INSTALL_PATH}/Tk.framework/Versions/${FRAMEWORK_VERSION}/Resources\"\nif [ -z \"${EMBEDDED_BUILD:-}\" ]; then\n    if [ ! -d usr/lib ]; then mkdir -p usr; ln -fs /usr/lib usr/; RM_USRLIB=1; fi\n    if [ ! -d System ]; then ln -fs /System .; RM_SYSTEM=1; fi\n    if [ ! -d Library/Frameworks/Tcl.framework ]; then ln -fs ${TCL_FRAMEWORK_DIR}/Tcl.framework Library/Frameworks; RM_TCL=1; fi\n    PREBIND_OPTS=\"-r .\"\nfi\nredo_prebinding ${PREBIND_OPTS:-} -e \"./${INSTALL_PATH}/${EXECUTABLE_DIR}\" \"./${INSTALL_PATH}/${EXECUTABLE}\"\nif [ -n \"${RM_USRLIB:-}\" ]; then rm -f usr/lib; rmdir -p usr 2>&-; fi\nif [ -n \"${RM_SYSTEM:-}\" ]; then rm -f System; fi\nif [ -n \"${RM_TCL:-}\" ]; then rm -f Library/Frameworks/Tcl.framework; fi\n\n# copy Wish.app into framework, install wish script & symbolic link\nif [ -z \"${EMBEDDED_BUILD:-}\" ]; then\nrm -rf \"./${FWK_RSRC_DIR}/${APP_DIR}\"\ncp -fpRPH \"./${INSTALL_PATH}/${APP_DIR}\" \"./${FWK_RSRC_DIR}\"\nmkdir -p \"./${BINDIR}\"\nrm -f \"./${BINDIR}/wish${FRAMEWORK_VERSION}\"\ncat > \"./${BINDIR}/wish${FRAMEWORK_VERSION}\" <<EOF\n#!/bin/sh\n\"\\$(dirname \\$0)$(echo ${BINDIR} | sed -e 's#/[^/][^/]*#/..#g')${FWK_RSRC_DIR}/${EXECUTABLE}\" \"\\$@\"\nEOF\nchmod a+x \"./${BINDIR}/wish${FRAMEWORK_VERSION}\"\nln -fs \"wish${FRAMEWORK_VERSION}\" \"./${BINDIR}/wish\"\nfi";
+		};
+		F59D847903390D7E016F146B = {
+			buildActionMask = 2147483647;
+			files = (
+			);
+			generatedFileNames = (
+			);
+			isa = PBXShellScriptBuildPhase;
+			neededFileNames = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "if [ \"${BUILD_STYLE}\" = \"Development\" ]; then\n\t# force Deployment build to be relinked next time\n\tif [ -f \"${OBJROOT}/Deployment.build/${PROJECT_NAME}.build/${TARGET_NAME}.build/Objects-normal/LinkFileList\" ]; then\n\t    touch -t `date -r \\`expr \\\\\\`date +\"%s\"\\\\\\` + 30\\` +\"%Y%m%d%H%M.%S\"` \"${OBJROOT}/Deployment.build/${PROJECT_NAME}.build/${TARGET_NAME}.build/Objects-normal/LinkFileList\"\n\tfi\nelse\n\t# force Development build to be relinked next time\n\tif [ -f \"${OBJROOT}/Development.build/${PROJECT_NAME}.build/${TARGET_NAME}.build/Objects-normal/LinkFileList\" ]; then\n\t    touch -t `date -r \\`expr \\\\\\`date +\"%s\"\\\\\\` + 30\\` +\"%Y%m%d%H%M.%S\"` \"${OBJROOT}/Development.build/${PROJECT_NAME}.build/${TARGET_NAME}.build/Objects-normal/LinkFileList\"\n\tfi\nfi";
+		};
+		F5B1FC08016FFE3501DC9062 = {
+			buildActionMask = 2147483647;
+			dstPath = "Versions/$(FRAMEWORK_VERSION)/Resources/Scripts";
+			dstSubfolderSpec = 1;
+			files = (
+				F5B1FC09016FFE3501DC9062,
+				F5B1FC0A016FFE3501DC9062,
+				F5B1FC0B016FFE3501DC9062,
+				F5B1FC0C016FFE3501DC9062,
+				F5B1FC0D016FFE3501DC9062,
+				F5B1FC0E016FFE3501DC9062,
+				F5B1FC0F016FFE3501DC9062,
+				F5B1FC10016FFE3501DC9062,
+				F5B1FC11016FFE3501DC9062,
+				F5B1FC12016FFE3501DC9062,
+				F5B1FC13016FFE3501DC9062,
+				F5B1FC14016FFE3501DC9062,
+				F5B1FC15016FFE3501DC9062,
+				F5C2EA35034D7212016F146B,
+				F5B1FC16016FFE3501DC9062,
+				F5B1FC17016FFE3501DC9062,
+				F5B1FC18016FFE3501DC9062,
+				F5B1FC19016FFE3501DC9062,
+				F5B1FC1A016FFE3501DC9062,
+				F55BC46B02B2D3F301DC9062,
+				F5B1FC1B016FFE3501DC9062,
+				F5B1FC1C016FFE3501DC9062,
+				F5B1FC1D016FFE3501DC9062,
+				F5B1FC1E016FFE3501DC9062,
+				F5B1FC1F016FFE3501DC9062,
+				F5B1FC20016FFE3501DC9062,
+				F5B1FC21016FFE3501DC9062,
+				F5B1FC22016FFE3501DC9062,
+				F5B1FC23016FFE3501DC9062,
+				F5B1FC24016FFE3501DC9062,
+				F5B1FC25016FFE3501DC9062,
+				F5B1FC26016FFE3501DC9062,
+			);
+			isa = PBXCopyFilesBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F5B1FC09016FFE3501DC9062 = {
+			fileRef = F5DF0928016CD3F901DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5B1FC0A016FFE3501DC9062 = {
+			fileRef = F5DF0929016CD3F901DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5B1FC0B016FFE3501DC9062 = {
+			fileRef = F5DF092A016CD3F901DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5B1FC0C016FFE3501DC9062 = {
+			fileRef = F5DF092B016CD3F901DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5B1FC0D016FFE3501DC9062 = {
+			fileRef = F5DF092C016CD3F901DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5B1FC0E016FFE3501DC9062 = {
+			fileRef = F5DF092D016CD3F901DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5B1FC0F016FFE3501DC9062 = {
+			fileRef = F5DF092E016CD3F901DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5B1FC10016FFE3501DC9062 = {
+			fileRef = F5DF092F016CD3F901DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5B1FC11016FFE3501DC9062 = {
+			fileRef = F5DF0930016CD3F901DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5B1FC12016FFE3501DC9062 = {
+			fileRef = F5DF0931016CD3F901DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5B1FC13016FFE3501DC9062 = {
+			fileRef = F5DF0932016CD3F901DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5B1FC14016FFE3501DC9062 = {
+			fileRef = F5DF0933016CD3F901DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5B1FC15016FFE3501DC9062 = {
+			fileRef = F5DF0934016CD3F901DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5B1FC16016FFE3501DC9062 = {
+			fileRef = F5DF0935016CD3F901DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5B1FC17016FFE3501DC9062 = {
+			fileRef = F5DF0936016CD3F901DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5B1FC18016FFE3501DC9062 = {
+			fileRef = F5DF0937016CD3F901DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5B1FC19016FFE3501DC9062 = {
+			fileRef = F5DF0938016CD3F901DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5B1FC1A016FFE3501DC9062 = {
+			fileRef = F5DF0939016CD3F901DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5B1FC1B016FFE3501DC9062 = {
+			fileRef = F5DF093A016CD3F901DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5B1FC1C016FFE3501DC9062 = {
+			fileRef = F5DF093B016CD3F901DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5B1FC1D016FFE3501DC9062 = {
+			fileRef = F5DF093C016CD3F901DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5B1FC1E016FFE3501DC9062 = {
+			fileRef = F5DF093D016CD3F901DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5B1FC1F016FFE3501DC9062 = {
+			fileRef = F5DF093E016CD3F901DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5B1FC20016FFE3501DC9062 = {
+			fileRef = F5DF093F016CD3F901DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5B1FC21016FFE3501DC9062 = {
+			fileRef = F5DF0940016CD3F901DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5B1FC22016FFE3501DC9062 = {
+			fileRef = F5DF0941016CD3F901DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5B1FC23016FFE3501DC9062 = {
+			fileRef = F5DF0942016CD3F901DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5B1FC24016FFE3501DC9062 = {
+			fileRef = F5DF0943016CD3F901DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5B1FC25016FFE3501DC9062 = {
+			fileRef = F5DF0944016CD3F901DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5B1FC26016FFE3501DC9062 = {
+			fileRef = F5DF0945016CD3F901DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5BFE58B02F8C41501DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			name = tkStyle.c;
+			path = ../generic/tkStyle.c;
+			refType = 2;
+		};
+		F5BFE58C02F8C41501DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			name = tkUndo.c;
+			path = ../generic/tkUndo.c;
+			refType = 2;
+		};
+		F5BFE58D02F8C41501DC9062 = {
+			fileRef = F5BFE58B02F8C41501DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5BFE58E02F8C41501DC9062 = {
+			fileRef = F5BFE58C02F8C41501DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5BFE58F02F8C45B01DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			name = tkUndo.h;
+			path = ../generic/tkUndo.h;
+			refType = 2;
+		};
+		F5BFE59002F8C45B01DC9062 = {
+			fileRef = F5BFE58F02F8C45B01DC9062;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5C1D51901B88F9A01DC9062 = {
+			buildActionMask = 12;
+			files = (
+			);
+			generatedFileNames = (
+			);
+			isa = PBXShellScriptBuildPhase;
+			neededFileNames = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# synthesize tkConfig.sh via buildTkConfig.tcl script\nexport DYLD_FRAMEWORK_PATH=\"${TCL_FRAMEWORK_DIR}\"\nTCLSH=\"${TCLSH_DIR}/tclsh${FRAMEWORK_VERSION}\"\nif [ ! -e \"${TCLSH}\" ]; then TCLSH=\"/bin/sh\"; fi\n\"${TCLSH}\" \"${SRCROOT}/buildTkConfig.tcl\" \"${TCL_FRAMEWORK_DIR}/Tcl.${WRAPPER_EXTENSION}/tclConfig.sh\" \"${SRCROOT}/../unix/tkConfig.sh.in\" \"${TARGET_BUILD_DIR}/${PRODUCT_NAME}.${WRAPPER_EXTENSION}/Versions/${FRAMEWORK_VERSION}/tkConfig.sh\"";
+		};
+		F5C2EA33034D71B2016F146B = {
+			isa = PBXFileReference;
+			name = mkpsenc.tcl;
+			path = ../library/mkpsenc.tcl;
+			refType = 2;
+		};
+		F5C2EA34034D71B2016F146B = {
+			fileRef = F5C2EA33034D71B2016F146B;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5C2EA35034D7212016F146B = {
+			fileRef = F5C2EA33034D71B2016F146B;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5C88659017D625C01DC9062 = {
+			children = (
+				F5C8865A017D625C01DC9062,
+				F5C8865B017D625C01DC9062,
+			);
+			isa = PBXGroup;
+			name = "Header Tools";
+			refType = 4;
+		};
+		F5C8865A017D625C01DC9062 = {
+			isa = PBXFileReference;
+			name = tk.decls;
+			path = ../generic/tk.decls;
+			refType = 2;
+		};
+		F5C8865B017D625C01DC9062 = {
+			isa = PBXFileReference;
+			name = tkInt.decls;
+			path = ../generic/tkInt.decls;
+			refType = 2;
+		};
+		F5DF07A7016CD03801DC9062 = {
+			children = (
+				F5DF0928016CD3F901DC9062,
+				F5DF0929016CD3F901DC9062,
+				F5DF092A016CD3F901DC9062,
+				F5DF092B016CD3F901DC9062,
+				F5DF092C016CD3F901DC9062,
+				F5DF092D016CD3F901DC9062,
+				F5DF092E016CD3F901DC9062,
+				F5DF092F016CD3F901DC9062,
+				F5DF0930016CD3F901DC9062,
+				F5DF0931016CD3F901DC9062,
+				F5DF0932016CD3F901DC9062,
+				F5DF0933016CD3F901DC9062,
+				F5DF0934016CD3F901DC9062,
+				F5C2EA33034D71B2016F146B,
+				F5DF0935016CD3F901DC9062,
+				F5DF0936016CD3F901DC9062,
+				F5DF0937016CD3F901DC9062,
+				F5DF0938016CD3F901DC9062,
+				F5DF0939016CD3F901DC9062,
+				F55BC46A02B2D3F301DC9062,
+				F5DF093A016CD3F901DC9062,
+				F5DF093B016CD3F901DC9062,
+				F5DF093C016CD3F901DC9062,
+				F5DF093D016CD3F901DC9062,
+				F5DF093E016CD3F901DC9062,
+				F5DF093F016CD3F901DC9062,
+				F5DF0940016CD3F901DC9062,
+				F5DF0941016CD3F901DC9062,
+				F5DF0942016CD3F901DC9062,
+				F5DF0943016CD3F901DC9062,
+				F5DF0944016CD3F901DC9062,
+				F5DF0945016CD3F901DC9062,
+			);
+			isa = PBXGroup;
+			name = Scripts;
+			refType = 4;
+		};
+		F5DF0928016CD3F901DC9062 = {
+			isa = PBXFileReference;
+			name = bgerror.tcl;
+			path = ../library/bgerror.tcl;
+			refType = 2;
+		};
+		F5DF0929016CD3F901DC9062 = {
+			isa = PBXFileReference;
+			name = button.tcl;
+			path = ../library/button.tcl;
+			refType = 2;
+		};
+		F5DF092A016CD3F901DC9062 = {
+			isa = PBXFileReference;
+			name = choosedir.tcl;
+			path = ../library/choosedir.tcl;
+			refType = 2;
+		};
+		F5DF092B016CD3F901DC9062 = {
+			isa = PBXFileReference;
+			name = clrpick.tcl;
+			path = ../library/clrpick.tcl;
+			refType = 2;
+		};
+		F5DF092C016CD3F901DC9062 = {
+			isa = PBXFileReference;
+			name = comdlg.tcl;
+			path = ../library/comdlg.tcl;
+			refType = 2;
+		};
+		F5DF092D016CD3F901DC9062 = {
+			isa = PBXFileReference;
+			name = console.tcl;
+			path = ../library/console.tcl;
+			refType = 2;
+		};
+		F5DF092E016CD3F901DC9062 = {
+			includeInIndex = 0;
+			isa = PBXFolderReference;
+			name = demos;
+			path = ../library/demos;
+			refType = 2;
+		};
+		F5DF092F016CD3F901DC9062 = {
+			isa = PBXFileReference;
+			name = dialog.tcl;
+			path = ../library/dialog.tcl;
+			refType = 2;
+		};
+		F5DF0930016CD3F901DC9062 = {
+			isa = PBXFileReference;
+			name = entry.tcl;
+			path = ../library/entry.tcl;
+			refType = 2;
+		};
+		F5DF0931016CD3F901DC9062 = {
+			isa = PBXFileReference;
+			name = focus.tcl;
+			path = ../library/focus.tcl;
+			refType = 2;
+		};
+		F5DF0932016CD3F901DC9062 = {
+			includeInIndex = 0;
+			isa = PBXFolderReference;
+			name = images;
+			path = ../library/images;
+			refType = 2;
+		};
+		F5DF0933016CD3F901DC9062 = {
+			isa = PBXFileReference;
+			name = listbox.tcl;
+			path = ../library/listbox.tcl;
+			refType = 2;
+		};
+		F5DF0934016CD3F901DC9062 = {
+			isa = PBXFileReference;
+			name = menu.tcl;
+			path = ../library/menu.tcl;
+			refType = 2;
+		};
+		F5DF0935016CD3F901DC9062 = {
+			isa = PBXFileReference;
+			name = msgbox.tcl;
+			path = ../library/msgbox.tcl;
+			refType = 2;
+		};
+		F5DF0936016CD3F901DC9062 = {
+			includeInIndex = 0;
+			isa = PBXFolderReference;
+			name = msgs;
+			path = ../library/msgs;
+			refType = 2;
+		};
+		F5DF0937016CD3F901DC9062 = {
+			isa = PBXFileReference;
+			name = obsolete.tcl;
+			path = ../library/obsolete.tcl;
+			refType = 2;
+		};
+		F5DF0938016CD3F901DC9062 = {
+			isa = PBXFileReference;
+			name = optMenu.tcl;
+			path = ../library/optMenu.tcl;
+			refType = 2;
+		};
+		F5DF0939016CD3F901DC9062 = {
+			isa = PBXFileReference;
+			name = palette.tcl;
+			path = ../library/palette.tcl;
+			refType = 2;
+		};
+		F5DF093A016CD3F901DC9062 = {
+			isa = PBXFileReference;
+			name = prolog.ps;
+			path = ../generic/prolog.ps;
+			refType = 2;
+		};
+		F5DF093B016CD3F901DC9062 = {
+			isa = PBXFileReference;
+			name = safetk.tcl;
+			path = ../library/safetk.tcl;
+			refType = 2;
+		};
+		F5DF093C016CD3F901DC9062 = {
+			isa = PBXFileReference;
+			name = scale.tcl;
+			path = ../library/scale.tcl;
+			refType = 2;
+		};
+		F5DF093D016CD3F901DC9062 = {
+			isa = PBXFileReference;
+			name = scrlbar.tcl;
+			path = ../library/scrlbar.tcl;
+			refType = 2;
+		};
+		F5DF093E016CD3F901DC9062 = {
+			isa = PBXFileReference;
+			name = spinbox.tcl;
+			path = ../library/spinbox.tcl;
+			refType = 2;
+		};
+		F5DF093F016CD3F901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			name = tclIndex;
+			path = ../library/tclIndex;
+			refType = 2;
+		};
+		F5DF0940016CD3F901DC9062 = {
+			isa = PBXFileReference;
+			name = tearoff.tcl;
+			path = ../library/tearoff.tcl;
+			refType = 2;
+		};
+		F5DF0941016CD3F901DC9062 = {
+			isa = PBXFileReference;
+			name = text.tcl;
+			path = ../library/text.tcl;
+			refType = 2;
+		};
+		F5DF0942016CD3F901DC9062 = {
+			isa = PBXFileReference;
+			name = tk.tcl;
+			path = ../library/tk.tcl;
+			refType = 2;
+		};
+		F5DF0943016CD3F901DC9062 = {
+			isa = PBXFileReference;
+			name = tkfbox.tcl;
+			path = ../library/tkfbox.tcl;
+			refType = 2;
+		};
+		F5DF0944016CD3F901DC9062 = {
+			isa = PBXFileReference;
+			name = unsupported.tcl;
+			path = ../library/unsupported.tcl;
+			refType = 2;
+		};
+		F5DF0945016CD3F901DC9062 = {
+			isa = PBXFileReference;
+			name = xmfbox.tcl;
+			path = ../library/xmfbox.tcl;
+			refType = 2;
+		};
+		F5EEA7050324680B016F146B = {
+			buildActionMask = 2147483647;
+			files = (
+			);
+			generatedFileNames = (
+			);
+			isa = PBXShellScriptBuildPhase;
+			neededFileNames = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "if [ \"${BUILD_STYLE}\" = \"Development\" ]; then\n\t# force Deployment build to be relinked next time\n\tif [ -f \"${OBJROOT}/Deployment.build/${PROJECT_NAME}.build/${TARGET_NAME}.build/Objects-normal/LinkFileList\" ]; then\n\t    touch -t `date -r \\`expr \\\\\\`date +\"%s\"\\\\\\` + 30\\` +\"%Y%m%d%H%M.%S\"` \"${OBJROOT}/Deployment.build/${PROJECT_NAME}.build/${TARGET_NAME}.build/Objects-normal/LinkFileList\"\n\tfi\nelse\n\t# force Development build to be relinked next time\n\tif [ -f \"${OBJROOT}/Development.build/${PROJECT_NAME}.build/${TARGET_NAME}.build/Objects-normal/LinkFileList\" ]; then\n\t    touch -t `date -r \\`expr \\\\\\`date +\"%s\"\\\\\\` + 30\\` +\"%Y%m%d%H%M.%S\"` \"${OBJROOT}/Development.build/${PROJECT_NAME}.build/${TARGET_NAME}.build/Objects-normal/LinkFileList\"\n\tfi\nfi\n# create symbolic link to Tcl.framework if necessary\ncd \"${SYMROOT}\"\nif [ ! -e Tcl.framework -o -L Tcl.framework ]; then\n\trm -f Tcl.framework && ln -s \"${TCL_FRAMEWORK_DIR}/Tcl.framework\" .\nfi";
+		};
+//F50
+//F51
+//F52
+//F53
+//F54
+//F90
+//F91
+//F92
+//F93
+//F94
+		F92ED9910403D0F0006F146B = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			name = ChangeLog;
+			path = ../ChangeLog;
+			refType = 2;
+		};
+		F9A61D2F04C2C861006F5A0B = {
+			buildActionMask = 8;
+			files = (
+			);
+			generatedFileNames = (
+			);
+			isa = PBXShellScriptBuildPhase;
+			neededFileNames = (
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+			shellPath = /bin/sh;
+			shellScript = "if [ -z \"${EMBEDDED_BUILD:-}\" ]; then\n# build html documentation\nif [ \"${BUILD_STYLE}\" = \"Deployment\" ]; then\n\texport DYLD_FRAMEWORK_PATH=\"${TCL_FRAMEWORK_DIR}\"\n\tif [ -e \"${TCL_FRAMEWORK_DIR}/Deployment/Makefile\" ]; then\n\t\tcd \"${TCL_FRAMEWORK_DIR}/Deployment\"\n\t\texport DYLD_FRAMEWORK_PATH=\"${TCL_FRAMEWORK_DIR}\"\n\t\tgnumake html-tk DISTDIR=\"${INSTALL_ROOT}${DOCDIR}\" TCL_EXE=\"${TCLSH_DIR}/tclsh${FRAMEWORK_VERSION}\"\n\t\tcd \"${INSTALL_ROOT}${DOCDIR}\"\n\t\tln -fs contents.htm html/${PRODUCT_NAME}TOC.html\n\t\trm -fr \"${PRODUCT_NAME}\"; mv -f html \"${PRODUCT_NAME}\"\n\telse\n\t\techo \"Couldn't build html documentation!\"\n\tfi\nfi\nfi";
+		};
+	};
+	rootObject = F537552A016C352C01DC9062;
+}

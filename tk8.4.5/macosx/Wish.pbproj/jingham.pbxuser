@@ -1,0 +1,54 @@
+// !$*UTF8*$!
+{
+	F537552A016C352C01DC9062 = {
+		activeBuildStyle = F537552C016C352C01DC9062;
+		activeExecutable = F9B92F14047876F1006F146B;
+		activeTarget = F53756A0016C4DD401DC9062;
+		breakpoints = (
+		);
+		executables = (
+			F9B92F14047876F1006F146B,
+		);
+		perUserDictionary = {
+			PBXPerProjectTemplateStateSaveDate = 79872368;
+			PBXWorkspaceStateSaveDate = 79872368;
+		};
+		projectwideBuildSettings = {
+			SYMROOT = "${SRCROOT}/../../build/tk";
+		};
+		wantsIndex = 1;
+		wantsSCM = -1;
+	};
+	F53755DF016C38D201DC9062 = {
+		activeExec = 0;
+	};
+	F53756A0016C4DD401DC9062 = {
+		activeExec = 0;
+		executables = (
+			F9B92F14047876F1006F146B,
+		);
+	};
+	F548F8CE0313CEF0016F146B = {
+		activeExec = 0;
+	};
+	F9B92F14047876F1006F146B = {
+		activeArgIndex = 2147483647;
+		activeArgIndices = (
+		);
+		argumentStrings = (
+		);
+		configStateDict = {
+		};
+		debuggerPlugin = GDBDebugging;
+		dylibVariantSuffix = "";
+		enableDebugStr = 1;
+		environmentEntries = (
+		);
+		isa = PBXExecutable;
+		name = Wish;
+		shlibInfoDictList = (
+		);
+		sourceDirectories = (
+		);
+	};
+}

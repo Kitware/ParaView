@@ -1,0 +1,81 @@
+Tk 8.4 for Macintosh
+
+Originally by Ray Johnson while at Sun Microsystems Labs
+with major help from Jim Ingham while at Cygnus Solutions
+
+RCS: @(#) Id
+
+1. Introduction
+---------------
+
+This is the README file for the Macintosh version of the Tk
+extension for the Tcl scripting language.  The file consists of
+information specific to the Macintosh version of Tcl and Tk.  For more
+general information please read the README file in the main Tk
+directory.
+
+3. Mac specific features
+------------------------
+
+There are several features or enhancements in Tk that are unique to 
+the Macintosh version of Tk.  The list of these features is
+maintained at
+	http://www.tcl.tk/software/mac/features.html
+
+4. The Distribution
+-------------------
+
+Macintosh Tk is distributed in three different forms.  This should
+make it easier to only download what you need.  Replace <version>
+with the current version of Tk.  The packages are as follows:
+
+mactk<version>.sea.hqx
+
+    This distribution is a "binary" only release.  It contains an
+    installer program that will install a 68k, PowerPC, or Fat
+    version of the "Wish" application.  In addition, in installs
+    the Tcl & Tk libraries in the Extensions folder inside your
+    System Folder.  (No "INIT"'s or Control Pannels are installed.)
+
+mactcltk-full-<version>.sea.hqx
+
+    This release contains the full release of Tcl and Tk for the
+    Macintosh plus the More Files package on which Macintosh Tcl and
+    Tk rely.
+
+mactk-source-<version>.sea.hqx
+
+    This release contains the complete source to Tk for the Macintosh
+    In addition, Metrowerks CodeWarrior libraries and project files
+    are included.  However, you must already have the More Files
+    package to compile this code.
+
+5. Compiling Tk
+---------------
+
+In order to compile Macintosh Tk you must have the 
+following items:
+
+	CodeWarrior Pro 5 or higher
+	Mac Tcl (source)
+	  (which requires More Files 1.4.9)
+	Mac Tk (source)
+
+The project  files included with the Mac Tcl source should work 
+fine.  The only thing you may need to update are the access paths.
+As with Tcl, you need to upgrade to the 2.0.1 version of the C
+compilers or later to build the CFM68K version of Tcl/Tk.
+
+Special notes:
+
+* Check out the file bugs.doc for information about known bugs.
+
+* We are starting to support the new Appearance Manager that shipped
+  with MacOS 8.0.  The Tk 8.0.3 release is the first Tk release
+  that supported the Appearance Manager well.  Tk 8.0.4 extended this support
+  to the menu system, though you have to have Appearance 1.0.1 or later
+  installed for this to work.
+  
+
+If you have comments or Bug reports, use our on-line database at
+	http://tcl.sourceforge.net/

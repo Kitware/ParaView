@@ -9,6 +9,7 @@ CreateConverters.tcl  crlf=input
 JavaWrap.tcl     crlf=input
 SwigIt           crlf=input
 browse           crlf=input
+buildTkConfig.tcl  crlf=input
 config.guess     crlf=input
 config.sub       crlf=input
 configure        crlf=input
