@@ -128,7 +128,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.239");
+vtkCxxRevisionMacro(vtkPVApplication, "1.240");
 vtkCxxSetObjectMacro(vtkPVApplication, RenderModule, vtkPVRenderModule);
 
 
@@ -257,12 +257,29 @@ public:
     this->ErrorOccurred = 0;
     this->TestErrors = 1;
   }
+
+  ~vtkPVOutputWindow()
+    {
+    ostrstream str;
+    int cc;
+    for ( cc = 0; cc < this->Errors.size(); cc ++ )
+      {
+      str << this->Errors[cc].c_str() << endl;
+      }
+    str << ends;
+    if ( cc > 0 )
+      {
+      cout << "Errors while exiting ParaView:" << endl;
+      cout << str.str() << endl;
+      }
+    str.rdbuf()->freeze(0);
+    }
   
   void SetWindowCollection(vtkKWWindowCollection *windows)
   {
     vtkKWWindowCollection* win = this->Windows;
     this->Windows = windows;
-    if ( !win )
+    if ( !win && this->Windows )
       {
       ostrstream str;
       int cc;
@@ -346,6 +363,10 @@ Tcl_Interp *vtkPVApplication::InitializeTcl(int argc,
 //----------------------------------------------------------------------------
 vtkPVApplication::vtkPVApplication()
 {
+  vtkPVOutputWindow *window = vtkPVOutputWindow::New();
+  this->OutputWindow = window;
+  vtkOutputWindow::SetInstance(this->OutputWindow);
+
   this->CrashOnErrors = 0;
   this->AlwaysSSH = 0;
   this->MajorVersion = PARAVIEW_VERSION_MAJOR;
@@ -441,6 +462,8 @@ vtkPVApplication::~vtkPVApplication()
   this->SetHostName(NULL);
   this->SetUsername(0);
   this->SetDemoPath(NULL);
+  vtkOutputWindow::SetInstance(0);
+  this->OutputWindow->Delete();
 }
 
 
@@ -1069,9 +1092,6 @@ int vtkPVApplication::ParseCommandLineArguments(int argc, char*argv[])
 //----------------------------------------------------------------------------
 void vtkPVApplication::Start(int argc, char*argv[])
 {
-  vtkPVOutputWindow *window = vtkPVOutputWindow::New();
-  this->OutputWindow = window;
-  vtkOutputWindow::SetInstance(this->OutputWindow);
 
 
   // Find the installation directory (now that we have the app name)
@@ -1259,8 +1279,6 @@ void vtkPVApplication::Start(int argc, char*argv[])
       }
     }
 
-  vtkOutputWindow::GetInstance()->PromptUserOn();
-
   // Splash screen ?
 
   if (this->ShowSplashScreen)
@@ -1312,7 +1330,7 @@ void vtkPVApplication::Start(int argc, char*argv[])
 
   this->Script("proc bgerror { m } "
                "{ global Application; $Application DisplayTCLError $m }");
-  window->SetWindowCollection( this->Windows );
+  this->OutputWindow->SetWindowCollection( this->Windows );
 
   // Check if there is an existing ParaViewTrace file.
   if (this->ShowSplashScreen)
@@ -1428,8 +1446,7 @@ void vtkPVApplication::Start(int argc, char*argv[])
     {
     this->vtkKWApplication::Start(argc,argv);
     }
-  vtkOutputWindow::SetInstance(0);
-  this->OutputWindow->Delete();
+  this->OutputWindow->SetWindowCollection(0);
 
   // Circular reference.
   this->SetRenderModule(NULL);
