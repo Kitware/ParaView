@@ -128,9 +128,8 @@ public:
   // GetLimitedEditionModeAndWarn will return the limited edition mode ; if 
   // the mode is true, it will also display a popup warning stating that a
   // feature (string parameter) is not available in this mode.
-  // Also set/Get the name of the Limited Edition Mode, as displayed in the
-  // GUI or after the application name in the title bar 
-  // (default to: limited edition).
+  // Also set/Get the name of the application when in Limited Edition Mode, 
+  // as displayed in the GUI or after in the title bar instead of the app name.
   //BTX 
   virtual void SetLimitedEditionMode(int arg);
   vtkBooleanMacro(LimitedEditionMode, int);

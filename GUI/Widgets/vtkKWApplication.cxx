@@ -59,7 +59,7 @@ int vtkKWApplication::WidgetVisibility = 1;
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.166");
+vtkCxxRevisionMacro(vtkKWApplication, "1.167");
 
 extern "C" int Vtktcl_Init(Tcl_Interp *interp);
 extern "C" int Vtkkwwidgetstcl_Init(Tcl_Interp *interp);
@@ -81,7 +81,10 @@ vtkKWApplication::vtkKWApplication()
   this->ApplicationPrettyName = NULL;
   this->ApplicationInstallationDirectory = NULL;
 
-  this->LimitedEditionModeName = vtkString::Duplicate("limited edition");
+  this->LimitedEditionModeName = NULL;
+  char name[1024];
+  sprintf(name, "%s Limited Edition", this->ApplicationName);
+  this->SetLimitedEditionModeName(name);
 
   this->EmailFeedbackAddress = NULL;
 
@@ -1446,11 +1449,11 @@ int vtkKWApplication::GetLimitedEditionModeAndWarn(const char *feature)
     feature_str << ends;
 
     const char *lem_name = this->GetLimitedEditionModeName() 
-      ? this->GetLimitedEditionModeName() : "limited edition";
+      ? this->GetLimitedEditionModeName() : "Limited Edition";
 
     ostrstream msg_str;
     msg_str << this->GetApplicationName() 
-            << " is running in " << lem_name << " mode. "
+            << " is running in \"" << lem_name << "\" mode. "
             << "The feature you are trying to use" << feature_str.str() 
             << " is not available in this mode. "
             << ends;
@@ -1470,17 +1473,27 @@ int vtkKWApplication::GetLimitedEditionModeAndWarn(const char *feature)
 const char* vtkKWApplication::GetApplicationPrettyName()
 {
   ostrstream pretty_str;
-  pretty_str << (this->ApplicationName ? this->ApplicationName : "")
-             << " " << this->MajorVersion << "." << this->MinorVersion;
   if (this->LimitedEditionMode)
     {
-    const char *lem_name = this->GetLimitedEditionModeName() 
-      ? this->GetLimitedEditionModeName() : "limited edition";
-    char *upfirst = vtkString::Duplicate(lem_name);
-    pretty_str << " " << vtkString::ToUpperFirst(upfirst);
-    delete [] upfirst;
+    const char *lem_name = this->GetLimitedEditionModeName();
+    if (lem_name)
+      {
+      pretty_str << lem_name << " ";
+      }
+    else
+      {
+      if (this->ApplicationName)
+        {
+        pretty_str << this->ApplicationName << " ";
+        }
+      pretty_str << "Limited Edition ";
+      }
     }
-  pretty_str << ends;
+  else if (this->ApplicationName)
+    {
+    pretty_str << this->ApplicationName << " ";
+    }
+  pretty_str << this->MajorVersion << "." << this->MinorVersion << ends;
 
   this->SetApplicationPrettyName(pretty_str.str());
   pretty_str.rdbuf()->freeze(0);
