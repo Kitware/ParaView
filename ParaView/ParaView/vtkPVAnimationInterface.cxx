@@ -144,7 +144,7 @@ static unsigned char image_goto_end[] =
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterface);
-vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.59");
+vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.60");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterface,ControlledWidget, vtkPVWidget);
 
@@ -848,7 +848,7 @@ void vtkPVAnimationInterface::Create(vtkKWApplication *app, char *frameArgs)
   this->TimeScale->Create(this->Application, "");
   this->TimeScale->DisplayEntry();
   this->TimeScale->DisplayEntryAndLabelOnTopOff();
-  this->TimeScale->DisplayLabel("Time:");
+  this->TimeScale->DisplayLabel("Frame:");
   this->TimeScale->SetEndCommand(this, "TimeScaleCallback");
   this->TimeScale->SetEntryCommand(this, "TimeScaleCallback");
 
@@ -864,7 +864,7 @@ void vtkPVAnimationInterface::Create(vtkKWApplication *app, char *frameArgs)
   this->TimeSpanEntry->SetParent(this->TimeFrame);
   this->TimeSpanEntry->Create(this->Application);
   this->TimeSpanEntry->GetEntry()->SetWidth(6);
-  this->TimeSpanEntry->SetLabel("Number Of Iterations:");
+  this->TimeSpanEntry->SetLabel("Number Of Frames:");
   this->TimeSpanEntry->SetValue(this->TimeSpan);
 
   this->Script("bind %s <KeyPress-Return> {%s TimeSpanEntryCallback}",
