@@ -63,7 +63,6 @@ public:
   // Description:
   // Show/Hide the splash screen
   void Show();
-  void ShowWithBind();
   void Hide();
   
   // Description:
