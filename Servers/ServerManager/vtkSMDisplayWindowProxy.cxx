@@ -14,6 +14,7 @@
 =========================================================================*/
 #include "vtkSMDisplayWindowProxy.h"
 
+#include "vtkCamera.h"
 #include "vtkClientServerStream.h"
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
@@ -25,7 +26,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMDisplayWindowProxy);
-vtkCxxRevisionMacro(vtkSMDisplayWindowProxy, "1.8");
+vtkCxxRevisionMacro(vtkSMDisplayWindowProxy, "1.9");
 
 struct vtkSMDisplayWindowProxyInternals
 {
@@ -206,6 +207,22 @@ void vtkSMDisplayWindowProxy::WriteImage(const char* filename,
 
   imageWriter->Delete();
 
+}
+
+//---------------------------------------------------------------------------
+vtkCamera* vtkSMDisplayWindowProxy::GetCamera(unsigned int idx)
+{
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  if (pm)
+    {
+    vtkSMProxy* cameraProxy = this->GetSubProxy("camera");
+    if (cameraProxy && cameraProxy->GetNumberOfIDs() > idx)
+      {
+      return vtkCamera::SafeDownCast(
+        pm->GetObjectFromID(cameraProxy->GetID(idx)));
+      }
+    }
+  return 0;
 }
 
 //---------------------------------------------------------------------------

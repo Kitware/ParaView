@@ -33,6 +33,7 @@
 class vtkClientServerStream;
 class vtkPVXMLElement;
 class vtkSMDomain;
+class vtkSMProxy;
 class vtkSMXMLParser;
 //BTX
 struct vtkSMPropertyInternals;
@@ -68,6 +69,9 @@ public:
   vtkGetMacro(UpdateSelf, int);
 
   // Description:
+  vtkGetMacro(IsReadOnly, int);
+
+  // Description:
   vtkSMProperty* GetSubProperty(const char* name);
 
 protected:
@@ -84,7 +88,7 @@ protected:
   // The proxy objects create a stream by calling this method on all the
   // modified properties.
   virtual void AppendCommandToStream(
-    vtkClientServerStream* stream, vtkClientServerID objectId );
+    vtkSMProxy*, vtkClientServerStream* stream, vtkClientServerID objectId );
   //ETX
 
   // Description:
@@ -122,12 +126,16 @@ protected:
   // Description:
   void RemoveSubProperty(const char* name);
 
+  // Description:
+  vtkSetMacro(IsReadOnly, int);
+
   char* Command;
 
   vtkSMPropertyInternals* PInternals;
 
   int ImmediateUpdate;
   int UpdateSelf;
+  int IsReadOnly;
 
   char* XMLName;
 

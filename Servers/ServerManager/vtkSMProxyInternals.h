@@ -51,6 +51,15 @@ struct vtkSMProxyInternals
 
   typedef vtkstd::map<vtkStdString,  vtkSmartPointer<vtkSMProxy> > ProxyMap;
   ProxyMap SubProxies;
+
+  struct ConsumerInfo
+  {
+    ConsumerInfo(vtkSMProperty* prop, vtkSMProxy* prox) : Property(prop),
+      Proxy(prox) {};
+    vtkSMProperty* Property;
+    vtkSMProxy* Proxy;
+  };
+  vtkstd::vector<ConsumerInfo> Consumers;
 };
 
 #endif

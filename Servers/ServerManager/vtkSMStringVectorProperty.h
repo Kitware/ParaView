@@ -82,7 +82,7 @@ protected:
   // Update the vtk object (with the given id and on the given
   // nodes) with the property values(s).
   virtual void AppendCommandToStream(
-    vtkClientServerStream* stream, vtkClientServerID objectId );
+    vtkSMProxy*, vtkClientServerStream* stream, vtkClientServerID objectId );
   //ETX
 
   virtual int ReadXMLAttributes(vtkPVXMLElement* element);

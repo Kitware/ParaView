@@ -23,7 +23,7 @@
 #include "vtkSMProxyManager.h"
 
 vtkStandardNewMacro(vtkSMInputProperty);
-vtkCxxRevisionMacro(vtkSMInputProperty, "1.4");
+vtkCxxRevisionMacro(vtkSMInputProperty, "1.5");
 
 int vtkSMInputProperty::InputsUpdateImmediately = 1;
 
@@ -75,12 +75,15 @@ void vtkSMInputProperty::SetInputsUpdateImmediately(int up)
 
 //---------------------------------------------------------------------------
 void vtkSMInputProperty::AppendCommandToStream(
-    vtkClientServerStream* str, vtkClientServerID objectId )
+  vtkSMProxy* cons, vtkClientServerStream* str, vtkClientServerID objectId )
 {
-  if (!this->Command)
+  if (!this->Command || this->IsReadOnly)
     {
     return;
     }
+
+  this->RemoveConsumers(cons);
+  this->ClearPreviousProxies();
 
   if (this->CleanCommand)
     {
@@ -91,20 +94,27 @@ void vtkSMInputProperty::AppendCommandToStream(
   unsigned int numInputs = this->GetNumberOfProxies();
   for (unsigned int i=0; i<numInputs; i++)
     {
-    *str << vtkClientServerStream::Invoke 
-         << objectId 
-         << "AddInput" 
-         << this->GetProxy(i) 
-         << this->Command;
-    if (this->MultipleInput)
+    vtkSMProxy* proxy = this->GetProxy(i) ;
+    if (proxy)
       {
-      *str << 1;
+      this->AddPreviousProxy(proxy);
+      proxy->AddConsumer(this, cons);
+
+      *str << vtkClientServerStream::Invoke 
+           << objectId 
+           << "AddInput" 
+           << proxy
+           << this->Command;
+      if (this->MultipleInput)
+        {
+        *str << 1;
+        }
+      else
+        {
+        *str << 0;
+        }
+      *str << vtkClientServerStream::End;
       }
-    else
-      {
-      *str << 0;
-      }
-    *str << vtkClientServerStream::End;
     }
 }
 

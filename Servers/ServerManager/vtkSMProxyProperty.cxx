@@ -26,11 +26,12 @@
 #include "vtkStdString.h"
 
 vtkStandardNewMacro(vtkSMProxyProperty);
-vtkCxxRevisionMacro(vtkSMProxyProperty, "1.5");
+vtkCxxRevisionMacro(vtkSMProxyProperty, "1.6");
 
 struct vtkSMProxyPropertyInternals
 {
   vtkstd::vector<vtkSmartPointer<vtkSMProxy> > Proxies;
+  vtkstd::vector<vtkSmartPointer<vtkSMProxy> > PreviousProxies;
 };
 
 //---------------------------------------------------------------------------
@@ -61,9 +62,9 @@ void vtkSMProxyProperty::UpdateAllInputs()
 
 //---------------------------------------------------------------------------
 void vtkSMProxyProperty::AppendCommandToStream(
-    vtkClientServerStream* str, vtkClientServerID objectId )
+  vtkSMProxy* cons, vtkClientServerStream* str, vtkClientServerID objectId )
 {
-  if (!this->Command)
+  if (!this->Command || this->IsReadOnly)
     {
     return;
     }
@@ -74,12 +75,16 @@ void vtkSMProxyProperty::AppendCommandToStream(
     return;
     }
 
+  this->RemoveConsumers(cons);
+  this->ClearPreviousProxies();
   for (unsigned int idx=0; idx < numProxies; idx++)
     {
     *str << vtkClientServerStream::Invoke << objectId << this->Command;
     vtkSMProxy* proxy = this->GetProxy(idx);
     if (proxy)
       {
+      this->AddPreviousProxy(proxy);
+      proxy->AddConsumer(this, cons);
       if (this->UpdateSelf)
         {
         *str << proxy;
@@ -103,8 +108,37 @@ void vtkSMProxyProperty::AppendCommandToStream(
 }
 
 //---------------------------------------------------------------------------
+void vtkSMProxyProperty::ClearPreviousProxies()
+{
+  this->PPInternals->PreviousProxies.erase(
+    this->PPInternals->PreviousProxies.begin(),
+    this->PPInternals->PreviousProxies.end());
+}
+
+//---------------------------------------------------------------------------
+void vtkSMProxyProperty::AddPreviousProxy(vtkSMProxy* proxy)
+{
+  this->PPInternals->PreviousProxies.push_back(proxy);
+}
+
+//---------------------------------------------------------------------------
+void vtkSMProxyProperty::RemoveConsumers(vtkSMProxy* proxy)
+{
+  vtkstd::vector<vtkSmartPointer<vtkSMProxy> >::iterator it =
+    this->PPInternals->PreviousProxies.begin();
+  for(; it != this->PPInternals->PreviousProxies.end(); it++)
+    {
+    it->GetPointer()->RemoveConsumer(this, proxy);
+    }
+}
+
+//---------------------------------------------------------------------------
 void vtkSMProxyProperty::AddProxy(vtkSMProxy* proxy, int modify)
 {
+  if (this->IsReadOnly)
+    {
+    return;
+    }
   this->PPInternals->Proxies.push_back(proxy);
   if (modify)
     {

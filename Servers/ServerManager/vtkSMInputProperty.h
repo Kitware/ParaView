@@ -65,7 +65,7 @@ protected:
   // Note that if the proxy has multiple IDs, they are all appended to the 
   // command stream.  
   virtual void AppendCommandToStream(
-    vtkClientServerStream* stream, vtkClientServerID objectId );
+    vtkSMProxy*, vtkClientServerStream* stream, vtkClientServerID objectId );
   //ETX
 
   // Description:

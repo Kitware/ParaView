@@ -26,7 +26,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMSourceProxy);
-vtkCxxRevisionMacro(vtkSMSourceProxy, "1.11");
+vtkCxxRevisionMacro(vtkSMSourceProxy, "1.12");
 
 struct vtkSMSourceProxyInternals
 {
@@ -85,7 +85,7 @@ void vtkSMSourceProxy::UpdateInformation()
 //---------------------------------------------------------------------------
 // Call Update() on all sources
 // TODO this should update information properties.
-void vtkSMSourceProxy::Update()
+void vtkSMSourceProxy::UpdatePipeline()
 {
   int numIDs = this->GetNumberOfIDs();
   if (numIDs <= 0)

@@ -24,8 +24,10 @@
 
 #include "vtkSMProxyInternals.h"
 
+#include <vtkstd/algorithm>
+
 vtkStandardNewMacro(vtkSMProxy);
-vtkCxxRevisionMacro(vtkSMProxy, "1.12");
+vtkCxxRevisionMacro(vtkSMProxy, "1.13");
 
 //---------------------------------------------------------------------------
 // Observer for modified event of the property
@@ -213,13 +215,13 @@ vtkTypeUInt32 vtkSMProxy::GetServers()
 }
 
 //---------------------------------------------------------------------------
-int vtkSMProxy::GetNumberOfIDs()
+unsigned int vtkSMProxy::GetNumberOfIDs()
 {
   return this->Internals->IDs.size();
 }
 
 //---------------------------------------------------------------------------
-vtkClientServerID vtkSMProxy::GetID(int idx)
+vtkClientServerID vtkSMProxy::GetID(unsigned int idx)
 {
   return this->Internals->IDs[idx];
 }
@@ -391,7 +393,7 @@ void vtkSMProxy::PushProperty(
   if (it->second.ModifiedFlag)
     {
     vtkClientServerStream str;
-    it->second.Property.GetPointer()->AppendCommandToStream(&str, id);
+    it->second.Property.GetPointer()->AppendCommandToStream(this, &str, id);
     vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
     pm->SendStream(servers, str, 0);
     }
@@ -434,7 +436,7 @@ void vtkSMProxy::SetPropertyModifiedFlag(const char* name, int flag)
       
       for (int i=0; i<numObjects; i++)
         {
-        prop->AppendCommandToStream(&str, this->Internals->IDs[i]);
+        prop->AppendCommandToStream(this, &str, this->Internals->IDs[i]);
         }
       
       if (str.GetNumberOfMessages() > 0)
@@ -502,7 +504,7 @@ void vtkSMProxy::UpdateVTKObjects()
         {
         for (int i=0; i<numObjects; i++)
           {
-          prop->AppendCommandToStream(&str, this->Internals->IDs[i]);
+          prop->AppendCommandToStream(this, &str, this->Internals->IDs[i]);
           }
         }
       it->second.ModifiedFlag = 0;
@@ -613,6 +615,69 @@ void vtkSMProxy::RemoveSubProxy(const char* name)
     {
     this->Internals->SubProxies.erase(it);
     }
+}
+
+//---------------------------------------------------------------------------
+void vtkSMProxy::AddConsumer(vtkSMProperty* property, vtkSMProxy* proxy)
+{
+  int found=0;
+  vtkstd::vector<vtkSMProxyInternals::ConsumerInfo>::iterator i = 
+    this->Internals->Consumers.begin();
+  for(; i != this->Internals->Consumers.end(); i++)
+    {
+    if ( i->Property == property && i->Proxy == proxy )
+      {
+      found = 1;
+      break;
+      }
+    }
+
+  if (!found)
+    {
+    vtkSMProxyInternals::ConsumerInfo info(property, proxy);
+    this->Internals->Consumers.push_back(info);
+    }
+  
+}
+
+//---------------------------------------------------------------------------
+void vtkSMProxy::RemoveConsumer(vtkSMProperty* property, vtkSMProxy* proxy)
+{
+  vtkstd::vector<vtkSMProxyInternals::ConsumerInfo>::iterator i = 
+    this->Internals->Consumers.begin();
+  for(; i != this->Internals->Consumers.end(); i++)
+    {
+    if ( i->Property == property && i->Proxy == proxy )
+      {
+      this->Internals->Consumers.erase(i);
+      break;
+      }
+    }
+}
+
+//---------------------------------------------------------------------------
+void vtkSMProxy::RemoveAllConsumers()
+{
+  this->Internals->Consumers.erase(this->Internals->Consumers.begin(),
+                                   this->Internals->Consumers.end());
+}
+
+//---------------------------------------------------------------------------
+unsigned int vtkSMProxy::GetNumberOfConsumers()
+{
+  return this->Internals->Consumers.size();
+}
+
+//---------------------------------------------------------------------------
+vtkSMProxy* vtkSMProxy::GetConsumerProxy(unsigned int idx)
+{
+  return this->Internals->Consumers[idx].Proxy;
+}
+
+//---------------------------------------------------------------------------
+vtkSMProperty* vtkSMProxy::GetConsumerProperty(unsigned int idx)
+{
+  return this->Internals->Consumers[idx].Property;
 }
 
 //---------------------------------------------------------------------------

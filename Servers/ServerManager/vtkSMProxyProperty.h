@@ -76,7 +76,7 @@ protected:
   // Note that if the proxy has multiple IDs, they are all appended to the 
   // command stream.  
   virtual void AppendCommandToStream(
-    vtkClientServerStream* stream, vtkClientServerID objectId );
+    vtkSMProxy*, vtkClientServerStream* stream, vtkClientServerID objectId );
   //ETX
 
   // Description:
@@ -86,6 +86,15 @@ protected:
   // Description:
   // Saves the state of the object in XML format. 
   virtual void SaveState(const char* name,  ofstream* file, vtkIndent indent);
+
+  // Description:
+  void AddPreviousProxy(vtkSMProxy* proxy);
+
+  // Description:
+  void ClearPreviousProxies();
+
+  // Description:
+  void RemoveConsumers(vtkSMProxy* proxy);
 
   vtkSMProxyPropertyInternals* PPInternals;
 

@@ -26,7 +26,7 @@
 #include "vtkSMPropertyInternals.h"
 
 vtkStandardNewMacro(vtkSMProperty);
-vtkCxxRevisionMacro(vtkSMProperty, "1.5");
+vtkCxxRevisionMacro(vtkSMProperty, "1.6");
 
 //---------------------------------------------------------------------------
 vtkSMProperty::vtkSMProperty()
@@ -36,6 +36,7 @@ vtkSMProperty::vtkSMProperty()
   this->UpdateSelf = 0;
   this->PInternals = new vtkSMPropertyInternals;
   this->XMLName = 0;
+  this->IsReadOnly = 0;
 }
 
 //---------------------------------------------------------------------------
@@ -108,9 +109,9 @@ void vtkSMProperty::RemoveSubProperty(const char* name)
 
 //---------------------------------------------------------------------------
 void vtkSMProperty::AppendCommandToStream(
-    vtkClientServerStream* str, vtkClientServerID objectId )
+  vtkSMProxy*, vtkClientServerStream* str, vtkClientServerID objectId )
 {
-  if (!this->Command)
+  if (!this->Command || this->IsReadOnly)
     {
     return;
     }
@@ -178,4 +179,5 @@ void vtkSMProperty::PrintSelf(ostream& os, vtkIndent indent)
      << (this->Command ? this->Command : "(null)") << endl;
   os << indent << "ImmediateUpdate:" << this->ImmediateUpdate << endl;
   os << indent << "UpdateSelf:" << this->UpdateSelf << endl;
+  os << indent << "IsReadOnly:" << this->IsReadOnly << endl;
 }

@@ -102,7 +102,7 @@ protected:
   // The proxy objects create a stream by calling this method on all the
   // modified properties.
   virtual void AppendCommandToStream(
-    vtkClientServerStream* stream, vtkClientServerID objectId );
+    vtkSMProxy*, vtkClientServerStream* stream, vtkClientServerID objectId );
   //ETX
 
 private:

@@ -49,7 +49,7 @@ public:
   // Description:
   // Calls Update() on all sources.  In future, this will also 
   // populate some information properties.
-  void Update();
+  void UpdatePipeline();
 
   // Description:
   // Connects filters/sinks to an input. If the filter(s) is not

@@ -94,6 +94,15 @@ public:
   // Returns a new (initialized) iterator of the properties.
   vtkSMPropertyIterator* NewPropertyIterator();
 
+  // Description:
+  unsigned int GetNumberOfConsumers();
+
+  // Description:
+  vtkSMProxy* GetConsumerProxy(unsigned int idx);
+
+  // Description:
+  vtkSMProperty* GetConsumerProperty(unsigned int idx);
+  
 protected:
   vtkSMProxy();
   ~vtkSMProxy();
@@ -104,6 +113,7 @@ protected:
   // use a small subset of protected methods. This should be kept
   // as such.
   friend class vtkSMProxyManager;
+  friend class vtkSMInputProperty;
   friend class vtkSMProxyProperty;
   friend class vtkSMDisplayerProxy;
   friend class vtkSMDisplayWindowProxy;
@@ -152,7 +162,7 @@ protected:
   // Description:
   // Returns the number of server ids (same as the number of server objects
   // if CreateVTKObjects() has already been called)
-  int GetNumberOfIDs();
+  unsigned int GetNumberOfIDs();
 
   // Description:
   // Add an ID to be managed by the proxy. In this case, the proxy
@@ -166,7 +176,7 @@ protected:
 
   // Description:
   // Returns the id of a server object.
-  vtkClientServerID GetID(int idx);
+  vtkClientServerID GetID(unsigned int idx);
 
   // Server IDs determine on which server(s) the VTK objects are
   // instantiated. Use the following methods to set/get the server
@@ -251,6 +261,15 @@ protected:
   // Description:
   // Returns a sub-proxy. Returns 0 if sub-proxy does not exist.
   vtkSMProxy* GetSubProxy(const char* name);
+
+  // Description:
+  void AddConsumer(vtkSMProperty* property, vtkSMProxy* proxy);
+
+  // Description:
+  void RemoveConsumer(vtkSMProperty* property, vtkSMProxy* proxy);
+
+  // Description:
+  void RemoveAllConsumers();
 
   char* VTKClassName;
   char* XMLGroup;

@@ -22,7 +22,7 @@
 #include "vtkStdString.h"
 
 vtkStandardNewMacro(vtkSMStringVectorProperty);
-vtkCxxRevisionMacro(vtkSMStringVectorProperty, "1.6");
+vtkCxxRevisionMacro(vtkSMStringVectorProperty, "1.7");
 
 struct vtkSMStringVectorPropertyInternals
 {
@@ -45,6 +45,11 @@ vtkSMStringVectorProperty::~vtkSMStringVectorProperty()
 //---------------------------------------------------------------------------
 void vtkSMStringVectorProperty::SetElementType(unsigned int idx, int type)
 {
+  if (this->IsReadOnly)
+    {
+    return;
+    }
+
   unsigned int size = this->Internals->ElementTypes.size();
   if (idx >= size)
     {
@@ -69,9 +74,9 @@ int vtkSMStringVectorProperty::GetElementType(unsigned int idx)
 
 //---------------------------------------------------------------------------
 void vtkSMStringVectorProperty::AppendCommandToStream(
-    vtkClientServerStream* str, vtkClientServerID objectId )
+  vtkSMProxy*, vtkClientServerStream* str, vtkClientServerID objectId )
 {
-  if (!this->Command)
+  if (!this->Command || this->IsReadOnly)
     {
     return;
     }
@@ -152,6 +157,10 @@ const char* vtkSMStringVectorProperty::GetElement(unsigned int idx)
 //---------------------------------------------------------------------------
 void vtkSMStringVectorProperty::SetElement(unsigned int idx, const char* value)
 {
+  if (this->IsReadOnly)
+    {
+    return;
+    }
   if (idx >= this->GetNumberOfElements())
     {
     this->SetNumberOfElements(idx+1);

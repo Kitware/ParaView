@@ -26,6 +26,7 @@
 #include "vtkSMProxy.h"
 #include "vtkClientServerID.h" // Needed for ClientServerID
 
+class vtkCamera;
 class vtkSMProxy;
 //BTX
 struct vtkSMDisplayWindowProxyInternals;
@@ -54,6 +55,14 @@ public:
   // Description:
   // Generate a screenshot from the render window.
   void WriteImage(const char* filename, const char* writerName);
+  
+//BTX
+  // Description:
+  // If there is a local camera object with given index, return it.
+  // This requires that the display window instantiates a camera
+  // on the server manager.
+  vtkCamera* GetCamera(unsigned int idx);
+//ETX
 
 protected:
   vtkSMDisplayWindowProxy();

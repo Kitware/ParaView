@@ -21,7 +21,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMIntVectorProperty);
-vtkCxxRevisionMacro(vtkSMIntVectorProperty, "1.8");
+vtkCxxRevisionMacro(vtkSMIntVectorProperty, "1.9");
 
 struct vtkSMIntVectorPropertyInternals
 {
@@ -43,9 +43,9 @@ vtkSMIntVectorProperty::~vtkSMIntVectorProperty()
 
 //---------------------------------------------------------------------------
 void vtkSMIntVectorProperty::AppendCommandToStream(
-    vtkClientServerStream* str, vtkClientServerID objectId )
+  vtkSMProxy*, vtkClientServerStream* str, vtkClientServerID objectId )
 {
-  if (!this->Command)
+  if (!this->Command || this->IsReadOnly)
     {
     return;
     }
@@ -119,6 +119,11 @@ int vtkSMIntVectorProperty::GetElement(unsigned int idx)
 //---------------------------------------------------------------------------
 void vtkSMIntVectorProperty::SetElement(unsigned int idx, int value)
 {
+  if (this->IsReadOnly)
+    {
+    return;
+    }
+
   if (idx >= this->GetNumberOfElements())
     {
     this->SetNumberOfElements(idx+1);
@@ -151,6 +156,10 @@ void vtkSMIntVectorProperty::SetElements3(int value0, int value1, int value2)
 //---------------------------------------------------------------------------
 void vtkSMIntVectorProperty::SetElements(const int* values)
 {
+  if (this->IsReadOnly)
+    {
+    return;
+    }
   int numArgs = this->GetNumberOfElements();
   memcpy(&this->Internals->Values[0], values, numArgs*sizeof(int));
   this->Modified();
