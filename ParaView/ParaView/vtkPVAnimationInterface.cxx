@@ -143,7 +143,7 @@ static unsigned char image_goto_end[] =
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterface);
-vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.63");
+vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.64");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterface,ControlledWidget, vtkPVWidget);
 
@@ -179,6 +179,8 @@ public:
 
     this->TypeIsInt = 0;
     this->CurrentIndex = 0;
+
+    this->UpdatingEntries = 0;
     }
 
   void SetParent(vtkKWWidget* widget)
@@ -330,6 +332,11 @@ public:
 
   void UpdateStartEndValueFromEntry()
     {
+    if (this->UpdatingEntries)
+      {
+      return;
+      }
+    this->UpdatingEntries = 1;
     if ( this->TimeStart != this->StartTimeEntry->GetValueAsFloat() )
       {
       this->Parent->SetTimeStart(this->CurrentIndex, this->StartTimeEntry->GetValueAsFloat());
@@ -338,6 +345,7 @@ public:
       {
       this->Parent->SetTimeEnd(this->CurrentIndex, this->EndTimeEntry->GetValueAsFloat());
       }
+    this->UpdatingEntries = 0;
     }
 
   void UpdateStartEndValueToEntry()
@@ -453,6 +461,7 @@ protected:
 
   int TypeIsInt;
   int CurrentIndex;
+  int UpdatingEntries;
 
 private:
   vtkPVAnimationInterfaceEntry(const vtkPVAnimationInterfaceEntry&);
