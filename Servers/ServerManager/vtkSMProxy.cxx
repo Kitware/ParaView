@@ -30,7 +30,7 @@
 #include <vtkstd/algorithm>
 
 vtkStandardNewMacro(vtkSMProxy);
-vtkCxxRevisionMacro(vtkSMProxy, "1.28");
+vtkCxxRevisionMacro(vtkSMProxy, "1.28.2.1");
 
 vtkCxxSetObjectMacro(vtkSMProxy, XMLElement, vtkPVXMLElement);
 
@@ -616,7 +616,10 @@ void vtkSMProxy::UpdateVTKObjects()
     it2->second.GetPointer()->UpdateVTKObjects();
     }
 
-  this->MarkConsumersAsModified();
+  // I am am removing this because it was causing the animation to
+  // loose its caches when it Updated the VTK objects.
+  // It has to be called separately now.
+  //this->MarkConsumersAsModified();
 }
 
 //---------------------------------------------------------------------------

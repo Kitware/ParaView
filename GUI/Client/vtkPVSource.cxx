@@ -67,7 +67,7 @@
 
 
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.395.2.3");
+vtkCxxRevisionMacro(vtkPVSource, "1.395.2.4");
 vtkCxxSetObjectMacro(vtkPVSource,Notebook,vtkPVSourceNotebook);
 vtkCxxSetObjectMacro(vtkPVSource,PartDisplay,vtkSMPartDisplay);
 
@@ -1449,7 +1449,8 @@ void vtkPVSource::UpdateParameterWidgets()
     {
     pvw = static_cast<vtkPVWidget*>(it->GetObject());
     // Do not try to reset the widget if it is not initialized
-    if (pvw && (pvw->GetModifiedFlag() || !this->Initialized))
+    if (pvw && (pvw->GetModifiedFlag() || !this->Initialized) || 
+        !this->DataInformationValid)
       {
       pvw->Reset();
       }

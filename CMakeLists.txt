@@ -78,19 +78,6 @@ IF(NOT PARAVIEW_TESTING_DART_SERVER)
 
 #########################################################################
 # Configure TclTk
-IF(UNIX)
-  # On UNIX, Tcl needs the math library.
-  IF(UNIX)
-    LINK_LIBRARIES(-lm)
-  ENDIF(UNIX)
-
-  # If using X with Tk, we need to link to X when we link
-  # to Tk in order to support static linking.
-  IF(CMAKE_HAS_X)
-    LINK_LIBRARIES(-lXt ${CMAKE_X_LIBS})
-  ENDIF(CMAKE_HAS_X)
-ENDIF(UNIX)
-
 SET(APPLICATION_BINARY_DIR "${ParaView_BINARY_DIR}")
 SET(VTK_TCL_TK_MACROS_MODULE 
     "${ParaView_SOURCE_DIR}/VTK/CMake/vtkTclTkMacros.cmake")

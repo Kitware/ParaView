@@ -55,7 +55,7 @@
 #endif
 
 
-vtkCxxRevisionMacro(vtkClientCompositeManager, "1.39.4.1");
+vtkCxxRevisionMacro(vtkClientCompositeManager, "1.39.4.2");
 vtkStandardNewMacro(vtkClientCompositeManager);
 
 vtkCxxSetObjectMacro(vtkClientCompositeManager,Compositer,vtkCompositer);
@@ -627,6 +627,8 @@ void vtkClientCompositeManager::SatelliteStartRender()
   controller->Receive((int*)(&intInfo), intInfoSize, 
                       otherId, vtkClientCompositeManager::WIN_INFO_TAG);
 
+  if (!renWin->GetOffScreenRendering())
+    {
   // In case the render window is smaller than requested.
   // This assumes that all server processes will have the
   // same (or larger) maximum render window size.
@@ -658,6 +660,7 @@ void vtkClientCompositeManager::SatelliteStartRender()
       { // Sanity check that all server 
         // procs have the same window limitation.
       vtkErrorMacro("Server window size mismatch.");
+        }
       }
     }
 
