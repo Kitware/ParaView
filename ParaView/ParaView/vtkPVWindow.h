@@ -455,6 +455,7 @@ public:
   // Go to interaction or back to regular rendering speed.
   virtual void SetInteraction(int s);
   vtkBooleanMacro(Interaction,int);
+  vtkGetMacro(Interaction,int);
 
 protected:
   vtkPVWindow();
@@ -620,6 +621,8 @@ protected:
   void ShowCenterActor();
 
   int CenterActorVisibility;
+
+  int Interaction;
 
 private:
   static const char* StandardReaderInterfaces;

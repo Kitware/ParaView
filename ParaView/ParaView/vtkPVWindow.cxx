@@ -115,7 +115,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.364");
+vtkCxxRevisionMacro(vtkPVWindow, "1.365");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -123,6 +123,7 @@ int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
 //----------------------------------------------------------------------------
 vtkPVWindow::vtkPVWindow()
 {
+  this->Interaction = 0;
   this->NamesToSources = 0;
   this->SetWindowClass("ParaView");
 
@@ -3719,7 +3720,7 @@ void vtkPVWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVWindow ";
-  this->ExtractRevision(os,"$Revision: 1.364 $");
+  this->ExtractRevision(os,"$Revision: 1.365 $");
 }
 
 //----------------------------------------------------------------------------
@@ -4067,6 +4068,7 @@ void vtkPVWindow::DeleteAllSources()
 //----------------------------------------------------------------------------
 void vtkPVWindow::SetInteraction(int s)
 {
+  this->Interaction = s;
   vtkPVGenericRenderWindowInteractor* rwi = this->GetGenericInteractor();
   vtkRenderWindow* rw = this->GetMainView()->GetRenderWindow();
   if ( !rwi || !rw )
