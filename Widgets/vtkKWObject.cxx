@@ -111,17 +111,17 @@ const char *vtkKWObject::GetTclName()
     }
 
   // otherwise we must register ourselves with tcl and get a name
-  if (!this->Application)
+  if (!this->GetApplication())
     {
     vtkWarningMacro("attempt to create Tcl instance before application was set!");
     return NULL;
     }
 
-  vtkTclGetObjectFromPointer(this->Application->GetMainInterp(), 
+  vtkTclGetObjectFromPointer(this->GetApplication()->GetMainInterp(), 
                              (void *)this, this->CommandFunction);
   this->TclName = 
-    new char [strlen(this->Application->GetMainInterp()->result)+1];
-  strcpy(this->TclName,this->Application->GetMainInterp()->result);
+    new char [strlen(this->GetApplication()->GetMainInterp()->result)+1];
+  strcpy(this->TclName,this->GetApplication()->GetMainInterp()->result);
   return this->TclName;
 }
 
@@ -134,9 +134,9 @@ void vtkKWObject::Script(char *format, ...)
   vsprintf(event, format, var_args);
   va_end(var_args);
 
-  if (this->Application)
+  if (this->GetApplication())
     {
-    this->Application->SimpleScript(event);
+    this->GetApplication()->SimpleScript(event);
     }
   else
     {
@@ -157,5 +157,24 @@ float vtkKWObject::GetFloatResult(vtkKWApplication *app)
   
   res = atof(Tcl_GetStringResult(app->GetMainInterp()));
   return res;
+}
+
+void vtkKWObject::SetApplication (vtkKWApplication* arg)
+{  
+  vtkDebugMacro(<< this->GetClassName() 
+  << " (" << this << "): setting " << "Application" " to " << arg ); 
+  if (this->Application != arg) 
+    { 
+    if (this->Application != NULL) 
+      { 
+      this->Application->UnRegister(this); 
+      }
+    this->Application = arg;
+    if (this->Application != NULL)
+      {
+      this->Application->Register(this);
+      }
+    this->Modified();
+    }
 }
 

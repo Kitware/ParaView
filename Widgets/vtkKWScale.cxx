@@ -119,7 +119,7 @@ void vtkKWScale::Create(vtkKWApplication *app, char *args)
   this->Script("frame %s",wname);
   this->ScaleWidget->Create(app,"scale","-orient horizontal -showvalue no");
   this->Script("%s configure %s",this->ScaleWidget->GetWidgetName(),args);
-  this->ScaleWidget->SetCommand("{%s ScaleValueChanged}",this->GetTclName());
+  this->ScaleWidget->SetCommand(this, "ScaleValueChanged");
   this->Script("pack %s -side bottom -fill x -expand yes",
                this->ScaleWidget->GetWidgetName());
 
@@ -201,53 +201,33 @@ void vtkKWScale::ScaleValueChanged(float num)
     }
 }
 
-void vtkKWScale::SetCommand(char *format, ...)
+
+void vtkKWScale::SetStartCommand(vtkKWObject* Object, const char * MethodAndArgString)
 {
-  static char event[16000];
-
-  va_list var_args;
-  va_start(var_args, format);
-  vsprintf(event, format, var_args);
-  va_end(var_args);
-
-  if (this->Command)
-    {
-    delete [] this->Command;
-    }
-  this->Command = new char [strlen(event)+1];
-  strcpy(this->Command,event);
-}
-
-void vtkKWScale::SetStartCommand(char *format, ...)
-{
-  static char event[16000];
-
-  va_list var_args;
-  va_start(var_args, format);
-  vsprintf(event, format, var_args);
-  va_end(var_args);
-
   if (this->StartCommand)
     {
     delete [] this->StartCommand;
     }
-  this->StartCommand = new char [strlen(event)+1];
-  strcpy(this->StartCommand,event);
+  this->StartCommand = this->CreateCommand(Object, MethodAndArgString);
 }
 
-void vtkKWScale::SetEndCommand(char *format, ...)
+void vtkKWScale::SetEndCommand(vtkKWObject* Object, const char * MethodAndArgString)
 {
-  static char event[16000];
-
-  va_list var_args;
-  va_start(var_args, format);
-  vsprintf(event, format, var_args);
-  va_end(var_args);
-
   if (this->EndCommand)
     {
     delete [] this->EndCommand;
     }
-  this->EndCommand = new char [strlen(event)+1];
-  strcpy(this->EndCommand,event);
+  this->EndCommand = this->CreateCommand(Object, MethodAndArgString);
+}
+
+
+void vtkKWScale::SetCommand(vtkKWObject* CalledObject, const char *CommandString)
+{
+  if (this->Command)
+    {
+    delete [] this->Command;
+    }
+  ostrstream command;
+  command << CalledObject->GetTclName() << " " << CommandString << ends;
+  this->Command = command.str();
 }

@@ -170,6 +170,14 @@ SOURCE=.\vtkKWLabeledFrameTcl.cxx
 # End Source File
 # Begin Source File
 
+SOURCE=.\vtkKWMenu.cxx
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkKWMenuTcl.cxx
+# End Source File
+# Begin Source File
+
 SOURCE=.\vtkKWMessageDialog.cxx
 # End Source File
 # Begin Source File
@@ -544,6 +552,26 @@ InputName=vtkKWLabeledFrame
 # Begin Custom Build
 InputPath=.\vtkKWLabeledFrame.h
 InputName=vtkKWLabeledFrame
+
+"$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx
+
+# End Custom Build
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkKWMenu.h
+
+!IF  "$(CFG)" == "Widgets - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "Widgets - Win32 Debug"
+
+# Begin Custom Build
+InputPath=.\vtkKWMenu.h
+InputName=vtkKWMenu
 
 "$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx

@@ -26,6 +26,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 =========================================================================*/
 #include "vtkKWView.h"
+#include "vtkKWApplication.h"
 
 int vtkKWCompositeCommand(ClientData cd, Tcl_Interp *interp,
 			  int argc, char *argv[]);

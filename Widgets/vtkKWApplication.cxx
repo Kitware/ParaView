@@ -34,7 +34,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkTclUtil.h"
 #include "vtkKWMessageDialog.h"
 #include "vtkObjectFactory.h"
-
+#include "vtkOutputWindow.h"
 
 
 //------------------------------------------------------------------------------
@@ -109,6 +109,11 @@ void vtkKWApplication::Script(char *format, ...)
 }
 void vtkKWApplication::SimpleScript(char *event)
 {
+#ifdef VTK_DEBUG_SCRIPT
+    vtkOutputWindow::GetInstance()->DisplayText(event);
+    vtkOutputWindow::GetInstance()->DisplayText("\n");
+#endif
+  
   if (Tcl_GlobalEval(this->MainInterp, event) != TCL_OK)
     {
     vtkGenericWarningMacro("Error returned from tcl script.\n" <<

@@ -39,7 +39,8 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #ifndef __vtkKWObject_h
 #define __vtkKWObject_h
 
-#include "vtkKWApplication.h"
+class vtkKWApplication;
+#include "vtkObject.h"
 #include "vtkKWSerializer.h"
 
 // var args
@@ -50,6 +51,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include <stdlib.h>
 #include <string.h>
 #include "tcl.h"
+
 
 class VTK_EXPORT vtkKWObject : public vtkObject
 {
@@ -66,7 +68,7 @@ public:
   // Description:
   // Get the application instance for this class.
   vtkGetObjectMacro(Application,vtkKWApplication);
-  vtkSetObjectMacro(Application,vtkKWApplication);
+  virtual void SetApplication (vtkKWApplication* arg);
 
   // Description:
   // Convienience methods to get results of Tcl commands.

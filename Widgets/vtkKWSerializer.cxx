@@ -28,7 +28,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkKWSerializer.h"
 #include <ctype.h>
 #include "vtkObjectFactory.h"
-
+#include "vtkKWApplication.h"
 
 
 //------------------------------------------------------------------------------

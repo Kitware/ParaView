@@ -70,12 +70,12 @@ public:
   // 1 if it was Canceled 2 if it was OK.
   int GetStatus() {return this->Done;};
 
-//BTX
   // Description:
-  // A convienience method to invoke some tcl script code and
-  // perform arguement substitution.
-  virtual void SetCommand(char *EventString, ...);
-//ETX
+  // A method to set callback functions on objects.  The first argument is
+  // the KWObject that will have the method called on it.  The second is the
+  // name of the method to be called and any arguments in string form.
+  // The calling is done via TCL wrappers for the KWObject.
+  virtual void SetCommand(vtkKWObject* CalledObject, const char *CommandString);
 
 protected:
   char *Command;

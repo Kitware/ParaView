@@ -29,6 +29,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkKWWindow.h"
 #include "vtkKWView.h"
 #include "vtkObjectFactory.h"
+#include "vtkKWMenu.h"
 
 
 
@@ -2235,13 +2236,13 @@ vtkKWWindow::vtkKWWindow()
   this->SelectedView = NULL;
   this->Views = vtkKWViewCollection::New();
 
-  this->Menu = vtkKWWidget::New();
+  this->Menu = vtkKWMenu::New();
   this->Menu->SetParent(this);
   
-  this->MenuFile = vtkKWWidget::New();
+  this->MenuFile = vtkKWMenu::New();
   this->MenuFile->SetParent(this->Menu);
 
-  this->MenuHelp = vtkKWWidget::New();
+  this->MenuHelp = vtkKWMenu::New();
   this->MenuHelp->SetParent(this->Menu);
 
   this->ViewFrame = vtkKWWidget::New();
@@ -2393,80 +2394,64 @@ void vtkKWWindow::SetStatusText(const char *text)
 }
 
 // some common menus we provide here
-vtkKWWidget *vtkKWWindow::GetMenuEdit()
+vtkKWMenu *vtkKWWindow::GetMenuEdit()
 {
   if (this->MenuEdit)
     {
     return this->MenuEdit;
     }
   
-  this->MenuEdit = vtkKWWidget::New();
+  this->MenuEdit = vtkKWMenu::New();
   this->MenuEdit->SetParent(this->GetMenu());
-  this->MenuEdit->Create(this->Application,"menu","-tearoff 0");
-  this->Script("%s insert 1 cascade -label {Edit} -menu %s -underline 0",
-               this->Menu->GetWidgetName(),this->MenuEdit->GetWidgetName());
-
+  this->MenuEdit->Create(this->Application,"-tearoff 0");
+  this->Menu->InsertCascade(1, "Edit", this->MenuEdit, 0);
   return this->MenuEdit;
 }
 
-vtkKWWidget *vtkKWWindow::GetMenuView()
+vtkKWMenu *vtkKWWindow::GetMenuView()
 {
   if (this->MenuView)
     {
     return this->MenuView;
     }
   
-  this->MenuView = vtkKWWidget::New();
+  this->MenuView = vtkKWMenu::New();
   this->MenuView->SetParent(this->GetMenu());
-  this->MenuView->Create(this->Application,"menu","-tearoff 0");
+  this->MenuView->Create(this->Application, "-tearoff 0");
   if (this->MenuEdit)
-    {
-    this->Script("%s insert 2 cascade -label {View} -menu %s -underline 0",
-                 this->Menu->GetWidgetName(),
-                 this->MenuView->GetWidgetName());
+    { 
+    this->Menu->InsertCascade(2, "View", this->MenuView, 0);
     }
   else
     {
-    this->Script("%s insert 1 cascade -label {View} -menu %s -underline 0",
-                 this->Menu->GetWidgetName(),
-                 this->MenuView->GetWidgetName());
+    this->Menu->InsertCascade(2, "View", this->MenuView, 0);
     }
   
   return this->MenuView;
 }
 
-vtkKWWidget *vtkKWWindow::GetMenuProperties()
+vtkKWMenu *vtkKWWindow::GetMenuProperties()
 {
   if (this->MenuProperties)
     {
     return this->MenuProperties;
     }
   
-  this->MenuProperties = vtkKWWidget::New();
+  this->MenuProperties = vtkKWMenu::New();
   this->MenuProperties->SetParent(this->GetMenu());
-  this->MenuProperties->Create(this->Application,"menu","-tearoff 0");
+  this->MenuProperties->Create(this->Application,"-tearoff 0");
   if (this->MenuView && this->MenuEdit)
     {
-    this->Script(
-      "%s insert 3 cascade -label {Properties} -menu %s -underline 0",
-      this->Menu->GetWidgetName(),
-      this->MenuProperties->GetWidgetName());
+    this->Menu->InsertCascade(3, "Properties", this->MenuProperties, 0);
     }
   else if (this->MenuView || this->MenuEdit)
     {
-    this->Script(
-      "%s insert 2 cascade -label {Properties} -menu %s -underline 0",
-      this->Menu->GetWidgetName(),
-      this->MenuProperties->GetWidgetName());
+    this->Menu->InsertCascade(2, "Properties", this->MenuProperties, 0);
     }
   else
-    {
-    this->Script(
-      "%s insert 1 cascade -label {Properties} -menu %s -underline 0",
-      this->Menu->GetWidgetName(),
-      this->MenuProperties->GetWidgetName());
+    { 
+    this->Menu->InsertCascade(1, "Properties", this->MenuProperties, 0);
     }
-  
   return this->MenuProperties;
 }
 
@@ -2515,31 +2500,27 @@ void vtkKWWindow::Create(vtkKWApplication *app, char *args)
   this->Script("pack %s -side right -fill both -expand yes",
                this->ViewFrame->GetWidgetName());
 
-  this->Menu->Create(app,"menu","-tearoff 0");
-  this->MenuFile->Create(app,"menu","-tearoff 0");
-  this->Script("%s add cascade -label \"File\" -menu %s -underline 0",
-               this->Menu->GetWidgetName(),this->MenuFile->GetWidgetName());
-  this->Script(
-    "%s add command -label \"Load Script\" -command {%s LoadScript}",
-    this->MenuFile->GetWidgetName(), this->GetTclName());
-  this->Script( "%s add separator",
-    this->MenuFile->GetWidgetName(), this->GetTclName());
-  this->Script("%s add command -label \"Close\" -command {%s Close}",
-    this->MenuFile->GetWidgetName(), this->GetTclName());
-  this->Script("%s add command -label \"Exit\" -command {%s Exit}",
-               this->MenuFile->GetWidgetName(), this->GetTclName());
+  // Set up standard menus
+  this->Menu->Create(app,"-tearoff 0");
+  this->MenuFile->Create(app,"-tearoff 0");
+  this->Menu->AddCascade("File", this->MenuFile, 0);
+  this->MenuFile->AddCommand("Load Script", this, "LoadScript");
+  this->MenuFile->AddSeparator();
+  this->MenuFile->AddCommand("Close", this, "Close");
+  this->MenuFile->AddCommand("Exit", this, "Exit");
+  this->MenuHelp->Create(app,"-tearoff 0");
+  this->Menu->AddCascade("Help", this->MenuHelp, 0);
+  this->MenuHelp->AddCommand("OnLine Help", this, "DisplayHelp");
+  this->MenuHelp->AddCommand("About", this, "DisplayAbout");
+  // install the menu bar into this window
+  this->InstallMenu(this->Menu);
+}
+
+void vtkKWWindow::InstallMenu(vtkKWMenu* menu)
+{ 
+  this->Script("%s configure -menu %s", this->GetWidgetName(),
+	       this->Menu->GetWidgetName());
   
-  this->Script("%s configure -menu %s",wname,this->Menu->GetWidgetName());
-  
-  this->MenuHelp->Create(app,"menu","-tearoff 0");
-  this->Script("%s add cascade -label \"Help\" -menu %s -underline 0",
-               this->Menu->GetWidgetName(),this->MenuHelp->GetWidgetName());
-  this->Script(
-    "%s add command -label \"OnLine Help\" -command {%s DisplayHelp}",
-    this->MenuHelp->GetWidgetName(), this->GetTclName());
-  this->Script(
-    "%s add command -label \"About\" -command {%s DisplayAbout}",
-    this->MenuHelp->GetWidgetName(), this->GetTclName());
 }
 
 void vtkKWWindow::UnRegister(vtkObject *o)

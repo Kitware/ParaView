@@ -35,20 +35,27 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #ifndef __vtkKWApplication_h
 #define __vtkKWApplication_h
 
-#include "vtkObject.h"
+#include "vtkKWObject.h"
 #include "tcl.h"
 #include "tk.h"
 class vtkKWWindowCollection;
 class vtkKWWindow;
 class vtkKWWidget;
 
-class VTK_EXPORT vtkKWApplication : public vtkObject
+class VTK_EXPORT vtkKWApplication : public vtkKWObject
 {
 public:
   vtkKWApplication();
   ~vtkKWApplication();
   static vtkKWApplication* New();
   const char *GetClassName() {return "vtkKWApplication";};
+  
+  virtual vtkKWApplication *GetApplication()  { return this;  }
+  virtual void SetApplication (vtkKWApplication* arg) 
+    { 
+      vtkErrorMacro( << "Do not set the Application on an Application" << endl ); 
+    }
+  
   
   // Description:
   // Start running the main application.

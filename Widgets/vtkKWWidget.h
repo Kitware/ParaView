@@ -76,14 +76,15 @@ public:
   // Get the net reference count of this widget. That is the
   // reference count of this widget minus its children.
   virtual int  GetNetReferenceCount();
-  
-//BTX
   // Description:
-  // A convienience method to invoke some tcl script code and
-  // perform arguement substitution.
-  virtual void SetCommand(char *EventString, ...);
-//ETX
-  
+  // A method to set callback functions on objects.  The first argument is
+  // the KWObject that will have the method called on it.  The second is the
+  // name of the method to be called and any arguments in string form.
+  // The calling is done via TCL wrappers for the KWObject.
+  virtual void SetCommand( vtkKWObject* Object, const char* MethodAndArgString);
+  // Description: a method to create a callback string from a KWObject.
+  // The caller is resposible for deleting the returned string.  
+  char* CreateCommand(vtkKWObject* Object, const char* MethodAndArgString);
 protected:
   char *WidgetName;
   vtkKWWidget *Parent;

@@ -77,7 +77,7 @@ void vtkKWMessageDialog::Create(vtkKWApplication *app, char *args)
   this->Message->Create(app,"label","");
   this->ButtonFrame->Create(app,"frame","");
   this->OKButton->Create(app,"button","-text OK -width 16");
-  this->OKButton->SetCommand("{%s OK}",this->GetTclName());
+  this->OKButton->SetCommand(this, "OK");
   this->Script("pack %s -side left -padx 4 -expand yes",
                this->OKButton->GetWidgetName());
   this->Script("pack %s -side bottom -fill x -pady 4",

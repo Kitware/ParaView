@@ -34,7 +34,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #ifndef __vtkKWSerializer_h
 #define __vtkKWSerializer_h
 
-#include "vtkKWApplication.h"
+#include "vtkKWObject.h"
 
 // var args
 #ifndef _WIN32

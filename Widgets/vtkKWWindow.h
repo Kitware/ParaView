@@ -36,6 +36,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkKWWidget.h"
 class vtkKWApplication;
 #include "vtkKWViewCollection.h"
+#include "vtkKWMenu.h"
 
 class VTK_EXPORT vtkKWWindow : public vtkKWWidget
 {
@@ -80,11 +81,11 @@ public:
   // Allow windows to get at the different menu entries. In some
   // cases the menu entry may be created if it doesn't already
   // exist.
-  vtkGetObjectMacro(Menu,vtkKWWidget);
-  vtkGetObjectMacro(MenuFile,vtkKWWidget);
-  vtkKWWidget *GetMenuEdit();
-  vtkKWWidget *GetMenuView();
-  vtkKWWidget *GetMenuProperties();
+  vtkGetObjectMacro(Menu,vtkKWMenu);
+  vtkGetObjectMacro(MenuFile,vtkKWMenu);
+  vtkKWMenu *GetMenuEdit();
+  vtkKWMenu *GetMenuView();
+  vtkKWMenu *GetMenuProperties();
   
   // Description:
   // Operations on the views.
@@ -120,18 +121,22 @@ public:
   // in the file menu. This is useful because most menu options
   // go above the MRU list, hence above this index.
   int GetFileMenuIndex();
-
+  
+  // Description:
+  // Install a menu bar into this window.
+  void InstallMenu(vtkKWMenu* menu);
+  
 protected:
   void CreateStatusImage();
   int NumberOfMRUFiles;
   vtkKWView *SelectedView;
   vtkKWViewCollection *Views;
-  vtkKWWidget *Menu;
-  vtkKWWidget *MenuFile;
-  vtkKWWidget *MenuProperties;
-  vtkKWWidget *MenuEdit;
-  vtkKWWidget *MenuView;
-  vtkKWWidget *MenuHelp;
+  vtkKWMenu *Menu;
+  vtkKWMenu *MenuFile;
+  vtkKWMenu *MenuProperties;
+  vtkKWMenu *MenuEdit;
+  vtkKWMenu *MenuView;
+  vtkKWMenu *MenuHelp;
   vtkKWWidget *StatusFrame;
   vtkKWWidget *StatusImage;
   vtkKWWidget *StatusLabel;
