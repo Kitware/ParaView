@@ -219,7 +219,7 @@ void vtkPVSendPolyData(void* arg, void*, int, int)
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVClientServerModule);
-vtkCxxRevisionMacro(vtkPVClientServerModule, "1.46");
+vtkCxxRevisionMacro(vtkPVClientServerModule, "1.47");
 
 int vtkPVClientServerModuleCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -905,9 +905,18 @@ void vtkPVClientServerModule::GatherInformation(vtkPVInformation* info,
   // Just a simple way of passing the information object to the next method.
   this->TemporaryInformation = info;
   // Some objects are not created on the client (data.
-  this->ServerScript(
-    "[$Application GetProcessModule] GatherInformationInternal %s %s",
-    info->GetClassName(), objectTclName);
+  if (!info->GetRootOnly())
+    {
+    this->ServerScript(
+      "[$Application GetProcessModule] GatherInformationInternal %s %s",
+      info->GetClassName(), objectTclName);
+    }
+  else
+    {
+    this->RootScript(
+      "[$Application GetProcessModule] GatherInformationInternal %s %s",
+      info->GetClassName(), objectTclName);
+    }
   this->GatherInformationInternal(NULL, NULL);
   this->TemporaryInformation = NULL; 
 }
@@ -950,7 +959,7 @@ void vtkPVClientServerModule::GatherInformationInternal(char* infoClassName,
   tmp1 = vtkPVInformation::SafeDownCast(o);
   o = NULL;
 
-  if (myId != 0)
+  if (myId != 0 && !tmp1->GetRootOnly())
     {
     tmp1->CopyFromObject(object);
     length = tmp1->GetMessageLength();
@@ -966,26 +975,28 @@ void vtkPVClientServerModule::GatherInformationInternal(char* infoClassName,
     }
 
   // Node 0.
-  o = vtkInstantiator::CreateInstance(infoClassName);
-  vtkPVInformation* tmp2;
-  tmp2 = vtkPVInformation::SafeDownCast(o);
-  o = NULL;
-
-  int numProcs = this->Controller->GetNumberOfProcesses();
-  int idx;
   tmp1->CopyFromObject(object);
-  for (idx = 1; idx < numProcs; ++idx)
+  if (!tmp1->GetRootOnly())
     {
-    this->Controller->Receive(&length, 1, idx, 498798);
-    msg = new unsigned char[length];
-    this->Controller->Receive(msg, length, idx, 498799);
-    tmp2->CopyFromMessage(msg);
-    tmp1->AddInformation(tmp2);
-    delete [] msg;
-    msg = NULL;
+    o = vtkInstantiator::CreateInstance(infoClassName);
+    vtkPVInformation* tmp2 = vtkPVInformation::SafeDownCast(o);
+    o = NULL;
+    
+    int numProcs = this->Controller->GetNumberOfProcesses();
+    int idx;
+    for (idx = 1; idx < numProcs; ++idx)
+      {
+      this->Controller->Receive(&length, 1, idx, 498798);
+      msg = new unsigned char[length];
+      this->Controller->Receive(msg, length, idx, 498799);
+      tmp2->CopyFromMessage(msg);
+      tmp1->AddInformation(tmp2);
+      delete [] msg;
+      msg = NULL;
+      }
+    tmp2->Delete();
+    tmp2 = NULL;
     }
-  tmp2->Delete();
-  tmp2 = NULL;
 
   // Send final information to client over socket connection.
   length = tmp1->GetMessageLength();
