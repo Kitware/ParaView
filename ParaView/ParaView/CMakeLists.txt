@@ -62,6 +62,7 @@ vtkPVPointWidget.cxx
 vtkPVProbe.cxx
 vtkPVPushButton.cxx
 vtkPVReaderModule.cxx
+vtkPVRenderGroupDialog.cxx
 vtkPVRenderView.cxx 
 vtkPVScalarRangeLabel.cxx 
 vtkPVScale.cxx 
