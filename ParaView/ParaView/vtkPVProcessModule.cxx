@@ -41,6 +41,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "vtkPVProcessModule.h"
 
+#include "vtkCallbackCommand.h"
 #include "vtkCharArray.h"
 #include "vtkDataSet.h"
 #include "vtkDoubleArray.h"
@@ -86,7 +87,7 @@ struct vtkPVArgs
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProcessModule);
-vtkCxxRevisionMacro(vtkPVProcessModule, "1.24.2.23");
+vtkCxxRevisionMacro(vtkPVProcessModule, "1.24.2.24");
 
 int vtkPVProcessModuleCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -101,6 +102,7 @@ vtkPVProcessModule::vtkPVProcessModule()
   this->RootResult = NULL;
   this->ClientServerStream = 0;
   this->Interpreter = 0;
+  this->InterpreterObserver = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -634,6 +636,13 @@ void vtkPVProcessModule::InitializeInterpreter()
   this->Interpreter = vtkClientServerInterpreter::New();
   this->ClientServerStream = new vtkClientServerStream;
 
+  // Setup a callback for the interpreter to report errors.
+  this->InterpreterObserver = vtkCallbackCommand::New();
+  this->InterpreterObserver->SetCallback(&vtkPVProcessModule::InterpreterCallbackFunction);
+  this->InterpreterObserver->SetClientData(this);
+  this->Interpreter->AddObserver(vtkCommand::ErrorEvent,
+                                 this->InterpreterObserver);
+
   // Initialize built-in wrapper modules.
   vtkCommonCS_Initialize(this->Interpreter);
   vtkFilteringCS_Initialize(this->Interpreter);
@@ -683,9 +692,41 @@ void vtkPVProcessModule::FinalizeInterpreter()
   this->Interpreter->ProcessStream(css);
 
   // Free the interpreter and supporting stream.
+  this->Interpreter->RemoveObserver(this->InterpreterObserver);
+  this->InterpreterObserver->Delete();
   delete this->ClientServerStream;
   this->Interpreter->Delete();
   this->Interpreter = 0;
+}
+
+//----------------------------------------------------------------------------
+void vtkPVProcessModule::InterpreterCallbackFunction(vtkObject*,
+                                                     unsigned long eid,
+                                                     void* cd, void* d)
+{
+  reinterpret_cast<vtkPVProcessModule*>(cd)->InterpreterCallback(eid, d);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVProcessModule::InterpreterCallback(unsigned long, void* pinfo)
+{
+  const char* errorMessage;
+  vtkClientServerInterpreterErrorCallbackInfo* info
+    = static_cast<vtkClientServerInterpreterErrorCallbackInfo*>(pinfo);
+  const vtkClientServerStream& last = this->Interpreter->GetLastResult();
+  if(last.GetNumberOfMessages() > 0 &&
+     (last.GetCommand(0) == vtkClientServerStream::Error) &&
+     last.GetArgument(0, 0, &errorMessage))
+    {
+    ostrstream error;
+    error << "\nwhile processing\n";
+    info->css->PrintMessage(error, info->message);
+    error << ends;
+    vtkErrorMacro(<< errorMessage << error.str());
+    error.rdbuf()->freeze(0);
+    vtkErrorMacro("Aborting execution for debugging purposes.");
+    abort();
+    }
 }
 
 //----------------------------------------------------------------------------

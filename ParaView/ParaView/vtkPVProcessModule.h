@@ -61,6 +61,7 @@ class vtkPVPart;
 class vtkPVPartDisplay;
 class vtkSource;
 class vtkStringList;
+class vtkCallbackCommand;
 class vtkClientServerInterpreter;
 class vtkClientServerStream;
 
@@ -246,6 +247,10 @@ protected:
 
   virtual void InitializeInterpreter();
   virtual void FinalizeInterpreter();
+  static void InterpreterCallbackFunction(vtkObject* caller,
+                                          unsigned long eid,
+                                          void* cd, void* d);
+  virtual void InterpreterCallback(unsigned long eid, void*);
 
   vtkMultiProcessController *Controller;
   vtkPVInformation *TemporaryInformation;
@@ -255,6 +260,7 @@ protected:
   vtkClientServerInterpreter* Interpreter;
   vtkClientServerStream* ClientServerStream;
   vtkClientServerID UniqueID;
+  vtkCallbackCommand* InterpreterObserver;
 private:
   vtkPVProcessModule(const vtkPVProcessModule&); // Not implemented
   void operator=(const vtkPVProcessModule&); // Not implemented
