@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   Visualization Toolkit
-  Module:    vtkPVImageCacheFilter.h
+  Module:    vtkStructuredCacheFilter.h
   Language:  C++
   Date:      $Date$
   Version:   $Revision$
@@ -15,9 +15,9 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPVImageCacheFilter - Reuses output. Can get remote data.
+// .NAME vtkStructuredCacheFilter - Reuses output. Can get remote data.
 // .SECTION Description
-// vtkPVImageCacheFilter serves two purposes.
+// vtkStructuredCacheFilter serves two purposes.
 // First, it will resuse the output if possible.  This keeps the entire
 // dataset from being loaded when the user requests another
 // ghost level.
@@ -27,10 +27,10 @@
 
 
 
-#ifndef __vtkPVImageCacheFilter_h
-#define __vtkPVImageCacheFilter_h
+#ifndef __vtkStructuredCacheFilter_h
+#define __vtkStructuredCacheFilter_h
 
-#include "vtkImageToImageFilter.h"
+#include "vtkDataSetToDataSetFilter.h"
 class vtkMultiProcessController;
 class vtkExtentSplitter;
 class vtkDataSet;
@@ -38,11 +38,11 @@ class vtkDataSetAttributes;
 class vtkDataArray;
 
 
-class VTK_EXPORT vtkPVImageCacheFilter : public vtkImageToImageFilter
+class VTK_EXPORT vtkStructuredCacheFilter : public vtkDataSetToDataSetFilter
 {
 public:
-  static vtkPVImageCacheFilter *New();
-  vtkTypeRevisionMacro(vtkPVImageCacheFilter,vtkImageToImageFilter);
+  static vtkStructuredCacheFilter *New();
+  vtkTypeRevisionMacro(vtkStructuredCacheFilter,vtkDataSetToDataSetFilter);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // We need to use update, because we may be requesting multiple
@@ -50,19 +50,21 @@ public:
   void UpdateData(vtkDataObject *outObject);
   
 protected:
-  vtkPVImageCacheFilter();
-  ~vtkPVImageCacheFilter();
+  vtkStructuredCacheFilter();
+  ~vtkStructuredCacheFilter();
 
-  void AllocateOutput(vtkImageData *out, vtkImageData *in);
   void BuildExtentMap(vtkDataSet *in, vtkDataSet *out);
-  void CopyImageExtent(vtkImageData *in, vtkImageData *out, int *ext);
+  void CopyExtent(vtkDataSet *in, vtkDataSet *out, int *ext);
   void CopyDataAttributes(int* copyExt,
                           vtkDataSetAttributes* in, int* inExt,
                           vtkDataSetAttributes* out, int* outExt);
   void CopyArray(int* copyExt, vtkDataArray* in, int* inExt,
                                vtkDataArray* out, int* outExt);
-                                      
-  vtkImageData *Cache;
+
+  void AllocateOutput(vtkDataSet *out, vtkDataSet *in);
+  void GetExtent(vtkDataSet* ds, int ext[6]);
+
+  vtkDataSet *Cache;
   vtkTimeStamp CacheUpdateTime;
   int OutputAllocated;
 
@@ -71,8 +73,8 @@ protected:
   vtkExtentSplitter *ExtentMap;
 
 private:
-  vtkPVImageCacheFilter(const vtkPVImageCacheFilter&);  // Not implemented.
-  void operator=(const vtkPVImageCacheFilter&);  // Not implemented.
+  vtkStructuredCacheFilter(const vtkStructuredCacheFilter&);  // Not implemented.
+  void operator=(const vtkStructuredCacheFilter&);  // Not implemented.
 };
 
 

@@ -66,7 +66,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPart);
-vtkCxxRevisionMacro(vtkPVPart, "1.25.2.4");
+vtkCxxRevisionMacro(vtkPVPart, "1.25.2.5");
 
 
 int vtkPVPartCommand(ClientData cd, Tcl_Interp *interp,
@@ -354,7 +354,23 @@ void vtkPVPart::InsertExtractPiecesIfNecessary()
     {
     if (getenv("PV_LOCK_SAFE") == NULL)
       {
-      pm->ServerSimpleScript("vtkPVImageCacheFilter pvTemp");
+      pm->ServerSimpleScript("vtkStructuredCacheFilter pvTemp");
+      }
+    }
+  else if((pm->RootScript("%s IsA vtkStructuredGrid", this->VTKDataTclName),
+           atoi(pm->GetRootResult())))
+    {
+    if (getenv("PV_LOCK_SAFE") == NULL)
+      {
+      pm->ServerSimpleScript("vtkStructuredCacheFilter pvTemp");
+      }
+    }
+  else if((pm->RootScript("%s IsA vtkRectilinearGrid", this->VTKDataTclName),
+           atoi(pm->GetRootResult())))
+    {
+    if (getenv("PV_LOCK_SAFE") == NULL)
+      {
+      pm->ServerSimpleScript("vtkStructuredCacheFilter pvTemp");
       }
     }
   else
