@@ -27,7 +27,7 @@
 
 
 
-vtkCxxRevisionMacro(vtkCTHOutlineFilter, "1.4");
+vtkCxxRevisionMacro(vtkCTHOutlineFilter, "1.5");
 vtkStandardNewMacro(vtkCTHOutlineFilter);
 
 //----------------------------------------------------------------------------
@@ -46,6 +46,8 @@ void vtkCTHOutlineFilter::Execute()
   int blockId, numBlocks;
   vtkCTHData* input = this->GetInput();
   vtkOutlineSource* outlineSource;
+  outlineSource = vtkOutlineSource::New();
+  vtkPolyData* tmp = vtkPolyData::New();
   vtkAppendPolyData *append = vtkAppendPolyData::New();  
   double bounds[6];
   double *origin;
@@ -57,12 +59,14 @@ void vtkCTHOutlineFilter::Execute()
   dimensions = input->GetBlockPointDimensions(0);
   ghostLevels = input->GetNumberOfGhostLevels();
 
+  append->AddInput(outlineSource->GetOutput());
+  append->AddInput(tmp);
+
   numBlocks = input->GetNumberOfBlocks();
   for (blockId = 0; blockId < numBlocks; ++blockId)
     {
     origin = input->GetBlockOrigin(blockId);
     spacing = input->GetBlockSpacing(blockId);
-    outlineSource = vtkOutlineSource::New();
     bounds[0] = origin[0] + spacing[0]*ghostLevels;
     bounds[2] = origin[1] + spacing[1]*ghostLevels;
     bounds[4] = origin[2] + spacing[2]*ghostLevels;
@@ -72,16 +76,17 @@ void vtkCTHOutlineFilter::Execute()
     bounds[5] = origin[2] + spacing[2]*(dimensions[2]-1-ghostLevels);
   
     outlineSource->SetBounds(bounds);
-    outlineSource->Update();
+    append->Update();
 
-    append->AddInput(outlineSource->GetOutput());
-    outlineSource->Delete();
-    outlineSource = NULL;
+    // Copy output to input to append next block.
+    tmp->ShallowCopy(append->GetOutput());
     }
   
-  append->Update();
   this->GetOutput()->ShallowCopy(append->GetOutput());
+
   append->Delete();
+  outlineSource->Delete();
+  tmp->Delete();
 }
 
 

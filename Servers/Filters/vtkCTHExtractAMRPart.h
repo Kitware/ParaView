@@ -29,7 +29,12 @@ class vtkCTHData;
 class vtkPlane;
 class vtkStringList;
 class vtkAppendPolyData;
+class vtkContourFilter;
+class vtkDataSetSurfaceFilter;
+class vtkClipPolyData;
+class vtkCutter;
 class vtkImageData;
+class vtkPolyData;
 class vtkFloatArray;
 class vtkDataArray;
 class vtkIdList;
@@ -70,12 +75,12 @@ protected:
   ~vtkCTHExtractAMRPart();
 
   virtual void Execute();
-  void ExecuteBlock(vtkImageData* block, vtkAppendPolyData** appends);
+
+  void ExecuteBlock(vtkImageData* block, vtkPolyData** appendCaches);
   void ExecutePart(const char* arrayName, vtkImageData* block, 
-                   vtkAppendPolyData* append);
+                   vtkPolyData* appendCache);
   void ExecuteCellDataToPointData(vtkDataArray *cellVolumeFraction, 
                                   vtkFloatArray *pointVolumeFraction, int *dims);
-
 
   void ExecuteCellDataToPointData2(vtkDataArray *cellVolumeFraction, 
                             vtkFloatArray *pointVolumeFraction, vtkCTHData* data);
@@ -87,6 +92,22 @@ protected:
   vtkPlane* ClipPlane;
   vtkStringList *VolumeArrayNames;
   vtkIdList* IdList;
+
+  void CreateInternalPipeline();
+  void DeleteInternalPipeline();
+
+  // Pipeline to extract a part from a block.
+  vtkImageData* Image;
+  vtkPolyData* PolyData;
+  vtkContourFilter* Contour;
+  vtkAppendPolyData* Append1;
+  vtkAppendPolyData* Append2;
+  vtkDataSetSurfaceFilter* Surface;
+  vtkClipPolyData* Clip0;
+  vtkClipPolyData* Clip1;
+  vtkClipPolyData* Clip2;
+  vtkCutter* Cut;
+  vtkAppendPolyData* FinalAppend;
 
 private:
   void InternalImageDataCopy(vtkCTHExtractAMRPart *src);
