@@ -124,7 +124,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.532");
+vtkCxxRevisionMacro(vtkPVWindow, "1.533");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -2657,7 +2657,7 @@ void vtkPVWindow::SaveGeometryInBatchFile(ofstream *file,
   const char* sourceName;
   int numParts, partIdx;
   vtkPVPart* part;
-  vtkPVPartDisplay* partDisplay;
+  vtkPVPartDisplay* partDisplay = NULL;
   char *fileName;
   vtkPVSourceCollection *sources;
   char* fileExt = NULL;

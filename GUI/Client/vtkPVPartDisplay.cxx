@@ -47,7 +47,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPartDisplay);
-vtkCxxRevisionMacro(vtkPVPartDisplay, "1.25");
+vtkCxxRevisionMacro(vtkPVPartDisplay, "1.26");
 
 
 //----------------------------------------------------------------------------
@@ -72,11 +72,11 @@ vtkPVPartDisplay::vtkPVPartDisplay()
   this->GeometryIsValid = 0;
   this->GeometryID.ID = 0;
 
-  this->VolumeID.ID         = NULL;
-  this->VolumeMapperID.ID   = NULL;
-  this->VolumePropertyID.ID = NULL;
-  this->VolumeColorID.ID    = NULL;
-  this->VolumeOpacityID.ID  = NULL; 
+  this->VolumeID.ID         = 0;
+  this->VolumeMapperID.ID   = 0;
+  this->VolumePropertyID.ID = 0;
+  this->VolumeColorID.ID    = 0;
+  this->VolumeOpacityID.ID  = 0; 
   this->Volume              = NULL;
   
   // Create a unique id for creating tcl names.
