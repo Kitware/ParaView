@@ -102,10 +102,6 @@ public:
   void ShowCurrentSourceProperties();
   
   // Description:
-  // Callback to show the page for the current actor
-  void ShowCurrentActorProperties();
-  
-  // Description:
   // Need to be able to get the toolbar so I can add buttons from outside
   // this class.
   vtkGetObjectMacro(Toolbar, vtkKWToolbar);
@@ -151,8 +147,6 @@ protected:
   vtkKWToolbar *Toolbar;
   vtkKWPushButton *ResetCameraButton;
   vtkKWPushButton *CameraStyleButton;
-  vtkKWPushButton *CurrentSourceButton;
-  vtkKWPushButton *CurrentActorButton;
 
   vtkKWPushButton *CalculatorButton;
   vtkKWPushButton *ThresholdButton;

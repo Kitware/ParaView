@@ -104,7 +104,7 @@ vtkPVSource *vtkPVSourceInterface::CreateCallback()
     }
   
   pvs = vtkPVSource::New();
-  pvs->SetPropertiesParent(this->PVWindow->GetMainView()->GetSourceParent());
+  pvs->SetPropertiesParent(this->PVWindow->GetMainView()->GetPropertiesParent());
   pvs->SetApplication(pvApp);
   pvs->SetInterface(this);
   pvs->SetVTKSource(s, tclName);
@@ -122,7 +122,6 @@ vtkPVSource *vtkPVSourceInterface::CreateCallback()
   pvs->CreateProperties();
   pvs->CreateInputList(this->InputClassName);
   this->PVWindow->SetCurrentPVSource(pvs);
-  this->PVWindow->GetMainView()->ShowSourceParent();
 
   // Create the output.
   pvd = vtkPVData::New();

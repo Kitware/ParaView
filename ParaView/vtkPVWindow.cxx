@@ -79,8 +79,6 @@ vtkPVWindow::vtkPVWindow()
   this->Toolbar = vtkKWToolbar::New();
   this->ResetCameraButton = vtkKWPushButton::New();
   this->CameraStyleButton = vtkKWPushButton::New();
-  this->CurrentSourceButton = vtkKWPushButton::New();
-  this->CurrentActorButton = vtkKWPushButton::New();
 
   this->CalculatorButton = vtkKWPushButton::New();
   this->ThresholdButton = vtkKWPushButton::New();
@@ -106,10 +104,6 @@ vtkPVWindow::~vtkPVWindow()
   this->ResetCameraButton = NULL;
   this->CameraStyleButton->Delete();
   this->CameraStyleButton = NULL;
-  this->CurrentSourceButton->Delete();
-  this->CurrentSourceButton = NULL;
-  this->CurrentActorButton->Delete();
-  this->CurrentActorButton = NULL;
   
   this->CalculatorButton->Delete();
   this->CalculatorButton = NULL;
@@ -168,9 +162,6 @@ void vtkPVWindow::Create(vtkKWApplication *app, char *args)
   this->GetMenuProperties()->AddRadioButton(2, "Source",
                                             rbv, this,
                                             "ShowCurrentSourceProperties");
-  this->GetMenuProperties()->AddRadioButton(3, "Actor", rbv, this,
-                                            "ShowCurrentActorProperties");
-  
   delete [] rbv;
 
   // create the top level
@@ -214,14 +205,6 @@ void vtkPVWindow::Create(vtkKWApplication *app, char *args)
   this->ResetCameraButton->Create(app, "-text ResetCamera");
   this->ResetCameraButton->SetCommand(this, "ResetCameraCallback");
   
-  this->CurrentSourceButton->SetParent(this->Toolbar);
-  this->CurrentSourceButton->Create(app, "-text Source");
-  this->CurrentSourceButton->SetCommand(this, "ShowCurrentSourceProperties");
-
-  this->CurrentActorButton->SetParent(this->Toolbar);
-  this->CurrentActorButton->Create(app, "-text Actor");
-  this->CurrentActorButton->SetCommand(this, "ShowCurrentActorProperties");
-  
   this->CalculatorButton->SetParent(this->Toolbar);
   this->CalculatorButton->Create(app, "-text Calculator");
   this->CalculatorButton->SetCommand(this, "CalculatorCallback");
@@ -238,10 +221,8 @@ void vtkPVWindow::Create(vtkKWApplication *app, char *args)
   this->GlyphButton->Create(app, "-text Glyph");
   this->GlyphButton->SetCommand(this, "GlyphCallback");
 
-    this->Script("pack %s %s %s %s %s %s %s -side left -pady 0 -fill none -expand no",
+  this->Script("pack %s %s %s %s %s -side left -pady 0 -fill none -expand no",
                this->ResetCameraButton->GetWidgetName(),
-               this->CurrentSourceButton->GetWidgetName(),
-               this->CurrentActorButton->GetWidgetName(),
                this->CalculatorButton->GetWidgetName(),
                this->ThresholdButton->GetWidgetName(),
                this->ContourButton->GetWidgetName(),
@@ -529,7 +510,7 @@ void vtkPVWindow::CalculatorCallback()
     }
   
   calc = vtkPVArrayCalculator::New();
-  calc->SetPropertiesParent(this->GetMainView()->GetSourceParent());
+  calc->SetPropertiesParent(this->GetMainView()->GetPropertiesParent());
   calc->SetApplication(pvApp);
   calc->SetVTKSource(s, tclName);
   calc->SetNthPVInput(0, this->GetCurrentPVData());
@@ -539,7 +520,6 @@ void vtkPVWindow::CalculatorCallback()
   calc->CreateProperties();
   calc->CreateInputList("vtkDataSet");
   this->SetCurrentPVSource(calc);
-  this->GetMainView()->ShowSourceParent();
 
   // Create the output.
   pvd = vtkPVData::New();
@@ -593,7 +573,7 @@ void vtkPVWindow::ThresholdCallback()
     }
   
   threshold = vtkPVThreshold::New();
-  threshold->SetPropertiesParent(this->GetMainView()->GetSourceParent());
+  threshold->SetPropertiesParent(this->GetMainView()->GetPropertiesParent());
   threshold->SetApplication(pvApp);
   threshold->SetVTKSource(s, tclName);
   threshold->SetNthPVInput(0, this->GetCurrentPVData());
@@ -603,7 +583,6 @@ void vtkPVWindow::ThresholdCallback()
   threshold->CreateProperties();
   threshold->CreateInputList("vtkDataSet");
   this->SetCurrentPVSource(threshold);
-  this->GetMainView()->ShowSourceParent();
 
   // Create the output.
   pvd = vtkPVData::New();
@@ -657,7 +636,7 @@ void vtkPVWindow::ContourCallback()
     }
   
   contour = vtkPVContour::New();
-  contour->SetPropertiesParent(this->GetMainView()->GetSourceParent());
+  contour->SetPropertiesParent(this->GetMainView()->GetPropertiesParent());
   contour->SetApplication(pvApp);
   contour->SetVTKSource(s, tclName);
   contour->SetNthPVInput(0, this->GetCurrentPVData());
@@ -667,7 +646,6 @@ void vtkPVWindow::ContourCallback()
   contour->CreateProperties();
   contour->CreateInputList("vtkDataSet");
   this->SetCurrentPVSource(contour);
-  this->GetMainView()->ShowSourceParent();
 
   // Create the output.
   pvd = vtkPVData::New();
@@ -721,7 +699,7 @@ void vtkPVWindow::GlyphCallback()
     }
   
   glyph = vtkPVGlyph3D::New();
-  glyph->SetPropertiesParent(this->GetMainView()->GetSourceParent());
+  glyph->SetPropertiesParent(this->GetMainView()->GetPropertiesParent());
   glyph->SetApplication(pvApp);
   glyph->SetVTKSource(s, tclName);
   glyph->SetNthPVInput(0, this->GetCurrentPVData());
@@ -731,7 +709,6 @@ void vtkPVWindow::GlyphCallback()
   glyph->CreateProperties();
   glyph->CreateInputList("vtkDataSet");
   this->SetCurrentPVSource(glyph);
-  this->GetMainView()->ShowSourceParent();
 
   // Create the output.
   pvd = vtkPVData::New();
@@ -780,17 +757,13 @@ void vtkPVWindow::ShowCurrentSourceProperties()
     {
     ((vtkPVGlyph3D*)this->GetCurrentPVSource())->UpdateSourceMenu();
     }
-  this->MainView->ShowSourceParent();
-}
-
-//----------------------------------------------------------------------------
-void vtkPVWindow::ShowCurrentActorProperties()
-{
-  // We need to update the properties-menu radio button too!
-  this->GetMenuProperties()->CheckRadioButton(
-    this->GetMenuProperties(), "Radio", 3);
-  
-  this->MainView->ShowActorParent();
+  this->Script("catch {eval pack forget [pack slaves %s]}",
+               this->MainView->GetPropertiesParent()->GetWidgetName());
+  this->Script("pack %s -side top -fill x",
+               this->MainView->GetNavigationFrame()->GetWidgetName());
+  this->Script("pack %s -side top -fill x",
+               this->GetCurrentPVSource()->GetNotebook()->GetWidgetName());
+  this->GetCurrentPVSource()->GetNotebook()->Raise("Source");
 }
 
 //----------------------------------------------------------------------------
@@ -808,9 +781,6 @@ void vtkPVWindow::ReadSourceInterfaces()
   vtkPVApplication *pvApp = this->GetPVApplication();
   vtkPVMethodInterface *mInt;
   vtkPVSourceInterface *sInt;
-
-  
-  
   
   // ============= Image Sources ==============  
 

@@ -130,22 +130,16 @@ public:
   void OffScreenRenderingOn();
 
   // Description:
-  // Different property parents a composite can choose between.
-  vtkKWWidget *GetSourceParent();
-  vtkKWWidget *GetActorParent();
-
-  // Description:
-  // Methods for packing the different properties parent.
-  void ShowSourceParent();
-  void ShowActorParent();  
-  
-  // Description:
   // This is for an experiment on rendering timing.  It should be temporary.
   vtkGetObjectMacro(Composite, vtkTreeComposite);
 
   // Description:
   // Update the navigation window for a particular source
   void UpdateNavigationWindow(vtkPVSource *currentSource);
+
+  // Description:
+  // Get the frame for the navigation window
+  vtkGetObjectMacro(NavigationFrame, vtkKWLabeledFrame);
   
 protected:
 
@@ -169,10 +163,6 @@ protected:
   char *RenderWindowTclName;
   vtkSetStringMacro(RenderWindowTclName);  
   
-  // We are going to switch between these properties parents.
-  vtkKWWidget *SourceParent;
-  vtkKWWidget *ActorParent;
-
   vtkKWLabeledFrame *NavigationFrame;
   vtkKWWidget       *NavigationCanvas;
 

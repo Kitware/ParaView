@@ -254,16 +254,9 @@ vtkPVActorComposite::~vtkPVActorComposite()
 //----------------------------------------------------------------------------
 void vtkPVActorComposite::CreateProperties()
 {
-  const char *actorPage;
   vtkPVApplication *pvApp = this->GetPVApplication();  
     
-  // invoke superclass always
-  this->vtkKWActorComposite::CreateProperties();
-  
-  actorPage = this->GetClassName();
-  this->Notebook->AddPage(actorPage);
-  this->Notebook->SetMinimumHeight(500);
-  this->Properties->SetParent(this->Notebook->GetFrame(actorPage));
+  this->Properties->SetParent(this->GetPVData()->GetPVSource()->GetNotebook()->GetFrame("Data"));
   this->Properties->Create(this->Application, "frame","");
   this->Script("pack %s -pady 2 -fill x -expand yes",
                this->Properties->GetWidgetName());
@@ -772,8 +765,8 @@ void vtkPVActorComposite::Select(vtkKWView *v)
   // invoke super
   this->vtkKWComposite::Select(v); 
   
-  this->Script("pack %s -pady 2 -padx 2 -fill both -expand yes -anchor n",
-               this->Notebook->GetWidgetName());
+//  this->Script("pack %s -pady 2 -padx 2 -fill both -expand yes -anchor n",
+//               this->Notebook->GetWidgetName());
   
   this->UpdateProperties();
 }

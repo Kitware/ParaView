@@ -296,17 +296,16 @@ vtkPVApplication* vtkPVSource::GetPVApplication()
 //----------------------------------------------------------------------------
 void vtkPVSource::CreateProperties()
 {
-  const char *sourcePage;
   vtkPVApplication *app = this->GetPVApplication();
   
   // invoke super
   this->vtkKWComposite::CreateProperties();  
 
   // Set up the pages of the notebook.
-  sourcePage = this->GetClassName();
-  this->Notebook->AddPage(sourcePage);
+  this->Notebook->AddPage("Source");
+  this->Notebook->AddPage("Data");
   this->Notebook->SetMinimumHeight(500);
-  this->Properties->SetParent(this->Notebook->GetFrame(sourcePage));
+  this->Properties->SetParent(this->Notebook->GetFrame("Source"));
   this->Properties->Create(this->Application,"frame","");
   this->Script("pack %s -pady 2 -fill x -expand yes",
                this->Properties->GetWidgetName());
@@ -430,6 +429,10 @@ void vtkPVSource::Select(vtkKWView *v)
   // invoke super
   this->vtkKWComposite::Select(v); 
   
+  this->Script("catch {eval pack forget [pack slaves %s]}",
+               this->View->GetPropertiesParent()->GetWidgetName());
+  this->Script("pack %s -side top -fill x",
+               ((vtkPVRenderView*)this->View)->GetNavigationFrame()->GetWidgetName());
   this->Script("pack %s -pady 2 -padx 2 -fill both -expand yes -anchor n",
                this->Notebook->GetWidgetName());
 
@@ -556,7 +559,6 @@ void vtkPVSource::AcceptCallback()
     
     ac = this->GetPVOutput(0);
     window->GetMainView()->AddComposite(ac);
-    ac->SetPropertiesParent(window->GetMainView()->GetActorParent());    
     ac->CreateProperties();
     ac->Initialize();
     // Make the last data invisible.
