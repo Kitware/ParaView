@@ -52,7 +52,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVDeskTopRenderModuleUI);
-vtkCxxRevisionMacro(vtkPVDeskTopRenderModuleUI, "1.1.2.3");
+vtkCxxRevisionMacro(vtkPVDeskTopRenderModuleUI, "1.1.2.4");
 
 int vtkPVDeskTopRenderModuleUICommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -97,6 +97,15 @@ void vtkPVDeskTopRenderModuleUI::Create(vtkKWApplication *app, const char *)
   this->SetReductionFactor(1);
   this->ReductionCheck->EnabledOff();
   this->ReductionLabel->EnabledOff();
+
+}
+
+//----------------------------------------------------------------------------
+void vtkPVDeskTopRenderModuleUI::EnableRenductionFactor()
+{
+  this->SetReductionFactor(2);
+  this->ReductionCheck->EnabledOn();
+  this->ReductionLabel->EnabledOn();
 
 }
 

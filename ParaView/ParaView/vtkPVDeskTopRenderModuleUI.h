@@ -64,6 +64,8 @@ public:
 
   void Create(vtkKWApplication *app, const char *);
 
+  void EnableRenductionFactor();
+
 protected:
   vtkPVDeskTopRenderModuleUI();
   ~vtkPVDeskTopRenderModuleUI();
