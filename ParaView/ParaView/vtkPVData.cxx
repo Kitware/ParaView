@@ -2334,7 +2334,7 @@ void vtkPVData::PrintSelf(ostream& os, vtkIndent indent)
     {
     os << indent << "PVColorMap: NULL\n";
     }
-
+  os << indent << "RenderOnlyLocally: " << (this->RenderOnlyLocally?"on":"off") << endl;
   os << indent << "VTKData: " << this->GetVTKData() << endl;
   os << indent << "VTKDataTclName: " << (this->VTKDataTclName?this->VTKDataTclName:"none") << endl;
   os << indent << "View: " << this->GetView() << endl;
