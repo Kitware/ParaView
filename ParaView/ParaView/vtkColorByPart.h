@@ -53,6 +53,10 @@ public:
   vtkDataSet *GetOutput() 
     {return this->GetInput( 0 );}
   
+  // Description:
+  // By default copy the output update extent to the input
+  virtual void ComputeInputUpdateExtents( vtkDataObject *output );
+
 protected:
   vtkColorByPart() {};
   ~vtkColorByPart() {};
