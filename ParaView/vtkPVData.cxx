@@ -59,6 +59,8 @@ vtkPVData::vtkPVData()
   this->Mapper->ImmediateModeRenderingOn();
   this->Actor = vtkActor::New();
   this->Assignment = NULL;
+
+  this->ActorCompositeButton = vtkKWPushButton::New();
   
   // This is initialized in "Clone();"
   this->ActorComposite = NULL;
@@ -85,6 +87,9 @@ vtkPVData::~vtkPVData()
     this->ActorComposite->UnRegister(this);
     this->ActorComposite = NULL;
     }
+  
+  this->ActorCompositeButton->Delete();
+  this->ActorCompositeButton = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -155,8 +160,20 @@ int vtkPVData::Create(char *args)
   this->FiltersMenuButton->AddCommand("vtkColorByProcess", this,
 				      "ColorByProcess");
   this->Script("pack %s", this->FiltersMenuButton->GetWidgetName());
+  
+  this->ActorCompositeButton->SetParent(this);
+  this->ActorCompositeButton->Create(this->Application, "");
+  this->ActorCompositeButton->SetLabel("Get Actor Composite");
+  this->ActorCompositeButton->SetCommand(this, "ShowActorComposite");
+  this->Script("pack %s", this->ActorCompositeButton->GetWidgetName());
 
   return 1;
+}
+
+//----------------------------------------------------------------------------
+void vtkPVData::ShowActorComposite()
+{
+  this->GetActorComposite()->ShowProperties();
 }
 
 //----------------------------------------------------------------------------
@@ -361,10 +378,9 @@ void vtkPVData::TransmitBounds()
 				this->Assignment->GetNumberOfPieces(),
 				0);
     this->Data->Update();
-    }
-  
+    }  
 
-  if (this->Data == NULL || this->Data->GetNumberOfCells())
+  if (this->Data == NULL || this->Data->GetNumberOfCells() == 0)
     {
     emptyFlag = 1;
     bounds[0] = bounds[1] = bounds[2] = 0.0;
@@ -381,6 +397,76 @@ void vtkPVData::TransmitBounds()
 }
 
 //----------------------------------------------------------------------------
+int vtkPVData::GetNumberOfCells()
+{
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  vtkMultiProcessController *controller = pvApp->GetController();
+  float id, num;
+  int numCells, numRemoteCells;
+  
+  // Just some error checking.
+  if (controller->GetLocalProcessId() != 0)
+    {
+    vtkErrorMacro("This method should only be called from processes 0");
+    return -1;
+    }
+  
+  if (this->Data == NULL)
+    {
+    numCells = 0;
+    }
+  
+  pvApp->BroadcastScript("%s TransmitNumberOfCells", this->GetTclName());
+  
+  if (this->Assignment == NULL)
+    {
+    vtkWarningMacro("Cannot update without Assignment.");
+    }
+  else
+    {
+    this->Data->SetUpdateExtent(this->Assignment->GetPiece(),
+				this->Assignment->GetNumberOfPieces(),
+				0);
+    this->Data->Update();
+    numCells = this->Data->GetNumberOfCells();
+    }
+  
+  num = controller->GetNumberOfProcesses();
+  for (id = 1; id < num; ++id)
+    {
+    controller->Receive((int*)(&numRemoteCells), 1, id, 994);
+    numCells += numRemoteCells;
+    }
+  
+  return numCells;
+}
+
+//----------------------------------------------------------------------------
+void vtkPVData::TransmitNumberOfCells()
+{
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  vtkMultiProcessController *controller = pvApp->GetController();
+  int numCells;
+  
+  // Try to update data.
+  if (this->Assignment == NULL)
+    {
+    vtkWarningMacro("Cannot update without Assignment.");
+    }
+  else
+    {
+    this->Data->SetUpdateExtent(this->Assignment->GetPiece(),
+				this->Assignment->GetNumberOfPieces(),
+				0);
+    this->Data->Update();
+    }
+
+  numCells = this->Data->GetNumberOfCells();
+  
+  controller->Send((int*)(&numCells), 1, 0, 994);
+}
+
+//----------------------------------------------------------------------------
 void vtkPVData::SetActorComposite(vtkPVActorComposite *c)
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
@@ -391,7 +477,7 @@ void vtkPVData::SetActorComposite(vtkPVActorComposite *c)
     }
   if (c == NULL)
     {
-    vtkErrorMacro("You should not be setting a NULL actor compiste.");
+    vtkErrorMacro("You should not be setting a NULL actor composite.");
     return;
     }
   this->Modified();
@@ -410,6 +496,7 @@ void vtkPVData::SetActorComposite(vtkPVActorComposite *c)
     }
   c->Register(this);
   this->ActorComposite = c;
+  this->ActorComposite->SetPVData(this);
   
   // Try to keep all internal relationships consistent.
   if (this->Assignment)

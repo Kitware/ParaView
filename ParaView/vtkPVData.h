@@ -29,8 +29,8 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #ifndef __vtkPVData_h
 #define __vtkPVData_h
 
-#include "vtkKWWidget.h"
 #include "vtkDataSet.h"
+#include "vtkKWPushButton.h"
 
 class vtkActor;
 class vtkDataSetMapper;
@@ -84,7 +84,7 @@ public:
   void Elevation();
 
   // Description:
-  // DO NOT CALL THIS IF YOU ARE NOT A COMPOSITE!
+  // DO NOT CALL THIS IF YOU ARE NOT A PVSOURCE!
   // The composite sets this so this data widget will know who owns it.
   void SetPVSource(vtkPVSource *source);
   vtkGetObjectMacro(PVSource, vtkPVSource);
@@ -114,12 +114,23 @@ public:
   // A Helper method for GetBounds that needs to be wrapped.
   // Do not call this method directly.
   void TransmitBounds();
-
+  
+  // Description:
+  // This method collects the number of cells from all processes.
+  int GetNumberOfCells();
+  
+  // Description:
+  // A Helper method for GetNumberOfCells that needs to be wrapped.
+  // Do not call this method directly.
+  void TransmitNumberOfCells();
+  
   // Description:
   // This is for setting up the links between VTK objects and PV object.
   // Subclasses overide this method so that they can create special
   // mappers for the actor composites.  The user should not call this method.
   vtkSetObjectMacro(Data, vtkDataSet);  
+  
+  void ShowActorComposite();
   
 protected:
   vtkPVData();
@@ -134,6 +145,7 @@ protected:
   vtkActor *Actor;
 
   vtkPVActorComposite *ActorComposite;
+  vtkKWPushButton *ActorCompositeButton;
   
   // This points to the source widget that owns this data widget.
   vtkPVSource *PVSource;

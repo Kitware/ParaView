@@ -32,6 +32,8 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkKWWindow.h"
 #include "vtkPVApplication.h"
 #include "vtkPVAssignment.h"
+#include "vtkPVData.h"
+#include "vtkPVSource.h"
 
 //----------------------------------------------------------------------------
 vtkPVActorComposite* vtkPVActorComposite::New()
@@ -55,20 +57,39 @@ vtkPVActorComposite::vtkPVActorComposite()
   this->CommandFunction = vtkPVActorCompositeCommand;
   
   this->Properties = vtkKWWidget::New();
-  this->Label = vtkKWLabel::New();
   this->Name = NULL;
+  
+  this->NumCellsLabel = vtkKWLabel::New();
+  this->BoundsLabel = vtkKWLabel::New();
+  this->XRangeLabel = vtkKWLabel::New();
+  this->YRangeLabel = vtkKWLabel::New();
+  this->ZRangeLabel = vtkKWLabel::New();
+  
+  this->DataNotebookButton = vtkKWPushButton::New();
 }
 
 //----------------------------------------------------------------------------
 vtkPVActorComposite::~vtkPVActorComposite()
 {
-  this->Label->Delete();
-  this->Label = NULL;
-  
   this->Properties->Delete();
   this->Properties = NULL;
   
   this->SetName(NULL);
+  
+  this->NumCellsLabel->Delete();
+  this->NumCellsLabel = NULL;
+  
+  this->BoundsLabel->Delete();
+  this->BoundsLabel = NULL;
+  this->XRangeLabel->Delete();
+  this->XRangeLabel = NULL;
+  this->YRangeLabel->Delete();
+  this->YRangeLabel = NULL;
+  this->ZRangeLabel->Delete();
+  this->ZRangeLabel = NULL;
+  
+  this->DataNotebookButton->Delete();
+  this->DataNotebookButton = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -93,6 +114,18 @@ void vtkPVActorComposite::Clone(vtkPVApplication *pvApp)
 void vtkPVActorComposite::CreateProperties()
 {
   const char *actorPage;
+  char *cellsLabel;
+  char *xLabel;
+  char *yLabel;
+  char *zLabel;
+  float bounds[6];
+  
+  cellsLabel = new char[35];
+  xLabel = new char[35];
+  yLabel = new char[35];
+  zLabel = new char[35];
+  
+  this->GetPVData()->GetBounds(bounds);
   
   // invoke superclass always
   this->vtkKWActorComposite::CreateProperties();
@@ -104,11 +137,59 @@ void vtkPVActorComposite::CreateProperties()
   this->Script("pack %s -pady 2 -fill x -expand yes",
                this->Properties->GetWidgetName());
   
-  this->Label->SetParent(this->Properties);
-  this->Label->Create(this->Application, "");
-  this->Label->SetLabel("vtkPVActorComposite label");
-  this->Script("pack %s", this->Label->GetWidgetName());
+  this->NumCellsLabel->SetParent(this->Properties);
+  this->NumCellsLabel->Create(this->Application, "");
+  sprintf(cellsLabel, "number of cells: %d",
+	  this->GetPVData()->GetNumberOfCells());
+  this->NumCellsLabel->SetLabel(cellsLabel);
+  this->BoundsLabel->SetParent(this->Properties);
+  this->BoundsLabel->Create(this->Application, "");
+  this->BoundsLabel->SetLabel("bounds:");
+  this->XRangeLabel->SetParent(this->Properties);
+  this->XRangeLabel->Create(this->Application, "");
+  sprintf(xLabel, "x range: %f to %f", bounds[0], bounds[1]);
+  this->XRangeLabel->SetLabel(xLabel);
+  this->YRangeLabel->SetParent(this->Properties);
+  this->YRangeLabel->Create(this->Application, "");
+  sprintf(yLabel, "y range: %f to %f", bounds[2], bounds[3]);
+  this->YRangeLabel->SetLabel(yLabel);
+  this->ZRangeLabel->SetParent(this->Properties);
+  this->ZRangeLabel->Create(this->Application, "");
+  sprintf(zLabel, "z range: %f to %f", bounds[4], bounds[5]);
+  this->ZRangeLabel->SetLabel(zLabel);
+  this->DataNotebookButton->SetParent(this->Properties);
+  this->DataNotebookButton->Create(this->Application, "");
+  this->DataNotebookButton->SetLabel("Return to Data Notebook");
+  this->DataNotebookButton->SetCommand(this, "ShowDataNotebook");
+  this->Script("pack %s %s %s %s %s %s",
+	       this->NumCellsLabel->GetWidgetName(),
+	       this->BoundsLabel->GetWidgetName(),
+	       this->XRangeLabel->GetWidgetName(),
+	       this->YRangeLabel->GetWidgetName(),
+	       this->ZRangeLabel->GetWidgetName(),
+	       this->DataNotebookButton->GetWidgetName());
   
+  delete [] cellsLabel;
+  delete [] xLabel;
+  delete [] yLabel;
+  delete [] zLabel;
+}
+
+//----------------------------------------------------------------------------
+void vtkPVActorComposite::ShowDataNotebook()
+{
+  this->GetPVData()->GetPVSource()->ShowProperties();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVActorComposite::SetPVData(vtkPVData *data)
+{
+  //There's probably more we're supposed to do here.
+  
+  if (data)
+    {
+    this->PVData = data;
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -124,7 +205,8 @@ void vtkPVActorComposite::GetInputScalarRange(float range[2])
   this->Mapper->GetInput()->GetScalarRange(range);
   for (idx = 1; idx < numProcs; ++idx)
     {
-    pvApp->RemoteScript(idx, "%s TransmitInputScalarRange", this->GetTclName());
+    pvApp->RemoteScript(idx, "%s TransmitInputScalarRange",
+			this->GetTclName());
     controller->Receive(tmp, 2, idx, 99399);
     if (range[0] > tmp[0])
       {
@@ -163,8 +245,6 @@ void vtkPVActorComposite::SetScalarRange(float min, float max)
   
   this->Mapper->SetScalarRange(min, max);
 }
-
-
 
 //----------------------------------------------------------------------------
 void vtkPVActorComposite::SetName (const char* arg) 
@@ -234,8 +314,8 @@ void vtkPVActorComposite::ShowProperties()
 {
   vtkKWWindow *pw = this->View->GetParentWindow();
   pw->ShowProperties();
-  pw->GetMenuProperties()->CheckRadioButton(
-    pw->GetMenuProperties(),"Radio",100);
+  pw->GetMenuProperties()->CheckRadioButton(pw->GetMenuProperties(),
+					    "Radio", 100);
 
   // unpack any current children
   this->Script("catch {eval pack forget [pack slaves %s]}",
@@ -270,7 +350,6 @@ void vtkPVActorComposite::SetVisibility(int v)
     pvApp->BroadcastScript("%s SetVisibility %d", this->GetTclName(), v);
     }
 }
-
   
 //----------------------------------------------------------------------------
 int vtkPVActorComposite::GetVisibility()
@@ -284,7 +363,6 @@ int vtkPVActorComposite::GetVisibility()
   
   return p->GetVisibility();
 }
-
 
 //----------------------------------------------------------------------------
 void vtkPVActorComposite::SetAssignment(vtkPVAssignment *a)

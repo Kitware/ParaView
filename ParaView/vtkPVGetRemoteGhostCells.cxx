@@ -103,12 +103,15 @@ void vtkPVGetRemoteGhostCells::GhostLevelChanged()
   vtkPVApplication *pvApp = (vtkPVApplication *)this->Application;
   vtkPVWindow *window = this->GetWindow();
   
-  this->SetGhostLevel(this->GhostLevelEntry->GetValueAsInt());
-
   if (this->GetPVData() == NULL)
     { // This is the first time. Create the data.
     this->InitializeData();
     }
+  
+  // This line needs to be after data is initialized because we need to set
+  // the ghost level of the poly data mapper, which isn't created until
+  // the data is initialized.
+  this->SetGhostLevel(this->GhostLevelEntry->GetValueAsInt());
   
   window->GetMainView()->SetSelectedComposite(this);
   
@@ -125,8 +128,7 @@ void vtkPVGetRemoteGhostCells::SetGhostLevel(int level)
 			   level);
     }
   
-//  this->GetRemoteGhostCells()->GetOutput()->SetUpdateGhostLevel(level);
-  this->GetRemoteGhostCells()->SetGhostLevel(level);
+  this->GetOutput()->GetActorComposite()->GetMapper()->SetGhostLevel(level);
 }
 
 //----------------------------------------------------------------------------

@@ -34,8 +34,6 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #define __vtkPVPolyData_h
 
 #include "vtkPolyData.h"
-#include "vtkKWWidget.h"
-#include "vtkKWScale.h"
 #include "vtkDataSet.h"
 #include "vtkPVData.h"
 
@@ -64,7 +62,7 @@ public:
   void Glyph();
   void GetGhostCells();
   void PolyDataNormals();
-  
+
 protected:
   vtkPVPolyData();
   ~vtkPVPolyData();

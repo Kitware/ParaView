@@ -36,12 +36,13 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 #include "vtkKWActorComposite.h"
 #include "vtkKWLabel.h"
+#include "vtkKWPushButton.h"
 #include "vtkPVApplication.h"
 #include "vtkDataSetMapper.h"
 
 class vtkPVAssignment;
 class vtkPVApplication;
-
+class vtkPVData;
 
 class VTK_EXPORT vtkPVActorComposite : public vtkKWActorComposite
 {
@@ -81,6 +82,12 @@ public:
   void SetAssignment(vtkPVAssignment *a);
 
   // Description:
+  // ONLY SET THIS IF YOU ARE A PVDATA!
+  // The actor composite needs to know which PVData it belongs to.
+  void SetPVData(vtkPVData *data);
+  vtkGetObjectMacro(PVData, vtkPVData);
+  
+  // Description:
   // Parallel methods for computing the scalar range from the input,
   /// and setting the scalar range of the mapper.
   void GetInputScalarRange(float range[2]);
@@ -93,6 +100,8 @@ public:
   
   vtkGetObjectMacro(Mapper, vtkPolyDataMapper);
   
+  void ShowDataNotebook();
+  
 protected:
   vtkPVActorComposite();
   ~vtkPVActorComposite();
@@ -100,8 +109,17 @@ protected:
   void operator=(const vtkPVActorComposite&) {};
   
   vtkKWWidget *Properties;
-  vtkKWLabel *Label;
   char *Name;
+  vtkKWLabel *NumCellsLabel;
+  vtkKWLabel *BoundsLabel;
+  vtkKWLabel *XRangeLabel;
+  vtkKWLabel *YRangeLabel;
+  vtkKWLabel *ZRangeLabel;
+  
+  vtkKWPushButton *DataNotebookButton;
+  
+  // the data object that owns this composite
+  vtkPVData *PVData;
 };
 
 #endif

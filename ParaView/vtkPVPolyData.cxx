@@ -53,11 +53,15 @@ int vtkPVPolyDataCommand(ClientData cd, Tcl_Interp *interp,
 vtkPVPolyData::vtkPVPolyData()
 {
   this->CommandFunction = vtkPVPolyDataCommand;
+  
+  this->ActorCompositeButton = vtkKWPushButton::New();
 }
 
 //----------------------------------------------------------------------------
 vtkPVPolyData::~vtkPVPolyData()
 {
+  this->ActorCompositeButton->Delete();
+  this->ActorCompositeButton = NULL;
 }
 
 //----------------------------------------------------------------------------

@@ -295,6 +295,11 @@ void vtkPVImageMandelbrotSource::AcceptParameters()
     {
     this->InitializeData();
     }
+
+  if (window->GetPreviousSource() != NULL)
+    {
+    window->GetPreviousSource()->GetPVData()->GetActorComposite()->VisibilityOff();
+    }
   
   window->GetMainView()->SetSelectedComposite(this);
   this->GetView()->Render();
