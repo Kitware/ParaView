@@ -50,7 +50,7 @@
  
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProbe);
-vtkCxxRevisionMacro(vtkPVProbe, "1.128");
+vtkCxxRevisionMacro(vtkPVProbe, "1.129");
 
 int vtkPVProbeCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -402,12 +402,6 @@ void vtkPVProbe::AcceptCallbackInternal()
     
 }
  
-//----------------------------------------------------------------------------
-void vtkPVProbe::Deselect(int doPackForget)
-{
-  this->vtkPVSource::Deselect(doPackForget);
-}
-
 //----------------------------------------------------------------------------
 void vtkPVProbe::PrintSelf(ostream& os, vtkIndent indent)
 {

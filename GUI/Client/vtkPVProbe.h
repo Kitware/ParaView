@@ -42,10 +42,6 @@ public:
   void CreateProperties();
 
   // Description:
-  // Methods to call when this pv source is selected/deselected
-  virtual void Deselect(int doPackForget = 1);
-
-  // Description:
   // Access to the ShowXYPlotToggle from Tcl
   vtkGetObjectMacro(ShowXYPlotToggle, vtkKWCheckButton);
 
