@@ -410,8 +410,13 @@ protected:
   // Convert a Tcl string (stored internally as UTF-8/Unicode) to another
   // internal format (given the widget's application CharacterEncoding), 
   // and vice-versa.
-  const char* ConvertTclStringToInternalString(const char *str);
-  const char* ConvertInternalStringToTclString(const char *str);
+  // If no_curly_braces is true, curly braces will be removed from the
+  // string, so that the resulting string can be used to set an option
+  // using the usual {%s} syntax.
+  const char* ConvertTclStringToInternalString(
+    const char *str, int no_curly_braces = 1);
+  const char* ConvertInternalStringToTclString(
+    const char *str, int no_curly_braces = 1);
 
 private:
   vtkKWWidget(const vtkKWWidget&); // Not implemented

@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWWidget );
-vtkCxxRevisionMacro(vtkKWWidget, "1.82");
+vtkCxxRevisionMacro(vtkKWWidget, "1.83");
 
 int vtkKWWidgetCommand(ClientData cd, Tcl_Interp *interp,
                        int argc, char *argv[]);
@@ -348,7 +348,7 @@ void vtkKWWidget::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkKWWidget ";
-  this->ExtractRevision(os,"$Revision: 1.82 $");
+  this->ExtractRevision(os,"$Revision: 1.83 $");
 }
 
 //----------------------------------------------------------------------------
@@ -659,63 +659,115 @@ const char* vtkKWWidget::GetTclCharacterEncodingAsString(int encoding)
 }
 
 //----------------------------------------------------------------------------
-const char* vtkKWWidget::ConvertInternalStringToTclString(const char *str)
+const char* vtkKWWidget::ConvertInternalStringToTclString(
+  const char *str, int no_curly_braces)
 {
   if (!str || !this->IsCreated())
     {
     return NULL;
     }
 
-  // No encoding known ? The fast way
+  // Shall we remove the curly braces so that we can use the {%s}
+  // syntax to use the string inside this->Script ?
+
+  const char *clean_str = NULL;
+  if (no_curly_braces && (strchr(str, '{') || strchr(str, '}')))
+    {
+    str = clean_str = vtkString::RemoveChars(str, "{}");
+    }
+
+  // No encoding known ? The fast way, return unchanged
 
   int app_encoding = this->GetApplication()->GetCharacterEncoding();
-  if (app_encoding == VTK_ENCODING_NONE || 
-      app_encoding == VTK_ENCODING_UNKNOWN)
+  if (app_encoding != VTK_ENCODING_NONE &&
+      app_encoding != VTK_ENCODING_UNKNOWN)
     {
-    return str;
+    // Get the Tcl encoding name
+
+    const char *tcl_encoding_name = 
+      vtkKWWidget::GetTclCharacterEncodingAsString(app_encoding);
+
+    // Check if we have that encoding
+    
+    Tcl_Encoding tcl_encoding = 
+      Tcl_GetEncoding(this->Application->GetMainInterp(), tcl_encoding_name);
+    if (tcl_encoding != NULL)
+      {
+      Tcl_FreeEncoding(tcl_encoding);
+      
+      // Convert from that encoding
+      
+      const char *res = 
+        this->Script("encoding convertfrom %s {%s}", tcl_encoding_name, str);
+
+      if (clean_str)
+        {
+        delete [] clean_str;
+        }
+
+      return res;
+      }
     }
 
-  // Get the Tcl encoding name
+  // Otherwise just return unchanged (or without the braces)
 
-  const char *tcl_encoding_name = 
-    vtkKWWidget::GetTclCharacterEncodingAsString(app_encoding);
-
-  // Check if we have that encoding
-
-  Tcl_Encoding tcl_encoding = 
-    Tcl_GetEncoding(this->Application->GetMainInterp(), tcl_encoding_name);
-  if (tcl_encoding == NULL)
+  if (clean_str)
     {
-    return str;
+    const char *res = this->Script("set __foo__ {%s}", str);
+    delete [] clean_str;
+    return res;
     }
-
-  Tcl_FreeEncoding(tcl_encoding);
-
-  // Convert from that encoding
-
-  return this->Script("encoding convertfrom %s {%s}", tcl_encoding_name, str);
+  
+  return str;
 }
 
 //----------------------------------------------------------------------------
-const char* vtkKWWidget::ConvertTclStringToInternalString(const char *str)
+const char* vtkKWWidget::ConvertTclStringToInternalString(
+  const char *str, int no_curly_braces)
 {
   if (!str || !this->IsCreated())
     {
     return NULL;
     }
 
-  // No encoding known ? The fast way
-
-  int app_encoding = this->GetApplication()->GetCharacterEncoding();
-  if (app_encoding == VTK_ENCODING_NONE || 
-      app_encoding == VTK_ENCODING_UNKNOWN)
+  // Shall we remove the curly braces so that we can use the {%s}
+  // syntax to use the string inside this->Script ?
+  
+  const char *clean_str = NULL;
+  if (no_curly_braces && (strchr(str, '{') || strchr(str, '}')))
     {
-    return str;
+    str = clean_str = vtkString::RemoveChars(str, "{}");
     }
 
-  // Otherwise try to encode/decode
+  // No encoding known ? The fast way, return unchanged
 
-  return this->Script("encoding convertfrom identity {%s}", str);
+  int app_encoding = this->GetApplication()->GetCharacterEncoding();
+  if (app_encoding != VTK_ENCODING_NONE &&
+      app_encoding != VTK_ENCODING_UNKNOWN)
+    {
+    // Otherwise try to encode/decode
+
+    const char *res = 
+      this->Script("encoding convertfrom identity {%s}", str);
+    
+    if (clean_str)
+      {
+      delete [] clean_str;
+      }
+    
+    return res;
+    }
+  
+  // Otherwise just return unchanged (or without the braces)
+  
+  if (clean_str)
+    {
+    const char *res = this->Script("set __foo__ {%s}", str);
+    delete [] clean_str;
+    return res;
+    }
+  
+  return str;
 }
 
 //----------------------------------------------------------------------------
@@ -727,7 +779,8 @@ void vtkKWWidget::SetTextOption(const char *str, const char *option)
     }
 
   const char *val = this->ConvertInternalStringToTclString(str);
-  this->Script("%s configure %s {%s}", this->GetWidgetName(), option, val);
+  this->Script("catch {%s configure %s {%s}}", 
+               this->GetWidgetName(), option, val);
 }
 
 //----------------------------------------------------------------------------
