@@ -176,11 +176,6 @@ public:
 
   void SetUpdateExtent(int piece, int numPieces,
                        int ghostLevel);
-  void SetUpdateExtent(int i1, int i2, int i3, int i4, int i5, int i6)
-    {
-    this->Superclass::SetUpdateExtent(i1, i2, i3, i4, i5, i6);
-    }
-  void SetUpdateExtent(int* i) { this->Superclass::SetUpdateExtent(i); }
   void GetUpdateExtent(int &piece, int &numPieces,
                        int &ghostLevel);
 
@@ -213,6 +208,13 @@ protected:
   // A temporary array used to return dimensions.
   int TemporaryDimensions[3];
   int TemporaryExtent[6];
+
+  // Hidden methods
+  void SetUpdateExtent(int, int ,int, int, int, int) {}
+  void SetUpdateExtent(int*) {}
+  void GetUpdateExtent(int &,int &,int &,int &,int &,int &) {}
+  int* GetUpdateExtent() {return NULL;}
+  void GetUpdateExtenent(int*) {}
 
 private:
   void InternalCTHDataCopy(vtkCTHData *src);
