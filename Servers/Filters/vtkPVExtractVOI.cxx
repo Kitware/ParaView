@@ -21,13 +21,14 @@
 #include "vtkGarbageCollector.h"
 #include "vtkImageData.h"
 #include "vtkInformation.h"
+#include "vtkInformationVector.h"
 #include "vtkInstantiator.h"
 #include "vtkObjectFactory.h"
 #include "vtkRectilinearGrid.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkStructuredGrid.h"
 
-vtkCxxRevisionMacro(vtkPVExtractVOI, "1.5");
+vtkCxxRevisionMacro(vtkPVExtractVOI, "1.6");
 vtkStandardNewMacro(vtkPVExtractVOI);
 
 //----------------------------------------------------------------------------
@@ -64,40 +65,6 @@ vtkPVExtractVOI::~vtkPVExtractVOI()
 }
 
 //----------------------------------------------------------------------------
-const char* vtkPVExtractVOI::DetermineOutputType()
-{
-  vtkDataSet* input = this->GetInput();
-
-  if (!input)
-    {
-    return NULL;
-    }
-
-  vtkImageData* imInput = vtkImageData::SafeDownCast(input);
-  if (imInput)
-    {
-    return "vtkImageData";
-    }
-  else
-    {
-    vtkStructuredGrid* sgInput = vtkStructuredGrid::SafeDownCast(input);
-    if (sgInput)
-      {
-      return "vtkStructuredGrid";
-      }
-    else
-      {
-      vtkRectilinearGrid* rgInput = vtkRectilinearGrid::SafeDownCast(input);
-      if (rgInput)
-        {
-        return "vtkRectilinearGrid";
-        }
-      }
-    }
-  return NULL;
-}
-
-//----------------------------------------------------------------------------
 template <class FilterType, class InputType>
 void vtkPVExtractVOIComputeInputUpdateExtents(
   FilterType* filter, InputType* input, vtkDataObject* output, vtkPVExtractVOI* self)
@@ -107,21 +74,26 @@ void vtkPVExtractVOIComputeInputUpdateExtents(
   filter->SetInput(input);
   vtkInformation* innerInfo = filter->GetOutput()->GetPipelineInformation();
   vtkInformation* outerInfo = output->GetPipelineInformation();
-  innerInfo->CopyEntry(outerInfo, vtkStreamingDemandDrivenPipeline::UPDATE_EXTENT());
-  innerInfo->CopyEntry(outerInfo, vtkStreamingDemandDrivenPipeline::UPDATE_EXTENT_INITIALIZED());
+  innerInfo->CopyEntry(
+    outerInfo, vtkStreamingDemandDrivenPipeline::UPDATE_EXTENT());
+  innerInfo->CopyEntry(
+    outerInfo, vtkStreamingDemandDrivenPipeline::UPDATE_EXTENT_INITIALIZED());
   filter->GetOutput()->PropagateUpdateExtent();
 }
 
 //----------------------------------------------------------------------------
-void vtkPVExtractVOI::ComputeInputUpdateExtents(vtkDataObject *output)
+int vtkPVExtractVOI::RequestUpdateExtent(
+  vtkInformation*, vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
-  const char* outputType = this->DetermineOutputType();
-  if (!outputType)
-    {
-    return;
-    }
-  vtkDataSet* input = this->GetInput();
-  if (strcmp(outputType, "vtkImageData") == 0)
+  vtkInformation* outInfo = outputVector->GetInformationObject(0);
+  vtkDataSet* output = 
+    vtkDataSet::SafeDownCast(outInfo->Get(vtkDataObject::DATA_OBJECT()));
+
+  vtkInformation* inInfo = inputVector[0]->GetInformationObject(0);
+  vtkDataSet* input = 
+    vtkDataSet::SafeDownCast(inInfo->Get(vtkDataObject::DATA_OBJECT()));
+
+  if (output->GetDataObjectType() == VTK_IMAGE_DATA)
     {
     this->ExtractVOI->GetOutput()->ShallowCopy(output);
     this->ExtractVOI->GetOutput()->SetUpdateExtent(output->GetUpdateExtent());
@@ -131,7 +103,7 @@ void vtkPVExtractVOI::ComputeInputUpdateExtents(vtkDataObject *output)
       output,
       this);
     }
-  else if (strcmp(outputType, "vtkStructuredGrid") == 0)
+  else if (output->GetDataObjectType() == VTK_STRUCTURED_GRID)
     {
     this->ExtractGrid->GetOutput()->ShallowCopy(output);
     this->ExtractGrid->GetOutput()->SetUpdateExtent(output->GetUpdateExtent());
@@ -142,7 +114,7 @@ void vtkPVExtractVOI::ComputeInputUpdateExtents(vtkDataObject *output)
       output,
       this);
     }
-  else if (strcmp(outputType, "vtkRectilinearGrid") == 0)
+  else if (output->GetDataObjectType() == VTK_RECTILINEAR_GRID)
     {
     this->ExtractRG->GetOutput()->ShallowCopy(output);
     this->ExtractRG->GetOutput()->SetUpdateExtent(output->GetUpdateExtent());
@@ -157,8 +129,7 @@ void vtkPVExtractVOI::ComputeInputUpdateExtents(vtkDataObject *output)
   // We can handle anything.
   input->SetRequestExactExtent(0);
 
-  int extent[6];
-  input->GetUpdateExtent(extent);
+  return 1;
 }
 
 //----------------------------------------------------------------------------
@@ -174,24 +145,26 @@ void vtkPVExtractVOIExecuteInformation(
 }
 
 //----------------------------------------------------------------------------
-void vtkPVExtractVOI::ExecuteInformation()
+int vtkPVExtractVOI::RequestInformation(
+  vtkInformation*, vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
-  this->Superclass::ExecuteInformation();
+  vtkInformation* outInfo = outputVector->GetInformationObject(0);
+  vtkDataSet* output = 
+    vtkDataSet::SafeDownCast(outInfo->Get(vtkDataObject::DATA_OBJECT()));
 
-  const char* outputType = this->DetermineOutputType();
-  if (!outputType)
-    {
-    return;
-    }
-  vtkDataSet* input = this->GetInput();
-  if (strcmp(outputType, "vtkImageData") == 0)
+  vtkInformation* inInfo = inputVector[0]->GetInformationObject(0);
+  vtkDataSet* input = 
+    vtkDataSet::SafeDownCast(inInfo->Get(vtkDataObject::DATA_OBJECT()));
+
+
+  if (output->GetDataObjectType() == VTK_IMAGE_DATA)
     {
     vtkPVExtractVOIExecuteInformation(
       this->ExtractVOI, 
       vtkImageData::SafeDownCast(input),
       this);
     }
-  else if (strcmp(outputType, "vtkStructuredGrid") == 0)
+  else if (output->GetDataObjectType() == VTK_STRUCTURED_GRID)
     {
     this->ExtractGrid->SetIncludeBoundary(this->IncludeBoundary);
     vtkPVExtractVOIExecuteInformation(
@@ -199,7 +172,7 @@ void vtkPVExtractVOI::ExecuteInformation()
       vtkStructuredGrid::SafeDownCast(input),
       this);
     }
-  else if (strcmp(outputType, "vtkRectilinearGrid") == 0)
+  else if (output->GetDataObjectType() == VTK_RECTILINEAR_GRID)
     {
     this->ExtractRG->SetIncludeBoundary(this->IncludeBoundary);
     vtkPVExtractVOIExecuteInformation(
@@ -207,6 +180,8 @@ void vtkPVExtractVOI::ExecuteInformation()
       vtkRectilinearGrid::SafeDownCast(input),
       this);
     }
+
+  return 1;
 }
 
 //----------------------------------------------------------------------------
@@ -222,22 +197,25 @@ void vtkPVExtractVOIExecuteData(
 }
 
 //----------------------------------------------------------------------------
-void vtkPVExtractVOI::ExecuteData(vtkDataObject*)
+int vtkPVExtractVOI::RequestData(
+  vtkInformation*, vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
-  const char* outputType = this->DetermineOutputType();
-  if (!outputType)
-    {
-    return;
-    }
-  vtkDataSet* input = this->GetInput();
-  if (strcmp(outputType, "vtkImageData") == 0)
+  vtkInformation* outInfo = outputVector->GetInformationObject(0);
+  vtkDataSet* output = 
+    vtkDataSet::SafeDownCast(outInfo->Get(vtkDataObject::DATA_OBJECT()));
+
+  vtkInformation* inInfo = inputVector[0]->GetInformationObject(0);
+  vtkDataSet* input = 
+    vtkDataSet::SafeDownCast(inInfo->Get(vtkDataObject::DATA_OBJECT()));
+
+  if (output->GetDataObjectType() == VTK_IMAGE_DATA)
     {
     vtkPVExtractVOIExecuteData(
       this->ExtractVOI, 
       vtkImageData::SafeDownCast(input),
       this);
     }
-  else if (strcmp(outputType, "vtkStructuredGrid") == 0)
+  else if (output->GetDataObjectType() == VTK_STRUCTURED_GRID)
     {
     this->ExtractGrid->SetIncludeBoundary(this->IncludeBoundary);
     vtkPVExtractVOIExecuteData(
@@ -245,7 +223,7 @@ void vtkPVExtractVOI::ExecuteData(vtkDataObject*)
       vtkStructuredGrid::SafeDownCast(input),
       this);
     }
-  else if (strcmp(outputType, "vtkRectilinearGrid") == 0)
+  else if (output->GetDataObjectType() == VTK_RECTILINEAR_GRID)
     {
     this->ExtractRG->SetIncludeBoundary(this->IncludeBoundary);
     vtkPVExtractVOIExecuteData(
@@ -253,6 +231,8 @@ void vtkPVExtractVOI::ExecuteData(vtkDataObject*)
       vtkRectilinearGrid::SafeDownCast(input),
       this);
     }
+
+  return 1;
 }
 
 //----------------------------------------------------------------------------

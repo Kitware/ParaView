@@ -24,7 +24,7 @@
 #ifndef __vtkPVExtractVOI_h
 #define __vtkPVExtractVOI_h
 
-#include "vtkDataSetToDataSetFilter.h"
+#include "vtkDataSetAlgorithm.h"
 
 class vtkDataObject;
 class vtkDataSet;
@@ -32,12 +32,12 @@ class vtkExtractGrid;
 class vtkExtractRectilinearGrid;
 class vtkExtractVOI;
 
-class VTK_EXPORT vtkPVExtractVOI : public vtkDataSetToDataSetFilter
+class VTK_EXPORT vtkPVExtractVOI : public vtkDataSetAlgorithm
 {
 
 public:
   static vtkPVExtractVOI *New();
-  vtkTypeRevisionMacro(vtkPVExtractVOI,vtkDataSetToDataSetFilter);
+  vtkTypeRevisionMacro(vtkPVExtractVOI,vtkDataSetAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
@@ -79,15 +79,13 @@ protected:
   vtkPVExtractVOI();
   ~vtkPVExtractVOI();
 
-  // Description:
-  // By default copy the output update extent to the input
-  void ComputeInputUpdateExtents(vtkDataObject *out);
+  virtual int RequestData(
+    vtkInformation *, vtkInformationVector **, vtkInformationVector *);
+  virtual int RequestInformation(
+    vtkInformation *, vtkInformationVector **, vtkInformationVector *);
+  virtual int RequestUpdateExtent(
+    vtkInformation *, vtkInformationVector **, vtkInformationVector *);
 
-  void ExecuteData(vtkDataObject*);
-  void ExecuteInformation();
-
-  const char* DetermineOutputType();
-  
   int VOI[6];
   int SampleRate[3];
   int IncludeBoundary;
