@@ -123,9 +123,17 @@ public:
   // Write out the part of the tcl script cooresponding to vtkPVProbe
   void SaveInTclScript(ofstream *file);
   
+  // Description:
+  // Method to update which scalars are being used in the xyplot
   virtual void UpdateScalars();
 
+  //Description:
+  // Access to the EndPointMenu from Tcl
   vtkGetObjectMacro(EndPointMenu, vtkKWOptionMenu);
+
+  // Description:
+  // Access to the ShowXYPlotToggle from Tcl
+  vtkGetObjectMacro(ShowXYPlotToggle, vtkKWCheckButton);
   
 protected:
   vtkPVProbe();
@@ -160,6 +168,7 @@ protected:
   vtkKWLabeledEntry *End2XEntry;
   vtkKWLabeledEntry *End2YEntry;
   vtkKWLabeledEntry *End2ZEntry;
+  vtkKWCheckButton *ShowXYPlotToggle;
   vtkKWLabeledEntry *DivisionsEntry;
   
   vtkKWSelectPointInteractor *Interactor;

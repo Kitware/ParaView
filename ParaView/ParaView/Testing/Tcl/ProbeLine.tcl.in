@@ -1,0 +1,30 @@
+set DataDir "@PARAVIEW_DATA_ROOT@"
+
+set pv(vtkTemp1) [Application GetMainWindow]
+set pv(vtkTemp43) [$pv(vtkTemp1) GetMainView]
+set pv(vtkTemp89) [$pv(vtkTemp1) GetGlyphSource Arrow]
+set pv(vtkTemp93) [$pv(vtkTemp1) GetGlyphSource Cone]
+set pv(vtkTemp97) [$pv(vtkTemp1) GetGlyphSource Sphere]
+set pv(vtkTemp100) [$pv(vtkTemp1) Open $DataDir/Data/vox8_bin.vtk]
+set pv(vtkTemp138) [$pv(vtkTemp1) ProbeCallback]
+$pv(vtkTemp138) UseLine
+[$pv(vtkTemp138) GetScalarOperationMenu] SetValue scalars
+$pv(vtkTemp138) UpdateScalars
+[$pv(vtkTemp138) GetEndPointMenu] SetValue "End Point 1"
+$pv(vtkTemp138) SetCurrentEndPoint 1
+[$pv(vtkTemp138) GetInteractor] SetSelectedPoint 0.000000 0.000000 1.000000
+[$pv(vtkTemp138) GetEndPointMenu] SetValue "End Point 2"
+$pv(vtkTemp138) SetCurrentEndPoint 2
+[$pv(vtkTemp138) GetInteractor] SetSelectedPoint 2.000000 2.000000 1.000000
+[$pv(vtkTemp138) GetShowXYPlotToggle] SetState 0
+$pv(vtkTemp138) AcceptCallback
+
+# Fix the size of the image.
+RenWin1 SetSize 300 300
+RenWin1 Render
+update
+
+source $DataDir/Utility/rtImage.tcl
+pvImageTest $DataDir/Baseline/ProbeLine.png 10
+   
+Application Exit

@@ -51,6 +51,10 @@ ${PARAVIEW_SOURCE_DIR}/ParaView/Testing/Tcl/Mandelbrot.tcl.in
 ${PARAVIEW_BINARY_DIR}/ParaView/Testing/Tcl/Mandelbrot.tcl)
 
 CONFIGURE_FILE(
+${PARAVIEW_SOURCE_DIR}/ParaView/Testing/Tcl/ProbeLine.tcl.in
+${PARAVIEW_BINARY_DIR}/ParaView/Testing/Tcl/ProbeLine.tcl)
+
+CONFIGURE_FILE(
 ${PARAVIEW_SOURCE_DIR}/ParaView/Testing/Tcl/ProbePoint.tcl.in
 ${PARAVIEW_BINARY_DIR}/ParaView/Testing/Tcl/ProbePoint.tcl)
 
@@ -108,6 +112,9 @@ ADD_TEST(ImageReader ${PARAVIEW_EXECUTABLE}
 
 ADD_TEST(Mandelbrot ${PARAVIEW_EXECUTABLE}
                     ${PARAVIEW_BINARY_DIR}/ParaView/Testing/Tcl/Mandelbrot.tcl)
+
+ADD_TEST(ProbeLine ${PARAVIEW_EXECUTABLE}
+                    ${PARAVIEW_BINARY_DIR}/ParaView/Testing/Tcl/ProbeLine.tcl)
 
 ADD_TEST(ProbePoint ${PARAVIEW_EXECUTABLE}
                     ${PARAVIEW_BINARY_DIR}/ParaView/Testing/Tcl/ProbePoint.tcl)

@@ -88,6 +88,7 @@ vtkPVProbe::vtkPVProbe()
   this->End2ZEntry = vtkKWLabeledEntry::New();
   
   this->DivisionsEntry = vtkKWLabeledEntry::New();
+  this->ShowXYPlotToggle = vtkKWCheckButton::New();
   
   this->ProbeFrame = vtkKWWidget::New();
 
@@ -164,6 +165,9 @@ vtkPVProbe::~vtkPVProbe()
   this->DivisionsEntry->Delete();
   this->DivisionsEntry = NULL;
 
+  this->ShowXYPlotToggle->Delete();
+  this->ShowXYPlotToggle = NULL;
+  
   this->ProbeFrame->Delete();
   this->ProbeFrame = NULL;
 
@@ -408,6 +412,12 @@ void vtkPVProbe::CreateProperties()
   this->Script("bind %s <KeyPress> {%s ChangeAcceptButtonColor}",
                this->DivisionsEntry->GetEntry()->GetWidgetName(), this->GetTclName());
   
+  this->ShowXYPlotToggle->SetParent(this->ProbeFrame);
+  this->ShowXYPlotToggle->Create(pvApp, "-text \"Show XY-Plot\"");
+  this->ShowXYPlotToggle->SetState(1);
+  this->Script("%s configure -command {%s ChangeAcceptButtonColor}",
+               this->ShowXYPlotToggle->GetWidgetName(), this->GetTclName());
+  
   this->Script("grab release %s", this->ParameterFrame->GetWidgetName());
 
   this->UsePoint();
@@ -490,6 +500,9 @@ void vtkPVProbe::AcceptCallback()
                          this->End2XEntry->GetValueAsFloat(),
                          this->End2YEntry->GetValueAsFloat(),
                          this->End2ZEntry->GetValueAsFloat());
+    pvApp->AddTraceEntry("[$pv(%s) GetShowXYPlotToggle] SetState %d",
+                         this->GetTclName(),
+                         this->ShowXYPlotToggle->GetState());
     }
   
   // call the superclass's method
@@ -594,9 +607,12 @@ void vtkPVProbe::AcceptCallback()
     this->Script("%s AddInput [%s GetOutput]", this->XYPlotTclName,
                  this->ChangeScalarsFilterTclName);
     
-    this->Script("%s AddActor %s",
-		 window->GetMainView()->GetRendererTclName(),
-		 this->XYPlotTclName);
+    if (this->ShowXYPlotToggle->GetState())
+      {
+      this->Script("%s AddActor %s",
+                   window->GetMainView()->GetRendererTclName(),
+                   this->XYPlotTclName);
+      }
     window->GetMainView()->Render();
     }
 }
@@ -800,12 +816,12 @@ void vtkPVProbe::UseLine()
   this->Dimensionality = 1;
   this->Script("catch {eval pack forget [pack slaves %s]}",
                this->ProbeFrame->GetWidgetName());
-  this->Script("pack %s %s %s %s",
+  this->Script("pack %s %s %s %s %s",
                this->EndPointMenuFrame->GetWidgetName(),
                this->EndPoint1Frame->GetWidgetName(),
                this->EndPoint2Frame->GetWidgetName(),
-	       this->DivisionsEntry->GetWidgetName());
-
+	       this->DivisionsEntry->GetWidgetName(),
+               this->ShowXYPlotToggle->GetWidgetName());
   
   this->PackScalarsMenu();
   
@@ -1082,17 +1098,20 @@ void vtkPVProbe::SaveInTclScript(ofstream *file)
     *file << "\t" << this->ChangeScalarsFilterTclName
           << " SetOutputAttributeDataToPointData\n\n";
     
-    *file << "vtkXYPlotActor " << this->XYPlotTclName << "\n";
-    *file << "\t[" << this->XYPlotTclName
-          << " GetPositionCoordinate] SetValue 0.05 0.05 0\n";
-    *file << "\t[" << this->XYPlotTclName
-          << " GetPosition2Coordinate] SetValue 0.8 0.3 0\n";
-    *file << "\t" << this->XYPlotTclName << " SetNumberOfXLabels 5\n";
-    *file << "\t" << this->XYPlotTclName << " SetXTitle \"Line Divisions\"\n";
-    *file << "\t" << this->XYPlotTclName << " SetYTitle "
-          << this->DefaultScalarsName << "\n";
-    *file << "\t" << this->XYPlotTclName << " AddInput ["
-          << this->ChangeScalarsFilterTclName << " GetOutput]\n\n";
+    if (this->ShowXYPlotToggle->GetState())
+      {
+      *file << "vtkXYPlotActor " << this->XYPlotTclName << "\n";
+      *file << "\t[" << this->XYPlotTclName
+            << " GetPositionCoordinate] SetValue 0.05 0.05 0\n";
+      *file << "\t[" << this->XYPlotTclName
+            << " GetPosition2Coordinate] SetValue 0.8 0.3 0\n";
+      *file << "\t" << this->XYPlotTclName << " SetNumberOfXLabels 5\n";
+      *file << "\t" << this->XYPlotTclName << " SetXTitle \"Line Divisions\"\n";
+      *file << "\t" << this->XYPlotTclName << " SetYTitle "
+            << this->DefaultScalarsName << "\n";
+      *file << "\t" << this->XYPlotTclName << " AddInput ["
+            << this->ChangeScalarsFilterTclName << " GetOutput]\n\n";
+      }
     }
   
   this->GetPVOutput(0)->SaveInTclScript(file, this->VTKSourceTclName);
