@@ -18,7 +18,12 @@
 #include "vtkPVImageMedian3D.h"
 #include "vtkPVImageGradient.h"
 #include "vtkImageViewer.h"
+#include "vtkImageMagnitude.h"
 #include "vtkTesting.h"
+
+#ifdef VTK_USE_PATENTED
+#include "vtkPVKitwareContourFilter.h"
+#endif
 
 int main(int argc, char* argv[])
 {
@@ -49,18 +54,30 @@ int main(int argc, char* argv[])
   gradient->SetInput( median->GetOutput() );
   gradient->Update(); //discard gradient
 
+  vtkImageMagnitude *imgMagnitude = vtkImageMagnitude::New();
+  imgMagnitude->SetInput( gradient->GetOutput() );
+
+#ifdef VTK_USE_PATENTED
+  vtkPVKitwareContourFilter* contour = vtkPVKitwareContourFilter::New();
+  contour->SetInput( imgMagnitude->GetOutput() );
+  contour->SetValue(0, 0.5);
+  contour->Update();  //discard
+  contour->Delete();
+#endif
+
   vtkImageViewer *viewer = vtkImageViewer::New();
-  viewer->SetInput ( median->GetOutput() );
+  viewer->SetInput ( gradient->GetOutput() );
   viewer->SetColorWindow(2000);
   viewer->SetColorLevel(1000);
-  
   viewer->Render();
+
   reader->Delete();
   dilate->Delete();
   erode->Delete();
-  viewer->Delete();
   median->Delete();
   gradient->Delete();
+  imgMagnitude->Delete();
+  viewer->Delete();
 
   return 0;
 }
