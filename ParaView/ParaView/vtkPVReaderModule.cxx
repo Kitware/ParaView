@@ -52,7 +52,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVReaderModule);
-vtkCxxRevisionMacro(vtkPVReaderModule, "1.25");
+vtkCxxRevisionMacro(vtkPVReaderModule, "1.26");
 
 int vtkPVReaderModuleCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -101,7 +101,17 @@ void vtkPVReaderModule::CreateProperties()
   
   if (this->PackFileEntry)
     {
-    this->Script("pack %s", this->FileEntry->GetWidgetName());
+    if ( this->FileEntry->GetParent()->GetNumberOfPackedChildren() > 0 )
+      {
+      this->Script("pack %s -pady 10 -side top -fill x -expand t -before [lindex [pack slaves %s] 0]", 
+                   this->FileEntry->GetWidgetName(), 
+                   this->FileEntry->GetParent()->GetWidgetName());
+      }
+    else
+      {
+      this->Script("pack %s -side top -fill x -expand t", 
+                   this->FileEntry->GetWidgetName());
+      }
     }
 
 }
