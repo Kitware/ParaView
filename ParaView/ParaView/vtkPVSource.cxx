@@ -911,7 +911,24 @@ void vtkPVSource::DeleteCallback()
     }
   // Just remember it. We set the current pv source later.
   //this->GetPVWindow()->SetCurrentPVSourceCallback(prev);
+  if ( prev == NULL && window->GetSourceList("Sources")->GetNumberOfItems() > 0 )
+    {
+    vtkCollectionIterator *it = window->GetSourceList("Sources")->NewIterator();
+    it->InitTraversal();
+    while ( !it->IsDoneWithTraversal() )
+      {
+      prev = static_cast<vtkPVSource*>( it->GetObject() );
+      if ( prev != this )
+        {
+        break;
+        }
+      it->GoToNextItem();
+      }
+    it->Delete();
+    }
+
   current = prev;
+  
   if (prev == NULL)
     {
     // Unpack the properties.  This is required if prev is NULL.
@@ -953,11 +970,11 @@ void vtkPVSource::DeleteCallback()
   
   this->GetPVRenderView()->EventuallyRender();
   
-  window->EnableMenus();
   // This should delete this source.
   // "this" will no longer be valid after the call.
   window->RemovePVSource("Sources", this);
   window->SetCurrentPVSourceCallback(current);
+  window->EnableMenus();
 }
 
 //----------------------------------------------------------------------------
@@ -1828,7 +1845,7 @@ void vtkPVSource::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVSource ";
-  this->ExtractRevision(os,"$Revision: 1.225 $");
+  this->ExtractRevision(os,"$Revision: 1.226 $");
 }
 
 //----------------------------------------------------------------------------
