@@ -71,6 +71,7 @@ vtkPVSourceList::vtkPVSourceList()
 
   this->CurrentSource = 0;
   this->PopupMenu = vtkKWMenu::New();
+  this->Height = 40;
 }
 
 //----------------------------------------------------------------------------
