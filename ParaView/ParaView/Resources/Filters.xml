@@ -703,6 +703,23 @@ help="Set the name of the array to hold the results of this computation"/>
              input_name="Input"/>
 </Module>
 
+<Module name="TransformFilter" menu_name="Transform" root_name="Trans" module_type="Filter" 
+        long_help="This filter applies transformation to the polygons." 
+        short_help="Transform polygonal data.">
+  <Filter class="vtkTransformFilter">
+    <Input name="Input" class="vtkPointSet" /> 
+  </Filter>
+  <InputMenu label="Input" help="Set the input to this filter."
+             input_name="Input"/>
+  <SelectWidget use_widget_command="1" label="Transform Widget"
+                  trace_name="Transform Widget" variable="Transform">
+    <Item label="Box" value="GetBoxTransformTclName">
+      <BoxWidget use_label="0" trace_name="Box"
+                 help="Adjusts the parameters of the box to clip with."/>
+    </Item>
+  </SelectWidget>
+</Module>
+
 <Module name="TubeFilter" menu_name="Tube" root_name="Tuber" module_type="Filter" 
         long_help="Convert lines into tubes.  Normals are used to avoid cracks between tube segments." 
         short_help="Convert lines into tubes.">
