@@ -158,6 +158,7 @@ public:
   // Switch between script and time
   // i = 0 - script
   // i > 0 - time
+  // i < 0 - none
   void SwitchScriptTime(int i);
 
   // Description:
