@@ -19,7 +19,7 @@
 #include "vtkSMProxyInternals.h"
 
 vtkStandardNewMacro(vtkSMPropertyIterator);
-vtkCxxRevisionMacro(vtkSMPropertyIterator, "1.1");
+vtkCxxRevisionMacro(vtkSMPropertyIterator, "1.2");
 
 struct vtkSMPropertyIteratorInternals
 {
@@ -92,6 +92,11 @@ void vtkSMPropertyIterator::Begin()
 //---------------------------------------------------------------------------
 int vtkSMPropertyIterator::IsAtEnd()
 {
+  if (!this->Proxy)
+    {
+    vtkErrorMacro("Proxy is not set. Can not perform operation: IsAtEnd()");
+    return 1;
+    }
   if ( (this->Internals->PropertyIterator == this->Proxy->Internals->Properties.end()) && (this->Internals->ProxyIterator == this->Proxy->Internals->SubProxies.end()) )
     {
     return 1;
@@ -102,6 +107,11 @@ int vtkSMPropertyIterator::IsAtEnd()
 //---------------------------------------------------------------------------
 void vtkSMPropertyIterator::Next()
 {
+  if (!this->Proxy)
+    {
+    vtkErrorMacro("Proxy is not set. Can not perform operation: Next()");
+    return;
+    }
   if (this->Internals->PropertyIterator != 
       this->Proxy->Internals->Properties.end())
     {
@@ -141,6 +151,12 @@ void vtkSMPropertyIterator::Next()
 //---------------------------------------------------------------------------
 const char* vtkSMPropertyIterator::GetKey()
 {
+  if (!this->Proxy)
+    {
+    vtkErrorMacro("Proxy is not set. Can not perform operation: GetKey()");
+    return 0;
+    }
+
   if (this->Internals->PropertyIterator != 
       this->Proxy->Internals->Properties.end())
     {
@@ -159,6 +175,11 @@ const char* vtkSMPropertyIterator::GetKey()
 //---------------------------------------------------------------------------
 vtkSMProperty* vtkSMPropertyIterator::GetProperty()
 {
+  if (!this->Proxy)
+    {
+    vtkErrorMacro("Proxy is not set. Can not perform operation: GetProperty()");
+    return 0;
+    }
   if (this->Internals->PropertyIterator != 
       this->Proxy->Internals->Properties.end())
     {
