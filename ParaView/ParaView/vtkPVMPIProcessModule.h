@@ -85,6 +85,19 @@ public:
   // This breaks rmi loops and cleans up processes.`                
   virtual void Exit();
 
+  // Send the current vtkClientServerStream contents to the client.
+  // Also reset the vtkClientServerStream object.
+  virtual void SendStreamToClient();
+
+  // Send the current vtkClientServerStream contents to the server.
+  // Also reset the vtkClientServerStream object.
+  virtual void SendStreamToServer();
+
+  // Description:
+  // Send current ClientServerStream data to the server and the client.
+  // Also reset the vtkClientServerStream object.
+  virtual void SendStreamToClientAndServer();
+
   // Description:
   // The primary method for building pipelines on remote proceses
   // is to use tcl.
@@ -107,6 +120,9 @@ public:
 protected:
   vtkPVMPIProcessModule();
   ~vtkPVMPIProcessModule();
+
+  virtual void SendStreamToServerNodeInternal(int remoteId);
+  virtual void SendStreamToServerInternal();
 
   // To pass arguments through controller single method.
   int    ArgumentCount;

@@ -72,10 +72,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkClientServerStream.h"
 #include "vtkClientServerInterpreter.h"
 
+#define VTK_PV_SLAVE_CLIENTSERVER_RMI_TAG 397529
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVMPIProcessModule);
-vtkCxxRevisionMacro(vtkPVMPIProcessModule, "1.15.4.7");
+vtkCxxRevisionMacro(vtkPVMPIProcessModule, "1.15.4.8");
 
 int vtkPVMPIProcessModuleCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -95,6 +96,19 @@ void vtkPVSlaveScript(void *localArg, void *remoteArg,
 
   //cerr << " ++++ SlaveScript: " << ((char*)remoteArg) << endl;
   self->SimpleScript((char*)remoteArg);
+}
+
+
+//----------------------------------------------------------------------------
+void vtkPVSendStreamToServerNodeRMI(void *localArg, void *remoteArg,
+                                    int remoteArgLength,
+                                    int vtkNotUsed(remoteProcessId))
+{
+  vtkPVMPIProcessModule* self =
+    reinterpret_cast<vtkPVMPIProcessModule*>(localArg);
+  self->GetInterpreter()
+    ->ProcessStream(reinterpret_cast<unsigned char*>(remoteArg),
+                    remoteArgLength);
 }
 
 
@@ -180,6 +194,8 @@ void vtkPVMPIProcessModule::Initialize()
     vtkPVApplication *pvApp = this->GetPVApplication();
     this->Controller->AddRMI(vtkPVSlaveScript, (void *)(pvApp),
                              VTK_PV_SLAVE_SCRIPT_RMI_TAG);
+    this->Controller->AddRMI(vtkPVSendStreamToServerNodeRMI, this,
+                             VTK_PV_SLAVE_CLIENTSERVER_RMI_TAG);
     this->Controller->ProcessRMIs();
     }
 }
@@ -302,7 +318,57 @@ void vtkPVMPIProcessModule::RemoteSimpleScript(int remoteId, const char *str)
                                VTK_PV_SLAVE_SCRIPT_RMI_TAG);
 }
 
+//----------------------------------------------------------------------------
+void vtkPVMPIProcessModule::SendStreamToClient()
+{
+  this->Interpreter->ProcessStream(*this->ClientServerStream);
+  this->ClientServerStream->Reset();
+}
 
+//----------------------------------------------------------------------------
+void vtkPVMPIProcessModule::SendStreamToServer()
+{
+  this->SendStreamToServerInternal();
+  this->ClientServerStream->Reset();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVMPIProcessModule::SendStreamToClientAndServer()
+{
+  this->SendStreamToServer();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVMPIProcessModule::SendStreamToServerInternal()
+{
+  // First send the command to the other server nodes.
+  int numPartitions = this->GetNumberOfPartitions();
+  for(int i=1; i < numPartitions; ++i)
+    {
+    this->SendStreamToServerNodeInternal(i);
+    }
+
+  // Now process the stream locally.
+  this->Interpreter->ProcessStream(*this->ClientServerStream);
+}
+
+//----------------------------------------------------------------------------
+void
+vtkPVMPIProcessModule::SendStreamToServerNodeInternal(int remoteId)
+{
+  if(remoteId == this->Controller->GetLocalProcessId())
+    {
+    this->Interpreter->ProcessStream(*this->ClientServerStream);
+    }
+  else
+    {
+    const unsigned char* data;
+    size_t length;
+    this->ClientServerStream->GetData(&data, &length);
+    this->Controller->TriggerRMI(remoteId, (void*)data, length,
+                                 VTK_PV_SLAVE_CLIENTSERVER_RMI_TAG);
+    }
+}
 
 //----------------------------------------------------------------------------
 int vtkPVMPIProcessModule::GetNumberOfPartitions()
