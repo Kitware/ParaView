@@ -1,15 +1,15 @@
 /*=========================================================================
 
-  Program:   ParaView
-  Module:    vtkDesktopDeliveryServer.cxx
+Program:   ParaView
+Module:    vtkDesktopDeliveryServer.cxx
 
-  Copyright (c) Kitware, Inc.
-  All rights reserved.
-  See Copyright.txt or http://www.paraview.org/HTML/Copyright.html for details.
+Copyright (c) Kitware, Inc.
+All rights reserved.
+See Copyright.txt or http://www.paraview.org/HTML/Copyright.html for details.
 
-     This software is distributed WITHOUT ANY WARRANTY; without even
-     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-     PURPOSE.  See the above copyright notice for more information.
+This software is distributed WITHOUT ANY WARRANTY; without even
+the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
 
@@ -29,26 +29,26 @@
 #include "vtkMultiProcessController.h"
 
 static void SatelliteStartRender(vtkObject *caller,
-                 unsigned long vtkNotUsed(event),
-                 void *clientData, void *);
+                                 unsigned long vtkNotUsed(event),
+                                 void *clientData, void *);
 static void SatelliteEndRender(vtkObject *caller,
-                   unsigned long vtkNotUsed(event),
-                   void *clientData, void *);
+                               unsigned long vtkNotUsed(event),
+                               void *clientData, void *);
 static void SatelliteStartParallelRender(vtkObject *caller,
-                     unsigned long vtkNotUsed(event),
-                     void *clientData, void *);
+                                         unsigned long vtkNotUsed(event),
+                                         void *clientData, void *);
 static void SatelliteEndParallelRender(vtkObject *caller,
-                       unsigned long vtkNotUsed(event),
-                       void *clientData, void *);
+                                       unsigned long vtkNotUsed(event),
+                                       void *clientData, void *);
 
-vtkCxxRevisionMacro(vtkDesktopDeliveryServer, "1.15");
+vtkCxxRevisionMacro(vtkDesktopDeliveryServer, "1.16");
 vtkStandardNewMacro(vtkDesktopDeliveryServer);
 
 vtkDesktopDeliveryServer::vtkDesktopDeliveryServer()
 {
-    this->ParallelRenderManager = NULL;
-    this->RemoteDisplay = 1;
-    this->SquirtBuffer = vtkUnsignedCharArray::New();
+  this->ParallelRenderManager = NULL;
+  this->RemoteDisplay = 1;
+  this->SquirtBuffer = vtkUnsignedCharArray::New();
 }
 
 vtkDesktopDeliveryServer::~vtkDesktopDeliveryServer()
@@ -77,7 +77,7 @@ vtkDesktopDeliveryServer::SetController(vtkMultiProcessController *controller)
 }
 
 void vtkDesktopDeliveryServer
-    ::SetParallelRenderManager(vtkParallelRenderManager *prm)
+::SetParallelRenderManager(vtkParallelRenderManager *prm)
 {
   if (this->ParallelRenderManager == prm)
     {
@@ -233,9 +233,9 @@ void vtkDesktopDeliveryServer::ReceiveWindowInformation()
 {
   vtkDesktopDeliveryServer::SquirtOptions squirt_options;
   this->Controller->Receive((int *)(&squirt_options),
-                vtkDesktopDeliveryServer::SQUIRT_OPTIONS_SIZE,
-                this->RootProcessId,
-                vtkDesktopDeliveryServer::SQUIRT_OPTIONS_TAG);
+                            vtkDesktopDeliveryServer::SQUIRT_OPTIONS_SIZE,
+                            this->RootProcessId,
+                            vtkDesktopDeliveryServer::SQUIRT_OPTIONS_TAG);
 
   this->Squirt = squirt_options.Enabled;
   this->SquirtCompressionLevel = squirt_options.CompressLevel;
@@ -247,7 +247,7 @@ void vtkDesktopDeliveryServer::PreRenderProcessing()
 
   // Send remote display flag.
   this->Controller->Send(&this->RemoteDisplay, 1, this->RootProcessId,
-    vtkDesktopDeliveryServer::REMOTE_DISPLAY_TAG);
+                         vtkDesktopDeliveryServer::REMOTE_DISPLAY_TAG);
 
   if (this->ParallelRenderManager)
     {
@@ -267,7 +267,7 @@ void vtkDesktopDeliveryServer::PreRenderProcessing()
 
     // Make sure the prm has the correct image reduction factor.
     if (  this->ParallelRenderManager->GetMaxImageReductionFactor()
-        < this->ImageReductionFactor)
+          < this->ImageReductionFactor)
       {
       this->ParallelRenderManager
         ->SetMaxImageReductionFactor(this->ImageReductionFactor);
@@ -329,9 +329,9 @@ void vtkDesktopDeliveryServer::PostRenderProcessing()
   else
     {
     this->Controller->Send((int *)(&ip),
-               vtkDesktopDeliveryServer::IMAGE_PARAMS_SIZE,
-               this->RootProcessId,
-               vtkDesktopDeliveryServer::IMAGE_PARAMS_TAG);
+                           vtkDesktopDeliveryServer::IMAGE_PARAMS_SIZE,
+                           this->RootProcessId,
+                           vtkDesktopDeliveryServer::IMAGE_PARAMS_TAG);
     }
 
   // Send timing metics
@@ -347,9 +347,9 @@ void vtkDesktopDeliveryServer::PostRenderProcessing()
     }
 
   this->Controller->Send((double *)(&tm),
-             vtkDesktopDeliveryServer::TIMING_METRICS_SIZE,
-             this->RootProcessId,
-             vtkDesktopDeliveryServer::TIMING_METRICS_TAG);
+                         vtkDesktopDeliveryServer::TIMING_METRICS_SIZE,
+                         this->RootProcessId,
+                         vtkDesktopDeliveryServer::TIMING_METRICS_TAG);
 
   // If another parallel render manager has already made an image, don't
   // clober it.
@@ -381,14 +381,14 @@ void vtkDesktopDeliveryServer::ReadReducedImage()
     {
     int *size = this->ParallelRenderManager->GetReducedImageSize();
     if (   (this->ReducedImageSize[0] != size[0])
-        || (this->ReducedImageSize[1] != size[1]) )
+           || (this->ReducedImageSize[1] != size[1]) )
       {
       vtkDebugMacro(<< "Coupled parallel render manager reports unexpected reduced image size\n"
-                      << "Expected size: " << this->ReducedImageSize[0] << " "
-                      << this->ReducedImageSize[1] << "\n"
-                      << "Reported size: " << size[0] << " " << size[1]);
+                    << "Expected size: " << this->ReducedImageSize[0] << " "
+                    << this->ReducedImageSize[1] << "\n"
+                    << "Reported size: " << size[0] << " " << size[1]);
       if (   (this->ReducedImageSize[0] == this->FullImageSize[0])
-          && (this->ReducedImageSize[1] == this->FullImageSize[1]) )
+             && (this->ReducedImageSize[1] == this->FullImageSize[1]) )
         {
         vtkWarningMacro(<< "The coupled render manager has apparently resized the window.\n"
                         << "Operation will still work normally, but the client may waste many cycles\n"
@@ -407,7 +407,7 @@ void vtkDesktopDeliveryServer::ReadReducedImage()
 }
 
 void vtkDesktopDeliveryServer::LocalComputeVisiblePropBounds(vtkRenderer *ren,
-                                 double bounds[6])
+                                                             double bounds[6])
 {
   if (this->ParallelRenderManager)
     {
@@ -420,7 +420,7 @@ void vtkDesktopDeliveryServer::LocalComputeVisiblePropBounds(vtkRenderer *ren,
 }
 
 void vtkDesktopDeliveryServer::SquirtCompress(vtkUnsignedCharArray *in,
-                          vtkUnsignedCharArray *out)
+                                              vtkUnsignedCharArray *out)
 {
   if (in->GetNumberOfComponents() != 4)
     {
@@ -433,11 +433,11 @@ void vtkDesktopDeliveryServer::SquirtCompress(vtkUnsignedCharArray *in,
   int end_index;
   unsigned int current_color;
   unsigned char compress_masks[6][4] = { {0xFF, 0xFF, 0xFF, 0xFF},
-                     {0xFE, 0xFF, 0xFE, 0xFF},
-                     {0xFC, 0xFE, 0xFC, 0xFF},
-                     {0xF8, 0xFC, 0xF8, 0xFF},
-                     {0xF0, 0xF8, 0xF0, 0xFF},
-                     {0xE0, 0xF0, 0xE0, 0xFF} };
+                                         {0xFE, 0xFF, 0xFE, 0xFF},
+                                         {0xFC, 0xFE, 0xFC, 0xFF},
+                                         {0xF8, 0xFC, 0xF8, 0xFF},
+                                         {0xF0, 0xF8, 0xF0, 0xFF},
+                                         {0xE0, 0xF0, 0xE0, 0xFF} };
 
   // Set bitmask based on compress_level
   unsigned int compress_mask
@@ -461,8 +461,8 @@ void vtkDesktopDeliveryServer::SquirtCompress(vtkUnsignedCharArray *in,
 
     // Compute Run
     while(   (   (current_color&compress_mask)
-          == (_rawColorBuffer[index]&compress_mask))
-      && (index<end_index) && (count<255))
+                 == (_rawColorBuffer[index]&compress_mask))
+             && (index<end_index) && (count<255))
       {
       index++;
       count++;
@@ -492,8 +492,8 @@ void vtkDesktopDeliveryServer::PrintSelf(ostream& os, vtkIndent indent)
 
 
 static void SatelliteStartRender(vtkObject *caller,
-                 unsigned long vtkNotUsed(event),
-                 void *clientData, void *)
+                                 unsigned long vtkNotUsed(event),
+                                 void *clientData, void *)
 {
   vtkDesktopDeliveryServer *self = (vtkDesktopDeliveryServer *)clientData;
   if (caller != self->GetRenderWindow())
@@ -504,8 +504,8 @@ static void SatelliteStartRender(vtkObject *caller,
   self->SatelliteStartRender();
 }
 static void SatelliteEndRender(vtkObject *caller,
-                   unsigned long vtkNotUsed(event),
-                   void *clientData, void *)
+                               unsigned long vtkNotUsed(event),
+                               void *clientData, void *)
 {
   vtkDesktopDeliveryServer *self = (vtkDesktopDeliveryServer *)clientData;
   if (caller != self->GetRenderWindow())
@@ -517,8 +517,8 @@ static void SatelliteEndRender(vtkObject *caller,
 }
 
 static void SatelliteStartParallelRender(vtkObject *caller,
-                     unsigned long vtkNotUsed(event),
-                     void *clientData, void *)
+                                         unsigned long vtkNotUsed(event),
+                                         void *clientData, void *)
 {
   vtkDesktopDeliveryServer *self = (vtkDesktopDeliveryServer *)clientData;
   if (caller != self->GetParallelRenderManager())
@@ -529,8 +529,8 @@ static void SatelliteStartParallelRender(vtkObject *caller,
   self->SatelliteStartRender();
 }
 static void SatelliteEndParallelRender(vtkObject *caller,
-                       unsigned long vtkNotUsed(event),
-                       void *clientData, void *)
+                                       unsigned long vtkNotUsed(event),
+                                       void *clientData, void *)
 {
   vtkDesktopDeliveryServer *self = (vtkDesktopDeliveryServer *)clientData;
   if (caller != self->GetParallelRenderManager())
