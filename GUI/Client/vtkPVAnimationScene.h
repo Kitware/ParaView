@@ -95,7 +95,20 @@ public:
   // Note that this time is not normalized time. It extends from
   // [0, Duration].
   void SetCurrentTime( double time);
+#ifdef VTK_WORKAROUND_WINDOWS_MANGLE
+  // Avoid windows name mangling.
+#define GetTickCount() GetCurrentTime()
+#endif
+  // Description:
+  // Get the current animation time step.
   double GetCurrentTime();
+  
+#ifdef VTK_WORKAROUND_WINDOWS_MANGLE
+# undef GetTickCount
+  //BTX
+  int GetTickCount();
+  //ETX
+#endif
 
   // Description:
   // Sets the current time for the animation state. 

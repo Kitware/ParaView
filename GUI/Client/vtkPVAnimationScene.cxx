@@ -67,7 +67,7 @@
 #endif
 
 vtkStandardNewMacro(vtkPVAnimationScene);
-vtkCxxRevisionMacro(vtkPVAnimationScene, "1.4");
+vtkCxxRevisionMacro(vtkPVAnimationScene, "1.5");
 #define VTK_PV_PLAYMODE_SEQUENCE_TITLE "Sequence"
 #define VTK_PV_PLAYMODE_REALTIME_TITLE "Real Time"
 //*****************************************************************************
@@ -846,6 +846,16 @@ void vtkPVAnimationScene::SetCurrentTime(double time)
   this->TimeScale->SetValue(time);
   this->AddTraceEntry("$kw(%s) SetCurrentTime %f", this->GetTclName(), time);
 }
+
+//-----------------------------------------------------------------------------
+#ifdef VTK_WORKAROUND_WINDOWS_MANGLE
+# undef GetCurrentTime
+// Define possible mangled names.
+int vtkPVAnimationScene::GetTickCount()
+{
+  return this->GetCurrentTime();
+}
+#endif
 
 //-----------------------------------------------------------------------------
 double vtkPVAnimationScene::GetCurrentTime()
