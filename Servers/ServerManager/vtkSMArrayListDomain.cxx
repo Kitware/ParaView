@@ -24,7 +24,7 @@
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkSMArrayListDomain);
-vtkCxxRevisionMacro(vtkSMArrayListDomain, "1.1");
+vtkCxxRevisionMacro(vtkSMArrayListDomain, "1.2");
 
 //---------------------------------------------------------------------------
 vtkSMArrayListDomain::vtkSMArrayListDomain()
@@ -40,7 +40,7 @@ vtkSMArrayListDomain::~vtkSMArrayListDomain()
 void vtkSMArrayListDomain::AddArrays(vtkPVDataSetAttributesInformation* info, 
                                      vtkSMInputArrayDomain* iad)
 {
-  int attrIdx=-1;
+  //int attrIdx=-1;
   //vtkPVArrayInformation* attrInfo = info->GetAttributeInformation(
   //this->AttributeType);
   int num = info->GetNumberOfArrays();
