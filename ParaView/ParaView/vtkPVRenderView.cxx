@@ -135,7 +135,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.309");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.310");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -1272,7 +1272,7 @@ void vtkPVRenderView::CreateViewProperties()
   this->CameraControlFrame->SetParent(frame->GetFrame());
   this->CameraControlFrame->ShowHideFrameOn();
   this->CameraControlFrame->Create(this->Application, 0);
-  this->CameraControlFrame->SetLabel("Camera Control");
+  this->CameraControlFrame->SetLabel("Camera Orientation");
   
   // Camera: camera control
   
