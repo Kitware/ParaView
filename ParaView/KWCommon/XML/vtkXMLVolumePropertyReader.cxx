@@ -51,7 +51,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkXMLVolumePropertyWriter.h"
 
 vtkStandardNewMacro(vtkXMLVolumePropertyReader);
-vtkCxxRevisionMacro(vtkXMLVolumePropertyReader, "1.1");
+vtkCxxRevisionMacro(vtkXMLVolumePropertyReader, "1.2");
 
 //----------------------------------------------------------------------------
 char* vtkXMLVolumePropertyReader::GetRootElementName()
@@ -95,37 +95,41 @@ int vtkXMLVolumePropertyReader::Parse(vtkXMLDataElement *elem)
   int nb_nested_elems = elem->GetNumberOfNestedElements();
   for (int idx = 0; idx < nb_nested_elems; idx++)
     {
-    vtkXMLDataElement *nested_elem = elem->GetNestedElement(idx);
-    if (strcmp(nested_elem->GetName(), 
+    vtkXMLDataElement *comp_elem = elem->GetNestedElement(idx);
+    if (strcmp(comp_elem->GetName(), 
                vtkXMLVolumePropertyWriter::GetComponentElementName()))
       {
       continue;
       }
 
     int c_idx;
-    if (!nested_elem->GetScalarAttribute("Index", c_idx) || 
+    if (!comp_elem->GetScalarAttribute("Index", c_idx) || 
         c_idx >= VTK_MAX_VRCOMP)
       {
       continue;
       }
 
-    if (nested_elem->GetScalarAttribute("Shade", ival))
+    if (comp_elem->GetScalarAttribute("Shade", ival))
       {
       obj->SetShade(c_idx, ival);
       }
-    if (nested_elem->GetScalarAttribute("Ambient", fval))
+
+    if (comp_elem->GetScalarAttribute("Ambient", fval))
       {
       obj->SetAmbient(c_idx, fval);
       }
-    if (nested_elem->GetScalarAttribute("Diffuse", fval))
+
+    if (comp_elem->GetScalarAttribute("Diffuse", fval))
       {
       obj->SetDiffuse(c_idx, fval);
       }
-    if (nested_elem->GetScalarAttribute("Specular", fval))
+
+    if (comp_elem->GetScalarAttribute("Specular", fval))
       {
       obj->SetSpecular(c_idx, fval);
       }
-    if (nested_elem->GetScalarAttribute("SpecularPower", fval))
+
+    if (comp_elem->GetScalarAttribute("SpecularPower", fval))
       {
       obj->SetSpecularPower(c_idx, fval);
       }
@@ -133,40 +137,34 @@ int vtkXMLVolumePropertyReader::Parse(vtkXMLDataElement *elem)
     // Gray or Color Transfer Function
     
     int gtf_was_set = 0;
-    vtkXMLDataElement *gtf_elem = nested_elem->FindNestedElementWithName(
-      vtkXMLVolumePropertyWriter::GetGrayTransferFunctionElementName());
-    if (gtf_elem)
+    if (xmlpfr->IsInNestedElement(
+          comp_elem, 
+          vtkXMLVolumePropertyWriter::GetGrayTransferFunctionElementName()))
       {
-      vtkXMLDataElement *gtf_nested_elem = 
-        gtf_elem->FindNestedElementWithName(xmlpfr->GetRootElementName());
-      if (gtf_nested_elem)
+      vtkPiecewiseFunction *gtf = obj->GetGrayTransferFunction(c_idx);
+      if (gtf)
         {
-        vtkPiecewiseFunction *gtf = obj->GetGrayTransferFunction(c_idx);
-        if (gtf)
-          {
-          xmlpfr->SetObject(gtf);
-          xmlpfr->Parse(gtf_nested_elem);
-          gtf_was_set = 1;
-          }
+        xmlpfr->SetObject(gtf);
+        xmlpfr->ParseInNestedElement(
+          comp_elem,
+          vtkXMLVolumePropertyWriter::GetGrayTransferFunctionElementName());
+        gtf_was_set = 1;
         }
       }
 
     int rgbtf_was_set = 0;
-    vtkXMLDataElement *rgbtf_elem = nested_elem->FindNestedElementWithName(
-      vtkXMLVolumePropertyWriter::GetRGBTransferFunctionElementName());
-    if (rgbtf_elem)
+    if (xmlctfr->IsInNestedElement(
+          comp_elem, 
+          vtkXMLVolumePropertyWriter::GetRGBTransferFunctionElementName()))
       {
-      vtkXMLDataElement *rgbtf_nested_elem = 
-        rgbtf_elem->FindNestedElementWithName(xmlctfr->GetRootElementName());
-      if (rgbtf_nested_elem)
+      vtkColorTransferFunction *rgbtf = obj->GetRGBTransferFunction(c_idx);
+      if (rgbtf)
         {
-        vtkColorTransferFunction *rgbtf = obj->GetRGBTransferFunction(c_idx);
-        if (rgbtf)
-          {
-          xmlctfr->SetObject(rgbtf);
-          xmlctfr->Parse(rgbtf_nested_elem);
-          rgbtf_was_set = 1;
-          }
+        xmlctfr->SetObject(rgbtf);
+        xmlctfr->ParseInNestedElement(
+          comp_elem,
+          vtkXMLVolumePropertyWriter::GetRGBTransferFunctionElementName());
+        rgbtf_was_set = 1;
         }
       }
 
@@ -188,21 +186,18 @@ int vtkXMLVolumePropertyReader::Parse(vtkXMLDataElement *elem)
     // Scalar Opacity
 
     int sotf_was_set = 0;
-    vtkXMLDataElement *sotf_elem = nested_elem->FindNestedElementWithName(
-      vtkXMLVolumePropertyWriter::GetScalarOpacityElementName());
-    if (sotf_elem)
+    if (xmlpfr->IsInNestedElement(
+          comp_elem, 
+          vtkXMLVolumePropertyWriter::GetScalarOpacityElementName()))
       {
-      vtkXMLDataElement *sotf_nested_elem = 
-        sotf_elem->FindNestedElementWithName(xmlpfr->GetRootElementName());
-      if (sotf_nested_elem)
+      vtkPiecewiseFunction *sotf = obj->GetScalarOpacity(c_idx);
+      if (sotf)
         {
-        vtkPiecewiseFunction *sotf = obj->GetScalarOpacity(c_idx);
-        if (sotf)
-          {
-          xmlpfr->SetObject(sotf);
-          xmlpfr->Parse(sotf_nested_elem);
-          sotf_was_set = 1;
-          }
+        xmlpfr->SetObject(sotf);
+        xmlpfr->ParseInNestedElement(
+          comp_elem,
+          vtkXMLVolumePropertyWriter::GetScalarOpacityElementName());
+        sotf_was_set = 1;
         }
       }
     if (!sotf_was_set)
@@ -213,21 +208,18 @@ int vtkXMLVolumePropertyReader::Parse(vtkXMLDataElement *elem)
     // Gradient Opacity
 
     int gotf_was_set = 0;
-    vtkXMLDataElement *gotf_elem = nested_elem->FindNestedElementWithName(
-      vtkXMLVolumePropertyWriter::GetGradientOpacityElementName());
-    if (gotf_elem)
+    if (xmlpfr->IsInNestedElement(
+          comp_elem, 
+          vtkXMLVolumePropertyWriter::GetGradientOpacityElementName()))
       {
-      vtkXMLDataElement *gotf_nested_elem = 
-        gotf_elem->FindNestedElementWithName(xmlpfr->GetRootElementName());
-      if (gotf_nested_elem)
+      vtkPiecewiseFunction *gotf = obj->GetGradientOpacity(c_idx);
+      if (gotf)
         {
-        vtkPiecewiseFunction *gotf = obj->GetGradientOpacity(c_idx);
-        if (gotf)
-          {
-          xmlpfr->SetObject(gotf);
-          xmlpfr->Parse(gotf_nested_elem);
-          gotf_was_set = 1;
-          }
+        xmlpfr->SetObject(gotf);
+        xmlpfr->ParseInNestedElement(
+          comp_elem,
+          vtkXMLVolumePropertyWriter::GetGradientOpacityElementName());
+        gotf_was_set = 1;
         }
       }
     if (!gotf_was_set)

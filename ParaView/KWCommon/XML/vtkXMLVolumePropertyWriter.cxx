@@ -50,7 +50,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkXMLPiecewiseFunctionWriter.h"
 
 vtkStandardNewMacro(vtkXMLVolumePropertyWriter);
-vtkCxxRevisionMacro(vtkXMLVolumePropertyWriter, "1.1");
+vtkCxxRevisionMacro(vtkXMLVolumePropertyWriter, "1.2");
 
 //----------------------------------------------------------------------------
 char* vtkXMLVolumePropertyWriter::GetRootElementName()
@@ -147,7 +147,8 @@ int vtkXMLVolumePropertyWriter::AddNestedElements(vtkXMLDataElement *elem)
     comp_elem->SetFloatAttribute("Ambient", obj->GetAmbient(c_idx));
     comp_elem->SetFloatAttribute("Diffuse", obj->GetDiffuse(c_idx));
     comp_elem->SetFloatAttribute("Specular", obj->GetSpecular(c_idx));
-    comp_elem->SetFloatAttribute("SpecularPower", obj->GetSpecularPower(c_idx));
+    comp_elem->SetFloatAttribute(
+      "SpecularPower", obj->GetSpecularPower(c_idx));
     
     // Gray or Color Transfer Function
 
@@ -156,15 +157,9 @@ int vtkXMLVolumePropertyWriter::AddNestedElements(vtkXMLDataElement *elem)
       vtkPiecewiseFunction *gtf = obj->GetGrayTransferFunction(c_idx);
       if (gtf)
         {
-        vtkXMLDataElement *gtf_elem = vtkXMLDataElement::New();
-        comp_elem->AddNestedElement(gtf_elem);
-        gtf_elem->Delete();
-        gtf_elem->SetName(this->GetGrayTransferFunctionElementName());
-        vtkXMLDataElement *gtf_nested_elem = vtkXMLDataElement::New();
-        gtf_elem->AddNestedElement(gtf_nested_elem);
-        gtf_nested_elem->Delete();
         xmlpfw->SetObject(gtf);
-        xmlpfw->Create(gtf_nested_elem);
+        xmlpfw->CreateInNestedElement(
+          comp_elem, this->GetGrayTransferFunctionElementName());
         }
       }
     else if (obj->GetColorChannels() >= 1)
@@ -172,15 +167,9 @@ int vtkXMLVolumePropertyWriter::AddNestedElements(vtkXMLDataElement *elem)
       vtkColorTransferFunction *rgbtf = obj->GetRGBTransferFunction(c_idx);
       if (rgbtf)
         {
-        vtkXMLDataElement *rgbtf_elem = vtkXMLDataElement::New();
-        comp_elem->AddNestedElement(rgbtf_elem);
-        rgbtf_elem->Delete();
-        rgbtf_elem->SetName(this->GetRGBTransferFunctionElementName());
-        vtkXMLDataElement *rgbtf_nested_elem = vtkXMLDataElement::New();
-        rgbtf_elem->AddNestedElement(rgbtf_nested_elem);
-        rgbtf_nested_elem->Delete();
         xmlctfw->SetObject(rgbtf);
-        xmlctfw->Create(rgbtf_nested_elem);
+        xmlctfw->CreateInNestedElement(
+          comp_elem, this->GetRGBTransferFunctionElementName());
         }
       }
 
@@ -189,15 +178,9 @@ int vtkXMLVolumePropertyWriter::AddNestedElements(vtkXMLDataElement *elem)
     vtkPiecewiseFunction *sotf = obj->GetScalarOpacity(c_idx);
     if (sotf)
       {
-      vtkXMLDataElement *sotf_elem = vtkXMLDataElement::New();
-      comp_elem->AddNestedElement(sotf_elem);
-      sotf_elem->Delete();
-      sotf_elem->SetName(this->GetScalarOpacityElementName());
-      vtkXMLDataElement *sotf_nested_elem = vtkXMLDataElement::New();
-      sotf_elem->AddNestedElement(sotf_nested_elem);
-      sotf_nested_elem->Delete();
       xmlpfw->SetObject(sotf);
-      xmlpfw->Create(sotf_nested_elem);
+      xmlpfw->CreateInNestedElement(
+        comp_elem, this->GetScalarOpacityElementName());
       }
 
     // Gradient Opacity
@@ -205,15 +188,9 @@ int vtkXMLVolumePropertyWriter::AddNestedElements(vtkXMLDataElement *elem)
     vtkPiecewiseFunction *gotf = obj->GetGradientOpacity(c_idx);
     if (gotf)
       {
-      vtkXMLDataElement *gotf_elem = vtkXMLDataElement::New();
-      comp_elem->AddNestedElement(gotf_elem);
-      gotf_elem->Delete();
-      gotf_elem->SetName(this->GetGradientOpacityElementName());
-      vtkXMLDataElement *gotf_nested_elem = vtkXMLDataElement::New();
-      gotf_elem->AddNestedElement(gotf_nested_elem);
-      gotf_nested_elem->Delete();
       xmlpfw->SetObject(gotf);
-      xmlpfw->Create(gotf_nested_elem);
+      xmlpfw->CreateInNestedElement(
+        comp_elem, this->GetGradientOpacityElementName());
       }
     }
 
