@@ -56,7 +56,8 @@ protected:
 
   vtkCollection* LabelCollection;
   void ClearDataLabels();
-  void InsertDataLabel(const char* label, vtkIdType idx, vtkDataSetAttributes* attr);
+  void InsertDataLabel(const char* label, vtkIdType idx,
+                       vtkDataSetAttributes* attr, double* x=0);
   int LabelRow;
 
   // The real AcceptCallback method.

@@ -32,7 +32,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPick);
-vtkCxxRevisionMacro(vtkPVPick, "1.6");
+vtkCxxRevisionMacro(vtkPVPick, "1.7");
 
 
 //----------------------------------------------------------------------------
@@ -130,7 +130,9 @@ void vtkPVPick::AcceptCallbackInternal()
   num = d->GetNumberOfPoints();
   for (idx = 0; idx < num; ++idx)
     {
-    this->InsertDataLabel("Point", idx, d->GetPointData());
+    double x[3];
+    d->GetPoints()->GetPoint(idx, x);
+    this->InsertDataLabel("Point", idx, d->GetPointData(), x);
     }
 }
  
@@ -157,8 +159,59 @@ void vtkPVPick::ClearDataLabels()
 }
 
 //----------------------------------------------------------------------------
+template <class T>
+void vtkPVPickPrint(ostream& os, T* d)
+{
+  os << *d;
+}
+void vtkPVPickPrintChar(ostream& os, char* d)
+{
+  os << static_cast<short>(*d);
+}
+void vtkPVPickPrintUChar(ostream& os, unsigned char* d)
+{
+  os << static_cast<unsigned short>(*d);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVPickPrint(ostream& os, vtkDataArray* da,
+                    vtkIdType index, vtkIdType j)
+{
+  // Print the component using its real type.
+  void* d = da->GetVoidPointer(index);
+  switch(da->GetDataType())
+    {
+    case VTK_ID_TYPE:
+      vtkPVPickPrint(os, static_cast<vtkIdType*>(d)+j); break;
+    case VTK_DOUBLE:
+      vtkPVPickPrint(os, static_cast<double*>(d)+j); break;
+    case VTK_FLOAT:
+      vtkPVPickPrint(os, static_cast<float*>(d)+j); break;
+    case VTK_LONG:
+      vtkPVPickPrint(os, static_cast<long*>(d)+j); break;
+    case VTK_UNSIGNED_LONG:
+      vtkPVPickPrint(os, static_cast<unsigned long*>(d)+j); break;
+    case VTK_INT:
+      vtkPVPickPrint(os, static_cast<int*>(d)+j); break;
+    case VTK_UNSIGNED_INT:
+      vtkPVPickPrint(os, static_cast<unsigned int*>(d)+j); break;
+    case VTK_SHORT:
+      vtkPVPickPrint(os, static_cast<short*>(d)+j); break;
+    case VTK_UNSIGNED_SHORT:
+      vtkPVPickPrint(os, static_cast<unsigned short*>(d)+j); break;
+    case VTK_CHAR:
+      vtkPVPickPrintChar(os, static_cast<char*>(d)+j); break;
+    case VTK_UNSIGNED_CHAR:
+      vtkPVPickPrintUChar(os, static_cast<unsigned char*>(d)+j); break;
+    default:
+      // We do not know about the type.  Just use double.
+      os << da->GetComponent(index, j);
+    }
+}
+
+//----------------------------------------------------------------------------
 void vtkPVPick::InsertDataLabel(const char* labelArg, vtkIdType idx, 
-                                vtkDataSetAttributes* attr)
+                                vtkDataSetAttributes* attr, double* x)
 {
   // update the ui
   vtkIdType j, numComponents;
@@ -182,6 +235,16 @@ void vtkPVPick::InsertDataLabel(const char* labelArg, vtkIdType idx,
   kwl->Delete();
   kwl = NULL;
 
+  // Print the point location if given.
+  if(x)
+    {
+    ostrstream arrayStrm;
+    arrayStrm << "Location: ( " << x[0] << "," << x[1] << "," << x[2] << " )"
+              << endl << ends;
+    label += arrayStrm.str();
+    arrayStrm.rdbuf()->freeze(0);
+    }
+
   // Now add a label for the attribute data.
   int numArrays = attr->GetNumberOfArrays();
   for (int i = 0; i < numArrays; i++)
@@ -201,7 +264,8 @@ void vtkPVPick::InsertDataLabel(const char* labelArg, vtkIdType idx,
           {
           // make sure we fill buffer from the beginning
           ostrstream tempStrm;
-          tempStrm << array->GetComponent( idx, j ) << ends; 
+          vtkPVPickPrint(tempStrm, array, idx, j);
+          tempStrm << ends;
           tempArray = tempStrm.str();
           tempStrm.rdbuf()->freeze(0);
 
@@ -229,7 +293,9 @@ void vtkPVPick::InsertDataLabel(const char* labelArg, vtkIdType idx,
         {
         // make sure we fill buffer from the beginning
         ostrstream arrayStrm;
-        arrayStrm << array->GetName() << ": " << array->GetComponent( idx, 0 ) << endl << ends;
+        arrayStrm << array->GetName() << ": ";
+        vtkPVPickPrint(arrayStrm, array, idx, 0);
+        arrayStrm << endl << ends;
         label += arrayStrm.str();
         arrayStrm.rdbuf()->freeze(0);
         }
