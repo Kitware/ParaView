@@ -91,6 +91,10 @@ public:
   void SetCameraState(float p0, float p1, float p2,
                       float fp0, float fp1, float fp2,
                       float up0, float up1, float up2);
+  
+  // Description:
+  // Set the parallel scale of the camera.
+  void SetCameraParallelScale(float scale);
 
   // Description:
   // Callback to set the view up or down one of the three axes.

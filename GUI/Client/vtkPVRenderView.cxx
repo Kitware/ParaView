@@ -135,7 +135,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.323");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.324");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -1438,6 +1438,17 @@ void vtkPVRenderView::SetCameraState(float p0, float p1, float p2,
 }
 
 //----------------------------------------------------------------------------
+void vtkPVRenderView::SetCameraParallelScale(float scale)
+{
+  this->AddTraceEntry("$kw(%s) SetCameraParallelScale %.3f",
+                      this->GetTclName(), scale);
+  
+  this->GetRenderer()->GetActiveCamera()->SetParallelScale(scale);
+  
+  this->EventuallyRender();
+}
+
+//----------------------------------------------------------------------------
 void vtkPVRenderView::AddBindings()
 {
   this->Script("bind %s <Motion> {%s MotionCallback %%x %%y}",
@@ -1886,8 +1897,7 @@ void vtkPVRenderView::SaveState(ofstream* file)
   if (camera->GetParallelProjection())
     {
     *file << "$kw(" << this->GetTclName() << ") ParallelProjectionOn" << endl;
-    *file << "[[$kw(" << this->GetTclName()
-          << ") GetRenderer] GetActiveCamera] SetParallelScale "
+    *file << "$kw(" << this->GetTclName() << " SetCaemraParallelScale "
           << camera->GetParallelScale() << endl;
     }
   else
