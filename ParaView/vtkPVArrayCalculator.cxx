@@ -36,7 +36,6 @@ int vtkPVArrayCalculatorCommand(ClientData cd, Tcl_Interp *interp,
 vtkPVArrayCalculator::vtkPVArrayCalculator()
 {
   this->CommandFunction = vtkPVArrayCalculatorCommand;
-  this->Calculator = NULL;
   
   this->AttributeModeFrame = vtkKWWidget::New();
   this->AttributeModeLabel = vtkKWLabel::New();
@@ -199,12 +198,6 @@ void vtkPVArrayCalculator::CreateProperties()
   vtkPVApplication* pvApp = this->GetPVApplication();
   
   this->vtkPVSource::CreateProperties();
-  
-  this->Calculator = (vtkArrayCalculator*)this->GetVTKSource();
-  if (!this->Calculator)
-    {
-    return;
-    }
   
   this->AttributeModeFrame->SetParent(this->GetParameterFrame()->GetFrame());
   this->AttributeModeFrame->Create(pvApp, "frame", "");
@@ -518,7 +511,6 @@ void vtkPVArrayCalculator::ClearFunction()
   
   this->ChangeAcceptButtonColor();
   this->FunctionLabel->SetLabel("");
-  this->Calculator->RemoveAllVariables();
   pvApp->BroadcastScript("%s RemoveAllVariables",
                          this->GetVTKSourceTclName());
 }
@@ -537,24 +529,21 @@ void vtkPVArrayCalculator::ChangeAttributeMode(const char* newMode)
   this->ScalarsMenu->GetMenu()->DeleteAllMenuItems();
   this->VectorsMenu->GetMenu()->DeleteAllMenuItems();
   this->FunctionLabel->SetLabel("");
-  this->Calculator->RemoveAllVariables();
 
   pvApp->BroadcastScript("%s RemoveAllVariables",
                          this->GetVTKSourceTclName());
   
   if (strcmp(newMode, "point") == 0)
     {
-    this->Calculator->SetAttributeModeToUsePointData();
     pvApp->BroadcastScript("%s SetAttributeModeToUsePointData",
                            this->GetVTKSourceTclName());
-    fd = this->Calculator->GetInput()->GetPointData()->GetFieldData();
+    fd = this->GetNthPVInput(0)->GetVTKData()->GetPointData()->GetFieldData();
     }
   else if (strcmp(newMode, "cell") == 0)
     {
-    this->Calculator->SetAttributeModeToUseCellData();
     pvApp->BroadcastScript("%s SetAttributeModeToUseCellData",
                            this->GetVTKSourceTclName());
-    fd = this->Calculator->GetInput()->GetCellData()->GetFieldData();
+    fd = this->GetNthPVInput(0)->GetVTKData()->GetCellData()->GetFieldData();
     }
   
   if (fd)
@@ -664,22 +653,29 @@ void vtkPVArrayCalculator::Save(ofstream *file)
     *file << "CellData\n\t";
     }
   
-  for (i = 0; i < this->Calculator->GetNumberOfScalarArrays(); i++)
+  for (i = 0; i < ((vtkArrayCalculator*)this->GetVTKSource())->
+	 GetNumberOfScalarArrays(); i++)
     {
     *file << this->VTKSourceTclName << " AddScalarVariable "
-          << this->Calculator->GetScalarVariableName(i) << " "
-          << this->Calculator->GetScalarArrayName(i)
+          << ((vtkArrayCalculator*)this->GetVTKSource())->
+      GetScalarVariableName(i) << " "
+          << ((vtkArrayCalculator*)this->GetVTKSource())->
+      GetScalarArrayName(i)
           << " 0\n\t";
     }
-  for (i = 0; i < this->Calculator->GetNumberOfVectorArrays(); i++)
+  for (i = 0; i < ((vtkArrayCalculator*)this->GetVTKSource())->
+	 GetNumberOfVectorArrays(); i++)
     {
     *file << this->VTKSourceTclName << " AddVectorVariable "
-          << this->Calculator->GetVectorVariableName(i) << " "
-          << this->Calculator->GetVectorArrayName(i)
+          << ((vtkArrayCalculator*)this->GetVTKSource())->
+      GetVectorVariableName(i) << " "
+          << ((vtkArrayCalculator*)this->GetVTKSource())->
+      GetVectorArrayName(i)
           << " 0 1 2\n\t";
     }
   *file << this->VTKSourceTclName << " SetResultArrayName "
-        << this->Calculator->GetResultArrayName() << "\n\n";
+        << ((vtkArrayCalculator*)this->GetVTKSource())->
+    GetResultArrayName() << "\n\n";
   
   this->GetPVOutput(0)->Save(file, this->VTKSourceTclName);
 }

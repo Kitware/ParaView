@@ -81,8 +81,6 @@ protected:
   vtkPVArrayCalculator(const vtkPVArrayCalculator&) {};
   void operator=(const vtkPVArrayCalculator&) {};
 
-  vtkArrayCalculator* Calculator;
-  
   vtkKWWidget* AttributeModeFrame;
   vtkKWLabel* AttributeModeLabel;
   vtkKWOptionMenu* AttributeModeMenu;
