@@ -31,8 +31,9 @@
 #endif
 #include "vtkMPIMToNSocketConnection.h"
 #include "vtkSocketCommunicator.h"
+#include "vtkAllToNRedistributePolyData.h"
 
-vtkCxxRevisionMacro(vtkM2NCollect, "1.4");
+vtkCxxRevisionMacro(vtkM2NCollect, "1.5");
 vtkStandardNewMacro(vtkM2NCollect);
 
 vtkCxxSetObjectMacro(vtkM2NCollect,MPIMToNSocketConnection, vtkMPIMToNSocketConnection);
@@ -83,7 +84,31 @@ void vtkM2NCollect::ComputeInputUpdateExtents(vtkDataObject *output)
 }
 
 
-  
+/*
+Here is the new plan:
+
+1: Assume there are fewer render processes than data processes.
+2: Do the M to N conversion on the data server.
+3: If there are N sockets, then the communication is trivial
+
+Handle this case later!
+4: If there are fewer sockets, then .....
+
+Two phases:
+Phase 1: Transfer 1 to 1 data on processes with sockets.
+Phase 2: 
+A: The last processes on thedata server is the master/scheduler.
+B: All processes with sockets ask the last process for a task.
+C: The last process starts assigning and checking off processes with data but no socket.
+D: If the last process has data, then it assigns its own data last.
+E: All processes with data but no socket ask/wait on a receiveto find out 
+   which process to send its data to.
+F: All processes with a socket wait in a while loop for a message from
+   the last process.  This message tells thesocket process who to receive data from.
+G: When the last process has finish assigning task, it send  a message to all
+   the socket processes that they are finished.
+
+*/  
 
 //-----------------------------------------------------------------------------
 void vtkM2NCollect::ExecuteData(vtkDataObject* outData)
@@ -98,17 +123,32 @@ void vtkM2NCollect::ExecuteData(vtkDataObject* outData)
     return;
     }
 
-  // If no render server, handle compositing with super (which will do nothing).
+  // If no render server, handle compositing with super(which will do nothing).
   if (this->MPIMToNSocketConnection == NULL)
     {
     this->Superclass::ExecuteData(outData);
     return;
     }
 
-  vtkPolyData *input = this->GetInput();
+  int numConnections = this->MPIMToNSocketConnection->GetNumberOfConnections();
   int bufSize = 0;
   char* buf = NULL;
 
+  // If we are the data server and there are fewer render processes,
+  // Perform the M to N operation.
+  vtkAllToNRedistributePolyData* AllToN = NULL;
+  vtkPolyData* input = this->GetInput();
+  vtkMultiProcessController* controller = this->GetController();
+  if (this->ServerMode && controller && 
+      controller->GetNumberOfProcesses() > numConnections)
+    {
+    AllToN = vtkAllToNRedistributePolyData::New();
+    AllToN->SetController(controller);
+    AllToN->SetNumberOfProcesses(numConnections);
+    AllToN->SetInput(input);
+    AllToN->Update();
+    input = AllToN->GetOutput();
+    }
 
   // If we have data, marshal it.
   if (input && input->GetNumberOfPoints() > 0)
@@ -133,17 +173,32 @@ void vtkM2NCollect::ExecuteData(vtkDataObject* outData)
     pd->Delete();
     pd = NULL;
     }
+  if (AllToN)
+    {
+    AllToN->Delete();
+    AllToN = NULL;
+    input = NULL;
+    }
 
-  // M to N stuff.
-  // Communicate sizes (future: array of sizes).
+  // M to N stuff..
   char* newBuf = NULL;
-  int newBufSize = this->ShuffleSizes(bufSize);
+
+  // int fixme;
+  // The plan has changed.
+  // The communication ismoresimple because we are going to do the
+  // MToN on the data server first.  The only drawback to this is
+  // that the render server must have fewer processes than the data server.
+  
+  // This exchangemethod has a data/render server mode check inside.
+  // This check should be moved into  this execute method.
+
+  int newBufSize = this->ExchangeSizes(bufSize);
   if (newBufSize > 0)
     {
     newBuf = new char[newBufSize];
     }
   // Shuffle memory.
-  this->Shuffle(bufSize, buf, newBufSize, newBuf);
+  this->ExchangeData(bufSize, buf, newBufSize, newBuf);
   if (buf)
     {
     delete [] newBuf;
@@ -174,8 +229,9 @@ void vtkM2NCollect::ExecuteData(vtkDataObject* outData)
     }
 }
 
+
 //-----------------------------------------------------------------------------
-int vtkM2NCollect::ShuffleSizes(int size)
+int vtkM2NCollect::ExchangeSizes(int size)
 {
   vtkSocketCommunicator* socket = this->MPIMToNSocketConnection->GetSocketCommunicator();
   if(!socket)
@@ -198,7 +254,7 @@ int vtkM2NCollect::ShuffleSizes(int size)
 
 
 //-----------------------------------------------------------------------------
-void vtkM2NCollect::Shuffle(int inSize, char* inBuf, int outSize, char* outBuf)
+void vtkM2NCollect::ExchangeData(int inSize, char* inBuf, int outSize, char* outBuf)
 { 
   vtkSocketCommunicator* socket = this->MPIMToNSocketConnection->GetSocketCommunicator();
   if(!socket)
