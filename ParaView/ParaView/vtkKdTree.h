@@ -225,7 +225,7 @@ public:
 
     void CreateCellList(int DataSet, int *regionList, int listSize);
     void CreateCellList(vtkDataSet *set, int *regionList, int listSize);
-    void CreateCellList(int *regionList, int listSize);
+    void CreateCellList(vtkIdType *regionList, int listSize);
     void CreateCellList();
 
     // Description:
