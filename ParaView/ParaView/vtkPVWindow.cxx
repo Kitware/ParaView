@@ -147,7 +147,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.475.2.28");
+vtkCxxRevisionMacro(vtkPVWindow, "1.475.2.29");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -430,20 +430,20 @@ void vtkPVWindow::PrepareForDelete()
   if (pvApp && this->CenterSourceID.ID)
     {
     pm->DeleteStreamObject(this->CenterSourceID);
-    pm->SendStreamToServerRoot();
+    pm->SendStreamToClientAndServerRoot();
     }
   this->CenterSourceID.ID = 0;
   if (pvApp && this->CenterMapperID.ID)
     {
     pm->DeleteStreamObject(this->CenterMapperID);
-    pm->SendStreamToServerRoot();
+    pm->SendStreamToClientAndServerRoot();
     }
   this->CenterMapperID.ID = 0;
 
   if (pvApp && this->CenterActorID.ID)
     {
     pm->DeleteStreamObject(this->CenterActorID);
-    pm->SendStreamToServerRoot();
+    pm->SendStreamToClientAndServerRoot();
     }
   this->CenterActorID.ID = 0;
 
@@ -1008,7 +1008,7 @@ void vtkPVWindow::Create(vtkKWApplication *app, char* vtkNotUsed(args))
   pm->GetStream() << vtkClientServerStream::Invoke <<  this->CenterActorID
                   << "VisibilityOff"
                   << vtkClientServerStream::End;
-  pm->SendStreamToServerRoot();
+  pm->SendStreamToClientAndServerRoot();
   
   this->CenterEntryFrame->SetParent(this->PickCenterToolbar->GetFrame());
   this->CenterEntryFrame->Create(app, "frame", "");
@@ -1071,7 +1071,7 @@ void vtkPVWindow::Create(vtkKWApplication *app, char* vtkNotUsed(args))
                   << pvApp->GetRenderModule()->GetRendererID()
                   << "AddActor" << this->CenterActorID 
                   << vtkClientServerStream::End;
-  pm->SendStreamToServerRoot();
+  pm->SendStreamToClientAndServerRoot();
   vtkClientServerStream& stream = pm->GetStream();
 
   // Create a dummy interactor on the satellites so they han have 3d widgets.
@@ -1323,7 +1323,7 @@ void vtkPVWindow::SetCenterOfRotation(float x, float y, float z)
   pm->GetStream() << vtkClientServerStream::Invoke <<  this->CenterActorID
                   << "SetPosition" << x << y << z
                   << vtkClientServerStream::End;
-  pm->SendStreamToServerRoot();
+  pm->SendStreamToClientAndServerRoot();
   this->MainView->EventuallyRender();
 }
 
@@ -1339,7 +1339,7 @@ void vtkPVWindow::HideCenterActor()
   pm->GetStream() << vtkClientServerStream::Invoke <<  this->CenterActorID
                   << "VisibilityOff"
                   << vtkClientServerStream::End;
-  pm->SendStreamToServerRoot();
+  pm->SendStreamToClientAndServerRoot();
 }
 
 //-----------------------------------------------------------------------------
@@ -1356,7 +1356,7 @@ void vtkPVWindow::ShowCenterActor()
     pm->GetStream() << vtkClientServerStream::Invoke <<  this->CenterActorID
                     << "VisibilityOn"
                     << vtkClientServerStream::End;
-    pm->SendStreamToServerRoot();
+    pm->SendStreamToClientAndServerRoot();
     }
 }
 
@@ -1469,7 +1469,7 @@ void vtkPVWindow::ResizeCenterActor()
                     << vtkClientServerStream::End;
     this->MainView->ResetCamera();
     }
-  pm->SendStreamToServerRoot();
+  pm->SendStreamToClientAndServerRoot();
 }
 
 //-----------------------------------------------------------------------------
