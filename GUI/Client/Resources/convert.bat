@@ -20,6 +20,7 @@ SET OPTIONS=ZLIB BASE64 %1
 %CONVERTIMAGE% vtkPVSurfaceVectorsButton.h PVSurfaceVectorsButton.png %OPTIONS%
 %CONVERTIMAGE% vtkPVResetCenterButton.h PVResetCenterButton.png %OPTIONS%
 %CONVERTIMAGE% vtkPVResetViewButton.h PVResetViewButton.png %OPTIONS%
+%CONVERTIMAGE% vtkPVRulerButton.h PVRulerButton.png %OPTIONS%
 %CONVERTIMAGE% vtkPVRotateViewButton.h PVRotateViewButton.png PVRotateViewButtonActive.png %OPTIONS%
 %CONVERTIMAGE% vtkPVShowCenterButton.h PVShowCenterButton.png %OPTIONS%
 %CONVERTIMAGE% vtkPVSplashScreen.h PVSplashScreen.png %OPTIONS%
@@ -28,3 +29,15 @@ SET OPTIONS=ZLIB BASE64 %1
 %CONVERTIMAGE% vtkPVTranslateViewButton.h PVTranslateViewButton.png PVTranslateViewButtonActive.png %OPTIONS%
 %CONVERTIMAGE% vtkPVVectorDisplacementButton.h PVVectorDisplacementButton.png %OPTIONS%
 %CONVERTIMAGE% vtkPVSelectionWindowButton.h PVSelectionWindowButton.png PVNavigationWindowButton.png %OPTIONS%
+
+
+
+
+
+
+
+
+
+
+
+

@@ -52,6 +52,7 @@
 #include "Resources/vtkPVTranslateViewButton.h"
 #include "Resources/vtkPVVectorDisplacementButton.h"
 #include "Resources/vtkPVPickButton.h"
+#include "Resources/vtkPVRulerButton.h"
 #include "Resources/vtkPVIntegrateFlowButton.h"
 #include "Resources/vtkPVSurfaceVectorsButton.h"
 
@@ -238,6 +239,13 @@ void vtkPVApplication::CreateButtonPhotos()
                     image_PVStreamTracerButton_height,
                     image_PVStreamTracerButton_pixel_size,
                     image_PVStreamTracerButton_buffer_length);
+
+  this->CreatePhoto("PVRulerButton", 
+                    image_PVRulerButton, 
+                    image_PVRulerButton_width, 
+                    image_PVRulerButton_height,
+                    image_PVRulerButton_pixel_size,
+                    image_PVRulerButton_buffer_length);
 
   this->CreatePhoto("PVNavigationWindowButton", 
                     image_PVNavigationWindowButton, 

@@ -207,6 +207,8 @@ The output of the Cylinder source is polygonal data containing both normals and 
 
 <Module name="LineSource" menu_name="Line" root_name="Line" 
         module_type="Source" 
+        button_image="PVRulerButton"
+        button_help="Measure the distance between two point.  Use the 'p' key to pick the points."
         long_help="Line between two points. The resolution indicates how many segments are in the line." 
         short_help="Create a line between two points">
   <Source class="vtkLineSource"/>
