@@ -76,13 +76,31 @@ public:
   virtual void Create(vtkKWApplication *app);
 
   // Description:
-  // Access to the sub-widgets. Note that they might be NULL until the Create()
-  // function is called.
-  vtkGetObjectMacro(InterfaceSettingsFrame, vtkKWLabeledFrame);
-  vtkGetObjectMacro(ConfirmExitCheckButton, vtkKWCheckButton);
-  vtkGetObjectMacro(SaveGeometryCheckButton, vtkKWCheckButton);
-  vtkGetObjectMacro(ShowSplashScreenCheckButton, vtkKWCheckButton);
-  vtkGetObjectMacro(ShowBalloonHelpCheckButton, vtkKWCheckButton);
+  // Enable/Disable this panel. This should propagate SetEnabled() calls to the
+  // internal widgets.
+  virtual void SetEnabled(int e);
+
+  // Description:
+  // Set ConfirmExit UI On/Off programmatically. 
+  // Save the setting to registry.
+  void SetConfirmExit(int);
+
+  // Description:
+  // Set SaveGeometry UI On/Off programmatically. 
+  // Save the setting to registry.
+  void SetSaveGeometry(int);
+
+  // Description:
+  // Set ShowSplashScreen UI On/Off programmatically. 
+  // Save the setting to registry.
+  // Call the vtkKWapplication::SetShowSplashScreen() method accordingly.
+  void SetShowSplashScreen(int);
+
+  // Description:
+  // Set ShowBalloonHelp (tooltips) UI On/Off programmatically. 
+  // Save the setting to registry.
+  // Call the vtkKWapplication::SetShowBalloonHelp() method accordingly.
+  void SetShowBalloonHelp(int);
 
   // Description:
   // Callback used when interaction has been performed.
@@ -92,9 +110,9 @@ public:
   void ShowBalloonHelpCheckButtonCallback();
 
   // Description:
-  // Enable/Disable this panel. This should propagate SetEnabled() calls to the
-  // internal widgets.
-  virtual void SetEnabled(int e);
+  // Access to some sub-widgets. Note that they might be NULL until the Create()
+  // function is called.
+  vtkGetObjectMacro(InterfaceSettingsFrame, vtkKWLabeledFrame);
 
 protected:
   vtkKWApplicationSettingsInterface();
