@@ -16,7 +16,7 @@
 #define __vtkPVLocal_h
 
 #if defined(_WIN32)
-# if defined(VTK_PVLocal_EXPORTS)
+# if defined(PVLocal_EXPORTS)
 #  define VTK_PVLocal_EXPORT __declspec(dllexport)
 # else
 #  define VTK_PVLocal_EXPORT __declspec(dllimport)
