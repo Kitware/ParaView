@@ -265,7 +265,7 @@ void vtkKWNotebook::Raise(int num)
 #ifdef _WIN32    
   int h0 = bw * 2; // Should be 3
   int ww = 1;
-  int hh = 2;
+  int hh = 3;
 #else
   int h0 = bw * 2 + 2;
   int ww = 0;
