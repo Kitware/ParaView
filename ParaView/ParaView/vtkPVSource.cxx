@@ -89,7 +89,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.313.2.22");
+vtkCxxRevisionMacro(vtkPVSource, "1.313.2.23");
 
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
@@ -655,6 +655,10 @@ void vtkPVSource::AddVTKSource(const char*)
 void vtkPVSource::RemoveAllVTKSources()
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
+  if(!pvApp)
+    {
+    return;
+    }
   vtkPVProcessModule* pm = pvApp->GetProcessModule();
   int num, idx;
 

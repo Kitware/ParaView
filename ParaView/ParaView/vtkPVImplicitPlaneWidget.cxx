@@ -68,7 +68,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVImplicitPlaneWidget);
-vtkCxxRevisionMacro(vtkPVImplicitPlaneWidget, "1.18.4.7");
+vtkCxxRevisionMacro(vtkPVImplicitPlaneWidget, "1.18.4.8");
 
 vtkCxxSetObjectMacro(vtkPVImplicitPlaneWidget, InputMenu, vtkPVInputMenu);
 
@@ -269,7 +269,7 @@ void vtkPVImplicitPlaneWidget::AcceptInternal(vtkClientServerID sourceID)
   pm->GetStream() << vtkClientServerStream::Invoke 
                   << this->Widget3DID << "SetDrawPlane" << 0
                   << vtkClientServerStream::End;
-
+  pm->SendStreamToClientAndServer();
   // This should be done in the initialization.
   // There must be a more general way of hooking up the plane object.
   // ExtractCTH uses this varible, General Clipping uses the select widget.
@@ -293,7 +293,6 @@ void vtkPVImplicitPlaneWidget::AcceptInternal(vtkClientServerID sourceID)
     this->SetCenterInternal(val[0], val[1], val[2]);
     pm->GetStream() << vtkClientServerStream::Invoke << this->PlaneID << "SetOrigin"
                     << val[0] << val[1] <<  val[2] << vtkClientServerStream::End;
-      
     this->SetLastAcceptedCenter(val);
     for ( cc = 0; cc < 3; cc ++ )
       {
@@ -302,6 +301,7 @@ void vtkPVImplicitPlaneWidget::AcceptInternal(vtkClientServerID sourceID)
     this->SetNormalInternal(val[0], val[1], val[2]);
     pm->GetStream() << vtkClientServerStream::Invoke << this->PlaneID << "SetNormal"
                     << val[0] << val[1] <<  val[2] << vtkClientServerStream::End;
+    pm->SendStreamToClientAndServer();
     this->SetLastAcceptedNormal(val);
     }
 
