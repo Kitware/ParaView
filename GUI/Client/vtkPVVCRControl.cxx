@@ -22,7 +22,7 @@
 #include "vtkKWFrame.h"
 
 vtkStandardNewMacro(vtkPVVCRControl);
-vtkCxxRevisionMacro(vtkPVVCRControl, "1.4");
+vtkCxxRevisionMacro(vtkPVVCRControl, "1.5");
 //-----------------------------------------------------------------------------
 vtkPVVCRControl::vtkPVVCRControl()
 {
@@ -362,6 +362,7 @@ void vtkPVVCRControl::UpdateEnableState()
   this->PropagateEnableState(this->GoToEndButton);
   this->PropagateEnableState(this->GoToPreviousButton);
   this->PropagateEnableState(this->GoToNextButton);
+  this->PropagateEnableState(this->SaveAnimationButton);
   
   this->Enabled = enabled;
 }
