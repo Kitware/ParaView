@@ -2480,7 +2480,7 @@
    <insert a suppression name here>
    Memcheck:Leak
    fun:malloc
-   fun:dice_yyalloc
+   fun:_Z12dice_yyallocj
 }
 {
    <insert a suppression name here>
