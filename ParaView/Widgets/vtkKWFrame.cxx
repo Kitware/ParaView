@@ -37,12 +37,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWFrame.h"
 #include "vtkObjectFactory.h"
 
-
-
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWFrame );
-vtkCxxRevisionMacro(vtkKWFrame, "1.16");
+vtkCxxRevisionMacro(vtkKWFrame, "1.17");
 
+//----------------------------------------------------------------------------
 vtkKWFrame::vtkKWFrame()
 {
   this->ScrollFrame = 0;
@@ -50,6 +49,7 @@ vtkKWFrame::vtkKWFrame()
   this->Scrollable = 0;
 }
 
+//----------------------------------------------------------------------------
 vtkKWFrame::~vtkKWFrame()
 {
   if ( this->ScrollFrame )
@@ -62,7 +62,7 @@ vtkKWFrame::~vtkKWFrame()
     }
 }
 
-
+//----------------------------------------------------------------------------
 void vtkKWFrame::Create(vtkKWApplication *app, const char* args)
 {
   const char *wname;
@@ -116,6 +116,24 @@ void vtkKWFrame::Create(vtkKWApplication *app, const char* args)
   // Update enable state
 
   this->UpdateEnableState();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWFrame::SetWidth(int width)
+{
+  if (this->IsCreated() && this->HasConfigurationOption("-width"))
+    {
+    this->Script("%s config -width %d", this->GetWidgetName(), width);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWFrame::SetHeight(int height)
+{
+  if (this->IsCreated() && this->HasConfigurationOption("-height"))
+    {
+    this->Script("%s config -height %d", this->GetWidgetName(), height);
+    }
 }
 
 //----------------------------------------------------------------------------

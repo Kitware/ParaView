@@ -65,6 +65,12 @@ public:
   vtkSetMacro(Scrollable,int);
   vtkGetMacro(Scrollable,int);
   vtkBooleanMacro(Scrollable,int);
+
+  // Description:
+  // Convenience method to set the width/height of a frame.
+  // Supported only starting Tcl/Tk 8.3
+  virtual void SetWidth(int);
+  virtual void SetHeight(int);
   
 protected:
   vtkKWFrame();
