@@ -55,6 +55,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkToolkits.h"
 #include "vtkDirectory.h"
 #include "vtkMath.h"
+#include "vtkKWEvent.h"
 
 #include "vtkPVSource.h"
 #include "vtkPVData.h"
@@ -562,9 +563,6 @@ void vtkPVWindow::PrepareForDelete()
 //----------------------------------------------------------------------------
 void vtkPVWindow::InitializeMenus(vtkKWApplication *app)
 {
-  vtkPVApplication *pvApp = vtkPVApplication::SafeDownCast(app);
-  vtkKWWidget *pushButton;
-  
   // Add view options.
 
   // Shows the notebook for the current source and data object.
@@ -660,9 +658,6 @@ void vtkPVWindow::InitializeMenus(vtkKWApplication *app)
 //----------------------------------------------------------------------------
 void vtkPVWindow::InitializeToolbars(vtkKWApplication *app)
 {
-
-  vtkPVApplication *pvApp = vtkPVApplication::SafeDownCast(app);
-
   this->InteractorToolbar->SetParent(this->GetToolbarFrame());
   this->InteractorToolbar->Create(app);
 
@@ -672,17 +667,12 @@ void vtkPVWindow::InitializeToolbars(vtkKWApplication *app)
   this->Script("pack %s -side left -pady 0 -anchor n -fill none -expand no",
                this->InteractorToolbar->GetWidgetName());
   this->Script("pack  %s -side left -pady 0 -fill both -expand yes",
-	       this->Toolbar->GetWidgetName());
-  
+	       this->Toolbar->GetWidgetName()); 
 }
 
 //----------------------------------------------------------------------------
 void vtkPVWindow::InitializeInteractorInterfaces(vtkKWApplication *app)
 {
-  vtkPVApplication *pvApp = vtkPVApplication::SafeDownCast(app);
-
-  vtkKWRadioButton *button;
-
   // Set up the button to reset the camera.
   vtkKWWidget* pushButton = vtkKWWidget::New();
   pushButton->SetParent(this->InteractorToolbar->GetFrame());
@@ -1719,7 +1709,6 @@ void vtkPVWindow::SaveInTclScript(const char* filename, int vtkFlag)
 {
   ofstream *file;
   vtkPVSource *pvs;
-  int num, idx;
   int imageFlag = 0;
   int animationFlag = 0;
   int offScreenFlag = 0;
@@ -2764,7 +2753,6 @@ int vtkPVWindow::OpenPackage(const char* openFileName)
 void vtkPVWindow::ReadSourceInterfaces()
 {
   // Add special sources.
-  vtkPVApplication *pvApp = this->GetPVApplication();
   
   // Setup our built in source interfaces.
   this->ReadSourceInterfacesFromString(vtkPVWindow::StandardSourceInterfaces);
@@ -2973,6 +2961,9 @@ void vtkPVWindow::AddFileType(const char *description, const char *ext,
 void vtkPVWindow::WarningMessage(const char* message)
 {
   this->CreateErrorLogDisplay();
+  char *wmessage = vtkString::Duplicate(message);
+  this->InvokeEvent(vtkKWEvent::WarningMessageEvent, wmessage);
+  delete [] wmessage;
   this->ErrorLogDisplay->AppendError(message);
 }
 
@@ -2980,9 +2971,11 @@ void vtkPVWindow::WarningMessage(const char* message)
 void vtkPVWindow::ErrorMessage(const char* message)
 {
   this->CreateErrorLogDisplay();
+  char *wmessage = vtkString::Duplicate(message);
+  this->InvokeEvent(vtkKWEvent::ErrorMessageEvent, wmessage);
+  delete [] wmessage;
   this->ErrorLogDisplay->AppendError(message);
 }
-
 
 //----------------------------------------------------------------------------
 void vtkPVWindow::PrintSelf(ostream& os, vtkIndent indent)

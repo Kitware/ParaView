@@ -68,6 +68,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVExtractGridButton.h"
 #include "vtkProbeFilter.h"
 #include "vtkMapper.h"
+#include "vtkString.h"
 
 #include "vtkIntArray.h"
 #include "vtkFloatArray.h"
@@ -79,6 +80,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkUnsignedCharArray.h"
 #include "vtkUnsignedLongArray.h"
 #include "vtkUnsignedShortArray.h"
+#include "vtkCallbackCommand.h"
+#include "vtkKWEvent.h"
 
 #include "vtkOutputWindow.h"
 #include <sys/stat.h>
@@ -93,6 +96,30 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 extern "C" int Vtktkrenderwidget_Init(Tcl_Interp *interp);
 extern "C" int Vtkkwparaviewtcl_Init(Tcl_Interp *interp);
 
+
+static void vtkPVAppProcessMessage(vtkObject* object,
+				   unsigned long event, 
+				   void *clientdata, void *calldata)
+{
+  vtkPVApplication *self = static_cast<vtkPVApplication*>( clientdata );
+  const char* message = static_cast<char*>( calldata );
+  cout << "# Error or warning: " << message << endl;
+  self->AddTraceEntry("# Error or warning:");
+  int cc;
+  ostrstream str;
+  for ( cc= 0; cc < vtkString::Length(message); cc ++ )
+    {
+    str << message[cc];
+    if ( message[cc] == '\n' )
+      {
+      str << "# ";
+      }
+    }
+  str << ends;
+  self->AddTraceEntry("# %s\n#", str.str());
+  cout << "# " << str.str() << endl;
+  str.rdbuf()->freeze(0);
+}
 
 // initialze the class variables
 int vtkPVApplication::GlobalLODFlag = 0;
@@ -506,6 +533,13 @@ void vtkPVApplication::Start(int argc, char*argv[])
 
   vtkPVWindow *ui = vtkPVWindow::New();
   this->Windows->AddItem(ui);
+
+  vtkCallbackCommand *ccm = vtkCallbackCommand::New();
+  ccm->SetClientData(this);
+  ccm->SetCallback(::vtkPVAppProcessMessage);  
+  ui->AddObserver(vtkKWEvent::WarningMessageEvent, ccm);
+  ui->AddObserver(vtkKWEvent::ErrorMessageEvent, ccm);
+  ccm->Delete();
 
   this->CreateButtonPhotos();
 
