@@ -180,7 +180,7 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterface);
-vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.88");
+vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.89");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterface,ControlledWidget, vtkPVWidget);
 
@@ -1435,6 +1435,22 @@ void vtkPVAnimationInterface::SaveGeometry(const char* fileName,
     }  
 }
 
+
+//-----------------------------------------------------------------------------
+int vtkPVAnimationInterface::IsAnimationValid()
+{
+  vtkCollectionIterator* it = this->AnimationEntriesIterator;
+  for ( it->InitTraversal(); !it->IsDoneWithTraversal(); it->GoToNextItem() )
+    {
+    vtkPVAnimationInterfaceEntry* entry
+      = vtkPVAnimationInterfaceEntry::SafeDownCast(it->GetObject());
+    if ( entry->IsActionValid() )
+      {
+      return 1;
+      }
+    }
+  return 0;
+}
 
 //-----------------------------------------------------------------------------
 void vtkPVAnimationInterface::SaveInBatchScript(ofstream *file, 
