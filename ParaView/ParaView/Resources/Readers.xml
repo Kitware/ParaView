@@ -470,8 +470,12 @@
                    help="Select whether the reader generates global node ids" default_value="1"/>
     <LabeledToggle label="Global Element Ids"
                    variable="GenerateGlobalElementIdArray"
-                   trace_name="blobal_element_ids"
+                   trace_name="global_element_ids"
                    help="Select whether the reader generates global element ids" default_value="0"/>
+    <LabeledToggle label="File Ids"
+                   variable="GenerateFileIdArray"
+                   trace_name="global_file_ids"
+                   help="Select whether the reader generates cell based disk file ids" default_value="0"/>
   </Module>
 #endif
 #ifdef PARAVIEW_USE_SAF
