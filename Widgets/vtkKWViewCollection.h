@@ -37,9 +37,9 @@ class vtkKWView;
 
 class VTK_EXPORT vtkKWViewCollection : public vtkCollection
 {
- public:
+public:
   static vtkKWViewCollection *New();
-  const char *GetClassName() {return "vtkKWViewCollection";};
+  vtkTypeMacro(vtkKWViewCollection,vtkCollection);
 
   // Description:
   // Add an KWView to the list.
@@ -61,6 +61,13 @@ class VTK_EXPORT vtkKWViewCollection : public vtkCollection
   // Description:
   // Get the last KWView in the list.
   vtkKWView *GetLastKWView();
+
+protected:
+  vtkKWViewCollection() {};
+  ~vtkKWViewCollection() {};
+  vtkKWViewCollection(const vtkKWViewCollection&) {};
+  void operator=(const vtkKWViewCollection&) {};
+
 };
 
 inline void vtkKWViewCollection::AddItem(vtkKWView *a) 

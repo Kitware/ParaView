@@ -49,7 +49,7 @@ class VTK_EXPORT vtkKWSerializer : public vtkObject
 {
 public:
   static vtkKWSerializer* New();
-  const char *GetClassName() {return "vtkKWSerializer";};
+  vtkTypeMacro(vtkKWSerializer,vtkObject);
 
   // Description:
   // The primary helper functions instances can invoke.
@@ -59,6 +59,11 @@ public:
   static void WriteSafeString(ostream& os, const char *val);
   
 protected:
+  vtkKWSerializer() {};
+  ~vtkKWSerializer() {};
+  vtkKWSerializer(const vtkKWSerializer&) {};
+  void operator=(const vtkKWSerializer&) {};
+
   static void EatWhiteSpace(istream *is);
 };
 

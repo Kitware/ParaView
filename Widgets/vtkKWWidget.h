@@ -43,10 +43,8 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 class VTK_EXPORT vtkKWWidget : public vtkKWObject
 {
 public:
-  vtkKWWidget();
-  ~vtkKWWidget();
   static vtkKWWidget* New();
-  const char *GetClassName() {return "vtkKWWidget";};
+  vtkTypeMacro(vtkKWWidget,vtkKWObject);
 
   // Description:
   // Create a Tk widget
@@ -85,7 +83,13 @@ public:
   // Description: a method to create a callback string from a KWObject.
   // The caller is resposible for deleting the returned string.  
   char* CreateCommand(vtkKWObject* Object, const char* MethodAndArgString);
+
 protected:
+  vtkKWWidget();
+  ~vtkKWWidget();
+  vtkKWWidget(const vtkKWWidget&) {};
+  void operator=(const vtkKWWidget&) {};
+
   char *WidgetName;
   vtkKWWidget *Parent;
   vtkKWWidgetCollection *Children; 

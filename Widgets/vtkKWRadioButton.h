@@ -39,7 +39,7 @@ class VTK_EXPORT vtkKWRadioButton : public vtkKWCheckButton
 {
 public:
   static vtkKWRadioButton* New();
-  const char *GetClassName() {return "vtkKWRadioButton";};
+  vtkTypeMacro(vtkKWRadioButton,vtkKWCheckButton);
 
   // Description:
   // Create a Tk widget
@@ -50,6 +50,10 @@ public:
   vtkBooleanMacro(State,int);
   
 protected:
+  vtkKWRadioButton() {};
+  ~vtkKWRadioButton() {};
+  vtkKWRadioButton(const vtkKWRadioButton&) {};
+  void operator=(const vtkKWRadioButton&) {};
 };
 
 

@@ -38,10 +38,8 @@ class vtkKWApplication;
 class VTK_EXPORT vtkKWMessageDialog : public vtkKWDialog
 {
 public:
-  vtkKWMessageDialog();
-  ~vtkKWMessageDialog();
   static vtkKWMessageDialog* New();
-  const char *GetClassName() {return "vtkKWMessageDialog";};
+  vtkTypeMacro(vtkKWMessageDialog,vtkKWDialog);
 
   // Description:
   // Create a Tk widget
@@ -52,6 +50,11 @@ public:
   void SetText(const char *);
   
 protected:
+  vtkKWMessageDialog();
+  ~vtkKWMessageDialog();
+  vtkKWMessageDialog(const vtkKWMessageDialog&) {};
+  void operator=(const vtkKWMessageDialog&) {};
+
   vtkKWWidget *Message;
   vtkKWWidget *ButtonFrame;
   vtkKWWidget *OKButton;

@@ -39,10 +39,8 @@ class vtkKWApplication;
 class VTK_EXPORT vtkKWOptionMenu : public vtkKWWidget
 {
 public:
-  vtkKWOptionMenu();
-  ~vtkKWOptionMenu();
   static vtkKWOptionMenu* New();
-  const char *GetClassName() {return "vtkKWOptionMenu";};
+  vtkTypeMacro(vtkKWOptionMenu,vtkKWWidget);
 
   // Description:
   // Create a Tk widget
@@ -63,6 +61,11 @@ public:
   void SetCurrentEntry(const char *name);
 
 protected:
+  vtkKWOptionMenu();
+  ~vtkKWOptionMenu();
+  vtkKWOptionMenu(const vtkKWOptionMenu&) {};
+  void operator=(const vtkKWOptionMenu&) {};
+
   char *CurrentValue;  
   vtkKWWidget *Menu;
 };

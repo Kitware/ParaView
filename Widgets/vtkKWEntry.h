@@ -39,7 +39,7 @@ class VTK_EXPORT vtkKWEntry : public vtkKWWidget
 {
 public:
   static vtkKWEntry* New();
-  const char *GetClassName() {return "vtkKWEntry";};
+  vtkTypeMacro(vtkKWEntry,vtkKWWidget);
 
   // Description:
   // Create a Tk widget
@@ -58,6 +58,10 @@ public:
   
 
 protected:
+  vtkKWEntry() {};
+  ~vtkKWEntry() {};
+  vtkKWEntry(const vtkKWEntry&) {};
+  void operator=(const vtkKWEntry&) {};
 };
 
 

@@ -40,7 +40,7 @@ class VTK_EXPORT vtkKWCheckButton : public vtkKWWidget
 {
 public:
   static vtkKWCheckButton* New();
-  const char *GetClassName() {return "vtkKWCheckButton";};
+  vtkTypeMacro(vtkKWCheckButton,vtkKWWidget);
 
   // Description:
   // Create a Tk widget
@@ -52,6 +52,11 @@ public:
   virtual int GetState();
 
 protected:
+  vtkKWCheckButton() {};
+  ~vtkKWCheckButton() {};
+  vtkKWCheckButton(const vtkKWCheckButton&) {};
+  void operator=(const vtkKWCheckButton&) {};
+  
 };
 
 

@@ -37,9 +37,9 @@ class vtkKWWidget;
 
 class VTK_EXPORT vtkKWWidgetCollection : public vtkCollection
 {
- public:
+public:
   static vtkKWWidgetCollection *New();
-  const char *GetClassName() {return "vtkKWWidgetCollection";};
+  vtkTypeMacro(vtkKWWidgetCollection,vtkCollection);
 
   // Description:
   // Add an KWWidget to the list.
@@ -61,6 +61,13 @@ class VTK_EXPORT vtkKWWidgetCollection : public vtkCollection
   // Description:
   // Get the last KWWidget in the list.
   vtkKWWidget *GetLastKWWidget();
+
+protected:
+  vtkKWWidgetCollection() {};
+  ~vtkKWWidgetCollection() {};
+  vtkKWWidgetCollection(const vtkKWWidgetCollection&) {};
+  void operator=(const vtkKWWidgetCollection&) {};
+
 };
 
 inline void vtkKWWidgetCollection::AddItem(vtkKWWidget *a) 

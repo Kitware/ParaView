@@ -39,10 +39,8 @@ class vtkKWApplication;
 class VTK_EXPORT vtkKWNotebook : public vtkKWWidget
 {
 public:
-  vtkKWNotebook();
-  ~vtkKWNotebook();
   static vtkKWNotebook* New();
-  const char *GetClassName() {return "vtkKWNotebook";};
+  vtkTypeMacro(vtkKWNotebook,vtkKWWidget);
 
   // Description:
   // Create a Tk widget
@@ -82,6 +80,11 @@ public:
   vtkGetMacro(MinimumHeight,int);
   
 protected:
+  vtkKWNotebook();
+  ~vtkKWNotebook();
+  vtkKWNotebook(const vtkKWNotebook&) {};
+  void operator=(const vtkKWNotebook&) {};
+
   int MinimumWidth;
   int MinimumHeight;
   int Current;

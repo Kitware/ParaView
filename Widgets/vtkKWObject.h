@@ -56,10 +56,8 @@ class vtkKWApplication;
 class VTK_EXPORT vtkKWObject : public vtkObject
 {
 public:
-  vtkKWObject();
-  ~vtkKWObject();
   static vtkKWObject* New();
-  const char *GetClassName() {return "vtkKWObject";};
+  vtkTypeMacro(vtkKWObject,vtkObject);
 
   // Description:
   // Get the name of the tcl object this instance represents.
@@ -93,6 +91,11 @@ private:
   char *TclName;
 
 protected:
+  vtkKWObject();
+  ~vtkKWObject();
+  vtkKWObject(const vtkKWObject&) {};
+  void operator=(const vtkKWObject&) {};
+
   vtkKWApplication *Application;
 
   // this instance variable holds the command functions for this class.

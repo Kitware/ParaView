@@ -39,10 +39,8 @@ class vtkKWApplication;
 class VTK_EXPORT vtkKWLabeledFrame : public vtkKWWidget
 {
 public:
-  vtkKWLabeledFrame();
-  ~vtkKWLabeledFrame();
   static vtkKWLabeledFrame* New();
-  const char *GetClassName() {return "vtkKWLabeledFrame";};
+  vtkTypeMacro(vtkKWLabeledFrame,vtkKWWidget);
 
   // Description:
   // Create a Tk widget
@@ -57,6 +55,11 @@ public:
   vtkKWWidget *GetFrame() {return this->Frame;};
 
 protected:
+  vtkKWLabeledFrame();
+  ~vtkKWLabeledFrame();
+  vtkKWLabeledFrame(const vtkKWLabeledFrame&) {};
+  void operator=(const vtkKWLabeledFrame&) {};
+
   vtkKWWidget *Border;
   vtkKWWidget *Border2;
   vtkKWWidget *Frame;

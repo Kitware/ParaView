@@ -34,9 +34,9 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 class VTK_EXPORT vtkKWCompositeCollection : public vtkCollection
 {
- public:
+public:
   static vtkKWCompositeCollection *New();
-  const char *GetClassName() {return "vtkKWCompositeCollection";};
+  vtkTypeMacro(vtkKWCompositeCollection,vtkCollection);
 
   // Description:
   // Add an KWComposite to the list.
@@ -58,6 +58,13 @@ class VTK_EXPORT vtkKWCompositeCollection : public vtkCollection
   // Description:
   // Get the last KWComposite in the list.
   vtkKWComposite *GetLastKWComposite();
+
+protected:
+  vtkKWCompositeCollection() {};
+  ~vtkKWCompositeCollection() {};
+  vtkKWCompositeCollection(const vtkKWCompositeCollection&) {};
+  void operator=(const vtkKWCompositeCollection&) {};
+
 };
 
 inline void vtkKWCompositeCollection::AddItem(vtkKWComposite *a) 

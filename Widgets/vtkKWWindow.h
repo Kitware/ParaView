@@ -41,10 +41,8 @@ class vtkKWApplication;
 class VTK_EXPORT vtkKWWindow : public vtkKWWidget
 {
 public:
-  vtkKWWindow();
-  ~vtkKWWindow();
   static vtkKWWindow* New();
-  const char *GetClassName() {return "vtkKWWindow";};
+  vtkTypeMacro(vtkKWWindow,vtkKWWidget);
 
   // Description:
   // Create a Tk widget
@@ -132,6 +130,11 @@ public:
   vtkGetObjectMacro(ToolbarFrame, vtkKWWidget);
  
 protected:
+  vtkKWWindow();
+  ~vtkKWWindow();
+  vtkKWWindow(const vtkKWWindow&) {};
+  void operator=(const vtkKWWindow&) {};
+
   void CreateStatusImage();
   int NumberOfMRUFiles;
   vtkKWView *SelectedView;

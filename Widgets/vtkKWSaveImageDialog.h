@@ -38,9 +38,8 @@ class vtkKWApplication;
 class VTK_EXPORT vtkKWSaveImageDialog : public vtkKWWidget
 {
 public:
-  vtkKWSaveImageDialog();
   static vtkKWSaveImageDialog* New();
-  const char *GetClassName() {return "vtkKWSaveImageDialog";};
+  vtkTypeMacro(vtkKWSaveImageDialog,vtkKWWidget);
 
   // Description:
   // Create a Tk widget
@@ -56,6 +55,11 @@ public:
   vtkSetStringMacro(FileName);
 
 protected:
+  vtkKWSaveImageDialog();
+  ~vtkKWSaveImageDialog() {};
+  vtkKWSaveImageDialog(const vtkKWSaveImageDialog&) {};
+  void operator=(const vtkKWSaveImageDialog&) {};
+
   char *FileName;
 };
 

@@ -45,10 +45,8 @@ class vtkStructuredPoints;
 class VTK_EXPORT vtkKWGenericComposite : public vtkKWComposite
 {
 public:
-  vtkKWGenericComposite();
-  ~vtkKWGenericComposite();
   static vtkKWGenericComposite* New();
-  const char *GetClassName() {return "vtkKWGenericComposite";};
+  vtkTypeMacro(vtkKWGenericComposite,vtkKWComposite);
 
   // Description:
   // Get the prop for this composite
@@ -56,6 +54,11 @@ public:
   vtkSetObjectMacro(Prop,vtkProp);
   
 protected:
+  vtkKWGenericComposite();
+  ~vtkKWGenericComposite();
+  vtkKWGenericComposite(const vtkKWGenericComposite&) {};
+  void operator=(const vtkKWGenericComposite&) {};
+
   vtkProp *Prop;
 };
 

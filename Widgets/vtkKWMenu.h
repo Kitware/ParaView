@@ -40,10 +40,8 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 class VTK_EXPORT vtkKWMenu : public vtkKWWidget
 {
 public:
-  vtkKWMenu();
-  ~vtkKWMenu();
   static vtkKWMenu* New();
-  const char *GetClassName() {return "vtkKWMenu";};
+  vtkTypeMacro(vtkKWMenu,vtkKWWidget);
   
   void Create(vtkKWApplication* app, const char* args);
   
@@ -97,6 +95,12 @@ public:
   int GetIndex(const char* menuname);
   
 protected:
+  vtkKWMenu();
+  ~vtkKWMenu();
+  vtkKWMenu(const vtkKWMenu&) {};
+  void operator=(const   
+                 &) {};
+
   void AddGeneric(const char* addtype, const char* label, vtkKWObject* Object,
 		  const char* MethodAndArgString, const char* extra);
   void InsertGeneric(int position, const char* addtype, const char* label, 

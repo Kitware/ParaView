@@ -41,10 +41,8 @@ class vtkKWApplication;
 class VTK_EXPORT vtkKWExtent : public vtkKWWidget
 {
 public:
-  vtkKWExtent();
-  ~vtkKWExtent();
   static vtkKWExtent* New();
-  const char *GetClassName() {return "vtkKWExtent";};
+  vtkTypeMacro(vtkKWExtent,vtkKWWidget);
 
   // Description:
   // Create a Tk widget
@@ -84,6 +82,11 @@ public:
   virtual void SetCommand(vtkKWObject* Object, const char *MethodAndArgString);
 
 protected:
+  vtkKWExtent();
+  ~vtkKWExtent();
+  vtkKWExtent(const vtkKWExtent&) {};
+  void operator=(const vtkKWExtent&) {};
+
   char *Command;
   int Extent[6];
   vtkKWScale  *XMinScale;

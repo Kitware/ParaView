@@ -40,9 +40,9 @@ class vtkKWWindow;
 
 class VTK_EXPORT vtkKWWindowCollection : public vtkCollection
 {
- public:
+public:
   static vtkKWWindowCollection *New();
-  const char *GetClassName() {return "vtkKWWindowCollection";};
+  vtkTypeMacro(vtkKWWindowCollection,vtkCollection);
 
   // Description:
   // Add an KWWindow to the list.
@@ -64,6 +64,12 @@ class VTK_EXPORT vtkKWWindowCollection : public vtkCollection
   // Description:
   // Get the last KWWindow in the list.
   vtkKWWindow *GetLastKWWindow();
+
+protected:
+  vtkKWWindowCollection() {};
+  ~vtkKWWindowCollection() {};
+  vtkKWWindowCollection(const vtkKWWindowCollection&) {};
+  void operator=(const vtkKWWindowCollection&) {};
 };
 
 inline void vtkKWWindowCollection::AddItem(vtkKWWindow *a) 

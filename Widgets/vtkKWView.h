@@ -58,9 +58,7 @@ class vtkViewport;
 class VTK_EXPORT vtkKWView : public vtkKWWidget
 {
 public:
-  vtkKWView();
-  ~vtkKWView();
-  const char *GetClassName() {return "vtkKWView";};
+  vtkTypeMacro(vtkKWView,vtkKWWidget);
 
   // Description:
   // Create a View
@@ -240,6 +238,11 @@ public:
   virtual void SerializeToken(istream& is,const char token[1024]);
 
 protected:
+  vtkKWView();
+  ~vtkKWView();
+  vtkKWView(const vtkKWView&) {};
+  void operator=(const vtkKWView&) {};
+
   vtkKWNotebook *Notebook;
   int InExpose;
   int SharedPropertiesParent;

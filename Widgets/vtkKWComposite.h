@@ -45,9 +45,7 @@ class vtkKWWidget;
 class VTK_EXPORT vtkKWComposite : public vtkKWObject
 {
 public:
-  vtkKWComposite();
-  ~vtkKWComposite();
-  const char *GetClassName() {return "vtkKWComposite";};
+  vtkTypeMacro(vtkKWComposite,vtkKWObject);
 
   // Description:
   // Get the View for this class.
@@ -92,6 +90,11 @@ public:
   virtual void Close() {};
 
 protected:
+  vtkKWComposite();
+  ~vtkKWComposite();
+  vtkKWComposite(const vtkKWComposite&) {};
+  void operator=(const vtkKWComposite&) {};
+
   vtkKWNotebook *Notebook;
   vtkKWNotebook *Notebook2;
   int PropertiesCreated;
