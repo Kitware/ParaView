@@ -111,7 +111,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.361");
+vtkCxxRevisionMacro(vtkPVWindow, "1.362");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -3487,6 +3487,7 @@ void vtkPVWindow::AddFileWriter(vtkPVWriter* writer)
 //----------------------------------------------------------------------------
 void vtkPVWindow::WarningMessage(const char* message)
 {
+  this->Script("bell");
   this->CreateErrorLogDisplay();
   char *wmessage = vtkString::Duplicate(message);
   this->InvokeEvent(vtkKWEvent::WarningMessageEvent, wmessage);
@@ -3497,7 +3498,8 @@ void vtkPVWindow::WarningMessage(const char* message)
 
 //----------------------------------------------------------------------------
 void vtkPVWindow::ErrorMessage(const char* message)
-{
+{  
+  this->Script("bell");
   this->CreateErrorLogDisplay();
   char *wmessage = vtkString::Duplicate(message);
   this->InvokeEvent(vtkKWEvent::ErrorMessageEvent, wmessage);
@@ -3587,7 +3589,7 @@ void vtkPVWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVWindow ";
-  this->ExtractRevision(os,"$Revision: 1.361 $");
+  this->ExtractRevision(os,"$Revision: 1.362 $");
 }
 
 //----------------------------------------------------------------------------
