@@ -1841,6 +1841,8 @@ The Glyph filter operates on any type of data set. Its output is polygonal. This
   <Module name="Pick"
           class="vtkPVPick"
           root_name="Pick"
+          button_image="PVPickButton"
+          button_help="Pick a cell and display its attributes. Use the 'p' key to pick the cell under the cursor."
           module_type="Filter"
           long_help="Find the cell or point closest to the input point."
           short_help="Pick cells or points.">

@@ -51,6 +51,9 @@
 #include "Resources/vtkPVThresholdButton.h"
 #include "Resources/vtkPVTranslateViewButton.h"
 #include "Resources/vtkPVVectorDisplacementButton.h"
+#include "Resources/vtkPVPickButton.h"
+#include "Resources/vtkPVIntegrateFlowButton.h"
+#include "Resources/vtkPVSurfaceVectorsButton.h"
 
 #include "Resources/vtkPVSelectionWindowButton.h"
 
@@ -249,6 +252,28 @@ void vtkPVApplication::CreateButtonPhotos()
                     image_PVSelectionWindowButton_height,
                     image_PVSelectionWindowButton_pixel_size,
                     image_PVSelectionWindowButton_buffer_length);
+
+  this->CreatePhoto("PVPickButton", 
+                    image_PVPickButton, 
+                    image_PVPickButton_width, 
+                    image_PVPickButton_height,
+                    image_PVPickButton_pixel_size,
+                    image_PVPickButton_buffer_length);
+
+  this->CreatePhoto("PVIntegrateFlowButton", 
+                    image_PVIntegrateFlowButton, 
+                    image_PVIntegrateFlowButton_width, 
+                    image_PVIntegrateFlowButton_height,
+                    image_PVIntegrateFlowButton_pixel_size,
+                    image_PVIntegrateFlowButton_buffer_length);
+
+  this->CreatePhoto("PVSurfaceVectorsButton", 
+                    image_PVSurfaceVectorsButton, 
+                    image_PVSurfaceVectorsButton_width, 
+                    image_PVSurfaceVectorsButton_height,
+                    image_PVSurfaceVectorsButton_pixel_size,
+                    image_PVSurfaceVectorsButton_buffer_length);
+
 }
 
 //----------------------------------------------------------------------------
