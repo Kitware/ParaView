@@ -181,7 +181,7 @@ remote_copy()
 remote_copy_source()
 {
     check_host "$1" || return 1
-    remote_copy "$HOST" "${PROJECT}-${VERSION}.tar*"
+    remote_copy "$HOST" "${PROJECT}-${VERSION}.*"
 }
 
 #-----------------------------------------------------------------------------
@@ -250,8 +250,10 @@ remote_binary()
 upload()
 {
     echo "------- Copying tarballs to www.paraview.org. -------"
-    scp ${PROJECT}-${VERSION}*tar.* kitware@www.paraview.org:/projects/FTP/pub/paraview/v${PARAVIEW_VERSION}
-    scp ${PROJECT}-docs-${VERSION}*tar.* kitware@www.paraview.org:/projects/FTP/pub/paraview/v${PARAVIEW_VERSION}
+    scp ${PROJECT}-${VERSION}*tar.* \
+        ${PROJECT}-docs-${VERSION}*tar.* \
+        ${PROJECT}-${VERSION}.zip \
+        kitware@www.paraview.org:/projects/FTP/pub/paraview/v${PARAVIEW_VERSION}
     echo "---- Done copying tarballs to www.paraview.org. -----"
 }
 
@@ -385,6 +387,24 @@ source_tarball()
         compress -cf Tarballs/${PROJECT}-${VERSION}.tar >Tarballs/${PROJECT}-${VERSION}.tar.Z &&
         rm -rf Tarballs/${PROJECT}-${VERSION}.tar
     ) >Logs/source_tarball.log 2>&1 || error_log Logs/source_tarball.log
+}
+
+#-----------------------------------------------------------------------------
+# Create a source zipfile.
+#
+#  source_zipfile
+#
+source_zipfile()
+{
+    [ -z "${DONE_source_zipfile}" ] || return 0 ; DONE_source_zipfile="yes"
+    config || return 1
+    [ -d "${PROJECT}-${VERSION}" ] || checkout || return 1
+    echo "Creating source zipfile ..." &&
+    (
+        mkdir -p Tarballs &&
+        rm -rf Tarballs/${PROJECT}-${VERSION}.zip &&
+        zip -r Tarballs/${PROJECT}-${VERSION}.zip ${PROJECT}-${VERSION}
+    ) >Logs/source_zipfile.log 2>&1 || error_log Logs/source_zipfile.log
 }
 
 #-----------------------------------------------------------------------------
