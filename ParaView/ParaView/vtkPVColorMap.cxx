@@ -75,7 +75,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVColorMap);
-vtkCxxRevisionMacro(vtkPVColorMap, "1.53");
+vtkCxxRevisionMacro(vtkPVColorMap, "1.54");
 
 int vtkPVColorMapCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -1964,6 +1964,11 @@ void vtkPVColorMap::VectorModeComponentCallback()
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
 
+  if (this->VectorComponentMenu->GetApplication() == NULL)
+    { // Sanity check
+    return;
+    }
+
   this->AddTraceEntry("$kw(%s) VectorModeComponentCallback", 
                       this->GetTclName());
 
@@ -2141,7 +2146,7 @@ void vtkPVColorMap::SaveState(ofstream *file)
     {
     *file << "$kw(" << this->GetTclName() << ") VectorModeMagnitudeCallback\n";
     }
-  if (this->VectorMode == vtkPVColorMap::COMPONENT)
+  if (this->VectorMode == vtkPVColorMap::COMPONENT && this->NumberOfVectorComponents > 1)
     {
     *file << "$kw(" << this->GetTclName() << ") VectorModeComponentCallback\n";
     if (this->VectorComponent != 0)

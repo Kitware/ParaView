@@ -98,6 +98,7 @@ vtkPVRenderView.cxx
 vtkPVRibbonFilter.cxx
 vtkPVScalarRangeLabel.cxx 
 vtkPVScale.cxx 
+vtkPVSelectCTHArrays.cxx
 vtkPVSelectCustomReader.cxx
 vtkPVSelectTimeSet.cxx
 vtkPVSelectWidget.cxx 

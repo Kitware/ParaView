@@ -128,7 +128,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.425");
+vtkCxxRevisionMacro(vtkPVWindow, "1.426");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -2674,7 +2674,6 @@ void vtkPVWindow::SaveBatchScript(const char* filename)
       }
     delete [] path;
     *file << "vtkCommand DeleteAllObjects\n";
-    *file << "exit";
     }
 
   delete file;
@@ -4014,7 +4013,7 @@ void vtkPVWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVWindow ";
-  this->ExtractRevision(os,"$Revision: 1.425 $");
+  this->ExtractRevision(os,"$Revision: 1.426 $");
 }
 
 //-----------------------------------------------------------------------------

@@ -79,7 +79,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.280");
+vtkCxxRevisionMacro(vtkPVSource, "1.281");
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -1207,6 +1207,7 @@ void vtkPVSource::Accept(int hideFlag, int hideSource)
   window = this->GetPVWindow();
 
   this->SetAcceptButtonColorToWhite();
+  this->Script("update");
   
   // We need to pass the parameters from the UI to the VTK objects before
   // we check whether to insert ExtractPieces.  Otherwise, we'll get errors
@@ -1218,7 +1219,7 @@ void vtkPVSource::Accept(int hideFlag, int hideSource)
   // Initialize the output if necessary.
   // This has to be after the widgets are accepted (UpdateVTKSOurceParameters)
   // because they can change the number of parts.
-  if ( ! this->Initialized)
+  if (this->GetPVOutput() == NULL)
     { // This is the first time, create the data.
     this->InitializeData();
     }
@@ -1228,6 +1229,7 @@ void vtkPVSource::Accept(int hideFlag, int hideSource)
     { // This is the first time, initialize data.    
     vtkPVData *pvd;
     
+    this->Initialized = 1;
     pvd = this->GetPVOutput();
     if (pvd == NULL)
       { // I suppose we should try and delete the source.
@@ -1301,7 +1303,6 @@ void vtkPVSource::Accept(int hideFlag, int hideSource)
       }
 
     pvd->Initialize();
-    this->Initialized = 1;
     }
 
   window->GetMenuView()->CheckRadioButton(
@@ -1949,9 +1950,20 @@ void vtkPVSource::SetInputsInBatchScript(ofstream *file)
       numOutputs = pvs->GetVTKSource(sourceCount)->GetNumberOfOutputs();
       }
 
+    vtkPVInputProperty* ip = this->GetInputProperty(idx);
+    const char* inputName;
+    if (ip)
+      {
+      inputName = ip->GetName();
+      }
+    else
+      {
+      inputName = "Input";
+      }
+
     *file << "\t";
     *file << this->GetVTKSourceTclName(idx) << " Set"
-          << this->GetInputProperty(idx)->GetName() << " [" 
+          << inputName << " [" 
           << pvs->GetVTKSourceTclName(sourceCount) 
           << " GetOutput " << outputCount << "]\n";
     
@@ -2562,7 +2574,7 @@ void vtkPVSource::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVSource ";
-  this->ExtractRevision(os,"$Revision: 1.280 $");
+  this->ExtractRevision(os,"$Revision: 1.281 $");
 }
 
 //----------------------------------------------------------------------------

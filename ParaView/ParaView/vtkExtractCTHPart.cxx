@@ -29,17 +29,20 @@
 #include "vtkPointData.h"
 #include "vtkPolyData.h"
 #include "vtkRectilinearGrid.h"
+#include "vtkStringList.h"
+#include "vtkCharArray.h"
+#include "vtkFloatArray.h"
 
 #include <math.h>
 
-vtkCxxRevisionMacro(vtkExtractCTHPart, "1.2");
+vtkCxxRevisionMacro(vtkExtractCTHPart, "1.3");
 vtkStandardNewMacro(vtkExtractCTHPart);
 vtkCxxSetObjectMacro(vtkExtractCTHPart,ClipPlane,vtkPlane);
 
 //------------------------------------------------------------------------------
 vtkExtractCTHPart::vtkExtractCTHPart()
 {
-  this->InputScalarsSelection = NULL;
+  this->VolumeArrayNames = vtkStringList::New();
   this->Clipping = 0;
   this->ClipPlane = vtkPlane::New();
   // For consistent references.
@@ -50,7 +53,8 @@ vtkExtractCTHPart::vtkExtractCTHPart()
 //------------------------------------------------------------------------------
 vtkExtractCTHPart::~vtkExtractCTHPart()
 {
-  this->SetInputScalarsSelection(NULL);
+  this->VolumeArrayNames->Delete();
+  this->VolumeArrayNames = NULL;
   this->SetClipPlane(NULL);
 }
 
@@ -70,6 +74,64 @@ unsigned long vtkExtractCTHPart::GetMTime()
 
   return mTime;
 }
+
+
+
+//--------------------------------------------------------------------------
+void vtkExtractCTHPart::RemoveAllVolumeArrayNames()
+{
+  int num, idx;
+
+  num = this->GetNumberOfOutputs();
+  for (idx = 0; idx < num; ++idx)
+    {
+    this->SetOutput(idx, NULL);
+    }
+
+  this->VolumeArrayNames->RemoveAllItems();  
+}
+
+//--------------------------------------------------------------------------
+void vtkExtractCTHPart::AddVolumeArrayName(char* arrayName)
+{
+  vtkPolyData* d = vtkPolyData::New();
+  int num = this->GetNumberOfOutputs();
+  this->VolumeArrayNames->AddString(arrayName);
+  this->SetOutput(num, d);
+  d->Delete();
+  d = NULL;
+}
+
+//--------------------------------------------------------------------------
+int vtkExtractCTHPart::GetNumberOfVolumeArrayNames()
+{
+  return this->VolumeArrayNames->GetNumberOfStrings();
+}
+
+//--------------------------------------------------------------------------
+const char* vtkExtractCTHPart::GetVolumeArrayName(int idx)
+{
+  return this->VolumeArrayNames->GetString(idx);
+}
+
+//--------------------------------------------------------------------------
+void vtkExtractCTHPart::SetOutput(int idx, vtkPolyData* d)
+{
+  this->vtkSource::SetNthOutput(idx, d);  
+}
+
+//----------------------------------------------------------------------------
+vtkPolyData* vtkExtractCTHPart::GetOutput(int idx)
+{
+  return (vtkPolyData *) this->vtkSource::GetOutput(idx); 
+}
+
+//----------------------------------------------------------------------------
+int vtkExtractCTHPart::GetNumberOfOutputs()
+{
+  return this->VolumeArrayNames->GetNumberOfStrings();
+}
+
 
 //--------------------------------------------------------------------------
 void vtkExtractCTHPart::ComputeInputUpdateExtents(vtkDataObject *output)
@@ -95,9 +157,44 @@ void vtkExtractCTHPart::ComputeInputUpdateExtents(vtkDataObject *output)
 //------------------------------------------------------------------------------
 void vtkExtractCTHPart::Execute()
 {
+  int idx, num;
+  int idx2, numPts;
+  const char* arrayName;
+  vtkPolyData* output;
+
+
+  num = this->VolumeArrayNames->GetNumberOfStrings();
+  for (idx = 0; idx < num; ++idx)
+    {
+    arrayName = this->VolumeArrayNames->GetString(idx);
+    output = this->GetOutput(idx);
+    this->ExecutePart(arrayName, output);
+
+    // In the future we might be able to select the rgb color here.
+    if (num > 1)
+      {
+      // Add scalars to color this part.
+      numPts = output->GetNumberOfPoints();
+      vtkFloatArray *partArray = vtkFloatArray::New();
+      partArray->SetName("Part Index");
+      float *p = partArray->WritePointer(0, numPts);
+      for (idx2 = 0; idx2 < numPts; ++idx2)
+        {
+        p[idx2] = (float)(idx);
+        }
+      output->GetPointData()->SetScalars(partArray);
+      partArray->Delete();
+      }
+    } 
+}
+
+
+
+//------------------------------------------------------------------------------
+void vtkExtractCTHPart::ExecutePart(const char* arrayName, vtkPolyData* output)
+{
   vtkRectilinearGrid* input = this->GetInput();
   vtkRectilinearGrid* data = vtkRectilinearGrid::New();
-  vtkPolyData* output;
   vtkPolyData* tmp;
   vtkDataArray* cellVolumeFraction;
   vtkFloatArray* pointVolumeFraction;
@@ -114,11 +211,18 @@ void vtkExtractCTHPart::Execute()
   data->GetCellData()->PassData(input->GetCellData());
   // Only convert single volume fraction array to point data.
   // Other attributes will have to be viewed as cell data.
-  cellVolumeFraction = input->GetCellData()->GetScalars(this->InputScalarsSelection);
+  cellVolumeFraction = input->GetCellData()->GetArray(arrayName);
+  if (cellVolumeFraction == NULL)
+    {
+    vtkErrorMacro("Could not find cell array " << arrayName);
+    data->Delete();
+    return;
+    }
   if (cellVolumeFraction->GetDataType() != VTK_FLOAT)
     {
     vtkErrorMacro("Expecting volume fraction to be of type float.");
     data->Delete();
+    return;
     }
   pointVolumeFraction = vtkFloatArray::New();
   dims = input->GetDimensions();
@@ -179,7 +283,6 @@ void vtkExtractCTHPart::Execute()
     clip2 = NULL;
     }
 
-  output = this->GetOutput();
   output->CopyStructure(tmp);
   output->GetCellData()->PassData(tmp->GetCellData());
 
@@ -196,6 +299,14 @@ void vtkExtractCTHPart::Execute()
     append2->Delete();
     }
   pointVolumeFraction->Delete();
+
+  // Add a name for this part.
+  vtkCharArray *nameArray = vtkCharArray::New();
+  nameArray->SetName("Name");
+  char *str = nameArray->WritePointer(0, (int)(strlen(arrayName))+1);
+  sprintf(str, "%s", arrayName);
+  output->GetFieldData()->AddArray(nameArray);
+  nameArray->Delete();
 }
 
 //------------------------------------------------------------------------------
@@ -302,11 +413,9 @@ void vtkExtractCTHPart::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
 
-  if (this->InputScalarsSelection)
-    {
-    os << indent << "InputScalarsSelection: " 
-       << this->InputScalarsSelection << endl;
-    }
+  os << indent << "VolumeArrayNames: \n";
+  vtkIndent i2 = indent.GetNextIndent();
+  this->VolumeArrayNames->PrintSelf(os, i2);
   if (this->Clipping)
     {
     os << indent << "Clipping: On\n";
