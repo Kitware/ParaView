@@ -16,7 +16,7 @@
 #include "vtkObjectFactory.h"
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkRMObject, "1.2");
+vtkCxxRevisionMacro(vtkRMObject, "1.3");
 
 //----------------------------------------------------------------------------
 vtkRMObject::vtkRMObject()
@@ -28,6 +28,7 @@ vtkRMObject::~vtkRMObject()
 {
 }
 //----------------------------------------------------------------------------
-void vtkRMObject::PrintSelf(ostream& , vtkIndent )
+void vtkRMObject::PrintSelf(ostream& os, vtkIndent indent)
 {
+  this->Superclass::PrintSelf(os, indent);
 }
