@@ -51,7 +51,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Resources/vtkKWArrowDown.h"
 
 vtkStandardNewMacro(vtkKWSelectionFrame);
-vtkCxxRevisionMacro(vtkKWSelectionFrame, "1.3");
+vtkCxxRevisionMacro(vtkKWSelectionFrame, "1.4");
 
 vtkCxxSetObjectMacro(vtkKWSelectionFrame, SelectObject, vtkKWObject);
 
@@ -133,8 +133,8 @@ void vtkKWSelectionFrame::Create(vtkKWApplication *app, const char *args)
   this->Script("pack %s -side top -fill both -expand yes",
                this->BodyFrame->GetWidgetName());
   
-  this->SetSelectObject(this);
-  this->SetSelectMethod("{}");
+  this->SetSelectObject(NULL);
+  this->SetSelectMethod(NULL);
 }
 
 void vtkKWSelectionFrame::SetTitle(const char *title)
@@ -159,10 +159,14 @@ void vtkKWSelectionFrame::SetSelectionList(int num, const char **list)
   this->SelectionList->GetMenu()->DeleteAllMenuItems();
   
   int i;
+  char *cbk;
+  
   for (i = 0; i < num; i++)
     {
-    this->SelectionList->AddCommand(list[i], this->SelectObject,
-                                    this->SelectMethod);
+    cbk = new char[strlen(list[i]) + 25];
+    sprintf(cbk, "SelectionMenuCallback {%s}", list[i]);
+    this->SelectionList->AddCommand(list[i], this, cbk);
+    delete [] cbk;
     }
 }
 
@@ -171,6 +175,20 @@ void vtkKWSelectionFrame::SetSelectCommand(vtkKWObject *object,
 {
   this->SetSelectObject(object);
   this->SetSelectMethod(methodAndArgString);
+}
+
+void vtkKWSelectionFrame::SelectionMenuCallback(const char *menuItem)
+{
+  cout << "selected " << menuItem << endl;
+  
+  if ( ! (this->SelectObject && this->SelectMethod) )
+    {
+    return;
+    }
+  
+  this->Script("%s %s {%s}",
+               this->SelectObject->GetTclName(), this->SelectMethod,
+               menuItem);
 }
 
 void vtkKWSelectionFrame::PrintSelf(ostream& os, vtkIndent indent)

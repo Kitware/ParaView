@@ -51,7 +51,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // ---------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWScale );
-vtkCxxRevisionMacro(vtkKWScale, "1.41");
+vtkCxxRevisionMacro(vtkKWScale, "1.42");
 
 int vtkKWScaleCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -101,13 +101,18 @@ vtkKWScale::vtkKWScale()
 
   this->NormalLabel = NULL;
   this->ShortLabel = NULL;
-  
+
+  this->LongWidth = 230;
   this->MediumWidth = 200;
+  this->MediumShortWidth = 150;
   this->ShortWidth = 100;
   
   this->RangeMinLabel = NULL;
   this->RangeMaxLabel = NULL;
   this->DisplayRange = 0;
+  
+  this->PackEntry = 1;
+  this->PackRange = 1;
 }
 
 // ---------------------------------------------------------------------------
@@ -383,35 +388,44 @@ void vtkKWScale::PackWidget()
 
   if (this->DisplayRange)
     {
-    this->Script("pack %s -side left -padx 0 -fill y -before %s",
+    this->Script("pack forget %s %s",
                  this->RangeMinLabel->GetWidgetName(),
-                 this->Scale->GetWidgetName());
-    this->Script("pack %s -side left -padx 0 -fill y -after %s",
-                 this->RangeMaxLabel->GetWidgetName(),
-                 this->Scale->GetWidgetName());
+                 this->RangeMaxLabel->GetWidgetName());
+    if (this->PackRange)
+      {
+      this->Script("pack %s -side left -padx 0 -fill y -before %s",
+                   this->RangeMinLabel->GetWidgetName(),
+                   this->Scale->GetWidgetName());
+      this->Script("pack %s -side left -padx 0 -fill y -after %s",
+                   this->RangeMaxLabel->GetWidgetName(),
+                   this->Scale->GetWidgetName());
+      }
     }
   
   if (this->Entry && this->Entry->IsCreated())
     {
     this->Script("pack forget %s", this->Entry->GetWidgetName());
-    if (this->PopupScale)
+    if (this->PackEntry)
       {
-      this->Script("pack %s -side left -padx 0 %s", 
-                   this->Entry->GetWidgetName(),
-                   (this->ExpandEntry ? "-fill both -expand t" : "-fill y"));
-      }
-    else
-      {
-      if (this->DisplayEntryAndLabelOnTop)
+      if (this->PopupScale)
         {
-        this->Script("pack %s -side right -padx 0 -fill y", 
-                     this->Entry->GetWidgetName());
+        this->Script("pack %s -side left -padx 0 %s", 
+                     this->Entry->GetWidgetName(),
+                     (this->ExpandEntry ? "-fill both -expand t" : "-fill y"));
         }
       else
         {
-        this->Script("pack %s -side right -padx 0 -fill y -after %s", 
-                     this->Entry->GetWidgetName(), 
-                     this->Scale->GetWidgetName());
+        if (this->DisplayEntryAndLabelOnTop)
+          {
+          this->Script("pack %s -side right -padx 0 -fill y", 
+                       this->Entry->GetWidgetName());
+          }
+        else
+          {
+          this->Script("pack %s -side right -padx 0 -fill y -after %s", 
+                       this->Entry->GetWidgetName(), 
+                       this->Scale->GetWidgetName());
+          }
         }
       }
     }
@@ -911,8 +925,10 @@ void vtkKWScale::Resize()
     return;
     }
   
-  this->Script("winfo reqwidth %s", this->GetWidgetName());
+  this->Script("winfo width %s", this->GetWidgetName());
   int width = vtkKWObject::GetIntegerResult(this->Application);
+  
+//  cout << "width: " << width << endl;
   
   char labelText[100];
   
@@ -930,34 +946,48 @@ void vtkKWScale::Resize()
       this->Script("%s configure -text {}",
                    this->RangeMaxLabel->GetWidgetName());
       }
-    if (this->Entry && this->Entry->IsPacked())
-      {
-      this->Script("pack forget %s", this->Entry->GetWidgetName());
-      }
+    this->Script("%s configure -sliderlength 10",
+                 this->Scale->GetWidgetName());
+    
+    this->PackEntry = 0;
+    this->PackRange = 0;
+    this->PackWidget();
+    }
+  else if (width < this->MediumShortWidth)
+    {
+    this->Script("%s configure -sliderlength 15",
+                 this->Scale->GetWidgetName());
+    this->PackRange = 0;
+    this->PackEntry = 0;
+    this->PackWidget();
     }
   else if (width < this->MediumWidth)
     {
+    this->Script("%s configure -sliderlength 20",
+                 this->Scale->GetWidgetName());
     this->Script("%s configure -text {%s}",
                  this->Label->GetWidgetName(), this->ShortLabel);
-    if (this->RangeMinLabel && this->RangeMinLabel->IsCreated())
-      {
-      this->Script("%s configure -text {}",
-                   this->RangeMinLabel->GetWidgetName());
-      }
-    if (this->RangeMaxLabel && this->RangeMaxLabel->IsCreated())
-      {
-      this->Script("%s configure -text {}",
-                   this->RangeMaxLabel->GetWidgetName());
-      }
-    if (this->Entry && ! this->Entry->IsPacked())
-      {
-      this->PackWidget();
-      }
+    this->PackRange = 0;
+    this->PackEntry = 1;
+    this->PackWidget();
+    }
+  else if (width < this->LongWidth)
+    {
+    this->Script("%s configure -sliderlength 25",
+                 this->Scale->GetWidgetName());
+    this->Script("%s configure -text {%s}",
+                 this->Label->GetWidgetName(), this->NormalLabel);
+    this->PackRange = 0;
+    this->PackEntry = 1;
+    this->PackWidget();
     }
   else
     {
+    this->Script("%s configure -sliderlength 30",
+                 this->Scale->GetWidgetName());
     this->Script("%s configure -text {%s}",
                  this->Label->GetWidgetName(), this->NormalLabel);
+    
     if (this->RangeMinLabel && this->RangeMinLabel->IsCreated())
       {
       if (this->Resolution >= 1)
@@ -984,10 +1014,9 @@ void vtkKWScale::Resize()
       this->Script("%s configure -text %s",
                    this->RangeMaxLabel->GetWidgetName(), labelText);
       }
-    if (this->Entry && ! this->Entry->IsPacked())
-      {
-      this->PackWidget();
-      }
+    this->PackRange = 1;
+    this->PackEntry = 1;
+    this->PackWidget();
     }
 }
 

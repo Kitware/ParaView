@@ -69,6 +69,8 @@ public:
 
   void SetSelectCommand(vtkKWObject *object, const char *methodAndArgString);
 
+  void SelectionMenuCallback(const char *menuItem);
+  
 protected:
   vtkKWSelectionFrame();
   ~vtkKWSelectionFrame();

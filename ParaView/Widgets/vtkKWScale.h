@@ -206,8 +206,12 @@ protected:
   
   char *NormalLabel;
   char *ShortLabel;
+  int LongWidth;
   int MediumWidth;
+  int MediumShortWidth;
   int ShortWidth;
+  int PackEntry;
+  int PackRange;
   
   vtkSetStringMacro(NormalLabel);
   

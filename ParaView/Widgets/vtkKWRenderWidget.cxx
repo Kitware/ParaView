@@ -51,12 +51,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkProp.h"
 #include "vtkRenderWindow.h"
 #include "vtkRenderer.h"
+#include "vtkTextProperty.h"
 
 #ifdef _WIN32
 #include "vtkWin32OpenGLRenderWindow.h"
 #endif
 
-vtkCxxRevisionMacro(vtkKWRenderWidget, "1.5");
+vtkCxxRevisionMacro(vtkKWRenderWidget, "1.6");
 
 vtkKWRenderWidget::vtkKWRenderWidget()
 {
@@ -463,6 +464,19 @@ float* vtkKWRenderWidget::GetBackgroundColor()
 void vtkKWRenderWidget::Close()
 {
   this->RemoveBindings();
+}
+
+void vtkKWRenderWidget::SetCornerTextColor(float r, float g, float b)
+{
+  this->CornerAnnotation->GetTextProperty()->SetColor(r, g, b);
+  this->Render();
+}
+
+float* vtkKWRenderWidget::GetCornerTextColor()
+{
+  float rgb[3];
+  this->CornerAnnotation->GetTextProperty()->GetColor(rgb);
+  return rgb;
 }
 
 void vtkKWRenderWidget::PrintSelf(ostream& os, vtkIndent indent)

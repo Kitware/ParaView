@@ -126,7 +126,7 @@ public:
   virtual void RemoveAllProps();
   
   virtual void SetBackgroundColor(float r, float g, float b);
-  virtual void SetBackgroundCOlor(float *rgb)
+  virtual void SetBackgroundColor(float *rgb)
     { this->SetBackgroundColor(rgb[0], rgb[1], rgb[2]); }
   virtual void GetBackgroundColor(float *r, float *g, float *b);
   virtual float* GetBackgroundColor();
@@ -137,6 +137,11 @@ public:
   // Get the underlying vtkCornerAnnotation.
   vtkGetObjectMacro(CornerAnnotation, vtkCornerAnnotation);
 
+  void SetCornerTextColor(float r, float g, float b);
+  void SetCornerTextColor(float *rgb)
+    { this->SetCornerTextColor(rgb[0], rgb[1], rgb[2]); }
+  float* GetCornerTextColor();
+      
 protected:
   vtkKWRenderWidget();
   ~vtkKWRenderWidget();
