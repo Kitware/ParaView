@@ -70,7 +70,7 @@ int vtkKWApplication::WidgetVisibility = 1;
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.119");
+vtkCxxRevisionMacro(vtkKWApplication, "1.120");
 
 extern "C" int Vtktcl_Init(Tcl_Interp *interp);
 extern "C" int Vtkkwwidgetstcl_Init(Tcl_Interp *interp);
@@ -216,6 +216,7 @@ void vtkKWApplication::SetApplication(vtkKWApplication*)
 void vtkKWApplication::FindApplicationInstallationDirectory()
 {
   const char *nameofexec = this->Script("info nameofexecutable");
+  cout << "\"" << nameofexec << "\"" << endl;
   if (nameofexec && vtkKWDirectoryUtilities::FileExists(nameofexec))
     {
     char directory[1024];
@@ -241,11 +242,7 @@ void vtkKWApplication::FindApplicationInstallationDirectory()
       }
     else
       {
-      this->SetApplicationInstallationDirectory("");
-      vtkKWMessageDialog::PopupMessage( 
-        this, 0, "Startup Error", 
-        "The application installation directory was not found.", 
-        vtkKWMessageDialog::ErrorIcon);
+      this->SetApplicationInstallationDirectory(0);
       }
     }
 }
