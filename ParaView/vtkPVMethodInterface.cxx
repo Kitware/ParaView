@@ -84,7 +84,7 @@ void vtkPVMethodInterface::AddArgumentType(int type)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVMethodInterface::AddSelectionEntry(int idx, char *string)
+void vtkPVMethodInterface::AddSelectionEntry(int idx, const char *string)
 {
   if (this->SelectionEntries == NULL)
     {

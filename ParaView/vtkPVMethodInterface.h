@@ -97,7 +97,7 @@ public:
   // Description:
   // For a selection widget.  Add the string options.
   void SetWidgetTypeToSelection() { this->SetWidgetType(VTK_PV_METHOD_WIDGET_SELECTION);}
-  void AddSelectionEntry(int idx, char *label);
+  void AddSelectionEntry(int idx, const char *label);
   vtkStringList *GetSelectionEntries() {return this->SelectionEntries;}
 
   // Description:
