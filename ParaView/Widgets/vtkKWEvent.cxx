@@ -116,6 +116,8 @@ static const char *vtkKWEventStrings[] = {
   "MultiPassStillRenderEndEvent",
   "MultiPassStillRenderStageChangedEvent",
   "PerspectiveViewAngleChangedEvent",
+  "PluginFilterApplyEvent",
+  "PluginFilterSelectEvent",
   "PrinterDPIChangedEvent",
   "ProbeInformationChangedEvent",
   "ProjectionTypeChangedEvent",

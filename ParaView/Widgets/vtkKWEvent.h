@@ -125,6 +125,8 @@ class VTK_EXPORT vtkKWEvent
     MultiPassStillRenderEndEvent,
     MultiPassStillRenderStageChangedEvent,
     PerspectiveViewAngleChangedEvent,
+    PluginFilterApplyEvent,
+    PluginFilterSelectEvent,
     PrinterDPIChangedEvent,
     ProbeInformationChangedEvent,
     ProjectionTypeChangedEvent,
