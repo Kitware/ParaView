@@ -31,7 +31,7 @@
 #include <vtkstd/map>
 #include <vtkstd/algorithm>
 
-vtkCxxRevisionMacro(vtkXMLCollectionReader, "1.14");
+vtkCxxRevisionMacro(vtkXMLCollectionReader, "1.15");
 vtkStandardNewMacro(vtkXMLCollectionReader);
 
 //----------------------------------------------------------------------------
@@ -471,6 +471,9 @@ void vtkXMLCollectionReader::SetupOutput(const char* filePath, int index,
 
 
 //----------------------------------------------------------------------------
+// This method overloads the method in vtkXMLReader.  The ReadXMLInformation
+// call is made in RequestDataObject (UpdateData is done at the beginning of
+// the UpdateInformation pass, before RequestInformation on the algorithm)
 int vtkXMLCollectionReader::RequestInformation(vtkInformation *request,
   vtkInformationVector **vtkNotUsed(inputVector), vtkInformationVector *outputVector)
 {
@@ -493,15 +496,19 @@ int vtkXMLCollectionReader::RequestInformation(vtkInformation *request,
       // We already did the RequestInformation/UpdateInformation on the
       // individual readers during the ReqeustDataObject pass for the
       // vtkXMLCollectionReader, in SetupOutput; now, we need to copy relevant
-      // keys that were setup in the child readers to the outputs of this reader
+      // keys that were setup in the child readers to the outputs of this
+      // reader
       this->Internal->Readers[i]->CopyOutputInformation(
         outputVector->GetInformationObject(i), 0);
+      this->SetupOutputInformation( outputVector->GetInformationObject(i) );
       }
     }
   else
     {
     this->Internal->Readers[outputPort]->CopyOutputInformation(
       outputVector->GetInformationObject(outputPort), 0);
+    this->SetupOutputInformation( 
+      outputVector->GetInformationObject(outputPort) );
     }
 
   return !this->InformationError;
