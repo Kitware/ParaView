@@ -164,14 +164,6 @@ public:
 
 
   // Description:
-  // This value will be returned by ParaView at exit.
-  // Use this from scripts if you want ParaView exit with an
-  // error status (for example to indicate that a regression test 
-  // failed)
-  vtkSetMacro(ExitStatus, int);
-  vtkGetMacro(ExitStatus, int);
-
-  // Description:
   // ParaView version is always MajorVersion.MinorVersion.
   // Change these in the constructor.
   vtkGetMacro(MajorVersion, int);
@@ -206,7 +198,6 @@ protected:
   int CheckRegistration();
   int PromptRegistration(char *,char *);
 
-  int ExitStatus;
   int MajorVersion;
   int MinorVersion;
 

@@ -121,6 +121,9 @@ vtkKWApplication::vtkKWApplication()
   
   this->InExit = 0;
   this->TraceFile = NULL;
+
+  this->ExitStatus = 0;
+
 }
 
 vtkKWApplication::~vtkKWApplication()

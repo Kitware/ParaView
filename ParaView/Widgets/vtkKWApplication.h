@@ -153,6 +153,15 @@ public:
 
   virtual int GetApplicationKey() {return -1;};
 
+
+  // Description:
+  // This value will be returned by application1 at exit.
+  // Use this from scripts if you want ParaView exit with an
+  // error status (for example to indicate that a regression test 
+  // failed)
+  vtkSetMacro(ExitStatus, int);
+  vtkGetMacro(ExitStatus, int);
+
 protected:
   vtkKWApplication();
   ~vtkKWApplication();
@@ -175,6 +184,8 @@ protected:
 
   static int WidgetVisibility;
   int InExit;
+
+  int ExitStatus;
   
   ofstream *TraceFile;
 };

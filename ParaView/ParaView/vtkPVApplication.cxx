@@ -144,8 +144,6 @@ vtkPVApplication::vtkPVApplication()
   this->Log = NULL;
   this->LogFileName = NULL;
 
-  this->ExitStatus = 0;
-
   this->TraceFile = new ofstream("ParaViewTrace.tcl", ios::out);
   if (this->TraceFile && this->TraceFile->fail())
     {
