@@ -432,7 +432,7 @@ void vtkInteractorStylePlane::ShowCrosshair()
       {
       this->CurrentRenderer->AddActor(this->CrossHairActor);
       }
-  this->CurrentRenderer->Render();
+  this->CurrentRenderer->GetRenderWindow()->Render();
 }
 
 //----------------------------------------------------------------------------
@@ -444,5 +444,5 @@ void vtkInteractorStylePlane::HideCrosshair()
       {
       this->CurrentRenderer->RemoveActor(this->CrossHairActor);
       }
-  this->CurrentRenderer->Render();
+  this->CurrentRenderer->GetRenderWindow()->Render();
 }
