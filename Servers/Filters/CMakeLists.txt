@@ -3,92 +3,92 @@ INCLUDE_REGULAR_EXPRESSION("^vtk.*$")
 
 
 SET(Filters_SRCS
-  vtkMultiDisplayManager.cxx
-  vtkCaveRenderManager.cxx
-  vtkDesktopDeliveryClient.cxx
-  vtkDesktopDeliveryServer.cxx
-  vtkPVServerArraySelection.cxx
-  vtkPVServerFileListing.cxx
-  vtkPVServerObject.cxx
-  vtkPVServerSelectTimeSet.cxx
-  vtkPVServerXDMFParameters.cxx
-  vtkPVExtentTranslator.cxx
-  vtkPickLineWidget.cxx
-  vtkPickPointWidget.cxx
-  vtkPVSummaryHelper.cxx
-  vtkSurfaceVectors.cxx
-  vtkIntegrateAttributes.cxx
-  vtkIntegrateFlowThroughSurface.cxx
-  vtkPVLODActor.cxx
-  vtkPVLODVolume.cxx
-  vtkPVGenericRenderWindowInteractor.cxx
-  vtkPVGeometryInformation.cxx
-  vtkPVRenderViewProxy.cxx
-  vtkPVGeometryFilter.cxx
-  vtkPVMain.cxx
-  vtkPVXMLElement.cxx
-  vtkPVXMLParser.cxx
-  vtkCellCenterDepthSort.cxx
-  vtkCleanUnstructuredGrid.cxx
-  vtkColorByPart.cxx
-  vtkCTHData.cxx
-  vtkCTHDataToCTHDataFilter.cxx
-  vtkCTHDataToPolyDataFilter.cxx
-  vtkCTHExtractAMRPart.cxx
+  vtkAMRSpyPlotReader.cxx
   vtkCTHAMRCellToPointData.cxx
   vtkCTHAMRContour.cxx
   vtkCTHAMRExtractPart.cxx
   vtkCTHAMRSurface.cxx
+  vtkCTHData.cxx
+  vtkCTHDataToCTHDataFilter.cxx
+  vtkCTHDataToPolyDataFilter.cxx
+  vtkCTHExtractAMRPart.cxx
   vtkCTHFractal.cxx
   vtkCTHOutlineFilter.cxx
   vtkCTHSource.cxx
+  vtkCaveRenderManager.cxx
+  vtkCellCenterDepthSort.cxx
+  vtkCleanUnstructuredGrid.cxx
+  vtkClientCompositeManager.cxx
+  vtkColorByPart.cxx
+  vtkCompleteArrays.cxx
+  vtkDataSetSubdivisionAlgorithm.cxx
+  vtkDesktopDeliveryClient.cxx
+  vtkDesktopDeliveryServer.cxx
   vtkGroup.cxx
   vtkHDF5RawImageReader.cxx
+  vtkIntegrateAttributes.cxx
+  vtkIntegrateFlowThroughSurface.cxx
   vtkMPIDuplicatePolyData.cxx
   vtkMPIDuplicateUnstructuredGrid.cxx
+  vtkMPIMoveData.cxx
   vtkMazeSource.cxx
   vtkMergeArrays.cxx
-  vtkPickFilter.cxx
-  vtkProjectedTetrahedraMapper.cxx
+  vtkMultiDisplayManager.cxx
   vtkPVArrowSource.cxx
   vtkPVClipDataSet.cxx
+  vtkPVCompositeBuffer.cxx
+  vtkPVCompositeUtilities.cxx
   vtkPVConnectivityFilter.cxx
   vtkPVContourFilter.cxx
+  vtkPVDReader.cxx
   vtkPVEnSightMasterServerReader.cxx
   vtkPVEnSightMasterServerTranslator.cxx
+  vtkPVExtentTranslator.cxx
   vtkPVExtractVOI.cxx
+  vtkPVGenericRenderWindowInteractor.cxx
+  vtkPVGeometryFilter.cxx
+  vtkPVGeometryInformation.cxx
   vtkPVGlyphFilter.cxx
   vtkPVImageContinuousDilate3D.cxx
   vtkPVImageContinuousErode3D.cxx
   vtkPVImageGradient.cxx
   vtkPVImageGradientMagnitude.cxx
   vtkPVImageMedian3D.cxx
+  vtkPVLODActor.cxx
+  vtkPVLODVolume.cxx
   vtkPVLinearExtrusionFilter.cxx
+  vtkPVMain.cxx
+  vtkPVRenderViewProxy.cxx
   vtkPVRibbonFilter.cxx
+  vtkPVServerArraySelection.cxx
+  vtkPVServerFileListing.cxx
+  vtkPVServerObject.cxx
+  vtkPVServerSelectTimeSet.cxx
+  vtkPVServerXDMFParameters.cxx
+  vtkPVSummaryHelper.cxx
   vtkPVThresholdFilter.cxx
+  vtkPVTreeComposite.cxx
   vtkPVUpdateSuppressor.cxx
   vtkPVWarpScalar.cxx
   vtkPVWarpVector.cxx
+  vtkPVXMLElement.cxx
+  vtkPVXMLParser.cxx
+  vtkPickFilter.cxx
+  vtkPickLineWidget.cxx
+  vtkPickPointWidget.cxx
+  vtkProjectedTetrahedraMapper.cxx
+  vtkSelectInputs.cxx
   vtkSortDataArray.cxx
-  vtkTiledDisplaySchedule.cxx
-  vtkVisibilitySort.cxx
-  vtkVRMLSource.cxx
-  vtkXMLPVDWriter.cxx
-  vtkDataSetSubdivisionAlgorithm.cxx
   vtkStreamingTessellator.cxx
   vtkSubdivisionAlgorithm.cxx
-  vtkMPIMoveData.cxx
-
-  vtkCompleteArrays.cxx
-  vtkClientCompositeManager.cxx
-  vtkPVDReader.cxx
-  vtkPVCompositeUtilities.cxx
-  vtkPVCompositeBuffer.cxx
-  vtkPVTreeComposite.cxx
-  vtkXMLPVAnimationWriter.cxx
-  vtkXMLCollectionReader.cxx
-  vtkSelectInputs.cxx
+  vtkSurfaceVectors.cxx
   vtkTempTessellatorFilter.cxx # Remove after ParaView 1.4
+  vtkTiledDisplaySchedule.cxx
+  vtkVRMLSource.cxx
+  vtkVisibilitySort.cxx
+  vtkXMLCollectionReader.cxx
+  vtkXMLPVAnimationWriter.cxx
+  vtkXMLPVDWriter.cxx
   )
 
 SET_SOURCE_FILES_PROPERTIES(
@@ -149,6 +149,7 @@ INCLUDE_DIRECTORIES(
   ${PVCommon_SOURCE_DIR}
   ${KWCOMMON_INCLUDE_DIR}
   ${HDF5_INCLUDE_DIR}
+  ${SPCTH_INCLUDE_DIR}
   ${VTK_INCLUDE_DIR}
   ${XDMF_INCLUDE_DIRS}
   ${KWSYS_INCLUDE_DIR}
@@ -164,27 +165,27 @@ ENDIF(VTK_USE_MPI)
 OPTION(PARAVIEW_BUILD_WITH_ADAPTOR "Build ParaView against the PVAdaptor private source library. Requires Kitware License" OFF)
 MARK_AS_ADVANCED(PARAVIEW_BUILD_WITH_ADAPTOR)
 IF(PARAVIEW_BUILD_WITH_ADAPTOR)
- FIND_LIBRARY(PARAVIEW_ADAPTOR_LIBRARY PVAdaptor
- PATHS /usr/lib /usr/local/lib
- DOC "Private source library. Requires Kitware License"
-)
- IF(PARAVIEW_ADAPTOR_LIBRARY)
-  MESSAGE("adaptor lib found.")
-  GET_FILENAME_COMPONENT(PARAVIEW_ADAPTOR_LIBRARY_PATH 
-    "${PARAVIEW_ADAPTOR_LIBRARY}" PATH)
-  SET(PARAVIEW_ADAPTOR_INCLUDE_DIR ${PARAVIEW_ADAPTOR_LIBRARY_PATH}/../../include/vtk)
- ENDIF(PARAVIEW_ADAPTOR_LIBRARY)
- MARK_AS_ADVANCED(PARAVIEW_ADAPTOR_LIBRARY)
+  FIND_LIBRARY(PARAVIEW_ADAPTOR_LIBRARY PVAdaptor
+    PATHS /usr/lib /usr/local/lib
+    DOC "Private source library. Requires Kitware License"
+    )
+  IF(PARAVIEW_ADAPTOR_LIBRARY)
+    MESSAGE("adaptor lib found.")
+    GET_FILENAME_COMPONENT(PARAVIEW_ADAPTOR_LIBRARY_PATH 
+      "${PARAVIEW_ADAPTOR_LIBRARY}" PATH)
+    SET(PARAVIEW_ADAPTOR_INCLUDE_DIR ${PARAVIEW_ADAPTOR_LIBRARY_PATH}/../../include/vtk)
+  ENDIF(PARAVIEW_ADAPTOR_LIBRARY)
+  MARK_AS_ADVANCED(PARAVIEW_ADAPTOR_LIBRARY)
 
- IF (PARAVIEW_ADAPTOR_LIBRARY)
-   MESSAGE("adding adaptor include dir")
-   MESSAGE("PARAVIEW_ADAPTOR_INCLUDE_DIR=${PARAVIEW_ADAPTOR_INCLUDE_DIR}")
-   INCLUDE_DIRECTORIES(${PARAVIEW_ADAPTOR_INCLUDE_DIR})
-   MESSAGE("adding adaptor lib")
-   MESSAGE("PARAVIEW_ADAPTOR_LIBRARY=${PARAVIEW_ADAPTOR_LIBRARY}")
-#   TARGET_LINK_LIBRARIES(vtkKWParaView ${PARAVIEW_ADAPTOR_LIBRARY})
-#   TARGET_LINK_LIBRARIES(vtkPVFilters ${PARAVIEW_ADAPTOR_LIBRARY})
- ENDIF (PARAVIEW_ADAPTOR_LIBRARY)
+  IF (PARAVIEW_ADAPTOR_LIBRARY)
+    MESSAGE("adding adaptor include dir")
+    MESSAGE("PARAVIEW_ADAPTOR_INCLUDE_DIR=${PARAVIEW_ADAPTOR_INCLUDE_DIR}")
+    INCLUDE_DIRECTORIES(${PARAVIEW_ADAPTOR_INCLUDE_DIR})
+    MESSAGE("adding adaptor lib")
+    MESSAGE("PARAVIEW_ADAPTOR_LIBRARY=${PARAVIEW_ADAPTOR_LIBRARY}")
+    #   TARGET_LINK_LIBRARIES(vtkKWParaView ${PARAVIEW_ADAPTOR_LIBRARY})
+    #   TARGET_LINK_LIBRARIES(vtkPVFilters ${PARAVIEW_ADAPTOR_LIBRARY})
+  ENDIF (PARAVIEW_ADAPTOR_LIBRARY)
 ENDIF(PARAVIEW_BUILD_WITH_ADAPTOR)
 
 #########################################################################
@@ -207,7 +208,7 @@ TARGET_LINK_LIBRARIES(vtkPVFilters vtkKWCommon vtkPVCommon vtkPVCommonCS vtkXdmf
 IF (VTK_USE_PATENTED)
   TARGET_LINK_LIBRARIES(vtkPVFilters vtkPatented)
 ENDIF (VTK_USE_PATENTED)
-TARGET_LINK_LIBRARIES(vtkPVFilters ${PARAVIEW_HDF5_LIBRARIES})
+TARGET_LINK_LIBRARIES(vtkPVFilters ${PARAVIEW_HDF5_LIBRARIES} ${SPCTH_LIBRARIES})
 TARGET_LINK_LIBRARIES(vtkPVFilters vtkClientServer)
 
 IF(PARAVIEW_USE_ICE_T)
@@ -216,7 +217,7 @@ IF(PARAVIEW_USE_ICE_T)
 ENDIF(PARAVIEW_USE_ICE_T)
 
 IF (PARAVIEW_ADAPTOR_LIBRARY)
- TARGET_LINK_LIBRARIES(vtkPVFilters ${PARAVIEW_ADAPTOR_LIBRARY})
+  TARGET_LINK_LIBRARIES(vtkPVFilters ${PARAVIEW_ADAPTOR_LIBRARY})
 ENDIF (PARAVIEW_ADAPTOR_LIBRARY)
 
 # load the ClientServer command

@@ -23,7 +23,7 @@
 #include "vtkPolyData.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 
-vtkCxxRevisionMacro(vtkPVGlyphFilter, "1.17");
+vtkCxxRevisionMacro(vtkPVGlyphFilter, "1.18");
 vtkStandardNewMacro(vtkPVGlyphFilter);
 
 //-----------------------------------------------------------------------------
@@ -50,7 +50,12 @@ vtkPVGlyphFilter::~vtkPVGlyphFilter()
 //-----------------------------------------------------------------------------
 void vtkPVGlyphFilter::SetRandomMode(int mode)
 {
+  if ( mode == this->MaskPoints->GetRandomMode() )
+    {
+    return;
+    }
   this->MaskPoints->SetRandomMode(mode);
+  this->Modified();
 }
 
 //-----------------------------------------------------------------------------
