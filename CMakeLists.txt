@@ -212,6 +212,7 @@ EXPORT_LIBRARY_DEPENDENCIES(${ParaView_BINARY_DIR}/ParaViewLibraryDepends.cmake)
 # For ParaView from build tree:
 SET(PARAVIEW_VTK_DIR ${VTK_DIR})
 SET(VTK_WRAP_ClientServer_EXE_CONFIG ${VTK_WRAP_ClientServer_EXE})
+SET(VTKCS_SOURCE_DIR ${ParaView_SOURCE_DIR}/Utilities/VTKClientServer)
 SET(PARAVIEW_CMAKE_CLIENT_SERVER_EXTENSION
   ${VTKCS_SOURCE_DIR}/CMake/vtkWrapClientServer.cmake)
 SET(PARAVIEW_USE_FILE ${ParaView_SOURCE_DIR}/ParaViewUse.cmake)
