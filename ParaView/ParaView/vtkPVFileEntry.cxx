@@ -61,7 +61,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVFileEntry);
-vtkCxxRevisionMacro(vtkPVFileEntry, "1.47");
+vtkCxxRevisionMacro(vtkPVFileEntry, "1.48");
 
 //----------------------------------------------------------------------------
 vtkPVFileEntry::vtkPVFileEntry()
@@ -713,4 +713,5 @@ void vtkPVFileEntry::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
   os << "Extension: " << (this->Extension?this->Extension:"none") << endl;
+  os << "Range: " << this->Range[0] << " " << this->Range[1] << endl;
 }
