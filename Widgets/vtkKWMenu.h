@@ -98,8 +98,7 @@ protected:
   vtkKWMenu();
   ~vtkKWMenu();
   vtkKWMenu(const vtkKWMenu&) {};
-  void operator=(const   
-                 &) {};
+  void operator=(const vtkKWMenu&) {};
 
   void AddGeneric(const char* addtype, const char* label, vtkKWObject* Object,
 		  const char* MethodAndArgString, const char* extra);
