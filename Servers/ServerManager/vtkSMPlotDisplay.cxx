@@ -39,11 +39,12 @@
 #include "vtkMPIMoveData.h"
 #include "vtkXYPlotWidget.h"
 #include "vtkXYPlotActor.h"
+#include "vtkMath.h"
 #include "vtkPVOptions.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMPlotDisplay);
-vtkCxxRevisionMacro(vtkSMPlotDisplay, "1.3");
+vtkCxxRevisionMacro(vtkSMPlotDisplay, "1.3.2.1");
 
 
 //----------------------------------------------------------------------------
@@ -327,7 +328,7 @@ void vtkSMPlotDisplay::SetInput(vtkSMSourceProxy* input)
                       << "SetPlotLabel" << i << arrayName 
                       << vtkClientServerStream::End;
       float r, g, b;
-      this->HSVtoRGB(ccolor, 1, 1, &r, &g, &b);
+      vtkMath::HSVToRGB(ccolor, 1, 1, &r, &g, &b);
       stream << vtkClientServerStream::Invoke 
                       << this->XYPlotActorProxy->GetID(0) 
                       << "SetPlotColor" << i << r << g << b 
@@ -424,76 +425,6 @@ void vtkSMPlotDisplay::ConnectWidgetAndActor(vtkXYPlotWidget* widget)
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   widget->SetXYPlotActor(vtkXYPlotActor::SafeDownCast(
      pm->GetObjectFromID(this->XYPlotActorProxy->GetID(0))));
-}
-
-//----------------------------------------------------------------------------
-void vtkSMPlotDisplay::HSVtoRGB(float h, float s, float v, float *r, float *g, float *b)
-{
-  float R, G, B;
-  float max = 1.0;
-  float third = max / 3.0;
-  float temp;
-
-  // compute rgb assuming S = 1.0;
-  if (h >= 0.0 && h <= third) // red -> green
-    {
-    G = h/third;
-    R = 1.0 - G;
-    B = 0.0;
-    }
-  else if (h >= third && h <= 2.0*third) // green -> blue
-    {
-    B = (h - third)/third;
-    G = 1.0 - B;
-    R = 0.0;
-    }
-  else // blue -> red
-    {
-    R = (h - 2.0 * third)/third;
-    B = 1.0 - R;
-    G = 0.0;
-    }
-        
-  // add Saturation to the equation.
-  s = s / max;
-  //R = S + (1.0 - S)*R;
-  //G = S + (1.0 - S)*G;
-  //B = S + (1.0 - S)*B;
-  // what happend to this?
-  R = s*R + (1.0 - s);
-  G = s*G + (1.0 - s);
-  B = s*B + (1.0 - s);
-      
-  // Use value to get actual RGB 
-  // normalize RGB first then apply value
-  temp = R + G + B; 
-  //V = 3 * V / (temp * max);
-  // and what happend to this?
-  v = 3 * v / (temp);
-  R = R * v;
-  G = G * v;
-  B = B * v;
-      
-  // clip below 255
-  //if (R > 255.0) R = max;
-  //if (G > 255.0) G = max;
-  //if (B > 255.0) B = max;
-  // mixed constant 255 and max ?????
-  if (R > max)
-    {
-    R = max;
-    }
-  if (G > max)
-    {
-    G = max;
-    }
-  if (B > max)
-    {
-    B = max;
-    }
-  *r = R;
-  *g = G;
-  *b = B;
 }
 
 //----------------------------------------------------------------------------

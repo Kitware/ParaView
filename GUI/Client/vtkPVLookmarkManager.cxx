@@ -110,7 +110,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLookmarkManager);
-vtkCxxRevisionMacro(vtkPVLookmarkManager, "1.6.2.1");
+vtkCxxRevisionMacro(vtkPVLookmarkManager, "1.6.2.2");
 int vtkPVLookmarkManagerCommand(ClientData cd, Tcl_Interp *interp, int argc, char *argv[]);
 
 //----------------------------------------------------------------------------
@@ -3807,7 +3807,7 @@ void vtkPVLookmarkManager::DestroyUnusedLmkWidgets(vtkKWWidget *lmkItem)
     vtkKWLookmarkFolder *oldLmkFolder = vtkKWLookmarkFolder::SafeDownCast(lmkItem);
     if(!this->LmkFolderWidgets->IsItemPresent(oldLmkFolder))
       {
-      oldLmkFolder->Delete();
+      oldLmkFolder->RemoveFolder();
       this->Script("destroy %s", oldLmkFolder->GetWidgetName());
       if(oldLmkFolder)
         {

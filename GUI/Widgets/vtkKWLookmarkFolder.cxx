@@ -36,7 +36,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLookmarkFolder );
-vtkCxxRevisionMacro( vtkKWLookmarkFolder, "1.2.2.1");
+vtkCxxRevisionMacro( vtkKWLookmarkFolder, "1.2.2.2");
 
 int vtkKWLookmarkFolderCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -57,6 +57,12 @@ vtkKWLookmarkFolder::vtkKWLookmarkFolder()
 
 //----------------------------------------------------------------------------
 vtkKWLookmarkFolder::~vtkKWLookmarkFolder()
+{
+  this->RemoveFolder();
+}
+
+
+void vtkKWLookmarkFolder::RemoveFolder()
 {
   if(this->NameField)
     {
