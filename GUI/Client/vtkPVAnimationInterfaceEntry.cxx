@@ -77,7 +77,7 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterfaceEntry);
-vtkCxxRevisionMacro(vtkPVAnimationInterfaceEntry, "1.46");
+vtkCxxRevisionMacro(vtkPVAnimationInterfaceEntry, "1.47");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterfaceEntry, CurrentProperty,
                      vtkPVWidgetProperty);
@@ -1197,9 +1197,9 @@ void vtkPVAnimationInterfaceEntry::SaveState(ofstream* file)
               << ") GetCurrentSMProperty] GetDomain {range}]" << endl;
         }
 
-      //*file << "$kw(" << this->GetTclName() << ") SetLabelAndScript {"
-      //<< this->CurrentMethod << "} \"\" " 
-      //<< this->GetTraceName() << endl;
+      *file << "$kw(" << this->GetTclName() << ") SetLabelAndScript {"
+            << this->CurrentMethod << "} \"\" " 
+            << this->GetTraceName() << endl;
       *file << "$kw(" << this->GetTclName() << ") SetTimeStart " << this->TimeStart << endl;
       *file << "$kw(" << this->GetTclName() << ") SetTimeEnd " << this->TimeEnd << endl;
       *file << "$kw(" << this->GetTclName() << ") SetTimeEquationStyle " << this->TimeEquationStyle << endl;
