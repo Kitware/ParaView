@@ -231,3 +231,63 @@ void vtkPVContour::ContourValuesCancelCallback()
     this->ContourValuesList->AppendUnique(newValue);
     }
 }
+
+void vtkPVContour::Save(ofstream* file)
+{
+  char sourceTclName[256];
+  char* tempName;
+  int i;
+  vtkKitwareContourFilter *source =
+    (vtkKitwareContourFilter*)this->GetVTKSource();
+
+  *file << this->VTKSource->GetClassName() << " "
+        << this->VTKSourceTclName << "\n";
+  
+  *file << "\t" << this->VTKSourceTclName << " SetInput [";
+  if (strncmp(this->GetNthPVInput(0)->GetVTKDataTclName(),
+              "EnSight", 7) == 0)
+    {
+    char *charFound;
+    int pos;
+    char *dataName = this->GetNthPVInput(0)->GetVTKDataTclName();
+    
+    sprintf(sourceTclName, "EnSightReader");
+    tempName = strtok(dataName, "O");
+    strcat(sourceTclName, tempName+7);
+    *file << sourceTclName << " GetOutput ";
+    charFound = strrchr(dataName, 't');
+    pos = charFound - dataName + 1;
+    *file << dataName+pos << "]\n\t";
+    }
+  else if (strncmp(this->GetNthPVInput(0)->GetVTKDataTclName(),
+                   "DataSet", 7) == 0)
+    {
+    sprintf(sourceTclName, "DataSetReader");
+    tempName = strtok(this->GetNthPVInput(0)->GetVTKDataTclName(), "O");
+    strcat(sourceTclName, tempName+7);
+    *file << sourceTclName << " GetOutput]\n\t";
+    }
+  else
+    {
+    *file << this->GetNthPVInput(0)->GetPVSource()->GetVTKSourceTclName()
+          << " GetOutput]\n\t";
+    }
+  
+  *file << this->VTKSourceTclName << " SetNumberOfContours "
+        << source->GetNumberOfContours() << "\n\t";
+  
+  for (i = 0; i < source->GetNumberOfContours(); i++)
+    {
+    *file << this->VTKSourceTclName << " SetValue " << i << " "
+          << source->GetValue(i) << "\n\t";
+    }
+
+  *file << this->VTKSourceTclName << " SetComputeNormals "
+        << this->ComputeNormalsCheck->GetState() << "\n\t"
+        << this->VTKSourceTclName << " SetComputeGradients "
+        << this->ComputeGradientsCheck->GetState() << "\n\t"
+        << this->VTKSourceTclName << " SetComputeScalars "
+        << this->ComputeScalarsCheck->GetState() << "\n\n";
+  
+  this->GetPVOutput(0)->Save(file, this->VTKSourceTclName);
+}

@@ -140,6 +140,11 @@ public:
   // Description:
   // Get the frame for the navigation window
   vtkGetObjectMacro(NavigationFrame, vtkKWLabeledFrame);
+
+  // Description:
+  // Save the renderer and render window to a file.
+  void Save(ofstream *file);
+  void AddActorsToFile(ofstream *file);
   
 protected:
 

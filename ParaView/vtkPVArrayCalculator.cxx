@@ -562,3 +562,74 @@ void vtkPVArrayCalculator::AddVectorVariable(const char* variableName,
                          this->GetVTKSourceTclName(),
                          variableName, arrayName);
 }
+
+void vtkPVArrayCalculator::Save(ofstream *file)
+{
+  char sourceTclName[256];
+  char* tempName;
+  int i;
+  
+  *file << this->VTKSource->GetClassName() << " "
+        << this->VTKSourceTclName << "\n\t"
+        << this->VTKSourceTclName << " SetInput [";
+  if (strncmp(this->GetNthPVInput(0)->GetVTKDataTclName(),
+              "EnSight", 7) == 0)
+    {
+    char *charFound;
+    int pos;
+    char *dataName = this->GetNthPVInput(0)->GetVTKDataTclName();
+    
+    sprintf(sourceTclName, "EnSightReader");
+    tempName = strtok(dataName, "O");
+    strcat(sourceTclName, tempName+7);
+    *file << sourceTclName
+          << " GetOutput ";
+    charFound = strrchr(dataName, 't');
+    pos = charFound - dataName + 1;
+    *file << dataName+pos << "]\n";
+    }
+  else if (strncmp(this->GetNthPVInput(0)->GetVTKDataTclName(),
+                   "DataSet", 7) == 0)
+    {
+    sprintf(sourceTclName, "DataSetReader");
+    tempName = strtok(this->GetNthPVInput(0)->GetVTKDataTclName(), "O");
+    strcat(sourceTclName, tempName+7);
+    *file << sourceTclName << " GetOutput]\n";
+    }
+  else
+    {
+    *file << this->GetNthPVInput(0)->GetPVSource()->GetVTKSourceTclName()
+          << " GetOutput]\n";
+    }
+  
+  *file << "\t" << this->VTKSourceTclName << " SetFunction "
+        << this->FunctionEntry->GetValue() << "\n\t"
+        << this->VTKSourceTclName << " SetAttributeModeToUse";
+  if (strcmp(this->AttributeModeMenu->GetValue(), "Point Data") == 0)
+    {
+    *file << "PointData\n\t";
+    }
+  else
+    {
+    *file << "CellData\n\t";
+    }
+  
+  for (i = 0; i < this->Calculator->GetNumberOfScalarArrays(); i++)
+    {
+    *file << this->VTKSourceTclName << " AddScalarVariable "
+          << this->Calculator->GetScalarVariableName(i) << " "
+          << this->Calculator->GetScalarArrayName(i)
+          << " 0\n\t";
+    }
+  for (i = 0; i < this->Calculator->GetNumberOfVectorArrays(); i++)
+    {
+    *file << this->VTKSourceTclName << " AddVectorVariable "
+          << this->Calculator->GetVectorVariableName(i) << " "
+          << this->Calculator->GetVectorArrayName(i)
+          << " 0 1 2\n\t";
+    }
+  *file << this->VTKSourceTclName << " SetResultArrayName "
+        << this->Calculator->GetResultArrayName() << "\n\n";
+  
+  this->GetPVOutput(0)->Save(file, this->VTKSourceTclName);
+}

@@ -59,6 +59,10 @@ public:
   // Tcl callbacks for the upper value and lower value scales
   void UpperValueCallback();
   void LowerValueCallback();
+
+  // Description:
+  // Save this source to a file.
+  void Save(ofstream *file);
   
 protected:
   vtkPVThreshold();

@@ -36,6 +36,7 @@ int vtkPVDataSetReaderInterfaceCommand(ClientData cd, Tcl_Interp *interp,
 vtkPVDataSetReaderInterface::vtkPVDataSetReaderInterface()
 {
   this->CommandFunction = vtkPVDataSetReaderInterfaceCommand;
+  this->FileName = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -66,7 +67,7 @@ vtkPVSource *vtkPVDataSetReaderInterface::CreateCallback()
     }
   // Use dialog to get file name on just prrocess 0
   pvApp->Script("%s SetFileName [tk_getOpenFile -filetypes {{{VTK Data Sets} {.vtk}} {{All Files} {.*}}}]", tclName);
-
+  
   // No file name?  Just abort.
   if (strcmp(reader->GetFileName(), "") == 0)
     {
@@ -77,6 +78,7 @@ vtkPVSource *vtkPVDataSetReaderInterface::CreateCallback()
   // Broadcast file name to readers on all processes.
   pvApp->BroadcastScript("%s SetFileName %s", tclName,
 			 reader->GetFileName());
+  this->SetFileName(reader->GetFileName());
   // Let the reader create its outputs.
   pvApp->BroadcastScript("%s Update", tclName);
   
@@ -96,10 +98,10 @@ vtkPVSource *vtkPVDataSetReaderInterface::CreateCallback()
     pvs = vtkPVSource::New();
     pvs->SetPropertiesParent(this->PVWindow->GetMainView()->GetPropertiesParent());
     pvs->SetApplication(pvApp);
-    pvs->CreateProperties();
     pvs->SetInterface(this);
 
     this->PVWindow->GetMainView()->AddComposite(pvs);
+    pvs->CreateProperties();
     this->PVWindow->SetCurrentPVSource(pvs);
     
     sprintf(srcTclName, "%s_%d", tclName, i+1);
@@ -118,3 +120,8 @@ vtkPVSource *vtkPVDataSetReaderInterface::CreateCallback()
   ++this->InstanceCount;
   return pvs;
 } 
+
+void vtkPVDataSetReaderInterface::Save(ofstream *file, const char* sourceName)
+{
+  *file << "\t" << sourceName << " SetFileName " << this->FileName << "\n";
+}

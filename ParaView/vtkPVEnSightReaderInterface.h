@@ -41,12 +41,17 @@ public:
   vtkTypeMacro(vtkPVEnSightReaderInterface, vtkPVSourceInterface);
 
   vtkPVSource* CreateCallback();
+
+  void Save(ofstream *file, const char *sourceName);
   
 protected:
   vtkPVEnSightReaderInterface();
   ~vtkPVEnSightReaderInterface() {};
   vtkPVEnSightReaderInterface(const vtkPVEnSightReaderInterface&) {};
   void operator=(const vtkPVEnSightReaderInterface&) {};
+
+  vtkSetStringMacro(CaseFileName);
+  char* CaseFileName;
 };
 
 #endif

@@ -349,25 +349,78 @@ void vtkPVWindow::SavePipeline()
   ofstream *file;
   vtkCollection *sources;
   vtkPVSource *pvs;
-
-  file = new ofstream("pipeline.pv", ios::out);
+  char *filename;
+  
+  this->Script("tk_getSaveFile -filetypes {{{Tcl Scripts} {.tcl}} {{All Files} {.*}}} -defaultextension .tcl");
+  filename = this->Application->GetMainInterp()->result;
+  
+  if (strcmp(filename, "") == 0)
+    {
+    return;
+    }
+  
+  file = new ofstream(filename, ios::out);
   if (file->fail())
     {
-    vtkErrorMacro("Could not open file pipeline.pv");
+    vtkErrorMacro("Could not open file pipeline.tcl");
     delete file;
     file = NULL;
     return;
     }
 
-  *file << "<ParaView Version= 0.1>\n";
+  *file << "# ParaView Version 0.1\n\n";
+
+  *file << "catch {load vtktcl}\n"
+        << "if { [catch {set VTK_TCL $env(VTK_TCL)}] != 0} { set VTK_TCL \"../../vtk/examplesTcl/\" }\n\n"
+        << "source $VTK_TCL/vtkInt.tcl\n\n"
+        << "# create a rendering window and renderer\n";
+  
+  this->GetMainView()->Save(file);
+  
   // Loop through sources ...
   sources = this->GetSources();
   sources->InitTraversal();
-  while ( (pvs=(vtkPVSource*)(sources->GetNextItemAsObject())) )
+
+  int numSources = sources->GetNumberOfItems();
+  int sourceCount = 0;
+
+  while (sourceCount < numSources)
     {
-    pvs->Save(file);
+    if (strcmp(sources->GetItemAsObject(sourceCount)->GetClassName(),
+               "vtkPVArrayCalculator") == 0)
+      {
+      ((vtkPVArrayCalculator*)sources->GetItemAsObject(sourceCount))->Save(file);
+      }
+    else if (strcmp(sources->GetItemAsObject(sourceCount)->GetClassName(),
+                    "vtkPVContour") == 0)
+      {
+      ((vtkPVContour*)sources->GetItemAsObject(sourceCount))->Save(file);
+      }
+    else if (strcmp(sources->GetItemAsObject(sourceCount)->GetClassName(),
+                    "vtkPVGlyph3D") == 0)
+      {
+      ((vtkPVGlyph3D*)sources->GetItemAsObject(sourceCount))->Save(file);
+      }
+    else if (strcmp(sources->GetItemAsObject(sourceCount)->GetClassName(),
+                    "vtkPVThreshold") == 0)
+      {
+      ((vtkPVThreshold*)sources->GetItemAsObject(sourceCount))->Save(file);
+      }
+    else
+      {
+      pvs = (vtkPVSource*)sources->GetItemAsObject(sourceCount);
+      pvs->Save(file);
+      }
+    sourceCount++;
     }
-  *file << "</ParaView>\n";
+
+  this->GetMainView()->AddActorsToFile(file);
+    
+  *file << "# enable user interface interactor\n"
+        << "iren SetUserMethod {wm deiconify .vtkInteract}\n"
+        << "iren Initialize\n\n"
+        << "# prevent the tk window from showing up then start the event loop\n"
+        << "wm withdraw .\n";
 
   if (file)
     {

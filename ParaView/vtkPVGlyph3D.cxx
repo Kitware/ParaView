@@ -335,3 +335,115 @@ void vtkPVGlyph3D::ChangeSource()
   pvApp->BroadcastScript("[%s GetVTKSource] SetSource %s",
                          this->GetTclName(), tclName);
 }
+
+void vtkPVGlyph3D::Save(ofstream *file)
+{
+  char sourceTclName[256];
+  char* tempName;
+  vtkGlyph3D *source = (vtkGlyph3D*)this->GetVTKSource();
+  char *charFound;
+  int pos;
+  
+  *file << this->VTKSource->GetClassName() << " "
+        << this->VTKSourceTclName << "\n";
+  
+  *file << "\t" << this->VTKSourceTclName << " SetInput [";
+  if (strncmp(this->GetNthPVInput(0)->GetVTKDataTclName(),
+              "EnSight", 7) == 0)
+    {
+    char *dataName = this->GetNthPVInput(0)->GetVTKDataTclName();
+    
+    sprintf(sourceTclName, "EnSightReader");
+    tempName = strtok(dataName, "O");
+    strcat(sourceTclName, tempName+7);
+    *file << sourceTclName << " GetOutput ";
+    charFound = strrchr(dataName, 't');
+    pos = charFound - dataName + 1;
+    *file << dataName+pos << "]\n\t";
+    }
+  else if (strncmp(this->GetNthPVInput(0)->GetVTKDataTclName(),
+                   "DataSet", 7) == 0)
+    {
+    sprintf(sourceTclName, "DataSetReader");
+    tempName = strtok(this->GetNthPVInput(0)->GetVTKDataTclName(), "O");
+    strcat(sourceTclName, tempName+7);
+    *file << sourceTclName << " GetOutput]\n\t";
+    }
+  else
+    {
+    *file << this->GetNthPVInput(0)->GetPVSource()->GetVTKSourceTclName()
+          << " GetOutput]\n\t";
+    }
+  
+  *file << this->VTKSourceTclName << " SetSource [";
+  if (strncmp(this->GetNthPVInput(0)->GetVTKDataTclName(),
+              "EnSight", 7) == 0)
+    {
+    sprintf(sourceTclName, "EnSightReader");
+    tempName = strtok(this->GlyphSourceTclName, "O");
+    strcat(sourceTclName, this->GlyphSourceTclName+7);
+    *file << sourceTclName << " GetOutput ";
+    charFound = strrchr(this->GlyphSourceTclName, 't');
+    pos = charFound - this->GlyphSourceTclName + 1;
+    *file << this->GlyphSourceTclName+pos << "]\n\t";
+    }
+  else if (strncmp(this->GetNthPVInput(0)->GetVTKDataTclName(),
+                   "DataSet", 7) == 0)
+    {
+    sprintf(sourceTclName, "DataSetReader");
+    tempName = strtok(this->GlyphSourceTclName, "O");
+    strcat(sourceTclName, tempName+7);
+    *file << sourceTclName << " GetOutput]\n\t";
+    }
+  else
+    {
+    char *whichSource;
+    
+    charFound = strrchr(this->GlyphSourceTclName, 't');
+    pos = charFound - this->GlyphSourceTclName + 1;
+    whichSource = this->GlyphSourceTclName + pos;
+    tempName = strtok(this->GlyphSourceTclName, "O");
+    *file << tempName << whichSource <<" GetOutput]\n\t";
+    }
+
+  *file << this->VTKSourceTclName << " SetScaleModeTo";
+  if (strcmp(this->ScaleModeMenu->GetValue(), "Scalar") == 0)
+    {
+    *file << "ScaleByScalar\n\t";
+    }
+  else if (strcmp(this->ScaleModeMenu->GetValue(), "Vector") == 0)
+    {
+    *file << "ScaleByVector\n\t";
+    }
+  else if (strcmp(this->ScaleModeMenu->GetValue(), "Vector Components") == 0)
+    {
+    *file << "ScaleByVectorComponents\n\t";
+    }
+  else
+    {
+    *file << "DataScalingOff\n\t";
+    }
+  
+  *file << this->VTKSourceTclName << " SetVectorModeTo";
+  if (strcmp(this->VectorModeMenu->GetValue(), "Normal") == 0)
+    {
+    *file << "UseNormal\n\t";
+    }
+  else if (strcmp(this->VectorModeMenu->GetValue(), "Vector") == 0)
+    {
+    *file << "UseVector\n\t";
+    }
+  else
+    {
+    *file << "VectorRotationOff\n\t";
+    }
+  
+  *file << this->VTKSourceTclName << " SetOrient "
+        << this->OrientCheck->GetState() << "\n\t";
+  *file << this->VTKSourceTclName << " SetScaling "
+        << this->ScaleCheck->GetState() << "\n\t";
+  *file << this->VTKSourceTclName << " SetScaleFactor "
+        << this->ScaleEntry->GetValueAsFloat() << "\n\n";
+  
+  this->GetPVOutput(0)->Save(file, this->VTKSourceTclName);
+}

@@ -77,6 +77,10 @@ public:
   vtkSetStringMacro(GlyphVectorMode);
   vtkGetStringMacro(GlyphVectorMode);
 
+  // Description:
+  // Save this source to a file.
+  void Save(ofstream *file);
+  
 protected:
   vtkPVGlyph3D();
   ~vtkPVGlyph3D();

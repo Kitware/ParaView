@@ -80,6 +80,10 @@ public:
   // Decription:
   // This method is called to create another source.
   vtkPVSource *CreateCallback();
+
+  // Description:
+  // Save this interface to a file.
+  virtual void Save(ofstream *file, const char* sourceName);
   
 protected:
   vtkPVSourceInterface();

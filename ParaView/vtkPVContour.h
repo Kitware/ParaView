@@ -58,6 +58,10 @@ public:
   // Tcl callback for adding the contour values
   void ContourValuesAcceptCallback();
   void ContourValuesCancelCallback();
+
+  // Description:
+  // Save this source to a file.
+  void Save(ofstream *file);
   
 protected:
   vtkPVContour();

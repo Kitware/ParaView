@@ -66,6 +66,10 @@ public:
   // Description:
   // Tcl callback for the entries in the vectors menu.
   void AddVectorVariable(const char* variableName, const char* arrayName);
+
+  // Description:
+  // Save this source to a file.
+  void Save(ofstream *file);
   
 protected:
   vtkPVArrayCalculator();

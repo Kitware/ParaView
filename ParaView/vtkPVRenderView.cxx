@@ -715,3 +715,56 @@ void vtkPVRenderView::Render()
   this->RenderWindow->Render();
 }
 
+void vtkPVRenderView::Save(ofstream *file)
+{
+  *file << "vtkRenderer " << this->RendererTclName << "\n"
+        << "vtkRenderWindow " << this->RenderWindowTclName << "\n\t"
+        << this->RenderWindowTclName << " AddRenderer "
+        << this->RendererTclName << "\n"
+        << "vtkRenderWindowInteractor iren\n\t"
+        << "iren SetRenderWindow " << this->RenderWindowTclName << "\n\n";
+}
+
+void vtkPVRenderView::AddActorsToFile(ofstream *file)
+{
+  int i;
+  char *result;
+  vtkCamera *camera;
+  float position[3];
+  float focalPoint[3];
+  float viewUp[3];
+  float viewAngle;
+  float clippingRange[2];
+
+  *file << "# assign actors to the renderer\n";
+  
+  for (i = 0; i < this->GetRenderer()->GetActors()->GetNumberOfItems(); i++)
+    {
+    *file << this->RendererTclName << " AddActor ";
+    this->Script("set tempValue [[%s GetActors] GetItemAsObject %d]",
+                 this->RendererTclName, i);
+    result = this->Application->GetMainInterp()->result;
+    *file << result << "\n";
+    }
+  *file << "\n";
+  
+  camera = this->GetRenderer()->GetActiveCamera();
+  camera->GetPosition(position);
+  camera->GetFocalPoint(focalPoint);
+  camera->GetViewUp(viewUp);
+  viewAngle = camera->GetViewAngle();
+  camera->GetClippingRange(clippingRange);
+  
+  *file << "# camera parameters\n"
+        << "vtkCamera camera\n\t"
+        << "camera SetPosition " << position[0] << " " << position[1] << " "
+        << position[2] << "\n\t"
+        << "camera SetFocalPoint " << focalPoint[0] << " " << focalPoint[1]
+        << " " << focalPoint[2] << "\n\t"
+        << "camera SetViewUp " << viewUp[0] << " " << viewUp[1] << " "
+        << viewUp[2] << "\n\t"
+        << "camera SetViewAngle " << viewAngle << "\n\t"
+        << "camera SetClippingRange " << clippingRange[0] << " "
+        << clippingRange[1] << "\n"
+        << this->RendererTclName << " SetActiveCamera camera\n\n";
+}

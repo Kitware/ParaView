@@ -48,11 +48,17 @@ public:
 
   vtkPVSource* CreateCallback();
   
+  void Save(ofstream *file, const char *sourceName);
+  
 protected:
   vtkPVDataSetReaderInterface();
   ~vtkPVDataSetReaderInterface() {};
   vtkPVDataSetReaderInterface(const vtkPVDataSetReaderInterface&) {};
   void operator=(const vtkPVDataSetReaderInterface&) {};
+  
+  // necessary for writing out pipeline
+  vtkSetStringMacro(FileName);
+  char* FileName;
 };
 
 #endif

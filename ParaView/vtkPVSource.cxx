@@ -988,6 +988,76 @@ vtkPVData *vtkPVSource::GetNthPVOutput(int idx)
 //----------------------------------------------------------------------------
 void vtkPVSource::Save(ofstream *file)
 {
+  char tclName[256];
+  char sourceTclName[256];
+  char* tempName;
+  
+  if (this->VTKSource)
+    {
+    *file << this->VTKSource->GetClassName() << " "
+          << this->VTKSourceTclName << "\n";
+    sprintf(tclName, this->VTKSourceTclName);
+    }
+  else if (strncmp(this->Name, "EnSight", 7) == 0)
+    {
+    sprintf(tclName, "EnSightReader");
+    strcat(tclName, this->Name+7);
+    tempName = strtok(tclName, "_");
+    sprintf(tclName, tempName);
+    this->Interface->Save(file, tclName);
+    this->GetPVOutput(0)->Save(file, tclName);
+    return;
+    }
+  else if (strncmp(this->Name, "DataSet", 7) == 0)
+    {
+    sprintf(tclName, "DataSetReader");
+    strcat(tclName, this->Name+7);
+    tempName = strtok(tclName, "_");
+    sprintf(tclName, tempName);
+    *file << "vtkDataSetReader " << tclName << "\n";
+    }
+  
+  if (this->NumberOfPVInputs > 0)
+    {
+    *file << "\t" << tclName << " SetInput [";
+    if (strncmp(this->GetNthPVInput(0)->GetVTKDataTclName(),
+                "EnSight", 7) == 0)
+      {
+      char *charFound;
+      int pos;
+      char *dataName = this->GetNthPVInput(0)->GetVTKDataTclName();
+      
+      sprintf(sourceTclName, "EnSightReader");
+      tempName = strtok(dataName, "O");
+      strcat(sourceTclName, tempName+7);
+      *file << sourceTclName << " GetOutput ";
+      charFound = strrchr(dataName, 't');
+      pos = charFound - dataName + 1;
+      *file << dataName+pos << "]\n";
+      }
+    else if (strncmp(this->GetNthPVInput(0)->GetVTKDataTclName(),
+                     "DataSet", 7) == 0)
+      {
+      sprintf(sourceTclName, "DataSetReader");
+      tempName = strtok(this->GetNthPVInput(0)->GetVTKDataTclName(), "O");
+      strcat(sourceTclName, tempName+7);
+      *file << sourceTclName << " GetOutput]\n";
+      }
+    else
+      {
+      *file << this->GetNthPVInput(0)->GetPVSource()->GetVTKSourceTclName()
+            << " GetOutput]\n";
+      }
+    }
+  
+  if (this->Interface)
+    {
+    this->Interface->Save(file, tclName);
+    }
+  
+  *file << "\n";
+
+  this->GetPVOutput(0)->Save(file, tclName);
 }
 
 

@@ -237,3 +237,61 @@ void vtkPVThreshold::ChangeAttributeMode(const char* newMode)
   this->LowerValueScale->SetRange(range[0], range[1]);
   this->LowerValueScale->SetValue(range[0]);
 }
+
+void vtkPVThreshold::Save(ofstream *file)
+{
+  char sourceTclName[256];
+  char* tempName;
+  vtkThreshold *source = (vtkThreshold*)this->GetVTKSource();
+  char *charFound;
+  int pos;
+  
+  *file << this->VTKSource->GetClassName() << " "
+        << this->VTKSourceTclName << "\n";
+  
+  *file << "\t" << this->VTKSourceTclName << " SetInput [";
+  if (strncmp(this->GetNthPVInput(0)->GetVTKDataTclName(),
+              "EnSight", 7) == 0)
+    {
+    char *dataName = this->GetNthPVInput(0)->GetVTKDataTclName();
+    
+    sprintf(sourceTclName, "EnSightReader");
+    tempName = strtok(dataName, "O");
+    strcat(sourceTclName, tempName+7);
+    *file << sourceTclName << " GetOutput ";
+    charFound = strrchr(dataName, 't');
+    pos = charFound - dataName + 1;
+    *file << dataName+pos << "]\n\t";
+    }
+  else if (strncmp(this->GetNthPVInput(0)->GetVTKDataTclName(),
+                   "DataSet", 7) == 0)
+    {
+    sprintf(sourceTclName, "DataSetReader");
+    tempName = strtok(this->GetNthPVInput(0)->GetVTKDataTclName(), "O");
+    strcat(sourceTclName, tempName+7);
+    *file << sourceTclName << " GetOutput]\n\t";
+    }
+  else
+    {
+    *file << this->GetNthPVInput(0)->GetPVSource()->GetVTKSourceTclName()
+          << " GetOutput]\n\t";
+    }
+  
+  *file << this->VTKSourceTclName << " SetAttributeModeToUse";
+  if (strcmp(this->AttributeModeMenu->GetValue(), "Point Data") == 0)
+    {
+    *file << "PointData\n\t";
+    }
+  else
+    {
+    *file << "CellData\n\t";
+    }
+  
+  *file << this->VTKSourceTclName << " ThresholdBetween "
+        << this->LowerValueScale->GetValue() << " "
+        << this->UpperValueScale->GetValue() << "\n\t"
+        << this->VTKSourceTclName << " SetAllScalars "
+        << this->AllScalarsCheck->GetState() << "\n\n";
+  
+  this->GetPVOutput(0)->Save(file, this->VTKSourceTclName);
+}

@@ -765,9 +765,6 @@ void vtkPVActorComposite::Select(vtkKWView *v)
   // invoke super
   this->vtkKWComposite::Select(v); 
   
-//  this->Script("pack %s -pady 2 -padx 2 -fill both -expand yes -anchor n",
-//               this->Notebook->GetWidgetName());
-  
   this->UpdateProperties();
 }
 
@@ -1006,3 +1003,128 @@ void vtkPVActorComposite::ScalarBarCheckCallback()
   this->GetView()->Render();  
 }
 
+void vtkPVActorComposite::Save(ofstream *file, const char *sourceName)
+{
+  char* charFound;
+  int pos;
+  float range[2];
+  const char* scalarMode;
+  static int readerNum = -1;
+  static int outputNum;
+  int newReaderNum;
+  
+  if (this->Mode == VTK_PV_ACTOR_COMPOSITE_IMAGE_OUTLINE_MODE)
+    {
+    *file << "vtkImageOutlineFilter " << this->OutlineTclName << "\n\t"
+          << this->OutlineTclName << " SetInput [" << sourceName
+          << " GetOutput";
+    if (strncmp(sourceName, "EnSight", 7) == 0)
+      {
+      charFound = strrchr(sourceName, 'r');
+      pos = charFound - sourceName + 1;
+      newReaderNum = atoi(sourceName + pos);
+      if (newReaderNum != readerNum)
+        {
+        readerNum = newReaderNum;
+        outputNum = 0;
+        }
+      else
+        {
+        outputNum++;
+        }
+      *file << " " << outputNum << "]\n\n";
+      }
+    else
+      {
+      *file << "]\n\n";
+      }
+    
+    *file << "vtkPolyDataMapper " << this->MapperTclName << "\n\t"
+          << this->MapperTclName << " SetInput ["
+          << this->OutlineTclName << " GetOutput]\n\t";
+    }
+  else if (this->Mode == VTK_PV_ACTOR_COMPOSITE_DATA_SET_MODE)
+    {
+    *file << "vtkFastGeometryFilter " << this->GeometryTclName << "\n\t"
+          << this->GeometryTclName << " SetInput [" << sourceName
+          << " GetOutput";
+    if (strncmp(sourceName, "EnSight", 7) == 0)
+      {
+      charFound = strrchr(sourceName, 'r');
+      pos = charFound - sourceName + 1;
+      newReaderNum = atoi(sourceName + pos);
+      if (newReaderNum != readerNum)
+        {
+        readerNum = newReaderNum;
+        outputNum = 0;
+        }
+      else
+        {
+        outputNum++;
+        }
+      *file << " " << outputNum << "]\n\n";
+      }
+    else
+      {
+      *file << "]\n\n";
+      }
+    
+    *file << "vtkPolyDataMapper " << this->MapperTclName << "\n\t"
+          << this->MapperTclName << " SetInput ["
+          << this->GeometryTclName << " GetOutput]\n\t";
+    }
+  else
+    {
+    *file << "vtkPolyDataMapper " << this->MapperTclName << "\n\t"
+          << this->MapperTclName << " SetInput [" << sourceName
+          << " GetOutput";
+    if (strncmp(sourceName, "EnSight", 7) == 0)
+      {
+      charFound = strrchr(sourceName, 'r');
+      pos = charFound - sourceName + 1;
+      newReaderNum = atoi(sourceName + pos);
+      if (newReaderNum != readerNum)
+        {
+        readerNum = newReaderNum;
+        outputNum = 0;
+        }
+      else
+        {
+        outputNum++;
+        }
+      *file << " " << outputNum << "]\n\t";
+      }
+    else
+      {
+      *file << "]\n\t";
+      }
+    }
+  
+  *file << this->MapperTclName << " SetImmediateModeRendering "
+        << this->Mapper->GetImmediateModeRendering() << "\n\t";
+  
+  this->Mapper->GetScalarRange(range);
+  *file << this->MapperTclName << " SetScalarRange " << range[0] << " "
+        << range[1] << "\n\t";
+  *file << this->MapperTclName << " SetScalarVisibility "
+        << this->Mapper->GetScalarVisibility() << "\n\t"
+        << this->MapperTclName << " SetScalarModeTo";
+
+  scalarMode = this->Mapper->GetScalarModeAsString();
+  *file << scalarMode << "\n";
+  if (strcmp(scalarMode, "UsePointFieldData") == 0 ||
+      strcmp(scalarMode, "UseCellFieldData") == 0)
+    {
+    *file << "\t" << this->MapperTclName << " ColorByArrayComponent "
+          << this->Mapper->GetArrayName() << " "
+          << this->Mapper->GetArrayComponent() << "\n";
+    }
+  *file << "\n";
+  
+  *file << "vtkActor " << this->ActorTclName << "\n\t"
+        << this->ActorTclName << " SetMapper " << this->MapperTclName << "\n\t"
+        << "[" << this->ActorTclName << " GetProperty] SetRepresentationTo"
+        << this->Actor->GetProperty()->GetRepresentationAsString() << "\n\t"
+        << this->ActorTclName << " SetVisibility "
+        << this->Actor->GetVisibility() << "\n\n";
+}

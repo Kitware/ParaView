@@ -252,4 +252,22 @@ int vtkPVSourceInterface::GetIsValidInput(vtkPVData *pvd)
   return data->IsA(this->InputClassName);
 }
 
-
+//----------------------------------------------------------------------------
+void vtkPVSourceInterface::Save(ofstream *file, const char *sourceName)
+{
+  vtkCollection *methods;
+  vtkPVMethodInterface *currentMethod;
+  int i;
+  char *result;
+  
+  methods = this->GetMethodInterfaces();
+  for (i = 0; i < methods->GetNumberOfItems(); i++)
+    {
+    currentMethod = (vtkPVMethodInterface*)methods->GetItemAsObject(i);
+    *file << "\t" << sourceName << " " << currentMethod->GetSetCommand();
+    this->Script("set tempValue [%s %s]", sourceName,
+                 currentMethod->GetGetCommand());
+    result = this->Application->GetMainInterp()->result;
+    *file << " " << result << "\n";
+    }
+}

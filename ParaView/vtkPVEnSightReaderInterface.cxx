@@ -36,6 +36,7 @@ int vtkPVEnSightReaderInterfaceCommand(ClientData cd, Tcl_Interp *interp,
 vtkPVEnSightReaderInterface::vtkPVEnSightReaderInterface()
 {
   this->CommandFunction = vtkPVEnSightReaderInterfaceCommand;
+  this->CaseFileName = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -54,6 +55,7 @@ vtkPVSource *vtkPVEnSightReaderInterface::CreateCallback()
   vtkPVSource *pvs;
   vtkPVApplication *pvApp = this->GetPVApplication();
   int numOutputs, i;
+  char fullPath[256];
   
   // Create the vtkSource.
   sprintf(tclName, "%s%d", this->RootName, this->InstanceCount);
@@ -77,6 +79,9 @@ vtkPVSource *vtkPVEnSightReaderInterface::CreateCallback()
 			 reader->GetFilePath());
   pvApp->BroadcastScript("%s SetCaseFileName %s", tclName,
 			 reader->GetCaseFileName());
+  sprintf(fullPath, "%s%s", reader->GetFilePath(), reader->GetCaseFileName());
+  this->SetCaseFileName(fullPath);
+  
   pvApp->BroadcastScript("%s Update", tclName);
   
   numOutputs = reader->GetNumberOfOutputs();
@@ -95,10 +100,10 @@ vtkPVSource *vtkPVEnSightReaderInterface::CreateCallback()
     pvs = vtkPVSource::New();
     pvs->SetPropertiesParent(this->PVWindow->GetMainView()->GetPropertiesParent());
     pvs->SetApplication(pvApp);
-    pvs->CreateProperties();
     pvs->SetInterface(this);
 
     this->PVWindow->GetMainView()->AddComposite(pvs);
+    pvs->CreateProperties();
     this->PVWindow->SetCurrentPVSource(pvs);
 
     sprintf(srcTclName, "%s_%d", tclName, i+1);
@@ -116,3 +121,17 @@ vtkPVSource *vtkPVEnSightReaderInterface::CreateCallback()
   ++this->InstanceCount;
   return pvs;
 } 
+
+void vtkPVEnSightReaderInterface::Save(ofstream *file, const char *sourceName)
+{
+  static int sourceCount = 0;
+  
+  if (sourceCount == 0)
+    {
+    *file << "vtkGenericEnSightReader " << sourceName << "\n";
+    *file << "\t" << sourceName << " SetCaseFileName " 
+          << this->CaseFileName << "\n";
+    *file << "\t" << sourceName << " Update\n\n";
+    sourceCount++;
+    }
+}

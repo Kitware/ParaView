@@ -178,6 +178,10 @@ public:
   // Description:
   // Temporary intoerface for seting the compositing reduction.
   void ReductionCallback();
+
+  // Description:
+  // Save out the mapper and actor to a file.
+  void Save(ofstream *file, const char *sourceName);
   
 protected:
 
