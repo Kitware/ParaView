@@ -205,9 +205,10 @@ void vtkKWTclInteractor::Evaluate()
   this->Script("set commandList [linsert $commandList end [list %s]]",
                this->CommandEntry->GetValue());
   this->Script("%s insert end \"\n\"", this->DisplayText->GetWidgetName());
-  this->Script("%s insert end [eval [list %s]]\n\n",
+  this->Script("%s insert end [eval [list %s]]",
                this->DisplayText->GetWidgetName(),
                this->CommandEntry->GetValue());
+  this->Script("%s insert end \"\n\n\"", this->DisplayText->GetWidgetName());
   this->Script("%s configure -state disabled",
                this->DisplayText->GetWidgetName());
   this->Script("%s yview end", this->DisplayText->GetWidgetName());
