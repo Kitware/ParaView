@@ -51,6 +51,8 @@ class vtkKWLabel;
 class vtkKWPushButton;
 class vtkKWEntry;
 class vtkPVSource;
+class vtkKWScale;
+class vtkKWFrame;
 
 //BTX
 template<class KeyType,class DataType> class vtkArrayMap;
@@ -115,6 +117,32 @@ public:
   // This serves a dual purpose.  For tracing and for saving state.
   virtual void Trace(ofstream *file);
 
+  // Description:
+  // This callback is called when entry changes.
+  void EntryChangedCallback();
+
+  // Description:
+  // This callback is called when timestep changes.
+  void TimestepChangedCallback();
+
+  // Description:
+  // adds a script to the menu of the animation interface.
+  virtual void AddAnimationScriptsToMenu(vtkKWMenu *menu, 
+                                         vtkPVAnimationInterface *ai);
+
+  // Description:
+  // This method gets called when the user selects this widget to animate.
+  // It sets up the script and animation parameters.
+  void AnimationMenuCallback(vtkPVAnimationInterface *ai);
+
+
+  // Description:
+  // Set the current time step.
+  void SetTimeStep(int ts);
+
+  // Description:
+  void SaveInBatchScriptForPart(ofstream* file, const char* sourceTclName);
+
 protected:
   vtkPVFileEntry();
   ~vtkPVFileEntry();
@@ -125,17 +153,35 @@ protected:
   vtkKWEntry *Entry;
 
   char* Extension;
+  int InSetValue;
+
+  // Timestep scale
+  vtkKWFrame *TimestepFrame;
+  vtkKWScale *Timestep;
+
+  vtkSetStringMacro(Format);
+  vtkSetStringMacro(Prefix);
+  vtkSetStringMacro(Path);
+  vtkSetStringMacro(Ext);
+  vtkSetVector2Macro(Range, int);
+
+  char* Prefix;
+  char* Format;
+  char* Path;
+  char* Ext;
+  int FileNameLength;
+  int Range[2];
 
   vtkPVFileEntry(const vtkPVFileEntry&); // Not implemented
   void operator=(const vtkPVFileEntry&); // Not implemented
 
-//BTX
+  //BTX
   virtual void CopyProperties(vtkPVWidget* clone, vtkPVSource* pvSource,
-                              vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
-//ETX
-  
+    vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
+  //ETX
+
   int ReadXMLAttributes(vtkPVXMLElement* element,
-                        vtkPVXMLPackageParser* parser);
+    vtkPVXMLPackageParser* parser);
 };
 
 #endif
