@@ -106,7 +106,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.283");
+vtkCxxRevisionMacro(vtkPVApplication, "1.284");
 vtkCxxSetObjectMacro(vtkPVApplication, RenderModule, vtkPVRenderModule);
 
 
@@ -603,7 +603,11 @@ const char vtkPVApplication::ArgumentList[vtkPVApplication::NUM_ARGS][128] =
 { "--client" , "-c", 
   "Run ParaView as client (MPI run, 1 process) (ParaView Server must be started first).", 
   "--client-render-server" , "-crs", 
-  "Run ParaView as client (MPI run, 1 process) (ParaView Data Server and Render Server must be started first).", 
+  "Run ParaView as a client to a data and render server. The render server will wait for the data server.", 
+  "--connect-data-to-render" , "-d2r", 
+  "Run ParaView as a client to a data and render server. The render server will wait for the data server.", 
+  "--connect-render-to-data" , "-r2d", 
+  "Run ParaView as a client to a data and render server. The data server will wait for the render server.", 
   "--machines" , "-m", 
   "Specify the network configurations file for the render server (--machines=cfgfile).",
   "--cave-configuration" , "-cc", 
@@ -985,10 +989,26 @@ int vtkPVApplication::ParseCommandLineArguments(int argc, char*argv[])
                                           index) == VTK_OK ||
        vtkPVApplication::CheckForArgument(argc, argv, "-crs",
                                           index) == VTK_OK )
-    {
-    this->ClientMode = 1;
-    this->RenderServerMode = 1;
-
+      {
+        this->ClientMode = 1;
+        this->RenderServerMode = 1;
+      }
+    if ( vtkPVApplication::CheckForArgument(argc, argv, "--connect-render-to-data",
+                                          index) == VTK_OK ||
+       vtkPVApplication::CheckForArgument(argc, argv, "-r2d",
+                                          index) == VTK_OK )
+      {
+        this->ClientMode = 1;
+        this->RenderServerMode = 2;
+      }
+    if ( vtkPVApplication::CheckForArgument(argc, argv, "--connect-data-to-render",
+                                          index) == VTK_OK ||
+       vtkPVApplication::CheckForArgument(argc, argv, "-d2r",
+                                          index) == VTK_OK )
+      {
+        this->ClientMode = 1;
+        this->RenderServerMode = 1;
+      }
     if ( vtkPVApplication::CheckForArgument(argc, argv, "--user",
                                             index) == VTK_OK )
       {
@@ -1004,7 +1024,7 @@ int vtkPVApplication::ParseCommandLineArguments(int argc, char*argv[])
         }
       this->SetUsername(newarg);
       }
-    }
+    
 
   if ( vtkPVApplication::CheckForArgument(argc, argv, "--server",
                                           index) == VTK_OK ||

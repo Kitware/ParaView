@@ -23,7 +23,7 @@
 #include <vtkstd/vector>
 
 
-vtkCxxRevisionMacro(vtkMPIMToNSocketConnection, "1.9");
+vtkCxxRevisionMacro(vtkMPIMToNSocketConnection, "1.10");
 vtkStandardNewMacro(vtkMPIMToNSocketConnection);
 
 vtkCxxSetObjectMacro(vtkMPIMToNSocketConnection,Controller, vtkMultiProcessController);
@@ -51,6 +51,7 @@ vtkMPIMToNSocketConnection::vtkMPIMToNSocketConnection()
   this->Controller = 0;
   this->SetController(vtkMultiProcessController::GetGlobalController());  
   this->SocketCommunicator = 0;
+  this->NumberOfConnections = -1;
 }
 
 vtkMPIMToNSocketConnection::~vtkMPIMToNSocketConnection()
@@ -128,6 +129,10 @@ void  vtkMPIMToNSocketConnection::SetupWaitForConnection()
     return;
     }
   unsigned int myId = this->Controller->GetLocalProcessId();
+  if(myId >= this->NumberOfConnections)
+    {
+      return;
+    }
   this->SocketCommunicator = vtkSocketCommunicator::New();
   // open a socket on a random port
   cerr << "open with port " << this->PortNumber << "\n";
@@ -156,20 +161,23 @@ void  vtkMPIMToNSocketConnection::SetupWaitForConnection()
     }
   this->PortNumber = port;
   this->Socket = sock;
-  this->NumberOfConnections = this->Controller->GetNumberOfProcesses();
+  if(this->NumberOfConnections == -1)
+    {
+      this->NumberOfConnections = this->Controller->GetNumberOfProcesses();
+    }
   cout.flush();
 }
 
 void vtkMPIMToNSocketConnection::WaitForConnection()
 { 
-  if(!this->SocketCommunicator)
-    {
-    vtkErrorMacro("SetupWaitForConnection must be called before WaitForConnection");
-    return;
-    }
   unsigned int myId = this->Controller->GetLocalProcessId();
   if(myId >= static_cast<unsigned int>(this->NumberOfConnections))
     {
+    return;
+    }
+  if(!this->SocketCommunicator)
+    {
+    vtkErrorMacro("SetupWaitForConnection must be called before WaitForConnection");
     return;
     }
   cout << "WaitForConnection: id :" 
