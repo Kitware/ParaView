@@ -23,7 +23,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVMultiDisplayPartDisplay);
-vtkCxxRevisionMacro(vtkPVMultiDisplayPartDisplay, "1.13");
+vtkCxxRevisionMacro(vtkPVMultiDisplayPartDisplay, "1.14");
 
 
 //----------------------------------------------------------------------------
@@ -57,6 +57,20 @@ void vtkPVMultiDisplayPartDisplay::CreateParallelTclObjects(vtkPVApplication *pv
 {
   this->Superclass::CreateParallelTclObjects(pvApp);
   vtkPVProcessModule* pm = pvApp->GetProcessModule();
+
+
+  // This little hack causes collect mode to be iditical to clone mode.
+  // This allows the superclass to treat tiled display like normal compositing.
+  pm->GetStream()
+    << vtkClientServerStream::Invoke
+    << this->CollectID << "DefineCollectAsCloneOn"
+    << vtkClientServerStream::End;
+  pm->GetStream()
+    << vtkClientServerStream::Invoke
+    << this->LODCollectID << "DefineCollectAsCloneOn"
+    << vtkClientServerStream::End;
+  pm->SendStream(vtkProcessModule::CLIENT_AND_SERVERS);
+
 
   // pvApp->ClientMode is only set when there is a server.
 
