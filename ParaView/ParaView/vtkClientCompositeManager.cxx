@@ -34,7 +34,11 @@
 #include "vtkToolkits.h"
 #include "vtkUnsignedCharArray.h"
 #include "vtkFloatArray.h"
+#include "vtkUnsignedCharArray.h"
 #include "vtkTimerLog.h"
+// Until we trigger LOD from AllocatedRenderTime ...
+#include "vtkPVApplication.h"
+
 
 #ifdef _WIN32
 #include "vtkWin32OpenGLRenderWindow.h"
@@ -46,7 +50,7 @@
  #include <mpi.h>
 #endif
 
-vtkCxxRevisionMacro(vtkClientCompositeManager, "1.5");
+vtkCxxRevisionMacro(vtkClientCompositeManager, "1.6");
 vtkStandardNewMacro(vtkClientCompositeManager);
 
 vtkCxxSetObjectMacro(vtkClientCompositeManager,Compositer,vtkCompositer);
@@ -113,6 +117,7 @@ vtkClientCompositeManager::vtkClientCompositeManager()
   this->ZData = NULL;
   this->PData2 = NULL;
   this->ZData2 = NULL;
+  this->SquirtArray = NULL;
   this->MagnifiedPData = NULL;
   this->RenderView = NULL;
 
@@ -123,7 +128,11 @@ vtkClientCompositeManager::vtkClientCompositeManager()
   this->TiledDimensions[0] = this->TiledDimensions[1] = 1;
 
   this->UseChar = 1;
-  this->UseRGB = 1;
+  this->UseRGB = 0;
+
+  this->BaseArray = NULL;
+
+  this->SquirtCompression = 0;
 }
 
   
@@ -159,6 +168,11 @@ vtkClientCompositeManager::~vtkClientCompositeManager()
     this->ZData2 = NULL;
     }
 
+  if (this->SquirtArray)
+    {
+    vtkCompositeManager::DeleteArray(this->SquirtArray);
+    this->SquirtArray = NULL;
+    }
   if (this->MagnifiedPData)
     {
     vtkCompositeManager::DeleteArray(this->MagnifiedPData);
@@ -166,6 +180,12 @@ vtkClientCompositeManager::~vtkClientCompositeManager()
     }
   this->SetRenderView(NULL);
   this->SetCompositer(NULL);
+
+
+  if (this->BaseArray)
+    {
+    this->BaseArray->Delete();
+    }
 }
 
 
@@ -224,11 +244,21 @@ void vtkClientCompositeManager::StartRender()
   vtkLightCollection *lc;
   vtkLight *light;
   static int firstRender = 1;
+  float updateRate = this->RenderWindow->GetDesiredUpdateRate();
   
   if (firstRender)
     {
     firstRender = 0;
     return;
+    }
+
+  if (updateRate > 2.0)
+    {
+    this->ReductionFactor = 2;
+    }
+  else
+    {
+    this->ReductionFactor = 1;
     }
   
   vtkDebugMacro("StartRender");
@@ -249,9 +279,9 @@ void vtkClientCompositeManager::StartRender()
   size = this->RenderWindow->GetSize();
   winInfo.Size[0] = size[0]/this->ReductionFactor;
   winInfo.Size[1] = size[1]/this->ReductionFactor;
+  winInfo.DesiredUpdateRate = updateRate;
   winInfo.ReductionFactor = this->ReductionFactor;
   winInfo.NumberOfRenderers = rens->GetNumberOfItems();
-  winInfo.DesiredUpdateRate = this->RenderWindow->GetDesiredUpdateRate();
   this->SetPDataSize(winInfo.Size[0], winInfo.Size[1]);
   
   controller->TriggerRMI(1, vtkClientCompositeManager::RENDER_RMI_TAG);
@@ -307,8 +337,42 @@ void vtkClientCompositeManager::StartRender()
 // Method executed only on client.
 void vtkClientCompositeManager::ReceiveAndSetColorBuffer()
 {
-  this->ClientController->Receive(this->PData, 1, 123451);
+  if (this->UseChar && ! this->UseRGB)
+    {
+    int length;
+    this->ClientController->Receive(&length, 1, 1, 123450);
+    this->SquirtArray->SetNumberOfTuples(length / (this->SquirtArray->GetNumberOfComponents()));
+    this->ClientController->Receive((unsigned char*)(this->SquirtArray->GetVoidPointer(0)),
+                                                    length, 1, 123451);
+    this->SquirtDecompress(this->SquirtArray,
+                           static_cast<vtkUnsignedCharArray*>(this->PData));
+    //this->DeltaDecode(static_cast<vtkUnsignedCharArray*>(this->PData));
+    }
+  else
+    {
+    //this->ClientController->Receive(this->PData, 1, 123451);
+    int length = this->PData->GetMaxId() + 1;
+    this->ClientController->Receive((unsigned char*)(this->PData->GetVoidPointer(0)),
+                                    length, 1, 123451);
+    }
  
+  /*
+  if (this->ReductionFactor == 2)
+    {
+    vtkTimerLog::MarkStartEvent("Double Buffer");
+    this->DoubleBuffer(this->PData, this->MagnifiedPData, this->PDataSize);
+    vtkTimerLog::MarkEndEvent("Double Buffer");
+    
+    // I do not know if this is necessary !!!!!!!
+    vtkRenderer* renderer =
+      ((vtkRenderer*)
+       this->RenderWindow->GetRenderers()->GetItemAsObject(0));
+    renderer->SetViewport(0, 0, 1.0, 1.0);
+    renderer->GetActiveCamera()->UpdateViewport(renderer);
+    // We have to set the color buffer as an even multiple of factor.
+    }
+  else 
+  */
   if (this->ReductionFactor > 1)
     {
     vtkTimerLog::MarkStartEvent("Magnify Buffer");
@@ -492,6 +556,84 @@ void vtkClientCompositeManager::MagnifyBuffer(vtkDataArray* localP,
 }
   
 
+//----------------------------------------------------------------------------
+// We change this to work backwards so we can make it inplace. !!!!!!!     
+void vtkClientCompositeManager::DoubleBuffer(vtkDataArray* localP, 
+                                             vtkDataArray* magP,
+                                             int windowSize[2])
+{
+  int   x, y, i;
+  int   xInDim, yInDim;
+  // Local increments for input.
+  int   outYInc; 
+  unsigned char *localPdata;
+  unsigned char *newLocalPData;
+  unsigned char half, quarter;
+  
+  xInDim = windowSize[0];
+  yInDim = windowSize[1];
+
+  outYInc = 2 * xInDim * 4;
+
+  if (this->ReductionFactor != 2)
+    {
+    vtkErrorMacro("double does not match reduction factor.");
+    return;
+    }
+  // Assume rgba char.
+  if (localP->GetNumberOfComponents() != 4)
+    {
+    vtkErrorMacro("Expecting RGBA");
+    return;
+    }
+  if ( ! this->UseChar)
+    {
+    vtkErrorMacro("Expecting char data");
+    return;
+    }
+
+  newLocalPData = reinterpret_cast<unsigned char*>(magP->GetVoidPointer(0));
+  memset(newLocalPData, 0, magP->GetMaxId()+1);
+  localPdata = reinterpret_cast<unsigned char*>(localP->GetVoidPointer(0));
+
+  for (y = 0; y < yInDim; y++)
+    {
+    for (x = 0; x < xInDim; x++)
+      {
+      for (i = 0; i < 4; ++i)
+        {
+        half = *localPdata >> 1;
+        quarter = half >> 1;
+        newLocalPData[0] = *localPdata;
+        newLocalPData[4] += half;
+        newLocalPData[outYInc] += half;
+        newLocalPData[outYInc+4] += quarter;
+        if (x > 0)
+          {
+          newLocalPData[-4] += half;
+          newLocalPData[outYInc-4] += quarter;
+          if (y > 0)
+            {
+            newLocalPData[-outYInc-4] += quarter;
+            }
+          }
+        if (y > 0)
+          {
+          newLocalPData[-outYInc] += half;
+          newLocalPData[-outYInc+4] += quarter;
+          }
+      
+        ++localPdata;
+        ++newLocalPData;
+        }
+      newLocalPData += 4;
+      }
+    newLocalPData += outYInc;
+   }
+}
+      
+
+
 
 //-------------------------------------------------------------------------
 void vtkClientCompositeManager::ResetCamera(vtkRenderer *ren)
@@ -649,6 +791,7 @@ void vtkClientCompositeManager::SatelliteStartRender()
                   winInfo.Size[1] * winInfo.ReductionFactor);
   renWin->SetDesiredUpdateRate(winInfo.DesiredUpdateRate);
   this->ReductionFactor = winInfo.ReductionFactor;
+  this->SquirtCompression = 3 * (winInfo.ReductionFactor-1);
 
   // Synchronize the renderers.
   rens = renWin->GetRenderers();
@@ -811,7 +954,23 @@ void vtkClientCompositeManager::SatelliteEndRender()
 
   if (myId == 0)
     {
-    this->ClientController->Send(this->PData, 1, 123451);
+    if (this->UseChar && ! this->UseRGB)
+      {
+      //this->DeltaEncode(static_cast<vtkUnsignedCharArray*>(this->PData));
+      this->SquirtCompress(static_cast<vtkUnsignedCharArray*>(this->PData),
+                           this->SquirtArray, this->SquirtCompression);
+      int length = this->SquirtArray->GetMaxId() + 1;
+      this->ClientController->Send(&length, 1, 1, 123450);
+      this->ClientController->Send((unsigned char*)(this->SquirtArray->GetVoidPointer(0)),
+                                                    length, 1, 123451);
+      }
+    else
+      {
+      //this->ClientController->Send(this->PData, 1, 123451);
+      int length = this->PData->GetMaxId() + 1;
+      this->ClientController->Send((unsigned char*)(this->PData->GetVoidPointer(0)),
+                                                    length, 1, 123451);
+      }
     }
 }
 
@@ -1069,12 +1228,30 @@ void vtkClientCompositeManager::ReallocPDataArrays()
     vtkCompositeManager::DeleteArray(this->PData2);
     this->PData2 = NULL;
     } 
+  if (this->SquirtArray)
+    {
+    vtkCompositeManager::DeleteArray(this->SquirtArray);
+    this->SquirtArray = NULL;
+    } 
   if (this->MagnifiedPData)
     {
     vtkCompositeManager::DeleteArray(this->MagnifiedPData);
     this->MagnifiedPData = NULL;
     } 
 
+  // Allocate squirt compressed array.
+  if (this->UseChar && ! this->UseRGB)
+    {
+    if (this->ClientFlag || this->CompositeController->GetLocalProcessId() == 0)
+      {
+      if (this->SquirtArray == NULL)
+        {
+        this->SquirtArray = vtkUnsignedCharArray::New();
+        }
+      vtkCompositeManager::ResizeUnsignedCharArray(
+          this->SquirtArray, 4, numTuples);
+      }
+    }
   if (this->UseChar)
     {
     this->PData = vtkUnsignedCharArray::New();
@@ -1164,6 +1341,11 @@ void vtkClientCompositeManager::SetPDataSize(int x, int y)
       vtkCompositeManager::DeleteArray(this->PData2);
       this->PData2 = NULL;
       }
+    if (this->SquirtArray)
+      {
+      vtkCompositeManager::DeleteArray(this->SquirtArray);
+      this->SquirtArray = NULL;
+      }
     if (this->ZData)
       {
       vtkCompositeManager::DeleteArray(this->ZData);
@@ -1186,6 +1368,20 @@ void vtkClientCompositeManager::SetPDataSize(int x, int y)
   magNumPixels = this->MagnifiedPDataSize[0] 
                   * this->MagnifiedPDataSize[1];
 
+
+  // Allocate squirt compressed array.
+  if (this->UseChar && ! this->UseRGB)
+    {
+    if (this->ClientFlag || this->CompositeController->GetLocalProcessId() == 0)
+      {
+      if ( this->SquirtArray == NULL)
+        {
+        this->SquirtArray = vtkUnsignedCharArray::New();
+        }
+      vtkCompositeManager::ResizeUnsignedCharArray(
+          this->SquirtArray, 4, numPixels);
+      }
+    }
 
   if (numProcs > 1)
     { // Not client (numProcs == 1)
@@ -1308,7 +1504,252 @@ void vtkClientCompositeManager::InitializeRMIs()
     }
 }
 
+//-------------------------------------------------------------------------
+void vtkClientCompositeManager::SquirtCompress(vtkUnsignedCharArray *in,
+                                               vtkUnsignedCharArray *out,
+                                               int compress_level)
+{
+  if (in->GetNumberOfComponents() != 4)
+    {
+    vtkErrorMacro("Squirt only works with RGBA");
+    return;
+    }
 
+  unsigned int count=0;
+  int index=0;
+  int comp_index=0;
+  int end_index;
+  unsigned int current_color;
+  static int total_size=0, total_compress=0;
+  static float max_ratio=0;
+  unsigned int compress_mask;
+
+  // Set bitmask based on compress_level
+  // switch statement is a bit lame
+  switch (compress_level) {
+  case 0: compress_mask = 0x00FFFFFF;
+      break;
+  case 1: compress_mask = 0x00FEFFFE;
+      break;
+  case 2: compress_mask = 0x00FCFEFC;
+      break;
+  case 3: compress_mask = 0x00F8FCF8;
+      break;
+  case 4: compress_mask = 0x00F0F8F0;
+      break;
+  case 5: compress_mask = 0x00E0F0E0;
+      break;
+  default: compress_mask = 0x00E0F0E0;
+      break;
+  }
+
+  // Access raw arrays directly
+  unsigned int* _rawColorBuffer;
+  unsigned int* _rawCompressedBuffer;
+  int numPixels = in->GetNumberOfTuples();
+  _rawColorBuffer = (unsigned int*)in->GetPointer(0);
+  _rawCompressedBuffer = (unsigned int*)out->WritePointer(0,numPixels*4);
+
+  end_index = numPixels;
+
+  // Go through color buffer and put RLE format into compressed buffer
+  while((index < end_index) && (comp_index < end_index)) 
+    {
+    // Record color
+    current_color = _rawCompressedBuffer[comp_index] = _rawColorBuffer[index];
+    index++;
+
+    // Compute Run
+    while(((current_color&compress_mask) ==(_rawColorBuffer[index]&compress_mask)) && 
+          (index<end_index) && (count<255)) 
+      { 
+      index++; 
+      count++; 
+      }
+
+    // Record Run length
+    _rawCompressedBuffer[comp_index] &= (count<<24|0x00FFFFFF);
+    comp_index++;
+    
+    count = 0;
+    }
+
+  // Back to vtk arrays :)
+  //ColorBuffer->SetNumberOfTuples(ImageX*ImageY);  
+  out->SetNumberOfTuples(comp_index);
+
+  // Doesn't do much good to keep stats on the server.
+
+  // Keep stats
+  //total_size += end_index;
+  //total_compress += comp_index;
+  //if (comp_index/(float)end_index > max_ratio) 
+  //  {
+  //  max_ratio = comp_index/(float)end_index;
+  //  }
+
+  // Output stats
+  //vtkTimerLog::FormatAndMarkEvent("Compress ratio: %f", comp_index/(float)end_index);
+  //vtkTimerLog::FormatAndMarkEvent("Compress size: %f", comp_index*4);
+  //vtkTimerLog::FormatAndMarkEvent("Avg ratio: %f", total_compress/(float)total_size);
+  //vtkTimerLog::FormatAndMarkEvent("Max ratio: %f", max_ratio);
+}
+
+
+//-------------------------------------------------------------------------
+void vtkClientCompositeManager::SquirtDecompress(vtkUnsignedCharArray *in,
+                                                 vtkUnsignedCharArray *out)
+{
+  int count=0;
+  int index=0;
+  unsigned int current_color;
+  unsigned int* _rawColorBuffer;
+  unsigned int* _rawCompressedBuffer;
+
+  // Get compressed buffer size
+  int CompSize = in->GetNumberOfTuples();
+
+  // Access raw arrays directly
+  _rawColorBuffer = (unsigned int*)out->GetPointer(0);
+  _rawCompressedBuffer = (unsigned int*)in->GetPointer(0);
+
+  // Go through compress buffer and extract RLE format into color buffer
+  for(int i=0; i<CompSize; i++) 
+    {
+    // Get color and count
+    current_color = _rawCompressedBuffer[i];
+
+    // Get first byte as count;
+    count = current_color>>24;
+
+    // Fixed Alpha
+    current_color |= 0xFF000000;
+
+    // Set color
+    _rawColorBuffer[index++] = current_color;
+
+    // Blast color into color buffer
+    for(int j=0; j< count; j++)
+      _rawColorBuffer[index++] = current_color;
+    }
+
+  // Back to vtk arrays :)
+  // Could use index, 
+  // but color buffer should be set to correct length already.
+  //out->SetNumberOfTuples(ImageX*ImageY);
+
+  // Save out compression stats.
+  vtkTimerLog::FormatAndMarkEvent("Squirt ratio: %f", (float)CompSize/(float)index);
+}
+
+//-------------------------------------------------------------------------
+void vtkClientCompositeManager::DeltaEncode(vtkUnsignedCharArray *buf)
+{
+  int idx;
+  int numPixels = buf->GetNumberOfTuples();
+  unsigned char* ptr1;
+  unsigned char* ptr2;
+  short a, b, c;
+
+  if (this->BaseArray == NULL)
+    {
+    this->BaseArray = vtkUnsignedCharArray::New();
+    this->BaseArray->SetNumberOfComponents(4);
+    this->BaseArray->SetNumberOfTuples(numPixels);
+    ptr1 = this->BaseArray->GetPointer(0);
+    memset(ptr1, 0, numPixels*4);
+    }
+  if (this->BaseArray->GetNumberOfTuples() != numPixels)
+    {
+    this->BaseArray->SetNumberOfTuples(numPixels);
+    ptr1 = this->BaseArray->GetPointer(0);
+    memset(ptr1, 0, numPixels*4);
+    }
+  ptr1 = this->BaseArray->GetPointer(0);  
+  ptr2 = buf->GetPointer(0);
+  for (idx = 0; idx < numPixels; ++idx)
+    {
+    a = ptr1[0];
+    b = ptr2[0];
+    c = b-a + 256;
+    c = c >> 1;
+    if (c > 255) {c = 255;}
+    if (c < 0) {c = 0;} 
+    ptr2[0] = (unsigned char)(c);
+    c = c << 1;
+    ptr1[0] = (unsigned char)(c + a - 255);
+
+    a = ptr1[1];
+    b = ptr2[1];
+    c = b-a + 256;
+    c = c >> 1;
+    if (c > 255) {c = 255;}
+    if (c < 0) {c = 0;}
+    ptr2[1] = (unsigned char)(c);
+    c = c << 1;
+    ptr1[1] = (unsigned char)(c + a - 255);
+
+    a = ptr1[2];
+    b = ptr2[2];
+    c = b-a + 256;
+    c = c >> 1;
+    if (c > 255) {c = 255;}
+    if (c < 0) {c = 0;}
+    ptr2[2] = (unsigned char)(c);
+    c = c << 1;
+    ptr1[2] = (unsigned char)(c + a - 255);
+
+    ptr1 += 4;
+    ptr2 += 4;
+    }
+}
+
+//-------------------------------------------------------------------------
+void vtkClientCompositeManager::DeltaDecode(vtkUnsignedCharArray *buf)
+{
+  int idx;
+  int numPixels = buf->GetNumberOfTuples();
+  unsigned char* ptr1;
+  unsigned char* ptr2;
+  short dif;
+
+  if (this->BaseArray == NULL)
+    {
+    this->BaseArray = vtkUnsignedCharArray::New();
+    this->BaseArray->SetNumberOfComponents(4);
+    this->BaseArray->SetNumberOfTuples(numPixels);
+    ptr1 = this->BaseArray->GetPointer(0);
+    memset(ptr1, 0, numPixels*4);
+    }
+  if (this->BaseArray->GetNumberOfTuples() != numPixels)
+    {
+    this->BaseArray->SetNumberOfTuples(numPixels);
+    ptr1 = this->BaseArray->GetPointer(0);
+    memset(ptr1, 0, numPixels*4);
+    }
+  ptr1 = this->BaseArray->GetPointer(0);  
+  ptr2 = buf->GetPointer(0);
+  for (idx = 0; idx < numPixels; ++idx)
+    {
+    dif = (short)(ptr2[0]);
+    dif = dif << 1;
+    dif = dif + (short)(ptr1[0]) - 255;
+    ptr2[0] = ptr1[0] = (unsigned char)(dif);
+
+    dif = (short)(ptr2[1]);
+    dif = dif << 1;
+    dif = dif + (short)(ptr1[1]) - 255;
+    ptr2[1] = ptr1[1] = (unsigned char)(dif);
+
+    dif = (short)(ptr2[2]);
+    dif = dif << 1;
+    dif = dif + (short)(ptr1[2]) - 255;
+    ptr2[2] = ptr1[2] = (unsigned char)(dif);
+
+    ptr1 += 4;
+    ptr2 += 4;
+    }
+}
 
 //----------------------------------------------------------------------------
 void vtkClientCompositeManager::PrintSelf(ostream& os, vtkIndent indent)
