@@ -133,7 +133,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.622");
+vtkCxxRevisionMacro(vtkPVWindow, "1.623");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -2322,47 +2322,17 @@ void vtkPVWindow::WriteData()
     return;
     }
 
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  vtkProcessModule* pm = pvApp->GetProcessModule();
+
   vtkSMPart *part = this->GetCurrentPVSource()->GetPart();
   vtkPVDataInformation* info = part->GetDataInformation();
 
   // Instantiator does not work for static builds and VTK objects.
-  vtkDataSet* data;
-  if (info->DataSetTypeIsA("vtkImageData"))
-    {
-    data = vtkImageData::New();
-    }
-  else if (info->DataSetTypeIsA("vtkStructuredPoints"))
-    {
-    data = vtkStructuredPoints::New();
-    }
-  else if (info->DataSetTypeIsA("vtkStructuredGrid"))
-    {
-    data = vtkStructuredGrid::New();
-    }
-  else if (info->DataSetTypeIsA("vtkRectilinearGrid"))
-    {
-    data = vtkRectilinearGrid::New();
-    }
-  else if (info->DataSetTypeIsA("vtkPolyData"))
-    {
-    data = vtkPolyData::New();
-    }
-  else if (info->DataSetTypeIsA("vtkUnstructuredGrid"))
-    {
-    data = vtkUnstructuredGrid::New();
-    }
-  else
-    {
-    vtkKWMessageDialog::PopupMessage(
-      this->GetApplication(), this, "Error Saving File", 
-      "Error getting data type from root node.",
-      vtkKWMessageDialog::ErrorIcon);
-    return;
-    }
+  vtkDataObject* data = pm->GetDataObjectOfType(info->GetDataClassName());
 
   // Check the number of processes.
-  vtkPVApplication *pvApp = this->GetPVApplication();
-  int parallel = (pvApp->GetProcessModule()->GetNumberOfPartitions() > 1);
+  int parallel = (pm->GetNumberOfPartitions() > 1);
   int numParts = this->GetCurrentPVSource()->GetNumberOfParts();
   int writerFound = 0;
   
@@ -2389,8 +2359,6 @@ void vtkPVWindow::WriteData()
     it->GoToNextItem();
     }
   it->Delete();
-  
-  data->Delete();
   
   // Make sure we have at least one writer.
   if(!writerFound)
@@ -2419,8 +2387,7 @@ void vtkPVWindow::WriteData()
     }
   
   typesStr << ends;
-  char* types = vtkString::Duplicate(typesStr.str());
-  typesStr.rdbuf()->freeze(0);
+  char* types = typesStr.str();
   
   vtkKWLoadSaveDialog* saveDialog = this->GetPVApplication()->NewLoadSaveDialog();
   
@@ -2429,10 +2396,9 @@ void vtkPVWindow::WriteData()
   saveDialog->SetParent(this);
   saveDialog->SetTitle(VTK_PV_SAVE_DATA_MENU_LABEL);
   saveDialog->SetFileTypes(types);
+  delete [] types;
   saveDialog->Create(this->GetApplication(), 0);
   // Ask the user for the filename.
-
-  delete [] types;
 
   int enabled = this->GetEnabled();
   this->SetEnabled(0);
@@ -4051,8 +4017,6 @@ vtkPVSource *vtkPVWindow::CreatePVSource(const char* moduleName,
         clone->SetTraceInitialized(1);
         }
       }
-
-    clone->UpdateParameterWidgets();
 
     vtkPVSourceCollection* col = 0;
     if(sourceList)
