@@ -38,7 +38,7 @@ class vtkPVArraySelectionArraySet: public vtkPVArraySelectionArraySetBase {};
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVArraySelection);
-vtkCxxRevisionMacro(vtkPVArraySelection, "1.48");
+vtkCxxRevisionMacro(vtkPVArraySelection, "1.49");
 
 //----------------------------------------------------------------------------
 int vtkDataArraySelectionCommand(ClientData cd, Tcl_Interp *interp,
@@ -329,6 +329,8 @@ void vtkPVArraySelection::AcceptInternal(vtkClientServerID id)
 
   this->SetLocalSelectionsFromReader();
   this->SetReaderSelectionsFromWidgets();
+  this->SetLocalSelectionsFromReader();
+  this->SetWidgetSelectionsFromLocal();
 }
 
 //---------------------------------------------------------------------------

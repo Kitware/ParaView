@@ -449,21 +449,22 @@
 
     <SelectWidget type="int" 
                   variable="DisplayType"
-                  trace_name="DisplayType">
+                  trace_name="DisplayType"
+                  default_value="1">
       <Item label="Blocks" value="1">
         <ArraySelection trace_name="block_sel"
                         attribute_name="Block"
 						label_text="Blocks"/>
       </Item>
-      <Item label="Parts" value="2">
-        <ArraySelection trace_name="part_sel"
-                        attribute_name="Part"
-						label_text="Parts"/>
-      </Item>
-      <Item label="Materials" value="3">
+      <Item label="Materials" value="2">
         <ArraySelection trace_name="material_sel"
                         attribute_name="Material"
 						label_text="Materials"/>
+      </Item>
+      <Item label="Hierarchy" value="3">
+        <ArraySelection trace_name="hierarchy_sel"
+                        attribute_name="Hierarchy"
+						label_text="Hierarchy"/>
       </Item>
     </SelectWidget>
 	<LabeledToggle label="Apply Displacements"
