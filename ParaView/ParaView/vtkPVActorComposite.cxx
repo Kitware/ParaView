@@ -174,6 +174,7 @@ void vtkPVActorComposite::CreateParallelTclObjects(vtkPVApplication *pvApp)
   
   sprintf(tclName, "Geometry%d", this->InstanceCount);
   pvApp->BroadcastScript("vtkPVGeometryFilter %s", tclName);
+  pvApp->BroadcastScript("%s UseStripsOn", tclName);
   this->SetGeometryTclName(tclName);
   
   // Get rid of previous object created by the superclass.
@@ -188,8 +189,8 @@ void vtkPVActorComposite::CreateParallelTclObjects(vtkPVApplication *pvApp)
   this->MapperTclName = NULL;
   this->SetMapperTclName(tclName);
   
-  pvApp->BroadcastScript("%s ImmediateModeRenderingOn",
-                         this->MapperTclName);
+  //pvApp->BroadcastScript("%s ImmediateModeRenderingOn",
+  //                       this->MapperTclName);
   
   pvApp->BroadcastScript("%s SetInput [%s GetOutput]", this->MapperTclName,
                          this->GeometryTclName);
@@ -225,7 +226,7 @@ void vtkPVActorComposite::CreateParallelTclObjects(vtkPVApplication *pvApp)
   pvApp->BroadcastScript("vtkPolyDataMapper %s", tclName);
   this->LODMapperTclName = NULL;
   this->SetLODMapperTclName(tclName);
-  pvApp->BroadcastScript("%s ImmediateModeRenderingOn", this->LODMapperTclName);
+  //pvApp->BroadcastScript("%s ImmediateModeRenderingOn", this->LODMapperTclName);
 
   this->Script("%s SetLookupTable [%s GetLookupTable]",
                this->GetScalarBarTclName(), this->MapperTclName);

@@ -340,6 +340,11 @@ protected:
   
   vtkKWTclInteractor *TclInteractor;
   
+  // Description:
+  // This method gives the window an opportunity to get rid
+  // of circular references before closing.
+  virtual void CloseNoPrompt();
+
 private:
   static const char* StandardSourceInterfaces;
   static const char* StandardFilterInterfaces;

@@ -201,6 +201,19 @@ vtkPVWindow::~vtkPVWindow()
 }
 
 //----------------------------------------------------------------------------
+void vtkPVWindow::CloseNoPrompt()
+{
+  if (this->TclInteractor )
+    {
+    this->TclInteractor->SetMasterWindow(NULL);
+    this->TclInteractor->Delete();
+    this->TclInteractor = NULL;
+    }
+
+  this->vtkKWWindow::CloseNoPrompt();
+}
+
+//----------------------------------------------------------------------------
 void vtkPVWindow::PrepareForDelete()
 {
   this->SetCurrentPVData(NULL);

@@ -466,14 +466,14 @@ void vtkPVRenderView::CreateViewProperties()
 
   this->TriangleStripsCheck->SetParent(this->RenderParametersFrame->GetFrame());
   this->TriangleStripsCheck->Create(this->Application, "-text \"Use Triangle Strips\"");
+  this->TriangleStripsCheck->SetState(1);
   this->TriangleStripsCheck->SetCommand(this, "TriangleStripsCallback");
-  this->TriangleStripsCheck->SetState(0);
   this->TriangleStripsCheck->SetBalloonHelpString("Toggle the use of triangle strips when rendering polygonal data");
   
   this->ImmediateModeCheck->SetParent(this->RenderParametersFrame->GetFrame());
   this->ImmediateModeCheck->Create(this->Application, "-text \"Use Immediate Mode Rendering\"");
+  this->ImmediateModeCheck->SetState(0);
   this->ImmediateModeCheck->SetCommand(this, "ImmediateModeCallback");
-  this->ImmediateModeCheck->SetState(1);
   this->ImmediateModeCheck->SetBalloonHelpString("Toggle the use of immediate mode rendering (when off, display lists are used)");
   
 #ifdef VTK_USE_MPI
@@ -1152,7 +1152,7 @@ void vtkPVRenderView::ImmediateModeCallback()
       {
       pvApp->BroadcastScript("%s SetImmediateModeRendering %d",
                              comp->GetMapperTclName(),
-                             this->TriangleStripsCheck->GetState());
+                             this->ImmediateModeCheck->GetState());
       }
     }
 }
