@@ -3532,6 +3532,10 @@ if ![info exists DemoDir] {
         .control.main.info configure -text "ParaView demo initializing.\n Please wait." 
         grab .control.main.stop
 
+        set rv [[$Application GetMainWindow] GetMainView]
+        set parallelState  [[$rv GetParallelProjectionCheck] GetState]
+        $rv ParallelProjectionOff
+
         clip_init
         extract_init
         iso_init
@@ -3556,6 +3560,9 @@ if ![info exists DemoDir] {
             }
         }
 
+        if { $parallelState } {
+            $rv ParallelProjectionOn
+        }
     }
     if { [info exists pvDemoCommandLine] } {
         $Application Exit
