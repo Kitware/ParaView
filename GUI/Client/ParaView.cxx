@@ -65,12 +65,6 @@ PURPOSE.  See the above copyright notice for more information.
 static void ParaViewInitializeInterpreter(vtkPVProcessModule* pm);
 
 #ifdef PARAVIEW_ENABLE_FPE
-#ifdef __linux__
-#ifndef _GNU_SOURCE
-#define _GNU_SOURCE
-#endif  //_GNU_SOURCE
-#include <fenv.h>
-#endif //__linux__
 void u_fpu_setup()
 {
 #ifdef _MSC_VER
@@ -82,9 +76,9 @@ void u_fpu_setup()
     }
 #endif  //_MSC_VER
 #ifdef __linux__
-  // This only works on linux, see man fesetenv
-  // It also need to be link to -lm
-  fesetenv (FE_NOMASK_ENV);
+  // This only works on linux x86
+  unsigned int fpucw= 0x1372;
+  __asm__ ("fldcw %0" : : "m" (fpucw));
 #endif  //__linux__
 }
 #endif //PARAVIEW_ENABLE_FPE
