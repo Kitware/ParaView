@@ -101,6 +101,37 @@ void vtkKWOptionMenu::AddEntryWithCommand(const char *name, const char *obj,
     this->GetWidgetName(), obj, method);
 }
 
+void vtkKWOptionMenu::AddEntryWithCommand(const char *name, vtkKWObject *obj, 
+					  const char *methodAndArgs)
+{
+  this->Script(
+    "%s add radiobutton -label {%s} -variable %sValue -command {%s %s}",
+    this->Menu->GetWidgetName(), name, 
+    this->GetWidgetName(), obj->GetTclName(), methodAndArgs);
+}
+
+void vtkKWOptionMenu::DeleteEntry(const char* name)
+{ 
+  this->Script(
+    "%s  delete {%s}",
+    this->Menu->GetWidgetName(), name);
+}
+
+
+void vtkKWOptionMenu::DeleteEntry(int index)
+{
+  this->Script(
+    "%s  delete %d",
+    this->Menu->GetWidgetName(), index);
+
+}
+
+
+void vtkKWOptionMenu::ClearEntries()
+{
+  this->Script("%s delete 0 end", this->Menu->GetWidgetName());
+}
+
 void vtkKWOptionMenu::SetCurrentEntry(const char *name)
 { 
   this->Script("set %sValue {%s}",this->GetWidgetName(), name);

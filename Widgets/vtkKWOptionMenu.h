@@ -55,7 +55,17 @@ public:
   // Add entries to an option menu, with or without a command.
   void AddEntry(const char *name);
   void AddEntryWithCommand(const char *name, const char *obj, const char *method);
+  void AddEntryWithCommand(const char *name, vtkKWObject *obj, const char *methodAndArgs);
 
+  // Description:
+  // Remove entry from an option menu.
+  void DeleteEntry(const char*name);
+  void DeleteEntry(int index);
+  
+  // Description:
+  // Remove all entries from the option menu.
+  void ClearEntries();
+  
   // Description:
   // Set the current entry of this optionmenu
   void SetCurrentEntry(const char *name);
