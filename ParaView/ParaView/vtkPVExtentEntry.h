@@ -96,6 +96,7 @@ public:
   // Description:
   // The label.
   void SetRange(int v0, int v1, int v2, int v3, int v4, int v5);
+  vtkGetVector6Macro(Range,int);
 
   // Description:
   // This class redefines SetBalloonHelpString since it
@@ -138,6 +139,7 @@ protected:
 
   vtkPVInputMenu* InputMenu;
 
+  int Range[6];
   vtkPVMinMax* MinMax[3];
 
 //BTX

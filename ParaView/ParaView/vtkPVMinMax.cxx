@@ -52,7 +52,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVMinMax);
-vtkCxxRevisionMacro(vtkPVMinMax, "1.19");
+vtkCxxRevisionMacro(vtkPVMinMax, "1.20");
 
 vtkCxxSetObjectMacro(vtkPVMinMax, ArrayMenu, vtkPVArrayMenu);
 
@@ -328,7 +328,6 @@ void vtkPVMinMax::Update()
 
   if (this->ArrayMenu == NULL)
     {
-    vtkErrorMacro("Array menu has not been set.");
     return;
     }
 
@@ -358,7 +357,7 @@ void vtkPVMinMax::Update()
     }
 
   // Find the place value resolution.
-  int place = (int)(floor(log10((double)(range[1]-range[2])) - 1.5));
+  int place = (int)(floor(log10((double)(range[1]-range[0])) - 1.5));
   double resolution = pow(10.0, (double)(place));
   // Now find the range at resolution values.
   range[0] = (float)(floor((double)(range[0]) / resolution) * resolution);

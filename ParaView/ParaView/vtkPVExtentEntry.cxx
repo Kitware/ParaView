@@ -61,7 +61,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVExtentEntry);
-vtkCxxRevisionMacro(vtkPVExtentEntry, "1.18");
+vtkCxxRevisionMacro(vtkPVExtentEntry, "1.19");
 
 vtkCxxSetObjectMacro(vtkPVExtentEntry, InputMenu, vtkPVInputMenu);
 
@@ -79,6 +79,9 @@ vtkPVExtentEntry::vtkPVExtentEntry()
     }
 
   this->InputMenu = 0;
+
+  this->Range[0] = this->Range[2] = this->Range[4] = -VTK_LARGE_INTEGER;
+  this->Range[1] = this->Range[3] = this->Range[5] = VTK_LARGE_INTEGER;
 }
 
 //-----------------------------------------------------------------------------
@@ -201,6 +204,7 @@ void vtkPVExtentEntry::Create(vtkKWApplication *pvApp)
     this->MinMax[i]->ShowMaxLabelOff();
     this->MinMax[i]->SetMinLabelWidth(2);
     this->MinMax[i]->Create(pvApp);
+    this->MinMax[i]->SetRange(this->Range[i*2], this->Range[i*2+1]);
     this->MinMax[i]->SetMinimumLabel(labels[i]);
     this->MinMax[i]->GetMinScale()->SetEndCommand(this, "ModifiedCallback");
     this->MinMax[i]->GetMinScale()->SetEntryCommand(this, "ModifiedCallback");
@@ -279,9 +283,19 @@ void vtkPVExtentEntry::ResetInternal(const char* sourceTclName)
 void vtkPVExtentEntry::SetRange(int v0, int v1, int v2, 
                                 int v3, int v4, int v5)
 {
-  this->MinMax[0]->SetRange(v0, v1);
-  this->MinMax[1]->SetRange(v2, v3);
-  this->MinMax[2]->SetRange(v4, v5);
+  this->Range[0] = v0;
+  this->Range[1] = v1;
+  this->Range[2] = v2;
+  this->Range[3] = v3;
+  this->Range[4] = v4;
+  this->Range[5] = v5;
+
+  if (this->Application)
+    {
+    this->MinMax[0]->SetRange(v0, v1);
+    this->MinMax[1]->SetRange(v2, v3);
+    this->MinMax[2]->SetRange(v4, v5);
+    }
 
   this->ModifiedCallback();
 }

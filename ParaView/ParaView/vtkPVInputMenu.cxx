@@ -60,7 +60,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVInputMenu);
-vtkCxxRevisionMacro(vtkPVInputMenu, "1.43");
+vtkCxxRevisionMacro(vtkPVInputMenu, "1.44");
 
 
 //----------------------------------------------------------------------------
@@ -431,6 +431,9 @@ void vtkPVInputMenu::ResetInternal(const char* sourceTclName)
     {
     this->ModifiedFlag = 1;
     }
+
+  // Update any widgets that depend on this input menu.
+  this->Update();
 }
 
 //----------------------------------------------------------------------------
