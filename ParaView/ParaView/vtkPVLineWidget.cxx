@@ -73,7 +73,6 @@ public:
   virtual void Execute(vtkObject* wdg, unsigned long, 
                        void*)
     {
-      cout << "Event invoked." << endl;
       vtkLineWidget* widget = vtkLineWidget::SafeDownCast(wdg);
       if (!widget)
 	{
@@ -136,13 +135,10 @@ vtkPVLineWidget::vtkPVLineWidget()
 //----------------------------------------------------------------------------
 vtkPVLineWidget::~vtkPVLineWidget()
 {
-  cerr << "In destructor" << endl;
   if (this->Widget3D->GetEnabled())
     {
-    cerr << "Disabling" << endl;
     this->Widget3D->EnabledOff();
     }
-  cout << "Ref count: " << this->Widget3D->GetReferenceCount() << endl;
   this->Widget3D->Delete();
   this->Observer->Delete();
   this->Labels[0]->Delete();
@@ -381,7 +377,6 @@ void vtkPVLineWidget::CopyProperties(vtkPVWidget* clone,
 void vtkPVLineWidget::SetLineVisibility()
 {
   int visibility = this->Visibility->GetState();
-  cout << "Line visibility: " << visibility << endl;
   this->Widget3D->SetEnabled(visibility);
 }
 
