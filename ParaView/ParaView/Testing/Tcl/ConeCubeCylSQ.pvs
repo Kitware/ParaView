@@ -44,7 +44,7 @@ set pv(vtkTemp428) [$pv(vtkTemp416) GetPVWidget {Resolution}]
 $pv(vtkTemp428) SetValue 30
 $pv(vtkTemp416) AcceptCallback
 
-set pv(vtkTemp452) [$pv(vtkTemp1) CreatePVSource PLinearExtrusionFilter]
+set pv(vtkTemp452) [$pv(vtkTemp1) CreatePVSource LinearExtrusionFilter]
 set pv(vtkTemp466) [$pv(vtkTemp452) GetPVWidget {ScaleFactor}]
 $pv(vtkTemp466) SetValue .5
 $pv(vtkTemp452) AcceptCallback
