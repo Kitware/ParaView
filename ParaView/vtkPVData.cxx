@@ -180,7 +180,7 @@ void vtkPVData::ShowActorComposite()
 //----------------------------------------------------------------------------
 void vtkPVData::Contour()
 {
-  static instanceCount = 0;
+  static int instanceCount = 0;
   vtkPVDataSetToPolyDataFilter *f;
   vtkPVApplication *pvApp = this->GetPVApplication();
   vtkPVWindow *window = this->GetPVSource()->GetWindow();
@@ -242,7 +242,7 @@ void vtkPVData::Cutter()
 //----------------------------------------------------------------------------
 void vtkPVData::Elevation()
 {
-  static instanceCount = 0;
+  static int instanceCount = 0;
   vtkPVDataSetToDataSetFilter *f;
   vtkPVApplication *pvApp = this->GetPVApplication();
   vtkPVWindow *window = this->GetPVSource()->GetWindow();
@@ -280,7 +280,7 @@ void vtkPVData::Elevation()
 //----------------------------------------------------------------------------
 void vtkPVData::ExtractEdges()
 {
-  static instanceCount = 0;
+  static int instanceCount = 0;
   vtkPVDataSetToPolyDataFilter *f;
   vtkPVApplication *pvApp = this->GetPVApplication();
   vtkPVWindow *window = this->GetPVSource()->GetWindow();
@@ -310,7 +310,7 @@ void vtkPVData::ExtractEdges()
 //----------------------------------------------------------------------------
 void vtkPVData::ColorByProcess()
 {
-  static instanceCount = 0;
+  static int instanceCount = 0;
   vtkPVDataSetToDataSetFilter *f;
   vtkPVApplication *pvApp = this->GetPVApplication();
   vtkPVWindow *window = this->GetPVSource()->GetWindow();

@@ -76,7 +76,7 @@ vtkPVPolyData* vtkPVPolyData::New()
 //----------------------------------------------------------------------------
 void vtkPVPolyData::Shrink()
 {
-  static instanceCount = 0;
+  static int instanceCount = 0;
   vtkPVPolyDataToPolyDataFilter *f;
   vtkPVApplication *pvApp = this->GetPVApplication();
   vtkPVWindow *window = this->GetPVSource()->GetWindow();
@@ -107,7 +107,7 @@ void vtkPVPolyData::Shrink()
 //----------------------------------------------------------------------------
 void vtkPVPolyData::TubeFilter()
 {
-  static instanceCount = 0;
+  static int instanceCount = 0;
   vtkPVPolyDataToPolyDataFilter *f;
   vtkPVApplication *pvApp = this->GetPVApplication();
   vtkPVWindow *window = this->GetPVSource()->GetWindow();
@@ -138,7 +138,7 @@ void vtkPVPolyData::TubeFilter()
 //----------------------------------------------------------------------------
 void vtkPVPolyData::PolyDataNormals()
 {
-  static instanceCount = 0;
+  static int instanceCount = 0;
   vtkPVPolyDataToPolyDataFilter *f;
   vtkPVApplication *pvApp = this->GetPVApplication();
   vtkPVWindow *window = this->GetPVSource()->GetWindow();
@@ -194,7 +194,7 @@ void vtkPVPolyData::Glyph()
 //----------------------------------------------------------------------------
 void vtkPVPolyData::LoopSubdivision()
 {
-  static instanceCount = 0;
+  static int instanceCount = 0;
   vtkPVPolyDataToPolyDataFilter *f;
   vtkPVApplication *pvApp = this->GetPVApplication();
   vtkPVWindow *window = this->GetPVSource()->GetWindow();
@@ -225,7 +225,7 @@ void vtkPVPolyData::LoopSubdivision()
 //----------------------------------------------------------------------------
 void vtkPVPolyData::Clean()
 {
-  static instanceCount = 0;
+  static int instanceCount = 0;
   vtkPVPolyDataToPolyDataFilter *f;
   vtkPVApplication *pvApp = this->GetPVApplication();
   vtkPVWindow *window = this->GetPVSource()->GetWindow();
@@ -255,7 +255,7 @@ void vtkPVPolyData::Clean()
 //----------------------------------------------------------------------------
 void vtkPVPolyData::Triangulate()
 {
-  static instanceCount = 0;
+  static int instanceCount = 0;
   vtkPVPolyDataToPolyDataFilter *f;
   vtkPVApplication *pvApp = this->GetPVApplication();
   vtkPVWindow *window = this->GetPVSource()->GetWindow();
@@ -287,7 +287,7 @@ void vtkPVPolyData::Triangulate()
 //----------------------------------------------------------------------------
 void vtkPVPolyData::Decimate()
 {
-  static instanceCount = 0;
+  static int instanceCount = 0;
   vtkPVPolyDataToPolyDataFilter *f;
   vtkPVApplication *pvApp = this->GetPVApplication();
   vtkPVWindow *window = this->GetPVSource()->GetWindow();
@@ -330,7 +330,7 @@ void vtkPVPolyData::Decimate()
 //----------------------------------------------------------------------------
 void vtkPVPolyData::QuadricClustering()
 {
-  static instanceCount = 0;
+  static int instanceCount = 0;
   vtkPVPolyDataToPolyDataFilter *f;
   vtkPVApplication *pvApp = this->GetPVApplication();
   vtkPVWindow *window = this->GetPVSource()->GetWindow();

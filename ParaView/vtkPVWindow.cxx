@@ -248,7 +248,7 @@ void vtkPVWindow::SetCurrentSource(vtkPVSource *comp)
 //----------------------------------------------------------------------------
 vtkPVPolyDataSource *vtkPVWindow::CreateCone()
 {
-  static instanceCount = 0;
+  static int instanceCount = 0;
   vtkPVSource *pvs;
   vtkPVApplication *pvApp = this->GetPVApplication();
   
@@ -279,7 +279,7 @@ vtkPVPolyDataSource *vtkPVWindow::CreateCone()
 //----------------------------------------------------------------------------
 vtkPVPolyDataSource *vtkPVWindow::CreateSphere()
 {
-  static instanceCount = 0;
+  static int instanceCount = 0;
   vtkPVSource *pvs;
   vtkPVApplication *pvApp = this->GetPVApplication();
   
@@ -314,7 +314,7 @@ vtkPVPolyDataSource *vtkPVWindow::CreateSphere()
 //----------------------------------------------------------------------------
 vtkPVPolyDataSource *vtkPVWindow::CreateAxes()
 {
-  static instanceCount = 0;
+  static int instanceCount = 0;
   vtkPVSource *pvs;
   vtkPVApplication *pvApp = this->GetPVApplication();
   
@@ -344,7 +344,7 @@ vtkPVPolyDataSource *vtkPVWindow::CreateAxes()
 //----------------------------------------------------------------------------
 vtkPVPolyDataSource *vtkPVWindow::CreateCube()
 {
-  static instanceCount = 0;
+  static int instanceCount = 0;
   vtkPVSource *pvs;
   vtkPVApplication *pvApp = this->GetPVApplication();
   
@@ -374,7 +374,7 @@ vtkPVPolyDataSource *vtkPVWindow::CreateCube()
 //----------------------------------------------------------------------------
 vtkPVPolyDataSource *vtkPVWindow::CreateCylinder()
 {
-  static instanceCount = 0;
+  static int instanceCount = 0;
   vtkPVSource *pvs;
   vtkPVApplication *pvApp = this->GetPVApplication();
   
@@ -405,7 +405,7 @@ vtkPVPolyDataSource *vtkPVWindow::CreateCylinder()
 //----------------------------------------------------------------------------
 vtkPVPolyDataSource *vtkPVWindow::CreateDisk()
 {
-  static instanceCount = 0;
+  static int instanceCount = 0;
   vtkPVSource *pvs;
   vtkPVApplication *pvApp = this->GetPVApplication();
   
@@ -435,7 +435,7 @@ vtkPVPolyDataSource *vtkPVWindow::CreateDisk()
 //----------------------------------------------------------------------------
 vtkPVPolyDataSource *vtkPVWindow::CreateLine()
 {
-  static instanceCount = 0;
+  static int instanceCount = 0;
   vtkPVSource *pvs;
   vtkPVApplication *pvApp = this->GetPVApplication();
   
@@ -464,7 +464,7 @@ vtkPVPolyDataSource *vtkPVWindow::CreateLine()
 //----------------------------------------------------------------------------
 vtkPVPolyDataSource *vtkPVWindow::CreatePlane()
 {
-  static instanceCount = 0;
+  static int instanceCount = 0;
   vtkPVSource *pvs;
   vtkPVApplication *pvApp = this->GetPVApplication();
   
@@ -494,7 +494,7 @@ vtkPVPolyDataSource *vtkPVWindow::CreatePlane()
 //----------------------------------------------------------------------------
 vtkPVPolyDataSource *vtkPVWindow::CreatePoints()
 {
-  static instanceCount = 0;
+  static int instanceCount = 0;
   vtkPVSource *pvs;
   vtkPVApplication *pvApp = this->GetPVApplication();
   
@@ -527,7 +527,7 @@ vtkPVPolyDataSource *vtkPVWindow::CreatePoints()
 //----------------------------------------------------------------------------
 vtkPVPolyDataSource *vtkPVWindow::CreateSTLReader()
 {
-  static instanceCount = 0;
+  static int instanceCount = 0;
   vtkPVSource *pvs;
   vtkPVApplication *pvApp = this->GetPVApplication();
   
@@ -559,7 +559,7 @@ vtkPVPolyDataSource *vtkPVWindow::CreateSTLReader()
 //----------------------------------------------------------------------------
 vtkPVPolyDataSource *vtkPVWindow::CreateSuperQuadric()
 {
-  static instanceCount = 0;
+  static int instanceCount = 0;
   vtkPVSource *pvs;
   vtkPVApplication *pvApp = this->GetPVApplication();
   
