@@ -31,7 +31,13 @@ public:
   // Description:
   // Set the scalr bar title string.
   virtual void SetTitle(const char* title);
-  
+
+
+  // Description:
+  // Enable/Disable the scalar bar. Overridden to set the current renderer on the
+  // ScalarBarWidget.
+  virtual void SetEnabled(int enable);
+
   // Description:
   // Set the format for the labels on the ScalarBar
   virtual void SetLabelFormat(const char* format);

@@ -27,7 +27,7 @@
 #include "vtkSMProxyProperty.h"
 
 vtkStandardNewMacro(vtkSMScalarBarWidgetProxy);
-vtkCxxRevisionMacro(vtkSMScalarBarWidgetProxy, "1.5");
+vtkCxxRevisionMacro(vtkSMScalarBarWidgetProxy, "1.6");
 
 //----------------------------------------------------------------------------
 vtkSMScalarBarWidgetProxy::vtkSMScalarBarWidgetProxy()
@@ -64,11 +64,27 @@ void vtkSMScalarBarWidgetProxy::CreateVTKObjects(int numObjects)
 }
 
 //----------------------------------------------------------------------------
+void vtkSMScalarBarWidgetProxy::SetEnabled(int enable)
+{
+  if (enable)
+    {
+    vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+    if (pm->GetRenderModule())
+      {
+      vtkClientServerID rendererID = pm->GetRenderModule()->GetRenderer2DID();
+      this->SetCurrentRenderer(rendererID);
+      }
+    }
+  this->Superclass::SetEnabled(enable);
+}
+
+//----------------------------------------------------------------------------
 void vtkSMScalarBarWidgetProxy::UpdateVTKObjects()
 {
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+
   this->Superclass::UpdateVTKObjects();
   
-  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   vtkClientServerStream str;
   unsigned int cc;
   for (cc=0; cc < this->GetNumberOfIDs(); cc++)
