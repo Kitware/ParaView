@@ -86,6 +86,9 @@ vtkPVActorComposite::vtkPVActorComposite()
   this->RepresentationMenuLabel = vtkKWLabel::New();
   this->RepresentationMenu = vtkKWOptionMenu::New();
   
+  this->InterpolationMenuLabel = vtkKWLabel::New();
+  this->InterpolationMenu = vtkKWOptionMenu::New();
+  
   this->CompositeCheck = vtkKWCheckButton::New();
   this->ScalarBarCheck = vtkKWCheckButton::New();
   this->ScalarBarOrientationCheck = vtkKWCheckButton::New();
@@ -214,10 +217,14 @@ vtkPVActorComposite::~vtkPVActorComposite()
   this->ColorMenu = NULL;
   
   this->RepresentationMenuLabel->Delete();
-  this->RepresentationMenuLabel = NULL;
-  
+  this->RepresentationMenuLabel = NULL;  
   this->RepresentationMenu->Delete();
   this->RepresentationMenu = NULL;
+  
+  this->InterpolationMenuLabel->Delete();
+  this->InterpolationMenuLabel = NULL;
+  this->InterpolationMenu->Delete();
+  this->InterpolationMenu = NULL;
   
   this->SetInput(NULL);
     
@@ -318,7 +325,6 @@ void vtkPVActorComposite::CreateProperties()
   this->RepresentationMenuLabel->SetParent(this->Properties);
   this->RepresentationMenuLabel->Create(this->Application, "");
   this->RepresentationMenuLabel->SetLabel("Data set representation:");
-  
   this->RepresentationMenu->SetParent(this->Properties);
   this->RepresentationMenu->Create(this->Application, "");
   this->RepresentationMenu->AddEntryWithCommand("Wireframe", this,
@@ -328,6 +334,17 @@ void vtkPVActorComposite::CreateProperties()
   this->RepresentationMenu->AddEntryWithCommand("Points", this,
                                                 "DrawPoints");
   this->RepresentationMenu->SetValue("Surface");
+  
+  this->InterpolationMenuLabel->SetParent(this->Properties);
+  this->InterpolationMenuLabel->Create(this->Application, "");
+  this->InterpolationMenuLabel->SetLabel("Shading Interpolation:");
+  this->InterpolationMenu->SetParent(this->Properties);
+  this->InterpolationMenu->Create(this->Application, "");
+  this->InterpolationMenu->AddEntryWithCommand("Flat", this,
+					       "SetInterpolationToFlat");
+  this->InterpolationMenu->AddEntryWithCommand("Gouraud", this,
+					       "SetInterpolationToGouraud");
+  this->InterpolationMenu->SetValue("Gouraud");
   
   this->CompositeCheck->SetParent(this->Properties);
   this->CompositeCheck->Create(this->Application, "-text Composite");
@@ -379,6 +396,10 @@ void vtkPVActorComposite::CreateProperties()
                this->RepresentationMenuLabel->GetWidgetName());
   this->Script("pack %s",
                this->RepresentationMenu->GetWidgetName());
+  this->Script("pack %s",
+               this->InterpolationMenuLabel->GetWidgetName());
+  this->Script("pack %s",
+               this->InterpolationMenu->GetWidgetName());
   this->Script("pack %s",
                this->CompositeCheck->GetWidgetName());
   this->Script("pack %s",
@@ -635,7 +656,7 @@ void vtkPVActorComposite::DrawWireframe()
 			   this->ActorTclName);
     }
   
-  this->GetActor()->GetProperty()->SetRepresentationToWireframe();
+  //this->GetActor()->GetProperty()->SetRepresentationToWireframe();
   this->GetView()->Render();
 }
 
@@ -650,7 +671,7 @@ void vtkPVActorComposite::DrawSurface()
 			   this->ActorTclName);
     }
   
-  this->GetActor()->GetProperty()->SetRepresentationToSurface();
+  //this->GetActor()->GetProperty()->SetRepresentationToSurface();
   this->GetView()->Render();
 }
 
@@ -665,9 +686,43 @@ void vtkPVActorComposite::DrawPoints()
 			   this->ActorTclName);
     }
   
-  this->GetActor()->GetProperty()->SetRepresentationToPoints();
+  //this->GetActor()->GetProperty()->SetRepresentationToPoints();
   this->GetView()->Render();
 }
+
+
+//----------------------------------------------------------------------------
+void vtkPVActorComposite::SetInterpolationToFlat()
+{
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  
+  if (this->ActorTclName)
+    {
+    pvApp->BroadcastScript("[%s GetProperty] SetInterpolationToFlat",
+			   this->ActorTclName);
+    }
+  
+  //this->GetActor()->GetProperty()->SetRepresentationToWireframe();
+  this->GetView()->Render();
+}
+
+
+//----------------------------------------------------------------------------
+void vtkPVActorComposite::SetInterpolationToGouraud()
+{
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  
+  if (this->ActorTclName)
+    {
+    pvApp->BroadcastScript("[%s GetProperty] SetInterpolationToGouraud",
+			   this->ActorTclName);
+    }
+  
+  //this->GetActor()->GetProperty()->SetRepresentationToWireframe();
+  this->GetView()->Render();
+}
+
+
 
 //----------------------------------------------------------------------------
 void vtkPVActorComposite::AmbientChanged()
@@ -1210,6 +1265,13 @@ void vtkPVActorComposite::Save(ofstream *file, const char *sourceName)
         << this->ActorTclName << " SetMapper " << this->MapperTclName << "\n\t"
         << "[" << this->ActorTclName << " GetProperty] SetRepresentationTo"
         << this->Actor->GetProperty()->GetRepresentationAsString() << "\n\t"
+        << this->ActorTclName << " SetVisibility "
+        << this->Actor->GetVisibility() << "\n\n";
+
+  *file << "vtkActor " << this->ActorTclName << "\n\t"
+        << this->ActorTclName << " SetMapper " << this->MapperTclName << "\n\t"
+        << "[" << this->ActorTclName << " GetProperty] SetInterpolationTo"
+        << this->Actor->GetProperty()->GetInterpolationAsString() << "\n\t"
         << this->ActorTclName << " SetVisibility "
         << this->Actor->GetVisibility() << "\n\n";
 }

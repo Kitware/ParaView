@@ -88,9 +88,10 @@ vtkKWCenterOfRotation::vtkKWCenterOfRotation()
   this->CenterActor = vtkActor::New();
   this->CenterActor->PickableOff();
   this->CenterSource->SymmetricOn();
+  this->CenterSource->ComputeNormalsOff();
   this->CenterMapper->SetInput(this->CenterSource->GetOutput());
   this->CenterActor->SetMapper(this->CenterMapper);
-  this->CenterActor->GetProperty()->SetAmbient(0.6);
+  //this->CenterActor->GetProperty()->SetAmbient(0.6);
   this->CenterActor->VisibilityOff();
 
   this->DefaultFlag = 1;

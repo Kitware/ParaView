@@ -178,15 +178,11 @@ void vtkPOPReader::Execute()
   vtkStructuredGrid *output;
   vtkPoints *points;
   vtkImageData *image;
+  vtkDataArray *array;
   int ext[6];
   int i;
-  vtkFieldData *fd;
 
   output = this->GetOutput();
-  fd = vtkFieldData::New();
-  output->GetPointData()->SetFieldData(fd);
-  fd->Delete();
-  fd = NULL;
   
   // Set up the extent of the grid image.
   ext[0] = ext[2] = ext[4] = 0;
@@ -243,8 +239,10 @@ void vtkPOPReader::Execute()
       image = wrap->GetOutput();
       image->SetUpdateExtent(ext);
       image->Update();
-      output->GetPointData()->GetFieldData()->AddArray(
-        image->GetPointData()->GetScalars()->GetData(), this->ArrayNames[i]);
+      array = image->GetPointData()->GetScalars()->GetData();
+      array->SetName(this->ArrayNames[i]);
+      
+      output->GetPointData()->AddArray(array);
       image->ReleaseData();
       }
     }

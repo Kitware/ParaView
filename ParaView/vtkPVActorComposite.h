@@ -155,6 +155,11 @@ public:
   void DrawPoints();
   
   // Description:
+  // Methods called when item chosen from RepresentationMenu
+  void SetInterpolationToFlat();
+  void SetInterpolationToGouraud();
+  
+  // Description:
   // Get the color range from the mappers on all the processes.
   void GetColorRange(float range[2]);
   
@@ -203,6 +208,9 @@ protected:
 
   vtkKWLabel *RepresentationMenuLabel;
   vtkKWOptionMenu *RepresentationMenu;
+
+  vtkKWLabel *InterpolationMenuLabel;
+  vtkKWOptionMenu *InterpolationMenu;
 
   vtkKWCheckButton *CompositeCheck;
 
