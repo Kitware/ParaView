@@ -76,7 +76,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderModule);
-vtkCxxRevisionMacro(vtkPVRenderModule, "1.3");
+vtkCxxRevisionMacro(vtkPVRenderModule, "1.4");
 
 //int vtkPVRenderModuleCommand(ClientData cd, Tcl_Interp *interp,
 //                             int argc, char *argv[]);
@@ -103,13 +103,15 @@ vtkPVRenderModule::vtkPVRenderModule()
   this->StillCompositeTime       = 0;
   this->Composite                = 0;
 
-  this->ResetCameraClippingRangeTag = -1;
+  this->ResetCameraClippingRangeTag = 0;
 
   this->DisableRenderingFlag = 0;
 
   this->LODThreshold = 2.0;
   this->LODResolution = 50;
   this->CollectThreshold = 2.0;
+
+  this->RenderInterruptsEnabled = 1;
 
   this->RenderWindowTclName = NULL;
 }
@@ -195,8 +197,11 @@ void PVRenderModuleAbortCheck(vtkObject*, unsigned long, void* arg, void*)
 {
   vtkPVRenderModule *me = (vtkPVRenderModule*)arg;
 
-  // Just forward the event along.
-  me->InvokeEvent(vtkCommand::AbortCheckEvent, NULL);  
+  if (me->GetRenderInterruptsEnabled())
+    {
+    // Just forward the event along.
+    me->InvokeEvent(vtkCommand::AbortCheckEvent, NULL);  
+    }
 }
 
 
@@ -903,7 +908,8 @@ void vtkPVRenderModule::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "StillRenderTime: " << this->GetStillRenderTime() << endl;
   os << indent << "DisableRenderingFlag: " 
      << (this->DisableRenderingFlag ? "on" : "off") << endl;
-
+  os << indent << "RenderInterruptsEnabled: " 
+     << (this->RenderInterruptsEnabled ? "on" : "off") << endl;
 
   os << indent << "UseReductionFactor: " << this->UseReductionFactor << endl;
   if (this->CompositeTclName)

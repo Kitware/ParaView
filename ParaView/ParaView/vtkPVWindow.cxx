@@ -137,7 +137,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.445");
+vtkCxxRevisionMacro(vtkPVWindow, "1.446");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -434,7 +434,7 @@ int vtkPVWindow::MakeCollectionDecision()
   this->ComputeTotalVisibleMemorySize();
   pvApp->SetTotalVisibleMemorySizeValid(1);
   if (this->TotalVisibleGeometryMemorySize > 
-      this->GetMainView()->GetCollectThreshold()*1000)
+      pvApp->GetRenderModule()->GetCollectThreshold()*1000)
     {
     decision = 0;
     }
@@ -481,7 +481,7 @@ int vtkPVWindow::MakeLODCollectionDecision()
   this->ComputeTotalVisibleMemorySize();
   pvApp->SetTotalVisibleMemorySizeValid(1);
   if (this->TotalVisibleLODMemorySize > 
-      this->GetMainView()->GetCollectThreshold()*1000)
+      pvApp->GetRenderModule()->GetCollectThreshold()*1000)
     {
     decision = 0;
     }
@@ -4249,7 +4249,7 @@ void vtkPVWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVWindow ";
-  this->ExtractRevision(os,"$Revision: 1.445 $");
+  this->ExtractRevision(os,"$Revision: 1.446 $");
 }
 
 //-----------------------------------------------------------------------------

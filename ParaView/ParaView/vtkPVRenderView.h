@@ -74,6 +74,7 @@ class vtkPVSourceList;
 class vtkPVSourcesNavigationWindow;
 class vtkPVTreeComposite;
 class vtkPVWindow;
+class vtkPVRenderModuleUI;
 
 #define VTK_PV_VIEW_MENU_LABEL       " 3D View Properties"
 
@@ -95,11 +96,6 @@ public:
   // Description:
   // Create the TK widgets associated with the view.
   virtual void Create(vtkKWApplication *app, const char *args);
-
-  // Description:
-  // Compute the bounding box of all the visibile props
-  // Used in ResetCamera() and ResetCameraClippingRange()
-  //void ComputeVisiblePropBounds( float bounds[6] ); 
   
   // Description:
   // Method called by the toolbar reset camera button.
@@ -114,11 +110,6 @@ public:
   // Description:
   // Callback to set the view up or down one of the three axes.
   void StandardViewCallback(float x, float y, float z);
-
-  // Description:
-  // This method is executed in all processes.
-  //void AddPVSource(vtkPVSource *pvs);
-  //void RemovePVSource(vtkPVSource *pvs);
 
   // Description:
   // Make snapshot of the render window.
@@ -210,20 +201,6 @@ public:
   //vtkGetStringMacro(RendererTclName);
   
   // Description:
-  // Set this flag to indicate whether to calculate the reduction factor for
-  // use in tree composite.
-  //vtkSetMacro(UseReductionFactor, int);
-  //vtkGetMacro(UseReductionFactor, int);
-  //vtkBooleanMacro(UseReductionFactor, int);
-  
-  // Description:
-  // The render view keeps track of these times but does not use them.
-  //vtkGetMacro(StillRenderTime, double);
-  //vtkGetMacro(InteractiveRenderTime, double);
-  //vtkGetMacro(StillCompositeTime, double);
-  //vtkGetMacro(InteractiveCompositeTime, double);
-
-  // Description:
   // Callback for toggling between parallel and perspective.
   void ParallelProjectionCallback();
   
@@ -235,21 +212,6 @@ public:
   // Callback for the immediate mode rendering check button
   void ImmediateModeCallback();
   
-  // Description:
-  // Callback for the interrupt render check button
-  void InterruptRenderCallback();
-  
-  // Description:
-  // Callback for the use char check button.  
-  // These are only public because they are callbacks.
-  // Cannot be used from a script because they do not 
-  // change the state of the check.
-  void CompositeWithFloatCallback();
-  void CompositeWithFloatCallback(int val);
-  void CompositeWithRGBACallback();
-  void CompositeWithRGBACallback(int val);
-  void CompositeCompressionCallback();
-  void CompositeCompressionCallback(int val);
   
   // Description:
   // Get the triangle strips check button.
@@ -293,60 +255,11 @@ public:
   virtual vtkKWWidget *GetSourceParent();
   vtkKWSplitFrame *GetSplitFrame() {return this->SplitFrame;}
 
-  // Description:
-  // Threshold for individual actors as number of points.
-  void LODThresholdScaleCallback();
-
-  // Description:
-  // This method sets the threshold without tracing or
-  // changing the UI scale.
-  void SetLODThresholdInternal(float threshold);
-
-  // Description:
-  // This methods can be used from a script.  
-  // "Set" sets the value of the scale, and adds an entry to the trace.
-  void SetLODThreshold(float);
-  vtkGetMacro(LODThreshold, float);
-  vtkBooleanMacro(LODThreshold, float);
-
-
-  // Description:
-  // LOD resolution determines how many cells are in decimated model.
-  void LODResolutionScaleCallback();
-  void LODResolutionLabelCallback();
-
-  // Description:
-  // This method sets the resolution without tracing or
-  // changing the UI scale.
-  void SetLODResolutionInternal(int threshold);
-
-  // Description:
-  // This methods can be used from a script.  
-  // "Set" sets the value of the scale, and adds an entry to the trace.
-  void SetLODResolution(int);
-  vtkGetMacro(LODResolution, int);
-  vtkBooleanMacro(LODResolution, int);
 
   // Description:
   // This method is called when an event is called that PVRenderView
   // is interested in.
   void ExecuteEvent(vtkObject* wdg, unsigned long event, void* calldata);
-
-  // Description:
-  // Threshold for collecting data to a single process (MBytes).
-  void CollectThresholdScaleCallback();
-
-  // Description:
-  // This method sets the threshold without tracing or
-  // changing the UI scale.
-  void SetCollectThresholdInternal(float threshold);
-
-  // Description:
-  // This methods can be used from a script.  
-  // "Set" sets the value of the scale, and adds an entry to the trace.
-  void SetCollectThreshold(float);
-  vtkGetMacro(CollectThreshold, float);
-  vtkBooleanMacro(CollectThreshold, float);
 
   // Description:
   // Store current camera at a specified position. This stores all the
@@ -386,18 +299,6 @@ protected:
   //int UpdateAllPVData(int interactive);
  
   int Interactive;
-
-  int UseReductionFactor;
-  
-  //vtkPVTreeComposite *Composite;
-  //char *CompositeTclName;
-  //vtkSetStringMacro(CompositeTclName);
-
-  //char *RendererTclName;
-  //vtkSetStringMacro(RendererTclName);  
-   
-  //char *RenderWindowTclName;
-  //vtkSetStringMacro(RenderWindowTclName);  
     
   vtkKWLabeledFrame *StandardViewsFrame;
   vtkKWPushButton   *XMaxViewButton; 
@@ -407,31 +308,16 @@ protected:
   vtkKWPushButton   *ZMaxViewButton; 
   vtkKWPushButton   *ZMinViewButton; 
 
-  vtkKWLabeledFrame *LODFrame;
   vtkKWLabeledFrame *RenderParametersFrame;
-  vtkKWLabeledFrame *ParallelRenderParametersFrame;
   vtkKWCheckButton *TriangleStripsCheck;
   vtkKWCheckButton *ParallelProjectionCheck;
   vtkKWCheckButton *ImmediateModeCheck;
-  vtkKWCheckButton *InterruptRenderCheck;
-  vtkKWCheckButton *CompositeWithFloatCheck;
-  vtkKWCheckButton *CompositeWithRGBACheck;
-  vtkKWCheckButton *CompositeCompressionCheck;
+
+  vtkPVRenderModuleUI* RenderModuleUI;
 
   vtkKWLabeledFrame *InterfaceSettingsFrame;
   vtkKWCheckButton *Display3DWidgets;
 
-  vtkKWWidget *LODScalesFrame;
-  vtkKWLabel *LODResolutionLabel;
-  vtkKWScale *LODResolutionScale;
-  vtkKWLabel *LODResolutionValue;
-  vtkKWLabel *LODThresholdLabel;
-  vtkKWScale *LODThresholdScale;
-  vtkKWLabel *LODThresholdValue;
-
-  vtkKWLabel *CollectThresholdLabel;
-  vtkKWScale *CollectThresholdScale;
-  vtkKWLabel *CollectThresholdValue;
 
   vtkKWSplitFrame *SplitFrame;
 
@@ -445,11 +331,6 @@ protected:
   char* RenderPending;
   vtkSetStringMacro(RenderPending);
 
-  //double StillRenderTime;
-  //double InteractiveRenderTime;
-  //double StillCompositeTime;
-  //double InteractiveCompositeTime;
-
   int ShowSelectionWindow;
   int ShowNavigationWindow;
 
@@ -461,9 +342,6 @@ protected:
 
   int DisableRenderingFlag;
 
-  float LODThreshold;
-  int LODResolution;
-  float CollectThreshold;
 
   // Camera icons
   vtkKWLabeledFrame* CameraIconsFrame;

@@ -59,6 +59,7 @@ class vtkSocketController;
 class vtkPVOutputWindow;
 class vtkPVSource;
 class vtkPVWindow;
+class vtkPVRenderView;
 class vtkPolyDataMapper;
 class vtkProbeFilter;
 
@@ -189,6 +190,7 @@ public:
   // Description:
   // Since ParaView has only one window, we might as well provide access to it.
   vtkPVWindow *GetMainWindow();
+  vtkPVRenderView *GetMainView();
 
   // Description:
   // Display the on-line help and about dialog for this application.

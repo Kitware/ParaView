@@ -186,6 +186,12 @@ public:
   void SetCollectThreshold(float);
   vtkGetMacro(CollectThreshold, float);
 
+  // Description:
+  // Controls whether the render module invokes abort check events.
+  vtkSetMacro(RenderInterruptsEnabled,int);
+  vtkGetMacro(RenderInterruptsEnabled,int);
+  vtkBooleanMacro(RenderInterruptsEnabled,int);
+
 protected:
   vtkPVRenderModule();
   ~vtkPVRenderModule();
@@ -219,6 +225,7 @@ protected:
   double InteractiveCompositeTime;
 
   int DisableRenderingFlag;
+  int RenderInterruptsEnabled;
 
   unsigned long ResetCameraClippingRangeTag;
 

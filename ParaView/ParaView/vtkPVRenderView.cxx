@@ -79,6 +79,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVSourceList.h"
 #include "vtkPVWindow.h"
 #include "vtkPVSource.h"
+#include "vtkPVRenderModuleUI.h"
 #include "vtkPolyData.h"
 #include "vtkPolyDataMapper.h"
 #include "vtkRenderer.h"
@@ -110,7 +111,7 @@ static unsigned char image_properties[] =
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.249");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.250");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -162,8 +163,6 @@ vtkPVRenderView::vtkPVRenderView()
   this->CommandFunction = vtkPVRenderViewCommand;
   
   this->Interactive = 0;
-
-  this->UseReductionFactor = 1;
   
   this->RenderWindow->SetDesiredUpdateRate(1.0);  
 
@@ -184,30 +183,14 @@ vtkPVRenderView::vtkPVRenderView()
   this->ZMaxViewButton = vtkKWPushButton::New();
   this->ZMinViewButton = vtkKWPushButton::New();
   
-  this->ParallelRenderParametersFrame = vtkKWLabeledFrame::New();
   this->RenderParametersFrame = vtkKWLabeledFrame::New();
 
   this->TriangleStripsCheck = vtkKWCheckButton::New();
   this->ParallelProjectionCheck = vtkKWCheckButton::New();
   this->ImmediateModeCheck = vtkKWCheckButton::New();
-  this->InterruptRenderCheck = vtkKWCheckButton::New();
-  this->CompositeWithFloatCheck = vtkKWCheckButton::New();
-  this->CompositeWithRGBACheck = vtkKWCheckButton::New();
-  this->CompositeCompressionCheck = vtkKWCheckButton::New();
 
-  this->LODFrame = vtkKWLabeledFrame::New();
+  this->RenderModuleUI = NULL;
  
-  this->LODScalesFrame = vtkKWWidget::New();
-  this->LODThresholdLabel = vtkKWLabel::New();
-  this->LODThresholdScale = vtkKWScale::New();
-  this->LODThresholdValue = vtkKWLabel::New();
-  this->LODResolutionLabel = vtkKWLabel::New();
-  this->LODResolutionScale = vtkKWScale::New();
-  this->LODResolutionValue = vtkKWLabel::New();
-  this->CollectThresholdLabel = vtkKWLabel::New();
-  this->CollectThresholdScale = vtkKWScale::New();
-  this->CollectThresholdValue = vtkKWLabel::New();
-
   this->ManipulatorControl2D = vtkPVInteractorStyleControl::New();
   this->ManipulatorControl2D->SetRegisteryName("2D");
   this->ManipulatorControl3D = vtkPVInteractorStyleControl::New();
@@ -226,10 +209,6 @@ vtkPVRenderView::vtkPVRenderView()
 
   this->InterfaceSettingsFrame = vtkKWLabeledFrame::New();
   this->Display3DWidgets = vtkKWCheckButton::New();
-
-  this->LODThreshold = 2.0;
-  this->LODResolution = 50;
-  this->CollectThreshold = 20.0;
 
   int cc;
   for ( cc = 0; cc < 6; cc ++ )
@@ -298,6 +277,10 @@ vtkPVRenderView::~vtkPVRenderView()
     pvApp = this->GetPVApplication();
     }
 
+  // I do not know if it is importatn to get rid of this callback.
+  // This class created it, so why not.
+  pvApp->GetRenderModule()->RemoveObservers(vtkCommand::AbortCheckEvent);
+
   this->InterfaceSettingsFrame->Delete();
   this->Display3DWidgets->Delete();
   this->Display3DWidgets = NULL;
@@ -318,8 +301,11 @@ vtkPVRenderView::~vtkPVRenderView()
   this->NavigationWindow->Delete();
   this->NavigationWindow = NULL;
 
-  this->LODFrame->Delete();
-  this->LODFrame = NULL;
+  if (this->RenderModuleUI)
+    {
+    this->RenderModuleUI->Delete();
+    this->RenderModuleUI = NULL;
+    }
 
   if (this->Renderer)
     {
@@ -368,9 +354,6 @@ vtkPVRenderView::~vtkPVRenderView()
   this->RenderParametersFrame->Delete();
   this->RenderParametersFrame = 0;
 
-  this->ParallelRenderParametersFrame->Delete();
-  this->ParallelRenderParametersFrame = 0;
-
   this->ParallelProjectionCheck->Delete();
   this->ParallelProjectionCheck = NULL;
 
@@ -380,46 +363,10 @@ vtkPVRenderView::~vtkPVRenderView()
   this->ImmediateModeCheck->Delete();
   this->ImmediateModeCheck = NULL;
 
-  this->InterruptRenderCheck->Delete();
-  this->InterruptRenderCheck = NULL;
-
-  this->CompositeWithFloatCheck->Delete();
-  this->CompositeWithFloatCheck = NULL;
-
-  this->CompositeWithRGBACheck->Delete();
-  this->CompositeWithRGBACheck = NULL;
-  
-  this->CompositeCompressionCheck->Delete();
-  this->CompositeCompressionCheck = NULL;
-
 
   this->ManipulatorControl2D->Delete();
   this->ManipulatorControl3D->Delete();
   
-  this->LODScalesFrame->Delete();
-  this->LODScalesFrame = NULL;
-
-  this->LODThresholdLabel->Delete();
-  this->LODThresholdLabel = NULL;
-  this->LODThresholdScale->Delete();
-  this->LODThresholdScale = NULL;
-  this->LODThresholdValue->Delete();
-  this->LODThresholdValue = NULL;
-
-  this->LODResolutionLabel->Delete();
-  this->LODResolutionLabel = NULL;
-  this->LODResolutionScale->Delete();
-  this->LODResolutionScale = NULL;
-  this->LODResolutionValue->Delete();
-  this->LODResolutionValue = NULL;
-
-  this->CollectThresholdLabel->Delete();
-  this->CollectThresholdLabel = NULL;
-  this->CollectThresholdScale->Delete();
-  this->CollectThresholdScale = NULL;
-  this->CollectThresholdValue->Delete();
-  this->CollectThresholdValue = NULL;
-
   this->CameraIconsFrame->Delete();
   this->CameraIconsFrame = 0;
   int cc;
@@ -472,6 +419,14 @@ void vtkPVRenderView::CreateRenderObjects(vtkPVApplication *pvApp)
   this->Renderer = pvApp->GetRenderModule()->GetRenderer();
   this->Renderer->Register(this);
 
+  // Create the call back that looks for events to abort rendering.
+  pvApp->GetRenderModule()->RemoveObservers(vtkCommand::AbortCheckEvent);
+  vtkCallbackCommand* abc = vtkCallbackCommand::New();
+  abc->SetCallback(PVRenderViewAbortCheck);
+  abc->SetClientData(this);
+  pvApp->GetRenderModule()->AddObserver(vtkCommand::AbortCheckEvent, abc);
+  abc->Delete();
+
   // Get rid of render window created by the superclass
   this->RenderWindow->Delete();
   this->RenderWindow = pvApp->GetRenderModule()->GetRenderWindow();
@@ -495,24 +450,6 @@ void vtkPVRenderView::PrepareForDelete()
                              this->TriangleStripsCheck->GetState());
     pvapp->SetRegisteryValue(2, "RunTime", "UseImmediateMode", "%d",
                              this->ImmediateModeCheck->GetState());
-    pvapp->SetRegisteryValue(2, "RunTime", "LODThreshold", "%f",
-                             this->LODThreshold);
-    pvapp->SetRegisteryValue(2, "RunTime", "LODResolution", "%d",
-                             this->LODResolution);
-
-    if (pvapp->GetRenderModule()->GetComposite() || pvapp->GetClientMode())
-      {
-      pvapp->SetRegisteryValue(2, "RunTime", "CollectThreshold", "%f",
-                               this->CollectThreshold);
-      pvapp->SetRegisteryValue(2, "RunTime", "InterruptRender", "%d",
-                               this->InterruptRenderCheck->GetState());
-      pvapp->SetRegisteryValue(2, "RunTime", "UseFloatInComposite", "%d",
-                               this->CompositeWithFloatCheck->GetState());
-      pvapp->SetRegisteryValue(2, "RunTime", "UseRGBAInComposite", "%d",
-                               this->CompositeWithRGBACheck->GetState());
-      pvapp->SetRegisteryValue(2, "RunTime", "UseCompressionInComposite", "%d",
-                               this->CompositeCompressionCheck->GetState());
-      }
 
     // If it's the last win, save the size of the nav frame
 
@@ -986,272 +923,17 @@ void vtkPVRenderView::CreateViewProperties()
                this->TriangleStripsCheck->GetWidgetName(),
                this->ImmediateModeCheck->GetWidgetName());
 
-  // LOD parameters
-
-  this->LODFrame->SetParent(this->GeneralProperties->GetFrame());
-  this->LODFrame->ShowHideFrameOn();
-  this->LODFrame->Create(this->Application,0);
-  this->LODFrame->SetLabel("LOD Parameters");
+  this->RenderModuleUI = vtkPVRenderModuleUI::New();
+  this->RenderModuleUI->SetParent(this->GeneralProperties->GetFrame());
+  this->RenderModuleUI->Create(this->Application,0);
   this->Script("pack %s -padx 2 -pady 2 -fill x -expand yes -anchor w",
-               this->LODFrame->GetWidgetName());
+               this->RenderModuleUI->GetWidgetName());
 
-  // LOD parameters: the frame that will pack all scales
-
-  this->LODScalesFrame->SetParent(this->LODFrame->GetFrame());
-  this->LODScalesFrame->Create(this->Application, "frame", "");
-
-  // LOD parameters: threshold
-
-  this->LODThresholdLabel->SetParent(this->LODScalesFrame);
-  this->LODThresholdLabel->Create(this->Application, "-anchor w");
-  this->LODThresholdLabel->SetLabel("LOD threshold:");
-
-  this->LODThresholdScale->SetParent(this->LODScalesFrame);
-  this->LODThresholdScale->Create(this->Application, 
-                                  "-resolution 0.1 -orient horizontal");
-  this->LODThresholdScale->SetRange(0.0, 6.0);
-  this->LODThresholdScale->SetResolution(0.1);
-
-  this->LODThresholdValue->SetParent(this->LODScalesFrame);
-  this->LODThresholdValue->Create(this->Application, "-anchor w");
-
-  if (pvapp && pvwindow &&
-      pvapp->GetRegisteryValue(2, "RunTime", "LODThreshold", 0))
-    {
-    this->SetLODThreshold(
-      pvwindow->GetFloatRegisteryValue(2, "RunTime", "LODThreshold"));
-    }
-  else
-    {
-    this->SetLODThreshold(this->LODThreshold);
-    }
-
-  this->LODThresholdScale->SetValue(this->CollectThreshold);
-  this->LODThresholdScale->SetCommand(this, 
-                                      "LODThresholdScaleCallback");
-  this->LODThresholdScale->SetBalloonHelpString(
-    "This slider determines whether to use decimated models "
-    "during interaction.  Threshold critera is based on size "
-    "of geometry in mega bytes.  "
-    "Left: Always use full resolution. Right: Always use decimated models.");    
 
   int row = 0;
 
-  pvapp->Script("grid %s -row %d -column 1 -sticky news", 
-                this->LODThresholdValue->GetWidgetName(), row++);
-  pvapp->Script("grid %s -row %d -column 0 -sticky nws", 
-                this->LODThresholdLabel->GetWidgetName(), row);
-  pvapp->Script("grid %s -row %d -column 1 -sticky news", 
-                this->LODThresholdScale->GetWidgetName(), row++);
-  
-  pvapp->Script("grid columnconfigure %s 1 -weight 1",
-                this->LODThresholdScale->GetParent()->GetWidgetName());
 
-  // LOD parameters: resolution
 
-  this->LODResolutionLabel->SetParent(this->LODScalesFrame);
-  this->LODResolutionLabel->Create(this->Application, "-anchor w");
-  this->LODResolutionLabel->SetLabel("LOD resolution:");
-
-  this->LODResolutionScale->SetParent(this->LODScalesFrame);
-  this->LODResolutionScale->Create(this->Application, "-orient horizontal");
-  this->LODResolutionScale->SetRange(10, 160);
-  this->LODResolutionScale->SetResolution(1.0);
-
-  this->LODResolutionValue->SetParent(this->LODScalesFrame);
-  this->LODResolutionValue->Create(this->Application, "-anchor w");
-
-  if (pvapp && pvwindow &&
-      pvapp->GetRegisteryValue(2, "RunTime", "LODResolution", 0))
-    {
-    this->SetLODResolution(
-      pvwindow->GetIntRegisteryValue(2, "RunTime", "LODResolution"));
-    }
-  else
-    {
-    this->SetLODResolution(this->LODResolution);
-    }
-
-  this->LODResolutionScale->SetValue(150 - this->LODResolution);
-  this->LODResolutionScale->SetCommand(this, "LODResolutionLabelCallback");
-  this->LODResolutionScale->SetEndCommand(this, "LODResolutionScaleCallback");
-  this->LODResolutionScale->SetBalloonHelpString(
-    "This slider determines the resolution of the decimated level-of-detail "
-    "models. The value is the dimension for each axis in the quadric clustering "
-    "algorithm."
-    "\nLeft: Use slow high-resolution models. "
-    "Right: Use fast simple models .");
-
-  pvapp->Script("grid %s -row %d -column 1 -sticky news", 
-                this->LODResolutionValue->GetWidgetName(), row++);
-  pvapp->Script("grid %s -row %d -column 0 -sticky nws", 
-                this->LODResolutionLabel->GetWidgetName(), row);
-  pvapp->Script("grid %s -row %d -column 1 -sticky news", 
-                this->LODResolutionScale->GetWidgetName(), row++);
-
-  // LOD parameters: rendering interrupts
-
-  this->InterruptRenderCheck->SetParent(this->LODFrame->GetFrame());
-  this->InterruptRenderCheck->Create(this->Application, 
-                                     "-text \"Allow rendering interrupts\"");
-  this->InterruptRenderCheck->SetCommand(this, "InterruptRenderCallback");
-  
-  if (pvwindow && pvapp && pvapp->GetRegisteryValue(2, "RunTime", 
-                                                    "InterruptRender", 0))
-    {
-    this->InterruptRenderCheck->SetState(
-      pvwindow->GetIntRegisteryValue(2, "RunTime", "InterruptRender"));
-    }
-  else
-    {
-    this->InterruptRenderCheck->SetState(1);
-    }
-  this->InterruptRenderCallback();
-  this->InterruptRenderCheck->SetBalloonHelpString(
-    "Toggle the use of  render interrupts (when using MPI, this uses "
-    "asynchronous messaging). When off, renders can not be interrupted.");
-
-  // LOD parameters: pack
-
-  this->Script("pack %s -side top -fill x -expand t -anchor w",
-               this->LODScalesFrame->GetWidgetName());
-  this->Script("pack %s -side top -anchor w",
-               this->InterruptRenderCheck->GetWidgetName());
-
-  // LOD parameters: collection threshold
-  // Conditional interface should really be part of a module. !!!!
-  if ((pvapp->GetClientMode() || pvapp->GetProcessModule()->GetNumberOfPartitions() > 1) &&
-      !pvapp->GetUseRenderingGroup())
-    {
-    // Determines when geometry is collected to process 0 for rendering.
-
-    this->CollectThresholdLabel->SetParent(this->LODScalesFrame);
-    this->CollectThresholdLabel->Create(this->Application, "-anchor w");
-    this->CollectThresholdLabel->SetLabel("Collection threshold:");
-
-    this->CollectThresholdScale->SetParent(this->LODScalesFrame);
-    this->CollectThresholdScale->Create(this->Application,
-                                        "-orient horizontal");
-    this->CollectThresholdScale->SetRange(0.0, 100.0);
-    this->CollectThresholdScale->SetResolution(1.0);
-
-    this->CollectThresholdValue->SetParent(this->LODScalesFrame);
-    this->CollectThresholdValue->Create(this->Application, "-anchor w");
-    //if (pvapp && pvwindow &&
-    //    pvapp->GetRegisteryValue(2, "RunTime", "CollectThreshold", 0))
-    //  {
-    //  this->SetCollectThreshold(
-    //    pvwindow->GetFloatRegisteryValue(2, "RunTime", "CollectThreshold"));
-    //  }
-    //else
-    //  {
-    this->SetCollectThreshold(this->CollectThreshold);
-    //  }
-
-    this->CollectThresholdScale->SetValue(this->CollectThreshold);
-    this->CollectThresholdScale->SetCommand(this, 
-                                            "CollectThresholdScaleCallback");
-    this->CollectThresholdScale->SetBalloonHelpString(
-      "This slider determines when models are collected to process 0 for "
-      "local rendering. Threshold critera is based on size of model in mega "
-      "bytes.  "
-      "Left: Always leave models distributed. Right: Move even large models "
-      "to process 0.");    
-
-    pvapp->Script("grid %s -row %d -column 1 -sticky news", 
-                  this->CollectThresholdValue->GetWidgetName(), row++);
-    pvapp->Script("grid %s -row %d -column 0 -sticky nws", 
-                  this->CollectThresholdLabel->GetWidgetName(), row);
-    pvapp->Script("grid %s -row %d -column 1 -sticky news", 
-                  this->CollectThresholdScale->GetWidgetName(), row++);
-    }
-  // Parallel rendering parameters
-  // Conditional interface should really be part of a module !!!!!!
-  if (pvapp->GetProcessModule()->GetNumberOfPartitions() > 1 && 
-      pvapp->GetRenderModule()->GetComposite())
-    {
-    this->ParallelRenderParametersFrame->SetParent( 
-      this->GeneralProperties->GetFrame() );
-    this->ParallelRenderParametersFrame->ShowHideFrameOn();
-    this->ParallelRenderParametersFrame->Create(this->Application,0);
-    this->ParallelRenderParametersFrame->SetLabel(
-      "Parallel Rendering Parameters");
-
-    this->Script("pack %s -padx 2 -pady 2 -fill x -expand yes -anchor w",
-                 this->ParallelRenderParametersFrame->GetWidgetName());
-  
-    this->CompositeWithFloatCheck->SetParent(
-      this->ParallelRenderParametersFrame->GetFrame());
-    this->CompositeWithFloatCheck->Create(this->Application, 
-                                          "-text \"Composite with floats\"");
-
-    this->CompositeWithRGBACheck->SetParent(
-      this->ParallelRenderParametersFrame->GetFrame());
-    this->CompositeWithRGBACheck->Create(this->Application, 
-                                         "-text \"Composite RGBA\"");
-
-    this->CompositeCompressionCheck->SetParent(
-      this->ParallelRenderParametersFrame->GetFrame());
-    this->CompositeCompressionCheck->Create(this->Application, 
-                                            "-text \"Composite compression\"");
-  
-    this->CompositeWithFloatCheck->SetCommand(this, 
-                                              "CompositeWithFloatCallback");
-    if (pvwindow && pvapp && 
-        pvapp->GetRegisteryValue(2, "RunTime", "UseFloatInComposite", 0))
-      {
-      this->CompositeWithFloatCheck->SetState(
-        pvwindow->GetIntRegisteryValue(2, "RunTime", "UseFloatInComposite"));
-      this->CompositeWithFloatCallback();
-      }
-    else
-      {
-      this->CompositeWithFloatCheck->SetState(0);
-      }
-    this->CompositeWithFloatCheck->SetBalloonHelpString(
-      "Toggle the use of char/float values when compositing. "
-      "If rendering defects occur, try turning this on.");
-  
-    this->CompositeWithRGBACheck->SetCommand(this, "CompositeWithRGBACallback");
-    if (pvwindow && pvapp && pvapp->GetRegisteryValue(2, "RunTime", 
-                                                      "UseRGBAInComposite", 0))
-      {
-      this->CompositeWithRGBACheck->SetState(
-        pvwindow->GetIntRegisteryValue(2, "RunTime", "UseRGBAInComposite"));
-      this->CompositeWithRGBACallback();
-      }
-    else
-      {
-      this->CompositeWithRGBACheck->SetState(0);
-      }
-    this->CompositeWithRGBACheck->SetBalloonHelpString(
-      "Toggle the use of RGB/RGBA values when compositing. "
-      "This is here to bypass some bugs in some graphics card drivers.");
-
-    this->CompositeCompressionCheck->SetCommand(this, 
-                                               "CompositeCompressionCallback");
-    if (pvwindow && pvapp && 
-        pvapp->GetRegisteryValue(2, "RunTime", "UseCompressionInComposite", 0))
-      {
-      this->CompositeCompressionCheck->SetState(
-        pvwindow->GetIntRegisteryValue(2, "RunTime", 
-                                       "UseCompressionInComposite"));
-      this->CompositeCompressionCallback();
-      }
-    else
-      {
-      this->CompositeCompressionCheck->SetState(1);
-      }
-    this->CompositeCompressionCheck->SetBalloonHelpString(
-      "Toggle the use of run length encoding when compositing. "
-      "This is here to compare performance.  "
-      "It should not change the final rendered image.");
-  
-    this->Script("pack %s %s %s -side top -anchor w",
-                 this->CompositeWithFloatCheck->GetWidgetName(),
-                 this->CompositeWithRGBACheck->GetWidgetName(),
-                 this->CompositeCompressionCheck->GetWidgetName());
-    }
 
   // Interface settings
 
@@ -1763,318 +1445,6 @@ void vtkPVRenderView::ImmediateModeCallback()
     }
 }
 
-
-//----------------------------------------------------------------------------
-void vtkPVRenderView::LODThresholdScaleCallback()
-{
-  float value = this->LODThresholdScale->GetValue();
-  float threshold;
-
-  // Value should be between 0 and 18.
-  // producing threshold between 65Mil and 1.
-  //threshold = static_cast<int>(exp(18.0 - value));
-  threshold = value;  
-
-  // Use internal method so we do not reset the slider.
-  // I do not know if it would cause a problem, but ...
-  this->SetLODThresholdInternal(threshold);
-
-  vtkTimerLog::FormatAndMarkEvent("--- Change LOD Threshold %d.", 
-                                  threshold);
-  this->AddTraceEntry("$kw(%s) SetLODThreshold %d",
-                      this->GetTclName(), threshold);
-}
-
-//----------------------------------------------------------------------------
-void vtkPVRenderView::SetLODThreshold(float threshold)
-{
-  float value;
-  
-  value = threshold;
-  this->LODThresholdScale->SetValue(value);
-
-  this->SetLODThresholdInternal(threshold);
-
-  vtkTimerLog::FormatAndMarkEvent("--- Change LOD Threshold %d.", 
-                                  threshold);
-  this->AddTraceEntry("$kw(%s) SetLODThreshold %d",
-                      this->GetTclName(), threshold);
-}
-
-//----------------------------------------------------------------------------
-void vtkPVRenderView::SetLODThresholdInternal(float threshold)
-{
-  char str[256];
-
-  sprintf(str, "%.1f MBytes", threshold);
-  this->LODThresholdValue->SetLabel(str);
-  this->GetPVApplication()->GetRenderModule()->SetLODThreshold(threshold);
-
-  this->LODThreshold = threshold;
-}
-
-
-
-
-//----------------------------------------------------------------------------
-void vtkPVRenderView::LODResolutionScaleCallback()
-{
-  int value = static_cast<int>(this->LODResolutionScale->GetValue());
-  value = 170 - value;
-
-  // Use internal method so we do not reset the slider.
-  // I do not know if it would cause a problem, but ...
-  this->SetLODResolutionInternal(value);
-
-  vtkTimerLog::FormatAndMarkEvent("--- Change LOD Resolution %d.", value);
-  this->AddTraceEntry("$kw(%s) SetLODResolution %d",
-                      this->GetTclName(), value);
-}
-
-//----------------------------------------------------------------------------
-void vtkPVRenderView::LODResolutionLabelCallback()
-{
-  int resolution = static_cast<int>(this->LODResolutionScale->GetValue());
-  resolution = 170 - resolution;
-
-  char str[256];
-  sprintf(str, "%dx%dx%d", resolution, resolution, resolution);
-  this->LODResolutionValue->SetLabel(str);
-}
-
-
-//----------------------------------------------------------------------------
-void vtkPVRenderView::SetLODResolution(int value)
-{
-  this->LODResolutionScale->SetValue(150 - value);
-
-  this->SetLODResolutionInternal(value);
-
-  vtkTimerLog::FormatAndMarkEvent("--- Change LOD Resolution %d.", value);
-  this->AddTraceEntry("$kw(%s) SetLODResolution %d",
-                      this->GetTclName(), value);
-}
-
-//----------------------------------------------------------------------------
-void vtkPVRenderView::SetLODResolutionInternal(int resolution)
-{
-  vtkPVWindow *pvWin;
-  vtkPVSourceCollection *sources;
-  vtkPVSource *pvs;
-  vtkPVApplication *pvApp;
-  char str[256];
-
-  sprintf(str, "%dx%dx%d", resolution, resolution, resolution);
-  this->LODResolutionValue->SetLabel(str);
-
-  this->LODResolution = resolution;
-
-  pvApp = this->GetPVApplication();
-  pvWin = this->GetPVWindow();
-  if (pvWin == NULL)
-    {
-    vtkErrorMacro("Missing window.");
-    return;
-    }
-  sources = pvWin->GetSourceList("Sources");
-  sources->InitTraversal();
-  while ( (pvs = sources->GetNextPVSource()) )
-    {
-    pvs->SetLODResolution(resolution);
-    }
-}
-
-
-
-
-
-//----------------------------------------------------------------------------
-void vtkPVRenderView::CollectThresholdScaleCallback()
-{
-  float threshold = this->CollectThresholdScale->GetValue();
-
-  // Use internal method so we do not reset the slider.
-  // I do not know if it would cause a problem, but ...
-  this->SetCollectThresholdInternal(threshold);
-
-  vtkTimerLog::FormatAndMarkEvent("--- Change LOD Threshold %f.", threshold);
-  this->AddTraceEntry("$kw(%s) SetCollectThreshold %f",
-                      this->GetTclName(), threshold);
-}
-
-//----------------------------------------------------------------------------
-void vtkPVRenderView::SetCollectThreshold(float threshold)
-{
-  this->CollectThresholdScale->SetValue(threshold);
-
-  this->SetCollectThresholdInternal(threshold);
-
-  vtkTimerLog::FormatAndMarkEvent("--- Change LOD Threshold %f.", threshold);
-  this->AddTraceEntry("$kw(%s) SetCollectThreshold %f",
-                      this->GetTclName(), threshold);
-}
-
-//----------------------------------------------------------------------------
-void vtkPVRenderView::SetCollectThresholdInternal(float threshold)
-{
-  vtkPVApplication *pvApp;
-  char str[256];
-
-  sprintf(str, "%.1f MBytes", threshold);
-  this->CollectThresholdValue->SetLabel(str);
-
-  this->CollectThreshold = threshold;
-
-  // This will cause collection to be re evaluated.
-  pvApp = this->GetPVApplication();
-  pvApp->SetTotalVisibleMemorySizeValid(0);
-}
-
-
-
-
-//----------------------------------------------------------------------------
-void vtkPVRenderView::InterruptRenderCallback()
-{
-  vtkPVApplication* pvApp = this->GetPVApplication();
-
-  pvApp->GetRenderModule()->RemoveObservers(vtkCommand::AbortCheckEvent);
-  if (this->InterruptRenderCheck->GetState())
-    {
-    vtkCallbackCommand* abc = vtkCallbackCommand::New();
-    abc->SetCallback(PVRenderViewAbortCheck);
-    abc->SetClientData(this);
-    pvApp->GetRenderModule()->AddObserver(vtkCommand::AbortCheckEvent, abc);
-    abc->Delete();
-    }
-}
-
-//----------------------------------------------------------------------------
-void vtkPVRenderView::CompositeWithFloatCallback()
-{
-  int val = this->CompositeWithFloatCheck->GetState();
-  this->CompositeWithFloatCallback(val);
-}
-
-//----------------------------------------------------------------------------
-void vtkPVRenderView::CompositeWithFloatCallback(int val)
-{
-  this->AddTraceEntry("$kw(%s) CompositeWithFloatCallback %d", 
-                      this->GetTclName(), val);
-  if ( this->CompositeWithFloatCheck->GetState() != val )
-    {
-    this->CompositeWithFloatCheck->SetState(val);
-    }
- 
-  if (this->GetPVApplication()->GetRenderModule()->GetComposite())
-    {
-    this->GetPVApplication()->BroadcastScript("%s SetUseChar %d",
-                                              this->GetPVApplication()->GetRenderModule()->GetCompositeTclName(),
-                                              !val);
-    // Limit of composite manager.
-    if (val != 0) // float
-      {
-      this->CompositeWithRGBACheck->SetState(1);
-      }
-    this->EventuallyRender();
-    }
-
-  if (this->CompositeWithFloatCheck->GetState())
-    {
-    vtkTimerLog::MarkEvent("--- Get color buffers as floats.");
-    }
-  else
-    {
-    vtkTimerLog::MarkEvent("--- Get color buffers as unsigned char.");
-    }
-
-}
-
-//----------------------------------------------------------------------------
-void vtkPVRenderView::CompositeWithRGBACallback()
-{
-  int val = this->CompositeWithRGBACheck->GetState();
-  this->CompositeWithRGBACallback(val);
-}
-
-//----------------------------------------------------------------------------
-void vtkPVRenderView::CompositeWithRGBACallback(int val)
-{
-  this->AddTraceEntry("$kw(%s) CompositeWithRGBACallback %d", 
-                      this->GetTclName(), val);
-  if ( this->CompositeWithRGBACheck->GetState() != val )
-    {
-    this->CompositeWithRGBACheck->SetState(val);
-    }
-  if (this->GetPVApplication()->GetRenderModule()->GetComposite())
-    {
-    this->GetPVApplication()->BroadcastScript("%s SetUseRGB %d",
-                                              this->GetPVApplication()->GetRenderModule()->GetCompositeTclName(),
-                                              !val);
-    // Limit of composite manager.
-    if (val != 1) // RGB
-      {
-      this->CompositeWithFloatCheck->SetState(0);
-      }
-    this->EventuallyRender();
-    }
-
-  if (this->CompositeWithRGBACheck->GetState())
-    {
-    vtkTimerLog::MarkEvent("--- Use RGBA pixels to get color buffers.");
-    }
-  else
-    {
-    vtkTimerLog::MarkEvent("--- Use RGB pixels to get color buffers.");
-    }
-}
-
-
-//----------------------------------------------------------------------------
-void vtkPVRenderView::CompositeCompressionCallback()
-{
-  int val = this->CompositeCompressionCheck->GetState();
-  this->CompositeCompressionCallback(val);
-}
-
-//----------------------------------------------------------------------------
-void vtkPVRenderView::CompositeCompressionCallback(int val)
-{
-  vtkPVApplication *pvApp = this->GetPVApplication();
-
-  this->AddTraceEntry("$kw(%s) CompositeCompressionCallback %d", 
-                      this->GetTclName(), val);
-  if ( this->CompositeCompressionCheck->GetState() != val )
-    {
-    this->CompositeCompressionCheck->SetState(val);
-    }
-  if (pvApp->GetRenderModule()->GetComposite())
-    {
-    if (val)
-      {
-      pvApp->BroadcastScript("vtkCompressCompositer pvTemp");
-      }
-    else
-      {
-      pvApp->BroadcastScript("vtkTreeCompositer pvTemp");
-      }
-    pvApp->BroadcastScript("%s SetCompositer pvTemp", pvApp->GetRenderModule()->GetCompositeTclName());
-    pvApp->BroadcastScript("pvTemp Delete");
-    this->EventuallyRender();
-    }
-
-  if (val)
-    {
-    vtkTimerLog::MarkEvent("--- Enable compression when compositing.");
-    }
-  else
-    {
-    vtkTimerLog::MarkEvent("--- Disable compression when compositing.");
-    }
-
-}
-
-
 //----------------------------------------------------------------------------
 vtkPVWindow *vtkPVRenderView::GetPVWindow()
 {
@@ -2241,7 +1611,7 @@ void vtkPVRenderView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVRenderView ";
-  this->ExtractRevision(os,"$Revision: 1.249 $");
+  this->ExtractRevision(os,"$Revision: 1.250 $");
 }
 
 //------------------------------------------------------------------------------
@@ -2397,8 +1767,5 @@ void vtkPVRenderView::PrintSelf(ostream& os, vtkIndent indent)
      << this->ManipulatorControl2D << endl;
   os << indent << "ManipulatorControl3D: " 
      << this->ManipulatorControl3D << endl;
-  os << indent << "LODThreshold: " << this->LODThreshold << endl;
-  os << indent << "LODResolution: " << this->LODResolution << endl;
-  os << indent << "CollectThreshold: " << this->CollectThreshold << endl;
 }
 

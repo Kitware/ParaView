@@ -101,6 +101,7 @@ SET( ParaView_SRCS
   vtkPVReaderModule.cxx
   vtkPVRenderGroupDialog.cxx
   vtkPVRenderModule.cxx
+  vtkPVRenderModuleUI.cxx
   vtkPVRenderView.cxx 
   vtkPVRibbonFilter.cxx
   vtkPVSaveBatchScriptDialog.cxx

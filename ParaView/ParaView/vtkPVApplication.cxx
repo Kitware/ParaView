@@ -118,7 +118,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.191");
+vtkCxxRevisionMacro(vtkPVApplication, "1.192");
 vtkCxxSetObjectMacro(vtkPVApplication, RenderModule, vtkPVRenderModule);
 
 
@@ -412,6 +412,11 @@ vtkPVWindow *vtkPVApplication::GetMainWindow()
   return (vtkPVWindow*)(this->Windows->GetNextItemAsObject());
 }
 
+//----------------------------------------------------------------------------
+vtkPVRenderView *vtkPVApplication::GetMainView()
+{
+  return this->GetMainWindow()->GetMainView();
+}
 
 
 //----------------------------------------------------------------------------
