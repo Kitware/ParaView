@@ -816,6 +816,49 @@ void vtkPVWindow::ReadSourceInterfaces()
   
   // ============= Image Sources ==============  
 
+  // ---- ImageReader ----
+  sInt = vtkPVSourceInterface::New();
+  sInt->SetApplication(pvApp);
+  sInt->SetPVWindow(this);
+  sInt->SetSourceClassName("vtkImageReader");
+  sInt->SetRootName("ImageRead");
+  sInt->SetOutputClassName("vtkImageData");
+  // Method
+  mInt = vtkPVMethodInterface::New();
+  mInt->SetVariableName("FilePrefix");
+  mInt->SetSetCommand("SetFilePrefix");
+  mInt->SetGetCommand("GetFilePrefix");
+  mInt->AddStringArgument();
+  sInt->AddMethodInterface(mInt);
+  mInt->Delete();
+  mInt = NULL;
+  // Method
+  mInt = vtkPVMethodInterface::New();
+  mInt->SetVariableName("ScalarType");
+  mInt->SetSetCommand("SetDataScalarType");
+  mInt->SetGetCommand("GetDataScalarType");
+  mInt->AddIntegerArgument();  
+  mInt->Delete();
+  mInt = NULL;
+  // Method
+  mInt = vtkPVMethodInterface::New();
+  mInt->SetVariableName("Extent");
+  mInt->SetSetCommand("SetDataExtent");
+  mInt->SetGetCommand("GetDataExtent");
+  mInt->AddIntegerArgument();  
+  mInt->AddIntegerArgument();  
+  mInt->AddIntegerArgument();  
+  mInt->AddIntegerArgument();  
+  mInt->AddIntegerArgument();  
+  mInt->AddIntegerArgument();  
+  sInt->AddMethodInterface(mInt);
+  mInt->Delete();
+  mInt = NULL;
+  // Add it to the list.
+  this->SourceInterfaces->AddItem(sInt);
+  sInt->Delete();
+  sInt = NULL;  
+  
   // ---- Fractal Source ----
   sInt = vtkPVSourceInterface::New();
   sInt->SetApplication(pvApp);
@@ -823,7 +866,6 @@ void vtkPVWindow::ReadSourceInterfaces()
   sInt->SetSourceClassName("vtkImageMandelbrotSource");
   sInt->SetRootName("Fractal");
   sInt->SetOutputClassName("vtkImageData");
-  
   // Method
   mInt = vtkPVMethodInterface::New();
   mInt->SetVariableName("Extent");
@@ -1388,6 +1430,92 @@ void vtkPVWindow::ReadSourceInterfaces()
   mInt->SetSetCommand("SetShrinkFactor");
   mInt->SetGetCommand("GetShrinkFactor");
   mInt->AddFloatArgument();
+  sInt->AddMethodInterface(mInt);
+  mInt->Delete();
+  mInt = NULL;
+  // Add it to the list.
+  this->SourceInterfaces->AddItem(sInt);
+  sInt->Delete();
+  sInt = NULL;
+
+  // ---- Stream ----.
+  sInt = vtkPVSourceInterface::New();
+  sInt->SetApplication(pvApp);
+  sInt->SetPVWindow(this);
+  sInt->SetSourceClassName("vtkPolyDataStreamer");
+  sInt->SetRootName("Stream");
+  sInt->SetInputClassName("vtkPolyData");
+  sInt->SetOutputClassName("vtkPolyData");
+  // Method
+  mInt = vtkPVMethodInterface::New();
+  mInt->SetVariableName("NumberOfDivisions");
+  mInt->SetSetCommand("SetNumberOfStreamDivisions");
+  mInt->SetGetCommand("GetNumberOfStreamDivisions");
+  mInt->AddIntegerArgument();
+  sInt->AddMethodInterface(mInt);
+  mInt->Delete();
+  mInt = NULL;
+  // Add it to the list.
+  this->SourceInterfaces->AddItem(sInt);
+  sInt->Delete();
+  sInt = NULL;
+
+  // ---- Triangle ----.
+  sInt = vtkPVSourceInterface::New();
+  sInt->SetApplication(pvApp);
+  sInt->SetPVWindow(this);
+  sInt->SetSourceClassName("vtkTriangleFilter");
+  sInt->SetRootName("Tri");
+  sInt->SetInputClassName("vtkPolyData");
+  sInt->SetOutputClassName("vtkPolyData");
+  // Add it to the list.
+  this->SourceInterfaces->AddItem(sInt);
+  sInt->Delete();
+  sInt = NULL;
+
+  // ---- Deci ----.
+  sInt = vtkPVSourceInterface::New();
+  sInt->SetApplication(pvApp);
+  sInt->SetPVWindow(this);
+  sInt->SetSourceClassName("vtkQuadricClustering");
+  sInt->SetRootName("QC");
+  sInt->SetInputClassName("vtkPolyData");
+  sInt->SetOutputClassName("vtkPolyData");
+  // Method
+  mInt = vtkPVMethodInterface::New();
+  mInt->SetVariableName("Spacing");
+  mInt->SetSetCommand("SetDivisionSpacing");
+  mInt->SetGetCommand("GetDivisionSpacing");
+  mInt->AddFloatArgument();  
+  mInt->AddFloatArgument();  
+  mInt->AddFloatArgument();  
+  sInt->AddMethodInterface(mInt);
+  mInt->Delete();
+  mInt = NULL;
+  // Method
+  mInt = vtkPVMethodInterface::New();
+  mInt->SetVariableName("UseInputPoints");
+  mInt->SetSetCommand("SetUseInputPoints");
+  mInt->SetGetCommand("GetUseInputPoints");
+  mInt->SetWidgetTypeToToggle();
+  sInt->AddMethodInterface(mInt);
+  mInt->Delete();
+  mInt = NULL;
+  // Method
+  mInt = vtkPVMethodInterface::New();
+  mInt->SetVariableName("UseFeatureEdges");
+  mInt->SetSetCommand("SetUseFeatureEdges");
+  mInt->SetGetCommand("GetUseFeatureEdges");
+  mInt->SetWidgetTypeToToggle();
+  sInt->AddMethodInterface(mInt);
+  mInt->Delete();
+  mInt = NULL;
+  // Method
+  mInt = vtkPVMethodInterface::New();
+  mInt->SetVariableName("UseFeaturePoints");
+  mInt->SetSetCommand("SetUseFeaturePoints");
+  mInt->SetGetCommand("GetUseFeaturePoints");
+  mInt->SetWidgetTypeToToggle();
   sInt->AddMethodInterface(mInt);
   mInt->Delete();
   mInt = NULL;
