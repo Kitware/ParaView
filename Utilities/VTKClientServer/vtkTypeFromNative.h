@@ -87,7 +87,7 @@ VTK_TYPE_FROM_NATIVE(unsigned long, vtkTypeUInt64);
 #endif
 
 // Map non-standard types.
-#if defined(VTK_SIZEOF___INT64) && (VTK_SIZEOF___INT64 == 8)
+#if defined(VTK_SIZEOF___INT64) && !defined(VTK_TYPE_SAME_LONG_AND___INT64) && (VTK_SIZEOF___INT64 == 8)
 VTK_TYPE_FROM_NATIVE(__int64, vtkTypeInt64);
 VTK_TYPE_FROM_NATIVE(unsigned __int64, vtkTypeUInt64);
 #elif defined(VTK_SIZEOF_LONG_LONG) && (VTK_SIZEOF_LONG_LONG == 8)
