@@ -13,6 +13,7 @@ vtkKWDialog
 vtkKWEntry 
 vtkKWEvent
 vtkKWExtent 
+vtkKWFrame
 vtkKWGenericComposite 
 vtkKWHashTable
 vtkKWHashTableIterator
@@ -27,11 +28,11 @@ vtkKWMenu
 vtkKWMenuButton 
 vtkKWMessageDialog 
 vtkKWNotebook 
-vtkKWObject 
 vtkKWOKCancelDialog 
+vtkKWObject 
 vtkKWOptionMenu 
-vtkKWProgressGauge 
 vtkKWProcessStatistics
+vtkKWProgressGauge 
 vtkKWPushButton 
 vtkKWRadioButton 
 vtkKWRegisteryUtilities

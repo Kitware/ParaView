@@ -958,7 +958,7 @@ void vtkKWWindow::AddRecentFilesToMenu(char *menuEntry, vtkKWObject *target)
   delete [] newMenuEntry;
 }
 
-void vtkKWWindow::AddRecentFile(char *key, char *name,vtkKWObject *target,
+void vtkKWWindow::AddRecentFile(char *key, char *name, vtkKWObject *target,
                                 const char *command)
 {  
   const char* filename = this->Application->ExpandFileName(name);
@@ -991,7 +991,7 @@ void vtkKWWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWWindow ";
-  this->ExtractRevision(os,"$Revision: 1.83 $");
+  this->ExtractRevision(os,"$Revision: 1.84 $");
 }
 
 int vtkKWWindow::ExitDialog()

@@ -49,8 +49,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkKWWidget.h"
 class vtkKWApplication;
-class vtkKWImageLabel;
+class vtkKWFrame;
 class vtkKWIcon;
+class vtkKWImageLabel;
 
 class VTK_EXPORT vtkKWNotebook : public vtkKWWidget
 {
@@ -122,7 +123,7 @@ protected:
   vtkKWWidget *MaskRight;
   vtkKWWidget *MaskRight2;
   int NumberOfPages;
-  vtkKWWidget **Frames;
+  vtkKWFrame **Frames;
   vtkKWWidget **Buttons;
   vtkKWImageLabel **Icons;
   char **Titles;

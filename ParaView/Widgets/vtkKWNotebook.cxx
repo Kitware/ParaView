@@ -39,12 +39,14 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-#include "vtkKWApplication.h"
 #include "vtkKWNotebook.h"
-#include "vtkObjectFactory.h"
-#include "vtkKWImageLabel.h"
+
+#include "vtkKWApplication.h"
+#include "vtkKWFrame.h"
 #include "vtkKWIcon.h"
+#include "vtkKWImageLabel.h"
 #include "vtkKWWidgetsConfigure.h"
+#include "vtkObjectFactory.h"
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWNotebook );
@@ -341,7 +343,7 @@ vtkKWWidget *vtkKWNotebook::GetFrame(int n)
     {
     return NULL;
     }
-  return this->Frames[n];
+  return this->Frames[n]->GetFrame();
 }
 
 // Add a page to the notebook
@@ -367,7 +369,7 @@ void vtkKWNotebook::AddPage(const char *title, const char *ballon,
   int cnt;
 
   // for the frames we want to add to the list but not delete
-  vtkKWWidget **pages = new vtkKWWidget *[this->NumberOfPages+1];
+  vtkKWFrame **pages = new vtkKWFrame *[this->NumberOfPages+1];
   vtkKWWidget **buttons = new vtkKWWidget *[this->NumberOfPages+1];
   vtkKWImageLabel **icons = new vtkKWImageLabel *[this->NumberOfPages+1];
   char **titles = new char * [this->NumberOfPages+1];
@@ -396,9 +398,9 @@ void vtkKWNotebook::AddPage(const char *title, const char *ballon,
     delete [] this->Titles;
     }
   this->Frames = pages;
-  this->Frames[this->NumberOfPages] = vtkKWWidget::New();
+  this->Frames[this->NumberOfPages] = vtkKWFrame::New();
   this->Frames[this->NumberOfPages]->SetParent(this->Body);
-  this->Frames[this->NumberOfPages]->Create(this->Application,"frame","-bd 0");
+  this->Frames[this->NumberOfPages]->Create(this->Application,0);
   this->Titles = titles;
   this->Titles[this->NumberOfPages] = new char [strlen(title)+1];
   strcpy(this->Titles[this->NumberOfPages],title);

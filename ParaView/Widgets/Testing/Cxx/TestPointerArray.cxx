@@ -1,4 +1,3 @@
-#include "vtkKWPointerArray.h"
 #include "vtkVector.txx"
 
 int CheckName(const char *name, char **names)

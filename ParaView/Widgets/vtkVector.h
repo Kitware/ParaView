@@ -65,6 +65,17 @@ public:
   int InsertItem(unsigned long loc, DType a);
   
   // Description:
+  // Sets the Item at the specific location in the list to a new value.
+  // It also checks if the item can be set.
+  // It returns VTK_OK if successfull.
+  virtual int SetItem(unsigned long loc, DType a);
+
+  // Description:
+  // Sets the Item at the specific location in the list to a new value.
+  // This method does not perform any error checking.
+  virtual void SetItemNoCheck(unsigned long loc, DType a);
+
+   // Description:
   // Remove an Item from the vector
   int RemoveItem(unsigned long id);
   
@@ -75,14 +86,14 @@ public:
   // Description:
   // Find an item in the vector. Return one if it was found, zero if it was
   // not found. The location of the item is returned in res.
-  int Find(DType a, unsigned long &res);
+  int FindItem(DType a, unsigned long &res);
 
   // Description:
   // Find an item in the vector using a comparison routine. 
   // Return one if it was found, zero if it was
   // not found. The location of the item is returned in res.
-  int Find(DType a, vtkAbstractList<DType>::CompareFunction compare, 
-	   unsigned long &res);
+  int FindItem(DType a, vtkAbstractList<DType>::CompareFunction compare, 
+	       unsigned long &res);
   
   // Description:
   // Return the number of items currently held in this container. This

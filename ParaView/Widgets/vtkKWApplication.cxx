@@ -177,7 +177,7 @@ const char* vtkKWApplication::ExpandFileName(const char *String, ...)
   vsprintf(event, String, var_args);
   va_end(var_args);
   ostrstream str;
-  str << "eval file join \"" << event << "\"" << ends;
+  str << "eval file join {\"" << event << "\"}" << ends;
   this->SimpleScript(str.str());
   str.rdbuf()->freeze(0);
   return this->MainInterp->result;

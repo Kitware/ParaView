@@ -106,6 +106,34 @@ int vtkVector<DType>::InsertItem(unsigned long loc, DType a)
 }
 
 // Description:
+// Sets the Item at the specific location in the list to a new value.
+// It also checks if the item can be set.
+// It returns VTK_OK if successfull.
+template <class DType>
+int vtkVector<DType>::SetItem(unsigned long loc, DType a)
+{
+  if ( loc == this->NumberOfItems )
+    {
+    return this->AppendItem(a);
+    }
+  if ( loc > this->NumberOfItems )
+    {
+    return VTK_ERROR;
+    }
+  this->SetItemNoCheck(loc, a);
+  return VTK_OK;
+}
+
+// Description:
+// Sets the Item at the specific location in the list to a new value.
+// It returns VTK_OK if successfull.
+template <class DType>
+void vtkVector<DType>::SetItemNoCheck(unsigned long loc, DType a)
+{
+  this->Array[loc] = a;
+}
+
+// Description:
 // Remove an Item from the vector
 template <class DType>
 int vtkVector<DType>::RemoveItem(unsigned long id) 
@@ -164,7 +192,7 @@ int vtkVector<DType>::GetItem(unsigned long id, DType& ret)
 // Find an item in the vector. Return one if it was found, zero if it was
 // not found. The location of the item is returned in res.
 template <class DType>
-int vtkVector<DType>::Find(DType a, unsigned long &res) 
+int vtkVector<DType>::FindItem(DType a, unsigned long &res) 
 {
   unsigned long i;
   for (i = 0; i < this->NumberOfItems; ++i)
@@ -183,9 +211,10 @@ int vtkVector<DType>::Find(DType a, unsigned long &res)
 // Return one if it was found, zero if it was
 // not found. The location of the item is returned in res.
 template <class DType>
-int vtkVector<DType>::Find(DType a, 
-			   vtkAbstractList<DType>::CompareFunction compare, 
-			   unsigned long &res) 
+int vtkVector<DType>::FindItem(DType a, 
+			       vtkAbstractList<DType>::CompareFunction 
+			       compare, 
+			       unsigned long &res) 
 {
   unsigned long i;
   for (i = 0; i < this->NumberOfItems; ++i)
