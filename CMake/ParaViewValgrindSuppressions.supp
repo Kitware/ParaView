@@ -1,4 +1,4 @@
-{
+\{
    <insert a suppression name here>
    Memcheck:Param
    writev(vector[...])
@@ -2451,22 +2451,7 @@
    <insert a suppression name here>
    Memcheck:Leak
    fun:malloc
-   fun:XtMalloc
-   fun:XtRegisterGrabAction
-}
-{
-   <insert a suppression name here>
-   Memcheck:Leak
-   fun:malloc
    fun:__cxa_get_globals
-}
-{
-   <insert a suppression name here>
-   Memcheck:Leak
-   fun:malloc
-   fun:XtMalloc
-   fun:_XtMalloc
-   fun:_XtDependencies
 }
 {
    <insert a suppression name here>
@@ -2490,5 +2475,4 @@
    Memcheck:Leak
    fun:malloc
    fun:XtMalloc
-   fun:__XtMalloc
 }
