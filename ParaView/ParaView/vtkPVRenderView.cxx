@@ -87,7 +87,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.210");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.211");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -217,7 +217,7 @@ vtkPVRenderView::vtkPVRenderView()
   this->ShowSelectionWindow = 0;
   this->ShowNavigationWindow = 0;
 
-  this->ParaViewOptionsFrame = vtkKWLabeledFrame::New();
+  this->InterfaceSettingsFrame = vtkKWLabeledFrame::New();
   this->Display3DWidgets = vtkKWCheckButton::New();
 
   this->LODThreshold = 1000;
@@ -288,7 +288,7 @@ vtkPVRenderView::~vtkPVRenderView()
     pvApp = this->GetPVApplication();
     }
 
-  this->ParaViewOptionsFrame->Delete();
+  this->InterfaceSettingsFrame->Delete();
   this->Display3DWidgets->Delete();
 
   if ( this->SelectionWindow )
@@ -858,7 +858,7 @@ void vtkPVRenderView::CreateViewProperties()
   this->ParallelProjectionCheck->SetParent(
     this->RenderParametersFrame->GetFrame());
   this->ParallelProjectionCheck->Create(this->Application, "");
-  this->ParallelProjectionCheck->SetText("Use Parallel Projection");
+  this->ParallelProjectionCheck->SetText("Use parallel projection");
   if (pvapp && pvwindow && 
       pvapp->GetRegisteryValue(2, "RunTime", "UseParallelProjection", 0))
     {
@@ -877,7 +877,7 @@ void vtkPVRenderView::CreateViewProperties()
   this->TriangleStripsCheck->SetParent(
     this->RenderParametersFrame->GetFrame());
   this->TriangleStripsCheck->Create(this->Application, "");
-  this->TriangleStripsCheck->SetText("Use Triangle Strips");
+  this->TriangleStripsCheck->SetText("Use triangle strips");
   if (pvapp && pvwindow && 
       pvapp->GetRegisteryValue(2, "RunTime", "UseStrips", 0))
     {
@@ -894,7 +894,7 @@ void vtkPVRenderView::CreateViewProperties()
   
   this->ImmediateModeCheck->SetParent(this->RenderParametersFrame->GetFrame());
   this->ImmediateModeCheck->Create(this->Application, 
-                                   "-text \"Use Immediate Mode Rendering\"");
+                                   "-text \"Use immediate mode rendering\"");
   this->ImmediateModeCheck->SetCommand(this, "ImmediateModeCallback");
   if (pvapp && pvwindow && 
       pvapp->GetRegisteryValue(2, "RunTime", "UseImmediateMode", 0))
@@ -968,7 +968,7 @@ void vtkPVRenderView::CreateViewProperties()
   this->LODThresholdFrame->Create(this->Application, "frame", "");
   this->LODThresholdLabel->SetParent(this->LODThresholdFrame);
   this->LODThresholdLabel->Create(this->Application, "-width 18 -anchor w");
-  this->LODThresholdLabel->SetLabel("LOD Threshold:");
+  this->LODThresholdLabel->SetLabel("LOD threshold:");
   this->LODThresholdScale->SetParent(this->LODThresholdFrame);
   this->LODThresholdScale->Create(this->Application, 
                                "-resolution 0.1 -orient horizontal");
@@ -1002,7 +1002,7 @@ void vtkPVRenderView::CreateViewProperties()
   this->LODResolutionFrame->Create(this->Application, "frame", "");
   this->LODResolutionLabel->SetParent(this->LODResolutionFrame);
   this->LODResolutionLabel->Create(this->Application, "-width 18  -anchor w");
-  this->LODResolutionLabel->SetLabel("LOD Resolution:");
+  this->LODResolutionLabel->SetLabel("LOD resolution:");
   this->LODResolutionScale->SetParent(this->LODResolutionFrame);
   this->LODResolutionScale->Create(this->Application, 
                                "-orient horizontal");
@@ -1030,7 +1030,7 @@ void vtkPVRenderView::CreateViewProperties()
   this->InterruptRenderCheck->SetParent(
     this->LODFrame->GetFrame());
   this->InterruptRenderCheck->Create(this->Application, 
-                                     "-text \"Allow Rendering Interrupts\"");
+                                     "-text \"Allow rendering interrupts\"");
   this->InterruptRenderCheck->SetCommand(this, "InterruptRenderCallback");
   
   if (pvwindow && pvapp && pvapp->GetRegisteryValue(2, "RunTime", 
@@ -1177,17 +1177,17 @@ void vtkPVRenderView::CreateViewProperties()
                  this->CompositeCompressionCheck->GetWidgetName());
     }
 
-  this->ParaViewOptionsFrame->SetParent(this->GeneralProperties->GetFrame());
-  this->ParaViewOptionsFrame->ShowHideFrameOn();
-  this->ParaViewOptionsFrame->Create(this->Application);
-  this->ParaViewOptionsFrame->SetLabel("ParaView Options");
+  this->InterfaceSettingsFrame->SetParent(this->GeneralProperties->GetFrame());
+  this->InterfaceSettingsFrame->ShowHideFrameOn();
+  this->InterfaceSettingsFrame->Create(this->Application);
+  this->InterfaceSettingsFrame->SetLabel("Interface Settings");
   this->Script("pack %s -padx 2 -pady 2 -fill x -expand yes -anchor w",
-               this->ParaViewOptionsFrame->GetWidgetName());
+               this->InterfaceSettingsFrame->GetWidgetName());
 
   this->Display3DWidgets->SetParent(
-    this->ParaViewOptionsFrame->GetFrame());
+    this->InterfaceSettingsFrame->GetFrame());
   this->Display3DWidgets->Create(this->Application, 0);
-  this->Display3DWidgets->SetText("Display 3D Widgets Automatically");
+  this->Display3DWidgets->SetText("Display 3D widgets automatically");
   this->Display3DWidgets->SetCommand(this, "Display3DWidgetsCallback");
 
   this->Script("pack %s -side top -padx 2 -pady 2 -anchor w",
@@ -2340,7 +2340,7 @@ void vtkPVRenderView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVRenderView ";
-  this->ExtractRevision(os,"$Revision: 1.210 $");
+  this->ExtractRevision(os,"$Revision: 1.211 $");
 }
 
 //------------------------------------------------------------------------------

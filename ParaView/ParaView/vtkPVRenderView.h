@@ -415,9 +415,7 @@ protected:
   vtkKWCheckButton *CompositeWithRGBACheck;
   vtkKWCheckButton *CompositeCompressionCheck;
 
-  vtkKWLabeledFrame *ParaViewOptionsFrame;
-  vtkKWRadioButton *NavigationWindowButton;
-  vtkKWRadioButton *SelectionWindowButton;
+  vtkKWLabeledFrame *InterfaceSettingsFrame;
   vtkKWCheckButton *Display3DWidgets;
 
   vtkKWCheckButton *ReductionCheck;
@@ -446,6 +444,8 @@ protected:
   vtkKWLabeledFrame* NavigationFrame;
   vtkPVSourcesNavigationWindow* NavigationWindow;
   vtkPVSourcesNavigationWindow* SelectionWindow;
+  vtkKWRadioButton *NavigationWindowButton;
+  vtkKWRadioButton *SelectionWindowButton;
   
   int EventuallyRenderFlag;
   char* RenderPending;
