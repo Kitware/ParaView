@@ -18,7 +18,12 @@ $pvWindow OpenPackage "$DataDir/Data/Package.xml"
 set kw(vtkTemp1) [$Application GetMainWindow]
 set kw(vtkTemp21) [$kw(vtkTemp1) GetMainView]
 set kw(vtkTemp285) [$kw(vtkTemp1) CreatePVSource testConeSource]
+$kw(vtkTemp285) DescriptionEntryCallback
+$kw(vtkTemp285) SetDescription "This is a cone"
 $kw(vtkTemp285) AcceptCallback
+set kw(vtkTemp331) [$kw(vtkTemp285) GetPVWidget {Resolution}]
+$kw(vtkTemp331) SetValue 10
+$kw(vtkTemp285) ResetCallback
 
 $pvWindow SaveSessionFile "vtkParaViewOtherTest.pvs"
 $pvWindow DeleteAllSources
@@ -33,6 +38,13 @@ $pvWindow WarningMessage "This is a warning"
 $pvWindow DisableToolbarButtons
 $pvWindow EnableToolbarButtons
 $pvWindow PrintRecentFiles
+
+$pvWindow OnToggleProperties
+$pvWindow OnToggleProperties
+$pvWindow OnToggleProperties
+$pvWindow OnToggleProperties
+$pvWindow HideProperties
+$pvWindow ShowProperties
 
 $pvWindow CenterEntryOpenCallback
 $pvWindow CenterEntryCloseCallback
@@ -50,6 +62,14 @@ $pvWindow EnableNavigationWindow
 $pvWindow EnableToolbarButton "PVProbeButton"
 $pvWindow DisableToolbarButton "PVProbeButton"
 $pvWindow EnableToolbarButton "PVProbeButton"
+$pvWindow FlySpeedScaleCallback
+
+$pvWindow ChangeInteractorStyle 0
+$pvWindow ChangeInteractorStyle 1
+$pvWindow ChangeInteractorStyle 2
+$pvWindow ChangeInteractorStyle 3
+$pvWindow ChangeInteractorStyle 4
+$pvWindow ChangeInteractorStyle 1
 
 $pvWindow ProcessErrorClick
 $pvWindow DisplayCommandPrompt
@@ -80,6 +100,11 @@ $view CompositeCompressionCallback
 $view StoreCurrentCamera 0
 $view RestoreCurrentCamera 0
 $view Print
+
+$view EditCopy
+$view InteractOn
+$view InteractOff
+$view InteractOn
 
 foreach control { 1 2 } {
     foreach shift { 1 2 } {
