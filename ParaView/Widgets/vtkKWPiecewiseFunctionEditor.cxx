@@ -42,7 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWLabeledLabel.h"
 
 vtkStandardNewMacro(vtkKWPiecewiseFunctionEditor);
-vtkCxxRevisionMacro(vtkKWPiecewiseFunctionEditor, "1.5");
+vtkCxxRevisionMacro(vtkKWPiecewiseFunctionEditor, "1.6");
 
 //----------------------------------------------------------------------------
 vtkKWPiecewiseFunctionEditor::vtkKWPiecewiseFunctionEditor()
@@ -50,6 +50,9 @@ vtkKWPiecewiseFunctionEditor::vtkKWPiecewiseFunctionEditor()
   this->PiecewiseFunction = NULL;
 
   this->WindowLevelMode = 0;
+  this->WindowLevelModeLockEndPointValue = 0;
+  this->Window = 1.0;
+  this->Level = 1.0;
 }
 
 //----------------------------------------------------------------------------
@@ -103,20 +106,38 @@ unsigned long vtkKWPiecewiseFunctionEditor::GetFunctionMTime()
 }
 
 //----------------------------------------------------------------------------
+int vtkKWPiecewiseFunctionEditor::FunctionPointCanBeAdded()
+{
+  return (this->Superclass::FunctionPointCanBeAdded() &&
+          !this->WindowLevelMode);
+}
+
+//----------------------------------------------------------------------------
+int vtkKWPiecewiseFunctionEditor::FunctionPointCanBeRemoved(int id)
+{
+  return (this->Superclass::FunctionPointCanBeRemoved(id) &&
+          !this->WindowLevelMode);
+}
+
+//----------------------------------------------------------------------------
 int vtkKWPiecewiseFunctionEditor::FunctionPointParameterIsLocked(int id)
 {
-  return (this->HasFunction() &&
-          (this->LockEndPoints || this->WindowLevelMode) &&
-          (id == 0 || id == this->GetFunctionSize() - 1));
+  return (this->Superclass::FunctionPointParameterIsLocked(id) ||
+          (this->HasFunction() &&
+           this->WindowLevelMode &&
+           (id == 0 || 
+            (this->GetFunctionSize() && id == this->GetFunctionSize() - 1))));
 }
 
 //----------------------------------------------------------------------------
 int vtkKWPiecewiseFunctionEditor::FunctionPointValueIsLocked(int id)
 {
-  return (this->HasFunction() &&
-          this->WindowLevelMode &&
-          (id == this->GetFunctionSize() - 1 ||
-           this->GetFunctionSize() > 1 && id == this->GetFunctionSize() - 2));
+  return (this->Superclass::FunctionPointValueIsLocked(id) ||
+          (this->HasFunction() &&
+           this->WindowLevelMode && 
+           this->WindowLevelModeLockEndPointValue &&
+           ((this->GetFunctionSize() > 0 && id==this->GetFunctionSize()-1) ||
+            (this->GetFunctionSize() > 1 && id==this->GetFunctionSize()-2))));
 }
 
 //----------------------------------------------------------------------------
@@ -182,7 +203,9 @@ int vtkKWPiecewiseFunctionEditor::GetFunctionPointCanvasCoordinates(
 int vtkKWPiecewiseFunctionEditor::AddFunctionPointAtCanvasCoordinates( 
   int x, int y, int &id)
 {
-  if (!this->IsCreated() || !this->HasFunction() || this->DisableAddAndRemove)
+  if (!this->IsCreated() || 
+      !this->HasFunction() || 
+      !this->FunctionPointCanBeAdded())
     {
     return 0;
     }
@@ -213,7 +236,7 @@ int vtkKWPiecewiseFunctionEditor::AddFunctionPointAtCanvasCoordinates(
 int vtkKWPiecewiseFunctionEditor::AddFunctionPointAtParameter(
   float parameter, int &id)
 {
-  if (!this->IsCreated() || !this->HasFunction() || this->DisableAddAndRemove)
+  if (!this->HasFunction() || !this->FunctionPointCanBeAdded())
     {
     return 0;
     }
@@ -288,13 +311,23 @@ int vtkKWPiecewiseFunctionEditor::MoveFunctionPointToCanvasCoordinates(
     }
 
   // In window-level mode, the first and second point are value-constrained
+  // (so are the last and last - 1 point too)
 
-  if (this->WindowLevelMode && new_id <= 1)
+  int fsize = this->GetFunctionSize();
+  if (this->WindowLevelMode && 
+      (new_id <= 1 || (fsize >= 2 && new_id >= fsize - 2)))
     {
-    float constrained_parameter = this->PiecewiseFunction->GetDataPointer()[ 
-      (new_id == 0 ? 1 : 0) * 2];
+    if (new_id <= 1)
+      {
+      id = (new_id == 0) ? 1 : 0;
+      }
+    else
+      {
+      id = (new_id == fsize - 2) ? fsize - 1 : fsize - 2;
+      }
     this->RedrawCanvasPoint(
-      this->PiecewiseFunction->AddPoint(constrained_parameter, value));
+      this->PiecewiseFunction->AddPoint(
+        this->PiecewiseFunction->GetDataPointer()[id * 2], value));
     }
 
   return 1;
@@ -351,13 +384,23 @@ int vtkKWPiecewiseFunctionEditor::MoveFunctionPointToParameter(
     }
 
   // In window-level mode, the first and second point are value-constrained
+  // (so are the last and last - 1 point too)
 
-  if (this->WindowLevelMode && new_id <= 1)
+  int fsize = this->GetFunctionSize();
+  if (this->WindowLevelMode && 
+      (new_id <= 1 || (fsize >= 2 && new_id >= fsize - 2)))
     {
-    float constrained_parameter = this->PiecewiseFunction->GetDataPointer()[ 
-      (new_id == 0 ? 1 : 0) * 2];
+    if (new_id <= 1)
+      {
+      id = (new_id == 0) ? 1 : 0;
+      }
+    else
+      {
+      id = (new_id == fsize - 2) ? fsize - 1 : fsize - 2;
+      }
     this->RedrawCanvasPoint(
-      this->PiecewiseFunction->AddPoint(constrained_parameter, value));
+      this->PiecewiseFunction->AddPoint(
+        this->PiecewiseFunction->GetDataPointer()[id * 2], value));
     }
 
   return 1;
@@ -368,7 +411,7 @@ int vtkKWPiecewiseFunctionEditor::RemoveFunctionPoint(int id)
 {
   if (!this->IsCreated() || 
       !this->HasFunction() || id < 0 || id >= this->GetFunctionSize() ||
-      !this->FunctionPointIsRemovable(id))
+      !this->FunctionPointCanBeRemoved(id))
     {
     return 0;
     }
@@ -415,6 +458,75 @@ void vtkKWPiecewiseFunctionEditor::UpdateInfoLabelWithFunctionPoint(int id)
 }
 
 //----------------------------------------------------------------------------
+void vtkKWPiecewiseFunctionEditor::InvokeFunctionChangedCommand()
+{
+  this->Superclass::InvokeFunctionChangedCommand();
+
+#if 0
+  float fArg[2];
+  fArg[0] = this->Window;
+  fArg[1] = this->Level;
+  this->InvokeEvent(vtkKWEvent::WindowLevelChangedEvent, fArg);
+#endif
+}
+
+//----------------------------------------------------------------------------
+void vtkKWPiecewiseFunctionEditor::InvokeFunctionChangingCommand()
+{
+  this->Superclass::InvokeFunctionChangingCommand();
+
+#if 0
+  float fArg[2];
+  fArg[0] = this->Window;
+  fArg[1] = this->Level;
+  this->InvokeEvent(vtkKWEvent::WindowLevelChangingEvent, fArg);
+#endif
+}
+
+//----------------------------------------------------------------------------
+void vtkKWPiecewiseFunctionEditor::SetWindowLevelMode(int arg)
+{
+  if (this->WindowLevelMode == arg)
+    {
+    return;
+    }
+
+  this->WindowLevelMode = arg;
+  this->Modified();
+
+  if (this->WindowLevelMode)
+    {
+    this->UpdateWindowLevelPoints();
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWPiecewiseFunctionEditor::SetWindowLevel(float window, float level)
+{
+  if (this->Window == window && this->Level == level)
+    {
+    return;
+    }
+
+  this->Window = window;
+  this->Level = level;
+
+  if (this->WindowLevelMode)
+    {
+    this->UpdateWindowLevelPoints();
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWPiecewiseFunctionEditor::UpdateWindowLevelPoints()
+{
+  if (!this->WindowLevelMode)
+    {
+    return;
+    }
+}
+  
+//----------------------------------------------------------------------------
 void vtkKWPiecewiseFunctionEditor::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
@@ -424,5 +536,8 @@ void vtkKWPiecewiseFunctionEditor::PrintSelf(ostream& os, vtkIndent indent)
 
   os << indent << "WindowLevelMode: "
      << (this->WindowLevelMode ? "On" : "Off") << endl;
+
+  os << indent << "WindowLevelModeLockEndPointValue: "
+     << (this->WindowLevelModeLockEndPointValue ? "On" : "Off") << endl;
 }
 

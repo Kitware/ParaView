@@ -57,13 +57,31 @@ public:
   virtual void SetPiecewiseFunction(vtkPiecewiseFunction*);
 
   // Description:
-  // Set/Get the window/level mode. In that mode
-  // - the end-points are locked (similar to LockEndPoints), 
-  // - the second point constraint the first point value (they move together), 
-  // - the last and last-1 points values are locked (expected to be the same).
-  vtkSetMacro(WindowLevelMode, int);
+  // Set/Get the window/level mode. In that mode:
+  // - the end-points parameter are locked (similar to LockEndPointsParameter)
+  // - no point can be added or removed (similar to DisableAddAndRemove)
+  // - the first and second point have the same value (they move together)
+  // - the last and last-1 point have the same value (they move together) 
+  virtual void SetWindowLevelMode(int);
   vtkBooleanMacro(WindowLevelMode, int);
   vtkGetMacro(WindowLevelMode, int);
+
+  // Description:
+  // Set/Get the window/level lock mode. In that mode, provided that
+  // WindowLevelMode is On:
+  // - the last and last-1 points values are locked (expected to be the same)
+  vtkSetMacro(WindowLevelModeLockEndPointValue, int);
+  vtkBooleanMacro(WindowLevelModeLockEndPointValue, int);
+  vtkGetMacro(WindowLevelModeLockEndPointValue, int);
+
+  // Description:
+  // Set/Get the window/level.
+  virtual void SetWindowLevel(float window, float level);
+
+  // Description:
+  // Set commands.
+  virtual void InvokeFunctionChangedCommand();
+  virtual void InvokeFunctionChangingCommand();
 
 protected:
   vtkKWPiecewiseFunctionEditor();
@@ -72,9 +90,16 @@ protected:
   vtkPiecewiseFunction *PiecewiseFunction;
 
   int WindowLevelMode;
+  int WindowLevelModeLockEndPointValue;
+  float Window;
+  float Level;
+
+  virtual void UpdateWindowLevelPoints();
 
   // Description:
-  // Is point locked ?
+  // Is point locked, protected, removable ?
+  virtual int FunctionPointCanBeAdded();
+  virtual int FunctionPointCanBeRemoved(int id);
   virtual int FunctionPointParameterIsLocked(int id);
   virtual int FunctionPointValueIsLocked(int id);
 
