@@ -419,8 +419,10 @@ protected:
   int PreviousWasSolid;
 
   // Switch between showing the properties for actors and volumes
-  void ShowVolumeAppearance();
-  void ShowActorAppearance();
+  void VolumeRenderModeOn();
+  void VolumeRenderModeOff();
+
+  int VolumeRenderMode;
   
   vtkPVColorMap *PVColorMap;
 

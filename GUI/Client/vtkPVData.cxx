@@ -82,7 +82,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.266");
+vtkCxxRevisionMacro(vtkPVData, "1.267");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -186,6 +186,8 @@ vtkPVData::vtkPVData()
   this->ArraySetByUser = 0;
   
   this->PointLabelCheck = vtkKWCheckButton::New();
+  
+  this->VolumeRenderMode = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -1766,6 +1768,7 @@ void vtkPVData::DrawWireframe()
     this->AddTraceEntry("$kw(%s) DrawWireframe", this->GetTclName());
     }
   this->RepresentationMenu->SetValue(VTK_PV_WIREFRAME_LABEL);
+  this->VolumeRenderModeOff();
   
   // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   // We could move the property into vtkPVData so parts would share one object.
@@ -1777,7 +1780,6 @@ void vtkPVData::DrawWireframe()
     {
     part = this->GetPVSource()->GetPart(idx);
     part->GetPartDisplay()->VolumeRenderModeOff();
-    this->ShowActorAppearance();
 
     if (part->GetPartDisplay()->GetPropertyID().ID != 0)
       {
@@ -1849,13 +1851,13 @@ void vtkPVData::DrawPoints()
     this->AddTraceEntry("$kw(%s) DrawPoints", this->GetTclName());
     }
   this->RepresentationMenu->SetValue(VTK_PV_POINTS_LABEL);
+  this->VolumeRenderModeOff();
   
   num = this->GetPVSource()->GetNumberOfParts();
   for (idx = 0; idx < num; ++idx)
     {
     part = this->GetPVSource()->GetPart(idx);
     part->GetPartDisplay()->VolumeRenderModeOff();
-    this->ShowActorAppearance();
 
     if (part->GetPartDisplay()->GetProperty())
       {
@@ -1927,13 +1929,13 @@ void vtkPVData::DrawVolume()
     this->AddTraceEntry("$kw(%s) DrawVolume", this->GetTclName());
     }
   this->RepresentationMenu->SetValue(VTK_PV_VOLUME_LABEL);
+  this->VolumeRenderModeOn();
   
   num = this->GetPVSource()->GetNumberOfParts();
   for (idx = 0; idx < num; ++idx)
     {
     part = this->GetPVSource()->GetPart(idx);
     part->GetPartDisplay()->VolumeRenderModeOn();
-    this->ShowVolumeAppearance();
     }
   
   if ( this->GetPVRenderView() )
@@ -1956,7 +1958,8 @@ void vtkPVData::DrawSurface()
     this->AddTraceEntry("$kw(%s) DrawSurface", this->GetTclName());
     }
   this->RepresentationMenu->SetValue(VTK_PV_SURFACE_LABEL);
-
+  this->VolumeRenderModeOff();
+  
   // fixme
   // It would be better to loop over part displays from the render module.
 
@@ -1965,7 +1968,6 @@ void vtkPVData::DrawSurface()
     {
     part = this->GetPVSource()->GetPart(idx);
     part->GetPartDisplay()->VolumeRenderModeOff();
-    this->ShowActorAppearance();
 
     if (part->GetPartDisplay()->GetProperty())
       {
@@ -2036,13 +2038,13 @@ void vtkPVData::DrawOutline()
     this->AddTraceEntry("$kw(%s) DrawOutline", this->GetTclName());
     }
   this->RepresentationMenu->SetValue(VTK_PV_OUTLINE_LABEL);
-
+  this->VolumeRenderModeOff();
+  
   num = this->GetPVSource()->GetNumberOfParts();
   for (idx = 0; idx < num; ++idx)
     {
     part = this->GetPVSource()->GetPart(idx);
     part->GetPartDisplay()->VolumeRenderModeOff();
-    this->ShowActorAppearance();
 
     if (part->GetPartDisplay()->GetProperty())
       {
@@ -2095,30 +2097,28 @@ void vtkPVData::DrawOutline()
 //----------------------------------------------------------------------------
 // Change visibility / enabled state of widgets for actor properties
 //
-void vtkPVData::ShowActorAppearance()
+void vtkPVData::VolumeRenderModeOff()
 {
   this->Script("pack forget %s", 
                this->VolumeAppearanceFrame->GetWidgetName() );
-  
+  this->Script("pack forget %s", 
+               this->ColorFrame->GetWidgetName() );
+
   this->Script("pack %s -after %s -fill x -expand t -pady 2", 
                this->ColorFrame->GetWidgetName(),
                this->ViewFrame->GetWidgetName() );
   
-  this->InterpolationMenuLabel->EnabledOn();
-  this->InterpolationMenu->EnabledOn();
-  this->LineWidthLabel->EnabledOn();
-  this->LineWidthThumbWheel->EnabledOn();
-  this->PointSizeLabel->EnabledOn();
-  this->PointSizeThumbWheel->EnabledOn();
-  this->OpacityLabel->EnabledOn();
-  this->OpacityScale->EnabledOn();
+  this->VolumeRenderMode = 0;
+  this->UpdateEnableState();
 }
 
 //----------------------------------------------------------------------------
 // Change visibility / enabled state of widgets for volume properties
 //
-void vtkPVData::ShowVolumeAppearance()
+void vtkPVData::VolumeRenderModeOn()
 {
+  this->Script("pack forget %s", 
+               this->VolumeAppearanceFrame->GetWidgetName() );
   this->Script("pack forget %s", 
                this->ColorFrame->GetWidgetName() );
   
@@ -2126,14 +2126,8 @@ void vtkPVData::ShowVolumeAppearance()
                this->VolumeAppearanceFrame->GetWidgetName(),
                this->ViewFrame->GetWidgetName() );
   
-  this->InterpolationMenuLabel->EnabledOff();
-  this->InterpolationMenu->EnabledOff();
-  this->LineWidthLabel->EnabledOff();
-  this->LineWidthThumbWheel->EnabledOff();
-  this->PointSizeLabel->EnabledOff();
-  this->PointSizeThumbWheel->EnabledOff();
-  this->OpacityLabel->EnabledOff();
-  this->OpacityScale->EnabledOff();
+  this->VolumeRenderMode = 1;
+  this->UpdateEnableState();
 }
 
   
@@ -3534,12 +3528,6 @@ void vtkPVData::UpdateEnableState()
   this->PropagateEnableState(this->EditColorMapButton);
   this->PropagateEnableState(this->RepresentationMenuLabel);
   this->PropagateEnableState(this->RepresentationMenu);
-  this->PropagateEnableState(this->InterpolationMenuLabel);
-  this->PropagateEnableState(this->InterpolationMenu);
-  this->PropagateEnableState(this->PointSizeLabel);
-  this->PropagateEnableState(this->PointSizeThumbWheel);
-  this->PropagateEnableState(this->LineWidthLabel);
-  this->PropagateEnableState(this->LineWidthThumbWheel);
   this->PropagateEnableState(this->VisibilityCheck);
   this->PropagateEnableState(this->ScalarBarCheck);
   this->PropagateEnableState(this->MapScalarsCheck);
@@ -3556,11 +3544,33 @@ void vtkPVData::UpdateEnableState()
     this->PropagateEnableState(this->OrientationScale[cc]);
     this->PropagateEnableState(this->OriginThumbWheel[cc]);
     }
-  this->PropagateEnableState(this->OpacityLabel);
-  this->PropagateEnableState(this->OpacityScale);
   this->PropagateEnableState(this->CubeAxesCheck);
   this->PropagateEnableState(this->ResetCameraButton);
   this->PropagateEnableState(this->PVColorMap);
   this->PropagateEnableState(this->PointLabelCheck);
+  
+  if ( this->VolumeRenderMode )
+    {
+    this->InterpolationMenuLabel->SetEnabled(0);
+    this->InterpolationMenu->SetEnabled(0);
+    this->LineWidthLabel->SetEnabled(0);
+    this->LineWidthThumbWheel->SetEnabled(0);
+    this->PointSizeLabel->SetEnabled(0);
+    this->PointSizeThumbWheel->SetEnabled(0);
+    this->OpacityLabel->SetEnabled(0);
+    this->OpacityScale->SetEnabled(0);
+    }
+  else
+    {
+    this->PropagateEnableState(this->InterpolationMenuLabel);
+    this->PropagateEnableState(this->InterpolationMenu);
+    this->PropagateEnableState(this->PointSizeLabel);
+    this->PropagateEnableState(this->PointSizeThumbWheel);
+    this->PropagateEnableState(this->LineWidthLabel);
+    this->PropagateEnableState(this->LineWidthThumbWheel);
+    this->PropagateEnableState(this->OpacityLabel);
+    this->PropagateEnableState(this->OpacityScale);
+    }
+  
 }
 
