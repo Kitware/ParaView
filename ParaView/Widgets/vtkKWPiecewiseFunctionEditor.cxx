@@ -43,7 +43,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWEvent.h"
 
 vtkStandardNewMacro(vtkKWPiecewiseFunctionEditor);
-vtkCxxRevisionMacro(vtkKWPiecewiseFunctionEditor, "1.9");
+vtkCxxRevisionMacro(vtkKWPiecewiseFunctionEditor, "1.10");
 
 //----------------------------------------------------------------------------
 vtkKWPiecewiseFunctionEditor::vtkKWPiecewiseFunctionEditor()
@@ -84,6 +84,8 @@ void vtkKWPiecewiseFunctionEditor::SetPiecewiseFunction(
     }
 
   this->Modified();
+
+  this->LastRedrawCanvasElementsTime = 0;
 
   this->Update();
 }

@@ -45,7 +45,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkObjectFactory.h"
 
 vtkStandardNewMacro(vtkKWColorTransferFunctionEditor);
-vtkCxxRevisionMacro(vtkKWColorTransferFunctionEditor, "1.9");
+vtkCxxRevisionMacro(vtkKWColorTransferFunctionEditor, "1.10");
 
 #define VTK_KW_CTF_EDITOR_RGB_LABEL "RGB"
 #define VTK_KW_CTF_EDITOR_HSV_LABEL "HSV"
@@ -94,6 +94,8 @@ void vtkKWColorTransferFunctionEditor::SetColorTransferFunction(
     }
 
   this->Modified();
+
+  this->LastRedrawCanvasElementsTime = 0;
 
   this->Update();
 }
