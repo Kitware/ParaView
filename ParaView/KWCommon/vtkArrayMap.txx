@@ -144,7 +144,7 @@ vtkArrayMap<KeyType,DataType>::FindDataItem(KeyType key)
   // different from GetSize which is provided for some containers. GetSize
   // will return how many items the container can currently hold.
 template<class KeyType, class DataType>
-vtkIdType vtkArrayMap<KeyType,DataType>::GetNumberOfItems()
+vtkIdType vtkArrayMap<KeyType,DataType>::GetNumberOfItems() const
 {
   if ( !this->Array )
     {

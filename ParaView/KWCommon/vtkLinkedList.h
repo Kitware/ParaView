@@ -114,13 +114,13 @@ public:
   // Return the number of items currently held in this container. This
   // different from GetSize which is provided for some containers. GetSize
   // will return how many items the container can currently hold.
-  vtkIdType GetNumberOfItems() { return this->NumberOfItems; }
+  vtkIdType GetNumberOfItems() const { return this->NumberOfItems; }
   
   // Description:
   // Returns the number of items the container can currently hold.
   // Since capacity is arbitrary for the linked list, this will 
   // always return the current number of elements.
-  vtkIdType GetSize() { return this->NumberOfItems; }
+  vtkIdType GetSize() const { return this->NumberOfItems; }
 
   // Description:
   // Removes all items from the container.

@@ -117,11 +117,11 @@ public:
   // Return the number of items currently held in this container. This
   // different from GetSize which is provided for some containers. GetSize
   // will return how many items the container can currently hold.
-  vtkIdType GetNumberOfItems() { return this->NumberOfItems; }
+  vtkIdType GetNumberOfItems() const { return this->NumberOfItems; }
   
   // Description:
   // Returns the number of items the container can currently hold.
-  vtkIdType GetSize() { return this->Size; }
+  vtkIdType GetSize() const { return this->Size; }
 
   // Description:
   // Removes all items from the container.
@@ -140,7 +140,7 @@ public:
   void SetResize(int r) { this->Resize = r; }
   void ResizeOn() { this->SetResize(1); }
   void ResizeOff() { this->SetResize(0); }
-  int GetResize() { return this->Resize; }
+  int GetResize() const { return this->Resize; }
 
   // Description:
   // Display the content of the list.
