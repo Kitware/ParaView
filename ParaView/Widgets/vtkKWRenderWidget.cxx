@@ -41,6 +41,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkCornerAnnotation.h"
 #include "vtkKWApplication.h"
 #include "vtkKWEvent.h"
+#include "vtkKWRenderWidgetCommand.h"
 #include "vtkKWWindow.h"
 #include "vtkObjectFactory.h"
 #include "vtkProperty2D.h"
@@ -53,32 +54,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkWin32OpenGLRenderWindow.h"
 #endif
 
-vtkCxxRevisionMacro(vtkKWRenderWidget, "1.59");
-
-//----------------------------------------------------------------------------
-class vtkKWRenderWidgetObserver : public vtkCommand
-{
-public:
-  static vtkKWRenderWidgetObserver *New() 
-    {return new vtkKWRenderWidgetObserver;};
-
-  vtkKWRenderWidgetObserver()
-    {
-      this->KWRenderWidget = 0;
-    }
-
-  virtual void Execute(vtkObject* wdg, unsigned long event,  
-                       void* calldata)
-    {
-      if ( this->KWRenderWidget )
-        {
-        this->KWRenderWidget->ExecuteEvent(wdg, event, calldata);
-        this->AbortFlagOn();
-        }
-    }
-
-  vtkKWRenderWidget* KWRenderWidget;
-};
+vtkCxxRevisionMacro(vtkKWRenderWidget, "1.60");
 
 //----------------------------------------------------------------------------
 vtkKWRenderWidget::vtkKWRenderWidget()
@@ -127,20 +103,20 @@ vtkKWRenderWidget::vtkKWRenderWidget()
 
   this->CollapsingRenders = 0;
   
-  this->Observer = vtkKWRenderWidgetObserver::New();
-  this->Observer->KWRenderWidget = this;
-  
-  this->RenderWindow->AddObserver(vtkCommand::CursorChangedEvent,
-                                  this->Observer);
-
+  this->Observer = vtkKWRenderWidgetCommand::New();
 }
 
 //----------------------------------------------------------------------------
 vtkKWRenderWidget::~vtkKWRenderWidget()
 {
+  this->Observer->Delete();
+  this->Observer = NULL;
+
   this->Renderer->Delete();
   this->RenderWindow->Delete();
+
   this->SetParentWindow(NULL);
+
   this->VTKWidget->Delete();
   
   if (this->CornerAnnotation)
@@ -152,9 +128,6 @@ vtkKWRenderWidget::~vtkKWRenderWidget()
   this->HeaderAnnotation->Delete();
   
   this->SetDistanceUnits(NULL);
-  
-  this->Observer->Delete();
-  this->Observer = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -309,6 +282,10 @@ void vtkKWRenderWidget::SetupBindings()
     }
   
   this->SetupInteractionBindings();
+
+  // Observers
+
+  this->AddObservers();
 }
 
 //----------------------------------------------------------------------------
@@ -331,6 +308,10 @@ void vtkKWRenderWidget::RemoveBindings()
     }
 
   this->RemoveInteractionBindings();
+
+  // Observers
+
+  this->RemoveObservers();
 }
 
 //----------------------------------------------------------------------------
@@ -892,61 +873,87 @@ void vtkKWRenderWidget::SetCollapsingRenders(int r)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWRenderWidget::ExecuteEvent(vtkObject*, unsigned long event,
-                                       void *par)
+void vtkKWRenderWidget::AddObservers()
 {
-  if ( event == vtkCommand::CursorChangedEvent )
+  this->Observer->SetRenderWidget(this);
+
+  if (this->RenderWindow)
     {
-    int val = *(static_cast<int*>(par));
-    const char* image = "left_ptr";
-    switch ( val ) 
-      {
-      case VTK_CURSOR_ARROW:
-        image = "arrow";
-        break;
-      case VTK_CURSOR_SIZENE:
+    this->RenderWindow->AddObserver(
+      vtkCommand::CursorChangedEvent, this->Observer);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWRenderWidget::RemoveObservers()
+{
+  this->Observer->SetRenderWidget(NULL);
+
+  if (this->RenderWindow)
+    {
+    this->RenderWindow->RemoveObserver(this->Observer);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWRenderWidget::ProcessEvent(vtkObject *vtkNotUsed(caller),
+                                     unsigned long event,
+                                     void *calldata)
+{
+  const char *cptr = 0;
+  
+  switch (event)
+    {
+    case vtkCommand::CursorChangedEvent:
+      cptr = "left_ptr";
+      switch (*(static_cast<int*>(calldata))) 
+        {
+        case VTK_CURSOR_ARROW:
+          cptr = "arrow";
+          break;
+        case VTK_CURSOR_SIZENE:
 #ifdef _WIN32
-        image = "size_ne_sw";
+          cptr = "size_ne_sw";
 #else
-        image = "top_right_corner";
+          cptr = "top_right_corner";
 #endif
-        break;
-      case VTK_CURSOR_SIZENW:
+          break;
+        case VTK_CURSOR_SIZENW:
 #ifdef _WIN32
-        image = "size_nw_se";
+          cptr = "size_nw_se";
 #else
-        image = "top_left_corner";
+          cptr = "top_left_corner";
 #endif
-        break;
-      case VTK_CURSOR_SIZESW:
+          break;
+        case VTK_CURSOR_SIZESW:
 #ifdef _WIN32
-        image = "size_ne_sw";
+          cptr = "size_ne_sw";
 #else
-        image = "bottom_left_corner";
+          cptr = "bottom_left_corner";
 #endif
-        break;
-      case VTK_CURSOR_SIZESE:
+          break;
+        case VTK_CURSOR_SIZESE:
 #ifdef _WIN32
-        image = "size_nw_se";
+          cptr = "size_nw_se";
 #else
-        image = "bottom_right_corner";
+          cptr = "bottom_right_corner";
 #endif
-        break;
-      case VTK_CURSOR_SIZENS:
-        image = "sb_v_double_arrow";
-        break;
-      case VTK_CURSOR_SIZEWE:
-        image = "sb_h_double_arrow";
-        break;
-      case VTK_CURSOR_SIZEALL:
-        image = "fleur";
-        break;
-      case VTK_CURSOR_HAND:
-        image = "hand2";
-        break;
-      }
-    this->Script("%s config -cursor %s", 
-                 this->GetParentWindow()->GetWidgetName(), image);
+          break;
+        case VTK_CURSOR_SIZENS:
+          cptr = "sb_v_double_arrow";
+          break;
+        case VTK_CURSOR_SIZEWE:
+          cptr = "sb_h_double_arrow";
+          break;
+        case VTK_CURSOR_SIZEALL:
+          cptr = "fleur";
+          break;
+        case VTK_CURSOR_HAND:
+          cptr = "hand2";
+          break;
+        }
+      this->Script("%s config -cursor %s", 
+                   this->GetParentWindow()->GetWidgetName(), cptr);
     }
 }
 
