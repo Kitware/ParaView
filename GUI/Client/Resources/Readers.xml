@@ -436,7 +436,7 @@
           output="vtkUnstructuredGrid"
           class="vtkPVAdvancedReaderModule"
           module_type="Reader"
-          extensions=".e .ex2 .exo .gen .0 .00 .000 .0000"
+          extensions=".g .e .ex2 .exo .gen .0 .00 .000 .0000"
           file_description="Exodus">
     <StringEntry variable="FilePrefix"
                  extension="*" label="File prefix"
