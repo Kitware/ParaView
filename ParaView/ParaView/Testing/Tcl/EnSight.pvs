@@ -17,15 +17,17 @@ set pv(vtkTemp93) [$pv(vtkTemp1) GetPVSource GlyphSources Cone0]
 set pv(vtkTemp97) [$pv(vtkTemp1) GetPVSource GlyphSources Sphere0]
 
 $pv(vtkTemp1) ChangeInteractorStyle 1
-set ensight [$pv(vtkTemp1) InitializeReadCustom "ensight" "$DataDir/Data/elements.case"]
-$ensight AddPointVariable pointScalars
-$ensight AddPointVariable pointVectors
-$ensight AddPointVariable pointTensors
-$ensight AddCellVariable cellScalars
-$ensight AddCellVariable cellVectors
-$ensight AddCellVariable cellTensors
-$pv(vtkTemp1) ReadFileInformation  $ensight "$DataDir/Data/elements.case" 
-$pv(vtkTemp1) FinalizeRead $ensight "$DataDir/Data/elements.case" 
+
+set pv(vtkTemp574) [$pv(vtkTemp1) InitializeReadCustom "ensight" "$DataDir/Data/elements.case"]
+$pv(vtkTemp1) ReadFileInformation $pv(vtkTemp574) "$DataDir/Data/elements.case"
+$pv(vtkTemp1) FinalizeRead $pv(vtkTemp574) "$DataDir/Data/elements.case"
+set pv(vtkTemp585) [$pv(vtkTemp574) GetPVWidget PointArrays]
+$pv(vtkTemp585) SetArrayStatus {pointCScalars} 0
+$pv(vtkTemp585) SetArrayStatus {pointCVectors} 0
+set pv(vtkTemp589) [$pv(vtkTemp574) GetPVWidget CellArrays]
+$pv(vtkTemp589) SetArrayStatus {cellCScalars} 0
+$pv(vtkTemp589) SetArrayStatus {cellCVectors} 0
+$pv(vtkTemp574) AcceptCallback
 
 $pv(vtkTemp1) ResetCameraCallback
 
