@@ -43,7 +43,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWEvent.h"
 
 vtkStandardNewMacro(vtkKWPiecewiseFunctionEditor);
-vtkCxxRevisionMacro(vtkKWPiecewiseFunctionEditor, "1.8");
+vtkCxxRevisionMacro(vtkKWPiecewiseFunctionEditor, "1.9");
 
 //----------------------------------------------------------------------------
 vtkKWPiecewiseFunctionEditor::vtkKWPiecewiseFunctionEditor()
@@ -716,5 +716,8 @@ void vtkKWPiecewiseFunctionEditor::PrintSelf(ostream& os, vtkIndent indent)
 
   os << indent << "WindowLevelModeLockEndPointValue: "
      << (this->WindowLevelModeLockEndPointValue ? "On" : "Off") << endl;
+
+  os << indent << "Window: " << this->Window << endl;
+  os << indent << "Level: " << this->Level << endl;
 }
 
