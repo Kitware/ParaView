@@ -48,7 +48,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVGenericRenderWindowInteractor);
-vtkCxxRevisionMacro(vtkPVGenericRenderWindowInteractor, "1.10");
+vtkCxxRevisionMacro(vtkPVGenericRenderWindowInteractor, "1.11");
 
 //----------------------------------------------------------------------------
 vtkPVGenericRenderWindowInteractor::vtkPVGenericRenderWindowInteractor()
@@ -93,15 +93,10 @@ void vtkPVGenericRenderWindowInteractor::Render()
     { // The case for interactors on the satellite processes.
     return;
     }
-  
-  if (this->RenderWindow->GetDesiredUpdateRate() == this->StillUpdateRate)
-    {
-    this->PVRenderView->EventuallyRender();
-    }
-  else
-    {
-    this->PVRenderView->Render();
-    }
+
+  // This should fix the problem of the plane widget render 
+  // updating the pipeline too early, but what will it break.
+  this->PVRenderView->EventuallyRender();
 }
 
 // Special methods for forwarding events to satellite processes.

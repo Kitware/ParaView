@@ -133,7 +133,10 @@ public:
   enum Tags {
     RENDER_RMI_TAG=12721,
     WIN_INFO_TAG=22134,
-    REN_INFO_TAG=22135
+    REN_INFO_TAG=22135,
+    GATHER_Z_RMI_TAG=987987,
+    SERVER_Z_TAG=88771,
+    CLIENT_Z_TAG=88772
   };
 //ETX
 
@@ -142,6 +145,12 @@ public:
   vtkSetMacro(UseCompositing, int);
   vtkGetMacro(UseCompositing, int);
   vtkBooleanMacro(UseCompositing, int);
+
+  // Description:
+  // Get the z buffer value at a pixel.  GatherZBufferValue is
+  // an internal method.
+  float GetZBufferValue(int x, int y);
+  void GatherZBufferValueRMI(int x, int y);
 
 protected:
   vtkClientCompositeManager();

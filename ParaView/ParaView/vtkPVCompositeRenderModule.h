@@ -106,6 +106,10 @@ public:
   int MakeCollectionDecision();
   int MakeLODCollectionDecision();
 
+  // Description:
+  // For picking the center of rotation.
+  virtual float GetZBufferValue(int x, int y);
+
 protected:
   vtkPVCompositeRenderModule();
   ~vtkPVCompositeRenderModule();

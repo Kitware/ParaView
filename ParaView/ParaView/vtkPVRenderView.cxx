@@ -112,7 +112,7 @@ static unsigned char image_properties[] =
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.259");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.260");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -162,9 +162,6 @@ vtkPVRenderView::vtkPVRenderView()
     }    
 
   this->CommandFunction = vtkPVRenderViewCommand;
-    
-  this->RenderWindow->SetDesiredUpdateRate(1.0);  
-
   this->SplitFrame = vtkKWSplitFrame::New();
 
   this->EventuallyRenderFlag = 0;

@@ -211,7 +211,7 @@ void vtkPVSendDataObject(void* arg, void*, int, int)
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVClientServerModule);
-vtkCxxRevisionMacro(vtkPVClientServerModule, "1.39");
+vtkCxxRevisionMacro(vtkPVClientServerModule, "1.40");
 
 int vtkPVClientServerModuleCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -922,7 +922,6 @@ void vtkPVClientServerModule::GatherInformationInternal(char* infoClassName,
   tmp1->Delete();
   tmp1 = NULL;
 }    
-
 
 //----------------------------------------------------------------------------
 void vtkPVClientServerModule::PrintSelf(ostream& os, vtkIndent indent)

@@ -55,7 +55,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCompositeRenderModule);
-vtkCxxRevisionMacro(vtkPVCompositeRenderModule, "1.2");
+vtkCxxRevisionMacro(vtkPVCompositeRenderModule, "1.3");
 
 
 
@@ -611,6 +611,37 @@ int vtkPVCompositeRenderModule::MakeLODCollectionDecision()
     }
 
   return this->LODCollectionDecision;
+}
+
+
+//----------------------------------------------------------------------------
+float vtkPVCompositeRenderModule::GetZBufferValue(int x, int y)
+{
+  vtkPVApplication *pvApp = this->GetPVApplication();
+
+  if (this->LocalRender)
+    {
+    return this->Superclass::GetZBufferValue(x, y);
+    }
+
+  // Only MPI has a pointer to a composite.
+  if (this->Composite)
+    {
+    return this->Composite->GetZ(x, y);
+    }
+
+  // If client-server...
+  if (pvApp->GetClientMode())
+    {
+    float z;
+    this->PVApplication->Script("%s GetZBufferValue %d %d",
+                                this->CompositeTclName, x, y);
+    z = this->PVApplication->GetFloatResult(this->PVApplication);
+    return z;
+    }
+
+  vtkErrorMacro("Unknown RenderModule mode.");
+  return 0;
 }
 
 

@@ -76,7 +76,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderModule);
-vtkCxxRevisionMacro(vtkPVRenderModule, "1.12");
+vtkCxxRevisionMacro(vtkPVRenderModule, "1.13");
 
 //int vtkPVRenderModuleCommand(ClientData cd, Tcl_Interp *interp,
 //                             int argc, char *argv[]);
@@ -384,9 +384,6 @@ void vtkPVRenderModule::InteractiveRender()
 {
   this->UpdateAllPVData();
 
-  //this->RenderWindow->SetDesiredUpdateRate(this->InteractiveUpdateRate);
-  this->RenderWindow->SetDesiredUpdateRate(5.0);
-
   vtkTimerLog::MarkStartEvent("Interactive Render");
   this->RenderWindow->Render();
   vtkTimerLog::MarkEndEvent("Interactive Render");
@@ -402,9 +399,6 @@ void vtkPVRenderModule::StillRender()
   // which cal ResetCameraClippingRange on the Renderer.
   // We could convert them to call a method on the module directly ...
   this->Renderer->ResetCameraClippingRange();
-
-  this->RenderWindow->SetDesiredUpdateRate(0.002);
-  // this->GetPVWindow()->GetInteractor()->GetStillUpdateRate());
 
   this->GetPVApplication()->SetGlobalLODFlag(0);
   vtkTimerLog::MarkStartEvent("Still Render");

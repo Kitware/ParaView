@@ -42,6 +42,7 @@
 #include "vtkTimerLog.h"
 // Until we trigger LOD from AllocatedRenderTime ...
 #include "vtkPVApplication.h"
+#include "vtkByteSwap.h"
 
 
 #ifdef _WIN32
@@ -51,7 +52,7 @@
 #endif
 
 
-vtkCxxRevisionMacro(vtkClientCompositeManager, "1.14");
+vtkCxxRevisionMacro(vtkClientCompositeManager, "1.15");
 vtkStandardNewMacro(vtkClientCompositeManager);
 
 vtkCxxSetObjectMacro(vtkClientCompositeManager,Compositer,vtkCompositer);
@@ -188,6 +189,116 @@ vtkClientCompositeManager::~vtkClientCompositeManager()
     this->BaseArray->Delete();
     }
 }
+
+
+//----------------------------------------------------------------------------
+// Called only on the client.
+float vtkClientCompositeManager::GetZBufferValue(int x, int y)
+{
+  float z;
+  int pArg[3];
+
+  if (this->UseCompositing == 0)
+    {
+    // This could cause a problem between setting this ivar and rendering.
+    // We could always composite, and always consider client z.
+    float *pz;
+    pz = this->RenderWindow->GetZbufferData(x, y, x, y);
+    z = *pz;
+    delete [] pz;
+    return z;
+    }
+  
+  // This first int is to check for byte swapping.
+  pArg[0] = 1;
+  pArg[1] = x;
+  pArg[2] = y;
+  this->ClientController->TriggerRMI(1, (void*)pArg, sizeof(int)*3, 
+                                vtkClientCompositeManager::GATHER_Z_RMI_TAG);
+  this->ClientController->Receive(&z, 1, 1, vtkClientCompositeManager::CLIENT_Z_TAG);
+  return z;
+}
+
+//----------------------------------------------------------------------------
+void vtkClientCompositeManagerGatherZBufferValueRMI(void *local, void *pArg, 
+                                                    int pLength, int)
+{
+  vtkClientCompositeManager* self = (vtkClientCompositeManager*)local;
+  int *p;
+  int x, y;
+
+  if (pLength != sizeof(int)*3)
+    {
+    vtkGenericWarningMacro("Integer sizes differ.");
+    }
+
+  p = (int*)pArg;
+  if (p[0] != 1)
+    { // Need to swap
+    vtkByteSwap::SwapVoidRange(pArg, 3, sizeof(int));
+    if (p[0] != 1)
+      { // Swapping did not work.
+      vtkGenericWarningMacro("Swapping failed.");
+      }
+    }
+  x = p[1];
+  y = p[2];
+  
+  self->GatherZBufferValueRMI(x, y);
+}
+
+//----------------------------------------------------------------------------
+void vtkClientCompositeManager::GatherZBufferValueRMI(int x, int y)
+{
+  float z, otherZ;
+  int pArg[3];
+
+  // Get the z value.
+  int *size = this->RenderWindow->GetSize();
+  if (x < 0 || x >= size[0] || y < 0 || y >= size[1])
+    {
+    vtkErrorMacro("Point not contained in window.");
+    z = 0;
+    }
+  else
+    {
+    float *tmp;
+    tmp = this->RenderWindow->GetZbufferData(x, y, x, y);
+    z = *tmp;
+    delete [] tmp;
+    }
+
+  int myId = this->CompositeController->GetLocalProcessId();
+  if (myId == 0)
+    {
+    int numProcs = this->CompositeController->GetNumberOfProcesses();
+    int idx;
+    pArg[0] = 1;
+    pArg[1] = x;
+    pArg[2] = y;
+    for (idx = 1; idx < numProcs; ++idx)
+      {
+      this->CompositeController->TriggerRMI(1, (void*)pArg, sizeof(int)*3, 
+                          vtkClientCompositeManager::GATHER_Z_RMI_TAG);
+      }
+    for (idx = 1; idx < numProcs; ++idx)
+      {
+      this->CompositeController->Receive(&otherZ, 1, idx, vtkClientCompositeManager::SERVER_Z_TAG);
+      if (otherZ < z)
+        {
+        z = otherZ;
+        }
+      }
+    // Send final result to the client.
+    this->ClientController->Send(&z, 1, 1, vtkClientCompositeManager::CLIENT_Z_TAG);
+    }
+  else
+    {
+    // Send z to the root server node..
+    this->CompositeController->Send(&z, 1, 1, vtkClientCompositeManager::SERVER_Z_TAG);
+    }
+}
+
 
 
 //=======================  Client ========================
@@ -1360,11 +1471,17 @@ void vtkClientCompositeManager::InitializeRMIs()
       }
     this->ClientController->AddRMI(vtkClientCompositeManagerRenderRMI, (void*)this, 
                                    vtkClientCompositeManager::RENDER_RMI_TAG); 
+    this->ClientController->AddRMI(vtkClientCompositeManagerGatherZBufferValueRMI, 
+                                   (void*)this, 
+                                   vtkClientCompositeManager::GATHER_Z_RMI_TAG); 
     }
   else
     { // Other satellite processes wait for RMIs for root.
     this->CompositeController->AddRMI(vtkClientCompositeManagerRenderRMI, (void*)this, 
-                                   vtkClientCompositeManager::RENDER_RMI_TAG); 
+                                      vtkClientCompositeManager::RENDER_RMI_TAG); 
+    this->CompositeController->AddRMI(vtkClientCompositeManagerGatherZBufferValueRMI, 
+                                      (void*)this, 
+                                      vtkClientCompositeManager::GATHER_Z_RMI_TAG); 
     }
 }
 
