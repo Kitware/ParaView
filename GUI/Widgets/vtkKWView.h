@@ -299,8 +299,8 @@ class VTK_EXPORT vtkKWView : public vtkKWWidget
 
   // Description:
   // Set the background color
-  virtual void SetBackgroundColor(double r, double g, double b);
-  virtual void GetBackgroundColor(double *r, double *g, double *b);
+  virtual void SetRendererBackgroundColor(double r, double g, double b);
+  virtual void GetRendererBackgroundColor(double *r, double *g, double *b);
   
   // Description:
   // Set the name to be used in the menu for the view properties

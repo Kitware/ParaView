@@ -36,7 +36,7 @@
 #endif
 
 vtkStandardNewMacro(vtkKWRenderWidget);
-vtkCxxRevisionMacro(vtkKWRenderWidget, "1.78");
+vtkCxxRevisionMacro(vtkKWRenderWidget, "1.79");
 
 //----------------------------------------------------------------------------
 vtkKWRenderWidget::vtkKWRenderWidget()
@@ -900,12 +900,10 @@ void vtkKWRenderWidget::RemoveAllProps()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWRenderWidget::SetBackgroundColor(double r, double g, double b)
+void vtkKWRenderWidget::SetRendererBackgroundColor(double r, double g, double b)
 {
-  this->Superclass::SetBackgroundColor(r, g, b);
-
   double color[3];
-  this->GetBackgroundColor(color, color + 1, color + 2);
+  this->GetRendererBackgroundColor(color, color + 1, color + 2);
   if (color[0] == r && color[1] == g && color[2] == b)
     {
     return;
@@ -932,7 +930,7 @@ void vtkKWRenderWidget::SetBackgroundColor(double r, double g, double b)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWRenderWidget::GetBackgroundColor(double *r, double *g, double *b)
+void vtkKWRenderWidget::GetRendererBackgroundColor(double *r, double *g, double *b)
 {
   vtkRendererCollection *renderers = this->RenderWindow->GetRenderers();
   if (renderers)
