@@ -42,7 +42,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCalculatorWidget);
-vtkCxxRevisionMacro(vtkPVCalculatorWidget, "1.14");
+vtkCxxRevisionMacro(vtkPVCalculatorWidget, "1.15");
 
 int vtkPVCalculatorWidgetCommand(ClientData cd, Tcl_Interp *interp,
                                 int argc, char *argv[]);
@@ -288,11 +288,11 @@ void vtkPVCalculatorWidget::Create(vtkKWApplication *app)
   this->ButtonIHAT->SetCommand(this, "UpdateFunction iHat");
   this->ButtonJHAT->SetParent(this->CalculatorFrame->GetFrame());
   this->ButtonJHAT->Create(pvApp, "");
-  this->ButtonJHAT->SetLabel("jhat");
+  this->ButtonJHAT->SetLabel("jHat");
   this->ButtonJHAT->SetCommand(this, "UpdateFunction jHat");
   this->ButtonKHAT->SetParent(this->CalculatorFrame->GetFrame());
   this->ButtonKHAT->Create(pvApp, "");
-  this->ButtonKHAT->SetLabel("khat");
+  this->ButtonKHAT->SetLabel("kHat");
   this->ButtonKHAT->SetCommand(this, "UpdateFunction kHat");
   this->Script("grid %s %s %s %s %s %s -sticky ew",
                this->ButtonClear->GetWidgetName(),
