@@ -40,16 +40,19 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 #include "vtkPVPlaneWidget.h"
-#include "vtkPVSource.h"
-#include "vtkKWView.h"
-#include "vtkObjectFactory.h"
+
+#include "vtkCamera.h"
+#include "vtkKWCompositeCollection.h"
 #include "vtkKWLabel.h"
 #include "vtkKWPushButton.h"
+#include "vtkKWView.h"
+#include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
 #include "vtkPVData.h"
+#include "vtkPVSource.h"
 #include "vtkPVVectorEntry.h"
-#include "vtkKWCompositeCollection.h"
 #include "vtkPVXMLElement.h"
+#include "vtkRenderer.h"
 
 int vtkPVPlaneWidgetCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);

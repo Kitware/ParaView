@@ -40,19 +40,26 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#include "vtkToolkits.h"
-#include "vtkPVTreeComposite.h"
-#include "vtkPolyData.h"
-#include "vtkPolyDataMapper.h"
 #include "vtkPVRenderView.h"
-#include "vtkPVApplication.h"
+
+#include "vtkCamera.h"
+#include "vtkDummyRenderWindow.h"
+#include "vtkDummyRenderer.h"
+#include "vtkKWCheckButton.h"
+#include "vtkKWCornerAnnotation.h"
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
+#include "vtkPVApplication.h"
 #include "vtkPVData.h"
 #include "vtkPVNavigationWindow.h"
-#include "vtkPVWindow.h"
+#include "vtkPVRenderView.h"
 #include "vtkPVSourceCollection.h"
-#include "vtkKWCheckButton.h"
+#include "vtkPVTreeComposite.h"
+#include "vtkPVWindow.h"
+#include "vtkPolyData.h"
+#include "vtkPolyDataMapper.h"
+#include "vtkTimerLog.h"
+#include "vtkToolkits.h"
 
 #ifdef _WIN32
 #include "vtkWin32OpenGLRenderWindow.h"
@@ -61,11 +68,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkOpenGLRenderer.h"
 #endif
 
-#include "vtkDummyRenderWindow.h"
-#include "vtkDummyRenderer.h"
-
-#include "vtkTimerLog.h"
-#include "vtkKWCornerAnnotation.h"
 
 
 //----------------------------------------------------------------------------

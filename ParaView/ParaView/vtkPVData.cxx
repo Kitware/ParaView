@@ -57,11 +57,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWNotebook.h"
 #include "vtkKWWidget.h"
 #include "vtkPVRenderView.h"
+#include "vtkPolyDataMapper.h"
+#include "vtkProperty.h"
 #include "vtkScalarBarActor.h"
 #include "vtkTexture.h"
 #include "vtkTimerLog.h"
 #include "vtkTreeComposite.h"
-#include "vtkProperty.h"
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
 		     int argc, char *argv[]);

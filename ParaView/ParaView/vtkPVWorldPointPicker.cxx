@@ -40,12 +40,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 #include "vtkPVWorldPointPicker.h"
-#include "vtkObjectFactory.h"
+
+#include "vtkCamera.h"
 #include "vtkCommand.h"
-
-
-
-
+#include "vtkObjectFactory.h"
+#include "vtkRenderer.h"
 
 //----------------------------------------------------------------------------
 vtkPVWorldPointPicker* vtkPVWorldPointPicker::New()

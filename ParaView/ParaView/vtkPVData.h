@@ -64,16 +64,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWView.h"
 #include "vtkDataSet.h"
 
-class vtkPVSource;
+class vtkCubeAxesActor2D;
+class vtkKWBoundsDisplay;
+class vtkKWCheckButton;
+class vtkKWFrame;
 class vtkPVApplication;
 class vtkPVRenderView;
-class vtkKWCheckButton;
-class vtkKWBoundsDisplay;
+class vtkPVSource;
+class vtkProp;
+class vtkProperty;
 class vtkScalarBarActor;
-class vtkCubeAxesActor2D;
-class vtkKWFrame;
-
-
 
 class VTK_EXPORT vtkPVData : public vtkKWObject
 {

@@ -40,17 +40,21 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 #include "vtkPVProbe.h"
-#include "vtkPVApplication.h"
-#include "vtkStringList.h"
-#include "vtkObjectFactory.h"
-#include "vtkTclUtil.h"
-#include "vtkKWToolbar.h"
-#include "vtkPVRenderView.h"
-#include "vtkPVWindow.h"
-#include "vtkPVInputMenu.h"
+
+#include "vtkArrayMap.txx"
+#include "vtkIdTypeArray.h"
 #include "vtkKWCompositeCollection.h"
 #include "vtkKWFrame.h"
-#include "vtkArrayMap.txx"
+#include "vtkKWToolbar.h"
+#include "vtkObjectFactory.h"
+#include "vtkPVApplication.h"
+#include "vtkPVInputMenu.h"
+#include "vtkPVRenderView.h"
+#include "vtkPVWindow.h"
+#include "vtkPolyData.h"
+#include "vtkSource.h"
+#include "vtkStringList.h"
+#include "vtkTclUtil.h"
 
 int vtkPVProbeCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
