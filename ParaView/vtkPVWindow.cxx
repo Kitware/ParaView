@@ -78,6 +78,8 @@ vtkPVWindow::vtkPVWindow()
   this->ResetCameraButton = vtkKWPushButton::New();
   this->SourceListButton = vtkKWPushButton::New();
   this->CameraStyleButton = vtkKWPushButton::New();
+  this->CurrentSourceButton = vtkKWPushButton::New();
+  this->CurrentActorButton = vtkKWPushButton::New();
   
   this->Sources = vtkKWCompositeCollection::New();
   
@@ -103,6 +105,10 @@ vtkPVWindow::~vtkPVWindow()
   this->SourceListButton = NULL;
   this->CameraStyleButton->Delete();
   this->CameraStyleButton = NULL;
+  this->CurrentSourceButton->Delete();
+  this->CurrentSourceButton = NULL;
+  this->CurrentActorButton->Delete();
+  this->CurrentActorButton = NULL;
   
   this->SourceList->Delete();
   this->SourceList = NULL;
@@ -192,13 +198,30 @@ void vtkPVWindow::Create(vtkKWApplication *app, char *args)
   this->SourceListButton->SetParent(this->Toolbar);
   this->SourceListButton->Create(app, "-text SourceList");
   this->SourceListButton->SetCommand(this, "ShowWindowProperties");
-  this->CameraStyleButton->SetParent(this->Toolbar);
-  this->CameraStyleButton->Create(app, "");
-  this->CameraStyleButton->SetLabel("Camera");
-  this->CameraStyleButton->SetCommand(this, "UseCameraStyle");
-  this->Script("pack %s %s -side left -pady 0 -fill none -expand no",
-	       this->SourceListButton->GetWidgetName(),
-	       this->CameraStyleButton->GetWidgetName());
+  this->Script("pack %s -side left -pady 0 -fill none -expand no",
+	       this->SourceListButton->GetWidgetName());
+
+  this->CurrentSourceButton->SetParent(this->Toolbar);
+  this->CurrentSourceButton->Create(app, "-text Source");
+  this->CurrentSourceButton->SetCommand(this, "ShowCurrentSourceProperties");
+  this->Script("pack %s -side left -pady 0 -fill none -expand no",
+	       this->CurrentSourceButton->GetWidgetName());
+
+  this->CurrentActorButton->SetParent(this->Toolbar);
+  this->CurrentActorButton->Create(app, "-text Actor");
+  this->CurrentActorButton->SetCommand(this, "ShowCurrentActorProperties");
+  this->Script("pack %s -side left -pady 0 -fill none -expand no",
+	       this->CurrentActorButton->GetWidgetName());
+  
+  // This button doesn't do anything useful right now.  It was put in originally
+  // so we could switch between interactor styles.
+//  this->CameraStyleButton->SetParent(this->Toolbar);
+//  this->CameraStyleButton->Create(app, "");
+//  this->CameraStyleButton->SetLabel("Camera");
+//  this->CameraStyleButton->SetCommand(this, "UseCameraStyle");
+//  this->Script("pack %s %s -side left -pady 0 -fill none -expand no",
+//	       this->SourceListButton->GetWidgetName(),
+//	       this->CameraStyleButton->GetWidgetName());
   this->Script("pack %s -side left -pady 0 -fill none -expand no",
                this->Toolbar->GetWidgetName());
   
@@ -457,6 +480,19 @@ void vtkPVWindow::ShowWindowProperties()
                this->Notebook->GetParent()->GetWidgetName());  
   this->Script("pack %s -pady 2 -padx 2 -fill both -expand yes -anchor n",
                this->Notebook->GetWidgetName());
+}
+
+//----------------------------------------------------------------------------
+void vtkPVWindow::ShowCurrentSourceProperties()
+{
+  this->GetCurrentPVSource()->ShowProperties();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVWindow::ShowCurrentActorProperties()
+{
+  this->GetCurrentPVSource()->GetPVOutput(0)->GetActorComposite()->
+    ShowProperties();
 }
 
 //----------------------------------------------------------------------------

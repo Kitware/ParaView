@@ -80,7 +80,7 @@ public:
   // This call also sets the input to the mapper.
   // SetVTKData should be called after the application has been set, but before
   // PVData is used as input a filter or output of a source.
-  // We could change the object so that it creates its own data (durring initialization), 
+  // We could change the object so that it creates its own data (during initialization), 
   // but then we would have to tell it what type of data to create.
   void SetVTKData(vtkDataSet *data, const char *name);
   vtkGetObjectMacro(VTKData,vtkDataSet);  

@@ -78,6 +78,10 @@ vtkPVActorComposite::vtkPVActorComposite()
   
   this->DataNotebookButton = vtkKWPushButton::New();
   this->AmbientScale = vtkKWScale::New();
+
+  this->ArrayNameMenu = vtkKWOptionMenu::New();
+  this->ArrayComponentEntry = vtkKWLabeledEntry::New();
+  this->AcceptButton = vtkKWPushButton::New();
   
   this->PVData = NULL;
   this->DataSetInput = NULL;
@@ -164,6 +168,13 @@ vtkPVActorComposite::~vtkPVActorComposite()
   this->AmbientScale->Delete();
   this->AmbientScale = NULL;
   
+  this->ArrayNameMenu->Delete();
+  this->ArrayNameMenu = NULL;
+  this->ArrayComponentEntry->Delete();
+  this->ArrayComponentEntry = NULL;
+  this->AcceptButton->Delete();
+  this->AcceptButton = NULL;
+  
   this->SetInput(NULL);
   
   //if (this->TextureFilter != NULL)
@@ -203,6 +214,8 @@ void vtkPVActorComposite::CreateProperties()
   char *yLabel;
   char *zLabel;
   float bounds[6];
+  int i, numPointFDArrays = 0, numCellFDArrays = 0;
+  vtkFieldData *pointFieldData, *cellFieldData;
   
   cellsLabel = new char[350];
   xLabel = new char[350];
@@ -241,10 +254,10 @@ void vtkPVActorComposite::CreateProperties()
   this->ZRangeLabel->Create(this->Application, "");
   sprintf(zLabel, "z range: %f to %f", bounds[4], bounds[5]);
   this->ZRangeLabel->SetLabel(zLabel);
-  this->DataNotebookButton->SetParent(this->Properties);
-  this->DataNotebookButton->Create(this->Application, "");
-  this->DataNotebookButton->SetLabel("Return to Data Notebook");
-  this->DataNotebookButton->SetCommand(this, "ShowDataNotebook");
+//  this->DataNotebookButton->SetParent(this->Properties);
+//  this->DataNotebookButton->Create(this->Application, "");
+//  this->DataNotebookButton->SetLabel("Return to Data Notebook");
+//  this->DataNotebookButton->SetCommand(this, "ShowDataNotebook");
   this->AmbientScale->SetParent(this->Properties);
   this->AmbientScale->Create(this->Application, "-showvalue 1");
   this->AmbientScale->DisplayLabel("Ambient Light");
@@ -252,19 +265,75 @@ void vtkPVActorComposite::CreateProperties()
   this->AmbientScale->SetResolution(0.1);
   this->AmbientScale->SetValue(this->GetActor()->GetProperty()->GetAmbient());
   this->AmbientScale->SetCommand(this, "AmbientChanged");
-  this->Script("pack %s %s %s %s %s %s %s",
+  
+  this->Script("pack %s %s %s %s %s %s",
 	       this->NumCellsLabel->GetWidgetName(),
 	       this->BoundsLabel->GetWidgetName(),
 	       this->XRangeLabel->GetWidgetName(),
 	       this->YRangeLabel->GetWidgetName(),
 	       this->ZRangeLabel->GetWidgetName(),
-	       this->AmbientScale->GetWidgetName(),
-	       this->DataNotebookButton->GetWidgetName());
+	       this->AmbientScale->GetWidgetName());
+
+  pointFieldData = 
+    this->GetPVData()->GetVTKData()->GetPointData()->GetFieldData();
+  cellFieldData =
+    this->GetPVData()->GetVTKData()->GetCellData()->GetFieldData();
+  if (pointFieldData)
+    {
+    numPointFDArrays += pointFieldData->GetNumberOfArrays();
+    }
+  if (cellFieldData)
+    {
+    numCellFDArrays += cellFieldData->GetNumberOfArrays();
+    }
+  if (numPointFDArrays + numCellFDArrays > 0)
+    {
+    this->ArrayNameMenu->SetParent(this->Properties);
+    this->ArrayNameMenu->Create(this->Application, "");
+    
+    for (i = 0; i < numPointFDArrays; i++)
+      {
+      this->ArrayNameMenu->AddEntryWithCommand(pointFieldData->GetArrayName(i),
+					       this, "SetMapperToUsePointFieldData");
+      }
+    
+    for (i = 0; i < numCellFDArrays; i++)
+      {
+      this->ArrayNameMenu->AddEntryWithCommand(cellFieldData->GetArrayName(i),
+					       this, "SetMapperToUseCellFieldData");
+      }
+    
+    this->ArrayComponentEntry->SetParent(this->Properties);
+    this->ArrayComponentEntry->Create(this->Application);
+    this->ArrayComponentEntry->SetLabel("Component Number:");
+    
+    this->AcceptButton->SetParent(this->Properties);
+    this->AcceptButton->Create(this->Application, "");
+    this->AcceptButton->SetLabel("Accept");
+    this->AcceptButton->SetCommand(this, "SelectArrayComponent");
+    
+    this->Script("pack %s %s %s",
+		 this->ArrayNameMenu->GetWidgetName(),
+		 this->ArrayComponentEntry->GetWidgetName(),
+		 this->AcceptButton->GetWidgetName());
+    }
+    
+//	       this->DataNotebookButton->GetWidgetName());
   
   delete [] cellsLabel;
   delete [] xLabel;
   delete [] yLabel;
   delete [] zLabel;
+}
+
+void vtkPVActorComposite::SetMapperToUsePointFieldData()
+{
+  this->Mapper->SetScalarModeToUsePointFieldData();
+}
+
+void vtkPVActorComposite::SetMapperToUseCellFieldData()
+{
+  this->Mapper->SetScalarModeToUseCellFieldData();
 }
 
 //----------------------------------------------------------------------------
@@ -290,6 +359,19 @@ void vtkPVActorComposite::SetAmbient(float ambient)
 void vtkPVActorComposite::ShowDataNotebook()
 {
   this->GetPVData()->GetPVSource()->ShowProperties();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVActorComposite::SelectArrayComponent()
+{
+  char *arrayName;
+  int arrayComponent;
+  
+  arrayName = this->ArrayNameMenu->GetValue();
+  arrayComponent = this->ArrayComponentEntry->GetValueAsInt();
+  
+  this->Mapper->ColorByArrayComponent(arrayName, arrayComponent);
+  this->Mapper->SetScalarRange(this->Mapper->GetColors()->GetRange());
 }
 
 //----------------------------------------------------------------------------

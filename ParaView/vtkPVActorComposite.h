@@ -39,6 +39,8 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkKWLabel.h"
 #include "vtkKWPushButton.h"
 #include "vtkKWScale.h"
+#include "vtkKWLabeledEntry.h"
+#include "vtkKWOptionMenu.h"
 #include "vtkPVApplication.h"
 #include "vtkDataSetMapper.h"
 
@@ -112,6 +114,13 @@ public:
   void ShowDataNotebook();
 
   // Description:
+  // Callbacks to set the mapper correctly to color by a given component of a field
+  // data array.
+  void SelectArrayComponent();
+  void SetMapperToUsePointFieldData();
+  void SetMapperToUseCellFieldData();
+  
+  // Description:
   // to change the ambient component of the light
   void AmbientChanged();
   void SetAmbient(float ambient);
@@ -154,6 +163,10 @@ protected:
   
   vtkKWPushButton *DataNotebookButton;
   vtkKWScale *AmbientScale;
+  
+  vtkKWOptionMenu *ArrayNameMenu;
+  vtkKWLabeledEntry *ArrayComponentEntry;
+  vtkKWPushButton *AcceptButton;
   
   // the data object that owns this composite
   vtkPVData *PVData;
