@@ -52,7 +52,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWWidget );
-vtkCxxRevisionMacro(vtkKWWidget, "1.62");
+vtkCxxRevisionMacro(vtkKWWidget, "1.63");
 
 int vtkKWWidgetCommand(ClientData cd, Tcl_Interp *interp,
                        int argc, char *argv[]);
@@ -346,7 +346,7 @@ void vtkKWWidget::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkKWWidget ";
-  this->ExtractRevision(os,"$Revision: 1.62 $");
+  this->ExtractRevision(os,"$Revision: 1.63 $");
 }
 
 //------------------------------------------------------------------------------
@@ -880,10 +880,48 @@ int vtkKWWidget::AddDragAndDropTarget(vtkKWWidget *widget)
 }
 
 // ---------------------------------------------------------------------------
+int vtkKWWidget::RemoveDragAndDropTarget(vtkKWWidget *widget)
+{
+  vtkKWWidget::DragAndDropTarget *found = this->GetDragAndDropTarget(widget);
+  if (!found)
+    {
+    return 0;
+    }
+  
+  vtkIdType idx = 0;
+  if (this->DragAndDropTargets->FindItem(found, idx) != VTK_OK)
+    {
+    vtkErrorMacro("Error while searching for a Drag & Drop target.");
+    return 0;
+    }
+
+  if (this->DragAndDropTargets->RemoveItem(idx) != VTK_OK)
+    {
+    vtkErrorMacro("Error while removing a Drag & Drop target.");
+    return 0;
+    }
+
+  delete found;
+
+  return 1;
+}
+
+// ---------------------------------------------------------------------------
 int vtkKWWidget::HasDragAndDropTarget(vtkKWWidget *widget)
 {
   vtkKWWidget::DragAndDropTarget *found = this->GetDragAndDropTarget(widget);
   return found ? 1 : 0;
+}
+
+// ---------------------------------------------------------------------------
+int vtkKWWidget::GetNumberOfDragAndDropTargets()
+{
+  if (!this->DragAndDropTargets)
+    {
+    return 0;
+    }
+
+  return this->DragAndDropTargets->GetNumberOfItems();
 }
 
 // ---------------------------------------------------------------------------
@@ -961,7 +999,9 @@ int vtkKWWidget::SetDragAndDropEndCommand(vtkKWWidget *target,
 // ---------------------------------------------------------------------------
 void vtkKWWidget::DragAndDropStartCallback(int x, int y)
 {
-  if (!this->EnableDragAndDrop)
+  if (!this->EnableDragAndDrop || 
+      !this->DragAndDropTargets || 
+      !this->GetNumberOfDragAndDropTargets())
     {
     return;
     }
@@ -987,62 +1027,60 @@ void vtkKWWidget::DragAndDropStartCallback(int x, int y)
 
   // Call each target's StartCommand
 
-  if (this->DragAndDropTargets)
-    {
-    vtkKWWidget::DragAndDropTarget *target = NULL;
-    vtkKWWidget::DragAndDropTargetsContainerIterator *it = 
-      this->DragAndDropTargets->NewIterator();
+  vtkKWWidget::DragAndDropTarget *target = NULL;
+  vtkKWWidget::DragAndDropTargetsContainerIterator *it = 
+    this->DragAndDropTargets->NewIterator();
 
-    it->InitTraversal();
-    while (!it->IsDoneWithTraversal())
+  it->InitTraversal();
+  while (!it->IsDoneWithTraversal())
+    {
+    if (it->GetData(target) == VTK_OK && target->StartCommand)
       {
-      if (it->GetData(target) == VTK_OK && target->StartCommand)
-        {
-        this->Script("eval %s %d %d %s %s", 
-                     target->StartCommand, x, y, 
-                     this->GetTclName(), this->DragAndDropAnchor->GetTclName());
-        }
-      it->GoToNextItem();
+      this->Script("eval %s %d %d %s %s", 
+                   target->StartCommand, x, y, 
+                   this->GetTclName(), this->DragAndDropAnchor->GetTclName());
       }
-    it->Delete();
+    it->GoToNextItem();
     }
+  it->Delete();
 }
 
 // ---------------------------------------------------------------------------
 void vtkKWWidget::DragAndDropPerformCallback(int x, int y)
 {
-  if (!this->EnableDragAndDrop)
+  if (!this->EnableDragAndDrop || 
+      !this->DragAndDropTargets || 
+      !this->GetNumberOfDragAndDropTargets())
     {
     return;
     }
 
   // Call each target's PerformCommand
 
-  if (this->DragAndDropTargets)
+  vtkKWWidget::DragAndDropTarget *target = NULL;
+  vtkKWWidget::DragAndDropTargetsContainerIterator *it = 
+    this->DragAndDropTargets->NewIterator();
+  
+  it->InitTraversal();
+  while (!it->IsDoneWithTraversal())
     {
-    vtkKWWidget::DragAndDropTarget *target = NULL;
-    vtkKWWidget::DragAndDropTargetsContainerIterator *it = 
-      this->DragAndDropTargets->NewIterator();
-
-    it->InitTraversal();
-    while (!it->IsDoneWithTraversal())
+    if (it->GetData(target) == VTK_OK && target->PerformCommand)
       {
-      if (it->GetData(target) == VTK_OK && target->PerformCommand)
-        {
-        this->Script("eval %s %d %d %s %s", 
-                     target->PerformCommand, x, y, 
-                     this->GetTclName(), this->DragAndDropAnchor->GetTclName());
-        }
-      it->GoToNextItem();
+      this->Script("eval %s %d %d %s %s", 
+                   target->PerformCommand, x, y, 
+                   this->GetTclName(), this->DragAndDropAnchor->GetTclName());
       }
-    it->Delete();
+    it->GoToNextItem();
     }
+  it->Delete();
 }
 
 // ---------------------------------------------------------------------------
 void vtkKWWidget::DragAndDropEndCallback(int x, int y)
 {
-  if (!this->EnableDragAndDrop)
+  if (!this->EnableDragAndDrop || 
+      !this->DragAndDropTargets || 
+      !this->GetNumberOfDragAndDropTargets())
     {
     return;
     }
@@ -1067,33 +1105,29 @@ void vtkKWWidget::DragAndDropEndCallback(int x, int y)
 
   // Find if the cursor is in a target, and call its EndCommand
 
-  if (this->DragAndDropTargets)
+  vtkKWWidget::DragAndDropTarget *target = NULL;
+  vtkKWWidget::DragAndDropTargetsContainerIterator *it = 
+    this->DragAndDropTargets->NewIterator();
+  
+  it->InitTraversal();
+  while (!it->IsDoneWithTraversal())
     {
-    vtkKWWidget::DragAndDropTarget *target = NULL;
-    vtkKWWidget::DragAndDropTargetsContainerIterator *it = 
-      this->DragAndDropTargets->NewIterator();
-
-    it->InitTraversal();
-    while (!it->IsDoneWithTraversal())
+    if (it->GetData(target) == VTK_OK && target->EndCommand && 
+        target->Target && 
+        target->Target->IsCreated() &&
+        vtkKWTkUtilities::ContainsCoordinates(
+          target->Target->GetApplication()->GetMainInterp(),
+          target->Target->GetWidgetName(),
+          x, y))
       {
-      if (it->GetData(target) == VTK_OK && target->EndCommand && 
-          target->Target && 
-          target->Target->IsCreated() &&
-          vtkKWTkUtilities::ContainsCoordinates(
-            target->Target->GetApplication()->GetMainInterp(),
-            target->Target->GetWidgetName(),
-            x, y))
-        {
-          
-        this->Script("eval %s %d %d %s %s %s", 
-                     target->EndCommand, x, y, 
-                     this->GetTclName(), this->DragAndDropAnchor->GetTclName(),
-                     target->Target->GetTclName());
-        }
-      it->GoToNextItem();
+      this->Script("eval %s %d %d %s %s %s", 
+                   target->EndCommand, x, y, 
+                   this->GetTclName(), this->DragAndDropAnchor->GetTclName(),
+                   target->Target->GetTclName());
       }
-    it->Delete();
+    it->GoToNextItem();
     }
+  it->Delete();
 }
 
 //----------------------------------------------------------------------------
