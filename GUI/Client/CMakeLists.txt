@@ -18,6 +18,7 @@ SET(ParaViewSharedNotTclWrapped_SRCS
   vtkMPIMToNSocketConnection.cxx
   vtkPVExtentTranslator.cxx
   vtkPVClientServerModule.cxx
+  vtkPVGenericRenderWindowInteractor.cxx
   )
 
 SET( ParaViewServer_SRCS
@@ -57,7 +58,6 @@ IF(XDMF_FOUND)
 ENDIF(XDMF_FOUND)
 
 SET( ParaViewClientNotWrapped_SRCS
-  vtkPVGenericRenderWindowInteractor.cxx
   vtkPVAxesActor.cxx
   vtkPVAxesWidget.cxx
   vtkPVInteractorStyle.cxx
@@ -324,7 +324,7 @@ INCLUDE_DIRECTORIES(
 # Create ClientServer wrappers for ParaView classes.
 SET(VTK_BINARY_DIR "${PVClient_BINARY_DIR}")
 INCLUDE(${VTK_SOURCE_DIR}/CMake/vtkExportKit.cmake)
-VTK_EXPORT_KIT("ParaViewServer" "PVSERVER" "${ParaViewServer_SRCS};${ParaViewShared_SRCS};${ParaView_SOURCE_DIR}/GUI/Widgets/vtkKWApplication.cxx;${ParaView_SOURCE_DIR}/GUI/Widgets/vtkKWObject.cxx;${ParaViewServerNotTclWrapped_SRCS}")
+VTK_EXPORT_KIT("ParaViewServer" "PVSERVER" "${ParaViewServer_SRCS};${ParaViewShared_SRCS};${ParaView_SOURCE_DIR}/GUI/Widgets/vtkKWApplication.cxx;${ParaView_SOURCE_DIR}/GUI/Widgets/vtkKWObject.cxx;${ParaViewSharedNotTclWrapped_SRCS}")
 
 SET(KIT_WRAP_DEPS PVFilters)
 SET(VTK_KITS_DIR "${ParaView_BINARY_DIR}/GUI/Client/Utilities")
