@@ -50,7 +50,7 @@
 #include "vtkPVRenderModule.h"
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVColorMap);
-vtkCxxRevisionMacro(vtkPVColorMap, "1.79");
+vtkCxxRevisionMacro(vtkPVColorMap, "1.80");
 
 int vtkPVColorMapCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -1826,12 +1826,13 @@ void vtkPVColorMap::SaveInBatchScript(ofstream *file)
 //----------------------------------------------------------------------------
 void vtkPVColorMap::UpdateScalarBarTitle()
 {
-  vtkPVProcessModule *pm = this->GetPVApplication()->GetProcessModule();
-
-  if (this->ScalarBar == NULL || this->ScalarBarTitle == NULL)
+  if (this->ScalarBar == NULL || this->ScalarBarTitle == NULL ||
+      this->GetPVApplication() == NULL)
     {
     return;
     }
+
+  vtkPVProcessModule *pm = this->GetPVApplication()->GetProcessModule();
 
   if (this->VectorMode == vtkPVColorMap::MAGNITUDE)
     {
