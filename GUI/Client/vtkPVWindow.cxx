@@ -130,7 +130,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.612");
+vtkCxxRevisionMacro(vtkPVWindow, "1.613");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -924,7 +924,7 @@ void vtkPVWindow::AddToolbarButton(const char* buttonName,
   button->Create(this->GetPVApplication(), opts.str());
   // Add the button to the toolbar configuration menu.
   vtkKWMenu* menu = this->ToolbarMenuButton->GetMenu();
-  const char* var = menu->CreateCheckButtonVariable(this, buttonName);
+  char* var = menu->CreateCheckButtonVariable(this, buttonName);
   ostrstream checkCommand;
   checkCommand << "ToolbarMenuCheckCallback " << buttonName << ends;
   menu->AddCheckButton(buttonName,var,this, checkCommand.str(),
@@ -941,6 +941,7 @@ void vtkPVWindow::AddToolbarButton(const char* buttonName,
   int index = menu->GetNumberOfItems()-1;
   menu->ConfigureItem(index, opts.str());  
   checkCommand.rdbuf()->freeze(0);
+  delete[] var;
 
   // Clean up.
   opts.rdbuf()->freeze(0);
