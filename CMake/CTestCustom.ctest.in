@@ -6,8 +6,22 @@ SET(CTEST_CUSTOM_MEMCHECK_IGNORE
   Example-vtkMy
 
   # These tests do not actually run any VTK code
-  HeaderTesting-PVGUI-Client
+  HeaderTesting-Common          
+  HeaderTesting-Filtering       
+  HeaderTesting-Graphics        
+  HeaderTesting-Imaging         
+  HeaderTesting-IO              
+  HeaderTesting-Rendering       
+  HeaderTesting-Hybrid          
+  HeaderTesting-Parallel        
+  HeaderTesting-Patented        
+  HeaderTesting-PVServer-Common 
   HeaderTesting-PVServer-Filters
+  HeaderTesting-PVServer-ServerManager
+  HeaderTesting-PVServer-StreamInterpreter
+  HeaderTesting-KWWidgets       
+  HeaderTesting-PVGUI-Client    
+  
   PrintSelf-KWWidgets	
   PrintSelf-PVGUI-Client
   PrintSelf-PVServer-Common
