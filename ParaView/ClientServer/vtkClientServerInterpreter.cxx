@@ -25,7 +25,7 @@
 #include <sys/stat.h>
 
 vtkStandardNewMacro(vtkClientServerInterpreter);
-vtkCxxRevisionMacro(vtkClientServerInterpreter, "1.5");
+vtkCxxRevisionMacro(vtkClientServerInterpreter, "1.6");
 
 //----------------------------------------------------------------------------
 class vtkClientServerInterpreterInternals
@@ -346,7 +346,11 @@ vtkClientServerInterpreter
 {
   // Create a message with all known id_value arguments expanded.
   vtkClientServerStream msg;
-  this->ExpandMessage(css, midx, 0, msg);
+  if(!this->ExpandMessage(css, midx, 0, msg))
+    {
+    // ExpandMessage left an error in the LastResultMessage for us.
+    return 0;
+    }
 
   // Now that id_values have been expanded, we do not need the last
   // result.  Reset the result to empty before processing the message.
@@ -474,7 +478,11 @@ vtkClientServerInterpreter
   // Create a message with all known id_value arguments expanded
   // except for the first argument.
   vtkClientServerStream msg;
-  this->ExpandMessage(css, midx, 1, msg);
+  if(!this->ExpandMessage(css, midx, 1, msg))
+    {
+    // ExpandMessage left an error in the LastResultMessage for us.
+    return 0;
+    }
 
   // Now that id_values have been expanded, we do not need the last
   // result.  Reset the result to empty before processing the message.
@@ -543,6 +551,14 @@ int vtkClientServerInterpreter::ExpandMessage(const vtkClientServerStream& in,
   out.Reset();
   if(inIndex < 0 || inIndex >= in.GetNumberOfMessages())
     {
+    ostrstream error;
+    error << "ExpandMessage called to expand message index " << inIndex
+          << " in a stream with " << in.GetNumberOfMessages()
+          << " messages." << ends;
+    this->LastResultMessage->Reset();
+    *this->LastResultMessage
+      << vtkClientServerStream::Error << error.str()
+      << vtkClientServerStream::End;
     return 0;
     }
 
