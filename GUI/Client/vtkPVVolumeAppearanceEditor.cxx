@@ -36,7 +36,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVVolumeAppearanceEditor);
-vtkCxxRevisionMacro(vtkPVVolumeAppearanceEditor, "1.23");
+vtkCxxRevisionMacro(vtkPVVolumeAppearanceEditor, "1.24");
 
 int vtkPVVolumeAppearanceEditorCommand(ClientData cd, Tcl_Interp *interp,
                                        int argc, char *argv[]);
@@ -456,54 +456,65 @@ void vtkPVVolumeAppearanceEditor::AddScalarOpacityPoint(double scalar, double op
 //----------------------------------------------------------------------------
 void vtkPVVolumeAppearanceEditor::SaveState(ofstream *file)
 {
-  *file << "set kw(" << this->GetTclName() << ") [$kw("
-    << this->PVRenderView->GetPVWindow()->GetTclName()
-    << ") GetVolumeAppearanceEditor]" << endl;
-
-  *file << "[$kw(" << this->PVSource->GetTclName() << ") GetPVOutput] "
-    << "VolumeRenderPointField {" << this->ArrayInfo->GetName() << "} "
-    << this->ArrayInfo->GetNumberOfComponents() << endl;
-  *file << "[$kw(" << this->PVSource->GetTclName() << ") GetPVOutput] "
-    << "ShowVolumeAppearanceEditor" << endl;
-
-  // Scalar Opacity (vtkPiecewiseFunction)
-  vtkKWPiecewiseFunctionEditor *kwfunc =
-    this->VolumePropertyWidget->GetScalarOpacityFunctionEditor();
-  vtkPiecewiseFunction *func = kwfunc->GetPiecewiseFunction();
-  double *points = func->GetDataPointer();
-
-  // Unit distance:
-  vtkKWScale* scale =
-    this->VolumePropertyWidget->GetScalarOpacityUnitDistanceScale();
-  double unitDistance = scale->GetValue();
-
-  // Color Ramp (vtkColorTransferFunction)
-  vtkKWColorTransferFunctionEditor *kwcolor =
-    this->VolumePropertyWidget->GetScalarColorFunctionEditor();
-  vtkColorTransferFunction* color = kwcolor->GetColorTransferFunction();
-  double *rgb = color->GetDataPointer();
-
-  // 1. ScalarOpacity
-  for(int j=0; j<func->GetSize(); j++)
+  vtkPVApplication *pvApp = NULL;
+ 
+  if ( this->GetApplication() )
     {
-    // Copy points one by one from the vtkPiecewiseFunction:
-    *file << "$kw(" << this->GetTclName() << ") "
-      << "AddScalarOpacityPoint " << points[2*j] << " " << points[2*j+1]
-      << endl;
+    pvApp =
+      vtkPVApplication::SafeDownCast(this->GetApplication());
     }
 
-  //2. ScalarOpacityUnitDistance
-  *file << "$kw(" << this->GetTclName() << ") "
-    << "SetScalarOpacityUnitDistance " << unitDistance
-    << endl;
-
-  //3. Color Ramp, similar to ScalarOpacity
-  for(int k=0; k<color->GetSize(); k++)
+  if ( this->PVSource && this->ArrayInfo && pvApp )
     {
+    *file << "set kw(" << this->GetTclName() << ") [$kw("
+      << this->PVRenderView->GetPVWindow()->GetTclName()
+      << ") GetVolumeAppearanceEditor]" << endl;
+
+    *file << "[$kw(" << this->PVSource->GetTclName() << ") GetPVOutput] "
+      << "VolumeRenderPointField {" << this->ArrayInfo->GetName() << "} "
+      << this->ArrayInfo->GetNumberOfComponents() << endl;
+    *file << "[$kw(" << this->PVSource->GetTclName() << ") GetPVOutput] "
+      << "ShowVolumeAppearanceEditor" << endl;
+
+    // Scalar Opacity (vtkPiecewiseFunction)
+    vtkKWPiecewiseFunctionEditor *kwfunc =
+      this->VolumePropertyWidget->GetScalarOpacityFunctionEditor();
+    vtkPiecewiseFunction *func = kwfunc->GetPiecewiseFunction();
+    double *points = func->GetDataPointer();
+
+    // Unit distance:
+    vtkKWScale* scale =
+      this->VolumePropertyWidget->GetScalarOpacityUnitDistanceScale();
+    double unitDistance = scale->GetValue();
+
+    // Color Ramp (vtkColorTransferFunction)
+    vtkKWColorTransferFunctionEditor *kwcolor =
+      this->VolumePropertyWidget->GetScalarColorFunctionEditor();
+    vtkColorTransferFunction* color = kwcolor->GetColorTransferFunction();
+    double *rgb = color->GetDataPointer();
+
+    // 1. ScalarOpacity
+    for(int j=0; j<func->GetSize(); j++)
+      {
+      // Copy points one by one from the vtkPiecewiseFunction:
+      *file << "$kw(" << this->GetTclName() << ") "
+        << "AddScalarOpacityPoint " << points[2*j] << " " << points[2*j+1]
+        << endl;
+      }
+
+    //2. ScalarOpacityUnitDistance
     *file << "$kw(" << this->GetTclName() << ") "
-      << "AddColorPoint " << rgb[4*k] << " " << rgb[4*k+1]
-      << " " << rgb[4*k+2] << " " << rgb[4*k+3]
+      << "SetScalarOpacityUnitDistance " << unitDistance
       << endl;
+
+    //3. Color Ramp, similar to ScalarOpacity
+    for(int k=0; k<color->GetSize(); k++)
+      {
+      *file << "$kw(" << this->GetTclName() << ") "
+        << "AddColorPoint " << rgb[4*k] << " " << rgb[4*k+1]
+        << " " << rgb[4*k+2] << " " << rgb[4*k+3]
+        << endl;
+      }
     }
 }
 
