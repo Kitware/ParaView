@@ -37,10 +37,11 @@
 #include "vtkPVColorMap.h"
 #include "vtkFieldDataToAttributeDataFilter.h"
 #include "vtkClientServerStream.h"
+#include "vtkPVDataInformation.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLODPartDisplay);
-vtkCxxRevisionMacro(vtkPVLODPartDisplay, "1.14.2.1");
+vtkCxxRevisionMacro(vtkPVLODPartDisplay, "1.14.2.2");
 
 
 //----------------------------------------------------------------------------
