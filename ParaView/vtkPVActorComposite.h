@@ -183,8 +183,16 @@ public:
   void GetColorRange(float range[2]);
   
   // Description:
+  // Sets the color range of all the mappers (all procs) and updates
+  // the user interface as well.
+  void SetColorRange(float min, float max);
+
+  // Description:
   // Callback for the ResetColorRange button.
   void ResetColorRange();
+
+  // Set the color range from the entry widgets.
+  void ColorRangeEntryCallback();
   
   void SetScalarBarVisibility(int val);  
   void ScalarBarCheckCallback();
@@ -302,11 +310,18 @@ protected:
   // If the data changes, we need to change to.
   vtkTimeStamp UpdateTime;
   
+  vtkKWWidget *ScalarBarCheckFrame;
   vtkKWCheckButton *ScalarBarCheck;
   vtkKWCheckButton *ScalarBarOrientationCheck;
   char* ScalarBarTclName;
   vtkSetStringMacro(ScalarBarTclName);
   
+  // Stuff for setting the range of the color map.
+  vtkKWWidget *ColorRangeFrame;
+  vtkKWPushButton *ColorRangeResetButton;
+  vtkKWLabeledEntry *ColorRangeMinEntry;
+  vtkKWLabeledEntry *ColorRangeMaxEntry;
+
   vtkKWCheckButton *CubeAxesCheck;
   char* CubeAxesTclName;
   vtkSetStringMacro(CubeAxesTclName);

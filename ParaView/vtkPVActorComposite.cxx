@@ -123,6 +123,12 @@ vtkPVActorComposite::vtkPVActorComposite()
   this->ColorMapMenu = vtkKWOptionMenu::New();
   
   this->ColorButton = vtkKWChangeColorButton::New();
+
+   // Stuff for setting the range of the color map.
+  this->ColorRangeFrame = vtkKWWidget::New();
+  this->ColorRangeResetButton = vtkKWPushButton::New();
+  this->ColorRangeMinEntry = vtkKWLabeledEntry::New();
+  this->ColorRangeMaxEntry = vtkKWLabeledEntry::New();
   
   this->RepresentationMenuLabel = vtkKWLabel::New();
   this->RepresentationMenu = vtkKWOptionMenu::New();
@@ -130,6 +136,7 @@ vtkPVActorComposite::vtkPVActorComposite()
   this->InterpolationMenuLabel = vtkKWLabel::New();
   this->InterpolationMenu = vtkKWOptionMenu::New();
   
+  this->ScalarBarCheckFrame = vtkKWWidget::New();
   this->ScalarBarCheck = vtkKWCheckButton::New();
   this->ScalarBarOrientationCheck = vtkKWCheckButton::New();
   this->CubeAxesCheck = vtkKWCheckButton::New();
@@ -290,6 +297,16 @@ vtkPVActorComposite::~vtkPVActorComposite()
   this->ColorButton->Delete();
   this->ColorButton = NULL;
   
+   // Stuff for setting the range of the color map.
+  this->ColorRangeFrame->Delete();
+  this->ColorRangeFrame = NULL;
+  this->ColorRangeResetButton->Delete();
+  this->ColorRangeResetButton = NULL;
+  this->ColorRangeMinEntry->Delete();
+  this->ColorRangeMinEntry = NULL;
+  this->ColorRangeMaxEntry->Delete();
+  this->ColorRangeMaxEntry = NULL;
+
   this->RepresentationMenuLabel->Delete();
   this->RepresentationMenuLabel = NULL;  
   this->RepresentationMenu->Delete();
@@ -347,9 +364,10 @@ vtkPVActorComposite::~vtkPVActorComposite()
     this->SetLODDeciTclName(NULL);
     }
   
+  this->ScalarBarCheckFrame->Delete();
+  this->ScalarBarCheckFrame = NULL;
   this->ScalarBarCheck->Delete();
-  this->ScalarBarCheck = NULL;
-  
+  this->ScalarBarCheck = NULL;  
   this->ScalarBarOrientationCheck->Delete();
   this->ScalarBarOrientationCheck = NULL;
   
@@ -389,7 +407,6 @@ void vtkPVActorComposite::CreateProperties()
   this->Properties->Create(this->Application, "frame","");
   this->Script("pack %s -pady 2 -fill x -expand yes",
                this->Properties->GetWidgetName());
- 
   this->ScalarBarFrame->SetParent(this->Properties);
   this->ScalarBarFrame->Create(this->Application);
   this->ScalarBarFrame->SetLabel("Scalar Bar");
@@ -436,11 +453,11 @@ void vtkPVActorComposite::CreateProperties()
   this->ColorButton->SetText("Actor Color");
   this->ColorButton->SetCommand(this, "ChangeActorColor");
   
-  this->ColorMapMenuLabel->SetParent(this->ScalarBarFrame->GetFrame());
+  this->ColorMapMenuLabel->SetParent(this->ScalarBarCheckFrame);
   this->ColorMapMenuLabel->Create(this->Application, "");
   this->ColorMapMenuLabel->SetLabel("Color map:");
   
-  this->ColorMapMenu->SetParent(this->ScalarBarFrame->GetFrame());
+  this->ColorMapMenu->SetParent(this->ScalarBarCheckFrame);
   this->ColorMapMenu->Create(this->Application, "");
   this->ColorMapMenu->AddEntryWithCommand("Red to Blue", this,
                                           "ChangeColorMap");
@@ -450,6 +467,28 @@ void vtkPVActorComposite::CreateProperties()
                                           "ChangeColorMap");
   this->ColorMapMenu->SetValue("Red to Blue");
   
+  this->ColorRangeFrame->SetParent(this->ScalarBarFrame->GetFrame());
+  this->ColorRangeFrame->Create(this->Application, "frame", "");
+  this->ColorRangeResetButton->SetParent(this->ColorRangeFrame);
+  this->ColorRangeResetButton->Create(this->Application, "-text {Reset Range}");
+  this->ColorRangeResetButton->SetCommand(this, "ResetColorRange");
+  this->ColorRangeMinEntry->SetParent(this->ColorRangeFrame);
+  this->ColorRangeMinEntry->Create(this->Application);
+  this->ColorRangeMinEntry->SetLabel("Min:");
+  //this->ColorRangeMinEntry->GetEntry()->SetWidth(5);
+  this->Script("bind %s <KeyPress-Return> {%s RangeEntryCallback}",
+               this->GetTclName(), this->ColorRangeMinEntry->GetWidgetName());
+  this->Script("bind %s <FocusOut> {%s RangeEntryCallback}",
+               this->GetTclName(), this->ColorRangeMinEntry->GetWidgetName());
+  this->ColorRangeMaxEntry->SetParent(this->ColorRangeFrame);
+  this->ColorRangeMaxEntry->Create(this->Application);
+  this->ColorRangeMaxEntry->SetLabel("Max:");
+  //this->ColorRangeMaxEntry->GetEntry()->SetWidth(5);
+  this->Script("bind %s <KeyPress-Return> {%s RangeEntryCallback}",
+               this->GetTclName(), this->ColorRangeMaxEntry->GetWidgetName());
+  this->Script("bind %s <FocusOut> {%s RangeEntryCallback}",
+               this->GetTclName(), this->ColorRangeMaxEntry->GetWidgetName());
+
   this->RepresentationMenuLabel->SetParent(this->DisplayStyleFrame->GetFrame());
   this->RepresentationMenuLabel->Create(this->Application, "");
   this->RepresentationMenuLabel->SetLabel("Representation:");
@@ -474,13 +513,15 @@ void vtkPVActorComposite::CreateProperties()
 					       "SetInterpolationToGouraud");
   this->InterpolationMenu->SetValue("Gouraud");
   
-  this->ScalarBarCheck->SetParent(this->ScalarBarFrame->GetFrame());
+  this->ScalarBarCheckFrame->SetParent(this->ScalarBarFrame->GetFrame());
+  this->ScalarBarCheckFrame->Create(this->Application, "frame", "");
+  this->ScalarBarCheck->SetParent(this->ScalarBarCheckFrame);
   this->ScalarBarCheck->Create(this->Application, "-text Visibility");
   this->Application->Script("%s configure -command {%s ScalarBarCheckCallback}",
                             this->ScalarBarCheck->GetWidgetName(),
                             this->GetTclName());
 
-  this->ScalarBarOrientationCheck->SetParent(this->ScalarBarFrame->GetFrame());
+  this->ScalarBarOrientationCheck->SetParent(this->ScalarBarCheckFrame);
   this->ScalarBarOrientationCheck->Create(this->Application, "-text Vertical");
   this->ScalarBarOrientationCheck->SetState(1);
   this->ScalarBarOrientationCheck->SetCommand(this, "ScalarBarOrientationCallback");
@@ -503,7 +544,7 @@ void vtkPVActorComposite::CreateProperties()
   
   this->Script("pack %s", this->StatsFrame->GetWidgetName());
   this->Script("pack %s %s -side left",
-	       this->NumCellsLabel->GetWidgetName(),
+               this->NumCellsLabel->GetWidgetName(),
                this->NumPointsLabel->GetWidgetName());
   this->Script("pack %s",
 	       this->BoundsLabel->GetWidgetName());
@@ -514,16 +555,24 @@ void vtkPVActorComposite::CreateProperties()
   this->Script("pack %s",
 	       this->ZRangeLabel->GetWidgetName());
   this->Script("pack %s -fill x", this->ColorFrame->GetWidgetName());
-  this->Script("pack %s %s %s -side left",
-	       this->ColorMenuLabel->GetWidgetName(),
-               this->ColorMenu->GetWidgetName(),
-               this->ColorButton->GetWidgetName());
+  this->Script("pack %s %s -side left",
+               this->ColorMenuLabel->GetWidgetName(),
+               this->ColorMenu->GetWidgetName());
   this->Script("pack %s -fill x", this->ScalarBarFrame->GetWidgetName());
+  this->Script("pack %s %s -side top -expand t -fill x",
+	       this->ScalarBarCheckFrame->GetWidgetName(),
+	       this->ColorRangeFrame->GetWidgetName());
   this->Script("pack %s %s %s %s -side left",
                this->ScalarBarCheck->GetWidgetName(),
                this->ScalarBarOrientationCheck->GetWidgetName(),
                this->ColorMapMenuLabel->GetWidgetName(),
                this->ColorMapMenu->GetWidgetName());
+  this->Script("pack %s -side left -expand f",
+	       this->ColorRangeResetButton->GetWidgetName());
+  this->Script("pack %s %s -side left -expand t -fill x",
+	       this->ColorRangeMinEntry->GetWidgetName(),
+	       this->ColorRangeMaxEntry->GetWidgetName());
+
   this->Script("pack %s -fill x", this->DisplayStyleFrame->GetWidgetName());
   this->Script("pack %s %s %s %s -side left",
                this->RepresentationMenuLabel->GetWidgetName(),
@@ -685,6 +734,7 @@ void vtkPVActorComposite::UpdateProperties()
     }
 }
 
+//----------------------------------------------------------------------------
 void vtkPVActorComposite::ChangeActorColor(float r, float g, float b)
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
@@ -699,6 +749,7 @@ void vtkPVActorComposite::ChangeActorColor(float r, float g, float b)
   this->GetPVRenderView()->EventuallyRender();
 }
 
+//----------------------------------------------------------------------------
 void vtkPVActorComposite::ChangeColorMap()
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
@@ -735,6 +786,21 @@ void vtkPVActorComposite::ChangeColorMap()
   this->GetPVRenderView()->EventuallyRender();
 }
 
+//----------------------------------------------------------------------------
+void vtkPVActorComposite::SetColorRange(float min, float max)
+{
+  this->GetPVApplication()->BroadcastScript("%s SetScalarRange %f %f",
+					    this->MapperTclName,
+					    min, max);
+  this->GetPVApplication()->BroadcastScript("%s SetScalarRange %f %f",
+					    this->LODMapperTclName,
+					    min, max);
+
+  this->ColorRangeMinEntry->SetValue(min);
+  this->ColorRangeMaxEntry->SetValue(max);
+}
+
+//----------------------------------------------------------------------------
 void vtkPVActorComposite::ResetColorRange()
 {
   float range[2];
@@ -743,18 +809,32 @@ void vtkPVActorComposite::ResetColorRange()
   // Avoid the bad range error
   if (range[1] <= range[0])
     {
-    range[1] = range[0] + 0.000001;
+    range[1] = range[0] + 0.00001;
     }
 
-  this->GetPVApplication()->BroadcastScript("%s SetScalarRange %f %f",
-					    this->MapperTclName,
-					    range[0], range[1]);
-  this->GetPVApplication()->BroadcastScript("%s SetScalarRange %f %f",
-					    this->LODMapperTclName,
-					    range[0], range[1]);
+  this->SetColorRange(range[0], range[1]);
   this->GetPVRenderView()->EventuallyRender();
 }
 
+//----------------------------------------------------------------------------
+void vtkPVActorComposite::ColorRangeEntryCallback()
+{
+  float min, max;
+
+  min = this->ColorRangeMinEntry->GetValueAsFloat();
+  max = this->ColorRangeMaxEntry->GetValueAsFloat();
+  
+  // Avoid the bad range error
+  if (max <= min)
+    {
+    max = min + 0.00001;
+    }
+
+  this->SetColorRange(min, max);
+  this->GetPVRenderView()->EventuallyRender();
+}
+
+//----------------------------------------------------------------------------
 void vtkPVActorComposite::GetColorRange(float range[2])
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
@@ -810,6 +890,9 @@ void vtkPVActorComposite::ColorByProperty()
   // No scalars visible.  Turn off scalar bar.
   this->SetScalarBarVisibility(0);
 
+  this->Script("pack %s -side left",
+               this->ColorButton->GetWidgetName());
+
   this->GetPVRenderView()->EventuallyRender();
 }
 
@@ -834,6 +917,10 @@ void vtkPVActorComposite::ColorByPointFieldComponent(char *name, int comp)
   this->Script("%s SetTitle %s", this->GetScalarBarTclName(), name);
   
   this->ResetColorRange();
+
+  this->Script("pack forget %s",
+               this->ColorButton->GetWidgetName());
+
   this->GetPVRenderView()->EventuallyRender();
 }
 
@@ -857,6 +944,10 @@ void vtkPVActorComposite::ColorByCellFieldComponent(char *name, int comp)
   this->Script("%s SetTitle %s", this->GetScalarBarTclName(), name);
   
   this->ResetColorRange();
+
+  this->Script("pack forget %s",
+               this->ColorButton->GetWidgetName());
+
   this->GetPVRenderView()->EventuallyRender();
 }
 
