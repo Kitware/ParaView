@@ -5,7 +5,6 @@ vtkClipPlane
 vtkCutMaterial 
 vtkCutPlane 
 vtkDummyRenderWindowInteractor 
-vtkFastGeometryFilter 
 vtkImageOutlineFilter 
 vtkInteractor 
 vtkInteractorStyleCamera 
@@ -28,9 +27,11 @@ vtkPVData
 vtkPVDataSetReaderInterface 
 vtkPVEnSightReaderInterface 
 vtkPVExtentTranslator 
+vtkPVGeometryFilter
 vtkPVGlyph3D 
 vtkPVInputMenu 
 vtkPVMethodInterface 
+vtkPVOutputWindow
 vtkPVRenderView 
 vtkPVSelectionList 
 vtkPVSource 

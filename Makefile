@@ -1,6 +1,6 @@
-VTKSRC = /home7/amy/vtk
-VTKBIN = /home7/amy/vtk
-VIEWSDIR = /home7/amy/Views
+VTKSRC = /home/berk/vtk
+VTKBIN = /home/berk/vtk-build
+VIEWSDIR = /home/berk/Views
 
 
 all: doWidgets doParaView
