@@ -67,7 +67,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWSelectionFrameLayoutManager);
-vtkCxxRevisionMacro(vtkKWSelectionFrameLayoutManager, "1.3");
+vtkCxxRevisionMacro(vtkKWSelectionFrameLayoutManager, "1.4");
 
 //----------------------------------------------------------------------------
 class vtkKWSelectionFrameLayoutManagerInternals
@@ -1325,18 +1325,18 @@ int vtkKWSelectionFrameLayoutManager::AppendWidgetsToImageData(
   // We need a window to image filter for each widget in the grid
 
   vtkstd::vector<vtkWindowToImageFilter*> w2i_filters;
-  w2i_filters.assign(nb_slots, NULL);
+  w2i_filters.assign(nb_slots, (vtkWindowToImageFilter*)NULL);
 
   // We also need a pad filter to add a small margin for each widget 
 
   vtkstd::vector<vtkImageConstantPad*> pad_filters;
-  pad_filters.assign(nb_slots, NULL);
+  pad_filters.assign(nb_slots, (vtkImageConstantPad*)NULL);
 
   // We need an append filter for each row in the grid, to append
   // widgets horizontally
 
   vtkstd::vector<vtkImageAppend*> append_filters;
-  append_filters.assign(this->Resolution[1], NULL);
+  append_filters.assign(this->Resolution[1], (vtkImageAppend*)NULL);
 
   // We need an append filter to append each rows (see above) and form
   // the final picture
