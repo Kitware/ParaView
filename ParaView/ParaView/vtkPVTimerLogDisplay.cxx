@@ -54,7 +54,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVTimerLogDisplay );
-vtkCxxRevisionMacro(vtkPVTimerLogDisplay, "1.6");
+vtkCxxRevisionMacro(vtkPVTimerLogDisplay, "1.7");
 
 int vtkPVTimerLogDisplayCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -189,8 +189,8 @@ void vtkPVTimerLogDisplay::Create(vtkKWApplication *app)
   this->Script("pack %s -side left -expand 1 -fill x",
                this->DismissButton->GetWidgetName());
 
-  this->Script("wm protocol %s WM_DELETE_WINDOW {wm withdraw %s}",
-               wname, wname);
+  this->Script("wm protocol %s WM_DELETE_WINDOW {%s Dismiss}",
+               wname, this->GetTclName());
     
   char scrollBarCommand[100];
   this->DisplayFrame->SetParent(this);
