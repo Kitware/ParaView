@@ -73,6 +73,7 @@ SET(PROJECT_TESTS
   TestImageDataIO
   VolumeGroup
   XdmfRead
+  TestAnimationSaveLoad
   )
 
 IF(PARAVIEW_USE_EXODUS)
@@ -211,6 +212,7 @@ REMOVE (PROJECT_TESTS
   TestDemo
   TestPackage
   Write
+  TestAnimationSaveLoad
 #  XdmfRead
 )
 

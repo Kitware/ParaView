@@ -1,0 +1,85 @@
+set kw(vtkTemp5) [$Application GetMainWindow]
+set kw(vtkTemp24) [$kw(vtkTemp5) GetMainView]
+
+# Parse command line and setup testing.
+source [file join [file dirname [info script]] CommandLineOptions.tcl]
+ParseCommandLine $kw(vtkTemp24) $argv $argc
+$kw(vtkTemp24) SetOrientationAxesVisibility 0
+$kw(vtkTemp24) SetRendererBackgroundColor 0 0 0
+$kw(vtkTemp5) SetUseMessageDialog 0
+
+# Create a sphere to animate.
+set kw(vtkTemp993) [$kw(vtkTemp5) CreatePVSource SphereSource]
+set kw(vtkTemp999) [$kw(vtkTemp993) GetPVWidget {Center}]
+$kw(vtkTemp999) SetValue 0 0 0
+set kw(vtkTemp1005) [$kw(vtkTemp993) GetPVWidget {Radius}]
+$kw(vtkTemp1005) SetValue 0.5
+set kw(vtkTemp1011) [$kw(vtkTemp993) GetPVWidget {Theta Resolution}]
+$kw(vtkTemp1011) SetValue 8
+set kw(vtkTemp1016) [$kw(vtkTemp993) GetPVWidget {Start Theta}]
+$kw(vtkTemp1016) SetValue 0
+set kw(vtkTemp1021) [$kw(vtkTemp993) GetPVWidget {End Theta}]
+$kw(vtkTemp1021) SetValue 360
+set kw(vtkTemp1026) [$kw(vtkTemp993) GetPVWidget {Phi Resolution}]
+$kw(vtkTemp1026) SetValue 8
+set kw(vtkTemp1031) [$kw(vtkTemp993) GetPVWidget {Start Phi}]
+$kw(vtkTemp1031) SetValue 0
+set kw(vtkTemp1036) [$kw(vtkTemp993) GetPVWidget {End Phi}]
+$kw(vtkTemp1036) SetValue 180
+$kw(vtkTemp5) SetCenterOfRotation 0.000000 0.000000 0.000000
+$kw(vtkTemp5) SetCenterOfRotation 0.000000 0.000000 0.000000
+$kw(vtkTemp993) AcceptCallback
+
+# Save an animation of the sphere.
+$kw(vtkTemp5) ShowAnimationProperties
+set kw(vtkTemp178) [$kw(vtkTemp5) GetAnimationInterface]
+set kw(vtkTemp193) [$kw(vtkTemp178) GetSourceEntry 0]
+$kw(vtkTemp193) SetPVSource $kw(vtkTemp993)
+$kw(vtkTemp1016) AnimationMenuCallback $kw(vtkTemp193)
+$kw(vtkTemp193) SetTimeEnd 360.000000
+$kw(vtkTemp193) SetTimeEnd 90.000000
+$kw(vtkTemp178) SetNumberOfFrames 3
+$kw(vtkTemp178) SaveGeometry {testAnimationSaveLoad.pvd} {1}
+
+# Remove old sphere.
+$kw(vtkTemp5) ShowCurrentSourcePropertiesCallback
+$kw(vtkTemp193) SetPVSource {}
+$kw(vtkTemp178) DeleteSourceItem 0
+$kw(vtkTemp178) AddEmptySourceItem
+$kw(vtkTemp993) DeleteCallback
+$kw(vtkTemp5) SetCurrentPVSourceCallback {}
+
+# Load the animation.
+set kw(vtkTemp1186) [$kw(vtkTemp5) InitializeReadCustom "PVDReader" "testAnimationSaveLoad.pvd"]
+$kw(vtkTemp5) ReadFileInformation $kw(vtkTemp1186) "testAnimationSaveLoad.pvd"
+$kw(vtkTemp5) FinalizeRead $kw(vtkTemp1186) "testAnimationSaveLoad.pvd"
+set kw(vtkTemp1191) [$kw(vtkTemp1186) GetPVWidget {Filename}]
+$kw(vtkTemp1191) SetValue "testAnimationSaveLoad.pvd"
+set kw(vtkTemp1196) [$kw(vtkTemp1186) GetPVWidget {Timestep}]
+$kw(vtkTemp1196) SetValue 0
+$kw(vtkTemp5) SetCenterOfRotation 0.000000 0.000000 0.000000
+$kw(vtkTemp5) SetCenterOfRotation 0.000000 0.000000 0.000000
+$kw(vtkTemp1186) AcceptCallback
+
+# Setup the animation.
+$kw(vtkTemp5) ShowAnimationProperties
+set kw(vtkTemp1160) [$kw(vtkTemp178) GetSourceEntry 0]
+$kw(vtkTemp1160) SetPVSource $kw(vtkTemp1186)
+$kw(vtkTemp1196) AnimationMenuCallback $kw(vtkTemp1160)
+
+# Play the animation.  Use the number of timesteps reported by the
+# reader module so that it will behave as the animation would in the
+# gui.  If the nubmer of timesteps is wrong the test should fail.
+set timesteps [$kw(vtkTemp1186) GetNumberOfTimeSteps]
+$kw(vtkTemp1160) SetTimeEnd [expr $timesteps - 1]
+for {set i 0} {$i < $timesteps} {incr i} {
+  $kw(vtkTemp178) SetCurrentTime $i 1
+}
+
+# Check the results.
+source [file join [file dirname [info script]] Compare.tcl]
+Compare $Application $argv $argc
+
+# Delete the saved file and its directory.
+catch { file delete -force "testAnimationSaveLoad.pvd" }
+catch { file delete -force "testAnimationSaveLoad" }
