@@ -1,0 +1,53 @@
+1. Start ParaView (see <link> for information on how to launch ParaView)
+
+2. Create a sphere source by selecting SphereSource from VTK -> Sources
+   menu. 
+
+   <insert creating.jpg>
+
+3. Set the theta resolution (in Parameters window) of the sphere  
+   to 16 and click accept.
+
+   <insert changeres.jpg>
+
+4. Create a shrink filter by selecting ShrinkFilter from VTK -> Filters
+   menu.
+
+   <insert shrink.jpg>
+
+5. Set the shrink factor (in Parameters window) to 0.8 and click accept.
+
+   <insert result.jpg>
+
+6. Select Sphere1 from the Navigation window, in the  Parameters windows,
+   set set the starting phi angle to 30 and click accept.
+
+   <insert changeangle.jpg>
+
+7. Rotate the camera around the sphere by clicking the left mouse button
+   near the center of the sphere and dragging the mouse to observe the
+   effect of change the starting phi angle.
+
+8. Select Shrink1 from the Select menu.
+
+   <insert navigate.jpg>
+
+9. Select the Display tab from the source notebook and change the variable
+   to be colored by to "Point Normals 0".
+
+   <insert addcolor.jpg>
+
+10. Select View from Properties menu.
+
+    <insert view.jpg>
+
+11. Select the General tab from the view notebook and click on the "Set Color"
+    button. Change the color of the background using the color dialog.
+
+    <insert background.jpg>
+
+12. To hide the properties menu, choose "Hide Properties" from the Properties
+    menu. You can un-hide the properties menu back by choosing one of
+    Source, Animation or View from the Properties menu.
+
+    <insert final.jpg>
