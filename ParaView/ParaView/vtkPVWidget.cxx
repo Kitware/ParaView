@@ -179,6 +179,7 @@ void vtkPVWidget::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "ModifiedFlag: " << this->GetModifiedFlag() << endl;
 }
 
+//----------------------------------------------------------------------------
 vtkPVWidget* vtkPVWidget::ClonePrototypeInternal(vtkPVSource* pvSource,
 				vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
 {
@@ -203,6 +204,7 @@ vtkPVWidget* vtkPVWidget::ClonePrototypeInternal(vtkPVSource* pvSource,
   return pvWidget;
 }
 
+//----------------------------------------------------------------------------
 void vtkPVWidget::CopyProperties(vtkPVWidget* clone, vtkPVSource* pvSource,
 			      vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
 {
