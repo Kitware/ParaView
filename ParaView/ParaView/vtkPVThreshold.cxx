@@ -59,7 +59,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVThreshold);
-vtkCxxRevisionMacro(vtkPVThreshold, "1.48");
+vtkCxxRevisionMacro(vtkPVThreshold, "1.48.2.1");
 
 int vtkPVThresholdCommand(ClientData cd, Tcl_Interp *interp,
                           int argc, char *argv[]);
@@ -185,31 +185,37 @@ void vtkPVThreshold::UpdateMinMaxScale()
   float range[2];
   range[0] = 0;
   range[1] = 1;
-  vtkDataSet *thresholdInput = this->GetPVInput()->GetVTKData();
 
-  mode = this->AttributeModeMenu->GetValue();
-  if (mode && strcmp(mode, "Point Data") == 0)
+  vtkPVData* input = this->GetPVInput();
+  if (input)
     {
-    if (thresholdInput->GetPointData()->GetScalars())
+    vtkDataSet* thresholdInput = input->GetVTKData();
+    vtkDataArray* scalars=0;
+    int pointDataFlag;
+    
+    mode = this->AttributeModeMenu->GetValue();
+    if (mode && strcmp(mode, "Point Data") == 0)
       {
-      thresholdInput->GetPointData()->GetScalars()->GetRange(range);
+      scalars = thresholdInput->GetPointData()->GetScalars();
+      pointDataFlag=1;
       }
-    else
+    else if (mode && strcmp(mode, "Cell Data") == 0)
       {
-      range[0] = 0;
-      range[1] = 1;
+      scalars = thresholdInput->GetCellData()->GetScalars();
+      pointDataFlag=0;
       }
-    }
-  else if (mode && strcmp(mode, "Cell Data") == 0)
-    {
-    if (thresholdInput->GetCellData()->GetScalars())
+    
+    if (scalars)
       {
-      thresholdInput->GetCellData()->GetScalars()->GetRange(range);
-      }
-    else
-      {
-      range[0] = 0;
-      range[1] = 1;
+      const char* name = scalars->GetName();
+      if (name)
+        {
+        input->GetArrayComponentRange(range, pointDataFlag, name, 0);
+        }
+      else
+        {
+        scalars->GetRange(range, 0);
+        }
       }
     }
 
