@@ -124,6 +124,7 @@ public:
   // Description:
   // Manage props inside this widget renderer(s). Add, remove, query.
   virtual void AddProp(vtkProp *prop);
+  virtual void AddOverlayProp(vtkProp *prop);
   virtual int  HasProp(vtkProp *prop);
   virtual void RemoveProp(vtkProp *prop);
   virtual void RemoveAllProps();
@@ -260,6 +261,7 @@ protected:
   vtkTextActor        *HeaderAnnotation;
   
   vtkRenderer     *Renderer;
+  vtkRenderer     *OverlayRenderer;
   vtkRenderWindow *RenderWindow;
   vtkKWWindow     *ParentWindow;
   

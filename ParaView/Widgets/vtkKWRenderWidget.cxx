@@ -54,7 +54,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkWin32OpenGLRenderWindow.h"
 #endif
 
-vtkCxxRevisionMacro(vtkKWRenderWidget, "1.60");
+vtkCxxRevisionMacro(vtkKWRenderWidget, "1.61");
 
 //----------------------------------------------------------------------------
 vtkKWRenderWidget::vtkKWRenderWidget()
@@ -63,8 +63,12 @@ vtkKWRenderWidget::vtkKWRenderWidget()
   this->VTKWidget->SetParent(this);
   
   this->Renderer = vtkRenderer::New();
+  this->Renderer->SetLayer(1);
+  this->OverlayRenderer = vtkRenderer::New();
   this->RenderWindow = vtkRenderWindow::New();
+  this->RenderWindow->SetNumberOfLayers(2);
   this->RenderWindow->AddRenderer(this->Renderer);
+  this->RenderWindow->AddRenderer(this->OverlayRenderer);
   
   this->Printing = 0;
   this->RenderMode = vtkKWRenderWidget::STILL_RENDER;
@@ -81,13 +85,14 @@ vtkKWRenderWidget::vtkKWRenderWidget()
   this->CornerAnnotation->VisibilityOff();
 
   this->HeaderAnnotation = vtkTextActor::New();
+  this->HeaderAnnotation->SetNonLinearFontScale(0.7,10);
   this->HeaderAnnotation->GetTextProperty()->SetJustificationToCentered();
   this->HeaderAnnotation->GetTextProperty()->SetVerticalJustificationToTop();
   this->HeaderAnnotation->GetTextProperty()->ShadowOff();
   this->HeaderAnnotation->ScaledTextOn();
   this->HeaderAnnotation->GetPositionCoordinate()
     ->SetCoordinateSystemToNormalizedViewport();
-  this->HeaderAnnotation->GetPositionCoordinate()->SetValue(0.2, 0.88);
+  this->HeaderAnnotation->GetPositionCoordinate()->SetValue(0.2, 0.84);
   this->HeaderAnnotation->GetPosition2Coordinate()
     ->SetCoordinateSystemToNormalizedViewport();
   this->HeaderAnnotation->GetPosition2Coordinate()->SetValue(0.6, 0.1);
@@ -100,7 +105,7 @@ vtkKWRenderWidget::vtkKWRenderWidget()
     {
     cam->ParallelProjectionOn();
     }
-
+  this->OverlayRenderer->SetActiveCamera(cam);
   this->CollapsingRenders = 0;
   
   this->Observer = vtkKWRenderWidgetCommand::New();
@@ -113,6 +118,7 @@ vtkKWRenderWidget::~vtkKWRenderWidget()
   this->Observer = NULL;
 
   this->Renderer->Delete();
+  this->OverlayRenderer->Delete();
   this->RenderWindow->Delete();
 
   this->SetParentWindow(NULL);
@@ -628,21 +634,36 @@ void vtkKWRenderWidget::AddProp(vtkProp *prop)
 }
 
 //----------------------------------------------------------------------------
+void vtkKWRenderWidget::AddOverlayProp(vtkProp *prop)
+{
+  this->OverlayRenderer->AddProp(prop);
+}
+
+//----------------------------------------------------------------------------
 int vtkKWRenderWidget::HasProp(vtkProp *prop)
 {
-  return this->Renderer->GetProps()->IsItemPresent(prop);
+  if (this->Renderer->GetProps()->IsItemPresent(prop) ||
+      this->OverlayRenderer->GetProps()->IsItemPresent(prop))
+    {
+    return 1;
+    }
+  
+  return 0;
 }
 
 //----------------------------------------------------------------------------
 void vtkKWRenderWidget::RemoveProp(vtkProp *prop)
 {
+  // safe to call both, vtkViewport does a check first
   this->Renderer->RemoveProp(prop);
+  this->OverlayRenderer->RemoveProp(prop);
 }
 
 //----------------------------------------------------------------------------
 void vtkKWRenderWidget::RemoveAllProps()
 {
   this->Renderer->RemoveAllProps();
+  this->OverlayRenderer->RemoveAllProps();
 }
 
 //----------------------------------------------------------------------------
@@ -710,7 +731,7 @@ void vtkKWRenderWidget::SetCornerAnnotationVisibility(int v)
     this->CornerAnnotation->VisibilityOn();
     if (!this->HasProp(this->CornerAnnotation))
       {
-      this->AddProp(this->CornerAnnotation);
+      this->AddOverlayProp(this->CornerAnnotation);
       }
     }
   else
@@ -781,7 +802,7 @@ void vtkKWRenderWidget::SetHeaderAnnotationVisibility(int v)
     this->HeaderAnnotation->VisibilityOn();
     if (!this->HasProp(this->HeaderAnnotation))
       {
-      this->AddProp(this->HeaderAnnotation);
+      this->AddOverlayProp(this->HeaderAnnotation);
       }
     }
   else
