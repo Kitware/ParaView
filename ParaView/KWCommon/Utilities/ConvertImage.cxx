@@ -179,9 +179,6 @@ int main(int argc, char **argv)
   int i;
   for (i = 2; i < argc; i++)
     {
-    vtkPNGReader *pr = vtkPNGReader::New();
-    vtkImageFlip *flip = vtkImageFlip::New();
-    
     // Check if image exists
 
     if (!file_exists(argv[i]))
@@ -197,18 +194,13 @@ int main(int argc, char **argv)
 
     cout << "  - from: " << image_name << endl;
 
+    vtkPNGReader *pr = vtkPNGReader::New();
     pr->SetFileName(argv[i]);
     pr->Update();
 
-    if (pr->GetOutput()->GetNumberOfScalarComponents() != 3 &&
-        pr->GetOutput()->GetNumberOfScalarComponents() != 4)
-      {
-      cerr << "Can only convert RGB or RGBA images" << endl;
-      continue;
-      }
-
     // Flip image (in VTK, [0,0] is lower left)
 
+    vtkImageFlip *flip = vtkImageFlip::New();
     flip->SetInput(pr->GetOutput());
     flip->SetFilteredAxis(1);
     flip->Update();
@@ -241,6 +233,7 @@ int main(int argc, char **argv)
         {
         cerr << "Error: zlib encoding failed." << endl;
         delete [] zlib_buffer;
+        pr->Delete();
         continue;
         }
       data_ptr = zlib_buffer;
@@ -263,6 +256,7 @@ int main(int argc, char **argv)
           delete [] zlib_buffer;
           }
         delete [] base64_buffer;
+        pr->Delete();
         continue;
         }
       data_ptr = base64_buffer;
