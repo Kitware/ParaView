@@ -104,7 +104,8 @@ class VTK_EXPORT vtkKWEvent
     // PV
     InitializeTraceEvent,
     ErrorMessageEvent,
-    WarningMessageEvent,    
+    WarningMessageEvent,
+    ManipulatorModifiedEvent,
     // 
     FinalBogusNotUsedEvent
   };
