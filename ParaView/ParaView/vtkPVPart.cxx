@@ -66,7 +66,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPart);
-vtkCxxRevisionMacro(vtkPVPart, "1.25");
+vtkCxxRevisionMacro(vtkPVPart, "1.25.2.1");
 
 
 int vtkPVPartCommand(ClientData cd, Tcl_Interp *interp,
@@ -83,7 +83,7 @@ vtkPVPart::vtkPVPart()
   this->Name = NULL;
 
   this->DataInformation = vtkPVDataInformation::New();
-  this->DataInformationValid;
+  this->DataInformationValid = 0;
   this->VTKDataTclName = NULL;
 
   // Used to be in vtkPVActorComposite
