@@ -60,7 +60,7 @@ protected:
   vtkPVGlyphFilter();
   ~vtkPVGlyphFilter();
 
-  virtual void Execute();
+  virtual int RequestData(vtkInformation *, vtkInformationVector **, vtkInformationVector *);
   
   vtkMaskPoints *MaskPoints;
   int MaximumNumberOfPoints;

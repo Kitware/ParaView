@@ -15,12 +15,15 @@
 #include "vtkPVGlyphFilter.h"
 
 #include "vtkGarbageCollector.h"
+#include "vtkInformation.h"
+#include "vtkInformationVector.h"
 #include "vtkMaskPoints.h"
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
 #include "vtkPolyData.h"
+#include "vtkStreamingDemandDrivenPipeline.h"
 
-vtkCxxRevisionMacro(vtkPVGlyphFilter, "1.14");
+vtkCxxRevisionMacro(vtkPVGlyphFilter, "1.15");
 vtkStandardNewMacro(vtkPVGlyphFilter);
 
 //-----------------------------------------------------------------------------
@@ -64,11 +67,17 @@ int vtkPVGlyphFilter::GetRandomMode()
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVGlyphFilter::Execute()
+int vtkPVGlyphFilter::RequestData(
+  vtkInformation *request,
+  vtkInformationVector **inputVector,
+  vtkInformationVector *outputVector)
 {
+  vtkInformation *outInfo = outputVector->GetInformationObject(0);
+  vtkPolyData *output = vtkPolyData::SafeDownCast(
+    outInfo->Get(vtkDataObject::DATA_OBJECT()));
+
   if (this->UseMaskPoints)
     {
-    vtkPolyData* output = this->GetOutput();
     this->Superclass::SetInput(this->MaskPoints->GetOutput());
     vtkIdType maxNumPts = this->MaximumNumberOfPoints;
     vtkIdType numPts = static_cast<vtkDataSet*>(this->MaskPoints->GetInput(0))->GetNumberOfPoints();
@@ -111,10 +120,15 @@ void vtkPVGlyphFilter::Execute()
     this->MaskPoints->SetOnRatio(numPts / maxNumPts);
     // I do not like connecting internal filters to the actual input, but
     // This is the smallest change possible to fix the problem.
-    // This update caused input to be executed with number of piecces of 1.
-    this->MaskPoints->GetOutput()->SetUpdateNumberOfPieces(output->GetUpdateNumberOfPieces());
-    this->MaskPoints->GetOutput()->SetUpdatePiece(output->GetUpdatePiece());
-    this->MaskPoints->GetOutput()->SetUpdateGhostLevel(output->GetUpdateGhostLevel());
+    // This update caused input to be executed with number of pieces of 1.
+    vtkInformation *maskPointsInfo =
+      this->MaskPoints->GetOutputPortInformation(0);
+    maskPointsInfo->Set(vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_PIECES(),
+                        outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_PIECES()));
+    maskPointsInfo->Set(vtkStreamingDemandDrivenPipeline::UPDATE_PIECE_NUMBER(),
+                        outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_PIECE_NUMBER()));
+    maskPointsInfo->Set(vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_GHOST_LEVELS(),
+                        outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_GHOST_LEVELS()));
     this->MaskPoints->Update();
     }
   else
@@ -122,7 +136,7 @@ void vtkPVGlyphFilter::Execute()
     this->Superclass::SetInput(static_cast<vtkDataSet*>(this->MaskPoints->GetInput(0)));
     }
   
-  this->Superclass::Execute();
+  return this->Superclass::RequestData(request, inputVector, outputVector);
 }
 
 //-----------------------------------------------------------------------------
