@@ -179,9 +179,12 @@ int vtkKWWindowMenuEntry::InsertToMenu( int pos, vtkKWMenu *menu )
     {
     char *file = strcpy(new char[strlen(this->File)+1], this->File);
     file[0] = pos + '0';
+    ostrstream str;
+    str << this->Command << " " << this->FullFile << ends;
     menu->InsertCommand( menu->GetIndex("Close") - 1, 
-			 file, this->Target, this->Command, 0 );
+			 file, this->Target, str.str(), 0 );
     delete [] file;
+    delete [] str.str();
     return 1;
     }
   return 0;
@@ -910,7 +913,7 @@ void vtkKWWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWWindow ";
-  this->ExtractRevision(os,"$Revision: 1.45 $");
+  this->ExtractRevision(os,"$Revision: 1.46 $");
 }
 
 int vtkKWWindow::ExitDialog()
