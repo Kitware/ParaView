@@ -134,6 +134,9 @@ int MyMain(int argc, char *argv[])
          << err.str() << endl;
 #endif
     err.rdbuf()->freeze(0);
+#ifdef VTK_USE_MPI
+    MPI_Finalize();
+#endif
     return 1;
     }
   err.rdbuf()->freeze(0);
@@ -232,6 +235,10 @@ int MyMain(int argc, char *argv[])
   app->Delete();
   Tcl_DeleteInterp(interp);
   Tcl_Finalize();
+
+#ifdef VTK_USE_MPI
+  MPI_Finalize();
+#endif
 
   return (retVal?retVal:startVal);
 }
