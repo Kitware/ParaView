@@ -173,7 +173,7 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterface);
-vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.81");
+vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.82");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterface,ControlledWidget, vtkPVWidget);
 
@@ -648,9 +648,7 @@ void vtkPVAnimationInterface::Create(vtkKWApplication *app, char *frameArgs)
 
   this->Script("pack %s %s -side top -expand t -fill x -padx 2 -pady 2", 
                this->ControlFrame->GetWidgetName(),
-               this->AnimationEntriesFrame->GetWidgetName(),
-               this->ActionFrame->GetWidgetName(),
-               this->SaveFrame->GetWidgetName());
+               this->AnimationEntriesFrame->GetWidgetName());
 
   //this->Script("pack %s -side top -expand t -fill x -padx 2 -pady 2", 
   //             this->ActionFrame->GetWidgetName());
@@ -1130,8 +1128,8 @@ void vtkPVAnimationInterface::SaveImagesCallback()
   vtkKWLoadSaveDialog* saveDialog = vtkKWLoadSaveDialog::New();
   this->GetWindow()->RetrieveLastPath(saveDialog, "SaveAnimationFile");
   saveDialog->SetParent(this);
-  saveDialog->Create(this->Application, 0);
   saveDialog->SaveDialogOn();
+  saveDialog->Create(this->Application, 0);
   saveDialog->SetTitle("Save Animation Images");
   saveDialog->SetDefaultExtension(".jpg");
   saveDialog->SetFileTypes("{{jpeg} {.jpg}} {{tiff} {.tif}} {{Portable Network Graphics} {.png}}");
