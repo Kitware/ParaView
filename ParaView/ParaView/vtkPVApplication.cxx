@@ -101,7 +101,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.156.2.7");
+vtkCxxRevisionMacro(vtkPVApplication, "1.156.2.8");
 
 int vtkPVApplicationCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -527,6 +527,8 @@ const char vtkPVApplication::ArgumentList[vtkPVApplication::NUM_ARGS][128] =
   "--use-satellite-software", "-s", 
   "Use software (Mesa) rendering (supports off-screen rendering) only on satellite processes.", 
 #endif
+  "--play-demo", "-pd",
+  "Run the ParaView demo.",
   "--help", "",
   "Displays available command line arguments.",
   "" 
@@ -737,8 +739,6 @@ void vtkPVApplication::Start(int argc, char*argv[])
   int index=-1;
 
   if ( vtkPVApplication::CheckForArgument(argc, argv, "--help",
-                                          index) == VTK_OK ||
-       vtkPVApplication::CheckForArgument(argc, argv, "-h",
                                           index) == VTK_OK )
     {
     char* error = this->CreateHelpString();
@@ -746,6 +746,15 @@ void vtkPVApplication::Start(int argc, char*argv[])
     delete[] error;
     this->Exit();
     return;
+    }
+
+  int playDemo=0;
+  if ( vtkPVApplication::CheckForArgument(argc, argv, "--play-demo",
+                                          index) == VTK_OK ||
+       vtkPVApplication::CheckForArgument(argc, argv, "-pd",
+                                          index) == VTK_OK )
+    {
+    playDemo = 1;
     }
 
   if ( vtkPVApplication::CheckForArgument(argc, argv, "--disable-registry",
@@ -1019,9 +1028,6 @@ void vtkPVApplication::Start(int argc, char*argv[])
                       ui->GetMainView()->GetTclName(), ui->GetTclName());
   ui->GetMainView()->SetTraceInitialized(1);
 
-
-
-
   // If any of the argumens has a .pvs extension, load it as a script.
   for (i=1; i < argc; i++)
     {
@@ -1033,7 +1039,14 @@ void vtkPVApplication::Start(int argc, char*argv[])
       }
     }
 
-  this->vtkKWApplication::Start(argc,argv);
+  if (playDemo)
+    {
+    ui->PlayDemo();
+    }
+  else
+    {
+    this->vtkKWApplication::Start(argc,argv);
+    }
   vtkOutputWindow::SetInstance(0);
   this->OutputWindow->Delete();
 }
