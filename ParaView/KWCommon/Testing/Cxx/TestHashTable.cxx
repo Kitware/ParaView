@@ -1,9 +1,8 @@
-#include "vtkArrayMap.txx"
 #include "vtkKWHashTable.h"
 #include "vtkKWHashTableIterator.h"
-#include "vtkStringArrayMap.txx"
 #include "vtkString.h"
 #include "vtkActor.h"
+#include "vtkArrayMap.txx"
 
 int main()
 {
@@ -22,39 +21,41 @@ int main()
     "Sebastien",
     "Will"
   };
-
-  /*
-    vtkArrayMap<int,char*> *am 
+  
+  vtkArrayMap<int,char*> *am 
     = vtkArrayMap<int,char*>::New();
-    for ( cc = 9; cc >= 0; cc -- )
+  int x;
+  vtkAbstractMapDefaultCreateFunction(x,x);
+  
+
+  for ( cc = 9; cc >= 0; cc -- )
     {
     if ( am->SetItem(cc, names[cc]) != VTK_OK )
-    {
-    cout << "Problem adding item to the array map" << endl;
-    error = 1;
+      {
+      cout << "Problem adding item to the array map" << endl;
+      error = 1;
+      }
     }
-    }
-    for ( cc = 0; cc < 10; cc ++ )
+  for ( cc = 0; cc < 10; cc ++ )
     {
     char *buffer = 0;
     if ( am->GetItem(cc, buffer) != VTK_OK)
-    {
-    cout << "Problem retrieving item from the array map" << endl;
-    error = 1;
-    }
+      {
+      cout << "Problem retrieving item from the array map" << endl;
+      error = 1;
+      }
     if ( !buffer || strcmp(buffer, names[cc]) )
-    {
-    cout << "Retrieved string: " << (buffer?buffer:"") 
-    << " is not the same as the"
-    " one inserted" << endl;
-    }
+      {
+      cout << "Retrieved string: " << (buffer?buffer:"") 
+	   << " is not the same as the"
+	" one inserted" << endl;
+      }
     }
  
-    am->Delete();
-  */  
-  vtkArrayMap<const char*,const char*> *sam 
-    = vtkArrayMap<const char*,const char*>::New();
-  //vtkStringArrayMap<const char*> *sam = vtkStringArrayMap<const char*>::New();
+  am->Delete();
+
+  vtkArrayMap<const char*,char*> *sam 
+    = vtkArrayMap<const char*,char*>::New();
   vtkAbstractMapKeyIsString(sam);
   for ( cc = 9; cc >= 0; cc -- )
     {
@@ -229,7 +230,7 @@ int main()
     }
 
   ht->Delete();
-
+ 
   return error;
 }
 

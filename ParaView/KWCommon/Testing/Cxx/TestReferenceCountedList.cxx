@@ -1,5 +1,5 @@
-#include "vtkReferenceCountedVector.txx"
-#include "vtkReferenceCountedLinkedList.txx"
+#include "vtkVector.txx"
+#include "vtkLinkedList.txx"
 #include "vtkActor.h"
 
 #define C_ERROR(c) cout << "Container: " << c->GetClassName() << " "
@@ -76,8 +76,9 @@ int main()
   vv->Delete();
 
   //cout << "Linked List: " << endl;
-  vtkReferenceCountedLinkedList<vtkActor*> *vl 
-    = vtkReferenceCountedLinkedList<vtkActor*>::New();
+  vtkLinkedList<vtkActor*> *vl 
+    = vtkLinkedList<vtkActor*>::New();
+  vtkAbstractListDataIsReferenceCounted(vv);
   res += TestList(vl);
   vl->Delete();
 
