@@ -579,8 +579,6 @@ protected:
   int VTKMultipleInputsFlag;
   vtkCollection* InputProperties;
 
-  vtkPVSource* Prototype;
-
   // Taking responsibility of saving inputs away from input menu.
   void SetInputsInBatchScript(ofstream *file);
 

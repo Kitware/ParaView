@@ -62,7 +62,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.331");
+vtkCxxRevisionMacro(vtkPVSource, "1.332");
 
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
@@ -156,8 +156,6 @@ vtkPVSource::vtkPVSource()
   this->SourceGrabbed = 0;
 
   this->ToolbarModule = 0;
-
-  this->Prototype = 0;
 
   this->UpdateSourceInBatch = 0;
 
