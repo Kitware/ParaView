@@ -41,7 +41,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVOptions);
-vtkCxxRevisionMacro(vtkPVOptions, "1.24");
+vtkCxxRevisionMacro(vtkPVOptions, "1.25");
 
 //----------------------------------------------------------------------------
 vtkPVOptions::vtkPVOptions()
@@ -202,10 +202,10 @@ void vtkPVOptions::Initialize()
                            "Have the server connect to the client.");
   this->AddArgument("--tile-dimensions-x", "-tdx", this->TileDimensions, 
                     "Size of tile display in the number of displays in each row of the display.",
-                    vtkPVOptions::PVRENDER_SERVER|vtkPVOptions::PVSERVER);
+                    vtkPVOptions::PVCLIENT|vtkPVOptions::PVRENDER_SERVER|vtkPVOptions::PVSERVER);
   this->AddArgument("--tile-dimensions-y", "-tdy", this->TileDimensions+1, 
                     "Size of tile display in the number of displays in each column of the display.",
-                    vtkPVOptions::PVRENDER_SERVER|vtkPVOptions::PVSERVER);
+                    vtkPVOptions::PVCLIENT|vtkPVOptions::PVRENDER_SERVER|vtkPVOptions::PVSERVER);
   
   // This should be deprecated when I get the time 
   this->AddArgument("--cave-configuration", "-cc", &this->CaveConfigurationFileName,
