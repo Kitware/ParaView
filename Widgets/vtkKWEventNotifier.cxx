@@ -197,7 +197,16 @@ void vtkKWEventNotifier::RemoveCallback( const char *event,
     }
 }
 
+
 void vtkKWEventNotifier::InvokeCallbacks( const char *event,
+					  vtkKWWindow *window,
+					  const char *args )
+{
+  this->InvokeCallbacks( NULL, event, window, args );
+}
+
+void vtkKWEventNotifier::InvokeCallbacks( vtkKWObject *object,
+                                          const char *event,
 					  vtkKWWindow *window,
 					  const char *args )
 {
@@ -214,10 +223,13 @@ void vtkKWEventNotifier::InvokeCallbacks( const char *event,
     while (tmp)
       {
       // If we have a match, invoke it. Either a window is NULL, or the
-      // window arguments must match as well as the event string
+      // window arguments must match as well as the event string. The object
+      // argument must not match - this is used to exclude the calling
+      // object from invoking its own callbacks.
       if ( !strcmp( tmp->GetEventString(), event ) &&
 	   ( window == NULL || tmp->GetWindow() == NULL ||
-	     tmp->GetWindow() == window ) )
+	     tmp->GetWindow() == window ) &&
+           tmp->GetCalledObject() != object )
 	{
 	this->Script("eval %s %s %s", tmp->GetCalledObject()->GetTclName(),
 		     tmp->GetCommandString(), args );

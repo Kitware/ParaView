@@ -47,8 +47,15 @@ public:
   void RemoveCallback( const char *event,   vtkKWWindow *window,
 		       vtkKWObject *object, const char *command );
 
+  // This version invokes all callbacks of the specified type for
+  // the specified window - even its own callback if it has one
   void InvokeCallbacks( const char *event, vtkKWWindow *window,
 			const char *args );
+
+  // This version won't invoke callbacks on the specified object 
+  // Usually the calling object uses this to avoid calling itself
+  void InvokeCallbacks( vtkKWObject *object, const char *event, 
+                        vtkKWWindow *window, const char *args );
 
 protected:
   vtkKWEventNotifier();
