@@ -50,14 +50,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <stdarg.h>
 #include <ctype.h>
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWObject );
-vtkCxxRevisionMacro(vtkKWObject, "1.35");
+vtkCxxRevisionMacro(vtkKWObject, "1.36");
 
 int vtkKWObjectCommand(ClientData cd, Tcl_Interp *interp,
                        int argc, char *argv[]);
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 vtkKWObject::vtkKWObject()
 {
   this->TclName = NULL;
@@ -71,7 +71,7 @@ vtkKWObject::vtkKWObject()
   this->TraceReferenceCommand = NULL;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 vtkKWObject::~vtkKWObject()
 {
   if (this->TclName)
@@ -94,7 +94,7 @@ vtkKWObject::~vtkKWObject()
 }
 
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void vtkKWObject::Serialize(ostream& os, vtkIndent indent)
 {
   os << this->GetClassName() << endl;
@@ -107,7 +107,7 @@ void vtkKWObject::Serialize(ostream& os, vtkIndent indent)
   os << indent << "  }\n";
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void vtkKWObject::ExtractRevision(ostream& os,const char *revIn)
 {
   char rev[128];
@@ -115,14 +115,14 @@ void vtkKWObject::ExtractRevision(ostream& os,const char *revIn)
   os << rev << endl;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void vtkKWObject::SerializeRevision(ostream& os, vtkIndent indent)
 {
   os << indent << "vtkKWObject ";
-  this->ExtractRevision(os,"$Revision: 1.35 $");
+  this->ExtractRevision(os,"$Revision: 1.36 $");
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void vtkKWObject::Serialize(istream& is)
 {
   char token[VTK_KWSERIALIZER_MAX_TOKEN_LENGTH];
@@ -170,12 +170,12 @@ void vtkKWObject::Serialize(istream& is)
   while (token[0] != '}' && is.tellg() >= 0);
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void vtkKWObject::SerializeToken(istream& /*is*/, const char * /*token*/)
 {
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 const char *vtkKWObject::GetTclName()
 {
   // is the name is already set the just return it
@@ -198,7 +198,7 @@ const char *vtkKWObject::GetTclName()
   return this->TclName;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 const char* vtkKWObject::Script(const char* format, ...)
 {
   if(this->GetApplication())
@@ -220,7 +220,7 @@ const char* vtkKWObject::Script(const char* format, ...)
 }
 
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 int vtkKWObject::GetIntegerResult(vtkKWApplication *app)
 {
   int res;
@@ -236,7 +236,7 @@ float vtkKWObject::GetFloatResult(vtkKWApplication *app)
   return res;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void vtkKWObject::SetApplication (vtkKWApplication* arg)
 {  
   vtkDebugMacro(<< this->GetClassName() 
@@ -256,7 +256,7 @@ void vtkKWObject::SetApplication (vtkKWApplication* arg)
     }
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void vtkKWObject::AddVersion(const char *cname, const char *version)
 {
   // allocate more space
@@ -286,7 +286,7 @@ void vtkKWObject::AddVersion(const char *cname, const char *version)
   this->NumberOfVersions++;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 int vtkKWObject::CompareVersions(const char *v1, const char *v2)
 {
   if (!v1 && !v2)
@@ -338,7 +338,7 @@ int vtkKWObject::CompareVersions(const char *v1, const char *v2)
   return 0;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 const char *vtkKWObject::GetVersion(const char *cname)
 {
   for (int i = 0; i < this->NumberOfVersions; i++)
@@ -352,7 +352,7 @@ const char *vtkKWObject::GetVersion(const char *cname)
 }
 
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 int vtkKWObject::InitializeTrace(ofstream* file)
 {
   int stateFlag = 0;
@@ -407,7 +407,7 @@ int vtkKWObject::InitializeTrace(ofstream* file)
   return *pInit;
 }  
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void vtkKWObject::AddTraceEntry(const char *format, ...)
 {
   ofstream *os;
@@ -450,7 +450,7 @@ void vtkKWObject::AddTraceEntry(const char *format, ...)
 }
 
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void vtkKWObject::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
@@ -463,7 +463,7 @@ void vtkKWObject::PrintSelf(ostream& os, vtkIndent indent)
      << this->GetTraceReferenceObject() << endl;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 int vtkKWObject::EstimateFormatLength(const char* format, va_list ap)
 {
   // Quick-hack attempt at estimating the length of the string.

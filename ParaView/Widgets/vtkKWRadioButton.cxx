@@ -43,11 +43,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWRadioButton.h"
 #include "vtkObjectFactory.h"
 
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWRadioButton );
-vtkCxxRevisionMacro(vtkKWRadioButton, "1.10");
+vtkCxxRevisionMacro(vtkKWRadioButton, "1.11");
 
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void vtkKWRadioButton::Create(vtkKWApplication *app, const char *args)
 {
   const char *wname;
@@ -84,7 +84,7 @@ void vtkKWRadioButton::SetValue(const char *v)
   this->Script("%s configure -value %s", this->GetWidgetName(), v);
 }
 
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 int vtkKWRadioButton::GetState()
 {
   if (this->IsCreated())

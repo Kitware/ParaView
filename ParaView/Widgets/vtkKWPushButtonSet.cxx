@@ -48,10 +48,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkLinkedListIterator.txx"
 #include "vtkObjectFactory.h"
 
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkKWPushButtonSet);
-vtkCxxRevisionMacro(vtkKWPushButtonSet, "1.6");
+vtkCxxRevisionMacro(vtkKWPushButtonSet, "1.7");
 
 int vtkvtkKWPushButtonSetCommand(ClientData cd, Tcl_Interp *interp,
                                   int argc, char *argv[]);
@@ -148,7 +148,7 @@ int vtkKWPushButtonSet::HasButton(int id)
   return this->GetButtonSlot(id) ? 1 : 0;
 }
 
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void vtkKWPushButtonSet::Create(vtkKWApplication *app, const char *args)
 {
   // Set the application
@@ -191,7 +191,7 @@ void vtkKWPushButtonSet::UpdateEnableState()
   it->Delete();
 }
 
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 int vtkKWPushButtonSet::AddButton(int id, 
                                   const char *text, 
                                   vtkKWObject *object, 

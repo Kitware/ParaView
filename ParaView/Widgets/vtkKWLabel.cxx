@@ -47,11 +47,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 int vtkKWLabelCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLabel );
-vtkCxxRevisionMacro(vtkKWLabel, "1.19");
+vtkCxxRevisionMacro(vtkKWLabel, "1.20");
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 vtkKWLabel::vtkKWLabel()
 {
   this->Label    = new char[1];
@@ -62,13 +62,13 @@ vtkKWLabel::vtkKWLabel()
   this->CommandFunction = vtkKWLabelCommand;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 vtkKWLabel::~vtkKWLabel()
 {
   delete [] this->Label;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void vtkKWLabel::SetLabel(const char* l)
 {
   if(!l)
@@ -86,7 +86,7 @@ void vtkKWLabel::SetLabel(const char* l)
     }
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void vtkKWLabel::Create(vtkKWApplication *app, const char *args)
 {
   const char *wname;
@@ -119,7 +119,7 @@ void vtkKWLabel::Create(vtkKWApplication *app, const char *args)
   this->UpdateEnableState();
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void vtkKWLabel::SetLineType( int type )
 {
   if ( this->Application )
@@ -162,7 +162,7 @@ void vtkKWLabel::SetWidth(int width)
     }
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void vtkKWLabel::SetAdjustWrapLengthToWidth(int v)
 {
   if (this->AdjustWrapLengthToWidth == v)
@@ -187,7 +187,7 @@ void vtkKWLabel::SetAdjustWrapLengthToWidth(int v)
     }
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void vtkKWLabel::AdjustWrapLengthToWidthCallback()
 {
   if (!this->IsCreated() || !this->AdjustWrapLengthToWidth)

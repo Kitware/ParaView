@@ -81,9 +81,9 @@ void vtkKWToolbar::SetGlobalWidgetsFlatAspect(int val)
   vtkKWToolbarGlobalWidgetsFlatAspect = val; 
 };
 
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWToolbar );
-vtkCxxRevisionMacro(vtkKWToolbar, "1.29");
+vtkCxxRevisionMacro(vtkKWToolbar, "1.30");
 
 
 int vtkKWToolbarCommand(ClientData cd, Tcl_Interp *interp,
@@ -634,7 +634,7 @@ void vtkKWToolbar::Pack(const char *options)
     }
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void vtkKWToolbar::SetFlatAspect(int f)
 {
   if (this->FlatAspect == f)
@@ -651,7 +651,7 @@ void vtkKWToolbar::SetFlatAspect(int f)
     }
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void vtkKWToolbar::SetWidgetsFlatAspect(int f)
 {
   if (this->WidgetsFlatAspect == f)
@@ -663,7 +663,7 @@ void vtkKWToolbar::SetWidgetsFlatAspect(int f)
   this->UpdateWidgets();
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void vtkKWToolbar::SetResizable(int r)
 {
   if (this->Resizable == r)

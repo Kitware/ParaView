@@ -48,10 +48,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkLinkedListIterator.txx"
 #include "vtkObjectFactory.h"
 
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkKWRadioButtonSet);
-vtkCxxRevisionMacro(vtkKWRadioButtonSet, "1.5");
+vtkCxxRevisionMacro(vtkKWRadioButtonSet, "1.6");
 
 int vtkvtkKWRadioButtonSetCommand(ClientData cd, Tcl_Interp *interp,
                                   int argc, char *argv[]);
@@ -137,7 +137,7 @@ int vtkKWRadioButtonSet::HasButton(int id)
   return this->GetButtonSlot(id) ? 1 : 0;
 }
 
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void vtkKWRadioButtonSet::Create(vtkKWApplication *app, const char *args)
 {
   // Set the application
@@ -180,7 +180,7 @@ void vtkKWRadioButtonSet::UpdateEnableState()
   it->Delete();
 }
 
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 int vtkKWRadioButtonSet::AddButton(int id, 
                                    const char *text, 
                                    vtkKWObject *object, 

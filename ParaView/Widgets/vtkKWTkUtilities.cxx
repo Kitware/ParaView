@@ -56,9 +56,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "tk.h"
 #include "zlib.h"
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWTkUtilities);
-vtkCxxRevisionMacro(vtkKWTkUtilities, "1.23");
+vtkCxxRevisionMacro(vtkKWTkUtilities, "1.24");
 
 //----------------------------------------------------------------------------
 void vtkKWTkUtilities::GetRGBColor(Tcl_Interp *interp,
@@ -83,7 +83,7 @@ void vtkKWTkUtilities::GetRGBColor(Tcl_Interp *interp,
   *bb = static_cast<int>((static_cast<float>(b) / 65535.0)*255.0); 
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void vtkKWTkUtilities::GetOptionColor(Tcl_Interp *interp,
                                       const char *window,
                                       const char *option,
@@ -103,7 +103,7 @@ void vtkKWTkUtilities::GetOptionColor(Tcl_Interp *interp,
   vtkKWTkUtilities::GetRGBColor(interp, window, interp->result, r, g, b);
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void vtkKWTkUtilities::GetBackgroundColor(Tcl_Interp *interp,
                                           const char *window,
                                           int *r, int *g, int *b)

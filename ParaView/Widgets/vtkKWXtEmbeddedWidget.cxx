@@ -45,9 +45,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWXtEmbeddedWidget);
-vtkCxxRevisionMacro(vtkKWXtEmbeddedWidget, "1.6");
+vtkCxxRevisionMacro(vtkKWXtEmbeddedWidget, "1.7");
 
 int vtkKWXtEmbeddedWidgetCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);

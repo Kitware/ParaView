@@ -72,7 +72,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define VTK_KW_WINDOW_GEOMETRY_REG_KEY "WindowGeometry"
 #define VTK_KW_WINDOW_FRAME1_SIZE_REG_KEY "WindowFrame1Size"
 
-vtkCxxRevisionMacro(vtkKWWindow, "1.152");
+vtkCxxRevisionMacro(vtkKWWindow, "1.153");
 vtkCxxSetObjectMacro(vtkKWWindow, PropertiesParent, vtkKWWidget);
 
 class vtkKWWindowMenuEntry
@@ -209,7 +209,7 @@ int vtkKWWindowMenuEntry::InsertToMenu( int pos, const char* menuEntry,
   return 0;
 }
 
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWWindow );
 
 int vtkKWWindowCommand(ClientData cd, Tcl_Interp *interp,

@@ -44,11 +44,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWApplication.h"
 #include "vtkObjectFactory.h"
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWSplashScreen );
-vtkCxxRevisionMacro(vtkKWSplashScreen, "1.9");
+vtkCxxRevisionMacro(vtkKWSplashScreen, "1.10");
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 vtkKWSplashScreen::vtkKWSplashScreen()
 {
   this->Canvas = vtkKWWidget::New();
@@ -58,7 +58,7 @@ vtkKWSplashScreen::vtkKWSplashScreen()
   this->ProgressMessageVerticalOffset = -10;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 vtkKWSplashScreen::~vtkKWSplashScreen()
 {
   if (this->Canvas)
@@ -69,7 +69,7 @@ vtkKWSplashScreen::~vtkKWSplashScreen()
   this->SetImageName(0);
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void vtkKWSplashScreen::Create(vtkKWApplication *app, const char *args)
 {
   // Set the application
@@ -109,7 +109,7 @@ void vtkKWSplashScreen::Create(vtkKWApplication *app, const char *args)
                this->Canvas->GetWidgetName());
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void vtkKWSplashScreen::UpdateCanvasSize()
 {
   // Resize the canvas according to the image
@@ -126,7 +126,7 @@ void vtkKWSplashScreen::UpdateCanvasSize()
     }
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void vtkKWSplashScreen::UpdateProgressMessagePosition()
 {
   if (this->Application)
@@ -143,7 +143,7 @@ void vtkKWSplashScreen::UpdateProgressMessagePosition()
     }
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void vtkKWSplashScreen::Show()
 {
   if (!this->Application)
@@ -186,7 +186,7 @@ void vtkKWSplashScreen::Show()
   this->Script("update", this->GetWidgetName());
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void vtkKWSplashScreen::Hide()
 {
   this->Script("wm withdraw %s", this->GetWidgetName());
@@ -229,7 +229,7 @@ void vtkKWSplashScreen::SetImageName (const char* _arg)
     }
 } 
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void vtkKWSplashScreen::SetProgressMessage(const char *txt)
 {
   if (this->Application)
@@ -240,7 +240,7 @@ void vtkKWSplashScreen::SetProgressMessage(const char *txt)
     }
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void vtkKWSplashScreen::SetProgressMessageVerticalOffset(int _arg)
 {
   if (this->ProgressMessageVerticalOffset == _arg)

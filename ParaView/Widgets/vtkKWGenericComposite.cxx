@@ -44,9 +44,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkObjectFactory.h"
 #include "vtkProp.h"
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWGenericComposite );
-vtkCxxRevisionMacro(vtkKWGenericComposite, "1.7");
+vtkCxxRevisionMacro(vtkKWGenericComposite, "1.8");
 
 vtkSetObjectImplementationMacro(vtkKWGenericComposite, Prop, vtkProp);
 

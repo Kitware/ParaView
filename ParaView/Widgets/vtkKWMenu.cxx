@@ -46,29 +46,29 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWWindow.h"
 #include "vtkArrayMap.txx"
 
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWMenu );
-vtkCxxRevisionMacro(vtkKWMenu, "1.37");
+vtkCxxRevisionMacro(vtkKWMenu, "1.38");
 
 
 
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 int vtkKWMenuCommand(ClientData cd, Tcl_Interp *interp,
                        int argc, char *argv[]);
 
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 vtkKWMenu::vtkKWMenu()
 {
   this->CommandFunction = vtkKWMenuCommand;
   this->TearOff = 0;
 }
 
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 vtkKWMenu::~vtkKWMenu()
 {
 }
 
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void vtkKWMenu::Create(vtkKWApplication* app, const char* args)
 {
   // Set the application
@@ -91,7 +91,7 @@ void vtkKWMenu::Create(vtkKWApplication* app, const char* args)
   this->UpdateEnableState();
 }
 
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void vtkKWMenu::SetTearOff(int val)
 {
   if (val == this->TearOff)
@@ -108,7 +108,7 @@ void vtkKWMenu::SetTearOff(int val)
 }
 
 
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void vtkKWMenu::DisplayHelp(const char* widget)
 {
   const char* tname = this->GetTclName();
@@ -128,7 +128,7 @@ void vtkKWMenu::DisplayHelp(const char* widget)
 }
 
 
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void vtkKWMenu::AddGeneric(const char* addtype, 
                            const char* label,
                            vtkKWObject* Object,
@@ -169,7 +169,7 @@ void vtkKWMenu::AddGeneric(const char* addtype,
                label, help);
 }
 
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void vtkKWMenu::InsertGeneric(int position, const char* addtype, 
                               const char* label, 
                               vtkKWObject* Object,
@@ -210,7 +210,7 @@ void vtkKWMenu::InsertGeneric(int position, const char* addtype,
                label, help);
 }
 
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void vtkKWMenu::AddCascade(const char* label, 
                            vtkKWMenu* menu, 
                            int underline, 
@@ -232,7 +232,7 @@ void vtkKWMenu::AddCascade(const char* label,
   this->SetCascade(label, menu);
 }
 
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void  vtkKWMenu::InsertCascade(int position, 
                                const char* label, 
                                vtkKWMenu* menu, 
@@ -337,7 +337,7 @@ void vtkKWMenu::SetCascade(const char* item, const char* menu)
   this->SetCascade(this->GetIndex(item), menu);
 }
 
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void  vtkKWMenu::AddCheckButton(const char* label, const char* ButtonVar, 
                                 vtkKWObject* Object, 
                                 const char* MethodAndArgString, 
@@ -346,7 +346,7 @@ void  vtkKWMenu::AddCheckButton(const char* label, const char* ButtonVar,
   this->AddCheckButton(label, ButtonVar, Object, MethodAndArgString, -1, help);
 }
  
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void  vtkKWMenu::AddCheckButton(const char* label, const char* ButtonVar, 
                                 vtkKWObject* Object, 
                                 const char* MethodAndArgString, 
@@ -365,7 +365,7 @@ void  vtkKWMenu::AddCheckButton(const char* label, const char* ButtonVar,
 }
 
 
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void vtkKWMenu::InsertCheckButton(int position, 
                                   const char* label, const char* ButtonVar, 
                                   vtkKWObject* Object, 
@@ -375,7 +375,7 @@ void vtkKWMenu::InsertCheckButton(int position,
                            -1, help );
 }
 
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void vtkKWMenu::InsertCheckButton(int position, 
                                   const char* label, const char* ButtonVar, 
                                   vtkKWObject* Object, 
@@ -395,7 +395,7 @@ void vtkKWMenu::InsertCheckButton(int position,
 }
 
 
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void  vtkKWMenu::AddCommand(const char* label, vtkKWObject* Object,
                             const char* MethodAndArgString,
                             int underline, 
@@ -412,7 +412,7 @@ void  vtkKWMenu::AddCommand(const char* label, vtkKWObject* Object,
   delete [] str.str();
 }
 
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void  vtkKWMenu::AddCommand(const char* label, vtkKWObject* Object,
                             const char* MethodAndArgString ,
                             const char* help)

@@ -46,18 +46,18 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkObjectFactory.h"
 #include "vtkString.h"
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWOptionMenu );
-vtkCxxRevisionMacro(vtkKWOptionMenu, "1.23");
+vtkCxxRevisionMacro(vtkKWOptionMenu, "1.24");
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 vtkKWOptionMenu::vtkKWOptionMenu()
 {
   this->CurrentValue = NULL;
   this->Menu = vtkKWMenu::New();
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 vtkKWOptionMenu::~vtkKWOptionMenu()
 {
   if (this->CurrentValue)
@@ -68,7 +68,7 @@ vtkKWOptionMenu::~vtkKWOptionMenu()
   this->Menu->Delete();
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 const char *vtkKWOptionMenu::GetValue()
 {
   if (this->CurrentValue)
@@ -85,7 +85,7 @@ const char *vtkKWOptionMenu::GetValue()
   return this->CurrentValue;  
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void vtkKWOptionMenu::SetValue(const char *s)
 {
   if (this->Application && s)
@@ -94,38 +94,38 @@ void vtkKWOptionMenu::SetValue(const char *s)
     }
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void vtkKWOptionMenu::SetCurrentEntry(const char *name)
 { 
   this->SetValue(name);
 }
  
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void vtkKWOptionMenu::SetCurrentImageEntry(const char *image_name)
 { 
   this->Script("%s configure -image %s", this->GetWidgetName(), image_name);
   this->SetValue(image_name);
 }
  
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 const char* vtkKWOptionMenu::GetEntryLabel(int index)
 { 
   return this->Menu->GetItemLabel(index);
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 int vtkKWOptionMenu::GetNumberOfEntries()
 { 
   return this->Menu->GetNumberOfItems();
 }
  
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void vtkKWOptionMenu::AddEntry(const char *name)
 {
   this->AddEntryWithCommand(name, 0, 0, 0);
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void vtkKWOptionMenu::AddEntryWithCommand(const char *name, 
                                           vtkKWObject *obj, 
                                           const char *method,
@@ -142,7 +142,7 @@ void vtkKWOptionMenu::AddEntryWithCommand(const char *name,
   extra.rdbuf()->freeze(0);
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void vtkKWOptionMenu::AddImageEntryWithCommand(const char *image_name, 
                                                vtkKWObject *obj, 
                                                const char *method,
@@ -162,37 +162,37 @@ void vtkKWOptionMenu::AddImageEntryWithCommand(const char *image_name,
   extra.rdbuf()->freeze(0);
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void vtkKWOptionMenu::AddSeparator()
 {
   this->Menu->AddSeparator();
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void vtkKWOptionMenu::DeleteEntry(const char* name)
 { 
   this->Menu->DeleteMenuItem(name);
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void vtkKWOptionMenu::DeleteEntry(int index)
 {
   this->Menu->DeleteMenuItem(index);
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 int vtkKWOptionMenu::HasEntry(const char *name)
 {
   return this->Menu->HasItem(name);
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void vtkKWOptionMenu::ClearEntries()
 {
   this->Menu->DeleteAllMenuItems();
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void vtkKWOptionMenu::Create(vtkKWApplication *app, const char *args)
 {
   const char *wname;
@@ -227,7 +227,7 @@ void vtkKWOptionMenu::Create(vtkKWApplication *app, const char *args)
   this->UpdateEnableState();
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void vtkKWOptionMenu::IndicatorOn()
 {
   if (!this->IsCreated())
@@ -238,7 +238,7 @@ void vtkKWOptionMenu::IndicatorOn()
   this->Script("%s config -indicatoron 1", this->GetWidgetName());
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void vtkKWOptionMenu::IndicatorOff()
 {
   if (!this->IsCreated())
@@ -249,7 +249,7 @@ void vtkKWOptionMenu::IndicatorOff()
   this->Script("%s config -indicatoron 0", this->GetWidgetName());
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void vtkKWOptionMenu::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);

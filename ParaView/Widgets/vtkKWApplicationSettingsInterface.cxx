@@ -58,7 +58,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWApplicationSettingsInterface);
-vtkCxxRevisionMacro(vtkKWApplicationSettingsInterface, "1.12");
+vtkCxxRevisionMacro(vtkKWApplicationSettingsInterface, "1.13");
 
 int vtkKWApplicationSettingsInterfaceCommand(ClientData cd, Tcl_Interp *interp,
                                              int argc, char *argv[]);
@@ -554,7 +554,7 @@ void vtkKWApplicationSettingsInterface::FlatButtonsCallback()
     }
 }
 
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void vtkKWApplicationSettingsInterface::UpdateEnableState()
 {
   this->Superclass::UpdateEnableState();

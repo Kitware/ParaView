@@ -46,11 +46,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <ctype.h>
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWSerializer );
-vtkCxxRevisionMacro(vtkKWSerializer, "1.4");
+vtkCxxRevisionMacro(vtkKWSerializer, "1.5");
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 // Internal function used to consume whitespace when reading in
 // an InputString.
 void vtkKWSerializer::EatWhiteSpace(istream *is)
@@ -66,7 +66,7 @@ void vtkKWSerializer::EatWhiteSpace(istream *is)
     }
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 int vtkKWSerializer::GetNextToken(istream *is, char *result)
 {
   int success;
@@ -144,7 +144,7 @@ int vtkKWSerializer::GetNextToken(istream *is, char *result)
   return success;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void vtkKWSerializer::FindClosingBrace(istream *is, vtkObject *obj)
 {
   char token[VTK_KWSERIALIZER_MAX_TOKEN_LENGTH];
@@ -168,7 +168,7 @@ void vtkKWSerializer::FindClosingBrace(istream *is, vtkObject *obj)
     }
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void vtkKWSerializer::ReadNextToken(istream *is, const char *tok,
                                     vtkObject *obj)
 {
@@ -183,7 +183,7 @@ void vtkKWSerializer::ReadNextToken(istream *is, const char *tok,
     }
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void vtkKWSerializer::WriteSafeString(ostream& os, const char *val)
 {
   int i;

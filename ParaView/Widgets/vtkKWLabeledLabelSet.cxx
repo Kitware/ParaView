@@ -50,10 +50,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkLinkedListIterator.txx"
 #include "vtkObjectFactory.h"
 
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkKWLabeledLabelSet);
-vtkCxxRevisionMacro(vtkKWLabeledLabelSet, "1.3");
+vtkCxxRevisionMacro(vtkKWLabeledLabelSet, "1.4");
 
 int vtkvtkKWLabeledLabelSetCommand(ClientData cd, Tcl_Interp *interp,
                                   int argc, char *argv[]);
@@ -138,7 +138,7 @@ int vtkKWLabeledLabelSet::HasLabeledLabel(int id)
   return this->GetLabeledLabelSlot(id) ? 1 : 0;
 }
 
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void vtkKWLabeledLabelSet::Create(vtkKWApplication *app, const char *args)
 {
   // Set the application
@@ -181,7 +181,7 @@ void vtkKWLabeledLabelSet::UpdateEnableState()
   it->Delete();
 }
 
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 int vtkKWLabeledLabelSet::AddLabeledLabel(int id, 
                                           const char *text, 
                                           const char *text2, 

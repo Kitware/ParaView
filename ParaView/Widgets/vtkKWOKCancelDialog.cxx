@@ -45,9 +45,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWOKCancelDialog );
-vtkCxxRevisionMacro(vtkKWOKCancelDialog, "1.6");
+vtkCxxRevisionMacro(vtkKWOKCancelDialog, "1.7");
 
 
 

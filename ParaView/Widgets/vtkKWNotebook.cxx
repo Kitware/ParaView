@@ -84,15 +84,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define VTK_KW_NB_TAB_PIN_G 255
 #define VTK_KW_NB_TAB_PIN_B 194
 
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWNotebook);
-vtkCxxRevisionMacro(vtkKWNotebook, "1.49");
+vtkCxxRevisionMacro(vtkKWNotebook, "1.50");
 
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 int vtkKWNotebookCommand(ClientData cd, Tcl_Interp *interp,
                          int argc, char *argv[]);
 
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void vtkKWNotebook::Page::Delete()
 {
   if (this->Title)
@@ -132,7 +132,7 @@ void vtkKWNotebook::Page::Delete()
     }
 }
 
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 vtkKWNotebook::vtkKWNotebook()
 {
   this->CommandFunction = vtkKWNotebookCommand;
@@ -166,7 +166,7 @@ vtkKWNotebook::vtkKWNotebook()
 
 }
 
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 vtkKWNotebook::~vtkKWNotebook()
 {
   if (this->Body)
@@ -218,7 +218,7 @@ vtkKWNotebook::~vtkKWNotebook()
   this->MostRecentPages->Delete();
 }
 
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void vtkKWNotebook::Create(vtkKWApplication *app, const char *args)
 {
   // Set the application
@@ -282,7 +282,7 @@ void vtkKWNotebook::Create(vtkKWApplication *app, const char *args)
   this->UpdateEnableState();
 }
 
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 vtkKWNotebook::Page* vtkKWNotebook::GetPage(int id)
 {
   vtkKWNotebook::Page *page = NULL;
@@ -306,7 +306,7 @@ vtkKWNotebook::Page* vtkKWNotebook::GetPage(int id)
   return found;
 }
 
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 vtkKWNotebook::Page* vtkKWNotebook::GetPage(const char *title)
 {
   if (title == NULL)
@@ -337,7 +337,7 @@ vtkKWNotebook::Page* vtkKWNotebook::GetPage(const char *title)
   return found;
 }
 
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 vtkKWNotebook::Page* vtkKWNotebook::GetPage(const char *title, int tag)
 {
   if (title == NULL)
@@ -369,7 +369,7 @@ vtkKWNotebook::Page* vtkKWNotebook::GetPage(const char *title, int tag)
   return found;
 }
 
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 vtkKWNotebook::Page* vtkKWNotebook::GetFirstVisiblePage()
 {
   vtkKWNotebook::Page *page = NULL;
@@ -393,7 +393,7 @@ vtkKWNotebook::Page* vtkKWNotebook::GetFirstVisiblePage()
   return found;
 }
 
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 vtkKWNotebook::Page* vtkKWNotebook::GetFirstPageMatchingTag(int tag)
 {
   vtkKWNotebook::Page *page = NULL;
@@ -417,7 +417,7 @@ vtkKWNotebook::Page* vtkKWNotebook::GetFirstPageMatchingTag(int tag)
   return found;
 }
 
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 vtkKWNotebook::Page* vtkKWNotebook::GetFirstPackedPageNotMatchingTag(int tag)
 {
   if (!this->IsCreated())
@@ -470,13 +470,13 @@ vtkKWNotebook::Page* vtkKWNotebook::GetFirstPackedPageNotMatchingTag(int tag)
   return found;
 }
 
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 unsigned int vtkKWNotebook::GetNumberOfPages()
 {
   return (unsigned int)this->Pages->GetNumberOfItems();
 }
 
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 unsigned int vtkKWNotebook::GetNumberOfVisiblePages()
 {
   unsigned int count = 0;
@@ -497,7 +497,7 @@ unsigned int vtkKWNotebook::GetNumberOfVisiblePages()
   return count;
 }
 
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 int vtkKWNotebook::GetVisiblePageId(int idx)
 {
   // As a convenience, if ShowOnlyMostRecentPages is On, return the 
@@ -548,7 +548,7 @@ int vtkKWNotebook::GetVisiblePageId(int idx)
   return found;
 }
 
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 int vtkKWNotebook::AreTabsVisible()
 {
   int visible_pages = this->GetNumberOfVisiblePages();
@@ -556,7 +556,7 @@ int vtkKWNotebook::AreTabsVisible()
     (visible_pages > 1 || (visible_pages == 1 && this->AlwaysShowTabs)) ? 1 : 0;
 }
 
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 vtkKWWidget *vtkKWNotebook::GetFrame(int id)
 {
   // Return the frame corresponding to that id
@@ -569,7 +569,7 @@ vtkKWWidget *vtkKWNotebook::GetFrame(int id)
   return NULL;
 }
 
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 vtkKWWidget *vtkKWNotebook::GetFrame(const char *title)
 {
   // Return the frame corresponding to that title
@@ -582,7 +582,7 @@ vtkKWWidget *vtkKWNotebook::GetFrame(const char *title)
   return NULL;
 }
 
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 vtkKWWidget *vtkKWNotebook::GetFrame(const char *title, int tag)
 {
   // Return the frame corresponding to that title and tag
@@ -595,20 +595,20 @@ vtkKWWidget *vtkKWNotebook::GetFrame(const char *title, int tag)
   return NULL;
 }
 
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 int vtkKWNotebook::AddPage(const char *title)
 {
   return this->AddPage(title, 0);
 }
 
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 int vtkKWNotebook::AddPage(const char *title, 
                            const char *balloon)
 {
   return this->AddPage(title, balloon, 0);
 }
 
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 int vtkKWNotebook::AddPage(const char *title, 
                            const char *balloon, 
                            vtkKWIcon *icon)
@@ -616,7 +616,7 @@ int vtkKWNotebook::AddPage(const char *title,
   return this->AddPage(title, balloon, icon, 0);
 }
 
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 int vtkKWNotebook::AddPage(const char *title, 
                            const char *balloon, 
                            vtkKWIcon *icon,
@@ -736,19 +736,19 @@ int vtkKWNotebook::AddPage(const char *title,
   return page->Id;
 }
 
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 int vtkKWNotebook::RemovePage(int id)
 {
   return this->RemovePage(this->GetPage(id));
 }
 
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 int vtkKWNotebook::RemovePage(const char *title)
 {
   return this->RemovePage(this->GetPage(title));
 }
 
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 int vtkKWNotebook::RemovePage(vtkKWNotebook::Page *page)
 {
   if (!this->IsCreated())
@@ -801,7 +801,7 @@ int vtkKWNotebook::RemovePage(vtkKWNotebook::Page *page)
   return 1;
 }
 
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void vtkKWNotebook::RemovePagesMatchingTag(int tag)
 {
   vtkKWNotebook::Page *page = NULL;
@@ -823,25 +823,25 @@ void vtkKWNotebook::RemovePagesMatchingTag(int tag)
   it->Delete();
 }
 
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void vtkKWNotebook::Raise(int id)
 {
   this->RaisePage(this->GetPage(id));
 }
 
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void vtkKWNotebook::Raise(const char *title)
 {
   this->RaisePage(this->GetPage(title));
 }
 
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void vtkKWNotebook::Raise(const char *title, int tag)
 {
   this->RaisePage(this->GetPage(title, tag));
 }
 
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void vtkKWNotebook::RaisePage(vtkKWNotebook::Page *page)
 {
   if (page == NULL || !this->IsCreated())
@@ -918,19 +918,19 @@ void vtkKWNotebook::RaisePage(vtkKWNotebook::Page *page)
   this->PutOnTopOfMostRecentPages(page);
 }
 
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 int vtkKWNotebook::GetRaisedPageId()
 {
   return this->CurrentId;
 }
 
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void vtkKWNotebook::RaiseFirstPageMatchingTag(int tag)
 {
   this->RaisePage(this->GetFirstPageMatchingTag(tag));
 }
 
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void vtkKWNotebook::ShowPageTab(vtkKWNotebook::Page *page)
 {
   if (page == NULL || !this->IsCreated())
@@ -986,7 +986,7 @@ void vtkKWNotebook::ShowPageTab(vtkKWNotebook::Page *page)
   cmd.rdbuf()->freeze(0);
 }
 
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void vtkKWNotebook::ShowPageTabAsLow(vtkKWNotebook::Page *page)
 {
   if (page == NULL || !this->IsCreated())
@@ -1012,7 +1012,7 @@ void vtkKWNotebook::ShowPageTabAsLow(vtkKWNotebook::Page *page)
   this->ScheduleResize();
 }
 
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void vtkKWNotebook::LowerPage(vtkKWNotebook::Page *page)
 {
   if (page == NULL || !this->IsCreated())
@@ -1035,19 +1035,19 @@ void vtkKWNotebook::LowerPage(vtkKWNotebook::Page *page)
   this->ShowPageTabAsLow(page);
 }
 
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void vtkKWNotebook::SetPageTag(int id, int tag)
 {
   this->SetPageTag(this->GetPage(id), tag);
 }
 
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void vtkKWNotebook::SetPageTag(const char *title, int tag)
 {
   this->SetPageTag(this->GetPage(title), tag);
 }
 
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void vtkKWNotebook::SetPageTag(vtkKWNotebook::Page *page, int tag)
 {
   if (page == NULL || !this->IsCreated())
@@ -1058,19 +1058,19 @@ void vtkKWNotebook::SetPageTag(vtkKWNotebook::Page *page, int tag)
   page->Tag = tag;
 }
 
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 int vtkKWNotebook::GetPageTag(int id)
 {
   return this->GetPageTag(this->GetPage(id));
 }
 
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 int vtkKWNotebook::GetPageTag(const char *title)
 {
   return this->GetPageTag(this->GetPage(title));
 }
 
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 int vtkKWNotebook::GetPageTag(vtkKWNotebook::Page *page)
 {
   if (page == NULL || !this->IsCreated())
@@ -1082,13 +1082,13 @@ int vtkKWNotebook::GetPageTag(vtkKWNotebook::Page *page)
   return page->Tag;
 }
 
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 char* vtkKWNotebook::GetPageTitle(int id)
 {
   return this->GetPageTitle(this->GetPage(id));
 }
 
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 char* vtkKWNotebook::GetPageTitle(vtkKWNotebook::Page *page)
 {
   if (page == NULL || !this->IsCreated())
@@ -1100,19 +1100,19 @@ char* vtkKWNotebook::GetPageTitle(vtkKWNotebook::Page *page)
   return page->Title;
 }
 
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void vtkKWNotebook::ShowPage(int id)
 {
   this->ShowPage(this->GetPage(id));
 }
 
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void vtkKWNotebook::ShowPage(const char *title)
 {
   this->ShowPage(this->GetPage(title));
 }
 
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void vtkKWNotebook::ShowPage(vtkKWNotebook::Page *page)
 {
   if (page == NULL || !this->IsCreated() || page->Visibility)
@@ -1139,19 +1139,19 @@ void vtkKWNotebook::ShowPage(vtkKWNotebook::Page *page)
   this->ConstrainVisiblePages();
 }
 
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 int vtkKWNotebook::CanBeHidden(int id)
 {
   return this->CanBeHidden(this->GetPage(id));
 }
 
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 int vtkKWNotebook::CanBeHidden(const char *title)
 {
   return this->CanBeHidden(this->GetPage(title));
 }
 
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 int vtkKWNotebook::CanBeHidden(vtkKWNotebook::Page *page)
 {
   if (page == NULL || !this->IsCreated())
@@ -1164,19 +1164,19 @@ int vtkKWNotebook::CanBeHidden(vtkKWNotebook::Page *page)
   return !page->Pinned;
 }
 
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void vtkKWNotebook::HidePage(int id)
 {
   this->HidePage(this->GetPage(id));
 }
 
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void vtkKWNotebook::HidePage(const char *title)
 {
   this->HidePage(this->GetPage(title));
 }
 
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void vtkKWNotebook::HidePage(vtkKWNotebook::Page *page)
 {
   if (page == NULL || 
@@ -1229,7 +1229,7 @@ void vtkKWNotebook::HidePage(vtkKWNotebook::Page *page)
   this->ScheduleResize();
 }
 
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void vtkKWNotebook::SetPageVisibility(int id, int flag)
 {
   if (flag)
@@ -1242,7 +1242,7 @@ void vtkKWNotebook::SetPageVisibility(int id, int flag)
     }
 }
 
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void vtkKWNotebook::SetPageVisibility(const char *title, int flag)
 {
   if (flag)
@@ -1255,19 +1255,19 @@ void vtkKWNotebook::SetPageVisibility(const char *title, int flag)
     }
 }
 
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 int vtkKWNotebook::GetPageVisibility(int id)
 {
   return this->GetPageVisibility(this->GetPage(id));
 }
 
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 int vtkKWNotebook::GetPageVisibility(const char *title)
 {
   return this->GetPageVisibility(this->GetPage(title));
 }
 
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 int vtkKWNotebook::GetPageVisibility(vtkKWNotebook::Page *page)
 {
   if (page == NULL || !this->IsCreated())
@@ -1278,19 +1278,19 @@ int vtkKWNotebook::GetPageVisibility(vtkKWNotebook::Page *page)
   return page->Visibility;
 }
 
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void vtkKWNotebook::TogglePageVisibility(int id)
 {
   this->TogglePageVisibility(this->GetPage(id));
 }
 
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void vtkKWNotebook::TogglePageVisibility(const char *title)
 {
   this->TogglePageVisibility(this->GetPage(title));
 }
 
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void vtkKWNotebook::TogglePageVisibility(vtkKWNotebook::Page *page)
 {
   if (page == NULL || !this->IsCreated())
@@ -1308,7 +1308,7 @@ void vtkKWNotebook::TogglePageVisibility(vtkKWNotebook::Page *page)
     }
 }
 
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void vtkKWNotebook::HideAllPages()
 {
   vtkKWNotebook::Page *page = NULL;
@@ -1326,7 +1326,7 @@ void vtkKWNotebook::HideAllPages()
   it->Delete();
 }
 
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void vtkKWNotebook::ShowPagesMatchingTag(int tag)
 {
   vtkKWNotebook::Page *page = NULL;
@@ -1344,7 +1344,7 @@ void vtkKWNotebook::ShowPagesMatchingTag(int tag)
   it->Delete();
 }
 
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void vtkKWNotebook::ShowPagesMatchingTagReverse(int tag)
 {
   vtkKWNotebook::Page *page = NULL;
@@ -1362,7 +1362,7 @@ void vtkKWNotebook::ShowPagesMatchingTagReverse(int tag)
   it->Delete();
 }
 
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void vtkKWNotebook::HidePagesMatchingTag(int tag)
 {
   vtkKWNotebook::Page *page = NULL;
@@ -1380,7 +1380,7 @@ void vtkKWNotebook::HidePagesMatchingTag(int tag)
   it->Delete();
 }
 
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void vtkKWNotebook::ShowPagesNotMatchingTag(int tag)
 {
   vtkKWNotebook::Page *page = NULL;
@@ -1398,7 +1398,7 @@ void vtkKWNotebook::ShowPagesNotMatchingTag(int tag)
   it->Delete();
 }
 
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void vtkKWNotebook::HidePagesNotMatchingTag(int tag)
 {
   vtkKWNotebook::Page *page = NULL;
@@ -1416,7 +1416,7 @@ void vtkKWNotebook::HidePagesNotMatchingTag(int tag)
   it->Delete();
 }
 
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 int vtkKWNotebook::AddToMostRecentPages(vtkKWNotebook::Page *page)
 {
   vtkIdType idx;
@@ -1429,7 +1429,7 @@ int vtkKWNotebook::AddToMostRecentPages(vtkKWNotebook::Page *page)
   return 1;
 }
 
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 int vtkKWNotebook::RemoveFromMostRecentPages(vtkKWNotebook::Page *page)
 {
   if (page == NULL)
@@ -1446,14 +1446,14 @@ int vtkKWNotebook::RemoveFromMostRecentPages(vtkKWNotebook::Page *page)
   return 1;
 }
 
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 int vtkKWNotebook::PutOnTopOfMostRecentPages(vtkKWNotebook::Page *page)
 {
   this->RemoveFromMostRecentPages(page);
   return this->AddToMostRecentPages(page);
 }
 
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 int vtkKWNotebook::GetMostRecentPageId(int idx)
 {
   if (idx < 0 || idx >= this->MostRecentPages->GetNumberOfItems())
@@ -1470,13 +1470,13 @@ int vtkKWNotebook::GetMostRecentPageId(int idx)
   return page->Id;
 }
 
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void vtkKWNotebook::PinPage(int id)
 {
   this->PinPage(this->GetPage(id));
 }
 
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void vtkKWNotebook::PinPage(const char *title)
 {
   this->PinPage(this->GetPage(title));
@@ -1494,19 +1494,19 @@ void vtkKWNotebook::PinPage(vtkKWNotebook::Page *page)
   this->UpdatePageTabBackgroundColor(page, this->CurrentId == page->Id);
 }
 
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void vtkKWNotebook::UnpinPage(int id)
 {
   this->UnpinPage(this->GetPage(id));
 }
 
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void vtkKWNotebook::UnpinPage(const char *title)
 {
   this->UnpinPage(this->GetPage(title));
 }
 
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void vtkKWNotebook::UnpinPage(vtkKWNotebook::Page *page)
 {
   if (page == NULL || !this->IsCreated())
@@ -1518,19 +1518,19 @@ void vtkKWNotebook::UnpinPage(vtkKWNotebook::Page *page)
   this->UpdatePageTabBackgroundColor(page, this->CurrentId == page->Id);
 }
 
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void vtkKWNotebook::TogglePagePinned(int id)
 {
   this->TogglePagePinned(this->GetPage(id));
 }
 
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void vtkKWNotebook::TogglePagePinned(const char *title)
 {
   this->TogglePagePinned(this->GetPage(title));
 }
 
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void vtkKWNotebook::TogglePagePinned(vtkKWNotebook::Page *page)
 {
   if (page == NULL || !this->IsCreated())
@@ -1548,19 +1548,19 @@ void vtkKWNotebook::TogglePagePinned(vtkKWNotebook::Page *page)
     }
 }
 
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 int vtkKWNotebook::GetPagePinned(int id)
 {
   return this->GetPagePinned(this->GetPage(id));
 }
 
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 int vtkKWNotebook::GetPagePinned(const char *title)
 {
   return this->GetPagePinned(this->GetPage(title));
 }
 
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 int vtkKWNotebook::GetPagePinned(vtkKWNotebook::Page *page)
 {
   if (page == NULL || !this->IsCreated())
@@ -1572,7 +1572,7 @@ int vtkKWNotebook::GetPagePinned(vtkKWNotebook::Page *page)
   return page->Pinned;
 }
 
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 unsigned int vtkKWNotebook::GetNumberOfPinnedPages()
 {
   unsigned int count = 0;
@@ -1593,7 +1593,7 @@ unsigned int vtkKWNotebook::GetNumberOfPinnedPages()
   return count;
 }
 
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 int vtkKWNotebook::GetPinnedPageId(int idx)
 {
   vtkIdType found = -1;
@@ -1615,7 +1615,7 @@ int vtkKWNotebook::GetPinnedPageId(int idx)
   return found;
 }
 
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void vtkKWNotebook::PageTabContextMenuCallback(int id, int x, int y)
 {
   if (!this->IsCreated() || !this->EnablePageTabContextMenu)
@@ -1680,7 +1680,7 @@ void vtkKWNotebook::PageTabContextMenuCallback(int id, int x, int y)
                this->TabPopupMenu->GetWidgetName(), x, y);
 }
 
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void vtkKWNotebook::UpdatePageTabBackgroundColor(vtkKWNotebook::Page *page, 
                                                  int selected)
 {
@@ -1807,7 +1807,7 @@ void vtkKWNotebook::UpdatePageTabBackgroundColor(vtkKWNotebook::Page *page,
 #endif
 }
 
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void vtkKWNotebook::UpdateBodyPosition()
 {
   if (!this->IsCreated())
@@ -1848,7 +1848,7 @@ void vtkKWNotebook::UpdateBodyPosition()
     }
 }
 
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void vtkKWNotebook::UpdateMaskPosition()
 {
   if (!this->IsCreated())
@@ -1952,7 +1952,7 @@ void vtkKWNotebook::UpdateMaskPosition()
     }
 }
 
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void vtkKWNotebook::ScheduleResize()
 {  
   if (this->Expanding)
@@ -1967,7 +1967,7 @@ void vtkKWNotebook::ScheduleResize()
   this->Script("after idle {catch {%s Resize}}", this->GetTclName());
 }
 
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void vtkKWNotebook::Resize()
 {
   if (!this->IsCreated())

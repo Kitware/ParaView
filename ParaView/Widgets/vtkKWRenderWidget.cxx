@@ -59,7 +59,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkWin32OpenGLRenderWindow.h"
 #endif
 
-vtkCxxRevisionMacro(vtkKWRenderWidget, "1.41");
+vtkCxxRevisionMacro(vtkKWRenderWidget, "1.42");
 
 //----------------------------------------------------------------------------
 class vtkKWRenderWidgetObserver : public vtkCommand
@@ -841,7 +841,7 @@ void vtkKWRenderWidget::ExecuteEvent(vtkObject*, unsigned long event,
     }
 }
 
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void vtkKWRenderWidget::UpdateEnableState()
 {
   this->Superclass::UpdateEnableState();

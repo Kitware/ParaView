@@ -50,9 +50,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "Resources/icons.h"
 
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWIcon );
-vtkCxxRevisionMacro(vtkKWIcon, "1.11");
+vtkCxxRevisionMacro(vtkKWIcon, "1.12");
 
 //----------------------------------------------------------------------------
 vtkKWIcon::vtkKWIcon()
