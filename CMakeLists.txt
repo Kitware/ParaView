@@ -2,6 +2,8 @@ PROJECT(PARAVIEW)
 
 FIND_PATH( VTK_BINARY_DIR vtkConfigure.h )
 
+SET (PARAVIEW_CAN_BUILD 1)
+
 # load in the values from VTK if found
 IF ( VTK_BINARY_DIR )
   LOAD_CACHE(${VTK_BINARY_DIR} EXCLUDE
@@ -14,9 +16,35 @@ IF ( VTK_BINARY_DIR )
                                 VTK_BINARY_PATH
                                 VTK_LIBRARY_PATH)
   INCLUDE (${VTK_SOURCE_DIR}/vtkCMakeOptions.cmake)
-  SUBDIRS(Widgets ParaView)
-  SUBDIR_DEPENDS(ParaView Widgets)
+ELSE (VTK_BINARY_DIR )
+  SET (PARAVIEW_CAN_BUILD 0)
+  MESSAGE("ParaView requires VTK to build. Please set VTK_BINARY_DIR")
 ENDIF (VTK_BINARY_DIR )
+
+IF (NOT VTK_USE_HYBRID)
+   MESSAGE("ParaView requires VTK to be built with hybrid support. Please rebuild VTK with hybrid and re-run CMake")
+   SET (PARAVIEW_CAN_BUILD 0)
+ENDIF (NOT VTK_USE_HYBRID)
+
+IF (NOT VTK_USE_RENDERING)
+   MESSAGE("ParaView requires VTK to be built with rendering support. Please rebuild VTK with rendering and re-run CMake")
+   SET (PARAVIEW_CAN_BUILD 0)
+ENDIF (NOT VTK_USE_RENDERING)
+
+IF (NOT VTK_USE_PARALLEL)
+   MESSAGE("ParaView requires VTK to be built with parallel support. Please rebuild VTK with parallel and re-run CMake")
+   SET (PARAVIEW_CAN_BUILD 0)
+ENDIF (NOT VTK_USE_PARALLEL)
+
+IF (NOT VTK_USE_PATENTED)
+   MESSAGE("ParaView requires VTK to be built with patented support. Please rebuild VTK with patented and re-run CMake")
+   SET (PARAVIEW_CAN_BUILD 0)
+ENDIF (NOT VTK_USE_PATENTED)
+
+IF (PARAVIEW_CAN_BUILD)
+
+SUBDIRS(Widgets ParaView)
+SUBDIR_DEPENDS(ParaView Widgets)
 
 OPTION(BUILD_SHARED_LIBS "Build ParaView with shared libraries." OFF)
 OPTION(BUILD_EXAMPLES "Build VTK examples." OFF)
@@ -52,8 +80,8 @@ ENDIF (UNIX)
 IF (WIN32)
 FIND_PATH( HTML_HELP_PATH htmlhelp.h 
 	   "c:/program files/html help workshop"  
-	   "c:/program files/html help workshop/include" )
-
+	   "c:/program files/html help workshop/include" 
+           "[HKEY_CURRENT_USER\\Software\\Microsoft\\HTML Help Workshop;InstallDir]/include" )
 IF (HTML_HELP_PATH)
   INCLUDE_DIRECTORIES(${HTML_HELP_PATH})
 ENDIF (HTML_HELP_PATH)
@@ -61,7 +89,8 @@ ENDIF (HTML_HELP_PATH)
 
 FIND_LIBRARY( HTML_HELP_LIBRARY htmlhelp
 	   "c:/program files/html help workshop"  
-	   "c:/program files/html help workshop/LIB")
+	   "c:/program files/html help workshop/LIB"
+           "[HKEY_CURRENT_USER\\Software\\Microsoft\\HTML Help Workshop;InstallDir]/lib")
 
 IF (HTML_HELP_LIBRARY)	  
    LINK_LIBRARIES( ${HTML_HELP_LIBRARY} )
@@ -83,3 +112,4 @@ ENDIF(BUILD_TESTING)
 
 SET (LIBRARY_OUTPUT_PATH ${PARAVIEW_BINARY_DIR}/bin/ CACHE PATH "Single output directory for building all libraries.")
 SET (EXECUTABLE_OUTPUT_PATH ${PARAVIEW_BINARY_DIR}/bin/ CACHE PATH "Single output directory for building all executables.")
+ENDIF (PARAVIEW_CAN_BUILD)
