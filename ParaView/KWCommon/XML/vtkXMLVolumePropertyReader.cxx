@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkXMLVolumePropertyWriter.h"
 
 vtkStandardNewMacro(vtkXMLVolumePropertyReader);
-vtkCxxRevisionMacro(vtkXMLVolumePropertyReader, "1.9");
+vtkCxxRevisionMacro(vtkXMLVolumePropertyReader, "1.10");
 
 //----------------------------------------------------------------------------
 char* vtkXMLVolumePropertyReader::GetRootElementName()
@@ -112,10 +112,10 @@ int vtkXMLVolumePropertyReader::Parse(vtkXMLDataElement *elem)
     obj->SetIndependentComponents(ival);
     }
 
-  float avg_spacing = 0.0;
+  double avg_spacing = 0.0;
   if (this->ImageData)
     {
-    float *spacing = this->ImageData->GetSpacing();
+    double *spacing = this->ImageData->GetSpacing();
     avg_spacing = (spacing[0] + spacing[1] + spacing[2]) / 3.0;
     }
 
