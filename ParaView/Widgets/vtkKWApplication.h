@@ -283,6 +283,10 @@ protected:
   // Do one tcl event and whatever application might want to do.
   virtual void DoOneTclEvent();
 
+  // Description:
+  // Cleanup everything before exiting.
+  virtual void Cleanup() { };
+
   Tk_Window MainWindow;
   Tcl_Interp *MainInterp;
   vtkKWWindowCollection *Windows;

@@ -75,7 +75,7 @@ int vtkKWApplication::WidgetVisibility = 1;
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.107");
+vtkCxxRevisionMacro(vtkKWApplication, "1.108");
 
 extern "C" int Vtktcl_Init(Tcl_Interp *interp);
 extern "C" int Vtkkwwidgetstcl_Init(Tcl_Interp *interp);
@@ -486,6 +486,7 @@ void vtkKWApplication::Exit()
     }
 
   this->InExit = 0;
+  this->Cleanup();
 
   return;
 }
