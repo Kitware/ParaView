@@ -23,7 +23,6 @@
 #define __vtkSMDisplay_h
 
 #include "vtkSMProxy.h"
-#include "vtkClientServerStream.h"
 
 class vtkSMSourceProxy;
 

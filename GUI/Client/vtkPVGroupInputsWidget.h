@@ -23,12 +23,13 @@
 #define __vtkPVGroupInputsWidget_h
 
 #include "vtkPVWidget.h"
-#include <vector>
+
 class vtkKWPushButton;
 class vtkKWWidget;
 class vtkKWListBox;
 class vtkCollection;
 class vtkPVSourceCollection;
+class vtkPVSourceVectorInternals;
 
 class VTK_EXPORT vtkPVGroupInputsWidget : public vtkPVWidget
 {
@@ -74,9 +75,7 @@ protected:
   vtkPVGroupInputsWidget();
   ~vtkPVGroupInputsWidget();
 
-//BTX
-  vtkstd::vector<vtkPVSource*> InputsVector;
-//ETX
+  vtkPVSourceVectorInternals *Internal;
 
   vtkKWListBox* PartSelectionList;
   // Labels get substituted for list box after accept is called.

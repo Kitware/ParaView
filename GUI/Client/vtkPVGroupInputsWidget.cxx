@@ -27,16 +27,26 @@
 #include "vtkPVWindow.h"
 #include "vtkPVSourceCollection.h"
 
+#include <vtkstd/vector>
+
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVGroupInputsWidget);
-vtkCxxRevisionMacro(vtkPVGroupInputsWidget, "1.27");
+vtkCxxRevisionMacro(vtkPVGroupInputsWidget, "1.28");
+
+class vtkPVSourceVectorInternals
+{
+public:
+  typedef vtkstd::vector<vtkPVSource*> VectorType;
+  VectorType InputsVector;
+};
 
 int vtkPVGroupInputsWidgetCommand(ClientData cd, Tcl_Interp *interp,
-                                int argc, char *argv[]);
+                                  int argc, char *argv[]);
 
 //----------------------------------------------------------------------------
 vtkPVGroupInputsWidget::vtkPVGroupInputsWidget()
 {
+  this->Internal = new vtkPVSourceVectorInternals;
   this->CommandFunction = vtkPVGroupInputsWidgetCommand;
   
   this->PartSelectionList = vtkKWListBox::New();
@@ -50,6 +60,7 @@ vtkPVGroupInputsWidget::~vtkPVGroupInputsWidget()
   this->PartSelectionList = NULL;
   this->PartLabelCollection->Delete();
   this->PartLabelCollection = NULL;
+  delete this->Internal;
 }
 
 //----------------------------------------------------------------------------
@@ -187,7 +198,7 @@ void vtkPVGroupInputsWidget::Accept()
     if (state)
       {
       // Keep a list of selected inputs for later use.
-      this->InputsVector.push_back(pvs);
+      this->Internal->InputsVector.push_back(pvs);
 
       this->PVSource->AddPVInput(pvs);
       // SetPVinput does all this for us.
@@ -249,9 +260,9 @@ void vtkPVGroupInputsWidget::Trace(ofstream *file)
     }
   *file << "$kw(" << this->GetTclName() << ") AllOffCallback" << endl;
  
-  for (unsigned int i=0; i < this->InputsVector.size(); ++i)
+  for (unsigned int i=0; i < this->Internal->InputsVector.size(); ++i)
     {
-    pvs = this->InputsVector[i];
+    pvs = this->Internal->InputsVector[i];
     if ( ! pvs->InitializeTrace(file))
       {
       vtkErrorMacro("Could not initialize trace for object.");
