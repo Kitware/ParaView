@@ -101,7 +101,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.156.2.9");
+vtkCxxRevisionMacro(vtkPVApplication, "1.156.2.10");
 
 int vtkPVApplicationCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -1742,6 +1742,8 @@ void vtkPVApplication::PrintSelf(ostream& os, vtkIndent indent)
      << endl;
   os << indent << "TraceFileName: " 
      << (this->TraceFileName ? this->TraceFileName : "(none)") << endl;
+  os << indent << "Argv0: " 
+     << (this->Argv0 ? this->Argv0 : "(none)") << endl;
 }
 
 void vtkPVApplication::DisplayTCLError(const char* message)
