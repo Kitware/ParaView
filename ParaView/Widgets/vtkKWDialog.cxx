@@ -58,9 +58,6 @@ vtkKWDialog* vtkKWDialog::New()
   return new vtkKWDialog;
 }
 
-
-
-
 int vtkKWDialogCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
 
@@ -132,7 +129,6 @@ void vtkKWDialog::OK()
     }
 }
 
-
 void vtkKWDialog::Create(vtkKWApplication *app, const char *args)
 {
   const char *wname;
@@ -160,3 +156,10 @@ void vtkKWDialog::SetCommand(vtkKWObject* CalledObject, const char *CommandStrin
 {
   this->Command = this->CreateCommand(CalledObject, CommandString);
 }
+
+void vtkKWDialog::SetTitle( const char* title )
+{
+  this->Script("wm title %s \"%s\"", this->GetWidgetName(), 
+	       title);
+}
+

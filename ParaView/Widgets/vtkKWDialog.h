@@ -89,6 +89,10 @@ public:
   // The calling is done via TCL wrappers for the KWObject.
   virtual void SetCommand(vtkKWObject* CalledObject, const char *CommandString);
 
+  // Description:
+  // Set the title of the dialog. Default is "Kitware Dialog".
+  void SetTitle(const char *);
+
 protected:
   vtkKWDialog();
   ~vtkKWDialog();
