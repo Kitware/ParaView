@@ -176,7 +176,7 @@ void vtkPVPointWidget::Accept()
 	    this->PositionEntry[0]->GetValueAsFloat(),
 	    this->PositionEntry[1]->GetValueAsFloat(),
 	    this->PositionEntry[2]->GetValueAsFloat());
-    pvApp->BroadcastScript(acceptCmd);
+    pvApp->Script(acceptCmd);
     }
   this->Superclass::Accept();
 }

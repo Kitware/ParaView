@@ -278,7 +278,7 @@ void vtkPVLineWidget::Accept()
 	    this->Point1[0]->GetValueAsFloat(),
 	    this->Point1[1]->GetValueAsFloat(),
 	    this->Point1[2]->GetValueAsFloat());
-    pvApp->BroadcastScript(acceptCmd);
+    pvApp->Script(acceptCmd);
     }
   if ( this->Point2Variable && this->Point2Object )
     {
@@ -287,14 +287,14 @@ void vtkPVLineWidget::Accept()
 	    this->Point2[0]->GetValueAsFloat(),
 	    this->Point2[1]->GetValueAsFloat(),
 	    this->Point2[2]->GetValueAsFloat());
-    pvApp->BroadcastScript(acceptCmd);
+    pvApp->Script(acceptCmd);
     }
   if ( this->ResolutionVariable && this->ResolutionObject )
     {
     sprintf(acceptCmd, "%s Set%s %i", this->ResolutionObject, 
 	    this->ResolutionVariable,
 	    this->ResolutionEntry->GetValueAsInt());
-    pvApp->BroadcastScript(acceptCmd);
+    pvApp->Script(acceptCmd);
     }
   this->Superclass::Accept();
 }
