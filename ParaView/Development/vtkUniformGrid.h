@@ -84,7 +84,7 @@ public:
   void Initialize();
   int GetMaxCellSize() {return 8;}; //voxel is the largest
   virtual void GetScalarRange(float range[2]);
-  float *GetScalarRange() {return this->Superclass::GetScalarRange();}
+  double *GetScalarRange() {return this->Superclass::GetScalarRange();}
 
   // Description:
   // For streaming.  User/next filter specifies which piece the want updated.
