@@ -239,11 +239,13 @@ public:
   // When storing multiple arguments, separate with spaces.
   // If the level is lower than current registery level, operation 
   // will be successfull.
+  /*
   int SetWindowRegisteryValue(int level, const char* subkey, const char* key, 
 			const char* format, ...);
   int GetWindowRegisteryValue(int level, const char* subkey, const char* key, 
 			char*value);
   int DeleteRegisteryValue(int level, const char* subkey, const char* key);
+  */
   
   // Description:
   // Get float registery value (zero if not found).

@@ -223,6 +223,8 @@ public:
 			const char* format, ...);
   int GetRegisteryValue(int level, const char* subkey, const char* key, 
 			char*value);
+  int DeleteRegisteryValue(int level, const char* subkey, const char* key);
+  
 //ETX
 protected:
   vtkKWApplication();

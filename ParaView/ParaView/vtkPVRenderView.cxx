@@ -519,7 +519,7 @@ void vtkPVRenderView::CreateViewProperties()
   this->InterruptRenderCheck->Create(this->Application, "-text \"Allow Rendering Interrupts\"");
   this->InterruptRenderCheck->SetCommand(this, "InterruptRenderCallback");
 
-  if (pvwindow && pvwindow->GetWindowRegisteryValue(2, "RunTime", 
+  if (pvwindow && pvapp && pvapp->GetRegisteryValue(2, "RunTime", 
                                                     "InterruptRender", 0))
     {
     this->InterruptRenderCheck->SetState(
@@ -538,7 +538,7 @@ void vtkPVRenderView::CreateViewProperties()
   this->CompositeWithRGBACheck->Create(this->Application, "-text \"Composite RGBA\"");
   
   this->CompositeWithFloatCheck->SetCommand(this, "CompositeWithFloatCallback");
-  if (pvwindow && pvwindow->GetWindowRegisteryValue(2, "RunTime", 
+  if (pvwindow && pvapp && pvapp->GetRegisteryValue(2, "RunTime", 
                                                     "UseFloatInComposite", 0))
     {
     this->CompositeWithFloatCheck->SetState(pvwindow->GetIntRegisteryValue(
@@ -552,7 +552,7 @@ void vtkPVRenderView::CreateViewProperties()
   this->CompositeWithFloatCheck->SetBalloonHelpString("Toggle the use of char/float values when compositing. If rendering defects occur, try turning this on.");
   
   this->CompositeWithRGBACheck->SetCommand(this, "CompositeWithRGBACallback");
-  if (pvwindow && pvwindow->GetWindowRegisteryValue(2, "RunTime", 
+  if (pvwindow && pvapp && pvapp->GetRegisteryValue(2, "RunTime", 
                                                     "UseRGBAInComposite", 0))
     {
     this->CompositeWithRGBACheck->SetState(pvwindow->GetIntRegisteryValue(

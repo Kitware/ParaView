@@ -890,8 +890,8 @@ void vtkKWWindow::StoreRecentMenuToRegistery(char * vtkNotUsed(key))
     {
     sprintf(KeyNameP, "File%d", i);
     sprintf(CmdNameP, "File%dCmd", i);
-    this->DeleteRegisteryValue( 1, "MRU", KeyNameP );
-    this->DeleteRegisteryValue( 1, "MRU", CmdNameP );    
+    this->GetApplication()->DeleteRegisteryValue( 1, "MRU", KeyNameP );
+    this->GetApplication()->DeleteRegisteryValue( 1, "MRU", CmdNameP );    
     if ( this->RecentFilesVector )
       {
       vtkKWWindowMenuEntry *vp = 0;
@@ -993,7 +993,7 @@ void vtkKWWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWWindow ";
-  this->ExtractRevision(os,"$Revision: 1.87 $");
+  this->ExtractRevision(os,"$Revision: 1.88 $");
 }
 
 int vtkKWWindow::ExitDialog()
@@ -1142,82 +1142,6 @@ void vtkKWWindow::InsertRecentFileToMenu(const char *filename,
 
   delete [] file;
   //this->PrintRecentFiles();
-}
-
-int vtkKWWindow::SetWindowRegisteryValue(int level, const char* subkey, 
-				   const char* key, 
-				   const char* format, ...)
-{
-  if ( this->GetApplication()->GetRegisteryLevel() < 0 ||
-       this->GetApplication()->GetRegisteryLevel() < level )
-    {
-    return 0;
-    }
-  int res = 0;
-  char buffer[100];
-  char value[16000];
-  sprintf(buffer, "%s\\%s", 
-	  this->GetApplication()->GetApplicationVersionName(),
-	  subkey);
-  va_list var_args;
-  va_start(var_args, format);
-  vsprintf(value, format, var_args);
-  va_end(var_args);
-  
-  vtkKWRegisteryUtilities *reg 
-    = this->GetApplication()->GetRegistery(
-      this->GetApplication()->GetApplicationName());
-  res = reg->SetValue(buffer, key, value);
-  return res;
-}
-
-int vtkKWWindow::DeleteRegisteryValue(int level, const char* subkey, 
-				      const char* key)
-{
-  if ( this->GetApplication()->GetRegisteryLevel() < 0 ||
-       this->GetApplication()->GetRegisteryLevel() < level )
-    {
-    return 0;
-    }
-  int res = 0;
-  char buffer[100];
-  sprintf(buffer, "%s\\%s", 
-	  this->GetApplication()->GetApplicationVersionName(),
-	  subkey);
-  
-  vtkKWRegisteryUtilities *reg 
-    = this->GetApplication()->GetRegistery(
-      this->GetApplication()->GetApplicationName());
-  res = reg->DeleteValue(buffer, key);
-  return res;
-}
-
-int vtkKWWindow::GetWindowRegisteryValue(int level, const char* subkey, 
-				   const char* key, char* value)
-{
-  int res = 0;
-  char buff[1024];
-  if ( !this->GetApplication() ||
-       this->GetApplication()->GetRegisteryLevel() < 0 ||
-       this->GetApplication()->GetRegisteryLevel() < level )
-    {
-    return 0;
-    }
-  char buffer[100];
-  sprintf(buffer, "%s\\%s", 
-	  this->GetApplication()->GetApplicationVersionName(),
-	  subkey);
-
-  vtkKWRegisteryUtilities *reg 
-    = this->GetApplication()->GetRegistery(
-      this->GetApplication()->GetApplicationName());
-  res = reg->ReadValue(buffer, key, buff);
-  if ( *buff && value )
-    {
-    *value = 0;
-    strcpy(value, buff);
-    }  
-  return res;
 }
 
 float vtkKWWindow::GetFloatRegisteryValue(int level, const char* subkey, 
