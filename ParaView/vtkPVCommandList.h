@@ -49,6 +49,10 @@ public:
 //ETX
   
   // Description:
+  // Random access.
+  void SetCommand(int idx, const char *str);
+
+  // Description:
   // Get the length of the list.
   int GetLength() { return this->NumberOfCommands;}
   
@@ -66,6 +70,7 @@ protected:
   int NumberOfCommands;
   int CommandArrayLength;
   char **Commands;
+  void Reallocate(int num);
   void DeleteCommands();
 
 };

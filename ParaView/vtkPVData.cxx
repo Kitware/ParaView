@@ -132,7 +132,7 @@ int vtkPVData::Create(char *args)
   //this->Update();
   
   this->FiltersMenuButton->SetParent(this);
-  this->FiltersMenuButton->Create(this->Application, "");
+  this->FiltersMenuButton->Create(this->Application, "-relief raised -bd 2");
   this->FiltersMenuButton->SetButtonText("Filters");
   this->FiltersMenuButton->AddCommand("vtkContourFilter", this,
 				      "Contour");

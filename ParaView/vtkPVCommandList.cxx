@@ -96,24 +96,7 @@ void vtkPVCommandList::AddCommand(const char *format, ...)
   // Check to see if we need to extent to array of commands.
   if (this->CommandArrayLength <= this->NumberOfCommands)
     { // Yes.
-    int i;
-    // Allocate a new array
-    this->CommandArrayLength += 20;
-    char **tmp = new char* [this->CommandArrayLength];
-    // Copy array elements.
-    for (i = 0; i < this->NumberOfCommands; ++i)
-      {
-      tmp[i] = this->Commands[i];
-      }
-    // Delete the old array.
-    if (this->Commands)
-      {
-      delete [] this->Commands;
-      this->Commands = NULL;
-      }
-    // Set the new array.
-    this->Commands = tmp;
-    tmp = NULL;
+    this->Reallocate(this->CommandArrayLength + 20);
     }
 
   // Allocate the string for and set the new command.
@@ -121,4 +104,71 @@ void vtkPVCommandList::AddCommand(const char *format, ...)
               = new char[strlen(event) + 2];
   strcpy(this->Commands[this->NumberOfCommands], event);
   this->NumberOfCommands += 1;
+}
+
+//----------------------------------------------------------------------------
+void vtkPVCommandList::SetCommand(int idx, const char *str)
+{
+  int j;
+
+  if (idx >= this->CommandArrayLength)
+    {
+    this->Reallocate(idx + 20);
+    }
+
+  // Expand the command list to include idx.
+  // Add NULL entries if necessary.
+  if (idx >= this->NumberOfCommands)
+    {
+    for (j = this->NumberOfCommands; j <= idx; ++j)
+      {
+      this->Commands[j] = NULL;
+      }
+    this->NumberOfCommands = idx + 1;
+    }
+  
+  // Delete old command
+  if (this->Commands[idx])
+    {
+    delete [] this->Commands[idx];
+    this->Commands[idx] = NULL;
+    }
+  if (str == NULL)
+    {
+    return;
+    }
+
+  // Copy the string into the array.
+  this->Commands[idx] = new char[strlen(str) + 2];
+  strcpy(this->Commands[idx], str);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVCommandList::Reallocate(int num)
+{
+  int i;
+
+  // Check to see if we need to extent to array of commands.
+  if (this->CommandArrayLength >= num)
+    { // No
+    return;
+    }
+
+  // Allocate a new array
+  this->CommandArrayLength = num;
+  char **tmp = new char* [this->CommandArrayLength];
+  // Copy array elements.
+  for (i = 0; i < this->NumberOfCommands; ++i)
+    {
+    tmp[i] = this->Commands[i];
+    }
+  // Delete the old array.
+  if (this->Commands)
+    {
+    delete [] this->Commands;
+    this->Commands = NULL;
+    }
+  // Set the new array.
+  this->Commands = tmp;
+  tmp = NULL;
 }

@@ -26,6 +26,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 =========================================================================*/
 #include "vtkPVSelectionList.h"
+#include "vtkPVCommandList.h"
 
 int vtkPVSelectionListCommand(ClientData cd, Tcl_Interp *interp,
 		     int argc, char *argv[]);
@@ -40,7 +41,8 @@ vtkPVSelectionList::vtkPVSelectionList()
   this->CurrentName = NULL;
   
   this->MenuButton = vtkPVMenuButton::New();
-  this->Label = vtkKWLabel::New();
+
+  this->Names = vtkPVCommandList::New();
 }
 
 //----------------------------------------------------------------------------
@@ -50,8 +52,8 @@ vtkPVSelectionList::~vtkPVSelectionList()
   
   this->MenuButton->Delete();
   this->MenuButton = NULL;
-  this->Label->Delete();
-  this->Label = NULL;
+  this->Names->Delete();
+  this->Names = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -73,10 +75,6 @@ int vtkPVSelectionList::Create(vtkKWApplication *app)
   // create the top level
   this->Script("frame %s", this->GetWidgetName());
 
-  this->Label->SetParent(this);
-  this->Label->Create(app, "");
-  this->Script("pack %s -side left", this->Label->GetWidgetName());
-
   this->MenuButton->SetParent(this);
   this->MenuButton->Create(app, "");
   this->Script("pack %s -side left", this->MenuButton->GetWidgetName());
@@ -89,6 +87,9 @@ void vtkPVSelectionList::AddItem(const char *name, int value)
 {
   char tmp[1024];
   
+  // Save for internal use
+  this->Names->SetCommand(value, name);
+
   sprintf(tmp, "SelectCallback %s %d", name, value);
   this->MenuButton->AddCommand(name, this, tmp);
   
@@ -99,9 +100,27 @@ void vtkPVSelectionList::AddItem(const char *name, int value)
 }
 
 //----------------------------------------------------------------------------
+void vtkPVSelectionList::SetCurrentValue(int value)
+{
+  char *name;
+
+  if (this->CurrentValue == value)
+    {
+    return;
+    }
+  this->Modified();
+  this->CurrentValue = value;
+  name = this->Names->GetCommand(value);
+  if (name)
+    {
+    this->SelectCallback(name, value);
+    }
+}
+
+//----------------------------------------------------------------------------
 void vtkPVSelectionList::SelectCallback(const char *name, int value)
 {
-  this->SetCurrentValue(value);
+  this->CurrentValue = value;
   this->SetCurrentName(name);
   
   this->MenuButton->SetButtonText(name);

@@ -31,6 +31,8 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 // When the button is pressed, the list is displayed in the form of a menu.
 // The user can select a new value from the menu.
 
+// This might do better as a subclass of vtkPVMenuButton.
+
 #ifndef __vtkPVSelectionList_h
 #define __vtkPVSelectionList_h
 
@@ -38,6 +40,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkKWLabel.h"
 #include "vtkPVMenuButton.h"
 
+class vtkPVCommandList;
 
 class VTK_EXPORT vtkPVSelectionList : public vtkKWWidget
 {
@@ -56,19 +59,15 @@ public:
   void AddItem(const char *name, int value);
   
   // Description:
-  // A label is placed in from of the menu button.
-  void SetLabel(const char *label) {this->Label->SetLabel(label);}
-  const char *GetLabel() {return this->Label->GetLabel();}
-
-  // Description:
   // This is how the user can query the stat of the selection.
-  // Warning:  Setting the current value will not change the label.
+  // Warning:  Setting the current value will not change vtk ivar.
   vtkGetMacro(CurrentValue, int);
-  vtkSetMacro(CurrentValue, int);
+  void SetCurrentValue(int val);
   vtkGetStringMacro(CurrentName);
   
   // Description:
-  // This method gets called when the user selects an entry/
+  // This method gets called when the user selects an entry.
+  // Use this method if you want to programmatically change the selection.
   void SelectCallback(const char *name, int value);
   
 protected:
@@ -77,11 +76,13 @@ protected:
   vtkPVSelectionList(const vtkPVSelectionList&) {};
   void operator=(const vtkPVSelectionList&) {};
 
-  vtkKWLabel *Label;
   vtkPVMenuButton *MenuButton;
 
   int CurrentValue;
   char *CurrentName;
+  // Using this list as an array of strings.
+  vtkPVCommandList *Names;
+
   vtkSetStringMacro(CurrentName);
   
 };

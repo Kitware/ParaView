@@ -72,14 +72,13 @@ vtkGetRemoteGhostCells::~vtkGetRemoteGhostCells()
 
 void vtkGetRemoteGhostCells::Execute()
 {
-  int validFlag, myId, numProcs, numPoints, pointId, *pointIds, newPointId;
+  int myId, numProcs, numPoints, pointId;
   float point[3];
-  int numCells, numCellPoints;
+  int numCells, cellId;
   vtkPolyData *input = this->GetInput();
   vtkPolyData *output = this->GetOutput();
-  int i = 0, j, k, l, id, gl;
+  int i = 0, j, k, id, gl;
   vtkPoints *points = vtkPoints::New();
-  vtkPoints *cellPoints;
   vtkCellArray *polys;
   vtkIdList *cellIds = vtkIdList::New();
   vtkGenericCell *cell = vtkGenericCell::New();
@@ -91,7 +90,6 @@ void vtkGetRemoteGhostCells::Execute()
   vtkIdList *newCells = vtkIdList::New();
   vtkIdList *currentPoints = vtkIdList::New();
   vtkIdList **remoteCells;
-  int cellId, remoteCellId, newCellId;
   vtkPolyData *polyData = vtkPolyData::New();
   vtkPolyData *remotePolyData = vtkPolyData::New();
   vtkPointLocator *outputLocator = vtkPointLocator::New();

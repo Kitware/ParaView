@@ -233,6 +233,14 @@ SOURCE=.\vtkPVColorByProcessTcl.cxx
 # End Source File
 # Begin Source File
 
+SOURCE=.\vtkPVCommandList.cxx
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkPVCommandListTcl.cxx
+# End Source File
+# Begin Source File
+
 SOURCE=.\vtkPVConeSource.cxx
 # End Source File
 # Begin Source File
@@ -269,6 +277,14 @@ SOURCE=.\vtkPVDataSetToDataSetFilterTcl.cxx
 # End Source File
 # Begin Source File
 
+SOURCE=.\vtkPVDataSetToPolyDataFilter.cxx
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkPVDataSetToPolyDataFilterTcl.cxx
+# End Source File
+# Begin Source File
+
 SOURCE=.\vtkPVDataTcl.cxx
 # End Source File
 # Begin Source File
@@ -286,6 +302,14 @@ SOURCE=.\vtkPVExtentTranslator.cxx
 # Begin Source File
 
 SOURCE=.\vtkPVExtentTranslatorTcl.cxx
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkPVExtractEdges.cxx
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkPVExtractEdgesTcl.cxx
 # End Source File
 # Begin Source File
 
@@ -353,10 +377,6 @@ SOURCE=.\vtkPVImageSourceTcl.cxx
 # End Source File
 # Begin Source File
 
-SOURCE=.\vtkPVImageTcl.cxx
-# End Source File
-# Begin Source File
-
 SOURCE=.\vtkPVImageTextureFilter.cxx
 # End Source File
 # Begin Source File
@@ -418,6 +438,14 @@ SOURCE=.\vtkPVRenderView.cxx
 # Begin Source File
 
 SOURCE=.\vtkPVRenderViewTcl.cxx
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkPVSelectionList.cxx
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkPVSelectionListTcl.cxx
 # End Source File
 # Begin Source File
 
@@ -858,6 +886,26 @@ InputName=vtkPVColorByProcess
 # End Source File
 # Begin Source File
 
+SOURCE=.\vtkPVCommandList.h
+
+!IF  "$(CFG)" == "ParaView - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "ParaView - Win32 Debug"
+
+# Begin Custom Build
+InputPath=.\vtkPVCommandList.h
+InputName=vtkPVCommandList
+
+"$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx
+
+# End Custom Build
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
 SOURCE=.\vtkPVConeSource.h
 
 !IF  "$(CFG)" == "ParaView - Win32 Release"
@@ -958,6 +1006,26 @@ InputName=vtkPVDataSetToDataSetFilter
 # End Source File
 # Begin Source File
 
+SOURCE=.\vtkPVDataSetToPolyDataFilter.h
+
+!IF  "$(CFG)" == "ParaView - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "ParaView - Win32 Debug"
+
+# Begin Custom Build
+InputPath=.\vtkPVDataSetToPolyDataFilter.h
+InputName=vtkPVDataSetToPolyDataFilter
+
+"$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx
+
+# End Custom Build
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
 SOURCE=.\vtkPVElevationFilter.h
 
 !IF  "$(CFG)" == "ParaView - Win32 Release"
@@ -987,6 +1055,26 @@ SOURCE=.\vtkPVExtentTranslator.h
 # Begin Custom Build
 InputPath=.\vtkPVExtentTranslator.h
 InputName=vtkPVExtentTranslator
+
+"$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx
+
+# End Custom Build
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkPVExtractEdges.h
+
+!IF  "$(CFG)" == "ParaView - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "ParaView - Win32 Debug"
+
+# Begin Custom Build
+InputPath=.\vtkPVExtractEdges.h
+InputName=vtkPVExtractEdges
 
 "$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx
@@ -1307,6 +1395,26 @@ SOURCE=.\vtkPVRenderView.h
 # Begin Custom Build
 InputPath=.\vtkPVRenderView.h
 InputName=vtkPVRenderView
+
+"$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx
+
+# End Custom Build
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkPVSelectionList.h
+
+!IF  "$(CFG)" == "ParaView - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "ParaView - Win32 Debug"
+
+# Begin Custom Build
+InputPath=.\vtkPVSelectionList.h
+InputName=vtkPVSelectionList
 
 "$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx

@@ -74,7 +74,6 @@ vtkPVImageData *vtkPVImageSource::GetPVOutput()
 void vtkPVImageSource::InitializeOutput()
 {
   vtkPVImageData *output;
-  vtkPVActorComposite *ac;
   vtkPVData *input;
   vtkPVAssignment *assignment;  
 

@@ -183,6 +183,7 @@ protected:
   vtkPVSelectionList *LastSelectionList;
 
   vtkPVCommandList *AcceptCommands;
+  vtkPVCommandList *CancelCommands;
 };
 
 #endif
