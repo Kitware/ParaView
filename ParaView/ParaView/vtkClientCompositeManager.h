@@ -152,6 +152,12 @@ public:
   float GetZBufferValue(int x, int y);
   void GatherZBufferValueRMI(int x, int y);
 
+  // Description:
+  // Turn on and off Squirt compression
+  vtkBooleanMacro(UseSquirt, int);
+  vtkSetClampMacro(UseSquirt, int, 0, 1);
+  vtkGetMacro(UseSquirt, int);
+
 protected:
   vtkClientCompositeManager();
   ~vtkClientCompositeManager();
@@ -222,6 +228,8 @@ protected:
   int UseRGB;
 
   int UseCompositing;
+
+  int UseSquirt;
 
 private:
   vtkClientCompositeManager(const vtkClientCompositeManager&); // Not implemented

@@ -52,7 +52,7 @@
 #endif
 
 
-vtkCxxRevisionMacro(vtkClientCompositeManager, "1.15");
+vtkCxxRevisionMacro(vtkClientCompositeManager, "1.16");
 vtkStandardNewMacro(vtkClientCompositeManager);
 
 vtkCxxSetObjectMacro(vtkClientCompositeManager,Compositer,vtkCompositer);
@@ -98,6 +98,7 @@ struct vtkClientRendererInfo
 //-------------------------------------------------------------------------
 vtkClientCompositeManager::vtkClientCompositeManager()
 {
+  this->UseSquirt = 0;
   this->RenderWindow = NULL;
   this->CompositeController = vtkMultiProcessController::GetGlobalController();
   if (this->CompositeController)
@@ -440,7 +441,7 @@ void vtkClientCompositeManager::StartRender()
 // Method executed only on client.
 void vtkClientCompositeManager::ReceiveAndSetColorBuffer()
 {
-  if (this->UseChar && ! this->UseRGB)
+  if (this->UseChar && ! this->UseRGB && this->UseSquirt)
     {
     int length;
     this->ClientController->Receive(&length, 1, 1, 123450);
@@ -1003,7 +1004,7 @@ void vtkClientCompositeManager::SatelliteEndRender()
 
   if (myId == 0)
     {
-    if (this->UseChar && ! this->UseRGB)
+    if (this->UseChar && ! this->UseRGB && this->UseSquirt)
       {
       //this->DeltaEncode(static_cast<vtkUnsignedCharArray*>(this->PData));
       this->SquirtCompress(static_cast<vtkUnsignedCharArray*>(this->PData),
@@ -1758,6 +1759,7 @@ void vtkClientCompositeManager::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "UseCompositing: " << this->UseCompositing << endl;
   os << indent << "UseChar: " << this->UseChar << endl;
   os << indent << "UseRGB: " << this->UseRGB << endl;
+  os << indent << "UseSquirt: " << this->UseSquirt << endl;
   os << indent << "ClientFlag: " << this->ClientFlag << endl;
 
   os << indent << "Compositer: " << this->Compositer << endl;
