@@ -349,11 +349,11 @@ protected:
   virtual void AddAboutText(ostream &);
 
   void CreateButtonPhotos();
-  void CreatePhoto(char *name, 
-                   unsigned char *data, 
+  void CreatePhoto(const char *name, 
+                   const unsigned char *data, 
                    int width, int height, int pixel_size, 
                    unsigned long buffer_length = 0,
-                   char *filename = 0);
+                   const char *filename = 0);
   int CheckRegistration();
   int PromptRegistration(char *,char *);
 

@@ -20,7 +20,7 @@
 #include "vtkPointsProjectedHull.h"
 #include "vtkObjectFactory.h"
 
-vtkCxxRevisionMacro(vtkPointsProjectedHull, "1.10");
+vtkCxxRevisionMacro(vtkPointsProjectedHull, "1.11");
 vtkStandardNewMacro(vtkPointsProjectedHull);
 
 static const int xdim=0, ydim=1, zdim=2;
@@ -215,11 +215,11 @@ int vtkPointsProjectedHull::rectangleIntersection(double hmin, double hmax,
 //
 // Algorithm comes from Graphics Gems IV
 //
+extern "C" static int incrVertAxis(const void *p1, const void *p2);
+extern "C" static int ccw(const void *p1, const void *p2);
 int vtkPointsProjectedHull::grahamScanAlgorithm(int dir)
 {
 int horizAxis = 0, vertAxis = 0;
-int incrVertAxis(const void *p1, const void *p2);
-int ccw(const void *p1, const void *p2);
 int i,j;
 
   if ((this->Npts == 0) || (this->GetMTime() > this->PtsTime))
@@ -674,7 +674,8 @@ int vtkPointsProjectedHull::rectangleOutside1DPolygon(double hmin, double hmax,
 
 // The sort functions
 
-int incrVertAxis(const void *p1, const void *p2)
+extern "C"
+static int incrVertAxis(const void *p1, const void *p2)
 {
 double *a, *b;
 
@@ -685,7 +686,9 @@ double *a, *b;
     else if (a[1] == b[1]) return 0;
     else                   return 1;
 }
-int ccw(const void *p1, const void *p2)
+
+extern "C"
+static int ccw(const void *p1, const void *p2)
 {
 double *a, *b;
 double val;
@@ -701,6 +704,7 @@ double val;
     else if (val == 0) return 0;   // b is on line firstPt->a
     else               return -1;  // b is left of line firstPt->a
 }
+
 void vtkPointsProjectedHull::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);

@@ -281,11 +281,11 @@ void vtkPVApplication::AddAboutText(ostream &os)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVApplication::CreatePhoto(char *name, 
-                                   unsigned char *data, 
+void vtkPVApplication::CreatePhoto(const char *name, 
+                                   const unsigned char *data, 
                                    int width, int height, int pixel_size,
                                    unsigned long buffer_length,
-                                   char *filename)
+                                   const char *filename)
 {
   struct stat fs;
 

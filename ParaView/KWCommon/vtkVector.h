@@ -131,11 +131,6 @@ public:
   // Display the content of the list.
   void DebugList();
 
-  // Description:
-  // Sort the content of the list.
-  // Provide a comparison function.
-  void Sort(int (*func)(const void *, const void *));
-
 protected:
   vtkVector() {
     this->Array = 0; this->NumberOfItems = 0; this->Size = 0; 
