@@ -51,7 +51,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // ---------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWScale );
-vtkCxxRevisionMacro(vtkKWScale, "1.42");
+vtkCxxRevisionMacro(vtkKWScale, "1.43");
 
 int vtkKWScaleCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -193,9 +193,9 @@ void vtkKWScale::Create(vtkKWApplication *app, const char *args)
 {
   const char *wname;
 
-  // Must set the application
+  // Set the application
 
-  if (this->Application)
+  if (this->IsCreated())
     {
     vtkErrorMacro("Scale already created");
     return;
@@ -266,6 +266,10 @@ void vtkKWScale::Create(vtkKWApplication *app, const char *args)
 
   this->PackWidget();
   this->Bind();
+
+  // Update enable state
+
+  this->UpdateEnableState();
 }
 
 // ---------------------------------------------------------------------------
@@ -883,38 +887,32 @@ void vtkKWScale::SetBalloonHelpJustification(int j)
 }
 
 // ---------------------------------------------------------------------------
-void vtkKWScale::SetEnabled(int e)
+void vtkKWScale::UpdateEnableState()
 {
-  if (this->Enabled == e)
+  this->Superclass::UpdateEnableState();
+
+  if (this->Entry)
     {
-    return;
+    this->Entry->SetEnabled(this->Enabled);
     }
 
-  this->Enabled = e;
-  this->Modified();
-
-  if (this->Entry && this->Entry->IsCreated())
+  if (this->Label)
     {
-    this->Entry->SetEnabled(e);
+    this->Label->SetEnabled(this->Enabled);
     }
 
-  if (this->Label && this->Label->IsCreated())
+  if (this->Scale)
     {
-    this->Label->SetEnabled(e);
+    this->Scale->SetEnabled(this->Enabled);
     }
 
-  if (this->Scale->IsCreated())
+  if (this->PopupPushButton)
     {
-    this->Scale->SetEnabled(e);
-    }
-
-  if (this->PopupScale && 
-      this->PopupPushButton && this->PopupPushButton->IsCreated())
-    {
-    this->PopupPushButton->SetEnabled(e);
+    this->PopupPushButton->SetEnabled(this->Enabled);
     }
 }
 
+// ---------------------------------------------------------------------------
 void vtkKWScale::Resize()
 {
   if (!this->SmartResize || 
@@ -1020,6 +1018,7 @@ void vtkKWScale::Resize()
     }
 }
 
+// ---------------------------------------------------------------------------
 void vtkKWScale::SetDisplayRange(int flag)
 {
   if (this->DisplayRange == flag)

@@ -153,10 +153,6 @@ public:
   virtual void SetBalloonHelpJustification(int j);
 
   // Description:
-  // Set/get enabled state.
-  virtual void SetEnabled(int);
-
-  // Description:
   // Bind/Unbind all components so that values can be changed, but
   // no command will be called.
   void Bind();
@@ -217,6 +213,10 @@ protected:
   
   void PackWidget();
   void UpdateEntryResolution();
+
+  // Update the enable state. This should propagate similar calls to the
+  // internal widgets.
+  virtual void UpdateEnableState();
 
 private:
   vtkKWScale(const vtkKWScale&); // Not implemented
