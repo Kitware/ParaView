@@ -25,7 +25,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkClientServerInterpreter);
-vtkCxxRevisionMacro(vtkClientServerInterpreter, "1.1.2.5");
+vtkCxxRevisionMacro(vtkClientServerInterpreter, "1.1.2.6");
 
 //----------------------------------------------------------------------------
 // Internal container instantiations.
@@ -151,14 +151,6 @@ int vtkClientServerInterpreter::ProcessStream(const vtkClientServerStream& css)
     {
     if(!this->ProcessOneMessage(css, i))
       {
-      const char* errorMessage;
-      if(this->LastResultMessage->GetNumberOfMessages() > 0 &&
-         this->LastResultMessage->GetCommand(0) ==
-         vtkClientServerStream::Error &&
-         this->LastResultMessage->GetArgument(0, 0, &errorMessage))
-        {
-        vtkErrorMacro(<< errorMessage);
-        }
       return 0;
       }
     }
@@ -170,27 +162,76 @@ int
 vtkClientServerInterpreter::ProcessOneMessage(const vtkClientServerStream& css,
                                               int message)
 {
+  // Log the message.
+  if(this->LogStream)
+    {
+    *this->LogStream << "---------------------------------------"
+                     << "---------------------------------------\n";
+    *this->LogStream << "Processing ";
+    css.PrintMessage(*this->LogStream, message);
+    }
+
   // Look for known commands in the message.
+  int result = 0;
   vtkClientServerStream::Commands cmd = css.GetCommand(message);
   switch(cmd)
     {
     case vtkClientServerStream::New:
-      return this->ProcessCommandNew(css, message);
+      result = this->ProcessCommandNew(css, message); break;
     case vtkClientServerStream::Invoke:
-      return this->ProcessCommandInvoke(css, message);
+      result = this->ProcessCommandInvoke(css, message); break;
     case vtkClientServerStream::Delete:
-      return this->ProcessCommandDelete(css, message);
+      result = this->ProcessCommandDelete(css, message); break;
     case vtkClientServerStream::AssignResult:
-      return this->ProcessCommandAssignResult(css, message);
+      result = this->ProcessCommandAssignResult(css, message); break;
     default:
-      break;
+      {
+      // Command is not known.
+      ostrstream error;
+      error << "Message with type "
+            << vtkClientServerStream::GetStringFromCommand(cmd)
+            << " cannot be executed." << ends;
+      this->LastResultMessage->Reset();
+      *this->LastResultMessage
+        << vtkClientServerStream::Error << error.str()
+        << vtkClientServerStream::End;
+      error.rdbuf()->freeze(0);
+      } break;
     }
 
-  vtkErrorMacro("Message " << message << " with type "
-                << static_cast<int>(cmd) << " ("
-                << vtkClientServerStream::GetStringFromCommand(cmd)
-                << ") cannot be executed.");
-  return 0;
+  // Log the result of the message.
+  if(this->LogStream)
+    {
+    if(this->LastResultMessage->GetNumberOfMessages() > 0)
+      {
+      *this->LogStream << "Result ";
+      this->LastResultMessage->Print(*this->LogStream);
+      }
+    else
+      {
+      *this->LogStream << "Empty Result\n";
+      }
+    }
+
+  // Report an error if the command failed with an error message.
+  if(!result)
+    {
+    const char* errorMessage;
+    if(this->LastResultMessage->GetNumberOfMessages() > 0 &&
+       this->LastResultMessage->GetCommand(0) ==
+       vtkClientServerStream::Error &&
+       this->LastResultMessage->GetArgument(0, 0, &errorMessage))
+      {
+      ostrstream error;
+      error << "\nwhile processing\n";
+      css.PrintMessage(error, message);
+      error << ends;
+      vtkErrorMacro(<< errorMessage << error.str());
+      error.rdbuf()->freeze(0);
+      }
+    }
+
+  return result;
 }
 
 //----------------------------------------------------------------------------
@@ -198,10 +239,16 @@ int
 vtkClientServerInterpreter
 ::ProcessCommandNew(const vtkClientServerStream& css, int midx)
 {
+  // This command ignores any previous result.
+  this->LastResultMessage->Reset();
+
   // Make sure we have some instance creation functions registered.
   if(this->Internal->NewInstanceFunctions.size() == 0)
     {
-    vtkErrorMacro("Attempt to create object with no NewInstanceFunctions.");
+    *this->LastResultMessage
+      << vtkClientServerStream::Error
+      << "Attempt to create object with no registered class wrappers."
+      << vtkClientServerStream::End;
     return 0;
     }
 
@@ -217,6 +264,7 @@ vtkClientServerInterpreter
           it = this->Internal->NewInstanceFunctions.begin();
         !created && it != this->Internal->NewInstanceFunctions.end(); ++it)
       {
+      // Try this new-instance function.
       if((*(*it))(this, cname, id) == 0)
         {
         created = 1;
@@ -224,6 +272,7 @@ vtkClientServerInterpreter
       }
     if(created)
       {
+      // Object was created.  Notify observers.
       vtkClientServerInterpreter::NewCallbackInfo info;
       info.Type = cname;
       info.ID = id.ID;
@@ -232,8 +281,21 @@ vtkClientServerInterpreter
       }
     else
       {
-      vtkErrorMacro("Cannot create object of type \"" << cname << "\".");
+      // Object was not created.
+      ostrstream error;
+      error << "Cannot create object of type \"" << cname << "\".";
+      *this->LastResultMessage
+        << vtkClientServerStream::Error << error.str()
+        << vtkClientServerStream::End;
+      error.rdbuf()->freeze(0);
       }
+    }
+  else
+    {
+    *this->LastResultMessage
+      << vtkClientServerStream::Error
+      << "Invalid arguments to vtkClientServerStream::New."
+      << vtkClientServerStream::End;
     }
   return 0;
 }
@@ -247,7 +309,8 @@ vtkClientServerInterpreter
   vtkClientServerStream msg;
   this->ExpandMessage(css, midx, msg);
 
-  // Reset the result to empty before processing the message.
+  // Now that id_values have been expanded, we do not need the last
+  // result.  Reset the result to empty before processing the message.
   this->LastResultMessage->Reset();
 
   // Get the object and method to be invoked.
@@ -256,28 +319,41 @@ vtkClientServerInterpreter
   if(msg.GetNumberOfArguments(0) >= 2 &&
      msg.GetArgument(0, 0, &obj) && msg.GetArgument(0, 1, &method))
     {
-    // Log the invocation.
+    // Log the expanded form of the message.
     if(this->LogStream)
       {
-      *this->LogStream << "---------------------------------------"
-                       << "---------------------------------------\n";
+      *this->LogStream << "Invoking ";
       msg.Print(*this->LogStream);
       }
 
     // Find the command function for this object's type.
     if(vtkClientServerCommandFunction func = this->GetCommandFunction(obj))
       {
-      // Try to invoke the method.
+      // Try to invoke the method.  If it fails, LastResultMessage
+      // will have the error message.
       if(func(this, obj, method, msg, *this->LastResultMessage) == 0)
         {
-        // Success.  Log the result.
-        if(this->LogStream)
-          {
-          this->LastResultMessage->Print(*this->LogStream);
-          }
         return 1;
         }
       }
+    else
+      {
+      // Command function was not found for the class.
+      ostrstream error;
+      const char* cname = obj? obj->GetClassName():"(vtk object is NULL)";
+      error << "Wrapper function not found for class \"" << cname << "\".";
+      *this->LastResultMessage
+        << vtkClientServerStream::Error << error.str()
+        << vtkClientServerStream::End;
+      error.rdbuf()->freeze(0);
+      }
+    }
+  else
+    {
+    *this->LastResultMessage
+      << vtkClientServerStream::Error
+      << "Invalid arguments to vtkClientServerStream::Invoke."
+      << vtkClientServerStream::End;
     }
   return 0;
 }
@@ -287,11 +363,28 @@ int
 vtkClientServerInterpreter
 ::ProcessCommandDelete(const vtkClientServerStream& msg, int midx)
 {
+  // This command ignores any previous result.
+  this->LastResultMessage->Reset();
+
+  // Get the ID to delete.
   vtkClientServerID id;
-  if(msg.GetNumberOfArguments(midx) == 1 && msg.GetArgument(midx, 0, &id))
+  if(msg.GetNumberOfArguments(midx) == 1 &&
+     msg.GetArgument(midx, 0, &id) && id.ID > 0)
     {
-    // If the value is an object, invoke the event callback.
-    if(vtkObjectBase* obj = this->GetObjectFromID(id))
+    // Find the ID in the map.
+    vtkClientServerStream* item = 0;
+    if(this->IDToMessageMap->GetItem(id.ID, item) != VTK_OK)
+      {
+      *this->LastResultMessage
+        << vtkClientServerStream::Error
+        << "Attempt to delete ID that does not exist."
+        << vtkClientServerStream::End;
+      return 0;
+      }
+
+    // If the value is an object, notify observers of deletion.
+    vtkObjectBase* obj;
+    if(item->GetArgument(0, 0, &obj))
       {
       vtkClientServerInterpreter::NewCallbackInfo info;
       info.Type = obj->GetClassName();
@@ -300,11 +393,19 @@ vtkClientServerInterpreter
       }
 
     // Remove the ID from the map.
-    vtkClientServerStream* item;
-    this->IDToMessageMap->GetItem(id.ID, item);
     this->IDToMessageMap->RemoveItem(id.ID);
+
+    // Delete the entry's value.
     delete item;
+
     return 1;
+    }
+  else
+    {
+    *this->LastResultMessage
+      << vtkClientServerStream::Error
+      << "Invalid arguments to vtkClientServerStream::Delete."
+      << vtkClientServerStream::End;
     }
 
   return 0;
@@ -318,7 +419,32 @@ vtkClientServerInterpreter
   vtkClientServerID id;
   if(msg.GetNumberOfArguments(midx) == 1 && msg.GetArgument(midx, 0, &id))
     {
-    return this->AssignResultToID(id);
+    // Make sure the ID doesn't exist.
+    vtkClientServerStream* tmp;
+    if(this->IDToMessageMap->GetItem(id.ID, tmp) == VTK_OK)
+      {
+      this->LastResultMessage->Reset();
+      *this->LastResultMessage
+        << vtkClientServerStream::Error
+        << "Attempt to assign ID that already exists."
+        << vtkClientServerStream::End;
+      return 0;
+      }
+
+    // Copy the result to store it in the map.  The result itself
+    // remains unchanged.
+    tmp = new vtkClientServerStream(*this->LastResultMessage);
+    this->IDToMessageMap->SetItem(id.ID, tmp);
+
+    return 1;
+    }
+  else
+    {
+    this->LastResultMessage->Reset();
+    *this->LastResultMessage
+      << vtkClientServerStream::Error
+      << "Invalid arguments to vtkClientServerStream::AssignResult."
+      << vtkClientServerStream::End;
     }
   return 0;
 }
@@ -417,9 +543,9 @@ int vtkClientServerInterpreter::NewInstance(vtkObjectBase* obj,
                                             vtkClientServerID id)
 {
   // Store the object in the last result.
-  vtkClientServerStream& lrm = *this->LastResultMessage;
-  lrm.Reset();
-  lrm << vtkClientServerStream::Reply << obj << vtkClientServerStream::End;
+  this->LastResultMessage->Reset();
+  *this->LastResultMessage
+    << vtkClientServerStream::Reply << obj << vtkClientServerStream::End;
 
   // Last result holds a reference.  Remove reference from ::New()
   // call in generated code.
