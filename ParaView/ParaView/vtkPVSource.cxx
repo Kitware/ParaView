@@ -70,7 +70,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.240");
+vtkCxxRevisionMacro(vtkPVSource, "1.241");
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -757,19 +757,18 @@ void vtkPVSource::SetDescription (const char* arg)
     {
     this->GetPVRenderView()->UpdateNavigationWindow(this, this->SourceGrabbed);
     }
-} 
-
-//----------------------------------------------------------------------------
-void vtkPVSource::DescriptionEntryCallback()
-{
-  this->SetDescription(this->DescriptionEntry->GetValue()
-);
   // Trace here, not in SetDescription (design choice)
   this->GetPVApplication()->AddTraceEntry("$kw(%s) SetDescription {%s}",
                                           this->GetTclName(),
                                           this->Description);
   this->GetPVApplication()->AddTraceEntry("$kw(%s) DescriptionEntryCallback",
                                           this->GetTclName());
+} 
+
+//----------------------------------------------------------------------------
+void vtkPVSource::DescriptionEntryCallback()
+{
+  this->SetDescription(this->DescriptionEntry->GetValue());
 }
 
 //----------------------------------------------------------------------------
@@ -2040,7 +2039,7 @@ void vtkPVSource::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVSource ";
-  this->ExtractRevision(os,"$Revision: 1.240 $");
+  this->ExtractRevision(os,"$Revision: 1.241 $");
 }
 
 //----------------------------------------------------------------------------
