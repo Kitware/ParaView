@@ -382,8 +382,8 @@
      </IntVectorProperty>
 
      <StringVectorProperty 
-        name="GlobalIdArrayName" 
-        command="SetGlobalIdArrayName" 
+        name="GlobalNodeIdArrayName" 
+        command="SetGlobalNodeIdArrayName" 
         number_of_elements="1" /> 
 
      <IntVectorProperty 

@@ -327,9 +327,9 @@ The Decimate filter reduces the number of triangles in a polygonal data set. Bec
       <Item name="Duplicate cells" value="1"/>
       <Item name="Divide cells" value="2"/>
     </SelectionList>
-    <StringEntry label="Global Id Array Name" property="GlobalIdArrayName"
-                 trace_name="GlobalIdArrayName"
-                 help="Provide name of global node ID array so redistributed data does not duplicate node IDs" />
+    <StringEntry label="Global Node Id Array Name" property="GlobalNodeIdArrayName"
+                 trace_name="GlobalNodeIdArrayName"
+                 help="Provide name of global node (point) ID array so redistributed data does not duplicate node IDs" />
     <LabeledToggle label="Minimal memory"
                    trace_name="UseMinimalMemory" 
                    property="UseMinimalMemory" 
