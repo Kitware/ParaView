@@ -46,7 +46,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWBoundsDisplay);
-vtkCxxRevisionMacro(vtkKWBoundsDisplay, "1.8");
+vtkCxxRevisionMacro(vtkKWBoundsDisplay, "1.9");
 
 int vtkKWBoundsDisplayCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -106,6 +106,10 @@ void vtkKWBoundsDisplay::Create(vtkKWApplication *app,
                this->ZRangeLabel->GetWidgetName());
 
   this->UpdateWidgets();
+
+  // Update enable state
+
+  this->UpdateEnableState();
 }
 
 //----------------------------------------------------------------------------
