@@ -1710,6 +1710,17 @@ void vtkPVSource::SelectSource(vtkPVSource *source)
     this->GetWindow()->SetCurrentSource(source);
     source->ShowProperties();
     source->GetNotebook()->Raise(0);
+    if (source->GetPVData() &&
+        source->GetPVData()->GetPVSourceUsers()->GetNumberOfItems() > 0)
+      {
+      this->Script("%s configure -state disabled",
+                   source->GetDeleteButton()->GetWidgetName());
+      }
+    else
+      {
+      this->Script("%s configure -state normal",
+                   source->GetDeleteButton()->GetWidgetName());
+      }
     }
 }
 

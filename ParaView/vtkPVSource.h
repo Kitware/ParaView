@@ -189,7 +189,9 @@ public:
   // A call back method from the Navigation window.
   // This sets the input source as the selected composite.
   void SelectSource(vtkPVSource *source);
-
+  
+  vtkGetObjectMacro(DeleteButton, vtkKWPushButton);
+  
 protected:
   vtkPVSource();
   ~vtkPVSource();
