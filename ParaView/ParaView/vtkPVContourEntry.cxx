@@ -353,6 +353,7 @@ void vtkPVContourEntry::AddAnimationScriptsToMenu(vtkKWMenu *menu,
   menu->AddCommand(this->GetTraceName(), ai, methodAndArgs, 0, "");
 }
 
+//----------------------------------------------------------------------------
 vtkPVContourEntry* vtkPVContourEntry::ClonePrototype(vtkPVSource* pvSource,
 				 vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
 {
