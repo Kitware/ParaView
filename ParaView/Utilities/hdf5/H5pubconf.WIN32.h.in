@@ -98,3 +98,12 @@
 #pragma warning ( disable : 4706 )
 #pragma warning ( disable : 4786 )
 #endif
+
+#cmakedefine VTKHDF5_BUILD_SHARED_LIBS
+#ifdef VTKHDF5_BUILD_SHARED_LIBS
+# ifdef vtkhdf5_EXPORTS
+#  define _HDF5DLL_
+# else
+#  define _HDF5USEDLL_
+# endif
+#endif
