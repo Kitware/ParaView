@@ -55,6 +55,7 @@ class vtkKWImageLabel;
 class vtkKWLabel;
 class vtkKWLoadSaveDialog;
 class vtkKWMenu;
+class vtkKWMessageDialog;
 class vtkKWNotebook;
 class vtkKWProgressGauge;
 class vtkKWSplitFrame;
@@ -351,6 +352,8 @@ protected:
 
   int InExit;
   int UseMenuProperties;
+
+  vtkKWMessageDialog *ExitDialogWidget;
 
 //BTX
   // Description:
