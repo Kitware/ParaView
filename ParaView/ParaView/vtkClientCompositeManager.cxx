@@ -57,7 +57,7 @@
 #endif
 
 
-vtkCxxRevisionMacro(vtkClientCompositeManager, "1.26");
+vtkCxxRevisionMacro(vtkClientCompositeManager, "1.27");
 vtkStandardNewMacro(vtkClientCompositeManager);
 
 vtkCxxSetObjectMacro(vtkClientCompositeManager,Compositer,vtkCompositer);
@@ -1547,7 +1547,8 @@ void vtkClientCompositeManager::SquirtCompress(vtkUnsignedCharArray *in,
 
   // Set bitmask based on compress_level
   unsigned int compress_mask;
-  memcpy(&compress_mask, &compress_masks[compress_level], 4);
+  // I shifted the level by one so that 0 means no compression.
+  memcpy(&compress_mask, &compress_masks[compress_level-1], 4);
 
   // Access raw arrays directly
   unsigned int* _rawColorBuffer;
