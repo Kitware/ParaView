@@ -24,9 +24,10 @@
 #include "vtkKWToolbarSet.h"
 
 #include <vtkstd/list>
+#include <vtkstd/string>
 
 vtkStandardNewMacro(vtkKWSelectionFrame);
-vtkCxxRevisionMacro(vtkKWSelectionFrame, "1.28");
+vtkCxxRevisionMacro(vtkKWSelectionFrame, "1.29");
 
 //----------------------------------------------------------------------------
 class vtkKWSelectionFrameInternals
