@@ -153,7 +153,7 @@ $kw(vtkTemp834) SetEndHSV 0 1 1
 $kw(vtkTemp834) VectorModeMagnitudeCallback
 $kw(vtkTemp834) SetScalarBarVisibility 0
 set kw(vtkTemp1507) [$kw(vtkTemp1) GetPVColorMap {Piece} 1]
-$kw(vtkTemp1507) SetScalarRange 0 1
+$kw(vtkTemp1507) ResetScalarRange
 $kw(vtkTemp1507) SetStartHSV 0.6667 1 1
 $kw(vtkTemp1507) SetEndHSV 0 1 1
 $kw(vtkTemp1507) VectorModeMagnitudeCallback
