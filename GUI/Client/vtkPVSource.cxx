@@ -68,7 +68,7 @@
 
 
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.383");
+vtkCxxRevisionMacro(vtkPVSource, "1.384");
 vtkCxxSetObjectMacro(vtkPVSource,Notebook,vtkKWNotebook);
 vtkCxxSetObjectMacro(vtkPVSource,InformationGUI,vtkPVInformationGUI);
 vtkCxxSetObjectMacro(vtkPVSource,DisplayGUI,vtkPVDisplayGUI);
@@ -1616,6 +1616,9 @@ void vtkPVSource::DeleteCallback()
     vtkErrorMacro("An output is used.  We cannot delete this source.");
     return;
     }
+
+  // Do this to here to release resource (decrement use count).
+  this->SetPVColorMap(0);
 
   window->GetAnimationInterface()->DeleteSource(this);
 
