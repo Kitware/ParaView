@@ -980,9 +980,9 @@ help="Set the name of the array to hold the results of this computation"/>
              label="Scalars" trace_name="Scalars" input_menu="im"
              number_of_components="1"
              help="Choose which scalar array you want to contour."/>
-  <ScalarRangeLabel trace_name="ScalarRangeLabel" array_menu="am"/>
+  <ScalarRangeLabel id="srl" trace_name="ScalarRangeLabel" array_menu="am"/>
   <ContourEntry label="Contour Values" trace_name="Contour Values"
-                help="List of current contour values. "/>
+                help="List of current contour values." scalar_range="srl"/>
     <LabeledToggle label="Compute Normals"
                    variable="ComputeNormals" 
                    help="Select whether to compute normals"/>

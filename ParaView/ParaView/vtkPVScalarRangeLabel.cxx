@@ -56,7 +56,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVScalarRangeLabel);
-vtkCxxRevisionMacro(vtkPVScalarRangeLabel, "1.15");
+vtkCxxRevisionMacro(vtkPVScalarRangeLabel, "1.16");
 
 vtkCxxSetObjectMacro(vtkPVScalarRangeLabel, ArrayMenu, vtkPVArrayMenu);
 
@@ -125,7 +125,7 @@ void vtkPVScalarRangeLabel::Update()
     }
 
   ai->GetComponentRange(0, this->Range);
-
+  
   char str[512];
   if (this->Range[0] > this->Range[1])
     {

@@ -225,10 +225,12 @@ IF (PARAVIEW_CAN_BUILD)
  INCLUDE_DIRECTORIES(${PARAVIEW_BINARY_DIR} 
                      ${PARAVIEW_SOURCE_DIR}/KWCommon
                      ${PARAVIEW_SOURCE_DIR}/Widgets
+                     ${PARAVIEW_SOURCE_DIR}/Filters
                      ${PARAVIEW_SOURCE_DIR}/ParaView)
 
  LINK_DIRECTORIES(${PARAVIEW_BINARY_DIR}/KWCommon
                   ${PARAVIEW_BINARY_DIR}/Widgets
+                  ${PARAVIEW_BINARY_DIR}/Filters
                   ${PARAVIEW_BINARY_DIR}/ParaView)
 
  SET (PARAVIEW_EXECUTABLE ${EXECUTABLE_OUTPUT_PATH}/paraview)
