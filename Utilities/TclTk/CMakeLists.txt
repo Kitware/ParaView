@@ -173,5 +173,7 @@ IF (try_file)
   ENDIF ("${TK_INTERNAL_PATH}" MATCHES "${TK_INTERNAL_PATH_LEGACY}")
 ENDIF (try_file)
 
+INCLUDE(${ParaView_SOURCE_DIR}/VTK/Wrapping/Tcl/vtkDetermineTkResources.cmake)
+
 INSTALL_FILES(/lib/tcl8.4 FILES ${TCL_SUPPORT_FILES})
 INSTALL_FILES(/lib/tk8.4 FILES ${TK_SUPPORT_FILES})
