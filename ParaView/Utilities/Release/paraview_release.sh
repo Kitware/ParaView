@@ -23,9 +23,9 @@
 #
 
 # Release version number.
-TAG="ParaView-1-0-1"
+TAG="ParaView-1-0-2"
 PARAVIEW_VERSION="1.0"
-VERSION="${PARAVIEW_VERSION}.1"
+VERSION="${PARAVIEW_VERSION}.2"
 RELEASE="1"
 
 # Project configuration.
