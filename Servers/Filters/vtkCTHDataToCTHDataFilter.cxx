@@ -18,7 +18,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkInformation.h"
 
-vtkCxxRevisionMacro(vtkCTHDataToCTHDataFilter, "1.1");
+vtkCxxRevisionMacro(vtkCTHDataToCTHDataFilter, "1.2");
 
 //----------------------------------------------------------------------------
 vtkCTHDataToCTHDataFilter::vtkCTHDataToCTHDataFilter()
@@ -55,7 +55,7 @@ void vtkCTHDataToCTHDataFilter::ComputeInputUpdateExtents(vtkDataObject *output)
 
   if (input)
     {
-    this->vtkCTHSource::ComputeInputUpdateExtents(output);
+    this->Superclass::ComputeInputUpdateExtents(output);
     input->RequestExactExtentOn();
     }
 }
