@@ -140,7 +140,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.663");
+vtkCxxRevisionMacro(vtkPVWindow, "1.664");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -3649,23 +3649,6 @@ void vtkPVWindow::AddPVSource(const char* listname, vtkPVSource *pvs)
   if (col && col->IsItemPresent(pvs) == 0)
     {
     col->AddItem(pvs);
-    vtkPVReaderModule* clone = vtkPVReaderModule::SafeDownCast(pvs);
-    int numOfTimeSteps;
-    if (this->AnimationInterface && clone && (numOfTimeSteps = clone->GetNumberOfTimeSteps()) > 1)
-      {
-      int i = this->AnimationInterface->IsAnimationValid();
-
-      vtkPVAnimationInterfaceEntry* entry = this->AnimationInterface->GetEmptySourceItem();
-      entry->SetPVSource(clone);
-      entry->SetCurrentMethodIndex(0);
-      if (i == 0)
-        {
-        // implying that is the only animation entry. In which case we set the number of
-        // frames to the number of timesteps.
-        this->AnimationInterface->SetNumberOfFrames(numOfTimeSteps);
-        }
-      this->AnimationInterface->UpdateEntries();
-      }
     }
 }
 
