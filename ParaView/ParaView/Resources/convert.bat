@@ -24,3 +24,4 @@ SET OPTIONS=ZLIB BASE64 %1
 %CONVERTIMAGE% vtkPVThresholdButton.h PVThresholdButton.png %OPTIONS%
 %CONVERTIMAGE% vtkPVTranslateViewButton.h PVTranslateViewButton.png PVTranslateViewButtonActive.png %OPTIONS%
 %CONVERTIMAGE% vtkPVVectorDisplacementButton.h PVVectorDisplacementButton.png %OPTIONS%
+%CONVERTIMAGE% vtkPVSelectionWindowButton.h PVSelectionWindowButton.png PVNavigationWindowButton.png %OPTIONS%
