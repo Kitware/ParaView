@@ -25,7 +25,7 @@
 
 #include <ctype.h>
 
-vtkCxxRevisionMacro(vtkKWRegisteryUtilities, "1.9");
+vtkCxxRevisionMacro(vtkKWRegisteryUtilities, "1.10");
 
 //----------------------------------------------------------------------------
 vtkKWRegisteryUtilities *vtkKWRegisteryUtilities::New()
@@ -291,13 +291,18 @@ char *vtkKWRegisteryUtilities::Strip(char *str)
 void vtkKWRegisteryUtilities::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
-  os << indent << "TopLevel: " << this->GetTopLevel() << endl
-     << indent << "Locked: " << (this->GetLocked() ? "on" : "off") 
-     << endl
-     << indent << "Opened: " << (this->GetOpened() ? "on" : "off")
-     << endl
-     << indent << "GlobalScope: " << (this->GetGlobalScope() ? "on" : "off")
-     << endl;
+  if( this->TopLevel )
+    {
+    os << indent << "TopLevel: " << this->TopLevel << "\n";
+    }
+  else
+    {
+    os << indent << "TopLevel: (none)\n";
+    }
+   
+  os << indent << "Locked: " << (this->Locked ? "On" : "Off") << "\n";
+  os << indent << "Opened: " << (this->Opened ? "On" : "Off") << "\n";
+  os << indent << "GlobalScope: " << (this->GlobalScope ? "On" : "Off") << "\n";
 }
 
 

@@ -53,7 +53,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWRemoteExecute );
-vtkCxxRevisionMacro(vtkKWRemoteExecute, "1.16");
+vtkCxxRevisionMacro(vtkKWRemoteExecute, "1.17");
 
 //----------------------------------------------------------------------------
 vtkKWRemoteExecute::vtkKWRemoteExecute()
@@ -207,11 +207,15 @@ void* vtkKWRemoteExecute::RunCommandThread(void* vargs)
 void vtkKWRemoteExecute::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
-  os << indent << "RemoteHost: " << this->RemoteHost << endl;
-  os << indent << "SSHCommand: " << (this->SSHCommand?this->SSHCommand:"(none)") << endl;
+  os << indent << "RemoteHost: " << ( this->RemoteHost ?
+                                      this->RemoteHost : "(none)" ) << endl;
+  os << indent << "SSHCommand: " << ( this->SSHCommand ? 
+                                      this->SSHCommand : "(none)" ) << endl;
   os << indent << "Result: " << this->Result << endl;
-  os << indent << "SSHArguments: " << (this->SSHArguments?this->SSHArguments:"(none)") << endl;
-  os << indent << "SSHUser: " << (this->SSHUser?this->SSHUser:"(none)") << endl;
+  os << indent << "SSHArguments: " << ( this->SSHArguments ? 
+                                        this->SSHArguments : "(none)" ) << endl;
+  os << indent << "SSHUser: " << ( this->SSHUser ? 
+                                   this->SSHUser : "(none)" ) << endl;
 }
 
 
