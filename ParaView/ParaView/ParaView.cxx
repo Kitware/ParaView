@@ -27,6 +27,7 @@ PURPOSE.  See the above copyright notice for more information.
 
 #include "vtkObject.h"
 #include "vtkTclUtil.h"
+#include "vtkTimerLog.h"
 
 /*
  * Make sure all the kits register their classes with vtkInstantiator.
@@ -229,6 +230,8 @@ int MyMain(int argc, char *argv[])
     pm = NULL;
     }
 
+  // free some memory
+  vtkTimerLog::CleanupLog();
   app->Delete();
   Tcl_DeleteInterp(interp);
   Tcl_Finalize();
@@ -248,6 +251,13 @@ int __stdcall WinMain(HINSTANCE vtkNotUsed(hInstance),
   char**       argv;
   unsigned int i;
   int          j;
+
+  // enable floating point exceptions on MSVC
+//  short m = 0x372;
+//  __asm
+//    {
+//    fldcw m;
+//    }
 
   // parse a few of the command line arguments
   // a space delimites an argument except when it is inside a quote
