@@ -66,7 +66,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define VTK_KW_WINDOW_GEOMETRY_REG_KEY "WindowGeometry"
 #define VTK_KW_WINDOW_FRAME1_SIZE_REG_KEY "WindowFrame1Size"
 
-vtkCxxRevisionMacro(vtkKWWindow, "1.155");
+vtkCxxRevisionMacro(vtkKWWindow, "1.156");
 vtkCxxSetObjectMacro(vtkKWWindow, PropertiesParent, vtkKWWidget);
 
 class vtkKWWindowMenuEntry
@@ -703,22 +703,23 @@ void vtkKWWindow::Create(vtkKWApplication *app, char *args)
   // for the ViewFrame and PropertiesParent
 
   this->MiddleFrame->SetSeparatorSize(0);
-  this->MiddleFrame->SetFrame1MinimumSize(380);
+  int min_size = 380;
+  this->MiddleFrame->SetFrame1MinimumSize(min_size);
 
   if (this->Application->HasRegisteryValue(
-    2, "Geometry", VTK_KW_SAVE_WINDOW_GEOMETRY_REG_KEY) &&
+        2, "Geometry", VTK_KW_WINDOW_FRAME1_SIZE_REG_KEY) &&
       this->Application->GetIntRegisteryValue(
-        2, "Geometry", VTK_KW_SAVE_WINDOW_GEOMETRY_REG_KEY) &&
-      this->Application->HasRegisteryValue(
-        2, "Geometry", VTK_KW_WINDOW_FRAME1_SIZE_REG_KEY))
+        2, "Geometry", VTK_KW_WINDOW_FRAME1_SIZE_REG_KEY) >= min_size)
     {
-    this->MiddleFrame->SetFrame1Size(this->Application->GetIntRegisteryValue(
-      2, "Geometry", VTK_KW_WINDOW_FRAME1_SIZE_REG_KEY));
+    this->MiddleFrame->SetFrame1Size(
+      this->Application->GetIntRegisteryValue(
+        2, "Geometry", VTK_KW_WINDOW_FRAME1_SIZE_REG_KEY));
     }
   else
     {
-    this->MiddleFrame->SetFrame1Size(380);
+    this->MiddleFrame->SetFrame1Size(min_size);
     }
+
   this->MiddleFrame->Create(app);
   this->Script("pack %s -side bottom -fill both -expand t",
     this->MiddleFrame->GetWidgetName());
