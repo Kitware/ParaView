@@ -136,7 +136,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.345");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.346");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -1097,6 +1097,8 @@ void vtkPVRenderView::CreateViewProperties()
   this->OrientationAxesCheck->Create(this->GetApplication(), 0);
   this->OrientationAxesCheck->SetText("Display orientation axes");
   this->OrientationAxesCheck->SetCommand(this, "OrientationAxesCheckCallback");
+  this->OrientationAxesCheck->SetBalloonHelpString(
+    "Toggle the visibility of the orientation axes.");
   if (pvapp && pvwindow &&
       pvapp->GetRegisteryValue(2, "RunTime", "OrientationAxesVisibility", 0))
     {
@@ -1116,6 +1118,9 @@ void vtkPVRenderView::CreateViewProperties()
   this->OrientationAxesInteractiveCheck->Create(this->GetApplication(), 0);
   this->OrientationAxesInteractiveCheck->SetText("Interactive");
   this->OrientationAxesInteractiveCheck->SetCommand(this, "OrientationAxesInteractiveCallback");
+  this->OrientationAxesInteractiveCheck->SetBalloonHelpString(
+    "Toggle whether the position and size of the orientation axes can be "
+    "controlled using mouse interaction in the 3D View window.");
   if (pvapp && pvwindow &&
       pvapp->GetRegisteryValue(2, "RunTime", "OrientationAxesInteractivity", 0))
     {
@@ -1136,6 +1141,8 @@ void vtkPVRenderView::CreateViewProperties()
   this->OrientationAxesOutlineColor->SetText("Set Outline Color");
   this->OrientationAxesOutlineColor->Create(this->GetApplication(), 0);
   this->OrientationAxesOutlineColor->SetCommand(this, "SetOrientationAxesOutlineColor");
+  this->OrientationAxesOutlineColor->SetBalloonHelpString(
+    "Choose the color of the outline for resizing the orientation axes.");
   if (pvapp && pvwindow)
     {
     pvwindow->RetrieveColor(2, "OrientationAxesOutline", rgb);
@@ -1161,6 +1168,8 @@ void vtkPVRenderView::CreateViewProperties()
   this->OrientationAxesTextColor->SetText("Set Axis Label Color");
   this->OrientationAxesTextColor->Create(this->GetApplication(), 0);
   this->OrientationAxesTextColor->SetCommand(this, "SetOrientationAxesTextColor");
+  this->OrientationAxesTextColor->SetBalloonHelpString(
+    "Choose the color of the X, Y, Z labels of the orientation axes.");
   if (pvapp && pvwindow)
     {
     pvwindow->RetrieveColor(2, "OrientationAxesText", rgb);
