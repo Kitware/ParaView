@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWWidget );
-vtkCxxRevisionMacro(vtkKWWidget, "1.79");
+vtkCxxRevisionMacro(vtkKWWidget, "1.80");
 
 int vtkKWWidgetCommand(ClientData cd, Tcl_Interp *interp,
                        int argc, char *argv[]);
@@ -348,7 +348,7 @@ void vtkKWWidget::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkKWWidget ";
-  this->ExtractRevision(os,"$Revision: 1.79 $");
+  this->ExtractRevision(os,"$Revision: 1.80 $");
 }
 
 //----------------------------------------------------------------------------
@@ -666,10 +666,16 @@ const char* vtkKWWidget::ConvertInternalStringToTkString(const char *str)
     return "";
     }
 
-  return this->Script(
-    "encoding convertfrom %s {%s}", 
-    vtkKWWidget::GetCharacterEncodingAsString(
-      this->GetApplication()->GetCharacterEncoding()), str);
+  const char *encoding = vtkKWWidget::GetCharacterEncodingAsString(
+    this->GetApplication()->GetCharacterEncoding());
+
+  this->Script(
+    "if {[catch {encoding convertfrom %s {%s}} __foo__]} {"
+    "  encoding convertfrom identity {%s} "
+    "} { "
+    "  set __foo__ "
+    "}", 
+    encoding, str, str);
 }
 
 //----------------------------------------------------------------------------
@@ -680,8 +686,7 @@ const char* vtkKWWidget::ConvertTkStringToInternalString(const char *str)
     return "";
     }
 
-  return this->Script(
-    "encoding convertfrom identity {%s}", str);
+  return this->Script("encoding convertfrom identity {%s}", str);
 }
 
 //----------------------------------------------------------------------------
@@ -692,13 +697,8 @@ void vtkKWWidget::SetTextOption(const char *str, const char *option)
     return;
     }
 
-  this->Script(
-    "%s configure %s [encoding convertfrom %s {%s}]", 
-    this->GetWidgetName(), 
-    option, 
-    vtkKWWidget::GetCharacterEncodingAsString(
-      this->GetApplication()->GetCharacterEncoding()), 
-    (str ? str : ""));
+  const char *val = this->ConvertInternalStringToTkString(str);
+  this->Script("%s configure %s {%s}", this->GetWidgetName(), option, val);
 }
 
 //----------------------------------------------------------------------------
@@ -709,8 +709,8 @@ const char* vtkKWWidget::GetTextOption(const char *option)
     return "";
     }
 
-  return this->Script("encoding convertfrom identity [%s cget %s]", 
-                      this->GetWidgetName(), option);
+  const char *val = this->Script("%s cget %s", this->GetWidgetName(), option);
+  return this->ConvertTkStringToInternalString(val);
 }
 
 //----------------------------------------------------------------------------
