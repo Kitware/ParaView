@@ -53,22 +53,22 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <stdarg.h>
 
-//------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVNavigationWindow );
-vtkCxxRevisionMacro(vtkPVNavigationWindow, "1.16");
+vtkCxxRevisionMacro(vtkPVNavigationWindow, "1.16.2.1");
 
-//------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 vtkPVNavigationWindow::vtkPVNavigationWindow()
 {
 }
 
-//------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 vtkPVNavigationWindow::~vtkPVNavigationWindow()
 {
 }
 
 
-//------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVNavigationWindow::ChildUpdate(vtkPVSource *currentSource, int NoBind)
 {
   vtkPVSource *source;
@@ -302,7 +302,7 @@ void vtkPVNavigationWindow::ChildUpdate(vtkPVSource *currentSource, int NoBind)
     }
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVNavigationWindow::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
