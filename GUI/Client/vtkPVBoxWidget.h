@@ -131,6 +131,7 @@ protected:
   // PlaceWidget is overloaded since, this class has to position the
   // bounds on the BoxProxy(vtkBox) as well.
   virtual void PlaceWidget(double bds[6]);
+  virtual void PlaceWidget() { this->Superclass::PlaceWidget(); }
   
   // Description:
   // Call creation on the child.
