@@ -129,7 +129,7 @@ public:
   // Description:
   // A convienience method to invoke some tcl script code and
   // perform arguement substitution.
-  void Script(const char *EventString, ...);
+  const char* Script(const char *EventString, ...);
   
   // Description:
   // Method to estimate the length of the string that will be produced

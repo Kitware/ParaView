@@ -117,7 +117,7 @@ void vtkKWObject::ExtractRevision(ostream& os,const char *revIn)
 void vtkKWObject::SerializeRevision(ostream& os, vtkIndent indent)
 {
   os << indent << "vtkKWObject ";
-  this->ExtractRevision(os,"$Revision: 1.26 $");
+  this->ExtractRevision(os,"$Revision: 1.27 $");
 }
 
 void vtkKWObject::Serialize(istream& is)
@@ -193,10 +193,11 @@ const char *vtkKWObject::GetTclName()
   return this->TclName;
 }
 
-void vtkKWObject::Script(const char *format, ...)
+const char* vtkKWObject::Script(const char *format, ...)
 {
   char event[1600];
   char* buffer = event;
+  const char* res = 0;
   
   va_list ap;
   va_start(ap, format);
@@ -215,7 +216,7 @@ void vtkKWObject::Script(const char *format, ...)
   
   if (this->GetApplication())
     {
-    this->GetApplication()->SimpleScript(buffer);
+    res = this->GetApplication()->SimpleScript(buffer);
     }
   else
     {
@@ -226,6 +227,7 @@ void vtkKWObject::Script(const char *format, ...)
     {
     delete [] buffer;
     }
+  return res;
 }
 
 int vtkKWObject::GetIntegerResult(vtkKWApplication *app)
