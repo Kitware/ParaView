@@ -124,7 +124,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.546");
+vtkCxxRevisionMacro(vtkPVWindow, "1.547");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -2560,15 +2560,15 @@ void vtkPVWindow::SaveBatchScript(const char *filename, int offScreenFlag, const
     vtkPVSourceCollection* col = 0;
     if (it->GetData(col) == VTK_OK && col)
       {
-      vtkCollectionIterator *cit = col->NewIterator();
-      cit->InitTraversal();
-      while ( !cit->IsDoneWithTraversal() )
+      vtkCollectionIterator *collIt = col->NewIterator();
+      collIt->InitTraversal();
+      while ( !collIt->IsDoneWithTraversal() )
         {
-        pvs = static_cast<vtkPVSource*>(cit->GetObject()); 
+        pvs = static_cast<vtkPVSource*>(collIt->GetObject()); 
         pvs->SetVisitedFlag(0);
-        cit->GoToNextItem();
+        collIt->GoToNextItem();
         }
-      cit->Delete();
+      collIt->Delete();
       }
     it->GoToNextItem();
     }
