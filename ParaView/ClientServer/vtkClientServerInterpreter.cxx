@@ -25,7 +25,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkClientServerInterpreter);
-vtkCxxRevisionMacro(vtkClientServerInterpreter, "1.1.2.12");
+vtkCxxRevisionMacro(vtkClientServerInterpreter, "1.1.2.13");
 
 //----------------------------------------------------------------------------
 // Internal container instantiations.
@@ -642,9 +642,9 @@ vtkClientServerInterpreter::GetMessageFromID(vtkClientServerID id)
 }
 
 //----------------------------------------------------------------------------
-const vtkClientServerStream* vtkClientServerInterpreter::GetLastResult() const
+const vtkClientServerStream& vtkClientServerInterpreter::GetLastResult() const
 {
-  return this->LastResultMessage;
+  return *this->LastResultMessage;
 }
 
 //----------------------------------------------------------------------------

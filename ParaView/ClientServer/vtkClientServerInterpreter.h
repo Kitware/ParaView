@@ -78,7 +78,7 @@ public:
 
   // Description:
   // Get the last result message.
-  const vtkClientServerStream* GetLastResult() const;
+  const vtkClientServerStream& GetLastResult() const;
 
   // Description:
   // Return a pointer to a vtkObjectBase for an ID whose message
