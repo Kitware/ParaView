@@ -50,7 +50,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWWidget );
-vtkCxxRevisionMacro(vtkKWWidget, "1.48");
+vtkCxxRevisionMacro(vtkKWWidget, "1.49");
 
 int vtkKWWidgetCommand(ClientData cd, Tcl_Interp *interp,
                        int argc, char *argv[]);
@@ -254,36 +254,32 @@ void vtkKWWidget::Focus()
 //------------------------------------------------------------------------------
 void vtkKWWidget::SetBind(vtkKWObject* CalledObject, const char *Event, const char *CommandString)
 {
-  this->Application->Script("bind %s %s { %s %s }", this->GetWidgetName(), 
-                            Event, CalledObject->GetTclName(), CommandString);
+  this->Script("bind %s %s { %s %s }", this->GetWidgetName(), 
+               Event, CalledObject->GetTclName(), CommandString);
 }
 
 //------------------------------------------------------------------------------
 void vtkKWWidget::SetBind(const char *Event, const char *CommandString)
 {
-  this->Application->Script("bind %s %s { %s }", this->GetWidgetName(), 
-                            Event, CommandString);
+  this->Script("bind %s %s { %s }", this->GetWidgetName(), Event, CommandString);
 }
 
 //------------------------------------------------------------------------------
 void vtkKWWidget::SetBind(const char *event, const char *widget, const char *command)
 {
-  this->Application->Script("bind %s %s { %s %s }", this->GetWidgetName(), 
-                            event, widget, command);
+  this->Script("bind %s %s { %s %s }", this->GetWidgetName(), event, widget, command);
 }
 
 //------------------------------------------------------------------------------
 void vtkKWWidget::SetBindAll(const char *event, const char *widget, const char *command)
 {
-  this->Application->Script("bind all %s { %s %s }", 
-                            event, widget, command);
+  this->Script("bind all %s { %s %s }", event, widget, command);
 }
 
 //------------------------------------------------------------------------------
 void vtkKWWidget::SetBindAll(const char *event, const char *command)
 {
-  this->Application->Script("bind all %s { %s }", 
-                            event, command);
+  this->Script("bind all %s { %s }", event, command);
 }
 
 //------------------------------------------------------------------------------
@@ -345,7 +341,7 @@ void vtkKWWidget::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkKWWidget ";
-  this->ExtractRevision(os,"$Revision: 1.48 $");
+  this->ExtractRevision(os,"$Revision: 1.49 $");
 }
 
 //------------------------------------------------------------------------------
