@@ -55,6 +55,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWNotebook.h"
 #include "vtkKWProgressGauge.h"
 #include "vtkKWSplitFrame.h"
+#include "vtkKWTkUtilities.h"
 #include "vtkKWView.h"
 #include "vtkKWViewCollection.h"
 #include "vtkKWWidgetCollection.h"
@@ -67,7 +68,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define VTK_KW_SHOW_PROPERTIES_LABEL "Show Left Panel"
 #define VTK_KW_EXIT_DIALOG_NAME "ExitApplication"
 
-vtkCxxRevisionMacro(vtkKWWindow, "1.114");
+vtkCxxRevisionMacro(vtkKWWindow, "1.115");
 vtkCxxSetObjectMacro(vtkKWWindow, PropertiesParent, vtkKWWidget);
 
 class vtkKWWindowMenuEntry
@@ -277,6 +278,8 @@ vtkKWWindow::vtkKWWindow()
   this->WindowClass = NULL;
   this->SetWindowClass("KitwareWidget");
 
+  this->Title = NULL;
+
   this->PromptBeforeClose = 1;
 
   this->RecentFilesVector = 0;
@@ -358,6 +361,7 @@ vtkKWWindow::~vtkKWWindow()
     }
 
   this->SetWindowClass(0);
+  this->SetTitle(0);
   this->SetScriptExtension(0);
   this->SetScriptType(0);
 
@@ -598,30 +602,35 @@ void vtkKWWindow::Create(vtkKWApplication *app, char *args)
   this->Script("toplevel %s -visual best %s -class %s",wname,args,
                this->WindowClass);
   this->Script("wm title %s {%s}",wname,
-               app->GetApplicationName());
+               this->GetTitle());
   this->Script("wm iconname %s {%s}",wname,
                app->GetApplicationName());
   this->Script("wm protocol %s WM_DELETE_WINDOW {%s Close}",
                wname, this->GetTclName());
 
   this->StatusFrame->Create(app,"frame","");
-  this->Script("image create photo -height 34 -width 128");
+
+  this->Script("image create photo");
   this->StatusImageName = vtkString::Duplicate(interp->result);
   this->CreateStatusImage();
   this->StatusImage->Create(app,"label",
-                            "-relief sunken -bd 1 -height 38 -width 132 -fg #ffffff -bg #ffffff");
+                            "-relief sunken -bd 1 -fg #ffffff -bg #ffffff");
   this->Script("%s configure -image %s", this->StatusImage->GetWidgetName(),
                this->StatusImageName);
-  this->Script("pack %s -side left -padx 2", 
+  this->Script("pack %s -side left -ipadx 2 -ipady 2", 
                this->StatusImage->GetWidgetName());
+
   this->StatusLabel->Create(app,"-relief sunken -padx 3 -bd 1 -font \"Helvetica 10\" -anchor w");
   this->Script("pack %s -side left -padx 2 -expand yes -fill both",
                this->StatusLabel->GetWidgetName());
+
   this->Script("pack %s -side bottom -fill x -pady 2",
                this->StatusFrame->GetWidgetName());
+
   this->ProgressFrame->Create(app, "frame", "-relief sunken -borderwidth 2");
   this->ProgressGauge->SetLength(200);
-  this->ProgressGauge->SetHeight(30);
+  this->ProgressGauge->SetHeight(
+    vtkKWTkUtilities::GetPhotoHeight(interp, this->StatusImageName) - 2);
   this->ProgressGauge->Create(app, "");
 
   this->Script("pack %s -side left -padx 2 -fill y", 
@@ -986,6 +995,8 @@ void vtkKWWindow::CreateStatusImage()
     vtkWarningMacro("error looking up color ramp image");
     return;
     }
+
+  Tk_PhotoSetSize(photo, block.width, block.height);
   
   unsigned char *pp = block.pixelPtr;
   float *lp = KITLOGO + 33*128*3;
@@ -1134,7 +1145,7 @@ void vtkKWWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWWindow ";
-  this->ExtractRevision(os,"$Revision: 1.114 $");
+  this->ExtractRevision(os,"$Revision: 1.115 $");
 }
 
 int vtkKWWindow::ExitDialog()
@@ -1451,6 +1462,54 @@ void vtkKWWindow::ProcessErrorClick()
 }
 
 //----------------------------------------------------------------------------
+void vtkKWWindow::SetTitle (const char* _arg)
+{
+  if (this->Title == NULL && _arg == NULL) 
+    { 
+    return;
+    }
+
+  if (this->Title && _arg && (!strcmp(this->Title, _arg))) 
+    {
+    return;
+    }
+
+  if (this->Title) 
+    { 
+    delete [] this->Title; 
+    }
+
+  if (_arg)
+    {
+    this->Title = new char[strlen(_arg)+1];
+    strcpy(this->Title, _arg);
+    }
+  else
+    {
+    this->Title = NULL;
+    }
+
+  this->Modified();
+
+  if (this->Application)
+    {
+    this->Script("wm title %s {%s}", this->GetWidgetName(), this->GetTitle());
+    }
+} 
+
+//----------------------------------------------------------------------------
+char* vtkKWWindow::GetTitle()
+{
+  if (!this->Title && 
+      this->Application && 
+      this->Application->GetApplicationName())
+    {
+    return this->Application->GetApplicationName();
+    }
+  return this->Title;
+}
+
+//----------------------------------------------------------------------------
 void vtkKWWindow::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
@@ -1469,6 +1528,8 @@ void vtkKWWindow::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "SelectedView: " << this->GetSelectedView() << endl;
   os << indent << "SupportHelp: " << this->GetSupportHelp() << endl;
   os << indent << "ToolbarFrame: " << this->GetToolbarFrame() << endl;
+  os << indent << "StatusFrame: " << this->GetStatusFrame() << endl;
   os << indent << "ViewFrame: " << this->GetViewFrame() << endl;
   os << indent << "WindowClass: " << this->GetWindowClass() << endl;  
+  os << indent << "Title: " << this->GetTitle() << endl;  
 }
