@@ -22,7 +22,6 @@
 #include "vtkPointData.h"
 #include "vtkCellData.h"
 #include "vtkIntArray.h"
-#include "vtkFloatArray.h"
 #include "vtkOutlineFilter.h"
 #include "vtkAppendPolyData.h"
 #include "vtkDataSetSurfaceFilter.h"
@@ -36,7 +35,7 @@
 
 
 
-vtkCxxRevisionMacro(vtkCTHAMRCellToPointData, "1.6");
+vtkCxxRevisionMacro(vtkCTHAMRCellToPointData, "1.7");
 vtkStandardNewMacro(vtkCTHAMRCellToPointData);
 
 //----------------------------------------------------------------------------
@@ -113,7 +112,7 @@ void vtkCTHAMRCellToPointData::Execute()
       this->UpdateProgress(.2 + .6 * static_cast<double>(arrayNamesIdx)/static_cast<double>(numArrayNames));
       arrayName = this->VolumeArrayNames->GetString(arrayNamesIdx);
       vtkDataArray* cellVolumeFraction;
-      vtkFloatArray* pointVolumeFraction;
+      vtkDataArray* pointVolumeFraction;
 
       cellVolumeFraction = input->GetCellData()->GetArray(arrayName);
       if (cellVolumeFraction == NULL)
@@ -121,21 +120,12 @@ void vtkCTHAMRCellToPointData::Execute()
         vtkErrorMacro("Could not find cell array " << arrayName);
         return;
         }
-      if (cellVolumeFraction->GetDataType() == VTK_FLOAT ||
-          cellVolumeFraction->GetDataType() == VTK_DOUBLE)
-        {
-        pointVolumeFraction = vtkFloatArray::New();
-        pointVolumeFraction->SetNumberOfTuples(output->GetNumberOfPoints());
-        this->ExecuteCellDataToPointData(input, cellVolumeFraction, 
-                                         output, pointVolumeFraction);
-        output->GetPointData()->AddArray(pointVolumeFraction);
-        pointVolumeFraction->Delete();                                             
-        }
-      else
-        {
-        vtkErrorMacro("Expecting volume fraction to be of type double or float.");
-        return;
-        }
+      pointVolumeFraction = cellVolumeFraction->NewInstance();
+      pointVolumeFraction->SetNumberOfTuples(output->GetNumberOfPoints());
+      this->ExecuteCellDataToPointData(input, cellVolumeFraction, 
+                                        output, pointVolumeFraction);
+      output->GetPointData()->AddArray(pointVolumeFraction);
+      pointVolumeFraction->Delete();                                             
       }
     }
   this->UpdateProgress(.8);
@@ -187,11 +177,12 @@ void vtkCTHAMRCellToPointData::CreateOutputGeometry(vtkCTHData* input,
 //----------------------------------------------------------------------------
 // This assumes that ghost levels exist.  No boundary condition checks.
 template <class T>
-void vtkCTHAMRExecuteCellDataToPointData(T* pCell,float* pPoint, 
+void vtkCTHAMRExecuteCellDataToPointData(T* pCell,T* pPoint, 
                                          int* cDims, int* pDims)
 {
   int i, j, k;
   int jInc, kInc;
+  double tmp;
 
   // Increments are for the cell array.
   // This assumes one level of ghost cells on input.
@@ -207,24 +198,25 @@ void vtkCTHAMRExecuteCellDataToPointData(T* pCell,float* pPoint,
       for (i = 0; i < pDims[0]; ++i)
         {        
         // Add cell value to all points of cell.
-        *pPoint = pCell[0];
-        *pPoint += pCell[1];
-        *pPoint += pCell[jInc];
-        *pPoint += pCell[jInc+1];
+        tmp = pCell[0];
+        tmp += pCell[1];
+        tmp += pCell[jInc];
+        tmp += pCell[jInc+1];
         if (cDims[2] > 1)
           {
-          *pPoint += pCell[kInc];
-          *pPoint += pCell[kInc+1];
-          *pPoint += pCell[kInc+jInc];
-          *pPoint += pCell[kInc+jInc+1];
+          tmp += pCell[kInc];
+          tmp += pCell[kInc+1];
+          tmp += pCell[kInc+jInc];
+          tmp += pCell[kInc+jInc+1];
           // Average 8 neighbors.
-          *pPoint = *pPoint * 0.125;
+          tmp = tmp * 0.125;
           }
         else
           {
           // Average 4 neighbors.
-          *pPoint = *pPoint * 0.25;
-          }    
+          tmp = tmp * 0.25;
+          }
+        *pPoint = tmp;
         // Increment pointers
         ++pPoint;
         ++pCell;
@@ -238,13 +230,13 @@ void vtkCTHAMRExecuteCellDataToPointData(T* pCell,float* pPoint,
 }
 
 //------------------------------------------------------------------------------
+// Point and cell arrays have to have the same data type.
 void vtkCTHAMRCellToPointData::ExecuteCellDataToPointData(
                          vtkCTHData* input, vtkDataArray *cellVolumeFraction, 
-                         vtkCTHData* output, vtkFloatArray *pointVolumeFraction)
+                         vtkCTHData* output, vtkDataArray *pointVolumeFraction)
 {
   vtkIdType inStart, outStart;
   int block, numBlocks;
-  float *pPoint;
   int* pDims;
   int* cDims;
 
@@ -256,20 +248,16 @@ void vtkCTHAMRCellToPointData::ExecuteCellDataToPointData(
     {
     pDims = output->GetBlockPointDimensions(block); 
     cDims = input->GetBlockCellDimensions(block); 
-    pPoint = pointVolumeFraction->GetPointer(outStart);
-    if (cellVolumeFraction->GetDataType() == VTK_FLOAT)
+
+    void* pCell = cellVolumeFraction->GetVoidPointer(inStart);
+    void* pPoint = pointVolumeFraction->GetVoidPointer(outStart);
+    switch (cellVolumeFraction->GetDataType())
       {
-      float* pCell = (float*)(cellVolumeFraction->GetVoidPointer(inStart));
-      vtkCTHAMRExecuteCellDataToPointData(pCell,pPoint,cDims,pDims);
-      }
-    else if (cellVolumeFraction->GetDataType() == VTK_DOUBLE)
-      {
-      double* pCell = (double*)(cellVolumeFraction->GetVoidPointer(inStart));
-      vtkCTHAMRExecuteCellDataToPointData(pCell,pPoint,cDims,pDims);
-      }
-    else
-      {
-      vtkErrorMacro("Expecting double or float array.");
+      vtkTemplateMacro4(vtkCTHAMRExecuteCellDataToPointData, 
+                        (VTK_TT *)(pCell), (VTK_TT *)(pPoint), cDims, pDims);
+      default:
+        vtkErrorMacro(<< "Execute: Unknown ScalarType");
+        return;
       }
     inStart += (cDims[0])*(cDims[1])*(cDims[2]);
     // This assumes one level of ghost cells on input.
@@ -278,233 +266,17 @@ void vtkCTHAMRCellToPointData::ExecuteCellDataToPointData(
 }
 
 
-
-
-// A bit harder to template.  Do it later.
-//------------------------------------------------------------------------------
-// I am trying a better way of converting cell data to point data.
-// This should olny be used when there are no ghost cells.
-// For each point ,verage all cells touching the point.
-void vtkCTHAMRCellToPointData::ExecuteCellDataToPointData2(
-                          vtkCTHData* input, vtkCTHData* output)
-{
-  int x, y, z;
-  float *pPoint0;
-  float *pPoint;
-  double *pCell0;
-  double *pCellX, *pCellY, *pCellZ;
-  int cInc[6];
-  int pIncX, pIncY, pIncZ;
-  int cIncX, cIncY, cIncZ;
-  int blockId, numBlocks;
-  vtkIdList* blockList = vtkIdList::New();
-  int cDims[3];
-  int pDims[3];
-  int pMaxX, pMaxY, pMaxZ;
-  vtkDataArray *cellVolumeFraction;
-  vtkDataArray *pointVolumeFraction;
-    
-  input->GetBlockCellDimensions(0, cDims);
-  output->GetBlockPointDimensions(0, pDims);
-
-  pIncX = 1;
-  pIncY = pDims[0];
-  pIncZ = pIncY * pDims[1];
-  
-  cIncX = 1;
-  cIncY = cDims[0];
-  cIncZ = cIncY * cDims[1];
-  
-  int numCellsPerBlock = input->GetNumberOfCellsPerBlock();
-  int numPtsPerBlock = output->GetNumberOfPointsPerBlock();
-  // Ignore ghost levels.
-  // For parallel runs, we might keep the ghost levels,
-  // or we could transmit neightboring block values.
-  int numGhostLevels = input->GetNumberOfGhostLevels();
-
-  // Precompute for speed.  We have to do alot of comparisons
-  // For boundary condition checking.
-  pMaxX = pDims[0]-1;
-  pMaxY = pDims[1]-1;
-  pMaxZ = pDims[2]-1;
-
-  // All neighbor cell incs except 0 and 1.
-  // Funny order is for cache locality.
-  cInc[0] = cDims[0];              // +y 
-  cInc[1] = 1 + cInc[0];              // +x +y
-  cInc[2] = (cDims[1]) * (cDims[0]);// +z
-  cInc[3] = 1 + cInc[2];              // +x +z
-  cInc[4] = cInc[0] + cInc[2];        // +y +z
-  cInc[5] = 1 + cInc[0] + cInc[2];    // +x +y +z
-
-
-  // Loop over all of the selected arrays.
-  // This would be more efficient if we kept an array of pointers
-  // and has this loop as the inner loop.  We would only compute 
-  // neighbors once for each block.
-  // Tried this.  It was a real mess.
-  int numArrayNames = this->VolumeArrayNames->GetNumberOfStrings();
-  int arrayNamesIdx;
-  const char* arrayName;
-
-  // Create all of the point arrays.
-  for (arrayNamesIdx = 0; arrayNamesIdx < numArrayNames; ++arrayNamesIdx)
-    {
-    arrayName = this->VolumeArrayNames->GetString(arrayNamesIdx);
-    cellVolumeFraction = input->GetCellData()->GetScalars(arrayName);
-    if (cellVolumeFraction == NULL)
-      {
-      vtkErrorMacro("Could not find cell array " << arrayName);
-      return;
-      }
-    if (cellVolumeFraction->GetDataType() != VTK_DOUBLE)
-      {
-      vtkErrorMacro("Expecting volume fraction to be of type double.");
-      return;
-      }
-    pointVolumeFraction = vtkFloatArray::New();
-    pointVolumeFraction->SetName(arrayName);
-    pointVolumeFraction->SetNumberOfTuples(output->GetNumberOfPoints());
-    output->GetPointData()->AddArray(pointVolumeFraction);
-    pointVolumeFraction->Delete();
-    }
-
-
-  // Now lets loop over blocks. Low levels first.
-  // Processing the low levels first will allow me to force some
-  // boundary points (that are not on neighbor grid points) to obey
-  // linear interpolation of neighbor's face.
-  numBlocks = input->GetNumberOfBlocks();
-  int blocksFinished = 0;
-  int level = 0;
-  while (blocksFinished < numBlocks)
-    { // Look for all blocks with level.
-    this->UpdateProgress(.2 + .6 * static_cast<double>(blocksFinished)/static_cast<double>(numBlocks));
-    for (blockId = 0; blockId < numBlocks; ++blockId)
-      {
-      // We should really have level a better part of the data set structure.
-      // Look to level array for now.
-      if (input->GetBlockLevel(blockId) < 0)
-        {
-        vtkErrorMacro("Bad block level");
-        // avoids an infinite loop.
-        ++blocksFinished;
-        }
-      if (input->GetBlockLevel(blockId) == level)
-        {
-        // Mark a block as finished (before we start processing the block).
-        ++blocksFinished;
-        // Make a list of neighbors so each point does not need to look through
-        // all the blocks.  With a better data structure, we might have
-        // a method to return neighbors of indexed by block face.
-        this->FindBlockNeighbors(output, blockId, blockList);
-
-        // Best place I can find for this loop.  After block neighbor ..
-        // Any later is a real mess.
-        for (arrayNamesIdx = 0; arrayNamesIdx < numArrayNames; ++arrayNamesIdx)
-          {
-          arrayName = this->VolumeArrayNames->GetString(arrayNamesIdx);
-          cellVolumeFraction = input->GetCellData()->GetScalars(arrayName);
-          pointVolumeFraction = output->GetPointData()->GetScalars(arrayName);
-
-          // It might be faster to have a separate loop for interior points.
-          // Loop over all points.
-          pPoint0 = (float*) pointVolumeFraction->GetVoidPointer(0);
-          pCell0 = (double*)(cellVolumeFraction->GetVoidPointer(0));
-
-          // Move pointers to start of block.
-          pPoint = pPoint0 + (blockId*numPtsPerBlock);
-          // Skip to correct block
-          pCellZ = pCell0 + (blockId*numCellsPerBlock);
-          // Skip over initial ghost cells.
-          if (cDims[2] > 1)
-            {
-            pCellZ += numGhostLevels * (cIncX+cIncY+cIncZ);
-            }
-          else
-            { // 2D case.
-            pCellZ += numGhostLevels * (cIncX+cIncY);
-            }
-          // Loop over all points in this output block.
-          // March through cells as if there were no ghost cells.
-          for (z = 0; z <= pMaxZ; ++z)
-            {
-            pCellY = pCellZ;
-            for (y = 0; y <= pMaxY; ++y)
-              {
-              pCellX = pCellY;
-              for (x = 0; x <= pMaxX; ++x)
-                {
-                if (z == 0 || y == 0 || x == 0)
-                  {
-                  *pPoint = this->ComputeSharedPoint(blockId, blockList, 
-                                                    x, y, z, pCell0, pPoint0, input, output);
-                  ++pPoint;
-                  // Do not increment the cell pointer for negative boundary faces.
-                  }
-                else if (z == pMaxZ || y == pMaxY || x == pMaxX)
-                  {
-                  *pPoint = this->ComputeSharedPoint(blockId, blockList, 
-                                                    x, y, z, pCell0, pPoint0, input, output);
-                  ++pPoint;
-                  }
-                else
-                  {
-                  // This fast path for interior point should speed things up.
-                  // Average the eight neighboring cells.
-                  if (cDims[2] > 1)
-                    {
-                    *pPoint = (pCellX[0] + pCellX[1] + pCellX[cInc[0]] + pCellX[cInc[1]]
-                            + pCellX[cInc[2]] + pCellX[cInc[3]] + pCellX[cInc[4]]
-                            + pCellX[cInc[5]]) * 0.125;
-                    }
-                  else
-                    { // 2D case
-                    *pPoint = (pCellX[0] + pCellX[1] + pCellX[cInc[0]] + pCellX[cInc[1]]) * 0.25;
-                    }
-                  ++pPoint;
-                  }
-                // March through the cells like there are no ghost cells.
-                // first two point use the first cell.
-                if (x > 0)
-                  {
-                  ++pCellX;
-                  }
-                } // x loop
-              if (y > 0)
-                {
-                pCellY += cIncY;
-                }  
-              } // y loop
-            if (z > 0)
-              {
-              pCellZ += cIncZ;  
-              }
-            } // z loop
-          } // array name loop
-        } // if (data->GetBlockLevel(blockId) == level)
-      } // for (blockId = 0; blockId < numBlocks; ++blockId)
-      // Move to next level.
-      ++level;
-    } // while (blocksFinished < numBlocks)
-  blockList->Delete();
-}
-
-
-
-// I am converting to skip over ghost cells by:
-// Changing only increments.
-
 //------------------------------------------------------------------------------
 // I am trying a better way of converting cell data to point data.
 // This should olny be used when there are no ghost cells.
 // For each point, average all cells touching the point.
 // Weight the cell by inverse of spacing.
 // We need the point array only for linear interpolation constraint.
-float vtkCTHAMRCellToPointData::ComputeSharedPoint(int blockId, vtkIdList* blockList,
-                                               int x, int y, int z, 
-                                               double* pCell, float* pPoint, 
-                                               vtkCTHData* input, vtkCTHData* output)
+template <class T>
+double vtkCTHAMRCellToPointDataComputeSharedPoint(int blockId, vtkIdList* blockList,
+                                                 int x, int y, int z, 
+                                                 T* pCell, T* pPoint, 
+                                                 vtkCTHData* input, vtkCTHData* output)
 {
   int pDims[3];
   int cDims[3];
@@ -638,7 +410,7 @@ float vtkCTHAMRCellToPointData::ComputeSharedPoint(int blockId, vtkIdList* block
         // Sanity check:  We expect that blocks only share faces.
         if (x>0 && x<pMaxX && y>0 && y<pMaxY && z>0 && z<pMaxZ)
           {
-          vtkErrorMacro("Expecting a boundary point.");
+          vtkGenericWarningMacro("Expecting a boundary point.");
           }
         // Compute remainder (whether point is on grid).
         // This should really just be a flag because
@@ -655,7 +427,7 @@ float vtkCTHAMRCellToPointData::ComputeSharedPoint(int blockId, vtkIdList* block
         // This is not necessary if point lies on neighbors grid.
         if (dx > epsilon || dy > epsilon || dz > epsilon)
           {
-          float* cornerPoint = pPoint + id*numPtsPerBlock + x + y*pIncY + z*pIncZ;
+          T* cornerPoint = pPoint + id*numPtsPerBlock + x + y*pIncY + z*pIncZ;
           // Since there are only six cases (3 edges and 3 faces),
           // just have a condition for each.
           if (dx > epsilon && dy <= epsilon && dz <= epsilon)
@@ -687,7 +459,7 @@ float vtkCTHAMRCellToPointData::ComputeSharedPoint(int blockId, vtkIdList* block
             }
           else
             { // Point in middle of cell.  Drop through.
-            vtkErrorMacro("Bondary point in middle of neighbor cell.");
+            vtkGenericWarningMacro("Bondary point in middle of neighbor cell.");
             }
           }
         // Handle last point (max boundary face).
@@ -723,6 +495,241 @@ float vtkCTHAMRCellToPointData::ComputeSharedPoint(int blockId, vtkIdList* block
   //  average cells values.
   return sum / sumWeight; 
 }
+
+
+
+//------------------------------------------------------------------------------
+template <class T>
+void vtkCTHAMRCellToPointDataLoop(T* pPoint0, T* pCell0, 
+                                  int blockId, int numGhostLevels,
+                                  vtkIdList* blockList, 
+                                  vtkCTHData* input, vtkCTHData* output)
+{
+  int x, y, z;
+  T *pPoint;
+  T *pCellX, *pCellY, *pCellZ;
+  int cInc[6];
+  int pIncX, pIncY, pIncZ;
+  int cIncX, cIncY, cIncZ;
+  int pMaxX, pMaxY, pMaxZ;
+  int cDims[3];
+  int pDims[3];
+
+  input->GetBlockCellDimensions(blockId, cDims);
+  output->GetBlockPointDimensions(blockId, pDims);
+
+  // Precompute for speed.  We have to do alot of comparisons
+  // For boundary condition checking.
+  pMaxX = pDims[0]-1;
+  pMaxY = pDims[1]-1;
+  pMaxZ = pDims[2]-1;
+
+  // Standard increments for moving around pointers.
+  pIncX = 1;
+  pIncY = pDims[0];
+  pIncZ = pIncY * pDims[1];
+  cIncX = 1;
+  cIncY = cDims[0];
+  cIncZ = cIncY * cDims[1];
+
+  // All neighbor cell incs except 0 and 1.
+  // Best cache locality.
+  cInc[0] = cDims[0];              // +y 
+  cInc[1] = 1 + cInc[0];              // +x +y
+  cInc[2] = (cDims[1]) * (cDims[0]);// +z
+  cInc[3] = 1 + cInc[2];              // +x +z
+  cInc[4] = cInc[0] + cInc[2];        // +y +z
+  cInc[5] = 1 + cInc[0] + cInc[2];    // +x +y +z
+
+  // Move pointers to start of block.
+  pPoint = pPoint0 + (blockId*(pDims[0]*pDims[1]*pDims[2]));
+  // Skip to correct block
+  pCellZ = pCell0 + (blockId*(cDims[0]*cDims[1]*cDims[2]));
+
+  // Skip over initial ghost cells.
+  if (cDims[2] > 1)
+    {
+    pCellZ += numGhostLevels * (cIncX+cIncY+cIncZ);
+    }
+  else
+    { // 2D case.
+    pCellZ += numGhostLevels * (cIncX+cIncY);
+    }
+  // Loop over all points in this output block.
+  // March through cells as if there were no ghost cells.
+  for (z = 0; z <= pMaxZ; ++z)
+    {
+    pCellY = pCellZ;
+    for (y = 0; y <= pMaxY; ++y)
+      {
+      pCellX = pCellY;
+      for (x = 0; x <= pMaxX; ++x)
+        {
+        if (z == 0 || y == 0 || x == 0)
+          {
+          *pPoint = vtkCTHAMRCellToPointDataComputeSharedPoint(blockId, blockList, 
+                                            x, y, z, pCell0, pPoint0, input, output);
+          ++pPoint;
+          // Do not increment the cell pointer for negative boundary faces.
+          }
+        else if (z == pMaxZ || y == pMaxY || x == pMaxX)
+          {
+          *pPoint = vtkCTHAMRCellToPointDataComputeSharedPoint(blockId, blockList, 
+                                            x, y, z, pCell0, pPoint0, input, output);
+          ++pPoint;
+          }
+        else
+          {
+          // This fast path for interior point should speed things up.
+          // Average the eight neighboring cells.
+          if (cDims[2] > 1)
+            {
+            *pPoint = (pCellX[0] + pCellX[1] + pCellX[cInc[0]] + pCellX[cInc[1]]
+                    + pCellX[cInc[2]] + pCellX[cInc[3]] + pCellX[cInc[4]]
+                    + pCellX[cInc[5]]) * 0.125;
+            }
+          else
+            { // 2D case
+            *pPoint = (pCellX[0] + pCellX[1] + pCellX[cInc[0]] + pCellX[cInc[1]]) * 0.25;
+            }
+          ++pPoint;
+          }
+        // March through the cells like there are no ghost cells.
+        // first two point use the first cell.
+        if (x > 0)
+          {
+          ++pCellX;
+          }
+        } // x loop
+      if (y > 0)
+        {
+        pCellY += cIncY;
+        }  
+      } // y loop
+    if (z > 0)
+      {
+      pCellZ += cIncZ;  
+      }
+    } // z loop  
+}
+
+// A bit harder to template.  Do it later.
+//------------------------------------------------------------------------------
+// I am trying a better way of converting cell data to point data.
+// This should olny be used when there are no ghost cells.
+// For each point ,verage all cells touching the point.
+void vtkCTHAMRCellToPointData::ExecuteCellDataToPointData2(
+                          vtkCTHData* input, vtkCTHData* output)
+{
+  void* pPoint0;
+  void* pCell0;
+  int blockId, numBlocks;
+  vtkIdList* blockList = vtkIdList::New();
+  vtkDataArray *cellVolumeFraction;
+  vtkDataArray *pointVolumeFraction;
+      
+  int numCellsPerBlock = input->GetNumberOfCellsPerBlock();
+  // Ignore ghost levels.
+  // For parallel runs, we might keep the ghost levels,
+  // or we could transmit neightboring block values.
+  int numGhostLevels = input->GetNumberOfGhostLevels();
+
+  // Loop over all of the selected arrays.
+  // This would be more efficient if we kept an array of pointers
+  // and has this loop as the inner loop.  We would only compute 
+  // neighbors once for each block.
+  // Tried this.  It was a real mess.
+  int numArrayNames = this->VolumeArrayNames->GetNumberOfStrings();
+  int arrayNamesIdx;
+  const char* arrayName;
+
+  // Create all of the point arrays.
+  for (arrayNamesIdx = 0; arrayNamesIdx < numArrayNames; ++arrayNamesIdx)
+    {
+    arrayName = this->VolumeArrayNames->GetString(arrayNamesIdx);
+    cellVolumeFraction = input->GetCellData()->GetScalars(arrayName);
+    if (cellVolumeFraction == NULL)
+      {
+      vtkErrorMacro("Could not find cell array " << arrayName);
+      return;
+      }
+    pointVolumeFraction = cellVolumeFraction->NewInstance();
+    pointVolumeFraction->SetName(arrayName);
+    pointVolumeFraction->SetNumberOfTuples(output->GetNumberOfPoints());
+    output->GetPointData()->AddArray(pointVolumeFraction);
+    pointVolumeFraction->Delete();
+    }
+
+
+  // Now lets loop over blocks. Low levels first.
+  // Processing the low levels first will allow me to force some
+  // boundary points (that are not on neighbor grid points) to obey
+  // linear interpolation of neighbor's face.
+  numBlocks = input->GetNumberOfBlocks();
+  int blocksFinished = 0;
+  int level = 0;
+  while (blocksFinished < numBlocks)
+    { // Look for all blocks with level.
+    this->UpdateProgress(.2 + .6 * static_cast<double>(blocksFinished)/static_cast<double>(numBlocks));
+    for (blockId = 0; blockId < numBlocks; ++blockId)
+      {
+      // We should really have level a better part of the data set structure.
+      // Look to level array for now.
+      if (input->GetBlockLevel(blockId) < 0)
+        {
+        vtkErrorMacro("Bad block level");
+        // avoids an infinite loop.
+        ++blocksFinished;
+        }
+      if (input->GetBlockLevel(blockId) == level)
+        {
+        // Mark a block as finished (before we start processing the block).
+        ++blocksFinished;
+        // Make a list of neighbors so each point does not need to look through
+        // all the blocks.  With a better data structure, we might have
+        // a method to return neighbors of indexed by block face.
+        this->FindBlockNeighbors(output, blockId, blockList);
+
+        // Best place I can find for this loop.  After block neighbor ..
+        // Any later is a real mess.
+        for (arrayNamesIdx = 0; arrayNamesIdx < numArrayNames; ++arrayNamesIdx)
+          {
+          arrayName = this->VolumeArrayNames->GetString(arrayNamesIdx);
+          cellVolumeFraction = input->GetCellData()->GetScalars(arrayName);
+          pointVolumeFraction = output->GetPointData()->GetScalars(arrayName);
+
+          // It might be faster to have a separate loop for interior points.
+          // Loop over all points.
+          pPoint0 = pointVolumeFraction->GetVoidPointer(0);
+          pCell0 = cellVolumeFraction->GetVoidPointer(0);
+
+          // Templated method here.
+          // Get rid of as many arguments as possible.
+          switch (cellVolumeFraction->GetDataType())
+            {
+            vtkTemplateMacro7(vtkCTHAMRCellToPointDataLoop, 
+                              (VTK_TT *)(pPoint0), (VTK_TT *)(pCell0), 
+                              blockId, numGhostLevels, blockList, input, output);
+            default:
+              vtkErrorMacro(<< "Execute: Unknown ScalarType");
+              return;
+            }
+          
+          
+          } // array name loop
+        } // if (data->GetBlockLevel(blockId) == level)
+      } // for (blockId = 0; blockId < numBlocks; ++blockId)
+      // Move to next level.
+      ++level;
+    } // while (blocksFinished < numBlocks)
+  blockList->Delete();
+}
+
+
+
+// I am converting to skip over ghost cells by:
+// Changing only increments.
+
 
 //------------------------------------------------------------------------------
 // Note, this only works with no ghost levels.
@@ -781,7 +788,7 @@ void vtkCTHAMRCellToPointData::FindBlockNeighbors(vtkCTHData* self, int blockId,
 
 
 //------------------------------------------------------------------------------
-// Sort of stupid, but dims is the point dimesnions of input.
+// Sort of stupid, but dims is the point dimensions of input.
 // This assumes that ghost levels exist.  No boundary condition checks.
 template <class T>
 void vtkCTHAMRCellDataToPointDataClipArrays(T* pIn, int *inDims, 

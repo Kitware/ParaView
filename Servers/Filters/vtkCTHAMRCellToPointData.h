@@ -64,12 +64,10 @@ protected:
 
   void ExecuteCellDataToPointData(
                          vtkCTHData* input, vtkDataArray *cellVolumeFraction, 
-                         vtkCTHData* output, vtkFloatArray *pointVolumeFraction);
+                         vtkCTHData* output, vtkDataArray *pointVolumeFraction);
 
   void ExecuteCellDataToPointData2(vtkCTHData* input, vtkCTHData* output);
   void FindBlockNeighbors(vtkCTHData* self, int blockId, vtkIdList* blockList);
-  float ComputeSharedPoint(int blockId, vtkIdList* blockList, int x, int y, int z, 
-                           double* pCell, float* pPoint, vtkCTHData* input, vtkCTHData* output);
   void CopyCellData(vtkCTHData* input, vtkCTHData* output);
                            
   vtkStringList *VolumeArrayNames;
