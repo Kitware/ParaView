@@ -35,7 +35,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCompositePartDisplay);
-vtkCxxRevisionMacro(vtkPVCompositePartDisplay, "1.24");
+vtkCxxRevisionMacro(vtkPVCompositePartDisplay, "1.25");
 
 
 //----------------------------------------------------------------------------
@@ -81,10 +81,19 @@ vtkPVCompositePartDisplay::~vtkPVCompositePartDisplay()
 vtkClientServerID vtkPVCompositePartDisplay::CreateCollectionFilter(vtkPVApplication* pvApp)
 { 
   vtkPVProcessModule* pm = pvApp->GetProcessModule();
-  vtkClientServerID id = pm->NewStreamObject("vtkM2NCollect");
+  vtkClientServerID id = pm->NewStreamObject("vtkMPIMoveData");
+  // Create a temporary input.
+  // This is needed to get the output of the vtkDataSetToDataSetFitler
+  vtkClientServerID id2;
+  id2 = pm->NewStreamObject("vtkPolyData");
+  pm->GetStream() << vtkClientServerStream::Invoke << id 
+                  << "SetInput" << id2 
+                  <<  vtkClientServerStream::End;
+  pm->DeleteStreamObject(id2);
+  // Default is pass through because it executes fastest.  
   pm->GetStream()
     << vtkClientServerStream::Invoke
-    << id << "SetPassThrough" << 1
+    << id << "SetMoveModeToPassThrough"
     << vtkClientServerStream::End;
   pm->SendStream(vtkProcessModule::CLIENT_AND_SERVERS);
   pm->GetStream()
@@ -98,7 +107,7 @@ vtkClientServerID vtkPVCompositePartDisplay::CreateCollectionFilter(vtkPVApplica
   // always set client mode
   pm->GetStream()
     << vtkClientServerStream::Invoke
-    << id << "SetClientMode" << 1
+    << id << "SetServerToClient"
     << vtkClientServerStream::End;
   pm->SendStream(vtkProcessModule::CLIENT);
   // if running in client mode
@@ -107,7 +116,7 @@ vtkClientServerID vtkPVCompositePartDisplay::CreateCollectionFilter(vtkPVApplica
     {
     pm->GetStream()
       << vtkClientServerStream::Invoke
-      << id << "SetServerMode" << 1
+      << id << "SetServerToDataServer"
       << vtkClientServerStream::End;
     pm->SendStream(vtkProcessModule::DATA_SERVER);
     }
@@ -116,7 +125,7 @@ vtkClientServerID vtkPVCompositePartDisplay::CreateCollectionFilter(vtkPVApplica
     {
     pm->GetStream()
       << vtkClientServerStream::Invoke
-      << id << "SetRenderServerMode" << 1
+      << id << "SetServerToRenderServer"
       << vtkClientServerStream::End;
     pm->SendStream(vtkProcessModule::RENDER_SERVER);
     }
@@ -148,10 +157,6 @@ void vtkPVCompositePartDisplay::CreateParallelTclObjects(vtkPVApplication *pvApp
   else if (pvApp->GetUseTiledDisplay() || pvApp->GetCaveConfigurationFileName())
     { 
     this->CollectID = pm->NewStreamObject("vtkMPIMoveData");
-    pm->GetStream()
-      << vtkClientServerStream::Invoke
-      << this->CollectID << "SetMoveModeToPassThrough"
-      << vtkClientServerStream::End;
     // Create a temporary input.
     // This is needed to get the output of the vtkDataSetToDataSetFitler
     vtkClientServerID id;
@@ -160,7 +165,11 @@ void vtkPVCompositePartDisplay::CreateParallelTclObjects(vtkPVApplication *pvApp
                     << "SetInput" << id 
                     <<  vtkClientServerStream::End;
     pm->DeleteStreamObject(id);
-    pm->SendStream(vtkProcessModule::CLIENT_AND_SERVERS);
+    // Default is pass through because it executes fastest.    
+    pm->GetStream()
+      << vtkClientServerStream::Invoke
+      << this->CollectID << "SetMoveModeToPassThrough"
+      << vtkClientServerStream::End;
 
     // For the render server feature.
     pm->GetStream()
@@ -208,18 +217,19 @@ void vtkPVCompositePartDisplay::CreateParallelTclObjects(vtkPVApplication *pvApp
   else if (pvApp->GetUseTiledDisplay() || pvApp->GetCaveConfigurationFileName())
     { // This should be in subclass.
     this->LODCollectID = pm->NewStreamObject("vtkMPIMoveData");
-    pm->GetStream()
-      << vtkClientServerStream::Invoke
-      << this->LODCollectID << "SetPassThrough" << 1
-      << vtkClientServerStream::End;
     // Create a temporary input.
     // This is needed to get the output of the vtkDataSetToDataSetFitler
     vtkClientServerID id;
     id = pm->NewStreamObject("vtkPolyData");
-    pm->GetStream() << vtkClientServerStream::Invoke << this->LODCollectID 
+    pm->GetStream() << vtkClientServerStream::Invoke << this->CollectID 
                     << "SetInput" << id 
                     <<  vtkClientServerStream::End;
     pm->DeleteStreamObject(id);
+    // Default is pass through because it executes fastest.
+    pm->GetStream()
+      << vtkClientServerStream::Invoke
+      << this->LODCollectID << "SetMoveModeToPassThrough"
+      << vtkClientServerStream::End;
     pm->SendStream(vtkProcessModule::CLIENT_AND_SERVERS);
 
     // For the render server feature.
@@ -364,7 +374,7 @@ vtkPVLODPartDisplayInformation* vtkPVCompositePartDisplay::GetInformation()
     this->LODCollectionDecision = 0;
     pm->GetStream()
       << vtkClientServerStream::Invoke
-      << this->CollectID << "SetPassThrough" << 1
+      << this->CollectID << "SetMoveModeToPassThrough"
       << vtkClientServerStream::End;
     pm->GetStream()
       << vtkClientServerStream::Invoke
@@ -372,7 +382,7 @@ vtkPVLODPartDisplayInformation* vtkPVCompositePartDisplay::GetInformation()
       << vtkClientServerStream::End;
     pm->GetStream()
       << vtkClientServerStream::Invoke
-      << this->LODCollectID << "SetPassThrough" << 1
+      << this->LODCollectID << "SetMoveModeToPassThrough"
       << vtkClientServerStream::End;
     pm->GetStream()
       << vtkClientServerStream::Invoke
@@ -410,11 +420,20 @@ void vtkPVCompositePartDisplay::SetCollectionDecision(int v)
 
   if (this->CollectID.ID)
     {
-    pm->GetStream()
-      << vtkClientServerStream::Invoke
-      << this->CollectID << "SetPassThrough"
-      << (this->CollectionDecision? 0:1)
-      << vtkClientServerStream::End;
+    if (this->CollectionDecision)
+      {
+      pm->GetStream()
+        << vtkClientServerStream::Invoke
+        << this->CollectID << "SetMoveModeToCollect"
+        << vtkClientServerStream::End;
+      }
+    else
+      {
+      pm->GetStream()
+        << vtkClientServerStream::Invoke
+        << this->CollectID << "SetMoveModeToPassThrough"
+        << vtkClientServerStream::End;
+      }
     pm->GetStream()
       << vtkClientServerStream::Invoke
       << this->UpdateSuppressorID << "RemoveAllCaches"

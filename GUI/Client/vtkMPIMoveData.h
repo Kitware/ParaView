@@ -44,12 +44,16 @@ public:
   // when we are running with a render server.  It has multiple
   // sockets which are used to send data from the data server to the 
   // render server.
+  // ClientDataServerController==0  => One MPI program.
+  // MPIMToNSocketConnection==0 => Client-DataServer.
+  // MPIMToNSocketConnection==1 => Client-DataServer-RenderServer.
   void SetController(vtkMultiProcessController* controller);
   void SetClientDataServerSocketController(vtkSocketController* sdc);
   void SetMPIMToNSocketConnection(vtkMPIMToNSocketConnection* sc);
   
   // Description:
   // Tell the object on which client/server it resides.
+  // Whether the sockets are set helps determine which servers are running.
   void SetServerToClient(){this->Server=vtkMPIMoveData::CLIENT;}
   void SetServerToDataServer(){this->Server=vtkMPIMoveData::DATA_SERVER;}
   void SetServerToRenderServer(){this->Server=vtkMPIMoveData::RENDER_SERVER;}

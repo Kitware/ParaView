@@ -7,6 +7,12 @@ SET(Filters_SRCS
   vtkPVXMLParser.cxx
   vtkCleanUnstructuredGrid.cxx
   vtkColorByPart.cxx
+  vtkCTHData.cxx
+  vtkCTHDataToPolyDataFilter.cxx
+  vtkCTHExtractAMRPart.cxx
+  vtkCTHFractal.cxx
+  vtkCTHOutlineFilter.cxx
+  vtkCTHSource.cxx
   vtkGroup.cxx
   vtkHDF5RawImageReader.cxx
   vtkMPIDuplicatePolyData.cxx

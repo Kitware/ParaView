@@ -35,7 +35,7 @@
 #include "vtkMPIMToNSocketConnection.h"
 #include "vtkSocketCommunicator.h"
 
-vtkCxxRevisionMacro(vtkMPIMoveData, "1.10");
+vtkCxxRevisionMacro(vtkMPIMoveData, "1.11");
 vtkStandardNewMacro(vtkMPIMoveData);
 
 vtkCxxSetObjectMacro(vtkMPIMoveData,Controller, vtkMultiProcessController);
@@ -140,25 +140,34 @@ void vtkMPIMoveData::Execute()
   vtkDataSet* input = this->GetInput();
   vtkDataSet* output = this->GetOutput();
 
-  // Duplicate with everything running on one MPIgroup (including single process).
-  // GatherAll.  Allthough we do not support tiled display without client server,
-  // this case is used for picking and plotting.
-  if (this->Server == -1 || 
-      (this->Server == 0 && this->ClientDataServerSocketController == 0))
+  // This case deals with everything running as one MPI group
+  // Client, Data and render server are all the same program.
+  // This covers single process mode too, although this filter 
+  // is unnecessary in that mode and really should not be put in.
+  if (this->MPIMToNSocketConnection == 0 &&
+      this->ClientDataServerSocketController == 0)
     {
-    this->DataServerGatherAll(input, output);
+    // Clone in this mode is used for plots and picking.
+    if (this->MoveMode == vtkMPIMoveData::CLONE)
+      {
+      this->DataServerGatherAll(input, output);
+      return;
+      }
+    // Collect mode for rendering on node 0.
+    if (this->MoveMode == vtkMPIMoveData::COLLECT)
+      {
+      this->DataServerGatherToZero(input, output);
+      return;
+      }
+    // PassThrough mode for compositing.
+    if (this->MoveMode == vtkMPIMoveData::PASS_THROUGH)
+      {
+      output->ShallowCopy(input);
+      return;
+      }
+    vtkErrorMacro("MoveMode not set.");
     return;
-    }
-
-  // PassThrough with everything running on one MPIgroup (including single process).
-  // This is used for composite rendering.
-  // Just copy.  
-  if (this->Server == -1 || 
-      (this->Server == 0 && this->ClientDataServerSocketController == 0))
-    {
-    output->ShallowCopy(input);
-    return;
-    }
+    }    
 
   // PassThrough with no RenderServer. (Distributed rendering on data server).
   // Data server copy input to output. 
@@ -533,10 +542,10 @@ void vtkMPIMoveData::DataServerZeroSendToRenderServerZero(vtkDataSet* data)
     // We might be able to eliminate this marshal.
     this->ClearBuffer();
     this->MarshalDataToBuffer(data);
-
     com->Send(&(this->NumberOfBuffers), 1, 1, 23480);
     com->Send(this->BufferLengths, this->NumberOfBuffers, 1, 23481);
     com->Send(this->Buffers, this->BufferTotalLength, 1, 23482);
+    this->ClearBuffer();
     }
 }
 

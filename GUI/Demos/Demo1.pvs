@@ -121,7 +121,7 @@ proc clip_run {} {
         return
     }
 
-    DemoAfter 1500
+    DemoAfter 500
 
     set clip(vtkTemp623) [$clip(vtkTemp572) GetPVWidget {InsideOut}]
     $clip(vtkTemp623) SetState 1
@@ -134,7 +134,7 @@ proc clip_run {} {
         return
     }
 
-    DemoAfter 1500
+    DemoAfter 500
 
     $clip(vtkTemp24) SetCameraState 0.000 0.000 3.469  0.000 0.000 0.000  0.000 1.000 0.000
     $clip(vtkTemp589) SetCenter -0.031120 -0.014700 0.015850
@@ -148,7 +148,7 @@ proc clip_run {} {
         return
     }
 
-    DemoAfter 1500
+    DemoAfter 500
 
     $clip(vtkTemp24) SetCameraState 0.000 0.000 3.469  0.000 0.000 0.000  0.000 1.000 0.000
     $clip(vtkTemp589) SetCenter 0.061670 0.029120 -0.031410
@@ -162,7 +162,7 @@ proc clip_run {} {
         return
     }
 
-    DemoAfter 1500
+    DemoAfter 500
 
     $clip(vtkTemp24) SetCameraState 0.000 0.000 3.469  0.000 0.000 0.000  0.000 1.000 0.000
     $clip(vtkTemp589) SetCenter 0.061670 0.029120 -0.031410
@@ -1551,76 +1551,76 @@ proc iso_run {} {
     }
     DemoAfter 1000
 
-    $iso(vtkTemp106) SetCurrentTime 0 1; DemoAfter 100
-    $iso(vtkTemp106) SetCurrentTime 1 1; DemoAfter 100
-    $iso(vtkTemp106) SetCurrentTime 2 1; DemoAfter 100
-    $iso(vtkTemp106) SetCurrentTime 3 1; DemoAfter 100
-    $iso(vtkTemp106) SetCurrentTime 4 1; DemoAfter 100
-    $iso(vtkTemp106) SetCurrentTime 5 1; DemoAfter 100
-    $iso(vtkTemp106) SetCurrentTime 6 1; DemoAfter 100
-    $iso(vtkTemp106) SetCurrentTime 7 1; DemoAfter 100
-    $iso(vtkTemp106) SetCurrentTime 8 1; DemoAfter 100
-    $iso(vtkTemp106) SetCurrentTime 9 1; DemoAfter 100
-    $iso(vtkTemp106) SetCurrentTime 10 1; DemoAfter 100
-    $iso(vtkTemp106) SetCurrentTime 11 1; DemoAfter 100
+    $iso(vtkTemp106) SetCurrentTime 0 1; DemoAfter 50
+    $iso(vtkTemp106) SetCurrentTime 1 1; DemoAfter 50
+    $iso(vtkTemp106) SetCurrentTime 2 1; DemoAfter 50
+    $iso(vtkTemp106) SetCurrentTime 3 1; DemoAfter 50
+    $iso(vtkTemp106) SetCurrentTime 4 1; DemoAfter 50
+    $iso(vtkTemp106) SetCurrentTime 5 1; DemoAfter 50
+    $iso(vtkTemp106) SetCurrentTime 6 1; DemoAfter 50
+    $iso(vtkTemp106) SetCurrentTime 7 1; DemoAfter 50
+    $iso(vtkTemp106) SetCurrentTime 8 1; DemoAfter 50
+    $iso(vtkTemp106) SetCurrentTime 9 1; DemoAfter 50
+    $iso(vtkTemp106) SetCurrentTime 10 1; DemoAfter 50
+    $iso(vtkTemp106) SetCurrentTime 11 1; DemoAfter 50
     if $pvDemoShouldStop {
         return
     }
-    $iso(vtkTemp106) SetCurrentTime 12 1; DemoAfter 100
-    $iso(vtkTemp106) SetCurrentTime 13 1; DemoAfter 100
-    $iso(vtkTemp106) SetCurrentTime 14 1; DemoAfter 100
-    $iso(vtkTemp106) SetCurrentTime 15 1; DemoAfter 100
-    $iso(vtkTemp106) SetCurrentTime 16 1; DemoAfter 100
-    $iso(vtkTemp106) SetCurrentTime 17 1; DemoAfter 100
-    $iso(vtkTemp106) SetCurrentTime 18 1; DemoAfter 100
-    $iso(vtkTemp106) SetCurrentTime 19 1; DemoAfter 100
-    $iso(vtkTemp106) SetCurrentTime 20 1; DemoAfter 100
-    $iso(vtkTemp106) SetCurrentTime 21 1; DemoAfter 100
-    $iso(vtkTemp106) SetCurrentTime 22 1; DemoAfter 100
-    $iso(vtkTemp106) SetCurrentTime 23 1; DemoAfter 100
-    $iso(vtkTemp106) SetCurrentTime 24 1; DemoAfter 100
-    $iso(vtkTemp106) SetCurrentTime 25 1; DemoAfter 100
-    $iso(vtkTemp106) SetCurrentTime 26 1; DemoAfter 100
+    $iso(vtkTemp106) SetCurrentTime 12 1; DemoAfter 50
+    $iso(vtkTemp106) SetCurrentTime 13 1; DemoAfter 50
+    $iso(vtkTemp106) SetCurrentTime 14 1; DemoAfter 50
+    $iso(vtkTemp106) SetCurrentTime 15 1; DemoAfter 50
+    $iso(vtkTemp106) SetCurrentTime 16 1; DemoAfter 50
+    $iso(vtkTemp106) SetCurrentTime 17 1; DemoAfter 50
+    $iso(vtkTemp106) SetCurrentTime 18 1; DemoAfter 50
+    $iso(vtkTemp106) SetCurrentTime 19 1; DemoAfter 50
+    $iso(vtkTemp106) SetCurrentTime 20 1; DemoAfter 50
+    $iso(vtkTemp106) SetCurrentTime 21 1; DemoAfter 50
+    $iso(vtkTemp106) SetCurrentTime 22 1; DemoAfter 50
+    $iso(vtkTemp106) SetCurrentTime 23 1; DemoAfter 50
+    $iso(vtkTemp106) SetCurrentTime 24 1; DemoAfter 50
+    $iso(vtkTemp106) SetCurrentTime 25 1; DemoAfter 50
+    $iso(vtkTemp106) SetCurrentTime 26 1; DemoAfter 50
     if $pvDemoShouldStop {
         return
     }
-    $iso(vtkTemp106) SetCurrentTime 27 1; DemoAfter 100
-    $iso(vtkTemp106) SetCurrentTime 28 1; DemoAfter 100
-    $iso(vtkTemp106) SetCurrentTime 29 1; DemoAfter 100
-    $iso(vtkTemp106) SetCurrentTime 30 1; DemoAfter 100
-    $iso(vtkTemp106) SetCurrentTime 31 1; DemoAfter 100
-    $iso(vtkTemp106) SetCurrentTime 32 1; DemoAfter 100
-    $iso(vtkTemp106) SetCurrentTime 33 1; DemoAfter 100
-    $iso(vtkTemp106) SetCurrentTime 34 1; DemoAfter 100
-    $iso(vtkTemp106) SetCurrentTime 35 1; DemoAfter 100
-    $iso(vtkTemp106) SetCurrentTime 36 1; DemoAfter 100
-    $iso(vtkTemp106) SetCurrentTime 37 1; DemoAfter 100
-    $iso(vtkTemp106) SetCurrentTime 38 1; DemoAfter 100
-    $iso(vtkTemp106) SetCurrentTime 39 1; DemoAfter 100
-    $iso(vtkTemp106) SetCurrentTime 40 1; DemoAfter 100
-    $iso(vtkTemp106) SetCurrentTime 41 1; DemoAfter 100
-    $iso(vtkTemp106) SetCurrentTime 42 1; DemoAfter 100
-    $iso(vtkTemp106) SetCurrentTime 43 1; DemoAfter 100
-    $iso(vtkTemp106) SetCurrentTime 44 1; DemoAfter 100
+    $iso(vtkTemp106) SetCurrentTime 27 1; DemoAfter 50
+    $iso(vtkTemp106) SetCurrentTime 28 1; DemoAfter 50
+    $iso(vtkTemp106) SetCurrentTime 29 1; DemoAfter 50
+    $iso(vtkTemp106) SetCurrentTime 30 1; DemoAfter 50
+    $iso(vtkTemp106) SetCurrentTime 31 1; DemoAfter 50
+    $iso(vtkTemp106) SetCurrentTime 32 1; DemoAfter 50
+    $iso(vtkTemp106) SetCurrentTime 33 1; DemoAfter 50
+    $iso(vtkTemp106) SetCurrentTime 34 1; DemoAfter 50
+    $iso(vtkTemp106) SetCurrentTime 35 1; DemoAfter 50
+    $iso(vtkTemp106) SetCurrentTime 36 1; DemoAfter 50
+    $iso(vtkTemp106) SetCurrentTime 37 1; DemoAfter 50
+    $iso(vtkTemp106) SetCurrentTime 38 1; DemoAfter 50
+    $iso(vtkTemp106) SetCurrentTime 39 1; DemoAfter 50
+    $iso(vtkTemp106) SetCurrentTime 40 1; DemoAfter 50
+    $iso(vtkTemp106) SetCurrentTime 41 1; DemoAfter 50
+    $iso(vtkTemp106) SetCurrentTime 42 1; DemoAfter 50
+    $iso(vtkTemp106) SetCurrentTime 43 1; DemoAfter 50
+    $iso(vtkTemp106) SetCurrentTime 44 1; DemoAfter 50
     if $pvDemoShouldStop {
         return
     }
-    $iso(vtkTemp106) SetCurrentTime 45 1; DemoAfter 100
-    $iso(vtkTemp106) SetCurrentTime 46 1; DemoAfter 100
-    $iso(vtkTemp106) SetCurrentTime 47 1; DemoAfter 100
-    $iso(vtkTemp106) SetCurrentTime 48 1; DemoAfter 100
-    $iso(vtkTemp106) SetCurrentTime 49 1; DemoAfter 100
-    $iso(vtkTemp106) SetCurrentTime 50 1; DemoAfter 100
-    $iso(vtkTemp106) SetCurrentTime 51 1; DemoAfter 100
-    $iso(vtkTemp106) SetCurrentTime 52 1; DemoAfter 100
-    $iso(vtkTemp106) SetCurrentTime 53 1; DemoAfter 100
-    $iso(vtkTemp106) SetCurrentTime 54 1; DemoAfter 100
-    $iso(vtkTemp106) SetCurrentTime 55 1; DemoAfter 100
-    $iso(vtkTemp106) SetCurrentTime 56 1; DemoAfter 100
-    $iso(vtkTemp106) SetCurrentTime 57 1; DemoAfter 100
-    $iso(vtkTemp106) SetCurrentTime 58 1; DemoAfter 100
-    $iso(vtkTemp106) SetCurrentTime 59 1; DemoAfter 100
-    $iso(vtkTemp106) SetCurrentTime 60 1; DemoAfter 100
+    $iso(vtkTemp106) SetCurrentTime 45 1; DemoAfter 50
+    $iso(vtkTemp106) SetCurrentTime 46 1; DemoAfter 50
+    $iso(vtkTemp106) SetCurrentTime 47 1; DemoAfter 50
+    $iso(vtkTemp106) SetCurrentTime 48 1; DemoAfter 50
+    $iso(vtkTemp106) SetCurrentTime 49 1; DemoAfter 50
+    $iso(vtkTemp106) SetCurrentTime 50 1; DemoAfter 50
+    $iso(vtkTemp106) SetCurrentTime 51 1; DemoAfter 50
+    $iso(vtkTemp106) SetCurrentTime 52 1; DemoAfter 50
+    $iso(vtkTemp106) SetCurrentTime 53 1; DemoAfter 50
+    $iso(vtkTemp106) SetCurrentTime 54 1; DemoAfter 50
+    $iso(vtkTemp106) SetCurrentTime 55 1; DemoAfter 50
+    $iso(vtkTemp106) SetCurrentTime 56 1; DemoAfter 50
+    $iso(vtkTemp106) SetCurrentTime 57 1; DemoAfter 50
+    $iso(vtkTemp106) SetCurrentTime 58 1; DemoAfter 50
+    $iso(vtkTemp106) SetCurrentTime 59 1; DemoAfter 50
+    $iso(vtkTemp106) SetCurrentTime 60 1; DemoAfter 50
     if $pvDemoShouldStop {
         return
     }
@@ -1632,7 +1632,7 @@ proc iso_run {} {
     if $pvDemoShouldStop {
         return
     }
-    DemoAfter 1000
+    DemoAfter 700
     $iso(vtkTemp457) RemoveAllValues
     $iso(vtkTemp457) AddValue 0.000000
     $iso(vtkTemp457) AddValue 0.200000
@@ -1641,7 +1641,7 @@ proc iso_run {} {
     if $pvDemoShouldStop {
         return
     }
-    DemoAfter 1000
+    DemoAfter 700
     $iso(vtkTemp457) RemoveAllValues
     $iso(vtkTemp457) AddValue 0.000000
     $iso(vtkTemp457) AddValue 0.200000
@@ -1651,7 +1651,7 @@ proc iso_run {} {
     if $pvDemoShouldStop {
         return
     }
-    DemoAfter 1000
+    DemoAfter 700
     $iso(vtkTemp457) RemoveAllValues
     $iso(vtkTemp457) AddValue 0.000000
     $iso(vtkTemp457) AddValue 0.200000
@@ -1662,7 +1662,7 @@ proc iso_run {} {
     if $pvDemoShouldStop {
         return
     }
-    DemoAfter 3000
+    DemoAfter 2000
 
     $iso(vtkTemp1) HideProperties
     $iso(vtkTemp24) SetCameraState 1.736 3.553 6.396  1.474 -0.089 0.457  -0.006 0.881 -0.472
@@ -1685,42 +1685,42 @@ proc iso_run {} {
     $iso(vtkTemp1032) SetTimeEnd 29.0
 
     $iso(vtkTemp106) SetCurrentTime 0 1
-    $iso(vtkTemp106) SetCurrentTime 1 1; DemoAfter 100
-    $iso(vtkTemp106) SetCurrentTime 2 1; DemoAfter 100
-    $iso(vtkTemp106) SetCurrentTime 3 1; DemoAfter 100
-    $iso(vtkTemp106) SetCurrentTime 4 1; DemoAfter 100
-    $iso(vtkTemp106) SetCurrentTime 5 1; DemoAfter 100
-    $iso(vtkTemp106) SetCurrentTime 6 1; DemoAfter 100
-    $iso(vtkTemp106) SetCurrentTime 7 1; DemoAfter 100
-    $iso(vtkTemp106) SetCurrentTime 8 1; DemoAfter 100
-    $iso(vtkTemp106) SetCurrentTime 9 1; DemoAfter 100
-    $iso(vtkTemp106) SetCurrentTime 10 1; DemoAfter 100
-    $iso(vtkTemp106) SetCurrentTime 11 1; DemoAfter 100
-    $iso(vtkTemp106) SetCurrentTime 12 1; DemoAfter 100
+    $iso(vtkTemp106) SetCurrentTime 1 1; DemoAfter 50
+    $iso(vtkTemp106) SetCurrentTime 2 1; DemoAfter 50
+    $iso(vtkTemp106) SetCurrentTime 3 1; DemoAfter 50
+    $iso(vtkTemp106) SetCurrentTime 4 1; DemoAfter 50
+    $iso(vtkTemp106) SetCurrentTime 5 1; DemoAfter 50
+    $iso(vtkTemp106) SetCurrentTime 6 1; DemoAfter 50
+    $iso(vtkTemp106) SetCurrentTime 7 1; DemoAfter 50
+    $iso(vtkTemp106) SetCurrentTime 8 1; DemoAfter 50
+    $iso(vtkTemp106) SetCurrentTime 9 1; DemoAfter 50
+    $iso(vtkTemp106) SetCurrentTime 10 1; DemoAfter 50
+    $iso(vtkTemp106) SetCurrentTime 11 1; DemoAfter 50
+    $iso(vtkTemp106) SetCurrentTime 12 1; DemoAfter 50
     if $pvDemoShouldStop {
         return
     }
-    $iso(vtkTemp106) SetCurrentTime 13 1; DemoAfter 100
-    $iso(vtkTemp106) SetCurrentTime 14 1; DemoAfter 100
-    $iso(vtkTemp106) SetCurrentTime 15 1; DemoAfter 100
-    $iso(vtkTemp106) SetCurrentTime 16 1; DemoAfter 100
-    $iso(vtkTemp106) SetCurrentTime 17 1; DemoAfter 100
-    $iso(vtkTemp106) SetCurrentTime 18 1; DemoAfter 100
-    $iso(vtkTemp106) SetCurrentTime 19 1; DemoAfter 100
-    $iso(vtkTemp106) SetCurrentTime 20 1; DemoAfter 100
-    $iso(vtkTemp106) SetCurrentTime 21 1; DemoAfter 100
-    $iso(vtkTemp106) SetCurrentTime 22 1; DemoAfter 100
-    $iso(vtkTemp106) SetCurrentTime 23 1; DemoAfter 100
-    $iso(vtkTemp106) SetCurrentTime 24 1; DemoAfter 100
-    $iso(vtkTemp106) SetCurrentTime 25 1; DemoAfter 100
-    $iso(vtkTemp106) SetCurrentTime 26 1; DemoAfter 100
-    $iso(vtkTemp106) SetCurrentTime 27 1; DemoAfter 100
-    $iso(vtkTemp106) SetCurrentTime 28 1; DemoAfter 100
+    $iso(vtkTemp106) SetCurrentTime 13 1; DemoAfter 50
+    $iso(vtkTemp106) SetCurrentTime 14 1; DemoAfter 50
+    $iso(vtkTemp106) SetCurrentTime 15 1; DemoAfter 50
+    $iso(vtkTemp106) SetCurrentTime 16 1; DemoAfter 50
+    $iso(vtkTemp106) SetCurrentTime 17 1; DemoAfter 50
+    $iso(vtkTemp106) SetCurrentTime 18 1; DemoAfter 50
+    $iso(vtkTemp106) SetCurrentTime 19 1; DemoAfter 50
+    $iso(vtkTemp106) SetCurrentTime 20 1; DemoAfter 50
+    $iso(vtkTemp106) SetCurrentTime 21 1; DemoAfter 50
+    $iso(vtkTemp106) SetCurrentTime 22 1; DemoAfter 50
+    $iso(vtkTemp106) SetCurrentTime 23 1; DemoAfter 50
+    $iso(vtkTemp106) SetCurrentTime 24 1; DemoAfter 50
+    $iso(vtkTemp106) SetCurrentTime 25 1; DemoAfter 50
+    $iso(vtkTemp106) SetCurrentTime 26 1; DemoAfter 50
+    $iso(vtkTemp106) SetCurrentTime 27 1; DemoAfter 50
+    $iso(vtkTemp106) SetCurrentTime 28 1; DemoAfter 50
     if $pvDemoShouldStop {
         return
     }
 
-    DemoAfter 2000
+    DemoAfter 1000
 
     $iso(vtkTemp1) ShowProperties
 
@@ -4550,7 +4550,7 @@ proc threshold_run {} {
         if $pvDemoShouldStop {
             return
         }
-        DemoAfter 500
+        DemoAfter 400
     }
 
     if $pvDemoShouldStop {
@@ -4619,9 +4619,10 @@ proc warp_run {} {
         if $pvDemoShouldStop {
             return
         }
-        DemoAfter 500
+        DemoAfter 200
     }
     [$warp(vtkTemp1) GetPVColorMap "thickness10" 1] SetScalarBarVisibility 0
+    DemoAfter 400
     $warp(vtkTemp469) DrawWireframe
     update
     [[$Application GetMainWindow] GetMainView] ForceRender
@@ -4639,11 +4640,11 @@ proc warp_run {} {
         if $pvDemoShouldStop {
             return
         }
-        DemoAfter 500
+        DemoAfter 200
     }
     [$warp(vtkTemp1) GetPVColorMap "thickness10" 1] SetScalarBarVisibility 0
 
-    DemoAfter 3000 
+    DemoAfter 2000 
 
     $warp(vtkTemp469) SetVisibility 0
 }

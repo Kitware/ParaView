@@ -29,8 +29,6 @@ SET( ParaViewServer_SRCS
   vtkPVServerProbe.cxx
   vtkPVServerSelectTimeSet.cxx
   vtkPVSummaryHelper.cxx
-  vtkM2NCollect.cxx
-  vtkM2NDuplicate.cxx
   vtkMPIMoveData.cxx
   vtkPVServerXDMFParameters.cxx
   )

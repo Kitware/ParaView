@@ -38,12 +38,12 @@
 #include "vtkPVDataInformation.h"
 #include "vtkPVDataSetAttributesInformation.h"
 #include "vtkPVArrayInformation.h"
-#include "vtkM2NDuplicate.h"
+#include "vtkMPIMoveData.h"
 
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPlotDisplay);
-vtkCxxRevisionMacro(vtkPVPlotDisplay, "1.8");
+vtkCxxRevisionMacro(vtkPVPlotDisplay, "1.9");
 
 
 //----------------------------------------------------------------------------
@@ -106,15 +106,15 @@ vtkPolyData* vtkPVPlotDisplay::GetCollectedData()
     {
     return NULL;
     }
-  vtkMPIDuplicatePolyData* dp;
-  dp = vtkM2NDuplicate::SafeDownCast(
+  vtkMPIMoveData* dp;
+  dp = vtkMPIMoveData::SafeDownCast(
       pm->GetObjectFromID(this->DuplicatePolyDataID));
   if (dp == NULL)
     {
     return NULL;
     }
 
-  return dp->GetOutput();
+  return vtkPolyData::SafeDownCast(dp->GetOutput());
 }
 
 
@@ -125,10 +125,19 @@ void vtkPVPlotDisplay::CreateParallelTclObjects(vtkPVApplication *pvApp)
   vtkClientServerStream& stream = pm->GetStream();
 
   // Create the fliter wich duplicates the data on all processes.
-  vtkClientServerID id = pm->NewStreamObject("vtkM2NDuplicate");
+  vtkClientServerID id = pm->NewStreamObject("vtkMPIMoveData");
+  // Create a temporary input.
+  // This is needed to get the output of the vtkDataSetToDataSetFitler
+  vtkClientServerID id2;
+  id2 = pm->NewStreamObject("vtkPolyData");
+  pm->GetStream() << vtkClientServerStream::Invoke << id 
+                  << "SetInput" << id2 
+                  <<  vtkClientServerStream::End;
+  pm->DeleteStreamObject(id2);
+  // We always duplicate because all processes render the plot.
   pm->GetStream()
     << vtkClientServerStream::Invoke
-    << id << "SetPassThrough" << 0
+    << id << "SetMoveModeToClone"
     << vtkClientServerStream::End;
   pm->SendStream(vtkProcessModule::CLIENT_AND_SERVERS);
   pm->GetStream()
@@ -142,7 +151,7 @@ void vtkPVPlotDisplay::CreateParallelTclObjects(vtkPVApplication *pvApp)
   // always set client mode
   pm->GetStream()
     << vtkClientServerStream::Invoke
-    << id << "SetClientMode" << 1
+    << id << "SetServerToClient"
     << vtkClientServerStream::End;
   pm->SendStream(vtkProcessModule::CLIENT);
   // if running in client mode
@@ -151,7 +160,7 @@ void vtkPVPlotDisplay::CreateParallelTclObjects(vtkPVApplication *pvApp)
     {
     pm->GetStream()
       << vtkClientServerStream::Invoke
-      << id << "SetServerMode" << 1
+      << id << "SetServerToDataServer"
       << vtkClientServerStream::End;
     pm->SendStream(vtkProcessModule::DATA_SERVER);
     }
@@ -160,7 +169,7 @@ void vtkPVPlotDisplay::CreateParallelTclObjects(vtkPVApplication *pvApp)
     {
     pm->GetStream()
       << vtkClientServerStream::Invoke
-      << id << "SetRenderServerMode" << 1
+      << id << "SetServerToRenderServer"
       << vtkClientServerStream::End;
     pm->SendStream(vtkProcessModule::RENDER_SERVER);
     }  
@@ -174,7 +183,7 @@ void vtkPVPlotDisplay::CreateParallelTclObjects(vtkPVApplication *pvApp)
 
     pm->GetStream()
       << vtkClientServerStream::Invoke
-      << this->DuplicatePolyDataID << "SetClientFlag" << 1
+      << this->DuplicatePolyDataID << "SetServerToClient"
       << vtkClientServerStream::End;
     pm->SendStream(vtkProcessModule::CLIENT);
     }

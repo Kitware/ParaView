@@ -392,7 +392,7 @@ The Elevation filter generates point scalar values for an input data set along a
 The line can be specified interactively using the 3D line widget. See section 7.4 for more information about this widget.
     </Documentation>
   </Module>
-#ifdef PARAVIEW_BUILD_DEVELOPMENT
+<!-- #ifdef PARAVIEW_BUILD_DEVELOPMENT-->
   <Module name="CTHPartAMR"
           menu_name="Extract CTH Parts"
           root_name="CTHPartAMR"
@@ -424,7 +424,7 @@ The line can be specified interactively using the 3D line widget. See section 7.
       </Item>
     </SelectWidget>
   </Module>
-#endif
+<!-- #endif -->
   <Module name="CTHPart"
           menu_name="Extract CTH Parts"
           root_name="CTHPart"
@@ -912,7 +912,7 @@ This filter computes the normals at the points in the data set. In the process o
 If this filter is run in parallel, the resulting data set will have seams along the processor boundaries unless the Piece invariant check box is marked.
     </Documentation>
   </Module>
-#ifdef PARAVIEW_BUILD_DEVELOPMENT
+<!-- #ifdef PARAVIEW_BUILD_DEVELOPMENT -->
   <Module name="CTHOutlineFilter"
           menu_name="Outline (CTH AMR)"
           root_name="CTHOutline"
@@ -937,7 +937,7 @@ If this filter is run in parallel, the resulting data set will have seams along 
                help="Set the input to this filter."
                input_name="Input"/>
   </Module>
-#endif
+<!-- #endif -->
   <Module name="OutlineFilter"
           menu_name="Outline"
           root_name="Outline"

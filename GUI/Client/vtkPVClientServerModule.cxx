@@ -145,7 +145,7 @@ void vtkPVSendStreamToClientServerNodeRMI(void *localArg, void *remoteArg,
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVClientServerModule);
-vtkCxxRevisionMacro(vtkPVClientServerModule, "1.85");
+vtkCxxRevisionMacro(vtkPVClientServerModule, "1.86");
 
 int vtkPVClientServerModuleCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -919,6 +919,11 @@ vtkPVClientServerModule::GatherInformationInternal(const char* infoClassName,
     // Client just receives information from the server.
     int length;
     controller->Receive(&length, 1, 1, 398798);
+    if (length < 0)
+      { // I got this condition when the server aborted.
+      vtkErrorMacro("Could not gather information.");
+      return;
+      }
     unsigned char* data = new unsigned char[length];
     controller->Receive(data, length, 1, 398799);
     css.SetData(data, length);
