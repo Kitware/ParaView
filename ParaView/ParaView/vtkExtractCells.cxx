@@ -22,7 +22,7 @@
 #include <algorithm>
 #include <set>
 
-vtkCxxRevisionMacro(vtkExtractCells, "1.1.2.1");
+vtkCxxRevisionMacro(vtkExtractCells, "1.1.2.2");
 vtkStandardNewMacro(vtkExtractCells);
 
 void vtkExtractCells::FreeCellList()
@@ -284,7 +284,7 @@ vtkIdList *vtkExtractCells::reMapPointIds(vtkDataSet *grid)
 
     int nIds = ptIds->GetNumberOfIds();
 
-    int *ptId = ptIds->GetPointer(0);
+    vtkIdType *ptId = ptIds->GetPointer(0);
 
     for (int j=0; j<nIds; j++){
       ptList.insert(*ptId++);

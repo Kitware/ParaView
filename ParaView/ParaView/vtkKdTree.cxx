@@ -11,17 +11,16 @@
 =========================================================================*/
 
 #include "vtkKdTree.h"
-#include "vtkObjectFactory.h"
-#include "vtkDataSet.h"
-#include "vtkCamera.h"
-#include "vtkPolyData.h"
-#include "vtkRenderWindow.h"
-#include "vtkFloatArray.h"
-#include "vtkMath.h"
-
 #include <algorithm>
+#include <vtkObjectFactory.h>
+#include <vtkDataSet.h>
+#include <vtkCamera.h>
+#include <vtkPolyData.h>
+#include <vtkRenderWindow.h>
+#include <vtkFloatArray.h>
+#include <vtkMath.h>
 
-vtkCxxRevisionMacro(vtkKdTree, "1.1.2.3");
+vtkCxxRevisionMacro(vtkKdTree, "1.1.2.4");
 
 // methods for vtkKdNode -------------------------------------------
 
@@ -48,15 +47,11 @@ const char *vtkKdNode::LevelMarker[20]={
 "                   "
 };
 
-#define makeCompareFunc(name, loc) \
-   static int compareFunc##name(const void *a, const void *b){ \
-      const float *apt = static_cast<const float *>(a); \
-      const float *bpt = static_cast<const float *>(b); \
-      if (apt[loc] < bpt[loc]) return -1;  \
-      else if (apt[loc] > bpt[loc]) return 1; \
-      else return 0;                        \
-   }
 
+static void* vtkIdMemCpy(vtkIdType* dest, vtkIdType* src, size_t n)
+{
+  return memcpy(dest, src, n);
+}
 
 vtkKdNode::vtkKdNode()
 {  
@@ -91,7 +86,7 @@ void vtkKdNode::SetDataBounds(float *v)
   int x;
   double newbounds[6];
 
-  int numCells = this->GetNumberOfCells();
+  vtkIdType numCells = this->GetNumberOfCells();
 
   int i;
 
@@ -316,7 +311,7 @@ void vtkKdTree::DeleteAllCellLists(vtkKdTree::_cellList *list)
   }
   return;
 }
-int vtkKdTree::OnList(int *list, int size, int n)
+int vtkKdTree::OnList(vtkIdType *list, int size, vtkIdType n)
 {
   int i;
   for (i=0; i<size; i++){
@@ -325,7 +320,7 @@ int vtkKdTree::OnList(int *list, int size, int n)
   return 0;
 }
 void vtkKdTree::DeleteSomeCellLists(vtkKdTree::_cellList *list, 
-               int ndelete, int *rlist, int listsize)
+               int ndelete, vtkIdType *rlist, int listsize)
 {
   int i, j;
 
@@ -333,7 +328,7 @@ void vtkKdTree::DeleteSomeCellLists(vtkKdTree::_cellList *list,
 
   if (nkeep >= list->nRegions) return;
 
-  int *regionList = (int *)malloc(sizeof(int) * nkeep);
+  vtkIdType *regionList = (vtkIdType *)malloc(sizeof(vtkIdType) * nkeep);
 
   if (!regionList){
     vtkErrorMacro(<<"vtkKdTree::DeleteSomeCellLists memory allocation");
@@ -1493,15 +1488,15 @@ int vtkKdTree::findRegion(vtkKdNode *node, float x, float y, float z)
 }
 void vtkKdTree::CreateCellList()
 {
-  this->CreateCellList(this->DataSets[0], (int *)NULL, 0);
+  this->CreateCellList(this->DataSets[0], (vtkIdType *)NULL, 0);
   return;
 }
-void vtkKdTree::CreateCellList(int *regionList, int listSize)
+void vtkKdTree::CreateCellList(vtkIdType *regionList, int listSize)
 {
   this->CreateCellList(this->DataSets[0], regionList, listSize);
   return;
 }
-void vtkKdTree::CreateCellList(int dataSet, int *regionList, int listSize)
+void vtkKdTree::CreateCellList(int dataSet, vtkIdType *regionList, int listSize)
 {
   if ((dataSet < 0) || (dataSet >= NumDataSets)){
     vtkErrorMacro(<<"vtkKdTree::CreateCellList invalid data set");
@@ -1511,7 +1506,7 @@ void vtkKdTree::CreateCellList(int dataSet, int *regionList, int listSize)
   this->CreateCellList(this->DataSets[dataSet], regionList, listSize);
   return;
 }
-void vtkKdTree::CreateCellList(vtkDataSet *set, int *regionList, int listSize)
+void vtkKdTree::CreateCellList(vtkDataSet *set, vtkIdType *regionList, int listSize)
 {
   int i, AllRegions, regionId;
   struct _cellList *list;
@@ -1592,7 +1587,7 @@ void vtkKdTree::CreateCellList(vtkDataSet *set, int *regionList, int listSize)
   int nHave = list->nRegions;
   int nWant = (AllRegions) ? this->NumRegions : listSize;
   int nNeed = 0;
-  int *wantList = (int *)malloc(sizeof(int) * nWant);
+  vtkIdType *wantList = (vtkIdType *)malloc(sizeof(vtkIdType) * nWant);
 
   if (!wantList){
     vtkErrorMacro(<<"vtkKdTree::CreateCellList memory allocation");
@@ -1603,13 +1598,13 @@ void vtkKdTree::CreateCellList(vtkDataSet *set, int *regionList, int listSize)
     for (i=0; i<this->NumRegions; i++) wantList[i] = i;
   }
   else{
-    memcpy(wantList, regionList, sizeof(int) * nWant);
+    vtkIdMemCpy(wantList, regionList, sizeof(vtkIdType) * nWant);
   }
 
   if (nHave > 0){  // remove regions already computed from list
 
-    int *haveList = new int [nHave];
-    memcpy(haveList, list->regionIds, sizeof(int) * nHave);
+    vtkIdType *haveList = new vtkIdType [nHave];
+    vtkIdMemCpy(haveList, list->regionIds, sizeof(vtkIdType) * nHave);
 
     SORTLIST(haveList, nHave);
     if (!AllRegions){
@@ -1644,14 +1639,14 @@ void vtkKdTree::CreateCellList(vtkDataSet *set, int *regionList, int listSize)
   }
 
   if (nHave > 0){
-    list->regionIds = (int *)realloc(list->regionIds, 
-                                 (nHave+nNeed) * sizeof(int));
+    list->regionIds = (vtkIdType *)realloc(list->regionIds, 
+                                 (nHave+nNeed) * sizeof(vtkIdType));
 
     if (!list->regionIds){
       vtkErrorMacro(<<"vtkKdTree::CreateCellList memory allocation");
       return;
     }
-    memcpy(list->regionIds + nHave, wantList, sizeof(int) * nNeed);
+    vtkIdMemCpy(list->regionIds + nHave, wantList, sizeof(vtkIdType) * nNeed);
 
     list->cells = (vtkIdList **)realloc(list->cells, 
                                  (nHave+nNeed) * sizeof(vtkIdList *));
@@ -1711,13 +1706,13 @@ void vtkKdTree::CreateCellList(vtkDataSet *set, int *regionList, int listSize)
 }
 void vtkKdTree::DeleteCellList()
 {
-  this->DeleteCellList(this->DataSets[0], (int *)NULL, 0);
+  this->DeleteCellList(this->DataSets[0], (vtkIdType *)NULL, 0);
 }
-void vtkKdTree::DeleteCellList(int *regionList, int listSize)
+void vtkKdTree::DeleteCellList(vtkIdType *regionList, int listSize)
 {
   this->DeleteCellList(this->DataSets[0], regionList, listSize);
 }
-void vtkKdTree::DeleteCellList(int dataSet, int *regionList, int listSize)
+void vtkKdTree::DeleteCellList(int dataSet, vtkIdType *regionList, int listSize)
 {
   if ( (dataSet < 0) || (dataSet >= this->NumDataSets)){
     vtkErrorMacro(<< "vtkKdTree::DeleteCellList invalid data set");
@@ -1726,10 +1721,10 @@ void vtkKdTree::DeleteCellList(int dataSet, int *regionList, int listSize)
 
   this->DeleteCellList(this->DataSets[dataSet], regionList, listSize);
 }
-void vtkKdTree::DeleteCellList(vtkDataSet *set, int *regionList, int listSize)
+void vtkKdTree::DeleteCellList(vtkDataSet *set, vtkIdType *regionList, int listSize)
 {
   struct _cellList *list;
-  int *rlist=NULL;
+  vtkIdType *rlist=NULL;
   int setNum;
   int ndelete;
   int i;
@@ -1755,8 +1750,8 @@ void vtkKdTree::DeleteCellList(vtkDataSet *set, int *regionList, int listSize)
   else{
     ndelete = 0;
 
-    rlist = new int [listSize];
-    memcpy(rlist, regionList, sizeof(int) * listSize);
+    rlist = new vtkIdType [listSize];
+    vtkIdMemCpy(rlist, regionList, sizeof(vtkIdType) * listSize);
 
     SORTLIST(rlist, listSize);
     REMOVEDUPLICATES(rlist, listSize, listSize);
@@ -2483,14 +2478,9 @@ vtkPlanesIntersection *vtkKdTree::ConvertFrustumToWorld(vtkRenderer *ren,
 
 //---------------------------------------------------------------------------
 
-void vtkKdTree::PrintTiming(ostream& os, vtkIndent indent)
+void vtkKdTree::PrintTiming(ostream& os, vtkIndent)
 {
   vtkTimerLog::DumpLogWithIndents(&os, (float)0.0);
-}
-
-void vtkKdTree::PrintRegion(int id)
-{ 
-  this->RegionList[id]->PrintNode(0);
 }
 
 void vtkKdTree::PrintSelf(ostream& os, vtkIndent indent)
