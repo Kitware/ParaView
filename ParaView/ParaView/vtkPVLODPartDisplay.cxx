@@ -64,7 +64,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLODPartDisplay);
-vtkCxxRevisionMacro(vtkPVLODPartDisplay, "1.6.2.4");
+vtkCxxRevisionMacro(vtkPVLODPartDisplay, "1.6.2.5");
 
 
 //----------------------------------------------------------------------------
@@ -184,10 +184,11 @@ void vtkPVLODPartDisplay::CreateParallelTclObjects(vtkPVApplication *pvApp)
   //pvApp->BroadcastScript("%s UseFeatureEdgesOn", this->LODDeciTclName);
   //pvApp->BroadcastScript("%s UseFeaturePointsOn", this->LODDeciTclName);
   // This should be changed to origin and spacing determined globally.
+  int res[3] = {this->LODResolution,this->LODResolution,this->LODResolution};
   pm->GetStream()
     << vtkClientServerStream::Invoke
     << this->LODDeciID << "SetNumberOfDivisions"
-    << this->LODResolution << this->LODResolution << this->LODResolution
+    << vtkClientServerStream::InsertArray(res, 3)
     << vtkClientServerStream::End;
   pm->SendStreamToClientAndServer();
 
