@@ -1,3 +1,5 @@
+Application ExitOnReturnOn
+
 if {[info exists argc]} { 
     set argcm1 [expr $argc - 1]
     for {set i 0} {$i < $argcm1} {incr i} {
@@ -50,8 +52,8 @@ $pv(vtkTemp294) AcceptCallback
 
 set pv(vtkTemp327) [$pv(vtkTemp1) CreatePVSource DataSetSurfaceFilter]
 $pv(vtkTemp327) AcceptCallback
-$pv(vtkTemp1) SetCurrentPVSource $pv(vtkTemp207)
-$pv(vtkTemp1) ShowCurrentSourceProperties
+$pv(vtkTemp1) SetCurrentPVSourceCallback $pv(vtkTemp207)
+$pv(vtkTemp1) ShowCurrentSourcePropertiesCallback
 
 
 set pv(vtkTemp366) [$pv(vtkTemp1) CreatePVSource Clip]
@@ -65,8 +67,8 @@ $pv(vtkTemp366) AcceptCallback
 
 set pv(vtkTemp395) [$pv(vtkTemp1) CreatePVSource DataSetSurfaceFilter]
 $pv(vtkTemp395) AcceptCallback
-$pv(vtkTemp1) SetCurrentPVSource $pv(vtkTemp164)
-$pv(vtkTemp1) ShowCurrentSourceProperties
+$pv(vtkTemp1) SetCurrentPVSourceCallback $pv(vtkTemp164)
+$pv(vtkTemp1) ShowCurrentSourcePropertiesCallback
 
 
 set pv(vtkTemp416) [$pv(vtkTemp1) CreatePVSource Cut]
@@ -75,8 +77,8 @@ set pv(vtkTemp417) [$pv(vtkTemp418) GetPVWidget {Plane}]
 $pv(vtkTemp417) SetCenter 0.150 -0.650 0.500
 $pv(vtkTemp417) SetNormal 0 0 -1
 $pv(vtkTemp416) AcceptCallback
-$pv(vtkTemp1) SetCurrentPVSource $pv(vtkTemp98)
-$pv(vtkTemp1) ShowCurrentSourceProperties
+$pv(vtkTemp1) SetCurrentPVSourceCallback $pv(vtkTemp98)
+$pv(vtkTemp1) ShowCurrentSourcePropertiesCallback
 
 
 set pv(vtkTemp446) [$pv(vtkTemp1) CreatePVSource Cut]
@@ -88,6 +90,17 @@ set pv(vtkTemp463) [$pv(vtkTemp446) GetPVWidget {Cut Values}]
 $pv(vtkTemp463) RemoveAllValues
 $pv(vtkTemp463) AddValue 0.1
 $pv(vtkTemp446) AcceptCallback
+
+# Retrace
+update
+Application StopRecordingScript
+[ Application GetMainWindow ] DeleteAllSources
+# Source the trace to regenerate the sources.
+if {[catch {set channel [open test.tmp w]}] == 0 } {
+   close $channel
+   file delete -force test.tmp
+   source "ParaViewTrace.pvs"
+}
 
 # Fix the size of the image.
 RenWin1 SetSize 300 300
