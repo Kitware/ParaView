@@ -124,7 +124,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.530");
+vtkCxxRevisionMacro(vtkPVWindow, "1.531");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -3576,7 +3576,7 @@ int vtkPVWindow::SaveTrace(const char* filename)
     return 0;
     }
 
-  if (trace && *trace && trace->is_open())
+  if (trace && *trace)
     {
     trace->close();
     }
