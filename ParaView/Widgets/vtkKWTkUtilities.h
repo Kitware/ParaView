@@ -130,6 +130,14 @@ public:
                                int *height);
 
   // Description:
+  // Get the horizontal position of a slave of a pack (in case 'winfo x' does
+  // not work because the widget has not been mapped).
+  static int GetPackSlaveHorizontalPosition(Tcl_Interp *interp,
+                                            const char *widget,
+                                            const char *slave,
+                                            int *x);
+
+  // Description:
   // Get the padding info of a slave (packed).
   static int GetPackSlavePadding(Tcl_Interp *interp,
                                  const char *widget,

@@ -58,7 +58,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWTkUtilities);
-vtkCxxRevisionMacro(vtkKWTkUtilities, "1.17");
+vtkCxxRevisionMacro(vtkKWTkUtilities, "1.18");
 
 //----------------------------------------------------------------------------
 void vtkKWTkUtilities::GetRGBColor(Tcl_Interp *interp,
@@ -524,27 +524,43 @@ int vtkKWTkUtilities::GetPackSlavePadding(Tcl_Interp *interp,
   
   // Parse (ex: -ipadx 0 -ipady 0 -padx 0 -pady 0)
 
-  char *ptr = strstr(interp->result, "-ipadx ");
-  if (ptr)
+  char *ptr;
+  if (ipadx)
     {
-    sscanf(ptr + 7, "%d", ipadx);
+    ptr = strstr(interp->result, "-ipadx ");
+    if (ptr)
+      {
+      sscanf(ptr + 7, "%d", ipadx);
+      }
     }
-  ptr = strstr(interp->result, "-ipady ");
-  if (ptr)
+
+  if (ipady)
     {
-    sscanf(ptr + 7, "%d", ipady);
+    ptr = strstr(interp->result, "-ipady ");
+    if (ptr)
+      {
+      sscanf(ptr + 7, "%d", ipady);
+      }
     }
-  ptr = strstr(interp->result, "-padx ");
-  if (ptr)
+
+  if (padx)
     {
-    sscanf(ptr + 6, "%d", padx);
+    ptr = strstr(interp->result, "-padx ");
+    if (ptr)
+      {
+      sscanf(ptr + 6, "%d", padx);
+      }
     }
-  ptr = strstr(interp->result, "-pady ");
-  if (ptr)
+
+  if (pady)
     {
-    sscanf(ptr + 6, "%d", pady);
+    ptr = strstr(interp->result, "-pady ");
+    if (ptr)
+      {
+      sscanf(ptr + 6, "%d", pady);
+      }
     }
-  
+
   return 1;
 }
 
@@ -576,6 +592,7 @@ int vtkKWTkUtilities::GetPackSlavesBbox(Tcl_Interp *interp,
   int buffer_length = strlen(interp->result);
   char *buffer = new char [buffer_length + 1];
   strcpy(buffer, interp->result);
+
   char *buffer_end = buffer + buffer_length;
   char *ptr = buffer, *word_end;
 
@@ -634,6 +651,100 @@ int vtkKWTkUtilities::GetPackSlavesBbox(Tcl_Interp *interp,
         {
         *height = h;
         }
+      }
+    
+    ptr = word_end + 1;
+    }
+
+  delete [] buffer;
+
+  return 1;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWTkUtilities::GetPackSlaveHorizontalPosition(Tcl_Interp *interp,
+                                                     const char *widget,
+                                                     const char *slave,
+                                                     int *x)
+{
+  ostrstream slaves;
+  slaves << "pack slaves " << widget << ends;
+  int res = Tcl_GlobalEval(interp, slaves.str());
+  slaves.rdbuf()->freeze(0);
+  if (res != TCL_OK)
+    {
+    vtkGenericWarningMacro(<< "Unable to get pack slaves!");
+    return 0;
+    }
+  
+  // No slaves
+  
+  if (!interp->result || !interp->result[0])
+    {
+    return 1;
+    }
+  
+  // Browse each slave until the right one if found
+
+  int buffer_length = strlen(interp->result);
+  char *buffer = new char [buffer_length + 1];
+  strcpy(buffer, interp->result);
+
+  char *buffer_end = buffer + buffer_length;
+  char *ptr = buffer, *word_end;
+
+  while (ptr < buffer_end)
+    {
+    // Get the slave name
+
+    word_end = strchr(ptr + 1, ' ');
+    if (word_end == NULL)
+      {
+      word_end = buffer_end;
+      }
+    else
+      {
+      *word_end = 0;
+      }
+
+    // If slave found, add one padx and leave
+    
+    if (!strcmp(ptr, slave))
+      {
+      int padx = 0;
+      vtkKWTkUtilities::GetPackSlavePadding(interp, ptr, 0, 0, &padx, 0);
+      *x += padx;
+      break;
+      }
+
+    // Get width
+
+    ostrstream geometry;
+    geometry << "winfo reqwidth " << ptr << ends;
+    res = Tcl_GlobalEval(interp, geometry.str());
+    geometry.rdbuf()->freeze(0);
+    if (res != TCL_OK)
+      {
+      vtkGenericWarningMacro(<< "Unable to query slave geometry!");
+      }
+    else
+      {
+      int w = atoi(interp->result);
+      
+      // If w == 1 then again it might not have been packed, so get bbox
+
+      if (w == 1)
+        {
+        int h;
+        vtkKWTkUtilities::GetPackSlavesBbox(interp, ptr, &w, &h);
+        }
+
+      // Don't forget the padding
+
+      int ipadx = 0, padx = 0;
+      vtkKWTkUtilities::GetPackSlavePadding(interp, ptr, &ipadx, 0, &padx, 0);
+      
+      *x += w + 2 * (padx + ipadx);
       }
     
     ptr = word_end + 1;
