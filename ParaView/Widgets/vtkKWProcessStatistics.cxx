@@ -17,7 +17,7 @@
 =========================================================================*/
 #include "vtkKWProcessStatistics.h"
 
-vtkCxxRevisionMacro(vtkKWProcessStatistics, "1.1");
+vtkCxxRevisionMacro(vtkKWProcessStatistics, "1.2");
 
 #ifndef _WIN32
 #include <sys/procfs.h>
@@ -71,7 +71,7 @@ vtkStandardNewMacro(vtkKWProcessStatistics);
 # endif /* no _SC_PAGESIZE */
 
 #endif /* no HAVE_GETPAGESIZE */
-#endif _WIN32
+#endif // _WIN32
 
 // Construct the ProcessStatistics with eight points.
 vtkKWProcessStatistics::vtkKWProcessStatistics()
@@ -82,7 +82,7 @@ vtkKWProcessStatistics::vtkKWProcessStatistics()
 int vtkKWProcessStatistics::GetProcessSizeInBytes()
 {
 
-#ifndef _WIN32
+#ifdef _solaris
   prpsinfo  psinfo;
   int       fd;
   char      pname[1024];
@@ -114,9 +114,7 @@ int vtkKWProcessStatistics::GetProcessSizeInBytes()
   // The size in bytes is the page size of the process times
   // the size of a page in bytes
   return psinfo.pr_size * pagesize;
-#endif
-
-#ifdef _WIN32
+#else
   return 0;
 #endif
 
@@ -125,7 +123,7 @@ int vtkKWProcessStatistics::GetProcessSizeInBytes()
 float vtkKWProcessStatistics::GetProcessCPUTimeInMilliseconds()
 {
 
-#ifndef _WIN32
+#ifdef _solaris
   prpsinfo  psinfo;
   int       fd;
   char      pname[1024];
@@ -144,9 +142,7 @@ float vtkKWProcessStatistics::GetProcessCPUTimeInMilliseconds()
   return 
     (float) psinfo.pr_time.tv_sec * 1000.0 + 
     (float) psinfo.pr_time.tv_nsec / 1000000.0;
-#endif
-
-#ifdef _WIN32
+#else
   return 0.0;
 #endif
 
@@ -170,20 +166,22 @@ int vtkKWProcessStatistics::QueryMemory()
   return 1;
 #elif __linux
   FILE *fd;
-  fd = fopen("/proc/meminfo", O_RDONLY );
+  fd = fopen("/proc/meminfo", "r" );
   if ( !fd ) 
-    {    
+    {
+    cout << "Problem opening /proc/meminfo" << endl;
     return 0;
     }
   long temp;
   char buffer[1024];
   fgets(buffer, sizeof(buffer), fd);
-  fscanf(fd, "Mem: %ld %ld %ld %ld %ld %ld %ld\n",
+  fscanf(fd, "Mem: %ld %ld %ld %ld %ld %ld\n",
 	 &this->TotalPhysicalMemory, &temp, &this->AvailablePhysicalMemory,
 	 &temp, &temp, &temp);
   fscanf(fd, "Swap: %ld %ld %ld\n",
 	 &this->TotalVirtualMemory, &temp, &this->AvailableVirtualMemory);  
   fclose( fd );
+  return 1;
 #elif __hpux
   struct pst_static pst;
   struct pst_dynamic pdy;
