@@ -79,7 +79,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.290");
+vtkCxxRevisionMacro(vtkPVSource, "1.291");
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -1909,6 +1909,7 @@ void vtkPVSource::SetInputsInBatchScript(ofstream *file)
   int numSources, numOutputs;
   int sourceCount, outputCount;
   vtkPVSource *pvs;
+  vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
 
   if (this->GetNumberOfPVInputs() == 0)
     {
@@ -1939,7 +1940,9 @@ void vtkPVSource::SetInputsInBatchScript(ofstream *file)
       for (sourceCount = 0; sourceCount < numSources; ++sourceCount)
         {
         // Loop through all of the outputs of this vtk source (multiple outputs).
-        numOutputs = pvs->GetVTKSource(sourceCount)->GetNumberOfOutputs();
+        pm->RootScript("%s GetNumberOfOutputs",
+                       pvs->GetVTKSourceTclName(sourceCount));
+        numOutputs = atoi(pm->GetRootResult());
         for (outputCount = 0; outputCount < numOutputs; ++outputCount)
           {
           *file << "\t";
@@ -1978,7 +1981,9 @@ void vtkPVSource::SetInputsInBatchScript(ofstream *file)
         return;
         }
       outputCount = 0;
-      numOutputs = pvs->GetVTKSource(sourceCount)->GetNumberOfOutputs();
+      pm->RootScript("%s GetNumberOfOutputs",
+                     pvs->GetVTKSourceTclName(sourceCount));
+      numOutputs = atoi(pm->GetRootResult());
       }
 
     vtkPVInputProperty* ip = this->GetInputProperty(idx);
@@ -2320,7 +2325,6 @@ int vtkPVSource::InitializeData()
   vtkPVApplication* pvApp = this->GetPVApplication();
   vtkPVProcessModule* pm = pvApp->GetProcessModule();
   int numSources, sourceIdx;
-  vtkSource* source;
   const char* sourceTclName;
   int numOutputs, idx;
   char dataName[1024];
@@ -2336,9 +2340,9 @@ int vtkPVSource::InitializeData()
   numSources = this->GetNumberOfVTKSources();
   for (sourceIdx = 0; sourceIdx < numSources; ++sourceIdx)
     {
-    source = this->GetVTKSource(sourceIdx);
     sourceTclName = this->GetVTKSourceTclName(sourceIdx);
-    numOutputs = source->GetNumberOfOutputs();
+    pm->RootScript("%s GetNumberOfOutputs", sourceTclName);
+    numOutputs = atoi(pm->GetRootResult());
 
     // When ever the source executes, data information needs to be recomputed.
     this->Script("%s AddObserver EndEvent {%s InvalidateDataInformation}", 
@@ -2608,7 +2612,7 @@ void vtkPVSource::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVSource ";
-  this->ExtractRevision(os,"$Revision: 1.290 $");
+  this->ExtractRevision(os,"$Revision: 1.291 $");
 }
 
 //----------------------------------------------------------------------------

@@ -95,7 +95,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.199");
+vtkCxxRevisionMacro(vtkPVData, "1.200");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -2096,6 +2096,7 @@ void vtkPVData::SaveInBatchScript(ofstream *file)
   int numSources;
   int outputCount;
   int numOutputs;
+  vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
 
   renTclName = this->GetPVRenderView()->GetRendererTclName();
   if (this->GetVisibility())
@@ -2123,7 +2124,9 @@ void vtkPVData::SaveInBatchScript(ofstream *file)
           vtkErrorMacro("We ran out of sources.");
           return;
           }
-        numOutputs = this->GetPVSource()->GetVTKSource(sourceCount)->GetNumberOfOutputs();
+        pm->RootScript("%s GetNumberOfOutputs",
+                       this->GetPVSource()->GetVTKSourceTclName(sourceCount));
+        numOutputs = atoi(pm->GetRootResult());
         outputCount = 0;
         }
 
@@ -2780,7 +2783,7 @@ void vtkPVData::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVData ";
-  this->ExtractRevision(os,"$Revision: 1.199 $");
+  this->ExtractRevision(os,"$Revision: 1.200 $");
 }
 
 //----------------------------------------------------------------------------
