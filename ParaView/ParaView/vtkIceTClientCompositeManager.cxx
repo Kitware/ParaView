@@ -51,7 +51,7 @@
 #endif
 
 
-vtkCxxRevisionMacro(vtkIceTClientCompositeManager, "1.2.2.3");
+vtkCxxRevisionMacro(vtkIceTClientCompositeManager, "1.2.2.4");
 vtkStandardNewMacro(vtkIceTClientCompositeManager);
 
 vtkCxxSetObjectMacro(vtkIceTClientCompositeManager,IceTManager,vtkIceTRenderManager);
@@ -600,6 +600,7 @@ void vtkIceTClientCompositeManager::PrintSelf(ostream& os, vtkIndent indent)
   
   os << indent << "UseCompositing: " << this->UseCompositing << endl;
   os << indent << "ClientFlag: " << this->ClientFlag << endl;
+  os << indent << "UseCompositeCompression: " << this->UseCompositeCompression << endl;
 
   if (this->IceTManager)
     {
