@@ -11,6 +11,10 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
+
+// need all of windows
+#define VTK_WINDOWS_FULL
+
 #include "vtkKWView.h"
 
 #include "vtkBMPWriter.h"
@@ -86,7 +90,7 @@ Bool vtkKWRenderViewPredProc(Display *vtkNotUsed(disp), XEvent *event,
 }
 #endif
 
-vtkCxxRevisionMacro(vtkKWView, "1.135");
+vtkCxxRevisionMacro(vtkKWView, "1.136");
 
 //----------------------------------------------------------------------------
 int vtkKWViewCommand(ClientData cd, Tcl_Interp *interp,
@@ -1565,7 +1569,7 @@ void vtkKWView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWView ";
-  this->ExtractRevision(os,"$Revision: 1.135 $");
+  this->ExtractRevision(os,"$Revision: 1.136 $");
 }
 
 //----------------------------------------------------------------------------

@@ -20,6 +20,9 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 =========================================================================*/
 
+// we need all of windows.h
+#define VTK_WINDOWS_FULL
+
 #include "vtkKWSelectionFrameLayoutManager.h"
 
 #include "vtkImageData.h"
@@ -69,7 +72,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWSelectionFrameLayoutManager);
-vtkCxxRevisionMacro(vtkKWSelectionFrameLayoutManager, "1.6");
+vtkCxxRevisionMacro(vtkKWSelectionFrameLayoutManager, "1.7");
 
 //----------------------------------------------------------------------------
 class vtkKWSelectionFrameLayoutManagerInternals
