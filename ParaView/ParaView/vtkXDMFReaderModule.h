@@ -67,6 +67,11 @@ public:
   void EnableGrid(const char* grid);
   void EnableAllGrids();
 
+  // Description:
+  // Save the pipeline to a batch file which can be run without
+  // a user interface.
+  virtual void SaveInBatchScript(ofstream *file);
+
 protected:
   vtkXDMFReaderModule();
   ~vtkXDMFReaderModule();

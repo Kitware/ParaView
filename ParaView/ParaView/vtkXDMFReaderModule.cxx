@@ -38,7 +38,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkXDMFReaderModule);
-vtkCxxRevisionMacro(vtkXDMFReaderModule, "1.15");
+vtkCxxRevisionMacro(vtkXDMFReaderModule, "1.16");
 
 int vtkXDMFReaderModuleCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -449,6 +449,37 @@ void vtkXDMFReaderModule::EnableAllGrids()
 void vtkXDMFReaderModule::EnableGrid(const char* grid)
 {
   this->Internals->GridList[grid] = 1;
+}
+
+//----------------------------------------------------------------------------
+void vtkXDMFReaderModule::SaveInBatchScript(ofstream *file)
+{
+  // This should not be needed, but We can check anyway.
+  if (this->VisitedFlag)
+    {
+    return;
+    }
+  this->Superclass::SaveInBatchScript(file);
+  int numSources, sourceIdx;
+  numSources = this->GetNumberOfVTKSources();
+  for (sourceIdx = 0; sourceIdx < numSources; ++sourceIdx)
+    {
+    if ( this->Domain )
+      {
+      *file << "\tpvTemp" << this->GetVTKSourceID(sourceIdx) << " SetDomainName {"
+       << this->Domain << "}" << endl;
+      *file << "\tpvTemp" << this->GetVTKSourceID(sourceIdx) << " UpdateInformation" << endl;
+      }
+    *file << "\tpvTemp" << this->GetVTKSourceID(sourceIdx) << " DisableAllGrids" << endl;
+    vtkXDMFReaderModuleInternal::GridListType::iterator mit;
+    for ( mit = this->Internals->GridList.begin(); 
+      mit != this->Internals->GridList.end(); 
+      ++mit )
+      {
+      *file << "\tpvTemp" << this->GetVTKSourceID(sourceIdx) << " EnableGrid {" << mit->first.c_str() << "}" << endl;
+      }
+    *file << "\tpvTemp" << this->GetVTKSourceID(sourceIdx) << " UpdateInformation" << endl;
+    }
 }
 
 //----------------------------------------------------------------------------
