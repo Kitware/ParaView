@@ -153,13 +153,13 @@ The Cell Data to Point Data filter averages the values of the cell attributes of
            resolution="0.01" range="0 1"
            display_entry="1"
            entry_and_label_on_top="0" display_value="0"/>
-  <!-- AbsoluteTolerance dependent on world-space size of data -->
-  <!-- should use a widget that keeps value non-negative -->
-    <VectorEntry label="Absolute tolerance"
-                 variable="AbsoluteTolerance"
-                 trace_name="AbsoluteTolerance" type="float"
-                 help="The tolerance in absolute terms."
-                 default_value="1.0"/>
+    <ThumbWheel label="Absolute tolerance"
+                variable="AbsoluteTolerance"
+                trace_name="AbsoluteTolerance"
+                resolution="0.01"
+                minimum_value="0"
+                default_value="1.0"
+                help="The tolerance in absolute terms."/>
     <LabeledToggle label="Tolerance is absolute"
                    trace_name="ToleranceIsAbsolute"
                    variable="ToleranceIsAbsolute"
@@ -789,26 +789,26 @@ The Loop Subdivision filter increases the granularity of a polygonal mesh. It wo
     <InputMenu trace_name="Input" label="Input"
                help="Set the input to this filter."
                input_name="Input"/>
-    <!-- should use widget that keeps value positive -->
-    <VectorEntry label="On ratio"
-                 trace_name="OnRatio"
-                 variable="OnRatio"
-                 help="The ratio of points retained."
-                 type="int"
-                 default_value="2"/>
-    <!-- should use widget that keeps value non-negative -->
-    <VectorEntry label="Max. points"
-                 trace_name="MaximumNumberOfPoints"
-                 variable="MaximumNumberOfPoints"
-                 help="Limit the number of points."
-                 type="int"
-                 default_value="5000"/>
-    <!-- should use widget that keeps value non-negative -->
-    <VectorEntry variable="Offset"
-                 trace_name="Offset"
-                 help="Start with this point."
-                 type="int"
-                 default_value="0"/>
+    <ThumbWheel label="On ratio"
+                trace_name="OnRatio"
+                variable="OnRatio"
+                resolution="1"
+                default_value="2"
+                minimum_value="1"
+                help="The ratio of points retained."/>
+    <ThumbWheel label="Max. points"
+                trace_name="MaximumNumberOfPoints"
+                variable="MaximumNumberOfPoints"
+                help="Limit the number of points."
+                resolution="1"
+                minimum_value="0"
+                default_value="5000"/>
+    <ThumbWheel variable="Offset"
+                trace_name="Offset"
+                resolution="1"
+                minimum_value="0"
+                default_value="0"
+                help="Start with this point."/>
     <LabeledToggle label="Random" trace_name="Random"
                    variable="RandomMode"
                    help="Select whether to randomly select points, or subsample regularly."
@@ -1133,20 +1133,20 @@ The Copy cell data toggle controls whether cell-centered data from the input sho
                label="Input"
                help="Set the input to this filter."
                input_name="Input"/>
-    <!-- should use a widget that keeps the value non-negative -->
-    <VectorEntry label="Min. speed"
-                 trace_name="MinimumSpeed"
-                 variable="MinimumSpeed"
-                 help="The minimum size of the random point vectors generated."
-                 type="float"
-                 default_value="0.0"/>
-    <!-- should use a widget that keeps the value non-negative -->
-    <VectorEntry label="Max. speed"
-                 trace_name="MaximumSpeed"
-                 variable="MaximumSpeed"
-                 help="The maximum size of the random point vectors generated."
-                 type="float"
-                 default_value="1.0"/>
+    <ThumbWheel label="Min. speed"
+                trace_name="MinimumSpeed"
+                variable="MinimumSpeed"
+                resolution="0.01"
+                minimum_value="0"
+                default_value="0"
+                help="The minimum size of the random point vectors generated."/>
+    <ThumbWheel label="Max. speed"
+                trace_name="MaximumSpeed"
+                variable="MaximumSpeed"
+                resolution="0.01"
+                minimum_value="0"
+                default_value="1"
+                help="The maximum size of the random point vectors generated."/>
     <Documentation>
 The Random Vectors filter generates a point-centered array of random vectors. It uses a random number generator to determine the components of the vectors. The Min. speed and Max. speed values determine the range of the vector magnitudes. This filter operates on any type of data set, and the output data set will be of the same type as the input.
     </Documentation>
@@ -1280,11 +1280,11 @@ The Reflection filter reflects the input data set across the specified plane. Th
                label="Input"
                help="Set the input to this filter."
                input_name="Input"/>
-    <!-- should use widget that keeps value positive -->
-    <VectorEntry variable="Resolution"
-                 trace_name="Resolution"
-                 type="int"
-                 default_value="12"/>
+    <ThumbWheel variable="Resolution"
+                trace_name="Resolution"
+                resolution="1"
+                minimum_value="1"
+                default_value="12"/>
     <LabeledToggle variable="Capping"
                    trace_name="Capping" default_value="1"/>
     <VectorEntry variable="Angle"
@@ -1371,13 +1371,13 @@ The Reflection filter reflects the input data set across the specified plane. Th
                label="Input"
                help="Set the input to this filter."
                input_name="Input"/>
-    <!-- should use widget that keeps value non-negative -->
-    <VectorEntry label="Num. iterations"
-                 trace_name="NumberOfIterations"
-                 variable="NumberOfIterations"
-                 help="Number of iterations. More iterations produces better smoothing."
-                 type="int"
-                 default_value="20"/>
+    <ThumbWheel label="Num. iterations"
+                trace_name="NumberOfIterations"
+                variable="NumberOfIterations"
+                resolution="1"
+                minimum_value="0"
+                default_value="20"
+                help="Number of iterations. More iterations produce better smoothing."/>
     <Scale variable="Convergence"
            trace_name="Convergence"
            help="Convergence criterion for the iteration process. Smaller numbers result in more smoothing iterations (0->1)."
@@ -1517,13 +1517,13 @@ The Reflection filter reflects the input data set across the specified plane. Th
                label="Input"
                help="Set the input to this filter."
                input_name="Input"/>
-    <!-- should use widget that keeps value > 2 -->
-    <VectorEntry label="Num. sides"
-                 variable="NumberOfSides"
-                 trace_name="NumberOfSides"
-                 help="Set the number of sides for the tube"
-                 type="int"
-                 default_value="6"/>
+    <ThumbWheel label="Num. sides"
+                variable="NumberOfSides"
+                trace_name="NumberOfSides"
+                resolution="1"
+                minimum_value="3"
+                default_value="6"
+                help="Set the number of sides for the tube"/>
     <LabeledToggle variable="Capping"
                    trace_name="Capping"
                    help="Select whether to draw endcaps on the tube"
@@ -1920,13 +1920,13 @@ The Reflection filter reflects the input data set across the specified plane. Th
                        scale_factor_command="SetScaleFactor"
                        default_orient_mode="1"
     default_scale_mode ="1"/>
-    <!-- should use a widget to keep value non-negative -->
-    <VectorEntry label="Max. Number of Glyphs"
-                 trace_name="Max Glyphs"
-                 variable="MaximumNumberOfPoints"
-                 type="int"
-                 default_value="5000"
-                 help="Set the maximum number of points to glyph" />
+    <ThumbWheel label="Max. Number of Glyphs"
+                trace_name="Max Glyphs"
+                variable="MaximumNumberOfPoints"
+                resolution="1"
+                minimum_value="0"
+                default_value="5000"
+                help="Set the maximum number of points to glyph"/>
     <LabeledToggle label="Mask Points"
                    trace_name="MaskPoints"
                    variable="UseMaskPoints"
