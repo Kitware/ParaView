@@ -86,11 +86,13 @@
   <Writer input="vtkUnstructuredGrid"
           class="vtkPVWriter"
           writer="vtkExodusIIWriter"
+          parallel="1"
           extension=".exo"
           file_description="Exodus II File"/>
   <Writer input="vtkUnstructuredGrid"
           class="vtkPVWriter"
           writer="vtkEnSightWriter"
+          parallel="1"
           extension=".case"
           file_description="EnSight File"/>
 #endif
