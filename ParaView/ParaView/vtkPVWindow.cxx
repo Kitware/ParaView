@@ -128,7 +128,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.397");
+vtkCxxRevisionMacro(vtkPVWindow, "1.398");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -700,6 +700,10 @@ void vtkPVWindow::InitializeMenus(vtkKWApplication* vtkNotUsed(app))
                                 "SaveTrace", 3,
                                 "Save a trace of every action "
                                 "since start up.");
+  this->MenuFile->InsertCommand(clidx++,
+                                "Import Package", this, 
+                                "OpenPackage", 3,
+                                "Import modules defined in a ParaView package ");
 
   /*
   // Open XML package
@@ -3911,7 +3915,7 @@ void vtkPVWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVWindow ";
-  this->ExtractRevision(os,"$Revision: 1.397 $");
+  this->ExtractRevision(os,"$Revision: 1.398 $");
 }
 
 //----------------------------------------------------------------------------
