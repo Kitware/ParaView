@@ -104,15 +104,19 @@ public:
 
   // Description:
   // Callback used when interaction has been performed.
-  void ConfirmExitCheckButtonCallback();
-  void SaveGeometryCheckButtonCallback();
-  void ShowSplashScreenCheckButtonCallback();
-  void ShowBalloonHelpCheckButtonCallback();
+  void ConfirmExitCallback();
+  void SaveGeometryCallback();
+  void ShowSplashScreenCallback();
+  void ShowBalloonHelpCallback();
 
   // Description:
   // Access to some sub-widgets. Note that they might be NULL until the Create()
   // function is called.
   vtkGetObjectMacro(InterfaceSettingsFrame, vtkKWLabeledFrame);
+
+  // Description:
+  // Refresh the interface given the ivars.
+  virtual void Update() {};
 
 protected:
   vtkKWApplicationSettingsInterface();

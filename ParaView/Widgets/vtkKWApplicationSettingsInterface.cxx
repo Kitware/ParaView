@@ -51,7 +51,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWApplicationSettingsInterface);
-vtkCxxRevisionMacro(vtkKWApplicationSettingsInterface, "1.3");
+vtkCxxRevisionMacro(vtkKWApplicationSettingsInterface, "1.4");
 
 int vtkKWApplicationSettingsInterfaceCommand(ClientData cd, Tcl_Interp *interp,
                                              int argc, char *argv[]);
@@ -164,7 +164,7 @@ void vtkKWApplicationSettingsInterface::Create(vtkKWApplication *app)
   this->ConfirmExitCheckButton->SetState(res ? 0 : 1);
 
   this->ConfirmExitCheckButton->SetCommand(
-    this, "ConfirmExitCheckButtonCallback");
+    this, "ConfirmExitCallback");
 
   this->ConfirmExitCheckButton->SetBalloonHelpString(
     "A confirmation dialog will be presented to the user on exit.");
@@ -198,7 +198,7 @@ void vtkKWApplicationSettingsInterface::Create(vtkKWApplication *app)
     }
   
   this->SaveGeometryCheckButton->SetCommand(
-    this, "SaveGeometryCheckButtonCallback");
+    this, "SaveGeometryCallback");
 
   this->SaveGeometryCheckButton->SetBalloonHelpString(
     "Save the window size and location on exit and restore it on startup.");
@@ -233,7 +233,7 @@ void vtkKWApplicationSettingsInterface::Create(vtkKWApplication *app)
       }
 
     this->ShowSplashScreenCheckButton->SetCommand(
-      this, "ShowSplashScreenCheckButtonCallback");
+      this, "ShowSplashScreenCallback");
 
     this->ShowSplashScreenCheckButton->SetBalloonHelpString(
       "Display the splash information screen at startup.");
@@ -267,7 +267,7 @@ void vtkKWApplicationSettingsInterface::Create(vtkKWApplication *app)
     }
 
   this->ShowBalloonHelpCheckButton->SetCommand(
-    this, "ShowBalloonHelpCheckButtonCallback");
+    this, "ShowBalloonHelpCallback");
 
   this->ShowBalloonHelpCheckButton->SetBalloonHelpString(
     "Display help in a yellow popup-box on the screen when you rest the "
@@ -296,7 +296,7 @@ void vtkKWApplicationSettingsInterface::SetConfirmExit(int v)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWApplicationSettingsInterface::ConfirmExitCheckButtonCallback()
+void vtkKWApplicationSettingsInterface::ConfirmExitCallback()
 {
  if (this->IsCreated())
    {
@@ -317,7 +317,7 @@ void vtkKWApplicationSettingsInterface::SetSaveGeometry(int v)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWApplicationSettingsInterface::SaveGeometryCheckButtonCallback()
+void vtkKWApplicationSettingsInterface::SaveGeometryCallback()
 {
  if (this->IsCreated())
    {
@@ -339,7 +339,7 @@ void vtkKWApplicationSettingsInterface::SetShowSplashScreen(int v)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWApplicationSettingsInterface::ShowSplashScreenCheckButtonCallback()
+void vtkKWApplicationSettingsInterface::ShowSplashScreenCallback()
 {
  if (this->IsCreated())
    {
@@ -362,7 +362,7 @@ void vtkKWApplicationSettingsInterface::SetShowBalloonHelp(int v)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWApplicationSettingsInterface::ShowBalloonHelpCheckButtonCallback()
+void vtkKWApplicationSettingsInterface::ShowBalloonHelpCallback()
 {
   if (this->IsCreated())
    {
