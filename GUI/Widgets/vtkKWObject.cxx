@@ -24,7 +24,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWObject );
-vtkCxxRevisionMacro(vtkKWObject, "1.41");
+vtkCxxRevisionMacro(vtkKWObject, "1.42");
 
 int vtkKWObjectCommand(ClientData cd, Tcl_Interp *interp,
                        int argc, char *argv[]);
@@ -91,7 +91,7 @@ void vtkKWObject::ExtractRevision(ostream& os,const char *revIn)
 void vtkKWObject::SerializeRevision(ostream& os, vtkIndent indent)
 {
   os << indent << "vtkKWObject ";
-  this->ExtractRevision(os,"$Revision: 1.41 $");
+  this->ExtractRevision(os,"$Revision: 1.42 $");
 }
 
 //----------------------------------------------------------------------------
@@ -332,7 +332,7 @@ int vtkKWObject::InitializeTrace(ofstream* file)
   int dummyInit = 0;
   int* pInit;
 
-  if(this->Application == NULL)
+  if(this->GetApplication() == NULL)
     {
     return 0;
     }
@@ -340,9 +340,9 @@ int vtkKWObject::InitializeTrace(ofstream* file)
   // Special logic for state files.
   // The issue is that this KWObject can only keep track of initialization
   // for one file, and I do not like any possible solutions to extend this.
-  if (file == NULL || file == this->Application->GetTraceFile())
+  if (file == NULL || file == this->GetApplication()->GetTraceFile())
     { // Tracing:  Keep track of initialization.
-    file = this->Application->GetTraceFile();
+    file = this->GetApplication()->GetTraceFile();
     pInit = &(this->TraceInitialized);
     }
   else
@@ -383,20 +383,20 @@ int vtkKWObject::InitializeTrace(ofstream* file)
 //----------------------------------------------------------------------------
 void vtkKWObject::AddTraceEntry(const char *format, ...)
 {
-  if ( !this->Application )
+  if ( !this->GetApplication() )
     {
     return;
     }
 
   ofstream *os;
 
-  os = this->Application->GetTraceFile();
+  os = this->GetApplication()->GetTraceFile();
   if (os == NULL)
     {
     return;
     }
 
-  if (this->Application == NULL || this->InitializeTrace(os) == 0)
+  if (this->GetApplication() == NULL || this->InitializeTrace(os) == 0)
     {
     return;
     }

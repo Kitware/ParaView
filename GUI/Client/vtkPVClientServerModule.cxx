@@ -145,7 +145,7 @@ void vtkPVSendStreamToClientServerNodeRMI(void *localArg, void *remoteArg,
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVClientServerModule);
-vtkCxxRevisionMacro(vtkPVClientServerModule, "1.84");
+vtkCxxRevisionMacro(vtkPVClientServerModule, "1.85");
 
 int vtkPVClientServerModuleCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -1060,7 +1060,7 @@ const vtkClientServerStream& vtkPVClientServerModule::GetLastClientResult()
 //----------------------------------------------------------------------------
 const vtkClientServerStream& vtkPVClientServerModule::GetLastServerResult()
 {
-  if(!this->Application)
+  if(!this->GetPVApplication())
     {
     vtkErrorMacro("Missing application object.");
     this->LastServerResultStream->Reset();

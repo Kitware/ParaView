@@ -25,7 +25,7 @@
 #include "vtkRenderer.h"
 #include "vtkTransform.h"
 
-vtkCxxRevisionMacro(vtkPVCameraManipulator, "1.10");
+vtkCxxRevisionMacro(vtkPVCameraManipulator, "1.11");
 vtkStandardNewMacro(vtkPVCameraManipulator);
 
 vtkCxxSetObjectMacro(vtkPVCameraManipulator,Application,vtkPVApplication);
@@ -53,12 +53,12 @@ vtkPVCameraManipulator::~vtkPVCameraManipulator()
 
 void vtkPVCameraManipulator::StartInteraction()
 {
-  this->Application->GetMainWindow()->InteractiveRenderEnabledOn();
+  this->GetApplication()->GetMainWindow()->InteractiveRenderEnabledOn();
 }
 
 void vtkPVCameraManipulator::EndInteraction()
 {
-  this->Application->GetMainWindow()->InteractiveRenderEnabledOff();
+  this->GetApplication()->GetMainWindow()->InteractiveRenderEnabledOff();
 }
 
 //-------------------------------------------------------------------------
@@ -108,7 +108,7 @@ void vtkPVCameraManipulator::PrintSelf(ostream& os, vtkIndent indent)
   
   os << indent << "Center: " << this->Center[0] << ", " 
      << this->Center[1] << ", " << this->Center[2] << endl;
-  os << indent << "Application: " << this->Application << endl;
+  os << indent << "Application: " << this->GetApplication() << endl;
 }
 
 

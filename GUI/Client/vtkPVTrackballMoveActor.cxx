@@ -25,7 +25,7 @@
 #include "vtkRenderWindowInteractor.h"
 #include "vtkRenderer.h"
 
-vtkCxxRevisionMacro(vtkPVTrackballMoveActor, "1.11");
+vtkCxxRevisionMacro(vtkPVTrackballMoveActor, "1.12");
 vtkStandardNewMacro(vtkPVTrackballMoveActor);
 
 //-------------------------------------------------------------------------
@@ -61,7 +61,7 @@ void vtkPVTrackballMoveActor::OnMouseMove(int x, int y, vtkRenderer *ren,
     }
 
   // These are different because y is flipped.
-  vtkPVApplication *app = vtkPVApplication::SafeDownCast(this->Application);
+  vtkPVApplication *app = vtkPVApplication::SafeDownCast(this->GetApplication());
   if ( !app )
     {
     return;

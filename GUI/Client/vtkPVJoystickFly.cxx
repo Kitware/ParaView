@@ -23,7 +23,7 @@
 #include "vtkRenderer.h"
 #include "vtkTimerLog.h"
 
-vtkCxxRevisionMacro(vtkPVJoystickFly, "1.15");
+vtkCxxRevisionMacro(vtkPVJoystickFly, "1.16");
 
 //-------------------------------------------------------------------------
 vtkPVJoystickFly::vtkPVJoystickFly()
@@ -60,7 +60,7 @@ void vtkPVJoystickFly::OnButtonDown(int, int, vtkRenderer *ren,
     vtkErrorMacro("Joystick Fly manipulator has to be used from one of the two subclasses (In and Out)");
     return;
     }
-  if ( !this->Application )
+  if ( !this->GetApplication() )
     {
     vtkErrorMacro("Application is not defined");
     return;
@@ -94,7 +94,7 @@ void vtkPVJoystickFly::OnMouseMove(int, int, vtkRenderer*,
 void vtkPVJoystickFly::Fly(vtkRenderer* ren, vtkRenderWindowInteractor *rwi,
                            float, float ispeed)
 {
-  if ( this->FlyFlag || !this->Application )
+  if ( this->FlyFlag || !this->GetApplication() )
     {
     return;
     }
@@ -227,7 +227,7 @@ void vtkPVJoystickFly::Fly(vtkRenderer* ren, vtkRenderWindowInteractor *rwi,
   
     // Update to process mouse events to get the new position
     // and to check for mouse up events
-    this->Application->Script("update");
+    this->GetApplication()->Script("update");
     }
     
   timer->Delete();
