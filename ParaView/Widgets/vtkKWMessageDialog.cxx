@@ -38,14 +38,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkObjectFactory.h"
 #include "vtkKWLabel.h"
 #include "vtkKWCheckButton.h"
-#include "vtkKWImageLabel.h"
 #include "vtkKWIcon.h"
 #include "vtkKWApplication.h"
 #include "vtkKWEvent.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWMessageDialog );
-vtkCxxRevisionMacro(vtkKWMessageDialog, "1.48");
+vtkCxxRevisionMacro(vtkKWMessageDialog, "1.49");
 
 
 
@@ -78,9 +77,8 @@ vtkKWMessageDialog::vtkKWMessageDialog()
   this->CancelButton = vtkKWWidget::New();
   this->CancelButton->SetParent(this->CancelFrame);
   this->Style = vtkKWMessageDialog::Message;
-  this->Icon = vtkKWImageLabel::New();
+  this->Icon = vtkKWLabel::New();
   this->Icon->SetParent(this);
-  this->IconImage = 0;
   this->DialogName = 0;
   this->Options    = 0;
   this->DialogText = 0;
@@ -103,10 +101,6 @@ vtkKWMessageDialog::~vtkKWMessageDialog()
   this->MessageDialogFrame->Delete();
   this->TopFrame->Delete();
   this->BottomFrame->Delete();
-  if ( this->IconImage )
-    {
-    this->IconImage->Delete();
-    }
   this->SetDialogName(0);
   this->SetDialogText(0);
   this->SetOKButtonText(0);
@@ -301,24 +295,17 @@ int vtkKWMessageDialog::Invoke()
 
 void vtkKWMessageDialog::SetIcon()
 {
-  if ( this->Options && !this->IconImage )
-    {
-    this->IconImage = vtkKWIcon::New();
-    }
   if ( this->Options & vtkKWMessageDialog::ErrorIcon )
     {
-    this->IconImage->SetImageData(vtkKWIcon::ICON_ERROR);
-    this->Icon->SetImageData(this->IconImage);
+    this->Icon->SetImageData(vtkKWIcon::ICON_ERROR);
     }
   else if ( this->Options & vtkKWMessageDialog::QuestionIcon )
     {
-    this->IconImage->SetImageData(vtkKWIcon::ICON_QUESTION);
-    this->Icon->SetImageData(this->IconImage);
+    this->Icon->SetImageData(vtkKWIcon::ICON_QUESTION);
     }
   else if ( this->Options & vtkKWMessageDialog::WarningIcon )
     {
-    this->IconImage->SetImageData(vtkKWIcon::ICON_WARNING);
-    this->Icon->SetImageData(this->IconImage);
+    this->Icon->SetImageData(vtkKWIcon::ICON_WARNING);
     }
   else
     {

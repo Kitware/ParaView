@@ -39,16 +39,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWEntry.h"
 #include "vtkKWFrame.h"
 #include "vtkKWIcon.h"
-#include "vtkKWImageLabel.h"
+#include "vtkKWLabel.h"
 #include "vtkKWMath.h"
 #include "vtkKWPushButton.h"
 #include "vtkKWPushButtonSet.h"
-#include "vtkKWTkUtilities.h"
 #include "vtkMath.h"
 #include "vtkObjectFactory.h"
 
 vtkStandardNewMacro( vtkKWRange );
-vtkCxxRevisionMacro(vtkKWRange, "1.20");
+vtkCxxRevisionMacro(vtkKWRange, "1.21");
 
 #define VTK_KW_RANGE_MIN_SLIDER_SIZE        2
 #define VTK_KW_RANGE_MIN_THICKNESS          (2*VTK_KW_RANGE_MIN_SLIDER_SIZE+1)
@@ -289,11 +288,7 @@ void vtkKWRange::CreateZoomButtons()
     button = this->ZoomButtons->GetButton(0);
     if (button)
       {
-      vtkKWIcon *icon = vtkKWIcon::New();
-      icon->SetImageData(vtkKWIcon::ICON_PLUS);
-      vtkKWTkUtilities::SetImageOption(this->Application->GetMainInterp(), 
-                                       button->GetWidgetName(), icon, ".plus");
-      icon->Delete();
+      button->SetImageData(vtkKWIcon::ICON_PLUS);
       }
 
     this->ZoomButtons->AddButton(
@@ -303,11 +298,7 @@ void vtkKWRange::CreateZoomButtons()
     button = this->ZoomButtons->GetButton(1);
     if (button)
       {
-      vtkKWIcon *icon = vtkKWIcon::New();
-      icon->SetImageData(vtkKWIcon::ICON_MINUS);
-      vtkKWTkUtilities::SetImageOption(this->Application->GetMainInterp(), 
-                                       button->GetWidgetName(), icon,".minus");
-      icon->Delete();
+      button->SetImageData(vtkKWIcon::ICON_MINUS);
       }
 
     this->ZoomButtons->SetBorderWidth(0);
@@ -1077,11 +1068,8 @@ void vtkKWRange::GetWholeRangeColor(int type, int &r, int &g, int &b)
     case vtkKWRange::BACKGROUND_COLOR:
     default:
 
-      vtkKWTkUtilities::GetBackgroundColor(
-        this->GetApplication()->GetMainInterp(),
-        this->Canvas->GetWidgetName(),
-        &r, &g, &b);
-
+      this->Canvas->GetBackgroundColor(&r, &g, &b);
+      
       break;
     }
 }

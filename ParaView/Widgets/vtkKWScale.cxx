@@ -39,13 +39,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWApplication.h"
 #include "vtkKWLabel.h"
 #include "vtkKWPushButton.h"
-#include "vtkKWTkUtilities.h"
 #include "vtkObjectFactory.h"
 
 
 // ---------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWScale );
-vtkCxxRevisionMacro(vtkKWScale, "1.53");
+vtkCxxRevisionMacro(vtkKWScale, "1.54");
 
 int vtkKWScaleCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -220,26 +219,11 @@ void vtkKWScale::Create(vtkKWApplication *app, const char *args)
     this->PopupPushButton->SetParent(this);
     this->PopupPushButton->Create(app, "-padx 0 -pady 0");
 
-    ostrstream arrow;
-    arrow << this->PopupPushButton->GetWidgetName() << ".arrowimg" << ends;
-    if (!vtkKWTkUtilities::UpdatePhoto(this->Application->GetMainInterp(),
-                                       arrow.str(), 
-                                       image_arrow, 
-                                       image_arrow_width, 
-                                       image_arrow_height, 
-                                       image_arrow_pixel_size,
-                                       image_arrow_buffer_length,
-                                       this->PopupPushButton->GetWidgetName()))
-      {
-      vtkWarningMacro(<< "Error creating photo (arrow)");
-      this->PopupPushButton->SetLabel(">");
-      }
-    else
-      {
-      this->Script("%s configure -image %s", 
-                   this->PopupPushButton->GetWidgetName(), arrow.str());
-      }
-    arrow.rdbuf()->freeze(0);
+    this->PopupPushButton->SetImageData(image_arrow, 
+                                        image_arrow_width, 
+                                        image_arrow_height, 
+                                        image_arrow_pixel_size,
+                                        image_arrow_buffer_length);
 
     this->Scale->SetParent(this->TopLevel);
     }

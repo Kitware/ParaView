@@ -39,7 +39,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWApplication.h"
 #include "vtkKWCheckButton.h"
 #include "vtkKWFrame.h"
-#include "vtkKWIcon.h"
 #include "vtkKWLabeledFrame.h"
 #include "vtkKWToolbar.h"
 #include "vtkKWWindow.h"
@@ -52,7 +51,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWApplicationSettingsInterface);
-vtkCxxRevisionMacro(vtkKWApplicationSettingsInterface, "1.14");
+vtkCxxRevisionMacro(vtkKWApplicationSettingsInterface, "1.15");
 
 int vtkKWApplicationSettingsInterfaceCommand(ClientData cd, Tcl_Interp *interp,
                                              int argc, char *argv[]);
@@ -170,11 +169,7 @@ void vtkKWApplicationSettingsInterface::Create(vtkKWApplication *app)
   // --------------------------------------------------------------
   // Add a "Preferences" page
 
-  vtkKWIcon *ico = vtkKWIcon::New();
-  ico->SetImageData(vtkKWIcon::ICON_PREFERENCES);
-  this->AddPage(this->GetName(), "Change the application settings", ico);
-  ico->Delete();
-
+  this->AddPage(this->GetName(), "Change the application settings");
   page = this->GetPageWidget(this->GetName());
   
   // --------------------------------------------------------------

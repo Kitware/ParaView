@@ -40,12 +40,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWLabel.h"
 #include "vtkKWMenu.h"
 #include "vtkKWMenuButton.h"
-#include "vtkKWTkUtilities.h"
 
 #include "Resources/vtkKWArrowDown.h"
 
 vtkStandardNewMacro(vtkKWSelectionFrame);
-vtkCxxRevisionMacro(vtkKWSelectionFrame, "1.9");
+vtkCxxRevisionMacro(vtkKWSelectionFrame, "1.10");
 
 //vtkCxxSetObjectMacro(vtkKWSelectionFrame, SelectObject, vtkKWObject);
 
@@ -99,18 +98,13 @@ void vtkKWSelectionFrame::Create(vtkKWApplication *app, const char *args)
   
   this->TitleBar->Create(app, "frame", "-bg #008");
   
-  this->SelectionList->Create(app, "");
-  this->Script("image create photo -width 7 -height 4");
-  char *imageName = new char[strlen(app->GetMainInterp()->result)+1];
-  strcpy(imageName, app->GetMainInterp()->result);
-  vtkKWTkUtilities::UpdatePhoto(app->GetMainInterp(), imageName,
-                                image_KWArrowDown, image_KWArrowDown_width,
-                                image_KWArrowDown_height,
-                                image_KWArrowDown_pixel_size,
-                                image_KWArrowDown_buffer_length);
-  this->Script("%s configure -image %s -indicatoron 0",
-               this->SelectionList->GetWidgetName(), imageName);
-  delete [] imageName;
+  this->SelectionList->Create(app, "-indicatoron 0");
+
+  this->SelectionList->SetImageData(image_KWArrowDown, 
+                                    image_KWArrowDown_width,
+                                    image_KWArrowDown_height,
+                                    image_KWArrowDown_pixel_size,
+                                    image_KWArrowDown_buffer_length);
 
   this->Title->Create(app, "-bg #008 -fg #fff");
   this->Title->SetLabel("<Click to Select>");

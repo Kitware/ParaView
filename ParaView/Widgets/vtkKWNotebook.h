@@ -47,7 +47,6 @@ class vtkKWApplication;
 class vtkKWFrame;
 class vtkKWIcon;
 class vtkKWLabel;
-class vtkKWImageLabel;
 class vtkKWMenu;
 
 //BTX
@@ -328,7 +327,7 @@ protected:
     vtkKWFrame      *Frame;
     vtkKWFrame      *TabFrame;
     vtkKWLabel      *Label;
-    vtkKWImageLabel *ImageLabel;
+    vtkKWLabel      *ImageLabel;
     vtkKWIcon       *Icon;
   };
 

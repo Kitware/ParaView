@@ -42,7 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWEvent.h"
 #include "vtkKWFrame.h"
 #include "vtkKWIcon.h"
-#include "vtkKWImageLabel.h"
+#include "vtkKWLabel.h"
 #include "vtkKWLoadSaveDialog.h"
 #include "vtkKWMenu.h"
 #include "vtkKWMessageDialog.h"
@@ -66,7 +66,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define VTK_KW_WINDOW_GEOMETRY_REG_KEY "WindowGeometry"
 #define VTK_KW_WINDOW_FRAME1_SIZE_REG_KEY "WindowFrame1Size"
 
-vtkCxxRevisionMacro(vtkKWWindow, "1.157");
+vtkCxxRevisionMacro(vtkKWWindow, "1.158");
 vtkCxxSetObjectMacro(vtkKWWindow, PropertiesParent, vtkKWWidget);
 
 class vtkKWWindowMenuEntry
@@ -253,7 +253,7 @@ vtkKWWindow::vtkKWWindow()
   this->TrayFrame = vtkKWFrame::New();
   this->TrayFrame->SetParent(this->StatusFrame);
 
-  this->TrayImageError = vtkKWImageLabel::New();
+  this->TrayImageError = vtkKWLabel::New();
   this->TrayImageError->SetParent(this->TrayFrame);
 
   this->Notebook = vtkKWNotebook::New();
@@ -696,10 +696,8 @@ void vtkKWWindow::Create(vtkKWApplication *app, char *args)
   this->TrayImageError->Create(app, "");
   this->Script("%s configure -relief sunken -bd 2",
                this->TrayImageError->GetWidgetName());
-  vtkKWIcon *ico = vtkKWIcon::New();
-  ico->SetImageData(vtkKWIcon::ICON_SMALLERRORRED);
-  this->TrayImageError->SetImageData(ico);
-  ico->Delete();
+
+  this->TrayImageError->SetImageData(vtkKWIcon::ICON_SMALLERRORRED);
   this->TrayImageError->SetBind(this, "<Button-1>", "ProcessErrorClick");
   
   // To force the toolbar on top, I am creating a separate "MiddleFrame" 
@@ -1371,18 +1369,11 @@ void vtkKWWindow::SetErrorIcon(int s)
                  this->TrayImageError->GetWidgetName());
     if ( s > 1 )
       {
-      //cout << "Configure with color red" << endl;
-      vtkKWIcon *ico = vtkKWIcon::New();
-      ico->SetImageData(vtkKWIcon::ICON_SMALLERRORRED);
-      this->TrayImageError->SetImageData(ico);
-      ico->Delete();
+      this->TrayImageError->SetImageData(vtkKWIcon::ICON_SMALLERRORRED);
       }
     else
       {
-      vtkKWIcon *ico = vtkKWIcon::New();
-      ico->SetImageData(vtkKWIcon::ICON_SMALLERROR);
-      this->TrayImageError->SetImageData(ico);
-      ico->Delete();
+      this->TrayImageError->SetImageData(vtkKWIcon::ICON_SMALLERROR);
       }
     }
   else

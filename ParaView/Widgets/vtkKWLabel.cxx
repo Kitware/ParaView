@@ -43,7 +43,7 @@ int vtkKWLabelCommand(ClientData cd, Tcl_Interp *interp,
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLabel );
-vtkCxxRevisionMacro(vtkKWLabel, "1.24");
+vtkCxxRevisionMacro(vtkKWLabel, "1.25");
 
 //----------------------------------------------------------------------------
 vtkKWLabel::vtkKWLabel()
@@ -97,11 +97,18 @@ void vtkKWLabel::SetLabel(const char* _arg)
 
   this->Modified();
 
-  if (this->IsCreated() && this->Label)
+  if (this->Label && this->IsCreated())
     {
     this->Script("%s configure -text {%s}", 
-                 this->GetWidgetName(), 
-                 this->Label);
+                 this->GetWidgetName(), this->Label);
+
+    // Whatever the label, -image always takes precedence, unless it's empty
+    // so change it accordingly
+    
+    if (this->LineType != vtkKWLabel::MultiLine && *this->Label)
+      {
+      this->Script("%s configure -image {}", this->GetWidgetName());
+      }
     }
 } 
 

@@ -47,8 +47,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkKWObject.h"
 
-class vtkKWWindow;
+class vtkKWIcon;
 class vtkKWWidgetCollection;
+class vtkKWWindow;
 
 //BTX
 template<class DataType> class vtkLinkedList;
@@ -288,6 +289,30 @@ public:
   //ETX
   virtual const char* GetAnchorAsString(int);
 
+  // Description:
+  // Set image data using either icon, predefined icon index (see 
+  // vtkKWIcon.h) or pixel data (pixels and the structure of the
+  // image, i.e. width, height, pixel_size ; if buffer_length = 0, it
+  // is computed using width * height * pixel_size, otherwise used as 
+  // a hint whereas the data is in Base64 / Zlib format).
+  // If RGBA (pixel_size > 3), blend pixels with background color of
+  // the widget (otherwise 0.5, 0.5, 0.5 gray). If blend_color_option is not
+  // NULL,  use this option as blend color instead of background (-bg) 
+  // (ex: -fg, -selectcolor)
+  // An image is created and associated to the Tk -image option, 
+  // or image_option if not NULL (ex: -selectimage).
+  virtual void SetImageData(int icon_index,
+                            const char *blend_color_option = 0,
+                            const char *image_option = 0);
+  virtual void SetImageData(vtkKWIcon *icon,
+                            const char *blend_color_option = 0,
+                            const char *image_option = 0);
+  virtual void SetImageData(const unsigned char* data, 
+                            int width, int height, int pixel_size = 4,
+                            unsigned long buffer_length = 0,
+                            const char *blend_color_option = 0,
+                            const char *image_option = 0);
+  
 protected:
   vtkKWWidget();
   ~vtkKWWidget();
@@ -359,8 +384,4 @@ private:
   void operator=(const vtkKWWidget&); // Not implemented
 };
 
-
 #endif
-
-
-

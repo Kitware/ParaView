@@ -38,7 +38,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWApplication.h"
 #include "vtkKWFrame.h"
 #include "vtkKWIcon.h"
-#include "vtkKWImageLabel.h"
+#include "vtkKWLabel.h"
 #include "vtkKWMenu.h"
 #include "vtkKWTkUtilities.h"
 #include "vtkKWWidgetsConfigure.h"
@@ -80,7 +80,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWNotebook);
-vtkCxxRevisionMacro(vtkKWNotebook, "1.51");
+vtkCxxRevisionMacro(vtkKWNotebook, "1.52");
 
 //----------------------------------------------------------------------------
 int vtkKWNotebookCommand(ClientData cd, Tcl_Interp *interp,
@@ -694,7 +694,7 @@ int vtkKWNotebook::AddPage(const char *title,
     page->Icon = vtkKWIcon::New();
     page->Icon->SetImageData(icon);
 
-    page->ImageLabel = vtkKWImageLabel::New();
+    page->ImageLabel = vtkKWLabel::New();
     page->ImageLabel->SetParent(page->TabFrame);
     page->ImageLabel->Create(this->Application, "");
     page->ImageLabel->SetImageData(page->Icon);

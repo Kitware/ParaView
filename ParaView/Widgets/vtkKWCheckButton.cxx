@@ -39,7 +39,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWCheckButton );
-vtkCxxRevisionMacro(vtkKWCheckButton, "1.21");
+vtkCxxRevisionMacro(vtkKWCheckButton, "1.22");
 
 //----------------------------------------------------------------------------
 vtkKWCheckButton::vtkKWCheckButton() 
@@ -217,6 +217,50 @@ void vtkKWCheckButton::Configure()
   else
     {
     this->Script("%s configure -variable {%s}", wname, this->VariableName);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWCheckButton::SetImageData(int icon_index,
+                                    const char *blend_color_option,
+                                    const char *image_option)
+{
+  this->Superclass::SetImageData(icon_index, blend_color_option, image_option);
+  if (!blend_color_option && !image_option)
+    {
+    this->Superclass::SetImageData(icon_index, "-selectcolor", "-selectimage");
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWCheckButton::SetImageData(vtkKWIcon* icon,
+                                    const char *blend_color_option,
+                                    const char *image_option)
+{
+  this->Superclass::SetImageData(icon, blend_color_option, image_option);
+  if (!blend_color_option && !image_option)
+    {
+    this->Superclass::SetImageData(icon, "-selectcolor", "-selectimage");
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWCheckButton::SetImageData(const unsigned char* data, 
+                                    int width, 
+                                    int height,
+                                    int pixel_size,
+                                    unsigned long buffer_length,
+                                    const char *blend_color_option,
+                                    const char *image_option)
+{
+  this->Superclass::SetImageData(
+    data, width, height, pixel_size, buffer_length, 
+    blend_color_option, image_option);
+  if (!blend_color_option && !image_option)
+    {
+    this->Superclass::SetImageData(
+      data, width, height, pixel_size, buffer_length, 
+      "-selectcolor", "-selectimage");
     }
 }
 

@@ -36,6 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWWidget.h"
 
 #include "vtkKWApplication.h"
+#include "vtkKWIcon.h"
 #include "vtkKWTkUtilities.h"
 #include "vtkKWWidgetCollection.h"
 #include "vtkKWWindow.h"
@@ -46,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWWidget );
-vtkCxxRevisionMacro(vtkKWWidget, "1.70");
+vtkCxxRevisionMacro(vtkKWWidget, "1.71");
 
 int vtkKWWidgetCommand(ClientData cd, Tcl_Interp *interp,
                        int argc, char *argv[]);
@@ -340,7 +341,7 @@ void vtkKWWidget::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkKWWidget ";
-  this->ExtractRevision(os,"$Revision: 1.70 $");
+  this->ExtractRevision(os,"$Revision: 1.71 $");
 }
 
 //----------------------------------------------------------------------------
@@ -1170,6 +1171,89 @@ const char* vtkKWWidget::GetAnchorAsString(int anchor)
     default:
       return "";
     }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWWidget::SetImageData(int icon_index,
+                               const char *blend_color_option,
+                               const char *image_option)
+{
+  vtkKWIcon *icon = vtkKWIcon::New();
+  icon->SetImageData(icon_index);
+  this->SetImageData(icon, blend_color_option, image_option);
+  icon->Delete();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWWidget::SetImageData(vtkKWIcon* icon,
+                               const char *blend_color_option,
+                               const char *image_option)
+{
+  if (!icon)
+    {
+    return;
+    }
+
+  this->SetImageData(icon->GetData(), 
+                     icon->GetWidth(), 
+                     icon->GetHeight(), 
+                     icon->GetPixelSize(),
+                     0,
+                     blend_color_option, 
+                     image_option);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWWidget::SetImageData(const unsigned char* data, 
+                               int width, 
+                               int height,
+                               int pixel_size,
+                               unsigned long buffer_length,
+                               const char *blend_color_option,
+                               const char *image_option)
+{
+  if (!this->IsCreated())
+    {
+    vtkWarningMacro("Widget is not created yet !");
+    return;
+    }
+
+  if (!image_option || !*image_option)
+    {
+    image_option = "-image";
+    }
+
+  if (!this->HasConfigurationOption(image_option))
+    {
+    return;
+    }
+
+  ostrstream image_name;
+  image_name << this->GetWidgetName() << "." << &image_option[1] << ends;
+
+#if (TK_MAJOR_VERSION == 8) && (TK_MINOR_VERSION < 4)
+  // This work-around is put here to "fix" what looks like a bug
+  // in Tk. Without this, there seems to be some weird problems
+  // with Tk picking some alpha values for some colors.
+  this->Script("catch {destroy %s}", image_name.str());
+#endif
+  
+  if (!vtkKWTkUtilities::UpdatePhoto(this->GetApplication()->GetMainInterp(),
+                                     image_name.str(),
+                                     data, 
+                                     width, height, pixel_size,
+                                     buffer_length,
+                                     this->GetWidgetName(),
+                                     blend_color_option))
+    {
+    vtkWarningMacro("Error updating Tk photo " << image_name.str());
+    return;
+    }
+
+  this->Script("%s configure %s {%s}", 
+               this->GetWidgetName(), image_option, image_name.str());
+
+  image_name.rdbuf()->freeze(0);
 }
 
 //----------------------------------------------------------------------------

@@ -46,7 +46,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class vtkKWApplication;
 class vtkKWApplicationSettingsInterface;
 class vtkKWFrame;
-class vtkKWImageLabel;
 class vtkKWLabel;
 class vtkKWLoadSaveDialog;
 class vtkKWMenu;
@@ -387,7 +386,7 @@ protected:
   vtkKWWidget        *ProgressFrame;
 
   vtkKWFrame      *TrayFrame;
-  vtkKWImageLabel *TrayImageError;
+  vtkKWLabel      *TrayImageError;
 
   vtkKWLabel *StatusLabel;
   char       *StatusImageName;

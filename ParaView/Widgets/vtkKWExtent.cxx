@@ -36,14 +36,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWExtent.h"
 
 #include "vtkKWApplication.h"
-#include "vtkKWImageLabel.h"
 #include "vtkKWRange.h"
-#include "vtkKWTkUtilities.h"
 #include "vtkObjectFactory.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWExtent );
-vtkCxxRevisionMacro(vtkKWExtent, "1.22");
+vtkCxxRevisionMacro(vtkKWExtent, "1.23");
 
 //----------------------------------------------------------------------------
 int vtkKWExtentCommand(ClientData cd, Tcl_Interp *interp,

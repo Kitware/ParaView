@@ -36,10 +36,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWEntry.h"
 
 #include "vtkKWApplication.h"
-#include "vtkObjectFactory.h"
-#include "vtkKWImageLabel.h"
 #include "vtkKWIcon.h"
+#include "vtkKWLabel.h"
 #include "vtkKWListBox.h"
+#include "vtkObjectFactory.h"
 
 #ifdef _MSC_VER
 #pragma warning (push, 1)
@@ -73,7 +73,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWEntry );
-vtkCxxRevisionMacro(vtkKWEntry, "1.27");
+vtkCxxRevisionMacro(vtkKWEntry, "1.28");
 
 //----------------------------------------------------------------------------
 vtkKWEntry::vtkKWEntry()
@@ -217,13 +217,10 @@ void vtkKWEntry::Create(vtkKWApplication *app, const char *args)
     this->Entry->SetParent(this);
     this->Entry->Create(app, "entry", (args?args:""));
     this->Script("pack %s -fill both -expand 1 -side left", this->Entry->GetWidgetName());
-    vtkKWImageLabel* label = vtkKWImageLabel::New();
+    vtkKWLabel *label = vtkKWLabel::New();
     label->SetParent(this);
-    vtkKWIcon* ico = vtkKWIcon::New();
-    ico->SetImageData(vtkKWIcon::ICON_EXPAND);
     label->Create(app, "-relief raised");
-    label->SetImageData(ico);
-    ico->Delete();
+    label->SetImageData(vtkKWIcon::ICON_EXPAND);
     this->Script("pack %s -fill y -expand 0 -side left", label->GetWidgetName());
     label->SetBind(this, "<ButtonPress>", "DisplayPopupCallback");
     label->Delete();

@@ -40,7 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWChangeColorButton.h"
 #include "vtkKWCheckButton.h"
 #include "vtkKWCheckButtonSet.h"
-#include "vtkKWImageLabel.h"
+#include "vtkKWLabel.h"
 #include "vtkKWLabeledCheckButtonSet.h"
 #include "vtkKWLabeledOptionMenu.h"
 #include "vtkKWLabeledPushButtonSet.h"
@@ -122,7 +122,7 @@ static unsigned char image_copy[] =
 
 // ----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWTextProperty);
-vtkCxxRevisionMacro(vtkKWTextProperty, "1.18");
+vtkCxxRevisionMacro(vtkKWTextProperty, "1.19");
 
 int vtkKWTextPropertyCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -270,45 +270,11 @@ void vtkKWTextProperty::Create(vtkKWApplication *app)
   cb = cbs->GetButton(VTK_KW_TEXT_PROP_BOLD_ID);
   this->Script("%s configure %s", cb->GetWidgetName(), styles_options);
 
-  ostrstream bold;
-  bold << cb->GetWidgetName() << ".boldimg" << ends;
-  if (!vtkKWTkUtilities::UpdatePhoto(this->Application->GetMainInterp(),
-                                     bold.str(), 
-                                     image_bold, 
-                                     image_bold_width, 
-                                     image_bold_height, 
-                                     image_bold_pixel_size,
-                                     image_bold_buffer_length,
-                                     cb->GetWidgetName()))
-    {
-    vtkWarningMacro(<< "Error creating photo (bold)");
-    cb->SetText("Bold");
-    }
-  else
-    {
-    this->Script("%s configure -image %s", cb->GetWidgetName(), bold.str());
-    }
-  bold.rdbuf()->freeze(0);
-  ostrstream bold_s;
-  bold_s << cb->GetWidgetName() << ".bold_simg" << ends;
-  if (!vtkKWTkUtilities::UpdatePhoto(this->Application->GetMainInterp(),
-                                     bold_s.str(), 
-                                     image_bold, 
-                                     image_bold_width, 
-                                     image_bold_height, 
-                                     image_bold_pixel_size,
-                                     image_bold_buffer_length,
-                                     cb->GetWidgetName(),
-                                     "-selectcolor"))
-    {
-    vtkWarningMacro(<< "Error creating photo (bold)");
-    }
-  else
-    {
-    this->Script("%s configure -selectimage %s", 
-                 cb->GetWidgetName(), bold_s.str());
-    }
-  bold_s.rdbuf()->freeze(0);
+  cb->SetImageData(image_bold, 
+                   image_bold_width, 
+                   image_bold_height, 
+                   image_bold_pixel_size,
+                   image_bold_buffer_length);
 
   cbs->AddButton(VTK_KW_TEXT_PROP_ITALIC_ID, 
                  0, 
@@ -317,47 +283,11 @@ void vtkKWTextProperty::Create(vtkKWApplication *app)
   cb = cbs->GetButton(VTK_KW_TEXT_PROP_ITALIC_ID);
   this->Script("%s configure %s", cb->GetWidgetName(), styles_options);
 
-  ostrstream italic;
-  italic << cb->GetWidgetName() << ".italicimg" << ends;
-  if (!vtkKWTkUtilities::UpdatePhoto(this->Application->GetMainInterp(),
-                                     italic.str(), 
-                                     image_italic, 
-                                     image_italic_width, 
-                                     image_italic_height, 
-                                     image_italic_pixel_size,
-                                     image_italic_buffer_length,
-                                     cb->GetWidgetName()))
-    {
-    vtkWarningMacro(<< "Error creating photo (italic)");
-    cb->SetText("Italic");
-    }
-  else
-    {
-    this->Script("%s configure -image %s", 
-                 cb->GetWidgetName(), italic.str());
-    }
-  italic.rdbuf()->freeze(0);
-  ostrstream italic_s;
-  italic_s << cb->GetWidgetName() 
-           << ".italic_simg" << ends;
-  if (!vtkKWTkUtilities::UpdatePhoto(this->Application->GetMainInterp(),
-                                     italic_s.str(), 
-                                     image_italic, 
-                                     image_italic_width, 
-                                     image_italic_height, 
-                                     image_italic_pixel_size,
-                                     image_italic_buffer_length,
-                                     cb->GetWidgetName(),
-                                     "-selectcolor"))
-    {
-    vtkWarningMacro(<< "Error creating photo (italic)");
-    }
-  else
-    {
-    this->Script("%s configure -selectimage %s", 
-                 cb->GetWidgetName(), italic_s.str());
-    }
-  italic_s.rdbuf()->freeze(0);
+  cb->SetImageData(image_italic, 
+                   image_italic_width, 
+                   image_italic_height, 
+                   image_italic_pixel_size,
+                   image_italic_buffer_length);
 
   cbs->AddButton(VTK_KW_TEXT_PROP_SHADOW_ID, 
                  0, 
@@ -366,47 +296,11 @@ void vtkKWTextProperty::Create(vtkKWApplication *app)
   cb = cbs->GetButton(VTK_KW_TEXT_PROP_SHADOW_ID);
   this->Script("%s configure %s", cb->GetWidgetName(), styles_options);
 
-  ostrstream shadow;
-  shadow << cb->GetWidgetName() << ".shadowimg" << ends;
-  if (!vtkKWTkUtilities::UpdatePhoto(this->Application->GetMainInterp(),
-                                     shadow.str(), 
-                                     image_shadow, 
-                                     image_shadow_width, 
-                                     image_shadow_height, 
-                                     image_shadow_pixel_size,
-                                     image_shadow_buffer_length,
-                                     cb->GetWidgetName()))
-    {
-    vtkWarningMacro(<< "Error creating photo (shadow)");
-    cb->SetText("Shadow");
-    }
-  else
-    {
-    this->Script("%s configure -image %s", 
-                 cb->GetWidgetName(), shadow.str());
-    }
-  shadow.rdbuf()->freeze(0);
-  ostrstream shadow_s;
-  shadow_s << cb->GetWidgetName() 
-           << ".shadow_simg" << ends;
-  if (!vtkKWTkUtilities::UpdatePhoto(this->Application->GetMainInterp(),
-                                     shadow_s.str(), 
-                                     image_shadow, 
-                                     image_shadow_width, 
-                                     image_shadow_height, 
-                                     image_shadow_pixel_size,
-                                     image_shadow_buffer_length,
-                                     cb->GetWidgetName(),
-                                     "-selectcolor"))
-    {
-    vtkWarningMacro(<< "Error creating photo (shadow)");
-    }
-  else
-    {
-    this->Script("%s configure -selectimage %s", 
-                 cb->GetWidgetName(), shadow_s.str());
-    }
-  shadow_s.rdbuf()->freeze(0);
+  cb->SetImageData(image_shadow, 
+                   image_shadow_width, 
+                   image_shadow_height, 
+                   image_shadow_pixel_size,
+                   image_shadow_buffer_length);
 
   // Opacity
 
@@ -440,26 +334,11 @@ void vtkKWTextProperty::Create(vtkKWApplication *app)
   pbs->AddButton(VTK_KW_TEXT_PROP_COPY_ID);
   pb = pbs->GetButton(VTK_KW_TEXT_PROP_COPY_ID);
 
-  ostrstream copy;
-  copy << pb->GetWidgetName() << ".copyimg" << ends;
-  if (!vtkKWTkUtilities::UpdatePhoto(this->Application->GetMainInterp(),
-                                     copy.str(), 
-                                     image_copy, 
-                                     image_copy_width, 
-                                     image_copy_height, 
-                                     image_copy_pixel_size,
-                                     image_copy_buffer_length,
-                                     pb->GetWidgetName()))
-    {
-    vtkWarningMacro(<< "Error creating photo (copy)");
-    pb->SetLabel("Copy");
-    }
-  else
-    {
-    this->Script("%s configure -image %s", 
-                 pb->GetWidgetName(), copy.str());
-    }
-  copy.rdbuf()->freeze(0);
+  pb->SetImageData(image_copy, 
+                   image_copy_width, 
+                   image_copy_height, 
+                   image_copy_pixel_size,
+                   image_copy_buffer_length);
 
   // Pack
 
@@ -484,19 +363,19 @@ void vtkKWTextProperty::Pack()
 
   if (this->LongFormat)
     {
-    this->ChangeColorButton->GetLabel()->SetLabel("Color:");
+    this->ChangeColorButton->SetLabel("Color:");
     this->ChangeColorButton->ShowLabelOn();
 
     this->FontFamilyOptionMenu->GetOptionMenu()->IndicatorOn();
-    this->FontFamilyOptionMenu->GetLabel()->SetLabel("Family:");
+    this->FontFamilyOptionMenu->SetLabel("Family:");
     this->FontFamilyOptionMenu->ShowLabelOn();
 
-    this->StylesCheckButtonSet->GetLabel()->SetLabel("Styles:");
+    this->StylesCheckButtonSet->SetLabel("Styles:");
     this->StylesCheckButtonSet->ShowLabelOn();
 
     this->OpacityScale->DisplayLabel("Opacity:");
 
-    this->PushButtonSet->GetLabel()->SetLabel("Functions:");
+    this->PushButtonSet->SetLabel("Functions:");
     this->PushButtonSet->ShowLabelOn();
 
     int row = 0, col = 0;

@@ -39,7 +39,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWEntry.h"
 #include "vtkKWLabel.h"
 #include "vtkKWPushButton.h"
-#include "vtkKWTkUtilities.h"
 #include "vtkMath.h"
 #include "vtkObjectFactory.h"
 
@@ -54,7 +53,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // ---------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWThumbWheel );
-vtkCxxRevisionMacro(vtkKWThumbWheel, "1.7");
+vtkCxxRevisionMacro(vtkKWThumbWheel, "1.8");
 
 // ---------------------------------------------------------------------------
 int vtkKWThumbWheelCommand(ClientData cd, 
@@ -220,26 +219,11 @@ void vtkKWThumbWheel::Create(vtkKWApplication *app,
     this->PopupPushButton->SetParent(this);
     this->PopupPushButton->Create(app, "-padx 0 -pady 0");
 
-    ostrstream arrow;
-    arrow << this->PopupPushButton->GetWidgetName() << ".arrowimg" << ends;
-    if (!vtkKWTkUtilities::UpdatePhoto(this->Application->GetMainInterp(),
-                                       arrow.str(), 
-                                       image_arrow, 
-                                       image_arrow_width, 
-                                       image_arrow_height, 
-                                       image_arrow_pixel_size,
-                                       image_arrow_buffer_length,
-                                       this->PopupPushButton->GetWidgetName()))
-      {
-      vtkWarningMacro(<< "Error creating photo (arrow)");
-      this->PopupPushButton->SetLabel(">");
-      }
-    else
-      {
-      this->Script("%s configure -image %s", 
-                   this->PopupPushButton->GetWidgetName(), arrow.str());
-      }
-    arrow.rdbuf()->freeze(0);
+    this->PopupPushButton->SetImageData(image_arrow, 
+                                        image_arrow_width, 
+                                        image_arrow_height, 
+                                        image_arrow_pixel_size,
+                                        image_arrow_buffer_length);
 
     this->ThumbWheel->SetParent(this->TopLevel);
     }
@@ -1386,9 +1370,6 @@ void vtkKWThumbWheel::UpdateThumbWheelImage(float pos)
   int last_notch = 0;
   int relief_flag = 0;
 
-  ostrstream img_name;
-  img_name << this->ThumbWheel->GetWidgetName() << ".img" << ends;
-
   // Allocate buffer for the whole wheel
 
   unsigned char *img_buffer = new unsigned char[img_buffer_size];
@@ -1590,22 +1571,11 @@ void vtkKWThumbWheel::UpdateThumbWheelImage(float pos)
 
   // Update the Tk photo
 
-  if (!vtkKWTkUtilities::UpdatePhoto(this->Application->GetMainInterp(),
-                                     img_name.str(),
-                                     img_buffer,
-                                     this->ThumbWheelWidth, 
-                                     this->ThumbWheelHeight, 
-                                     img_pixel_size))
-    {
-    vtkWarningMacro(<< "Error creating thumbwheel photo: " << img_name.str());
-    }
-  else
-    {
-    this->Script("%s configure -image %s", 
-                 this->ThumbWheel->GetWidgetName(), img_name.str());
-    }
+  this->ThumbWheel->SetImageData(img_buffer,
+                                 this->ThumbWheelWidth, 
+                                 this->ThumbWheelHeight, 
+                                 img_pixel_size);
 
-  img_name.rdbuf()->freeze(0);
   delete [] img_buffer;
 }
 
