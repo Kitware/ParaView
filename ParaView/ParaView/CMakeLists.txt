@@ -21,6 +21,7 @@ vtkPVData
 vtkPVDataSetReaderInterface 
 vtkPVEnSightReaderInterface 
 vtkPVExtentTranslator 
+vtkPVFileEntry
 vtkPVGlyph3D 
 vtkPVInputMenu 
 vtkPVLabeledToggle

@@ -60,6 +60,7 @@ class vtkPVData;
 class vtkPVWindow;
 class vtkStringList;
 class vtkPVLabeledToggle;
+class vtkPVFileEntry;
 class vtkKWScale;
 class vtkKWEntry;
 class vtkPVSelectionList;
@@ -182,8 +183,8 @@ public:
   
   // Description:
   // Create an entry for a filename.
-  vtkKWEntry *AddFileEntry(char *label, char *setCmd, char *getCmd,
-                           char *ext, char* help, vtkKWObject *o = NULL);
+  vtkPVFileEntry *AddFileEntry(char *label, char *setCmd, char *getCmd,
+                               char *ext, char* help, vtkKWObject *o = NULL);
 
   // Description:
   // Formats the command with brackets so that sopaces are preserved.  
@@ -228,7 +229,7 @@ public:
                        char* help, vtkKWObject *o = NULL);
   
   // Description:
-  // Creates a list for delecting a mode.
+  // Creates a list for selecting a mode.
   // The methods are called on the object (VTKSource if o=NULL).
   vtkPVSelectionList *AddModeList(char *label, char *setCmd, char *getCmd,
                                   char* help, vtkKWObject *o = NULL);

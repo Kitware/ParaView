@@ -64,6 +64,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkUnstructuredGridSource.h"
 #include "vtkPVArraySelection.h"
 #include "vtkPVLabeledToggle.h"
+#include "vtkPVFileEntry.h"
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
 			   int argc, char *argv[]);
@@ -791,13 +792,6 @@ void vtkPVSource::AcceptCallback()
   int numSources;
   vtkPVSource *source;
   
-  // This adds an extract filter only when the MaximumNumberOfPieces is 1.
-  // This is only the case the first time the accept is called.
-  if (this->GetNthPVOutput(0))
-    {
-    this->GetNthPVOutput(0)->InsertExtractPiecesIfNecessary();
-    }
-
   window = this->GetWindow();
 
   this->Script("update");
@@ -812,8 +806,19 @@ void vtkPVSource::AcceptCallback()
                this->AcceptButton->GetWidgetName());
 #endif
   
+  // We need to pass the parameters from the UI to the VTK objects before
+  // we check whether to insert ExtractPieces.  Otherwise, we'll get errors
+  // about unspecified file names, etc., when ExecuteInformation is called on
+  // the VTK source.  (The vtkPLOT3DReader is a good example of this.)
   this->UpdateVTKSourceParameters();
   
+  // This adds an extract filter only when the MaximumNumberOfPieces is 1.
+  // This is only the case the first time the accept is called.
+  if (this->GetNthPVOutput(0))
+    {
+    this->GetNthPVOutput(0)->InsertExtractPiecesIfNecessary();
+    }
+
   // Initialize the output if necessary.
   if ( ! this->Initialized)
     { // This is the first time, initialize data.    
@@ -1022,8 +1027,10 @@ void vtkPVSource::DeleteCallback()
 //----------------------------------------------------------------------------
 void vtkPVSource::UpdateParameterWidgets()
 {
-  int num, i;
+  int num, i, j, numStrings;
   char *cmd;
+  vtkKWWidget *widget;
+  vtkStringList *resetCommands;
 
   // Copy the ivars from the vtk object to the UI.
   num = this->ResetCommands->GetLength();
@@ -1034,7 +1041,22 @@ void vtkPVSource::UpdateParameterWidgets()
       {
       this->Script(cmd);
       }
-    } 
+    }
+  
+  this->Widgets->InitTraversal();
+  for (i = 0; i < this->Widgets->GetNumberOfItems(); i++)
+    {
+    widget = this->Widgets->GetNextKWWidget();
+    if (widget->IsA("vtkPVWidget"))
+      {
+      resetCommands = ((vtkPVWidget*)widget)->GetResetCommands();
+      numStrings = resetCommands->GetNumberOfStrings();
+      for (j = 0; j < numStrings; j++)
+        {
+        this->Script(resetCommands->GetString(j));
+        }
+      }
+    }
 }
 
 
@@ -1549,13 +1571,11 @@ vtkPVLabeledToggle *vtkPVSource::AddLabeledToggle(char *label, char *setCmd,
   return toggle;
 }  
 //----------------------------------------------------------------------------
-vtkKWEntry *vtkPVSource::AddFileEntry(char *label, char *setCmd, char *getCmd,
-                                      char *ext, char *help, vtkKWObject *o)
+vtkPVFileEntry *vtkPVSource::AddFileEntry(char *label, char *setCmd,
+                                          char *getCmd, char *ext, char *help,
+                                          vtkKWObject *o)
 {
-  vtkKWWidget *frame;
-  vtkKWLabel *labelWidget;
-  vtkKWEntry *entry;
-  vtkKWPushButton *browseButton;
+  vtkPVFileEntry *entry;
 
   // Find the Tcl name of the object whose methods will be called.
   const char *tclName = this->GetVTKSourceTclName();
@@ -1565,75 +1585,13 @@ vtkKWEntry *vtkPVSource::AddFileEntry(char *label, char *setCmd, char *getCmd,
     }
 
   // First a frame to hold the other widgets.
-  frame = vtkKWWidget::New();
-  this->Widgets->AddItem(frame);
-  frame->SetParent(this->ParameterFrame->GetFrame());
-  frame->Create(this->Application, "frame", "");
-  this->Script("pack %s -fill x -expand t", frame->GetWidgetName());
-
-  // Now a label
-  if (label && label[0] != '\0')
-    {  
-    labelWidget = vtkKWLabel::New();
-    this->Widgets->AddItem(labelWidget);
-    labelWidget->SetParent(frame);
-    labelWidget->Create(this->Application, "-width 18 -justify right");
-    labelWidget->SetLabel(label);
-    if (help)
-      {
-      labelWidget->SetBalloonHelpString(help);
-      }
-    this->Script("pack %s -side left", labelWidget->GetWidgetName());
-    labelWidget->Delete();
-    labelWidget = NULL;
-    }
-  
-  entry = vtkKWEntry::New();
+  entry = vtkPVFileEntry::New();
   this->Widgets->AddItem(entry);
-  entry->SetParent(frame);
-  entry->Create(this->Application, "");
+  entry->SetParent(this->ParameterFrame->GetFrame());
+  entry->SetPVSource(this);
+  entry->Create(this->Application, label, setCmd, getCmd, ext, help, tclName);
+  this->Script("pack %s -fill x -expand t", entry->GetWidgetName());
 
-  this->Script("%s configure -xscrollcommand {%s EntryChanged}",
-               entry->GetWidgetName(), this->GetTclName());
-  if (help)
-    {
-    entry->SetBalloonHelpString(help);
-    }
-  this->Script("pack %s -side left -fill x -expand t", entry->GetWidgetName());
-
-
-  browseButton = vtkKWPushButton::New();
-  this->Widgets->AddItem(browseButton);
-  browseButton->SetParent(frame);
-  browseButton->Create(this->Application, "");
-  browseButton->SetLabel("Browse");
-  if (help)
-    {
-    browseButton->SetBalloonHelpString(help);
-    }
-  this->Script("pack %s -side left", browseButton->GetWidgetName());
-  if (ext)
-    {
-    char str[1000];
-    sprintf(str, "SetValue [tk_getOpenFile -filetypes {{{} {.%s}}}]", ext);
-    browseButton->SetCommand(entry, str);
-    }
-  else
-    {
-    browseButton->SetCommand(entry, "SetValue [tk_getOpenFile]");
-    }
-  browseButton->Delete();
-  browseButton = NULL;
-
-  // Command to update the UI.
-  this->ResetCommands->AddString("%s SetValue [%s %s]",
-                                 entry->GetTclName(), tclName, getCmd); 
-  // Format a command to move value from widget to vtkObjects (on all processes).
-  // The VTK objects do not yet have to have the same Tcl name!
-  this->AcceptCommands->AddString("%s AcceptHelper2 %s %s [%s GetValue]",
-             this->GetTclName(), tclName, setCmd, entry->GetTclName());
-
-  frame->Delete();
   entry->Delete();
 
   // Although it has been deleted, it did not destruct.
@@ -2553,4 +2511,3 @@ vtkPVRenderView* vtkPVSource::GetPVRenderView()
 {
   return vtkPVRenderView::SafeDownCast(this->GetView());
 }
-
