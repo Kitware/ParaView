@@ -22,7 +22,7 @@
 #include "vtkKWMath.h"
 
 vtkStandardNewMacro(vtkSMLookupTableProxy);
-vtkCxxRevisionMacro(vtkSMLookupTableProxy, "1.7");
+vtkCxxRevisionMacro(vtkSMLookupTableProxy, "1.8");
 
 //---------------------------------------------------------------------------
 vtkSMLookupTableProxy::vtkSMLookupTableProxy()
@@ -34,6 +34,7 @@ vtkSMLookupTableProxy::vtkSMLookupTableProxy()
 //---------------------------------------------------------------------------
 vtkSMLookupTableProxy::~vtkSMLookupTableProxy()
 {
+  this->SetVTKClassName(0);
   this->SetArrayName(0);
 }
 
@@ -142,12 +143,12 @@ void vtkSMLookupTableProxy::Build()
 //---------------------------------------------------------------------------
 void vtkSMLookupTableProxy::SaveInBatchScript(ofstream* file)
 {
-  *file << endl;
   unsigned int cc;
   unsigned numObjects = this->GetNumberOfIDs();
   vtkSMIntVectorProperty* ivp;
   vtkSMDoubleVectorProperty* dvp;
 
+  *file << endl;
   for (cc=0; cc < numObjects; cc++)
     {
     vtkClientServerID id = this->GetID(cc);
@@ -214,8 +215,8 @@ void vtkSMLookupTableProxy::SaveInBatchScript(ofstream* file)
 void vtkSMLookupTableProxy::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-  os << indent << "ArrayName: " <<
-    ((this->ArrayName)? this->ArrayName : "NULL") <<endl;
+  os << indent << "ArrayName: "
+     << (this->ArrayName?this->ArrayName:"(none)") << endl;
 }
 
 
