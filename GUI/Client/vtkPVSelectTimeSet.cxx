@@ -33,7 +33,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectTimeSet);
-vtkCxxRevisionMacro(vtkPVSelectTimeSet, "1.49");
+vtkCxxRevisionMacro(vtkPVSelectTimeSet, "1.50");
 
 //-----------------------------------------------------------------------------
 int vtkDataArrayCollectionCommand(ClientData cd, Tcl_Interp *interp,
@@ -369,7 +369,7 @@ void vtkPVSelectTimeSet::CommonReset()
 //-----------------------------------------------------------------------------
 void vtkPVSelectTimeSet::Initialize()
 {
-  this->CommonReset();
+  this->SetTimeSetsFromReader();
 
   vtkSMDoubleVectorProperty *dvp = vtkSMDoubleVectorProperty::SafeDownCast(
     this->GetSMProperty());
@@ -379,6 +379,7 @@ void vtkPVSelectTimeSet::Initialize()
     dvp->SetElement(0, this->TimeSets->GetItem(0)->GetComponent(0, 0));
     }
   
+  this->CommonReset();
 }
 
 //-----------------------------------------------------------------------------
