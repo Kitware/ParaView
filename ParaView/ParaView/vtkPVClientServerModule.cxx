@@ -112,7 +112,7 @@ void vtkPVRelayRemoteScript(void *localArg, void *remoteArg,
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVClientServerModule);
-vtkCxxRevisionMacro(vtkPVClientServerModule, "1.6");
+vtkCxxRevisionMacro(vtkPVClientServerModule, "1.7");
 
 int vtkPVClientServerModuleCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -589,7 +589,7 @@ void vtkPVClientServerModule::SendDataBounds(vtkDataSet *data)
 //----------------------------------------------------------------------------
 int vtkPVClientServerModule::GetPVDataNumberOfCells(vtkPVData *pvd)
 {
-  float numCells;
+  int numCells;
 
   if ( ! this->ClientMode)
     {
@@ -606,7 +606,7 @@ int vtkPVClientServerModule::GetPVDataNumberOfCells(vtkPVData *pvd)
 //----------------------------------------------------------------------------
 void vtkPVClientServerModule::SendDataNumberOfCells(vtkDataSet *data)
 {
-  float numCells;
+  int numCells;
   
   if (this->ClientMode)
     {
@@ -674,7 +674,7 @@ void vtkPVClientServerModule::SendDataNumberOfPoints(vtkDataSet *data)
 
   // Only process 0 of the server gets to this point.
   int num, id;
-  float tmp;
+  int tmp;
 
   numPoints = data->GetNumberOfPoints();
   num = this->Controller->GetNumberOfProcesses();
@@ -779,7 +779,6 @@ void vtkPVClientServerModule::SendDataArrayRange(vtkDataSet *data,
 void vtkPVClientServerModule::CompleteArrays(vtkMapper *mapper, char *mapperTclName)
 {
   int j;
-  int nonEmptyFlag = 0;
   int activeAttributes[5];
 
   if (mapper->GetInput() == NULL || this->Controller == NULL)
