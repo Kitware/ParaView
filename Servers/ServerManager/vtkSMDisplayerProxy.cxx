@@ -27,7 +27,7 @@
 #include "vtkSMDisplayWindowProxy.h"
 
 vtkStandardNewMacro(vtkSMDisplayerProxy);
-vtkCxxRevisionMacro(vtkSMDisplayerProxy, "1.14");
+vtkCxxRevisionMacro(vtkSMDisplayerProxy, "1.15");
 
 //---------------------------------------------------------------------------
 vtkSMDisplayerProxy::vtkSMDisplayerProxy()
@@ -400,8 +400,10 @@ void vtkSMDisplayerProxy::AddToDisplayWindow(vtkSMDisplayWindowProxy* dw)
 }
 
 //---------------------------------------------------------------------------
-void vtkSMDisplayerProxy::AddInput(
-  vtkSMSourceProxy *input, const char* method, int hasMultipleInputs)
+void vtkSMDisplayerProxy::AddInput(vtkSMSourceProxy *input, 
+                                   const char* method, 
+                                   int portIdx, 
+                                   int hasMultipleInputs)
 {
   if (!input)
     {
@@ -432,8 +434,17 @@ void vtkSMDisplayerProxy::AddInput(
     int partIdx = sourceIdx % numInputs;
     vtkSMPart* part = input->GetPart(partIdx);
     stream << vtkClientServerStream::Invoke 
-      << sourceID << method << part->GetID(0) 
-      << vtkClientServerStream::End;
+           << sourceID << method;
+    if (portIdx >= 0)
+      {
+      stream << portIdx;
+      stream << part->GetID(1);
+      }
+    else
+      {
+      stream << part->GetID(0);
+      }
+    stream << vtkClientServerStream::End;
     }
   pm->SendStream(this->Servers, stream, 0);
 }

@@ -1,15 +1,15 @@
 /*=========================================================================
 
-  Program:   ParaView
-  Module:    vtkSMPointLabelDisplay.cxx
+Program:   ParaView
+Module:    vtkSMPointLabelDisplay.cxx
 
-  Copyright (c) Kitware, Inc.
-  All rights reserved.
-  See Copyright.txt or http://www.paraview.org/HTML/Copyright.html for details.
+Copyright (c) Kitware, Inc.
+All rights reserved.
+See Copyright.txt or http://www.paraview.org/HTML/Copyright.html for details.
 
-     This software is distributed WITHOUT ANY WARRANTY; without even
-     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-     PURPOSE.  See the above copyright notice for more information.
+This software is distributed WITHOUT ANY WARRANTY; without even
+the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
 #include "vtkSMPointLabelDisplay.h"
@@ -27,7 +27,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMPointLabelDisplay);
-vtkCxxRevisionMacro(vtkSMPointLabelDisplay, "1.3");
+vtkCxxRevisionMacro(vtkSMPointLabelDisplay, "1.4");
 
 
 //----------------------------------------------------------------------------
@@ -83,7 +83,7 @@ vtkUnstructuredGrid* vtkSMPointLabelDisplay::GetCollectedData()
     }
   vtkMPIMoveData* dp;
   dp = vtkMPIMoveData::SafeDownCast(
-      pm->GetObjectFromID(this->DuplicateProxy->GetID(0)));
+    pm->GetObjectFromID(this->DuplicateProxy->GetID(0)));
   if (dp == 0)
     {
     return 0;
@@ -217,24 +217,24 @@ void vtkSMPointLabelDisplay::CreateVTKObjects(int num)
 void vtkSMPointLabelDisplay::SetInput(vtkSMSourceProxy* input)
 {  
   vtkPVDataInformation *di=input->GetDataInformation();
-  if(!di->DataSetTypeIsA("vtkGenericDataSet"))
+  if(di->DataSetTypeIsA("vtkDataSet") && !di->GetBaseDataClassName())
     {
-  vtkPVProcessModule* pm;
-  pm = this->GetProcessModule();  
+    vtkPVProcessModule* pm;
+    pm = this->GetProcessModule();  
   
-  if (this->DuplicateProxy->GetNumberOfIDs() == 0)
-    {
-    this->CreateVTKObjects(1);
-    }
-  input->AddConsumer(0, this);
+    if (this->DuplicateProxy->GetNumberOfIDs() == 0)
+      {
+      this->CreateVTKObjects(1);
+      }
+    input->AddConsumer(0, this);
 
-  // Set vtkData as input to duplicate filter.
-  pm->GetStream() << vtkClientServerStream::Invoke 
-                  << this->DuplicateProxy->GetID(0) 
-                  << "SetInput" << input->GetPart(0)->GetID(0) 
-                  << vtkClientServerStream::End;
-  // Only the server has data.
-  pm->SendStream(vtkProcessModule::DATA_SERVER);
+    // Set vtkData as input to duplicate filter.
+    pm->GetStream() << vtkClientServerStream::Invoke 
+                    << this->DuplicateProxy->GetID(0) 
+                    << "SetInput" << input->GetPart(0)->GetID(0) 
+                    << vtkClientServerStream::End;
+    // Only the server has data.
+    pm->SendStream(vtkProcessModule::DATA_SERVER);
     }
 }
 
