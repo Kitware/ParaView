@@ -318,7 +318,7 @@ void vtkPVSourceList::Update(vtkPVSource* current, vtkPVSourceCollection* col)
 int vtkPVSourceList::Update(vtkPVSource *comp, int y, int in, int current)
 {
   int compIdx, x, yNext; 
-  static char *font = "-adobe-helvetica-medium-r-normal-*-14-100-100-100-p-76-iso8859-1";
+  static const char *font = "-adobe-helvetica-medium-r-normal-*-14-100-100-100-p-76-iso8859-1";
   char *result;
   int bbox[4];
   char *tmp;
@@ -401,11 +401,9 @@ int vtkPVSourceList::Update(vtkPVSource *comp, int y, int in, int current)
   //if (comp->GetPVWindow()->GetCurrentPVSource() == comp)
   if (current)
     {
-    tmp = "yellow";
-
     this->Script("%s create rectangle %d %d %d %d -fill %s -outline {}",
                  this->Canvas->GetWidgetName(), 
-                 bbox[0], bbox[1], bbox[2], bbox[3], tmp);
+                 bbox[0], bbox[1], bbox[2], bbox[3], "yellow");
     result = this->Application->GetMainInterp()->result;
     tmp = new char[strlen(result)+1];
     strcpy(tmp,result);
