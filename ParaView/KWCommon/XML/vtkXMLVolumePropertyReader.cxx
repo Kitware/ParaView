@@ -45,7 +45,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkXMLVolumePropertyWriter.h"
 
 vtkStandardNewMacro(vtkXMLVolumePropertyReader);
-vtkCxxRevisionMacro(vtkXMLVolumePropertyReader, "1.5");
+vtkCxxRevisionMacro(vtkXMLVolumePropertyReader, "1.6");
 
 //----------------------------------------------------------------------------
 char* vtkXMLVolumePropertyReader::GetRootElementName()
@@ -76,6 +76,11 @@ int vtkXMLVolumePropertyReader::Parse(vtkXMLDataElement *elem)
   if (elem->GetScalarAttribute("InterpolationType", ival))
     {
     obj->SetInterpolationType(ival);
+    }
+
+  if (elem->GetScalarAttribute("IndependentComponents", ival))
+    {
+    obj->SetIndependentComponents(ival);
     }
 
   // Iterate over all components

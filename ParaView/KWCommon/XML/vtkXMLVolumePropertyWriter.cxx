@@ -44,7 +44,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkXMLPiecewiseFunctionWriter.h"
 
 vtkStandardNewMacro(vtkXMLVolumePropertyWriter);
-vtkCxxRevisionMacro(vtkXMLVolumePropertyWriter, "1.5");
+vtkCxxRevisionMacro(vtkXMLVolumePropertyWriter, "1.6");
 
 //----------------------------------------------------------------------------
 char* vtkXMLVolumePropertyWriter::GetRootElementName()
@@ -97,9 +97,11 @@ int vtkXMLVolumePropertyWriter::AddAttributes(vtkXMLDataElement *elem)
     return 0;
     }
 
-  elem->SetIntAttribute("InterpolationType", obj->GetInterpolationType());
+  elem->SetIntAttribute(
+    "InterpolationType", obj->GetInterpolationType());
 
-  elem->SetIntAttribute("NumberOfComponents", VTK_MAX_VRCOMP);
+  elem->SetIntAttribute(
+    "IndependentComponents", obj->GetIndependentComponents());
 
   return 1;
 }
