@@ -59,6 +59,8 @@ ADD_EXECUTABLE(vtkWrapTclInit
   ${VTK_SOURCE_DIR}/Wrapping/vtkWrapTclInit.c)
 
 SET(VTK_TCL_FILES
+  "${ParaView_SOURCE_DIR}/VTK/Common/vtkCollection.cxx"
+  "${ParaView_SOURCE_DIR}/VTK/Common/vtkCollectionIterator.cxx"
   "${ParaView_SOURCE_DIR}/VTK/Common/vtkObject.cxx"
   "${ParaView_SOURCE_DIR}/VTK/Common/vtkObjectBase.cxx")
 
