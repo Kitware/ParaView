@@ -66,6 +66,14 @@ void vtkKWImageLabel::Create(vtkKWApplication *app, const char *args)
 void vtkKWImageLabel::SetImageData(const unsigned char* data, 
 				   int width, int height)
 {
+  this->Script("winfo rgb %s systemButtonFace", this->GetParent()->GetWidgetName());
+  int r, g, b;
+  sscanf( this->Application->GetMainInterp()->result, "%d %d %d",
+	  &r, &g, &b );
+  r = (r / 65535.0)*255;
+  g = (g / 65535.0)*255;
+  b = (b / 65535.0)*255;
+  //cout << "RGB: #" << r << ", " << g << ", " << b << endl;
   this->Script("image create photo -height %d -width %d", width, height);
   this->SetImageDataLabel(this->Application->GetMainInterp()->result);
   Tk_PhotoHandle photo;
@@ -99,6 +107,13 @@ void vtkKWImageLabel::SetImageData(const unsigned char* data,
       *(pp+1) = *(dd+1);
       *(pp+2) = *(dd+2);
       *(pp+3) = *(dd+3);
+      }
+    else
+      {
+      *(pp)   = r;
+      *(pp+1) = g;
+      *(pp+2) = b;
+      *(pp+3) = 0;
       }
     pp+=4;
     dd+=4;
