@@ -39,9 +39,11 @@ SET_SOURCE_FILES_PROPERTIES(
 
 INCLUDE_DIRECTORIES(
   ${VTK_BINARY_DIR}
+  ${TCL_INCLUDE_PATH}
   ${ParaView_SOURCE_DIR}/Common/KWCommon
   ${ParaView_BINARY_DIR}/Common/KWCommon
   ${ParaView_SOURCE_DIR}/Servers/Filters
+  ${ParaView_SOURCE_DIR}/Servers/ServerManager
   ${ParaView_BINARY_DIR}/Servers/ServerManager
 )
 
@@ -103,6 +105,6 @@ VTK_WRAP_TCL3(
   ""
   )
 ADD_LIBRARY(vtkPVServerManagerTCL ${ServerManagerTCL_SRCS})
-TARGET_LINK_LIBRARIES (vtkPVServerManagerTCL vtkPVServerManager)
+TARGET_LINK_LIBRARIES (vtkPVServerManagerTCL vtkPVServerManager vtkCommonTCL)
 
 
