@@ -60,7 +60,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVXMLElement.h"
 
 vtkStandardNewMacro(vtkPVOrientScaleWidget);
-vtkCxxRevisionMacro(vtkPVOrientScaleWidget, "1.2");
+vtkCxxRevisionMacro(vtkPVOrientScaleWidget, "1.3");
 
 vtkCxxSetObjectMacro(vtkPVOrientScaleWidget, InputMenu, vtkPVInputMenu);
 
@@ -187,9 +187,9 @@ void vtkPVOrientScaleWidget::Create(vtkKWApplication *app)
   this->Script("pack %s -side left", this->ScalarsLabel->GetWidgetName());
   this->Script("pack %s -side left -fill x -expand yes",
                this->ScalarsMenu->GetWidgetName());
-  this->Script("pack %s -side left -pady {0 2}",
+  this->Script("pack %s -side left",
                this->VectorsLabel->GetWidgetName());
-  this->Script("pack %s -side left -fill x -expand yes -pady {0 2}",
+  this->Script("pack %s -side left -fill x -expand yes",
                this->VectorsMenu->GetWidgetName());
   
   this->OrientModeFrame->Create(app, "frame", "");
