@@ -19,7 +19,7 @@ SET(PROJECT_TESTS
   ClipCut
   ColorMap
   CombustorTest
-  #               Composite
+  #Composite
   ConeCubeCylSQ
   CTH
   CutContours
@@ -85,13 +85,6 @@ IF(RUN_WITH_MPI)
   ENDFOREACH(tfile)
 ENDIF(RUN_WITH_MPI)
 
-ADD_TEST(TestBatch1-ParaView ${PARAVIEW_EXECUTABLE} --disable-registry
-  ${PVClientTests_SOURCE_DIR}/Tcl/TestBatch1.pvs
-  -D ${PVClientTestData}
-  -C ${PVCompareImages}
-  -T ${ParaView_BINARY_DIR}/Testing/Temporary
-  -V ${ParaView_BINARY_DIR}/Testing/Temporary/TestBatch1.png)
-
 SET (PV_MPI_COMMANDS )
 IF(RUN_WITH_MPI)
   SET (PV_MPI_COMMANDS "--use-mpi=${VTK_MPIRUN_EXE}")
@@ -102,6 +95,7 @@ FOREACH (tfile ${PROJECT_TESTS})
     -D ${PVClientTestData}
     -C ${PVCompareImages}
     -T ${ParaView_BINARY_DIR}/Testing/Temporary
+    -B ${ParaView_BINARY_DIR}/Testing/Temporary/${tfile}batch
     -V ${PVClientTestData}/Baseline/${tfile}.png)
   # repeat the test with the client server driver
   ADD_TEST("${tfile}ClientServer-ParaView" ${PARAVIEW_CS_EXECUTABLE}
@@ -121,6 +115,24 @@ FOREACH (tfile ${PROJECT_TESTS})
     -C ${PVCompareImages}
     -T ${ParaView_BINARY_DIR}/Testing/Temporary
     -V ${PVClientTestData}/Baseline/${tfile}.png)
+ENDFOREACH (tfile)
+
+REMOVE (PROJECT_TESTS
+  MouseInteraction
+  TestDemo
+  TestPackage
+)
+
+FOREACH (tfile ${PROJECT_TESTS})
+  # test batch
+  ADD_TEST(${tfile}-batch-ParaView ${PARAVIEW_EXECUTABLE} --disable-registry
+    ${PVClientTests_SOURCE_DIR}/Tcl/${tfile}.pvs
+    -D ${PVClientTestData}
+    -T ${ParaView_BINARY_DIR}/Testing/Temporary
+    -BT ${PVClientTests_SOURCE_DIR}/Tcl/TestBatch.tcl
+    -BC ${PVCompareImages}
+    -B ${ParaView_BINARY_DIR}/Testing/Temporary/${tfile}batch
+    -V ${ParaView_BINARY_DIR}/Testing/Temporary/${tfile}batch.png)
 ENDFOREACH (tfile)
 
 IF(VTK_PRINT_SELF_CHECK_TCL AND TCL_TCLSH)

@@ -166,10 +166,33 @@ $MainView SetRenderWindowSize 300 300
 update
 [[$Application GetMainWindow] GetMainView] ForceRender
 
+set didRegression 0
+
 for {set i  1} {$i < [expr $argc - 1]} {incr i} {
     if {[lindex $argv $i] == "-C"} {
 	source [lindex $argv [expr $i + 1]]
 	$Application SetExitStatus [CompareImage [[$Application GetMainWindow] GetMainView]]
+       set didRegression 1
+    }
+}
+
+
+if { ! $didRegression } {
+    set sourceList [[$Application GetMainWindow] GetSourceList Sources]
+    $sourceList InitTraversal
+    while { 1 } {
+        set source [$sourceList GetNextItemAsObject]
+        if { $source == {} } {
+            break
+        }
+        if { [$source GetSourceClassName] == "vtkElevationFilter" } {
+            [$source GetPVWidget Line] SetVisibility 0
+        }
+    }
+    for {set i  1} {$i < [expr $argc - 1]} {incr i} {
+        if {[lindex $argv $i] == "-BT"} {
+            source [lindex $argv [expr $i + 1]]
+        }
     }
 }
    

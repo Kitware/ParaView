@@ -66,6 +66,13 @@ set MainView [[$Application GetMainWindow] GetMainView]
 $MainView SetRenderWindowSize 250 250
 update
 [[$Application GetMainWindow] GetMainView] ForceRender
+
+for {set i  1} {$i < [expr $argc - 1]} {incr i} {
+    if {[lindex $argv $i] == "-BT"} {
+        source [lindex $argv [expr $i + 1]]
+    }
+}
+
 $Application Exit
 
 
