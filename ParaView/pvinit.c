@@ -8384,7 +8384,6 @@ static char Et_zFile30[] =
 static char Et_zFile31[] = 
 "load vtktcl\n"
 "load vtkKWWidgetsTcl\n"
-"load vtkKWWidgetsProTcl\n"
 "load vtkKWParaViewTcl\n"
 "\n"
 "wm withdraw .\n"

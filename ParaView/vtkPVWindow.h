@@ -35,11 +35,6 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 #include "vtkKWWindow.h"
 #include "vtkKWRenderView.h"
-class vtkPVOpenDialog;
-class vtkKWDataSetComposite;
-class vtkKWPolyDataComposite;
-class vtkKWPolyDataCompositeCollection;
-class vtkKWOperation;
 
 class VTK_EXPORT vtkPVWindow : public vtkKWWindow
 {
@@ -53,8 +48,6 @@ public:
 
   // Description:
   // Open or close a polygonal dataset for viewing.
-  virtual void Open();
-  virtual void Open(char *name);
   virtual void NewWindow();
   virtual void Save();
 
@@ -62,21 +55,7 @@ public:
   // Chaining method to serialize an object and its superclasses.
   virtual void SerializeSelf(ostream& os, vtkIndent indent);
   virtual void SerializeToken(istream& is,const char token[1024]);
-  
-  // Description:
-  // Methods for storing and retrieving polygonal datasets.
-  virtual void StorePolyData(vtkKWPolyDataComposite *);
-  virtual void RetrieveDataSet(const char *name);
-  virtual vtkKWPolyDataComposite *GetPolyDataByName(const char *name);
-  virtual vtkKWPolyDataCompositeCollection *GetPolyDataSets() 
-    {return this->PolyDataSets;};
-  
-  // Description:
-  // Helper method to verify that the current dataset has been saved 
-  // prior to loading a new one. If it has not been save then it will 
-  // prompt if you want it to be stored.
-  virtual void CheckSelectedPolyData();
-  
+    
 protected:
   vtkPVWindow();
   ~vtkPVWindow();
@@ -84,10 +63,7 @@ protected:
   void operator=(const vtkPVWindow&) {};
 
   void CloseData();
-  virtual void Load(vtkPVOpenDialog *);
   vtkKWRenderView *MainView;
-  vtkPVOpenDialog *DataPath;
-  vtkKWPolyDataCompositeCollection *PolyDataSets;
   vtkKWWidget *RetrieveMenu;
   vtkKWWidget *CreateMenu;
 };

@@ -178,7 +178,7 @@ void vtkPVApplication::Start(int argc, char*argv[])
       {
       if (strlen(argv[1]) > 1)
         {
-        ui->Open(argv[1]);
+        //ui->Open(argv[1]);
         }
       }
     }

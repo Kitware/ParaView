@@ -138,6 +138,14 @@ SOURCE=.\vtkKWCompositeTcl.cxx
 # End Source File
 # Begin Source File
 
+SOURCE=.\vtkKWCornerAnnotation.cxx
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkKWCornerAnnotationTcl.cxx
+# End Source File
+# Begin Source File
+
 SOURCE=.\vtkKWDialog.cxx
 # End Source File
 # Begin Source File
@@ -492,6 +500,26 @@ InputName=vtkKWCompositeCollection
 # Begin Custom Build
 InputPath=.\vtkKWCompositeCollection.h
 InputName=vtkKWCompositeCollection
+
+"$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx
+
+# End Custom Build
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkKWCornerAnnotation.h
+
+!IF  "$(CFG)" == "Widgets - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "Widgets - Win32 Debug"
+
+# Begin Custom Build
+InputPath=.\vtkKWCornerAnnotation.h
+InputName=vtkKWCornerAnnotation
 
 "$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx

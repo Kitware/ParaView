@@ -27,12 +27,8 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 =========================================================================*/
 #include "vtkKWApplication.h"
 #include "vtkPVWindow.h"
-#include "vtkKWActorComposite.h"
 #include "vtkOutlineFilter.h"
 #include "vtkObjectFactory.h"
-#include "vtkKWPolyDataCompositeCollection.h"
-#include "vtkKWCompositeCollection.h"
-#include "vtkPVOpenDialog.h"
 #include "vtkKWDialog.h"
 
 //--------------------------------------------------------------------------
@@ -54,20 +50,12 @@ int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
 vtkPVWindow::vtkPVWindow()
 {  
   this->CommandFunction = vtkPVWindowCommand;
-  this->DataPath = NULL;
-  this->PolyDataSets = vtkKWPolyDataCompositeCollection::New();
   this->RetrieveMenu = vtkKWWidget::New();
   this->CreateMenu = vtkKWWidget::New();
 }
 
 vtkPVWindow::~vtkPVWindow()
 {
-  if (this->DataPath)
-    {
-    this->DataPath->UnRegister(this);
-    }
-  this->DataPath = NULL;
-  this->PolyDataSets->Delete();
 }
 
 void vtkPVWindow::Create(vtkKWApplication *app, char *args)
@@ -124,37 +112,10 @@ void vtkPVWindow::Create(vtkKWApplication *app, char *args)
 
   char cmd[1024];
   sprintf(cmd,"%s Open", this->GetTclName());
-  this->AddRecentFilesToMenu(NULL,NULL,cmd);
   
   this->Script( "wm deiconify %s", this->GetWidgetName());
 }
 
-void vtkPVWindow::Open(char *name)
-{
-  vtkPVOpenDialog *dlg = vtkPVOpenDialog::New();
-  dlg->Create(this->Application,"");
-  
-  // open a volume for viewing
-  if (dlg->IsFileValid(name))
-    {
-    dlg->SetFileName(name);
-    this->Load(dlg);
-    }
-  dlg->Delete();
-}
-
-void vtkPVWindow::Open()
-{
-  vtkPVOpenDialog *dlg = vtkPVOpenDialog::New();
-  dlg->Create(this->Application,"");
-
-  // open a volume for viewing
-  if (dlg->Invoke())
-    {
-    this->Load(dlg);
-    }
-  dlg->Delete();
-}
 
 void vtkPVWindow::NewWindow()
 {
@@ -165,69 +126,6 @@ void vtkPVWindow::NewWindow()
 }
 
 
-void vtkPVWindow::Load(vtkPVOpenDialog *dlg)
-{
-  // what type of file are we loading, for tfun just load tfun
-  char *path = dlg->GetFileName();
- 
-  // open a session
-  //
-  if (!strcmp(path + strlen(path) - 4,".svs"))
-    {
-    this->CloseData();
-
-    // add to list of recently opened files
-    char cmd[1024];
-    sprintf(cmd,"%s Open",this->GetTclName());
-//    this->AddRecentFile(NULL, NULL, dlg->GetFileName(),cmd);
-    
-    // open the file
-    int oldrm = this->MainView->GetRenderMode();
-    this->MainView->SetRenderModeToDisabled();
-    istream *fptr;
-    fptr = new ifstream(path, ios::in);
-    this->Serialize(*fptr);
-    this->Script("update");
-    this->MainView->SetRenderMode(oldrm);
-    this->MainView->Render();
-    delete fptr;
-    }
-
-  // open a data file
-  else
-    {
-    this->CloseData();
-    
-    // create a new volume
-    this->DataPath = dlg;
-    dlg->Register(this);
-    int lrm = this->MainView->GetRenderMode();
-    this->MainView->SetRenderModeToDisabled();
-    
-    // create the composites and add them in
-    //
-    this->MainView->AddComposite(dlg->GetComposite());
-    dlg->GetComposite()->SetPVWindow(this);
-    this->MainView->MakeSelected();
-    this->MainView->SetSelectedComposite(dlg->GetComposite());
-    dlg->GetComposite()->ShowProperties();
-    this->MainView->Reset();
-    
-    char temp[1024];
-    sprintf(temp,"%s: %s",this->Application->GetApplicationName(),
-            dlg->GetFileName());
-    this->Script("wm title %s {%s}", this->GetWidgetName(),temp);
-    
-    // add to list of recently opened files
-    char cmd[1024];
-    sprintf(cmd,"%s Open",this->GetTclName());
-    this->AddRecentFile(NULL, dlg->GetFileName(), this, cmd);
-    
-    this->Script("update");
-    this->MainView->SetRenderMode(lrm);
-    this->MainView->Render();
-    }
-}
 
 void vtkPVWindow::Save() 
 {
@@ -242,23 +140,13 @@ void vtkPVWindow::SerializeSelf(ostream& os, vtkIndent indent)
   // invoke superclass
   this->vtkKWWindow::SerializeSelf(os,indent);
 
-  os << indent << "DataPath ";
-  this->DataPath->Serialize(os,indent);
   os << indent << "MainView ";
   this->MainView->Serialize(os,indent);
 }
 
+
 void vtkPVWindow::SerializeToken(istream& is, const char token[1024])
 {
-  if (!strcmp(token,"DataPath"))
-    {
-    vtkPVOpenDialog *dlg = vtkPVOpenDialog::New();
-    dlg->Create(this->Application,"");
-    dlg->Serialize(is);
-    this->Load(dlg);
-    dlg->Delete();
-    return;
-    }
   if (!strcmp(token,"MainView"))
     {
     this->MainView->Serialize(is);
@@ -268,125 +156,5 @@ void vtkPVWindow::SerializeToken(istream& is, const char token[1024])
   vtkKWWindow::SerializeToken(is,token);
 }
 
-void vtkPVWindow::CloseData()
-{
-  this->CheckSelectedPolyData();
-}
 
-void vtkPVWindow::StorePolyData(vtkKWPolyDataComposite *c)
-{
-  if (!this->PolyDataSets->IsItemPresent(c))
-    {
-    this->PolyDataSets->AddItem(c);
-    }
-  // add it to the retrieve menu
-  this->Script(
-    "%s add command -label {%s} -command {%s RetrieveDataSet {%s}}",
-    this->RetrieveMenu->GetWidgetName(), c->GetName(),
-    this->GetTclName(), c->GetName());
-}
-
-void vtkPVWindow::RetrieveDataSet(const char *name)
-{
-  vtkKWPolyDataComposite *c = this->GetPolyDataByName(name);
-  if (!c)
-    {
-    return;
-    }
-  // make sure we don't accidentally delete the current
-  this->CheckSelectedPolyData();
-  
-  // make this the selected data set
-  if (!this->SelectedView->GetComposites()->IsItemPresent(c))
-    {
-    this->SelectedView->AddComposite(c);
-    }
-  this->SelectedView->SetSelectedComposite(c);
-  c->ShowProperties();
-  this->SelectedView->Reset();
-}
-
-vtkKWPolyDataComposite *vtkPVWindow::GetPolyDataByName(const char *name)
-{
-  vtkKWPolyDataComposite *res, *ptr;
-  
-  res = NULL;
-  
-  this->PolyDataSets->InitTraversal(); 
-  ptr = this->PolyDataSets->GetNextKWPolyDataComposite();
-  while (ptr)
-    {
-    if (!strcmp(ptr->GetName(),name))
-      {
-      res = ptr;
-      }
-    ptr = this->PolyDataSets->GetNextKWPolyDataComposite();
-    }
-  return res;
-}
-
-
-//================================================================
-//
-// Add sources here
-//
-
-void vtkPVWindow::CheckSelectedPolyData()
-{
-  // get the selected dataset
-  vtkKWComposite *com = this->SelectedView->GetSelectedComposite();
-  if (!com)
-    {
-    return;
-    }
-  
-  vtkKWPolyDataComposite *dsc = (vtkKWPolyDataComposite *)com;
-  
-  // is the selected data set not stored
-  if (!this->PolyDataSets->IsItemPresent(dsc))
-    {
-    // prompt the user if the want to store or replace
-    vtkKWDialog *dlg = vtkKWDialog::New();
-    vtkKWWidget *ButtonFrame = vtkKWWidget::New();
-    ButtonFrame->SetParent(dlg);
-    vtkKWWidget *OKButton = vtkKWWidget::New();
-    OKButton->SetParent(ButtonFrame);
-    vtkKWWidget *CancelButton = vtkKWWidget::New();
-    CancelButton->SetParent(ButtonFrame);
-    dlg->Create(this->Application,"");
-    
-    ButtonFrame->Create(this->Application,"frame","");
-    OKButton->Create(this->Application,"button","-text Store -width 16");
-    OKButton->SetCommand(this, "OK");
-    CancelButton->Create(this->Application,"button",
-			"-text Discard -width 16");
-    CancelButton->SetCommand(this, "Cancel");
-    this->Script("pack %s -side left -padx 4 -expand yes",
-                 OKButton->GetWidgetName());
-    this->Script("pack %s -side left -padx 4 -expand yes",
-                 CancelButton->GetWidgetName());
-    this->Script("pack %s -side bottom -fill x -pady 4",
-                 ButtonFrame->GetWidgetName());    
-    
-    vtkKWWidget *msg2 = vtkKWWidget::New();
-    msg2->SetParent(dlg);
-    msg2->Create(this->Application,"label","-text {"
-                 "The current dataset has not been stored. You can choose to store it now or discard it.}");
-    
-    this->Script("pack %s -side bottom -fill x -pady 4",msg2->GetWidgetName());
-    
-    int result = dlg->Invoke();
-    
-    if (result)
-      {
-      this->StorePolyData(dsc);
-      }
-    
-    CancelButton->Delete();
-    ButtonFrame->Delete();
-    OKButton->Delete();
-    msg2->Delete();
-    dlg->Delete();
-    }
-}
 
