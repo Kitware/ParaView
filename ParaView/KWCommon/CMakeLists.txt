@@ -1,6 +1,7 @@
 PROJECT(KWCommon)
 INCLUDE_REGULAR_EXPRESSION("^(vtk|kw|icons).*$")
 SET( KWCommon_SRCS
+vtkKWEventMap.cxx
 vtkKWIcon.cxx
 vtkKWProcessStatistics.cxx
 vtkKWRegisteryUtilities.cxx
