@@ -15,10 +15,20 @@
 // .NAME vtkSMProxyProperty - property representing pointer(s) to vtkObject(s)
 // .SECTION Description
 // vtkSMProxyProperty is a concrete sub-class of vtkSMProperty representing
-// pointer(s) to vtkObject(s) (through vtkSMProxy). Note that if the proxy
-// has multiple IDs, they are all appended to the command stream. If 
+// pointer(s) to vtkObject(s) (through vtkSMProxy). If 
 // UpdateSelf is true, the proxy ids (as opposed to the server object ids)
-// are passed to the stream.
+// are passed to the stream. 
+// Note: This property connects two proxies: proxy A (to which this property
+// belongs) and proxy B (or more) (which is to be proxy A by using this 
+// property).
+// The way this is set depends on the number of IDs of the two proxies.
+// If A and B have same number of IDs, the vtkObject represented by i'th ID on
+// B is set on the server object represented by i'th ID on A. If A has 1 ID and
+// B has more than one, than all IDs in B are set on A one after the other. 
+// If B has 1 ID and A has more than one, than vtkObject represented by B is 
+// set on all the server objects of A.
+// 
+//TODO: Update comment
 // .SECTION See Also
 // vtkSMProperty
 

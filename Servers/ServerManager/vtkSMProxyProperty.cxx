@@ -28,7 +28,7 @@
 #include "vtkStdString.h"
 
 vtkStandardNewMacro(vtkSMProxyProperty);
-vtkCxxRevisionMacro(vtkSMProxyProperty, "1.14.6.2");
+vtkCxxRevisionMacro(vtkSMProxyProperty, "1.14.6.3");
 
 struct vtkSMProxyPropertyInternals
 {
@@ -91,36 +91,68 @@ void vtkSMProxyProperty::AppendCommandToStream(
   this->RemoveConsumers(cons);
   // Remove all previous proxies before adding new ones.
   this->RemoveAllPreviousProxies();
+
+  unsigned int numConsIDs = cons->GetNumberOfIDs();
+  
   for (unsigned int idx=0; idx < numProxies; idx++)
     {
-    *str << vtkClientServerStream::Invoke << objectId << this->Command;
     vtkSMProxy* proxy = this->GetProxy(idx);
-    if (proxy)
+    if (!proxy)
       {
-      // Keep track of all proxies that point to this as a
-      // consumer so that we can remove this from the consumer
-      // list later if necessary
-      this->AddPreviousProxy(proxy);
-      proxy->AddConsumer(this, cons);
-      if (this->UpdateSelf)
+      vtkClientServerID nullID = { 0 };
+      *str << vtkClientServerStream::Invoke << objectId << this->Command
+        << nullID << vtkClientServerStream::End;
+      continue;
+      }
+  
+    // Keep track of all proxies that point to this as a
+    // consumer so that we can remove this from the consumer
+    // list later if necessary
+    this->AddPreviousProxy(proxy);
+    proxy->AddConsumer(this, cons);
+
+    if (this->UpdateSelf)
+      {
+      *str << vtkClientServerStream::Invoke << objectId << this->Command
+        << proxy << vtkClientServerStream::End;
+      continue;
+      }
+
+    unsigned int numIDs = proxy->GetNumberOfIDs();
+    // Determine now the IDs are added.
+    if (numConsIDs == numIDs)
+      {
+      // One to One Mapping between the IDs.
+      for (unsigned int i = 0; i < numIDs; i++)
         {
-        *str << proxy;
-        }
-      else
-        {
-        int numIDs = proxy->GetNumberOfIDs();
-        for(int i=0; i<numIDs; i++)
+        if (cons->GetID(i) == objectId)
           {
-          *str << proxy->GetID(i);
+          // This check is essential since AppendCommandToStream is called
+          // for all IDs in cons.
+          *str << vtkClientServerStream::Invoke << objectId << this->Command
+            << proxy->GetID(i)
+            << vtkClientServerStream::End;
           }
         }
       }
-    else
+    else if (numConsIDs == 1)
       {
-      vtkClientServerID nullID = { 0 };
-      *str << nullID;
+      // One to Many Mapping.
+      for (unsigned int i=0 ; i < numIDs; i++)
+        {
+        *str << vtkClientServerStream::Invoke << objectId << this->Command
+          << proxy->GetID(i) << vtkClientServerStream::End;
+        }
       }
-    *str << vtkClientServerStream::End;
+    else if (numIDs == 1)
+      {
+      // Many to One Mapping.
+      // No need to loop since AppendCommandToStream is called
+      // for all IDs in cons.
+      *str << vtkClientServerStream::Invoke << objectId << this->Command
+        << proxy->GetID(0)
+        << vtkClientServerStream::End;
+      }
     }
 }
 
