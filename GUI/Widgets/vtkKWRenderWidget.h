@@ -267,6 +267,7 @@ protected:
   int InExpose;
   int RenderState;
   int Printing;
+  Tcl_TimerToken InteractorTimerToken;
   
   char *DistanceUnits;
 

@@ -36,11 +36,16 @@
 #endif
 
 vtkStandardNewMacro(vtkKWRenderWidget);
-vtkCxxRevisionMacro(vtkKWRenderWidget, "1.74");
+vtkCxxRevisionMacro(vtkKWRenderWidget, "1.75");
 
 //----------------------------------------------------------------------------
 vtkKWRenderWidget::vtkKWRenderWidget()
 {
+  // The main callback
+
+  this->Observer = vtkKWRenderWidgetCallbackCommand::New();
+  this->EventIdentifier = -1;
+
   // The vtkTkRenderWidget
 
   this->ParentWindow = NULL;
@@ -69,6 +74,9 @@ vtkKWRenderWidget::vtkKWRenderWidget()
   this->Interactor = vtkKWGenericRenderWindowInteractor::New();
   this->Interactor->SetRenderWidget(this);  
   this->Interactor->SetRenderWindow(this->RenderWindow);
+  this->Interactor->AddObserver(vtkCommand::CreateTimerEvent, this->Observer);
+  this->Interactor->AddObserver(vtkCommand::DestroyTimerEvent, this->Observer);
+  this->InteractorTimerToken = NULL;
 
   // Corner annotation
 
@@ -104,11 +112,6 @@ vtkKWRenderWidget::vtkKWRenderWidget()
     cam->ParallelProjectionOn();
     }
   this->GetOverlayRenderer()->SetActiveCamera(cam);
-
-  // The main callback
-
-  this->Observer = vtkKWRenderWidgetCallbackCommand::New();
-  this->EventIdentifier = -1;
 
   // Current state (render mode, in expose, printing, etc)
 
@@ -155,6 +158,12 @@ vtkKWRenderWidget::~vtkKWRenderWidget()
     this->Interactor->SetInteractorStyle(NULL);
     this->Interactor->Delete();
     this->Interactor = NULL;
+    }
+
+  if (this->InteractorTimerToken)
+    {
+    Tcl_DeleteTimerHandler(this->InteractorTimerToken);
+    this->InteractorTimerToken = NULL;
     }
 
   if (this->VTKWidget)
@@ -1173,12 +1182,46 @@ void vtkKWRenderWidget::RemoveObservers()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWRenderWidget::ProcessEvent(vtkObject *vtkNotUsed(caller),
+void vtkKWRenderWidget_InteractorTimer(ClientData arg)
+{
+  vtkRenderWindowInteractor *me = (vtkRenderWindowInteractor*)arg;
+  me->InvokeEvent(vtkCommand::TimerEvent);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWRenderWidget::ProcessEvent(vtkObject *caller,
                                      unsigned long event,
                                      void *calldata)
 {
+  // Handle the timer event for the generic interactor
+
+  if (caller == this->Interactor)
+    {
+    switch (event)
+      {
+      case vtkCommand::CreateTimerEvent:
+      case vtkCommand::DestroyTimerEvent:
+        if (this->InteractorTimerToken)
+          {
+          Tcl_DeleteTimerHandler(this->InteractorTimerToken);
+          this->InteractorTimerToken = NULL;
+          }
+        if (event == vtkCommand::CreateTimerEvent)
+          {
+          this->InteractorTimerToken = 
+            Tcl_CreateTimerHandler(10, 
+                                   vtkKWRenderWidget_InteractorTimer, 
+                                   (ClientData)caller);
+          }
+        break;
+      }
+    return;
+    }
+
+  // Handle event for this class
+
   const char *cptr = 0;
-  
+
   switch (event)
     {
     case vtkCommand::CursorChangedEvent:
@@ -1234,6 +1277,7 @@ void vtkKWRenderWidget::ProcessEvent(vtkObject *vtkNotUsed(caller),
         this->Script("%s config -cursor %s", 
                      this->GetParentWindow()->GetWidgetName(), cptr);
         }
+      break;
     }
 }
 
