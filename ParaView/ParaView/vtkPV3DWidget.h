@@ -158,6 +158,7 @@ protected:
 
   char* Widget3DTclName;
   vtkSetStringMacro(Widget3DTclName);
+  vtk3DWidget* Widget3D;
 
 private:  
   vtkPV3DWidget(const vtkPV3DWidget&); // Not implemented
