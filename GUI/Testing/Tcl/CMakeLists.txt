@@ -87,8 +87,7 @@ ENDIF(RUN_WITH_MPI)
 
 SET (PV_MPI_COMMANDS )
 IF(RUN_WITH_MPI)
-# some of the tests crash right now
-#  SET (PV_MPI_COMMANDS "--use-mpi=${VTK_MPIRUN_EXE}")
+  SET (PV_MPI_COMMANDS "--use-mpi=${VTK_MPIRUN_EXE}")
 ENDIF(RUN_WITH_MPI)
 FOREACH (tfile ${PROJECT_TESTS})
   ADD_TEST(${tfile}-ParaView ${PARAVIEW_EXECUTABLE} --disable-registry
