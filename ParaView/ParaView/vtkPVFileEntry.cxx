@@ -62,7 +62,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVFileEntry);
-vtkCxxRevisionMacro(vtkPVFileEntry, "1.43.2.6");
+vtkCxxRevisionMacro(vtkPVFileEntry, "1.43.2.7");
 
 //----------------------------------------------------------------------------
 vtkPVFileEntry::vtkPVFileEntry()
@@ -268,6 +268,13 @@ void vtkPVFileEntry::BrowseCallback()
   vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
   vtkKWLoadSaveDialog* loadDialog = pm->NewLoadSaveDialog();
   const char* fname = this->Entry->GetValue();
+
+  vtkPVApplication* pvApp = pm->GetPVApplication();
+  vtkPVWindow* win = 0;
+  if (pvApp)
+    {
+    win = pvApp->GetMainWindow();
+    }
   if (fname && fname[0])
     {
     char* path   = new char [ strlen(fname) + 1];
@@ -280,17 +287,16 @@ void vtkPVFileEntry::BrowseCallback()
     }
   else
     {
-    vtkPVApplication* pvApp = pm->GetPVApplication();
-    if (pvApp)
+    if (win)
       {
-      vtkPVWindow* win = pvApp->GetMainWindow();
-      if (win)
-        {
-        win->RetrieveLastPath(loadDialog, "OpenPath");
-        }
+      win->RetrieveLastPath(loadDialog, "OpenPath");
       }
     }
   loadDialog->Create(this->GetPVApplication(), 0);
+  if (win) 
+    { 
+    loadDialog->SetParent(this); 
+    }
   loadDialog->SetTitle(this->GetLabel()?this->GetLabel():"Select File");
   if(this->Extension)
     {
