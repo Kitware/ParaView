@@ -51,7 +51,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // ---------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWScale );
-vtkCxxRevisionMacro(vtkKWScale, "1.49");
+vtkCxxRevisionMacro(vtkKWScale, "1.50");
 
 int vtkKWScaleCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -305,18 +305,17 @@ void vtkKWScale::DisplayLabel(const char *label)
   
   if (!this->Label)
     {
-    this->Label = vtkKWWidget::New();
+    this->Label = vtkKWLabel::New();
     }
 
   if (!this->Label->IsCreated())
     {
     this->Label->SetParent(this);
-    this->Label->Create(this->Application, "label", "-anchor w");
+    this->Label->Create(this->Application, "-anchor w");
     this->Label->SetEnabled(this->Enabled);
     }
 
-  this->Script("%s configure -text {%s}",
-               this->Label->GetWidgetName(), label);
+  this->Label->SetLabel(label);
 
   this->PackWidget();
 }
@@ -376,7 +375,7 @@ void vtkKWScale::PackWidget()
   if (this->Label && this->Label->IsCreated())
     {
     this->Script("pack forget %s", this->Label->GetWidgetName());
-    const char *res =this->Script("%s cget -text", this->Label->GetWidgetName());
+    const char *res = this->Label->GetLabel();
     is_label_empty = (!res || !*res);
     if (!is_label_empty)
       {
@@ -945,8 +944,7 @@ void vtkKWScale::Resize()
   
   if (width < this->ShortWidth)
     {
-    this->Script("%s configure -text {}",
-                 this->Label->GetWidgetName());
+    this->Label->SetLabel("");
     if (this->RangeMinLabel && this->RangeMinLabel->IsCreated())
       {
       this->Script("%s configure -text {}",
@@ -976,8 +974,7 @@ void vtkKWScale::Resize()
     {
     this->Script("%s configure -sliderlength 20",
                  this->Scale->GetWidgetName());
-    this->Script("%s configure -text {%s}",
-                 this->Label->GetWidgetName(), this->ShortLabel);
+    this->Label->SetLabel(this->ShortLabel);
     this->PackRange = 0;
     this->PackEntry = 1;
     this->PackWidget();
@@ -986,8 +983,7 @@ void vtkKWScale::Resize()
     {
     this->Script("%s configure -sliderlength 25",
                  this->Scale->GetWidgetName());
-    this->Script("%s configure -text {%s}",
-                 this->Label->GetWidgetName(), this->NormalLabel);
+    this->Label->SetLabel(this->NormalLabel);
     this->PackRange = 0;
     this->PackEntry = 1;
     this->PackWidget();
@@ -996,8 +992,7 @@ void vtkKWScale::Resize()
     {
     this->Script("%s configure -sliderlength 30",
                  this->Scale->GetWidgetName());
-    this->Script("%s configure -text {%s}",
-                 this->Label->GetWidgetName(), this->NormalLabel);
+    this->Label->SetLabel(this->NormalLabel);
     
     if (this->RangeMinLabel && this->RangeMinLabel->IsCreated())
       {
@@ -1084,7 +1079,7 @@ void vtkKWScale::SetLabelWidth(int width)
 {
   if (this->Label && this->Label->IsCreated())
     {
-    this->Script("%s configure -width %d", this->Label->GetWidgetName(), width);
+    this->Label->SetWidth(width);
     }
 }
 

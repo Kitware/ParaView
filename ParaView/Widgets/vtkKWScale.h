@@ -96,7 +96,7 @@ public:
   // Get the corresponding internal objects.
   void DisplayEntry();  
   void DisplayLabel(const char *l);  
-  vtkGetObjectMacro(Label, vtkKWWidget);
+  vtkGetObjectMacro(Label, vtkKWLabel);
   vtkGetObjectMacro(Entry, vtkKWEntry);
   vtkSetStringMacro(ShortLabel);
   vtkGetStringMacro(ShortLabel);
@@ -206,7 +206,7 @@ protected:
 
   vtkKWWidget *Scale;
   vtkKWEntry  *Entry;
-  vtkKWWidget *Label;
+  vtkKWLabel  *Label;
   vtkKWWidget *TopLevel;
   vtkKWPushButton *PopupPushButton;
 
