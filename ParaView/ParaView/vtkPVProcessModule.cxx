@@ -84,7 +84,7 @@ struct vtkPVArgs
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProcessModule);
-vtkCxxRevisionMacro(vtkPVProcessModule, "1.22.2.1");
+vtkCxxRevisionMacro(vtkPVProcessModule, "1.22.2.2");
 
 int vtkPVProcessModuleCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -458,7 +458,7 @@ void vtkPVProcessModule::InitializeTclMethodImplementations()
     "    foreach f [lsort -dictionary $entries] {\n"
     "      if {[file isfile $f] && [file $perm $f]} {\n"
     "        lappend files $f\n"
-    "      } elseif {[file isdirectory $f] && [file $perm $f]} {\n"
+    "      } elseif {[file isdirectory $f] && [file readable $f]} {\n"
     "        lappend dirs $f\n"
     "      }\n"
     "    }\n"
