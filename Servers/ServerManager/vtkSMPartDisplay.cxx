@@ -45,7 +45,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMPartDisplay);
-vtkCxxRevisionMacro(vtkSMPartDisplay, "1.18");
+vtkCxxRevisionMacro(vtkSMPartDisplay, "1.19");
 
 //----------------------------------------------------------------------------
 vtkSMPartDisplay::vtkSMPartDisplay()
@@ -508,7 +508,9 @@ void vtkSMPartDisplay::CreateVTKObjects(int num)
     stream << vtkClientServerStream::Invoke << this->VolumeColorProxy->GetID(i)
           << "RemoveAllPoints"  << vtkClientServerStream::End;
     stream << vtkClientServerStream::Invoke << this->VolumeColorProxy->GetID(i)
-          << "SetColorSpaceToHSVNoWrap"  << vtkClientServerStream::End;
+          << "SetColorSpaceToHSV"  << vtkClientServerStream::End;
+    stream << vtkClientServerStream::Invoke << this->VolumeColorProxy->GetID(i)
+          << "HSVWrapOff"  << vtkClientServerStream::End;
     stream << vtkClientServerStream::Invoke << this->VolumeOpacityProxy->GetID(i)
           << "RemoveAllPoints" << vtkClientServerStream::End;
     
@@ -1215,7 +1217,9 @@ void vtkSMPartDisplay::ResetTransferFunctions(vtkPVArrayInformation *arrayInfo,
          << "AddHSVPoint" << range[1] << 0.0 << 1.0 << 1.0 
          << vtkClientServerStream::End;
   stream << vtkClientServerStream::Invoke << this->VolumeColorProxy->GetID(0)
-         << "SetColorSpaceToHSVNoWrap" << vtkClientServerStream::End;
+         << "SetColorSpaceToHSV" << vtkClientServerStream::End;
+  stream << vtkClientServerStream::Invoke << this->VolumeColorProxy->GetID(0)
+          << "HSVWrapOff"  << vtkClientServerStream::End;
   
   stream << vtkClientServerStream::Invoke << this->VolumePropertyProxy->GetID(0)
          << "SetScalarOpacityUnitDistance" << unitDistance << vtkClientServerStream::End;
