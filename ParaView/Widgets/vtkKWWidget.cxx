@@ -171,8 +171,8 @@ void vtkKWWidget::Create(vtkKWApplication *app, const char *name,
        !vtkString::Equals(type, "Toplevel") )
     {
     this->Script("%s configure -state %s", 
-		 this->GetWidgetName(),
-		 (this->Enabled ? "normal" : "disabled"));
+                 this->GetWidgetName(),
+                 (this->Enabled ? "normal" : "disabled"));
     }
 }
 
@@ -253,35 +253,35 @@ void vtkKWWidget::Focus()
 void vtkKWWidget::SetBind(vtkKWObject* CalledObject, const char *Event, const char *CommandString)
 {
   this->Application->Script("bind %s %s { %s %s }", this->GetWidgetName(), 
-			    Event, CalledObject->GetTclName(), CommandString);
+                            Event, CalledObject->GetTclName(), CommandString);
 }
 
 //------------------------------------------------------------------------------
 void vtkKWWidget::SetBind(const char *Event, const char *CommandString)
 {
   this->Application->Script("bind %s %s { %s }", this->GetWidgetName(), 
-			    Event, CommandString);
+                            Event, CommandString);
 }
 
 //------------------------------------------------------------------------------
 void vtkKWWidget::SetBind(const char *event, const char *widget, const char *command)
 {
   this->Application->Script("bind %s %s { %s %s }", this->GetWidgetName(), 
-			    event, widget, command);
+                            event, widget, command);
 }
 
 //------------------------------------------------------------------------------
 void vtkKWWidget::SetBindAll(const char *event, const char *widget, const char *command)
 {
   this->Application->Script("bind all %s { %s %s }", 
-			    event, widget, command);
+                            event, widget, command);
 }
 
 //------------------------------------------------------------------------------
 void vtkKWWidget::SetBindAll(const char *event, const char *command)
 {
   this->Application->Script("bind all %s { %s }", 
-			    event, command);
+                            event, command);
 }
 
 //------------------------------------------------------------------------------
@@ -297,8 +297,8 @@ char* vtkKWWidget::CreateCommand(vtkKWObject* CalledObject, const char * Command
 {
   ostrstream event;
   event << this->GetWidgetName() << " configure -command {" 
-	<< CalledObject->GetTclName() 
-	<< " " << CommandString << "} " << ends;
+        << CalledObject->GetTclName() 
+        << " " << CommandString << "} " << ends;
 
   return event.str();
 }
@@ -343,7 +343,7 @@ void vtkKWWidget::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWObject::SerializeRevision(os,indent);
   os << indent << "vtkKWWidget ";
-  this->ExtractRevision(os,"$Revision: 1.36 $");
+  this->ExtractRevision(os,"$Revision: 1.37 $");
 }
 
 //------------------------------------------------------------------------------
@@ -439,13 +439,13 @@ int vtkKWWidget::InitializeTrace()
 
 //------------------------------------------------------------------------------
 void vtkKWWidget::GetRGBColor(const char* color,
-			      int *rr, int *gg, int *bb)
+                              int *rr, int *gg, int *bb)
 {
   this->Script("winfo rgb %s %s",
-	       this->GetWidgetName(), color);
+               this->GetWidgetName(), color);
   int r, g, b;
   sscanf( this->Application->GetMainInterp()->result, "%d %d %d",
-	  &r, &g, &b );
+          &r, &g, &b );
   *rr = static_cast<int>((static_cast<float>(r) / 65535.0)*255.0);
   *gg = static_cast<int>((static_cast<float>(g) / 65535.0)*255.0);
   *bb = static_cast<int>((static_cast<float>(b) / 65535.0)*255.0); 
@@ -476,15 +476,15 @@ void vtkKWWidget::SetEnabled(int e)
     const char* type = this->GetType();
 
     if ( !vtkString::Equals(type, "Frame") && 
-	 !vtkString::Equals(type, "Menu")  && 
-	 !vtkString::Equals(type, "Canvas") && 
-	 !vtkString::Equals(type, "Label") && 
-	 !vtkString::Equals(type, "Scrollbar") && 
-	 !vtkString::Equals(type, "Listbox") && 
-	 !vtkString::Equals(type, "Toplevel"))
+         !vtkString::Equals(type, "Menu")  && 
+         !vtkString::Equals(type, "Canvas") && 
+         !vtkString::Equals(type, "Label") && 
+         !vtkString::Equals(type, "Scrollbar") && 
+         !vtkString::Equals(type, "Listbox") && 
+         !vtkString::Equals(type, "Toplevel"))
       {
       this->Script("%s configure -state %s", this->GetWidgetName(),
-		   (this->Enabled ? "normal" : "disabled"));
+                   (this->Enabled ? "normal" : "disabled"));
       }
     }
   this->Modified();

@@ -65,6 +65,7 @@ public:
   // Description:
   // Create a Tk widget
   void Create(vtkKWApplication *app,const char *name, const char *args);
+  int IsCreated() { return (this->Application != 0); }
 
   // Description:
   // Get the name of the underlying tk widget being used
@@ -97,7 +98,7 @@ public:
   // name of the method to be called and any arguments in string form.
   // The calling is done via TCL wrappers for the KWObject.
   virtual void SetCommand( vtkKWObject* Object, 
-			   const char* MethodAndArgString);
+                           const char* MethodAndArgString);
 
   // Description:
   // Get the string type of a widget.
