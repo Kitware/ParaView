@@ -150,6 +150,12 @@ public:
   // in the Status frame on the bottom right of the window.
   vtkGetObjectMacro(ProgressGauge, vtkKWProgressGauge);
  
+  // Description:
+  // Will the window add a help menu?
+  vtkSetClampMacro( SupportHelp, int, 0, 1 );
+  vtkGetMacro( SupportHelp, int );
+  vtkBooleanMacro( SupportHelp, int );
+  
 protected:
   vtkKWWindow();
   ~vtkKWWindow();
@@ -180,6 +186,8 @@ protected:
   vtkKWWidget *ToolbarFrame;
   float      PrintTargetDPI;
   vtkKWMenu *PageMenu;
+
+  int SupportHelp;
 };
 
 
