@@ -124,7 +124,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.525");
+vtkCxxRevisionMacro(vtkPVWindow, "1.526");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -299,6 +299,8 @@ vtkPVWindow::~vtkPVWindow()
     vtkPVProcessModule *pm = pvApp->GetProcessModule();
     vtkClientServerStream& stream = pm->GetStream();
     stream << vtkClientServerStream::Invoke << this->InteractorID << "SetRenderWindow" 
+           << 0 << vtkClientServerStream::End;
+    stream << vtkClientServerStream::Invoke << this->InteractorID << "SetRenderer" 
            << 0 << vtkClientServerStream::End;
     pm->DeleteStreamObject(this->InteractorID);
     pm->SendStreamToClientAndServer();
@@ -929,6 +931,9 @@ void vtkPVWindow::Create(vtkKWApplication *app, const char* vtkNotUsed(args))
   vtkClientServerStream& stream = pm->GetStream();
   stream << vtkClientServerStream::Invoke << this->InteractorID << "SetRenderWindow" 
          << pvApp->GetRenderModule()->GetRenderWindowID()
+         << vtkClientServerStream::End;
+  stream << vtkClientServerStream::Invoke << this->InteractorID << "SetRenderer" 
+         << pvApp->GetRenderModule()->GetRendererID()
          << vtkClientServerStream::End;
   stream << vtkClientServerStream::Invoke << this->InteractorID 
          << "SetInteractorStyle" << 0 << vtkClientServerStream::End;

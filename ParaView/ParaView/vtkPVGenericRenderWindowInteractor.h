@@ -21,6 +21,7 @@
 #include "vtkGenericRenderWindowInteractor.h"
 
 class vtkPVRenderView;
+class vtkRenderer;
 
 class VTK_EXPORT vtkPVGenericRenderWindowInteractor : public vtkGenericRenderWindowInteractor
 {
@@ -33,16 +34,25 @@ public:
   vtkGetObjectMacro(PVRenderView, vtkPVRenderView);
 
   // Description:
+  // My sollution to the poked renderer problem.
+  // This interactor class always returns this renderer as poked render.
+  // This insures the 2D renderer will never be poked.
+  void SetRenderer(vtkRenderer *view);
+  vtkGetObjectMacro(Renderer,vtkRenderer);
+  virtual vtkRenderer *FindPokedRenderer(int,int);
+
+  // Description:
   // Set the event onformation, but remember keys from before.
   void SetMoveEventInformationFlipY(int x, int y);
-
 
   // Description:
   // 3D widgets call render on this interactor directly.
   // They call SetInteractive to tell whether to use still or interactive rendering.
   // This class just forwards the render request to ParaView's RenderModule.
   // DesiredUpdateRate is ignored.
-  vtkSetMacro(InteractiveRenderEnabled,int);
+  // Since I was having trouble with the 3D widget doing the final full res render,
+  // setting this to 0 causes the render view to eventually render.
+  void SetInteractiveRenderEnabled(int);
   vtkGetMacro(InteractiveRenderEnabled,int);
   vtkBooleanMacro(InteractiveRenderEnabled,int);
   virtual void Render();
@@ -66,6 +76,7 @@ protected:
   vtkPVRenderView *PVRenderView;
   int ReductionFactor;
   int InteractiveRenderEnabled;
+  vtkRenderer* Renderer;
 
 private:
   vtkPVGenericRenderWindowInteractor(const vtkPVGenericRenderWindowInteractor&); // Not implemented

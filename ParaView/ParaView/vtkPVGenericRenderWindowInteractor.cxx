@@ -14,6 +14,7 @@
 =========================================================================*/
 #include "vtkPVGenericRenderWindowInteractor.h"
 
+#include "vtkRenderer.h"
 #include "vtkPVRenderView.h"
 #include "vtkObjectFactory.h"
 #include "vtkRenderWindow.h"
@@ -21,12 +22,14 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVGenericRenderWindowInteractor);
-vtkCxxRevisionMacro(vtkPVGenericRenderWindowInteractor, "1.15");
+vtkCxxRevisionMacro(vtkPVGenericRenderWindowInteractor, "1.16");
+vtkCxxSetObjectMacro(vtkPVGenericRenderWindowInteractor,Renderer,vtkRenderer);
 
 //----------------------------------------------------------------------------
 vtkPVGenericRenderWindowInteractor::vtkPVGenericRenderWindowInteractor()
 {
   this->PVRenderView = NULL;
+  this->Renderer = NULL;
   this->ReductionFactor = 1;
   this->InteractiveRenderEnabled = 0;
 }
@@ -35,6 +38,7 @@ vtkPVGenericRenderWindowInteractor::vtkPVGenericRenderWindowInteractor()
 vtkPVGenericRenderWindowInteractor::~vtkPVGenericRenderWindowInteractor()
 {
   this->SetPVRenderView(NULL);
+  this->SetRenderer(NULL);
 }
 
 //----------------------------------------------------------------------------
@@ -61,6 +65,18 @@ void vtkPVGenericRenderWindowInteractor::SetMoveEventInformationFlipY(
 }
 
 //----------------------------------------------------------------------------
+vtkRenderer* vtkPVGenericRenderWindowInteractor::FindPokedRenderer(int,int)
+{
+  if (this->Renderer == NULL)
+    {
+    vtkErrorMacro("Renderer has not been set.");
+    }
+
+  return this->Renderer;
+}
+
+
+//----------------------------------------------------------------------------
 void vtkPVGenericRenderWindowInteractor::Render()
 {
   if ( this->PVRenderView == NULL || this->RenderWindow == NULL)
@@ -78,6 +94,24 @@ void vtkPVGenericRenderWindowInteractor::Render()
     this->PVRenderView->EventuallyRender();
     }
 }
+
+
+//----------------------------------------------------------------------------
+void vtkPVGenericRenderWindowInteractor::SetInteractiveRenderEnabled(int val)
+{
+  if (this->InteractiveRenderEnabled == val)
+    {
+    return;
+    }
+  this->Modified();
+  this->InteractiveRenderEnabled = val;
+  if (val == 0 && this->PVRenderView)
+    {
+    this->PVRenderView->EventuallyRender();
+    }
+}
+
+
 
 // Special methods for forwarding events to satellite processes.
 // The take care of the reduction factor by comparing 
