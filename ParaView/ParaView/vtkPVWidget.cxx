@@ -67,7 +67,7 @@ template class VTK_EXPORT vtkArrayMapIterator<vtkPVWidget*, vtkPVWidget*>;
 #endif
 
 //-----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkPVWidget, "1.35.2.1");
+vtkCxxRevisionMacro(vtkPVWidget, "1.35.2.2");
 
 //-----------------------------------------------------------------------------
 vtkPVWidget::vtkPVWidget()
@@ -159,9 +159,9 @@ void vtkPVWidget::Accept()
 //-----------------------------------------------------------------------------
 void vtkPVWidget::AcceptInternal(const char*)
 {
-  // Get rid of this eventually.  Display widgets (label) do not really
-  // need to implement this method.
-  //vtkErrorMacro("AcceptInternal not defined. " << this->GetClassName());
+  // Suppress reset just allows the widget to set its own default value.
+  // After accept is called, we want to enable the reset.
+  this->SuppressReset = 0;
 }
 
 //-----------------------------------------------------------------------------
