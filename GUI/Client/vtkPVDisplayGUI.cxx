@@ -84,7 +84,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVDisplayGUI);
-vtkCxxRevisionMacro(vtkPVDisplayGUI, "1.8");
+vtkCxxRevisionMacro(vtkPVDisplayGUI, "1.9");
 
 int vtkPVDisplayGUICommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -995,8 +995,20 @@ void vtkPVDisplayGUI::ShowVolumeAppearanceEditor()
   if ( menuValue && strlen(menuValue) > 6 )
     {
     vtkPVDataInformation* dataInfo = source->GetDataInformation();
-    vtkPVDataSetAttributesInformation *attrInfo = dataInfo->GetPointDataInformation();
-    vtkPVArrayInformation *arrayInfo = attrInfo->GetArrayInformation(menuValue+6);
+    vtkPVArrayInformation *arrayInfo;
+    int colorField = this->PVSource->GetPartDisplay()->GetColorField();
+    if (colorField == vtkDataSet::POINT_DATA_FIELD)
+      {
+      vtkPVDataSetAttributesInformation *attrInfo
+        = dataInfo->GetPointDataInformation();
+      arrayInfo = attrInfo->GetArrayInformation(menuValue+6);
+      }
+    else
+      {
+      vtkPVDataSetAttributesInformation *attrInfo
+        = dataInfo->GetCellDataInformation();
+      arrayInfo = attrInfo->GetArrayInformation(menuValue+5);
+      }
     this->VolumeAppearanceEditor->SetPVSourceAndArrayInfo( source, arrayInfo );
     }
   else
@@ -1131,8 +1143,42 @@ void vtkPVDisplayGUI::UpdateInternal()
       {
       sprintf(tmp, "Point %s", arrayInfo->GetName());
       this->VolumeScalarsMenu->AddEntryWithCommand(tmp, this, volCmd);
-      if ( (firstField && !strlen(currentVolumeField)) ||
-           !strcmp( tmp, currentVolumeField ) )
+      if ( firstField || (strcmp(tmp, currentVolumeField) == 0) )
+        {
+        this->VolumeScalarsMenu->SetValue( tmp );
+        volRenArray = arrayInfo;
+        firstField = 0;
+        }
+      }
+    if (attrInfo->IsArrayAnAttribute(i) == vtkDataSetAttributes::SCALARS)
+      {
+      strcpy(defCmd, tmp);
+      defPoint = 1;
+      defArray = arrayInfo;
+      if ( !strlen(currentVolumeField) )
+        {
+        volRenArray = arrayInfo;
+        this->VolumeScalarsMenu->SetValue( tmp );
+        }
+      }
+    }
+  
+  attrInfo = dataInfo->GetCellDataInformation();
+  numArrays = attrInfo->GetNumberOfArrays();
+  for (i = 0; i < numArrays; i++)
+    {
+    arrayInfo = attrInfo->GetArrayInformation(i);
+    numComps = arrayInfo->GetNumberOfComponents();
+    sprintf(volCmd, "VolumeRenderCellField {%s}", arrayInfo->GetName());
+    if (numComps > 1)
+      {
+      sprintf(tmp, "Cell %s (%d)", arrayInfo->GetName(), numComps);
+      }
+    else
+      {
+      sprintf(tmp, "Cell %s", arrayInfo->GetName());
+      this->VolumeScalarsMenu->AddEntryWithCommand(tmp, this, volCmd);
+      if ( firstField || (strcmp(tmp, currentVolumeField) == 0) )
         {
         this->VolumeScalarsMenu->SetValue( tmp );
         volRenArray = arrayInfo;
@@ -1519,6 +1565,46 @@ void vtkPVDisplayGUI::VolumeRenderPointFieldInternal(const char *name)
 }
 
 //----------------------------------------------------------------------------
+// Select which cell field to use for volume rendering
+//
+void vtkPVDisplayGUI::VolumeRenderCellField(const char *name)
+{
+  if (name == NULL)
+    {
+    return;
+    }
+
+  this->AddTraceEntry("$kw(%s) VolumeRenderCellField {%s}", 
+                      this->GetTclName(), name);
+
+  char *str;
+  str = new char [strlen(name) + 16];
+  sprintf(str, "Cell %s", name);
+  
+  // Update the transfer functions  
+  vtkPVDataInformation* dataInfo = this->GetPVSource()->GetDataInformation();
+  vtkPVDataSetAttributesInformation *attrInfo = dataInfo->GetCellDataInformation();
+  vtkPVArrayInformation *arrayInfo = attrInfo->GetArrayInformation(name);
+  
+  this->PVSource->GetPartDisplay()->ResetTransferFunctions(arrayInfo, dataInfo);
+  
+  this->VolumeScalarsMenu->SetValue(str);
+  this->VolumeRenderCellFieldInternal(name);
+  
+  delete [] str;
+}
+
+//----------------------------------------------------------------------------
+void vtkPVDisplayGUI::VolumeRenderCellFieldInternal(const char *name)
+{
+  this->PVSource->GetPartDisplay()->VolumeRenderCellField( name );
+  if ( this->GetPVRenderView() )
+    {
+    this->GetPVRenderView()->EventuallyRender();
+    }
+}
+
+//----------------------------------------------------------------------------
 void vtkPVDisplayGUI::ColorByPointField(const char *name, int numComps)
 {
   if (name == NULL)
@@ -1747,7 +1833,7 @@ void vtkPVDisplayGUI::DrawVolume()
   this->VolumeRenderModeOn();
   
   this->PVSource->GetPartDisplay()->SetRepresentation(VTK_VOLUME);
-  
+
   if ( this->GetPVRenderView() )
     {
     this->GetPVRenderView()->EventuallyRender();

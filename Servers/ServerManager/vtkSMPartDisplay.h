@@ -149,8 +149,12 @@ public:
   void InvalidateGeometry();
 
   // Description:
-  // Select the point field to use for volume rendering
+  // Select a point field to use for volume rendering
   void VolumeRenderPointField(const char *name);
+
+  // Description:
+  // Select a cell field to use for volume rendering
+  void VolumeRenderCellField(const char *name);
 
   // Description:
   // Turn on/off volume rendering. This controls which prop is 

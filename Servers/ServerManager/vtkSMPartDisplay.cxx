@@ -46,7 +46,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMPartDisplay);
-vtkCxxRevisionMacro(vtkSMPartDisplay, "1.9");
+vtkCxxRevisionMacro(vtkSMPartDisplay, "1.10");
 
 
 //----------------------------------------------------------------------------s
@@ -1233,6 +1233,8 @@ void vtkSMPartDisplay::VolumeRenderPointField(const char *name)
     }
   vtkClientServerStream& stream = pm->GetStream();
 
+  this->ColorField = vtkDataSet::POINT_DATA_FIELD;
+
   int i, num;
   num = this->VolumeFieldFilterProxy->GetNumberOfIDs();
   for (i = 0; i < num; ++i)
@@ -1241,6 +1243,34 @@ void vtkSMPartDisplay::VolumeRenderPointField(const char *name)
           << "SetInputFieldToPointDataField" << vtkClientServerStream::End;
     stream << vtkClientServerStream::Invoke << this->VolumeFieldFilterProxy->GetID(i)
           << "SetOutputAttributeDataToPointData" << vtkClientServerStream::End;
+    stream << vtkClientServerStream::Invoke << this->VolumeFieldFilterProxy->GetID(i)
+          << "SetScalarComponent" << 0 << name << 0 << vtkClientServerStream::End;
+    }
+  pm->SendStream(vtkProcessModule::DATA_SERVER);
+
+}
+
+//----------------------------------------------------------------------------
+void vtkSMPartDisplay::VolumeRenderCellField(const char *name)
+{
+  vtkPVProcessModule* pm = this->GetProcessModule();
+  if ( !pm )
+    {
+    vtkErrorMacro("Set the ProcessModule before you connect.");
+    return;
+    }
+  vtkClientServerStream& stream = pm->GetStream();
+
+  this->ColorField = vtkDataSet::CELL_DATA_FIELD;
+
+  int i, num;
+  num = this->VolumeFieldFilterProxy->GetNumberOfIDs();
+  for (i = 0; i < num; ++i)
+    {
+    stream << vtkClientServerStream::Invoke << this->VolumeFieldFilterProxy->GetID(i)
+          << "SetInputFieldToCellDataField" << vtkClientServerStream::End;
+    stream << vtkClientServerStream::Invoke << this->VolumeFieldFilterProxy->GetID(i)
+          << "SetOutputAttributeDataToCellData" << vtkClientServerStream::End;
     stream << vtkClientServerStream::Invoke << this->VolumeFieldFilterProxy->GetID(i)
           << "SetScalarComponent" << 0 << name << 0 << vtkClientServerStream::End;
     }
