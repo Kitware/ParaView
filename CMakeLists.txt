@@ -156,7 +156,7 @@ SET(VTK_INCLUDE_DIR
   ${ParaView_SOURCE_DIR}/VTK/Utilities
   ${ParaView_BINARY_DIR}/VTK/Utilities
   )
-SET(kits Common Filtering IO Imaging Rendering Parallel Graphics Hybrid)
+SET(kits Common Filtering GenericFiltering IO Imaging Rendering Parallel Graphics Hybrid)
 IF(VTK_USE_PATENTED)
   SET(kits ${kits} Patented)
 ENDIF(VTK_USE_PATENTED)
