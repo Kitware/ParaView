@@ -40,7 +40,7 @@
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkPVLineWidget);
-vtkCxxRevisionMacro(vtkPVLineWidget, "1.58");
+vtkCxxRevisionMacro(vtkPVLineWidget, "1.59");
 
 //----------------------------------------------------------------------------
 vtkPVLineWidget::vtkPVLineWidget()
@@ -462,10 +462,8 @@ void vtkPVLineWidget::ActualPlaceWidget()
 //----------------------------------------------------------------------------
 void vtkPVLineWidget::SaveInBatchScript(ofstream *file)
 {
-  //TODO: this method is incorrect. Why was this method incorrect even
-  //before the changes were made? Is this never invoked?
-  //I believe it is so, since PVLineWidget is used only(?) while
-  //creating a line source, so, it is not saved in batch script.
+  // First create the Line Widget proxy.
+  this->WidgetProxy->SaveInBatchScript(file);
 
   vtkClientServerID sourceID = this->PVSource->GetVTKSourceID(0);
 
@@ -481,7 +479,14 @@ void vtkPVLineWidget::SaveInBatchScript(ofstream *file)
       << sdvp->GetElement(0) << " "
       << sdvp->GetElement(1) << " "
       << sdvp->GetElement(2) << endl;
+    *file << "  [$pvTemp" << sourceID << " GetProperty "
+      << variablename << "] SetControllerProxy $pvTemp" << this->WidgetProxy->GetID(0)
+      << endl;
+    *file << "  [$pvTemp" << sourceID << " GetProperty "
+      << variablename << "] SetControllerProperty [$pvTemp" << this->WidgetProxy->GetID(0)
+      << " GetProperty Point1]" << endl;
     }
+
   // Point2
   variablename = (this->Point2Variable)? this->Point2Variable : "Point2";
   sdvp = vtkSMDoubleVectorProperty::SafeDownCast(
@@ -493,6 +498,12 @@ void vtkPVLineWidget::SaveInBatchScript(ofstream *file)
       << sdvp->GetElement(0) << " "
       << sdvp->GetElement(1) << " "
       << sdvp->GetElement(2) << endl;
+    *file << "  [$pvTemp" << sourceID << " GetProperty "
+      << variablename << "] SetControllerProxy $pvTemp" << this->WidgetProxy->GetID(0)
+      << endl;
+    *file << "  [$pvTemp" << sourceID << " GetProperty "
+      << variablename << "] SetControllerProperty [$pvTemp" << this->WidgetProxy->GetID(0)
+      << " GetProperty Point2]" << endl;   
     }
 
   // Resolution
@@ -505,6 +516,12 @@ void vtkPVLineWidget::SaveInBatchScript(ofstream *file)
       *file << "  " << "[$pvTemp" << sourceID << " GetProperty " 
         << variablename << "] SetElements1 "
         << sivp->GetElement(0) << endl;
+      *file << "  [$pvTemp" << sourceID << " GetProperty "
+        << variablename << "] SetControllerProxy $pvTemp" << this->WidgetProxy->GetID(0)
+        << endl;
+      *file << "  [$pvTemp" << sourceID << " GetProperty "
+        << variablename << "] SetControllerProperty [$pvTemp" << this->WidgetProxy->GetID(0)
+        << " GetProperty Resolution]" << endl;
       }
     }
 }

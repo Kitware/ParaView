@@ -42,7 +42,7 @@
 #include "vtkSMDoubleVectorProperty.h"
 
 vtkStandardNewMacro(vtkPVPointWidget);
-vtkCxxRevisionMacro(vtkPVPointWidget, "1.39");
+vtkCxxRevisionMacro(vtkPVPointWidget, "1.40");
 
 int vtkPVPointWidgetCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -207,15 +207,13 @@ void vtkPVPointWidget::Trace(ofstream *file)
 //----------------------------------------------------------------------------
 void vtkPVPointWidget::SaveInBatchScript(ofstream *file)
 {
-  //Same as vtkPVLineWidget::SaveInBatchScript, probably never invoked.
-  //Only the derrived class SaveInBatchScript is used.
-
   vtkClientServerID sourceID = this->PVSource->GetVTKSourceID(0);
   vtkSMSourceProxy* sproxy = this->GetPVSource()->GetProxy();
   const char* variablename = (this->VariableName)? this->VariableName : "Position";
   vtkSMDoubleVectorProperty* sdvp = vtkSMDoubleVectorProperty::SafeDownCast(
     sproxy->GetProperty(variablename));
 
+  this->WidgetProxy->SaveInBatchScript(file);
   // Point1
   if (sdvp)
     {  
@@ -224,8 +222,14 @@ void vtkPVPointWidget::SaveInBatchScript(ofstream *file)
           << sdvp->GetElement(0) << " "
           << sdvp->GetElement(1) << " "
           << sdvp->GetElement(2) << endl;
+    *file << "  [$pvTemp" << sourceID << " GetProperty "
+      << variablename << "] SetControllerProxy $pvTemp"
+      << this->WidgetProxy->GetID(0) << endl;
+    *file << "  [$pvTemp" << sourceID << " GetProperty "
+      << variablename << "] SetControllerProperty [$pvTemp"
+      << this->WidgetProxy->GetID(0) 
+      << " GetProperty Position]" << endl;
     }
-  this->WidgetProxy->SaveInBatchScript(file);
 }
 
 //----------------------------------------------------------------------------
