@@ -39,7 +39,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVExtentEntry);
-vtkCxxRevisionMacro(vtkPVExtentEntry, "1.49");
+vtkCxxRevisionMacro(vtkPVExtentEntry, "1.50");
 
 vtkCxxSetObjectMacro(vtkPVExtentEntry, InputMenu, vtkPVInputMenu);
 
@@ -297,6 +297,7 @@ void vtkPVExtentEntry::Trace(ofstream *file)
 void vtkPVExtentEntry::Initialize()
 {
   this->Update();
+  this->Accept();
 }
 
 //-----------------------------------------------------------------------------
@@ -306,7 +307,7 @@ void vtkPVExtentEntry::ResetInternal()
     this->GetSMProperty());
   if (ivp)
     {
-    this->SetValue(ivp->GetElement(0), ivp->GetElement(1),
+    this->SetValueInternal(ivp->GetElement(0), ivp->GetElement(1),
                    ivp->GetElement(2), ivp->GetElement(3),
                    ivp->GetElement(4), ivp->GetElement(5));
     }
@@ -337,6 +338,14 @@ void vtkPVExtentEntry::SetRange(int v0, int v1, int v2,
 
 //-----------------------------------------------------------------------------
 void vtkPVExtentEntry::SetValue(int v0, int v1, int v2, 
+                                int v3, int v4, int v5)
+{
+  this->SetValueInternal(v0, v1, v2, v3, v4, v5); 
+  this->ModifiedCallback();
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVExtentEntry::SetValueInternal(int v0, int v1, int v2, 
                                 int v3, int v4, int v5)
 {
   float range[2];
@@ -375,8 +384,6 @@ void vtkPVExtentEntry::SetValue(int v0, int v1, int v2,
     this->MinMax[2]->SetMinValue(v4);
     this->MinMax[2]->SetMaxValue(v5);
     }
-  
-  this->ModifiedCallback();
 }
 
 //-----------------------------------------------------------------------------

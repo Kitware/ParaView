@@ -144,6 +144,7 @@ protected:
   int Range[6];
   vtkPVMinMax* MinMax[3];
 
+  void SetValueInternal(int v1, int v2, int v3, int v4, int v5, int v6);
 //BTX
   virtual void CopyProperties(vtkPVWidget* clone, vtkPVSource* pvSource,
                               vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
