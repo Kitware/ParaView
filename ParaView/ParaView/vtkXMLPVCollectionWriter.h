@@ -25,6 +25,7 @@
 
 #include "vtkXMLWriter.h"
 
+class vtkCallbackCommand;
 class vtkXMLPVCollectionWriterInternals;
 
 class VTK_EXPORT vtkXMLPVCollectionWriter : public vtkXMLWriter
@@ -86,6 +87,15 @@ protected:
   // Whether to write the collection file on this node.
   int WriteCollectionFile;
   int WriteCollectionFileInitialized;
+  
+  // Callback registered with the ProgressObserver.
+  static void ProgressCallbackFunction(vtkObject*, unsigned long, void*,
+                                       void*);
+  // Progress callback from internal writer.
+  virtual void ProgressCallback(vtkProcessObject* w);
+  
+  // The observer to report progress from the internal writer.
+  vtkCallbackCommand* ProgressObserver;  
   
 private:
   vtkXMLPVCollectionWriter(const vtkXMLPVCollectionWriter&);  // Not implemented.

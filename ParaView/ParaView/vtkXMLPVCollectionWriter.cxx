@@ -17,6 +17,7 @@
 =========================================================================*/
 #include "vtkXMLPVCollectionWriter.h"
 
+#include "vtkCallbackCommand.h"
 #include "vtkImageData.h"
 #include "vtkObjectFactory.h"
 #include "vtkPolyData.h"
@@ -42,7 +43,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkXMLPVCollectionWriter);
-vtkCxxRevisionMacro(vtkXMLPVCollectionWriter, "1.1");
+vtkCxxRevisionMacro(vtkXMLPVCollectionWriter, "1.2");
 
 class vtkXMLPVCollectionWriterInternals
 {
@@ -60,11 +61,17 @@ vtkXMLPVCollectionWriter::vtkXMLPVCollectionWriter()
   this->NumberOfPieces = 1;
   this->WriteCollectionFileInitialized = 0;
   this->WriteCollectionFile = 0;
+
+  // Setup a callback for the internal writers to report progress.
+  this->ProgressObserver = vtkCallbackCommand::New();
+  this->ProgressObserver->SetCallback(&vtkXMLPVCollectionWriter::ProgressCallbackFunction);
+  this->ProgressObserver->SetClientData(this);
 }
 
 //----------------------------------------------------------------------------
 vtkXMLPVCollectionWriter::~vtkXMLPVCollectionWriter()
 {
+  this->ProgressObserver->Delete();
   delete this->Internal;
 }
 
@@ -102,18 +109,6 @@ int vtkXMLPVCollectionWriter::WriteInternal()
   // Create writers for each input.
   this->CreateWriters();
   
-  // Write each input.
-  int i;
-  for(i=0; i < this->GetNumberOfInputs(); ++i)
-    {
-    if(this->Internal->Writers[i].GetPointer())
-      {
-      vtkstd::string fname = this->Internal->CreatePieceFileName(i);
-      this->Internal->Writers[i]->SetFileName(fname.c_str());
-      this->Internal->Writers[i]->Write();
-      }
-    }
-  
   // Decide whether to write the collection file.
   int writeCollection = 0;
   if(this->WriteCollectionFileInitialized)
@@ -125,9 +120,43 @@ int vtkXMLPVCollectionWriter::WriteInternal()
     writeCollection = 1;
     }
   
+  float progressRange[2] = {0,0};
+  this->GetProgressRange(progressRange);
+  
+  // Write each input.
+  int i;
+  for(i=0; i < this->GetNumberOfInputs(); ++i)
+    {
+    this->SetProgressRange(progressRange, i,
+                           this->GetNumberOfInputs()+writeCollection);
+    if(vtkXMLWriter* w = this->Internal->Writers[i].GetPointer())
+      {
+      // Set the file name.
+      vtkstd::string fname = this->Internal->CreatePieceFileName(i);
+      w->SetFileName(fname.c_str());
+      
+      // Copy settings to the writer.
+      w->SetDebug(this->GetDebug());
+      w->SetByteOrder(this->GetByteOrder());
+      w->SetCompressor(this->GetCompressor());
+      w->SetBlockSize(this->GetBlockSize());
+      w->SetDataMode(this->GetDataMode());
+      w->SetEncodeAppendedData(this->GetEncodeAppendedData());
+      
+      w->AddObserver(vtkCommand::ProgressEvent, this->ProgressObserver);
+      
+      // Write the data.
+      w->Write();
+      
+      w->RemoveObserver(this->ProgressObserver);
+      }
+    }
+  
   // Write the collection file if requested.
   if(writeCollection)
     {
+    this->SetProgressRange(progressRange, this->GetNumberOfInputs(),
+                           this->GetNumberOfInputs()+writeCollection);
     if(!this->Superclass::WriteInternal()) { return 0; }
     }
   
@@ -365,4 +394,30 @@ vtkXMLPVCollectionWriterInternals::CreatePieceFileName(int index)
   fname = fn_with_warning_C4701.str();
   fn_with_warning_C4701.rdbuf()->freeze(0);
   return fname;
+}
+
+//----------------------------------------------------------------------------
+void vtkXMLPVCollectionWriter::ProgressCallbackFunction(vtkObject* caller,
+                                                        unsigned long,
+                                                        void* clientdata,
+                                                        void*)
+{
+  vtkProcessObject* w = vtkProcessObject::SafeDownCast(caller);
+  if(w)
+    {
+    reinterpret_cast<vtkXMLPVCollectionWriter*>(clientdata)->ProgressCallback(w);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkXMLPVCollectionWriter::ProgressCallback(vtkProcessObject* w)
+{
+  float width = this->ProgressRange[1]-this->ProgressRange[0];
+  float internalProgress = w->GetProgress();
+  float progress = this->ProgressRange[0] + internalProgress*width;
+  this->UpdateProgressDiscrete(progress);
+  if(this->AbortExecute)
+    {
+    w->SetAbortExecute(1);
+    }
 }
