@@ -148,7 +148,7 @@ void vtkPVSendStreamToClientServerNodeRMI(void *localArg, void *remoteArg,
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVClientServerModule);
-vtkCxxRevisionMacro(vtkPVClientServerModule, "1.19");
+vtkCxxRevisionMacro(vtkPVClientServerModule, "1.20");
 
 
 //----------------------------------------------------------------------------
@@ -740,7 +740,6 @@ void vtkPVClientServerModule::Connect()
   vtkCommunicator::SetUseCopy(1);
 #endif
 
-
   // Do not try to connect sockets on MPI processes other than root.
   if (myId > 0)
     {
@@ -758,6 +757,7 @@ void vtkPVClientServerModule::Connect()
 }
 
 
+//----------------------------------------------------------------------------
 void vtkPVClientServerModule::InitializeRenderServer()
 {
   // if this is not client and using render server, then exit
@@ -1241,9 +1241,10 @@ const vtkClientServerStream& vtkPVClientServerModule::GetLastRenderServerResult(
 }
 
   
+//----------------------------------------------------------------------------
 vtkTypeUInt32 vtkPVClientServerModule::CreateSendFlag(vtkTypeUInt32 servers)
-{  
-  vtkTypeUInt32 sendflag = 0;  
+{
+  vtkTypeUInt32 sendflag = 0;
 
   // for RenderServer mode keep the bit vector the same
   // because all servers are different processes
