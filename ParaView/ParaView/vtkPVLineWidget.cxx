@@ -210,7 +210,7 @@ void vtkPVLineWidget::SetPoint2()
 void vtkPVLineWidget::SetResolution(int i)
 {
   this->ResolutionEntry->SetValue(i);
-  float res = this->ResolutionEntry->GetValueAsFloat();
+  int res = this->ResolutionEntry->GetValueAsInt();
   vtkLineWidget *line = static_cast<vtkLineWidget*>( this->Widget3D );
   line->SetResolution(res);
   vtkPVGenericRenderWindowInteractor* iren = 

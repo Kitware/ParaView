@@ -219,7 +219,6 @@ void vtkPVPlaneWidget::Reset()
 //----------------------------------------------------------------------------
 void vtkPVPlaneWidget::ActualPlaceWidget()
 {
-  vtkPlaneWidget *widget = static_cast<vtkPlaneWidget*>( this->Widget3D );
   float center[3];
   float normal[3];
   int cc;
