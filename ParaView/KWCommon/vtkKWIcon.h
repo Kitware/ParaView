@@ -65,6 +65,7 @@ public:
     ICON_NOICON = 0,
     ICON_ANNOTATE,
     ICON_AXES,
+    ICON_CONNECTION,
     ICON_CONTOURS,
     ICON_CUT,
     ICON_ERROR,
