@@ -797,10 +797,14 @@ proc extract_init {} {
 
     set extract(vtkTemp1) [$Application GetMainWindow]
     set extract(vtkTemp24) [$extract(vtkTemp1) GetMainView]
-    $extract(vtkTemp1) OpenCustom "PLOT3D Files" "$DemoDir/combbin.xyz"
-    set extract(vtkTemp384) [$extract(vtkTemp1) GetCurrentPVSource]
-    set extract(vtkTemp398) [$extract(vtkTemp384) GetPVWidget {QFileName}]
-    $extract(vtkTemp398) SetValue "$DemoDir/combbin.q"
+
+    set extract(vtkTemp384) [$extract(vtkTemp1) InitializeReadCustom "P3DReader" "$DemoDir/combbin.xyz"]
+    $extract(vtkTemp1) ReadFileInformation $extract(vtkTemp384) "$DemoDir/combbin.xyz"
+    $extract(vtkTemp1) FinalizeRead $extract(vtkTemp384) "$DemoDir/combbin.xyz"
+    set extract(vtkTemp555) [$extract(vtkTemp384) GetPVWidget {QFileName}]
+    $extract(vtkTemp555) SetValue "$DemoDir/combbin.q"
+    set extract(vtkTemp580) [$extract(vtkTemp384) GetPVWidget {Filename}]
+    $extract(vtkTemp580) SetValue "$DemoDir/combbin.xyz"
     $extract(vtkTemp384) AcceptCallback
 
     set extract(vtkTemp478) [$extract(vtkTemp1) CreatePVSource ExtractGrid]
@@ -1105,10 +1109,6 @@ proc iso_init {} {
     set iso(vtkTemp24) [$iso(vtkTemp1) GetMainView]
     $iso(vtkTemp1) Open "$DemoDir/quadric.vtk"
     set iso(vtkTemp384) [vtkTemp1 GetCurrentPVSource]
-    set iso(vtkTemp396) [$iso(vtkTemp384) GetPVWidget {File Name}]
-    $iso(vtkTemp396) SetValue "$DemoDir/quadric.vtk"
-    $iso(vtkTemp384) AcceptCallback
-
     if $pvDemoShouldStop {
         return
     }
@@ -1417,12 +1417,16 @@ proc stream_init {} {
     }
     set streams(vtkTemp1) [$Application GetMainWindow]
     set streams(vtkTemp24) [$streams(vtkTemp1) GetMainView]
-    $streams(vtkTemp1) OpenCustom "PLOT3D Files" "$DemoDir/postbin.xyz"
-    set streams(vtkTemp384) [$streams(vtkTemp1) GetCurrentPVSource]
+
+    set streams(vtkTemp384) [$streams(vtkTemp1) InitializeReadCustom "P3DReader" "$DemoDir/postbin.xyz"]
+    $streams(vtkTemp1) ReadFileInformation $streams(vtkTemp384) "$DemoDir/postbin.xyz"
+    $streams(vtkTemp1) FinalizeRead $streams(vtkTemp384) "$DemoDir/postbin.xyz"
     set streams(vtkTemp398) [$streams(vtkTemp384) GetPVWidget {QFileName}]
     $streams(vtkTemp398) SetValue "$DemoDir/postbin.q"
-    set streams(vtkTemp411) [$streams(vtkTemp384) GetPVWidget {IBlanking}]
-    $streams(vtkTemp411) SetState 1
+    set streams(vtkTemp569) [$streams(vtkTemp384) GetPVWidget {IBlanking}]
+    $streams(vtkTemp569) SetState 1
+    set streams(vtkTemp581) [$streams(vtkTemp384) GetPVWidget {Filename}]
+    $streams(vtkTemp581) SetValue "$DemoDir/postbin.xyz"
     $streams(vtkTemp384) AcceptCallback
 
     if $pvDemoShouldStop {
@@ -1657,12 +1661,16 @@ proc stream2_init {} {
     }
     set streams(vtkTemp1) [$Application GetMainWindow]
     set streams(vtkTemp24) [$streams(vtkTemp1) GetMainView]
-    $streams(vtkTemp1) OpenCustom "PLOT3D Files" "$DemoDir/postbin.xyz"
-    set streams(vtkTemp384) [$streams(vtkTemp1) GetCurrentPVSource]
+
+    set streams(vtkTemp384) [$streams(vtkTemp1) InitializeReadCustom "P3DReader" "$DemoDir/postbin.xyz"]
+    $streams(vtkTemp1) ReadFileInformation $streams(vtkTemp384) "$DemoDir/postbin.xyz"
+    $streams(vtkTemp1) FinalizeRead $streams(vtkTemp384) "$DemoDir/postbin.xyz"
     set streams(vtkTemp398) [$streams(vtkTemp384) GetPVWidget {QFileName}]
     $streams(vtkTemp398) SetValue "$DemoDir/postbin.q"
-    set streams(vtkTemp411) [$streams(vtkTemp384) GetPVWidget {IBlanking}]
-    $streams(vtkTemp411) SetState 1
+    set streams(vtkTemp569) [$streams(vtkTemp384) GetPVWidget {IBlanking}]
+    $streams(vtkTemp569) SetState 1
+    set streams(vtkTemp581) [$streams(vtkTemp384) GetPVWidget {Filename}]
+    $streams(vtkTemp581) SetValue "$DemoDir/postbin.xyz"
     $streams(vtkTemp384) AcceptCallback
 
     if $pvDemoShouldStop {
@@ -3674,7 +3682,7 @@ if ![info exists DemoDir] {
         wm deiconify .control
         .control.main.stop configure -state normal
         .control.main.info configure -text "ParaView demo initializing.\n Please wait." 
-        #grab .control.main.stop
+        grab .control.main.stop
 
         clip_init
         extract_init
@@ -3742,7 +3750,7 @@ if ![info exists DemoDir] {
 
         catch {$clip(vtkTemp24) EventuallyRender}
 
-        #grab release .control.main.stop
+        grab release .control.main.stop
         wm withdraw .control
 
         wm protocol .paraview WM_DELETE_WINDOW { [$Application GetMainWindow] Exit }
