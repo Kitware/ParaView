@@ -70,7 +70,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWEntry );
-vtkCxxRevisionMacro(vtkKWEntry, "1.19");
+vtkCxxRevisionMacro(vtkKWEntry, "1.20");
 
 //----------------------------------------------------------------------------
 vtkKWEntry::vtkKWEntry()
@@ -397,7 +397,7 @@ void vtkKWEntry::AddValue(const char* value)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWEntry::GetNumberOfValues()
+int vtkKWEntry::GetNumberOfValues()
 {
   return this->Internals->Entries.size();
 }
