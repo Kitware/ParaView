@@ -17,7 +17,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWFrame );
-vtkCxxRevisionMacro(vtkKWFrame, "1.19");
+vtkCxxRevisionMacro(vtkKWFrame, "1.20");
 
 //----------------------------------------------------------------------------
 vtkKWFrame::vtkKWFrame()
@@ -65,7 +65,8 @@ void vtkKWFrame::Create(vtkKWApplication *app, const char* args)
 
     this->ScrollFrame->SetParent(this);
     this->ScrollFrame->Create(this->Application, 
-                              "ScrollableFrame", "-height 1024");
+                              "ScrollableFrame",
+                              "-height 1024 -constrainedwidth 1");
     this->Script("%s setwidget %s", this->GetWidgetName(),
                  this->ScrollFrame->GetWidgetName());
 
@@ -74,9 +75,6 @@ void vtkKWFrame::Create(vtkKWApplication *app, const char* args)
     this->Script("%s getframe", this->ScrollFrame->GetWidgetName());
     this->Frame->SetWidgetName(this->Application->GetMainInterp()->result);
     this->Frame->SetApplication(this->Application);
-
-    this->Script("%s configure -constrainedwidth 1", 
-                 this->ScrollFrame->GetWidgetName());
     }
   else
     {
