@@ -281,7 +281,10 @@ vtkPVSource *vtkPVSourceInterface::CreateCallback()
       l = mInt->GetSelectionEntries();
       for (i = 0; i < l->GetLength(); ++i)
         {
-        pvs->AddModeListItem(l->GetString(i), i);
+        if (l->GetString(i))
+          {
+          pvs->AddModeListItem(l->GetString(i), i);
+          }
         }
       }
     else if (mInt->GetWidgetType() == VTK_PV_METHOD_WIDGET_EXTENT)

@@ -127,7 +127,7 @@ void vtkPVSelectionList::AddItem(const char *name, int value)
   // Save for internal use
   this->Names->SetString(value, name);
 
-  sprintf(tmp, "SelectCallback %s %d", name, value);
+  sprintf(tmp, "SelectCallback {%s} %d", name, value);
   this->MenuButton->AddCommand(name, this, tmp);
   
   if (value == this->CurrentValue)

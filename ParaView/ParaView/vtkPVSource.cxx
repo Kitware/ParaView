@@ -788,11 +788,7 @@ int vtkPVSource::GetVisibility()
 //----------------------------------------------------------------------------
 void vtkPVSource::AcceptCallback()
 {
-  int i;
   vtkPVWindow *window;
-  char methodAndArg[256];
-  int numSources;
-  vtkPVSource *source;
 
   window = this->GetWindow();
 
@@ -877,14 +873,6 @@ void vtkPVSource::AcceptCallback()
 
   // Update the selection menu.
   window->UpdateSelectMenu();
-  
-  for (i = 0; i < numSources; i++)
-    {
-    source = (vtkPVSource*)window->GetSources()->GetItemAsObject(i);
-    sprintf(methodAndArg, "SetCurrentPVSource %s", source->GetTclName());
-    window->GetSelectMenu()->AddCommand(source->GetName(), window,
-                                        methodAndArg);
-    }
   
   // Regenerate the data property page in case something has changed.
   if (this->NumberOfPVOutputs > 0)
