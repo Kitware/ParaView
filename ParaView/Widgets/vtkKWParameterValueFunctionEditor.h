@@ -42,6 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkKWLabeledWidget.h"
 
+class vtkCallbackCommand;
 class vtkKWFrame;
 class vtkKWIcon;
 class vtkKWLabel;
@@ -50,8 +51,6 @@ class vtkKWRange;
 
 //BTX
 class ostrstream;
-template<class DataType> class vtkLinkedList;
-template<class DataType> class vtkLinkedListIterator;
 //ETX
 
 class VTK_EXPORT vtkKWParameterValueFunctionEditor : public vtkKWLabeledWidget
@@ -176,33 +175,6 @@ public:
     vtkKWParameterValueFunctionEditor *editor);
 
   // Description:
-  // Synchronize points with a given editor. 
-  // First it will make sure both editors have the same points in the
-  // parameter space (by calling MergePointsFromEditor on each other).
-  // Then each time a point is added, moved or removed through 
-  // user interaction, the same point is altered in the synchronized editor,
-  // and vice-versa.
-  // Multiple editors can be synchronized (note that if you synchronize A
-  // with B, you do not need to synchronize B with A, this is a double-link).
-  // Return 1 on success, 0 otherwise.
-  virtual int SynchronizePointsWithEditor(
-    vtkKWParameterValueFunctionEditor *editor);
-  virtual int DoNotSynchronizePointsWithEditor(
-    vtkKWParameterValueFunctionEditor *editor);
-
-  // Description:
-  // Synchronize the visible parameter range with a given editor. 
-  // Each time the current visible range is changed, the same visible range
-  // is assigned to the synchronized editor, and vice-versa.
-  // Multiple editors can be synchronized (note that if you synchronize A
-  // with B, you do not need to synchronize B with A, this is a double-link).
-  // Return 1 on success, 0 otherwise.
-  virtual int SynchronizeVisibleParameterRangeWithEditor(
-    vtkKWParameterValueFunctionEditor *editor);
-  virtual int DoNotSynchronizeVisibleParameterRangeWithEditor(
-    vtkKWParameterValueFunctionEditor *editor);
-
-  // Description:
   // Set/Get the point color. 
   // Overriden by ComputePointColorFromValue if supported.
   vtkGetVector3Macro(PointColor, float);
@@ -268,6 +240,56 @@ public:
   vtkSetMacro(DisableCommands, int);
   vtkGetMacro(DisableCommands, int);
   vtkBooleanMacro(DisableCommands, int);
+
+  // Description:
+  // Synchronize the visible parameter range between two editors A and B.
+  // Each time the visible range of A is changed, the same visible range
+  // is assigned to the synchronized editor B, and vice-versa.
+  // Note that a call with (A, B) is the same as a call with (B, A), 
+  // i.e. this is a double-link, only one call is needed to set the sync.
+  // Return 1 on success, 0 otherwise.
+  static int SynchronizeVisibleParameterRange(
+    vtkKWParameterValueFunctionEditor *a,vtkKWParameterValueFunctionEditor *b);
+  static int DoNotSynchronizeVisibleParameterRange(
+    vtkKWParameterValueFunctionEditor *a,vtkKWParameterValueFunctionEditor *b);
+
+  // Description:
+  // Synchronize points between two editors A and B.
+  // First make sure both editors have the same points in the
+  // parameter space (by calling MergePointsFromEditor on each other).
+  // Then each time a point in A is added, moved or removed through 
+  // user interaction, the same point in B is altered and vice-versa.
+  // Note that a call with (A, B) is the same as a call with (B, A), 
+  // i.e. this is a double-link, only one call is needed to set the sync.
+  // Return 1 on success, 0 otherwise.
+  static int SynchronizePoints(
+    vtkKWParameterValueFunctionEditor *a,vtkKWParameterValueFunctionEditor *b);
+  static int DoNotSynchronizePoints(
+    vtkKWParameterValueFunctionEditor *a,vtkKWParameterValueFunctionEditor *b);
+
+  // Description:
+  // Synchronize single selection between two editors A and B.
+  // Each time a point is selected in A, the selection is cleared in B, 
+  // and vice-versa.
+  // Note that a call with (A, B) is the same as a call with (B, A), 
+  // i.e. this is a double-link, only one call is needed to set the sync.
+  // Return 1 on success, 0 otherwise.
+  static int SynchronizeSingleSelection(
+    vtkKWParameterValueFunctionEditor *a,vtkKWParameterValueFunctionEditor *b);
+  static int DoNotSynchronizeSingleSelection(
+    vtkKWParameterValueFunctionEditor *a,vtkKWParameterValueFunctionEditor *b);
+
+  // Description:
+  // Synchronize sa,e selection between two editors A and B.
+  // Each time a point is selected in A, the same point is selected in B, 
+  // and vice-versa.
+  // Note that a call with (A, B) is the same as a call with (B, A), 
+  // i.e. this is a double-link, only one call is needed to set the sync.
+  // Return 1 on success, 0 otherwise.
+  static int SynchronizeSameSelection(
+    vtkKWParameterValueFunctionEditor *a,vtkKWParameterValueFunctionEditor *b);
+  static int DoNotSynchronizeSameSelection(
+    vtkKWParameterValueFunctionEditor *a,vtkKWParameterValueFunctionEditor *b);
 
   // Description:
   // Set the string that enables balloon help for this widget.
@@ -387,8 +409,6 @@ protected:
   double        LastRelativeVisibleParameterRange;
   double        LastRelativeVisibleValueRange;
 
-  int           LastSelectCanvasCoordinates[2];
-  int           LastConstrainedMove;
   //BTX
   enum
   {
@@ -397,6 +417,8 @@ protected:
     CONSTRAINED_MOVE_V
   };
   //ETX
+  int           LastSelectCanvasCoordinates[2];
+  int           LastConstrainedMove;
 
   // Description:
   // Update the info label according to the current visible parameter and
@@ -425,48 +447,40 @@ protected:
   virtual int  AddFunctionPointAtCanvasCoordinates(int x, int y, int &id) = 0;
   virtual int  AddFunctionPointAtParameter(float parameter, int &id) = 0;
   virtual int  MoveFunctionPointToCanvasCoordinates(int id,int x,int y) = 0;
+  virtual int  MoveFunctionPointToParameter(int id,float parameter,int i=0)=0;
   virtual int  RemoveFunctionPoint(int id) = 0;
   virtual void UpdateInfoLabelWithFunctionPoint(int id) = 0;
   virtual unsigned long GetFunctionMTime() = 0;
 
-  // Synchronized editors
+  // Synchronization callbacks
 
   //BTX
-
-  class SynchronizedEditorSlot
+  enum
   {
-  public:
-    enum
-    {
-      SYNC_VISIBLE_PARAMETER_RANGE = 1,
-      SYNC_POINTS                  = 2
-    };
-    int Options;
-    vtkKWParameterValueFunctionEditor *Editor;
+    FunctionChangedEvent = 10000,
+    FunctionChangingEvent,
+    PointAddedEvent,
+    PointMovedEvent,
+    PointMovingEvent,
+    PointRemovedEvent,
+    SelectionChangedEvent,
+    VisibleParameterRangeChangedEvent,
+    VisibleParameterRangeChangingEvent,
+    VisibleRangeChangedEvent,
+    VisibleRangeChangingEvent
   };
-
-  typedef vtkLinkedList<SynchronizedEditorSlot*> 
-          SynchronizedEditorsContainer;
-  typedef vtkLinkedListIterator<SynchronizedEditorSlot*> 
-          SynchronizedEditorsContainerIterator;
-  SynchronizedEditorsContainer *SynchronizedEditors;
-
-  virtual void DeleteAllSynchronizedEditors();
-  SynchronizedEditorSlot* GetSynchronizedEditorSlot(
-    vtkKWParameterValueFunctionEditor *editor);
-  virtual int AddSynchronizedEditor(
-    vtkKWParameterValueFunctionEditor *editor);
-  virtual int RemoveSynchronizedEditor(
-    vtkKWParameterValueFunctionEditor *editor);
-  virtual int AddSynchronizedEditorOption(
-    vtkKWParameterValueFunctionEditor *editor, int option);
-  virtual int RemoveSynchronizedEditorOption(
-    vtkKWParameterValueFunctionEditor *editor, int option);
-
-  virtual void SynchronizePointsWithAllEditors();
-  virtual void SynchronizeVisibleParameterRangeWithAllEditors();
-
   //ETX
+
+  vtkCallbackCommand *SynchronizeCallbackCommand;
+  vtkCallbackCommand *SynchronizeCallbackCommand2;
+
+  virtual int AddObserversList(int nb_events, int *events, vtkCommand *cmd);
+  virtual int RemoveObserversList(int nb_events, int *events, vtkCommand *cmd);
+
+  static void ProcessSynchronizationEvents(
+    vtkObject *object, unsigned long event, void *clientdata, void *calldata);
+  static void ProcessSynchronizationEvents2(
+    vtkObject *object, unsigned long event, void *clientdata, void *calldata);
 
   // Description:
   // Update the enable state. This should propagate similar calls to the

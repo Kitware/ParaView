@@ -35,6 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "vtkKWParameterValueFunctionEditor.h"
 
+#include "vtkCallbackCommand.h"
 #include "vtkKWApplication.h"
 #include "vtkKWFrame.h"
 #include "vtkKWIcon.h"
@@ -42,12 +43,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWLabeledLabel.h"
 #include "vtkKWRange.h"
 #include "vtkKWTkUtilities.h"
-#include "vtkLinkedList.txx"
-#include "vtkLinkedListIterator.txx"
 #include "vtkMath.h"
 #include "vtkObjectFactory.h"
 
-vtkCxxRevisionMacro(vtkKWParameterValueFunctionEditor, "1.8");
+vtkCxxRevisionMacro(vtkKWParameterValueFunctionEditor, "1.9");
 
 #define VTK_KW_RANGE_POINT_RADIUS_MIN    2
 
@@ -127,10 +126,17 @@ vtkKWParameterValueFunctionEditor::vtkKWParameterValueFunctionEditor()
   this->LastSelectCanvasCoordinates[1]    = 0;
   this->LastConstrainedMove               = CONSTRAINED_MOVE_FREE;
 
-  // Synchronized editors
+  // Synchronization callbacks
+  
+  this->SynchronizeCallbackCommand = vtkCallbackCommand::New();
+  this->SynchronizeCallbackCommand->SetClientData(this); 
+  this->SynchronizeCallbackCommand->SetCallback(
+    vtkKWParameterValueFunctionEditor::ProcessSynchronizationEvents);
 
-  this->SynchronizedEditors = 
-    vtkKWParameterValueFunctionEditor::SynchronizedEditorsContainer::New();
+  this->SynchronizeCallbackCommand2 = vtkCallbackCommand::New();
+  this->SynchronizeCallbackCommand2->SetClientData(this); 
+  this->SynchronizeCallbackCommand2->SetCallback(
+    vtkKWParameterValueFunctionEditor::ProcessSynchronizationEvents2);
 }
 
 //----------------------------------------------------------------------------
@@ -239,14 +245,16 @@ vtkKWParameterValueFunctionEditor::~vtkKWParameterValueFunctionEditor()
     }
   delete [] this->Icons;
 
-  // Synchronized editors
-
-  this->DeleteAllSynchronizedEditors();
-
-  if (this->SynchronizedEditors)
+  if (this->SynchronizeCallbackCommand)
     {
-    this->SynchronizedEditors->Delete();
-    this->SynchronizedEditors = NULL;
+    this->SynchronizeCallbackCommand->Delete();
+    this->SynchronizeCallbackCommand = NULL;
+    }
+
+  if (this->SynchronizeCallbackCommand2)
+    {
+    this->SynchronizeCallbackCommand2->Delete();
+    this->SynchronizeCallbackCommand2 = NULL;
     }
 }
 
@@ -434,8 +442,6 @@ void vtkKWParameterValueFunctionEditor::Update()
   this->UpdateInfoLabelWithRange();
 
   this->RedrawCanvas();
-
-  this->SynchronizePointsWithAllEditors();
 }
 
 //----------------------------------------------------------------------------
@@ -816,54 +822,74 @@ void vtkKWParameterValueFunctionEditor::InvokePointCommand(const char *command,
 void vtkKWParameterValueFunctionEditor::InvokePointAddedCommand(int id)
 {
   this->InvokePointCommand(this->PointAddedCommand, id);
+
+  this->InvokeEvent(vtkKWParameterValueFunctionEditor::PointAddedEvent, &id);
 }
 
 //----------------------------------------------------------------------------
 void vtkKWParameterValueFunctionEditor::InvokePointMovingCommand(int id)
 {
   this->InvokePointCommand(this->PointMovingCommand, id);
+
+  this->InvokeEvent(vtkKWParameterValueFunctionEditor::PointMovingEvent, &id);
 }
 
 //----------------------------------------------------------------------------
 void vtkKWParameterValueFunctionEditor::InvokePointMovedCommand(int id)
 {
   this->InvokePointCommand(this->PointMovedCommand, id);
+
+  this->InvokeEvent(vtkKWParameterValueFunctionEditor::PointMovedEvent, &id);
 }
 
 //----------------------------------------------------------------------------
 void vtkKWParameterValueFunctionEditor::InvokePointRemovedCommand(int id)
 {
   this->InvokePointCommand(this->PointRemovedCommand, id);
+
+  this->InvokeEvent(vtkKWParameterValueFunctionEditor::PointRemovedEvent, &id);
 }
 
 //----------------------------------------------------------------------------
 void vtkKWParameterValueFunctionEditor::InvokeSelectionChangedCommand()
 {
   this->InvokeCommand(this->SelectionChangedCommand);
+
+  this->InvokeEvent(vtkKWParameterValueFunctionEditor::SelectionChangedEvent);
 }
 
 //----------------------------------------------------------------------------
 void vtkKWParameterValueFunctionEditor::InvokeFunctionChangedCommand()
 {
   this->InvokeCommand(this->FunctionChangedCommand);
+
+  this->InvokeEvent(vtkKWParameterValueFunctionEditor::FunctionChangedEvent);
 }
 
 //----------------------------------------------------------------------------
 void vtkKWParameterValueFunctionEditor::InvokeFunctionChangingCommand()
 {
   this->InvokeCommand(this->FunctionChangingCommand);
+
+  this->InvokeEvent(vtkKWParameterValueFunctionEditor::FunctionChangingEvent);
 }
 
 //----------------------------------------------------------------------------
 void vtkKWParameterValueFunctionEditor::InvokeVisibleRangeChangedCommand()
 {
   this->InvokeCommand(this->VisibleRangeChangedCommand);
+
+  this->InvokeEvent(
+    vtkKWParameterValueFunctionEditor::VisibleRangeChangedEvent);
 }
 
 //----------------------------------------------------------------------------
 void vtkKWParameterValueFunctionEditor::InvokeVisibleRangeChangingCommand()
 {
   this->InvokeCommand(this->VisibleRangeChangingCommand);
+
+  this->InvokeEvent(
+    vtkKWParameterValueFunctionEditor::VisibleRangeChangingEvent);
 }
 
 //----------------------------------------------------------------------------
@@ -1509,341 +1535,371 @@ void vtkKWParameterValueFunctionEditor::UpdateInfoLabelWithRange()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWParameterValueFunctionEditor::DeleteAllSynchronizedEditors()
+int vtkKWParameterValueFunctionEditor::AddObserversList(
+  int nb_events, int *events, vtkCommand *cmd)
 {
-  if (!this->SynchronizedEditors)
+ if (nb_events <= 0 || !events || !cmd)
+   {
+   return 0;
+   }
+
+  int added = 0;
+  for (int i = 0; i < nb_events; i++)
     {
-    return;
-    }
-
-  // Delete/free all synchronized editors
-
-  vtkKWParameterValueFunctionEditor::SynchronizedEditorSlot 
-    *sync_editor_slot = NULL;
-  vtkKWParameterValueFunctionEditor::SynchronizedEditorsContainerIterator 
-    *it = this->SynchronizedEditors->NewIterator();
-
-  it->InitTraversal();
-  while (!it->IsDoneWithTraversal())
-    {
-    if (it->GetData(sync_editor_slot) == VTK_OK)
+    if (!this->HasObserver(events[i], cmd))
       {
-      sync_editor_slot->Editor->RemoveSynchronizedEditor(this);
-      delete sync_editor_slot;
+      this->AddObserver(events[i], cmd);
+      added++;
       }
-    it->GoToNextItem();
     }
-  it->Delete();
 
-  this->SynchronizedEditors->RemoveAllItems();
+  return added;
 }
 
 //----------------------------------------------------------------------------
-vtkKWParameterValueFunctionEditor::SynchronizedEditorSlot* 
-vtkKWParameterValueFunctionEditor::GetSynchronizedEditorSlot(
-  vtkKWParameterValueFunctionEditor *editor)
+int vtkKWParameterValueFunctionEditor::RemoveObserversList(
+  int nb_events, int *events, vtkCommand *cmd)
 {
-  if (!this->SynchronizedEditors)
+ if (nb_events <= 0 || !events || !cmd)
+   {
+   return 0;
+   }
+
+  int removed = 0;
+  for (int i = 0; i < nb_events; i++)
     {
-    return NULL;
+    if (this->HasObserver(events[i], cmd))
+      {
+      this->RemoveObservers(events[i], cmd);
+      removed++;
+      }
     }
 
-  vtkKWParameterValueFunctionEditor::SynchronizedEditorSlot 
-    *sync_editor_slot = NULL;
-  vtkKWParameterValueFunctionEditor::SynchronizedEditorSlot 
-    *found = NULL;
-  vtkKWParameterValueFunctionEditor::SynchronizedEditorsContainerIterator 
-    *it = this->SynchronizedEditors->NewIterator();
+  return removed;
+}
 
-  it->InitTraversal();
-  while (!it->IsDoneWithTraversal())
+//----------------------------------------------------------------------------
+int vtkKWParameterValueFunctionEditor::SynchronizeVisibleParameterRange(
+  vtkKWParameterValueFunctionEditor *a,
+  vtkKWParameterValueFunctionEditor *b)
+{
+  // Static method
+
+  if (!a || !b)
     {
-    if (it->GetData(sync_editor_slot) == VTK_OK && 
-        sync_editor_slot->Editor == editor)
-      {
-      found = sync_editor_slot;
+    return 0;
+    }
+  
+  // Make sure both editors have the same visible range from now
+
+  b->SetVisibleParameterRange(a->GetVisibleParameterRange());
+
+  int events[] = 
+    {
+      vtkKWParameterValueFunctionEditor::VisibleParameterRangeChangedEvent,
+      vtkKWParameterValueFunctionEditor::VisibleParameterRangeChangingEvent
+    };
+
+  b->AddObserversList(
+    sizeof(events) / sizeof(int), events, a->SynchronizeCallbackCommand);
+
+  a->AddObserversList(
+    sizeof(events) / sizeof(int), events, b->SynchronizeCallbackCommand);
+
+  return 1;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWParameterValueFunctionEditor::DoNotSynchronizeVisibleParameterRange(
+  vtkKWParameterValueFunctionEditor *a,
+  vtkKWParameterValueFunctionEditor *b)
+{
+  // Static method
+
+  if (!a || !b)
+    {
+    return 0;
+    }
+
+  int events[] = 
+    {
+      vtkKWParameterValueFunctionEditor::VisibleParameterRangeChangedEvent,
+      vtkKWParameterValueFunctionEditor::VisibleParameterRangeChangingEvent
+    };
+
+  b->RemoveObserversList(
+    sizeof(events) / sizeof(int), events, a->SynchronizeCallbackCommand);
+
+  a->RemoveObserversList(
+    sizeof(events) / sizeof(int), events, b->SynchronizeCallbackCommand);
+
+  return 1;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWParameterValueFunctionEditor::SynchronizePoints(
+  vtkKWParameterValueFunctionEditor *a,
+  vtkKWParameterValueFunctionEditor *b)
+{
+  // Static method
+
+  if (!a || !b)
+    {
+    return 0;
+    }
+
+  // Make sure they share the same points in the parameter space from now
+
+  a->MergePointsFromEditor(b);
+  b->MergePointsFromEditor(a);
+
+  int events[] = 
+    {
+      vtkKWParameterValueFunctionEditor::PointMovingEvent,
+      vtkKWParameterValueFunctionEditor::PointRemovedEvent,
+      vtkKWParameterValueFunctionEditor::FunctionChangedEvent
+    };
+
+  b->AddObserversList(
+    sizeof(events) / sizeof(int), events, a->SynchronizeCallbackCommand);
+
+  a->AddObserversList(
+    sizeof(events) / sizeof(int), events, b->SynchronizeCallbackCommand);
+
+  return 1;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWParameterValueFunctionEditor::DoNotSynchronizePoints(
+  vtkKWParameterValueFunctionEditor *a,
+  vtkKWParameterValueFunctionEditor *b)
+{
+  // Static method
+
+  if (!a || !b)
+    {
+    return 0;
+    }
+
+  int events[] = 
+    {
+      vtkKWParameterValueFunctionEditor::PointMovingEvent,
+      vtkKWParameterValueFunctionEditor::PointRemovedEvent,
+      vtkKWParameterValueFunctionEditor::FunctionChangedEvent
+    };
+
+  b->RemoveObserversList(
+    sizeof(events) / sizeof(int), events, a->SynchronizeCallbackCommand);
+
+  a->RemoveObserversList(
+    sizeof(events) / sizeof(int), events, b->SynchronizeCallbackCommand);
+
+  return 1;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWParameterValueFunctionEditor::SynchronizeSingleSelection(
+  vtkKWParameterValueFunctionEditor *a,
+  vtkKWParameterValueFunctionEditor *b)
+{
+  // Static method
+
+  if (!a || !b)
+    {
+    return 0;
+    }
+  
+  // Make sure only one of those editors has a selected point from now
+  
+  if (a->GetSelectedPoint() >= 0)
+    {
+    b->ClearSelection();
+    }
+  
+  int events[] = 
+    {
+      vtkKWParameterValueFunctionEditor::SelectionChangedEvent
+    };
+  
+  b->AddObserversList(
+    sizeof(events) / sizeof(int), events, a->SynchronizeCallbackCommand);
+
+  a->AddObserversList(
+    sizeof(events) / sizeof(int), events, b->SynchronizeCallbackCommand);
+  
+  return 1;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWParameterValueFunctionEditor::DoNotSynchronizeSingleSelection(
+  vtkKWParameterValueFunctionEditor *a,
+  vtkKWParameterValueFunctionEditor *b)
+{
+  // Static method
+  
+  if (!a || !b)
+    {
+    return 0;
+    }
+  
+  int events[] = 
+    {
+      vtkKWParameterValueFunctionEditor::SelectionChangedEvent
+    };
+  
+  b->RemoveObserversList(
+    sizeof(events) / sizeof(int), events, a->SynchronizeCallbackCommand);
+
+  a->RemoveObserversList(
+    sizeof(events) / sizeof(int), events, b->SynchronizeCallbackCommand);
+  
+  return 1;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWParameterValueFunctionEditor::SynchronizeSameSelection(
+  vtkKWParameterValueFunctionEditor *a,
+  vtkKWParameterValueFunctionEditor *b)
+{
+  // Static method
+
+  if (!a || !b)
+    {
+    return 0;
+    }
+  
+  // Make sure those editors have the same selected point from now
+  
+  if (a->GetSelectedPoint() >= 0)
+    {
+    b->SelectPoint(a->GetSelectedPoint());
+    }
+  else if (b->GetSelectedPoint() >= 0)
+    {
+    a->SelectPoint(b->GetSelectedPoint());
+    }
+  
+  int events[] = 
+    {
+      vtkKWParameterValueFunctionEditor::SelectionChangedEvent
+    };
+  
+  b->AddObserversList(
+    sizeof(events) / sizeof(int), events, a->SynchronizeCallbackCommand2);
+
+  a->AddObserversList(
+    sizeof(events) / sizeof(int), events, b->SynchronizeCallbackCommand2);
+  
+  return 1;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWParameterValueFunctionEditor::DoNotSynchronizeSameSelection(
+  vtkKWParameterValueFunctionEditor *a,
+  vtkKWParameterValueFunctionEditor *b)
+{
+  // Static method
+  
+  if (!a || !b)
+    {
+    return 0;
+    }
+  
+  int events[] = 
+    {
+      vtkKWParameterValueFunctionEditor::SelectionChangedEvent
+    };
+  
+  b->RemoveObserversList(
+    sizeof(events) / sizeof(int), events, a->SynchronizeCallbackCommand2);
+  
+  a->RemoveObserversList(
+    sizeof(events) / sizeof(int), events, b->SynchronizeCallbackCommand2);
+  
+  return 1;
+}
+
+//----------------------------------------------------------------------------
+void vtkKWParameterValueFunctionEditor::ProcessSynchronizationEvents(
+  vtkObject *object,
+  unsigned long event,
+  void *clientdata,
+  void *calldata)
+{
+  vtkKWParameterValueFunctionEditor *pvfe =
+    reinterpret_cast<vtkKWParameterValueFunctionEditor *>(object);
+  
+  vtkKWParameterValueFunctionEditor *self =
+    reinterpret_cast<vtkKWParameterValueFunctionEditor *>(clientdata);
+  
+  float parameter;
+  int *point_id = reinterpret_cast<int *>(calldata);
+  
+  switch (event)
+    {
+    // Synchronize visible range
+    
+    case vtkKWParameterValueFunctionEditor::VisibleParameterRangeChangedEvent:
+    case vtkKWParameterValueFunctionEditor::VisibleParameterRangeChangingEvent:
+      self->SetVisibleParameterRange(pvfe->GetVisibleParameterRange());
       break;
-      }
-    it->GoToNextItem();
-    }
-  it->Delete();
+      
+    // Synchronize points
+      
+    case vtkKWParameterValueFunctionEditor::PointMovingEvent:
+      if (pvfe->GetFunctionPointParameter(*point_id, parameter))
+        {
+        self->MoveFunctionPointToParameter(*point_id, parameter);
+        }
+      break;
 
-  return found;
+    case vtkKWParameterValueFunctionEditor::PointRemovedEvent:
+      self->RemoveFunctionPoint(*point_id);
+      break;
+
+    case vtkKWParameterValueFunctionEditor::FunctionChangedEvent:
+      self->MergePointsFromEditor(pvfe);
+      break;
+
+    // Synchronize Single selection
+
+    case vtkKWParameterValueFunctionEditor::SelectionChangedEvent:
+      if (pvfe->GetSelectedPoint() >= 0)
+        {
+        self->ClearSelection();
+        }
+      break;
+    }
 }
 
 //----------------------------------------------------------------------------
-int vtkKWParameterValueFunctionEditor::AddSynchronizedEditor(
-  vtkKWParameterValueFunctionEditor *editor)
+void vtkKWParameterValueFunctionEditor::ProcessSynchronizationEvents2(
+  vtkObject *object,
+  unsigned long event,
+  void *clientdata,
+  void *vtkNotUsed(calldata))
 {
-  if (!this->SynchronizedEditors || !editor)
+  vtkKWParameterValueFunctionEditor *pvfe =
+    reinterpret_cast<vtkKWParameterValueFunctionEditor *>(object);
+  
+  vtkKWParameterValueFunctionEditor *self =
+    reinterpret_cast<vtkKWParameterValueFunctionEditor *>(clientdata);
+  
+  switch (event)
     {
-    return 0;
+    // Synchronize Same selection
+
+    case vtkKWParameterValueFunctionEditor::SelectionChangedEvent:
+      if (pvfe->GetSelectedPoint() >= 0)
+        {
+        self->SelectPoint(pvfe->GetSelectedPoint());
+        }
+      else
+        {
+        self->ClearSelection();
+        }
+      break;
     }
-
-  // Do not insert the same editor twice
-
-  vtkKWParameterValueFunctionEditor::SynchronizedEditorSlot 
-    *sync_editor_slot = this->GetSynchronizedEditorSlot(editor);
-  if (sync_editor_slot != NULL)
-    {
-    return 0;
-    }
-
-  // Allocate the slot and insert it
-
-  sync_editor_slot = 
-    new vtkKWParameterValueFunctionEditor::SynchronizedEditorSlot ;
-
-  if (this->SynchronizedEditors->AppendItem(sync_editor_slot) != VTK_OK)
-    {
-    vtkErrorMacro("Error while adding a synchronized editor.");
-    delete sync_editor_slot;
-    return 0;
-    }
-
-  sync_editor_slot->Options = 0;
-  sync_editor_slot->Editor = editor;
-
-  return 1;
-}
-
-//----------------------------------------------------------------------------
-int vtkKWParameterValueFunctionEditor::RemoveSynchronizedEditor(
-  vtkKWParameterValueFunctionEditor *editor)
-{
-  if (!this->SynchronizedEditors || !editor)
-    {
-    return 0;
-    }
-
-  // Find the slot given the editor
-
-  vtkKWParameterValueFunctionEditor::SynchronizedEditorSlot 
-    *sync_editor_slot = this->GetSynchronizedEditorSlot(editor);
-  if (sync_editor_slot == NULL)
-    {
-    return 0;
-    }
-
-  // Find the slot rank/index
-
-  vtkIdType found = 0;
-  if (this->SynchronizedEditors->FindItem(sync_editor_slot, found) != VTK_OK)
-    {
-    return 0;
-    }
-
-  // Remove the slot and deallocate it
-
-  if (this->SynchronizedEditors->RemoveItem(found) != VTK_OK)
-    {
-    vtkErrorMacro("Error while removing a synchronized editor.");
-    return 0;
-    }
-
-  delete sync_editor_slot;
-
-  return 1;
-}
-
-//----------------------------------------------------------------------------
-int vtkKWParameterValueFunctionEditor::AddSynchronizedEditorOption(
-  vtkKWParameterValueFunctionEditor *editor, int option)
-{
-  if (!this->SynchronizedEditors || !editor)
-    {
-    return 0;
-    }
-
-  // Find the slot given the editor, if not found add it
-
-  vtkKWParameterValueFunctionEditor::SynchronizedEditorSlot 
-    *sync_editor_slot = this->GetSynchronizedEditorSlot(editor);
-  if (sync_editor_slot == NULL)
-    {
-    if (!this->AddSynchronizedEditor(editor))
-      {
-      return 0;
-      }
-    sync_editor_slot = this->GetSynchronizedEditorSlot(editor);
-    if (sync_editor_slot == NULL)
-      {
-      return 0;
-      }
-    }
-
-  // Add the option if not set already
-
-  if (sync_editor_slot->Options & option)
-    {
-    return 1;
-    }
-
-  sync_editor_slot->Options |= option;
-
-  // Also add the option the other way around
-
-  sync_editor_slot->Editor->AddSynchronizedEditorOption(this, option);
-
-  return 1;
-}
-
-//----------------------------------------------------------------------------
-int vtkKWParameterValueFunctionEditor::RemoveSynchronizedEditorOption(
-  vtkKWParameterValueFunctionEditor *editor, int option)
-{
-  if (!this->SynchronizedEditors || !editor)
-    {
-    return 0;
-    }
-
-  // Find the slot given the editor, if not found , leave now
-
-  vtkKWParameterValueFunctionEditor::SynchronizedEditorSlot 
-    *sync_editor_slot = this->GetSynchronizedEditorSlot(editor);
-  if (sync_editor_slot == NULL)
-    {
-    return 1;
-    }
-
-  // Remove the option if not removed already
-
-  if (!(sync_editor_slot->Options & option))
-    {
-    return 1;
-    }
-
-  sync_editor_slot->Options &= ~option;
-
-  // Now remove the option the other way around
-
-  sync_editor_slot->Editor->RemoveSynchronizedEditorOption(this, option);
-
-  // If no options anymore, let's just remove the editor
-
-  if (!sync_editor_slot->Options)
-    {
-    this->RemoveSynchronizedEditor(editor);
-    }
-
-  return 1;
-}
-
-//----------------------------------------------------------------------------
-int vtkKWParameterValueFunctionEditor::SynchronizePointsWithEditor(
-  vtkKWParameterValueFunctionEditor *editor)
-{
-  // Add the option
-
-  if (!this->AddSynchronizedEditorOption(
-        editor, SynchronizedEditorSlot::SYNC_POINTS))
-    {
-    return 0;
-    }
-
-  // Now make sure they share the same points in the parameter space
-
-  this->MergePointsFromEditor(editor);
-  editor->MergePointsFromEditor(this);
-
-  return 1;
-}
-
-//----------------------------------------------------------------------------
-int vtkKWParameterValueFunctionEditor::DoNotSynchronizePointsWithEditor(
-  vtkKWParameterValueFunctionEditor *editor)
-{
-  // Remove the option
-
-  return this->RemoveSynchronizedEditorOption(
-    editor, SynchronizedEditorSlot::SYNC_POINTS);
-}
-
-//----------------------------------------------------------------------------
-void vtkKWParameterValueFunctionEditor::SynchronizePointsWithAllEditors()
-{
-  if (!this->SynchronizedEditors ||
-      !this->SynchronizedEditors->GetNumberOfItems())
-    {
-    return;
-    }
-
-  vtkKWParameterValueFunctionEditor::SynchronizedEditorSlot 
-    *sync_editor_slot = NULL;
-  vtkKWParameterValueFunctionEditor::SynchronizedEditorsContainerIterator 
-    *it = this->SynchronizedEditors->NewIterator();
-
-  it->InitTraversal();
-  while (!it->IsDoneWithTraversal())
-    {
-    if (it->GetData(sync_editor_slot) == VTK_OK && 
-        sync_editor_slot->Options & 
-        SynchronizedEditorSlot::SYNC_POINTS)
-      {
-      this->MergePointsFromEditor(sync_editor_slot->Editor);
-      sync_editor_slot->Editor->MergePointsFromEditor(this);
-      }
-    it->GoToNextItem();
-    }
-  it->Delete();
-}
-
-//----------------------------------------------------------------------------
-int vtkKWParameterValueFunctionEditor::SynchronizeVisibleParameterRangeWithEditor(
-  vtkKWParameterValueFunctionEditor *editor)
-{
-  // Add the option
-
-  if (!this->AddSynchronizedEditorOption(
-        editor, SynchronizedEditorSlot::SYNC_VISIBLE_PARAMETER_RANGE))
-    {
-    return 0;
-    }
-
-  // Now make sure the editor has the same visible range right now
-
-  editor->SetVisibleParameterRange(this->GetVisibleParameterRange());
-
-  return 1;
-}
-
-//----------------------------------------------------------------------------
-int vtkKWParameterValueFunctionEditor::DoNotSynchronizeVisibleParameterRangeWithEditor(
-  vtkKWParameterValueFunctionEditor *editor)
-{
-  // Remove the option
-
-  return this->RemoveSynchronizedEditorOption(
-    editor, SynchronizedEditorSlot::SYNC_VISIBLE_PARAMETER_RANGE);
-}
-
-//----------------------------------------------------------------------------
-void vtkKWParameterValueFunctionEditor::SynchronizeVisibleParameterRangeWithAllEditors()
-{
-  if (!this->SynchronizedEditors ||
-      !this->SynchronizedEditors->GetNumberOfItems())
-    {
-    return;
-    }
-
-  vtkKWParameterValueFunctionEditor::SynchronizedEditorSlot 
-    *sync_editor_slot = NULL;
-  vtkKWParameterValueFunctionEditor::SynchronizedEditorsContainerIterator 
-    *it = this->SynchronizedEditors->NewIterator();
-
-  it->InitTraversal();
-  while (!it->IsDoneWithTraversal())
-    {
-    if (it->GetData(sync_editor_slot) == VTK_OK && 
-        sync_editor_slot->Options & 
-        SynchronizedEditorSlot::SYNC_VISIBLE_PARAMETER_RANGE)
-      {
-      sync_editor_slot->Editor->SetVisibleParameterRange(
-        this->GetVisibleParameterRange());
-      }
-    it->GoToNextItem();
-    }
-  it->Delete();
 }
 
 //----------------------------------------------------------------------------
@@ -1860,9 +1916,8 @@ void vtkKWParameterValueFunctionEditor::VisibleParameterRangeChangingCallback()
 
   this->InvokeVisibleRangeChangingCommand();
 
-  // Synchronize some editors
-
-  this->SynchronizeVisibleParameterRangeWithAllEditors();
+  this->InvokeEvent(
+    vtkKWParameterValueFunctionEditor::VisibleParameterRangeChangingEvent);
 }
 
 //----------------------------------------------------------------------------
@@ -1873,9 +1928,8 @@ void vtkKWParameterValueFunctionEditor::VisibleParameterRangeChangedCallback()
 
   this->InvokeVisibleRangeChangedCommand();
 
-  // Synchronize some editors
-
-  this->SynchronizeVisibleParameterRangeWithAllEditors();
+  this->InvokeEvent(
+    vtkKWParameterValueFunctionEditor::VisibleParameterRangeChangedEvent);
 }
 
 //----------------------------------------------------------------------------
@@ -2147,10 +2201,11 @@ void vtkKWParameterValueFunctionEditor::EndInteractionCallback(int x, int y)
        y > this->CanvasHeight - 1 + VTK_KW_RANGE_CANVAS_DELETE_MARGIN))
     {
     int old_size = this->GetFunctionSize();
+    int old_id = this->SelectedPoint;
     this->RemoveFunctionPoint(this->SelectedPoint);
     if (old_size != this->GetFunctionSize())
       {
-      this->InvokePointRemovedCommand(this->SelectedPoint);
+      this->InvokePointRemovedCommand(old_id);
       this->InvokeFunctionChangedCommand();
       }
     }
