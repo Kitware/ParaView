@@ -176,7 +176,7 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterface);
-vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.167");
+vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.168");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterface,ControlledWidget, vtkPVWidget);
 
@@ -1258,12 +1258,15 @@ void vtkPVAnimationInterface::SaveImagesCallback()
     dlg->SetMasterWindow(this->Window);
     dlg->Create(this->GetApplication(), "");
     int isMPEG = (!strcmp(ext, "mpg") || !strcmp(ext, "mpeg") ||
-                  !strcmp(ext, "MPG") || !strcmp(ext, "MPEG"));
+                  !strcmp(ext, "MPG") || !strcmp(ext, "MPEG") ||
+                  !strcmp(ext, "MP2") || !strcmp(ext, "mp2"));
     if (isMPEG)
       {
       dlg->SetText(
-        "Specify the width and aspect ratio of the images to be saved from "
-        "this animation.");
+        "Specify the width and height of the mpeg to be saved from this "
+        "animation. Each dimension must be a multiple of 32. Each will be "
+        "resized to the next smallest multiple of 32 if it does not meet this "
+        "criterion.");
       }
     else
       { 
@@ -1292,62 +1295,15 @@ void vtkPVAnimationInterface::SaveImagesCallback()
     heightEntry->Create(this->GetApplication(), "");
     heightEntry->GetEntry()->SetValue(origHeight);
 
-    vtkKWLabeledOptionMenu *aspectRatioMenu = vtkKWLabeledOptionMenu::New();
-    aspectRatioMenu->SetLabel("Aspect Ratio:");
-    aspectRatioMenu->SetParent(frame);
-    aspectRatioMenu->Create(this->GetApplication(), "");
-    aspectRatioMenu->GetOptionMenu()->AddEntry("1:1");
-    aspectRatioMenu->GetOptionMenu()->AddEntry("4:3");
-    aspectRatioMenu->GetOptionMenu()->AddEntry("16:9");
-    aspectRatioMenu->GetOptionMenu()->AddEntry("2.21:1");
-    aspectRatioMenu->GetOptionMenu()->SetValue("1:1");
-    
-    if (isMPEG)
-      {
-      this->Script("pack %s %s -side left -fill both -expand t",
-                   widthEntry->GetWidgetName(),
-                   aspectRatioMenu->GetWidgetName());
-      }
-    else
-      {
-      this->Script("pack %s %s -side left -fill both -expand t",
-                   widthEntry->GetWidgetName(), heightEntry->GetWidgetName());
-      }
+    this->Script("pack %s %s -side left -fill both -expand t",
+                 widthEntry->GetWidgetName(), heightEntry->GetWidgetName());
     this->Script("pack %s -side top -pady 5", frame->GetWidgetName());
 
     dlg->Invoke();
 
     int width = widthEntry->GetEntry()->GetValueAsInt();
     int height = origHeight;
-    int aspectRatio = 0;
-    if (isMPEG)
-      {
-      const char *aspect = aspectRatioMenu->GetOptionMenu()->GetValue();
-      if (!strcmp(aspect, "1:1"))
-        {
-        height = width;
-        aspectRatio = 1;
-        }
-      else if (!strcmp(aspect, "4:3"))
-        {
-        height = static_cast<int>(width / 4.0 * 3);
-        aspectRatio = 2;
-        }
-      else if (!strcmp(aspect, "16:9"))
-        {
-        height = static_cast<int>(width / 16.0 * 9);
-        aspectRatio = 3;
-        }
-      else if (!strcmp(aspect, "2.21:1"))
-        {
-        height = static_cast<int>(width / 2.21);
-        aspectRatio = 4;
-        }
-      }
-    else
-      {
-      height = heightEntry->GetEntry()->GetValueAsInt();
-      }
+    height = heightEntry->GetEntry()->GetValueAsInt();
 
     // For now, the image size for the animations cannot be larger than
     // the size of the render window. The problem is that tiling doesn't
@@ -1369,22 +1325,35 @@ void vtkPVAnimationInterface::SaveImagesCallback()
         }
       }
     
-    if ((width % 32) > 0)
+    if (isMPEG)
       {
-      width -= width % 32;
+      if ((width % 32) > 0)
+        {
+        width -= width % 32;
+        }
+      if ((height % 32) > 0)
+        {
+        height -= height % 32;
+        }
       }
-    if ((height % 32) > 0)
+    else
       {
-      height -= height % 32;
+      if ((width % 4) > 0)
+        {
+        width -= width % 4;
+        }
+      if ((height % 4) > 0)
+        {
+        height -= height % 4;
+        }
       }
     
     widthEntry->Delete();
     heightEntry->Delete();
-    aspectRatioMenu->Delete();
     frame->Delete();
     dlg->Delete();
 
-    this->SaveImages(fileRoot, ext, width, height, aspectRatio);
+    this->SaveImages(fileRoot, ext, width, height, 0);
     this->View->SetRenderWindowSize(origWidth, origHeight);
     
     delete [] fileRoot;
