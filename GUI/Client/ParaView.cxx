@@ -174,42 +174,33 @@ int MyMain(int argc, char *argv[])
     
     app->GetApplicationSettingsFromRegistery();
     
-    // Create the proper default render module.
-    // Only the root server processes args.
-    if (app->GetUseTiledDisplay())
-      {
-      if (app->GetRenderModuleName() == NULL)
-        { // I do not like this initialization here.
-        // Think about moving it.
+    // The client chooses a render module.
+    if (app->GetRenderModuleName() == NULL)
+      { // The render module has not been set by the user.  Choose a default.
+      if (app->GetUseTiledDisplay())
+        {
 #ifdef PARAVIEW_USE_ICE_T
         app->SetRenderModuleName("IceTRenderModule");
 #else
         app->SetRenderModuleName("MultiDisplayRenderModule");
 #endif
         }
-      }
-    else
-      {
-#ifdef VTK_USE_MPI
-      if (app->GetRenderModuleName() == NULL)
-        { // I do not like this initialization here.
-        // Think about moving it.
-        app->SetRenderModuleName("MPIRenderModule");
-        }
+      else if (app->GetClientMode())
+        { // Client server, no tiled display.
+#ifdef PARAVIEW_USE_ICE_T
+        app->SetRenderModuleName("DeskTopRenderModule");
 #else
-      if (app->GetRenderModuleName() == NULL)
-        { // I do not like this initialization here.
-        // Think about moving it.
-        if (app->GetClientMode())
-          {
-          app->SetRenderModuleName("MPIRenderModule");
-          }
-        else
-          {
-          app->SetRenderModuleName("LODRenderModule");
-          }
+        app->SetRenderModuleName("MPIRenderModule");
+#endif        
         }
+      else
+        { // Single process, or one MPI program
+#ifdef VTK_USE_MPI
+        app->SetRenderModuleName("MPIRenderModule");
+#else
+        app->SetRenderModuleName("LODRenderModule");
 #endif
+        }
       }
     }
   
