@@ -20,7 +20,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkPolyData.h"
 
-vtkCxxRevisionMacro(vtkPVGlyphFilter, "1.11");
+vtkCxxRevisionMacro(vtkPVGlyphFilter, "1.12");
 vtkStandardNewMacro(vtkPVGlyphFilter);
 
 //-----------------------------------------------------------------------------
@@ -68,6 +68,7 @@ void vtkPVGlyphFilter::Execute()
 {
   if (this->UseMaskPoints)
     {
+    vtkPolyData* output = this->GetOutput();
     this->Superclass::SetInput(this->MaskPoints->GetOutput());
     vtkIdType maxNumPts = this->MaximumNumberOfPoints;
     vtkIdType numPts = this->MaskPoints->GetInput()->GetNumberOfPoints();
@@ -108,6 +109,12 @@ void vtkPVGlyphFilter::Execute()
     maxNumPts = (maxNumPts < 1) ? 1 : maxNumPts;
     this->MaskPoints->SetMaximumNumberOfPoints(maxNumPts);
     this->MaskPoints->SetOnRatio(numPts / maxNumPts);
+    // I do not like connecting internal filters to the actual input, but
+    // This is the smallest change possible to fix the problem.
+    // This update caused input to be executed with number of piecces of 1.
+    this->MaskPoints->GetOutput()->SetUpdateNumberOfPieces(output->GetUpdateNumberOfPieces());
+    this->MaskPoints->GetOutput()->SetUpdatePiece(output->GetUpdatePiece());
+    this->MaskPoints->GetOutput()->SetUpdateGhostLevel(output->GetUpdateGhostLevel());
     this->MaskPoints->Update();
     }
   else
