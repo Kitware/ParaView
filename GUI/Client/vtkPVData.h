@@ -209,7 +209,8 @@ public:
   // Description:
   // Called when the user presses the "Edit Volume Appearance" button.
   void EditVolumeAppearanceCallback();
-
+  void ShowVolumeAppearanceEditor();
+  
   void SetScalarBarVisibility(int val);  
   void ScalarBarCheckCallback();
   vtkGetObjectMacro(ScalarBarCheck, vtkKWCheckButton);
@@ -327,6 +328,17 @@ public:
   vtkGetObjectMacro(ActorControlFrame, vtkKWLabeledFrame);
   vtkGetObjectMacro(PVColorMap, vtkPVColorMap);
 
+  // Description:
+  // Used during state file loading to restore the transfer functions
+  void ClearVolumeOpacity();
+  void AddVolumeOpacity( double scalar,
+                         double opacity );
+  void ClearVolumeColor();
+  void AddVolumeColor( double scalar,
+                       double r, double g, double b );
+
+  void SetVolumeOpacityUnitDistance( double d );
+  
 protected:
   vtkPVData();
   ~vtkPVData();

@@ -48,7 +48,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPartDisplay);
-vtkCxxRevisionMacro(vtkPVPartDisplay, "1.41");
+vtkCxxRevisionMacro(vtkPVPartDisplay, "1.42");
 
 
 //----------------------------------------------------------------------------
@@ -82,7 +82,9 @@ vtkPVPartDisplay::vtkPVPartDisplay()
   this->VolumeOpacityID.ID     = 0; 
   this->VolumeFieldFilterID.ID = 0;
   this->Volume                 = NULL;
-
+  this->VolumeColor            = NULL;
+  this->VolumeOpacity          = NULL;
+  
   this->VolumeRenderMode       = 0;
   
   // Create a unique id for creating tcl names.
@@ -379,6 +381,14 @@ void vtkPVPartDisplay::CreateParallelTclObjects(vtkPVApplication *pvApp)
   this->Volume = 
     vtkVolume::SafeDownCast(
       pm->GetObjectFromID(this->VolumeID));
+
+  this->VolumeOpacity = 
+    vtkPiecewiseFunction::SafeDownCast(
+      pm->GetObjectFromID(this->VolumeOpacityID));
+
+  this->VolumeColor = 
+    vtkColorTransferFunction::SafeDownCast(
+      pm->GetObjectFromID(this->VolumeColorID));
 
 }
 
@@ -695,12 +705,8 @@ void vtkPVPartDisplay::InitializeTransferFunctions(vtkPVArrayInformation *arrayI
   vtkPVApplication *pvApp = this->GetPVApplication();
   vtkPVProcessModule* pm = pvApp->GetProcessModule();
   
-  vtkPiecewiseFunction *opacityFunc = 
-    vtkPiecewiseFunction::SafeDownCast(
-      pm->GetObjectFromID(this->VolumeOpacityID));
-
   // need to initialize only if there are no points in the function
-  if ( opacityFunc->GetSize() == 0 )
+  if ( this->VolumeOpacity->GetSize() == 0 )
     {
     this->ResetTransferFunctions(arrayInfo, dataInfo);
     }

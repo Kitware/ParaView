@@ -22,6 +22,7 @@
 #include "vtkPVPart.h"
 #include "vtkPVPartDisplay.h"
 #include "vtkCollection.h"
+#include "vtkColorTransferFunction.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVDataSetAttributesInformation.h"
 #include "vtkPVArrayInformation.h"
@@ -45,6 +46,7 @@
 #include "vtkKWWidget.h"
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
+#include "vtkPiecewiseFunction.h"
 #include "vtkPVApplication.h"
 #include "vtkPVColorMap.h"
 #include "vtkPVConfig.h"
@@ -71,6 +73,7 @@
 #include "vtkPVRenderModule.h"
 #include "vtkPVArrayInformation.h"
 #include "vtkPVRenderModuleUI.h"
+#include "vtkVolumeProperty.h"
 
 // Just for the definition of VTK_POINT_DATA_FIELD ...
 #include "vtkFieldDataToAttributeDataFilter.h"
@@ -83,7 +86,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.295");
+vtkCxxRevisionMacro(vtkPVData, "1.296");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -1152,6 +1155,22 @@ void vtkPVData::EditVolumeAppearanceCallback()
     vtkErrorMacro("Expecting a volume appearance editor");
     return;
     }
+  
+  this->AddTraceEntry("$kw(%s) ShowVolumeAppearanceEditor",
+                      this->GetTclName());
+
+  this->ShowVolumeAppearanceEditor();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVData::ShowVolumeAppearanceEditor()
+{
+  if (this->VolumeAppearanceEditor == NULL)
+    {
+    vtkErrorMacro("Expecting a volume appearance editor");
+    return;
+    }
+  
   this->Script("pack forget [pack slaves %s]",
           this->GetPVRenderView()->GetPropertiesParent()->GetWidgetName());
   this->Script("pack %s -side top -fill both -expand t",
@@ -1654,26 +1673,23 @@ void vtkPVData::VolumeRenderPointField(const char *name)
   str = new char [strlen(name) + 16];
   sprintf(str, "Point %s", name);
   
-  if ( !strcmp(this->VolumeScalarsMenu->GetValue(),str) )
+  // Update the transfer functions
+  vtkPVPart *part;
+  int idx, num;
+  
+  vtkPVDataInformation* dataInfo = this->GetPVSource()->GetDataInformation();
+  vtkPVDataSetAttributesInformation *attrInfo = dataInfo->GetPointDataInformation();
+  vtkPVArrayInformation *arrayInfo = attrInfo->GetArrayInformation(name);
+  
+  num = this->GetPVSource()->GetNumberOfParts();
+  for (idx = 0; idx < num; ++idx)
     {
-    // Update the transfer functions
-    vtkPVPart *part;
-    int idx, num;
-    
-    vtkPVDataInformation* dataInfo = this->GetPVSource()->GetDataInformation();
-    vtkPVDataSetAttributesInformation *attrInfo = dataInfo->GetPointDataInformation();
-    vtkPVArrayInformation *arrayInfo = attrInfo->GetArrayInformation(name);
-    
-    num = this->GetPVSource()->GetNumberOfParts();
-    for (idx = 0; idx < num; ++idx)
-      {
-      part = this->GetPVSource()->GetPart(idx);
-      part->GetPartDisplay()->ResetTransferFunctions(arrayInfo, dataInfo);
-      }
-
-    this->VolumeScalarsMenu->SetValue(str);
-    this->VolumeRenderPointFieldInternal(name);
+    part = this->GetPVSource()->GetPart(idx);
+    part->GetPartDisplay()->ResetTransferFunctions(arrayInfo, dataInfo);
     }
+  
+  this->VolumeScalarsMenu->SetValue(str);
+  this->VolumeRenderPointFieldInternal(name);
   
   delete [] str;
 }
@@ -3127,6 +3143,8 @@ void vtkPVData::SaveState(ofstream *file)
   if (strcmp(this->RepresentationMenu->GetValue(), VTK_PV_VOLUME_LABEL) == 0)
     {
     *file << "$kw(" << this->GetTclName() << ") DrawVolume\n";
+    *file << "$kw(" << this->GetTclName() << ") VolumeRenderPointField {" 
+            << (this->VolumeScalarsMenu->GetValue() + 7) << "} " << endl;
     }
 
   if (strcmp(this->InterpolationMenu->GetValue(),"Flat") == 0)
@@ -3202,6 +3220,141 @@ void vtkPVData::SaveState(ofstream *file)
   
   *file << "$kw(" << this->GetTclName() << ") SetVisibility "
         << this->GetVisibility() << endl;  
+  
+  int num = this->GetPVSource()->GetNumberOfParts();
+  if ( num > 0 )
+    {
+    int size;
+    int count;
+    double *fun;
+    
+    vtkPVPart *part = this->GetPVSource()->GetPart(0);
+    
+    vtkPiecewiseFunction *volumeOpacity = part->GetPartDisplay()->GetVolumeOpacity();
+    *file << "$kw(" << this->GetTclName() << ") ClearVolumeOpacity" << endl;
+    size = volumeOpacity->GetSize();
+    fun  = volumeOpacity->GetDataPointer();
+    for ( count = 0; count < size; count++ )
+      {
+      *file << "$kw(" << this->GetTclName() << ") AddVolumeOpacity "
+            << fun[2*count  ] << " " << fun[2*count+1] << endl;
+      }
+
+    vtkColorTransferFunction *volumeColor = part->GetPartDisplay()->GetVolumeColor();
+    *file << "$kw(" << this->GetTclName() << ") ClearVolumeColor" << endl;
+    size = volumeColor->GetSize();
+    fun  = volumeColor->GetDataPointer();
+    for ( count = 0; count < size; count++ )
+      {
+      *file << "$kw(" << this->GetTclName() << ") AddVolumeColor "
+            << fun[4*count  ] << " " << fun[4*count+1] << " " 
+            << fun[4*count+2] << " " << fun[4*count+3] << endl;      
+      }
+    
+    *file << "$kw(" << this->GetTclName() << ") SetVolumeOpacityUnitDistance " 
+          << part->GetPartDisplay()->GetVolume()->GetProperty()->GetScalarOpacityUnitDistance()
+          << endl;
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVData::SetVolumeOpacityUnitDistance( double d )
+{
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  vtkPVProcessModule* pm = pvApp->GetProcessModule();
+  vtkPVPart *part;
+  int idx, num;
+
+  num = this->GetPVSource()->GetNumberOfParts();
+  for (idx = 0; idx < num; ++idx)
+    {
+    part = this->GetPVSource()->GetPart(idx);
+    pm->GetStream() 
+      << vtkClientServerStream::Invoke 
+      << part->GetPartDisplay()->GetVolumePropertyID()
+      << "SetScalarOpacityUnitDistance" << d << vtkClientServerStream::End;
+    pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVData::ClearVolumeOpacity()
+{
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  vtkPVProcessModule* pm = pvApp->GetProcessModule();
+  vtkPVPart *part;
+  int idx, num;
+
+  num = this->GetPVSource()->GetNumberOfParts();
+  for (idx = 0; idx < num; ++idx)
+    {
+    part = this->GetPVSource()->GetPart(idx);
+    pm->GetStream() 
+      << vtkClientServerStream::Invoke 
+      << part->GetPartDisplay()->GetVolumeOpacityID()
+      << "RemoveAllPoints" << vtkClientServerStream::End;
+    pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVData::AddVolumeOpacity( double scalar, double opacity )
+{
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  vtkPVProcessModule* pm = pvApp->GetProcessModule();
+  vtkPVPart *part;
+  int idx, num;
+
+  num = this->GetPVSource()->GetNumberOfParts();
+  for (idx = 0; idx < num; ++idx)
+    {
+    part = this->GetPVSource()->GetPart(idx);
+    pm->GetStream() 
+      << vtkClientServerStream::Invoke 
+      << part->GetPartDisplay()->GetVolumeOpacityID()
+      << "AddPoint" << scalar << opacity << vtkClientServerStream::End;
+    pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVData::ClearVolumeColor()
+{
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  vtkPVProcessModule* pm = pvApp->GetProcessModule();
+  vtkPVPart *part;
+  int idx, num;
+
+  num = this->GetPVSource()->GetNumberOfParts();
+  for (idx = 0; idx < num; ++idx)
+    {
+    part = this->GetPVSource()->GetPart(idx);
+    pm->GetStream() 
+      << vtkClientServerStream::Invoke 
+      << part->GetPartDisplay()->GetVolumeColorID()
+      << "RemoveAllPoints" << vtkClientServerStream::End;
+    pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVData::AddVolumeColor( double scalar, double r, double g, double b )
+{
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  vtkPVProcessModule* pm = pvApp->GetProcessModule();
+  vtkPVPart *part;
+  int idx, num;
+
+  num = this->GetPVSource()->GetNumberOfParts();
+  for (idx = 0; idx < num; ++idx)
+    {
+    part = this->GetPVSource()->GetPart(idx);
+    pm->GetStream() 
+      << vtkClientServerStream::Invoke 
+      << part->GetPartDisplay()->GetVolumeColorID()
+      << "AddRGBPoint" << scalar << r << g << b << vtkClientServerStream::End;
+    pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
+    }
 }
 
 //----------------------------------------------------------------------------

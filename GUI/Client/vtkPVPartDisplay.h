@@ -140,8 +140,10 @@ public:
 
   //BTX
   // Description:
-  // Return the vtkVolume
+  // Return the actual objects
   vtkVolume *GetVolume() { return this->Volume; };
+  vtkPiecewiseFunction *GetVolumeOpacity() {return this->VolumeOpacity;};
+  vtkColorTransferFunction *GetVolumeColor() {return this->VolumeColor;};
   //ETX
   
   // Description:
@@ -213,7 +215,9 @@ protected:
   vtkClientServerID VolumeTetraFilterID;
   vtkClientServerID VolumeFieldFilterID;
 
-  vtkVolume         *Volume;
+  vtkVolume                *Volume;
+  vtkPiecewiseFunction     *VolumeOpacity;
+  vtkColorTransferFunction *VolumeColor;
   
   // Here to create unique names.
   int InstanceCount;

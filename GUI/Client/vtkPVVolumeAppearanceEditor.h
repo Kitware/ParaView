@@ -83,13 +83,25 @@ public:
                                 vtkPVArrayInformation *arrayInfo );
   
   void ScalarOpacityRampChanged();
-  void ScalarOpacityRampChangedInternal();
+  void SetScalarOpacityRamp( double scalarStart, double opacityStart,
+                             double scalarEnd,   double opacityEnd );
+  void SetScalarOpacityRampInternal( double scalarStart, double opacityStart,
+                                     double scalarEnd,   double opacityEnd );
   
   void ScalarOpacityUnitDistanceChanged();
-  void ScalarOpacityUnitDistanceChangedInternal();
+  void SetScalarOpacityUnitDistance(double d);
+  void SetScalarOpacityUnitDistanceInternal(double d);
 
   void ColorRampChanged();
-  void ColorRampChangedInternal();
+  void SetColorRamp( double s1, double r1, 
+                     double g1, double b1,
+                     double s2, double r2, 
+                     double g2, double b2 );
+  void SetColorRampInternal( double s1, double r1, 
+                             double g1, double b1,
+                             double s2, double r2, 
+                             double g2, double b2 );
+  
 
   void ColorMapLabelConfigureCallback(int width, int height);
   

@@ -41,7 +41,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVVolumeAppearanceEditor);
-vtkCxxRevisionMacro(vtkPVVolumeAppearanceEditor, "1.11");
+vtkCxxRevisionMacro(vtkPVVolumeAppearanceEditor, "1.12");
 
 int vtkPVVolumeAppearanceEditorCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -82,6 +82,8 @@ vtkPVVolumeAppearanceEditor::vtkPVVolumeAppearanceEditor()
   this->MapDataSize                    = 0;
   this->MapHeight                      = 25;
   this->MapWidth                       = 20;
+  
+  this->PVSource                       = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -464,7 +466,9 @@ void vtkPVVolumeAppearanceEditor::BackButtonCallback()
 
   // This has a side effect of gathering and display information.
   this->PVRenderView->GetPVWindow()->GetCurrentPVSource()->GetPVOutput()->UpdateProperties();
-  this->PVRenderView->GetPVWindow()->ShowCurrentSourceProperties();
+  
+  // Use the Callback version of the method to get the trace
+  this->PVRenderView->GetPVWindow()->ShowCurrentSourcePropertiesCallback();
 }
 
 //----------------------------------------------------------------------------
@@ -575,12 +579,56 @@ void vtkPVVolumeAppearanceEditor::SetPVSourceAndArrayInfo(vtkPVSource *source,
 //----------------------------------------------------------------------------
 void vtkPVVolumeAppearanceEditor::ScalarOpacityRampChanged()
 {
-  this->ScalarOpacityRampChangedInternal();
-  this->AddTraceEntry("$kw(%s) ScalarOpacityRampChanged", this->GetTclName());
+  vtkPVApplication *pvApp = NULL;
+  
+  if ( this->GetApplication() )
+    {
+    pvApp =
+      vtkPVApplication::SafeDownCast(this->GetApplication());    
+    }
+  
+  if ( this->PVSource && this->ArrayInfo && pvApp )
+    {
+
+    
+    double range[2];
+    this->ScalarOpacityRampRange->GetRange(range);
+    
+    double startValue = this->ScalarOpacityStartValueScale->GetValue();
+    double endValue = this->ScalarOpacityEndValueScale->GetValue();
+    
+    this->SetScalarOpacityRamp( range[0], startValue, range[1], endValue );
+    }
 }
 
 //----------------------------------------------------------------------------
-void vtkPVVolumeAppearanceEditor::ScalarOpacityRampChangedInternal()
+void vtkPVVolumeAppearanceEditor::SetScalarOpacityRamp( double scalarStart,
+                                                        double opacityStart,
+                                                        double scalarEnd,
+                                                        double opacityEnd )
+{
+  double range[2];
+  range[0] = scalarStart;
+  range[1] = scalarEnd;
+  
+  this->ScalarOpacityRampRange->SetRange( range );
+  this->ScalarOpacityStartValueScale->SetValue( opacityStart );
+  this->ScalarOpacityEndValueScale->SetValue( opacityEnd );
+  
+  this->SetScalarOpacityRampInternal( scalarStart, opacityStart,
+                                      scalarEnd,   opacityEnd );
+  
+  this->AddTraceEntry("$kw(%s) SetScalarOpacityRamp %f %f %f %f", 
+                      this->GetTclName(), 
+                      scalarStart, opacityStart,
+                      scalarEnd,   opacityEnd );
+}
+  
+//----------------------------------------------------------------------------
+void vtkPVVolumeAppearanceEditor::SetScalarOpacityRampInternal( double scalarStart,
+                                                                double opacityStart,
+                                                                double scalarEnd,
+                                                                double opacityEnd )
 {
   vtkPVApplication *pvApp = NULL;
   
@@ -592,12 +640,6 @@ void vtkPVVolumeAppearanceEditor::ScalarOpacityRampChangedInternal()
   
   if ( this->PVSource && this->ArrayInfo && pvApp )
     {
-    double range[2];
-    this->ScalarOpacityRampRange->GetRange(range);
-    
-    double startValue = this->ScalarOpacityStartValueScale->GetValue();
-    double endValue = this->ScalarOpacityEndValueScale->GetValue();
-
     int numParts = this->PVSource->GetNumberOfParts();
     int i;
     vtkPVPart *part;
@@ -615,9 +657,9 @@ void vtkPVVolumeAppearanceEditor::ScalarOpacityRampChangedInternal()
       stream << vtkClientServerStream::Invoke << volumeOpacityID 
              << "RemoveAllPoints" << vtkClientServerStream::End;
       stream << vtkClientServerStream::Invoke << volumeOpacityID 
-             << "AddPoint" << range[0] << startValue << vtkClientServerStream::End;
+             << "AddPoint" << scalarStart << opacityStart << vtkClientServerStream::End;
       stream << vtkClientServerStream::Invoke << volumeOpacityID 
-             << "AddPoint" << range[1] << endValue << vtkClientServerStream::End;
+             << "AddPoint" << scalarEnd << opacityEnd << vtkClientServerStream::End;
       pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
       }
     this->RenderView();
@@ -628,12 +670,21 @@ void vtkPVVolumeAppearanceEditor::ScalarOpacityRampChangedInternal()
 //----------------------------------------------------------------------------
 void vtkPVVolumeAppearanceEditor::ScalarOpacityUnitDistanceChanged()
 {
-  this->ScalarOpacityUnitDistanceChangedInternal();
-  this->AddTraceEntry("$kw(%s) ScalarOpacityUnitDistanceChanged", this->GetTclName());
+  double d = this->ScalarOpacityUnitDistanceScale->GetValue();
+  this->SetScalarOpacityUnitDistance( d );
 }
 
 //----------------------------------------------------------------------------
-void vtkPVVolumeAppearanceEditor::ScalarOpacityUnitDistanceChangedInternal()
+void vtkPVVolumeAppearanceEditor::SetScalarOpacityUnitDistance(double d)
+{
+  this->ScalarOpacityUnitDistanceScale->SetValue( d );
+  this->SetScalarOpacityUnitDistanceInternal( d );
+  this->AddTraceEntry("$kw(%s) SetScalarOpacityUnitDistance %f", 
+                      this->GetTclName(), d );
+}
+
+//----------------------------------------------------------------------------
+void vtkPVVolumeAppearanceEditor::SetScalarOpacityUnitDistanceInternal(double d)
 {
   vtkPVApplication *pvApp = NULL;
   
@@ -645,8 +696,6 @@ void vtkPVVolumeAppearanceEditor::ScalarOpacityUnitDistanceChangedInternal()
   
   if ( this->PVSource && this->ArrayInfo && pvApp )
     {
-    double unitDistance = this->ScalarOpacityUnitDistanceScale->GetValue();
-
     int numParts = this->PVSource->GetNumberOfParts();
     int i;
     vtkPVPart *part;
@@ -662,7 +711,7 @@ void vtkPVVolumeAppearanceEditor::ScalarOpacityUnitDistanceChangedInternal()
       vtkClientServerStream& stream = pm->GetStream();
       
       stream << vtkClientServerStream::Invoke << volumePropertyID 
-             << "SetScalarOpacityUnitDistance" << unitDistance << vtkClientServerStream::End;
+             << "SetScalarOpacityUnitDistance" << d << vtkClientServerStream::End;
       pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
       }
     this->RenderView();
@@ -681,13 +730,6 @@ void vtkPVVolumeAppearanceEditor::ColorButtonCallback( float vtkNotUsed(r),
 //----------------------------------------------------------------------------
 void vtkPVVolumeAppearanceEditor::ColorRampChanged()
 {
-  this->ColorRampChangedInternal();
-  this->AddTraceEntry("$kw(%s) ColorRampChanged", this->GetTclName());
-}
-
-//----------------------------------------------------------------------------
-void vtkPVVolumeAppearanceEditor::ColorRampChangedInternal()
-{
   vtkPVApplication *pvApp = NULL;
   
   if ( this->GetApplication() )
@@ -703,7 +745,50 @@ void vtkPVVolumeAppearanceEditor::ColorRampChangedInternal()
     
     double *startColor = this->ColorStartValueButton->GetColor();
     double *endColor = this->ColorEndValueButton->GetColor();
+    
+    this->SetColorRamp( range[0], startColor[0], startColor[1], startColor[2],
+                        range[1], endColor[0], endColor[1], endColor[2] );
+    }
+}
 
+//----------------------------------------------------------------------------
+void vtkPVVolumeAppearanceEditor::SetColorRamp( double s1, double r1, 
+                                                double g1, double b1,
+                                                double s2, double r2, 
+                                                double g2, double b2 )
+{
+  double range[2];
+  range[0] = s1;
+  range[1] = s2;
+  this->ColorRampRange->SetRange(range);
+  
+  this->ColorStartValueButton->SetColor( r1, g1, b1 );
+  this->ColorEndValueButton->SetColor( r2, g2, b2 );
+  
+  this->SetColorRampInternal( s1, r1, g1, b1,
+                              s2, r2, g2, b2 );
+  
+  this->AddTraceEntry("$kw(%s) SetColorRamp %f %f %f %f %f %f %f %f",
+                      this->GetTclName(), 
+                      s1, r1, g1, b1, s2, r2, g2, b2 );
+}
+
+//----------------------------------------------------------------------------
+void vtkPVVolumeAppearanceEditor::SetColorRampInternal( double s1, double r1, 
+                                                        double g1, double b1,
+                                                        double s2, double r2, 
+                                                        double g2, double b2 )
+{
+  vtkPVApplication *pvApp = NULL;
+  
+  if ( this->GetApplication() )
+    {
+    pvApp =
+      vtkPVApplication::SafeDownCast(this->GetApplication());    
+    }
+  
+  if ( this->PVSource && this->ArrayInfo && pvApp )
+    {
     int numParts = this->PVSource->GetNumberOfParts();
     int i;
     vtkPVPart *part;
@@ -721,12 +806,10 @@ void vtkPVVolumeAppearanceEditor::ColorRampChangedInternal()
       stream << vtkClientServerStream::Invoke << volumeColorID 
              << "RemoveAllPoints" << vtkClientServerStream::End;
       stream << vtkClientServerStream::Invoke << volumeColorID 
-             << "AddRGBPoint" << range[0] 
-             << startColor[0] << startColor[1] << startColor[2] 
+             << "AddRGBPoint" << s1 << r1 << g1 << b1 
              << vtkClientServerStream::End;
       stream << vtkClientServerStream::Invoke << volumeColorID 
-             << "AddRGBPoint" << range[1] 
-             << endColor[0] << endColor[1] << endColor[2] 
+             << "AddRGBPoint" << s2 << r2 << g2 << b2
              << vtkClientServerStream::End;
       pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
       }

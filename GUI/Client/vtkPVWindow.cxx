@@ -127,7 +127,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.588");
+vtkCxxRevisionMacro(vtkPVWindow, "1.589");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -4222,6 +4222,8 @@ vtkPVVolumeAppearanceEditor* vtkPVWindow::GetVolumeAppearanceEditor()
     this->VolumeAppearanceEditor->
       SetPVRenderView(this->GetMainView());
     this->VolumeAppearanceEditor->Create(this->GetPVApplication());
+    this->VolumeAppearanceEditor->SetTraceReferenceObject(this);
+    this->VolumeAppearanceEditor->SetTraceReferenceCommand("GetVolumeAppearanceEditor");
     }
   
   return this->VolumeAppearanceEditor;
