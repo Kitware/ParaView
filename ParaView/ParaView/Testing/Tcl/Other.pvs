@@ -9,4 +9,16 @@ $pvWindow DisableToolbarButtons
 $pvWindow EnableToolbarButtons
 $pvWindow PrintRecentFiles
 $pvWindow SaveSessionFile "vtkParaViewOtherTest.pvs"
+$pvWindow LoadSessionFile "vtkParaViewOtherTest.pvs"
+foreach control { 1 2 } {
+    foreach shift { 1 2 } {
+	foreach button { 1 2 3 } {
+	    $pvWindow MouseAction 0 $button 10 10 $shift $control
+	    $pvWindow MouseAction 1 $button 12 12 $shift $control
+	    $pvWindow MouseAction 1 $button 15 15 $shift $control
+	    $pvWindow MouseAction 1 $button 17 17 $shift $control
+	    $pvWindow MouseAction 2 $button 20 20 $shift $control
+	}
+    }
+}
 
