@@ -62,7 +62,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPartDisplay);
-vtkCxxRevisionMacro(vtkPVPartDisplay, "1.7");
+vtkCxxRevisionMacro(vtkPVPartDisplay, "1.8");
 
 
 //----------------------------------------------------------------------------
@@ -387,7 +387,7 @@ void vtkPVPartDisplay::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "MapperTclName: " << (this->MapperTclName?this->MapperTclName:"none") << endl;
   os << indent << "PropTclName: " << (this->PropTclName?this->PropTclName:"none") << endl;
   os << indent << "PropertyTclName: " << (this->PropertyTclName?this->PropertyTclName:"none") << endl;
-  os << indnet << "PVApplication: " << this->PVApplication << endl;
+  os << indent << "PVApplication: " << this->PVApplication << endl;
 
   os << indent << "DirectColorFlag: " << this->DirectColorFlag << endl;
 
