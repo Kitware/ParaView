@@ -217,6 +217,7 @@ public:
   {
   public:
     WidgetLocation();
+    void Empty();
 
     int PageId;
     vtkKWWidget *AfterWidget;
@@ -281,7 +282,7 @@ protected:
   // Get a D&D widget given its label (as returned by 
   // GetDragAndDropWidgetLabel()) and a hint about its location.
   virtual vtkKWWidget* GetDragAndDropWidgetFromLabelAndLocation(
-    const char *widget_label, WidgetLocation *loc_hint);
+    const char *widget_label, const WidgetLocation *loc_hint);
 
   // List of D&D entries
 
@@ -295,16 +296,27 @@ protected:
   DragAndDropEntry* GetLastDragAndDropEntry(vtkKWWidget *Widget);
 
   // Description:
+  // Check if a widget that was drag & drop has gone back to its previous
+  // location
+  virtual int IsDragAndDropWidgetAtOriginalLocation(vtkKWWidget *widget);
+
+  // Description:
   // Add a D&D entry to the list of entries, given a widget and its
   // target location (its current/source location will be computed 
   // automatically)
-  int AddDragAndDropEntry(vtkKWWidget *Widget, WidgetLocation *to_loc);
+  int AddDragAndDropEntry(
+    vtkKWWidget *Widget, 
+    const WidgetLocation *from_loc,
+    const WidgetLocation *to_loc);
 
   // Description:
   // Perform the actual D&D given a widget and its target location.
   // It will call AddDragAndDropEntry() and pack the widget to its new
   // location
-  virtual int DragAndDropWidget(vtkKWWidget *widget, WidgetLocation *to_loc);
+  virtual int DragAndDropWidget(
+    vtkKWWidget *widget, 
+    const WidgetLocation *from_loc,
+    const WidgetLocation *to_loc);
 
   //ETX
 

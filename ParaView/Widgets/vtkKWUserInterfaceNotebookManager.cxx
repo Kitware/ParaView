@@ -52,7 +52,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWUserInterfaceNotebookManager);
-vtkCxxRevisionMacro(vtkKWUserInterfaceNotebookManager, "1.17");
+vtkCxxRevisionMacro(vtkKWUserInterfaceNotebookManager, "1.18");
 
 int vtkKWUserInterfaceNotebookManagerCommand(ClientData cd, Tcl_Interp *interp,
                                              int argc, char *argv[]);
@@ -660,6 +660,12 @@ void vtkKWUserInterfaceNotebookManager::UpdatePanelDragAndDrop(
 //---------------------------------------------------------------------------
 vtkKWUserInterfaceNotebookManager::WidgetLocation::WidgetLocation()
 {
+  this->Empty();
+}
+
+//---------------------------------------------------------------------------
+void vtkKWUserInterfaceNotebookManager::WidgetLocation::Empty()
+{
   this->PageId = -1;
   this->AfterWidget = NULL;
 }
@@ -668,7 +674,7 @@ vtkKWUserInterfaceNotebookManager::WidgetLocation::WidgetLocation()
 int vtkKWUserInterfaceNotebookManager::GetDragAndDropWidgetLocation(
   vtkKWWidget *widget, WidgetLocation *loc)
 {
-  if (!this->Notebook || !widget || !loc || !widget->IsPacked())
+  if (!loc || !this->Notebook || !widget || !widget->IsPacked())
     {
     return 0;
     }
@@ -693,30 +699,44 @@ int vtkKWUserInterfaceNotebookManager::GetDragAndDropWidgetLocation(
     return 0;
     }
 
+  loc->Empty();
+
   loc->PageId = page_id;
 
-  // Query all the slaves in the same page, find the one located before our
-  // widget (if any) so that we can locate the widget among its sibblings.
+  // Query all the slaves in the same page, find the one located before 
+  // our widget (if any) so that we can locate the widget among
+  // its sibblings.
 
   ostrstream prev_slave_str;
-  if (vtkKWTkUtilities::GetPreviousSlave(
+  ostrstream next_slave_str;
+
+  if (vtkKWTkUtilities::GetPreviousAndNextSlave(
         widget->GetApplication()->GetMainInterp(),
         this->Notebook->GetFrame(page_id)->GetWidgetName(),
         widget->GetWidgetName(),
-        prev_slave_str))
+        prev_slave_str,
+        next_slave_str))
     {
     // Get the page's panel, then the panel's page's parent, and check if we
     // can find the previous widget (since they share the same parent)
 
     prev_slave_str << ends;
+    next_slave_str << ends;
+
     vtkKWUserInterfacePanel *panel = this->GetPanelFromPageId(page_id);
     vtkKWWidget *parent = this->GetPagesParentWidget(panel);
     if (parent)
       {
-      loc->AfterWidget = parent->GetChildWidgetWithName(prev_slave_str.str());
+      if (*prev_slave_str.str())
+        {
+        loc->AfterWidget = 
+          parent->GetChildWidgetWithName(prev_slave_str.str());
+        }
       }
     }
+
   prev_slave_str.rdbuf()->freeze(0);
+  next_slave_str.rdbuf()->freeze(0);
 
   return 1;
 }
@@ -724,7 +744,7 @@ int vtkKWUserInterfaceNotebookManager::GetDragAndDropWidgetLocation(
 //----------------------------------------------------------------------------
 vtkKWWidget* 
 vtkKWUserInterfaceNotebookManager::GetDragAndDropWidgetFromLabelAndLocation(
-  const char *widget_label, WidgetLocation *loc_hint)
+  const char *widget_label, const WidgetLocation *loc_hint)
 {
   if (!widget_label || !loc_hint)
     {
@@ -810,37 +830,6 @@ vtkKWUserInterfaceNotebookManager::GetLastDragAndDropEntry(vtkKWWidget *widget)
   it->Delete();
 
   return found;
-}
-
-//---------------------------------------------------------------------------
-int vtkKWUserInterfaceNotebookManager::AddDragAndDropEntry(
-  vtkKWWidget *widget, WidgetLocation *to_loc)
-{
-  // Get the current location
-
-  vtkKWUserInterfaceNotebookManager::WidgetLocation from_loc;
-  if (!this->GetDragAndDropWidgetLocation(widget, &from_loc))
-    {
-    return 0;
-    }
-
-  // Create and set an entry
-
-  vtkKWUserInterfaceNotebookManager::DragAndDropEntry *dd_entry = 
-    new vtkKWUserInterfaceNotebookManager::DragAndDropEntry;
-
-  if (this->DragAndDropEntries->AppendItem(dd_entry) != VTK_OK)
-    {
-    vtkErrorMacro("Error while adding a Drag & Drop entry to the manager.");
-    delete dd_entry;
-    return 0;
-    }
-
-  dd_entry->Widget = widget;
-  dd_entry->FromLocation = from_loc;
-  dd_entry->ToLocation = *to_loc;
-
-  return 1;
 }
 
 //---------------------------------------------------------------------------
@@ -1059,25 +1048,22 @@ int vtkKWUserInterfaceNotebookManager::DragAndDropWidget(
 
   // Move the widget
 
-  this->DragAndDropWidget(widget, &to_loc);
+  this->DragAndDropWidget(widget, &from_loc, &to_loc);
 
   return 1;
 }
 
 //----------------------------------------------------------------------------
 int vtkKWUserInterfaceNotebookManager::DragAndDropWidget(
-  vtkKWWidget *widget, WidgetLocation *to_loc)
+  vtkKWWidget *widget, 
+  const WidgetLocation *from_loc,
+  const WidgetLocation *to_loc)
 {
-  if (!widget || !this->Notebook || !to_loc || !widget->IsCreated())
+  if (!widget || !from_loc || !to_loc ||
+      !this->Notebook || !widget->IsCreated())
     {
     return 0;
     }
-
-  // Store the fact that this widget was moved
-  // Do it before actually packing the widget, so that its current location
-  // can be acquired before it is changed
-
-  this->AddDragAndDropEntry(widget, to_loc);
 
   // If a page id was specified, then pack in that specific page
 
@@ -1105,6 +1091,180 @@ int vtkKWUserInterfaceNotebookManager::DragAndDropWidget(
   in.rdbuf()->freeze(0);
   after.rdbuf()->freeze(0);
 
+  // Store the fact that this widget was moved
+
+  this->AddDragAndDropEntry(widget, from_loc, to_loc);
+
+  return 1;
+}
+
+//---------------------------------------------------------------------------
+int vtkKWUserInterfaceNotebookManager::IsDragAndDropWidgetAtOriginalLocation(
+  vtkKWWidget *widget)
+{
+  if (!widget)
+    {
+    return 0;
+    }
+
+  int atoriginal = 1;
+
+  vtkKWUserInterfaceNotebookManager::DragAndDropEntry *dd_entry = NULL;
+  vtkKWUserInterfaceNotebookManager::DragAndDropEntriesContainerIterator *it = 
+    this->DragAndDropEntries->NewIterator();
+
+  it->InitTraversal();
+  while (!it->IsDoneWithTraversal())
+    {
+    if (it->GetData(dd_entry) == VTK_OK && dd_entry->Widget == widget)
+      {
+      // Check that we have the same location, and that the after widget
+      // is either NULL or a widget that has not moved either
+
+      atoriginal = 
+        (dd_entry->FromLocation.PageId == 
+         dd_entry->ToLocation.PageId &&
+         dd_entry->FromLocation.AfterWidget == 
+         dd_entry->ToLocation.AfterWidget &&
+         (dd_entry->ToLocation.AfterWidget == NULL ||
+          this->IsDragAndDropWidgetAtOriginalLocation(
+            dd_entry->ToLocation.AfterWidget)));
+      break;
+      }
+    it->GoToNextItem();
+    }
+  it->Delete();
+
+  return atoriginal;
+}
+
+//---------------------------------------------------------------------------
+int vtkKWUserInterfaceNotebookManager::AddDragAndDropEntry(
+  vtkKWWidget *widget, 
+  const WidgetLocation *from_loc, 
+  const WidgetLocation *to_loc)
+{
+  if (!widget || !from_loc || !to_loc)
+    {
+    return 0;
+    }
+
+  vtkKWUserInterfaceNotebookManager::DragAndDropEntry *dd_entry, *prev_entry;
+
+  vtkKWUserInterfaceNotebookManager::WidgetLocation from_loc_fixed = *from_loc;
+
+  // Do we have an entry for that widget already ?
+  // In that case, remove it, and use the previous "from" location as the
+  // current "from" location
+  
+  prev_entry = this->GetLastDragAndDropEntry(widget);
+  if (prev_entry)
+    {
+    vtkIdType idx;
+    if (!this->DragAndDropEntries->FindItem(prev_entry, idx) ||
+        !this->DragAndDropEntries->RemoveItem(idx))
+      {
+      vtkErrorMacro(
+        "Error while removing previous Drag & Drop entry from the manager.");
+      return 0;
+      }
+    from_loc_fixed = prev_entry->FromLocation;
+    }
+
+  // Append and set an entry
+
+  dd_entry = new vtkKWUserInterfaceNotebookManager::DragAndDropEntry;
+  if (this->DragAndDropEntries->AppendItem(dd_entry) != VTK_OK)
+    {
+    vtkErrorMacro("Error while adding a Drag & Drop entry to the manager.");
+    delete dd_entry;
+    return 0;
+    }
+
+  dd_entry->Widget = widget;
+  dd_entry->FromLocation = from_loc_fixed;
+  dd_entry->ToLocation = *to_loc;
+
+  if (prev_entry)
+    {
+    delete prev_entry;
+    }
+
+  // Browse each entry for any entry representing a widget (W) 
+  // dropped after the widget (A) we have moved. Since the location
+  // if A is not valid anymore (it has been repack elsewhere), update the
+  // old entry W so that its destination location matches its current location
+
+  vtkKWUserInterfaceNotebookManager::DragAndDropEntriesContainerIterator *it = 
+    this->DragAndDropEntries->NewIterator();
+
+  it->InitTraversal();
+  while (!it->IsDoneWithTraversal())
+    {
+    if (it->GetData(dd_entry) == VTK_OK &&
+        dd_entry->ToLocation.AfterWidget == widget)
+      {
+      this->GetDragAndDropWidgetLocation(
+        dd_entry->Widget, &dd_entry->ToLocation);
+      }
+    it->GoToNextItem();
+    }
+
+  // Browse each entry, check if it represents an actual motion, if not 
+  // then remove it
+
+  it->InitTraversal();
+  while (!it->IsDoneWithTraversal())
+    {
+    if (it->GetData(dd_entry) == VTK_OK && 
+        this->IsDragAndDropWidgetAtOriginalLocation(dd_entry->Widget))
+      {
+      it->GoToNextItem();
+      vtkIdType idx;
+      if (this->DragAndDropEntries->FindItem(dd_entry, idx) &&
+          this->DragAndDropEntries->RemoveItem(idx))
+        {
+        delete dd_entry;
+        }
+      else
+        {
+        vtkErrorMacro(
+          "Error while removing noop Drag & Drop entry from the manager.");
+        }
+      }
+    else
+      {
+      it->GoToNextItem();
+      }
+    }
+
+#if 0
+  cout << "-------------------------------" << endl;
+  it->InitTraversal();
+  while (!it->IsDoneWithTraversal())
+    {
+    if (it->GetData(dd_entry) == VTK_OK)
+      {
+      cout << this->GetDragAndDropWidgetLabel(dd_entry->Widget) << " :\n";
+      cout << " - From (" 
+           << this->Notebook->GetPageTitle(dd_entry->FromLocation.PageId)
+           << ", ";
+      char *ptr = 
+        this->GetDragAndDropWidgetLabel(dd_entry->FromLocation.AfterWidget);
+      cout << (ptr ? ptr : "-") << ") " << endl;
+      cout << " - To   (" 
+           << this->Notebook->GetPageTitle(dd_entry->ToLocation.PageId)
+           << ", ";
+      ptr = 
+        this->GetDragAndDropWidgetLabel(dd_entry->ToLocation.AfterWidget);
+      cout << (ptr ? ptr : "-") << ") " << endl;
+      }
+    it->GoToNextItem();
+    }
+#endif
+
+  it->Delete();
+  
   return 1;
 }
 
@@ -1120,6 +1280,14 @@ void vtkKWUserInterfaceNotebookManager::DragAndDropEndCallback(
     return;
     }
 
+  // Get the current location of the widget
+
+  vtkKWUserInterfaceNotebookManager::WidgetLocation from_loc;
+  if (!this->GetDragAndDropWidgetLocation(widget, &from_loc))
+    {
+    return;
+    }
+
   // If the target is a "tab" in the notebook, move the widget to the page
   // corresponding to that "tab"
 
@@ -1130,8 +1298,7 @@ void vtkKWUserInterfaceNotebookManager::DragAndDropEndCallback(
       {
       vtkKWUserInterfaceNotebookManager::WidgetLocation to_loc;
       to_loc.PageId = page_id;
-      to_loc.AfterWidget = NULL;
-      this->DragAndDropWidget(widget, &to_loc);
+      this->DragAndDropWidget(widget, &from_loc, &to_loc);
       }
     return;
     }
@@ -1139,12 +1306,6 @@ void vtkKWUserInterfaceNotebookManager::DragAndDropEndCallback(
   // If not, first try to find the panel this widget is located in,
   // then browse the children of the panel to find the drop zone among the
   // sibling of the dragged widget
-
-  vtkKWUserInterfaceNotebookManager::WidgetLocation from_loc;
-  if (!this->GetDragAndDropWidgetLocation(widget, &from_loc))
-    {
-    return;
-    }
 
   vtkKWUserInterfacePanel *panel = this->GetPanelFromPageId(from_loc.PageId);
   if (!panel)
@@ -1163,7 +1324,7 @@ void vtkKWUserInterfaceNotebookManager::DragAndDropEndCallback(
     vtkKWWidget *anchor = 0;
 
     // If a compliant sibbling was found, move the dragged widget after it
-
+    
     if (sibbling != widget &&
         this->CanWidgetBeDragAndDropped(sibbling, &anchor) &&
         sibbling->IsMapped() && 
@@ -1175,7 +1336,7 @@ void vtkKWUserInterfaceNotebookManager::DragAndDropEndCallback(
       vtkKWUserInterfaceNotebookManager::WidgetLocation to_loc;
       to_loc.PageId = from_loc.PageId;
       to_loc.AfterWidget = sibbling;
-      this->DragAndDropWidget(widget, &to_loc);
+      this->DragAndDropWidget(widget, &from_loc, &to_loc);
       break;
       }
     sibbling_it->GoToNextItem();
