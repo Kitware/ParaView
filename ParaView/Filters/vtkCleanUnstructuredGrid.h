@@ -14,7 +14,6 @@
 #define __vtkCleanUnstructuredGrid_h
 
 #include <vtkDataSetToUnstructuredGridFilter.h>
-#include <vtkVersion.h>
 
 class vtkUnstructuredGrid;
 class vtkPointLocator;
