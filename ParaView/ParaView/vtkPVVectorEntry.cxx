@@ -49,6 +49,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVAnimationInterface.h"
 #include "vtkPVApplication.h"
 #include "vtkPVXMLElement.h"
+#include "vtkString.h"
 #include "vtkStringList.h"
 
 //----------------------------------------------------------------------------
@@ -69,6 +70,12 @@ vtkPVVectorEntry::vtkPVVectorEntry()
   this->VectorLength = 1;
   this->EntryLabel   = 0;
   this->ReadOnly     = 0;
+
+  int cc;
+  for ( cc = 0; cc < 6; cc ++ )
+    {
+    this->EntryValues[cc] = 0;
+    }
 }
 
 //---------------------------------------------------------------------------
@@ -84,6 +91,16 @@ vtkPVVectorEntry::~vtkPVVectorEntry()
   this->SetScriptValue(NULL);
   this->SubLabelTxts->Delete();
   this->SetEntryLabel(0);
+
+  int cc;
+  for ( cc = 0; cc < 6; cc ++ )
+    {
+    if ( this->EntryValues[cc] )
+      {
+      delete [] this->EntryValues[cc];
+      this->EntryValues[cc] = 0;
+      }
+    }
 }
 
 void vtkPVVectorEntry::SetLabel(const char* label)
@@ -198,11 +215,13 @@ void vtkPVVectorEntry::Create(vtkKWApplication *pvApp)
       }
     else
       {
-      this->Script("bind %s <KeyPress> {%s ModifiedCallback}",
-		   entry->GetWidgetName(), this->GetTclName());
+      this->Script("bind %s <KeyPress> {%s CheckModifiedCallback %K}",
+                   entry->GetWidgetName(), this->GetTclName());
+      this->Script("bind %s <FocusOut> {%s CheckModifiedCallback {}}",
+                   entry->GetWidgetName(), this->GetTclName());
       }
     this->Script("pack %s -side left -fill x -expand t",
-		 entry->GetWidgetName());
+                 entry->GetWidgetName());
     
     this->Entries->AddItem(entry);
     entry->Delete();
@@ -210,6 +229,46 @@ void vtkPVVectorEntry::Create(vtkKWApplication *pvApp)
   this->SetBalloonHelpString(this->BalloonHelpString);
 }
 
+//---------------------------------------------------------------------------
+void vtkPVVectorEntry::CheckModifiedCallback(const char* key)
+{
+  int found = 0;
+  int cc;
+  if ( vtkString::Equals(key, "Tab") ||
+       vtkString::Equals(key, "ISO_Left_Tab") ||
+       vtkString::Equals(key, "Return") ||
+       vtkString::Equals(key, "") )
+    {
+    for (cc = 0; cc < this->Entries->GetNumberOfItems(); cc ++ )
+      {
+      const char* val = this->EntryValues[cc];
+      if ( !vtkString::Equals(val, this->GetEntry(cc)->GetValue()) )
+        {
+        if ( this->EntryValues[cc] )
+          {
+          delete[] this->EntryValues[cc];
+          }
+        this->EntryValues[cc] = vtkString::Duplicate(this->GetEntry(cc)->GetValue());
+        found = 1;
+        }
+      }
+    }
+  else if ( vtkString::Equals(key, "Escape") )
+    {
+    for (cc = 0; cc < this->Entries->GetNumberOfItems(); cc ++ )
+      {
+      const char* val = this->EntryValues[cc];
+      if ( !vtkString::Equals(val, this->GetEntry(cc)->GetValue()) )
+        {
+        this->GetEntry(cc)->SetValue(val);
+        }
+      }
+    }
+  if ( found )
+    {
+    this->ModifiedCallback();
+    }
+}
 
 //---------------------------------------------------------------------------
 void vtkPVVectorEntry::Accept()
@@ -269,15 +328,29 @@ void vtkPVVectorEntry::Reset()
     }
 
   // Set each entry to the appropriate value.
-  this->Entries->InitTraversal();
-  while ( (entry = (vtkKWEntry*)(this->Entries->GetNextItemAsObject())) )
+  for( count = 0; count < this->Entries->GetNumberOfItems(); count ++ )
     {
-    this->Script("%s SetValue [lindex [%s Get%s] %d]",
-                 entry->GetTclName(), this->ObjectTclName, this->VariableName, 
-                 count++); 
+    this->Script("%s SetEntryValue %d [lindex [%s Get%s] %d]",
+                 this->GetTclName(), count, this->ObjectTclName, this->VariableName, 
+                 count); 
     }
 
   this->ModifiedFlag = 0;
+}
+
+//---------------------------------------------------------------------------
+void vtkPVVectorEntry::SetEntryValue(int index, const char* value)
+{
+  if ( index < 0 || index >= this->Entries->GetNumberOfItems() )
+    {
+    return;
+    }
+  this->GetEntry(index)->SetValue(value);
+  if ( this->EntryValues[index] )
+    {
+    delete [] this->EntryValues[index];
+    }
+  this->EntryValues[index] = vtkString::Duplicate(value);
 }
 
 //---------------------------------------------------------------------------
@@ -315,6 +388,35 @@ void vtkPVVectorEntry::SetValue(char** values, int num)
     {
     entry = this->GetEntry(idx);    
     entry->SetValue(values[idx]);
+    if ( this->EntryValues[idx] )
+      {
+      delete [] this->EntryValues[idx];
+      }
+    this->EntryValues[idx] = vtkString::Duplicate(values[idx]);
+    }
+  this->ModifiedCallback();
+}
+
+//---------------------------------------------------------------------------
+void vtkPVVectorEntry::SetValue(float* values, int num)
+{
+  int idx;
+  vtkKWEntry *entry;
+
+  if (num != this->Entries->GetNumberOfItems())
+    {
+    vtkErrorMacro("Componenet mismatch.");
+    return;
+    }
+  for (idx = 0; idx < num; ++idx)
+    {
+    entry = this->GetEntry(idx);    
+    entry->SetValue(values[idx], 4);
+    if ( this->EntryValues[idx] )
+      {
+      delete [] this->EntryValues[idx];
+      }
+    this->EntryValues[idx] = vtkString::Duplicate(entry->GetValue());
     }
   this->ModifiedCallback();
 }
@@ -427,13 +529,13 @@ void vtkPVVectorEntry::AddAnimationScriptsToMenu(vtkKWMenu *menu,
       {
       sprintf(methodAndArgs, "SetLabelAndScript {%s} {%s Set%s [expr int($pvTime)]}", 
               this->LabelWidget->GetLabel(), this->ObjectTclName, 
-	      this->VariableName);
+              this->VariableName);
       }
     else
       {
       sprintf(methodAndArgs, "SetLabelAndScript {%s} {%s Set%s $pvTime}", 
               this->LabelWidget->GetLabel(), this->ObjectTclName, 
-	      this->VariableName);
+              this->VariableName);
       }
     menu->AddCommand(this->LabelWidget->GetLabel(), ai, methodAndArgs, 0, "");
     }
@@ -453,15 +555,15 @@ void vtkPVVectorEntry::PrintSelf(ostream& os, vtkIndent indent)
 }
 
 vtkPVVectorEntry* vtkPVVectorEntry::ClonePrototype(vtkPVSource* pvSource,
-				 vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
+                                 vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
 {
   vtkPVWidget* clone = this->ClonePrototypeInternal(pvSource, map);
   return vtkPVVectorEntry::SafeDownCast(clone);
 }
 
 void vtkPVVectorEntry::CopyProperties(vtkPVWidget* clone, 
-				      vtkPVSource* pvSource,
-			      vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
+                                      vtkPVSource* pvSource,
+                              vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
 {
   this->Superclass::CopyProperties(clone, pvSource, map);
   vtkPVVectorEntry* pvve = vtkPVVectorEntry::SafeDownCast(clone);

@@ -39,8 +39,12 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-// .NAME vtkPVVectorEntry -
+// .NAME vtkPVVectorEntry - ParaView entry widget.
 // .SECTION Description
+// This widget allows user to enter text. It has a label and can have
+// multiple fields. The maximum number of fields is 6. Once the widget
+// is created the number of fields cannot be changed. When the user
+// modifies the entry, the modified callback is called.
 
 #ifndef __vtkPVVectorEntry_h
 #define __vtkPVVectorEntry_h
@@ -96,11 +100,17 @@ public:
   void SetValue(char* v1, char* v2, char* v3, char* v4, char* v5);
   void SetValue(char* v1, char* v2, char* v3, char* v4, char* v5, char* v6);
   void SetValue(char** vals, int num);
+  void SetValue(float* vals, int num);
 
   // Description:
   // Access values in the vector. Argument num is the size of the
   // values array. It has to be smaller than number of items.
   void GetValue(float* values, int num);
+  float *GetValue6();
+
+  // Description:
+  // Check if the entry was modified and call modified event.
+  void CheckModifiedCallback(const char*);
   
   // Description:
   // I need a solution:  I want to run ParaView with a low resolution
@@ -134,11 +144,16 @@ public:
   // Description:
   // Sets the length of the vector
   vtkSetMacro(VectorLength, int);
+  vtkGetMacro(VectorLength, int);
 
   // Description:
   // Sets one of the sub-labels. This has to be done
   // before create.
   void SetSubLabel(int i, const char* sublabl);
+
+  // Description:
+  // Set the entry value.
+  void SetEntryValue(int index, const char* value);
 
   // Description:
   // Set or get whether the entry is read only or not.
@@ -153,7 +168,7 @@ public:
   // using NewInstance() and then copy some necessary state 
   // parameters.
   vtkPVVectorEntry* ClonePrototype(vtkPVSource* pvSource,
-				 vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
+                                 vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
 //ETX
 
 protected:
@@ -177,6 +192,10 @@ protected:
 
   char *ScriptValue;
 
+  // Description:
+  // Get the stored entry values.
+  char *EntryValues[6];
+
   vtkPVVectorEntry(const vtkPVVectorEntry&); // Not implemented
   void operator=(const vtkPVVectorEntry&); // Not implemented
 
@@ -184,7 +203,7 @@ protected:
 
 //BTX
   virtual void CopyProperties(vtkPVWidget* clone, vtkPVSource* pvSource,
-			      vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
+                              vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
 //ETX
   
   int ReadXMLAttributes(vtkPVXMLElement* element,
