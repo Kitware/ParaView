@@ -3,6 +3,7 @@ $Application StartRecordingScript none.pvs
 $Application AcceptLicense
 $Application AcceptEvaluation
 set pvWindow [lindex [vtkPVWindow ListInstances] 0]
+$pvWindow UseMessageDialogOff
 $pvWindow ErrorMessage "This is an error"
 $pvWindow WarningMessage "This is a warning"
 $pvWindow DisableToolbarButtons
@@ -10,6 +11,24 @@ $pvWindow EnableToolbarButtons
 $pvWindow PrintRecentFiles
 $pvWindow SaveSessionFile "vtkParaViewOtherTest.pvs"
 $pvWindow LoadSessionFile "vtkParaViewOtherTest.pvs"
+
+$pvWindow CenterEntryOpenCallback
+$pvWindow CenterEntryCloseCallback
+$pvWindow CenterEntryOpenCallback
+$pvWindow CenterEntryCallback
+$pvWindow ToggleCenterActorCallback
+$pvWindow ToggleCenterActorCallback
+$pvWindow ToggleCenterActorCallback
+$pvWindow OnToolbarSettingsChange
+$pvWindow Open "vtkParaViewThisIsAFileThatDoesNotExists"
+$pvWindow Open "vtkParaViewOtherTest.pvs"
+$pvWindow EnableNavigationWindow
+$pvWindow DisableNavigationWindow
+$pvWindow EnableNavigationWindow
+$pvWindow EnableToolbarButton "PVProbeButton"
+$pvWindow DisableToolbarButton "PVProbeButton"
+$pvWindow EnableToolbarButton "PVProbeButton"
+
 foreach control { 1 2 } {
     foreach shift { 1 2 } {
 	foreach button { 1 2 3 } {

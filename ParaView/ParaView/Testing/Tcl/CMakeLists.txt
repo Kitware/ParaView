@@ -32,6 +32,7 @@ SET(PROJECT_TESTS ArrayMenuChangeInput
                DeleteSource
                EnSight
                Extrusion
+               ExtractGrid
                Glyph
                ImageReader
                Mandelbrot
