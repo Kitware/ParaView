@@ -13,9 +13,9 @@ set pv(vtkTemp97) [$pv(vtkTemp1) GetGlyphSource Sphere]
 
 set pv(vtkTemp98) [$pv(vtkTemp1) CreatePVSource vtkPLOT3DReader]
 set pv(vtkTemp110) [$pv(vtkTemp98) GetPVWidget {XYZFileName}]
-$pv(vtkTemp110) SetValue {C:/Law/VTKData/Data/combxyz.bin}
+$pv(vtkTemp110) SetValue $DataDir/Data/combxyz.bin
 set pv(vtkTemp114) [$pv(vtkTemp98) GetPVWidget {QFileName}]
-$pv(vtkTemp114) SetValue {C:/Law/VTKData/Data/combq.bin}
+$pv(vtkTemp114) SetValue $DataDir/Data/combq.bin
 $pv(vtkTemp98) AcceptCallback
 
 # A mistake, but I will leave it here
