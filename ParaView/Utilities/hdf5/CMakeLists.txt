@@ -20,8 +20,6 @@ INCLUDE (${CMAKE_ROOT}/Modules/CheckLibraryExists.cmake)
 INCLUDE (${CMAKE_ROOT}/Modules/CheckSymbolExists.cmake)
 INCLUDE (${CMAKE_ROOT}/Modules/CheckTypeSize.cmake)
 
-INCLUDE (${CMAKE_ROOT}/Modules/FindZLIB.cmake)
-
 # This macro checks if the symbol exists in the library and if it
 # does, it appends library to the list.
 SET(LINK_LIBS "")
@@ -67,7 +65,8 @@ CHECK_INCLUDE_FILE_CONCAT("sys/timeb.h" HAVE_SYS_TIMEB_H)
 CHECK_INCLUDE_FILE_CONCAT("sys/types.h" HAVE_SYS_TYPES_H)
 CHECK_INCLUDE_FILE_CONCAT("unistd.h" HAVE_UNISTD_H)
 CHECK_INCLUDE_FILE_CONCAT("winsock.h" HAVE_WINSOCK_H)
-CHECK_INCLUDE_FILE_CONCAT("zlib.h" HAVE_ZLIB_H)
+
+SET(HAVE_ZLIB_H 1)
 
 CHECK_TYPE_SIZE(char           SIZEOF_CHAR)
 CHECK_TYPE_SIZE(short          SIZEOF_SHORT)
@@ -405,10 +404,8 @@ CONFIGURE_FILE(${VTKHDF5_SOURCE_DIR}/H5pubconf.${CONFIG_FILE_EXT}.in
 SET(common_SRCS ${common_SRCS} ${VTKHDF5_BINARY_DIR}/H5Tinit.c)
 SET_SOURCE_FILES_PROPERTIES (${VTKHDF5_BINARY_DIR}/H5Tinit.c GENERATED)
 
-INCLUDE_DIRECTORIES(${ZLIB_INCLUDE_DIR})
-
 ADD_LIBRARY(vtkhdf5 ${common_SRCS})
-TARGET_LINK_LIBRARIES(vtkhdf5 ${LINK_LIBS} ${ZLIB_LIBRARY})
+TARGET_LINK_LIBRARIES(vtkhdf5 ${LINK_LIBS} ${VTK_ZLIB_LIBRARIES})
 
 IF(WIN32)
   SET(EXE_EXT ".exe")
