@@ -30,6 +30,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkKWView.h"
 #include "vtkObjectFactory.h"
 #include "vtkKWMenu.h"
+#include "vtkKWMessageDialog.h"
 
 #include "KitwareLogo.h"
 
@@ -202,7 +203,18 @@ void vtkKWWindow::SetSelectedView(vtkKWView *_arg)
 // invoke the apps exit when selected
 void vtkKWWindow::Exit()
 {
-  this->Application->Exit();
+  vtkKWMessageDialog *dlg = vtkKWMessageDialog::New();
+  dlg->SetStyleToYesNo();
+  dlg->Create(this->GetApplication(),"");
+  ostrstream str;
+  str << "Are you sure you want to exit " << this->GetApplication()->GetApplicationName() << "?" << ends;
+  dlg->SetText(str.str());
+  int ret = dlg->Invoke();  
+  dlg->Delete();
+  if (ret)
+    {
+    this->Application->Exit();
+    }
 }
 
 // invoke the apps close when selected
@@ -782,5 +794,5 @@ void vtkKWWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWWindow ";
-  this->ExtractRevision(os,"$Revision: 1.21 $");
+  this->ExtractRevision(os,"$Revision: 1.22 $");
 }
