@@ -52,5 +52,5 @@ proc rtOtherTest { fileid } {
 
 rtOtherTest stdout
 
-exit
+Application Exit
 
