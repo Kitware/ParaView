@@ -68,6 +68,10 @@ public:
   // this class on the client process even if MPI is not compiled in.
   virtual vtkMultiProcessController* GetController();
   virtual void SetController(vtkMultiProcessController* controller);
+
+  // Description:
+  // Return whether we can read the file given.
+  virtual int CanReadFile(const char*);
   
   // Description:
   // Get the number of pieces in the file.  Valid after
