@@ -66,6 +66,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVCameraIcon.h"
 #include "vtkPVConfig.h"
 #include "vtkPVData.h"
+#include "vtkPVDataInformation.h"
 #include "vtkPVPart.h"
 #include "vtkPVGenericRenderWindowInteractor.h"
 #include "vtkPVInteractorStyleControl.h"
@@ -108,7 +109,7 @@ static unsigned char image_properties[] =
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.228");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.229");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -1621,15 +1622,35 @@ void vtkPVRenderView::Update()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVRenderView::ComputeVisiblePropBounds(float bounds[6])
-{ 
-  if (this->Composite)
+void vtkPVRenderView::ComputeVisiblePropBounds(float bds[6])
+{
+  double *tmp;
+  vtkPVSource *pvs;
+  vtkPVSourceCollection *sources;
+
+  // Compute the bounds for our sources.
+  bds[0] = bds[2] = bds[4] = VTK_LARGE_FLOAT;
+  bds[1] = bds[3] = bds[5] = -VTK_LARGE_FLOAT;
+  sources = this->GetPVWindow()->GetSourceList("Sources");
+  sources->InitTraversal();
+  while ( (pvs = sources->GetNextPVSource()) )
     {
-    this->Composite->ComputeVisiblePropBounds(this->GetRenderer(), bounds);
+    if (pvs->GetVisibility())
+      {
+      tmp = pvs->GetPVOutput()->GetDataInformation()->GetBounds();
+      if (tmp[0] < bds[0]) { bds[0] = tmp[0]; }  
+      if (tmp[1] > bds[1]) { bds[1] = tmp[1]; }  
+      if (tmp[2] < bds[2]) { bds[2] = tmp[2]; }  
+      if (tmp[3] > bds[3]) { bds[3] = tmp[3]; }  
+      if (tmp[4] < bds[4]) { bds[4] = tmp[4]; }  
+      if (tmp[5] > bds[5]) { bds[5] = tmp[5]; }  
+      }
     }
-  else
+
+  if ( bds[0] > bds[1])
     {
-    this->GetRenderer()->ComputeVisiblePropBounds(bounds);
+    bds[0] = bds[2] = bds[4] = -1.0;
+    bds[1] = bds[3] = bds[5] = 1.0;
     }
 }
 
@@ -1639,6 +1660,7 @@ void vtkPVRenderView::ResetCamera()
   vtkCamera *cam;
   double *n;
   double mag2;
+  float bds[6];
 
   // Lets see if we can correct the situation when camera ivars go arwy.
   // Unfortunately, I cannot reproduce the problem.
@@ -1653,7 +1675,8 @@ void vtkPVRenderView::ResetCamera()
     cam->SetViewUp(0.0, 1.0, 0.0);
     }
 
-  this->GetRenderer()->ResetCamera();
+  this->ComputeVisiblePropBounds(bds);
+  this->GetRenderer()->ResetCamera(bds);
 }
 
 //----------------------------------------------------------------------------
@@ -2616,7 +2639,7 @@ void vtkPVRenderView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVRenderView ";
-  this->ExtractRevision(os,"$Revision: 1.228 $");
+  this->ExtractRevision(os,"$Revision: 1.229 $");
 }
 
 //------------------------------------------------------------------------------

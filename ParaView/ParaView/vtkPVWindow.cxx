@@ -126,7 +126,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.408");
+vtkCxxRevisionMacro(vtkPVWindow, "1.409");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -187,21 +187,11 @@ vtkPVWindow::vtkPVWindow()
   this->CenterYEntry = vtkKWEntry::New();
   this->CenterZLabel = vtkKWLabel::New();
   this->CenterZEntry = vtkKWEntry::New();
-
-  //this->FlySpeedToolbar = vtkKWToolbar::New();
-  //this->FlySpeedLabel = vtkKWLabel::New();
-  //this->FlySpeedScale = vtkKWScale::New();
   
-  this->CenterSource = vtkAxes::New();
-  this->CenterSource->SymmetricOn();
-  this->CenterSource->ComputeNormalsOff();
-  this->CenterMapper = vtkPolyDataMapper::New();
-  this->CenterMapper->SetInput(this->CenterSource->GetOutput());
-  this->CenterActor = vtkActor::New();
-  this->CenterActor->PickableOff();
-  this->CenterActor->SetMapper(this->CenterMapper);
-  this->CenterActor->VisibilityOff();
-  
+  this->CenterSourceTclName = NULL;
+  this->CenterMapperTclName = NULL;
+  this->CenterActorTclName = NULL;
+    
   this->CurrentPVData = NULL;
   this->CurrentPVSource = NULL;
 
@@ -288,6 +278,7 @@ vtkPVWindow::vtkPVWindow()
 //----------------------------------------------------------------------------
 vtkPVWindow::~vtkPVWindow()
 {
+  
   if ( this->NamesToSources )
     {
     this->NamesToSources->Delete();
@@ -310,21 +301,10 @@ vtkPVWindow::~vtkPVWindow()
     this->UserInterfaceManager->Delete();
     }
 
-  //this->FlyButton->Delete();
-  //this->FlyButton = NULL;
   this->RotateCameraButton->Delete();
   this->RotateCameraButton = NULL;
   this->TranslateCameraButton->Delete();
   this->TranslateCameraButton = NULL;
-  //this->TrackballCameraButton->Delete();
-  //this->TrackballCameraButton = NULL;
-
-  this->CenterSource->Delete();
-  this->CenterSource = NULL;
-  this->CenterMapper->Delete();
-  this->CenterMapper = NULL;
-  this->CenterActor->Delete();
-  this->CenterActor = NULL;
 
   this->SourceLists->Delete();
   this->SourceLists = 0;
@@ -394,7 +374,26 @@ void vtkPVWindow::CloseNoPrompt()
 //----------------------------------------------------------------------------
 void vtkPVWindow::PrepareForDelete()
 {
-  // Put this one first
+  vtkPVApplication *pvApp = this->GetPVApplication();
+
+  if (pvApp && this->CenterSourceTclName)
+    {
+    pvApp->BroadcastScript("%s Delete", this->CenterSourceTclName);
+    }
+  this->SetCenterSourceTclName(NULL);
+
+  if (pvApp && this->CenterMapperTclName)
+    {
+    pvApp->BroadcastScript("%s Delete", this->CenterMapperTclName);
+    }
+  this->SetCenterMapperTclName(NULL);
+
+  if (pvApp && this->CenterActorTclName)
+    {
+    pvApp->BroadcastScript("%s Delete", this->CenterActorTclName);
+    }
+  this->SetCenterActorTclName(NULL);
+
 
   if (this->AnimationInterface)
     {
@@ -932,6 +931,26 @@ void vtkPVWindow::Create(vtkKWApplication *app, char* vtkNotUsed(args))
     }
   this->InitializeInteractorInterfaces(app);
 
+
+  // Creating the center of rotation actor here because we have
+  // the application here.
+  // We do not need to broadcast.  We need Send to root method.
+  // Not local for client server option.
+  this->SetCenterSourceTclName("pvCenterSource");
+  pvApp->BroadcastScript("vtkAxes %s", this->CenterSourceTclName);
+  pvApp->BroadcastScript("%s SymmetricOn", this->CenterSourceTclName);
+  pvApp->BroadcastScript("%s ComputeNormalsOff", this->CenterSourceTclName);
+  this->SetCenterMapperTclName("pvMapperSource");
+  pvApp->BroadcastScript("vtkPolyDataMapper %s", this->CenterMapperTclName);
+  pvApp->BroadcastScript("%s SetInput [%s GetOutput]", this->CenterMapperTclName,
+                         this->CenterSourceTclName);
+  this->SetCenterActorTclName("pvActorSource");
+  pvApp->BroadcastScript("vtkActor %s", this->CenterActorTclName);
+  pvApp->BroadcastScript("%s SetMapper %s", this->CenterActorTclName,
+                         this->CenterMapperTclName);
+  pvApp->BroadcastScript("%s VisibilityOff", this->CenterActorTclName);
+  // -------------------------
+
   this->PickCenterToolbar->SetParent(this->GetToolbarFrame());
   this->PickCenterToolbar->Create(app);
   
@@ -1021,22 +1040,9 @@ void vtkPVWindow::Create(vtkKWApplication *app, char* vtkNotUsed(args))
       this->HideCenterActor();
       }
     }
-  this->MainView->GetRenderer()->AddActor(this->CenterActor);
   
-//   this->FlySpeedToolbar->SetParent(this->GetToolbarFrame());
-//   this->FlySpeedToolbar->Create(app);
-  
-//   this->FlySpeedLabel->SetParent(this->FlySpeedToolbar->GetFrame());
-//   this->FlySpeedLabel->Create(app, "");
-//   this->FlySpeedLabel->SetLabel("Fly Speed");
-//   this->FlySpeedToolbar->AddWidget(this->FlySpeedLabel);
-  
-//   this->FlySpeedScale->SetParent(this->FlySpeedToolbar->GetFrame());
-//   this->FlySpeedScale->Create(app, "");
-//   this->FlySpeedScale->SetRange(0.0, 50.0);
-//   this->FlySpeedScale->SetValue(20.0);
-//   this->FlySpeedScale->SetCommand(this, "FlySpeedScaleCallback");
-//   this->FlySpeedToolbar->AddWidget(this->FlySpeedScale);
+  pvApp->BroadcastScript("%s AddActor %s", this->MainView->GetRendererTclName(),
+                         this->CenterActorTclName);
   
   this->GenericInteractor->SetPVRenderView(this->MainView);
   this->ChangeInteractorStyle(1);
@@ -1204,6 +1210,7 @@ void vtkPVWindow::Create(vtkKWApplication *app, char* vtkNotUsed(args))
     {
     this->MainView->SetupCameraManipulators();     
     }
+
 }
 
 //----------------------------------------------------------------------------
@@ -1262,46 +1269,48 @@ void vtkPVWindow::CenterEntryCallback()
 //----------------------------------------------------------------------------
 void vtkPVWindow::SetCenterOfRotation(float x, float y, float z)
 {
-  float *pos = this->CenterActor->GetPosition();
-  if ( pos[0] == x && pos[1] == y && pos[2] == z )
-    {
-    return;
-    }
+  vtkPVApplication *pvApp = this->GetPVApplication();
+
   this->CenterXEntry->SetValue(x, 4);
   this->CenterYEntry->SetValue(y, 4);
   this->CenterZEntry->SetValue(z, 4);
   this->CameraStyle3D->SetCenterOfRotation(x, y, z);
-  this->CenterActor->SetPosition(x, y, z);
+  pvApp->BroadcastScript("%s SetPosition %f %f %f", 
+                         this->CenterActorTclName,
+                         x, y, z);
   this->MainView->EventuallyRender();
 }
 
 //----------------------------------------------------------------------------
 void vtkPVWindow::HideCenterActor()
 {
+  vtkPVApplication *pvApp = this->GetPVApplication();
   this->Script("%s configure -image PVShowCenterButton", 
                this->HideCenterButton->GetWidgetName() );
   this->HideCenterButton->SetBalloonHelpString(
     "Show the center of rotation to the center of the current data set.");
-  this->CenterActor->VisibilityOff();
+  pvApp->BroadcastScript("%s VisibilityOff", this->CenterActorTclName);
 }
 
 //----------------------------------------------------------------------------
 void vtkPVWindow::ShowCenterActor()
 {
+  vtkPVApplication *pvApp = this->GetPVApplication();
+
   if (this->CenterActorVisibility)
     {
     this->Script("%s configure -image PVHideCenterButton", 
                  this->HideCenterButton->GetWidgetName() );
-  this->HideCenterButton->SetBalloonHelpString(
-    "Hide the center of rotation to the center of the current data set.");
-    this->CenterActor->VisibilityOn();
+    this->HideCenterButton->SetBalloonHelpString(
+      "Hide the center of rotation to the center of the current data set.");
+    pvApp->BroadcastScript("%s VisibilityOn", this->CenterActorTclName);
     }
 }
 
 //----------------------------------------------------------------------------
 void vtkPVWindow::ToggleCenterActorCallback()
 {
-  if (this->CenterActor->GetVisibility())
+  if (this->CenterActorVisibility)
     {
     this->CenterActorVisibility=0;
     this->HideCenterActor();
@@ -1350,6 +1359,7 @@ void vtkPVWindow::ResetCenterCallback()
 //----------------------------------------------------------------------------
 void vtkPVWindow::ResizeCenterActor()
 {
+  vtkPVApplication *pvApp = this->GetPVApplication();
   int first = 1;
   double bounds[6];
   double tmp[6];
@@ -1391,20 +1401,15 @@ void vtkPVWindow::ResizeCenterActor()
   if ((! first) && (bounds[0] < bounds[1]) && 
       (bounds[2] < bounds[3]) && (bounds[4] < bounds[5]))
     {
-    this->CenterActor->SetScale(0.25 * (bounds[1]-bounds[0]),
-                                0.25 * (bounds[3]-bounds[2]),
-                                0.25 * (bounds[5]-bounds[4]));
+    pvApp->BroadcastScript("%s SetScale %f %f %f", this->CenterActorTclName,
+                           0.25 * (bounds[1]-bounds[0]),
+                           0.25 * (bounds[3]-bounds[2]),
+                           0.25 * (bounds[5]-bounds[4]));
     }
   else
     {
-    this->CenterActor->SetScale(1, 1, 1);
+    pvApp->BroadcastScript("%s SetScale 1 1 1", this->CenterActorTclName);
     this->MainView->ResetCamera();
-    //float range[2];
-    //float size;
-    //this->MainView->GetRenderer()->GetActiveCamera()->GetClippingRange(range);
-    //size = (range[1] - range[0]) * 0.5;
-    //this->CenterActor->SetScale(size, size, size);
-    //this->MainView->EventuallyRender();
     }
 }
 
@@ -2927,9 +2932,9 @@ vtkPVSourceCollection* vtkPVWindow::GetSourceList(const char* listname)
 //----------------------------------------------------------------------------
 void vtkPVWindow::ResetCameraCallback()
 {
+
   this->GetPVApplication()->AddTraceEntry("$kw(%s) ResetCameraCallback", 
                                           this->GetTclName());
-
   this->MainView->ResetCamera();
   this->MainView->EventuallyRender();
 }
@@ -3864,7 +3869,7 @@ void vtkPVWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVWindow ";
-  this->ExtractRevision(os,"$Revision: 1.408 $");
+  this->ExtractRevision(os,"$Revision: 1.409 $");
 }
 
 //----------------------------------------------------------------------------
@@ -3873,9 +3878,9 @@ void vtkPVWindow::SerializeSelf(ostream& os, vtkIndent indent)
   this->Superclass::SerializeSelf(os, indent);
 
   os << indent << "CenterOfRotation "
-     << this->CenterActor->GetPosition()[0] << " "
-     << this->CenterActor->GetPosition()[1] << " " 
-     << this->CenterActor->GetPosition()[2] << endl;    
+     << this->CenterXEntry->GetValue() << " "
+     << this->CenterYEntry->GetValue() << " " 
+     << this->CenterZEntry->GetValue() << endl;    
 
   os << indent << "RenderView ";
   this->MainView->Serialize(os, indent);

@@ -559,15 +559,17 @@ protected:
   vtkKWEntry *CenterYEntry;
   vtkKWLabel *CenterZLabel;
   vtkKWEntry *CenterZEntry;
-  
-  // widgets for setting fly speed for fly interactor style
-//  vtkKWToolbar *FlySpeedToolbar;
-//  vtkKWLabel *FlySpeedLabel;
-//  vtkKWScale *FlySpeedScale;
-  
-  vtkAxes *CenterSource;
-  vtkPolyDataMapper *CenterMapper;
-  vtkActor *CenterActor;
+    
+  //vtkAxes *CenterSource;
+  char *CenterSourceTclName;
+  vtkSetStringMacro(CenterSourceTclName);
+  //vtkPolyDataMapper *CenterMapper;
+  char *CenterMapperTclName;
+  vtkSetStringMacro(CenterMapperTclName);
+  //vtkActor *CenterActor;
+  char *CenterActorTclName;
+  vtkSetStringMacro(CenterActorTclName);
+
   void ResizeCenterActor();
   
   // Used internally.  Down casts vtkKWApplication to vtkPVApplication
