@@ -170,7 +170,7 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterface);
-vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.117");
+vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.118");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterface,ControlledWidget, vtkPVWidget);
 
@@ -1002,6 +1002,10 @@ void vtkPVAnimationInterface::SetCurrentTime(int time, int trace)
     // Allow the application GUI to be refreshed (ex: in a trace file)
 
     this->Script("update");
+    if ( this->View )
+      {
+      this->View->ForceRender();
+      }
     }
 }
 
