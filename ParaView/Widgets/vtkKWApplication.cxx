@@ -71,7 +71,7 @@ int vtkKWApplication::WidgetVisibility = 1;
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.132");
+vtkCxxRevisionMacro(vtkKWApplication, "1.133");
 
 extern "C" int Vtktcl_Init(Tcl_Interp *interp);
 extern "C" int Vtkkwwidgetstcl_Init(Tcl_Interp *interp);
@@ -161,9 +161,12 @@ vtkKWApplication::vtkKWApplication()
   this->ExitOnReturn = 0;
 
   this->HasSplashScreen = 0;
-  this->ShowSplashScreen = 1;
 
   this->ApplicationExited = 0;
+
+  this->ShowBalloonHelp = 1;
+  this->SaveWindowGeometry = 1;
+  this->ShowSplashScreen = 1;
 }
 
 //----------------------------------------------------------------------------
@@ -700,10 +703,6 @@ void vtkKWApplication::GetApplicationSettingsFromRegistery()
     this->ShowBalloonHelp = this->GetIntRegisteryValue(
       2, "RunTime", VTK_KW_SHOW_TOOLTIPS_REG_KEY);
     }
-  else
-    {
-    this->ShowBalloonHelp = 1;
-    }
 
   // Save window geometry ?
 
@@ -712,10 +711,6 @@ void vtkKWApplication::GetApplicationSettingsFromRegistery()
     {
     this->SaveWindowGeometry = this->GetIntRegisteryValue(
       2, "Geometry", VTK_KW_SAVE_WINDOW_GEOMETRY_REG_KEY);
-    }
-  else
-    {
-    this->SaveWindowGeometry = (this->RegisteryLevel < 0 ? 0 : 1);
     }
 
   // Show splash screen ?
@@ -726,9 +721,11 @@ void vtkKWApplication::GetApplicationSettingsFromRegistery()
     this->ShowSplashScreen = this->GetIntRegisteryValue(
       2, "RunTime", VTK_KW_SHOW_SPLASH_SCREEN_REG_KEY);
     }
-  else
+
+  if (this->RegisteryLevel <= 0)
     {
-    this->ShowSplashScreen = 1;
+    this->ShowSplashScreen = 0;
+    this->SaveWindowGeometry = 0;
     }
 }
 
