@@ -41,6 +41,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "vtkPVLabel.h"
 #include "vtkObjectFactory.h"
+#include "vtkArrayMap.txx"
+#include "vtkPVXMLElement.h"
 
 //----------------------------------------------------------------------------
 vtkPVLabel* vtkPVLabel::New()
@@ -69,8 +71,41 @@ vtkPVLabel::~vtkPVLabel()
   this->Label = NULL;
 }
 
+void vtkPVLabel::SetBalloonHelpString(const char *str)
+{
+
+  // A little overkill.
+  if (this->BalloonHelpString == NULL && str == NULL)
+    {
+    return;
+    }
+
+  // This check is needed to prevent errors when using
+  // this->SetBalloonHelpString(this->BalloonHelpString)
+  if (str != this->BalloonHelpString)
+    {
+    // Normal string stuff.
+    if (this->BalloonHelpString)
+      {
+      delete [] this->BalloonHelpString;
+      this->BalloonHelpString = NULL;
+      }
+    if (str != NULL)
+      {
+      this->BalloonHelpString = new char[strlen(str)+1];
+      strcpy(this->BalloonHelpString, str);
+      }
+    }
+  
+  if ( this->Application && !this->BalloonHelpInitialized )
+    {
+    this->Label->SetBalloonHelpString(this->BalloonHelpString);
+    this->BalloonHelpInitialized = 1;
+    }
+}
+
 //----------------------------------------------------------------------------
-void vtkPVLabel::Create(vtkKWApplication *pvApp, char *help)
+void vtkPVLabel::Create(vtkKWApplication *pvApp)
 {
   const char* wname;
   
@@ -88,9 +123,9 @@ void vtkPVLabel::Create(vtkKWApplication *pvApp, char *help)
   
   // Now a label
   this->Label->Create(pvApp, "-width 18 -justify right");
-  if (help)
+  if (this->BalloonHelpString)
     {
-    this->Label->SetBalloonHelpString(help);
+    this->SetBalloonHelpString(this->BalloonHelpString);
     }
   this->Script("pack %s -side left", this->Label->GetWidgetName());  
 }
@@ -112,4 +147,46 @@ void vtkPVLabel::Reset()
 
   this->ModifiedFlag = 0;
 
+}
+
+vtkPVLabel* vtkPVLabel::ClonePrototype(vtkPVSource* pvSource,
+				 vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
+{
+  vtkPVWidget* clone = this->ClonePrototypeInternal(pvSource, map);
+  return vtkPVLabel::SafeDownCast(clone);
+}
+
+void vtkPVLabel::CopyProperties(vtkPVWidget* clone, vtkPVSource* pvSource,
+			      vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
+{
+  this->Superclass::CopyProperties(clone, pvSource, map);
+  vtkPVLabel* pvl = vtkPVLabel::SafeDownCast(clone);
+  if (pvl)
+    {
+    pvl->Label->SetLabel(this->Label->GetLabel());
+    }
+  else 
+    {
+    vtkErrorMacro("Internal error. Could not downcast clone to PVLabel.");
+    }
+}
+
+//----------------------------------------------------------------------------
+int vtkPVLabel::ReadXMLAttributes(vtkPVXMLElement* element,
+                                  vtkPVXMLPackageParser* parser)
+{
+  if(!this->Superclass::ReadXMLAttributes(element, parser)) { return 0; }
+  
+  // Setup the Label.
+  const char* label = element->GetAttribute("label");
+  if(label)
+    {
+    this->Label->SetLabel(label);
+    }
+  else
+    {
+    this->Label->SetLabel(this->VariableName);
+    }
+  
+  return 1;
 }

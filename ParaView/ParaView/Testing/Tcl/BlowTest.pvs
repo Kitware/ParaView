@@ -10,21 +10,18 @@ if {[info exists argc]} {
 # hack to get the window.
 set pvWindow [lindex [vtkPVWindow ListInstances] 0]
 
-set reader [$pvWindow Open "$DataDir/Data/blow.vtk"]
+$pvWindow Open "$DataDir/Data/blow.vtk"
 
-set wInt [$pvWindow GetSourceInterface "vtkWarpVector"]
-set pvWarp [$wInt CreateCallback]
+set pvWarp [$pvWindow CreatePVSource WarpVector]
 $pvWarp UpdateParameterWidgets
 $pvWarp AcceptCallback
 
-set lsInt [$pvWindow GetSourceInterface "vtkLoopSubdivisionFilter"]
-set pvSub [$lsInt CreateCallback] 
+set pvSub [$pvWindow CreatePVSource LoopSubdivisionFilter]
 [$pvSub GetVTKSource] SetNumberOfSubdivisions 2
 $pvSub UpdateParameterWidgets
 $pvSub AcceptCallback
 
-set nInt [$pvWindow GetSourceInterface "vtkPPolyDataNormals"]
-set pvNormals [$nInt CreateCallback]
+set pvNormals [$pvWindow CreatePVSource PPolyDataNormals]
 [$pvNormals GetVTKSource] SetFeatureAngle 60
 $pvNormals UpdateParameterWidgets
 $pvNormals AcceptCallback

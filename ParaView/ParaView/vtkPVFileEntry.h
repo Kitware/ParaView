@@ -62,8 +62,7 @@ public:
   void SetLabel(const char* label);
   const char* GetLabel();
 
-  void Create(vtkKWApplication *pvApp, 
-              char *ext, char *help);
+  void Create(vtkKWApplication *pvApp);
   
   // Description:
   // Called when accept button is pushed.  
@@ -86,6 +85,26 @@ public:
   // Called when the browse button is pressed.
   void BrowseCallback();
 
+  // Description:
+  // This class redefines SetBalloonHelpString since it
+  // has to forward the call to a widget it contains.
+  virtual void SetBalloonHelpString(const char *str);
+
+  // Description:
+  // The extension used in the file dialog
+  vtkSetStringMacro(Extension);
+  vtkGetStringMacro(Extension);
+
+//BTX
+  // Description:
+  // Creates and returns a copy of this widget. It will create
+  // a new instance of the same type as the current object
+  // using NewInstance() and then copy some necessary state 
+  // parameters.
+  vtkPVFileEntry* ClonePrototype(vtkPVSource* pvSource,
+				 vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
+//ETX
+
 protected:
   vtkPVFileEntry();
   ~vtkPVFileEntry();
@@ -95,10 +114,17 @@ protected:
   vtkKWEntry *Entry;
 
   char* Extension;
-  vtkSetStringMacro(Extension);
 
   vtkPVFileEntry(const vtkPVFileEntry&); // Not implemented
   void operator=(const vtkPVFileEntry&); // Not implemented
+
+//BTX
+  virtual void CopyProperties(vtkPVWidget* clone, vtkPVSource* pvSource,
+			      vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
+//ETX
+  
+  int ReadXMLAttributes(vtkPVXMLElement* element,
+                        vtkPVXMLPackageParser* parser);
 };
 
 #endif

@@ -187,7 +187,8 @@ void vtkPVWizard::Create(vtkKWApplication *app, const char *args)
                this->Label->GetWidgetName());
 
   this->FileEntry->SetParent(this->WizardFrame);
-  this->FileEntry->Create(this->Application, "xml", NULL);
+  this->FileEntry->SetExtension("xml");
+  this->FileEntry->Create(this->Application);
 
   // create the reader.
   // I know the name conflict issue, but I expect to start using C++ ...

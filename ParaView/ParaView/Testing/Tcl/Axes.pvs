@@ -10,13 +10,13 @@ if {[info exists argc]} {
 
 set pv(vtkTemp1) [Application GetMainWindow]
 set pv(vtkTemp43) [$pv(vtkTemp1) GetMainView]
-set pv(vtkTemp89) [$pv(vtkTemp1) GetGlyphSource Arrow]
-set pv(vtkTemp93) [$pv(vtkTemp1) GetGlyphSource Cone]
-set pv(vtkTemp97) [$pv(vtkTemp1) GetGlyphSource Sphere]
-set pv(vtkTemp98) [$pv(vtkTemp1) CreatePVSource vtkAxes]
+set pv(vtkTemp89) [$pv(vtkTemp1) GetPVSource GlyphSources Arrow]
+set pv(vtkTemp93) [$pv(vtkTemp1) GetPVSource GlyphSources Cone]
+set pv(vtkTemp97) [$pv(vtkTemp1) GetPVSource GlyphSources Sphere]
+set pv(vtkTemp98) [$pv(vtkTemp1) CreatePVSource Axes]
 $pv(vtkTemp98) AcceptCallback
 [$pv(vtkTemp98) GetPVOutput 0] SetLineWidth 3
-set pv(vtkTemp168) [$pv(vtkTemp1) CreatePVSource vtkAxes]
+set pv(vtkTemp168) [$pv(vtkTemp1) CreatePVSource Axes]
 set pv(vtkTemp183) [$pv(vtkTemp168) GetPVWidget {Origin}]
 $pv(vtkTemp183) SetValue 0 3 0
 set pv(vtkTemp188) [$pv(vtkTemp168) GetPVWidget {Symmetric}]

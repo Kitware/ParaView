@@ -17,9 +17,10 @@
 =========================================================================*/
 // .NAME vtkDummyRenderWindow - Updates actor pipelines but does not render.
 // .SECTION Description
-// vtkDummyRenderWindow  is meant to be used with a filter that moves all the data
-// to a subset of the processes.  The processes with no data do not need to 
-// create a window and render, but they do need to update the pipeline.
+// vtkDummyRenderWindow is meant to be used with a filter that moves all
+// the data to a subset of the processes.  The processes with no data do
+// not need to create a window and render, but they do need to update the
+// pipeline.
 
 // .SECTION see also
 // vtkDummyRenderer 
@@ -101,7 +102,6 @@ public:
   virtual int GetZbufferData( int, int, int, int, vtkFloatArray*);
   virtual int SetZbufferData(int, int, int, int, float *);
   virtual int SetZbufferData( int, int, int, int, vtkFloatArray * );
-
 
 protected:
   vtkDummyRenderWindow();

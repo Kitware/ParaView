@@ -44,8 +44,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkObjectFactory.h"
 #include "vtkKWMessageDialog.h"
 #include "vtkPVInputMenu.h"
-#include "vtkPVScalarRangeLabel.h"
 #include "vtkPVData.h"
+#include "vtkPVSource.h"
+#include "vtkArrayMap.txx"
+#include "vtkPVXMLElement.h"
 
 //----------------------------------------------------------------------------
 vtkPVArrayMenu* vtkPVArrayMenu::New()
@@ -84,8 +86,6 @@ vtkPVArrayMenu::vtkPVArrayMenu()
 
   this->InputMenu = NULL;
 
-  this->ShowScalarRangeLabel = 0;
-  this->ScalarRangeLabel = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -107,11 +107,6 @@ vtkPVArrayMenu::~vtkPVArrayMenu()
 
   this->SetInputMenu(NULL);
 
-  if (this->ScalarRangeLabel)
-    {
-    this->ScalarRangeLabel->Delete();
-    this->ScalarRangeLabel = NULL;
-    }
 }
 
 //----------------------------------------------------------------------------
@@ -282,52 +277,6 @@ void vtkPVArrayMenu::Create(vtkKWApplication *app)
   extraFrame->Delete();
   extraFrame = NULL;
 
-  if (this->ShowScalarRangeLabel)
-    {
-    this->ScalarRangeLabel = vtkPVScalarRangeLabel::New();
-    this->ScalarRangeLabel->SetArrayMenu(this);
-    // This causes the range to be recomputed when the menu value changes.
-    this->AddDependant(this->ScalarRangeLabel);  
-    this->ScalarRangeLabel->SetParent(this);
-    this->ScalarRangeLabel->Create(this->Application);
-    this->Script("pack %s -side top -fill x -expand t", this->ScalarRangeLabel->GetWidgetName());
-    }
-}
-
-
-//----------------------------------------------------------------------------
-void vtkPVArrayMenu::SetShowScalarRangeLabel(int val)
-{
-  if (this->ShowScalarRangeLabel == val)
-    {
-    return;
-    }
-  this->Modified();
-  this->ShowScalarRangeLabel = val;
-
-  if (this->Application == NULL)
-    { // Create will do the rest.
-    return;
-    }
-
-  if (this->ScalarRangeLabel == NULL)
-    {
-    this->ScalarRangeLabel = vtkPVScalarRangeLabel::New();
-    this->ScalarRangeLabel->SetArrayMenu(this);
-    // This causes the range to be recomputed when the menu value changes.
-    this->AddDependant(this->ScalarRangeLabel);  
-    this->ScalarRangeLabel->SetParent(this);
-    this->ScalarRangeLabel->Create(this->Application);
-    }
-
-  if (val == 0)
-    {
-    this->Script("pack forget %s", this->ScalarRangeLabel->GetWidgetName());
-    }
-  else
-    {
-    this->Script("pack %s -side top -fill x -expand t", this->ScalarRangeLabel->GetWidgetName());
-    }
 }
 
 
@@ -785,5 +734,149 @@ void vtkPVArrayMenu::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "SelectedComponent: " << this->GetSelectedComponent();
   os << indent << "ShowComponentMenu: " << this->GetShowComponentMenu();
   os << indent << "ShowFieldMenu: " << this->GetShowFieldMenu();
-  os << indent << "ShowScalarRangeLabel: " << this->GetShowScalarRangeLabel();
+}
+
+vtkPVArrayMenu* vtkPVArrayMenu::ClonePrototype(vtkPVSource* pvSource,
+				 vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
+{
+  vtkPVWidget* clone = this->ClonePrototypeInternal(pvSource, map);
+  return vtkPVArrayMenu::SafeDownCast(clone);
+}
+
+vtkPVWidget* vtkPVArrayMenu::ClonePrototypeInternal(vtkPVSource* pvSource,
+				vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
+{
+  vtkPVWidget* pvWidget = 0;
+  // Check if a clone of this widget has already been created
+  if ( map->GetItem(this, pvWidget) != VTK_OK )
+    {
+    // If not, create one and add it to the map
+    pvWidget = this->NewInstance();
+    map->SetItem(this, pvWidget);
+    // Now copy all the properties
+    this->CopyProperties(pvWidget, pvSource, map);
+
+    vtkPVArrayMenu* pvArrayMenu = vtkPVArrayMenu::SafeDownCast(pvWidget);
+    if (!pvArrayMenu)
+      {
+      vtkErrorMacro("Internal error. Could not downcast pointer.");
+      pvWidget->Delete();
+      return 0;
+      }
+    }
+  else
+    {
+    // Increment the reference count. This is necessary
+    // to make the behavior same whether a widget is created
+    // or returned from the map. Always call Delete() after
+    // cloning.
+    pvWidget->Register(this);
+    }
+
+  // note pvSelect == pvWidget
+  return pvWidget;
+}
+
+void vtkPVArrayMenu::CopyProperties(vtkPVWidget* clone, vtkPVSource* pvSource,
+			      vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
+{
+  this->Superclass::CopyProperties(clone, pvSource, map);
+  vtkPVArrayMenu* pvam = vtkPVArrayMenu::SafeDownCast(clone);
+  if (pvam)
+    {
+    pvam->SetNumberOfComponents(this->NumberOfComponents);
+    pvam->SetInputName(this->InputName);
+    pvam->SetAttributeType(this->AttributeType);
+    pvam->SetLabel(this->Label->GetLabel());
+    pvam->SetObjectTclName(pvSource->GetVTKSourceTclName());
+    if (this->InputMenu)
+      {
+      // This will either clone or return a previously cloned
+      // object.
+      vtkPVInputMenu* im = this->InputMenu->ClonePrototype(pvSource, map);
+      pvam->SetInputMenu(im);
+      im->Delete();
+      }
+    }
+  else 
+    {
+    vtkErrorMacro("Internal error. Could not downcast clone to PVArrayMenu.");
+    }
+}
+
+//----------------------------------------------------------------------------
+int vtkPVArrayMenu::ReadXMLAttributes(vtkPVXMLElement* element,
+                                      vtkPVXMLPackageParser* parser)
+{
+  if(!this->Superclass::ReadXMLAttributes(element, parser)) { return 0; }
+  
+  // Setup the Label.
+  const char* label = element->GetAttribute("label");
+  if(!label)
+    {
+    vtkErrorMacro("No label attribute.");
+    return 0;
+    }
+  this->Label->SetLabel(label);
+  
+  // Setup the InputMenu.
+  const char* input_menu = element->GetAttribute("input_menu");
+  if(!input_menu)
+    {
+    vtkErrorMacro("No input_menu attribute.");
+    return 0;
+    }
+  
+  vtkPVXMLElement* ime = element->LookupElement(input_menu);
+  vtkPVWidget* w = this->GetPVWidgetFromParser(ime, parser);
+  vtkPVInputMenu* imw = vtkPVInputMenu::SafeDownCast(w);
+  if(!imw)
+    {
+    if(w) { w->Delete(); }
+    vtkErrorMacro("Couldn't get InputMenu widget " << input_menu);
+    return 0;
+    }
+  imw->AddDependent(this);
+  this->SetInputMenu(imw);
+  imw->Delete();
+  
+  // Setup the NumberOfComponents.
+  if(!element->GetScalarAttribute("number_of_components",
+                                  &this->NumberOfComponents))
+    {
+    this->NumberOfComponents = 1;
+    }
+  
+  // Setup the InputName.
+  const char* input_name = element->GetAttribute("input_name");
+  if(input_name)
+    {
+    this->SetInputName(input_name);
+    }
+  else
+    {
+    this->SetInputName("Input");
+    }
+  
+  // Search for attribute type with matching name.
+  const char* attribute_type = element->GetAttribute("attribute_type");
+  unsigned int i = vtkDataSetAttributes::NUM_ATTRIBUTES;
+  if(attribute_type)
+    {
+    for(i=0;i < vtkDataSetAttributes::NUM_ATTRIBUTES;++i)
+      {
+      if(strcmp(vtkDataSetAttributes::GetAttributeTypeAsString(i),
+                attribute_type) == 0)
+        {
+        this->SetAttributeType(i);
+        break;
+        }
+      }
+    }
+  if(i == vtkDataSetAttributes::NUM_ATTRIBUTES)
+    {
+    this->SetAttributeType(vtkDataSetAttributes::SCALARS);
+    }
+  
+  return 1;
 }

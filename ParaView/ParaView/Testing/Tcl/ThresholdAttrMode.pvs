@@ -10,11 +10,12 @@ if {[info exists argc]} {
 
 set pv(vtkTemp1) [Application GetMainWindow]
 set pv(vtkTemp44) [$pv(vtkTemp1) GetMainView]
-set pv(vtkTemp90) [$pv(vtkTemp1) GetGlyphSource Arrow]
-set pv(vtkTemp94) [$pv(vtkTemp1) GetGlyphSource Cone]
-set pv(vtkTemp98) [$pv(vtkTemp1) GetGlyphSource Sphere]
-set pv(vtkTemp101) [$pv(vtkTemp1) Open $DataDir/Data/vox8_bin.vtk]
-set pv(vtkTemp129) [$pv(vtkTemp1) ThresholdCallback]
+set pv(vtkTemp90) [$pv(vtkTemp1) GetPVSource GlyphSources Arrow0]
+set pv(vtkTemp94) [$pv(vtkTemp1) GetPVSource GlyphSources Cone0]
+set pv(vtkTemp98) [$pv(vtkTemp1) GetPVSource GlyphSources Sphere0]
+$pv(vtkTemp1) Open "$DataDir/Data/vox8_bin.vtk"
+set pv(vtkTemp101) [$pv(vtkTemp1) GetCurrentPVSource]
+set pv(vtkTemp129) [$pv(vtkTemp1) CreatePVSource Threshold]
 set pv(vtkTemp137) [$pv(vtkTemp129) GetAttributeModeMenu]
 $pv(vtkTemp137) SetValue "Cell Data"
 $pv(vtkTemp129) ChangeAttributeMode cell
@@ -25,7 +26,7 @@ $pv(vtkTemp141) SetMinValue 0.048000
 $pv(vtkTemp141) SetMaxValue 0.400000
 set pv(vtkTemp146) [$pv(vtkTemp129) GetPVWidget {AllScalars}]
 $pv(vtkTemp129) AcceptCallback
-set pv(vtkTemp158) [$pv(vtkTemp1) CreatePVSource vtkDataSetSurfaceFilter]
+set pv(vtkTemp158) [$pv(vtkTemp1) CreatePVSource DataSetSurfaceFilter]
 set pv(vtkTemp164) [$pv(vtkTemp158) GetPVWidget {Input}]
 $pv(vtkTemp164) SetCurrentValue $pv(vtkTemp129)
 $pv(vtkTemp158) AcceptCallback

@@ -64,21 +64,13 @@ public:
   // Get the vtkKWWidget for the internal frame.
   vtkKWWidget *GetFrame() {return this->Frame;};
 
-  // Description:
-  // These methods are internal. They are public because
-  // they have to be wrapped.
-  void ResizeFrame();
-  void ResizeCanvas();
-
 protected:
   vtkKWFrame();
   ~vtkKWFrame();
 
-  void CalculateBBox(vtkKWWidget* canvas, char* name, int bbox[4]);
-
   vtkKWWidget *Frame;
-  vtkKWWidget *Canvas;
-  vtkKWWidget *ScrollBar;
+  vtkKWWidget *ScrollWindow;
+  vtkKWWidget *ScrollFrame;
 
   char* FrameId;
 

@@ -56,9 +56,7 @@ public:
   static vtkPVScale* New();
   vtkTypeMacro(vtkPVScale, vtkPVObjectWidget);
 
-  void Create(vtkKWApplication *pvApp, char *label,
-              float min, float max, float resolution,
-              char *help);
+  void Create(vtkKWApplication *pvApp);
   
   // Description:
   // Called when accept button is pushed.  
@@ -77,15 +75,55 @@ public:
   void SetValue(float val);
   float GetValue() { return this->Scale->GetValue(); }
 
+  // Description:
+  // The label.
+  void SetLabel(const char* label);
+
+  // Description:
+  // The resolution of the scale
+  void SetResolution(float res);
+
+  // Description:
+  // Set the range of the scale.
+  void SetRange(float min, float max);
+
+  // Description:
+  // This class redefines SetBalloonHelpString since it
+  // has to forward the call to a widget it contains.
+  virtual void SetBalloonHelpString(const char *str);
+  
+//BTX
+  // Description:
+  // Creates and returns a copy of this widget. It will create
+  // a new instance of the same type as the current object
+  // using NewInstance() and then copy some necessary state 
+  // parameters.
+  vtkPVScale* ClonePrototype(vtkPVSource* pvSource,
+				 vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
+//ETX
+
 protected:
   vtkPVScale();
   ~vtkPVScale();
   
-  vtkKWLabel *Label;
+  vtkKWLabel *LabelWidget;
   vtkKWScale *Scale;
 
   vtkPVScale(const vtkPVScale&); // Not implemented
   void operator=(const vtkPVScale&); // Not implemented
+
+  vtkSetStringMacro(EntryLabel);
+  vtkGetStringMacro(EntryLabel);
+  char* EntryLabel;
+
+//BTX
+  virtual void CopyProperties(vtkPVWidget* clone, vtkPVSource* pvSource,
+			      vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
+//ETX
+
+  int ReadXMLAttributes(vtkPVXMLElement* element,
+			vtkPVXMLPackageParser* parser);
+
 };
 
 #endif

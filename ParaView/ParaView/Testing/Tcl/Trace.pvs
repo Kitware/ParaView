@@ -13,13 +13,13 @@ if {[info exists argc]} {
 
 set pv(vtkTemp1) [Application GetMainWindow]
 set pv(vtkTemp43) [$pv(vtkTemp1) GetMainView]
-set pv(vtkTemp89) [$pv(vtkTemp1) GetGlyphSource GlyphArrow]
-set pv(vtkTemp93) [$pv(vtkTemp1) GetGlyphSource GlyphCone]
-set pv(vtkTemp97) [$pv(vtkTemp1) GetGlyphSource GlyphSphere]
+set pv(vtkTemp89) [$pv(vtkTemp1) GetPVSource GlyphSources Arrow0]
+set pv(vtkTemp93) [$pv(vtkTemp1) GetPVSource GlyphSources Cone0]
+set pv(vtkTemp97) [$pv(vtkTemp1) GetPVSource GlyphSources Sphere0]
 
 # Excercise all of the different types of PV widgets.
 
-set pv(vtkTemp98) [$pv(vtkTemp1) CreatePVSource vtkPLOT3DReader]
+set pv(vtkTemp98) [$pv(vtkTemp1) CreatePVSource PLOT3DReader]
 set pv(vtkTemp110) [$pv(vtkTemp98) GetPVWidget {XYZFileName}]
 $pv(vtkTemp110) SetValue $DataDir/Data/combxyz.bin
 set pv(vtkTemp114) [$pv(vtkTemp98) GetPVWidget {QFileName}]
@@ -27,12 +27,12 @@ $pv(vtkTemp114) SetValue $DataDir/Data/combq.bin
 $pv(vtkTemp98) AcceptCallback
 
 # A mistake, but I will leave it here
-set pv(vtkTemp154) [$pv(vtkTemp1) CreatePVSource vtkDataSetSurfaceFilter]
+set pv(vtkTemp154) [$pv(vtkTemp1) CreatePVSource DataSetSurfaceFilter]
 $pv(vtkTemp154) DeleteCallback
 $pv(vtkTemp1) SetCurrentPVSource $pv(vtkTemp98)
 $pv(vtkTemp1) ShowCurrentSourceProperties
 
-set pv(vtkTemp167) [$pv(vtkTemp1) CreatePVSource vtkSphereSource]
+set pv(vtkTemp167) [$pv(vtkTemp1) CreatePVSource SphereSource]
 $pv(vtkTemp167) AcceptCallback
 $pv(vtkTemp1) ResetCameraCallback
 set pv(vtkTemp184) [$pv(vtkTemp167) GetPVWidget {Radius}]
@@ -41,7 +41,7 @@ $pv(vtkTemp167) AcceptCallback
 $pv(vtkTemp184) SetValue 5
 $pv(vtkTemp167) AcceptCallback
 
-set pv(vtkTemp230) [$pv(vtkTemp1) GlyphCallback]
+set pv(vtkTemp230) [$pv(vtkTemp1) CreatePVSource Glyph]
 set pv(vtkTemp238) [$pv(vtkTemp230) GetPVWidget {Input}]
 $pv(vtkTemp238) SetCurrentValue $pv(vtkTemp167)
 set pv(vtkTemp239) [$pv(vtkTemp230) GetPVWidget {Glyph}]
@@ -54,7 +54,7 @@ $pv(vtkTemp230) AcceptCallback
 set pv(vtkTemp245) [$pv(vtkTemp230) GetPVWidget {Orient}]
 $pv(vtkTemp245) SetState 0
 $pv(vtkTemp230) AcceptCallback
-set pv(vtkTemp265) [$pv(vtkTemp1) CreatePVSource vtkDataSetSurfaceFilter]
+set pv(vtkTemp265) [$pv(vtkTemp1) CreatePVSource DataSetSurfaceFilter]
 set pv(vtkTemp274) [$pv(vtkTemp265) GetPVWidget {Input}]
 $pv(vtkTemp274) SetCurrentValue $pv(vtkTemp230)
 $pv(vtkTemp265) AcceptCallback
@@ -63,7 +63,7 @@ $pv(vtkTemp274) SetCurrentValue $pv(vtkTemp98)
 $pv(vtkTemp265) AcceptCallback
 $pv(vtkTemp1) ResetCameraCallback
 
-set pv(vtkTemp286) [$pv(vtkTemp1) CalculatorCallback]
+set pv(vtkTemp286) [$pv(vtkTemp1) CreatePVSource Calculator]
 $pv(vtkTemp286) AddScalarVariable Momentum_0 Momentum 0
 $pv(vtkTemp286) AddScalarVariable Momentum_1 Momentum 1
 $pv(vtkTemp286) SetFunctionLabel {Momentum_0+Momentum_1}
@@ -73,7 +73,7 @@ $pv(vtkTemp286) AcceptCallback
 
 # Test the Plane widget tracing.
 
-set kw(vtkTemp285) [$pv(vtkTemp1) CreatePVSource vtkSphereSource]
+set kw(vtkTemp285) [$pv(vtkTemp1) CreatePVSource SphereSource]
 set kw(vtkTemp295) [$kw(vtkTemp285) GetPVWidget {Center}]
 set kw(vtkTemp300) [$kw(vtkTemp285) GetPVWidget {Radius}]
 $kw(vtkTemp300) SetValue 5
@@ -82,7 +82,7 @@ $kw(vtkTemp285) AcceptCallback
 
 $pv(vtkTemp1) ResetCameraCallback
 
-set kw(vtkTemp327) [$pv(vtkTemp1) ClipCallback]
+set kw(vtkTemp327) [$pv(vtkTemp1) CreatePVSource Clip]
 set kw(vtkTemp328) [$kw(vtkTemp327) GetPVWidget {Clip Function}]
 set kw(vtkTemp334) [$kw(vtkTemp328) GetPVWidget {Plane}]
 set kw(vtkTemp335) [$kw(vtkTemp334) GetCenterEntry]

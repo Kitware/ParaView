@@ -115,7 +115,16 @@ Tcl_Interp *vtkPVApplication::InitializeTcl(int argc, char *argv[])
     }
    
   Vtkkwparaviewtcl_Init(interp);
- 
+  
+  // Create the component loader procedure in Tcl.
+  char* script = new char[strlen(vtkPVApplication::LoadComponentProc)+1];
+  strcpy(script, vtkPVApplication::LoadComponentProc);
+  if (Tcl_GlobalEval(interp, script) != TCL_OK)
+    {
+    // ????
+    }  
+  delete [] script;
+  
   return interp;
 }
 
@@ -138,6 +147,8 @@ int vtkPVApplicationCommand(ClientData cd, Tcl_Interp *interp,
 //----------------------------------------------------------------------------
 vtkPVApplication::vtkPVApplication()
 {
+  this->RunningParaViewScript = 0;
+
   char name[128];
   this->CommandFunction = vtkPVApplicationCommand;
   this->MajorVersion = 0;
@@ -353,6 +364,43 @@ int vtkPVApplication::CheckRegistration()
 }
 
 //----------------------------------------------------------------------------
+int vtkPVApplication::CheckForArgument(int argc, char* argv[], 
+				       const char* arg, int& index)
+{
+  if (!arg)
+    {
+    return VTK_ERROR;
+    }
+
+  int i;
+  for (i=0; i < argc; i++)
+    {
+    if (argv[i] && strcmp(arg, argv[i]) == 0)
+      {
+      index = i;
+      return VTK_OK;
+      }
+    }
+  return VTK_ERROR;
+}
+
+const char vtkPVApplication::ArgumentList[vtkPVApplication::NUM_ARGS][128] = 
+{ "--start-empty" };
+
+int vtkPVApplication::IsParaViewScriptFile(const char* arg)
+{
+  if (!arg || strlen(arg) < 4)
+    {
+    return 0;
+    }
+  if (strcmp(arg + strlen(arg) - 4,".pvs") == 0)
+    {
+    return 1;
+    }
+  return 0;
+}
+
+//----------------------------------------------------------------------------
 void vtkPVApplication::Start(int argc, char*argv[])
 {
   vtkOutputWindow::GetInstance()->PromptUserOn();
@@ -375,23 +423,61 @@ void vtkPVApplication::Start(int argc, char*argv[])
   this->Script("option add *Button.padY 3");
 #endif
 
+
+  int i;
+  for (i=1; i < argc; i++)
+    {
+    if ( vtkPVApplication::IsParaViewScriptFile(argv[i]) )
+      {
+      this->RunningParaViewScript = 1;
+      break;
+      }
+    }
+
+  if (!this->RunningParaViewScript)
+    {
+    int  j;
+    for (i=1; i < argc; i++)
+      {
+      for(j=0; j<NUM_ARGS; j++)
+	{
+	if ( argv[i] && strcmp(argv[i], ArgumentList[j]) != 0 )
+	  {
+	  vtkErrorMacro("Unrecognized argument " << argv[i] << ".");
+	  this->Exit();
+	  return;
+	  }
+	}
+      }
+    }
+
   vtkPVWindow *ui = vtkPVWindow::New();
   this->Windows->AddItem(ui);
 
   this->CreateButtonPhotos();
+
+  int index;
+  if ( vtkPVApplication::CheckForArgument(argc, argv, "--start-empty", index) 
+       == VTK_OK )
+    {
+    ui->InitializeDefaultInterfacesOff();
+    }
   ui->Create(this,"");
 
   // ui has ref. count of at least 1 because of AddItem() above
   ui->Delete();
-  
-  if (argc > 1 && argv[1])
+
+  // If any of the argumens has a .pvs extension, load it as a script.
+  for (i=1; i < argc; i++)
     {
-    // if a tcl script was passed in as an arg then load it
-    if (!strcmp(argv[1] + strlen(argv[1]) - 4,".pvs"))
+    if (vtkPVApplication::IsParaViewScriptFile(argv[i]))
       {
-      ui->LoadScript(argv[1]);
+      this->RunningParaViewScript = 1;
+      ui->LoadScript(argv[i]);
+      this->RunningParaViewScript = 0;
       }
     }
+
 
   this->vtkKWApplication::Start(argc,argv);
 }
@@ -412,7 +498,8 @@ void vtkPVApplication::Exit()
     {
     if (id != myId)
       {
-      this->Controller->TriggerRMI(id, vtkMultiProcessController::BREAK_RMI_TAG);
+      this->Controller->TriggerRMI(id, 
+				   vtkMultiProcessController::BREAK_RMI_TAG);
       }
     }
 
@@ -981,7 +1068,6 @@ void vtkPVApplication::DisplayHelp(vtkKWWindow* master)
   dlg->Delete();
 }
 
-
 //----------------------------------------------------------------------------
 void vtkPVApplication::LogStartEvent(char* str)
 {
@@ -1002,3 +1088,56 @@ void vtkPVApplication::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "MajorVersion: " << this->GetMajorVersion();
   os << indent << "MinorVersion: " << this->GetMinorVersion();
 }
+
+//----------------------------------------------------------------------------
+const char* const vtkPVApplication::LoadComponentProc =
+"namespace eval ::paraview {\n"
+"    proc load_component {name} {\n"
+"        \n"
+"        global tcl_platform auto_path env\n"
+"        \n"
+"        # First dir is empty, to let Tcl try in the current dir\n"
+"        \n"
+"        set dirs {\"\"}\n"
+"        set ext [info sharedlibextension]\n"
+"        if {$tcl_platform(platform) == \"unix\"} {\n"
+"            set prefix \"lib\"\n"
+"            # Help Unix a bit by browsing into $auto_path and /usr/lib...\n"
+"            set dirs [concat $dirs /usr/local/lib /usr/local/lib/vtk $auto_path]\n"
+"            if {[info exists env(LD_LIBRARY_PATH)]} {\n"
+"                set dirs [concat $dirs [split $env(LD_LIBRARY_PATH) \":\"]]\n"
+"            }\n"
+"            if {[info exists env(PATH)]} {\n"
+"                set dirs [concat $dirs [split $env(PATH) \":\"]]\n"
+"            }\n"
+"        } else {\n"
+"            set prefix \"\"\n"
+"            if {$tcl_platform(platform) == \"windows\"} {\n"
+"                if {[info exists env(PATH)]} {\n"
+"                    set dirs [concat $dirs [split $env(PATH) \";\"]]\n"
+"                }\n"
+"            }\n"
+"        }\n"
+"        \n"
+"        foreach dir $dirs {\n"
+"            set libname [file join $dir ${prefix}${name}${ext}]\n"
+"            if {[file exists $libname]} {\n"
+"                if {![catch {load $libname} errormsg]} {\n"
+"                    # WARNING: it HAS to be \"\" so that pkg_mkIndex work (since\n"
+"                    # while evaluating a package ::paraview::load_component won't\n"
+"                    # exist and will default to the unknown() proc that \n"
+"                    # returns \"\"\n"
+"                    return \"\"\n"
+"                } else {\n"
+"                    # If not loaded but file was found, oops\n"
+"                    puts stderr $errormsg\n"
+"                }\n"
+"            }\n"
+"        }\n"
+"        \n"
+"        puts stderr \"::paraview::load_component: $name could not be found.\"\n"
+"        \n"
+"        return 1\n"
+"    }   \n"
+"    namespace export load_component\n"
+"}\n";

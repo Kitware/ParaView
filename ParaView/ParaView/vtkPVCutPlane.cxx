@@ -48,6 +48,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVSelectWidget.h"
 #include "vtkPVPlaneWidget.h"
 #include "vtkPVSphereWidget.h"
+#include "vtkPVBoundsDisplay.h"
 #include "vtkPVInputMenu.h"
 #include "vtkObjectFactory.h"
 #include "vtkKWFrame.h"
@@ -104,9 +105,18 @@ void vtkPVCutPlane::CreateProperties()
  
   inputMenu = this->AddInputMenu("Input", "PVInput", "vtkDataSet",
                                  "Set the input to this filter.",
-                                 this->GetPVWindow()->GetSources());
+                                 this->GetPVWindow()->GetSourceList("Sources"));
 
-  this->AddBoundsDisplay(inputMenu);
+  vtkPVBoundsDisplay* boundsDisplay = vtkPVBoundsDisplay::New();
+  boundsDisplay->SetParent(this->GetParameterFrame()->GetFrame());
+  boundsDisplay->ShowHideFrameOn();
+  boundsDisplay->Create(this->Application);
+  boundsDisplay->SetTraceName("BoundsDisplay");
+  boundsDisplay->SetLabel("Input Bounds");
+  boundsDisplay->SetInputMenu(inputMenu);
+  inputMenu->AddDependent(boundsDisplay);
+  this->AddPVWidget(boundsDisplay);
+  boundsDisplay->Delete();
 
   selectWidget = vtkPVSelectWidget::New();
   selectWidget->SetParent(this->GetParameterFrame()->GetFrame());

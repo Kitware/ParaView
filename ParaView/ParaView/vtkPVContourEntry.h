@@ -90,13 +90,6 @@ public:
   void DeleteValueCallback();
 
   // Description:
-  // Need the filter to set the countour.
-  // I would like to get rid of this ivar.
-  // It is not reference counted for fear of loops.
-  void SetPVSource(vtkPVSource *pvs) { this->PVSource = pvs;}
-  vtkPVSource *GetPVSource() { return this->PVSource;}
-
-  // Description:
   // The widget saves it state/command in the vtk tcl script.
   void SaveInTclScript(ofstream *file);
 
@@ -104,6 +97,16 @@ public:
   // adds a script to the menu of the animation interface.
   virtual void AddAnimationScriptsToMenu(vtkKWMenu *menu, 
 					 vtkPVAnimationInterface *ai);
+
+//BTX
+  // Description:
+  // Creates and returns a copy of this widget. It will create
+  // a new instance of the same type as the current object
+  // using NewInstance() and then copy some necessary state 
+  // parameters.
+  vtkPVContourEntry* ClonePrototype(vtkPVSource* pvSource,
+				 vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
+//ETX
 
 protected:
   vtkPVContourEntry();
@@ -117,11 +120,17 @@ protected:
   vtkKWPushButton* AddValueButton;
   vtkKWPushButton* DeleteValueButton;
 
-  // I would like to get rid of this reference.
-  vtkPVSource *PVSource;
 
   vtkPVContourEntry(const vtkPVContourEntry&); // Not implemented
   void operator=(const vtkPVContourEntry&); // Not implemented
+
+//BTX
+  virtual void CopyProperties(vtkPVWidget* clone, vtkPVSource* pvSource,
+			      vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
+//ETX
+  
+  int ReadXMLAttributes(vtkPVXMLElement* element,      
+                        vtkPVXMLPackageParser* parser);
 };
 
 #endif

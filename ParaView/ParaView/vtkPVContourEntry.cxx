@@ -45,10 +45,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWListBox.h"
 #include "vtkKWEntry.h"
 #include "vtkKWPushButton.h"
+#include "vtkPVXMLElement.h"
 
 #include "vtkKWMenu.h"
 #include "vtkPVAnimationInterface.h"
-
+#include "vtkArrayMap.txx"
 
 int vtkPVContourEntryCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -65,7 +66,6 @@ vtkPVContourEntry::vtkPVContourEntry()
   this->NewValueEntry = vtkKWEntry::New();
   this->AddValueButton = vtkKWPushButton::New();
   this->DeleteValueButton = vtkKWPushButton::New();
-  this->PVSource = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -351,3 +351,42 @@ void vtkPVContourEntry::AddAnimationScriptsToMenu(vtkKWMenu *menu,
   menu->AddCommand(this->GetTraceName(), ai, methodAndArgs, 0, "");
 }
 
+vtkPVContourEntry* vtkPVContourEntry::ClonePrototype(vtkPVSource* pvSource,
+				 vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
+{
+  vtkPVWidget* clone = this->ClonePrototypeInternal(pvSource, map);
+  return vtkPVContourEntry::SafeDownCast(clone);
+}
+
+void vtkPVContourEntry::CopyProperties(vtkPVWidget* clone, 
+				       vtkPVSource* pvSource,
+			      vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
+{
+  this->Superclass::CopyProperties(clone, pvSource, map);
+  vtkPVContourEntry* pvce = vtkPVContourEntry::SafeDownCast(clone);
+  if (pvce)
+    {
+    pvce->SetLabel(this->ContourValuesLabel->GetLabel());
+    }
+  else 
+    {
+    vtkErrorMacro("Internal error. Could not downcast clone to PVContourEntry.");
+    }
+}
+
+//----------------------------------------------------------------------------
+int vtkPVContourEntry::ReadXMLAttributes(vtkPVXMLElement* element,
+                                         vtkPVXMLPackageParser* parser)
+{
+  if(!this->Superclass::ReadXMLAttributes(element, parser)) { return 0; }
+  
+  const char* label = element->GetAttribute("label");
+  if(!label)
+    {
+    vtkErrorMacro("No label attribute.");
+    return 0;
+    }
+  this->SetLabel(label);
+  
+  return 1;
+}

@@ -40,11 +40,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 #include "vtkPVSelectWidget.h"
+#include "vtkPVApplication.h"
 #include "vtkStringList.h"
-#include "vtkCollection.h"
+#include "vtkPVWidgetCollection.h"
 #include "vtkKWLabeledFrame.h"
 #include "vtkKWOptionMenu.h"
 #include "vtkObjectFactory.h"
+#include "vtkArrayMap.txx"
+#include "vtkPVXMLElement.h"
 
 int vtkPVSelectWidgetCommand(ClientData cd, Tcl_Interp *interp,
 		     int argc, char *argv[]);
@@ -60,9 +63,11 @@ vtkPVSelectWidget::vtkPVSelectWidget()
 
   this->Labels = vtkStringList::New();
   this->Values = vtkStringList::New();
-  this->Widgets = vtkCollection::New();
+  this->Widgets = vtkPVWidgetCollection::New();
 
   this->CurrentIndex = -1;
+  this->EntryLabel = 0;
+  this->UseWidgetCommand = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -78,6 +83,7 @@ vtkPVSelectWidget::~vtkPVSelectWidget()
   this->Values = NULL;
   this->Widgets->Delete();
   this->Widgets = NULL;
+  this->SetEntryLabel(0);
 }
 
 //----------------------------------------------------------------------------
@@ -94,12 +100,11 @@ vtkPVSelectWidget* vtkPVSelectWidget::New()
 }
 
 //----------------------------------------------------------------------------
-int vtkPVSelectWidget::Create(vtkKWApplication *app)
+void vtkPVSelectWidget::Create(vtkKWApplication *app)
 {
   if (this->Application != NULL)
     {
     vtkErrorMacro("Object has already been created.");
-    return 0;
     }
   this->SetApplication(app);
 
@@ -109,6 +114,10 @@ int vtkPVSelectWidget::Create(vtkKWApplication *app)
   this->LabeledFrame->SetParent(this);
   this->LabeledFrame->ShowHideFrameOn();
   this->LabeledFrame->Create(app);
+  if (this->EntryLabel)
+    {
+    this->LabeledFrame->SetLabel(this->EntryLabel);
+    }
   this->Script("pack %s -side top -fill both -expand true", 
                this->LabeledFrame->GetWidgetName());
 
@@ -123,8 +132,30 @@ int vtkPVSelectWidget::Create(vtkKWApplication *app)
   this->Script("pack %s -side left", this->Menu->GetWidgetName());
 
   justifyFrame->Delete();
+  int len = this->Widgets->GetNumberOfItems();
+  vtkPVWidget* widget;
+  for(int i=0; i<len; i++)
+    {
+    widget = static_cast<vtkPVWidget*>(this->Widgets->GetItemAsObject(i));
+    if (!widget->GetApplication())
+      {
+      widget->Create(this->Application);
+      }
+    }
 
-  return 1;
+  len = this->Labels->GetLength();
+  char* label;
+  for(int i=0; i<len; i++)
+    {
+    label = this->Labels->GetString(i);
+    this->Menu->AddEntryWithCommand(label, this, "MenuCallback");
+    }
+  if (len > 0 && this->CurrentIndex < 0)
+    {
+    this->Menu->SetValue(this->Labels->GetString(0));
+    this->SetCurrentIndex(0);
+    }
+
 }
 
 
@@ -133,7 +164,11 @@ void vtkPVSelectWidget::SetLabel(const char* label)
 {
   // For getting the widget in a script.
   this->SetTraceName(label);
-  this->LabeledFrame->SetLabel(label);
+  this->SetEntryLabel(label);
+  if (this->Application)
+    {
+    this->LabeledFrame->SetLabel(label);
+    }
 }
   
 //----------------------------------------------------------------------------
@@ -148,15 +183,18 @@ void vtkPVSelectWidget::Accept()
     }
 
   // Command to update the UI.
-  pvApp->BroadcastScript("%s Set%s {%s}",
-                         this->ObjectTclName,
-                         this->VariableName,
-                         this->GetCurrentVTKValue()); 
+  if (this->GetCurrentVTKValue())
+    {
+    pvApp->BroadcastScript("%s Set%s {%s}",
+			   this->ObjectTclName,
+			   this->VariableName,
+			   this->GetCurrentVTKValue()); 
+    }
 
   if (this->CurrentIndex >= 0)
     {
     vtkPVWidget *pvw;
-    pvw = (vtkPVWidget*)(this->Widgets->GetItemAsObject(this->CurrentIndex));
+    pvw = (vtkPVWidget*)this->Widgets->GetItemAsObject(this->CurrentIndex);
     pvw->Accept();
     }
 
@@ -167,12 +205,34 @@ void vtkPVSelectWidget::Accept()
 //----------------------------------------------------------------------------
 void vtkPVSelectWidget::Reset()
 {
-  // Catch incase the value is not set by default.
-  // We default to the first in the list.
-  this->Script("catch {%s SetCurrentVTKValue [%s Get%s]}",
-               this->GetTclName(),
-               this->ObjectTclName,
-               this->VariableName);
+  int index=-1, i;
+  int num = this->Values->GetNumberOfStrings();
+  const char* value;
+  const char* tmp;
+  char* currentValue;
+
+  this->Script("%s Get%s",this->ObjectTclName,this->VariableName);
+  tmp = Tcl_GetStringResult(this->Application->GetMainInterp());
+  if (tmp && strlen(tmp) > 0)
+    {
+    currentValue = new char[strlen(tmp)+1];
+    strcpy(currentValue, tmp);
+    for (i = 0; i < num; ++i)
+      {
+      value = this->GetVTKValue(i);
+      if (value && currentValue && strcmp(value, currentValue) == 0)
+	{
+	index = i;
+	break;
+	}
+      }
+    if ( index >= 0 )
+      {
+      this->Menu->SetValue(this->Labels->GetString(index));
+      this->SetCurrentIndex(index);
+      }
+    delete[] currentValue;
+    }
 
   if (this->CurrentIndex >= 0)
     {
@@ -204,35 +264,49 @@ const char* vtkPVSelectWidget::GetCurrentValue()
   return this->Menu->GetValue();
 }
 
-//----------------------------------------------------------------------------
-void vtkPVSelectWidget::SetCurrentVTKValue(const char *val)
+const char* vtkPVSelectWidget::GetVTKValue(int index)
 {
-  int idx;
+  if (index < 0)
+    {
+    return 0;
+    }
   
-  if (val == NULL || val[0] == '\0')
+  const char* res = this->Values->GetString(index);
+  if ( this->UseWidgetCommand )
     {
-    // We do not allow an empty selection.
-    return;
+    vtkPVWidget* pvw = (vtkPVWidget*)(this->Widgets->GetItemAsObject(index));
+    if (pvw)
+      {
+      if (res && res[0] != '\0')
+	{
+	this->Script("%s %s", pvw->GetTclName(), res);
+	return Tcl_GetStringResult(this->Application->GetMainInterp());
+	}
+      else
+	{
+	return 0;
+	}
+      }
+    }
+  else
+    {
+    if (res && res[0] != '\0')
+      {
+      return this->Values->GetString(index);
+      }
+    else
+      {
+      return 0;
+      }
     }
 
-  idx = this->FindIndex(val, this->Values);
-  if (idx < 0 || idx == this->CurrentIndex)
-    {
-    return;
-    }
-
-  this->Menu->SetValue(this->Labels->GetString(idx));
-  this->SetCurrentIndex(idx);
+  return 0;
 }
 
 //----------------------------------------------------------------------------
 const char* vtkPVSelectWidget::GetCurrentVTKValue()
 {
-  if (this->CurrentIndex < 0)
-    {
-    return NULL;
-    }
-  return this->Values->GetString(this->CurrentIndex);
+  return this->GetVTKValue(this->CurrentIndex);
 }
 
 //----------------------------------------------------------------------------
@@ -242,14 +316,25 @@ void vtkPVSelectWidget::AddItem(const char* labelVal, vtkPVWidget *pvw,
   char str[512];
 
   this->Labels->AddString(labelVal);
-  this->Values->AddString(vtkVal);
   this->Widgets->AddItem(pvw);
 
-  this->Menu->AddEntryWithCommand(labelVal, this, "MenuCallback");
-  if (this->Application && this->CurrentIndex < 0)
+  if (vtkVal)
     {
-    this->Menu->SetValue(labelVal);
-    this->SetCurrentIndex(0);
+    this->Values->AddString(vtkVal);
+    }
+  else
+    {
+    this->Values->AddString("");
+    }
+
+  if (this->Application)
+    {
+    this->Menu->AddEntryWithCommand(labelVal, this, "MenuCallback");
+    if (this->CurrentIndex < 0)
+      {
+      this->Menu->SetValue(labelVal);
+      this->SetCurrentIndex(0);
+      }
     }
 
   pvw->SetTraceReferenceObject(this);
@@ -350,4 +435,133 @@ void vtkPVSelectWidget::SaveInTclScript(ofstream *file)
         << " {" << vtkValue << "}" << endl;
 }
 
+vtkPVSelectWidget* vtkPVSelectWidget::ClonePrototype(vtkPVSource* pvSource,
+				 vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
+{
+  vtkPVWidget* clone = this->ClonePrototypeInternal(pvSource, map);
+  return vtkPVSelectWidget::SafeDownCast(clone);
+}
 
+vtkPVWidget* vtkPVSelectWidget::ClonePrototypeInternal(vtkPVSource* pvSource,
+				vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
+{
+  vtkPVWidget* pvWidget = 0;
+  // Check if a clone of this widget has already been created
+  if ( map->GetItem(this, pvWidget) != VTK_OK )
+    {
+    // If not, create one and add it to the map
+    pvWidget = this->NewInstance();
+    map->SetItem(this, pvWidget);
+    // Now copy all the properties
+    this->CopyProperties(pvWidget, pvSource, map);
+
+    vtkPVSelectWidget* pvSelect = vtkPVSelectWidget::SafeDownCast(pvWidget);
+    if (!pvSelect)
+      {
+      vtkErrorMacro("Internal error. Could not downcast pointer.");
+      pvWidget->Delete();
+      return 0;
+      }
+    
+    // Now clone all the children
+    int len = this->Labels->GetLength();
+    char* label;
+    char* value;
+    vtkPVWidget* widget;
+    vtkPVWidget* clone;
+    for(int i=0; i<len; i++)
+      {
+      label = this->Labels->GetString(i);
+      value = this->Values->GetString(i);
+
+      widget = static_cast<vtkPVWidget*>(this->Widgets->GetItemAsObject(i));
+      clone = widget->ClonePrototype(pvSource, map);
+      clone->SetParent(pvSelect->GetFrame());
+      pvSelect->AddItem(label, clone, value);
+      clone->Delete();
+      }
+    }
+  else
+    {
+    // Increment the reference count. This is necessary
+    // to make the behavior same whether a widget is created
+    // or returned from the map. Always call Delete() after
+    // cloning.
+    pvWidget->Register(this);
+    }
+
+  // note pvSelect == pvWidget
+  return pvWidget;
+}
+
+void vtkPVSelectWidget::CopyProperties(vtkPVWidget* clone, 
+				       vtkPVSource* pvSource,
+			      vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
+{
+  this->Superclass::CopyProperties(clone, pvSource, map);
+  vtkPVSelectWidget* pvse = vtkPVSelectWidget::SafeDownCast(clone);
+  if (pvse)
+    {
+    pvse->SetLabel(this->EntryLabel);
+    pvse->SetUseWidgetCommand(this->UseWidgetCommand);
+    }
+  else 
+    {
+    vtkErrorMacro("Internal error. Could not downcast clone to PVSelectWidget.");
+    }
+}
+
+//----------------------------------------------------------------------------
+int vtkPVSelectWidget::ReadXMLAttributes(vtkPVXMLElement* element,
+                                         vtkPVXMLPackageParser* parser)
+{
+  if(!this->Superclass::ReadXMLAttributes(element, parser)) { return 0; }
+  
+  // Setup the Label.
+  const char* label = element->GetAttribute("label");
+  if(label)
+    {
+    this->SetLabel(label);  
+    }
+  else
+    {
+    this->SetLabel(this->VariableName);
+    }
+  
+  // Setup the UseWidgetCommand.
+  if(!element->GetScalarAttribute("use_widget_command",
+                                  &this->UseWidgetCommand))
+    {
+    this->UseWidgetCommand = 0;
+    }
+  
+  // Extract the list of items.
+  unsigned int i;
+  for(i=0;i < element->GetNumberOfNestedElements(); ++i)
+    {
+    vtkPVXMLElement* item = element->GetNestedElement(i);
+    if(strcmp(item->GetName(), "Item") != 0)
+      {
+      vtkErrorMacro("Found non-Item element in SelectWidget.");
+      return 0;
+      }
+    else if(item->GetNumberOfNestedElements() != 1)
+      {
+      vtkErrorMacro("Item element doesn't have exactly 1 widget.");
+      return 0;
+      }
+    const char* itemLabel = item->GetAttribute("label");
+    const char* itemValue = item->GetAttribute("value");
+    if(!itemLabel)
+      {
+      vtkErrorMacro("Item has no label.");
+      return 0;
+      }
+    vtkPVXMLElement* we = item->GetNestedElement(0);
+    vtkPVWidget* widget = this->GetPVWidgetFromParser(we, parser);
+    this->AddItem(itemLabel, widget, itemValue);
+    widget->Delete();
+    }
+  
+  return 1;
+}

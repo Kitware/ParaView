@@ -54,6 +54,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class vtkKWRadioButton;
 class vtkPVData;
+class vtkKWPushButton;
+class vtkCollection;
 
 class VTK_EXPORT vtkPVArraySelection : public vtkPVWidget
 {
@@ -99,6 +101,16 @@ public:
   // Description:
   // Save this widget to a file.  
   virtual void SaveInTclScript(ofstream *file);
+
+//BTX
+  // Description:
+  // Creates and returns a copy of this widget. It will create
+  // a new instance of the same type as the current object
+  // using NewInstance() and then copy some necessary state 
+  // parameters.
+  vtkPVArraySelection* ClonePrototype(vtkPVSource* pvSource,
+				 vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
+//ETX
   
 protected:
   vtkPVArraySelection();
@@ -123,6 +135,14 @@ protected:
 
   vtkPVArraySelection(const vtkPVArraySelection&); // Not implemented
   void operator=(const vtkPVArraySelection&); // Not implemented
+
+//BTX
+  virtual void CopyProperties(vtkPVWidget* clone, vtkPVSource* pvSource,
+			      vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
+//ETX
+
+  int ReadXMLAttributes(vtkPVXMLElement* element,
+                        vtkPVXMLPackageParser* parser);
 };
 
 #endif

@@ -49,6 +49,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 vtkStandardNewMacro( vtkKWPushButton );
 
 
+vtkKWPushButton::vtkKWPushButton()
+{
+  this->ButtonLabel = 0;
+}
+
+vtkKWPushButton::~vtkKWPushButton()
+{
+  this->SetButtonLabel(0);
+}
 
 void vtkKWPushButton::Create(vtkKWApplication *app, const char *args)
 {
@@ -65,7 +74,14 @@ void vtkKWPushButton::Create(vtkKWApplication *app, const char *args)
 
   // create the top level
   wname = this->GetWidgetName();
-  this->Script("button %s %s", wname,args);
+  if (this->ButtonLabel)
+    {
+    this->Script("button %s %s -text {%s}", wname,args,this->ButtonLabel);
+    }
+  else
+    {
+    this->Script("button %s %s", wname,args);
+    }
 }
 
 void vtkKWPushButton::SetLabel( const char *name )
@@ -74,6 +90,7 @@ void vtkKWPushButton::SetLabel( const char *name )
     {
     this->Script("%s configure -text {%s}", this->GetWidgetName(), name );
     }
+  this->SetButtonLabel(name);
 }
 
 

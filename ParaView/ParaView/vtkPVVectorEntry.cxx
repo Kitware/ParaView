@@ -40,10 +40,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 #include "vtkPVVectorEntry.h"
+#include "vtkPVApplication.h"
 #include "vtkPVAnimationInterface.h"
 #include "vtkObjectFactory.h"
 #include "vtkKWEntry.h"
 #include "vtkKWMenu.h"
+#include "vtkStringList.h"
+#include "vtkPVXMLElement.h"
 
 //----------------------------------------------------------------------------
 vtkPVVectorEntry* vtkPVVectorEntry::New()
@@ -61,13 +64,17 @@ vtkPVVectorEntry* vtkPVVectorEntry::New()
 //---------------------------------------------------------------------------
 vtkPVVectorEntry::vtkPVVectorEntry()
 {
-  this->Label = vtkKWLabel::New();
-  this->Label->SetParent(this);
+  this->LabelWidget = vtkKWLabel::New();
+  this->LabelWidget->SetParent(this);
   this->Entries = vtkKWWidgetCollection::New();
   this->SubLabels = vtkKWWidgetCollection::New();
 
   this->ScriptValue = NULL;
   this->DataType = VTK_FLOAT;
+  this->SubLabelTxts = vtkStringList::New();
+
+  this->VectorLength = 1;
+  this->EntryLabel = 0;
 }
 
 //---------------------------------------------------------------------------
@@ -77,15 +84,72 @@ vtkPVVectorEntry::~vtkPVVectorEntry()
   this->Entries = NULL;
   this->SubLabels->Delete();
   this->SubLabels = NULL;
-  this->Label->Delete();
-  this->Label = NULL;
+  this->LabelWidget->Delete();
+  this->LabelWidget = NULL;
 
   this->SetScriptValue(NULL);
+  this->SubLabelTxts->Delete();
+  this->SetEntryLabel(0);
+}
+
+void vtkPVVectorEntry::SetLabel(const char* label)
+{
+  this->SetEntryLabel(label);
+  this->LabelWidget->SetLabel(label);
+}
+
+void vtkPVVectorEntry::SetSubLabel(int i, const char* sublabel)
+{
+  this->SubLabelTxts->SetString(i, sublabel);
+}
+
+void vtkPVVectorEntry::SetBalloonHelpString(const char *str)
+{
+
+  // A little overkill.
+  if (this->BalloonHelpString == NULL && str == NULL)
+    {
+    return;
+    }
+
+  // This check is needed to prevent errors when using
+  // this->SetBalloonHelpString(this->BalloonHelpString)
+  if (str != this->BalloonHelpString)
+    {
+    // Normal string stuff.
+    if (this->BalloonHelpString)
+      {
+      delete [] this->BalloonHelpString;
+      this->BalloonHelpString = NULL;
+      }
+    if (str != NULL)
+      {
+      this->BalloonHelpString = new char[strlen(str)+1];
+      strcpy(this->BalloonHelpString, str);
+      }
+    }
+  
+  if ( this->Application && !this->BalloonHelpInitialized )
+    {
+    this->LabelWidget->SetBalloonHelpString(this->BalloonHelpString);
+    this->SubLabels->InitTraversal();
+    int i, numItems = this->SubLabels->GetNumberOfItems();
+    for (i=0; i<numItems; i++)
+      {
+      this->SubLabels->GetNextKWWidget()->SetBalloonHelpString(str);
+      }
+    this->Entries->InitTraversal();
+    numItems = this->Entries->GetNumberOfItems();
+    for (i=0; i<numItems; i++)
+      {
+      this->Entries->GetNextKWWidget()->SetBalloonHelpString(str);
+      }
+    this->BalloonHelpInitialized = 1;
+    }
 }
 
 //---------------------------------------------------------------------------
-void vtkPVVectorEntry::Create(vtkKWApplication *pvApp, char *label,
-                              int vectorLength, char **subLabels, char *help)
+void vtkPVVectorEntry::Create(vtkKWApplication *pvApp)
 {
   const char* wname;
   int i;
@@ -99,7 +163,7 @@ void vtkPVVectorEntry::Create(vtkKWApplication *pvApp, char *label,
     }
   
   // For getting the widget in a script.
-  this->SetTraceName(label);
+  this->SetTraceName(this->EntryLabel);
 
   this->SetApplication(pvApp);
 
@@ -108,26 +172,24 @@ void vtkPVVectorEntry::Create(vtkKWApplication *pvApp, char *label,
   this->Script("frame %s -borderwidth 0 -relief flat", wname);
   
   // Now a label
-  if (label && label[0] != '\0')
+  if (this->EntryLabel && this->EntryLabel[0] != '\0')
     {
-    this->Label->Create(pvApp, "-width 18 -justify right");
-    this->Label->SetLabel(label);
-    if (help)
-      {
-      this->Label->SetBalloonHelpString(help);
-      }
-    this->Script("pack %s -side left", this->Label->GetWidgetName());
+    this->LabelWidget->Create(pvApp, "-width 18 -justify right");
+    this->LabelWidget->SetLabel(this->EntryLabel);
+    this->Script("pack %s -side left", this->LabelWidget->GetWidgetName());
     }
     
   // Now the sublabels and entries
-  for (i = 0; i < vectorLength; i++)
+  char* subLabelTxt;
+  for (i = 0; i < this->VectorLength; i++)
     {
-    if (subLabels && subLabels[i] && subLabels[i][0] != '\0')
+    subLabelTxt = this->SubLabelTxts->GetString(i);
+    if (subLabelTxt && subLabelTxt[0] != '\0')
       {
       subLabel = vtkKWLabel::New();
       subLabel->SetParent(this);
       subLabel->Create(pvApp, "");
-      subLabel->SetLabel(subLabels[i]);
+      subLabel->SetLabel(subLabelTxt);
       this->Script("pack %s -side left", subLabel->GetWidgetName());
       this->SubLabels->AddItem(subLabel);
       subLabel->Delete();
@@ -138,16 +200,12 @@ void vtkPVVectorEntry::Create(vtkKWApplication *pvApp, char *label,
     entry->Create(pvApp, "-width 2");
     this->Script("bind %s <KeyPress> {%s ModifiedCallback}",
                  entry->GetWidgetName(), this->GetTclName());
-    if (help)
-      { 
-      entry->SetBalloonHelpString(help);
-      }
     this->Script("pack %s -side left -fill x -expand t",
                  entry->GetWidgetName());
     this->Entries->AddItem(entry);
-    
     entry->Delete();
     }
+  this->SetBalloonHelpString(this->BalloonHelpString);
 }
 
 
@@ -348,14 +406,16 @@ void vtkPVVectorEntry::AddAnimationScriptsToMenu(vtkKWMenu *menu,
     if (this->DataType == VTK_INT || this->DataType == VTK_LONG)
       {
       sprintf(methodAndArgs, "SetLabelAndScript {%s} {%s Set%s [expr int($pvTime)]}", 
-              this->Label->GetLabel(), this->ObjectTclName, this->VariableName);
+              this->LabelWidget->GetLabel(), this->ObjectTclName, 
+	      this->VariableName);
       }
     else
       {
       sprintf(methodAndArgs, "SetLabelAndScript {%s} {%s Set%s $pvTime}", 
-              this->Label->GetLabel(), this->ObjectTclName, this->VariableName);
+              this->LabelWidget->GetLabel(), this->ObjectTclName, 
+	      this->VariableName);
       }
-    menu->AddCommand(this->Label->GetLabel(), ai, methodAndArgs, 0, "");
+    menu->AddCommand(this->LabelWidget->GetLabel(), ai, methodAndArgs, 0, "");
     }
 }
 
@@ -365,7 +425,104 @@ void vtkPVVectorEntry::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os,indent);
   os << indent << "DataType: " << this->GetDataType() << endl;
   os << indent << "Entries: " << this->GetEntries() << endl;
-  os << indent << "Label: " << this->GetLabel() << endl;
   os << indent << "ScriptValue: " << this->GetScriptValue() << endl;
   os << indent << "SubLabels: " << this->GetSubLabels() << endl;
+}
+
+vtkPVVectorEntry* vtkPVVectorEntry::ClonePrototype(vtkPVSource* pvSource,
+				 vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
+{
+  vtkPVWidget* clone = this->ClonePrototypeInternal(pvSource, map);
+  return vtkPVVectorEntry::SafeDownCast(clone);
+}
+
+void vtkPVVectorEntry::CopyProperties(vtkPVWidget* clone, 
+				      vtkPVSource* pvSource,
+			      vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
+{
+  this->Superclass::CopyProperties(clone, pvSource, map);
+  vtkPVVectorEntry* pvve = vtkPVVectorEntry::SafeDownCast(clone);
+  if (pvve)
+    {
+    pvve->SetLabel(this->EntryLabel);
+    pvve->SetDataType(this->DataType);
+    pvve->SetVectorLength(this->VectorLength);
+    int i, len = this->SubLabelTxts->GetLength();
+    for (i=0; i<len; i++)
+      {
+      pvve->SubLabelTxts->SetString(i, this->SubLabelTxts->GetString(i));
+      }
+    }
+  else 
+    {
+    vtkErrorMacro("Internal error. Could not downcast clone to PVVectorEntry.");
+    }
+}
+
+//----------------------------------------------------------------------------
+int vtkPVVectorEntry::ReadXMLAttributes(vtkPVXMLElement* element,
+                                        vtkPVXMLPackageParser* parser)
+{
+  if(!this->Superclass::ReadXMLAttributes(element, parser)) { return 0; }
+  
+  // Setup the VectorLength.
+  if(!element->GetScalarAttribute("length", &this->VectorLength))
+    {
+    this->VectorLength = 1;
+    }
+  
+  // Setup the DataType.
+  const char* type = element->GetAttribute("type");
+  if(!type)
+    {
+    vtkErrorMacro("No type attribute.");
+    return 0;
+    }
+  if(strcmp(type, "int") == 0) { this->DataType = VTK_INT; }
+  else if(strcmp(type, "float") == 0) { this->DataType = VTK_FLOAT; }
+  else
+    {
+    vtkErrorMacro("Unknown type " << type);
+    return 0;
+    }
+  
+  // Setup the Label.
+  const char* label = element->GetAttribute("label");
+  if(label)
+    {
+    this->SetLabel(label);
+    }
+  else
+    {
+    this->SetLabel(this->VariableName);
+    }
+  
+  // Setup the SubLabels.
+  const char* sub_labels = element->GetAttribute("sub_labels");
+  if(sub_labels)
+    {
+    const char* start = sub_labels;
+    const char* end = 0;
+    int index = 0;
+    
+    // Parse the semi-colon-separated list.
+    while(*start)
+      {
+      while(*start && (*start == ';')) { ++start; }
+      end = start;
+      while(*end && (*end != ';')) { ++end; }
+      int length = end-start;
+      if(length)
+        {
+        char* entry = new char[length+1];
+        strncpy(entry, start, length);
+        entry[length] = '\0';
+        this->SubLabelTxts->SetString(index++, entry);
+        delete [] entry;
+        }
+      start = end;
+      }
+    }
+  
+  return 1;
 }

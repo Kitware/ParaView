@@ -40,9 +40,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 #include "vtkPVComponentSelection.h"
+#include "vtkPVSource.h"
+#include "vtkPVApplication.h"
 #include "vtkObjectFactory.h"
 #include "vtkKWCheckButton.h"
 #include "vtkKWWidgetCollection.h"
+#include "vtkArrayMap.txx"
+#include "vtkPVXMLElement.h"
 
 //---------------------------------------------------------------------------
 vtkPVComponentSelection* vtkPVComponentSelection::New()
@@ -61,10 +65,10 @@ vtkPVComponentSelection* vtkPVComponentSelection::New()
 vtkPVComponentSelection::vtkPVComponentSelection()
 {
   this->CheckButtons = vtkKWWidgetCollection::New();
-  this->PVSource = NULL;
   this->Initialized = 0;
   this->ObjectTclName = NULL;
   this->VariableName = NULL;
+  this->NumberOfComponents = 0;
 }
 
 //---------------------------------------------------------------------------
@@ -76,8 +80,7 @@ vtkPVComponentSelection::~vtkPVComponentSelection()
 }
 
 //---------------------------------------------------------------------------
-void vtkPVComponentSelection::Create(vtkKWApplication *pvApp,
-                                     int numComponents, char *help)
+void vtkPVComponentSelection::Create(vtkKWApplication *app)
 {
   const char* wname;
   int i;
@@ -90,26 +93,25 @@ void vtkPVComponentSelection::Create(vtkKWApplication *pvApp,
     return;
     }
   
-  this->SetApplication(pvApp);
+  this->SetApplication(app);
+  vtkPVApplication *pvApp = this->GetPVApplication();
   
   // create the top level
   wname = this->GetWidgetName();
   this->Script("frame %s -borderwidth 0 -relief flat", wname);
   
-  for (i = 0; i <= numComponents; i++)
+  for (i = 0; i <= this->NumberOfComponents; i++)
     {
     button = vtkKWCheckButton::New();
     button->SetParent(this);
-    button->Create(pvApp, "");
+    button->Create(app, "");
     button->SetCommand(this, "ModifiedCallback");
     button->SetState(1);
     sprintf(compId, "%d", i);
     button->SetText(compId);
-    if (help)
-      {
-      button->SetBalloonHelpString(help);
-      }
     this->CheckButtons->AddItem(button);
+    pvApp->BroadcastScript("%s Set%s %d %d", this->ObjectTclName, 
+			   this->VariableName, i, i);
     this->Script("pack %s", button->GetWidgetName());
     button->Delete();
     }
@@ -134,6 +136,12 @@ void vtkPVComponentSelection::Accept()
                                this->ObjectTclName, this->VariableName,
                                i, i);
         }
+      else
+        {
+        pvApp->BroadcastScript("%s Set%s %d %d",
+                               this->ObjectTclName, this->VariableName,
+                               i, -1);
+        }
       }
     }
   
@@ -156,10 +164,10 @@ void vtkPVComponentSelection::Reset()
     }
   
   int i;
-  
+
   for (i = 0; i < this->CheckButtons->GetNumberOfItems(); i++)
     {
-    this->Script("%s SetState %d [%s GetValue %d]",
+    this->Script("%s SetState %d [expr [%s GetValue %d]+1]",
                  this->GetTclName(), i, this->PVSource->GetVTKSourceTclName(),
                  i);
     }
@@ -190,10 +198,40 @@ int vtkPVComponentSelection::GetState(int i)
     GetState();
 }
 
-//---------------------------------------------------------------------------
-void vtkPVComponentSelection::SetObjectVariable(const char *objName,
-                                                const char *varName)
+vtkPVComponentSelection* vtkPVComponentSelection::ClonePrototype(
+  vtkPVSource* pvSource, vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
 {
-  this->SetObjectTclName(objName);
-  this->SetVariableName(varName);
+  vtkPVWidget* clone = this->ClonePrototypeInternal(pvSource, map);
+  return vtkPVComponentSelection::SafeDownCast(clone);
+}
+
+void vtkPVComponentSelection::CopyProperties(vtkPVWidget* clone, 
+					     vtkPVSource* pvSource,
+			      vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
+{
+  this->Superclass::CopyProperties(clone, pvSource, map);
+  vtkPVComponentSelection* pvcs = vtkPVComponentSelection::SafeDownCast(clone);
+  if (pvcs)
+    {
+    pvcs->SetNumberOfComponents(this->NumberOfComponents);
+    }
+  else 
+    {
+    vtkErrorMacro("Internal error. Could not downcast clone to PVComponentSelection.");
+    }
+}
+
+//----------------------------------------------------------------------------
+int vtkPVComponentSelection::ReadXMLAttributes(vtkPVXMLElement* element,
+                                               vtkPVXMLPackageParser* parser)
+{
+  if(!this->Superclass::ReadXMLAttributes(element, parser)) { return 0; }
+  
+  if(!element->GetScalarAttribute("number_of_components",
+                                  &this->NumberOfComponents))
+    {
+    this->NumberOfComponents = 1;
+    }
+  
+  return 1;
 }

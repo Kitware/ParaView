@@ -51,7 +51,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVData.h"
 #include "vtkPVNavigationWindow.h"
 #include "vtkPVWindow.h"
-#include "vtkKWScale.h"
+#include "vtkPVSourceCollection.h"
 #include "vtkKWCheckButton.h"
 
 #ifdef _WIN32
@@ -968,8 +968,10 @@ void vtkPVRenderView::EventuallyRender()
   // pending when this object is deleted, we can cancel the "after" command.
   // We don't want to have this object register itself because this can
   // cause leaks if we exit before EventuallyRenderCallBack is called.
+  this->Script("update idletasks");
   this->Script("after idle {%s EventuallyRenderCallBack}",this->GetTclName());
   this->SetRenderPending(this->Application->GetMainInterp()->result);
+
 }
                       
 //----------------------------------------------------------------------------
@@ -1023,7 +1025,7 @@ void vtkPVRenderView::EventuallyRenderCallBack()
 void vtkPVRenderView::TriangleStripsCallback()
 {
   vtkPVWindow *pvWin;
-  vtkCollection *sources;
+  vtkPVSourceCollection *sources;
   vtkPVSource *pvs;
   vtkPVData *pvd;
   vtkPVApplication *pvApp;
@@ -1035,10 +1037,10 @@ void vtkPVRenderView::TriangleStripsCallback()
     vtkErrorMacro("Missing window.");
     return;
     }
-  sources = pvWin->GetSources();
+  sources = pvWin->GetSourceList("Sources");
   
   sources->InitTraversal();
-  while ( (pvs = (vtkPVSource*)(sources->GetNextItemAsObject())) )
+  while ( (pvs = sources->GetNextPVSource()) )
     {
     pvd = pvs->GetPVOutput();
     pvApp->BroadcastScript("%s SetUseStrips %d",
@@ -1061,7 +1063,7 @@ void vtkPVRenderView::TriangleStripsCallback()
 void vtkPVRenderView::ImmediateModeCallback()
 {
   vtkPVWindow *pvWin;
-  vtkCollection *sources;
+  vtkPVSourceCollection *sources;
   vtkPVSource *pvs;
   vtkPVData *pvd;
   vtkPVApplication *pvApp;
@@ -1073,10 +1075,10 @@ void vtkPVRenderView::ImmediateModeCallback()
     vtkErrorMacro("Missing window.");
     return;
     }
-  sources = pvWin->GetSources();
+  sources = pvWin->GetSourceList("Sources");
   
   sources->InitTraversal();
-  while ( (pvs = (vtkPVSource*)(sources->GetNextItemAsObject())) )
+  while ( (pvs = sources->GetNextPVSource()) )
     {
     pvd = pvs->GetPVOutput();
     pvApp->BroadcastScript("%s SetImmediateModeRendering %d",
@@ -1204,7 +1206,8 @@ vtkPVWindow *vtkPVRenderView::GetPVWindow()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVRenderView::SaveInTclScript(ofstream *file, int vtkFlag)
+void vtkPVRenderView::SaveInTclScript(ofstream *file, int vtkFlag,
+				      int offScreenFlag)
 {
   vtkCamera *camera;
   float position[3];
@@ -1226,8 +1229,11 @@ void vtkPVRenderView::SaveInTclScript(ofstream *file, int vtkFlag)
           << this->RenderWindowTclName << " AddRenderer "
           << this->RendererTclName << "\n\t";
     *file << this->RenderWindowTclName << " SetSize " << size[0] << " " << size[1] << endl;
-    *file << "vtkRenderWindowInteractor iren\n\t"
-          << "iren SetRenderWindow " << this->RenderWindowTclName << "\n\n";
+    if (!offScreenFlag)
+      {
+      *file << "vtkRenderWindowInteractor iren\n\t"
+	    << "iren SetRenderWindow " << this->RenderWindowTclName << "\n\n";
+      }
     }
 
   camera = this->GetRenderer()->GetActiveCamera();

@@ -1,4 +1,5 @@
 SOURCE_FILES( ParaView_SRCS
+vtkPVAdvancedReaderModule
 vtkDummyRenderer
 vtkDummyRenderWindow
 vtkKWBoundsDisplay
@@ -9,17 +10,17 @@ vtkPVArrayCalculator
 vtkPVArrayMenu 
 vtkPVArraySelection
 vtkPVBoundsDisplay
-vtkPVClip
 vtkPVComponentSelection
 vtkPVConnectivityFilter
-vtkPVCut
+vtkPVContainerWidget
 vtkPVContour 
 vtkPVContourEntry 
-vtkPVCutPlane
 vtkPVData 
 vtkPVDataSetFileEntry
-vtkPVDataSetReaderInterface 
-vtkPVEnSightReaderInterface 
+vtkPVDataSetReaderModule
+vtkPVEnSightReaderModule
+#vtkPVDataSetReaderInterface 
+#vtkPVEnSightReaderInterface 
 vtkPVExtentEntry
 vtkPVExtentTranslator 
 vtkPVExtractGeometryByScalar
@@ -34,12 +35,13 @@ vtkPVInteractorStyleTranslateCamera
 vtkPVLabel
 vtkPVLabeledToggle
 vtkPVLODActor
-vtkPVMethodInterface 
+#vtkPVMethodInterface 
 vtkPVNavigationWindow
 vtkPVObjectWidget
 vtkPVPlaneWidget
 vtkPVMinMax
 vtkPVProbe
+vtkPVReaderModule
 vtkPVRenderView 
 vtkPVScalarRangeLabel 
 vtkPVScale 
@@ -47,26 +49,41 @@ vtkPVSelectionList
 vtkPVSelectWidget 
 vtkPVSphereWidget
 vtkPVSource 
-vtkPVSourceInterface 
-vtkPVSourceInterfaceParser
+vtkPVSourceCollection
+#vtkPVSourceInterface 
+#vtkPVSourceInterfaceParser
 vtkPVStringEntry
 vtkPVThreshold 
 vtkPVTimerLogDisplay
 vtkPVTreeComposite 
 vtkPVVectorEntry
 vtkPVWidget
+vtkPVWidgetCollection
 vtkPVWindow 
 vtkPVWizard
 vtkPVWorldPointPicker 
+vtkPVXMLElement
+vtkPVXMLParser
+vtkPVXMLPackageParser
 vtkStringList 
 )
 
+ABSTRACT_FILES(
+vtkPVObjectWidget
+vtkPVWidget
+)
 WRAP_EXCLUDE_FILES(
 vtkPVSourceInterfaceParser
 )
 
-VTK_WRAP_TCL(vtkKWParaViewTCL ParaViewTCL_SRCS ParaView_SRCS)
-ADD_LIBRARY(vtkKWParaViewTCL ParaViewTCL_SRCS ParaView_SRCS)
+# Setup vtkInstantiator registration for this library's classes.
+VTK_MAKE_INSTANTIATOR(vtkParaViewInstantiator PVInstantiator_SRCS
+                      ParaView_SRCS
+                      EXPORT_MACRO VTK_EXPORT
+                      HEADER_LOCATION ${PARAVIEW_BINARY_DIR}/ParaView)
+
+VTK_WRAP_TCL(vtkKWParaViewTCL ParaViewTCL_SRCS PVInstantiator_SRCS ParaView_SRCS)
+ADD_LIBRARY(vtkKWParaViewTCL ParaViewTCL_SRCS PVInstantiator_SRCS ParaView_SRCS)
 
 CONFIGURE_FILE(${PARAVIEW_SOURCE_DIR}/ParaView/vtkPVSourceInterfaceDirectories.h.in
                ${PARAVIEW_BINARY_DIR}/ParaView/vtkPVSourceInterfaceDirectories.h

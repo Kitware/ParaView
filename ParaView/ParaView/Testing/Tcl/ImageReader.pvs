@@ -11,7 +11,7 @@ if {[info exists argc]} {
 set pv(vtkTemp1) [Application GetMainWindow]
 set pv(vtkTemp43) [$pv(vtkTemp1) GetMainView]
 
-set pv(vtkTemp98) [$pv(vtkTemp1) CreatePVSource vtkImageReader]
+set pv(vtkTemp98) [$pv(vtkTemp1) CreatePVSource ImageReader]
 set pv(vtkTemp110) [$pv(vtkTemp98) GetPVWidget {FilePrefix}]
 $pv(vtkTemp110) SetValue $DataDir/Data/headsq/quarter
 set pv(vtkTemp120) [$pv(vtkTemp98) GetPVWidget {Extent}]
@@ -20,7 +20,7 @@ set pv(vtkTemp129) [$pv(vtkTemp98) GetPVWidget {DataByteOrder}]
 $pv(vtkTemp129) SetCurrentValue {1}
 $pv(vtkTemp98) AcceptCallback
 
-set pv(vtkTemp187) [$pv(vtkTemp1) ContourCallback]
+set pv(vtkTemp187) [$pv(vtkTemp1) CreatePVSource Contour]
 set pv(vtkTemp198) [$pv(vtkTemp187) GetPVWidget {Contour Values}]
 $pv(vtkTemp198) RemoveAllValues
 $pv(vtkTemp198) AddValue 600.000000

@@ -54,7 +54,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class VTK_EXPORT vtkPVObjectWidget : public vtkPVWidget
 {
 public:
-  static vtkPVObjectWidget* New();
   vtkTypeMacro(vtkPVObjectWidget, vtkPVWidget);
 
   // Description:
@@ -63,10 +62,24 @@ public:
   // can be specified. Subclasses may have seperate or addition
   // variables for specifying the relationship.
   void SetObjectVariable(const char *objectTclName, const char *var);
+  vtkSetStringMacro(ObjectTclName);
+  vtkGetStringMacro(ObjectTclName);
+  vtkSetStringMacro(VariableName);
+  vtkGetStringMacro(VariableName);
 
   // Description:
   // An interface for saving a widget into a script.
   virtual void SaveInTclScript(ofstream *file);
+
+//BTX
+  // Description:
+  // Creates and returns a copy of this widget. It will create
+  // a new instance of the same type as the current object
+  // using NewInstance() and then copy some necessary state 
+  // parameters.
+  vtkPVObjectWidget* ClonePrototype(vtkPVSource* pvSource,
+				 vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
+//ETX
 
 protected:
   vtkPVObjectWidget();
@@ -74,11 +87,17 @@ protected:
 
   char *ObjectTclName;
   char *VariableName;
-  vtkSetStringMacro(ObjectTclName);
-  vtkSetStringMacro(VariableName);
 
   vtkPVObjectWidget(const vtkPVObjectWidget&); // Not implemented
   void operator=(const vtkPVObjectWidget&); // Not implemented
+
+//BTX
+  virtual void CopyProperties(vtkPVWidget* clone, vtkPVSource* pvSource,
+			      vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
+//ETX
+  
+  int ReadXMLAttributes(vtkPVXMLElement* element,
+                        vtkPVXMLPackageParser* parser);
 };
 
 #endif

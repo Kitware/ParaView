@@ -40,7 +40,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 #include "vtkPVMinMax.h"
+#include "vtkPVApplication.h"
 #include "vtkObjectFactory.h"
+#include "vtkArrayMap.txx"
+#include "vtkPVXMLElement.h"
 
 //----------------------------------------------------------------------------
 vtkPVMinMax* vtkPVMinMax::New()
@@ -70,6 +73,10 @@ vtkPVMinMax::vtkPVMinMax()
   this->GetMinCommand = NULL;
   this->GetMaxCommand = NULL;
   this->SetCommand = NULL;
+
+  this->MinHelp = 0;
+  this->MaxHelp = 0;
+
 }
 
 //----------------------------------------------------------------------------
@@ -90,13 +97,47 @@ vtkPVMinMax::~vtkPVMinMax()
   this->SetGetMinCommand(NULL);
   this->SetGetMaxCommand(NULL);
   this->SetSetCommand(NULL);
+  this->SetMinHelp(0);
+  this->SetMaxHelp(0);
+}
+
+void vtkPVMinMax::SetMinimumLabel(const char* label)
+{
+  this->MinLabel->SetLabel(label);
+}
+
+void vtkPVMinMax::SetMaximumLabel(const char* label)
+{
+  this->MaxLabel->SetLabel(label);
+}
+
+void vtkPVMinMax::SetMinimumHelp(const char* help)
+{
+  // This check is needed to prevent errors when using
+  // this->SetBalloonHelpString(this->BalloonHelpString)
+  if (help != this->MinHelp)
+    {
+    this->SetMinHelp(help);
+    }
+  this->MinLabel->SetBalloonHelpString(help);
+  this->MinScale->SetBalloonHelpString(help);
+  
+}
+
+void vtkPVMinMax::SetMaximumHelp(const char* help)
+{
+  // This check is needed to prevent errors when using
+  // this->SetBalloonHelpString(this->BalloonHelpString)
+  if (help != this->MaxHelp)
+    {
+    this->SetMaxHelp(help);
+    }
+  this->MaxLabel->SetBalloonHelpString(help);
+  this->MaxScale->SetBalloonHelpString(help);
 }
 
 //----------------------------------------------------------------------------
-void vtkPVMinMax::Create(vtkKWApplication *pvApp, char *minLabel,
-                         char* maxLabel, float min, float max,
-                         float resolution, char *setCmd, char *getMinCmd,
-                         char *getMaxCmd, char *minHelp, char *maxHelp)
+void vtkPVMinMax::Create(vtkKWApplication *pvApp)
 {
   if (this->Application)
     {
@@ -105,14 +146,10 @@ void vtkPVMinMax::Create(vtkKWApplication *pvApp, char *minLabel,
     }
 
   // For getting the widget in a script.
-  this->SetTraceName(minLabel);
+  this->SetTraceName(this->MinLabel->GetLabel());
   
   this->SetApplication(pvApp);
 
-  this->SetSetCommand(setCmd);
-  this->SetGetMinCommand(getMinCmd);
-  this->SetGetMaxCommand(getMaxCmd);
-  
   // create the top level
   this->Script("frame %s -borderwidth 0 -relief flat", this->GetWidgetName());
 
@@ -125,59 +162,29 @@ void vtkPVMinMax::Create(vtkKWApplication *pvApp, char *minLabel,
   // Now a label
   this->MinLabel->SetParent(this->MinFrame);
   this->MinLabel->Create(pvApp, "-width 18 -justify right");
-  this->MinLabel->SetLabel(minLabel);
-  if (minHelp)
-    {
-    this->MinLabel->SetBalloonHelpString(minHelp);
-    }
   this->Script("pack %s -side left", this->MinLabel->GetWidgetName());
 
   this->MaxLabel->SetParent(this->MaxFrame);
   this->MaxLabel->Create(pvApp, "-width 18 -justify right");
-  this->MaxLabel->SetLabel(maxLabel);
-  if (maxHelp)
-    {
-    this->MaxLabel->SetBalloonHelpString(maxHelp);
-    }
   this->Script("pack %s -side left", this->MaxLabel->GetWidgetName());
 
   this->MinScale->SetParent(this->MinFrame);
   this->MinScale->Create(this->Application, "-showvalue 1 -digits 5");
   this->MinScale->SetCommand(this, "MinValueCallback");
-  this->MinScale->SetRange(min, max);
-  this->MinScale->SetResolution(resolution);
-  this->SetMinValue(min);
-  if (minHelp)
-    {
-    this->MinScale->SetBalloonHelpString(minHelp);
-    }
   this->Script("pack %s -fill x -expand t", this->MinScale->GetWidgetName());
   
   this->MaxScale->SetParent(this->MaxFrame);
   this->MaxScale->Create(this->Application, "-showvalue 1 -digits 5");
   this->MaxScale->SetCommand(this, "MaxValueCallback");
-  this->MaxScale->SetRange(min, max);
-  this->MaxScale->SetResolution(resolution);
-  this->SetMaxValue(max);
-  if (maxHelp)
-    {
-    this->MaxScale->SetBalloonHelpString(maxHelp);
-    }
   this->Script("pack %s -fill x -expand t", this->MaxScale->GetWidgetName());
 
+  this->SetMinimumHelp(this->MinHelp);
+  this->SetMaximumHelp(this->MaxHelp);
 }
 
 //----------------------------------------------------------------------------
 void vtkPVMinMax::SetMinValue(float val)
 {
-  float oldVal;
-  
-  oldVal = this->MinScale->GetValue();
-  if (val == oldVal)
-    {
-    return;
-    }
-
   if (val > this->MaxScale->GetValue())
     {
     this->MinScale->SetValue(this->MaxScale->GetValue());
@@ -193,13 +200,6 @@ void vtkPVMinMax::SetMinValue(float val)
 //----------------------------------------------------------------------------
 void vtkPVMinMax::SetMaxValue(float val)
 {
-  float oldVal;
-  
-  oldVal = this->MaxScale->GetValue();
-  if (val == oldVal)
-    {
-    return;
-    }
   if (val < this->MinScale->GetValue())
     {
     this->MaxScale->SetValue(this->MinScale->GetValue());
@@ -289,4 +289,108 @@ void vtkPVMinMax::SaveInTclScript(ofstream *file)
   this->Script("set tempValue [%s %s]", this->ObjectTclName, this->GetMaxCommand);
   result = this->Application->GetMainInterp()->result;
   *file << " " << result << "\n";
+}
+
+vtkPVMinMax* vtkPVMinMax::ClonePrototype(vtkPVSource* pvSource,
+				 vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
+{
+  vtkPVWidget* clone = this->ClonePrototypeInternal(pvSource, map);
+  return vtkPVMinMax::SafeDownCast(clone);
+}
+
+void vtkPVMinMax::CopyProperties(vtkPVWidget* clone, vtkPVSource* pvSource,
+			      vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
+{
+  this->Superclass::CopyProperties(clone, pvSource, map);
+  vtkPVMinMax* pvmm = vtkPVMinMax::SafeDownCast(clone);
+  if (pvmm)
+    {
+    pvmm->SetMinimumLabel(this->MinLabel->GetLabel());
+    pvmm->SetMaximumLabel(this->MaxLabel->GetLabel());
+    pvmm->SetMinimumHelp(this->MinHelp);
+    pvmm->SetMaximumHelp(this->MaxHelp);
+    pvmm->SetResolution(this->MinScale->GetResolution());
+    float min, max;
+    this->MinScale->GetRange(min, max);
+    pvmm->SetRange(min, max);
+    pvmm->SetSetCommand(this->SetCommand);
+    pvmm->SetGetMinCommand(this->GetMinCommand);
+    pvmm->SetGetMaxCommand(this->GetMaxCommand);
+    }
+  else 
+    {
+    vtkErrorMacro("Internal error. Could not downcast clone to PVMinMax.");
+    }
+}
+
+//----------------------------------------------------------------------------
+int vtkPVMinMax::ReadXMLAttributes(vtkPVXMLElement* element,
+                                   vtkPVXMLPackageParser* parser)
+{
+  if(!this->Superclass::ReadXMLAttributes(element, parser)) { return 0; }
+  
+  // Setup the MinimumLabel.
+  const char* min_label = element->GetAttribute("min_label");
+  if(!min_label)
+    {
+    vtkErrorMacro("No min_label attribute.");
+    return 0;
+    }
+  this->SetMinimumLabel(min_label);
+  
+  // Setup the MaximumLabel.
+  const char* max_label = element->GetAttribute("max_label");
+  if(!max_label)
+    {
+    vtkErrorMacro("No max_label attribute.");
+    return 0;
+    }
+  this->SetMaximumLabel(max_label);
+  
+  // Setup the MinimumHelp.
+  const char* min_help = element->GetAttribute("min_help");
+  if(!min_help)
+    {
+    vtkErrorMacro("No min_help attribute.");
+    return 0;
+    }
+  this->SetMinimumHelp(min_help);
+  
+  // Setup the MaximumHelp.
+  const char* max_help = element->GetAttribute("max_help");
+  if(!max_help)
+    {
+    vtkErrorMacro("No max_help attribute.");
+    return 0;
+    }
+  this->SetMaximumHelp(max_help);
+  
+  // Setup the GetMinCommand.
+  const char* get_min_command = element->GetAttribute("get_min_command");
+  if(!get_min_command)
+    {
+    vtkErrorMacro("No get_min_command attribute.");
+    return 0;
+    }
+  this->SetGetMinCommand(get_min_command);
+  
+  // Setup the GetMaxCommand.
+  const char* get_max_command = element->GetAttribute("get_max_command");
+  if(!get_max_command)
+    {
+    vtkErrorMacro("No get_max_command attribute.");
+    return 0;
+    }
+  this->SetGetMaxCommand(get_max_command);
+  
+  // Setup the SetCommand.
+  const char* set_command = element->GetAttribute("set_command");
+  if(!set_command)
+    {
+    vtkErrorMacro("No set_command attribute.");
+    return 0;
+    }
+  this->SetSetCommand(set_command);
+  
+  return 1;
 }

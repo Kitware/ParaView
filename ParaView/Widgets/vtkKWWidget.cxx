@@ -272,11 +272,11 @@ char* vtkKWWidget::CreateCommand(vtkKWObject* CalledObject, const char * Command
 
 void vtkKWWidget::SetBalloonHelpString(const char *str)
 {
-  if (this->Application == NULL)
-    {
-    vtkErrorMacro("Application needs to be set before balloon help.");
-    return;
-    }
+//    if (this->Application == NULL)
+//      {
+//      vtkErrorMacro("Application needs to be set before balloon help.");
+//      return;
+//      }
 
   // A little overkill.
   if (this->BalloonHelpString == NULL && str == NULL)
@@ -296,7 +296,8 @@ void vtkKWWidget::SetBalloonHelpString(const char *str)
     strcpy(this->BalloonHelpString, str);
     }
   
-  if ( !this->BalloonHelpInitialized )
+  if ( this->BalloonHelpString && this->Application && 
+       !this->BalloonHelpInitialized )
     {
     this->SetUpBalloonHelpBindings();
     this->BalloonHelpInitialized = 1;
@@ -307,7 +308,7 @@ void vtkKWWidget::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWObject::SerializeRevision(os,indent);
   os << indent << "vtkKWWidget ";
-  this->ExtractRevision(os,"$Revision: 1.29 $");
+  this->ExtractRevision(os,"$Revision: 1.30 $");
 }
 
 vtkKWWindow* vtkKWWidget::GetWindow()

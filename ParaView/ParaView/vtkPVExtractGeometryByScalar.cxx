@@ -84,7 +84,7 @@ void vtkPVExtractGeometryByScalar::CreateProperties()
   
   this->AddInputMenu("Input", "PVInput", "vtkUnstructuredGrid",
                      "Select the input for the filter.",
-                     this->GetPVWindow()->GetSources());
+                     this->GetPVWindow()->GetSourceList("Sources"));
   
   vtkPVComponentSelection *select = vtkPVComponentSelection::New();
   select->SetPVSource(this);
@@ -95,7 +95,8 @@ void vtkPVExtractGeometryByScalar::CreateProperties()
   float range[2];
   this->GetPVInput()->GetVTKData()->GetPointData()->GetScalars()->
     GetRange(range);
-  select->Create(pvApp, (int)range[1], "Select which componets to display");
+  select->SetNumberOfComponents((int)range[1]);
+  select->Create(pvApp);
   select->SetTraceName("ComponentSelect");
   this->AddPVWidget(select);
   

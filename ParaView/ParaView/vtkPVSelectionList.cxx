@@ -40,10 +40,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 #include "vtkPVSelectionList.h"
+#include "vtkPVApplication.h"
 #include "vtkStringList.h"
 #include "vtkKWLabel.h"
 #include "vtkKWOptionMenu.h"
 #include "vtkObjectFactory.h"
+#include "vtkArrayMap.txx"
+#include "vtkPVXMLElement.h"
 
 int vtkPVSelectionListCommand(ClientData cd, Tcl_Interp *interp,
 		     int argc, char *argv[]);
@@ -90,12 +93,12 @@ vtkPVSelectionList* vtkPVSelectionList::New()
 }
 
 //----------------------------------------------------------------------------
-int vtkPVSelectionList::Create(vtkKWApplication *app)
+void vtkPVSelectionList::Create(vtkKWApplication *app)
 {
   if (this->Application != NULL)
     {
     vtkErrorMacro("Object has already been created.");
-    return 0;
+    return;
     }
   this->SetApplication(app);
 
@@ -110,7 +113,24 @@ int vtkPVSelectionList::Create(vtkKWApplication *app)
   this->Menu->Create(app, "");
   this->Script("pack %s -side left", this->Menu->GetWidgetName());
 
-  return 1;
+  char tmp[1024];
+  int i, numItems = this->Names->GetLength();
+  char *name;
+  for(int i=0; i<numItems; i++)
+    {
+    name = this->Names->GetString(i);
+    if (name)
+      {
+      sprintf(tmp, "SelectCallback {%s} %d", name, i);
+      this->Menu->AddEntryWithCommand(name, this, tmp);
+      }
+    }
+  name = this->Names->GetString(this->CurrentValue);
+  if (name)
+    {
+    this->Menu->SetValue(name);
+    }
+
 }
 
 
@@ -168,12 +188,17 @@ void vtkPVSelectionList::AddItem(const char *name, int value)
   // Save for internal use
   this->Names->SetString(value, name);
 
-  sprintf(tmp, "SelectCallback {%s} %d", name, value);
-  this->Menu->AddEntryWithCommand(name, this, tmp);
-  
-  if (value == this->CurrentValue)
+  // It should be possible to add items without creating
+  // the widget. This is necessary for the prototypes.
+  if (this->Application)
     {
-    this->Menu->SetValue(name);
+    sprintf(tmp, "SelectCallback {%s} %d", name, value);
+    this->Menu->AddEntryWithCommand(name, this, tmp);
+    
+    if (value == this->CurrentValue)
+      {
+      this->Menu->SetValue(name);
+      }
     }
 }
 
@@ -212,4 +237,82 @@ void vtkPVSelectionList::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os,indent);
   os << indent << "CurrentName: " << this->GetCurrentName() << endl;
   os << indent << "CurrentValue: " << this->GetCurrentValue() << endl;
+}
+
+vtkPVSelectionList* vtkPVSelectionList::ClonePrototype(vtkPVSource* pvSource,
+				 vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
+{
+  vtkPVWidget* clone = this->ClonePrototypeInternal(pvSource, map);
+  return vtkPVSelectionList::SafeDownCast(clone);
+}
+
+void vtkPVSelectionList::CopyProperties(vtkPVWidget* clone, 
+					vtkPVSource* pvSource,
+			      vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
+{
+  this->Superclass::CopyProperties(clone, pvSource, map);
+  vtkPVSelectionList* pvsl = vtkPVSelectionList::SafeDownCast(clone);
+  if (pvsl)
+    {
+    pvsl->SetLabel(this->Label->GetLabel());
+    int i, numItems = this->Names->GetLength();
+    char *name;
+    for(int i=0; i<numItems; i++)
+      {
+      name = this->Names->GetString(i);
+      if (name)
+	{
+	pvsl->Names->SetString(i, name);
+	}
+      }
+    }
+  else 
+    {
+    vtkErrorMacro("Internal error. Could not downcast clone to PVSelectionList.");
+    }
+}
+
+//----------------------------------------------------------------------------
+int vtkPVSelectionList::ReadXMLAttributes(vtkPVXMLElement* element,
+                                          vtkPVXMLPackageParser* parser)
+{
+  if(!this->Superclass::ReadXMLAttributes(element, parser)) { return 0; }
+  
+  // Setup the Label.
+  const char* label = element->GetAttribute("label");
+  if(label)
+    {
+    this->Label->SetLabel(label);  
+    }
+  else
+    {
+    this->Label->SetLabel(this->VariableName);
+    }
+  
+  // Extract the list of items.
+  unsigned int i;
+  for(i=0;i < element->GetNumberOfNestedElements(); ++i)
+    {
+    vtkPVXMLElement* item = element->GetNestedElement(i);
+    if(strcmp(item->GetName(), "Item") != 0)
+      {
+      vtkErrorMacro("Found non-Item element in SelectionList.");
+      return 0;
+      }
+    const char* itemName = item->GetAttribute("name");
+    if(!itemName)
+      {
+      vtkErrorMacro("Item has no name.");
+      return 0;
+      }
+    int itemValue;
+    if(!item->GetScalarAttribute("value", &itemValue))
+      {
+      vtkErrorMacro("Item has no value.");
+      return 0;
+      }
+    this->AddItem(itemName, itemValue);
+    }
+  
+  return 1;
 }

@@ -10,19 +10,14 @@ if {[info exists argc]} {
 
 set pv(vtkTemp1) [Application GetMainWindow]
 set pv(vtkTemp43) [$pv(vtkTemp1) GetMainView]
-set pv(vtkTemp89) [$pv(vtkTemp1) GetGlyphSource Arrow]
-set pv(vtkTemp93) [$pv(vtkTemp1) GetGlyphSource Cone]
-set pv(vtkTemp97) [$pv(vtkTemp1) GetGlyphSource Sphere]
+set pv(vtkTemp89) [$pv(vtkTemp1) GetPVSource GlyphSources Arrow0]
+set pv(vtkTemp93) [$pv(vtkTemp1) GetPVSource GlyphSources Cone0]
+set pv(vtkTemp97) [$pv(vtkTemp1) GetPVSource GlyphSources Sphere0]
 
-vtkPVDataSetReaderInterface rInt
-rInt SetDataFileName "$DataDir/Data/blow.vtk"
-rInt SetSourceClassName vtkPDataSetReader
-rInt SetApplication Application
-rInt SetPVWindow $pv(vtkTemp1)
-set pv(vtkTemp100) [rInt CreateCallback]
-$pv(vtkTemp100) AcceptCallback
+$pv(vtkTemp1) Open "$DataDir/Data/blow.vtk"
+set pv(vtkTemp100) [$pv(vtkTemp1) GetCurrentPVSource]
 
-set pv(vtkTemp157) [$pv(vtkTemp1) CreatePVSource vtkRotationalExtrusionFilter]
+set pv(vtkTemp157) [$pv(vtkTemp1) CreatePVSource RotationalExtrusionFilter]
 set pv(vtkTemp175) [$pv(vtkTemp157) GetPVWidget {Angle}]
 $pv(vtkTemp175) SetValue 90
 set pv(vtkTemp178) [$pv(vtkTemp157) GetPVWidget {Translation}]
@@ -45,5 +40,4 @@ for {set i  1} {$i < [expr $argc - 1]} {incr i} {
     }
 }
 
-rInt Delete   
 Application Exit

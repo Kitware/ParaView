@@ -68,6 +68,10 @@ public:
   // checks fopr scalars.
   virtual void SetPVInput(vtkPVData* input);
   
+  // Description:
+  // Create the widgets in the prototype.
+  virtual void InitializePrototype();
+
 protected:
   vtkPVContour();
   ~vtkPVContour();
@@ -76,6 +80,8 @@ protected:
 
   vtkPVContour(const vtkPVContour&); // Not implemented
   void operator=(const vtkPVContour&); // Not implemented
+
+  virtual int ClonePrototypeInternal(int makeCurrent, vtkPVSource*& clone);
 };
 
 #endif

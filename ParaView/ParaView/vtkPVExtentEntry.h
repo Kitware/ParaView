@@ -54,13 +54,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWLabel.h"
 #include "vtkKWWidgetCollection.h"
 
+class vtkKWEntry;
+
 class VTK_EXPORT vtkPVExtentEntry : public vtkPVObjectWidget
 {
 public:
   static vtkPVExtentEntry* New();
   vtkTypeMacro(vtkPVExtentEntry, vtkPVObjectWidget);
 
-  void Create(vtkKWApplication *pvApp, char *label, char *help);
+  void Create(vtkKWApplication *pvApp);
   
   // Description:
   // Called when accept button is pushed.  
@@ -87,11 +89,26 @@ public:
   // It sets up the script and animation parameters.
   void AnimationMenuCallback(vtkPVAnimationInterface *ai, int Mode);
 
+  // Description:
+  // The label.
+  void SetLabel(const char* label);
+
+//BTX
+  // Description:
+  // Creates and returns a copy of this widget. It will create
+  // a new instance of the same type as the current object
+  // using NewInstance() and then copy some necessary state 
+  // parameters.
+  vtkPVExtentEntry* ClonePrototype(vtkPVSource* pvSource,
+				 vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
+//ETX
+
 protected:
   vtkPVExtentEntry();
   ~vtkPVExtentEntry();
   
-  vtkKWLabel *Label;
+  vtkKWLabel *LabelWidget;
+
   vtkKWEntry *XMinEntry;
   vtkKWEntry *XMaxEntry;
   vtkKWEntry *YMinEntry;
@@ -101,6 +118,18 @@ protected:
 
   vtkPVExtentEntry(const vtkPVExtentEntry&); // Not implemented
   void operator=(const vtkPVExtentEntry&); // Not implemented
+
+  vtkSetStringMacro(EntryLabel);
+  vtkGetStringMacro(EntryLabel);
+  char* EntryLabel;
+
+//BTX
+  virtual void CopyProperties(vtkPVWidget* clone, vtkPVSource* pvSource,
+			      vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
+//ETX
+  
+  int ReadXMLAttributes(vtkPVXMLElement* element,
+                        vtkPVXMLPackageParser* parser);
 };
 
 #endif

@@ -121,6 +121,14 @@ public:
 protected:
   vtkPVProbe();
   ~vtkPVProbe();
+  
+  // Description:
+  // Create a menu to select the input.
+  virtual vtkPVInputMenu *AddInputMenu(char* label, char* inputName, 
+				       char* inputType, char* help, 
+				       vtkPVSourceCollection* sources);
+  vtkPVInputMenu* InputMenu;
+  virtual void SetInputMenu(vtkPVInputMenu* im);
 
   vtkKWLabel *DimensionalityLabel;
   vtkKWOptionMenu *DimensionalityMenu;

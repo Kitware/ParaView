@@ -42,35 +42,30 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // .NAME vtkPVPlaneWidget - A widget to manipulate an implicit plane.
 // .SECTION Description
 // This widget creates and manages its own vtkPlane on each process.
-// I could not descide whether to include the bounds display or not. (I did not.) 
+// I could not descide whether to include the bounds display or not. 
+// (I did not.) 
 
 
 #ifndef __vtkPVPlaneWidget_h
 #define __vtkPVPlaneWidget_h
 
 #include "vtkPVWidget.h"
+#include "vtkPVObjectWidget.h"
+
 class vtkPVSource;
+class vtkPVVectorEntry;
+class vtkKWPushButton;
+class vtkKWWidget;
 
-
-class VTK_EXPORT vtkPVPlaneWidget : public vtkPVWidget
+class VTK_EXPORT vtkPVPlaneWidget : public vtkPVObjectWidget
 {
 public:
   static vtkPVPlaneWidget* New();
-  vtkTypeMacro(vtkPVPlaneWidget, vtkPVWidget);
+  vtkTypeMacro(vtkPVPlaneWidget, vtkPVObjectWidget);
+
   void PrintSelf(ostream& os, vtkIndent indent);
     
   virtual void Create(vtkKWApplication *app);
-
-  // Description:
-  // This widget needs access to the PVSource for reseting the center to
-  // the middle of the data bounds and getting the camera for setting
-  // the normal to the view plane normal.  If this widget gets used for some 
-  // other purpose, then we might consider changing this reference to a 
-  // render view and data object.
-  // Note: There is no reference counting for fear of reference loops.
-  // The pvSource owns this widget.
-  void SetPVSource(vtkPVSource *pvs) {this->PVSource = pvs;}
-  vtkPVSource *GetPVSource() {return this->PVSource;}
 
   // Description:
   // Callback that set the center to the middle of the bounds.
@@ -102,22 +97,22 @@ public:
   vtkGetObjectMacro(NormalEntry, vtkPVVectorEntry);
 
   // Description:
-  // This interface is the same as vtkPVObjectWidget, and it might make
-  // sense to make this class a subclass of vtkPVObject widget.
-  // In this case the object is the clip or cut filter, adn the
-  // variable is the name of the implicit function in the 
-  // filter: "ClipFunction" or "CutFunction"
-  void SetObjectVariable(const char *objectTclName, const char *var);
-
-  // Description:
   // For saving the widget into a VTK tcl script.
   void SaveInTclScript(ofstream *file);
+
+//BTX
+  // Description:
+  // Creates and returns a copy of this widget. It will create
+  // a new instance of the same type as the current object
+  // using NewInstance() and then copy some necessary state 
+  // parameters.
+  vtkPVPlaneWidget* ClonePrototype(vtkPVSource* pvSource,
+				 vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
+//ETX
 
 protected:
   vtkPVPlaneWidget();
   ~vtkPVPlaneWidget();
-
-  vtkPVSource *PVSource;
 
   vtkPVVectorEntry *CenterEntry;
   vtkKWPushButton *CenterResetButton;
@@ -133,13 +128,12 @@ protected:
   char *PlaneTclName;
   vtkSetStringMacro(PlaneTclName);
 
-  char *ObjectTclName;
-  char *VariableName;
-  vtkSetStringMacro(ObjectTclName);
-  vtkSetStringMacro(VariableName);
 
   vtkPVPlaneWidget(const vtkPVPlaneWidget&); // Not implemented
   void operator=(const vtkPVPlaneWidget&); // Not implemented
+
+  int ReadXMLAttributes(vtkPVXMLElement* element,
+                        vtkPVXMLPackageParser* parser);
 };
 
 #endif

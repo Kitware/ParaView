@@ -10,22 +10,18 @@ if {[info exists argc]} {
 # hack to get the window.
 set pvWindow [lindex [vtkPVWindow ListInstances] 0]
 
-set sInt [$pvWindow GetSourceInterface "vtkSphereSource"]
-set pvSphere [$sInt CreateCallback]
+set pvSphere [$pvWindow CreatePVSource SphereSource]
 [$pvSphere GetPVWidget {Theta Resolution}] SetValue 16
 $pvSphere AcceptCallback
 
-set sInt2 [$pvWindow GetSourceInterface "vtkShrinkPolyData"]
-set pvShrink [$sInt2 CreateCallback]
+set pvShrink [$pvWindow CreatePVSource ShrinkPolyData]
 [$pvShrink GetPVWidget {ShrinkFactor}] SetValue 0.9
 $pvShrink AcceptCallback
 
-set eInt [$pvWindow GetSourceInterface "vtkElevationFilter"]
-set pvElevation [$eInt CreateCallback]
+set pvElevation [$pvWindow CreatePVSource ElevationFilter]
 $pvElevation AcceptCallback
 
-set eInt2 [$pvWindow GetSourceInterface "vtkExtractEdges"]
-set pvExtract [$eInt2 CreateCallback]
+set pvExtract [$pvWindow CreatePVSource ExtractEdges]
 $pvExtract AcceptCallback
 
 set extractOutput [$pvExtract GetPVOutput]

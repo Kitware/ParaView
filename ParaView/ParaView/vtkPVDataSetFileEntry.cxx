@@ -39,6 +39,7 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
+#include "vtkPVApplication.h"
 #include "vtkPVDataSetFileEntry.h"
 #include "vtkPVWindow.h"
 #include "vtkObjectFactory.h"
@@ -99,4 +100,19 @@ void vtkPVDataSetFileEntry::Accept()
 
   this->vtkPVFileEntry::Accept();
 
+}
+
+vtkPVDataSetFileEntry* vtkPVDataSetFileEntry::ClonePrototype(
+  vtkPVSource* pvSource, vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
+{
+  vtkPVWidget* clone = this->ClonePrototypeInternal(pvSource, map);
+  return vtkPVDataSetFileEntry::SafeDownCast(clone);
+}
+
+//----------------------------------------------------------------------------
+int vtkPVDataSetFileEntry::ReadXMLAttributes(vtkPVXMLElement* element,
+                                             vtkPVXMLPackageParser* parser)
+{
+  if(!this->Superclass::ReadXMLAttributes(element, parser)) { return 0; }  
+  return 1;
 }

@@ -40,7 +40,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 #include "vtkPVScale.h"
+#include "vtkPVApplication.h"
 #include "vtkObjectFactory.h"
+#include "vtkArrayMap.txx"
+#include "vtkPVXMLElement.h"
 
 //----------------------------------------------------------------------------
 vtkPVScale* vtkPVScale::New()
@@ -58,8 +61,8 @@ vtkPVScale* vtkPVScale::New()
 //----------------------------------------------------------------------------
 vtkPVScale::vtkPVScale()
 {
-  this->Label = vtkKWLabel::New();
-  this->Label->SetParent(this);
+  this->LabelWidget = vtkKWLabel::New();
+  this->LabelWidget->SetParent(this);
   this->Scale = vtkKWScale::New();
   this->Scale->SetParent(this);
 }
@@ -69,13 +72,62 @@ vtkPVScale::~vtkPVScale()
 {
   this->Scale->Delete();
   this->Scale = NULL;
-  this->Label->Delete();
-  this->Label = NULL;
+  this->LabelWidget->Delete();
+  this->LabelWidget = NULL;
+}
+
+void vtkPVScale::SetLabel(const char* label)
+{
+  this->SetEntryLabel(label);
+  this->LabelWidget->SetLabel(label);
+}
+
+void vtkPVScale::SetBalloonHelpString(const char *str)
+{
+
+  // A little overkill.
+  if (this->BalloonHelpString == NULL && str == NULL)
+    {
+    return;
+    }
+
+  // This check is needed to prevent errors when using
+  // this->SetBalloonHelpString(this->BalloonHelpString)
+  if (str != this->BalloonHelpString)
+    {
+    // Normal string stuff.
+    if (this->BalloonHelpString)
+      {
+      delete [] this->BalloonHelpString;
+      this->BalloonHelpString = NULL;
+      }
+    if (str != NULL)
+      {
+      this->BalloonHelpString = new char[strlen(str)+1];
+      strcpy(this->BalloonHelpString, str);
+      }
+    }
+  
+  if ( this->Application && !this->BalloonHelpInitialized )
+    {
+    this->LabelWidget->SetBalloonHelpString(this->BalloonHelpString);
+    this->Scale->SetBalloonHelpString(this->BalloonHelpString);
+    this->BalloonHelpInitialized = 1;
+    }
+}
+
+void vtkPVScale::SetResolution(float res)
+{
+  this->Scale->SetResolution(res);
+}
+
+void vtkPVScale::SetRange(float min, float max)
+{
+  this->Scale->SetRange(min, max);
 }
 
 //----------------------------------------------------------------------------
-void vtkPVScale::Create(vtkKWApplication *pvApp, char *label,
-                        float min, float max, float resolution, char *help)
+void vtkPVScale::Create(vtkKWApplication *pvApp)
 {
   if (this->Application)
     {
@@ -84,7 +136,7 @@ void vtkPVScale::Create(vtkKWApplication *pvApp, char *label,
     }
 
   // For getting the widget in a script.
-  this->SetTraceName(label);
+  this->SetTraceName(this->EntryLabel);
   
   this->SetApplication(pvApp);
 
@@ -92,24 +144,16 @@ void vtkPVScale::Create(vtkKWApplication *pvApp, char *label,
   this->Script("frame %s -borderwidth 0 -relief flat", this->GetWidgetName());
 
   // Now a label
-  this->Label->SetParent(this);
-  this->Label->Create(pvApp, "-width 18 -justify right");
-  this->Label->SetLabel(label);
-  if (help)
-    {
-    this->Label->SetBalloonHelpString(help);
-    }
-  this->Script("pack %s -side left", this->Label->GetWidgetName());
+  this->LabelWidget->SetParent(this);
+  this->LabelWidget->Create(pvApp, "-width 18 -justify right");
+  this->LabelWidget->SetLabel(this->EntryLabel);
+  this->Script("pack %s -side left", this->LabelWidget->GetWidgetName());
 
   this->Scale->SetParent(this);
   this->Scale->Create(this->Application, "-showvalue 1");
   this->Scale->SetCommand(this, "ModifiedCallback");
-  this->Scale->SetRange(min, max);
-  this->Scale->SetResolution(resolution);
-  if (help)
-    {
-    this->Scale->SetBalloonHelpString(help);
-    }
+
+  this->SetBalloonHelpString(this->BalloonHelpString);
   this->Script("pack %s -side left -fill x -expand t", 
                this->Scale->GetWidgetName());
 }
@@ -171,4 +215,63 @@ void vtkPVScale::Reset()
   this->ModifiedFlag = 0;
 }
 
+vtkPVScale* vtkPVScale::ClonePrototype(vtkPVSource* pvSource,
+				 vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
+{
+  vtkPVWidget* clone = this->ClonePrototypeInternal(pvSource, map);
+  return vtkPVScale::SafeDownCast(clone);
+}
 
+void vtkPVScale::CopyProperties(vtkPVWidget* clone, vtkPVSource* pvSource,
+			      vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
+{
+  this->Superclass::CopyProperties(clone, pvSource, map);
+  vtkPVScale* pvs = vtkPVScale::SafeDownCast(clone);
+  if (pvs)
+    {
+    float min, max;
+    this->Scale->GetRange(min, max);
+    pvs->SetRange(min, max);
+    pvs->SetResolution(this->Scale->GetResolution());
+    pvs->SetLabel(this->EntryLabel);
+    }
+  else 
+    {
+    vtkErrorMacro("Internal error. Could not downcast clone to PVScale.");
+    }
+}
+
+//----------------------------------------------------------------------------
+int vtkPVScale::ReadXMLAttributes(vtkPVXMLElement* element,
+				  vtkPVXMLPackageParser* parser)
+{
+  if(!this->Superclass::ReadXMLAttributes(element, parser)) { return 0; }
+
+  // Setup the Label.
+  const char* label = element->GetAttribute("label");
+  if(!label)
+    {
+    vtkErrorMacro("No label attribute.");
+    return 0;
+    }
+  this->SetLabel(label);
+
+  // Setup the Resolution.
+  float resolution;
+  if(!element->GetScalarAttribute("resolution",&resolution))
+    {
+    resolution = 1;
+    }
+  this->SetResolution(resolution);
+
+  float range[2];
+  if(!element->GetVectorAttribute("range",2,range))
+    {
+    range[0] = 0;
+    range[1] = 100;
+    }
+  this->SetRange(range[0], range[1]);
+
+  return 1;
+  
+}

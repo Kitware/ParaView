@@ -42,7 +42,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVProbe.h"
 #include "vtkPVApplication.h"
 #include "vtkStringList.h"
-#include "vtkPVSourceInterface.h"
 #include "vtkObjectFactory.h"
 #include "vtkTclUtil.h"
 #include "vtkKWToolbar.h"
@@ -51,6 +50,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVInputMenu.h"
 #include "vtkKWCompositeCollection.h"
 #include "vtkKWFrame.h"
+#include "vtkArrayMap.txx"
 
 int vtkPVProbeCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -105,6 +105,7 @@ vtkPVProbe::vtkPVProbe()
   this->InstanceCount = instanceCount;
   
   this->ReplaceInputOff();
+  this->InputMenu = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -174,6 +175,7 @@ vtkPVProbe::~vtkPVProbe()
 
   this->ScalarArrayMenu->Delete();
   this->ScalarArrayMenu = NULL;
+  this->SetInputMenu(0);
 }
 
 //----------------------------------------------------------------------------
@@ -230,7 +232,10 @@ void vtkPVProbe::CreateProperties()
 
   this->AddInputMenu("Input", "PVInput", "vtkDataSet",
                      "Set the input to this filter.",
-                     this->GetPVWindow()->GetSources()); 
+                     this->GetPVWindow()->GetSourceList("Sources")); 
+  this->Script("pack %s", this->InputMenu->GetWidgetName());
+
+  pvApp->BroadcastScript("%s SetSpatialMatch 2", this->VTKSourceTclName);
 
   // We should really use the vtkPVSource helper methods.
   this->ScalarArrayMenu->SetNumberOfComponents(1);
@@ -851,12 +856,24 @@ void vtkPVProbe::SetCurrentEndPoint(int id)
     }
 }
 
+vtkCxxSetObjectMacro(vtkPVProbe, InputMenu, vtkPVInputMenu);
+
+vtkPVInputMenu *vtkPVProbe::AddInputMenu(char *label, char *inputName, 
+					 char *inputType, char *help, 
+					 vtkPVSourceCollection *sources)
+{
+  vtkPVInputMenu* inputMenu = this->Superclass::AddInputMenu(label, inputName,
+							     inputType, help,
+							     sources);
+  this->SetInputMenu(inputMenu);
+  return inputMenu;
+}
+
 void vtkPVProbe::SaveInTclScript(ofstream *file)
 {
   Tcl_Interp *interp = this->GetPVApplication()->GetMainInterp();
   char *tempName;
-  vtkPVSourceInterface *pvsInterface =
-    this->GetPVInput()->GetPVSource()->GetInterface();
+  vtkPVSource *pvs = this->GetPVInput()->GetPVSource();
   
   if (this->Dimensionality == 0)
     {
@@ -904,8 +921,7 @@ void vtkPVProbe::SaveInTclScript(ofstream *file)
   
   *file << "\t" << this->GetVTKSourceTclName() << " SetSource [";
 
-  if (pvsInterface && strcmp(pvsInterface->GetSourceClassName(),
-                             "vtkGenericEnSightReader") == 0)
+  if (pvs && strcmp(pvs->GetSourceClassName(), "vtkGenericEnSightReader") == 0)
     {
     const char *probeSourceTclName = this->GetPVInput()->GetVTKDataTclName();
     char *dataName = new char[strlen(probeSourceTclName) + 1];
@@ -920,8 +936,7 @@ void vtkPVProbe::SaveInTclScript(ofstream *file)
     *file << dataName+pos << "]\n\n";
     delete [] dataName;
     }
-  else if (pvsInterface && strcmp(pvsInterface->GetSourceClassName(),
-                                  "vtkPDataSetReader") == 0)
+  else if (pvs && strcmp(pvs->GetSourceClassName(), "vtkPDataSetReader") == 0)
     {
     const char *probeSourceTclName = this->GetPVInput()->GetVTKDataTclName();
     char *dataName = new char[strlen(probeSourceTclName) + 1];
@@ -948,8 +963,6 @@ void vtkPVProbe::SaveInTclScript(ofstream *file)
             << " GetPosition2Coordinate] SetValue 0.8 0.3 0\n";
       *file << "\t" << this->XYPlotTclName << " SetNumberOfXLabels 5\n";
       *file << "\t" << this->XYPlotTclName << " SetXTitle \"Line Divisions\"\n";
-      *file << "\t" << this->XYPlotTclName << " SetYTitle "
-            << this->DefaultScalarsName << "\n";
       }
     }
   

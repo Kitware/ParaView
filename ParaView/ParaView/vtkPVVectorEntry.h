@@ -49,6 +49,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWApplication.h"
 #include "vtkKWLabel.h"
 #include "vtkKWWidgetCollection.h"
+#include "vtkArrayMap.txx"
+
+class vtkStringList;
+class vtkKWEntry;
 
 class VTK_EXPORT vtkPVVectorEntry : public vtkPVObjectWidget
 {
@@ -57,8 +61,7 @@ public:
   vtkTypeMacro(vtkPVVectorEntry, vtkPVObjectWidget);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  void Create(vtkKWApplication *pvApp, char *label, int vectorLength,
-              char **subLabels, char *help);
+  void Create(vtkKWApplication *pvApp);
   
   // Description:
   // Called when accept button is pushed.  
@@ -75,7 +78,7 @@ public:
   // Description:
   // I will eventually remove access to internal widgets once I figure
   // out how to get the vectors value in Tcl with any number of componenets.
-  vtkGetObjectMacro(Label, vtkKWLabel);
+  vtkGetObjectMacro(LabelWidget, vtkKWLabel);
   vtkGetObjectMacro(SubLabels, vtkKWWidgetCollection);
   vtkGetObjectMacro(Entries, vtkKWWidgetCollection);
   vtkKWLabel* GetSubLabel(int idx);
@@ -111,20 +114,63 @@ public:
   vtkSetMacro(DataType, int); 
   vtkGetMacro(DataType, int); 
   
+  // Description:
+  // The label.
+  void SetLabel(const char* label);
+
+  // Description:
+  // This class redefines SetBalloonHelpString since it
+  // has to forward the call to a widget it contains.
+  virtual void SetBalloonHelpString(const char *str);
+
+  // Description:
+  // Sets the length of the vector
+  vtkSetMacro(VectorLength, int);
+
+  // Description:
+  // Sets one of the sub-labels. This has to be done
+  // before create.
+  void SetSubLabel(int i, const char* sublabl);
+
+//BTX
+  // Description:
+  // Creates and returns a copy of this widget. It will create
+  // a new instance of the same type as the current object
+  // using NewInstance() and then copy some necessary state 
+  // parameters.
+  vtkPVVectorEntry* ClonePrototype(vtkPVSource* pvSource,
+				 vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
+//ETX
+
 protected:
   vtkPVVectorEntry();
   ~vtkPVVectorEntry();
   
-  vtkKWLabel *Label;
+  vtkKWLabel *LabelWidget;
   vtkKWWidgetCollection *SubLabels;
   vtkKWWidgetCollection *Entries;
 
+  vtkSetStringMacro(EntryLabel);
+  vtkGetStringMacro(EntryLabel);
+  char* EntryLabel;
+
   int DataType;
+  int VectorLength;
 
   char *ScriptValue;
 
   vtkPVVectorEntry(const vtkPVVectorEntry&); // Not implemented
   void operator=(const vtkPVVectorEntry&); // Not implemented
+
+  vtkStringList* SubLabelTxts;
+
+//BTX
+  virtual void CopyProperties(vtkPVWidget* clone, vtkPVSource* pvSource,
+			      vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
+//ETX
+  
+  int ReadXMLAttributes(vtkPVXMLElement* element,
+                        vtkPVXMLPackageParser* parser);
 };
 
 #endif

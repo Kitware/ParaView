@@ -42,14 +42,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVArrayCalculator.h"
 #include "vtkPVApplication.h"
 #include "vtkStringList.h"
-#include "vtkPVSourceInterface.h"
 #include "vtkPVData.h"
 #include "vtkKWLabel.h"
 #include "vtkKWPushButton.h"
 #include "vtkPVWindow.h"
-#include "vtkKWCompositeCollection.h"
 #include "vtkObjectFactory.h"
 #include "vtkKWFrame.h"
+#include "vtkPVSourceCollection.h"
+#include "vtkPVInputMenu.h"
 
 int vtkPVArrayCalculatorCommand(ClientData cd, Tcl_Interp *interp,
                                 int argc, char *argv[]);
@@ -226,15 +226,16 @@ void vtkPVArrayCalculator::CreateProperties()
   
   this->vtkPVSource::CreateProperties();
   
-  this->AddInputMenu("Input", "PVInput", "vtkDataSet",
-                     "Set the input to this filter.",
-                     this->GetPVWindow()->GetSources());
-
+  vtkPVInputMenu* im = this->AddInputMenu(
+    "Input", "PVInput", "vtkDataSet", "Set the input to this filter.",
+    this->GetPVWindow()->GetSourceList("Sources"));
+  this->Script("pack %s -side top -fill x -expand t", im->GetWidgetName());
+  
   this->AttributeModeFrame->SetParent(this->GetParameterFrame()->GetFrame());
   this->AttributeModeFrame->Create(pvApp, "frame", "");
   this->Script("pack %s -side top -fill x",
                this->AttributeModeFrame->GetWidgetName());
-  
+
   this->AttributeModeLabel->SetParent(this->AttributeModeFrame);
   this->AttributeModeLabel->Create(pvApp, "");
   this->AttributeModeLabel->SetLabel("Attribute Mode:");
@@ -256,8 +257,9 @@ void vtkPVArrayCalculator::CreateProperties()
                                           "ResultArrayName");
   this->ArrayNameEntry->SetModifiedCommand(this->GetTclName(), 
                                             "SetAcceptButtonColorToRed");
-  this->ArrayNameEntry->Create(pvApp, "Result Array Name:",
-                               "Set the name of the array to hold the results of this computation");
+  this->ArrayNameEntry->SetLabel("Result Array Name:");
+  this->ArrayNameEntry->SetBalloonHelpString("Set the name of the array to hold the results of this computation");
+  this->ArrayNameEntry->Create(pvApp);
   this->AddPVWidget(this->ArrayNameEntry);
   this->Script("pack %s -side top -fill x",
                this->ArrayNameEntry->GetWidgetName());
@@ -668,14 +670,12 @@ void vtkPVArrayCalculator::SaveInTclScript(ofstream *file)
 {
   char* tempName;
   int i;
-  vtkPVSourceInterface *pvsInterface =
-    this->GetPVInput()->GetPVSource()->GetInterface();
+  vtkPVSource *pvs = this->GetPVInput()->GetPVSource();
   
   *file << this->VTKSource->GetClassName() << " "
         << this->VTKSourceTclName << "\n\t"
         << this->VTKSourceTclName << " SetInput [";
-  if (pvsInterface && strcmp(pvsInterface->GetSourceClassName(),
-                             "vtkGenericEnSightReader") == 0)
+  if (pvs && strcmp(pvs->GetSourceClassName(), "vtkGenericEnSightReader") == 0)
     {
     char *charFound;
     int pos;
@@ -689,8 +689,7 @@ void vtkPVArrayCalculator::SaveInTclScript(ofstream *file)
     *file << dataName+pos << "]\n";
     delete [] dataName;
     }
-  else if (pvsInterface && strcmp(pvsInterface->GetSourceClassName(),
-                                  "vtkPDataSetReader") == 0)
+  else if (pvs && strcmp(pvs->GetSourceClassName(), "vtkPDataSetReader") == 0)
     {
     char *dataName = new char[strlen(this->GetPVInput()->GetVTKDataTclName()) + 1];
     strcpy(dataName, this->GetPVInput()->GetVTKDataTclName());

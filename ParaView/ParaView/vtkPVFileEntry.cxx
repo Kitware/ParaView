@@ -39,8 +39,11 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
+#include "vtkPVApplication.h"
 #include "vtkPVFileEntry.h"
 #include "vtkObjectFactory.h"
+#include "vtkArrayMap.txx"
+#include "vtkPVXMLElement.h"
 
 //----------------------------------------------------------------------------
 vtkPVFileEntry* vtkPVFileEntry::New()
@@ -93,9 +96,43 @@ const char* vtkPVFileEntry::GetLabel()
   return this->LabelWidget->GetLabel();
 }
 
+void vtkPVFileEntry::SetBalloonHelpString(const char *str)
+{
+
+  // A little overkill.
+  if (this->BalloonHelpString == NULL && str == NULL)
+    {
+    return;
+    }
+
+  // This check is needed to prevent errors when using
+  // this->SetBalloonHelpString(this->BalloonHelpString)
+  if (str != this->BalloonHelpString)
+    {
+    // Normal string stuff.
+    if (this->BalloonHelpString)
+      {
+      delete [] this->BalloonHelpString;
+      this->BalloonHelpString = NULL;
+      }
+    if (str != NULL)
+      {
+      this->BalloonHelpString = new char[strlen(str)+1];
+      strcpy(this->BalloonHelpString, str);
+      }
+    }
+  
+  if ( this->Application && !this->BalloonHelpInitialized )
+    {
+    this->LabelWidget->SetBalloonHelpString(this->BalloonHelpString);
+    this->Entry->SetBalloonHelpString(this->BalloonHelpString);
+    this->BrowseButton->SetBalloonHelpString(this->BalloonHelpString);
+    this->BalloonHelpInitialized = 1;
+    }
+}
+
 //----------------------------------------------------------------------------
-void vtkPVFileEntry::Create(vtkKWApplication *pvApp,
-                            char *ext, char *help)
+void vtkPVFileEntry::Create(vtkKWApplication *pvApp)
 {
   const char* wname;
   
@@ -113,10 +150,6 @@ void vtkPVFileEntry::Create(vtkKWApplication *pvApp,
   
   // Now a label
   this->LabelWidget->Create(pvApp, "-width 18 -justify right");
-  if (help)
-    {
-    this->LabelWidget->SetBalloonHelpString(help);
-    }
   this->Script("pack %s -side left", this->LabelWidget->GetWidgetName());
   
   // Now the entry
@@ -127,10 +160,6 @@ void vtkPVFileEntry::Create(vtkKWApplication *pvApp,
   // modified command gets called after the entry changes.
   this->Script("bindtags %s [concat Entry [lreplace [bindtags %s] 1 1]]", 
                this->Entry->GetWidgetName(), this->Entry->GetWidgetName());
-  if (help)
-    { 
-    this->Entry->SetBalloonHelpString(help);
-   }
   this->Script("pack %s -side left -fill x -expand t",
                this->Entry->GetWidgetName());
   
@@ -138,13 +167,12 @@ void vtkPVFileEntry::Create(vtkKWApplication *pvApp,
   this->BrowseButton->Create(pvApp, "");
   this->BrowseButton->SetLabel("Browse");
   this->BrowseButton->SetCommand(this, "BrowseCallback");
-  if (help)
+
+  if (this->BalloonHelpString)
     {
-    this->BrowseButton->SetBalloonHelpString(help);
+    this->SetBalloonHelpString(this->BalloonHelpString);
     }
   this->Script("pack %s -side left", this->BrowseButton->GetWidgetName());
-
-  this->SetExtension(ext);
 }
 
 
@@ -153,7 +181,7 @@ void vtkPVFileEntry::BrowseCallback()
 {
   if (this->Extension)
     {
-    this->Script("%s SetValue [tk_getOpenFile -filetypes {{{} {.%s}}}]", 
+    this->Script("%s SetValue [tk_getOpenFile -filetypes {{{} {.%s}} {{All files} {*.*}}}]", 
                  this->GetTclName(), this->Extension);
     }
   else
@@ -214,4 +242,56 @@ void vtkPVFileEntry::Reset()
 
   // The supper does nothing but turn the modified flag off.
   this->vtkPVWidget::Reset();
+}
+
+vtkPVFileEntry* vtkPVFileEntry::ClonePrototype(vtkPVSource* pvSource,
+				 vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
+{
+  vtkPVWidget* clone = this->ClonePrototypeInternal(pvSource, map);
+  return vtkPVFileEntry::SafeDownCast(clone);
+}
+
+void vtkPVFileEntry::CopyProperties(vtkPVWidget* clone, vtkPVSource* pvSource,
+			      vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
+{
+  this->Superclass::CopyProperties(clone, pvSource, map);
+  vtkPVFileEntry* pvfe = vtkPVFileEntry::SafeDownCast(clone);
+  if (pvfe)
+    {
+    pvfe->LabelWidget->SetLabel(this->LabelWidget->GetLabel());
+    pvfe->SetExtension(this->GetExtension());
+    }
+  else 
+    {
+    vtkErrorMacro("Internal error. Could not downcast clone to PVFileEntry.");
+    }
+}
+
+//----------------------------------------------------------------------------
+int vtkPVFileEntry::ReadXMLAttributes(vtkPVXMLElement* element,
+                                      vtkPVXMLPackageParser* parser)
+{
+  if(!this->Superclass::ReadXMLAttributes(element, parser)) { return 0; }
+  
+  // Setup the Label.
+  const char* label = element->GetAttribute("label");
+  if(label)
+    {
+    this->SetLabel(label);
+    }
+  else
+    {
+    this->SetLabel(this->VariableName);
+    }
+  
+  // Setup the Extension.
+  const char* extension = element->GetAttribute("extension");
+  if(!extension)
+    {
+    vtkErrorMacro("No extension attribute.");
+    return 0;
+    }
+  this->SetExtension(extension);
+  
+  return 1;
 }

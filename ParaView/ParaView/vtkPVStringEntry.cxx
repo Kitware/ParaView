@@ -40,7 +40,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 #include "vtkPVStringEntry.h"
+#include "vtkPVApplication.h"
 #include "vtkObjectFactory.h"
+#include "vtkArrayMap.txx"
+#include "vtkPVXMLElement.h"
 
 //----------------------------------------------------------------------------
 vtkPVStringEntry* vtkPVStringEntry::New()
@@ -58,10 +61,11 @@ vtkPVStringEntry* vtkPVStringEntry::New()
 //----------------------------------------------------------------------------
 vtkPVStringEntry::vtkPVStringEntry()
 {
-  this->Label = vtkKWLabel::New();
-  this->Label->SetParent(this);
+  this->LabelWidget = vtkKWLabel::New();
+  this->LabelWidget->SetParent(this);
   this->Entry = vtkKWEntry::New();
   this->Entry->SetParent(this);
+  this->EntryLabel = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -69,13 +73,53 @@ vtkPVStringEntry::~vtkPVStringEntry()
 {
   this->Entry->Delete();
   this->Entry = NULL;
-  this->Label->Delete();
-  this->Label = NULL;
+  this->LabelWidget->Delete();
+  this->LabelWidget = NULL;
+  this->SetEntryLabel(0);
+}
+
+void vtkPVStringEntry::SetLabel(const char* label)
+{
+  this->SetEntryLabel(label);
+  this->LabelWidget->SetLabel(label);
+}
+
+void vtkPVStringEntry::SetBalloonHelpString(const char *str)
+{
+
+  // A little overkill.
+  if (this->BalloonHelpString == NULL && str == NULL)
+    {
+    return;
+    }
+
+  // This check is needed to prevent errors when using
+  // this->SetBalloonHelpString(this->BalloonHelpString)
+  if (str != this->BalloonHelpString)
+    {
+    // Normal string stuff.
+    if (this->BalloonHelpString)
+      {
+      delete [] this->BalloonHelpString;
+      this->BalloonHelpString = NULL;
+      }
+    if (str != NULL)
+      {
+      this->BalloonHelpString = new char[strlen(str)+1];
+      strcpy(this->BalloonHelpString, str);
+      }
+    }
+  
+  if ( this->Application && !this->BalloonHelpInitialized )
+    {
+    this->LabelWidget->SetBalloonHelpString(this->BalloonHelpString);
+    this->Entry->SetBalloonHelpString(this->BalloonHelpString);
+    this->BalloonHelpInitialized = 1;
+    }
 }
 
 //----------------------------------------------------------------------------
-void vtkPVStringEntry::Create(vtkKWApplication *pvApp, char *label,
-                              char *help)
+void vtkPVStringEntry::Create(vtkKWApplication *pvApp)
 {
   const char* wname;
   
@@ -86,7 +130,7 @@ void vtkPVStringEntry::Create(vtkKWApplication *pvApp, char *label,
     }
 
   // For getting the widget in a script.
-  this->SetTraceName(label);
+  this->SetTraceName(this->EntryLabel);
   
   this->SetApplication(pvApp);
   
@@ -95,24 +139,20 @@ void vtkPVStringEntry::Create(vtkKWApplication *pvApp, char *label,
   this->Script("frame %s -borderwidth 0 -relief flat", wname);
   
   // Now a label
-  if (label && label[0] != '\0')
+  if (this->EntryLabel && this->EntryLabel[0] != '\0')
     {
-    this->Label->Create(pvApp, "-width 18 -justify right");
-    this->Label->SetLabel(label);
-    if (help)
-      {
-      this->Label->SetBalloonHelpString(help);
-      }
-    this->Script("pack %s -side left", this->Label->GetWidgetName());
+    this->LabelWidget->Create(pvApp, "-width 18 -justify right");
+    this->LabelWidget->SetLabel(this->EntryLabel);
+    this->Script("pack %s -side left", this->LabelWidget->GetWidgetName());
     }
   
   // Now the entry
   this->Entry->Create(pvApp, "");
   this->Script("bind %s <KeyPress> {%s ModifiedCallback}",
                this->Entry->GetWidgetName(), this->GetTclName());
-  if (help)
-    { 
-    this->Entry->SetBalloonHelpString(help);
+  if (this->BalloonHelpString)
+    {
+    this->SetBalloonHelpString(this->BalloonHelpString);
     }
   this->Script("pack %s -side left -fill x -expand t",
                this->Entry->GetWidgetName());
@@ -175,3 +215,45 @@ void vtkPVStringEntry::Reset()
   this->ModifiedFlag = 0;
 }
 
+vtkPVStringEntry* vtkPVStringEntry::ClonePrototype(vtkPVSource* pvSource,
+				 vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
+{
+  vtkPVWidget* clone = this->ClonePrototypeInternal(pvSource, map);
+  return vtkPVStringEntry::SafeDownCast(clone);
+}
+
+void vtkPVStringEntry::CopyProperties(vtkPVWidget* clone, 
+				      vtkPVSource* pvSource,
+			      vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
+{
+  this->Superclass::CopyProperties(clone, pvSource, map);
+  vtkPVStringEntry* pvse = vtkPVStringEntry::SafeDownCast(clone);
+  if (pvse)
+    {
+    pvse->SetLabel(this->EntryLabel);
+    }
+  else 
+    {
+    vtkErrorMacro("Internal error. Could not downcast clone to PVStringEntry.");
+    }
+}
+
+//----------------------------------------------------------------------------
+int vtkPVStringEntry::ReadXMLAttributes(vtkPVXMLElement* element,
+                                        vtkPVXMLPackageParser* parser)
+{
+  if(!this->Superclass::ReadXMLAttributes(element, parser)) { return 0; }
+  
+  // Setup the Label.
+  const char* label = element->GetAttribute("label");
+  if(label)
+    {
+    this->SetLabel(label);
+    }
+  else
+    {
+    this->SetLabel(this->VariableName);
+    }
+  
+  return 1;
+}

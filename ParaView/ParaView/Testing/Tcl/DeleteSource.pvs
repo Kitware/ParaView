@@ -33,14 +33,12 @@ proc decipadString { str before total } {
 # hack to get the window.
 set pvWindow [lindex [vtkPVWindow ListInstances] 0]
 
-set sInt [$pvWindow GetSourceInterface "vtkSphereSource"]
-set pvSphere [$sInt CreateCallback]
+set pvSphere [$pvWindow CreatePVSource SphereSource]
 [$pvSphere GetVTKSource] SetThetaResolution 16
 $pvSphere UpdateParameterWidgets
 $pvSphere AcceptCallback
 
-set sInt [$pvWindow GetSourceInterface "vtkShrinkPolyData"]
-set pvShrink [$sInt CreateCallback]
+set pvShrink [$pvWindow CreatePVSource ShrinkPolyData]
 [$pvShrink GetVTKSource] SetShrinkFactor 0.9
 $pvShrink UpdateParameterWidgets
 $pvShrink AcceptCallback

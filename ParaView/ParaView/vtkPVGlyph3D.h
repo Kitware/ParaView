@@ -63,6 +63,10 @@ public:
   void SetGlyphSource(vtkPVData *source);
   vtkPVData* GetGlyphSource();
 
+  // Description:
+  // Create the PVGlyph3D widgets.
+  virtual void InitializePrototype();
+
 protected:
   vtkPVGlyph3D();
   ~vtkPVGlyph3D();

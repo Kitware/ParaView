@@ -20,18 +20,18 @@ if { [catch {set fp [open "out.txt" w]}] != 0 } {
 
 set kw(vtkTemp1) [Application GetMainWindow]
 set kw(vtkTemp44) [$kw(vtkTemp1) GetMainView]
-set kw(vtkTemp90) [$kw(vtkTemp1) GetGlyphSource Arrow]
-set kw(vtkTemp94) [$kw(vtkTemp1) GetGlyphSource Cone]
-set kw(vtkTemp98) [$kw(vtkTemp1) GetGlyphSource Sphere]
-set kw(vtkTemp99) [$kw(vtkTemp1) CreatePVSource vtkImageMandelbrotSource]
+set kw(vtkTemp90) [$kw(vtkTemp1) GetPVSource GlyphSources Arrow0]
+set kw(vtkTemp94) [$kw(vtkTemp1) GetPVSource GlyphSources Cone0]
+set kw(vtkTemp98) [$kw(vtkTemp1) GetPVSource GlyphSources Sphere0]
+set kw(vtkTemp99) [$kw(vtkTemp1) CreatePVSource ImageMandelbrotSource]
 $kw(vtkTemp1) ShowCurrentSourceProperties
 $kw(vtkTemp99) AcceptCallback
-set kw(vtkTemp152) [$kw(vtkTemp1) CalculatorCallback]
+set kw(vtkTemp152) [$kw(vtkTemp1) CreatePVSource Calculator]
 $kw(vtkTemp1) ShowCurrentSourceProperties
 $kw(vtkTemp152) AddScalarVariable Iterations Iterations 0
 $kw(vtkTemp152) SetFunctionLabel {Iterations*2}
 $kw(vtkTemp152) AcceptCallback
-set kw(vtkTemp179) [$kw(vtkTemp1) CreatePVSource vtkSphereSource]
+set kw(vtkTemp179) [$kw(vtkTemp1) CreatePVSource SphereSource]
 $kw(vtkTemp1) ShowCurrentSourceProperties
 set kw(vtkTemp194) [$kw(vtkTemp179) GetPVWidget {Radius}]
 $kw(vtkTemp194) SetValue 1
@@ -40,7 +40,7 @@ $kw(vtkTemp197) SetValue 32
 set kw(vtkTemp206) [$kw(vtkTemp179) GetPVWidget {Phi Resolution}]
 $kw(vtkTemp206) SetValue 32
 $kw(vtkTemp179) AcceptCallback
-set kw(vtkTemp236) [$kw(vtkTemp1) CreatePVSource vtkElevationFilter]
+set kw(vtkTemp236) [$kw(vtkTemp1) CreatePVSource ElevationFilter]
 $kw(vtkTemp1) ShowCurrentSourceProperties
 set kw(vtkTemp257) [$kw(vtkTemp236) GetPVWidget {ScalarRange}]
 $kw(vtkTemp257) SetValue 0 10
@@ -49,7 +49,7 @@ $kw(vtkTemp236) AcceptCallback
 
 
 
-set kw(vtkTemp267) [$kw(vtkTemp1) ContourCallback]
+set kw(vtkTemp267) [$kw(vtkTemp1) CreatePVSource Contour]
 $kw(vtkTemp1) ShowCurrentSourceProperties
 set ScalarRangeLabel [$kw(vtkTemp267) GetPVWidget {ScalarRangeLabel}]
 

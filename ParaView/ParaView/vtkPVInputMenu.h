@@ -52,7 +52,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWOptionMenu.h"
 #include "vtkKWLabel.h"
 
-class vtkCollection;
+class vtkPVSourceCollection;
+class vtkPVData;
+class vtkDataSet;
 
 class VTK_EXPORT vtkPVInputMenu : public vtkPVWidget
 {
@@ -63,7 +65,7 @@ public:
   
   // Description:
   // Create the widget.
-  void Create(vtkKWApplication *app);
+  virtual void Create(vtkKWApplication *app);
 
   // Description:
   // Set the label.  The label can be used to get this widget
@@ -77,8 +79,8 @@ public:
   // in the menu on the next Reset call.
   // The collection is not referce counted for fear of loops 
   // and memory leaks.  We may wnet to fix his later.
-  void SetSources(vtkCollection *sources) {this->Sources = sources;}
-  vtkCollection *GetSources() {return this->Sources;}
+  void SetSources(vtkPVSourceCollection *sources) {this->Sources = sources;}
+  vtkPVSourceCollection *GetSources() {return this->Sources;}
 
   // Description:
   // Set/Get the class type for this input menu
@@ -128,13 +130,6 @@ public:
   void MenuEntryCallback(vtkPVSource *pvs);
 
   // Description:
-  // Need the source to get the input.
-  // I would like to get rid of this ivar.
-  // It is not reference counted for fear of loops.
-  void SetPVSource(vtkPVSource *pvs) { this->PVSource = pvs;}
-  vtkPVSource *GetPVSource() { return this->PVSource;}
-
-  // Description:
   // Save this widget to a file.  
   virtual void SaveInTclScript(ofstream *file);
 
@@ -144,20 +139,28 @@ public:
   vtkSetStringMacro(VTKInputName);
   vtkGetStringMacro(VTKInputName);
 
+//BTX
+  // Description:
+  // Creates and returns a copy of this widget. It will create
+  // a new instance of the same type as the current object
+  // using NewInstance() and then copy some necessary state 
+  // parameters.
+  vtkPVInputMenu* ClonePrototype(vtkPVSource* pvSource,
+				 vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
+//ETX
+
 protected:
   vtkPVInputMenu();
   ~vtkPVInputMenu();
+
 
   char* InputType;
   char* InputName;
   char *VTKInputName;
   
   vtkPVSource *CurrentValue;
-  vtkCollection *Sources;
+  vtkPVSourceCollection *Sources;
   
-  // I would like to get rid of this.
-  vtkPVSource *PVSource;
-
   vtkKWLabel *Label;
   vtkKWOptionMenu *Menu;
 
@@ -174,10 +177,18 @@ protected:
   // Description:
   // Adds a collection of sources to the menu.
   // The sources are filtered by "InputType".
-  void AddSources(vtkCollection *sources);
+  void AddSources(vtkPVSourceCollection *sources);
 
   vtkPVInputMenu(const vtkPVInputMenu&); // Not implemented
   void operator=(const vtkPVInputMenu&); // Not implemented
+
+//BTX
+  virtual void CopyProperties(vtkPVWidget* clone, vtkPVSource* pvSource,
+			      vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
+//ETX
+  
+  int ReadXMLAttributes(vtkPVXMLElement* element,
+                        vtkPVXMLPackageParser* parser);
 };
 
 #endif

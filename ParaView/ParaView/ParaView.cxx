@@ -61,8 +61,9 @@ void vtkPVSlaveScript(void *localArg, void *remoteArg,
 }
 
 
-// Each process starts with this method.  One process is designated as "master" 
-// and starts the application.  The other processes are slaves to the application.
+// Each process starts with this method.  One process is designated as
+// "master" and starts the application.  The other processes are slaves to
+// the application.
 void Process_Init(vtkMultiProcessController *controller, void *arg )
 {
   vtkPVArgs *pvArgs = (vtkPVArgs *)arg;
@@ -111,7 +112,8 @@ void Process_Init(vtkMultiProcessController *controller, void *arg )
     strncpy(displayStringRoot, displayString, len);
     displayStringRoot[len] = '\0';
     //    cerr << "display string root = " << displayStringRoot << endl;
-    sprintf(displayCommand, "DISPLAY=%s%d", displayStringRoot, myId-startRenderProc);
+    sprintf(displayCommand, "DISPLAY=%s%d", displayStringRoot, 
+	    myId-startRenderProc);
     //    cerr << "display command = " << displayCommand << endl;
     putenv(displayCommand);
     }
@@ -157,7 +159,8 @@ void Process_Init(vtkMultiProcessController *controller, void *arg )
     }
   else
     {
-    // The slaves try to connect.  In the future, we may not want to initialize Tk.
+    // The slaves try to connect.  In the future, we may not want to
+    // initialize Tk.
     //putenv("DISPLAY=:0.0");
 
     vtkKWApplication::SetWidgetVisibility(0);
@@ -180,7 +183,8 @@ void Process_Init(vtkMultiProcessController *controller, void *arg )
       return;
       }  
     app->SetController(controller);
-    controller->AddRMI(vtkPVSlaveScript, (void *)(app), VTK_PV_SLAVE_SCRIPT_RMI_TAG);
+    controller->AddRMI(vtkPVSlaveScript, (void *)(app), 
+		       VTK_PV_SLAVE_SCRIPT_RMI_TAG);
     controller->ProcessRMIs();
     }
 

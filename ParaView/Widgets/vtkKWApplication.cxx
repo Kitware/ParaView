@@ -52,7 +52,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkOutputWindow.h"
 #include "vtkKWWindow.h"
 #include "kwinit.h"
-
+#include "vtkbwidgets.h"
+ 
 #include "vtkArrayMap.txx"
 
 
@@ -402,10 +403,19 @@ Tcl_Interp *vtkKWApplication::InitializeTcl(int argc, char *argv[])
   // initialize VTK
   Vtktcl_Init(interp);
 
+
   // initialize Widgets
   if (vtkKWApplication::WidgetVisibility)
     {
     Vtkkwwidgetstcl_Init(interp);
+
+    char* script = new char[strlen(bwidgets)+1];
+    strcpy(script, bwidgets);
+    if (Tcl_GlobalEval(interp, script) != TCL_OK)
+      {
+      vtkGenericWarningMacro(<< "BWidgets failed to initialize. Error:" << interp->result);
+      }
+    delete[] script;
     }
 
   return interp;

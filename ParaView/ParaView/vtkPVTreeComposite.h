@@ -51,7 +51,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __vtkPVTreeComposite_h
 
 #ifdef VTK_USE_MPI
-#include "vtkMPIController.h"
+#include "vtkMPICommunicator.h"
+class vtkMPIController;
 #endif
 
 #include "vtkCompositeManager.h"

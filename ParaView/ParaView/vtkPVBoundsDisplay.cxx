@@ -44,7 +44,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWLabel.h"
 #include "vtkPVInputMenu.h"
 #include "vtkPVData.h"
+#include "vtkPVSource.h"
 #include "vtkObjectFactory.h"
+#include "vtkArrayMap.txx"
+#include "vtkPVXMLElement.h"
 
 //----------------------------------------------------------------------------
 vtkPVBoundsDisplay* vtkPVBoundsDisplay::New()
@@ -69,8 +72,9 @@ vtkPVBoundsDisplay::vtkPVBoundsDisplay()
   this->CommandFunction = vtkPVBoundsDisplayCommand;
 
   this->Widget = vtkKWBoundsDisplay::New();
-  this->InputMenu = NULL;
+  this->InputMenu = 0;
   this->ShowHideFrame = 0;
+  this->FrameLabel = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -79,6 +83,7 @@ vtkPVBoundsDisplay::~vtkPVBoundsDisplay()
   this->Widget->Delete();
   this->Widget = NULL;
   this->SetInputMenu(NULL);
+  this->SetFrameLabel(0);
 }
 
 
@@ -97,9 +102,28 @@ void vtkPVBoundsDisplay::Create(vtkKWApplication *app)
   this->Widget->SetParent(this);
   this->Widget->SetShowHideFrame( this->GetShowHideFrame() );
   this->Widget->Create(app);
+  if (this->FrameLabel)
+    {
+    this->Widget->SetLabel(this->FrameLabel);
+    }
   this->Script("pack %s -side top -expand t -fill x", 
                this->Widget->GetWidgetName());
 }
+
+void vtkPVBoundsDisplay::SetLabel(const char* label)
+{
+  this->SetFrameLabel(label);
+  if (this->Application && this->FrameLabel)
+    {
+    this->Widget->SetLabel(this->FrameLabel);
+    }
+}
+
+const char* vtkPVBoundsDisplay::GetLabel()
+{
+  return this->GetFrameLabel();
+}
+
 
 //----------------------------------------------------------------------------
 void vtkPVBoundsDisplay::Update()
@@ -134,4 +158,114 @@ void vtkPVBoundsDisplay::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "InputMenu: " << this->GetInputMenu();
   os << indent << "ShowHideFrame: " << this->GetShowHideFrame();
   os << indent << "Widget: " << this->GetWidget();
+}
+
+vtkPVBoundsDisplay* vtkPVBoundsDisplay::ClonePrototype(vtkPVSource* pvSource,
+				 vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
+{
+  vtkPVWidget* clone = this->ClonePrototypeInternal(pvSource, map);
+  return vtkPVBoundsDisplay::SafeDownCast(clone);
+}
+
+vtkPVWidget* vtkPVBoundsDisplay::ClonePrototypeInternal(vtkPVSource* pvSource,
+				vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
+{
+  vtkPVWidget* pvWidget = 0;
+  // Check if a clone of this widget has already been created
+  if ( map->GetItem(this, pvWidget) != VTK_OK )
+    {
+    // If not, create one and add it to the map
+    pvWidget = this->NewInstance();
+    map->SetItem(this, pvWidget);
+    // Now copy all the properties
+    this->CopyProperties(pvWidget, pvSource, map);
+
+    vtkPVBoundsDisplay* pvBounds = vtkPVBoundsDisplay::SafeDownCast(pvWidget);
+    if (!pvBounds)
+      {
+      vtkErrorMacro("Internal error. Could not downcast pointer.");
+      pvWidget->Delete();
+      return 0;
+      }
+    
+    if (this->InputMenu)
+      {
+      // This will either clone or return a previously cloned
+      // object.
+      vtkPVInputMenu* im = this->InputMenu->ClonePrototype(pvSource, map);
+      pvBounds->SetInputMenu(im);
+      im->Delete();
+      }
+    }
+  else
+    {
+    // Increment the reference count. This is necessary
+    // to make the behavior same whether a widget is created
+    // or returned from the map. Always call Delete() after
+    // cloning.
+    pvWidget->Register(this);
+    }
+
+
+  // note pvSelect == pvWidget
+  return pvWidget;
+}
+
+void vtkPVBoundsDisplay::CopyProperties(vtkPVWidget* clone, 
+					vtkPVSource* pvSource,
+			      vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
+{
+  this->Superclass::CopyProperties(clone, pvSource, map);
+  vtkPVBoundsDisplay* pvbd = vtkPVBoundsDisplay::SafeDownCast(clone);
+  if (pvbd)
+    {
+    pvbd->SetShowHideFrame(this->GetShowHideFrame());
+    pvbd->SetFrameLabel(this->GetFrameLabel());
+    pvbd->SetTraceName(this->GetFrameLabel());
+    }
+  else 
+    {
+    vtkErrorMacro("Internal error. Could not downcast clone to PVBoundsDisplay.");
+    }
+}
+
+//----------------------------------------------------------------------------
+int vtkPVBoundsDisplay::ReadXMLAttributes(vtkPVXMLElement* element,
+                                          vtkPVXMLPackageParser* parser)
+{
+  if(!this->Superclass::ReadXMLAttributes(element, parser)) { return 0; }
+  
+  if(!element->GetScalarAttribute("show_hide_frame", &this->ShowHideFrame))
+    {
+    this->ShowHideFrame = 0;
+    }
+  
+  const char* label = element->GetAttribute("label");
+  if(label)
+    {
+    this->SetFrameLabel(label);
+    }
+
+  // Setup the InputMenu.
+  const char* input_menu = element->GetAttribute("input_menu");
+  if(!input_menu)
+    {
+    vtkErrorMacro("No input_menu attribute.");
+    return 0;
+    }
+  
+  vtkPVXMLElement* ime = element->LookupElement(input_menu);
+  vtkPVWidget* w = this->GetPVWidgetFromParser(ime, parser);
+  vtkPVInputMenu* imw = vtkPVInputMenu::SafeDownCast(w);
+  if(!imw)
+    {
+    if(w) { w->Delete(); }
+    vtkErrorMacro("Couldn't get InputMenu widget " << input_menu);
+    return 0;
+    }
+  imw->AddDependent(this);
+  this->SetInputMenu(imw);
+  imw->Delete();
+  
+  return 1;
 }

@@ -50,38 +50,29 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __vtkPVSource_h
 
 #include "vtkKWObject.h"
-#include "vtkKWView.h"
 
-class vtkCollection;
+class vtkPVSourceCollection;
+class vtkPVWidgetCollection;
 class vtkKWEntry;
 class vtkKWLabel;
+class vtkKWWidget;
+class vtkKWView;
+class vtkKWNotebook;
 class vtkKWLabeledFrame;
 class vtkKWPushButton;
 class vtkPVApplication;
-class vtkPVArrayMenu;
-class vtkPVArraySelection;
-class vtkPVBoundsDisplay;
 class vtkPVData;
-class vtkPVFileEntry;
-class vtkPVInputMenu;
 class vtkPVLabel;
-class vtkPVLabeledToggle;
 class vtkPVRenderView;
-class vtkPVScalarRangeLabel;
-class vtkPVScale;
-class vtkPVSelectionList;
-class vtkPVSourceInterface;
 class vtkPVRenderView;
 class vtkKWLabeledFrame;
 class vtkKWFrame;
 class vtkKWLabel;
-class vtkPVStringEntry;
-class vtkPVVectorEntry;
-class vtkPVExtentEntry;
 class vtkPVWidget;
 class vtkPVWindow;
 class vtkSource;
 class vtkStringList;
+class vtkPVInputMenu;
 
 class VTK_EXPORT vtkPVSource : public vtkKWObject
 {
@@ -108,9 +99,10 @@ public:
   virtual void Select();
   virtual void Deselect();
 
-  // Description:
-  // This flag turns the visibility of the prop on and off.  These methods transmit
-  // the state change to all of the satellite processes.
+  // Description: 
+  // This flag turns the visibility of the prop on and off.
+  // These methods transmit the state change to all of the satellite
+  // processes.
   void SetVisibility(int v);
 
   // Description:
@@ -153,96 +145,14 @@ public:
   virtual void DeleteCallback();
 
   // Description:
-  // This method resets the UI values (Widgets added with the following methods).
-  // It uses the GetCommand supplied to the interface.
+  // This method resets the UI values (Widgets added with the following
+  // methods).  It uses the GetCommand supplied to the interface.
   virtual void UpdateParameterWidgets();
   
   // Description:
   // This method gets called to set the VTK source parameters
   // from the widget values.
   virtual void UpdateVTKSourceParameters();
-
-  //---------------------------------------------------------------------
-  // This is a poor way to create widgets.  Another method should be created.
-  // Well, these do not seem so bad as conveniance methods. 
-  
-  // Description:
-  // Create a menu to select the input.
-  vtkPVInputMenu *AddInputMenu(char* label, char* inputName, char* inputType,
-                               char* help, vtkCollection* sources);
-
-  // Description:
-  // Adds a widget that displays the bounds of the input.
-  vtkPVBoundsDisplay* AddBoundsDisplay(vtkPVInputMenu *inputMenu);
-
-  // Description:
-  // Create a menu to select the active scalars of the input..
-  vtkPVArrayMenu *AddArrayMenu(const char* label, int attributeType, 
-                               int numComponents, const char* help);
-
-  // Description:
-  // This widget is for readers that selectively read arrays.
-  vtkPVArraySelection *AddArraySelection(const char *attributeName, 
-                                         const char *help);
-
-  // Description:
-  // Adds a widget that displays the scalar range of the input array.
-  vtkPVScalarRangeLabel* AddScalarRangeLabel(vtkPVArrayMenu *arrayMenu);
-
-  // Description:
-  // Create an entry for a filename.
-  vtkPVFileEntry *AddFileEntry(char* label, char* varName,
-                               char* ext, char* help);
-
-  // Description:
-  // Formats the command with brackets so that sopaces are preserved.  
-  // Label is put to left of entry.
-  // The methods are called on the object (VTKSource if o=NULL).
-  vtkPVStringEntry *AddStringEntry(char* label, char* varName,
-                                   char* help);
- 
-  // Description:
-  // Create an entry for a single value.  Label is put to left of entry.
-  // The methods are called on the object (VTKSource if o=NULL).
-  vtkPVVectorEntry *AddLabeledEntry(char* label, char* varName,
-                                    char* help, int dataType);
-  
-  // Description:
-  // Add label to vtkSource
-  vtkPVLabel *AddLabel(char* label, char* help);
-
-  // Description:
-  // Create an entry for items with multiple elements.
-  // The primary label is put to the left.  The element labels
-  // (l1,l2,l3, ...) are put in from of the individual entry boxes.
-  // The methods are called on the object (VTKSource if o=NULL).
-  vtkPVVectorEntry* AddVector2Entry(char *label, char *l1, char *l2,
-                                    char *varName, char* help, int dataType);
-  vtkPVVectorEntry* AddVector3Entry(char *label, char *l1, char *l2, char *l3,
-                                    char *varName, char* help, int dataType);
-  vtkPVVectorEntry* AddVector4Entry(char *label, char *l1, char *l2, char *l3,
-                                    char *l4, char *varName, char *help, int dataType);
-  vtkPVVectorEntry* AddVector6Entry(char *label, char *l1, char *l2, char *l3, 
-                                    char *l4, char *l5, char *l6,
-                                    char *varName, char* help, int dataType);
-
-  // Description:
-  // Extent entries are like Vector6Entries, but more specialized for
-  // setting clip extents.
-  vtkPVExtentEntry* AddExtentEntry(char *label, char *varName, char* help);
-
-  // Description:
-  // Special widget controls (not entries).
-  // The methods are called on the object (VTKSource if o=NULL).
-  vtkPVLabeledToggle *AddLabeledToggle(char *label, char *varName, char* help);
-  vtkPVScale *AddScale(char *label, char *varName, float min, float max, 
-                       float resolution, char* help);
-  
-  // Description:
-  // Creates a list for selecting a mode.
-  // The methods are called on the object (VTKSource if o=NULL).
-  vtkPVSelectionList *AddModeList(char *label, char *varName, char* help);
-  void AddModeListItem(char *name, int value);
 
   // Description:
   // Set the vtk source that will be a part of the pipeline.
@@ -255,7 +165,7 @@ public:
   vtkGetObjectMacro(DeleteButton, vtkKWPushButton);
   vtkGetObjectMacro(AcceptButton, vtkKWPushButton);
   
-  vtkGetObjectMacro(Widgets, vtkKWWidgetCollection);
+  vtkGetObjectMacro(Widgets, vtkPVWidgetCollection);
   
   vtkGetObjectMacro(ParameterFrame, vtkKWFrame);
   vtkGetObjectMacro(MainParameterFrame, vtkKWWidget);
@@ -263,12 +173,6 @@ public:
   // Description:
   // Used to save the source into a file.
   void SaveInTclScript(ofstream *file);
-
-  // Description:
-  // This will be the new way the source gets specified.  It will use the
-  // interface directly.
-  void SetInterface(vtkPVSourceInterface *pvsi);
-  vtkPVSourceInterface *GetInterface() {return this->Interface;}
 
   // Description:
   // Make the Accept button turn red/white when one of the parameters 
@@ -282,8 +186,8 @@ public:
   vtkGetStringMacro(ExtentTranslatorTclName);
 
   // Description:
-  // This flag determines whether a source will make its input invisible 
-  // or not. By default, this flag is on.
+  // This flag determines whether a source will make its input invisible or
+  // not.  By default, this flag is on.
   vtkSetMacro(ReplaceInput, int);
   vtkGetMacro(ReplaceInput, int);
   vtkBooleanMacro(ReplaceInput, int);
@@ -304,7 +208,7 @@ public:
   vtkGetObjectMacro(Notebook, vtkKWNotebook);
 
   // I shall want to get rid of this.
-  vtkSetObjectMacro(View, vtkKWView);
+  void SetView(vtkKWView* view);
   vtkGetObjectMacro(View, vtkKWView);
   vtkKWView *View;
 
@@ -312,9 +216,9 @@ public:
   // This allows you to set the propertiesParent to any widget you like.  
   // If you do not specify a parent, then the views->PropertyParent is used.  
   // If the composite does not have a view, then a top level window is created.
-  void SetPropertiesParent(vtkKWWidget *parent);
-  vtkGetObjectMacro(PropertiesParent, vtkKWWidget);
-  vtkKWWidget *PropertiesParent;
+  void SetParametersParent(vtkKWWidget *parent);
+  vtkGetObjectMacro(ParametersParent, vtkKWWidget);
+  vtkKWWidget *ParametersParent;
 
   // Desription:
   // This is just a flag that is used to mark that the source has been saved
@@ -326,13 +230,50 @@ public:
   // This adds the PVWidget and sets up the callbacks to initialize its trace.
   void AddPVWidget(vtkPVWidget *pvw);
 
+  // Description: Creates and returns (by reference) a copy of this
+  // source. It will create a new instance of the same type as the current
+  // object using NewInstance() and then call ClonePrototype() on all
+  // widgets and add these clones to it's widget list. The return
+  // value is VTK_OK is the cloning was successful.
+  int ClonePrototype(int makeCurrent, vtkPVSource*& clone);
+
+  // Description:
+  // This method can be used by subclasses of PVSource to do
+  // special initialization (for example creating widgets). 
+  // It is called by PVWindow before adding a prototype to the main list.
+  virtual void InitializePrototype() {}
+
+  // Description:
+  // For now we are supporting only one input and output.
+  vtkSetStringMacro(InputClassName);
+  vtkGetStringMacro(InputClassName);
+  vtkSetStringMacro(OutputClassName);
+  vtkGetStringMacro(OutputClassName);
+  vtkSetStringMacro(SourceClassName);
+  vtkGetStringMacro(SourceClassName);
+
+  // Description:
+  // This method is called by the window to determine if this filter should be
+  // added to the filter menu.  Right now, only the class name of the input
+  // is checked.  In the future, attributes could be checked as well.
+  virtual int GetIsValidInput(vtkPVData *input);
+
+  // Description:
+  // Certain modules are not deletable (for example, glyph sources).
+  // Such modules should be marked as such.
+  vtkSetMacro(IsDeletable, int);
+  vtkGetMacro(IsDeletable, int);
+  vtkBooleanMacro(IsDeletable, int);
+
 protected:
   vtkPVSource();
   ~vtkPVSource();
 
-  // What did this do ??? ... 
-  char *DefaultScalarsName;
-  vtkSetStringMacro(DefaultScalarsName);
+  // Description:
+  // Create a menu to select the input.
+  virtual vtkPVInputMenu *AddInputMenu(char* label, char* inputName, 
+				       char* inputType, char* help, 
+				       vtkPVSourceCollection* sources);
 
   vtkPVRenderView* GetPVRenderView();
   
@@ -364,27 +305,20 @@ protected:
   // there are several implementation details that assume only one output.
   vtkPVData *GetNthPVOutput(int idx);
   void SetNthPVOutput(int idx, vtkPVData *output);
- 
- 
-  // We keep a reference to the input menu (if created) because any
-  // array menu must be dependant on it.
-  // This is a bit of a hack until we represent the dependancey in the XML.
-  vtkPVInputMenu *InputMenu;
-    
   
   vtkKWNotebook *Notebook;
 
   // The name is just for display.
   char      *Name;
 
-  vtkKWWidget       *Properties;
-  void              UpdateProperties();
+  vtkKWWidget* Parameters;
+  void UpdateProperties();
 
   vtkKWWidget *MainParameterFrame;
   vtkKWWidget *ButtonFrame;
   vtkKWFrame *ParameterFrame;
   
-  vtkKWWidgetCollection *Widgets;
+  vtkPVWidgetCollection *Widgets;
 
 
   vtkKWPushButton *AcceptButton;
@@ -392,18 +326,24 @@ protected:
   vtkKWPushButton *DeleteButton;
   vtkKWLabel *DisplayNameLabel;
     
-  vtkPVSelectionList *LastSelectionList;
+  char *InputClassName;
+  char *OutputClassName;
+  char *SourceClassName;
 
-  vtkPVSourceInterface *Interface;
-  
   // Whether the source should make its input invisible.
   int ReplaceInput;
 
-  int InstanceCount;
   int VisitedFlag;
 
   vtkPVSource(const vtkPVSource&); // Not implemented
   void operator=(const vtkPVSource&); // Not implemented
+
+  // Number of instances cloned from this prototype
+  int PrototypeInstanceCount;
+
+  int IsDeletable;
+
+  virtual int ClonePrototypeInternal(int makeCurrent, vtkPVSource*& clone);
 };
 
 #endif

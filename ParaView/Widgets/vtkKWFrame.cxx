@@ -50,27 +50,20 @@ vtkStandardNewMacro( vtkKWFrame );
 
 vtkKWFrame::vtkKWFrame()
 {
-  this->Canvas = 0;
-  this->ScrollBar = 0;
+  this->ScrollFrame = 0;
   this->Frame = 0;
-  this->FrameId = 0;
 }
 
 vtkKWFrame::~vtkKWFrame()
 {
-  if ( this->Canvas )
+  if ( this->ScrollFrame )
     {
-    this->Canvas->Delete();
+    this->ScrollFrame->Delete();
     }
-  if ( this->ScrollBar )
-    {
-    this->ScrollBar->Delete();
-    }
-  if ( this->FrameId )
+  if (this->Frame && this->Frame != this)
     {
     this->Frame->Delete();
     }
-  delete[] this->FrameId;
 }
 
 
@@ -87,108 +80,36 @@ void vtkKWFrame::Create(vtkKWApplication *app, int scrollable)
 
   this->SetApplication(app);
 
-  // create the top level
-  wname = this->GetWidgetName();
-  this->Script("frame %s -borderwidth 2 -relief flat", wname);
   
   if ( scrollable )
     {
+    // create the top level
+    wname = this->GetWidgetName();
+    this->Script("ScrolledWindow %s -relief flat -borderwidth 2", wname);
+
+    this->ScrollFrame = vtkKWWidget::New();
+
+    this->ScrollFrame->SetParent(this);
+    this->ScrollFrame->Create(this->Application, "ScrollableFrame", "-height 1024");
+    this->Script("%s setwidget %s", this->GetWidgetName(),
+		 this->ScrollFrame->GetWidgetName());
+
     this->Frame = vtkKWWidget::New();
-    this->Canvas = vtkKWWidget::New();
-    this->ScrollBar = vtkKWWidget::New();
-    this->Canvas->SetParent(this);
-    this->Canvas->Create(this->Application, "canvas", " -height 800 -highlightthickness 0"); 
-    
-    ostrstream command;
-    this->ScrollBar->SetParent(this);
-    command << "-command \"" <<  this->Canvas->GetWidgetName()
-	    << " yview\"" << ends;
-    char* commandStr = command.str();
-    this->ScrollBar->Create(this->Application, "scrollbar", commandStr);
-    delete[] commandStr;
-    
-    this->Script("%s configure -yscrollcommand \"%s set\"", 
-		 this->Canvas->GetWidgetName(),
-		 this->ScrollBar->GetWidgetName());
-    
-    this->Frame->SetParent(this->Canvas);
-    this->Frame->Create(this->Application, "frame", ""); 
-    
-    this->Script("%s configure -yscrollcommand \"%s set\"", 
-		 this->Canvas->GetWidgetName(),
-		 this->ScrollBar->GetWidgetName());
-    this->Script("%s create window 0 0 -anchor nw -window %s",
-		 this->Canvas->GetWidgetName(),
-		 this->Frame->GetWidgetName());
-    char* result = this->Application->GetMainInterp()->result;
-    this->FrameId = new char[strlen(result)+1];
-    strcpy(this->FrameId,result);
-    
-    this->Script("bind %s <Configure> {%s ResizeFrame}",
-		 this->Frame->GetWidgetName(),
-		 this->GetTclName());
-    this->Script("bind %s <Configure> {%s ResizeCanvas}",
-		 this->Canvas->GetWidgetName(),
-		 this->GetTclName());
-    
-    this->Script("pack %s -fill both -expand t -side left", 
-		 this->Canvas->GetWidgetName());
+    this->Frame->SetParent(this->ScrollFrame);
+    this->Script("%s getframe", this->ScrollFrame->GetWidgetName());
+    this->Frame->SetWidgetName(this->Application->GetMainInterp()->result);
+
+    this->Script("%s configure -constrainedwidth 1", this->ScrollFrame->GetWidgetName());
+
     }
   else
     {
+    // create the top level
+    wname = this->GetWidgetName();
+    this->Script("frame %s -borderwidth 2 -relief flat", wname);
+
     this->Frame = this;
     }
 }
 
-void vtkKWFrame::CalculateBBox(vtkKWWidget* canvas, char* name, 
-					 int bbox[4])
-{
-  char *result;
 
-  // Get the bounding box for the name. We may need to highlight it.
-  this->Script("%s bbox %s", canvas->GetWidgetName(), name);
-  result = this->Application->GetMainInterp()->result;
-  sscanf(result, "%d %d %d %d", bbox, bbox+1, bbox+2, bbox+3);
-
-}
-
-void vtkKWFrame::ResizeFrame()
-{
-  this->Script("winfo width %s", this->Frame->GetWidgetName());
-  //int widthFrame = this->GetIntegerResult(this->Application);
-
-  int bbox[4];
-  this->CalculateBBox(this->Canvas, "all", bbox);
-  this->Script("%s configure  -scrollregion \"%d %d %d %d\" "
-	       "-yscrollincrement 0.1i", this->Canvas->GetWidgetName(), 
-	       bbox[0], bbox[1], bbox[2], bbox[3]);
-}
-
-void vtkKWFrame::ResizeCanvas()
-{
-  this->Script("winfo width %s", this->Frame->GetWidgetName());
-  //int widthFrame = this->GetIntegerResult(this->Application);
-
-  int bbox[4], heightCanvas, heightFrame;
-
-  this->CalculateBBox(this->Canvas, "all", bbox);
-  heightFrame = bbox[3] - bbox[1];
-  this->Script("winfo height %s", this->Canvas->GetWidgetName());
-  heightCanvas = this->GetIntegerResult(this->Application);
-  if (heightFrame > heightCanvas)
-    {
-    this->Script("pack forget %s", this->Canvas->GetWidgetName());
-    this->Script("pack %s -fill both -expand t -side left", this->Canvas->GetWidgetName());
-    this->Script("pack %s -fill both -expand t -side right", 
-		 this->ScrollBar->GetWidgetName());
-    }
-  else
-    {
-    this->Script("pack forget %s", this->ScrollBar->GetWidgetName());
-    }
-  this->Script("%s itemconfigure %s -width [winfo width %s]",
-	       this->Canvas->GetWidgetName(),
-	       this->FrameId,
-	       this->Canvas->GetWidgetName());
-
-}

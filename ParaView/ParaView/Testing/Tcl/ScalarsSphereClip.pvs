@@ -11,25 +11,26 @@ if {[info exists argc]} {
     
 set kw(vtkTemp1) [Application GetMainWindow]
 set kw(vtkTemp29) [$kw(vtkTemp1) GetMainView]
-set kw(vtkTemp224) [$kw(vtkTemp1) CreatePVSource vtkRTAnalyticSource]
+set kw(vtkTemp224) [$kw(vtkTemp1) CreatePVSource RTAnalyticSource]
 $kw(vtkTemp224) AcceptCallback
-set kw(vtkTemp288) [$kw(vtkTemp1) ClipCallback]
+set kw(vtkTemp288) [$kw(vtkTemp1) CreatePVSource Clip]
 set kw(vtkTemp303) [$kw(vtkTemp288) GetPVWidget {Clip Function}]
 $kw(vtkTemp303) SetCurrentValue {Scalars}
-set kw(vtkTemp313) [$kw(vtkTemp303) GetPVWidget {Scalars}]
+set kw(vtkTemp999) [$kw(vtkTemp303) GetPVWidget {Scalars}]
+set kw(vtkTemp313) [$kw(vtkTemp999) GetPVWidget 1]
 $kw(vtkTemp313) SetValue {ImageValues}
 set kw(vtkTemp314) [$kw(vtkTemp288) GetPVWidget {Offset}]
 $kw(vtkTemp314) SetValue 200
 $kw(vtkTemp288) AcceptCallback
 [$kw(vtkTemp1) GetMainView] SetCameraState -33.506 28.392 54.140  0.000 0.000 0.000  0.071 0.901 -0.428
-set kw(vtkTemp337) [$kw(vtkTemp1) ClipCallback]
+set kw(vtkTemp337) [$kw(vtkTemp1) CreatePVSource Clip]
 set kw(vtkTemp351) [$kw(vtkTemp337) GetPVWidget {Clip Function}]
 $kw(vtkTemp351) SetCurrentValue {Sphere}
 set kw(vtkTemp358) [$kw(vtkTemp351) GetPVWidget {Sphere}]
 set kw(vtkTemp359) [$kw(vtkTemp358) GetCenterEntry]
 $kw(vtkTemp359) SetValue 10 0 0
 $kw(vtkTemp337) AcceptCallback
-set kw(vtkTemp389) [$kw(vtkTemp1) CreatePVSource vtkDataSetSurfaceFilter]
+set kw(vtkTemp389) [$kw(vtkTemp1) CreatePVSource DataSetSurfaceFilter]
 $kw(vtkTemp389) AcceptCallback
 [$kw(vtkTemp1) GetMainView] SetCameraState 53.415 25.363 36.925  0.000 0.000 0.000  -0.077 0.871 -0.486
 [$kw(vtkTemp1) GetMainView] SetCameraState 32.613 15.486 22.545  -20.802 -9.878 -14.380  -0.077 0.871 -0.486

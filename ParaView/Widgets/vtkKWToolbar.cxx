@@ -42,6 +42,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWApplication.h"
 #include "vtkKWToolbar.h"
 #include "vtkObjectFactory.h"
+#include "vtkVector.txx"
+#include "vtkVectorIterator.txx"
+
+#ifndef VTK_NO_EXPLICIT_TEMPLATE_INSTANTIATION
+
+template class VTK_EXPORT vtkVector<vtkKWWidget*>;
+
+#endif
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWToolbar );
@@ -54,20 +62,27 @@ int vtkKWToolbarCommand(ClientData cd, Tcl_Interp *interp,
 vtkKWToolbar::vtkKWToolbar()
 {
   this->CommandFunction = vtkKWToolbarCommand;
-  this->Height = 23;
   this->Expanding = 0;
 
-  this->Bar1 = vtkKWWidget::New();
-  this->Bar1->SetParent(this);
+  this->Frame = vtkKWWidget::New();
+  this->Frame->SetParent(this);
+
+  this->Widgets = vtkVector<vtkKWWidget*>::New();
 }
 
 //----------------------------------------------------------------------------
 vtkKWToolbar::~vtkKWToolbar()
 {
-  this->Bar1->Delete();
-  this->Bar1 = NULL;
+  this->Frame->Delete();
+  this->Frame = 0;
+  this->Widgets->Delete();
 }
 
+
+void vtkKWToolbar::AddWidget(vtkKWWidget* widget)
+{
+  this->Widgets->AppendItem(widget);
+}
 
 //----------------------------------------------------------------------------
 void vtkKWToolbar::Create(vtkKWApplication *app)
@@ -81,15 +96,15 @@ void vtkKWToolbar::Create(vtkKWApplication *app)
   this->SetApplication(app);
 
   // create the main frame for this widget
-  // How do you specify a height ???
-  this->Script( "frame %s -height %d -relief raised -bd 1", 
-                this->GetWidgetName(), this->Height);
+  this->Script("frame %s -relief raised -bd 1", this->GetWidgetName());
 
-  this->Bar1->Create(app, "frame", "-bd 1 -relief flat");
-  this->Script("pack %s -side left -fill y -expand yes -padx 4 -pady 2 -ipadx 2 -ipady 2",
-               this->Bar1->GetWidgetName());
   this->Script("bind %s <Configure> {%s ScheduleResize}",
-               this->Bar1->GetWidgetName(), this->GetTclName());
+               this->GetWidgetName(), this->GetTclName());
+
+  this->Frame->Create(app, "frame", "");
+  this->Script("pack %s -side left -expand yes   -anchor nw ",
+	       this->Frame->GetWidgetName());
+
 
 }
 
@@ -105,10 +120,61 @@ void vtkKWToolbar::ScheduleResize()
 }
 
 //----------------------------------------------------------------------------
+void vtkKWToolbar::UpdateWidgets()
+{
+  if ( this->Widgets->GetNumberOfItems() > 0 )
+    {
+    vtkVectorIterator<vtkKWWidget*>* it = this->Widgets->NewIterator();
+    
+    int totReqWidth=0;
+    while ( it->IsDoneWithTraversal() != VTK_OK )
+      {
+      vtkKWWidget* widget = 0;
+      if (it->GetData(widget) == VTK_OK)
+	{
+	this->Script("winfo reqwidth %s", widget->GetWidgetName());
+	totReqWidth += this->GetIntegerResult(this->Application);
+	}
+      it->GoToNextItem();
+      }
+
+    this->Script("winfo width %s", this->GetWidgetName());
+    int width = this->GetIntegerResult(this->Application);
+
+    int widthWidget = totReqWidth / this->Widgets->GetNumberOfItems();
+    int numPerRow = width / widthWidget;
+
+    if ( numPerRow > 0 )
+      {
+      int row = 0;
+      ostrstream s;
+      it->InitTraversal();
+      int num = 0;
+      while ( it->IsDoneWithTraversal() != VTK_OK )
+	{
+	vtkKWWidget* widget = 0;
+	if (it->GetData(widget) == VTK_OK)
+	  {
+	  s << "grid " << widget->GetWidgetName() << " -row " 
+	    << row << " -column " << num << " -sticky nsew " << endl;
+	  num++;
+	  if ( num == numPerRow ) { row++; num=0;}
+	  }
+	it->GoToNextItem();
+	}
+      s << ends;
+      this->Script(s.str());
+      s.rdbuf()->freeze(0);
+      }
+    it->Delete();
+
+    }
+}
+
+//----------------------------------------------------------------------------
 void vtkKWToolbar::Resize()
 {
-  this->Script("%s configure -height %d",
-               this->Bar1->GetWidgetName(), this->Height);
+  this->UpdateWidgets();
   this->Expanding = 0;
 }
 
@@ -117,5 +183,4 @@ void vtkKWToolbar::Resize()
 void vtkKWToolbar::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
-  os << indent << "Height: " << this->GetHeight() << endl;
 }

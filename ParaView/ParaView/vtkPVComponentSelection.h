@@ -46,14 +46,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __vtkPVComponentSelection_h
 
 #include "vtkPVWidget.h"
+#include "vtkPVObjectWidget.h"
 
-class VTK_EXPORT vtkPVComponentSelection : public vtkPVWidget
+class VTK_EXPORT vtkPVComponentSelection : public vtkPVObjectWidget
 {
 public:
   static vtkPVComponentSelection* New();
-  vtkTypeMacro(vtkPVComponentSelection, vtkPVWidget);
+  vtkTypeMacro(vtkPVComponentSelection, vtkPVObjectWidget);
   
-  void Create(vtkKWApplication *pvApp, int numComponents, char *help);
+  void Create(vtkKWApplication *pvApp);
   
   // Description:
   // Called when accept button is pushed.
@@ -73,28 +74,39 @@ public:
   int GetState(int i);
   
   // Description:
-  // Need the filter to set the components
-  // Not reference counted to avoid circular dependency.
-  void SetPVSource(vtkPVSource *pvs) { this->PVSource = pvs; }
-  vtkPVSource *GetPVSource() { return this->PVSource; }
-  
-  void SetObjectVariable(const char *objectTclName, const char *var);
-  
+  // Set the number of connected components.
+  // This has to be set before calling create.
+  vtkSetMacro(NumberOfComponents, int);
+
+//BTX
+  // Description:
+  // Creates and returns a copy of this widget. It will create
+  // a new instance of the same type as the current object
+  // using NewInstance() and then copy some necessary state 
+  // parameters.
+  vtkPVComponentSelection* ClonePrototype(vtkPVSource* pvSource,
+				 vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
+//ETX
+
 protected:
   vtkPVComponentSelection();
   ~vtkPVComponentSelection();
   
   vtkKWWidgetCollection *CheckButtons;
-  vtkPVSource *PVSource;
   int Initialized;
-  
-  char *ObjectTclName;
-  char *VariableName;
-  vtkSetStringMacro(ObjectTclName);
-  vtkSetStringMacro(VariableName);
 
   vtkPVComponentSelection(const vtkPVComponentSelection&); // Not implemented
   void operator=(const vtkPVComponentSelection&); // Not implemented
+
+  int NumberOfComponents;
+
+//BTX
+  virtual void CopyProperties(vtkPVWidget* clone, vtkPVSource* pvSource,
+			      vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
+//ETX
+
+  int ReadXMLAttributes(vtkPVXMLElement* element,
+                        vtkPVXMLPackageParser* parser);
 };
 
 #endif

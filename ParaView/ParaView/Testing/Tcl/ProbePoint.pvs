@@ -10,19 +10,20 @@ if {[info exists argc]} {
 
 set pv(vtkTemp1) [Application GetMainWindow]
 set pv(vtkTemp43) [$pv(vtkTemp1) GetMainView]
-set pv(vtkTemp89) [$pv(vtkTemp1) GetGlyphSource GlyphArrow]
-set pv(vtkTemp93) [$pv(vtkTemp1) GetGlyphSource GlyphCone]
-set pv(vtkTemp97) [$pv(vtkTemp1) GetGlyphSource GlyphSphere]
+set pv(vtkTemp89) [$pv(vtkTemp1) GetPVSource GlyphSources Arrow0]
+set pv(vtkTemp93) [$pv(vtkTemp1) GetPVSource GlyphSources Cone0]
+set pv(vtkTemp97) [$pv(vtkTemp1) GetPVSource GlyphSources Sphere0]
 
-set pv(vtkTemp100) [$pv(vtkTemp1) Open $DataDir/Data/vox8_bin.vtk]
+$pv(vtkTemp1) Open "$DataDir/Data/vox8_bin.vtk"
+set pv(vtkTemp100) [$pv(vtkTemp1) GetCurrentPVSource]
 set pv(vtkTemp101) [$pv(vtkTemp100) GetPVOutput]
 $pv(vtkTemp101) DrawWireframe
 $pv(vtkTemp101) ColorByProperty
-set pv(vtkTemp138) [$pv(vtkTemp1) ProbeCallback]
+set pv(vtkTemp138) [$pv(vtkTemp1) CreatePVSource Probe]
 $pv(vtkTemp138) UsePoint
 $pv(vtkTemp138) SetSelectedPoint 0.409600 0.385700 1.620400
 $pv(vtkTemp138) AcceptCallback
-set pv(vtkTemp179) [$pv(vtkTemp1) GlyphCallback]
+set pv(vtkTemp179) [$pv(vtkTemp1) CreatePVSource Glyph]
 set pv(vtkTemp187) [$pv(vtkTemp179) GetPVWidget {Input}]
 $pv(vtkTemp187) SetCurrentValue $pv(vtkTemp138)
 set pv(vtkTemp188) [$pv(vtkTemp179) GetPVWidget {Glyph}]

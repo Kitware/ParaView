@@ -39,8 +39,11 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
+#include "vtkPVApplication.h"
 #include "vtkPVLabeledToggle.h"
 #include "vtkObjectFactory.h"
+#include "vtkArrayMap.txx"
+#include "vtkPVXMLElement.h"
 
 //----------------------------------------------------------------------------
 vtkPVLabeledToggle* vtkPVLabeledToggle::New()
@@ -73,8 +76,42 @@ vtkPVLabeledToggle::~vtkPVLabeledToggle()
   this->Label = NULL;
 }
 
+void vtkPVLabeledToggle::SetBalloonHelpString(const char *str)
+{
+
+  // A little overkill.
+  if (this->BalloonHelpString == NULL && str == NULL)
+    {
+    return;
+    }
+
+  // This check is needed to prevent errors when using
+  // this->SetBalloonHelpString(this->BalloonHelpString)
+  if (str != this->BalloonHelpString)
+    {
+    // Normal string stuff.
+    if (this->BalloonHelpString)
+      {
+      delete [] this->BalloonHelpString;
+      this->BalloonHelpString = NULL;
+      }
+    if (str != NULL)
+      {
+      this->BalloonHelpString = new char[strlen(str)+1];
+      strcpy(this->BalloonHelpString, str);
+      }
+    }
+  
+  if ( this->Application && !this->BalloonHelpInitialized )
+    {
+    this->Label->SetBalloonHelpString(this->BalloonHelpString);
+    this->CheckButton->SetBalloonHelpString(this->BalloonHelpString);
+    this->BalloonHelpInitialized = 1;
+    }
+}
+
 //----------------------------------------------------------------------------
-void vtkPVLabeledToggle::Create(vtkKWApplication *pvApp, char *help)
+void vtkPVLabeledToggle::Create(vtkKWApplication *pvApp)
 {
   const char* wname;
   
@@ -92,18 +129,14 @@ void vtkPVLabeledToggle::Create(vtkKWApplication *pvApp, char *help)
   
   // Now a label
   this->Label->Create(pvApp, "-width 18 -justify right");
-  if (help)
-    {
-    this->Label->SetBalloonHelpString(help);
-    }
   this->Script("pack %s -side left", this->Label->GetWidgetName());
   
   // Now the check button
   this->CheckButton->Create(pvApp, "");
   this->CheckButton->SetCommand(this, "ModifiedCallback");
-  if (help)
+  if (this->BalloonHelpString)
     {
-    this->CheckButton->SetBalloonHelpString(help);
+    this->SetBalloonHelpString(this->BalloonHelpString);
     }
   this->Script("pack %s -side left", this->CheckButton->GetWidgetName());
 }
@@ -154,4 +187,48 @@ void vtkPVLabeledToggle::Reset()
 
   this->ModifiedFlag = 0;
 
+}
+
+vtkPVLabeledToggle* vtkPVLabeledToggle::ClonePrototype(vtkPVSource* pvSource,
+				 vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
+{
+  vtkPVWidget* clone = this->ClonePrototypeInternal(pvSource, map);
+  return vtkPVLabeledToggle::SafeDownCast(clone);
+}
+
+void vtkPVLabeledToggle::CopyProperties(vtkPVWidget* clone, 
+					vtkPVSource* pvSource,
+			      vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
+{
+  this->Superclass::CopyProperties(clone, pvSource, map);
+  vtkPVLabeledToggle* pvlt = vtkPVLabeledToggle::SafeDownCast(clone);
+  if (pvlt)
+    {
+    pvlt->Label->SetLabel(this->Label->GetLabel());
+    pvlt->SetTraceName(this->Label->GetLabel());
+    }
+  else 
+    {
+    vtkErrorMacro("Internal error. Could not downcast clone to PVLabeledToggle.");
+    }
+}
+
+//----------------------------------------------------------------------------
+int vtkPVLabeledToggle::ReadXMLAttributes(vtkPVXMLElement* element,
+                                          vtkPVXMLPackageParser* parser)
+{
+  if(!this->Superclass::ReadXMLAttributes(element, parser)) { return 0; }
+  
+  // Setup the Label.
+  const char* label = element->GetAttribute("label");
+  if(label)
+    {
+    this->Label->SetLabel(label);
+    }
+  else
+    {
+    this->Label->SetLabel(this->VariableName);
+    }
+  
+  return 1;
 }

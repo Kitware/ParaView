@@ -39,16 +39,46 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-// .NAME vtkPVWindow
+// .NAME vtkPVWindow - Main ParaView user interface.
 // .SECTION Description
 // This class represents a top level window with menu bar and status
 // line. It is designed to hold one or more vtkPVViews in it.
+// The menu bar contains the following menus:
+// @verbatim
+// File Menu    -> File manipulations
+// View Menu    -> Changes what is displayed on the properties
+//                 window (on the left)
+// SelectMenu   -> used to select existing data objects
+// GlyphMenu    -> used to select existing glyph objects (cascaded from
+//                 SelectMenu)
+// AdvancedMenu -> for advanced users, contains SourceMenu and FilterMenu,
+//                 buttons for command prompt, exporting VTK scripts...
+// Help         -> Brings up on-line help
+// 
+// @endverbatim
+// Below the menus, there is a frame separated into two. On the left,
+// the "properties" frame is placed and on the right, the render window is
+// placed. The "properties" frame is multi-functional. It can display
+// general settings, the properties of the current data object/source etc.
+// Finally, the status and progress bar (current unused) are packed at
+// the bottom.
+//
+// The PVWindow holds all the existing PVSources (prototypes and instances) 
+// and provides access to them. The prototypes are instantiated by
+// parsing an XML configuration file. It also has methods to create new data
+// objects/sources by cloning prototypes. These data objects can be
+// selected either from the SelectMenu or using the navigation window.
+// All the reader module prototypes are also stored in the window. The window
+// consults each of these when opening a file. The first one which claims
+// it can open the current file is passed the filename and is asked to read it.
+//
+// .SECTION See Also
+// vtkPVSource vtkPVData vtkPVRenderView vtkPVNavigationWindow
 
 #ifndef __vtkPVWindow_h
 #define __vtkPVWindow_h
 
 #include "vtkKWWindow.h"
-#include "vtkPVSource.h"
 
 class vtkPVRenderView;
 class vtkKWNotebook;
@@ -60,7 +90,6 @@ class vtkKWLabel;
 class vtkKWCheckButton;
 class vtkPVAnimationInterface;
 class vtkKWRotateCameraInteractor;
-class vtkKWCompositeCollection;
 class vtkKWTclInteractor;
 class vtkPVTimerLogDisplay;
 class vtkPVGenericRenderWindowInteractor;
@@ -73,6 +102,21 @@ class vtkPVInteractorStyleFly;
 class vtkAxes;
 class vtkActor;
 class vtkPolyDataMapper;
+class vtkPVSourceCollection;
+class vtkPVXMLPackageParser;
+class vtkPVReaderModule;
+class vtkPVSource;
+class vtkPVData;
+class vtkKWLabeledFrame;
+class vtkPVApplication;
+class vtkKWEntry;
+
+//BTX
+template <class key, class data> 
+class vtkArrayMap;
+template <class value>
+class vtkLinkedList;
+//ETX
 
 class VTK_EXPORT vtkPVWindow : public vtkKWWindow
 {
@@ -82,65 +126,56 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Create a Tk widget
+  // Create the window and all of the associated widgets. This
+  // essentially creates the whole user interface. ParaView supports
+  // only one window.
   virtual void Create(vtkKWApplication *app, char *args);
 
-  // Description:
-  // I assume this creates a new applciation window.
-  void NewWindow();
-  
-  // Description:
-  // Chaining method to serialize an object and its superclasses.
-  virtual void SerializeSelf(ostream& os, vtkIndent indent);
-  virtual void SerializeToken(istream& is,const char token[1024]);
-    
   // Description:
   // Access to the RenderView.
   vtkGetObjectMacro(MainView, vtkPVRenderView);
 
   // Description:
-  // The current source ...  Setting the current source also sets the current PVData.
-  // It also sets the selected composite to the source.
+  // The current source ...  Setting the current source also sets the
+  // current PVData.  It also sets the selected composite to the source.
   void SetCurrentPVSource(vtkPVSource *comp);
   void SetCurrentPVSourceCallback(vtkPVSource *comp);
   vtkPVSource *GetCurrentPVSource() {return this->CurrentPVSource;}
   vtkPVSource *GetPreviousPVSource(int idx = 1);
 
   // Description:
-  // This adds a PVSource to the Source collection, and makes it current.
-  // No trace entry is added during this call.
-  void AddPVSource(vtkPVSource *pvs);
-  void RemovePVSource(vtkPVSource *pvs);
-  
+  // This adds a PVSource to the collection called "listname", and makes 
+  // it current. No trace entry is added during this call.
+  void AddPVSource(const char* listname, vtkPVSource *pvs);
+
   // Description:
-  // The current data is the data object that will be used as input to the next filter.
-  // It is usually the last output of the current source.  If the current source
-  // has more than one output, they can be selected through the UI.  The current data
-  // determines which filters are displayed in the filter menu.
+  // This removes a PVSource from the collection called "listname".
+  // No trace entry is added during this call.
+  void RemovePVSource(const char* listname, vtkPVSource *pvs);
+  
+  // Description: 
+  // The current data is the data object that will be used as
+  // input to the next filter.  It is usually the last output of the
+  // current source. The current data determines which filters are 
+  // displayed in the filter menu.
   void SetCurrentPVData(vtkPVData *data);
   vtkGetObjectMacro(CurrentPVData, vtkPVData);
   
   // Description:
-  // This is a special list of precreated sources that can be used to glyph.
-  vtkCollection *GetGlyphSources();
-
-  // Description:
-  // This access method is needed for scripts that modify the glyph source.
-  // It indexes the sources by name.
-  vtkPVSource *GetGlyphSource(char* name);
+  // Find a data source with name "sourcename" in the source list called
+  // "listname"
+  vtkPVSource *GetPVSource(const char* listname, char* sourcename);
     
+  // Description:
+  // Access methods to ParaView specific menus.
   vtkGetObjectMacro(SelectMenu, vtkKWMenu);
   vtkGetObjectMacro(GlyphMenu, vtkKWMenu);
   vtkGetObjectMacro(SourceMenu, vtkKWMenu);
   vtkGetObjectMacro(FilterMenu, vtkKWMenu);
   
   // Description:
-  // Callback from the reset camera button.
+  // Callback for the reset camera button.
   void ResetCameraCallback();
-  
-  // Description:
-  // Callback to display window proerties
-  void ShowWindowProperties();
   
   // Description:
   // Callback to show the page for the current source.
@@ -153,9 +188,9 @@ public:
   void ShowAnimationProperties();
   
   // Description:
-  // Need to be able to get the toolbar so I can add buttons from outside
-  // this class.
+  // Access to the toolbars.
   vtkGetObjectMacro(Toolbar, vtkKWToolbar);
+  vtkGetObjectMacro(InteractorToolbar, vtkKWToolbar);
   
   // Description:
   // Access from script for regression test.
@@ -170,56 +205,28 @@ public:
   void SaveTrace();
   
   // Description:
-  // Save the pipeline ParaView Tcl script
+  // Save the state of ParaView as a Tcl script. Not implemented
+  // yet.
   void SaveWorkspace();
   
   // Description:
-  // Open a data file.
+  // Open a data file. Prompt the user for the filename first.
   void OpenCallback();
-  vtkPVSource *Open(char *fileName);
-  int OpenRecentFile(char *fileName);
-  
+
   // Description:
-  // Play the demo
+  // Open a data file. Does not prompt the user.
+  // Returns VTK_OK on success and VTK_ERROR on failure.
+  int Open(char *fileName);
+
+  // Description:
+  // Play the demo.
   void PlayDemo();
-
-  // Description:
-  // Callback from the calculator button.
-  vtkPVSource *CalculatorCallback();
-  
-  // Description:
-  // Callback from the Cut button.
-  vtkPVSource *CutCallback();
-
-  // Description:
-  // Callback from the Clip button.
-  vtkPVSource *ClipCallback();
 
   // Description:
   // Callback from the ExtractGrid button.
   vtkPVSource *ExtractGridCallback();
 
   // Description:
-  // Callback from the threshold button.
-  vtkPVSource *ThresholdCallback();
-
-  // Description:
-  // Callback from the contour button.
-  vtkPVSource *ContourCallback();
-
-  // Description:
-  // Callback from the glyph button.
-  vtkPVSource *GlyphCallback();
-  
-  // Description:
-  // Callback from the probe button.
-  vtkPVSource *ProbeCallback();
-  
-  // Description:
-  // Callback from the extract voids button.
-  vtkPVSource *ExtractVoidsCallback();
-  
-  virtual void Close();
 
   // Stuff for creating a log file for times.
   void ShowLog();
@@ -234,23 +241,15 @@ public:
   void WriteVTKFile(char *filename);
   void WritePVTKFile(char *filename, int ghostLevel);
 
-
-  vtkGetObjectMacro(CalculatorButton, vtkKWPushButton);
-  vtkGetObjectMacro(CutButton, vtkKWPushButton);
-  vtkGetObjectMacro(ClipButton, vtkKWPushButton);
-  vtkGetObjectMacro(ExtractGridButton, vtkKWPushButton);
-  vtkGetObjectMacro(ThresholdButton, vtkKWPushButton);
-  vtkGetObjectMacro(ContourButton, vtkKWPushButton);
-  vtkGetObjectMacro(GlyphButton, vtkKWPushButton);
-  vtkGetObjectMacro(ProbeButton, vtkKWPushButton);
-  vtkGetObjectMacro(ExtractVoidsButton, vtkKWPushButton);
-  vtkGetObjectMacro(InteractorStyleToolbar, vtkKWToolbar);
-
   // Description:
-  // Get a source interface from the class name.
-  // Useful for writing scripts that create sources.
-  vtkPVSourceInterface *GetSourceInterface(const char *className);
-  vtkPVSource *CreatePVSource(const char *className);
+  // These methods create a new data source/object given a name and a 
+  // source list.
+  vtkPVSource *CreatePVSource(const char *className)
+    { return this->CreatePVSource(className, 0, 1); }
+  vtkPVSource *CreatePVSource(const char *className, const char* sourceList)
+    { return this->CreatePVSource(className, sourceList, 1); }
+  vtkPVSource *CreatePVSource(const char *className, const char* sourceList,
+			      int addTraceEntry);
   
   // Description:
   // Access to the interactor styles from tcl.
@@ -259,13 +258,13 @@ public:
   vtkGetObjectMacro(FlyStyle, vtkPVInteractorStyleFly);
   
   // Description:
-  // This list contains all the sources created by the user.
-  // It is used to create input menus for filters.
-  vtkCollection *GetSources();
+  // Get the source list called "listname". The default source
+  // lists are "Sources" and "GlyphSources".
+  vtkPVSourceCollection *GetSourceList(const char* listname);
 
-  // Description:
-  // When you add a source to the source list, you sould update the select menu.
-  // This object should probably have AddPVSource RemovePVSource methods ...
+  // Description: 
+  // Re-populate the select menu from the list of existing data
+  // objects.
   void UpdateSelectMenu();
 
   // Description:
@@ -277,25 +276,63 @@ public:
   // Description:
   // Ability to disable and enable the filter buttons on the toolbar.
   // Most of the manipulation is internal to window.
-  void DisableFilterButtons();
-  void EnableFilterButtons();
+  void DisableToolbarButtons();
+  void EnableToolbarButtons();
 
   // Description:
-  // Display the tcl interactor
+  // Re-populate the source menu (under Advanced).
+  void UpdateSourceMenu();
+
+  // Description:
+  // Re-populate the filter menu (under Advanced).
+  void UpdateFilterMenu();
+
+  // Description:
+  // Display the tcl interactor.
   void DisplayCommandPrompt();
   
   // Description:
-  // Experimenting with wizards.
+  // Experimenting with wizards. Has to cleaned up - Berk
   void WizardCallback();
 
   // Description:
   // Access to the animation interface for scripting.
-  vtkPVAnimationInterface* GetAnimationInterface() {return this->AnimationInterface;}
+  vtkPVAnimationInterface* GetAnimationInterface() 
+    {return this->AnimationInterface;}
 
   // Description:
-  // Experimenting with modules.
-  int LoadModule(const char *name);
-  int GetModuleLoaded(const char *name);
+  // Add a prototype from which a module can be created.
+  void AddPrototype(const char* name, vtkPVSource* prototype);
+
+  // Description:
+  // Add a push button to the main toolbar.
+  void AddToolbarButton(const char* buttonName, const char* imageName, 
+			const char* command, const char* balloonHelp);
+
+  // Description:
+  // Determines whether message dialogs or error macros as used
+  // for displaying certain warnings/errors.
+  vtkSetMacro(UseMessageDialog, int);
+  vtkGetMacro(UseMessageDialog, int);
+  vtkBooleanMacro(UseMessageDialog, int);
+
+  // Description:
+  // Adds package name. These names are later used when writing
+  // VTK scripts.
+  void AddPackageName(const char* name);
+
+  // Description:
+  // Whether to parse and create the default interfaces at startup
+  vtkSetMacro(InitializeDefaultInterfaces, int);
+  vtkGetMacro(InitializeDefaultInterfaces, int);
+  vtkBooleanMacro(InitializeDefaultInterfaces, int);
+
+  // Description:
+  // Open a ParaView package (prompt the user for the filename) 
+  // and load the contents. Returns VTK_OK on success.
+  int OpenPackage();
+  int OpenPackage(const char* fileName);
+
 
   // Description:
   // Callbacks for generic render window interactor
@@ -332,7 +369,10 @@ protected:
   vtkPVWindow();
   ~vtkPVWindow();
 
+  // Main render window
   vtkPVRenderView *MainView;
+
+  // ParaView specific menus
   vtkKWMenu *AdvancedMenu;
   vtkKWMenu *SourceMenu;
   vtkKWMenu *FilterMenu;
@@ -345,7 +385,8 @@ protected:
   vtkPVInteractorStyleCenterOfRotation *CenterOfRotationStyle;
   vtkPVInteractorStyleFly *FlyStyle;
   
-  vtkKWToolbar *InteractorStyleToolbar;
+  // Interactor stuff
+  vtkKWToolbar *InteractorToolbar;
   vtkKWRadioButton *FlyButton;
   vtkKWRadioButton *RotateCameraButton;
   vtkKWRadioButton *TranslateCameraButton;
@@ -353,16 +394,8 @@ protected:
   
   vtkPVGenericRenderWindowInteractor *GenericInteractor;
   
+  // Main toolbar
   vtkKWToolbar *Toolbar;
-  vtkKWPushButton *CalculatorButton;
-  vtkKWPushButton *CutButton;
-  vtkKWPushButton *ClipButton;
-  vtkKWPushButton *ExtractGridButton;
-  vtkKWPushButton *ThresholdButton;
-  vtkKWPushButton *ContourButton;
-  vtkKWPushButton *GlyphButton;
-  vtkKWPushButton *ProbeButton;
-  vtkKWPushButton *ExtractVoidsButton;
   
   // widgets for setting center of rotation for rotate camera interactor style
   vtkKWToolbar *PickCenterToolbar;
@@ -388,11 +421,6 @@ protected:
   vtkActor *CenterActor;
   void ResizeCenterActor();
   
-  vtkCollection *Sources;
-  // Special list of static sources that can be used for glyphing.
-  vtkCollection *GlyphSources;
-  vtkKWLabeledFrame *ApplicationAreaFrame;
-
   // Used internally.  Down casts vtkKWApplication to vtkPVApplication
   vtkPVApplication *GetPVApplication();
 
@@ -402,13 +430,12 @@ protected:
   // Get rid of all references we own.
   void PrepareForDelete();
 
-  void ReadSourceInterfaces();
-  void ReadSourceInterfacesFromString(const char*);
-  void ReadSourceInterfacesFromFile(const char*);
-  int ReadSourceInterfacesFromDirectory(const char*);
-  
-  vtkCollection *SourceInterfaces;
-  
+  // Disable or enable the select menu.
+  void EnableSelectMenu();
+
+  // Returns VTK_OK is file exists and is readable.
+  int CheckIfFileIsReadable(const char* fname);
+
   vtkPVSource *CurrentPVSource;
   vtkPVData *CurrentPVData;
 
@@ -416,7 +443,12 @@ protected:
   // if we ever get more that one renderer, the animation
   // will save out the window with all renderers.
   vtkPVAnimationInterface *AnimationInterface;
-  
+
+  // Initialization methods called from create.
+  void InitializeMenus(vtkKWApplication* app);
+  void InitializeToolbars(vtkKWApplication* app);
+  void InitializeInteractorInterfaces(vtkKWApplication* app);
+
   vtkKWTclInteractor *TclInteractor;
   vtkPVTimerLogDisplay *TimerLogDisplay;
 
@@ -428,18 +460,38 @@ protected:
   // Extensions of files that loaded readers recognize.
   char *FileExtensions;
   char *FileDescriptions;
-  void AddFileType(const char* description, const char* ext);
-  vtkStringList *ReaderInterfaces;
+  // Add a file type and the corresponding prototype
+  void AddFileType(const char* description, const char* ext, 
+		   vtkPVReaderModule* prototype);
+
+  // Read interface description from XML.
+  void ReadSourceInterfaces();
+  void ReadSourceInterfacesFromString(const char*);
+  void ReadSourceInterfacesFromFile(const char*);
+  int ReadSourceInterfacesFromDirectory(const char*);
+
+//BTX
+  vtkArrayMap<const char*, vtkPVSource*>* Prototypes;
+  vtkArrayMap<const char*, vtkPVSourceCollection*>* SourceLists;
+  vtkArrayMap<const char*, vtkKWPushButton*>* ToolbarButtons;
+  vtkLinkedList<vtkPVReaderModule*>* ReaderList;
+  vtkLinkedList<const char*>* PackageNames;
+
+  friend class vtkPVXMLPackageParser;
+//ETX
+
+  // This can be used to disable the pop-up dialogs if necessary
+  // (usually used from inside regression scripts)
+  int UseMessageDialog;
+
+  // Whether or not to read the default interfaces.
+  int InitializeDefaultInterfaces;
 
 private:
+  static const char* StandardReaderInterfaces;
   static const char* StandardSourceInterfaces;
   static const char* StandardFilterInterfaces;
 
-  // Modules.
-  vtkStringList *Modules;
-  vtkPVSource *OpenWithReaderInterface(const char *openFileName, 
-				       const char *rootName,
-                                       const char *rIntName);
 
   vtkPVWindow(const vtkPVWindow&); // Not implemented
   void operator=(const vtkPVWindow&); // Not implemented

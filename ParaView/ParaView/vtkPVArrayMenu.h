@@ -54,11 +54,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVWidget.h"
 #include "vtkKWOptionMenu.h"
 #include "vtkKWLabel.h"
-
+#include "vtkPVInputMenu.h"
 
 class vtkPVInputMenu;
-class vtkPVScalarRangeLabel;
 class vtkCollection;
+class vtkDataArray;
 
 class VTK_EXPORT vtkPVArrayMenu : public vtkPVWidget
 {
@@ -132,9 +132,9 @@ public:
   vtkGetStringMacro(ObjectTclName);
 
   // Description:
-  // This input menu supplies the data set.  We do not refernce count it to avoid a reference loop.
-  void SetInputMenu(vtkPVInputMenu *im) { this->InputMenu = im;}
-  vtkPVInputMenu* GetInputMenu() {return this->InputMenu;}
+  // This input menu supplies the data set.
+  vtkSetObjectMacro(InputMenu, vtkPVInputMenu);
+  vtkGetObjectMacro(InputMenu, vtkPVInputMenu);
   
   // Description:
   // Gets called when the accept button is pressed.
@@ -186,12 +186,16 @@ public:
   // This is called to update the menus if soething (InputMenu) changes.
   virtual void Update();
 
+//BTX
   // Description:
-  // Option to have a scalar range label to show the range
-  // of the selected scalars.
-  void SetShowScalarRangeLabel(int val);
-  vtkGetMacro(ShowScalarRangeLabel, int);
-  vtkBooleanMacro(ShowScalarRangeLabel, int);
+  // Creates and returns a copy of this widget. It will create
+  // a new instance of the same type as the current object
+  // using NewInstance() and then copy some necessary state 
+  // parameters.
+  vtkPVArrayMenu* ClonePrototype(vtkPVSource* pvSource,
+				 vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
+//ETX
+
 
 protected:
   vtkPVArrayMenu();
@@ -228,12 +232,18 @@ protected:
   // Resets the values based on the array.
   void UpdateComponentMenu();
 
-  // Here we have the option of displaying a scalar range label.
-  vtkPVScalarRangeLabel *ScalarRangeLabel;
-  int ShowScalarRangeLabel;
+//BTX
+  virtual vtkPVWidget* ClonePrototypeInternal(vtkPVSource* pvSource,
+			      vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
+  virtual void CopyProperties(vtkPVWidget* clone, vtkPVSource* pvSource,
+			      vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
+//ETX
 
   vtkPVArrayMenu(const vtkPVArrayMenu&); // Not implemented
   void operator=(const vtkPVArrayMenu&); // Not implemented
+
+  int ReadXMLAttributes(vtkPVXMLElement* element,
+                        vtkPVXMLPackageParser* parser);
 };
 
 #endif

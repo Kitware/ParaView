@@ -10,14 +10,14 @@ if {[info exists argc]} {
 
 set pv(vtkTemp1) [Application GetMainWindow]
 set pv(vtkTemp43) [$pv(vtkTemp1) GetMainView]
-set pv(vtkTemp89) [$pv(vtkTemp1) GetGlyphSource Arrow]
-set pv(vtkTemp93) [$pv(vtkTemp1) GetGlyphSource Cone]
-set pv(vtkTemp97) [$pv(vtkTemp1) GetGlyphSource Sphere]
-set pv(vtkTemp98) [$pv(vtkTemp1) CreatePVSource vtkArrowSource]
+set pv(vtkTemp89) [$pv(vtkTemp1) GetPVSource GlyphSources Arrow0]
+set pv(vtkTemp93) [$pv(vtkTemp1) GetPVSource GlyphSources Cone0]
+set pv(vtkTemp97) [$pv(vtkTemp1) GetPVSource GlyphSources Sphere0]
+set pv(vtkTemp98) [$pv(vtkTemp1) CreatePVSource ArrowSource]
 $pv(vtkTemp98) AcceptCallback
-set pv(vtkTemp172) [$pv(vtkTemp1) CreatePVSource vtkExtractEdges]
+set pv(vtkTemp172) [$pv(vtkTemp1) CreatePVSource ExtractEdges]
 $pv(vtkTemp172) AcceptCallback
-set pv(vtkTemp192) [$pv(vtkTemp1) CreatePVSource vtkTubeFilter]
+set pv(vtkTemp192) [$pv(vtkTemp1) CreatePVSource TubeFilter]
 set pv(vtkTemp212) [$pv(vtkTemp192) GetPVWidget {Radius}]
 $pv(vtkTemp212) SetValue 0.01
 $pv(vtkTemp192) AcceptCallback

@@ -58,6 +58,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class vtkStringList;
 class vtkKWOptionMenu;
 class vtkKWLabel;
+class vtkPVWidgetCollection;
+//BTX
+template <class key, class data> 
+class vtkArrayMap;
+//ETX
 
 class VTK_EXPORT vtkPVSelectWidget : public vtkPVObjectWidget
 {
@@ -67,8 +72,7 @@ public:
   
   // Description:
   // Creates common widgets.
-  // Returns 0 if there was an error.
-  int Create(vtkKWApplication *app);
+  void Create(vtkKWApplication *app);
 
   // Description:
   // Add widgets to the possible selection.  The vtkValue
@@ -111,12 +115,38 @@ public:
   // Methods used internally by accept and reset to 
   // Set and Get the widget selection.
   const char* GetCurrentVTKValue();
-  void SetCurrentVTKValue(const char* val);
+  const char* GetVTKValue(int i);
 
   // Description:
   // For saving the widget into a VTK tcl script.
   void SaveInTclScript(ofstream *file);
     
+//BTX
+  // Description:
+  // Creates and returns a copy of this widget. It will create
+  // a new instance of the same type as the current object
+  // using NewInstance() and then copy some necessary state 
+  // parameters.
+  vtkPVSelectWidget* ClonePrototype(vtkPVSource* pvSource,
+				    vtkArrayMap<vtkPVWidget*, 
+				    vtkPVWidget*>* map);
+//ETX
+
+  // Description:
+  // Normally, SelectWidget executes a command of the form
+  // <ObjectTclName> Set<VariableName> <CurrentValue> where
+  // ObjectTclName usually corresponds to the underlying VTK
+  // object, VariableName is an ivar of that object and the
+  // CurrentValue is a value assigned in AddItem (vtkVal argument).
+  // If UseWidgetCommand is on, <CurrentValue> is instead obtained
+  // from the current sub-widget with a command of the form
+  // [<WidgetTclName> <CurrentCommand>] where <CurrentCommand> is
+  // a command assigned in AddItem (vtkVal). Note that this flag
+  // has to be set before any AddItem calls.
+  vtkSetMacro(UseWidgetCommand, int);
+  vtkGetMacro(UseWidgetCommand, int);
+  vtkBooleanMacro(UseWidgetCommand, int);
+
 protected:
   vtkPVSelectWidget();
   ~vtkPVSelectWidget();
@@ -127,15 +157,31 @@ protected:
   vtkKWLabeledFrame *LabeledFrame;
   vtkKWOptionMenu *Menu;
 
+  vtkSetStringMacro(EntryLabel);
+  vtkGetStringMacro(EntryLabel);
+  char* EntryLabel;
+
   // Using this list as an array of strings.
   vtkStringList *Labels;
   vtkStringList *Values;
-  vtkCollection *Widgets;
+  vtkPVWidgetCollection *Widgets;
 
   int CurrentIndex;
 
   vtkPVSelectWidget(const vtkPVSelectWidget&); // Not implemented
   void operator=(const vtkPVSelectWidget&); // Not implemented
+
+  int UseWidgetCommand;
+
+//BTX
+  virtual vtkPVWidget* ClonePrototypeInternal(vtkPVSource* pvSource,
+			      vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
+  virtual void CopyProperties(vtkPVWidget* clone, vtkPVSource* pvSource,
+			      vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
+//ETX
+  
+  int ReadXMLAttributes(vtkPVXMLElement* element,
+                        vtkPVXMLPackageParser* parser);
 };
 
 #endif

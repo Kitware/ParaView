@@ -40,6 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 #include "vtkPVSphereWidget.h"
+#include "vtkPVSource.h"
 #include "vtkKWView.h"
 #include "vtkObjectFactory.h"
 #include "vtkKWLabel.h"
@@ -47,7 +48,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVApplication.h"
 #include "vtkPVData.h"
 #include "vtkPVVectorEntry.h"
-#include "vtkPVWindow.h"
 #include "vtkKWCompositeCollection.h"
 
 int vtkPVSphereWidgetCommand(ClientData cd, Tcl_Interp *interp,
@@ -137,7 +137,9 @@ void vtkPVSphereWidget::Create(vtkKWApplication *app)
   this->CenterEntry->SetObjectVariable(sphereTclName, "Center");
   this->CenterEntry->SetModifiedCommand(this->GetTclName(), 
                                         "ModifiedCallback");
-  this->CenterEntry->Create(this->Application, "Center", 3, NULL, NULL);
+  this->CenterEntry->SetLabel("Center");
+  this->CenterEntry->SetVectorLength(3);
+  this->CenterEntry->Create(this->Application);
   this->Script("pack %s -side top -fill x",
                this->CenterEntry->GetWidgetName());
 
@@ -145,7 +147,8 @@ void vtkPVSphereWidget::Create(vtkKWApplication *app)
   this->RadiusEntry->SetObjectVariable(sphereTclName, "Radius");
   this->RadiusEntry->SetModifiedCommand(this->GetTclName(), 
                                         "ModifiedCallback");
-  this->RadiusEntry->Create(this->Application, "Radius", 1, NULL, NULL);
+  this->RadiusEntry->SetLabel("Radius");
+  this->RadiusEntry->Create(this->Application);
   this->Script("pack %s -side top -fill x",
                this->RadiusEntry->GetWidgetName());
 
@@ -200,14 +203,6 @@ void vtkPVSphereWidget::Accept()
 
 
 //----------------------------------------------------------------------------
-void vtkPVSphereWidget::SetObjectVariable(const char* objName, 
-                                         const char* varName)
-{
-  this->SetObjectTclName(objName);
-  this->SetVariableName(varName);
-}
-
-//----------------------------------------------------------------------------
 void vtkPVSphereWidget::SaveInTclScript(ofstream *file)
 {
   *file << "vtkSphere " << this->SphereTclName << endl;
@@ -229,4 +224,19 @@ void vtkPVSphereWidget::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "CenterEntry: " << this->GetCenterEntry() << endl;
   os << indent << "RadiusEntry: " << this->GetRadiusEntry() << endl;
   os << indent << "SphereTclName: " << this->GetSphereTclName() << endl;
+}
+
+vtkPVSphereWidget* vtkPVSphereWidget::ClonePrototype(vtkPVSource* pvSource,
+				 vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
+{
+  vtkPVWidget* clone = this->ClonePrototypeInternal(pvSource, map);
+  return vtkPVSphereWidget::SafeDownCast(clone);
+}
+
+//----------------------------------------------------------------------------
+int vtkPVSphereWidget::ReadXMLAttributes(vtkPVXMLElement* element,
+                                         vtkPVXMLPackageParser* parser)
+{
+  if(!this->Superclass::ReadXMLAttributes(element, parser)) { return 0; }
+  return 1;
 }

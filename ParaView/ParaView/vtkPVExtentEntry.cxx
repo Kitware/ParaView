@@ -44,6 +44,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkObjectFactory.h"
 #include "vtkKWEntry.h"
 #include "vtkKWMenu.h"
+#include "vtkArrayMap.txx"
+#include "vtkPVData.h"
+#include "vtkPVXMLElement.h"
 
 //----------------------------------------------------------------------------
 vtkPVExtentEntry* vtkPVExtentEntry::New()
@@ -61,8 +64,9 @@ vtkPVExtentEntry* vtkPVExtentEntry::New()
 //---------------------------------------------------------------------------
 vtkPVExtentEntry::vtkPVExtentEntry()
 {
-  this->Label = vtkKWLabel::New();
-  this->Label->SetParent(this);
+  this->LabelWidget = vtkKWLabel::New();
+  this->LabelWidget->SetParent(this);
+  this->EntryLabel = 0;
   this->XMinEntry = vtkKWEntry::New();
   this->XMaxEntry = vtkKWEntry::New();
   this->YMinEntry = vtkKWEntry::New();
@@ -86,12 +90,20 @@ vtkPVExtentEntry::~vtkPVExtentEntry()
   this->ZMinEntry = NULL;
   this->ZMaxEntry->Delete();
   this->ZMaxEntry = NULL;
-  this->Label->Delete();
-  this->Label = NULL;
+
+  this->LabelWidget->Delete();
+  this->LabelWidget = NULL;
+  this->SetEntryLabel(0);
+}
+
+void vtkPVExtentEntry::SetLabel(const char* label)
+{
+  this->SetEntryLabel(label);
+  this->LabelWidget->SetLabel(label);
 }
 
 //---------------------------------------------------------------------------
-void vtkPVExtentEntry::Create(vtkKWApplication *pvApp,char *label,char *help)
+void vtkPVExtentEntry::Create(vtkKWApplication *pvApp)
 {
   const char* wname;
   
@@ -102,25 +114,30 @@ void vtkPVExtentEntry::Create(vtkKWApplication *pvApp,char *label,char *help)
     }
   
   // For getting the widget in a script.
-  this->SetTraceName(label);
+  this->SetTraceName(this->EntryLabel);
 
   this->SetApplication(pvApp);
+
+  // Initialize the extent of the VTK source. Normally, it
+  // is set to -VTK_LARGE_FLOAT, VTK_LARGE_FLOAT...
+  if (this->PVSource && this->PVSource->GetPVInput() && this->VariableName )
+    {
+    this->Script("eval %s Set%s [%s GetWholeExtent]",
+		 this->PVSource->GetVTKSourceTclName(), 
+		 this->GetVariableName(),
+		 this->PVSource->GetPVInput()->GetVTKDataTclName());
+    }
 
   // create the top level
   wname = this->GetWidgetName();
   this->Script("frame %s -borderwidth 0 -relief flat", wname);
 
-  if (help)
-    { 
-    this->SetBalloonHelpString(help);
-    }
-  
   // Now a label
-  if (label && label[0] != '\0')
+  if (this->EntryLabel && this->EntryLabel[0] != '\0')
     {
-    this->Label->Create(pvApp, "-width 18 -justify right");
-    this->Label->SetLabel(label);
-    this->Script("pack %s -side left", this->Label->GetWidgetName());
+    this->LabelWidget->Create(pvApp, "-width 18 -justify right");
+    this->LabelWidget->SetLabel(this->EntryLabel);
+    this->Script("pack %s -side left", this->LabelWidget->GetWidgetName());
     }
     
   // Now the entries
@@ -314,4 +331,47 @@ void vtkPVExtentEntry::AnimationMenuCallback(vtkPVAnimationInterface *ai,
     vtkErrorMacro("Bad extent animation mode.");
     }
   ai->SetControlledWidget(this);
+}
+
+vtkPVExtentEntry* vtkPVExtentEntry::ClonePrototype(vtkPVSource* pvSource,
+				 vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
+{
+  vtkPVWidget* clone = this->ClonePrototypeInternal(pvSource, map);
+  return vtkPVExtentEntry::SafeDownCast(clone);
+}
+
+void vtkPVExtentEntry::CopyProperties(vtkPVWidget* clone, 
+				      vtkPVSource* pvSource,
+			      vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
+{
+  this->Superclass::CopyProperties(clone, pvSource, map);
+  vtkPVExtentEntry* pvee = vtkPVExtentEntry::SafeDownCast(clone);
+  if (pvee)
+    {
+    pvee->SetLabel(this->EntryLabel);
+    }
+  else 
+    {
+    vtkErrorMacro("Internal error. Could not downcast clone to PVExtentEntry.");
+    }
+}
+
+//----------------------------------------------------------------------------
+int vtkPVExtentEntry::ReadXMLAttributes(vtkPVXMLElement* element,
+                                        vtkPVXMLPackageParser* parser)
+{
+  if(!this->Superclass::ReadXMLAttributes(element, parser)) { return 0; }
+  
+  // Setup the Label.
+  const char* label = element->GetAttribute("label");
+  if(label)
+    {
+    this->SetLabel(label);
+    }
+  else
+    {
+    this->SetLabel(this->VariableName);
+    }
+  
+  return 1;
 }

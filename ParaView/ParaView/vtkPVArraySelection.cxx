@@ -40,10 +40,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 #include "vtkPVArraySelection.h"
+#include "vtkPVApplication.h"
+#include "vtkPVSource.h"
 #include "vtkKWPushButton.h"
 #include "vtkKWCheckButton.h"
 #include "vtkCollection.h"
 #include "vtkObjectFactory.h"
+#include "vtkArrayMap.txx"
+#include "vtkPVXMLElement.h"
 
 //----------------------------------------------------------------------------
 vtkPVArraySelection* vtkPVArraySelection::New()
@@ -366,4 +370,47 @@ void vtkPVArraySelection::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os,indent);
   os << indent << "AttributeName: " << this->GetAttributeName();
   os << indent << "VTKReaderTclName: " << this->GetVTKReaderTclName();
+}
+vtkPVArraySelection* vtkPVArraySelection::ClonePrototype(vtkPVSource* pvSource,
+				 vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
+{
+  vtkPVWidget* clone = this->ClonePrototypeInternal(pvSource, map);
+  return vtkPVArraySelection::SafeDownCast(clone);
+}
+
+void vtkPVArraySelection::CopyProperties(vtkPVWidget* clone, 
+					 vtkPVSource* pvSource,
+			      vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
+{
+  this->Superclass::CopyProperties(clone, pvSource, map);
+  vtkPVArraySelection* pvas = vtkPVArraySelection::SafeDownCast(clone);
+  if (pvas)
+    {
+    pvas->SetAttributeName(this->AttributeName);
+    pvas->SetVTKReaderTclName(pvSource->GetVTKSourceTclName());
+    }
+  else 
+    {
+    vtkErrorMacro("Internal error. Could not downcast clone to PVArraySelection.");
+    }
+}
+
+//----------------------------------------------------------------------------
+int vtkPVArraySelection::ReadXMLAttributes(vtkPVXMLElement* element,
+                                           vtkPVXMLPackageParser* parser)
+{
+  if(!this->Superclass::ReadXMLAttributes(element, parser)) { return 0; }
+  
+  const char* attribute_name = element->GetAttribute("attribute_name");
+  if(attribute_name)
+    {
+    this->SetAttributeName(attribute_name);
+    }
+  else
+    {
+    vtkErrorMacro("No attribute_name specified.");
+    return 0;
+    }
+  
+  return 1;
 }

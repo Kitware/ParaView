@@ -11,14 +11,14 @@ if {[info exists argc]} {
 set pv(vtkTemp1) [Application GetMainWindow]
 set pv(vtkTemp43) [$pv(vtkTemp1) GetMainView]
 
-set pv(vtkTemp98) [$pv(vtkTemp1) CreatePVSource vtkImageMandelbrotSource]
+set pv(vtkTemp98) [$pv(vtkTemp1) CreatePVSource ImageMandelbrotSource]
 set pv(vtkTemp110) [$pv(vtkTemp98) GetPVWidget {Extent}]
 $pv(vtkTemp110) SetValue 0 12 0 12 0 10
 set pv(vtkTemp129) [$pv(vtkTemp98) GetPVWidget {Size}]
 $pv(vtkTemp129) SetValue 1.2 1.2 1.0 1.0
 $pv(vtkTemp98) AcceptCallback
 
-set pv(vtkTemp164) [$pv(vtkTemp1) CreatePVSource vtkImageMandelbrotSource]
+set pv(vtkTemp164) [$pv(vtkTemp1) CreatePVSource ImageMandelbrotSource]
 set pv(vtkTemp176) [$pv(vtkTemp164) GetPVWidget {Extent}]
 $pv(vtkTemp176) SetValue 13 25 0 12 0 10
 set pv(vtkTemp195) [$pv(vtkTemp164) GetPVWidget {Size}]
@@ -26,7 +26,7 @@ $pv(vtkTemp195) SetValue 1.2 1.2 1.0 1.0
 $pv(vtkTemp164) AcceptCallback
 $pv(vtkTemp1) ResetCameraCallback
 
-set pv(vtkTemp207) [$pv(vtkTemp1) CreatePVSource vtkImageMandelbrotSource]
+set pv(vtkTemp207) [$pv(vtkTemp1) CreatePVSource ImageMandelbrotSource]
 set pv(vtkTemp219) [$pv(vtkTemp207) GetPVWidget {Extent}]
 $pv(vtkTemp219) SetValue 0 12 13 25 0 10
 set pv(vtkTemp238) [$pv(vtkTemp207) GetPVWidget {Size}]
@@ -34,14 +34,14 @@ $pv(vtkTemp238) SetValue 1.2 1.2 1.0 1.0
 $pv(vtkTemp207) AcceptCallback
 $pv(vtkTemp1) ResetCameraCallback
 
-set pv(vtkTemp250) [$pv(vtkTemp1) CreatePVSource vtkImageMandelbrotSource]
+set pv(vtkTemp250) [$pv(vtkTemp1) CreatePVSource ImageMandelbrotSource]
 set pv(vtkTemp262) [$pv(vtkTemp250) GetPVWidget {Extent}]
 $pv(vtkTemp262) SetValue 13 25 13 25 0 10
 set pv(vtkTemp281) [$pv(vtkTemp250) GetPVWidget {Size}]
 $pv(vtkTemp281) SetValue 1.2 1.2 1.0 1.0
 $pv(vtkTemp250) AcceptCallback
 
-set pv(vtkTemp294) [$pv(vtkTemp1) ClipCallback]
+set pv(vtkTemp294) [$pv(vtkTemp1) CreatePVSource Clip]
 set pv(vtkTemp296) [$pv(vtkTemp294) GetPVWidget {Clip Function}]
 set pv(vtkTemp295) [$pv(vtkTemp296) GetPVWidget {Plane}]
 set pv(vtkTemp303) [$pv(vtkTemp295) GetCenterEntry]
@@ -50,13 +50,13 @@ set pv(vtkTemp307) [$pv(vtkTemp295) GetNormalEntry]
 $pv(vtkTemp307) SetValue 0 0 -1
 $pv(vtkTemp294) AcceptCallback
 
-set pv(vtkTemp327) [$pv(vtkTemp1) CreatePVSource vtkDataSetSurfaceFilter]
+set pv(vtkTemp327) [$pv(vtkTemp1) CreatePVSource DataSetSurfaceFilter]
 $pv(vtkTemp327) AcceptCallback
 $pv(vtkTemp1) SetCurrentPVSource $pv(vtkTemp207)
 $pv(vtkTemp1) ShowCurrentSourceProperties
 
 
-set pv(vtkTemp366) [$pv(vtkTemp1) ClipCallback]
+set pv(vtkTemp366) [$pv(vtkTemp1) CreatePVSource Clip]
 set pv(vtkTemp368) [$pv(vtkTemp366) GetPVWidget {Clip Function}]
 set pv(vtkTemp367) [$pv(vtkTemp368) GetPVWidget {Plane}]
 set pv(vtkTemp375) [$pv(vtkTemp367) GetCenterEntry]
@@ -67,13 +67,13 @@ set pv(vtkTemp383) [$pv(vtkTemp366) GetPVWidget {Offset}]
 $pv(vtkTemp383) SetValue 0.2
 $pv(vtkTemp366) AcceptCallback
 
-set pv(vtkTemp395) [$pv(vtkTemp1) CreatePVSource vtkDataSetSurfaceFilter]
+set pv(vtkTemp395) [$pv(vtkTemp1) CreatePVSource DataSetSurfaceFilter]
 $pv(vtkTemp395) AcceptCallback
 $pv(vtkTemp1) SetCurrentPVSource $pv(vtkTemp164)
 $pv(vtkTemp1) ShowCurrentSourceProperties
 
 
-set pv(vtkTemp416) [$pv(vtkTemp1) CutCallback]
+set pv(vtkTemp416) [$pv(vtkTemp1) CreatePVSource Cut]
 set pv(vtkTemp418) [$pv(vtkTemp416) GetPVWidget {Cut Function}]
 set pv(vtkTemp417) [$pv(vtkTemp418) GetPVWidget {Plane}]
 set pv(vtkTemp425) [$pv(vtkTemp417) GetCenterEntry]
@@ -83,7 +83,7 @@ $pv(vtkTemp1) SetCurrentPVSource $pv(vtkTemp98)
 $pv(vtkTemp1) ShowCurrentSourceProperties
 
 
-set pv(vtkTemp446) [$pv(vtkTemp1) CutCallback]
+set pv(vtkTemp446) [$pv(vtkTemp1) CreatePVSource Cut]
 set pv(vtkTemp449) [$pv(vtkTemp446) GetPVWidget {Cut Function}]
 set pv(vtkTemp448) [$pv(vtkTemp449) GetPVWidget {Plane}]
 set pv(vtkTemp455) [$pv(vtkTemp448) GetCenterEntry]

@@ -45,6 +45,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVData.h"
 #include "vtkKWLabel.h"
 #include "vtkObjectFactory.h"
+#include "vtkPVXMLElement.h"
 
 //----------------------------------------------------------------------------
 vtkPVScalarRangeLabel* vtkPVScalarRangeLabel::New()
@@ -192,4 +193,69 @@ void vtkPVScalarRangeLabel::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os,indent);
   os << indent << "ArrayMenu: " << this->GetArrayMenu() << endl;
   os << indent << "Range: " << this->GetRange() << endl;
+}
+
+vtkPVScalarRangeLabel* vtkPVScalarRangeLabel::ClonePrototype(
+  vtkPVSource* pvSource, vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
+{
+  vtkPVWidget* clone = this->ClonePrototypeInternal(pvSource, map);
+  return vtkPVScalarRangeLabel::SafeDownCast(clone);
+}
+
+void vtkPVScalarRangeLabel::CopyProperties(vtkPVWidget* clone, 
+					   vtkPVSource* pvSource,
+			      vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
+{
+  this->Superclass::CopyProperties(clone, pvSource, map);
+  vtkPVScalarRangeLabel* pvsrl = vtkPVScalarRangeLabel::SafeDownCast(clone);
+  if (pvsrl)
+    {
+    if (this->ArrayMenu)
+      {
+      // This will either clone or return a previously cloned
+      // object.
+      vtkPVArrayMenu* am = this->ArrayMenu->ClonePrototype(pvSource, map);
+      pvsrl->SetArrayMenu(am);
+      am->Delete();
+      }
+    }
+  else 
+    {
+    vtkErrorMacro("Internal error. Could not downcast clone to PVScalarRangeLabel.");
+    }
+}
+
+//----------------------------------------------------------------------------
+int vtkPVScalarRangeLabel::ReadXMLAttributes(vtkPVXMLElement* element,
+                                             vtkPVXMLPackageParser* parser)
+{
+  if(!this->Superclass::ReadXMLAttributes(element, parser)) { return 0; }  
+  
+  // Setup the ArrayMenu.
+  const char* array_menu = element->GetAttribute("array_menu");
+  if(!array_menu)
+    {
+    vtkErrorMacro("No array_menu attribute.");
+    return 0;
+    }
+  
+  vtkPVXMLElement* ame = element->LookupElement(array_menu);
+  if (!ame)
+    {
+    vtkErrorMacro("Couldn't find ArrayMenu element " << array_menu);
+    return 0;
+    }
+  vtkPVWidget* w = this->GetPVWidgetFromParser(ame, parser);
+  vtkPVArrayMenu* amw = vtkPVArrayMenu::SafeDownCast(w);
+  if(!amw)
+    {
+    if(w) { w->Delete(); }
+    vtkErrorMacro("Couldn't get ArrayMenu widget " << array_menu);
+    return 0;
+    }
+  amw->AddDependent(this);
+  this->SetArrayMenu(amw);
+  amw->Delete();  
+  
+  return 1;
 }

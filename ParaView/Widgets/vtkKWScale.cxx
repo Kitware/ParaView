@@ -135,6 +135,9 @@ void vtkKWScale::Create(vtkKWApplication *app, const char *args)
   this->Script("%s configure %s",this->ScaleWidget->GetWidgetName(),args);
   this->Script("%s configure -resolution %f -highlightthickness 0",
                this->ScaleWidget->GetWidgetName(),this->Resolution);
+  this->Script("%s configure -from %f -to %f",
+               this->ScaleWidget->GetWidgetName(),
+	       this->Range[0], this->Range[1]);
   this->ScaleWidget->SetCommand(this, "ScaleValueChanged");
   this->Script("pack %s -side bottom -fill x -expand yes -pady 0 -padx 0",
                this->ScaleWidget->GetWidgetName());
@@ -149,8 +152,12 @@ void vtkKWScale::SetRange(float min, float max)
 {
   this->Range[0] = min;
   this->Range[1] = max;
-  this->Script("%s configure -from %f -to %f",
-               this->ScaleWidget->GetWidgetName(),min,max);
+  if (this->Application)
+    {
+    this->Script("%s configure -from %f -to %f",
+		 this->ScaleWidget->GetWidgetName(),min,max);
+    }
+  this->Modified();
 }
 
 void vtkKWScale::GetRange(float &min, float &max)
@@ -227,7 +234,6 @@ void vtkKWScale::ScaleValueChanged(float num)
 
   this->Script("%s set %f", this->ScaleWidget->GetWidgetName(),num);
   
-  
   this->Value = num;
   if (this->Entry)
     {
@@ -289,11 +295,11 @@ void vtkKWScale::SetCommand(vtkKWObject* CalledObject, const char *CommandString
 
 void vtkKWScale::SetBalloonHelpString( const char *string )
 {
-  if ( !this->Application )
-    {
-    vtkErrorMacro("Must set application before setting balloon help string");
-    return;
-    }
+//    if ( !this->Application )
+//      {
+//      vtkErrorMacro("Must set application before setting balloon help string");
+//      return;
+//      }
   
   this->ScaleWidget->SetBalloonHelpString( string );
   if ( this->Entry )

@@ -166,7 +166,6 @@ public:
   vtkGetMacro(MajorVersion, int);
   vtkGetMacro(MinorVersion, int);
 
-
   // Description:
   // Display the on-line help and about dialog for this application.
   // Over-writing vtkKWApplication defaults.
@@ -192,6 +191,10 @@ public:
   void LogStartEvent(char* str);
   void LogEndEvent(char* str);
 
+  //BTX
+  static const char* const LoadComponentProc;
+  //ETX
+
 protected:
   vtkPVApplication();
   ~vtkPVApplication();
@@ -209,10 +212,25 @@ protected:
   // of the vtkCollectPolydata filter.
   static int GlobalLODFlag;
 
+  int RunningParaViewScript;
+
   vtkMultiProcessController *Controller;
 
   vtkPVApplication(const vtkPVApplication&); // Not implemented
   void operator=(const vtkPVApplication&); // Not implemented
+
+  static int CheckForArgument(int argc, char* argv[], const char* arg,
+			      int& index);
+  static int IsParaViewScriptFile(const char* arg);
+
+  //BTX
+  enum
+  {
+    NUM_ARGS=1
+  };
+  static const char ArgumentList[vtkPVApplication::NUM_ARGS][128];
+  //ETX
+  
 };
 
 #endif

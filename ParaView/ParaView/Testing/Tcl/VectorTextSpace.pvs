@@ -18,18 +18,18 @@ if {[info exists argc]} {
 
 set pv(vtkTemp1) [Application GetMainWindow]
 set pv(vtkTemp43) [$pv(vtkTemp1) GetMainView]
-set pv(vtkTemp89) [$pv(vtkTemp1) GetGlyphSource Arrow]
-set pv(vtkTemp93) [$pv(vtkTemp1) GetGlyphSource Cone]
-set pv(vtkTemp97) [$pv(vtkTemp1) GetGlyphSource Sphere]
-set pv(vtkTemp98) [$pv(vtkTemp1) CreatePVSource vtkConeSource]
+set pv(vtkTemp89) [$pv(vtkTemp1) GetPVSource GlyphSources Arrow0]
+set pv(vtkTemp93) [$pv(vtkTemp1) GetPVSource GlyphSources Cone0]
+set pv(vtkTemp97) [$pv(vtkTemp1) GetPVSource GlyphSources Sphere0]
+set pv(vtkTemp98) [$pv(vtkTemp1) CreatePVSource ConeSource]
 $pv(vtkTemp98) AcceptCallback
-set pv(vtkTemp167) [$pv(vtkTemp1) CreatePVSource vtkShrinkPolyData]
+set pv(vtkTemp167) [$pv(vtkTemp1) CreatePVSource ShrinkPolyData]
 $pv(vtkTemp167) AcceptCallback
-set pv(vtkTemp190) [$pv(vtkTemp1) CreatePVSource vtkSphereSource]
+set pv(vtkTemp190) [$pv(vtkTemp1) CreatePVSource SphereSource]
 $pv(vtkTemp190) AcceptCallback
-set pv(vtkTemp234) [$pv(vtkTemp1) CreatePVSource vtkCylinderSource]
+set pv(vtkTemp234) [$pv(vtkTemp1) CreatePVSource CylinderSource]
 $pv(vtkTemp234) AcceptCallback
-set pv(vtkTemp270) [$pv(vtkTemp1) CreatePVSource vtkVectorText]
+set pv(vtkTemp270) [$pv(vtkTemp1) CreatePVSource VectorText]
 set pv(vtkTemp282) [$pv(vtkTemp270) GetPVWidget {Text}]
 $pv(vtkTemp282) SetValue {Hello World}
 $pv(vtkTemp270) AcceptCallback

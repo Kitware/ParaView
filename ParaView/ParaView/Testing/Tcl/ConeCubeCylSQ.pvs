@@ -10,12 +10,12 @@ if {[info exists argc]} {
 
 set pv(vtkTemp1) [Application GetMainWindow]
 set pv(vtkTemp43) [$pv(vtkTemp1) GetMainView]
-set pv(vtkTemp89) [$pv(vtkTemp1) GetGlyphSource Arrow]
-set pv(vtkTemp93) [$pv(vtkTemp1) GetGlyphSource Cone]
-set pv(vtkTemp97) [$pv(vtkTemp1) GetGlyphSource Sphere]
+set pv(vtkTemp89) [$pv(vtkTemp1) GetPVSource GlyphSources Arrow0]
+set pv(vtkTemp93) [$pv(vtkTemp1) GetPVSource GlyphSources Cone0]
+set pv(vtkTemp97) [$pv(vtkTemp1) GetPVSource GlyphSources Sphere0]
 
 
-set pv(vtkTemp98) [$pv(vtkTemp1) CreatePVSource vtkSphereSource]
+set pv(vtkTemp98) [$pv(vtkTemp1) CreatePVSource SphereSource]
 set pv(vtkTemp118) [$pv(vtkTemp98) GetPVWidget {Theta Resolution}]
 $pv(vtkTemp118) SetValue 100
 set pv(vtkTemp127) [$pv(vtkTemp98) GetPVWidget {Phi Resolution}]
@@ -24,32 +24,32 @@ set pv(vtkTemp110) [$pv(vtkTemp98) GetPVWidget {Center}]
 $pv(vtkTemp110) SetValue 2 2 0
 $pv(vtkTemp98) AcceptCallback
 
-set pv(vtkTemp180) [$pv(vtkTemp1) CreatePVSource vtkDecimatePro]
+set pv(vtkTemp180) [$pv(vtkTemp1) CreatePVSource DecimatePro]
 set pv(vtkTemp194) [$pv(vtkTemp180) GetPVWidget {TargetReduction}]
 $pv(vtkTemp194) SetValue 0.99
 $pv(vtkTemp180) AcceptCallback
 
 
-set pv(vtkTemp212) [$pv(vtkTemp1) CreatePVSource vtkConeSource]
+set pv(vtkTemp212) [$pv(vtkTemp1) CreatePVSource ConeSource]
 $pv(vtkTemp212) AcceptCallback
 
-set pv(vtkTemp364) [$pv(vtkTemp1) CreatePVSource vtkExtractEdges]
+set pv(vtkTemp364) [$pv(vtkTemp1) CreatePVSource ExtractEdges]
 $pv(vtkTemp364) AcceptCallback
 
-set pv(vtkTemp416) [$pv(vtkTemp1) CreatePVSource vtkCylinderSource]
+set pv(vtkTemp416) [$pv(vtkTemp1) CreatePVSource CylinderSource]
 set pv(vtkTemp437) [$pv(vtkTemp416) GetPVWidget {Center}]
 $pv(vtkTemp437) SetValue 2 0 0
 set pv(vtkTemp428) [$pv(vtkTemp416) GetPVWidget {Resolution}]
 $pv(vtkTemp428) SetValue 30
 $pv(vtkTemp416) AcceptCallback
 
-set pv(vtkTemp452) [$pv(vtkTemp1) CreatePVSource vtkPLinearExtrusionFilter]
+set pv(vtkTemp452) [$pv(vtkTemp1) CreatePVSource PLinearExtrusionFilter]
 set pv(vtkTemp466) [$pv(vtkTemp452) GetPVWidget {ScaleFactor}]
 $pv(vtkTemp466) SetValue .5
 $pv(vtkTemp452) AcceptCallback
 
 
-set pv(vtkTemp486) [$pv(vtkTemp1) CreatePVSource vtkSuperquadricSource]
+set pv(vtkTemp486) [$pv(vtkTemp1) CreatePVSource SuperquadricSource]
 set pv(vtkTemp526) [$pv(vtkTemp486) GetPVWidget {Toroidal}]
 $pv(vtkTemp526) SetState 1
 set pv(vtkTemp498) [$pv(vtkTemp486) GetPVWidget {Center}]
@@ -58,7 +58,7 @@ set pv(vtkTemp514) [$pv(vtkTemp486) GetPVWidget {Thickness}]
 $pv(vtkTemp514) SetValue 0.4
 $pv(vtkTemp486) AcceptCallback
 
-set pv(vtkTemp536) [$pv(vtkTemp1) CreatePVSource vtkOutlineCornerFilter]
+set pv(vtkTemp536) [$pv(vtkTemp1) CreatePVSource OutlineCornerFilter]
 $pv(vtkTemp536) AcceptCallback
 
 [$pv(vtkTemp486) GetPVOutput] SetVisibility 1

@@ -53,17 +53,25 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __vtkPVWidget_h
 
 #include "vtkKWWidget.h"
-#include "vtkStringList.h"
-#include "vtkPVSource.h"
-#include "vtkPVApplication.h"
 
+class vtkKWMenu;
+class vtkPVSource;
+class vtkPVApplication;
 class vtkPVAnimationInterface;
+class vtkPVXMLElement;
+class vtkPVXMLPackageParser;
+class vtkPVWindow;
 
+//BTX
+template <class key, class data> 
+class vtkArrayMap;
+template <class value>
+class vtkLinkedList;
+//ETX
 
 class VTK_EXPORT vtkPVWidget : public vtkKWWidget
 {
 public:
-  static vtkPVWidget* New();
   vtkTypeMacro(vtkPVWidget, vtkKWWidget);
   void PrintSelf(ostream& os, vtkIndent indent);
 
@@ -80,7 +88,7 @@ public:
   // Description:
   // The methods get called when reset is called.  
   // It can also get called on its own.  If the widget has options 
-  // or configuration values dependant on the VTK object, this method
+  // or configuration values dependent on the VTK object, this method
   // set these configuation object using the VTK object.
   virtual void Update();
 
@@ -90,7 +98,15 @@ public:
   // on this widget, it will call Update on widgets in this list.  
   // I could have used event callbacks, but descided
   // it would be easier to just keep a collection of dependances.
-  void AddDependant(vtkPVWidget *widget);
+  void AddDependent(vtkPVWidget *widget);
+
+  // Description
+  // Remove a dependent
+  void RemoveDependent(vtkPVWidget *widget);
+
+  // Description
+  // Remove all the dependents
+  void RemoveAllDependents();
 
   // Description:
   // This commands is an optional action that will be called when
@@ -111,8 +127,7 @@ public:
   
   // Description:
   // Conveniance method that casts the application to a PV application.
-  vtkPVApplication *GetPVApplication() 
-    {return vtkPVApplication::SafeDownCast(this->Application);}
+  vtkPVApplication *GetPVApplication();
 
   // Description:
   // Save this widget to a file.  
@@ -130,6 +145,37 @@ public:
     vtkKWMenu* vtkNotUsed(menu), 
     vtkPVAnimationInterface* vtkNotUsed(object) ) {};
  
+  // Description:
+  // Create the widget. All sub-classes should use this
+  // signature because widgets are created using vtkPVWidget
+  // pointers after cloning.
+  virtual void Create(vtkKWApplication* app) = 0;
+
+  // Description:
+  // Need the source to get the input.
+  // I would like to get rid of this ivar.
+  // It is not reference counted for fear of loops.
+  void SetPVSource(vtkPVSource *pvs) { this->PVSource = pvs;}
+  vtkPVSource *GetPVSource() { return this->PVSource;}
+
+//BTX
+  // Description:
+  // Creates and returns a copy of this widget. It will create
+  // a new instance of the same type as the current object
+  // using NewInstance() and then copy some necessary state 
+  // parameters.
+  vtkPVWidget* ClonePrototype(vtkPVSource* pvSource,
+			      vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
+    {
+      return this->ClonePrototypeInternal(pvSource, map);
+    }
+//ETX
+
+  // Description:
+  // Called by vtkPVXMLPackageParser to configure the widget from XML
+  // attributes.
+  virtual int ReadXMLAttributes(vtkPVXMLElement* element,
+                                vtkPVXMLPackageParser* parser);
 protected:
   vtkPVWidget();
   ~vtkPVWidget();
@@ -143,12 +189,24 @@ protected:
   // added to the trace file.
   int ModifiedFlag;
 
-  // There are ssveral ways I could do this.
-  // This sets up a widget tree of dependancies.
-  vtkCollection *DependantCollection;
+  vtkPVSource* PVSource;
+
+//BTX
+  virtual vtkPVWidget* ClonePrototypeInternal(vtkPVSource* pvSource,
+			      vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
+  virtual void CopyProperties(vtkPVWidget* clone, vtkPVSource* pvSource,
+			      vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
+
+
+  vtkLinkedList<void*>* Dependents;
+//ETX
 
   vtkPVWidget(const vtkPVWidget&); // Not implemented
   void operator=(const vtkPVWidget&); // Not implemented
+
+  vtkPVWidget* GetPVWidgetFromParser(vtkPVXMLElement* element,
+                                     vtkPVXMLPackageParser* parser);
+  vtkPVWindow* GetPVWindowFormParser(vtkPVXMLPackageParser* parser);
 };
 
 #endif

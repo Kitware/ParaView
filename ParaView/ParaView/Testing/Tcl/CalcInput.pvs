@@ -14,21 +14,21 @@ if {[info exists argc]} {
 
 set pv(vtkTemp1) [Application GetMainWindow]
 set pv(vtkTemp43) [$pv(vtkTemp1) GetMainView]
-set pv(vtkTemp89) [$pv(vtkTemp1) GetGlyphSource Arrow]
-set pv(vtkTemp93) [$pv(vtkTemp1) GetGlyphSource Cone]
-set pv(vtkTemp97) [$pv(vtkTemp1) GetGlyphSource Sphere]
+set pv(vtkTemp89) [$pv(vtkTemp1) GetPVSource GlyphSources Arrow0]
+set pv(vtkTemp93) [$pv(vtkTemp1) GetPVSource GlyphSources Cone0]
+set pv(vtkTemp97) [$pv(vtkTemp1) GetPVSource GlyphSources Sphere0]
 
-set pv(vtkTemp98) [$pv(vtkTemp1) CreatePVSource vtkSphereSource]
+set pv(vtkTemp98) [$pv(vtkTemp1) CreatePVSource SphereSource]
 $pv(vtkTemp98) AcceptCallback
 
-set pv(vtkTemp182) [$pv(vtkTemp1) CalculatorCallback]
+set pv(vtkTemp182) [$pv(vtkTemp1) CreatePVSource Calculator]
 $pv(vtkTemp182) AddScalarVariable Normals_0 Normals 0
 $pv(vtkTemp182) AddScalarVariable Normals_1 Normals 1
 $pv(vtkTemp182) AddScalarVariable Normals_2 Normals 2
 $pv(vtkTemp182) SetFunctionLabel {Normals_0+Normals_1+Normals_2}
 $pv(vtkTemp182) AcceptCallback
 
-set pv(vtkTemp211) [$pv(vtkTemp1) CreatePVSource vtkCylinderSource]
+set pv(vtkTemp211) [$pv(vtkTemp1) CreatePVSource CylinderSource]
 set pv(vtkTemp232) [$pv(vtkTemp211) GetPVWidget {Center}]
 $pv(vtkTemp232) SetValue 1 0 0
 set pv(vtkTemp233) [$pv(vtkTemp211) GetPVWidget {Resolution}]
@@ -36,7 +36,7 @@ $pv(vtkTemp233) SetValue 12
 $pv(vtkTemp211) AcceptCallback
 $pv(vtkTemp1) ResetCameraCallback
 
-set pv(vtkTemp247) [$pv(vtkTemp1) CreatePVSource vtkShrinkPolyData]
+set pv(vtkTemp247) [$pv(vtkTemp1) CreatePVSource ShrinkPolyData]
 $pv(vtkTemp247) AcceptCallback
 
 $pv(vtkTemp1) SetCurrentPVSource $pv(vtkTemp182)

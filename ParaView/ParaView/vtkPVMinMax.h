@@ -56,11 +56,8 @@ public:
   static vtkPVMinMax* New();
   vtkTypeMacro(vtkPVMinMax, vtkPVObjectWidget);
 
-  void Create(vtkKWApplication *pvApp, char *minLabel, char *maxLabel,
-              float min, float max, float resolution,
-              char *setCmd, char *getMinCmd, char *getMaxCmd, char *minHelp,
-              char *maxHelp);
-  
+  void Create(vtkKWApplication *pvApp);
+
   // Description:
   // Called when accept button is pushed.  
   // Sets objects variable to the widgets value.
@@ -82,6 +79,13 @@ public:
   void SetResolution(float res);
   float GetResolution() { return this->MinScale->GetResolution(); }
   void SetRange(float min, float max);
+
+  // Description:
+  // These commands are used to set/get values on/from the
+  // underlying VTK object.
+  vtkSetStringMacro(GetMinCommand);
+  vtkSetStringMacro(GetMaxCommand);
+  vtkSetStringMacro(SetCommand);
   
   // Description:
   // Save this widget to a file
@@ -95,6 +99,32 @@ public:
   // Callback for max scale
   void MaxValueCallback();
   
+  // Description:
+  // Label for the minimum value scale.
+  void SetMinimumLabel(const char* label);
+
+  // Description:
+  // Label for the maximum value scale.
+  void SetMaximumLabel(const char* label);
+
+  // Description:
+  // Set the balloon help string for the minimum value scale.
+  void SetMinimumHelp(const char* help);
+
+  // Description:
+  // Set the balloon help string for the maximum value scale.
+  void SetMaximumHelp(const char* help);
+
+//BTX
+  // Description:
+  // Creates and returns a copy of this widget. It will create
+  // a new instance of the same type as the current object
+  // using NewInstance() and then copy some necessary state 
+  // parameters.
+  vtkPVMinMax* ClonePrototype(vtkPVSource* pvSource,
+				 vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
+//ETX
+
 protected:
   vtkPVMinMax();
   ~vtkPVMinMax();
@@ -109,13 +139,23 @@ protected:
   char *GetMinCommand;
   char *GetMaxCommand;
   char *SetCommand;
+
+  char* MinHelp;
+  char* MaxHelp;
+  vtkSetStringMacro(MinHelp);
+  vtkSetStringMacro(MaxHelp);
+
+//BTX
+  virtual void CopyProperties(vtkPVWidget* clone, vtkPVSource* pvSource,
+			      vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
+//ETX
   
-  vtkSetStringMacro(GetMinCommand);
-  vtkSetStringMacro(GetMaxCommand);
-  vtkSetStringMacro(SetCommand);
 
   vtkPVMinMax(const vtkPVMinMax&); // Not implemented
   void operator=(const vtkPVMinMax&); // Not implemented
+
+  int ReadXMLAttributes(vtkPVXMLElement* element,
+                        vtkPVXMLPackageParser* parser);
 };
 
 #endif

@@ -10,21 +10,21 @@ if {[info exists argc]} {
 
 set pv(vtkTemp1) [Application GetMainWindow]
 set pv(vtkTemp43) [$pv(vtkTemp1) GetMainView]
-set pv(vtkTemp89) [$pv(vtkTemp1) GetGlyphSource Arrow]
-set pv(vtkTemp93) [$pv(vtkTemp1) GetGlyphSource Cone]
-set pv(vtkTemp97) [$pv(vtkTemp1) GetGlyphSource Sphere]
-set pv(vtkTemp98) [$pv(vtkTemp1) CreatePVSource vtkSphereSource]
+set pv(vtkTemp89) [$pv(vtkTemp1) GetPVSource GlyphSources Arrow0]
+set pv(vtkTemp93) [$pv(vtkTemp1) GetPVSource GlyphSources Cone0]
+set pv(vtkTemp97) [$pv(vtkTemp1) GetPVSource GlyphSources Sphere0]
+set pv(vtkTemp98) [$pv(vtkTemp1) CreatePVSource SphereSource]
 $pv(vtkTemp98) AcceptCallback
 set pv(vtkTemp118) [$pv(vtkTemp98) GetPVWidget {Theta Resolution}]
 $pv(vtkTemp118) SetValue 16
 set pv(vtkTemp127) [$pv(vtkTemp98) GetPVWidget {Phi Resolution}]
 $pv(vtkTemp127) SetValue 16
 $pv(vtkTemp98) AcceptCallback
-set pv(vtkTemp180) [$pv(vtkTemp1) CreatePVSource vtkElevationFilter]
+set pv(vtkTemp180) [$pv(vtkTemp1) CreatePVSource ElevationFilter]
 set pv(vtkTemp199) [$pv(vtkTemp180) GetPVWidget {HighPoint}]
 $pv(vtkTemp199) SetValue 1 1 1
 $pv(vtkTemp180) AcceptCallback
-set pv(vtkTemp215) [$pv(vtkTemp1) ThresholdCallback]
+set pv(vtkTemp215) [$pv(vtkTemp1) CreatePVSource Threshold]
 set pv(vtkTemp229) [$pv(vtkTemp215) GetPVWidget {Lower Threshold}]
 $pv(vtkTemp229) SetMinValue 0.069000
 $pv(vtkTemp229) SetMaxValue 0.255880

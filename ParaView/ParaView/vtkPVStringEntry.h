@@ -56,7 +56,7 @@ public:
   static vtkPVStringEntry* New();
   vtkTypeMacro(vtkPVStringEntry, vtkPVObjectWidget);
 
-  void Create(vtkKWApplication *pvApp, char *label, char *help);
+  void Create(vtkKWApplication *pvApp);
   
   // Description:
   // Called when accept button is pushed.  
@@ -70,21 +70,51 @@ public:
   // Side effect is to turn the modified flag off.
   virtual void Reset();
 
-  
   // Description:
   // This method allows scripts to modify the widgets value.
   void SetValue(const char* fileName);
   const char* GetValue() {return this->Entry->GetValue();}
-  
+
+  // Description:
+  // The label.
+  void SetLabel(const char* label);
+
+  // Description:
+  // This class redefines SetBalloonHelpString since it
+  // has to forward the call to a widget it contains.
+  virtual void SetBalloonHelpString(const char *str);
+
+//BTX
+  // Description:
+  // Creates and returns a copy of this widget. It will create
+  // a new instance of the same type as the current object
+  // using NewInstance() and then copy some necessary state 
+  // parameters.
+  vtkPVStringEntry* ClonePrototype(vtkPVSource* pvSource,
+				 vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
+//ETX
+
 protected:
   vtkPVStringEntry();
   ~vtkPVStringEntry();
   
-  vtkKWLabel *Label;
+  vtkKWLabel *LabelWidget;
   vtkKWEntry *Entry;
 
   vtkPVStringEntry(const vtkPVStringEntry&); // Not implemented
   void operator=(const vtkPVStringEntry&); // Not implemented
+
+  vtkSetStringMacro(EntryLabel);
+  vtkGetStringMacro(EntryLabel);
+  char* EntryLabel;
+
+//BTX
+  virtual void CopyProperties(vtkPVWidget* clone, vtkPVSource* pvSource,
+			      vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
+//ETX
+  
+  int ReadXMLAttributes(vtkPVXMLElement* element,
+                        vtkPVXMLPackageParser* parser);
 };
 
 #endif

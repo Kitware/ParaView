@@ -43,7 +43,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVApplication.h"
 #include "vtkStringList.h"
 #include "vtkObjectFactory.h"
-#include "vtkPVSourceInterface.h"
 #include "vtkKWLabel.h"
 #include "vtkKWPushButton.h"
 #include "vtkPVData.h"
@@ -105,7 +104,7 @@ void vtkPVThreshold::CreateProperties()
 
   this->AddInputMenu("Input", "PVInput", "vtkDataSet",
                      "Set the input to this filter.",
-                     this->GetPVWindow()->GetSources());
+                     this->GetPVWindow()->GetSourceList("Sources"));
   
   this->AttributeModeFrame->SetParent(this->GetParameterFrame()->GetFrame());
   this->AttributeModeFrame->Create(pvApp, "frame", "");
@@ -141,12 +140,18 @@ void vtkPVThreshold::CreateProperties()
   this->MinMaxScale->SetParent(this->GetParameterFrame()->GetFrame());
   this->MinMaxScale->SetObjectVariable(this->GetVTKSourceTclName(), "");
   this->MinMaxScale->SetModifiedCommand(this->GetTclName(), "SetAcceptButtonColorToRed");
-  this->MinMaxScale->Create(pvApp, "Lower Threshold", "Upper Threshold",
-                            range[0], range[1], (range[1] - range[0]) / 100.0,
-                            "ThresholdBetween", "GetLowerThreshold",
-                            "GetUpperThreshold",
-                            "Choose the lower value of the threshold",
-                            "Choose the upper value of the threshold");
+  this->MinMaxScale->SetRange(range[0], range[1]);
+  this->MinMaxScale->SetResolution((range[1] - range[0]) / 100.0);
+  this->MinMaxScale->SetMinimumLabel("Lower Threshold");
+  this->MinMaxScale->SetMaximumLabel("Upper Threshold");
+  this->MinMaxScale->SetMinimumHelp("Choose the lower value of the threshold");
+  this->MinMaxScale->SetMaximumHelp("Choose the upper value of the threshold");
+  this->MinMaxScale->SetSetCommand("ThresholdBetween");
+  this->MinMaxScale->SetGetMinCommand("GetLowerThreshold");
+  this->MinMaxScale->SetGetMaxCommand("GetUpperThreshold");
+  pvApp->BroadcastScript("%s ThresholdBetween %f %f",
+			 this->GetVTKSourceTclName(), range[0], range[1]);
+  this->MinMaxScale->Create(pvApp);
   this->AddPVWidget(this->MinMaxScale);
   
   this->AllScalarsCheck->SetParent(this->GetParameterFrame()->GetFrame());
@@ -155,7 +160,8 @@ void vtkPVThreshold::CreateProperties()
                                            "AllScalars");
   this->AllScalarsCheck->SetModifiedCommand(this->GetTclName(), 
                                            "SetAcceptButtonColorToRed");
-  this->AllScalarsCheck->Create(pvApp, "If AllScalars is checked, then a cell is only included if all its points are within the threshold. This is only relevant for point data.");
+  this->AllScalarsCheck->SetBalloonHelpString("If AllScalars is checked, then a cell is only included if all its points are within the threshold. This is only relevant for point data.");
+  this->AllScalarsCheck->Create(pvApp);
   this->AddPVWidget(this->AllScalarsCheck);
   this->AllScalarsCheck->SetState(1);
 
@@ -208,8 +214,7 @@ void vtkPVThreshold::UpdateMinMaxScale()
 
   this->MinMaxScale->SetResolution((range[1] - range[0]) / 100.0);
   this->MinMaxScale->SetRange(range[0], range[1]);
-  this->MinMaxScale->SetMaxValue(range[1]);
-  this->MinMaxScale->SetMinValue(range[0]);
+  this->MinMaxScale->Reset();
 }
 
 //----------------------------------------------------------------------------
@@ -291,76 +296,38 @@ void vtkPVThreshold::SaveInTclScript(ofstream *file)
   char* tempName;
   char *charFound;
   int pos;
-  vtkPVSourceInterface *pvsInterface =
-        this->GetPVInput()->GetPVSource()->GetInterface();
+  vtkPVSource *pvs = this->GetPVInput()->GetPVSource();
   
-  if (this->DefaultScalarsName)
-    {
-    if (pvsInterface && strcmp(pvsInterface->GetSourceClassName(),
-                               "vtkGenericEnSightReader") == 0)
-      {
-      char *charFound;
-      int pos;
-      char *dataName = new char[strlen(this->GetPVInput()->GetVTKDataTclName()) + 1];
-      strcpy(dataName, this->GetPVInput()->GetVTKDataTclName());
-      
-      charFound = strrchr(dataName, 't');
-      tempName = strtok(dataName, "O");
-      *file << tempName << " GetOutput ";
-      pos = charFound - dataName + 1;
-      *file << dataName+pos << "]\n\t";
-      delete [] dataName;
-      }
-    else if (pvsInterface && strcmp(pvsInterface->GetSourceClassName(),
-                                    "vtkPDataSetReader") == 0)
-      {
-      char *dataName = new char[strlen(this->GetPVInput()->GetVTKDataTclName()) + 1];
-      strcpy(dataName, this->GetPVInput()->GetVTKDataTclName());
-      tempName = strtok(dataName, "O");
-      *file << tempName << " GetOutput]\n\t";
-      delete [] dataName;
-      }
-    else
-      {
-      *file << this->GetPVInput()->GetPVSource()->GetVTKSourceTclName()
-            << " GetOutput]\n\t";
-      }
-    }
 
   *file << this->VTKSource->GetClassName() << " "
         << this->VTKSourceTclName << "\n";
   
   *file << "\t" << this->VTKSourceTclName << " SetInput [";
 
-  if (!this->DefaultScalarsName)
+  if (pvs && strcmp(pvs->GetSourceClassName(), "vtkGenericEnSightReader") == 0)
     {
-    if (pvsInterface && strcmp(pvsInterface->GetSourceClassName(),
-                               "vtkGenericEnSightReader") == 0)
-      {
-      char *dataName = this->GetPVInput()->GetVTKDataTclName();
-      
-      charFound = strrchr(dataName, 't');
-      tempName = strtok(dataName, "O");
-      *file << tempName << " GetOutput ";
-      pos = charFound - dataName + 1;
-      *file << dataName+pos << "]\n\t";
-      delete [] dataName;
-      }
-    else if (pvsInterface && strcmp(pvsInterface->GetSourceClassName(),
-                                    "vtkPDataSetReader") == 0)
-      {
-      char *dataName = new char[strlen(this->GetPVInput()->GetVTKDataTclName()) + 1];
-      strcpy(dataName, this->GetPVInput()->GetVTKDataTclName());
-      
-      tempName = strtok(dataName, "O");
-      *file << tempName << " GetOutput]\n\t";
-      delete [] dataName;
-      }
-    else
-      {
-      *file << this->GetPVInput()->GetPVSource()->GetVTKSourceTclName()
-            << " GetOutput]\n\t";
-      }
+    char *dataName = this->GetPVInput()->GetVTKDataTclName();
+    
+    charFound = strrchr(dataName, 't');
+    tempName = strtok(dataName, "O");
+    *file << tempName << " GetOutput ";
+    pos = charFound - dataName + 1;
+    *file << dataName+pos << "]\n\t";
+    delete [] dataName;
+    }
+  else if (pvs && strcmp(pvs->GetSourceClassName(), "vtkPDataSetReader") == 0)
+    {
+    char *dataName = new char[strlen(this->GetPVInput()->GetVTKDataTclName()) + 1];
+    strcpy(dataName, this->GetPVInput()->GetVTKDataTclName());
+    
+    tempName = strtok(dataName, "O");
+    *file << tempName << " GetOutput]\n\t";
+    delete [] dataName;
+    }
+  else
+    {
+    *file << this->GetPVInput()->GetPVSource()->GetVTKSourceTclName()
+	  << " GetOutput]\n\t";
     }
   
   *file << this->VTKSourceTclName << " SetAttributeModeToUse";

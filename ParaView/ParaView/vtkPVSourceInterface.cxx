@@ -48,6 +48,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVWindow.h"
 #include "vtkPVRenderView.h"
 #include "vtkKWCompositeCollection.h"
+#include "vtkPVInputMenu.h"
+#include "vtkPVSourceCollection.h"
 
 int vtkPVSourceInterfaceCommand(ClientData cd, Tcl_Interp *interp,
 			        int argc, char *argv[]);
@@ -107,9 +109,186 @@ void vtkPVSourceInterface::SetPVWindow(vtkPVWindow *w)
   this->PVWindow = w;
 }
 
+vtkPVSource *vtkPVSourceInterface::PrototypeCreateCallback()
+{
+  char tclName[100], otherTclName[100];
+  const char *outputDataType;
+  vtkDataSet *d;
+  vtkPVData *pvd = 0;
+  vtkSource *s;
+  vtkPVSource *pvs;
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  vtkPVMethodInterface *mInt;
+  
+  // Before we do anything, let see if we can determine the output type.
+  outputDataType = this->GetOutputClassName();
+  if (!outputDataType)
+    {
+    return 0;
+    }
+
+  if (strcmp(outputDataType, "vtkDataSet") == 0)
+    {
+    outputDataType = 0;
+    }
+  else if (strcmp(outputDataType, "vtkPointSet") == 0)
+    {
+    outputDataType = 0;
+    }
+
+  sprintf(tclName, "%s", this->RootName);
+//    // Create the object through tcl on all processes.
+//    s = (vtkSource *)(pvApp->MakeTclObject(this->SourceClassName, tclName));
+//    if (s == NULL)
+//      {
+//      vtkErrorMacro("Could not get pointer from object.");
+//      return NULL;
+//      }
+  
+  pvs = vtkPVSource::New();
+  pvs->SetReplaceInput(this->ReplaceInput);
+  pvs->SetPropertiesParent(this->PVWindow->GetMainView()->GetPropertiesParent());
+  pvs->SetApplication(pvApp);
+  pvs->SetInterface(this);
+//  pvs->SetVTKSource(s, tclName);
+  pvs->SetSourceClassName(this->SourceClassName);
+  pvs->SetInputClassName(this->InputClassName);
+  pvs->SetOutputClassName(this->OutputClassName);
+  pvs->SetName(tclName);  
+
+  // Add the new Source to the View, and make it current.
+  pvs->SetView(this->PVWindow->GetMainView());
+
+  if (this->InputClassName)
+    {
+    vtkPVInputMenu *inputMenu;
+    
+    inputMenu = vtkPVInputMenu::New();
+    inputMenu->SetPVSource(pvs);
+    inputMenu->SetSources(this->PVWindow->GetSourceList("Sources"));
+    inputMenu->SetLabel("Input");
+    inputMenu->SetBalloonHelpString("Set the input to this filter.");
+    inputMenu->SetInputName("PVInput"); 
+    inputMenu->SetInputType(this->InputClassName); 
+    pvs->AddPVWidget(inputMenu);
+    inputMenu->Delete();
+    }
+
+  if (outputDataType)
+    {
+    // Create the output.
+    pvd = vtkPVData::New();
+    pvd->SetPVApplication(pvApp);
+    sprintf(otherTclName, "%sOutput", tclName);
+    // Create the object through tcl on all processes.
+    d = (vtkDataSet *)(pvApp->MakeTclObject(outputDataType, otherTclName));
+    pvd->SetVTKData(d, otherTclName);
+
+    // Connect the source and data.
+    pvs->SetPVOutput(pvd);
+    pvd->Delete();
+    }
+
+  // Loop through the methods creating widgets.
+  this->MethodInterfaces->InitTraversal();
+  while ( (mInt = ((vtkPVMethodInterface*)(this->MethodInterfaces->GetNextItemAsObject()))) )
+    {
+    //---------------------------------------------------------------------
+    // This is a poor way to create widgets.  Another method that integrates
+    // with vtkPVMethodInterfaces should be created.
+  
+    if (mInt->GetWidgetType() == VTK_PV_METHOD_WIDGET_FILE)
+      {
+      pvs->AddFileEntry(mInt->GetLabel(), 
+			mInt->GetVariableName(),
+			mInt->GetFileExtension(),
+                        mInt->GetBalloonHelp());
+      }
+    else if (mInt->GetWidgetType() == VTK_PV_METHOD_WIDGET_TOGGLE)
+      {
+      pvs->AddLabeledToggle(mInt->GetLabel(), 
+			    mInt->GetVariableName(),
+                            mInt->GetBalloonHelp());
+      }
+    else if (mInt->GetWidgetType() == VTK_PV_METHOD_WIDGET_SELECTION)
+      {
+      int i;
+      vtkStringList *l;
+      pvs->AddModeList(mInt->GetLabel(),
+		       mInt->GetVariableName(),
+                       mInt->GetBalloonHelp());
+      l = mInt->GetSelectionEntries();
+      for (i = 0; i < l->GetLength(); ++i)
+        {
+        if (l->GetString(i))
+          {
+          pvs->AddModeListItem(l->GetString(i), i);
+          }
+        }
+      }
+    else if (mInt->GetWidgetType() == VTK_PV_METHOD_WIDGET_EXTENT)
+      {
+      pvs->AddExtentEntry(mInt->GetLabel(),
+                          mInt->GetVariableName(),
+                          mInt->GetBalloonHelp());      
+      }
+    else if (mInt->GetNumberOfArguments() == 1)
+      {
+      if (mInt->GetArgumentType(0) == VTK_STRING)
+        {
+        pvs->AddStringEntry(mInt->GetLabel(), 
+                            mInt->GetVariableName(),
+                            mInt->GetBalloonHelp());
+        }
+      else
+        {
+        pvs->AddLabeledEntry(mInt->GetLabel(), 
+                             mInt->GetVariableName(),
+                             mInt->GetBalloonHelp(),
+                             mInt->GetArgumentType(0));
+        }
+      }
+    else if (mInt->GetNumberOfArguments() == 2)
+      {
+      pvs->AddVector2Entry(mInt->GetLabel(), "", "", 
+                           mInt->GetVariableName(),
+                           mInt->GetBalloonHelp(),
+                           mInt->GetArgumentType(0));
+      }
+    else if (mInt->GetNumberOfArguments() == 3)
+      {
+      pvs->AddVector3Entry(mInt->GetLabel(), "", "", "",
+                           mInt->GetVariableName(),
+                           mInt->GetBalloonHelp(),
+                           mInt->GetArgumentType(0));
+      }
+    else if (mInt->GetNumberOfArguments() == 4)
+      {
+      pvs->AddVector4Entry(mInt->GetLabel(), "", "", "", "",
+                           mInt->GetVariableName(),
+                           mInt->GetBalloonHelp(),
+                           mInt->GetArgumentType(0));
+      }
+    else if (mInt->GetNumberOfArguments() == 6)
+      {
+      pvs->AddVector6Entry(mInt->GetLabel(), "", "", "", "", "", "",
+                           mInt->GetVariableName(),
+                           mInt->GetBalloonHelp(),
+                           mInt->GetArgumentType(0));
+      }
+    else
+      {
+      vtkErrorMacro("I do not handle this widget type yet.");
+      }
+    }
+
+
+  return pvs;
+}
+
 //----------------------------------------------------------------------------
-vtkPVSource *vtkPVSourceInterface::CreateCallback(const char *name,
-                                                  vtkCollection *sourceList)
+vtkPVSource *vtkPVSourceInterface::CreateCallback(
+  const char *name, vtkPVSourceCollection *sourceList)
 {
   char tclName[100], otherTclName[100];
   const char *outputDataType;
@@ -195,7 +374,8 @@ vtkPVSource *vtkPVSourceInterface::CreateCallback(const char *name,
   if (this->InputClassName)
     {
     pvs->AddInputMenu("Input", "PVInput", this->InputClassName,
-                      "Set the input to this filter.", this->PVWindow->GetSources());
+                      "Set the input to this filter.", 
+		      this->PVWindow->GetSourceList("Sources"));
     }
 
   if (this->DefaultScalars)

@@ -40,9 +40,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
+#include "vtkPVSource.h"
 #include "vtkPVInputMenu.h"
 #include "vtkPVData.h"
 #include "vtkObjectFactory.h"
+#include "vtkPVSourceCollection.h"
+#include "vtkArrayMap.txx"
+#include "vtkPVXMLElement.h"
+#include "vtkPVWindow.h"
 
 //----------------------------------------------------------------------------
 vtkPVInputMenu* vtkPVInputMenu::New()
@@ -120,7 +125,7 @@ void vtkPVInputMenu::Create(vtkKWApplication *app)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVInputMenu::AddSources(vtkCollection *sources)
+void vtkPVInputMenu::AddSources(vtkPVSourceCollection *sources)
 {
   vtkObject *o;
   vtkPVSource *source;
@@ -338,4 +343,79 @@ void vtkPVInputMenu::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "InputName: " << this->GetInputName() << endl;
   os << indent << "InputType: " << this->GetInputType() << endl;
   os << indent << "VTKInputName: " << this->GetVTKInputName() << endl;
+}
+
+vtkPVInputMenu* vtkPVInputMenu::ClonePrototype(vtkPVSource* pvSource,
+				 vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
+{
+  vtkPVWidget* clone = this->ClonePrototypeInternal(pvSource, map);
+  return vtkPVInputMenu::SafeDownCast(clone);
+}
+
+void vtkPVInputMenu::CopyProperties(vtkPVWidget* clone, vtkPVSource* pvSource,
+			      vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
+{
+  this->Superclass::CopyProperties(clone, pvSource, map);
+  vtkPVInputMenu* pvim = vtkPVInputMenu::SafeDownCast(clone);
+  if (pvim)
+    {
+    pvim->SetLabel(this->Label->GetLabel());
+    pvim->SetInputName(this->InputName);
+    pvim->SetInputType(this->InputType);
+    pvim->SetSources(this->GetSources());
+    pvim->SetVTKInputName(this->VTKInputName);
+    }
+  else 
+    {
+    vtkErrorMacro("Internal error. Could not downcast clone to PVInputMenu.");
+    }
+}
+
+//----------------------------------------------------------------------------
+int vtkPVInputMenu::ReadXMLAttributes(vtkPVXMLElement* element,
+                                      vtkPVXMLPackageParser* parser)
+{
+  if(!this->Superclass::ReadXMLAttributes(element, parser)) { return 0; }
+  
+  // Setup the Label.
+  const char* label = element->GetAttribute("label");
+  if(!label)
+    {
+    vtkErrorMacro("No label attribute.");
+    return 0;
+    }
+  this->Label->SetLabel(label);  
+  
+  // Setup the InputName.
+  const char* input_name = element->GetAttribute("input_name");
+  if(input_name)
+    {
+    this->SetInputName(input_name);
+    }
+  else
+    {
+    this->SetInputName("Input");
+    }
+  
+  // Setup the InputType.
+  const char* input_type = element->GetAttribute("input_type");
+  if(!input_type)
+    {
+    vtkErrorMacro("No input_type attribute.");
+    return 0;
+    }
+  this->SetInputType(input_type);
+  
+  vtkPVWindow* window = this->GetPVWindowFormParser(parser);
+  const char* source_list = element->GetAttribute("source_list");
+  if(source_list)
+    {
+    this->SetSources(window->GetSourceList(source_list));
+    }
+  else
+    {
+    this->SetSources(window->GetSourceList("Sources"));
+    }
+  
+  return 1;
 }

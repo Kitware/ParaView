@@ -10,24 +10,24 @@ if {[info exists argc]} {
     
 set pv(vtkTemp1) [Application GetMainWindow]
 set pv(vtkTemp43) [$pv(vtkTemp1) GetMainView]
-set pv(vtkTemp89) [$pv(vtkTemp1) GetGlyphSource GlyphArrow]
-set pv(vtkTemp93) [$pv(vtkTemp1) GetGlyphSource GlyphCone]
-set pv(vtkTemp97) [$pv(vtkTemp1) GetGlyphSource GlyphSphere]
+set pv(vtkTemp89) [$pv(vtkTemp1) GetPVSource GlyphSources Arrow0]
+set pv(vtkTemp93) [$pv(vtkTemp1) GetPVSource GlyphSources Cone0]
+set pv(vtkTemp97) [$pv(vtkTemp1) GetPVSource GlyphSources Sphere0]
 
-set pv(vtkTemp98) [$pv(vtkTemp1) CreatePVSource vtkSphereSource]
+set pv(vtkTemp98) [$pv(vtkTemp1) CreatePVSource SphereSource]
 $pv(vtkTemp98) AcceptCallback
 
-set pv(vtkTemp183) [$pv(vtkTemp1) GlyphCallback]
+set pv(vtkTemp183) [$pv(vtkTemp1) CreatePVSource Glyph]
 set pv(vtkTemp204) [$pv(vtkTemp183) GetPVWidget {Scale Factor}]
 $pv(vtkTemp204) SetValue 0.2
 $pv(vtkTemp183) AcceptCallback
 
-set pv(vtkTemp217) [$pv(vtkTemp1) CreatePVSource vtkSphereSource]
+set pv(vtkTemp217) [$pv(vtkTemp1) CreatePVSource SphereSource]
 set pv(vtkTemp229) [$pv(vtkTemp217) GetPVWidget {Center}]
 $pv(vtkTemp229) SetValue 1.5 0 0
 $pv(vtkTemp217) AcceptCallback
 $pv(vtkTemp1) ResetCameraCallback
-set pv(vtkTemp262) [$pv(vtkTemp1) GlyphCallback]
+set pv(vtkTemp262) [$pv(vtkTemp1) CreatePVSource Glyph]
 set pv(vtkTemp271) [$pv(vtkTemp262) GetPVWidget {Glyph}]
 $pv(vtkTemp271) SetCurrentValue $pv(vtkTemp93)
 set pv(vtkTemp283) [$pv(vtkTemp262) GetPVWidget {Scale Factor}]
@@ -42,11 +42,11 @@ $pv(vtkTemp262) AcceptCallback
 #$pv(vtkTemp1) SetCurrentPVSource $pv(vtkTemp262)
 #$pv(vtkTemp1) ShowCurrentSourceProperties
 
-set pv(vtkTemp333) [$pv(vtkTemp1) CreatePVSource vtkSphereSource]
+set pv(vtkTemp333) [$pv(vtkTemp1) CreatePVSource SphereSource]
 set pv(vtkTemp345) [$pv(vtkTemp333) GetPVWidget {Center}]
 $pv(vtkTemp345) SetValue 0 1.5 0
 $pv(vtkTemp333) AcceptCallback
-set pv(vtkTemp378) [$pv(vtkTemp1) GlyphCallback]
+set pv(vtkTemp378) [$pv(vtkTemp1) CreatePVSource Glyph]
 set pv(vtkTemp399) [$pv(vtkTemp378) GetPVWidget {Scale Factor}]
 $pv(vtkTemp399) SetValue 1
 $pv(vtkTemp378) AcceptCallback
@@ -55,7 +55,7 @@ $pv(vtkTemp387) SetCurrentValue $pv(vtkTemp97)
 $pv(vtkTemp399) SetValue 0.1
 $pv(vtkTemp378) AcceptCallback
 
-set pv(vtkTemp412) [$pv(vtkTemp1) CreatePVSource vtkSphereSource]
+set pv(vtkTemp412) [$pv(vtkTemp1) CreatePVSource SphereSource]
 set pv(vtkTemp424) [$pv(vtkTemp412) GetPVWidget {Center}]
 $pv(vtkTemp424) SetValue 1.5 1.5 0
 $pv(vtkTemp412) AcceptCallback
@@ -69,7 +69,7 @@ $pv(vtkTemp183) AcceptCallback
 $pv(vtkTemp183) AcceptCallback
 $pv(vtkTemp1) SetCurrentPVSource $pv(vtkTemp98)
 $pv(vtkTemp1) ShowCurrentSourceProperties
-set pv(vtkTemp458) [$pv(vtkTemp1) GlyphCallback]
+set pv(vtkTemp458) [$pv(vtkTemp1) CreatePVSource Glyph]
 set pv(vtkTemp479) [$pv(vtkTemp458) GetPVWidget {Scale Factor}]
 $pv(vtkTemp479) SetValue 0.4
 set pv(vtkTemp482) [$pv(vtkTemp458) GetPVWidget {Vector Mode}]

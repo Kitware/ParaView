@@ -51,6 +51,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWWidget.h"
 class vtkKWApplication;
 
+//BTX
+template <class value>
+class vtkVector;
+//ETX
 
 class VTK_EXPORT vtkKWToolbar : public vtkKWWidget
 {
@@ -64,26 +68,33 @@ public:
   void Create(vtkKWApplication *app);
 
   // Description:
-  // All toolbars should be the same height.
-  vtkSetMacro(Height, int);
-  vtkGetMacro(Height, int);
-
-  // Description:
-  // Callbacks to ensure height stays the same.
+  // Callbacks to ensure all widgets are visible (only
+  // if the were added with AddWidget)
   void ScheduleResize();
   void Resize();
+  void UpdateWidgets();
 
+  // Description:
+  // Add a widget to the toolbar.
+  void AddWidget(vtkKWWidget* widget);
 
+  // Description:
+  // Returns the main frame of the toolbar. Put all the widgets
+  // in the main frame.
+  vtkGetObjectMacro(Frame, vtkKWWidget);
+  
 protected:
   vtkKWToolbar();
   ~vtkKWToolbar();
 
   // Height stuf is not working (ask ken)
-  int Height;
   int Expanding;
 
-  vtkKWWidget *Bar1;
-  vtkKWWidget *Bar2;
+  vtkKWWidget* Frame;
+
+//BTX
+  vtkVector<vtkKWWidget*>* Widgets;
+//ETX
 
 private:
   vtkKWToolbar(const vtkKWToolbar&); // Not implemented

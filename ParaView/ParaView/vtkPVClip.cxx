@@ -112,6 +112,7 @@ void vtkPVClip::CreateProperties()
 
   
   selectWidget = vtkPVSelectWidget::New();
+  selectWidget->UseWidgetCommandOn();
   selectWidget->SetParent(this->GetParameterFrame()->GetFrame());
   selectWidget->Create(this->Application);
   selectWidget->SetLabel("Clip Function");
@@ -129,7 +130,7 @@ void vtkPVClip::CreateProperties()
   planeWidget->SetPVSource(this);
   planeWidget->SetModifiedCommand(this->GetTclName(),"SetAcceptButtonColorToRed");
   planeWidget->Create(this->Application);  
-  selectWidget->AddItem("Plane", planeWidget, planeWidget->GetPlaneTclName());
+  selectWidget->AddItem("Plane", planeWidget, "GetPlaneTclName");
   
   // The Plane widget makes its owns VTK object (vtkPlane) so we do not
   // need to make the association.
@@ -138,7 +139,7 @@ void vtkPVClip::CreateProperties()
   sphereWidget->SetPVSource(this);
   sphereWidget->SetModifiedCommand(this->GetTclName(),"SetAcceptButtonColorToRed");
   sphereWidget->Create(this->Application);
-  selectWidget->AddItem("Sphere", sphereWidget, sphereWidget->GetSphereTclName());
+  selectWidget->AddItem("Sphere", sphereWidget, "GetSphereTclName");
 
   // Put an option to clip by scalar array.
   arrayMenu = vtkPVArrayMenu::New();
@@ -153,10 +154,10 @@ void vtkPVClip::CreateProperties()
   arrayMenu->SetModifiedCommand(this->GetTclName(),"SetAcceptButtonColorToRed");
   arrayMenu->Create(this->Application);
   arrayMenu->SetBalloonHelpString("Choose the clipping scalar array.");
-  selectWidget->AddItem("Scalars", arrayMenu, "");
+  selectWidget->AddItem("Scalars", arrayMenu, 0);
 
   // Set up the dependancy so that the array menu updates when the input changes.
-  inputMenu->AddDependant(arrayMenu);
+  inputMenu->AddDependent(arrayMenu);
   arrayMenu->SetInputMenu(inputMenu);  
 
   arrayMenu->Delete();
@@ -174,7 +175,8 @@ void vtkPVClip::CreateProperties()
   offsetEntry->SetObjectVariable(this->GetVTKSourceTclName(), "Value");
   offsetEntry->SetModifiedCommand(this->GetTclName(), 
                                   "SetAcceptButtonColorToRed");
-  offsetEntry->Create(this->Application, "Offset", 1, NULL, NULL);
+  offsetEntry->SetLabel("Offset");
+  offsetEntry->Create(this->Application);
   this->AddPVWidget(offsetEntry);
   this->Script("pack %s -side top -fill x", offsetEntry->GetWidgetName());
   offsetEntry->Delete();

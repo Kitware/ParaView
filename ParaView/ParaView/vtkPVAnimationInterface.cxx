@@ -27,7 +27,6 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 =========================================================================*/
 #include "vtkPVAnimationInterface.h"
 #include "vtkPVApplication.h"
-#include "vtkPVWindow.h"
 #include "vtkKWEntry.h"
 #include "vtkKWScale.h"
 #include "vtkKWPushButton.h"
@@ -38,8 +37,8 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkKWMenuButton.h"
 #include "vtkPVWindow.h"
 #include "vtkPVWidget.h"
-#include "vtkKWCompositeCollection.h"
-#include "vtkKWWidgetCollection.h"
+#include "vtkPVSourceCollection.h"
+#include "vtkPVWidgetCollection.h"
 
 // We need to:
 // Format min/max/resolution entries better.
@@ -595,17 +594,20 @@ void vtkPVAnimationInterface::UpdateSourceMenu()
     }
 
   // Update the selection menu.
-  numSources = this->Window->GetSources()->GetNumberOfItems();
-  
-  for (i = 0; i < numSources; i++)
+  vtkPVSourceCollection* col = this->Window->GetSourceList("Sources");
+  if (col)
     {
-    source = (vtkPVSource*)this->Window->GetSources()->GetItemAsObject(i);
-    sprintf(methodAndArgString, "SetPVSource %s", source->GetTclName());
-    this->SourceMenuButton->GetMenu()->AddCommand(source->GetName(), this,
-                                                  methodAndArgString);
-    if (this->PVSource == source)
+    vtkPVSource *source;
+    col->InitTraversal();
+    while ( (source = col->GetNextPVSource()) )
       {
-      sourceValid = 1;
+      sprintf(methodAndArgString, "SetPVSource %s", source->GetTclName());
+      this->SourceMenuButton->GetMenu()->AddCommand(source->GetName(), this,
+						    methodAndArgString);
+      if (this->PVSource == source)
+	{
+	sourceValid = 1;
+	}
       }
     }
 

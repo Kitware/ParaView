@@ -46,6 +46,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkMapper.h"
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
+#ifdef VTK_USE_MPI
+#include "vtkMPIController.h"
+#else
+#include "vtkMultiProcessController.h"
+#endif
 #include "vtkRendererCollection.h"
 #include "vtkRenderWindow.h"
 

@@ -49,25 +49,20 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __vtkPVSphereWidget_h
 
 #include "vtkPVWidget.h"
+#include "vtkPVObjectWidget.h"
+
 class vtkPVSource;
+class vtkPVVectorEntry;
 
 
-class VTK_EXPORT vtkPVSphereWidget : public vtkPVWidget
+class VTK_EXPORT vtkPVSphereWidget : public vtkPVObjectWidget
 {
 public:
   static vtkPVSphereWidget* New();
-  vtkTypeMacro(vtkPVSphereWidget, vtkPVWidget);
+  vtkTypeMacro(vtkPVSphereWidget, vtkPVObjectWidget);
   void PrintSelf(ostream& os, vtkIndent indent);
     
   virtual void Create(vtkKWApplication *app);
-
-  // Description:
-  // This widget needs access to the PVSource for reseting the center to
-  // the middle of the data bounds.
-  // Note: There is no reference counting for fear of reference loops.
-  // The pvSource owns this widget.
-  void SetPVSource(vtkPVSource *pvs) {this->PVSource = pvs;}
-  vtkPVSource *GetPVSource() {return this->PVSource;}
 
   // Description:
   // Called when the PVSources reset button is called.
@@ -88,22 +83,22 @@ public:
   vtkGetObjectMacro(RadiusEntry, vtkPVVectorEntry);
 
   // Description:
-  // This interface is the same as vtkPVObjectWidget, and it might make
-  // sense to make this class a subclass of vtkPVObject widget.
-  // In this case the object is the clip or cut filter, adn the
-  // variable is the name of the implicit function in the 
-  // filter: "ClipFunction" or "CutFunction"
-  void SetObjectVariable(const char *objectTclName, const char *var);
-
-  // Description:
   // For saving the widget into a VTK tcl script.
   void SaveInTclScript(ofstream *file);
+
+//BTX
+  // Description:
+  // Creates and returns a copy of this widget. It will create
+  // a new instance of the same type as the current object
+  // using NewInstance() and then copy some necessary state 
+  // parameters.
+  vtkPVSphereWidget* ClonePrototype(vtkPVSource* pvSource,
+				 vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
+//ETX
 
 protected:
   vtkPVSphereWidget();
   ~vtkPVSphereWidget();
-
-  vtkPVSource *PVSource;
 
   vtkPVVectorEntry *CenterEntry;
 
@@ -112,13 +107,11 @@ protected:
   char *SphereTclName;
   vtkSetStringMacro(SphereTclName);
 
-  char *ObjectTclName;
-  char *VariableName;
-  vtkSetStringMacro(ObjectTclName);
-  vtkSetStringMacro(VariableName);
-
   vtkPVSphereWidget(const vtkPVSphereWidget&); // Not implemented
   void operator=(const vtkPVSphereWidget&); // Not implemented
+
+  int ReadXMLAttributes(vtkPVXMLElement* element,
+                        vtkPVXMLPackageParser* parser);
 };
 
 #endif

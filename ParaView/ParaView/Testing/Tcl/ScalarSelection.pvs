@@ -15,14 +15,15 @@ if {[info exists argc]} {
 
 set pv(vtkTemp1) [Application GetMainWindow]
 set pv(vtkTemp43) [$pv(vtkTemp1) GetMainView]
-set pv(vtkTemp89) [$pv(vtkTemp1) GetGlyphSource Arrow]
-set pv(vtkTemp93) [$pv(vtkTemp1) GetGlyphSource Cone]
-set pv(vtkTemp97) [$pv(vtkTemp1) GetGlyphSource Sphere]
-set pv(vtkTemp100) [$pv(vtkTemp1) Open $DataDir/Data/vox8_bin.vtk]
+set pv(vtkTemp89) [$pv(vtkTemp1) GetPVSource GlyphSources Arrow0]
+set pv(vtkTemp93) [$pv(vtkTemp1) GetPVSource GlyphSources Cone0]
+set pv(vtkTemp97) [$pv(vtkTemp1) GetPVSource GlyphSources Sphere0]
+$pv(vtkTemp1) Open "$DataDir/Data/vox8_bin.vtk"
+set pv(vtkTemp100) [$pv(vtkTemp1) GetCurrentPVSource]
 set pv(vtkTemp101) [$pv(vtkTemp100) GetPVOutput]
 $pv(vtkTemp101) DrawWireframe
 $pv(vtkTemp101) ColorByProperty
-set pv(vtkTemp136) [$pv(vtkTemp1) ContourCallback]
+set pv(vtkTemp136) [$pv(vtkTemp1) CreatePVSource Contour]
 set pv(vtkTemp142) [$pv(vtkTemp136) GetPVWidget {Input}]
 $pv(vtkTemp142) SetCurrentValue $pv(vtkTemp100)
 set pv(vtkTemp143) [$pv(vtkTemp136) GetPVWidget {Scalars}]
@@ -69,7 +70,7 @@ $pv(vtkTemp146) AddValue 0.750000
 $pv(vtkTemp146) AddValue 0.850000
 $pv(vtkTemp146) AddValue 0.950000
 $pv(vtkTemp136) AcceptCallback
-set pv(vtkTemp188) [$pv(vtkTemp1) CreatePVSource vtkWarpScalar]
+set pv(vtkTemp188) [$pv(vtkTemp1) CreatePVSource WarpScalar]
 set pv(vtkTemp194) [$pv(vtkTemp188) GetPVWidget {Input}]
 $pv(vtkTemp194) SetCurrentValue $pv(vtkTemp136)
 set pv(vtkTemp195) [$pv(vtkTemp188) GetPVWidget {Scalars}]
@@ -84,7 +85,7 @@ $pv(vtkTemp188) AcceptCallback
 $pv(vtkTemp1) SetCurrentPVSource $pv(vtkTemp136)
 $pv(vtkTemp1) ShowCurrentSourceProperties
 $pv(vtkTemp1) ShowCurrentSourceProperties
-set pv(vtkTemp221) [$pv(vtkTemp1) CreatePVSource vtkLoopSubdivisionFilter]
+set pv(vtkTemp221) [$pv(vtkTemp1) CreatePVSource LoopSubdivisionFilter]
 set pv(vtkTemp227) [$pv(vtkTemp221) GetPVWidget {Input}]
 $pv(vtkTemp227) SetCurrentValue $pv(vtkTemp136)
 set pv(vtkTemp232) [$pv(vtkTemp221) GetPVWidget {NumberOfSubdivisions}]
@@ -103,7 +104,7 @@ $pv(vtkTemp1) ShowCurrentSourceProperties
 $pv(vtkTemp1) SetCurrentPVSource $pv(vtkTemp136)
 $pv(vtkTemp1) ShowCurrentSourceProperties
 $pv(vtkTemp1) ShowCurrentSourceProperties
-set pv(vtkTemp241) [$pv(vtkTemp1) CreatePVSource vtkLoopSubdivisionFilter]
+set pv(vtkTemp241) [$pv(vtkTemp1) CreatePVSource LoopSubdivisionFilter]
 set pv(vtkTemp247) [$pv(vtkTemp241) GetPVWidget {Input}]
 $pv(vtkTemp247) SetCurrentValue $pv(vtkTemp136)
 set pv(vtkTemp252) [$pv(vtkTemp241) GetPVWidget {NumberOfSubdivisions}]
@@ -239,11 +240,11 @@ $pv(vtkTemp1) SetCurrentPVSource $pv(vtkTemp136)
 $pv(vtkTemp1) ShowCurrentSourceProperties
 $pv(vtkTemp1) SetCurrentPVSource $pv(vtkTemp100)
 $pv(vtkTemp1) ShowCurrentSourceProperties
-set pv(vtkTemp261) [$pv(vtkTemp1) ClipCallback]
+set pv(vtkTemp261) [$pv(vtkTemp1) CreatePVSource Clip]
 $pv(vtkTemp261) DeleteCallback
 $pv(vtkTemp1) SetCurrentPVSource $pv(vtkTemp100)
 $pv(vtkTemp1) ShowCurrentSourceProperties
-set pv(vtkTemp282) [$pv(vtkTemp1) ContourCallback]
+set pv(vtkTemp282) [$pv(vtkTemp1) CreatePVSource Contour]
 set pv(vtkTemp288) [$pv(vtkTemp282) GetPVWidget {Input}]
 $pv(vtkTemp288) SetCurrentValue $pv(vtkTemp100)
 set pv(vtkTemp289) [$pv(vtkTemp282) GetPVWidget {Scalars}]
@@ -265,13 +266,13 @@ $pv(vtkTemp298) SetState 0
 set pv(vtkTemp301) [$pv(vtkTemp282) GetPVWidget {Compute Gradients}]
 set pv(vtkTemp304) [$pv(vtkTemp282) GetPVWidget {Compute Scalars}]
 $pv(vtkTemp282) AcceptCallback
-set pv(vtkTemp316) [$pv(vtkTemp1) CreatePVSource vtkLoopSubdivisionFilter]
+set pv(vtkTemp316) [$pv(vtkTemp1) CreatePVSource LoopSubdivisionFilter]
 set pv(vtkTemp322) [$pv(vtkTemp316) GetPVWidget {Input}]
 $pv(vtkTemp322) SetCurrentValue $pv(vtkTemp282)
 set pv(vtkTemp327) [$pv(vtkTemp316) GetPVWidget {NumberOfSubdivisions}]
 $pv(vtkTemp327) SetValue 4
 $pv(vtkTemp316) AcceptCallback
-set pv(vtkTemp336) [$pv(vtkTemp1) CreatePVSource vtkWarpScalar]
+set pv(vtkTemp336) [$pv(vtkTemp1) CreatePVSource WarpScalar]
 set pv(vtkTemp342) [$pv(vtkTemp336) GetPVWidget {Input}]
 $pv(vtkTemp342) SetCurrentValue $pv(vtkTemp316)
 set pv(vtkTemp343) [$pv(vtkTemp336) GetPVWidget {Scalars}]

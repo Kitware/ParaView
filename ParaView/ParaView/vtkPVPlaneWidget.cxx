@@ -40,6 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 #include "vtkPVPlaneWidget.h"
+#include "vtkPVSource.h"
 #include "vtkKWView.h"
 #include "vtkObjectFactory.h"
 #include "vtkKWLabel.h"
@@ -47,8 +48,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVApplication.h"
 #include "vtkPVData.h"
 #include "vtkPVVectorEntry.h"
-#include "vtkPVWindow.h"
 #include "vtkKWCompositeCollection.h"
+#include "vtkPVXMLElement.h"
 
 int vtkPVPlaneWidgetCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -156,7 +157,9 @@ void vtkPVPlaneWidget::Create(vtkKWApplication *app)
   this->CenterEntry->SetObjectVariable(planeTclName, "Origin");
   this->CenterEntry->SetModifiedCommand(this->GetTclName(), 
                                         "ModifiedCallback");
-  this->CenterEntry->Create(this->Application, "Center", 3, NULL, NULL);
+  this->CenterEntry->SetLabel("Center");
+  this->CenterEntry->SetVectorLength(3);
+  this->CenterEntry->Create(this->Application);
   this->Script("pack %s -side top -fill x",
                this->CenterEntry->GetWidgetName());
 
@@ -172,7 +175,9 @@ void vtkPVPlaneWidget::Create(vtkKWApplication *app)
   this->NormalEntry->SetObjectVariable(planeTclName, "Normal");
   this->NormalEntry->SetModifiedCommand(this->GetTclName(), 
                                         "ModifiedCallback");
-  this->NormalEntry->Create(this->Application, "Normal", 3, NULL, NULL);
+  this->NormalEntry->SetLabel("Normal");
+  this->NormalEntry->SetVectorLength(3);
+  this->NormalEntry->Create(this->Application);
   this->Script("pack %s -side top -fill x",
                this->NormalEntry->GetWidgetName());
 
@@ -355,14 +360,6 @@ void vtkPVPlaneWidget::Accept()
 
 
 //----------------------------------------------------------------------------
-void vtkPVPlaneWidget::SetObjectVariable(const char* objName, 
-                                         const char* varName)
-{
-  this->SetObjectTclName(objName);
-  this->SetVariableName(varName);
-}
-
-//----------------------------------------------------------------------------
 void vtkPVPlaneWidget::SaveInTclScript(ofstream *file)
 {
   *file << "vtkPlane " << this->PlaneTclName << endl;
@@ -384,4 +381,19 @@ void vtkPVPlaneWidget::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "CenterEntry: " << this->GetCenterEntry() << endl;
   os << indent << "NormalEntry: " << this->GetNormalEntry() << endl;
   os << indent << "PlaneTclName: " << this->GetPlaneTclName() << endl;
+}
+
+vtkPVPlaneWidget* vtkPVPlaneWidget::ClonePrototype(vtkPVSource* pvSource,
+				 vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
+{
+  vtkPVWidget* clone = this->ClonePrototypeInternal(pvSource, map);
+  return vtkPVPlaneWidget::SafeDownCast(clone);
+}
+
+//----------------------------------------------------------------------------
+int vtkPVPlaneWidget::ReadXMLAttributes(vtkPVXMLElement* element,
+                                        vtkPVXMLPackageParser* parser)
+{
+  if(!this->Superclass::ReadXMLAttributes(element, parser)) { return 0; }  
+  return 1;
 }

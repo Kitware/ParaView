@@ -40,23 +40,25 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 #include "vtkPVWidget.h"
+#include "vtkPVSource.h"
+#include "vtkPVApplication.h"
 #include "vtkObjectFactory.h"
 #include "vtkKWApplication.h"
 #include "vtkKWEvent.h"
 #include "vtkCollection.h"
+#include "vtkArrayMap.txx"
+#include "vtkLinkedList.txx"
+#include "vtkPVXMLElement.h"
+#include "vtkPVXMLPackageParser.h"
 
-//----------------------------------------------------------------------------
-vtkPVWidget* vtkPVWidget::New()
-{
-  // First try to create the object from the vtkObjectFactory
-  vtkObject* ret = vtkObjectFactory::CreateInstance("vtkPVWidget");
-  if (ret)
-    {
-    return (vtkPVWidget*)ret;
-    }
-  // If the factory was unable to create the object, then create it here.
-  return new vtkPVWidget;
-}
+#include <ctype.h>
+
+#ifndef VTK_NO_EXPLICIT_TEMPLATE_INSTANTIATION
+
+template class VTK_EXPORT vtkLinkedList<void*>;
+template class VTK_EXPORT vtkArrayMap<vtkPVWidget*, vtkPVWidget*>;
+
+#endif
 
 //----------------------------------------------------------------------------
 vtkPVWidget::vtkPVWidget()
@@ -67,7 +69,8 @@ vtkPVWidget::vtkPVWidget()
   // Start modified because empty widgets do not match their variables.
   this->ModifiedFlag = 1;
 
-  this->DependantCollection = vtkCollection::New();
+  this->Dependents = vtkLinkedList<void*>::New();
+  this->PVSource = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -76,8 +79,8 @@ vtkPVWidget::~vtkPVWidget()
   this->SetModifiedCommandObjectTclName(NULL);
   this->SetModifiedCommandMethod(NULL);
 
-  this->DependantCollection->Delete();
-  this->DependantCollection = NULL;
+  this->Dependents->Delete();
+  this->Dependents = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -106,21 +109,39 @@ void vtkPVWidget::Reset()
 //----------------------------------------------------------------------------
 void vtkPVWidget::Update()
 {
-  vtkPVWidget *pvw;
-  
-  this->DependantCollection->InitTraversal();
-  while ( (pvw = (vtkPVWidget*)(this->DependantCollection->GetNextItemAsObject())) )
+  vtkLinkedListIterator<void*>* it = this->Dependents->NewIterator();
+  while ( it->IsDoneWithTraversal() != VTK_OK )
     {
-    pvw->Update();
-    }  
+    void* pvwp = 0;
+    if (it->GetData(pvwp) == VTK_OK && pvwp)
+      {
+      static_cast<vtkPVWidget*>(pvwp)->Update();
+      }
+    it->GoToNextItem();
+    }
+  it->Delete();
 }
 
 //----------------------------------------------------------------------------
-void vtkPVWidget::AddDependant(vtkPVWidget *pvw)
+void vtkPVWidget::AddDependent(vtkPVWidget *pvw)
 {
-  this->DependantCollection->AddItem(pvw);  
+  this->Dependents->AppendItem(pvw);  
 }
 
+void vtkPVWidget::RemoveDependent(vtkPVWidget *pvw)
+{
+  vtkIdType index;
+
+  if ( this->Dependents->FindItem(pvw, index) == VTK_OK )
+    {
+    this->Dependents->RemoveItem(index);
+    }
+}
+
+void vtkPVWidget::RemoveAllDependents()
+{
+  this->Dependents->RemoveAllItems();
+}
 
 //----------------------------------------------------------------------------
 void vtkPVWidget::ModifiedCallback()
@@ -134,6 +155,11 @@ void vtkPVWidget::ModifiedCallback()
     }
 }
 
+vtkPVApplication *vtkPVWidget::GetPVApplication() 
+{
+  return vtkPVApplication::SafeDownCast(this->Application);
+}
+
 //----------------------------------------------------------------------------
 void vtkPVWidget::SaveInTclScript(ofstream *file)
 {
@@ -145,4 +171,139 @@ void vtkPVWidget::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
   os << indent << "ModifiedFlag: " << this->GetModifiedFlag() << endl;
+}
+
+vtkPVWidget* vtkPVWidget::ClonePrototypeInternal(vtkPVSource* pvSource,
+				vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
+{
+  vtkPVWidget* pvWidget = 0;
+  // Check if a clone of this widget has already been created
+  if ( map->GetItem(this, pvWidget) != VTK_OK )
+    {
+    // If not, create one and add it to the map
+    pvWidget = this->NewInstance();
+    map->SetItem(this, pvWidget);
+    // Now copy all the properties
+    this->CopyProperties(pvWidget, pvSource, map);
+    }
+  else
+    {
+    // Increment the reference count. This is necessary
+    // to make the behavior same whether a widget is created
+    // or returned from the map. Always call Delete() after
+    // cloning.
+    pvWidget->Register(this);
+    }
+  return pvWidget;
+}
+
+void vtkPVWidget::CopyProperties(vtkPVWidget* clone, vtkPVSource* pvSource,
+			      vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
+{
+  // Copy the tracename and help (note that SetBalloonHelpString
+  // is virtual and is redefined by subclasses when necessary).
+  clone->SetTraceName(this->GetTraceName());
+  clone->SetBalloonHelpString(this->GetBalloonHelpString());
+  clone->SetDebug(this->GetDebug());
+  
+  // Now copy the dependencies
+  vtkPVWidget* dep;
+  vtkPVWidget* clonedep;
+
+  vtkLinkedListIterator<void*>* it = this->Dependents->NewIterator();
+  while ( it->IsDoneWithTraversal() != VTK_OK )
+    {
+    void* pvwp = 0;
+    if (it->GetData(pvwp) == VTK_OK && pvwp)
+      {
+      dep = static_cast<vtkPVWidget*>(pvwp);
+      
+      // We call clone. If there is already a copy of this
+      // widget, it will be returned. Otherwise, a new one will
+      // be created.
+      clonedep = dep->ClonePrototype(pvSource, map);
+      clone->Dependents->AppendItem(clonedep);
+      // Although we are not registering this widget when
+      // adding it to the dependent list, we still call Delete
+      // because ClonePrototype() always increases the reference
+      // count by one. There is not danger of the widget being
+      // deleted even if it was created in ClonePrototype because
+      // the reference count will be 2 (1 when it is first created,
+      // 2 when it is added to the map). A problem may arise if
+      // the widget is not referenced by another container before
+      // the end of the cloning process. If the map is deleted and
+      // the widget is not referenced by any other object, it will
+      // be deleted and the pointer in the Dependents list will be
+      // invalid.
+      clonedep->Delete();
+      }
+    it->GoToNextItem();
+    }
+  it->Delete();
+
+  clone->SetPVSource(pvSource);
+  clone->SetModifiedCommand(pvSource->GetTclName(), 
+			    "SetAcceptButtonColorToRed");
+}
+
+//----------------------------------------------------------------------------
+static int vtkPVWidgetIsSpace(char c)
+{
+  return isspace(c);
+}
+
+//----------------------------------------------------------------------------
+int vtkPVWidget::ReadXMLAttributes(vtkPVXMLElement* element,
+                                   vtkPVXMLPackageParser* parser)
+{
+  const char* help = element->GetAttribute("help");
+  if(help) { this->SetBalloonHelpString(help); }
+  
+  const char* deps = element->GetAttribute("dependents");
+  if(deps)
+    {
+    const char* start = deps;
+    const char* end = 0;
+    
+    // Parse the space-separated list.
+    while(*start)
+      {
+      while(*start && vtkPVWidgetIsSpace(*start)) { ++start; }
+      end = start;
+      while(*end && !vtkPVWidgetIsSpace(*end)) { ++end; }
+      int length = end-start;
+      if(length)
+        {
+        char* entry = new char[length+1];
+        strncpy(entry, start, length);
+        entry[length] = '\0';
+        vtkPVXMLElement* depElement = element->LookupElement(entry);
+        vtkPVWidget* dep = this->GetPVWidgetFromParser(depElement, parser);
+        if(!dep)
+          {
+          vtkErrorMacro("Couldn't add dependent " << entry);
+          delete [] entry;
+          return 0;
+          }
+        delete [] entry;
+        this->Dependents->AppendItem(dep);
+	dep->Delete();
+        }
+      start = end;
+      }
+    }
+  return 1;
+}
+
+//----------------------------------------------------------------------------
+vtkPVWidget* vtkPVWidget::GetPVWidgetFromParser(vtkPVXMLElement* element,
+                                                vtkPVXMLPackageParser* parser)
+{
+  return parser->GetPVWidget(element);
+}
+
+//----------------------------------------------------------------------------
+vtkPVWindow* vtkPVWidget::GetPVWindowFormParser(vtkPVXMLPackageParser* parser)
+{
+  return parser->GetPVWindow();
 }

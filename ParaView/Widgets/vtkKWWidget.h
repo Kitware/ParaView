@@ -183,6 +183,11 @@ protected:
   vtkKWWidgetCollection *Children; 
   int DeletingChildren;
 
+//BTX
+  friend class vtkKWFrame;
+//ETX
+  vtkSetStringMacro(WidgetName);
+
   // Ballon help
   char  *BalloonHelpString;
   int   BalloonHelpJustification;

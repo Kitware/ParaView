@@ -10,7 +10,7 @@ if {[info exists argc]} {
 
 set kw(vtkTemp1) [Application GetMainWindow]
 set kw(vtkTemp29) [$kw(vtkTemp1) GetMainView]
-set kw(vtkTemp224) [$kw(vtkTemp1) CreatePVSource vtkImageMandelbrotSource]
+set kw(vtkTemp224) [$kw(vtkTemp1) CreatePVSource ImageMandelbrotSource]
 set kw(vtkTemp235) [$kw(vtkTemp224) GetPVWidget {Extent}]
 $kw(vtkTemp235) SetValue 0 25 0 25 0 25
 set kw(vtkTemp248) [$kw(vtkTemp224) GetPVWidget {Origin}]
@@ -21,7 +21,7 @@ $kw(vtkTemp224) AcceptCallback
 set kw(vtkTemp260) [$kw(vtkTemp224) GetPVWidget {MaxIterations}]
 $kw(vtkTemp260) SetValue 10
 $kw(vtkTemp224) AcceptCallback
-set kw(vtkTemp279) [$kw(vtkTemp1) ContourCallback]
+set kw(vtkTemp279) [$kw(vtkTemp1) CreatePVSource Contour]
 set kw(vtkTemp287) [$kw(vtkTemp279) GetPVWidget {Scalars}]
 $kw(vtkTemp287) SetValue {Iterations}
 set kw(vtkTemp290) [$kw(vtkTemp279) GetPVWidget {Contour Values}]
@@ -30,9 +30,8 @@ $kw(vtkTemp290) AddValue 4.500000
 $kw(vtkTemp279) AcceptCallback
 set kw(vtkTemp75) [$kw(vtkTemp1) GetRotateCameraInteractor]
 $kw(vtkTemp75) SetCameraState -1.717 -2.853 9.108  -0.750 -0.625 1.000  0.901 0.378 0.211
-set kw(vtkTemp325) [$kw(vtkTemp1) CreatePVSource vtkReflectionFilter]
-set kw(vtkTemp326) [$kw(vtkTemp325) GetPVWidget {Clip Function}]
-set kw(vtkTemp336) [$kw(vtkTemp326) GetPVWidget {Plane}]
+set kw(vtkTemp325) [$kw(vtkTemp1) CreatePVSource ReflectionFilter]
+set kw(vtkTemp336) [$kw(vtkTemp325) GetPVWidget {Plane}]
 $kw(vtkTemp336) SetCurrentValue {1}
 $kw(vtkTemp325) AcceptCallback
 $kw(vtkTemp336) SetCurrentValue {0}

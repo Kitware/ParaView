@@ -11,14 +11,14 @@ if {[info exists argc]} {
 
 set pv(vtkTemp1) [Application GetMainWindow]
 set pv(vtkTemp43) [$pv(vtkTemp1) GetMainView]
-set pv(vtkTemp89) [$pv(vtkTemp1) GetGlyphSource Arrow]
-set pv(vtkTemp93) [$pv(vtkTemp1) GetGlyphSource Cone]
-set pv(vtkTemp97) [$pv(vtkTemp1) GetGlyphSource Sphere]
-set pv(vtkTemp98) [$pv(vtkTemp1) CreatePVSource vtkSphereSource]
+set pv(vtkTemp89) [$pv(vtkTemp1) GetPVSource GlyphSources Arrow0]
+set pv(vtkTemp93) [$pv(vtkTemp1) GetPVSource GlyphSources Cone0]
+set pv(vtkTemp97) [$pv(vtkTemp1) GetPVSource GlyphSources Sphere0]
+set pv(vtkTemp98) [$pv(vtkTemp1) CreatePVSource SphereSource]
 set pv(vtkTemp110) [$pv(vtkTemp98) GetPVWidget {Center}]
 $pv(vtkTemp110) SetValue 0 0 4
 $pv(vtkTemp98) AcceptCallback
-set pv(vtkTemp182) [$pv(vtkTemp1) ClipCallback]
+set pv(vtkTemp182) [$pv(vtkTemp1) CreatePVSource Clip]
 $pv(vtkTemp182) AcceptCallback
 
 set pv(vtkTemp192) [$pv(vtkTemp182) GetPVWidget {Clip Function}]
@@ -34,7 +34,7 @@ $pv(vtkTemp194) SetValue 0.5
 $pv(vtkTemp182) AcceptCallback
 $pv(vtkTemp194) SetValue -0.5
 $pv(vtkTemp182) AcceptCallback
-set pv(vtkTemp213) [$pv(vtkTemp1) CutCallback]
+set pv(vtkTemp213) [$pv(vtkTemp1) CreatePVSource Cut]
 set pv(vtkTemp214) [$pv(vtkTemp213) GetPVWidget {Cut Function}]
 set pv(vtkTemp222) [$pv(vtkTemp214) GetPVWidget {Plane}]
 set pv(vtkTemp224) [$pv(vtkTemp222) GetNormalEntry]
@@ -46,7 +46,7 @@ $pv(vtkTemp227) AddValue 0.100000
 $pv(vtkTemp227) AddValue 0.200000
 $pv(vtkTemp227) AddValue 0.300000
 $pv(vtkTemp213) AcceptCallback
-set pv(vtkTemp249) [$pv(vtkTemp1) CreatePVSource vtkTubeFilter]
+set pv(vtkTemp249) [$pv(vtkTemp1) CreatePVSource TubeFilter]
 set pv(vtkTemp263) [$pv(vtkTemp249) GetPVWidget {NumberOfSides}]
 $pv(vtkTemp263) SetValue 8
 set pv(vtkTemp269) [$pv(vtkTemp249) GetPVWidget {Radius}]
@@ -64,7 +64,7 @@ $pv(vtkTemp1) SetCurrentPVSource $pv(vtkTemp213)
 $pv(vtkTemp1) ShowCurrentSourceProperties
 $pv(vtkTemp1) SetCurrentPVSource $pv(vtkTemp249)
 $pv(vtkTemp1) ShowCurrentSourceProperties
-set pv(vtkTemp283) [$pv(vtkTemp1) CreatePVSource vtkElevationFilter]
+set pv(vtkTemp283) [$pv(vtkTemp1) CreatePVSource ElevationFilter]
 set pv(vtkTemp297) [$pv(vtkTemp283) GetPVWidget {LowPoint}]
 $pv(vtkTemp297) SetValue 0 -1 0
 set pv(vtkTemp302) [$pv(vtkTemp283) GetPVWidget {HighPoint}]

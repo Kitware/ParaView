@@ -45,7 +45,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVContourEntry.h"
 #include "vtkPVLabeledToggle.h"
 #include "vtkPVApplication.h"
-#include "vtkPVSourceInterface.h"
 #include "vtkContourFilter.h"
 #include "vtkPVData.h"
 #include "vtkPVApplication.h"
@@ -93,6 +92,14 @@ vtkPVContour* vtkPVContour::New()
 //----------------------------------------------------------------------------
 void vtkPVContour::CreateProperties()
 {
+  this->vtkPVSource::CreateProperties();
+
+  vtkContourFilter* contour = vtkContourFilter::SafeDownCast(this->VTKSource);
+  if (contour)
+    {
+    contour->SetNumberOfContours(0);
+    }
+
   vtkPVApplication*      pvApp = this->GetPVApplication();
   vtkPVArrayMenu*        arrayMenu;
   vtkPVContourEntry*     entry;
@@ -100,65 +107,92 @@ void vtkPVContour::CreateProperties()
   vtkPVLabeledToggle*    computeNormalsCheck;
   vtkPVLabeledToggle*    computeGradientsCheck;
 
-  this->vtkPVSource::CreateProperties();
+  vtkPVInputMenu* im = this->AddInputMenu(
+    "Input", "PVInput", "vtkDataSet","Set the input to this filter.",
+    this->GetPVWindow()->GetSourceList("Sources")); 
+  im->SetModifiedCommand(this->GetTclName(), 
+			 "SetAcceptButtonColorToRed");
+  this->Script("pack %s -side top -fill x -expand t", im->GetWidgetName());
 
-  this->AddInputMenu("Input", "PVInput", "vtkDataSet",
-                     "Set the input to this filter.",
-                     this->GetPVWindow()->GetSources()); 
-  
+  this->ArrayMenu = vtkPVArrayMenu::New();
+  this->ArrayMenu->SetNumberOfComponents(1);
+  this->ArrayMenu->SetInputName("Input");
+  this->ArrayMenu->SetAttributeType(vtkDataSetAttributes::SCALARS);
+  this->ArrayMenu->SetLabel("Scalars");
+  this->ArrayMenu->SetObjectTclName(this->GetVTKSourceTclName());
+  this->ArrayMenu->SetParent(this->ParameterFrame->GetFrame());
+  this->ArrayMenu->Create(this->Application);
+  this->ArrayMenu->SetBalloonHelpString("Choose which scalar array you want"
+					" to contour.");
+  this->ArrayMenu->SetInputMenu(im);
+  im->AddDependent(this->ArrayMenu);
+  this->AddPVWidget(this->ArrayMenu);
+  this->ArrayMenu->SetModifiedCommand(this->GetTclName(), 
+				      "SetAcceptButtonColorToRed");
+  this->Script("pack %s -side top -fill x -expand t", this->ArrayMenu->GetWidgetName());
 
-  arrayMenu = this->AddArrayMenu("Scalars", vtkDataSetAttributes::SCALARS, 1,
-                                 "Choose which scalar array you want to contour.");
+  vtkPVScalarRangeLabel* scalarRange = vtkPVScalarRangeLabel::New();
+  scalarRange->SetArrayMenu(this->ArrayMenu);
+  scalarRange->SetTraceName("ScalarRangeLabel");
+  scalarRange->SetParent(this->ParameterFrame->GetFrame());
+  scalarRange->Create(this->Application);
+  this->ArrayMenu->AddDependent(scalarRange);  
+  this->AddPVWidget(scalarRange);
+  scalarRange->SetModifiedCommand(this->GetTclName(), 
+				  "SetAcceptButtonColorToRed");
+  this->Script("pack %s", scalarRange->GetWidgetName());
+  scalarRange->Delete();
 
-  // We need to keep this around to check for scalars when the input changes.
-  this->ArrayMenu = arrayMenu;
-  this->ArrayMenu->Register(this);
-
-  this->AddScalarRangeLabel(arrayMenu);
-  
   entry = vtkPVContourEntry::New();
   entry->SetPVSource(this);
   entry->SetParent(this->GetParameterFrame()->GetFrame());
   entry->SetLabel("Contour Values");
-  entry->SetModifiedCommand(this->GetTclName(), "SetAcceptButtonColorToRed");
   entry->Create(pvApp);
   this->AddPVWidget(entry);
   this->Script("pack %s", entry->GetWidgetName());
+  entry->SetModifiedCommand(this->GetTclName(), 
+			    "SetAcceptButtonColorToRed");
   entry->Delete();
   entry = NULL;
   
   computeNormalsCheck = vtkPVLabeledToggle::New();
   computeNormalsCheck->SetParent(this->GetParameterFrame()->GetFrame());
   computeNormalsCheck->SetLabel("Compute Normals");
-  computeNormalsCheck->SetObjectVariable(this->GetVTKSourceTclName(), 
-                                         "ComputeNormals");
-  computeNormalsCheck->SetModifiedCommand(this->GetTclName(), 
-                                          "SetAcceptButtonColorToRed");
-  computeNormalsCheck->Create(pvApp, "Select whether to compute normals");
+  computeNormalsCheck->SetObjectVariable(this->GetVTKSourceTclName(),
+					 "ComputeNormals");
+  computeNormalsCheck->SetBalloonHelpString(
+    "Select whether to compute normals");
+  computeNormalsCheck->Create(pvApp);
   computeNormalsCheck->SetState(1);
   this->AddPVWidget(computeNormalsCheck);
+  computeNormalsCheck->SetModifiedCommand(this->GetTclName(), 
+					  "SetAcceptButtonColorToRed");
 
   computeGradientsCheck = vtkPVLabeledToggle::New();
   computeGradientsCheck->SetParent(this->GetParameterFrame()->GetFrame());
   computeGradientsCheck->SetLabel("Compute Gradients");
-  computeGradientsCheck->SetObjectVariable(this->GetVTKSourceTclName(), 
-                                           "ComputeGradients");
-  computeGradientsCheck->SetModifiedCommand(this->GetTclName(), 
-                                            "SetAcceptButtonColorToRed");
-  computeGradientsCheck->Create(pvApp, "Select whether to compute gradients");
+  computeGradientsCheck->SetObjectVariable(this->GetVTKSourceTclName(),
+					   "ComputeGradients");
+  computeGradientsCheck->SetBalloonHelpString(
+    "Select whether to compute gradients");
+  computeGradientsCheck->Create(pvApp);
   computeGradientsCheck->SetState(0);
   this->AddPVWidget(computeGradientsCheck);
+  computeGradientsCheck->SetModifiedCommand(this->GetTclName(), 
+					    "SetAcceptButtonColorToRed");
   
   computeScalarsCheck = vtkPVLabeledToggle::New();
   computeScalarsCheck->SetParent(this->GetParameterFrame()->GetFrame());
   computeScalarsCheck->SetLabel("Compute Scalars");
-  computeScalarsCheck->SetObjectVariable(this->GetVTKSourceTclName(), 
-                                         "ComputeScalars");
-  computeScalarsCheck->SetModifiedCommand(this->GetTclName(), 
-                                          "SetAcceptButtonColorToRed");
-  computeScalarsCheck->Create(pvApp, "Select whether to compute scalars");
+  computeScalarsCheck->SetObjectVariable(this->GetVTKSourceTclName(),
+					 "ComputeScalars");
+  computeScalarsCheck->SetBalloonHelpString(
+    "Select whether to compute scalars");
+  computeScalarsCheck->Create(pvApp);
   computeScalarsCheck->SetState(1);
   this->AddPVWidget(computeScalarsCheck);
+  computeScalarsCheck->SetModifiedCommand(this->GetTclName(), 
+					  "SetAcceptButtonColorToRed");
 
   this->Script("pack %s %s %s -anchor w -padx 10",
                computeNormalsCheck->GetWidgetName(),
@@ -171,8 +205,6 @@ void vtkPVContour::CreateProperties()
   computeGradientsCheck= NULL;
   computeScalarsCheck->Delete();
   computeScalarsCheck= NULL;
-
-  this->UpdateParameterWidgets();
 }
 
 
@@ -183,22 +215,20 @@ void vtkPVContour::SetPVInput(vtkPVData *input)
     {
     return;
     }
+
   this->vtkPVSource::SetPVInput(input);
 
-  if (this->ArrayMenu == NULL)
+  if (this->ArrayMenu)
     {
-    vtkErrorMacro("Please set the input after you create the properties.  We need to check for scalars.");
-    return;
-    }
-
-  this->InputMenu->Reset();
-  this->ArrayMenu->Reset();
-  if (this->ArrayMenu->GetValue() == NULL)
-    {
-    vtkKWMessageDialog::PopupMessage(
-      this->Application, this->GetPVApplication()->GetMainWindow(), "Warning", 
-      "Input does not have scalars to contour.",
-      vtkKWMessageDialog::WarningIcon);
+    this->ArrayMenu->Reset();
+    if (this->ArrayMenu->GetValue() == NULL)
+      {
+      vtkKWMessageDialog::PopupMessage(
+	this->Application, this->GetPVApplication()->GetMainWindow(), 
+	"Warning", 
+	"Input does not have scalars to contour.",
+	vtkKWMessageDialog::WarningIcon);
+      }
     }
 }
 
@@ -210,8 +240,7 @@ void vtkPVContour::SaveInTclScript(ofstream* file)
   int i;
   vtkContourFilter *source =
     (vtkContourFilter*)this->GetVTKSource();
-  vtkPVSourceInterface *pvsInterface =
-    this->GetPVInput()->GetPVSource()->GetInterface();
+  vtkPVSource *pvs = this->GetPVInput()->GetPVSource();
   
 
   *file << this->VTKSource->GetClassName() << " "
@@ -219,38 +248,33 @@ void vtkPVContour::SaveInTclScript(ofstream* file)
 
   *file << "\t" << this->VTKSourceTclName << " SetInput [";
 
-  if (!this->DefaultScalarsName)
+  if (pvs && strcmp(pvs->GetSourceClassName(), "vtkGenericEnSightReader") == 0)
     {
-    if (pvsInterface && strcmp(pvsInterface->GetSourceClassName(),
-                               "vtkGenericEnSightReader") == 0)
-      {
-      char *charFound;
-      int pos;
-      char *dataName = new char[strlen(this->GetPVInput()->GetVTKDataTclName()) + 1];
-      strcpy(dataName, this->GetPVInput()->GetVTKDataTclName());
-      
-      charFound = strrchr(dataName, 't');
-      tempName = strtok(dataName, "O");
-      *file << tempName << " GetOutput ";
-      pos = charFound - dataName + 1;
-      *file << dataName+pos << "]\n\t";
-      delete [] dataName;
-      }
-    else if (pvsInterface && strcmp(pvsInterface->GetSourceClassName(),
-                                    "vtkPDataSetReader") == 0)
-      {
-      char *dataName = new char[strlen(this->GetPVInput()->GetVTKDataTclName()) + 1];
-      strcpy(dataName, this->GetPVInput()->GetVTKDataTclName());
-      
-      tempName = strtok(dataName, "O");
-      *file << tempName << " GetOutput]\n\t";
-      delete [] dataName;
-      }
-    else
-      {
-      *file << this->GetPVInput()->GetPVSource()->GetVTKSourceTclName()
-            << " GetOutput]\n\t";
-      }
+    char *charFound;
+    int pos;
+    char *dataName = new char[strlen(this->GetPVInput()->GetVTKDataTclName()) + 1];
+    strcpy(dataName, this->GetPVInput()->GetVTKDataTclName());
+    
+    charFound = strrchr(dataName, 't');
+    tempName = strtok(dataName, "O");
+    *file << tempName << " GetOutput ";
+    pos = charFound - dataName + 1;
+    *file << dataName+pos << "]\n\t";
+    delete [] dataName;
+    }
+  else if (pvs && strcmp(pvs->GetSourceClassName(), "vtkPDataSetReader") == 0)
+    {
+    char *dataName = new char[strlen(this->GetPVInput()->GetVTKDataTclName()) + 1];
+    strcpy(dataName, this->GetPVInput()->GetVTKDataTclName());
+    
+    tempName = strtok(dataName, "O");
+    *file << tempName << " GetOutput]\n\t";
+    delete [] dataName;
+    }
+  else
+    {
+    *file << this->GetPVInput()->GetPVSource()->GetVTKSourceTclName()
+	  << " GetOutput]\n\t";
     }
   
   *file << this->VTKSourceTclName << " SetNumberOfContours "
@@ -263,4 +287,15 @@ void vtkPVContour::SaveInTclScript(ofstream* file)
     }
 
   this->GetPVOutput(0)->SaveInTclScript(file);
+}
+
+void vtkPVContour::InitializePrototype()
+{
+
+
+}
+
+int vtkPVContour::ClonePrototypeInternal(int makeCurrent, vtkPVSource*& clone)
+{
+  return this->Superclass::ClonePrototypeInternal(makeCurrent, clone);
 }

@@ -60,7 +60,7 @@ public:
   void SetLabel(const char *str) {this->Label->SetLabel(str); this->SetTraceName(str);}
   const char* GetLabel() { return this->Label->GetLabel();}
 
-  void Create(vtkKWApplication *pvApp, char *help);
+  void Create(vtkKWApplication *pvApp);
   
   // Description:
   // Called when accept button is pushed.  
@@ -74,6 +74,21 @@ public:
   // Side effect is to turn the modified flag off.
   virtual void Reset();
   
+  // Description:
+  // This class redefines SetBalloonHelpString since it
+  // has to forward the call to a widget it contains.
+  virtual void SetBalloonHelpString(const char *str);
+
+//BTX
+  // Description:
+  // Creates and returns a copy of this widget. It will create
+  // a new instance of the same type as the current object
+  // using NewInstance() and then copy some necessary state 
+  // parameters.
+  vtkPVLabel* ClonePrototype(vtkPVSource* pvSource,
+				 vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
+//ETX
+
 protected:
   vtkPVLabel();
   ~vtkPVLabel();
@@ -82,6 +97,14 @@ protected:
 
   vtkPVLabel(const vtkPVLabel&); // Not implemented
   void operator=(const vtkPVLabel&); // Not implemented
+
+//BTX
+  virtual void CopyProperties(vtkPVWidget* clone, vtkPVSource* pvSource,
+			      vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
+//ETX
+  
+  int ReadXMLAttributes(vtkPVXMLElement* element,
+                        vtkPVXMLPackageParser* parser);
 };
 
 #endif

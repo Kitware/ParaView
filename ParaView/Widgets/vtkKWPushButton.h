@@ -69,9 +69,12 @@ public:
   void Enable();
 
 protected:
-  vtkKWPushButton() {};
-  ~vtkKWPushButton() {};
-  
+  vtkKWPushButton();
+  ~vtkKWPushButton();
+
+  vtkSetStringMacro(ButtonLabel);
+  char* ButtonLabel;
+
 private:
   vtkKWPushButton(const vtkKWPushButton&); // Not implemented
   void operator=(const vtkKWPushButton&); // Not implemented

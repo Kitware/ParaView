@@ -23,9 +23,7 @@ set pvWindow [lindex [vtkPVWindow ListInstances] 0]
 $pvWindow ChangeInteractorStyle 1
 
 # Create the reader
-set pInt [$pvWindow GetSourceInterface "vtkPLOT3DReader"]
-set pvPlot3D [$pInt CreateCallback]
-
+set pvPlot3D [$pvWindow CreatePVSource PLOT3DReader]
 
 set XYZFileEntry [$pvPlot3D GetPVWidget {XYZFileName}]
 $XYZFileEntry SetValue $DataDir/Data/combxyz.bin
@@ -34,20 +32,19 @@ $QFileEntry SetValue $DataDir/Data/combq.bin
 $pvPlot3D AcceptCallback
 
 # Create the contour filter
-set cInt [$pvWindow ContourCallback]
+set cInt [$pvWindow CreatePVSource Contour]
 $cInt AcceptCallback
 
 $pvWindow SetCurrentPVSource $pvPlot3D
 
-set eInt [$pvWindow GetSourceInterface "vtkExtractGrid"]
-set pvExtract [$eInt CreateCallback]
+set pvExtract [$pvWindow CreatePVSource ExtractGrid]
 set VOIEntry [$pvExtract GetPVWidget {VOI}]
 $VOIEntry SetValue 0 56 0 32 0 0 
 $pvExtract AcceptCallback
 
 [$pvExtract GetPVOutput] SetVisibility 0
 
-set pvGlyph [$pvWindow GlyphCallback]
+set pvGlyph [$pvWindow CreatePVSource Glyph]
 $pvGlyph AcceptCallback
 
 [$pvGlyph GetPVOutput] ColorByProperty

@@ -51,6 +51,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVWidget.h"
 #include "vtkKWBoundsDisplay.h"
 #include "vtkKWLabeledFrame.h"
+#include "vtkPVInputMenu.h"
 
 class vtkKWApplication;
 
@@ -67,8 +68,7 @@ public:
 
   // Description:
   // The bounds display gets its data object from the input menu.
-  // THis is not reference counted because we want to avoid reference loops.
-  void SetInputMenu(vtkPVInputMenu *inMenu) {this->InputMenu = inMenu;}
+  vtkSetObjectMacro(InputMenu, vtkPVInputMenu);
   vtkGetObjectMacro(InputMenu, vtkPVInputMenu);
 
   // Description:
@@ -86,6 +86,21 @@ public:
   vtkBooleanMacro(ShowHideFrame, int);
   vtkGetMacro(ShowHideFrame, int);
 
+  // Description:
+  // Set / get label for this object.
+  void SetLabel(const char* label);
+  const char* GetLabel();
+  
+//BTX
+  // Description:
+  // Creates and returns a copy of this widget. It will create
+  // a new instance of the same type as the current object
+  // using NewInstance() and then copy some necessary state 
+  // parameters.
+  vtkPVBoundsDisplay* ClonePrototype(vtkPVSource* pvSource,
+				 vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
+//ETX
+
 protected:
   vtkPVBoundsDisplay();
   ~vtkPVBoundsDisplay();
@@ -96,6 +111,21 @@ protected:
 
   vtkPVBoundsDisplay(const vtkPVBoundsDisplay&); // Not implemented
   void operator=(const vtkPVBoundsDisplay&); // Not implemented
+
+  vtkGetStringMacro(FrameLabel);
+  vtkSetStringMacro(FrameLabel);
+
+  char* FrameLabel;
+
+//BTX
+  virtual void CopyProperties(vtkPVWidget* clone, vtkPVSource* pvSource,
+			      vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
+  vtkPVWidget* ClonePrototypeInternal(
+    vtkPVSource* pvSource, vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
+//ETX
+
+  int ReadXMLAttributes(vtkPVXMLElement* element,
+                        vtkPVXMLPackageParser* parser);
 };
 
 

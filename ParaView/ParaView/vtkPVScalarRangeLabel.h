@@ -67,8 +67,7 @@ public:
 
   // Description:
   // The scalar range display gets its array object from the array menu.
-  // This is not reference counted because we want to avoid reference loops.
-  void SetArrayMenu(vtkPVArrayMenu *aMenu) {this->ArrayMenu = aMenu;}
+  vtkSetObjectMacro(ArrayMenu, vtkPVArrayMenu);
   vtkGetObjectMacro(ArrayMenu, vtkPVArrayMenu);
 
   // Description:
@@ -79,6 +78,16 @@ public:
   // Access to the range values.
   // This is used in a regression test.
   vtkGetVector2Macro(Range, float);
+
+//BTX
+  // Description:
+  // Creates and returns a copy of this widget. It will create
+  // a new instance of the same type as the current object
+  // using NewInstance() and then copy some necessary state 
+  // parameters.
+  vtkPVScalarRangeLabel* ClonePrototype(vtkPVSource* pvSource,
+				 vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
+//ETX
 
 protected:
   vtkPVScalarRangeLabel();
@@ -91,6 +100,14 @@ protected:
 
   vtkPVScalarRangeLabel(const vtkPVScalarRangeLabel&); // Not implemented
   void operator=(const vtkPVScalarRangeLabel&); // Not implemented
+
+//BTX
+  virtual void CopyProperties(vtkPVWidget* clone, vtkPVSource* pvSource,
+			      vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
+//ETX
+  
+  int ReadXMLAttributes(vtkPVXMLElement* element,
+                        vtkPVXMLPackageParser* parser);
 };
 
 

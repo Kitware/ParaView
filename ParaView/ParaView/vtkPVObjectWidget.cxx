@@ -39,21 +39,13 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
+#include "vtkPVApplication.h"
+#include "vtkPVSource.h"
 #include "vtkPVObjectWidget.h"
 #include "vtkObjectFactory.h"
+#include "vtkArrayMap.txx"
+#include "vtkPVXMLElement.h"
 
-//----------------------------------------------------------------------------
-vtkPVObjectWidget* vtkPVObjectWidget::New()
-{
-  // First try to create the object from the vtkObjectFactory
-  vtkObject* ret = vtkObjectFactory::CreateInstance("vtkPVObjectWidget");
-  if (ret)
-    {
-    return (vtkPVObjectWidget*)ret;
-    }
-  // If the factory was unable to create the object, then create it here.
-  return new vtkPVObjectWidget;
-}
 
 //----------------------------------------------------------------------------
 vtkPVObjectWidget::vtkPVObjectWidget()
@@ -89,5 +81,39 @@ void vtkPVObjectWidget::SaveInTclScript(ofstream *file)
   *file << " " << result << "\n";
 }
 
+vtkPVObjectWidget* vtkPVObjectWidget::ClonePrototype(vtkPVSource* pvSource,
+				 vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
+{
+  vtkPVWidget* clone = this->ClonePrototypeInternal(pvSource, map);
+  return vtkPVObjectWidget::SafeDownCast(clone);
+}
 
- 
+void vtkPVObjectWidget::CopyProperties(vtkPVWidget* clone, 
+				       vtkPVSource* pvSource,
+			      vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
+{
+  this->Superclass::CopyProperties(clone, pvSource, map);
+  vtkPVObjectWidget* pvow = vtkPVObjectWidget::SafeDownCast(clone);
+  if (pvow)
+    {
+    pvow->SetVariableName(this->VariableName);
+    pvow->SetObjectTclName(pvSource->GetVTKSourceTclName());
+    }
+  else 
+    {
+    vtkErrorMacro("Internal error. Could not downcast clone to PVObjectWidget.");
+    }
+}
+
+//----------------------------------------------------------------------------
+int vtkPVObjectWidget::ReadXMLAttributes(vtkPVXMLElement* element,
+                                          vtkPVXMLPackageParser* parser)
+{
+  if(!this->Superclass::ReadXMLAttributes(element, parser)) { return 0; }
+  const char* variable = element->GetAttribute("variable");
+  if(variable)
+    {
+    this->SetVariableName(variable);
+    }
+  return 1;
+}

@@ -66,8 +66,7 @@ public:
   
   // Description:
   // Creates common widgets.
-  // Returns 0 if there was an error.
-  int Create(vtkKWApplication *app);
+  void Create(vtkKWApplication *app);
 
   // Add items to the possible selection.
   // The string name is displayed in the list, and the integer value
@@ -101,6 +100,16 @@ public:
   // Use this method if you want to programmatically change the selection.
   void SelectCallback(const char *name, int value);
   
+//BTX
+  // Description:
+  // Creates and returns a copy of this widget. It will create
+  // a new instance of the same type as the current object
+  // using NewInstance() and then copy some necessary state 
+  // parameters.
+  vtkPVSelectionList* ClonePrototype(vtkPVSource* pvSource,
+				 vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
+//ETX
+
 protected:
   vtkPVSelectionList();
   ~vtkPVSelectionList();
@@ -118,6 +127,14 @@ protected:
   
   vtkPVSelectionList(const vtkPVSelectionList&); // Not implemented
   void operator=(const vtkPVSelectionList&); // Not implemented
+
+//BTX
+  virtual void CopyProperties(vtkPVWidget* clone, vtkPVSource* pvSource,
+			      vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
+//ETX
+  
+  int ReadXMLAttributes(vtkPVXMLElement* element,
+                        vtkPVXMLPackageParser* parser);
 };
 
 #endif
