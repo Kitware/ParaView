@@ -27,6 +27,7 @@ SET( KWWidgets_SRCS
   vtkKWCheckButton.cxx 
   vtkKWCheckButtonSet.cxx 
   vtkKWCheckButtonWithChangeColor.cxx
+  vtkKWColorPresetSelector.cxx
   vtkKWColorTransferFunctionEditor.cxx
   vtkKWComposite.cxx 
   vtkKWCompositeCollection.cxx 
