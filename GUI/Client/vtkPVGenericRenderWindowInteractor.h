@@ -18,20 +18,26 @@
 #ifndef __vtkPVGenericRenderWindowInteractor_h
 #define __vtkPVGenericRenderWindowInteractor_h
 
-#include "vtkGenericRenderWindowInteractor.h"
+#include "vtkRenderWindowInteractor.h"
 
 class vtkPVRenderView;
 class vtkRenderer;
 
-class VTK_EXPORT vtkPVGenericRenderWindowInteractor : public vtkGenericRenderWindowInteractor
+class VTK_EXPORT vtkPVGenericRenderWindowInteractor : public vtkRenderWindowInteractor
 {
 public:
   static vtkPVGenericRenderWindowInteractor *New();
-  vtkTypeRevisionMacro(vtkPVGenericRenderWindowInteractor, vtkGenericRenderWindowInteractor);
+  vtkTypeRevisionMacro(vtkPVGenericRenderWindowInteractor, vtkRenderWindowInteractor);
   void PrintSelf(ostream& os, vtkIndent indent);
   
   void SetPVRenderView(vtkPVRenderView *view);
   vtkGetObjectMacro(PVRenderView, vtkPVRenderView);
+
+  // Description:
+  // Fire various events, SetEventInformation should be called just prior
+  // to calling any of these methods.  This methods will Invoke the 
+  // corresponding vtk event.
+  virtual void ConfigureEvent();
 
   // Description:
   // My sollution to the poked renderer problem.
@@ -66,6 +72,7 @@ public:
   void SatelliteMiddleRelease(int x, int y, int control, int shift);
   void SatelliteRightRelease(int x, int y, int control, int shift);
   void SatelliteMove(int x, int y);
+  void SatelliteKeyPress(char keyCode, int x, int y);
 
 protected:
   vtkPVGenericRenderWindowInteractor();
