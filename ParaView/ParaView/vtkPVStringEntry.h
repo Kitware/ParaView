@@ -50,6 +50,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class vtkKWEntry;
 class vtkKWLabel;
+class vtkPVStringWidgetProperty;
 
 class VTK_EXPORT vtkPVStringEntry : public vtkPVObjectWidget
 {
@@ -100,6 +101,9 @@ public:
   // This serves a dual purpose.  For tracing and for saving state.
   virtual void Trace(ofstream *file);
 
+  virtual void SetProperty(vtkPVWidgetProperty *prop);
+  virtual vtkPVWidgetProperty* CreateAppropriateProperty();
+  
 protected:
   vtkPVStringEntry();
   ~vtkPVStringEntry();
@@ -114,10 +118,12 @@ protected:
   vtkGetStringMacro(EntryLabel);
   char* EntryLabel;
 
-  char* LastAcceptedString;
-  vtkSetStringMacro(LastAcceptedString);
-  vtkGetStringMacro(LastAcceptedString);
+  char* DefaultValue;
+  vtkSetStringMacro(DefaultValue);
+  vtkGetStringMacro(DefaultValue);
   int AcceptCalled;
+
+  vtkPVStringWidgetProperty *Property;
   
 //BTX
   virtual void CopyProperties(vtkPVWidget* clone, vtkPVSource* pvSource,

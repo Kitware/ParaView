@@ -55,6 +55,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVApplication.h"
 #include "vtkPVProcessModule.h"
 #include "vtkPVReaderModule.h"
+#include "vtkPVStringWidgetProperty.h"
 #include "vtkPVWindow.h"
 #include "vtkPVXMLElement.h"
 #include "vtkString.h"
@@ -62,7 +63,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVFileEntry);
-vtkCxxRevisionMacro(vtkPVFileEntry, "1.52.2.2");
+vtkCxxRevisionMacro(vtkPVFileEntry, "1.52.2.3");
 
 //----------------------------------------------------------------------------
 vtkPVFileEntry::vtkPVFileEntry()
@@ -84,7 +85,7 @@ vtkPVFileEntry::vtkPVFileEntry()
   this->Path = 0;
   this->Range[0] = this->Range[1] = 0;
   
-  this->LastAcceptedFileName = 0;
+  this->Property = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -105,7 +106,7 @@ vtkPVFileEntry::~vtkPVFileEntry()
   this->SetExt(0);
   this->SetPath(0);
   
-  this->SetLastAcceptedFileName(0);
+  this->SetProperty(NULL);
 }
 
 //----------------------------------------------------------------------------
@@ -576,9 +577,8 @@ void vtkPVFileEntry::AcceptInternal(const char* sourceTclName)
 
   const char* fname = this->Entry->GetValue();
 
-  pvApp->GetProcessModule()->ServerScript(
-    "%s Set%s {%s}", sourceTclName, this->VariableName, fname);
-  this->SetLastAcceptedFileName(fname);  
+  this->Property->SetString(fname);
+  this->Property->SetVTKSourceTclName(sourceTclName);
 
   vtkPVReaderModule* rm = vtkPVReaderModule::SafeDownCast(this->PVSource);
   if (rm && fname && fname[0])
@@ -599,9 +599,7 @@ void vtkPVFileEntry::ResetInternal()
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
 
-//  pvApp->Script("%s SetValue [%s Get%s]", this->Entry->GetTclName(),
-//                sourceTclName, this->VariableName); 
-  this->SetValue(this->LastAcceptedFileName);
+  this->SetValue(this->Property->GetString());
 
   this->ModifiedFlag = 0;
 }
@@ -732,6 +730,24 @@ void vtkPVFileEntry::AnimationMenuCallback(vtkPVAnimationInterfaceEntry *ai)
   ai->SetSaveStateScript(script);
   ai->SetSaveStateObject(this);
   ai->Update();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVFileEntry::SetProperty(vtkPVWidgetProperty *prop)
+{
+  this->Property = vtkPVStringWidgetProperty::SafeDownCast(prop);
+  if (this->Property)
+    {
+    char *cmd = new char[strlen(this->VariableName)+4];
+    sprintf(cmd, "Set%s", this->VariableName);
+    this->Property->SetVTKCommand(cmd);
+    }
+}
+
+//----------------------------------------------------------------------------
+vtkPVWidgetProperty* vtkPVFileEntry::CreateAppropriateProperty()
+{
+  return vtkPVStringWidgetProperty::New();
 }
 
 //----------------------------------------------------------------------------

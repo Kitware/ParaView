@@ -42,12 +42,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVContainerWidget.h"
 #include "vtkObjectFactory.h"
 #include "vtkArrayMap.txx"
-#include "vtkLinkedList.txx"
+#include "vtkCollection.h"
+#include "vtkCollectionIterator.h"
+#include "vtkPVWidgetProperty.h"
 #include "vtkPVXMLElement.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVContainerWidget);
-vtkCxxRevisionMacro(vtkPVContainerWidget, "1.14.4.1");
+vtkCxxRevisionMacro(vtkPVContainerWidget, "1.14.4.2");
 
 int vtkPVContainerWidgetCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -55,7 +57,6 @@ int vtkPVContainerWidgetCommand(ClientData cd, Tcl_Interp *interp,
 #ifndef VTK_NO_EXPLICIT_TEMPLATE_INSTANTIATION
 
 template class VTK_EXPORT vtkAbstractList<vtkPVWidget*>;
-template class VTK_EXPORT vtkLinkedList<vtkPVWidget*>;
 
 #endif
 
@@ -64,7 +65,7 @@ vtkPVContainerWidget::vtkPVContainerWidget()
 {
   this->CommandFunction = vtkPVContainerWidgetCommand;
 
-  this->Widgets = vtkLinkedList<vtkPVWidget*>::New();
+  this->WidgetProperties = vtkCollection::New();
 
   this->PackDirection = 0;
   this->SetPackDirection("top");
@@ -73,8 +74,8 @@ vtkPVContainerWidget::vtkPVContainerWidget()
 //----------------------------------------------------------------------------
 vtkPVContainerWidget::~vtkPVContainerWidget()
 {
-  this->Widgets->Delete();
-  this->Widgets = NULL;
+  this->WidgetProperties->Delete();
+  this->WidgetProperties = NULL;
   this->SetPackDirection(0);
 }
 
@@ -90,13 +91,18 @@ void vtkPVContainerWidget::Create(vtkKWApplication *app)
   // create the top level
   this->Script("frame %s", this->GetWidgetName());
 
-  vtkLinkedListIterator<vtkPVWidget*>* it = this->Widgets->NewIterator();
+  vtkCollectionIterator *it = this->WidgetProperties->NewIterator();
+  it->InitTraversal();
+  
   vtkPVWidget* widget;
-  while ( !it->IsDoneWithTraversal() )
+  vtkPVWidgetProperty *prop;
+  int i;
+  
+  for (i = 0; i < this->WidgetProperties->GetNumberOfItems(); i++)
     {
-    widget = 0;
-    it->GetData(widget);
-    if (widget && !widget->GetApplication())
+    prop = static_cast<vtkPVWidgetProperty*>(it->GetObject());
+    widget = prop->GetWidget();
+    if (!widget->GetApplication())
       {
       widget->Create(this->Application);
       this->Script("pack %s -side %s -fill both -expand true",
@@ -105,7 +111,6 @@ void vtkPVContainerWidget::Create(vtkKWApplication *app)
     it->GoToNextItem();
     }
   it->Delete();
-
 }
 
 
@@ -117,13 +122,18 @@ int vtkPVContainerWidget::GetModifiedFlag()
     return 1;
     }
 
-  vtkLinkedListIterator<vtkPVWidget*>* it = this->Widgets->NewIterator();
+  vtkCollectionIterator *it = this->WidgetProperties->NewIterator();
+  it->InitTraversal();
+  
   vtkPVWidget* widget;
-  while ( !it->IsDoneWithTraversal() )
+  vtkPVWidgetProperty *prop;
+  int i;
+  
+  for (i = 0; i < this->WidgetProperties->GetNumberOfItems(); i++)
     {
-    widget = 0;
-    it->GetData(widget);
-    if (widget && widget->GetModifiedFlag())
+    prop = static_cast<vtkPVWidgetProperty*>(it->GetObject());
+    widget = prop->GetWidget();
+    if (widget->GetModifiedFlag())
       {
       it->Delete();
       return 1;
@@ -139,16 +149,18 @@ int vtkPVContainerWidget::GetModifiedFlag()
 //----------------------------------------------------------------------------
 void vtkPVContainerWidget::AcceptInternal(const char* sourceTclName)
 {
-  vtkLinkedListIterator<vtkPVWidget*>* it = this->Widgets->NewIterator();
+  vtkCollectionIterator *it = this->WidgetProperties->NewIterator();
+  it->InitTraversal();
+  
   vtkPVWidget* widget;
-  while ( !it->IsDoneWithTraversal() )
+  vtkPVWidgetProperty *prop;
+  int i;
+  
+  for (i = 0; i < this->WidgetProperties->GetNumberOfItems(); i++)
     {
-    widget = 0;
-    it->GetData(widget);
-    if (widget)
-      {
-      widget->AcceptInternal(sourceTclName);
-      }
+    prop = static_cast<vtkPVWidgetProperty*>(it->GetObject());
+    widget = prop->GetWidget();
+    widget->AcceptInternal(sourceTclName);
     it->GoToNextItem();
     }
   it->Delete();
@@ -159,7 +171,8 @@ void vtkPVContainerWidget::AcceptInternal(const char* sourceTclName)
 //---------------------------------------------------------------------------
 void vtkPVContainerWidget::Trace(ofstream *file)
 {
-  vtkLinkedListIterator<vtkPVWidget*>* it;
+  vtkCollectionIterator *it;
+  
   vtkPVWidget* widget;
 
   if ( ! this->InitializeTrace(file))
@@ -167,15 +180,16 @@ void vtkPVContainerWidget::Trace(ofstream *file)
     return;
     }
 
-  it = this->Widgets->NewIterator();
-  while ( !it->IsDoneWithTraversal() )
+  it = this->WidgetProperties->NewIterator();
+  it->InitTraversal();
+  int i;
+  vtkPVWidgetProperty *prop;
+  
+  for (i = 0; i < this->WidgetProperties->GetNumberOfItems(); i++)
     {
-    widget = 0;
-    it->GetData(widget);
-    if (widget)
-      {
-      widget->Trace(file);
-      }
+    prop = static_cast<vtkPVWidgetProperty*>(it->GetObject());
+    widget = prop->GetWidget();
+    widget->Trace(file);
     it->GoToNextItem();
     }
   it->Delete();
@@ -185,17 +199,18 @@ void vtkPVContainerWidget::Trace(ofstream *file)
 //----------------------------------------------------------------------------
 void vtkPVContainerWidget::ResetInternal()
 {
-
-  vtkLinkedListIterator<vtkPVWidget*>* it = this->Widgets->NewIterator();
+  vtkCollectionIterator *it = this->WidgetProperties->NewIterator();
+  it->InitTraversal();
+  
   vtkPVWidget* widget;
-  while ( !it->IsDoneWithTraversal() )
+  vtkPVWidgetProperty *prop;
+  int i;
+  
+  for (i = 0; i < this->WidgetProperties->GetNumberOfItems(); i++)
     {
-    widget = 0;
-    it->GetData(widget);
-    if (widget)
-      {
-      widget->ResetInternal();
-      }
+    prop = static_cast<vtkPVWidgetProperty*>(it->GetObject());
+    widget = prop->GetWidget();
+    widget->ResetInternal();
     it->GoToNextItem();
     }
   it->Delete();
@@ -206,16 +221,18 @@ void vtkPVContainerWidget::ResetInternal()
 //----------------------------------------------------------------------------
 void vtkPVContainerWidget::Select()
 {
-  vtkLinkedListIterator<vtkPVWidget*>* it = this->Widgets->NewIterator();
+  vtkCollectionIterator *it = this->WidgetProperties->NewIterator();
+  it->InitTraversal();
+  
   vtkPVWidget* widget;
-  while ( !it->IsDoneWithTraversal() )
+  vtkPVWidgetProperty *prop;
+  int i;
+  
+  for (i = 0; i < this->WidgetProperties->GetNumberOfItems(); i++)
     {
-    widget = 0;
-    it->GetData(widget);
-    if (widget)
-      {
-      widget->Select();
-      }
+    prop = static_cast<vtkPVWidgetProperty*>(it->GetObject());
+    widget = prop->GetWidget();
+    widget->Select();
     it->GoToNextItem();
     }
   it->Delete();
@@ -226,16 +243,18 @@ void vtkPVContainerWidget::Select()
 //----------------------------------------------------------------------------
 void vtkPVContainerWidget::Deselect()
 {
-  vtkLinkedListIterator<vtkPVWidget*>* it = this->Widgets->NewIterator();
+  vtkCollectionIterator *it = this->WidgetProperties->NewIterator();
+  it->InitTraversal();
+  
   vtkPVWidget* widget;
-  while ( !it->IsDoneWithTraversal() )
+  vtkPVWidgetProperty *prop;
+  int i;
+  
+  for (i = 0; i < this->WidgetProperties->GetNumberOfItems(); i++)
     {
-    widget = 0;
-    it->GetData(widget);
-    if (widget)
-      {
-      widget->Deselect();
-      }
+    prop = static_cast<vtkPVWidgetProperty*>(it->GetObject());
+    widget = prop->GetWidget();
+    widget->Deselect();
     it->GoToNextItem();
     }
   it->Delete();
@@ -247,8 +266,11 @@ void vtkPVContainerWidget::Deselect()
 void vtkPVContainerWidget::AddPVWidget(vtkPVWidget *pvw)
 {
   char str[512];
-  this->Widgets->AppendItem(pvw); 
-
+  vtkPVWidgetProperty *prop = pvw->CreateAppropriateProperty();
+  prop->SetWidget(pvw);
+  this->WidgetProperties->AddItem(prop);
+  prop->Delete();
+  
   if (pvw->GetTraceName() == NULL)
     {
     vtkWarningMacro("TraceName not set.");
@@ -257,16 +279,21 @@ void vtkPVContainerWidget::AddPVWidget(vtkPVWidget *pvw)
 
   pvw->SetTraceReferenceObject(this);
   sprintf(str, "GetPVWidget {%s}", pvw->GetTraceName());
-  pvw->SetTraceReferenceCommand(str);
- 
+  pvw->SetTraceReferenceCommand(str); 
 }
 
 vtkPVWidget* vtkPVContainerWidget::GetPVWidget(vtkIdType i)
 {
   vtkPVWidget* widget = 0;
-  if (this->Widgets->GetItem(i, widget) != VTK_OK)
+  vtkPVWidgetProperty *prop =
+    static_cast<vtkPVWidgetProperty*>(this->WidgetProperties->GetItemAsObject(i));
+  if (!prop)
     {
     widget = 0;
+    }
+  else
+    {
+    widget = prop->GetWidget();
     }
   return widget;
 }
@@ -278,13 +305,18 @@ vtkPVWidget* vtkPVContainerWidget::GetPVWidget(const char* traceName)
     return 0;
     }
 
-  vtkLinkedListIterator<vtkPVWidget*>* it = this->Widgets->NewIterator();
+  vtkCollectionIterator *it = this->WidgetProperties->NewIterator();
+  it->InitTraversal();
+  
   vtkPVWidget* widget;
-  while ( !it->IsDoneWithTraversal() )
+  vtkPVWidgetProperty *prop;
+  int i;
+  
+  for (i = 0; i < this->WidgetProperties->GetNumberOfItems(); i++)
     {
-    widget = 0;
-    it->GetData(widget);
-    if (widget && widget->GetTraceName() && 
+    prop = static_cast<vtkPVWidgetProperty*>(it->GetObject());
+    widget = prop->GetWidget();
+    if (widget->GetTraceName() && 
         strcmp(traceName,widget->GetTraceName()) == 0) 
       {
       it->Delete();
@@ -299,16 +331,18 @@ vtkPVWidget* vtkPVContainerWidget::GetPVWidget(const char* traceName)
 //----------------------------------------------------------------------------
 void vtkPVContainerWidget::SaveInBatchScript(ofstream *file)
 {
-  vtkLinkedListIterator<vtkPVWidget*>* it = this->Widgets->NewIterator();
+  vtkCollectionIterator *it = this->WidgetProperties->NewIterator();
+  it->InitTraversal();
+  
   vtkPVWidget* widget;
-  while ( !it->IsDoneWithTraversal() )
+  vtkPVWidgetProperty *prop;
+  int i;
+  
+  for (i = 0; i < this->WidgetProperties->GetNumberOfItems(); i++)
     {
-    widget = 0;
-    it->GetData(widget);
-    if (widget) 
-      {
-      widget->SaveInBatchScript(file);
-      }
+    prop = static_cast<vtkPVWidgetProperty*>(it->GetObject());
+    widget = prop->GetWidget();
+    widget->SaveInBatchScript(file);
     it->GoToNextItem();
     }
   it->Delete();
@@ -343,20 +377,22 @@ vtkPVWidget* vtkPVContainerWidget::ClonePrototypeInternal(
       return 0;
       }
     
-    vtkLinkedListIterator<vtkPVWidget*>* it = this->Widgets->NewIterator();
+    vtkCollectionIterator *it = this->WidgetProperties->NewIterator();
+    it->InitTraversal();
+    
     vtkPVWidget* widget;
+    vtkPVWidgetProperty *prop;
     vtkPVWidget* clone;
-    while ( !it->IsDoneWithTraversal() )
+    int i;
+    
+    for (i = 0; i < this->WidgetProperties->GetNumberOfItems(); i++)
       {
-      widget = 0;
-      it->GetData(widget);
-      if (widget)
-        {
-        clone = widget->ClonePrototype(pvSource, map);
-        clone->SetParent(pvCont);
-        pvCont->AddPVWidget(clone);
-        clone->Delete();
-        }
+      prop = static_cast<vtkPVWidgetProperty*>(it->GetObject());
+      widget = prop->GetWidget();
+      clone = widget->ClonePrototype(pvSource, map);
+      clone->SetParent(pvCont);
+      pvCont->AddPVWidget(clone);
+      clone->Delete();
       it->GoToNextItem();
       }
     it->Delete();
@@ -389,8 +425,6 @@ void vtkPVContainerWidget::CopyProperties(
     vtkErrorMacro("Internal error. Could not downcast clone to "
                   "PVContainerWidget.");
     }
-  
-
 }
 
 //----------------------------------------------------------------------------

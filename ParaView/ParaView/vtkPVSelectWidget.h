@@ -55,12 +55,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class vtkStringList;
 class vtkKWOptionMenu;
 class vtkKWLabel;
-class vtkPVWidgetCollection;
+class vtkCollection;
 class vtkPVSource;
+class vtkPVStringWidgetProperty;
 class vtkKWLabeledFrame;
 class vtkStringList;
-class vtkPVWidgetCollection;
-
 
 //BTX
 template <class key, class data> 
@@ -169,6 +168,9 @@ public:
   // This serves a dual purpose.  For tracing and for saving state.
   virtual void Trace(ofstream *file);
 
+  virtual void SetProperty(vtkPVWidgetProperty *prop);
+  virtual vtkPVWidgetProperty* CreateAppropriateProperty();
+  
 protected:
   vtkPVSelectWidget();
   ~vtkPVSelectWidget();
@@ -186,13 +188,12 @@ protected:
   // Using this list as an array of strings.
   vtkStringList *Labels;
   vtkStringList *Values;
-  vtkPVWidgetCollection *Widgets;
+  vtkCollection *WidgetProperties;
 
   int CurrentIndex;
   int UseWidgetCommand;
 
-  char* LastAcceptedValue;
-  vtkSetStringMacro(LastAcceptedValue);
+  vtkPVStringWidgetProperty *Property;
   
 //BTX
   virtual vtkPVWidget* ClonePrototypeInternal(vtkPVSource* pvSource,

@@ -59,6 +59,7 @@ class vtkKWMenuButton;
 class vtkKWOptionMenu;
 class vtkKWPushButton;
 class vtkKWWidget;
+class vtkPVStringAndScalarListWidgetProperty;
 
 class VTK_EXPORT vtkPVCalculatorWidget : public vtkPVWidget
 {
@@ -113,6 +114,9 @@ public:
   // This serves a dual purpose.  For tracing and for saving state.
   virtual void Trace(ofstream *file);
 
+  virtual void SetProperty(vtkPVWidgetProperty *prop);
+  virtual vtkPVWidgetProperty* CreateAppropriateProperty();
+  
 protected:
   vtkPVCalculatorWidget();
   ~vtkPVCalculatorWidget();
@@ -179,6 +183,9 @@ protected:
   int NumberOfVectorVariables;
   void ClearAllVariables();
   
+  vtkPVStringAndScalarListWidgetProperty *Property;
+  
+private:
   vtkPVCalculatorWidget(const vtkPVCalculatorWidget&); // Not implemented
   void operator=(const vtkPVCalculatorWidget&); // Not implemented
 };

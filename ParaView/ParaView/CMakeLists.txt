@@ -74,6 +74,7 @@ SET( ParaView_SRCS
   vtkPVImageGradientMagnitude.cxx
   vtkPVImageMedian3D.cxx
   vtkPVImplicitPlaneWidget.cxx
+  vtkPVIndexWidgetProperty.cxx
   vtkPVInformation.cxx
   vtkPVInitialize.cxx
   vtkPVInputArrayRequirement.cxx
@@ -125,6 +126,7 @@ SET( ParaView_SRCS
   vtkPVRenderView.cxx 
   vtkPVRibbonFilter.cxx
   vtkPVSaveBatchScriptDialog.cxx
+  vtkPVScalarListWidgetProperty.cxx
   vtkPVScalarRangeLabel.cxx 
   vtkPVScale.cxx 
   vtkPVSelectCTHArrays.cxx
@@ -139,7 +141,9 @@ SET( ParaView_SRCS
   vtkPVSourceWidget.cxx
   vtkPVSourcesNavigationWindow.cxx
   vtkPVSphereWidget.cxx
+  vtkPVStringAndScalarListWidgetProperty.cxx
   vtkPVStringEntry.cxx
+  vtkPVStringWidgetProperty.cxx
   vtkPVSummaryHelper.cxx
   vtkPVThresholdFilter.cxx
   vtkPVTiledDisplayManager.cxx
@@ -157,6 +161,7 @@ SET( ParaView_SRCS
   vtkPVWarpVector.cxx
   vtkPVWidget.cxx
   vtkPVWidgetCollection.cxx
+  vtkPVWidgetProperty.cxx
   vtkPVWindow.cxx 
   vtkPVWindowResources.cxx 
   vtkPVWorldPointPicker.cxx 

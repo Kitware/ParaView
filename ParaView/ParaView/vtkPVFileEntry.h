@@ -53,6 +53,7 @@ class vtkKWEntry;
 class vtkPVSource;
 class vtkKWScale;
 class vtkKWFrame;
+class vtkPVStringWidgetProperty;
 
 //BTX
 template<class KeyType,class DataType> class vtkArrayMap;
@@ -147,6 +148,9 @@ public:
   // Get the range of files.
   vtkGetVector2Macro(Range, int);
 
+  virtual void SetProperty(vtkPVWidgetProperty *prop);
+  virtual vtkPVWidgetProperty* CreateAppropriateProperty();
+  
 protected:
   vtkPVFileEntry();
   ~vtkPVFileEntry();
@@ -176,11 +180,7 @@ protected:
   int FileNameLength;
   int Range[2];
 
-  char* LastAcceptedFileName;
-  vtkSetStringMacro(LastAcceptedFileName);
-  
-  vtkPVFileEntry(const vtkPVFileEntry&); // Not implemented
-  void operator=(const vtkPVFileEntry&); // Not implemented
+  vtkPVStringWidgetProperty *Property;
 
   //BTX
   virtual void CopyProperties(vtkPVWidget* clone, vtkPVSource* pvSource,
@@ -189,6 +189,10 @@ protected:
 
   int ReadXMLAttributes(vtkPVXMLElement* element,
     vtkPVXMLPackageParser* parser);
+  
+private:
+  vtkPVFileEntry(const vtkPVFileEntry&); // Not implemented
+  void operator=(const vtkPVFileEntry&); // Not implemented
 };
 
 #endif

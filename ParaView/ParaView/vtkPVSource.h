@@ -51,6 +51,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkKWObject.h"
 
+class vtkCollection;
 class vtkDataSet;
 class vtkKWEntry;
 class vtkKWFrame;
@@ -69,7 +70,7 @@ class vtkPVLabel;
 class vtkPVRenderView;
 class vtkPVSourceCollection;
 class vtkPVWidget;
-class vtkPVWidgetCollection;
+class vtkPVWidgetProperty;
 class vtkPVWindow;
 class vtkSource;
 class vtkStringList;
@@ -230,7 +231,8 @@ public:
   vtkGetObjectMacro(DeleteButton, vtkKWPushButton);
   vtkGetObjectMacro(AcceptButton, vtkKWPushButton);
   
-  vtkGetObjectMacro(Widgets, vtkPVWidgetCollection);
+//  vtkGetObjectMacro(Widgets, vtkPVWidgetCollection);
+  vtkGetObjectMacro(WidgetProperties, vtkCollection);
   
   vtkGetObjectMacro(ParameterFrame, vtkKWFrame);
   vtkGetObjectMacro(MainParameterFrame, vtkKWWidget);
@@ -524,7 +526,7 @@ protected:
   vtkKWWidget *ButtonFrame;
   vtkKWFrame *ParameterFrame;
   
-  vtkPVWidgetCollection *Widgets;
+  vtkCollection *WidgetProperties;
 
   vtkKWPushButton *AcceptButton;
   vtkKWPushButton *ResetButton;

@@ -46,12 +46,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWLabel.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
-#include "vtkPVProcessModule.h"
+#include "vtkPVIndexWidgetProperty.h"
 #include "vtkPVXMLElement.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLabeledToggle);
-vtkCxxRevisionMacro(vtkPVLabeledToggle, "1.18.4.2");
+vtkCxxRevisionMacro(vtkPVLabeledToggle, "1.18.4.3");
 
 //----------------------------------------------------------------------------
 vtkPVLabeledToggle::vtkPVLabeledToggle()
@@ -60,8 +60,9 @@ vtkPVLabeledToggle::vtkPVLabeledToggle()
   this->Label->SetParent(this);
   this->CheckButton = vtkKWCheckButton::New();
   this->CheckButton->SetParent(this);
-  this->LastAcceptedValue = 0;
   this->AcceptCalled = 0;
+  this->DefaultValue = 0;
+  this->Property = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -71,8 +72,10 @@ vtkPVLabeledToggle::~vtkPVLabeledToggle()
   this->CheckButton = NULL;
   this->Label->Delete();
   this->Label = NULL;
+  this->SetProperty(NULL);
 }
 
+//----------------------------------------------------------------------------
 void vtkPVLabeledToggle::SetBalloonHelpString(const char *str)
 {
 
@@ -137,7 +140,7 @@ void vtkPVLabeledToggle::Create(vtkKWApplication *pvApp)
     }
   this->Script("pack %s -side left", this->CheckButton->GetWidgetName());
   
-  this->SetState(this->LastAcceptedValue);
+  this->SetState(this->Property->GetIndex());
 }
 
 //----------------------------------------------------------------------------
@@ -155,7 +158,7 @@ void vtkPVLabeledToggle::SetState(int val)
   
   if (!this->AcceptCalled)
     {
-    this->LastAcceptedValue = val;
+    this->Property->SetIndex(val);
     }
   
   this->ModifiedCallback();
@@ -188,13 +191,10 @@ void vtkPVLabeledToggle::Trace(ofstream *file)
 //----------------------------------------------------------------------------
 void vtkPVLabeledToggle::AcceptInternal(const char* sourceTclName)
 {
-  vtkPVApplication *pvApp = this->GetPVApplication();
-
-  pvApp->GetProcessModule()->ServerScript(
-    "%s Set%s %d", sourceTclName, this->VariableName, this->GetState());
-
   this->ModifiedFlag = 0;
-  this->LastAcceptedValue = this->GetState();
+  this->Property->SetIndex(this->GetState());
+  this->Property->SetVTKSourceTclName(sourceTclName);
+  this->Property->AcceptInternal();
   
   this->AcceptCalled = 1;
 }
@@ -207,7 +207,7 @@ void vtkPVLabeledToggle::ResetInternal()
     return;
     }
 
-  this->SetState(this->LastAcceptedValue);
+  this->SetState(this->Property->GetIndex());
 
   this->ModifiedFlag = 0;
 }
@@ -220,6 +220,7 @@ vtkPVLabeledToggle* vtkPVLabeledToggle::ClonePrototype(vtkPVSource* pvSource,
   return vtkPVLabeledToggle::SafeDownCast(clone);
 }
 
+//----------------------------------------------------------------------------
 void vtkPVLabeledToggle::CopyProperties(vtkPVWidget* clone, 
                                         vtkPVSource* pvSource,
                               vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
@@ -238,7 +239,7 @@ void vtkPVLabeledToggle::CopyProperties(vtkPVWidget* clone,
       pvlt->SetTraceName(label);
       pvlt->SetTraceNameState(vtkPVWidget::SelfInitialized);
       }
-    pvlt->SetLastAcceptedValue(this->LastAcceptedValue);
+    pvlt->SetDefaultValue(this->DefaultValue);
     }
   else 
     {
@@ -264,7 +265,7 @@ int vtkPVLabeledToggle::ReadXMLAttributes(vtkPVXMLElement* element,
     }
 
   const char* defaultValue = element->GetAttribute("default_value");
-  this->LastAcceptedValue = atoi(defaultValue);
+  this->DefaultValue = atoi(defaultValue);
   
   return 1;
 }
@@ -292,6 +293,26 @@ const char* vtkPVLabeledToggle::GetLabel()
 int vtkPVLabeledToggle::GetState() 
 { 
   return this->CheckButton->GetState(); 
+}
+
+//----------------------------------------------------------------------------
+void vtkPVLabeledToggle::SetProperty(vtkPVWidgetProperty *prop)
+{
+  this->Property = vtkPVIndexWidgetProperty::SafeDownCast(prop);
+  if (this->Property)
+    {
+    char *cmd = new char[strlen(this->VariableName)+4];
+    sprintf(cmd, "Set%s", this->VariableName);
+    this->Property->SetVTKCommand(cmd);
+    this->Property->SetIndex(this->DefaultValue);
+    delete [] cmd;
+    }
+}
+
+//----------------------------------------------------------------------------
+vtkPVWidgetProperty* vtkPVLabeledToggle::CreateAppropriateProperty()
+{
+  return vtkPVIndexWidgetProperty::New();
 }
 
 //----------------------------------------------------------------------------

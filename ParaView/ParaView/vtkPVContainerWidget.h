@@ -51,8 +51,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //BTX
 template <class key, class data> 
 class vtkArrayMap;
-template <class value>
-class vtkLinkedList;
+class vtkCollection;
 //ETX
 
 class VTK_EXPORT vtkPVContainerWidget : public vtkPVWidget
@@ -134,7 +133,8 @@ protected:
   ~vtkPVContainerWidget();
 
 //BTX
-  vtkLinkedList<vtkPVWidget*>* Widgets;
+
+  vtkCollection *WidgetProperties;
 
   virtual vtkPVWidget* ClonePrototypeInternal(vtkPVSource* pvSource,
                               vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);

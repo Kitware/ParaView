@@ -69,7 +69,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVRenderView.h"
 #include "vtkPVRenderModule.h"
 #include "vtkPVSourceCollection.h"
-#include "vtkPVWidgetCollection.h"
+#include "vtkPVWidgetProperty.h"
 #include "vtkPVWindow.h"
 #include "vtkSource.h"
 #include "vtkString.h"
@@ -81,7 +81,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.313.2.3");
+vtkCxxRevisionMacro(vtkPVSource, "1.313.2.4");
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -144,7 +144,7 @@ vtkPVSource::vtkPVSource()
   this->LongHelpLabel = vtkKWLabeledLabel::New();
   this->LabelEntry = vtkKWLabeledEntry::New();
       
-  this->Widgets = vtkPVWidgetCollection::New();
+  this->WidgetProperties = vtkCollection::New();
     
   this->ReplaceInput = 1;
 
@@ -216,8 +216,8 @@ vtkPVSource::~vtkPVSource()
   this->Notebook->Delete();
   this->Notebook = NULL;
 
-  this->Widgets->Delete();
-  this->Widgets = NULL;
+  this->WidgetProperties->Delete();
+  this->WidgetProperties = NULL;
 
   this->AcceptButton->Delete();
   this->AcceptButton = NULL;  
@@ -618,10 +618,9 @@ void vtkPVSource::AddVTKSource(const char *tclName)
     return;
     }
 
-  // I hate having two collections: one for the vtk object, and one for its
-  // Tcl name.  I should probably create an object to contain both.
   this->VTKSourceTclNames->AddString(tclName);
-    
+
+  // This script won't work if we aren't creating VTK objects on the client.
 //  pvApp->Script("%s AddObserver ModifiedEvent {catch {%s VTKSourceModifiedMethod}}",
 //                tclName, this->GetTclName());
     
@@ -856,17 +855,22 @@ void vtkPVSource::CreateProperties()
   this->UpdateProperties();
 
   vtkPVWidget *pvWidget;
-  this->Widgets->InitTraversal();
+  vtkPVWidgetProperty *pvwProp;
+  vtkCollectionIterator *it = this->WidgetProperties->NewIterator();
+  it->InitTraversal();
+  
   int i;
-  for (i = 0; i < this->Widgets->GetNumberOfItems(); i++)
+  for (i = 0; i < this->WidgetProperties->GetNumberOfItems(); i++)
     {
-    pvWidget = this->Widgets->GetNextPVWidget();
+    pvwProp = static_cast<vtkPVWidgetProperty*>(it->GetObject());
+    pvWidget = pvwProp->GetWidget();
     pvWidget->SetParent(this->ParameterFrame->GetFrame());
     pvWidget->Create(this->Application);
     this->Script("pack %s -side top -fill x -expand t", 
                  pvWidget->GetWidgetName());
+    it->GoToNextItem();
     }
-
+  it->Delete();
 }
 
 //----------------------------------------------------------------------------
@@ -996,13 +1000,16 @@ void vtkPVSource::Select()
     }
 
   int i;
-  vtkPVWidget *pvw = 0;
-  this->Widgets->InitTraversal();
-  for (i = 0; i < this->Widgets->GetNumberOfItems(); i++)
+  vtkPVWidgetProperty *pvwProp = 0;
+  vtkCollectionIterator *it = this->WidgetProperties->NewIterator();
+  it->InitTraversal();
+  for (i = 0; i < this->WidgetProperties->GetNumberOfItems(); i++)
     {
-    pvw = this->Widgets->GetNextPVWidget();
-    pvw->Select();
+    pvwProp = static_cast<vtkPVWidgetProperty*>(it->GetObject());
+    pvwProp->GetWidget()->Select();
+    it->GoToNextItem();
     }
+  it->Delete();
 }
 
 //----------------------------------------------------------------------------
@@ -1013,13 +1020,17 @@ void vtkPVSource::Deselect(int doPackForget)
     this->Script("pack forget %s", this->Notebook->GetWidgetName());
     }
   int i;
-  vtkPVWidget *pvw = 0;
-  this->Widgets->InitTraversal();
-  for (i = 0; i < this->Widgets->GetNumberOfItems(); i++)
+  vtkPVWidgetProperty *pvwProp = 0;
+  vtkCollectionIterator *it = this->WidgetProperties->NewIterator();
+  it->InitTraversal();
+  
+  for (i = 0; i < this->WidgetProperties->GetNumberOfItems(); i++)
     {
-    pvw = this->Widgets->GetNextPVWidget();
-    pvw->Deselect();
+    pvwProp = static_cast<vtkPVWidgetProperty*>(it->GetObject());
+    pvwProp->GetWidget()->Deselect();
+    it->GoToNextItem();
     }
+  it->Delete();
 }
 
 
@@ -1574,11 +1585,13 @@ void vtkPVSource::VTKSourceModifiedMethod()
 void vtkPVSource::UpdateParameterWidgets()
 {
   vtkPVWidget *pvw;
-  vtkCollectionIterator *it = this->Widgets->NewIterator();
+  vtkPVWidgetProperty *pvwProp;
+  vtkCollectionIterator *it = this->WidgetProperties->NewIterator();
   it->InitTraversal();
   while( !it->IsDoneWithTraversal() )
     {
-    pvw = static_cast<vtkPVWidget*>(it->GetObject());
+    pvwProp = static_cast<vtkPVWidgetProperty*>(it->GetObject());
+    pvw = pvwProp->GetWidget();
     // Do not try to reset the widget if it is not initialized
     if (pvw->GetApplication())
       {
@@ -1599,18 +1612,15 @@ void vtkPVSource::RaiseSourcePage()
 // This should be apart of AcceptCallbackInternal.
 void vtkPVSource::UpdateVTKSourceParameters()
 {
-  vtkPVWidget *pvw;
+  vtkPVWidgetProperty *pvwProp;
   vtkCollectionIterator *it;
 
-  it = this->Widgets->NewIterator();
+  it = this->WidgetProperties->NewIterator();
   it->InitTraversal();
   while( !it->IsDoneWithTraversal() )
     {
-    pvw = static_cast<vtkPVWidget*>(it->GetObject());
-    if (pvw->GetModifiedFlag())
-      {
-      pvw->Accept();
-      }
+    pvwProp = static_cast<vtkPVWidgetProperty*>(it->GetObject());
+    pvwProp->Accept();
     it->GoToNextItem();
     }
   it->Delete();
@@ -1811,7 +1821,6 @@ void vtkPVSource::SetPVOutput(vtkPVData *pvd)
 void vtkPVSource::SaveInBatchScript(ofstream *file)
 {
   int i, numWidgets;
-  vtkPVWidget *widget;
 
   // Detect special sources we do not handle yet.
   if (this->GetSourceClassName() == NULL)
@@ -1851,15 +1860,17 @@ void vtkPVSource::SaveInBatchScript(ofstream *file)
   this->SetInputsInBatchScript(file);
 
   // Let the PVWidgets set up the object.
-  numWidgets = this->Widgets->GetNumberOfItems();
+  numWidgets = this->WidgetProperties->GetNumberOfItems();
+  vtkCollectionIterator *it = this->WidgetProperties->NewIterator();
+  vtkPVWidgetProperty *pvwProp;
+  
   for (i = 0; i < numWidgets; i++)
     {
-    widget = vtkPVWidget::SafeDownCast(this->Widgets->GetItemAsObject(i));
-    if (widget)
-      {
-      widget->SaveInBatchScript(file);
-      }
+    pvwProp = static_cast<vtkPVWidgetProperty*>(it->GetObject());
+    pvwProp->GetWidget()->SaveInBatchScript(file);
+    it->GoToNextItem();
     }
+  it->Delete();
 
   // Sub-classes which need to update the source before
   // connecting it to other objects should set UpdateSourceInBatch
@@ -1880,7 +1891,7 @@ void vtkPVSource::SaveInBatchScript(ofstream *file)
 void vtkPVSource::SaveState(ofstream *file)
 {
   int i, numWidgets;
-  vtkPVWidget *widget;
+  vtkPVWidgetProperty *pvwProp;
 
   // Detect if this source is in Glyph sourcesm and already exists.
   if (this->GetTraceReferenceCommand())
@@ -1930,16 +1941,17 @@ void vtkPVSource::SaveState(ofstream *file)
         << "CreatePVSource " << this->GetModuleName() << "]" << endl;
 
   // Let the PVWidgets set up the object.
-  numWidgets = this->Widgets->GetNumberOfItems();
+  numWidgets = this->WidgetProperties->GetNumberOfItems();
+  vtkCollectionIterator *it = this->WidgetProperties->NewIterator();
+  it->InitTraversal();
   for (i = 0; i < numWidgets; i++)
     {
-    widget = vtkPVWidget::SafeDownCast(this->Widgets->GetItemAsObject(i));
-    if (widget)
-      {
-      widget->SaveState(file);
-      }
+    pvwProp = static_cast<vtkPVWidgetProperty*>(it->GetObject());
+    pvwProp->GetWidget()->SaveState(file);
+    it->GoToNextItem();
     }
-
+  it->Delete();
+  
   // Call accept.
   *file << "$kw(" << this->GetTclName() << ") AcceptCallback" << endl;
 
@@ -2066,7 +2078,10 @@ void vtkPVSource::SetInputsInBatchScript(ofstream *file)
 void vtkPVSource::AddPVWidget(vtkPVWidget *pvw)
 {
   char str[512];
-  this->Widgets->AddItem(pvw);  
+  vtkPVWidgetProperty *prop = pvw->CreateAppropriateProperty();
+  prop->SetWidget(pvw);
+  this->WidgetProperties->AddItem(prop);
+  prop->Delete();
 
   if (pvw->GetTraceName() == NULL)
     {
@@ -2165,14 +2180,19 @@ vtkPVWidget* vtkPVSource::GetPVWidget(const char *name)
 {
   vtkObject *o;
   vtkPVWidget *pvw;
-  this->Widgets->InitTraversal();
-
-  while ( (o = this->Widgets->GetNextItemAsObject()) )
+  vtkPVWidgetProperty *pvwProp;
+  this->WidgetProperties->InitTraversal();
+  
+  while ( (o = this->WidgetProperties->GetNextItemAsObject()) )
     {
-    pvw = vtkPVWidget::SafeDownCast(o);
-    if (pvw && pvw->GetTraceName() && strcmp(pvw->GetTraceName(), name) == 0)
+    pvwProp = vtkPVWidgetProperty::SafeDownCast(o);
+    if (pvwProp)
       {
-      return pvw;
+      pvw = pvwProp->GetWidget();
+      if (pvw && pvw->GetTraceName() && strcmp(pvw->GetTraceName(), name) == 0)
+        {
+        return pvw;
+        }
       }
     }
 
@@ -2339,16 +2359,22 @@ int vtkPVSource::ClonePrototypeInternal(vtkPVSource*& clone)
 
   // Copy all widgets
   vtkPVWidget *pvWidget, *clonedWidget;
-  this->Widgets->InitTraversal();
+  vtkPVWidgetProperty *pvwProp;
+  vtkCollectionIterator *it = this->WidgetProperties->NewIterator();
+  it->InitTraversal();
+
   int i;
-  for (i = 0; i < this->Widgets->GetNumberOfItems(); i++)
+  for (i = 0; i < this->WidgetProperties->GetNumberOfItems(); i++)
     {
-    pvWidget = this->Widgets->GetNextPVWidget();
+    pvwProp = static_cast<vtkPVWidgetProperty*>(it->GetObject());
+    pvWidget = pvwProp->GetWidget();
     clonedWidget = pvWidget->ClonePrototype(pvs, widgetMap);
     pvs->AddPVWidget(clonedWidget);
     clonedWidget->Delete();
+    it->GoToNextItem();
     }
   widgetMap->Delete();
+  it->Delete();
 
   clone = pvs;
   return VTK_OK;
@@ -2452,8 +2478,6 @@ int vtkPVSource::InitializeData()
   return VTK_OK;
 }
 
-
-
 //----------------------------------------------------------------------------
 void vtkPVSource::PrintSelf(ostream& os, vtkIndent indent)
 {
@@ -2483,7 +2507,7 @@ void vtkPVSource::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "ReplaceInput: " << this->GetReplaceInput() << endl;
   os << indent << "View: " << this->GetView() << endl;
   os << indent << "VisitedFlag: " << this->GetVisitedFlag() << endl;
-  os << indent << "Widgets: " << this->GetWidgets() << endl;
+  os << indent << "WidgetProperties: " << this->GetWidgetProperties() << endl;
   os << indent << "IsPermanent: " << this->IsPermanent << endl;
   os << indent << "SourceClassName: " 
      << (this->SourceClassName?this->SourceClassName:"null") << endl;

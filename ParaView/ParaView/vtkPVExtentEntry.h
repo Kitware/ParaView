@@ -57,6 +57,7 @@ class vtkKWLabel;
 class vtkKWLabeledFrame;
 class vtkPVInputMenu;
 class vtkPVMinMax;
+class vtkPVScalarListWidgetProperty;
 
 class VTK_EXPORT vtkPVExtentEntry : public vtkPVObjectWidget
 {
@@ -130,6 +131,9 @@ public:
   // This serves a dual purpose.  For tracing and for saving state.
   virtual void Trace(ofstream *file);
 
+  virtual void SetProperty(vtkPVWidgetProperty *prop);
+  virtual vtkPVWidgetProperty* CreateAppropriateProperty();
+  
 protected:
   vtkPVExtentEntry();
   ~vtkPVExtentEntry();
@@ -150,9 +154,9 @@ protected:
   int ReadXMLAttributes(vtkPVXMLElement* element,
                         vtkPVXMLPackageParser* parser);
 
-  int LastAcceptedValues[6];
-  vtkSetVector6Macro(LastAcceptedValues, int);
   int AcceptCalled;
+
+  vtkPVScalarListWidgetProperty *Property;
   
 private:
   vtkPVExtentEntry(const vtkPVExtentEntry&); // Not implemented

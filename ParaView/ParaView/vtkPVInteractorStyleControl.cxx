@@ -60,13 +60,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVScale.h"
 #include "vtkPVVectorEntry.h"
 #include "vtkPVWidget.h"
+#include "vtkPVWidgetProperty.h"
 #include "vtkString.h"
 #include "vtkTclUtil.h"
 #include "vtkVector.txx"
 
-//------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVInteractorStyleControl );
-vtkCxxRevisionMacro(vtkPVInteractorStyleControl, "1.22");
+vtkCxxRevisionMacro(vtkPVInteractorStyleControl, "1.22.4.1");
 
 vtkCxxSetObjectMacro(vtkPVInteractorStyleControl,ManipulatorCollection,
                      vtkCollection);
@@ -98,7 +99,7 @@ public:
 //***************************************************************************
 //===========================================================================
 
-//------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 vtkPVInteractorStyleControl::vtkPVInteractorStyleControl()
 {
   this->InEvent = 0;
@@ -121,6 +122,7 @@ vtkPVInteractorStyleControl::vtkPVInteractorStyleControl()
 
   this->Manipulators = vtkPVInteractorStyleControl::ManipulatorMap::New();
   this->Widgets = vtkPVInteractorStyleControl::WidgetsMap::New();
+  this->WidgetProperties = vtkCollection::New();
   this->Arguments = vtkPVInteractorStyleControl::MapStringToArrayStrings::New();
 
   this->ManipulatorCollection = 0;
@@ -132,7 +134,7 @@ vtkPVInteractorStyleControl::vtkPVInteractorStyleControl()
   this->CurrentManipulator = 0;
 }
 
-//------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 vtkPVInteractorStyleControl::~vtkPVInteractorStyleControl()
 {
   if ( this->ManipulatorCollection )
@@ -167,6 +169,7 @@ vtkPVInteractorStyleControl::~vtkPVInteractorStyleControl()
     }
   this->Manipulators->Delete();
   this->Widgets->Delete();
+  this->WidgetProperties->Delete();
   this->Arguments->Delete();
 
   this->SetDefaultManipulator(0);
@@ -176,14 +179,14 @@ vtkPVInteractorStyleControl::~vtkPVInteractorStyleControl()
   this->Observer->Delete();
 }
 
-//------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVInteractorStyleControl::AddManipulator(const char* name, 
                                                  vtkPVCameraManipulator* object)
 {
   this->Manipulators->SetItem(name, object);
 }
 
-//------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVInteractorStyleControl::UpdateMenus()
 {
   if ( this->Application )
@@ -262,7 +265,7 @@ void vtkPVInteractorStyleControl::UpdateMenus()
     }
 }
 
-//------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVInteractorStyleControl::ExecuteEvent(
   vtkObject* wdg, unsigned long event, void* calldata)
 {
@@ -304,7 +307,7 @@ void vtkPVInteractorStyleControl::ExecuteEvent(
   this->InEvent = 0;
 }
 
-//------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVInteractorStyleControl::ChangeArgument(const char* name, 
                                                  const char* swidget)
 {
@@ -406,7 +409,7 @@ void vtkPVInteractorStyleControl::ChangeArgument(const char* name,
   delete [] value;
 }
 
-//------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVInteractorStyleControl::SetCurrentManipulator(
   int mouse, int key, const char* name)
 {
@@ -418,7 +421,7 @@ void vtkPVInteractorStyleControl::SetCurrentManipulator(
   this->SetCurrentManipulator(mouse + key * 3, name);
 }
 
-//------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVInteractorStyleControl::SetCurrentManipulator(
   int pos, const char* name)
 {
@@ -490,7 +493,7 @@ void vtkPVInteractorStyleControl::SetCurrentManipulator(
   clone->SetControl(control);
 }
 
-//------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVInteractorStyleControl::SetLabel(const char* label)
 {
   if ( this->LabeledFrame && this->Application )
@@ -502,7 +505,7 @@ void vtkPVInteractorStyleControl::SetLabel(const char* label)
     }
 }
 
-//------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 int vtkPVInteractorStyleControl::SetManipulator(int pos, const char* name)
 {
   if ( pos < 0 || pos > 8 )
@@ -518,7 +521,7 @@ int vtkPVInteractorStyleControl::SetManipulator(int pos, const char* name)
   return 1;
 }
 
-//------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 int vtkPVInteractorStyleControl::SetManipulator(int mouse, int key, 
                                                 const char* name)
 {
@@ -530,7 +533,7 @@ int vtkPVInteractorStyleControl::SetManipulator(int mouse, int key,
   return this->SetManipulator(mouse + key * 3, name);
 }
 
-//------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 vtkPVCameraManipulator* vtkPVInteractorStyleControl::GetManipulator(int pos)
 {
   if ( pos < 0 || pos > 8 )
@@ -554,7 +557,7 @@ vtkPVInteractorStyleControl::GetManipulator(int mouse, int key)
   return this->GetManipulator(mouse + key * 3);
 }
 
-//------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 vtkPVCameraManipulator* 
 vtkPVInteractorStyleControl::GetManipulator(const char* name)
 {
@@ -563,7 +566,7 @@ vtkPVInteractorStyleControl::GetManipulator(const char* name)
   return manipulator;
 }
 
-//------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVInteractorStyleControl::Create(vtkKWApplication *app, const char*)
 {
   // must set the application
@@ -716,6 +719,10 @@ void vtkPVInteractorStyleControl::AddArgument(
     }
   // Add widget to the map
   this->Widgets->SetItem(name, widget);
+  vtkPVWidgetProperty *prop = widget->CreateAppropriateProperty();
+  prop->SetWidget(widget);
+  this->WidgetProperties->AddItem(prop);
+  prop->Delete();
 
   // find vector of manipulators that respond to this argument
   vtkPVInteractorStyleControl::ArrayStrings* strings = 0;

@@ -57,12 +57,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVFieldMenu.h"
 #include "vtkPVInputMenu.h"
 #include "vtkPVProcessModule.h"
+#include "vtkPVStringAndScalarListWidgetProperty.h"
 #include "vtkPVSource.h"
 #include "vtkPVXMLElement.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVArrayMenu);
-vtkCxxRevisionMacro(vtkPVArrayMenu, "1.40.2.2");
+vtkCxxRevisionMacro(vtkPVArrayMenu, "1.40.2.3");
 
 vtkCxxSetObjectMacro(vtkPVArrayMenu, InputMenu, vtkPVInputMenu);
 vtkCxxSetObjectMacro(vtkPVArrayMenu, FieldMenu, vtkPVFieldMenu);
@@ -91,8 +92,8 @@ vtkPVArrayMenu::vtkPVArrayMenu()
   this->FieldMenu = NULL;
 
   this->AcceptCalled = 0;
-  this->LastAcceptedArrayName = 0;
-  this->LastAcceptedComponent = 0;
+  
+  this->Property = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -122,7 +123,7 @@ vtkPVArrayMenu::~vtkPVArrayMenu()
   this->SetInputMenu(NULL);
   this->SetFieldMenu(NULL);
 
-  this->SetLastAcceptedArrayName(NULL);
+  this->SetProperty(NULL);
 }
 
 //----------------------------------------------------------------------------
@@ -155,7 +156,6 @@ void vtkPVArrayMenu::SetFieldSelection(int field)
 
   this->Update();
 }
-
 
 //----------------------------------------------------------------------------
 void vtkPVArrayMenu::SetNumberOfComponents(int num)
@@ -229,11 +229,7 @@ void vtkPVArrayMenu::Create(vtkKWApplication *app)
 
   extraFrame->Delete();
   extraFrame = NULL;
-
 }
-
-
-
 
 //----------------------------------------------------------------------------
 void vtkPVArrayMenu::ArrayMenuEntryCallback(const char* name)
@@ -262,7 +258,6 @@ void vtkPVArrayMenu::ComponentMenuEntryCallback(int comp)
   this->vtkPVWidget::Update();
 }
 
-
 //----------------------------------------------------------------------------
 void vtkPVArrayMenu::SetValue(const char* name)
 {
@@ -275,13 +270,7 @@ void vtkPVArrayMenu::SetValue(const char* name)
   this->SetArrayName(name);
   this->ModifiedCallback();
   this->Update();
-  
-  if (!this->AcceptCalled)
-    {
-    this->SetLastAcceptedArrayName(name);
-    }
 }
-
 
 //----------------------------------------------------------------------------
 vtkPVDataSetAttributesInformation *vtkPVArrayMenu::GetFieldInformation()
@@ -323,7 +312,6 @@ vtkPVDataSetAttributesInformation *vtkPVArrayMenu::GetFieldInformation()
   return NULL;
 }
 
-
 //----------------------------------------------------------------------------
 vtkPVArrayInformation *vtkPVArrayMenu::GetArrayInformation()
 {
@@ -352,8 +340,7 @@ void vtkPVArrayMenu::SetSelectedComponent(int comp)
   this->SelectedComponent = comp;
   this->ModifiedCallback();
   this->vtkPVWidget::Update();
-}
- 
+} 
 
 //----------------------------------------------------------------------------
 void vtkPVArrayMenu::AcceptInternal(const char* sourceTclName)
@@ -375,32 +362,30 @@ void vtkPVArrayMenu::AcceptInternal(const char* sourceTclName)
     return;
     }
 
+  char **cmds = new char*[2];
+  char *string;
+  int *numStrings = new int[2];
+  int *numScalars = new int[2];
+  
   if (this->ArrayName)
     {
-    pvApp->GetProcessModule()->ServerScript("%s Select%s%s {%s}", 
-                                            sourceTclName,
-                                            this->InputName,
-                                            attributeName,
-                                            this->ArrayName);
-    this->SetLastAcceptedArrayName(this->ArrayName);
+    cmds[0] = new char[strlen(this->InputName)+strlen(attributeName)+7];
+    sprintf(cmds[0], "Select%s%s", this->InputName, attributeName);
+    string = new char[strlen(this->ArrayName)+1];
+    sprintf(string, this->ArrayName);
+    this->Property->SetStrings(1, &this->ArrayName);
     }
   else
     {
-    pvApp->GetProcessModule()->ServerScript("%s Select%s%s {}", 
-                                            sourceTclName,
-                                            this->InputName,
-                                            attributeName);
-    this->SetLastAcceptedArrayName(NULL);
+    cmds[0] = new char[strlen(this->InputName)+strlen(attributeName)+7];
+    sprintf(cmds[0], "Select%s%s", this->InputName, attributeName);
+    this->Property->SetStrings(0, NULL);
     }
 
   if (this->ShowComponentMenu)
     {
-    pvApp->GetProcessModule()->ServerScript("%s Select%s%sComponent %d", 
-                                            sourceTclName,
-                                            this->InputName,
-                                            attributeName,
-                                            this->SelectedComponent);
-    this->SetLastAcceptedComponent(this->SelectedComponent);
+    float scalar = this->SelectedComponent;
+    this->Property->SetScalars(1, &scalar);
     }
 
   this->ModifiedFlag = 0;
@@ -430,9 +415,7 @@ void vtkPVArrayMenu::Trace(ofstream *file)
     *file << "$kw(" << this->GetTclName() << ") "
           << "SetSelectedComponent " << this->SelectedComponent << endl;
     }
-
 }
-
 
 //----------------------------------------------------------------------------
 void vtkPVArrayMenu::ResetInternal()
@@ -447,25 +430,24 @@ void vtkPVArrayMenu::ResetInternal()
     return;
     }
 
-  if (this->InputName == NULL || this->LastAcceptedArrayName == NULL)
+  if (this->InputName == NULL || this->Property->GetString(0) == NULL)
     {
     vtkDebugMacro("Access names have not all been set.");
     return;
     }
 
   // Get the selected array.
-  this->SetValue(this->LastAcceptedArrayName);
+  this->SetValue(this->Property->GetString(0));
 
   // Get the selected array form the VTK filter.
   if (this->ShowComponentMenu)
     {
-    this->SetSelectedComponent(this->LastAcceptedComponent);
+    this->SetSelectedComponent(this->Property->GetScalar(0));
     }
 
   this->ModifiedFlag = 0;
   this->Update();
 }
-
 
 //----------------------------------------------------------------------------
 void vtkPVArrayMenu::SaveInBatchScriptForPart(ofstream *file,
@@ -592,9 +574,16 @@ void vtkPVArrayMenu::UpdateArrayMenu()
       // In this case, the widget does not match the object.
       this->ModifiedCallback();
       }
-
     // Now set the menu's value.
     this->ArrayMenu->SetValue(this->ArrayName);
+
+    if (!this->AcceptCalled)
+      {
+      char *str = new char[strlen(this->ArrayName)+1];
+      strcpy(str, this->ArrayName);
+      this->Property->SetStrings(1, &str);
+      delete [] str;
+      }
     }
 
   this->UpdateComponentMenu();
@@ -642,8 +631,6 @@ void vtkPVArrayMenu::UpdateComponentMenu()
     }
   this->SelectedComponent = currentComponent;
   this->Script("pack %s -side left", this->ComponentMenu->GetWidgetName());
-
-
 
   // Clear current values.
   this->ComponentMenu->ClearEntries();
@@ -734,8 +721,6 @@ void vtkPVArrayMenu::CopyProperties(vtkPVWidget* clone, vtkPVSource* pvSource,
       pvam->SetFieldMenu(im);
       im->Delete();
       }
-    pvam->SetLastAcceptedArrayName(this->LastAcceptedArrayName);
-    pvam->SetLastAcceptedComponent(this->LastAcceptedComponent);
     }
   else 
     {
@@ -860,6 +845,17 @@ const char* vtkPVArrayMenu::GetLabel()
   return this->Label->GetLabel();
 }
 
+//----------------------------------------------------------------------------
+void vtkPVArrayMenu::SetProperty(vtkPVWidgetProperty *prop)
+{
+  this->Property = vtkPVStringAndScalarListWidgetProperty::SafeDownCast(prop);
+}
+
+//----------------------------------------------------------------------------
+vtkPVWidgetProperty* vtkPVArrayMenu::CreateAppropriateProperty()
+{
+  return vtkPVStringAndScalarListWidgetProperty::New();
+}
 
 //----------------------------------------------------------------------------
 void vtkPVArrayMenu::PrintSelf(ostream& os, vtkIndent indent)
@@ -894,4 +890,3 @@ void vtkPVArrayMenu::PrintSelf(ostream& os, vtkIndent indent)
     os << indent << "FieldMenu: NULL\n";
     }
 }
-

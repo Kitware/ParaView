@@ -41,6 +41,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "vtkXDMFReaderModule.h"
 
+#include "vtkCollection.h"
 #include "vtkCollectionIterator.h"
 #include "vtkKWFrame.h"
 #include "vtkKWLabeledFrame.h"
@@ -51,7 +52,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVData.h"
 #include "vtkPVFileEntry.h"
 #include "vtkPVProcessModule.h"
-#include "vtkPVWidgetCollection.h"
+#include "vtkPVWidgetProperty.h"
 #include "vtkPVWindow.h"
 #include "vtkString.h"
 #include "vtkVector.txx"
@@ -63,7 +64,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkXDMFReaderModule);
-vtkCxxRevisionMacro(vtkXDMFReaderModule, "1.10");
+vtkCxxRevisionMacro(vtkXDMFReaderModule, "1.10.2.1");
 
 int vtkXDMFReaderModuleCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -251,11 +252,12 @@ int vtkXDMFReaderModule::ReadFileInformation(const char* fname)
     }
 
   // We called UpdateInformation, we need to update the widgets.
-  vtkCollectionIterator* it = this->GetWidgets()->NewIterator();
+  vtkCollectionIterator* it = this->GetWidgetProperties()->NewIterator();
   for ( it->InitTraversal(); !it->IsDoneWithTraversal(); it->GoToNextItem())
     {
-    vtkPVWidget *pvw = static_cast<vtkPVWidget*>(it->GetObject());
-    pvw->ModifiedCallback();
+    vtkPVWidgetProperty *pvwProp =
+      static_cast<vtkPVWidgetProperty*>(it->GetObject());
+    pvwProp->GetWidget()->ModifiedCallback();
     }
   it->Delete();
   this->UpdateParameterWidgets();
@@ -357,16 +359,18 @@ void vtkXDMFReaderModule::SaveState(ofstream *file)
         << this->FileEntry->GetValue() << "\"" << endl;
 
   // Let the PVWidgets set up the object.
-  int numWidgets = this->Widgets->GetNumberOfItems();
+  vtkCollectionIterator *it = this->WidgetProperties->NewIterator();
+  it->InitTraversal();
+  
+  int numWidgets = this->WidgetProperties->GetNumberOfItems();
   for (int i = 0; i < numWidgets; i++)
     {
-    vtkPVWidget* widget = 
-      vtkPVWidget::SafeDownCast(this->Widgets->GetItemAsObject(i));
-    if (widget)
-      {
-      widget->SaveState(file);
-      }
+    vtkPVWidgetProperty* pvwProp = 
+      static_cast<vtkPVWidgetProperty*>(it->GetObject());
+    pvwProp->GetWidget()->SaveState(file);
+    it->GoToNextItem();
     }
+  it->Delete();
 
   // Call accept.
   *file << "$kw(" << this->GetTclName() << ") AcceptCallback" << endl;

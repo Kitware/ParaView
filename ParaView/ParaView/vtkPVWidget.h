@@ -58,6 +58,7 @@ class vtkKWMenu;
 class vtkPVSource;
 class vtkPVApplication;
 class vtkPVAnimationInterfaceEntry;
+class vtkPVWidgetProperty;
 class vtkPVXMLElement;
 class vtkPVXMLPackageParser;
 class vtkPVWindow;
@@ -243,6 +244,9 @@ public:
   virtual void AcceptInternal(const char* sourceTclName);
   virtual void ResetInternal();
 
+  virtual void SetProperty(vtkPVWidgetProperty *) {}
+  virtual vtkPVWidgetProperty* CreateAppropriateProperty();
+  
 protected:
   vtkPVWidget();
   ~vtkPVWidget();

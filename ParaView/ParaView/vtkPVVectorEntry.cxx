@@ -49,7 +49,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkObjectFactory.h"
 #include "vtkPVAnimationInterfaceEntry.h"
 #include "vtkPVApplication.h"
-#include "vtkPVProcessModule.h"
+#include "vtkPVScalarListWidgetProperty.h"
 #include "vtkPVXMLElement.h"
 #include "vtkString.h"
 #include "vtkStringList.h"
@@ -57,7 +57,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVVectorEntry);
-vtkCxxRevisionMacro(vtkPVVectorEntry, "1.36.2.2");
+vtkCxxRevisionMacro(vtkPVVectorEntry, "1.36.2.3");
 
 //-----------------------------------------------------------------------------
 vtkPVVectorEntry::vtkPVVectorEntry()
@@ -79,9 +79,11 @@ vtkPVVectorEntry::vtkPVVectorEntry()
   for ( cc = 0; cc < 6; cc ++ )
     {
     this->EntryValues[cc] = 0;
-    this->LastAcceptedValues[cc] = 0;
+    this->DefaultValues[cc] = 0;
     }
   this->AcceptCalled = 0;
+  
+  this->Property = NULL;
 }
 
 //-----------------------------------------------------------------------------
@@ -107,6 +109,8 @@ vtkPVVectorEntry::~vtkPVVectorEntry()
       this->EntryValues[cc] = 0;
       }
     }
+  
+  this->SetProperty(NULL);
 }
 
 void vtkPVVectorEntry::SetLabel(const char* label)
@@ -291,23 +295,20 @@ void vtkPVVectorEntry::CheckModifiedCallback(const char* key)
 void vtkPVVectorEntry::AcceptInternal(const char* sourceTclName)
 {
   vtkKWEntry *entry;
-  vtkPVApplication *pvApp = this->GetPVApplication();
-  char acceptCmd[1024];
-
-  sprintf(acceptCmd, "%s Set%s ", sourceTclName, this->VariableName);
+  float scalars[6];
 
   // finish all the arguments for the trace file and the accept command.
   this->Entries->InitTraversal();
   int count = 0;
   while ( (entry = (vtkKWEntry*)(this->Entries->GetNextItemAsObject())) )
     {
-    strcat(acceptCmd, entry->GetValue());
-    strcat(acceptCmd, " ");
-    this->LastAcceptedValues[count] = entry->GetValueAsFloat();
+    scalars[count] = entry->GetValueAsFloat();
     count++;
     }
-  pvApp->GetProcessModule()->ServerScript(acceptCmd);
-
+  this->Property->SetScalars(count, scalars);
+  this->Property->SetVTKSourceTclName(sourceTclName);
+  this->Property->AcceptInternal();
+  
   this->AcceptCalled = 1;
   this->ModifiedFlag = 0;  
 }
@@ -345,16 +346,21 @@ void vtkPVVectorEntry::ResetInternal()
     return;
     }
 
+  float *scalars = this->Property->GetScalars();
+  
   // Set each entry to the appropriate value.
   for( count = 0; count < this->Entries->GetNumberOfItems(); count ++ )
     {
     ostrstream val;
-    val << this->LastAcceptedValues[count] << ends;
+    val << scalars[count] << ends;
     this->SetEntryValue(count, val.str());
     val.rdbuf()->freeze(0);
     }
 
-  this->ModifiedFlag = 0;
+  if (this->AcceptCalled)
+    {
+    this->ModifiedFlag = 0;
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -403,6 +409,9 @@ void vtkPVVectorEntry::SetValue(char** values, int num)
     vtkErrorMacro("Componenet mismatch.");
     return;
     }
+
+  float scalars[6];
+  
   for (idx = 0; idx < num; ++idx)
     {
     entry = this->GetEntry(idx);    
@@ -412,11 +421,14 @@ void vtkPVVectorEntry::SetValue(char** values, int num)
       delete [] this->EntryValues[idx];
       }
     this->EntryValues[idx] = vtkString::Duplicate(values[idx]);
-    if (!this->AcceptCalled)
-      {
-      sscanf(values[idx], "%f", &this->LastAcceptedValues[idx]);
-      }
+    sscanf(values[idx], "%f", &scalars[idx]);
     }
+  
+  if (!this->AcceptCalled)
+    {
+    this->Property->SetScalars(num, scalars);
+    }
+  
   this->ModifiedCallback();
 }
 
@@ -431,6 +443,9 @@ void vtkPVVectorEntry::SetValue(float* values, int num)
     vtkErrorMacro("Componenet mismatch.");
     return;
     }
+  
+  float scalars[6];
+  
   for (idx = 0; idx < num; ++idx)
     {
     entry = this->GetEntry(idx);    
@@ -440,11 +455,14 @@ void vtkPVVectorEntry::SetValue(float* values, int num)
       delete [] this->EntryValues[idx];
       }
     this->EntryValues[idx] = vtkString::Duplicate(entry->GetValue());
-    if (!this->AcceptCalled)
-      {
-      this->LastAcceptedValues[idx] = entry->GetValueAsFloat();
-      }
+    scalars[idx] = entry->GetValueAsFloat();
     }
+  
+  if (!this->AcceptCalled)
+    {
+    this->Property->SetScalars(num, scalars);
+    }
+  
   this->ModifiedCallback();
 }
 
@@ -633,7 +651,7 @@ void vtkPVVectorEntry::CopyProperties(vtkPVWidget* clone,
       {
       pvve->SubLabelTxts->SetString(i, this->SubLabelTxts->GetString(i));
       }
-    pvve->SetLastAcceptedValues(this->LastAcceptedValues);
+    pvve->SetDefaultValues(this->DefaultValues);
     }
   else 
     {
@@ -718,34 +736,53 @@ int vtkPVVectorEntry::ReadXMLAttributes(vtkPVXMLElement* element,
     switch(this->VectorLength)
       {
       case 1:
-        sscanf(defaultValue, "%f", &this->LastAcceptedValues[0]);
+        sscanf(defaultValue, "%f", &this->DefaultValues[0]);
         break;
       case 2:
-        sscanf(defaultValue, "%f %f", &this->LastAcceptedValues[0],
-               &this->LastAcceptedValues[1]);
+        sscanf(defaultValue, "%f %f", &this->DefaultValues[0],
+               &this->DefaultValues[1]);
         break;
       case 3:
-        sscanf(defaultValue, "%f %f %f", &this->LastAcceptedValues[0],
-               &this->LastAcceptedValues[1], &this->LastAcceptedValues[2]);
+        sscanf(defaultValue, "%f %f %f", &this->DefaultValues[0],
+               &this->DefaultValues[1], &this->DefaultValues[2]);
         break;
       case 4:
-        sscanf(defaultValue, "%f %f %f %f", &this->LastAcceptedValues[0],
-               &this->LastAcceptedValues[1], &this->LastAcceptedValues[2],
-               &this->LastAcceptedValues[3]);
+        sscanf(defaultValue, "%f %f %f %f", &this->DefaultValues[0],
+               &this->DefaultValues[1], &this->DefaultValues[2],
+               &this->DefaultValues[3]);
         break;
       case 5:
-        sscanf(defaultValue, "%f %f %f %f %f", &this->LastAcceptedValues[0],
-               &this->LastAcceptedValues[1], &this->LastAcceptedValues[2],
-               &this->LastAcceptedValues[3], &this->LastAcceptedValues[4]);
+        sscanf(defaultValue, "%f %f %f %f %f", &this->DefaultValues[0],
+               &this->DefaultValues[1], &this->DefaultValues[2],
+               &this->DefaultValues[3], &this->DefaultValues[4]);
         break;
       case 6:
-        sscanf(defaultValue, "%f %f %f %f %f %f", &this->LastAcceptedValues[0],
-               &this->LastAcceptedValues[1], &this->LastAcceptedValues[2],
-               &this->LastAcceptedValues[3], &this->LastAcceptedValues[4],
-               &this->LastAcceptedValues[5]);
+        sscanf(defaultValue, "%f %f %f %f %f %f", &this->DefaultValues[0],
+               &this->DefaultValues[1], &this->DefaultValues[2],
+               &this->DefaultValues[3], &this->DefaultValues[4],
+               &this->DefaultValues[5]);
         break;
       }
     }
   
   return 1;
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVVectorEntry::SetProperty(vtkPVWidgetProperty *prop)
+{
+  this->Property = vtkPVScalarListWidgetProperty::SafeDownCast(prop);
+  if (this->Property)
+    {
+    this->Property->SetScalars(this->VectorLength, this->DefaultValues);
+    char *cmd = new char[strlen(this->VariableName)+4];
+    sprintf(cmd, "Set%s", this->VariableName);
+    this->Property->SetVTKCommands(1, &cmd, &this->VectorLength);
+    }
+}
+
+//-----------------------------------------------------------------------------
+vtkPVWidgetProperty* vtkPVVectorEntry::CreateAppropriateProperty()
+{
+  return vtkPVScalarListWidgetProperty::New();
 }

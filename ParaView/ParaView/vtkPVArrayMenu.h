@@ -59,6 +59,7 @@ class vtkCollection;
 class vtkDataArray;
 class vtkPVDataSetAttributesInformation;
 class vtkPVArrayInformation;
+class vtkPVStringAndScalarListWidgetProperty;
 class vtkKWOptionMenu;
 class vtkKWLabel;
 
@@ -185,6 +186,9 @@ public:
   // This serves a dual purpose.  For tracing and for saving state.
   virtual void Trace(ofstream *file);
 
+  virtual void SetProperty(vtkPVWidgetProperty *prop);
+  virtual vtkPVWidgetProperty* CreateAppropriateProperty();
+  
 protected:
   vtkPVArrayMenu();
   ~vtkPVArrayMenu();
@@ -229,12 +233,10 @@ protected:
   // Resets the values based on the array.
   void UpdateComponentMenu();
   
-  char* LastAcceptedArrayName;
-  int LastAcceptedComponent;
-  vtkSetStringMacro(LastAcceptedArrayName);
-  vtkSetMacro(LastAcceptedComponent, int);
   int AcceptCalled;
 
+  vtkPVStringAndScalarListWidgetProperty *Property;
+  
 //BTX
   virtual vtkPVWidget* ClonePrototypeInternal(vtkPVSource* pvSource,
                               vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
@@ -242,15 +244,16 @@ protected:
                               vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
 //ETX
 
-  vtkPVArrayMenu(const vtkPVArrayMenu&); // Not implemented
-  void operator=(const vtkPVArrayMenu&); // Not implemented
-
   int ReadXMLAttributes(vtkPVXMLElement* element,
                         vtkPVXMLPackageParser* parser);
 
   // Description:
   // The widget saves it state/command in the vtk tcl script.
   void SaveInBatchScriptForPart(ofstream *file, const char* sourceTclName);
+
+private:
+  vtkPVArrayMenu(const vtkPVArrayMenu&); // Not implemented
+  void operator=(const vtkPVArrayMenu&); // Not implemented
 };
 
 #endif

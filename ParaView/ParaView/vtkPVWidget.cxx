@@ -48,6 +48,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkCollection.h"
 #include "vtkArrayMap.txx"
 #include "vtkLinkedList.txx"
+#include "vtkPVWidgetProperty.h"
 #include "vtkPVXMLElement.h"
 #include "vtkPVXMLPackageParser.h"
 
@@ -67,7 +68,7 @@ template class VTK_EXPORT vtkArrayMapIterator<vtkPVWidget*, vtkPVWidget*>;
 #endif
 
 //-----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkPVWidget, "1.36.2.3");
+vtkCxxRevisionMacro(vtkPVWidget, "1.36.2.4");
 
 //-----------------------------------------------------------------------------
 vtkPVWidget::vtkPVWidget()
@@ -449,6 +450,12 @@ vtkPVWidget* vtkPVWidget::GetPVWidgetFromParser(vtkPVXMLElement* element,
 vtkPVWindow* vtkPVWidget::GetPVWindowFormParser(vtkPVXMLPackageParser* parser)
 {
   return parser->GetPVWindow();
+}
+
+//-----------------------------------------------------------------------------
+vtkPVWidgetProperty* vtkPVWidget::CreateAppropriateProperty()
+{
+  return vtkPVWidgetProperty::New();
 }
 
 //-----------------------------------------------------------------------------

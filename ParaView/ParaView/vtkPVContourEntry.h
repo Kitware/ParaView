@@ -54,6 +54,7 @@ class vtkKWEntry;
 class vtkKWPushButton;
 class vtkKWLabel;
 class vtkContourValues;
+class vtkPVScalarListWidgetProperty;
 
 class VTK_EXPORT vtkPVContourEntry : public vtkPVWidget
 {
@@ -120,6 +121,9 @@ public:
   // This serves a dual purpose.  For tracing and for saving state.
   virtual void Trace(ofstream *file);
 
+  virtual void SetProperty(vtkPVWidgetProperty *prop);
+  virtual vtkPVWidgetProperty* CreateAppropriateProperty();
+  
 protected:
   vtkPVContourEntry();
   ~vtkPVContourEntry();
@@ -138,6 +142,8 @@ protected:
 
   vtkContourValues *LastAcceptedContourValues;
   int AcceptCalled;
+  void UpdateProperty();
+  vtkPVScalarListWidgetProperty *Property;
   
   vtkPVContourEntry(const vtkPVContourEntry&); // Not implemented
   void operator=(const vtkPVContourEntry&); // Not implemented

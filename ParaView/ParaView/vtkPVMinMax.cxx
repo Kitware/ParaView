@@ -48,12 +48,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVApplication.h"
 #include "vtkPVArrayInformation.h"
 #include "vtkPVArrayMenu.h"
-#include "vtkPVProcessModule.h"
+#include "vtkPVScalarListWidgetProperty.h"
 #include "vtkPVXMLElement.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVMinMax);
-vtkCxxRevisionMacro(vtkPVMinMax, "1.20.4.3");
+vtkCxxRevisionMacro(vtkPVMinMax, "1.20.4.4");
 
 vtkCxxSetObjectMacro(vtkPVMinMax, ArrayMenu, vtkPVArrayMenu);
 
@@ -87,8 +87,8 @@ vtkPVMinMax::vtkPVMinMax()
   this->ArrayMenu = NULL;
 
   this->AcceptCalled = 0;
-  this->LastAcceptedValues[0] = VTK_FLOAT_MIN;
-  this->LastAcceptedValues[1] = VTK_FLOAT_MAX;
+
+  this->Property = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -113,6 +113,8 @@ vtkPVMinMax::~vtkPVMinMax()
   this->SetMaxHelp(0);
 
   this->SetArrayMenu(NULL);
+  
+  this->SetProperty(NULL);
 }
 
 //----------------------------------------------------------------------------
@@ -257,16 +259,23 @@ void vtkPVMinMax::Create(vtkKWApplication *pvApp)
 void vtkPVMinMax::SetMinValue(float val)
 {
   this->MinScale->SetValue(val);
-  if (!this->AcceptCalled)
+  float *scalars = NULL;
+
+  if (this->Property)
     {
-    this->LastAcceptedValues[0] = val;
+    scalars = this->Property->GetScalars();
+    }
+  
+  if (!this->AcceptCalled && scalars)
+    {
+    scalars[0] = val;
     }
   if (val > this->MaxScale->GetValue())
     {
     this->MaxScale->SetValue(val);
-    if (!this->AcceptCalled)
+    if (!this->AcceptCalled && scalars)
       {
-      this->LastAcceptedValues[1] = val;
+      scalars[1] = val;
       }
     }
 
@@ -277,16 +286,23 @@ void vtkPVMinMax::SetMinValue(float val)
 void vtkPVMinMax::SetMaxValue(float val)
 {
   this->MaxScale->SetValue(val);
-  if (!this->AcceptCalled)
+  float *scalars = NULL;
+  
+  if (this->Property)
     {
-    this->LastAcceptedValues[1] = val;
+    scalars = this->Property->GetScalars();
+    }
+  
+  if (!this->AcceptCalled && scalars)
+    {
+    scalars[1] = val;
     }
   if (val < this->MinScale->GetValue())
     {
     this->MinScale->SetValue(val);
-    if (!this->AcceptCalled)
+    if (!this->AcceptCalled && scalars)
       {
-      this->LastAcceptedValues[0] = val;
+      scalars[0] = val;
       }
     }
   
@@ -296,14 +312,12 @@ void vtkPVMinMax::SetMaxValue(float val)
 //----------------------------------------------------------------------------
 void vtkPVMinMax::AcceptInternal(const char* sourceTclName)
 {
-  vtkPVApplication *pvApp = this->GetPVApplication();
-
-  pvApp->GetProcessModule()->ServerScript(
-    "%s %s %f %f", sourceTclName, this->SetCommand,
-    this->GetMinValue(), this->GetMaxValue());
-
-  this->LastAcceptedValues[0] = this->GetMinValue();
-  this->LastAcceptedValues[1] = this->GetMaxValue();
+  float scalars[2];
+  scalars[0] = this->GetMinValue();
+  scalars[1] = this->GetMaxValue();
+  this->Property->SetScalars(2, scalars);
+  this->Property->SetVTKSourceTclName(sourceTclName);
+  this->Property->AcceptInternal();
   
   this->ModifiedFlag = 0;
   this->AcceptCalled = 1;
@@ -330,8 +344,9 @@ void vtkPVMinMax::ResetInternal()
   if ( this->MinScale->IsCreated() )
     {
     // Command to update the UI.
-    this->SetMinValue(this->LastAcceptedValues[0]);
-    this->SetMaxValue(this->LastAcceptedValues[1]);
+    float *values = this->Property->GetScalars();
+    this->SetMinValue(values[0]);
+    this->SetMaxValue(values[1]);
     }
   this->ModifiedFlag = 0;
 }
@@ -497,7 +512,8 @@ void vtkPVMinMax::CopyProperties(vtkPVWidget* clone, vtkPVSource* pvSource,
     pvmm->SetSetCommand(this->SetCommand);
     pvmm->SetGetMinCommand(this->GetMinCommand);
     pvmm->SetGetMaxCommand(this->GetMaxCommand);
-    pvmm->SetLastAcceptedValues(this->LastAcceptedValues);
+    pvmm->SetMinValue(this->GetMinValue());
+    pvmm->SetMaxValue(this->GetMaxValue());
     }
   else 
     {
@@ -613,6 +629,30 @@ float vtkPVMinMax::GetMaxValue()
 //----------------------------------------------------------------------------
 float vtkPVMinMax::GetResolution() 
 { return this->MinScale->GetResolution(); }
+
+//----------------------------------------------------------------------------
+void vtkPVMinMax::SetProperty(vtkPVWidgetProperty *prop)
+{
+  this->Property = vtkPVScalarListWidgetProperty::SafeDownCast(prop);
+  if (this->Property)
+    {
+    char *cmd = new char[strlen(this->SetCommand)+1];
+    strcpy(cmd, this->SetCommand);
+    int numScalars = 2;
+    this->Property->SetVTKCommands(1, &cmd, &numScalars);
+    float scalars[2];
+    scalars[0] = this->MinScale->GetValue();
+    scalars[1] = this->MaxScale->GetValue();
+    this->Property->SetScalars(2, scalars);
+    delete [] cmd;
+    }
+}
+
+//----------------------------------------------------------------------------
+vtkPVWidgetProperty* vtkPVMinMax::CreateAppropriateProperty()
+{
+  return vtkPVScalarListWidgetProperty::New();
+}
 
 //----------------------------------------------------------------------------
 void vtkPVMinMax::PrintSelf(ostream& os, vtkIndent indent)

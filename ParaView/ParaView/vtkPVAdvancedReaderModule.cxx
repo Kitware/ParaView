@@ -41,6 +41,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "vtkPVAdvancedReaderModule.h"
 
+#include "vtkCollection.h"
+#include "vtkCollectionIterator.h"
 #include "vtkKWFrame.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
@@ -48,14 +50,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVPart.h"
 #include "vtkPVFileEntry.h"
 #include "vtkPVProcessModule.h"
-#include "vtkPVWidgetCollection.h"
+#include "vtkPVWidgetProperty.h"
 #include "vtkString.h"
 #include "vtkVector.txx"
 #include "vtkVectorIterator.txx"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAdvancedReaderModule);
-vtkCxxRevisionMacro(vtkPVAdvancedReaderModule, "1.13");
+vtkCxxRevisionMacro(vtkPVAdvancedReaderModule, "1.13.4.1");
 
 int vtkPVAdvancedReaderModuleCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -102,16 +104,21 @@ int vtkPVAdvancedReaderModule::ReadFileInformation(const char* fname)
   pm->ServerScript("%s UpdateInformation", this->GetVTKSourceTclName());
   
   // We need to update the widgets.
-  vtkPVWidget *pvw;
-  vtkPVWidgetCollection* widgets = this->GetWidgets();
-  if (widgets)
+  vtkPVWidgetProperty *pvwProp;
+  
+  vtkCollection* props = this->GetWidgetProperties();
+  if (props)
     {
-    widgets->InitTraversal();
-    for (int i = 0; i < widgets->GetNumberOfItems(); i++)
+    vtkCollectionIterator *it = props->NewIterator();
+    it->InitTraversal();
+
+    for (int i = 0; i < props->GetNumberOfItems(); i++)
       {
-      pvw = widgets->GetNextPVWidget();
-      pvw->ModifiedCallback();
+      pvwProp = static_cast<vtkPVWidgetProperty*>(it->GetObject());
+      pvwProp->GetWidget()->ModifiedCallback();
+      it->GoToNextItem();
       }
+    it->Delete();
     this->UpdateParameterWidgets();
     }
 

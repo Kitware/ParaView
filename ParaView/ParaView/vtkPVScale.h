@@ -49,6 +49,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class vtkKWScale;
 class vtkKWLabel;
+class vtkPVScalarListWidgetProperty;
 
 class VTK_EXPORT vtkPVScale : public vtkPVObjectWidget
 {
@@ -138,6 +139,9 @@ public:
   vtkGetMacro(Round, int);
   vtkBooleanMacro(Round, int);
   
+  virtual void SetProperty(vtkPVWidgetProperty *prop);
+  virtual vtkPVWidgetProperty* CreateAppropriateProperty();
+  
 protected:
   vtkPVScale();
   ~vtkPVScale();
@@ -156,9 +160,9 @@ protected:
   
   int Round;
 
-  float LastAcceptedValue;
-  vtkSetMacro(LastAcceptedValue, float);
   int AcceptedValueInitialized;
+
+  vtkPVScalarListWidgetProperty *Property;
   
 //BTX
   virtual void CopyProperties(vtkPVWidget* clone, vtkPVSource* pvSource,

@@ -41,20 +41,22 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "vtkPVReaderModule.h"
 
+#include "vtkCollection.h"
+#include "vtkCollectionIterator.h"
 #include "vtkKWFrame.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
 #include "vtkPVFileEntry.h"
 #include "vtkPVProcessModule.h"
 #include "vtkPVRenderView.h"
+#include "vtkPVWidgetProperty.h"
 #include "vtkPVWindow.h"
 #include "vtkVector.txx"
 #include "vtkVectorIterator.txx"
-#include "vtkPVWidgetCollection.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVReaderModule);
-vtkCxxRevisionMacro(vtkPVReaderModule, "1.32");
+vtkCxxRevisionMacro(vtkPVReaderModule, "1.32.2.1");
 
 int vtkPVReaderModuleCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -292,16 +294,18 @@ void vtkPVReaderModule::SaveState(ofstream *file)
         << this->FileEntry->GetValue() << "\"" << endl;
 
   // Let the PVWidgets set up the object.
-  int numWidgets = this->Widgets->GetNumberOfItems();
+  vtkCollectionIterator *it = this->WidgetProperties->NewIterator();
+  it->InitTraversal();
+  
+  int numWidgets = this->WidgetProperties->GetNumberOfItems();
   for (int i = 0; i < numWidgets; i++)
     {
-    vtkPVWidget* widget = 
-      vtkPVWidget::SafeDownCast(this->Widgets->GetItemAsObject(i));
-    if (widget)
-      {
-      widget->SaveState(file);
-      }
+    vtkPVWidgetProperty* prop =
+      static_cast<vtkPVWidgetProperty*>(it->GetObject());
+    prop->GetWidget()->SaveState(file);
+    it->GoToNextItem();
     }
+  it->Delete();
 
   // Call accept.
   *file << "$kw(" << this->GetTclName() << ") AcceptCallback" << endl;
@@ -312,25 +316,32 @@ void vtkPVReaderModule::SaveState(ofstream *file)
 //----------------------------------------------------------------------------
 void vtkPVReaderModule::AddPVFileEntry(vtkPVFileEntry* fileEntry)
 {
-  vtkPVWidget* pvw;
+  vtkPVWidgetProperty* pvwProp;
   // How to add to the begining of a collection?
   // Just make a new one.
-  vtkPVWidgetCollection *newWidgets = vtkPVWidgetCollection::New();
-  newWidgets->AddItem(fileEntry);
-  this->Widgets->InitTraversal();
-  while ( (pvw = this->Widgets->GetNextPVWidget()) )
+  vtkCollection *newWidgetProperties = vtkCollection::New();
+  vtkPVWidgetProperty *prop = fileEntry->CreateAppropriateProperty();
+  prop->SetWidget(fileEntry);
+  newWidgetProperties->AddItem(prop);
+  prop->Delete();
+  
+  vtkCollectionIterator *it = this->WidgetProperties->NewIterator();
+  it->InitTraversal();
+  while ( (pvwProp = static_cast<vtkPVWidgetProperty*>(it->GetObject())) )
     {
-    newWidgets->AddItem(pvw);
+    newWidgetProperties->AddItem(pvwProp);
+    it->GoToNextItem();
     }
-  this->Widgets->Delete();
-  this->Widgets = newWidgets;
-
+  this->WidgetProperties->Delete();
+  this->WidgetProperties = newWidgetProperties;
+  it->Delete();
+  
   // Just doing what is in vtkPVSource::AddPVWidget(pvw);
   char str[512];
   if (fileEntry->GetTraceName() == NULL)
     {
     vtkWarningMacro("TraceName not set. Widget class: " 
-                    << pvw->GetClassName());
+                    << fileEntry->GetClassName());
     return;
     }
 

@@ -56,6 +56,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class vtkStringList;
 class vtkKWOptionMenu;
 class vtkKWLabel;
+class vtkPVIndexWidgetProperty;
 
 class VTK_EXPORT vtkPVSelectionList : public vtkPVObjectWidget
 {
@@ -128,6 +129,9 @@ public:
   // This serves a dual purpose.  For tracing and for saving state.
   virtual void Trace(ofstream *file);
 
+  virtual void SetProperty(vtkPVWidgetProperty *prop);
+  virtual vtkPVWidgetProperty* CreateAppropriateProperty();
+  
 protected:
   vtkPVSelectionList();
   ~vtkPVSelectionList();
@@ -145,13 +149,12 @@ protected:
 
   vtkSetStringMacro(CurrentName);
 
-  int LastAcceptedValue;
+  int DefaultValue;
   int AcceptCalled;
-  vtkSetMacro(LastAcceptedValue, int);
-  
-  vtkPVSelectionList(const vtkPVSelectionList&); // Not implemented
-  void operator=(const vtkPVSelectionList&); // Not implemented
+  vtkSetMacro(DefaultValue, int);
 
+  vtkPVIndexWidgetProperty *Property;
+  
 //BTX
   virtual void CopyProperties(vtkPVWidget* clone, vtkPVSource* pvSource,
                               vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
@@ -159,6 +162,10 @@ protected:
   
   int ReadXMLAttributes(vtkPVXMLElement* element,
                         vtkPVXMLPackageParser* parser);
+
+private:
+  vtkPVSelectionList(const vtkPVSelectionList&); // Not implemented
+  void operator=(const vtkPVSelectionList&); // Not implemented
 };
 
 #endif
