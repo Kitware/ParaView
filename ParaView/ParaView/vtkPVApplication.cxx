@@ -83,6 +83,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkUnsignedLongArray.h"
 #include "vtkUnsignedShortArray.h"
 #include "vtkPolyData.h"
+#include "vtkPVHelpPaths.h"
 #include "vtkPVSourceInterfaceDirectories.h"
 #include "vtkPVRenderGroupDialog.h"
 
@@ -101,7 +102,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.156.2.13");
+vtkCxxRevisionMacro(vtkPVApplication, "1.156.2.14");
 
 int vtkPVApplicationCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -1623,6 +1624,8 @@ void vtkPVApplication::DisplayHelp(vtkKWWindow* master)
 #ifdef _WIN32
   char temp[1024];
   char loc[1024];
+  struct stat fs;
+
   vtkKWRegisteryUtilities *reg = this->GetRegistery();
   if (!this->GetRegisteryValue(2, "Setup", "InstalledPath", 0))
     {
@@ -1631,28 +1634,55 @@ void vtkPVApplication::DisplayHelp(vtkKWWindow* master)
 
   if (this->GetRegisteryValue(2, "Setup", "InstalledPath", loc))
     {
-    sprintf(temp,"%s/%s.chm::/UsersGuide/index.html",
-            loc,this->ApplicationName);
+    sprintf(temp, "%s/%s.chm", loc, this->ApplicationName);
     }
   else
     {
-    sprintf(temp,"%s.chm::/UsersGuide/index.html",this->ApplicationName);
+    sprintf(temp, "%s.chm", this->ApplicationName);
     }
   this->GetRegistery()->SetGlobalScope(0);
-  if ( HtmlHelp(NULL, temp, HH_DISPLAY_TOPIC, 0) )
+  if (stat(temp, &fs) == 0) 
     {
+    HtmlHelp(NULL, temp, HH_DISPLAY_TOPIC, 0);
     return;
     }
-#endif
+
+  const char** dir;
+  for(dir=VTK_PV_HELP_PATHS; *dir; ++dir)
+    {
+    sprintf(temp, "%s/%s.chm", *dir, this->ApplicationName);
+    if (stat(temp, &fs) == 0) 
+      {
+      HtmlHelp(NULL, temp, HH_DISPLAY_TOPIC, 0);
+      return;
+      }
+    }
+
   vtkKWMessageDialog *dlg = vtkKWMessageDialog::New();
   dlg->SetTitle("ParaView Help");
   dlg->SetMasterWindow(master);
   dlg->Create(this,"");
   dlg->SetText(
-    "HTML help is included in the Documentation/HTML subdirectory of\n"
+    "The help file could not be found. Please make sure that ParaView "
+    "is installed properly.");
+  dlg->Invoke();  
+  dlg->Delete();
+  return;
+    
+#else
+
+  vtkKWMessageDialog *dlg = vtkKWMessageDialog::New();
+  dlg->SetTitle("ParaView Help");
+  dlg->SetMasterWindow(master);
+  dlg->Create(this,"");
+  dlg->SetText(
+    "HTML help is included in the Documentation/HTML subdirectory of"
     "this application. You can view this help using a standard web browser.");
   dlg->Invoke();  
   dlg->Delete();
+
+
+#endif
 }
 
 //----------------------------------------------------------------------------

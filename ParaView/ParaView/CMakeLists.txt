@@ -154,6 +154,7 @@ CONFIGURE_FILE(${PARAVIEW_SOURCE_DIR}/ParaView/vtkPVDemoPaths.h.in
 
 CONFIGURE_FILE(${PARAVIEW_SOURCE_DIR}/ParaView/vtkPVHelpPaths.h.in
                ${PARAVIEW_BINARY_DIR}/ParaView/vtkPVHelpPaths.h
+               ESCAPE_QUOTES)
 
 CONFIGURE_FILE(${PARAVIEW_SOURCE_DIR}/ParaView/vtkPVConfig.h.in
                ${PARAVIEW_BINARY_DIR}/ParaView/vtkPVConfig.h
