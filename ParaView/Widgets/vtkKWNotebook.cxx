@@ -85,7 +85,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWNotebook);
-vtkCxxRevisionMacro(vtkKWNotebook, "1.39");
+vtkCxxRevisionMacro(vtkKWNotebook, "1.40");
 
 //------------------------------------------------------------------------------
 int vtkKWNotebookCommand(ClientData cd, Tcl_Interp *interp,
@@ -621,7 +621,7 @@ int vtkKWNotebook::AddPage(const char *title,
   if (icon && icon->GetData())
     {
     page->Icon = vtkKWIcon::New();
-    page->Icon->SetData(icon->GetData(), icon->GetWidth(), icon->GetHeight());
+    page->Icon->SetImageData(icon);
 
     page->ImageLabel = vtkKWImageLabel::New();
     page->ImageLabel->SetParent(page->TabFrame);

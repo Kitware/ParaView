@@ -66,7 +66,8 @@ public:
   // Description:
   // Set image data (either using icon, or pixel data).
   void SetImageData(vtkKWIcon *icon);
-  void SetImageData(const unsigned char* data, int width, int height, int pixel_size = 4);
+  void SetImageData(const unsigned char* data, 
+                    int width, int height, int pixel_size = 4);
   
   // Description:
   // Set/Get the TK name of the image.
