@@ -27,7 +27,7 @@
 
 
 vtkStandardNewMacro(vtkSMProxyManager);
-vtkCxxRevisionMacro(vtkSMProxyManager, "1.1");
+vtkCxxRevisionMacro(vtkSMProxyManager, "1.1.2.1");
 
 struct vtkSMProxyManagerInternals
 {
@@ -104,10 +104,10 @@ vtkSMProxy* vtkSMProxyManager::NewProxy(
 vtkSMProxy* vtkSMProxyManager::NewProxy(vtkPVXMLElement* pelement)
 {
   vtkObject* object = 0;
-  ostrstream name;
-  name << "vtkSM" << pelement->GetName() << ends;
-  object = vtkInstantiator::CreateInstance(name.str());
-  delete[] name.str();
+  ostrstream cname;
+  cname << "vtkSM" << pelement->GetName() << ends;
+  object = vtkInstantiator::CreateInstance(cname.str());
+  delete[] cname.str();
   
   vtkSMProxy* proxy = vtkSMProxy::SafeDownCast(object);
   if (proxy)
