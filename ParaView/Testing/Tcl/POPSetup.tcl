@@ -66,9 +66,6 @@ $pvContourOutput ColorByPointFieldComponent Temperature 0
 [$pvContourOutput GetColorMapMenu] SetValue {Blue to Red}
 $pvContourOutput ChangeColorMap
 
-$pvContourOutput SetScalarBarVisibility 1
-$pvContourOutput SetScalarBarOrientationToHorizontal
-
 $pvContourOutput SetVisibility 0
 
 

@@ -632,6 +632,23 @@ void vtkPVRenderView::ComputeVisiblePropBounds(float bounds[6])
 //----------------------------------------------------------------------------
 void vtkPVRenderView::ResetCamera()
 {
+  vtkCamera *cam;
+  double *n;
+  double mag2;
+
+  // Lets see if we can correct the situation when camera ivars go arwy.
+  // Unfortunately, I cannot reproduce the problem.
+  cam = this->GetRenderer()->GetActiveCamera();
+  n = cam->GetViewPlaneNormal();
+  mag2 = n[0]*n[0] + n[1]*n[1] + n[2]*n[2];
+  if (mag2 > 99999.0)
+    {
+    // Must be a problem.
+    cam->SetPosition(0.0, 0.0, -1.0);
+    cam->SetFocalPoint(0.0, 0.0, -1.0);
+    cam->SetViewUp(0.0, 1.0, 0.0);
+    }
+
   this->GetRenderer()->ResetCamera();
 }
 
