@@ -47,9 +47,10 @@
 #include "vtkScalarBarActor.h"
 #include "vtkScalarBarWidget.h"
 #include "vtkPVProcessModule.h"
+#include "vtkPVRenderModule.h"
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVColorMap);
-vtkCxxRevisionMacro(vtkPVColorMap, "1.74");
+vtkCxxRevisionMacro(vtkPVColorMap, "1.75");
 
 int vtkPVColorMapCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -149,6 +150,7 @@ vtkPVColorMap::vtkPVColorMap()
   this->PVRenderView = NULL;
   this->LookupTableID.ID = 0;
   this->LookupTable = NULL;
+  this->ScalarBarID.ID = 0;
   this->ScalarBar = NULL;
   this->ScalarBarObserver = NULL;
 
@@ -245,7 +247,13 @@ vtkPVColorMap::~vtkPVColorMap()
 
   if (this->ScalarBar)
     {
-    this->ScalarBar->Delete();
+    if ( pvApp )
+      {
+      vtkPVProcessModule* pm = pvApp->GetProcessModule();
+      pm->DeleteStreamObject(this->ScalarBarID);
+      pm->SendStreamToClientAndServer();
+      }
+    this->ScalarBarID.ID = 0;
     this->ScalarBar = NULL;
     }
 
@@ -845,20 +853,44 @@ void vtkPVColorMap::CreateParallelTclObjects(vtkPVApplication *pvApp)
   
   this->LookupTableID = pm->NewStreamObject("vtkLookupTable");
   pm->SendStreamToClientAndServer();
-  
   this->LookupTable =
     vtkLookupTable::SafeDownCast(pm->GetObjectFromID(this->LookupTableID));
   pm->GetStream() << vtkClientServerStream::Invoke 
                   << this->LookupTableID << "SetVectorModeToComponent"
                   << vtkClientServerStream::End;
-  
-  this->ScalarBar = vtkScalarBarWidget::New();
+
+  this->ScalarBarID = pm->NewStreamObject("vtkScalarBarWidget");
+  pm->SendStreamToClientAndServer();
+  this->ScalarBar =
+    vtkScalarBarWidget::SafeDownCast(pm->GetObjectFromID(this->ScalarBarID));
   this->ScalarBar->SetInteractor(
     this->PVRenderView->GetPVWindow()->GetInteractor());
-  this->ScalarBar->GetScalarBarActor()->GetPositionCoordinate()
-    ->SetValue(0.87, 0.25);
-  this->ScalarBar->GetScalarBarActor()->SetWidth(0.13);
-  this->ScalarBar->GetScalarBarActor()->SetHeight(0.5);
+  pm->GetStream() << vtkClientServerStream::Invoke 
+                  << this->ScalarBarID << "GetScalarBarActor"
+                  << vtkClientServerStream::End;
+  pm->GetStream() << vtkClientServerStream::Invoke 
+                  << vtkClientServerStream::LastResult 
+                  << "GetPositionCoordinate" 
+                  << vtkClientServerStream::End;
+  pm->GetStream() << vtkClientServerStream::Invoke 
+                  << vtkClientServerStream::LastResult 
+                  << "SetValue" << 0.87 << 0.25
+                  << vtkClientServerStream::End;
+  pm->GetStream() << vtkClientServerStream::Invoke 
+                  << this->ScalarBarID << "GetScalarBarActor"
+                  << vtkClientServerStream::End;
+  pm->GetStream() << vtkClientServerStream::Invoke 
+                  << vtkClientServerStream::LastResult 
+                  << "SetWidth" << 0.13 
+                  << vtkClientServerStream::End;
+  pm->GetStream() << vtkClientServerStream::Invoke 
+                  << this->ScalarBarID << "GetScalarBarActor"
+                  << vtkClientServerStream::End;
+  pm->GetStream() << vtkClientServerStream::Invoke 
+                  << vtkClientServerStream::LastResult 
+                  << "SetHeight" << 0.5 
+                  << vtkClientServerStream::End;
+  pm->SendStreamToClientAndServer();
 
   this->ScalarBarObserver = vtkScalarBarWidgetObserver::New();
   this->ScalarBarObserver->PVColorMap = this;
@@ -871,7 +903,14 @@ void vtkPVColorMap::CreateParallelTclObjects(vtkPVApplication *pvApp)
 
   this->UpdateScalarBarTitle();
 
-  this->ScalarBar->GetScalarBarActor()->SetLookupTable(this->LookupTable);
+  pm->GetStream() << vtkClientServerStream::Invoke 
+                  << this->ScalarBarID << "GetScalarBarActor"
+                  << vtkClientServerStream::End;
+  pm->GetStream() << vtkClientServerStream::Invoke 
+                  << vtkClientServerStream::LastResult 
+                  << "SetLookupTable" << this->LookupTableID
+                  << vtkClientServerStream::End;
+  pm->SendStreamToClientAndServer();
 }
 
 //----------------------------------------------------------------------------
@@ -1661,24 +1700,55 @@ void vtkPVColorMap::UpdateInternalScalarBarVisibility()
     return;
     }
   
-  // I am going to add and remove it from the renderer instead of using
-  // visibility.  Composites should really have multiple props.
-
-  if (this->GetPVRenderView()->GetRenderer2D())
+  vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
+  vtkPVRenderModule* rm = this->GetPVApplication()->GetRenderModule();
+  if (rm == NULL)
     {
-    if (visible)
-      {
-      this->GetPVRenderView()->Enable3DWidget(this->ScalarBar);
-      
-      // This is here in case process 0 has not geometry.  
-      // We have to explicitly build the color map.
-      this->LookupTable->Build();
-      this->LookupTable->Modified();
-      }
-    else
-      {
-      this->ScalarBar->SetEnabled(0);
-      }
+    return;
+    }
+
+  if (visible)
+    {
+    // This removes all renderers from the render window before enabling 
+    // the widget. It then adds them back into the render window.
+    // I assume the widget needs to know which renderer it uses.
+    // It's the old poked renderer problem.
+    this->GetPVRenderView()->Enable3DWidget(this->ScalarBar);
+
+    // Since there is no interactor on the server, add the prop directly.
+    pm->GetStream() << vtkClientServerStream::Invoke 
+                    << this->ScalarBarID << "GetScalarBarActor"
+                    << vtkClientServerStream::End;
+    pm->GetStream() << vtkClientServerStream::Invoke 
+                    << rm->GetRenderer2DID() << "AddActor"
+                    << vtkClientServerStream::LastResult 
+                    << vtkClientServerStream::End;
+    pm->SendStreamToServer();
+    
+    // This is here in case a process has no geometry.  
+    // We have to explicitly build the color map.  The mapper
+    // skips this if there is nothing to render.
+    // Shouldn't the scalar build the color map if necessary?
+    pm->GetStream() << vtkClientServerStream::Invoke 
+                    << this->LookupTableID << "Build"
+                    << vtkClientServerStream::End;
+    pm->GetStream() << vtkClientServerStream::Invoke 
+                    << this->LookupTableID << "Modified"
+                    << vtkClientServerStream::End;
+    }
+  else
+    {
+    this->ScalarBar->SetEnabled(0);
+
+    // Since there is no interactor on the server, remove the prop directly.
+    pm->GetStream() << vtkClientServerStream::Invoke 
+                    << this->ScalarBarID << "GetScalarBarActor"
+                    << vtkClientServerStream::End;
+    pm->GetStream() << vtkClientServerStream::Invoke 
+                    << rm->GetRenderer2DID() << "RemoveActor"
+                    << vtkClientServerStream::LastResult 
+                    << vtkClientServerStream::End;
+    pm->SendStreamToServer();
     }
 
   this->Modified();
@@ -2290,3 +2360,4 @@ void vtkPVColorMap::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "VisitedFlag: " << this->VisitedFlag << endl;
   os << indent << "ScalarBarCheck: " << this->ScalarBarCheck << endl;
 }
+
