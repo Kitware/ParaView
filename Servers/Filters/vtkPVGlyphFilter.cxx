@@ -20,7 +20,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkPolyData.h"
 
-vtkCxxRevisionMacro(vtkPVGlyphFilter, "1.13");
+vtkCxxRevisionMacro(vtkPVGlyphFilter, "1.14");
 vtkStandardNewMacro(vtkPVGlyphFilter);
 
 //-----------------------------------------------------------------------------
@@ -71,7 +71,7 @@ void vtkPVGlyphFilter::Execute()
     vtkPolyData* output = this->GetOutput();
     this->Superclass::SetInput(this->MaskPoints->GetOutput());
     vtkIdType maxNumPts = this->MaximumNumberOfPoints;
-    vtkIdType numPts = this->MaskPoints->GetInput()->GetNumberOfPoints();
+    vtkIdType numPts = static_cast<vtkDataSet*>(this->MaskPoints->GetInput(0))->GetNumberOfPoints();
     // Although this is not perfectly process invariant, it is better
     // than we had before (divide by number of processes).
     vtkIdType totalNumPts = numPts;
@@ -119,7 +119,7 @@ void vtkPVGlyphFilter::Execute()
     }
   else
     {
-    this->Superclass::SetInput(this->MaskPoints->GetInput());
+    this->Superclass::SetInput(static_cast<vtkDataSet*>(this->MaskPoints->GetInput(0)));
     }
   
   this->Superclass::Execute();
