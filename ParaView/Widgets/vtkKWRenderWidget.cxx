@@ -53,7 +53,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkWin32OpenGLRenderWindow.h"
 #endif
 
-vtkCxxRevisionMacro(vtkKWRenderWidget, "1.48");
+vtkCxxRevisionMacro(vtkKWRenderWidget, "1.49");
 
 //----------------------------------------------------------------------------
 class vtkKWRenderWidgetObserver : public vtkCommand
@@ -247,7 +247,9 @@ void vtkKWRenderWidget::Create(vtkKWApplication *app, const char *args)
   sprintf(local, "%s -rw Addr=%p", args, this->RenderWindow);
   this->Script("vtkTkRenderWidget %s %s",
                this->VTKWidget->GetWidgetName(), local);
-  this->Script("pack %s -fill both -expand yes",
+  this->Script("grid rowconfigure %s 0 -weight 1",
+               this->GetWidgetName());
+  this->Script("grid %s -sticky nsew",
                this->VTKWidget->GetWidgetName());
   
   this->RenderWindow->Render();
