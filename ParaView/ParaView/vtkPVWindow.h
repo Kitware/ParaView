@@ -339,6 +339,7 @@ public:
 
   // Description:
   // Load in a Tcl based script to drive the application.
+  virtual void LoadScript() { this->Superclass::LoadScript(); }
   virtual void LoadScript(const char *name);
 
   // Description:
