@@ -62,7 +62,7 @@ public:
 //BTX
   // Description:
   // Run command remotely.
-  int RunRemoteCommand(const char* command, const char* args[]);
+  int RunRemoteCommand(const char* args[]);
 
   // Description:
   // Run command.

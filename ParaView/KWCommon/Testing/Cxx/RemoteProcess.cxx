@@ -7,7 +7,7 @@
 int main()
 {
   const char* args[] = {
-    "find",
+    "/usr/bin/find",
     "/usr",
     "-type",
     "f",
@@ -17,7 +17,7 @@ int main()
   };
   vtkKWRemoteExecute* re = vtkKWRemoteExecute::New();
   re->SetRemoteHost("public");
-  re->RunRemoteCommand("/usr/bin/find", args);
+  re->RunRemoteCommand(args);
   while( re->GetResult() == vtkKWRemoteExecute::RUNNING )
     {
     cout << "Waiting" << endl;
