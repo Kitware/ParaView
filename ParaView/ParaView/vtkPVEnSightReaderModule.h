@@ -39,14 +39,23 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-// .NAME vtkPVEnSightReaderModule - A class to handle the UI for vtkGlyph3D
+// .NAME vtkPVEnSightReaderModule - A class to handle the UI for EnSight readers
 // .SECTION Description
-
+// This is a special reader module for the EnSight readers. Since EnSight
+// readers have usually multiple output, this module creates dummy
+// "connection" modules for each output. These modules act as terminals
+// to which users can attach other modules. The module which represent
+// the properties of the reader does not have a display page and does
+// not add any actors. On the other hand, the "connection" modules have
+// no properties pages. Deleting the reader module (only possible if
+// the connection points have no consumers) deletes the whole assembly.
 
 #ifndef __vtkPVEnSightReaderModule_h
 #define __vtkPVEnSightReaderModule_h
 
 #include "vtkPVReaderModule.h"
+
+class vtkGenericEnSightReader;
 
 class VTK_EXPORT vtkPVEnSightReaderModule : public vtkPVReaderModule
 {
@@ -68,6 +77,11 @@ public:
 protected:
   vtkPVEnSightReaderModule();
   ~vtkPVEnSightReaderModule();
+
+  char* CreateTclName(const char* fname);
+  
+  int InitialTimeSelection(const char* tclName, 
+			   vtkGenericEnSightReader* reader, float& time);
 
 private:
   vtkPVEnSightReaderModule(const vtkPVEnSightReaderModule&); // Not implemented
