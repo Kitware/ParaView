@@ -79,7 +79,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.279");
+vtkCxxRevisionMacro(vtkPVSource, "1.280");
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -2313,20 +2313,27 @@ int vtkPVSource::InitializeData()
       part->SetCollectionDecision(this->GetPVWindow()->MakeCollectionDecision());
       part->SetLODCollectionDecision(this->GetPVWindow()->MakeLODCollectionDecision());
 
-      // We need to add the extract pieces filter before we set the ExtentTranslator
-      // Or we will get a memory leak.
-      part->InsertExtractPiecesIfNecessary();
-
       // Create the extent translator (sources with no inputs only).
+      // Needs to be before "ExtractPieces" because translator propagates.
+      char translatorTclName[1024];
+      translatorTclName[0] = '\0';
       if ( ! input)
         {
-        char translatorTclName[1024];
         sprintf(translatorTclName, "%sTranslator%d", this->GetName(), idx);
         pvApp->BroadcastScript("vtkPVExtentTranslator %s", translatorTclName);
-        pvApp->BroadcastScript("%s SetOriginalSource $%s",
-                               translatorTclName, dataName);
         pvApp->BroadcastScript("$%s SetExtentTranslator %s",
                                dataName, translatorTclName);
+        }
+
+      part->InsertExtractPiecesIfNecessary();
+      
+      if (translatorTclName[0])
+        {
+        // Translator has to be set on source because it is propagated.
+        // Original source is set after transmit so reference
+        // loop can be broken when pvPart is deleted.
+        pvApp->BroadcastScript("%s SetOriginalSource $%s",
+                               translatorTclName, dataName);
         pvApp->BroadcastScript("%s Delete", translatorTclName);
         }
 
@@ -2555,7 +2562,7 @@ void vtkPVSource::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVSource ";
-  this->ExtractRevision(os,"$Revision: 1.279 $");
+  this->ExtractRevision(os,"$Revision: 1.280 $");
 }
 
 //----------------------------------------------------------------------------

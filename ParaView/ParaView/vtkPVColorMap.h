@@ -290,6 +290,7 @@ protected:
   // Visibility depends on check and UseCount.
   void UpdateInternalScalarBarVisibility();
   void RGBToHSV(float rgb[3], float hsv[3]);
+  void HSVToRGB(float hsv[3], float rgb[3]);
 
   vtkLookupTable* LookupTable;
   char* LookupTableTclName;

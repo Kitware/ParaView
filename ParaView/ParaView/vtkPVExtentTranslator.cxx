@@ -47,9 +47,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVExtentTranslator);
-vtkCxxRevisionMacro(vtkPVExtentTranslator, "1.13");
+vtkCxxRevisionMacro(vtkPVExtentTranslator, "1.14");
 
-vtkCxxSetObjectMacro(vtkPVExtentTranslator, OriginalSource, vtkDataSet);
+//vtkCxxSetObjectMacro(vtkPVExtentTranslator, OriginalSource, vtkDataSet);
 
 //-----------------------------------------------------------------------------
 vtkPVExtentTranslator::vtkPVExtentTranslator()
@@ -62,6 +62,15 @@ vtkPVExtentTranslator::~vtkPVExtentTranslator()
 {
   this->SetOriginalSource(NULL);
 }
+
+//-----------------------------------------------------------------------------
+void vtkPVExtentTranslator::SetOriginalSource(vtkDataSet *d)
+{
+  // No reference counting because of nasty loop. (TransmitPolyData ...)
+  // Propagation should make it safe to ignore reference counting.
+  this->OriginalSource = d;
+} 
+
 
 //-----------------------------------------------------------------------------
 int vtkPVExtentTranslator::PieceToExtentThreadSafe(int piece, int numPieces, 

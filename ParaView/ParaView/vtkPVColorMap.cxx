@@ -75,7 +75,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVColorMap);
-vtkCxxRevisionMacro(vtkPVColorMap, "1.52");
+vtkCxxRevisionMacro(vtkPVColorMap, "1.53");
 
 int vtkPVColorMapCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -1296,11 +1296,19 @@ void vtkPVColorMap::StartColorButtonCallback(float r, float g, float b)
 // Access for trace files.
 void vtkPVColorMap::SetStartHSV(float h, float s, float v)
 {
+  float hsv[3];
+  float rgb[3];
+
   if ( this->StartHSV[0] == h && 
        this->StartHSV[1] == s && this->StartHSV[2] == v)
     {
     return;
     }
+
+  // Change color button (should have no callback effect...)
+  hsv[0] = h;  hsv[1] = s;  hsv[2] = v;
+  this->HSVToRGB(hsv, rgb);
+  this->StartColorButton->SetColor(rgb);
 
   this->AddTraceEntry("$kw(%s) SetStartHSV %g %g %g", 
                       this->GetTclName(), h, s, v);
@@ -1332,11 +1340,19 @@ void vtkPVColorMap::EndColorButtonCallback(float r, float g, float b)
 // Access for trace files.
 void vtkPVColorMap::SetEndHSV(float h, float s, float v)
 {
+  float hsv[3];
+  float rgb[3];
+
   if ( this->EndHSV[0] == h && 
        this->EndHSV[1] == s && this->EndHSV[2] == v)
     {
     return;
     }
+
+  // Change color button (should have no callback effect...)
+  hsv[0] = h;  hsv[1] = s;  hsv[2] = v;
+  this->HSVToRGB(hsv, rgb);
+  this->EndColorButton->SetColor(rgb);
 
   this->AddTraceEntry("$kw(%s) SetEndHSV %g %g %g", 
                       this->GetTclName(), h, s, v);
@@ -1831,6 +1847,94 @@ void vtkPVColorMap::RGBToHSV(float rgb[3], float hsv[3])
   hsv[2] = val;
 }
 
+//----------------------------------------------------------------------------
+// Only used to get the color of the button when HSV is set from script.
+// It might be easier to save the RGB values.
+void vtkPVColorMap::HSVToRGB(float hsv[3], float rgb[3])
+{
+  float hue = hsv[0];
+  float sat = hsv[1];
+  float val = hsv[2];
+  float lx, ly, lz;
+
+  // Wrap hue into expected range.
+  while (hue >= 1.0)
+    {
+    hue = hue-1.0;
+    }
+  while (hue < 0.0)
+    {
+    hue = hue+1.0;
+    }
+
+  // Gray.
+  if (sat == 0.0)
+    {
+    rgb[0] = rgb[1] = rgb[2] = val;
+    return;
+    }
+
+  // Red (green)
+  if (hue < (1.0/6.0))
+    {
+    rgb[0] = val;
+    lx = (1.0-sat)*val;
+    lz = val*(1.0 - ((1.0 - (6.0*hue))*sat));
+    rgb[1] = lz;
+    rgb[2] = lx;
+    return;
+    }
+  // Green (red)
+  if (hue < 2.0/6.0)
+    {
+    rgb[1] = val;
+    lx = (1.0-sat)*val;
+    ly = val*(1.0 - (((6.0*hue) - 1.0)*sat));
+    rgb[0] = ly;
+    rgb[2] = lx;
+    return;
+    }
+  // Green (blue)
+  if (hue< (3.0/6.0))
+    { // case 2
+    rgb[1] = val;
+    lx = (1.0-sat)*val;
+    lz = val*(1.0 - ((1.0 - ((6.0*hue) - 2.0))*sat));
+    rgb[0] = lx;
+    rgb[2] = lz;
+    return;
+    }
+  // Blue (green)
+  if (hue < (4.0/6.0))
+    {
+    rgb[2] = val;
+    lx = (1.0 - sat)*val;
+    ly = val*(1.0 - (((6.0*hue)-3.0)*sat));
+    rgb[0] = lx;
+    rgb[1] = ly;
+    return;
+    }
+  // Blue (red)
+  if (hue < 5.0/6.0)
+    { // case 4
+    rgb[2] = val;
+    lx = (1.0-sat)*val;
+    lz = val* (1.0 - ((1.0 - ((6.0*hue)-4.0))*sat));
+    rgb[0] = lz;
+    rgb[1] = lx;
+    return;
+    }
+  // Red (blue).
+  if (hue < 1.0)
+    {
+    rgb[0] = val;
+    lx = (1.0-sat)*val;    
+    ly = val*(1.0 - (((6.0*hue)-5.0)*sat));
+    rgb[1] = lx;
+    rgb[2] = ly;
+    return;
+    }
+}
 
 //----------------------------------------------------------------------------
 void vtkPVColorMap::MapConfigureCallback(int width, int height)
@@ -2015,15 +2119,24 @@ void vtkPVColorMap::SaveState(ofstream *file)
 
   *file << "$kw(" << this->GetTclName() << ") SetScalarRange " 
         << this->ScalarRange[0] << " " << this->ScalarRange[1] << endl;
-  *file << "$kw(" << this->GetTclName() << ") SetStartHSV " 
-        << this->StartHSV[0] << " " << this->StartHSV[1] << " " 
-        << this->StartHSV[2] << endl;
-  *file << "$kw(" << this->GetTclName() << ") SetEndHSV " 
-        << this->EndHSV[0] << " " << this->EndHSV[1] << " " 
-        << this->EndHSV[2] << endl;
-  *file << "$kw(" << this->GetTclName() << ") SetNumberOfColors " 
-        << this->NumberOfColors << endl;
 
+  if (this->StartHSV[0] != 0 || this->StartHSV[1] != 1 || this->StartHSV[2] != 1)
+    {
+    *file << "$kw(" << this->GetTclName() << ") SetStartHSV " 
+          << this->StartHSV[0] << " " << this->StartHSV[1] << " " 
+          << this->StartHSV[2] << endl;
+    }
+  if (this->EndHSV[0] != 2.0/6.0 || this->EndHSV[1] != 1 || this->EndHSV[2] != 1)
+    {
+    *file << "$kw(" << this->GetTclName() << ") SetEndHSV " 
+          << this->EndHSV[0] << " " << this->EndHSV[1] << " " 
+          << this->EndHSV[2] << endl;
+    }
+  if (this->NumberOfColors != 256)
+    {
+    *file << "$kw(" << this->GetTclName() << ") SetNumberOfColors " 
+          << this->NumberOfColors << endl;
+    }
   if (this->VectorMode == vtkPVColorMap::MAGNITUDE)
     {
     *file << "$kw(" << this->GetTclName() << ") VectorModeMagnitudeCallback\n";
@@ -2031,8 +2144,11 @@ void vtkPVColorMap::SaveState(ofstream *file)
   if (this->VectorMode == vtkPVColorMap::COMPONENT)
     {
     *file << "$kw(" << this->GetTclName() << ") VectorModeComponentCallback\n";
-    *file << "$kw(" << this->GetTclName() << ") SetVectorComponent " 
-          << this->VectorComponent << endl;
+    if (this->VectorComponent != 0)
+      {
+      *file << "$kw(" << this->GetTclName() << ") SetVectorComponent " 
+            << this->VectorComponent << endl;
+      }
     }
 
   *file << "$kw(" << this->GetTclName() << ") SetScalarBarVisibility " 
@@ -2042,12 +2158,21 @@ void vtkPVColorMap::SaveState(ofstream *file)
   float *pos1 = sact->GetPositionCoordinate()->GetValue();
   float *pos2 = sact->GetPosition2Coordinate()->GetValue();
 
-  *file << "$kw(" << this->GetTclName() << ") SetScalarBarPosition1 " 
-        << pos1[0] << " " << pos1[1] << endl; 
-  *file << "$kw(" << this->GetTclName() << ") SetScalarBarPosition2 " 
-        << pos2[0] << " " << pos2[1] << endl;
-  *file << "$kw(" << this->GetTclName() << ") SetScalarBarOrientation " 
-        << sact->GetOrientation() << endl;
+  if (pos1[0] != 0.87 || pos1[1] != 0.25)
+    {    
+    *file << "$kw(" << this->GetTclName() << ") SetScalarBarPosition1 " 
+          << pos1[0] << " " << pos1[1] << endl; 
+    }
+  if (pos2[0] != 0.13 || pos2[1] != 0.5)
+    {
+    *file << "$kw(" << this->GetTclName() << ") SetScalarBarPosition2 " 
+          << pos2[0] << " " << pos2[1] << endl;
+    }
+  if (sact->GetOrientation() != 1)
+    {
+    *file << "$kw(" << this->GetTclName() << ") SetScalarBarOrientation " 
+         << sact->GetOrientation() << endl;
+    }
 }
 
 //----------------------------------------------------------------------------

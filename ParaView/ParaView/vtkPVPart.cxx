@@ -63,7 +63,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPart);
-vtkCxxRevisionMacro(vtkPVPart, "1.8");
+vtkCxxRevisionMacro(vtkPVPart, "1.9");
 
 int vtkPVPartCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -110,6 +110,7 @@ vtkPVPart::vtkPVPart()
 vtkPVPart::~vtkPVPart()
 {  
   // Get rid of the circular reference created by the extent translator.
+  // We have a problem with ExtractPolyDataPiece also.
   if (this->VTKDataTclName)
     {
     this->GetPVApplication()->BroadcastScript("%s SetExtentTranslator {}",
