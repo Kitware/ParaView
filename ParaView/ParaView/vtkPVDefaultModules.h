@@ -692,7 +692,7 @@ const char* vtkPVInitialize::StandardFilterInterfaces=
 "</Module>\n"
 "\n"
 "<Module name=\"GroupParts\" root_name=\"GroupParts\" \n"
-"        module_type=\"Filter\" replace_input=\"0\" \n"
+"        module_type=\"Filter\" replace_input=\"1\" \n"
 "        long_help=\"Group parts.\" \n"
 "        short_help=\"Group multiple inputs into one collection.\">\n"
 "  <Filter class=\"vtkGroup\" >\n"

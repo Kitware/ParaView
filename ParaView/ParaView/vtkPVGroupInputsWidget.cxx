@@ -55,7 +55,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVGroupInputsWidget);
-vtkCxxRevisionMacro(vtkPVGroupInputsWidget, "1.4");
+vtkCxxRevisionMacro(vtkPVGroupInputsWidget, "1.5");
 
 int vtkPVGroupInputsWidgetCommand(ClientData cd, Tcl_Interp *interp,
                                 int argc, char *argv[]);
@@ -178,16 +178,20 @@ void vtkPVGroupInputsWidget::AcceptInternal(const char* vtkSourceTclName)
     if (state)
       {
       this->PVSource->SetPVInput(count++, pvd);
+      // SetPVinput does all this for us.
       // Special replace input feature.
       // Visibility of ALL selected input turned off.
+      // Setting the input should change visibility, but
+      // for some reason it only works for the first input.
+      // I am lazy and do not want to debug this ...
       pvs->SetVisibility(0);
-      numParts = pvd->GetNumberOfPVParts();
-      for (partIdx = 0; partIdx < numParts; ++partIdx)
-        {
-        part = pvd->GetPVPart(partIdx);
-        pvApp->BroadcastScript("%s AddInput %s",  vtkSourceTclName,
-                               part->GetVTKDataTclName());
-        }
+      //numParts = pvd->GetNumberOfPVParts();
+      //for (partIdx = 0; partIdx < numParts; ++partIdx)
+      //  {
+      //  part = pvd->GetPVPart(partIdx);
+      //  pvApp->BroadcastScript("%s AddInput %s",  vtkSourceTclName,
+      //                         part->GetVTKDataTclName());
+      //  }
       }
     }
 
