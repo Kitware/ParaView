@@ -63,7 +63,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVServerFileDialog );
-vtkCxxRevisionMacro(vtkPVServerFileDialog, "1.21.2.3");
+vtkCxxRevisionMacro(vtkPVServerFileDialog, "1.21.2.4");
 
 int vtkPVServerFileDialogCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -1017,7 +1017,6 @@ void vtkPVServerFileDialog::Update()
        ->GetDirectoryListing(this->LastPath, dirs, files, perm)))
     {
     // Directory did not exist, use current directory instead.
-    vtkErrorMacro("Cannot open directory: " << this->LastPath);
     pm->RootScript("pwd");
     this->SetLastPath(pm->GetRootResult());
     this->ConvertLastPath();
