@@ -69,8 +69,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define VTK_KW_EXIT_DIALOG_NAME "ExitApplication"
 #define VTK_KW_SAVE_WINDOW_GEOMETRY_REG_KEY "SaveWindowGeometry"
 #define VTK_KW_WINDOW_GEOMETRY_REG_KEY "WindowGeometry"
+#define VTK_KW_WINDOW_FRAME1_SIZE_REG_KEY "WindowFrame1Size"
 
-vtkCxxRevisionMacro(vtkKWWindow, "1.122.2.2");
+vtkCxxRevisionMacro(vtkKWWindow, "1.122.2.3");
 vtkCxxSetObjectMacro(vtkKWWindow, PropertiesParent, vtkKWWidget);
 
 class vtkKWWindowMenuEntry
@@ -236,10 +237,6 @@ vtkKWWindow::vtkKWWindow()
 
   this->MiddleFrame = vtkKWSplitFrame::New();
   this->MiddleFrame->SetParent(this);
-  // Default is not interactively resizable.
-  this->MiddleFrame->SetSeparatorSize(0);
-  this->MiddleFrame->SetFrame1MinimumSize(360);
-  this->MiddleFrame->SetFrame1Size(360);
 
   this->ViewFrame = vtkKWWidget::New();
   this->ViewFrame->SetParent(this->MiddleFrame->GetFrame2());
@@ -508,6 +505,9 @@ void vtkKWWindow::CloseNoPrompt()
     this->Application->SetRegisteryValue(
       2, "RunTime", VTK_KW_WINDOW_GEOMETRY_REG_KEY, "%s", 
       this->Application->GetMainInterp()->result);
+    this->Application->SetRegisteryValue(
+      2, "RunTime", VTK_KW_WINDOW_FRAME1_SIZE_REG_KEY, "%d", 
+      this->MiddleFrame->GetFrame1Size());
     }
 
   vtkKWView *v;
@@ -706,6 +706,24 @@ void vtkKWWindow::Create(vtkKWApplication *app, char *args)
   this->TrayImage->SetBind(this, "<Button-1>", "ProcessErrorClick");
   
   // To force the toolbar on top, I am create a separate "MiddleFrame" for the ViewFrame and PropertiesParent
+
+  this->MiddleFrame->SetSeparatorSize(0);
+  this->MiddleFrame->SetFrame1MinimumSize(360);
+
+  if (this->Application->HasRegisteryValue(
+    2, "RunTime", VTK_KW_SAVE_WINDOW_GEOMETRY_REG_KEY) &&
+      this->Application->GetIntRegisteryValue(
+        2, "RunTime", VTK_KW_SAVE_WINDOW_GEOMETRY_REG_KEY) &&
+      this->Application->HasRegisteryValue(
+        2, "RunTime", VTK_KW_WINDOW_FRAME1_SIZE_REG_KEY))
+    {
+    this->MiddleFrame->SetFrame1Size(this->Application->GetIntRegisteryValue(
+      2, "RunTime", VTK_KW_WINDOW_FRAME1_SIZE_REG_KEY));
+    }
+  else
+    {
+    this->MiddleFrame->SetFrame1Size(360);
+    }
   this->MiddleFrame->Create(app);
   this->Script("pack %s -side bottom -fill both -expand t",
     this->MiddleFrame->GetWidgetName());
@@ -1235,7 +1253,7 @@ void vtkKWWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWWindow ";
-  this->ExtractRevision(os,"$Revision: 1.122.2.2 $");
+  this->ExtractRevision(os,"$Revision: 1.122.2.3 $");
 }
 
 int vtkKWWindow::ExitDialog()

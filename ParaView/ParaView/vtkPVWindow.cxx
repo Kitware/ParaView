@@ -121,7 +121,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.391.2.4");
+vtkCxxRevisionMacro(vtkPVWindow, "1.391.2.5");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -202,13 +202,6 @@ vtkPVWindow::vtkPVWindow()
   
   this->CurrentPVData = NULL;
   this->CurrentPVSource = NULL;
-
-  // Allow the user to interactively resize the properties parent.
-  this->MiddleFrame->SetSeparatorSize(5);
-  this->MiddleFrame->SetFrame1Size(350);
-  this->MiddleFrame->SetFrame1MinimumSize(200);
-
-  this->MiddleFrame->SetFrame2MinimumSize(200);
 
   // Frame used for animations.
   this->AnimationInterface = vtkPVAnimationInterface::New();
@@ -878,6 +871,12 @@ void vtkPVWindow::Create(vtkKWApplication *app, char* vtkNotUsed(args))
 
   // Hide the main window until after all user interface is initialized.
   this->Script( "wm withdraw %s", this->GetWidgetName());
+
+  // Allow the user to interactively resize the properties parent.
+  // The left panel size (Frame1) is restored by vtkKWWindow
+  this->MiddleFrame->SetSeparatorSize(5);
+  this->MiddleFrame->SetFrame1MinimumSize(200);
+  this->MiddleFrame->SetFrame2MinimumSize(200);
 
   // Put the version in the status bar.
   char version[128];
@@ -3772,7 +3771,7 @@ void vtkPVWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVWindow ";
-  this->ExtractRevision(os,"$Revision: 1.391.2.4 $");
+  this->ExtractRevision(os,"$Revision: 1.391.2.5 $");
 }
 
 //----------------------------------------------------------------------------
