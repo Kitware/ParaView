@@ -111,32 +111,32 @@ void vtkKWExtent::Create(vtkKWApplication *app, char *args)
   this->XMinScale->Create(this->Application,"-length 190");
   this->XMinScale->SetCommand(this, "ExtentSelected");
   this->XMinScale->DisplayEntry();
-  this->XMinScale->DisplayLabel("Minimum X");
+  this->XMinScale->DisplayLabel("Minimum X (Units)");
 
   this->XMaxScale->Create(this->Application,"");
   this->XMaxScale->SetCommand(this, "ExtentSelected");
   this->XMaxScale->DisplayEntry();
-  this->XMaxScale->DisplayLabel("Maximum X");
+  this->XMaxScale->DisplayLabel("Maximum X (Units)");
 
   this->YMinScale->Create(this->Application,"");
   this->YMinScale->SetCommand(this, "ExtentSelected");
   this->YMinScale->DisplayEntry();
-  this->YMinScale->DisplayLabel("Minimum Y");
+  this->YMinScale->DisplayLabel("Minimum Y (Units)");
 
   this->YMaxScale->Create(this->Application,"");
   this->YMaxScale->SetCommand(this, "ExtentSelected");
   this->YMaxScale->DisplayEntry();
-  this->YMaxScale->DisplayLabel("Maximum Y");
+  this->YMaxScale->DisplayLabel("Maximum Y (Units)");
 
   this->ZMinScale->Create(this->Application,"");
   this->ZMinScale->SetCommand(this, "ExtentSelected");
   this->ZMinScale->DisplayEntry();
-  this->ZMinScale->DisplayLabel("Minimum Z");
+  this->ZMinScale->DisplayLabel("Minimum Z (Units)");
 
   this->ZMaxScale->Create(this->Application,"");
   this->ZMaxScale->SetCommand(this, "ExtentSelected");
   this->ZMaxScale->DisplayEntry();
-  this->ZMaxScale->DisplayLabel("Maximum Z");
+  this->ZMaxScale->DisplayLabel("Maximum Z (Units)");
 
   this->Script(
     "pack %s %s %s %s %s %s -padx 2 -pady 2 -fill x -expand yes -anchor w",
@@ -149,12 +149,12 @@ void vtkKWExtent::Create(vtkKWApplication *app, char *args)
 }
 
 
-void vtkKWExtent::SetExtentRange(int *er)
+void vtkKWExtent::SetExtentRange(float *er)
 {
   this->SetExtentRange(er[0],er[1],er[2],er[3],er[4],er[5]);
 }
-void vtkKWExtent::SetExtentRange(int x1, int x2, int y1, int y2, 
-                                 int z1, int z2)
+void vtkKWExtent::SetExtentRange(float x1, float x2, float y1, float y2, 
+                                 float z1, float z2)
 {
   this->XMinScale->SetRange(x1,x2);
   this->XMaxScale->SetRange(x1,x2);
@@ -165,7 +165,7 @@ void vtkKWExtent::SetExtentRange(int x1, int x2, int y1, int y2,
   this->SetExtent(x1,x2,y1,y2,z1,z2);
 }
 
-void vtkKWExtent::SetExtent(int x1, int x2, int y1, int y2, int z1, int z2)
+void vtkKWExtent::SetExtent(float x1, float x2, float y1, float y2, float z1, float z2)
 {
   if (this->Extent[0] == x1 &&
       this->Extent[1] == x2 &&
@@ -185,7 +185,7 @@ void vtkKWExtent::SetExtent(int x1, int x2, int y1, int y2, int z1, int z2)
   this->ZMaxScale->SetValue(z2);
 }
 
-void vtkKWExtent::SetExtent(int *er)
+void vtkKWExtent::SetExtent(float *er)
 {
   this->SetExtent(er[0],er[1],er[2],er[3],er[4],er[5]);
 }
