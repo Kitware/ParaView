@@ -44,7 +44,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMPartDisplay);
-vtkCxxRevisionMacro(vtkSMPartDisplay, "1.22");
+vtkCxxRevisionMacro(vtkSMPartDisplay, "1.23");
 
 //----------------------------------------------------------------------------
 vtkSMPartDisplay::vtkSMPartDisplay()
@@ -303,80 +303,157 @@ void vtkSMPartDisplay::CreateVTKObjects(int num)
   // just create the proxys here.
 
   // Create the geometry filter.
-  this->GeometryProxy = vtkSMProxy::New();
-  this->GeometryProxy->SetVTKClassName("vtkPVGeometryFilter");
-  this->GeometryProxy->SetServersSelf(vtkProcessModule::DATA_SERVER);
-  this->GeometryProxy->AddProperty("UseTriangleStrips", 
-                                   this->UseTriangleStripsProperty);
+  if (!this->GeometryProxy)
+    {
+    this->GeometryProxy = vtkSMProxy::New();
+    this->GeometryProxy->SetVTKClassName("vtkPVGeometryFilter");
+    this->GeometryProxy->SetServersSelf(vtkProcessModule::DATA_SERVER);
+    this->GeometryProxy->AddProperty("UseTriangleStrips", 
+                                     this->UseTriangleStripsProperty);
+    }
+  else
+    {
+    this->GeometryProxy->UnRegisterVTKObjects();
+    }
 
   // Now create the update supressors which keep the renderers/mappers
   // from updating the pipeline.  These are here to ensure that all
   // processes get updated at the same time.
   // ===== Primary branch:
-  this->UpdateSuppressorProxy = vtkSMProxy::New();
-  this->UpdateSuppressorProxy->SetVTKClassName("vtkPVUpdateSuppressor");
-  this->UpdateSuppressorProxy->SetServersSelf(vtkProcessModule::CLIENT_AND_SERVERS);
+  if (!this->UpdateSuppressorProxy)
+    {
+    this->UpdateSuppressorProxy = vtkSMProxy::New();
+    this->UpdateSuppressorProxy->SetVTKClassName("vtkPVUpdateSuppressor");
+    this->UpdateSuppressorProxy->SetServersSelf(vtkProcessModule::CLIENT_AND_SERVERS);
+    }
+  else
+    {
+    this->UpdateSuppressorProxy->UnRegisterVTKObjects();
+    }
 
   // Now create the mapper.
-  this->MapperProxy = vtkSMProxy::New();
-  this->MapperProxy->SetVTKClassName("vtkPolyDataMapper");
-  this->MapperProxy->SetServersSelf(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
-  this->MapperProxy->AddProperty("ScalarVisibility", this->ScalarVisibilityProperty);
-  this->MapperProxy->AddProperty("DirectColorFlag", this->DirectColorFlagProperty);
-  this->MapperProxy->AddProperty("InterpolateColorsFlag", this->InterpolateColorsFlagProperty);
-  this->MapperProxy->AddProperty("UseImmediateMode", this->UseImmediateModeProperty);
+  if (!this->MapperProxy)
+    {
+    this->MapperProxy = vtkSMProxy::New();
+    this->MapperProxy->SetVTKClassName("vtkPolyDataMapper");
+    this->MapperProxy->SetServersSelf(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
+    this->MapperProxy->AddProperty("ScalarVisibility", this->ScalarVisibilityProperty);
+    this->MapperProxy->AddProperty("DirectColorFlag", this->DirectColorFlagProperty);
+    this->MapperProxy->AddProperty("InterpolateColorsFlag", this->InterpolateColorsFlagProperty);
+    this->MapperProxy->AddProperty("UseImmediateMode", this->UseImmediateModeProperty);
+    }
+  else
+    {
+    this->MapperProxy->UnRegisterVTKObjects();
+    }
 
   // Create a LOD Actor for the subclasses.
   // I could use just a plain actor for this class.
-  this->PropProxy = vtkSMProxy::New();
-  this->PropProxy->SetVTKClassName("vtkPVLODActor");
-  this->PropProxy->SetServersSelf(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
-  this->PropProxy->AddProperty("Visibility", this->PropVisibilityProperty);
-  this->PropProxy->AddProperty("Translate", this->TranslateProperty);
-  this->PropProxy->AddProperty("Scale", this->ScaleProperty);
-  this->PropProxy->AddProperty("Orientation", this->OrientationProperty);
-  this->PropProxy->AddProperty("Origin", this->OriginProperty);
+  if (!this->PropProxy)
+    {
+    this->PropProxy = vtkSMProxy::New();
+    this->PropProxy->SetVTKClassName("vtkPVLODActor");
+    this->PropProxy->SetServersSelf(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
+    this->PropProxy->AddProperty("Visibility", this->PropVisibilityProperty);
+    this->PropProxy->AddProperty("Translate", this->TranslateProperty);
+    this->PropProxy->AddProperty("Scale", this->ScaleProperty);
+    this->PropProxy->AddProperty("Orientation", this->OrientationProperty);
+    this->PropProxy->AddProperty("Origin", this->OriginProperty);
+    }
+  else
+    {
+    this->PropProxy->UnRegisterVTKObjects();
+    }
 
   // this is a vtk property not SM.
-  this->PropertyProxy = vtkSMProxy::New();
-  this->PropertyProxy->SetVTKClassName("vtkProperty");
-  this->PropertyProxy->SetServersSelf(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
-  this->PropertyProxy->AddProperty("LineWidth", this->LineWidthProperty);
-  this->PropertyProxy->AddProperty("PointSize", this->PointSizeProperty);
-  this->PropertyProxy->AddProperty("Interpolation", this->InterpolationProperty);
-  this->PropertyProxy->AddProperty("Color", this->ColorProperty);
-  this->PropertyProxy->AddProperty("Opacity", this->OpacityProperty);
+  if (!this->PropertyProxy)
+    {
+    this->PropertyProxy = vtkSMProxy::New();
+    this->PropertyProxy->SetVTKClassName("vtkProperty");
+    this->PropertyProxy->SetServersSelf(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
+    this->PropertyProxy->AddProperty("LineWidth", this->LineWidthProperty);
+    this->PropertyProxy->AddProperty("PointSize", this->PointSizeProperty);
+    this->PropertyProxy->AddProperty("Interpolation", this->InterpolationProperty);
+    this->PropertyProxy->AddProperty("Color", this->ColorProperty);
+    this->PropertyProxy->AddProperty("Opacity", this->OpacityProperty);
+    }
+  else
+    {
+    this->PropertyProxy->UnRegisterVTKObjects();
+    }
 
   // Now create the object for volume rendering if applicable
-  this->VolumeProxy = vtkSMProxy::New();
-  this->VolumeProxy->SetVTKClassName("vtkPVLODVolume");
-  this->VolumeProxy->SetServersSelf(vtkProcessModule::CLIENT_AND_SERVERS);
-  // Share properties.
-  this->VolumeProxy->AddProperty("Visibility", this->VolumeVisibilityProperty);
-  this->VolumeProxy->AddProperty("Translate", this->TranslateProperty);
-  this->VolumeProxy->AddProperty("Scale", this->ScaleProperty);
-  this->VolumeProxy->AddProperty("Orientation", this->OrientationProperty);
-  this->VolumeProxy->AddProperty("Origin", this->OriginProperty);
+  if (!this->VolumeProxy)
+    {
+    this->VolumeProxy = vtkSMProxy::New();
+    this->VolumeProxy->SetVTKClassName("vtkPVLODVolume");
+    this->VolumeProxy->SetServersSelf(vtkProcessModule::CLIENT_AND_SERVERS);
+    // Share properties.
+    this->VolumeProxy->AddProperty("Visibility", this->VolumeVisibilityProperty);
+    this->VolumeProxy->AddProperty("Translate", this->TranslateProperty);
+    this->VolumeProxy->AddProperty("Scale", this->ScaleProperty);
+    this->VolumeProxy->AddProperty("Orientation", this->OrientationProperty);
+    this->VolumeProxy->AddProperty("Origin", this->OriginProperty);
+    }
+  else
+    {
+    this->VolumeProxy->UnRegisterVTKObjects();
+    }
 
-  this->VolumeTetraFilterProxy = vtkSMProxy::New();
-  this->VolumeTetraFilterProxy->SetVTKClassName("vtkDataSetTriangleFilter");
-  this->VolumeTetraFilterProxy->SetServersSelf(vtkProcessModule::CLIENT_AND_SERVERS);
+  if (!this->VolumeTetraFilterProxy)
+    {
+    this->VolumeTetraFilterProxy = vtkSMProxy::New();
+    this->VolumeTetraFilterProxy->SetVTKClassName("vtkDataSetTriangleFilter");
+    this->VolumeTetraFilterProxy->SetServersSelf(vtkProcessModule::CLIENT_AND_SERVERS);
+    }
+  else
+    {
+    this->VolumeTetraFilterProxy->UnRegisterVTKObjects();
+    }
 
-  this->VolumeMapperProxy = vtkSMProxy::New();
-  this->VolumeMapperProxy->SetVTKClassName("vtkUnstructuredGridVolumeRayCastMapper");
-  this->VolumeMapperProxy->SetServersSelf(vtkProcessModule::CLIENT_AND_SERVERS);
+  if (!this->VolumeMapperProxy)
+    {
+    this->VolumeMapperProxy = vtkSMProxy::New();
+    this->VolumeMapperProxy->SetVTKClassName("vtkUnstructuredGridVolumeRayCastMapper");
+    this->VolumeMapperProxy->SetServersSelf(vtkProcessModule::CLIENT_AND_SERVERS);
+    }
+  else
+    {
+    this->VolumeMapperProxy->UnRegisterVTKObjects();
+    }
 
-  this->VolumePropertyProxy = vtkSMProxy::New();
-  this->VolumePropertyProxy->SetVTKClassName("vtkVolumeProperty");
-  this->VolumePropertyProxy->SetServersSelf(vtkProcessModule::CLIENT_AND_SERVERS);
+  if (!this->VolumePropertyProxy)
+    {
+    this->VolumePropertyProxy = vtkSMProxy::New();
+    this->VolumePropertyProxy->SetVTKClassName("vtkVolumeProperty");
+    this->VolumePropertyProxy->SetServersSelf(vtkProcessModule::CLIENT_AND_SERVERS);
+    }
+  else
+    {
+    this->VolumePropertyProxy->UnRegisterVTKObjects();
+    }
 
-  this->VolumeOpacityProxy = vtkSMProxy::New();
-  this->VolumeOpacityProxy->SetVTKClassName("vtkPiecewiseFunction");
-  this->VolumeOpacityProxy->SetServersSelf(vtkProcessModule::CLIENT_AND_SERVERS);
+  if (!this->VolumeOpacityProxy)
+    {
+    this->VolumeOpacityProxy = vtkSMProxy::New();
+    this->VolumeOpacityProxy->SetVTKClassName("vtkPiecewiseFunction");
+    this->VolumeOpacityProxy->SetServersSelf(vtkProcessModule::CLIENT_AND_SERVERS);
+    }
+  else
+    {
+    this->VolumeOpacityProxy->UnRegisterVTKObjects();
+    }
 
-  this->VolumeColorProxy = vtkSMProxy::New();
-  this->VolumeColorProxy->SetVTKClassName("vtkColorTransferFunction");
-  this->VolumeColorProxy->SetServersSelf(vtkProcessModule::CLIENT_AND_SERVERS);
+  if (!this->VolumeColorProxy)
+    {
+    this->VolumeColorProxy = vtkSMProxy::New();
+    this->VolumeColorProxy->SetVTKClassName("vtkColorTransferFunction");
+    this->VolumeColorProxy->SetServersSelf(vtkProcessModule::CLIENT_AND_SERVERS);
+    }
+  else
+    {
+    this->VolumeColorProxy->UnRegisterVTKObjects();
+    }
 
   this->GeometryProxy->CreateVTKObjects(num);
   this->UpdateSuppressorProxy->CreateVTKObjects(num);

@@ -39,7 +39,7 @@
 #include "vtkSMStringVectorProperty.h"
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMLODPartDisplay);
-vtkCxxRevisionMacro(vtkSMLODPartDisplay, "1.12");
+vtkCxxRevisionMacro(vtkSMLODPartDisplay, "1.13");
 
 
 //----------------------------------------------------------------------------
@@ -122,35 +122,63 @@ void vtkSMLODPartDisplay::CreateVTKObjects(int num)
     return;
     }
   this->Superclass::CreateVTKObjects(num);
-  
+
   // Create the decimation filter which branches the LOD pipeline.
-  this->LODDeciProxy = vtkSMProxy::New();
-  this->LODDeciProxy->SetVTKClassName("vtkQuadricClustering");
-  this->LODDeciProxy->SetServersSelf(vtkProcessModule::DATA_SERVER);
+  if (!this->LODDeciProxy)
+    {
+    this->LODDeciProxy = vtkSMProxy::New();
+    this->LODDeciProxy->SetVTKClassName("vtkQuadricClustering");
+    this->LODDeciProxy->SetServersSelf(vtkProcessModule::DATA_SERVER);
+    }
+  else
+    {
+    this->LODDeciProxy->UnRegisterVTKObjects();
+    }
 
   // ===== LOD branch:
-  this->LODUpdateSuppressorProxy = vtkSMProxy::New();
-  this->LODUpdateSuppressorProxy->SetVTKClassName("vtkPVUpdateSuppressor");
-  this->LODUpdateSuppressorProxy->SetServersSelf(vtkProcessModule::CLIENT_AND_SERVERS);
-
+  if (!this->LODUpdateSuppressorProxy)
+    {
+    this->LODUpdateSuppressorProxy = vtkSMProxy::New();
+    this->LODUpdateSuppressorProxy->SetVTKClassName("vtkPVUpdateSuppressor");
+    this->LODUpdateSuppressorProxy->SetServersSelf(vtkProcessModule::CLIENT_AND_SERVERS);
+    }
+  else
+    {
+    this->LODUpdateSuppressorProxy->UnRegisterVTKObjects();
+    }
+  
   // ===== LOD branch:
-  this->LODMapperProxy = vtkSMProxy::New();
-  this->LODMapperProxy->SetVTKClassName("vtkPolyDataMapper");
-  this->LODMapperProxy->SetServersSelf(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
-  this->LODMapperProxy->AddProperty("DirectColorFlag", this->DirectColorFlagProperty);
-  this->LODMapperProxy->AddProperty("InterpolateColorsFlag", this->InterpolateColorsFlagProperty);
+  if (!this->LODMapperProxy)
+    {
+    this->LODMapperProxy = vtkSMProxy::New();
+    this->LODMapperProxy->SetVTKClassName("vtkPolyDataMapper");
+    this->LODMapperProxy->SetServersSelf(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
+    this->LODMapperProxy->AddProperty("DirectColorFlag", this->DirectColorFlagProperty);
+    this->LODMapperProxy->AddProperty("InterpolateColorsFlag", this->InterpolateColorsFlagProperty);
+    }
+  else
+    {
+    this->LODMapperProxy->UnRegisterVTKObjects();
+    }
 
   this->LODDeciProxy->CreateVTKObjects(num);
   this->LODUpdateSuppressorProxy->CreateVTKObjects(num);
   this->LODMapperProxy->CreateVTKObjects(num);
 
   // ===== Volume rendering LOD branch (use a surface for low LOD):
-  this->LODVolumeMapperProxy = vtkSMProxy::New();
-  this->LODVolumeMapperProxy->SetVTKClassName("vtkPolyDataMapper");
-  this->LODVolumeMapperProxy->SetServersSelf(  vtkProcessModule::CLIENT
-                                             | vtkProcessModule::RENDER_SERVER);
-  this->LODVolumeMapperProxy->AddProperty("InterpolateColorsFlag",
-                                          this->InterpolateColorsFlagProperty);
+  if (!this->LODVolumeMapperProxy)
+    {
+    this->LODVolumeMapperProxy = vtkSMProxy::New();
+    this->LODVolumeMapperProxy->SetVTKClassName("vtkPolyDataMapper");
+    this->LODVolumeMapperProxy->SetServersSelf(  vtkProcessModule::CLIENT
+                                                 | vtkProcessModule::RENDER_SERVER);
+    this->LODVolumeMapperProxy->AddProperty("InterpolateColorsFlag",
+                                            this->InterpolateColorsFlagProperty);
+    }
+  else
+    {
+    this->LODVolumeMapperProxy->UnRegisterVTKObjects();
+    }
 
   this->LODVolumeMapperProxy->CreateVTKObjects(num);
 
