@@ -42,9 +42,11 @@ class vtkKWRecentFileEntry;
 template<class DType> class vtkVector;
 //ETX
 
-#define VTK_KW_PAGE_SETUP_MENU_LABEL   "Page Setup"
-#define VTK_KW_RECENT_FILES_MENU_LABEL "Open Recent File"
-#define VTK_KW_EXIT_DIALOG_NAME        "ExitApplication"
+#define VTK_KW_PAGE_SETUP_MENU_LABEL      "Page Setup"
+#define VTK_KW_RECENT_FILES_MENU_LABEL    "Open Recent File"
+#define VTK_KW_EXIT_DIALOG_NAME           "ExitApplication"
+#define VTK_KW_WINDOW_GEOMETRY_REG_KEY    "WindowGeometry"
+#define VTK_KW_WINDOW_FRAME1_SIZE_REG_KEY "WindowFrame1Size"
 
 class VTK_EXPORT vtkKWWindow : public vtkKWWidget
 {
@@ -213,6 +215,12 @@ public:
   vtkBooleanMacro( SupportHelp, int );
 
   // Description:
+  // Will the window add print entries in the file menu?
+  vtkSetClampMacro( SupportPrint, int, 0, 1 );
+  vtkGetMacro( SupportPrint, int );
+  vtkBooleanMacro( SupportPrint, int );
+
+  // Description:
   // Class of the window. Passed to the toplevel command.
   vtkSetStringMacro(WindowClass);
   vtkGetStringMacro(WindowClass);
@@ -366,6 +374,11 @@ protected:
   virtual void InternalProcessEvent(
     vtkObject *, unsigned long, float *, void *);
 
+  // Description:
+  // Save/Restore window geometry
+  virtual void SaveWindowGeometry();
+  virtual void RestoreWindowGeometry();
+
   virtual void CreateStatusImage();
 
   vtkKWNotebook *Notebook;
@@ -408,6 +421,7 @@ protected:
   char  *ScriptExtension;
   char  *ScriptType;
   int   SupportHelp;
+  int   SupportPrint;
   char  *WindowClass;
   char  *Title;
   int   PromptBeforeClose;

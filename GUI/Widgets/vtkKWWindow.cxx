@@ -43,10 +43,8 @@
 
 #define VTK_KW_HIDE_PROPERTIES_LABEL "Hide Left Panel" 
 #define VTK_KW_SHOW_PROPERTIES_LABEL "Show Left Panel"
-#define VTK_KW_WINDOW_GEOMETRY_REG_KEY "WindowGeometry"
-#define VTK_KW_WINDOW_FRAME1_SIZE_REG_KEY "WindowFrame1Size"
 
-vtkCxxRevisionMacro(vtkKWWindow, "1.197");
+vtkCxxRevisionMacro(vtkKWWindow, "1.198");
 vtkCxxSetObjectMacro(vtkKWWindow, PropertiesParent, vtkKWWidget);
 
 #define VTK_KW_RECENT_FILES_MAX 20
@@ -175,6 +173,7 @@ vtkKWWindow::vtkKWWindow()
 
   this->PrintTargetDPI        = 100;
   this->SupportHelp           = 1;
+  this->SupportPrint           = 1;
   this->WindowClass           = NULL;
   this->Title                 = NULL;
   this->PromptBeforeClose     = 1;
@@ -298,24 +297,6 @@ void vtkKWWindow::Create(vtkKWApplication *app, const char *args)
   this->Script("wm iconname %s {%s}",
                wname, app->GetApplicationPrettyName());
 
-  // Restore window geometry
-
-  if (app->GetSaveWindowGeometry() &&
-      app->HasRegisteryValue(
-        2, "Geometry", VTK_KW_WINDOW_GEOMETRY_REG_KEY))
-    {
-    char geometry[40];
-    if (app->GetRegisteryValue(
-          2, "Geometry", VTK_KW_WINDOW_GEOMETRY_REG_KEY, geometry))
-      {
-      this->Script("wm geometry %s %s", wname, geometry);
-      }
-    }
-  else
-    {
-    this->Script("wm geometry %s 900x700+0+0", wname);
-    }
-
   // Set up standard menus
 
   this->Menu->SetParent(this);
@@ -349,10 +330,14 @@ void vtkKWWindow::Create(vtkKWApplication *app, const char *args)
 
   this->Menu->AddCascade("File", this->MenuFile, 0);
 
-  this->MenuFile->AddSeparator();
-  this->MenuFile->AddCascade(VTK_KW_PAGE_SETUP_MENU_LABEL, this->PageMenu, 8);
+  if (this->SupportPrint)
+    {
+    this->MenuFile->AddSeparator();
+    this->MenuFile->AddCascade(
+      VTK_KW_PAGE_SETUP_MENU_LABEL, this->PageMenu, 8);
+    this->MenuFile->AddSeparator();
+    }
 
-  this->MenuFile->AddSeparator();
   this->MenuFile->AddCommand("Close", this, "Close", 0);
   this->MenuFile->AddCommand("Exit", this, "Exit", 1);
 
@@ -402,21 +387,14 @@ void vtkKWWindow::Create(vtkKWApplication *app, const char *args)
   this->Toolbars->Create(app, "");
   this->Toolbars->ShowBottomSeparatorOn();
 
-  // Split frame
+  // Restore Window Geometry
 
-  // To force the toolbar on top, I am creating a separate "MiddleFrame" 
-  // for the ViewFrame and PropertiesParent
-
-  if (app->HasRegisteryValue(
-        2, "Geometry", VTK_KW_WINDOW_FRAME1_SIZE_REG_KEY))
+  if (app->GetSaveWindowGeometry())
     {
-    int reg_size = app->GetIntRegisteryValue(
-      2, "Geometry", VTK_KW_WINDOW_FRAME1_SIZE_REG_KEY);
-    if (reg_size >= this->MiddleFrame->GetFrame1MinimumSize())
-      {
-      this->MiddleFrame->SetFrame1Size(reg_size);
-      }
+    this->RestoreWindowGeometry();
     }
+
+  // Split frame
 
   this->MiddleFrame->SetParent(this);
   this->MiddleFrame->Create(app);
@@ -680,18 +658,11 @@ void vtkKWWindow::CloseNoPrompt()
     this->TclInteractor = NULL;
     }
 
-  // If it's the last win, save its geometry
+  // Save its geometry
 
-  if (this->GetApplication()->GetWindows()->GetNumberOfItems() <= 1 &&
-      this->GetApplication()->GetSaveWindowGeometry())
+  if (this->GetApplication()->GetSaveWindowGeometry())
     {
-    this->Script("wm geometry %s", this->GetWidgetName());
-    this->GetApplication()->SetRegisteryValue(
-      2, "Geometry", VTK_KW_WINDOW_GEOMETRY_REG_KEY, "%s", 
-      this->GetApplication()->GetMainInterp()->result);
-    this->GetApplication()->SetRegisteryValue(
-      2, "Geometry", VTK_KW_WINDOW_FRAME1_SIZE_REG_KEY, "%d", 
-      this->MiddleFrame->GetFrame1Size());
+    this->SaveWindowGeometry();
     }
 
   vtkKWView *v;
@@ -706,6 +677,56 @@ void vtkKWWindow::CloseNoPrompt()
   // Close this window in the application. The
   // application will exit if there are no more windows.
   this->GetApplication()->Close(this);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWWindow::SaveWindowGeometry()
+{
+  if (this->IsCreated())
+    {
+    this->Script("wm geometry %s", this->GetWidgetName());
+
+    this->GetApplication()->SetRegisteryValue(
+      2, "Geometry", VTK_KW_WINDOW_GEOMETRY_REG_KEY, "%s", 
+      this->GetApplication()->GetMainInterp()->result);
+
+    this->GetApplication()->SetRegisteryValue(
+      2, "Geometry", VTK_KW_WINDOW_FRAME1_SIZE_REG_KEY, "%d", 
+      this->MiddleFrame->GetFrame1Size());
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWWindow::RestoreWindowGeometry()
+{
+  if (this->IsCreated())
+    {
+    if (this->GetApplication()->HasRegisteryValue(
+          2, "Geometry", VTK_KW_WINDOW_GEOMETRY_REG_KEY))
+      {
+      char geometry[40];
+      if (this->GetApplication()->GetRegisteryValue(
+            2, "Geometry", VTK_KW_WINDOW_GEOMETRY_REG_KEY, geometry))
+        {
+        this->Script("wm geometry %s %s", this->GetWidgetName(), geometry);
+        }
+      }
+    else
+      {
+      this->Script("wm geometry %s 900x700+0+0", this->GetWidgetName());
+      }
+
+    if (this->GetApplication()->HasRegisteryValue(
+          2, "Geometry", VTK_KW_WINDOW_FRAME1_SIZE_REG_KEY))
+      {
+      int reg_size = this->GetApplication()->GetIntRegisteryValue(
+        2, "Geometry", VTK_KW_WINDOW_FRAME1_SIZE_REG_KEY);
+      if (reg_size >= this->MiddleFrame->GetFrame1MinimumSize())
+        {
+        this->MiddleFrame->SetFrame1Size(reg_size);
+        }
+      }
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -1783,6 +1804,7 @@ void vtkKWWindow::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "ScriptType: " << this->GetScriptType() << endl;
   os << indent << "SelectedView: " << this->GetSelectedView() << endl;
   os << indent << "SupportHelp: " << this->GetSupportHelp() << endl;
+  os << indent << "SupportPrint: " << this->GetSupportPrint() << endl;
   os << indent << "StatusFrame: " << this->GetStatusFrame() << endl;
   os << indent << "ViewFrame: " << this->GetViewFrame() << endl;
   os << indent << "WindowClass: " << this->GetWindowClass() << endl;  
