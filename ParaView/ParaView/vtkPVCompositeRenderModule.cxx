@@ -28,7 +28,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCompositeRenderModule);
-vtkCxxRevisionMacro(vtkPVCompositeRenderModule, "1.14");
+vtkCxxRevisionMacro(vtkPVCompositeRenderModule, "1.15");
 
 
 
@@ -140,7 +140,6 @@ void vtkPVCompositeRenderModule::StillRender()
   // No reduction for still render.
   if (this->PVApplication && this->CompositeID.ID)
     {
-    vtkPVProcessModule* pm = this->PVApplication->GetProcessModule();
     pm->GetStream()
       << vtkClientServerStream::Invoke
       << this->CompositeID << "SetImageReductionFactor" << 1
@@ -165,7 +164,6 @@ void vtkPVCompositeRenderModule::StillRender()
   // Switch the compositer to local/composite mode.
   if (this->CompositeID.ID)
     {
-    vtkPVProcessModule* pm = this->PVApplication->GetProcessModule();
     if (localRender)
       {
       pm->GetStream()

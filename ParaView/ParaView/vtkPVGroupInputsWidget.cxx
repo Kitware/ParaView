@@ -29,7 +29,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVGroupInputsWidget);
-vtkCxxRevisionMacro(vtkPVGroupInputsWidget, "1.18");
+vtkCxxRevisionMacro(vtkPVGroupInputsWidget, "1.19");
 
 int vtkPVGroupInputsWidgetCommand(ClientData cd, Tcl_Interp *interp,
                                 int argc, char *argv[]);
@@ -151,7 +151,7 @@ void vtkPVGroupInputsWidget::Inactivate()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVGroupInputsWidget::AcceptInternal(vtkClientServerID vtkSourceID)
+void vtkPVGroupInputsWidget::AcceptInternal(vtkClientServerID )
 {
   int num, idx;
   int state;
