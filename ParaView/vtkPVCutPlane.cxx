@@ -316,8 +316,8 @@ void vtkPVCutPlane::CreateProperties()
                                  this->VTKSourceTclName, "GetOffset"); 
   // Format a command to move value from widget to vtkObjects (on all processes).
   // The VTK objects do not yet have to have the same Tcl name!
-  this->AcceptCommands->AddString("%s SetOffset [%s GetValue]",
-                        this->VTKSourceTclName,
+  this->AcceptCommands->AddString("%s AcceptHelper2 %s %s [%s GetValue]",
+                        this->GetTclName(), this->VTKSourceTclName, "SetOffset",
                         this->OffsetEntry->GetTclName());
 
   this->UpdateProperties();

@@ -5,7 +5,7 @@ set pvView [$pvWindow GetMainView]
 
 
 # Load the model of the continents.
-set pvCont [$pvWindow Open "C:/ParaView/ParaView/data/POP/contDeciFull.vtk"]
+set pvCont [$pvWindow Open "E:/Law/ParaView/ParaView/data/POP/contDeciFull.vtk"]
 # set the color of the continent model.
 set pvContOutput [$pvCont GetNthPVOutput 0]
 [$pvContOutput GetColorMenu] SetValue {Property}
@@ -16,7 +16,7 @@ $pvView EventuallyRender
 
 
 # Load the model of the ocean floor.
-set pvFloor [$pvWindow Open "C:/ParaView/ParaView/data/POP/oceanFloorSmall.vtk"]
+set pvFloor [$pvWindow Open "E:/Law/ParaView/ParaView/data/POP/oceanFloorSmall.vtk"]
 # set the color of the ocean floor model.
 set pvFloorOutput [$pvFloor GetNthPVOutput 0]
 [$pvFloorOutput GetColorMenu] SetValue {Property}
@@ -27,7 +27,7 @@ $pvView EventuallyRender
 
 
 # load the pop volume
-set pvPOP [$pvWindow Open "C:/ParaView/ParaView/data/POP/small.pop"]
+set pvPOP [$pvWindow Open "E:/Law/ParaView/ParaView/data/POP/small.pop"]
 $pvPOP AcceptCallback
 update
 
@@ -58,6 +58,30 @@ update
 
 
 
+
+
+
+
+# Create an iso surface of Salinity and color it by temerature.
+$pvWindow SetCurrentPVSource $pvPOP
+
+set pvContour [$pvWindow ContourCallback]
+[$pvContour GetVTKSource] SetValue 0 0.032
+$pvContour UpdateParameterWidgets
+$pvContour AcceptCallback
+
+# change to the data page.
+[$pvContour GetNotebook] Raise {Display}
+
+# Setup color map to show temperature.
+set pvContourOutput [$pvContour GetNthPVOutput 0]
+[$pvContourOutput GetColorMenu] SetValue {Point Temperature}
+$pvContourOutput ColorByPointFieldComponent Temperature 0
+[$pvContourOutput GetColorMapMenu] SetValue {Blue to Red}
+$pvContourOutput ChangeColorMap
+
+$pvContourOutput SetScalarBarVisibility 1
+$pvContourOutput SetScalarBarOrientationToHorizontal
 
 
 

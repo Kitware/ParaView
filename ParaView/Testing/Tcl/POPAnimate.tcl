@@ -70,9 +70,13 @@ for {set i 0} {$i < 540} { set i [expr $i + $RotationStep]} {
     $pvView Render
 }
 
-# Turn on the cube-axis actor.
-
 $pvView EventuallyRender
+
+
+
+
+# Iterate through Salinity IsoSurfaces.
+
 
 
 
