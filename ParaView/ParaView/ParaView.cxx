@@ -83,7 +83,7 @@ int MyMain(int argc, char *argv[])
   // initialization would clean things up.
   MPI_Comm_rank(MPI_COMM_WORLD,&myId); 
 #endif
-  
+
   // Don't prompt the user with startup errors on unix.
 #if defined(_WIN32) && !defined(__CYGWIN__)
   vtkOutputWindow::GetInstance()->PromptUserOn();
@@ -132,12 +132,15 @@ int MyMain(int argc, char *argv[])
 
   // Create the application to parse the command line arguments.
   app = vtkPVApplication::New();
+
   if (myId == 0 && app->ParseCommandLineArguments(argc, argv))
     {
-    // either error occured during parsing or we are not root node
     retVal = 1;
     app->SetStartGUI(0);
+    app->Exit();
     }
+  else
+    {
 
   // Get the application settings from the registery
   // It has to be called now, after ParseCommandLineArguments, which can 
@@ -206,23 +209,27 @@ int MyMain(int argc, char *argv[])
   // Start the application's event loop.  This will enable
   // vtkOutputWindow's user prompting for any further errors now that
   // startup is completed.
-  startVal = pm->Start(argc, argv);
+  if ( retVal )
+    {
+    app->Exit();
+    }
+  else
+    {
+    startVal = pm->Start(argc, argv);
+    }
 
   // Clean up for exit.
   pm->FinalizeInterpreter();
-  app->Delete();
   pm->Delete();
   pm = NULL;
+    }
+
+  app->Delete();
   Tcl_DeleteInterp(interp);
   Tcl_Finalize();
 
   return (retVal?retVal:startVal);
 }
-
-
-
-
-
 
 #ifdef _WIN32
 #include <windows.h>

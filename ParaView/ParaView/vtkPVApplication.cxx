@@ -101,7 +101,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.243");
+vtkCxxRevisionMacro(vtkPVApplication, "1.244");
 vtkCxxSetObjectMacro(vtkPVApplication, RenderModule, vtkPVRenderModule);
 
 
@@ -233,43 +233,37 @@ public:
 
   ~vtkPVOutputWindow()
     {
-    ostrstream str;
-    unsigned int cc;
-    for ( cc = 0; cc < this->Errors.size(); cc ++ )
-      {
-      str << this->Errors[cc].c_str() << endl;
-      }
-    str << ends;
-    if ( cc > 0 )
+    if ( this->Errors.size() > 0 )
       {
       cout << "Errors while exiting ParaView:" << endl;
-      cout << str.str() << endl;
       }
-    str.rdbuf()->freeze(0);
+    this->FlushErrors(cout);
     }
   
+  void FlushErrors(ostream& os)
+    {
+    vtkstd::string::size_type cc;
+    for ( cc = 0; cc < this->Errors.size(); cc ++ )
+      {
+      os << this->Errors[cc].c_str() << endl;
+      }
+    this->Errors.erase(this->Errors.begin(), this->Errors.end());
+    }
+
   void SetWindowCollection(vtkKWWindowCollection *windows)
-  {
+    {
     vtkKWWindowCollection* wins = this->Windows;
     this->Windows = windows;
-    if ( !wins && this->Windows )
+    if ( !wins && this->Windows && this->Errors.size() > 0 )
       {
       ostrstream str;
-      unsigned int cc;
-      for ( cc = 0; cc < this->Errors.size(); cc ++ )
-        {
-        str << this->Errors[cc].c_str() << endl;
-        }
+      this->FlushErrors(str);
       str << ends;
       vtkKWWindow *win = this->Windows->GetLastKWWindow();
-      if ( cc > 0 )
-        {
-        win->ErrorMessage(str.str());
-        }
+      win->ErrorMessage(str.str());
       str.rdbuf()->freeze(0);
-      this->Errors.erase(this->Errors.begin(), this->Errors.end());
       }
-  }
+    }
 
   int GetErrorOccurred()
     {
@@ -1065,8 +1059,6 @@ int vtkPVApplication::ParseCommandLineArguments(int argc, char*argv[])
 //----------------------------------------------------------------------------
 void vtkPVApplication::Start(int argc, char*argv[])
 {
-
-
   // Find the installation directory (now that we have the app name)
   this->FindApplicationInstallationDirectory();
 
@@ -1535,7 +1527,10 @@ void vtkPVApplication::Exit()
 
   this->vtkKWApplication::Exit();
 
-  this->ProcessModule->Exit();
+  if ( this->ProcessModule )
+    {
+    this->ProcessModule->Exit();
+    }
 
   // This is a normal exit.  Close trace file here and delete it.
   if (this->TraceFile)
