@@ -555,13 +555,13 @@ void vtkPVArrayCalculator::ChangeAttributeMode(const char* newMode)
     {
     pvApp->BroadcastScript("%s SetAttributeModeToUsePointData",
                            this->GetVTKSourceTclName());
-    fd = this->GetNthPVInput(0)->GetVTKData()->GetPointData()->GetFieldData();
+    fd = this->GetNthPVInput(0)->GetVTKData()->GetPointData();
     }
   else if (strcmp(newMode, "cell") == 0)
     {
     pvApp->BroadcastScript("%s SetAttributeModeToUseCellData",
                            this->GetVTKSourceTclName());
-    fd = this->GetNthPVInput(0)->GetVTKData()->GetCellData()->GetFieldData();
+    fd = this->GetNthPVInput(0)->GetVTKData()->GetCellData();
     }
   
   if (fd)

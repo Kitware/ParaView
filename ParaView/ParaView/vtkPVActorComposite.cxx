@@ -1219,7 +1219,7 @@ void vtkPVActorComposite::Initialize()
   this->Script("%s SetInertia 20", this->GetCubeAxesTclName());
   
   if ((array =
-       this->Mapper->GetInput()->GetPointData()->GetActiveScalars()) &&
+       this->Mapper->GetInput()->GetPointData()->GetScalars()) &&
       (array->GetName()))
     {
     char *arrayName = (char*)array->GetName();
@@ -1229,7 +1229,7 @@ void vtkPVActorComposite::Initialize()
     this->ColorMenu->SetValue(tmp);
     }
   else if ((array =
-            this->Mapper->GetInput()->GetCellData()->GetActiveScalars()) &&
+            this->Mapper->GetInput()->GetCellData()->GetScalars()) &&
             (array->GetName()))
     {
     char *arrayName = (char*)array->GetName();

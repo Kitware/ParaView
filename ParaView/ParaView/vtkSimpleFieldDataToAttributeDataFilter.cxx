@@ -82,7 +82,7 @@ void vtkSimpleFieldDataToAttributeDataFilter::Execute()
 
   output->ShallowCopy(input);
 
-  field = this->GetInput()->GetPointData()->GetFieldData();
+  field = this->GetInput()->GetPointData();
   if (field)
     {
     array = field->GetArray(this->FieldName);
@@ -97,24 +97,11 @@ void vtkSimpleFieldDataToAttributeDataFilter::Execute()
   num = array->GetNumberOfComponents();
   if (this->Attribute == 0)
     { // scalars
-    // Create a scalars object around the array. 
-    vtkScalars *scalars;
-    scalars = vtkScalars::New();
-    scalars->SetData(array);
-    output->GetPointData()->SetScalars(scalars);
-    scalars->Delete();
-    scalars = NULL;
+    output->GetPointData()->SetScalars(array);
     }
   else
     { // vectors
-    // Create a vector object around the array. 
-    vtkVectors *vects;
-    vects = vtkVectors::New();
-    vects->SetData(array);
-    output->GetPointData()->SetVectors(vects);
-    vects->Delete();
-    vects = NULL;
-
+    output->GetPointData()->SetVectors(array);
     }
 }
 
