@@ -71,7 +71,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVEnSightReaderModule);
-vtkCxxRevisionMacro(vtkPVEnSightReaderModule, "1.30");
+vtkCxxRevisionMacro(vtkPVEnSightReaderModule, "1.31");
 
 int vtkPVEnSightReaderModuleCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -565,7 +565,7 @@ int vtkPVEnSightReaderModule::Initialize(const char* fname,
 //----------------------------------------------------------------------------
 int vtkPVEnSightReaderModule::ReadFileInformation(const char* fname)
 {
-  char *tclName, *outputTclName;
+  char *tclName;
   int numOutputs, i;
 
   vtkPVApplication* pvApp = this->GetPVApplication();
