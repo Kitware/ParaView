@@ -61,7 +61,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkRenderer.h"
 
 vtkStandardNewMacro(vtkPVBoxWidget);
-vtkCxxRevisionMacro(vtkPVBoxWidget, "1.1");
+vtkCxxRevisionMacro(vtkPVBoxWidget, "1.2");
 
 int vtkPVBoxWidgetCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -101,8 +101,6 @@ void vtkPVBoxWidget::ResetInternal(const char* sourceTclName)
 //----------------------------------------------------------------------------
 void vtkPVBoxWidget::ActualPlaceWidget()
 {
-  float center[3];
-  float radius;
   this->Superclass::ActualPlaceWidget();
   vtkPVApplication *pvApp = static_cast<vtkPVApplication*>(
     this->Application);
