@@ -26,6 +26,10 @@ $pv(vtkTemp141) SetMinValue 0.048000
 $pv(vtkTemp141) SetMaxValue 0.400000
 set pv(vtkTemp146) [$pv(vtkTemp129) GetPVWidget {AllScalars}]
 $pv(vtkTemp129) AcceptCallback
+set pv(vtkTemp304) [$pv(vtkTemp1) CreatePVSource DataSetTriangleFilter]
+$pv(vtkTemp304) AcceptCallback
+set pv(vtkTemp321) [$pv(vtkTemp304) GetPVOutput]
+$pv(vtkTemp321) SetVisibility 0
 set pv(vtkTemp158) [$pv(vtkTemp1) CreatePVSource DataSetSurfaceFilter]
 set pv(vtkTemp164) [$pv(vtkTemp158) GetPVWidget {Input}]
 $pv(vtkTemp164) SetCurrentValue $pv(vtkTemp129)
