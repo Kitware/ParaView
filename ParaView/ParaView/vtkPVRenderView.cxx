@@ -88,7 +88,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.213.2.7");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.213.2.8");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -779,12 +779,16 @@ void vtkPVRenderView::Create(vtkKWApplication *app, const char *args)
   this->NavigationWindow->SetHeight(545);
   this->NavigationWindow->Create(this->Application, 0); 
 
+  cout << "NavigationWindow: " << this->NavigationWindow->GetTclName() << endl;
+
   // Configure the selection window
 
   this->SelectionWindow->SetParent(this->NavigationFrame->GetFrame());
   this->SelectionWindow->SetWidth(341);
   this->SelectionWindow->SetHeight(545);
   this->SelectionWindow->Create(this->Application, 0); 
+
+  cout << "SelectionWindow: " << this->SelectionWindow->GetTclName() << endl;
 
   this->SelectionWindowButton->SetParent(
     this->NavigationFrame->GetLabelFrame());
@@ -1371,11 +1375,13 @@ void vtkPVRenderView::UpdateNavigationWindow(vtkPVSource *currentSource,
 {
   if (this->NavigationWindow)
     {
-    this->NavigationWindow->Update(currentSource, nobind);
+    this->NavigationWindow->SetCreateSelectionBindings(!nobind);
+    this->NavigationWindow->Update(currentSource);
     }
   if (this->SelectionWindow)
     {
-    this->SelectionWindow->Update(currentSource, nobind);
+    this->SelectionWindow->SetCreateSelectionBindings(!nobind);
+    this->SelectionWindow->Update(currentSource);
     }
 }
 
@@ -1921,11 +1927,11 @@ void vtkPVRenderView::SetLODThresholdInternal(int threshold)
     }
   else if (threshold < 1000000)
     {
-    sprintf(str, "%.1f Kpoints", (float)(threshold) / 1000.0);
+    sprintf(str, "%.1fK points", (float)(threshold) / 1000.0);
     }
   else
     {
-    sprintf(str, "%.1f Mpoints", (float)(threshold) / 1000000.0);
+    sprintf(str, "%.1fM points", (float)(threshold) / 1000000.0);
     }
 
   this->LODThresholdValue->SetLabel(str);
@@ -2392,7 +2398,7 @@ void vtkPVRenderView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVRenderView ";
-  this->ExtractRevision(os,"$Revision: 1.213.2.7 $");
+  this->ExtractRevision(os,"$Revision: 1.213.2.8 $");
 }
 
 //------------------------------------------------------------------------------
