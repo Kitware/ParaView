@@ -44,6 +44,7 @@ SET( ParaView_SRCS
   vtkPVDataSetReaderModule.cxx
   vtkPVDummyWidget.cxx
   vtkPVDuplicatePolyData.cxx
+  vtkPVEnSightMasterServerReader.cxx
   vtkPVEnSightReaderModule.cxx
   vtkPVErrorLogDisplay.cxx
   vtkPVExtentEntry.cxx
@@ -147,10 +148,6 @@ SET( ParaView_SRCS
   vtkWeightedRedistributePolyData.cxx
   vtkXDMFReaderModule.cxx
   )
-
-IF(VTK_USE_MPI)
-  SET(ParaView_SRCS ${ParaView_SRCS} vtkPVEnSightMasterServerReader.cxx)
-ENDIF(VTK_USE_MPI)
 
 IF (VTK_USE_PATENTED)
   SET( ParaView_SRCS

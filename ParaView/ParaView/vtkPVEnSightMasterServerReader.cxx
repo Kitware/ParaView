@@ -44,12 +44,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkDataArray.h"
 #include "vtkDataArrayCollection.h"
 #include "vtkImageData.h"
-#include "vtkMPIController.h"
 #include "vtkObjectFactory.h"
 #include "vtkPolyData.h"
 #include "vtkRectilinearGrid.h"
 #include "vtkStructuredGrid.h"
+#include "vtkToolkits.h"
 #include "vtkUnstructuredGrid.h"
+
+#ifdef VTK_USE_MPI
+# include "vtkMPIController.h"
+#endif
 
 #include <vtkstd/string>
 #include <vtkstd/vector>
@@ -58,10 +62,24 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVEnSightMasterServerReader);
-vtkCxxRevisionMacro(vtkPVEnSightMasterServerReader, "1.1");
+vtkCxxRevisionMacro(vtkPVEnSightMasterServerReader, "1.2");
 
+#ifdef VTK_USE_MPI
 vtkCxxSetObjectMacro(vtkPVEnSightMasterServerReader, Controller,
-                     vtkMPIController);
+                     vtkMultiProcessController);
+vtkMultiProcessController* vtkPVEnSightMasterServerReader::GetController()
+{
+  return this->Controller;
+}
+#else
+void vtkPVEnSightMasterServerReader::SetController(vtkMPIController*)
+{
+}
+vtkMultiProcessController* vtkPVEnSightMasterServerReader::GetController()
+{
+  return 0;
+}
+#endif
 
 //----------------------------------------------------------------------------
 class vtkPVEnSightMasterServerReaderInternal
@@ -100,6 +118,7 @@ void vtkPVEnSightMasterServerReader::PrintSelf(ostream& os, vtkIndent indent)
 }
 
 //----------------------------------------------------------------------------
+#ifdef VTK_USE_MPI
 template <class T>
 int vtkPVEnSightMasterServerReaderSyncValues(T* data, int numValues,
                                              int numPieces,
@@ -164,8 +183,10 @@ int vtkPVEnSightMasterServerReaderSyncValues(T* data, int numValues,
   
   return result;
 }
+#endif
 
 //----------------------------------------------------------------------------
+#ifdef VTK_USE_MPI
 void vtkPVEnSightMasterServerReader::ExecuteInformation()
 {
   int i;
@@ -283,8 +304,14 @@ void vtkPVEnSightMasterServerReader::ExecuteInformation()
     return;
     }
 }
+#else
+void vtkPVEnSightMasterServerReader::ExecuteInformation()
+{
+}
+#endif
 
 //----------------------------------------------------------------------------
+#ifdef VTK_USE_MPI
 void vtkPVEnSightMasterServerReader::Execute()
 {
   int i;
@@ -389,6 +416,13 @@ void vtkPVEnSightMasterServerReader::Execute()
       }
     }
 }
+#else
+void vtkPVEnSightMasterServerReader::Execute()
+{
+  // Without MPI, all we can do is produce an empty output.
+  this->ExecuteError();
+}
+#endif
 
 //----------------------------------------------------------------------------
 void vtkPVEnSightMasterServerReader::ExecuteError()
@@ -406,6 +440,7 @@ void vtkPVEnSightMasterServerReader::ExecuteError()
 }
 
 //----------------------------------------------------------------------------
+#ifdef VTK_USE_MPI
 void vtkPVEnSightMasterServerReader::SuperclassExecuteInformation()
 {
   // Fake the filename when the superclass uses it.
@@ -416,8 +451,14 @@ void vtkPVEnSightMasterServerReader::SuperclassExecuteInformation()
   this->Superclass::ExecuteInformation();
   this->CaseFileName = temp;
 }
+#else
+void vtkPVEnSightMasterServerReader::SuperclassExecuteInformation()
+{
+}
+#endif
 
 //----------------------------------------------------------------------------
+#ifdef VTK_USE_MPI
 void vtkPVEnSightMasterServerReader::SuperclassExecuteData()
 {
   // Fake the filename when the superclass uses it.
@@ -428,6 +469,11 @@ void vtkPVEnSightMasterServerReader::SuperclassExecuteData()
   this->Superclass::Execute();
   this->CaseFileName = temp;
 }
+#else
+void vtkPVEnSightMasterServerReader::SuperclassExecuteData()
+{
+}
+#endif
 
 //----------------------------------------------------------------------------
 static int vtkPVEnSightMasterServerReaderIsSpace(char c)
