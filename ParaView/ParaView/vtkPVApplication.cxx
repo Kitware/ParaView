@@ -99,7 +99,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.156.2.1");
+vtkCxxRevisionMacro(vtkPVApplication, "1.156.2.2");
 
 int vtkPVApplicationCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -751,6 +751,72 @@ void vtkPVApplication::Start(int argc, char*argv[])
     }
 #endif
 
+  // Handle setting up the SGI pipes.
+  if (this->UseRenderingGroup)
+    {
+    int numProcs = this->Controller->GetNumberOfProcesses();
+    int numPipes = 1;
+    int id;
+    // Until I add a user interface to set the number of pipes,
+    // just read it from a file.
+    ifstream ifs;
+    if (this->GroupFileName)
+      {
+      ifs.open(this->GroupFileName,ios::in);
+      }
+    else
+      {
+      ifs.open("pipes.inp",ios::in);
+      }
+    if (ifs.fail())
+      {
+      if (this->GroupFileName)
+        {
+        vtkErrorMacro("Could not find the file " << this->GroupFileName);
+        }
+      else
+        {
+        vtkErrorMacro("Could not find the file pipes.inp");
+        }
+        numPipes = numProcs;
+      }
+    else
+      {
+      ifs >> numPipes;
+      if (numPipes > numProcs) numPipes = numProcs;
+      if (numPipes < 1) numPipes = 1;
+      }
+
+    
+    vtkPVRenderGroupDialog *rgDialog = vtkPVRenderGroupDialog::New();
+    const char *displayString;
+    displayString = getenv("DISPLAY");
+    if (displayString)
+      {
+      rgDialog->SetDisplayString(0, displayString);
+      }
+    rgDialog->SetNumberOfProcessesInGroup(numPipes);
+    rgDialog->Create(this);
+
+    rgDialog->Invoke();
+    numPipes = rgDialog->GetNumberOfProcessesInGroup();
+    
+    this->BroadcastScript("$Application SetNumberOfPipes %d", numPipes);    
+    
+    if (displayString)
+      {    
+      for (id = 1; id < numPipes; ++id)
+        {
+        // Format a new display string based on process.
+        displayString = rgDialog->GetDisplayString(id);
+        this->RemoteScript(
+          id, "$Application SetEnvironmentVariable {DISPLAY=%s}", 
+          displayString);
+        }
+      }
+    rgDialog->Delete();
+    }
+
   // Splash screen ?
 
   if (this->ShowSplashScreen)
@@ -795,7 +861,8 @@ void vtkPVApplication::Start(int argc, char*argv[])
   // ui has ref. count of at least 1 because of AddItem() above
   ui->Delete();
 
-  this->Script("proc bgerror { m } { global Application; $Application DisplayTCLError $m }");
+  this->Script("proc bgerror { m } "
+               "{ global Application; $Application DisplayTCLError $m }");
   vtkPVOutputWindow *window = vtkPVOutputWindow::New();
   window->SetWindowCollection( this->Windows );
   this->OutputWindow = window;
@@ -857,74 +924,6 @@ void vtkPVApplication::Start(int argc, char*argv[])
 
 
 
-  // Handle setting up the SGI pipes.
-  if (this->UseRenderingGroup)
-    {
-    int numProcs = this->Controller->GetNumberOfProcesses();
-    int numPipes = 1;
-    int id;
-    // Until I add a user interface to set the number of pipes,
-    // just read it from a file.
-    ifstream ifs;
-    if (this->GroupFileName)
-      {
-      ifs.open(this->GroupFileName,ios::in);
-      }
-    else
-      {
-      ifs.open("pipes.inp",ios::in);
-      }
-    if (ifs.fail())
-      {
-      if (this->GroupFileName)
-        {
-        vtkErrorMacro("Could not find the file " << this->GroupFileName);
-        }
-      else
-        {
-        vtkErrorMacro("Could not find the file pipes.inp");
-        }
-        numPipes = numProcs;
-      }
-    else
-      {
-      ifs >> numPipes;
-      if (numPipes > numProcs) numPipes = numProcs;
-      if (numPipes < 1) numPipes = 1;
-      }
-
-    
-    vtkPVRenderGroupDialog *rgDialog = vtkPVRenderGroupDialog::New();
-    const char *displayString;
-    displayString = getenv("DISPLAY");
-    if (displayString)
-      {
-      rgDialog->SetDisplayString(0, displayString);
-      }
-    rgDialog->SetNumberOfProcessesInGroup(numPipes);
-    rgDialog->SetMasterWindow(ui);
-    rgDialog->SetParent(ui);
-    rgDialog->Create(this);
-
-    rgDialog->Invoke();
-    numPipes = rgDialog->GetNumberOfProcessesInGroup();
-    
-    this->BroadcastScript("$Application SetNumberOfPipes %d", numPipes);    
-    
-    if (displayString)
-      {    
-      for (id = 1; id < numPipes; ++id)
-        {
-        // Format a new display string based on process.
-        displayString = rgDialog->GetDisplayString(id);
-        this->RemoteScript(id, "$Application SetEnvironmentVariable {DISPLAY=%s}", 
-                           displayString);
-        }
-      }
-      rgDialog->SetParent(NULL);
-      rgDialog->Delete();
-      rgDialog = NULL;
-    }
 
   // If any of the argumens has a .pvs extension, load it as a script.
   for (i=1; i < argc; i++)

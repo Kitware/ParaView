@@ -77,7 +77,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.161.2.1");
+vtkCxxRevisionMacro(vtkPVData, "1.161.2.2");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -2760,10 +2760,13 @@ void vtkPVData::SetCollectThreshold(float threshold)
   
   vtkPVApplication *pvApp = this->GetPVApplication();
     
-  pvApp->BroadcastScript("%s SetThreshold %d", this->CollectTclName,
-                         static_cast<unsigned long>(threshold*1000.0));
-  pvApp->BroadcastScript("%s SetThreshold %d", this->LODCollectTclName,
-                         static_cast<unsigned long>(threshold*1000.0));
+  if (!pvApp->GetUseRenderingGroup())
+    {
+    pvApp->BroadcastScript("%s SetThreshold %d", this->CollectTclName,
+                           static_cast<unsigned long>(threshold*1000.0));
+    pvApp->BroadcastScript("%s SetThreshold %d", this->LODCollectTclName,
+                           static_cast<unsigned long>(threshold*1000.0));
+    }
 }
 
 
@@ -2772,7 +2775,7 @@ void vtkPVData::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVData ";
-  this->ExtractRevision(os,"$Revision: 1.161.2.1 $");
+  this->ExtractRevision(os,"$Revision: 1.161.2.2 $");
 }
 
 //----------------------------------------------------------------------------
