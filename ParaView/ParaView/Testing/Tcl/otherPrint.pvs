@@ -34,20 +34,30 @@ proc rtOtherTest { fileid } {
         if {$a == "vtkPVApplication"} {
            continue
         }
-        catch {
+	if { [ catch {
            $a b
            b Print
            if {[b IsA $a] == 0} {puts stderr "$a failed IsA test!!!"}
            if {[b IsA "vtkObject"] == 0} {puts stdout "$a is not a sub-class of vtkObject"}
+	   if { [catch { b Create } res ] != 0 } {
+		puts "Error creating: $res"
+		Application SetExitStatus 1
+           }
            b GetClassName
            b Delete
+        } fres ] != 0 } {
+          puts "Error pass 1: $fres"
+	  Application SetExitStatus 1
         }
-        catch {
+        if { [ catch {
            $a b 
            $a c 
            set d [b SafeDownCast c]
            b Delete
            c Delete
+        } fres ] != 0 } {
+          puts "Error pass 2: $fres"
+	  Application SetExitStatus 1
         }
     }
 }

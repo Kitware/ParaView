@@ -24,7 +24,8 @@ if { [catch {
   file delete -force vtkParaViewWriteTest.tcl
   $pvWindow ErrorMessage "This is an error"
   $pvWindow WarningMessage "This is a warning"
-} ] != 0 } {
+} res ] != 0 } {
+	puts "Error: $res"
 	Application SetExitStatus 1
 }
 
