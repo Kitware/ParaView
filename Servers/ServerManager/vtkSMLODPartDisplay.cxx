@@ -39,7 +39,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMLODPartDisplay);
-vtkCxxRevisionMacro(vtkSMLODPartDisplay, "1.16");
+vtkCxxRevisionMacro(vtkSMLODPartDisplay, "1.17");
 
 
 //----------------------------------------------------------------------------
@@ -646,7 +646,7 @@ void vtkSMLODPartDisplay::CacheUpdate(int idx, int total)
     << vtkClientServerStream::Invoke
     << this->LODMapperProxy->GetID(0) << "Modified"
     << vtkClientServerStream::End;
-  pm->SendStream(vtkProcessModule::CLIENT_AND_SERVERS, stream);
+  pm->SendStream(vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER, stream);
 }
 
 
