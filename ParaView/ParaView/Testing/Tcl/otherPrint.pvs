@@ -24,6 +24,9 @@ proc rtOtherTest { fileid } {
         if {$a == "vtkTkRenderWidget"} {
            continue
         }
+        if {$a == "vtkTkImageViewerWidget"} {
+           continue
+        }
         if {$a == "vtkCommand"} {
             continue
         }
