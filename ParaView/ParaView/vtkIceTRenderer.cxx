@@ -21,6 +21,8 @@
 #include <vtkObjectFactory.h>
 #include <vtkLightCollection.h>
 
+#include <GL/ice-t.h>
+
 #define VTK41 1
 
 //******************************************************************
@@ -37,7 +39,7 @@ static vtkIceTRenderer *currentRenderer;
 // vtkIceTRenderer implementation.
 //******************************************************************
 
-vtkCxxRevisionMacro(vtkIceTRenderer, "1.1");
+vtkCxxRevisionMacro(vtkIceTRenderer, "1.2");
 vtkStandardNewMacro(vtkIceTRenderer);
 
 vtkIceTRenderer::vtkIceTRenderer()
@@ -282,6 +284,7 @@ int vtkIceTRenderer::UpdateGeometry()
 void vtkIceTRenderer::PrintSelf(ostream &os, vtkIndent indent)
 {
   this->vtkOpenGLRenderer::PrintSelf(os, indent);
+  os << indent << "ComposeNextFrame: " << this->ComposeNextFrame << endl;
 }
 
 //******************************************************************

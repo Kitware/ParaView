@@ -49,10 +49,9 @@
 
 #include "vtkParallelRenderManager.h"
 
-#include <GL/ice-t.h>
+#include <GL/ice-t.h> // Needed for IceTContext
 
-class VTK_EXPORT vtkIceTRenderManager
-    : public vtkParallelRenderManager
+class VTK_EXPORT vtkIceTRenderManager : public vtkParallelRenderManager
 {
 public:
   static vtkIceTRenderManager *New();
@@ -140,8 +139,8 @@ protected:
   virtual void ReadReducedImage();
 
 private:
-  vtkIceTRenderManager(const vtkIceTRenderManager&);
-  void operator=(const vtkIceTRenderManager&);
+  vtkIceTRenderManager(const vtkIceTRenderManager&); // Not implemented
+  void operator=(const vtkIceTRenderManager&); //Not implemented
 };
 
 

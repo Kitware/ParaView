@@ -37,14 +37,16 @@
 class VTK_EXPORT vtkIceTFactory : public vtkObjectFactory
 {
 public:
-  vtkTypeMacro(vtkIceTFactory, vtkObjectFactory);
+  vtkTypeRevisionMacro(vtkIceTFactory, vtkObjectFactory);
   static vtkIceTFactory *New();
   void PrintSelf(ostream& os, vtkIndent indent);
   virtual const char *GetVTKSourceVersion();
   virtual const char *GetDescription();
+
 protected:
   vtkIceTFactory();
   virtual ~vtkIceTFactory() { }
+
 private:
   vtkIceTFactory(const vtkIceTFactory &); // Not implemented.
   void operator=(const vtkIceTFactory &); // Not implemented.

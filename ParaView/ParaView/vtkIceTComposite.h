@@ -40,13 +40,11 @@
 
 #include "vtkCompositeManager.h"
 
-#include <GL/ice-t.h>
-
 class VTK_EXPORT vtkIceTComposite : public vtkCompositeManager
 {
 public:
   static vtkIceTComposite *New();
-  vtkTypeMacro(vtkIceTComposite, vtkCompositeManager);
+  vtkTypeRevisionMacro(vtkIceTComposite, vtkCompositeManager);
   virtual void PrintSelf(ostream &os, vtkIndent indent);
 
   // Description:
@@ -144,8 +142,8 @@ protected:
   int StrategyDirty;
 
 private:
-  vtkIceTComposite(const vtkIceTComposite&);
-  void operator=(const vtkIceTComposite&);
+  vtkIceTComposite(const vtkIceTComposite&); // Not implemented
+  void operator=(const vtkIceTComposite&); // Not implemented
 };
 
 

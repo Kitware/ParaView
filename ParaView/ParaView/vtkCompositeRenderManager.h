@@ -29,12 +29,10 @@
 
 #include "vtkParallelRenderManager.h"
 
-#include "vtkCompositer.h"
-
+class vtkCompositer;
 #define USE_ICET
 
-class VTK_EXPORT vtkCompositeRenderManager
-    : public vtkParallelRenderManager
+class VTK_EXPORT vtkCompositeRenderManager : public vtkParallelRenderManager
 {
 public:
   vtkTypeRevisionMacro(vtkCompositeRenderManager, vtkParallelRenderManager);
@@ -43,12 +41,8 @@ public:
 
   // Description:
   // Set/Get the composite algorithm.
-  vtkSetObjectMacro(Compositer, vtkCompositer);
   vtkGetObjectMacro(Compositer, vtkCompositer);
-
-  // Description:
-  // Get rendering metrics.
-  vtkGetMacro(ImageProcessingTime, double);
+  virtual void SetCompositer(vtkCompositer*);
 
 protected:
   vtkCompositeRenderManager();

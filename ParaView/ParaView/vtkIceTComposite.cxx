@@ -28,6 +28,8 @@
 #include <vtkMPI.h>
 
 #include <string.h>
+#include <GL/ice-t.h>
+
 
 //******************************************************************
 // Prototypes
@@ -563,4 +565,5 @@ void vtkIceTComposite::PrintSelf(ostream &os, vtkIndent indent)
       }
     icetDestroyContext(context);
     }
+  os << indent << "Strategy: " << this->Strategy << endl;
 }

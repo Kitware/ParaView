@@ -27,8 +27,6 @@
 
 #include "vtkOpenGLRenderer.h"
 
-#include <GL/ice-t.h>
-
 class VTK_EXPORT vtkIceTRenderer : public vtkOpenGLRenderer
 {
 public:
@@ -62,6 +60,10 @@ protected:
   virtual int UpdateGeometry();
 
   int ComposeNextFrame;
+
+private:
+  vtkIceTRenderer(const vtkIceTRenderer&); // Not implemented
+  void operator=(const vtkIceTRenderer&); // Not implemented
 };
 
 #endif //__vtkIceTRenderer_h

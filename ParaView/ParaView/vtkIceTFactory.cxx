@@ -24,6 +24,8 @@
 #include "vtkCrOpenGLRenderWindow.h"
 #endif
 
+vtkCxxRevisionMacro(vtkIceTFactory, "1.2");
+
 VTK_FACTORY_INTERFACE_IMPLEMENT(vtkIceTFactory);
 
 vtkIceTFactory* vtkIceTFactory::New()

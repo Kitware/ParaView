@@ -27,9 +27,11 @@
 #include "vtkRendererCollection.h"
 #include "vtkTimerLog.h"
 #include "vtkMultiProcessController.h"
+#include "vtkCompositer.h"
 
-vtkCxxRevisionMacro(vtkCompositeRenderManager, "1.1");
+vtkCxxRevisionMacro(vtkCompositeRenderManager, "1.2");
 vtkStandardNewMacro(vtkCompositeRenderManager);
+vtkCxxSetObjectMacro(vtkCompositeRenderManager, Compositer, vtkCompositer);
 
 vtkCompositeRenderManager::vtkCompositeRenderManager()
 {

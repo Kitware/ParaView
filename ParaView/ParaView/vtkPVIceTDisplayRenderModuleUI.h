@@ -51,7 +51,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __vtkPVIceTDisplayRenderModuleUI_h
 #define __vtkPVIceTDisplayRenderModuleUI_h
 
-#include "vtkPVCompositeRenderModuleUI.h"
+#include "vtkPVRenderModuleUI.h"
 
 class vtkPVIceTDisplayRenderModule;
 

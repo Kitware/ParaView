@@ -93,7 +93,7 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterfaceEntry);
-vtkCxxRevisionMacro(vtkPVAnimationInterfaceEntry, "1.6");
+vtkCxxRevisionMacro(vtkPVAnimationInterfaceEntry, "1.7");
 
 //-----------------------------------------------------------------------------
 vtkPVAnimationInterfaceEntry::vtkPVAnimationInterfaceEntry()
@@ -621,5 +621,8 @@ void vtkPVAnimationInterfaceEntry::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "SourceMenuButton: " << this->SourceMenuButton << endl;
   os << indent << "MethodMenuButton: " << this->MethodMenuButton << endl;
   os << indent << "PVSource: " << this->PVSource<< endl;
+
+  os << indent << "SaveStateScript: " 
+    << (this->SaveStateScript?this->SaveStateScript:"(none") << endl;
 }
 
