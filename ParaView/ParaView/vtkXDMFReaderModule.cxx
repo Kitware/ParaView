@@ -64,7 +64,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkXDMFReaderModule);
-vtkCxxRevisionMacro(vtkXDMFReaderModule, "1.8.2.1");
+vtkCxxRevisionMacro(vtkXDMFReaderModule, "1.8.2.2");
 
 int vtkXDMFReaderModuleCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -155,9 +155,10 @@ int vtkXDMFReaderModule::ReadFileInformation(const char* fname)
 
     vtkKWMessageDialog* dlg = vtkKWMessageDialog::New();
     dlg->SetTitle("Domain and Grids Selection");
+    dlg->SetStyleToOkCancel();
     dlg->SetMasterWindow(this->GetPVWindow());
     dlg->Create(pvApp,0);
-    dlg->SetText("Select Domain and Grids");
+    //dlg->SetText("Select Domain and Grids");
 
     this->DomainGridFrame = vtkKWLabeledFrame::New();
     this->DomainGridFrame->SetParent(dlg->GetMessageDialogFrame());
@@ -168,7 +169,6 @@ int vtkXDMFReaderModule::ReadFileInformation(const char* fname)
     this->DomainMenu->SetParent(this->DomainGridFrame->GetFrame());
     this->DomainMenu->Create(pvApp, 0);
     this->UpdateDomains(res);
-
 
     this->GridSelection = vtkKWListBox::New();
     this->GridSelection->SetParent(this->DomainGridFrame->GetFrame());
@@ -183,20 +183,30 @@ int vtkXDMFReaderModule::ReadFileInformation(const char* fname)
       this->DomainMenu->GetWidgetName());
     this->Script("pack %s -expand yes -fill x -side top -pady 2", 
       this->GridSelection->GetWidgetName());
-    this->Script("pack %s -expand yes -fill x -side bottom -pady 2", 
-      this->DomainGridFrame->GetWidgetName());
 
-    if ( this->GridSelection->GetNumberOfItems() > 1 )
+    if ( this->DomainMenu->GetNumberOfEntries() > 0 )
       {
-      vtkKWPushButton* selectAllButton = vtkKWPushButton::New();
-      selectAllButton->SetParent(this->DomainGridFrame->GetFrame());
-      selectAllButton->SetLabel("Select All Grids");
-      selectAllButton->Create(pvApp, 0);
-      selectAllButton->SetCommand(this, "EnableAllGrids");
-      this->Script("pack %s -expand yes -fill x -side bottom -pady 2", 
-        selectAllButton->GetWidgetName());
-      selectAllButton->Delete();
+      this->Script("pack %s -expand yes -fill x -side top -pady 2", 
+        this->DomainGridFrame->GetWidgetName());
+      if ( this->GridSelection->GetNumberOfItems() > 1 )
+        {
+        vtkKWPushButton* selectAllButton = vtkKWPushButton::New();
+        selectAllButton->SetParent(this->DomainGridFrame->GetFrame());
+        selectAllButton->SetLabel("Select All Grids");
+        selectAllButton->Create(pvApp, 0);
+        selectAllButton->SetCommand(this, "EnableAllGrids");
+        this->Script("pack %s -expand yes -fill x -side bottom -pady 2", 
+          selectAllButton->GetWidgetName());
+        selectAllButton->Delete();
+        }
       }
+    else
+      {
+      dlg->SetText("No domains found");
+      dlg->GetOKButton()->EnabledOff();
+      }
+
+    int result = VTK_OK;
 
     if ( dlg->Invoke() )
       {
@@ -210,6 +220,10 @@ int vtkXDMFReaderModule::ReadFileInformation(const char* fname)
           }
         }
       }
+    else
+      {
+      result = VTK_ERROR;
+      }
 
     this->DomainMenu->Delete();
     this->DomainMenu = 0;
@@ -222,6 +236,10 @@ int vtkXDMFReaderModule::ReadFileInformation(const char* fname)
     this->DomainGridFrame = 0;
 
     dlg->Delete();
+    if ( result != VTK_OK )
+      {
+      return result;
+      }
 
     }
 

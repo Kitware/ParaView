@@ -292,7 +292,7 @@
 #ifdef PARAVIEW_LINK_XDMF
  <Module name="XdmfReader" root_name="XdmfReader"
    output="vtkDataSet"
-   class="vtkXDMFReaderModule" module_type="Reader" extensions=".xmf"
+   class="vtkXDMFReaderModule" module_type="Reader" extensions=".xmf .xdmf"
    file_description="Xdmf Reader">
   <Source class="vtkXdmfReader"/>
   <ArraySelection trace_name="point_array_sel" attribute_name="Cell" />
