@@ -47,8 +47,8 @@ if ![file exists $DataDir/small.pop] {
     set DataDirLocal 0
 }
 
-if ![file exists $DataDir/Dat.vtk] {
-    if ![file exists Dat.vtk] {
+if ![file exists $DataDir/Dat.pvtk] {
+    if ![file exists Dat.pvtk] {
 	vtkKWMessageDialog _adialog
 	_adialog Create Application ""
 	_adialog SetText "Could not find the data file Dat.pvtk\n. This usually means that ParaView was not installed properly\n or that this script was loaded using 'Load Script' from the file menu."
@@ -383,7 +383,7 @@ proc ParticleDemoRun {pvParticles pvClip pvClipOutput} {
 	update
 
 	.control.main.info configure -text "rotate $i"
-	if $ShouldStop {
+	if pvDemoShouldStop {
 	    $pvView EventuallyRender
 	    return
 	}
@@ -408,7 +408,7 @@ proc ParticleDemoRun {pvParticles pvClip pvClipOutput} {
 	$pvClip AcceptCallback
 
 	update
-	if $ShouldStop {
+	if pvDemoShouldStop {
 	    $pvView EventuallyRender
 	    return
 	}
