@@ -25,7 +25,7 @@
 #include "vtkObjectFactory.h"
 
 vtkStandardNewMacro( vtkKWRange );
-vtkCxxRevisionMacro(vtkKWRange, "1.28");
+vtkCxxRevisionMacro(vtkKWRange, "1.29");
 
 #define VTK_KW_RANGE_MIN_SLIDER_SIZE        2
 #define VTK_KW_RANGE_MIN_THICKNESS          (2*VTK_KW_RANGE_MIN_SLIDER_SIZE+1)
@@ -700,6 +700,12 @@ void vtkKWRange::ConstrainRangeToResolution(float range[2], int adjust)
         {
         if (i - inv)
           {
+          //if (new_value > value + epsilon)
+          //  {
+          //  int times = static_cast<int>(
+          //    (new_value - (value + epsilon))/res);
+          //  new_value = new_value - (times + 1)*res;
+          //  }
           while (new_value > value + epsilon)
             {
             new_value -= res;
