@@ -53,7 +53,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVMultiDisplayRenderModule);
-vtkCxxRevisionMacro(vtkPVMultiDisplayRenderModule, "1.5.2.3");
+vtkCxxRevisionMacro(vtkPVMultiDisplayRenderModule, "1.5.2.4");
 
 
 
@@ -274,6 +274,11 @@ void vtkPVMultiDisplayRenderModule::InteractiveRender()
     pDisp = vtkPVCompositePartDisplay::SafeDownCast(object);
     if (pDisp->GetVisibility())
       {
+      // I had to add this because the default for the
+      // Collection filter is not to collect 
+      // (in case of large data).  Accept was not performing
+      // the collection decision logic so was collecting ...
+      pDisp->SetLODCollectionDecision(1);
       // What we are really doing here is a little opaque.
       // First setting the part display's LODCollectionDescision
       // does nothing (the value is ignored).  The LOD
