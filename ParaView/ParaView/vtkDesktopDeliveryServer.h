@@ -31,17 +31,14 @@
 
 #include "vtkParallelRenderManager.h"
 
-class VTK_EXPORT vtkDesktopDeliveryServer : public vtkParallelRenderManager
+class VTK_EXPORT vtkDesktopDeliveryServer
+    : public vtkParallelRenderManager
 {
 public:
   vtkTypeRevisionMacro(vtkDesktopDeliveryServer, vtkParallelRenderManager);
   virtual void PrintSelf(ostream &os, vtkIndent indent);
 
   static vtkDesktopDeliveryServer *New();
-
-  // For ParaView
-  void SetRenderManager(vtkParallelRenderManager* rm)
-  {this->SetParallelRenderManager(rm);}
 
   // Description:
   // Set/Get the controller that is attached to a vtkDesktopDeliveryClient.
@@ -58,6 +55,8 @@ public:
   // processes.
   virtual void SetParallelRenderManager(vtkParallelRenderManager *prm);
   vtkGetObjectMacro(ParallelRenderManager, vtkParallelRenderManager);
+  void SetRenderManger(vtkParallelRenderManager* rm) 
+    {this->SetParallelRenderManager(rm);}
 
   virtual void SetRenderWindow(vtkRenderWindow *renWin);
 
@@ -77,15 +76,35 @@ public:
     IMAGE_TAG=12433,
     IMAGE_SIZE_TAG=12434,
     REMOTE_DISPLAY_TAG=834340,
-    TIMING_METRICS_TAG=834341
+    TIMING_METRICS_TAG=834341,
+    SQUIRT_OPTIONS_TAG=834342,
+    IMAGE_PARAMS_TAG=834343
   };
 
   struct TimingMetrics {
     double ImageProcessingTime;
   };
 
-  enum StructSizes {
+  struct SquirtOptions {
+    int Enabled;
+    int CompressLevel;
+  };
+
+  struct ImageParams {
+    int RemoteDisplay;
+    int SquirtCompressed;
+    int NumberOfComponents;
+    int Size;
+  };
+
+  enum TimingMetricSize {
     TIMING_METRICS_SIZE=sizeof(struct TimingMetrics)/sizeof(double)
+  };
+  enum SquirtOptionSize {
+    SQUIRT_OPTIONS_SIZE=sizeof(struct SquirtOptions)/sizeof(int)
+  };
+  enum ImageParamsSize {
+    IMAGE_PARAMS_SIZE=sizeof(struct ImageParams)/sizeof(int)
   };
 
 //ETX
@@ -107,11 +126,19 @@ protected:
 
   virtual void ReadReducedImage();
 
+  virtual void ReceiveWindowInformation();
+
+  int Squirt;
+  int SquirtCompressionLevel;
+  void SquirtCompress(vtkUnsignedCharArray *in, vtkUnsignedCharArray *out);
+
   int RemoteDisplay;
+
+  vtkUnsignedCharArray *SquirtBuffer;
 
 private:
   vtkDesktopDeliveryServer(const vtkDesktopDeliveryServer &); //Not implemented
-  void operator=(const vtkDesktopDeliveryServer &);  //Not implemented
+  void operator=(const vtkDesktopDeliveryServer &);    //Not implemented
 };
 
 

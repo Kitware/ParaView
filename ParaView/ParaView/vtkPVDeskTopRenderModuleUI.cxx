@@ -52,7 +52,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVDeskTopRenderModuleUI);
-vtkCxxRevisionMacro(vtkPVDeskTopRenderModuleUI, "1.1.2.2");
+vtkCxxRevisionMacro(vtkPVDeskTopRenderModuleUI, "1.1.2.3");
 
 int vtkPVDeskTopRenderModuleUICommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -88,11 +88,16 @@ void vtkPVDeskTopRenderModuleUI::Create(vtkKWApplication *app, const char *)
                this->ParallelRenderParametersFrame->GetWidgetName());
   //this->CompositeCompressionCheck->EnabledOff();
 
-  this->SquirtCheck->SetState(0);
-  this->SquirtLabel->EnabledOff();
-  this->SquirtCheck->EnabledOff();
-  this->SquirtLevelScale->EnabledOff();
-  this->SquirtLevelLabel->EnabledOff();
+  //this->SquirtCheck->SetState(0);
+  //this->SquirtLabel->EnabledOff();
+  //this->SquirtCheck->EnabledOff();
+  //this->SquirtLevelScale->EnabledOff();
+  //this->SquirtLevelLabel->EnabledOff();
+
+  this->SetReductionFactor(1);
+  this->ReductionCheck->EnabledOff();
+  this->ReductionLabel->EnabledOff();
+
 }
 
 

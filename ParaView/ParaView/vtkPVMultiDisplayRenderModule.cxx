@@ -53,7 +53,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVMultiDisplayRenderModule);
-vtkCxxRevisionMacro(vtkPVMultiDisplayRenderModule, "1.5.2.5");
+vtkCxxRevisionMacro(vtkPVMultiDisplayRenderModule, "1.5.2.6");
 
 
 
@@ -167,7 +167,7 @@ void vtkPVMultiDisplayRenderModule::StillRender()
 
   if (this->PVApplication && this->CompositeTclName)
     {
-    this->PVApplication->Script("%s SetReductionFactor 1",
+    this->PVApplication->Script("%s SetImageReductionFactor 1",
                                 this->CompositeTclName);
     }
 

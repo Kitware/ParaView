@@ -55,7 +55,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCompositeRenderModule);
-vtkCxxRevisionMacro(vtkPVCompositeRenderModule, "1.6.2.7");
+vtkCxxRevisionMacro(vtkPVCompositeRenderModule, "1.6.2.8");
 
 
 
@@ -173,7 +173,7 @@ void vtkPVCompositeRenderModule::StillRender()
         squirtLevel = 1;
         }
       // Catch because IceTDesktopdeliveryClient does not have Squirt yet. !!!!
-      this->PVApplication->Script("catch {%s SetSquirtLevel %d}",
+      this->PVApplication->Script("%s SetSquirtLevel %d",
                                   this->CompositeTclName, squirtLevel);
       }
     }
@@ -295,7 +295,7 @@ void vtkPVCompositeRenderModule::InteractiveRender()
   // Handle squirt compression.
   if (this->PVApplication->GetClientMode())
     {
-    this->PVApplication->Script("catch {%s SetSquirtLevel %d}", 
+    this->PVApplication->Script("%s SetSquirtLevel %d", 
                                 this->CompositeTclName,
                                 this->SquirtLevel);
     }

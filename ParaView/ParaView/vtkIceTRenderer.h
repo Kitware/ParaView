@@ -1,3 +1,5 @@
+// -*- c++ -*-
+
 /*=========================================================================
 
   Program:   Visualization Toolkit
@@ -5,14 +7,6 @@
   Language:  C++
   Date:      $Date$
   Version:   $Revision$
-
-  Copyright (c) 1993-2002 Ken Martin, Will Schroeder, Bill Lorensen 
-  All rights reserved.
-  See Copyright.txt or http://www.kitware.com/Copyright.htm for details.
-
-     This software is distributed WITHOUT ANY WARRANTY; without even 
-     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR 
-     PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
 // .NAME vtkIceTRenderer
@@ -25,7 +19,11 @@
 #ifndef __vtkIceTRenderer_h
 #define __vtkIceTRenderer_h
 
-#include "vtkOpenGLRenderer.h"
+//#include "vtksnlParallelWin32Header.h"
+
+#include <vtkOpenGLRenderer.h>
+
+#include <GL/ice-t.h>
 
 class VTK_EXPORT vtkIceTRenderer : public vtkOpenGLRenderer
 {
@@ -52,6 +50,11 @@ public:
   // Adds a corrective term for the tile aspect.
   virtual void ComputeAspect();
 
+  // Description:
+  // Ensures that the background has an ambient color of 0 when color blend
+  // compositing is on.
+  virtual void Clear();
+
 protected:
   vtkIceTRenderer();
   virtual ~vtkIceTRenderer();
@@ -60,10 +63,7 @@ protected:
   virtual int UpdateGeometry();
 
   int ComposeNextFrame;
-
-private:
-  vtkIceTRenderer(const vtkIceTRenderer&); // Not implemented
-  void operator=(const vtkIceTRenderer&); // Not implemented
+  int InIceTRender;
 };
 
 #endif //__vtkIceTRenderer_h

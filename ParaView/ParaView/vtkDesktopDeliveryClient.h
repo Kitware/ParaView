@@ -29,9 +29,12 @@
 #ifndef __vtkDesktopDeliveryClient_h
 #define __vtkDesktopDeliveryClient_h
 
+//#include "vtksnlParallelWin32Header.h"
+
 #include <vtkParallelRenderManager.h>
 
-class VTK_EXPORT vtkDesktopDeliveryClient : public vtkParallelRenderManager
+class VTK_EXPORT vtkDesktopDeliveryClient
+    : public vtkParallelRenderManager
 {
 public:
   vtkTypeRevisionMacro(vtkDesktopDeliveryClient, vtkParallelRenderManager);
@@ -39,12 +42,10 @@ public:
 
   static vtkDesktopDeliveryClient *New();
 
-  // Description:
-  // Needed for compatability.
-  void SetUseCompositing(int v) {this->SetParallelRendering(v);}
-  int GetUseCompositing() { return this->GetParallelRendering();}
-  vtkBooleanMacro(UseCompositing, int);
-  
+  // For ParaView
+  void SetUseCompositing(int v) {this->UseCompositing = v; this->SetParallelRendering(v);}
+  void SetRenderManager(vtkParallelRenderManager*) {};
+
   // Description:
   // Set/Get the controller that is attached to a vtkDesktopDeliveryServer.
   // This object will assume that the controller has two processors, and
@@ -83,8 +84,30 @@ public:
   }
   virtual double GetImageProcessingTime() {
     return (  this->RemoteImageProcessingTime
-      + this->TransferTime + this->ImageProcessingTime);
+        + this->TransferTime + this->ImageProcessingTime);
   }
+
+  // For ParaView
+  void SetSquirtLevel (int l)
+  { if (l == 0) {this->SquirtOff();} else {
+    this->SquirtOn(); this->SetSquirtCompressionLevel(l-1);}}
+
+  // Description:
+  // Enables or disables SQUIRT compression for image delivery.  By
+  // default, compression is off.  Note that this function may be replaced
+  // with a more universal image compression at a later date.
+  vtkGetMacro(Squirt, int);
+  vtkSetMacro(Squirt, int);
+  vtkBooleanMacro(Squirt, int);
+
+  // Description:
+  // Sets the compression level used by SQUIRT.  Higher values result in
+  // better compression but lower resolution in the color space (the size
+  // of the image is unaffected by this option).
+  vtkGetMacro(SquirtCompressionLevel, int);
+  vtkSetClampMacro(SquirtCompressionLevel, int, 0, 5);
+
+  virtual void SetImageReductionFactorForUpdateRate(float DesiredUpdateRate);
 
 protected:
   vtkDesktopDeliveryClient();
@@ -102,9 +125,18 @@ protected:
   double RemoteImageProcessingTime;
   double TransferTime;
 
+  virtual void SendWindowInformation();
+
+  // Squirt options (probably to be replaced later).
+  int Squirt;
+  int SquirtCompressionLevel;
+  vtkUnsignedCharArray *SquirtBuffer;
+
+  void SquirtDecompress(vtkUnsignedCharArray *in, vtkUnsignedCharArray *out);
+
 private:
   vtkDesktopDeliveryClient(const vtkDesktopDeliveryClient &); //Not implemented
-  void operator=(const vtkDesktopDeliveryClient &);  //Not implemented
+  void operator=(const vtkDesktopDeliveryClient &);    //Not implemented
 };
 
 

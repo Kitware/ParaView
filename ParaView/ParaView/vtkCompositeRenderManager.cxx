@@ -1,37 +1,18 @@
-/*=========================================================================
-
-  Program:   Visualization Toolkit
-  Module:    vtkCompositeRenderManager.cxx
-  Language:  C++
-  Date:      $Date$
-  Version:   $Revision$
-
-  Copyright (c) 1993-2002 Ken Martin, Will Schroeder, Bill Lorensen 
-  All rights reserved.
-  See Copyright.txt or http://www.kitware.com/Copyright.htm for details.
-
-     This software is distributed WITHOUT ANY WARRANTY; without even 
-     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR 
-     PURPOSE.  See the above copyright notice for more information.
-
-=========================================================================*/
+// -*- c++ -*-
 
 #include "vtkCompositeRenderManager.h"
 
-#include "vtkObjectFactory.h"
-#include "vtkCompressCompositer.h"
-#include "vtkUnsignedCharArray.h"
-#include "vtkFloatArray.h"
-#include "vtkRenderer.h"
-#include "vtkRenderWindow.h"
-#include "vtkRendererCollection.h"
-#include "vtkTimerLog.h"
-#include "vtkMultiProcessController.h"
-#include "vtkCompositer.h"
+#include <vtkObjectFactory.h>
+#include <vtkCompressCompositer.h>
+#include <vtkUnsignedCharArray.h>
+#include <vtkFloatArray.h>
+#include <vtkRenderer.h>
+#include <vtkRenderWindow.h>
+#include <vtkRendererCollection.h>
+#include <vtkTimerLog.h>
 
-vtkCxxRevisionMacro(vtkCompositeRenderManager, "1.2.2.1");
+vtkCxxRevisionMacro(vtkCompositeRenderManager, "1.2.2.2");
 vtkStandardNewMacro(vtkCompositeRenderManager);
-vtkCxxSetObjectMacro(vtkCompositeRenderManager, Compositer, vtkCompositer);
 
 vtkCompositeRenderManager::vtkCompositeRenderManager()
 {
@@ -43,9 +24,9 @@ vtkCompositeRenderManager::vtkCompositeRenderManager()
   this->TmpPixelData = vtkUnsignedCharArray::New();
   this->TmpDepthData = vtkFloatArray::New();
 
-  this->DepthData->SetNumberOfComponents(3);
-  this->TmpPixelData->SetNumberOfComponents(3);
-  this->TmpDepthData->SetNumberOfComponents(3);
+  this->DepthData->SetNumberOfComponents(1);
+  this->TmpPixelData->SetNumberOfComponents(4);
+  this->TmpDepthData->SetNumberOfComponents(1);
 }
 
 vtkCompositeRenderManager::~vtkCompositeRenderManager()
@@ -79,8 +60,8 @@ void vtkCompositeRenderManager::PostRenderProcessing()
     this->ReadReducedImage();
     this->Timer->StartTimer();
     this->RenderWindow->GetZbufferData(0, 0, this->ReducedImageSize[0]-1,
-               this->ReducedImageSize[1]-1,
-               this->DepthData);
+                       this->ReducedImageSize[1]-1,
+                       this->DepthData);
 
     // Set up temporary buffers.
     this->TmpPixelData->SetNumberOfComponents
@@ -94,7 +75,7 @@ void vtkCompositeRenderManager::PostRenderProcessing()
     // Do composite
     this->Compositer->SetController(this->Controller);
     this->Compositer->CompositeBuffer(this->ReducedImage, this->DepthData,
-              this->TmpPixelData, this->TmpDepthData);
+                      this->TmpPixelData, this->TmpDepthData);
 
     this->Timer->StopTimer();
     this->ImageProcessingTime = this->Timer->GetElapsedTime();

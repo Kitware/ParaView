@@ -1,3 +1,5 @@
+// -*- c++ -*-
+
 /*=========================================================================
 
   Program:   Visualization Toolkit
@@ -5,14 +7,6 @@
   Language:  C++
   Date:      $Date$
   Version:   $Revision$
-
-  Copyright (c) 1993-2002 Ken Martin, Will Schroeder, Bill Lorensen 
-  All rights reserved.
-  See Copyright.txt or http://www.kitware.com/Copyright.htm for details.
-
-     This software is distributed WITHOUT ANY WARRANTY; without even 
-     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR 
-     PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
 // .NAME vtkParallelRenderManager - An object to control parallel rendering.
@@ -42,14 +36,17 @@
 #ifndef __vtkParallelRenderManager_h
 #define __vtkParallelRenderManager_h
 
+//#include "vtksnlParallelWin32Header.h"
+
 #include <vtkObject.h>
 
+#include <vtkMultiProcessController.h>
+
+class vtkRenderWindow;
 class vtkRenderer;
 class vtkUnsignedCharArray;
 class vtkFloatArray;
 class vtkTimerLog;
-class vtkMultiProcessController;
-class vtkRenderWindow;
 
 class VTK_EXPORT vtkParallelRenderManager : public vtkObject
 {
@@ -111,7 +108,7 @@ public:
 
   // Description:
   // If on root node, stops the RMI processing on all service nodes.
-  virtual void StopService();
+  virtual void StopServices();
 
   // Description:
   // Callbacks that initialize and finish rendering and other tasks.
@@ -174,7 +171,7 @@ public:
   // may ignore the image reduction factor if it will result in little or
   // no performance enhancements (eg. it does not do image space
   // manipulations).
-  vtkSetClampMacro(ImageReductionFactor, int, 1, this->MaxImageReductionFactor);
+  virtual void SetImageReductionFactor(int factor);
   vtkGetMacro(ImageReductionFactor, int);
 
   vtkSetMacro(MaxImageReductionFactor, int);
@@ -220,6 +217,23 @@ public:
   vtkGetMacro(MagnifyImages, int);
   vtkBooleanMacro(MagnifyImages, int);
 
+//BTX
+  enum { NEAREST, LINEAR };
+//ETX
+
+  // Description:
+  // Sets the method used to magnify images.  Nearest simply replicates
+  // each pixel enough times to fill the image.  Linear performs linear
+  // interpolation between the pixels.
+  virtual void SetMagnifyImageMethod(int method);
+  vtkGetMacro(MagnifyImageMethod, int);
+  void SetMagnifyImageMethodToNearest() {
+    this->SetMagnifyImageMethod(NEAREST);
+  }
+  void SetMagnifyImageMethodToLinear() {
+    this->SetMagnifyImageMethod(LINEAR);
+  }
+
   // Description:
   // The most appropriate way to retrieve full size image data after a
   // render.  Will work regardless of whether WriteBackImages or
@@ -228,7 +242,7 @@ public:
   // render or if the ParallelRenderManager is destroyed.
   virtual void GetPixelData(vtkUnsignedCharArray *data);
   virtual void GetPixelData(int x1, int y1, int x2, int y2,
-    vtkUnsignedCharArray *data);
+          vtkUnsignedCharArray *data);
 
   // Description:
   // The most appropriate way to retrieve reduced size image data after a
@@ -238,7 +252,7 @@ public:
   // render or if the ParallelRenderManager is destroyed.
   virtual void GetReducedPixelData(vtkUnsignedCharArray *data);
   virtual void GetReducedPixelData(int x1, int y1, int x2, int y2,
-    vtkUnsignedCharArray *data);
+           vtkUnsignedCharArray *data);
 
   // Description:
   // Returns the full image size calculated at the last render.
@@ -294,6 +308,7 @@ protected:
 
   int WriteBackImages;
   int MagnifyImages;
+  int MagnifyImageMethod;
 
   int FullImageSize[2];
   int ReducedImageSize[2];
@@ -326,8 +341,8 @@ protected:
   // Used to synchronize rendering information per frame.
   virtual void SendWindowInformation() {}
   virtual void ReceiveWindowInformation() {}
-  virtual void SendRendererInformation(vtkRenderer *ren) {(void)ren;};
-  virtual void ReceiveRendererInformation(vtkRenderer *ren) {(void)ren;};
+  virtual void SendRendererInformation(vtkRenderer *ren) {};
+  virtual void ReceiveRendererInformation(vtkRenderer *ren) {};
 
   // Description:
   // Here is a good place to handle processing of data before and after
@@ -363,9 +378,14 @@ protected:
   // if it is in the back.
   virtual int LastRenderInFrontBuffer();
 
+  // Description:
+  // Sets the current render window's pixel data.
+  virtual void SetRenderWindowPixelData(vtkUnsignedCharArray *pixels,
+          const int pixel_dimensions[2]);
+
 private:
   vtkParallelRenderManager(const vtkParallelRenderManager &); //Not implemented
-  void operator=(const vtkParallelRenderManager &); //Not implemented
+  void operator=(const vtkParallelRenderManager &);  //Not implemented
 };
 
 #endif //__vtkParalleRenderManager_h

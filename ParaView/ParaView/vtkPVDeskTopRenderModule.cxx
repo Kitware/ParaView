@@ -54,7 +54,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVDeskTopRenderModule);
-vtkCxxRevisionMacro(vtkPVDeskTopRenderModule, "1.1.2.1");
+vtkCxxRevisionMacro(vtkPVDeskTopRenderModule, "1.1.2.2");
 
 
 
@@ -162,6 +162,8 @@ void vtkPVDeskTopRenderModule::SetPVApplication(vtkPVApplication *pvApp)
   //pm->Script("%s SetClientFlag [$Application GetClientMode]", this->CompositeTclName);
   pm->RootScript("%s SetController [$Application GetSocketController]", this->CompositeTclName);
   //pm->RootScript("%s SetClientFlag [$Application GetClientMode]", this->CompositeTclName);
+  pm->RootScript("%s SetParallelRenderManager %s", 
+                 this->CompositeTclName, this->DisplayManagerTclName);
 
   pm->Script("%s SetRenderWindow %s", this->CompositeTclName, this->RenderWindowTclName);
   pm->Script("%s InitializeRMIs", this->CompositeTclName);
@@ -170,11 +172,6 @@ void vtkPVDeskTopRenderModule::SetPVApplication(vtkPVApplication *pvApp)
 
   pm->Script("%s UseCompositingOn", this->CompositeTclName);
   pm->RootScript("%s UseCompositingOn", this->CompositeTclName);
-
-  // The client server manager needs to set parameters on the IceT manager.
-  pm->RootScript("%s SetRenderManager %s", 
-                 this->CompositeTclName, this->DisplayManagerTclName);
-
 }
 
 //----------------------------------------------------------------------------
