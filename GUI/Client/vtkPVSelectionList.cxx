@@ -19,7 +19,6 @@
 #include "vtkKWOptionMenu.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
-#include "vtkPVIndexWidgetProperty.h"
 #include "vtkPVSource.h"
 #include "vtkPVXMLElement.h"
 #include "vtkSMIntVectorProperty.h"
@@ -27,7 +26,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectionList);
-vtkCxxRevisionMacro(vtkPVSelectionList, "1.48");
+vtkCxxRevisionMacro(vtkPVSelectionList, "1.49");
 
 int vtkPVSelectionListCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -60,8 +59,6 @@ vtkPVSelectionList::~vtkPVSelectionList()
   this->Menu = NULL;
   this->Names->Delete();
   this->Names = NULL;
-  
-  this->SetProperty(NULL);
 }
 
 void vtkPVSelectionList::SetBalloonHelpString(const char *str)

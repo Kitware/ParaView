@@ -29,7 +29,6 @@
 #include "vtkPVProcessModule.h"
 #include "vtkPVSource.h"
 #include "vtkPVXMLElement.h"
-#include "vtkPVStringAndScalarListWidgetProperty.h"
 
 #include "vtkSMProperty.h"
 #include "vtkSMStringListRangeDomain.h"
@@ -150,7 +149,7 @@ vtkStandardNewMacro(vtkPVXDMFParametersInternals);
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVXDMFParameters);
-vtkCxxRevisionMacro(vtkPVXDMFParameters, "1.23");
+vtkCxxRevisionMacro(vtkPVXDMFParameters, "1.24");
 
 //----------------------------------------------------------------------------
 vtkPVXDMFParameters::vtkPVXDMFParameters()
