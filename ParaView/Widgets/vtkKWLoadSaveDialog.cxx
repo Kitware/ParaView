@@ -48,7 +48,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLoadSaveDialog );
-vtkCxxRevisionMacro(vtkKWLoadSaveDialog, "1.20");
+vtkCxxRevisionMacro(vtkKWLoadSaveDialog, "1.21");
 
 vtkKWLoadSaveDialog::vtkKWLoadSaveDialog()
 {
@@ -114,7 +114,20 @@ int vtkKWLoadSaveDialog::Invoke()
   command.rdbuf()->freeze(0);
 
   int res = 0;
+
+  // At this point, the string is encoded as UTF-8, which matches ASCII value
+  // up to 0x7F in hexadecimal). Higher values are encoded as two or 3 bytes.
+  // Example: the file Baumann_Gü_0002 becomes Baumann_GÃ¼_0002
+  // convertfrom identity seems to do the trick to convert back to
+  // an ASCII-8 string that can be understood by the system.
+
+#if _WIN32
+  this->Script("encoding convertfrom identity %s", 
+               this->Application->GetMainInterp()->result);
+#endif
+
   path = this->Application->GetMainInterp()->result;
+
   if (path && strlen(path))
     {
     this->SetFileName(path);
