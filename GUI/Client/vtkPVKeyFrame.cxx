@@ -43,7 +43,7 @@
 #include "vtkKWPushButton.h"
 #include "vtkSMStringVectorProperty.h"
 
-vtkCxxRevisionMacro(vtkPVKeyFrame, "1.4");
+vtkCxxRevisionMacro(vtkPVKeyFrame, "1.5");
 //*****************************************************************************
 class vtkPVKeyFrameObserver : public vtkCommand
 {
@@ -354,10 +354,10 @@ void vtkPVKeyFrame::InitializeKeyValueUsingProperty(vtkSMProperty* property, int
     if (string && pvList)
       {
       // find the index for this string in the widget / or domain.
-      int index = pvList->GetValue(string);
-      if (index != -1)
+      int vindex = pvList->GetValue(string);
+      if (vindex != -1)
         {
-        this->SetKeyValue(static_cast<double>(index));
+        this->SetKeyValue(static_cast<double>(vindex));
         }
       }
     }

@@ -59,7 +59,7 @@
 #define VTK_PV_ANIMATION_GROUP "animateable"
 
 vtkStandardNewMacro(vtkPVAnimationManager);
-vtkCxxRevisionMacro(vtkPVAnimationManager, "1.15");
+vtkCxxRevisionMacro(vtkPVAnimationManager, "1.16");
 vtkCxxSetObjectMacro(vtkPVAnimationManager, HorizantalParent, vtkKWWidget);
 vtkCxxSetObjectMacro(vtkPVAnimationManager, VerticalParent, vtkKWWidget);
 //*****************************************************************************
@@ -1250,4 +1250,5 @@ void vtkPVAnimationManager::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "HAnimationInterface: " << this->HAnimationInterface << endl;
   os << indent << "AnimationScene: " << this->AnimationScene << endl;
   os << indent << "ProxyIterator: " << this->ProxyIterator << endl;
+  os << indent << "AdvancedView: " << this->AdvancedView << endl;
 }
