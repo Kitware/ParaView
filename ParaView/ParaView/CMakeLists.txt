@@ -236,6 +236,7 @@ SET_SOURCE_FILES_PROPERTIES(
   vtkPV3DWidget
   vtkPVJoystickFly
   vtkPVSourceWidget
+  vtkPVInformation
   ABSTRACT
   )
 

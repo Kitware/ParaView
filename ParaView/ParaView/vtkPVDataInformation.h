@@ -21,7 +21,7 @@ modification, are permitted provided that the following conditions are met:
    and/or other materials provided with the distribution.
 
  * Neither the name of Kitware nor the names of any contributors may be used
-   to endorse or promote products derived from this software without specific 
+   to endorse or promote products derived from this software without specific
    prior written permission.
 
  * Modified source versions must be plainly marked as such, and must not be
@@ -41,21 +41,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 // .NAME vtkPVDataInformation - Light object for holding data information.
 // .SECTION Description
-// This object is a light weight object. It has no user interface and
-// does not necessarily last a long time.  It is meant to help
-// collect information about data object and collections of data objects.
-// It has a PV in the class name because it should never be moved into
+// This object is a light weight object.  It has no user interface and
+// does not necessarily last a long time.  It is meant to help collect
+// information about data object and collections of data objects.  It
+// has a PV in the class name because it should never be moved into
 // VTK.
-
-// Note:  It would be nice to use a vtkDataSet object to store all of this
-// information.  It already has the structure.  I do not know how I would
-// store the information (number of points, bounds ...) with out storing
-// the actual points and cells.
-
 
 #ifndef __vtkPVDataInformation_h
 #define __vtkPVDataInformation_h
-
 
 #include "vtkPVInformation.h"
 
@@ -71,24 +64,20 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Transfer information about a single object into
-  // this object.
-  virtual void CopyFromObject(vtkObject* data);
-  virtual void CopyFromMessage(unsigned char* msg);
+  // Transfer information about a single object into this object.
+  virtual void CopyFromObject(vtkObject*);
 
   // Description:
   // Merge another information object.
-  virtual void AddInformation(vtkPVInformation* info);
-  
-  // Description:
-  // Serialize message.
-  virtual int GetMessageLength(); 
-  virtual void WriteMessage(unsigned char* msg);
+  virtual void AddInformation(vtkPVInformation*);
 
-
-  
   // Description:
-  // Remove all infommation. next add will be like a copy.
+  // Manage a serialized version of the information.
+  virtual void CopyToStream(vtkClientServerStream*) const;
+  virtual void CopyFromStream(const vtkClientServerStream*);
+
+  // Description:
+  // Remove all information.  The next add will be like a copy.
   // I might want to put this in the PVInformation superclass.
   void Initialize();
 

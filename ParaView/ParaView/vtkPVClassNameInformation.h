@@ -21,7 +21,7 @@ modification, are permitted provided that the following conditions are met:
    and/or other materials provided with the distribution.
 
  * Neither the name of Kitware nor the names of any contributors may be used
-   to endorse or promote products derived from this software without specific 
+   to endorse or promote products derived from this software without specific
    prior written permission.
 
  * Modified source versions must be plainly marked as such, and must not be
@@ -56,30 +56,30 @@ public:
   static vtkPVClassNameInformation* New();
   vtkTypeRevisionMacro(vtkPVClassNameInformation, vtkPVInformation);
   void PrintSelf(ostream &os, vtkIndent indent);
-  
+
   // Description:
   // Get class name of VTK object.
   vtkGetStringMacro(VTKClassName);
 
   // Description:
   // Transfer information about a single object into this object.
-  virtual void CopyFromObject(vtkObject *data);
-  virtual void CopyFromMessage(unsigned char *msg);
-  
+  virtual void CopyFromObject(vtkObject*);
+
   // Description:
-  // Serialize message.
-  virtual int GetMessageLength();
-  virtual void WriteMessage(unsigned char *msg);
-  
-  virtual void AddInformation(vtkPVInformation*) {};
-  
+  // Merge another information object.
+  virtual void AddInformation(vtkPVInformation*);
+
+  // Description:
+  // Manage a serialized version of the information.
+  virtual void CopyToStream(vtkClientServerStream*) const;
+  virtual void CopyFromStream(const vtkClientServerStream*);
+
 protected:
   vtkPVClassNameInformation();
   ~vtkPVClassNameInformation();
-  
-  char *VTKClassName;
+
+  char* VTKClassName;
   vtkSetStringMacro(VTKClassName);
-  
 private:
   vtkPVClassNameInformation(const vtkPVClassNameInformation&); // Not implemented
   void operator=(const vtkPVClassNameInformation&); // Not implemented

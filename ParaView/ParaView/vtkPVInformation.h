@@ -21,7 +21,7 @@ modification, are permitted provided that the following conditions are met:
    and/or other materials provided with the distribution.
 
  * Neither the name of Kitware nor the names of any contributors may be used
-   to endorse or promote products derived from this software without specific 
+   to endorse or promote products derived from this software without specific
    prior written permission.
 
  * Modified source versions must be plainly marked as such, and must not be
@@ -43,47 +43,45 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // .SECTION Description
 // Subclasses of this class are used to get information from the server.
 
-
 #ifndef __vtkPVInformation_h
 #define __vtkPVInformation_h
 
-
 #include "vtkObject.h"
 
+class vtkClientServerStream;
 
 class VTK_EXPORT vtkPVInformation : public vtkObject
 {
 public:
-  static vtkPVInformation* New();
   vtkTypeRevisionMacro(vtkPVInformation, vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Transfer information about a single object into
-  // this object.
-  virtual void CopyFromObject(vtkObject* data);
-  virtual void CopyFromMessage(unsigned char* msg);
+  // Transfer information about a single object into this object.
+  virtual void CopyFromObject(vtkObject*);
 
   // Description:
   // Merge another information object.
-  virtual void AddInformation(vtkPVInformation* info);
-  
+  virtual void AddInformation(vtkPVInformation*);
+
+  //BTX
   // Description:
-  // Serialize message.
-  virtual int GetMessageLength(); 
-  virtual void WriteMessage(unsigned char* msg);
+  // Manage a serialized version of the information.
+  virtual void CopyToStream(vtkClientServerStream*) const = 0;
+  virtual void CopyFromStream(const vtkClientServerStream*);
+  //ETX
 
   // Description:
   // Set/get whether to gather information only from the root.
   vtkGetMacro(RootOnly, int);
   vtkSetMacro(RootOnly, int);
-  
+
 protected:
   vtkPVInformation();
-  ~vtkPVInformation() {};
+  ~vtkPVInformation();
 
   int RootOnly;
-  
+
   vtkPVInformation(const vtkPVInformation&); // Not implemented
   void operator=(const vtkPVInformation&); // Not implemented
 };

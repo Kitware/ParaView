@@ -21,7 +21,7 @@ modification, are permitted provided that the following conditions are met:
    and/or other materials provided with the distribution.
 
  * Neither the name of Kitware nor the names of any contributors may be used
-   to endorse or promote products derived from this software without specific 
+   to endorse or promote products derived from this software without specific
    prior written permission.
 
  * Modified source versions must be plainly marked as such, and must not be
@@ -48,9 +48,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __vtkPVLODPartDisplayInformation_h
 #define __vtkPVLODPartDisplayInformation_h
 
-
 #include "vtkPVInformation.h"
-
 
 class VTK_EXPORT vtkPVLODPartDisplayInformation : public vtkPVInformation
 {
@@ -60,34 +58,30 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Memory sizes of full resolution geometry and decimated geometry 
+  // Memory sizes of full resolution geometry and decimated geometry
   // summed over all processes.
   vtkGetMacro(GeometryMemorySize, int);
   vtkGetMacro(LODGeometryMemorySize, int);
 
   // Description:
-  // Transfer information about a single object into
-  // this object.
-  virtual void CopyFromObject(vtkObject* data);
-  virtual void CopyFromMessage(unsigned char* msg);
+  // Transfer information about a single object into this object.
+  virtual void CopyFromObject(vtkObject*);
 
   // Description:
   // Merge another information object.
-  virtual void AddInformation(vtkPVInformation* info);
-  
+  virtual void AddInformation(vtkPVInformation*);
+
   // Description:
-  // Serialize message.
-  virtual int GetMessageLength(); 
-  virtual void WriteMessage(unsigned char* msg);
+  // Manage a serialized version of the information.
+  virtual void CopyToStream(vtkClientServerStream*) const;
+  virtual void CopyFromStream(const vtkClientServerStream*);
 
 protected:
-  vtkPVLODPartDisplayInformation() {};
-  ~vtkPVLODPartDisplayInformation() {};
+  vtkPVLODPartDisplayInformation();
+  ~vtkPVLODPartDisplayInformation();
 
-  // These used to be unsigned long, but I changed them to int
-  // incase client is 32bit and server is 64bit.
-  int GeometryMemorySize;
-  int LODGeometryMemorySize;
+  unsigned long GeometryMemorySize;
+  unsigned long LODGeometryMemorySize;
 
   vtkPVLODPartDisplayInformation(const vtkPVLODPartDisplayInformation&); // Not implemented
   void operator=(const vtkPVLODPartDisplayInformation&); // Not implemented
