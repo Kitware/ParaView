@@ -122,6 +122,8 @@ vtkKWApplication::vtkKWApplication()
 
   this->Registery = 0;
   this->RegisteryLevel = 10;
+
+  this->UseMessageDialogs = 1;
 }
 
 vtkKWApplication::~vtkKWApplication()

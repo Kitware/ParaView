@@ -191,6 +191,10 @@ void vtkKWMessageDialog::SetText(const char *txt)
 
 int vtkKWMessageDialog::Invoke()
 {
+  if ( !this->GetApplication()->GetUseMessageDialogs() )
+    {
+    return 0;
+    }
   if ( this->Default == vtkKWMessageDialog::YesDefault )
     {
     this->OKButton->Focus();

@@ -190,6 +190,12 @@ public:
   // it will refuse to exit
   vtkSetMacro(DialogUp, int);
   vtkGetMacro(DialogUp, int);
+
+  // Description:
+  // This method will suppress all message dialogs.
+  // There is no way back for now.
+  void SupressMessageDialogs() { this->UseMessageDialogs = 0; }
+  vtkGetMacro(UseMessageDialogs, int);
   
 protected:
   vtkKWApplication();
@@ -220,6 +226,8 @@ protected:
   vtkKWRegisteryUtilities *Registery;
   int RegisteryLevel;
   int BalloonHelpDelay;
+
+  int UseMessageDialogs;
 
 private:
   vtkKWApplication(const vtkKWApplication&);   // Not implemented.
