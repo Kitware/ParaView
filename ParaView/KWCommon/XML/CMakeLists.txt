@@ -9,13 +9,21 @@ INCLUDE_DIRECTORIES(
 SET(KWCommonXML_SRCS
   vtkXMLCameraReader.cxx
   vtkXMLCameraWriter.cxx
+  vtkXMLColorTransferFunctionReader.cxx
+  vtkXMLColorTransferFunctionWriter.cxx
   vtkXMLObjectReader.cxx
   vtkXMLObjectWriter.cxx
+  vtkXMLPiecewiseFunctionReader.cxx
+  vtkXMLPiecewiseFunctionWriter.cxx
   vtkXMLPropertyReader.cxx
   vtkXMLPropertyWriter.cxx
+  vtkXMLScalarsToColorsReader.cxx
+  vtkXMLScalarsToColorsWriter.cxx
   vtkXMLTextPropertyReader.cxx
   vtkXMLTextPropertyWriter.cxx
   vtkXMLUtilities.cxx
+  vtkXMLVolumePropertyReader.cxx
+  vtkXMLVolumePropertyWriter.cxx
 )
 
 SET_SOURCE_FILES_PROPERTIES(
