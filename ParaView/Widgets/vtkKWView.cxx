@@ -63,6 +63,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWWindow.h"
 #include "vtkPNGWriter.h"
 #include "vtkPNMWriter.h"
+#include "vtkCallbackCommand.h"
 #include "vtkPostScriptWriter.h"
 #include "vtkProperty2D.h"
 #include "vtkRenderer.h"
@@ -99,14 +100,14 @@ Bool vtkKWRenderViewPredProc(Display *vtkNotUsed(disp), XEvent *event,
 }
 #endif
 
-vtkCxxRevisionMacro(vtkKWView, "1.95");
+vtkCxxRevisionMacro(vtkKWView, "1.96");
 
 //----------------------------------------------------------------------------
 int vtkKWViewCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
 
 //----------------------------------------------------------------------------
-void KWViewAbortCheckMethod( void *arg )
+void KWViewAbortCheckMethod( vtkObject*, unsigned long, void* arg, void* )
 {
   vtkKWView *me = (vtkKWView *)arg;
 
@@ -202,7 +203,12 @@ vtkKWView::vtkKWView()
   this->Renderer = vtkRenderer::New();
   this->RenderWindow = vtkRenderWindow::New();
   this->RenderWindow->AddRenderer(this->Renderer);
-  this->RenderWindow->SetAbortCheckMethod(KWViewAbortCheckMethod, (void*)this);
+
+  vtkCallbackCommand* abc = vtkCallbackCommand::New();
+  abc->SetCallback(KWViewAbortCheckMethod);
+  abc->SetClientData(this);
+  this->RenderWindow->AddObserver(vtkCommand::AbortCheckEvent, abc);
+  abc->Delete();
 
 }
 
@@ -1494,7 +1500,7 @@ void vtkKWView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWView ";
-  this->ExtractRevision(os,"$Revision: 1.95 $");
+  this->ExtractRevision(os,"$Revision: 1.96 $");
 }
 
 //----------------------------------------------------------------------------
