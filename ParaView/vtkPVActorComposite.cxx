@@ -129,12 +129,17 @@ vtkPVActorComposite::vtkPVActorComposite()
   this->ColorRangeResetButton = vtkKWPushButton::New();
   this->ColorRangeMinEntry = vtkKWLabeledEntry::New();
   this->ColorRangeMaxEntry = vtkKWLabeledEntry::New();
-  
+
+  this->DisplayMenusFrame = vtkKWWidget::New();
   this->RepresentationMenuLabel = vtkKWLabel::New();
   this->RepresentationMenu = vtkKWOptionMenu::New();
   
   this->InterpolationMenuLabel = vtkKWLabel::New();
   this->InterpolationMenu = vtkKWOptionMenu::New();
+  
+  this->DisplayScalesFrame = vtkKWWidget::New();
+  this->PointSizeScale = vtkKWScale::New();
+  this->LineWidthScale = vtkKWScale::New();
   
   this->ScalarBarCheckFrame = vtkKWWidget::New();
   this->ScalarBarCheck = vtkKWCheckButton::New();
@@ -149,8 +154,7 @@ vtkPVActorComposite::vtkPVActorComposite()
   this->DataSetInput = NULL;
   this->Mode = VTK_PV_ACTOR_COMPOSITE_POLY_DATA_MODE;
   
-  //this->TextureFilter = NULL;
-  
+  //this->TextureFilter = NULL;  
 }
 
 
@@ -317,6 +321,16 @@ vtkPVActorComposite::~vtkPVActorComposite()
   this->InterpolationMenu->Delete();
   this->InterpolationMenu = NULL;
   
+  this->DisplayMenusFrame->Delete();
+  this->DisplayMenusFrame = NULL;
+  
+  this->PointSizeScale->Delete();
+  this->PointSizeScale = NULL;
+  this->LineWidthScale->Delete();
+  this->LineWidthScale = NULL;
+  this->DisplayScalesFrame->Delete();
+  this->DisplayScalesFrame = NULL;
+  
   this->SetInput(NULL);
     
   if (this->ScalarBarTclName)
@@ -447,7 +461,6 @@ void vtkPVActorComposite::CreateProperties()
   
   this->ColorMenu->SetParent(this->ColorFrame->GetFrame());
   this->ColorMenu->Create(this->Application, "");    
-
   this->ColorButton->SetParent(this->ColorFrame->GetFrame());
   this->ColorButton->Create(this->Application, "");
   this->ColorButton->SetText("Actor Color");
@@ -496,10 +509,13 @@ void vtkPVActorComposite::CreateProperties()
                this->ColorRangeMaxEntry->GetEntry()->GetWidgetName(),
                this->GetTclName());
 
-  this->RepresentationMenuLabel->SetParent(this->DisplayStyleFrame->GetFrame());
+  this->DisplayMenusFrame->SetParent(this->DisplayStyleFrame->GetFrame());
+  this->DisplayMenusFrame->Create(this->Application, "frame", "");
+  
+  this->RepresentationMenuLabel->SetParent(this->DisplayMenusFrame);
   this->RepresentationMenuLabel->Create(this->Application, "");
   this->RepresentationMenuLabel->SetLabel("Representation:");
-  this->RepresentationMenu->SetParent(this->DisplayStyleFrame->GetFrame());
+  this->RepresentationMenu->SetParent(this->DisplayMenusFrame);
   this->RepresentationMenu->Create(this->Application, "");
   this->RepresentationMenu->AddEntryWithCommand("Wireframe", this,
                                                 "DrawWireframe");
@@ -509,16 +525,36 @@ void vtkPVActorComposite::CreateProperties()
                                                 "DrawPoints");
   this->RepresentationMenu->SetValue("Surface");
   
-  this->InterpolationMenuLabel->SetParent(this->DisplayStyleFrame->GetFrame());
+  this->InterpolationMenuLabel->SetParent(this->DisplayMenusFrame);
   this->InterpolationMenuLabel->Create(this->Application, "");
   this->InterpolationMenuLabel->SetLabel("Interpolation:");
-  this->InterpolationMenu->SetParent(this->DisplayStyleFrame->GetFrame());
+  this->InterpolationMenu->SetParent(this->DisplayMenusFrame);
   this->InterpolationMenu->Create(this->Application, "");
   this->InterpolationMenu->AddEntryWithCommand("Flat", this,
 					       "SetInterpolationToFlat");
   this->InterpolationMenu->AddEntryWithCommand("Gouraud", this,
 					       "SetInterpolationToGouraud");
   this->InterpolationMenu->SetValue("Gouraud");
+
+  this->DisplayScalesFrame->SetParent(this->DisplayStyleFrame->GetFrame());
+  this->DisplayScalesFrame->Create(this->Application, "frame", "");
+  
+  this->PointSizeScale->SetParent(this->DisplayScalesFrame);
+  this->PointSizeScale->Create(this->Application, "-showvalue 1");
+  this->PointSizeScale->SetRange(1, 5);
+  this->PointSizeScale->SetResolution(1);
+  this->PointSizeScale->DisplayLabel("Point Size");
+  this->PointSizeScale->SetCommand(this, "ChangePointSize");
+  this->PointSizeScale->SetValue(1);
+  
+  this->LineWidthScale->SetParent(this->DisplayScalesFrame);
+  this->LineWidthScale->Create(this->Application, "-showvalue 1");
+  this->LineWidthScale->SetRange(1, 5);
+  this->LineWidthScale->SetResolution(1);
+  this->LineWidthScale->DisplayLabel("LineWidth");
+  this->LineWidthScale->SetCommand(this, "ChangeLineWidth");
+  this->LineWidthScale->SetValue(1);
+  
   
   this->ScalarBarCheck->SetParent(this->ScalarBarCheckFrame);
   this->ScalarBarCheck->Create(this->Application, "-text Visibility");
@@ -577,12 +613,18 @@ void vtkPVActorComposite::CreateProperties()
 	       this->ColorRangeMinEntry->GetWidgetName(),
 	       this->ColorRangeMaxEntry->GetWidgetName());
 
-  this->Script("pack %s -fill x", this->DisplayStyleFrame->GetWidgetName());
+  this->Script("pack %s %s -side top -fill x",
+               this->DisplayMenusFrame->GetWidgetName(),
+               this->DisplayScalesFrame->GetWidgetName());
   this->Script("pack %s %s %s %s -side left",
                this->RepresentationMenuLabel->GetWidgetName(),
                this->RepresentationMenu->GetWidgetName(),
                this->InterpolationMenuLabel->GetWidgetName(),
                this->InterpolationMenu->GetWidgetName());
+  this->Script("pack %s %s -side left",
+               this->PointSizeScale->GetWidgetName(),
+               this->LineWidthScale->GetWidgetName());
+  this->Script("pack %s -fill x", this->DisplayStyleFrame->GetWidgetName());
   this->Script("pack %s",
                this->CubeAxesCheck->GetWidgetName());
   this->Script("pack %s",
@@ -817,7 +859,6 @@ void vtkPVActorComposite::ResetColorRange()
   float range[2];
   this->GetColorRange(range);
   
-  vtkErrorMacro("min: " << this->ColorRangeMinEntry->GetWidgetName());
   // Avoid the bad range error
   if (range[1] <= range[0])
     {
@@ -1498,6 +1539,34 @@ void vtkPVActorComposite::ScalarBarOrientationCallback()
     this->Script("%s SetHeight 0.13", this->GetScalarBarTclName());
     this->Script("%s SetWidth 0.5", this->GetScalarBarTclName());
     }
+  this->GetPVRenderView()->EventuallyRender();
+}
+
+void vtkPVActorComposite::ChangePointSize()
+{
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  
+  if (this->PropertyTclName)
+    {
+    pvApp->BroadcastScript("%s SetPointSize %f",
+                           this->PropertyTclName,
+                           this->PointSizeScale->GetValue());
+    }
+  
+  this->GetPVRenderView()->EventuallyRender();
+}
+
+void vtkPVActorComposite::ChangeLineWidth()
+{
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  
+  if (this->PropertyTclName)
+    {
+    pvApp->BroadcastScript("%s SetLineWidth %f",
+                           this->PropertyTclName,
+                           this->LineWidthScale->GetValue());
+    }
+
   this->GetPVRenderView()->EventuallyRender();
 }
 

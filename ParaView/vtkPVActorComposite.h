@@ -222,6 +222,11 @@ public:
   // Description:
   // Get the name of the cube axes actor.
   vtkGetStringMacro(CubeAxesTclName);
+
+  // Description:
+  // Callbacks for point size and line width sliders
+  void ChangePointSize();
+  void ChangeLineWidth();
   
 protected:
 
@@ -259,12 +264,16 @@ protected:
   vtkKWLabel *ColorMapMenuLabel;
   vtkKWOptionMenu *ColorMapMenu;
   
+  vtkKWWidget *DisplayMenusFrame;
   vtkKWLabel *RepresentationMenuLabel;
   vtkKWOptionMenu *RepresentationMenu;
-
   vtkKWLabel *InterpolationMenuLabel;
   vtkKWOptionMenu *InterpolationMenu;
 
+  vtkKWWidget *DisplayScalesFrame;
+  vtkKWScale *PointSizeScale;
+  vtkKWScale *LineWidthScale;
+  
   vtkKWCheckButton *VisibilityCheck;
   
   // I merged the PVData object and the PVActorComposite.  
