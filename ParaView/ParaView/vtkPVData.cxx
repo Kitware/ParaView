@@ -80,7 +80,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.161.2.23");
+vtkCxxRevisionMacro(vtkPVData, "1.161.2.24");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -2026,6 +2026,8 @@ void vtkPVData::ColorByPointFieldComponentInternal(const char *name,
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
 
+  pvApp->CompleteArrays(this->VTKData, this->VTKDataTclName);
+
   // I would like to make this an argument, but not right now.
   int numComps;
   vtkDataArray *a = this->VTKData->GetPointData()->GetArray(name);
@@ -2115,6 +2117,8 @@ void vtkPVData::ColorByCellFieldComponentInternal(const char *name,
                                                             int comp)
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
+
+  pvApp->CompleteArrays(this->VTKData, this->VTKDataTclName);
 
   // I would like to make this an argument, but not right now.
   int numComps;
@@ -3312,7 +3316,7 @@ void vtkPVData::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVData ";
-  this->ExtractRevision(os,"$Revision: 1.161.2.23 $");
+  this->ExtractRevision(os,"$Revision: 1.161.2.24 $");
 }
 
 //----------------------------------------------------------------------------
