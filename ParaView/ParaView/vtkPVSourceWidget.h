@@ -64,6 +64,10 @@ public:
   // The Tcl name of the output of the contained VTK source.
   vtkGetStringMacro(OutputTclName);
 
+  // Description:
+  // A method for saving a widget into a VTK Tcl script.
+  virtual void SaveInTclScript(ofstream *file);
+
 protected:
   vtkPVSourceWidget();
   ~vtkPVSourceWidget();

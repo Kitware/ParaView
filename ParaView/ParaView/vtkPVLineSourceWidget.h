@@ -87,6 +87,11 @@ public:
   // is deselected.
   virtual void Deselect();
 
+  // Description:
+  // Saves the value of this widget into a VTK Tcl script.
+  // This does what the superclass does, but also create the line source.
+  void SaveInTclScript(ofstream *file);
+
 protected:
   vtkPVLineSourceWidget();
   ~vtkPVLineSourceWidget();

@@ -52,7 +52,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectWidget);
-vtkCxxRevisionMacro(vtkPVSelectWidget, "1.15");
+vtkCxxRevisionMacro(vtkPVSelectWidget, "1.16");
 
 int vtkPVSelectWidgetCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -178,7 +178,7 @@ void vtkPVSelectWidget::Accept()
   // Command to update the UI.
   if (this->GetCurrentVTKValue())
     {
-    pvApp->BroadcastScript("%s Set%s {%s}",
+    pvApp->BroadcastScript("%s Set%s %s",
                            this->ObjectTclName,
                            this->VariableName,
                            this->GetCurrentVTKValue()); 
@@ -426,7 +426,7 @@ void vtkPVSelectWidget::SaveInTclScript(ofstream *file)
   if (tmp && strlen(tmp) > 0)
     {
     *file << "\t" << this->ObjectTclName << " Set" << this->VariableName
-          << " {" << tmp << "}" << endl;
+          << " " << this->GetCurrentVTKValue() << endl;
     }
 }
 

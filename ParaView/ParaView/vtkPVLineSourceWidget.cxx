@@ -50,7 +50,7 @@ int vtkPVLineSourceWidget::InstanceCount = 0;
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLineSourceWidget);
-vtkCxxRevisionMacro(vtkPVLineSourceWidget, "1.2");
+vtkCxxRevisionMacro(vtkPVLineSourceWidget, "1.3");
 
 int vtkPVLineSourceWidgetCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -95,15 +95,19 @@ void vtkPVLineSourceWidget::Create(vtkKWApplication *app)
   if (pvApp)
     {
     this->SetSourceTclName(name);
-    this->SetOutputTclName(outputName);
-
     pvApp->BroadcastScript("vtkLineSource %s;"
                            "vtkPolyData %s;"
                            "%s SetOutput %s;", 
                            name,
                            outputName,
                            name, outputName);
+
+    //special for saving in tcl scripts.
+    sprintf(outputName, "[%s GetOutput]", name);
+    this->SetOutputTclName(outputName);
     }
+
+
 
   this->LineWidget->SetObjectTclName(name);
   this->LineWidget->SetPoint1VariableName("Point1");
@@ -143,6 +147,28 @@ void vtkPVLineSourceWidget::Select()
 void vtkPVLineSourceWidget::Deselect()
 {
   this->LineWidget->Deselect();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVLineSourceWidget::SaveInTclScript(ofstream *file)
+{
+  float pt[3];
+  
+  if (this->SourceTclName == NULL || this->LineWidget == NULL)
+    {
+    vtkErrorMacro(<< this->GetClassName() << " must not have SaveInTclScript method.");
+    return;
+    } 
+
+  *file << "vtkLineSource " << this->SourceTclName << "\n";
+  this->LineWidget->GetPoint1(pt);
+  *file << "\t" << this->SourceTclName << " SetPoint1 " 
+        << pt[0] << " " << pt[1] << " " << pt[2] << endl; 
+  this->LineWidget->GetPoint2(pt);
+  *file << "\t" << this->SourceTclName << " SetPoint2 " 
+        << pt[0] << " " << pt[1] << " " << pt[2] << endl; 
+  *file << "\t" << this->SourceTclName << " SetResolution " 
+        << this->LineWidget->GetResolution() << endl; 
 }
 
 //----------------------------------------------------------------------------

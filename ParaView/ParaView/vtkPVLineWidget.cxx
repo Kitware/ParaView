@@ -55,7 +55,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVXMLElement.h"
 
 vtkStandardNewMacro(vtkPVLineWidget);
-vtkCxxRevisionMacro(vtkPVLineWidget, "1.27");
+vtkCxxRevisionMacro(vtkPVLineWidget, "1.28");
 
 //----------------------------------------------------------------------------
 vtkPVLineWidget::vtkPVLineWidget()
@@ -167,6 +167,19 @@ void vtkPVLineWidget::SetPoint1(float x, float y, float z)
 }
 
 //----------------------------------------------------------------------------
+void vtkPVLineWidget::GetPoint1(float pt[3])
+{
+  if (this->Application == NULL)
+    {
+    vtkErrorMacro("Not created yet.");
+    return;
+    }
+  pt[0] = this->Point1[0]->GetValueAsFloat();
+  pt[1] = this->Point1[1]->GetValueAsFloat();
+  pt[2] = this->Point1[2]->GetValueAsFloat();
+}
+
+//----------------------------------------------------------------------------
 void vtkPVLineWidget::SetPoint2(float x, float y, float z)
 {
   this->Point2[0]->SetValue(x,5);
@@ -184,6 +197,19 @@ void vtkPVLineWidget::SetPoint2(float x, float y, float z)
   line->SetAlignToNone();
   this->ModifiedFlag = 1;
   this->Render();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVLineWidget::GetPoint2(float pt[3])
+{
+  if (this->Application == NULL)
+    {
+    vtkErrorMacro("Not created yet.");
+    return;
+    }
+  pt[0] = this->Point2[0]->GetValueAsFloat();
+  pt[1] = this->Point2[1]->GetValueAsFloat();
+  pt[2] = this->Point2[2]->GetValueAsFloat();
 }
 
 //----------------------------------------------------------------------------
@@ -230,6 +256,18 @@ void vtkPVLineWidget::SetResolution(int i)
   vtkLineWidget *line = static_cast<vtkLineWidget*>( this->Widget3D );
   line->SetResolution(res);
   this->Render();
+}
+
+//----------------------------------------------------------------------------
+int vtkPVLineWidget::GetResolution()
+{
+  if (this->Application == NULL)
+    {
+    vtkErrorMacro("Not created yet.");
+    return 0;
+    }
+
+  return this->ResolutionEntry->GetValueAsInt();
 }
 
 //----------------------------------------------------------------------------

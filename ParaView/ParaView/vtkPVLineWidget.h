@@ -83,11 +83,14 @@ public:
   void SetPoint2();
   void SetPoint1(float x, float y, float z);
   void SetPoint2(float x, float y, float z);
+  void GetPoint1(float pt[3]);
+  void GetPoint2(float pt[3]);
 
   // Description:
   // Set the resolution of the line widget.
   void SetResolution();
   void SetResolution(int f);
+  int GetResolution();
 
   // Description:
   // Set the tcl variables that are modified when accept is called.

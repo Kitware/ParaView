@@ -43,7 +43,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkPVApplication.h"
 
-vtkCxxRevisionMacro(vtkPVSourceWidget, "1.3");
+vtkCxxRevisionMacro(vtkPVSourceWidget, "1.4");
 
 //----------------------------------------------------------------------------
 vtkPVSourceWidget::vtkPVSourceWidget()
@@ -77,6 +77,26 @@ vtkPVSourceWidget::~vtkPVSourceWidget()
 
   this->SetSourceTclName(0);
   this->SetOutputTclName(0);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVSourceWidget::SaveInTclScript(ofstream *file)
+{
+  char *result;
+  
+  if (this->ObjectTclName == NULL || this->VariableName == NULL 
+      || this->SourceTclName)
+    {
+    vtkErrorMacro(<< this->GetClassName() << " must not have SaveInTclScript method.");
+    return;
+    } 
+
+  this->Script("%s GetClassName", this->SourceTclName);
+  result = this->Application->GetMainInterp()->result;
+  *file << result << " " << this->SourceTclName << "\n";
+
+  *file << "\t" << this->ObjectTclName << " Set" << this->VariableName
+        << " " << this->SourceTclName << endl;
 }
 
 //----------------------------------------------------------------------------
