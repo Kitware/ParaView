@@ -29,7 +29,7 @@
 #include "vtkMPICommunicator.h"
 #endif
 
-vtkCxxRevisionMacro(vtkMPIDuplicatePolyData, "1.8");
+vtkCxxRevisionMacro(vtkMPIDuplicatePolyData, "1.9");
 vtkStandardNewMacro(vtkMPIDuplicatePolyData);
 
 vtkCxxSetObjectMacro(vtkMPIDuplicatePolyData,Controller, vtkMultiProcessController);
@@ -168,9 +168,6 @@ void vtkMPIDuplicatePolyData::ServerExecute(vtkPolyDataReader* reader,
   numProcs = this->Controller->GetNumberOfProcesses();
   vtkPolyData* input;
   vtkPolyData* pd;
-  int idx;
-  int sum;
-  int myId = this->Controller->GetLocalProcessId();
   
   // First marshal our input.
   input = this->GetInput();
@@ -188,6 +185,9 @@ void vtkMPIDuplicatePolyData::ServerExecute(vtkPolyDataReader* reader,
   
 #ifdef VTK_USE_MPI
 
+  int idx;
+  int sum;
+  int myId = this->Controller->GetLocalProcessId();
   vtkMPICommunicator *com = NULL;
   if (this->Controller)
     {
