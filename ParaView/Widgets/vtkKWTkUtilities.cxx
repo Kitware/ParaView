@@ -53,7 +53,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWTkUtilities);
-vtkCxxRevisionMacro(vtkKWTkUtilities, "1.26");
+vtkCxxRevisionMacro(vtkKWTkUtilities, "1.27");
 
 //----------------------------------------------------------------------------
 void vtkKWTkUtilities::GetRGBColor(Tcl_Interp *interp,
@@ -876,7 +876,7 @@ int vtkKWTkUtilities::GetPackSlaveHorizontalPosition(Tcl_Interp *interp,
 
       if (w == 1)
         {
-        int h;
+        int h = 0;
         vtkKWTkUtilities::GetPackSlavesBbox(interp, ptr, &w, &h);
         }
 
