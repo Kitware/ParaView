@@ -52,7 +52,9 @@
 #include "vtkPVSourceCollection.h"
 #include "vtkPVVectorEntry.h"
 #include "vtkPVMinMax.h"
+#ifdef PARAVIEW_USE_EXODUS
 #include "vtkPVBasicDSPFilterWidget.h"
+#endif
 
 #include "vtkKWLabeledCheckButton.h"
 #include "vtkKWOptionMenu.h"
@@ -122,7 +124,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLookmarkManager);
-vtkCxxRevisionMacro(vtkPVLookmarkManager, "1.1");
+vtkCxxRevisionMacro(vtkPVLookmarkManager, "1.2");
 int vtkPVLookmarkManagerCommand(ClientData cd, Tcl_Interp *interp, int argc, char *argv[]);
 
 //----------------------------------------------------------------------------
@@ -3146,7 +3148,9 @@ void vtkPVLookmarkManager::ParseAndExecuteStateScript(vtkPVSource *reader,char *
   vtkPVStringEntry *stringEntry;
   vtkPVSelectWidget *selectWidget;
   vtkPVMinMax *minMaxWidget;
+#ifdef PARAVIEW_USE_EXODUS
   vtkPVBasicDSPFilterWidget *dspWidget;
+#endif
   vtkPVSource *src;
   vtkPVWidget *pvWidget;
   float tvalue=0;
@@ -3287,6 +3291,7 @@ void vtkPVLookmarkManager::ParseAndExecuteStateScript(vtkPVSource *reader,char *
             minMaxWidget->SetMinValue(this->GetIntegerScalarWidgetValue(ptr));
             ptr = strtok(NULL,"\r\n");
             }
+#ifdef PARAVIEW_USE_EXODUS
           else if((dspWidget = vtkPVBasicDSPFilterWidget::SafeDownCast(pvWidget)))
             {
             ptr = strtok(NULL,"\r\n");
@@ -3297,6 +3302,7 @@ void vtkPVLookmarkManager::ParseAndExecuteStateScript(vtkPVSource *reader,char *
             dspWidget->SetFilterLength(atoi(this->GetStringValue(ptr)));
             ptr = strtok(NULL,"\r\n");
             }
+#endif
           else   //if we do not support this widget yet, advance and break loop
             {
             ptr = strtok(NULL,"\r\n");
