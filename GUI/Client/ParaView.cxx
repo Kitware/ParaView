@@ -164,7 +164,7 @@ int MyMain(int argc, char *argv[])
   pm->SetGUIHelper(helper);
   helper->Delete();
 
-  pm->InitializeInterpreter();
+  pm->Initialize();
   ParaViewInitializeInterpreter(pm);
 
   // Start the application's event loop.  This will enable
@@ -177,8 +177,7 @@ int MyMain(int argc, char *argv[])
   startVal = pm->Start(new_argc, new_argv);
 
   // Clean up for exit.
-  pm->SetRenderModule(0);
-  pm->FinalizeInterpreter();
+  pm->Finalize();
   pm->Delete();
   pm = NULL;
 

@@ -179,6 +179,11 @@ public:
 //ETX
 
   // Description:
+  // Initialize and finalize process module.
+  void Initialize();
+  void Finalize();
+
+  // Description:
   // Set/Get whether to report errors from the Interpreter.
   vtkGetMacro(ReportInterpreterErrors, int);
   vtkSetMacro(ReportInterpreterErrors, int);

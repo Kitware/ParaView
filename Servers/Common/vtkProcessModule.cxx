@@ -45,7 +45,7 @@ struct vtkProcessModuleInternals
 };
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkProcessModule, "1.13");
+vtkCxxRevisionMacro(vtkProcessModule, "1.14");
 vtkCxxSetObjectMacro(vtkProcessModule, RenderModule, vtkPVRenderModule);
 
 //----------------------------------------------------------------------------
@@ -763,5 +763,19 @@ void vtkProcessModule::SetOptions(vtkPVOptions* op)
 vtkCommand* vtkProcessModule::GetObserver()
 {
   return this->Observer;
+}
+
+//----------------------------------------------------------------------------
+void vtkProcessModule::Initialize()
+{
+  this->InitializeInterpreter();
+}
+
+//----------------------------------------------------------------------------
+void vtkProcessModule::Finalize()
+{
+  this->SetGUIHelper(0);
+  this->SetRenderModule(0);
+  this->FinalizeInterpreter();
 }
 
