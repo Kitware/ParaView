@@ -177,8 +177,8 @@ public:
     vtkKWWidget *widget, vtkKWWidget *anchor, vtkKWWidget *target);
 
   // Description:
-  // Write the list of visible pages to a string, parse the same kind of
-  // list from a string (and show the pages). Pinned status is saved too.
+  // Write the list of visible pages to a stream, parse the same kind of
+  // list from a stream (and show the pages). Pinned status is saved too.
   virtual void WriteVisiblePagesString(ostream &os);
   virtual void ParseVisiblePagesString(istream &is);
 
