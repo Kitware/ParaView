@@ -60,7 +60,7 @@ int vtkKWApplication::WidgetVisibility = 1;
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.191");
+vtkCxxRevisionMacro(vtkKWApplication, "1.192");
 
 extern "C" int Vtktcl_Init(Tcl_Interp *interp);
 extern "C" int Kwwidgetstcl_Init(Tcl_Interp *interp);
@@ -730,8 +730,7 @@ void vtkKWApplication::Start()
   argv[0] = NULL;
   for (i = 1; i < argc; i++)
     {
-    this->Script("lindex $argv %d",i-1);
-    argv[i] = strdup(this->GetMainInterp()->result);
+    argv[i] = strdup(this->Script("lindex $argv %d",i-1));
     }
   this->Start(argc,argv);
   
@@ -743,12 +742,6 @@ void vtkKWApplication::Start()
       }
     }
   delete [] argv;
-}
-
-//----------------------------------------------------------------------------
-void vtkKWApplication::Start(char *arg)
-{ 
-  this->Start(1,&arg);
 }
 
 //----------------------------------------------------------------------------
@@ -858,7 +851,7 @@ void vtkKWApplication::BalloonHelpTrigger(vtkKWWidget *widget)
     {
     return;
     }
-  char *result;
+  const char *result;
 
   // If there is no help string, return
 
@@ -872,10 +865,9 @@ void vtkKWApplication::BalloonHelpTrigger(vtkKWWidget *widget)
   
   this->BalloonHelpCancel();
   this->SetBalloonHelpWidget(widget);
-  this->Script("after %d {catch {%s BalloonHelpDisplay %s}}", 
-               this->BalloonHelpDelay * 1000,
-               this->GetTclName(), widget->GetTclName());
-  result = this->GetMainInterp()->result;
+  result = this->Script("after %d {catch {%s BalloonHelpDisplay %s}}", 
+                        this->BalloonHelpDelay * 1000,
+                        this->GetTclName(), widget->GetTclName());
   this->SetBalloonHelpPending(result);
 }
 

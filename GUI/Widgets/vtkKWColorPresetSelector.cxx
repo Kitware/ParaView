@@ -28,7 +28,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWColorPresetSelector);
-vtkCxxRevisionMacro(vtkKWColorPresetSelector, "1.5");
+vtkCxxRevisionMacro(vtkKWColorPresetSelector, "1.6");
 
 vtkCxxSetObjectMacro(vtkKWColorPresetSelector,ColorTransferFunction,vtkColorTransferFunction);
 
@@ -717,8 +717,6 @@ void vtkKWColorPresetSelector::PopulatePresetMenu()
   vtkKWMenu *menu = this->GetWidget()->GetMenu();
   menu->DeleteAllMenuItems();
 
-  Tcl_Interp *interp = this->GetApplication()->GetMainInterp();
-
   vtkstd::string callback, preset_label, img_name;
   char func_addr[128];
 
@@ -790,11 +788,11 @@ void vtkKWColorPresetSelector::PopulatePresetMenu()
         img_name += func_addr;
 
         int update_preview = 1;
-        Tk_PhotoHandle photo = Tk_FindPhoto(interp, img_name.c_str());
-        if (photo)
+        if (vtkKWTkUtilities::FindPhoto(
+              this->GetApplication(), img_name.c_str()))
           {
           int img_height = vtkKWTkUtilities::GetPhotoHeight(
-            interp, img_name.c_str());
+            this->GetApplication(), img_name.c_str());
           if (img_height == this->PreviewSize)
             {
             update_preview = 0;
@@ -865,7 +863,7 @@ int vtkKWColorPresetSelector::CreateColorTransferFunctionPreview(
 
   // Update the Tk image
 
-  vtkKWTkUtilities::UpdatePhoto(this->GetApplication()->GetMainInterp(),
+  vtkKWTkUtilities::UpdatePhoto(this->GetApplication(),
                                 img_name,
                                 buffer,
                                 this->PreviewSize, this->PreviewSize, 3,

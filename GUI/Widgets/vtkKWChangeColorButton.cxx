@@ -20,7 +20,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWChangeColorButton);
-vtkCxxRevisionMacro(vtkKWChangeColorButton, "1.51");
+vtkCxxRevisionMacro(vtkKWChangeColorButton, "1.52");
 
 int vtkKWChangeColorButtonCommand(ClientData cd, Tcl_Interp *interp,
                                   int argc, char *argv[]);
@@ -424,19 +424,17 @@ void vtkKWChangeColorButton::SetBalloonHelpJustification(int j)
 void vtkKWChangeColorButton::QueryUserForColor()
 {  
   int r, g, b;
-  char *result, tmp[3];
+  char tmp[3];
 
   this->GetApplication()->SetDialogUp(1);
 
-  this->Script(
+  const char *result = this->Script(
      "tk_chooseColor -initialcolor {#%02x%02x%02x} -title {%s} -parent %s",
      (int)(this->Color[0] * 255.5), 
      (int)(this->Color[1] * 255.5), 
      (int)(this->Color[2] * 255.5),
      (this->DialogText?this->DialogText:"Choose Color"),
      this->GetWidgetName() );
-
-  result = this->GetApplication()->GetMainInterp()->result;
 
   this->GetApplication()->SetDialogUp(0);
 

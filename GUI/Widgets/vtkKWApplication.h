@@ -11,19 +11,19 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkKWApplication - manage all the windows in an application
+// .NAME vtkKWApplication - an application class
 // .SECTION Description
 // vtkKWApplication is the overall class that represents the entire 
-// applicaiton. It is a fairly small class that is primarily responsible
-// for managing the all the vtkKWWindows in the application. 
-
+// application. It is also responsible for managing the vtkKWWindow(s) 
+// associated to the application.
 
 #ifndef __vtkKWApplication_h
 #define __vtkKWApplication_h
 
 #include "vtkKWObject.h"
+
 #include "vtkTcl.h" // Needed for Tcl_Interp
-#include "vtkTk.h" // Needed for Tk_Window
+#include "vtkTk.h"  // Needed for Tk_Window
 
 class vtkKWLabel;
 class vtkKWMessageDialog;
@@ -42,13 +42,17 @@ public:
   vtkTypeRevisionMacro(vtkKWApplication,vtkKWObject);
   void PrintSelf(ostream& os, vtkIndent indent);
   
+  // Description:
+  // Override vtkKWObject's method. A vtkKWObject is associated to a
+  // vtkKWApplication. Even if vtkKWApplication is a subclass of 
+  // vtkKWObject, an application's application is actually 'itself', 
+  // and it can not be reset.
   virtual vtkKWApplication *GetApplication()  { return this;  }
   virtual void SetApplication (vtkKWApplication*);
   
   // Description:
-  // Start running the main application.
+  // Start running the application, with or without arguments.
   virtual void Start();
-  virtual void Start(char *arg);
   virtual void Start(int argc, char *argv[]);
 
   // Description:
