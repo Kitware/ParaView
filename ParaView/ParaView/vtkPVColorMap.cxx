@@ -68,7 +68,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVColorMap);
-vtkCxxRevisionMacro(vtkPVColorMap, "1.24.2.6");
+vtkCxxRevisionMacro(vtkPVColorMap, "1.24.2.7");
 
 int vtkPVColorMapCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -411,6 +411,8 @@ void vtkPVColorMap::Create(vtkKWApplication *app)
   this->NumberOfColorsScale->DisplayEntryAndLabelOnTopOff();
   this->NumberOfColorsScale->SetEndCommand(this, 
                                            "NumberOfColorsScaleCallback");
+  this->NumberOfColorsScale->SetEntryCommand(this, 
+                                             "NumberOfColorsScaleCallback");
   this->NumberOfColorsScale->SetBalloonHelpString(
     "Select the discrete number of colors in the color map.");
 
