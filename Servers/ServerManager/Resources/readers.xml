@@ -352,6 +352,7 @@
          command="SetStride"
          number_of_elements="3"
          default_values="1 1 1" >
+        <IntRangeDomain name="range"/>
       </IntVectorProperty>
    <!-- End HDF5RawImageReader -->
    </SourceProxy>
@@ -398,6 +399,7 @@
          command="SetTimeStep"
          number_of_elements="1"
          default_values="0" >
+        <IntRangeDomain name="range"/>
       </IntVectorProperty>
    <!-- End xyzreader -->
    </SourceProxy>
@@ -504,6 +506,7 @@
          command="SetHBScale"
          number_of_elements="1"
          default_values="1.0" >
+        <DoubleRangeDomain name="range"/>
       </DoubleVectorProperty>
 
       <DoubleVectorProperty
@@ -511,6 +514,7 @@
          command="SetBScale"
          number_of_elements="1"
          default_values="1.0" >
+        <DoubleRangeDomain name="range"/>
       </DoubleVectorProperty>
    <!-- End gaussiancubereader -->
    </SourceProxy>
@@ -528,6 +532,7 @@
          command="SetRadius"
          number_of_elements="1"
          default_values="60000" >
+        <DoubleRangeDomain name="range"/>
       </DoubleVectorProperty>
 
      <IntVectorProperty 
@@ -535,6 +540,7 @@
         command="SetClipExtent" 
         number_of_elements="6"
         default_values="-2147483647 2147483647 -2147483647 2147483647 -2147483647 2147483647" > 
+       <IntRangeDomain name="range"/>
      </IntVectorProperty>
 
      <IntVectorProperty 
@@ -542,6 +548,7 @@
         command="SetNumberOfGhostLevels" 
         number_of_elements="1"
         default_values="1" > 
+       <IntRangeDomain name="range"/>
      </IntVectorProperty>
    <!-- End popreader -->
    </SourceProxy>
@@ -646,6 +653,7 @@
          command="SetDataOrigin"
          number_of_elements="3"
          default_values="0.0 0.0 0.0" >
+        <DoubleRangeDomain name="range"/>
       </DoubleVectorProperty>
 
       <DoubleVectorProperty
@@ -653,19 +661,24 @@
          command="SetDataSpacing"
          number_of_elements="3"
          default_values="1.0 1.0 1.0" >
+        <DoubleRangeDomain name="range"/>
       </DoubleVectorProperty>
 
      <IntVectorProperty 
         name="DataExtent"
         command="SetDataExtent"
         number_of_elements="6" 
-        default_values="0 0 0 0 0 0" />
+        default_values="0 0 0 0 0 0" >
+       <IntRangeDomain name="range"/>
+     </IntVectorProperty>
 
      <IntVectorProperty 
         name="NumberOfScalarComponents"
         command="SetNumberOfScalarComponents"
         number_of_elements="1" 
-        default_values="1" />
+        default_values="1" >
+       <IntRangeDomain name="range"/>
+     </IntVectorProperty>
 
      <StringVectorProperty
         name="ScalarArrayName"
@@ -705,6 +718,7 @@
          command="SetStride"
          number_of_elements="3"
          default_values="1 1 1" >
+        <IntRangeDomain name="range"/>
       </IntVectorProperty>
 
      <StringVectorProperty
@@ -756,7 +770,9 @@
         name="FileRange"
         command="SetFileRange"
         number_of_elements="2" 
-        default_values="0 0"/>
+        default_values="0 0">
+       <IntRangeDomain name="range"/>
+     </IntVectorProperty>
 
      <IntVectorProperty 
         name="TimeStep"
@@ -857,6 +873,7 @@
         command="SetDisplacementMagnitude" 
         number_of_elements="1"
         default_values="1" > 
+       <DoubleRangeDomain name="range"/>
      </DoubleVectorProperty>
    <!-- End ExodusReader -->
    </SourceProxy>

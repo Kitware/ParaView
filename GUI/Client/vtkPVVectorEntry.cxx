@@ -34,7 +34,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVVectorEntry);
-vtkCxxRevisionMacro(vtkPVVectorEntry, "1.56");
+vtkCxxRevisionMacro(vtkPVVectorEntry, "1.57");
 
 //-----------------------------------------------------------------------------
 vtkPVVectorEntry::vtkPVVectorEntry()
@@ -619,64 +619,92 @@ void vtkPVVectorEntry::AddAnimationScriptsToMenu(vtkKWMenu *menu,
   vtkPVAnimationInterfaceEntry *ai)
 {
   char methodAndArgs[500];
-
+  char command[200];
+  
   if (this->Entries->GetNumberOfItems() == 1)
     {
-    sprintf(methodAndArgs, "AnimationMenuCallback %s", ai->GetTclName()); 
+    sprintf(methodAndArgs, "AnimationMenuCallback %s 0", ai->GetTclName()); 
     menu->AddCommand(this->LabelWidget->GetLabel(), this, methodAndArgs, 0,"");
+    }
+  else
+    {
+    char methodAndArgs[200];
+    vtkKWMenu *cascadeMenu = vtkKWMenu::New();
+    cascadeMenu->SetParent(menu);
+    cascadeMenu->Create(this->GetApplication(), "-tearoff 0");
+    menu->AddCascade(this->GetTraceName(), cascadeMenu, 0,
+                     "Choose a vector component to animate.");
+    int i;
+    for (i = 0; i < this->Entries->GetNumberOfItems(); i++)
+      {
+      sprintf(command, "Component %d", i);
+      sprintf(methodAndArgs, "AnimationMenuCallback %s %d",
+              ai->GetTclName(), i);
+      cascadeMenu->AddCommand(command, this, methodAndArgs, 0, "");
+      }
+    cascadeMenu->Delete();
+    cascadeMenu = NULL;
     }
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVVectorEntry::AnimationMenuCallback(vtkPVAnimationInterfaceEntry *ai)
+void vtkPVVectorEntry::AnimationMenuCallback(vtkPVAnimationInterfaceEntry *ai,
+                                             int idx)
 {
   if (ai->InitializeTrace(NULL))
     {
     this->AddTraceEntry("$kw(%s) AnimationMenuCallback $kw(%s)",
                         this->GetTclName(), ai->GetTclName());
     }
-  
+
   if (this->Entries->GetNumberOfItems() == 1)
     {
-    ai->SetLabelAndScript(this->LabelWidget->GetLabel(), NULL, this->GetTraceName());
-    vtkSMProperty *prop = this->GetSMProperty();
-    vtkSMDomain *rangeDomain = prop->GetDomain("range");
-    
-    ai->SetCurrentSMProperty(prop);
-    ai->SetCurrentSMDomain(rangeDomain);
-    ai->SetAnimationElement(0);
+    ai->SetLabelAndScript(this->LabelWidget->GetLabel(), NULL,
+                          this->GetTraceName());
+    }
+  else
+    {
+    char label[200];
+    sprintf(label, "%s (%d)", this->LabelWidget->GetLabel(), idx);
+    ai->SetLabelAndScript(label, NULL, this->GetTraceName());
+    }
+  
+  vtkSMProperty *prop = this->GetSMProperty();
+  vtkSMDomain *rangeDomain = prop->GetDomain("range");
 
-    if (rangeDomain)
+  ai->SetCurrentSMProperty(prop);
+  ai->SetCurrentSMDomain(rangeDomain);
+  ai->SetAnimationElement(idx);
+
+  if (rangeDomain)
+    {
+    vtkSMIntRangeDomain *intRangeDomain =
+      vtkSMIntRangeDomain::SafeDownCast(rangeDomain);
+    vtkSMDoubleRangeDomain *doubleRangeDomain =
+      vtkSMDoubleRangeDomain::SafeDownCast(rangeDomain);
+    int minExists = 0, maxExists = 0;
+    if (intRangeDomain)
       {
-      vtkSMIntRangeDomain *intRangeDomain =
-        vtkSMIntRangeDomain::SafeDownCast(rangeDomain);
-      vtkSMDoubleRangeDomain *doubleRangeDomain =
-        vtkSMDoubleRangeDomain::SafeDownCast(rangeDomain);
-      int minExists = 0, maxExists = 0;
-      if (intRangeDomain)
+      int min = intRangeDomain->GetMinimum(idx, minExists);
+      int max = intRangeDomain->GetMaximum(idx, maxExists);
+      if (minExists && maxExists)
         {
-        int min = intRangeDomain->GetMinimum(0, minExists);
-        int max = intRangeDomain->GetMaximum(0, maxExists);
-        if (minExists && maxExists)
-          {
-          ai->SetTimeStart(min);
-          ai->SetTimeEnd(max);
-          }
-        }
-      else if (doubleRangeDomain)
-        {
-        double min = doubleRangeDomain->GetMinimum(0, minExists);
-        double max = doubleRangeDomain->GetMaximum(0, maxExists);
-        if (minExists && maxExists)
-          {
-          ai->SetTimeStart(min);
-          ai->SetTimeEnd(max);
-          }
+        ai->SetTimeStart(min);
+        ai->SetTimeEnd(max);
         }
       }
-    ai->Update();
+    else if (doubleRangeDomain)
+      {
+      double min = doubleRangeDomain->GetMinimum(idx, minExists);
+      double max = doubleRangeDomain->GetMaximum(idx, maxExists);
+      if (minExists && maxExists)
+        {
+        ai->SetTimeStart(min);
+        ai->SetTimeEnd(max);
+        }
+      }
     }
-    // What if there are more than one entry?
+  ai->Update();
 }
 
 //-----------------------------------------------------------------------------

@@ -89,7 +89,7 @@ public:
   // Description:
   // Called when menu item (above) is selected.  Neede for tracing.
   // Would not be necessary if menus traced invocations.
-  void AnimationMenuCallback(vtkPVAnimationInterfaceEntry *ai);
+  void AnimationMenuCallback(vtkPVAnimationInterfaceEntry *ai, int idx);
 
   // Description:
   // This is the data type the vtk object is expecting.

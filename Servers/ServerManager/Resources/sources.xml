@@ -100,6 +100,7 @@
          command="SetOrigin"
          number_of_elements="3"
          default_values="0.0 0.0 0.0" >
+        <DoubleRangeDomain name="range"/>
       </DoubleVectorProperty>
 
      <IntVectorProperty 
@@ -142,6 +143,7 @@
          command="SetCenter"
          number_of_elements="3"
          default_values="0.0 0.0 0.0" >
+        <DoubleRangeDomain name="range"/>
       </DoubleVectorProperty>
    <!-- End Box -->
    </SourceProxy>
@@ -253,6 +255,7 @@
          command="SetCenter"
          number_of_elements="3"
          default_values="0.0 0.0 0.0" >
+        <DoubleRangeDomain name="range"/>
       </DoubleVectorProperty>
 
      <IntVectorProperty 
@@ -296,6 +299,7 @@
          command="SetWholeExtent"
          number_of_elements="6"
          default_values="0 250 0 250 0 0" >
+        <IntRangeDomain name="range"/>
       </IntVectorProperty>
 
       <IntVectorProperty
@@ -303,6 +307,7 @@
          command="SetProjectionAxes"
          number_of_elements="3"
          default_values="0 1 2" >
+        <IntRangeDomain name="range"/>
       </IntVectorProperty>
 
       <DoubleVectorProperty
@@ -310,6 +315,7 @@
          command="SetOriginCX"
          number_of_elements="4"
          default_values="-1.75 -1.25 0.0 0.0" >
+        <DoubleRangeDomain name="range"/>
       </DoubleVectorProperty>
 
       <DoubleVectorProperty
@@ -317,6 +323,7 @@
          command="SetSizeCX"
          number_of_elements="4"
          default_values="2.5 2.5 2.0 1.5" >
+        <DoubleRangeDomain name="range"/>
       </DoubleVectorProperty>
 
       <IntVectorProperty
@@ -386,6 +393,7 @@
          command="SetOrigin"
          number_of_elements="3"
          default_values="-0.5 -0.5 0.0" >
+        <DoubleRangeDomain name="range"/>
       </DoubleVectorProperty>
 
       <DoubleVectorProperty
@@ -393,6 +401,7 @@
          command="SetPoint1"
          number_of_elements="3"
          default_values="0.5 -0.5 0.0" >
+        <DoubleRangeDomain name="range"/>
       </DoubleVectorProperty>
 
       <DoubleVectorProperty
@@ -400,6 +409,7 @@
          command="SetPoint2"
          number_of_elements="3"
          default_values="-0.5 0.5 0.0" >
+        <DoubleRangeDomain name="range"/>
       </DoubleVectorProperty>
 
       <IntVectorProperty
@@ -450,6 +460,7 @@
          command="SetCenter"
          number_of_elements="3"
          default_values="0.0 0.0 0.0" >
+        <DoubleRangeDomain name="range"/>
       </DoubleVectorProperty>
 
       <DoubleVectorProperty
@@ -516,6 +527,7 @@
          command="SetCenter"
          number_of_elements="3"
          default_values="0.0 0.0 0.0" >
+        <DoubleRangeDomain name="range"/>
       </DoubleVectorProperty>
 
       <DoubleVectorProperty
@@ -523,6 +535,7 @@
          command="SetScale"
          number_of_elements="3"
          default_values="1.0 1.0 1.0" >
+        <DoubleRangeDomain name="range"/>
       </DoubleVectorProperty>
 
       <IntVectorProperty
@@ -589,6 +602,7 @@
          command="SetWholeExtent"
          number_of_elements="6"
          default_values="-10 10 -10 10 -10 10" >
+        <IntRangeDomain name="range"/>
       </IntVectorProperty>
 
       <DoubleVectorProperty
@@ -596,6 +610,7 @@
          command="SetCenter"
          number_of_elements="3"
          default_values="0.0 0.0 0.0" >
+        <DoubleRangeDomain name="range"/>
       </DoubleVectorProperty>
 
       <DoubleVectorProperty

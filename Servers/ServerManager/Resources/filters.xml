@@ -377,6 +377,7 @@
          command="SetScalarRange"
          number_of_elements="2"
          default_values="0 1" >
+        <DoubleRangeDomain name="range"/>
       </DoubleVectorProperty>
 
       <DoubleVectorProperty
@@ -761,6 +762,7 @@
         command="SetVector"
         number_of_elements="3"
         default_values="0 0 1" >
+       <DoubleRangeDomain name="range"/>
      </DoubleVectorProperty>
 
      <IntVectorProperty 
@@ -890,6 +892,7 @@
         command="SetKernelSize" 
         number_of_elements="3"
         default_values="1 1 1" > 
+       <IntRangeDomain name="range"/>
      </IntVectorProperty>
    <!-- End Median -->
    </SourceProxy>
@@ -1086,7 +1089,9 @@
         name="NumberOfDivisions" 
         command="SetNumberOfDivisions" 
         number_of_elements="3"
-        default_values="50 50 50" /> 
+        default_values="50 50 50" > 
+       <IntRangeDomain name="range"/>
+     </IntVectorProperty>
 
      <IntVectorProperty 
         name="UseInputPoints" 
@@ -1269,6 +1274,7 @@
         command="SetDefaultNormal"
         number_of_elements="3"
         default_values="0 0 1" >
+       <DoubleRangeDomain name="range"/>
      </DoubleVectorProperty>
 
      <IntVectorProperty 
@@ -1464,7 +1470,9 @@
         name="ChordError"
         command="SetChordError"
         number_of_elements="1"
-        default_values="1e-3"/>
+        default_values="1e-3">
+       <DoubleRangeDomain name="range"/>
+     </DoubleVectorProperty>
 
      <IntVectorProperty
         name="MaximumNumberOfSubdivisions"
@@ -1630,6 +1638,7 @@
         command="SetNormal"
         number_of_elements="3"
         default_values="0 0 1" >
+       <DoubleRangeDomain name="range"/>
      </DoubleVectorProperty>
 
      <IntVectorProperty 
@@ -1789,12 +1798,13 @@
         command="SetValue"
         number_of_elements="1"
         default_values="0.0" >
-          <ArrayRangeDomain name="range">
+          <ArrayRangeDomain name="scalar_range">
             <RequiredProperties>
                <Property name="Input" function="Input"/>
                <Property name="SelectInputScalars" function="ArraySelection"/>
             </RequiredProperties>
           </ArrayRangeDomain>         
+          <DoubleRangeDomain name="range"/>
      </DoubleVectorProperty>
    <!-- End Clip -->
    </SourceProxy>
@@ -1846,7 +1856,7 @@
         command="ThresholdBetween"
         number_of_elements="2"
         default_values="0 0">
-          <ArrayRangeDomain name="range">
+          <ArrayRangeDomain name="scalar_range">
             <RequiredProperties>
                <Property name="Input" function="Input"/>
                <Property name="SelectInputScalars" function="ArraySelection"/>
@@ -1902,7 +1912,7 @@
         repeat_command="1"
         number_of_elements_per_command="1"
         use_index="1">
-          <ArrayRangeDomain name="range">
+          <ArrayRangeDomain name="scalar_range">
             <RequiredProperties>
                <Property name="Input" function="Input"/>
                <Property name="SelectInputScalars" function="ArraySelection"/>
