@@ -107,6 +107,10 @@ Tcl_Interp *vtkPVInitializeTcl()
     {
     cerr << "Init Patented error\n";
     }
+  if (Vtkparalleltcl_Init(interp) == TCL_ERROR) 
+    {
+    cerr << "Init Parallel error\n";
+    }
 #endif
 
   if (Vtkkwwidgetstcl_Init(interp) == TCL_ERROR) 
