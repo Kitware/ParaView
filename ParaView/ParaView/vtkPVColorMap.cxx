@@ -50,7 +50,7 @@
 #include "vtkPVRenderModule.h"
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVColorMap);
-vtkCxxRevisionMacro(vtkPVColorMap, "1.77");
+vtkCxxRevisionMacro(vtkPVColorMap, "1.78");
 
 int vtkPVColorMapCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -2190,7 +2190,7 @@ void vtkPVColorMap::SetScalarBarPosition2(float x, float y)
   vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
 
   pm->GetStream() << vtkClientServerStream::Invoke 
-                  << this->ScalarBarActorID << "GetPositionCoordinate2"
+                  << this->ScalarBarActorID << "GetPosition2Coordinate"
                   << vtkClientServerStream::End;
   pm->GetStream() << vtkClientServerStream::Invoke 
                   << vtkClientServerStream::LastResult << "SetValue"
