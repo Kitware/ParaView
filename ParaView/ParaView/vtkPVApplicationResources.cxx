@@ -76,6 +76,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Resources/vtkPVTranslateViewButton.h"
 #include "Resources/vtkPVVectorDisplacementButton.h"
 
+#include "Resources/vtkPVSelectionWindowButton.h"
+
 // Splash screen
 
 #include "Resources/vtkPVSplashScreen.h"
@@ -257,6 +259,20 @@ void vtkPVApplication::CreateButtonPhotos()
                     image_PVStreamTracerButton_height,
                     image_PVStreamTracerButton_pixel_size,
                     image_PVStreamTracerButton_buffer_length);
+
+  this->CreatePhoto("PVNavigationWindowButton", 
+                    image_PVNavigationWindowButton, 
+                    image_PVNavigationWindowButton_width, 
+                    image_PVNavigationWindowButton_height,
+                    image_PVNavigationWindowButton_pixel_size,
+                    image_PVNavigationWindowButton_buffer_length);
+
+  this->CreatePhoto("PVSelectionWindowButton", 
+                    image_PVSelectionWindowButton, 
+                    image_PVSelectionWindowButton_width, 
+                    image_PVSelectionWindowButton_height,
+                    image_PVSelectionWindowButton_pixel_size,
+                    image_PVSelectionWindowButton_buffer_length);
 }
 
 //----------------------------------------------------------------------------
