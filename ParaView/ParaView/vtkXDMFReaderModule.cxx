@@ -56,27 +56,59 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkString.h"
 #include "vtkVector.txx"
 #include "vtkVectorIterator.txx"
+#include "vtkKWListBox.h"
+#include "vtkKWPushButton.h"
+
+#include <vtkstd/string>
+#include <vtkstd/map>
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkXDMFReaderModule);
-vtkCxxRevisionMacro(vtkXDMFReaderModule, "1.8");
+vtkCxxRevisionMacro(vtkXDMFReaderModule, "1.8.2.1");
 
 int vtkXDMFReaderModuleCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
 
+class vtkXDMFReaderModuleInternal
+{
+public:
+  typedef vtkstd::map<vtkstd::string, int> GridListType;
+  GridListType GridList;
+};
+
 //----------------------------------------------------------------------------
 vtkXDMFReaderModule::vtkXDMFReaderModule()
 {
+  this->DomainGridFrame = 0;
   this->DomainMenu = 0;
-  this->GridMenu = 0;
 
-  this->Grid = 0;
   this->Domain = 0;
+
+  this->GridSelection = 0;
+
+  this->Internals = new vtkXDMFReaderModuleInternal;
 }
 
 //----------------------------------------------------------------------------
 vtkXDMFReaderModule::~vtkXDMFReaderModule()
 {
+  this->SetDomain(0);
+  delete this->Internals;
+  if ( this->DomainMenu )
+    {
+    this->DomainMenu->Delete();
+    this->DomainMenu = 0;
+    }
+  if ( this->GridSelection )
+    {
+    this->GridSelection->Delete();
+    this->GridSelection = 0;
+    }
+  if ( this->DomainGridFrame )
+    {
+    this->DomainGridFrame->Delete();
+    this->DomainGridFrame = 0;
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -95,7 +127,11 @@ int vtkXDMFReaderModule::Initialize(const char* fname,
   const char* res = clone->GetVTKSourceTclName();
   vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
   pm->ServerScript("%s Set%s {%s}", res, "FileName", fname);
-  this->SetGrid(0);
+
+  this->Internals->GridList.erase(
+    this->Internals->GridList.begin(),
+    this->Internals->GridList.end());
+
   this->SetDomain(0);
 
   return VTK_OK;
@@ -104,93 +140,117 @@ int vtkXDMFReaderModule::Initialize(const char* fname,
 //----------------------------------------------------------------------------
 int vtkXDMFReaderModule::ReadFileInformation(const char* fname)
 {
+  int cc;
   vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
   vtkPVApplication* pvApp = this->GetPVApplication();
-  if ( !this->Grid || !this->Domain )
+  const char* res = this->GetVTKSourceTclName();
+
+  if ( !this->Domain ||
+    this->Internals->GridList.size() == 0 )
     {
     // Prompt user
-    const char* res = this->GetVTKSourceTclName();
 
     // Change the hardcoded "FileName" to something more elaborated
     pm->ServerScript("%s UpdateInformation", res);
 
     vtkKWMessageDialog* dlg = vtkKWMessageDialog::New();
-    dlg->SetTitle("Domain and Grid Selection");
+    dlg->SetTitle("Domain and Grids Selection");
     dlg->SetMasterWindow(this->GetPVWindow());
     dlg->Create(pvApp,0);
-    dlg->SetText("Select Domain and Grid");
-    vtkKWLabeledFrame* frame = vtkKWLabeledFrame::New();
-    frame->SetParent(dlg->GetMessageDialogFrame());
-    frame->Create(pvApp, 0);
-    frame->SetLabel("Domain and Grid Selection");
+    dlg->SetText("Select Domain and Grids");
+
+    this->DomainGridFrame = vtkKWLabeledFrame::New();
+    this->DomainGridFrame->SetParent(dlg->GetMessageDialogFrame());
+    this->DomainGridFrame->Create(pvApp, 0);
+    this->DomainGridFrame->SetLabel("Domain and Grids Selection");
 
     this->DomainMenu = vtkKWOptionMenu::New();
-    this->DomainMenu->SetParent(frame->GetFrame());
+    this->DomainMenu->SetParent(this->DomainGridFrame->GetFrame());
     this->DomainMenu->Create(pvApp, 0);
     this->UpdateDomains(res);
 
-    
-    this->GridMenu = vtkKWOptionMenu::New();
-    this->GridMenu->SetParent(frame->GetFrame());
-    this->GridMenu->Create(pvApp, 0);
+
+    this->GridSelection = vtkKWListBox::New();
+    this->GridSelection->SetParent(this->DomainGridFrame->GetFrame());
+    this->GridSelection->ScrollbarOn();
+    this->GridSelection->Create(pvApp, "-selectmode extended");
+    this->GridSelection->SetHeight(0);
     this->UpdateGrids(res);
 
+
     this->Script("%s configure -height 1", this->DomainMenu->GetWidgetName());
-    this->Script("%s configure -height 2", this->GridMenu->GetWidgetName());
     this->Script("pack %s -expand yes -fill x -side top -pady 2", 
-                 this->DomainMenu->GetWidgetName());
+      this->DomainMenu->GetWidgetName());
     this->Script("pack %s -expand yes -fill x -side top -pady 2", 
-                 this->GridMenu->GetWidgetName());
+      this->GridSelection->GetWidgetName());
     this->Script("pack %s -expand yes -fill x -side bottom -pady 2", 
-                 frame->GetWidgetName());
-    
+      this->DomainGridFrame->GetWidgetName());
+
+    if ( this->GridSelection->GetNumberOfItems() > 1 )
+      {
+      vtkKWPushButton* selectAllButton = vtkKWPushButton::New();
+      selectAllButton->SetParent(this->DomainGridFrame->GetFrame());
+      selectAllButton->SetLabel("Select All Grids");
+      selectAllButton->Create(pvApp, 0);
+      selectAllButton->SetCommand(this, "EnableAllGrids");
+      this->Script("pack %s -expand yes -fill x -side bottom -pady 2", 
+        selectAllButton->GetWidgetName());
+      selectAllButton->Delete();
+      }
+
     if ( dlg->Invoke() )
       {
       this->SetDomain(this->DomainMenu->GetValue());
-      this->SetGrid(this->GridMenu->GetValue());
+
+      for ( cc = 0; cc < this->GridSelection->GetNumberOfItems(); cc ++ )
+        {
+        if ( this->GridSelection->GetSelectState(cc) )
+          {
+          this->Internals->GridList[this->GridSelection->GetItem(cc)] = 1;
+          }
+        }
       }
 
-    frame->Delete();
-    dlg->Delete();
-    
     this->DomainMenu->Delete();
     this->DomainMenu = 0;
-    this->GridMenu->Delete();
-    this->GridMenu = 0;
-    
-    if ( this->Domain )
-      {
-      pm->ServerScript("%s SetDomainName \"%s\"", res, this->Domain);
-      }
-    
-    if ( this->Grid )
-      {
-      pm->ServerScript("%s SetGridName \"%s\"", res, this->Grid);
-      }
 
-    pm->ServerScript("%s UpdateInformation", res);
+
+    this->GridSelection->Delete();
+    this->GridSelection = 0;
+
+    this->DomainGridFrame->Delete();
+    this->DomainGridFrame = 0;
+
+    dlg->Delete();
+
     }
 
+  pm->ServerScript("%s UpdateInformation", res);
   if ( this->Domain )
     {
     pm->ServerScript("%s SetDomainName \"%s\"", 
-                     this->GetVTKSourceTclName(), 
-                     this->Domain);
+      res, 
+      this->Domain);
     pvApp->AddTraceEntry("$kw(%s) SetDomain {%s}", 
-                         this->GetTclName(), 
-                         this->Domain);
+      this->GetTclName(), 
+      this->Domain);
     }
-    
-  if ( this->Grid )
+
+  pm->ServerScript(
+    "%s UpdateInformation\n"
+    "%s DisableAllGrids", res, res);
+  vtkXDMFReaderModuleInternal::GridListType::iterator mit;
+  for ( mit = this->Internals->GridList.begin(); 
+    mit != this->Internals->GridList.end(); 
+    ++mit )
     {
-    pm->ServerScript("%s SetGridName \"%s\"", this->GetVTKSourceTclName(), 
-                           this->Grid);
-    pvApp->AddTraceEntry("$kw(%s) SetGrid {%s}", this->GetTclName(), this->Grid);
+    pm->ServerScript("%s EnableGrid {%s}", res, mit->first.c_str());
+    pvApp->AddTraceEntry("$kw(%s) EnableGrid {%s}", this->GetTclName(), mit->first.c_str());
     }
 
   int retVal = VTK_OK;
 
-  pm->ServerScript("%s UpdateInformation", this->GetVTKSourceTclName());
+  pm->ServerScript("%s UpdateInformation", res);
   retVal = this->InitializeClone(0, 1);
 
   if (retVal != VTK_OK)
@@ -231,17 +291,24 @@ void vtkXDMFReaderModule::UpdateGrids(const char* ob)
   pm->ServerScript("%s UpdateInformation", ob);
   pm->RootScript("%s GetNumberOfGrids", ob);
   num = atoi(pm->GetRootResult());
-  this->GridMenu->ClearEntries();
+  this->GridSelection->DeleteAll();
   for ( cc = 0; cc < num; cc ++ )
     {
     pm->RootScript("%s GetGridName %d", ob, cc);
     char* gname = vtkString::Duplicate(pm->GetRootResult());
-    this->GridMenu->AddEntry(gname);
-    if ( !cc )
-      {
-      this->GridMenu->SetValue(gname);
-      }
+    this->GridSelection->InsertEntry(cc, gname);
     delete [] gname;
+    }
+  this->GridSelection->SetSelectState(0, 1);
+  if ( this->GridSelection->GetNumberOfItems() < 6 )
+    {
+    this->GridSelection->SetHeight(this->GridSelection->GetNumberOfItems());
+    this->GridSelection->ScrollbarOff();
+    }
+  else
+    {
+    this->GridSelection->SetHeight(6);
+    this->GridSelection->ScrollbarOn();
     }
 }
 
@@ -289,10 +356,12 @@ void vtkXDMFReaderModule::SaveState(ofstream *file)
     *file << "$kw(" << this->GetTclName() << ") SetDomain " << this->Domain
           << endl;
     }
-  if ( this->Grid )
+  vtkXDMFReaderModuleInternal::GridListType::iterator mit;
+  for ( mit = this->Internals->GridList.begin(); 
+    mit != this->Internals->GridList.end(); 
+    ++mit )
     {
-    *file << "$kw(" << this->GetTclName() << ") SetGrid " << this->Grid
-          << endl;
+    *file << "$kw(" << this->GetTclName() << ") EnableGrid " << mit->first.c_str() << endl;
     }
   *file << "$kw(" << this->GetPVWindow()->GetTclName() << ") "
         << "ReadFileInformation $kw(" << this->GetTclName() << ") \""
@@ -320,9 +389,33 @@ void vtkXDMFReaderModule::SaveState(ofstream *file)
 }
 
 //----------------------------------------------------------------------------
+void vtkXDMFReaderModule::EnableAllGrids()
+{
+  int cc;
+  for ( cc = 0; cc < this->GridSelection->GetNumberOfItems(); cc ++ )
+    {
+    this->GridSelection->SetSelectState(cc, 1);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkXDMFReaderModule::EnableGrid(const char* grid)
+{
+  this->Internals->GridList[grid] = 1;
+}
+
+//----------------------------------------------------------------------------
 void vtkXDMFReaderModule::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
-  os << indent << "Grid: " << (this->Grid?this->Grid:"(none)") << endl;
   os << indent << "Domain: " << (this->Domain?this->Domain:"(none)") << endl;
+  vtkXDMFReaderModuleInternal::GridListType::iterator mit;
+  int cc = 0;
+  for ( mit = this->Internals->GridList.begin(); 
+    mit != this->Internals->GridList.end(); 
+    ++mit )
+    {
+    os << indent << "Enabled grid " << cc << " " << mit->first.c_str() << endl;
+    cc ++;
+    }
 }

@@ -62,6 +62,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVAdvancedReaderModule.h"
 
 class vtkKWOptionMenu;
+class vtkKWListBox;
+class vtkXDMFReaderModuleInternal;
 
 class VTK_EXPORT vtkXDMFReaderModule : public vtkPVAdvancedReaderModule
 {
@@ -85,20 +87,23 @@ public:
   virtual void SaveState(ofstream *file);
 
   vtkSetStringMacro(Domain);
-  vtkSetStringMacro(Grid);
 
   void UpdateGrids(const char*);
   void UpdateDomains(const char*);
+
+  void EnableGrid(const char* grid);
+  void EnableAllGrids();
 
 protected:
   vtkXDMFReaderModule();
   ~vtkXDMFReaderModule();
 
+  vtkKWLabeledFrame *DomainGridFrame;
   vtkKWOptionMenu *DomainMenu;
-  vtkKWOptionMenu *GridMenu;
+  vtkKWListBox* GridSelection;
 
-  char *Grid;
   char *Domain;
+  vtkXDMFReaderModuleInternal* Internals;
 
 private:
   vtkXDMFReaderModule(const vtkXDMFReaderModule&); // Not implemented
