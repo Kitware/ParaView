@@ -115,6 +115,11 @@ protected:
   // nodes) with the property values(s).
   virtual void AppendCommandToStream(
     vtkSMProxy*, vtkClientServerStream* stream, vtkClientServerID objectId );
+
+  // Description:
+  // If InformationOnly is set, uses the Command to get values
+  // from the server and assign them to the property.
+  virtual void UpdateInformation(int serverids, vtkClientServerID objectId);
   //ETX
 
   virtual int ReadXMLAttributes(vtkSMProxy* parent, 

@@ -17,12 +17,13 @@
 #include "vtkClientServerStream.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVXMLElement.h"
+#include "vtkProcessModule.h"
 
 #include <vtkstd/vector>
 #include "vtkStdString.h"
 
 vtkStandardNewMacro(vtkSMStringVectorProperty);
-vtkCxxRevisionMacro(vtkSMStringVectorProperty, "1.14");
+vtkCxxRevisionMacro(vtkSMStringVectorProperty, "1.15");
 
 struct vtkSMStringVectorPropertyInternals
 {
@@ -46,11 +47,6 @@ vtkSMStringVectorProperty::~vtkSMStringVectorProperty()
 //---------------------------------------------------------------------------
 void vtkSMStringVectorProperty::SetElementType(unsigned int idx, int type)
 {
-  if (this->IsReadOnly)
-    {
-    return;
-    }
-
   unsigned int size = this->Internals->ElementTypes.size();
   if (idx >= size)
     {
@@ -77,7 +73,7 @@ int vtkSMStringVectorProperty::GetElementType(unsigned int idx)
 void vtkSMStringVectorProperty::AppendCommandToStream(
   vtkSMProxy*, vtkClientServerStream* str, vtkClientServerID objectId )
 {
-  if (!this->Command || this->IsReadOnly)
+  if (!this->Command || this->InformationOnly)
     {
     return;
     }
@@ -133,6 +129,55 @@ void vtkSMStringVectorProperty::AppendCommandToStream(
         }
       *str << vtkClientServerStream::End;
       }
+    }
+}
+
+//---------------------------------------------------------------------------
+void vtkSMStringVectorProperty::UpdateInformation( 
+  int serverIds, vtkClientServerID objectId )
+{
+  if (!this->InformationOnly)
+    {
+    return;
+    }
+
+  vtkClientServerStream str;
+  str << vtkClientServerStream::Invoke 
+      << objectId << this->Command
+      << vtkClientServerStream::End;
+
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  pm->SendStream(vtkProcessModule::GetRootId(serverIds), str, 0);
+
+  const vtkClientServerStream& res =     
+    pm->GetLastResult(vtkProcessModule::GetRootId(serverIds));
+
+
+  int numMsgs = res.GetNumberOfMessages();
+  if (numMsgs < 1)
+    {
+    return;
+    }
+
+  int numArgs = res.GetNumberOfArguments(0);
+  if (numArgs < 1)
+    {
+    return;
+    }
+
+  int argType = res.GetArgumentType(0, 0);
+
+  if (argType == vtkClientServerStream::string_value)
+    {
+    const char* sres;
+    int retVal = res.GetArgument(0, 0, &sres);
+    if (!retVal)
+      {
+      vtkErrorMacro("Error getting argument.");
+      return;
+      }
+    this->SetNumberOfElements(1);
+    this->SetElement(0, sres);
     }
 }
 
@@ -193,11 +238,6 @@ void vtkSMStringVectorProperty::SetUncheckedElement(
 //---------------------------------------------------------------------------
 int vtkSMStringVectorProperty::SetElement(unsigned int idx, const char* value)
 {
-  if (this->IsReadOnly)
-    {
-    return 0;
-    }
-
   if (!value)
     {
     value = "";
