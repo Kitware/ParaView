@@ -211,9 +211,11 @@ protected:
 
   PanelSlot* GetPanelSlot(vtkKWUserInterfacePanel *panel);
   PanelSlot* GetPanelSlot(int id);
+  PanelSlot* GetPanelSlot(const char *panel_name);
   int HasPanel(vtkKWUserInterfacePanel *panel);
   int GetPanelId(vtkKWUserInterfacePanel *panel);
   vtkKWUserInterfacePanel* GetPanel(int id);
+  vtkKWUserInterfacePanel* GetPanel(const char *panel_name);
 
   //ETX
 
