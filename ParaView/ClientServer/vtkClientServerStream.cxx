@@ -2025,6 +2025,7 @@ const char* vtkClientServerStream::StreamToString() const
 {
   ostrstream ostr;
   this->StreamToString(ostr);
+  ostr << ends;
   if (ostr.str())
     {
     this->Internal->String = ostr.str();
