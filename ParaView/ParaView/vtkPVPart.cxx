@@ -67,7 +67,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPart);
-vtkCxxRevisionMacro(vtkPVPart, "1.33");
+vtkCxxRevisionMacro(vtkPVPart, "1.34");
 
 
 int vtkPVPartCommand(ClientData cd, Tcl_Interp *interp,
@@ -329,6 +329,13 @@ void vtkPVPart::InsertExtractPiecesIfNecessary()
   char *className = this->ClassNameInformation->GetVTKClassName();
   if (!strcmp(className, "vtkPolyData"))
     {
+    // Don't add anything if we are only using one processes.
+    // Image can still benifit from its cache so this check
+    // is specific for unstructured data.
+    if (pm->GetNumberOfPartitions() == 1)
+      {
+      return;
+      }  
     pm->ServerScript("%s UpdateInformation", this->VTKDataTclName);
     pm->RootScript("%s GetMaximumNumberOfPieces", this->VTKDataTclName);
     if (atoi(pm->GetRootResult()) != 1)
@@ -353,6 +360,13 @@ void vtkPVPart::InsertExtractPiecesIfNecessary()
     }
   else if (!strcmp(className, "vtkUnstructuredGrid"))
     {
+    // Don't add anything if we are only using one processes.
+    // Image can still benifit from its cache so this check
+    // is specific for unstructured data.
+    if (pm->GetNumberOfPartitions() == 1)
+      {
+      return;
+      }      
     pm->ServerScript("%s UpdateInformation", this->VTKDataTclName);
     pm->RootScript("%s GetMaximumNumberOfPieces", this->VTKDataTclName);
     if (atoi(pm->GetRootResult()) != 1)
