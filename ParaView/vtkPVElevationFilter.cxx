@@ -349,7 +349,6 @@ void vtkPVElevationFilter::ElevationParameterChanged()
   this->SetHighPoint(high[0], high[1], high[2]);
   this->SetScalarRange(range[0], range[1]);
   
-//  window->GetPreviousSource()->VisibilityOff();
   window->GetPreviousSource()->GetPVData()->GetActorComposite()->VisibilityOff();
   
   this->GetView()->Render();
@@ -358,7 +357,7 @@ void vtkPVElevationFilter::ElevationParameterChanged()
   
   ac = this->GetPVData()->GetActorComposite();
   window->GetMainView()->AddComposite(ac);
-  window->GetMainView()->SetSelectedComposite(ac);
+  window->GetMainView()->SetSelectedComposite(this);
 }
 
 //----------------------------------------------------------------------------

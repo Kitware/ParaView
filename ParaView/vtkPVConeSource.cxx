@@ -181,7 +181,7 @@ void vtkPVConeSource::ConeParameterChanged()
   
   ac = this->GetPVData()->GetActorComposite();
   window->GetMainView()->AddComposite(ac);
-  window->GetMainView()->SetSelectedComposite(ac);
+  window->GetMainView()->SetSelectedComposite(this);
 }
 
 //----------------------------------------------------------------------------

@@ -206,7 +206,6 @@ void vtkPVGlyph3D::ScaleFactorChanged()
   this->Glyph->Modified();
   this->Glyph->Update();
   
-//  window->GetPreviousSource()->VisibilityOff();
   window->GetPreviousSource()->GetPVData()->GetActorComposite()->VisibilityOff();
   
   this->GetView()->Render();
@@ -215,6 +214,6 @@ void vtkPVGlyph3D::ScaleFactorChanged()
   
   ac = this->GetPVData()->GetActorComposite();
   window->GetMainView()->AddComposite(ac);
-  window->GetMainView()->SetSelectedComposite(ac);
+  window->GetMainView()->SetSelectedComposite(this);
 }
 
