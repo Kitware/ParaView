@@ -1396,10 +1396,7 @@ int vtkPVWindow::CheckIfFileIsReadable(const char* fileName)
     {
     return VTK_ERROR;
     }
-  else
-    {
-    return VTK_OK;
-    }
+  return VTK_OK;
 }
 
 
@@ -1962,7 +1959,7 @@ void vtkPVWindow::UpdateSourceMenu()
   vtkArrayMapIterator<const char*, vtkPVSource*>* it = 
     this->Prototypes->NewIterator();
   vtkPVSource* proto;
-  const char* key;
+  const char* key = 0;
   int numFilters = 0;
   while ( !it->IsDoneWithTraversal() )
     {
@@ -2017,7 +2014,7 @@ void vtkPVWindow::UpdateFilterMenu()
     vtkArrayMapIterator<const char*, vtkPVSource*>* it = 
       this->Prototypes->NewIterator();
     vtkPVSource* proto;
-    const char* key;
+    const char* key = 0;
     int numSources = 0;
     while ( !it->IsDoneWithTraversal() )
       {

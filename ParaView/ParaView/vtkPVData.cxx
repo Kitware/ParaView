@@ -736,7 +736,8 @@ int vtkPVData::GetNumberOfCells()
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
   vtkMultiProcessController *controller = pvApp->GetController();
-  int tmp, numCells, id, numProcs;
+  int tmp = 0;
+  int numCells, id, numProcs;
   
   if (this->VTKData == NULL)
     {
@@ -763,7 +764,8 @@ int vtkPVData::GetNumberOfPoints()
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
   vtkMultiProcessController *controller = pvApp->GetController();
-  int tmp, numPoints, id, numProcs;
+  int tmp = 0;
+  int numPoints, id, numProcs;
   
   if (this->VTKData == NULL)
     {

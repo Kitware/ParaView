@@ -41,14 +41,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "vtkPVDataSetReaderModule.h"
 
-#include "vtkObjectFactory.h"
-#include "vtkPVData.h"
-#include "vtkPVWindow.h"
-#include "vtkPVRenderView.h"
-#include "vtkPDataSetReader.h"
-#include "vtkPVDataSetFileEntry.h"
 #include "vtkKWFrame.h"
+#include "vtkObjectFactory.h"
+#include "vtkPDataSetReader.h"
 #include "vtkPVApplication.h"
+#include "vtkPVData.h"
+#include "vtkPVDataSetFileEntry.h"
+#include "vtkPVRenderView.h"
+#include "vtkPVWindow.h"
+#include "vtkString.h"
 
 #include <ctype.h>
 
@@ -109,7 +110,7 @@ int vtkPVDataSetReaderModule::ReadFile(const char* fname,
 
   // Get the root name between the last slash and last period.
   slashPosition = 0;
-  extensionPosition = strlen(fname);
+  extensionPosition = vtkString::Length(fname);
   if ((extension = strrchr(fname, '.')))
     {
     extensionPosition = extension - fname;

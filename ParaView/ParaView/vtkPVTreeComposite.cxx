@@ -156,7 +156,7 @@ int vtkPVTreeComposite::ShouldIComposite()
   int numProcs;
   int myId;
   int dataFlag = 0;
-  int tmp;
+  int tmp = 0;
 
   if (this->Controller == NULL)
     {

@@ -639,7 +639,9 @@ void vtkPVProbe::UpdateProbe()
   
   vtkPolyData *probeOutput, *remoteProbeOutput = vtkPolyData::New();
   int error, i, k, numProcs, numComponents;
-  vtkIdType numPoints, numRemotePoints, j, pointId;
+  vtkIdType numPoints;
+  vtkIdType numRemotePoints = 0;
+  vtkIdType j, pointId;
   vtkIdTypeArray *validPoints = vtkIdTypeArray::New();
   vtkPointData *pointData, *remotePointData;
   float *tuple;

@@ -39,17 +39,18 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-#include "vtkKWApplication.h"
 #include "vtkPVTimerLogDisplay.h"
-#include "vtkKWPushButton.h"
-#include "vtkKWText.h"
-#include "vtkTimerLog.h"
-#include "vtkKWWindow.h"
-#include "vtkObjectFactory.h"
+
+#include "vtkKWApplication.h"
+#include "vtkKWCheckButton.h"
 #include "vtkKWLabel.h"
 #include "vtkKWOptionMenu.h"
-#include "vtkKWCheckButton.h"
-
+#include "vtkKWPushButton.h"
+#include "vtkKWText.h"
+#include "vtkKWWindow.h"
+#include "vtkObjectFactory.h"
+#include "vtkString.h"
+#include "vtkTimerLog.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVTimerLogDisplay );
@@ -449,7 +450,7 @@ void vtkPVTimerLogDisplay::Update()
       // Strings seemed to be put in recursively, so we run out of stack.
       char *start, *end;
       int count;
-      length = strlen(str);
+      length = vtkString::Length(str);
       count = 0;
       start = end = str;
       while (count < length)

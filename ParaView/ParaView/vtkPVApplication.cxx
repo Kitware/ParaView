@@ -338,7 +338,7 @@ void vtkPVApplication::RemoteSimpleScript(int remoteId, const char *str)
   int length;
 
   // send string to evaluate.
-  length = strlen(str) + 1;
+  length = vtkString::Length(str) + 1;
   if (length <= 1)
     {
     return;
@@ -374,7 +374,7 @@ void vtkPVApplication::BroadcastSimpleScript(const char *str)
   
   num = this->Controller->GetNumberOfProcesses();
 
-  int len = strlen(str);
+  int len = vtkString::Length(str);
   if (!str || (len < 1))
     {
     return;
@@ -931,7 +931,7 @@ void vtkPVApplication::CompleteArrays(vtkMapper *mapper, char *mapperTclName)
 {
   int i, j;
   int numProcs;
-  int nonEmptyFlag;
+  int nonEmptyFlag = 0;
   int activeAttributes[5];
 
   if (mapper->GetInput() == NULL || this->Controller == NULL ||
@@ -949,12 +949,12 @@ void vtkPVApplication::CompleteArrays(vtkMapper *mapper, char *mapperTclName)
     this->Controller->Receive(&nonEmptyFlag, 1, i, 987243);
     if (nonEmptyFlag)
       { // This process has data.  Receive all the arrays, type and component.
-      int num;
+      int num = 0;
       vtkDataArray *array = 0;
       char *name;
-      int nameLength;
-      int type;
-      int numComps;
+      int nameLength = 0;
+      int type = 0;
+      int numComps = 0;
       
       // First Point data.
       this->Controller->Receive(&num, 1, i, 987244);
@@ -1117,7 +1117,7 @@ void vtkPVApplication::SendCompleteArrays(vtkMapper *mapper)
       {
       name = "";
       }
-    nameLength = strlen(name)+1;
+    nameLength = vtkString::Length(name)+1;
     this->Controller->Send(&nameLength, 1, 0, 987247);
     // I am pretty sure that Send does not modify the string.
     this->Controller->Send(const_cast<char*>(name), nameLength, 0, 987248);
@@ -1142,7 +1142,7 @@ void vtkPVApplication::SendCompleteArrays(vtkMapper *mapper)
       {
       name = "";
       }
-    nameLength = strlen(name+1);
+    nameLength = vtkString::Length(name+1);
     this->Controller->Send(&nameLength, 1, 0, 987247);
     this->Controller->Send(const_cast<char*>(name), nameLength, 0, 987248);
     }

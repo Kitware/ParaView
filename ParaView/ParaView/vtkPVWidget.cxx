@@ -136,7 +136,7 @@ void vtkPVWidget::AddDependent(vtkPVWidget *pvw)
 
 void vtkPVWidget::RemoveDependent(vtkPVWidget *pvw)
 {
-  vtkIdType index;
+  vtkIdType index = 0;
 
   if ( this->Dependents->FindItem(pvw, index) == VTK_OK )
     {
