@@ -106,7 +106,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.279");
+vtkCxxRevisionMacro(vtkPVApplication, "1.280");
 vtkCxxSetObjectMacro(vtkPVApplication, RenderModule, vtkPVRenderModule);
 
 
@@ -412,6 +412,7 @@ Tcl_Interp *vtkPVApplication::InitializeTcl(int argc,
 //----------------------------------------------------------------------------
 vtkPVApplication::vtkPVApplication()
 {
+  this->CaveConfigurationFileName = 0;
   this->ApplicationInitialized = 0;
   this->MachinesFileName = 0;
   this->ProgressEnabled = 0;
