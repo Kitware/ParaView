@@ -51,7 +51,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // ---------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWScale );
-vtkCxxRevisionMacro(vtkKWScale, "1.44");
+vtkCxxRevisionMacro(vtkKWScale, "1.45");
 
 int vtkKWScaleCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -659,8 +659,17 @@ void vtkKWScale::SetValue(float num)
 
   if (this->Scale && this->Scale->IsCreated())
     {
+    int was_disabled = !this->Enabled;
+    if (was_disabled)
+      {
+      this->SetEnabled(1);
+      }
     this->Script("%s set %f", 
                  this->Scale->GetWidgetName(), num);
+    if (was_disabled)
+      {
+      this->SetEnabled(0);
+      }
     }
   
   if (this->Entry && this->Entry->IsCreated())
