@@ -28,7 +28,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCompositeRenderModule);
-vtkCxxRevisionMacro(vtkPVCompositeRenderModule, "1.12");
+vtkCxxRevisionMacro(vtkPVCompositeRenderModule, "1.13");
 
 
 //----------------------------------------------------------------------------
@@ -351,38 +351,40 @@ void vtkPVCompositeRenderModule::ComputeReductionFactor()
       {
       vtkPVTreeComposite *composite = 
         vtkPVTreeComposite::SafeDownCast( pm->GetObjectFromID( this->CompositeID ));
+      if( composite ) // we know this is a vtkPVTreeComposite
+        {
+        // Leave halve time for compositing.
+        renderTime = renderTime * 0.5;
+        // Try to factor in user preference.
+        renderTime = renderTime / (float)(this->ReductionFactor);
+        // Compute time for each pixel on the last render.
+        area = windowSize[0] * windowSize[1];
+        reductionFactor = (float)composite->GetImageReductionFactor();
+        reducedArea = (int)(area / (reductionFactor * reductionFactor));
+        getBuffersTime = composite->GetGetBuffersTime();
 
-      // Leave halve time for compositing.
-      renderTime = renderTime * 0.5;
-      // Try to factor in user preference.
-      renderTime = renderTime / (float)(this->ReductionFactor);
-      // Compute time for each pixel on the last render.
-      area = windowSize[0] * windowSize[1];
-      reductionFactor = (float)composite->GetImageReductionFactor();
-      reducedArea = (int)(area / (reductionFactor * reductionFactor));
-      getBuffersTime = composite->GetGetBuffersTime();
-      
-      setBuffersTime = composite->GetSetBuffersTime();
-      transmitTime = composite->GetCompositeTime();
+        setBuffersTime = composite->GetSetBuffersTime();
+        transmitTime = composite->GetCompositeTime();
 
-      // Do not consider SetBufferTime because 
-      //it is not dependent on reduction factor.,
-      timePerPixel = (getBuffersTime + transmitTime) / reducedArea;
-      newReductionFactor = sqrt(area * timePerPixel / renderTime);
-  
-      // Do not let the width go below 150.
-      maxReductionFactor = windowSize[0] / 150.0;
-      if (maxReductionFactor > this->ReductionFactor)
-        {
-        maxReductionFactor = this->ReductionFactor;
-        }
-      if (newReductionFactor > maxReductionFactor)
-        {
-        newReductionFactor = maxReductionFactor;
-        }
-      if (newReductionFactor < 1.0)
-        {
-        newReductionFactor = 1.0;
+        // Do not consider SetBufferTime because 
+        //it is not dependent on reduction factor.,
+        timePerPixel = (getBuffersTime + transmitTime) / reducedArea;
+        newReductionFactor = sqrt(area * timePerPixel / renderTime);
+
+        // Do not let the width go below 150.
+        maxReductionFactor = windowSize[0] / 150.0;
+        if (maxReductionFactor > this->ReductionFactor)
+          {
+          maxReductionFactor = this->ReductionFactor;
+          }
+        if (newReductionFactor > maxReductionFactor)
+          {
+          newReductionFactor = maxReductionFactor;
+          }
+        if (newReductionFactor < 1.0)
+          {
+          newReductionFactor = 1.0;
+          }
         }
       }
     }
