@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkXMLVolumePropertyWriter.h"
 
 vtkStandardNewMacro(vtkXMLVolumePropertyReader);
-vtkCxxRevisionMacro(vtkXMLVolumePropertyReader, "1.8");
+vtkCxxRevisionMacro(vtkXMLVolumePropertyReader, "1.9");
 
 //----------------------------------------------------------------------------
 char* vtkXMLVolumePropertyReader::GetRootElementName()
@@ -199,7 +199,7 @@ int vtkXMLVolumePropertyReader::Parse(vtkXMLDataElement *elem)
       vtkPiecewiseFunction *gtf = obj->GetGrayTransferFunction(c_idx);
       if (gtf)
         {
-        float function_range[2];
+        double function_range[2];
         function_range[0] = gtf->GetRange()[0];
         function_range[1] = gtf->GetRange()[1];
         
@@ -223,7 +223,7 @@ int vtkXMLVolumePropertyReader::Parse(vtkXMLDataElement *elem)
       vtkColorTransferFunction *rgbtf = obj->GetRGBTransferFunction(c_idx);
       if (rgbtf)
         {
-        float function_range[2];
+        double function_range[2];
         rgbtf->GetRange(function_range);
 
         xmlctfr->SetObject(rgbtf);
@@ -263,7 +263,7 @@ int vtkXMLVolumePropertyReader::Parse(vtkXMLDataElement *elem)
       vtkPiecewiseFunction *sotf = obj->GetScalarOpacity(c_idx);
       if (sotf)
         {
-        float function_range[2];
+        double function_range[2];
         function_range[0] = sotf->GetRange()[0];
         function_range[1] = sotf->GetRange()[1];
 
@@ -293,7 +293,7 @@ int vtkXMLVolumePropertyReader::Parse(vtkXMLDataElement *elem)
       vtkPiecewiseFunction *gotf = obj->GetStoredGradientOpacity(c_idx);
       if (gotf)
         {
-        float function_range[2];
+        double function_range[2];
         function_range[0] = gotf->GetRange()[0];
         function_range[1] = gotf->GetRange()[1];
 

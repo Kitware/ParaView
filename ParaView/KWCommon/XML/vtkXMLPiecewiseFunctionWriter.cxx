@@ -40,7 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkXMLDataElement.h"
 
 vtkStandardNewMacro(vtkXMLPiecewiseFunctionWriter);
-vtkCxxRevisionMacro(vtkXMLPiecewiseFunctionWriter, "1.3");
+vtkCxxRevisionMacro(vtkXMLPiecewiseFunctionWriter, "1.4");
 
 //----------------------------------------------------------------------------
 char* vtkXMLPiecewiseFunctionWriter::GetRootElementName()
@@ -94,7 +94,7 @@ int vtkXMLPiecewiseFunctionWriter::AddNestedElements(vtkXMLDataElement *elem)
   // Iterate over all points and create a point XML data element for each one
 
   int size = obj->GetSize();
-  float *data_ptr = obj->GetDataPointer();
+  double *data_ptr = obj->GetDataPointer();
 
   if (size && data_ptr)
     {
@@ -104,8 +104,8 @@ int vtkXMLPiecewiseFunctionWriter::AddNestedElements(vtkXMLDataElement *elem)
       elem->AddNestedElement(point_elem);
       point_elem->Delete();
       point_elem->SetName(this->GetPointElementName());
-      point_elem->SetFloatAttribute("X", data_ptr[0]);
-      point_elem->SetFloatAttribute("Value", data_ptr[1]);
+      point_elem->SetDoubleAttribute("X", data_ptr[0]);
+      point_elem->SetDoubleAttribute("Value", data_ptr[1]);
       }
     }
 
