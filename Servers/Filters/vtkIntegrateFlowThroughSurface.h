@@ -54,8 +54,7 @@ protected:
   void ComputeInputUpdateExtent();
 
 private:
-  // Not implemented.
-  vtkIntegrateFlowThroughSurface(const vtkIntegrateFlowThroughSurface&);  
+  vtkIntegrateFlowThroughSurface(const vtkIntegrateFlowThroughSurface&); // Not implemented.
   void operator=(const vtkIntegrateFlowThroughSurface&);  // Not implemented.
 };
 
