@@ -60,9 +60,14 @@
   #include "vtkAVIWriter.h"
 #endif
 
+#if !defined(_WIN32) || defined(__CYGWIN__)
+# include <unistd.h> /* unlink */
+#else
+# include <io.h> /* unlink */
+#endif
 
 vtkStandardNewMacro(vtkPVAnimationScene);
-vtkCxxRevisionMacro(vtkPVAnimationScene, "1.2");
+vtkCxxRevisionMacro(vtkPVAnimationScene, "1.3");
 #define VTK_PV_PLAYMODE_SEQUENCE_TITLE "Sequence"
 #define VTK_PV_PLAYMODE_REALTIME_TITLE "Real Time"
 //*****************************************************************************
