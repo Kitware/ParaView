@@ -111,12 +111,13 @@ public:
 
   // Description:
   // Access to individual parts.
+  void AddPVPart(vtkPVPart *part);
   void SetPVPart(vtkPVPart *part);
   vtkPVPart *GetPVPart() {return this->GetPVPart(0);} 
   vtkPVPart *GetPVPart(int idx); 
+  int GetNumberOfPVParts();
   // This will create and set the part.
   void SetVTKData(vtkDataSet *data, const char *name);
-
 
   // Description:
   // Get the number of consumers
@@ -189,10 +190,15 @@ public:
   void OpacityChangedEndCallback();
 
   // Description:
-  // Create the properties object, called by UpdateProperties.
+  // Create the user interface.
   void CreateProperties();
-  void UpdateProperties();
   
+  // Description:
+  // This updates the user interface.  It checks first to see if the
+  // data has changed.  If nothing has changes, it is smart enough
+  // to do nothing.
+  void UpdateProperties();
+
   // Description:
   // This method should be called immediately after the object is constructed.
   // It create VTK objects which have to exeist on all processes.
@@ -347,14 +353,11 @@ public:
 
   // Description:
   // Moving away from direct access to VTK data objects.
-  vtkPVDataInformation* GetDataInformation() {return this->DataInformation;}
+  vtkPVDataInformation* GetDataInformation();
   
   // Description:
-  // This method collects data information from all processes.
-  // This needs to be called before this parts information
-  // is valid.
-  void GatherDataInformation();
-
+  // Called by source EndEvent to schedule another Gather.
+  void InvalidateDataInformation();
 
 protected:
   vtkPVData();
@@ -367,7 +370,12 @@ protected:
   int InstanceCount;
   vtkCollection *PVParts;
 
+  // Description:
+  // This method collects data information from all processes.
+  void GatherDataInformation();
+  void UpdatePropertiesInternal();
   vtkPVDataInformation *DataInformation;
+  int DataInformationValid;
   
   // This points to the source widget that owns this data widget.
   vtkPVSource *PVSource;
@@ -431,9 +439,6 @@ protected:
   // color map "UseCount".
   int Visibility;
     
-  // If the data changes, we need to change to.
-  vtkTimeStamp UpdateTime;
-
   // True if CreateProperties() has been called.
   int PropertiesCreated;
 

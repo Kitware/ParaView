@@ -50,7 +50,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVMinMax);
-vtkCxxRevisionMacro(vtkPVMinMax, "1.15");
+vtkCxxRevisionMacro(vtkPVMinMax, "1.16");
 
 //----------------------------------------------------------------------------
 vtkPVMinMax::vtkPVMinMax()
@@ -265,7 +265,7 @@ void vtkPVMinMax::SetMaxValue(float val)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVMinMax::Accept()
+void vtkPVMinMax::Accept(const char* sourceTclName)
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
 
@@ -278,7 +278,7 @@ void vtkPVMinMax::Accept()
     }
 
   pvApp->BroadcastScript("%s %s %f %f",
-                         this->ObjectTclName, this->SetCommand,
+                         sourceTclName, this->SetCommand,
                          this->GetMinValue(), this->GetMaxValue());
 
   this->ModifiedFlag = 0;
@@ -286,32 +286,55 @@ void vtkPVMinMax::Accept()
 
 
 //----------------------------------------------------------------------------
-void vtkPVMinMax::Reset()
+void vtkPVMinMax::Accept()
+{
+  this->Accept(this->ObjectTclName);
+}
+
+
+//----------------------------------------------------------------------------
+void vtkPVMinMax::Reset(const char* sourceTclName)
 {
   if ( this->MinScale->IsCreated() )
     {
     // Command to update the UI.
     this->Script("%s SetValue [%s %s]", this->MinScale->GetTclName(), 
-                 this->ObjectTclName, this->GetMinCommand); 
+                 sourceTclName, this->GetMinCommand); 
     this->Script("%s SetValue [%s %s]", this->MaxScale->GetTclName(), 
-                 this->ObjectTclName, this->GetMaxCommand); 
+                 sourceTclName, this->GetMaxCommand); 
     }
   this->ModifiedFlag = 0;
 }
 
 
+//----------------------------------------------------------------------------
+void vtkPVMinMax::Reset()
+{
+  this->Reset(this->ObjectTclName);
+}
+
+
+//----------------------------------------------------------------------------
 void vtkPVMinMax::SetResolution(float res)
 {
   this->MinScale->SetResolution(res);
   this->MaxScale->SetResolution(res);
 }
 
+//----------------------------------------------------------------------------
 void vtkPVMinMax::SetRange(float min, float max)
 {
   this->MinScale->SetRange(min, max);
   this->MaxScale->SetRange(min, max);
 }
 
+//----------------------------------------------------------------------------
+void vtkPVMinMax::GetRange(float range[2])
+{
+  this->MinScale->GetRange(range);
+}
+
+//----------------------------------------------------------------------------
 void vtkPVMinMax::MinValueCallback()
 {
   if (this->MinScale->GetValue() > this->MaxScale->GetValue())

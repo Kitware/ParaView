@@ -62,7 +62,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPart);
-vtkCxxRevisionMacro(vtkPVPart, "1.1");
+vtkCxxRevisionMacro(vtkPVPart, "1.2");
 
 int vtkPVPartCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -72,6 +72,8 @@ int vtkPVPartCommand(ClientData cd, Tcl_Interp *interp,
 vtkPVPart::vtkPVPart()
 {
   this->CommandFunction = vtkPVPartCommand;
+
+  this->Name = NULL;
 
   this->DataInformation = vtkPVDataInformation::New();
   this->VTKData = NULL;
@@ -110,6 +112,8 @@ vtkPVPart::~vtkPVPart()
                                               this->VTKDataTclName);
     }  
     
+  this->SetName(NULL);
+
   this->DataInformation->Delete();
   this->DataInformation = NULL;
   this->SetVTKData(NULL, NULL);
@@ -212,9 +216,9 @@ void vtkPVPart::CreateParallelTclObjects(vtkPVApplication *pvApp)
   pvApp->BroadcastScript("vtkPVGeometryFilter %s", tclName);
   this->SetGeometryTclName(tclName);
   // Keep track of how long each geometry filter takes to execute.
-  pvApp->BroadcastScript("%s AddObserver StartMethod {$Application LogStartEvent "
+  pvApp->BroadcastScript("%s AddObserver StartEvent {$Application LogStartEvent "
                          "{Execute Geometry}}", this->GeometryTclName);
-  pvApp->BroadcastScript("%s AddObserver EndMethod {$Application LogEndEvent "
+  pvApp->BroadcastScript("%s AddObserver EndEvent {$Application LogEndEvent "
                          "{Execute Geometry}}", this->GeometryTclName);
 
 
@@ -224,9 +228,9 @@ void vtkPVPart::CreateParallelTclObjects(vtkPVApplication *pvApp)
   this->LODDeciTclName = NULL;
   this->SetLODDeciTclName(tclName);
   // Keep track of how long each decimation filter takes to execute.
-  pvApp->BroadcastScript("%s AddObserver StartMethod {$Application LogStartEvent {Execute Decimate}}", 
+  pvApp->BroadcastScript("%s AddObserver StartEvent {$Application LogStartEvent {Execute Decimate}}", 
                          this->LODDeciTclName);
-  pvApp->BroadcastScript("%s AddObserver EndMethod {$Application LogEndEvent {Execute Decimate}}", 
+  pvApp->BroadcastScript("%s AddObserver EndEvent {$Application LogEndEvent {Execute Decimate}}", 
                          this->LODDeciTclName);
   // The input of course is the geometry filter.
   pvApp->BroadcastScript("%s SetInput [%s GetOutput]", 
@@ -264,9 +268,9 @@ void vtkPVPart::CreateParallelTclObjects(vtkPVApplication *pvApp)
   this->SetCollectTclName(tclName);
   pvApp->BroadcastScript("%s SetInput [%s GetOutput]", 
                          this->CollectTclName, this->GeometryTclName);
-  pvApp->BroadcastScript("%s AddObserver StartMethod {$Application LogStartEvent {Execute Collect}}", 
+  pvApp->BroadcastScript("%s AddObserver StartEvent {$Application LogStartEvent {Execute Collect}}", 
                          this->CollectTclName);
-  pvApp->BroadcastScript("%s AddObserver EndMethod {$Application LogEndEvent {Execute Collect}}", 
+  pvApp->BroadcastScript("%s AddObserver EndEvent {$Application LogEndEvent {Execute Collect}}", 
                          this->CollectTclName);
   //
   // ===== LOD branch:
@@ -290,9 +294,9 @@ void vtkPVPart::CreateParallelTclObjects(vtkPVApplication *pvApp)
   this->SetLODCollectTclName(tclName);
   pvApp->BroadcastScript("%s SetInput [%s GetOutput]", 
                          this->LODCollectTclName, this->LODDeciTclName);
-  pvApp->BroadcastScript("%s AddObserver StartMethod {$Application LogStartEvent {Execute LODCollect}}", 
+  pvApp->BroadcastScript("%s AddObserver StartEvent {$Application LogStartEvent {Execute LODCollect}}", 
                          this->LODCollectTclName);
-  pvApp->BroadcastScript("%s AddObserver EndMethod {$Application LogEndEvent {Execute LODCollect}}", 
+  pvApp->BroadcastScript("%s AddObserver EndEvent {$Application LogEndEvent {Execute LODCollect}}", 
                          this->LODCollectTclName);
 #endif
 
@@ -389,6 +393,47 @@ void vtkPVPart::GatherDataInformation()
   vtkPVProcessModule *pm = pvApp->GetProcessModule();
 
   pm->GatherDataInformation(this->DataInformation, this->VTKDataTclName);
+
+  // Look for a name defined in Field data.
+  this->SetName(this->DataInformation->GetName());
+
+  // I would like to have all sources generate names and all filters
+  // Pass the field data, but until all is working well, this is a default.
+  if (this->Name == NULL)
+    {
+    char str[100];
+    if (this->DataInformation->GetDataSetType() == VTK_POLY_DATA)
+      {
+      sprintf(str, "Polygonal: %d cells", this->DataInformation->GetNumberOfCells());
+      }
+    else if (this->DataInformation->GetDataSetType() == VTK_UNSTRUCTURED_GRID)
+      {
+      sprintf(str, "Unstructured Grid: %d cells", this->DataInformation->GetNumberOfCells());
+      }
+    else if (this->DataInformation->GetDataSetType() == VTK_IMAGE_DATA)
+      {
+      int *ext = this->DataInformation->GetExtent();
+      sprintf(str, "Uniform Rectilinear: extent (%d, %d) (%d, %d) (%d, %d)", 
+              ext[0], ext[1], ext[2], ext[3], ext[4], ext[5]);
+      }
+    else if (this->DataInformation->GetDataSetType() == VTK_RECTILINEAR_GRID)
+      {
+      int *ext = this->DataInformation->GetExtent();
+      sprintf(str, "Nonuniform Rectilinear: extent (%d, %d) (%d, %d) (%d, %d)", 
+              ext[0], ext[1], ext[2], ext[3], ext[4], ext[5]);
+      }
+    else if (this->DataInformation->GetDataSetType() == VTK_STRUCTURED_GRID)
+      {
+      int *ext = this->DataInformation->GetExtent();
+      sprintf(str, "Curvilinear: extent (%d, %d) (%d, %d) (%d, %d)", 
+              ext[0], ext[1], ext[2], ext[3], ext[4], ext[5]);
+      }
+    else
+      {
+      sprintf(str, "Part of unknown type");
+      }    
+    this->SetName(str);
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -410,8 +455,6 @@ void vtkPVPart::SetPVApplication(vtkPVApplication *pvApp)
 
 
 //----------------------------------------------------------------------------
-// Tcl does the reference counting, so we are not going to put an 
-// additional reference of the data.
 void vtkPVPart::SetVTKData(vtkDataSet *data, const char *tclName)
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
@@ -424,17 +467,28 @@ void vtkPVPart::SetVTKData(vtkDataSet *data, const char *tclName)
   
   if (this->VTKDataTclName)
     {
-    pvApp->BroadcastScript("%s Delete", this->VTKDataTclName);
     delete [] this->VTKDataTclName;
     this->VTKDataTclName = NULL;
-    this->VTKData = NULL;
     }
   if (tclName)
     {
     this->VTKDataTclName = new char[strlen(tclName) + 1];
     strcpy(this->VTKDataTclName, tclName);
+    // Connect the data to the pipeline for displaying the data.
+    pvApp->BroadcastScript("%s SetInput %s",
+                           this->GeometryTclName,
+                           this->VTKDataTclName);
+    }
+
+  if (this->VTKData)
+    {
+    this->VTKData->UnRegister(this);
+    this->VTKData = NULL;
+    }
+  if (data)
+    {
     this->VTKData = data;
-    
+    data->Register(this);
     }
 }
 
@@ -449,12 +503,11 @@ void vtkPVPart::Update()
                          this->VTKDataTclName, 
                          this->MapperTclName, this->MapperTclName);
   pvApp->BroadcastScript("%s Update", this->VTKDataTclName);
-  //this->GatherDataInformation();
 }
 
 
 //----------------------------------------------------------------------------
-void vtkPVPart::InsertExtractPiecesIfNecessary(char *sourceTclName)
+void vtkPVPart::InsertExtractPiecesIfNecessary()
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
 
@@ -502,37 +555,18 @@ void vtkPVPart::InsertExtractPiecesIfNecessary(char *sourceTclName)
     return;
     }
 
-  if (sourceTclName)
-    {
-    pvApp->BroadcastSimpleScript("pvTemp SetInput [pvTemp GetOutput]");
-    pvApp->BroadcastScript("pvTemp SetOutput %s", this->VTKDataTclName);
-    pvApp->BroadcastScript("%s SetOutput [pvTemp GetInput]",
-                           sourceTclName);
-    pvApp->BroadcastSimpleScript("[pvTemp GetInput] ReleaseDataFlagOn");
-    // Now delete Tcl's reference to the piece filter.
-    pvApp->BroadcastSimpleScript("pvTemp Delete");
-    return;
-    }
-
-  // No source, just create new static data.
-  // This happens with data set reader.
-  if (this->VTKData->IsA("vtkPolyData"))
-    {
-    pvApp->BroadcastSimpleScript("vtkPolyData pvTempOut");
-    }
-  else if (this->VTKData->IsA("vtkUnstructuredGrid"))
-    {
-    pvApp->BroadcastSimpleScript("vtkUnstructuredGrid pvTempOut");
-    }
-
-  pvApp->BroadcastScript("pvTempOut ShallowCopy %s", this->VTKDataTclName);
-  pvApp->BroadcastSimpleScript("pvTemp SetInput pvTempOut");
-  pvApp->BroadcastScript("pvTemp SetOutput %s", this->VTKDataTclName);
-
+  // Connect the filter to the pipeline.
+  pvApp->BroadcastScript("pvTemp SetInput %s", this->VTKDataTclName);
+  // Set the output name to point to the new data object.
+  // This is a bit of a hack because we have to strip the '$' off of the current name.
+  pvApp->BroadcastScript("set %s [pvTemp GetOutput]", this->VTKDataTclName+1);
+  
+  // Record the name (doesn't change) and pointer of the new output.
+  this->Script("%s SetVTKData %s {%s}", this->GetTclName(),
+               this->VTKDataTclName, this->VTKDataTclName);
 
   // Now delete Tcl's reference to the piece filter.
   pvApp->BroadcastSimpleScript("pvTemp Delete");
-  pvApp->BroadcastSimpleScript("pvTempOut Delete");
 }
 
 
@@ -562,6 +596,7 @@ vtkPVApplication* vtkPVPart::GetPVApplication()
 void vtkPVPart::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
+  os << indent << "Name: " << (this->Name?this->Name:"none") << endl;
   os << indent << "GeometryTclName: " << (this->GeometryTclName?this->GeometryTclName:"none") << endl;
   os << indent << "LODMapperTclName: " << (this->LODMapperTclName?this->LODMapperTclName:"none") << endl;
   os << indent << "Mapper: " << this->GetMapper() << endl;

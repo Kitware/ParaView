@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVContainerWidget);
-vtkCxxRevisionMacro(vtkPVContainerWidget, "1.10");
+vtkCxxRevisionMacro(vtkPVContainerWidget, "1.11");
 
 int vtkPVContainerWidgetCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -110,7 +110,33 @@ void vtkPVContainerWidget::Create(vtkKWApplication *app)
 
 
 //----------------------------------------------------------------------------
-void vtkPVContainerWidget::Accept()
+int vtkPVContainerWidget::GetModifiedFlag()
+{
+  if (this->ModifiedFlag)
+    {
+    return 1;
+    }
+
+  vtkLinkedListIterator<vtkPVWidget*>* it = this->Widgets->NewIterator();
+  vtkPVWidget* widget;
+  while ( !it->IsDoneWithTraversal() )
+    {
+    widget = 0;
+    it->GetData(widget);
+    if (widget && widget->GetModifiedFlag())
+      {
+      return 1;
+      }
+    it->GoToNextItem();
+    }
+  it->Delete();
+
+  return 0;
+}
+
+
+//----------------------------------------------------------------------------
+void vtkPVContainerWidget::Accept(const char* sourceTclName)
 {
   vtkLinkedListIterator<vtkPVWidget*>* it = this->Widgets->NewIterator();
   vtkPVWidget* widget;
@@ -120,7 +146,7 @@ void vtkPVContainerWidget::Accept()
     it->GetData(widget);
     if (widget)
       {
-      widget->Accept();
+      widget->Accept(sourceTclName);
       }
     it->GoToNextItem();
     }
@@ -128,10 +154,14 @@ void vtkPVContainerWidget::Accept()
 
   this->ModifiedFlag = 0;
 }
-
+//----------------------------------------------------------------------------
+void vtkPVContainerWidget::Accept()
+{
+  vtkErrorMacro("Accept requires a source name.");
+}
 
 //----------------------------------------------------------------------------
-void vtkPVContainerWidget::Reset()
+void vtkPVContainerWidget::Reset(const char* sourceTclName)
 {
 
   vtkLinkedListIterator<vtkPVWidget*>* it = this->Widgets->NewIterator();
@@ -142,13 +172,18 @@ void vtkPVContainerWidget::Reset()
     it->GetData(widget);
     if (widget)
       {
-      widget->Reset();
+      widget->Reset(sourceTclName);
       }
     it->GoToNextItem();
     }
   it->Delete();
 
   this->ModifiedFlag = 0;
+}
+//----------------------------------------------------------------------------
+void vtkPVContainerWidget::Reset()
+{
+  vtkErrorMacro("Reset requires a source name.");
 }
 
 //----------------------------------------------------------------------------

@@ -113,7 +113,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.173");
+vtkCxxRevisionMacro(vtkPVApplication, "1.174");
 
 
 int vtkPVApplicationCommand(ClientData cd, Tcl_Interp *interp,
@@ -1385,7 +1385,6 @@ void vtkPVApplication::DisplayHelp(vtkKWWindow* master)
   char loc[1024];
   struct stat fs;
 
-  vtkKWRegisteryUtilities *reg = this->GetRegistery();
   if (!this->GetRegisteryValue(2, "Setup", "InstalledPath", 0))
     {
     this->GetRegistery()->SetGlobalScope(1);

@@ -40,7 +40,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 // .NAME vtkPVPointSourceWidget -  a PointWidget which contains a separate point source
-// .SECTION Description
 // This widget contains a vtkPointWidget as well as a vtkPointSource. 
 // This vtkPointSource (which is created on all processes) can be used as 
 // input or source to filters (for example as streamline seed).
@@ -77,13 +76,19 @@ public:
   vtkGetObjectMacro(NumberOfPointsWidget, vtkPVVectorEntry);
 
   // Description:
+  // Returns if any subwidgets are modified.
+  virtual int GetModifiedFlag();
+
+  // Description:
   // The methods get called when the Accept button is pressed. 
   // It sets the VTK objects value using this widgets value.
+  virtual void Accept(const char* sourceTclName);
   virtual void Accept();
 
   // Description:
   // The methods get called when the Reset button is pressed. 
   // It sets this widgets value using the VTK objects value.
+  virtual void Reset(const char* sourceTclName);
   virtual void Reset();
 
   // Description:

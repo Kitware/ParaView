@@ -45,6 +45,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // When the button is pressed, the list is displayed in the form of a menu.
 // The user can select a new value from the menu.
 
+// This class is not named correctly.  It should be selection menu.
+
 
 #ifndef __vtkPVSelectionList_h
 #define __vtkPVSelectionList_h

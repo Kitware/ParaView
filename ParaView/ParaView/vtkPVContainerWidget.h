@@ -70,16 +70,23 @@ public:
   // Add widgets to the possible selection.  The vtkValue
   // is value used to set the vtk object variable.
   void AddPVWidget(vtkPVWidget *pvw);
-  
+
+  // Description:
+  // This method considers all contained widgets 
+  // when computing the modified flag.
+  virtual GetModifiedFlag();  
+
   // Description:
   // Called when accept button is pushed.
   // Adds to the trace file and sets the objects variable from UI.
   virtual void Accept();
+  virtual void Accept(const char* sourceTclName);
 
   // Description:
   // Called when reset button is pushed.
   // Sets UI current value from objects variable.
   virtual void Reset();
+  virtual void Reset(const char* sourceTclName);
 
   // Description:
   // This method is called when the source that contains this widget

@@ -61,7 +61,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVArrayMenu);
-vtkCxxRevisionMacro(vtkPVArrayMenu, "1.33");
+vtkCxxRevisionMacro(vtkPVArrayMenu, "1.34");
 
 vtkCxxSetObjectMacro(vtkPVArrayMenu, InputMenu, vtkPVInputMenu);
 
@@ -380,10 +380,10 @@ void vtkPVArrayMenu::SetSelectedComponent(int comp)
   this->ModifiedCallback();
   this->vtkPVWidget::Update();
 }
-
+ 
 
 //----------------------------------------------------------------------------
-void vtkPVArrayMenu::Accept()
+void vtkPVArrayMenu::Accept(const char* sourceTclName)
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
   const char* attributeName;
@@ -396,12 +396,7 @@ void vtkPVArrayMenu::Accept()
     return;
     }
 
-  if ( ! this->ModifiedFlag)
-    {
-    return;
-    }
-
-  if (this->InputName == NULL || this->ObjectTclName == NULL)
+  if (this->InputName == NULL || sourceTclName == NULL)
     {
     vtkDebugMacro("Access names have not all been set.");
     return;
@@ -410,27 +405,33 @@ void vtkPVArrayMenu::Accept()
   if (this->ArrayName)
     {
     pvApp->BroadcastScript("%s Select%s%s {%s}", 
-                           this->ObjectTclName,
+                           sourceTclName,
                            this->InputName,
                            attributeName,
                            this->ArrayName);
-    this->AddTraceEntry("$kw(%s) SetValue {%s}", 
-                        this->GetTclName(), 
-                        this->ArrayName);
+    if (this->ModifiedFlag)
+      {  // Trace the first source.
+      this->AddTraceEntry("$kw(%s) SetValue {%s}", 
+                          this->GetTclName(), 
+                          this->ArrayName);
+      }
     }
   else
     {
     pvApp->BroadcastScript("%s Select%s%s {}", 
-                           this->ObjectTclName,
+                           sourceTclName,
                            this->InputName,
                            attributeName);
-    this->AddTraceEntry("$kw(%s) SetValue {}", this->GetTclName());
+    if (this->ModifiedFlag)
+      {  // Trace the first source.
+      this->AddTraceEntry("$kw(%s) SetValue {}", this->GetTclName());
+      }
     }
 
   if (this->ShowComponentMenu)
     {
     pvApp->BroadcastScript("%s Select%s%sComponent %d", 
-                           this->ObjectTclName,
+                           sourceTclName,
                            this->InputName,
                            attributeName,
                            this->SelectedComponent);
@@ -444,7 +445,13 @@ void vtkPVArrayMenu::Accept()
 
 
 //----------------------------------------------------------------------------
-void vtkPVArrayMenu::Reset()
+void vtkPVArrayMenu::Accept()
+{
+  this->Accept(this->ObjectTclName);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVArrayMenu::Reset(const char* sourceTclName)
 {
   const char* attributeName;
 
@@ -456,7 +463,7 @@ void vtkPVArrayMenu::Reset()
     return;
     }
 
-  if (this->InputName == NULL || this->ObjectTclName == NULL)
+  if (this->InputName == NULL || sourceTclName == NULL)
     {
     vtkDebugMacro("Access names have not all been set.");
     return;
@@ -465,7 +472,7 @@ void vtkPVArrayMenu::Reset()
   // Get the selected array form the VTK filter.
   this->Script("%s SetArrayName [%s Get%s%sSelection]",
                this->GetTclName(), 
-               this->ObjectTclName,
+               sourceTclName,
                this->InputName,
                attributeName);
   
@@ -475,13 +482,19 @@ void vtkPVArrayMenu::Reset()
     {
     this->Script("%s SetSelectedComponent [%s Get%s%sComponentSelection]",
                  this->GetTclName(), 
-                 this->ObjectTclName,
+                 sourceTclName,
                  this->InputName,
                  attributeName);
     }
 
   this->ModifiedFlag = 0;
   this->Update();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVArrayMenu::Reset()
+{
+  this->Reset(this->ObjectTclName);
 }
 
 //----------------------------------------------------------------------------
@@ -557,8 +570,6 @@ void vtkPVArrayMenu::UpdateArrayMenu()
     vtkErrorMacro("Input menu has not been set.");
     return;
     } 
-
-  this->InputMenu->CompleteArrays();
 
   pvd = this->InputMenu->GetPVData();
   if (pvd == NULL)

@@ -58,7 +58,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //---------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVExtractGeometryByScalar);
-vtkCxxRevisionMacro(vtkPVExtractGeometryByScalar, "1.9");
+vtkCxxRevisionMacro(vtkPVExtractGeometryByScalar, "1.10");
 
 int vtkPVExtractGeometryByScalarCommand(ClientData cd, Tcl_Interp *interp,
                                         int argc, char *argv[]);
@@ -89,7 +89,7 @@ void vtkPVExtractGeometryByScalar::CreateProperties()
   select->SetPVSource(this);
   select->SetParent(this->GetParameterFrame()->GetFrame());
   select->SetModifiedCommand(this->GetTclName(), "SetAcceptButtonColorToRed");
-  select->SetObjectVariable(this->VTKSourceTclName, "Value");
+  select->SetObjectVariable(this->GetVTKSourceTclName(), "Value");
   
   float range[2];
   vtkPVArrayInformation *ai;

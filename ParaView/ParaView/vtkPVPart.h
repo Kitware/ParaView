@@ -102,7 +102,7 @@ public:
   // has a maximum number of pieces, then a extract piece filter is inserted
   // before the data object.  This will give parallel pipelines at the
   // expense of initial generation (reading) of the data.
-  void InsertExtractPiecesIfNecessary(char *sourceTclName);
+  void InsertExtractPiecesIfNecessary();
   
   //===================
   
@@ -153,10 +153,19 @@ public:
   // is valid.
   void GatherDataInformation();
 
+  // Description:
+  // The name is just a string that will be used in the extract part UI.
+  vtkSetStringMacro(Name);
+  vtkGetStringMacro(Name);
+
 protected:
   vtkPVPart();
   ~vtkPVPart();
   
+  // A part needs a name to show in the extract part filter.
+  // We are also going to allow expresion matching.
+  char *Name;
+
   vtkPVDataInformation *DataInformation;
   
   vtkDataSet *VTKData;

@@ -74,7 +74,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVColorMap);
-vtkCxxRevisionMacro(vtkPVColorMap, "1.42");
+vtkCxxRevisionMacro(vtkPVColorMap, "1.43");
 
 int vtkPVColorMapCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -909,8 +909,8 @@ void vtkPVColorMap::BackButtonCallback()
     return;
     }
 
+  // This has a side effect of gathering and display information.
   this->PVRenderView->GetPVWindow()->GetCurrentPVData()->UpdateProperties();
-
   this->PVRenderView->GetPVWindow()->ShowCurrentSourceProperties();
 }
 
@@ -980,6 +980,14 @@ void vtkPVColorMap::ScalarBarTitleEntryCallback()
 //----------------------------------------------------------------------------
 void vtkPVColorMap::SetScalarBarTitle(const char* name)
 {
+  this->SetScalarBarTitleInternal(name);
+  this->AddTraceEntry("$kw(%s) SetScalarBarTitle {%s}", 
+                      this->GetTclName(), name);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVColorMap::SetScalarBarTitleInternal(const char* name)
+{
   if (this->ScalarBarTitle == NULL && name == NULL) 
     { 
     return;
@@ -1004,13 +1012,11 @@ void vtkPVColorMap::SetScalarBarTitle(const char* name)
 
   this->ScalarBarTitleEntry->SetValue(name);
 
-  this->AddTraceEntry("$kw(%s) SetScalarBarTitle {%s}", 
-                      this->GetTclName(), name);
-
   this->UpdateScalarBarTitle();
 
   this->Modified();
 }
+
 
 //----------------------------------------------------------------------------
 void vtkPVColorMap::ScalarBarVectorTitleEntryCallback()
@@ -1368,6 +1374,13 @@ void vtkPVColorMap::SetVectorComponent(int component)
 //----------------------------------------------------------------------------
 void vtkPVColorMap::ResetScalarRange()
 {
+  this->ResetScalarRangeInternal();
+  this->AddTraceEntry("$kw(%s) ResetScalarRange", this->GetTclName());
+}
+
+//----------------------------------------------------------------------------
+void vtkPVColorMap::ResetScalarRangeInternal()
+{
   float range[2];
   float tmp[2];
   vtkPVSourceCollection *sourceList;
@@ -1435,14 +1448,13 @@ void vtkPVColorMap::ResetScalarRange()
     range[1] = range[0] + 0.001;
     }
 
-  this->SetScalarRange(range[0], range[1]);
+  this->SetScalarRangeInternal(range[0], range[1]);
 
   if ( this->GetPVRenderView() )
     {
     this->GetPVRenderView()->EventuallyRender();
     }
 }
-
 
 //----------------------------------------------------------------------------
 vtkPVApplication* vtkPVColorMap::GetPVApplication()

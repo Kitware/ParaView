@@ -38,8 +38,9 @@ $kw(vtkTemp394) SetPoint2 0.00000 0.00000 1.00000
 $kw(vtkTemp394) SetResolution 20
 $kw(vtkTemp381) AcceptCallback
 set kw(vtkTemp428) [$kw(vtkTemp1) CreatePVSource Calculator]
-$kw(vtkTemp428) AddScalarVariable Normals_0 Normals 0
-$kw(vtkTemp428) SetFunctionLabel {Normals_0}
+set kw(vtkTemp668) [$kw(vtkTemp428) GetPVWidget {Equation}]
+$kw(vtkTemp668) AddScalarVariable Normals_0 Normals 0
+$kw(vtkTemp668) SetFunctionLabel {Normals_0}
 $kw(vtkTemp428) AcceptCallback
 set kw(vtkTemp482) [$kw(vtkTemp1) CreatePVSource WarpScalar]
 set kw(vtkTemp491) [$kw(vtkTemp482) GetPVWidget {Scalars}]

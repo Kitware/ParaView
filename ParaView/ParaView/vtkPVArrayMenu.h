@@ -141,10 +141,12 @@ public:
   // Gets called when the accept button is pressed.
   // This method may add an entry to the trace file.
   virtual void Accept();
+  virtual void Accept(const char* sourceTclName);
 
   // Description:
   // Gets called when the reset button is pressed.
   virtual void Reset();
+  virtual void Reset(const char* sourceTclName);
 
   // Description:
   // The widget saves it state/command in the vtk tcl script.

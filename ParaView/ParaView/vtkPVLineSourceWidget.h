@@ -68,13 +68,19 @@ public:
   vtkGetObjectMacro(LineWidget, vtkPVLineWidget);
 
   // Description:
+  // This method looks to the subwidgets to compute the modified flag.
+  virtual int GetModifiedFlag();
+
+  // Description:
   // The methods get called when the Accept button is pressed. 
   // It sets the VTK objects value using this widgets value.
+  virtual void Accept(const char* sourceTclName);
   virtual void Accept();
 
   // Description:
   // The methods get called when the Reset button is pressed. 
   // It sets this widgets value using the VTK objects value.
+  virtual void Reset(const char* sourceTclName);
   virtual void Reset();
 
   // Description:

@@ -52,7 +52,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVData.h"
 #include "vtkPVPart.h"
 #include "vtkPVGenericRenderWindowInteractor.h"
-#include "vtkPVInputMenu.h"
 #include "vtkPVRenderView.h"
 #include "vtkPVWindow.h"
 #include "vtkPointData.h"
@@ -66,9 +65,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProbe);
-vtkCxxRevisionMacro(vtkPVProbe, "1.84");
-
-vtkCxxSetObjectMacro(vtkPVProbe, InputMenu, vtkPVInputMenu);
+vtkCxxRevisionMacro(vtkPVProbe, "1.85");
 
 int vtkPVProbeCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -79,8 +76,6 @@ vtkPVProbe::vtkPVProbe()
   static int instanceCount = 0;
   
   this->CommandFunction = vtkPVProbeCommand;
-
-  this->ScalarArrayMenu = vtkPVArrayMenu::New();
 
   this->SelectedPointFrame = vtkKWWidget::New();
   this->SelectedPointLabel = vtkKWLabel::New();
@@ -98,13 +93,16 @@ vtkPVProbe::vtkPVProbe()
   this->InstanceCount = instanceCount;
   
   this->ReplaceInputOff();
-  this->InputMenu = 0;
 
   this->XYPlotTclName = 0;
 
   char buffer[1024];
   sprintf(buffer, "probeXYPlot%d", this->InstanceCount);
   this->SetXYPlotTclName(buffer);
+
+  // Special ivar in vtkPVSource just for this subclass.
+  // We cannot process inputs that have more than one part.
+  this->RequiredNumberOfInputParts = 1;
 }
 
 //----------------------------------------------------------------------------
@@ -128,10 +126,6 @@ vtkPVProbe::~vtkPVProbe()
     this->XYPlotWidget->Delete();
     this->XYPlotWidget = 0;
     }
-
-  this->ScalarArrayMenu->Delete();
-  this->ScalarArrayMenu = NULL;
-  this->SetInputMenu(0);
 
   this->SetXYPlotTclName(0);
 }
@@ -171,35 +165,7 @@ void vtkPVProbe::CreateProperties()
   
   this->vtkPVSource::CreateProperties();
 
-  this->AddInputMenu("Input", "PVInput", "vtkDataSet",
-                     "Set the input to this filter.",
-                     this->GetPVWindow()->GetSourceList("Sources")); 
-  this->Script("pack %s", this->InputMenu->GetWidgetName());
-
-  pvApp->BroadcastScript("%s SetSpatialMatch 2", this->VTKSourceTclName);
-
-  // We should really use the vtkPVSource helper methods.
-  this->ScalarArrayMenu->SetNumberOfComponents(1);
-  this->ScalarArrayMenu->ShowComponentMenuOn();
-  this->ScalarArrayMenu->SetInputName("Input");
-  this->ScalarArrayMenu->SetAttributeType(vtkDataSetAttributes::SCALARS);
-  this->ScalarArrayMenu->SetParent(this->ParameterFrame->GetFrame());
-  this->ScalarArrayMenu->SetLabel("Scalars");
-  this->ScalarArrayMenu->SetModifiedCommand(this->GetTclName(), "SetAcceptButtonColorToRed");
-  this->ScalarArrayMenu->Create(this->Application);
-  this->ScalarArrayMenu->SetBalloonHelpString("Choose the scalar array to graph.");
-  this->AddPVWidget(this->ScalarArrayMenu);
-  if (this->InputMenu == NULL)
-    {
-    vtkErrorMacro("Could not find the input menu.");
-    }
-  else
-    {
-    this->ScalarArrayMenu->SetInputMenu(this->InputMenu);
-    }
-
-  this->Script("pack %s", this->ScalarArrayMenu->GetWidgetName());
-  this->ScalarArrayMenu->Update();
+  pvApp->BroadcastScript("%s SetSpatialMatch 2", this->GetVTKSourceTclName());
 
   this->ProbeFrame->SetParent(this->GetParameterFrame()->GetFrame());
   this->ProbeFrame->Create(pvApp, "frame", "");
@@ -257,8 +223,7 @@ void vtkPVProbe::CreateProperties()
 void vtkPVProbe::AcceptCallbackInternal()
 {
   int i;
-  const char *arrayName = this->ScalarArrayMenu->GetValue();
-  int component;
+  const char *arrayName;
   
   // This can't be an accept command because this calls SetInput for
   // the vtkProbeFilter, and vtkPVSource::AcceptCallbackInternal
@@ -272,19 +237,33 @@ void vtkPVProbe::AcceptCallbackInternal()
                        this->GetTclName(),
                        this->ShowXYPlotToggle->GetState());
   
+  // Here is a hack!  The probe cannot return its output until its SOURCE
+  // is set.  The source is set by the widgets.
+  // Since we know the source is going to be a polydata, 
+  // just set the output here.
+  // Probe can only have one source.
+  if ( ! this->Initialized)
+    { // This is the first time, create the data.
+    pvApp->BroadcastScript("vtkPolyData ProbePolyData");
+    pvApp->BroadcastScript("%s SetOutput ProbePolyData", this->GetVTKSourceTclName());
+    pvApp->BroadcastScript("ProbePolyData Delete");
+    }
   // call the superclass's method
   this->vtkPVSource::AcceptCallbackInternal();
   
   vtkPVWindow *window = this->GetPVWindow();
   
-  int error;
-  vtkPolyData *probeOutput = (vtkPolyData *)
-    (vtkTclGetPointerFromObject(this->GetPVOutput()->GetPVPart()->GetVTKDataTclName(),
-                                "vtkPolyData", pvApp->GetMainInterp(),
-                                error));
+  // Can't wait for render to update things.
+  if (this->GetPVOutput())
+    {
+    // Update the VTK data.
+    this->GetPVOutput()->Update();
+    }
 
+  vtkPolyData *probeOutput = (vtkPolyData *)(this->GetPVOutput()->GetPVPart(0)->GetVTKData());
   vtkPointData *pd = probeOutput->GetPointData();
     
+  int arrayCount;
   int numArrays = pd->GetNumberOfArrays();
   vtkDataArray *array;
 
@@ -310,7 +289,6 @@ void vtkPVProbe::AcceptCallbackInternal()
         for (j = 0; j < numComponents; j++)
           {
           sprintf(tempArray, "%f", array->GetComponent(0, j));
-          
           if (j < numComponents - 1)
             {
             strcat(tempArray, ",");
@@ -354,31 +332,26 @@ void vtkPVProbe::AcceptCallbackInternal()
     xyp->GetProperty()->SetPointSize(2);
     xyp->SetLegendPosition(.4, .6);
     xyp->SetLegendPosition2(.5, .25);
-    component = this->ScalarArrayMenu->GetSelectedComponent();
     
     float cstep = 1.0 / numArrays;
     float ccolor = 0;
+    arrayCount = 0;
     for ( i = 0; i < numArrays; i++)
       {
       array = pd->GetArray(i);
       arrayName = array->GetName();
-      xyp->AddInput(this->GetPVOutput()->GetPVPart()->GetVTKData(), arrayName, component);
-      xyp->SetPlotLabel(i, arrayName);
-      float r, g, b;
-      this->HSVtoRGB(ccolor, 1, 1, &r, &g, &b);
-      xyp->SetPlotColor(i, r, g, b);
-      ccolor += cstep;
-      
-      // Color by the choosen array in the output.
-      // The menu's not changing, but It is going to replaced soon.
-      // For now I will put this here.
-      char tmp[256];
-      sprintf(tmp, "Point %s", arrayName);
-      this->GetPVOutput()->GetColorMenu()->SetValue(tmp);
+      if (array->GetNumberOfComponents() == 1)
+        {
+        xyp->AddInput(this->GetPVOutput()->GetPVPart()->GetVTKData(), arrayName, 0);
+        xyp->SetPlotLabel(i, arrayName);
+        float r, g, b;
+        this->HSVtoRGB(ccolor, 1, 1, &r, &g, &b);
+        xyp->SetPlotColor(i, r, g, b);
+        ccolor += cstep;
+        }      
       }
-    this->GetPVOutput()->ColorByPointField(arrayName, array->GetNumberOfComponents());
     
-    if ( numArrays > 1 )
+    if ( arrayCount > 1 )
       {
       xyp->LegendOn();
       }
@@ -393,6 +366,7 @@ void vtkPVProbe::AcceptCallbackInternal()
     window->GetMainView()->Render();
     }
 }
+ 
 
 //----------------------------------------------------------------------------
 void vtkPVProbe::UpdateProbe()
@@ -416,20 +390,7 @@ void vtkPVProbe::UpdateProbe()
 
 void vtkPVProbe::Deselect(int doPackForget)
 {
-  this->ScalarArrayMenu->Update();
   this->vtkPVSource::Deselect(doPackForget);
-}
-
-//----------------------------------------------------------------------------
-vtkPVInputMenu *vtkPVProbe::AddInputMenu(char *label, char *inputName, 
-                                         char *inputType, char *help, 
-                                         vtkPVSourceCollection *sources)
-{
-  vtkPVInputMenu* inputMenu = this->Superclass::AddInputMenu(label, inputName,
-                                                             inputType, help,
-                                                             sources);
-  this->SetInputMenu(inputMenu);
-  return inputMenu;
 }
 
 //----------------------------------------------------------------------------
@@ -476,7 +437,7 @@ void vtkPVProbe::SaveInTclScript(ofstream *file, int interactiveFlag,
     *file << "\tline" << this->InstanceCount << " SetResolution " << interp->result << "\n\n";
     }
   
-  *file << this->VTKSource->GetClassName() << " "
+  *file << this->GetVTKSource()->GetClassName() << " "
         << this->GetVTKSourceTclName() << "\n";
   if (this->GetDimensionality() == 0)
     {

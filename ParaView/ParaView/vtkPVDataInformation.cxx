@@ -41,16 +41,20 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "vtkPVDataInformation.h"
 
+#include "vtkImageData.h"
+#include "vtkRectilinearGrid.h"
+#include "vtkStructuredGrid.h"
 #include "vtkCellData.h"
 #include "vtkCollection.h"
 #include "vtkDataSet.h"
+#include "vtkDataArray.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVDataSetAttributesInformation.h"
 #include "vtkPointData.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVDataInformation);
-vtkCxxRevisionMacro(vtkPVDataInformation, "1.2");
+vtkCxxRevisionMacro(vtkPVDataInformation, "1.3");
 
 
 //----------------------------------------------------------------------------
@@ -62,8 +66,12 @@ vtkPVDataInformation::vtkPVDataInformation()
   this->MemorySize = 0;
   this->Bounds[0] = this->Bounds[2] = this->Bounds[4] = VTK_LARGE_FLOAT;
   this->Bounds[1] = this->Bounds[3] = this->Bounds[5] = -VTK_LARGE_FLOAT;
+  this->Extent[0] = this->Extent[2] = this->Extent[4] = VTK_LARGE_INTEGER;
+  this->Extent[1] = this->Extent[3] = this->Extent[5] = -VTK_LARGE_INTEGER;
+
   this->PointDataInformation = vtkPVDataSetAttributesInformation::New();
   this->CellDataInformation = vtkPVDataSetAttributesInformation::New();
+  this->Name = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -73,6 +81,7 @@ vtkPVDataInformation::~vtkPVDataInformation()
   this->PointDataInformation = NULL;  
   this->CellDataInformation->Delete();
   this->CellDataInformation = NULL;  
+  this->SetName(NULL);
 }
 
 //----------------------------------------------------------------------------
@@ -94,8 +103,11 @@ void vtkPVDataInformation::Initialize()
   this->MemorySize = 0;
   this->Bounds[0] = this->Bounds[2] = this->Bounds[4] = VTK_LARGE_FLOAT;
   this->Bounds[1] = this->Bounds[3] = this->Bounds[5] = -VTK_LARGE_FLOAT;
+  this->Extent[0] = this->Extent[2] = this->Extent[4] = VTK_LARGE_INTEGER;
+  this->Extent[1] = this->Extent[3] = this->Extent[5] = -VTK_LARGE_INTEGER;
   this->PointDataInformation->Initialize();
   this->CellDataInformation->Initialize();
+  this->SetName(NULL);
 }
 
 //----------------------------------------------------------------------------
@@ -103,6 +115,7 @@ void vtkPVDataInformation::DeepCopy(vtkPVDataInformation *dataInfo)
 {
   int idx;
   double *bounds;
+  int *ext;
 
   this->DataSetType = dataInfo->GetDataSetType();
 
@@ -115,10 +128,17 @@ void vtkPVDataInformation::DeepCopy(vtkPVDataInformation *dataInfo)
     {
     this->Bounds[idx] = bounds[idx];
     }
+  ext = dataInfo->GetExtent();
+  for (idx = 0; idx < 6; ++idx)
+    {
+    this->Extent[idx] = ext[idx];
+    }
 
   // Copy attribute information.
   this->PointDataInformation->DeepCopy(dataInfo->GetPointDataInformation());
   this->CellDataInformation->DeepCopy(dataInfo->GetCellDataInformation());
+
+  this->SetName(dataInfo->GetName());
 }
 
 //----------------------------------------------------------------------------
@@ -126,6 +146,7 @@ void vtkPVDataInformation::CopyFromData(vtkDataSet *data)
 {
   int idx;
   float *bds;
+  int *ext = NULL;
 
   this->NumberOfPoints = data->GetNumberOfPoints();
   this->NumberOfCells = data->GetNumberOfCells();
@@ -137,12 +158,39 @@ void vtkPVDataInformation::CopyFromData(vtkDataSet *data)
   this->MemorySize = data->GetActualMemorySize();
   
   this->DataSetType = data->GetDataObjectType();
+  if (this->DataSetType == VTK_IMAGE_DATA)
+    {
+    ext = static_cast<vtkImageData*>(data)->GetExtent();
+    }
+  if (this->DataSetType == VTK_STRUCTURED_GRID)
+    {
+    ext = static_cast<vtkStructuredGrid*>(data)->GetExtent();
+    }
+  if (this->DataSetType == VTK_RECTILINEAR_GRID)
+    {
+    ext = static_cast<vtkRectilinearGrid*>(data)->GetExtent();
+    }
+  if (ext)
+    {
+    for (idx = 0; idx < 6; ++idx)
+      {
+      this->Extent[idx] = ext[idx];
+      }
+    }
 
   // Copy Point Data information
   this->PointDataInformation->CopyFromDataSetAttributes(data->GetPointData());
 
   // Copy Cell Data information
   this->CellDataInformation->CopyFromDataSetAttributes(data->GetCellData());
+
+  // Look for a name stored in Field Data.
+  vtkDataArray *nameArray = data->GetFieldData()->GetArray("Name");
+  if (nameArray)
+    {
+    char* str = static_cast<char*>(nameArray->GetVoidPointer(0));
+    this->SetName(str);
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -150,15 +198,38 @@ void vtkPVDataInformation::AddInformation(vtkPVDataInformation *info)
 {
   int             i,j;
   double*         bounds;
+  int*            ext;
 
-  // Empty data set? Just use nonempty one.
-  if (info->GetNumberOfCells() == 0 && info->GetNumberOfPoints() == 0)
-    {
-    return;
-    }
   if (this->NumberOfPoints == 0 && this->NumberOfCells == 0)
     { // Just copy the other array information.
     this->DeepCopy(info);
+    return;
+    }
+
+  // For data set, lets pick the common super class.
+  // This supports Heterogeneous collections.
+  // We need a new classification: Structured.
+  // This would allow extracting grid from mixed structured collections.
+  if (this->DataSetType != info->GetDataSetType())
+    { // IsTypeOf method will not work here.  Must be done manually.
+    if (this->DataSetType == VTK_IMAGE_DATA ||
+        this->DataSetType == VTK_RECTILINEAR_GRID ||
+        this->DataSetType == VTK_DATA_SET ||
+        info->GetDataSetType() == VTK_IMAGE_DATA ||
+        info->GetDataSetType() == VTK_RECTILINEAR_GRID ||
+        info->GetDataSetType() == VTK_DATA_SET)
+      {
+      this->DataSetType = VTK_DATA_SET;
+      }
+    else
+      {
+      this->DataSetType = VTK_POINT_SET;
+      }
+    }
+
+  // Empty data set? Ignore bounds, extent and array info.
+  if (info->GetNumberOfCells() == 0 && info->GetNumberOfPoints() == 0)
+    {
     return;
     }
 
@@ -169,6 +240,7 @@ void vtkPVDataInformation::AddInformation(vtkPVDataInformation *info)
 
   // Bounds are only a little harder.
   bounds = info->GetBounds();
+  ext = info->GetExtent();
   for (i = 0; i < 3; ++i)
     {
     j = i*2;
@@ -176,36 +248,30 @@ void vtkPVDataInformation::AddInformation(vtkPVDataInformation *info)
       {
       this->Bounds[j] = bounds[j];
       }
+    if (ext[j] < this->Extent[j])
+      {
+      this->Extent[j] = ext[j];
+      }
     ++j;
     if (bounds[j] > this->Bounds[j])
       {
       this->Bounds[j] = bounds[j];
       }
+    if (ext[j] > this->Extent[j])
+      {
+      this->Extent[j] = ext[j];
+      }
     }
 
-  // For data set, lets pick the common super class.
-  // Initially, groups will be homogenous, but If we find a good user 
-  // interface, we sould be able to support heterogeneous groups.
-  if (this->DataSetType != info->GetDataSetType())
-    { // IsTypeOf method will not work here.  Must be done manually.
-    if (this->DataSetType == VTK_IMAGE_DATA ||
-        this->DataSetType == VTK_RECTILINEAR_GRID ||
-        this->DataSetType == VTK_DATA_SET ||
-        info->GetDataSetType() == VTK_IMAGE_DATA == 0 ||
-        info->GetDataSetType() == VTK_RECTILINEAR_GRID == 0 ||
-        info->GetDataSetType() == VTK_DATA_SET == 0)
-      {
-      this->DataSetType = VTK_DATA_SET;
-      }
-    else
-      {
-      this->DataSetType = VTK_POINT_SET;
-      }
-    }
 
   // Now for the messy part, all of the arrays.
   this->PointDataInformation->AddInformation(info->GetPointDataInformation());
   this->CellDataInformation->AddInformation(info->GetCellDataInformation());
+
+  if (this->Name == NULL)
+    {
+    this->SetName(info->GetName());
+    }
 }
 
 
@@ -296,13 +362,23 @@ unsigned char* vtkPVDataInformation::NewMessage(int &length)
   // - vtkIdType for numberOfPoints
   // - vtkIdType for numberOfCells
   // - 6 doubles for bounds.
+  // - 6 integers for extent.
   // - For each data set attributes ...
 
-  length = 2 + 2*sizeof(vtkIdType) + 6*sizeof(double);
+  length = 2 + 2*sizeof(vtkIdType) + 6*sizeof(double) + 6*sizeof(int);
 
   // Now add space for all of the cell and point data information.
   length += this->PointDataInformation->GetMessageLength();
   length += this->CellDataInformation->GetMessageLength();
+
+  // One char for length,
+  int nameLength = strlen(this->Name);
+  if (nameLength > 255)
+    {
+    nameLength = 255;
+    }
+  length += nameLength+1;
+
 
   // Allocate memory for the message. 
   msg = new unsigned char[length];
@@ -327,6 +403,12 @@ unsigned char* vtkPVDataInformation::NewMessage(int &length)
     *((double*)tmp) = this->Bounds[idx];
     tmp += sizeof(double);
     }
+  // Extent
+  for (idx = 0; idx < 6; ++idx)
+    {
+    *((int*)tmp) = this->Extent[idx];
+    tmp += sizeof(int);
+    }
 
   // Point data
   attrMsgLength = this->PointDataInformation->WriteMessage(tmp);
@@ -335,6 +417,14 @@ unsigned char* vtkPVDataInformation::NewMessage(int &length)
   // Cell data
   attrMsgLength = this->CellDataInformation->WriteMessage(tmp);
   tmp += attrMsgLength;
+
+  // Name
+  *tmp = static_cast<unsigned char>(nameLength);
+  ++tmp;
+  for (idx = 0; idx < nameLength; ++idx)
+    {
+    tmp[idx] = static_cast<unsigned char>(this->Name[idx]);
+    }
 
   return msg;
 }
@@ -377,6 +467,13 @@ void vtkPVDataInformation::CopyFromMessage(unsigned char *msg)
     tmp += sizeof(double);
     }
 
+  // Extent
+  for (idx = 0; idx < 6; ++idx)
+    {
+    this->Extent[idx] = *((int*)tmp);
+    tmp += sizeof(int);
+    }
+
   // Point data
   attrMsgLength = this->PointDataInformation->CopyFromMessage(tmp);
   tmp += attrMsgLength;
@@ -384,6 +481,14 @@ void vtkPVDataInformation::CopyFromMessage(unsigned char *msg)
   // Cell data
   attrMsgLength = this->CellDataInformation->CopyFromMessage(tmp);
   tmp += attrMsgLength;
+
+  int nameLength = *tmp;
+  ++tmp;
+  // Manually allocate and copy because their is no ending \0.
+  this->SetName(NULL);
+  this->Name = new char[nameLength + 1];
+  strncpy(this->Name, (char*)(tmp), nameLength);
+  this->Name[nameLength] = '\0';
 }
 
 
@@ -400,13 +505,23 @@ void vtkPVDataInformation::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "Bounds: " << this->Bounds[0] << ", " << this->Bounds[1] 
      << ", " << this->Bounds[2] << ", " << this->Bounds[3] 
      << ", " << this->Bounds[4] << ", " << this->Bounds[5] << endl;
-
+  os << indent << "Extent: " << this->Extent[0] << ", " << this->Extent[1] 
+     << ", " << this->Extent[2] << ", " << this->Extent[3] 
+     << ", " << this->Extent[4] << ", " << this->Extent[5] << endl;
   os << indent << "PointDataInformation " << endl;
   this->PointDataInformation->PrintSelf(os, i2);
   os << indent << "CellDataInformation " << endl;
   this->CellDataInformation->PrintSelf(os, i2);
-}
 
+  if (this->Name)
+    {
+    os << indent << "Name: " << this->Name << endl;
+    }
+  else  
+    {
+    os << indent << "Name: NULL\n";
+    }
+}
 
   
 

@@ -67,7 +67,7 @@ template class VTK_EXPORT vtkArrayMapIterator<vtkPVWidget*, vtkPVWidget*>;
 #endif
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkPVWidget, "1.26");
+vtkCxxRevisionMacro(vtkPVWidget, "1.27");
 
 //----------------------------------------------------------------------------
 vtkPVWidget::vtkPVWidget()
@@ -100,6 +100,31 @@ vtkPVWidget::~vtkPVWidget()
 }
 
 //----------------------------------------------------------------------------
+void vtkPVWidget::Accept(const char* sourceTclName)
+{
+  //vtkErrorMacro("Multi source Accept not defined. " << this->GetClassName());
+  this->Accept();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVWidget::Reset(const char* sourceTclName)
+{
+  this->Update();
+  // We want the modifiedCallbacks to occur before we reset this flag.
+  this->Script("update");
+  this->ModifiedFlag = 0;
+}
+
+//----------------------------------------------------------------------------
+// I have to think how to get rid of this method.
+void vtkPVWidget::Reset()
+{
+  vtkErrorMacro("Reset called with no source Tcl name." << this->GetClassName());
+  this->Reset(NULL);
+}
+
+
+//----------------------------------------------------------------------------
 void vtkPVWidget::SetModifiedCommand(const char* cmdObject, 
                                      const char* methodAndArgs)
 {
@@ -122,20 +147,12 @@ void vtkPVWidget::Accept()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVWidget::ForceReset()
+void vtkPVWidget::ForceReset(const char* sourceTclName)
 {
   this->ModifiedFlag = 1;
-  this->Reset();
+  this->Reset(sourceTclName);
 }
 
-//----------------------------------------------------------------------------
-void vtkPVWidget::Reset()
-{
-  this->Update();
-  // We want the modifiedCallbacks to occur before we reset this flag.
-  this->Script("update");
-  this->ModifiedFlag = 0;
-}
 
 //----------------------------------------------------------------------------
 void vtkPVWidget::Update()
@@ -344,7 +361,7 @@ void vtkPVWidget::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVWidget ";
-  this->ExtractRevision(os,"$Revision: 1.26 $");
+  this->ExtractRevision(os,"$Revision: 1.27 $");
 }
 
 //----------------------------------------------------------------------------

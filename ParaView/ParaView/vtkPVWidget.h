@@ -76,6 +76,13 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
+  // These methods are going to replace the Accept/Reset with no arguments.
+  // We need the widgets to control multiple sources.
+  virtual void Accept(const char* sourceTclName);
+  virtual void Reset(const char* sourceTclName);
+  virtual void Reset();
+
+  // Description:
   // The methods get called when the Accept button is pressed. 
   // It sets the VTK objects value using this widgets value.
   virtual void Accept();
@@ -83,8 +90,7 @@ public:
   // Description:
   // The methods get called when the Reset button is pressed. 
   // It sets this widgets value using the VTK objects value.
-  virtual void Reset();
-  void ForceReset();
+  void ForceReset(const char* sourceTclName);
 
   // Description:
   // The methods get called when reset is called.  

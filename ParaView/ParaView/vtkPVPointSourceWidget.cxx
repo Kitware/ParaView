@@ -51,7 +51,7 @@ int vtkPVPointSourceWidget::InstanceCount = 0;
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPointSourceWidget);
-vtkCxxRevisionMacro(vtkPVPointSourceWidget, "1.4");
+vtkCxxRevisionMacro(vtkPVPointSourceWidget, "1.5");
 
 int vtkPVPointSourceWidgetCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -76,6 +76,9 @@ vtkPVPointSourceWidget::vtkPVPointSourceWidget()
   this->NumberOfPointsWidget->SetTraceReferenceObject(this);
   this->NumberOfPointsWidget->SetTraceReferenceCommand(
     "GetNumberOfPointsWidget");
+
+  // Start out modified so that accept will set the source
+  this->ModifiedFlag = 1;
 }
 
 //----------------------------------------------------------------------------
@@ -189,22 +192,57 @@ void vtkPVPointSourceWidget::Create(vtkKWApplication *app)
 }
 
 //----------------------------------------------------------------------------
+int vtkPVPointSourceWidget::GetModifiedFlag()
+{
+  if (this->ModifiedFlag)
+    {
+    return 1;
+    }
+  if (this->PointWidget->GetModifiedFlag() ||
+      this->RadiusWidget->GetModifiedFlag() ||
+      this->NumberOfPointsWidget->GetModifiedFlag())
+    {
+    return 1;
+    }
+  return 0;
+}
+ 
+
+//----------------------------------------------------------------------------
+void vtkPVPointSourceWidget::Reset(const char* sourceTclName)
+{
+  // Ignore the source passed in.  We are updating our
+  // own point source.
+  this->PointWidget->Reset(this->SourceTclName);
+  this->RadiusWidget->Reset(this->SourceTclName);
+  this->NumberOfPointsWidget->Reset(this->SourceTclName);
+  this->ModifiedFlag = 0;
+}
+//----------------------------------------------------------------------------
 void vtkPVPointSourceWidget::Reset()
 {
+  this->Reset(this->SourceTclName);
+}
+
+
+//----------------------------------------------------------------------------
+void vtkPVPointSourceWidget::Accept(const char* sourceTclName)
+{
+  // Ignore the source passed in.  We are updating our
+  // own point source.
+  if (this->GetModifiedFlag())
+    {
+    this->PointWidget->Accept(this->SourceTclName);
+    this->RadiusWidget->Accept(this->SourceTclName);
+    this->NumberOfPointsWidget->Accept(this->SourceTclName);
+    }
   this->ModifiedFlag = 0;
-  this->PointWidget->Reset();
-  this->RadiusWidget->Reset();
-  this->NumberOfPointsWidget->Reset();
 }
 
 //----------------------------------------------------------------------------
 void vtkPVPointSourceWidget::Accept()
 {
-  this->PointWidget->Accept();
-  this->RadiusWidget->Accept();
-  this->NumberOfPointsWidget->Accept();
-  
-  this->ModifiedFlag = 0;
+  this->Accept(this->SourceTclName);
 }
 
 //----------------------------------------------------------------------------

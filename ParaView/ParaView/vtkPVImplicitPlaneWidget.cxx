@@ -65,7 +65,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVImplicitPlaneWidget);
-vtkCxxRevisionMacro(vtkPVImplicitPlaneWidget, "1.9");
+vtkCxxRevisionMacro(vtkPVImplicitPlaneWidget, "1.10");
 
 int vtkPVImplicitPlaneWidgetCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -208,7 +208,7 @@ void vtkPVImplicitPlaneWidget::NormalZCallback()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVImplicitPlaneWidget::Reset()
+void vtkPVImplicitPlaneWidget::Reset(const char* sourceTclName)
 {
   if ( ! this->ModifiedFlag)
     {
@@ -223,9 +223,13 @@ void vtkPVImplicitPlaneWidget::Reset()
     this->Script("eval %s SetNormal [ %s GetNormal ]", 
                  this->GetTclName(), this->PlaneTclName);
     }
-  this->Superclass::Reset();
+  this->Superclass::Reset(sourceTclName);
 }
-
+//----------------------------------------------------------------------------
+void vtkPVImplicitPlaneWidget::Reset()
+{
+  this->Reset(this->ObjectTclName);
+}
 //----------------------------------------------------------------------------
 void vtkPVImplicitPlaneWidget::ActualPlaceWidget()
 {
@@ -244,7 +248,7 @@ void vtkPVImplicitPlaneWidget::ActualPlaceWidget()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVImplicitPlaneWidget::Accept()
+void vtkPVImplicitPlaneWidget::Accept(const char* sourceTclName)
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
 
@@ -252,14 +256,10 @@ void vtkPVImplicitPlaneWidget::Accept()
   static_cast<vtkImplicitPlaneWidget*>(this->Widget3D)->SetDrawPlane(0);
 
   // I guess this should be done in the initialization.
-  if (this->VariableName && this->ObjectTclName)
+  if (this->VariableName && sourceTclName)
     {
-    pvApp->BroadcastScript("%s Set%s %s", this->ObjectTclName,
+    pvApp->BroadcastScript("%s Set%s %s", sourceTclName,
                            this->VariableName, this->PlaneTclName);                   
-    }
-  if ( ! this->ModifiedFlag)
-    {
-    return;
     }
   if ( this->PlaneTclName )
     {
@@ -273,8 +273,11 @@ void vtkPVImplicitPlaneWidget::Accept()
     pvApp->BroadcastScript("%s SetOrigin %f %f %f", 
                            this->PlaneTclName,
                            val[0], val[1], val[2]);
-    this->AddTraceEntry("$kw(%s) SetCenter %f %f %f", 
-                        this->GetTclName(), val[0], val[1], val[2]);
+    if (this->ModifiedFlag)
+      {
+      this->AddTraceEntry("$kw(%s) SetCenter %f %f %f", 
+                          this->GetTclName(), val[0], val[1], val[2]);
+      }
     for ( cc = 0; cc < 3; cc ++ )
       {
       val[cc] = atof( this->NormalEntry[cc]->GetValue() );
@@ -283,14 +286,21 @@ void vtkPVImplicitPlaneWidget::Accept()
     pvApp->BroadcastScript("%s SetNormal %f %f %f", 
                            this->PlaneTclName,
                            val[0], val[1], val[2]);
-    this->AddTraceEntry("$kw(%s) SetNormal %f %f %f", 
-                        this->GetTclName(), val[0], val[1], val[2]);
-     
+    if (this->ModifiedFlag)
+      {
+      this->AddTraceEntry("$kw(%s) SetNormal %f %f %f", 
+                          this->GetTclName(), val[0], val[1], val[2]);
+      }
     }
 
-  this->Superclass::Accept();
+  this->Superclass::Accept(sourceTclName);
 }
 
+//----------------------------------------------------------------------------
+void vtkPVImplicitPlaneWidget::Accept()
+{
+  this->Accept(this->ObjectTclName);
+}
 
 //----------------------------------------------------------------------------
 void vtkPVImplicitPlaneWidget::SaveInTclScript(ofstream *file)

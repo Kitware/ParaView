@@ -52,7 +52,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVFileEntry);
-vtkCxxRevisionMacro(vtkPVFileEntry, "1.21");
+vtkCxxRevisionMacro(vtkPVFileEntry, "1.22");
 
 //----------------------------------------------------------------------------
 vtkPVFileEntry::vtkPVFileEntry()
@@ -218,7 +218,7 @@ void vtkPVFileEntry::SetValue(const char* fileName)
 
 
 //----------------------------------------------------------------------------
-void vtkPVFileEntry::Accept()
+void vtkPVFileEntry::Accept(const char* sourceTclName)
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
 
@@ -231,7 +231,7 @@ void vtkPVFileEntry::Accept()
   const char* fname = this->Entry->GetValue();
 
   pvApp->BroadcastScript("%s Set%s {%s}",
-                         this->ObjectTclName, this->VariableName, fname);
+                         sourceTclName, this->VariableName, fname);
 
   vtkPVReaderModule* rm = vtkPVReaderModule::SafeDownCast(this->PVSource);
   if (rm && fname && fname[0])
@@ -243,22 +243,33 @@ void vtkPVFileEntry::Accept()
       }
     }
 
-  // The supper does nothing but turn the modified flag off.
-  this->vtkPVWidget::Accept();
+  this->ModifiedFlag = 0;
+}
+
+//----------------------------------------------------------------------------
+void vtkPVFileEntry::Accept()
+{
+  this->Accept(this->ObjectTclName);
 }
 
 
 //----------------------------------------------------------------------------
-void vtkPVFileEntry::Reset()
+void vtkPVFileEntry::Reset(const char* sourceTclName)
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
 
   pvApp->Script("%s SetValue [%s Get%s]", this->Entry->GetTclName(),
-                this->ObjectTclName, this->VariableName); 
+                sourceTclName, this->VariableName); 
 
   // The supper does nothing but turn the modified flag off.
-  this->vtkPVWidget::Reset();
+  this->vtkPVWidget::Reset(sourceTclName);
 }
+//----------------------------------------------------------------------------
+void vtkPVFileEntry::Reset()
+{
+  this->Reset(this->ObjectTclName);
+}
+
 
 vtkPVFileEntry* vtkPVFileEntry::ClonePrototype(vtkPVSource* pvSource,
                                  vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)

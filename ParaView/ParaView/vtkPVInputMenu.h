@@ -96,11 +96,11 @@ public:
   // Description:
   // Gets called when the accept button is pressed.
   // This method may add an entry to the trace file.
-  virtual void Accept();
+  virtual void Accept(const char* sourceTclName);
 
   // Description:
   // Gets called when the reset button is pressed.
-  virtual void Reset();
+  virtual void Reset(const char* sourceTclName);
 
   // Description:
   // This method gets called when the user changes the widgets value,
@@ -149,12 +149,6 @@ public:
   vtkPVInputMenu* ClonePrototype(vtkPVSource* pvSource,
                                  vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
 //ETX
-
-  // Description:
-  // Complete arrays on process 0.  VTK filters do not fill out arrays
-  // if data is empty.  This method makes sure process 0 data hgas all
-  // the arrays for filling out array menu entries.
-  void CompleteArrays();
 
 protected:
   vtkPVInputMenu();

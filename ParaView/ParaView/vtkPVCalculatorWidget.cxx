@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    vtkPVArrayCalculator.cxx
+  Module:    vtkPVCalculatorWidget.cxx
   Language:  C++
   Date:      $Date$
   Version:   $Revision$
@@ -39,12 +39,10 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-#include "vtkPVArrayCalculator.h"
+#include "vtkPVCalculatorWidget.h"
 
 #include "vtkArrayCalculator.h"
-#include "vtkCellData.h"
 #include "vtkDataSet.h"
-#include "vtkFieldData.h"
 #include "vtkFieldData.h"
 #include "vtkKWFrame.h"
 #include "vtkKWLabel.h"
@@ -55,27 +53,29 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWPushButton.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
+#include "vtkPVSource.h"
 #include "vtkPVData.h"
-#include "vtkPVInputMenu.h"
 #include "vtkPVPart.h"
 #include "vtkPVSourceCollection.h"
 #include "vtkPVWidgetCollection.h"
 #include "vtkPVWindow.h"
-#include "vtkPointData.h"
 #include "vtkSource.h"
 #include "vtkStringList.h"
+#include "vtkPVDataInformation.h"
+#include "vtkPVDataSetAttributesInformation.h"
+#include "vtkPVArrayInformation.h"
 
 //----------------------------------------------------------------------------
-vtkStandardNewMacro(vtkPVArrayCalculator);
-vtkCxxRevisionMacro(vtkPVArrayCalculator, "1.52");
+vtkStandardNewMacro(vtkPVCalculatorWidget);
+vtkCxxRevisionMacro(vtkPVCalculatorWidget, "1.1");
 
-int vtkPVArrayCalculatorCommand(ClientData cd, Tcl_Interp *interp,
+int vtkPVCalculatorWidgetCommand(ClientData cd, Tcl_Interp *interp,
                                 int argc, char *argv[]);
 
 //----------------------------------------------------------------------------
-vtkPVArrayCalculator::vtkPVArrayCalculator()
+vtkPVCalculatorWidget::vtkPVCalculatorWidget()
 {
-  this->CommandFunction = vtkPVArrayCalculatorCommand;
+  this->CommandFunction = vtkPVCalculatorWidgetCommand;
   
   this->AttributeModeFrame = vtkKWWidget::New();
   this->AttributeModeLabel = vtkKWLabel::New();
@@ -123,12 +123,10 @@ vtkPVArrayCalculator::vtkPVArrayCalculator()
   this->ButtonRightParenthesis = vtkKWPushButton::New();
   this->ScalarsMenu = vtkKWMenuButton::New();
   this->VectorsMenu = vtkKWMenuButton::New();
-  
-  this->ModifiedFlag = 0;
 }
 
 //----------------------------------------------------------------------------
-vtkPVArrayCalculator::~vtkPVArrayCalculator()
+vtkPVCalculatorWidget::~vtkPVCalculatorWidget()
 {
   this->AttributeModeLabel->Delete();
   this->AttributeModeLabel = NULL;
@@ -223,13 +221,22 @@ vtkPVArrayCalculator::~vtkPVArrayCalculator()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVArrayCalculator::CreateProperties()
+void vtkPVCalculatorWidget::Create(vtkKWApplication *app)
 {
-  vtkPVApplication* pvApp = this->GetPVApplication();
+  vtkPVApplication* pvApp = vtkPVApplication::SafeDownCast(app);
+
+  if (this->Application)
+    {
+    vtkErrorMacro("PVWidget already created");
+    return;
+    }
+  this->SetApplication(app);
+
+  // create the top level
+  this->Script("frame %s -borderwidth 0 -relief flat", this->GetWidgetName());
+
   
-  this->vtkPVSource::CreateProperties();
-  
-  this->AttributeModeFrame->SetParent(this->GetParameterFrame()->GetFrame());
+  this->AttributeModeFrame->SetParent(this);
   this->AttributeModeFrame->Create(pvApp, "frame", "");
   this->Script("pack %s -side top -fill x",
                this->AttributeModeFrame->GetWidgetName());
@@ -252,7 +259,7 @@ void vtkPVArrayCalculator::CreateProperties()
                this->AttributeModeLabel->GetWidgetName(),
                this->AttributeModeMenu->GetWidgetName());
   
-  this->CalculatorFrame->SetParent(this->GetParameterFrame()->GetFrame());
+  this->CalculatorFrame->SetParent(this);
   this->CalculatorFrame->ShowHideFrameOn();
   this->CalculatorFrame->Create(pvApp, 0);
   this->CalculatorFrame->SetLabel("Calculator");
@@ -485,178 +492,223 @@ void vtkPVArrayCalculator::CreateProperties()
                this->CalculatorFrame->GetFrame()->GetWidgetName());
   this->Script("grid columnconfigure %s 6 -minsize 40",
                this->CalculatorFrame->GetFrame()->GetWidgetName());
-
-  this->UpdateParameterWidgets();
-
 }
 
-void vtkPVArrayCalculator::UpdateFunction(const char* newSymbol)
+void vtkPVCalculatorWidget::UpdateFunction(const char* newSymbol)
 {
   char* newFunction;
   const char* currentFunction = this->FunctionLabel->GetLabel();
-  this->SetAcceptButtonColorToRed();
   newFunction = new char[strlen(currentFunction)+strlen(newSymbol)+1];
   sprintf(newFunction, "%s%s", currentFunction, newSymbol);
   this->FunctionLabel->SetLabel(newFunction);
   delete [] newFunction;
-  
-  this->ModifiedFlag = 1;
+  this->ModifiedCallback();
 }
 
-void vtkPVArrayCalculator::ClearFunction()
+void vtkPVCalculatorWidget::ClearFunction()
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
   
-  this->SetAcceptButtonColorToRed();
   this->FunctionLabel->SetLabel("");
-  pvApp->BroadcastScript("%s RemoveAllVariables",
-                         this->GetVTKSourceTclName());
+
+  // This should be done in accept.
+  if (this->PVSource == NULL)
+    {
+    vtkErrorMacro("Missing PVSource.");
+    return;
+    }
+  int num, idx;
+  num = this->PVSource->GetNumberOfVTKSources();
+  for (idx = 0; idx < num; ++idx)
+    {
+    pvApp->BroadcastScript("%s RemoveAllVariables",
+                           this->PVSource->GetVTKSourceTclName(idx));
+    }
   
-  this->ModifiedFlag = 1;
+  this->ModifiedCallback();
 }
 
-void vtkPVArrayCalculator::ChangeAttributeMode(const char* newMode)
+void vtkPVCalculatorWidget::ChangeAttributeMode(const char* newMode)
 {
-  vtkFieldData* fd = NULL;
+  vtkPVDataSetAttributesInformation* fdi = NULL;
   int i, j;
   int numComponents;
   char menuCommand[256];
   char menuEntry[256];
+  char* name;
   vtkPVApplication *pvApp = this->GetPVApplication();
-  
-  this->SetAcceptButtonColorToRed();
-  
+    
   this->ScalarsMenu->GetMenu()->DeleteAllMenuItems();
   this->VectorsMenu->GetMenu()->DeleteAllMenuItems();
   this->FunctionLabel->SetLabel("");
 
-  pvApp->BroadcastScript("%s RemoveAllVariables",
-                         this->GetVTKSourceTclName());
-  
+  int num, idx;
+  num = this->PVSource->GetNumberOfVTKSources();
+  for (idx = 0; idx < num; ++idx)
+    {
+    pvApp->BroadcastScript("%s RemoveAllVariables",
+                           this->PVSource->GetVTKSourceTclName(idx));
+    if (strcmp(newMode, "point") == 0)
+      {
+      pvApp->BroadcastScript("%s SetAttributeModeToUsePointData",
+                             this->PVSource->GetVTKSourceTclName());
+      }
+    else if (strcmp(newMode, "cell") == 0)
+      {
+      pvApp->BroadcastScript("%s SetAttributeModeToUseCellData",
+                             this->PVSource->GetVTKSourceTclName());
+      }
+    }
+
+  // Populate the scalar and array menu using collected data information.
   if (strcmp(newMode, "point") == 0)
     {
-    pvApp->BroadcastScript("%s SetAttributeModeToUsePointData",
-                           this->GetVTKSourceTclName());
-    fd = this->GetPVInput()->GetPVPart()->GetVTKData()->GetPointData();
+    fdi = this->PVSource->GetPVInput()->GetDataInformation()->GetPointDataInformation();
     }
   else if (strcmp(newMode, "cell") == 0)
     {
-    pvApp->BroadcastScript("%s SetAttributeModeToUseCellData",
-                           this->GetVTKSourceTclName());
-    fd = this->GetPVInput()->GetPVPart()->GetVTKData()->GetCellData();
+    fdi = this->PVSource->GetPVInput()->GetDataInformation()->GetCellDataInformation();
     }
   
-  if (fd)
+  if (fdi)
     {
-    for (i = 0; i < fd->GetNumberOfArrays(); i++)
+    for (i = 0; i < fdi->GetNumberOfArrays(); i++)
       {
-      numComponents = fd->GetArray(i)->GetNumberOfComponents();
+      numComponents = fdi->GetArrayInformation(i)->GetNumberOfComponents();
+      name = fdi->GetArrayInformation(i)->GetName();
       for (j = 0; j < numComponents; j++)
         {
         if (numComponents == 1)
           {
-          sprintf(menuCommand, "AddScalarVariable %s %s 0", fd->GetArrayName(i),
-                  fd->GetArrayName(i));
-          this->ScalarsMenu->GetMenu()->AddCommand(fd->GetArrayName(i), this,
+          sprintf(menuCommand, "AddScalarVariable %s %s 0", name, name);
+          this->ScalarsMenu->GetMenu()->AddCommand(name, this,
                                                    menuCommand);
           }
         else
           {
-          sprintf(menuEntry, "%s_%d", fd->GetArrayName(i), j);
+          sprintf(menuEntry, "%s_%d", name, j);
           sprintf(menuCommand, "AddScalarVariable %s %s %d", menuEntry,
-                  fd->GetArrayName(i), j);
+                  name, j);
           this->ScalarsMenu->GetMenu()->AddCommand(menuEntry, this, menuCommand);
           }
         }
       if (numComponents == 3)
         {
-        sprintf(menuCommand, "AddVectorVariable %s %s", fd->GetArrayName(i),
-                fd->GetArrayName(i));
-        this->VectorsMenu->GetMenu()->AddCommand(fd->GetArrayName(i), this,
+        sprintf(menuCommand, "AddVectorVariable %s %s",
+                name, name);
+        this->VectorsMenu->GetMenu()->AddCommand(name, this,
                                                  menuCommand);
         }
       }
     }
+
+  this->ModifiedCallback();
 }
 
-void vtkPVArrayCalculator::AddScalarVariable(const char* variableName,
-                                             const char* arrayName,
-                                             int component)
+void vtkPVCalculatorWidget::AddScalarVariable(const char* variableName,
+                                              const char* arrayName,
+                                              int component)
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
   
   this->UpdateFunction(variableName);
-  pvApp->BroadcastScript("%s AddScalarVariable %s %s %d",
-                         this->GetVTKSourceTclName(),
-                         variableName, arrayName, component);
+
+  // This should be in accept.
+  int num, idx;
+  num = this->PVSource->GetNumberOfVTKSources();
+  for (idx = 0; idx < num; ++idx)
+    {
+    pvApp->BroadcastScript("%s AddScalarVariable %s %s %d",
+                           this->PVSource->GetVTKSourceTclName(idx),
+                           variableName, arrayName, component);
+    }
   
-  pvApp->AddTraceEntry("$kw(%s) AddScalarVariable %s %s %d",
+  this->AddTraceEntry("$kw(%s) AddScalarVariable %s %s %d",
                        this->GetTclName(), variableName, arrayName, component);
 }
 
-void vtkPVArrayCalculator::AddVectorVariable(const char* variableName,
+void vtkPVCalculatorWidget::AddVectorVariable(const char* variableName,
                                              const char* arrayName)
 {
   vtkPVApplication* pvApp = this->GetPVApplication();
 
   this->UpdateFunction(variableName);
-  pvApp->BroadcastScript("%s AddVectorVariable %s %s 0 1 2",
-                         this->GetVTKSourceTclName(),
-                         variableName, arrayName);
-  
-  pvApp->AddTraceEntry("$kw(%s) AddVectorVariable %s %s",
+
+
+  // This should be in accept.
+  int num, idx;
+  num = this->PVSource->GetNumberOfVTKSources();
+  for (idx = 0; idx < num; ++idx)
+    {
+    pvApp->BroadcastScript("%s AddVectorVariable %s %s 0 1 2",
+                           this->PVSource->GetVTKSourceTclName(idx),
+                           variableName, arrayName);
+    }
+
+  this->AddTraceEntry("$kw(%s) AddVectorVariable %s %s",
                        this->GetTclName(), variableName, arrayName);
 }
 
+
 //----------------------------------------------------------------------------
-void vtkPVArrayCalculator::UpdateVTKSourceParameters()
+void vtkPVCalculatorWidget::Accept()
+{
+  int num, idx;
+  num = this->PVSource->GetNumberOfVTKSources();
+  for (idx = 0; idx < num; ++idx)
+    {
+    this->Accept(this->PVSource->GetVTKSourceTclName(idx));
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVCalculatorWidget::Accept(const char* vtkSourceTclName)
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
 
   if (this->ModifiedFlag)
     {
     // The calculator UI is not a widget so we have to manage it here.
-    pvApp->AddTraceEntry("$kw(%s) SetFunctionLabel {%s}",
+    this->AddTraceEntry("$kw(%s) SetFunctionLabel {%s}",
                          this->GetTclName(), this->FunctionLabel->GetLabel());
-
-    // Format a command to move value from widget to vtkObjects (on all
-    // processes).  The VTK objects do not yet have to have the same Tcl
-    // name!
-    pvApp->BroadcastScript("%s SetFunction {%s}",
-                           this->GetVTKSourceTclName(),
-                           this->FunctionLabel->GetLabel());
-
-    // Note: Since the Calculator is acting like a pvWidget, it has its own
-    // modified flag that vtkPVSource knows nothing about.
-    this->ModifiedFlag = 0;
     }
 
-  // This takes care of the input selection menu.
-  this->vtkPVSource::UpdateVTKSourceParameters();
-
-}
-
-//----------------------------------------------------------------------------
-void vtkPVArrayCalculator::UpdateParameterWidgets()
-{
-  // This takes care of the input selection menu.
-  this->vtkPVSource::UpdateParameterWidgets();
-
-  if ( this->FunctionLabel->IsCreated() )
-    {
-    this->Script("%s SetLabel [%s GetFunction]", 
-                 this->FunctionLabel->GetTclName(), 
-                 this->GetVTKSourceTclName());
-    }
-  
-  // Note: Since the Calculator is acting like a pvWidget, it has its own
-  // modified flag that vtkPVSource knows nothing about.
+  // Format a command to move value from widget to vtkObjects (on all
+  // processes).  The VTK objects do not yet have to have the same Tcl
+  // name!
+  pvApp->BroadcastScript("%s SetFunction {%s}", vtkSourceTclName,
+                         this->FunctionLabel->GetLabel());
   this->ModifiedFlag = 0;
 }
 
 
 //----------------------------------------------------------------------------
-void vtkPVArrayCalculator::SetFunctionLabel(char *function)
+void vtkPVCalculatorWidget::Reset()
+{
+  int num, idx;
+  num = this->PVSource->GetNumberOfVTKSources();
+  for (idx = 0; idx < num; ++idx)
+    {
+    this->Reset(this->PVSource->GetVTKSourceTclName(idx));
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVCalculatorWidget::Reset(const char* vtkSourceTclName)
+{
+  if ( this->FunctionLabel->IsCreated() )
+    {
+    this->Script("%s SetLabel [%s GetFunction]", 
+                 this->FunctionLabel->GetTclName(), 
+                 vtkSourceTclName);
+    }
+  
+  this->ModifiedFlag = 0;
+}
+
+
+//----------------------------------------------------------------------------
+void vtkPVCalculatorWidget::SetFunctionLabel(char *function)
 {
   this->ModifiedFlag = 1;
   this->FunctionLabel->SetLabel(function);
@@ -664,86 +716,25 @@ void vtkPVArrayCalculator::SetFunctionLabel(char *function)
 
 
 //----------------------------------------------------------------------------
-void vtkPVArrayCalculator::SaveInTclScript(ofstream *file, int interactiveFlag,
+void vtkPVCalculatorWidget::SaveInTclScript(ofstream *file, int interactiveFlag,
                                            int vtkFlag)
 {
   int i;
-  vtkArrayCalculator *calc = (vtkArrayCalculator*)(this->GetVTKSource());
-
-
-
+  vtkArrayCalculator *calc = (vtkArrayCalculator*)(this->PVSource->GetVTKSource(0));
 
   // This is just the super classes method "SaveInTclScript" without
   // saving the output.
   // The correct way to do this is to create a calculator PVWidget.
   // I am just fixing bugs for a release right now.
-  int numWidgets;
-  vtkPVWidget *widget;
 
   // Detect special sources we do not handle yet.
-  if (this->VTKSource == NULL)
+  if (calc == NULL)
     {
     return;
     }
-
-  // This should not be needed, but We can check anyway.
-  if (this->VisitedFlag == 2)
-    {
-    return;
-    }
-
-  // Special condition to detect loops in the pipeline.
-  // Visited 1 means that source is in stack, 2 means that
-  // the tcl script contains the source.
-  if (this->VisitedFlag == 1)
-    { // This source is already in in the stack, but there is a loop.
-    *file << "\n" << this->VTKSource->GetClassName()
-          << " " << this->VTKSourceTclName << "\n";
-    this->VisitedFlag = 2;
-    return;
-    }
-
-  // This is the recursive part.
-  this->VisitedFlag = 1;
-  // Loop through all of the inputs
-  for (i = 0; i < this->NumberOfPVInputs; ++i)
-    {
-    if (this->PVInputs[i] && this->PVInputs[i]->GetPVSource()->GetVisitedFlag() != 2)
-      {
-      this->PVInputs[i]->GetPVSource()->SaveInTclScript(file, interactiveFlag, vtkFlag);
-      }
-    }
-  
-  // Save the object in the script.
-  if (this->VisitedFlag != 2)
-    {
-    *file << "\n" << this->VTKSource->GetClassName()
-          << " " << this->VTKSourceTclName << "\n";
-    this->VisitedFlag = 2;
-    }
-
-  // Let the PVWidgets set up the object.
-  numWidgets = this->Widgets->GetNumberOfItems();
-  for (i = 0; i < numWidgets; i++)
-    {
-    widget = vtkPVWidget::SafeDownCast(this->Widgets->GetItemAsObject(i));
-    if (widget)
-      {
-      widget->SaveInTclScript(file);
-      }
-    }
-
-
-
-
-
-
-
-
-
 
   // This suff is what should be in PVWidgets.
-  *file << "\t" << this->VTKSourceTclName << " SetAttributeModeToUse";
+  *file << "\t" << this->PVSource->GetVTKSourceTclName() << " SetAttributeModeToUse";
   if (strcmp(this->AttributeModeMenu->GetValue(), "Point Data") == 0)
     {
     *file << "PointData\n\t";
@@ -755,39 +746,33 @@ void vtkPVArrayCalculator::SaveInTclScript(ofstream *file, int interactiveFlag,
   
   for (i = 0; i < calc->GetNumberOfScalarArrays(); i++)
     {
-    *file << this->VTKSourceTclName << " AddScalarVariable "
+    *file << this->PVSource->GetVTKSourceTclName() << " AddScalarVariable "
           << calc->GetScalarVariableName(i) << " "
           << calc->GetScalarArrayName(i) 
           << " " << calc->GetSelectedScalarComponent(i)
           << "\n\t";
     }
-  for (i = 0; i < ((vtkArrayCalculator*)this->GetVTKSource())->
+  for (i = 0; i < ((vtkArrayCalculator*)this->PVSource->GetVTKSource())->
          GetNumberOfVectorArrays(); i++)
     {
-    *file << this->VTKSourceTclName << " AddVectorVariable "
-          << ((vtkArrayCalculator*)this->GetVTKSource())->
+    *file << this->PVSource->GetVTKSourceTclName() << " AddVectorVariable "
+          << ((vtkArrayCalculator*)this->PVSource->GetVTKSource())->
       GetVectorVariableName(i) << " "
-          << ((vtkArrayCalculator*)this->GetVTKSource())->
+          << ((vtkArrayCalculator*)this->PVSource->GetVTKSource())->
       GetVectorArrayName(i)
           << " 0 1 2\n\t";
     }  
 
   if ( this->FunctionLabel->IsCreated() )
     {
-    *file << "\t" << this->VTKSourceTclName << " SetFunction {"  
+    *file << "\t" << this->PVSource->GetVTKSourceTclName() << " SetFunction {"  
           << this->FunctionLabel->GetLabel() << "}\n";
     }
 
-
-
-
-  // Put the ouptut at the end so that the actor gets created last.
-  // Add the mapper, actor, scalar bar actor ...
-  this->GetPVOutput()->SaveInTclScript(file, interactiveFlag, vtkFlag);
 }
 
 //----------------------------------------------------------------------------
-void vtkPVArrayCalculator::PrintSelf(ostream& os, vtkIndent indent)
+void vtkPVCalculatorWidget::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
 }

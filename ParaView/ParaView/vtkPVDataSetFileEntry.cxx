@@ -48,7 +48,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVDataSetFileEntry);
-vtkCxxRevisionMacro(vtkPVDataSetFileEntry, "1.7");
+vtkCxxRevisionMacro(vtkPVDataSetFileEntry, "1.8");
 
 //----------------------------------------------------------------------------
 vtkPVDataSetFileEntry::vtkPVDataSetFileEntry()
@@ -67,7 +67,7 @@ vtkPVDataSetFileEntry::~vtkPVDataSetFileEntry()
 
 
 //----------------------------------------------------------------------------
-void vtkPVDataSetFileEntry::Accept()
+void vtkPVDataSetFileEntry::Accept(const char* sourceTclName)
 {
   int newType;
 
@@ -93,9 +93,16 @@ void vtkPVDataSetFileEntry::Accept()
     return;
     }
 
-  this->vtkPVFileEntry::Accept();
-
+  this->vtkPVFileEntry::Accept(sourceTclName);
 }
+
+
+//----------------------------------------------------------------------------
+void vtkPVDataSetFileEntry::Accept()
+{
+  this->Accept(this->ObjectTclName);
+}
+
 
 vtkPVDataSetFileEntry* vtkPVDataSetFileEntry::ClonePrototype(
   vtkPVSource* pvSource, vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)

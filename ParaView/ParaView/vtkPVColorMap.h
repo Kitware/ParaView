@@ -98,6 +98,7 @@ public:
   // (e.g. Temperature). Currently it also indicates the arrays mapped
   // by this color map object.
   void SetScalarBarTitle(const char* Name);
+  void SetScalarBarTitleInternal(const char* Name);
   const char* GetScalarBarTitle() {return this->ScalarBarTitle;}
 
   // Description:
@@ -139,6 +140,7 @@ public:
   // This also sets the color map to automatic.  In the future,
   // it will rescale to match changes in the global scalar range.
   void ResetScalarRange();
+  void ResetScalarRangeInternal();
   
   // Descriptions:
   // Adds and removes scalar bar from renderer.

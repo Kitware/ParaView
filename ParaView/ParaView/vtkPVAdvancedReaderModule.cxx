@@ -53,7 +53,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAdvancedReaderModule);
-vtkCxxRevisionMacro(vtkPVAdvancedReaderModule, "1.8");
+vtkCxxRevisionMacro(vtkPVAdvancedReaderModule, "1.9");
 
 int vtkPVAdvancedReaderModuleCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -122,7 +122,7 @@ int vtkPVAdvancedReaderModule::ReadFileInformation(const char* fname)
     }
 
   this->Script("%s UpdateInformation", 
-               this->GetPVOutput()->GetPVPart()->GetVTKDataTclName());
+               this->GetVTKSourceTclName(0));
 
   // We called UpdateInformation, we need to update the widgets.
   vtkPVWidget *pvw;

@@ -39,10 +39,10 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-// .NAME vtkKWAssignment - An object for assigning data to processors.
+// .NAME vtkKWAssignment - Manages allocation and freeing for a string list.
 // .SECTION Description
-// A vtkStringList holds a data piece/extent specification for a process.
-// It is really just a parallel object wrapper for vtkPVExtentTranslator.
+// A vtkStringList holds a list of strings.  
+// We might be able to replace it in the future.
 
 #ifndef __vtkStringList_h
 #define __vtkStringList_h

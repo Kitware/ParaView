@@ -74,6 +74,7 @@ class vtkPVWidgetCollection;
 class vtkPVWindow;
 class vtkSource;
 class vtkStringList;
+class vtkCollection;
 
 //BTX
 template <class DType> 
@@ -121,6 +122,9 @@ public:
   virtual vtkPVData* GetPVInput() {return this->GetNthPVInput(0);}
   vtkGetMacro(NumberOfPVInputs, int);
   vtkPVData *GetNthPVInput(int idx);
+  void RemoveAllPVInputs();
+  void SetNthPVInput(int idx, vtkPVData *input);
+
 
   // Description:
   // Set/get the first output of this source. Most source are setup
@@ -208,9 +212,14 @@ public:
   // Set the vtk source that will be a part of the pipeline.
   // The pointer to this class is used as little as possible.
   // (VTKSourceTclName is used instead.)
-  void SetVTKSource(vtkSource *source, const char *tclName);
-  vtkGetObjectMacro(VTKSource, vtkSource);
-  vtkGetStringMacro(VTKSourceTclName);
+  void AddVTKSource(vtkSource *source, const char *tclName);
+  void RemoveAllVTKSources();
+  int GetNumberOfVTKSources();
+  vtkSource *GetVTKSource(int idx);
+  char *GetVTKSourceTclName(int idx);
+  // Legacy
+  vtkSource *GetVTKSource() {return this->GetVTKSource(0);}
+  char *GetVTKSourceTclName() {return this->GetVTKSourceTclName(0);}
 
   vtkGetObjectMacro(DeleteButton, vtkKWPushButton);
   vtkGetObjectMacro(AcceptButton, vtkKWPushButton);
@@ -233,11 +242,6 @@ public:
   void SetAcceptButtonColorToRed();
   void SetAcceptButtonColorToWhite();
   
-  // Description:
-  // Needed to clean up properly.
-  vtkSetStringMacro(ExtentTranslatorTclName);
-  vtkGetStringMacro(ExtentTranslatorTclName);
-
   // Description:
   // This flag determines whether a source will make its input invisible or
   // not.  By default, this flag is on.
@@ -299,9 +303,12 @@ public:
   // current (if makeCurrent is true), 4. creates output (vtkPVData) which
   // contains a vtk data object of type outputDataType, 5. assigns or
   // creates an extent translator to the output.
-  int InitializeClone(vtkPVData* input, 
-                      const char* outputDataType, 
-                      int makeCurrent);
+  int InitializeClone(vtkPVData* input, int makeCurrent);
+
+  // Description:
+  // This sets up the PVData.  This method is called when
+  // the accept button is pressed for the first time.
+  int InitializeData();  
 
   // Description:
   // This method can be used by subclasses of PVSource to do
@@ -417,6 +424,13 @@ public:
   // Update the properties page.
   void UpdateProperties();
 
+  // Description:
+  // Option set by the xml filter element.
+  // When this flag is on, then one VTK filter handles all
+  // of the parts in a PVData.
+  vtkSetMacro(VTKMultipleInputFlag, int);
+  vtkGetMacro(VTKMultipleInputFlag, int);
+
 protected:
   vtkPVSource();
   ~vtkPVSource();
@@ -448,11 +462,8 @@ protected:
   // for this source. Used by sources like Glyphs
   int HideInformationPage;
 
-  vtkSource *VTKSource;
-  char *VTKSourceTclName;
-  
-  // To clean up properly.
-  char *ExtentTranslatorTclName;
+  vtkCollection *VTKSources;
+  vtkStringList *VTKSourceTclNames;
 
   // Called to allocate the output array.  Copies old outputs.
   void SetNumberOfPVOutputs(int num);
@@ -463,11 +474,8 @@ protected:
   void SetNumberOfPVInputs(int num);
   vtkPVData **PVInputs;
   int NumberOfPVInputs; 
- 
-  void RemoveAllPVInputs();
-  
+   
   void SetNthPVOutput(int idx, vtkPVData *output);
-  void SetNthPVInput(int idx, vtkPVData *input);
 
   void UpdateDescriptionFrame();
   
@@ -532,6 +540,15 @@ protected:
 //BTX
   vtkVector<const char*>* InputClassNames;
 //ETX
+  // This ivar is here so that Probe will not have any sources which
+  // have more than one part. A value of -1 means no restrictions.
+  int RequiredNumberOfInputParts;
+  // This flag indicates that the VTK source can take multiple inputs.
+  // The input may have multiple parts, but the output will have only one part.
+  // By default, this flag is off (0) indicating the VTK filter
+  // takes one input, and has one output.  A VTK filter will
+  // be created for each part.
+  int VTKMultipleInputFlag;
 
   vtkPVSource* Prototype;
 

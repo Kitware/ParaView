@@ -58,7 +58,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVGlyph3D);
-vtkCxxRevisionMacro(vtkPVGlyph3D, "1.75");
+vtkCxxRevisionMacro(vtkPVGlyph3D, "1.76");
 
 int vtkPVGlyph3DCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -85,28 +85,42 @@ vtkPVGlyph3D::~vtkPVGlyph3D()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVGlyph3D::SetGlyphSource(vtkPVData *source)
+void vtkPVGlyph3D::SetGlyphSource(vtkPVData *pvdInput)
 {
+  int numSources;
+  int sourceIdx;
   vtkPVApplication *pvApp = this->GetPVApplication();
 
-  this->SetNthPVInput(1, source);
+  this->SetNthPVInput(1, pvdInput);
 
-  if (source)
+  numSources = this->GetNumberOfVTKSources();
+  for (sourceIdx = 0; sourceIdx < numSources; ++sourceIdx)
     {
-    source->Register(this);
-    pvApp->BroadcastScript("%s SetSource %s", this->GetVTKSourceTclName(),
-                          source->GetPVPart()->GetVTKDataTclName());
+    if (pvdInput)
+      {
+      // The input is limited and has only one part.
+      pvApp->BroadcastScript("%s SetSource %s", 
+                             this->GetVTKSourceTclName(sourceIdx),
+                             pvdInput->GetPVPart()->GetVTKDataTclName());
+      }
+    else
+      {
+      pvApp->BroadcastScript("%s SetSource {}", 
+                             this->GetVTKSourceTclName(sourceIdx));
+      }
     }
-  else
-    {
-    pvApp->BroadcastScript("%s SetSource {}", this->GetVTKSourceTclName());
-    }
+
+  // I do not know why we need a special ivar.
   if (this->GlyphSource)
     {
     this->GlyphSource->UnRegister(this);
     }
-  this->GlyphSource = source;
-}
+  this->GlyphSource = pvdInput;
+  if (this->GlyphSource)
+    {
+    this->GlyphSource->Register(this);
+    }
+ }
 
 //----------------------------------------------------------------------------
 vtkPVData* vtkPVGlyph3D::GetGlyphSource()

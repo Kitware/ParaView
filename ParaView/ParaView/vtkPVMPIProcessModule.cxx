@@ -86,7 +86,7 @@ void vtkPVSlaveScript(void *localArg, void *remoteArg,
 
  //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVMPIProcessModule);
-vtkCxxRevisionMacro(vtkPVMPIProcessModule, "1.6");
+vtkCxxRevisionMacro(vtkPVMPIProcessModule, "1.7");
 
 int vtkPVMPIProcessModuleCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -312,6 +312,12 @@ void vtkPVMPIProcessModule::GatherDataInformation(vtkDataSet *data)
   unsigned char *msg;
   int myId = this->Controller->GetLocalProcessId();
   vtkPVDataInformation *tmp = vtkPVDataInformation::New();
+
+  if (data == NULL)
+    {
+    vtkErrorMacro("Data Tcl name must be wrong.");
+    return;
+    }
 
   if (myId != 0)
     {

@@ -52,6 +52,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVAnimationInterface.h"
 #include "vtkPVApplication.h"
 #include "vtkPVData.h"
+#include "vtkPVDataInformation.h"
 #include "vtkPVPart.h"
 #include "vtkPVInputMenu.h"
 #include "vtkPVMinMax.h"
@@ -60,7 +61,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVExtentEntry);
-vtkCxxRevisionMacro(vtkPVExtentEntry, "1.14");
+vtkCxxRevisionMacro(vtkPVExtentEntry, "1.15");
 
 vtkCxxSetObjectMacro(vtkPVExtentEntry, InputMenu, vtkPVInputMenu);
 
@@ -108,16 +109,13 @@ void vtkPVExtentEntry::Update()
   vtkPVData *input = this->InputMenu->GetCurrentValue()->GetPVOutput();
   if (input == NULL)
     {
-    this->Script("eval %s SetRange %d %d %d %d %d %d",
-                 this->GetTclName(), 0, 0, 0, 0, 0, 0);
+    this->SetRange(0, 0, 0, 0, 0, 0);
     }
   else
     {
-    this->Script("eval %s SetRange [%s GetWholeExtent]",
-                 this->GetTclName(),
-                 input->GetPVPart()->GetVTKDataTclName());
+    int *ext = input->GetDataInformation()->GetExtent();
+    this->SetRange(ext[0], ext[1], ext[2], ext[3], ext[4], ext[5]);
     }
-
 }
 
 void vtkPVExtentEntry::SetBalloonHelpString( const char *str )
@@ -215,21 +213,7 @@ void vtkPVExtentEntry::Create(vtkKWApplication *pvApp)
     this->MinMax[i]->GetMaxScale()->DisplayEntry();
     this->MinMax[i]->GetMaxScale()->DisplayLabel(" Max:");
     }
-
-  // Initialize the extent of the VTK source. Normally, it
-  // is set to -VTK_LARGE_FLOAT, VTK_LARGE_FLOAT...
-  if (this->PVSource && this->PVSource->GetPVInput() && this->VariableName )
-    {
-    this->Script("eval %s Set%s [%s GetWholeExtent]",
-                 this->PVSource->GetVTKSourceTclName(), 
-                 this->GetVariableName(),
-                 this->PVSource->GetPVInput()->GetPVPart()->GetVTKDataTclName());
-
-    this->Script("eval %s SetRange [%s GetWholeExtent]",
-                 this->GetTclName(),
-                 this->PVSource->GetPVInput()->GetPVPart()->GetVTKDataTclName());
-    }
-
+  
   for(i=0; i<3; i++)
     {
     this->Script("pack %s -side top -fill x -expand t -pady 5", 
@@ -244,19 +228,14 @@ void vtkPVExtentEntry::Create(vtkKWApplication *pvApp)
 
 
 //---------------------------------------------------------------------------
-void vtkPVExtentEntry::Accept()
+void vtkPVExtentEntry::Accept(const char* sourceTclName)
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
   ofstream *traceFile = pvApp->GetTraceFile();
   int traceFlag = 0;
 
-  if ( ! this->ModifiedFlag)
-    {
-    return;
-    }
-
   // Start the trace entry and the accept command.
-  if (traceFile && this->InitializeTrace())
+  if (this->ModifiedFlag && traceFile && this->InitializeTrace())
     {
     traceFlag = 1;
     }
@@ -273,7 +252,7 @@ void vtkPVExtentEntry::Accept()
     }
 
   pvApp->BroadcastScript("%s Set%s %d %d %d %d %d %d", 
-                         this->ObjectTclName, this->VariableName,
+                         sourceTclName, this->VariableName,
                          static_cast<int>(this->MinMax[0]->GetMinValue()), 
                          static_cast<int>(this->MinMax[0]->GetMaxValue()),
                          static_cast<int>(this->MinMax[1]->GetMinValue()), 
@@ -283,9 +262,14 @@ void vtkPVExtentEntry::Accept()
 
   this->ModifiedFlag = 0;  
 }
+//---------------------------------------------------------------------------
+void vtkPVExtentEntry::Accept()
+{
+  this->Accept(this->ObjectTclName);
+}
 
 //---------------------------------------------------------------------------
-void vtkPVExtentEntry::Reset()
+void vtkPVExtentEntry::Reset(const char* sourceTclName)
 {
   if ( ! this->ModifiedFlag)
     {
@@ -293,9 +277,14 @@ void vtkPVExtentEntry::Reset()
     }
 
   this->Script("eval %s SetValue [%s Get%s]",
-               this->GetTclName(), this->ObjectTclName,  this->VariableName);
+               this->GetTclName(), sourceTclName,  this->VariableName);
 
   this->ModifiedFlag = 0;
+}
+//---------------------------------------------------------------------------
+void vtkPVExtentEntry::Reset()
+{
+  this->Reset(this->ObjectTclName);
 }
 
 
@@ -314,6 +303,25 @@ void vtkPVExtentEntry::SetRange(int v0, int v1, int v2,
 void vtkPVExtentEntry::SetValue(int v0, int v1, int v2, 
                                 int v3, int v4, int v5)
 {
+  float range[2];
+
+  // First, restrict value to current range.
+  this->MinMax[0]->GetRange(range);
+  if (v0 < range[0]) {v0 = range[0];}
+  if (v0 > range[1]) {v0 = range[1];}
+  if (v1 < range[0]) {v1 = range[0];}
+  if (v1 > range[1]) {v1 = range[1];}
+  this->MinMax[1]->GetRange(range);
+  if (v2 < range[0]) {v2 = range[0];}
+  if (v2 > range[1]) {v2 = range[1];}
+  if (v3 < range[0]) {v3 = range[0];}
+  if (v3 > range[1]) {v3 = range[1];}
+  this->MinMax[2]->GetRange(range);
+  if (v4 < range[0]) {v4 = range[0];}
+  if (v4 > range[1]) {v4 = range[1];}
+  if (v5 < range[0]) {v5 = range[0];}
+  if (v5 > range[1]) {v5 = range[1];}
+
   if ( v1 >= v0 )
     {
     if ( (float)v1 < this->MinMax[0]->GetMinValue() )

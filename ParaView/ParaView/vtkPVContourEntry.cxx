@@ -55,7 +55,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVContourEntry);
-vtkCxxRevisionMacro(vtkPVContourEntry, "1.18");
+vtkCxxRevisionMacro(vtkPVContourEntry, "1.19");
 
 int vtkPVContourEntryCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -284,16 +284,15 @@ void vtkPVContourEntry::RemoveAllValues()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVContourEntry::Accept()
+void vtkPVContourEntry::Accept(const char* sourceTclName)
 {
   int i;
   float value;
   int numContours;
   vtkPVApplication *pvApp = this->GetPVApplication();
 
-  if (this->PVSource == NULL)
+  if (sourceTclName == NULL)
     {
-    vtkErrorMacro("PVSource not set.");
     return;
     }
 
@@ -310,19 +309,35 @@ void vtkPVContourEntry::Accept()
     {  
     this->AddTraceEntry("$kw(%s) RemoveAllValues", 
                          this->GetTclName());
-    pvApp->BroadcastScript("%s SetNumberOfContours %d",
-                           this->PVSource->GetVTKSourceTclName(), numContours);
+    }
+
+  pvApp->BroadcastScript("%s SetNumberOfContours %d",
+                         sourceTclName, numContours);
   
-    for (i = 0; i < numContours; i++)
+  for (i = 0; i < numContours; i++)
+    {
+    value = atof(this->ContourValuesList->GetItem(i));
+    pvApp->BroadcastScript("%s SetValue %d %f",
+                           sourceTclName, i, value);
+    if (this->ModifiedFlag)
       {
-      value = atof(this->ContourValuesList->GetItem(i));
-      pvApp->BroadcastScript("%s SetValue %d %f",
-                             this->PVSource->GetVTKSourceTclName(),
-                             i, value);
       this->AddTraceEntry("$kw(%s) AddValue %f", 
                            this->GetTclName(), value);
       }
     }
+}
+
+
+//----------------------------------------------------------------------------
+void vtkPVContourEntry::Accept()
+{
+  if (this->PVSource == NULL)
+    {
+    vtkErrorMacro("PVSource not set.");
+    return;
+    }
+
+  this->Accept(this->PVSource->GetVTKSourceTclName(0));
 }
 
 //----------------------------------------------------------------------------
@@ -346,7 +361,7 @@ void vtkPVContourEntry::SaveInTclScript(ofstream *file)
 //----------------------------------------------------------------------------
 // If we had access to the ContourValues object of the filter,
 // this would be much easier.  We would not have to rely on Tcl calls.
-void vtkPVContourEntry::Reset()
+void vtkPVContourEntry::Reset(const char* sourceTclName)
 {
   int i;
   int numContours;
@@ -357,7 +372,7 @@ void vtkPVContourEntry::Reset()
     return;
     }
   this->Script("%s GetNumberOfContours", 
-               this->PVSource->GetVTKSourceTclName());
+               sourceTclName);
   numContours = this->GetIntegerResult(this->Application);
 
   // The widget has been modified.  
@@ -367,13 +382,25 @@ void vtkPVContourEntry::Reset()
     {
     this->Script("%s AppendUnique [%s GetValue %d]", 
                  this->ContourValuesList->GetTclName(),
-                 this->PVSource->GetVTKSourceTclName(), i);
+                 sourceTclName, i);
     }
 
   // Since the widget now matches the fitler, it is no longer modified.
   this->ModifiedFlag = 0;
 }
 
+
+//----------------------------------------------------------------------------
+void vtkPVContourEntry::Reset()
+{
+  if (this->PVSource == NULL)
+    {
+    vtkErrorMacro("PVSource not set.");
+    return;
+    }
+
+  this->Reset(this->PVSource->GetVTKSourceTclName(0));
+}
 
 //----------------------------------------------------------------------------
 void vtkPVContourEntry::AddAnimationScriptsToMenu(vtkKWMenu *menu, 

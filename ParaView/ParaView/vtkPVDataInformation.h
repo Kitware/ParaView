@@ -99,6 +99,11 @@ public:
   void GetBounds(float* bds);
 
   // Description:
+  // Of course Extent is only valid for structured data sets.
+  // Extent is the largest extent that contains all the parts.
+  vtkGetVector6Macro(Extent, int);
+
+  // Description:
   // Access to information about point and cell data.
   vtkGetObjectMacro(PointDataInformation,vtkPVDataSetAttributesInformation);
   vtkGetObjectMacro(CellDataInformation,vtkPVDataSetAttributesInformation);
@@ -111,6 +116,10 @@ public:
   unsigned char *NewMessage(int &length);
   void CopyFromMessage(unsigned char *msg);
 
+  // Description:
+  // Name stored in field data.
+  vtkGetStringMacro(Name);
+
 protected:
   vtkPVDataInformation();
   ~vtkPVDataInformation();
@@ -121,6 +130,9 @@ protected:
   int            NumberOfCells;
   unsigned long  MemorySize;
   double         Bounds[6];
+  int            Extent[6];
+  char*          Name;
+  vtkSetStringMacro(Name);
 
   vtkPVDataSetAttributesInformation* PointDataInformation;
   vtkPVDataSetAttributesInformation* CellDataInformation;

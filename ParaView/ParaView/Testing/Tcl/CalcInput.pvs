@@ -23,10 +23,11 @@ set pv(vtkTemp98) [$pv(vtkTemp1) CreatePVSource SphereSource]
 $pv(vtkTemp98) AcceptCallback
 
 set pv(vtkTemp182) [$pv(vtkTemp1) CreatePVSource Calculator]
-$pv(vtkTemp182) AddScalarVariable Normals_0 Normals 0
-$pv(vtkTemp182) AddScalarVariable Normals_1 Normals 1
-$pv(vtkTemp182) AddScalarVariable Normals_2 Normals 2
-$pv(vtkTemp182) SetFunctionLabel {Normals_0+Normals_1+Normals_2}
+set pv(vtkTemp668) [$pv(vtkTemp182) GetPVWidget {Equation}]
+$pv(vtkTemp668) AddScalarVariable Normals_0 Normals 0
+$pv(vtkTemp668) AddScalarVariable Normals_1 Normals 1
+$pv(vtkTemp668) AddScalarVariable Normals_2 Normals 2
+$pv(vtkTemp668) SetFunctionLabel {Normals_0+Normals_1+Normals_2}
 $pv(vtkTemp182) AcceptCallback
 
 set pv(vtkTemp211) [$pv(vtkTemp1) CreatePVSource CylinderSource]

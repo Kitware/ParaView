@@ -71,12 +71,14 @@ public:
   // Called when accept button is pushed.  
   // Sets objects variable to the widgets value.
   // Adds a trace entry.  Side effect is to turn modified flag off.
+  virtual void Accept(const char* sourceTclName);
   virtual void Accept();
   
   // Description:
   // Called when the reset button is pushed.
   // Sets widget's value to the object-variable's value.
   // Side effect is to turn the modified flag off.
+  virtual void Reset(const char* sourceTclName);
   virtual void Reset();
 
   // Description:

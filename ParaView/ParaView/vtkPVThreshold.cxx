@@ -64,7 +64,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVThreshold);
-vtkCxxRevisionMacro(vtkPVThreshold, "1.53");
+vtkCxxRevisionMacro(vtkPVThreshold, "1.54");
 
 int vtkPVThresholdCommand(ClientData cd, Tcl_Interp *interp,
                           int argc, char *argv[]);
@@ -319,15 +319,15 @@ void vtkPVThreshold::SaveInTclScript(ofstream *file, int interactiveFlag,
 
   this->GetPVInput()->GetPVSource()->SaveInTclScript(file, interactiveFlag,vtkFlag);
 
-  *file << this->VTKSource->GetClassName() << " "
-        << this->VTKSourceTclName << "\n";
+  *file << this->GetVTKSource()->GetClassName() << " "
+        << this->GetVTKSourceTclName() << "\n";
   
-  *file << "\t" << this->VTKSourceTclName << " SetInput [";
+  *file << "\t" << this->GetVTKSourceTclName() << " SetInput [";
 
   *file << this->GetPVInput()->GetPVSource()->GetVTKSourceTclName()
         << " GetOutput]\n\t";
   
-  *file << this->VTKSourceTclName << " SetAttributeModeToUse";
+  *file << this->GetVTKSourceTclName() << " SetAttributeModeToUse";
   if (strcmp(this->AttributeModeMenu->GetValue(), "Point Data") == 0)
     {
     *file << "PointData\n\t";

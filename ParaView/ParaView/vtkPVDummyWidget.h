@@ -55,7 +55,7 @@ public:
   static vtkPVDummyWidget* New();
   vtkTypeRevisionMacro(vtkPVDummyWidget, vtkPVWidget);
   void PrintSelf(ostream& os, vtkIndent indent);
-  
+
   // Description:
   // Create the widget.
   virtual void Create(vtkKWApplication *app);
@@ -70,6 +70,10 @@ public:
                                  vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
 //ETX
 
+  // Description:
+  // Trying out a ne protocal.
+  virtual void Accept(const char* sourceTclName) { this->ModifiedFlag = 0;}
+  virtual void Reset(const char* sourceTclName) { this->ModifiedFlag = 0;}
 
 protected:
   vtkPVDummyWidget();

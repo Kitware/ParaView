@@ -50,7 +50,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVStringEntry);
-vtkCxxRevisionMacro(vtkPVStringEntry, "1.15");
+vtkCxxRevisionMacro(vtkPVStringEntry, "1.16");
 
 //----------------------------------------------------------------------------
 vtkPVStringEntry::vtkPVStringEntry()
@@ -180,10 +180,15 @@ void vtkPVStringEntry::SetValue(const char* fileName)
   this->ModifiedCallback();
 }
 
-
-
 //----------------------------------------------------------------------------
 void vtkPVStringEntry::Accept()
+{
+  // We could use PVSource here to loop through all of the correct sources.
+  this->Accept(this->ObjectTclName);
+}
+  
+//----------------------------------------------------------------------------
+void vtkPVStringEntry::Accept(const char* sourceTclName)
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
 
@@ -194,14 +199,22 @@ void vtkPVStringEntry::Accept()
     }
 
   pvApp->BroadcastScript("%s Set%s {%s}",
-                         this->ObjectTclName, this->VariableName,
+                         sourceTclName, this->VariableName,
                          this->GetValue());
 
   this->ModifiedFlag = 0;
 }
 
+
 //----------------------------------------------------------------------------
 void vtkPVStringEntry::Reset()
+{
+  // We could use PVSource here to loop through all of the correct sources.
+  this->Reset(this->ObjectTclName);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVStringEntry::Reset(const char* sourceTclName)
 {
   if ( ! this->ModifiedFlag)
     {
@@ -210,11 +223,12 @@ void vtkPVStringEntry::Reset()
 
   // Command to update the UI.
   this->Script("%s SetValue [%s Get%s]", this->Entry->GetTclName(), 
-               this->ObjectTclName, this->VariableName); 
+               sourceTclName, this->VariableName); 
 
   this->ModifiedFlag = 0;
 }
 
+//----------------------------------------------------------------------------
 vtkPVStringEntry* vtkPVStringEntry::ClonePrototype(vtkPVSource* pvSource,
                                  vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
 {

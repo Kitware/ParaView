@@ -12,8 +12,7 @@ set kw(vtkTemp1) [$Application GetMainWindow]
 set kw(vtkTemp21) [$kw(vtkTemp1) GetMainView]
 $kw(vtkTemp1) Open "$DataDir/Data/ironProt.vtk"
 set kw(vtkTemp285) [vtkTemp1 GetCurrentPVSource]
-set kw(vtkTemp296) [$kw(vtkTemp285) GetPVWidget {File Name}]
-$kw(vtkTemp296) SetValue "$DataDir/Data/ironProt.vtk"
+
 set kw(vtkTemp318) [$kw(vtkTemp1) CreatePVSource ImageClip]
 set kw(vtkTemp330) [$kw(vtkTemp318) GetPVWidget {OutputWholeExtent}]
 $kw(vtkTemp330) SetValue 10 20 10 20 10 20

@@ -22,15 +22,15 @@ set pv(vtkTemp97) [$pv(vtkTemp1) GetPVSource GlyphSources Sphere0]
 # Excercise all of the different types of PV widgets.
 
 $pv(vtkTemp1) OpenCustom "P3DReader" "$DataDir/Data/combxyz.bin"
-set kw(vtkTemp292) [$pv(vtkTemp1) GetCurrentPVSource]
-set kw(vtkTemp305) [$kw(vtkTemp292) GetPVWidget {QFileName}]
-$kw(vtkTemp305) SetValue "$DataDir/Data/combq.bin"
-$kw(vtkTemp292) AcceptCallback
+set pv(vtkTemp292) [$pv(vtkTemp1) GetCurrentPVSource]
+set pv(vtkTemp305) [$pv(vtkTemp292) GetPVWidget {QFileName}]
+$pv(vtkTemp305) SetValue "$DataDir/Data/combq.bin"
+$pv(vtkTemp292) AcceptCallback
 
 # A mistake, but I will leave it here
 set pv(vtkTemp154) [$pv(vtkTemp1) CreatePVSource DataSetSurfaceFilter]
 $pv(vtkTemp154) DeleteCallback
-$pv(vtkTemp1) SetCurrentPVSource $kw(vtkTemp292)
+$pv(vtkTemp1) SetCurrentPVSource $pv(vtkTemp292)
 $pv(vtkTemp1) ShowCurrentSourceProperties
 
 set pv(vtkTemp167) [$pv(vtkTemp1) CreatePVSource SphereSource]
@@ -60,35 +60,36 @@ set pv(vtkTemp274) [$pv(vtkTemp265) GetPVWidget {Input}]
 $pv(vtkTemp274) SetCurrentValue $pv(vtkTemp230)
 $pv(vtkTemp265) AcceptCallback
 [$pv(vtkTemp274) GetCurrentValue] SetVisibility 1
-$pv(vtkTemp274) SetCurrentValue $kw(vtkTemp292)
+$pv(vtkTemp274) SetCurrentValue $pv(vtkTemp292)
 $pv(vtkTemp265) AcceptCallback
 $pv(vtkTemp1) ResetCameraCallback
 
 set pv(vtkTemp286) [$pv(vtkTemp1) CreatePVSource Calculator]
-$pv(vtkTemp286) AddScalarVariable Momentum_0 Momentum 0
-$pv(vtkTemp286) AddScalarVariable Momentum_1 Momentum 1
-$pv(vtkTemp286) SetFunctionLabel {Momentum_0+Momentum_1}
+set pv(vtkTemp668) [$pv(vtkTemp286) GetPVWidget {Equation}]
+$pv(vtkTemp668) AddScalarVariable Momentum_0 Momentum 0
+$pv(vtkTemp668) AddScalarVariable Momentum_1 Momentum 1
+$pv(vtkTemp668) SetFunctionLabel {Momentum_0+Momentum_1}
 set pv(vtkTemp298) [$pv(vtkTemp286) GetPVWidget {ResultArray}]
 $pv(vtkTemp298) SetValue {sum}
 $pv(vtkTemp286) AcceptCallback
 
 # Test the Plane widget tracing.
 
-set kw(vtkTemp285) [$pv(vtkTemp1) CreatePVSource SphereSource]
-set kw(vtkTemp295) [$kw(vtkTemp285) GetPVWidget {Center}]
-set kw(vtkTemp300) [$kw(vtkTemp285) GetPVWidget {Radius}]
-$kw(vtkTemp300) SetValue 5
-$kw(vtkTemp295) SetValue 0 15 0
-$kw(vtkTemp285) AcceptCallback
+set pv(vtkTemp285) [$pv(vtkTemp1) CreatePVSource SphereSource]
+set pv(vtkTemp295) [$pv(vtkTemp285) GetPVWidget {Center}]
+set pv(vtkTemp300) [$pv(vtkTemp285) GetPVWidget {Radius}]
+$pv(vtkTemp300) SetValue 5
+$pv(vtkTemp295) SetValue 0 15 0
+$pv(vtkTemp285) AcceptCallback
 
 $pv(vtkTemp1) ResetCameraCallback
 
-set kw(vtkTemp327) [$pv(vtkTemp1) CreatePVSource Clip]
-set kw(vtkTemp328) [$kw(vtkTemp327) GetPVWidget {Clip Function}]
-set kw(vtkTemp334) [$kw(vtkTemp328) GetPVWidget {Plane}]
-$kw(vtkTemp334) SetCenter 0 16 0
-$kw(vtkTemp334) SetNormal 0.57546 0.76627 -0.28578
-$kw(vtkTemp327) AcceptCallback
+set pv(vtkTemp327) [$pv(vtkTemp1) CreatePVSource Clip]
+set pv(vtkTemp328) [$pv(vtkTemp327) GetPVWidget {Clip Function}]
+set pv(vtkTemp334) [$pv(vtkTemp328) GetPVWidget {Plane}]
+$pv(vtkTemp334) SetCenter 0 16 0
+$pv(vtkTemp334) SetNormal 0.57546 0.76627 -0.28578
+$pv(vtkTemp327) AcceptCallback
 
 
 
@@ -98,17 +99,17 @@ $Application StopRecordingScript
 
 # Delete all the sources
 
-$pv(vtkTemp1) SetCurrentPVSource $kw(vtkTemp327)
-$kw(vtkTemp327) DeleteCallback
-$pv(vtkTemp1) SetCurrentPVSource $kw(vtkTemp285)
-$kw(vtkTemp285) DeleteCallback
+$pv(vtkTemp1) SetCurrentPVSource $pv(vtkTemp327)
+$pv(vtkTemp327) DeleteCallback
+$pv(vtkTemp1) SetCurrentPVSource $pv(vtkTemp285)
+$pv(vtkTemp285) DeleteCallback
 
 $pv(vtkTemp1) SetCurrentPVSource $pv(vtkTemp286)
 $pv(vtkTemp286) DeleteCallback
 $pv(vtkTemp1) SetCurrentPVSource $pv(vtkTemp265)
 $pv(vtkTemp265) DeleteCallback
-$pv(vtkTemp1) SetCurrentPVSource $kw(vtkTemp292)
-$kw(vtkTemp292) DeleteCallback
+$pv(vtkTemp1) SetCurrentPVSource $pv(vtkTemp292)
+$pv(vtkTemp292) DeleteCallback
 $pv(vtkTemp1) SetCurrentPVSource $pv(vtkTemp230)
 $pv(vtkTemp230) DeleteCallback
 $pv(vtkTemp1) SetCurrentPVSource $pv(vtkTemp167)

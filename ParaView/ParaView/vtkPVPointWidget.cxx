@@ -61,7 +61,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkRenderer.h"
 
 vtkStandardNewMacro(vtkPVPointWidget);
-vtkCxxRevisionMacro(vtkPVPointWidget, "1.13");
+vtkCxxRevisionMacro(vtkPVPointWidget, "1.14");
 
 int vtkPVPointWidgetCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -124,53 +124,66 @@ void vtkPVPointWidget::PositionResetCallback()
 
 
 //----------------------------------------------------------------------------
-void vtkPVPointWidget::Reset()
+void vtkPVPointWidget::Reset(const char* sourceTclName)
 {
   if ( ! this->ModifiedFlag)
     {
     return;
     }
   // Reset point
-  if ( this->VariableName && this->ObjectTclName )
+  if ( this->VariableName && sourceTclName )
     {
     this->Script("eval %s SetPosition [ %s Get%s ]",
-                 this->GetTclName(), this->ObjectTclName, 
+                 this->GetTclName(), sourceTclName, 
                  this->VariableName);
     }
-  this->Superclass::Reset();
+  this->Superclass::Reset(sourceTclName);
+}
+//----------------------------------------------------------------------------
+void vtkPVPointWidget::Reset()  
+{
+  this->Reset(this->ObjectTclName);
+}
+
+
+//----------------------------------------------------------------------------
+void vtkPVPointWidget::Accept(const char* sourceTclName)  
+{
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  ofstream *traceFile = pvApp->GetTraceFile();
+  int traceFlag = 0;
+
+  // Start the trace entry and the accept command.
+  // Modified flag is used to keep from having multiple traces with 
+  // multiple sources.
+  if (this->ModifiedFlag && traceFile && this->InitializeTrace())
+    {
+    traceFlag = 1;
+    }
+
+  this->SetPosition(this->PositionEntry[0]->GetValueAsFloat(),
+                    this->PositionEntry[1]->GetValueAsFloat(),
+                    this->PositionEntry[2]->GetValueAsFloat());
+
+  if (traceFlag)
+    {
+    *traceFile << "$kw(" << this->GetTclName() << ") SetPosition "
+               << this->PositionEntry[0]->GetValue() << " "
+               << this->PositionEntry[1]->GetValue() << " "
+               << this->PositionEntry[2]->GetValue() << endl;
+    }
+  this->UpdateVTKObject();
+  
+  this->Superclass::Accept(sourceTclName);
 }
 
 //----------------------------------------------------------------------------
 void vtkPVPointWidget::Accept()  
 {
-  if ( this->ModifiedFlag)
-    {
-    vtkPVApplication *pvApp = this->GetPVApplication();
-    ofstream *traceFile = pvApp->GetTraceFile();
-    int traceFlag = 0;
-
-    // Start the trace entry and the accept command.
-    if (traceFile && this->InitializeTrace())
-      {
-      traceFlag = 1;
-      }
-
-    this->SetPosition(this->PositionEntry[0]->GetValueAsFloat(),
-                      this->PositionEntry[1]->GetValueAsFloat(),
-                      this->PositionEntry[2]->GetValueAsFloat());
-
-    if (traceFlag)
-      {
-      *traceFile << "$kw(" << this->GetTclName() << ") SetPosition "
-                 << this->PositionEntry[0]->GetValue() << " "
-                 << this->PositionEntry[1]->GetValue() << " "
-                 << this->PositionEntry[2]->GetValue() << endl;
-      }
-    this->UpdateVTKObject();
-    }
-  this->Superclass::Accept();
+  this->Accept(this->ObjectTclName);
 }
 
+//----------------------------------------------------------------------------
 void vtkPVPointWidget::UpdateVTKObject()  
 {
   vtkPVApplication *pvApp = this->GetPVApplication();

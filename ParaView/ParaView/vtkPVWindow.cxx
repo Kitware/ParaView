@@ -126,7 +126,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.407");
+vtkCxxRevisionMacro(vtkPVWindow, "1.408");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -1117,7 +1117,6 @@ void vtkPVWindow::Create(vtkKWApplication *app, char* vtkNotUsed(args))
       }
 
     vtkPVSource *pvs=0;
-    
     // Create the sources that can be used for glyphing.
     // ===== Arrow
     pvs = this->CreatePVSource("ArrowSource", "GlyphSources", 0, 0);
@@ -1351,13 +1350,46 @@ void vtkPVWindow::ResetCenterCallback()
 //----------------------------------------------------------------------------
 void vtkPVWindow::ResizeCenterActor()
 {
-  float bounds[6];
-  
-  int vis = this->CenterActor->GetVisibility();
-  this->CenterActor->VisibilityOff();
-  this->MainView->ComputeVisiblePropBounds(bounds);
-  if ((bounds[0] < bounds[1]) && (bounds[2] < bounds[3]) &&
-      (bounds[4] < bounds[5]))
+  int first = 1;
+  double bounds[6];
+  double tmp[6];
+  vtkPVSource *pvs;
+ 
+  // Loop though all sources/Data objects and compute total bounds.
+  vtkPVSourceCollection* col = this->GetSourceList("Sources");
+  if (col == NULL)
+    {
+    return;
+    }
+  vtkCollectionIterator *it = col->NewIterator();
+  it->InitTraversal();
+  while ( !it->IsDoneWithTraversal() )
+    {
+    pvs = static_cast<vtkPVSource*>( it->GetObject() );
+    if (pvs->GetVisibility())
+      {
+      if (first)
+        {
+        pvs->GetPVOutput()->GetDataInformation()->GetBounds(bounds);
+        first = 0;
+        }
+      else
+        {
+        pvs->GetPVOutput()->GetDataInformation()->GetBounds(tmp);
+        if (tmp[0] < bounds[0]) {bounds[0] = tmp[0];} 
+        if (tmp[1] > bounds[1]) {bounds[1] = tmp[1];} 
+        if (tmp[2] < bounds[2]) {bounds[2] = tmp[2];} 
+        if (tmp[3] > bounds[3]) {bounds[3] = tmp[3];} 
+        if (tmp[4] < bounds[4]) {bounds[4] = tmp[4];} 
+        if (tmp[5] > bounds[5]) {bounds[5] = tmp[5];} 
+        }
+      }
+    it->GoToNextItem();
+    }
+
+  it->Delete();
+  if ((! first) && (bounds[0] < bounds[1]) && 
+      (bounds[2] < bounds[3]) && (bounds[4] < bounds[5]))
     {
     this->CenterActor->SetScale(0.25 * (bounds[1]-bounds[0]),
                                 0.25 * (bounds[3]-bounds[2]),
@@ -1366,13 +1398,14 @@ void vtkPVWindow::ResizeCenterActor()
   else
     {
     this->CenterActor->SetScale(1, 1, 1);
-    this->CenterActor->VisibilityOn();
     this->MainView->ResetCamera();
-    this->MainView->EventuallyRender();
-    this->CenterActor->VisibilityOff();
+    //float range[2];
+    //float size;
+    //this->MainView->GetRenderer()->GetActiveCamera()->GetClippingRange(range);
+    //size = (range[1] - range[0]) * 0.5;
+    //this->CenterActor->SetScale(size, size, size);
+    //this->MainView->EventuallyRender();
     }
-    
-  this->CenterActor->SetVisibility(vis);
 }
 
 //----------------------------------------------------------------------------
@@ -3788,8 +3821,8 @@ vtkPVColorMap* vtkPVWindow::GetPVColorMap(const char* parameterName,
   cm->SetNumberOfVectorComponents(numberOfComponents);
   cm->Create(this->GetPVApplication());
   cm->SetTraceReferenceObject(this);
-  cm->SetScalarBarTitle(parameterName);
-  cm->ResetScalarRange();
+  cm->SetScalarBarTitleInternal(parameterName);
+  cm->ResetScalarRangeInternal();
 
   this->PVColorMaps->AddItem(cm);
   cm->Delete();
@@ -3831,7 +3864,7 @@ void vtkPVWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVWindow ";
-  this->ExtractRevision(os,"$Revision: 1.407 $");
+  this->ExtractRevision(os,"$Revision: 1.408 $");
 }
 
 //----------------------------------------------------------------------------

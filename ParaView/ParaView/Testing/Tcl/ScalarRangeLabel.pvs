@@ -29,8 +29,9 @@ $kw(vtkTemp1) ShowCurrentSourceProperties
 $kw(vtkTemp99) AcceptCallback
 set kw(vtkTemp152) [$kw(vtkTemp1) CreatePVSource Calculator]
 $kw(vtkTemp1) ShowCurrentSourceProperties
-$kw(vtkTemp152) AddScalarVariable Iterations Iterations 0
-$kw(vtkTemp152) SetFunctionLabel {Iterations*2}
+set kw(vtkTemp668) [$kw(vtkTemp152) GetPVWidget {Equation}]
+$kw(vtkTemp668) AddScalarVariable Iterations Iterations 0
+$kw(vtkTemp668) SetFunctionLabel {Iterations*2}
 $kw(vtkTemp152) AcceptCallback
 set kw(vtkTemp179) [$kw(vtkTemp1) CreatePVSource SphereSource]
 $kw(vtkTemp1) ShowCurrentSourceProperties

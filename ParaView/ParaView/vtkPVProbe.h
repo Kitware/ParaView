@@ -53,7 +53,6 @@ class vtkKWLabel;
 class vtkKWLabel;
 class vtkKWOptionMenu;
 class vtkKWWidget;
-class vtkPVArrayMenu;
 class vtkXYPlotWidget;
 
 class VTK_EXPORT vtkPVProbe : public vtkPVSource
@@ -100,13 +99,6 @@ protected:
   vtkPVProbe();
   ~vtkPVProbe();
   
-  // Description:
-  // Create a menu to select the input.
-  virtual vtkPVInputMenu *AddInputMenu(char* label, char* inputName, 
-                                       char* inputType, char* help, 
-                                       vtkPVSourceCollection* sources);
-  vtkPVInputMenu* InputMenu;
-  virtual void SetInputMenu(vtkPVInputMenu* im);
   
   // The real AcceptCallback method.
   virtual void AcceptCallbackInternal();  
@@ -114,8 +106,6 @@ protected:
   vtkKWLabel *DimensionalityLabel;
   vtkKWOptionMenu *DimensionalityMenu;
   vtkKWWidget *ProbeFrame;
-
-  vtkPVArrayMenu *ScalarArrayMenu;
 
   vtkKWWidget *SelectedPointFrame;
   vtkKWLabel *SelectedPointLabel;

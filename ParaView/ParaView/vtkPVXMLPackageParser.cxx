@@ -58,7 +58,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <ctype.h>
 
-vtkCxxRevisionMacro(vtkPVXMLPackageParser, "1.18");
+vtkCxxRevisionMacro(vtkPVXMLPackageParser, "1.19");
 vtkStandardNewMacro(vtkPVXMLPackageParser);
 
 #ifndef VTK_NO_EXPLICIT_TEMPLATE_INSTANTIATION
@@ -436,7 +436,6 @@ void vtkPVXMLPackageParser::CreateFilterModule(vtkPVXMLElement* me)
     pvm->SetReplaceInput(replace_input);
     }
 
-
   // Get the name of the module.
   const char* name = me->GetAttribute("name");
   if(!name)
@@ -544,14 +543,38 @@ int vtkPVXMLPackageParser::CreateModule(vtkPVXMLElement* me, vtkPVSource* pvm)
     {
     vtkPVXMLElement* element = me->GetNestedElement(i);
     const char* name = element->GetName();
-    if((strcmp(name, "Source") == 0) || (strcmp(name, "Filter") == 0))
-      {
-      const char* type = element->GetAttribute("type");
+    if(strcmp(name, "Source") == 0)
+      {  // Item describing a VTK source.
+      const char* type = element->GetAttribute("class");
+      if (type) { pvm->SetSourceClassName(type); }
+      else
+        {
+        vtkErrorMacro("Source missing class.");
+        return 0;
+        }
+      }
+    else if (strcmp(name, "Filter") == 0)
+      { // Item describing a VTK filter.
+      const char* type = element->GetAttribute("class");
       if(type) { pvm->SetSourceClassName(type); }
       else
         {
-        vtkErrorMacro("Filter missing type.");
+        vtkErrorMacro("Filter missing class.");
         return 0;
+        }
+      // Attribute that tells whether the filter takes multiple
+      // inputs.  Different options handle multiple parts differently.
+      type = element->GetAttribute("input_quantity");
+      if (type) 
+        {
+        if (strcmp(type, "Single") == 0)
+          {
+          pvm->SetVTKMultipleInputFlag(0);
+          }
+        else if (strcmp(type, "Multiple"))
+          { 
+          pvm->SetVTKMultipleInputFlag(1);
+          } 
         }
       }
     else

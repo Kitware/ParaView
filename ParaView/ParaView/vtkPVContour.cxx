@@ -54,7 +54,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVContour);
-vtkCxxRevisionMacro(vtkPVContour, "1.57");
+vtkCxxRevisionMacro(vtkPVContour, "1.58");
 
 //----------------------------------------------------------------------------
 int vtkPVContourCommand(ClientData cd, Tcl_Interp *interp,
@@ -76,7 +76,7 @@ vtkPVContour::~vtkPVContour()
 //----------------------------------------------------------------------------
 void vtkPVContour::CreateProperties()
 {
-  vtkContourFilter* contour = vtkContourFilter::SafeDownCast(this->VTKSource);
+  vtkContourFilter* contour = vtkContourFilter::SafeDownCast(this->GetVTKSource());
   if (contour)
     {
     contour->SetNumberOfContours(0);
@@ -90,7 +90,10 @@ void vtkPVContour::CreateProperties()
   vtkPVWidget* input = this->GetPVWidget("Input");
   if (input)
     {
-    input->Reset();
+    // Input menu does not use the source name.
+    // I was planning to get rid of all "ObjectTclName" ivar.
+    // Maybe I should rethink "Reset"
+    input->Reset(NULL);
     }
   this->VerifyInput();
 }

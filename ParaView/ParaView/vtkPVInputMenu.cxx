@@ -58,7 +58,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVInputMenu);
-vtkCxxRevisionMacro(vtkPVInputMenu, "1.37");
+vtkCxxRevisionMacro(vtkPVInputMenu, "1.38");
 
 //----------------------------------------------------------------------------
 vtkPVInputMenu::vtkPVInputMenu()
@@ -173,14 +173,45 @@ void vtkPVInputMenu::AddSources(vtkPVSourceCollection *sources)
 //----------------------------------------------------------------------------
 int vtkPVInputMenu::AddEntry(vtkPVSource *pvs)
 {
-  if (pvs == this->PVSource)
+  vtkPVData *pvd;
+  if (pvs == this->PVSource || pvs == NULL)
     {
     return 0;
     }
 
-  if (pvs == NULL || pvs->GetPVOutput() == NULL)
+  // The next section of code eliminates any inputs which
+  // do not match the current input part for part.
+  // I is assumed the the PVSource has already created its
+  // vtkFilters and their outputs, and these can not change.
+  pvd = pvs->GetPVOutput();
+  if (pvd == NULL)
     {
     return 0;
+    }
+  if (this->CurrentValue)
+    {
+    vtkPVData *currentData = this->CurrentValue->GetPVOutput();
+    if (currentData != NULL)
+      {
+     // Only accept inputs which match part for part.
+      int partIdx, numParts;
+      numParts = currentData->GetNumberOfPVParts(); 
+      if (pvd->GetNumberOfPVParts() != numParts)
+        {
+        return 0;
+        }
+      for (partIdx = 0; partIdx < numParts; ++partIdx)
+        {
+        vtkPVDataInformation *info1;
+        vtkPVDataInformation *info2;
+        info1 = pvd->GetPVPart(partIdx)->GetDataInformation();
+        info2 = currentData->GetPVPart(partIdx)->GetDataInformation();
+        if (info1->GetDataSetType() != info2->GetDataSetType())
+          {
+          return 0;
+          }
+        }
+      }
     }
 
   if (this->InputType == NULL || 
@@ -319,13 +350,14 @@ void vtkPVInputMenu::ModifiedCallback()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVInputMenu::Accept()
+void vtkPVInputMenu::Accept(const char* sourceTclName)
 {
-  if (!this->ModifiedFlag)
+  // Since this is done on PVSource and not vtk source,
+  // We can ignore the sourceTclName and return after the first call.
+  if (this->ModifiedFlag == 0)
     {
     return;
     }
-
   if (this->PVSource == NULL)
     {
     vtkErrorMacro("PVSource not set.");
@@ -336,7 +368,7 @@ void vtkPVInputMenu::Accept()
     {
     this->Script("%s Set%s %s", this->PVSource->GetTclName(), this->InputName,
                  this->CurrentValue->GetPVOutput()->GetTclName());
-    if (this->ModifiedFlag && this->CurrentValue->InitializeTrace())
+    if (this->CurrentValue->InitializeTrace())
       {
       this->AddTraceEntry("$kw(%s) SetCurrentValue $kw(%s)", 
                            this->GetTclName(), 
@@ -356,17 +388,14 @@ void vtkPVInputMenu::Accept()
   else
     {
     this->Script("%s Set%s {}", this->PVSource->GetTclName(), this->InputName);
-    if (this->ModifiedFlag)
-      {
-      this->AddTraceEntry("$kw(%s) SetCurrentValue {}", 
-                           this->GetTclName());
-      }
+    this->AddTraceEntry("$kw(%s) SetCurrentValue {}", 
+                         this->GetTclName());
     }
   this->ModifiedFlag=1;
 }
 
 //----------------------------------------------------------------------------
-void vtkPVInputMenu::Reset()
+void vtkPVInputMenu::Reset(const char* sourceTclName)
 {
   if (this->PVSource == NULL)
     {
@@ -491,27 +520,6 @@ vtkPVSourceCollection *vtkPVInputMenu::GetSources()
 void vtkPVInputMenu::ClearEntries() 
 { 
   this->Menu->ClearEntries();
-}
-
-
-//----------------------------------------------------------------------------
-void vtkPVInputMenu::CompleteArrays()
-{
-  vtkPVSource* pvs;
-  vtkPVData*  pvd;
-
-  pvs = this->GetCurrentValue();
-  if (pvs == NULL)
-    {
-    return;
-    }
-  pvd = pvs->GetPVOutput();
-  if (pvd == NULL)
-    {
-    return;
-    }
-
-  pvd->GatherDataInformation();
 }
 
 

@@ -48,7 +48,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVDataSetAttributesInformation);
-vtkCxxRevisionMacro(vtkPVDataSetAttributesInformation, "1.1");
+vtkCxxRevisionMacro(vtkPVDataSetAttributesInformation, "1.2");
 
 
 //----------------------------------------------------------------------------
@@ -170,7 +170,7 @@ void vtkPVDataSetAttributesInformation::AddInformation(vtkPVDataSetAttributesInf
     // First find a match for array1 in info.
     idx2 = idx1;
     ai2 = info->GetArrayInformation(idx1);
-    if ( ai2 && ai1->Compare(ai2) == 0 )
+    if ( ai1->Compare(ai2) == 0 )
       { // Arrays are not in the same order.  Try to find a match.
       for (idx2 = 0; idx2 < num2; ++idx2)
         {

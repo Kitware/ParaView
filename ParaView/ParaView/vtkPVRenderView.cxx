@@ -108,7 +108,7 @@ static unsigned char image_properties[] =
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.227");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.228");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -1718,28 +1718,39 @@ vtkPVApplication* vtkPVRenderView::GetPVApplication()
 
 
 //----------------------------------------------------------------------------
-void vtkPVRenderView::AddPVData(vtkPVData *pvc)
+void vtkPVRenderView::AddPVData(vtkPVData *pvd)
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
+  vtkPVPart *part;
+  int num, idx;
   
-  if (pvc == NULL)
+  if (pvd == NULL)
     {
     return;
     }  
 
-  pvc->SetPVRenderView(this);
-    
-  if (pvc->GetPVPart()->GetPropTclName() != NULL)
+  // This has no side effects.  It just sets the pointer.
+  pvd->SetPVRenderView(this);
+  
+  // I would like to move the addition of the prop into vtkPVPart sometime.
+  num = pvd->GetNumberOfPVParts();
+  for (idx = 0; idx < num; ++idx)
     {
-    pvApp->BroadcastScript("%s AddProp %s", this->RendererTclName,
-                           pvc->GetPVPart()->GetPropTclName());
+    part = pvd->GetPVPart(idx);
+    if (part && part->GetPropTclName() != NULL)
+      {
+      pvApp->BroadcastScript("%s AddProp %s", this->RendererTclName,
+                             part->GetPropTclName());
+      }
     }
 }
 
 //----------------------------------------------------------------------------
 void vtkPVRenderView::RemovePVData(vtkPVData *pvc)
 {
+  int idx, num;
   vtkPVApplication *pvApp = this->GetPVApplication();
+  vtkPVPart *part;
 
   if (pvc == NULL)
     {
@@ -1747,10 +1758,15 @@ void vtkPVRenderView::RemovePVData(vtkPVData *pvc)
     }
 
   pvc->SetPVRenderView(NULL);
-  if (pvc->GetPVPart()->GetPropTclName() != NULL)
+  num = pvc->GetNumberOfPVParts();
+  for (idx = 0; idx < num; ++idx)
     {
-    pvApp->BroadcastScript("%s RemoveProp %s", this->RendererTclName,
-                  pvc->GetPVPart()->GetPropTclName());
+    part = pvc->GetPVPart(idx);
+    if (part->GetPropTclName() != NULL)
+      {
+      pvApp->BroadcastScript("%s RemoveProp %s", this->RendererTclName,
+                             part->GetPropTclName());
+      }
     }
 }
 
@@ -2153,7 +2169,7 @@ void vtkPVRenderView::SetLODThresholdInternal(int threshold)
     if (pvs->GetInitialized())
       {
       pvd = pvs->GetPVOutput();
-      // The performs the check and enables or disables decimation LOD.
+      // This gathers and displays information
       pvd->UpdateProperties();
       }
     }
@@ -2600,7 +2616,7 @@ void vtkPVRenderView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVRenderView ";
-  this->ExtractRevision(os,"$Revision: 1.227 $");
+  this->ExtractRevision(os,"$Revision: 1.228 $");
 }
 
 //------------------------------------------------------------------------------

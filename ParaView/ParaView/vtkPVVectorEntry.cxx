@@ -55,7 +55,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVVectorEntry);
-vtkCxxRevisionMacro(vtkPVVectorEntry, "1.28");
+vtkCxxRevisionMacro(vtkPVVectorEntry, "1.29");
 
 //---------------------------------------------------------------------------
 vtkPVVectorEntry::vtkPVVectorEntry()
@@ -281,6 +281,68 @@ void vtkPVVectorEntry::CheckModifiedCallback(const char* key)
     {
     this->ModifiedCallback();
     }
+}
+
+//---------------------------------------------------------------------------
+void vtkPVVectorEntry::Accept(const char* sourceTclName)
+{
+  vtkKWEntry *entry;
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  ofstream *traceFile = pvApp->GetTraceFile();
+  int traceFlag = 0;
+  char acceptCmd[1024];
+
+  // Start the trace entry and the accept command.
+  if (traceFile && this->InitializeTrace())
+    {
+    traceFlag = 1;
+    }
+
+  if (traceFlag && this->ModifiedFlag)
+    {
+    *traceFile << "$kw(" << this->GetTclName() << ") SetValue";
+    }
+  sprintf(acceptCmd, "%s Set%s ", sourceTclName, this->VariableName);
+
+  // finish all the arguments for the trace file and the accept command.
+  this->Entries->InitTraversal();
+  while ( (entry = (vtkKWEntry*)(this->Entries->GetNextItemAsObject())) )
+    {
+    if (traceFlag && this->ModifiedFlag)
+      {
+      *traceFile << " " << entry->GetValue();
+      }
+    strcat(acceptCmd, entry->GetValue());
+    strcat(acceptCmd, " ");
+    }
+  if (traceFlag && this->ModifiedFlag)
+    {
+    *traceFile << endl;
+    }
+  pvApp->BroadcastScript(acceptCmd);
+
+  this->ModifiedFlag = 0;  
+}
+
+//---------------------------------------------------------------------------
+void vtkPVVectorEntry::Reset(const char* sourceTclName)
+{
+  int count = 0;
+
+  if ( ! this->ModifiedFlag)
+    {
+    return;
+    }
+
+  // Set each entry to the appropriate value.
+  for( count = 0; count < this->Entries->GetNumberOfItems(); count ++ )
+    {
+    this->Script("%s SetEntryValue %d [lindex [%s Get%s] %d]",
+                 this->GetTclName(), count, sourceTclName, 
+                 this->VariableName, count); 
+    }
+
+  this->ModifiedFlag = 0;
 }
 
 //---------------------------------------------------------------------------

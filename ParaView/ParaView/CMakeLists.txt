@@ -5,10 +5,14 @@ vtkClientCompositeManager.cxx
 vtkCompositeProp.cxx
 vtkDuplicatePolyData.cxx
 vtkExtractCTHPart.cxx
+vtkGroup.cxx
 vtkRedistributePolyData.cxx
 vtkWeightedRedistributePolyData.cxx
 vtkKWBoundsDisplay.cxx
 vtkKWExtractGeometryByScalar.cxx
+vtkMultiOut.cxx
+vtkMultiOut2.cxx
+vtkMultiOut3.cxx
 vtkPickDataSetFilter.cxx
 vtkPV3DWidget.cxx
 vtkPVAdvancedReaderModule.cxx
@@ -16,11 +20,11 @@ vtkPVAnimationInterface.cxx
 vtkPVApplication.cxx 
 vtkPVApplicationResources.cxx 
 vtkPVApplicationSettingsInterface.cxx
-vtkPVArrayCalculator.cxx 
 vtkPVArrayInformation.cxx
 vtkPVArrayMenu.cxx 
 vtkPVArraySelection.cxx
 vtkPVBoundsDisplay.cxx
+vtkPVCalculatorWidget.cxx
 vtkPVCameraIcon.cxx
 vtkPVCameraManipulator.cxx
 vtkPVClientServerModule.cxx
@@ -42,10 +46,12 @@ vtkPVErrorLogDisplay.cxx
 vtkPVExtentEntry.cxx
 vtkPVExtentTranslator.cxx 
 vtkPVExtractGeometryByScalar.cxx
+vtkPVExtractPartsWidget.cxx
 vtkPVFileEntry.cxx
 vtkPVGenericRenderWindowInteractor.cxx
 vtkPVGhostLevelDialog.cxx
 vtkPVGlyph3D.cxx 
+vtkPVGroupInputsWidget.cxx
 vtkPVImplicitPlaneWidget.cxx
 vtkPVInitialize.cxx
 vtkPVInputMenu.cxx 
@@ -112,6 +118,7 @@ vtkPVWriter.cxx
 vtkPVXMLElement.cxx
 vtkPVXMLPackageParser.cxx
 vtkPVXMLParser.cxx
+vtkSelectInputs.cxx
 vtkStringList.cxx 
 vtkTiledDisplayManager.cxx
 

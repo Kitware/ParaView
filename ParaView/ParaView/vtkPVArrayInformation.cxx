@@ -46,7 +46,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVArrayInformation);
-vtkCxxRevisionMacro(vtkPVArrayInformation, "1.1");
+vtkCxxRevisionMacro(vtkPVArrayInformation, "1.2");
 
 //----------------------------------------------------------------------------
 vtkPVArrayInformation::vtkPVArrayInformation()
@@ -265,6 +265,10 @@ void vtkPVArrayInformation::CopyFromArray(vtkDataArray *array)
 //----------------------------------------------------------------------------
 int vtkPVArrayInformation::Compare(vtkPVArrayInformation *info)
 {
+  if (info == NULL)
+    {
+    return 0;
+    }
   if (strcmp(info->GetName(), this->Name) == 0 && 
       info->GetNumberOfComponents() == this->NumberOfComponents)
     {

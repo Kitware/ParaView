@@ -57,7 +57,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVXMLElement.h"
 
 vtkStandardNewMacro(vtkPVLineWidget);
-vtkCxxRevisionMacro(vtkPVLineWidget, "1.30");
+vtkCxxRevisionMacro(vtkPVLineWidget, "1.31");
 
 //----------------------------------------------------------------------------
 vtkPVLineWidget::vtkPVLineWidget()
@@ -287,20 +287,17 @@ void vtkPVLineWidget::SetResolution()
   this->ValueChanged = 0; 
 }
 
+
+
 //----------------------------------------------------------------------------
 void vtkPVLineWidget::Accept()
 {
-  if ( ! this->ModifiedFlag)
-    {
-    return;
-    }
-
   vtkPVApplication *pvApp = this->GetPVApplication();
   ofstream *traceFile = pvApp->GetTraceFile();
   int traceFlag = 0;
 
   // Start the trace entry and the accept command.
-  if (traceFile && this->InitializeTrace())
+  if (this->ModifiedFlag && traceFile && this->InitializeTrace())
     {
     traceFlag = 1;
     }
@@ -319,12 +316,46 @@ void vtkPVLineWidget::Accept()
                << this->ResolutionEntry->GetValue() << endl;
     }
 
-  this->UpdateVTKObject();
+  //this->UpdateVTKObject(this->ObjectTclName);
   this->Superclass::Accept();
 }
 
 //----------------------------------------------------------------------------
-void vtkPVLineWidget::UpdateVTKObject()
+void vtkPVLineWidget::Accept(const char* sourceTclName)
+{
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  ofstream *traceFile = pvApp->GetTraceFile();
+  int traceFlag = 0;
+
+  // Start the trace entry and the accept command.
+  if (this->ModifiedFlag && traceFile && this->InitializeTrace())
+    {
+    traceFlag = 1;
+    }
+
+  if (traceFlag)
+    {
+    *traceFile << "$kw(" << this->GetTclName() << ") SetPoint1 "
+               << this->Point1[0]->GetValue() << " "
+               << this->Point1[1]->GetValue() << " "
+               << this->Point1[2]->GetValue() << endl;
+    *traceFile << "$kw(" << this->GetTclName() << ") SetPoint2 "
+               << this->Point2[0]->GetValue() << " "
+               << this->Point2[1]->GetValue() << " "
+               << this->Point2[2]->GetValue() << endl;
+    *traceFile << "$kw(" << this->GetTclName() << ") SetResolution "
+               << this->ResolutionEntry->GetValue() << endl;
+    }
+
+  this->UpdateVTKObject(sourceTclName);
+  this->Superclass::Accept(sourceTclName);
+}
+
+
+
+
+//----------------------------------------------------------------------------
+void vtkPVLineWidget::UpdateVTKObject(const char* sourceTclName)
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
 
@@ -336,27 +367,27 @@ void vtkPVLineWidget::UpdateVTKObject()
                   this->Point2[2]->GetValueAsFloat());
 
   char acceptCmd[1024];
-  if ( this->Point1Variable && this->ObjectTclName )
+  if ( this->Point1Variable && sourceTclName )
     {    
-    sprintf(acceptCmd, "%s Set%s %f %f %f", this->ObjectTclName, 
+    sprintf(acceptCmd, "%s Set%s %f %f %f", sourceTclName, 
             this->Point1Variable,
             this->Point1[0]->GetValueAsFloat(),
             this->Point1[1]->GetValueAsFloat(),
             this->Point1[2]->GetValueAsFloat());
     pvApp->BroadcastScript(acceptCmd);
     }
-  if ( this->Point2Variable && this->ObjectTclName )
+  if ( this->Point2Variable && sourceTclName )
     {
-    sprintf(acceptCmd, "%s Set%s %f %f %f", this->ObjectTclName, 
+    sprintf(acceptCmd, "%s Set%s %f %f %f", sourceTclName, 
             this->Point2Variable,
             this->Point2[0]->GetValueAsFloat(),
             this->Point2[1]->GetValueAsFloat(),
             this->Point2[2]->GetValueAsFloat());
     pvApp->BroadcastScript(acceptCmd);
     }
-  if ( this->ResolutionVariable && this->ObjectTclName )
+  if ( this->ResolutionVariable && sourceTclName )
     {
-    sprintf(acceptCmd, "%s Set%s %i", this->ObjectTclName, 
+    sprintf(acceptCmd, "%s Set%s %i", sourceTclName, 
             this->ResolutionVariable,
             this->ResolutionEntry->GetValueAsInt());
     pvApp->BroadcastScript(acceptCmd);
@@ -388,7 +419,8 @@ void vtkPVLineWidget::ActualPlaceWidget()
   this->Widget3D->SetInput(data);
 
   this->Widget3D->PlaceWidget(bounds);
-  this->UpdateVTKObject();
+  // We want to use these defaults, not the default setting of the line source.
+  this->UpdateVTKObject(this->ObjectTclName);
 }
 
 //----------------------------------------------------------------------------
@@ -396,10 +428,6 @@ void vtkPVLineWidget::SaveInTclScript(ofstream *file)
 {
   char *result;
 
-  if (this->ObjectTclName == NULL)
-    {
-    return;
-    }
 
   // Point1
   if (this->Point1Variable)
@@ -432,32 +460,39 @@ void vtkPVLineWidget::SaveInTclScript(ofstream *file)
     }
 }
 
+
 //----------------------------------------------------------------------------
-void vtkPVLineWidget::Reset()
+void vtkPVLineWidget::Reset(const char* sourceTclName)
 {
   if ( ! this->ModifiedFlag)
     {
     return;
     }
-  if ( this->Point1Variable && this->ObjectTclName )
+  if ( this->Point1Variable && sourceTclName )
     {
     this->Script("eval %s SetPoint1 [ %s Get%s ]",
-                 this->GetTclName(), this->ObjectTclName, 
+                 this->GetTclName(), sourceTclName, 
                  this->Point1Variable);
     }
-  if ( this->Point2Variable && this->ObjectTclName )
+  if ( this->Point2Variable && sourceTclName )
     {
     this->Script("eval %s SetPoint2 [ %s Get%s ]",
-                 this->GetTclName(), this->ObjectTclName, 
+                 this->GetTclName(), sourceTclName, 
                  this->Point2Variable);
     }
-  if ( this->ResolutionVariable && this->ObjectTclName )
+  if ( this->ResolutionVariable && sourceTclName )
     {
     this->Script("%s SetResolution [ %s Get%s ]",
-                 this->GetTclName(), this->ObjectTclName, 
+                 this->GetTclName(), sourceTclName, 
                  this->ResolutionVariable);
     }
   this->Superclass::Reset();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVLineWidget::Reset()
+{
+  this->Reset(this->ObjectTclName);
 }
 
 //----------------------------------------------------------------------------

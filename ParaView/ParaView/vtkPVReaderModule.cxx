@@ -52,7 +52,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVReaderModule);
-vtkCxxRevisionMacro(vtkPVReaderModule, "1.19");
+vtkCxxRevisionMacro(vtkPVReaderModule, "1.20");
 
 int vtkPVReaderModuleCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -91,7 +91,7 @@ void vtkPVReaderModule::CreateProperties()
   this->FileEntry->SetParent(this->GetParameterFrame()->GetFrame());
   this->FileEntry->SetModifiedCommand(this->GetTclName(), 
                                       "SetAcceptButtonColorToRed");
-  this->FileEntry->SetObjectVariable(this->VTKSourceTclName, "FileName");
+  this->FileEntry->SetObjectVariable(this->GetVTKSourceTclName(), "FileName");
   this->FileEntry->Create(this->GetPVApplication());
 
   if (this->AddFileEntry)
@@ -132,17 +132,32 @@ int vtkPVReaderModule::CanReadFile(const char* fname)
     this->Iterator->GetData(val);
     if (ext && strcmp(ext, val) == 0)
       {
-//        // The extension matches, see if the reader can read the file.
-//        this->Script("%s vtkPVReaderModuleCanReadFileTemp",
-//                     this->SourceClassName);
-//        this->Script("vtkPVReaderModuleCanReadFileTemp CanReadFile {%s}",
-//                     fname);
-//        int result = this->GetIntegerResult(this->Application);
-//        this->Script("vtkPVReaderModuleCanReadFileTemp Delete");
-//        if(result)
-//          {
-      return 1;
-//        }
+      // Trouble reading PLOT3D files, so disable Canread feature,
+      // and just go by extension.
+
+      // The extension matches, see if the reader can read the file.
+      //this->Script("%s vtkPVReaderModuleCanReadFileTemp",
+      //             this->SourceClassName);
+
+      // First see if the reader has a CanRead method.
+      //this->Script("catch {vtkPVReaderModuleCanReadFileTemp CanReadFile {%s}}",
+      //             fname);
+      //int result = this->GetIntegerResult(this->Application);
+      //if (result == 1)
+      //  {
+        // The reader does not have a CanReadFile method.
+        // Assume it can read the file because it has the correct extension.
+      //  return 1;
+      //  }
+
+      //this->Script("vtkPVReaderModuleCanReadFileTemp CanReadFile {%s}",
+      //             fname);
+      //result = this->GetIntegerResult(this->Application);
+      //this->Script("vtkPVReaderModuleCanReadFileTemp Delete");
+      //if(result)
+      //  {
+        return 1;
+      //  }
       }
     this->Iterator->GoToNextItem();
     }

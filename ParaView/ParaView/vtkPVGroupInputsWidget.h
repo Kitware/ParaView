@@ -1,0 +1,100 @@
+/*=========================================================================
+
+  Program:   ParaView
+  Module:    vtkPVGroupInputsWidget.h
+  Language:  C++
+  Date:      $Date$
+  Version:   $Revision$
+
+Copyright (c) 2000-2001 Kitware Inc. 469 Clifton Corporate Parkway,
+Clifton Park, NY, 12065, USA.
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+ * Redistributions of source code must retain the above copyright notice,
+   this list of conditions and the following disclaimer.
+
+ * Redistributions in binary form must reproduce the above copyright notice,
+   this list of conditions and the following disclaimer in the documentation
+   and/or other materials provided with the distribution.
+
+ * Neither the name of Kitware nor the names of any contributors may be used
+   to endorse or promote products derived from this software without specific 
+   prior written permission.
+
+ * Modified source versions must be plainly marked as such, and must not be
+   misrepresented as being the original software.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS ``AS IS''
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ARE DISCLAIMED. IN NO EVENT SHALL THE AUTHORS OR CONTRIBUTORS BE LIABLE FOR
+ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+=========================================================================*/
+// .NAME vtkPVGroupInputsWidget - Widget for vtkGroup filter.
+// .SECTION Description
+// This widget lets the user select multiple inputs for the vtkGroup filter.
+// After accept is called, the widget is disabled.  This is necessary
+// because we cannot allow the number of outputs or output types
+// to change after the outputs have been created.
+
+#ifndef __vtkPVGroupInputsWidget_h
+#define __vtkPVGroupInputsWidget_h
+
+#include "vtkPVWidget.h"
+class vtkKWPushButton;
+class vtkKWWidget;
+class vtkKWListBox;
+class vtkCollection;
+
+class VTK_EXPORT vtkPVGroupInputsWidget : public vtkPVWidget
+{
+public:
+  static vtkPVGroupInputsWidget* New();
+  vtkTypeRevisionMacro(vtkPVGroupInputsWidget, vtkPVWidget);
+  void PrintSelf(ostream& os, vtkIndent indent);
+    
+  // Description:
+  // Set up the UI for this source
+  void Create(vtkKWApplication *app);
+
+  // Description:
+  // Save this source to a file.
+  void SaveInTclScript(ofstream *file);
+
+  // Description:
+  // Called when the Accept button is pressed.  It moves the widget values to the 
+  // VTK calculator filter.
+  virtual void Accept();
+  virtual void Accept(const char* vtkSourceTclName);
+  
+  // Description:
+  // This method resets the widget values from the VTK filter.
+  virtual void Reset();
+  virtual void Reset(const char* vtkSourceTclName);
+
+protected:
+  vtkPVGroupInputsWidget();
+  ~vtkPVGroupInputsWidget();
+
+  vtkKWListBox* PartSelectionList;
+  // Labels get substituted for list box after accept is called.
+  vtkCollection* PartLabelCollection;
+
+  // Called to inactivate widget (after accept is called).
+  void Inactivate();
+
+  
+  vtkPVGroupInputsWidget(const vtkPVGroupInputsWidget&); // Not implemented
+  void operator=(const vtkPVGroupInputsWidget&); // Not implemented
+};
+
+#endif

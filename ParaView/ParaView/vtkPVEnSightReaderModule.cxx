@@ -71,7 +71,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVEnSightReaderModule);
-vtkCxxRevisionMacro(vtkPVEnSightReaderModule, "1.33");
+vtkCxxRevisionMacro(vtkPVEnSightReaderModule, "1.34");
 
 int vtkPVEnSightReaderModuleCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -826,11 +826,7 @@ int vtkPVEnSightReaderModule::Finalize(const char* fname)
 {
   vtkPVWindow* window = this->GetPVWindow();
   vtkPVApplication* pvApp = this->GetPVApplication();
-  vtkDataSet *d;
-  int numOutputs = this->Reader->GetNumberOfOutputs();
-  int i;
   char* tclName = this->CreateTclName(fname);
-  char* connectionTclName;
 
   // Create the main reader source.
   vtkPVEnSightReaderModule *pvs = vtkPVEnSightReaderModule::New();
@@ -838,24 +834,17 @@ int vtkPVEnSightReaderModule::Finalize(const char* fname)
   pvs->PackFileEntry = 0;
   pvs->SetParametersParent(window->GetMainView()->GetSourceParent());
   pvs->SetApplication(pvApp);
-  pvs->SetVTKSource(this->Reader, tclName);
+  pvs->AddVTKSource(this->Reader, tclName);
   pvs->SetView(window->GetMainView());
   pvs->SetName(tclName);
   pvs->SetTraceInitialized(1);
 
-  if (numOutputs > 1)
-    {
-    pvs->HideDisplayPageOn();
-    pvs->HideInformationPageOn();
-    }
 
   // Since, at the end of creation, the main reader will be
   // the current source, we initialize it's variable with
   // GetCurrentPVSource
   pvApp->AddTraceEntry("set kw(%s) [$kw(%s) GetCurrentPVSource]",
                        pvs->GetTclName(), window->GetTclName());
-
-  window->GetMainView()->DisableRenderingFlagOn();
 
   const char* desc = this->RemovePath(fname);
   if (desc)
@@ -864,152 +853,6 @@ int vtkPVEnSightReaderModule::Finalize(const char* fname)
     }
   window->GetSourceList("Sources")->AddItem(pvs);
 
-  vtkPVPassThrough* connection;
-  vtkPVData* connectionOutput;
-  char* extentTranslatorName = 0;
-  for (i = 0; i < numOutputs; i++)
-    {
-    // ith output (PVData)
-    // Create replacement outputs of proper type and replace the
-    // current ones.
-    int len;
-    if ( i == 0 )
-      {
-      len = static_cast<int>(strlen(tclName)+ strlen("Output")) + 3;
-      }
-    else
-      {
-      len = static_cast<int>(strlen(tclName)+ strlen("Output")) + 
-        static_cast<int>(log10(static_cast<double>(i))) + 3;
-      }
-    char* outputTclName = new char[len];
-    sprintf(outputTclName, "%sOutput%d", tclName, i);
-    d = static_cast<vtkDataSet*>(pvApp->MakeTclObject(
-      this->Reader->GetOutput(i)->GetClassName(), outputTclName));
-    pvApp->BroadcastScript("%s ShallowCopy [%s GetOutput %d]",
-                           outputTclName, tclName, i);
-    pvApp->BroadcastScript("%s ReplaceNthOutput %d %s", tclName, i, 
-                           outputTclName);
-
-    extentTranslatorName = 0;
-    if (this->MasterFile)
-      {
-      // We use an extent translator to make sure that the
-      // structured parts we load are not broken further into
-      // pieces by the pipeline. We want to whole structured
-      // data to be processed because the data is pre-split
-      // and the whole extent is equal to the actual extent of
-      // the current piece.
-      extentTranslatorName = new char [strlen(outputTclName)+4];
-      sprintf(extentTranslatorName, "%sExt", outputTclName);
-      pvApp->BroadcastScript("vtkMultiPartExtentTranslator %s",
-                             extentTranslatorName);
-      pvApp->BroadcastScript("%s SetExtentTranslator %s",
-                             outputTclName, extentTranslatorName);
-      }
-
-    vtkPVData *pvd = vtkPVData::New();
-    pvd->SetPVApplication(pvApp);
-    pvd->SetVTKData(d, outputTclName);
-    pvs->SetPVOutput(i, pvd);
-    delete [] outputTclName;
-
-    if (numOutputs > 1)
-      {
-      // ith connection point and it's output
-      // These are dummy filters (vtkPassThroughFilter) which
-      // simply shallow copy their input to their output.
-      connection = vtkPVPassThrough::New();
-      connection->SetOutputNumber(i);
-      connection->SetParametersParent(
-        window->GetMainView()->GetSourceParent());
-      connection->SetApplication(pvApp);
-      int len = static_cast<int>(strlen(tclName))+ 2 + 
-        static_cast<int>(log10(static_cast<double>(i+1))) + 3;
-      connectionTclName = new char[len];
-      sprintf(connectionTclName, "%s_%d", tclName, i+1);
-      vtkSource* source = static_cast<vtkSource*>(
-        pvApp->MakeTclObject("vtkPassThroughFilter", connectionTclName));
-      connection->SetVTKSource(source, connectionTclName);
-      connection->SetView(window->GetMainView());
-      connection->SetName(connectionTclName);
-      connection->HideParametersPageOn();
-      connection->SetTraceInitialized(1);
-      
-      if ( i == 0 )
-        {
-        len = static_cast<int>(strlen(connectionTclName)+ strlen("Output")) + 3;
-        }
-      else
-        {
-        len = static_cast<int>(strlen(connectionTclName)+ strlen("Output")) + 
-          static_cast<int>(log10(static_cast<double>(i))) + 3;
-        }
-      outputTclName = new char[len];
-      sprintf(outputTclName, "%sOutput%d", connectionTclName, i);
-      d = static_cast<vtkDataSet*>(pvApp->MakeTclObject(
-        this->Reader->GetOutput(i)->GetClassName(), outputTclName));
-      
-      if (this->MasterFile)
-        {
-        // We use an extent translator to make sure that the
-        // structured parts we load are not broken further into
-        // pieces by the pipeline. See the comment above.
-        pvApp->BroadcastScript("%s SetExtentTranslator %s",
-                               outputTclName, extentTranslatorName);
-        }
-      
-      connectionOutput = vtkPVData::New();
-      connectionOutput->SetPVApplication(pvApp);
-      connectionOutput->SetVTKData(d, outputTclName);
-      connection->SetPVOutput(connectionOutput);
-      
-      connection->CreateProperties();
-      // Created is called only on the first output when Accept()
-      // is invoked on the input. We need to call it for the others.
-      // (if it is verified that the Display pages for these outputs
-      // are not necessary, this can be removed)
-      if ( i > 0 )
-        {
-        pvd->CreateProperties();
-        }
-      connection->SetPVInput(pvd);
-      pvApp->BroadcastScript("%s SetOutput %s", connectionTclName, 
-                             outputTclName);
-
-      connectionOutput->Delete();
-      delete [] outputTclName;
-      delete [] connectionTclName;
-      
-      const char* desc = this->RemovePath(fname);
-      if (desc)
-        {
-        connection->SetLabelNoTrace(desc);
-        }
-      window->GetSourceList("Sources")->AddItem(connection);
-      connection->UpdateParameterWidgets();
-      connection->Accept(0);
-
-      // In the trace, the connection points are named by looking at
-      // the outputs/consumers of the reader (CurrentPVSource)
-      pvApp->AddTraceEntry("set kw(%s) "
-                           "[[[$kw(%s) GetCurrentPVSource] GetPVOutput %d] "
-                           "GetPVConsumer 0]",
-                           connection->GetTclName(), 
-                           window->GetTclName(), i);
-      
-      connection->Delete();
-      }
-
-    pvd->Delete();
-    
-    }
-
-  if (this->MasterFile)
-    {
-    pvApp->BroadcastScript("%s Delete", extentTranslatorName);
-    delete[] extentTranslatorName;
-    }
 
   pvs->CreateProperties();
   pvs->SetTraceInitialized(1);
@@ -1081,21 +924,7 @@ int vtkPVEnSightReaderModule::Finalize(const char* fname)
     }
   
   pvs->UpdateParameterWidgets();
-  vtkPVData *pvOutput;
   
-  if (numOutputs > 1)
-    {
-    pvs->GetPVOutput()->SetVisibilityInternal(0);
-    pvOutput =
-      pvs->GetPVOutput()->GetPVConsumer(0)->GetPVOutput();
-    if (strcmp(pvOutput->GetColorMenu()->GetValue(), "Property") != 0)
-      {
-      pvs->GetPVOutput()->GetPVConsumer(0)->GetPVOutput()->ResetColorRange();
-      }
-    }
-
-  window->ResetCameraCallback();
-  window->GetMainView()->DisableRenderingFlagOff();
   // need AcceptCallbackFlag to be set so Reset isn't called when VTK
   // parameters change during Accept
   pvs->AcceptCallback();
@@ -1224,7 +1053,7 @@ void vtkPVEnSightReaderModule::SaveInTclScript(ofstream *file,
 
   if (reader == NULL)
     {
-    vtkErrorMacro("GenericEnsightReader: Bad guess. " << this->VTKSource->GetClassName());
+    vtkErrorMacro("GenericEnsightReader: Bad guess. " << this->GetVTKSource()->GetClassName());
     return;
     }
 
@@ -1237,19 +1066,19 @@ void vtkPVEnSightReaderModule::SaveInTclScript(ofstream *file,
   this->VisitedFlag = 1;
 
   // Save the object in the script.
-  *file << "\n" << this->VTKSource->GetClassName()
-        << " " << this->VTKSourceTclName << "\n";
+  *file << "\n" << this->GetVTKSource()->GetClassName()
+        << " " << this->GetVTKSourceTclName() << "\n";
 
-  *file << "\t" << this->VTKSourceTclName << " SetFilePath {"
+  *file << "\t" << this->GetVTKSourceTclName() << " SetFilePath {"
         << reader->GetFilePath() << "}\n";
 
-  *file << "\t" << this->VTKSourceTclName << " SetCaseFileName {"
+  *file << "\t" << this->GetVTKSourceTclName() << " SetCaseFileName {"
         << reader->GetCaseFileName() << "}\n";
    
-  *file << "\t" << this->VTKSourceTclName << " SetTimeValue "
+  *file << "\t" << this->GetVTKSourceTclName() << " SetTimeValue "
         << reader->GetTimeValue() << "\n";
    
-  *file << "\t" << this->VTKSourceTclName << " Update\n";
+  *file << "\t" << this->GetVTKSourceTclName() << " Update\n";
 
 }
 

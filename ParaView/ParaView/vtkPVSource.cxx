@@ -41,7 +41,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "vtkPVSource.h"
 
-#include "vtkArrayMap.txx"
 #include "vtkCollectionIterator.h"
 #include "vtkDataSet.h"
 #include "vtkKWEntry.h"
@@ -62,18 +61,24 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVData.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVPart.h"
+#include "vtkPVProcessModule.h"
 #include "vtkPVInputMenu.h"
 #include "vtkPVRenderView.h"
 #include "vtkPVSourceCollection.h"
 #include "vtkPVWidgetCollection.h"
 #include "vtkPVWindow.h"
+#include "vtkPVPassThrough.h"
 #include "vtkSource.h"
 #include "vtkString.h"
 #include "vtkVector.h"
+#include "vtkRenderer.h"
+#include "vtkArrayMap.txx"
+#include "vtkStringList.h"
+#include "vtkCollection.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.258");
+vtkCxxRevisionMacro(vtkPVSource, "1.259");
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -110,8 +115,8 @@ vtkPVSource::vtkPVSource()
 
   // The underlying VTK object. This will change. PVSource will
   // support multiple VTK sources/filters.
-  this->VTKSource = NULL;
-  this->VTKSourceTclName = NULL;
+  this->VTKSources = vtkCollection::New();
+  this->VTKSourceTclNames = vtkStringList::New();
 
   // The frame which contains the parameters related to the data source
   // and the Accept/Reset/Delete buttons.
@@ -132,8 +137,6 @@ vtkPVSource::vtkPVSource()
       
   this->Widgets = vtkPVWidgetCollection::New();
     
-  this->ExtentTranslatorTclName = NULL;
-
   this->ReplaceInput = 1;
 
   this->ParametersParent = NULL;
@@ -145,6 +148,8 @@ vtkPVSource::vtkPVSource()
   this->SourceClassName = 0;
 
   this->InputClassNames = vtkVector<const char*>::New();
+  this->RequiredNumberOfInputParts = -1;
+  this->VTKMultipleInputFlag = 0;
 
   this->IsPermanent = 0;
 
@@ -185,7 +190,10 @@ vtkPVSource::~vtkPVSource()
   
   this->RemoveAllPVInputs();
 
-  this->SetVTKSource(NULL, NULL);
+  // We need to delete the Tcl object too.  This call does it.
+  this->RemoveAllVTKSources();
+  this->VTKSources->Delete();
+  this->VTKSourceTclNames->Delete();
 
   // Do not use SetName() or SetLabel() here. These make
   // the navigation window update when it should not.
@@ -242,14 +250,6 @@ vtkPVSource::~vtkPVSource()
   this->Parameters->Delete();
   this->Parameters = NULL;
     
-
-  if (this->ExtentTranslatorTclName)
-    {
-    this->GetPVApplication()->BroadcastScript("%s Delete", 
-                                this->ExtentTranslatorTclName);
-    this->SetExtentTranslatorTclName(NULL);
-    }
-
   if (this->ParametersParent)
     {
     this->ParametersParent->UnRegister(this);
@@ -281,20 +281,51 @@ vtkPVSource* vtkPVSource::GetInputPVSource()
 //----------------------------------------------------------------------------
 void vtkPVSource::SetPVInput(vtkPVData *pvd)
 {
+  int partIdx, numParts;
+  vtkPVPart *part;
   vtkPVApplication *pvApp = this->GetPVApplication();
-  
+  char *sourceTclName;
+
   if (pvApp == NULL)
     {
     vtkErrorMacro(
       "No Application. Create the source before setting the input.");
     return;
     }
-
   this->SetNthPVInput(0, pvd);
 
-  pvApp->BroadcastScript("%s SetInput %s", this->GetVTKSourceTclName(),
-                         pvd->GetPVPart()->GetVTKDataTclName());
-
+  numParts = pvd->GetNumberOfPVParts();
+  for (partIdx = 0; partIdx < numParts; ++partIdx)
+    {
+    part = pvd->GetPVPart(partIdx);
+    if (this->VTKMultipleInputFlag)
+      { // Only one source takes all parts as input.
+      sourceTclName = this->GetVTKSourceTclName(0);
+      
+      if (part->GetVTKDataTclName() == NULL || sourceTclName == NULL)
+        { // Sanity check.
+        vtkErrorMacro("Missing tcl name.");
+        }
+      else
+        {
+        pvApp->BroadcastScript("%s AddInput %s", sourceTclName,
+                               part->GetVTKDataTclName());
+        }      
+      }
+    else
+      { // One source for each part.
+      sourceTclName = this->GetVTKSourceTclName(partIdx);
+      if (part->GetVTKDataTclName() == NULL || sourceTclName == NULL)
+        {
+        vtkErrorMacro("Source data mismatch.");
+        }
+      else
+        {
+        pvApp->BroadcastScript("%s SetInput %s", sourceTclName,
+                               part->GetVTKDataTclName());
+        }
+      }
+    }
 
   this->GetPVRenderView()->UpdateNavigationWindow(this, 0);
 
@@ -350,7 +381,7 @@ void vtkPVSourceEndProgress(void* vtkNotUsed(arg))
 //----------------------------------------------------------------------------
 // Tcl does the reference counting, so we are not going to put an 
 // additional reference of the data.
-void vtkPVSource::SetVTKSource(vtkSource *source, const char *tclName)
+void vtkPVSource::AddVTKSource(vtkSource *source, const char *tclName)
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
   
@@ -359,36 +390,64 @@ void vtkPVSource::SetVTKSource(vtkSource *source, const char *tclName)
     return;
     }
   
-  if (this->VTKSourceTclName)
+  if (tclName == NULL || source == NULL)
     {
-    pvApp->BroadcastScript("if {[info command %s] != \"\"} { %s Delete }", 
-                           this->VTKSourceTclName, this->VTKSourceTclName);
-    delete [] this->VTKSourceTclName;
-    this->VTKSourceTclName = NULL;
-    this->VTKSource = NULL;
+    vtkErrorMacro("Missing Tcl name or source.");
+    return;
     }
-  if (tclName)
+
+  // I hate having two collections: one for the vtk object, and one for its
+  // Tcl name.  I should probably create an object to contain both.
+  this->VTKSources->AddItem(source);
+  this->VTKSourceTclNames->AddString(tclName);
+    
+  pvApp->Script("%s AddObserver ModifiedEvent {%s VTKSourceModifiedMethod}",
+                tclName, this->GetTclName());
+    
+  pvApp->BroadcastScript(
+    "%s AddObserver EndEvent {$Application LogStartEvent {Execute %s}}", 
+    tclName, tclName);
+
+  pvApp->BroadcastScript(
+    "%s AddObserver EndEvent {$Application LogEndEvent {Execute %s}}", 
+    tclName, tclName);
+
+}
+
+//----------------------------------------------------------------------------
+void vtkPVSource::RemoveAllVTKSources()
+{
+  char *tclName;
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  int num, idx;
+
+  num = this->VTKSourceTclNames->GetNumberOfStrings();
+  for (idx = 0; idx < num; ++ idx)
     {
-    this->VTKSourceTclName = new char[strlen(tclName) + 1];
-    strcpy(this->VTKSourceTclName, tclName);
-    this->VTKSource = source;
-    // Set up the progress methods.
-    //source->SetStartMethod(vtkPVSourceStartProgress, this);
-    //source->SetProgressMethod(vtkPVSourceReportProgress, this);
-    //source->SetEndMethod(vtkPVSourceEndProgress, this);
-    
-    pvApp->Script("%s AddObserver ModifiedEvent {%s VTKSourceModifiedMethod}",
-                  tclName, this->GetTclName());
-    
-    pvApp->BroadcastScript(
-      "%s AddObserver EndMethod {$Application LogStartEvent {Execute %s}}", 
-      tclName, tclName);
-    pvApp->BroadcastScript(
-      "%s AddObserver EndMethod {$Application LogEndEvent {Execute %s}}", 
-      tclName, tclName);
-
-
+    tclName = this->VTKSourceTclNames->GetString(idx);
+    pvApp->BroadcastScript("%s Delete", tclName);
     }
+
+  this->VTKSourceTclNames->RemoveAllItems();
+  this->VTKSources->RemoveAllItems();
+}
+
+//----------------------------------------------------------------------------
+int vtkPVSource::GetNumberOfVTKSources()
+{
+  return this->VTKSources->GetNumberOfItems();
+}
+
+//----------------------------------------------------------------------------
+vtkSource* vtkPVSource::GetVTKSource(int idx)
+{
+  return static_cast<vtkSource*>(this->VTKSources->GetItemAsObject(idx));
+}
+
+//----------------------------------------------------------------------------
+char* vtkPVSource::GetVTKSourceTclName(int idx)
+{
+  return this->VTKSourceTclNames->GetString(idx);
 }
 
 //----------------------------------------------------------------------------
@@ -705,16 +764,12 @@ void vtkPVSource::Select()
   // which is now just another pvWidget.
   this->UpdateParameterWidgets();
   
-  // This assumes that a source only has one (visible) output.
-  // This assumption should normally hold because when the
-  // source has multiple outputs, the design requires creating
-  // "connection" objects for each output. The actual outputs
-  // of a multi-output source are not visible.
+  // This assumes that a source only has one output.
   data = this->GetPVOutput();
   if (data)
     {
-    // Update the Display and Information page.
-    data->UpdateProperties();
+    // This has a side effect of gathering and displaying information.
+    data->GetDataInformation();
     }
 
   if (this->GetPVRenderView())
@@ -945,6 +1000,8 @@ void vtkPVSource::AcceptCallbackInternal()
 void vtkPVSource::Accept(int hideFlag, int hideSource)
 {
   vtkPVWindow *window;
+  int idx, num;
+  vtkPVPart *part;
 
   this->Script("update");
 
@@ -958,6 +1015,15 @@ void vtkPVSource::Accept(int hideFlag, int hideSource)
   // the VTK source.  (The vtkPLOT3DReader is a good example of this.)
   this->UpdateVTKSourceParameters();
   
+  // Moved from creation of the source. (InitializeClone)
+  // Initialize the output if necessary.
+  // This has to be after the widgets are accepted (UpdateVTKSOurceParameters)
+  // because they can change the number of outputs.
+  if ( ! this->Initialized)
+    { // This is the first time, create the data.
+    this->InitializeData();
+    }
+
   // This adds an extract filter only when the MaximumNumberOfPieces is 1.
   // This is only the case the first time the accept is called.
   int i;
@@ -983,6 +1049,15 @@ void vtkPVSource::Accept(int hideFlag, int hideSource)
       this->DeleteCallback();    
       return;
       }
+
+    // I need to update the data before 
+    // UpdateFilterMenu which is called by SetCurrentPVData.
+    // Although tis fixes my problem,  I should not have to actually update.
+    // All I need is the data type from the information which should be
+    // obtainable after initialize data ...
+    // The bug I was fixing is the ExtractGrid button was active
+    // for a polydata and imagedata collection.
+    pvd->Update();
     
     window->GetMainView()->AddPVData(pvd);
     if (!this->GetHideDisplayPage())
@@ -993,8 +1068,8 @@ void vtkPVSource::Accept(int hideFlag, int hideSource)
       {
       this->Notebook->AddPage("Information");
       }
+
     pvd->CreateProperties();
-    pvd->Initialize();
     // Make the last data invisible.
     input = this->GetPVInput();
     if (input)
@@ -1017,6 +1092,13 @@ void vtkPVSource::Accept(int hideFlag, int hideSource)
       this->GetPVOutput()->SetVisibilityInternal(0);
       }
 
+    // We need to update so we will have correct information for initialization.
+    if (this->GetPVOutput())
+      {
+      // Update the VTK data.
+      this->GetPVOutput()->Update();
+      }
+
     // The best test I could come up with to only reset
     // the camera when the first source is created.
     if (window->GetSourceList("Sources")->GetNumberOfItems() == 1)
@@ -1027,9 +1109,10 @@ void vtkPVSource::Accept(int hideFlag, int hideSource)
                                   0.5*(bds[2]+bds[3]),
                                   0.5*(bds[4]+bds[5]));
       window->ResetCenterCallback();
-      window->GetMainView()->ResetCamera();
+      window->GetMainView()->GetRenderer()->ResetCamera(bds);
       }
 
+    pvd->Initialize();
     this->Initialized = 1;
     }
 
@@ -1042,9 +1125,17 @@ void vtkPVSource::Accept(int hideFlag, int hideSource)
   window->UpdateSelectMenu();
 
   // Regenerate the data property page in case something has changed.
-  if (this->NumberOfPVOutputs > 0)
+  vtkPVData *pvd = this->GetPVOutput();
+  if (pvd)
     {
-    this->GetNthPVOutput(0)->UpdateProperties();
+    num = pvd->GetNumberOfPVParts();
+    for (idx = 0; idx < num; ++idx)
+      {
+      part = pvd->GetPVPart(idx);
+      // This has a side effect of gathering and displaying information.
+      this->GetPVOutput()->GetPVPart()->Update();
+      }
+    pvd->UpdateProperties();
     }
 
   this->Script("update");  
@@ -1055,6 +1146,10 @@ void vtkPVSource::Accept(int hideFlag, int hideSource)
   this->Script("%s configure -cursor left_ptr", window->GetWidgetName());
 #endif  
 
+  // Causes the data information to be updated if the filter executed.
+  // Note has to be done here because tcl update causes render which
+  // causes the filter to execute.
+  pvd->UpdateProperties();
 }
 
 //----------------------------------------------------------------------------
@@ -1080,8 +1175,10 @@ void vtkPVSource::DeleteCallback()
   vtkPVSource *current = 0;
   vtkPVWindow *window = this->GetPVWindow();
 
-  // Condition here because I am trying to delete glyph sources.  
-  this->GetPVOutput()->DeleteCallback();
+  if (this->GetPVOutput())
+    {  
+    this->GetPVOutput()->DeleteCallback();
+    }
 
   // Just in case cursor was left in a funny state.
 #ifdef _WIN32
@@ -1257,7 +1354,7 @@ void vtkPVSource::UpdateParameterWidgets()
     // Do not try to reset the widget if it is not initialized
     if (pvw->GetApplication())
       {
-      pvw->ForceReset();
+      pvw->ForceReset(this->GetVTKSourceTclName(0));
       }
     it->GoToNextItem();
     }
@@ -1275,12 +1372,29 @@ void vtkPVSource::RaiseSourcePage()
 void vtkPVSource::UpdateVTKSourceParameters()
 {
   vtkPVWidget *pvw;
-  vtkCollectionIterator *it = this->Widgets->NewIterator();
+  int numSources, idx;
+  vtkCollectionIterator *it;
+
+  it = this->Widgets->NewIterator();
   it->InitTraversal();
   while( !it->IsDoneWithTraversal() )
     {
     pvw = static_cast<vtkPVWidget*>(it->GetObject());
-    pvw->Accept();
+    if (pvw->GetModifiedFlag())
+      {
+      // This is not a bad solution to having multiple VTK sources for each 
+      // PV source: Loop over all sources and pass tcl name to widget.
+      // Unfortunately, only "ObjectWidgets" use the source tclname.
+      // Other widgets (like bounds display) only execute accept when
+      // the widget is modified.
+      // Maybe the PVSource should be passed and the Object widgets
+      // should iterate over the VTK sources them selves. 
+      numSources = this->GetNumberOfVTKSources();
+      for (idx = 0; idx < numSources; ++idx)
+        {
+        pvw->Accept(this->GetVTKSourceTclName(idx));
+        }
+      }
     it->GoToNextItem();
     }
   it->Delete();
@@ -1348,15 +1462,6 @@ void vtkPVSource::UpdateProperties()
                    this->DeleteButton->GetWidgetName());
       }
   
-  // I do not know why the inputs have to be updated.
-  // I am changing it to output as an experiment.
-  // The output might have been already updated elsewhere.
-  if (this->GetPVOutput())
-    {
-    // Update the VTK data.
-    this->GetPVOutput()->Update();
-    }
-
   this->UpdateDescriptionFrame();
 }
 
@@ -1431,6 +1536,7 @@ void vtkPVSource::SetNumberOfPVInputs(int num)
   this->NumberOfPVInputs = num;
   this->Modified();
 }
+
 
 //---------------------------------------------------------------------------
 void vtkPVSource::SetNthPVInput(int idx, vtkPVData *pvd)
@@ -1602,7 +1708,7 @@ void vtkPVSource::SaveInTclScript(ofstream *file, int interactiveFlag,
   vtkPVWidget *widget;
 
   // Detect special sources we do not handle yet.
-  if (this->VTKSource == NULL)
+  if (this->GetVTKSource() == NULL)
     {
     return;
     }
@@ -1618,8 +1724,8 @@ void vtkPVSource::SaveInTclScript(ofstream *file, int interactiveFlag,
   // the tcl script contains the source.
   if (this->VisitedFlag == 1)
     { // This source is already in in the stack, but there is a loop.
-    *file << "\n" << this->VTKSource->GetClassName()
-          << " " << this->VTKSourceTclName << "\n";
+    *file << "\n" << this->GetVTKSource()->GetClassName()
+          << " " << this->GetVTKSourceTclName() << "\n";
     this->VisitedFlag = 2;
     return;
     }
@@ -1638,8 +1744,8 @@ void vtkPVSource::SaveInTclScript(ofstream *file, int interactiveFlag,
   // Save the object in the script.
   if (this->VisitedFlag != 2)
     {
-    *file << "\n" << this->VTKSource->GetClassName()
-          << " " << this->VTKSourceTclName << "\n";
+    *file << "\n" << this->GetVTKSource()->GetClassName()
+          << " " << this->GetVTKSourceTclName() << "\n";
     this->VisitedFlag = 2;
     }
 
@@ -1693,17 +1799,25 @@ vtkIdType vtkPVSource::GetNumberOfInputClasses()
 //----------------------------------------------------------------------------
 int vtkPVSource::GetIsValidInput(vtkPVData *pvd)
 {
-  vtkDataObject *data;
-
   int match = 0;
+
+  // A special condition for probe,
+  // which cannot have inputs with more than one part.
+  if (this->RequiredNumberOfInputParts >= 0)
+    {
+    if (pvd->GetNumberOfPVParts() != this->RequiredNumberOfInputParts)
+      {
+      return 0;
+      }
+    }
+
   vtkIdType numItems = this->InputClassNames->GetNumberOfItems();
   for(int i=0; i<numItems; i++)
     {
     const char* item;
     if ( this->InputClassNames->GetItem(i, item) == VTK_OK )
       {
-      data = pvd->GetPVPart()->GetVTKData();
-      if ( data && data->IsA(item) )
+      if (pvd->GetDataInformation()->DataSetTypeIsA(item))
         {
         match = 1;
         break;
@@ -1757,6 +1871,7 @@ vtkPVRenderView* vtkPVSource::GetPVRenderView()
   return vtkPVRenderView::SafeDownCast(this->View);
 }
 
+//----------------------------------------------------------------------------
 vtkPVInputMenu *vtkPVSource::AddInputMenu(char *label, char *inputName, 
                                           char *inputType, char *help, 
                                           vtkPVSourceCollection *sources)
@@ -1781,6 +1896,7 @@ vtkPVInputMenu *vtkPVSource::AddInputMenu(char *label, char *inputName,
   return inputMenu;
 }
 
+//----------------------------------------------------------------------------
 int vtkPVSource::CloneAndInitialize(int makeCurrent, vtkPVSource*& clone )
 {
 
@@ -1791,9 +1907,7 @@ int vtkPVSource::CloneAndInitialize(int makeCurrent, vtkPVSource*& clone )
     }
 
   vtkPVData *current = this->GetPVWindow()->GetCurrentPVData();
-  retVal = clone->InitializeClone(current, 
-                                  this->GetOutputClassName(),
-                                  makeCurrent);
+  retVal = clone->InitializeClone(current, makeCurrent);
 
   if (retVal != VTK_OK)
     {
@@ -1808,11 +1922,13 @@ int vtkPVSource::CloneAndInitialize(int makeCurrent, vtkPVSource*& clone )
   return VTK_OK;
 }
 
+//----------------------------------------------------------------------------
 int vtkPVSource::ClonePrototype(vtkPVSource*& clone)
 {
   return this->ClonePrototypeInternal(clone);
 }
 
+//----------------------------------------------------------------------------
 int vtkPVSource::ClonePrototypeInternal(vtkPVSource*& clone)
 {
   clone = 0;
@@ -1826,6 +1942,8 @@ int vtkPVSource::ClonePrototypeInternal(vtkPVSource*& clone)
 
   pvs->SetShortHelp(this->GetShortHelp());
   pvs->SetLongHelp(this->GetLongHelp());
+  pvs->SetVTKMultipleInputFlag(this->VTKMultipleInputFlag);
+
 
   vtkIdType numItems = this->InputClassNames->GetNumberOfItems();
   vtkIdType id;
@@ -1850,9 +1968,10 @@ int vtkPVSource::ClonePrototypeInternal(vtkPVSource*& clone)
     return VTK_ERROR;
     }
 
-  // Create a (unique) name for the source.
+  // Create a (unique) name for the PVSource.
   // Beware: If two prototypes have the same name, the name 
   // will not be unique.
+  // Does this name really have to be unique?
   char tclName[1024];
   if (this->Name && this->Name[0] != '\0')
     { 
@@ -1866,18 +1985,47 @@ int vtkPVSource::ClonePrototypeInternal(vtkPVSource*& clone)
     }
   pvs->SetName(tclName);
 
-  // Create a vtkSource with the same name as the PVSource
-  vtkSource* vtksource = 
-    static_cast<vtkSource *>(pvApp->MakeTclObject(this->SourceClassName, 
-                                                  tclName));
-  if (vtksource == NULL)
+
+  // We need oue source for each part.
+  int numSources = 1;
+  // Set the input if necessary.
+  if (this->InputClassNames->GetNumberOfItems() > 0)
     {
-    vtkErrorMacro("Could not get pointer from object.");
-    pvs->Delete();
-    return VTK_ERROR;
+    vtkPVData *input = this->GetPVWindow()->GetCurrentPVData();
+    numSources = input->GetNumberOfPVParts();
+    }
+  // If the VTK filter takes multiple inputs (vtkAppendPolyData)
+  // then we create only one filter with each part as an input.
+  if (this->VTKMultipleInputFlag)
+    {
+    numSources = 1;
     }
 
-  pvs->SetVTKSource(vtksource, tclName);
+  int idx;
+  for (idx = 0; idx < numSources; ++idx)
+    {
+    if (numSources > 1)
+      {
+      // Create a (unique) name for the source.
+      // Beware: If two prototypes have the same name, the name 
+      // will not be unique.
+      sprintf(tclName, "%s_%d", pvs->GetName(), idx);
+      }
+
+    // Create a vtkSource
+    vtkSource* vtksource = 
+      static_cast<vtkSource *>(pvApp->MakeTclObject(this->SourceClassName, 
+                                                    tclName));
+    if (vtksource == NULL)
+      {
+      vtkErrorMacro("Could not get pointer from object.");
+      pvs->Delete();
+      return VTK_ERROR;
+      }
+
+    pvs->AddVTKSource(vtksource, tclName);
+    }
+
   pvs->SetView(this->GetPVWindow()->GetMainView());
 
   pvs->PrototypeInstanceCount = this->PrototypeInstanceCount;
@@ -1904,20 +2052,16 @@ int vtkPVSource::ClonePrototypeInternal(vtkPVSource*& clone)
   return VTK_OK;
 }
 
+
+//----------------------------------------------------------------------------
 int vtkPVSource::InitializeClone(vtkPVData* input,
-                                 const char* outputDataType,
                                  int makeCurrent)
 
 {
-
   // Set the input if necessary.
   if (this->InputClassNames->GetNumberOfItems() > 0)
     {
     this->SetPVInput(input);
-    }
-  else
-    {
-    input = 0;
     }
 
   // Create the properties frame etc.
@@ -1926,80 +2070,234 @@ int vtkPVSource::InitializeClone(vtkPVData* input,
   if (makeCurrent)
     {
     this->GetPVWindow()->SetCurrentPVSourceCallback(this);
-    }
-  
-  const char* inputDataType=0;
-  if ( input )
-    {
-    inputDataType = input->GetPVPart()->GetVTKData()->GetClassName();
-    }
+    } 
 
-  // let's see if we can determine the output type.
-  if (strcmp(outputDataType, "vtkDataSet") == 0)
-    { // Output will be the same as the input.
-    if (!inputDataType)
-      {
-      vtkErrorMacro("Cannot determine output type.");
-      return VTK_ERROR;
-      }
-    outputDataType = inputDataType;
-    }
-  if (strcmp(outputDataType, "vtkPointSet") == 0)
-    { // Output will be the same as the input.
-    if (!inputDataType)
-      {
-      vtkErrorMacro("Cannot determine output type.");
-      return VTK_ERROR;
-      }
-    outputDataType = inputDataType;
-    }
-
-  vtkPVApplication* pvApp = vtkPVApplication::SafeDownCast(this->Application);
-
-  // Create the output.
-  char otherTclName[1024];
-  vtkPVData* pvd = vtkPVData::New();
-  pvd->SetPVApplication(pvApp);
-  sprintf(otherTclName, "%sOutput", this->GetName());
-  // Create the object through tcl on all processes.
-  vtkDataSet* vtkdata = static_cast<vtkDataSet *>(pvApp->MakeTclObject(
-    outputDataType, otherTclName));
-  pvd->SetVTKData(vtkdata, otherTclName);
-
-  // Connect the source and data.
-  this->SetPVOutput(pvd);  
-  
-  // Relay the connection to the VTK objects.  
-  pvApp->BroadcastScript("%s SetOutput %s", this->GetVTKSourceTclName(),
-                         pvd->GetPVPart()->GetVTKDataTclName());   
-
-  // Create the extent translator
-  if (input)
-    {
-    pvApp->BroadcastScript("%s SetExtentTranslator [%s GetExtentTranslator]",
-                           pvd->GetPVPart()->GetVTKDataTclName(), 
-                           input->GetPVPart()->GetVTKDataTclName());
-    }
-  else
-    {
-    sprintf(otherTclName, "%sTranslator", this->GetName());
-    pvApp->BroadcastScript("vtkPVExtentTranslator %s", otherTclName);
-    pvApp->BroadcastScript("%s SetOriginalSource [%s GetOutput]",
-                           otherTclName, 
-                           this->GetVTKSourceTclName());
-    pvApp->BroadcastScript("%s SetExtentTranslator %s",
-                            pvd->GetPVPart()->GetVTKDataTclName(), 
-                           otherTclName);
-    // Hold onto name so it can be deleted.
-    this->SetExtentTranslatorTclName(otherTclName);
-    }
-
-  pvd->Delete();
   return VTK_OK;
-
 }
 
 
+
+//----------------------------------------------------------------------------
+// This stuff used to be in Initialize clone.
+// I want to initialize the output after accept is called.
+int vtkPVSource::InitializeData()
+{
+  vtkPVApplication* pvApp = this->GetPVApplication();
+  int numSources, sourceIdx;
+  vtkSource *source;
+  char *sourceTclName;
+  int numOutputs, idx;
+  char dataName[1024];
+  int outputCount = 0;
+
+  // Create the output.
+  vtkPVData* pvd = vtkPVData::New();
+  pvd->SetPVApplication(pvApp);
+
+  numSources = this->GetNumberOfVTKSources();
+  for (sourceIdx = 0; sourceIdx < numSources; ++sourceIdx)
+    {
+    source = this->GetVTKSource(sourceIdx);
+    sourceTclName = this->GetVTKSourceTclName(sourceIdx);
+    numOutputs = source->GetNumberOfOutputs();
+
+    // When ever the source executes, data information needs to be recomputed.
+    this->Script("%s AddObserver EndEvent {%s InvalidateDataInformation}", 
+                 sourceTclName, pvd->GetTclName());
+    for (idx = 0; idx < numOutputs; ++idx)
+      {
+      ++outputCount;
+      sprintf(dataName, "%sOutput%d", this->GetName(), outputCount);
+      pvApp->BroadcastScript("set %s [%s GetOutput %d]", dataName, 
+                             sourceTclName, idx);
+      vtkPVPart *part = vtkPVPart::New();
+      part->SetPVApplication(pvApp);
+      this->Script("%s SetVTKData $%s {$%s}", part->GetTclName(),
+                   dataName, dataName);
+      pvApp->GetProcessModule()->InitializePVPartPartition(part);
+      pvd->AddPVPart(part);
+      part->Delete();
+  
+      // Create the extent translator
+      /*
+      if (this->GetPVInput())
+        {
+        pvApp->BroadcastScript("%s SetExtentTranslator [%s GetExtentTranslator]",
+                               dataName, this->GetPVInput()->GetPVPart()->GetVTKDataTclName());
+        }
+      else
+        {
+        char translatorTclName[1024];
+        sprintf(translatorTclName, "%sTranslator%d", this->GetName(), idx);
+        pvApp->BroadcastScript("vtkPVExtentTranslator %s", translatorTclName);
+        pvApp->BroadcastScript("%s SetOriginalSource $%s",
+                               translatorTclName, dataName);
+        pvApp->BroadcastScript("$%s SetExtentTranslator %s",
+                               dataName, translatorTclName);
+        pvApp->BroadcastScript("%s Delete", translatorTclName);
+        }
+      */
+      }
+    }
+
+  this->SetPVOutput(pvd);
+  pvd->Delete();
+
+  return VTK_OK;
+}
+
+/*
+This was almost working.
+VTK pipeline was not set correctly.
+Connection did not have input.
+Geometry filter did not have input.
+
+
+//----------------------------------------------------------------------------
+// This stuff used to be in Initialize clone.
+// I want to initialize the output after accept is called.
+int vtkPVSource::InitializeData()
+{
+  vtkPVApplication* pvApp = this->GetPVApplication();
+  int numOutputs, idx;
+  char dataName[1024];
+
+  numOutputs = this->VTKSource->GetNumberOfOutputs();
+
+  for (idx = 0; idx < numOutputs; ++idx)
+    {
+    // Create the output.
+    vtkPVData* pvd = vtkPVData::New();
+    pvd->SetPVApplication(pvApp);
+    if (numOutputs > 1)
+      {
+      sprintf(dataName, "%sOutput%d", this->GetName(), idx);
+      }
+    else
+      {
+      sprintf(dataName, "%sOutput", this->GetName());
+      }
+   
+    pvApp->BroadcastScript("set %s [%s GetOutput %d]", dataName, this->GetVTKSourceTclName(), idx);
+    // When ever the source executes, data information needs to be recomputed.
+    this->Script("%s AddObserver EndEvent {%s InvalidateDataInformation}", 
+                 this->GetVTKSourceTclName(), pvd->GetTclName());
+
+    // Assign a name to the output on all processes.
+    this->Script("%s SetVTKData $%s {$%s}", pvd->GetTclName(), dataName, dataName);
+    // Connect the source and data.
+    this->SetPVOutput(idx, pvd);  
+  
+    // Create the extent translator
+    if (this->GetPVInput())
+      {
+      pvApp->BroadcastScript("%s SetExtentTranslator [%s GetExtentTranslator]",
+                       dataName, this->GetPVInput()->GetPVPart()->GetVTKDataTclName());
+      }
+    else
+      {
+      char translatorTclName[1024];
+      sprintf(translatorTclName, "%sTranslator%d", this->GetName(), idx);
+      pvApp->BroadcastScript("vtkPVExtentTranslator %s", translatorTclName);
+      pvApp->BroadcastScript("%s SetOriginalSource $%s",
+                             translatorTclName, dataName);
+      pvApp->BroadcastScript("$%s SetExtentTranslator %s",
+                             dataName, translatorTclName);
+      // Hold onto name so it can be deleted.
+      this->SetExtentTranslatorTclName(translatorTclName);
+      }
+
+    // !!!!!!!! Since we are in accept already, this should be simplified. !!!!!!!
+    // Created is called only on the first output when Accept()
+    // is invoked on the input. We need to call it for the others.
+    // (if it is verified that the Display pages for these outputs
+    // are not necessary, this can be removed)
+    if ( idx > 0 )
+      {
+      pvd->CreateProperties();
+      }
+    pvd->Delete();
+    }
+
+  if (numOutputs > 1)
+    {
+    // Create dummy pass-through sources.
+    vtkPVWindow* window = this->GetPVWindow();
+    vtkPVPassThrough *pvConnection;
+    vtkPVData *pvConnectionOutput;
+    char *outputTclName;
+    char *connectionTclName;
+    for (idx = 0; idx < numOutputs; ++idx)
+      {
+      pvConnection = vtkPVPassThrough::New();
+      pvConnection->SetLabelNoTrace(this->GetLabel());
+      pvConnection->SetOutputNumber(idx);
+      pvConnection->SetParametersParent(
+          window->GetMainView()->GetSourceParent());
+      pvConnection->SetApplication(pvApp);
+
+      int len = static_cast<int>(strlen(this->VTKSourceTclName))+ 2 + 
+        static_cast<int>(log10(static_cast<double>(idx+1))) + 3;
+      connectionTclName = new char[len];
+      sprintf(connectionTclName, "%s_%d", this->VTKSourceTclName, idx+1);
+      vtkSource* source = static_cast<vtkSource*>(
+        pvApp->MakeTclObject("vtkPassThroughFilter", connectionTclName));
+      pvConnection->SetVTKSource(source, connectionTclName);
+      pvConnection->SetView(window->GetMainView());
+      pvConnection->SetName(connectionTclName);
+      pvConnection->HideParametersPageOn();
+      pvConnection->SetTraceInitialized(1);
+      // Input needs to be set before we can get the output,    
+      pvConnection->SetPVInput(this->GetPVOutput(idx)); 
+
+      if ( idx == 0 )
+        {
+        len = static_cast<int>(strlen(connectionTclName)+ strlen("Output")) + 3;
+        }
+      else
+        {
+        len = static_cast<int>(strlen(connectionTclName)+ strlen("Output")) + 
+              static_cast<int>(log10(static_cast<double>(idx))) + 3;
+        }
+      outputTclName = new char[len];
+      sprintf(outputTclName, "%sOutput%d", connectionTclName, idx);
+      pvApp->BroadcastScript("set %s [%s GetOutput]", outputTclName,
+                             connectionTclName);
+      pvConnectionOutput = vtkPVData::New();
+      pvConnectionOutput->SetPVApplication(pvApp);
+      // When ever the source executes, data information will be collected from all processes.
+      this->Script("%s AddObserver EndEvent {%s InvalidateDataInformation}", 
+                   connectionTclName, pvConnectionOutput->GetTclName());
+
+      vtkPVPart *part = vtkPVPart::New();
+      part->SetPVApplication(pvApp);
+      this->Script("%s SetVTKData $%s {$%s}", part->GetTclName(),
+                   outputTclName, outputTclName);
+      pvApp->GetProcessModule()->InitializePVPartPartition(part);
+      pvConnectionOutput->SetPVPart(part);
+      part->Delete();
+      pvConnection->SetPVOutput(pvConnectionOutput);
+        
+      pvConnection->CreateProperties();
+
+      pvConnectionOutput->Delete();
+      delete [] outputTclName;
+      delete [] connectionTclName;
+        
+      window->GetSourceList("Sources")->AddItem(pvConnection);
+      pvConnection->UpdateParameterWidgets();
+      // Keep the connection from calling this method (InitializeData).
+      pvConnection->Initialized = 1;;
+      pvConnection->Accept(0);
+        
+      pvConnection->Delete();
+      }
+    }
+
+  return VTK_OK;
+
+}
+*/
 //----------------------------------------------------------------------------
 void vtkPVSource::SerializeSelf(ostream& os, vtkIndent indent)
 {
@@ -2189,7 +2487,7 @@ void vtkPVSource::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVSource ";
-  this->ExtractRevision(os,"$Revision: 1.258 $");
+  this->ExtractRevision(os,"$Revision: 1.259 $");
 }
 
 //----------------------------------------------------------------------------
@@ -2210,9 +2508,6 @@ void vtkPVSource::PrintSelf(ostream& os, vtkIndent indent)
      << endl;
   os << indent << "AcceptButton: " << this->GetAcceptButton() << endl;
   os << indent << "DeleteButton: " << this->GetDeleteButton() << endl;
-  os << indent << "ExtentTranslatorTclName: " 
-     << (this->ExtentTranslatorTclName?this->ExtentTranslatorTclName:"null")
-     << endl;
   os << indent << "MainParameterFrame: " << this->GetMainParameterFrame() 
      << endl;
   os << indent << "DescriptionFrame: " << this->DescriptionFrame 
@@ -2224,9 +2519,6 @@ void vtkPVSource::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "ParameterFrame: " << this->GetParameterFrame() << endl;
   os << indent << "ParametersParent: " << this->GetParametersParent() << endl;
   os << indent << "ReplaceInput: " << this->GetReplaceInput() << endl;
-  os << indent << "VTKSource: " << this->GetVTKSource() << endl;
-  os << indent << "VTKSourceTclName: " 
-     << (this->VTKSourceTclName?this->VTKSourceTclName:"none") << endl;
   os << indent << "View: " << this->GetView() << endl;
   os << indent << "VisitedFlag: " << this->GetVisitedFlag() << endl;
   os << indent << "Widgets: " << this->GetWidgets() << endl;
@@ -2240,4 +2532,6 @@ void vtkPVSource::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "HideDisplayPage: " << this->HideDisplayPage << endl;
   os << indent << "HideInformationPage: " << this->HideInformationPage << endl;
   os << indent << "ToolbarModule: " << this->ToolbarModule << endl;
+
+  os << indent << "VTKMultipleInputFlag: " << this->VTKMultipleInputFlag << endl;
 }

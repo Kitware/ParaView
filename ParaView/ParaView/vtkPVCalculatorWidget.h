@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    vtkPVArrayCalculator.h
+  Module:    vtkPVCalculatorWidget.h
   Language:  C++
   Date:      $Date$
   Version:   $Revision$
@@ -39,14 +39,19 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-// .NAME vtkPVArrayCalculator - A class to handle the UI for vtkArrayCalculatorInterface
+// .NAME vtkPVCalculatorWidget - Widget for the PVArrayCalculator.
 // .SECTION Description
+// I am removing the special vtkPVSource vtkPVArrayCalculator and
+// using this special vtkPVWidget instead.  Unfortunately it uses
+// the ivar PVSource alot.  I would like to stop using this ivar.
+// To do this the widget has to maintain the state of all scalar
+// and vector variables. ...
 
 
-#ifndef __vtkPVArrayCalculator_h
-#define __vtkPVArrayCalculator_h
+#ifndef __vtkPVCalculatorWidget_h
+#define __vtkPVCalculatorWidget_h
 
-#include "vtkPVSource.h"
+#include "vtkPVWidget.h"
 
 class vtkKWLabel;
 class vtkKWLabeledFrame;
@@ -55,16 +60,16 @@ class vtkKWOptionMenu;
 class vtkKWPushButton;
 class vtkKWWidget;
 
-class VTK_EXPORT vtkPVArrayCalculator : public vtkPVSource
+class VTK_EXPORT vtkPVCalculatorWidget : public vtkPVWidget
 {
 public:
-  static vtkPVArrayCalculator* New();
-  vtkTypeRevisionMacro(vtkPVArrayCalculator, vtkPVSource);
+  static vtkPVCalculatorWidget* New();
+  vtkTypeRevisionMacro(vtkPVCalculatorWidget, vtkPVWidget);
   void PrintSelf(ostream& os, vtkIndent indent);
     
   // Description:
   // Set up the UI for this source
-  void CreateProperties();
+  void Create(vtkKWApplication *app);
 
   // Description:
   // Tcl callback for the buttons in the calculator
@@ -98,15 +103,17 @@ public:
   // Description:
   // Called when the Accept button is pressed.  It moves the widget values to the 
   // VTK calculator filter.
-  virtual void UpdateVTKSourceParameters();
+  virtual void Accept();
+  virtual void Accept(const char* vtkSourceTclName);
   
   // Description:
   // This method resets the widget values from the VTK filter.
-  virtual void UpdateParameterWidgets();
+  virtual void Reset();
+  virtual void Reset(const char* vtkSourceTclName);
 
 protected:
-  vtkPVArrayCalculator();
-  ~vtkPVArrayCalculator();
+  vtkPVCalculatorWidget();
+  ~vtkPVCalculatorWidget();
 
   vtkKWWidget* AttributeModeFrame;
   vtkKWLabel* AttributeModeLabel;
@@ -155,10 +162,8 @@ protected:
   vtkKWMenuButton* ScalarsMenu;
   vtkKWMenuButton* VectorsMenu;
   
-  int ModifiedFlag;
-
-  vtkPVArrayCalculator(const vtkPVArrayCalculator&); // Not implemented
-  void operator=(const vtkPVArrayCalculator&); // Not implemented
+  vtkPVCalculatorWidget(const vtkPVCalculatorWidget&); // Not implemented
+  void operator=(const vtkPVCalculatorWidget&); // Not implemented
 };
 
 #endif

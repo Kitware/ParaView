@@ -57,7 +57,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVXMLElement.h"
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkPV3DWidget, "1.30");
+vtkCxxRevisionMacro(vtkPV3DWidget, "1.31");
 
 //===========================================================================
 //***************************************************************************
@@ -212,6 +212,7 @@ void vtkPV3DWidget::CopyProperties(vtkPVWidget* clone,
     }
 }
 
+
 //----------------------------------------------------------------------------
 void vtkPV3DWidget::Reset()
 {
@@ -219,8 +220,25 @@ void vtkPV3DWidget::Reset()
   this->ValueChanged = 0;
 }
 
+
+//----------------------------------------------------------------------------
+void vtkPV3DWidget::Reset(const char* sourceTclName)
+{
+  this->ModifiedFlag = 0;
+  this->ValueChanged = 0;
+}
+
 //----------------------------------------------------------------------------
 void vtkPV3DWidget::Accept()
+{
+  this->PlaceWidget();
+  this->ModifiedFlag = 0;
+  this->ValueChanged = 0;
+}
+
+
+//----------------------------------------------------------------------------
+void vtkPV3DWidget::Accept(const char* sourceTclName)
 {
   this->PlaceWidget();
   this->ModifiedFlag = 0;

@@ -69,12 +69,14 @@ public:
   // Sets objects variable to the widgets value.
   // Adds a trace entry.  Side effect is to turn modified flag off.
   virtual void Accept();
+  virtual void Accept(const char* sourceTclName);
   
   // Description:
   // Called when the reset button is pushed.
   // Sets widget's value to the object-variable's value.
   // Side effect is to turn the modified flag off.
   virtual void Reset();
+  virtual void Reset(const char* sourceTclName);
 
   // Description:
   // Callbacks to set the points of the 3D widget from the
@@ -168,7 +170,7 @@ protected:
   // Execute event of the 3D Widget.
   virtual void ExecuteEvent(vtkObject*, unsigned long, void*);
 
-  void UpdateVTKObject();
+  void UpdateVTKObject(const char* sourceTclName);
 
   vtkKWEntry* Point1[3];
   vtkKWEntry* Point2[3];

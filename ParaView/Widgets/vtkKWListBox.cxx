@@ -46,7 +46,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWListBox );
-vtkCxxRevisionMacro(vtkKWListBox, "1.13");
+vtkCxxRevisionMacro(vtkKWListBox, "1.14");
 
 
 int vtkKWListBoxCommand(ClientData cd, Tcl_Interp *interp,
@@ -63,6 +63,8 @@ vtkKWListBox::vtkKWListBox()
   
   this->Listbox = vtkKWWidget::New();
   this->Listbox->SetParent(this);
+
+  this->ScrollbarFlag = 1;
 }
 
 vtkKWListBox::~vtkKWListBox()
@@ -133,6 +135,35 @@ const char *vtkKWListBox::GetSelection()
 }
 
 
+void vtkKWListBox::SetSelectState(int idx, int state)
+{
+  if ( idx < 0 )
+    {
+    return;
+    }
+  if (state)
+    {
+    this->Script("%s selection set %d", this->Listbox->GetWidgetName(), idx);
+    }
+  else
+    {
+    this->Script("%s selection clear %d", this->Listbox->GetWidgetName(), idx);
+    }
+}
+
+int vtkKWListBox::GetSelectState(int idx)
+{
+  if ( idx < 0 )
+    {
+    return 0;
+    }
+
+  this->Script("%s selection includes %d", this->Listbox->GetWidgetName(), idx);
+
+  int result = atoi(this->Application->GetMainInterp()->result);
+  return result;
+}
+
 void vtkKWListBox::InsertEntry(int index, const char *name)
 {
   this->Script("%s insert %d {%s}", this->Listbox->GetWidgetName(), index, name);
@@ -198,8 +229,11 @@ void vtkKWListBox::Create(vtkKWApplication *app, const char *args)
   this->Script( "%s configure -command {%s yview}", 
                 this->Scrollbar->GetWidgetName(),
                 this->Listbox->GetWidgetName());
-  
-  this->Script("pack %s -side right -fill y", this->Scrollbar->GetWidgetName());
+    
+  if (this->ScrollbarFlag)
+    {
+    this->Script("pack %s -side right -fill y", this->Scrollbar->GetWidgetName());
+    }
   this->Script("pack %s -side left -expand 1 -fill both", this->Listbox->GetWidgetName());
 
   // Update enable state
@@ -212,6 +246,24 @@ void vtkKWListBox::SetWidth(int w)
 {
   this->Script("%s configure -width %d", this->Listbox->GetWidgetName(), w);
 }
+
+void vtkKWListBox::SetScrollbarFlag(int v)
+{
+  this->ScrollbarFlag = v;
+
+  if (this->Application)
+    {
+    this->Script("pack forget %s", this->Scrollbar->GetWidgetName());
+    this->Script("pack forget %s", this->Listbox->GetWidgetName());
+    if (this->ScrollbarFlag)
+      {
+      this->Script("pack %s -side right -fill y", this->Scrollbar->GetWidgetName());
+      }
+    this->Script("pack %s -side left -expand 1 -fill both", this->Listbox->GetWidgetName());
+    }
+}
+
+
 
 void vtkKWListBox::SetHeight(int h)
 {

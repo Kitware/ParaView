@@ -62,10 +62,17 @@ public:
   virtual void Create(vtkKWApplication *app, const char *args);
 
   // Description:
-  // Get the current selected string in the list
+  // Get the current selected string in the list.  This is used when
+  // Select mode is single or browse.
   const char *GetSelection();
   int GetSelectionIndex();
   void SetSelectionIndex(int);
+
+  // Description:
+  // When selectmode is multiple or extended, then these methods can be used to set
+  // and query the selection.
+  void SetSelectState(int idx, int state);
+  int GetSelectState(int idx);
   
   // Description:
   // Add entries to an option menu, with or without a command.
@@ -112,6 +119,11 @@ public:
   virtual void SetBalloonHelpString(const char *str);
   virtual void SetBalloonHelpJustification( int j );
     
+  // Description:
+  // Specify whether you want a scrollbar (default on) before you call Create.
+  void ScrollbarOn() {this->SetScrollbarFlag(1);}
+  void ScrollbarOff() {this->SetScrollbarFlag(0);}
+  
 protected:
   vtkKWListBox();
   ~vtkKWListBox();
@@ -120,6 +132,9 @@ protected:
   
   vtkKWWidget *Scrollbar;
   vtkKWWidget *Listbox;
+  int ScrollbarFlag;
+
+  void SetScrollbarFlag(int v);
   
 private:
   vtkKWListBox(const vtkKWListBox&); // Not implemented

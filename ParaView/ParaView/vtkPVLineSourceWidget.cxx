@@ -50,7 +50,7 @@ int vtkPVLineSourceWidget::InstanceCount = 0;
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLineSourceWidget);
-vtkCxxRevisionMacro(vtkPVLineSourceWidget, "1.3");
+vtkCxxRevisionMacro(vtkPVLineSourceWidget, "1.4");
 
 int vtkPVLineSourceWidgetCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -122,19 +122,47 @@ void vtkPVLineSourceWidget::Create(vtkKWApplication *app)
                this->LineWidget->GetWidgetName());
 }
 
+
+//----------------------------------------------------------------------------
+int vtkPVLineSourceWidget::GetModifiedFlag()
+{
+  if (this->ModifiedFlag || this->LineWidget->GetModifiedFlag())
+    {
+    return 1;
+    }
+  else
+    {
+    return 0;
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVLineSourceWidget::Reset(const char* sourceTclName)
+{
+  this->ModifiedFlag = 0;
+  // Ignore the source passed in.  Modify our one source.
+  this->LineWidget->Reset(this->SourceTclName);
+}
+
 //----------------------------------------------------------------------------
 void vtkPVLineSourceWidget::Reset()
 {
+  this->Reset(this->SourceTclName);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVLineSourceWidget::Accept(const char* sourceTclName)
+{
+  // Ignore the source passed in.  Modify our one source.
+  this->LineWidget->Accept(this->SourceTclName);
+  
   this->ModifiedFlag = 0;
-  this->LineWidget->Reset();
 }
 
 //----------------------------------------------------------------------------
 void vtkPVLineSourceWidget::Accept()
 {
-  this->LineWidget->Accept();
-  
-  this->ModifiedFlag = 0;
+  this->Accept(this->SourceTclName);
 }
 
 //----------------------------------------------------------------------------

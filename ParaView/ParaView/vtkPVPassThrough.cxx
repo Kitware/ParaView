@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPassThrough);
-vtkCxxRevisionMacro(vtkPVPassThrough, "1.1");
+vtkCxxRevisionMacro(vtkPVPassThrough, "1.2");
 
 int vtkPVPassThroughCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -73,7 +73,7 @@ void vtkPVPassThrough::SaveInTclScript(ofstream *file, int interactiveFlag,
   int i;
 
   // Detect special sources we do not handle yet.
-  if (this->VTKSource == NULL)
+  if (this->GetVTKSource() == NULL)
     {
     return;
     }
@@ -97,8 +97,8 @@ void vtkPVPassThrough::SaveInTclScript(ofstream *file, int interactiveFlag,
     }
    
   // Save the object in the script.
-  *file << "\n" << this->VTKSource->GetClassName()
-        << " " << this->VTKSourceTclName << "\n";
+  *file << "\n" << this->GetVTKSource()->GetClassName()
+        << " " << this->GetVTKSourceTclName() << "\n";
  
   // Set the input to the passthrough filter.
   vtkPVData *inputData = this->GetPVInput();

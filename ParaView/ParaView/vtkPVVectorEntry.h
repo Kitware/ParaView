@@ -71,6 +71,12 @@ public:
   virtual void Create(vtkKWApplication *pvApp);
   
   // Description:
+  // These methods are going to replace the Accept/Reset with no arguments.
+  // We need the widgets to control multiple sources.
+  virtual void Accept(const char* sourceTclName);
+  virtual void Reset(const char* sourceTclName);
+
+  // Description:
   // Called when accept button is pushed.  
   // Sets objects variable to the widgets value.
   // Adds a trace entry.  Side effect is to turn modified flag off.

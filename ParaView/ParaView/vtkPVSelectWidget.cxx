@@ -52,7 +52,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectWidget);
-vtkCxxRevisionMacro(vtkPVSelectWidget, "1.18");
+vtkCxxRevisionMacro(vtkPVSelectWidget, "1.19");
 
 int vtkPVSelectWidgetCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -170,9 +170,29 @@ void vtkPVSelectWidget::SetLabel(const char* label)
     this->LabeledFrame->SetLabel(label);
     }
 }
+
+
   
 //----------------------------------------------------------------------------
-void vtkPVSelectWidget::Accept()
+int vtkPVSelectWidget::GetModifiedFlag()
+{
+  if (this->ModifiedFlag)
+    {
+    return 1;
+    }
+
+  if (this->CurrentIndex >= 0)
+    {
+    vtkPVWidget *pvw;
+    pvw = (vtkPVWidget*)this->Widgets->GetItemAsObject(this->CurrentIndex);
+    return pvw->GetModifiedFlag();
+    }
+  return 0;
+}
+
+  
+//----------------------------------------------------------------------------
+void vtkPVSelectWidget::Accept(const char* sourceTclName)
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
 
@@ -186,7 +206,7 @@ void vtkPVSelectWidget::Accept()
   if (this->GetCurrentVTKValue())
     {
     pvApp->BroadcastScript("%s Set%s %s",
-                           this->ObjectTclName,
+                           sourceTclName,
                            this->VariableName,
                            this->GetCurrentVTKValue()); 
     }
@@ -195,15 +215,20 @@ void vtkPVSelectWidget::Accept()
     {
     vtkPVWidget *pvw;
     pvw = (vtkPVWidget*)this->Widgets->GetItemAsObject(this->CurrentIndex);
-    pvw->Accept();
+    pvw->Accept(sourceTclName);
     }
 
   this->ModifiedFlag = 0;
 }
-
+  
+//----------------------------------------------------------------------------
+void vtkPVSelectWidget::Accept()
+{
+  this->Accept(this->ObjectTclName);
+}
 
 //----------------------------------------------------------------------------
-void vtkPVSelectWidget::Reset()
+void vtkPVSelectWidget::Reset(const char* sourceTclName)
 {
   int index=-1, i;
   int num = this->Values->GetNumberOfStrings();
@@ -211,7 +236,7 @@ void vtkPVSelectWidget::Reset()
   const char* tmp;
   char* currentValue;
 
-  this->Script("%s Get%s",this->ObjectTclName,this->VariableName);
+  this->Script("%s Get%s",sourceTclName,this->VariableName);
   tmp = Tcl_GetStringResult(this->Application->GetMainInterp());
   if (tmp && strlen(tmp) > 0)
     {
@@ -232,16 +257,28 @@ void vtkPVSelectWidget::Reset()
       this->SetCurrentIndex(index);
       }
     delete[] currentValue;
+    this->ModifiedFlag = 0;
+    }
+  else
+    { 
+    // The value is not set. 
+    // Keep the modified flag so that accept will set the default value.
+    this->ModifiedFlag = 1;
     }
 
   if (this->CurrentIndex >= 0)
     {
     vtkPVWidget *pvw;
     pvw = (vtkPVWidget*)(this->Widgets->GetItemAsObject(this->CurrentIndex));
-    pvw->Reset();
+    pvw->Reset(sourceTclName);
     }
+}
 
-  this->ModifiedFlag = 0;
+
+//----------------------------------------------------------------------------
+void vtkPVSelectWidget::Reset()
+{
+  this->Reset(this->ObjectTclName);
 }
 
 //----------------------------------------------------------------------------
@@ -414,7 +451,7 @@ void vtkPVSelectWidget::SetCurrentIndex(int idx)
   // Pack the new widget.
   pvw = (vtkPVWidget*)(this->Widgets->GetItemAsObject(this->CurrentIndex));
   this->Script("pack %s -side top -fill both -expand t", pvw->GetWidgetName());
-  pvw->Reset();
+  pvw->Reset(this->ObjectTclName);
   pvw->Select();
 
   this->ModifiedCallback();

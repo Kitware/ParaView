@@ -61,7 +61,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkRenderer.h"
 
 vtkStandardNewMacro(vtkPVSphereWidget);
-vtkCxxRevisionMacro(vtkPVSphereWidget, "1.17");
+vtkCxxRevisionMacro(vtkPVSphereWidget, "1.18");
 
 int vtkPVSphereWidgetCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -131,7 +131,7 @@ void vtkPVSphereWidget::CenterResetCallback()
 
 
 //----------------------------------------------------------------------------
-void vtkPVSphereWidget::Reset()
+void vtkPVSphereWidget::Reset(const char* sourceTclName)
 {
   if ( ! this->ModifiedFlag)
     {
@@ -144,7 +144,12 @@ void vtkPVSphereWidget::Reset()
     this->Script("eval %s SetRadius [ %s GetRadius ]", 
                  this->GetTclName(), this->SphereTclName);
     }
-  this->Superclass::Reset();
+  this->Superclass::Reset(sourceTclName);
+}
+//----------------------------------------------------------------------------
+void vtkPVSphereWidget::Reset()
+{
+  this->Reset(this->ObjectTclName);
 }
 
 //----------------------------------------------------------------------------
@@ -165,7 +170,7 @@ void vtkPVSphereWidget::ActualPlaceWidget()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVSphereWidget::Accept()  
+void vtkPVSphereWidget::Accept(const char* sourceTclName)  
 {
   this->PlaceWidget();
   if ( ! this->ModifiedFlag)
@@ -194,11 +199,16 @@ void vtkPVSphereWidget::Accept()
     this->AddTraceEntry("$kw(%s) SetRadius %f", 
                         this->GetTclName(), rad);
     }
-  this->Superclass::Accept();
+  this->Superclass::Accept(sourceTclName);
+}
+//----------------------------------------------------------------------------
+void vtkPVSphereWidget::Accept()  
+{
+  this->Accept(this->ObjectTclName);
 }
 
 //----------------------------------------------------------------------------
-void vtkPVSphereWidget::UpdateVTKObject()
+void vtkPVSphereWidget::UpdateVTKObject(const char* sourceTclName)
 {
 }
 

@@ -46,6 +46,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkCubeAxesActor2D.h"
 #include "vtkDataSetAttributes.h"
 #include "vtkDataSetSurfaceFilter.h"
+#include "vtkPVProcessModule.h"
+#include "vtkPVPart.h"
+#include "vtkCollection.h"
+#include "vtkPVDataInformation.h"
+#include "vtkPVDataSetAttributesInformation.h"
+#include "vtkPVArrayInformation.h"
 #include "vtkImageData.h"
 #include "vtkKWBoundsDisplay.h"
 #include "vtkKWChangeColorButton.h"
@@ -90,7 +96,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.189");
+vtkCxxRevisionMacro(vtkPVData, "1.190");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -105,6 +111,7 @@ vtkPVData::vtkPVData()
 
   this->PVParts = vtkCollection::New();
   this->DataInformation = vtkPVDataInformation::New();
+  this->DataInformationValid = 0;
   this->PVSource = NULL;
   
   this->NumberOfPVConsumers = 0;
@@ -337,7 +344,19 @@ vtkPVData::~vtkPVData()
 
 
 //----------------------------------------------------------------------------
+int vtkPVData::GetNumberOfPVParts()
+{
+  return this->PVParts->GetNumberOfItems();
+}
+
+//----------------------------------------------------------------------------
 void vtkPVData::SetPVPart(vtkPVPart* part)
+{
+  this->PVParts->AddItem(part);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVData::AddPVPart(vtkPVPart* part)
 {
   this->PVParts->AddItem(part);
 }
@@ -352,9 +371,26 @@ vtkPVPart* vtkPVData::GetPVPart(int idx)
 }
 
 //----------------------------------------------------------------------------
+vtkPVDataInformation* vtkPVData::GetDataInformation()
+{
+  if (this->DataInformationValid == 0)
+    {
+    this->GatherDataInformation();
+    }
+  return this->DataInformation;
+}
+
+//----------------------------------------------------------------------------
+void vtkPVData::InvalidateDataInformation()
+{
+  this->DataInformationValid = 0;
+}
+
+//----------------------------------------------------------------------------
 void vtkPVData::GatherDataInformation()
 {
   vtkPVPart *part;
+  int count = 1;
 
   this->DataInformation->Initialize();
   this->PVParts->InitTraversal();
@@ -363,6 +399,8 @@ void vtkPVData::GatherDataInformation()
     part->GatherDataInformation();
     this->DataInformation->AddInformation(part->GetDataInformation());
     }
+  this->DataInformationValid = 1;
+  this->UpdatePropertiesInternal();
 }
 
 //----------------------------------------------------------------------------
@@ -417,11 +455,6 @@ void vtkPVData::SetPVColorMap(vtkPVColorMap *colorMap)
         this->PVColorMap->GetScalarBarCheck()->GetVariableName());
       }
     }
-  
-  // Updating properties caused some problems:
-  // The arrays were "completed" in the middle of CopyByPointFieldComponent.
-  // The array name was deleted before the method finished using it.
-  //this->UpdateProperties();
 }
 
 //----------------------------------------------------------------------------
@@ -563,7 +596,9 @@ void vtkPVData::Update()
     {
     part->Update();
     }
-  this->GatherDataInformation();
+  
+  // Now done as a callback.
+  //this->GatherDataInformation();
 }
 
 
@@ -576,7 +611,7 @@ void vtkPVData::InsertExtractPiecesIfNecessary()
   this->PVParts->InitTraversal();
   while ( (part = (vtkPVPart*)(this->PVParts->GetNextItemAsObject())) )
     {
-    part->InsertExtractPiecesIfNecessary(this->PVSource->GetVTKSourceTclName());
+    part->InsertExtractPiecesIfNecessary();
     }
 }
 
@@ -1144,8 +1179,17 @@ void vtkPVData::EditColorMapCallback()
           this->PVColorMap->GetWidgetName());
 }
 
+
 //----------------------------------------------------------------------------
 void vtkPVData::UpdateProperties()
+{
+  // This call makes sure the information is up to date.
+  // If not, it gathers information and updates the properties (internal).
+  this->GetDataInformation();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVData::UpdatePropertiesInternal()
 {
   vtkPVSource* source = this->GetPVSource();
 
@@ -1157,19 +1201,16 @@ void vtkPVData::UpdateProperties()
   char tmp[350], cmd[1024], defCmd[350];
   float bounds[6];
   int i, numArrays, numComps;
-  vtkDataSetAttributes *fieldData;
+  vtkPVDataSetAttributesInformation *attrInfo;
   vtkPVApplication *pvApp = this->GetPVApplication();  
-  vtkDataArray *array;
+  vtkPVArrayInformation *arrayInfo;
   const char *currentColorBy;
   int currentColorByFound = 0;
   vtkPVWindow *window;
   int defPoint = 0;
-
-  // Eliminate the PVPart here.
-  // !!!!!!!!!!!!!!!!!!!!!!!! .....................
-  vtkDataArray *defArray;
+  vtkPVArrayInformation *defArray;
   vtkPVPart *part;
-  part = this->GetPVPart();
+  int idx, num;
 
   // Default is the scalars to use when current color is not found.
   // This is sort of a mess, and should be handled by a color selection widget.
@@ -1183,11 +1224,21 @@ void vtkPVData::UpdateProperties()
   int numberOfPoints = this->DataInformation->GetNumberOfPoints();
   if (numberOfPoints > this->GetPVRenderView()->GetLODThreshold())
     {
-    pvApp->BroadcastScript("%s EnableLODOn", part->GetPropTclName());
+    num = this->GetNumberOfPVParts();
+    for (idx = 0; idx < num; ++idx)
+      {  
+      part = this->GetPVPart(idx);
+      pvApp->BroadcastScript("%s EnableLODOn", part->GetPropTclName());
+      }
     }
   else
     {
-    pvApp->BroadcastScript("%s EnableLODOff", part->GetPropTclName());
+    num = this->GetNumberOfPVParts();
+    for (idx = 0; idx < num; ++idx)
+      {  
+      part = this->GetPVPart(idx);
+      pvApp->BroadcastScript("%s EnableLODOff", part->GetPropTclName());
+      }
     }
 
   if (this->PVColorMap)
@@ -1202,12 +1253,6 @@ void vtkPVData::UpdateProperties()
       }
     }
 
-  if (this->UpdateTime > this->GetPVPart()->GetVTKData()->GetMTime())
-    {
-    return;
-    }
-  this->UpdateTime.Modified();
-
   if (source->GetHideDisplayPage())
     {
     return;
@@ -1215,87 +1260,56 @@ void vtkPVData::UpdateProperties()
 
   window = this->GetPVApplication()->GetMainWindow();
 
-  // Update and time the filter.
-  char *str = new char[strlen(part->GetVTKDataTclName()) + 80];
-  sprintf(str, "Accept: %s", part->GetVTKDataTclName());
-  vtkTimerLog::MarkStartEvent(str);
-  pvApp->BroadcastScript("%s ForceUpdate", part->GetUpdateSuppressorTclName());
-  pvApp->BroadcastScript("%s Update", part->GetMapperTclName());
-  // Get bounds to time completion (not just triggering) of update.
-  this->DataInformation->GetBounds(bounds);
-  vtkTimerLog::MarkEndEvent(str);
-  delete [] str;
-
   // Update actor control resolutions
 
   this->UpdateActorControlResolutions();
   
-  // Time creation of the LOD
-  vtkTimerLog::MarkStartEvent("Create LOD");
-  pvApp->BroadcastScript("%s ForceUpdate", part->GetLODUpdateSuppressorTclName());
-  pvApp->BroadcastScript("%s Update", part->GetLODMapperTclName());
-  // Get bounds to time completion (not just triggering) of update.
-  this->DataInformation->GetBounds(bounds);
-  vtkTimerLog::MarkEndEvent("Create LOD");
-
   ostrstream type;
   type << "Type: ";
 
   // Put the data type as the label of the top frame.
-  vtkDataSet *data = NULL;
-  if (this->GetPVPart())
+  int dataType = this->DataInformation->GetDataSetType();
+  if (dataType == VTK_POLY_DATA)
     {
-    data = this->GetPVPart()->GetVTKData();
+    type << "Polygonal";
+    this->Script("pack forget %s", 
+                 this->ExtentDisplay->GetWidgetName());
     }
-  if (data)
+  else if (dataType == VTK_UNSTRUCTURED_GRID)
     {
-    if (data->IsA("vtkPolyData"))
+    type << "Unstructured Grid";
+    this->Script("pack forget %s", 
+                 this->ExtentDisplay->GetWidgetName());
+    }
+  else if (dataType == VTK_STRUCTURED_GRID)
+    {
+    type << "Curvilinear";
+    this->ExtentDisplay->SetExtent(
+            this->DataInformation->GetExtent());
+    this->Script("pack %s -fill x -expand t -pady 2", 
+                 this->ExtentDisplay->GetWidgetName());
+    }
+  else if (dataType == VTK_RECTILINEAR_GRID)
+    {
+    type << "Nonuniform Rectilinear";
+    this->ExtentDisplay->SetExtent(this->DataInformation->GetExtent());
+    this->Script("pack %s -fill x -expand t -pady 2", 
+                 this->ExtentDisplay->GetWidgetName());
+    }
+  else if (dataType == VTK_IMAGE_DATA)
+    {
+    int *ext = this->DataInformation->GetExtent();
+    if (ext[0] == ext[1] || ext[2] == ext[3] || ext[4] == ext[5])
       {
-      type << "Polygonal";
-      this->Script("pack forget %s", 
-                   this->ExtentDisplay->GetWidgetName());
-      }
-    else if (data->IsA("vtkUnstructuredGrid"))
-      {
-      type << "Unstructured Grid";
-      this->Script("pack forget %s", 
-                   this->ExtentDisplay->GetWidgetName());
-      }
-    else if (data->IsA("vtkStructuredGrid"))
-      {
-      type << "Curvilinear";
-      this->ExtentDisplay->SetExtent(
-              ((vtkStructuredGrid*)data)->GetExtent());
-      this->Script("pack %s -fill x -expand t -pady 2", 
-                   this->ExtentDisplay->GetWidgetName());
-      }
-    else if (data->IsA("vtkRectilinearGrid"))
-      {
-      type << "Nonuniform Rectilinear";
-      this->ExtentDisplay->SetExtent(
-              ((vtkRectilinearGrid*)data)->GetExtent());
-      this->Script("pack %s -fill x -expand t -pady 2", 
-                   this->ExtentDisplay->GetWidgetName());
-      }
-    else if (data->IsA("vtkImageData"))
-      {
-      int *ext = ((vtkImageData*)data)->GetExtent();
-      if (ext[0] == ext[1] || ext[2] == ext[3] || ext[4] == ext[5])
-        {
-        type << "Image (Uniform Rectilinear)";
-        }
-      else
-        {
-        type << "Volume (Uniform Rectilinear)";
-        }
-      this->ExtentDisplay->SetExtent(ext);
-      this->Script("pack %s -fill x -expand t -pady 2", 
-                   this->ExtentDisplay->GetWidgetName());
+      type << "Image (Uniform Rectilinear)";
       }
     else
       {
-      type << "Unknown";
+      type << "Volume (Uniform Rectilinear)";
       }
+    this->ExtentDisplay->SetExtent(ext);
+    this->Script("pack %s -fill x -expand t -pady 2", 
+                 this->ExtentDisplay->GetWidgetName());
     }
   else
     {
@@ -1311,6 +1325,7 @@ void vtkPVData::UpdateProperties()
   sprintf(tmp, "Number of points: %d", numberOfPoints);
   this->NumPointsLabel->SetLabel(tmp);
   
+  this->DataInformation->GetBounds(bounds);
   this->BoundsDisplay->SetBounds(bounds);
   if (this->CubeAxesTclName)
     {  
@@ -1318,87 +1333,73 @@ void vtkPVData::UpdateProperties()
                  this->CubeAxesTclName, bounds[0], bounds[1], bounds[2],
                  bounds[3], bounds[4], bounds[5]);
     }
-  // This doesn't need to be set currently because we're not packing
-  // the AmbientScale.
-  //  this->AmbientScale->SetValue(part->GetProperty()->GetAmbient());
-
-  this->GatherDataInformation();
 
   currentColorBy = this->ColorMenu->GetValue();
   this->ColorMenu->ClearEntries();
   this->ColorMenu->AddEntryWithCommand("Property",
                                        this, "ColorByProperty");
-  fieldData = this->GetPVPart()->GetMapper()->GetInput()->GetPointData();
-  if (fieldData)
+
+  attrInfo = this->DataInformation->GetPointDataInformation();
+  numArrays = attrInfo->GetNumberOfArrays();
+  for (i = 0; i < numArrays; i++)
     {
-    numArrays = fieldData->GetNumberOfArrays();
-    for (i = 0; i < numArrays; i++)
+    arrayInfo = attrInfo->GetArrayInformation(i);
+    numComps = arrayInfo->GetNumberOfComponents();
+    sprintf(cmd, "ColorByPointField {%s} %d", 
+            arrayInfo->GetName(), arrayInfo->GetNumberOfComponents());
+    if (arrayInfo->GetNumberOfComponents() > 1)
       {
-      if (fieldData->GetArrayName(i))
-        {
-        array = fieldData->GetArray(i);
-        numComps = array->GetNumberOfComponents();
-        sprintf(cmd, "ColorByPointField {%s} %d", 
-                array->GetName(), array->GetNumberOfComponents());
-        if (array->GetNumberOfComponents() > 1)
-          {
-          sprintf(tmp, "Point %s (%d)", fieldData->GetArrayName(i),
-                  array->GetNumberOfComponents());
-          }
-        else
-          {
-          sprintf(tmp, "Point %s", fieldData->GetArrayName(i));
-          }
-        this->ColorMenu->AddEntryWithCommand(tmp, this, cmd);
-        if (strcmp(tmp, currentColorBy) == 0)
-          {
-          currentColorByFound = 1;
-          }
-        if (fieldData->GetScalars() == array)
-          {
-          strcpy(defCmd, tmp);
-          defPoint = 1;
-          defArray = array;
-          }
-        }
+      sprintf(tmp, "Point %s (%d)", arrayInfo->GetName(),
+              arrayInfo->GetNumberOfComponents());
+      }
+    else
+      {
+      sprintf(tmp, "Point %s", arrayInfo->GetName());
+      }
+    this->ColorMenu->AddEntryWithCommand(tmp, this, cmd);
+    if (strcmp(tmp, currentColorBy) == 0)
+      {
+      currentColorByFound = 1;
+      }
+    if (attrInfo->IsArrayAnAttribute(i) == vtkDataSetAttributes::SCALARS)
+      {
+      strcpy(defCmd, tmp);
+      defPoint = 1;
+      defArray = arrayInfo;
       }
     }
-  
-  fieldData = this->GetPVPart()->GetMapper()->GetInput()->GetCellData();
-  if (fieldData)
+
+  attrInfo = this->DataInformation->GetCellDataInformation();
+  numArrays = attrInfo->GetNumberOfArrays();
+  for (i = 0; i < numArrays; i++)
     {
-    numArrays = fieldData->GetNumberOfArrays();
-    for (i = 0; i < numArrays; i++)
+    arrayInfo = attrInfo->GetArrayInformation(i);
+    sprintf(cmd, "ColorByCellField {%s} %d", 
+            arrayInfo->GetName(), arrayInfo->GetNumberOfComponents());
+    if (arrayInfo->GetNumberOfComponents() > 1)
       {
-      if (fieldData->GetArrayName(i))
-        {
-        array = fieldData->GetArray(i);
-        sprintf(cmd, "ColorByCellField {%s} %d", 
-                array->GetName(), array->GetNumberOfComponents());
-        if (array->GetNumberOfComponents() > 1)
-          {
-          sprintf(tmp, "Cell %s (%d)", fieldData->GetArrayName(i),
-                  array->GetNumberOfComponents());
-          }
-        else
-          {
-          sprintf(tmp, "Cell %s", fieldData->GetArrayName(i));
-          }
-        this->ColorMenu->AddEntryWithCommand(tmp, this, cmd);
-        if (strcmp(tmp, currentColorBy) == 0)
-          {
-          currentColorByFound = 1;
-          }
-        if (defArray == NULL && fieldData->GetScalars() == array)
-          {
-          strcpy(defCmd, tmp);
-          defPoint = 0;
-          defArray = array;
-          }
-        }
+      sprintf(tmp, "Cell %s (%d)", arrayInfo->GetName(),
+              arrayInfo->GetNumberOfComponents());
+      }
+    else
+      {
+      sprintf(tmp, "Cell %s", arrayInfo->GetName());
+      }
+    this->ColorMenu->AddEntryWithCommand(tmp, this, cmd);
+    if (strcmp(tmp, currentColorBy) == 0)
+      {
+      currentColorByFound = 1;
+      }
+    if (defArray == NULL && attrInfo->IsArrayAnAttribute(i) == vtkDataSetAttributes::SCALARS)
+      {
+      strcpy(defCmd, tmp);
+      defPoint = 0;
+      defArray = arrayInfo;
       }
     }
-  if (strcmp(currentColorBy, "Property") == 0 && this->ColorSetByUser)
+
+  // Current color by will never be NULL ....
+  if (currentColorBy != NULL && strcmp(currentColorBy, "Property") == 0 && this->ColorSetByUser)
     {
     return;
     }
@@ -1414,12 +1415,12 @@ void vtkPVData::UpdateProperties()
       if (defPoint)
         {
         this->ColorByPointFieldInternal(defArray->GetName(), 
-                                      defArray->GetNumberOfComponents());
+                                        defArray->GetNumberOfComponents());
         }
       else
         {
         this->ColorByCellFieldInternal(defArray->GetName(), 
-                                      defArray->GetNumberOfComponents());
+                                       defArray->GetNumberOfComponents());
         }
       }
     else
@@ -1435,20 +1436,25 @@ void vtkPVData::SetActorColor(float r, float g, float b)
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
   vtkPVPart *part;
-  part = this->GetPVPart();
+  int idx, num;
 
-  pvApp->BroadcastScript("%s SetColor %f %f %f", 
-                         part->GetPropertyTclName(), r, g, b);
+  num = this->GetNumberOfPVParts();
+  for (idx = 0; idx < num; ++idx)
+    {
+    part = this->GetPVPart(idx);
+    pvApp->BroadcastScript("%s SetColor %f %f %f", 
+                           part->GetPropertyTclName(), r, g, b);
 
-  // Add a bit of specular when just coloring by property.
-  pvApp->BroadcastScript("%s SetSpecular 0.1", 
-                         part->GetPropertyTclName());
+    // Add a bit of specular when just coloring by property.
+    pvApp->BroadcastScript("%s SetSpecular 0.1", 
+                           part->GetPropertyTclName());
 
-  pvApp->BroadcastScript("%s SetSpecularPower 100.0", 
-                         part->GetPropertyTclName());
+    pvApp->BroadcastScript("%s SetSpecularPower 100.0", 
+                           part->GetPropertyTclName());
 
-  pvApp->BroadcastScript("%s SetSpecularColor 1.0 1.0 1.0", 
-                         part->GetPropertyTclName());
+    pvApp->BroadcastScript("%s SetSpecularColor 1.0 1.0 1.0", 
+                           part->GetPropertyTclName());
+    }
 }  
 
 //----------------------------------------------------------------------------
@@ -1509,7 +1515,6 @@ void vtkPVData::ResetColorRange()
     }
 
   this->PVColorMap->ResetScalarRange();
-  this->UpdateProperties();
   if ( this->GetPVRenderView() )
     {
     this->GetPVRenderView()->EventuallyRender();
@@ -1530,10 +1535,15 @@ void vtkPVData::ColorByPropertyInternal()
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
   vtkPVPart *part;
-  part = this->GetPVPart();
-  
-  pvApp->BroadcastScript("%s ScalarVisibilityOff", part->GetMapperTclName());
-  pvApp->BroadcastScript("%s ScalarVisibilityOff", part->GetLODMapperTclName());
+  int idx, num;
+
+  num = this->GetNumberOfPVParts();
+  for (idx = 0; idx < num; ++idx)
+    {
+    part = this->GetPVPart(idx);
+    pvApp->BroadcastScript("%s ScalarVisibilityOff", part->GetMapperTclName());
+    pvApp->BroadcastScript("%s ScalarVisibilityOff", part->GetLODMapperTclName());
+    }
 
   float *color = this->ColorButton->GetColor();
   this->SetActorColor(color[0], color[1], color[2]);
@@ -1584,8 +1594,8 @@ void vtkPVData::ColorByPointField(const char *name, int numComps)
 void vtkPVData::ColorByPointFieldInternal(const char *name, int numComps)
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
+  int num, idx;
   vtkPVPart *part;
-  part = this->GetPVPart();
 
   this->SetPVColorMap(pvApp->GetMainWindow()->GetPVColorMap(name, numComps));
   if (this->PVColorMap == NULL)
@@ -1594,33 +1604,35 @@ void vtkPVData::ColorByPointFieldInternal(const char *name, int numComps)
     return;
     }
 
-  // Turn off the specualr so it does not interfere with data.
-  pvApp->BroadcastScript("%s SetSpecular 0.0", part->GetPropertyTclName());
+  num = this->GetNumberOfPVParts();
+  for (idx = 0; idx < num; ++idx)
+    {
+    part = this->GetPVPart(idx);
+    // Turn off the specualr so it does not interfere with data.
+    pvApp->BroadcastScript("%s SetSpecular 0.0", part->GetPropertyTclName());
 
-  pvApp->BroadcastScript("%s SetLookupTable %s", part->GetMapperTclName(),
-                         this->PVColorMap->GetLookupTableTclName());
-  pvApp->BroadcastScript("%s ScalarVisibilityOn", part->GetMapperTclName());
-  pvApp->BroadcastScript("%s SetScalarModeToUsePointFieldData",
-                         part->GetMapperTclName());
-  pvApp->BroadcastScript("%s SelectColorArray {%s}",
-                         part->GetMapperTclName(), name);
+    pvApp->BroadcastScript("%s SetLookupTable %s", part->GetMapperTclName(),
+                           this->PVColorMap->GetLookupTableTclName());
+    pvApp->BroadcastScript("%s ScalarVisibilityOn", part->GetMapperTclName());
+    pvApp->BroadcastScript("%s SetScalarModeToUsePointFieldData",
+                           part->GetMapperTclName());
+    pvApp->BroadcastScript("%s SelectColorArray {%s}",
+                           part->GetMapperTclName(), name);
 
-  pvApp->BroadcastScript("%s SetLookupTable %s", part->GetLODMapperTclName(),
-                         this->PVColorMap->GetLookupTableTclName());
-  pvApp->BroadcastScript("%s ScalarVisibilityOn", part->GetLODMapperTclName());
-  pvApp->BroadcastScript("%s SetScalarModeToUsePointFieldData",
-                         part->GetLODMapperTclName());
-  pvApp->BroadcastScript("%s SelectColorArray {%s}",
-                         part->GetLODMapperTclName(), name);
-  
+    pvApp->BroadcastScript("%s SetLookupTable %s", part->GetLODMapperTclName(),
+                           this->PVColorMap->GetLookupTableTclName());
+    pvApp->BroadcastScript("%s ScalarVisibilityOn", part->GetLODMapperTclName());
+    pvApp->BroadcastScript("%s SetScalarModeToUsePointFieldData",
+                           part->GetLODMapperTclName());
+    pvApp->BroadcastScript("%s SelectColorArray {%s}",
+                           part->GetLODMapperTclName(), name);
+    } 
   this->Script("grid remove %s", this->ColorButton->GetWidgetName());
 
   this->Script("grid %s %s",
                this->ScalarBarCheck->GetWidgetName(),
                this->EditColorMapButton->GetWidgetName());
 
-  // Synchronize the UI with the new color map.
-  this->UpdateProperties();
   if ( this->GetPVRenderView() )
     {
     this->GetPVRenderView()->EventuallyRender();
@@ -1659,7 +1671,7 @@ void vtkPVData::ColorByCellFieldInternal(const char *name, int numComps)
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
   vtkPVPart *part;
-  part = this->GetPVPart();
+  int idx, num;
 
   this->SetPVColorMap(pvApp->GetMainWindow()->GetPVColorMap(name, numComps));
   if (this->PVColorMap == NULL)
@@ -1668,25 +1680,29 @@ void vtkPVData::ColorByCellFieldInternal(const char *name, int numComps)
     return;
     }
 
-  // Turn off the specualr so it does not interfere with data.
-  pvApp->BroadcastScript("%s SetSpecular 0.0", part->GetPropertyTclName());
+  num = this->GetNumberOfPVParts();
+  for (idx = 0; idx < num; ++idx)
+    {
+    part = this->GetPVPart(idx);
+    // Turn off the specualr so it does not interfere with data.
+    pvApp->BroadcastScript("%s SetSpecular 0.0", part->GetPropertyTclName());
+    pvApp->BroadcastScript("%s SetLookupTable %s", part->GetMapperTclName(),
+                           this->PVColorMap->GetLookupTableTclName());
+    pvApp->BroadcastScript("%s ScalarVisibilityOn", part->GetMapperTclName());
+    pvApp->BroadcastScript("%s SetScalarModeToUseCellFieldData",
+                           part->GetMapperTclName());
+    pvApp->BroadcastScript("%s SelectColorArray {%s}",
+                           part->GetMapperTclName(), name);
 
-  pvApp->BroadcastScript("%s SetLookupTable %s", part->GetMapperTclName(),
-                         this->PVColorMap->GetLookupTableTclName());
-  pvApp->BroadcastScript("%s ScalarVisibilityOn", part->GetMapperTclName());
-  pvApp->BroadcastScript("%s SetScalarModeToUseCellFieldData",
-                         part->GetMapperTclName());
-  pvApp->BroadcastScript("%s SelectColorArray {%s}",
-                         part->GetMapperTclName(), name);
+    pvApp->BroadcastScript("%s SetLookupTable %s", part->GetLODMapperTclName(),
+                           this->PVColorMap->GetLookupTableTclName());
+    pvApp->BroadcastScript("%s ScalarVisibilityOn", part->GetLODMapperTclName());
+    pvApp->BroadcastScript("%s SetScalarModeToUseCellFieldData",
+                           part->GetLODMapperTclName());
+    pvApp->BroadcastScript("%s SelectColorArray {%s}",
+                           part->GetLODMapperTclName(), name);
+    }
 
-  pvApp->BroadcastScript("%s SetLookupTable %s", part->GetLODMapperTclName(),
-                         this->PVColorMap->GetLookupTableTclName());
-  pvApp->BroadcastScript("%s ScalarVisibilityOn", part->GetLODMapperTclName());
-  pvApp->BroadcastScript("%s SetScalarModeToUseCellFieldData",
-                         part->GetLODMapperTclName());
-  pvApp->BroadcastScript("%s SelectColorArray {%s}",
-                         part->GetLODMapperTclName(), name);
-  
   this->Script("grid remove %s", this->ColorButton->GetWidgetName());
 
   this->Script("grid %s %s",
@@ -1726,30 +1742,36 @@ void vtkPVData::DrawWireframe()
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
   vtkPVPart *part;
-  part = this->GetPVPart();
+  int idx, num;
   
   this->AddTraceEntry("$kw(%s) DrawWireframe", this->GetTclName());
-  this->RepresentationMenu->SetValue("Wireframe");
 
   // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-  // Move the property into vtkPVData as soon as things are working again.
+  // We could move the property into vtkPVData so parts would share one object.
+  // Well, this would complicate initialization.  We would have to pass
+  // the property into the part for the mappers.
   // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-  if (part->GetPropertyTclName())
+  num = this->GetNumberOfPVParts();
+  for (idx = 0; idx < num; ++idx)
     {
-    if (this->PreviousWasSolid)
+    part = this->GetPVPart(idx);
+    if (part->GetPropertyTclName())
       {
-      this->PreviousAmbient = part->GetProperty()->GetAmbient();
-      this->PreviousDiffuse = part->GetProperty()->GetDiffuse();
-      this->PreviousSpecular = part->GetProperty()->GetSpecular();
+      if (this->PreviousWasSolid)
+        {
+        this->PreviousAmbient = part->GetProperty()->GetAmbient();
+        this->PreviousDiffuse = part->GetProperty()->GetDiffuse();
+        this->PreviousSpecular = part->GetProperty()->GetSpecular();
+        }
+      this->PreviousWasSolid = 0;
+      pvApp->BroadcastScript("%s SetAmbient 1", part->GetPropertyTclName());
+      pvApp->BroadcastScript("%s SetDiffuse 0", part->GetPropertyTclName());
+      pvApp->BroadcastScript("%s SetSpecular 0", part->GetPropertyTclName());
+      pvApp->BroadcastScript("%s SetRepresentationToWireframe",
+                             part->GetPropertyTclName());
       }
-    this->PreviousWasSolid = 0;
-    pvApp->BroadcastScript("%s SetAmbient 1", part->GetPropertyTclName());
-    pvApp->BroadcastScript("%s SetDiffuse 0", part->GetPropertyTclName());
-    pvApp->BroadcastScript("%s SetSpecular 0", part->GetPropertyTclName());
-    pvApp->BroadcastScript("%s SetRepresentationToWireframe",
-                           part->GetPropertyTclName());
     }
-  
+
   if ( this->GetPVRenderView() )
     {
     this->GetPVRenderView()->EventuallyRender();
@@ -1761,25 +1783,30 @@ void vtkPVData::DrawPoints()
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
   vtkPVPart *part;
-  part = this->GetPVPart();
+  int idx, num;
 
   this->AddTraceEntry("$kw(%s) DrawPoints", this->GetTclName());
   this->RepresentationMenu->SetValue("Points");
 
-  if (part->GetPropertyTclName())
+  num = this->GetNumberOfPVParts();
+  for (idx = 0; idx < num; ++idx)
     {
-    if (this->PreviousWasSolid)
+    part = this->GetPVPart(idx);
+    if (part->GetPropertyTclName())
       {
-      this->PreviousAmbient = part->GetProperty()->GetAmbient();
-      this->PreviousDiffuse = part->GetProperty()->GetDiffuse();
-      this->PreviousSpecular = part->GetProperty()->GetSpecular();
+      if (this->PreviousWasSolid)
+        {
+        this->PreviousAmbient = part->GetProperty()->GetAmbient();
+        this->PreviousDiffuse = part->GetProperty()->GetDiffuse();
+        this->PreviousSpecular = part->GetProperty()->GetSpecular();
+        }
+      this->PreviousWasSolid = 0;
+      pvApp->BroadcastScript("%s SetAmbient 1", part->GetPropertyTclName());
+      pvApp->BroadcastScript("%s SetDiffuse 0", part->GetPropertyTclName());
+      pvApp->BroadcastScript("%s SetSpecular 0", part->GetPropertyTclName());
+      pvApp->BroadcastScript("%s SetRepresentationToPoints",
+                             part->GetPropertyTclName());
       }
-    this->PreviousWasSolid = 0;
-    pvApp->BroadcastScript("%s SetAmbient 1", part->GetPropertyTclName());
-    pvApp->BroadcastScript("%s SetDiffuse 0", part->GetPropertyTclName());
-    pvApp->BroadcastScript("%s SetSpecular 0", part->GetPropertyTclName());
-    pvApp->BroadcastScript("%s SetRepresentationToPoints",
-                           part->GetPropertyTclName());
     }
   
   if ( this->GetPVRenderView() )
@@ -1793,27 +1820,33 @@ void vtkPVData::DrawSurface()
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
   vtkPVPart *part;
-  part = this->GetPVPart();
+  int num, idx;
   
   this->AddTraceEntry("$kw(%s) DrawSurface", this->GetTclName());
   this->RepresentationMenu->SetValue("Surface");
 
-  if (part->GetPropertyTclName())
+
+  num = this->GetNumberOfPVParts();
+  for (idx = 0; idx < num; ++idx)
     {
-    if (!this->PreviousWasSolid)
+    part = this->GetPVPart(idx);
+    if (part->GetPropertyTclName())
       {
-      pvApp->BroadcastScript("%s SetAmbient %f",
-                             part->GetPropertyTclName(), this->PreviousAmbient);
-      pvApp->BroadcastScript("%s SetDiffuse %f",
-                             part->GetPropertyTclName(), this->PreviousDiffuse);
-      pvApp->BroadcastScript("%s SetSpecular %f",
-                             part->GetPropertyTclName(), this->PreviousSpecular);
-      pvApp->BroadcastScript("%s SetRepresentationToSurface",
-                             part->GetPropertyTclName());
+      if (!this->PreviousWasSolid)
+        {
+        pvApp->BroadcastScript("%s SetAmbient %f",
+                               part->GetPropertyTclName(), this->PreviousAmbient);
+        pvApp->BroadcastScript("%s SetDiffuse %f",
+                               part->GetPropertyTclName(), this->PreviousDiffuse);
+        pvApp->BroadcastScript("%s SetSpecular %f",
+                               part->GetPropertyTclName(), this->PreviousSpecular);
+        pvApp->BroadcastScript("%s SetRepresentationToSurface",
+                               part->GetPropertyTclName());
+        }
+      this->PreviousWasSolid = 1;
       }
-    this->PreviousWasSolid = 1;
     }
-  
+
   if ( this->GetPVRenderView() )
     {
     this->GetPVRenderView()->EventuallyRender();
@@ -1843,21 +1876,25 @@ void vtkPVData::SetInterpolationToFlat()
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
   vtkPVPart *part;
-  part = this->GetPVPart();
+  int idx, num;
   
   this->AddTraceEntry("$kw(%s) SetInterpolationToFlat", 
                       this->GetTclName());
   this->InterpolationMenu->SetValue("Flat");
 
-  if (part->GetPropertyTclName())
+  num = this->GetNumberOfPVParts();
+  for (idx = 0; idx < num; ++idx)
     {
-    pvApp->BroadcastScript("%s SetInterpolationToFlat",
-                           part->GetPropertyTclName());
-    }
-  
-  if ( this->GetPVRenderView() )
-    {
-    this->GetPVRenderView()->EventuallyRender();
+    part = this->GetPVPart(idx);
+    if (part->GetPropertyTclName())
+      {
+      pvApp->BroadcastScript("%s SetInterpolationToFlat",
+                             part->GetPropertyTclName());
+      }
+    if ( this->GetPVRenderView() )
+      {
+      this->GetPVRenderView()->EventuallyRender();
+      }
     }
 }
 
@@ -1867,16 +1904,21 @@ void vtkPVData::SetInterpolationToGouraud()
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
   vtkPVPart *part;
-  part = this->GetPVPart();
+  int num, idx;
   
   this->AddTraceEntry("$kw(%s) SetInterpolationToGouraud", 
                       this->GetTclName());
   this->InterpolationMenu->SetValue("Gouraud");
 
-  if (part->GetPropertyTclName())
+  num = this->GetNumberOfPVParts();
+  for (idx = 0; idx < num; ++idx)
     {
-    pvApp->BroadcastScript("%s SetInterpolationToGouraud",
-                           part->GetPropertyTclName());
+    part = this->GetPVPart(idx);
+    if (part->GetPropertyTclName())
+      {
+      pvApp->BroadcastScript("%s SetInterpolationToGouraud",
+                             part->GetPropertyTclName());
+      }
     }
   
   if ( this->GetPVRenderView() )
@@ -1910,31 +1952,34 @@ void vtkPVData::AmbientChanged()
 void vtkPVData::SetAmbient(float ambient)
 {
   vtkPVPart *part;
-  part = this->GetPVPart();
-  part->GetProperty()->SetAmbient(ambient);
+  int num, idx;
+
+  num = this->GetNumberOfPVParts();
+  for (idx = 0; idx < num; ++idx)
+    {
+    part = this->GetPVPart(idx);
+    part->GetProperty()->SetAmbient(ambient);
+    }
 }
 
 
 //----------------------------------------------------------------------------
+// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+// I would like to get rid of this method.  
+// It is no longer needed to set scalar range.
+// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 void vtkPVData::Initialize()
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
   float bounds[6];
-  vtkDataArray *array;
   char *tclName;
   char newTclName[100];
   vtkPVPart *part;
-  part = this->GetPVPart();
-
-  pvApp->BroadcastScript("%s SetInput %s",
-                         part->GetGeometryTclName(),
-                         part->GetVTKDataTclName());
-  
+  int num, idx;
 
   vtkDebugMacro( << "Initialize --------")
-  this->UpdateProperties();
   
-  this->DataInformation->GetBounds(bounds);
+  this->GetDataInformation()->GetBounds(bounds);
   if (bounds[0] < 0)
     {
     bounds[0] += 0.05 * (bounds[1] - bounds[0]);
@@ -2003,50 +2048,24 @@ void vtkPVData::Initialize()
                this->GetCubeAxesTclName(), tclName);
   this->Script("%s SetInertia 20", this->GetCubeAxesTclName());
   
-  if ((array =
-       part->GetMapper()->GetInput()->GetPointData()->GetScalars()) &&
-      (array->GetName()))
+  int dataType = this->GetDataInformation()->GetDataSetType();
+
+  num = this->GetNumberOfPVParts();
+  for (idx = 0; idx < num; ++idx)
     {
-    char *arrayName = (char*)array->GetName();
-    char tmp[350];
-    sprintf(tmp, "Point %s", arrayName);
-    // Order is important here because Internal method check for consistent
-    // menu value and arrays.
-    this->ColorMenu->SetValue(tmp);
-    this->ColorByPointFieldInternal(arrayName, 
-                                    array->GetNumberOfComponents());
+    part = this->GetPVPart(idx);
+    if (dataType == VTK_POLY_DATA || dataType == VTK_UNSTRUCTURED_GRID)
+      {
+      pvApp->BroadcastScript("%s SetUseStrips %d", part->GetGeometryTclName(),
+                             this->GetPVRenderView()->GetTriangleStripsCheck()->GetState());
+      }
+    pvApp->BroadcastScript("%s SetImmediateModeRendering %d",
+                           part->GetMapperTclName(),
+                           this->GetPVRenderView()->GetImmediateModeCheck()->GetState());
+    pvApp->BroadcastScript("%s SetImmediateModeRendering %d", 
+                           part->GetLODMapperTclName(),
+                           this->GetPVRenderView()->GetImmediateModeCheck()->GetState());
     }
-  else if ((array =
-            part->GetMapper()->GetInput()->GetCellData()->GetScalars()) &&
-            (array->GetName()))
-    {
-    char *arrayName = (char*)array->GetName();
-    char tmp[350];
-    sprintf(tmp, "Cell %s", arrayName);
-    // Order is important here because Internal method check for consistent
-    // menu value and arrays.
-    this->ColorMenu->SetValue(tmp);
-    this->ColorByCellFieldInternal(arrayName,
-                                   array->GetNumberOfComponents());
-    }
-  else
-    {
-    this->ColorByPropertyInternal();
-    this->ColorMenu->SetValue("Property");
-    }
-  
-  if (this->GetPVPart()->GetVTKData()->IsA("vtkPolyData") ||
-      this->GetPVPart()->GetVTKData()->IsA("vtkUnstructuredGrid"))
-    {
-    pvApp->BroadcastScript("%s SetUseStrips %d", part->GetGeometryTclName(),
-                           this->GetPVRenderView()->GetTriangleStripsCheck()->GetState());
-    }
-  pvApp->BroadcastScript("%s SetImmediateModeRendering %d",
-                         part->GetMapperTclName(),
-                         this->GetPVRenderView()->GetImmediateModeCheck()->GetState());
-  pvApp->BroadcastScript("%s SetImmediateModeRendering %d", 
-                         part->GetLODMapperTclName(),
-                         this->GetPVRenderView()->GetImmediateModeCheck()->GetState());
 }
 
 
@@ -2058,7 +2077,7 @@ void vtkPVData::CenterCamera()
   char* tclName;
   
   tclName = this->GetPVRenderView()->GetRendererTclName();
-  this->DataInformation->GetBounds(bounds);
+  this->GetDataInformation()->GetBounds(bounds);
   pvApp->BroadcastScript("%s ResetCamera %f %f %f %f %f %f",
                          tclName, bounds[0], bounds[1], bounds[2],
                          bounds[3], bounds[4], bounds[5]);
@@ -2095,7 +2114,7 @@ void vtkPVData::SetVisibilityInternal(int v)
   vtkPVApplication *pvApp;
   pvApp = (vtkPVApplication*)(this->Application);
   vtkPVPart *part;
-  part = this->GetPVPart();
+  int idx, num;
 
   if (this->Visibility == v)
     {
@@ -2124,13 +2143,18 @@ void vtkPVData::SetVisibilityInternal(int v)
       }
     }
 
-  if (part->GetPropTclName())
+  num = this->GetNumberOfPVParts();
+  for (idx = 0; idx < num; ++idx)
     {
-    pvApp->BroadcastScript("%s SetVisibility %d", part->GetPropTclName(), v);
-    }
-  if (v == 0 && part->GetGeometryTclName())
-    {
-    pvApp->BroadcastScript("[%s GetInput] ReleaseData", part->GetMapperTclName());
+    part = this->GetPVPart(idx);
+    if (part->GetPropTclName())
+      {
+      pvApp->BroadcastScript("%s SetVisibility %d", part->GetPropTclName(), v);
+      }
+    if (v == 0 && part->GetGeometryTclName())
+      {
+      pvApp->BroadcastScript("[%s GetInput] ReleaseData", part->GetMapperTclName());
+      }
     }
 }
 
@@ -2280,15 +2304,20 @@ void vtkPVData::ChangePointSize()
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
   vtkPVPart *part;
-  part = this->GetPVPart();
+  int idx, num;
   
-  if (part->GetPropertyTclName())
+  num = this->GetNumberOfPVParts();
+  for (idx = 0; idx < num; ++idx)
     {
-    pvApp->BroadcastScript("%s SetPointSize %f",
-                           part->GetPropertyTclName(),
-                           this->PointSizeThumbWheel->GetValue());
+    part = this->GetPVPart(idx);
+    if (part->GetPropertyTclName())
+      {
+      pvApp->BroadcastScript("%s SetPointSize %f",
+                             part->GetPropertyTclName(),
+                             this->PointSizeThumbWheel->GetValue());
+      }
     }
-  
+ 
   if ( this->GetPVRenderView() )
     {
     this->GetPVRenderView()->EventuallyRender();
@@ -2324,13 +2353,18 @@ void vtkPVData::ChangeLineWidth()
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
   vtkPVPart *part;
-  part = this->GetPVPart();
+  int idx, num;
   
-  if (part->GetPropertyTclName())
+  num = this->GetNumberOfPVParts();
+  for (idx = 0; idx < num; ++idx)
     {
-    pvApp->BroadcastScript("%s SetLineWidth %f",
-                           part->GetPropertyTclName(),
-                           this->LineWidthThumbWheel->GetValue());
+    part = this->GetPVPart(idx);
+    if (part->GetPropertyTclName())
+      {
+      pvApp->BroadcastScript("%s SetLineWidth %f",
+                             part->GetPropertyTclName(),
+                             this->LineWidthThumbWheel->GetValue());
+      }
     }
 
   if ( this->GetPVRenderView() )
@@ -2534,10 +2568,17 @@ void vtkPVData::SetOpacity(float val)
 void vtkPVData::OpacityChangedCallback()
 {
   vtkPVPart *part;
-  part = this->GetPVPart();
-  this->GetPVApplication()->BroadcastScript("[ %s GetProperty ] SetOpacity %f",
-                                            part->GetPropTclName(), 
-                                            this->OpacityScale->GetValue());
+  int idx, num;
+
+  num = this->GetNumberOfPVParts();
+  for (idx = 0; idx < num; ++idx)
+    {
+    part = this->GetPVPart(idx);
+    this->GetPVApplication()->BroadcastScript("[ %s GetProperty ] SetOpacity %f",
+                                              part->GetPropTclName(), 
+                                              this->OpacityScale->GetValue());
+    }
+
   if ( this->GetPVRenderView() )
     {
     this->GetPVRenderView()->EventuallyRender();
@@ -2556,8 +2597,8 @@ void vtkPVData::OpacityChangedEndCallback()
 void vtkPVData::GetActorTranslate(float* point)
 {
   vtkPVPart *part;
-  
-  part = this->GetPVPart();
+
+  part = this->GetPVPart(0);  
   vtkProp3D *prop = vtkProp3D::SafeDownCast(part->GetProp());
   if (prop)
     {
@@ -2575,14 +2616,19 @@ void vtkPVData::GetActorTranslate(float* point)
 void vtkPVData::SetActorTranslateNoTrace(float x, float y, float z)
 {
   vtkPVPart *part;
-  part = this->GetPVPart();
+  int idx, num;
 
   this->TranslateThumbWheel[0]->SetValue(x);
   this->TranslateThumbWheel[1]->SetValue(y);
   this->TranslateThumbWheel[2]->SetValue(z);
 
-  this->GetPVApplication()->BroadcastScript("%s SetPosition %f %f %f",
-                                            part->GetPropTclName(), x, y, z);
+  num = this->GetNumberOfPVParts();
+  for (idx = 0; idx < num; ++idx)
+    {
+    part = this->GetPVPart(idx);
+    this->GetPVApplication()->BroadcastScript("%s SetPosition %f %f %f",
+                                              part->GetPropTclName(), x, y, z);
+    }
 
   // Do not render here (do it in the callback, since it could be either
   // Render or EventuallyRender depending on the interaction)
@@ -2636,7 +2682,7 @@ void vtkPVData::GetActorScale(float* point)
 {
   vtkPVPart *part;
 
-  part = this->GetPVPart();
+  part = this->GetPVPart(0);
   vtkProp3D *prop = vtkProp3D::SafeDownCast(part->GetProp());
   if (prop)
     {
@@ -2654,14 +2700,19 @@ void vtkPVData::GetActorScale(float* point)
 void vtkPVData::SetActorScaleNoTrace(float x, float y, float z)
 {
   vtkPVPart *part;
-  part = this->GetPVPart();
+  int idx, num;
 
   this->ScaleThumbWheel[0]->SetValue(x);
   this->ScaleThumbWheel[1]->SetValue(y);
   this->ScaleThumbWheel[2]->SetValue(z);
 
-  this->GetPVApplication()->BroadcastScript("%s SetScale %f %f %f",
-                                            part->GetPropTclName(), x, y, z);
+  num = this->GetNumberOfPVParts();
+  for (idx = 0; idx < num; ++idx)
+    {
+    part = this->GetPVPart(idx);
+    this->GetPVApplication()->BroadcastScript("%s SetScale %f %f %f",
+                                              part->GetPropTclName(), x, y, z);
+    }
 
   // Do not render here (do it in the callback, since it could be either
   // Render or EventuallyRender depending on the interaction)
@@ -2715,7 +2766,7 @@ void vtkPVData::GetActorOrientation(float* point)
 {
   vtkPVPart *part;
 
-  part = this->GetPVPart();
+  part = this->GetPVPart(0);
 
   vtkProp3D *prop = vtkProp3D::SafeDownCast(part->GetProp());
   if (prop)
@@ -2734,14 +2785,19 @@ void vtkPVData::GetActorOrientation(float* point)
 void vtkPVData::SetActorOrientationNoTrace(float x, float y, float z)
 {
   vtkPVPart *part;
-  part = this->GetPVPart();
+  int idx, num;
 
   this->OrientationScale[0]->SetValue(x);
   this->OrientationScale[1]->SetValue(y);
   this->OrientationScale[2]->SetValue(z);
 
-  this->GetPVApplication()->BroadcastScript("%s SetOrientation %f %f %f",
-                                            part->GetPropTclName(), x, y, z);
+  num = this->GetNumberOfPVParts();
+  for (idx = 0; idx < num; ++idx)
+    {
+    part = this->GetPVPart(idx);
+    this->GetPVApplication()->BroadcastScript("%s SetOrientation %f %f %f",
+                                              part->GetPropTclName(), x, y, z);
+    }
 
   // Do not render here (do it in the callback, since it could be either
   // Render or EventuallyRender depending on the interaction)
@@ -2795,7 +2851,7 @@ void vtkPVData::GetActorOrigin(float* point)
 {
   vtkPVPart *part;
 
-  part = this->GetPVPart();
+  part = this->GetPVPart(0);
   vtkProp3D *prop = vtkProp3D::SafeDownCast(part->GetProp());
   if (prop)
     {
@@ -2813,14 +2869,19 @@ void vtkPVData::GetActorOrigin(float* point)
 void vtkPVData::SetActorOriginNoTrace(float x, float y, float z)
 {
   vtkPVPart *part;
-  part = this->GetPVPart();
+  int idx, num;
 
   this->OriginThumbWheel[0]->SetValue(x);
   this->OriginThumbWheel[1]->SetValue(y);
   this->OriginThumbWheel[2]->SetValue(z);
 
-  this->GetPVApplication()->BroadcastScript("%s SetOrigin %f %f %f",
-                                            part->GetPropTclName(), x, y, z);
+  num = this->GetNumberOfPVParts();
+  for (idx = 0; idx < num; ++idx)
+    {
+    part = this->GetPVPart(idx);
+    this->GetPVApplication()->BroadcastScript("%s SetOrigin %f %f %f",
+                                              part->GetPropTclName(), x, y, z);
+    }
 
   // Do not render here (do it in the callback, since it could be either
   // Render or EventuallyRender depending on the interaction)
@@ -2873,7 +2934,7 @@ void vtkPVData::ActorOriginEndCallback()
 void vtkPVData::UpdateActorControlResolutions()
 {
   float bounds[6];
-  this->DataInformation->GetBounds(bounds);
+  this->GetDataInformation()->GetBounds(bounds);
 
   float res, oneh, half;
 
@@ -2904,45 +2965,53 @@ void vtkPVData::UpdateActorControlResolutions()
 void vtkPVData::SetLODResolution(int dim)
 {
   vtkPVPart *part;
-
-  part = this->GetPVPart();
+  int idx, num;
+  vtkPVApplication *pvApp = this->GetPVApplication();
+    
   if (this->LODResolution == dim)
     {
     return;
     }
   this->LODResolution = dim;
-  
-  vtkPVApplication *pvApp = this->GetPVApplication();
-    
-  pvApp->BroadcastScript("%s SetNumberOfDivisions %d %d %d", 
-                         part->GetLODDeciTclName(), this->LODResolution,
-                         this->LODResolution, this->LODResolution); 
+
+  num = this->GetNumberOfPVParts();
+  for (idx = 0; idx < num; ++idx)
+    {
+    part = this->GetPVPart(idx);
+    pvApp->BroadcastScript("%s SetNumberOfDivisions %d %d %d", 
+                           part->GetLODDeciTclName(), this->LODResolution,
+                           this->LODResolution, this->LODResolution); 
+    }
 }
 
 //----------------------------------------------------------------------------
 void vtkPVData::SetCollectThreshold(float threshold)
 {
+  int idx, num;
   vtkPVPart *part;
-
-  part = this->GetPVPart();
+  vtkPVApplication *pvApp = this->GetPVApplication();
 
   if (this->CollectThreshold == threshold)
     {
     return;
     }
   this->CollectThreshold = threshold;
-  
-  vtkPVApplication *pvApp = this->GetPVApplication();
-    
-  // Threshold is only used whit vtkCollectPolyData.
-  // We need rendering modules ...
-  if (!pvApp->GetUseRenderingGroup() && !pvApp->GetUseTiledDisplay() && 
-      part->GetCollectTclName())
+
+
+  num = this->GetNumberOfPVParts();
+  for (idx = 0; idx < num; ++idx)
     {
-    pvApp->BroadcastScript("%s SetThreshold %d", part->GetCollectTclName(),
-                           static_cast<unsigned long>(threshold*1000.0));
-    pvApp->BroadcastScript("%s SetThreshold %d", part->GetLODCollectTclName(),
-                           static_cast<unsigned long>(threshold*1000.0));
+    part = this->GetPVPart();  
+    // Threshold is only used whit vtkCollectPolyData.
+    // We need rendering modules ...
+    if (!pvApp->GetUseRenderingGroup() && !pvApp->GetUseTiledDisplay() && 
+        part->GetCollectTclName())
+      {
+      pvApp->BroadcastScript("%s SetThreshold %d", part->GetCollectTclName(),
+                             static_cast<unsigned long>(threshold*1000.0));
+      pvApp->BroadcastScript("%s SetThreshold %d", part->GetLODCollectTclName(),
+                             static_cast<unsigned long>(threshold*1000.0));
+      }
     }
 }
 
@@ -2952,7 +3021,7 @@ void vtkPVData::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVData ";
-  this->ExtractRevision(os,"$Revision: 1.189 $");
+  this->ExtractRevision(os,"$Revision: 1.190 $");
 }
 
 //----------------------------------------------------------------------------
@@ -2962,7 +3031,8 @@ void vtkPVData::SerializeSelf(ostream& os, vtkIndent indent)
   os << indent << "Visibility " << this->VisibilityCheck->GetState() << endl;
   // Color by is not serialized because of gui does not follow tracing
   os << indent << "ColorBy " << this->ColorMenu->GetValue() << endl;
-  if ( !vtkString::Equals(this->ColorMenu->GetValue(), "Property") )
+  if (!vtkString::Equals(this->ColorMenu->GetValue(), "Property") 
+      && this->PVColorMap)
     {
     float *tmp = this->PVColorMap->GetScalarRange();
     os << indent << "ColorRange " << tmp[0] << " " << tmp[1] << endl;
