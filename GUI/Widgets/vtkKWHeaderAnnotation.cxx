@@ -30,7 +30,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWHeaderAnnotation );
-vtkCxxRevisionMacro(vtkKWHeaderAnnotation, "1.9");
+vtkCxxRevisionMacro(vtkKWHeaderAnnotation, "1.10");
 
 int vtkKWHeaderAnnotationCommand(ClientData cd, Tcl_Interp *interp,
                                  int argc, char *argv[]);
@@ -245,7 +245,7 @@ void vtkKWHeaderAnnotation::Update()
     anno = this->RenderWidget->GetHeaderAnnotation();
     }
 
-  if (!anno || !this->IsCreated())
+  if (!this->IsCreated())
     {
     return;
     }
@@ -254,15 +254,19 @@ void vtkKWHeaderAnnotation::Update()
 
   if (this->TextEntry)
     {
-    this->TextEntry->GetEntry()->SetValue(
-      anno->GetInput() ? anno->GetInput() : "");
+    if (anno)
+      {
+      this->TextEntry->GetEntry()->SetValue(
+        anno->GetInput() ? anno->GetInput() : "");
+      }
     }
 
   // Text property
 
   if (this->TextPropertyWidget)
     {
-    this->TextPropertyWidget->SetTextProperty(anno->GetTextProperty());
+    this->TextPropertyWidget->SetTextProperty(
+      anno ? anno->GetTextProperty() : NULL);
     this->TextPropertyWidget->SetActor2D(anno);
     this->TextPropertyWidget->Update();
     }

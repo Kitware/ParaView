@@ -37,7 +37,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWCornerAnnotation );
-vtkCxxRevisionMacro(vtkKWCornerAnnotation, "1.78");
+vtkCxxRevisionMacro(vtkKWCornerAnnotation, "1.79");
 
 int vtkKWCornerAnnotationCommand(ClientData cd, Tcl_Interp *interp,
                                  int argc, char *argv[]);
@@ -473,11 +473,8 @@ void vtkKWCornerAnnotation::Update()
 
   if (this->TextPropertyWidget)
     {
-    if (this->CornerAnnotation)
-      {
-      this->TextPropertyWidget->SetTextProperty(
-        this->CornerAnnotation->GetTextProperty());
-      }
+    this->TextPropertyWidget->SetTextProperty(
+      this->CornerAnnotation ? this->CornerAnnotation->GetTextProperty():NULL);
     this->TextPropertyWidget->SetActor2D(this->CornerAnnotation);
     this->TextPropertyWidget->Update();
     }
@@ -763,7 +760,7 @@ void vtkKWCornerAnnotation::SerializeToken(istream& is, const char *token)
 void vtkKWCornerAnnotation::SerializeRevision(ostream& os, vtkIndent indent)
 {
   os << indent << "vtkKWCornerAnnotation ";
-  this->ExtractRevision(os,"$Revision: 1.78 $");
+  this->ExtractRevision(os,"$Revision: 1.79 $");
 }
 
 //----------------------------------------------------------------------------

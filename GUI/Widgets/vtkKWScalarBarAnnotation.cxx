@@ -36,7 +36,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWScalarBarAnnotation );
-vtkCxxRevisionMacro(vtkKWScalarBarAnnotation, "1.13");
+vtkCxxRevisionMacro(vtkKWScalarBarAnnotation, "1.14");
 
 int vtkKWScalarBarAnnotationCommand(ClientData cd, Tcl_Interp *interp,
                                     int argc, char *argv[]);
@@ -540,17 +540,15 @@ void vtkKWScalarBarAnnotation::Update()
       }
     }
   
-  if (!anno)
-    {
-    return;
-    }
-
   // Title
 
   if (this->TitleEntry)
     {
-    this->TitleEntry->GetEntry()->SetValue(
-      anno->GetTitle() ? anno->GetTitle() : "");
+    if (anno)
+      {
+      this->TitleEntry->GetEntry()->SetValue(
+        anno->GetTitle() ? anno->GetTitle() : "");
+      }
     }
 
   // Title text property
@@ -558,7 +556,7 @@ void vtkKWScalarBarAnnotation::Update()
   if (this->TitleTextPropertyWidget)
     {
     this->TitleTextPropertyWidget->SetTextProperty(
-      anno->GetTitleTextProperty());
+      anno ? anno->GetTitleTextProperty() : NULL);
     this->TitleTextPropertyWidget->SetActor2D(anno);
     this->TitleTextPropertyWidget->Update();
     }
@@ -567,8 +565,11 @@ void vtkKWScalarBarAnnotation::Update()
 
   if (this->LabelFormatEntry)
     {
-    this->LabelFormatEntry->GetEntry()->SetValue(
-      anno->GetLabelFormat() ? anno->GetLabelFormat() : "");
+    if (anno)
+      {
+      this->LabelFormatEntry->GetEntry()->SetValue(
+        anno->GetLabelFormat() ? anno->GetLabelFormat() : "");
+      }
     }
 
   // Label text property
@@ -576,7 +577,7 @@ void vtkKWScalarBarAnnotation::Update()
   if (this->LabelTextPropertyWidget)
     {
     this->LabelTextPropertyWidget->SetTextProperty(
-      anno->GetLabelTextProperty());
+      anno ? anno->GetLabelTextProperty() : NULL);
     this->LabelTextPropertyWidget->SetActor2D(anno);
     this->LabelTextPropertyWidget->Update();
     }
@@ -585,16 +586,22 @@ void vtkKWScalarBarAnnotation::Update()
 
   if (this->MaximumNumberOfColorsThumbWheel)
     {
-    this->MaximumNumberOfColorsThumbWheel->SetValue(
-      anno->GetMaximumNumberOfColors());
+    if (anno)
+      {
+      this->MaximumNumberOfColorsThumbWheel->SetValue(
+        anno->GetMaximumNumberOfColors());
+      }
     }
 
   // Number of labels
 
   if (this->NumberOfLabelsScale)
     {
-    this->NumberOfLabelsScale->SetValue(
-      anno->GetNumberOfLabels());
+    if (anno)
+      {
+      this->NumberOfLabelsScale->SetValue(
+        anno->GetNumberOfLabels());
+      }
     }
 }
 
