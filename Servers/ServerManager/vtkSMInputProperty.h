@@ -37,14 +37,8 @@ public:
   vtkGetMacro(MultipleInput, int);
 
   // Description:
-  static int GetInputsUpdateImmediately()
-    {
-      return vtkSMInputProperty::InputsUpdateImmediately;
-    }
-  static void SetInputsUpdateImmediately(int up)
-    {
-      vtkSMInputProperty::InputsUpdateImmediately = up;
-    }
+  static int GetInputsUpdateImmediately();
+  static void SetInputsUpdateImmediately(int up);
 
 protected:
   vtkSMInputProperty();

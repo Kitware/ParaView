@@ -21,7 +21,7 @@
 #include "vtkSMProxyManager.h"
 
 vtkStandardNewMacro(vtkSMInputProperty);
-vtkCxxRevisionMacro(vtkSMInputProperty, "1.2");
+vtkCxxRevisionMacro(vtkSMInputProperty, "1.3");
 
 int vtkSMInputProperty::InputsUpdateImmediately = 1;
 
@@ -93,6 +93,16 @@ int vtkSMInputProperty::ReadXMLAttributes(vtkPVXMLElement* element)
     }
 
   return 1;
+}
+
+int vtkSMInputProperty::GetInputsUpdateImmediately()
+{
+  return vtkSMInputProperty::InputsUpdateImmediately;
+}
+
+void vtkSMInputProperty::SetInputsUpdateImmediately(int up)
+{
+  vtkSMInputProperty::InputsUpdateImmediately = up;
 }
 
 //---------------------------------------------------------------------------
