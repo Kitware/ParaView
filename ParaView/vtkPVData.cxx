@@ -374,6 +374,7 @@ void vtkPVData::InsertExtractPiecesIfNecessary()
     pvApp->BroadcastScript("pvTemp SetOutput %s", this->VTKDataTclName);
     pvApp->BroadcastScript("%s SetOutput [pvTemp GetInput]",
                            this->PVSource->GetVTKSourceTclName());
+    pvApp->BroadcastSimpleScript("[pvTemp GetInput] ReleaseDataFlagOn");
     // Now delete Tcl's reference to the piece filter.
     pvApp->BroadcastSimpleScript("pvTemp Delete");
     return;

@@ -386,25 +386,60 @@ void vtkPVApplication::SendDataNumberOfPoints(vtkDataSet *data)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVApplication::SendMapperColorRange(vtkPolyDataMapper *mapper)
+void vtkPVApplication::GetMapperColorRange(float range[2],
+                                           vtkPolyDataMapper *mapper)
 {
-  float range[2];
-  vtkScalars *colors;
-
-  if (this->Controller->GetLocalProcessId() == 0)
-    {
-    return;
-    }
-  colors = mapper->GetColors();
-  if (colors == NULL)
+  vtkDataSetAttributes *attr = NULL;
+  vtkDataArray *array;
+  
+  if (mapper == NULL || mapper->GetInput() == NULL)
     {
     range[0] = VTK_LARGE_FLOAT;
     range[1] = -VTK_LARGE_FLOAT;
+    return;
     }
-  else
+
+  // Determine and get the array used to color the model.
+  if (mapper->GetScalarMode() == VTK_SCALAR_MODE_USE_POINT_FIELD_DATA)
     {
-    colors->GetRange(range);
+    attr = mapper->GetInput()->GetPointData();
     }
+  if (mapper->GetScalarMode() == VTK_SCALAR_MODE_USE_CELL_FIELD_DATA)
+    {
+    attr = mapper->GetInput()->GetCellData();
+    }
+
+  // Sanity check.
+  if (attr == NULL)
+    {
+    range[0] = VTK_LARGE_FLOAT;
+    range[1] = -VTK_LARGE_FLOAT;
+    return;
+    }
+
+  array = attr->GetArray(mapper->GetArrayName());
+  if (array == NULL)
+    {
+    range[0] = VTK_LARGE_FLOAT;
+    range[1] = -VTK_LARGE_FLOAT;
+    return;
+    }
+
+  array->GetRange( range, mapper->GetArrayComponent());
+}
+
+
+//----------------------------------------------------------------------------
+void vtkPVApplication::SendMapperColorRange(vtkPolyDataMapper *mapper)
+{
+  float range[2];
+  
+  if (this->Controller->GetLocalProcessId == 0)
+    {
+    return;
+    }
+
+  this->GetMapperColorRange(range, mapper);
   this->Controller->Send(range, 2, 0, 1969);
 }
 

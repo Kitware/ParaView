@@ -117,12 +117,12 @@ vtkPVSource *vtkPVSourceInterface::CreateCallback()
   vtkPVApplication *pvApp = this->GetPVApplication();
   vtkPVMethodInterface *mInt;
   int numMenus, i;
+  vtkPVData *current = this->PVWindow->GetCurrentPVData();
   
   // Before we do anything, let see if we can determine the output type.
   outputDataType = this->GetOutputClassName();
   if (strcmp(outputDataType, "vtkDataSet") == 0)
     { // Output will be the same as the input.
-    vtkPVData *current = this->PVWindow->GetCurrentPVData();
     if (current == NULL)
       {
       vtkErrorMacro("Cannot determine output type.");
@@ -132,7 +132,6 @@ vtkPVSource *vtkPVSourceInterface::CreateCallback()
     }
   if (strcmp(outputDataType, "vtkPointSet") == 0)
     { // Output will be the same as the input.
-    vtkPVData *current = this->PVWindow->GetCurrentPVData();
     if (current == NULL)
       {
       vtkErrorMacro("Cannot determine output type.");
@@ -161,7 +160,6 @@ vtkPVSource *vtkPVSourceInterface::CreateCallback()
   // Set the input if necessary.
   if (this->InputClassName)
     {
-    vtkPVData *current = this->PVWindow->GetCurrentPVData();
     pvs->SetNthPVInput(0, current);
     }
   
@@ -221,8 +219,8 @@ vtkPVSource *vtkPVSourceInterface::CreateCallback()
   else
     {
     pvApp->BroadcastScript(
-      "%s SetExtentTranslator [[%s GetInput] GetExtentTranslator]",
-      pvd->GetVTKDataTclName(), pvs->GetVTKSourceTclName());
+      "%s SetExtentTranslator [%s GetExtentTranslator]",
+      pvd->GetVTKDataTclName(), current->GetVTKDataTclName());
     }
 
   // Loop through the methods creating widgets.
@@ -236,11 +234,11 @@ vtkPVSource *vtkPVSourceInterface::CreateCallback()
     if (mInt->GetWidgetType() == VTK_PV_METHOD_WIDGET_FILE)
       {
       if (this->GetDataFileName())
-	{
-	this->Script("%s %s %s",
-		     pvs->GetVTKSourceTclName(), mInt->GetSetCommand(),
-		     this->GetDataFileName());
-	}
+        {
+        this->Script("%s %s %s",
+              pvs->GetVTKSourceTclName(), mInt->GetSetCommand(),
+              this->GetDataFileName());
+        }
       pvs->AddFileEntry(mInt->GetVariableName(), 
 			mInt->GetSetCommand(),
 			mInt->GetGetCommand(), 
@@ -264,9 +262,9 @@ vtkPVSource *vtkPVSourceInterface::CreateCallback()
                        mInt->GetBalloonHelp());
       l = mInt->GetSelectionEntries();
       for (i = 0; i < l->GetLength(); ++i)
-	{
-	pvs->AddModeListItem(l->GetString(i), i);
-	}
+        {
+        pvs->AddModeListItem(l->GetString(i), i);
+        }
       }
     else if (mInt->GetWidgetType() == VTK_PV_METHOD_WIDGET_EXTENT)
       {
@@ -281,19 +279,19 @@ vtkPVSource *vtkPVSourceInterface::CreateCallback()
     else if (mInt->GetNumberOfArguments() == 1)
       {
       if (mInt->GetArgumentType(0) == VTK_STRING)
-	{
-	pvs->AddStringEntry(mInt->GetVariableName(), 
-			    mInt->GetSetCommand(),
-			    mInt->GetGetCommand(),
+        {
+        pvs->AddStringEntry(mInt->GetVariableName(), 
+                            mInt->GetSetCommand(),
+                            mInt->GetGetCommand(),
                             mInt->GetBalloonHelp());
-	}
+        }
       else
-	{
-	pvs->AddLabeledEntry(mInt->GetVariableName(), 
-			     mInt->GetSetCommand(),
-			     mInt->GetGetCommand(),
+        {
+        pvs->AddLabeledEntry(mInt->GetVariableName(), 
+                             mInt->GetSetCommand(),
+                             mInt->GetGetCommand(),
                              mInt->GetBalloonHelp());
-	}
+        }
       }
     else if (mInt->GetNumberOfArguments() == 2)
       {

@@ -125,6 +125,10 @@ public:
   void SendDataNumberOfPoints(vtkDataSet *data);
   void SendMapperColorRange(vtkPolyDataMapper *mapper);
   void SendProbeData(vtkProbeFilter *source);
+
+  // Description:
+  // A method that should probably be in the mapper.
+  void GetMapperColorRange(float range[2], vtkPolyDataMapper *mapper);
   
   // Description:
   // Methods that will create a text log file.

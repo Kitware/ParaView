@@ -253,17 +253,18 @@ void vtkPVActorComposite::CreateParallelTclObjects(vtkPVApplication *pvApp)
   // Special debug situation. Only generate half the data.
   // This allows us to debug the parallel features of the
   // application and VTK on only one process.
+  int debugNum = numProcs;
   if (getenv("PV_HALF_DEBUG") != NULL)
     {
-    numProcs *= 2;
+    debugNum *= 2;
     }
   for (id = 0; id < numProcs; ++id)
     {
     pvApp->RemoteScript(id, "%s SetNumberOfPieces %d",
-			this->MapperTclName, numProcs);
+			this->MapperTclName, debugNum);
     pvApp->RemoteScript(id, "%s SetPiece %d", this->MapperTclName, id);
     pvApp->RemoteScript(id, "%s SetNumberOfPieces %d",
-			this->LODMapperTclName, numProcs);
+			this->LODMapperTclName, debugNum);
     pvApp->RemoteScript(id, "%s SetPiece %d", this->LODMapperTclName, id);
     }
 }
@@ -841,7 +842,7 @@ void vtkPVActorComposite::ResetColorRange()
   // Avoid the bad range error
   if (range[1] <= range[0])
     {
-    range[1] = range[0] + 0.00001;
+    range[1] = range[0] * 1.001;
     }
 
   this->SetColorRange(range[0], range[1]);
@@ -873,19 +874,11 @@ void vtkPVActorComposite::GetColorRange(float range[2])
   vtkMultiProcessController *controller = pvApp->GetController();
   float tmp[2];
   int id, num;
-  
-  if (this->Mapper->GetColors() == NULL)
-    {
-    range[0] = 0.0;
-    range[1] = 1.0;
-    return;
-    }
 
   pvApp->BroadcastScript("Application SendMapperColorRange %s", 
-			 this->MapperTclName);
-  
-  this->Mapper->GetColors()->GetRange(range);
-  
+                         this->MapperTclName);
+  pvApp->GetMapperColorRange(range, this->Mapper);
+    
   num = controller->GetNumberOfProcesses();
   for (id = 1; id < num; ++id)
     {
@@ -1309,6 +1302,7 @@ void vtkPVActorComposite::CenterCamera()
   pvApp->BroadcastScript("%s ResetCamera %f %f %f %f %f %f",
                          tclName, bounds[0], bounds[1], bounds[2],
                          bounds[3], bounds[4], bounds[5]);
+  pvApp->BroadcastScript("%s ResetCameraClippingRange", tclName);
   this->GetPVRenderView()->EventuallyRender();
 }
 

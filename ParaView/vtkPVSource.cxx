@@ -1183,8 +1183,8 @@ void vtkPVSource::AcceptHelper2(char *name, char *method, char *args)
 //----------------------------------------------------------------------------
 void vtkPVSource::UpdateProperties()
 {
-  int num, idx;
-  vtkPVData *input;
+  //int num, idx;
+  //vtkPVData *input;
   
   // --------------------------------------
   // Change the state of the delete button based on if there are any users.
@@ -1204,12 +1204,24 @@ void vtkPVSource::UpdateProperties()
   this->GetWindow()->GetMainView()->UpdateNavigationWindow(this);
   
   // Make sure all the inputs are up to date.
-  num = this->GetNumberOfPVInputs();
-  for (idx = 0; idx < num; ++idx)
+  //num = this->GetNumberOfPVInputs();
+  //for (idx = 0; idx < num; ++idx)
+  //  {
+  //  input = this->GetNthPVInput(idx);
+  //  input->Update();
+  //  }
+
+  // I do not know why the inputs have to be updated.
+  // I am changing it to output as an experiment.
+  // The output might have been already updated elsewhere.
+  if (this->GetPVOutput(0))
     {
-    input = this->GetNthPVInput(idx);
-    input->Update();
+    this->GetPVOutput(0)->Update();
     }
+
+  //this->UpdateScalarsMenu();
+  //this->UpdateVectorsMenu();
+
   if (this->Interface)
     {
     if (this->Interface->GetDefaultScalars())

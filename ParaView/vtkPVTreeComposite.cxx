@@ -57,6 +57,95 @@ vtkPVTreeComposite* vtkPVTreeComposite::New()
 }
 
 
+//----------------------------------------------------------------------------
+void vtkPVTreeComposite::ComputeVisiblePropBounds(vtkRenderer *ren, 
+                                                  float bounds[6])
+{
+  float tmp[6];
+  float *pbds;
+  int id, num;
+  int numProps;
+  vtkProp    *prop;
+  vtkPropCollection *props;
+  int foundOne = 0;
+  
+  num = this->Controller->GetNumberOfProcesses();  
+  for (id = 1; id < num; ++id)
+    {
+    this->Controller->TriggerRMI(id,COMPUTE_VISIBLE_PROP_BOUNDS_RMI_TAG);
+    }
+
+  bounds[0] = bounds[2] = bounds[4] = VTK_LARGE_FLOAT;
+  bounds[1] = bounds[3] = bounds[5] = -VTK_LARGE_FLOAT;
+  
+  // Are there any pickable visible props?
+  props = ren->GetProps();
+  numProps = props->GetNumberOfItems();
+  for (props->InitTraversal(); (prop = props->GetNextProp()); )
+    {
+    if ( prop->GetVisibility() && (prop->GetPickable()))
+      {
+      foundOne = 1;
+      }
+    }
+
+  // Loop through all props collecting bounds.
+  for (props->InitTraversal(); (prop = props->GetNextProp()); )
+    {
+    // Skip if invisible.  
+    // Skip if it is not pickable and there are other pickable props. 
+    if ( prop->GetVisibility() && (prop->GetPickable() || ! foundOne))
+      {
+      pbds = prop->GetBounds();
+      // make sure we haven't got bogus bounds
+      if ( pbds != NULL &&
+           pbds[0] > -VTK_LARGE_FLOAT && pbds[1] < VTK_LARGE_FLOAT &&
+           pbds[2] > -VTK_LARGE_FLOAT && pbds[3] < VTK_LARGE_FLOAT &&
+           pbds[4] > -VTK_LARGE_FLOAT && pbds[5] < VTK_LARGE_FLOAT )
+        {
+        if (pbds[0] < bounds[0])
+          {
+          bounds[0] = pbds[0]; 
+          }
+        if (pbds[1] > bounds[1])
+          {
+          bounds[1] = pbds[1]; 
+          }
+        if (pbds[2] < bounds[2])
+          {
+          bounds[2] = pbds[2]; 
+          }
+        if (pbds[3] > bounds[3])
+          {
+          bounds[3] = pbds[3]; 
+          }
+        if (pbds[4] < bounds[4])
+          {
+          bounds[4] = pbds[4]; 
+          }
+        if (pbds[5] > bounds[5])
+          {
+          bounds[5] = pbds[5]; 
+          }
+        }//not bogus
+      }
+    }
+
+  // Get the bounds from the rest of the processes.
+  for (id = 1; id < num; ++id)
+    {
+    this->Controller->Receive(tmp, 6, id, vtkTreeComposite::BOUNDS_TAG);
+    if (tmp[0] < bounds[0]) {bounds[0] = tmp[0];}
+    if (tmp[1] > bounds[1]) {bounds[1] = tmp[1];}
+    if (tmp[2] < bounds[2]) {bounds[2] = tmp[2];}
+    if (tmp[3] > bounds[3]) {bounds[3] = tmp[3];}
+    if (tmp[4] < bounds[4]) {bounds[4] = tmp[4];}
+    if (tmp[5] > bounds[5]) {bounds[5] = tmp[5];}
+    }
+}
+
+
+
 //#########################################################################
 // If we are not using MPI, just stub out this class so the supper class
 // will do every thing.

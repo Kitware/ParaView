@@ -89,6 +89,12 @@ protected:
   // Flag used to indicate the first call for a render.
   // There is no initialize method.
   int Initialized;
+
+  // Description:
+  // Avoid having the cross hairs contribute to the bounds unless
+  // it is the only actor.  This method considers Pickable flag.
+  virtual void ComputeVisiblePropBounds(vtkRenderer *ren, 
+                                        float bounds[6]);
   
 //BTX 
 #ifdef VTK_USE_MPI 

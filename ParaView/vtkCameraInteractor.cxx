@@ -68,6 +68,9 @@ vtkCameraInteractor::vtkCameraInteractor()
   this->CenterSource->ComputeNormalsOff();
   this->CenterMapper->SetInput(this->CenterSource->GetOutput());
   this->CenterActor->SetMapper(this->CenterMapper);
+  // We are going to use pickable to indicate that this actor should not 
+  // be considered when computing the bounds.
+  this->CenterActor->PickableOff();
   //this->CenterActor->GetProperty()->SetAmbient(0.6);
   this->CenterActor->VisibilityOff();
 }
