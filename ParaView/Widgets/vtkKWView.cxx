@@ -104,7 +104,7 @@ Bool vtkKWRenderViewPredProc(Display *vtkNotUsed(disp), XEvent *event,
 }
 #endif
 
-vtkCxxRevisionMacro(vtkKWView, "1.102");
+vtkCxxRevisionMacro(vtkKWView, "1.103");
 
 //----------------------------------------------------------------------------
 int vtkKWViewCommand(ClientData cd, Tcl_Interp *interp,
@@ -752,6 +752,12 @@ void vtkKWView::RemoveComposite(vtkKWComposite *c)
   c->SetView(NULL);
   this->GetViewport()->RemoveProp(c->GetProp());
   this->Composites->RemoveItem(c);
+}
+
+//----------------------------------------------------------------------------
+int vtkKWView::HasComposite(vtkKWComposite *c)
+{
+  return this->Composites->IsItemPresent(c);
 }
 
 //----------------------------------------------------------------------------
@@ -1518,7 +1524,7 @@ void vtkKWView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWView ";
-  this->ExtractRevision(os,"$Revision: 1.102 $");
+  this->ExtractRevision(os,"$Revision: 1.103 $");
 }
 
 //----------------------------------------------------------------------------
