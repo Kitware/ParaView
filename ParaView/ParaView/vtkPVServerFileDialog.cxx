@@ -64,7 +64,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVServerFileDialog );
-vtkCxxRevisionMacro(vtkPVServerFileDialog, "1.22.2.2");
+vtkCxxRevisionMacro(vtkPVServerFileDialog, "1.22.2.3");
 
 int vtkPVServerFileDialogCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -162,6 +162,7 @@ vtkPVServerFileDialog::vtkPVServerFileDialog()
   this->ExtensionStrings = vtkStringList::New();
 
   this->ScrollBar = vtkKWWidget::New();
+  this->ServerSideID.ID = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -221,6 +222,24 @@ vtkPVServerFileDialog::~vtkPVServerFileDialog()
   if (this->ScrollBar)
     {
     this->ScrollBar->Delete();
+    }
+
+  if(this->ServerSideID.ID)
+    {
+    vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
+    pm->DeleteStreamObject(this->ServerSideID);
+    pm->SendStreamToServer();
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVServerFileDialog::CreateServerSide()
+{
+  if(!this->ServerSideID.ID)
+    {
+    vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
+    this->ServerSideID = pm->NewStreamObject("vtkPVServerFileListing");
+    pm->SendStreamToServer();
     }
 }
 
@@ -592,8 +611,18 @@ void vtkPVServerFileDialog::LoadSaveCallback()
   vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
   if(fileName[0] == '/' || fileName[1] == ':')
     {
-    pm->RootScript("file isdirectory {%s}", fileName.c_str());
-    if(atoi(pm->GetRootResult()) == 1)
+    this->CreateServerSide();
+    pm->GetStream() << vtkClientServerStream::Invoke
+                    << this->ServerSideID << "FileIsDirectory"
+                    << fileName.c_str()
+                    << vtkClientServerStream::End;
+    pm->SendStreamToServer();
+    int isdir = 0;
+    if(!pm->GetLastServerResult().GetArgument(0, 0, &isdir))
+      {
+      vtkErrorMacro("Error checking whether file is directory on server.");
+      }
+    if(isdir)
       {
       this->FileNameEntry->SetValue("");
       this->SetLastPath(fileName.c_str());
@@ -891,24 +920,43 @@ void vtkPVServerFileDialog::Update()
   vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
   vtkStringList* dirs = vtkStringList::New();
   vtkStringList* files = vtkStringList::New();
-  
+
   // Make sure we have a directory.
   if(!this->LastPath)
     {
-    pm->RootScript("pwd");
-    this->SetLastPath(pm->GetRootResult());
+    this->CreateServerSide();
+    pm->GetStream() << vtkClientServerStream::Invoke
+                    << this->ServerSideID << "GetCurrentWorkingDirectory"
+                    << vtkClientServerStream::End;
+    pm->SendStreamToServer();
+    const char* cwd;
+    if(!pm->GetLastServerResult().GetArgument(0, 0, &cwd))
+      {
+      vtkErrorMacro("Error getting current working directory from server.");
+      cwd = "";
+      }
+    this->SetLastPath(cwd);
     this->ConvertLastPath();
     }
 
   // Read the list of subdirectories and files.
-  if(!(this->GetPVApplication()->GetProcessModule()
-       ->GetDirectoryListing(this->LastPath, dirs, files, this->SaveDialog)))
+  if(!(pm->GetDirectoryListing(this->LastPath, dirs, files, this->SaveDialog)))
     {
     // Directory did not exist, use current directory instead.
-    pm->RootScript("pwd");
-    this->SetLastPath(pm->GetRootResult());
+    this->CreateServerSide();
+    pm->GetStream() << vtkClientServerStream::Invoke
+                    << this->ServerSideID << "GetCurrentWorkingDirectory"
+                    << vtkClientServerStream::End;
+    pm->SendStreamToServer();
+    const char* cwd;
+    if(!pm->GetLastServerResult().GetArgument(0, 0, &cwd))
+      {
+      vtkErrorMacro("Error getting current working directory from server.");
+      cwd = "";
+      }
+    this->SetLastPath(cwd);
     this->ConvertLastPath();
-    
+
     // We will now succeed.
     pm->GetDirectoryListing(this->LastPath, dirs, files, this->SaveDialog);
     }
