@@ -144,7 +144,7 @@ public:
 //BTX
   void ClientStartRender();
   void RootStartRender(vtkPVMultiDisplayInfo info);
-  void SatelliteStartRender(vtkPVMultiDisplayInfo info);
+  void SatelliteStartRender();
 
 //ETX
 protected:
@@ -192,6 +192,7 @@ protected:
 
   void PreRenderProcessing() {}
   void PostRenderProcessing() {}
+  void InternalSatelliteStartRender(vtkPVMultiDisplayInfo info);
   
 private:
   vtkMultiDisplayManager(const vtkMultiDisplayManager&); // Not implemented

@@ -45,7 +45,7 @@
  #include <mpi.h>
 #endif
 
-vtkCxxRevisionMacro(vtkMultiDisplayManager, "1.12");
+vtkCxxRevisionMacro(vtkMultiDisplayManager, "1.13");
 vtkStandardNewMacro(vtkMultiDisplayManager);
 
 // Structures to communicate render info.
@@ -219,12 +219,7 @@ void vtkMultiDisplayManagerSatelliteStartRender(void *localArg,
                                                 void *, int, int)
 {
   vtkMultiDisplayManager *self = (vtkMultiDisplayManager *)localArg;
-  vtkMultiProcessController *controller = self->GetController();
-  vtkPVMultiDisplayInfo info;  
-
-  controller->Receive((float*)(&info), 24, 0, 
-                     vtkMultiDisplayManager::INFO_TAG);
-  self->SatelliteStartRender(info);
+  self->SatelliteStartRender();
 }
 
 
@@ -404,14 +399,22 @@ void vtkMultiDisplayManager::RootStartRender(vtkPVMultiDisplayInfo info)
     }
   if ( this->SocketController)
     { // Root is not client, it participates also.
-    this->SatelliteStartRender(info);
+    this->InternalSatelliteStartRender(info);
     }
 }
 
+//-------------------------------------------------------------------------
+void vtkMultiDisplayManager::SatelliteStartRender()
+{
+  vtkPVMultiDisplayInfo info;
 
+  this->SocketController->Receive((float*)(&info), 24, 0, 
+                                  vtkMultiDisplayManager::INFO_TAG);
+  this->InternalSatelliteStartRender(info);
+}
 
 //-------------------------------------------------------------------------
-void vtkMultiDisplayManager::SatelliteStartRender(vtkPVMultiDisplayInfo info)
+void vtkMultiDisplayManager::InternalSatelliteStartRender(vtkPVMultiDisplayInfo info)
 {
   vtkRendererCollection *rens;
   vtkRenderer* ren;
