@@ -14,31 +14,40 @@
 =========================================================================*/
 #include "vtkPVPartDisplay.h"
 
-#include "vtkPVRenderModule.h"
+#include "vtkClientServerStream.h"
+#include "vtkFieldDataToAttributeDataFilter.h"
 #include "vtkImageData.h"
+#include "vtkKWCheckButton.h"
 #include "vtkObjectFactory.h"
-#include "vtkProp3D.h"
-#include "vtkPVApplication.h"
-#include "vtkPVProcessModule.h"
-#include "vtkPVConfig.h"
 #include "vtkPolyData.h"
 #include "vtkPolyDataMapper.h"
+#include "vtkProp3D.h"
 #include "vtkProperty.h"
+#include "vtkPVApplication.h"
+#include "vtkPVClassNameInformation.h"
+#include "vtkPVColorMap.h"
+#include "vtkPVConfig.h"
+#include "vtkPVProcessModule.h"
+#include "vtkPVRenderModule.h"
 #include "vtkRectilinearGrid.h"
+#include "vtkString.h"
 #include "vtkStructuredGrid.h"
 #include "vtkString.h"
 #include "vtkPVColorMap.h"
 #include "vtkPVPart.h"
 #include "vtkTimerLog.h"
 #include "vtkToolkits.h"
-#include "vtkFieldDataToAttributeDataFilter.h"
-#include "vtkClientServerStream.h"
 #include "vtkPVRenderView.h"
-#include "vtkKWCheckButton.h"
+
+#include "vtkVolume.h"
+#include "vtkVolumeProperty.h"
+#include "vtkPiecewiseFunction.h"
+#include "vtkColorTransferFunction.h"
+#include "vtkUnstructuredGridVolumeRayCastMapper.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPartDisplay);
-vtkCxxRevisionMacro(vtkPVPartDisplay, "1.24");
+vtkCxxRevisionMacro(vtkPVPartDisplay, "1.25");
 
 
 //----------------------------------------------------------------------------
@@ -63,6 +72,13 @@ vtkPVPartDisplay::vtkPVPartDisplay()
   this->GeometryIsValid = 0;
   this->GeometryID.ID = 0;
 
+  this->VolumeID.ID         = NULL;
+  this->VolumeMapperID.ID   = NULL;
+  this->VolumePropertyID.ID = NULL;
+  this->VolumeColorID.ID    = NULL;
+  this->VolumeOpacityID.ID  = NULL; 
+  this->Volume              = NULL;
+  
   // Create a unique id for creating tcl names.
   ++instanceCount;
   this->InstanceCount = instanceCount;
@@ -76,6 +92,27 @@ vtkPVPartDisplay::~vtkPVPartDisplay()
   if(pvApp)
     {
     pm = pvApp->GetProcessModule();
+    }
+  
+  if ( pm && this->VolumeID.ID != 0 )
+    {
+    pm->DeleteStreamObject( this->VolumeID );
+    }
+  if ( pm && this->VolumeMapperID.ID != 0 )
+    {
+    pm->DeleteStreamObject( this->VolumeMapperID );
+    }
+  if ( pm && this->VolumePropertyID.ID != 0 )
+    {
+    pm->DeleteStreamObject( this->VolumePropertyID );
+    }
+  if ( pm && this->VolumeColorID.ID != 0 )
+    {
+    pm->DeleteStreamObject( this->VolumeColorID );
+    }
+  if ( pm && this->VolumeOpacityID.ID != 0 )
+    {
+    pm->DeleteStreamObject( this->VolumeOpacityID );
     }
   
   if ( pm && this->MapperID.ID != 0)
@@ -148,8 +185,22 @@ void vtkPVPartDisplay::SetInput(vtkPVPart* input)
       << input->GetVTKDataID() << vtkClientServerStream::End;
     }
   pm->SendStreamToServer();
+  
+  if ( input != NULL )
+  {
+  vtkPVClassNameInformation *info = vtkPVClassNameInformation::New();
+  pm->GatherInformation(info, input->GetVTKDataID());
+  char *className = info->GetVTKClassName();
+  
+  if (strcmp(className, "vtkUnstructuredGrid") == 0 )
+    {
+    stream << vtkClientServerStream::Invoke << this->VolumeMapperID
+           << "SetInput" << input->GetVTKDataID() << vtkClientServerStream::End;
+    pm->SendStreamToClientAndServer();
+    }
+  info->Delete();
+  }
 }
-
 
 //----------------------------------------------------------------------------
 void vtkPVPartDisplay::CreateParallelTclObjects(vtkPVApplication *pvApp)
@@ -244,6 +295,9 @@ void vtkPVPartDisplay::CreateParallelTclObjects(vtkPVApplication *pvApp)
   this->Property = 
     vtkProperty::SafeDownCast(
       pm->GetObjectFromID(this->PropertyID));
+  this->Prop = 
+    vtkProp::SafeDownCast(
+      pm->GetObjectFromID(this->PropID));
   this->Mapper = 
     vtkPolyDataMapper::SafeDownCast(pm->GetObjectFromID(this->MapperID));
 
@@ -264,6 +318,49 @@ void vtkPVPartDisplay::CreateParallelTclObjects(vtkPVApplication *pvApp)
     << vtkClientServerStream::LastResult
     << vtkClientServerStream::End;
   pm->SendStreamToClientAndServer();
+  
+  
+  // Now create the object for volume rendering if applicable
+  this->VolumeID         = pm->NewStreamObject("vtkVolume");
+  this->VolumeMapperID   = pm->NewStreamObject("vtkUnstructuredGridVolumeRayCastMapper");
+  this->VolumePropertyID = pm->NewStreamObject("vtkVolumeProperty");
+  this->VolumeOpacityID  = pm->NewStreamObject("vtkPiecewiseFunction");
+  this->VolumeColorID    = pm->NewStreamObject("vtkColorTransferFunction");
+
+  stream << vtkClientServerStream::Invoke << this->VolumeID 
+         << "VisibilityOff" << vtkClientServerStream::End;
+  stream << vtkClientServerStream::Invoke << this->VolumeID 
+         << "SetMapper" << this->VolumeMapperID  << vtkClientServerStream::End;
+  stream << vtkClientServerStream::Invoke << this->VolumeID 
+         << "SetProperty" << this->VolumePropertyID  << vtkClientServerStream::End;
+
+  stream << vtkClientServerStream::Invoke << this->VolumePropertyID 
+         << "SetScalarOpacity" << this->VolumeOpacityID  << vtkClientServerStream::End;
+  stream << vtkClientServerStream::Invoke << this->VolumePropertyID 
+         << "SetColor" << this->VolumeColorID  << vtkClientServerStream::End;
+  
+  stream << vtkClientServerStream::Invoke << this->VolumeColorID 
+         << "AddHSVPoint" << 0.0 << 0.01 << 1.0 << 1.0 << vtkClientServerStream::End;
+  stream << vtkClientServerStream::Invoke << this->VolumeColorID 
+         << "AddHSVPoint" << 128.0 << 0.5 << 1.0 << 1.0 << vtkClientServerStream::End;
+  stream << vtkClientServerStream::Invoke << this->VolumeColorID 
+         << "AddHSVPoint" << 255.0 << 0.99 << 1.0 << 1.0 << vtkClientServerStream::End;
+
+  stream << vtkClientServerStream::Invoke << this->VolumeOpacityID 
+         << "AddPoint" << 0.0 << 0.0 << vtkClientServerStream::End;
+  stream << vtkClientServerStream::Invoke << this->VolumeOpacityID 
+         << "AddPoint" << 60.0 << 0.0 << vtkClientServerStream::End;
+  stream << vtkClientServerStream::Invoke << this->VolumeOpacityID 
+         << "AddPoint" << 100.0 << 1.0 << vtkClientServerStream::End;
+  stream << vtkClientServerStream::Invoke << this->VolumeOpacityID 
+         << "AddPoint" << 255.0 << 1.0 << vtkClientServerStream::End;
+  
+  pm->SendStreamToClientAndServer();
+  
+  this->Volume = 
+    vtkVolume::SafeDownCast(
+      pm->GetObjectFromID(this->VolumeID));
+
 }
 
 
@@ -495,5 +592,12 @@ void vtkPVPartDisplay::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "PVApplication: " << this->PVApplication << endl;
   os << indent << "DirectColorFlag: " << this->DirectColorFlag << endl;
   os << indent << "UpdateSuppressor: " << this->UpdateSuppressorID.ID << endl;
+  
+  os << indent << "VolumeID: "         << this->VolumeID.ID         << endl;
+  os << indent << "VolumeMapperID: "   << this->VolumeMapperID.ID   << endl;
+  os << indent << "VolumePropertyID: " << this->VolumePropertyID.ID << endl;
+  os << indent << "VolumeOpacityID: "  << this->VolumeOpacityID.ID  << endl;
+  os << indent << "VolumeColorID: "    << this->VolumeColorID.ID    << endl;
+  
 }
 
