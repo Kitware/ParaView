@@ -42,7 +42,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCalculatorWidget);
-vtkCxxRevisionMacro(vtkPVCalculatorWidget, "1.17");
+vtkCxxRevisionMacro(vtkPVCalculatorWidget, "1.18");
 
 int vtkPVCalculatorWidgetCommand(ClientData cd, Tcl_Interp *interp,
                                 int argc, char *argv[]);
@@ -240,8 +240,8 @@ void vtkPVCalculatorWidget::Create(vtkKWApplication *app)
                this->AttributeModeFrame->GetWidgetName());
 
   this->AttributeModeLabel->SetParent(this->AttributeModeFrame);
-  this->AttributeModeLabel->Create(pvApp, "");
-  this->AttributeModeLabel->SetLabel("Attribute Mode:");
+  this->AttributeModeLabel->Create(pvApp, "-width 18 -justify right");
+  this->AttributeModeLabel->SetLabel("Attribute Mode");
   this->AttributeModeLabel->SetBalloonHelpString(
     "Select whether to operate on point or cell data");
   this->AttributeModeMenu->SetParent(this->AttributeModeFrame);
