@@ -51,7 +51,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkKWPushButtonSet);
-vtkCxxRevisionMacro(vtkKWPushButtonSet, "1.7");
+vtkCxxRevisionMacro(vtkKWPushButtonSet, "1.8");
 
 int vtkvtkKWPushButtonSetCommand(ClientData cd, Tcl_Interp *interp,
                                   int argc, char *argv[]);
@@ -404,6 +404,32 @@ int vtkKWPushButtonSet::GetNumberOfVisibleButtons()
     return 0;
     }
   return atoi(this->Script("llength [grid slaves %s]", this->GetWidgetName()));
+}
+
+//----------------------------------------------------------------------------
+void vtkKWPushButtonSet::SetBorderWidth(int bd)
+{
+  ostrstream tk_cmd;
+
+  vtkKWPushButtonSet::ButtonSlot *button_slot = NULL;
+  vtkKWPushButtonSet::ButtonsContainerIterator *it = 
+    this->Buttons->NewIterator();
+
+  it->InitTraversal();
+  while (!it->IsDoneWithTraversal())
+    {
+    if (it->GetData(button_slot) == VTK_OK)
+      {
+      tk_cmd << button_slot->Button->GetWidgetName() 
+         << " config -bd " << bd << endl;
+      }
+    it->GoToNextItem();
+    }
+  it->Delete();
+
+  tk_cmd << ends;
+  this->Script(tk_cmd.str());
+  tk_cmd.rdbuf()->freeze(0);
 }
 
 //----------------------------------------------------------------------------

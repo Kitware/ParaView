@@ -120,8 +120,12 @@ public:
   vtkGetMacro(MaximumNumberOfWidgetInPackingDirection, int);
 
   // Description:
-  // Set the button padding.
+  // Set the buttons padding.
   virtual void SetPadding(int x, int y);
+
+  // Description:
+  // Set the buttons border width.
+  virtual void SetBorderWidth(int bd);
 
 protected:
   vtkKWPushButtonSet();
@@ -135,7 +139,8 @@ protected:
   //BTX
 
   // A pushbutton slot associates a pushbutton to a unique Id
-  // No, I don't want to use a map between those two, for the following reasons:
+  // No, I don't want to use a map between those two, for the following 
+  // reasons:
   // a), we might need more information in the future, b) a map 
   // Register/Unregister pointers if they are pointers to VTK objects.
  
