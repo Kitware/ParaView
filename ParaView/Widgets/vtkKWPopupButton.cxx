@@ -43,7 +43,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWPopupButton);
-vtkCxxRevisionMacro(vtkKWPopupButton, "1.8");
+vtkCxxRevisionMacro(vtkKWPopupButton, "1.9");
 
 int vtkKWPopupButtonCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -133,7 +133,7 @@ void vtkKWPopupButton::Create(vtkKWApplication *app, const char *args)
   this->PopupCloseButton->SetLabel("Close");
 
   tk_cmd << "pack " << this->PopupCloseButton->GetWidgetName() 
-         << " -side top -expand y -fill x -pady 2" << endl;
+         << " -side top -expand false -fill x -pady 2" << endl;
 
   // Pack, bind
 
