@@ -44,10 +44,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkObjectFactory.h"
 
 
+int vtkKWLabelCommand(ClientData cd, Tcl_Interp *interp,
+                      int argc, char *argv[]);
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLabel );
-vtkCxxRevisionMacro(vtkKWLabel, "1.13");
+vtkCxxRevisionMacro(vtkKWLabel, "1.14");
 
 //-----------------------------------------------------------------------------
 vtkKWLabel::vtkKWLabel()
@@ -57,6 +59,7 @@ vtkKWLabel::vtkKWLabel()
   this->LineType = vtkKWLabel::SingleLine;
   this->Width    = 0;
   this->AdjustWrapLengthToWidth = 0;
+  this->CommandFunction = vtkKWLabelCommand;
 }
 
 //-----------------------------------------------------------------------------
