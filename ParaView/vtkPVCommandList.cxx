@@ -25,6 +25,7 @@ PARTICULAR PURPOSE, AND NON-INFRINGEMENT.  THIS SOFTWARE IS PROVIDED ON AN
 MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 =========================================================================*/
+#include <stdarg.h>
 #include "vtkObjectFactory.h"
 #include "vtkPVCommandList.h"
 
