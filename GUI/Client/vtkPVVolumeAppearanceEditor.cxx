@@ -36,7 +36,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVVolumeAppearanceEditor);
-vtkCxxRevisionMacro(vtkPVVolumeAppearanceEditor, "1.18");
+vtkCxxRevisionMacro(vtkPVVolumeAppearanceEditor, "1.19");
 
 int vtkPVVolumeAppearanceEditorCommand(ClientData cd, Tcl_Interp *interp,
                                        int argc, char *argv[]);
@@ -502,9 +502,6 @@ void vtkPVVolumeAppearanceEditor::SetScalarOpacityUnitDistance(double d)
     for (i = 0; i < numParts; i++)
       {
       part = this->PVSource->GetPart(i);
-      // Access the vtkPiecewiseFunction:
-      vtkClientServerID volumeOpacityID =
-        this->PVSource->GetPartDisplay()->GetVolumeOpacityProxy()->GetID(0);
 
       vtkPVProcessModule* pm = pvApp->GetProcessModule();
       vtkClientServerStream& stream = pm->GetStream();
@@ -546,9 +543,6 @@ void vtkPVVolumeAppearanceEditor::SetColorRamp( double s1, double r1,
     for (i = 0; i < numParts; i++)
       {
       part = this->PVSource->GetPart(i);
-      // Access the vtkPiecewiseFunction:
-      vtkClientServerID volumeOpacityID =
-        this->PVSource->GetPartDisplay()->GetVolumeOpacityProxy()->GetID(0);
 
       vtkPVProcessModule* pm = pvApp->GetProcessModule();
       vtkClientServerStream& stream = pm->GetStream();
