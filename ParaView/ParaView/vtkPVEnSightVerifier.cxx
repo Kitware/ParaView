@@ -25,7 +25,7 @@
 
 #include "vtkObjectFactory.h"
 
-vtkCxxRevisionMacro(vtkPVEnSightVerifier, "1.2");
+vtkCxxRevisionMacro(vtkPVEnSightVerifier, "1.3");
 vtkStandardNewMacro(vtkPVEnSightVerifier);
 
 vtkCxxSetObjectMacro(vtkPVEnSightVerifier, Controller, 
@@ -47,8 +47,6 @@ vtkPVEnSightVerifier::vtkPVEnSightVerifier()
 //----------------------------------------------------------------------------
 vtkPVEnSightVerifier::~vtkPVEnSightVerifier()
 {
-  int i;
-  
   this->SetController(0);
   this->SetCaseFileName(0);
   this->SetPieceCaseFileName(0);
