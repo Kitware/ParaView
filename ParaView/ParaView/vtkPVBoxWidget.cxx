@@ -68,7 +68,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkCommand.h"
 
 vtkStandardNewMacro(vtkPVBoxWidget);
-vtkCxxRevisionMacro(vtkPVBoxWidget, "1.8");
+vtkCxxRevisionMacro(vtkPVBoxWidget, "1.9");
 
 int vtkPVBoxWidgetCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -95,6 +95,8 @@ vtkPVBoxWidget::vtkPVBoxWidget()
     this->ScaleThumbWheel[cc] = vtkKWThumbWheel::New();
     this->OrientationScale[cc] = vtkKWScale::New();
     }
+
+  this->Initialized = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -146,7 +148,7 @@ void vtkPVBoxWidget::ResetInternal(const char* sourceTclName)
     this->SetPositionGUI(this->StoredPosition);
     this->SetRotationGUI(this->StoredRotation);
     this->SetScaleGUI(this->StoredScale);
-    this->UpdateBox();
+    this->UpdateBox(0);
     }
   this->Superclass::ResetInternal(sourceTclName);
 }
@@ -179,6 +181,7 @@ void vtkPVBoxWidget::AcceptInternal(const char* sourceTclName)
     this->SetStoredScale(this->ScaleGUI);
     }
   this->Superclass::AcceptInternal(sourceTclName);
+  this->Initialized = 1;
 }
 
 
@@ -554,19 +557,19 @@ void vtkPVBoxWidget::OrientationEndCallback()
 //----------------------------------------------------------------------------
 void vtkPVBoxWidget::SetOrientationNoTrace(float, float, float)
 {
-  this->UpdateBox();
+  this->UpdateBox(1);
 }
 
 //----------------------------------------------------------------------------
 void vtkPVBoxWidget::SetTranslateNoTrace(float, float, float)
 {
-  this->UpdateBox();
+  this->UpdateBox(1);
 }
 
 //----------------------------------------------------------------------------
 void vtkPVBoxWidget::SetScaleNoTrace(float, float, float)
 {
-  this->UpdateBox();
+  this->UpdateBox(1);
 }
 
 //----------------------------------------------------------------------------
@@ -634,17 +637,22 @@ void vtkPVBoxWidget::SetTranslate(float px, float py, float pz)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVBoxWidget::UpdateBox()
+void vtkPVBoxWidget::UpdateBox(int update)
 {
   vtkPVApplication* pvApp = this->GetPVApplication();
   vtkTransform* trans = this->BoxTransform;
   trans->Identity();
-  trans->Translate(this->GetPositionFromGUI());
-  this->GetRotationFromGUI();
+  if ( update || !this->Initialized )
+    {
+    this->GetPositionFromGUI();
+    this->GetRotationFromGUI();
+    this->GetScaleFromGUI();
+    }
+  trans->Translate(this->PositionGUI);
   trans->RotateZ(this->RotationGUI[2]);
   trans->RotateX(this->RotationGUI[0]);
   trans->RotateY(this->RotationGUI[1]);
-  trans->Scale(this->GetScaleFromGUI());
+  trans->Scale(this->ScaleGUI);
   vtkMatrix4x4* mat = trans->GetMatrix();
   /*
   printf(
