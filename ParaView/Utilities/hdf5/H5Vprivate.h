@@ -95,7 +95,7 @@ __DLL__ hsize_t H5V_array_offset(unsigned n, const hsize_t *total_size,
  *
  *-------------------------------------------------------------------------
  */
-H5_inline hsize_t UNUSED
+extern H5_inline hsize_t UNUSED
 H5V_vector_reduce_product(unsigned n, const hsize_t *v);
 
 /*-------------------------------------------------------------------------
@@ -115,7 +115,7 @@ H5V_vector_reduce_product(unsigned n, const hsize_t *v);
  *
  *-------------------------------------------------------------------------
  */
-H5_inline htri_t UNUSED
+extern H5_inline htri_t UNUSED
 H5V_vector_zerop_u(int n, const hsize_t *v);
 
 /*-------------------------------------------------------------------------
@@ -135,7 +135,7 @@ H5V_vector_zerop_u(int n, const hsize_t *v);
  *
  *-------------------------------------------------------------------------
  */
-H5_inline htri_t UNUSED
+extern H5_inline htri_t UNUSED
 H5V_vector_zerop_s(int n, const hssize_t *v);
 
 /*-------------------------------------------------------------------------
@@ -157,7 +157,7 @@ H5V_vector_zerop_s(int n, const hssize_t *v);
  *
  *-------------------------------------------------------------------------
  */
-H5_inline int UNUSED
+extern H5_inline int UNUSED
 H5V_vector_cmp_u (int n, const hsize_t *v1, const hsize_t *v2);
 
 
@@ -180,7 +180,7 @@ H5V_vector_cmp_u (int n, const hsize_t *v1, const hsize_t *v2);
  *
  *-------------------------------------------------------------------------
  */
-H5_inline int UNUSED
+extern H5_inline int UNUSED
 H5V_vector_cmp_s (unsigned n, const hssize_t *v1, const hssize_t *v2);
 
 
@@ -198,7 +198,7 @@ H5V_vector_cmp_s (unsigned n, const hssize_t *v1, const hssize_t *v2);
  *
  *-------------------------------------------------------------------------
  */
-H5_inline void UNUSED
+extern H5_inline void UNUSED
 H5V_vector_inc(int n, hsize_t *v1, const hsize_t *v2);
 
 #endif
