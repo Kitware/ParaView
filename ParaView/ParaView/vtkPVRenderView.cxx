@@ -135,7 +135,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.313");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.314");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -1654,7 +1654,8 @@ void vtkPVRenderView::SetUseTriangleStrips(int state)
       {
       vtkPVProcessModule* pm = pvApp->GetProcessModule();
       vtkClientServerStream& stream = pm->GetStream();
-      stream << vtkClientServerStream::Invoke << pvs->GetPart(partIdx)->GetGeometryID()
+      stream << vtkClientServerStream::Invoke
+             << pvs->GetPart(partIdx)->GetPartDisplay()->GetGeometryID()
              <<  "SetUseStrips" << state << vtkClientServerStream::End;
       pm->SendStreamToServer();
       pvs->GetPart(partIdx)->GetPartDisplay()->InvalidateGeometry();
