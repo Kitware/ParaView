@@ -84,7 +84,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWNotebook);
-vtkCxxRevisionMacro(vtkKWNotebook, "1.33");
+vtkCxxRevisionMacro(vtkKWNotebook, "1.34");
 
 //------------------------------------------------------------------------------
 int vtkKWNotebookCommand(ClientData cd, Tcl_Interp *interp,
@@ -703,8 +703,16 @@ void vtkKWNotebook::RaisePage(vtkKWNotebook::Page *page)
       << "pack " << page->TabFrame->GetWidgetName() 
       << " -side left -anchor s -ipadx 0 "
       << " -ipady " << VTK_KW_NB_TAB_SELECT_BD_Y 
-      << " -padx " << VTK_KW_NB_TAB_PADX << endl
-      << "focus " << page->Frame->GetWidgetName() << endl;
+      << " -padx " << VTK_KW_NB_TAB_PADX << endl;
+
+  // Warning: the following can have *very* nasty side effects. For example, 
+  // selected a vtkKWView might trigger a ViewSelectedEvent that will bring
+  // up the UI for that view. If showing that UI involves raising a page,
+  // the focus will be lost *aynchronously* (because of the events). Therefore,
+  // although the view has been selected, the focus is not in the view, and
+  // events like keys might not be triggered.
+  // Let's NOT use it :) Focus is evil.
+  // cmd << "focus " << page->Frame->GetWidgetName() << endl;
 
   cmd << ends;
   this->Script(cmd.str());
