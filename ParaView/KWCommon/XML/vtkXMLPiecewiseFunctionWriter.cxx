@@ -40,7 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkXMLDataElement.h"
 
 vtkStandardNewMacro(vtkXMLPiecewiseFunctionWriter);
-vtkCxxRevisionMacro(vtkXMLPiecewiseFunctionWriter, "1.2");
+vtkCxxRevisionMacro(vtkXMLPiecewiseFunctionWriter, "1.3");
 
 //----------------------------------------------------------------------------
 char* vtkXMLPiecewiseFunctionWriter::GetRootElementName()
@@ -100,7 +100,7 @@ int vtkXMLPiecewiseFunctionWriter::AddNestedElements(vtkXMLDataElement *elem)
     {
     for (int i = 0; i < size; i++, data_ptr += 2)
       {
-      vtkXMLDataElement *point_elem = vtkXMLDataElement::New();
+      vtkXMLDataElement *point_elem = this->NewDataElement();
       elem->AddNestedElement(point_elem);
       point_elem->Delete();
       point_elem->SetName(this->GetPointElementName());

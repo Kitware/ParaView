@@ -44,7 +44,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkXMLPiecewiseFunctionWriter.h"
 
 vtkStandardNewMacro(vtkXMLVolumePropertyWriter);
-vtkCxxRevisionMacro(vtkXMLVolumePropertyWriter, "1.8");
+vtkCxxRevisionMacro(vtkXMLVolumePropertyWriter, "1.9");
 
 //----------------------------------------------------------------------------
 char* vtkXMLVolumePropertyWriter::GetRootElementName()
@@ -144,7 +144,7 @@ int vtkXMLVolumePropertyWriter::AddNestedElements(vtkXMLDataElement *elem)
   int c_idx;
   for (c_idx = 0; c_idx < VTK_MAX_VRCOMP; c_idx++)
     {
-    vtkXMLDataElement *comp_elem = vtkXMLDataElement::New();
+    vtkXMLDataElement *comp_elem = this->NewDataElement();
     elem->AddNestedElement(comp_elem);
     comp_elem->Delete();
     comp_elem->SetName(this->GetComponentElementName());
