@@ -52,11 +52,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <stdarg.h>
 
-//------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVSourcesNavigationWindow );
-vtkCxxRevisionMacro(vtkPVSourcesNavigationWindow, "1.5");
+vtkCxxRevisionMacro(vtkPVSourcesNavigationWindow, "1.6");
 
-//------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 vtkPVSourcesNavigationWindow::vtkPVSourcesNavigationWindow()
 {
   this->Width     = -1;
@@ -66,7 +66,7 @@ vtkPVSourcesNavigationWindow::vtkPVSourcesNavigationWindow()
   this->PopupMenu = vtkKWMenu::New();
 }
 
-//------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 vtkPVSourcesNavigationWindow::~vtkPVSourcesNavigationWindow()
 {
   if (this->Canvas)
@@ -83,7 +83,7 @@ vtkPVSourcesNavigationWindow::~vtkPVSourcesNavigationWindow()
     }
 }
 
-//------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVSourcesNavigationWindow::CalculateBBox(vtkKWWidget* canvas, 
                                                  const char* name, 
                                                  int bbox[4])
@@ -94,7 +94,7 @@ void vtkPVSourcesNavigationWindow::CalculateBBox(vtkKWWidget* canvas,
   sscanf(result, "%d %d %d %d", bbox, bbox+1, bbox+2, bbox+3);
 }
 
-//------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 const char* vtkPVSourcesNavigationWindow::CreateCanvasItem(const char *format, ...)
 {
   char event[16000];
@@ -106,14 +106,14 @@ const char* vtkPVSourcesNavigationWindow::CreateCanvasItem(const char *format, .
   return this->Script(event);
 }
 
-//------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVSourcesNavigationWindow::ChildUpdate(vtkPVSource*,int)
 {
   vtkErrorMacro(<< "Subclass should do this.");
   vtkErrorMacro(<< "I am " << this->GetClassName());
 }
 
-//------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVSourcesNavigationWindow::Update(vtkPVSource *currentSource, int nobind)
 {
   // Clear the canvas
@@ -124,6 +124,7 @@ void vtkPVSourcesNavigationWindow::Update(vtkPVSource *currentSource, int nobind
   this->Reconfigure();
 }
 
+//-----------------------------------------------------------------------------
 void vtkPVSourcesNavigationWindow::Reconfigure()
 {
   this->Script("pack forget %s", this->ScrollBar->GetWidgetName());
@@ -145,7 +146,7 @@ void vtkPVSourcesNavigationWindow::Reconfigure()
 }
 
 
-//------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVSourcesNavigationWindow::Create(vtkKWApplication *app, const char *args)
 {
   const char *wname;
@@ -220,7 +221,7 @@ void vtkPVSourcesNavigationWindow::Create(vtkKWApplication *app, const char *arg
   this->ChildCreate();
 }
 
-//------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVSourcesNavigationWindow::SetWidth(int width)
 {
   if (this->Width == width)
@@ -238,7 +239,7 @@ void vtkPVSourcesNavigationWindow::SetWidth(int width)
     }
 }
 
-//------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVSourcesNavigationWindow::SetHeight(int height)
 {
   if (this->Height == height)
@@ -256,7 +257,7 @@ void vtkPVSourcesNavigationWindow::SetHeight(int height)
     }
 }
 
-//------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVSourcesNavigationWindow::HighlightObject(const char* widget, int onoff)
 {
   this->Script("%s itemconfigure %s -fill %s", 
@@ -264,7 +265,7 @@ void vtkPVSourcesNavigationWindow::HighlightObject(const char* widget, int onoff
                (onoff ? "red" : "blue") );
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVSourcesNavigationWindow::DisplayModulePopupMenu(const char* module, 
                                                    int x, int y)
 {
@@ -327,7 +328,7 @@ void vtkPVSourcesNavigationWindow::DisplayModulePopupMenu(const char* module,
   str1.rdbuf()->freeze(0);
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVSourcesNavigationWindow::ExecuteCommandOnModule(
   const char* module, const char* command)
 {
@@ -335,9 +336,15 @@ void vtkPVSourcesNavigationWindow::ExecuteCommandOnModule(
   this->Script("%s %s", module, command);
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVSourcesNavigationWindow::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
   os << indent << "Canvas: " << this->GetCanvas() << endl;
 }
+
+
+
+
+
+

@@ -59,8 +59,10 @@ class vtkLookupTable;
 class vtkScalarBarWidget;
 class vtkPVApplication;
 class vtkPVRenderView;
+class vtkKWMenu;
 class vtkKWOptionMenu;
 class vtkKWLabel;
+class vtkKWScale;
 class vtkKWLabeledFrame;
 class vtkKWLabeledEntry;
 class vtkKWWidget;
@@ -176,6 +178,14 @@ public:
   // Internal call used when the color map image changes shape.
   void MapConfigureCallback(int width, int height);
 
+  // Description:
+  // Called when user select the map.
+  void DisplayPopupMenu(int x, int y);
+
+  // Description:
+  // Called when the slider that select the resolution changes.
+  void NumberOfColorsScaleCallback();
+
 protected:
   vtkPVColorMap();
   ~vtkPVColorMap();
@@ -186,6 +196,7 @@ protected:
   // Here to create unique Tcl names.
   int InstanceCount;
 
+  int NumberOfColors;
   float ScalarRange[2];
   int VectorComponent;
   int NumberOfVectorComponents;
@@ -208,17 +219,21 @@ protected:
   int ScalarBarVisibility;
 
   // User interaface.
-  vtkKWLabeledEntry* ScalarBarTitleEntry;
+  vtkKWLabeledFrame* ColorMapFrame;
   vtkKWLabel*        ArrayNameLabel;
-  vtkKWLabeledFrame* ScalarBarFrame;
-  vtkKWWidget*       ScalarBarCheckFrame;
-  vtkKWCheckButton*  ScalarBarCheck;
-
+  vtkKWScale*        NumberOfColorsScale;
   // Stuff for selecting start and end colors.
   vtkKWWidget*            ColorEditorFrame;
   vtkKWChangeColorButton* StartColorButton;
   vtkKWImageLabel*        Map;
   vtkKWChangeColorButton* EndColorButton;
+
+  vtkKWLabeledFrame* ScalarBarFrame;
+  vtkKWLabeledEntry* ScalarBarTitleEntry;
+  vtkKWWidget*       ScalarBarCheckFrame;
+  vtkKWCheckButton*  ScalarBarCheck;
+
+
   
   // For the map image.
   unsigned char *MapData;
@@ -227,14 +242,13 @@ protected:
   int MapHeight;
   void UpdateMap(int width, int height);
 
+  vtkKWMenu* PopupMenu;
+
   // Stuff for setting the range of the color map.
   vtkKWWidget*       ColorRangeFrame;
   vtkKWPushButton*   ColorRangeResetButton;
   vtkKWLabeledEntry* ColorRangeMinEntry;
   vtkKWLabeledEntry* ColorRangeMaxEntry;
-
-  vtkKWLabel*        ColorMapMenuLabel;
-  vtkKWOptionMenu*   ColorMapMenu;
   
   vtkKWPushButton*   BackButton;
 
