@@ -72,7 +72,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVFileEntry);
-vtkCxxRevisionMacro(vtkPVFileEntry, "1.98");
+vtkCxxRevisionMacro(vtkPVFileEntry, "1.99");
 
 //----------------------------------------------------------------------------
 vtkPVFileEntry::vtkPVFileEntry()
@@ -706,6 +706,8 @@ void vtkPVFileEntry::Accept()
       }
     }
 
+  this->UpdateTimesteps();
+
   vtkSMStringListDomain *sld = vtkSMStringListDomain::SafeDownCast(
     svp->GetDomain("files"));
 
@@ -736,6 +738,42 @@ void vtkPVFileEntry::Accept()
   this->Superclass::Accept();
 }
 
+
+//----------------------------------------------------------------------------
+void vtkPVFileEntry::UpdateTimesteps()
+{
+  const char* fullfilename = this->GetValue();
+ 
+  // Check to see if the new filename value specified, is among the timesteps already
+  // selected. If so, in that case, the user is attempting to merely change the 
+  // timestep using the file name entry. Otherwise, the user is choosing a new dataset
+  // may be, so we just get rid of old timesteps.
+  int max_elems = this->FileListSelect->GetNumberOfElementsOnFinalList();
+  int cc;
+  int is_present = 0;
+  char *filename = new char[strlen(fullfilename)+32];
+  vtkKWDirectoryUtilities::GetFilenameName(fullfilename, filename);
+  
+  for (cc = 0; cc < max_elems; cc++)
+    {
+    if (strcmp(filename, this->FileListSelect->GetElementFromFinalList(cc))==0)
+      {
+      is_present = 1;
+      break;
+      }
+    }
+  if (is_present)
+    {
+    delete [] filename;
+    return;
+    }
+  // clear the file entries.
+  this->IgnoreFileListEvents = 1;
+  this->FileListSelect->RemoveItemsFromFinalList();
+  this->FileListSelect->AddFinalElement(filename);
+  this->IgnoreFileListEvents = 0;
+  delete [] filename;
+}
 
 //----------------------------------------------------------------------------
 void vtkPVFileEntry::Initialize()

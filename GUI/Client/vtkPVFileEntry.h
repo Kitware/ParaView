@@ -189,6 +189,14 @@ protected:
   vtkPVFileEntryObserver* Observer;
 
   void UpdateTimeStep();
+  
+  // Description:
+  // This method determines if the timesteps selected are valid or 
+  // must be discarded. This happends when the user changes the file name
+  // of the file name or file prefix entry to something that is 
+  // not in the list of timesteps, implying that the user wants to load
+  // a new dataset.
+  void UpdateTimesteps();
 
   int Initialized;
 
