@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVContainerWidget);
-vtkCxxRevisionMacro(vtkPVContainerWidget, "1.9");
+vtkCxxRevisionMacro(vtkPVContainerWidget, "1.10");
 
 int vtkPVContainerWidgetCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -245,8 +245,21 @@ vtkPVWidget* vtkPVContainerWidget::GetPVWidget(const char* traceName)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVContainerWidget::SaveInTclScript(ofstream *)
+void vtkPVContainerWidget::SaveInTclScript(ofstream *file)
 {
+  vtkLinkedListIterator<vtkPVWidget*>* it = this->Widgets->NewIterator();
+  vtkPVWidget* widget;
+  while ( !it->IsDoneWithTraversal() )
+    {
+    widget = 0;
+    it->GetData(widget);
+    if (widget) 
+      {
+      widget->SaveInTclScript(file);
+      }
+    it->GoToNextItem();
+    }
+  it->Delete();
 }
 
 vtkPVContainerWidget* vtkPVContainerWidget::ClonePrototype(
