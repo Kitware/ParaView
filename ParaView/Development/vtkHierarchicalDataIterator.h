@@ -15,8 +15,11 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkHierarchicalDataIterator -
+// .NAME vtkHierarchicalDataIterator - iterator to access datasets in a vtkHierarchicalDataIterator
 // .SECTION Description
+// vtkMultiBlockDataIterator is a concrete implementation of 
+// vtkCompositeDataIterator for vtkMultiBlockDataSet. It allows flat
+// and forward access to the datasets in the hierchical dataset.
 
 #ifndef __vtkHierarchicalDataIterator_h
 #define __vtkHierarchicalDataIterator_h

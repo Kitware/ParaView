@@ -15,8 +15,10 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkMultiBlockDataIterator -
+// .NAME vtkMultiBlockDataIterator - iterator to access datasets in a vtkMultiBlockDataSet
 // .SECTION Description
+// vtkMultiBlockDataIterator is a concrete implementation of 
+// vtkCompositeDataIterator for vtkMultiBlockDataSet.
 
 #ifndef __vtkMultiBlockDataIterator_h
 #define __vtkMultiBlockDataIterator_h

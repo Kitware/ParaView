@@ -15,8 +15,13 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkHierarchicalDataSet -
+// .NAME vtkHierarchicalDataSet - abstact superclass for hierarchical datasets
 // .SECTION Description
+// vtkHierarchicalDataSet is a vtkCompositeDataSet that stores
+// a hieararchy of datasets. The dataset collection consists of
+// multiple levels. Each dataset can have an arbitrary number of
+// parents and children at levels above and below. Currently,
+// the interface for connecting parents-children is incomplete.
 
 #ifndef __vtkHierarchicalDataSet_h
 #define __vtkHierarchicalDataSet_h
@@ -36,7 +41,8 @@ public:
   virtual void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Return a new iterator (has to be deleted by user)
+  // Return a new (forward) iterator 
+  // (the iterator has to be deleted by user)
   virtual vtkCompositeDataIterator* NewIterator();
 
   // Description:

@@ -23,7 +23,9 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkSource.h"
 #include "vtkUniformGrid.h"
 
-vtkCxxRevisionMacro(vtkHierarchicalBoxApplyFilterCommand, "1.2");
+#include "vtkApplyFilterCommandInternal.h"
+
+vtkCxxRevisionMacro(vtkHierarchicalBoxApplyFilterCommand, "1.3");
 vtkStandardNewMacro(vtkHierarchicalBoxApplyFilterCommand);
 
 vtkCxxSetObjectMacro(vtkHierarchicalBoxApplyFilterCommand,
@@ -34,6 +36,12 @@ vtkCxxSetObjectMacro(vtkHierarchicalBoxApplyFilterCommand,
 vtkHierarchicalBoxApplyFilterCommand::vtkHierarchicalBoxApplyFilterCommand() 
 { 
   this->Output = vtkHierarchicalBoxDataSet::New();
+
+  this->Internal->FilterTypes.clear();
+  vtkApplyFilterCommandInternal::FilterTypesVector ugfilters;
+  ugfilters.push_back("vtkDataSetToDataSetFilter");
+  this->Internal->FilterTypes["vtkUniformGrid"] = ugfilters;
+
 }
 
 //----------------------------------------------------------------
@@ -76,13 +84,16 @@ void vtkHierarchicalBoxApplyFilterCommand::Execute(
     this->Filter->Update();
     vtkUniformGrid* output = 
       vtkUniformGrid::SafeDownCast(this->Filter->GetOutputs()[0]);
-    vtkUniformGrid* outputsc = output->NewInstance();
-    outputsc->ShallowCopy(output);
-    this->Output->SetDataSet(info->Level, 
-                             info->DataSetId, 
-                             info->Box, 
-                             outputsc);
-    outputsc->Delete();
+    if (output)
+      {
+      vtkUniformGrid* outputsc = output->NewInstance();
+      outputsc->ShallowCopy(output);
+      this->Output->SetDataSet(info->Level, 
+                               info->DataSetId, 
+                               info->Box, 
+                               outputsc);
+      outputsc->Delete();
+      }
     }
   else
     {

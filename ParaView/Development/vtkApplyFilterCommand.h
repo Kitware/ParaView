@@ -15,8 +15,18 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkApplyFilterCommand -
+// .NAME vtkApplyFilterCommand - command responsible for executing a filter on datasets
 // .SECTION Description
+// vtkApplyFilterCommand is an abstract superclass for commands that
+// apply a filter to a dataset each time Execute() is called.
+// Currently, the filter has to be a subclass of one of the following:
+// vtkDataSetToDataSetFilter, vtkDataSetToImageFilter, 
+// vtkDataSetToPolyDataFilter, vtkDataSetToStructuredGridFilter
+// vtkDataSetToStructuredPointsFilter", vtkDataSetToUnstructuredGridFilter
+// and the datasets have to be subclasses of vtkDataSet.
+
+// .SECTION See Also
+// vtkMultiBlockApplyFilterCommand vtkHierarchicalBoxApplyFilterCommand
 
 #ifndef __vtkApplyFilterCommand_h
 #define __vtkApplyFilterCommand_h
@@ -35,6 +45,7 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
+  // The filter to be executed in Execute()
   void SetFilter(vtkSource* filter);
   vtkGetObjectMacro(Filter, vtkSource)
 
@@ -51,8 +62,7 @@ protected:
   ~vtkApplyFilterCommand();
 
 private:
-  vtkApplyFilterCommand(
-    const vtkApplyFilterCommand&); // Not implemented
+  vtkApplyFilterCommand(const vtkApplyFilterCommand&); // Not implemented
   void operator=(const vtkApplyFilterCommand&); // Not implemented
 };
 

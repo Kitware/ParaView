@@ -15,8 +15,17 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkHierarchicalBoxVisitor -
+// .NAME vtkHierarchicalBoxVisitor - visitor to apply a command to all datasets
 // .SECTION Description
+// vtkHierarchicalBoxVisitor is a concrete implementation of 
+// vtkCompositeDataIterator. It iterates over the collection
+// and applies the command to each. When calling Execute()
+// on the command, vtkHierarchicalBoxVisitor passes an instance
+// of vtkHierarchicalBoxApplyFilterCommand::LevelInformation as
+// the optional argument. This is used by vtkHierarchicalBoxApplyFilterCommand.
+
+// .SECTION See Also
+// vtkHierarchicalBoxApplyFilterCommand
 
 #ifndef __vtkHierarchicalBoxVisitor_h
 #define __vtkHierarchicalBoxVisitor_h

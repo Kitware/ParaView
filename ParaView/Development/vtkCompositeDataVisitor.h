@@ -15,8 +15,12 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkCompositeDataVisitor -
+// .NAME vtkCompositeDataVisitor - abstract superclass for composite data visitors
 // .SECTION Description
+// vtkCompositeDataVisitor is a superclass for composite data visitors.
+// Composite data visitors iterate through dataset collections and
+// apply an operation to each item.
+
 #ifndef __vtkCompositeDataVisitor_h
 #define __vtkCompositeDataVisitor_h
 

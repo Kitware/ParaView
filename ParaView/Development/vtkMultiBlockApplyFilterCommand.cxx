@@ -23,7 +23,7 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkObjectFactory.h"
 #include "vtkSource.h"
 
-vtkCxxRevisionMacro(vtkMultiBlockApplyFilterCommand, "1.2");
+vtkCxxRevisionMacro(vtkMultiBlockApplyFilterCommand, "1.3");
 vtkStandardNewMacro(vtkMultiBlockApplyFilterCommand);
 
 vtkCxxSetObjectMacro(vtkMultiBlockApplyFilterCommand,
@@ -54,7 +54,7 @@ void vtkMultiBlockApplyFilterCommand::Initialize()
 //----------------------------------------------------------------
 void vtkMultiBlockApplyFilterCommand::Execute(vtkCompositeDataVisitor *caller, 
                                               vtkDataObject *input,
-                                              void* callData)
+                                              void*)
 {
   if (!this->Output)
     {

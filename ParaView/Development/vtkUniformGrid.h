@@ -19,8 +19,8 @@
 // .SECTION Description
 // vtkUniformGrid is a data object that is a concrete implementation of
 // vtkDataSet. vtkUniformGrid represents a geometric structure that is 
-// a topological and geometrical regular array of points. Examples include
-// volumes (voxel data) and pixmaps. vtkUniformGrid supports blanking.
+// a topological and geometrical regular array of points. vtkUniformGrid 
+// is essentially a simple vtkImageData that supports blanking.
 
 #ifndef __vtkUniformGrid_h
 #define __vtkUniformGrid_h
@@ -83,7 +83,7 @@ public:
   void ComputeBounds();
   void Initialize();
   int GetMaxCellSize() {return 8;}; //voxel is the largest
-  virtual void GetScalarRange(float range[2]);
+  virtual void GetScalarRange(double range[2]);
   double *GetScalarRange() {return this->Superclass::GetScalarRange();}
 
   // Description:

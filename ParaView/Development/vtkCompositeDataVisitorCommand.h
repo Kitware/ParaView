@@ -15,8 +15,14 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkCompositeDataVisitorCommand -
+// .NAME vtkCompositeDataVisitorCommand - abstract superclass for commands
 // .SECTION Description
+// vtkCompositeDataVisitorCommand and it's subclasses are used by
+// the visitor classes. Visitors apply the command on each item
+// of a collection by calling Execute and passing the appropriate
+// arguments
+// .SECTION See Also
+// vtkCompositeDataVisitor
 
 #ifndef __vtkCompositeDataVisitorCommand_h
 #define __vtkCompositeDataVisitorCommand_h
@@ -33,11 +39,16 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
+  // Called by the visitor. The caller should pass itself, the
+  // current dataset. The last argument can be used to pass
+  // additional information.
   virtual void Execute(vtkCompositeDataVisitor *caller, 
                        vtkDataObject *input,
                        void* callData) = 0;
 
   // Description:
+  // Initialize should be called before iteration starts. It allows
+  // the command to initialize things like outputs.
   virtual void Initialize() {};
 
 protected:

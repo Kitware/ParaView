@@ -24,7 +24,7 @@
 #include "vtkUniformGrid.h"
 #include "vtkUnsignedCharArray.h"
 
-vtkCxxRevisionMacro(vtkHierarchicalBoxDataSet, "1.2");
+vtkCxxRevisionMacro(vtkHierarchicalBoxDataSet, "1.3");
 vtkStandardNewMacro(vtkHierarchicalBoxDataSet);
 
 //----------------------------------------------------------------------------
@@ -122,6 +122,8 @@ void vtkHierarchicalBoxDataSet::GenerateVisibilityArrays()
   unsigned int numLevels = this->GetNumberOfLevels();
   for (unsigned int levelIdx=0; levelIdx<numLevels-1; levelIdx++)
     {
+
+    // Copy boxes of higher level and coarsen to this level
     vtkstd::vector<vtkAMRBox> boxes;
     vtkHierarchicalDataSetInternal::LevelDataSetsType& ldataSets = 
       this->Internal->DataSets[levelIdx+1];
@@ -156,12 +158,13 @@ void vtkHierarchicalBoxDataSet::GenerateVisibilityArrays()
           }
 
         
-        for (int ix=0; ix<cellDims[0]; ix++)
+        for (int iz=0; iz<cellDims[2]; iz++)
           {
-          for (int iy=0; iy<cellDims[1]; iy++)
+          for (int ix=0; ix<cellDims[0]; ix++)
             {
-            for (int iz=0; iz<cellDims[2]; iz++)
+            for (int iy=0; iy<cellDims[1]; iy++)
               {
+              // Blank if cell is covered by a box of higher level
               if (vtkHierarchicalBoxDataSetIsInBoxes(boxes, ix, iy, iz))
                 {
                 vtkIdType id = 

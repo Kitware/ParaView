@@ -15,8 +15,12 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkHierarchicalBoxDataSet -
+// .NAME vtkHierarchicalBoxDataSet - hierarchical dataset of vtkUniformGrids
 // .SECTION Description
+// vtkHierarchicalBoxDataSet is a concrete implementation of  
+// vtkHierarchicalDataSet. The dataset type is restricted to
+// vtkUniformGrid. Each dataset has an associated vtkAMRBox
+// that represents it's region (similar to extent) in space.
 
 #ifndef __vtkHierarchicalBoxDataSet_h
 #define __vtkHierarchicalBoxDataSet_h

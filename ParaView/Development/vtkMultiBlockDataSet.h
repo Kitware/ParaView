@@ -15,8 +15,13 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkMultiBlockDataSet -
+// .NAME vtkMultiBlockDataSet - collection of data objects
 // .SECTION Description
+// vtkMultiBlockDataSet represents a collection of data objects.
+// The data objects can be primitive datasets as well as other
+// composite datasets.
+// No relation (spatial or hierarchical) between data objects is
+// specified or enforced.
 
 #ifndef __vtkMultiBlockDataSet_h
 #define __vtkMultiBlockDataSet_h
@@ -57,6 +62,9 @@ public:
   virtual void Initialize();
 
 //BTX
+  // Note that vtkMultiBlockDataIterator is dependent on the implementation
+  // of the data structure in this class. Changes to the data structure
+  // might require changes to vtkMultiBlockDataIterator.
   friend class vtkMultiBlockDataIterator;
 //ETX
 

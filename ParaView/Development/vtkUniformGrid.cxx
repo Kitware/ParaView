@@ -31,7 +31,7 @@
 #include "vtkVertex.h"
 #include "vtkVoxel.h"
 
-vtkCxxRevisionMacro(vtkUniformGrid, "1.1");
+vtkCxxRevisionMacro(vtkUniformGrid, "1.2");
 vtkStandardNewMacro(vtkUniformGrid);
 
 vtkCxxSetObjectMacro(vtkUniformGrid,
@@ -1016,17 +1016,17 @@ vtkIdType vtkUniformGrid::GetNumberOfCells()
 
 //----------------------------------------------------------------------------
 // Override this method because of blanking
-void vtkUniformGrid::GetScalarRange(float range[2])
+void vtkUniformGrid::GetScalarRange(double range[2])
 {
   vtkDataArray *ptScalars = this->PointData->GetScalars();
   vtkDataArray *cellScalars = this->CellData->GetScalars();
-  float ptRange[2];
-  float cellRange[2];
-  float s;
+  double ptRange[2];
+  double cellRange[2];
+  double s;
   int id, num;
   
-  ptRange[0] =  VTK_LARGE_FLOAT;
-  ptRange[1] =  -VTK_LARGE_FLOAT;
+  ptRange[0] =  VTK_DOUBLE_MAX;
+  ptRange[1] =  -VTK_DOUBLE_MAX;
   if ( ptScalars )
     {
     num = this->GetNumberOfPoints();
@@ -1069,8 +1069,8 @@ void vtkUniformGrid::GetScalarRange(float range[2])
       }
     }
 
-  range[0] = (cellRange[0] >= VTK_LARGE_FLOAT ? 0.0 : cellRange[0]);
-  range[1] = (cellRange[1] <= -VTK_LARGE_FLOAT ? 1.0 : cellRange[1]);
+  range[0] = (cellRange[0] >= VTK_DOUBLE_MAX ? 0.0 : cellRange[0]);
+  range[1] = (cellRange[1] <= -VTK_DOUBLE_MAX ? 1.0 : cellRange[1]);
 
   this->ComputeTime.Modified();
 }

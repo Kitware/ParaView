@@ -15,8 +15,11 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkCompositeDataIterator -
+// .NAME vtkCompositeDataIterator - abstract superclass for composite data iterators
 // .SECTION Description
+// vtkCompositeDataIterator provides an interface for accessing datasets
+// in a collection (vtkCompositeDataIterator). Sub-classes provide the
+// actual implementation.
 
 #ifndef __vtkCompositeDataIterator_h
 #define __vtkCompositeDataIterator_h

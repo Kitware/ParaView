@@ -15,8 +15,11 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkMultiBlockApplyFilterCommand -
+// .NAME vtkMultiBlockApplyFilterCommand - command responsible for executing a filter on datasets
 // .SECTION Description
+// vtkMultiBlockApplyFilterCommand is a concrete implemetation of
+// vtkApplyFilterCommand. It executes the filter on each dataset
+// and collects the output in a vtkMultiBlockDataSet.
 
 #ifndef __vtkMultiBlockApplyFilterCommand_h
 #define __vtkMultiBlockApplyFilterCommand_h
@@ -34,19 +37,21 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Satisfy the superclass API for callbacks. Recall that the caller is
-  // the instance invoking the event; eid is the event id (see 
-  // vtkCommand.h); and calldata is information sent when the callback
-  // was invoked
+  // Called by the visitor. The caller should pass itself, the
+  // current dataset. The last argument is ignored.
   virtual void Execute(vtkCompositeDataVisitor *caller, 
                        vtkDataObject *input,
-                       void* callData);
+                       void*);
 
   // Description:
+  // The output to be used to store the results. A default output
+  // is created during construction.
   void SetOutput(vtkMultiBlockDataSet* output);
   vtkGetObjectMacro(Output, vtkMultiBlockDataSet);
 
   // Description:
+  // Initialize should be called before iteration starts. It initializes
+  // the output.
   void Initialize();
 
 protected:
@@ -57,8 +62,7 @@ protected:
   ~vtkMultiBlockApplyFilterCommand();
 
 private:
-  vtkMultiBlockApplyFilterCommand(
-    const vtkMultiBlockApplyFilterCommand&); // Not implemented
+  vtkMultiBlockApplyFilterCommand(const vtkMultiBlockApplyFilterCommand&); // Not implemented
   void operator=(const vtkMultiBlockApplyFilterCommand&); // Not implemented
 };
 

@@ -17,12 +17,13 @@
 =========================================================================*/
 #include "vtkMultiBlockDataVisitor.h"
 
+#include "vtkCompositeDataSet.h"
 #include "vtkDataSet.h"
 #include "vtkMultiBlockDataIterator.h"
 #include "vtkCompositeDataVisitorCommand.h"
 #include "vtkObjectFactory.h"
 
-vtkCxxRevisionMacro(vtkMultiBlockDataVisitor, "1.1");
+vtkCxxRevisionMacro(vtkMultiBlockDataVisitor, "1.2");
 vtkStandardNewMacro(vtkMultiBlockDataVisitor);
 
 vtkCxxSetObjectMacro(vtkMultiBlockDataVisitor,
@@ -42,6 +43,46 @@ vtkMultiBlockDataVisitor::~vtkMultiBlockDataVisitor()
 }
 
 //----------------------------------------------------------------------------
+void vtkMultiBlockDataVisitor::ExecuteDataSet(vtkDataSet* ds)
+{
+  this->Command->Execute(this, ds, 0);
+}
+
+//----------------------------------------------------------------------------
+void vtkMultiBlockDataVisitor::ExecuteCompositeDataSet(
+  vtkCompositeDataIterator* iter)
+{
+  iter->GoToFirstItem();
+  while (!iter->IsDoneWithTraversal())
+    {
+    vtkDataObject* dobj = iter->GetCurrentDataObject();
+    // If the data object is a primitive dataset, simply
+    // apply the command to it.
+    if (dobj->IsA("vtkDataSet"))
+      {
+      vtkDataSet* curDataSet = vtkDataSet::SafeDownCast(dobj);
+      if (curDataSet)
+        {
+        this->ExecuteDataSet(curDataSet);
+        }
+      }
+    // if the data object is a composite dataset, recursively
+    // call  ExecuteCompositeDataSet() until a leaf node is reached
+    else if (dobj->IsA("vtkCompositeDataSet"))
+      {
+      vtkCompositeDataSet* curDataSet = vtkCompositeDataSet::SafeDownCast(dobj);
+      if (dobj)
+        {
+        vtkCompositeDataIterator* it = curDataSet->NewIterator();
+        this->ExecuteCompositeDataSet(it);
+        it->Delete();
+        }
+      }
+    iter->GoToNextItem();
+    }
+}
+
+//----------------------------------------------------------------------------
 void vtkMultiBlockDataVisitor::Execute()
 {
   if (!this->DataIterator)
@@ -57,19 +98,7 @@ void vtkMultiBlockDataVisitor::Execute()
     }
 
   this->Command->Initialize();
-  this->DataIterator->GoToFirstItem();
-  while (!this->DataIterator->IsDoneWithTraversal())
-    {
-    vtkDataSet* curDataSet = vtkDataSet::SafeDownCast(
-      this->DataIterator->GetCurrentDataObject());
-    if (curDataSet)
-      {
-      this->Command->Execute(this, 
-                             curDataSet,
-                             0);
-      }
-    this->DataIterator->GoToNextItem();
-    }
+  this->ExecuteCompositeDataSet(this->DataIterator);
 }
 
 //----------------------------------------------------------------------------

@@ -15,8 +15,11 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkAMRBox -
+// .NAME vtkAMRBox - represents a 3D uniform region in space
 // .SECTION Description
+// vtkAMRBox is similar to Chombo's Box. It represents a 3D
+// region by storing indices for two corners (LoCorner, HiCorner).
+// A few utility methods are provided.
 
 #ifndef __vtkAMRBox_h
 #define __vtkAMRBox_h
@@ -26,6 +29,7 @@
 class VTK_EXPORT vtkAMRBox
 {
 public:
+  // public for quick access
   int LoCorner[3];
   int HiCorner[3];
 
@@ -44,6 +48,10 @@ public:
       memcpy(this->HiCorner, hiCorner, dimensionality*sizeof(int));
     }
     
+  // Description:
+  // Returns the number of cells (aka elements, zones etc.) in
+  // the given region (for the specified refinement, see Coarsen()
+  // and Refine() ).
   vtkIdType GetNumberOfCells()
     {
       vtkIdType numCells=1;
@@ -54,6 +62,9 @@ public:
       return numCells;
     }
 
+  // Description:
+  // Modify LoCorner and HiCorner by coarsening with the given
+  // refinement ratio.
   void Coarsen(int refinement)
     {
       for (int i=0; i<3; i++)
@@ -69,6 +80,9 @@ public:
         }
     }
 
+  // Description:
+  // Modify LoCorner and HiCorner by refining with the given
+  // refinement ratio.
   void Refine(int refinement)
     {
       for (int i=0; i<3; i++)
@@ -78,6 +92,9 @@ public:
         }
     }
 
+  // Description:
+  // Returns non-zero if the box contains the cell with
+  // given indices.
   int DoesContainCell(int i, int j, int k)
     {
       return 

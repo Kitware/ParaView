@@ -21,9 +21,12 @@
 #include "vtkMultiBlockDataSetInternal.h"
 #include "vtkObjectFactory.h"
 
-vtkCxxRevisionMacro(vtkMultiBlockDataIterator, "1.2");
+vtkCxxRevisionMacro(vtkMultiBlockDataIterator, "1.3");
 vtkStandardNewMacro(vtkMultiBlockDataIterator);
 
+// Note that this class is dependent on the implementation
+// of the data structure in vtkMultiBlockDataSet. Changes
+// to vtkMultiBlockDataSet might require changes to this class.
 class vtkMultiBlockDataIteratorInternal
 {
 public:
@@ -71,6 +74,7 @@ void vtkMultiBlockDataIterator::GoToFirstItem()
     vtkErrorMacro("No data object has been set.");
     return;
     }
+  // Simply use the STL iterator from the vector
   this->Internal->Iterator = this->DataSet->Internal->DataSets.begin();
 }
 

@@ -15,8 +15,15 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkCompositeDataSet -
+// .NAME vtkCompositeDataSet - abstact superclass for composite (multi-block or AMR) datasets
 // .SECTION Description
+// vtkCompositeDataSet is an abstract class that represents a collection
+// of datasets (including other composite datasets). This superclass
+// does not implement an actual method for storing datasets. It
+// only provides an interface to access the datasets through iterators.
+
+// .SECTION See Also
+// vtkCompositeDataIterator vtkCompositeDataVisitor
 
 #ifndef __vtkCompositeDataSet_h
 #define __vtkCompositeDataSet_h
@@ -33,12 +40,13 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Return a new iterator (has to be deleted by user)
+  // Return a new (forward) iterator 
+  // (the iterator has to be deleted by user)
   virtual vtkCompositeDataIterator* NewIterator() = 0;
 
   // Description:
-  // This returns a vtkCompositeDataVisitor. Sub-classes can
-  // return this method to return the appropriate visitor.
+  // Return a new visitor. Sub-classes should overload
+  // this method to return the appropriate visitor.
   virtual vtkCompositeDataVisitor* NewVisitor() = 0;
 
   // Description:
@@ -49,21 +57,6 @@ public:
   // Description:
   // Restore data object to initial state,
   virtual void Initialize();
-
-  //------------------------------------------------------------
-  // Partial dataset interface:
-  //
-  // Description:
-  // Returns the total number of points.
-  vtkIdType GetNumberOfPoints();
-
-  // Description:
-  // Returns the total number of points.
-  vtkIdType GetNumberOfCells();
-
-  // Description:
-  // Returns the total bounds.
-  double* GetBounds();
 
   // Description:
   // For streaming.  User/next filter specifies which piece the want updated.
@@ -86,19 +79,6 @@ public:
 protected:
   vtkCompositeDataSet();
   ~vtkCompositeDataSet();
-
-  // Description:
-  // Compute these only when necessary (uses mtime)
-  void ComputeNumberOfPoints();
-  void ComputeNumberOfCells();
-  void ComputeBounds();
-
-  double Bounds[6];  // (xmin,xmax, ymin,ymax, zmin,zmax) geometric bounds
-  vtkIdType NumberOfPoints;
-  vtkIdType NumberOfCells;
-  vtkTimeStamp ComputeBoundsTime; // Time at which bounds, center, etc. computed
-  vtkTimeStamp ComputeNPtsTime;
-  vtkTimeStamp ComputeNCellsTime;
 
 private:
   vtkCompositeDataSet(const vtkCompositeDataSet&);  // Not implemented.

@@ -29,20 +29,9 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkDataSetToStructuredPointsFilter.h"
 #include "vtkDataSetToUnstructuredGridFilter.h"
 
-#include <vtkstd/map>
-#include <vtkstd/string>
-#include <vtkstd/vector>
+#include "vtkApplyFilterCommandInternal.h"
 
-class vtkApplyFilterCommandInternal
-{
-public:
-  typedef vtkstd::vector<vtkstd::string> FilterTypesVector;
-  typedef vtkstd::map<vtkstd::string, FilterTypesVector> FilterTypesMap;
-
-  FilterTypesMap FilterTypes;
-};
-
-vtkCxxRevisionMacro(vtkApplyFilterCommand, "1.1");
+vtkCxxRevisionMacro(vtkApplyFilterCommand, "1.2");
 
 vtkCxxSetObjectMacro(vtkApplyFilterCommand,
                      Filter, 
