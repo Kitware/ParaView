@@ -204,7 +204,12 @@ public:
   // Description:
   // For event handling.
   void ExecuteEvent(vtkObject *o, unsigned long event, void* calldata);
-
+  
+  // Description:
+  // Callback for the delay scale
+  void DelayScaleCallback();
+  void SetDelay(int value);
+  
   // Description:
   // Update the "enable" state of the object and its internal parts.
   // Depending on different Ivars (this->Enabled, the application's 

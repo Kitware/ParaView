@@ -170,7 +170,7 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterface);
-vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.111");
+vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.112");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterface,ControlledWidget, vtkPVWidget);
 
@@ -554,6 +554,7 @@ void vtkPVAnimationInterface::Create(vtkKWApplication *app, const char *frameArg
   this->AnimationDelayScale->DisplayEntryAndLabelOnTopOff();
   this->AnimationDelayScale->DisplayLabel("Delay:");
   this->AnimationDelayScale->SetRange(0, 500);
+  this->AnimationDelayScale->SetEndCommand(this, "DelayScaleCallback");
 
   this->Script("pack %s -side top -expand t -fill x", 
                this->AnimationDelayScale->GetWidgetName());
@@ -1256,6 +1257,8 @@ void vtkPVAnimationInterface::SaveImages(const char* fileRoot,
   int fileCount;
   int t;
 
+  this->AddTraceEntry("$kw(%s) SaveImages {%s} {%s}",
+                      this->GetTclName(), fileRoot, ext);
   winToImage = vtkPVWindowToImageFilter::New();
   winToImage->SetInput(this->GetPVApplication()->GetRenderModule());
   if (strcmp(ext,"jpg") == 0)
@@ -1352,6 +1355,9 @@ void vtkPVAnimationInterface::SaveGeometryCallback()
 void vtkPVAnimationInterface::SaveGeometry(const char* fileName, 
                                            int numPartitions) 
 {
+  this->AddTraceEntry("$kw(%s) SaveGeometry {%s} {%s}",
+                      this->GetTclName(), fileName, numPartitions);
+  
   vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
   vtkPVSourceCollection* sources = this->GetWindow()->GetSourceList("Sources");
   
@@ -2063,6 +2069,24 @@ void vtkPVAnimationInterface::UpdateEnableState()
 }
 
 //-----------------------------------------------------------------------------
+void vtkPVAnimationInterface::DelayScaleCallback()
+{
+  this->SetDelay(static_cast<int>(this->AnimationDelayScale->GetValue()));
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVAnimationInterface::SetDelay(int value)
+{
+  if ((static_cast<int>(this->AnimationDelayScale->GetValue())) != value)
+    {
+    this->AnimationDelayScale->SetValue(value);
+    }
+  
+  this->AddTraceEntry("$kw(%s) SetDelay %d",
+                      this->GetTclName(), value);
+}
+
+//-----------------------------------------------------------------------------
 void vtkPVAnimationInterface::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
@@ -2073,8 +2097,3 @@ void vtkPVAnimationInterface::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "Window: " << this->GetWindow() << endl;
   os << indent << "ScriptAvailable: " << this->ScriptAvailable << endl;
 }
-
-
-
-
-
