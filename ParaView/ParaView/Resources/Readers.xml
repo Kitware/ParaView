@@ -119,7 +119,7 @@
           root_name="Ensight" 
           module_type="Reader"
           extensions=".case" file_description="EnSight Files">
-    <Source class="vtkGenericEnSightReader"/>
+    <Source class="vtkPVEnSightMasterServerReader"/>
     <SelectionList label="Byte order" trace_name="ByteOrder"
                    variable="ByteOrder"
                    help="Select the byte order of the binary file"
