@@ -11,8 +11,6 @@ IF(PYTHON_EXECUTABLE AND VTK_HEADER_TESTING_PY)
   ADD_TEST(HeaderTesting-KWWidgets ${PYTHON_EXECUTABLE}
            ${VTK_HEADER_TESTING_PY}
 	   "${KWWidgets_SOURCE_DIR}"
-           KitwareLogo.h
-           bitmaps.h
            icons.h
            kwinit.h
            kwappicon.h
