@@ -110,7 +110,7 @@ IF (PARAVIEW_BUILD_GUI)
     ""
     )
   ADD_LIBRARY(vtkPVServerCommonTCL ${ServerCommonTCL_SRCS})
-  TARGET_LINK_LIBRARIES (vtkPVServerCommonTCL vtkCommonTCL)
+  TARGET_LINK_LIBRARIES (vtkPVServerCommonTCL vtkPVCommon vtkCommonTCL)
 ENDIF (PARAVIEW_BUILD_GUI)
 
 IF(BUILD_SHARED_LIBS)
