@@ -93,14 +93,17 @@ vtktcl.o: ${VTKSRC}/tcl/vtktcl.c
 ParaView: Makefile ParaView.o vtktcl.o ${TOOLKIT_DEPENDS} 
 	$(CXX) -o ParaView ParaView.o \
 	${TCL_LIB_FILE} ${KIT_LIBS} \
+	$(VIEWSDIR)/ParaView/vtkKWParaViewTcl$(VTK_LIB_EXT) \
+	$(VIEWSDIR)/ParaView/vtkKWParaView$(VTK_LIB_EXT) \
 	$(VIEWSDIR)/Widgets/vtkKWWidgetsTcl$(VTK_LIB_EXT) \
 	$(VIEWSDIR)/Widgets/vtkKWWidgets$(VTK_LIB_EXT) \
+	vtktcl.o \
 	${USE_PATENTED_LIBS}	\
 	${USE_IMAGING_LIBS}	\
 	${USE_GRAPHICS_LIBS}	\
 	${USE_CONTRIB_LIBS}	\
 	-L${VTKBIN}/common -lVTKCommonTcl  -lVTKCommon \
-	vtktcl.o ${LDLIBS} ${CONTROLLER_API_LIBS} \
+	${LDLIBS} ${CONTROLLER_API_LIBS} \
 	${TK_LIB} ${TCL_LIB} ${DL_LIBS} ${THREAD_LIBS} \
 	-L. ${CXX_FLAGS} ${VTK_SHLIB_LINK_FLAGS} ${XLDFLAGS} ${LDLIBS} \
 	${XLIBS} ${GRAPHICS_API_LIBS} -lXext -lXt ${X_PRE_LIBS} -lX11 ${X_EXTRA_LIBS} -lm
