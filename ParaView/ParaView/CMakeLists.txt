@@ -41,7 +41,6 @@ vtkPVVectorEntry
 vtkPVWidget
 vtkPVWindow 
 vtkPVWorldPointPicker 
-vtkSimpleFieldDataToAttributeDataFilter 
 vtkStringList 
 )
 
