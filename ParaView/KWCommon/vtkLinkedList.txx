@@ -332,4 +332,11 @@ vtkLinkedListIterator<DType> *vtkLinkedList<DType>::NewIterator()
   return it;
 }
 
+#if defined ( _MSC_VER )
+template <class DType>
+vtkLinkedList<DType>::vtkLinkedList(const vtkLinkedList<DType>&){}
+template <class DType>
+void vtkLinkedList<DType>::operator=(const vtkLinkedList<DType>&){}
+#endif
+
 #endif

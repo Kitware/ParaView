@@ -165,4 +165,11 @@ int vtkLinkedListIterator<DType>::GoToLastItem()
   return VTK_OK;
 }
 
+#if defined ( _MSC_VER )
+template <class DType>
+vtkLinkedListIterator<DType>::vtkLinkedListIterator(const vtkLinkedListIterator<DType>&){}
+template <class DType>
+void vtkLinkedListIterator<DType>::operator=(const vtkLinkedListIterator<DType>&){}
+#endif
+
 #endif

@@ -148,4 +148,11 @@ int vtkArrayMapIterator<KeyType,DataType>::GoToLastItem()
   return VTK_OK;
 }
 
+#if defined ( _MSC_VER )
+template <class KeyType,class DataType>
+vtkArrayMapIterator<KeyType,DataType>::vtkArrayMapIterator(const vtkArrayMapIterator<KeyType,DataType>&){}
+template <class KeyType,class DataType>
+void vtkArrayMapIterator<KeyType,DataType>::operator=(const vtkArrayMapIterator<KeyType,DataType>&){}
+#endif
+
 #endif

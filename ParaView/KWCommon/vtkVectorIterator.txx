@@ -139,4 +139,11 @@ int vtkVectorIterator<DType>::GoToLastItem()
   return VTK_OK;
 }
 
+#if defined ( _MSC_VER )
+template <class DType>
+vtkVectorIterator<DType>::vtkVectorIterator(const vtkVectorIterator<DType>&){}
+template <class DType>
+void vtkVectorIterator<DType>::operator=(const vtkVectorIterator<DType>&){}
+#endif
+
 #endif

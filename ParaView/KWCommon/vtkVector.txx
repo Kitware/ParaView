@@ -338,4 +338,11 @@ vtkVectorIterator<DType> *vtkVector<DType>::NewIterator()
   return it;
 }
 
+#if defined ( _MSC_VER )
+template <class DType>
+vtkVector<DType>::vtkVector(const vtkVector<DType>&){}
+template <class DType>
+void vtkVector<DType>::operator=(const vtkVector<DType>&){}
+#endif
+
 #endif

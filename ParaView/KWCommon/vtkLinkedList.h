@@ -151,8 +151,8 @@ protected:
   vtkLinkedListNode<DType> *Tail;
 
 private:
-  vtkLinkedList(const vtkLinkedList<DType>&){}
-  void operator=(const vtkLinkedList<DType>&){}
+  vtkLinkedList(const vtkLinkedList<DType>&); // Not implemented
+  void operator=(const vtkLinkedList<DType>&); // Not implemented
 };
 
 #ifdef VTK_NO_EXPLICIT_TEMPLATE_INSTANTIATION

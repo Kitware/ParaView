@@ -192,6 +192,14 @@ vtkArrayMap<KeyType,DataType>::NewIterator()
   return it;
 }
 
+
+#if defined ( _MSC_VER )
+template <class KeyType,class DataType>
+vtkArrayMap<KeyType,DataType>::vtkArrayMap(const vtkArrayMap<KeyType,DataType>&){}
+template <class KeyType,class DataType>
+void vtkArrayMap<KeyType,DataType>::operator=(const vtkArrayMap<KeyType,DataType>&){}
+#endif
+
 #endif
 
 

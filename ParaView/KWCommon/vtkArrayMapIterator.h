@@ -106,8 +106,8 @@ protected:
   vtkIdType Index;
 
 private:
-  vtkArrayMapIterator(const vtkArrayMapIterator<KeyType,DataType>&) {}
-  void operator=(const vtkArrayMapIterator<KeyType,DataType>&) {}
+  vtkArrayMapIterator(const vtkArrayMapIterator<KeyType,DataType>&); // Not implemented
+  void operator=(const vtkArrayMapIterator<KeyType,DataType>&); // Not implemented
 };
 
 #ifdef VTK_NO_EXPLICIT_TEMPLATE_INSTANTIATION
