@@ -211,7 +211,7 @@ void vtkPVSendPolyData(void* arg, void*, int, int)
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVClientServerModule);
-vtkCxxRevisionMacro(vtkPVClientServerModule, "1.41");
+vtkCxxRevisionMacro(vtkPVClientServerModule, "1.42");
 
 int vtkPVClientServerModuleCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -442,7 +442,11 @@ void vtkPVClientServerModule::Initialize()
     int port= pvApp->GetPort();
 
     // Establish connection
-    if (!comm->WaitForConnection(port))
+
+
+
+
+   if (!comm->WaitForConnection(port))
       {
       vtkErrorMacro("Server error: Wait timed out or could not initialize socket.");
       comm->Delete();

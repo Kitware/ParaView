@@ -24,6 +24,7 @@
 #include "vtkLight.h"
 #include "vtkLightCollection.h"
 #include "vtkMultiProcessController.h"
+#include "vtkSocketController.h"
 #include "vtkObjectFactory.h"
 #include "vtkRenderWindow.h"
 #include "vtkRenderer.h"
@@ -44,7 +45,7 @@
  #include <mpi.h>
 #endif
 
-vtkCxxRevisionMacro(vtkMultiDisplayManager, "1.1");
+vtkCxxRevisionMacro(vtkMultiDisplayManager, "1.2");
 vtkStandardNewMacro(vtkMultiDisplayManager);
 
 vtkCxxSetObjectMacro(vtkMultiDisplayManager, RenderView, vtkObject);
@@ -107,6 +108,7 @@ vtkMultiDisplayManager::vtkMultiDisplayManager()
 
   this->RenderWindow = NULL;
   this->Controller = vtkMultiProcessController::GetGlobalController();
+  this->SocketController = NULL;
   this->NumberOfProcesses = this->Controller->GetNumberOfProcesses();
 
   if (this->Controller)
@@ -140,6 +142,11 @@ vtkMultiDisplayManager::~vtkMultiDisplayManager()
     this->Controller->UnRegister(this);
     this->Controller = NULL;
     }
+  if (this->SocketController)
+    {
+    this->SocketController->UnRegister(this);
+    this->SocketController = NULL;
+    }
 
   this->CompositeUtilities->Delete();
   this->CompositeUtilities = NULL;
@@ -164,7 +171,7 @@ void vtkMultiDisplayManagerClientStartRender(vtkObject *caller,
     return;
     }
 
-  self->StartRender();
+  self->ClientStartRender();
 }
 
 
@@ -175,21 +182,24 @@ void vtkMultiDisplayManagerRootStartRender(vtkObject *caller,
 {
   vtkMultiDisplayManager *self = (vtkMultiDisplayManager *)clientData;
   vtkMultiProcessController *controller = self->GetSocketController();
-  vtkMultiDisplayInfo info;  
+  vtkPVMultiDisplayInfo info;  
 
   controller->Receive((float*)(&info), 24, 1, 
                      vtkMultiDisplayManager::INFO_TAG);
   self->RootStartRender(info);
 }
 
+typedef void (*vtkRMIFunctionType)(void *localArg, 
+                                   void *remoteArg, int remoteArgLength, 
+                                   int remoteProcessId);
+
 //-------------------------------------------------------------------------
-void vtkMultiDisplayManagerSatelliteStartRender(vtkObject *caller,
-                                 unsigned long vtkNotUsed(event), 
-                                 void *clientData, void *)
+void vtkMultiDisplayManagerSatelliteStartRender(void *localArg, 
+                                                void *, int, int)
 {
-  vtkMultiDisplayManager *self = (vtkMultiDisplayManager *)clientData;
+  vtkMultiDisplayManager *self = (vtkMultiDisplayManager *)localArg;
   vtkMultiProcessController *controller = self->GetController();
-  vtkMultiDisplayInfo info;  
+  vtkPVMultiDisplayInfo info;  
 
   controller->Receive((float*)(&info), 24, 1, 
                      vtkMultiDisplayManager::INFO_TAG);
@@ -212,13 +222,6 @@ void vtkMultiDisplayManagerEndRender(vtkObject *caller,
   self->EndRender();
 }
 
-//----------------------------------------------------------------------------
-void vtkMultiDisplayManagerRenderRMI(void *arg, void *, int, int)
-{
-  vtkMultiDisplayManager* self = (vtkMultiDisplayManager*) arg;
-  
-  self->RenderRMI();
-}
 
 //==================== end of RMI functions ====================
 
@@ -250,15 +253,15 @@ void vtkMultiDisplayManager::ComputeCamera(float *o, float *x, float *y,
     ox[idx] = x[idx] - o[idx];
     oy[idx] = y[idx] - o[idx];
     center[idx] = o[idx] + 0.5*(ox[idx] + oy[idx]);
-    cp[idx] = p[idx] - c[idx];
+    cp[idx] = p[idx] - center[idx];
     }
   vtkMath::Cross(ox, oy, vn);
   vtkMath::Normalize(vn);
   // Compute distance to plane.
   dist = vtkMath::Dot(vn,cp);
   // Compute width and height of the window.
-  width = vtkMath::Magnitude(ox);
-  height = vtkMath::Magnitude(oy);
+  width = sqrt(ox[0]*ox[0] + ox[1]*ox[1] + ox[2]*ox[2]);
+  height = sqrt(oy[0]*oy[0] + oy[1]*oy[1] + oy[2]*oy[2]);
 
   // Point the camera orthogonal toward the plane.
   cam->SetPosition(p[0], p[1], p[2]);
@@ -275,9 +278,9 @@ void vtkMultiDisplayManager::ComputeCamera(float *o, float *x, float *y,
   offset[2] = center[2] - (p[2]-dist*vn[2]);
 
   // Compute the normalized x and y components of shear offset.
-  tmp = vtkMath::Magnitude(ox);
+  tmp = sqrt(ox[0]*ox[0] + ox[1]*ox[1] + ox[2]*ox[2]);
   xOffset = vtkMath::Dot(offset, ox) / (tmp * tmp); 
-  tmp = vtkMath::Magnitude(oy);
+  tmp = sqrt(oy[0]*oy[0] + oy[1]*oy[1] + oy[2]*oy[2]);
   yOffset = vtkMath::Dot(offset, oy) / (tmp * tmp); 
 
   // Off angle positioning of window.
@@ -290,9 +293,8 @@ void vtkMultiDisplayManager::ComputeCamera(float *o, float *x, float *y,
 // Only called on "client".
 void vtkMultiDisplayManager::ClientStartRender()
 {
-  struct vtkPVMultiDisplayInfo info;
-  int id, numProcs;
-  int *size;
+  vtkPVMultiDisplayInfo info;
+  int numProcs;
   vtkRendererCollection *rens;
   vtkRenderer* ren;
   vtkCamera *cam;
@@ -301,12 +303,8 @@ void vtkMultiDisplayManager::ClientStartRender()
   float updateRate = this->RenderWindow->GetDesiredUpdateRate();
   
   vtkDebugMacro("StartRender");
-  if (controller == NULL)
-    {
-    return;
-    }
   // Make sure they all swp buffers at the same time.
-  renWin->SwapBuffersOff();
+  this->RenderWindow->SwapBuffersOff();
 
   // All this just gets information to send to the satellites.  
   vtkRenderWindow* renWin = this->RenderWindow;
@@ -341,10 +339,10 @@ void vtkMultiDisplayManager::ClientStartRender()
   lc = ren->GetLights();
   lc->InitTraversal();
   light = lc->GetNextItem();
-  cam->GetPosition(renInfo.CameraPosition);
-  cam->GetFocalPoint(renInfo.CameraFocalPoint);
-  cam->GetViewUp(renInfo.CameraViewUp);
-  cam->GetClippingRange(renInfo.CameraClippingRange);
+  cam->GetPosition(info.CameraPosition);
+  cam->GetFocalPoint(info.CameraFocalPoint);
+  cam->GetViewUp(info.CameraViewUp);
+  cam->GetClippingRange(info.CameraClippingRange);
   info.CameraViewAngle = cam->GetViewAngle();
   if (cam->GetParallelProjection())
     {
@@ -362,12 +360,11 @@ void vtkMultiDisplayManager::ClientStartRender()
   ren->GetBackground(info.Background);
 
 
-
   // Trigger the satellite processes to start their render routine.  
-  if (this->SocketController && ! this->Controller)
+  if (this->SocketController)
     { // client... Send to root
-    this->SocketController->TriggerRMI(id, NULL, 0, 
-                     vtkMultiDisplayManager::ROOT_RENDER_RMI_TAG);
+    this->SocketController->TriggerRMI(1, NULL, 0, 
+                     vtkMultiDisplayManager::RENDER_RMI_TAG);
     this->SocketController->Send((float*)(&info), 24, 1, 
                      vtkMultiDisplayManager::INFO_TAG);
     }
@@ -382,11 +379,15 @@ void vtkMultiDisplayManager::ClientStartRender()
 // Only called on "root".
 void vtkMultiDisplayManager::RootStartRender(vtkPVMultiDisplayInfo info)
 {
+  int id, numProcs;
+
+  numProcs = this->Controller->GetNumberOfProcesses();
+
   // Every process (except "client") gets to participate.  
   for (id = 1; id < numProcs; ++id)
     {
     this->Controller->TriggerRMI(id, NULL, 0, 
-                     vtkMultiDisplayManager::SATELLITE_RENDER_RMI_TAG);
+                     vtkMultiDisplayManager::RENDER_RMI_TAG);
     this->Controller->Send((float*)(&info), 24, id,
                      vtkMultiDisplayManager::INFO_TAG);
     }
@@ -399,7 +400,7 @@ void vtkMultiDisplayManager::RootStartRender(vtkPVMultiDisplayInfo info)
 
 
 //-------------------------------------------------------------------------
-void vtkMultiDisplayManager::SatelliteStartRender(vtkMultiDisplayInfo info)
+void vtkMultiDisplayManager::SatelliteStartRender(vtkPVMultiDisplayInfo info)
 {
   vtkRendererCollection *rens;
   vtkRenderer* ren;
@@ -408,7 +409,6 @@ void vtkMultiDisplayManager::SatelliteStartRender(vtkMultiDisplayInfo info)
   vtkLight *light;
   vtkRenderWindow* renWin = this->RenderWindow;
   vtkMultiProcessController *controller = this->Controller;
-  vtkRenderWindow* renWin = this->RenderWindow;
 
   // Delay swapping buffers untill all processes are finished.
   if (this->Controller)
@@ -537,8 +537,6 @@ void vtkMultiDisplayManager::Composite()
   size[0] = (int)((float)rws[0] / (float)(this->ReductionFactor));
   size[1] = (int)((float)rws[1] / (float)(this->ReductionFactor));  
 
-  tdp = this->Schedule->Processes[myId];
-
   // We allocated with special mpiPro new so we do not need to copy.
 #ifdef MPIPROALLOC
   vtkCommunicator::SetUseCopy(0);
@@ -588,21 +586,16 @@ void vtkMultiDisplayManager::Composite()
     zData = NULL;
 
     // One stage of compositing.
-    tde = tdp->Elements[idx];
-    // make sure the correct tile is being composited.
-    if (tde && tde->TileId != idx)
-      {
-      vtkErrorMacro("Wrong tile rendered!");
-      }
-    if ( ! tde )
-      { // This only happens when numTiles == 1.
-      tileBuffers[idx] = buf;
-      }
-    else if ( ! tde->ReceiveFlag)
+    //if ( ! tde )
+    //  { // This only happens when numTiles == 1.
+    //  tileBuffers[idx] = buf;
+    //  }
+    if ( ! this->Schedule->GetElementReceiveFlag(myId, idx) )
       {
       // Send and recycle the buffer.
       vtkPVCompositeUtilities::SendBuffer(this->Controller, buf,
-                                          tde->OtherProcessId, 98);
+                                  this->Schedule->GetElementOtherProcessId(myId, idx), 
+                                  98);
       buf->Delete();
       buf = NULL;          
       }
@@ -610,7 +603,8 @@ void vtkMultiDisplayManager::Composite()
       {
       // Receive a buffer.
       buf2 = this->CompositeUtilities->ReceiveNewBuffer(this->Controller, 
-                                                 tde->OtherProcessId, 98);
+                                  this->Schedule->GetElementOtherProcessId(myId, idx), 
+                                  98);
       // This value is currently a conservative estimate.
       length = vtkPVCompositeUtilities::GetCompositedLength(buf, buf2);
       buf3 = this->CompositeUtilities->NewCompositeBuffer(length);
@@ -626,32 +620,31 @@ void vtkMultiDisplayManager::Composite()
     }
   
   // Do the rest of the compositing steps.
-  for (i = numberOfTiles; i < tdp->Length; i++) 
+  for (i = numberOfTiles; i < this->Schedule->GetNumberOfProcessElements(myId); i++) 
     {
-    tde = tdp->Elements[i];
-    if ( ! tde->ReceiveFlag)
+    if ( ! this->Schedule->GetElementReceiveFlag(myId, i))
       {
       // Send and recycle the buffer.
-      buf = tileBuffers[tde->TileId];
-      tileBuffers[tde->TileId] = NULL;
+      buf = tileBuffers[this->Schedule->GetProcessTileId(myId)];
+      tileBuffers[this->Schedule->GetProcessTileId(myId)] = NULL;
       vtkPVCompositeUtilities::SendBuffer(this->Controller, buf, 
-                                          tde->OtherProcessId, 99);
+                                  this->Schedule->GetElementOtherProcessId(myId, idx), 99);
       buf->Delete();          
       buf = NULL;
       }
     else
       {
-      buf = tileBuffers[tde->TileId];
-      tileBuffers[tde->TileId] = NULL;
+      buf = tileBuffers[this->Schedule->GetProcessTileId(myId)];
+      tileBuffers[this->Schedule->GetProcessTileId(myId)] = NULL;
       // Receive a buffer.
       buf2 = this->CompositeUtilities->ReceiveNewBuffer(this->Controller, 
-                                                 tde->OtherProcessId, 99);
+                                  this->Schedule->GetElementOtherProcessId(myId, idx), 99);
       // Length is a conservative estimate.
       length = vtkPVCompositeUtilities::GetCompositedLength(buf, buf2);
       buf3 = this->CompositeUtilities->NewCompositeBuffer(length);
       // Buf1 was allocated as full size.
       vtkPVCompositeUtilities::CompositeImagePair(buf, buf2, buf3);
-      tileBuffers[tde->TileId] = buf3;
+      tileBuffers[this->Schedule->GetProcessTileId(myId)] = buf3;
       buf3 = NULL;
       buf->Delete();
       buf2->Delete();
@@ -664,8 +657,8 @@ void vtkMultiDisplayManager::Composite()
 
   if (tileId >= 0)
     {
-    buf = tileBuffers[tdp->TileId];
-    tileBuffers[tdp->TileId] = NULL;
+    buf = tileBuffers[this->Schedule->GetProcessTileId(myId)];
+    tileBuffers[this->Schedule->GetProcessTileId(myId)] = NULL;
 
     // Recreate a buffer to hold the color data.
     pData = this->CompositeUtilities->NewUnsignedCharArray(size[0]*size[1], 3);
@@ -776,7 +769,7 @@ void vtkMultiDisplayManager::SetRenderWindow(vtkRenderWindow *renWin)
       vtkCallbackCommand *cbc;
       
       cbc= vtkCallbackCommand::New();
-      cbc->SetCallback(vtkMultiDisplayManagerStartRender);
+      cbc->SetCallback(vtkMultiDisplayManagerClientStartRender);
       cbc->SetClientData((void*)this);
       // renWin will delete the cbc when the observer is removed.
       this->StartTag = renWin->AddObserver(vtkCommand::StartEvent,cbc);
@@ -816,6 +809,7 @@ void vtkMultiDisplayManager::SetController(vtkMultiProcessController *mpc)
 }
 
 
+
 //-------------------------------------------------------------------------
 void vtkMultiDisplayManager::SetSocketController(vtkSocketController *mpc)
 {
@@ -853,7 +847,7 @@ void vtkMultiDisplayManager::InitializeRMIs()
     return;
     }
 
-  this->Controller->AddRMI(vtkMultiDisplayManagerRenderRMI, (void*)this, 
+  this->Controller->AddRMI(vtkMultiDisplayManagerSatelliteStartRender, (void*)this, 
                            vtkMultiDisplayManager::RENDER_RMI_TAG); 
 
 }
@@ -901,7 +895,7 @@ void vtkMultiDisplayManager::PrintSelf(ostream& os, vtkIndent indent)
 
   if (this->Schedule)
     {
-    this->Schedule->Print(os, indent);
+    this->Schedule->PrintSelf(os, indent);
     }
 
   os << indent << "CompositeUtilities: \n";

@@ -64,6 +64,7 @@ public:
   // Description:
   // Always collect when using LOD
   virtual void InteractiveRender();
+  virtual void StillRender();
 
 protected:
   vtkPVMultiDisplayRenderModule();

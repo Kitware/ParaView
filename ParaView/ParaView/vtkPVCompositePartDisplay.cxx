@@ -61,7 +61,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCompositePartDisplay);
-vtkCxxRevisionMacro(vtkPVCompositePartDisplay, "1.2");
+vtkCxxRevisionMacro(vtkPVCompositePartDisplay, "1.3");
 
 
 //----------------------------------------------------------------------------
@@ -131,13 +131,8 @@ void vtkPVCompositePartDisplay::CreateParallelTclObjects(vtkPVApplication *pvApp
                            pvApp->GetNumberOfPipes());
     }
   else if (pvApp->GetUseTiledDisplay())
-    {
-    int numProcs = pvApp->GetController()->GetNumberOfProcesses();
-    int* dims = pvApp->GetTileDimensions();
+    { // I would like to get this condition into the subclass.
     pvApp->BroadcastScript("vtkPVDuplicatePolyData %s", tclName);
-    pvApp->BroadcastScript("%s InitializeSchedule %d %d", tclName,
-                           numProcs, dims[0]*dims[1]);
-    // Initialize collection descision here. (When we have rendering module).
     }
   else
     {

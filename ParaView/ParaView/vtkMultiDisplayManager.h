@@ -32,11 +32,14 @@
 
 class vtkRenderWindow;
 class vtkMultiProcessController;
+class vtkSocketController;
 class vtkRenderer;
+class vtkCamera;
 class vtkTiledDisplaySchedule;
 class vtkPVCompositeUtilities;
 class vtkFloatArray;
 class vtkUnsignedCharArray;
+class vtkPVMultiDisplayInfo;
 
 class VTK_EXPORT vtkMultiDisplayManager : public vtkObject
 {
@@ -53,11 +56,8 @@ public:
 
   // Description:
   // Callbacks that initialize and finish the compositing.
-  virtual void StartRender();
   virtual void EndRender();
-  virtual void SatelliteStartRender();
   virtual void SatelliteEndRender();
-  void RenderRMI();
   
   // Description:
   // If the user wants to handle the event loop, then they must call this
@@ -73,6 +73,11 @@ public:
   vtkGetObjectMacro(Controller, vtkMultiProcessController);
 
   // Description:
+  // Set/Get the controller use to send final image to client
+  void SetSocketController(vtkSocketController* controller);
+  vtkGetObjectMacro(SocketController, vtkSocketController);
+
+  // Description:
   // Methods that are not used at the moment.
   virtual void SetRenderView(vtkObject*);
 
@@ -85,8 +90,7 @@ public:
 //BTX
   enum Tags {
     RENDER_RMI_TAG=12721,
-    WIN_INFO_TAG=22134,
-    REN_INFO_TAG=22135
+    INFO_TAG=22135
   };
 //ETX
 
@@ -117,12 +121,26 @@ public:
   // Just used for debugging.
   vtkGetObjectMacro(CompositeUtilities,vtkPVCompositeUtilities);
 
+  // Description:
+  // Working toward general displays.
+  void ComputeCamera(float *o, float *x, float *y,
+                     float *p, vtkCamera* cam);
+
+  // Description:
+  // Internal, but public for RMI/Callbacks.
+//BTX
+  void ClientStartRender();
+  void RootStartRender(vtkPVMultiDisplayInfo info);
+  void SatelliteStartRender(vtkPVMultiDisplayInfo info);
+
+//ETX
 protected:
   vtkMultiDisplayManager();
   ~vtkMultiDisplayManager();
   
   vtkRenderWindow* RenderWindow;
   vtkMultiProcessController* Controller;
+  vtkSocketController* SocketController;
 
   // For managing buffers.
   vtkPVCompositeUtilities* CompositeUtilities;

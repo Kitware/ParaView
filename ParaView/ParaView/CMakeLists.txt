@@ -10,6 +10,7 @@ SET( ParaView_SRCS
   vtkKWBoundsDisplay.cxx
   vtkKWExtractGeometryByScalar.cxx
   vtkMergeArrays.cxx
+  vtkMultiDisplayManager.cxx
   vtkMultiOut.cxx
   vtkMultiOut2.cxx
   vtkMultiOut3.cxx

@@ -26,7 +26,7 @@
 #include "vtkSocketController.h"
 #include "vtkTiledDisplaySchedule.h"
 
-vtkCxxRevisionMacro(vtkPVDuplicatePolyData, "1.3");
+vtkCxxRevisionMacro(vtkPVDuplicatePolyData, "1.4");
 vtkStandardNewMacro(vtkPVDuplicatePolyData);
 
 vtkCxxSetObjectMacro(vtkPVDuplicatePolyData,Controller, vtkMultiProcessController);
@@ -44,6 +44,7 @@ vtkPVDuplicatePolyData::vtkPVDuplicatePolyData()
   this->SocketController = NULL;
   this->ClientFlag = 0;
   this->PassThrough = 0;
+  this->ZeroEmpty = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -61,8 +62,7 @@ vtkPVDuplicatePolyData::~vtkPVDuplicatePolyData()
 //-----------------------------------------------------------------------------
 void vtkPVDuplicatePolyData::InitializeSchedule(int numProcs, int numTiles)
 {
-  // The -1 is for zeroEmpty.
-  this->Schedule->InitializeTiles(numTiles, (numProcs-1));
+  this->Schedule->InitializeTiles(numTiles, (numProcs-this->ZeroEmpty));
 }
 
 //-----------------------------------------------------------------------------
@@ -106,12 +106,6 @@ void vtkPVDuplicatePolyData::Execute()
   vtkAppendPolyData** appendFilters;
   vtkPolyData* tmp;
 
-  if (this->SocketController && this->ClientFlag)
-    {
-    this->ClientExecute();
-    return;
-    }
-
   if (input == NULL)
     {
     vtkErrorMacro("Input has not been set.");
@@ -119,29 +113,26 @@ void vtkPVDuplicatePolyData::Execute()
     }
 
   // Take this path if memory size is too large.
-  if (this->Controller == NULL || this->PassThrough)
+  if (this->PassThrough)
     {
     output->CopyStructure(input);
     output->GetPointData()->PassData(input->GetPointData());
     output->GetCellData()->PassData(input->GetCellData());
-    if (this->SocketController && ! this->ClientFlag)
-      {
-      this->SocketController->Send(output, 1, 18732);
-      }
     return;
     }
-  
-  myId = this->Controller->GetLocalProcessId();
-  if (myId == 0)
+
+  // Remote (socket) process as client.
+  if (this->SocketController && this->ClientFlag)
     {
-    // Copy to zero also (eventhough zeroEmpty). (it is small).
-    tmp = vtkPolyData::New();
-    this->Controller->Receive(tmp, 1, 12333);
-    output->CopyStructure(tmp);
-    output->GetPointData()->PassData(tmp->GetPointData());
-    output->GetCellData()->PassData(tmp->GetCellData());
-    tmp->Delete();
-    tmp = NULL;
+    this->ClientExecute(this->SocketController);
+    return;
+    }
+  // MPIRoot as client.
+  // Subset of satellites for zero empty.
+  myId = this->Controller->GetLocalProcessId() - this->ZeroEmpty;
+  if (myId < 0)
+    {
+    this->ClientExecute(this->Controller);
     return;
     }
 
@@ -152,7 +143,6 @@ void vtkPVDuplicatePolyData::Execute()
     }
 
   // For zeroEmpty condition.
-  myId = myId -1;
   numElements = this->Schedule->GetNumberOfProcessElements(myId);
   for (idx = 0; idx < numElements; ++idx)
     {
@@ -228,34 +218,38 @@ void vtkPVDuplicatePolyData::Execute()
     }
   delete [] appendFilters;
 
-  // zeroEmpty case.
-  // Remember: myId was decremented.
+  // Send final results to client
+  // Remember: myId may have been decremented.
   if (myId == 0)
     {
-    this->Controller->Send(output, 0, 12333);
-    }
-
-  // Not worrying about client server yet. .......
-  if (this->SocketController && ! this->ClientFlag)
-    {
-    this->SocketController->Send(output, 1, 18732);
+    if (this->ZeroEmpty)
+      {
+      this->Controller->Send(output, 0, 11872);
+      }
+    else
+      {
+      this->SocketController->Send(output, 1, 11872);
+      }
     }
 }
 
 
 //-----------------------------------------------------------------------------
-void vtkPVDuplicatePolyData::ClientExecute()
+void vtkPVDuplicatePolyData::ClientExecute(vtkMultiProcessController* controller)
 {
   vtkPolyData *output = this->GetOutput();
   vtkPolyData *tmp = vtkPolyData::New();
 
   // No data is on the client, so we just have to get the data
   // from node 0 of the server.
-  this->SocketController->Receive(tmp, 1, 18732);
+  controller->Receive(tmp, 1, 11872);
   output->CopyStructure(tmp);
   output->GetPointData()->PassData(tmp->GetPointData());
   output->GetCellData()->PassData(tmp->GetCellData());
+  tmp->Delete();
+  tmp = NULL;
 }
+
 
 
 //-----------------------------------------------------------------------------
@@ -276,5 +270,6 @@ void vtkPVDuplicatePolyData::PrintSelf(ostream& os, vtkIndent indent)
     }
 
   os << indent << "PassThrough: " << this->PassThrough << endl;
+  os << indent << "ZeroEmpty: " << this->ZeroEmpty << endl;
 }
 

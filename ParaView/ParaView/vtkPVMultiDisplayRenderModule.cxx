@@ -53,7 +53,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVMultiDisplayRenderModule);
-vtkCxxRevisionMacro(vtkPVMultiDisplayRenderModule, "1.3");
+vtkCxxRevisionMacro(vtkPVMultiDisplayRenderModule, "1.4");
 
 
 
@@ -116,6 +116,96 @@ vtkPVPartDisplay* vtkPVMultiDisplayRenderModule::CreatePartDisplay()
 // This is almost an exact duplicate of the superclass.
 // Think about reorganizing methods to reduce code duplication.
 // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+//----------------------------------------------------------------------------
+void vtkPVMultiDisplayRenderModule::StillRender()
+{
+  vtkObject* object;
+  vtkPVCompositePartDisplay* pDisp;
+  vtkPVLODPartDisplayInformation* info;
+  unsigned long totalMemory = 0;
+  int localRender;
+
+  // Find out whether we are going to render localy.
+  this->PartDisplays->InitTraversal();
+  while ( (object = this->PartDisplays->GetNextItemAsObject()) )
+    {
+    pDisp = vtkPVCompositePartDisplay::SafeDownCast(object);
+    if (pDisp->GetVisibility())
+      {
+      // This updates if required (collection disabled).
+      info = pDisp->GetInformation();
+      totalMemory += info->GetGeometryMemorySize();
+      }
+    }
+  localRender = 0;
+  if ((float)(totalMemory)/1000.0 < this->GetCollectThreshold())
+    {
+    localRender = 1;
+    }
+  // Change the collection flags and update.
+  this->PartDisplays->InitTraversal();
+  while ( (object = this->PartDisplays->GetNextItemAsObject()) )
+    {
+    pDisp = vtkPVCompositePartDisplay::SafeDownCast(object);
+    if (pDisp->GetVisibility())
+      {
+      pDisp->SetCollectionDecision(localRender);
+      pDisp->Update();
+      }
+    }
+
+  // Switch the compositer to local/composite mode.
+  if (this->LocalRender != localRender)
+    {
+    if (this->CompositeTclName)
+      {
+      if (localRender)
+        {
+        this->PVApplication->Script("%s UseCompositingOff", this->CompositeTclName);
+        }
+      else
+        {
+        this->PVApplication->Script("%s UseCompositingOn", this->CompositeTclName);
+        }
+      this->LocalRender = localRender;
+      }
+    }
+
+
+  // Still Render can get called some funky ways.
+  // Interactive renders get called through the PVInteractorStyles
+  // which cal ResetCameraClippingRange on the Renderer.
+  // We could convert them to call a method on the module directly ...
+  this->Renderer->ResetCameraClippingRange();
+
+  this->RenderWindow->SetDesiredUpdateRate(0.002);
+  // this->GetPVWindow()->GetInteractor()->GetStillUpdateRate());
+
+  this->GetPVApplication()->SetGlobalLODFlag(0);
+
+  // This is the only thing I believe makes a difference
+  // for this sublcass !!!!!!
+  if ( ! localRender)
+    {
+    // A bit of a hack to have client use LOD 
+    // which may be different than satellites.
+    this->GetPVApplication()->SetGlobalLODFlagInternal(1);
+    }
+
+  vtkTimerLog::MarkStartEvent("Still Render");
+  this->RenderWindow->Render();
+  vtkTimerLog::MarkEndEvent("Still Render");
+
+  // If we do not restore the consistent original value,
+  // it will get stuck in high res on satellites.
+  if ( ! localRender)
+    {
+    this->GetPVApplication()->SetGlobalLODFlagInternal(0);
+    }
+}
+
+
+//----------------------------------------------------------------------------
 void vtkPVMultiDisplayRenderModule::InteractiveRender()
 {
   vtkObject* object;
@@ -173,11 +263,15 @@ void vtkPVMultiDisplayRenderModule::InteractiveRender()
     pDisp = vtkPVCompositePartDisplay::SafeDownCast(object);
     if (pDisp->GetVisibility())
       {
-      if (useLOD)
-        {
-        pDisp->SetLODCollectionDecision(localRender);
-        }
-      else
+      // What we are really doing here is a little opaque.
+      // First setting the part display's LODCollectionDescision
+      // does nothing (the value is ignored).  The LOD
+      // always collects.
+      // The only special case we have to consider is 
+      // rendering full res model but not collecting.
+      // In this condition, the client renders the collected LOD,
+      // but the satellites render their parition of the full res.
+      if ( ! useLOD)
         {
         pDisp->SetCollectionDecision(localRender);
         }
@@ -218,9 +312,26 @@ void vtkPVMultiDisplayRenderModule::InteractiveRender()
     this->ComputeReductionFactor();
     }
 
+  // This is the only thing I believe makes a difference
+  // for this sublcass !!!!!!
+  if ( ! localRender)
+    {
+    // A bit of a hack to have client use LOD 
+    // which may be different than satellites.
+    this->GetPVApplication()->SetGlobalLODFlagInternal(1);
+    }
+
   vtkTimerLog::MarkStartEvent("Interactive Render");
   this->RenderWindow->Render();
   vtkTimerLog::MarkEndEvent("Interactive Render");
+
+  // If we do not restore the consistent original value,
+  // it will get stuck in high res on satellites.
+  if ( ! localRender)
+    {
+    this->GetPVApplication()->SetGlobalLODFlagInternal(useLOD);
+    }
+
 
 }
 

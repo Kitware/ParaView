@@ -169,12 +169,7 @@ int MyMain(int argc, char *argv[])
 
   // Create the process module for initializing the processes.
   // Only the root server processes args.
-  if (app->GetUseTiledDisplay())
-    {
-    vtkPVClientServerModule *processModule = vtkPVClientServerModule::New();
-    pm = processModule;
-    }
-  else if (app->GetClientMode() || serverMode) 
+  if (app->GetClientMode() || serverMode) 
     {
     vtkPVClientServerModule *processModule = vtkPVClientServerModule::New();
     pm = processModule;

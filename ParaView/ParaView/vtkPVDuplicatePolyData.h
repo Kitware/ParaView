@@ -70,6 +70,13 @@ public:
   vtkGetMacro(PassThrough,int);
   vtkBooleanMacro(PassThrough,int);
 
+  // Description:
+  // This flag should be set on all processes when MPI root
+  // is used as client.
+  vtkSetMacro(ZeroEmpty,int);
+  vtkGetMacro(ZeroEmpty,int);
+  vtkBooleanMacro(ZeroEmpty,int);
+
 protected:
   vtkPVDuplicatePolyData();
   ~vtkPVDuplicatePolyData();
@@ -77,7 +84,7 @@ protected:
   // Data generation method
   void ComputeInputUpdateExtents(vtkDataObject *output);
   void Execute();
-  void ClientExecute();
+  void ClientExecute(vtkMultiProcessController* controller);
   void ExecuteInformation();
 
   vtkMultiProcessController *Controller;
@@ -88,6 +95,7 @@ protected:
   int ClientFlag;
 
   int PassThrough;
+  int ZeroEmpty;
 
 private:
   vtkPVDuplicatePolyData(const vtkPVDuplicatePolyData&); // Not implemented

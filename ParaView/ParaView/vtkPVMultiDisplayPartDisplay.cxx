@@ -42,11 +42,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVMultiDisplayPartDisplay.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
+#include "vtkMultiProcessController.h"
 
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVMultiDisplayPartDisplay);
-vtkCxxRevisionMacro(vtkPVMultiDisplayPartDisplay, "1.3");
+vtkCxxRevisionMacro(vtkPVMultiDisplayPartDisplay, "1.4");
 
 
 //----------------------------------------------------------------------------
@@ -73,15 +74,29 @@ void vtkPVMultiDisplayPartDisplay::CreateParallelTclObjects(vtkPVApplication *pv
 {
   this->Superclass::CreateParallelTclObjects(pvApp);
 
-  // Connect up full res path to LOD pipeline on local process.
-  if (this->LODCollectTclName)
+  // Special case when TileDisplay is not running client server.
+  if ( ! pvApp->GetClientMode())
     {
-    pvApp->Script("%s SetInput [%s GetOutput]", 
-                  this->UpdateSuppressorTclName, 
-                  this->LODCollectTclName);
+    pvApp->BroadcastScript("%s ZeroEmptyOn; %s ZeroEmptyOn",
+                          this->CollectTclName,
+                          this->LODCollectTclName);
+    int* dims = pvApp->GetTileDimensions();
+    int numProcs = pvApp->GetController()->GetNumberOfProcesses();
+    pvApp->BroadcastScript("%s InitializeSchedule %d %d; %s InitializeSchedule %d %d", 
+                           this->CollectTclName, numProcs, dims[0]*dims[1],
+                           this->LODCollectTclName, numProcs, dims[0]*dims[1]);
+
+    // Broadcast for subclasses.  
+    pvApp->BroadcastScript("%s SetUpdateNumberOfPieces [expr {[[$Application GetProcessModule] GetNumberOfPartitions]-1}]",
+                          this->LODUpdateSuppressorTclName);
+    pvApp->BroadcastScript("%s SetUpdatePiece [expr {[[$Application GetProcessModule] GetPartitionId]-1}]",
+                          this->LODUpdateSuppressorTclName);
+    pvApp->BroadcastScript("%s SetUpdateNumberOfPieces [expr {[[$Application GetProcessModule] GetNumberOfPartitions]-1}]",
+                          this->UpdateSuppressorTclName);
+    pvApp->BroadcastScript("%s SetUpdatePiece [expr {[[$Application GetProcessModule] GetPartitionId]-1}]",
+                          this->UpdateSuppressorTclName);
+    // Local pipeline has no data, or all of the data?
     }
-
-
 }
 
 //----------------------------------------------------------------------------

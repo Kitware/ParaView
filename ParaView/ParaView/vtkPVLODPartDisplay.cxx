@@ -63,7 +63,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLODPartDisplay);
-vtkCxxRevisionMacro(vtkPVLODPartDisplay, "1.2");
+vtkCxxRevisionMacro(vtkPVLODPartDisplay, "1.3");
 
 
 
@@ -190,7 +190,6 @@ void vtkPVLODPartDisplay::CreateParallelTclObjects(vtkPVApplication *pvApp)
   pvApp->BroadcastScript("%s SetLODMapper %s", this->PropTclName,
                          this->LODMapperTclName);
   
-  // Broadcast for subclasses.  
   // Broadcast for subclasses.  
   pvApp->BroadcastScript("%s SetUpdateNumberOfPieces [[$Application GetProcessModule] GetNumberOfPartitions]",
                         this->LODUpdateSuppressorTclName);
