@@ -96,17 +96,6 @@ set kw(vtkTemp1225) [$kw(vtkTemp1191) GetPVWidget {Toroidal}]
 $kw(vtkTemp1225) SetState 1
 $kw(vtkTemp1191) AcceptCallback
 set kw(vtkTemp1333) [$kw(vtkTemp1) CreatePVSource GroupParts]
-$kw(vtkTemp572) SetVisibility 0
-set kw(vtkTemp708) [$kw(vtkTemp666) GetPVOutput]
-$kw(vtkTemp708) SetVisibility 0
-set kw(vtkTemp836) [$kw(vtkTemp802) GetPVOutput]
-$kw(vtkTemp836) SetVisibility 0
-set kw(vtkTemp961) [$kw(vtkTemp930) GetPVOutput]
-$kw(vtkTemp961) SetVisibility 0
-set kw(vtkTemp1097) [$kw(vtkTemp1055) GetPVOutput]
-$kw(vtkTemp1097) SetVisibility 0
-set kw(vtkTemp1239) [$kw(vtkTemp1191) GetPVOutput]
-$kw(vtkTemp1239) SetVisibility 0
 set kw(vtkTemp1339) [$kw(vtkTemp1333) GetPVWidget {inputs}]
 $kw(vtkTemp1339) AllOffCallback
 $kw(vtkTemp1339) SetSelectState $kw(vtkTemp544) 1
@@ -126,7 +115,7 @@ $kw(vtkTemp1490) SetSelectState 4 0
 $kw(vtkTemp1490) SetSelectState 5 1
 $kw(vtkTemp1484) AcceptCallback
 $kw(vtkTemp17) SetRendererBackgroundColor 0.000000 0.000000 0.000000
-$kw(vtkTemp572) SetVisibility 1
+$kw(vtkTemp544) SetVisibility 1
 set kw(vtkTemp1612) [$kw(vtkTemp1) CreatePVSource ElevationFilter]
 $kw(vtkTemp17) SetCameraState 3.582 -1.893 4.982  0.989 0.381 -0.476  -0.722 0.446 0.529
 set kw(vtkTemp1623) [$kw(vtkTemp1612) GetPVWidget {Line}]

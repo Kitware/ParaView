@@ -18,6 +18,8 @@ if { [catch {set fp [open "out.txt" w]}] != 0 } {
 
 
 proc AdjustContourValue { cnt val } {
+    global pvWindow
+    $pvWindow SetCurrentPVSource $cnt
     set entry [$cnt GetPVWidget {Contour Values}]
     $entry RemoveAllValues
     $entry AddValue $val
@@ -87,14 +89,12 @@ $pvGlyph AcceptCallback
 [$pvGlyph GetPVOutput] SetVisibility 0
 
 
-set cntOutput [$cInt GetPVOutput]
-
 set MainView [[$Application GetMainWindow] GetMainView]
 $MainView SetCameraState -29.1076 -40.3242 38.8874 8.255 0 29.7631 -0.00809309 0.227813 0.973671
 
 # Vary isosuface
-$cntOutput SetVisibility 1
-[$kw(vtkTemp292) GetPVOutput] SetVisibility 1
+$cInt SetVisibility 1
+$kw(vtkTemp292) SetVisibility 1
 
 set start 0.2
 set end 0.7
@@ -103,12 +103,13 @@ set incr [expr ($end - $start)/$num]
 for {set i 0} {$i < $num} {incr i 1} {
     set val [expr $start + $i * $incr]
     AdjustContourValue $cInt $val 
-
 }
 
 # Rotate isosuface
 AdjustContourValue $cInt 0.3
 
+$pvWindow SetCurrentPVSource $cInt
+set cntOutput [$cInt GetPVOutput]
 $cntOutput ColorByPointField Momentum 3
 $cntOutput SetScalarBarVisibility 1
 $cInt UpdateParameterWidgets
@@ -122,23 +123,27 @@ for {set i 0} {$i < 1} {incr i 1} {
     update
 }
 
-$cntOutput SetVisibility 0
+$cInt SetVisibility 0
 $cntOutput SetScalarBarVisibility 0
 
 # Here goes cut-plane (see end of this file)
 
 $MainView SetCameraState -28.8139 1.07506 33.8794 26.5733 -0.117269 27.8723 0.10793 0.00506272 0.994146
 
+
+$pvWindow SetCurrentPVSource $pvExtract
 $VOIEntry SetValue 0 56 0 32 0 0 
 $pvExtract AcceptCallback
 
 [$pvExtract GetPVOutput] SetVisibility 1
 
+$pvWindow SetCurrentPVSource $pvGlyph
 [$pvGlyph GetPVOutput] SetVisibility 1
 [$pvGlyph GetPVOutput] ColorByProperty
 
 $MainView SetCameraState 36.8437 -0.196199 53.7392 -5.92921 -0.324064 18.022 -0.639592 -0.0625532 0.766165
 
+$pvWindow SetCurrentPVSource $pvExtract
 $VOIEntry SetValue 0 0 0 32 3 20
 $pvExtract AcceptCallback
 [[$Application GetMainWindow] GetMainView] Render
@@ -147,6 +152,7 @@ set extOutput [$pvExtract GetPVOutput]
 $extOutput ColorByPointField {Density} 1
 $extOutput SetScalarBarVisibility 1
 
+$pvWindow SetCurrentPVSource $pvExtract
 for {set i 55} {$i < 56} {incr i 1} {
     $VOIEntry SetValue $i $i 0 32 3 20
     $pvExtract AcceptCallback

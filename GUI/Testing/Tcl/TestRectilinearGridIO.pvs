@@ -46,7 +46,7 @@ $kw(vtkTemp328) AddValue 5.0
 set kw(vtkTemp1029) [$kw(vtkTemp319) GetPVWidget {Compute Scalars}]
 $kw(vtkTemp1029) SetState 1
 $kw(vtkTemp319) AcceptCallback
-[$kw(vtkTemp319) GetPVOutput] SetColorRange 0 10
+[$kw(vtkTemp319) GetPVColorMap] SetScalarRange 0 10
 
 source [file join [file dirname [info script]] Compare.tcl]
 Compare $Application $argv $argc

@@ -32,7 +32,7 @@ set kw(vtkTemp1029) [$pv(vtkTemp187) GetPVWidget {Compute Scalars}]
 $kw(vtkTemp1029) SetState 1
 $pv(vtkTemp187) AcceptCallback
 
-[$pv(vtkTemp187) GetPVOutput] SetColorRange 0 3926
+[$pv(vtkTemp187) GetPVColorMap] SetScalarRange 0 3926
 
 set MainView [[$Application GetMainWindow] GetMainView]
 $MainView SetCameraState 31.5 250.821 20.5266 31.5 31.5 31.5 0 -0.049971 -0.998751

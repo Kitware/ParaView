@@ -8,11 +8,13 @@ $kw(vtkTemp16) SetOrientationAxesVisibility 0
 
 set kw(vtkTemp224) [$kw(vtkTemp1) CreatePVSource ConeSource]
 $kw(vtkTemp224) AcceptCallback
+
 set kw(vtkTemp260) [$kw(vtkTemp1) CreatePVSource ElevationFilter]
 set kw(vtkTemp999) [$kw(vtkTemp260) GetPVWidget {Line}]
 $kw(vtkTemp999) SetPoint1 0 0 0
 $kw(vtkTemp999) SetPoint2 0 0 1
 $kw(vtkTemp260) AcceptCallback
+
 set kw(vtkTemp294) [$kw(vtkTemp260) GetPVOutput]
 set kw(vtkTemp336) [$kw(vtkTemp1) GetPVColorMap {Elevation} 1]
 $kw(vtkTemp336) SetColorSchemeToBlueRed
@@ -29,21 +31,20 @@ $kw(vtkTemp294) SetInterpolationToGouraud
 $kw(vtkTemp294) ColorByProperty
 $kw(vtkTemp294) ChangeActorColor 1.000000 0.070588 1.000000
 $kw(vtkTemp294) ColorByPointField {Elevation} 1
-$kw(vtkTemp294) SetColorRange 0.100000 0.433010
-$kw(vtkTemp294) SetColorRange 0.200000 0.433010
-$kw(vtkTemp294) SetColorRange 0.000000 0.433010
-$kw(vtkTemp294) SetColorRange 0.300000 0.433010
+$kw(vtkTemp336) SetScalarRange 0.100000 0.433010
+$kw(vtkTemp336) SetScalarRange 0.200000 0.433010
+$kw(vtkTemp336) SetScalarRange 0.000000 0.433010
+$kw(vtkTemp336) SetScalarRange 0.300000 0.433010
 $kw(vtkTemp336) SetColorSchemeToBlueRed
-$kw(vtkTemp294) SetColorRange 0.300000 0.433010
+$kw(vtkTemp336) SetScalarRange 0.300000 0.433010
 $kw(vtkTemp336) SetColorSchemeToRedBlue
-$kw(vtkTemp294) SetColorRange 0.300000 0.433010
-$kw(vtkTemp294) SetColorRange 0.300000 0.433010
+$kw(vtkTemp336) SetScalarRange 0.300000 0.433010
+$kw(vtkTemp336) SetScalarRange 0.300000 0.433010
 $kw(vtkTemp294) SetInterpolateColorsFlag 0
-$kw(vtkTemp294) SetCubeAxesVisibility 1
-$kw(vtkTemp294) SetScalarBarVisibility 1
+$kw(vtkTemp260) SetCubeAxesVisibility 1
+$kw(vtkTemp336) SetScalarBarVisibility 1
 
 set kw(vtkTemp300) [$kw(vtkTemp1) CreatePVSource Glyph]
-$kw(vtkTemp294) SetColorRange 0.300000 0.433010
 set kw(vtkTemp97) [$kw(vtkTemp1) GetPVSource GlyphSources Arrow0]
 set kw(vtkTemp320) [$kw(vtkTemp300) GetPVWidget {Glyph}]
 $kw(vtkTemp320) SetCurrentValue $kw(vtkTemp97)
@@ -51,6 +52,7 @@ set kw(vtkTemp309) [$kw(vtkTemp300) GetPVWidget {OrientScale}]
 $kw(vtkTemp309) SetOrientMode Vector
 $kw(vtkTemp309) SetScaleFactor 1
 $kw(vtkTemp300) AcceptCallback
+[$kw(vtkTemp300) GetPVColorMap] SetScalarRange 0.300000 0.433010
 
 
 $kw(vtkTemp1) SetCurrentPVSourceCallback $kw(vtkTemp260)

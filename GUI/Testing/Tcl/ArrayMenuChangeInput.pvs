@@ -52,7 +52,7 @@ $kw(vtkTemp509) SetVisibility 1
 $kw(vtkTemp509) ColorByProperty
 
 
-
+$kw(vtkTemp1) SetCurrentPVSourceCallback $kw(vtkTemp273)
 set kw(vtkTemp309) [$kw(vtkTemp273) GetPVOutput]
 $kw(vtkTemp309) ColorByPointField {Normals} 3
 set kw(vtkTemp310) [$kw(vtkTemp309) GetPVColorMap]
@@ -63,6 +63,7 @@ $kw(vtkTemp310) ResetScalarRange
 # Lets see if the array menu has the correct value.
 # Create a text files with the current menu value.
 # out.txt is a special name
+$kw(vtkTemp1) SetCurrentPVSourceCallback $kw(vtkTemp482)
 if { [catch {set fp [open "out.txt" w]}] == 0 } {
   puts $fp [$kw(vtkTemp491) GetValue]
 }

@@ -67,7 +67,7 @@ $kw(vtkTemp1) SetCurrentPVSourceCallback $kw(vtkTemp349)
 set kw(vtkTemp366) [$kw(vtkTemp349) GetPVWidget {Compute Gradients}]
 $kw(vtkTemp366) SetState 1
 $kw(vtkTemp349) AcceptCallback
-[$kw(vtkTemp349) GetPVOutput] SetColorRange 0 255
+[$kw(vtkTemp349) GetPVColorMap] SetScalarRange 0 255
 $kw(vtkTemp21) SetCameraState -4.208 17.411 -13.986  15.000 15.000 15.000  0.631 0.687 -0.361
 $kw(vtkTemp21) SetCameraState 4.397 21.006 -17.657  15.000 15.000 15.000  0.743 0.658 -0.120
 $kw(vtkTemp1) SetCurrentPVSourceCallback $kw(vtkTemp400)

@@ -15,8 +15,8 @@ $kw(vtkTemp781) AcceptCallback
 $kw(vtkTemp19) SetCameraState 11.651 7.426 34.047  -1.750 -0.000 0.000  -0.152 0.976 -0.153
 set kw(vtkTemp973) [$kw(vtkTemp5) CreatePVSource CTHPart]
 set kw(vtkTemp813) [$kw(vtkTemp781) GetPVOutput]
-$kw(vtkTemp813) SetVisibility 1
-$kw(vtkTemp813) SetVisibility 0
+$kw(vtkTemp973) SetVisibility 1
+$kw(vtkTemp973) SetVisibility 0
 set kw(vtkTemp1007) [$kw(vtkTemp973) GetPVWidget {Input}]
 $kw(vtkTemp1007) SetCurrentValue $kw(vtkTemp781)
 set kw(vtkTemp980) [$kw(vtkTemp973) GetPVWidget {ArraySelection}]
