@@ -16,6 +16,8 @@
 #include "vtkPVSource.h"
 #include "vtkPVApplication.h"
 #include "vtkKWNotebook.h"
+#include "vtkPVApplicationSettingsInterface.h"
+#include "vtkPVWindow.h"
 #include "vtkPVInformationGUI.h"
 #include "vtkPVDisplayGUI.h"
 #include "vtkKWLabeledLabel.h"
@@ -28,14 +30,11 @@
 #include "vtkKWLabel.h"
 #include "vtkKWTkUtilities.h"
 
-#ifdef _WIN32
-# include "vtkKWRegisteryUtilities.h"
-#endif
-
+#define VTK_PV_AUTO_ACCEPT_REG_KEY "AutoAccept"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSourceNotebook);
-vtkCxxRevisionMacro(vtkPVSourceNotebook, "1.4");
+vtkCxxRevisionMacro(vtkPVSourceNotebook, "1.5");
 
 //----------------------------------------------------------------------------
 int vtkPVSourceNotebookCommand(ClientData cd, Tcl_Interp *interp,
@@ -167,6 +166,7 @@ void vtkPVSourceNotebook::UpdateEnableStateWithSource(vtkPVSource* pvs)
     }
 }
 
+//----------------------------------------------------------------------------
 void vtkPVSourceNotebook::UpdateEnableState()
 {
   this->PropagateEnableState(this->Notebook);
@@ -206,11 +206,6 @@ void vtkPVSourceNotebook::Create(vtkKWApplication* app, const char* args)
     {
     vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;
-    }
-
-  if (app->GetRegisteryValue(2, "RunTime", "AutoAccept", 0))
-    {
-    this->AutoAccept = app->GetIntRegisteryValue(2, "RunTime", "AutoAccept");
     }
     
   this->Notebook->SetParent(this);
@@ -314,8 +309,17 @@ void vtkPVSourceNotebook::Create(vtkKWApplication* app, const char* args)
   this->Script("pack %s -fill x -expand t", frame->GetWidgetName());  
   
   this->AcceptButton->SetParent(frame);
-  this->AcceptButton->Create(this->GetApplication(), 
-                             "-text Accept");
+  this->AcceptButton->Create(this->GetApplication(), "");
+  if (this->AutoAccept)
+    {
+    this->AcceptButton->SetLabel("Auto Accept");
+    this->Script("%s config -relief flat", this->AcceptButton->GetWidgetName());
+    }
+  else
+    {
+    this->AcceptButton->SetLabel("Accept");
+    this->Script("%s config -relief raised", this->AcceptButton->GetWidgetName());
+    }    
   this->AcceptButton->SetCommand(this, "AcceptButtonCallback");
   this->AcceptButton->SetBalloonHelpString(
     "Cause the current values in the user interface to take effect "
@@ -326,6 +330,13 @@ void vtkPVSourceNotebook::Create(vtkKWApplication* app, const char* args)
                                     "-image PVPullDownArrow");
   this->Script("place %s -relx 0 -rely 1 -x -5 -y 5 -anchor se", 
                 this->AcceptPullDownArrow->GetWidgetName());
+
+  if (app->GetRegisteryValue(2,"RunTime", 
+          VTK_PV_AUTO_ACCEPT_REG_KEY,0))
+    {
+    this->SetAutoAccept(app->GetIntRegisteryValue(2,"RunTime",
+                                  VTK_PV_AUTO_ACCEPT_REG_KEY));
+    }
 
   vtkKWMenu* menu = this->AcceptButton->GetMenu();
   char* var = menu->CreateRadioButtonVariable(this, "Auto");
@@ -378,16 +389,27 @@ void vtkPVSourceNotebook::SetAutoAccept(int val)
     {
     return;
     }
-    
-  // Save in the registery
-  vtkPVApplication* pvApp = this->GetPVApplication();
-  pvApp->SetRegisteryValue(2, "RunTime", "AutoAccept", 
-                             "%d", val);
   this->AutoAccept = val;
+
+ this->GetApplication()->SetRegisteryValue(
+   2, "RunTime", VTK_PV_AUTO_ACCEPT_REG_KEY, "%d", val);
+
+  // Synchronize the two auto accept guis.
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  vtkPVApplicationSettingsInterface* appInt = 
+      vtkPVApplicationSettingsInterface::SafeDownCast(
+        pvApp->GetMainWindow()->GetApplicationSettingsInterface());
+  appInt->SetAutoAccept(this->AutoAccept);
+
   if (val)
     {
+    this->AcceptButton->SetLabel("Auto Accept");
     // Just in case the source is already modified.
     this->AcceptButtonCallback();
+    }
+  else
+    {
+    this->AcceptButton->SetLabel("Accept");
     }
 }
 
@@ -414,6 +436,11 @@ void vtkPVSourceNotebook::DeleteButtonCallback()
     {
     this->PVSource->DeleteCallback();
     }
+
+  // In case this delete came from a half formed source 
+  // (accept not called yet).
+  this->ShowPage("Display");
+  this->ShowPage("Information");
 }
 
 //----------------------------------------------------------------------------
@@ -434,6 +461,12 @@ void vtkPVSourceNotebook::SetAcceptButtonColorToModified()
     this->AcceptButtonCallback();
     return;
     }
+    
+  if ( this->GetPVApplication()->GetMainWindow()->GetInDemo() )
+    {
+    return;
+    }
+  
   this->Script("%s configure -background #17b27e",
                this->AcceptButton->GetWidgetName());
   this->Script("%s configure -activebackground #17b27e",
