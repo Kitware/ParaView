@@ -55,6 +55,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class vtkTextMapper;
 class vtkImageMapToWindowLevelColors;
 class vtkImageActor;
+class vtkTextProperty;
 
 class VTK_EXPORT vtkCornerAnnotation : public vtkActor2D
 {
@@ -118,11 +119,18 @@ public:
   vtkSetMacro(LevelScale, float);
   vtkGetMacro(LevelScale, float);
   
+  // Description:
+  // Set/Get the text property of all corners.
+  virtual void SetTextProperty(vtkTextProperty *p);
+  vtkGetObjectMacro(TextProperty,vtkTextProperty);
+  
 protected:
   vtkCornerAnnotation();
   ~vtkCornerAnnotation();
 
   float MaximumLineHeight;
+
+  vtkTextProperty *TextProperty;
 
   vtkImageMapToWindowLevelColors *WindowLevel;
   float LevelShift;
