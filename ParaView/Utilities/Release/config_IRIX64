@@ -1,7 +1,38 @@
 PLATFORM="irix64"
 CC="cc"
 CXX="CC"
-CXXFLAGS="-ptused -no_prelink"
-CMAKE="/home/sci/itk/CMake-CC-dashboard/bin/cmake"
+CFLAGS="-64"
+CXXFLAGS="-ptused -no_prelink -64"
+LDFLAGS="-64"
+CMAKE="/home/sci/itk/CMake-CC64-dashboard/bin/cmake"
 MAKE="gmake -j 20"
 DISPLAY=:0.0
+
+write_cache()
+{
+    write_standard_cache
+    cat >> CMakeCache.txt <<EOF
+EXODUS_INCLUDE_DIR:PATH=/home/sci/itk/Exodus/include/
+EXODUS_LIBRARY:FILEPATH=/home/sci/itk/Exodus/sgi/libexoIIv2c-64.a
+NETCDF_LIBRARY:FILEPATH=/home/sci/itk/Exodus/sgi/libnetcdf-64.a
+EXODUS_SOURCE_DIR:PATH=/home/sci/itk/Exodus/vtkSNL/IO
+PARAVIEW_USE_EXODUS:BOOl=1
+
+SAF_DSL_LIBRARY:FILEPATH=/home/sci/itk/Exodus/saf_irix/lib/libdsl.a
+SAF_INCLUDE_DIR:PATH=/home/sci/itk/Exodus/saf_irix/include
+SAF_LIBRARY:FILEPATH=/home/sci/itk/Exodus/saf_irix/lib/libsafapi.a
+SAF_SOURCE_DIR:PATH=/home/sci/itk/Exodus/vtkSNL/IO
+SAF_VBT_LIBRARY:FILEPATH=/home/sci/itk/Exodus/saf_irix/lib/libvbt.a
+PARAVIEW_USE_SAF:BOOL=ON
+
+
+HDF5_INCLUDE_PATH:PATH=/home/sci/itk/Exodus/hdf_irix/include
+HDF5_INCLUDE_DIR:INTERNAL=/home/sci/itk/Exodus/hdf_irix/include
+HDF5_LIBRARY:INTERNAL=/home/sci/itk/Exodus/hdf_irix/lib/libhdf5.a
+XDMF_SYSTEM_HDF5:INTERNAL=1
+
+VTKSNL_SOURCE_DIR:PATH=/home/sci/itk/Exodus/vtkSNL
+
+EOF
+}
+
