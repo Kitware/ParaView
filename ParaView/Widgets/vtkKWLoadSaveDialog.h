@@ -80,11 +80,6 @@ public:
   vtkGetStringMacro( FileTypes );
 
   // Description:
-  // Set the initial directory for the dialog.
-  vtkSetStringMacro(InitialDir);
-  vtkGetStringMacro(InitialDir);
-
-  // Description:
   // Retrieve the file path that the user selected
   vtkGetStringMacro(FileName);
 
@@ -115,15 +110,16 @@ public:
   // Set/Get last path
   vtkGetStringMacro(LastPath);
   vtkSetStringMacro(LastPath);
+
+  // Description:
+  // Figure out last path out of the file name.
+  const char* GenerateLastPath(const char* path);
+
 protected:
-
-
   vtkKWLoadSaveDialog();
   ~vtkKWLoadSaveDialog();
 
-
   char *FileTypes;
-  char *InitialDir;  
   char *Title;
   char *FileName;
   char *DefaultExt;

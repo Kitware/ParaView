@@ -209,6 +209,7 @@ public:
   // Description:
   // Copy the trace file to a file with the specified file name.
   void SaveTrace();
+  void SaveTrace(const char*);
   
   // Description:
   // Save the state of ParaView as a Tcl script. Not implemented

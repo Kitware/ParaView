@@ -50,15 +50,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWEntry.h"
 #include "vtkKWEvent.h"
 #include "vtkKWLabel.h"
+#include "vtkKWLabeledFrame.h"
+#include "vtkKWLoadSaveDialog.h"
 #include "vtkKWMenu.h"
 #include "vtkKWMessageDialog.h"
 #include "vtkKWNotebook.h"
 #include "vtkKWPushButton.h"
 #include "vtkKWRadioButton.h"
 #include "vtkKWScale.h"
-#include "vtkKWTclInteractor.h"
-#include "vtkKWLabeledFrame.h"
 #include "vtkKWSplitFrame.h"
+#include "vtkKWTclInteractor.h"
 #include "vtkKWToolbar.h"
 #include "vtkLinkedList.txx"
 #include "vtkLinkedListIterator.txx"
@@ -1465,14 +1466,6 @@ int vtkPVWindow::CheckIfFileIsReadable(const char* fileName)
 // Prompts the user for a filename and calls Open().
 void vtkPVWindow::OpenCallback()
 {
-  char buffer[1024];
-  // Retrieve old path from the registery
-  if ( !this->GetApplication()->GetRegisteryValue(
-         2, "RunTime", "OpenPath", buffer) )
-    {
-    sprintf(buffer, ".");
-    }
-  
   char *openFileName = NULL;
 
   if (!this->FileExtensions)
@@ -1494,40 +1487,32 @@ void vtkPVWindow::OpenCallback()
     return;
     }
 
-  this->Script("set openFileName [tk_getOpenFile -initialdir {%s} "
-               "-filetypes {{{ParaView Files} {%s}} %s {{All Files} {*}}}]", 
-               buffer, this->FileExtensions, this->FileDescriptions);
+  ostrstream str;
+  str << "{{ParaView Files} {" << this->FileExtensions << "}} "
+      << this->FileDescriptions << " {{All Files} {*}}" << ends;
 
-  openFileName 
-    = vtkString::Duplicate(this->GetPVApplication()->GetMainInterp()->result);
-
-  if (strcmp(openFileName, "") == 0)
+  vtkKWLoadSaveDialog* loadDialog = vtkKWLoadSaveDialog::New();
+  this->RetrieveLastPath(loadDialog, "OpenPath");
+  loadDialog->Create(this->Application,"");
+  loadDialog->SetTitle("Open ParaView File");
+  loadDialog->SetDefaultExt(".vtk");
+  loadDialog->SetFileTypes(str.str());
+  str.rdbuf()->freeze(0);  
+  if ( loadDialog->Invoke() )
     {
-    return;
+    openFileName = vtkString::Duplicate(loadDialog->GetFileName());
     }
-
-  if  (this->Open(openFileName) != VTK_OK)
-    {
-    return;
-    }
-
+  
   // Store last path
   if ( openFileName && vtkString::Length(openFileName) > 0 )
     {
-    char *pth = vtkString::Duplicate(openFileName);
-    int pos = vtkString::Length(openFileName);
-    // Strip off the file name
-    while (pos && pth[pos] != '/' && pth[pos] != '\\')
+    if  (this->Open(openFileName) == VTK_OK)
       {
-      pos--;
+      this->SaveLastPath(loadDialog, "OpenPath");
       }
-    pth[pos] = '\0';
-    // Store in the registery
-    this->GetApplication()->SetRegisteryValue(
-      2, "RunTime", "OpenPath", pth);
-    delete [] pth;
     }
   
+  loadDialog->Delete();
   delete [] openFileName;
 }
 
@@ -1738,17 +1723,20 @@ void vtkPVWindow::WriteData()
 //----------------------------------------------------------------------------
 void vtkPVWindow::ExportVTKScript()
 {
-  char *filename;
-  
-  this->Script("tk_getSaveFile -filetypes {{{Tcl Scripts} {.tcl}} {{All Files} {.*}}} -defaultextension .tcl");
-  filename = this->Application->GetMainInterp()->result;
-  
-  if (strcmp(filename, "") == 0)
+  vtkKWLoadSaveDialog* exportDialog = vtkKWLoadSaveDialog::New();
+  this->RetrieveLastPath(exportDialog, "ExportVTKLastPath");
+  exportDialog->Create(this->Application,"");
+  exportDialog->SaveDialogOn();
+  exportDialog->SetTitle("Save VTK Script");
+  exportDialog->SetDefaultExt(".tcl");
+  exportDialog->SetFileTypes("{{Tcl Scripts} {.tcl}} {{All Files} {.*}}");
+  if ( exportDialog->Invoke() && 
+       vtkString::Length(exportDialog->GetFileName())>0)
     {
-    return;
+    this->SaveInTclScript(exportDialog->GetFileName(), 1, 0);
+    this->SaveLastPath(exportDialog, "ExportVTKLastPath");
     }
-
-  this->SaveInTclScript(filename, 1, 0);
+  exportDialog->Delete();
 }
 
 //----------------------------------------------------------------------------
@@ -2640,6 +2628,25 @@ void vtkPVWindow::CreateErrorLogDisplay()
 //----------------------------------------------------------------------------
 void vtkPVWindow::SaveTrace()
 {
+  vtkKWLoadSaveDialog* exportDialog = vtkKWLoadSaveDialog::New();
+  this->RetrieveLastPath(exportDialog, "SaveTracePath");
+  exportDialog->Create(this->Application,"");
+  exportDialog->SaveDialogOn();
+  exportDialog->SetTitle("Save ParaView Trace");
+  exportDialog->SetDefaultExt(".pvs");
+  exportDialog->SetFileTypes("{{ParaView Scripts} {.pvs}} {{All Files} {.*}}");
+  if ( exportDialog->Invoke() && 
+       vtkString::Length(exportDialog->GetFileName())>0)
+    {
+    this->SaveTrace(exportDialog->GetFileName());
+    this->SaveLastPath(exportDialog, "SaveTracePath");
+    }
+  exportDialog->Delete();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVWindow::SaveTrace(const char* filename)
+{
   ofstream *trace = this->GetPVApplication()->GetTraceFile();
   cout << trace << endl;
   if ( ! trace)
@@ -2647,15 +2654,8 @@ void vtkPVWindow::SaveTrace()
     return;
     }
   
-  char *filename;
-  
-  this->Script("tk_getSaveFile -filetypes {{{ParaView Script} {.pvs}}} -defaultextension .pvs");
-  cout << this->Application->GetMainInterp()->result << endl;
-  filename = vtkString::Duplicate(this->Application->GetMainInterp()->result);
-  
-  if (strcmp(filename, "") == 0)
+  if (vtkString::Length(filename) <= 0)
     {
-    delete [] filename;
     return;
     }
   

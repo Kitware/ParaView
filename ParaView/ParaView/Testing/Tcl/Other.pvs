@@ -21,4 +21,5 @@ foreach control { 1 2 } {
 	}
     }
 }
+$pvWindow SaveTrace "vtkParaViewTestTrace.pvs"
 

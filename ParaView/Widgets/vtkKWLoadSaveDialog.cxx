@@ -39,11 +39,11 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-#include "vtkKWApplication.h"
 #include "vtkKWLoadSaveDialog.h"
+
+#include "vtkKWApplication.h"
 #include "vtkObjectFactory.h"
-
-
+#include "vtkString.h"
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLoadSaveDialog );
@@ -52,7 +52,6 @@ vtkKWLoadSaveDialog::vtkKWLoadSaveDialog()
 {
   this->Done = 1;
   this->FileTypes = 0;
-  this->InitialDir = 0;
   this->Title = 0;
   this->FileName = 0;
   this->LastPath = 0;
@@ -62,13 +61,11 @@ vtkKWLoadSaveDialog::vtkKWLoadSaveDialog()
 
   this->SetTitle("Open Text Document");
   this->SetFileTypes("{{Text Document} {.txt}}");
-  this->SetInitialDir(".");
 }
 
 vtkKWLoadSaveDialog::~vtkKWLoadSaveDialog()
 {
   this->SetFileTypes(0);
-  this->SetInitialDir(0);
   this->SetTitle(0);
   this->SetFileName(0);
   this->SetDefaultExt(0);
@@ -96,17 +93,40 @@ int vtkKWLoadSaveDialog::Invoke()
                "-filetypes {%s} -initialdir {%s}", 
                (this->SaveDialog) ? "tk_getSaveFile" : "tk_getOpenFile", 
                this->Title, this->DefaultExt ? this->DefaultExt : "",
-               this->FileTypes, this->InitialDir);
+               this->FileTypes, this->LastPath);
   path = this->Application->GetMainInterp()->result;
   if ( path && strlen(path) )
     {
     this->SetFileName(path);
+    this->GenerateLastPath(path);
     this->Application->SetDialogUp(0);
     return 1;
     }
   this->SetFileName(0);
   this->Application->SetDialogUp(0);
   return 0;
+}
+
+//----------------------------------------------------------------------------
+const char* vtkKWLoadSaveDialog::GenerateLastPath(const char* path)
+{
+  this->SetLastPath(0);
+  // Store last path
+  if ( path && vtkString::Length(path) > 0 )
+    {
+    char *pth = vtkString::Duplicate(path);
+    int pos = vtkString::Length(path);
+    // Strip off the file name
+    while (pos && pth[pos] != '/' && pth[pos] != '\\')
+      {
+      pos--;
+      }
+    pth[pos] = '\0';
+    // Store in the registery
+    this->SetLastPath(pth);
+    delete [] pth;
+    }
+  return this->LastPath;
 }
 
 //----------------------------------------------------------------------------
@@ -118,8 +138,6 @@ void vtkKWLoadSaveDialog::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "FileName: " << (this->FileName?this->FileName:"none") 
      << endl;
   os << indent << "FileTypes: " << (this->FileTypes?this->FileTypes:"none") 
-     << endl;
-  os << indent << "InitialDir: " << (this->InitialDir?this->InitialDir:"none")
      << endl;
   os << indent << "LastPath: " << (this->LastPath?this->LastPath:"none")
      << endl;
