@@ -50,7 +50,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // ---------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWScale );
-vtkCxxRevisionMacro(vtkKWScale, "1.31.2.6");
+vtkCxxRevisionMacro(vtkKWScale, "1.31.2.7");
 
 int vtkKWScaleCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -79,6 +79,7 @@ vtkKWScale::vtkKWScale()
 
   this->Value      = 0;
   this->Resolution = 1;
+  this->EntryResolution = 2;
   this->Range[0]   = 0;
   this->Range[1]   = 1;  
 
@@ -90,6 +91,7 @@ vtkKWScale::vtkKWScale()
 
   this->DisplayEntryAndLabelOnTop = 1;
   this->PopupScale = 0;
+  this->ExpandEntry = 0;
 }
 
 // ---------------------------------------------------------------------------
@@ -242,7 +244,8 @@ void vtkKWScale::DisplayEntry()
   this->Entry = vtkKWEntry::New();
   this->Entry->SetParent(this);
   this->Entry->Create(this->Application, "-width 10");
-  this->Entry->SetValue(this->GetValue(), 2);
+  this->UpdateEntryResolution();
+  this->Entry->SetValue(this->GetValue(), this->EntryResolution);
 
   this->PackWidget();
   this->Bind();
@@ -277,6 +280,20 @@ void vtkKWScale::SetDisplayEntryAndLabelOnTop(int arg)
     }
 
   this->DisplayEntryAndLabelOnTop = arg;
+  this->Modified();
+
+  this->PackWidget();
+}
+
+// ---------------------------------------------------------------------------
+void vtkKWScale::SetExpandEntry(int arg)
+{
+  if (this->ExpandEntry == arg)
+    {
+    return;
+    }
+
+  this->ExpandEntry = arg;
   this->Modified();
 
   this->PackWidget();
@@ -320,8 +337,9 @@ void vtkKWScale::PackWidget()
     this->Script("pack forget %s", this->Entry->GetWidgetName());
     if (this->PopupScale)
       {
-      this->Script("pack %s -side left -padx 0 -fill y", 
-                   this->Entry->GetWidgetName());
+      this->Script("pack %s -side left -padx 0 %s", 
+                   this->Entry->GetWidgetName(),
+                   (this->ExpandEntry ? "-fill both -expand t" : "-fill y"));
       }
     else
       {
@@ -508,6 +526,27 @@ void vtkKWScale::WithdrawPopupScaleCallback()
 }
 
 // ---------------------------------------------------------------------------
+void vtkKWScale::UpdateEntryResolution()
+{
+  if (fabs(this->Resolution) >= 1.0)
+    {
+    this->EntryResolution = 0;
+    }
+  else if (this->IsCreated())
+    {
+    // Trick here: use the 'expr' Tcl command to display the shortest
+    // representation of the floating point number this->Resolution.
+    // sprintf would be of no help here.
+    const char *res = this->Script("expr %f", fabs(this->Resolution));
+    char *pos = strchr(res, '.');
+    if (pos)
+      {
+      this->EntryResolution = strlen(res) - (pos - res) - 1;
+      }
+    }
+}
+
+// ---------------------------------------------------------------------------
 void vtkKWScale::SetResolution(float r)
 {
   if (this->Resolution == r)
@@ -517,11 +556,17 @@ void vtkKWScale::SetResolution(float r)
 
   this->Resolution = r;
   this->Modified();
-  
+
   if (this->Scale && this->Scale->IsCreated())
     {
     this->Script("%s configure -resolution %f",
                  this->Scale->GetWidgetName(), r);
+    }
+
+  if (this->Entry && this->Entry->IsCreated())
+    {
+    this->UpdateEntryResolution();
+    this->Entry->SetValue(this->Value, this->EntryResolution);
     }
 }
 
@@ -544,7 +589,7 @@ void vtkKWScale::SetValue(float num)
   
   if (this->Entry && this->Entry->IsCreated())
     {
-    this->Entry->SetValue(this->Value, 2);
+    this->Entry->SetValue(this->Value, this->EntryResolution);
     }
 
   if (this->Command)
@@ -784,6 +829,8 @@ void vtkKWScale::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "PopupPushButton: " << this->PopupPushButton << endl;
   os << indent << "DisplayEntryAndLabelOnTop: " 
      << (this->DisplayEntryAndLabelOnTop ? "On" : "Off") << endl;
-  os << indent << "DisplayEntryAndLabelOnTop: " 
+  os << indent << "PupupScale: " 
      << (this->PopupScale ? "On" : "Off") << endl;
+  os << indent << "ExpandEntry: " 
+     << (this->ExpandEntry ? "On" : "Off") << endl;
 }

@@ -107,6 +107,15 @@ public:
   vtkGetObjectMacro(PopupPushButton, vtkKWPushButton);
 
   // Description:
+  // Set/Get the entry expansion flag. This flag is only used if PopupScale mode
+  // is On. In that case, the default behaviour is to provide a widget as compact
+  // as possible, i.e. the Entry won't be expanded if the widget grows. Set
+  // ExpandEntry to On to override this behaviour.
+  virtual void SetExpandEntry(int flag);
+  vtkGetMacro(ExpandEntry, int);
+  vtkBooleanMacro(ExpandEntry, int);  
+
+  // Description:
   // Method that gets invoked when the sliders value has changed.
   virtual void ScaleValueChanged(float num);
   virtual void EntryValueChanged();
@@ -150,6 +159,7 @@ protected:
 
   int         DisplayEntryAndLabelOnTop;
   int         PopupScale;
+  int         ExpandEntry;
 
   char        *Command;
   char        *StartCommand;
@@ -160,6 +170,8 @@ protected:
   float       Resolution;
   float       Range[2];
 
+  int         EntryResolution;
+
   vtkKWWidget *Scale;
   vtkKWEntry  *Entry;
   vtkKWWidget *Label;
@@ -167,6 +179,7 @@ protected:
   vtkKWPushButton *PopupPushButton;
 
   void PackWidget();
+  void UpdateEntryResolution();
 
 private:
   vtkKWScale(const vtkKWScale&); // Not implemented
