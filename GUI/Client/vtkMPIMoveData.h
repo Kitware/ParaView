@@ -1,0 +1,121 @@
+/*=========================================================================
+
+  Program:   Visualization Toolkit
+  Module:    vtkMPIMoveData.h
+
+  Copyright (c) Ken Martin, Will Schroeder, Bill Lorensen
+  All rights reserved.
+  See Copyright.txt or http://www.kitware.com/Copyright.htm for details.
+
+     This software is distributed WITHOUT ANY WARRANTY; without even
+     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+     PURPOSE.  See the above copyright notice for more information.
+
+=========================================================================*/
+// .NAME vtkMPIMoveData - For distributed tiled displays.
+// .DESCRIPTION
+// This class combines all the duplicate and collection requirments
+// into one filter.
+
+#ifndef __vtkMPIMoveData_h
+#define __vtkMPIMoveData_h
+
+#include "vtkDataSetToDataSetFilter.h"
+class vtkMultiProcessController;
+class vtkSocketController;
+class vtkMPIMToNSocketConnection;
+class vtkDataSet;
+class vtkIndent;
+
+class VTK_EXPORT vtkMPIMoveData : public vtkDataSetToDataSetFilter
+{
+public:
+  static vtkMPIMoveData *New();
+  vtkTypeRevisionMacro(vtkMPIMoveData, vtkDataSetToDataSetFilter);
+  void PrintSelf(ostream& os, vtkIndent indent);
+
+  // Description:
+  // Objects for communication.
+  // The controller is an MPI controller used to communicate
+  // between processes within one server (render or data).
+  // The client-data server socket controller is set on the client
+  // and data server and is used to communicate between the two.
+  // MPIMToNSocetConnection is set on the data server and render server 
+  // when we are running with a render server.  It has multiple
+  // sockets which are used to send data from the data server to the 
+  // render server.
+  void SetController(vtkMultiProcessController* controller);
+  void SetClientDataServerSocketController(vtkSocketController* sdc);
+  void SetMPIMToNSocketConnection(vtkMPIMToNSocketConnection* sc);
+  
+  // Description:
+  // Tell the object on which client/server it resides.
+  void SetServerToClient(){this->Server=vtkMPIMoveData::CLIENT;}
+  void SetServerToDataServer(){this->Server=vtkMPIMoveData::DATA_SERVER;}
+  void SetServerToRenderServer(){this->Server=vtkMPIMoveData::RENDER_SERVER;}
+
+  // Description:
+  // Specify how the data is to be redistributed.
+  void SetMoveModeToPassThrough(){this->MoveMode=vtkMPIMoveData::PASS_THROUGH;}
+  void SetMoveModeToCollect(){this->MoveMode=vtkMPIMoveData::COLLECT;}
+  void SetMoveModeToClone(){this->MoveMode=vtkMPIMoveData::CLONE;}
+
+protected:
+  vtkMPIMoveData();
+  ~vtkMPIMoveData();
+
+  vtkMultiProcessController* Controller;
+  vtkSocketController* ClientDataServerSocketController;
+  vtkMPIMToNSocketConnection* MPIMToNSocketConnection;
+
+  // Data generation method
+  virtual void ComputeInputUpdateExtents(vtkDataObject *output);
+  virtual void Execute();
+  virtual void ExecuteInformation();
+
+  void DataServerAllToN(vtkDataSet* inData, vtkDataSet* outData, int n);
+  void DataServerGatherAll(vtkDataSet* input, vtkDataSet* output);
+  void DataServerGatherToZero(vtkDataSet* input, vtkDataSet* output);
+  void DataServerSendToRenderServer(vtkDataSet* output);
+  void RenderServerReceiveFromDataServer(vtkDataSet* output);
+  void DataServerZeroSendToRenderServerZero(vtkDataSet* data);
+  void RenderServerZeroReceiveFromDataServerZero(vtkDataSet* data);
+  void DataServerSendToClient(vtkDataSet* output);
+  void ClientReceiveFromDataServer(vtkDataSet* output);
+
+  int   NumberOfBuffers;
+  int*  BufferLengths;
+  int*  BufferOffsets;
+  char* Buffers;
+  int   BufferTotalLength;
+
+  void ClearBuffer();
+  void MarshalDataToBuffer(vtkDataSet* data);
+  void ReconstructDataFromBuffer(vtkDataSet* data);
+
+  int MoveMode;
+  int Server;
+
+//BTX
+  enum MoveModes {
+    PASS_THROUGH=0,
+    COLLECT=1,
+    CLONE=2
+  };
+//ETX
+
+//BTX
+  enum Servers {
+    CLIENT=0,
+    DATA_SERVER=1,
+    RENDER_SERVER=2
+  };
+//ETX
+
+private:
+  vtkMPIMoveData(const vtkMPIMoveData&); // Not implemented
+  void operator=(const vtkMPIMoveData&); // Not implemented
+};
+
+#endif
+

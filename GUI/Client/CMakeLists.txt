@@ -31,6 +31,7 @@ SET( ParaViewServer_SRCS
   vtkPVSummaryHelper.cxx
   vtkM2NCollect.cxx
   vtkM2NDuplicate.cxx
+  vtkMPIMoveData.cxx
   vtkPVServerXDMFParameters.cxx
   )
 
