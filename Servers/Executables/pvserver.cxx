@@ -24,6 +24,10 @@ PURPOSE.  See the above copyright notice for more information.
 
 #include "vtkTimerLog.h"
 
+#ifdef _WIN32
+#  include "vtkDynamicLoader.h"
+#endif
+
 #include "vtkPVOptions.h"
 #include "vtkPVCreateProcessModule.h"
 #include "vtkProcessModule.h"
