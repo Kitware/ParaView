@@ -39,12 +39,12 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-// .NAME vtkPVRenderModule - Mangages rendering and LODs.
+// .NAME vtkPVRenderModule - Mangages rendering and displaying data.
 // .SECTION Description
 
 // I am in the process of moving features around into new objects.
-
-// This object manages creation and manipulation of the render window.  
+// This is a super class for all rendering modules.
+// Subclasses manages creation and manipulation of the render window.  
 // No user interface in this class.
 // Some common camera manipulation (and other render window control)
 // may be moved back into vtkPVRenderView to simplify this module.

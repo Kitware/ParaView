@@ -76,7 +76,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderModule);
-vtkCxxRevisionMacro(vtkPVRenderModule, "1.5");
+vtkCxxRevisionMacro(vtkPVRenderModule, "1.6");
 
 //int vtkPVRenderModuleCommand(ClientData cd, Tcl_Interp *interp,
 //                             int argc, char *argv[]);
@@ -429,16 +429,22 @@ void vtkPVRenderModule::AddPVSource(vtkPVSource *pvs)
     part->SetPartDisplay(pDisp);
     pDisp->SetPart(part);
 
-    // This initialization should be done by a render module.
-    pDisp->SetCollectionDecision(this->GetPVWindow()->MakeCollectionDecision());
-    pDisp->SetLODCollectionDecision(this->GetPVWindow()->MakeLODCollectionDecision());
-
     if (part && pDisp->GetPropTclName() != NULL)
       {
       pvApp->BroadcastScript("%s AddProp %s", this->RendererTclName,
                              pDisp->GetPropTclName());
       }
     pDisp->Delete();
+    }
+
+  // I would like to find a new place for this initialization.
+  // The data is not up to date anyway.  Maybe in Update ... !!!!
+  // I would like to gather information for part displays separately.
+  for (idx = 0; idx < num; ++idx)
+    {
+    part = pvs->GetPart(idx);
+    // Create a part display for each part.
+    pDisp = part->GetPartDisplay();
     }
 }
 
