@@ -55,7 +55,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectWidget);
-vtkCxxRevisionMacro(vtkPVSelectWidget, "1.24");
+vtkCxxRevisionMacro(vtkPVSelectWidget, "1.25");
 
 int vtkPVSelectWidgetCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -202,8 +202,6 @@ int vtkPVSelectWidget::GetModifiedFlag()
 //-----------------------------------------------------------------------------
 void vtkPVSelectWidget::AcceptInternal(const char* sourceTclName)
 {
-  vtkPVApplication *pvApp = this->GetPVApplication();
-
   // Command to update the UI.
   if (this->GetCurrentVTKValue())
     {

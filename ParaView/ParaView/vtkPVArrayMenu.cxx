@@ -63,7 +63,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVArrayMenu);
-vtkCxxRevisionMacro(vtkPVArrayMenu, "1.41");
+vtkCxxRevisionMacro(vtkPVArrayMenu, "1.42");
 
 vtkCxxSetObjectMacro(vtkPVArrayMenu, InputMenu, vtkPVInputMenu);
 vtkCxxSetObjectMacro(vtkPVArrayMenu, FieldMenu, vtkPVFieldMenu);
@@ -345,7 +345,6 @@ void vtkPVArrayMenu::SetSelectedComponent(int comp)
 //----------------------------------------------------------------------------
 void vtkPVArrayMenu::AcceptInternal(const char* sourceTclName)
 {
-  vtkPVApplication *pvApp = this->GetPVApplication();
   const char* attributeName;
 
   attributeName = vtkDataSetAttributes::GetAttributeTypeAsString(
@@ -448,7 +447,7 @@ void vtkPVArrayMenu::ResetInternal()
   // Get the selected array form the VTK filter.
   if (this->ShowComponentMenu)
     {
-    this->SetSelectedComponent(this->Property->GetScalar(0));
+    this->SetSelectedComponent(static_cast<int>(this->Property->GetScalar(0)));
     }
 
   this->ModifiedFlag = 0;

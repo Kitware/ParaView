@@ -143,7 +143,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.485");
+vtkCxxRevisionMacro(vtkPVWindow, "1.486");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -1486,8 +1486,6 @@ void vtkPVWindow::ChangeInteractorStyle(int index)
 void vtkPVWindow::MouseAction(int action,int button, 
                               int x,int y, int shift,int control)
 {
-  vtkPVApplication *pvApp = this->GetPVApplication();
-
   if ( action == 0 )
     {
     if (button == 1)

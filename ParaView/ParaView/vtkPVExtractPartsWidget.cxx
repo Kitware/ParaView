@@ -56,7 +56,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVExtractPartsWidget);
-vtkCxxRevisionMacro(vtkPVExtractPartsWidget, "1.7");
+vtkCxxRevisionMacro(vtkPVExtractPartsWidget, "1.8");
 
 int vtkPVExtractPartsWidgetCommand(ClientData cd, Tcl_Interp *interp,
                                 int argc, char *argv[]);
@@ -194,8 +194,6 @@ void vtkPVExtractPartsWidget::AcceptInternal(const char* vtkSourceTclName)
   int num, idx;
 
   num = this->PartSelectionList->GetNumberOfItems();
-
-  vtkPVApplication *pvApp = this->GetPVApplication();
 
   if (this->ModifiedFlag)
     {
