@@ -175,8 +175,7 @@ ENDIF(VTK_USE_MPI)
 
 
 
-SET(ParaViewBinary_SRCS
-  ParaView.cxx)
+SET(ParaViewBinary_SRCS ParaView.cxx)
 
 IF (PARAVIEW_USE_ICE_T)
   SET( ParaViewClient_SRCS
@@ -186,6 +185,10 @@ IF (PARAVIEW_USE_ICE_T)
     )
 
 ENDIF (PARAVIEW_USE_ICE_T)
+IF (WIN32)
+  SET( ParaViewClientNotWrapped_SRCS
+    ${ParaViewClientNotWrapped_SRCS} vtkAVIWriter.cxx)
+ENDIF (WIN32)
 
 SET_SOURCE_FILES_PROPERTIES(
   vtkPVApplicationResources

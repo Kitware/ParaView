@@ -66,6 +66,8 @@
 
 #ifndef _WIN32
 # include <unistd.h>
+#else
+#include "vtkAVIWriter.h"
 #endif
 
 #include <vtkstd/vector>
@@ -177,7 +179,7 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterface);
-vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.161.2.3");
+vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.161.2.4");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterface,ControlledWidget, vtkPVWidget);
 
@@ -1215,6 +1217,10 @@ void vtkPVAnimationInterface::SaveImagesCallback()
   ostr << "{{JPEG Images} {.jpg}} {{TIFF Images} {.tif}} {{PNG Images} {.png}}";
   ostr << " {{MPEG2 movie file} {.mp2}}";
 
+#ifdef _WIN32
+  ostr << " {{AVI movie file} {.avi}}";
+#endif
+  
   ostr << ends;
 
   saveDialog->SetFileTypes(ostr.str());
@@ -1258,8 +1264,10 @@ void vtkPVAnimationInterface::SaveImagesCallback()
     vtkKWMessageDialog *dlg = vtkKWMessageDialog::New();
     dlg->SetMasterWindow(this->Window);
     dlg->Create(this->GetApplication(), "");
+    // is this a video format
     int isMPEG = (!strcmp(ext, "mpg") || !strcmp(ext, "mpeg") ||
                   !strcmp(ext, "MPG") || !strcmp(ext, "MPEG") ||
+                  !strcmp(ext, "AVI") || !strcmp(ext, "avi") ||
                   !strcmp(ext, "MP2") || !strcmp(ext, "mp2"));
     if (isMPEG)
       {
@@ -1424,11 +1432,13 @@ void vtkPVAnimationInterface::SaveImages(const char* fileRoot,
   else if (strcmp(ext, "mp2") == 0)
     {
     awriter = vtkMPEG2Writer::New();
-//    if ( aspectRatio > 0 && aspectRatio <= 4 )
-//      {
-//      vtkMPEG2Writer::SafeDownCast(awriter)->SetAspectRatio(aspectRatio);
-//      }
       }
+#ifdef _WIN32
+  else if (strcmp(ext, "avi") == 0)
+    {
+    awriter = vtkAVIWriter::New();
+    }
+#endif
   else
     {
     vtkErrorMacro("Unknown extension " << ext << ", try: jpg, tif or png.");
