@@ -40,7 +40,7 @@ protected:
   vtkPointSet* GetInputAsPointSet();
   
   virtual vtkXMLUnstructuredDataWriter* CreateUnstructuredPieceWriter()=0;
-  vtkXMLWriter* CreatePieceWriter();
+  vtkXMLWriter* CreatePieceWriter(int index);
   void WritePData(vtkIndent indent);
   
 private:

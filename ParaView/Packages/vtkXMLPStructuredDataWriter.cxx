@@ -20,7 +20,7 @@
 #include "vtkExtentTranslator.h"
 #include "vtkDataSet.h"
 
-vtkCxxRevisionMacro(vtkXMLPStructuredDataWriter, "1.2");
+vtkCxxRevisionMacro(vtkXMLPStructuredDataWriter, "1.3");
 vtkCxxSetObjectMacro(vtkXMLPStructuredDataWriter, ExtentTranslator,
                      vtkExtentTranslator);
 
@@ -72,13 +72,13 @@ void vtkXMLPStructuredDataWriter::WritePPieceAttributes(int index)
 }
 
 //----------------------------------------------------------------------------
-vtkXMLWriter* vtkXMLPStructuredDataWriter::CreatePieceWriter()
+vtkXMLWriter* vtkXMLPStructuredDataWriter::CreatePieceWriter(int index)
 {
   vtkDataSet* input = this->GetInputAsDataSet();
   
   this->ExtentTranslator->SetWholeExtent(input->GetWholeExtent());
   this->ExtentTranslator->SetNumberOfPieces(this->NumberOfPieces);
-  this->ExtentTranslator->SetPiece(this->Piece);
+  this->ExtentTranslator->SetPiece(index);
   this->ExtentTranslator->SetGhostLevel(this->GhostLevel);
   this->ExtentTranslator->PieceToExtent();  
   

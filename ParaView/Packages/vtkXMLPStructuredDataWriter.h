@@ -44,7 +44,7 @@ protected:
   virtual vtkXMLStructuredDataWriter* CreateStructuredPieceWriter()=0;
   void WritePrimaryElementAttributes();
   void WritePPieceAttributes(int index);
-  vtkXMLWriter* CreatePieceWriter();
+  vtkXMLWriter* CreatePieceWriter(int index);
   
   vtkExtentTranslator* ExtentTranslator;
   

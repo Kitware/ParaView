@@ -38,9 +38,11 @@ public:
   vtkGetMacro(NumberOfPieces, int);
   
   // Description:
-  // Get/Set the piece number assigned to this writer.
-  vtkSetMacro(Piece, int);
-  vtkGetMacro(Piece, int);
+  // Get/Set the range of pieces assigned to this writer.
+  vtkSetMacro(StartPiece, int);
+  vtkGetMacro(StartPiece, int);
+  vtkSetMacro(EndPiece, int);
+  vtkGetMacro(EndPiece, int);
   
   // Description:
   // Get/Set the ghost level used for this writer's piece.
@@ -58,7 +60,7 @@ protected:
   vtkXMLPDataWriter();
   ~vtkXMLPDataWriter();
   
-  virtual vtkXMLWriter* CreatePieceWriter()=0;
+  virtual vtkXMLWriter* CreatePieceWriter(int index)=0;
   
   int Write();
   void WriteFileAttributes();
@@ -69,9 +71,11 @@ protected:
   
   char* CreatePieceFileName(int index, const char* path=0);
   void SplitFileName();
-  int WritePiece();
+  int WritePieces();
+  int WritePiece(int index);
   
-  int Piece;
+  int StartPiece;
+  int EndPiece;
   int NumberOfPieces;
   int GhostLevel;
   int WriteSummaryFile;

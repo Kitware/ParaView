@@ -18,12 +18,13 @@
 #include "vtkXMLPDataWriter.h"
 #include "vtkDataSet.h"
 
-vtkCxxRevisionMacro(vtkXMLPDataWriter, "1.3");
+vtkCxxRevisionMacro(vtkXMLPDataWriter, "1.4");
 
 //----------------------------------------------------------------------------
 vtkXMLPDataWriter::vtkXMLPDataWriter()
 {
-  this->Piece = 0;
+  this->StartPiece = 0;
+  this->EndPiece = 0;
   this->NumberOfPieces = 1;
   this->GhostLevel = 0;
   this->WriteSummaryFileInitialized = 0;
@@ -47,7 +48,8 @@ void vtkXMLPDataWriter::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
   os << indent << "NumberOfPieces: " << this->NumberOfPieces << "\n";
-  os << indent << "Piece: " << this->Piece << "\n";
+  os << indent << "StartPiece: " << this->StartPiece << "\n";
+  os << indent << "EndPiece: " << this->EndPiece << "\n";
   os << indent << "GhostLevel: " << this->GhostLevel << "\n";
   os << indent << "WriteSummaryFile: " << this->WriteSummaryFile << "\n";
 }
@@ -82,8 +84,8 @@ int vtkXMLPDataWriter::Write()
   vtkDataSet* input = this->GetInputAsDataSet();  
   input->UpdateInformation();
   
-  // Write the piece now so the data are up to date.
-  this->WritePiece();
+  // Write the pieces now so the data are up to date.
+  this->WritePieces();
   
   // Decide whether to write the summary file.
   int writeSummary = 0;
@@ -91,7 +93,7 @@ int vtkXMLPDataWriter::Write()
     {
     writeSummary = this->WriteSummaryFile;
     }
-  else if(this->Piece == 0)
+  else if(this->StartPiece == 0)
     {
     writeSummary = 1;
     }
@@ -237,14 +239,29 @@ char* vtkXMLPDataWriter::CreatePieceFileName(int index, const char* path)
 }
 
 //----------------------------------------------------------------------------
-int vtkXMLPDataWriter::WritePiece()
+int vtkXMLPDataWriter::WritePieces()
+{
+  // Write each piece from StartPiece to EndPiece.
+  int i;
+  for(i=this->StartPiece; i <= this->EndPiece; ++i)
+    {
+    if(!this->WritePiece(i))
+      {
+      return 0;
+      }
+    }
+  return 1;
+}
+
+//----------------------------------------------------------------------------
+int vtkXMLPDataWriter::WritePiece(int index)
 {
   // Construct the output filename.
-  char* fileName = this->CreatePieceFileName(this->Piece, this->PathName);
+  char* fileName = this->CreatePieceFileName(index, this->PathName);
   
   // Create the writer for the piece.  Its configuration should match
   // our own writer.
-  vtkXMLWriter* pWriter = this->CreatePieceWriter();
+  vtkXMLWriter* pWriter = this->CreatePieceWriter(index);
   pWriter->SetFileName(fileName);
   pWriter->SetCompressor(this->Compressor);
   pWriter->SetDataMode(this->DataMode);
