@@ -204,7 +204,11 @@ public:
   // Description:
   // Callback for the immediate mode rendering check button
   void ImmediateModeCallback();
-
+  
+  // Description:
+  // Callback for the interrupt render check button
+  void InterruptRenderCallback();
+  
   // Description:
   // Get the triangle strips check button.
   vtkGetObjectMacro(TriangleStripsCheck, vtkKWCheckButton);
@@ -241,6 +245,7 @@ protected:
 
   vtkKWCheckButton *TriangleStripsCheck;
   vtkKWCheckButton *ImmediateModeCheck;
+  vtkKWCheckButton *InterruptRenderCheck;
   
   int EventuallyRenderFlag;
   char* RenderPending;

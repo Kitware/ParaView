@@ -121,8 +121,8 @@ vtkPVRenderView::vtkPVRenderView()
   this->SetMenuPropertiesHelp("Show global view parameters (background color, annoations2 etc.)");
   
   this->TriangleStripsCheck = vtkKWCheckButton::New();
-  
   this->ImmediateModeCheck = vtkKWCheckButton::New();
+  this->InterruptRenderCheck = vtkKWCheckButton::New();
 }
 
 //----------------------------------------------------------------------------
@@ -287,6 +287,8 @@ vtkPVRenderView::~vtkPVRenderView()
   this->TriangleStripsCheck = NULL;
   this->ImmediateModeCheck->Delete();
   this->ImmediateModeCheck = NULL;
+  this->InterruptRenderCheck->Delete();
+  this->InterruptRenderCheck = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -450,9 +452,15 @@ void vtkPVRenderView::CreateViewProperties()
   this->ImmediateModeCheck->SetCommand(this, "ImmediateModeCallback");
   this->ImmediateModeCheck->SetState(1);
   
-  this->Script("pack %s %s -side top -anchor w",
+  this->InterruptRenderCheck->SetParent(this->GeneralProperties);
+  this->InterruptRenderCheck->Create(this->Application, "-text \"Allow Rendering Interrupts\"");
+  this->InterruptRenderCheck->SetCommand(this, "InterruptRenderCallback");
+  this->InterruptRenderCheck->SetState(1);
+  
+  this->Script("pack %s %s %s -side top -anchor w",
                this->TriangleStripsCheck->GetWidgetName(),
-               this->ImmediateModeCheck->GetWidgetName());
+               this->ImmediateModeCheck->GetWidgetName(),
+               this->InterruptRenderCheck->GetWidgetName());
 }
 
 void vtkPVRenderView::UpdateNavigationWindow(vtkPVSource *currentSource)
@@ -1070,6 +1078,17 @@ void vtkPVRenderView::ImmediateModeCallback()
                              comp->GetMapperTclName(),
                              this->TriangleStripsCheck->GetState());
       }
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::InterruptRenderCallback()
+{
+  if (this->Composite)
+    {
+    this->GetPVApplication()->BroadcastScript("%s SetEnableAbort %d",
+                                              this->CompositeTclName,
+                                              this->InterruptRenderCheck->GetState());
     }
 }
 
