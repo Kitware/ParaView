@@ -69,7 +69,6 @@ SET( KWWidgets_SRCS
   vtkKWMessageDialog.cxx 
   vtkKWMultiColumnList.cxx
   vtkKWNotebook.cxx 
-  vtkKWOKCancelDialog.cxx 
   vtkKWObject.cxx 
   vtkKWOptionMenu.cxx 
   vtkKWParameterValueFunctionEditor.cxx
