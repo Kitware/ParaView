@@ -58,7 +58,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWTkUtilities);
-vtkCxxRevisionMacro(vtkKWTkUtilities, "1.21");
+vtkCxxRevisionMacro(vtkKWTkUtilities, "1.22");
 
 //----------------------------------------------------------------------------
 void vtkKWTkUtilities::GetRGBColor(Tcl_Interp *interp,
@@ -1095,6 +1095,82 @@ int vtkKWTkUtilities::SynchroniseLabelsMaximumWidth(
     }
 
   return 1;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWTkUtilities::GetSlaves(
+  Tcl_Interp *interp,
+  const char *widget,
+  char ***slaves)
+{
+  int res;
+
+  // Get number of slaves
+
+  ostrstream nb_slaves_str;
+  nb_slaves_str << "llength [pack slaves " << widget << "]" << ends;
+  res = Tcl_GlobalEval(interp, nb_slaves_str.str());
+  nb_slaves_str.rdbuf()->freeze(0);
+  if (res != TCL_OK || !interp->result || !interp->result[0])
+    {
+    vtkGenericWarningMacro(<< "Unable to get number of packed slaves!");
+    return 0;
+    }
+
+  int nb_slaves = atoi(interp->result);
+  if (!nb_slaves)
+    {
+    return 0;
+    }
+
+  // Get the slaves as a space-separated list
+
+  ostrstream slaves_str;
+  slaves_str << "pack slaves " << widget << ends;
+  res = Tcl_GlobalEval(interp, slaves_str.str());
+  slaves_str.rdbuf()->freeze(0);
+  if (res != TCL_OK || !interp->result || !interp->result[0])
+    {
+    vtkGenericWarningMacro(<< "Unable to get packed slaves!");
+    return 0;
+    }
+  
+  // Allocate slaves
+
+  *slaves = new char* [nb_slaves];
+  
+  // Browse each slave and store it
+
+  int buffer_length = strlen(interp->result);
+  char *buffer = new char [buffer_length + 1];
+  strcpy(buffer, interp->result);
+
+  char *buffer_end = buffer + buffer_length;
+  char *ptr = buffer, *word_end;
+  int i = 0;
+
+  while (ptr < buffer_end && i < nb_slaves)
+    {
+    word_end = strchr(ptr + 1, ' ');
+    if (word_end == NULL)
+      {
+      word_end = buffer_end;
+      }
+    else
+      {
+      *word_end = 0;
+      }
+
+    (*slaves)[i] = new char [strlen(ptr) + 1];
+    strcpy((*slaves)[i], ptr);
+
+    i++;
+    ptr = word_end + 1;
+    }
+
+  delete [] buffer;
+
+  return nb_slaves;
 }
 
 //----------------------------------------------------------------------------

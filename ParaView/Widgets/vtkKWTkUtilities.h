@@ -161,6 +161,7 @@ public:
                                  int *nb_of_cols,
                                  int **col_widths,
                                  int allocate = 0);
+
   // Description:
   // Synchronize the columns minimum size of different widgets that have
   // been grid. If 'factors' is non-null, it is used as an array of
@@ -181,6 +182,13 @@ public:
                                            int nb_of_widgets,
                                            const char **widgets,
                                            const char *options = 0);
+
+  // Description:
+  // Returns the slaves of widget. The slaves array is allocated automatically
+  // and the number of slaves is returned.
+  static int GetSlaves(Tcl_Interp *interp,
+                       const char *widget,
+                       char ***slaves);
 
   //ETX
 
