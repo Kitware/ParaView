@@ -48,7 +48,7 @@
 #endif
 
 
-vtkCxxRevisionMacro(vtkIceTClientCompositeManager, "1.6");
+vtkCxxRevisionMacro(vtkIceTClientCompositeManager, "1.7");
 vtkStandardNewMacro(vtkIceTClientCompositeManager);
 
 vtkCxxSetObjectMacro(vtkIceTClientCompositeManager,IceTManager,vtkIceTRenderManager);
@@ -64,15 +64,15 @@ struct vtkClientRenderWindowInfo
 
 struct vtkClientRendererInfo 
 {
-  float CameraPosition[3];
-  float CameraFocalPoint[3];
-  float CameraViewUp[3];
-  float CameraClippingRange[2];
-  float LightPosition[3];
-  float LightFocalPoint[3];
-  float Background[3];
-  float ParallelScale;
-  float CameraViewAngle;
+  double CameraPosition[3];
+  double CameraFocalPoint[3];
+  double CameraViewUp[3];
+  double CameraClippingRange[2];
+  double LightPosition[3];
+  double LightFocalPoint[3];
+  double Background[3];
+  double ParallelScale;
+  double CameraViewAngle;
 };
 
 #define vtkInitializeVector3(v) { v[0] = 0; v[1] = 0; v[2] = 0; }
