@@ -30,16 +30,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #define __vtkPVColorByProcess_h
 
 #include "vtkPVDataSetToDataSetFilter.h"
-#include "vtkKWLabel.h"
 #include "vtkColorByProcess.h"
-#include "vtkKWEntry.h"
-#include "vtkKWScale.h"
-#include "vtkKWPushButton.h"
-#include "vtkPVSource.h"
-
-class vtkPVPolyData;
-class vtkPVImageData;
-
 
 class VTK_EXPORT vtkPVColorByProcess : public vtkPVDataSetToDataSetFilter
 {
@@ -52,25 +43,20 @@ public:
   void CreateProperties();
 
   // Description:
-  // this method casts the fitler to a vtkColorByProcess filter.
-  vtkColorByProcess *GetFilter();
-  
+  // Gets the filter cast to the correct type.
+  vtkColorByProcess* GetColorByProcess();
+
   // Description:
-  // A callback that gets called when the Accept button is pressed.
-  void ParameterChanged();
-  
-  // Description:
-  // This method sets the controller in the VTK filter.
+  // I do not want to use "GetGlobalController", so the filter needs to
+  // get the controller from the application.
   void SetApplication(vtkKWApplication *app);
 
 protected:
   vtkPVColorByProcess();
-  ~vtkPVColorByProcess();
+  ~vtkPVColorByProcess() {};
   vtkPVColorByProcess(const vtkPVColorByProcess&) {};
   void operator=(const vtkPVColorByProcess&) {};
   
-  vtkKWPushButton *Accept;
-  vtkKWPushButton *SourceButton;
 };
 
 #endif

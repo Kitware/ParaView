@@ -130,10 +130,10 @@ void vtkPVActorComposite::CreateProperties()
   char *zLabel;
   float bounds[6];
   
-  cellsLabel = new char[35];
-  xLabel = new char[35];
-  yLabel = new char[35];
-  zLabel = new char[35];
+  cellsLabel = new char[350];
+  xLabel = new char[350];
+  yLabel = new char[350];
+  zLabel = new char[350];
   
   this->GetPVData()->GetBounds(bounds);
   

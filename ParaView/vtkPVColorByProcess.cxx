@@ -28,10 +28,8 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 #include "vtkPVColorByProcess.h"
 #include "vtkPVApplication.h"
-#include "vtkPVRenderView.h"
-#include "vtkPVPolyData.h"
-#include "vtkPVImageData.h"
-#include "vtkPVWindow.h"
+#include "vtkColorByProcess.h"
+
 
 int vtkPVColorByProcessCommand(ClientData cd, Tcl_Interp *interp,
 				int argc, char *argv[]);
@@ -40,26 +38,10 @@ int vtkPVColorByProcessCommand(ClientData cd, Tcl_Interp *interp,
 vtkPVColorByProcess::vtkPVColorByProcess()
 {
   this->CommandFunction = vtkPVColorByProcessCommand;
-  
-  this->Accept = vtkKWPushButton::New();
-  this->Accept->SetParent(this->Properties);
-  
-  this->SourceButton = vtkKWPushButton::New();
-  this->SourceButton->SetParent(this->Properties);
-  
+   
   vtkColorByProcess *f = vtkColorByProcess::New();
   this->SetVTKSource(f);
   f->Delete();
-}
-
-//----------------------------------------------------------------------------
-vtkPVColorByProcess::~vtkPVColorByProcess()
-{
-  this->Accept->Delete();
-  this->Accept = NULL;
-  
-  this->SourceButton->Delete();
-  this->SourceButton = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -69,7 +51,7 @@ vtkPVColorByProcess* vtkPVColorByProcess::New()
 }
 
 //----------------------------------------------------------------------------
-vtkColorByProcess* vtkPVColorByProcess::GetFilter()
+vtkColorByProcess* vtkPVColorByProcess::GetColorByProcess()
 {
   return vtkColorByProcess::SafeDownCast(this->GetVTKSource());
 }
@@ -79,7 +61,7 @@ void vtkPVColorByProcess::SetApplication(vtkKWApplication *app)
 {
   vtkPVApplication *pvApp = vtkPVApplication::SafeDownCast(app);
 
-  this->GetFilter()->SetController(pvApp->GetController());
+  this->GetColorByProcess()->SetController(pvApp->GetController());
   this->vtkPVDataSetToDataSetFilter::SetApplication(app);
 }
 
@@ -88,53 +70,6 @@ void vtkPVColorByProcess::CreateProperties()
 {  
   // must set the application
   this->vtkPVSource::CreateProperties();
-  
-  this->SourceButton->Create(this->Application, "-text GetSource");
-  this->SourceButton->SetCommand(this, "GetSource");
-  this->Script("pack %s", this->SourceButton->GetWidgetName());
-  
-  this->Accept->Create(this->Application, "-text Accept");
-  this->Accept->SetCommand(this, "ParameterChanged");
-  this->Script("pack %s", this->Accept->GetWidgetName());
 }
 
-//----------------------------------------------------------------------------
-// Functions to update the progress bar
-void StartColorByProcessProgress(void *arg)
-{
-  vtkPVColorByProcess *me = (vtkPVColorByProcess*)arg;
-  me->GetWindow()->SetStatusText("Processing ColorByProcess");
-}
 
-//----------------------------------------------------------------------------
-void ColorByProcessProgress(void *arg)
-{
-  vtkPVColorByProcess *me = (vtkPVColorByProcess*)arg;
-  me->GetWindow()->GetProgressGauge()->SetValue((int)(me->GetFilter()->GetProgress() * 100));
-}
-
-//----------------------------------------------------------------------------
-void EndColorByProcessProgress(void *arg)
-{
-  vtkPVColorByProcess *me = (vtkPVColorByProcess*)arg;
-  me->GetWindow()->SetStatusText("");
-  me->GetWindow()->GetProgressGauge()->SetValue(0);
-}
-
-//----------------------------------------------------------------------------
-void vtkPVColorByProcess::ParameterChanged()
-{
-  vtkPVWindow *window = this->GetWindow();
-  
-  if (this->GetPVData() == NULL)
-    { // This is the first time. Initialize data.
-    this->GetFilter()->SetStartMethod(StartColorByProcessProgress, this);
-    this->GetFilter()->SetProgressMethod(ColorByProcessProgress, this);
-    this->GetFilter()->SetEndMethod(EndColorByProcessProgress, this);
-    //this->InitializeData();
-    window->GetSourceList()->Update();
-    }
-  
-  this->GetView()->Render();
-  window->GetMainView()->SetSelectedComposite(this);
-}

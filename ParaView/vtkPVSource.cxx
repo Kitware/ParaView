@@ -304,7 +304,11 @@ void vtkPVSource::CreateProperties()
   this->Script("pack %s -side left -fill x -expand t", 
 	       this->CancelButton->GetWidgetName());
 
+  // Every source has a name.
+  this->AddLabeledEntry("Name:", "SetName", "GetName", this);
+
   this->UpdateNavigationCanvas();
+  this->UpdateParameterWidgets();
 }
 
 //----------------------------------------------------------------------------
@@ -457,7 +461,8 @@ int vtkPVSource::GetVisibility()
 
 
 //----------------------------------------------------------------------------
-void vtkPVSource::AddLabeledToggle(char *label, char *setCmd, char *getCmd)
+void vtkPVSource::AddLabeledToggle(char *label, char *setCmd, char *getCmd, 
+                                   vtkKWObject *o)
 {
   // First a frame to hold the other widgets.
   vtkKWWidget *frame = vtkKWWidget::New();
@@ -486,18 +491,27 @@ void vtkPVSource::AddLabeledToggle(char *label, char *setCmd, char *getCmd)
   check->Create(this->Application, "");
   this->Script("pack %s -side left", check->GetWidgetName());
 
-  // Get initial value from the vtk source.
-  this->Script("%s SetState [[%s GetVTKSource] %s]", 
-               check->GetTclName(), this->GetTclName(), getCmd); 
-
-  // Save this command to call when the cancel button is pressed.
-  this->CancelCommands->AddCommand("%s SetState [[%s GetVTKSource] %s]",
-               check->GetTclName(), this->GetTclName(), getCmd); 
-
-  // Format a command to move value from widget to vtkObjects (on all processes).
-  // The VTK objects do not yet have to have the same Tcl name!
-  this->AcceptCommands->AddCommand("%s AcceptHelper %s [%s GetState]",
-               this->GetTclName(), setCmd, check->GetTclName()); 
+  // This condition would go away if we could use the Tcl name of the VTKsource.
+  if (o == NULL)
+    {
+    // Command to update the UI.
+    this->CancelCommands->AddCommand("%s SetState [[%s GetVTKSource] %s]",
+                check->GetTclName(), this->GetTclName(), getCmd); 
+    // Format a command to move value from widget to vtkObjects (on all processes).
+    // The VTK objects do not yet have to have the same Tcl name!
+    this->AcceptCommands->AddCommand("%s AcceptHelper %s [%s GetState]",
+                 this->GetTclName(), setCmd, check->GetTclName()); 
+    }
+  else
+    {
+    // Command to update the UI.
+    this->CancelCommands->AddCommand("%s SetState [%s %s]",
+            check->GetTclName(), this->GetTclName(), getCmd); 
+    // Format a command to move value from widget to vtkObjects (on all processes).
+    // The VTK objects do not yet have to have the same Tcl name!
+    this->AcceptCommands->AddCommand("%s AcceptHelper2 %s %s [%s GetState]",
+            this->GetTclName(), o->GetTclName(), setCmd, check->GetTclName()); 
+    }
 
   this->Script("pack %s -side left", check->GetWidgetName());
 
@@ -505,7 +519,8 @@ void vtkPVSource::AddLabeledToggle(char *label, char *setCmd, char *getCmd)
   check->Delete();
 }  
 //----------------------------------------------------------------------------
-void vtkPVSource::AddLabeledEntry(char *label, char *setCmd, char *getCmd)
+void vtkPVSource::AddLabeledEntry(char *label, char *setCmd, char *getCmd,
+                                  vtkKWObject *o)
 {
   vtkKWWidget *frame;
   vtkKWLabel *labelWidget;
@@ -537,18 +552,27 @@ void vtkPVSource::AddLabeledEntry(char *label, char *setCmd, char *getCmd)
   entry->Create(this->Application, "");
   this->Script("pack %s -side left -fill x -expand t", entry->GetWidgetName());
 
-  // Get initial value from the vtk source.
-  this->Script("%s SetValue [[%s GetVTKSource] %s]", entry->GetTclName(), 
-	       this->GetTclName(), getCmd); 
-
-  // Save this command to call when the cancel button is pressed.
-  this->CancelCommands->AddCommand("%s SetValue [[%s GetVTKSource] %s]",
+  // This condition would go away if we could use the Tcl name of the VTKsource.
+  if (o == NULL)
+    {
+    // Command to update the UI.
+    this->CancelCommands->AddCommand("%s SetValue [[%s GetVTKSource] %s]",
                entry->GetTclName(), this->GetTclName(), getCmd); 
-
-  // Format a command to move value from widget to vtkObjects (on all processes).
-  // The VTK objects do not yet have to have the same Tcl name!
-  this->AcceptCommands->AddCommand("%s AcceptHelper %s [%s GetValue]",
+    // Format a command to move value from widget to vtkObjects (on all processes).
+    // The VTK objects do not yet have to have the same Tcl name!
+    this->AcceptCommands->AddCommand("%s AcceptHelper %s [%s GetValue]",
 			   this->GetTclName(), setCmd, entry->GetTclName());
+    } 
+  else
+    {
+    // Command to update the UI.
+    this->CancelCommands->AddCommand("%s SetValue [%s %s]",
+               entry->GetTclName(), o->GetTclName(), getCmd); 
+    // Format a command to move value from widget to vtkObjects (on all processes).
+    // The VTK objects do not yet have to have the same Tcl name!
+    this->AcceptCommands->AddCommand("%s AcceptHelper2 %s %s [%s GetValue]",
+			   this->GetTclName(), o->GetTclName(), setCmd, entry->GetTclName());
+    }
 
   frame->Delete();
   entry->Delete();
@@ -556,7 +580,7 @@ void vtkPVSource::AddLabeledEntry(char *label, char *setCmd, char *getCmd)
 
 //----------------------------------------------------------------------------
 void vtkPVSource::AddVector2Entry(char *label, char *l1, char *l2,
-				  char *setCmd, char *getCmd)
+				                          char *setCmd, char *getCmd, vtkKWObject *o)
 {
   vtkKWWidget *frame;
   vtkKWLabel *labelWidget;
@@ -618,23 +642,34 @@ void vtkPVSource::AddVector2Entry(char *label, char *l1, char *l2,
   maxEntry->Create(this->Application, "-width 7");
   this->Script("pack %s -side left -fill x -expand t", maxEntry->GetWidgetName());
 
-  // Get initial value from the vtk source.
-  this->Script("%s SetValue [lindex [[%s GetVTKSource] %s] 0]", 
-               minEntry->GetTclName(), this->GetTclName(), getCmd); 
-  this->Script("%s SetValue [lindex [[%s GetVTKSource] %s] 1]", 
-               maxEntry->GetTclName(), this->GetTclName(), getCmd); 
-
-  // Save this command to call when the cancel button is pressed.
-  this->CancelCommands->AddCommand(
-    "%s SetValue [lindex [[%s GetVTKSource] %s] 0]; %s SetValue [lindex [[%s GetVTKSource] %s] 1]",
+  // This condition would go away if we could use the Tcl name of the VTKsource.
+  if (o == NULL)
+    {
+    // Command to update the UI.
+    this->CancelCommands->AddCommand(
+      "%s SetValue [lindex [[%s GetVTKSource] %s] 0]; %s SetValue [lindex [[%s GetVTKSource] %s] 1]",
                minEntry->GetTclName(), this->GetTclName(), getCmd,
                maxEntry->GetTclName(), this->GetTclName(), getCmd); 
-
-  // Format a command to move value from widget to vtkObjects (on all processes).
-  // The VTK objects do not yet have to have the same Tcl name!
-  this->AcceptCommands->AddCommand("%s AcceptHelper %s \"[%s GetValue] [%s GetValue]\"",
+    // Format a command to move value from widget to vtkObjects (on all processes).
+    // The VTK objects do not yet have to have the same Tcl name!
+    this->AcceptCommands->AddCommand("%s AcceptHelper %s \"[%s GetValue] [%s GetValue]\"",
                           this->GetTclName(), setCmd, minEntry->GetTclName(),
                           maxEntry->GetTclName());
+    }
+  else
+    {
+    // Command to update the UI.
+    this->CancelCommands->AddCommand(
+      "%s SetValue [lindex [[%s GetVTKSource] %s] 0]; %s SetValue [lindex [[%s GetVTKSource] %s] 1]",
+               minEntry->GetTclName(), this->GetTclName(), getCmd,
+               maxEntry->GetTclName(), this->GetTclName(), getCmd); 
+    // Format a command to move value from widget to vtkObjects (on all processes).
+    // The VTK objects do not yet have to have the same Tcl name!
+    this->AcceptCommands->AddCommand("%s AcceptHelper2 %s %s \"[%s GetValue] [%s GetValue]\"",
+                          this->GetTclName(), o->GetTclName(), setCmd, minEntry->GetTclName(),
+                          maxEntry->GetTclName());
+    }
+
 
   frame->Delete();
   minEntry->Delete();
@@ -643,7 +678,7 @@ void vtkPVSource::AddVector2Entry(char *label, char *l1, char *l2,
 
 //----------------------------------------------------------------------------
 void vtkPVSource::AddVector3Entry(char *label, char *l1, char *l2, char *l3,
-				  char *setCmd, char *getCmd)
+				                          char *setCmd, char *getCmd, vtkKWObject *o)
 {
   vtkKWWidget *frame;
   vtkKWLabel *labelWidget;
@@ -723,26 +758,36 @@ void vtkPVSource::AddVector3Entry(char *label, char *l1, char *l2, char *l3,
   zEntry->Create(this->Application, "-width 6");
   this->Script("pack %s -side left -fill x -expand t", zEntry->GetWidgetName());
 
-  // Get initial value from the vtk source.
-  this->Script("%s SetValue [lindex [[%s GetVTKSource] %s] 0]", 
-               xEntry->GetTclName(), this->GetTclName(), getCmd); 
-  this->Script("%s SetValue [lindex [[%s GetVTKSource] %s] 1]", 
-               yEntry->GetTclName(), this->GetTclName(), getCmd); 
-  this->Script("%s SetValue [lindex [[%s GetVTKSource] %s] 2]", 
-               zEntry->GetTclName(), this->GetTclName(), getCmd); 
-
-  // Save this command to call when the cancel button is pressed.
-  this->CancelCommands->AddCommand(
-    "%s SetValue [lindex [[%s GetVTKSource] %s] 0]; %s SetValue [lindex [[%s GetVTKSource] %s] 1]; %s SetValue [lindex [[%s GetVTKSource] %s] 2]",
+  // This condition would go away if we could use the Tcl name of the VTKsource.
+  if (o == NULL)
+    {
+    // Command to update the UI.
+    this->CancelCommands->AddCommand(
+      "%s SetValue [lindex [[%s GetVTKSource] %s] 0]; %s SetValue [lindex [[%s GetVTKSource] %s] 1]; %s SetValue [lindex [[%s GetVTKSource] %s] 2]",
                xEntry->GetTclName(), this->GetTclName(), getCmd,
                yEntry->GetTclName(), this->GetTclName(), getCmd,
                zEntry->GetTclName(), this->GetTclName(), getCmd); 
-
-  // Format a command to move value from widget to vtkObjects (on all processes).
-  // The VTK objects do not yet have to have the same Tcl name!
-  this->AcceptCommands->AddCommand("%s AcceptHelper %s \"[%s GetValue] [%s GetValue] [%s GetValue]\"",
+    // Format a command to move value from widget to vtkObjects (on all processes).
+    // The VTK objects do not yet have to have the same Tcl name!
+    this->AcceptCommands->AddCommand("%s AcceptHelper %s \"[%s GetValue] [%s GetValue] [%s GetValue]\"",
                           this->GetTclName(), setCmd, xEntry->GetTclName(),
                           yEntry->GetTclName(), zEntry->GetTclName());
+    }
+  else
+    {
+    // Command to update the UI.
+    this->CancelCommands->AddCommand("%s SetValue [lindex [%s %s] 0]", 
+               xEntry->GetTclName(), o->GetTclName(), getCmd); 
+    this->CancelCommands->AddCommand("%s SetValue [lindex [%s %s] 1]", 
+               yEntry->GetTclName(), o->GetTclName(), getCmd); 
+    this->CancelCommands->AddCommand("%s SetValue [lindex [%s %s] 2]", 
+               zEntry->GetTclName(), o->GetTclName(), getCmd); 
+    // Format a command to move value from widget to vtkObjects (on all processes).
+    // The VTK objects do not yet have to have the same Tcl name!
+    this->AcceptCommands->AddCommand("%s AcceptHelper2 %s %s \"[%s GetValue] [%s GetValue] [%s GetValue]\"",
+                          this->GetTclName(), o->GetTclName(), setCmd, xEntry->GetTclName(),
+                          yEntry->GetTclName(), zEntry->GetTclName());
+    }
 
   frame->Delete();
   xEntry->Delete();
@@ -753,7 +798,8 @@ void vtkPVSource::AddVector3Entry(char *label, char *l1, char *l2, char *l3,
 
 //----------------------------------------------------------------------------
 void vtkPVSource::AddVector4Entry(char *label, char *l1, char *l2, char *l3,
-				  char *l4, char *setCmd, char *getCmd)
+                                  char *l4, char *setCmd, char *getCmd,
+                                  vtkKWObject *o)
 {
   vtkKWWidget *frame;
   vtkKWLabel *labelWidget;
@@ -851,21 +897,43 @@ void vtkPVSource::AddVector4Entry(char *label, char *l1, char *l2, char *l3,
   wEntry->Create(this->Application, "-width 5");
   this->Script("pack %s -side left", wEntry->GetWidgetName());
 
-  // Get initial value from the vtk source.
-  this->Script("%s SetValue [lindex [[%s GetVTKSource] %s] 0]", 
-               xEntry->GetTclName(), this->GetTclName(), getCmd); 
-  this->Script("%s SetValue [lindex [[%s GetVTKSource] %s] 1]", 
-               yEntry->GetTclName(), this->GetTclName(), getCmd); 
-  this->Script("%s SetValue [lindex [[%s GetVTKSource] %s] 2]", 
-               zEntry->GetTclName(), this->GetTclName(), getCmd); 
-  this->Script("%s SetValue [lindex [[%s GetVTKSource] %s] 3]", 
-               wEntry->GetTclName(), this->GetTclName(), getCmd); 
-
-  // Format a command to move value from widget to vtkObjects (on all processes).
-  // The VTK objects do not yet have to have the same Tcl name!
-  this->AcceptCommands->AddCommand("%s AcceptHelper %s \"[%s GetValue] [%s GetValue] [%s GetValue] [%s GetValue]\"",
+  // This condition would go away if we could use the Tcl name of the VTKsource.
+  if (o == NULL)
+    {
+    // Command to update the UI.
+    this->CancelCommands->AddCommand(
+        "%s SetValue [lindex [[%s GetVTKSource] %s] 0]",
+        xEntry->GetTclName(), this->GetTclName(), getCmd);
+    this->CancelCommands->AddCommand(
+        "%s SetValue [lindex [[%s GetVTKSource] %s] 1]",
+        yEntry->GetTclName(), this->GetTclName(), getCmd);
+    this->CancelCommands->AddCommand(
+        "%s SetValue [lindex [[%s GetVTKSource] %s] 2]",
+        zEntry->GetTclName(), this->GetTclName(), getCmd);
+    this->CancelCommands->AddCommand(
+        "%s SetValue [lindex [[%s GetVTKSource] %s] 3]",
+        wEntry->GetTclName(), this->GetTclName(), getCmd);
+    // Format a command to move value from widget to vtkObjects (on all processes).
+    // The VTK objects do not yet have to have the same Tcl name!
+    this->AcceptCommands->AddCommand("%s AcceptHelper %s \"[%s GetValue] [%s GetValue] [%s GetValue] [%s GetValue]\"",
                           this->GetTclName(), setCmd, xEntry->GetTclName(),
                           yEntry->GetTclName(), zEntry->GetTclName(), wEntry->GetTclName());
+    }
+  else
+    {
+    // Command to update the UI.
+    this->CancelCommands->AddCommand(
+      "%s SetValue [lindex [%s %s] 0]; %s SetValue [lindex [%s %s] 1]; %s SetValue [lindex [%s %s] 2]; %s SetValue [lindex [%s %s] 3]",
+               xEntry->GetTclName(), o->GetTclName(), getCmd,
+               yEntry->GetTclName(), o->GetTclName(), getCmd,
+               zEntry->GetTclName(), o->GetTclName(), getCmd, 
+               wEntry->GetTclName(), o->GetTclName(), getCmd); 
+    // Format a command to move value from widget to vtkObjects (on all processes).
+    // The VTK objects do not yet have to have the same Tcl name!
+    this->AcceptCommands->AddCommand("%s AcceptHelper2 %s %s \"[%s GetValue] [%s GetValue] [%s GetValue] [%s GetValue]\"",
+                          this->GetTclName(), o->GetTclName(), setCmd, xEntry->GetTclName(),
+                          yEntry->GetTclName(), zEntry->GetTclName(), wEntry->GetTclName());
+    }
 
   frame->Delete();
   xEntry->Delete();
@@ -878,8 +946,9 @@ void vtkPVSource::AddVector4Entry(char *label, char *l1, char *l2, char *l3,
 // It might make sence here to store the labels in an array 
 // so that a loop can be used to create the widgets.
 void vtkPVSource::AddVector6Entry(char *label, char *l1, char *l2, char *l3,
-				  char *l4, char *l5, char *l6,
-				  char *setCmd, char *getCmd)
+                                  char *l4, char *l5, char *l6,
+                                  char *setCmd, char *getCmd, vtkKWObject *o)
+
 {
   vtkKWWidget *frame;
   vtkKWLabel *labelWidget;
@@ -1013,36 +1082,43 @@ void vtkPVSource::AddVector6Entry(char *label, char *l1, char *l2, char *l3,
   zEntry->Create(this->Application, "-width 4");
   this->Script("pack %s -side left", zEntry->GetWidgetName());
 
-  // Get initial value from the vtk source.
-  this->Script("%s SetValue [lindex [[%s GetVTKSource] %s] 0]", 
-               uEntry->GetTclName(), this->GetTclName(), getCmd); 
-  this->Script("%s SetValue [lindex [[%s GetVTKSource] %s] 1]", 
-               vEntry->GetTclName(), this->GetTclName(), getCmd); 
-  this->Script("%s SetValue [lindex [[%s GetVTKSource] %s] 2]", 
-               wEntry->GetTclName(), this->GetTclName(), getCmd); 
-  this->Script("%s SetValue [lindex [[%s GetVTKSource] %s] 3]", 
-               xEntry->GetTclName(), this->GetTclName(), getCmd); 
-  this->Script("%s SetValue [lindex [[%s GetVTKSource] %s] 4]", 
-               yEntry->GetTclName(), this->GetTclName(), getCmd); 
-  this->Script("%s SetValue [lindex [[%s GetVTKSource] %s] 5]", 
-               zEntry->GetTclName(), this->GetTclName(), getCmd); 
-
-  // Save this command to call when the cancel button is pressed.
-  this->CancelCommands->AddCommand(
-    "%s SetValue [lindex [[%s GetVTKSource] %s] 0]; %s SetValue [lindex [[%s GetVTKSource] %s] 1]; %s SetValue [lindex [[%s GetVTKSource] %s] 2]; %s SetValue [lindex [[%s GetVTKSource] %s] 3]; %s SetValue [lindex [[%s GetVTKSource] %s] 4]; %s SetValue [lindex [[%s GetVTKSource] %s] 5]",
+  // This condition would go away if we could use the Tcl name of the VTKsource.
+  if (o == NULL)
+    {
+    // Command to update the UI.
+    this->CancelCommands->AddCommand(
+      "%s SetValue [lindex [[%s GetVTKSource] %s] 0]; %s SetValue [lindex [[%s GetVTKSource] %s] 1]; %s SetValue [lindex [[%s GetVTKSource] %s] 2]; %s SetValue [lindex [[%s GetVTKSource] %s] 3]; %s SetValue [lindex [[%s GetVTKSource] %s] 4]; %s SetValue [lindex [[%s GetVTKSource] %s] 5]",
                uEntry->GetTclName(), this->GetTclName(), getCmd,
                vEntry->GetTclName(), this->GetTclName(), getCmd,
                wEntry->GetTclName(), this->GetTclName(), getCmd,
                xEntry->GetTclName(), this->GetTclName(), getCmd,
                yEntry->GetTclName(), this->GetTclName(), getCmd,
                zEntry->GetTclName(), this->GetTclName(), getCmd); 
-
-  // Format a command to move value from widget to vtkObjects (on all processes).
-  // The VTK objects do not yet have to have the same Tcl name!
-  this->AcceptCommands->AddCommand("%s AcceptHelper %s \"[%s GetValue] [%s GetValue] [%s GetValue] [%s GetValue] [%s GetValue] [%s GetValue]\"",
-			 this->GetTclName(), setCmd, uEntry->GetTclName(), 
-			 vEntry->GetTclName(), wEntry->GetTclName(),
-			 xEntry->GetTclName(), yEntry->GetTclName(), zEntry->GetTclName());
+    // Format a command to move value from widget to vtkObjects (on all processes).
+    // The VTK objects do not yet have to have the same Tcl name!
+    this->AcceptCommands->AddCommand("%s AcceptHelper %s \"[%s GetValue] [%s GetValue] [%s GetValue] [%s GetValue] [%s GetValue] [%s GetValue]\"",
+		  	 this->GetTclName(), setCmd, uEntry->GetTclName(), 
+			   vEntry->GetTclName(), wEntry->GetTclName(),
+			   xEntry->GetTclName(), yEntry->GetTclName(), zEntry->GetTclName());
+    }
+  else
+    {
+    // Command to update the UI.
+    this->CancelCommands->AddCommand(
+      "%s SetValue [lindex [%s %s] 0]; %s SetValue [lindex [%s %s] 1]; %s SetValue [lindex [%s %s] 2]; %s SetValue [lindex [%s %s] 3]; %s SetValue [lindex [%s %s] 4]; %s SetValue [lindex [%s %s] 5]",
+               uEntry->GetTclName(), this->GetTclName(), getCmd,
+               vEntry->GetTclName(), this->GetTclName(), getCmd,
+               wEntry->GetTclName(), this->GetTclName(), getCmd,
+               xEntry->GetTclName(), this->GetTclName(), getCmd,
+               yEntry->GetTclName(), this->GetTclName(), getCmd,
+               zEntry->GetTclName(), this->GetTclName(), getCmd); 
+    // Format a command to move value from widget to vtkObjects (on all processes).
+    // The VTK objects do not yet have to have the same Tcl name!
+    this->AcceptCommands->AddCommand("%s AcceptHelper2 %s %s \"[%s GetValue] [%s GetValue] [%s GetValue] [%s GetValue] [%s GetValue] [%s GetValue]\"",
+		  	 this->GetTclName(), o->GetTclName(), setCmd, uEntry->GetTclName(), 
+			   vEntry->GetTclName(), wEntry->GetTclName(),
+			   xEntry->GetTclName(), yEntry->GetTclName(), zEntry->GetTclName());
+    }
 
   frame->Delete();
   uEntry->Delete();
@@ -1056,7 +1132,8 @@ void vtkPVSource::AddVector6Entry(char *label, char *l1, char *l2, char *l3,
 
 //----------------------------------------------------------------------------
 void vtkPVSource::AddScale(char *label, char *setCmd, char *getCmd,
-			   float min, float max, float resolution)
+                           float min, float max, float resolution,
+                           vtkKWObject *o)
 {
   vtkKWWidget *frame;
   vtkKWLabel *labelWidget;
@@ -1085,18 +1162,27 @@ void vtkPVSource::AddScale(char *label, char *setCmd, char *getCmd,
   slider->SetResolution(resolution);
   this->Script("pack %s -side left -fill x -expand t", slider->GetWidgetName());
 
-  // Get initial value from the vtk source.
-  this->Script("%s SetValue [[%s GetVTKSource] %s]", 
-               slider->GetTclName(), this->GetTclName(), getCmd); 
-
-  // Save this command to call when the cancel button is pressed.
-  this->CancelCommands->AddCommand("%s SetValue [[%s GetVTKSource] %s]",
-               slider->GetTclName(), this->GetTclName(), getCmd); 
-
-  // Format a command to move value from widget to vtkObjects (on all processes).
-  // The VTK objects do not yet have to have the same Tcl name!
-  this->AcceptCommands->AddCommand("%s AcceptHelper %s [%s GetValue]",
-			 this->GetTclName(), setCmd, slider->GetTclName());
+  // This condition would go away if we could use the Tcl name of the VTKsource.
+  if (o == NULL)
+    {
+    // Command to update the UI.
+    this->CancelCommands->AddCommand("%s SetValue [[%s GetVTKSource] %s]",
+                 slider->GetTclName(), this->GetTclName(), getCmd); 
+    // Format a command to move value from widget to vtkObjects (on all processes).
+    // The VTK objects do not yet have to have the same Tcl name!
+    this->AcceptCommands->AddCommand("%s AcceptHelper %s [%s GetValue]",
+	  		 this->GetTclName(), setCmd, slider->GetTclName());
+    }
+  else
+    {
+    // Command to update the UI.
+    this->CancelCommands->AddCommand("%s SetValue [%s %s]",
+                 slider->GetTclName(), o->GetTclName(), getCmd); 
+    // Format a command to move value from widget to vtkObjects (on all processes).
+    // The VTK objects do not yet have to have the same Tcl name!
+    this->AcceptCommands->AddCommand("%s AcceptHelper2 %s %s [%s GetValue]",
+	  		 this->GetTclName(), o->GetTclName(), setCmd, slider->GetTclName());
+    }
 
   frame->Delete();
   labelWidget->Delete();
@@ -1105,7 +1191,8 @@ void vtkPVSource::AddScale(char *label, char *setCmd, char *getCmd,
 
 
 //----------------------------------------------------------------------------
-void vtkPVSource::AddModeList(char *label, char *setCmd, char *getCmd)
+void vtkPVSource::AddModeList(char *label, char *setCmd, char *getCmd,
+                              vtkKWObject *o)
 {
   vtkKWWidget *frame;
   vtkKWLabel *labelWidget;
@@ -1131,18 +1218,28 @@ void vtkPVSource::AddModeList(char *label, char *setCmd, char *getCmd)
   sl->Create(this->Application);  
   this->Script("pack %s -fill x -expand t", sl->GetWidgetName());
     
-  this->Script("%s SetCurrentValue [[%s GetVTKSource] %s]",
-	       sl->GetTclName(), this->GetTclName(), getCmd);
-
-  // Save this command to call when the cancel button is pressed.
-  this->CancelCommands->AddCommand("%s SetCurrentValue [[%s GetVTKSource] %s]",
-               sl->GetTclName(), this->GetTclName(), getCmd); 
-
-  // Format a command to move value from widget to vtkObjects (on all processes).
-  // The VTK objects do not yet have to have the same Tcl name!
-  this->AcceptCommands->AddCommand("%s AcceptHelper %s [%s GetCurrentValue]",
-			 this->GetTclName(), setCmd, sl->GetTclName());
-  
+  // This condition would go away if we could use the Tcl name of the VTKsource.
+  if (o == NULL)
+    {
+    // Command to update the UI.
+    this->CancelCommands->AddCommand("%s SetCurrentValue [[%s GetVTKSource] %s]",
+                 sl->GetTclName(), this->GetTclName(), getCmd); 
+    // Format a command to move value from widget to vtkObjects (on all processes).
+    // The VTK objects do not yet have to have the same Tcl name!
+    this->AcceptCommands->AddCommand("%s AcceptHelper %s [%s GetCurrentValue]",
+		  	 this->GetTclName(), setCmd, sl->GetTclName());
+    }
+  else
+    {
+    // Command to update the UI.
+    this->CancelCommands->AddCommand("%s SetCurrentValue [%s %s]",
+                 sl->GetTclName(), o->GetTclName(), getCmd); 
+    // Format a command to move value from widget to vtkObjects (on all processes).
+    // The VTK objects do not yet have to have the same Tcl name!
+    this->AcceptCommands->AddCommand("%s AcceptHelper %s %s [%s GetCurrentValue]",
+		  	 this->GetTclName(), o->GetTclName(), setCmd, sl->GetTclName());
+    }
+    
   // Save this selection list so the user can add items to it.
   if (this->LastSelectionList)
     {
@@ -1203,6 +1300,7 @@ void vtkPVSource::AcceptCallback()
     }
 
   window->GetMainView()->SetSelectedComposite(this);  
+  this->UpdateNavigationCanvas();
   this->GetView()->Render();
   window->GetSourceList()->Update();
 }
@@ -1221,19 +1319,26 @@ void vtkPVSource::CancelCallback()
     }
   else
     {
-    // Copy the ivars from the vtk object to the UI.
-    int num, i;
-    char *cmd;
-    num = this->CancelCommands->GetLength();
-    for (i = 0; i < num; ++i)
-      {
-      cmd = this->CancelCommands->GetCommand(i);
-      if (cmd)
-        {
-        this->Script(cmd);
-        }
-      } 
+    this->UpdateParameterWidgets();
     }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVSource::UpdateParameterWidgets()
+{
+  int num, i;
+  char *cmd;
+
+  // Copy the ivars from the vtk object to the UI.
+  num = this->CancelCommands->GetLength();
+  for (i = 0; i < num; ++i)
+    {
+    cmd = this->CancelCommands->GetCommand(i);
+    if (cmd)
+      {
+      this->Script(cmd);
+      }
+    } 
 }
 
 
@@ -1251,6 +1356,16 @@ void vtkPVSource::AcceptHelper(char *method, char *args)
                          method, args);
 }
 
+//----------------------------------------------------------------------------
+void vtkPVSource::AcceptHelper2(char *name, char *method, char *args)
+{
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  pvApp->Script("%s %s %s", name, method, args);
+
+  vtkDebugMacro(<< name << " " << method << " " << args);
+
+  pvApp->BroadcastScript("%s %s %s", name, this->GetTclName(), method, args);
+}
 
 //----------------------------------------------------------------------------
 void vtkPVSource::UpdateNavigationCanvas()

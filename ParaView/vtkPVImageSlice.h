@@ -30,65 +30,34 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #define __vtkPVImageSlice_h
 
 #include "vtkImageClip.h"
-#include "vtkKWLabeledEntry.h"
-#include "vtkKWPushButton.h"
-#include "vtkKWRadioButton.h"
-#include "vtkPVSource.h"
+#include "vtkPVImageToImageFilter.h"
 #include "vtkInteractorStyleImageExtent.h"
 
 class vtkPVImageData;
 
-class VTK_EXPORT vtkPVImageSlice : public vtkPVSource
+class VTK_EXPORT vtkPVImageSlice : public vtkPVImageToImageFilter
 {
 public:
   static vtkPVImageSlice* New();
-  vtkTypeMacro(vtkPVImageSlice, vtkPVSource);
+  vtkTypeMacro(vtkPVImageSlice, vtkPVImageToImageFilter);
 
   // Description:
   // You have to clone this object before you create its UI.
   void CreateProperties();
-  
-  // Description:
-  // The methods executes on all processes.
-  void SetInput(vtkPVImageData *pvData);
-  
-  // Description:
-  // For now you have to set the output explicitly.  This allows you to manage
-  // the object creation/tcl-names in the other processes.
-  void SetPVOutput(vtkPVImageData *pvd);
-  vtkPVImageData *GetPVOutput();
-  
-  // Description:
-  // This is called when the accept button is pressed.
-  // The first time, it creates data.
-  void SliceChanged();
-
+    
   // Description:
   // Manual method for selecting which axis gets sliced.
   void SetSliceAxis(int axis);
+  int GetSliceAxis();
 
   // Description:
   // Manual method for selecting which slice to display
   void SetSliceNumber(int slice);
-
-  // Description:
-  // Callbacks from the Select SliceAxis buttons.
-  // This is the only way to get radio button fuctionality.
-  void SelectXCallback();
-  void SelectYCallback();
-  void SelectZCallback();
+  int GetSliceNumber();
   
   // Description:
-  // This is the parallel method.  SetSliceAxis ... should really be parallel,
-  // but this is easier since the accept method makes this call.
-  // This call should not be called externally because the
-  // output whole extent is computed from the SliceAxis ...
-  void SetOutputWholeExtent(int xmin, int xmax, int ymin, int ymax,
-			    int zmin, int zmax);
-
-  // Description:
   // Get the underlying vtkImageSlice
-  vtkGetObjectMacro(Slice, vtkImageClip);
+  vtkImageClip *GetImageClip();
   
   vtkGetObjectMacro(SliceStyle, vtkInteractorStyleImageExtent);
   
@@ -100,7 +69,6 @@ public:
   virtual void Deselect(vtkKWView *view);
   
   void UseSliceStyle();
-  vtkGetObjectMacro(SliceEntry, vtkKWLabeledEntry);
   
 protected:
   vtkPVImageSlice();
@@ -112,20 +80,11 @@ protected:
   // programatically (not through UI).
   void UpdateProperties();
   
-  vtkKWPushButton *Accept;
-  vtkKWPushButton *SourceButton;
-  vtkKWLabeledEntry *SliceEntry;
-  vtkKWRadioButton *XDimension;
-  vtkKWRadioButton *YDimension;
-  vtkKWRadioButton *ZDimension;
-
   // Keep the parameters here (in addition to the widgets)
   // so they can be set before the properties are created.
-  int PropertiesCreated;
   int SliceNumber;
   int SliceAxis;
   
-  vtkImageClip  *Slice;
   vtkInteractorStyleImageExtent *SliceStyle;
   vtkKWPushButton *SliceStyleButton;
   int SliceStyleCreated;

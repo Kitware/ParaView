@@ -27,11 +27,8 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 =========================================================================*/
 
 #include "vtkPVParallelDecimate.h"
+#include "vtkParallelDecimate.h"
 #include "vtkPVApplication.h"
-#include "vtkPVRenderView.h"
-#include "vtkPVPolyData.h"
-#include "vtkPVWindow.h"
-#include "vtkPVActorComposite.h"
 
 int vtkPVParallelDecimateCommand(ClientData cd, Tcl_Interp *interp,
 				 int argc, char *argv[]);
@@ -40,24 +37,10 @@ int vtkPVParallelDecimateCommand(ClientData cd, Tcl_Interp *interp,
 vtkPVParallelDecimate::vtkPVParallelDecimate()
 {
   this->CommandFunction = vtkPVParallelDecimateCommand;
-  
-  this->Accept = vtkKWPushButton::New();
-  this->Accept->SetParent(this->Properties);
-  this->SourceButton = vtkKWPushButton::New();
-  this->SourceButton->SetParent(this->Properties);
 
   vtkParallelDecimate *pd = vtkParallelDecimate::New();
   this->SetVTKSource(pd);
   pd->Delete();
-}
-
-//----------------------------------------------------------------------------
-vtkPVParallelDecimate::~vtkPVParallelDecimate()
-{ 
-  this->Accept->Delete();
-  this->Accept = NULL;
-  this->SourceButton->Delete();
-  this->SourceButton = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -70,33 +53,9 @@ vtkPVParallelDecimate* vtkPVParallelDecimate::New()
 void vtkPVParallelDecimate::CreateProperties()
 {  
   // must set the application
-  this->vtkPVSource::CreateProperties();
-  
-  this->SourceButton->Create(this->Application, "-text GetSource");
-  this->SourceButton->SetCommand(this, "SelectInputSource");
-  this->Accept->Create(this->Application, "-text Accept");
-  this->Accept->SetCommand(this, "ParallelDecimateChanged");
-  this->Script("pack %s %s",
-	       this->SourceButton->GetWidgetName(),
-	       this->Accept->GetWidgetName());
+  this->vtkPVPolyDataToPolyDataFilter::CreateProperties();
 }
 
-//----------------------------------------------------------------------------
-void vtkPVParallelDecimate::ParallelDecimateChanged()
-{
-  vtkPVApplication *pvApp = (vtkPVApplication *)this->Application;
-  vtkPVWindow *window = this->GetWindow();
-  
-  if (this->GetPVData() == NULL)
-    { // This is the first time. Create the data.
-    //this->InitializeData();
-    window->GetSourceList()->Update();
-    }
-  
-  window->GetMainView()->SetSelectedComposite(this);
-  
-  this->GetView()->Render();
-}
 
 //----------------------------------------------------------------------------
 void vtkPVParallelDecimate::SetApplication(vtkKWApplication *app)

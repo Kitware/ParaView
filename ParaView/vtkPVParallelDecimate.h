@@ -33,13 +33,10 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #ifndef __vtkPVParallelDecimate_h
 #define __vtkPVParallelDecimate_h
 
-#include "vtkKWLabel.h"
-#include "vtkParallelDecimate.h"
-#include "vtkKWScale.h"
-#include "vtkKWPushButton.h"
 #include "vtkPVPolyDataToPolyDataFilter.h"
 
-class vtkPVPolyData;
+class vtkKWApplication;
+class vtkParallelDecimate;
 
 
 class VTK_EXPORT vtkPVParallelDecimate : public vtkPVPolyDataToPolyDataFilter
@@ -51,14 +48,6 @@ public:
   // Description:
   // You have to clone this object before you create its UI.
   void CreateProperties();
-  
-  // Description:
-  // This method is called when the accept button is pressed.
-  void ParallelDecimateChanged();
-
-  // Description:
-  // This is used internally to cast the source to a vtkParallelDecimate
-  vtkParallelDecimate *GetParallelDecimate();
 
   // Description:
   // This method sets the controller in the VTK filter.
@@ -66,12 +55,13 @@ public:
   
 protected:
   vtkPVParallelDecimate();
-  ~vtkPVParallelDecimate();
+  ~vtkPVParallelDecimate() {};
   vtkPVParallelDecimate(const vtkPVParallelDecimate&) {};
   void operator=(const vtkPVParallelDecimate&) {};
   
-  vtkKWPushButton *Accept;
-  vtkKWPushButton *SourceButton;
+  // Description:
+  // This is used internally to cast the source to a vtkParallelDecimate
+  vtkParallelDecimate *GetParallelDecimate();
 };
 
 #endif

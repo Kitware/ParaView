@@ -44,24 +44,6 @@ vtkPVImageSlice::vtkPVImageSlice()
 {
   this->CommandFunction = vtkPVImageSliceCommand;
   
-  this->Accept = vtkKWPushButton::New();
-  this->Accept->SetParent(this->Properties);
-  this->SourceButton = vtkKWPushButton::New();
-  this->SourceButton->SetParent(this->Properties);
-  
-  this->SliceEntry = vtkKWLabeledEntry::New();
-  this->SliceEntry->SetParent(this->Properties);
-  this->XDimension = vtkKWRadioButton::New();
-  this->XDimension->SetParent(this->Properties);
-  this->YDimension = vtkKWRadioButton::New();
-  this->YDimension->SetParent(this->Properties);
-  this->ZDimension = vtkKWRadioButton::New();
-  this->ZDimension->SetParent(this->Properties);
-  
-  this->Slice = vtkImageClip::New();
-  this->Slice->ClipDataOn();
-  
-  this->PropertiesCreated = 0;
   this->SliceNumber = 0;
   this->SliceAxis = 3;
   
@@ -69,28 +51,16 @@ vtkPVImageSlice::vtkPVImageSlice()
   this->SliceStyle->ConstrainSpheresOn();
   this->SliceStyleButton = vtkKWPushButton::New();
   this->SliceStyleCreated = 0;
+
+  vtkImageClip *clip = vtkImageClip::New();
+  clip->ClipDataOn();
+  this->SetVTKSource(clip);
+  clip->Delete();
 }
 
 //----------------------------------------------------------------------------
 vtkPVImageSlice::~vtkPVImageSlice()
 { 
-  this->Accept->Delete();
-  this->Accept = NULL;
-  this->SourceButton->Delete();
-  this->SourceButton = NULL;
-  
-  this->SliceEntry->Delete();
-  this->SliceEntry = NULL;
-  this->XDimension->Delete();
-  this->XDimension = NULL;
-  this->YDimension->Delete();
-  this->YDimension = NULL;
-  this->ZDimension->Delete();
-  this->ZDimension = NULL;
-  
-  this->Slice->Delete();
-  this->Slice = NULL;
-  
   this->SliceStyle->Delete();
   this->SliceStyle = NULL;
   this->SliceStyleButton->Delete();
@@ -106,43 +76,20 @@ vtkPVImageSlice* vtkPVImageSlice::New()
 //----------------------------------------------------------------------------
 void vtkPVImageSlice::CreateProperties()
 {
-  if (this->PropertiesCreated)
-    {
-    vtkErrorMacro("Properties already created.");
-    return;
-    }
-  this->PropertiesCreated = 1;
+  // must set the application
+  this->vtkPVImageToImageFilter::CreateProperties();
  
   this->GetSliceStyle()->
-    SetImageData((vtkImageData*)this->GetInput()->GetData());
+    SetImageData(this->GetInput()->GetData());
   this->GetSliceStyle()->
     SetExtent(this->GetSlice()->GetOutputWholeExtent());
   
-  // must set the application
-  this->vtkPVSource::CreateProperties();
+  this->AddScale("Slice:","SetSliceNumber","GetSliceNumber", 
+                 0,100,1, this);
+  this->AddModeList("Axis:", "SetSliceAxis","GetSliceAxis" *setCmd, char *getCmd,
+                   vtkKWObject *o = NULL);
+  void AddModeListItem(char *name, int value);
   
-  this->XDimension->Create(this->Application, "-text X");
-  this->XDimension->SetCommand(this, "SelectXCallback");
-  this->YDimension->Create(this->Application, "-text Y");
-  this->YDimension->SetCommand(this, "SelectYCallback");
-  this->ZDimension->Create(this->Application, "-text Z");
-  this->ZDimension->SetCommand(this, "SelectZCallback");
-
-  this->SliceEntry->Create(this->Application);
-  this->SliceEntry->SetLabel("Slice:");
-  
-  this->SourceButton->Create(this->Application, "-text GetSource");
-  this->SourceButton->SetCommand(this, "GetSource");
-  this->Accept->Create(this->Application, "-text Accept");
-  this->Accept->SetCommand(this, "SliceChanged");
-  this->Script("pack %s %s %s %s %s %s",
-	       this->SourceButton->GetWidgetName(),
-	       this->Accept->GetWidgetName(),
-	       this->SliceEntry->GetWidgetName(),
-	       this->XDimension->GetWidgetName(),
-	       this->YDimension->GetWidgetName(),
-	       this->ZDimension->GetWidgetName());
-
   this->UpdateProperties();
 }
 

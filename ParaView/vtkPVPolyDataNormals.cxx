@@ -27,12 +27,8 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 =========================================================================*/
 
 #include "vtkPVPolyDataNormals.h"
-#include "vtkPVApplication.h"
-#include "vtkPVRenderView.h"
-#include "vtkPVPolyData.h"
-#include "vtkPVImageData.h"
-#include "vtkPVWindow.h"
-#include "vtkPVActorComposite.h"
+#include "vtkPolyDataNormals.h"
+
 
 int vtkPVPolyDataNormalsCommand(ClientData cd, Tcl_Interp *interp,
 				int argc, char *argv[]);
@@ -42,39 +38,11 @@ vtkPVPolyDataNormals::vtkPVPolyDataNormals()
 {
   this->CommandFunction = vtkPVPolyDataNormalsCommand;
   
-  this->Accept = vtkKWPushButton::New();
-  this->Accept->SetParent(this->Properties);
-  
-  this->SourceButton = vtkKWPushButton::New();
-  this->SourceButton->SetParent(this->Properties);
-  
-  this->Splitting = vtkKWCheckButton::New();
-  this->Splitting->SetParent(this->Properties);
-
-  this->FeatureAngleEntry = vtkKWLabeledEntry::New();
-  this->FeatureAngleEntry->SetParent(this->Properties);
-  
-  this->PolyDataNormals = vtkPolyDataNormals::New();
+  vtkPolyDataNormals *pdn = vtkPolyDataNormals::New();
+  this->SetVTKSource(pdn);
+  pdn->Delete();
 }
 
-//----------------------------------------------------------------------------
-vtkPVPolyDataNormals::~vtkPVPolyDataNormals()
-{
-  this->Accept->Delete();
-  this->Accept = NULL;
-  
-  this->SourceButton->Delete();
-  this->SourceButton = NULL;
-  
-  this->Splitting->Delete();
-  this->Splitting = NULL;
-  
-  this->FeatureAngleEntry->Delete();
-  this->FeatureAngleEntry = NULL;
-  
-  this->PolyDataNormals->Delete();
-  this->PolyDataNormals = NULL;
-}
 
 //----------------------------------------------------------------------------
 vtkPVPolyDataNormals* vtkPVPolyDataNormals::New()
@@ -86,145 +54,16 @@ vtkPVPolyDataNormals* vtkPVPolyDataNormals::New()
 void vtkPVPolyDataNormals::CreateProperties()
 { 
   // must set the application
-  this->vtkPVSource::CreateProperties();
+  this->vtkPVPolyDataToPolyDataFilter::CreateProperties();
   
-  this->SourceButton->Create(this->Application, "-text GetSource");
-  this->SourceButton->SetCommand(this, "GetSource");
-  
-  this->Accept->Create(this->Application, "-text Accept");
-  this->Accept->SetCommand(this, "NormalsParameterChanged");
+  this->AddLabeledEntry("FeatureAngle:", "SetFeatureAngle", "GetFeatureAngle");
+  this->AddLabeledToggle("Splitting:", "SetSplitting", "GetSplitting");
+  this->AddLabeledToggle("Consistency:", "SetConsistency", "GetConsistency");
+  this->AddLabeledToggle("ComputePointNormals:", "SetComputePointNormals", "GetComputePointNormals");
+  this->AddLabeledToggle("ComputeCellNormals:", "SetComputeCellNormals", "GetComputeCellNormals");
+  this->AddLabeledToggle("FlipNormals:", "SetFlipNormals", "GetFlipNormals");
+  this->AddLabeledToggle("NonManifoldTraversal:", "SetNonManifoldTraversal", "GetNonManifoldTraversal");
 
-  this->Splitting->Create(this->Application, "-text Splitting");
-  this->Splitting->SetState(0);
-  
-  this->FeatureAngleEntry->Create(this->Application);
-  this->FeatureAngleEntry->SetLabel("Feature Angle:");
-  this->FeatureAngleEntry->SetValue(this->GetPolyDataNormals()->GetFeatureAngle());
-  
-  this->Script("pack %s %s %s %s",
-	       this->SourceButton->GetWidgetName(),
-	       this->Accept->GetWidgetName(),
-	       this->Splitting->GetWidgetName(),
-	       this->FeatureAngleEntry->GetWidgetName());
+  this->UpdateParameterWidgets();
 }
 
-//----------------------------------------------------------------------------
-void vtkPVPolyDataNormals::SetInput(vtkPVData *pvData)
-{
-  vtkPVApplication *pvApp = this->GetPVApplication();
-  
-  if (pvApp && pvApp->GetController()->GetLocalProcessId() == 0)
-    {
-    pvApp->BroadcastScript("%s SetInput %s", this->GetTclName(),
-			   pvData->GetTclName());
-    }  
-  
-  this->GetPolyDataNormals()->SetInput(vtkPolyData::SafeDownCast(pvData->GetData()));
-  this->Input = pvData;
-}
-
-//----------------------------------------------------------------------------
-void vtkPVPolyDataNormals::SetPVOutput(vtkPVPolyData *pvd)
-{
-  vtkPVApplication *pvApp = this->GetPVApplication();
-  
-  if (pvApp && pvApp->GetController()->GetLocalProcessId() == 0)
-    {
-    pvApp->BroadcastScript("%s SetPVOutput %s", this->GetTclName(),
-			   pvd->GetTclName());
-    }  
-  
-  this->SetPVData(pvd);  
-  pvd->SetData(this->GetPolyDataNormals()->GetOutput());
-}
-
-//----------------------------------------------------------------------------
-vtkPVPolyData *vtkPVPolyDataNormals::GetPVOutput()
-{
-  return vtkPVPolyData::SafeDownCast(this->PVOutput);
-}
-
-//----------------------------------------------------------------------------
-// Functions to update the progress bar
-void StartNormalsProgress(void *arg)
-{
-  vtkPVPolyDataNormals *me = (vtkPVPolyDataNormals*)arg;
-  me->GetWindow()->SetStatusText("Processing PolyData Normals");
-}
-
-//----------------------------------------------------------------------------
-void NormalsProgress(void *arg)
-{
-  vtkPVPolyDataNormals *me = (vtkPVPolyDataNormals*)arg;
-  me->GetWindow()->GetProgressGauge()->SetValue((int)(me->GetPolyDataNormals()->GetProgress() * 100));
-}
-
-//----------------------------------------------------------------------------
-void EndNormalsProgress(void *arg)
-{
-  vtkPVPolyDataNormals *me = (vtkPVPolyDataNormals*)arg;
-  me->GetWindow()->SetStatusText("");
-  me->GetWindow()->GetProgressGauge()->SetValue(0);
-}
-
-//----------------------------------------------------------------------------
-void vtkPVPolyDataNormals::NormalsParameterChanged()
-{
-  vtkPVApplication *pvApp = this->GetPVApplication();
-  vtkPVWindow *window = this->GetWindow();
-  vtkPVPolyData *pvd;
-  vtkPVAssignment *a;
-  vtkPVActorComposite *ac;
-  
-  this->SetSplitting(this->Splitting->GetState());
-  this->SetFeatureAngle(this->FeatureAngleEntry->GetValueAsFloat());
-  
-  if (this->GetPVData() == NULL)
-    { // This is the first time.  Create the data.
-    this->GetPolyDataNormals()->SetStartMethod(StartNormalsProgress, this);
-    this->GetPolyDataNormals()->SetProgressMethod(NormalsProgress, this);
-    this->GetPolyDataNormals()->SetEndMethod(EndNormalsProgress, this);
-    pvd = vtkPVPolyData::New();
-    pvd->Clone(pvApp);
-    this->SetPVOutput(pvd);
-    a = this->GetInput()->GetAssignment();
-    pvd->SetAssignment(a);
-    this->GetInput()->GetActorComposite()->VisibilityOff();
-    this->CreateDataPage();
-    ac = this->GetPVData()->GetActorComposite();
-    window->GetMainView()->AddComposite(ac);
-    window->GetSourceList()->Update();
-    }
-  
-  window->GetMainView()->SetSelectedComposite(this);
-  this->GetView()->Render();
-  window->GetMainView()->ResetCamera();
-}
-
-//----------------------------------------------------------------------------
-void vtkPVPolyDataNormals::SetSplitting(int split)
-{
-  vtkPVApplication *pvApp = this->GetPVApplication();
-  
-  if (pvApp && pvApp->GetController()->GetLocalProcessId() == 0)
-    {
-    pvApp->BroadcastScript("%s SetSplitting %d", this->GetTclName(),
-			   split);
-    }  
-  
-  this->GetPolyDataNormals()->SetSplitting(split);
-}
-
-//----------------------------------------------------------------------------
-void vtkPVPolyDataNormals::SetFeatureAngle(float angle)
-{
-  vtkPVApplication *pvApp = this->GetPVApplication();
-  
-  if (pvApp && pvApp->GetController()->GetLocalProcessId() == 0)
-    {
-    pvApp->BroadcastScript("%s SetFeatureAngle %f", this->GetTclName(),
-			   angle);
-    }
-  
-  this->GetPolyDataNormals()->SetFeatureAngle(angle);
-}

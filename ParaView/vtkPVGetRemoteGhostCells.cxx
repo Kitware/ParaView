@@ -27,11 +27,8 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 =========================================================================*/
 
 #include "vtkPVGetRemoteGhostCells.h"
+#include "vtkGetRemoteGhostCells.h"
 #include "vtkPVApplication.h"
-#include "vtkPVRenderView.h"
-#include "vtkPVPolyData.h"
-#include "vtkPVWindow.h"
-#include "vtkPVActorComposite.h"
 
 int vtkPVGetRemoteGhostCellsCommand(ClientData cd, Tcl_Interp *interp,
 				    int argc, char *argv[]);
@@ -41,27 +38,9 @@ vtkPVGetRemoteGhostCells::vtkPVGetRemoteGhostCells()
 {
   this->CommandFunction = vtkPVGetRemoteGhostCellsCommand;
   
-  this->Accept = vtkKWPushButton::New();
-  this->Accept->SetParent(this->Properties);
-  this->SourceButton = vtkKWPushButton::New();
-  this->SourceButton->SetParent(this->Properties);
-  this->GhostLevelEntry = vtkKWLabeledEntry::New();
-  this->GhostLevelEntry->SetParent(this->Properties);
-
   vtkGetRemoteGhostCells *rgc = vtkGetRemoteGhostCells::New();
   this->SetVTKSource(rgc);
   rgc->Delete();
-}
-
-//----------------------------------------------------------------------------
-vtkPVGetRemoteGhostCells::~vtkPVGetRemoteGhostCells()
-{ 
-  this->Accept->Delete();
-  this->Accept = NULL;
-  this->SourceButton->Delete();
-  this->SourceButton = NULL;
-  this->GhostLevelEntry->Delete();
-  this->GhostLevelEntry = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -74,56 +53,11 @@ vtkPVGetRemoteGhostCells* vtkPVGetRemoteGhostCells::New()
 void vtkPVGetRemoteGhostCells::CreateProperties()
 {  
   // must set the application
-  this->vtkPVSource::CreateProperties();
+  this->vtkPVPolyDataToPolyDataFilter::CreateProperties();
   
-  this->GhostLevelEntry->Create(this->Application);
-  this->GhostLevelEntry->SetLabel("Ghost Level: ");
-  this->GhostLevelEntry->SetValue(this->GetRemoteGhostCells()->GetOutput()->
-				  GetUpdateGhostLevel());
-  
-  this->SourceButton->Create(this->Application, "-text GetSource");
-  this->SourceButton->SetCommand(this, "SelectInputSource");
-  this->Accept->Create(this->Application, "-text Accept");
-  this->Accept->SetCommand(this, "GhostLevelChanged");
-  this->Script("pack %s %s %s",
-	       this->SourceButton->GetWidgetName(),
-	       this->Accept->GetWidgetName(),
-	       this->GhostLevelEntry->GetWidgetName());
-}
+  this->AddLabeledEntry("Levels:", "SetGhostLevel", "GetGhostLevel");
 
-//----------------------------------------------------------------------------
-void vtkPVGetRemoteGhostCells::GhostLevelChanged()
-{
-  vtkPVApplication *pvApp = (vtkPVApplication *)this->Application;
-  vtkPVWindow *window = this->GetWindow();
-  
-  if (this->GetPVData() == NULL)
-    { // This is the first time. Create the data.
-    //this->InitializeData();
-    window->GetSourceList()->Update();
-    }
-  
-  // This line needs to be after data is initialized because we need to set
-  // the ghost level of the poly data mapper, which isn't created until
-  // the data is initialized.
-  this->SetGhostLevel(this->GhostLevelEntry->GetValueAsInt());
-  
-  window->GetMainView()->SetSelectedComposite(this);
-  
-  this->GetView()->Render();
-}
-
-//----------------------------------------------------------------------------
-void vtkPVGetRemoteGhostCells::SetGhostLevel(int level)
-{
-  vtkPVApplication *pvApp = this->GetPVApplication();
-  if (pvApp && pvApp->GetController()->GetLocalProcessId() == 0)
-    {
-    pvApp->BroadcastScript("%s SetGhostLevel %d", this->GetTclName(), 
-			   level);
-    }
-  
-  this->GetPVOutput()->GetActorComposite()->GetMapper()->SetGhostLevel(level);
+  this->UpdateParameterWidgets();
 }
 
 //----------------------------------------------------------------------------

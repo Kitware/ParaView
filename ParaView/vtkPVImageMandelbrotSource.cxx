@@ -37,9 +37,9 @@ vtkPVImageMandelbrotSource::vtkPVImageMandelbrotSource()
   this->SetVTKSource(s);
 
   // initialize parameters
-  //s->SetCenter(-0.733569, 0.24405, 0.296116, 0.0253163);
-  //s->SetSpacing(1.38125e-005, 1.0e-004);
-  //s->SetDimensions(110, 110, 110);
+  s->SetOriginCX(-0.733569, 0.24405, 0.296116, 0.0253163);
+  s->SetSampleCX(1.38125e-005, 1.38125e-005, 1.0e-004, 1.0e-004);
+  s->SetWholeExtent(-50, 50, -50, 50, -50, 50);
   
   s->Delete();
 }
@@ -55,9 +55,11 @@ void vtkPVImageMandelbrotSource::CreateProperties()
 {  
   this->vtkPVSource::CreateProperties();
 
-  //void SetDimensions(int dx, int dy, int dz);
-  //void SetSpacing(float sc, float sx);
-  //void SetCenter(float cReal, float cImage, float xReal, float xImag);
+  this->AddVector6Entry("Extent:","X",NULL,"Y",NULL,"Z",NULL,"SetWholeExtent","GetWholeExtent");
+  this->AddVector3Entry("SubSpace:","X","Y","Z", "SetProjectionAxes", "GetProjectionAxes");
+  this->AddVector4Entry("Origin:","Cr","Ci","Xr","Xi","SetOriginCX","GetOriginCX");
+  this->AddVector4Entry("Spacing:","Cr","Ci","Xr","Xi","SetSampleCX","GetSampleCX");
 
+  this->UpdateParameterWidgets();
 }
 

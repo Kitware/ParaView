@@ -59,5 +59,7 @@ void vtkPVElevationFilter::CreateProperties()
 			"SetHighPoint", "GetHighPoint");
   this->AddVector2Entry("ScalarRange:", "Min", "Max", 
 			"SetScalarRange", "GetScalarRange");
+
+  this->UpdateParameterWidgets();
 }
 

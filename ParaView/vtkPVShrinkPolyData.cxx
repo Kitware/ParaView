@@ -56,5 +56,7 @@ void vtkPVShrinkPolyData::CreateProperties()
   
   this->AddScale("Shrink Factor:", "SetShrinkFactor", "GetShrinkFactor",
 		  0.0, 1.0, 0.01);
+
+  this->UpdateParameterWidgets();
 }
 

@@ -29,12 +29,10 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #ifndef __vtkPVGetRemoteGhostCells_h
 #define __vtkPVGetRemoteGhostCells_h
 
-#include "vtkKWLabeledEntry.h"
-#include "vtkGetRemoteGhostCells.h"
-#include "vtkKWPushButton.h"
 #include "vtkPVPolyDataToPolyDataFilter.h"
 
-class vtkPVPolyData;
+class vtkPVApplication;
+class vtkGetRemoteGhostCells;
 
 
 class VTK_EXPORT vtkPVGetRemoteGhostCells : public vtkPVPolyDataToPolyDataFilter
@@ -46,32 +44,19 @@ public:
   // Description:
   // You have to clone this object before you create its UI.
   void CreateProperties();
-  
-  // Description:
-  // This method is called when the accept button is pressed.
-  void GhostLevelChanged();
 
   // Description:
-  // This is used internally to cast the source to a vtkGetRemoteGhostCells
-  vtkGetRemoteGhostCells *GetRemoteGhostCells();
-
-  // Description:
-  // The methods execute on all processes.
-  void SetGhostLevel(int level);
-
-  // Description:
-  // This method sets the controller in the VTK filter.
+  // The class is overriding this method becuase the VTK filter needs
+  // the controller.
   void SetApplication(vtkKWApplication *app);
   
 protected:
   vtkPVGetRemoteGhostCells();
-  ~vtkPVGetRemoteGhostCells();
+  ~vtkPVGetRemoteGhostCells() {};
   vtkPVGetRemoteGhostCells(const vtkPVGetRemoteGhostCells&) {};
   void operator=(const vtkPVGetRemoteGhostCells&) {};
-  
-  vtkKWPushButton *Accept;
-  vtkKWPushButton *SourceButton;
-  vtkKWLabeledEntry *GhostLevelEntry;
+
+  vtkGetRemoteGhostCells *GetRemoteGhostCells();
 };
 
 #endif

@@ -129,7 +129,8 @@ void vtkPVGlyph3D::CreateProperties()
   this->AddModeListItem("Scale", 0);
   this->AddModeListItem("Scalar", 1);
   this->AddModeListItem("Vector", 2);
-  
+
+  this->UpdateParameterWidgets();  
 }
 
 

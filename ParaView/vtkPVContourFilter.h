@@ -29,56 +29,33 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #ifndef __vtkPVContourFilter_h
 #define __vtkPVContourFilter_h
 
-#include "vtkKitwareContourFilter.h"
-#include "vtkKWPushButton.h"
-#include "vtkKWLabeledEntry.h"
-#include "vtkPVSource.h"
+#include "vtkPVDataSetToPolyDataFilter.h"
 
-class vtkPVPolyData;
-class vtkPVImageData;
+class vtkKitwareContourFilter;
 
 
-class VTK_EXPORT vtkPVContourFilter : public vtkPVSource
+class VTK_EXPORT vtkPVContourFilter : public vtkPVDataSetToPolyDataFilter
 {
 public:
   static vtkPVContourFilter* New();
-  vtkTypeMacro(vtkPVContourFilter, vtkPVSource);
+  vtkTypeMacro(vtkPVContourFilter, vtkPVDataSetToPolyDataFilter);
 
   // Description:
   // You have to clone this object before you create its UI.
   void CreateProperties();
-  
-  // Description:
-  // The methods executes on all processes.
-  void SetInput(vtkPVData *pvData);
-  
-  // Description:
-  // For now you have to set the output explicitly.  This allows you to manage
-  // the object creation/tcl-names in the other processes.  Do not try to
-  // set the output before the input has been set.
-  void SetPVOutput(vtkPVPolyData *pvd);
-  vtkPVPolyData *GetPVOutput();
-  
-  // Description:
-  // This interface broadcasts the change to all the processes.
-  void SetValue(int contour, float val);
-  
-  void ContourValueChanged();
-  void GetSource();
 
-  vtkGetObjectMacro(Contour, vtkContourFilter);
+  // Description:
+  // Add value would not work.  We need a simple interface.
+  void SetValue(float val);
+  float GetValue();
 
 protected:
   vtkPVContourFilter();
-  ~vtkPVContourFilter();
+  ~vtkPVContourFilter() {};
   vtkPVContourFilter(const vtkPVContourFilter&) {};
   void operator=(const vtkPVContourFilter&) {};
-  
-  vtkKWPushButton *Accept;
-  vtkKWLabeledEntry *ContourValueEntry;
-  vtkKWPushButton *SourceButton;
-  
-  vtkKitwareContourFilter  *Contour;
+
+  vtkKitwareContourFilter *GetContour();
 };
 
 #endif

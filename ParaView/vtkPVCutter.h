@@ -29,63 +29,36 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #ifndef __vtkPVCutter_h
 #define __vtkPVCutter_h
 
+#include "vtkPVDataSetToPolyDataFilter.h"
 #include "vtkCutter.h"
 #include "vtkKWPushButton.h"
-#include "vtkKWLabeledFrame.h"
-#include "vtkKWLabeledEntry.h"
-#include "vtkKWPushButton.h"
 #include "vtkKWCheckButton.h"
-#include "vtkPVSource.h"
 #include "vtkInteractorStylePlane.h"
 
 class vtkPVPolyData;
 class vtkPVImageData;
 
 
-class VTK_EXPORT vtkPVCutter : public vtkPVSource
+class VTK_EXPORT vtkPVCutter : public vtkPVDataSetToPolyDataFilter
 {
 public:
   static vtkPVCutter* New();
-  vtkTypeMacro(vtkPVCutter, vtkPVSource);
+  vtkTypeMacro(vtkPVCutter, vtkPVDataSetToPolyDataFilter);
 
   // Description:
   // You have to clone this object before you create its UI.
   void CreateProperties();
-  
+    
   // Description:
-  // The methods executes on all processes.
-  void SetInput(vtkPVData *pvData);
+  // These set the parameters of the plane.
+  void SetOrigin(float originX, float originY, float originZ);
+  vtkGetVector3Macro(Origin, float);
+  void SetNormal(float normalX, float normalY, float normalZ);
+  vtkGetVector3Macro(Normal, float);
   
-  // Description:
-  // For now you have to set the output explicitly.  This allows you to manage
-  // the object creation/tcl-names in the other processes.  Do not try to
-  // set the output before the input has been set.
-  void SetPVOutput(vtkPVPolyData *pvd);
-  vtkPVPolyData *GetPVOutput();
-  
-  // Description:
-  // This interface broadcasts the change to all the processes.
-  void SetCutPlane(float originX, float originY, float originZ,
-		   float normalX, float normalY, float normalZ);
-  
-  void CutterChanged();
-  void GetSource();
-
-  vtkGetObjectMacro(Cutter, vtkCutter);
   vtkGetObjectMacro(PlaneStyle, vtkInteractorStylePlane);
-  
   void UsePlaneStyle();
-
-  // Description:
-  // Need to be able to get these to be able to change their values from a
-  // callback.
-  vtkGetObjectMacro(OriginXEntry, vtkKWLabeledEntry);
-  vtkGetObjectMacro(OriginYEntry, vtkKWLabeledEntry);
-  vtkGetObjectMacro(OriginZEntry, vtkKWLabeledEntry);
-  vtkGetObjectMacro(NormalXEntry, vtkKWLabeledEntry);
-  vtkGetObjectMacro(NormalYEntry, vtkKWLabeledEntry);
-  vtkGetObjectMacro(NormalZEntry, vtkKWLabeledEntry);
-  
+ 
   // Description:
   // need to pack/unpack the plane interactor style button depending on
   // whether we are selecting or deselecting this source
@@ -103,26 +76,18 @@ protected:
   vtkPVCutter(const vtkPVCutter&) {};
   void operator=(const vtkPVCutter&) {};
   
-  vtkKWPushButton *Accept;
-  vtkKWPushButton *SourceButton;
-
-  vtkKWLabeledFrame *OriginFrame;
-  vtkKWLabeledFrame *NormalFrame;
-  vtkKWLabeledEntry *OriginXEntry;
-  vtkKWLabeledEntry *OriginYEntry;
-  vtkKWLabeledEntry *OriginZEntry;
-  vtkKWLabeledEntry *NormalXEntry;
-  vtkKWLabeledEntry *NormalYEntry;
-  vtkKWLabeledEntry *NormalZEntry;
   vtkKWCheckButton *ShowCrosshairButton;
 
   vtkKWPushButton *PlaneStyleButton;
   
-  vtkCutter  *Cutter;
   vtkInteractorStylePlane *PlaneStyle;
 
   int PlaneStyleCreated;
   int PlaneStyleUsed;
+
+  // These duplicates are here because I did not want to modify the hints file.
+  float Origin[3];
+  float Normal[3];
 };
 
 #endif

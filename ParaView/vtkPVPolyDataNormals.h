@@ -29,59 +29,26 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #ifndef __vtkPVPolyDataNormals_h
 #define __vtkPVPolyDataNormals_h
 
-#include "vtkPolyDataNormals.h"
-#include "vtkKWPushButton.h"
-#include "vtkKWCheckButton.h"
-#include "vtkKWLabeledEntry.h"
-#include "vtkPVSource.h"
-
-class vtkPVPolyData;
-class vtkPVImageData;
+#include "vtkPVPolyDataToPolyDataFilter.h"
 
 
-class VTK_EXPORT vtkPVPolyDataNormals : public vtkPVSource
+class VTK_EXPORT vtkPVPolyDataNormals : public vtkPVPolyDataToPolyDataFilter
 {
 public:
   static vtkPVPolyDataNormals* New();
-  vtkTypeMacro(vtkPVPolyDataNormals, vtkPVSource);
+  vtkTypeMacro(vtkPVPolyDataNormals, vtkPVPolyDataToPolyDataFilter);
 
   // Description:
   // You have to clone this object before you create its UI.
   void CreateProperties();
-
-  // Description:
-  // This method executes in every process.
-  void SetInput(vtkPVData *input);
-  
-  // Description:
-  // For now you have to set the output explicitly.  This allows you to manage
-  // the object creation/tcl-names in the other processes.
-  void SetPVOutput(vtkPVPolyData *pvd);
-  vtkPVPolyData *GetPVOutput();
-  
-  // Description:
-  // Get the underlying vtk filter
-  vtkGetObjectMacro(PolyDataNormals, vtkPolyDataNormals);
-  
-  void NormalsParameterChanged();
-  
-  // Description:
-  // These methods execute in every process.
-  void SetSplitting(int split);
-  void SetFeatureAngle(float angle);
   
 protected:
   vtkPVPolyDataNormals();
-  ~vtkPVPolyDataNormals();
+  ~vtkPVPolyDataNormals() {};
   vtkPVPolyDataNormals(const vtkPVPolyDataNormals&) {};
   void operator=(const vtkPVPolyDataNormals&) {};
+ 
   
-  vtkKWPushButton *Accept;
-  vtkKWPushButton *SourceButton;
-  vtkKWCheckButton *Splitting;
-  vtkKWLabeledEntry *FeatureAngleEntry;
-  
-  vtkPolyDataNormals *PolyDataNormals;
 };
 
 #endif

@@ -61,6 +61,8 @@ void vtkPVSphereSource::CreateProperties()
   this->AddLabeledEntry("End Theta:", "SetEndTheta", "GetEndTheta");
   this->AddLabeledEntry("Start Phi:", "SetStartPhi", "GetStartPhi");
   this->AddLabeledEntry("End Phi:", "SetEndPhi", "GetEndPhi");
+
+  this->UpdateParameterWidgets();
 }
 
 

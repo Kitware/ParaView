@@ -57,5 +57,7 @@ void vtkPVConeSource::CreateProperties()
   this->AddLabeledEntry("Height:", "SetHeight", "GetHeight");
   this->AddLabeledEntry("Radius:", "SetRadius", "GetRadius");
   this->AddLabeledToggle("Capping:", "SetCapping", "GetCapping");
+
+  this->UpdateParameterWidgets();
 }
 

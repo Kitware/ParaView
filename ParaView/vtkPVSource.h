@@ -114,44 +114,58 @@ public:
   // Description:
   // Called when the accept button is pressed.
   void CancelCallback();
-  
+
   // Description:
-  // A method used to broadcast changes resulting from widgets.
-  void AcceptHelper(char *method, char *args);
+  // This method resets the UI values (Widgets added with the following methods).
+  // It uses the GetCommand supplied to the interface.
+  void UpdateParameterWidgets();
   
   // Description:
   // Create an entry for a single value.  Label is put to left of entry.
-  void AddLabeledEntry(char *label, char *setCmd, char *getCmd);
+  // The methods are called on the object (VTKSource if o=NULL).
+  void AddLabeledEntry(char *label, char *setCmd, char *getCmd,
+                       vtkKWObject *o = NULL);
   
   // Description:
   // Create an entry for items with multiple elements.
   // The primary label is put to the left.  The element labels
   // (l1,l2,l3, ...) are put in from of the individual entry boxes.
+  // The methods are called on the object (VTKSource if o=NULL).
   void AddVector2Entry(char *label, char *l1, char *l2,
-		       char *setCmd, char *getCmd);
+		       char *setCmd, char *getCmd, vtkKWObject *o = NULL);
   void AddVector3Entry(char *label, char *l1, char *l2, char *l3,
-		       char *setCmd, char *getCmd);
+		       char *setCmd, char *getCmd, vtkKWObject *o = NULL);
   void AddVector4Entry(char *label, char *l1, char *l2, char *l3, char *l4,
-		       char *setCmd, char *getCmd);
+		       char *setCmd, char *getCmd, vtkKWObject *o = NULL);
   void AddVector6Entry(char *label, char *l1, char *l2, char *l3, 
 		       char *l4, char *l5, char *l6,
-		       char *setCmd, char *getCmd);
+		       char *setCmd, char *getCmd, vtkKWObject *o = NULL);
   
   // Description:
   // Special widget controls (not entries).
-  void AddLabeledToggle(char *label, char *setCmd, char *getCmd);
+  // The methods are called on the object (VTKSource if o=NULL).
+  void AddLabeledToggle(char *label, char *setCmd, char *getCmd,
+                        vtkKWObject *o = NULL);
   void AddScale(char *label, char *setCmd, char *getCmd, 
-		float min, float max, float resolution);
+                float min, float max, float resolution,
+                vtkKWObject *o = NULL);
 
   // Description:
   // Creates a list for delecting a mode.
-  void AddModeList(char *label, char *setCmd, char *getCmd);
+  // The methods are called on the object (VTKSource if o=NULL).
+  void AddModeList(char *label, char *setCmd, char *getCmd,
+                   vtkKWObject *o = NULL);
   void AddModeListItem(char *name, int value);
   
   // Description:
   // Set the vtk source that will be a part of the pipeline.
   void SetVTKSource(vtkSource *source);
   vtkGetObjectMacro(VTKSource, vtkSource);
+
+  // Description:
+  // A method used to broadcast changes resulting from widgets.
+  void AcceptHelper(char *method, char *args);
+  void AcceptHelper2(char *tclName, char *method, char *args);  
 
   // Description:
   // A call back method from the Navigation window.

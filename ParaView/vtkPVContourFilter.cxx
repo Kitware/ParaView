@@ -27,11 +27,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 =========================================================================*/
 
 #include "vtkPVContourFilter.h"
-#include "vtkPVApplication.h"
-#include "vtkPVRenderView.h"
-#include "vtkPVPolyData.h"
-#include "vtkPVWindow.h"
-#include "vtkPVActorComposite.h"
+#include "vtkKitwareContourFilter.h"
 
 
 int vtkPVContourFilterCommand(ClientData cd, Tcl_Interp *interp,
@@ -41,31 +37,10 @@ int vtkPVContourFilterCommand(ClientData cd, Tcl_Interp *interp,
 vtkPVContourFilter::vtkPVContourFilter()
 {
   this->CommandFunction = vtkPVContourFilterCommand;
-  
-  this->Accept = vtkKWPushButton::New();
-  this->Accept->SetParent(this->Properties);
-  this->ContourValueEntry = vtkKWLabeledEntry::New();
-  this->ContourValueEntry->SetParent(this->Properties);
-  this->SourceButton = vtkKWPushButton::New();
-  this->SourceButton->SetParent(this->Properties);
-  
-  this->Contour = vtkKitwareContourFilter::New();
-}
-
-//----------------------------------------------------------------------------
-vtkPVContourFilter::~vtkPVContourFilter()
-{ 
-  this->Accept->Delete();
-  this->Accept = NULL;
-  
-  this->ContourValueEntry->Delete();
-  this->ContourValueEntry = NULL;
-  
-  this->SourceButton->Delete();
-  this->SourceButton = NULL;
-  
-  this->Contour->Delete();
-  this->Contour = NULL;
+    
+  vtkKitwareContourFilter *c = vtkKitwareContourFilter::New();
+  this->SetVTKSource(c);
+  c->Delete();
 }
 
 //----------------------------------------------------------------------------
@@ -79,132 +54,27 @@ void vtkPVContourFilter::CreateProperties()
 {
   this->vtkPVSource::CreateProperties();
   
-  this->SourceButton->Create(this->Application, "-text GetSource");
-  this->SourceButton->SetCommand(this, "GetSource");
-  this->Script("pack %s", this->SourceButton->GetWidgetName());
+  this->AddLabeledEntry("Value:","SetValue","GetValue",this);
 
-  this->ContourValueEntry->Create(this->Application);
-  this->ContourValueEntry->SetLabel("Contour Value:");
-  this->ContourValueEntry->SetValue(this->GetContour()->GetValue(0), 2);
-
-  this->Accept->Create(this->Application, "-text Accept");
-  this->Accept->SetCommand(this, "ContourValueChanged");
-  this->Script("pack %s %s", this->Accept->GetWidgetName(),
-	       this->ContourValueEntry->GetWidgetName());
+  this->UpdateParameterWidgets();
 }
 
+
 //----------------------------------------------------------------------------
-void vtkPVContourFilter::SetInput(vtkPVData *pvData)
+vtkKitwareContourFilter *vtkPVContourFilter::GetContour()
 {
-  vtkPVApplication *pvApp = this->GetPVApplication();
-  
-  if (pvApp && pvApp->GetController()->GetLocalProcessId() == 0)
-    {
-    pvApp->BroadcastScript("%s SetInput %s", this->GetTclName(),
-			   pvData->GetTclName());
-    }  
-  
-  this->GetContour()->SetInput(pvData->GetData());
-  this->Input = pvData;
+  return vtkKitwareContourFilter::SafeDownCast(this->GetVTKSource());
 }
 
 //----------------------------------------------------------------------------
-void vtkPVContourFilter::SetPVOutput(vtkPVPolyData *pvd)
-{
-  vtkPVApplication *pvApp = this->GetPVApplication();
-  
-  if (pvApp && pvApp->GetController()->GetLocalProcessId() == 0)
-    {
-    pvApp->BroadcastScript("%s SetPVOutput %s", this->GetTclName(),
-			   pvd->GetTclName());
-    }  
-  
-  this->SetPVData(pvd);  
-  pvd->SetData(this->Contour->GetOutput());
-}
-
-//----------------------------------------------------------------------------
-vtkPVPolyData *vtkPVContourFilter::GetPVOutput()
-{
-  return vtkPVPolyData::SafeDownCast(this->PVOutput);
-}
-
-//----------------------------------------------------------------------------
-void vtkPVContourFilter::SetValue(int contour, float val)
+void vtkPVContourFilter::SetValue(float val)
 {  
-  vtkPVApplication *pvApp = this->GetPVApplication();
-  
-  if (pvApp && pvApp->GetController()->GetLocalProcessId() == 0)
-    {
-    //this->ContourValueEntry->SetValue(val, 7);
-    pvApp->BroadcastScript("%s SetValue %d %f", this->GetTclName(),
-			   contour, val);
-    }
-  
-  this->GetContour()->SetValue(contour, val);
+  this->GetContour()->SetValue(0, val);
 }
 
 //----------------------------------------------------------------------------
-// Functions to update the progress bar
-void StartContourFilterProgress(void *arg)
-{
-  vtkPVContourFilter *me = (vtkPVContourFilter*)arg;
-  me->GetWindow()->SetStatusText("Processing ContourFilter");
+float vtkPVContourFilter::GetValue()
+{  
+  return this->GetContour()->GetValue(0);
 }
 
-//----------------------------------------------------------------------------
-void ContourFilterProgress(void *arg)
-{
-  vtkPVContourFilter *me = (vtkPVContourFilter*)arg;
-  me->GetWindow()->GetProgressGauge()->SetValue((int)(me->GetContour()->GetProgress() * 100));
-}
-
-//----------------------------------------------------------------------------
-void EndContourFilterProgress(void *arg)
-{
-  vtkPVContourFilter *me = (vtkPVContourFilter*)arg;
-  me->GetWindow()->SetStatusText("");
-  me->GetWindow()->GetProgressGauge()->SetValue(0);
-}
-
-//----------------------------------------------------------------------------
-void vtkPVContourFilter::ContourValueChanged()
-{
-  vtkPVApplication *pvApp = (vtkPVApplication *)this->Application;
-  vtkPVWindow *window = this->GetWindow();
-  vtkPVPolyData *pvd;
-  vtkPVAssignment *a;
-  vtkPVActorComposite *ac;
-  
-  this->SetValue(0, this->ContourValueEntry->GetValueAsFloat());
-
-  if (this->GetPVData() == NULL)
-    { // This is the first time.  Create the data.
-    this->GetContour()->SetStartMethod(StartContourFilterProgress, this);
-    this->GetContour()->SetProgressMethod(ContourFilterProgress, this);
-    this->GetContour()->SetEndMethod(EndContourFilterProgress, this);
-    pvd = vtkPVPolyData::New();
-    pvd->Clone(pvApp);
-    this->SetPVOutput(pvd);
-    a = this->GetInput()->GetAssignment();
-    pvd->SetAssignment(a);
-    this->GetInput()->GetActorComposite()->VisibilityOff();
-    this->CreateDataPage();
-    ac = this->GetPVData()->GetActorComposite();
-    window->GetMainView()->AddComposite(ac);
-    window->GetSourceList()->Update();
-    }
-  window->GetMainView()->SetSelectedComposite(this);
-  this->GetView()->Render();
-}
-
-//----------------------------------------------------------------------------
-void vtkPVContourFilter::GetSource()
-{
-  this->GetPVData()->GetActorComposite()->VisibilityOff();
-  this->GetWindow()->GetMainView()->
-    SetSelectedComposite(this->GetInput()->GetPVSource());
-  this->GetInput()->GetActorComposite()->VisibilityOn();
-  this->GetView()->Render();
-  this->GetWindow()->GetMainView()->ResetCamera();
-}

@@ -134,7 +134,8 @@ int vtkPVData::Create(char *args)
   // create the top level
   this->Script("frame %s %s", this->GetWidgetName(), args);
 
-  //this->Update();
+  // The contour entry checks for scalars.
+  this->Update();
   
   this->FiltersMenuButton->SetParent(this);
   this->FiltersMenuButton->Create(this->Application, "-relief raised -bd 2");
@@ -192,7 +193,7 @@ void vtkPVData::Contour()
   this->Update();
   // This should be replaced by a parallel version.
   range = this->Data->GetScalarRange();
-  contour->SetValue(0, (range[1]+range[0])/2.0);
+  contour->SetValue((range[1]+range[0])/2.0);
       
   contour->SetName("contour");
 
@@ -214,7 +215,8 @@ void vtkPVData::Cutter()
   cutter->Clone(pvApp);
   cutter->SetInput(this);
   
-  cutter->SetCutPlane(0, 0, 0, 0, 0, 1);
+  cutter->SetOrigin(0, 0, 0);
+  cutter->SetNormal(0, 0, 1);
 
   this->GetPVSource()->GetView()->AddComposite(cutter);
   cutter->SetName("cutter");

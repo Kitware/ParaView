@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   Visualization Toolkit
-  Module:    vtkPVTubeFilter.cxx
+  Module:    vtkPVImageToImageFilter.cxx
   Language:  C++
   Date:      $Date$
   Version:   $Revision$
@@ -26,36 +26,57 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 =========================================================================*/
 
-#include "vtkPVTubeFilter.h"
-#include "vtkTubeFilter.h"
+#include "vtkPVImageToImageFilter.h"
+#include "vtkImageToImageFilter.h"
+#include "vtkPVApplication.h"
+#include "vtkPVImageData.h"
 
-int vtkPVTubeFilterCommand(ClientData cd, Tcl_Interp *interp,
+
+int vtkPVImageToImageFilterCommand(ClientData cd, Tcl_Interp *interp,
 			   int argc, char *argv[]);
 
 //----------------------------------------------------------------------------
-vtkPVTubeFilter::vtkPVTubeFilter()
+vtkPVImageToImageFilter::vtkPVImageToImageFilter()
 {
-  this->CommandFunction = vtkPVTubeFilterCommand;
-  
-  vtkTubeFilter *tube = vtkTubeFilter::New();
-  this->SetVTKSource(tube);
-  tube->Delete();
+  this->CommandFunction = vtkPVImageToImageFilterCommand;
 }
 
 //----------------------------------------------------------------------------
-vtkPVTubeFilter* vtkPVTubeFilter::New()
+vtkPVImageToImageFilter* vtkPVImageToImageFilter::New()
 {
-  return new vtkPVTubeFilter();
+  return new vtkPVImageToImageFilter();
 }
 
 //----------------------------------------------------------------------------
-void vtkPVTubeFilter::CreateProperties()
-{  
-  this->vtkPVPolyDataToPolyDataFilter::CreateProperties();
+void vtkPVImageToImageFilter::SetInput(vtkPVImageData *pvData)
+{
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  vtkImageToImageFilter *f;
   
-  this->AddLabeledEntry("Radius:", "SetRadius", "GetRadius");
-  this->AddLabeledEntry("Number of Sides:", "SetNumberOfSides", "GetNumberOfSides");
+  // Handle parallelism.
+  if (pvApp && pvApp->GetController()->GetLocalProcessId() == 0)
+    {
+    pvApp->BroadcastScript("%s SetInput %s", this->GetTclName(),
+			   pvData->GetTclName());
+    }  
+  
+  // Set the input of the VTK filter.
+  f = vtkImageToImageFilter::SafeDownCast(this->GetVTKSource());
+  f->SetInput(pvData->GetImageData());
 
-  this->UpdateParameterWidgets();
+  // Handle reference counting and the reverse link.
+  if (this->Input)
+    {
+    this->Input->RemovePVSourceFromUsers(this);
+    this->Input->UnRegister(this);
+    this->Input = NULL;
+    }
+  if (pvData)
+    {
+    pvData->Register(this);
+    this->Input = pvData;
+    this->Input->AddPVSourceToUsers(this);
+    }
 }
+
 
