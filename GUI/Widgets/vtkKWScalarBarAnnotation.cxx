@@ -33,13 +33,10 @@
 #include "vtkScalarBarWidget.h"
 #include "vtkTextProperty.h"
 #include "vtkVolumeProperty.h"
-#ifndef DO_NOT_BUILD_XML_RW
-#include "vtkXMLScalarBarWidgetWriter.h"
-#endif
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWScalarBarAnnotation );
-vtkCxxRevisionMacro(vtkKWScalarBarAnnotation, "1.10");
+vtkCxxRevisionMacro(vtkKWScalarBarAnnotation, "1.11");
 
 int vtkKWScalarBarAnnotationCommand(ClientData cd, Tcl_Interp *interp,
                                     int argc, char *argv[]);
@@ -886,21 +883,7 @@ void vtkKWScalarBarAnnotation::SendChangedEvent()
     return;
     }
 
-#ifdef DO_NOT_BUILD_XML_RW
   this->InvokeEvent(this->AnnotationChangedEvent, NULL);
-#else
-  ostrstream event;
-
-  vtkXMLScalarBarWidgetWriter *xmlw = vtkXMLScalarBarWidgetWriter::New();
-  xmlw->SetObject(this->ScalarBarWidget);
-  xmlw->WriteToStream(event);
-  xmlw->Delete();
-
-  event << ends;
-
-  this->InvokeEvent(this->AnnotationChangedEvent, event.str());
-  event.rdbuf()->freeze(0);
-#endif
 }
 
 //----------------------------------------------------------------------------

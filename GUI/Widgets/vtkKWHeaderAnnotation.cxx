@@ -27,13 +27,10 @@
 #include "vtkObjectFactory.h"
 #include "vtkTextActor.h"
 #include "vtkTextProperty.h"
-#ifndef DO_NOT_BUILD_XML_RW
-#include "vtkXMLTextActorWriter.h"
-#endif
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWHeaderAnnotation );
-vtkCxxRevisionMacro(vtkKWHeaderAnnotation, "1.6");
+vtkCxxRevisionMacro(vtkKWHeaderAnnotation, "1.7");
 
 int vtkKWHeaderAnnotationCommand(ClientData cd, Tcl_Interp *interp,
                                  int argc, char *argv[]);
@@ -392,21 +389,7 @@ void vtkKWHeaderAnnotation::SendChangedEvent()
     return;
     }
 
-#ifdef DO_NOT_BUILD_XML_RW
   this->InvokeEvent(this->AnnotationChangedEvent, NULL);
-#else
-  ostrstream event;
-
-  vtkXMLTextActorWriter *xmlw = vtkXMLTextActorWriter::New();
-  xmlw->SetObject(this->RenderWidget->GetHeaderAnnotation());
-  xmlw->WriteToStream(event);
-  xmlw->Delete();
-
-  event << ends;
-
-  this->InvokeEvent(this->AnnotationChangedEvent, event.str());
-  event.rdbuf()->freeze(0);
-#endif
 }
 
 //----------------------------------------------------------------------------
