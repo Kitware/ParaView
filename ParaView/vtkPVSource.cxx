@@ -925,6 +925,12 @@ void vtkPVSource::AcceptCallback()
     vtkPVData *ac;
     
     ac = this->GetPVOutput(0);
+    if (ac == NULL)
+      { // I suppose we should try and delete the source.
+      vtkErrorMacro("Could not get output.");
+      this->DeleteCallback();    
+      return;
+      }
     window->GetMainView()->AddComposite(ac);
     ac->CreateProperties();
     ac->Initialize();
