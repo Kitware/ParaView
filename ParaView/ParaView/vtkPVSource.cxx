@@ -70,7 +70,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.247");
+vtkCxxRevisionMacro(vtkPVSource, "1.248");
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -517,8 +517,6 @@ void vtkPVSource::CreateProperties()
   this->AcceptButton->SetCommand(this, "PreAcceptCallback");
   this->AcceptButton->SetBalloonHelpString(
     "Cause the current values in the user interface to take effect");
-  this->Script("pack %s -side left -fill x -expand t", 
-               this->AcceptButton->GetWidgetName());
 
   this->ResetButton->SetParent(frame);
   this->ResetButton->Create(this->Application, "-text Reset");
@@ -526,8 +524,6 @@ void vtkPVSource::CreateProperties()
   this->ResetButton->SetBalloonHelpString(
     "Revert to the previous parameters of current module.  "
     "If no values have been set, remove it.");
-  this->Script("pack %s -side left -fill x -expand t", 
-               this->ResetButton->GetWidgetName());
 
   this->DeleteButton->SetParent(frame);
   this->DeleteButton->Create(this->Application, "-text Delete");
@@ -535,11 +531,14 @@ void vtkPVSource::CreateProperties()
   this->DeleteButton->SetBalloonHelpString(
     "Remove the current module.  "
     "This can only be done if no other modules depends on the current one.");
-  this->Script("pack %s -side left -fill x -expand t",
+
+  this->Script("pack %s %s %s -padx 2 -pady 2 -side left -fill x -expand t",
+               this->AcceptButton->GetWidgetName(), 
+               this->ResetButton->GetWidgetName(), 
                this->DeleteButton->GetWidgetName());
 
   frame->Delete();  
-  
+ 
   
   this->UpdateProperties();
   
@@ -2066,7 +2065,7 @@ void vtkPVSource::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVSource ";
-  this->ExtractRevision(os,"$Revision: 1.247 $");
+  this->ExtractRevision(os,"$Revision: 1.248 $");
 }
 
 //----------------------------------------------------------------------------
