@@ -1,4 +1,12 @@
 <ModuleInterfaces>
+  <Module name="DEMReader"
+          root_name="DEMReader"
+          class="vtkPVReaderModule"
+          module_type="Reader"
+          extensions=".dem"
+          file_description="Digital Elevation Map Files">
+    <Source class="vtkDEMReader"/>
+  </Module>
   <Module name="PVDReader"
           class="vtkPVDReaderModule"
           root_name="PVDReader"

@@ -1,6 +1,18 @@
 <ServerManagerConfiguration>
   <ProxyGroup name="sources">
 
+   <SourceProxy name="DEMReader" 
+                class="vtkDEMReader">
+     <StringVectorProperty
+        name="FileName"
+        command="SetFileName"
+        number_of_elements="1">
+        <StringListDomain name="files"/>
+     </StringVectorProperty>
+
+   <!-- End DEMReader -->
+   </SourceProxy>
+
    <SourceProxy name="PVDReader" 
                 class="vtkPVDReader">
      <StringVectorProperty
