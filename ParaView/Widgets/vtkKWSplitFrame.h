@@ -86,6 +86,15 @@ public:
   void SetFrame1Size(int minSize);
 
   // Description:
+  // Set/Get the visibility of the left or right frame.  
+  virtual void SetFrame1Visibility(int flag);
+  vtkGetMacro(Frame1Visibility, int);
+  vtkBooleanMacro(Frame1Visibility, int);  
+  virtual void SetFrame2Visibility(int flag);
+  vtkGetMacro(Frame2Visibility, int);
+  vtkBooleanMacro(Frame2Visibility, int);  
+
+  // Description:
   // This sets the separators narrow dimension. Horizontal=> size = width.  
   // If the size is 0, then the two frames cannot be adjusted by the user.
   void SetSeparatorSize(int size);
@@ -124,6 +133,9 @@ protected:
   int Frame1Size;
   int Frame2Size;
   int SeparatorSize;
+
+  int Frame1Visibility;
+  int Frame2Visibility;
 
   int Frame1MinimumSize;
   int Frame2MinimumSize;

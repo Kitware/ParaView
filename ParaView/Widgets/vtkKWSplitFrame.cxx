@@ -46,7 +46,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 vtkStandardNewMacro( vtkKWSplitFrame );
-vtkCxxRevisionMacro(vtkKWSplitFrame, "1.12");
+vtkCxxRevisionMacro(vtkKWSplitFrame, "1.13");
 
 
 
@@ -70,6 +70,9 @@ vtkKWSplitFrame::vtkKWSplitFrame()
   this->Frame2Size = 700;
   this->Frame1MinimumSize = 50;
   this->Frame2MinimumSize = 50;
+
+  this->Frame1Visibility = 1;
+  this->Frame2Visibility = 1;
 
   this->SeparatorSize = 6;
 
@@ -384,6 +387,31 @@ void vtkKWSplitFrame::SetSeparatorSize(int size)
   this->SetFrame1Size(this->Frame1Size);
 }
 
+//----------------------------------------------------------------------------
+void vtkKWSplitFrame::SetFrame1Visibility(int flag)
+{
+  if (this->Frame1Visibility == flag)
+    {
+    return;
+    }
+
+  this->Frame1Visibility = flag;
+  this->Modified();
+  this->Update();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWSplitFrame::SetFrame2Visibility(int flag)
+{
+  if (this->Frame2Visibility == flag)
+    {
+    return;
+    }
+
+  this->Frame2Visibility = flag;
+  this->Modified();
+  this->Update();
+}
 
 //----------------------------------------------------------------------------
 void vtkKWSplitFrame::Update()
@@ -393,27 +421,91 @@ void vtkKWSplitFrame::Update()
     return;
     }
 
-  if (this->Orientation == vtkKWSplitFrame::Horizontal)  
+  int separator_size, frame1_size, frame2_size;
+
+  if (this->Frame1Visibility && this->Frame2Visibility)
     {
-    this->Script("place %s -relx 0 -rely 0 -width %d -relheight 1.0",
-                 this->Frame1->GetWidgetName(), this->Frame1Size);
-    this->Script("place %s -x %d -rely 0 -width %d -relheight 1.0",
-                 this->Separator->GetWidgetName(), this->Frame1Size,
-                 this->SeparatorSize);
-    this->Script("place %s -x %d -rely 0 -width %d -relheight 1.0",
-                 this->Frame2->GetWidgetName(), 
-                 this->Frame1Size+this->SeparatorSize, this->Frame2Size);
+    separator_size = this->SeparatorSize;
+    frame1_size = this->Frame1Size;
+    frame2_size = this->Frame2Size;
     }
   else
     {
-    this->Script("place %s -relx 0 -rely 0 -relwidth 1.0 -height %d",
-                 this->Frame1->GetWidgetName(), this->Frame1Size);
-    this->Script("place %s -relx 0 -y %d -relwidth 1.0 -height %d",
-                 this->Separator->GetWidgetName(), this->Frame1Size,
-                 this->SeparatorSize);
-    this->Script("place %s -relx 0 -y %d -height %d -relwidth 1.0",
-                 this->Frame2->GetWidgetName(), 
-                 this->Frame1Size+this->SeparatorSize, this->Frame2Size);
+    separator_size = 0;
+    if (this->Frame1Visibility)
+      {
+      frame1_size = this->Size;
+      frame2_size = 0;
+      }
+    else if (this->Frame2Visibility)
+      {
+      frame1_size = 0;
+      frame2_size = this->Size;
+      }
+    else
+      {
+      frame1_size = frame2_size = 0;
+      }
+    }
+
+  if (this->Frame1Visibility)
+    {
+    if (this->Orientation == vtkKWSplitFrame::Horizontal)  
+      {
+      this->Script("place %s -relx 0 -rely 0 -width %d -relheight 1.0",
+                   this->Frame1->GetWidgetName(), frame1_size);
+      }
+    else
+      {
+      this->Script("place %s -relx 0 -rely 0 -relwidth 1.0 -height %d",
+                   this->Frame1->GetWidgetName(), frame1_size);
+      }
+    }
+  else
+    {
+    this->Script("place forget %s", this->Frame1->GetWidgetName());
+    }
+
+  if (this->Frame1Visibility && this->Frame2Visibility)
+    {
+    if (this->Orientation == vtkKWSplitFrame::Horizontal)  
+      {
+      this->Script("place %s -x %d -rely 0 -width %d -relheight 1.0",
+                   this->Separator->GetWidgetName(), 
+                   frame1_size,
+                   separator_size);
+      }
+    else
+      {
+      this->Script("place %s -relx 0 -y %d -relwidth 1.0 -height %d",
+                   this->Separator->GetWidgetName(), 
+                   frame1_size,
+                   separator_size);
+      }
+    }
+  else
+    {
+    this->Script("place forget %s", this->Separator->GetWidgetName());
+    }
+
+  if (this->Frame2Visibility)
+    {
+    if (this->Orientation == vtkKWSplitFrame::Horizontal)  
+      {
+      this->Script("place %s -x %d -rely 0 -width %d -relheight 1.0",
+                   this->Frame2->GetWidgetName(), 
+                   frame1_size + separator_size, frame2_size);
+      }
+    else
+      {
+      this->Script("place %s -relx 0 -y %d -height %d -relwidth 1.0",
+                   this->Frame2->GetWidgetName(), 
+                   frame1_size + separator_size, frame2_size);
+      }
+    }
+  else
+    {
+    this->Script("place forget %s", this->Frame2->GetWidgetName());
     }
 }
 
@@ -424,9 +516,11 @@ void vtkKWSplitFrame::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "Frame1MinimumSize: " << this->GetFrame1MinimumSize() 
      << endl;
   os << indent << "Frame1Size: " << this->GetFrame1Size() << endl;
+  os << indent << "Frame1Visibility: " << (this->Frame1Visibility ? "On" : "Off") << endl;
   os << indent << "Frame2MinimumSize: " << this->GetFrame2MinimumSize() 
      << endl;
   os << indent << "Frame2Size: " << this->GetFrame2Size() << endl;
+  os << indent << "Frame2Visibility: " << (this->Frame2Visibility ? "On" : "Off") << endl;
   os << indent << "SeparatorSize: " << this->GetSeparatorSize() << endl;
 
   if (this->Orientation == vtkKWSplitFrame::Horizontal)
