@@ -7,6 +7,7 @@ SET(Filters_SRCS
   vtkGroup.cxx
   vtkMazeSource.cxx
   vtkMergeArrays.cxx
+  vtkMPIDuplicatePolyData.cxx
   vtkPVArrowSource.cxx
   vtkPVClipDataSet.cxx
   vtkPVConnectivityFilter.cxx
@@ -40,7 +41,6 @@ IF(VTK_USE_MPI)
       vtkExtractUserDefinedPiece.cxx
       vtkKdTree.cxx
       vtkMergeCells.cxx
-      vtkMPIDuplicatePolyData.cxx
       vtkPKdTree.cxx
       vtkPlanesIntersection.cxx
       vtkPointsProjectedHull.cxx

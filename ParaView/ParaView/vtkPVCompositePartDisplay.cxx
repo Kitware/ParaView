@@ -34,7 +34,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCompositePartDisplay);
-vtkCxxRevisionMacro(vtkPVCompositePartDisplay, "1.14");
+vtkCxxRevisionMacro(vtkPVCompositePartDisplay, "1.15");
 
 
 //----------------------------------------------------------------------------
@@ -126,12 +126,7 @@ void vtkPVCompositePartDisplay::CreateParallelTclObjects(vtkPVApplication *pvApp
     }
   else if (pvApp->GetUseTiledDisplay())
     { 
-#ifdef VTK_USE_MPI
     this->CollectID = pm->NewStreamObject("vtkMPIDuplicatePolyData");
-#else
-    // We should never use a composite part display without MPI. 
-    vtkErrorMacro("Do not use composite part display without MPI.");
-#endif    
     pm->GetStream()
       << vtkClientServerStream::Invoke
       << this->CollectID << "SetPassThrough" << 1

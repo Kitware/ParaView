@@ -26,7 +26,6 @@
 #include "vtkPolyDataToPolyDataFilter.h"
 class vtkSocketController;
 class vtkMultiProcessController;
-class vtkMPICommunicator;
 class vtkPolyDataWriter;
 class vtkPolyDataReader;
 
@@ -82,7 +81,7 @@ protected:
   // Data generation method
   void ComputeInputUpdateExtents(vtkDataObject *output);
   void Execute();
-  void ServerExecute(vtkMPICommunicator* com, vtkPolyDataReader* reader, 
+  void ServerExecute(vtkPolyDataReader* reader, 
                      vtkPolyDataWriter* writer);
   void ClientExecute(vtkPolyDataReader* reader);
   void ReconstructOutput(vtkPolyDataReader* reader, int numProcs,
