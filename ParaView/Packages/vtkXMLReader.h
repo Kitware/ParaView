@@ -45,6 +45,10 @@ public:
   // reader.
   virtual int CanReadFile(const char* name);
   
+  // Description:
+  // Get the output as a vtkDataSet pointer.
+  vtkDataSet* GetOutputAsDataSet();
+  
 protected:
   vtkXMLReader();
   ~vtkXMLReader();
@@ -58,9 +62,6 @@ protected:
   // done.
   virtual void ReadXMLInformation();
   virtual void ReadXMLData();
-  
-  // Get the output as a vtkDataSet pointer.
-  vtkDataSet* GetOutputAsDataSet();
   
   // Get the name of the data set being read.
   virtual const char* GetDataSetName()=0;
