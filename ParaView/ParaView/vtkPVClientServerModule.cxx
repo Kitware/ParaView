@@ -219,7 +219,7 @@ void vtkPVSendPolyData(void* arg, void*, int, int)
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVClientServerModule);
-vtkCxxRevisionMacro(vtkPVClientServerModule, "1.48");
+vtkCxxRevisionMacro(vtkPVClientServerModule, "1.49");
 
 int vtkPVClientServerModuleCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -479,7 +479,7 @@ void vtkPVClientServerModule::Connect()
           runcommand += numbuffer;
           runcommand += " ";
           }
-        runcommand += "${PARAVIEW_EXECUTABLE} --server --port=";
+        runcommand += "eval ${PARAVIEW_EXECUTABLE} --server --port=";
         sprintf(numbuffer, "%d", this->Port);
         runcommand += numbuffer;
         this->RemoteExecution->SetRemoteHost(this->Hostname);
