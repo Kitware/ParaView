@@ -184,7 +184,11 @@ protected:
 
   int ReadXMLAttributes(vtkPVXMLElement* element,
                         vtkPVXMLPackageParser* parser);
-  
+
+  // Description:
+  // These methods don't call ModifiedCallback().
+  void  SetMinValueInternal(float val);
+  void  SetMaxValueInternal(float val); 
 private:
   vtkPVMinMax(const vtkPVMinMax&); // Not implemented
   void operator=(const vtkPVMinMax&); // Not implemented

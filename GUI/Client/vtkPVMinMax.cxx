@@ -32,7 +32,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVMinMax);
-vtkCxxRevisionMacro(vtkPVMinMax, "1.40");
+vtkCxxRevisionMacro(vtkPVMinMax, "1.41");
 
 vtkCxxSetObjectMacro(vtkPVMinMax, ArrayMenu, vtkPVArrayMenu);
 
@@ -222,16 +222,29 @@ void vtkPVMinMax::Create(vtkKWApplication *pvApp)
 //----------------------------------------------------------------------------
 void vtkPVMinMax::SetMinValue(float val)
 {
-  this->MinScale->SetValue(val);
+  this->SetMinValueInternal(val);
   this->ModifiedCallback();
 }
 
 //----------------------------------------------------------------------------
 void vtkPVMinMax::SetMaxValue(float val)
 {
-  this->MaxScale->SetValue(val);
+  this->SetMaxValueInternal(val);
   this->ModifiedCallback();
 }
+
+//-----------------------------------------------------------------------------
+void vtkPVMinMax::SetMinValueInternal(float val)
+{
+  this->MinScale->SetValue(val);
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVMinMax::SetMaxValueInternal(float val)
+{
+  this->MaxScale->SetValue(val);
+}
+
 
 //-----------------------------------------------------------------------------
 void vtkPVMinMax::SaveInBatchScript(ofstream *file)
@@ -303,8 +316,8 @@ void vtkPVMinMax::ResetInternal()
       this->GetSMProperty());
     if (dprop)
       {
-      this->SetMinValue(dprop->GetElement(0));
-      this->SetMaxValue(dprop->GetElement(1));
+      this->SetMinValueInternal(dprop->GetElement(0));
+      this->SetMaxValueInternal(dprop->GetElement(1));
       }
     else
       {
@@ -312,8 +325,8 @@ void vtkPVMinMax::ResetInternal()
         this->GetSMProperty());
       if (iprop)
         {
-        this->SetMinValue(iprop->GetElement(0));
-        this->SetMaxValue(iprop->GetElement(1));
+        this->SetMinValueInternal(iprop->GetElement(0));
+        this->SetMaxValueInternal(iprop->GetElement(1));
         }
       }
     }
