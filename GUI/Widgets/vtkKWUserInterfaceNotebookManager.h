@@ -196,6 +196,36 @@ public:
   vtkSetMacro(LockDragAndDropEntries, int);
   vtkGetMacro(LockDragAndDropEntries, int);
 
+  //BTX
+  // A Widget location. 
+  // Store both the page the widget is packed in, and the widget it is 
+  // packed after (if any).
+
+  class WidgetLocation
+  {
+  public:
+    WidgetLocation();
+    void Empty();
+
+    int PageId;
+    vtkKWWidget *AfterWidget;
+  };
+
+  // A D&D entry. 
+  // Store the widget source and target location.
+
+  class DragAndDropEntry
+  {
+  public:
+    DragAndDropEntry();
+
+    vtkKWWidget *Widget;
+    WidgetLocation FromLocation;
+    WidgetLocation ToLocation;
+  };
+
+  //ETX
+
 protected:
   vtkKWUserInterfaceNotebookManager();
   ~vtkKWUserInterfaceNotebookManager();
@@ -232,34 +262,6 @@ protected:
   // return a label that will be used to identify it. This is mostly used to
   // save a D&D event to a text string/file.
   virtual char* GetDragAndDropWidgetLabel(vtkKWWidget *widget);
-
-  // A Widget location. 
-  // Store both the page the widget is packed in, and the widget it is 
-  // packed after (if any).
-
-  class WidgetLocation
-  {
-  public:
-    WidgetLocation();
-    void Empty();
-
-    int PageId;
-    vtkKWWidget *AfterWidget;
-  };
-
-  // A D&D entry. 
-  // Store the widget source and target location.
-
-  class DragAndDropEntry
-  {
-  public:
-    DragAndDropEntry();
-
-    vtkKWWidget *Widget;
-    WidgetLocation FromLocation;
-    WidgetLocation ToLocation;
-  };
-  friend class vtkKWUserInterfaceNotebookManager::DragAndDropEntry;
 
   // PIMPL Encapsulation for STL containers
 
