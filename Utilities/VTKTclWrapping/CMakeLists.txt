@@ -108,6 +108,19 @@ TARGET_LINK_LIBRARIES(vtkCommonTCL
   ${TK_LIBRARY}
   )
 
+IF(UNIX)
+  # On UNIX, Tcl needs the math library.
+  IF(UNIX)
+    TARGET_LINK_LIBRARIES(vtkCommonTCL -lm)
+  ENDIF(UNIX)
+
+  # If using X with Tk, we need to link to X when we link
+  # to Tk in order to support static linking.
+  IF(CMAKE_HAS_X)
+    TARGET_LINK_LIBRARIES(vtkCommonTCL -lXt ${CMAKE_X_LIBS})
+  ENDIF(CMAKE_HAS_X)
+ENDIF(UNIX)
+
 IF(BUILD_SHARED_LIBS)
   INSTALL_TARGETS(/lib vtkCommonTCL)
 ENDIF(BUILD_SHARED_LIBS)
