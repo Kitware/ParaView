@@ -24,7 +24,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWIcon );
-vtkCxxRevisionMacro(vtkKWIcon, "1.27");
+vtkCxxRevisionMacro(vtkKWIcon, "1.28");
 
 //----------------------------------------------------------------------------
 vtkKWIcon::vtkKWIcon()
@@ -312,6 +312,22 @@ void vtkKWIcon::SetImage(int image)
         image_doc_asf_buffer_length);
       break;
 
+    case vtkKWIcon::ICON_DOC_AVI:
+      this->SetImage(
+        image_doc_avi, 
+        image_doc_avi_width, image_doc_avi_height,
+        image_doc_avi_pixel_size, 
+        image_doc_avi_buffer_length);
+      break;
+
+    case vtkKWIcon::ICON_DOC_BMP:
+      this->SetImage(
+        image_doc_bmp, 
+        image_doc_bmp_width, image_doc_bmp_height,
+        image_doc_bmp_pixel_size, 
+        image_doc_bmp_buffer_length);
+      break;
+
     case vtkKWIcon::ICON_DOC_CHM:
       this->SetImage(
         image_doc_chm, 
@@ -328,6 +344,14 @@ void vtkKWIcon::SetImage(int image)
         image_doc_exe_buffer_length);
       break;
 
+    case vtkKWIcon::ICON_DOC_GIF:
+      this->SetImage(
+        image_doc_gif, 
+        image_doc_gif_width, image_doc_gif_height,
+        image_doc_gif_pixel_size, 
+        image_doc_gif_buffer_length);
+      break;
+
     case vtkKWIcon::ICON_DOC_HLP:
       this->SetImage(
         image_doc_hlp, 
@@ -342,6 +366,14 @@ void vtkKWIcon::SetImage(int image)
         image_doc_http_width, image_doc_http_height,
         image_doc_http_pixel_size, 
         image_doc_http_buffer_length);
+      break;
+
+    case vtkKWIcon::ICON_DOC_JPG:
+      this->SetImage(
+        image_doc_jpg, 
+        image_doc_jpg_width, image_doc_jpg_height,
+        image_doc_jpg_pixel_size, 
+        image_doc_jpg_buffer_length);
       break;
 
     case vtkKWIcon::ICON_DOC_MP3:
@@ -376,6 +408,14 @@ void vtkKWIcon::SetImage(int image)
         image_doc_pdf_buffer_length);
       break;
 
+    case vtkKWIcon::ICON_DOC_PNG:
+      this->SetImage(
+        image_doc_png, 
+        image_doc_png_width, image_doc_png_height,
+        image_doc_png_pixel_size, 
+        image_doc_png_buffer_length);
+      break;
+
     case vtkKWIcon::ICON_DOC_POSTSCRIPT:
       this->SetImage(
         image_doc_postscript, 
@@ -408,12 +448,36 @@ void vtkKWIcon::SetImage(int image)
         image_doc_realaudio_buffer_length);
       break;
 
+    case vtkKWIcon::ICON_DOC_TGA:
+      this->SetImage(
+        image_doc_tga, 
+        image_doc_tga_width, image_doc_tga_height,
+        image_doc_tga_pixel_size, 
+        image_doc_tga_buffer_length);
+      break;
+
+    case vtkKWIcon::ICON_DOC_TIF:
+      this->SetImage(
+        image_doc_tif, 
+        image_doc_tif_width, image_doc_tif_height,
+        image_doc_tif_pixel_size, 
+        image_doc_tif_buffer_length);
+      break;
+
     case vtkKWIcon::ICON_DOC_TXT:
       this->SetImage(
         image_doc_txt, 
         image_doc_txt_width, image_doc_txt_height,
         image_doc_txt_pixel_size, 
         image_doc_txt_buffer_length);
+      break;
+
+    case vtkKWIcon::ICON_DOC_WAV:
+      this->SetImage(
+        image_doc_wav, 
+        image_doc_wav_width, image_doc_wav_height,
+        image_doc_wav_pixel_size, 
+        image_doc_wav_buffer_length);
       break;
 
     case vtkKWIcon::ICON_DOC_WORD:
