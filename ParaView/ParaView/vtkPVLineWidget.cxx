@@ -55,7 +55,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVXMLElement.h"
 
 vtkStandardNewMacro(vtkPVLineWidget);
-vtkCxxRevisionMacro(vtkPVLineWidget, "1.24");
+vtkCxxRevisionMacro(vtkPVLineWidget, "1.25");
 
 //----------------------------------------------------------------------------
 vtkPVLineWidget::vtkPVLineWidget()
@@ -163,12 +163,7 @@ void vtkPVLineWidget::SetPoint1(float x, float y, float z)
   line->SetPoint1(pos);
   line->SetAlignToNone();
   this->ModifiedFlag = 1;
-  vtkPVGenericRenderWindowInteractor* iren = 
-    this->PVSource->GetPVWindow()->GetGenericInteractor();
-  if(iren)
-    {
-    iren->Render();
-    }
+  this->Render();
 }
 
 //----------------------------------------------------------------------------
@@ -188,12 +183,7 @@ void vtkPVLineWidget::SetPoint2(float x, float y, float z)
   line->SetPoint2(pos);
   line->SetAlignToNone();
   this->ModifiedFlag = 1;
-  vtkPVGenericRenderWindowInteractor* iren = 
-    this->PVSource->GetPVWindow()->GetGenericInteractor();
-  if(iren)
-    {
-    iren->Render();
-    }
+  this->Render();
 }
 
 //----------------------------------------------------------------------------
@@ -239,12 +229,7 @@ void vtkPVLineWidget::SetResolution(int i)
   int res = this->ResolutionEntry->GetValueAsInt();
   vtkLineWidget *line = static_cast<vtkLineWidget*>( this->Widget3D );
   line->SetResolution(res);
-  vtkPVGenericRenderWindowInteractor* iren = 
-    this->PVSource->GetPVWindow()->GetGenericInteractor();
-  if(iren)
-    {
-    iren->Render();
-    }
+  this->Render();
 }
 
 //----------------------------------------------------------------------------

@@ -60,7 +60,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkRenderer.h"
 
 vtkStandardNewMacro(vtkPVSphereWidget);
-vtkCxxRevisionMacro(vtkPVSphereWidget, "1.14");
+vtkCxxRevisionMacro(vtkPVSphereWidget, "1.15");
 
 int vtkPVSphereWidgetCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -384,12 +384,7 @@ void vtkPVSphereWidget::SetCenter()
     }
   vtkSphereWidget *sphere = static_cast<vtkSphereWidget*>(this->Widget3D);
   sphere->SetCenter(val);
-  vtkPVGenericRenderWindowInteractor* iren = 
-    this->PVSource->GetPVWindow()->GetGenericInteractor();
-  if(iren)
-    {
-    iren->Render();
-    }
+  this->Render();
   this->ModifiedCallback();
   this->ValueChanged = 0;
 }
@@ -414,12 +409,7 @@ void vtkPVSphereWidget::SetRadius()
 
   vtkSphereWidget *sphere = static_cast<vtkSphereWidget*>(this->Widget3D);
   sphere->SetRadius(val);
-  vtkPVGenericRenderWindowInteractor* iren = 
-    this->PVSource->GetPVWindow()->GetGenericInteractor();
-  if(iren)
-    {
-    iren->Render();
-    }
+  this->Render();
   this->ModifiedCallback();
   this->ValueChanged = 0;
 }

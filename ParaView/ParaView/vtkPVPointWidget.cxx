@@ -60,7 +60,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkRenderer.h"
 
 vtkStandardNewMacro(vtkPVPointWidget);
-vtkCxxRevisionMacro(vtkPVPointWidget, "1.9");
+vtkCxxRevisionMacro(vtkPVPointWidget, "1.10");
 
 int vtkPVPointWidgetCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -333,12 +333,7 @@ void vtkPVPointWidget::SetPosition(float x, float y, float z)
     point->SetPosition(x, y, z);
     }
   this->ModifiedFlag = 1;
-  vtkPVGenericRenderWindowInteractor* iren = 
-    this->PVSource->GetPVWindow()->GetGenericInteractor();
-  if(iren)
-    {
-    iren->Render();
-    }
+  this->Render();
 }
 
 //----------------------------------------------------------------------------
