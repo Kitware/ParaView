@@ -65,7 +65,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWCornerAnnotation );
-vtkCxxRevisionMacro(vtkKWCornerAnnotation, "1.54");
+vtkCxxRevisionMacro(vtkKWCornerAnnotation, "1.55");
 
 int vtkKWCornerAnnotationCommand(ClientData cd, Tcl_Interp *interp,
                                 int argc, char *argv[]);
@@ -96,6 +96,7 @@ vtkKWCornerAnnotation::vtkKWCornerAnnotation()
   this->PopupMode = 0;
   this->PutVisibilityButtonInTitle = 0;
   this->PopupTextProperty = 0;
+  this->DisablePopupButtonWhenNotDisplayed = 0;
 
   this->PopupButton = NULL;
 
@@ -639,6 +640,31 @@ void vtkKWCornerAnnotation::Update()
     this->TextPropertyWidget->SetActor2D(this->CornerProp);
     this->TextPropertyWidget->Update();
     }
+
+  // Disable the popup button if not checked
+
+  if (this->DisablePopupButtonWhenNotDisplayed &&
+      this->PopupButton && 
+      this->CornerVisibilityButton && this->CornerVisibilityButton->IsCreated())
+    {
+    this->PopupButton->SetEnabled(
+      this->CornerVisibilityButton->GetState() ? this->Enabled : 0);
+    }
+
+}
+
+// ----------------------------------------------------------------------------
+void vtkKWCornerAnnotation::SetDisablePopupButtonWhenNotDisplayed(
+  int _arg)
+{
+  if (this->DisablePopupButtonWhenNotDisplayed == _arg)
+    {
+    return;
+    }
+  this->DisablePopupButtonWhenNotDisplayed = _arg;
+  this->Modified();
+
+  this->Update();
 }
 
 //----------------------------------------------------------------------------
@@ -951,7 +977,7 @@ void vtkKWCornerAnnotation::SerializeToken(istream& is,
 void vtkKWCornerAnnotation::SerializeRevision(ostream& os, vtkIndent indent)
 {
   os << indent << "vtkKWCornerAnnotation ";
-  this->ExtractRevision(os,"$Revision: 1.54 $");
+  this->ExtractRevision(os,"$Revision: 1.55 $");
 }
 
 //----------------------------------------------------------------------------
@@ -1086,4 +1112,6 @@ void vtkKWCornerAnnotation::PrintSelf(ostream& os, vtkIndent indent)
      << (this->PopupMode ? "On" : "Off") << endl;
   os << indent << "PopupTextProperty: " 
      << (this->PopupTextProperty ? "On" : "Off") << endl;
+  os << indent << "DisablePopupButtonWhenNotDisplayed: " 
+     << (this->DisablePopupButtonWhenNotDisplayed ? "On" : "Off") << endl;
 }

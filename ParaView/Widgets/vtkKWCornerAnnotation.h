@@ -167,6 +167,14 @@ public:
   vtkBooleanMacro(PopupTextProperty, int);
 
   // Description:
+  // Disable the popup button when the visibility button is not checked.
+  // You will have to call the Update() method manually though, to reflect
+  // that state.
+  virtual void SetDisablePopupButtonWhenNotDisplayed(int);
+  vtkBooleanMacro(DisablePopupButtonWhenNotDisplayed, int);
+  vtkGetMacro(DisablePopupButtonWhenNotDisplayed, int);
+
+  // Description:
   // Chaining method to serialize an object and its superclasses.
   virtual void SerializeSelf(ostream& os, vtkIndent indent);
   virtual void SerializeToken(istream& is,const char token[1024]);
@@ -234,6 +242,7 @@ protected:
   int                     PopupMode;
   int                     PutVisibilityButtonInTitle;
   int                     PopupTextProperty;
+  int                     DisablePopupButtonWhenNotDisplayed;
 
   vtkKWPopupButton        *PopupButton;
   vtkKWLabeledFrame       *Frame;
