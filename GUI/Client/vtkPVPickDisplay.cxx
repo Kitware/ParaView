@@ -15,7 +15,7 @@
 #include "vtkPVPickDisplay.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
-#include "vtkMPIDuplicateUnstructuredGrid.h"
+#include "vtkMPIMoveData.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVPart.h"
 #include "vtkClientServerStream.h"
@@ -27,7 +27,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPickDisplay);
-vtkCxxRevisionMacro(vtkPVPickDisplay, "1.2");
+vtkCxxRevisionMacro(vtkPVPickDisplay, "1.3");
 
 
 //----------------------------------------------------------------------------
@@ -98,15 +98,15 @@ vtkUnstructuredGrid* vtkPVPickDisplay::GetCollectedData()
     {
     return NULL;
     }
-  vtkMPIDuplicateUnstructuredGrid* dp;
-  dp = vtkMPIDuplicateUnstructuredGrid::SafeDownCast(
+  vtkMPIMoveData* dp;
+  dp = vtkMPIMoveData::SafeDownCast(
       pm->GetObjectFromID(this->DuplicateID));
   if (dp == NULL)
     {
     return NULL;
     }
 
-  return dp->GetOutput();
+  return dp->GetUnstructuredGridOutput();
 }
 
 
@@ -117,39 +117,85 @@ void vtkPVPickDisplay::CreateParallelTclObjects(vtkPVApplication *pvApp)
   vtkClientServerStream& stream = pm->GetStream();
 
   // Create the fliter wich duplicates the data on all processes.
-  this->DuplicateID = pm->NewStreamObject("vtkMPIDuplicateUnstructuredGrid");
+  this->DuplicateID = pm->NewStreamObject("vtkMPIMoveData");
   pm->SendStreamToRenderServerClientAndServer();
+
+  // A rather complex mess to set the correct server variable 
+  // on all of the remote duplication filters.
   if(pvApp->GetClientMode())
     {
     // We need this because the socket controller has no way of distinguishing
     // between processes.
     pm->GetStream()
       << vtkClientServerStream::Invoke
-      << this->DuplicateID << "SetClientFlag" << 1
+      << this->DuplicateID << "SetServerToClient"
       << vtkClientServerStream::End;
     pm->SendStreamToClient();
     }
+  // pvApp->ClientMode is only set when there is a server.
+  if(pvApp->GetClientMode())
+    {
+    pm->GetStream()
+      << vtkClientServerStream::Invoke
+      << this->DuplicateID << "SetServerToDataServer"
+      << vtkClientServerStream::End;
+    pm->SendStreamToServer();
+    }
+  // if running in render server mode
+  if(pvApp->GetRenderServerMode())
+    {
+    pm->GetStream()
+      << vtkClientServerStream::Invoke
+      << this->DuplicateID << "SetServerToRenderServer"
+      << vtkClientServerStream::End;
+    pm->SendStreamToRenderServer();
+    }  
+
+
   // Handle collection setup with client server.
   pm->GetStream()
     << vtkClientServerStream::Invoke
     << pm->GetProcessModuleID() << "GetSocketController"
     << vtkClientServerStream::End
     << vtkClientServerStream::Invoke
-    << this->DuplicateID << "SetSocketController"
+    << this->DuplicateID << "SetClientDataServerSocketController"
     << vtkClientServerStream::LastResult
     << vtkClientServerStream::End;
   pm->SendStreamToClientAndServer();
+
+  pm->GetStream()
+    << vtkClientServerStream::Invoke
+    << this->DuplicateID << "SetMPIMToNSocketConnection" 
+    << pm->GetMPIMToNSocketConnectionID()
+    << vtkClientServerStream::End;
+  pm->SendStreamToRenderServerAndServer();
+
+  stream << vtkClientServerStream::Invoke << this->DuplicateID 
+         << "SetMoveModeToClone" << vtkClientServerStream::End;
+  pm->SendStreamToRenderServerClientAndServer();
+
 
   // Now create the update supressors which keep the renderers/mappers
   // from updating the pipeline.  These are here to ensure that all
   // processes get updated at the same time.
   this->UpdateSuppressorID = pm->NewStreamObject("vtkPVUpdateSuppressor");
   pm->SendStreamToRenderServerClientAndServer();
-  stream << vtkClientServerStream::Invoke << this->DuplicateID << "GetOutput" 
-         <<  vtkClientServerStream::End
-         << vtkClientServerStream::Invoke << this->UpdateSuppressorID 
-         << "SetInput" << vtkClientServerStream::LastResult 
-         << vtkClientServerStream::End;
+
+  // Set the output of the duplicate on all nodes.
+  // Only the data server has an input and
+  // the duplicate fitler is a vtkDataSetToDataSetFilter.
+  vtkClientServerID id;
+  id = pm->NewStreamObject("vtkUnstructuredGrid");
+  pm->GetStream() << vtkClientServerStream::Invoke << this->DuplicateID 
+                  << "SetInput" << id 
+                  <<  vtkClientServerStream::End;
+  // Now connect the duplicate filter to the update suppressor.
+  pm->GetStream() << vtkClientServerStream::Invoke << this->DuplicateID
+                  << "GetOutput" << vtkClientServerStream::End
+                  << vtkClientServerStream::Invoke << this->UpdateSuppressorID 
+                  << "SetInput" << vtkClientServerStream::LastResult 
+                  << vtkClientServerStream::End;
+  pm->DeleteStreamObject(id);
   pm->SendStreamToRenderServerClientAndServer();
 
   // Create point labels.
