@@ -48,7 +48,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkStringList.h"
 
 vtkStandardNewMacro(vtkPVStringAndScalarListWidgetProperty);
-vtkCxxRevisionMacro(vtkPVStringAndScalarListWidgetProperty, "1.1.2.3");
+vtkCxxRevisionMacro(vtkPVStringAndScalarListWidgetProperty, "1.1.2.4");
 
 vtkPVStringAndScalarListWidgetProperty::vtkPVStringAndScalarListWidgetProperty()
 {
@@ -75,7 +75,7 @@ void vtkPVStringAndScalarListWidgetProperty::AcceptInternal()
   for (i = 0; i < this->NumberOfCommands; i++)
     {
     stream << vtkClientServerStream::Invoke
-           << this->VTKSourceID << " " << this->VTKCommands[i];
+           << this->VTKSourceID << this->VTKCommands[i];
     for (j = 0; j < this->NumberOfStringsPerCommand[i]; j++)
       {
       stream << this->Strings->GetString(stringCount);
