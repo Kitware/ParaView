@@ -6,6 +6,7 @@ proc IncrementFileName { validImage count } {
 
 proc CompareImage { view } {
    global argc argv
+
    set validImageFound 0
    for {set i  1} {$i < [expr $argc - 1]} {incr i} {
       if {[lindex $argv $i] == "-A"} {
@@ -39,7 +40,7 @@ proc CompareImage { view } {
          rt_pngw Write
          rt_pngw Delete
       } else {
-         puts "Unable to find valid image:${validImage}"
+	 catch {puts "Unable to find valid image:${validImage}"}
          rt_w2if Delete
          return 1
       }
@@ -151,31 +152,31 @@ proc CompareImage { view } {
             rt_jpegw_dashboard Delete
             rt_gamma Delete
          }
-         puts "Failed Image Test with error: $imageError"
+         catch {puts "Failed Image Test with error: $imageError"}
          
-         puts -nonewline "<DartMeasurement name=\"ImageError\" type=\"numeric/double\">"
-         puts -nonewline "$imageError"
-         puts "</DartMeasurement>"
+         catch {puts -nonewline "<DartMeasurement name=\"ImageError\" type=\"numeric/double\">"}
+         catch {puts -nonewline "$imageError"}
+         catch {puts "</DartMeasurement>"}
          
          if { $errIndex <= 0} {
-            puts -nonewline "<DartMeasurement name=\"BaselineImage\" type=\"text/string\">Standard</DartMeasurement>"
+	     catch {puts -nonewline "<DartMeasurement name=\"BaselineImage\" type=\"text/string\">Standard</DartMeasurement>"}
          } else {
-            puts -nonewline "<DartMeasurement name=\"BaselineImage\" type=\"numeric/integer\">"
-            puts -nonewline "$errIndex"
-            puts "</DartMeasurement>"
+	     catch {puts -nonewline "<DartMeasurement name=\"BaselineImage\" type=\"numeric/integer\">"}
+	     catch {puts -nonewline "$errIndex"}
+	     catch {puts "</DartMeasurement>"}
          }
          
-         puts -nonewline "<DartMeasurementFile name=\"TestImage\" type=\"image/jpeg\">"
-         puts -nonewline "$validImage.test.small.jpg"
-         puts "</DartMeasurementFile>"
+         catch {puts -nonewline "<DartMeasurementFile name=\"TestImage\" type=\"image/jpeg\">"}
+         catch {puts -nonewline "$validImage.test.small.jpg"}
+         catch {puts "</DartMeasurementFile>"}
          
-         puts -nonewline "<DartMeasurementFile name=\"DifferenceImage\" type=\"image/jpeg\">"
-         puts -nonewline "$validImage.diff.small.jpg"
-         puts "</DartMeasurementFile>"
+         catch {puts -nonewline "<DartMeasurementFile name=\"DifferenceImage\" type=\"image/jpeg\">"}
+         catch {puts -nonewline "$validImage.diff.small.jpg"}
+         catch {puts "</DartMeasurementFile>"}
          
-         puts -nonewline "<DartMeasurementFile name=\"ValidImage\" type=\"image/jpeg\">"
-         puts -nonewline "$validImage.small.jpg"
-         puts "</DartMeasurementFile>"
+         catch {puts -nonewline "<DartMeasurementFile name=\"ValidImage\" type=\"image/jpeg\">"}
+         catch {puts -nonewline "$validImage.small.jpg"}
+         catch {puts "</DartMeasurementFile>"}
          
          rt_id Delete
          rt_png Delete
@@ -184,16 +185,16 @@ proc CompareImage { view } {
    }
      
    # output the image error even if a test passed
-   puts -nonewline "<DartMeasurement name=\"ImageError\" type=\"numeric/double\">"
-   puts -nonewline "$imageError"
-   puts "</DartMeasurement>"
+   catch {puts -nonewline "<DartMeasurement name=\"ImageError\" type=\"numeric/double\">"}
+   catch {puts -nonewline "$imageError"}
+   catch {puts "</DartMeasurement>"}
    
    if { $errIndex <= 0} {
-      puts -nonewline "<DartMeasurement name=\"BaselineImage\" type=\"text/string\">Standard</DartMeasurement>"
+       catch {puts -nonewline "<DartMeasurement name=\"BaselineImage\" type=\"text/string\">Standard</DartMeasurement>"}
    } else {
-      puts -nonewline "<DartMeasurement name=\"BaselineImage\" type=\"numeric/integer\">"
-      puts -nonewline "$errIndex"
-      puts "</DartMeasurement>"
+       catch {puts -nonewline "<DartMeasurement name=\"BaselineImage\" type=\"numeric/integer\">"}
+       catch {puts -nonewline "$errIndex"}
+       catch {puts "</DartMeasurement>"}
    }
    rt_id Delete
    rt_png Delete
