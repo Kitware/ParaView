@@ -274,6 +274,7 @@ public:
   // Save or retrieve color from registery. If color does not 
   // exist, it will retrieve -1, -1 ,-1 and return 0 (1 if success).
   void SaveColor(int level, const char*, float rgb[3]);
+  void SaveColor(int level, const char*, double rgb[3]);
   int RetrieveColor(int level, const char*, float rgb[3]);
   int RetrieveColor(int level, const char*, double rgb[3]);
 

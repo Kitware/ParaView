@@ -120,7 +120,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.501");
+vtkCxxRevisionMacro(vtkPVWindow, "1.502");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -1596,7 +1596,7 @@ void vtkPVWindow::CreateMainView(vtkPVApplication *pvApp)
   iscontrol2D->SetManipulatorCollection(
     this->CameraStyle2D->GetCameraManipulators());
   
-  float rgb[3];
+  double rgb[3];
   this->RetrieveColor(2, "RenderViewBG", rgb); 
   if (rgb[0] == -1)
     {

@@ -50,7 +50,7 @@
 
 //-------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVTreeComposite);
-vtkCxxRevisionMacro(vtkPVTreeComposite, "1.48");
+vtkCxxRevisionMacro(vtkPVTreeComposite, "1.49");
 
 
 //=========================================================================
@@ -73,62 +73,6 @@ void vtkPVTreeCompositeExitInteractor(vtkObject *vtkNotUsed(o),
 
   self->ExitInteractor();
 }
-
-//struct vtkPVTreeCompositeRenderWindowInfo 
-//{
-//  int Size[2];
-//  int ImageReductionFactor;
-//  int NumberOfRenderers;
-//  float DesiredUpdateRate;
-//};
-
-struct vtkPVTreeCompositeRenderWindowInfoInt
-{
-  int FullSize[2];
-  int ReducedSize[2];
-  int NumberOfRenderers;
-  int ImageReductionFactor;
-  int UseCompositing;
-};
-
-struct vtkPVTreeCompositeRenderWindowInfoFloat
-{
-  float DesiredUpdateRate;
-};
-
-//struct vtkPVTreeCompositeRendererInfo 
-//{
-//  float CameraPosition[3];
-//  float CameraFocalPoint[3];
-//  float CameraViewUp[3];
-//  float CameraClippingRange[2];
-//  float LightPosition[3];
-//  float LightFocalPoint[3];
-//  float Background[3];
-//  float ParallelScale;
-//};
-
-struct vtkPVTreeCompositeRendererInfoInt
-{
-  int NumberOfLights;
-};
-
-struct vtkPVTreeCompositeRendererInfoFloat
-{
-  float Viewport[4];
-  float CameraPosition[3];
-  float CameraFocalPoint[3];
-  float CameraViewUp[3];
-  float CameraClippingRange[2];
-  float Background[3];
-  float ParallelScale;
-};
-
-struct vtkPVTreeCompositeLightInfoFloat
-{
-  float Position[3];
-  float FocalPoint[3];
-};
 
 //-------------------------------------------------------------------------
 void vtkPVTreeCompositeAbortRenderCheck(vtkObject*, unsigned long, void* arg,
@@ -348,11 +292,11 @@ void vtkPVTreeComposite::StartRender()
 //-------------------------------------------------------------------------
 void vtkPVTreeComposite::InternalStartRender()
 {
-  struct vtkPVTreeCompositeRenderWindowInfoInt winInfoInt;
-  struct vtkPVTreeCompositeRenderWindowInfoFloat winInfoFloat;
-  struct vtkPVTreeCompositeRendererInfoInt renInfoInt;
-  struct vtkPVTreeCompositeRendererInfoFloat renInfoFloat;
-  struct vtkPVTreeCompositeLightInfoFloat lightInfoFloat;
+  vtkParallelRenderManager::RenderWindowInfoInt winInfoInt;
+  vtkParallelRenderManager::RenderWindowInfoFloat winInfoFloat;
+  vtkParallelRenderManager::RendererInfoInt renInfoInt;
+  vtkParallelRenderManager::RendererInfoDouble renInfoDouble;
+  vtkParallelRenderManager::LightInfoDouble lightInfoDouble;
   int id, numProcs;
   int *size;
   vtkRendererCollection *rens;
@@ -435,11 +379,13 @@ void vtkPVTreeComposite::InternalStartRender()
       }
     // Synchronize the size of the windows.
     controller->Send((int*)(&winInfoInt),
-                     sizeof(vtkPVTreeCompositeRenderWindowInfoInt)/sizeof(int),
-                     id, vtkCompositeRenderManager::WIN_INFO_INT_TAG);
+                     vtkParallelRenderManager::WIN_INFO_INT_SIZE,
+                     id, 
+                     vtkCompositeRenderManager::WIN_INFO_INT_TAG);
     controller->Send((float*)(&winInfoFloat),
-                     sizeof(vtkPVTreeCompositeRenderWindowInfoFloat)/sizeof(float),
-                     id, vtkCompositeRenderManager::WIN_INFO_FLOAT_TAG);
+                     vtkParallelRenderManager::WIN_INFO_FLOAT_SIZE,
+                     id, 
+                     vtkCompositeRenderManager::WIN_INFO_FLOAT_TAG);
     }
   
   // Make sure the satellite renderers have the same camera I do.
@@ -455,50 +401,47 @@ void vtkPVTreeComposite::InternalStartRender()
     lc->InitTraversal();
     light = lc->GetNextItem();
     renInfoInt.NumberOfLights = lc->GetNumberOfItems();
-    // fix
-    int fixme;
-    double vp[4];
-    ren->GetViewport(vp);
-    renInfoFloat.Viewport[0] = vp[0];
-    renInfoFloat.Viewport[1] = vp[1];
-    renInfoFloat.Viewport[2] = vp[2];
-    renInfoFloat.Viewport[3] = vp[3];
-    // -end fix
+    ren->GetViewport(renInfoDouble.Viewport);
     if (this->ImageReductionFactor > 1)
       {
       this->Viewports->SetNumberOfTuples(1);
-      this->Viewports->SetTuple(0, renInfoFloat.Viewport);
+      this->Viewports->SetTuple(0, renInfoDouble.Viewport);
       }
-    cam->GetPosition(renInfoFloat.CameraPosition);
-    cam->GetFocalPoint(renInfoFloat.CameraFocalPoint);
-    cam->GetViewUp(renInfoFloat.CameraViewUp);
-    cam->GetClippingRange(renInfoFloat.CameraClippingRange);
+    cam->GetPosition(renInfoDouble.CameraPosition);
+    cam->GetFocalPoint(renInfoDouble.CameraFocalPoint);
+    cam->GetViewUp(renInfoDouble.CameraViewUp);
+    cam->GetClippingRange(renInfoDouble.CameraClippingRange);
     if (cam->GetParallelProjection())
       {
-      renInfoFloat.ParallelScale = cam->GetParallelScale();
+      renInfoDouble.ParallelScale = cam->GetParallelScale();
       }
     else
       {
-      renInfoFloat.ParallelScale = 0.0;
+      renInfoDouble.ParallelScale = 0.0;
       }
     if (light)
       {
-      light->GetPosition(lightInfoFloat.Position);
-      light->GetFocalPoint(lightInfoFloat.FocalPoint);
+      light->GetPosition(lightInfoDouble.Position);
+      light->GetFocalPoint(lightInfoDouble.FocalPoint);
       }
-    ren->GetBackground(renInfoFloat.Background);
+    ren->GetBackground(renInfoDouble.Background);
     
     for (id = 1; id < numProcs; ++id)
       {
       controller->Send((int*)(&renInfoInt),
-                       sizeof(struct vtkPVTreeCompositeRendererInfoInt)/sizeof(int),
-                       id, vtkCompositeRenderManager::REN_INFO_INT_TAG);
-      controller->Send((float*)(&renInfoFloat),
-                       sizeof(struct vtkPVTreeCompositeRendererInfoFloat)/sizeof(int),
-                       id, vtkCompositeRenderManager::REN_INFO_DOUBLE_TAG);
-      controller->Send((float*)(&lightInfoFloat),
-                       sizeof(struct vtkPVTreeCompositeLightInfoFloat)/sizeof(float),
-                       id, vtkCompositeRenderManager::LIGHT_INFO_FLOAT_TAG);
+                       vtkParallelRenderManager::REN_INFO_INT_SIZE,
+                       id, 
+                       vtkCompositeRenderManager::REN_INFO_INT_TAG);
+      controller->Send(
+        (double*)(&renInfoDouble),
+        vtkParallelRenderManager::REN_INFO_DOUBLE_SIZE,
+        id, 
+        vtkCompositeRenderManager::REN_INFO_DOUBLE_TAG);
+      controller->Send(
+        (double*)(&lightInfoDouble),
+        vtkParallelRenderManager::LIGHT_INFO_DOUBLE_SIZE,
+        id, 
+        vtkCompositeRenderManager::LIGHT_INFO_DOUBLE_TAG);
       }
 //    }
   
@@ -911,7 +854,7 @@ int vtkPVTreeComposite::CheckForAbortComposite()
 #define VTK_STATUS_TAG           548934
 
 
-// Root ------>>>>>>>> Satellite
+// Root ------> Satellite
 // Exaclty one of these two methods will be sent (by the root) to each
 // satelite process.  They terminate the non blocking receive.  The second
 // message is also used as a barrier to ensure all processes start
@@ -922,7 +865,7 @@ int vtkPVTreeComposite::CheckForAbortComposite()
 #define  VTK_COMPOSITE                 1
 
 
-// Root ------>>>>>>>> Satellite
+// Root ------> Satellite
 // When the root process has finished rendering, it waits for each of the
 // satellite processes (one by one) to finish rendering.  This root sends
 // this message to inform a satellite process that is waiting for it.  In a
@@ -931,7 +874,7 @@ int vtkPVTreeComposite::CheckForAbortComposite()
 // bother sending this message to the remaining satellites.
 #define  VTK_ROOT_WAITING              2
 
-// Root <<<<<<<<------ Satellite
+// Root <------ Satellite
 // This message may be sent from any satellite processes to the root
 // processes.  It is used to ping the root process when it has finished
 // rendering and is waiting in a blocking receive for a "Finshed" message.
@@ -939,7 +882,7 @@ int vtkPVTreeComposite::CheckForAbortComposite()
 // messages.  Any number of them can be sent (including 0).
 #define  VTK_CHECK_ABORT               3
 
-// Root <<<<<<<<------ Satellite
+// Root <------ Satellite
 // This message is sent from the satellite (the root is actively waiting
 // for) to signal that is done rendering and is waiting to composite.  In a
 // normal (not aborted) render, every satellite process sends this message

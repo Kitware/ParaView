@@ -46,7 +46,7 @@
 #define VTK_KW_WINDOW_GEOMETRY_REG_KEY "WindowGeometry"
 #define VTK_KW_WINDOW_FRAME1_SIZE_REG_KEY "WindowFrame1Size"
 
-vtkCxxRevisionMacro(vtkKWWindow, "1.182");
+vtkCxxRevisionMacro(vtkKWWindow, "1.183");
 vtkCxxSetObjectMacro(vtkKWWindow, PropertiesParent, vtkKWWidget);
 
 #define VTK_KW_RECENT_FILES_MAX 20
@@ -1405,10 +1405,20 @@ void vtkKWWindow::RetrieveLastPath(vtkKWLoadSaveDialog *dialog, const char* key)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWWindow::SaveColor(int level, const char* key, float rgb[3])
+void vtkKWWindow::SaveColor(int level, const char* key, double rgb[3])
 {
   this->GetApplication()->SetRegisteryValue(
-    level, "Colors", key, "Color: %f %f %f", rgb[0], rgb[1], rgb[2]);
+    level, "Colors", key, "Color: %lf %lf %lf", rgb[0], rgb[1], rgb[2]);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWWindow::SaveColor(int level, const char* key, float rgb[3])
+{
+  double drgb[3];
+  drgb[0] = rgb[0];
+  drgb[1] = rgb[1];
+  drgb[2] = rgb[2];
+  this->SaveColor(level, key, drgb);
 }
 
 //----------------------------------------------------------------------------

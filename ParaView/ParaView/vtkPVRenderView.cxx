@@ -96,7 +96,7 @@ static unsigned char image_properties[] =
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.283");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.284");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -1253,7 +1253,7 @@ void vtkPVRenderView::UpdateNavigationWindow(vtkPVSource *currentSource,
 }
 
 //----------------------------------------------------------------------------
-void vtkPVRenderView::SetBackgroundColor(float r, float g, float b)
+void vtkPVRenderView::SetBackgroundColor(double r, double g, double b)
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
   
@@ -1606,7 +1606,7 @@ void vtkPVRenderView::SaveInBatchScript(ofstream* file)
   double viewUp[3];
   double viewAngle;
   double clippingRange[2];
-  float *color;
+  double *color;
   int *size;
 
   size = this->RenderWindow->GetSize();
@@ -1647,7 +1647,7 @@ void vtkPVRenderView::SaveState(ofstream* file)
   double position[3];
   double focalPoint[3];
   double viewUp[3];
-  float *color;
+  double *color;
 
   color = this->Renderer->GetBackground();
   *file << "$kw(" << this->GetTclName() << ") SetBackgroundColor " 

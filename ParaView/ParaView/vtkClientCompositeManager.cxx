@@ -57,7 +57,7 @@
 #endif
 
 
-vtkCxxRevisionMacro(vtkClientCompositeManager, "1.24");
+vtkCxxRevisionMacro(vtkClientCompositeManager, "1.25");
 vtkStandardNewMacro(vtkClientCompositeManager);
 
 vtkCxxSetObjectMacro(vtkClientCompositeManager,Compositer,vtkCompositer);
@@ -73,15 +73,15 @@ struct vtkClientRenderWindowInfo
 
 struct vtkClientRendererInfo 
 {
-  float CameraPosition[3];
-  float CameraFocalPoint[3];
-  float CameraViewUp[3];
-  float CameraClippingRange[2];
-  float LightPosition[3];
-  float LightFocalPoint[3];
-  float Background[3];
-  float ParallelScale;
-  float CameraViewAngle;
+  double CameraPosition[3];
+  double CameraFocalPoint[3];
+  double CameraViewUp[3];
+  double CameraClippingRange[2];
+  double LightPosition[3];
+  double LightFocalPoint[3];
+  double Background[3];
+  double ParallelScale;
+  double CameraViewAngle;
 };
 
 #define vtkInitializeVector3(v) { v[0] = 0; v[1] = 0; v[2] = 0; }
@@ -893,7 +893,7 @@ void vtkClientCompositeManager::SatelliteStartRender()
       //this->Controller->Send((char*)(&winInfo), 
       //                sizeof(struct vtkClientRenderWindowInfo), j,
       //                vtkCompositeManager::WIN_INFO_TAG);
-      this->Controller->Send((float*)(&winInfo), 5, j,
+      this->Controller->Send((int*)(&winInfo), 5, j,
                       vtkCompositeManager::WIN_INFO_TAG);
       }
     }
@@ -926,7 +926,7 @@ void vtkClientCompositeManager::SatelliteStartRender()
     //controller->Receive((char*)(&renInfo), 
     //                    sizeof(struct vtkClientRendererInfo), 
     //                    otherId, vtkCompositeManager::REN_INFO_TAG);
-    controller->Receive((float*)(&renInfo), 22, otherId, 
+    controller->Receive((double*)(&renInfo), 22, otherId, 
                         vtkCompositeManager::REN_INFO_TAG);
     if (myId == 0)
       {  // Relay info to server satellite processes.
@@ -935,7 +935,7 @@ void vtkClientCompositeManager::SatelliteStartRender()
         //this->Controller->Send((char*)(&renInfo), 
         //                sizeof(struct vtkClientRendererInfo), 
         //                j, vtkCompositeManager::REN_INFO_TAG);
-        this->Controller->Send((float*)(&renInfo), 22, j, 
+        this->Controller->Send((double*)(&renInfo), 22, j, 
                                         vtkCompositeManager::REN_INFO_TAG);
         }
       }

@@ -42,7 +42,7 @@
  #include <mpi.h>
 #endif
 
-vtkCxxRevisionMacro(vtkMultiDisplayManager, "1.14");
+vtkCxxRevisionMacro(vtkMultiDisplayManager, "1.15");
 vtkStandardNewMacro(vtkMultiDisplayManager);
 
 // Structures to communicate render info.
@@ -51,17 +51,17 @@ class vtkPVMultiDisplayInfo
 {
 public:
   vtkPVMultiDisplayInfo();
-  float UseCompositing;
-  float ImageReductionFactor;
-  float CameraPosition[3];
-  float CameraFocalPoint[3];
-  float CameraViewUp[3];
-  float CameraClippingRange[2];
-  float LightPosition[3];
-  float LightFocalPoint[3];
-  float Background[3];
-  float ParallelScale;
-  float CameraViewAngle;
+  double UseCompositing;
+  double ImageReductionFactor;
+  double CameraPosition[3];
+  double CameraFocalPoint[3];
+  double CameraViewUp[3];
+  double CameraClippingRange[2];
+  double LightPosition[3];
+  double LightFocalPoint[3];
+  double Background[3];
+  double ParallelScale;
+  double CameraViewAngle;
 };
 
 vtkPVMultiDisplayInfo::vtkPVMultiDisplayInfo()
@@ -206,7 +206,7 @@ void vtkMultiDisplayManagerRootStartRender(void *localArg,
   vtkMultiProcessController *controller = self->GetSocketController();
   vtkPVMultiDisplayInfo info;  
 
-  controller->Receive((float*)(&info), 24, 1, 
+  controller->Receive((double*)(&info), 24, 1, 
                      vtkMultiDisplayManager::INFO_TAG);
   self->RootStartRender(info);
 }
@@ -361,7 +361,7 @@ void vtkMultiDisplayManager::ClientStartRender()
     { // client... Send to root
     this->SocketController->TriggerRMI(1, NULL, 0, 
                      vtkMultiDisplayManager::ROOT_RENDER_RMI_TAG);
-    this->SocketController->Send((float*)(&info), 24, 1, 
+    this->SocketController->Send((double*)(&info), 24, 1, 
                      vtkMultiDisplayManager::INFO_TAG);
     }
   else
@@ -391,7 +391,7 @@ void vtkMultiDisplayManager::RootStartRender(vtkPVMultiDisplayInfo info)
     {
     this->Controller->TriggerRMI(id, NULL, 0, 
                      vtkMultiDisplayManager::SATELLITE_RENDER_RMI_TAG);
-    this->Controller->Send((float*)(&info), 24, id,
+    this->Controller->Send((double*)(&info), 24, id,
                      vtkMultiDisplayManager::INFO_TAG);
     }
   if ( this->SocketController)
@@ -405,7 +405,7 @@ void vtkMultiDisplayManager::SatelliteStartRender()
 {
   vtkPVMultiDisplayInfo info;
 
-  this->SocketController->Receive((float*)(&info), 24, 0, 
+  this->SocketController->Receive((double*)(&info), 24, 0, 
                                   vtkMultiDisplayManager::INFO_TAG);
   this->InternalSatelliteStartRender(info);
 }
