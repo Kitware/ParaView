@@ -101,7 +101,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.218");
+vtkCxxRevisionMacro(vtkPVData, "1.219");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -1534,6 +1534,14 @@ void vtkPVData::UpdateMapScalarsCheck(vtkPVDataSetAttributesInformation* info,
     this->MapScalarsCheck->EnabledOff();
     this->ScalarBarCheck->EnabledOn();
     this->EditColorMapButton->EnabledOn();
+    // Tell all of the part displays to map scalars.
+    int num, idx;
+    num = this->PVSource->GetNumberOfParts();
+    for (idx = 0; idx < num; ++idx)
+      {
+      this->PVSource->GetPart(idx)->GetPartDisplay()->SetDirectColorFlag(0);
+      }
+  
     return;
     }
 
