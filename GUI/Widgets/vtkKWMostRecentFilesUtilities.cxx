@@ -22,7 +22,7 @@
 
 #include <kwsys/SystemTools.hxx>
 
-vtkCxxRevisionMacro(vtkKWMostRecentFilesUtilities, "1.3");
+vtkCxxRevisionMacro(vtkKWMostRecentFilesUtilities, "1.4");
 vtkStandardNewMacro(vtkKWMostRecentFilesUtilities );
 
 int vtkKWMostRecentFilesUtilitiesCommand(ClientData cd, Tcl_Interp *interp,
@@ -68,8 +68,8 @@ public:
     vtkstd::string TargetCommand;
   };
 
-  typedef vtkstd::list<vtkKWMostRecentFilesUtilitiesInternals::MostRecentFileEntry*> MostRecentFileEntriesContainer;
-  typedef vtkstd::list<vtkKWMostRecentFilesUtilitiesInternals::MostRecentFileEntry*>::iterator MostRecentFileEntriesContainerIterator;
+  typedef vtkstd::list<MostRecentFileEntry*> MostRecentFileEntriesContainer;
+  typedef vtkstd::list<MostRecentFileEntry*>::iterator MostRecentFileEntriesContainerIterator;
 
   MostRecentFileEntriesContainer MostRecentFileEntries;
 };
