@@ -67,7 +67,7 @@ template class VTK_EXPORT vtkArrayMapIterator<vtkPVWidget*, vtkPVWidget*>;
 #endif
 
 //-----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkPVWidget, "1.35");
+vtkCxxRevisionMacro(vtkPVWidget, "1.35.2.1");
 
 //-----------------------------------------------------------------------------
 vtkPVWidget::vtkPVWidget()
@@ -398,7 +398,8 @@ int vtkPVWidget::ReadXMLAttributes(vtkPVXMLElement* element,
 
   if(!element->GetScalarAttribute("suppress_reset", &this->SuppressReset))
     {
-    this->SuppressReset = 0;
+    // Just use the widgets default if XML does not specify.
+    //this->SuppressReset = 0;
     }
 
   const char* deps = element->GetAttribute("dependents");
