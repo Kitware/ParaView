@@ -51,7 +51,7 @@
  
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProbe);
-vtkCxxRevisionMacro(vtkPVProbe, "1.132");
+vtkCxxRevisionMacro(vtkPVProbe, "1.133");
 
 int vtkPVProbeCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -406,6 +406,9 @@ void vtkPVProbe::AcceptCallbackInternal()
   else
     {
     this->XYPlotWidget->SetEnabled(0);
+    vtkPVApplication* pvApp = this->GetPVApplication();
+    vtkPVRenderModule* rm = pvApp->GetProcessModule()->GetRenderModule();
+    rm->RemoveDisplay(this->PlotDisplay);
     }
     
 }
