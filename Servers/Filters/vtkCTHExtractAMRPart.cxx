@@ -41,10 +41,10 @@
 #include "vtkPlane.h"
 #include "vtkIdList.h"
 #include "vtkTimerLog.h"
+#include "vtkGarbageCollector.h"
 
 
-
-vtkCxxRevisionMacro(vtkCTHExtractAMRPart, "1.15");
+vtkCxxRevisionMacro(vtkCTHExtractAMRPart, "1.16");
 vtkStandardNewMacro(vtkCTHExtractAMRPart);
 vtkCxxSetObjectMacro(vtkCTHExtractAMRPart,ClipPlane,vtkPlane);
 
@@ -74,7 +74,6 @@ vtkCTHExtractAMRPart::vtkCTHExtractAMRPart()
   this->Clip1 = 0;
   this->Clip2 =0;
   this->Cut = 0;
-  this->FinalAppend = 0;
 
   this->IgnoreGhostLevels = 1;
 }
@@ -174,8 +173,10 @@ void vtkCTHExtractAMRPart::Execute()
   vtkCTHData* inputCopy = vtkCTHData::New();
   vtkPolyData* output;
   vtkImageData* block; 
-  vtkPolyData** tmps;
+  vtkAppendPolyData** tmps;
   int idx, num;
+
+  vtkGarbageCollector::DeferredCollectionPush();
 
   this->CreateInternalPipeline();
   inputCopy->ShallowCopy(input);
@@ -209,10 +210,10 @@ void vtkCTHExtractAMRPart::Execute()
 
   // Create an append for each part (one part per output).
   num = this->VolumeArrayNames->GetNumberOfStrings();
-  tmps = new vtkPolyData* [num];
+  tmps = new vtkAppendPolyData* [num];
   for (idx = 0; idx < num; ++idx)
     {
-    tmps[idx] = vtkPolyData::New();
+    tmps[idx] = vtkAppendPolyData::New();
     }
 
   this->UpdateProgress(.05);
@@ -229,6 +230,7 @@ void vtkCTHExtractAMRPart::Execute()
     block = vtkImageData::New();
     inputCopy->GetBlock(blockId, block);
     this->ExecuteBlock(block, tmps, startProg, endProg);
+    block->Initialize();
     block->Delete();
     block = NULL;
     }
@@ -238,9 +240,14 @@ void vtkCTHExtractAMRPart::Execute()
     {
     this->UpdateProgress(.95 + .05 * static_cast<double>(idx)/static_cast<double>(num));
     output = this->GetOutput(idx);
-    output->ShallowCopy(tmps[idx]);
+ 
+    vtkTimerLog::MarkStartEvent("BlockAppend");               
+    tmps[idx]->Update();
+    vtkTimerLog::MarkEndEvent("BlockAppend");              
+    
+    output->ShallowCopy(tmps[idx]->GetOutput());
     tmps[idx]->Delete();
-    tmps[idx] = NULL;
+    tmps[idx] = 0;
 
     // In the future we might be able to select the rgb color here.
     if (num > 1)
@@ -275,11 +282,12 @@ void vtkCTHExtractAMRPart::Execute()
   inputCopy->Delete();
   inputCopy = NULL;
   this->DeleteInternalPipeline();
+  vtkGarbageCollector::DeferredCollectionPop();  
 }
 
 //-----------------------------------------------------------------------------
 void vtkCTHExtractAMRPart::ExecuteBlock(vtkImageData* block, 
-                                        vtkPolyData** tmps,
+                                        vtkAppendPolyData** tmps,
                                         double startProg, double endProg)
 {
   vtkFloatArray* pointVolumeFraction;
@@ -299,9 +307,7 @@ void vtkCTHExtractAMRPart::ExecuteBlock(vtkImageData* block,
       vtkDataArray* cellVolumeFraction;
       dims = block->GetDimensions();
 
-      vtkTimerLog::MarkStartEvent("GetBlock");
       cellVolumeFraction = block->GetCellData()->GetArray(arrayName);
-      vtkTimerLog::MarkEndEvent("GetBlock");
       if (cellVolumeFraction == NULL)
         {
         vtkErrorMacro("Could not find cell array " << arrayName);
@@ -312,11 +318,9 @@ void vtkCTHExtractAMRPart::ExecuteBlock(vtkImageData* block,
         {
         pointVolumeFraction = vtkFloatArray::New();
         pointVolumeFraction->SetNumberOfTuples(block->GetNumberOfPoints());
-        vtkTimerLog::MarkStartEvent("CellToPoint(Ghost)");        
         this->ExecuteCellDataToPointData(cellVolumeFraction, 
                                          pointVolumeFraction, 
                                          dims);        
-        vtkTimerLog::MarkEndEvent("CellToPoint(Ghost)");        
         }
       else
         {
@@ -344,9 +348,7 @@ void vtkCTHExtractAMRPart::ExecuteBlock(vtkImageData* block,
     ext[3] -= extraGhostLevels;
     ext[5] -= extraGhostLevels;
     block->SetUpdateExtent(ext);
-    vtkTimerLog::MarkStartEvent("CropGhostCells");            
     block->Crop();
-    vtkTimerLog::MarkEndEvent("CropGhostCells");            
     }
   
   // Loop over parts extracting surfaces.
@@ -365,10 +367,6 @@ void vtkCTHExtractAMRPart::CreateInternalPipeline()
   // Having inputs keeps us from having to set and remove inputs.
   // The garbage collecting associated with this is expensive.
   this->Image = vtkImageData::New();
-  this->PolyData = vtkPolyData::New();
-  
-  // The filter that iteratively appends the output.
-  this->FinalAppend = vtkAppendPolyData::New();
   
   // Note: I had trouble with the kitware contour filter setting the input
   // of the internal synchronized templates filter (garbage collection took too long.)
@@ -426,14 +424,12 @@ void vtkCTHExtractAMRPart::CreateInternalPipeline()
     this->Clip2->SetInput(this->Cut->GetOutput());
     this->Clip2->SetValue(CTH_AMR_SURFACE_VALUE);
     this->Append2->AddInput(this->Clip2->GetOutput());
-    this->Append2->Update();
-    this->FinalAppend->AddInput(this->Append2->GetOutput());
+    this->PolyData = this->Append2->GetOutput();
     }
   else
     {
-    this->FinalAppend->AddInput(this->Append1->GetOutput());
+    this->PolyData = this->Append1->GetOutput();
     }
-  this->FinalAppend->AddInput(this->PolyData);
 }
 
 //------------------------------------------------------------------------------
@@ -443,11 +439,6 @@ void vtkCTHExtractAMRPart::DeleteInternalPipeline()
     {
     this->Image->Delete();
     this->Image = 0;
-    }
-  if (this->PolyData)
-    {
-    this->PolyData->Delete();
-    this->PolyData = 0;
     }
 
   if (this->Clip1)
@@ -494,17 +485,12 @@ void vtkCTHExtractAMRPart::DeleteInternalPipeline()
     this->Append2->Delete();
     this->Append2 = 0;
     }
-  if (this->FinalAppend)
-    {
-    this->FinalAppend->Delete();
-    this->FinalAppend = 0;
-    }
 }
 
 //------------------------------------------------------------------------------
 void vtkCTHExtractAMRPart::ExecutePart(const char* arrayName,
                                        vtkImageData* block, 
-                                       vtkPolyData* appendCache)
+                                       vtkAppendPolyData* append)
 {
   // See if we can skip this block.
   vtkDataArray* array = block->GetPointData()->GetArray(arrayName);
@@ -521,38 +507,11 @@ void vtkCTHExtractAMRPart::ExecutePart(const char* arrayName,
   block->GetPointData()->SetActiveScalars(arrayName);
 
   this->Image->ShallowCopy(block);
-  this->PolyData->ShallowCopy(appendCache);
-  
-  
-  if (this->Contour)
-    {
-    vtkTimerLog::MarkStartEvent("Contour");              
-    this->Contour->Update();
-    vtkTimerLog::MarkEndEvent("Contour");              
-    }
-  if (this->Surface)
-    {
-    vtkTimerLog::MarkStartEvent("Surface");              
-    this->Surface->Update();
-    vtkTimerLog::MarkEndEvent("Surface");              
-    }
-  if (this->Clip0)
-    {
-    vtkTimerLog::MarkStartEvent("Clip0");              
-    this->Clip0->Update();
-    vtkTimerLog::MarkEndEvent("Clip0");              
-    }
-  if (this->Append1)
-    {
-    vtkTimerLog::MarkStartEvent("Append1");              
-    this->Append1->Update();
-    vtkTimerLog::MarkEndEvent("Append1");              
-    }
-  
-  vtkTimerLog::MarkStartEvent("BlockAppend");              
-  this->FinalAppend->Update();
-  vtkTimerLog::MarkEndEvent("BlockAppend");              
-  appendCache->ShallowCopy(this->FinalAppend->GetOutput());
+  this->PolyData->Update();
+  vtkPolyData* tmp = vtkPolyData::New();
+  tmp->ShallowCopy(this->PolyData);
+  append->AddInput(tmp);
+  tmp->Delete();
 }
 
 template <class T>

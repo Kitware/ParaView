@@ -83,9 +83,9 @@ protected:
 
   virtual void Execute();
 
-  void ExecuteBlock(vtkImageData* block, vtkPolyData** appendCaches, double startProgress, double stopProgress);
+  void ExecuteBlock(vtkImageData* block, vtkAppendPolyData** appends, double startProgress, double stopProgress);
   void ExecutePart(const char* arrayName, vtkImageData* block, 
-                   vtkPolyData* appendCache);
+                   vtkAppendPolyData* append);
   void ExecuteCellDataToPointData(vtkDataArray *cellVolumeFraction, 
                                   vtkFloatArray *pointVolumeFraction, int *dims);
 
@@ -107,6 +107,8 @@ protected:
 
   // Pipeline to extract a part from a block.
   vtkImageData* Image;
+  // Polydata is not instantiated.  It just holds the output
+  // from the internal pipeline.
   vtkPolyData* PolyData;
   // KitwareContourFilter took too long because of garbage collection
   // when input of internal filter was deleted.
@@ -123,7 +125,6 @@ protected:
   vtkClipPolyData* Clip1;
   vtkClipPolyData* Clip2;
   vtkCutter* Cut;
-  vtkAppendPolyData* FinalAppend;
 
 private:
   void InternalImageDataCopy(vtkCTHExtractAMRPart *src);
