@@ -19,7 +19,7 @@
 #include "vtkCommand.h"
 
 
-vtkCxxRevisionMacro(vtkDummyRenderWindow, "1.3");
+vtkCxxRevisionMacro(vtkDummyRenderWindow, "1.4");
 
 // Construct an instance of  vtkDummyRenderWindow with its screen size 
 // set to 300x300, borders turned on, positioned at (0,0), double 
@@ -134,3 +134,70 @@ vtkDummyRenderWindow::GetRGBACharPixelData(int x1,int y1,
 
 
 
+unsigned char *vtkDummyRenderWindow::GetPixelData(int, int, int, int, 
+						  int) 
+{
+  return 0;
+}
+int vtkDummyRenderWindow::GetPixelData(int ,int ,int ,int , int,
+				       vtkUnsignedCharArray*) 
+{
+  return VTK_ERROR;
+}
+int vtkDummyRenderWindow::SetPixelData(int, int, int, int, 
+				       unsigned char *,int)
+{
+  return VTK_ERROR;
+}
+int vtkDummyRenderWindow::SetPixelData(int, int, int, int, 
+				       vtkUnsignedCharArray*,int)
+{
+  return VTK_ERROR;
+}
+int vtkDummyRenderWindow::GetRGBAPixelData(int, int, int, int, int, 
+					   vtkFloatArray*)
+{
+  return VTK_ERROR;
+}
+int vtkDummyRenderWindow::SetRGBAPixelData(int ,int ,int ,int ,float *,
+					   int, int) 
+{
+  return VTK_ERROR;
+}
+int vtkDummyRenderWindow::SetRGBAPixelData(int, int, int, int, 
+					   vtkFloatArray*,
+					   int, int) 
+{
+  return VTK_ERROR;
+}
+int vtkDummyRenderWindow::GetRGBACharPixelData(int ,int, int, int, int,
+					       vtkUnsignedCharArray*)
+{
+  return VTK_ERROR;
+}
+int vtkDummyRenderWindow::SetRGBACharPixelData(int ,int ,int ,int ,
+					       unsigned char *, int,
+					       int) 
+{
+  return VTK_ERROR;
+}
+int vtkDummyRenderWindow::SetRGBACharPixelData(int, int, int, int,
+					       vtkUnsignedCharArray *,
+					       int, int) 
+{
+  return VTK_ERROR;
+}
+int vtkDummyRenderWindow::GetZbufferData( int, int, int, int, 
+					  vtkFloatArray*)
+{
+  return VTK_ERROR;
+}
+int vtkDummyRenderWindow::SetZbufferData(int, int, int, int, float *)
+{
+  return VTK_ERROR;
+}
+int vtkDummyRenderWindow::SetZbufferData( int, int, int, int, 
+					  vtkFloatArray * )
+{
+  return VTK_ERROR;
+}

@@ -79,66 +79,27 @@ public:
   virtual int GetEventPending() {return 0;};
   virtual void MakeCurrent() {};
   virtual int GetDepthBufferSize() {return -1;};
-  virtual unsigned char *GetPixelData(int, int, int, int, int) 
-    {
-      return 0;
-    }
+  virtual unsigned char *GetPixelData(int, int, int, int, int);
   virtual int GetPixelData(int ,int ,int ,int , int,
-			   vtkUnsignedCharArray*) 
-    {
-      return VTK_ERROR;
-    }
-  virtual int SetPixelData(int, int, int, int, unsigned char *,int)
-    {
-      return VTK_ERROR;
-    }
+			   vtkUnsignedCharArray*);
+  virtual int SetPixelData(int, int, int, int, unsigned char *,int);
   virtual int SetPixelData(int, int, int, int, vtkUnsignedCharArray*,
-			   int )
-    {
-      return VTK_ERROR;
-    }
-  virtual int GetRGBAPixelData(int, int, int, int, int, vtkFloatArray* )
-    {
-      return VTK_ERROR;
-    }
+			   int );
+  virtual int GetRGBAPixelData(int, int, int, int, int, vtkFloatArray* );
   virtual int SetRGBAPixelData(int ,int ,int ,int ,float *,int,
-			       int vtkNotUsed(blend)=0) 
-    {
-      return VTK_ERROR;
-    }
+			       int blend=0);
   virtual int SetRGBAPixelData(int, int, int, int, vtkFloatArray*,
-			       int, int vtkNotUsed(blend)=0) 
-    {
-      return VTK_ERROR;
-    }
+			       int, int blend=0);
   virtual int GetRGBACharPixelData(int ,int, int, int, int,
-				   vtkUnsignedCharArray*)
-    {
-      return VTK_ERROR;
-    }
+				   vtkUnsignedCharArray*);
   virtual int SetRGBACharPixelData(int ,int ,int ,int ,unsigned char *, int,
-				   int vtkNotUsed(blend)=0) 
-    {
-      return VTK_ERROR;
-    }
+				   int blend=0);
   virtual int SetRGBACharPixelData(int, int, int, int,
 				   vtkUnsignedCharArray *,
-				   int, int vtkNotUsed(blend)=0) 
-    {
-      return VTK_ERROR;
-    }
-  virtual int GetZbufferData( int, int, int, int, vtkFloatArray*)
-    {
-      return VTK_ERROR;
-    }
-  virtual int SetZbufferData(int, int, int, int, float *)
-    {
-      return VTK_ERROR;
-    }
-  virtual int SetZbufferData( int, int, int, int, vtkFloatArray * )
-    {
-      return VTK_ERROR;
-    }
+				   int, int blend=0);
+  virtual int GetZbufferData( int, int, int, int, vtkFloatArray*);
+  virtual int SetZbufferData(int, int, int, int, float *);
+  virtual int SetZbufferData( int, int, int, int, vtkFloatArray * );
 
 
 protected:
