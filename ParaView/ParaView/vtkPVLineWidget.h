@@ -42,6 +42,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // .NAME vtkPVLineWidget -
 // .SECTION Description
 
+// Todo:
+// Cleanup GUI:
+//       * Visibility
+//       * Resolution
+//       *
+
 #ifndef __vtkPVLineWidget_h
 #define __vtkPVLineWidget_h
 

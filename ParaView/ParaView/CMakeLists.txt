@@ -39,6 +39,7 @@ vtkPVInteractorStyleTranslateCamera
 vtkPVLODActor
 vtkPVLabel
 vtkPVLabeledToggle
+vtkPVLineWidget
 vtkPVMinMax
 vtkPVNavigationWindow
 vtkPVObjectWidget
