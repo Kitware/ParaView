@@ -1,6 +1,192 @@
 <ServerManagerConfiguration>
   <ProxyGroup name="filters">
 
+   <SourceProxy name="ImageShrink" class="vtkImageShrink3D">
+    <InputProperty
+       name="Input"
+       command="SetInput">
+          <ProxyGroupDomain name="groups">
+            <Group name="sources"/>
+            <Group name="filters"/>
+          </ProxyGroupDomain>
+          <DataTypeDomain name="input_type">
+            <DataType value="vtkImageData"/>
+          </DataTypeDomain>
+     </InputProperty>
+
+     <IntVectorProperty 
+        name="ShrinkFactors" 
+        command="SetShrinkFactors" 
+        number_of_elements="3"
+        default_values="1 1 1" > 
+       <IntRangeDomain name="range" min="1" max="100"/>
+     </IntVectorProperty>
+
+     <IntVectorProperty 
+        name="Averaging" 
+        command="SetAveraging" 
+        number_of_elements="1"
+        default_values="1" > 
+       <BooleanDomain name="bool"/>
+     </IntVectorProperty>
+   <!-- End Stripper -->
+   </SourceProxy>
+
+   <SourceProxy name="ProjectedTexture" class="vtkProjectedTexture">
+     <InputProperty
+        name="Input"
+        command="SetInput">
+           <ProxyGroupDomain name="groups">
+             <Group name="sources"/>
+             <Group name="filters"/>
+           </ProxyGroupDomain>
+           <DataTypeDomain name="input_type">
+             <DataType value="vtkDataSet"/>
+           </DataTypeDomain>
+      </InputProperty>
+
+      <DoubleVectorProperty
+         name="Position"
+         command="SetPosition"
+         number_of_elements="3"
+         default_values="0.0 0.0 0.0" >
+        <DoubleRangeDomain name="range"/>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty
+         name="FocalPoint"
+         command="SetFocalPoint"
+         number_of_elements="3"
+         default_values="10.0 0.0 0.0" >
+        <DoubleRangeDomain name="range"/>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty
+         name="Up"
+         command="SetUp"
+         number_of_elements="3"
+         default_values="0.0 1.0 0.0" >
+        <DoubleRangeDomain name="range"/>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty
+         name="AspectRatio"
+         command="SetAspectRatio"
+         number_of_elements="3"
+         default_values="1.0 1.0 1.0" >
+        <DoubleRangeDomain name="range"/>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty
+         name="SRange"
+         command="SetSRange"
+         number_of_elements="2"
+         default_values="0.0 1.0" >
+        <DoubleRangeDomain name="range" min="0" max="1" />
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty
+         name="TRange"
+         command="SetTRange"
+         number_of_elements="2"
+         default_values="0.0 1.0" >
+        <DoubleRangeDomain name="range" min="0" max="1" />
+      </DoubleVectorProperty>
+
+   <!-- End ProjectedTExture -->
+   </SourceProxy>
+
+   <SourceProxy name="SurfaceVectors" class="vtkSurfaceVectors">
+     <InputProperty
+        name="Input"
+        command="SetInput">
+           <ProxyGroupDomain name="groups">
+             <Group name="sources"/>
+             <Group name="filters"/>
+           </ProxyGroupDomain>
+           <DataTypeDomain name="input_type">
+             <DataType value="vtkDataSet"/>
+           </DataTypeDomain>
+           <InputArrayDomain name="input_array" attribute_type="point"
+                             number_of_components="3"/>
+      </InputProperty>
+
+      <StringVectorProperty 
+         name="SelectInputVectors" 
+         command="SelectInputVectors" 
+         number_of_elements="1"> 
+            <ArrayListDomain name="array_list" attribute_type="Vectors">
+              <RequiredProperties>
+                 <Property name="Input" function="Input"/>
+              </RequiredProperties>
+            </ArrayListDomain>
+      </StringVectorProperty> 
+
+     <IntVectorProperty 
+        name="ConstraintMode" 
+        command="SetConstraintMode" 
+        number_of_elements="1"
+        default_values="0" >
+       <EnumerationDomain>
+         <Entry value="0" text="Parallel"/>
+         <Entry value="1" text="Perpendicular"/>
+         <Entry value="2" text="PerpendicularScale"/>
+       </EnumerationDomain>
+     </IntVectorProperty>
+
+   <!-- End SurfaceVectors -->
+   </SourceProxy>
+
+   <SourceProxy name="IntegrateAttributes" class="vtkIntegrateAttributes">
+     <InputProperty
+        name="Input"
+        command="SetInput">
+           <ProxyGroupDomain name="groups">
+             <Group name="sources"/>
+             <Group name="filters"/>
+           </ProxyGroupDomain>
+           <DataTypeDomain name="input_type">
+             <DataType value="vtkDataSet"/>
+           </DataTypeDomain>
+      </InputProperty>
+
+   <!-- End IntegrateAttributes -->
+   </SourceProxy>
+
+   <SourceProxy name="IntegrateFlowThroughSurface" class="vtkIntegrateFlowThroughSurface">
+     <InputProperty
+        name="Input"
+        command="SetInput">
+           <ProxyGroupDomain name="groups">
+             <Group name="sources"/>
+             <Group name="filters"/>
+           </ProxyGroupDomain>
+           <DataTypeDomain name="input_type">
+             <DataType value="vtkDataSet"/>
+           </DataTypeDomain>
+           <InputArrayDomain name="input_array" attribute_type="point"
+                             number_of_components="3"/>
+      </InputProperty>
+
+      <StringVectorProperty 
+         name="SelectInputVectors" 
+         command="SelectInputVectors" 
+         number_of_elements="1"> 
+            <ArrayListDomain name="array_list" attribute_type="Vectors">
+              <RequiredProperties>
+                 <Property name="Input" function="Input"/>
+              </RequiredProperties>
+            </ArrayListDomain>
+      </StringVectorProperty> 
+
+   <!-- End IntegrateFlowThroughSurface -->
+   </SourceProxy>
+
+
+
+
+
+
    <SourceProxy name="AllToN" class="vtkAllToNRedistributePolyData">
       <InputProperty
          name="Input"
