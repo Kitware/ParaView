@@ -27,14 +27,13 @@
 #include "vtkPVSelectionList.h"
 #include "vtkPVSourceCollection.h"
 #include "vtkPVWidgetCollection.h"
-#include "vtkPVWidgetProperty.h"
 #include "vtkPVWindow.h"
 #include "vtkSource.h"
 #include "vtkStructuredGrid.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPLOT3DReaderModule);
-vtkCxxRevisionMacro(vtkPVPLOT3DReaderModule, "1.28");
+vtkCxxRevisionMacro(vtkPVPLOT3DReaderModule, "1.29");
 
 int vtkPVPLOT3DReaderModuleCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
