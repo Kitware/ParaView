@@ -138,7 +138,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.463");
+vtkCxxRevisionMacro(vtkPVWindow, "1.464");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -1885,7 +1885,7 @@ int vtkPVWindow::Open(char *openFileName, int store)
       }
     else
       {
-      vtkErrorMacro(<<error);
+      vtkErrorMacro(<<error.str());
       }
     error.rdbuf()->freeze(0);
     return VTK_ERROR;
