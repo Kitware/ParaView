@@ -51,6 +51,22 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endif
 
 
+#include "Resources/vtkKWFlyButton.h"
+#include "Resources/vtkKWPickCenterButton.h"
+#include "Resources/vtkKWResetViewButton.h"
+#include "Resources/vtkKWRotateViewButton.h"
+#include "Resources/vtkKWTranslateViewButton.h"
+#include "Resources/vtkPV3DCursor.h"
+#include "Resources/vtkPVCalculatorButton.h"
+#include "Resources/vtkPVClipButton.h"
+#include "Resources/vtkPVContourButton.h"
+#include "Resources/vtkPVCutButton.h"
+#include "Resources/vtkPVExtractGridButton.h"
+#include "Resources/vtkPVGlyphButton.h"
+#include "Resources/vtkPVProbeButton.h"
+#include "Resources/vtkPVThresholdButton.h"
+#include "Resources/vtkPVVectorDisplacementButton.h"
+
 #include "vtkCallbackCommand.h"
 #include "vtkCharArray.h"
 #include "vtkDataSet.h"
@@ -59,30 +75,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkIntArray.h"
 #include "vtkKWDialog.h"
 #include "vtkKWEvent.h"
-#include "vtkKWFlyButton.h"
 #include "vtkKWLabeledFrame.h"
 #include "vtkKWMessageDialog.h"
-#include "vtkKWPickCenterButton.h"
-#include "vtkKWResetViewButton.h"
-#include "vtkKWRotateViewButton.h"
-#include "vtkKWTranslateViewButton.h"
 #include "vtkKWWindowCollection.h"
 #include "vtkLongArray.h"
 #include "vtkMapper.h"
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
 #include "vtkOutputWindow.h"
-#include "vtkPV3DCursor.h"
-#include "vtkPVCalculatorButton.h"
-#include "vtkPVClipButton.h"
-#include "vtkPVContourButton.h"
-#include "vtkPVCutButton.h"
-#include "vtkPVExtractGridButton.h"
-#include "vtkPVGlyphButton.h"
-#include "vtkPVProbeButton.h"
-#include "vtkPVVectorDisplacementButton.h"
 #include "vtkPVRenderView.h"
-#include "vtkPVThresholdButton.h"
 #include "vtkPVWindow.h"
 #include "vtkPolyDataMapper.h"
 #include "vtkProbeFilter.h"
@@ -111,7 +112,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.126");
+vtkCxxRevisionMacro(vtkPVApplication, "1.127");
 
 int vtkPVApplicationCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
