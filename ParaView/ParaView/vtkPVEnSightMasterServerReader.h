@@ -50,6 +50,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class vtkMPIController;
 class vtkMultiProcessController;
 class vtkPVEnSightMasterServerReaderInternal;
+class vtkPVEnSightMasterServerTranslator;
 
 class VTK_EXPORT vtkPVEnSightMasterServerReader : public vtkGenericEnSightReader
 {
@@ -97,6 +98,10 @@ protected:
   
   // Internal implementation details.
   vtkPVEnSightMasterServerReaderInternal* Internal;
+  
+  // The extent translator used to provide the correct breakdown of
+  // pieces across processes.
+  vtkPVEnSightMasterServerTranslator* ExtentTranslator;
   
   // Whether an error occurred during ExecuteInformation.
   int InformationError;

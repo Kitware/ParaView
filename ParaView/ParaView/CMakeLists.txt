@@ -45,6 +45,7 @@ SET( ParaView_SRCS
   vtkPVDummyWidget.cxx
   vtkPVDuplicatePolyData.cxx
   vtkPVEnSightMasterServerReader.cxx
+  vtkPVEnSightMasterServerTranslator.cxx
   vtkPVEnSightReaderModule.cxx
   vtkPVErrorLogDisplay.cxx
   vtkPVExtentEntry.cxx
