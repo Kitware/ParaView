@@ -69,16 +69,64 @@ ELSE(UNIX)
       COPYONLY)
   ENDFOREACH (config)
 ENDIF(UNIX)
-#SET(TCL_TK_COPY_SUPPORT_LIBRARY 1 CACHE INTERNAL "Very few users should worry about this option. If VTK is built against a static Tcl/Tk lib (see TCL_TK_STATIC) or a shared Tcl/Tk bundled inside a project with no library support files (ex: ParaView), this variable should be set to ON and both TCL_SUPPORT_LIBRARY_PATH and TK_SUPPORT_LIBRARY_PATH should point to the directories that hold those files (typically, lib/tcl8.4 and lib/tk8.4 for a typical Tcl/Tk installation, or tcl8.4.5/library and tk8.4.5/library for a Tcl/Tk source repository). Once this variable is set to ON, support files will automatically be copied to the build directory and the executables will try to use that location to initialize Tcl/Tk." FORCE)
-#SET(TCL_SUPPORT_LIBRARY_PATH ${TclTk_SOURCE_DIR}/tcl8.4.5/library CACHE INTERNAL "Path to the Tcl support library files. See TCL_TK_COPY_SUPPORT_LIBRARY help." FORCE)
-#SET(TK_SUPPORT_LIBRARY_PATH ${TclTk_SOURCE_DIR}/tk8.4.5/library CACHE INTERNAL "Path to the Tcl support library files. See TCL_TK_COPY_SUPPORT_LIBRARY help." FORCE)
 
 SET(TCL_TK_COPY_SUPPORT_LIBRARY 1)
 SET(TCL_SUPPORT_LIBRARY_PATH ${TclTk_SOURCE_DIR}/tcl8.4.5/library)
 SET(TK_SUPPORT_LIBRARY_PATH ${TclTk_SOURCE_DIR}/tk8.4.5/library)
 
 INCLUDE(${ParaView_SOURCE_DIR}/VTK/CMake/vtkTclTkMacros.cmake)
-VTK_COPY_TCL_TK_SUPPORT_FILES_TO_BUILD_DIR(
+
+# ----------------------------------------------------------------------------
+# VTK_COPY_TCL_TK_SUPPORT_FILES_TO_BUILD_DIR
+# Front-end to VTK_COPY_TCL_TK_SUPPORT_FILES, this macro will copy the
+# appropriate Tcl/Tk support files to a project build directory.
+# The support files will be copied simultaneously to all configuration 
+# sub-directories (Release, RelInfo, Debug, etc.) if needed.
+# The Tcl/Tk version is retrieved automatically and used to create
+# the subdirectories (see example below)
+#
+# in: tcl_support_lib_dir: path to the Tcl support lib dir
+#     tk_support_lib_dir:  path to the Tk support lib dir
+#     build_dir:           project build dir
+#     dir:                 relative subdir inside the build dir, into which the
+#                          support files will be copied.
+#
+# ex: VTK_COPY_TCL_TK_SUPPORT_FILES_TO_BUILD_DIR (
+#        "c:/tcl/lib/tcl8.4" "c:/tcl/lib/tk8.4" "d:/vtk-bin" "TclTk/lib")
+#     if this project is configured to use TclTk 8.4, this will copy support 
+#     files from:
+#       c:/tcl/lib/tcl8.4
+#       c:/tcl/lib/tk8.4
+#     to:
+#       d:/vtk-bin/TclTk/lib/tcl8.4
+#       d:/vtk-bin/TclTk/lib/tk8.4
+#     or (if configuration types are supported by the generator):
+#       d:/vtk-bin/Release/TclTk/lib/tcl8.4
+#       d:/vtk-bin/Release/TclTk/lib/tk8.4
+#       d:/vtk-bin/Debug/TclTk/lib/tcl8.4
+#       d:/vtk-bin/Debug/TclTk/lib/tk8.4
+#       etc.
+
+MACRO (PARAVIEW_COPY_TCL_TK_SUPPORT_FILES_TO_BUILD_DIR tcl_support_lib_dir tk_support_lib_dir build_dir dir)
+
+  # For each configuration type (Debug, RelInfo, Release, etc.)
+  # Copy the TclTk support files to the corresponding sub-directory inside
+  # the build dir
+
+  VTK_GET_TCL_TK_VERSION ("TCL_TK_MAJOR_VERSION" "TCL_TK_MINOR_VERSION")
+  IF (TCL_TK_MAJOR_VERSION AND TCL_TK_MINOR_VERSION)
+    SET (TCL_TK_VERSION "${TCL_TK_MAJOR_VERSION}.${TCL_TK_MINOR_VERSION}")
+    VTK_COPY_TCL_TK_SUPPORT_FILES (
+      "${tcl_support_lib_dir}"
+      "${build_dir}/${dir}/tcl${TCL_TK_VERSION}"
+      "${tk_support_lib_dir}"
+      "${build_dir}/${dir}/tk${TCL_TK_VERSION}"
+	   )
+    ENDFOREACH (config)
+  ENDIF (TCL_TK_MAJOR_VERSION AND TCL_TK_MINOR_VERSION)
+
+ENDMACRO (PARAVIEW_COPY_TCL_TK_SUPPORT_FILES_TO_BUILD_DIR)
+PARAVIEW_COPY_TCL_TK_SUPPORT_FILES_TO_BUILD_DIR(
   "${TCL_SUPPORT_LIBRARY_PATH}"
   "${TK_SUPPORT_LIBRARY_PATH}"
   "${ParaView_BINARY_DIR}"
