@@ -65,6 +65,7 @@ public:
   // Description:
   // Must be called after Create
   void SetTitle(const char *title);
+  const char* GetTitle();
   void SetSelectionList(int num, const char **list);
 
   void SetSelectCommand(vtkKWObject *object, const char *methodAndArgString);
