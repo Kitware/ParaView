@@ -170,7 +170,12 @@ public:
   vtkSetClampMacro( SupportHelp, int, 0, 1 );
   vtkGetMacro( SupportHelp, int );
   vtkBooleanMacro( SupportHelp, int );
-  
+
+  // Description:
+  // Class of the window. Passed to the toplevel command.
+  vtkSetStringMacro(WindowClass);
+  vtkGetStringMacro(WindowClass);
+
 protected:
   vtkKWWindow();
   ~vtkKWWindow();
@@ -203,6 +208,7 @@ protected:
   vtkKWMenu *PageMenu;
 
   int SupportHelp;
+  char *WindowClass;
 };
 
 

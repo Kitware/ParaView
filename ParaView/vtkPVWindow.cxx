@@ -98,6 +98,9 @@ int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
 //----------------------------------------------------------------------------
 vtkPVWindow::vtkPVWindow()
 {  
+
+  this->SetWindowClass("ParaView");
+
   vtkPVMethodInterface *mInt;
 
   this->CommandFunction = vtkPVWindowCommand;
@@ -479,6 +482,10 @@ void vtkPVWindow::Create(vtkKWApplication *app, char *args)
     }
 
   // invoke super method first
+  // Make sure the widget is name appropriately: paraview instead of a number
+  // On X11, the window name is the same as the widget name.
+  this->WidgetName = new char [strlen("paraview")+1];
+  strcpy(this->WidgetName,".paraview");
   this->vtkKWWindow::Create(pvApp,"");
 
   // We need an application before we can read the interface.

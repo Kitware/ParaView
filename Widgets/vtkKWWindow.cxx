@@ -120,6 +120,8 @@ vtkKWWindow::vtkKWWindow()
   this->PrintTargetDPI = 100;
 
   this->SupportHelp = 1;
+
+  this->SetWindowClass("Kitware");
 }
 
 vtkKWWindow::~vtkKWWindow()
@@ -161,6 +163,8 @@ vtkKWWindow::~vtkKWWindow()
     {
     delete [] this->StatusImageName;
     }
+
+  this->SetWindowClass(0);
 }
 
 void vtkKWWindow::DisplayHelp()
@@ -355,7 +359,8 @@ void vtkKWWindow::Create(vtkKWApplication *app, char *args)
 
   // create the top level
   wname = this->GetWidgetName();
-  this->Script("toplevel %s -visual best %s",wname,args);
+  this->Script("toplevel %s -visual best %s -class %s",wname,args,
+	       this->WindowClass);
   this->Script("wm title %s {%s}",wname,
                app->GetApplicationName());
   this->Script("wm iconname %s {%s}",wname,
@@ -816,5 +821,5 @@ void vtkKWWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWWindow ";
-  this->ExtractRevision(os,"$Revision: 1.27 $");
+  this->ExtractRevision(os,"$Revision: 1.27.2.1 $");
 }
