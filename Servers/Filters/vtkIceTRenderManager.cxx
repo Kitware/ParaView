@@ -46,10 +46,11 @@ const int ICET_INFO_SIZE = sizeof(struct IceTInformation)/sizeof(int);
 // vtkIceTRenderManager implementation.
 //******************************************************************
 
-vtkCxxRevisionMacro(vtkIceTRenderManager, "1.14");
+vtkCxxRevisionMacro(vtkIceTRenderManager, "1.15");
 vtkStandardNewMacro(vtkIceTRenderManager);
 
 vtkCxxSetObjectMacro(vtkIceTRenderManager, SortingKdTree, vtkPKdTree);
+vtkCxxSetObjectMacro(vtkIceTRenderManager, DataReplicationGroup, vtkIntArray);
 
 vtkIceTRenderManager::vtkIceTRenderManager()
 {
@@ -72,6 +73,8 @@ vtkIceTRenderManager::vtkIceTRenderManager()
 
   this->FullImageSharesData = 0;
   this->ReducedImageSharesData = 0;
+
+  this->DataReplicationGroup = NULL;
 }
 
 vtkIceTRenderManager::~vtkIceTRenderManager()
@@ -83,6 +86,7 @@ vtkIceTRenderManager::~vtkIceTRenderManager()
     }
   delete[] this->TileRanks;
   this->SetSortingKdTree(NULL);
+  this->SetDataReplicationGroup(NULL);
 }
 
 vtkRenderer *vtkIceTRenderManager::MakeRenderer()
@@ -149,6 +153,17 @@ void vtkIceTRenderManager::SetController(vtkMultiProcessController *controller)
     this->Context = icetCreateContext(icet_comm);
     icetDestroyMPICommunicator(icet_comm);
     vtkDebugMacro("Created new ICE-T context.");
+
+    vtkIntArray *drg = vtkIntArray::New();
+    drg->SetNumberOfComponents(1);
+    drg->SetNumberOfTuples(1);
+    drg->SetValue(0, this->Controller->GetLocalProcessId());
+    this->SetDataReplicationGroup(drg);
+    drg->Delete();
+    }
+  else
+    {
+    this->SetDataReplicationGroup(NULL);
     }
 
   this->ContextDirty = 1;
@@ -249,6 +264,25 @@ void vtkIceTRenderManager::UpdateIceTContext()
       icetDisable(ICET_DISPLAY_INFLATE);
       }
     icetEnable(ICET_CORRECT_COLORED_BACKGROUND);
+
+    if (this->UseCompositing)
+      {
+      icetDataReplicationGroup(this->DataReplicationGroup->GetNumberOfTuples(),
+                               this->DataReplicationGroup->GetPointer(0));
+      }
+    else
+      {
+      // If we're not compositing, tell ICE-T that all processes have
+      // duplicated data.  ICE-T will just have each process render to its
+      // local tile instead.
+      int *drg = new int[this->Controller->GetNumberOfProcesses()];
+      for (int i = 0; i < this->Controller->GetNumberOfProcesses(); i++)
+        {
+        drg[i] = i;
+        }
+      icetDataReplicationGroup(this->Controller->GetNumberOfProcesses(), drg);
+      delete[] drg;
+      }
     }
 
   this->ContextUpdateTime.Modified();
@@ -388,6 +422,24 @@ void vtkIceTRenderManager::SetComposeOperation(ComposeOperationType operation)
 
   this->ComposeOperation = operation;
   this->ComposeOperationDirty = 1;
+}
+
+void vtkIceTRenderManager::SetDataReplicationGroupColor(int color)
+{
+  // Just use ICE-T to figure out groups, since it can do that already.
+  icetSetContext(this->Context);
+
+  icetDataReplicationGroupColor(color);
+
+  vtkIntArray *drg = vtkIntArray::New();
+  drg->SetNumberOfComponents(1);
+  int size;
+  icetGetIntegerv(ICET_DATA_REPLICATION_GROUP_SIZE, &size);
+  drg->SetNumberOfTuples(size);
+  icetGetIntegerv(ICET_DATA_REPLICATION_GROUP, drg->GetPointer(0));
+
+  this->SetDataReplicationGroup(drg);
+  drg->Delete();
 }
 
 double vtkIceTRenderManager::GetRenderTime()
@@ -576,10 +628,10 @@ void vtkIceTRenderManager::PreRenderProcessing()
   // process render its local tile (if any).  The only real overhead is an
   // unnecessary frame buffer read back by ICE-T.  If that's a problem, we
   // could always add a special case to ICE-T...
-  // Code taken from my tile display module.
 
   this->UpdateIceTContext();
-  // Only composite the first frame.
+
+  // Only composite the first renderer.
   rens->InitTraversal();
   ren = rens->GetNextItem();
   //for (rens->InitTraversal(), i = 0; (ren = rens->GetNextItem()); i++)
@@ -630,12 +682,6 @@ void vtkIceTRenderManager::PostRenderProcessing()
 {
   vtkDebugMacro("PostRenderProcessing");
 
-  // Try to put the camera back the way it was.
-  if (!this->UseCompositing)
-    {
-    return;
-    }
-  
   this->Controller->Barrier();
 
   if (this->WriteBackImages)
@@ -776,6 +822,17 @@ void vtkIceTRenderManager::PrintSelf(ostream &os, vtkIndent indent)
     {
     os << endl;
     this->SortingKdTree->PrintSelf(os, i2);
+    }
+  else
+    {
+    os << "(none)" << endl;
+    }
+
+  os << indent << "Data Replication Group: ";
+  if (this->DataReplicationGroup)
+    {
+    os << endl;
+    this->DataReplicationGroup->PrintSelf(os, i2);
     }
   else
     {
