@@ -102,6 +102,13 @@ vtkKWView::vtkKWView()
   this->MultiPassStillAbortCheckMethod = NULL;
   this->MultiPassStillAbortCheckMethodArg = NULL;
 
+  this->GeneralProperties = vtkKWWidget::New();
+
+  this->BackgroundFrame = vtkKWLabeledFrame::New();
+  this->BackgroundFrame->SetParent( this->GeneralProperties );
+  this->BackgroundColor = vtkKWChangeColorButton::New();
+  this->BackgroundColor->SetParent( this->BackgroundFrame->GetFrame() );
+
   this->Printing = 0;
   this->PrintTargetDPI = 100;
   
@@ -111,6 +118,10 @@ vtkKWView::vtkKWView()
 
 vtkKWView::~vtkKWView()
 {
+  this->GeneralProperties->Delete();
+  this->BackgroundFrame->Delete();
+  this->BackgroundColor->Delete();
+
   this->AnnotationProperties->Delete();
   this->HeaderComposite->Delete();
   this->HeaderProp->Delete();
@@ -295,6 +306,28 @@ void vtkKWView::CreateViewProperties()
   this->CornerAnnotation->SetLabel("Corner Annotation");
   this->Script("pack %s -padx 2 -pady 4 -fill x -expand yes -anchor w",
                this->CornerAnnotation->GetWidgetName());
+
+  this->Notebook->AddPage("General");
+  
+  this->GeneralProperties->SetParent(this->Notebook->GetFrame("General"));
+  this->GeneralProperties->Create(app,"frame","");
+  this->Script("pack %s -pady 2 -padx 2 -fill both -expand yes -anchor n",
+               this->Notebook->GetWidgetName());
+  this->Script("pack %s -pady 2 -fill both -expand yes -anchor n",
+               this->GeneralProperties->GetWidgetName());  
+
+  this->BackgroundFrame->Create( app );
+  this->BackgroundFrame->SetLabel("Background");
+  this->Script("pack %s -padx 2 -pady 2 -fill x -expand yes -anchor w",
+               this->BackgroundFrame->GetWidgetName());
+
+  float c[3];  c[0] = 0.0;  c[1] = 0.0;  c[2] = 0.0;
+  this->BackgroundColor->SetColor( c );
+  this->BackgroundColor->Create( app, "" );
+  this->BackgroundColor->SetCommand( this, "SetBackgroundColor" );
+  this->Script("pack %s -side top -padx 15 -pady 4 -expand 1 -fill x",
+               this->BackgroundColor->GetWidgetName());
+
   this->PropertiesCreated = 1;
 }
 
@@ -897,6 +930,9 @@ void vtkKWView::SerializeSelf(ostream& os, vtkIndent indent)
     
     os << indent << "HeaderColor ";
     this->HeaderColor->Serialize(os,indent);
+
+    os << indent << "BackgroundColor ";
+    this->BackgroundColor->Serialize(os,indent);
     }
 }
 
@@ -955,6 +991,12 @@ void vtkKWView::SerializeToken(istream& is, const char token[1024])
     return;
     }
   
+  if (!strcmp(token,"BackgroundColor"))
+    {
+    this->BackgroundColor->Serialize(is);
+    return;
+    }
+
   vtkKWWidget::SerializeToken(is,token);
 }
 
@@ -962,5 +1004,5 @@ void vtkKWView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWView ";
-  this->ExtractRevision(os,"$Revision: 1.17 $");
+  this->ExtractRevision(os,"$Revision: 1.18 $");
 }

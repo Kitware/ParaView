@@ -257,6 +257,10 @@ public:
   void InteractOff();
 
   // Description:
+  // Set the background color
+  virtual void SetBackgroundColor( float r, float g, float b ) {};
+
+  // Description:
   // Set the name to be used in the Properties menu for the view properties
   // sheet entry
   vtkSetStringMacro( MenuPropertiesName );
@@ -297,6 +301,9 @@ protected:
   vtkScaledTextActor     *HeaderProp;
   vtkTextMapper          *HeaderMapper;
 
+  vtkKWWidget            *GeneralProperties;
+  vtkKWLabeledFrame      *BackgroundFrame;
+  vtkKWChangeColorButton *BackgroundColor;
 
   int              PropertiesCreated;
 
