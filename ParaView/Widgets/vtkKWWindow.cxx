@@ -72,7 +72,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define VTK_KW_WINDOW_GEOMETRY_REG_KEY "WindowGeometry"
 #define VTK_KW_WINDOW_FRAME1_SIZE_REG_KEY "WindowFrame1Size"
 
-vtkCxxRevisionMacro(vtkKWWindow, "1.148");
+vtkCxxRevisionMacro(vtkKWWindow, "1.149");
 vtkCxxSetObjectMacro(vtkKWWindow, PropertiesParent, vtkKWWidget);
 
 class vtkKWWindowMenuEntry
@@ -765,7 +765,7 @@ void vtkKWWindow::Create(vtkKWApplication *app, char *args)
   // Properties panel
 
   this->GetMenuWindow()->AddCommand(VTK_KW_HIDE_PROPERTIES_LABEL, this,
-                                    "OnToggleProperties", 1 );
+                                    "TogglePropertiesVisibilityCallback", 1 );
 
   // Window properties / Application settings (leading to preferences)
 
@@ -806,41 +806,40 @@ void vtkKWWindow::OnPrint(int propagate, int res)
     }
 }
 
-void vtkKWWindow::ShowProperties()
+int vtkKWWindow::GetPropertiesVisiblity()
 {
-  if (this->MiddleFrame && !this->MiddleFrame->GetFrame1Visibility())
-    {
-    this->MiddleFrame->Frame1VisibilityOn();
-    this->Script("%s entryconfigure 0 -label {%s}",
-                 this->GetMenuWindow()->GetWidgetName(),
-                 VTK_KW_HIDE_PROPERTIES_LABEL);
-    }
+  return (this->MiddleFrame && this->MiddleFrame->GetFrame1Visibility() ? 1 : 0);
 }
 
-void vtkKWWindow::HideProperties()
+void vtkKWWindow::SetPropertiesVisiblity(int arg)
 {
-  if (this->MiddleFrame && this->MiddleFrame->GetFrame1Visibility())
+  if (arg)
     {
-    this->MiddleFrame->Frame1VisibilityOff();
-    this->Script("%s entryconfigure 0 -label {%s}",
-                 this->GetMenuWindow()->GetWidgetName(),
-                 VTK_KW_SHOW_PROPERTIES_LABEL);
-    }
-}
-
-void vtkKWWindow::OnToggleProperties()
-{
-  float farg;
-  if (this->MiddleFrame && this->MiddleFrame->GetFrame1Visibility())
-    {
-    this->HideProperties();
-    farg = 0;
+    if (!this->GetPropertiesVisiblity())
+      {
+      this->MiddleFrame->Frame1VisibilityOn();
+      this->Script("%s entryconfigure 0 -label {%s}",
+                   this->GetMenuWindow()->GetWidgetName(),
+                   VTK_KW_HIDE_PROPERTIES_LABEL);
+      }
     }
   else
     {
-    this->ShowProperties();
-    farg = 1;
+    if (this->GetPropertiesVisiblity())
+      {
+      this->MiddleFrame->Frame1VisibilityOff();
+      this->Script("%s entryconfigure 0 -label {%s}",
+                   this->GetMenuWindow()->GetWidgetName(),
+                   VTK_KW_SHOW_PROPERTIES_LABEL);
+      }
     }
+}
+
+void vtkKWWindow::TogglePropertiesVisibilityCallback()
+{
+  int arg = !this->GetPropertiesVisiblity();
+  this->SetPropertiesVisiblity(arg);
+  float farg = arg;
   this->InvokeEvent(vtkKWEvent::UserInterfaceVisibilityChangedEvent, &farg);
 }
 
@@ -1116,11 +1115,40 @@ int vtkKWWindow::GetFileMenuIndex()
   return clidx - 1;  
 }
 
+void vtkKWWindow::SerializeSelf(ostream& os, vtkIndent indent)
+{
+  // Invoke superclass
+
+  this->Superclass::SerializeSelf(os, indent);
+
+  // Properties visibility
+
+  os << indent << "PropertiesVisibility " 
+     << this->GetPropertiesVisiblity() << endl;
+}
+
+//------------------------------------------------------------------------------
+void vtkKWWindow::SerializeToken(istream& is, const char token[1024])
+{
+  // Properties visibility
+
+  if (!strcmp(token, "PropertiesVisibility"))
+    {
+    int vis;
+    is >> vis;
+    this->SetPropertiesVisiblity(vis);
+    }
+
+  // Invoke superclass
+
+  this->Superclass::SerializeToken(is,token);
+}
+
 void vtkKWWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
-  vtkKWWidget::SerializeRevision(os,indent);
+  this->Superclass::SerializeRevision(os, indent);
   os << indent << "vtkKWWindow ";
-  this->ExtractRevision(os,"$Revision: 1.148 $");
+  this->ExtractRevision(os, "$Revision: 1.149 $");
 }
 
 int vtkKWWindow::ExitDialog()
