@@ -69,12 +69,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVSourceCollection.h"
 #include "vtkPVWindow.h"
 #include "vtkRenderer.h"
+#include "vtkRendererCollection.h"
+#include "vtkRenderWindow.h"
 #include "vtkScalarBarActor.h"
 #include "vtkScalarBarWidget.h"
 #include "vtkPVProcessModule.h"
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVColorMap);
-vtkCxxRevisionMacro(vtkPVColorMap, "1.63.2.5");
+vtkCxxRevisionMacro(vtkPVColorMap, "1.63.2.6");
 
 int vtkPVColorMapCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -1653,7 +1655,6 @@ void vtkPVColorMap::SetScalarBarVisibility(int val)
 //----------------------------------------------------------------------------
 void vtkPVColorMap::UpdateInternalScalarBarVisibility()
 {
-  vtkRenderer *ren;
   int visible = this->ScalarBarVisibility;
 
   if (this->UseCount == 0)
@@ -1673,21 +1674,15 @@ void vtkPVColorMap::UpdateInternalScalarBarVisibility()
     return;
     }
   
-  ren = this->GetPVRenderView()->GetRenderer();
-  
-  if (ren == NULL)
-    {
-    return;
-    }
-
   // I am going to add and remove it from the renderer instead of using
   // visibility.  Composites should really have multiple props.
-  
-  if (ren)
+
+  if (this->GetPVRenderView()->GetRenderer2D())
     {
     if (visible)
       {
-      this->ScalarBar->SetEnabled(1);
+      this->GetPVRenderView()->Enable3DWidget(this->ScalarBar);
+      
       // This is here in case process 0 has not geometry.  
       // We have to explicitly build the color map.
       this->LookupTable->Build();

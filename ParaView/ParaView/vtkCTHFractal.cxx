@@ -29,7 +29,7 @@
 
 
 
-vtkCxxRevisionMacro(vtkCTHFractal, "1.3.2.3");
+vtkCxxRevisionMacro(vtkCTHFractal, "1.3.2.4");
 vtkStandardNewMacro(vtkCTHFractal);
 
 //----------------------------------------------------------------------------

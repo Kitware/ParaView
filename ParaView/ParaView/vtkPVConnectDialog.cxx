@@ -57,7 +57,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVConnectDialog);
-vtkCxxRevisionMacro(vtkPVConnectDialog, "1.9.2.1");
+vtkCxxRevisionMacro(vtkPVConnectDialog, "1.9.2.2");
 
 //----------------------------------------------------------------------------
 void vtkPVConnectDialog::Create(vtkKWApplication* app, const char* vtkNotUsed(opts))
@@ -89,8 +89,8 @@ void vtkPVConnectDialog::Create(vtkKWApplication* app, const char* vtkNotUsed(op
   this->Port->SetParent(frame);
   this->Port->Create(app,0);
   this->Port->SetLabel(":");
-  this->Script("%s configure -width 4", this->Port->GetEntry()->GetEntry()->GetWidgetName());
-  this->Script("%s configure -width 7", this->Username->GetEntry()->GetWidgetName());
+  this->Port->GetEntry()->SetWidth(4);
+  this->Username->SetWidth(7);
   this->Script("pack %s -side left -expand 0", 
     this->Username->GetWidgetName());
   this->Script("pack %s -side left -expand 1 -fill x", 

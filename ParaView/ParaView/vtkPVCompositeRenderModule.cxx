@@ -55,7 +55,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCompositeRenderModule);
-vtkCxxRevisionMacro(vtkPVCompositeRenderModule, "1.7.2.5");
+vtkCxxRevisionMacro(vtkPVCompositeRenderModule, "1.7.2.6");
 
 
 
@@ -222,8 +222,30 @@ void vtkPVCompositeRenderModule::StillRender()
 
   this->GetPVApplication()->SetGlobalLODFlag(0);
   vtkTimerLog::MarkStartEvent("Still Render");
-  this->RenderWindow->Render();
+  vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
+  pm->GetStream() << vtkClientServerStream::Invoke
+                  << this->CompositeID << "IsA" << "vtkClientCompositeManager"
+                  << vtkClientServerStream::End;
+  pm->SendStreamToClient();
+  int result = 0;
+  pm->GetLastClientResult().GetArgument(0, 0, &result);
+  if(result)
+    {
+    pm->GetStream() << vtkClientServerStream::Invoke
+                    << this->CompositeID << "StartRender"
+                    << vtkClientServerStream::End;
+    pm->SendStreamToClient();
+    }
+  else
+    {
+    this->RenderWindow->Render();
+    }
   vtkTimerLog::MarkEndEvent("Still Render");
+  
+//  if (this->CompositeTclName && !strcmp(this->CompositeTclName, "CCompositeManager1") && !localRender)
+//    {
+//    this->PVApplication->Script("%s EndRender", this->CompositeTclName);
+//    }
 }
 
 
@@ -344,7 +366,23 @@ void vtkPVCompositeRenderModule::InteractiveRender()
     }
 
   vtkTimerLog::MarkStartEvent("Interactive Render");
-  this->RenderWindow->Render();
+  pm->GetStream() << vtkClientServerStream::Invoke
+                  << this->CompositeID << "IsA" << "vtkClientCompositeManager"
+                  << vtkClientServerStream::End;
+  pm->SendStreamToClient();
+  int result = 0;
+  pm->GetLastClientResult().GetArgument(0, 0, &result);
+  if(result)
+    {
+    pm->GetStream() << vtkClientServerStream::Invoke
+                    << this->CompositeID << "StartRender"
+                    << vtkClientServerStream::End;
+    pm->SendStreamToClient();
+    }
+  else
+    {
+    this->RenderWindow->Render();
+    }
   vtkTimerLog::MarkEndEvent("Interactive Render");
 
   // These times are used to determine reduction factor.
@@ -356,6 +394,20 @@ void vtkPVCompositeRenderModule::InteractiveRender()
       + this->Composite->GetGetBuffersTime()
       + this->Composite->GetSetBuffersTime();
     }
+
+  /*
+  if (this->CompositeTclName && !strcmp(this->CompositeTclName, "CCompositeManager1"))
+    {
+    int composite;
+    this->PVApplication->Script("%s GetUseCompositing",
+                                this->CompositeTclName);
+    composite = vtkKWObject::GetIntegerResult(this->PVApplication);
+    if (composite)
+      {
+      this->PVApplication->Script("%s EndRender", this->CompositeTclName);
+      }
+    }
+  */
 }
 
 

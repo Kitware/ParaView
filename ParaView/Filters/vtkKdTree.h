@@ -147,18 +147,9 @@ public:
     vtkGetMacro(Timing, int);
     
     // Description:
-    //  Maximum depth of binary tree
-    vtkSetMacro(MaxLevel, int);
-    vtkGetMacro(MaxLevel, int);
-
-    // Description:
     //  Minimum number of cells per spatial region
     vtkSetMacro(MinCells, int);
     vtkGetMacro(MinCells, int);
-
-    // Description:
-    //    Level of complete tree
-    vtkGetMacro(Level, int);
 
     // Description:
     //    Omit partitions along the X axis, yielding shafts in the X direction
@@ -606,8 +597,6 @@ protected:
 
 private:
 
-    vtkKdTree(const vtkKdTree&);
-
 //BTX
     int DivideRegion(vtkKdNode *kd, float *c1, int nlevels);
     void SelfRegister(vtkKdNode *kd);
@@ -697,5 +686,8 @@ private:
 
     int *CellRegionList;
 
+
+  vtkKdTree(const vtkKdTree&); // Not implemented
+  void operator=(const vtkKdTree&); // Not implemented
 };
 #endif

@@ -44,8 +44,7 @@
 class vtkIdList;
 class vtkUnstructuredGrid;
 
-class VTK_EXPORT vtkExtractCells : 
-      public vtkDataSetToUnstructuredGridFilter
+class VTK_EXPORT vtkExtractCells : public vtkDataSetToUnstructuredGridFilter
 {
 public:
   vtkTypeRevisionMacro(vtkExtractCells, vtkDataSetToUnstructuredGridFilter);
@@ -99,5 +98,9 @@ private:
 
   int SubSetUGridCellArraySize;
   char InputIsUgrid;
+
+  vtkExtractCells(const vtkExtractCells&); // Not implemented
+  void operator=(const vtkExtractCells&); // Not implemented
 };
+
 #endif

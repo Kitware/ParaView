@@ -41,9 +41,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "vtkPVDataInformation.h"
 
+#include "vtkByteSwap.h"
 #include "vtkCellData.h"
 #include "vtkClientServerStream.h"
 #include "vtkCollection.h"
+#ifdef PARAVIEW_BUILD_DEVELOPMENT
+#include "vtkCompositeDataSet.h"
+#include "vtkCompositeDataIterator.h"
+#endif
 #include "vtkDataArray.h"
 #include "vtkDataSet.h"
 #include "vtkImageData.h"
@@ -56,7 +61,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkPVDataInformation);
-vtkCxxRevisionMacro(vtkPVDataInformation, "1.12.4.1");
+vtkCxxRevisionMacro(vtkPVDataInformation, "1.12.4.2");
 
 //----------------------------------------------------------------------------
 vtkPVDataInformation::vtkPVDataInformation()
@@ -174,19 +179,40 @@ void vtkPVDataInformation::DeepCopy(vtkPVDataInformation *dataInfo)
   this->SetName(dataInfo->GetName());
 }
 
+#ifdef PARAVIEW_BUILD_DEVELOPMENT
 //----------------------------------------------------------------------------
-void vtkPVDataInformation::CopyFromObject(vtkObject* object)
+void vtkPVDataInformation::CopyFromCompositeDataSet(vtkCompositeDataSet* data)
 {
-  vtkDataSet* data = vtkDataSet::SafeDownCast(object);
+  vtkCompositeDataIterator* iter = data->NewIterator();
+  iter->GoToFirstItem();
+  while (!iter->IsDoneWithTraversal())
+    {
+    vtkDataObject* dobj = iter->GetCurrentDataObject();
+    vtkPVDataInformation* dinf = vtkPVDataInformation::New();
+    dinf->CopyFromObject(dobj);
+    this->AddInformation(dinf);
+    dinf->Delete();
+    iter->GoToNextItem();
+    }
+  iter->Delete();
+  this->DataSetType = data->GetDataObjectType();
+}
+#else
+class vtkCompositeDataSet
+{
+};
+//----------------------------------------------------------------------------
+void vtkPVDataInformation::CopyFromCompositeDataSet(vtkCompositeDataSet*)
+{
+}
+#endif
+
+//----------------------------------------------------------------------------
+void vtkPVDataInformation::CopyFromDataSet(vtkDataSet* data)
+{
   int idx;
   float *bds;
   int *ext = NULL;
-
-  if (data == NULL)
-    {
-    vtkErrorMacro("Cound not cast object to data set.");
-    return;
-    }
 
   this->NumberOfPoints = data->GetNumberOfPoints();
   this->NumberOfCells = data->GetNumberOfCells();
@@ -231,6 +257,28 @@ void vtkPVDataInformation::CopyFromObject(vtkObject* object)
     char* str = static_cast<char*>(nameArray->GetVoidPointer(0));
     this->SetName(str);
     }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVDataInformation::CopyFromObject(vtkObject* object)
+{
+  vtkDataSet* ds = vtkDataSet::SafeDownCast(object);
+  if (ds)
+    {
+    this->CopyFromDataSet(ds);
+    return;
+    }
+
+#ifdef PARAVIEW_BUILD_DEVELOPMENT
+  vtkCompositeDataSet* cds = vtkCompositeDataSet::SafeDownCast(object);
+  if (cds)
+    {
+    this->CopyFromCompositeDataSet(cds);
+    return;
+    }
+#endif
+
+  vtkErrorMacro("Cound not cast object to data set.");
 }
 
 //----------------------------------------------------------------------------
@@ -353,6 +401,18 @@ const char* vtkPVDataInformation::GetDataSetTypeAsString()
   if (this->DataSetType == VTK_POINT_SET)
     {
     return "vtkPointSet";
+    }
+  if (this->DataSetType == VTK_COMPOSITE_DATA_SET)
+    {
+    return "vtkCompositeDataSet";
+    }
+  if (this->DataSetType == VTK_MULTI_BLOCK_DATA_SET)
+    {
+    return "vtkMultiBlockDataSet";
+    }
+  if (this->DataSetType == VTK_HIERARCHICAL_BOX_DATA_SET)
+    {
+    return "vtkHierarchicalBoxDataSet";
     }
 
   return "UnknownType";

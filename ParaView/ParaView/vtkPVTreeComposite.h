@@ -99,6 +99,9 @@ public:
   // Public because it is an RMI.  
   void CheckForDataRMI();
 
+  virtual void SetRenderWindow(vtkRenderWindow *renWin);
+  virtual void Composite();
+  
 protected:
   vtkPVTreeComposite();
   ~vtkPVTreeComposite();
@@ -106,6 +109,8 @@ protected:
   int  CheckForData();
   int  ShouldIComposite();
 
+  void InternalStartRender();
+  
 //BTX
 
   enum Tags {

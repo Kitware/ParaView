@@ -48,11 +48,14 @@
 #define __vtkMergeCells_h
 
 #include "vtkObject.h"
-#include "vtkUnstructuredGrid.h"
-#include "vtkDataSetAttributes.h"
-#include <map>
+
+#include "vtkDataSetAttributes.h" // Needed for FieldList
+#include <map> // Needed for GlobalIdMap
 
 class vtkDataSet;
+class vtkUnstructuredGrid;
+class vtkPointData;
+class vtkCellData;
 
 class VTK_EXPORT vtkMergeCells : public vtkObject
 { 
@@ -151,5 +154,8 @@ private:
   vtkUnstructuredGrid *UnstructuredGrid;
 
   int nextGrid;
+
+  vtkMergeCells(const vtkMergeCells&); // Not implemented
+  void operator=(const vtkMergeCells&); // Not implemented
 };
 #endif

@@ -67,7 +67,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPart);
-vtkCxxRevisionMacro(vtkPVPart, "1.28.2.12");
+vtkCxxRevisionMacro(vtkPVPart, "1.28.2.13");
 
 
 int vtkPVPartCommand(ClientData cd, Tcl_Interp *interp,
@@ -313,6 +313,59 @@ void vtkPVPart::SetVTKDataID(vtkClientServerID id)
   pm->SendStreamToServer();
 }
 
+//----------------------------------------------------------------------------
+// Create the extent translator (sources with no inputs only).
+// Needs to be before "ExtractPieces" because translator propagates.
+void vtkPVPart::CreateTranslatorIfNecessary()
+{
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  vtkPVProcessModule* pm = pvApp->GetProcessModule();
+  
+  // We are going to create the piece filter with a dummy tcl name,
+  // setup the pipeline, and remove tcl's reference to the objects.
+  // The vtkData object will be moved to the output of the piece filter.
+  pm->GatherInformation(this->ClassNameInformation, this->VTKDataID);
+  char *className = this->ClassNameInformation->GetVTKClassName();
+  if (strcmp(className, "vtkImageData") == 0 ||
+      strcmp(className, "vtkStructuredPoints") == 0 ||
+      strcmp(className, "vtkStructuredGrid") == 0 ||
+      strcmp(className, "vtkRectilinearGrid") == 0 )
+    {
+    // Do not overwrite custom extent translators.
+    // PVExtent translator should really be the default,
+    // Then we would not need to do this.
+    pm->GetStream() << vtkClientServerStream::Invoke
+                    << this->VTKDataID << "GetExtentTranslator"
+                    << vtkClientServerStream::End
+                    << vtkClientServerStream::Invoke
+                    << vtkClientServerStream::LastResult
+                    << "GetClassName"
+                    << vtkClientServerStream::End;
+    pm->SendStreamToServerRoot();
+    char* classname = 0;
+    if(!pm->GetLastServerResult().GetArgument(0,0,&classname))
+      {
+      vtkErrorMacro(<< "Faild to get server result.");
+      }
+    if(classname && strcmp(classname, "vtkExtentTranslator") == 0)
+      {
+      vtkClientServerID translatorID =
+        pm->NewStreamObject("vtkPVExtentTranslator");
+      pm->GetStream() << vtkClientServerStream::Invoke
+                      << this->VTKDataID << "SetExtentTranslator"
+                      << translatorID
+                      << vtkClientServerStream::End;
+      // Translator has to be set on source because it is propagated.
+      pm->GetStream() << vtkClientServerStream::Invoke
+                      << translatorID << "SetOriginalSource"
+                      << this->VTKDataID
+                      << vtkClientServerStream::End;
+      pm->DeleteStreamObject(translatorID);
+      pm->SendStreamToServer();
+      }
+   }
+
+}
 
 
 //----------------------------------------------------------------------------

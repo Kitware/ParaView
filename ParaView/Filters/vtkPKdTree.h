@@ -411,6 +411,8 @@ private:
   void AddEntry(int *list, int len, int id);
   static int BinarySearch(int *list, int len, int which);
 
+  vtkPKdTree(const vtkPKdTree&); // Not implemented
+  void operator=(const vtkPKdTree&); // Not implemented
 };
 
 //BTX

@@ -69,6 +69,7 @@ public:
                   int underline, const char* help = 0);
   void InsertCascade(int position, const char* label,  vtkKWMenu*, 
                      int underline, const char* help = 0  );
+  int GetCascadeIndex(vtkKWMenu *);
 
   // Description:
   // Set cascade menu for menu entry.
@@ -192,6 +193,7 @@ public:
 
   // Description:
   // Get the option of an entry
+  int HasItemOption(int position, const char *option);
   const char* GetItemOption(int position, const char *option);
   const char* GetItemOption(const char *item, const char *option);
 

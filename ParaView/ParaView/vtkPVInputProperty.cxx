@@ -53,7 +53,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVInputProperty);
-vtkCxxRevisionMacro(vtkPVInputProperty, "1.3.4.1");
+vtkCxxRevisionMacro(vtkPVInputProperty, "1.3.4.2");
 
 //----------------------------------------------------------------------------
 vtkPVInputProperty::vtkPVInputProperty()
@@ -107,9 +107,22 @@ int vtkPVInputProperty::GetIsValidInput(vtkPVSource *input, vtkPVSource *pvs)
   // Also, this could be just another requirment instead of an input property attribute.
  
   // Special sets of types.
-  if (this->Type == NULL || strcmp(this->Type, "vtkDataSet") == 0)
+  if (this->Type == NULL)
     {
     return 1;
+    }
+  if (strcmp(this->Type, "vtkDataSet") == 0)
+    {
+    if (info->GetDataSetType() == VTK_IMAGE_DATA ||
+        info->GetDataSetType() == VTK_RECTILINEAR_GRID ||
+        info->GetDataSetType() == VTK_STRUCTURED_GRID ||
+        info->GetDataSetType() == VTK_POLY_DATA ||
+        info->GetDataSetType() == VTK_UNSTRUCTURED_GRID ||
+        info->GetDataSetType() == VTK_CTH_DATA ||
+        info->GetDataSetType() == VTK_UNIFORM_GRID )
+      {
+      return 1;
+      }
     }
   if (strcmp(this->Type, "vtkStructuredData") == 0)
     {
@@ -158,6 +171,11 @@ int vtkPVInputProperty::GetIsValidInput(vtkPVSource *input, vtkPVSource *pvs)
     }
   if (strcmp(this->Type, "vtkCTHData") == 0 &&
       info->GetDataSetType() == VTK_CTH_DATA)
+    {
+    return 1;
+    }
+  if (strcmp(this->Type, "vtkHierarchicalBoxDataSet") == 0 &&
+      info->GetDataSetType() == VTK_HIERARCHICAL_BOX_DATA_SET)
     {
     return 1;
     }

@@ -68,7 +68,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProbe);
-vtkCxxRevisionMacro(vtkPVProbe, "1.99.2.8");
+vtkCxxRevisionMacro(vtkPVProbe, "1.99.2.9");
 
 int vtkPVProbeCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -357,7 +357,14 @@ void vtkPVProbe::AcceptCallbackInternal()
       xyp->SetYTitle(arrayName);
       xyp->SetPlotColor(0, 1, 1, 1);
       }
-    this->XYPlotWidget->SetEnabled(this->ShowXYPlotToggle->GetState());
+    if (this->ShowXYPlotToggle->GetState())
+      {
+      this->GetPVRenderView()->Enable3DWidget(this->XYPlotWidget);
+      }
+    else
+      {
+      this->XYPlotWidget->SetEnabled(0);
+      }
     
     window->GetMainView()->Render();
     }

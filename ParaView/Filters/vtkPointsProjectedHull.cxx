@@ -30,8 +30,9 @@
 =========================================================================*/
 
 #include "vtkPointsProjectedHull.h"
+#include "vtkObjectFactory.h"
 
-vtkCxxRevisionMacro(vtkPointsProjectedHull, "1.6.4.1");
+vtkCxxRevisionMacro(vtkPointsProjectedHull, "1.6.4.2");
 vtkStandardNewMacro(vtkPointsProjectedHull);
 
 static const int xdim=0, ydim=1, zdim=2;

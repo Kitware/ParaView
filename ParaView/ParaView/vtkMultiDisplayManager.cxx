@@ -45,7 +45,7 @@
  #include <mpi.h>
 #endif
 
-vtkCxxRevisionMacro(vtkMultiDisplayManager, "1.9.2.1");
+vtkCxxRevisionMacro(vtkMultiDisplayManager, "1.9.2.2");
 vtkStandardNewMacro(vtkMultiDisplayManager);
 
 vtkCxxSetObjectMacro(vtkMultiDisplayManager, RenderView, vtkObject);
@@ -96,7 +96,7 @@ vtkPVMultiDisplayInfo::vtkPVMultiDisplayInfo()
   this->Background[2] = 0.0;
   this->ParallelScale = 0.0;                         
   this->CameraViewAngle = 0.0;                       
-  }
+}
   
 
 

@@ -75,7 +75,7 @@ const int REN_INFO_INT_SIZE = sizeof(RendererInfoInt)/sizeof(int);
 const int REN_INFO_FLOAT_SIZE = sizeof(RendererInfoFloat)/sizeof(float);
 const int LIGHT_INFO_FLOAT_SIZE = sizeof(LightInfoFloat)/sizeof(float);
 
-vtkCxxRevisionMacro(vtkParallelRenderManager, "1.2.4.1");
+vtkCxxRevisionMacro(vtkParallelRenderManager, "1.2.4.2");
 
 vtkParallelRenderManager::vtkParallelRenderManager()
 {
@@ -481,7 +481,7 @@ void vtkParallelRenderManager::StopServices()
 
 void vtkParallelRenderManager::StartRender()
 {
-  int i;
+//  int i;
   struct RenderWindowInfoInt winInfoInt;
   struct RenderWindowInfoFloat winInfoFloat;
   struct RendererInfoInt renInfoInt;
@@ -550,7 +550,8 @@ void vtkParallelRenderManager::StartRender()
   winInfoInt.FullSize[1] = this->FullImageSize[1];
   winInfoInt.ReducedSize[0] = this->ReducedImageSize[0];
   winInfoInt.ReducedSize[1] = this->ReducedImageSize[1];
-  winInfoInt.NumberOfRenderers = rens->GetNumberOfItems();
+//  winInfoInt.NumberOfRenderers = rens->GetNumberOfItems();
+  winInfoInt.NumberOfRenderers = 1;
   winInfoInt.ImageReductionFactor = this->ImageReductionFactor;
   winInfoInt.UseCompositing = this->UseCompositing;
   winInfoFloat.DesiredUpdateRate = this->RenderWindow->GetDesiredUpdateRate();
@@ -575,14 +576,20 @@ void vtkParallelRenderManager::StartRender()
     this->Viewports->SetNumberOfTuples(rens->GetNumberOfItems());
     }
   vtkRenderer *ren;
-  for (rens->InitTraversal(), i = 0; (ren = rens->GetNextItem()); i++)
+  rens->InitTraversal();
+  ren = rens->GetNextItem();
+  
+//  for (rens->InitTraversal(), i = 0; (ren = rens->GetNextItem()); i++)
+//    {
+  if (ren)
     {
     ren->GetViewport(renInfoFloat.Viewport);
 
     // Adjust Renderer viewports to get reduced size image.
     if (this->ImageReductionFactor > 1)
       {
-      this->Viewports->SetTuple(i, renInfoFloat.Viewport);
+//      this->Viewports->SetTuple(i, renInfoFloat.Viewport);
+      this->Viewports->SetTuple(0, renInfoFloat.Viewport);
       renInfoFloat.Viewport[0] /= this->ImageReductionFactor;
       renInfoFloat.Viewport[1] /= this->ImageReductionFactor;
       renInfoFloat.Viewport[2] /= this->ImageReductionFactor;
@@ -614,18 +621,19 @@ void vtkParallelRenderManager::StartRender()
       {
       light->GetPosition(lightInfoFloat.Position);
       light->GetFocalPoint(lightInfoFloat.FocalPoint);
-
+      
       for (id = 0; id < numProcs; id++)
-    {
-    if (id == this->RootProcessId) continue;
-    this->Controller->Send((float *)(&lightInfoFloat),
-                   LIGHT_INFO_FLOAT_SIZE, id,
-                   vtkParallelRenderManager::LIGHT_INFO_FLOAT_TAG);
-    }
+        {
+        if (id == this->RootProcessId) continue;
+        this->Controller->Send((float *)(&lightInfoFloat),
+                               LIGHT_INFO_FLOAT_SIZE, id,
+                               vtkParallelRenderManager::LIGHT_INFO_FLOAT_TAG);
+        }
       }
 
     this->SendRendererInformation(ren);
     }
+//    }
 
   this->PreRenderProcessing();
 }

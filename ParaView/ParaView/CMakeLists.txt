@@ -33,6 +33,9 @@ SET( ParaViewServer_SRCS
   vtkXMLPVAnimationWriter.cxx
   )
 
+SET( ParaViewServerNonWrapped_SRCS
+  )
+
 SET( ParaViewExtraWrapper_SRCS
   ${PARAVIEW_SOURCE_DIR}/Widgets/vtkKWApplication.h
   ${PARAVIEW_SOURCE_DIR}/Widgets/vtkKWObject.h
@@ -64,6 +67,8 @@ SET( ParaViewClient_SRCS
   vtkPVClassNameInformation.cxx
   vtkPVColorMap.cxx
   vtkPVComponentSelection.cxx
+  vtkPVAxesActor.cxx
+  vtkPVAxesWidget.cxx
   vtkPVCompositeBuffer.cxx
   vtkPVCompositePartDisplay.cxx
   vtkPVCompositeRenderModule.cxx
@@ -86,7 +91,6 @@ SET( ParaViewClient_SRCS
   vtkPVErrorLogDisplay.cxx
   vtkPVExtentEntry.cxx
   vtkPVExtentWidgetProperty.cxx
-  vtkPVExtractGeometryByScalar.cxx
   vtkPVExtractPartsWidget.cxx
   vtkPVFieldMenu.cxx
   vtkPVFileEntry.cxx
@@ -188,6 +192,9 @@ SET( ParaViewClient_SRCS
 #  vtkPVRenderGroupDialog.cxx
   )
 
+SET(ParaViewBinary_SRCS
+  ParaView.cxx)
+
 IF (PARAVIEW_USE_ICE_T)
   SET( ParaViewClient_SRCS
     ${ParaViewClient_SRCS}
@@ -230,135 +237,66 @@ SET_SOURCE_FILES_PROPERTIES(
   ABSTRACT
   )
 
+SET(PARAVIEW_ADDITIONAL_LIBRARIES)
+
+#
+# Imported project adds libraries
+#
+MACRO(PARAVIEW_LINK_LIBRARIES LIBS)
+  SET(PARAVIEW_ADDITIONAL_LIBRARIES ${PARAVIEW_ADDITIONAL_LIBRARIES} ${LIBS})
+ENDMACRO(PARAVIEW_LINK_LIBRARIES LIBS)
+
+#
+# Imported project adds source files
+# This ones need to be fixed, so that first are not wrapped. This will be fixed
+# once the server changes are merged.
+#
+MACRO(PARAVIEW_INCLUDE_SOURCES SRCS)
+  SET(ParaViewServerNonWrapped_SRCS ${ParaViewServerNonWrapped_SRCS} ${SRCS})
+ENDMACRO(PARAVIEW_INCLUDE_SOURCES SRCS)
+MACRO(PARAVIEW_INCLUDE_EXECUTABLE_SOURCES SRCS)
+  SET(ParaViewBinary_SRCS ${ParaViewBinary_SRCS} ${SRCS})
+ENDMACRO(PARAVIEW_INCLUDE_EXECUTABLE_SOURCES SRCS)
+MACRO(PARAVIEW_INCLUDE_WRAPPED_SOURCES SRCS)
+  SET(ParaViewServer_SRCS ${ParaViewServer_SRCS} ${SRCS})
+ENDMACRO(PARAVIEW_INCLUDE_WRAPPED_SOURCES SRCS)
+
 OPTION(PARAVIEW_USE_EXODUS "Build using Exodus library. Requires access to Exodus libraries" OFF)
 MARK_AS_ADVANCED(PARAVIEW_USE_EXODUS)
 IF(PARAVIEW_USE_EXODUS)
   FIND_PATH(EXODUS_SOURCE_DIR 
-    vtkExodusReader.h
+    ExodusParaViewImport.cmake
     ../Trilab/ExodusReader
     ../../Trilab/ExodusReader
     ../../../Trilab/ExodusReader)
-  FIND_PATH(EXODUS_INCLUDE_DIR
-    exodusII.h
-    ../Exodus/inc
-    ../../Exodus/inc
-    ../../../Exodus/inc)
-  FIND_LIBRARY(EXODUS_LIBRARY
-    NAMES exoIIv2c exodusII
-    PATHS
-    ../Exodus/lib
-    ../../Exodus/lib
-    ../../../Exodus/lib)
-  FIND_LIBRARY(NETCDF_LIBRARY
-    NAMES netcdf
-    PATHS 
-    ../Exodus/lib
-    ../../Exodus/lib
-    ../../../Exodus/lib)
 
-  SET(NOTFOUND 0)
-  IF(NOT NETCDF_LIBRARY)
-    SET(NOTFOUND 1)
-    MESSAGE(SEND_ERROR "Cannot find NetCDF library")
-  ENDIF(NOT NETCDF_LIBRARY)
-  IF(NOT EXODUS_LIBRARY)
-    SET(NOTFOUND 1)
-    MESSAGE(SEND_ERROR "Cannot find Exodus library")
-  ENDIF(NOT EXODUS_LIBRARY)
-  IF(NOT EXODUS_SOURCE_DIR)
-    SET(NOTFOUND 1)
-    MESSAGE(SEND_ERROR "Cannot find Exodus source directory")
-  ENDIF(NOT EXODUS_SOURCE_DIR)
-  IF(NOT EXODUS_INCLUDE_DIR)
-    SET(NOTFOUND 1)
-    MESSAGE(SEND_ERROR "Cannot find Exodus include directory")
-  ENDIF(NOT EXODUS_INCLUDE_DIR)
-
-  IF(NOT NOTFOUND)
-    INCLUDE(${EXODUS_SOURCE_DIR}/Files.cmake)
-    INCLUDE_DIRECTORIES(${EXODUS_SOURCE_DIR})
-    INCLUDE_DIRECTORIES(${EXODUS_INCLUDE_DIR})
-    SET( ParaView_SRCS
-      ${ParaView_SRCS}
-      ${EXODUS_SRCS})
-  ENDIF(NOT NOTFOUND)
+  IF(EXISTS ${EXODUS_SOURCE_DIR}/ExodusParaViewImport.cmake)
+    INCLUDE(${EXODUS_SOURCE_DIR}/ExodusParaViewImport.cmake)
+  ELSE(EXISTS ${EXODUS_SOURCE_DIR}/ExodusParaViewImport.cmake)
+    MESSAGE(SEND_ERROR "Cannot find Exodus sources directory")
+  ENDIF(EXISTS ${EXODUS_SOURCE_DIR}/ExodusParaViewImport.cmake)
 ENDIF(PARAVIEW_USE_EXODUS)
 
 OPTION(PARAVIEW_USE_SAF "Build using SAF library. Requires access to SAF libraries and HDF5 version 1.6 libraries" OFF)
 MARK_AS_ADVANCED(PARAVIEW_USE_SAF)
-IF(PARAVIEW_USE_SAF)                                                                                                                    
-  IF(WIN32)
-    FIND_FILE( SAF_LIBRARY safapi.lib )
-    FIND_FILE( SAF_VBT_LIBRARY vbt.lib )
-    FIND_FILE( SAF_DSL_LIBRARY dsl.lib )
-  ELSE(WIN32)
-    FIND_FILE( SAF_LIBRARY libsafapi.a )
-    FIND_FILE( SAF_VBT_LIBRARY libvbt.a )
-    FIND_FILE( SAF_DSL_LIBRARY libdsl.a )
-  ENDIF(WIN32)
 
-  FIND_PATH(SAF_INCLUDE_DIR saf.h)
-  FIND_LIBRARY(SAF_READER_LIBRARY NAMES vtksnlSAFIO)
-  FIND_PATH(VTKSNL_SOURCE_DIR vtkSnl.cmake )
-  FIND_PATH(VTKSNL_BUILD_DIR vtksnlConfigure.h )
+IF(PARAVIEW_USE_SAF)
+  FIND_PATH(SAF_SOURCE_DIR 
+    SAFParaViewImport.cmake
+    ../Trilab/ExodusReader
+    ../../Trilab/ExodusReader
+    ../../../Trilab/ExodusReader)
 
-  SET(NOTFOUND 0)
-  IF(NOT SAF_INCLUDE_DIR)
-    SET(NOTFOUND 1)
-    MESSAGE(SEND_ERROR "Cannot find SAF include directory")
-  ENDIF(NOT SAF_INCLUDE_DIR)
-  IF(NOT SAF_READER_LIBRARY)
-    SET(NOTFOUND 1)
-    MESSAGE(SEND_ERROR "Cannot find vtksnlSAFIO library")
-  ENDIF(NOT SAF_READER_LIBRARY)
-  IF(NOT VTKSNL_SOURCE_DIR)
-    SET(NOTFOUND 1)
-    MESSAGE(SEND_ERROR "Cannot find vtkSNL source directory")
-  ENDIF(NOT VTKSNL_SOURCE_DIR)
-  IF(NOT VTKSNL_BUILD_DIR)
-    SET(NOTFOUND 1)
-    MESSAGE(SEND_ERROR "Cannot find vtkSNL build directory")
-  ENDIF(NOT VTKSNL_BUILD_DIR)
-  IF(NOT SAF_LIBRARY)
-    SET(NOTFOUND 1)
-    MESSAGE(SEND_ERROR "Cannot find saf library")
-  ENDIF(NOT SAF_LIBRARY)
-  IF(NOT SAF_VBT_LIBRARY)
-    SET(NOTFOUND 1)
-    MESSAGE(SEND_ERROR "Cannot find saf vbt library")
-  ENDIF(NOT SAF_VBT_LIBRARY)
-  IF(NOT SAF_DSL_LIBRARY)
-    SET(NOTFOUND 1)
-    MESSAGE(SEND_ERROR "Cannot find saf dsl library")
-  ENDIF(NOT SAF_DSL_LIBRARY)
-
-  IF(NOT PARAVIEW_USE_SYSTEM_HDF5)
-    SET(NOTFOUND 1)
-    MESSAGE(SEND_ERROR "In order to build SAF, you must have hdf5 version 1.6, i.e. PARAVIEW_USE_SYSTEM_HDF5 must be true")
-  ENDIF(NOT PARAVIEW_USE_SYSTEM_HDF5)
-
-  IF(NOT NOTFOUND)
-    INCLUDE_DIRECTORIES(${VTKSNL_SOURCE_DIR})
-    INCLUDE_DIRECTORIES(${VTKSNL_SOURCE_DIR}/IO)
-    INCLUDE_DIRECTORIES(${VTKSNL_SOURCE_DIR}/Graphics)
-    INCLUDE_DIRECTORIES(${VTKSNL_SOURCE_DIR}/Common)
-    INCLUDE_DIRECTORIES(${VTKSNL_SOURCE_DIR}/Utilities/Saf)
-    INCLUDE_DIRECTORIES(${VTKSNL_BUILD_DIR})
-    INCLUDE_DIRECTORIES(${SAF_INCLUDE_DIR})
-    INCLUDE_DIRECTORIES(${SAF_INCLUDE_DIR}/private)
-    SET( ParaViewServer_SRCS
-      ${ParaViewServer_SRCS}
-      ${VTKSNL_SOURCE_DIR}/IO/vtkSAFPVReader.cxx
-      )
-    SET_SOURCE_FILES_PROPERTIES(
-      ${VTKSNL_SOURCE_DIR}/IO/vtkSAFPVReader.cxx
-      COMPILE_FLAGS -DBUNDLE_REGISTRY_INTO_EXECUTABLE
-    )
-  ENDIF(NOT NOTFOUND)
+  IF(EXISTS ${SAF_SOURCE_DIR}/SAFParaViewImport.cmake)
+    INCLUDE(${SAF_SOURCE_DIR}/SAFParaViewImport.cmake)
+  ELSE(EXISTS ${SAF_SOURCE_DIR}/SAFParaViewImport.cmake)
+    MESSAGE(SEND_ERROR "Cannot find SAF sources directory")
+  ENDIF(EXISTS ${SAF_SOURCE_DIR}/SAFParaViewImport.cmake)
 ENDIF(PARAVIEW_USE_SAF)
 
 SET(ParaView_SRCS ${ParaView_SRCS} ${ParaViewShared_SRCS}
-  ${ParaViewServer_SRCS} ${ParaViewClient_SRCS})
+  ${ParaViewServer_SRCS} ${ParaViewServerNonWrapped_SRCS}
+  ${ParaViewClient_SRCS})
 
 # Setup vtkInstantiator registration for this library's classes.
 VTK_MAKE_INSTANTIATOR2(vtkParaViewInstantiator PVInstantiator_SRCS
@@ -379,27 +317,33 @@ VTK_WRAP_TCL2(vtkKWParaViewTCL ParaViewTCL_SRCS ${PVInstantiator_SRCS}
   ${ParaViewShared_SRCS} ${ParaViewClient_SRCS})
 ADD_LIBRARY(vtkKWParaViewTCL ${ParaViewTCL_SRCS} ${PVInstantiator_SRCS}
   ${ParaView_SRCS})
-IF(PARAVIEW_USE_EXODUS)
-  TARGET_LINK_LIBRARIES(vtkKWParaViewTCL ${EXODUS_LIBRARY} ${NETCDF_LIBRARY})
-ENDIF(PARAVIEW_USE_EXODUS)
+
+IF(PARAVIEW_BUILD_DEVELOPMENT)
+  FIND_LIBRARY(PARAVIEW_BLT_LIBRARY BLT
+               PATHS /usr/lib /usr/local/lib
+               DOC "Optional BLT library. This might be used for a graph widget in the future."
+               )
+  MARK_AS_ADVANCED(PARAVIEW_BLT_LIBRARY)
+ENDIF(PARAVIEW_BUILD_DEVELOPMENT)
+
+TARGET_LINK_LIBRARIES(vtkKWParaViewTCL ${PARAVIEW_ADDITIONAL_LIBRARIES})
+IF(PARAVIEW_BUILD_DEVELOPMENT)
+  IF (PARAVIEW_BLT_LIBRARY)
+    TARGET_LINK_LIBRARIES(vtkKWParaViewTCL ${PARAVIEW_BLT_LIBRARY})
+  ENDIF (PARAVIEW_BLT_LIBRARY)
+ENDIF(PARAVIEW_BUILD_DEVELOPMENT)
 
 TARGET_LINK_LIBRARIES (vtkKWParaViewTCL vtkPVFiltersTCL vtkParaViewServerCS)
 IF(XDMF_FOUND)
   TARGET_LINK_LIBRARIES(vtkKWParaViewTCL vtkXdmfTCL vtkXdmfCS)
 ENDIF(XDMF_FOUND)
+IF(PARAVIEW_BUILD_DEVELOPMENT)
+  TARGET_LINK_LIBRARIES(vtkKWParaViewTCL vtkPVDevelopmentTCL)
+ENDIF(PARAVIEW_BUILD_DEVELOPMENT)
 IF(PARAVIEW_USE_ICE_T)
   TARGET_LINK_LIBRARIES(vtkKWParaViewTCL icet icet_mpi icet_strategies)
   INCLUDE_DIRECTORIES(${ICE_T_INCLUDE_DIR})
 ENDIF(PARAVIEW_USE_ICE_T)
-
-IF(PARAVIEW_USE_SAF)
-  TARGET_LINK_LIBRARIES( vtkKWParaViewTCL 
-			 ${SAF_READER_LIBRARY} 
-			 ${SAF_LIBRARY}
-			 ${SAF_VBT_LIBRARY}
-			 ${SAF_DSL_LIBRARY}
-			 ${HDF5_LIBRARY} )
-ENDIF(PARAVIEW_USE_SAF)
 
 CONFIGURE_FILE(
   ${PARAVIEW_SOURCE_DIR}/ParaView/vtkPVSourceInterfaceDirectories.h.in
@@ -421,18 +365,9 @@ CONFIGURE_FILE(${PARAVIEW_SOURCE_DIR}/ParaView/vtkPVConfig.h.in
 INCLUDE_DIRECTORIES(${PARAVIEW_BINARY_DIR}/ParaView
   ${PARAVIEW_SOURCE_DIR}/Filters)
 
-SET(ParaViewBinary_SRCS
-  ParaView.cxx)
-
-IF(PARAVIEW_USE_SAF)
-  SET(ParaViewBinary_SRCS ${ParaViewBinary_SRCS} 
-    ${VTKSNL_SOURCE_DIR}/Graphics/vtkRectilinearGridToHexahedra.cxx
-    ${VTKSNL_SOURCE_DIR}/Graphics/vtkStructuredGridToHexahedra.cxx
-    ${VTKSNL_SOURCE_DIR}/IO/vtkSAFRectilinearReader.cxx
-    ${VTKSNL_SOURCE_DIR}/IO/vtkSAFStructuredReader.cxx
-    ${VTKSNL_SOURCE_DIR}/IO/vtkSAFUnstructuredReader.cxx
-  )
-ENDIF(PARAVIEW_USE_SAF)
+IF(PARAVIEW_BUILD_DEVELOPMENT)
+  INCLUDE_DIRECTORIES(${PARAVIEW_SOURCE_DIR}/Development)
+ENDIF(PARAVIEW_BUILD_DEVELOPMENT)
 
 IF(WIN32)
   SET(ParaViewBinary_SRCS ${ParaViewBinary_SRCS} ParaView.rc)

@@ -60,7 +60,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVXMLElement.h"
 
 vtkStandardNewMacro(vtkPVOrientScaleWidget);
-vtkCxxRevisionMacro(vtkPVOrientScaleWidget, "1.6.2.2");
+vtkCxxRevisionMacro(vtkPVOrientScaleWidget, "1.6.2.3");
 
 vtkCxxSetObjectMacro(vtkPVOrientScaleWidget, InputMenu, vtkPVInputMenu);
 
@@ -299,6 +299,7 @@ void vtkPVOrientScaleWidget::Update()
 {
   this->UpdateArrayMenus();
   this->UpdateModeMenus();
+  this->UpdateActiveState();
   this->UpdateScaleFactor();
   this->Superclass::Update();
 }

@@ -24,7 +24,7 @@ static vtkIceTRenderer *currentRenderer;
 // vtkIceTRenderer implementation.
 //******************************************************************
 
-vtkCxxRevisionMacro(vtkIceTRenderer, "1.2.4.2");
+vtkCxxRevisionMacro(vtkIceTRenderer, "1.2.4.3");
 vtkStandardNewMacro(vtkIceTRenderer);
 
 vtkIceTRenderer::vtkIceTRenderer()
@@ -246,29 +246,34 @@ int vtkIceTRenderer::UpdateGeometry()
     {
     float *bounds = this->PropArray[i]->GetBounds();
 
-    bool left, right, bottom, top, znear, zfar;
-    left = right = bottom = top = znear = zfar = false;
+    // I do not know why, but this prop can return a null bounds.
+    // It may be the scalar bar.
+    if (bounds)
+      {
+      bool left, right, bottom, top, znear, zfar;
+      left = right = bottom = top = znear = zfar = false;
 
-    GLdouble vert[3];
+      GLdouble vert[3];
 
-    vert[0] = bounds[0];  vert[1] = bounds[2];  vert[2] = bounds[4];
-    UpdateViewParams(vert, transform, left, right, bottom, top, znear, zfar);
-    vert[0] = bounds[0];  vert[1] = bounds[2];  vert[2] = bounds[5];
-    UpdateViewParams(vert, transform, left, right, bottom, top, znear, zfar);
-    vert[0] = bounds[0];  vert[1] = bounds[3];  vert[2] = bounds[4];
-    UpdateViewParams(vert, transform, left, right, bottom, top, znear, zfar);
-    vert[0] = bounds[0];  vert[1] = bounds[3];  vert[2] = bounds[5];
-    UpdateViewParams(vert, transform, left, right, bottom, top, znear, zfar);
-    vert[0] = bounds[1];  vert[1] = bounds[2];  vert[2] = bounds[4];
-    UpdateViewParams(vert, transform, left, right, bottom, top, znear, zfar);
-    vert[0] = bounds[1];  vert[1] = bounds[2];  vert[2] = bounds[5];
-    UpdateViewParams(vert, transform, left, right, bottom, top, znear, zfar);
-    vert[0] = bounds[1];  vert[1] = bounds[3];  vert[2] = bounds[4];
-    UpdateViewParams(vert, transform, left, right, bottom, top, znear, zfar);
-    vert[0] = bounds[1];  vert[1] = bounds[3];  vert[2] = bounds[5];
-    UpdateViewParams(vert, transform, left, right, bottom, top, znear, zfar);
+      vert[0] = bounds[0];  vert[1] = bounds[2];  vert[2] = bounds[4];
+      UpdateViewParams(vert, transform, left, right, bottom, top, znear, zfar);
+      vert[0] = bounds[0];  vert[1] = bounds[2];  vert[2] = bounds[5];
+      UpdateViewParams(vert, transform, left, right, bottom, top, znear, zfar);
+      vert[0] = bounds[0];  vert[1] = bounds[3];  vert[2] = bounds[4];
+      UpdateViewParams(vert, transform, left, right, bottom, top, znear, zfar);
+      vert[0] = bounds[0];  vert[1] = bounds[3];  vert[2] = bounds[5];
+      UpdateViewParams(vert, transform, left, right, bottom, top, znear, zfar);
+      vert[0] = bounds[1];  vert[1] = bounds[2];  vert[2] = bounds[4];
+      UpdateViewParams(vert, transform, left, right, bottom, top, znear, zfar);
+      vert[0] = bounds[1];  vert[1] = bounds[2];  vert[2] = bounds[5];
+      UpdateViewParams(vert, transform, left, right, bottom, top, znear, zfar);
+      vert[0] = bounds[1];  vert[1] = bounds[3];  vert[2] = bounds[4];
+      UpdateViewParams(vert, transform, left, right, bottom, top, znear, zfar);
+      vert[0] = bounds[1];  vert[1] = bounds[3];  vert[2] = bounds[5];
+      UpdateViewParams(vert, transform, left, right, bottom, top, znear, zfar);
 
-    visible[i] = left && right && bottom && top && znear && zfar;
+      visible[i] = left && right && bottom && top && znear && zfar;
+      }
     }
 
   //Now render the props that are really visible.

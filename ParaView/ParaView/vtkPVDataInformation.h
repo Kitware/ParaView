@@ -52,9 +52,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkPVInformation.h"
 
+class vtkCollection;
+class vtkCompositeDataSet;
 class vtkDataSet;
 class vtkPVDataSetAttributesInformation;
-class vtkCollection;
 
 class VTK_EXPORT vtkPVDataInformation : public vtkPVInformation
 {
@@ -111,6 +112,9 @@ protected:
   ~vtkPVDataInformation();
 
   void DeepCopy(vtkPVDataInformation *dataInfo);
+
+  void CopyFromCompositeDataSet(vtkCompositeDataSet* data);
+  void CopyFromDataSet(vtkDataSet* data);
 
   // Data information collected from remote processes.
   int            DataSetType;

@@ -47,9 +47,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkCollectionIterator.h"
 #include "vtkCallbackCommand.h"
 #include "vtkCommand.h"
+#include "vtkInteractorObserver.h"
 #include "vtkKWApplicationSettingsInterface.h"
 #include "vtkKWChangeColorButton.h"
 #include "vtkKWCheckButton.h"
+#include "vtkKWComposite.h"
+#include "vtkKWCompositeCollection.h"
 #include "vtkKWFrame.h"
 #include "vtkKWLabel.h"
 #include "vtkKWLabeledFrame.h"
@@ -65,24 +68,28 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVApplication.h"
 #include "vtkPVApplicationSettingsInterface.h"
 #include "vtkPVCameraIcon.h"
+#include "vtkPVCompositeRenderModule.h"
 #include "vtkPVConfig.h"
 #include "vtkPVData.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVGenericRenderWindowInteractor.h"
-#include "vtkPVPart.h"
-#include "vtkPVPartDisplay.h"
 #include "vtkPVInteractorStyleControl.h"
 #include "vtkPVNavigationWindow.h"
+#include "vtkPVPart.h"
+#include "vtkPVPartDisplay.h"
 #include "vtkPVProcessModule.h"
+#include "vtkPVRenderModuleUI.h"
 #include "vtkPVRenderView.h"
+#include "vtkPVSource.h"
 #include "vtkPVSourceCollection.h"
 #include "vtkPVSourceList.h"
+#include "vtkPVTreeComposite.h"
 #include "vtkPVWindow.h"
-#include "vtkPVSource.h"
-#include "vtkPVRenderModuleUI.h"
 #include "vtkPolyData.h"
 #include "vtkPolyDataMapper.h"
 #include "vtkRenderer.h"
+#include "vtkRendererCollection.h"
+#include "vtkRenderWindow.h"
 #include "vtkString.h"
 #include "vtkTimerLog.h"
 #include "vtkToolkits.h"
@@ -113,7 +120,7 @@ static unsigned char image_properties[] =
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.269.2.4");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.269.2.5");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -218,6 +225,8 @@ vtkPVRenderView::vtkPVRenderView()
 
   this->PropertiesButton = vtkKWPushButton::New();
   this->MenuLabelSwitchBackAndForthToViewProperties = 0;
+  
+  this->Renderer2D = vtkRenderer::New();
 }
 
 //----------------------------------------------------------------------------
@@ -304,6 +313,9 @@ vtkPVRenderView::~vtkPVRenderView()
     this->Renderer->UnRegister(this);
     this->Renderer = NULL;
     }
+  
+  this->Renderer2D->Delete();
+  this->Renderer2D = NULL;
   
   if (this->RenderWindow)
     {
@@ -423,7 +435,25 @@ void vtkPVRenderView::CreateRenderObjects(vtkPVApplication *pvApp)
   this->RenderWindow->Delete();
   this->RenderWindow = pvApp->GetRenderModule()->GetRenderWindow();
   this->RenderWindow->Register(this);
+  // ordering of the renderers matters for interaction to work
+  this->RenderWindow->RemoveRenderer(this->Renderer);
+  this->RenderWindow->AddRenderer(this->Renderer);
+  this->RenderWindow->AddRenderer(this->Renderer2D);
+  this->RenderWindow->SetNumberOfLayers(2);
+  this->Renderer->SetLayer(1);
 
+  vtkPVCompositeRenderModule *crm =
+    vtkPVCompositeRenderModule::SafeDownCast(pvApp->GetRenderModule());
+  if (crm)
+    {
+    vtkPVTreeComposite *comp = crm->GetComposite();
+    if (comp)
+      {
+      comp->SetRenderWindow(NULL);
+      comp->SetRenderWindow(this->RenderWindow);
+      }
+    }
+  
   this->RenderWindow->AddObserver(
     vtkCommand::CursorChangedEvent, this->Observer);
 }
@@ -1637,6 +1667,77 @@ void vtkPVRenderView::ExecuteEvent(vtkObject*, unsigned long event, void* par)
 }
 
 //----------------------------------------------------------------------------
+void vtkPVRenderView::Add2DComposite(vtkKWComposite *c)
+{
+  c->SetView(this);
+  // never allow a composite to be added twice
+  if (this->Composites->IsItemPresent(c))
+    {
+    return;
+    }
+  this->Composites->AddItem(c);
+  if (c->GetProp() != NULL)
+    {
+    this->GetRenderer2D()->AddProp(c->GetProp());
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::Remove2DComposite(vtkKWComposite *c)
+{
+  c->SetView(NULL);
+  this->GetRenderer2D()->RemoveProp(c->GetProp());
+  this->Composites->RemoveItem(c);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::Enable3DWidget(vtkInteractorObserver *o)
+{
+  vtkRenderer *ren = this->GetRenderer2D();
+  if (!ren)
+    {
+    return;
+    }
+  
+  vtkRendererCollection *savedRens = vtkRendererCollection::New();
+  vtkRenderWindow *renWin = this->GetRenderWindow();
+  vtkRendererCollection *rens = renWin->GetRenderers();
+  
+  vtkRenderer *current;
+  
+  int i, numRens = rens->GetNumberOfItems();
+  int renId = rens->IsItemPresent(ren) - 1;
+  rens->InitTraversal();
+  for (i = 0; i < numRens; i++)
+    {
+    current = rens->GetNextItem();
+    if (current != ren)
+      {
+      savedRens->AddItem(current);
+      renWin->RemoveRenderer(current);
+      }
+    }
+  
+  o->SetEnabled(1);  
+
+  // put the renderers back in the correct order
+  renWin->RemoveRenderer(ren);
+  savedRens->InitTraversal();
+  for (i = 0 ; i < numRens; i++)
+    {
+    if (i == renId)
+      {
+      renWin->AddRenderer(ren);
+      }
+    else
+      {
+      renWin->AddRenderer(savedRens->GetNextItem());
+      }
+    }      
+  savedRens->Delete();
+}
+
+//----------------------------------------------------------------------------
 void vtkPVRenderView::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
@@ -1652,5 +1753,5 @@ void vtkPVRenderView::PrintSelf(ostream& os, vtkIndent indent)
      << this->ManipulatorControl2D << endl;
   os << indent << "ManipulatorControl3D: " 
      << this->ManipulatorControl3D << endl;
+  os << indent << "Renderer2D: " << this->Renderer2D << endl;
 }
-

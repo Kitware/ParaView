@@ -41,7 +41,7 @@
 #include "vtkVoxel.h"
 #include "vtkImageData.h"
 
-vtkCxxRevisionMacro(vtkCTHData, "1.3.2.3");
+vtkCxxRevisionMacro(vtkCTHData, "1.3.2.4");
 vtkStandardNewMacro(vtkCTHData);
 
 //----------------------------------------------------------------------------
@@ -1294,7 +1294,6 @@ void vtkCTHData::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "TopLevelOrigin: (" << this->TopLevelOrigin[0] << ", "
                                   << this->TopLevelOrigin[1] << ", "
                                   << this->TopLevelOrigin[2] << ")\n";
-  os << indent << "NumberOfGhostLevels: " << this->NumberOfGhostLevels << endl;
 
   os << indent << "NumberOfBlocks: "  << numBlocks << endl;
   for (idx = 0; idx < numBlocks; ++idx)

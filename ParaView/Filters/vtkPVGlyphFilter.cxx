@@ -22,7 +22,7 @@
 #include "vtkMultiProcessController.h"
 #include "vtkPolyData.h"
 
-vtkCxxRevisionMacro(vtkPVGlyphFilter, "1.2.4.1");
+vtkCxxRevisionMacro(vtkPVGlyphFilter, "1.2.4.2");
 vtkStandardNewMacro(vtkPVGlyphFilter);
 
 vtkPVGlyphFilter::vtkPVGlyphFilter()
@@ -95,4 +95,8 @@ void vtkPVGlyphFilter::PrintSelf(ostream& os, vtkIndent indent)
   
   os << indent << "MaximumNumberOfPoints: " << this->GetMaximumNumberOfPoints()
      << endl;
+
+  os << indent << "UseMaskPoints: " << (this->UseMaskPoints?"on":"off") << endl;
+
+  os << indent << "NumberOfProcesses: " << this->NumberOfProcesses << endl;
 }

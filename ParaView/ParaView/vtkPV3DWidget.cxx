@@ -52,13 +52,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVDataInformation.h"
 #include "vtkPVGenericRenderWindowInteractor.h"
 #include "vtkPVPart.h"
+#include "vtkPVRenderView.h"
 #include "vtkPVSource.h"
 #include "vtkPVWindow.h"
 #include "vtkPVXMLElement.h"
 #include "vtkPVProcessModule.h"
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkPV3DWidget, "1.39.2.6");
+vtkCxxRevisionMacro(vtkPV3DWidget, "1.39.2.7");
 
 //===========================================================================
 //***************************************************************************
@@ -185,6 +186,8 @@ void vtkPV3DWidget::Create(vtkKWApplication *kwApp)
       vtk3DWidget::SafeDownCast(pvApp->GetProcessModule()->GetObjectFromID(this->Widget3DID));
     }
 
+  this->Widget3D->SetCurrentRenderer(this->PVSource->GetPVWindow()->GetMainView()->GetRenderer());
+  
   // Only initialize observers on the UI process.
   if (this->Widget3DID.ID  != 0)
     {
@@ -275,11 +278,12 @@ void vtkPV3DWidget::SetVisibility()
 void vtkPV3DWidget::SetVisibility(int visibility)
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
+  vtkPVProcessModule* pm = pvApp->GetProcessModule();
   if ( visibility )
     {
     this->PlaceWidget();
     }
-  vtkPVProcessModule* pm = pvApp->GetProcessModule();
+  this->Widget3D->SetCurrentRenderer(this->PVSource->GetPVWindow()->GetMainView()->GetRenderer());
   pm->GetStream() << vtkClientServerStream::Invoke << this->Widget3DID
                   << "SetEnabled" << visibility << vtkClientServerStream::End;
   pm->SendStreamToClientAndServer();
@@ -294,6 +298,7 @@ void vtkPV3DWidget::Select()
 {
   if ( this->Visible )
     {
+    this->Widget3D->SetCurrentRenderer(this->PVSource->GetPVWindow()->GetMainView()->GetRenderer());
     this->SetVisibilityNoTrace(1);
     }
 }

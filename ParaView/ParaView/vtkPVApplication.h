@@ -136,6 +136,10 @@ public:
   int AcceptEvaluation();
 
   // Description:
+  // This method is invoked when a window closes
+  virtual void Close(vtkKWWindow *);
+
+  // Description:
   // We need to kill the slave processes
   virtual void Exit();
   
@@ -395,6 +399,12 @@ public:
   void EnableTestErrors();
   void DisableTestErrors();
 
+  // Description:
+  // This is a debug feature of ParaView. If this is set, ParaView will crash on errors.
+  vtkSetClampMacro(CrashOnErrors, int, 0, 1);
+  vtkBooleanMacro(CrashOnErrors, int);
+  vtkGetMacro(CrashOnErrors, int);
+
 protected:
   vtkPVApplication();
   ~vtkPVApplication();
@@ -489,6 +499,8 @@ protected:
   vtkSetStringMacro(DemoPath);
 
   float LogThreshold;
+
+  int CrashOnErrors;
 
 private:  
   vtkPVApplication(const vtkPVApplication&); // Not implemented

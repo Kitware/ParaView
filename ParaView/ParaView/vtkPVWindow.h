@@ -515,9 +515,6 @@ protected:
   vtkPVGenericRenderWindowInteractor *Interactor;
   vtkClientServerID InteractorID;
   
-//  char *InteractorTclName;
-//  vtkSetStringMacro(InteractorTclName);  
-
   // ParaView specific menus
   vtkKWMenu *SourceMenu;
   vtkKWMenu *FilterMenu;

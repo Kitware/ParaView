@@ -128,7 +128,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.221.2.11");
+vtkCxxRevisionMacro(vtkPVApplication, "1.221.2.12");
 vtkCxxSetObjectMacro(vtkPVApplication, RenderModule, vtkPVRenderModule);
 
 
@@ -148,6 +148,13 @@ void vtkPVApplication::SetProcessModule(vtkPVProcessModule *pm)
 extern "C" int Vtktkrenderwidget_Init(Tcl_Interp *interp);
 extern "C" int Vtkkwparaviewtcl_Init(Tcl_Interp *interp);
 extern "C" int Vtkpvfilterstcl_Init(Tcl_Interp *interp);
+#if defined(PARAVIEW_BUILD_DEVELOPMENT) && defined(PARAVIEW_BLT_LIBRARY)
+extern "C" int Blt_Init(Tcl_Interp *interp);
+#endif
+
+#ifdef PARAVIEW_BUILD_DEVELOPMENT
+extern "C" int Vtkpvdevelopmenttcl_Init(Tcl_Interp *interp);
+#endif
 
 #ifdef PARAVIEW_LINK_XDMF
 extern "C" int Vtkxdmftcl_Init(Tcl_Interp *interp);
@@ -282,15 +289,16 @@ Tcl_Interp *vtkPVApplication::InitializeTcl(int argc,
     }
 
   Vtkpvfilterstcl_Init(interp);
-  //  if (Vtkparalleltcl_Init(interp) == TCL_ERROR) 
-  //  {
-   // cerr << "Init Parallel error\n";
-   // }
+#ifdef PARAVIEW_BUILD_DEVELOPMENT
+  Vtkpvdevelopmenttcl_Init(interp);
+#endif
 
-  // Why is this here?  Doesn't the superclass initialize this?
   if (vtkKWApplication::GetWidgetVisibility())
     {
     Vtktkrenderwidget_Init(interp);
+#if defined(PARAVIEW_BUILD_DEVELOPMENT) && defined(PARAVIEW_BLT_LIBRARY)
+    Blt_Init(interp);
+#endif
     }
    
   Vtkkwparaviewtcl_Init(interp);
@@ -315,6 +323,7 @@ Tcl_Interp *vtkPVApplication::InitializeTcl(int argc,
 //----------------------------------------------------------------------------
 vtkPVApplication::vtkPVApplication()
 {
+  this->CrashOnErrors = 0;
   this->AlwaysSSH = 0;
   this->MajorVersion = PARAVIEW_VERSION_MAJOR;
   this->MinorVersion = PARAVIEW_VERSION_MINOR;
@@ -568,6 +577,8 @@ const char vtkPVApplication::ArgumentList[vtkPVApplication::NUM_ARGS][128] =
   "--tile-dimensions-y", "-tdy",
   "-tdy=Y where Y is number of displays in each column of the display.",
 #endif
+  "--crash-on-errors", "",
+  "",
 #ifdef VTK_USE_MANGLED_MESA
   "--use-software-rendering", "-r", 
   "Use software (Mesa) rendering (supports off-screen rendering).", 
@@ -1081,6 +1092,12 @@ int vtkPVApplication::ParseCommandLineArguments(int argc, char*argv[])
     {
     this->UseOffscreenRendering = 1;
     }
+  
+  if ( vtkPVApplication::CheckForArgument(argc, argv, "--crash-on-errors",
+      index) == VTK_OK )
+    {
+    this->CrashOnErrors = 1;
+    }
 
   return 0;
 }
@@ -1524,6 +1541,18 @@ void vtkPVApplication::SetSourcesBrowserAlwaysShowName(int v)
 }
 
 //----------------------------------------------------------------------------
+void vtkPVApplication::Close(vtkKWWindow *win)
+{
+  if (this->Windows->GetNumberOfItems() == 1)
+    {
+    // Try to get the render window to destruct before the render widget.
+    this->SetRenderModule(NULL);
+    }
+
+  this->Superclass::Close(win);
+}
+
+//----------------------------------------------------------------------------
 void vtkPVApplication::Exit()
 {  
   // Avoid recursive exit calls during window destruction.
@@ -1547,9 +1576,6 @@ void vtkPVApplication::Exit()
   // still be displayed.
   vtkOutputWindow::SetInstance(0);
 
-  // Try to get the render window to destruct before the render widget.
-  this->SetRenderModule(NULL);
-  
   this->vtkKWApplication::Exit();
 
   this->ProcessModule->Exit();
@@ -1956,6 +1982,7 @@ void vtkPVApplication::PrintSelf(ostream& os, vtkIndent indent)
      << (this->SourcesBrowserAlwaysShowName?"on":"off") << endl;
 
   os << indent << "LogThreshold: " << this->LogThreshold << endl;
+  os << indent << "CrashOnErrors: " << (this->CrashOnErrors?"on":"off") << endl;
 }
 
 void vtkPVApplication::DisplayTCLError(const char* message)

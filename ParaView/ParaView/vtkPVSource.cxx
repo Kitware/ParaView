@@ -89,7 +89,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.313.2.23");
+vtkCxxRevisionMacro(vtkPVSource, "1.313.2.24");
 
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
@@ -2439,7 +2439,7 @@ int vtkPVSource::InitializeData()
     for (idx = 0; idx < numOutputs; ++idx)
       {
       ++outputCount;
-      stream << vtkClientServerStream::Invoke << sourceID 
+      stream << vtkClientServerStream::Invoke << sourceID
              << "GetOutput" << idx <<  vtkClientServerStream::End;
       vtkClientServerID dataID = pm->GetUniqueID();
       stream << vtkClientServerStream::Assign << dataID
@@ -2455,45 +2455,9 @@ int vtkPVSource::InitializeData()
 
       // Create the extent translator (sources with no inputs only).
       // Needs to be before "ExtractPieces" because translator propagates.
-      vtkClientServerID translatorID = {0};
-      if ( ! input)
-        {  
-        stream << vtkClientServerStream::Invoke << dataID 
-               << "GetExtentTranslator"
-               << vtkClientServerStream::End;
-        stream << vtkClientServerStream::Invoke 
-               << vtkClientServerStream::LastResult 
-               << "GetClassName"
-               << vtkClientServerStream::End; 
-        pm->SendStreamToServerRoot();
-        char* classname = 0;
-        if(!pm->GetLastServerResult().GetArgument(0,0,&classname))
-          {
-          vtkErrorMacro(<< "Faild to get server result.");
-          }
-        if(classname && strcmp(classname, "vtkExtentTranslator") == 0)
-          {
-          vtkClientServerID translatorID 
-            = pm->NewStreamObject("vtkPVExtentTranslator");
-          stream << vtkClientServerStream::Invoke << dataID 
-                 << "SetExtentTranslator" << translatorID 
-                 << vtkClientServerStream::End;
-          pm->SendStreamToServer();
-          }
-        }
+      part->CreateTranslatorIfNecessary(translatorTclName);
       part->InsertExtractPiecesIfNecessary();
-      if (translatorID.ID != 0)
-        {
-        // Translator has to be set on source because it is propagated.
-        // Original source is set after transmit so reference
-        // loop can be broken when pvPart is deleted.
-        stream << vtkClientServerStream::Invoke << translatorID 
-               << "SetOriginalSource" << dataID 
-               << vtkClientServerStream::End;
-        pm->DeleteStreamObject(translatorID); 
-        pm->SendStreamToServer();
-        }
-      part->Delete();  
+      part->Delete();
       }
     }
 
