@@ -35,7 +35,7 @@
 #include "vtkMPIMToNSocketConnection.h"
 #include "vtkSocketCommunicator.h"
 
-vtkCxxRevisionMacro(vtkMPIMoveData, "1.5");
+vtkCxxRevisionMacro(vtkMPIMoveData, "1.6");
 vtkStandardNewMacro(vtkMPIMoveData);
 
 vtkCxxSetObjectMacro(vtkMPIMoveData,Controller, vtkMultiProcessController);
@@ -383,10 +383,16 @@ void vtkMPIMoveData::DataServerGatherAll(vtkDataSet* input,
 void vtkMPIMoveData::DataServerGatherToZero(vtkDataSet* input, 
                                             vtkDataSet* output)
 {
+  int numProcs= this->Controller->GetNumberOfProcesses();
+  if (numProcs == 1)
+    {
+    output->ShallowCopy(input);
+    return;
+    }
+
 #ifdef VTK_USE_MPI
   int idx;
   int myId= this->Controller->GetLocalProcessId();
-  int numProcs= this->Controller->GetNumberOfProcesses();
   vtkMPICommunicator* com = vtkMPICommunicator::SafeDownCast(
                                          this->Controller->GetCommunicator()); 
 
@@ -432,6 +438,7 @@ void vtkMPIMoveData::DataServerGatherToZero(vtkDataSet* input,
     }
   com->GatherV(inBuffer, this->Buffers, inBufferLength, 
                   this->BufferLengths, this->BufferOffsets, 0);
+  this->NumberOfBuffers = numProcs;
 
   if (myId == 0)
     {
@@ -647,6 +654,12 @@ void vtkMPIMoveData::ClearBuffer()
 //-----------------------------------------------------------------------------
 void vtkMPIMoveData::MarshalDataToBuffer(vtkDataSet* data)
 {
+  // Protect from empty data.
+  if (data->GetNumberOfPoints() == 0)
+    {
+    this->NumberOfBuffers = 0;
+    }
+
   // Copy input to isolate reader from the pipeline.
   vtkDataSet* d = data->NewInstance();
   d->CopyStructure(data);
@@ -677,7 +690,7 @@ void vtkMPIMoveData::MarshalDataToBuffer(vtkDataSet* data)
 //-----------------------------------------------------------------------------
 void vtkMPIMoveData::ReconstructDataFromBuffer(vtkDataSet* data)
 {
-  if (this->Buffers == 0)
+  if (this->NumberOfBuffers == 0 || this->Buffers == 0)
     {
     data->Initialize();
     return;
