@@ -676,7 +676,7 @@ void vtkKWView::Deselect(vtkKWWindow *pw)
 {
   pw->GetMenuProperties()->DeleteMenuItem("View");
   pw->GetMenuFile()->DeleteMenuItem("Print");
-  pw->GetMenuFile()->DeleteMenuItem("Save Ad Image");
+  pw->GetMenuFile()->DeleteMenuItem("Save As Image");
 
 #ifdef _WIN32
   // add the edit copy option
@@ -917,5 +917,5 @@ void vtkKWView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWView ";
-  this->ExtractRevision(os,"$Revision: 1.10 $");
+  this->ExtractRevision(os,"$Revision: 1.11 $");
 }
