@@ -63,7 +63,6 @@ SET( ParaViewClientNotWrapped_SRCS
   vtkPVInteractorStyle.cxx
   vtkPVInteractorStyleCenterOfRotation.cxx
   vtkPVSourceCollection.cxx
-  vtkPVBatchCompositeManager.cxx
   vtkPVCompositeRenderModule.cxx
   vtkPVMultiDisplayRenderModule.cxx
   vtkPVLODRenderModule.cxx
