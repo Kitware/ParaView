@@ -1248,7 +1248,7 @@ void vtkPVSource::AddPVWidget(vtkPVWidget *pvw)
 
   if (pvw->GetTraceName() == NULL)
     {
-    vtkWarningMacro("TarceName not set.");
+    vtkWarningMacro("TraceName not set.");
     return;
     }
 
