@@ -25,7 +25,7 @@
 #include <sys/stat.h>
 
 vtkStandardNewMacro(vtkClientServerInterpreter);
-vtkCxxRevisionMacro(vtkClientServerInterpreter, "1.6");
+vtkCxxRevisionMacro(vtkClientServerInterpreter, "1.7");
 
 //----------------------------------------------------------------------------
 class vtkClientServerInterpreterInternals
@@ -577,7 +577,7 @@ int vtkClientServerInterpreter::ExpandMessage(const vtkClientServerStream& in,
     {
     if(in.GetArgumentType(inIndex, a) == vtkClientServerStream::id_value)
       {
-      vtkClientServerID id;
+      vtkClientServerID id = { 0 };
       in.GetArgument(inIndex, a, &id);
 
       // If the ID is in the map, expand it.  Otherwise, leave it.
