@@ -49,8 +49,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVMPIRenderModule);
-vtkCxxRevisionMacro(vtkPVMPIRenderModule, "1.4");
-
+vtkCxxRevisionMacro(vtkPVMPIRenderModule, "1.5");
 
 
 //***************************************************************************
@@ -111,8 +110,11 @@ void vtkPVMPIRenderModule::SetPVApplication(vtkPVApplication *pvApp)
 
     // Try using a more efficient compositer (if it exists).
     // This should be a part of a module.
-    pvApp->BroadcastScript("if {[catch {vtkCompressCompositer pvTmp}] == 0} "
-                           "{TreeComp1 SetCompositer pvTmp; pvTmp Delete}");
+    if (strcmp(pvApp->GetRenderModuleName(),"DeskTopRenderModule") != 0)
+      {
+      pvApp->BroadcastScript("if {[catch {vtkCompressCompositer pvTmp}] == 0} "
+                             "{TreeComp1 SetCompositer pvTmp; pvTmp Delete}");
+      }
 
     this->CompositeTclName = NULL;
     this->SetCompositeTclName("TreeComp1");
@@ -148,9 +150,13 @@ void vtkPVMPIRenderModule::SetPVApplication(vtkPVApplication *pvApp)
 //----------------------------------------------------------------------------
 void vtkPVMPIRenderModule::SetUseCompositeCompression(int val)
 {
+
+    vtkPVApplication *pvApp = this->GetPVApplication();
+ if (strcmp(pvApp->GetRenderModuleName(),"DeskTopRenderModule") != 0)
+  {
+
   if (this->CompositeTclName)
     {
-    vtkPVApplication *pvApp = this->GetPVApplication();
     if (val)
       {
       pvApp->BroadcastScript("vtkCompressCompositer pvTemp");
@@ -162,6 +168,7 @@ void vtkPVMPIRenderModule::SetUseCompositeCompression(int val)
     pvApp->BroadcastScript("%s SetCompositer pvTemp", this->CompositeTclName);
     pvApp->BroadcastScript("pvTemp Delete");
     }
+   }
 }
 
 

@@ -228,8 +228,9 @@
                  type="int" 
                  help="Set the number of ghost levels to read."/>
   </Module>
+<!--
   <Module name="ensightMS" class="vtkPVEnSightReaderModule"
-          root_name="Ensight" 
+          root_name="EnsightMS" 
           module_type="Reader"
           extensions=".sos" file_description="EnSight Master Server Files">
     <Source class="vtkPVEnSightMasterServerReader"/>
@@ -237,6 +238,7 @@
     <ArraySelection attribute_name="Point" trace_name="PointArrays"/>
     <ArraySelection attribute_name="Cell" trace_name="CellArrays"/>
   </Module>
+-->
 
 <Module name="ImageReader" menu_name="Raw File Reader" root_name="ImageRead" 
         module_type="Reader" class="vtkPVRawReaderModule"
@@ -290,7 +292,7 @@
 #ifdef PARAVIEW_LINK_XDMF
  <Module name="XdmfReader" root_name="XdmfReader"
    output="vtkDataSet"
-   class="vtkXDMFReaderModule" module_type="Reader" extensions=".xmf"
+   class="vtkXDMFReaderModule" module_type="Reader" extensions=".xmf .xdmf"
    file_description="Xdmf Reader">
   <Source class="vtkXdmfReader"/>
   <ArraySelection trace_name="point_array_sel" attribute_name="Cell" />
@@ -300,6 +302,28 @@
                help="Set the number of steps to skip between each point (structured data only)."/>
   <XDMFParameters trace_name="xdmf_parameters" label="Parameters" />
               
+ </Module>
+#endif
+#ifdef PARAVIEW_USE_EXODUS
+ <Module name="ExodusReader" root_name="ExodusReader" 
+   output="vtkUnstructuredGrid" 
+   class="vtkPVAdvancedReaderModule" module_type="Reader" extensions=".e .ex2 .00" 
+   file_description="Exodus Reader">
+  <Source class="vtkPExodusReader"/>
+  <ArraySelection attribute_name="Cell" />
+  <ArraySelection attribute_name="Point" />
+  <StringEntry variable="FilePrefix" extension="*" label="File prefix" 
+               help="Set the file root. Used with file pattern to format a file name." />
+
+  <StringEntry variable="FilePattern" label="File Pattern" 
+               help="Pattern used to load files. There are two parts to it prefix (%s) and the file number (%i)" />
+
+  <VectorEntry variable="FileRange" label="Range of files" type="int"
+               length="2" help="Range of files that are loaded" />
+
+  <Scale variable="TimeStep" type="int" label="Time step"
+               help="Set the current timestep." range_source="TimeStepRange" />
+
  </Module>
 #endif
 </ModuleInterfaces>

@@ -53,7 +53,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVMultiDisplayRenderModule);
-vtkCxxRevisionMacro(vtkPVMultiDisplayRenderModule, "1.6");
+vtkCxxRevisionMacro(vtkPVMultiDisplayRenderModule, "1.7");
 
 
 
@@ -163,6 +163,12 @@ void vtkPVMultiDisplayRenderModule::StillRender()
       pDisp->SetCollectionDecision(localRender);
       pDisp->Update();
       }
+    }
+
+  if (this->PVApplication && this->CompositeTclName)
+    {
+    this->PVApplication->Script("%s SetImageReductionFactor 1",
+                                this->CompositeTclName);
     }
 
   // Switch the compositer to local/composite mode.
@@ -357,7 +363,8 @@ void vtkPVMultiDisplayRenderModule::SetUseCompositeCompression(int val)
   if (this->CompositeTclName)
     {
     vtkPVApplication *pvApp = this->GetPVApplication();
-    pvApp->BroadcastScript("%s SetUseCompositeCompression %d", 
+    // !!!! Putting this catch here until I make a native TD sublcass. !!!
+    pvApp->BroadcastScript("catch {%s SetUseCompositeCompression %d}", 
                             this->CompositeTclName, val);
     }
 }

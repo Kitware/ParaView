@@ -53,6 +53,10 @@ public:
   virtual int GetNumberOfOutputs() { return 1;}
   vtkDataSet *GetOutput(); 
   vtkDataSet *GetOutput(int idx); 
+
+  // Description:
+  // By default copy the output update extent to the input
+  virtual void ComputeInputUpdateExtents( vtkDataObject *output );  
   
 protected:
   vtkMergeArrays();

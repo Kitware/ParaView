@@ -58,7 +58,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVSaveBatchScriptDialog );
-vtkCxxRevisionMacro(vtkPVSaveBatchScriptDialog, "1.5");
+vtkCxxRevisionMacro(vtkPVSaveBatchScriptDialog, "1.6");
 
 int vtkPVSaveBatchScriptDialogCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -392,7 +392,7 @@ void vtkPVSaveBatchScriptDialog::ImageFileNameBrowseButtonCallback()
     loadDialog->SetDefaultExtension(ext);
     }
   str << "{{} {.jpg}} {{} {.tif}} {{} {.png}} ";
-  str << "{{All files} {*.*}}" << ends;  
+  str << "{{All files} {*}}" << ends;  
   loadDialog->SetFileTypes(str.str());
   str.rdbuf()->freeze(0);  
   if(loadDialog->Invoke())
@@ -442,7 +442,7 @@ void vtkPVSaveBatchScriptDialog::GeometryFileNameBrowseButtonCallback()
     loadDialog->SetDefaultExtension(ext);
     }
   str << "{{} {.vtk}} ";
-  str << "{{All files} {*.*}}" << ends;  
+  str << "{{All files} {*}}" << ends;  
   loadDialog->SetFileTypes(str.str());
   str.rdbuf()->freeze(0);  
   if(loadDialog->Invoke())

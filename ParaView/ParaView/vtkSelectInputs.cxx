@@ -24,7 +24,7 @@
 #include "vtkFieldData.h"
 #include "vtkIntArray.h"
 
-vtkCxxRevisionMacro(vtkSelectInputs, "1.1");
+vtkCxxRevisionMacro(vtkSelectInputs, "1.2");
 vtkStandardNewMacro(vtkSelectInputs);
 
 //----------------------------------------------------------------------------
@@ -217,6 +217,41 @@ void vtkSelectInputs::Execute()
       }
     } 
 }
+
+//----------------------------------------------------------------------------
+void vtkSelectInputs::ComputeInputUpdateExtents(vtkDataObject *)
+{
+  int idx;
+  int num;
+  int count = 0;
+  vtkDataSet *input;
+  vtkDataSet *output;
+
+  num = this->NumberOfInputs;
+  for (idx = 0; idx < num; ++idx)
+    {
+    input = this->GetInput(idx);
+    if (this->GetInputMask(idx))
+      {
+      output = this->GetOutput(count);
+      if (input == NULL || output == NULL ||
+          input->GetDataObjectType() != output->GetDataObjectType())
+        {
+        vtkErrorMacro("Input/Output mismatch.");
+        }
+      else
+        {
+        input->SetUpdatePiece( output->GetUpdatePiece() );
+        input->SetUpdateNumberOfPieces( output->GetUpdateNumberOfPieces() );
+        input->SetUpdateGhostLevel( output->GetUpdateGhostLevel() );
+        input->SetUpdateExtent( output->GetUpdateExtent() );
+        }
+      ++count;
+      }
+    } 
+}
+
+
 
 //----------------------------------------------------------------------------
 void vtkSelectInputs::PrintSelf(ostream& os, vtkIndent indent)

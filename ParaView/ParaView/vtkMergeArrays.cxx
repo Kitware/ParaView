@@ -23,7 +23,7 @@
 #include "vtkCellData.h"
 #include "vtkFieldData.h"
 
-vtkCxxRevisionMacro(vtkMergeArrays, "1.1");
+vtkCxxRevisionMacro(vtkMergeArrays, "1.2");
 vtkStandardNewMacro(vtkMergeArrays);
 
 //----------------------------------------------------------------------------
@@ -96,6 +96,30 @@ vtkDataSet* vtkMergeArrays::GetOutput()
     }
   return static_cast<vtkDataSet*>(output);
 }
+
+
+//----------------------------------------------------------------------------
+// Copy the update information across
+void vtkMergeArrays::ComputeInputUpdateExtents(vtkDataObject *)
+{
+  int idx;
+  int num;
+  vtkDataSet *input;
+  vtkDataSet *output;
+
+  num = this->NumberOfInputs;
+  output = this->GetOutput();
+  for (idx = 0; idx < num; ++idx)
+    {
+    input = this->GetInput(idx);
+
+    input->SetUpdatePiece( output->GetUpdatePiece() );
+    input->SetUpdateNumberOfPieces( output->GetUpdateNumberOfPieces() );
+    input->SetUpdateGhostLevel( output->GetUpdateGhostLevel() );
+    input->SetUpdateExtent( output->GetUpdateExtent() );
+    }
+}
+
 
 
 //----------------------------------------------------------------------------

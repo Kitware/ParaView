@@ -54,7 +54,11 @@ public:
   vtkDataSet *GetOutput(int idx);
   vtkDataSet *GetOutput() 
     {return this->GetOutput( 0 );}
-  
+
+  // Description:
+  // By default copy the output update extent to the input
+  virtual void ComputeInputUpdateExtents( vtkDataObject *output );
+
 protected:
   vtkGroup();
   ~vtkGroup();
@@ -62,7 +66,7 @@ protected:
   // Usual data generation method
   virtual void Execute();
   virtual void ExecuteInformation();
-
+  virtual void PropagateUpdateExtent(vtkDataObject *output);
 
 private:
 

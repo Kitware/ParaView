@@ -48,7 +48,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVMultiDisplayRenderModuleUI);
-vtkCxxRevisionMacro(vtkPVMultiDisplayRenderModuleUI, "1.2");
+vtkCxxRevisionMacro(vtkPVMultiDisplayRenderModuleUI, "1.3");
 
 int vtkPVMultiDisplayRenderModuleUICommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -58,7 +58,7 @@ int vtkPVMultiDisplayRenderModuleUICommand(ClientData cd, Tcl_Interp *interp,
 vtkPVMultiDisplayRenderModuleUI::vtkPVMultiDisplayRenderModuleUI()
 {
   this->CommandFunction = vtkPVMultiDisplayRenderModuleUICommand;
-  this->CompositeOptionEnabled = 0;
+  this->CompositeOptionEnabled = 1;
 }
 
 //----------------------------------------------------------------------------

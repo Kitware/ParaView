@@ -167,15 +167,16 @@ public:
   // Load script from a file. Resturn if script was successful.
   int LoadScript(const char* filename);
 
-  //BTX
   // Description:
   // A convienience method to invoke some tcl script code and
   // perform arguement substitution.
-  virtual const char* Script(const char* format, ...);
   const char* SimpleScript(const char* script);
+  //BTX
+  virtual const char* Script(const char* format, ...);
   const char* EvaluateString(const char* format, ...);
   const char* ExpandFileName(const char* format, ...);
   int EvaluateBooleanExpression(const char* format, ...);
+  //ETX
   
   // Description:
   // Internal implementation method for Script invocation.  This

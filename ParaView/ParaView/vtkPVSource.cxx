@@ -81,7 +81,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.313");
+vtkCxxRevisionMacro(vtkPVSource, "1.314");
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -317,12 +317,13 @@ void vtkPVSource::SetPVInput(int idx, vtkPVSource *pvs)
     {
     inputName = "Input";
     }
+
   numParts = pvs->GetNumberOfParts();
-  for (partIdx = 0; partIdx < numParts; ++partIdx)
-    {
-    part = pvs->GetPart(partIdx);
-    if (this->VTKMultipleInputsFlag)
-      { // Only one source takes all parts as input.
+  if (this->VTKMultipleInputsFlag)
+    { // Only one source takes all parts as input.
+    for (partIdx = 0; partIdx < numParts; ++partIdx)
+      {
+      part = pvs->GetPart(partIdx);
       sourceTclName = this->GetVTKSourceTclName(0);
       
       if (part->GetVTKDataTclName() == NULL || sourceTclName == NULL)
@@ -335,9 +336,21 @@ void vtkPVSource::SetPVInput(int idx, vtkPVSource *pvs)
                          part->GetVTKDataTclName());
         }      
       }
-    else
-      { // One source for each part.
-      sourceTclName = this->GetVTKSourceTclName(partIdx);
+    }
+  else
+    { // One source for each part.
+    int numSources = this->GetNumberOfVTKSources();
+    for (int sourceIdx = 0; sourceIdx < numSources; ++sourceIdx)
+      {
+      sourceTclName = this->GetVTKSourceTclName(sourceIdx);
+      // This is to handle the case when there are multiple
+      // inputs and the first one has multiple parts. For
+      // example, in the Glyph filter, when the input has multiple
+      // parts, the glyph source has to be applied to each.
+      // In that case, sourceTclName == glyph input, 
+      // inputName == glyph source.
+      partIdx = sourceIdx % numParts;
+      part = pvs->GetPart(partIdx);
       if (part->GetVTKDataTclName() == NULL || sourceTclName == NULL)
         {
         vtkErrorMacro("Source data mismatch.");
@@ -1314,9 +1327,6 @@ void vtkPVSource::Accept(int hideFlag, int hideSource)
         }
       }
 
-
-    this->UnGrabFocus();
-
     // Set the current data of the window.
     if ( ! hideFlag)
       {
@@ -1351,6 +1361,9 @@ void vtkPVSource::Accept(int hideFlag, int hideSource)
       }
 
     pvd->Initialize();
+    // This causes input to be checked for validity.
+    // I put it at the end so the InputFixedTypeRequirement will work.
+    this->UnGrabFocus();
     }
 
   window->GetMenuView()->CheckRadioButton(
@@ -2420,7 +2433,16 @@ int vtkPVSource::InitializeData()
     {
     sourceTclName = this->GetVTKSourceTclName(sourceIdx);
     pm->RootScript("%s GetNumberOfOutputs", sourceTclName);
-    numOutputs = atoi(pm->GetRootResult());
+    const char* result = pm->GetRootResult();
+    if(result)
+      {
+      numOutputs = atoi(result);
+      }
+    else 
+      {
+      vtkErrorMacro("GetRootResult is null");
+      numOutputs = 0;
+      }
 
     for (idx = 0; idx < numOutputs; ++idx)
       {

@@ -20,7 +20,7 @@
 #include "vtkObjectFactory.h"
 
 
-vtkCxxRevisionMacro(vtkTiledDisplaySchedule, "1.6");
+vtkCxxRevisionMacro(vtkTiledDisplaySchedule, "1.7");
 vtkStandardNewMacro(vtkTiledDisplaySchedule);
 
 
@@ -623,9 +623,10 @@ int vtkTiledDisplaySchedule::ShuffleLevel(int level, int numTiles,
           if (p2->Length <= level && p2Other->Length <= level)
             { // We still have space in the combined/shuffled level.
             // Check to make sure we have already taken care of dependencies.
-            if (e->Dependency == NULL || e->Dependency->Shuffled)
+            //if (e->Dependency == NULL || e->Dependency->Shuffled)
+            if (this->CheckDependency(p, e))
               { // e dependencies OK.
-              if (eOther->Dependency == NULL || eOther->Dependency->Shuffled)
+              if (this->CheckDependency(pOther, eOther))
                 { // eOther dependencies OK.
                 // Shuffle them into the final schedule.
                 p->Elements[eIdx] = NULL;
@@ -651,6 +652,36 @@ int vtkTiledDisplaySchedule::ShuffleLevel(int level, int numTiles,
   return flag;
 }
 
+//-------------------------------------------------------------------------
+int vtkTiledDisplaySchedule::CheckDependency(vtkTiledDisplayProcess* p, 
+                                             vtkTiledDisplayElement* e)
+{
+  int idx;
+  vtkTiledDisplayElement* e2;
+  
+  if (e->ReceiveFlag)
+    {
+    // Receives never have a dependency, 
+    // since we are processing send receive pairs.
+    return 1;
+    }
+  // This is a send, and this should be the last item of this tile on 
+  // this process.
+  // Make sure all the previous send are done.
+  for (idx = 0; idx < p->Length; ++idx)
+    {
+    e2 = p->Elements[idx];
+    // This assumes that p is a single tile schedule.
+    // Since shuffled elements are removed,
+    // the not NULL check and != e check are enough.
+    // No need for the shuffled flag.
+    if (e2 && e2 != e && e2->ReceiveFlag && ! e2->Shuffled)
+      {
+      return 0;
+      }
+    }
+  return 1;
+}
 
 //-------------------------------------------------------------------------
 int vtkTiledDisplaySchedule::FindOtherElementIdx(vtkTiledDisplayProcess* p, 

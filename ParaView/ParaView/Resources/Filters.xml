@@ -143,6 +143,16 @@
   <LabeledToggle label="Boundary deletable" trace_name="BoundaryVertexDeletion" variable="BoundaryVertexDeletion" help="If off, decimate will not remove points on the boundary."/>
 </Module>
 
+<Module name="D3" menu_name="D3" root_name="D3" module_type="Filter" multiprocess_support="multiple_processes"
+        long_help="Repartition a data set." 
+        short_help="Repartition a data set.">
+  <Filter class="vtkDistributedDataFilter">
+    <Input name="Input" class="vtkDataSet" /> 
+  </Filter>
+  <InputMenu label="Input" help="Set the input to this filter."
+             input_name="Input"/>
+</Module>
+
   <Module name="Dialate"  root_name="Dialate" 
           module_type="Filter">
     <Filter class="vtkPVImageContinuousDilate3D">

@@ -66,7 +66,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPart);
-vtkCxxRevisionMacro(vtkPVPart, "1.28");
+vtkCxxRevisionMacro(vtkPVPart, "1.29");
 
 
 int vtkPVPartCommand(ClientData cd, Tcl_Interp *interp,
@@ -233,7 +233,7 @@ void vtkPVPart::GatherDataInformation()
 
   // I would like to have all sources generate names and all filters
   // Pass the field data, but until all is working well, this is a default.
-  if (this->Name == NULL)
+  if (this->Name == NULL || this->Name[0] == '\0')
     {
     char str[100];
     if (this->DataInformation->GetDataSetType() == VTK_POLY_DATA)

@@ -43,7 +43,7 @@
  #include <mpi.h>
 #endif
 
-vtkCxxRevisionMacro(vtkPVTiledDisplayManager, "1.10");
+vtkCxxRevisionMacro(vtkPVTiledDisplayManager, "1.11");
 vtkStandardNewMacro(vtkPVTiledDisplayManager);
 
 vtkCxxSetObjectMacro(vtkPVTiledDisplayManager, RenderView, vtkObject);
@@ -552,7 +552,7 @@ struct vtkPVTiledDisplayRenderWindowInfo
 {
   int Size[2];
   int NumberOfRenderers;
-  int ReductionFactor;
+  int ImageReductionFactor;
   int UseCompositing;
 };
 
@@ -589,7 +589,7 @@ struct vtkPVTiledDisplayRendererInfo
 //-------------------------------------------------------------------------
 vtkPVTiledDisplayManager::vtkPVTiledDisplayManager()
 {
-  this->ReductionFactor = 1;
+  this->ImageReductionFactor = 1;
   this->LODReductionFactor = 4;
 
   this->RenderWindow = NULL;
@@ -833,8 +833,8 @@ void vtkPVTiledDisplayManager::Composite()
     }
   
   rws = this->RenderWindow->GetSize();
-  size[0] = (int)((float)rws[0] / (float)(this->ReductionFactor));
-  size[1] = (int)((float)rws[1] / (float)(this->ReductionFactor));  
+  size[0] = (int)((float)rws[0] / (float)(this->ImageReductionFactor));
+  size[1] = (int)((float)rws[1] / (float)(this->ImageReductionFactor));  
 
   tdp = this->Schedule->Processes[myId];
 
@@ -975,7 +975,7 @@ void vtkPVTiledDisplayManager::Composite()
     buf->Delete();
     buf = NULL;
 
-    if (this->ReductionFactor > 1)
+    if (this->ImageReductionFactor > 1)
       {
       vtkUnsignedCharArray* pData2;
       pData2 = pData;
@@ -983,7 +983,7 @@ void vtkPVTiledDisplayManager::Composite()
 
       vtkTimerLog::MarkStartEvent("Magnify Buffer");
       vtkPVCompositeUtilities::MagnifyBuffer(pData2, pData, size, 
-                                             this->ReductionFactor);
+                                             this->ImageReductionFactor);
       vtkTimerLog::MarkEndEvent("Magnify Buffer");
       pData2->Delete();
       pData2 = NULL;
@@ -1034,7 +1034,7 @@ void vtkPVTiledDisplayManager::SatelliteStartRender()
   // Initialize to get rid of a warning.
   winInfo.Size[0] = winInfo.Size[1] = 0;
   winInfo.NumberOfRenderers = 1;
-  winInfo.ReductionFactor = 1;
+  winInfo.ImageReductionFactor = 1;
   winInfo.UseCompositing = 1;
 
   // Receive the window size.
@@ -1042,7 +1042,7 @@ void vtkPVTiledDisplayManager::SatelliteStartRender()
                       sizeof(struct vtkPVTiledDisplayRenderWindowInfo), 0, 
                       vtkPVTiledDisplayManager::WIN_INFO_TAG);
   //renWin->SetDesiredUpdateRate(winInfo.DesiredUpdateRate);
-  this->ReductionFactor = winInfo.ReductionFactor;
+  this->ImageReductionFactor = winInfo.ImageReductionFactor;
   this->UseCompositing = winInfo.UseCompositing;
 
   // Synchronize the renderers.
@@ -1092,8 +1092,8 @@ void vtkPVTiledDisplayManager::SatelliteStartRender()
       light->SetFocalPoint(renInfo.LightFocalPoint);
       }
     ren->SetBackground(renInfo.Background);
-    ren->SetViewport(0, 0, 1.0/(float)this->ReductionFactor, 
-                     1.0/(float)this->ReductionFactor);
+    ren->SetViewport(0, 0, 1.0/(float)this->ImageReductionFactor, 
+                     1.0/(float)this->ImageReductionFactor);
     }
 }
 
@@ -1149,11 +1149,11 @@ void vtkPVTiledDisplayManager::StartRender()
 
   if (updateRate > 2.0)
     {
-    this->ReductionFactor = 2;
+    this->ImageReductionFactor = 2;
     }
   else
     {
-    this->ReductionFactor = 1;
+    this->ImageReductionFactor = 1;
     }
  
 
@@ -1165,19 +1165,19 @@ void vtkPVTiledDisplayManager::StartRender()
   numProcs = this->Controller->GetNumberOfProcesses();
   size = this->RenderWindow->GetSize();
   // This does nothing because tiles are full screen.
-  winInfo.Size[0] = size[0]/this->ReductionFactor;
-  winInfo.Size[1] = size[1]/this->ReductionFactor;
+  winInfo.Size[0] = size[0]/this->ImageReductionFactor;
+  winInfo.Size[1] = size[1]/this->ImageReductionFactor;
   winInfo.NumberOfRenderers = rens->GetNumberOfItems();
   winInfo.UseCompositing = this->UseCompositing;
   // We should send the reduction factor !!!
   if (this->RenderWindow->GetDesiredUpdateRate() > 2.0 &&
       this->UseCompositing)
     {
-    winInfo.ReductionFactor = this->LODReductionFactor;
+    winInfo.ImageReductionFactor = this->LODReductionFactor;
     }
   else
     {
-    winInfo.ReductionFactor = 1;
+    winInfo.ImageReductionFactor = 1;
     }
   
   for (id = 1; id < numProcs; ++id)

@@ -62,7 +62,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVFileEntry);
-vtkCxxRevisionMacro(vtkPVFileEntry, "1.52");
+vtkCxxRevisionMacro(vtkPVFileEntry, "1.53");
 
 //----------------------------------------------------------------------------
 vtkPVFileEntry::vtkPVFileEntry()
@@ -297,7 +297,7 @@ void vtkPVFileEntry::BrowseCallback()
     loadDialog->SetDefaultExtension(this->Extension);
     str << "{{} {." << this->Extension << "}} ";
     }
-  str << "{{All files} {*.*}}" << ends;  
+  str << "{{All files} {*}}" << ends;  
   loadDialog->SetFileTypes(str.str());
   str.rdbuf()->freeze(0);  
   if(loadDialog->Invoke())

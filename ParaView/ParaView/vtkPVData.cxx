@@ -101,7 +101,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.210");
+vtkCxxRevisionMacro(vtkPVData, "1.211");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -148,7 +148,7 @@ vtkPVData::vtkPVData()
   this->ColorMenuLabel = vtkKWLabel::New();
   this->ColorMenu = vtkKWOptionMenu::New();
 
-  this->DirectColorCheck = vtkKWCheckButton::New();
+  this->MapScalarsCheck = vtkKWCheckButton::New();
   this->EditColorMapButton = vtkKWPushButton::New();
   
   this->ColorButton = vtkKWChangeColorButton::New();
@@ -252,8 +252,8 @@ vtkPVData::~vtkPVData()
   this->EditColorMapButton->Delete();
   this->EditColorMapButton = NULL;
 
-  this->DirectColorCheck->Delete();
-  this->DirectColorCheck = NULL;  
+  this->MapScalarsCheck->Delete();
+  this->MapScalarsCheck = NULL;  
     
   this->ColorButton->Delete();
   this->ColorButton = NULL;
@@ -569,14 +569,14 @@ void vtkPVData::CreateProperties()
     "Edit the constant color for the geometry.");
 
 
-  this->DirectColorCheck->SetParent(this->ColorFrame->GetFrame());
-  this->DirectColorCheck->Create(this->Application, "-text {Map Scalars}");
-  this->DirectColorCheck->SetState(1);
-  this->DirectColorCheck->SetBalloonHelpString(
-    "Toggle the visibility of the scalar bar for this data.");
+  this->MapScalarsCheck->SetParent(this->ColorFrame->GetFrame());
+  this->MapScalarsCheck->Create(this->Application, "-text {Map Scalars}");
+  this->MapScalarsCheck->SetState(0);
+  this->MapScalarsCheck->SetBalloonHelpString(
+    "Pass attriubte through color map or use unsigned char values as color.");
   this->Application->Script(
-    "%s configure -command {%s DirectColorCheckCallback}",
-    this->DirectColorCheck->GetWidgetName(),
+    "%s configure -command {%s MapScalarsCheckCallback}",
+    this->MapScalarsCheck->GetWidgetName(),
     this->GetTclName());
 
   this->EditColorMapButton->SetParent(this->ColorFrame->GetFrame());
@@ -601,13 +601,13 @@ void vtkPVData::CreateProperties()
   this->ColorButton->EnabledOff();
 
   this->Script("grid %s %s -sticky wns",
-               this->DirectColorCheck->GetWidgetName(),
+               this->MapScalarsCheck->GetWidgetName(),
                this->EditColorMapButton->GetWidgetName());
 
   this->Script("grid %s -sticky news -padx %d -pady %d",
                this->EditColorMapButton->GetWidgetName(),
                col_1_padx, button_pady);
-  this->DirectColorCheck->EnabledOff();
+  this->MapScalarsCheck->EnabledOff();
   this->EditColorMapButton->EnabledOff();
 
   // Display style
@@ -1357,7 +1357,7 @@ void vtkPVData::ColorByPropertyInternal()
 
   this->SetPVColorMap(NULL);
 
-  this->DirectColorCheck->EnabledOff();
+  this->MapScalarsCheck->EnabledOff();
   this->EditColorMapButton->EnabledOff();
   this->ScalarBarCheck->EnabledOff();
 
@@ -1419,7 +1419,7 @@ void vtkPVData::ColorByPointFieldInternal(const char *name, int numComps)
     part->GetPartDisplay()->ColorByArray(this->PVColorMap, VTK_POINT_DATA_FIELD);
     } 
   this->ColorButton->EnabledOff();
-  this->UpdateDirectColorCheck(
+  this->UpdateMapScalarsCheck(
            this->PVSource->GetDataInformation()->GetPointDataInformation(),
            name);
 
@@ -1479,7 +1479,7 @@ void vtkPVData::ColorByCellFieldInternal(const char *name, int numComps)
     }
 
   this->ColorButton->EnabledOff();
-  this->UpdateDirectColorCheck(
+  this->UpdateMapScalarsCheck(
            this->PVSource->GetDataInformation()->GetCellDataInformation(),
            name);
 
@@ -1491,7 +1491,7 @@ void vtkPVData::ColorByCellFieldInternal(const char *name, int numComps)
 
 
 //----------------------------------------------------------------------------
-void vtkPVData::UpdateDirectColorCheck(vtkPVDataSetAttributesInformation* info,
+void vtkPVData::UpdateMapScalarsCheck(vtkPVDataSetAttributesInformation* info,
                                        const char* name)
 {
   vtkPVArrayInformation* arrayInfo;
@@ -1502,7 +1502,8 @@ void vtkPVData::UpdateDirectColorCheck(vtkPVDataSetAttributesInformation* info,
   if (arrayInfo == NULL || 
       arrayInfo->GetDataType() != VTK_UNSIGNED_CHAR)
     { // Direct mapping not an option.
-    this->DirectColorCheck->EnabledOff();
+    this->MapScalarsCheck->SetState(1);
+    this->MapScalarsCheck->EnabledOff();
     this->ScalarBarCheck->EnabledOn();
     this->EditColorMapButton->EnabledOn();
     return;
@@ -1512,25 +1513,26 @@ void vtkPVData::UpdateDirectColorCheck(vtkPVDataSetAttributesInformation* info,
   if (arrayInfo->GetNumberOfComponents() != 1 &&
       arrayInfo->GetNumberOfComponents() != 3)
     { // I would like to have two as an option also ...
-    this->DirectColorCheck->EnabledOff();
+    this->MapScalarsCheck->SetState(1);
+    this->MapScalarsCheck->EnabledOff();
     this->ScalarBarCheck->EnabledOn();
     this->EditColorMapButton->EnabledOn();
     return;
     }
 
   // Direct color map is an option.
-  this->DirectColorCheck->EnabledOn();
+  this->MapScalarsCheck->EnabledOn();
 
   // I might like to store the default in another variable.
-  if (this->DirectColorCheck->GetState())
-    {
-    this->ScalarBarCheck->EnabledOff();
-    this->EditColorMapButton->EnabledOff();
-    }
-  else
+  if (this->MapScalarsCheck->GetState())
     {
     this->ScalarBarCheck->EnabledOn();
     this->EditColorMapButton->EnabledOn();
+    }
+  else
+    {
+    this->ScalarBarCheck->EnabledOff();
+    this->EditColorMapButton->EnabledOff();
     }
     
 }
@@ -1975,9 +1977,9 @@ void vtkPVData::CubeAxesCheckCallback()
 
 
 //----------------------------------------------------------------------------
-void vtkPVData::DirectColorCheckCallback()
+void vtkPVData::MapScalarsCheckCallback()
 {
-  this->SetDirectColorFlag(this->DirectColorCheck->GetState());
+  this->SetMapScalarsFlag(this->MapScalarsCheck->GetState());
   if ( this->GetPVRenderView() )
     {
     this->GetPVRenderView()->EventuallyRender();
@@ -1985,30 +1987,30 @@ void vtkPVData::DirectColorCheckCallback()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVData::SetDirectColorFlag(int val)
+void vtkPVData::SetMapScalarsFlag(int val)
 {
-  if (this->DirectColorCheck->GetState() != val)
+  if (this->MapScalarsCheck->GetState() != val)
     {
-    this->AddTraceEntry("$kw(%s) SetDirectColorFlag %d", this->GetTclName(), val);
-    this->DirectColorCheck->SetState(val);
+    this->AddTraceEntry("$kw(%s) SetMapScalarsFlag %d", this->GetTclName(), val);
+    this->MapScalarsCheck->SetState(val);
     }
 
   if (val)
     {
-    this->EditColorMapButton->EnabledOff();
-    this->ScalarBarCheck->EnabledOff();
+    this->EditColorMapButton->EnabledOn();
+    this->ScalarBarCheck->EnabledOn();
     }
   else
     {
-    this->EditColorMapButton->EnabledOn();
-    this->ScalarBarCheck->EnabledOn();
+    this->EditColorMapButton->EnabledOff();
+    this->ScalarBarCheck->EnabledOff();
     }
 
   int num, idx;
   num = this->PVSource->GetNumberOfParts();
   for (idx = 0; idx < num; ++idx)
     {
-    this->PVSource->GetPart(idx)->GetPartDisplay()->SetDirectColorFlag(val);
+    this->PVSource->GetPart(idx)->GetPartDisplay()->SetDirectColorFlag(!val);
     }
 }
 
