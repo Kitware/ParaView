@@ -35,7 +35,7 @@ class vtkRenderWindow;
 class vtkVolume;
 class vtkCuller;
 
-class VTK_RENDERING_EXPORT vtkDummyRenderer : public vtkRenderer
+class VTK_EXPORT vtkDummyRenderer : public vtkRenderer
 {
 public:
   vtkTypeRevisionMacro(vtkDummyRenderer,vtkRenderer);

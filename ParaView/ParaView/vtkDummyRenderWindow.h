@@ -33,7 +33,7 @@
 
 
 
-class VTK_RENDERING_EXPORT vtkDummyRenderWindow : public vtkRenderWindow
+class VTK_EXPORT vtkDummyRenderWindow : public vtkRenderWindow
 {
 public:
   vtkTypeRevisionMacro(vtkDummyRenderWindow,vtkRenderWindow);
