@@ -155,7 +155,7 @@ $pv(vtkTemp853) SetValue 5000
 set pv(vtkTemp858) [$pv(vtkTemp841) GetPVWidget {MaskPoints}]
 $pv(vtkTemp858) SetState 1
 set pv(vtkTemp861) [$pv(vtkTemp841) GetPVWidget {RandomMask}]
-$pv(vtkTemp861) SetState 1
+$pv(vtkTemp861) SetState 0
 $pv(vtkTemp841) AcceptCallback
 
 $pv(vtkTemp41) ColorByPointField {Momentum} 3
@@ -201,38 +201,6 @@ source [file join [file dirname [info script]] Compare.tcl]
 Compare $Application $argv $argc
 
 $Application Exit
-
-
-#set didRegression 0
-
-#for {set i  1} {$i < [expr $argc - 1]} {incr i} {
-#    if {[lindex $argv $i] == "-C"} {
-#	source [lindex $argv [expr $i + 1]]
-#	$Application SetExitStatus [CompareImage [[$Application GetMainWindow] GetMainView]]
-#       set didRegression 1
-#    }
-#}
-
-# I copied this from CombustorTest.  I do not know if it is needed.
-# It looks like code to avoid memory leaks.
-#if { ! $didRegression } {
-#    set colorMaps [[$Application GetMainWindow] GetPVColorMaps]
-#    $colorMaps InitTraversal
-#    while { 1 } {
-#        set colorMap [$colorMaps GetNextItemAsObject]
-#        if { $colorMap == {} } {
-#            break
-#        }
-#        $colorMap SetScalarBarVisibility 0
-#    }
-#    for {set i  1} {$i < [expr $argc - 1]} {incr i} {
-#        if {[lindex $argv $i] == "-BT"} {
-#            source [lindex $argv [expr $i + 1]]
-#        }
-#    }
-#}
-
-#$Application Exit
 
 
 

@@ -37,6 +37,9 @@ protected:
   vtkSMLookupTableProxy();
   ~vtkSMLookupTableProxy();
 
+  void LabToXYZ(double Lab[3], double xyz[3]);
+  void XYZToRGB(double xyz[3], double rgb[3]);
+
 private:
   vtkSMLookupTableProxy(const vtkSMLookupTableProxy&); // Not implemented
   void operator=(const vtkSMLookupTableProxy&); // Not implemented
