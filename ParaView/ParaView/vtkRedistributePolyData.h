@@ -39,7 +39,6 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-
 /*======================================================================
 // This software and ancillary information known as vtk_ext (and
 // herein called "SOFTWARE") is made available under the terms
@@ -75,7 +74,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __vtkRedistributePolyData_h
 
 #include "vtkPolyDataToPolyDataFilter.h"
+#include "vtkMultiProcessController.h"
 
+//*******************************************************************
 class vtkDataArray;
 class vtkDataSetAttributes;
 class vtkMultiProcessController;
@@ -91,7 +92,7 @@ public:
 
   // Description:
   // The filter needs a controller to determine which process it is in.
-  void SetController(vtkMultiProcessController* controller);
+  vtkSetObjectMacro(Controller, vtkMultiProcessController);
   vtkGetObjectMacro(Controller, vtkMultiProcessController); 
 
   void SetColorProc(int cp){colorProc = cp;};
@@ -213,6 +214,8 @@ private:
   void operator=(const vtkRedistributePolyData&); // Not implemented
   
 };
+
+//****************************************************************
 
 #endif
 

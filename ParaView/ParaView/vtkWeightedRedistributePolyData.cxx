@@ -39,7 +39,6 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ==================================================================*/
-
 /*======================================================================
 // This software and ancillary information known as vtk_ext (and
 // herein called "SOFTWARE") is made available under the terms
@@ -79,7 +78,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-------------------------------------------------------------------
 vtkStandardNewMacro(vtkWeightedRedistributePolyData);
-vtkCxxRevisionMacro(vtkWeightedRedistributePolyData, "1.8");
+vtkCxxRevisionMacro(vtkWeightedRedistributePolyData, "1.9");
 
 //-------------------------------------------------------------------
 
@@ -235,7 +234,6 @@ void vtkWeightedRedistributePolyData::MakeSchedule ( vtkCommSched* localSched)
         }
       }
 
-  
     for (type=0; type<NUM_CELL_TYPES; type++) 
       {
       goalNumCells[type] = new vtkIdType [numProcs]; 
@@ -291,9 +289,9 @@ void vtkWeightedRedistributePolyData::MakeSchedule ( vtkCommSched* localSched)
         for (id2 = id+1; id2 < numProcs; id2++)
           {
           if ((remoteSched[order[id]].NumberOfCells[type] - 
-               goalNumCells[type][order[id]]) < 
+             goalNumCells[type][order[id]]) < 
               (remoteSched[order[id2]].NumberOfCells[type] - 
-               goalNumCells[type][order[id2]]))
+             goalNumCells[type][order[id2]]))
             {
             temp = order[id];
             order[id] = order[id2];
@@ -336,12 +334,17 @@ void vtkWeightedRedistributePolyData::MakeSchedule ( vtkCommSched* localSched)
           numToSend--;
           leftovers[type]--;
           }
+
         cnt = 0;
         while (numToSend>0)
           {
-          if (start == last) cerr<<"error: start =last"<<endl;
+          if (start == last) 
+            { 
+            vtkErrorMacro("error: start =last");
+            }
           numToReceive = goalNumCells[type][olast]-
             remoteSched[olast].NumberOfCells[type];
+
           if (leftovers[type]>=(last-start-numProcZero[type]) || 
               (recflag==1))
             {
@@ -349,8 +352,7 @@ void vtkWeightedRedistributePolyData::MakeSchedule ( vtkCommSched* localSched)
             //  the leftover cells too ...
             numToReceive++;
             if (!recflag) {leftovers[type]--;}  // if flag, this 
-                                                // has already been
-                                                // subtracted
+            // has already been subtracted
             recflag = 1;  
             }
           if (numToSend >= numToReceive)
@@ -372,7 +374,7 @@ void vtkWeightedRedistributePolyData::MakeSchedule ( vtkCommSched* localSched)
             remoteSched[olast].NumberOfCells[type]  += numToSend;
             numToSend = 0;
             }
-        } // end while (numToSend>0)
+          } // end while (numToSend>0)
         rsCntSend[type][ostart] = cnt;
         rsSendTo[type][ostart]  = new int[cnt];
         rsSendNum[type][ostart] = new vtkIdType[cnt];
@@ -381,10 +383,10 @@ void vtkWeightedRedistributePolyData::MakeSchedule ( vtkCommSched* localSched)
           rsSendTo[type][ostart][i]  = sendToTemp[i];
           rsSendNum[type][ostart][i] = sendNumTemp[i];
           }
+
         start++;
         } // end while start<last loop 
       } // end loop over type
-
 
     // ... combine results for all types ...
 
@@ -429,7 +431,7 @@ void vtkWeightedRedistributePolyData::MakeSchedule ( vtkCommSched* localSched)
       remoteSched[id].SendNumber = new vtkIdType*[NUM_CELL_TYPES];
       for (type=0; type<NUM_CELL_TYPES; type++)
         {
-        remoteSched[id].SendNumber[type] = new vtkIdType[currSendCnt];
+        remoteSched[id].SendNumber[type] = new int[currSendCnt];
         }
 
       for (i=0; i<currSendCnt; i++)
@@ -462,9 +464,7 @@ void vtkWeightedRedistributePolyData::MakeSchedule ( vtkCommSched* localSched)
       delete [] tempSend;
       } // end loop over procs
 
-
     for (id = 0; id < numProcs; id++) { remoteSched[id].ReceiveCount = 0;} 
-
     // ... count up how processors a processor will be receiving from ...
     for (id = 0; id < numProcs; id++) 
       {
@@ -536,12 +536,12 @@ void vtkWeightedRedistributePolyData::MakeSchedule ( vtkCommSched* localSched)
         {
         for (i=0;i<remoteSched[id].SendCount;i++) 
           {
-           schedArray1[arraycnt1++] = remoteSched[id].SendTo[i];
-           for (type=0; type<NUM_CELL_TYPES; type++)
-             {
-             schedArray2[arraycnt2++] = 
-               remoteSched[id].SendNumber[type][i];
-             }
+          schedArray1[arraycnt1++] = remoteSched[id].SendTo[i];
+          for (type=0; type<NUM_CELL_TYPES; type++)
+            {
+            schedArray2[arraycnt2++] = 
+              remoteSched[id].SendNumber[type][i];
+            }
           }
         }
       if (remoteSched[id].ReceiveCount > 0)
@@ -556,19 +556,17 @@ void vtkWeightedRedistributePolyData::MakeSchedule ( vtkCommSched* localSched)
              }
           }
         }
-      this->Controller->Send((int*)(&schedLen1), 1, id, 
-                             SCHED_LEN_1_TAG); 
-      this->Controller->Send((int*)(&schedLen2), 1, id, 
-                             SCHED_LEN_2_TAG); 
-      this->Controller->Send((int*)schedArray1, schedLen1, id, 
-                             SCHED_1_TAG); 
-      this->Controller->Send((vtkIdType*)schedArray2, schedLen2, 
-                             id, SCHED_2_TAG); 
+      this->Controller->Send((int*)(&schedLen1), 1, id, SCHED_LEN_1_TAG); 
+      this->Controller->Send((int*)(&schedLen2), 1, id, SCHED_LEN_2_TAG); 
+      this->Controller->Send((int*)schedArray1, schedLen1, id, SCHED_1_TAG); 
+      this->Controller->Send((vtkIdType*)schedArray2, schedLen2, id, 
+                             SCHED_2_TAG); 
       delete [] schedArray1;
       delete [] schedArray2;
       } 
 
     // ... initialize the local schedule to return ...
+    localSched->NumberOfCells = new vtkIdType[NUM_CELL_TYPES]; 
     for (type=0; type<NUM_CELL_TYPES; type++)
       {
       localSched->NumberOfCells[type] = 
