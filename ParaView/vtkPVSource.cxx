@@ -1490,14 +1490,10 @@ void vtkPVSource::AcceptCallback()
     sb = this->GetPVOutput()->GetScalarBar();
     window->GetMainView()->AddComposite(sb);
     // Make the last data invisible.
-    // We want this to work whether we create different sources with or
-    // without using filters.
-    if (window->GetPreviousSource())
+    if (input)
       {
-      window->GetPreviousSource()->GetPVOutput()->GetActorComposite()->
-        SetVisibility(0);
-      window->GetPreviousSource()->GetPVOutput()->GetScalarBar()->
-        SetVisibility(0);
+      input->GetActorComposite()->SetVisibility(0);
+      input->GetScalarBar()->SetVisibility(0);
       }
     window->GetMainView()->ResetCamera();
     }
