@@ -137,7 +137,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.462.2.11");
+vtkCxxRevisionMacro(vtkPVWindow, "1.462.2.12");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -1877,6 +1877,7 @@ int vtkPVWindow::Open(char *openFileName, int store)
   error << "Could not find an appropriate reader for file "
         << openFileName << ". Would you like to manually select "
         << "the reader for this file?" << ends;
+  error.rdbuf()->freeze(0);     
   if (this->UseMessageDialog)
     {
     if ( vtkKWMessageDialog::PopupOkCancel(this->Application, this,
@@ -1908,6 +1909,8 @@ int vtkPVWindow::Open(char *openFileName, int store)
         str << "OpenCustom \"" << reader->GetModuleName() << "\"" <<ends;
         this->AddRecentFile(NULL, openFileName, this, str.str());
         str.rdbuf()->freeze(0);
+        dialog->Delete();
+        return VTK_OK;
         }
       // Cleanup
       dialog->Delete();
@@ -1917,7 +1920,6 @@ int vtkPVWindow::Open(char *openFileName, int store)
     {
     vtkErrorMacro(<<error.str());
     }
-  error.rdbuf()->freeze(0);     
 
   return VTK_ERROR;
 }
