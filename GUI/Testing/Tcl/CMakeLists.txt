@@ -114,36 +114,36 @@ ELSE(RUN_WITH_MPI)
       -V ${PVClientTestData}/Baseline/${tfile}.png)
   ENDFOREACH (tfile)
 
+
+  IF(VTK_PRINT_SELF_CHECK_TCL)
+    ADD_TEST(PrintSelf-${TEST_PATH} ${TCL_TCLSH}
+      ${VTK_PRINT_SELF_CHECK_TCL}
+      ${PVGUIClientDir})
+  ENDIF(VTK_PRINT_SELF_CHECK_TCL)
+  
+  IF(VTK_FIND_STRING_TCL)
+    ADD_TEST(TestSetObjectMacro-${TEST_PATH} ${TCL_TCLSH}
+      ${VTK_FIND_STRING_TCL}
+      "${PVGUIClientDir}/vtk\\\\*.h"
+      "vtkSetObjectMacro")
+  ENDIF(VTK_FIND_STRING_TCL)
+  
+  FOREACH(test otherPrint TestSetGet)
+    ADD_TEST(${test}-ParaView ${PARAVIEW_EXECUTABLE} --batch
+      ${PVClientTests_SOURCE_DIR}/Tcl/${test}.pvb)
+  ENDFOREACH(test)
+  
+  ADD_TEST(OtherTests-ParaView ${PARAVIEW_EXECUTABLE} --disable-registry --start-empty
+    ${PVClientTests_SOURCE_DIR}/Tcl/Other.pvs
+    -D ${PVClientTestData}
+    -A ${VTK_TCL_HOME}
+    )
+  
+  ADD_TEST (AnimationImages-ParaView ${PARAVIEW_EXECUTABLE} --disable-registry
+    ${PVClientTests_SOURCE_DIR}/Tcl/AnimationImages.pvs
+    -D ${PVClientTestData}
+    -T ${ParaView_BINARY_DIR}/Testing/Temporary
+    -C ${PVClientTests_SOURCE_DIR}/Tcl/ComparePNGs.tcl
+    -V ${PVClientTestData}/Baseline/AnimationImages.png)
+  
 ENDIF(RUN_WITH_MPI)
-
-IF(VTK_PRINT_SELF_CHECK_TCL)
-  ADD_TEST(PrintSelf-${TEST_PATH} ${TCL_TCLSH}
-    ${VTK_PRINT_SELF_CHECK_TCL}
-    ${PVGUIClientDir})
-ENDIF(VTK_PRINT_SELF_CHECK_TCL)
-
-IF(VTK_FIND_STRING_TCL)
-  ADD_TEST(TestSetObjectMacro-${TEST_PATH} ${TCL_TCLSH}
-    ${VTK_FIND_STRING_TCL}
-    "${PVGUIClientDir}/vtk\\\\*.h"
-    "vtkSetObjectMacro")
-ENDIF(VTK_FIND_STRING_TCL)
-
-FOREACH(test otherPrint TestSetGet)
-  ADD_TEST(${test}-ParaView ${PARAVIEW_EXECUTABLE} --batch
-    ${PVClientTests_SOURCE_DIR}/Tcl/${test}.pvb)
-ENDFOREACH(test)
-
-ADD_TEST(OtherTests-ParaView ${PARAVIEW_EXECUTABLE} --disable-registry --start-empty
-  ${PVClientTests_SOURCE_DIR}/Tcl/Other.pvs
-  -D ${PVClientTestData}
-  -A ${VTK_TCL_HOME}
-  )
-
-ADD_TEST (AnimationImages-ParaView ${PARAVIEW_EXECUTABLE} --disable-registry
-  ${PVClientTests_SOURCE_DIR}/Tcl/AnimationImages.pvs
-  -D ${PVClientTestData}
-  -T ${ParaView_BINARY_DIR}/Testing/Temporary
-  -C ${PVClientTests_SOURCE_DIR}/Tcl/ComparePNGs.tcl
-  -V ${PVClientTestData}/Baseline/AnimationImages.png)
-
