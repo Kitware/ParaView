@@ -425,7 +425,16 @@ int pvTestDriver::Main(int argc, char* argv[])
     {
     kwsysProcess_WaitForExit(renderServer, 0); 
     }
-   
+#ifdef PV_TEST_CLEAN_COMMAND
+  // If any executable did not exit properly, run a user-specified
+  // cleanup command.
+  if(kwsysProcess_GetState(client) != kwsysProcess_State_Exited ||
+     kwsysProcess_GetState(server) != kwsysProcess_State_Exited ||
+     kwsysProcess_GetState(renderServer) != kwsysProcess_State_Exited)
+    {
+    system(PV_TEST_CLEAN_COMMAND);
+    }
+#endif
   // Get the results.
   int clientResult = this->ReportStatus(client, "client");
   int serverResult = 0;
