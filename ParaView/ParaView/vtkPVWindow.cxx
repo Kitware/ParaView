@@ -2300,7 +2300,7 @@ void vtkPVWindow::EnableSelectMenu()
     numGlyphs = 0;
     }
   
-  if (numSources == 0 && numGlyphs == 0)
+  if (numSources == 0)
     {
     this->Script("%s entryconfigure Select -state disabled",
                  this->Menu->GetWidgetName());
