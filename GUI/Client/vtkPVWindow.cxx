@@ -100,6 +100,7 @@
 #include "vtkTimerLog.h"
 #include "vtkPVPluginsDialog.h"
 #include "vtkPVRenderViewProxyImplementation.h"
+#include "vtkSMApplication.h"
 #include "vtkPVGUIClientOptions.h"
 #include <vtkstd/map>
 
@@ -128,7 +129,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.600");
+vtkCxxRevisionMacro(vtkPVWindow, "1.601");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -2597,6 +2598,21 @@ void vtkPVWindow::SaveBatchScript(const char *filename, int offScreenFlag, const
 
   *file << endl << "vtkSMObject foo" << endl;
   *file << "set proxyManager [foo GetProxyManager]" << endl;
+
+  *file << endl << "set smApplication [foo GetApplication]" << endl;
+  vtkSMApplication* sma =
+    this->GetPVApplication()->GetSMApplication();
+  unsigned int numConfFiles = sma->GetNumberOfConfigurationFiles();
+  for (unsigned int idx=0; idx<numConfFiles; idx++)
+    {
+    const char* fname;
+    const char* dir;
+    sma->GetConfigurationFile(idx, fname, dir);
+    *file << "$smApplication AddConfigurationFile " << fname << " " << dir 
+          << endl;
+    }
+  *file << "$smApplication ParseConfigurationFiles" << endl;
+
   *file << "foo Delete" << endl << endl;
 
   *file << "vtkSMProperty foo" << endl;
