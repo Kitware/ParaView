@@ -45,7 +45,7 @@ public:
 
   // Description:
   // Control the visibility of the pick display as well.
-  virtual void SetVisibilityInternal(int val);
+  virtual void SetVisibilityNoTrace(int val);
 
 protected:
   vtkPVPick();
@@ -59,6 +59,8 @@ protected:
   vtkKWWidget *DataFrame;
 
   vtkCollection* LabelCollection;
+  virtual void Select();
+  void UpdateGUI();
   void ClearDataLabels();
   void InsertDataLabel(const char* label, vtkIdType idx,
                        vtkDataSetAttributes* attr, double* x=0);

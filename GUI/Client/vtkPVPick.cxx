@@ -3,7 +3,6 @@
   Program:   ParaView
   Module:    vtkPVPick.cxx
 
-  Copyright (c) Kitware, Inc.
   All rights reserved.
   See Copyright.txt or http://www.paraview.org/HTML/Copyright.html for details.
 
@@ -33,7 +32,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPick);
-vtkCxxRevisionMacro(vtkPVPick, "1.8");
+vtkCxxRevisionMacro(vtkPVPick, "1.9");
 
 
 //----------------------------------------------------------------------------
@@ -72,7 +71,7 @@ vtkPVPick::~vtkPVPick()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVPick::SetVisibilityInternal(int val)
+void vtkPVPick::SetVisibilityNoTrace(int val)
 {
   if (this->PickDisplay)
     {
@@ -120,9 +119,27 @@ void vtkPVPick::AcceptCallbackInternal()
   this->GetDisplayGUI()->ChangeActorColor(0.8, 0.0, 0.2);
   this->GetDisplayGUI()->SetLineWidth(2);
 
+  this->UpdateGUI();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVPick::Select()
+{
+  // Update the GUI incase the input has changed.
+  this->UpdateGUI();
+  this->Superclass::Select();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVPick::UpdateGUI()
+{
   this->ClearDataLabels();
   // Get the collected data from the display.
   vtkUnstructuredGrid* d = this->PickDisplay->GetCollectedData();
+  if (d == 0)
+    {
+    return;
+    }
   if (d->GetNumberOfCells() > 0)
     {
     this->InsertDataLabel("Cell", 0, d->GetCellData());
