@@ -48,6 +48,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWLabel.h"
 #include "vtkPVData.h"
 #include "vtkPVApplication.h"
+#include "vtkObjectFactory.h"
 
 int vtkPVContourCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -104,7 +105,13 @@ vtkPVContour::~vtkPVContour()
 //----------------------------------------------------------------------------
 vtkPVContour* vtkPVContour::New()
 {
-  return new vtkPVContour();
+  // First try to create the object from the vtkObjectFactory
+  vtkObject* ret = vtkObjectFactory::CreateInstance("vtkPVContour");
+  if(ret)
+    {
+    return (vtkPVContour*)ret;
+    }
+  return new vtkPVContour;
 }
 
 //----------------------------------------------------------------------------

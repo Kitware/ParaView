@@ -41,6 +41,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "vtkPVSelectionList.h"
 #include "vtkStringList.h"
+#include "vtkObjectFactory.h"
 
 int vtkPVSelectionListCommand(ClientData cd, Tcl_Interp *interp,
 		     int argc, char *argv[]);
@@ -76,7 +77,14 @@ vtkPVSelectionList::~vtkPVSelectionList()
 //----------------------------------------------------------------------------
 vtkPVSelectionList* vtkPVSelectionList::New()
 {
-  return new vtkPVSelectionList();
+  // First try to create the object from the vtkObjectFactory
+  vtkObject* ret = vtkObjectFactory::CreateInstance("vtkPVSelectionList");
+  if(ret)
+    {
+    return (vtkPVSelectionList*)ret;
+    }
+  // If the factory was unable to create the object, then create it here.
+  return new vtkPVSelectionList;
 }
 
 //----------------------------------------------------------------------------
