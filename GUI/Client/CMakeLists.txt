@@ -310,6 +310,12 @@ IF(PARAVIEW_USE_SAF)
   SET( ParaViewClient_SRCS
     ${ParaViewClient_SRCS}
     ${SAF_SOURCE_DIR}/vtkPVSAFReaderModule.cxx )
+
+  SET( ParaViewClient_SRCS
+      ${ParaViewClient_SRCS}
+      ${SAF_SOURCE_DIR}/../Filtering/vtkPVBasicDSPFilterWidget.cxx )
+  INCLUDE_DIRECTORIES(${SAF_SOURCE_DIR}/../Filtering/)
+
 ENDIF(PARAVIEW_USE_SAF)
 
 

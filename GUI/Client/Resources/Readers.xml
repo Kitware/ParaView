@@ -524,6 +524,8 @@
                     attribute_name="Variable"  />
     <ArraySelection trace_name="block_sel"
                     attribute_name="Block"  />
+    <BasicDSPFilterWidget trace_name="Apply basic time filtering"
+                      help="Apply basic time filtering"/>
   </Module>
 #endif
   <Module name="AVSucdReader"
