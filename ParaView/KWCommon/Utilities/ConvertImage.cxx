@@ -1,4 +1,4 @@
-#include "vtkBase64Utility.h"
+#include "vtkBase64Utilities.h"
 #include "vtkImageData.h"
 #include "vtkImageFlip.h"
 #include "vtkPNGReader.h"
@@ -33,7 +33,7 @@ void test ()
  
   unsigned char *encoded_buffer = new unsigned char [nb_of_bytes * 2];
 
-  unsigned long nb_of_bytes_encoded = vtkBase64Utility::Encode(
+  unsigned long nb_of_bytes_encoded = vtkBase64Utilities::Encode(
     (unsigned char *)(pr->GetOutput()->GetScalarPointer()),
     nb_of_bytes,
     encoded_buffer);
@@ -50,7 +50,7 @@ void test ()
 
   unsigned char *decoded_buffer = new unsigned char [nb_of_bytes];
 
-  unsigned long nb_of_bytes_decoded = vtkBase64Utility::Decode(
+  unsigned long nb_of_bytes_decoded = vtkBase64Utilities::Decode(
     const_cast<const unsigned char *>(encoded_buffer), 
     nb_of_bytes, decoded_buffer);
   cout << "Decoded: " << nb_of_bytes_decoded << " bytes (expecting " << nb_of_bytes << ")\n";
@@ -255,7 +255,7 @@ int main(int argc, char **argv)
       {
       base64_buffer = new unsigned char [nb_of_bytes * 2];
       nb_of_bytes = 
-        vtkBase64Utility::Encode(data_ptr, nb_of_bytes, base64_buffer);
+        vtkBase64Utilities::Encode(data_ptr, nb_of_bytes, base64_buffer);
       if (nb_of_bytes == 0)
         {
         cerr << "Error: base64 encoding failed." << endl;
