@@ -318,7 +318,7 @@ public:
   // Description:
   // This sets up the PVData.  This method is called when
   // the accept button is pressed for the first time.
-  int InitializeData();  
+  virtual int InitializeData();  
 
   // Description:
   // This method can be used by subclasses of PVSource to do
