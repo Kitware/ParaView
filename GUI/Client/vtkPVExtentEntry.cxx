@@ -38,7 +38,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVExtentEntry);
-vtkCxxRevisionMacro(vtkPVExtentEntry, "1.40");
+vtkCxxRevisionMacro(vtkPVExtentEntry, "1.41");
 
 vtkCxxSetObjectMacro(vtkPVExtentEntry, InputMenu, vtkPVInputMenu);
 
@@ -275,8 +275,8 @@ void vtkPVExtentEntry::Accept()
     ivp->SetNumberOfElements(6);
     for (i = 0; i < 3; i++)
       {
-      ivp->SetElement(2*i, this->MinMax[i]->GetMinValue());
-      ivp->SetElement(2*i+1, this->MinMax[i]->GetMaxValue());
+      ivp->SetElement(2*i, static_cast<int>(this->MinMax[i]->GetMinValue()));
+      ivp->SetElement(2*i+1, static_cast<int>(this->MinMax[i]->GetMaxValue()));
       }
     }
   
