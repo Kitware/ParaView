@@ -1,38 +1,8 @@
 PROJECT(VTKCS)
 
-# Support building this project outside of ParaView.
-IF(NOT PARAVIEW_SOURCE_DIR)
-  FIND_PACKAGE(VTK)
-
-  IF(NOT VTK_FOUND)
-    MESSAGE(FATAL_ERROR "VTK is required.  Please set VTK_DIR.")
-  ENDIF(NOT VTK_FOUND)
-
-  INCLUDE(${VTK_USE_FILE})
-  INCLUDE_DIRECTORIES(${VTKCS_SOURCE_DIR})
-  INCLUDE_DIRECTORIES(${VTKCS_BINARY_DIR})
-
-  # load the ClientServer command
-  IF (COMMAND VTK_WRAP_ClientServer)
-  ELSE (COMMAND VTK_WRAP_ClientServer)
-    TRY_COMPILE(COMPILE_OK
-      ${VTKCS_BINARY_DIR}/CMake
-      ${VTKCS_SOURCE_DIR}/CMake
-      ClientServer_LOADED_COMMANDS OUTPUT_VARIABLE TRYOUT)
-    IF (COMPILE_OK)
-      LOAD_COMMAND(VTK_WRAP_ClientServer
-        ${VTKCS_BINARY_DIR}/CMake
-        ${VTKCS_BINARY_DIR}/CMake/Debug)
-    ELSE (COMPILE_OK)
-      MESSAGE("failed to compile ParaView ClientServer extensions to CMake:\n${TRYOUT}")
-    ENDIF (COMPILE_OK)
-  ENDIF (COMMAND VTK_WRAP_ClientServer)
-  UTILITY_SOURCE(VTK_WRAP_ClientServer_EXE vtkWrapClientServer Wrapping vtkWrapClientServer.c)
-  SET(LIBRARY_OUTPUT_PATH ${VTKCS_BINARY_DIR}/bin CACHE PATH "Single output path for libraries")
-  SET(EXECUTABLE_OUTPUT_PATH ${VTKCS_BINARY_DIR}/bin CACHE PATH "Single output path for executable")
-  SET(BUILD_SHARED_LIBS ${VTK_BUILD_SHARED_LIBS})
-  MARK_AS_ADVANCED(VTK_WRAP_ClientServer_EXE)
-ENDIF(NOT PARAVIEW_SOURCE_DIR)
+INCLUDE(${VTKCS_SOURCE_DIR}/vtkClientServer.cmake)
+SET(VTK_KITS_DIR "${ParaView_BINARY_DIR}/VTK/Utilities")
+CS_INITIALIZE_WRAP()
 
 # Configure the vtkClientServer library.
 SET(VTK_CLIENT_SERVER_BUILD_SHARED ${BUILD_SHARED_LIBS})
@@ -41,6 +11,23 @@ CONFIGURE_FILE(
   ${VTKCS_BINARY_DIR}/vtkClientServerConfigure.h
   @ONLY IMMEDIATE
   )
+
+INCLUDE_DIRECTORIES(
+  ${VTKCS_SOURCE_DIR}
+  ${VTKCS_BINARY_DIR}
+  ${VTK_SOURCE_DIR}
+  ${VTK_BINARY_DIR}
+  )
+SET(kits Common Filtering IO Imaging Rendering Parallel Graphics Hybrid)
+IF(VTK_USE_PATENTED)
+  SET(kits ${kits} Patented)
+ENDIF(VTK_USE_PATENTED)
+FOREACH(kit ${kits})
+  INCLUDE_DIRECTORIES(
+    ${VTK_SOURCE_DIR}/${kit}
+    ${VTK_BINARY_DIR}/${kit}
+    )
+ENDFOREACH(kit)
 
 # Create vtkClientServer library.
 ADD_LIBRARY(vtkClientServer
@@ -66,7 +53,6 @@ IF(PARAVIEW_SOURCE_DIR)
   INSTALL_TARGETS(${KW_INSTALL_LIB_DIR} vtkClientServer)
 ENDIF(PARAVIEW_SOURCE_DIR)
 
-INCLUDE(${VTKCS_SOURCE_DIR}/vtkClientServer.cmake)
 
 # Build the vtkClientServer wrapping utility first.
 SUBDIRS(Wrapping)
