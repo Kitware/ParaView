@@ -1,5 +1,7 @@
 SOURCE_FILES( KWWidgets_SRCS
 kwinit
+vtkKWHashTable
+vtkKWPointerArray
 vtkKWComposite 
 vtkKWView 
 vtkCornerAnnotation 
@@ -12,7 +14,6 @@ vtkKWCompositeCollection
 vtkKWCornerAnnotation 
 vtkKWDialog 
 vtkKWEntry 
-vtkKWEventNotifier 
 vtkKWExtent 
 vtkKWGenericComposite 
 vtkKWLabel 
@@ -41,6 +42,7 @@ vtkKWWidgetCollection
 vtkKWViewCollection 
 vtkKWVolumeComposite 
 vtkKWWindow 
+vtkKWTclCommand
 vtkKWWindowCollection 
 vtkKWXtEmbeddedWidget 
 ${VTK_SOURCE_DIR}/Wrapping/Tcl/vtktcl 
@@ -51,12 +53,18 @@ vtkKWComposite
 vtkKWView 
 )
 
+
+SUBDIRS(Test)
+
 IF (WIN32)
   SOURCE_FILES( KWWidgets_SRCS vtkKWRegisteryUtilities )
-  WRAP_EXCLUDE_FILES(vtkKWRegisteryUtilities)
+  WRAP_EXCLUDE_FILES(
+    vtkKWRegisteryUtilities
+    vtkKWTclCommand
+  )
 ENDIF (WIN32)
   
-WRAP_EXCLUDE_FILES(kwinit vtktcl)
+WRAP_EXCLUDE_FILES(kwinit vtktcl vtkKWHashTable)
 
 VTK_WRAP_TCL(vtkKWWidgetsTCL KWWidgetsTCL_SRCS KWWidgets_SRCS)
 ADD_LIBRARY(vtkKWWidgetsTCL KWWidgetsTCL_SRCS KWWidgets_SRCS)
