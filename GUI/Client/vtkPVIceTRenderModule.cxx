@@ -27,7 +27,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVIceTRenderModule);
-vtkCxxRevisionMacro(vtkPVIceTRenderModule, "1.11");
+vtkCxxRevisionMacro(vtkPVIceTRenderModule, "1.11.2.1");
 
 
 
@@ -112,7 +112,7 @@ void vtkPVIceTRenderModule::SetPVApplication(vtkPVApplication *pvApp)
                   << "FullScreenOn" 
                   << vtkClientServerStream::End;
 
-  if (pvApp->GetUseStereoRendering)
+  if (pvApp->GetUseStereoRendering())
     {
     pm->GetStream() << vtkClientServerStream::Invoke << this->RenderWindowID 
                     << "StereoCapableWindowOn" 

@@ -35,7 +35,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProgressHandler);
-vtkCxxRevisionMacro(vtkPVProgressHandler, "1.5");
+vtkCxxRevisionMacro(vtkPVProgressHandler, "1.5.2.1");
 
 //----------------------------------------------------------------------------
 //****************************************************************************
@@ -301,7 +301,7 @@ void vtkPVProgressHandler::InvokeSatelliteProgressEvent(
   this->ProgressTimer->StopTimer();
   double delT = this->ProgressTimer->GetElapsedTime();
 
-  if (delT > this->MinimumProgressInterval || progress)
+  if (delT > this->MinimumProgressInterval && progress)
     {
     this->ProgressTimer->StartTimer();
     if (!this->ProgressPending)
