@@ -77,6 +77,15 @@ public:
     { this->SetRange(range[0], range[1]); };
 
   // Description:
+  // Set/Get the current (sub-)range as relative positions in the whole range.
+  virtual void GetRelativeRange(float &r0, float &r1);
+  virtual void GetRelativeRange(float range[2])
+    { this->GetRelativeRange(range[0], range[1]); };
+  virtual void SetRelativeRange(float r0, float r1);
+  virtual void SetRelativeRange(float range[2])
+    { this->SetRelativeRange(range[0], range[1]); };
+  
+  // Description:
   // Set/Get the resolution. Also get the entries resolution, which is the
   // number of decimal places displayed in the entries 
   // (computed automatically from the current resolution).
