@@ -375,7 +375,8 @@ public:
   // Callbacks for generic render window interactor
   void MouseAction(int action,int button, int x,int y, int shift,int control);
   void Configure(int width, int height);
-  
+  void KeyAction(char keyCode, int x, int y);
+
   // Description:
   // Change the current interactor style
   void ChangeInteractorStyle(int index);

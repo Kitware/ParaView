@@ -124,7 +124,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.543");
+vtkCxxRevisionMacro(vtkPVWindow, "1.544");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -1101,11 +1101,16 @@ void vtkPVWindow::Create(vtkKWApplication *app, const char* vtkNotUsed(args))
                wname, tname);
   this->Script("bind %s <Control-Any-ButtonRelease> {%s MouseAction 1 %%b %%x %%y 0 1}",
                wname, tname);
-  //this->Script("bind %s <Motion> {%s MouseAction 2 0 %%x %%y 0 0}",
-  //             wname, tname);
   this->Script("bind %s <Configure> {%s Configure %%w %%h}",
                wname, tname);
   
+  // We need keyboard focus to get key events in the render window.
+  // we are using the p key for picking.
+  this->Script("bind %s <Enter> {focus %s}",
+               wname, wname);
+  this->Script("bind %s <KeyPress> {%s KeyAction %%K %%x %%y}",
+               wname, tname);
+
   // Interface for the animation tool.
   this->AnimationInterface->SetWindow(this);
   this->AnimationInterface->SetView(this->GetMainView());
@@ -1548,6 +1553,16 @@ void vtkPVWindow::MouseAction(int action,int button,
     { 
     this->Interactor->SatelliteMove(x, y);
     }
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVWindow::KeyAction(char keyCode, int x, int y)
+{
+  if ( !this->MainView->GetEnabled()  )
+    {
+    return;
+    }
+  this->Interactor->SatelliteKeyPress(keyCode, x, y);
 }
 
 //-----------------------------------------------------------------------------
