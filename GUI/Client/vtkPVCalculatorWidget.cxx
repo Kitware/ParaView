@@ -17,6 +17,7 @@
 #include "vtkArrayCalculator.h"
 #include "vtkDataSet.h"
 #include "vtkFieldData.h"
+#include "vtkKWEntry.h"
 #include "vtkKWFrame.h"
 #include "vtkKWLabel.h"
 #include "vtkKWLabeledFrame.h"
@@ -42,7 +43,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCalculatorWidget);
-vtkCxxRevisionMacro(vtkPVCalculatorWidget, "1.22");
+vtkCxxRevisionMacro(vtkPVCalculatorWidget, "1.23");
 
 int vtkPVCalculatorWidgetCommand(ClientData cd, Tcl_Interp *interp,
                                 int argc, char *argv[]);
@@ -57,7 +58,7 @@ vtkPVCalculatorWidget::vtkPVCalculatorWidget()
   this->AttributeModeMenu = vtkKWOptionMenu::New();
   
   this->CalculatorFrame = vtkKWLabeledFrame::New();
-  this->FunctionLabel = vtkKWLabel::New();
+  this->FunctionLabel = vtkKWEntry::New();
 
   this->ButtonClear = vtkKWPushButton::New();
   this->ButtonZero = vtkKWPushButton::New();
@@ -262,8 +263,10 @@ void vtkPVCalculatorWidget::Create(vtkKWApplication *app)
                this->CalculatorFrame->GetWidgetName());
 
   this->FunctionLabel->SetParent(this->CalculatorFrame->GetFrame());
-  this->FunctionLabel->Create(pvApp, "-background white");
-  this->FunctionLabel->SetLabel("");
+  this->FunctionLabel->Create(pvApp, "");
+  this->FunctionLabel->SetValue("");
+  this->Script("bind %s <KeyPress> {%s ModifiedCallback}",
+               this->FunctionLabel->GetWidgetName(), this->GetTclName());
   this->Script("grid %s -columnspan 8 -sticky ew", 
                this->FunctionLabel->GetWidgetName());
   
@@ -508,32 +511,26 @@ void vtkPVCalculatorWidget::Create(vtkKWApplication *app)
 void vtkPVCalculatorWidget::UpdateFunction(const char* newSymbol)
 {
   char* newFunction;
-  const char* currentFunction = this->FunctionLabel->GetLabel();
+  const char* currentFunction = this->FunctionLabel->GetValue();
   newFunction = new char[strlen(currentFunction)+strlen(newSymbol)+1];
   sprintf(newFunction, "%s%s", currentFunction, newSymbol);
-  this->FunctionLabel->SetLabel(newFunction);
+  this->FunctionLabel->SetValue(newFunction);
   delete [] newFunction;
   this->ModifiedCallback();
 }
 
 void vtkPVCalculatorWidget::ClearFunction()
 {
-  this->FunctionLabel->SetLabel("");
+  this->FunctionLabel->SetValue("");
 
   this->ClearAllVariables();
+  this->AddAllVariables(0);
   
   this->ModifiedCallback();
 }
 
 void vtkPVCalculatorWidget::ChangeAttributeMode(const char* newMode)
 {
-  vtkPVDataSetAttributesInformation* fdi = NULL;
-  int i, j;
-  int numComponents;
-  char menuCommand[256];
-  char menuEntry[256];
-  char* name;
-
   if (!strcmp(newMode, "point"))
     {
     this->AttributeModeMenu->SetValue("Point Data");
@@ -549,49 +546,9 @@ void vtkPVCalculatorWidget::ChangeAttributeMode(const char* newMode)
   
   this->ScalarsMenu->GetMenu()->DeleteAllMenuItems();
   this->VectorsMenu->GetMenu()->DeleteAllMenuItems();
-  this->FunctionLabel->SetLabel("");
+  this->FunctionLabel->SetValue("");
 
-  // Populate the scalar and array menu using collected data information.
-  if (strcmp(newMode, "point") == 0)
-    {
-    fdi = this->PVSource->GetPVInput(0)->GetDataInformation()->GetPointDataInformation();
-    }
-  else if (strcmp(newMode, "cell") == 0)
-    {
-    fdi = this->PVSource->GetPVInput(0)->GetDataInformation()->GetCellDataInformation();
-    }
-  
-  if (fdi)
-    {
-    for (i = 0; i < fdi->GetNumberOfArrays(); i++)
-      {
-      numComponents = fdi->GetArrayInformation(i)->GetNumberOfComponents();
-      name = fdi->GetArrayInformation(i)->GetName();
-      for (j = 0; j < numComponents; j++)
-        {
-        if (numComponents == 1)
-          {
-          sprintf(menuCommand, "AddScalarVariable {%s} {%s} 0", name, name);
-          this->ScalarsMenu->GetMenu()->AddCommand(name, this,
-                                                   menuCommand);
-          }
-        else
-          {
-          sprintf(menuEntry, "%s_%d", name, j);
-          sprintf(menuCommand, "AddScalarVariable {%s} {%s} {%d}", menuEntry,
-                  name, j);
-          this->ScalarsMenu->GetMenu()->AddCommand(menuEntry, this, menuCommand);
-          }
-        }
-      if (numComponents == 3)
-        {
-        sprintf(menuCommand, "AddVectorVariable {%s} {%s}",
-                name, name);
-        this->VectorsMenu->GetMenu()->AddCommand(name, this,
-                                                 menuCommand);
-        }
-      }
-    }
+  this->AddAllVariables(1);
 
   this->ModifiedCallback();
 }
@@ -600,8 +557,6 @@ void vtkPVCalculatorWidget::AddScalarVariable(const char* variableName,
                                               const char* arrayName,
                                               int component)
 {
-  this->UpdateFunction(variableName);
-
   if (this->ScalarVariableExists(variableName, arrayName, component))
     {
     return;
@@ -665,7 +620,6 @@ void vtkPVCalculatorWidget::AddScalarVariable(const char* variableName,
   this->ScalarComponents[i] = component;
   
   this->NumberOfScalarVariables++;
-  
 }
 
 int vtkPVCalculatorWidget::ScalarVariableExists(const char *variableName,
@@ -689,8 +643,6 @@ int vtkPVCalculatorWidget::ScalarVariableExists(const char *variableName,
 void vtkPVCalculatorWidget::AddVectorVariable(const char* variableName,
                                              const char* arrayName)
 {
-  this->UpdateFunction(variableName);
-
   if (this->VectorVariableExists(variableName, arrayName))
     {
     return;
@@ -742,8 +694,7 @@ void vtkPVCalculatorWidget::AddVectorVariable(const char* variableName,
   this->VectorVariableNames[i] = new char[strlen(variableName) + 1];
   strcpy(this->VectorVariableNames[i], variableName);
   
-  this->NumberOfVectorVariables++;
-  
+  this->NumberOfVectorVariables++;  
 }
 
 int vtkPVCalculatorWidget::VectorVariableExists(const char *variableName,
@@ -798,7 +749,7 @@ void vtkPVCalculatorWidget::Trace(ofstream *file)
     }
 
   *file << "$kw(" << this->GetTclName() << ") SetFunctionLabel {"
-        << this->FunctionLabel->GetLabel() << "}" << endl;
+        << this->FunctionLabel->GetValue() << "}" << endl;
 }
 
 
@@ -885,8 +836,8 @@ void vtkPVCalculatorWidget::AcceptInternal(vtkClientServerID vtkSourceID)
   
   cmds[cmdCount] = new char[12];
   strcpy(cmds[cmdCount], "SetFunction");
-  strings[stringCount] = new char[strlen(this->FunctionLabel->GetLabel())+1];
-  strcpy(strings[stringCount], this->FunctionLabel->GetLabel());
+  strings[stringCount] = new char[strlen(this->FunctionLabel->GetValue())+1];
+  strcpy(strings[stringCount], this->FunctionLabel->GetValue());
   stringCount++;
   numStrings[cmdCount] = 1;
   numScalars[cmdCount] = 0;
@@ -924,7 +875,7 @@ void vtkPVCalculatorWidget::ResetInternal()
     int numStrings = this->Property->GetNumberOfStrings();
     if (numStrings > 0)
       {
-      this->FunctionLabel->SetLabel(this->Property->GetString(numStrings-1));
+      this->FunctionLabel->SetValue(this->Property->GetString(numStrings-1));
       }
     }
   
@@ -939,7 +890,7 @@ void vtkPVCalculatorWidget::ResetInternal()
 void vtkPVCalculatorWidget::SetFunctionLabel(char *function)
 {
   this->ModifiedCallback();
-  this->FunctionLabel->SetLabel(function);
+  this->FunctionLabel->SetValue(function);
 }
 
 
@@ -990,19 +941,19 @@ void vtkPVCalculatorWidget::SaveInBatchScript(ofstream *file)
   for (i = 0; i < this->NumberOfVectorVariables; i++)
     {
     *file << "  [$pvTemp" << sourceID.ID 
-          << " GetProperty AddVectorVariable] SetElement " << i*3
+          << " GetProperty AddVectorVariable] SetElement " << i*5
           << " {" <<  this->VectorVariableNames[i] << "}" << endl;
     *file << "  [$pvTemp" << sourceID.ID 
-          << " GetProperty AddVectorVariable] SetElement " << i*3+1
+          << " GetProperty AddVectorVariable] SetElement " << i*5+1
           << " {" <<  this->VectorArrayNames[i] << "}" << endl;
     *file << "  [$pvTemp" << sourceID.ID 
-          << " GetProperty AddVectorVariable] SetElement " << i*3+2
+          << " GetProperty AddVectorVariable] SetElement " << i*5+2
           << " 0" << endl;
     *file << "  [$pvTemp" << sourceID.ID 
-          << " GetProperty AddVectorVariable] SetElement " << i*3+3
+          << " GetProperty AddVectorVariable] SetElement " << i*5+3
           << " 1" << endl;
     *file << "  [$pvTemp" << sourceID.ID 
-          << " GetProperty AddVectorVariable] SetElement " << i*3+4
+          << " GetProperty AddVectorVariable] SetElement " << i*5+4
           << " 2" << endl;
     }
 
@@ -1011,7 +962,7 @@ void vtkPVCalculatorWidget::SaveInBatchScript(ofstream *file)
     {
     *file << "  [$pvTemp" << sourceID.ID 
           << " GetProperty Function] SetElement 0 "
-          <<  "{" << this->FunctionLabel->GetLabel() << "}"
+          <<  "{" << this->FunctionLabel->GetValue() << "}"
           << endl;
     }
 }
@@ -1063,6 +1014,70 @@ void vtkPVCalculatorWidget::ClearAllVariables()
     this->VectorArrayNames = NULL;
     }
   this->NumberOfVectorVariables = 0;  
+}
+
+//----------------------------------------------------------------------------
+void vtkPVCalculatorWidget::AddAllVariables(int populateMenus)
+{
+  vtkPVDataSetAttributesInformation* fdi = NULL;
+  int i, j;
+  int numComponents;
+  char menuCommand[256];
+  char menuEntry[256];
+  char* name;
+  const char* mode = this->AttributeModeMenu->GetValue();
+
+  // Populate the scalar and array menu using collected data information.
+  if (strcmp(mode, "Point Data") == 0)
+    {
+    fdi = this->PVSource->GetPVInput(0)->GetDataInformation()->GetPointDataInformation();
+    }
+  else if (strcmp(mode, "Cell Data") == 0)
+    {
+    fdi = this->PVSource->GetPVInput(0)->GetDataInformation()->GetCellDataInformation();
+    }
+  
+  if (fdi)
+    {
+    for (i = 0; i < fdi->GetNumberOfArrays(); i++)
+      {
+      numComponents = fdi->GetArrayInformation(i)->GetNumberOfComponents();
+      name = fdi->GetArrayInformation(i)->GetName();
+      for (j = 0; j < numComponents; j++)
+        {
+        if (numComponents == 1)
+          {
+          this->AddScalarVariable(name, name, 0);
+          if (populateMenus)
+            {
+            sprintf(menuCommand, "UpdateFunction {%s}", name);
+            this->ScalarsMenu->GetMenu()->AddCommand(name, this,
+                                                     menuCommand);
+            }
+          }
+        else
+          {
+          sprintf(menuEntry, "%s_%d", name, j);
+          this->AddScalarVariable(menuEntry, name, j);
+          if (populateMenus)
+            {
+            sprintf(menuCommand, "UpdateFunction {%s}", menuEntry);
+            this->ScalarsMenu->GetMenu()->AddCommand(menuEntry, this, menuCommand);
+            }
+          }
+        }
+      if (numComponents == 3)
+        {
+        this->AddVectorVariable(name, name);
+        if (populateMenus)
+          {
+          sprintf(menuCommand, "UpdateFunction {%s}", name);
+          this->VectorsMenu->GetMenu()->AddCommand(name, this,
+                                                   menuCommand);
+          }
+        }
+      }
+    }
 }
 
 //----------------------------------------------------------------------------

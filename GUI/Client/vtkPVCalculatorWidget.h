@@ -26,6 +26,7 @@
 
 #include "vtkPVWidget.h"
 
+class vtkKWEntry;
 class vtkKWLabel;
 class vtkKWLabeledFrame;
 class vtkKWMenuButton;
@@ -116,7 +117,7 @@ protected:
   vtkKWOptionMenu* AttributeModeMenu;
   
   vtkKWLabeledFrame* CalculatorFrame;
-  vtkKWLabel* FunctionLabel;
+  vtkKWEntry* FunctionLabel;
 
   vtkKWPushButton* ButtonClear;
   vtkKWPushButton* ButtonZero;
@@ -176,6 +177,7 @@ protected:
   char **VectorVariableNames;
   int NumberOfVectorVariables;
   void ClearAllVariables();
+  void AddAllVariables(int populateMenus);
   
   vtkPVStringAndScalarListWidgetProperty *Property;
   
