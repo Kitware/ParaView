@@ -2,6 +2,19 @@ proc ChangeDemoText { newtext } {
     .control.main.info configure -text "$newtext" -justify left
 }
 
+proc CheckForDemoFile { file } {
+    global Application foundFiles DemoDir
+
+    if ![file exists $DemoDir/$file] {
+	vtkKWMessageDialog _adialog
+	_adialog PopupMessage $Application [$Application GetMainWindow] Error "Could not find the data file $file. This usually means that ParaView was not installed properly. Please fix the problem and try again." 0
+	_adialog Delete
+        set foundFiles 0
+        return 0;
+    }
+    return 1;
+}
+
 proc clip_init {} {
     global DemoDir  pvDemoShouldStop Application clip
 
@@ -3429,41 +3442,52 @@ proc warp_run {} {
 
 $Application ExitOnReturnOn
 
-set pvDemoShouldStop 0
+set foundFiles 1
 
-wm protocol .paraview WM_DELETE_WINDOW {ChangeDemoText "ParaView demo exiting.\nPlease wait.";set pvDemoShouldStop 1}
+CheckForDemoFile combxyz.bin
+CheckForDemoFile combq.bin
+CheckForDemoFile postxyz.bin
+CheckForDemoFile postq.bin
+CheckForDemoFile quadric.vtk
+CheckForDemoFile blow.vtk
 
-toplevel .control
-wm title .control "control panel"
-frame .control.main -width 350 -height 200
-label .control.main.info -text "ParaView demo initializing.\n Please wait."
-button .control.main.stop -text "Stop Demo" -command {ChangeDemoText "ParaView demo exiting.\nPlease wait.";.control.main.stop configure -state disable; set pvDemoShouldStop 1} -bg red
-pack .control.main
-place .control.main.info -rely 0 -relx 0.5 -anchor n
-place .control.main.stop  -rely 0.95 -relx 0.5 -anchor s
+if $foundFiles {
+    set pvDemoShouldStop 0
 
-wm transient .control .paraview
+    wm protocol .paraview WM_DELETE_WINDOW {ChangeDemoText "ParaView demo exiting.\nPlease wait.";set pvDemoShouldStop 1}
 
-grab .control.main.stop
+    toplevel .control
+    wm title .control "control panel"
+    frame .control.main -width 350 -height 200
+    label .control.main.info -text "ParaView demo initializing.\n Please wait."
+    button .control.main.stop -text "Stop Demo" -command {ChangeDemoText "ParaView demo exiting.\nPlease wait.";.control.main.stop configure -state disable; set pvDemoShouldStop 1} -bg red
+    pack .control.main
+    place .control.main.info -rely 0 -relx 0.5 -anchor n
+    place .control.main.stop  -rely 0.95 -relx 0.5 -anchor s
 
-clip_init
-extract_init
-iso_init
-threshold_init
-warp_init
-stream_init
+    wm transient .control .paraview
 
-while {1} {
-    iso_run
-    warp_run
-    stream_run
-    extract_run
-    clip_run
-    threshold_run
+    grab .control.main.stop
 
-    if $pvDemoShouldStop {
-        break
+    clip_init
+    extract_init
+    iso_init
+    threshold_init
+    warp_init
+    stream_init
+
+    while {1} {
+        iso_run
+        warp_run
+        stream_run
+        extract_run
+        clip_run
+        threshold_run
+
+        if $pvDemoShouldStop {
+            break
+        }
     }
-}
 
+}
 $Application Exit
