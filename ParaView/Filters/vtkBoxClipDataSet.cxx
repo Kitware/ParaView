@@ -34,7 +34,7 @@
 #include <math.h>
 #include <stdio.h>
 
-vtkCxxRevisionMacro(vtkBoxClipDataSet, "1.6");
+vtkCxxRevisionMacro(vtkBoxClipDataSet, "1.7");
 vtkStandardNewMacro(vtkBoxClipDataSet);
 
 //----------------------------------------------------------------------------
@@ -773,6 +773,7 @@ void  vtkBoxClipDataSet::PyramidToTetra(vtkIdType *pyramId, vtkIdType *cellIds,v
 //  
 //
 //----------------------------------------------------------------------------
+
 void vtkBoxClipDataSet::TetraGrid(vtkIdType typeobj, vtkIdType npts, vtkIdType *cellIds,vtkCellArray *newCellArray)
 {
   vtkIdType tab[4];
@@ -1132,8 +1133,7 @@ void vtkBoxClipDataSet::TetraGrid(vtkIdType typeobj, vtkIdType npts, vtkIdType *
         }
       break;
   
-    case 5: //VTK_PYRAMID nptos:5
-                      //Create 2 tetrahedra
+    case VTK_PYRAMID: //Create 2 tetrahedra
       if(npts== 5)
         {
         //note: the first element vpyram[][0] is the smallest index of pyramid
@@ -1158,6 +1158,10 @@ void vtkBoxClipDataSet::TetraGrid(vtkIdType typeobj, vtkIdType npts, vtkIdType *
         exit(0);
         }
       break;
+
+    default:
+
+      cout << " unhandled type, awaiting fix for this " << typeobj << endl;
     }
 }
 
