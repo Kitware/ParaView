@@ -57,7 +57,7 @@ void vtkKWToolbar::SetGlobalWidgetsFlatAspect(int val)
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWToolbar );
-vtkCxxRevisionMacro(vtkKWToolbar, "1.37");
+vtkCxxRevisionMacro(vtkKWToolbar, "1.38");
 
 int vtkKWToolbarCommand(ClientData cd, Tcl_Interp *interp,
                        int argc, char *argv[]);
@@ -271,7 +271,7 @@ vtkKWWidget* vtkKWToolbar::AddRadioButtonImage(int value,
   vtkKWRadioButton *rb = vtkKWRadioButton::New();
 
   rb->SetParent(this->GetFrame());
-  rb->Create(this->GetApplication(), "");
+  rb->Create(this->GetApplication(), NULL);
   rb->SetIndicator(0);
   rb->SetValue(value);
 
@@ -280,8 +280,7 @@ vtkKWWidget* vtkKWToolbar::AddRadioButtonImage(int value,
     this->Script(
       "%s configure -highlightthickness 0 -image %s -selectimage %s", 
       rb->GetWidgetName(), 
-      image_name, 
-      select_image_name ? select_image_name : image_name);
+      image_name, (select_image_name ? select_image_name : image_name));
     }
 
   if (object && method)
@@ -299,16 +298,65 @@ vtkKWWidget* vtkKWToolbar::AddRadioButtonImage(int value,
     rb->SetBalloonHelpString(help);
     }
 
-  if (extra)
-    {
-    this->Script("%s configure %s", rb->GetWidgetName(), extra);
-    }
+  this->ConfigureOptions(extra);
 
   this->AddWidget(rb);
 
   rb->Delete();
 
   return rb;
+}
+
+//----------------------------------------------------------------------------
+vtkKWWidget* vtkKWToolbar::AddCheckButtonImage(const char *image_name, 
+                                               const char *select_image_name, 
+                                               const char *variable_name, 
+                                               vtkKWObject *object, 
+                                               const char *method,
+                                               const char *help,
+                                               const char *extra)
+{
+  if (!this->IsCreated())
+    {
+    return 0;
+    }
+
+  vtkKWCheckButton *cb = vtkKWCheckButton::New();
+
+  cb->SetParent(this->GetFrame());
+  cb->Create(this->GetApplication(), NULL);
+  cb->SetIndicator(0);
+
+  if (image_name)
+    {
+    this->Script(
+      "%s configure -highlightthickness 0 -image %s -selectimage %s", 
+      cb->GetWidgetName(), 
+      image_name, (select_image_name ? select_image_name : image_name));
+    }
+
+  if (object && method)
+    {
+    cb->SetCommand(object, method);
+    }
+
+  if (variable_name)
+    {
+    cb->SetVariableName(variable_name);
+    }
+
+  if (help)
+    {
+    cb->SetBalloonHelpString(help);
+    }
+
+  this->ConfigureOptions(extra);
+
+  this->AddWidget(cb);
+
+  cb->Delete();
+
+  return cb;
 }
 
 //----------------------------------------------------------------------------

@@ -63,8 +63,18 @@ public:
 
   // Description:
   // Convenience method to create and add a specific type of widget 
+  // Note: for radiobutton, the variable_name should be the same for
+  //       each radiobutton in the set of radiobuttons.
+  //       for checkbutton, this is only optional (can be NULL)
   vtkKWWidget* AddRadioButtonImage(int value, 
                                    const char *image_name, 
+                                   const char *select_image_name, 
+                                   const char *variable_name,
+                                   vtkKWObject *object, 
+                                   const char *method, 
+                                   const char *help = 0,
+                                   const char *extra = 0);
+  vtkKWWidget* AddCheckButtonImage(const char *image_name, 
                                    const char *select_image_name, 
                                    const char *variable_name,
                                    vtkKWObject *object, 
