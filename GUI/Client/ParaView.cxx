@@ -247,6 +247,7 @@ int MyMain(int argc, char *argv[])
 
 #ifdef _WIN32
 #include <windows.h>
+#include "vtkDynamicLoader.h"
 
 int __stdcall WinMain(HINSTANCE vtkNotUsed(hInstance), 
                       HINSTANCE vtkNotUsed(hPrevInstance),
@@ -257,7 +258,19 @@ int __stdcall WinMain(HINSTANCE vtkNotUsed(hInstance),
   char**       argv;
   unsigned int i;
   int          j;
-
+  typedef void (* VOID_FUN)();
+  vtkLibHandle lib = vtkDynamicLoader::OpenLibrary("user32.dll");
+  if(lib)
+    {
+    VOID_FUN func = (VOID_FUN)
+      vtkDynamicLoader::GetSymbolAddress(lib, "DisableProcessWindowsGhosting");
+    if(func)
+      {
+      (*func)();
+      }
+    }
+  
+    
   // enable floating point exceptions on MSVC
 //  short m = 0x372;
 //  __asm
