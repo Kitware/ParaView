@@ -24,7 +24,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVVolumeAppearanceEditor);
-vtkCxxRevisionMacro(vtkPVVolumeAppearanceEditor, "1.1");
+vtkCxxRevisionMacro(vtkPVVolumeAppearanceEditor, "1.2");
 
 int vtkPVVolumeAppearanceEditorCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -59,8 +59,6 @@ void vtkPVVolumeAppearanceEditor::Create(vtkKWApplication *app)
 {
   vtkPVApplication *pvApp = vtkPVApplication::SafeDownCast(app);
   const char* wname;
-  const char *grid_settings = "-padx 1 -pady 2";
-  const char *label_settings = "-anchor w";
   
   if (this->Application)
     {
