@@ -46,7 +46,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWSplashScreen );
-vtkCxxRevisionMacro(vtkKWSplashScreen, "1.7");
+vtkCxxRevisionMacro(vtkKWSplashScreen, "1.8");
 
 //-----------------------------------------------------------------------------
 vtkKWSplashScreen::vtkKWSplashScreen()
@@ -72,7 +72,9 @@ vtkKWSplashScreen::~vtkKWSplashScreen()
 //-----------------------------------------------------------------------------
 void vtkKWSplashScreen::Create(vtkKWApplication *app, const char *args)
 {
-  if (this->Application)
+  // Set the application
+
+  if (this->IsCreated())
     {
     vtkErrorMacro("Dialog already created");
     return;
