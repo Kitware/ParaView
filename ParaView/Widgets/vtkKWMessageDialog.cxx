@@ -51,7 +51,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWMessageDialog );
-vtkCxxRevisionMacro(vtkKWMessageDialog, "1.35");
+vtkCxxRevisionMacro(vtkKWMessageDialog, "1.36");
 
 
 
@@ -246,11 +246,10 @@ int vtkKWMessageDialog::Invoke()
     {
     this->OKButton->Focus();
     }
-  else 
-    {
-    this->SetBind("<Right>", "focus [ tk_focusNext %W ]");
-    this->SetBind("<Left>", "focus [ tk_focusPrev %W ]");
-    }
+  this->OKButton->SetBind("<Right>", "focus [ tk_focusNext %W ]");
+  this->OKButton->SetBind("<Left>",  "focus [ tk_focusPrev %W ]");
+  this->CancelButton->SetBind("<Right>", "focus [ tk_focusNext %W ]");
+  this->CancelButton->SetBind("<Left>",  "focus [ tk_focusPrev %W ]");
   
   this->Script("wm resizable %s 0 0", this->GetWidgetName());
 

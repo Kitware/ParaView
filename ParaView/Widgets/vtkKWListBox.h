@@ -65,6 +65,7 @@ public:
   // Get the current selected string in the list
   const char *GetSelection();
   int GetSelectionIndex();
+  void SetSelectionIndex(int);
   
   // Description:
   // Add entries to an option menu, with or without a command.

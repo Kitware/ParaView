@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWMenu );
-vtkCxxRevisionMacro(vtkKWMenu, "1.27");
+vtkCxxRevisionMacro(vtkKWMenu, "1.28");
 
 
 
@@ -111,8 +111,11 @@ void vtkKWMenu::DisplayHelp(const char* widget)
   if(this->GetApplication()->GetMainInterp()->result)
     {
     vtkKWWindow* window = this->GetWindow();
-    window->SetStatusText(
-      this->GetApplication()->GetMainInterp()->result);
+    if ( window )
+      {
+      window->SetStatusText(
+        this->GetApplication()->GetMainInterp()->result);
+      }
     }
 }
 

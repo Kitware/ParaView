@@ -46,7 +46,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWListBox );
-vtkCxxRevisionMacro(vtkKWListBox, "1.11");
+vtkCxxRevisionMacro(vtkKWListBox, "1.12");
 
 
 int vtkKWListBoxCommand(ClientData cd, Tcl_Interp *interp,
@@ -95,6 +95,15 @@ const char* vtkKWListBox::GetItem(int index)
   delete [] this->Item;
   this->Item = strcpy(new char[strlen(result)+1], result);
   return this->Item;
+}
+
+void vtkKWListBox::SetSelectionIndex(int sel)
+{
+  if ( sel < 0 )
+    {
+    return;
+    }
+  this->Script("%s selection set %d", this->Listbox->GetWidgetName(), sel);
 }
 
 int vtkKWListBox::GetSelectionIndex()

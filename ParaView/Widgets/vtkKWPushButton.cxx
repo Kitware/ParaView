@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWPushButton );
-vtkCxxRevisionMacro(vtkKWPushButton, "1.8");
+vtkCxxRevisionMacro(vtkKWPushButton, "1.9");
 
 
 vtkKWPushButton::vtkKWPushButton()
@@ -77,11 +77,12 @@ void vtkKWPushButton::Create(vtkKWApplication *app, const char *args)
   wname = this->GetWidgetName();
   if (this->ButtonLabel)
     {
-    this->Script("button %s %s -text {%s}", wname,args,this->ButtonLabel);
+    this->Script("button %s %s -text {%s}", wname,(args?args:""),
+                 (this->ButtonLabel?this->ButtonLabel:""));
     }
   else
     {
-    this->Script("button %s %s", wname,args);
+    this->Script("button %s %s", wname,(args?args:""));
     }
 }
 
