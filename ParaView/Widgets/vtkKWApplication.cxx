@@ -85,7 +85,7 @@ int vtkKWApplication::WidgetVisibility = 1;
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.143");
+vtkCxxRevisionMacro(vtkKWApplication, "1.144");
 
 extern "C" int Vtktcl_Init(Tcl_Interp *interp);
 extern "C" int Vtkkwwidgetstcl_Init(Tcl_Interp *interp);
@@ -1555,6 +1555,17 @@ int vtkKWApplication::CheckForValuedArgument(
       }
     }
   return VTK_ERROR;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWApplication::HasCheckForUpdates()
+{
+  return 0;
+}
+
+//----------------------------------------------------------------------------
+void vtkKWApplication::CheckForUpdates()
+{
 }
 
 //----------------------------------------------------------------------------

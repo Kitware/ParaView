@@ -68,7 +68,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define VTK_KW_WINDOW_GEOMETRY_REG_KEY "WindowGeometry"
 #define VTK_KW_WINDOW_FRAME1_SIZE_REG_KEY "WindowFrame1Size"
 
-vtkCxxRevisionMacro(vtkKWWindow, "1.174");
+vtkCxxRevisionMacro(vtkKWWindow, "1.175");
 vtkCxxSetObjectMacro(vtkKWWindow, PropertiesParent, vtkKWWidget);
 
 #define VTK_KW_RECENT_FILES_MAX 20
@@ -401,6 +401,11 @@ void vtkKWWindow::Create(vtkKWApplication *app, char *args)
 
   this->MenuHelp->AddCommand("OnLine Help", this, "DisplayHelp", 0);
   this->MenuHelp->AddCommand("About", this, "DisplayAbout", 0);
+
+  if (app->HasCheckForUpdates())
+    {
+    this->MenuHelp->AddCommand("Check For Updates", app, "CheckForUpdates", 0);
+    }
 
   // Menubar separator
 

@@ -338,6 +338,12 @@ public:
   virtual void SetCharacterEncoding(int val);
   vtkGetMacro(CharacterEncoding, int);
   
+  // Description:
+  // Test if we have some logic to check for application update and
+  // eventually perform that check.
+  virtual int HasCheckForUpdates();
+  virtual void CheckForUpdates();
+  
 protected:
   vtkKWApplication();
   ~vtkKWApplication();
