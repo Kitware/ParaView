@@ -179,8 +179,9 @@ public:
 
   // Description:
   // Return 1 if the action is valid, so if there is script or there is some
-  // not none action.
-  int IsActionValid();
+  // not none action. If the argument has_source is 1, then the action will be
+  // valiad if the source is present.
+  int IsActionValid(int has_source = 0);
 
 protected:
   vtkPVAnimationInterfaceEntry();
