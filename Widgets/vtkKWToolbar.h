@@ -45,7 +45,7 @@ public:
   ~vtkKWToolbar();
   vtkKWToolbar(const vtkKWToolbar&) {};
   void operator=(const vtkKWToolbar&) {};
-  static vtkKWToolbar* New() {return new vtkKWToolbar;};
+  static vtkKWToolbar* New();
   const char *GetClassName() {return "vtkKWToolbar";};
 
   // Description:
