@@ -1746,7 +1746,7 @@
             value="Output">
       <PointSourceWidget trace_name="Point"
                          default_radius="0"
-                         default_number_fof_points="1"
+                         default_number_of_points="1"
                          show_entries="0"/>
       </Item>
         <Item label="Line"
