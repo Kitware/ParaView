@@ -55,7 +55,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWApplicationSettingsInterface);
-vtkCxxRevisionMacro(vtkKWApplicationSettingsInterface, "1.18");
+vtkCxxRevisionMacro(vtkKWApplicationSettingsInterface, "1.19");
 
 int vtkKWApplicationSettingsInterfaceCommand(ClientData cd, Tcl_Interp *interp,
                                              int argc, char *argv[]);
@@ -351,8 +351,8 @@ void vtkKWApplicationSettingsInterface::Create(vtkKWApplication *app)
   this->EnableDragAndDropCheckButton->SetBalloonHelpString(
     "When this option is enabled you can drag & drop elements of the "
     "interface within the same panel or from one panel to the other. "
-    "To do so, drag the title of a labeled frame and drop it to another "
-    "frame or to a tab in the notebook.");
+    "To do so, drag the title of a labeled frame to reposition it within "
+    "a panel, or drop it on another tab to move it to a different panel.");
 
   tk_cmd << "pack " << this->EnableDragAndDropCheckButton->GetWidgetName()
          << "  -side left -anchor w -expand no -fill none" << endl;
@@ -370,11 +370,12 @@ void vtkKWApplicationSettingsInterface::Create(vtkKWApplication *app)
   this->ResetDragAndDropButton->SetLabel("Reset Interface");
   this->ResetDragAndDropButton->SetCommand(this, "ResetDragAndDropCallback");
   this->ResetDragAndDropButton->SetBalloonHelpString(
-    "Reset the interface to its default state, discarding any Drag & Drop "
-    "events.");
+    "Reset the placement of all user interface elements, discarding any "
+    "Drag & Drop events.");
 
   tk_cmd << "pack " << this->ResetDragAndDropButton->GetWidgetName()
-         << "  -side left -anchor e -expand no -fill none" << endl;
+         << "  -side right -anchor e -padx 4 -ipadx 4 -expand no -fill none" 
+         << endl;
 
   // --------------------------------------------------------------
   // Toolbar settings : main frame
