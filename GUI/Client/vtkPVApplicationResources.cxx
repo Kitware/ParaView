@@ -576,7 +576,7 @@ void vtkPVApplication::CreatePhoto(const char *name,
                                    const char *filename)
 {
   char dir[1024];
-  sprintf(dir, "%s/../GUI/Client/Resources", VTK_PV_SOURCE_CONFIG_DIR, name);
+  sprintf(dir, "%s/../GUI/Client/Resources", VTK_PV_SOURCE_CONFIG_DIR);
   if (!vtkKWTkUtilities::UpdateOrLoadPhoto(
         this->GetMainInterp(),
         name, 
