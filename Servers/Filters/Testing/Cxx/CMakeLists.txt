@@ -1,5 +1,6 @@
 INCLUDE_DIRECTORIES(
   ${ParaView_SOURCE_DIR}/VTK/Common/Testing/Cxx/
+  ${ParaView_SOURCE_DIR}/VTK/Rendering/Testing/Cxx/
   )
 
 SET(ServersFilters_SRCS
