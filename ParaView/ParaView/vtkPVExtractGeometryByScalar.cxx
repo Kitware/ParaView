@@ -53,7 +53,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //---------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVExtractGeometryByScalar);
-vtkCxxRevisionMacro(vtkPVExtractGeometryByScalar, "1.6");
+vtkCxxRevisionMacro(vtkPVExtractGeometryByScalar, "1.6.2.1");
 
 int vtkPVExtractGeometryByScalarCommand(ClientData cd, Tcl_Interp *interp,
                                         int argc, char *argv[]);
@@ -100,7 +100,9 @@ void vtkPVExtractGeometryByScalar::CreateProperties()
 }
 
 //---------------------------------------------------------------------------
-void vtkPVExtractGeometryByScalar::SaveInTclScript(ofstream* vtkNotUsed(file))
+void vtkPVExtractGeometryByScalar::SaveInTclScript(ofstream* vtkNotUsed(file),
+                                                   int vtkNotUsed(interactiveFlag), 
+                                                   int vtkNotUsed(vtkFlag))
 {
 }
 

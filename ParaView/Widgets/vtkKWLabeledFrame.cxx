@@ -51,7 +51,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLabeledFrame );
-vtkCxxRevisionMacro(vtkKWLabeledFrame, "1.18.2.5");
+vtkCxxRevisionMacro(vtkKWLabeledFrame, "1.18.2.6");
 
 
 
@@ -111,7 +111,7 @@ void vtkKWLabeledFrame::SetLabel(const char *text)
     }
   else
     {
-    int length = strlen(text);
+    size_t length = strlen(text);
     buffer = new char [length + 1];
     strcpy(buffer, text);
     char *convert = buffer + 1;

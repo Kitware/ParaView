@@ -66,7 +66,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVInteractorStyleControl );
-vtkCxxRevisionMacro(vtkPVInteractorStyleControl, "1.19.2.1");
+vtkCxxRevisionMacro(vtkPVInteractorStyleControl, "1.19.2.2");
 
 vtkCxxSetObjectMacro(vtkPVInteractorStyleControl,ManipulatorCollection,
                      vtkCollection);
@@ -607,7 +607,7 @@ void vtkPVInteractorStyleControl::Create(vtkKWApplication *app, const char*)
   this->Labels[4]->SetLabel("Shift");
   this->Labels[5]->SetLabel("Control");
 
-  char *grid_settings = " -sticky news -padx 1 -pady 1";
+  const char *grid_settings = " -sticky news -padx 1 -pady 1";
 
   this->Script("grid x %s %s %s %s", 
                this->Labels[0]->GetWidgetName(), 

@@ -104,7 +104,7 @@ static unsigned char image_properties[] =
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.213.2.14");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.213.2.15");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -1426,7 +1426,7 @@ void vtkPVRenderView::CreateViewProperties()
   this->StandardViewsFrame->Create(this->Application);
   this->StandardViewsFrame->SetLabel("Standard Views");
 
-  char *views_grid_settings = " -padx 1 -pady 1 -ipadx 5 -sticky ew";
+  const char *views_grid_settings = " -padx 1 -pady 1 -ipadx 5 -sticky ew";
 
   this->XMaxViewButton->SetParent(this->StandardViewsFrame->GetFrame());
   this->XMaxViewButton->SetLabel("+X");
@@ -1484,7 +1484,7 @@ void vtkPVRenderView::CreateViewProperties()
     int x, y;
     this->CameraIcons[cc]->SetRenderView(this);
     this->CameraIcons[cc]->SetParent(cframe);
-    this->CameraIcons[cc]->Create(this->Application);
+    this->CameraIcons[cc]->Create(this->Application, "");
 
     x = cc % 3;
     y = cc / 3;
@@ -2567,7 +2567,7 @@ void vtkPVRenderView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVRenderView ";
-  this->ExtractRevision(os,"$Revision: 1.213.2.14 $");
+  this->ExtractRevision(os,"$Revision: 1.213.2.15 $");
 }
 
 //------------------------------------------------------------------------------

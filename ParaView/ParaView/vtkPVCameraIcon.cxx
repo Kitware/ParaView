@@ -56,7 +56,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCameraIcon);
-vtkCxxRevisionMacro(vtkPVCameraIcon, "1.4.2.1");
+vtkCxxRevisionMacro(vtkPVCameraIcon, "1.4.2.2");
 
 vtkCxxSetObjectMacro(vtkPVCameraIcon,RenderView,vtkPVRenderView);
 
@@ -81,9 +81,9 @@ vtkPVCameraIcon::~vtkPVCameraIcon()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVCameraIcon::Create(vtkKWApplication *pvApp)
+void vtkPVCameraIcon::Create(vtkKWApplication *pvApp, const char *args)
 {
-  this->Superclass::Create(pvApp, 0);
+  this->Superclass::Create(pvApp, args);
 
   this->SetBind(this, "<Button-1>", "RestoreCamera");
   this->SetBind(this, "<Button-3>", "StoreCamera");
