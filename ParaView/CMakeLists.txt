@@ -38,7 +38,6 @@ vtkPVTreeComposite
 vtkPVWindow 
 vtkPVWorldPointPicker 
 vtkSimpleFieldDataToAttributeDataFilter 
-vtkSingleContourFilter 
 vtkStringList 
 )
 
