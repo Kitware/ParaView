@@ -62,7 +62,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.329");
+vtkCxxRevisionMacro(vtkPVSource, "1.330");
 
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
@@ -259,9 +259,20 @@ vtkPVSource::~vtkPVSource()
   this->SetModuleName(0);
 }
 
+//----------------------------------------------------------------------------
+void vtkPVSource::AddPVInput(vtkPVSource *pvs)
+{
+  this->SetPVInputInternal(this->NumberOfPVInputs, pvs, 0);
+}
 
 //----------------------------------------------------------------------------
 void vtkPVSource::SetPVInput(int idx, vtkPVSource *pvs)
+{
+  this->SetPVInputInternal(idx, pvs, 1);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVSource::SetPVInputInternal(int idx, vtkPVSource *pvs, int doInit)
 {
   int partIdx, numParts;
   vtkPVPart *part;
@@ -309,11 +320,18 @@ void vtkPVSource::SetPVInput(int idx, vtkPVSource *pvs)
   vtkClientServerStream& stream = pm->GetStream();
   if (this->VTKMultipleInputsFlag)
     {
+    sourceID = this->GetVTKSourceID(0);
+    if (doInit)
+      {
+      stream << vtkClientServerStream::Invoke 
+             << sourceID << "RemoveAllInputs"
+             << vtkClientServerStream::End;
+      pm->SendStreamToServer();
+      }
     for (partIdx = 0; partIdx < numParts; ++partIdx)
       {
       part = pvs->GetPart(partIdx);
       // Only one source takes all parts as input.
-      sourceID = this->GetVTKSourceID(0);
       if (part->GetVTKDataID().ID == 0 || sourceID.ID == 0)
         { // Sanity check.
         vtkErrorMacro("Missing id.");
@@ -322,7 +340,8 @@ void vtkPVSource::SetPVInput(int idx, vtkPVSource *pvs)
         {
         ostrstream str;
         str << "Add" << inputName << ends;
-        stream << vtkClientServerStream::Invoke << sourceID << str.str() << part->GetVTKDataID() 
+        stream << vtkClientServerStream::Invoke 
+               << sourceID << str.str() << part->GetVTKDataID() 
                << vtkClientServerStream::End;
         pm->SendStreamToServer();
         delete []str.str();
@@ -351,7 +370,8 @@ void vtkPVSource::SetPVInput(int idx, vtkPVSource *pvs)
         {
         ostrstream str;
         str << "Set" << inputName << ends;
-        stream << vtkClientServerStream::Invoke << sourceID << str.str() << part->GetVTKDataID() 
+        stream << vtkClientServerStream::Invoke 
+               << sourceID << str.str() << part->GetVTKDataID() 
                << vtkClientServerStream::End;
         pm->SendStreamToServer();
         delete [] str.str();
@@ -1779,7 +1799,8 @@ void vtkPVSource::RemoveAllPVInputs()
 {
   if ( this->PVInputs )
     {
-    for (int idx = 0; idx < this->NumberOfPVInputs; ++idx)
+    int idx;
+    for (idx = 0; idx < this->NumberOfPVInputs; ++idx)
       {
       this->SetNthPVInput(idx, NULL);
       }
@@ -1787,6 +1808,25 @@ void vtkPVSource::RemoveAllPVInputs()
     delete [] this->PVInputs;
     this->PVInputs = NULL;
     this->NumberOfPVInputs = 0;
+
+    // Make sure to disconnect all VTK filters as well
+    vtkPVApplication *pvApp = this->GetPVApplication();
+    if (pvApp)
+      {
+      vtkPVProcessModule* pm = pvApp->GetProcessModule();
+
+      int numSources = this->GetNumberOfVTKSources();
+      vtkClientServerStream& stream = pm->GetStream();
+      for (idx = 0; idx < numSources; ++idx)
+        {
+        vtkClientServerID sourceID = this->GetVTKSourceID(idx);
+        stream << vtkClientServerStream::Invoke 
+               << sourceID << "RemoveAllInputs"
+               << vtkClientServerStream::End;
+        }
+      pm->SendStreamToServer();
+      }
+
     this->Modified();
     }
 }

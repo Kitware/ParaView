@@ -95,11 +95,25 @@ public:
   void SetVisibilityInternal(int v);
 
   // Description:
-  // Although not all sources will need or use this input, I want to 
-  // avoid duplicating VTK's source class structure.
-  virtual void SetPVInput(int idx, vtkPVSource *input);
-  virtual vtkPVSource* GetPVInput(int idx) {return this->GetNthPVInput(idx);}
+  // Connect an input to this pvsource. 
+  // Note: SetPVInput() first disconnects all inputs of the
+  // internal VTK filter whereas AddPVInput() does not.
+  // See vtkPVGroupInputsWidgets for an example of how
+  // AddPVInput() is used.
+  void AddPVInput(vtkPVSource *input);
+  void SetPVInput(int idx, vtkPVSource *input);
+
+  // Description:
+  // Return an input given idx.
+  vtkPVSource* GetPVInput(int idx) {return this->GetNthPVInput(idx);}
+
+  // Description:
+  // Return the number of inputs.
   vtkGetMacro(NumberOfPVInputs, int);
+
+  // Description:
+  // Remove all inputs of this pvsource and disconnect all the
+  // inputs of all VTK filters in this pvsource.
   void RemoveAllPVInputs();
 
   // Description:
@@ -445,6 +459,8 @@ protected:
   ~vtkPVSource();
 
   vtkCollection *Parts;
+
+  void SetPVInputInternal(int idx, vtkPVSource *input, int doInit);
 
   // Description:
   // This method collects data information from all processes.
