@@ -109,11 +109,6 @@ public:
   int GetNumberOfVisibleButtons();
 
   // Description:
-  // Enable/Disable this widget. This propagates SetEnabled() calls to all
-  // radiobuttons.
-  virtual void SetEnabled(int);
-
-  // Description:
   // Set the widget packing order to be horizontal (default is vertical).
   void SetPackHorizontally(int);
   vtkBooleanMacro(PackHorizontally, int);
@@ -150,6 +145,10 @@ protected:
   //ETX
 
   void Pack();
+
+  // Update the enable state. This should propagate similar calls to the
+  // internal widgets.
+  virtual void UpdateEnableState();
 
 private:
   vtkKWRadioButtonSet(const vtkKWRadioButtonSet&); // Not implemented
