@@ -70,7 +70,7 @@ int vtkKWApplication::WidgetVisibility = 1;
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.118");
+vtkCxxRevisionMacro(vtkKWApplication, "1.119");
 
 extern "C" int Vtktcl_Init(Tcl_Interp *interp);
 extern "C" int Vtkkwwidgetstcl_Init(Tcl_Interp *interp);
@@ -1129,6 +1129,8 @@ void vtkKWApplication::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "HasSplashScreen: " << (this->HasSplashScreen ? "on":"off") << endl;
   os << indent << "ShowSplashScreen: " << (this->ShowSplashScreen ? "on":"off") << endl;
   os << indent << "ApplicationExited: " << this->ApplicationExited << endl;
+  os << indent << "ApplicationInstallationDirectory: " 
+     << (this->ApplicationInstallationDirectory ? ApplicationInstallationDirectory : "None") << endl;
 }
 
 
