@@ -257,6 +257,10 @@ public:
   };
 //ETX
 
+  // Description:
+  // If the PVRenderView is set, render it
+  virtual void RenderView();
+
 protected:
   vtkPVColorMap();
   ~vtkPVColorMap();
@@ -297,8 +301,6 @@ protected:
   vtkSetStringMacro(LookupTableTclName);
 
   vtkPVRenderView *PVRenderView;
-
-  virtual void RenderView();
 
   int Initialized;
   int ScalarBarVisibility;
