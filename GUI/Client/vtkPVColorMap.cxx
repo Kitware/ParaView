@@ -63,7 +63,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVColorMap);
-vtkCxxRevisionMacro(vtkPVColorMap, "1.115");
+vtkCxxRevisionMacro(vtkPVColorMap, "1.116");
 
 int vtkPVColorMapCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -369,13 +369,13 @@ void vtkPVColorMap::Create(vtkKWApplication *app)
   this->ColorMapFrame->SetParent(this);
   this->ColorMapFrame->ShowHideFrameOn();
   this->ColorMapFrame->Create(app, 0);
-  this->ColorMapFrame->SetLabel("Color Map");
+  this->ColorMapFrame->SetLabelText("Color Map");
 
   // Color map: parameter name
 
   this->ArrayNameLabel->SetParent(this->ColorMapFrame->GetFrame());
   this->ArrayNameLabel->Create(app, "-anchor w");
-  this->ArrayNameLabel->SetLabel("Parameter: ");
+  this->ArrayNameLabel->SetText("Parameter: ");
 
   // Color map: range
   this->ScalarRangeFrame->SetParent(this->ColorMapFrame->GetFrame());
@@ -497,7 +497,7 @@ void vtkPVColorMap::Create(vtkKWApplication *app)
     this->VectorFrame->SetParent(this);
     this->VectorFrame->ShowHideFrameOn();
     this->VectorFrame->Create(app, 0);
-    this->VectorFrame->SetLabel("Vector");
+    this->VectorFrame->SetLabelText("Vector");
 
     this->VectorModeMenu->SetParent(this->VectorFrame->GetFrame());
     this->VectorModeMenu->Create(app, "");
@@ -523,7 +523,7 @@ void vtkPVColorMap::Create(vtkKWApplication *app)
   this->ScalarBarFrame->SetParent(this);
   this->ScalarBarFrame->ShowHideFrameOn();
   this->ScalarBarFrame->Create(app, 0);
-  this->ScalarBarFrame->SetLabel("Scalar Bar");
+  this->ScalarBarFrame->SetLabelText("Scalar Bar");
 
   // Scalar bar : Visibility
 
@@ -540,7 +540,7 @@ void vtkPVColorMap::Create(vtkKWApplication *app)
   this->ScalarBarTitleFrame->Create(app, "frame", "-bd 0");
 
   this->ScalarBarTitleLabel->SetParent(this->ScalarBarTitleFrame);
-  this->ScalarBarTitleLabel->SetLabel("Title:");
+  this->ScalarBarTitleLabel->SetText("Title:");
   this->ScalarBarTitleLabel->Create(app, label_settings);
   
   this->ScalarBarTitleEntry->SetParent(this->ScalarBarTitleFrame);
@@ -602,7 +602,7 @@ void vtkPVColorMap::Create(vtkKWApplication *app)
   this->ScalarBarLabelFormatFrame->Create(app, "frame", "-bd 0");
 
   this->ScalarBarLabelFormatLabel->SetParent(this->ScalarBarLabelFormatFrame);
-  this->ScalarBarLabelFormatLabel->SetLabel("Labels:");
+  this->ScalarBarLabelFormatLabel->SetText("Labels:");
   this->ScalarBarLabelFormatLabel->Create(app, label_settings);
   
   this->ScalarBarLabelFormatEntry->SetParent(this->ScalarBarLabelFormatFrame);
@@ -1062,7 +1062,7 @@ void vtkPVColorMap::SetArrayName(const char* str)
     char *tmp;
     tmp = new char[strlen(str)+128];
     sprintf(tmp, "Parameter: %s", str);
-    this->ArrayNameLabel->SetLabel(tmp);
+    this->ArrayNameLabel->SetText(tmp);
     delete [] tmp;
     }
 

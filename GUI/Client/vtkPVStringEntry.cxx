@@ -30,7 +30,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVStringEntry);
-vtkCxxRevisionMacro(vtkPVStringEntry, "1.42");
+vtkCxxRevisionMacro(vtkPVStringEntry, "1.43");
 
 //----------------------------------------------------------------------------
 vtkPVStringEntry::vtkPVStringEntry()
@@ -56,7 +56,7 @@ vtkPVStringEntry::~vtkPVStringEntry()
 void vtkPVStringEntry::SetLabel(const char* label)
 {
   this->SetEntryLabel(label);
-  this->LabelWidget->SetLabel(label);
+  this->LabelWidget->SetText(label);
 }
 
 //----------------------------------------------------------------------------
@@ -118,7 +118,7 @@ void vtkPVStringEntry::Create(vtkKWApplication *pvApp)
   if (this->EntryLabel && this->EntryLabel[0] != '\0')
     {
     this->LabelWidget->Create(pvApp, "-width 18 -justify right");
-    this->LabelWidget->SetLabel(this->EntryLabel);
+    this->LabelWidget->SetText(this->EntryLabel);
     this->Script("pack %s -side left", this->LabelWidget->GetWidgetName());
     }
   

@@ -43,7 +43,7 @@
 #include "vtkKWPushButton.h"
 #include "vtkSMStringVectorProperty.h"
 
-vtkCxxRevisionMacro(vtkPVKeyFrame, "1.6");
+vtkCxxRevisionMacro(vtkPVKeyFrame, "1.7");
 //*****************************************************************************
 class vtkPVKeyFrameObserver : public vtkCommand
 {
@@ -177,7 +177,7 @@ void vtkPVKeyFrame::ChildCreate(vtkKWApplication* app)
 {
   this->TimeLabel->SetParent(this);
   this->TimeLabel->Create(app, 0);
-  this->TimeLabel->SetLabel("Time:");
+  this->TimeLabel->SetText("Time:");
   
   this->TimeThumbWheel->SetParent(this);
   this->TimeThumbWheel->PopupModeOn();
@@ -193,18 +193,18 @@ void vtkPVKeyFrame::ChildCreate(vtkKWApplication* app)
 
   this->ValueLabel->SetParent(this);
   this->ValueLabel->Create(app, 0);
-  this->ValueLabel->SetLabel("Value:");
+  this->ValueLabel->SetText("Value:");
   this->CreateValueWidget();
 
   this->MinButton->SetParent(this);
   this->MinButton->Create(this->GetApplication(),0);
-  this->MinButton->SetLabel("min");
+  this->MinButton->SetText("min");
   this->MinButton->SetBalloonHelpString("Set the value to the minimum possible, given the "
     "current state of the system.");
   this->MinButton->SetCommand(this,"MinimumCallback");
   this->MaxButton->SetParent(this);
   this->MaxButton->Create(this->GetApplication(),0);
-  this->MaxButton->SetLabel("max");
+  this->MaxButton->SetText("max");
   this->MaxButton->SetBalloonHelpString("Set the value to the maximum possible, given the "
     "current state of the system.");
   this->MaxButton->SetCommand(this, "MaximumCallback");

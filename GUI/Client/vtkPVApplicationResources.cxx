@@ -508,7 +508,7 @@ void vtkPVApplication::ConfigureAbout()
       {
       this->SaveRuntimeInfoButton->SetParent(
         this->AboutDialog->GetBottomFrame());
-      this->SaveRuntimeInfoButton->SetLabel("Save Information");
+      this->SaveRuntimeInfoButton->SetText("Save Information");
       this->SaveRuntimeInfoButton->Create(this, "-width 16");
       this->SaveRuntimeInfoButton->SetCommand(this, "SaveRuntimeInformation");
       }

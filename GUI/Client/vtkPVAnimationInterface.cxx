@@ -178,7 +178,7 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterface);
-vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.179");
+vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.180");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterface,ControlledWidget, vtkPVWidget);
 
@@ -422,7 +422,7 @@ void vtkPVAnimationInterface::Create(vtkKWApplication *app, const char *args)
   this->ControlFrame->SetParent(this->TopFrame->GetFrame());
   this->ControlFrame->ShowHideFrameOn();
   this->ControlFrame->Create(app, 0);
-  this->ControlFrame->SetLabel("Animation Control");
+  this->ControlFrame->SetLabelText("Animation Control");
 
   this->ControlButtonFrame->SetParent(this->ControlFrame->GetFrame());
   this->ControlButtonFrame->Create(app, "frame", "");
@@ -524,7 +524,7 @@ void vtkPVAnimationInterface::Create(vtkKWApplication *app, const char *args)
   this->NumberOfFramesEntry->SetParent(this->TimeFrame);
   this->NumberOfFramesEntry->Create(app);
   this->NumberOfFramesEntry->GetWidget()->SetWidth(6);
-  this->NumberOfFramesEntry->SetLabel("Number Of Frames:");
+  this->NumberOfFramesEntry->GetLabel()->SetText("Number Of Frames:");
   this->NumberOfFramesEntry->GetWidget()->SetValue(this->NumberOfFrames);
 
 
@@ -560,7 +560,7 @@ void vtkPVAnimationInterface::Create(vtkKWApplication *app, const char *args)
   this->AnimationEntriesFrame->SetParent(this->TopFrame->GetFrame());
   this->AnimationEntriesFrame->ShowHideFrameOn();
   this->AnimationEntriesFrame->Create(app, 0);
-  this->AnimationEntriesFrame->SetLabel("Actions");
+  this->AnimationEntriesFrame->SetLabelText("Actions");
   this->AnimationEntryInformation->SetParent(this->AnimationEntriesFrame->GetFrame());
   this->AnimationEntryInformation->Create(app, 0);
   this->AnimationEntriesMenu->SetParent(this->AnimationEntriesFrame->GetFrame());
@@ -570,10 +570,10 @@ void vtkPVAnimationInterface::Create(vtkKWApplication *app, const char *args)
   frame->Create(app, 0);
   this->AddItemButton->SetParent(frame->GetFrame());
   this->AddItemButton->Create(app, 0);
-  this->AddItemButton->SetLabel("Add Action");
+  this->AddItemButton->SetText("Add Action");
   this->DeleteItemButton->SetParent(frame->GetFrame());
   this->DeleteItemButton->Create(app, 0);
-  this->DeleteItemButton->SetLabel("Delete Action");
+  this->DeleteItemButton->SetText("Delete Action");
   this->Script("pack %s %s %s -side top -fill both -expand 1", 
     this->AnimationEntriesMenu->GetWidgetName(),
     this->AnimationEntryInformation->GetWidgetName(),
@@ -601,7 +601,7 @@ void vtkPVAnimationInterface::Create(vtkKWApplication *app, const char *args)
   this->ActionFrame->SetParent(this->TopFrame->GetFrame());
   this->ActionFrame->ShowHideFrameOn();
   this->ActionFrame->Create(app, 0);
-  this->ActionFrame->SetLabel("Script");
+  this->ActionFrame->SetLabelText("Script");
 
   // Action frame: Script check button and script editor
 
@@ -632,17 +632,17 @@ void vtkPVAnimationInterface::Create(vtkKWApplication *app, const char *args)
   // Save frame stuff
   this->SaveFrame->SetParent(this->TopFrame->GetFrame());
   this->SaveFrame->ShowHideFrameOn();
-  this->SaveFrame->SetLabel("Save");
+  this->SaveFrame->SetLabelText("Save");
   this->SaveFrame->Create(app, 0);
   this->SaveButtonFrame->SetParent(this->SaveFrame->GetFrame());
   this->SaveButtonFrame->Create(app, "frame", 0);
   this->SaveImagesButton->SetParent(this->SaveButtonFrame);
   this->SaveImagesButton->Create(app, 0);
-  this->SaveImagesButton->SetLabel("Save Animation");
+  this->SaveImagesButton->SetText("Save Animation");
   this->SaveImagesButton->SetCommand(this, "SaveImagesCallback");
   this->SaveGeometryButton->SetParent(this->SaveButtonFrame);
   this->SaveGeometryButton->Create(app, 0);
-  this->SaveGeometryButton->SetLabel("Save Geometry");
+  this->SaveGeometryButton->SetText("Save Geometry");
   this->SaveGeometryButton->SetCommand(this, "SaveGeometryCallback");
   this->Script("pack %s %s -side left -expand t -fill x -padx 2 -pady 2", 
                this->SaveImagesButton->GetWidgetName(),
@@ -1322,13 +1322,13 @@ void vtkPVAnimationInterface::SaveImagesCallback()
     int origHeight = this->View->GetRenderWindowSize()[1];
 
     vtkKWEntryLabeled *widthEntry = vtkKWEntryLabeled::New();
-    widthEntry->SetLabel("Width:");
+    widthEntry->GetLabel()->SetText("Width:");
     widthEntry->SetParent(frame);
     widthEntry->Create(this->GetApplication(), "");
     widthEntry->GetWidget()->SetValue(origWidth);
 
     vtkKWEntryLabeled *heightEntry = vtkKWEntryLabeled::New();
-    heightEntry->SetLabel("Height:");
+    heightEntry->GetLabel()->SetText("Height:");
     heightEntry->SetParent(frame);
     heightEntry->Create(this->GetApplication(), "");
     heightEntry->GetWidget()->SetValue(origHeight);

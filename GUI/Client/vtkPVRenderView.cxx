@@ -131,7 +131,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.355");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.356");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -289,7 +289,7 @@ void vtkPVRenderView::ShowNavigationWindowCallback(int registery)
                this->NavigationFrame->GetFrame()->GetWidgetName());
   this->Script("pack %s -fill both -expand t -side top -anchor n", 
                this->NavigationWindow->GetWidgetName());
-  this->NavigationFrame->SetLabel("Navigation Window");
+  this->NavigationFrame->SetLabelText("Navigation Window");
   this->ShowSelectionWindow = 0;
   this->ShowNavigationWindow = 1;
 
@@ -317,7 +317,7 @@ void vtkPVRenderView::ShowSelectionWindowCallback(int registery)
                this->NavigationFrame->GetFrame()->GetWidgetName());
   this->Script("pack %s -fill both -expand t -side top -anchor n", 
                this->SelectionWindow->GetWidgetName());
-  this->NavigationFrame->SetLabel("Selection Window");
+  this->NavigationFrame->SetLabelText("Selection Window");
   this->ShowNavigationWindow = 0;
   this->ShowSelectionWindow = 1;
 
@@ -708,7 +708,7 @@ void vtkPVRenderView::Create(vtkKWApplication *app, const char *args)
   this->NavigationFrame->SetParent(this->SplitFrame->GetFrame1());
   this->NavigationFrame->ShowHideFrameOff();
   this->NavigationFrame->Create(app, 0);
-  this->NavigationFrame->SetLabel("Navigation");
+  this->NavigationFrame->SetLabelText("Navigation");
   this->Script("pack %s -fill both -expand t -side top", 
                this->NavigationFrame->GetWidgetName());
 
@@ -916,7 +916,7 @@ void vtkPVRenderView::CreateViewProperties()
   this->RenderParametersFrame->SetParent(this->GeneralProperties->GetFrame());
   this->RenderParametersFrame->ShowHideFrameOn();
   this->RenderParametersFrame->Create(this->GetApplication(),0);
-  this->RenderParametersFrame->SetLabel("Advanced Render Parameters");
+  this->RenderParametersFrame->SetLabelText("Advanced Render Parameters");
   this->Script("pack %s -padx 2 -pady 2 -fill x -expand yes -anchor w",
                this->RenderParametersFrame->GetWidgetName());
 
@@ -1025,7 +1025,7 @@ void vtkPVRenderView::CreateViewProperties()
   this->InterfaceSettingsFrame->SetParent(this->GeneralProperties->GetFrame());
   this->InterfaceSettingsFrame->ShowHideFrameOn();
   this->InterfaceSettingsFrame->Create(this->GetApplication(),0);
-  this->InterfaceSettingsFrame->SetLabel("3D Interface Settings");
+  this->InterfaceSettingsFrame->SetLabelText("3D Interface Settings");
   this->Script("pack %s -padx 2 -pady 2 -fill x -expand yes -anchor w",
                this->InterfaceSettingsFrame->GetWidgetName());
 
@@ -1062,7 +1062,7 @@ void vtkPVRenderView::CreateViewProperties()
   this->OrientationAxesFrame->SetParent(this->AnnotationProperties->GetFrame());
   this->OrientationAxesFrame->ShowHideFrameOn();
   this->OrientationAxesFrame->Create(this->GetApplication(), 0);
-  this->OrientationAxesFrame->SetLabel("Orientation Axes");
+  this->OrientationAxesFrame->SetLabelText("Orientation Axes");
   this->Script("pack %s -padx 2 -pady 2 -fill x -expand yes -anchor w",
                this->OrientationAxesFrame->GetWidgetName());
   
@@ -1113,7 +1113,7 @@ void vtkPVRenderView::CreateViewProperties()
   
   this->OrientationAxesOutlineColor->SetParent(
     this->OrientationAxesFrame->GetFrame());
-  this->OrientationAxesOutlineColor->SetLabel("Set Outline Color");
+  this->OrientationAxesOutlineColor->GetLabel()->SetText("Set Outline Color");
   this->OrientationAxesOutlineColor->Create(this->GetApplication(), 0);
   this->OrientationAxesOutlineColor->SetCommand(this, "SetOrientationAxesOutlineColor");
   this->OrientationAxesOutlineColor->SetBalloonHelpString(
@@ -1140,7 +1140,7 @@ void vtkPVRenderView::CreateViewProperties()
   
   this->OrientationAxesTextColor->SetParent(
     this->OrientationAxesFrame->GetFrame());
-  this->OrientationAxesTextColor->SetLabel("Set Axis Label Color");
+  this->OrientationAxesTextColor->GetLabel()->SetText("Set Axis Label Color");
   this->OrientationAxesTextColor->Create(this->GetApplication(), 0);
   this->OrientationAxesTextColor->SetCommand(this, "SetOrientationAxesTextColor");
   this->OrientationAxesTextColor->SetBalloonHelpString(
@@ -1212,12 +1212,12 @@ void vtkPVRenderView::CreateViewProperties()
   this->StandardViewsFrame->SetParent( frame->GetFrame() );
   this->StandardViewsFrame->ShowHideFrameOn();
   this->StandardViewsFrame->Create(this->GetApplication(), 0);
-  this->StandardViewsFrame->SetLabel("Standard Views");
+  this->StandardViewsFrame->SetLabelText("Standard Views");
 
   const char *views_grid_settings = " -padx 1 -pady 1 -ipadx 5 -sticky ew";
 
   this->XMaxViewButton->SetParent(this->StandardViewsFrame->GetFrame());
-  this->XMaxViewButton->SetLabel("+X");
+  this->XMaxViewButton->SetText("+X");
   this->XMaxViewButton->Create(this->GetApplication(), "");
   this->XMaxViewButton->SetCommand(this, "StandardViewCallback 1 0 0");
   this->XMaxViewButton->SetBalloonHelpString(
@@ -1226,7 +1226,7 @@ void vtkPVRenderView::CreateViewProperties()
                this->XMaxViewButton->GetWidgetName(), views_grid_settings);
 
   this->XMinViewButton->SetParent(this->StandardViewsFrame->GetFrame());
-  this->XMinViewButton->SetLabel("-X");
+  this->XMinViewButton->SetText("-X");
   this->XMinViewButton->Create(this->GetApplication(), "");
   this->XMinViewButton->SetCommand(this, "StandardViewCallback -1 0 0");
   this->XMinViewButton->SetBalloonHelpString(
@@ -1235,7 +1235,7 @@ void vtkPVRenderView::CreateViewProperties()
                this->XMinViewButton->GetWidgetName(), views_grid_settings);
 
   this->YMaxViewButton->SetParent(this->StandardViewsFrame->GetFrame());
-  this->YMaxViewButton->SetLabel("+Y");
+  this->YMaxViewButton->SetText("+Y");
   this->YMaxViewButton->Create(this->GetApplication(), "");
   this->YMaxViewButton->SetCommand(this, "StandardViewCallback 0 1 0");
   this->YMaxViewButton->SetBalloonHelpString(
@@ -1244,7 +1244,7 @@ void vtkPVRenderView::CreateViewProperties()
                this->YMaxViewButton->GetWidgetName(), views_grid_settings);
 
   this->YMinViewButton->SetParent(this->StandardViewsFrame->GetFrame());
-  this->YMinViewButton->SetLabel("-Y");
+  this->YMinViewButton->SetText("-Y");
   this->YMinViewButton->Create(this->GetApplication(), "");
   this->YMinViewButton->SetCommand(this, "StandardViewCallback 0 -1 0");
   this->YMinViewButton->SetBalloonHelpString(
@@ -1253,7 +1253,7 @@ void vtkPVRenderView::CreateViewProperties()
                this->YMinViewButton->GetWidgetName(), views_grid_settings);
 
   this->ZMaxViewButton->SetParent(this->StandardViewsFrame->GetFrame());
-  this->ZMaxViewButton->SetLabel("+Z");
+  this->ZMaxViewButton->SetText("+Z");
   this->ZMaxViewButton->Create(this->GetApplication(), "");
   this->ZMaxViewButton->SetCommand(this, "StandardViewCallback 0 0 1");
   this->ZMaxViewButton->SetBalloonHelpString(
@@ -1262,7 +1262,7 @@ void vtkPVRenderView::CreateViewProperties()
                this->ZMaxViewButton->GetWidgetName(), views_grid_settings);
 
   this->ZMinViewButton->SetParent(this->StandardViewsFrame->GetFrame());
-  this->ZMinViewButton->SetLabel("-Z");
+  this->ZMinViewButton->SetText("-Z");
   this->ZMinViewButton->Create(this->GetApplication(), "");
   this->ZMinViewButton->SetCommand(this, "StandardViewCallback 0 0 -1");
   this->ZMinViewButton->SetBalloonHelpString(
@@ -1276,7 +1276,7 @@ void vtkPVRenderView::CreateViewProperties()
   this->CameraIconsFrame->SetParent(frame->GetFrame());
   this->CameraIconsFrame->ShowHideFrameOn();
   this->CameraIconsFrame->Create(this->GetApplication(), 0);
-  this->CameraIconsFrame->SetLabel("Stored Camera Positions");
+  this->CameraIconsFrame->SetLabelText("Stored Camera Positions");
 
   vtkKWWidget* cframe = this->CameraIconsFrame->GetFrame();
   for ( cc = 0; cc < 6; cc ++ )
@@ -1315,7 +1315,7 @@ void vtkPVRenderView::CreateViewProperties()
   this->CameraControlFrame->SetParent(frame->GetFrame());
   this->CameraControlFrame->ShowHideFrameOn();
   this->CameraControlFrame->Create(this->GetApplication(), 0);
-  this->CameraControlFrame->SetLabel("Camera Orientation");
+  this->CameraControlFrame->SetLabelText("Camera Orientation");
   
   // Camera: camera control
   

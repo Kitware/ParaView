@@ -41,7 +41,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVInteractorStyleControl );
-vtkCxxRevisionMacro(vtkPVInteractorStyleControl, "1.42");
+vtkCxxRevisionMacro(vtkPVInteractorStyleControl, "1.43");
 
 vtkCxxSetObjectMacro(vtkPVInteractorStyleControl,ManipulatorCollection,
                      vtkCollection);
@@ -470,7 +470,7 @@ void vtkPVInteractorStyleControl::SetLabel(const char* label)
     {
     ostrstream str;
     str << "Camera Control for " << label << ends;
-    this->LabeledFrame->SetLabel(str.str());
+    this->LabeledFrame->SetLabelText(str.str());
     str.rdbuf()->freeze(0);
     }
 }
@@ -530,7 +530,7 @@ void vtkPVInteractorStyleControl::Create(vtkKWApplication *app, const char*)
   
   this->LabeledFrame->ShowHideFrameOn();
   this->LabeledFrame->Create(app, 0);
-  this->LabeledFrame->SetLabel("Camera Manipulators Control");
+  this->LabeledFrame->SetLabelText("Camera Manipulators Control");
 
   this->OuterFrame = vtkKWFrame::New();
   this->OuterFrame->SetParent(this->LabeledFrame->GetFrame());
@@ -550,11 +550,11 @@ void vtkPVInteractorStyleControl::Create(vtkKWApplication *app, const char*)
     this->Menus[cc]->Create(app, "-anchor w");
     }
 
-  this->Labels[0]->SetLabel("Left Button");
-  this->Labels[1]->SetLabel("Middle Button");
-  this->Labels[2]->SetLabel("Right Button");
-  this->Labels[4]->SetLabel("Shift");
-  this->Labels[5]->SetLabel("Control");
+  this->Labels[0]->SetText("Left Button");
+  this->Labels[1]->SetText("Middle Button");
+  this->Labels[2]->SetText("Right Button");
+  this->Labels[4]->SetText("Shift");
+  this->Labels[5]->SetText("Control");
 
   const char *grid_settings = " -sticky news -padx 1 -pady 1";
 

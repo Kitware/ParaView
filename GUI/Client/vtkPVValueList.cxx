@@ -34,7 +34,7 @@
 #include "vtkSMDoubleVectorProperty.h"
 
 //-----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkPVValueList, "1.21");
+vtkCxxRevisionMacro(vtkPVValueList, "1.22");
 
 int vtkPVValueListCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -129,7 +129,7 @@ vtkPVValueList::~vtkPVValueList()
 //-----------------------------------------------------------------------------
 void vtkPVValueList::SetLabel(const char* str)
 {
-  this->ContourValuesFrame->SetLabel(str);
+  this->ContourValuesFrame->SetLabelText(str);
   if (str && str[0] &&
       (this->TraceNameState == vtkPVWidget::Uninitialized ||
        this->TraceNameState == vtkPVWidget::Default) )
@@ -199,7 +199,7 @@ void vtkPVValueList::Create(vtkKWApplication *app)
                this->ContourValuesList->GetWidgetName());
   
   this->NewValueFrame->SetParent(this);
-  this->NewValueFrame->SetLabel("Add value");
+  this->NewValueFrame->SetLabelText("Add value");
   this->NewValueFrame->Create(app, "");
   
   this->Script("pack %s -expand yes -fill x",
@@ -207,7 +207,7 @@ void vtkPVValueList::Create(vtkKWApplication *app)
   
   this->NewValueLabel->SetParent(this->NewValueFrame->GetFrame());
   this->NewValueLabel->Create(app, "");
-  this->NewValueLabel->SetLabel("New Value");
+  this->NewValueLabel->SetText("New Value");
   this->NewValueLabel->SetBalloonHelpString("Enter a new value");
   this->NewValueLabel->SetWidth(17);
   this->NewValueLabel->SetBalloonHelpString(
@@ -231,7 +231,7 @@ void vtkPVValueList::Create(vtkKWApplication *app)
   this->AddValueButton->Create(app, "-text {Add}");
   this->AddValueButton->SetCommand(this, "AddValueCallback");
   this->AddValueButton->SetBalloonHelpString("Add the new value to the list");
-  this->AddValueButton->SetLabelWidth(10);
+  this->AddValueButton->SetWidth(10);
   this->Script("bind %s <Enter> {+focus %s}",
                this->AddValueButton->GetWidgetName(),
                this->AddValueButton->GetWidgetName());
@@ -247,7 +247,7 @@ void vtkPVValueList::Create(vtkKWApplication *app)
 
   this->GenerateFrame->SetParent(this);
   this->GenerateFrame->Create(app, "");
-  this->GenerateFrame->SetLabel("Generate range of values");
+  this->GenerateFrame->SetLabelText("Generate range of values");
   
   this->Script("pack %s -fill x -expand yes", 
                this->GenerateFrame->GetWidgetName());
@@ -259,7 +259,7 @@ void vtkPVValueList::Create(vtkKWApplication *app)
   
   this->GenerateLabel->SetParent(this->GenerateNumberFrame->GetFrame());
   this->GenerateLabel->Create(app, "");
-  this->GenerateLabel->SetLabel("Number of Values");
+  this->GenerateLabel->SetText("Number of Values");
   this->GenerateLabel->SetWidth(17);
   
   this->GenerateEntry->SetParent(this->GenerateNumberFrame->GetFrame());
@@ -275,8 +275,8 @@ void vtkPVValueList::Create(vtkKWApplication *app)
   
   this->GenerateButton->SetParent(this->GenerateNumberFrame->GetFrame());
   this->GenerateButton->Create(app, "");
-  this->GenerateButton->SetLabel("Generate");
-  this->GenerateButton->SetLabelWidth(10);
+  this->GenerateButton->SetText("Generate");
+  this->GenerateButton->SetWidth(10);
   this->GenerateButton->SetCommand(this, "GenerateValuesCallback");
   this->GenerateButton->SetBalloonHelpString(
     "Add a range values to the list");
@@ -298,7 +298,7 @@ void vtkPVValueList::Create(vtkKWApplication *app)
 
   this->GenerateRangeLabel->SetParent(this->GenerateRangeFrame->GetFrame());
   this->GenerateRangeLabel->Create(app, "");
-  this->GenerateRangeLabel->SetLabel("Range");
+  this->GenerateRangeLabel->SetText("Range");
   this->GenerateRangeLabel->SetWidth(17);
   this->GenerateRangeLabel->SetBalloonHelpString(
     "Set the minimum and maximum of the values to be added");
@@ -608,7 +608,7 @@ void vtkPVValueList::CopyProperties(
   vtkPVValueList* pvce = vtkPVValueList::SafeDownCast(clone);
   if (pvce)
     {
-    pvce->SetLabel(this->ContourValuesFrame->GetLabel()->GetLabel());
+    pvce->SetLabel(this->ContourValuesFrame->GetLabel()->GetText());
     }
   else 
     {
@@ -638,7 +638,7 @@ int vtkPVValueList::ReadXMLAttributes(vtkPVXMLElement* element,
 //-----------------------------------------------------------------------------
 const char* vtkPVValueList::GetLabel() 
 {
-  return this->ContourValuesFrame->GetLabel()->GetLabel();
+  return this->ContourValuesFrame->GetLabel()->GetText();
 }
 
 //----------------------------------------------------------------------------

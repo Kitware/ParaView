@@ -150,7 +150,7 @@ vtkStandardNewMacro(vtkPVXDMFParametersInternals);
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVXDMFParameters);
-vtkCxxRevisionMacro(vtkPVXDMFParameters, "1.32");
+vtkCxxRevisionMacro(vtkPVXDMFParameters, "1.33");
 
 //----------------------------------------------------------------------------
 vtkPVXDMFParameters::vtkPVXDMFParameters()
@@ -207,7 +207,7 @@ void vtkPVXDMFParameters::Create(vtkKWApplication *pvApp)
   this->Frame = vtkKWFrameLabeled::New();
   this->Frame->SetParent(this);
   this->Frame->Create(pvApp, 0);
-  this->Frame->SetLabel(this->FrameLabel);
+  this->Frame->SetLabelText(this->FrameLabel);
   this->Script("pack %s -fill both -expand 1", this->Frame->GetWidgetName());
 }
 
@@ -438,7 +438,7 @@ void vtkPVXDMFParameters::SetLabel(const char* label)
   this->SetFrameLabel(label);
   if ( this->Frame )
     {
-    this->Frame->SetLabel(this->FrameLabel);
+    this->Frame->SetLabelText(this->FrameLabel);
     }
 }
 

@@ -22,7 +22,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWBoundsDisplay);
-vtkCxxRevisionMacro(vtkKWBoundsDisplay, "1.15");
+vtkCxxRevisionMacro(vtkKWBoundsDisplay, "1.16");
 
 int vtkKWBoundsDisplayCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -67,7 +67,7 @@ void vtkKWBoundsDisplay::Create(vtkKWApplication *app,
 
   this->Superclass::Create(app, 0);
 
-  this->SetLabel("Bounds");
+  this->SetLabelText("Bounds");
 
   this->XRangeLabel->SetParent(this->GetFrame());
   this->XRangeLabel->Create(app, "");
@@ -127,9 +127,9 @@ void vtkKWBoundsDisplay::UpdateWidgets()
         this->Extent[2] > this->Extent[3] || 
         this->Extent[4] > this->Extent[5]) 
       {
-      this->XRangeLabel->SetLabel("Empty extent");
-      this->YRangeLabel->SetLabel("");
-      this->ZRangeLabel->SetLabel("");
+      this->XRangeLabel->SetText("Empty extent");
+      this->YRangeLabel->SetText("");
+      this->ZRangeLabel->SetText("");
       }
     else
       {
@@ -137,15 +137,15 @@ void vtkKWBoundsDisplay::UpdateWidgets()
       sprintf(tmp, "X extent: %d to %d (dimension: %d)", 
               this->Extent[0], this->Extent[1], 
               this->Extent[1]-this->Extent[0]+1);
-      this->XRangeLabel->SetLabel(tmp);
+      this->XRangeLabel->SetText(tmp);
       sprintf(tmp, "Y extent: %d to %d (dimension: %d)", 
               this->Extent[2], this->Extent[3],
               this->Extent[3]-this->Extent[2]+1);
-      this->YRangeLabel->SetLabel(tmp);
+      this->YRangeLabel->SetText(tmp);
       sprintf(tmp, "Z extent: %d to %d (dimension: %d)", 
               this->Extent[4], this->Extent[5],
               this->Extent[5]-this->Extent[4]+1);
-      this->ZRangeLabel->SetLabel(tmp);
+      this->ZRangeLabel->SetText(tmp);
       }
     }
   else
@@ -154,9 +154,9 @@ void vtkKWBoundsDisplay::UpdateWidgets()
         this->Bounds[2] > this->Bounds[3] || 
         this->Bounds[4] > this->Bounds[5]) 
       {
-      this->XRangeLabel->SetLabel("Empty bounds");
-      this->YRangeLabel->SetLabel("");
-      this->ZRangeLabel->SetLabel("");
+      this->XRangeLabel->SetText("Empty bounds");
+      this->YRangeLabel->SetText("");
+      this->ZRangeLabel->SetText("");
       }
     else
       {
@@ -164,15 +164,15 @@ void vtkKWBoundsDisplay::UpdateWidgets()
       sprintf(tmp, "X range: %.3f to %.3f (delta: %.3f)", 
               this->Bounds[0], this->Bounds[1], 
               this->Bounds[1] - this->Bounds[0]);
-      this->XRangeLabel->SetLabel(tmp);
+      this->XRangeLabel->SetText(tmp);
       sprintf(tmp, "Y range: %.3f to %.3f (delta: %.3f)", 
               this->Bounds[2], this->Bounds[3],
               this->Bounds[3] - this->Bounds[2]);
-      this->YRangeLabel->SetLabel(tmp);
+      this->YRangeLabel->SetText(tmp);
       sprintf(tmp, "Z range: %.3f to %.3f (delta: %.3f)", 
               this->Bounds[4], this->Bounds[5],
               this->Bounds[5] - this->Bounds[4]);
-      this->ZRangeLabel->SetLabel(tmp);
+      this->ZRangeLabel->SetText(tmp);
       }
     }
 }

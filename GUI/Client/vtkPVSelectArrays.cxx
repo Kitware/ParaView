@@ -38,7 +38,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectArrays);
-vtkCxxRevisionMacro(vtkPVSelectArrays, "1.3");
+vtkCxxRevisionMacro(vtkPVSelectArrays, "1.4");
 vtkCxxSetObjectMacro(vtkPVSelectArrays, InputMenu, vtkPVInputMenu);
 
 int vtkPVSelectArraysCommand(ClientData cd, Tcl_Interp *interp,
@@ -104,7 +104,7 @@ void vtkPVSelectArrays::Create(vtkKWApplication *app)
                this->ButtonFrame->GetWidgetName());
   this->ShowAllLabel->SetParent(this->ButtonFrame);
   this->ShowAllLabel->Create(pvApp, "");
-  this->ShowAllLabel->SetLabel("Show All");
+  this->ShowAllLabel->SetText("Show All");
   this->ShowAllCheck->SetParent(this->ButtonFrame);
   this->ShowAllCheck->Create(pvApp, "");
   this->ShowAllCheck->SetState(0);
@@ -161,7 +161,7 @@ void vtkPVSelectArrays::Inactivate()
       this->SelectedArrayNames->AddString(arrayName);
       label = vtkKWLabel::New();
       label->SetParent(this);
-      label->SetLabel(arrayName);
+      label->SetText(arrayName);
       label->Create(this->GetApplication(), "");
       this->Script("pack %s -side top -anchor w",
                    label->GetWidgetName());

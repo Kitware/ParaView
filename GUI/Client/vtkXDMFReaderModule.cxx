@@ -38,7 +38,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkXDMFReaderModule);
-vtkCxxRevisionMacro(vtkXDMFReaderModule, "1.31");
+vtkCxxRevisionMacro(vtkXDMFReaderModule, "1.32");
 
 int vtkXDMFReaderModuleCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -143,7 +143,7 @@ int vtkXDMFReaderModule::ReadFileInformation(const char* fname)
     this->DomainGridFrame = vtkKWFrameLabeled::New();
     this->DomainGridFrame->SetParent(dlg->GetMessageDialogFrame());
     this->DomainGridFrame->Create(pvApp, 0);
-    this->DomainGridFrame->SetLabel("Domain and Grids Selection");
+    this->DomainGridFrame->SetLabelText("Domain and Grids Selection");
 
     this->DomainMenu = vtkKWOptionMenu::New();
     this->DomainMenu->SetParent(this->DomainGridFrame->GetFrame());
@@ -173,7 +173,7 @@ int vtkXDMFReaderModule::ReadFileInformation(const char* fname)
         {
         vtkKWPushButton* selectAllButton = vtkKWPushButton::New();
         selectAllButton->SetParent(this->DomainGridFrame->GetFrame());
-        selectAllButton->SetLabel("Select All Grids");
+        selectAllButton->SetText("Select All Grids");
         selectAllButton->Create(pvApp, 0);
         selectAllButton->SetCommand(this, "EnableAllGrids");
         this->Script("pack %s -expand yes -fill x -side bottom -pady 2", 

@@ -77,7 +77,7 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterfaceEntry);
-vtkCxxRevisionMacro(vtkPVAnimationInterfaceEntry, "1.57");
+vtkCxxRevisionMacro(vtkPVAnimationInterfaceEntry, "1.58");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterfaceEntry, CurrentSMDomain,
                      vtkSMDomain);
@@ -247,7 +247,7 @@ void vtkPVAnimationInterfaceEntry::Create(vtkPVApplication* pvApp, const char*)
   this->TimeRange->SetParent(this->TimeScriptEntryFrame->GetFrame());
   this->DummyFrame->SetParent(this->TimeScriptEntryFrame->GetFrame());
 
-  this->TimeEquationStyleEntry->SetLabel( "Waveform:" );
+  this->TimeEquationStyleEntry->GetLabel()->SetText( "Waveform:" );
   this->TimeEquationStyleEntry->SetParent(this->TimeScriptEntryFrame->GetFrame());
   this->TimeEquationStyleEntry->Create( pvApp, 0 );
   this->TimeEquationStyleEntry->ExpandWidgetOff();
@@ -281,7 +281,7 @@ void vtkPVAnimationInterfaceEntry::Create(vtkPVApplication* pvApp, const char*)
   this->TimeEquationFrequencyEntry->SetResolution( 0.5 );
   this->TimeEquationFrequencyEntry->DisplayEntryOn();
   this->TimeEquationFrequencyEntry->DisplayLabelOn();
-  this->TimeEquationFrequencyEntry->SetLabel( "Frequency" );
+  this->TimeEquationFrequencyEntry->GetLabel()->SetText( "Frequency" );
   this->TimeEquationFrequencyEntry->SetEndCommand( this, "UpdateTimeEquationValuesFromEntry" );
   this->TimeEquationFrequencyEntry->SetEntryCommand( this, "UpdateTimeEquationValuesFromEntry" );
 
@@ -310,9 +310,9 @@ void vtkPVAnimationInterfaceEntry::Create(vtkPVApplication* pvApp, const char*)
   this->ScriptEditor->UseVerticalScrollbarOn();
   this->DummyFrame->Create(pvApp, "-height 1");
 
-  this->StartTimeEntry->SetLabel("Start value");
-  this->EndTimeEntry->SetLabel("End value");
-  this->ResetRangeButton->SetLabel("Reset range");
+  this->StartTimeEntry->GetLabel()->SetText("Start value");
+  this->EndTimeEntry->GetLabel()->SetText("End value");
+  this->ResetRangeButton->SetText("Reset range");
 
   this->SourceMenuButton->SetBalloonHelpString(
     "Select the filter/source which will be modified by the current action.");
@@ -351,8 +351,8 @@ void vtkPVAnimationInterfaceEntry::Create(vtkPVApplication* pvApp, const char*)
     this->SourceMenuButton->SetButtonText("None");
     }
 
-  this->SourceLabel->SetLabel("Source");
-  this->MethodLabel->SetLabel("Parameter");
+  this->SourceLabel->SetText("Source");
+  this->MethodLabel->SetText("Parameter");
   pvApp->Script("grid %s %s -sticky news -pady 2 -padx 2", 
                 this->SourceLabel->GetWidgetName(),
                 this->SourceMenuButton->GetWidgetName());

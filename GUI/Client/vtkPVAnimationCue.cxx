@@ -75,7 +75,7 @@ static unsigned char image_open[] =
   "eNpjYGD4z0AEBgIGXJgWanC5YSDcQwgDAO0pqFg=";
 
 vtkStandardNewMacro(vtkPVAnimationCue);
-vtkCxxRevisionMacro(vtkPVAnimationCue, "1.16");
+vtkCxxRevisionMacro(vtkPVAnimationCue, "1.17");
 vtkCxxSetObjectMacro(vtkPVAnimationCue, TimeLineParent, vtkKWWidget);
 
 //***************************************************************************
@@ -197,13 +197,13 @@ vtkPVAnimationCue::~vtkPVAnimationCue()
 //-----------------------------------------------------------------------------
 void vtkPVAnimationCue::SetLabelText(const char* label)
 {
-  this->Label->SetLabel(label);
+  this->Label->SetText(label);
 }
 
 //-----------------------------------------------------------------------------
 const char* vtkPVAnimationCue::GetLabelText()
 {
-  return this->Label->GetLabel();
+  return this->Label->GetText();
 }
 
 //-----------------------------------------------------------------------------

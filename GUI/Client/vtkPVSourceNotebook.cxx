@@ -34,7 +34,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSourceNotebook);
-vtkCxxRevisionMacro(vtkPVSourceNotebook, "1.7");
+vtkCxxRevisionMacro(vtkPVSourceNotebook, "1.8");
 
 //----------------------------------------------------------------------------
 int vtkPVSourceNotebookCommand(ClientData cd, Tcl_Interp *interp,
@@ -249,7 +249,7 @@ void vtkPVSourceNotebook::Create(vtkKWApplication* app, const char* args)
   this->NameLabel->SetParent(this->DescriptionFrame);
   this->NameLabel->Create(this->GetApplication());
   this->NameLabel->ExpandWidgetOff();
-  this->NameLabel->SetLabel("Name:");
+  this->NameLabel->GetLabel()->SetText("Name:");
   this->Script("%s configure -anchor w", 
                this->NameLabel->GetWidget()->GetWidgetName());
   this->Script("%s config %s", 
@@ -263,7 +263,7 @@ void vtkPVSourceNotebook::Create(vtkKWApplication* app, const char* args)
   this->TypeLabel->SetParent(this->DescriptionFrame);
   this->TypeLabel->Create(this->GetApplication());
   this->TypeLabel->ExpandWidgetOff();
-  this->TypeLabel->GetLabel()->SetLabel("Class:");
+  this->TypeLabel->GetLabel()->SetText("Class:");
   this->Script("%s configure -anchor w", 
                this->TypeLabel->GetWidget()->GetWidgetName());
   this->Script("%s config %s", 
@@ -273,7 +273,7 @@ void vtkPVSourceNotebook::Create(vtkKWApplication* app, const char* args)
 
   this->LabelEntry->SetParent(this->DescriptionFrame);
   this->LabelEntry->Create(this->GetApplication());
-  this->LabelEntry->GetLabel()->SetLabel("Label:");
+  this->LabelEntry->GetLabel()->SetText("Label:");
   this->Script("%s config %s", 
                this->LabelEntry->GetLabel()->GetWidgetName(),label1_opt);
   this->Script("pack %s -fill x -expand t", 
@@ -285,7 +285,7 @@ void vtkPVSourceNotebook::Create(vtkKWApplication* app, const char* args)
   this->LongHelpLabel->SetParent(this->DescriptionFrame);
   this->LongHelpLabel->Create(this->GetApplication());
   this->LongHelpLabel->ExpandWidgetOff();
-  this->LongHelpLabel->GetLabel()->SetLabel("Description:");
+  this->LongHelpLabel->GetLabel()->SetText("Description:");
   this->LongHelpLabel->GetWidget()->AdjustWrapLengthToWidthOn();
   this->Script("%s configure -anchor w", 
                this->LongHelpLabel->GetWidget()->GetWidgetName());
@@ -320,12 +320,12 @@ void vtkPVSourceNotebook::Create(vtkKWApplication* app, const char* args)
   this->AcceptButton->Create(this->GetApplication(), "");
   if (this->AutoAccept)
     {
-    this->AcceptButton->SetLabel("Auto Accept");
+    this->AcceptButton->SetText("Auto Accept");
     this->Script("%s config -relief flat", this->AcceptButton->GetWidgetName());
     }
   else
     {
-    this->AcceptButton->SetLabel("Accept");
+    this->AcceptButton->SetText("Accept");
     this->Script("%s config -relief raised", this->AcceptButton->GetWidgetName());
     }    
   this->AcceptButton->SetCommand(this, "AcceptButtonCallback");
@@ -411,13 +411,13 @@ void vtkPVSourceNotebook::SetAutoAccept(int val)
 
   if (val)
     {
-    this->AcceptButton->SetLabel("Auto Accept");
+    this->AcceptButton->SetText("Auto Accept");
     // Just in case the source is already modified.
     this->AcceptButtonCallback();
     }
   else
     {
-    this->AcceptButton->SetLabel("Accept");
+    this->AcceptButton->SetText("Accept");
     }
 }
 
@@ -530,14 +530,14 @@ void vtkPVSourceNotebook::UpdateDescriptionFrame(vtkPVSource* pvs)
 
   if (this->NameLabel && this->NameLabel->IsCreated())
     {
-    this->NameLabel->GetWidget()->SetLabel(pvs->GetName() ? pvs->GetName() : "");
+    this->NameLabel->GetWidget()->SetText(pvs->GetName() ? pvs->GetName() : "");
     }
 
   if (this->TypeLabel && this->TypeLabel->IsCreated())
     {
     if (pvs->GetSourceClassName()) 
       {
-      this->TypeLabel->GetWidget()->SetLabel(
+      this->TypeLabel->GetWidget()->SetText(
         pvs->GetSourceClassName());
       if (this->DescriptionFrame->IsPacked())
         {
@@ -546,7 +546,7 @@ void vtkPVSourceNotebook::UpdateDescriptionFrame(vtkPVSource* pvs)
       }
     else
       {
-      this->TypeLabel->GetWidget()->SetLabel("");
+      this->TypeLabel->GetWidget()->SetText("");
       if (this->DescriptionFrame->IsPacked())
         {
         this->Script("grid remove %s", this->TypeLabel->GetWidgetName());
@@ -565,7 +565,7 @@ void vtkPVSourceNotebook::UpdateDescriptionFrame(vtkPVSource* pvs)
         !(this->GetPVApplication() && 
           !this->GetPVApplication()->GetShowSourcesLongHelp())) 
       {
-      this->LongHelpLabel->GetWidget()->SetLabel(pvs->GetLongHelp());
+      this->LongHelpLabel->GetWidget()->SetText(pvs->GetLongHelp());
       if (this->DescriptionFrame->IsPacked())
         {
         this->Script("grid %s", this->LongHelpLabel->GetWidgetName());
@@ -573,7 +573,7 @@ void vtkPVSourceNotebook::UpdateDescriptionFrame(vtkPVSource* pvs)
       }
     else
       {
-      this->LongHelpLabel->GetWidget()->SetLabel("");
+      this->LongHelpLabel->GetWidget()->SetText("");
       if (this->DescriptionFrame->IsPacked())
         {
         this->Script("grid remove %s", this->LongHelpLabel->GetWidgetName());

@@ -108,7 +108,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLookmarkManager);
-vtkCxxRevisionMacro(vtkPVLookmarkManager, "1.14");
+vtkCxxRevisionMacro(vtkPVLookmarkManager, "1.15");
 int vtkPVLookmarkManagerCommand(ClientData cd, Tcl_Interp *interp, int argc, char *argv[]);
 
 //----------------------------------------------------------------------------
@@ -389,7 +389,7 @@ void vtkPVLookmarkManager::Create(vtkKWApplication *app)
 
   this->CreateLmkButton->SetParent(this->LmkPanelFrame->GetFrame());
   this->CreateLmkButton->Create(this->GetPVApplication(), "");
-  this->CreateLmkButton->SetLabel("Create Lookmark");
+  this->CreateLmkButton->SetText("Create Lookmark");
   this->CreateLmkButton->SetCommand(this,"CreateLookmarkCallback");
 
   this->TopDragAndDropTarget->SetParent(this->LmkScrollFrame->GetFrame());
@@ -1156,7 +1156,7 @@ int vtkPVLookmarkManager::DragAndDropWidget(vtkKWWidget *widget,vtkKWWidget *Aft
     vtkKWLookmarkFolder *newLmkFolder = vtkKWLookmarkFolder::New();
     newLmkFolder->SetParent(dstPrnt);
     newLmkFolder->Create(this->GetPVApplication());
-    newLmkFolder->SetFolderName(lmkFolder->GetLabelFrame()->GetLabel()->GetLabel());
+    newLmkFolder->SetFolderName(lmkFolder->GetLabelFrame()->GetLabel()->GetText());
     newLmkFolder->SetLocation(newLoc);
 
     this->Script("pack %s -fill both -expand yes -padx 8",newLmkFolder->GetWidgetName());
@@ -2255,7 +2255,7 @@ void vtkPVLookmarkManager::CreateNestedXMLElements(vtkKWWidget *lmkItem, vtkXMLD
         {
         folder = vtkXMLDataElement::New();
         folder->SetName("LmkFolder");
-        folder->SetAttribute("Name",oldLmkFolder->GetLabelFrame()->GetLabel()->GetLabel());
+        folder->SetAttribute("Name",oldLmkFolder->GetLabelFrame()->GetLabel()->GetText());
         dest->AddNestedElement(folder);
         col = oldLmkFolder->GetLabelFrame()->GetFrame()->GetFrame()->GetChildren();
 
@@ -3861,7 +3861,7 @@ void vtkPVLookmarkManager::MoveCheckedChildren(vtkKWWidget *nestedWidget, vtkKWW
       vtkKWLookmarkFolder *newLmkFolder = vtkKWLookmarkFolder::New();
       newLmkFolder->SetParent(packingFrame);
       newLmkFolder->Create(this->GetPVApplication());
-      newLmkFolder->SetFolderName(oldLmkFolder->GetLabelFrame()->GetLabel()->GetLabel());
+      newLmkFolder->SetFolderName(oldLmkFolder->GetLabelFrame()->GetLabel()->GetText());
       newLmkFolder->SetLocation(oldLmkFolder->GetLocation());
       this->Script("pack %s -fill both -expand yes -padx 8",newLmkFolder->GetWidgetName());
 

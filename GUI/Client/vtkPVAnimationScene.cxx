@@ -68,7 +68,7 @@
 #endif
 
 vtkStandardNewMacro(vtkPVAnimationScene);
-vtkCxxRevisionMacro(vtkPVAnimationScene, "1.21");
+vtkCxxRevisionMacro(vtkPVAnimationScene, "1.22");
 #define VTK_PV_PLAYMODE_SEQUENCE_TITLE "Sequence"
 #define VTK_PV_PLAYMODE_REALTIME_TITLE "Real Time"
 
@@ -285,7 +285,7 @@ void vtkPVAnimationScene::Create(vtkKWApplication* app, const char* args)
   // Animation Control: Time scale
   this->TimeLabel->SetParent(this);
   this->TimeLabel->Create(app, 0);
-  this->TimeLabel->SetLabel("Current Time:");
+  this->TimeLabel->SetText("Current Time:");
 
   this->TimeScale->SetParent(this);
   this->TimeScale->Create(app, "");
@@ -303,7 +303,7 @@ void vtkPVAnimationScene::Create(vtkKWApplication* app, const char* args)
 
   this->DurationLabel->SetParent(this);
   this->DurationLabel->Create(app, 0);
-  this->DurationLabel->SetLabel("Duration:");
+  this->DurationLabel->SetText("Duration:");
   
   this->DurationThumbWheel->SetParent(this);
   this->DurationThumbWheel->PopupModeOn();
@@ -329,7 +329,7 @@ void vtkPVAnimationScene::Create(vtkKWApplication* app, const char* args)
   // Animation Control: Frame rate
   this->FrameRateLabel->SetParent(this);
   this->FrameRateLabel->Create(app, 0);
-  this->FrameRateLabel->SetLabel("Frame Rate:");
+  this->FrameRateLabel->SetText("Frame Rate:");
     
   this->FrameRateThumbWheel->SetParent(this);
   this->FrameRateThumbWheel->PopupModeOn();
@@ -358,7 +358,7 @@ void vtkPVAnimationScene::Create(vtkKWApplication* app, const char* args)
   // Animation Control: Play Mode
   this->PlayModeLabel->SetParent(this);
   this->PlayModeLabel->Create(app, 0);
-  this->PlayModeLabel->SetLabel("Play Mode:" );
+  this->PlayModeLabel->SetText("Play Mode:" );
   this->PlayModeMenuButton->SetParent(this);
   this->PlayModeMenuButton->Create(app, 0);
   this->PlayModeMenuButton->SetBalloonHelpString("Change the mode in which the "

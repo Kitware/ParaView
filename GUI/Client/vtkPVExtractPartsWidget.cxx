@@ -31,7 +31,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVExtractPartsWidget);
-vtkCxxRevisionMacro(vtkPVExtractPartsWidget, "1.25");
+vtkCxxRevisionMacro(vtkPVExtractPartsWidget, "1.26");
 
 int vtkPVExtractPartsWidgetCommand(ClientData cd, Tcl_Interp *interp,
                                 int argc, char *argv[]);
@@ -85,12 +85,12 @@ void vtkPVExtractPartsWidget::Create(vtkKWApplication *app)
 
   this->AllOnButton->SetParent(this->ButtonFrame);
   this->AllOnButton->Create(pvApp, "");
-  this->AllOnButton->SetLabel("All On");
+  this->AllOnButton->SetText("All On");
   this->AllOnButton->SetCommand(this, "AllOnCallback");
 
   this->AllOffButton->SetParent(this->ButtonFrame);
   this->AllOffButton->Create(pvApp, "");
-  this->AllOffButton->SetLabel("All Off");
+  this->AllOffButton->SetText("All Off");
   this->AllOffButton->SetCommand(this, "AllOffCallback");
 
   this->Script("pack %s %s -side left -fill x -expand t",
@@ -130,7 +130,7 @@ void vtkPVExtractPartsWidget::Inactivate()
       {
       label = vtkKWLabel::New();
       label->SetParent(this);
-      label->SetLabel(this->PartSelectionList->GetItem(idx));
+      label->SetText(this->PartSelectionList->GetItem(idx));
       label->Create(this->GetApplication(), "");
       this->Script("pack %s -side top -anchor w",
                    label->GetWidgetName());

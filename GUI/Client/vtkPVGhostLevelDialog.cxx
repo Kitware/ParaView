@@ -23,7 +23,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVGhostLevelDialog );
-vtkCxxRevisionMacro(vtkPVGhostLevelDialog, "1.7");
+vtkCxxRevisionMacro(vtkPVGhostLevelDialog, "1.8");
 
 int vtkPVGhostLevelDialogCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -34,7 +34,7 @@ vtkPVGhostLevelDialog::vtkPVGhostLevelDialog()
 
   this->Label = vtkKWLabel::New();
   this->Label->SetParent(this);
-  this->Label->SetLabel("How many ghost levels would you like to save?");
+  this->Label->SetText("How many ghost levels would you like to save?");
   
   this->Separator = vtkKWFrame::New();
   this->Separator->SetParent(this);

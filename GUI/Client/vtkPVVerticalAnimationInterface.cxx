@@ -40,7 +40,7 @@
 #include "vtkKWTkUtilities.h"
 
 vtkStandardNewMacro(vtkPVVerticalAnimationInterface);
-vtkCxxRevisionMacro(vtkPVVerticalAnimationInterface, "1.11");
+vtkCxxRevisionMacro(vtkPVVerticalAnimationInterface, "1.12");
 vtkCxxSetObjectMacro(vtkPVVerticalAnimationInterface, ActiveKeyFrame, vtkPVKeyFrame);
 
 #define VTK_PV_RAMP_INDEX 1
@@ -151,7 +151,7 @@ void vtkPVVerticalAnimationInterface::SetAnimationCue(vtkPVAnimationCue* cue)
       {
       this->RemoveObservers(this->AnimationCue);
       this->AnimationCue->UnRegister(this);
-      this->TitleLabel->SetLabel("");
+      this->TitleLabel->SetText("");
       }
     this->AnimationCue = cue;
     if (this->AnimationCue)
@@ -159,7 +159,7 @@ void vtkPVVerticalAnimationInterface::SetAnimationCue(vtkPVAnimationCue* cue)
       this->InitializeObservers(this->AnimationCue);
       this->AnimationCue->Register(this);
       char* text = this->AnimationCue->GetTextRepresentation();
-      this->TitleLabel->SetLabel(text);
+      this->TitleLabel->SetText(text);
       delete []text;
       }
     }
@@ -189,7 +189,7 @@ void vtkPVVerticalAnimationInterface::Create(vtkKWApplication* app,
   this->ScenePropertiesFrame->SetParent(this->TopFrame->GetFrame());
   this->ScenePropertiesFrame->ShowHideFrameOn();
   this->ScenePropertiesFrame->Create(app, 0);
-  this->ScenePropertiesFrame->SetLabel("Animation Control");
+  this->ScenePropertiesFrame->SetLabelText("Animation Control");
   this->Script("pack %s -side top -fill x -expand t -padx 2 -pady 2", 
     this->ScenePropertiesFrame->GetWidgetName());
  
@@ -197,13 +197,13 @@ void vtkPVVerticalAnimationInterface::Create(vtkKWApplication* app,
   this->KeyFramePropertiesFrame->SetParent(this->TopFrame->GetFrame());
   this->KeyFramePropertiesFrame->ShowHideFrameOn();
   this->KeyFramePropertiesFrame->Create(app, 0);
-  this->KeyFramePropertiesFrame->SetLabel(VTK_PV_KEYFRAME_PROPERTIES_DEFAULT_LABEL);
+  this->KeyFramePropertiesFrame->SetLabelText(VTK_PV_KEYFRAME_PROPERTIES_DEFAULT_LABEL);
   this->Script("pack %s -side top -fill x -expand t -padx 2 -pady 2", 
     this->KeyFramePropertiesFrame->GetWidgetName());
 
   this->TitleLabelLabel->SetParent(this->KeyFramePropertiesFrame->GetFrame());
   this->TitleLabelLabel->Create(app,"-relief flat");
-  this->TitleLabelLabel->SetLabel("Current Track:");
+  this->TitleLabelLabel->SetText("Current Track:");
   
   this->TitleLabel->SetParent(this->KeyFramePropertiesFrame->GetFrame());
   this->TitleLabel->Create(app,"-relief flat");
@@ -227,7 +227,7 @@ void vtkPVVerticalAnimationInterface::Create(vtkKWApplication* app,
   
   this->TypeLabel->SetParent(this->PropertiesFrame->GetFrame());
   this->TypeLabel->Create(app, 0);
-  this->TypeLabel->SetLabel("Interpolation:");
+  this->TypeLabel->SetText("Interpolation:");
  
   this->TypeImage->SetParent(this->PropertiesFrame->GetFrame());
   this->TypeImage->Create(app, "-relief flat");
@@ -243,7 +243,7 @@ void vtkPVVerticalAnimationInterface::Create(vtkKWApplication* app,
   this->BuildTypeMenu();
     
   this->SelectKeyFrameLabel->SetParent(this->KeyFramePropertiesFrame->GetFrame());
-  this->SelectKeyFrameLabel->SetLabel("Select or Add a key frame in the Animation Tracks "
+  this->SelectKeyFrameLabel->SetText("Select or Add a key frame in the Animation Tracks "
     "window to show its properties.");
 
   this->SelectKeyFrameLabel->Create(app, "-justify left");
@@ -260,7 +260,7 @@ void vtkPVVerticalAnimationInterface::Create(vtkKWApplication* app,
   // SAVE FRAME
   this->SaveFrame->SetParent(this->TopFrame->GetFrame());
   this->SaveFrame->ShowHideFrameOn();
-  this->SaveFrame->SetLabel("Animation Settings");
+  this->SaveFrame->SetLabelText("Animation Settings");
   this->SaveFrame->Create(app, 0);
   this->Script("pack %s -side top -fill x -expand t -padx 2 -pady 2", 
     this->SaveFrame->GetWidgetName());

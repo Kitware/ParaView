@@ -39,7 +39,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVServerFileDialog );
-vtkCxxRevisionMacro(vtkPVServerFileDialog, "1.37");
+vtkCxxRevisionMacro(vtkPVServerFileDialog, "1.38");
 
 int vtkPVServerFileDialogCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -355,7 +355,7 @@ void vtkPVServerFileDialog::Create(vtkKWApplication *app, const char *)
 
 
   this->FileNameLabel->SetParent(this->BottomFrame);
-  this->FileNameLabel->SetLabel("File name:");
+  this->FileNameLabel->SetText("File name:");
   this->FileNameLabel->Create(app, "");
   this->Script("grid %s -row 0 -column 0 -sticky w", 
                this->FileNameLabel->GetWidgetName());
@@ -371,11 +371,11 @@ void vtkPVServerFileDialog::Create(vtkKWApplication *app, const char *)
 
   if (this->SaveDialog)
     {
-    this->LoadSaveButton->SetLabel("Save");
+    this->LoadSaveButton->SetText("Save");
     }
   else
     {
-    this->LoadSaveButton->SetLabel("Open");
+    this->LoadSaveButton->SetText("Open");
     }
   this->Script("grid %s -row 0 -column 2 -sticky ew -ipadx 2m", 
                this->LoadSaveButton->GetWidgetName());
@@ -384,11 +384,11 @@ void vtkPVServerFileDialog::Create(vtkKWApplication *app, const char *)
   this->ExtensionsLabel->SetParent(this->BottomFrame);
   if (this->SaveDialog)
     {
-    this->ExtensionsLabel->SetLabel("Save as type:");
+    this->ExtensionsLabel->SetText("Save as type:");
     }
   else
     {
-    this->ExtensionsLabel->SetLabel("Load type:");
+    this->ExtensionsLabel->SetText("Load type:");
     }
   this->ExtensionsLabel->Create(app, "");
   this->Script("grid %s -row 1 -column 0 -sticky w", 
@@ -412,7 +412,7 @@ void vtkPVServerFileDialog::Create(vtkKWApplication *app, const char *)
   this->CancelButton->SetParent(this->BottomFrame);
   this->CancelButton->Create(app, "-pady 0");
   this->CancelButton->SetCommand(this, "CancelCallback");
-  this->CancelButton->SetLabel("Cancel");
+  this->CancelButton->SetText("Cancel");
   this->Script("grid %s -row 1 -column 2 -sticky ew -ipadx 2m", 
                this->CancelButton->GetWidgetName());
 
@@ -553,7 +553,7 @@ void vtkPVServerFileDialog::LoadSaveCallback()
 {
   int last;
   const char* dir;
-  dir = this->DirectoryDisplay->GetLabel();
+  dir = this->DirectoryDisplay->GetText();
   last = static_cast<int>(strlen(dir))-1;
 
   if (this->SelectedDirectory)
@@ -753,7 +753,7 @@ void vtkPVServerFileDialog::ExtensionsMenuButtonCallback(int typeIdx)
     }
   label << ends;
 
-  this->ExtensionsDisplay->SetLabel(label.str());
+  this->ExtensionsDisplay->SetText(label.str());
   label.rdbuf()->freeze(0);
   
   this->Update();
@@ -933,11 +933,11 @@ void vtkPVServerFileDialog::Update()
   this->SetSelectBoxId(NULL);
   if(this->LastPath[0] != '<')
     {
-    this->DirectoryDisplay->SetLabel(this->LastPath);
+    this->DirectoryDisplay->SetText(this->LastPath);
     }
   else
     {
-    this->DirectoryDisplay->SetLabel("Available Drives");
+    this->DirectoryDisplay->SetText("Available Drives");
     }
   
   // Construct the gui representation.

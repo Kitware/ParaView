@@ -38,7 +38,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectWidget);
-vtkCxxRevisionMacro(vtkPVSelectWidget, "1.64");
+vtkCxxRevisionMacro(vtkPVSelectWidget, "1.65");
 
 int vtkPVSelectWidgetCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -91,7 +91,7 @@ void vtkPVSelectWidget::Create(vtkKWApplication *app)
   this->LabeledFrame->Create(app, 0);
   if (this->EntryLabel)
     {
-    this->LabeledFrame->SetLabel(this->EntryLabel);
+    this->LabeledFrame->SetLabelText(this->EntryLabel);
     }
   this->Script("pack %s -side top -fill both -expand true", 
                this->LabeledFrame->GetWidgetName());
@@ -149,7 +149,7 @@ void vtkPVSelectWidget::SetLabel(const char* label)
 
   if (this->GetApplication())
     {
-    this->LabeledFrame->SetLabel(label);
+    this->LabeledFrame->SetLabelText(label);
     }
 }
   

@@ -62,7 +62,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLODRenderModuleUI);
-vtkCxxRevisionMacro(vtkPVLODRenderModuleUI, "1.20");
+vtkCxxRevisionMacro(vtkPVLODRenderModuleUI, "1.21");
 
 int vtkPVLODRenderModuleUICommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -193,7 +193,7 @@ void vtkPVLODRenderModuleUI::Create(vtkKWApplication *app, const char *)
   this->LODFrame->SetParent(this);
   this->LODFrame->ShowHideFrameOn();
   this->LODFrame->Create(app,0);
-  this->LODFrame->SetLabel("LOD Parameters");
+  this->LODFrame->SetLabelText("LOD Parameters");
   this->Script("pack %s -padx 2 -pady 2 -fill x -expand yes -anchor w",
                this->LODFrame->GetWidgetName());
 
@@ -204,7 +204,7 @@ void vtkPVLODRenderModuleUI::Create(vtkKWApplication *app, const char *)
   // LOD parameters: threshold
   this->LODThresholdLabel->SetParent(this->LODScalesFrame);
   this->LODThresholdLabel->Create(app, "-anchor w");
-  this->LODThresholdLabel->SetLabel("LOD threshold:");
+  this->LODThresholdLabel->SetText("LOD threshold:");
 
   this->LODCheck->SetParent(this->LODScalesFrame);
   this->LODCheck->Create(app, "");
@@ -256,7 +256,7 @@ void vtkPVLODRenderModuleUI::Create(vtkKWApplication *app, const char *)
 
   this->LODResolutionLabel->SetParent(this->LODScalesFrame);
   this->LODResolutionLabel->Create(app, "-anchor w");
-  this->LODResolutionLabel->SetLabel("LOD resolution:");
+  this->LODResolutionLabel->SetText("LOD resolution:");
 
   this->LODResolutionScale->SetParent(this->LODScalesFrame);
   this->LODResolutionScale->Create(app, "-orient horizontal");
@@ -297,7 +297,7 @@ void vtkPVLODRenderModuleUI::Create(vtkKWApplication *app, const char *)
 
   this->OutlineThresholdLabel->SetParent(this->LODScalesFrame);
   this->OutlineThresholdLabel->Create(app, "-anchor w");
-  this->OutlineThresholdLabel->SetLabel("Outline Threshold:");
+  this->OutlineThresholdLabel->SetText("Outline Threshold:");
 
   this->OutlineThresholdScale->SetParent(this->LODScalesFrame);
   this->OutlineThresholdScale->Create(app, "-orient horizontal");
@@ -395,13 +395,13 @@ void vtkPVLODRenderModuleUI::LODThresholdLabelCallback()
   float threshold = this->LODThresholdScale->GetValue();
   if (threshold == VTK_LARGE_FLOAT)
     {
-    this->LODThresholdValue->SetLabel("Disabled");
+    this->LODThresholdValue->SetText("Disabled");
     }
   else
     {
     char str[256];
     sprintf(str, "%.1f MBytes", threshold);
-    this->LODThresholdValue->SetLabel(str);
+    this->LODThresholdValue->SetText(str);
     }
 }
 
@@ -471,7 +471,7 @@ void vtkPVLODRenderModuleUI::LODResolutionLabelCallback()
 
   char str[256];
   sprintf(str, "%dx%dx%d", resolution, resolution, resolution);
-  this->LODResolutionValue->SetLabel(str);
+  this->LODResolutionValue->SetText(str);
 }
 
 
@@ -495,7 +495,7 @@ void vtkPVLODRenderModuleUI::SetLODResolutionInternal(int resolution)
   char str[256];
 
   sprintf(str, "%dx%dx%d", resolution, resolution, resolution);
-  this->LODResolutionValue->SetLabel(str);
+  this->LODResolutionValue->SetText(str);
 
   this->LODResolution = resolution;
  
@@ -532,7 +532,7 @@ void vtkPVLODRenderModuleUI::OutlineThresholdLabelCallback()
 
   char str[256];
   sprintf(str, "%0.1f MCells", value);
-  this->OutlineThresholdValue->SetLabel(str);
+  this->OutlineThresholdValue->SetText(str);
 }
 
 //----------------------------------------------------------------------------
@@ -555,7 +555,7 @@ void vtkPVLODRenderModuleUI::SetOutlineThresholdInternal(float threshold)
   char str[256];
 
   sprintf(str, "%0.1f MCells", threshold/1000000.0);
-  this->OutlineThresholdValue->SetLabel(str);
+  this->OutlineThresholdValue->SetText(str);
 
   this->OutlineThreshold = threshold;
 }

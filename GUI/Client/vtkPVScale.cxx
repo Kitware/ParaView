@@ -36,7 +36,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVScale);
-vtkCxxRevisionMacro(vtkPVScale, "1.58");
+vtkCxxRevisionMacro(vtkPVScale, "1.59");
 
 //----------------------------------------------------------------------------
 vtkPVScale::vtkPVScale()
@@ -65,7 +65,7 @@ vtkPVScale::~vtkPVScale()
 void vtkPVScale::SetLabel(const char* label)
 {
   this->SetEntryLabel(label);
-  this->LabelWidget->SetLabel(label);
+  this->LabelWidget->SetText(label);
 }
 
 //----------------------------------------------------------------------------
@@ -184,7 +184,7 @@ void vtkPVScale::Create(vtkKWApplication *pvApp)
   // Now a label
   this->LabelWidget->SetParent(this);
   this->LabelWidget->Create(pvApp, "-width 18 -justify right");
-  this->LabelWidget->SetLabel(this->EntryLabel);
+  this->LabelWidget->SetText(this->EntryLabel);
   this->Script("pack %s -side left", this->LabelWidget->GetWidgetName());
 
   this->Scale->SetParent(this);
@@ -506,7 +506,7 @@ void vtkPVScale::AddAnimationScriptsToMenu(vtkKWMenu *menu,
   char methodAndArgs[500];
   
   sprintf(methodAndArgs, "AnimationMenuCallback %s", ai->GetTclName()); 
-  menu->AddCommand(this->LabelWidget->GetLabel(), this, methodAndArgs, 0,"");
+  menu->AddCommand(this->LabelWidget->GetText(), this, methodAndArgs, 0,"");
 }
 
 //-----------------------------------------------------------------------------
@@ -580,7 +580,7 @@ void vtkPVScale::AnimationMenuCallback(vtkPVAnimationInterfaceEntry *ai)
   this->Superclass::AnimationMenuCallback(ai);
 
   ai->SetLabelAndScript(
-    this->LabelWidget->GetLabel(), NULL, this->GetTraceName());
+    this->LabelWidget->GetText(), NULL, this->GetTraceName());
   
   vtkSMProperty *prop = this->GetSMProperty();
   vtkSMDomain *dom = prop->GetDomain("range");

@@ -26,7 +26,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVScalarRangeLabel);
-vtkCxxRevisionMacro(vtkPVScalarRangeLabel, "1.25");
+vtkCxxRevisionMacro(vtkPVScalarRangeLabel, "1.26");
 
 vtkCxxSetObjectMacro(vtkPVScalarRangeLabel, ArrayMenu, vtkPVArrayMenu);
 
@@ -67,7 +67,7 @@ void vtkPVScalarRangeLabel::Create(vtkKWApplication *app)
     }
 
   this->Label->SetParent(this);
-  this->Label->SetLabel("");
+  this->Label->SetText("");
   this->Label->Create(app, "");
   this->Script("pack %s -side top -expand t -fill x", 
                this->Label->GetWidgetName());
@@ -88,7 +88,7 @@ void vtkPVScalarRangeLabel::Update()
   if (!prop || !dom)
     {
     vtkErrorMacro("Could not find required domain (scalar_range)");
-    this->Label->SetLabel("Missing Array");
+    this->Label->SetText("Missing Array");
     this->Superclass::Update();
     return;
     }
@@ -114,7 +114,7 @@ void vtkPVScalarRangeLabel::Update()
     {
     sprintf(str, "Scalar Range: %f to %f", this->Range[0], this->Range[1]);
     }
-  this->Label->SetLabel(str);
+  this->Label->SetText(str);
 
   this->Superclass::Update();
 

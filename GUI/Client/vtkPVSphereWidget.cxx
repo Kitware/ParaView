@@ -44,7 +44,7 @@
 #include "vtkSMSourceProxy.h"
 #include "vtkCommand.h"
 vtkStandardNewMacro(vtkPVSphereWidget);
-vtkCxxRevisionMacro(vtkPVSphereWidget, "1.56");
+vtkCxxRevisionMacro(vtkPVSphereWidget, "1.57");
 
 vtkCxxSetObjectMacro(vtkPVSphereWidget, InputMenu, vtkPVInputMenu);
 
@@ -437,10 +437,10 @@ void vtkPVSphereWidget::ChildCreate(vtkPVApplication* pvApp)
   this->SetFrameLabel("Sphere Widget");
   this->Labels[0]->SetParent(this->Frame->GetFrame());
   this->Labels[0]->Create(pvApp, "");
-  this->Labels[0]->SetLabel("Center");
+  this->Labels[0]->SetText("Center");
   this->Labels[1]->SetParent(this->Frame->GetFrame());
   this->Labels[1]->Create(pvApp, "");
-  this->Labels[1]->SetLabel("Radius");
+  this->Labels[1]->SetText("Radius");
 
   int i;
   for (i=0; i<3; i++)
@@ -449,7 +449,7 @@ void vtkPVSphereWidget::ChildCreate(vtkPVApplication* pvApp)
     this->CoordinateLabel[i]->Create(pvApp, "");
     char buffer[3];
     sprintf(buffer, "%c", "xyz"[i]);
-    this->CoordinateLabel[i]->SetLabel(buffer);
+    this->CoordinateLabel[i]->SetText(buffer);
     }
   for (i=0; i<3; i++)
     {
@@ -507,7 +507,7 @@ void vtkPVSphereWidget::ChildCreate(vtkPVApplication* pvApp)
     this->GetTclName());
   this->CenterResetButton->SetParent(this->Frame->GetFrame());
   this->CenterResetButton->Create(pvApp, "");
-  this->CenterResetButton->SetLabel("Set Sphere Center to Center of Bounds");
+  this->CenterResetButton->SetText("Set Sphere Center to Center of Bounds");
   this->CenterResetButton->SetCommand(this, "CenterResetCallback"); 
   this->Script("grid %s - - - - -sticky ew", 
     this->CenterResetButton->GetWidgetName());

@@ -84,7 +84,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVDisplayGUI);
-vtkCxxRevisionMacro(vtkPVDisplayGUI, "1.25");
+vtkCxxRevisionMacro(vtkPVDisplayGUI, "1.26");
 
 int vtkPVDisplayGUICommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -403,7 +403,7 @@ void vtkPVDisplayGUI::Create(vtkKWApplication* app, const char* options)
   this->ViewFrame->SetParent(this->GetFrame());
   this->ViewFrame->ShowHideFrameOn();
   this->ViewFrame->Create(this->GetApplication(), 0);
-  this->ViewFrame->SetLabel("View");
+  this->ViewFrame->SetLabelText("View");
  
   this->VisibilityCheck->SetParent(this->ViewFrame->GetFrame());
   this->VisibilityCheck->Create(this->GetApplication(), "-text Data");
@@ -417,7 +417,7 @@ void vtkPVDisplayGUI::Create(vtkKWApplication* app, const char* options)
 
   this->ResetCameraButton->SetParent(this->ViewFrame->GetFrame());
   this->ResetCameraButton->Create(this->GetApplication(), "");
-  this->ResetCameraButton->SetLabel("Set View to Data");
+  this->ResetCameraButton->SetText("Set View to Data");
   this->ResetCameraButton->SetCommand(this, "CenterCamera");
   this->ResetCameraButton->SetBalloonHelpString(
     "Change the camera location to best fit the dataset in the view window.");
@@ -468,11 +468,11 @@ void vtkPVDisplayGUI::Create(vtkKWApplication* app, const char* options)
   this->ColorFrame->SetParent(this->GetFrame());
   this->ColorFrame->ShowHideFrameOn();
   this->ColorFrame->Create(this->GetApplication(), 0);
-  this->ColorFrame->SetLabel("Color");
+  this->ColorFrame->SetLabelText("Color");
 
   this->ColorMenuLabel->SetParent(this->ColorFrame->GetFrame());
   this->ColorMenuLabel->Create(this->GetApplication(), "");
-  this->ColorMenuLabel->SetLabel("Color by:");
+  this->ColorMenuLabel->SetText("Color by:");
   this->ColorMenuLabel->SetBalloonHelpString(
     "Select method for coloring dataset geometry.");
   
@@ -482,7 +482,7 @@ void vtkPVDisplayGUI::Create(vtkKWApplication* app, const char* options)
     "Select method for coloring dataset geometry.");
 
   this->ColorButton->SetParent(this->ColorFrame->GetFrame());
-  this->ColorButton->SetLabel("Actor Color");
+  this->ColorButton->GetLabel()->SetText("Actor Color");
   this->ColorButton->Create(this->GetApplication(), "");
   this->ColorButton->SetCommand(this, "ChangeActorColor");
   this->ColorButton->SetBalloonHelpString(
@@ -514,14 +514,14 @@ void vtkPVDisplayGUI::Create(vtkKWApplication* app, const char* options)
   // --
   this->EditColorMapButton->SetParent(this->EditColorMapButtonFrame);
   this->EditColorMapButton->Create(this->GetApplication(), "");
-  this->EditColorMapButton->SetLabel("Edit Color Map");
+  this->EditColorMapButton->SetText("Edit Color Map");
   this->EditColorMapButton->SetCommand(this,"EditColorMapCallback");
   this->EditColorMapButton->SetBalloonHelpString(
     "Edit the table used to map data attributes to pseudo colors.");
   // --
   this->DataColorRangeButton->SetParent(this->EditColorMapButtonFrame);
   this->DataColorRangeButton->Create(this->GetApplication(), "");
-  this->DataColorRangeButton->SetLabel("Reset Range");
+  this->DataColorRangeButton->SetText("Reset Range");
   this->DataColorRangeButton->SetCommand(this,"DataColorRangeCallback");
   this->DataColorRangeButton->SetBalloonHelpString(
     "Sets the range of the color map to this module's scalar range.");
@@ -560,12 +560,12 @@ void vtkPVDisplayGUI::Create(vtkKWApplication* app, const char* options)
   this->VolumeAppearanceFrame->SetParent(this->GetFrame());
   this->VolumeAppearanceFrame->ShowHideFrameOn();
   this->VolumeAppearanceFrame->Create(this->GetApplication(), 0);
-  this->VolumeAppearanceFrame->SetLabel("Volume Appearance");
+  this->VolumeAppearanceFrame->SetLabelText("Volume Appearance");
 
   this->VolumeScalarsMenuLabel->
     SetParent(this->VolumeAppearanceFrame->GetFrame());
   this->VolumeScalarsMenuLabel->Create(this->GetApplication(), "");
-  this->VolumeScalarsMenuLabel->SetLabel("View Scalars:");
+  this->VolumeScalarsMenuLabel->SetText("View Scalars:");
   this->VolumeScalarsMenuLabel->SetBalloonHelpString(
     "Select scalars to view with volume rendering.");
   
@@ -577,7 +577,7 @@ void vtkPVDisplayGUI::Create(vtkKWApplication* app, const char* options)
   this->EditVolumeAppearanceButton->
     SetParent(this->VolumeAppearanceFrame->GetFrame());
   this->EditVolumeAppearanceButton->Create(this->GetApplication(), "");
-  this->EditVolumeAppearanceButton->SetLabel("Edit Volume Appearance...");
+  this->EditVolumeAppearanceButton->SetText("Edit Volume Appearance...");
   this->EditVolumeAppearanceButton->
     SetCommand(this,"EditVolumeAppearanceCallback");
   this->EditVolumeAppearanceButton->SetBalloonHelpString(
@@ -601,12 +601,12 @@ void vtkPVDisplayGUI::Create(vtkKWApplication* app, const char* options)
   this->DisplayStyleFrame->SetParent(this->GetFrame());
   this->DisplayStyleFrame->ShowHideFrameOn();
   this->DisplayStyleFrame->Create(this->GetApplication(), 0);
-  this->DisplayStyleFrame->SetLabel("Display Style");
+  this->DisplayStyleFrame->SetLabelText("Display Style");
   
   this->RepresentationMenuLabel->SetParent(
     this->DisplayStyleFrame->GetFrame());
   this->RepresentationMenuLabel->Create(this->GetApplication(), "");
-  this->RepresentationMenuLabel->SetLabel("Representation:");
+  this->RepresentationMenuLabel->SetText("Representation:");
 
   this->RepresentationMenu->SetParent(this->DisplayStyleFrame->GetFrame());
   this->RepresentationMenu->Create(this->GetApplication(), "");
@@ -624,7 +624,7 @@ void vtkPVDisplayGUI::Create(vtkKWApplication* app, const char* options)
 
   this->InterpolationMenuLabel->SetParent(this->DisplayStyleFrame->GetFrame());
   this->InterpolationMenuLabel->Create(this->GetApplication(), "");
-  this->InterpolationMenuLabel->SetLabel("Interpolation:");
+  this->InterpolationMenuLabel->SetText("Interpolation:");
 
   this->InterpolationMenu->SetParent(this->DisplayStyleFrame->GetFrame());
   this->InterpolationMenu->Create(this->GetApplication(), "");
@@ -638,7 +638,7 @@ void vtkPVDisplayGUI::Create(vtkKWApplication* app, const char* options)
 
   this->PointSizeLabel->SetParent(this->DisplayStyleFrame->GetFrame());
   this->PointSizeLabel->Create(this->GetApplication(), "");
-  this->PointSizeLabel->SetLabel("Point size:");
+  this->PointSizeLabel->SetText("Point size:");
   this->PointSizeLabel->SetBalloonHelpString(
     "If your dataset contains points/verticies, "
     "this scale adjusts the diameter of the rendered points.");
@@ -663,7 +663,7 @@ void vtkPVDisplayGUI::Create(vtkKWApplication* app, const char* options)
 
   this->LineWidthLabel->SetParent(this->DisplayStyleFrame->GetFrame());
   this->LineWidthLabel->Create(this->GetApplication(), "");
-  this->LineWidthLabel->SetLabel("Line width:");
+  this->LineWidthLabel->SetText("Line width:");
   this->LineWidthLabel->SetBalloonHelpString(
     "If your dataset containes lines/edges, "
     "this scale adjusts the width of the rendered lines.");
@@ -742,29 +742,29 @@ void vtkPVDisplayGUI::Create(vtkKWApplication* app, const char* options)
   this->ActorControlFrame->SetParent(this->GetFrame());
   this->ActorControlFrame->ShowHideFrameOn();
   this->ActorControlFrame->Create(this->GetApplication(), 0);
-  this->ActorControlFrame->SetLabel("Actor Control");
+  this->ActorControlFrame->SetLabelText("Actor Control");
 
   this->TranslateLabel->SetParent(this->ActorControlFrame->GetFrame());
   this->TranslateLabel->Create(this->GetApplication(), 0);
-  this->TranslateLabel->SetLabel("Translate:");
+  this->TranslateLabel->SetText("Translate:");
   this->TranslateLabel->SetBalloonHelpString(
     "Translate the geometry relative to the dataset location.");
 
   this->ScaleLabel->SetParent(this->ActorControlFrame->GetFrame());
   this->ScaleLabel->Create(this->GetApplication(), 0);
-  this->ScaleLabel->SetLabel("Scale:");
+  this->ScaleLabel->SetText("Scale:");
   this->ScaleLabel->SetBalloonHelpString(
     "Scale the geometry relative to the size of the dataset.");
 
   this->OrientationLabel->SetParent(this->ActorControlFrame->GetFrame());
   this->OrientationLabel->Create(this->GetApplication(), 0);
-  this->OrientationLabel->SetLabel("Orientation:");
+  this->OrientationLabel->SetText("Orientation:");
   this->OrientationLabel->SetBalloonHelpString(
     "Orient the geometry relative to the dataset origin.");
 
   this->OriginLabel->SetParent(this->ActorControlFrame->GetFrame());
   this->OriginLabel->Create(this->GetApplication(), 0);
-  this->OriginLabel->SetLabel("Origin:");
+  this->OriginLabel->SetText("Origin:");
   this->OriginLabel->SetBalloonHelpString(
     "Set the origin point about which rotations take place.");
 
@@ -839,7 +839,7 @@ void vtkPVDisplayGUI::Create(vtkKWApplication* app, const char* options)
 
   this->OpacityLabel->SetParent(this->ActorControlFrame->GetFrame());
   this->OpacityLabel->Create(this->GetApplication(), 0);
-  this->OpacityLabel->SetLabel("Opacity:");
+  this->OpacityLabel->SetText("Opacity:");
   this->OpacityLabel->SetBalloonHelpString(
     "Set the opacity of the dataset's geometry.  "
     "Artifacts may appear in translucent geomtry "

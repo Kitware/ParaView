@@ -33,7 +33,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectTimeSet);
-vtkCxxRevisionMacro(vtkPVSelectTimeSet, "1.51");
+vtkCxxRevisionMacro(vtkPVSelectTimeSet, "1.52");
 
 //-----------------------------------------------------------------------------
 int vtkDataArrayCollectionCommand(ClientData cd, Tcl_Interp *interp,
@@ -87,7 +87,7 @@ void vtkPVSelectTimeSet::SetLabel(const char* label)
   this->SetFrameLabel(label);
   if (this->GetApplication())
     {
-    this->LabeledFrame->SetLabel(label);
+    this->LabeledFrame->SetLabelText(label);
     }
 }
 
@@ -119,13 +119,13 @@ void vtkPVSelectTimeSet::Create(vtkKWApplication *pvApp)
   this->LabeledFrame->Create(this->GetApplication(), 0);
   if (this->FrameLabel)
     {
-    this->LabeledFrame->SetLabel(this->FrameLabel);
+    this->LabeledFrame->SetLabelText(this->FrameLabel);
     }
   this->TimeLabel->Create(this->GetApplication(), "");
 
   char label[32];
   sprintf(label, "Time value: %12.5e", 0.0);
-  this->TimeLabel->SetLabel(label);
+  this->TimeLabel->SetText(label);
   this->Script("pack %s", this->TimeLabel->GetWidgetName());
   
   this->TreeFrame->Create(this->GetApplication(), "ScrolledWindow", 
@@ -150,14 +150,14 @@ void vtkPVSelectTimeSet::Create(vtkKWApplication *pvApp)
 void vtkPVSelectTimeSet::SetTimeValue(float time)
 {
   if (this->TimeValue != time ||
-      !this->TimeLabel->GetLabel() ||
-      !strcmp(this->TimeLabel->GetLabel(), "No timesets available."))
+      !this->TimeLabel->GetText() ||
+      !strcmp(this->TimeLabel->GetText(), "No timesets available."))
     { 
     this->TimeValue = time; 
     
     char label[32];
     sprintf(label, "Time value: %12.5e", time);
-    this->TimeLabel->SetLabel(label);
+    this->TimeLabel->SetText(label);
     this->Modified(); 
     } 
 }
@@ -319,7 +319,7 @@ void vtkPVSelectTimeSet::CommonReset()
   if (this->TimeSets->GetNumberOfItems() == 0)
     {
     this->Script("pack forget %s", this->TreeFrame->GetWidgetName());
-    this->TimeLabel->SetLabel("No timesets available.");
+    this->TimeLabel->SetText("No timesets available.");
     return;
     }
   else

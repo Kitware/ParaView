@@ -40,7 +40,7 @@
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkPVLineWidget);
-vtkCxxRevisionMacro(vtkPVLineWidget, "1.62");
+vtkCxxRevisionMacro(vtkPVLineWidget, "1.63");
 
 //----------------------------------------------------------------------------
 vtkPVLineWidget::vtkPVLineWidget()
@@ -686,7 +686,7 @@ void vtkPVLineWidget::DisplayLength(double len)
 {
   char tmp[1024];
   sprintf(tmp, "%.5g", len);
-  this->LengthValue->SetLabel(tmp);
+  this->LengthValue->SetText(tmp);
 }
 
 //----------------------------------------------------------------------------
@@ -796,10 +796,10 @@ void vtkPVLineWidget::ChildCreate(vtkPVApplication* pvApp)
   this->SetFrameLabel("Line Widget");
   this->Labels[0]->SetParent(this->Frame->GetFrame());
   this->Labels[0]->Create(pvApp, "");
-  this->Labels[0]->SetLabel(this->GetPoint1LabelText());
+  this->Labels[0]->SetText(this->GetPoint1LabelText());
   this->Labels[1]->SetParent(this->Frame->GetFrame());
   this->Labels[1]->Create(pvApp, "");
-  this->Labels[1]->SetLabel(this->GetPoint2LabelText());
+  this->Labels[1]->SetText(this->GetPoint2LabelText());
   int i;
   for (i=0; i<3; i++)
     {
@@ -807,7 +807,7 @@ void vtkPVLineWidget::ChildCreate(vtkPVApplication* pvApp)
     this->CoordinateLabel[i]->Create(pvApp, "");
     char buffer[3];
     sprintf(buffer, "%c", "xyz"[i]);
-    this->CoordinateLabel[i]->SetLabel(buffer);
+    this->CoordinateLabel[i]->SetText(buffer);
     }
 
   for (i=0; i<3; i++)
@@ -823,16 +823,16 @@ void vtkPVLineWidget::ChildCreate(vtkPVApplication* pvApp)
     }
   this->ResolutionLabel->SetParent(this->Frame->GetFrame());
   this->ResolutionLabel->Create(pvApp, "");
-  this->ResolutionLabel->SetLabel(this->GetResolutionLabelText());
+  this->ResolutionLabel->SetText(this->GetResolutionLabelText());
   this->ResolutionEntry->SetParent(this->Frame->GetFrame());
   this->ResolutionEntry->Create(pvApp, "");
   this->ResolutionEntry->SetValue(0);
   this->LengthLabel->SetParent(this->Frame->GetFrame());
   this->LengthLabel->Create(pvApp, "");
-  this->LengthLabel->SetLabel("Length:");
+  this->LengthLabel->SetText("Length:");
   this->LengthValue->SetParent(this->Frame->GetFrame());
   this->LengthValue->Create(pvApp, "");
-  this->LengthValue->SetLabel("1.0");
+  this->LengthValue->SetText("1.0");
 
   this->Script("grid propagate %s 1",
     this->Frame->GetFrame()->GetWidgetName());

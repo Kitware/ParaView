@@ -26,7 +26,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectionList);
-vtkCxxRevisionMacro(vtkPVSelectionList, "1.53");
+vtkCxxRevisionMacro(vtkPVSelectionList, "1.54");
 
 int vtkPVSelectionListCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -163,7 +163,7 @@ void vtkPVSelectionList::Create(vtkKWApplication *app)
 void vtkPVSelectionList::SetLabel(const char* label) 
 {
   // For getting the widget in a script.
-  this->Label->SetLabel(label);
+  this->Label->SetText(label);
 
   if (label && label[0] &&
       (this->TraceNameState == vtkPVWidget::Uninitialized ||
@@ -199,7 +199,7 @@ void vtkPVSelectionList::SetLabelVisibility(int visible)
 //----------------------------------------------------------------------------
 const char *vtkPVSelectionList::GetLabel()
 {
-  return this->Label->GetLabel();
+  return this->Label->GetText();
 }
 
 //-----------------------------------------------------------------------------
@@ -372,7 +372,7 @@ void vtkPVSelectionList::CopyProperties(vtkPVWidget* clone,
   if (pvsl)
     {
     pvsl->SetOptionWidth(this->OptionWidth);
-    pvsl->SetLabel(this->Label->GetLabel());
+    pvsl->SetLabel(this->Label->GetText());
     int i, numItems = this->Names->GetLength();
     const char *name;
     for(i=0; i<numItems; i++)
@@ -406,11 +406,11 @@ int vtkPVSelectionList::ReadXMLAttributes(vtkPVXMLElement* element,
   const char* label = element->GetAttribute("label");
   if(label)
     {
-    this->Label->SetLabel(label);  
+    this->Label->SetText(label);  
     }
   else
     {
-    this->Label->SetLabel(this->VariableName);
+    this->Label->SetText(this->VariableName);
     }
 
   // Extract the list of items.

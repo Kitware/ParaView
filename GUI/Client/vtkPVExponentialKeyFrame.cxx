@@ -22,7 +22,7 @@
 #include "vtkSMExponentialKeyFrameProxy.h"
 
 vtkStandardNewMacro(vtkPVExponentialKeyFrame);
-vtkCxxRevisionMacro(vtkPVExponentialKeyFrame, "1.3");
+vtkCxxRevisionMacro(vtkPVExponentialKeyFrame, "1.4");
 
 //-----------------------------------------------------------------------------
 vtkPVExponentialKeyFrame::vtkPVExponentialKeyFrame()
@@ -54,7 +54,7 @@ void vtkPVExponentialKeyFrame::ChildCreate(vtkKWApplication* app)
 
   this->BaseLabel->SetParent(this);
   this->BaseLabel->Create(app, 0);
-  this->BaseLabel->SetLabel("Base:");
+  this->BaseLabel->SetText("Base:");
 
   this->BaseThumbWheel->SetParent(this);
   this->BaseThumbWheel->PopupModeOn();
@@ -71,7 +71,7 @@ void vtkPVExponentialKeyFrame::ChildCreate(vtkKWApplication* app)
 
   this->StartPowerLabel->SetParent(this);
   this->StartPowerLabel->Create(app, 0);
-  this->StartPowerLabel->SetLabel("Start Power:");
+  this->StartPowerLabel->SetText("Start Power:");
 
   this->StartPowerThumbWheel->SetParent(this);
   this->StartPowerThumbWheel->PopupModeOn();
@@ -88,7 +88,7 @@ void vtkPVExponentialKeyFrame::ChildCreate(vtkKWApplication* app)
 
   this->EndPowerLabel->SetParent(this);
   this->EndPowerLabel->Create(app, 0);
-  this->EndPowerLabel->SetLabel("End Power:");
+  this->EndPowerLabel->SetText("End Power:");
 
   this->EndPowerThumbWheel->SetParent(this);
   this->EndPowerThumbWheel->PopupModeOn();

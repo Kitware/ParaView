@@ -29,7 +29,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVBoundsDisplay);
-vtkCxxRevisionMacro(vtkPVBoundsDisplay, "1.23");
+vtkCxxRevisionMacro(vtkPVBoundsDisplay, "1.24");
 
 vtkCxxSetObjectMacro(vtkPVBoundsDisplay, Widget, vtkKWBoundsDisplay);
 
@@ -72,7 +72,7 @@ void vtkPVBoundsDisplay::Create(vtkKWApplication *app)
   this->Widget->Create(app, "");
   if (this->FrameLabel)
     {
-    this->Widget->SetLabel(this->FrameLabel);
+    this->Widget->SetLabelText(this->FrameLabel);
     }
   this->Script("pack %s -side top -expand t -fill x", 
                this->Widget->GetWidgetName());
@@ -84,7 +84,7 @@ void vtkPVBoundsDisplay::SetLabel(const char* label)
   this->SetFrameLabel(label);
   if (this->GetApplication() && this->FrameLabel)
     {
-    this->Widget->SetLabel(this->FrameLabel);
+    this->Widget->SetLabelText(this->FrameLabel);
     }
 }
 

@@ -33,7 +33,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVGroupInputsWidget);
-vtkCxxRevisionMacro(vtkPVGroupInputsWidget, "1.29");
+vtkCxxRevisionMacro(vtkPVGroupInputsWidget, "1.30");
 
 class vtkPVSourceVectorInternals
 {
@@ -189,7 +189,7 @@ void vtkPVGroupInputsWidget::Inactivate()
       {
       label = vtkKWLabel::New();
       label->SetParent(this);
-      label->SetLabel(this->PartSelectionList->GetItem(idx));
+      label->SetText(this->PartSelectionList->GetItem(idx));
       label->Create(this->GetApplication(), "");
       this->Script("pack %s -side top -anchor w",
                    label->GetWidgetName());

@@ -37,7 +37,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVArrayMenu);
-vtkCxxRevisionMacro(vtkPVArrayMenu, "1.70");
+vtkCxxRevisionMacro(vtkPVArrayMenu, "1.71");
 
 vtkCxxSetObjectMacro(vtkPVArrayMenu, InputMenu, vtkPVInputMenu);
 vtkCxxSetObjectMacro(vtkPVArrayMenu, FieldMenu, vtkPVFieldMenu);
@@ -76,7 +76,7 @@ vtkPVArrayMenu::~vtkPVArrayMenu()
 //----------------------------------------------------------------------------
 void vtkPVArrayMenu::SetLabel(const char* label)
 {
-  this->Label->SetLabel(label);
+  this->Label->SetText(label);
   if (label && label[0] &&
       (this->TraceNameState == vtkPVWidget::Uninitialized ||
        this->TraceNameState == vtkPVWidget::Default) )
@@ -492,7 +492,7 @@ void vtkPVArrayMenu::CopyProperties(vtkPVWidget* clone, vtkPVSource* pvSource,
   vtkPVArrayMenu* pvam = vtkPVArrayMenu::SafeDownCast(clone);
   if (pvam)
     {
-    pvam->SetLabel(this->Label->GetLabel());
+    pvam->SetLabel(this->Label->GetText());
     if (this->InputMenu)
       {
       // This will either clone or return a previously cloned
@@ -530,7 +530,7 @@ int vtkPVArrayMenu::ReadXMLAttributes(vtkPVXMLElement* element,
     vtkErrorMacro("No label attribute.");
     return 0;
     }
-  this->Label->SetLabel(label);
+  this->Label->SetText(label);
   
   // Setup the InputMenu.
   const char* input_menu = element->GetAttribute("input_menu");
@@ -593,7 +593,7 @@ int vtkPVArrayMenu::ReadXMLAttributes(vtkPVXMLElement* element,
 //----------------------------------------------------------------------------
 const char* vtkPVArrayMenu::GetLabel() 
 {
-  return this->Label->GetLabel();
+  return this->Label->GetText();
 }
 
 //----------------------------------------------------------------------------

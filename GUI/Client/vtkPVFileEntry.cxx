@@ -72,7 +72,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVFileEntry);
-vtkCxxRevisionMacro(vtkPVFileEntry, "1.104");
+vtkCxxRevisionMacro(vtkPVFileEntry, "1.105");
 
 //----------------------------------------------------------------------------
 vtkPVFileEntry::vtkPVFileEntry()
@@ -133,7 +133,7 @@ vtkPVFileEntry::~vtkPVFileEntry()
 void vtkPVFileEntry::SetLabel(const char* label)
 {
   // For getting the widget in a script.
-  this->LabelWidget->SetLabel(label);
+  this->LabelWidget->SetText(label);
 
   if (label && label[0] &&
       (this->TraceNameState == vtkPVWidget::Uninitialized ||
@@ -147,7 +147,7 @@ void vtkPVFileEntry::SetLabel(const char* label)
 //----------------------------------------------------------------------------
 const char* vtkPVFileEntry::GetLabel()
 {
-  return this->LabelWidget->GetLabel();
+  return this->LabelWidget->GetText();
 }
 
 //----------------------------------------------------------------------------
@@ -223,7 +223,7 @@ void vtkPVFileEntry::Create(vtkKWApplication *pvApp)
   
   // Now the push button
   this->BrowseButton->Create(pvApp, "");
-  this->BrowseButton->SetLabel("Browse");
+  this->BrowseButton->SetText("Browse");
   this->BrowseButton->SetCommand(this, "BrowseCallback");
 
   if (this->BalloonHelpString)
@@ -249,7 +249,7 @@ void vtkPVFileEntry::Create(vtkKWApplication *pvApp)
 
   this->FileListPopup->SetParent(frame);
   this->FileListPopup->Create(pvApp, 0);
-  this->FileListPopup->SetLabel("Timesteps");
+  this->FileListPopup->SetText("Timesteps");
   this->FileListPopup->SetPopupTitle("Select Files For Time Series");
   this->FileListPopup->SetCommand(this, "UpdateAvailableFiles");
 
@@ -835,7 +835,7 @@ void vtkPVFileEntry::CopyProperties(vtkPVWidget* clone, vtkPVSource* pvSource,
   vtkPVFileEntry* pvfe = vtkPVFileEntry::SafeDownCast(clone);
   if (pvfe)
     {
-    pvfe->LabelWidget->SetLabel(this->LabelWidget->GetLabel());
+    pvfe->LabelWidget->SetText(this->LabelWidget->GetText());
     pvfe->SetExtension(this->GetExtension());
     }
   else 

@@ -50,7 +50,7 @@
  
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProbe);
-vtkCxxRevisionMacro(vtkPVProbe, "1.135");
+vtkCxxRevisionMacro(vtkPVProbe, "1.136");
 
 int vtkPVProbeCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -184,7 +184,7 @@ void vtkPVProbe::CreateProperties()
   
   this->SelectedPointLabel->SetParent(this->SelectedPointFrame);
   this->SelectedPointLabel->Create(pvApp, "");
-  this->SelectedPointLabel->SetLabel("Point");
+  this->SelectedPointLabel->SetText("Point");
 
   this->Script("pack %s -side left",
                this->SelectedPointLabel->GetWidgetName());
@@ -387,12 +387,12 @@ void vtkPVProbe::AcceptCallbackInternal()
           }
         }
       }
-    this->PointDataLabel->SetLabel( label.c_str() );
+    this->PointDataLabel->SetText( label.c_str() );
     this->Script("pack %s", this->PointDataLabel->GetWidgetName());
     }
   else
     {
-    this->PointDataLabel->SetLabel("");
+    this->PointDataLabel->SetText("");
     this->Script("pack forget %s", this->PointDataLabel->GetWidgetName());
     }
 

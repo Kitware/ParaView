@@ -26,7 +26,7 @@
 #include "vtkRenderer.h"
 
 vtkStandardNewMacro(vtkPVCameraControl);
-vtkCxxRevisionMacro(vtkPVCameraControl, "1.6");
+vtkCxxRevisionMacro(vtkPVCameraControl, "1.7");
 
 vtkCxxSetObjectMacro(vtkPVCameraControl, InteractorStyle,
                      vtkPVInteractorStyleCenterOfRotation);
@@ -210,8 +210,8 @@ void vtkPVCameraControl::Create(vtkKWApplication *app, const char *)
   
   this->ElevationButton->SetParent(this);
   this->ElevationButton->Create(app, 0);
-  this->ElevationButton->SetLabel("Apply Elevation");
-  this->ElevationButton->SetLabelWidth(VTK_PV_CAMERA_CONTROL_LABEL_WIDTH);
+  this->ElevationButton->SetText("Apply Elevation");
+  this->ElevationButton->SetWidth(VTK_PV_CAMERA_CONTROL_LABEL_WIDTH);
   this->ElevationButton->SetCommand(this, "ElevationButtonCallback");
 
   this->ElevationEntry->SetParent(this);
@@ -221,12 +221,12 @@ void vtkPVCameraControl::Create(vtkKWApplication *app, const char *)
   
   this->ElevationLabel->SetParent(this);
   this->ElevationLabel->Create(app, 0);
-  this->ElevationLabel->SetLabel("degrees");
+  this->ElevationLabel->SetText("degrees");
   
   this->AzimuthButton->SetParent(this);
   this->AzimuthButton->Create(app, 0);
-  this->AzimuthButton->SetLabel("Apply Azimuth");
-  this->AzimuthButton->SetLabelWidth(VTK_PV_CAMERA_CONTROL_LABEL_WIDTH);
+  this->AzimuthButton->SetText("Apply Azimuth");
+  this->AzimuthButton->SetWidth(VTK_PV_CAMERA_CONTROL_LABEL_WIDTH);
   this->AzimuthButton->SetCommand(this, "AzimuthButtonCallback");
 
   this->AzimuthEntry->SetParent(this);
@@ -236,12 +236,12 @@ void vtkPVCameraControl::Create(vtkKWApplication *app, const char *)
   
   this->AzimuthLabel->SetParent(this);
   this->AzimuthLabel->Create(app, 0);
-  this->AzimuthLabel->SetLabel("degrees");
+  this->AzimuthLabel->SetText("degrees");
   
   this->RollButton->SetParent(this);
   this->RollButton->Create(app, 0);
-  this->RollButton->SetLabel("Apply Roll");
-  this->RollButton->SetLabelWidth(VTK_PV_CAMERA_CONTROL_LABEL_WIDTH);
+  this->RollButton->SetText("Apply Roll");
+  this->RollButton->SetWidth(VTK_PV_CAMERA_CONTROL_LABEL_WIDTH);
   this->RollButton->SetCommand(this, "RollButtonCallback");
 
   this->RollEntry->SetParent(this);
@@ -251,7 +251,7 @@ void vtkPVCameraControl::Create(vtkKWApplication *app, const char *)
   
   this->RollLabel->SetParent(this);
   this->RollLabel->Create(app, 0);
-  this->RollLabel->SetLabel("degrees");
+  this->RollLabel->SetText("degrees");
   
   this->Script("grid %s -row 0 -column 0 -padx 3",
                this->ElevationButton->GetWidgetName());

@@ -26,7 +26,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectCustomReader);
-vtkCxxRevisionMacro(vtkPVSelectCustomReader, "1.6");
+vtkCxxRevisionMacro(vtkPVSelectCustomReader, "1.7");
 
 //----------------------------------------------------------------------------
 vtkPVSelectCustomReader::vtkPVSelectCustomReader() 
@@ -59,7 +59,7 @@ vtkPVReaderModule* vtkPVSelectCustomReader::SelectReader(vtkPVWindow* win,
   label->SetParent(frame);
   ostrstream str1;
   str1 << "Open " << openFileName << " with:" << ends;
-  label->SetLabel(str1.str());
+  label->SetText(str1.str());
   label->Create(app, 0);
   str1.rdbuf()->freeze(0);
 

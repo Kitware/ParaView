@@ -32,7 +32,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCameraIcon);
-vtkCxxRevisionMacro(vtkPVCameraIcon, "1.21");
+vtkCxxRevisionMacro(vtkPVCameraIcon, "1.22");
 
 vtkCxxSetObjectMacro(vtkPVCameraIcon,RenderView,vtkPVRenderView);
 
@@ -79,7 +79,7 @@ void vtkPVCameraIcon::Create(vtkKWApplication *pvApp, const char *args)
   // The should work up to 1 pixel accuracy (since padding is all around,
   // the total added pad will be an even nb of pixels).
 
-  this->SetLabel("Empty");
+  this->SetText("Empty");
   this->Script("%s configure -relief raised -anchor center", 
                this->GetWidgetName());
 

@@ -29,7 +29,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVSaveBatchScriptDialog );
-vtkCxxRevisionMacro(vtkPVSaveBatchScriptDialog, "1.15");
+vtkCxxRevisionMacro(vtkPVSaveBatchScriptDialog, "1.16");
 
 int vtkPVSaveBatchScriptDialogCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -190,7 +190,7 @@ void vtkPVSaveBatchScriptDialog::Create(vtkKWApplication *app)
     }
   this->ImageFileNameBrowseButton->SetParent(this->ImageFileNameFrame);
   this->ImageFileNameBrowseButton->Create(app, 0);
-  this->ImageFileNameBrowseButton->SetLabel("Browse");
+  this->ImageFileNameBrowseButton->SetText("Browse");
   this->ImageFileNameBrowseButton->SetCommand(this, "ImageFileNameBrowseButtonCallback");
   this->Script("pack %s -side right -expand 0 -padx 2",
                this->ImageFileNameBrowseButton->GetWidgetName());
@@ -207,7 +207,7 @@ void vtkPVSaveBatchScriptDialog::Create(vtkKWApplication *app)
     }
   this->GeometryFileNameBrowseButton->SetParent(this->GeometryFileNameFrame);
   this->GeometryFileNameBrowseButton->Create(app, 0);
-  this->GeometryFileNameBrowseButton->SetLabel("Browse");
+  this->GeometryFileNameBrowseButton->SetText("Browse");
   this->GeometryFileNameBrowseButton->SetCommand(this, "GeometryFileNameBrowseButtonCallback");
 
   this->GeometryFileNameEntry->SetEnabled(0);
@@ -227,11 +227,11 @@ void vtkPVSaveBatchScriptDialog::Create(vtkKWApplication *app)
   this->AcceptButton->SetParent(this->ButtonFrame);
   this->AcceptButton->Create(app, "");
   this->AcceptButton->SetCommand(this, "Accept");
-  this->AcceptButton->SetLabel("Accept");
+  this->AcceptButton->SetText("Accept");
   this->CancelButton->SetParent(this->ButtonFrame);
   this->CancelButton->Create(app, "");
   this->CancelButton->SetCommand(this, "Cancel");
-  this->CancelButton->SetLabel("Cancel");
+  this->CancelButton->SetText("Cancel");
   this->Script("pack %s %s -side left -expand 1 -fill x -padx 2",
                this->AcceptButton->GetWidgetName(),
                this->CancelButton->GetWidgetName());

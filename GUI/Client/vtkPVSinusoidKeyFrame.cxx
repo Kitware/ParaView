@@ -22,7 +22,7 @@
 #include "vtkSMSinusoidKeyFrameProxy.h"
 
 vtkStandardNewMacro(vtkPVSinusoidKeyFrame);
-vtkCxxRevisionMacro(vtkPVSinusoidKeyFrame, "1.4");
+vtkCxxRevisionMacro(vtkPVSinusoidKeyFrame, "1.5");
 
 //-----------------------------------------------------------------------------
 vtkPVSinusoidKeyFrame::vtkPVSinusoidKeyFrame()
@@ -54,7 +54,7 @@ void vtkPVSinusoidKeyFrame::ChildCreate(vtkKWApplication* app)
 
   this->PhaseLabel->SetParent(this);
   this->PhaseLabel->Create(app, 0);
-  this->PhaseLabel->SetLabel("Phase:");
+  this->PhaseLabel->SetText("Phase:");
 
   this->PhaseThumbWheel->SetParent(this);
   this->PhaseThumbWheel->PopupModeOn();
@@ -73,7 +73,7 @@ void vtkPVSinusoidKeyFrame::ChildCreate(vtkKWApplication* app)
 
   this->FrequencyLabel->SetParent(this);
   this->FrequencyLabel->Create(app, 0);
-  this->FrequencyLabel->SetLabel("Frequency:");
+  this->FrequencyLabel->SetText("Frequency:");
 
   this->FrequencyThumbWheel->SetParent(this);
   this->FrequencyThumbWheel->PopupModeOn();
@@ -94,7 +94,7 @@ void vtkPVSinusoidKeyFrame::ChildCreate(vtkKWApplication* app)
 
   this->OffsetLabel->SetParent(this);
   this->OffsetLabel->Create(app, 0);
-  this->OffsetLabel->SetLabel("Amplitude:");
+  this->OffsetLabel->SetText("Amplitude:");
 
   this->OffsetThumbWheel->SetParent(this);
   this->OffsetThumbWheel->PopupModeOn();

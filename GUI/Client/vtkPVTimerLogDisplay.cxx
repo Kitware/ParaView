@@ -31,7 +31,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVTimerLogDisplay );
-vtkCxxRevisionMacro(vtkPVTimerLogDisplay, "1.23");
+vtkCxxRevisionMacro(vtkPVTimerLogDisplay, "1.24");
 
 int vtkPVTimerLogDisplayCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -169,7 +169,7 @@ void vtkPVTimerLogDisplay::Create(vtkKWApplication *app)
   this->DismissButton->SetParent(this->ButtonFrame);
   this->DismissButton->Create(app, "");
   this->DismissButton->SetCommand(this, "Dismiss");
-  this->DismissButton->SetLabel("Dismiss");
+  this->DismissButton->SetText("Dismiss");
   this->Script("pack %s -side left -expand 1 -fill x",
                this->DismissButton->GetWidgetName());
 
@@ -194,19 +194,19 @@ void vtkPVTimerLogDisplay::Create(vtkKWApplication *app)
   this->SaveButton->SetParent(this->ControlFrame);
   this->SaveButton->Create(app, "");
   this->SaveButton->SetCommand(this, "Save");
-  this->SaveButton->SetLabel("Save");
+  this->SaveButton->SetText("Save");
   this->Script("pack %s -side left -expand 0 -fill none",
                this->SaveButton->GetWidgetName());
   this->ClearButton->SetParent(this->ControlFrame);
   this->ClearButton->Create(app, "");
   this->ClearButton->SetCommand(this, "Clear");
-  this->ClearButton->SetLabel("Clear");
+  this->ClearButton->SetText("Clear");
   this->Script("pack %s -side left -expand 0 -fill none",
                this->ClearButton->GetWidgetName());
 
   this->ThresholdLabel->SetParent(this->ControlFrame);
   this->ThresholdLabel->Create(app, "");
-  this->ThresholdLabel->SetLabel("Time Threshold:");
+  this->ThresholdLabel->SetText("Time Threshold:");
   this->ThresholdLabel->SetBalloonHelpString("This option filters out short duration events.");
   this->ThresholdMenu->SetParent(this->ControlFrame);
   this->ThresholdMenu->Create(app, "");
@@ -221,7 +221,7 @@ void vtkPVTimerLogDisplay::Create(vtkKWApplication *app)
 
   this->BufferLengthLabel->SetParent(this->ControlFrame);
   this->BufferLengthLabel->Create(app, "");
-  this->BufferLengthLabel->SetLabel("Buffer Length:");
+  this->BufferLengthLabel->SetText("Buffer Length:");
   this->BufferLengthLabel->SetBalloonHelpString("Set how many entries the log can have.");
   this->BufferLengthMenu->SetParent(this->ControlFrame);
   this->BufferLengthMenu->Create(app, "");
@@ -236,7 +236,7 @@ void vtkPVTimerLogDisplay::Create(vtkKWApplication *app)
 
   this->EnableLabel->SetParent(this->ControlFrame);
   this->EnableLabel->Create(app, "");
-  this->EnableLabel->SetLabel("Enable:");
+  this->EnableLabel->SetText("Enable:");
   this->EnableLabel->SetBalloonHelpString("Enable or disable loging of new events.");
   this->EnableCheck->SetParent(this->ControlFrame);
   this->EnableCheck->Create(app, "");

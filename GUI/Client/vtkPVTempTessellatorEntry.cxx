@@ -34,7 +34,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVTempTessellatorEntry);
-vtkCxxRevisionMacro(vtkPVTempTessellatorEntry, "1.18");
+vtkCxxRevisionMacro(vtkPVTempTessellatorEntry, "1.19");
 
 //-----------------------------------------------------------------------------
 class vtkTessellatorEntryData
@@ -124,14 +124,14 @@ void vtkPVTempTessellatorEntry::Create( vtkKWApplication* app )
   vtkTessellatorEntryData* d = this->Data;
 
   d->CriteriaFrame->SetParent( this );
-  d->CriteriaFrame->SetLabel( "Tessellation Criteria" );
+  d->CriteriaFrame->SetLabelText( "Tessellation Criteria" );
   d->CriteriaFrame->Create( app, "" );
 
   d->CriteriaInstructions->SetParent( d->CriteriaFrame->GetFrame() );
   d->CriteriaInstructions->Create( app, "" );
   d->CriteriaInstructions->SetLineType( vtkKWLabel::MultiLine );
   d->CriteriaInstructions->AdjustWrapLengthToWidthOn();
-  d->CriteriaInstructions->SetLabel(
+  d->CriteriaInstructions->SetText(
     "Select a point field from the list below. You may "
     "then alter whether the field is used to subdivide "
     "edges and, if so, what the maximum allowable error "
@@ -378,7 +378,7 @@ void vtkPVTempTessellatorEntry::AddAnimationScriptsToMenu(
 
 void vtkPVTempTessellatorEntry::SetLabel( const char* label )
 {
-  this->Data->CriteriaFrame->SetLabel( label );
+  this->Data->CriteriaFrame->SetLabelText( label );
   if ( label && label[0] &&
        (this->TraceNameState == vtkPVWidget::Uninitialized ||
         this->TraceNameState == vtkPVWidget::Default) )
@@ -390,12 +390,12 @@ void vtkPVTempTessellatorEntry::SetLabel( const char* label )
 
 const char* vtkPVTempTessellatorEntry::GetLabel() const
 {
-  return this->Data->CriteriaFrame->GetLabel()->GetLabel();
+  return this->Data->CriteriaFrame->GetLabel()->GetText();
 }
 
 char* vtkPVTempTessellatorEntry::GetLabel()
 {
-  return this->Data->CriteriaFrame->GetLabel()->GetLabel();
+  return this->Data->CriteriaFrame->GetLabel()->GetText();
 }
 
 void vtkPVTempTessellatorEntry::ResetFieldCriteria()

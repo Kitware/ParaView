@@ -29,7 +29,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCompositeRenderModuleUI);
-vtkCxxRevisionMacro(vtkPVCompositeRenderModuleUI, "1.20");
+vtkCxxRevisionMacro(vtkPVCompositeRenderModuleUI, "1.21");
 
 int vtkPVCompositeRenderModuleUICommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -187,7 +187,7 @@ void vtkPVCompositeRenderModuleUI::Create(vtkKWApplication *app, const char *)
     // Determines when geometry is collected to process 0 for rendering.
     this->CompositeLabel->SetParent(this->LODScalesFrame);
     this->CompositeLabel->Create(app, "-anchor w");
-    this->CompositeLabel->SetLabel("Composite:");
+    this->CompositeLabel->SetText("Composite:");
 
     this->CompositeCheck->SetParent(this->LODScalesFrame);
     this->CompositeCheck->Create(app, "");
@@ -242,7 +242,7 @@ void vtkPVCompositeRenderModuleUI::Create(vtkKWApplication *app, const char *)
     // Determines which reduction/subsampling factor to use.
     this->ReductionLabel->SetParent(this->LODScalesFrame);
     this->ReductionLabel->Create(app, "-anchor w");
-    this->ReductionLabel->SetLabel("Subsample Rate:");
+    this->ReductionLabel->SetText("Subsample Rate:");
 
     this->ReductionCheck->SetParent(this->LODScalesFrame);
     this->ReductionCheck->Create(app, "");
@@ -261,7 +261,7 @@ void vtkPVCompositeRenderModuleUI::Create(vtkKWApplication *app, const char *)
              "Subsampling will use larger pixels during interaction.");
 
     this->ReductionFactorLabel->SetParent(this->LODScalesFrame);
-    this->ReductionFactorLabel->SetLabel("2 Pixels");
+    this->ReductionFactorLabel->SetText("2 Pixels");
     this->ReductionFactorLabel->Create(app, "-anchor w");
     if (pvapp &&
         pvapp->GetRegisteryValue(2, "RunTime", "ReductionFactor", 0))
@@ -287,7 +287,7 @@ void vtkPVCompositeRenderModuleUI::Create(vtkKWApplication *app, const char *)
     // Determines whether to squirt and what compression level.
     this->SquirtLabel->SetParent(this->LODScalesFrame);
     this->SquirtLabel->Create(app, "-anchor w");
-    this->SquirtLabel->SetLabel("Squirt Compression:");
+    this->SquirtLabel->SetText("Squirt Compression:");
 
     this->SquirtCheck->SetParent(this->LODScalesFrame);
     this->SquirtCheck->Create(app, "");
@@ -349,7 +349,7 @@ void vtkPVCompositeRenderModuleUI::Create(vtkKWApplication *app, const char *)
     this->ParallelRenderParametersFrame->SetParent(this); 
     this->ParallelRenderParametersFrame->ShowHideFrameOn();
     this->ParallelRenderParametersFrame->Create(app,0);
-    this->ParallelRenderParametersFrame->SetLabel(
+    this->ParallelRenderParametersFrame->SetLabelText(
       "Parallel Rendering Parameters");
 
     this->Script("pack %s -padx 2 -pady 2 -fill x -expand yes -anchor w",
@@ -460,13 +460,13 @@ void vtkPVCompositeRenderModuleUI::CompositeThresholdLabelCallback()
 
   if (threshold == VTK_LARGE_FLOAT)
     {
-    this->CompositeThresholdLabel->SetLabel("Compositing Disabled");
+    this->CompositeThresholdLabel->SetText("Compositing Disabled");
     }
   else
     {
     char str[256];
     sprintf(str, "Composite above %.1f MBytes", threshold);
-    this->CompositeThresholdLabel->SetLabel(str);
+    this->CompositeThresholdLabel->SetText(str);
     }
 }
 
@@ -688,7 +688,7 @@ void vtkPVCompositeRenderModuleUI::SetSquirtLevel(int level)
     this->SquirtLevelScale->EnabledOff();
     this->SquirtLevelLabel->EnabledOff();
     this->SquirtCheck->SetState(0);
-    this->SquirtLevelLabel->SetLabel("24 Bits-disabled");
+    this->SquirtLevelLabel->SetText("24 Bits-disabled");
     vtkTimerLog::MarkEvent("--- Squirt disabled.");
     }
   else
@@ -700,22 +700,22 @@ void vtkPVCompositeRenderModuleUI::SetSquirtLevel(int level)
     switch(level)
       {
       case 1:
-        this->SquirtLevelLabel->SetLabel("24 Bits");
+        this->SquirtLevelLabel->SetText("24 Bits");
         break;
       case 2:
-        this->SquirtLevelLabel->SetLabel("22 Bits");
+        this->SquirtLevelLabel->SetText("22 Bits");
         break;
       case 3:
-        this->SquirtLevelLabel->SetLabel("19 Bits");
+        this->SquirtLevelLabel->SetText("19 Bits");
         break;
       case 4:
-        this->SquirtLevelLabel->SetLabel("16 Bits");
+        this->SquirtLevelLabel->SetText("16 Bits");
         break;
       case 5:
-        this->SquirtLevelLabel->SetLabel("13 Bits");
+        this->SquirtLevelLabel->SetText("13 Bits");
         break;
       case 6:
-        this->SquirtLevelLabel->SetLabel("10 Bits");
+        this->SquirtLevelLabel->SetText("10 Bits");
         break;
       }
 
@@ -769,7 +769,7 @@ void vtkPVCompositeRenderModuleUI::SetReductionFactor(int factor)
     this->ReductionFactorScale->EnabledOff();
     this->ReductionFactorLabel->EnabledOff();
     this->ReductionCheck->SetState(0);
-    this->ReductionFactorLabel->SetLabel("Subsampling Disabled"); 
+    this->ReductionFactorLabel->SetText("Subsampling Disabled"); 
     vtkTimerLog::MarkEvent("--- Reduction disabled.");
     }
   else
@@ -780,7 +780,7 @@ void vtkPVCompositeRenderModuleUI::SetReductionFactor(int factor)
     this->ReductionCheck->SetState(1);
     char str[128];
     sprintf(str, "%d Pixels", factor);
-    this->ReductionFactorLabel->SetLabel(str); 
+    this->ReductionFactorLabel->SetText(str); 
      vtkTimerLog::FormatAndMarkEvent("--- Reduction factor %d.", factor);
    }
 

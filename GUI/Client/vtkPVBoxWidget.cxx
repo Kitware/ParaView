@@ -42,7 +42,7 @@
 #include "vtkPVWindow.h"
 
 vtkStandardNewMacro(vtkPVBoxWidget);
-vtkCxxRevisionMacro(vtkPVBoxWidget, "1.51");
+vtkCxxRevisionMacro(vtkPVBoxWidget, "1.52");
 
 vtkCxxSetObjectMacro(vtkPVBoxWidget, InputMenu, vtkPVInputMenu);
 
@@ -473,19 +473,19 @@ void vtkPVBoxWidget::ChildCreate(vtkPVApplication* )
 
   this->TranslateLabel->SetParent(this->ControlFrame->GetFrame());
   this->TranslateLabel->Create(this->GetApplication(), 0);
-  this->TranslateLabel->SetLabel("Translate:");
+  this->TranslateLabel->SetText("Translate:");
   this->TranslateLabel->SetBalloonHelpString(
     "Translate the geometry relative to the dataset location.");
 
   this->ScaleLabel->SetParent(this->ControlFrame->GetFrame());
   this->ScaleLabel->Create(this->GetApplication(), 0);
-  this->ScaleLabel->SetLabel("Scale:");
+  this->ScaleLabel->SetText("Scale:");
   this->ScaleLabel->SetBalloonHelpString(
     "Scale the geometry relative to the size of the dataset.");
 
   this->OrientationLabel->SetParent(this->ControlFrame->GetFrame());
   this->OrientationLabel->Create(this->GetApplication(), 0);
-  this->OrientationLabel->SetLabel("Orientation:");
+  this->OrientationLabel->SetText("Orientation:");
   this->OrientationLabel->SetBalloonHelpString(
     "Orient the geometry relative to the dataset origin.");
 

@@ -32,7 +32,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVMinMax);
-vtkCxxRevisionMacro(vtkPVMinMax, "1.45");
+vtkCxxRevisionMacro(vtkPVMinMax, "1.46");
 
 vtkCxxSetObjectMacro(vtkPVMinMax, ArrayMenu, vtkPVArrayMenu);
 
@@ -89,13 +89,13 @@ vtkPVMinMax::~vtkPVMinMax()
 //----------------------------------------------------------------------------
 void vtkPVMinMax::SetMinimumLabel(const char* label)
 {
-  this->MinLabel->SetLabel(label);
+  this->MinLabel->SetText(label);
 }
 
 //----------------------------------------------------------------------------
 void vtkPVMinMax::SetMaximumLabel(const char* label)
 {
-  this->MaxLabel->SetLabel(label);
+  this->MaxLabel->SetText(label);
 }
 
 //----------------------------------------------------------------------------
@@ -144,7 +144,7 @@ void vtkPVMinMax::Create(vtkKWApplication *pvApp)
 
   // For getting the widget in a script.
 
-  const char* label = this->MinLabel->GetLabel();
+  const char* label = this->MinLabel->GetText();
   if (label && label[0] &&
       (this->TraceNameState == vtkPVWidget::Uninitialized ||
        this->TraceNameState == vtkPVWidget::Default) )
@@ -518,8 +518,8 @@ void vtkPVMinMax::CopyProperties(vtkPVWidget* clone, vtkPVSource* pvSource,
       am->Delete();
       }
 
-    pvmm->SetMinimumLabel(this->MinLabel->GetLabel());
-    pvmm->SetMaximumLabel(this->MaxLabel->GetLabel());
+    pvmm->SetMinimumLabel(this->MinLabel->GetText());
+    pvmm->SetMaximumLabel(this->MaxLabel->GetText());
     pvmm->SetMinimumHelp(this->MinHelp);
     pvmm->SetMaximumHelp(this->MaxHelp);
     pvmm->SetResolution(this->MinScale->GetResolution());

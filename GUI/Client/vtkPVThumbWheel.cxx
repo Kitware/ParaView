@@ -33,7 +33,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVThumbWheel);
-vtkCxxRevisionMacro(vtkPVThumbWheel, "1.12");
+vtkCxxRevisionMacro(vtkPVThumbWheel, "1.13");
 
 //-----------------------------------------------------------------------------
 vtkPVThumbWheel::vtkPVThumbWheel()
@@ -64,7 +64,7 @@ void vtkPVThumbWheel::Create(vtkKWApplication *pvApp)
   
   // Now a label
   this->Label->Create(pvApp, "-justify right");
-  if (strlen(this->Label->GetLabel()) > 0)
+  if (strlen(this->Label->GetText()) > 0)
     {
     this->Label->SetWidth(18);
     }
@@ -122,7 +122,7 @@ float vtkPVThumbWheel::GetValue()
 //-----------------------------------------------------------------------------
 void vtkPVThumbWheel::SetLabel(const char *str)
 {
-  this->Label->SetLabel(str);
+  this->Label->SetText(str);
   if (str && str[0] &&
       (this->TraceNameState == vtkPVWidget::Uninitialized ||
        this->TraceNameState == vtkPVWidget::Default) )
@@ -204,7 +204,7 @@ void vtkPVThumbWheel::AddAnimationScriptsToMenu(vtkKWMenu *menu,
   char methodAndArgs[500];
 
   sprintf(methodAndArgs, "AnimationMenuCallback %s", ai->GetTclName()); 
-  menu->AddCommand(this->Label->GetLabel(), this, methodAndArgs, 0,"");
+  menu->AddCommand(this->Label->GetText(), this, methodAndArgs, 0,"");
 }
 
 //-----------------------------------------------------------------------------
@@ -256,7 +256,7 @@ void vtkPVThumbWheel::AnimationMenuCallback(vtkPVAnimationInterfaceEntry *ai)
   
   this->Superclass::AnimationMenuCallback(ai);
 
-  ai->SetLabelAndScript(this->Label->GetLabel(), NULL, this->GetTraceName());
+  ai->SetLabelAndScript(this->Label->GetText(), NULL, this->GetTraceName());
 
   char methodAndArgs[500];
   
@@ -361,7 +361,7 @@ void vtkPVThumbWheel::CopyProperties(vtkPVWidget *clone, vtkPVSource *source,
     {
     pvtw->SetMinimumValue(this->ThumbWheel->GetMinimumValue());
     pvtw->SetResolution(this->ThumbWheel->GetResolution());
-    pvtw->SetLabel(this->Label->GetLabel());
+    pvtw->SetLabel(this->Label->GetText());
     }
   else
     {

@@ -35,7 +35,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVInputMenu);
-vtkCxxRevisionMacro(vtkPVInputMenu, "1.69");
+vtkCxxRevisionMacro(vtkPVInputMenu, "1.70");
 
 
 //----------------------------------------------------------------------------
@@ -66,7 +66,7 @@ vtkPVInputMenu::~vtkPVInputMenu()
 //----------------------------------------------------------------------------
 void vtkPVInputMenu::SetLabel(const char* label)
 {
-  this->Label->SetLabel(label);
+  this->Label->SetText(label);
   if (label && label[0] &&
       (this->TraceNameState == vtkPVWidget::Uninitialized ||
        this->TraceNameState == vtkPVWidget::Default) )
@@ -469,7 +469,7 @@ void vtkPVInputMenu::CopyProperties(vtkPVWidget* clone, vtkPVSource* pvSource,
   vtkPVInputMenu* pvim = vtkPVInputMenu::SafeDownCast(clone);
   if (pvim)
     {
-    pvim->SetLabel(this->Label->GetLabel());
+    pvim->SetLabel(this->Label->GetText());
     pvim->SetInputName(this->InputName);
     pvim->SetSources(this->GetSources());
     pvim->InitializeWithCurrent = this->InitializeWithCurrent;
@@ -493,7 +493,7 @@ int vtkPVInputMenu::ReadXMLAttributes(vtkPVXMLElement* element,
     vtkErrorMacro("No label attribute.");
     return 0;
     }
-  this->Label->SetLabel(label);  
+  this->Label->SetText(label);  
   
   // Setup the InputName.
   const char* input_name = element->GetAttribute("input_name");
@@ -529,7 +529,7 @@ int vtkPVInputMenu::ReadXMLAttributes(vtkPVXMLElement* element,
 //----------------------------------------------------------------------------
 const char* vtkPVInputMenu::GetLabel() 
 {
-  return this->Label->GetLabel();
+  return this->Label->GetText();
 }
 
 //----------------------------------------------------------------------------

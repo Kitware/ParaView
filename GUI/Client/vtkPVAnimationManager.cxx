@@ -22,6 +22,7 @@
 #include "vtkPVHorizontalAnimationInterface.h"
 #include "vtkPVAnimationScene.h"
 #include "vtkKWFrame.h"
+#include "vtkKWLabel.h"
 #include "vtkSMProxyIterator.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyManager.h"
@@ -60,7 +61,7 @@
 #define VTK_PV_ANIMATION_GROUP "animateable"
 
 vtkStandardNewMacro(vtkPVAnimationManager);
-vtkCxxRevisionMacro(vtkPVAnimationManager, "1.24");
+vtkCxxRevisionMacro(vtkPVAnimationManager, "1.25");
 vtkCxxSetObjectMacro(vtkPVAnimationManager, HorizantalParent, vtkKWWidget);
 vtkCxxSetObjectMacro(vtkPVAnimationManager, VerticalParent, vtkKWWidget);
 //*****************************************************************************
@@ -1040,13 +1041,13 @@ void vtkPVAnimationManager::SaveAnimation()
     int origHeight = view->GetRenderWindowSize()[1];
 
     vtkKWEntryLabeled *widthEntry = vtkKWEntryLabeled::New();
-    widthEntry->SetLabel("Width:");
+    widthEntry->GetLabel()->SetText("Width:");
     widthEntry->SetParent(frame);
     widthEntry->Create(this->GetApplication(), "");
     widthEntry->GetWidget()->SetValue(origWidth);
 
     vtkKWEntryLabeled *heightEntry = vtkKWEntryLabeled::New();
-    heightEntry->SetLabel("Height:");
+    heightEntry->GetLabel()->SetText("Height:");
     heightEntry->SetParent(frame);
     heightEntry->Create(this->GetApplication(), "");
     heightEntry->GetWidget()->SetValue(origHeight);

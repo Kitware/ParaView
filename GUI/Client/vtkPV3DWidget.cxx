@@ -37,7 +37,7 @@
 #include "vtkSMDoubleVectorProperty.h"
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkPV3DWidget, "1.66");
+vtkCxxRevisionMacro(vtkPV3DWidget, "1.67");
 
 //===========================================================================
 //***************************************************************************
@@ -124,7 +124,7 @@ void vtkPV3DWidget::Create(vtkKWApplication *app)
     {
     this->LabeledFrame->SetParent(this);
     this->LabeledFrame->Create(pvApp, 0);
-    this->LabeledFrame->SetLabel("3D Widget");
+    this->LabeledFrame->SetLabelText("3D Widget");
     
     this->Script("pack %s -fill both -expand 1", 
                  this->LabeledFrame->GetWidgetName());
@@ -287,7 +287,7 @@ void vtkPV3DWidget::SetFrameLabel(const char* label)
 {
   if ( this->LabeledFrame && this->UseLabel )
     {
-    this->LabeledFrame->SetLabel(label);
+    this->LabeledFrame->SetLabelText(label);
     } 
 }
 

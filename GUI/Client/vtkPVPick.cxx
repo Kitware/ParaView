@@ -33,7 +33,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPick);
-vtkCxxRevisionMacro(vtkPVPick, "1.15");
+vtkCxxRevisionMacro(vtkPVPick, "1.16");
 
 
 //----------------------------------------------------------------------------
@@ -251,7 +251,7 @@ void vtkPVPick::InsertDataLabel(const char* labelArg, vtkIdType idx,
   kwl->Create(this->GetPVApplication(), "");
   ostrstream kwlStr;
   kwlStr << labelArg  << ": " << idx << ends;
-  kwl->SetLabel(kwlStr.str());
+  kwl->SetText(kwlStr.str());
   kwlStr.rdbuf()->freeze(0);
   this->LabelCollection->AddItem(kwl);
   this->Script("grid %s -column 1 -row %d -sticky nw",
@@ -330,7 +330,7 @@ void vtkPVPick::InsertDataLabel(const char* labelArg, vtkIdType idx,
   kwl = vtkKWLabel::New();
   kwl->SetParent(this->DataFrame);
   kwl->Create(this->GetPVApplication(), "");
-  kwl->SetLabel( label.c_str() );
+  kwl->SetText( label.c_str() );
   this->LabelCollection->AddItem(kwl);
   this->Script("grid %s -column 2 -row %d -sticky nw",
                kwl->GetWidgetName(), this->LabelRow++);

@@ -31,7 +31,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVConnectDialog);
-vtkCxxRevisionMacro(vtkPVConnectDialog, "1.19");
+vtkCxxRevisionMacro(vtkPVConnectDialog, "1.20");
 
 //----------------------------------------------------------------------------
 void vtkPVConnectDialog::Create(vtkKWApplication* app, const char* vtkNotUsed(opts))
@@ -68,10 +68,10 @@ void vtkPVConnectDialog::Create(vtkKWApplication* app, const char* vtkNotUsed(op
   this->Username->SetValue(this->SSHUser);
   this->Hostname->SetParent(frame);
   this->Hostname->Create(app, 0);
-  this->Hostname->SetLabel("@");
+  this->Hostname->GetLabel()->SetText("@");
   this->Port->SetParent(frame);
   this->Port->Create(app,0);
-  this->Port->SetLabel(":");
+  this->Port->GetLabel()->SetText(":");
   this->Port->GetWidget()->SetWidth(4);
   this->Username->SetWidth(7);
   this->Script("pack %s -side left -expand 0", 
@@ -89,7 +89,7 @@ void vtkPVConnectDialog::Create(vtkKWApplication* app, const char* vtkNotUsed(op
 
   this->MPIMode->SetParent(frame);
   this->MPIMode->Create(app, 0);
-  this->MPIMode->SetLabel("Use MPI");
+  this->MPIMode->GetLabel()->SetText("Use MPI");
   if ( this->MultiProcessMode == 1 )
     {
     this->MPIMode->GetWidget()->SetState(1);

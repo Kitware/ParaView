@@ -142,7 +142,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.673");
+vtkCxxRevisionMacro(vtkPVWindow, "1.674");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -1333,7 +1333,7 @@ void vtkPVWindow::Create(vtkKWApplication *app, const char* vtkNotUsed(args))
   
   this->CenterXLabel->SetParent(this->CenterEntryFrame);
   this->CenterXLabel->Create(app, "");
-  this->CenterXLabel->SetLabel("X");
+  this->CenterXLabel->SetText("X");
   
   this->CenterXEntry->SetParent(this->CenterEntryFrame);
   this->CenterXEntry->Create(app, "-width 7");
@@ -1344,7 +1344,7 @@ void vtkPVWindow::Create(vtkKWApplication *app, const char* vtkNotUsed(args))
   
   this->CenterYLabel->SetParent(this->CenterEntryFrame);
   this->CenterYLabel->Create(app, "");
-  this->CenterYLabel->SetLabel("Y");
+  this->CenterYLabel->SetText("Y");
   
   this->CenterYEntry->SetParent(this->CenterEntryFrame);
   this->CenterYEntry->Create(app, "-width 7");
@@ -1355,7 +1355,7 @@ void vtkPVWindow::Create(vtkKWApplication *app, const char* vtkNotUsed(args))
 
   this->CenterZLabel->SetParent(this->CenterEntryFrame);
   this->CenterZLabel->Create(app, "");
-  this->CenterZLabel->SetLabel("Z");
+  this->CenterZLabel->SetText("Z");
   
   this->CenterZEntry->SetParent(this->CenterEntryFrame);
   this->CenterZEntry->Create(app, "-width 7");

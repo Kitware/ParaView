@@ -23,7 +23,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVInformationGUI);
-vtkCxxRevisionMacro(vtkPVInformationGUI, "1.3");
+vtkCxxRevisionMacro(vtkPVInformationGUI, "1.4");
 
 int vtkPVInformationGUICommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -87,7 +87,7 @@ void vtkPVInformationGUI::Create(vtkKWApplication* app, const char* options)
   this->StatsFrame->SetParent(this->GetFrame());
   this->StatsFrame->ShowHideFrameOn();
   this->StatsFrame->Create(this->GetApplication(), 0);
-  this->StatsFrame->SetLabel("Statistics");
+  this->StatsFrame->SetLabelText("Statistics");
 
   this->TypeLabel->SetParent(this->StatsFrame->GetFrame());
   this->TypeLabel->Create(this->GetApplication(), "");
@@ -109,7 +109,7 @@ void vtkPVInformationGUI::Create(vtkKWApplication* app, const char* options)
   
   this->ExtentDisplay->SetParent(this->GetFrame());
   this->ExtentDisplay->Create(this->GetApplication(), "");
-  this->ExtentDisplay->SetLabel("Extents");
+  this->ExtentDisplay->SetLabelText("Extents");
   
   this->Script("pack %s %s %s %s -side top -anchor nw",
                this->TypeLabel->GetWidgetName(),
@@ -192,7 +192,7 @@ void vtkPVInformationGUI::Update(vtkPVSource* source)
     type << "Unknown";
     }
   type << ends;
-  this->TypeLabel->SetLabel(type.str());
+  this->TypeLabel->SetText(type.str());
   delete[] type.str();
   
   ostrstream numcells;
@@ -203,7 +203,7 @@ void vtkPVInformationGUI::Update(vtkPVSource* source)
     numds << "Number of datasets: " 
              << dataInfo->GetNumberOfDataSets() 
              << ends;
-    this->NumDataSetsLabel->SetLabel(numds.str());
+    this->NumDataSetsLabel->SetText(numds.str());
     delete[] numds.str();
     }
   else
@@ -213,17 +213,17 @@ void vtkPVInformationGUI::Update(vtkPVSource* source)
     }
 
   numcells << "Number of cells: " << dataInfo->GetNumberOfCells() << ends;
-  this->NumCellsLabel->SetLabel(numcells.str());
+  this->NumCellsLabel->SetText(numcells.str());
   delete[] numcells.str();
 
   ostrstream numpts;
   numpts << "Number of points: " << dataInfo->GetNumberOfPoints() << ends;
-  this->NumPointsLabel->SetLabel(numpts.str());
+  this->NumPointsLabel->SetText(numpts.str());
   delete[] numpts.str();
   
   ostrstream memsize;
   memsize << "Memory: " << ((float)(dataInfo->GetMemorySize())/1000.0) << " MBytes" << ends;
-  this->MemorySizeLabel->SetLabel(memsize.str());
+  this->MemorySizeLabel->SetText(memsize.str());
   delete[] memsize.str();
 
   dataInfo->GetBounds(bounds);

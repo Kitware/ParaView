@@ -39,7 +39,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVExtentEntry);
-vtkCxxRevisionMacro(vtkPVExtentEntry, "1.51");
+vtkCxxRevisionMacro(vtkPVExtentEntry, "1.52");
 
 vtkCxxSetObjectMacro(vtkPVExtentEntry, InputMenu, vtkPVInputMenu);
 
@@ -183,11 +183,11 @@ void vtkPVExtentEntry::Create(vtkKWApplication *pvApp)
 
   if (this->Label && this->Label[0] != '\0')
     {
-    this->LabeledFrame->SetLabel(this->Label);
+    this->LabeledFrame->SetLabelText(this->Label);
     }
   else
     {
-    this->LabeledFrame->SetLabel("Extent");
+    this->LabeledFrame->SetLabelText("Extent");
     }
    
   char labels[3][4] = { "I: ", "J: ", "K: "};

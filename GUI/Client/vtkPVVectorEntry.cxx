@@ -35,7 +35,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVVectorEntry);
-vtkCxxRevisionMacro(vtkPVVectorEntry, "1.70");
+vtkCxxRevisionMacro(vtkPVVectorEntry, "1.71");
 
 //-----------------------------------------------------------------------------
 vtkPVVectorEntry::vtkPVVectorEntry()
@@ -83,7 +83,7 @@ vtkPVVectorEntry::~vtkPVVectorEntry()
 void vtkPVVectorEntry::SetLabel(const char* label)
 {
   this->SetEntryLabel(label);
-  this->LabelWidget->SetLabel(label);
+  this->LabelWidget->SetText(label);
 }
 
 //-----------------------------------------------------------------------------
@@ -156,7 +156,7 @@ void vtkPVVectorEntry::Create(vtkKWApplication *pvApp)
   if (this->EntryLabel && this->EntryLabel[0] != '\0')
     {
     this->LabelWidget->Create(pvApp, "-width 18 -justify right");
-    this->LabelWidget->SetLabel(this->EntryLabel);
+    this->LabelWidget->SetText(this->EntryLabel);
     this->Script("pack %s -side left", this->LabelWidget->GetWidgetName());
     }
 
@@ -569,7 +569,7 @@ void vtkPVVectorEntry::AddAnimationScriptsToMenu(vtkKWMenu *menu,
   if (this->Entries->GetNumberOfItems() == 1)
     {
     sprintf(methodAndArgs, "AnimationMenuCallback %s 0", ai->GetTclName()); 
-    menu->AddCommand(this->LabelWidget->GetLabel(), this, methodAndArgs, 0,"");
+    menu->AddCommand(this->LabelWidget->GetText(), this, methodAndArgs, 0,"");
     }
   else
     {
@@ -693,13 +693,13 @@ void vtkPVVectorEntry::AnimationMenuCallback(vtkPVAnimationInterfaceEntry *ai,
 
   if (this->Entries->GetNumberOfItems() == 1)
     {
-    ai->SetLabelAndScript(this->LabelWidget->GetLabel(), NULL,
+    ai->SetLabelAndScript(this->LabelWidget->GetText(), NULL,
                           this->GetTraceName());
     }
   else
     {
     char label[200];
-    sprintf(label, "%s (%d)", this->LabelWidget->GetLabel(), idx);
+    sprintf(label, "%s (%d)", this->LabelWidget->GetText(), idx);
     ai->SetLabelAndScript(label, NULL, this->GetTraceName());
     }
   
