@@ -45,7 +45,7 @@
 
 #include <algorithm>
 
-vtkCxxRevisionMacro(vtkKdTree, "1.8");
+vtkCxxRevisionMacro(vtkKdTree, "1.9");
 
 // methods for vtkKdNode -------------------------------------------
 
@@ -1386,7 +1386,7 @@ void vtkKdTree::_Select(int dim, float *X, int L, int R, int K)
 
       N = R - L + 1;
       I = K - L + 1;
-      Z = log(N);
+      Z = log(static_cast<float>(N));
       S = static_cast<int>(.5 * exp(2*Z/3));
       SD = static_cast<int>(.5 * sqrt(Z*S*(N-S)/N) * sign(1 - N/2));
       LL = max(L, K - (I*S/N) + SD);
