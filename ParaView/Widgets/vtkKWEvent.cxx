@@ -81,6 +81,7 @@ static const char *vtkKWEventStrings[] = {
   "DistanceVisibilityChangedEvent",
   "EnableShadingEvent",
   "FilterRedoEvent",
+  "FilterRemoveMeshEvent",
   "FilterUndoEvent",
   "GradientOpacityFunctionChangedEvent",
   "GradientOpacityFunctionPresetApplyEvent",

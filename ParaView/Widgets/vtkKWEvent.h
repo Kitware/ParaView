@@ -90,6 +90,7 @@ class VTK_EXPORT vtkKWEvent
     DistanceVisibilityChangedEvent,
     EnableShadingEvent,
     FilterRedoEvent,
+    FilterRemoveMeshEvent,
     FilterUndoEvent,
     GradientOpacityFunctionChangedEvent,
     GradientOpacityFunctionPresetApplyEvent,
