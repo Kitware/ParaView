@@ -76,11 +76,21 @@ public:
   vtkSetObjectMacro(RenderView, vtkPVRenderView);
   vtkGetObjectMacro(RenderView, vtkPVRenderView);
   
+  // Description:
+  // This flag is on by default.
+  // If this flag is off, then the behavior of this class becomes
+  // that of the superclass (does not check for abort flag).
+  vtkSetMacro(EnableAbort, int);
+  vtkGetMacro(EnableAbort, int);
+  vtkBooleanMacro(EnableAbort, int);
+
 protected:
   vtkPVTreeComposite();
   ~vtkPVTreeComposite();
   vtkPVTreeComposite(const vtkPVTreeComposite&) {};
   void operator=(const vtkPVTreeComposite&) {};
+
+  int EnableAbort;
 
   int LocalProcessId;
   int RenderAborted;

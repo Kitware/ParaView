@@ -156,6 +156,8 @@ vtkPVTreeComposite::vtkPVTreeComposite()
 {
   this->MPIController = vtkMPIController::SafeDownCast(this->Controller);
   
+  this->EnableAbort = 1;
+
   this->RootWaiting = 0;
   this->ReceivePending = 0;
   this->ReceiveMessage = 0;
@@ -199,6 +201,11 @@ void vtkPVTreeComposite::PrintSelf(ostream& os, vtkIndent indent)
 //----------------------------------------------------------------------------
 void vtkPVTreeComposite::CheckForAbortRender()
 {  
+  if (this->EnableAbort == 0)
+    {
+    return;
+    }
+
   if ( ! this->Initialized)
     {
     // Never abort while printing.
@@ -229,6 +236,11 @@ void vtkPVTreeComposite::CheckForAbortRender()
 int vtkPVTreeComposite::CheckForAbortComposite()
 {
   int abort;
+
+  if (this->EnableAbort == 0)
+    {
+    return 0;
+    }
 
   // Check for abort render has to be called at least once.
   if ( ! this->Initialized)
