@@ -1272,8 +1272,8 @@ void vtkPVData::UpdateProperties()
   char *str = new char[strlen(this->GetVTKDataTclName()) + 80];
   sprintf(str, "Accept: %s", this->GetVTKDataTclName());
   vtkTimerLog::MarkStartEvent(str);
-  pvApp->BroadcastScript("%s Update", this->MapperTclName);
   pvApp->BroadcastScript("%s ForceUpdate", this->UpdateSupressorTclName);
+  pvApp->BroadcastScript("%s Update", this->MapperTclName);
   // Get bounds to time completion (not just triggering) of update.
   this->GetBounds(bounds);
   vtkTimerLog::MarkEndEvent(str);
@@ -1281,13 +1281,11 @@ void vtkPVData::UpdateProperties()
 
   // Time creation of the LOD
   vtkTimerLog::MarkStartEvent("Create LOD");
-  pvApp->BroadcastScript("%s Update", this->LODMapperTclName);
   pvApp->BroadcastScript("%s ForceUpdate", this->LODUpdateSupressorTclName);
+  pvApp->BroadcastScript("%s Update", this->LODMapperTclName);
   // Get bounds to time completion (not just triggering) of update.
   this->GetBounds(bounds);
   vtkTimerLog::MarkEndEvent("Create LOD");
-
-
 
   sprintf(tmp, "number of cells: %d", 
 	  this->GetNumberOfCells());
