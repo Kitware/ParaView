@@ -12,9 +12,13 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSMInputProperty -
+// .NAME vtkSMInputProperty - proxy representing inputs to a filter
 // .SECTION Description
-// vtkSMProperty
+// vtkSMInputProperty is a concrete sub-class of vtkSMProperty representing
+// inputs to a filter (through vtkSMProxy). It is a special property that
+// always calls AddInput on a vtkSMSourceProxy.
+// .SECTION See Also
+// vtkSMInputProperty vtkSMSourceProxy
 
 #ifndef __vtkSMInputProperty_h
 #define __vtkSMInputProperty_h
@@ -29,6 +33,7 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
   
   // Description:
+  // Command that can be used to remove inputs.
   vtkSetStringMacro(CleanCommand);
   vtkGetStringMacro(CleanCommand);
 

@@ -47,10 +47,18 @@ public:
   vtkGetStringMacro(Command);
 
   // Description:
+  // If ImmediateUpdate is true, the value of the property will
+  // be pushed to the server as soon as it is modified. Properties
+  // that do not have values can be pushed by calling Modified().
   vtkSetMacro(ImmediateUpdate, int);
   vtkGetMacro(ImmediateUpdate, int);
 
   // Description:
+  // Advanced. If UpdateSelf is true, the property will be pushed
+  // by calling the method (Command) on the proxy instead of the
+  // VTK object. This is commonly used to implement more complicated
+  // functionality than can be obtained by calling a method on all
+  // server objects.
   vtkSetMacro(UpdateSelf, int);
   vtkGetMacro(UpdateSelf, int);
 
@@ -76,16 +84,28 @@ protected:
   virtual int ReadXMLAttributes(vtkPVXMLElement* element);
 
   // Description:
+  // Update all proxies referred by this property (if any). Overwritten
+  // by vtkSMProxyProperty and sub-classes.
   virtual void UpdateAllInputs() {};
 
   // Description:
+  // Properties can have one or more domains. These are assigned by
+  // the proxy manager and can be used to obtain information other
+  // than given by the type of the propery and its values.
   void AddDomain(vtkSMDomain* dom);
 
   // Description:
+  // Returns a domain. Does not perform bounds check.
   vtkSMDomain* GetDomain(unsigned int idx);
 
   // Description:
+  // Returns the number of domains.
   unsigned int GetNumberOfDomains();
+
+  // Description:
+  // The name assigned by the xnl parser. Used to get the property
+  // from a proxy.
+  vtkSetStringMacro(XMLName);
 
   char* Command;
 
@@ -93,9 +113,6 @@ protected:
 
   int ImmediateUpdate;
   int UpdateSelf;
-
-  // Description:
-  vtkSetStringMacro(XMLName);
 
   char* XMLName;
 

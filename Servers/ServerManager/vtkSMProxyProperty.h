@@ -12,11 +12,13 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSMProxyProperty - property representing a pointer to vtkObject
+// .NAME vtkSMProxyProperty - property representing pointer(s) to vtkObject(s)
 // .SECTION Description
 // vtkSMProxyProperty is a concrete sub-class of vtkSMProperty representing
-// a pointer to a vtkObject (through vtkSMProxy). Note that if the proxy
-// has multiple IDs, they are all appended to the command stream.
+// pointer(s) to vtkObject(s) (through vtkSMProxy). Note that if the proxy
+// has multiple IDs, they are all appended to the command stream. If 
+// UpdateSelf is true, the proxy ids (as opposed to the server object ids)
+// are passed to the stream.
 // .SECTION See Also
 // vtkSMProperty
 
@@ -38,16 +40,27 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
   
   // Description:
+  // Add a proxy to the list of proxies.
   void AddProxy(vtkSMProxy* proxy);
+
+  // Description:
+  // Add a proxy to the list of proxies without calling Modified
+  // (if modify is false). This is commonly used when ImmediateUpdate
+  // is true but it is more efficient to avoid calling Update until
+  // the last proxy is added. To do this, add all proxies with modify=false
+  // and call Modified after the last.
   void AddProxy(vtkSMProxy* proxy, int modify);
 
   // Description:
+  // Remove all proxies from the list.
   void RemoveAllProxies();
 
   // Description:
+  // Returns the number of proxies.
   unsigned int GetNumberOfProxies();
 
   // Description:
+  // Return a proxy. No bounds check is performed.
   vtkSMProxy* GetProxy(unsigned int idx);
 
 protected:
@@ -67,8 +80,11 @@ protected:
   //ETX
 
   // Description:
+  // Update all proxies referred by this property.
   virtual void UpdateAllInputs();
 
+  // Description:
+  // Saves the state of the object in XML format. 
   virtual void SaveState(const char* name,  ofstream* file, vtkIndent indent);
 
   vtkSMProxyPropertyInternals* PPInternals;

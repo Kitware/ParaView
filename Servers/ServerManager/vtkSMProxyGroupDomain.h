@@ -43,13 +43,21 @@ public:
   void AddGroup(const char* group);
 
   // Description:
+  // Returns true if the value of the propery is in the domain.
+  // The propery has to be a vtkSMProxyPropery or a sub-class. All 
+  // proxies pointed by the property have to be in the domain.
   virtual int IsInDomain(vtkSMProperty* property);
+
+  // Description:
+  // Returns true if the proxy is in the domain.
   int IsInDomain(vtkSMProxy* proxy);
 
   // Description:
+  // Returns the number of groups.
   unsigned int GetNumberOfGroups();
 
   // Description:
+  // Returns group with give id. Does not perform bounds check.
   const char* GetGroup(unsigned int idx);
 
 protected:
