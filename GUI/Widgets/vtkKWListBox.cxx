@@ -18,7 +18,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWListBox );
-vtkCxxRevisionMacro(vtkKWListBox, "1.28");
+vtkCxxRevisionMacro(vtkKWListBox, "1.29");
 
 
 //----------------------------------------------------------------------------
@@ -262,8 +262,6 @@ void vtkKWListBox::Create(vtkKWApplication *app, const char *args)
     return;
     }
 
-  const char *wname = this->GetWidgetName();
-  
   this->Scrollbar->Create(app, "scrollbar", NULL);
   
   this->Listbox->Create(app, "listbox", args);
