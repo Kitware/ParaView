@@ -25,6 +25,8 @@
 
 #include "vtkPolyDataSource.h"
 
+#include "vtkPVConfig.h" // Needed for PARAVIEW_BUILD_DEVELOPMENT
+
 class vtkDataObject;
 class vtkDataSet;
 class vtkDataSetSurfaceFilter;

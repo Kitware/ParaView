@@ -59,6 +59,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkPVInformation.h"
 
+#include "vtkPVConfig.h" // Needed for PARAVIEW_BUILD_DEVELOPMENT
+
 class vtkCollection;
 #ifdef PARAVIEW_BUILD_DEVELOPMENT
 class vtkCompositeDataSet;
