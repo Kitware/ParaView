@@ -2,12 +2,18 @@
 int vtkKWApplicationCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkKWApplicationNewCommand();
+int vtkKWChangeColorButtonCommand(ClientData cd, Tcl_Interp *interp,
+             int argc, char *argv[]);
+ClientData vtkKWChangeColorButtonNewCommand();
 int vtkKWCheckButtonCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkKWCheckButtonNewCommand();
 int vtkKWCompositeCollectionCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkKWCompositeCollectionNewCommand();
+int vtkKWCornerAnnotationCommand(ClientData cd, Tcl_Interp *interp,
+             int argc, char *argv[]);
+ClientData vtkKWCornerAnnotationNewCommand();
 int vtkKWDialogCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkKWDialogNewCommand();
@@ -23,6 +29,9 @@ ClientData vtkKWGenericCompositeNewCommand();
 int vtkKWLabeledFrameCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkKWLabeledFrameNewCommand();
+int vtkKWMenuCommand(ClientData cd, Tcl_Interp *interp,
+             int argc, char *argv[]);
+ClientData vtkKWMenuNewCommand();
 int vtkKWMessageDialogCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkKWMessageDialogNewCommand();
@@ -35,6 +44,9 @@ ClientData vtkKWObjectNewCommand();
 int vtkKWOptionMenuCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkKWOptionMenuNewCommand();
+int vtkKWProgressGaugeCommand(ClientData cd, Tcl_Interp *interp,
+             int argc, char *argv[]);
+ClientData vtkKWProgressGaugeNewCommand();
 int vtkKWRadioButtonCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkKWRadioButtonNewCommand();
@@ -50,6 +62,9 @@ ClientData vtkKWSerializerNewCommand();
 int vtkKWTextCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkKWTextNewCommand();
+int vtkKWToolbarCommand(ClientData cd, Tcl_Interp *interp,
+             int argc, char *argv[]);
+ClientData vtkKWToolbarNewCommand();
 int vtkKWWidgetCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkKWWidgetNewCommand();
@@ -98,10 +113,14 @@ int VTK_EXPORT Vtkkwwidgetstcl_Init(Tcl_Interp *interp)
 {
   vtkTclCreateNew(interp,"vtkKWApplication", vtkKWApplicationNewCommand,
                   vtkKWApplicationCommand);
+  vtkTclCreateNew(interp,"vtkKWChangeColorButton", vtkKWChangeColorButtonNewCommand,
+                  vtkKWChangeColorButtonCommand);
   vtkTclCreateNew(interp,"vtkKWCheckButton", vtkKWCheckButtonNewCommand,
                   vtkKWCheckButtonCommand);
   vtkTclCreateNew(interp,"vtkKWCompositeCollection", vtkKWCompositeCollectionNewCommand,
                   vtkKWCompositeCollectionCommand);
+  vtkTclCreateNew(interp,"vtkKWCornerAnnotation", vtkKWCornerAnnotationNewCommand,
+                  vtkKWCornerAnnotationCommand);
   vtkTclCreateNew(interp,"vtkKWDialog", vtkKWDialogNewCommand,
                   vtkKWDialogCommand);
   vtkTclCreateNew(interp,"vtkKWEntry", vtkKWEntryNewCommand,
@@ -112,6 +131,8 @@ int VTK_EXPORT Vtkkwwidgetstcl_Init(Tcl_Interp *interp)
                   vtkKWGenericCompositeCommand);
   vtkTclCreateNew(interp,"vtkKWLabeledFrame", vtkKWLabeledFrameNewCommand,
                   vtkKWLabeledFrameCommand);
+  vtkTclCreateNew(interp,"vtkKWMenu", vtkKWMenuNewCommand,
+                  vtkKWMenuCommand);
   vtkTclCreateNew(interp,"vtkKWMessageDialog", vtkKWMessageDialogNewCommand,
                   vtkKWMessageDialogCommand);
   vtkTclCreateNew(interp,"vtkKWNotebook", vtkKWNotebookNewCommand,
@@ -120,6 +141,8 @@ int VTK_EXPORT Vtkkwwidgetstcl_Init(Tcl_Interp *interp)
                   vtkKWObjectCommand);
   vtkTclCreateNew(interp,"vtkKWOptionMenu", vtkKWOptionMenuNewCommand,
                   vtkKWOptionMenuCommand);
+  vtkTclCreateNew(interp,"vtkKWProgressGauge", vtkKWProgressGaugeNewCommand,
+                  vtkKWProgressGaugeCommand);
   vtkTclCreateNew(interp,"vtkKWRadioButton", vtkKWRadioButtonNewCommand,
                   vtkKWRadioButtonCommand);
   vtkTclCreateNew(interp,"vtkKWSaveImageDialog", vtkKWSaveImageDialogNewCommand,
@@ -130,6 +153,8 @@ int VTK_EXPORT Vtkkwwidgetstcl_Init(Tcl_Interp *interp)
                   vtkKWSerializerCommand);
   vtkTclCreateNew(interp,"vtkKWText", vtkKWTextNewCommand,
                   vtkKWTextCommand);
+  vtkTclCreateNew(interp,"vtkKWToolbar", vtkKWToolbarNewCommand,
+                  vtkKWToolbarCommand);
   vtkTclCreateNew(interp,"vtkKWWidget", vtkKWWidgetNewCommand,
                   vtkKWWidgetCommand);
   vtkTclCreateNew(interp,"vtkKWWidgetCollection", vtkKWWidgetCollectionNewCommand,

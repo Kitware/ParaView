@@ -19,6 +19,7 @@ vtkKWApplication \
 vtkKWChangeColorButton \
 vtkKWCheckButton \
 vtkKWCompositeCollection \
+vtkKWCornerAnnotation \
 vtkKWDialog \
 vtkKWEntry \
 vtkKWExtent \
@@ -29,11 +30,13 @@ vtkKWMessageDialog \
 vtkKWNotebook \
 vtkKWObject \
 vtkKWOptionMenu \
+vtkKWProgressGauge \
 vtkKWRadioButton \
 vtkKWSaveImageDialog \
 vtkKWScale \
 vtkKWSerializer \
 vtkKWText \
+vtkKWToolbar \
 vtkKWWidget \
 vtkKWWidgetCollection \
 vtkKWViewCollection \
