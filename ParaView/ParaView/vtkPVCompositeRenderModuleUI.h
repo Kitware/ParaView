@@ -42,9 +42,9 @@ public:
 
   // Description:
   // Callback for the use char check button.  
-  // These are only public because they are callbacks.
-  // Cannot be used from a script because they do not 
-  // change the state of the check.
+  // The ones without parameters are only public because they are callbacks;
+  // they cannot be used from a script because they do not change the state of
+  // the check.  Use the ones with parameters from a script.
   void CompositeWithFloatCallback();
   void CompositeWithFloatCallback(int val);
   void CompositeWithRGBACallback();
@@ -83,6 +83,10 @@ public:
   // not working yet for tiled displays.
   void SetCompositeOptionEnabled(int val);
 
+  // Description:
+  // Export the render module state to a file.
+  virtual void SaveState(ostream *file);
+  
 protected:
   vtkPVCompositeRenderModuleUI();
   ~vtkPVCompositeRenderModuleUI();

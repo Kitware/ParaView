@@ -74,9 +74,14 @@
 // Just for the definition of VTK_POINT_DATA_FIELD ...
 #include "vtkFieldDataToAttributeDataFilter.h"
 
+#define VTK_PV_OUTLINE_LABEL "Outline"
+#define VTK_PV_SURFACE_LABEL "Surface"
+#define VTK_PV_WIREFRAME_LABEL "Wireframe of Surface"
+#define VTK_PV_POINTS_LABEL "Points of Surface"
+
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.242");
+vtkCxxRevisionMacro(vtkPVData, "1.243");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -621,13 +626,13 @@ void vtkPVData::CreateProperties()
 
   this->RepresentationMenu->SetParent(this->DisplayStyleFrame->GetFrame());
   this->RepresentationMenu->Create(this->Application, "");
-  this->RepresentationMenu->AddEntryWithCommand("Outline", this,
+  this->RepresentationMenu->AddEntryWithCommand(VTK_PV_OUTLINE_LABEL, this,
                                                 "DrawOutline");
-  this->RepresentationMenu->AddEntryWithCommand("Surface", this,
+  this->RepresentationMenu->AddEntryWithCommand(VTK_PV_SURFACE_LABEL, this,
                                                 "DrawSurface");
-  this->RepresentationMenu->AddEntryWithCommand("Wireframe of Surface", this,
+  this->RepresentationMenu->AddEntryWithCommand(VTK_PV_WIREFRAME_LABEL, this,
                                                 "DrawWireframe");
-  this->RepresentationMenu->AddEntryWithCommand("Points of Surface", this,
+  this->RepresentationMenu->AddEntryWithCommand(VTK_PV_POINTS_LABEL, this,
                                                 "DrawPoints");
   this->RepresentationMenu->SetBalloonHelpString(
     "Choose what geometry should be used to represent the dataset.");
@@ -1626,19 +1631,19 @@ void vtkPVData::UpdateMapScalarsCheck(vtkPVDataSetAttributesInformation* info,
 //----------------------------------------------------------------------------
 void vtkPVData::SetRepresentation(const char* repr)
 {
-  if ( vtkString::Equals(repr, "Wireframe of Surface") )
+  if ( vtkString::Equals(repr, VTK_PV_WIREFRAME_LABEL) )
     {
     this->DrawWireframe();
     }
-  else if ( vtkString::Equals(repr, "Surface") )
+  else if ( vtkString::Equals(repr, VTK_PV_SURFACE_LABEL) )
     {
     this->DrawSurface();
     }
-  else if ( vtkString::Equals(repr, "Points of Surface") )
+  else if ( vtkString::Equals(repr, VTK_PV_POINTS_LABEL) )
     {
     this->DrawPoints();
     }
-  else if ( vtkString::Equals(repr, "Outline") )
+  else if ( vtkString::Equals(repr, VTK_PV_OUTLINE_LABEL) )
     {
     this->DrawOutline();
     }
@@ -1661,7 +1666,7 @@ void vtkPVData::DrawWireframe()
     {
     this->AddTraceEntry("$kw(%s) DrawWireframe", this->GetTclName());
     }
-  this->RepresentationMenu->SetValue("Wireframe of Surface");
+  this->RepresentationMenu->SetValue(VTK_PV_WIREFRAME_LABEL);
   
   // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   // We could move the property into vtkPVData so parts would share one object.
@@ -1736,7 +1741,7 @@ void vtkPVData::DrawPoints()
     {
     this->AddTraceEntry("$kw(%s) DrawPoints", this->GetTclName());
     }
-  this->RepresentationMenu->SetValue("Points of Surface");
+  this->RepresentationMenu->SetValue(VTK_PV_POINTS_LABEL);
   
   num = this->GetPVSource()->GetNumberOfParts();
   for (idx = 0; idx < num; ++idx)
@@ -1808,7 +1813,7 @@ void vtkPVData::DrawSurface()
     {
     this->AddTraceEntry("$kw(%s) DrawSurface", this->GetTclName());
     }
-  this->RepresentationMenu->SetValue("Surface");
+  this->RepresentationMenu->SetValue(VTK_PV_SURFACE_LABEL);
 
   num = this->GetPVSource()->GetNumberOfParts();
   for (idx = 0; idx < num; ++idx)
@@ -1877,7 +1882,7 @@ void vtkPVData::DrawOutline()
     {
     this->AddTraceEntry("$kw(%s) DrawOutline", this->GetTclName());
     }
-  this->RepresentationMenu->SetValue("Outline");
+  this->RepresentationMenu->SetValue(VTK_PV_OUTLINE_LABEL);
 
   num = this->GetPVSource()->GetNumberOfParts();
   for (idx = 0; idx < num; ++idx)
@@ -2071,7 +2076,7 @@ void vtkPVData::Initialize()
   int dataSetType = this->GetPVSource()->GetDataInformation()->GetDataSetType();
   if (dataSetType == VTK_POLY_DATA)
     {
-    this->SetRepresentation("Surface");
+    this->SetRepresentation(VTK_PV_SURFACE_LABEL);
     }
   else if (dataSetType == VTK_STRUCTURED_GRID || 
            dataSetType == VTK_RECTILINEAR_GRID ||
@@ -2080,11 +2085,11 @@ void vtkPVData::Initialize()
     int* ext = this->GetPVSource()->GetDataInformation()->GetExtent();
     if (ext[0] == ext[1] || ext[2] == ext[3] || ext[4] == ext[5])
       {
-      this->SetRepresentation("Surface");
+      this->SetRepresentation(VTK_PV_SURFACE_LABEL);
       }
     else
       {
-      this->SetRepresentation("Outline");
+      this->SetRepresentation(VTK_PV_OUTLINE_LABEL);
       }
     }
   else if (dataSetType == VTK_UNSTRUCTURED_GRID)
@@ -2092,17 +2097,17 @@ void vtkPVData::Initialize()
     if (this->GetPVSource()->GetDataInformation()->GetNumberOfCells() 
           < 5000000)
       {
-      this->SetRepresentation("Surface");
+      this->SetRepresentation(VTK_PV_SURFACE_LABEL);
       }
     else
       {
       this->GetPVApplication()->GetMainWindow()->SetStatusText("Using outline for large unstructured grid.");
-      this->SetRepresentation("Outline");
+      this->SetRepresentation(VTK_PV_OUTLINE_LABEL);
       }
     }
   else
     {
-    this->SetRepresentation("Outline");
+    this->SetRepresentation(VTK_PV_OUTLINE_LABEL);
     }
 }
 
@@ -2526,7 +2531,8 @@ void vtkPVData::SaveInBatchScript(ofstream *file)
             << this->GetPVSource()->GetVTKSourceID(sourceCount) 
             << " GetOutput " << outputCount << "]\n";
       *file << "\t";
-      if ( vtkString::Equals(this->RepresentationMenu->GetValue(), "Outline") )
+      if ( vtkString::Equals(this->RepresentationMenu->GetValue(),
+                             VTK_PV_OUTLINE_LABEL) )
         {
         *file << "pvTemp" << part->GetGeometryID() << " SetUseOutline 1" << endl;
         }
@@ -2663,11 +2669,19 @@ void vtkPVData::SaveState(ofstream *file)
     }
 
 
-  if (strcmp(this->RepresentationMenu->GetValue(),"Wireframe") == 0)
+  if (strcmp(this->RepresentationMenu->GetValue(), VTK_PV_OUTLINE_LABEL) == 0)
+    {
+    *file << "$kw(" << this->GetTclName() << ") DrawOutline" << endl;
+    }
+  if (strcmp(this->RepresentationMenu->GetValue(), VTK_PV_SURFACE_LABEL) == 0)
+    {
+    *file << "$kw(" << this->GetTclName() << ") DrawSurface" << endl;
+    }
+  if (strcmp(this->RepresentationMenu->GetValue(),VTK_PV_WIREFRAME_LABEL) == 0)
     {
     *file << "$kw(" << this->GetTclName() << ") DrawWireframe\n";
     }
-  if (strcmp(this->RepresentationMenu->GetValue(),"Points") == 0)
+  if (strcmp(this->RepresentationMenu->GetValue(), VTK_PV_POINTS_LABEL) == 0)
     {
     *file << "$kw(" << this->GetTclName() << ") DrawPoints\n";
     }
@@ -2685,7 +2699,7 @@ void vtkPVData::SaveState(ofstream *file)
 
   if (this->PointLabelCheck->GetState())
     {
-    *file << "$kw(" << this->GetTclName() << ") SetPointLabelVisibility 1\n";
+    *file << "$kw(" << this->GetTclName() << ") SetPointLabelVisibility 1 1\n";
     }
   
   i1 = (int)(this->PointSizeThumbWheel->GetValue());
@@ -2745,6 +2759,116 @@ void vtkPVData::SaveState(ofstream *file)
   
   *file << "$kw(" << this->GetTclName() << ") SetVisibility "
         << this->GetVisibility() << endl;
+  
+  const char *colorBy = this->ColorMenu->GetValue();
+  const char *subStr;
+  char *arrayName;
+  int pos, pos2, numComps;
+  vtkPVSource *src = this->GetPVSource();
+  vtkPVArrayInformation *arrayInfo;
+  
+  if (strcmp(colorBy, "Property") == 0)
+    {
+    *file << "$kw(" << this->GetTclName() << ") ColorByProperty" << endl;
+    }
+  else if (strncmp(colorBy, "Point", 5) == 0)
+    {
+    *file << "$kw(" << this->GetTclName() << ") ColorByPointField ";
+    subStr = strrchr(colorBy, ')');
+    pos = static_cast<int>(subStr - colorBy + 1);
+    if (pos == strlen(colorBy))
+      {
+      subStr = strrchr(colorBy, '(');
+      pos2 = static_cast<int>(subStr - colorBy + 1);
+      if (pos2 < pos)
+        {
+        subStr = colorBy+pos2-1;
+        if (sscanf(subStr, "(%d)", &numComps) != 0)
+          {
+          arrayName = new char[pos2];
+          strncpy(arrayName, colorBy+6, pos2);
+          if (src)
+            {
+            arrayInfo = src->GetDataInformation()->GetPointDataInformation()->GetArrayInformation(arrayName);
+            if (arrayInfo && arrayInfo->GetNumberOfComponents() == numComps)
+              {
+              *file << "{" << arrayName << "} " << numComps << endl;
+              }
+            else
+              {
+              *file << "{" << colorBy+6 << "} 1" << endl;
+              }
+            }
+          else
+            {
+            *file << "{" << colorBy+6 << "} 1" << endl;
+            }
+          delete [] arrayName;
+          }
+        else
+          {
+          *file << "{" << colorBy+6 << "} 1" << endl;
+          }
+        }
+      else
+        {
+        *file << "{" << colorBy+6 << "} 1" << endl;
+        }
+      }
+    else
+      {
+      *file << "{" << colorBy+6 << "} 1" << endl;
+      }
+    }
+  else if (strncmp(colorBy, "Cell", 4) == 0)
+    {
+    *file << "$kw(" << this->GetTclName() << ") ColorByCellField ";
+    subStr = strrchr(colorBy, ')');
+    pos = static_cast<int>(subStr - colorBy + 1);
+    if (pos == strlen(colorBy))
+      {
+      subStr = strrchr(colorBy, '(');
+      pos2 = static_cast<int>(subStr - colorBy + 1);
+      if (pos2 < pos)
+        {
+        subStr = colorBy+pos2-1;
+        if (sscanf(subStr, "(%d)", &numComps) != 0)
+          {
+          arrayName = new char[pos2];
+          strncpy(arrayName, colorBy+5, pos2);
+          if (src)
+            {
+            arrayInfo = src->GetDataInformation()->GetCellDataInformation()->GetArrayInformation(arrayName);
+            if (arrayInfo && arrayInfo->GetNumberOfComponents() == numComps)
+              {
+              *file << "{" << subStr << "} " << numComps << endl;
+              }
+            else
+              {
+              *file << "{" << colorBy+5 << "} 1" << endl;
+              }
+            }
+          else
+            {
+            *file << "{" << colorBy+5 << "} 1" << endl;
+            }
+          delete [] arrayName;
+          }
+        else
+          {
+          *file << "{" << colorBy+5 << "} 1" << endl;
+          }
+        }
+      else
+        {
+        *file << "{" << colorBy+5 << "} 1" << endl;
+        }
+      }
+    else
+      {
+      *file << "{" << colorBy+5 << "} 1" << endl;
+      }
+    }
 }
 
 //----------------------------------------------------------------------------

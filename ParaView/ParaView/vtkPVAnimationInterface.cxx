@@ -168,7 +168,7 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterface);
-vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.99");
+vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.100");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterface,ControlledWidget, vtkPVWidget);
 
@@ -1968,6 +1968,9 @@ void vtkPVAnimationInterface::SaveState(ofstream* file)
 
   *file << "$kw(" << this->GetTclName() << ") SetNumberOfFrames " << numberFrames << endl;
   *file << "$kw(" << this->GetTclName() << ") SetCurrentTime " << frame << endl;
+  
+  *file << "$kw(" << this->GetTclName() << ") SetCacheGeometry "
+        << this->GetCacheGeometry() << endl;
 }
 
 //-----------------------------------------------------------------------------

@@ -477,6 +477,11 @@ public:
   // otherwise.
   int CheckIfFileIsReadable(const char* fname);
 
+  // Description:
+  // Access to these widgets so their state can be set from a script
+  vtkGetObjectMacro(TranslateCameraButton, vtkKWRadioButton);
+  vtkGetObjectMacro(RotateCameraButton, vtkKWRadioButton);
+  
 protected:
   vtkPVWindow();
   ~vtkPVWindow();

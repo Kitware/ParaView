@@ -25,15 +25,12 @@
 #include "vtkTimerLog.h"
 #include "vtkPVRenderView.h"
 
-
-
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCompositeRenderModuleUI);
-vtkCxxRevisionMacro(vtkPVCompositeRenderModuleUI, "1.8");
+vtkCxxRevisionMacro(vtkPVCompositeRenderModuleUI, "1.9");
 
 int vtkPVCompositeRenderModuleUICommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
-
 
 //----------------------------------------------------------------------------
 vtkPVCompositeRenderModuleUI::vtkPVCompositeRenderModuleUI()
@@ -73,7 +70,6 @@ vtkPVCompositeRenderModuleUI::vtkPVCompositeRenderModuleUI()
 
   this->CompositeOptionEnabled = 1;
 }
-
 
 //----------------------------------------------------------------------------
 vtkPVCompositeRenderModuleUI::~vtkPVCompositeRenderModuleUI()
@@ -145,7 +141,6 @@ vtkPVCompositeRenderModuleUI::~vtkPVCompositeRenderModuleUI()
     }
 }
 
-
 //----------------------------------------------------------------------------
 void vtkPVCompositeRenderModuleUI::SetRenderModule(vtkPVRenderModule* rm)
 {
@@ -168,7 +163,6 @@ void vtkPVCompositeRenderModuleUI::SetRenderModule(vtkPVRenderModule* rm)
     vtkErrorMacro("Expecting a CompositeRenderModule.");
     }
 }
-
 
 //----------------------------------------------------------------------------
 void vtkPVCompositeRenderModuleUI::Create(vtkKWApplication *app, const char *)
@@ -429,8 +423,6 @@ void vtkPVCompositeRenderModuleUI::Create(vtkKWApplication *app, const char *)
     }
 }
 
-
-
 //----------------------------------------------------------------------------
 void vtkPVCompositeRenderModuleUI::CompositeThresholdScaleCallback()
 {
@@ -454,7 +446,6 @@ void vtkPVCompositeRenderModuleUI::CompositeThresholdLabelCallback()
     sprintf(str, "Composite above %.1f MBytes", threshold);
     this->CompositeThresholdLabel->SetLabel(str);
     }
-
 }
 
 //----------------------------------------------------------------------------
@@ -504,7 +495,6 @@ void vtkPVCompositeRenderModuleUI::SetCompositeThreshold(float threshold)
     }
 
   this->CompositeThreshold = threshold;
-
 
   this->SetCompositeThresholdInternal(threshold);
   vtkTimerLog::FormatAndMarkEvent("--- Change LOD Threshold %f.", threshold);
@@ -563,7 +553,6 @@ void vtkPVCompositeRenderModuleUI::CompositeWithFloatCallback(int val)
     {
     vtkTimerLog::MarkEvent("--- Get color buffers as unsigned char.");
     }
-
 }
 
 //----------------------------------------------------------------------------
@@ -606,7 +595,6 @@ void vtkPVCompositeRenderModuleUI::CompositeWithRGBACallback(int val)
     }
 }
 
-
 //----------------------------------------------------------------------------
 void vtkPVCompositeRenderModuleUI::CompositeCompressionCallback()
 {
@@ -640,8 +628,6 @@ void vtkPVCompositeRenderModuleUI::CompositeCompressionCallback(int val)
     vtkTimerLog::MarkEvent("--- Disable compression when compositing.");
     }
 }
-
-
 
 //----------------------------------------------------------------------------
 void vtkPVCompositeRenderModuleUI::SquirtLevelScaleCallback()
@@ -720,8 +706,6 @@ void vtkPVCompositeRenderModuleUI::SetSquirtLevel(int level)
     }
 }
 
-
-
 //----------------------------------------------------------------------------
 void vtkPVCompositeRenderModuleUI::ReductionFactorScaleCallback()
 {
@@ -778,13 +762,11 @@ void vtkPVCompositeRenderModuleUI::SetReductionFactor(int factor)
      vtkTimerLog::FormatAndMarkEvent("--- Reduction factor %d.", factor);
    }
 
-
   if (this->CompositeRenderModule)
     {
     this->CompositeRenderModule->SetReductionFactor(factor);
     }
 }
-
 
 //----------------------------------------------------------------------------
 void vtkPVCompositeRenderModuleUI::SetCompositeOptionEnabled(int val)
@@ -794,6 +776,30 @@ void vtkPVCompositeRenderModuleUI::SetCompositeOptionEnabled(int val)
   this->CompositeCheckCallback();
 }
 
+//----------------------------------------------------------------------------
+void vtkPVCompositeRenderModuleUI::SaveState(ostream *file)
+{
+  this->Superclass::SaveState(file);
+  
+  // We use catches because the paraview loading the state file might not
+  // have this module.
+  *file << "catch {$kw(" << this->GetTclName()
+        << ") CompositeWithFloatCallback "
+        << this->CompositeWithFloatCheck->GetState() << "}" << endl;
+  *file << "catch {$kw(" << this->GetTclName()
+        << ") CompositeWithRGBACallback "
+        << this->CompositeWithRGBACheck->GetState() << "}" << endl;
+  *file << "catch {$kw(" << this->GetTclName()
+        << ") CompositeCompressionCallback "
+        << this->CompositeCompressionCheck->GetState() << "}" << endl;
+  
+  *file << "catch {$kw(" << this->GetTclName() << ") SetCompositeThreshold "
+        << this->CompositeThreshold << "}" << endl;
+  *file << "catch {$kw(" << this->GetTclName() << ") SetReductionFactor "
+        << this->ReductionFactor << "}" << endl;
+  *file << "catch {$kw(" << this->GetTclName() << ") SetSquirtLevel "
+        << this->SquirtLevel << "}" << endl;
+}
 
 //----------------------------------------------------------------------------
 void vtkPVCompositeRenderModuleUI::PrintSelf(ostream& os, vtkIndent indent)
@@ -810,4 +816,3 @@ void vtkPVCompositeRenderModuleUI::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "CompositeCompressionFlag: " 
      << this->CompositeCompressionFlag << endl;
 }
-

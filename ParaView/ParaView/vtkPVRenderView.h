@@ -172,11 +172,12 @@ public:
   // Description:
   // Callback for the triangle strips check button
   void TriangleStripsCallback();
+  void SetUseTriangleStrips(int state);
   
   // Description:
   // Callback for the immediate mode rendering check button
   void ImmediateModeCallback();
-  
+  void SetUseImmediateMode(int state);
   
   // Description:
   // Get the triangle strips check button.
@@ -265,7 +266,7 @@ public:
   // Description:
   // Returns the UI created by the render module
   vtkGetObjectMacro(RenderModuleUI, vtkPVRenderModuleUI);
-  
+
 protected:
   vtkPVRenderView();
   ~vtkPVRenderView();

@@ -51,7 +51,10 @@ public:
   // Creates the UI.
   virtual void Create(vtkKWApplication *app, const char *);
 
-
+  // Description:
+  // Export the render module state to a file.
+  virtual void SaveState(ostream *file);
+  
 protected:
   vtkPVIceTDisplayRenderModuleUI();
   ~vtkPVIceTDisplayRenderModuleUI();

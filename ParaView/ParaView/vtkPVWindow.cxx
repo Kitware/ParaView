@@ -123,7 +123,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.508");
+vtkCxxRevisionMacro(vtkPVWindow, "1.509");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -2806,6 +2806,28 @@ void vtkPVWindow::SaveState(const char* filename)
   *file << "set kw(" << this->AnimationInterface->GetTclName() 
         << ") [$kw(" << this->GetTclName() << ") GetAnimationInterface]" << endl;
 
+  vtkInteractorObserver *style = this->Interactor->GetInteractorStyle();
+  if (style == this->CameraStyle3D)
+    {
+    *file << "[$kw(" << this->GetTclName()
+          << ") GetRotateCameraButton] SetState 1" << endl;
+    *file << "$kw(" << this->GetTclName() << ") ChangeInteractorStyle 1"
+          << endl;
+    }
+  else if (style == this->CameraStyle2D)
+    {
+    *file << "[$kw(" << this->GetTclName()
+          << ") GetTranslateCameraButton] SetState 1" << endl;
+    *file << "$kw(" << this->GetTclName() << ") ChangeInteractorStyle 2"
+          << endl;
+    }
+  else if (style == this->CenterOfRotationStyle)
+    {
+    *file << "$kw(" << this->GetTclName() << ") ChangeInteractorStyle 4"
+          << endl;
+    }
+  
+  
   vtkArrayMapIterator<const char*, vtkPVSourceCollection*>* it =
     this->SourceLists->NewIterator();
 
@@ -4303,6 +4325,9 @@ void vtkPVWindow::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "CameraStyle2D: " << this->CameraStyle2D << endl;
   os << indent << "CameraStyle3D: " << this->CameraStyle3D << endl;
   os << indent << "CenterOfRotationStyle: " << this->CenterOfRotationStyle
+     << endl;
+  os << indent << "RotateCameraButton: " << this->RotateCameraButton << endl;
+  os << indent << "TranslateCameraButton: " << this->TranslateCameraButton
      << endl;
   os << indent << "SelectMenu: " << this->SelectMenu << endl;
   os << indent << "SourceMenu: " << this->SourceMenu << endl;

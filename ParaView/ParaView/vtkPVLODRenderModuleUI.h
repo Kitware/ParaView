@@ -64,6 +64,7 @@ public:
   // Description:
   // Callback for the interrupt render check button
   void RenderInterruptsEnabledCheckCallback();
+  void SetRenderInterruptsEnabled(int state);
   
   // Description:
   // Threshold for individual actors as number of points.
@@ -95,7 +96,10 @@ public:
   vtkGetMacro(LODResolution, int);
   vtkBooleanMacro(LODResolution, int);
 
-
+  // Description:
+  // Export the render module state to a file.
+  virtual void SaveState(ostream *file);
+  
 protected:
   vtkPVLODRenderModuleUI();
   ~vtkPVLODRenderModuleUI();

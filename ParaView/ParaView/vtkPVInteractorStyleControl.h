@@ -125,6 +125,10 @@ public:
   // This method is called when one of the manipulator is modified.
   void ExecuteEvent(vtkObject* wdg, unsigned long event, void* calldata);
 
+  // Description:
+  // Export the state of the interactor style to a file.
+  virtual void SaveState(ostream *file);
+  
 protected:
   vtkPVInteractorStyleControl();
   ~vtkPVInteractorStyleControl();

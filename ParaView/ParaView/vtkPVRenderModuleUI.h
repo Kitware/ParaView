@@ -45,7 +45,11 @@ public:
   // Description:
   // Casts to vtkPVApplication.
   vtkPVApplication *GetPVApplication();
-        
+
+  // Description:
+  // Export the render module to a file.
+  void SaveState(ostream *) {}
+  
 protected:
   vtkPVRenderModuleUI();
   ~vtkPVRenderModuleUI();

@@ -96,7 +96,7 @@ static unsigned char image_properties[] =
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.289");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.290");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -1474,19 +1474,37 @@ void vtkPVRenderView::EventuallyRenderCallBack()
 //----------------------------------------------------------------------------
 void vtkPVRenderView::TriangleStripsCallback()
 {
+  if (this->TriangleStripsCheck->GetState())
+    {
+    vtkTimerLog::MarkEvent("--- Enable triangle strips.");
+    }
+  else
+    {
+    vtkTimerLog::MarkEvent("--- Disable triangle strips.");
+    }
+
+  this->SetUseTriangleStrips(this->TriangleStripsCheck->GetState());
+  this->AddTraceEntry("$kw(%s) TriangleStripsCallback", this->GetTclName());
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::SetUseTriangleStrips(int state)
+{
   vtkPVWindow *pvWin;
   vtkPVSourceCollection *sources;
   vtkPVSource *pvs;
   vtkPVApplication *pvApp;
   int numParts, partIdx;
 
-  if ( ! this->ImmediateModeCheck->GetState() && 
-       ! this->TriangleStripsCheck->GetState())
-    { // Make sure immediate mode is on when strips are off.
-    this->ImmediateModeCheck->SetState(1);
-    this->ImmediateModeCallback();
+  if (this->TriangleStripsCheck->GetState() != state)
+    {
+    this->TriangleStripsCheck->SetState(state);
     }
-
+  
+  if ( ! this->ImmediateModeCheck->GetState() && ! state)
+    { // Make sure immediate mode is on when strips are off.
+    this->SetUseImmediateMode(1);
+    }
 
   pvApp = this->GetPVApplication();
   pvWin = this->GetPVWindow();
@@ -1506,20 +1524,10 @@ void vtkPVRenderView::TriangleStripsCallback()
       vtkPVProcessModule* pm = pvApp->GetProcessModule();
       vtkClientServerStream& stream = pm->GetStream();
       stream << vtkClientServerStream::Invoke << pvs->GetPart(partIdx)->GetGeometryID()
-             <<  "SetUseStrips" << this->TriangleStripsCheck->GetState()
-             << vtkClientServerStream::End;
+             <<  "SetUseStrips" << state << vtkClientServerStream::End;
       pm->SendStreamToServer();
       pvs->GetPart(partIdx)->GetPartDisplay()->InvalidateGeometry();
       }
-    }
-
-  if (this->TriangleStripsCheck->GetState())
-    {
-    vtkTimerLog::MarkEvent("--- Enable triangle strips.");
-    }
-  else
-    {
-    vtkTimerLog::MarkEvent("--- Disable triangle strips.");
     }
 
   this->EventuallyRender();
@@ -1568,18 +1576,37 @@ void vtkPVRenderView::ParallelProjectionCallback()
 //----------------------------------------------------------------------------
 void vtkPVRenderView::ImmediateModeCallback()
 {
+  if (this->ImmediateModeCheck->GetState())
+    {
+    vtkTimerLog::MarkEvent("--- Disable display lists.");
+    }
+  else
+    {
+    vtkTimerLog::MarkEvent("--- Enable display lists.");
+    }
+  
+  this->SetUseImmediateMode(this->ImmediateModeCheck->GetState());
+  this->AddTraceEntry("$kw(%s) ImmediateModeCallback", this->GetTclName());
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::SetUseImmediateMode(int state)
+{
   vtkPVWindow *pvWin;
   vtkPVSourceCollection *sources;
   vtkPVSource *pvs;
   vtkPVApplication *pvApp;
   int partIdx, numParts;
 
-  if ( ! this->ImmediateModeCheck->GetState() && 
-       ! this->TriangleStripsCheck->GetState())
+  if (this->ImmediateModeCheck->GetState() != state)
+    {
+    this->ImmediateModeCheck->SetState(state);
+    }
+  
+  if ( ! state && ! this->TriangleStripsCheck->GetState())
     { // Make sure triangle strips are on.
     // When immediate mode is off, triangle strips must be on.
-    this->TriangleStripsCheck->SetState(1);
-    this->TriangleStripsCallback();
+    this->SetUseTriangleStrips(1);
     }
 
   pvApp = this->GetPVApplication();
@@ -1597,19 +1624,10 @@ void vtkPVRenderView::ImmediateModeCallback()
     numParts = pvs->GetNumberOfParts();
     for (partIdx = 0; partIdx < numParts; ++partIdx)
       {
-      pvs->GetPart(partIdx)->GetPartDisplay()->SetUseImmediateMode(
-                             this->ImmediateModeCheck->GetState());
+      pvs->GetPart(partIdx)->GetPartDisplay()->SetUseImmediateMode(state);
       }
     }
 
-  if (this->ImmediateModeCheck->GetState())
-    {
-    vtkTimerLog::MarkEvent("--- Disable display lists.");
-    }
-  else
-    {
-    vtkTimerLog::MarkEvent("--- Enable display lists.");
-    }
   this->EventuallyRender();
 }
 
@@ -1682,15 +1700,57 @@ void vtkPVRenderView::SaveState(ofstream* file)
   camera->GetFocalPoint(focalPoint);
   camera->GetViewUp(viewUp);
   
+  if (camera->GetParallelProjection())
+    {
+    *file << "$kw(" << this->GetTclName() << ") ParallelProjectionOn" << endl;
+    *file << "[[$kw(" << this->GetTclName()
+          << ") GetRenderer] GetActiveCamera] SetParallelScale "
+          << camera->GetParallelScale() << endl;
+    }
+  else
+    {
+    *file << "$kw(" << this->GetTclName() << ") ParallelProjectionOff" << endl;
+    }
+  
   *file << "$kw(" << this->GetTclName() << ") SetCameraState " 
         << position[0] << " " << position[1] << " " << position[2] << " "
         << focalPoint[0] << " " << focalPoint[1] << " " << focalPoint[2] << " "
         << viewUp[0] << " " << viewUp[1] << " " << viewUp[2] << endl; 
 
+  *file << "$kw(" << this->GetTclName() << ") SetUseTriangleStrips "
+        << this->TriangleStripsCheck->GetState() << endl;
+  
+  *file << "$kw(" << this->GetTclName() << ") SetUseImmediateMode "
+        << this->ImmediateModeCheck->GetState() << endl;
+  
+  if (this->RenderModuleUI)
+    {
+    *file << "set kw(" << this->RenderModuleUI->GetTclName()
+          << ") [$kw(" << this->GetTclName() << ") GetRenderModuleUI]" << endl;
+    this->RenderModuleUI->SaveState(file);
+    }
+  
   *file << "set kw(" << this->CornerAnnotation->GetTclName()
         << ") [$kw(" << this->GetTclName() << ") GetCornerAnnotation]" << endl;
-  
   this->CornerAnnotation->SaveState(file);
+  
+  *file << "$kw(" << this->GetTclName() << ") SetOrientationAxesVisibility "
+        << this->OrientationAxesCheck->GetState() << endl;
+  *file << "$kw(" << this->GetTclName() << ") SetOrientationAxesInteractivity "
+        << this->OrientationAxesInteractiveCheck->GetState() << endl;
+  color = this->OrientationAxesOutlineColor->GetColor();
+  *file << "$kw(" << this->GetTclName() << ") SetOrientationAxesOutlineColor "
+        << color[0] << " " << color[1] << " " << color[2] << endl;
+  
+  *file << "set kw(" << this->ManipulatorControl2D->GetTclName()
+        << ") [$kw(" << this->GetTclName() << ") GetManipulatorControl2D]"
+        << endl;
+  this->ManipulatorControl2D->SaveState(file);
+  
+  *file << "set kw(" << this->ManipulatorControl3D->GetTclName()
+        << ") [$kw(" << this->GetTclName() << ") GetManipulatorControl3D]"
+        << endl;
+  this->ManipulatorControl3D->SaveState(file);
 }
 
 //----------------------------------------------------------------------------

@@ -40,7 +40,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVInteractorStyleControl );
-vtkCxxRevisionMacro(vtkPVInteractorStyleControl, "1.24");
+vtkCxxRevisionMacro(vtkPVInteractorStyleControl, "1.25");
 
 vtkCxxSetObjectMacro(vtkPVInteractorStyleControl,ManipulatorCollection,
                      vtkCollection);
@@ -751,6 +751,40 @@ void vtkPVInteractorStyleControl::ResetWidget(vtkPVCameraManipulator* man,
     vectorEntry->SetValue(f, vectorEntry->GetVectorLength());
     this->CurrentManipulator = 0;
     }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVInteractorStyleControl::SaveState(ostream *file)
+{
+  if (!this->ManipulatorCollection)
+    {
+    return;
+    }
+  
+  vtkCollectionIterator *it = this->ManipulatorCollection->NewIterator();
+  it->InitTraversal();
+  while (!it->IsDoneWithTraversal())
+    {
+    vtkPVCameraManipulator *m = static_cast<vtkPVCameraManipulator*>(
+      it->GetObject());
+    *file << "$kw(" << this->GetTclName() << ") SetCurrentManipulator "
+          << m->GetButton() - 1 << " ";
+    if (m->GetShift())
+      {
+      *file << "1 ";
+      }
+    else if (m->GetControl())
+      {
+      *file << "2 ";
+      }
+    else
+      {
+      *file << "0 ";
+      }
+    *file << "{" << m->GetManipulatorName() << "}" << endl;
+    it->GoToNextItem();
+    }
+  it->Delete();
 }
 
 //----------------------------------------------------------------------------

@@ -63,7 +63,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLODRenderModuleUI);
-vtkCxxRevisionMacro(vtkPVLODRenderModuleUI, "1.9");
+vtkCxxRevisionMacro(vtkPVLODRenderModuleUI, "1.10");
 
 int vtkPVLODRenderModuleUICommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -454,16 +454,50 @@ void vtkPVLODRenderModuleUI::SetLODResolutionInternal(int resolution)
   this->LODRenderModule->SetLODResolution(resolution);
 }
 
-
 //----------------------------------------------------------------------------
 void vtkPVLODRenderModuleUI::RenderInterruptsEnabledCheckCallback()
 {
-  vtkPVApplication* pvApp = this->GetPVApplication();
-  this->RenderInterruptsEnabled = this->RenderInterruptsEnabledCheck->GetState();
-  pvApp->GetRenderModule()->SetRenderInterruptsEnabled(
-                                   this->RenderInterruptsEnabled);
+  this->SetRenderInterruptsEnabled(
+    this->RenderInterruptsEnabledCheck->GetState());
+  // We use a catch in this trace because the paraview executing
+  // the trace might not have this module
+  this->AddTraceEntry("catch {$kw(%s) SetRenderInterruptsEnabled %d",
+                      this->GetTclName(),
+                      this->RenderInterruptsEnabledCheck->GetState());
 }
 
+//----------------------------------------------------------------------------
+void vtkPVLODRenderModuleUI::SetRenderInterruptsEnabled(int state)
+{
+  if (this->RenderInterruptsEnabledCheck->GetState() != state)
+    {
+    this->RenderInterruptsEnabledCheck->SetState(state);
+    }
+  
+  vtkPVApplication* pvApp = this->GetPVApplication();
+  this->RenderInterruptsEnabled = state;
+  
+  pvApp->GetRenderModule()->SetRenderInterruptsEnabled(state);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVLODRenderModuleUI::SaveState(ostream *file)
+{
+  this->Superclass::SaveState(file);
+
+  // We use catches because the paraview loading the state file might not
+  // have this module.
+  *file << "catch {$kw(" << this->GetTclName() << ") SetLODThreshold "
+        << this->GetLODThreshold() << "}" << endl;
+  
+  *file << "catch {$kw(" << this->GetTclName() << ") SetLODResolution "
+        << this->GetLODResolution() << "}" << endl;
+  
+  *file << "catch {$kw(" << this->GetTclName()
+        << ") SetRenderInterruptsEnabled "
+        << this->GetPVApplication()->GetRenderModule()->GetRenderInterruptsEnabled()
+        << "}" << endl;
+}
 
 //----------------------------------------------------------------------------
 void vtkPVLODRenderModuleUI::PrintSelf(ostream& os, vtkIndent indent)
@@ -475,4 +509,3 @@ void vtkPVLODRenderModuleUI::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "RenderInterruptsEnabled: " 
      << this->RenderInterruptsEnabled << endl;
 }
-

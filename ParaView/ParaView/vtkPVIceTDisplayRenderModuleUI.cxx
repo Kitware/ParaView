@@ -24,7 +24,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVIceTDisplayRenderModuleUI);
-vtkCxxRevisionMacro(vtkPVIceTDisplayRenderModuleUI, "1.3");
+vtkCxxRevisionMacro(vtkPVIceTDisplayRenderModuleUI, "1.4");
 
 int vtkPVIceTDisplayRenderModuleUICommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -43,7 +43,6 @@ vtkPVIceTDisplayRenderModuleUI::vtkPVIceTDisplayRenderModuleUI()
 
   this->IceTRenderModule = NULL;
 }
-
 
 //----------------------------------------------------------------------------
 vtkPVIceTDisplayRenderModuleUI::~vtkPVIceTDisplayRenderModuleUI()
@@ -95,7 +94,6 @@ void vtkPVIceTDisplayRenderModuleUI::SetRenderModule(vtkPVRenderModule* rm)
     vtkErrorMacro("Expecting a IceTRenderModule.");
     }
 }
-
 
 //----------------------------------------------------------------------------
 void vtkPVIceTDisplayRenderModuleUI::Create(vtkKWApplication *app, const char *)
@@ -158,7 +156,6 @@ void vtkPVIceTDisplayRenderModuleUI::Create(vtkKWApplication *app, const char *)
                 this->ReductionFactorScale->GetWidgetName(), row++);
 }
 
-
 //----------------------------------------------------------------------------
 void vtkPVIceTDisplayRenderModuleUI::ReductionFactorScaleCallback()
 {
@@ -220,9 +217,16 @@ void vtkPVIceTDisplayRenderModuleUI::SetReductionFactor(int factor)
     }
 }
 
-
-
-
+//----------------------------------------------------------------------------
+void vtkPVIceTDisplayRenderModuleUI::SaveState(ostream *file)
+{
+  this->Superclass::SaveState(file);
+ 
+  // We use catches because the paraview loading the state file might not
+  // have this module.
+  *file << "catch {$kw(" << this->GetTclName() << ") SetReductionFactor "
+        << this->ReductionFactor << "}" << endl;
+}
 
 //----------------------------------------------------------------------------
 void vtkPVIceTDisplayRenderModuleUI::PrintSelf(ostream& os, vtkIndent indent)
@@ -231,4 +235,3 @@ void vtkPVIceTDisplayRenderModuleUI::PrintSelf(ostream& os, vtkIndent indent)
 
   os << indent << "ReductionFactor: " << this->ReductionFactor << endl;
 }
-
