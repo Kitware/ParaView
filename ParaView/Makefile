@@ -25,11 +25,9 @@ vtkInteractorStyleSphere \
 vtkKWRenderView \
 vtkPVApplication \
 vtkPVAssignment \
-vtkPVComposite \
 vtkPVConeSource \
 vtkPVContourFilter \
 vtkPVData \
-vtkPVDataList \
 vtkPVElevationFilter \
 vtkPVGlyph3D \
 vtkPVImage \
@@ -41,6 +39,7 @@ vtkPVPolyData \
 vtkPVRenderView \
 vtkPVShrinkPolyData \
 vtkPVSource \
+vtkPVSourceList \
 vtkPVWindow 
 
 
