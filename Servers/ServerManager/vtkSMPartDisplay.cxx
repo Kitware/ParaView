@@ -45,7 +45,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMPartDisplay);
-vtkCxxRevisionMacro(vtkSMPartDisplay, "1.4");
+vtkCxxRevisionMacro(vtkSMPartDisplay, "1.5");
 
 
 //----------------------------------------------------------------------------s
@@ -1186,7 +1186,11 @@ void vtkSMPartDisplay::ResetTransferFunctions(vtkPVArrayInformation *arrayInfo,
   
   int numCells = dataInfo->GetNumberOfCells();
   double linearNumCells = pow( (double) numCells, (1.0/3.0) );
-  double unitDistance = diameter / linearNumCells;
+  double unitDistance = diameter;
+  if (linearNumCells != 0.0)
+    {
+    unitDistance = diameter / linearNumCells;
+    }
   this->OpacityUnitDistance = unitDistance;
   
   vtkPVProcessModule* pm = this->GetProcessModule();
