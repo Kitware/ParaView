@@ -137,7 +137,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.452");
+vtkCxxRevisionMacro(vtkPVWindow, "1.453");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -1771,6 +1771,7 @@ void vtkPVWindow::OpenCallback()
   vtkKWLoadSaveDialog* loadDialog = pm->NewLoadSaveDialog();
   this->RetrieveLastPath(loadDialog, "OpenPath");
   loadDialog->Create(this->Application,0);
+  loadDialog->SetParent(this);
   loadDialog->SetTitle("Open ParaView File");
   loadDialog->SetDefaultExtension(".vtp");
   loadDialog->SetFileTypes(str.str());
