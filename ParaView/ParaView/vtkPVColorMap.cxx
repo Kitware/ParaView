@@ -68,7 +68,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVColorMap);
-vtkCxxRevisionMacro(vtkPVColorMap, "1.24.2.1");
+vtkCxxRevisionMacro(vtkPVColorMap, "1.24.2.2");
 
 int vtkPVColorMapCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -1005,44 +1005,8 @@ void vtkPVColorMap::UpdateScalarBarTitle()
     return;
     }
 
-  if (this->NumberOfVectorComponents == 3)
-    {
-    if (this->VectorComponent == 0)
-      {
-      ostrstream ostr;
-      ostr << this->ScalarBarTitle << " X" << ends;
-      this->ScalarBar->GetScalarBarActor()->SetTitle(ostr.str());
-      ostr.rdbuf()->freeze(0);
-      }
-    if (this->VectorComponent == 1)
-      {
-      ostrstream ostr;
-      ostr << this->ScalarBarTitle << " Y" << ends;
-      this->ScalarBar->GetScalarBarActor()->SetTitle(ostr.str());
-      ostr.rdbuf()->freeze(0);
-      }
-    if (this->VectorComponent == 2)
-      {
-      ostrstream ostr;
-      ostr << this->ScalarBarTitle << " Z" << ends;
-      this->ScalarBar->GetScalarBarActor()->SetTitle(ostr.str());
-      ostr.rdbuf()->freeze(0);
-      }
-    }
-  else if (this->NumberOfVectorComponents > 1)
-    {
-    ostrstream ostr;
-    ostr << this->ScalarBarTitle << " " << this->VectorComponent << ends;
-    this->ScalarBar->GetScalarBarActor()->SetTitle(ostr.str());
-    ostr.rdbuf()->freeze(0);
-    }
-  else
-    {
-    ostrstream ostr;
-    ostr << this->ScalarBarTitle<< ends;
-    this->ScalarBar->GetScalarBarActor()->SetTitle(ostr.str());
-    ostr.rdbuf()->freeze(0);
-    }
+  this->ScalarBar->GetScalarBarActor()->SetTitle(this->ScalarBarTitle);
+
   if (this->PVRenderView)
     {
     this->PVRenderView->EventuallyRender();

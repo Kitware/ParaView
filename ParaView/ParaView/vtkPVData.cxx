@@ -77,7 +77,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.161.2.2");
+vtkCxxRevisionMacro(vtkPVData, "1.161.2.3");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -1747,6 +1747,45 @@ void vtkPVData::ColorByPointFieldComponentInternal(const char *name,
                          this->MapperTclName);
   pvApp->BroadcastScript("%s SelectColorArray {%s}",
                          this->MapperTclName, name);
+
+  if (numComps == 3)
+    {
+    if (comp == 0)
+      {
+      ostrstream ostr;
+      ostr << name << " X" << ends;
+      this->PVColorMap->SetScalarBarTitle(ostr.str());
+      ostr.rdbuf()->freeze(0);
+      }
+    if (comp == 1)
+      {
+      ostrstream ostr;
+      ostr << name << " Y" << ends;
+      this->PVColorMap->SetScalarBarTitle(ostr.str());
+      ostr.rdbuf()->freeze(0);
+      }
+    if (comp == 2)
+      {
+      ostrstream ostr;
+      ostr << name << " Z" << ends;
+      this->PVColorMap->SetScalarBarTitle(ostr.str());
+      ostr.rdbuf()->freeze(0);
+      }
+    }
+  else if (numComps > 1)
+    {
+    ostrstream ostr;
+    ostr << name << " " << comp << ends;
+    this->PVColorMap->SetScalarBarTitle(ostr.str());
+    ostr.rdbuf()->freeze(0);
+    }
+  else
+    {
+    ostrstream ostr;
+    ostr << name << ends;
+    this->PVColorMap->SetScalarBarTitle(ostr.str());
+    ostr.rdbuf()->freeze(0);
+    }
   this->PVColorMap->SetVectorComponent(comp, numComps);
 
   pvApp->BroadcastScript("%s SetLookupTable %s", this->LODMapperTclName,
@@ -2775,7 +2814,7 @@ void vtkPVData::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVData ";
-  this->ExtractRevision(os,"$Revision: 1.161.2.2 $");
+  this->ExtractRevision(os,"$Revision: 1.161.2.3 $");
 }
 
 //----------------------------------------------------------------------------
