@@ -108,6 +108,8 @@ public:
   enum {
     WindowLevelChangedEvent = 2000,
     WindowLevelChangingEvent,
+    WindowLevelChangedImageCompositeEvent,
+    WindowLevelChangingImageCompositeEvent,
     ColorImageEvent,
     GradientOpacityFunctionChangedEvent,
     GradientOpacityStateChangedEvent,
