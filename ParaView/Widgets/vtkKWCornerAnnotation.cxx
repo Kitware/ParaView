@@ -54,7 +54,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWCornerAnnotation );
-vtkCxxRevisionMacro(vtkKWCornerAnnotation, "1.28");
+vtkCxxRevisionMacro(vtkKWCornerAnnotation, "1.29");
 
 vtkSetObjectImplementationMacro(vtkKWCornerAnnotation,View,vtkKWView);
 
@@ -139,7 +139,7 @@ void vtkKWCornerAnnotation::Create(vtkKWApplication *app)
     "pack %s -side top -padx 0 -pady 0 -expand 1 -fill x -anchor nw",
     this->CornerDisplayFrame->GetWidgetName() );
   this->CornerButton->Create(this->Application,
-                             "-text {Display Corner Annotation}");
+                             "-text {Display corner annotation}");
   this->CornerButton->SetBalloonHelpString("Toggle the visibility of the corner annotation text");
   this->CornerButton->SetCommand(this, "OnDisplayCorner");
   this->Script("pack %s -side left -padx 2 -pady 4 -anchor nw",
@@ -175,10 +175,10 @@ void vtkKWCornerAnnotation::Create(vtkKWApplication *app)
     this->CornerFrame[2]->GetWidgetName(),
     this->CornerFrame[3]->GetWidgetName() );
 
-  this->CornerLabel[0]->Create(app,"label","-text {Lower Left}");
-  this->CornerLabel[1]->Create(app,"label","-text {Lower Right}");
-  this->CornerLabel[2]->Create(app,"label","-text {Upper Left}");
-  this->CornerLabel[3]->Create(app,"label","-text {Upper Right}");
+  this->CornerLabel[0]->Create(app,"label","-text {Lower left}");
+  this->CornerLabel[1]->Create(app,"label","-text {Lower right}");
+  this->CornerLabel[2]->Create(app,"label","-text {Upper left}");
+  this->CornerLabel[3]->Create(app,"label","-text {Upper right}");
 
   for (int i = 0; i < 4; i++)
     {
@@ -351,7 +351,7 @@ void vtkKWCornerAnnotation::SerializeToken(istream& is,
 void vtkKWCornerAnnotation::SerializeRevision(ostream& os, vtkIndent indent)
 {
   os << indent << "vtkKWCornerAnnotation ";
-  this->ExtractRevision(os,"$Revision: 1.28 $");
+  this->ExtractRevision(os,"$Revision: 1.29 $");
   vtkKWLabeledFrame::SerializeRevision(os,indent);
 }
 

@@ -46,7 +46,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWBoundsDisplay);
-vtkCxxRevisionMacro(vtkKWBoundsDisplay, "1.4");
+vtkCxxRevisionMacro(vtkKWBoundsDisplay, "1.5");
 
 int vtkKWBoundsDisplayCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -95,7 +95,7 @@ void vtkKWBoundsDisplay::Create(vtkKWApplication *app)
   this->ZRangeLabel->SetParent(this->GetFrame());
   this->ZRangeLabel->Create(app, "");
 
-  this->Script("pack %s %s %s -side top -expand 1 -fill x", 
+  this->Script("pack %s %s %s -side top -anchor w", 
                this->XRangeLabel->GetWidgetName(),
                this->YRangeLabel->GetWidgetName(),
                this->ZRangeLabel->GetWidgetName());
@@ -131,11 +131,17 @@ void vtkKWBoundsDisplay::UpdateWidgets()
   else
     {
     char tmp[350];
-    sprintf(tmp, "x range: %f to %f", this->Bounds[0],this->Bounds[1]);
+    sprintf(tmp, "X range: %f to %f (= %f)", 
+            this->Bounds[0], this->Bounds[1], 
+            this->Bounds[1] - this->Bounds[0]);
     this->XRangeLabel->SetLabel(tmp);
-    sprintf(tmp, "y range: %f to %f", this->Bounds[2],this->Bounds[3]);
+    sprintf(tmp, "Y range: %f to %f (= %f)", 
+            this->Bounds[2], this->Bounds[3],
+            this->Bounds[3] - this->Bounds[2]);
     this->YRangeLabel->SetLabel(tmp);
-    sprintf(tmp, "z range: %f to %f", this->Bounds[4],this->Bounds[5]);
+    sprintf(tmp, "Z range: %f to %f (= %f)", 
+            this->Bounds[4], this->Bounds[5],
+            this->Bounds[5] - this->Bounds[4]);
     this->ZRangeLabel->SetLabel(tmp);
     }
 }
