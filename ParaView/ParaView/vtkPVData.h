@@ -180,6 +180,7 @@ public:
   void DrawWireframe();
   void DrawSurface();
   void DrawPoints();
+  void DrawVolume();
   void DrawOutline();
   
   // Description:

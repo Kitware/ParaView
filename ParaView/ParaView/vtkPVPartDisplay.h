@@ -35,6 +35,11 @@ class vtkProp;
 class vtkProperty;
 class vtkPVPart;
 class vtkPVColorMap;
+class vtkVolume;
+class vtkVolumeProperty;
+class vtkPiecewiseFunction;
+class vtkColorTransferFunction;
+class vtkUnstructuredGridVolumeRayCastMapper;
 
 class VTK_EXPORT vtkPVPartDisplay : public vtkPVDisplay
 {
@@ -110,6 +115,14 @@ public:
   vtkGetMacro(MapperID, vtkClientServerID);
 
   // Description:
+  // Return the id of the volume (on the server side)
+  vtkGetMacro(VolumeID, vtkClientServerID);
+
+  // Description:
+  // Return the vtkVolume
+  vtkVolume *GetVolume() { return this->Volume; };
+  
+  // Description:
   // Not referenced counted.  I might get rid of this reference later.
   virtual void SetPart(vtkPVPart* part) {this->Part = part;}
   vtkPVPart* GetPart() {return this->Part;}
@@ -152,6 +165,14 @@ protected:
   vtkClientServerID MapperID;
   vtkClientServerID UpdateSuppressorID;
 
+  vtkClientServerID VolumeID;
+  vtkClientServerID VolumePropertyID;
+  vtkClientServerID VolumeMapperID;
+  vtkClientServerID VolumeOpacityID;
+  vtkClientServerID VolumeColorID;
+
+  vtkVolume         *Volume;
+  
   // Here to create unique names.
   int InstanceCount;
 

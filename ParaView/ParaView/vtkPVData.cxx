@@ -79,10 +79,11 @@
 #define VTK_PV_SURFACE_LABEL "Surface"
 #define VTK_PV_WIREFRAME_LABEL "Wireframe of Surface"
 #define VTK_PV_POINTS_LABEL "Points of Surface"
+#define VTK_PV_VOLUME_LABEL "Volume Render"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.255");
+vtkCxxRevisionMacro(vtkPVData, "1.256");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -632,6 +633,8 @@ void vtkPVData::CreateProperties()
                                                 "DrawWireframe");
   this->RepresentationMenu->AddEntryWithCommand(VTK_PV_POINTS_LABEL, this,
                                                 "DrawPoints");
+  this->RepresentationMenu->AddEntryWithCommand(VTK_PV_VOLUME_LABEL, this,
+                                                "DrawVolume");
   this->RepresentationMenu->SetBalloonHelpString(
     "Choose what geometry should be used to represent the dataset.");
 
@@ -1640,6 +1643,10 @@ void vtkPVData::SetRepresentation(const char* repr)
     {
     this->DrawOutline();
     }
+  else if ( vtkString::Equals(repr, VTK_PV_VOLUME_LABEL) )
+    {
+    this->DrawVolume();
+    }
   else
     {
     vtkErrorMacro("Don't know the representation: " << repr);
@@ -1670,6 +1677,21 @@ void vtkPVData::DrawWireframe()
   for (idx = 0; idx < num; ++idx)
     {
     part = this->GetPVSource()->GetPart(idx);
+    if ( ( part->GetPartDisplay()->GetProp() &&
+           part->GetPartDisplay()->GetProp()->GetVisibility() ) ||
+         ( part->GetPartDisplay()->GetVolume() &&
+           part->GetPartDisplay()->GetVolume()->GetVisibility() ) )
+      {
+      pm->GetStream() 
+        << vtkClientServerStream::Invoke
+        << part->GetPartDisplay()->GetPropID()
+        << "VisibilityOn" << vtkClientServerStream::End;
+      pm->GetStream() 
+        << vtkClientServerStream::Invoke
+        << part->GetPartDisplay()->GetVolumeID()
+        << "VisibilityOff" << vtkClientServerStream::End;
+      pm->SendStreamToClientAndServer();
+      }
     if (part->GetPartDisplay()->GetPropertyID().ID != 0)
       {
       if (this->PreviousWasSolid)
@@ -1742,6 +1764,21 @@ void vtkPVData::DrawPoints()
   for (idx = 0; idx < num; ++idx)
     {
     part = this->GetPVSource()->GetPart(idx);
+    if ( ( part->GetPartDisplay()->GetProp() &&
+           part->GetPartDisplay()->GetProp()->GetVisibility() ) ||
+         ( part->GetPartDisplay()->GetVolume() &&
+           part->GetPartDisplay()->GetVolume()->GetVisibility() ) )
+      {
+      pm->GetStream() 
+        << vtkClientServerStream::Invoke
+        << part->GetPartDisplay()->GetPropID()
+        << "VisibilityOn" << vtkClientServerStream::End;
+      pm->GetStream() 
+        << vtkClientServerStream::Invoke
+        << part->GetPartDisplay()->GetVolumeID()
+        << "VisibilityOff" << vtkClientServerStream::End;
+      pm->SendStreamToClientAndServer();
+      }
     if (part->GetPartDisplay()->GetProperty())
       {
       if (this->PreviousWasSolid)
@@ -1797,6 +1834,47 @@ void vtkPVData::DrawPoints()
 }
 
 //----------------------------------------------------------------------------
+void vtkPVData::DrawVolume()
+{
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  vtkPVProcessModule* pm = pvApp->GetProcessModule();
+  vtkPVPart *part;
+  int idx, num;
+
+  if (this->GetPVSource()->GetInitialized())
+    {
+    this->AddTraceEntry("$kw(%s) DrawVolume", this->GetTclName());
+    }
+  this->RepresentationMenu->SetValue(VTK_PV_VOLUME_LABEL);
+  
+  num = this->GetPVSource()->GetNumberOfParts();
+  for (idx = 0; idx < num; ++idx)
+    {
+    part = this->GetPVSource()->GetPart(idx);
+    if ( ( part->GetPartDisplay()->GetProp() &&
+           part->GetPartDisplay()->GetProp()->GetVisibility() ) ||
+         ( part->GetPartDisplay()->GetVolume() &&
+           part->GetPartDisplay()->GetVolume()->GetVisibility() ) )
+      {
+      pm->GetStream() 
+        << vtkClientServerStream::Invoke
+        << part->GetPartDisplay()->GetPropID()
+        << "VisibilityOff" << vtkClientServerStream::End;
+      pm->GetStream() 
+        << vtkClientServerStream::Invoke
+        << part->GetPartDisplay()->GetVolumeID()
+        << "VisibilityOn" << vtkClientServerStream::End;
+      pm->SendStreamToClientAndServer();
+      }
+    }
+  
+  if ( this->GetPVRenderView() )
+    {
+    this->GetPVRenderView()->EventuallyRender();
+    }
+}
+
+//----------------------------------------------------------------------------
 void vtkPVData::DrawSurface()
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
@@ -1818,6 +1896,21 @@ void vtkPVData::DrawSurface()
   for (idx = 0; idx < num; ++idx)
     {
     part = this->GetPVSource()->GetPart(idx);
+    if ( ( part->GetPartDisplay()->GetProp() &&
+           part->GetPartDisplay()->GetProp()->GetVisibility() ) ||
+         ( part->GetPartDisplay()->GetVolume() &&
+           part->GetPartDisplay()->GetVolume()->GetVisibility() ) )
+      {
+      pm->GetStream() 
+        << vtkClientServerStream::Invoke
+        << part->GetPartDisplay()->GetPropID()
+        << "VisibilityOn" << vtkClientServerStream::End;
+      pm->GetStream() 
+        << vtkClientServerStream::Invoke
+        << part->GetPartDisplay()->GetVolumeID()
+        << "VisibilityOff" << vtkClientServerStream::End;
+      pm->SendStreamToClientAndServer();
+      }
     if (part->GetPartDisplay()->GetProperty())
       {
       if (!this->PreviousWasSolid)
@@ -1888,6 +1981,21 @@ void vtkPVData::DrawOutline()
   for (idx = 0; idx < num; ++idx)
     {
     part = this->GetPVSource()->GetPart(idx);
+    if ( ( part->GetPartDisplay()->GetProp() &&
+           part->GetPartDisplay()->GetProp()->GetVisibility() ) ||
+         ( part->GetPartDisplay()->GetVolume() &&
+           part->GetPartDisplay()->GetVolume()->GetVisibility() ) )
+      {
+      pm->GetStream() 
+        << vtkClientServerStream::Invoke
+        << part->GetPartDisplay()->GetPropID()
+        << "VisibilityOn" << vtkClientServerStream::End;
+      pm->GetStream() 
+        << vtkClientServerStream::Invoke
+        << part->GetPartDisplay()->GetVolumeID()
+        << "VisibilityOff" << vtkClientServerStream::End;
+      pm->SendStreamToClientAndServer();
+      }
     if (part->GetPartDisplay()->GetProperty())
       {
       if (this->PreviousWasSolid)
@@ -2694,6 +2802,10 @@ void vtkPVData::SaveState(ofstream *file)
   if (strcmp(this->RepresentationMenu->GetValue(), VTK_PV_POINTS_LABEL) == 0)
     {
     *file << "$kw(" << this->GetTclName() << ") DrawPoints\n";
+    }
+  if (strcmp(this->RepresentationMenu->GetValue(), VTK_PV_VOLUME_LABEL) == 0)
+    {
+    *file << "$kw(" << this->GetTclName() << ") DrawVolume\n";
     }
 
   if (strcmp(this->InterpolationMenu->GetValue(),"Flat") == 0)
