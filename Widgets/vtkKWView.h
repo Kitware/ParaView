@@ -130,7 +130,7 @@ public:
   
   // Description:
   // Add/Get/Remove the composites.
-  void AddComposite(vtkKWComposite *c);
+  virtual void AddComposite(vtkKWComposite *c);
   void RemoveComposite(vtkKWComposite *c);
   vtkKWCompositeCollection *GetComposites() {return this->Composites;};
   
