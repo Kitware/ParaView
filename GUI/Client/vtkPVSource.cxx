@@ -68,7 +68,7 @@
 
 
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.409");
+vtkCxxRevisionMacro(vtkPVSource, "1.410");
 vtkCxxSetObjectMacro(vtkPVSource,Notebook,vtkPVSourceNotebook);
 vtkCxxSetObjectMacro(vtkPVSource,PartDisplay,vtkSMPartDisplay);
 
@@ -172,6 +172,12 @@ vtkPVSource::~vtkPVSource()
     proxm->UnRegisterProxy(this->GetName());
     const char* proxyName = 
       proxm->GetProxyName("animateable", this->PartDisplay);
+    if (proxyName)
+      {
+      proxm->UnRegisterProxy("animateable", proxyName);
+      }
+    proxyName = 
+      proxm->GetProxyName("animateable", this->Proxy);
     if (proxyName)
       {
       proxm->UnRegisterProxy("animateable", proxyName);
