@@ -16,12 +16,13 @@
 
 #include "vtkClientServerStream.h"
 #include "vtkObjectFactory.h"
+#include "vtkPVXMLElement.h"
 #include "vtkSMCommunicationModule.h"
 
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMIntVectorProperty);
-vtkCxxRevisionMacro(vtkSMIntVectorProperty, "1.1");
+vtkCxxRevisionMacro(vtkSMIntVectorProperty, "1.1.2.1");
 
 struct vtkSMIntVectorPropertyInternals
 {
@@ -32,6 +33,7 @@ struct vtkSMIntVectorPropertyInternals
 vtkSMIntVectorProperty::vtkSMIntVectorProperty()
 {
   this->Internals = new vtkSMIntVectorPropertyInternals;
+  this->ArgumentIsArray = 0;
 }
 
 //---------------------------------------------------------------------------
@@ -53,9 +55,17 @@ void vtkSMIntVectorProperty::AppendCommandToStream(
     {
     *str << vtkClientServerStream::Invoke << objectId << this->Command;
     int numArgs = this->GetNumberOfElements();
+    if (this->ArgumentIsArray)
+      {
+      *str << vtkClientServerStream::InsertArray(
+        &(this->Internals->Values[0]), numArgs);
+      }
+    else
+      {
     for(int i=0; i<numArgs; i++)
       {
       *str << this->GetElement(i);
+      }
       }
     *str << vtkClientServerStream::End;
     }
@@ -66,6 +76,14 @@ void vtkSMIntVectorProperty::AppendCommandToStream(
     for(int i=0; i<numCommands; i++)
       {
       *str << vtkClientServerStream::Invoke << objectId << this->Command;
+      if (this->ArgumentIsArray)
+        {
+        *str << vtkClientServerStream::InsertArray(
+          &(this->Internals->Values[i*this->NumberOfElementsPerCommand]),
+          this->NumberOfElementsPerCommand);
+        }
+      else
+        {
       for (int j=0; j<this->NumberOfElementsPerCommand; j++)
         {
         if (this->UseIndex)
@@ -73,6 +91,7 @@ void vtkSMIntVectorProperty::AppendCommandToStream(
           *str << i;
           }
         *str << this->GetElement(i*this->NumberOfElementsPerCommand+j);
+        }
         }
       *str << vtkClientServerStream::End;
       }
@@ -136,6 +155,27 @@ void vtkSMIntVectorProperty::SetElements(int* values)
   int numArgs = this->GetNumberOfElements();
   memcpy(&this->Internals->Values[0], values, numArgs*sizeof(int));
   this->Modified();
+}
+
+//---------------------------------------------------------------------------
+int vtkSMIntVectorProperty::ReadXMLAttributes(vtkPVXMLElement* element)
+{
+  int retVal;
+
+  retVal = this->Superclass::ReadXMLAttributes(element);
+  if (!retVal)
+    {
+    return retVal;
+    }
+
+  int arg_is_array;
+  retVal = element->GetScalarAttribute("argument_is_array", &arg_is_array);
+  if(retVal) 
+    { 
+    this->SetArgumentIsArray(arg_is_array); 
+    }
+
+  return 1;
 }
 
 //---------------------------------------------------------------------------

@@ -80,7 +80,6 @@
 #include "vtkImagingFactory.h"
 #include "vtkSocketController.h"
 #include "vtkMPIMToNSocketConnectionPortInformation.h"
-
 #include "vtkPVProgressHandler.h"
 
 // #include "vtkPVRenderGroupDialog.h"
@@ -107,7 +106,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.267");
+vtkCxxRevisionMacro(vtkPVApplication, "1.267.2.1");
 vtkCxxSetObjectMacro(vtkPVApplication, RenderModule, vtkPVRenderModule);
 
 
@@ -422,7 +421,6 @@ vtkPVApplication::vtkPVApplication()
   vtkPVOutputWindow *window = vtkPVOutputWindow::New();
   this->OutputWindow = window;
   vtkOutputWindow::SetInstance(this->OutputWindow);
-
   this->CrashOnErrors = 0;
   this->AlwaysSSH = 0;
   this->MajorVersion = PARAVIEW_VERSION_MAJOR;
@@ -471,7 +469,7 @@ vtkPVApplication::vtkPVApplication()
   this->UseStereoRendering = 0;
   this->UseOffscreenRendering = 0;
   this->StartEmpty = 0;
-  this->PlayDemo = 0;
+  this->PlayDemoFlag = 0;
 
   // GUI style & consistency
 
@@ -924,13 +922,13 @@ int vtkPVApplication::ParseCommandLineArguments(int argc, char*argv[])
     return 1;
     }
 
-  this->PlayDemo = 0;
+  this->PlayDemoFlag = 0;
   if ( vtkPVApplication::CheckForArgument(argc, argv, "--play-demo",
                                           index) == VTK_OK ||
        vtkPVApplication::CheckForArgument(argc, argv, "-pd",
                                           index) == VTK_OK )
     {
-    this->PlayDemo = 1;
+    this->PlayDemoFlag = 1;
     }
 
   if ( vtkPVApplication::CheckForArgument(argc, argv, "--disable-registry",
@@ -1632,10 +1630,10 @@ void vtkPVApplication::Start(int argc, char*argv[])
     this->RunningParaViewScript = 0;
     }
   
-  if (this->PlayDemo)
+  if (this->PlayDemoFlag)
     {
     this->Script("set pvDemoCommandLine 1");
-    ui->PlayDemo();
+    this->PlayDemo(0);
     }
   else
     {
@@ -2311,3 +2309,68 @@ void vtkPVApplication::ProgressEvent(vtkObject *o, int val, const char* str)
 {
   this->ProgressHandler->InvokeProgressEvent(this, o, val, str);
 }
+
+//-----------------------------------------------------------------------------
+void vtkPVApplication::PlayDemo(int fromDashboard)
+{
+  vtkPVWindow* window = this->GetMainWindow();
+  window->SetInDemo(1);
+  const char* demoDataPath;
+  const char* demoScriptPath;
+  
+  window->Script("catch {unset pvDemoFromDashboard}");
+  if (fromDashboard)
+    {
+    window->Script("update");
+    window->Script("set pvDemoFromDashboard 1");
+    }
+
+  // Server path
+  vtkPVProcessModule* pm = this->GetProcessModule();
+  pm->GetStream() << vtkClientServerStream::Invoke
+                  << pm->GetApplicationID() << "GetDemoPath"
+                  << vtkClientServerStream::End;
+  pm->SendStreamToServerRoot();
+  if(!pm->GetLastServerResult().GetArgument(0, 0, &demoDataPath))
+    {
+    demoDataPath = 0;
+    }
+  // Client path
+  demoScriptPath = this->GetDemoPath();
+
+  if (demoDataPath && demoScriptPath)
+    {
+    char temp1[1024];
+    sprintf(temp1, "%s/Demo1.pvs", 
+            demoScriptPath);
+
+    window->Script("set DemoDir {%s}", demoDataPath);
+    window->LoadScript(temp1);
+    }
+  else
+    {
+    if (window->GetUseMessageDialog())
+      {
+      vtkKWMessageDialog::PopupMessage(
+        this, window,
+        "Warning", 
+        "Could not find Demo1.pvs in the installation or\n"
+        "build directory. Please make sure that ParaView\n"
+        "is installed properly.",
+        vtkKWMessageDialog::WarningIcon);
+      }
+    else
+      {
+      vtkWarningMacro("Could not find Demo1.pvs in the installation or "
+                      "build directory. Please make sure that ParaView "
+                      "is installed properly.");
+      }
+    }
+  if(!fromDashboard)
+    {
+    window->SetInDemo(0);
+    window->UpdateEnableState();
+    }
+}
+
+

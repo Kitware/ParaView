@@ -30,10 +30,41 @@
 void ReportCommand(const char* const* command, const char* name);
 int ReportStatus(kwsysProcess* process, const char* name);
 
+
+inline void PauseForServerStart()
+{
+#ifdef _WIN32
+  Sleep(1000);
+#else
+  sleep(1);
+#endif
+}
+
 //----------------------------------------------------------------------------
 int main(int argc, char* argv[])
 {
+  int argStart = 1;
+  int testRenderServer = 0;
+  if(argc > 1)
+    {
+    if(strcmp(argv[1], "--test-render-server") == 0)
+      {
+      argStart = 2;
+      testRenderServer = 1;
+      fprintf(stderr, "Test Render Server\n");
+      }
+    }
   // Allocate process managers.
+  kwsysProcess* renderServer = 0;
+  if(testRenderServer)
+    {
+    renderServer = kwsysProcess_New();
+    if(!renderServer)
+      {
+      cerr << "Cannot allocate kwsysProcess to run the render server.\n";
+      return 1;
+      }
+    }
   kwsysProcess* server = kwsysProcess_New();
   if(!server)
     {
@@ -55,6 +86,18 @@ int main(int argc, char* argv[])
 #endif
   paraview += "/paraview";
 
+  // Construct the render server process command line
+  if(renderServer)
+    {
+    // Construct the server process command line.
+    kwsys_stl::vector<const char*> renderServerCommand;
+    renderServerCommand.push_back(paraview.c_str());
+    renderServerCommand.push_back("--render-server");
+    renderServerCommand.push_back(0);
+    ReportCommand(&renderServerCommand[0], "renderserver");
+    kwsysProcess_SetCommand(renderServer, &renderServerCommand[0]);
+    }
+  
   // Construct the server process command line.
   kwsys_stl::vector<const char*> serverCommand;
   serverCommand.push_back(paraview.c_str());
@@ -66,8 +109,16 @@ int main(int argc, char* argv[])
   // Construct the client process command line.
   kwsys_stl::vector<const char*> clientCommand;
   clientCommand.push_back(paraview.c_str());
+  if(renderServer)
+    {
+    clientCommand.push_back("--client-render-server"); 
+    }
+  else
+    {
   clientCommand.push_back("--client");
-  for(int i=1; i < argc; ++i)
+    }
+  
+  for(int i=argStart; i < argc; ++i)
     {
     clientCommand.push_back(argv[i]);
     }
@@ -78,20 +129,28 @@ int main(int argc, char* argv[])
   // Kill the processes if they are taking too long.
   kwsysProcess_SetTimeout(server, 1400);
   kwsysProcess_SetTimeout(client, 1400);
+  if(renderServer)
+    {
+    fprintf(stderr, "start render server\n");
+    kwsysProcess_SetTimeout(renderServer, 1400);
+    kwsysProcess_Execute(renderServer);
+    PauseForServerStart();
+    }
 
   // Execute the server and then the client.
   kwsysProcess_Execute(server);
-#ifdef _WIN32
-  Sleep(1000);
-#else
-  sleep(1);
-#endif
+  PauseForServerStart();
   kwsysProcess_Execute(client);
 
   // Report the output of the processes.
   int clientPipe = 1;
   int serverPipe = 1;
-  while(clientPipe || serverPipe)
+  int renderServerPipe = 0;
+  if(renderServer)
+    {
+    renderServerPipe = 1;
+    }
+  while(clientPipe || serverPipe || renderServerPipe)
     {
     char* data;
     int length;
@@ -124,19 +183,46 @@ int main(int argc, char* argv[])
       cerr.write(data, length);
       cout.flush();
       }
+    if(renderServer)
+      {
+      renderServerPipe = kwsysProcess_WaitForData(server, &data, &length, &timeout);
+      if(renderServerPipe == kwsysProcess_Pipe_STDOUT)
+        {
+        cout.write(data, length);
+        cout.flush();
+        }
+      else if(renderServerPipe == kwsysProcess_Pipe_STDERR)
+        {
+        cerr.write(data, length);
+        cout.flush();
+        }
+      }
     }
 
   // Wait for the client and server to exit.
   kwsysProcess_WaitForExit(client, 0);
   kwsysProcess_WaitForExit(server, 0);
+  if(renderServer)
+    {
+    kwsysProcess_WaitForExit(renderServer, 0); 
+    }
 
   // Get the results.
   int serverResult = ReportStatus(server, "server");
   int clientResult = ReportStatus(client, "client");
+  int renderServerResult = 0;
+  if(renderServer)
+    {
+    renderServerResult = ReportStatus(renderServer, "renderserver");
+    }
 
   // Free process managers.
   kwsysProcess_Delete(client);
   kwsysProcess_Delete(server);
+  if(renderServer)
+    {
+    kwsysProcess_Delete(renderServer);
+    }
 
   // Report the server return code if it is nonzero.  Otherwise report
   // the client return code.
@@ -144,10 +230,13 @@ int main(int argc, char* argv[])
     {
     return serverResult;
     }
-  else
+  // if renderServer return code is nonzero then return it
+  if(renderServerResult)
     {
-    return clientResult;
+    return renderServerResult;
     }
+  // if both servers are fine return the client result
+    return clientResult;
 }
 
 //----------------------------------------------------------------------------

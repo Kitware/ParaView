@@ -41,7 +41,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVImplicitPlaneWidget);
-vtkCxxRevisionMacro(vtkPVImplicitPlaneWidget, "1.28");
+vtkCxxRevisionMacro(vtkPVImplicitPlaneWidget, "1.28.2.1");
 
 vtkCxxSetObjectMacro(vtkPVImplicitPlaneWidget, InputMenu, vtkPVInputMenu);
 
@@ -810,6 +810,7 @@ void vtkPVImplicitPlaneWidget::Update()
     pm->GetStream() << vtkClientServerStream::Invoke << this->Widget3DID << "PlaceWidget"
                     << bds[0] << bds[1] << bds[2] << bds[3] << bds[4] << bds[5]
                     << vtkClientServerStream::End;
+    pm->SendStreamToClientAndRenderServer();
 
     // Should I also move the center of the plane?  Keep the old plane?
     // Keep the old normal?

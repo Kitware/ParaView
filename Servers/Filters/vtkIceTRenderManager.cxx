@@ -46,7 +46,7 @@ const int ICET_INFO_SIZE = sizeof(struct IceTInformation)/sizeof(int);
 // vtkIceTRenderManager implementation.
 //******************************************************************
 
-vtkCxxRevisionMacro(vtkIceTRenderManager, "1.16");
+vtkCxxRevisionMacro(vtkIceTRenderManager, "1.16.2.1");
 vtkStandardNewMacro(vtkIceTRenderManager);
 
 vtkCxxSetObjectMacro(vtkIceTRenderManager, SortingKdTree, vtkPKdTree);
@@ -130,7 +130,7 @@ void vtkIceTRenderManager::SetController(vtkMultiProcessController *controller)
     return;
     }
 
-  vtkCommunicator *communicator;
+  vtkCommunicator *communicator = NULL;
   if (controller != NULL)
     {
     communicator = controller->GetCommunicator();

@@ -56,7 +56,7 @@
 #endif
 
 
-vtkCxxRevisionMacro(vtkClientCompositeManager, "1.35");
+vtkCxxRevisionMacro(vtkClientCompositeManager, "1.35.2.1");
 vtkStandardNewMacro(vtkClientCompositeManager);
 
 vtkCxxSetObjectMacro(vtkClientCompositeManager,Compositer,vtkCompositer);
@@ -105,12 +105,6 @@ struct vtkClientCompositeDoubleInfo
 vtkClientCompositeManager::vtkClientCompositeManager()
 {
   this->SquirtLevel = 0;
-  this->Controller = vtkMultiProcessController::GetGlobalController();
-  if (this->Controller)
-    {
-    this->Controller->Register(this);
-    }
-
   this->ClientController = NULL;
   this->ClientFlag = 1;
 

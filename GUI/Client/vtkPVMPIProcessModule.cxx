@@ -49,7 +49,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVMPIProcessModule);
-vtkCxxRevisionMacro(vtkPVMPIProcessModule, "1.23");
+vtkCxxRevisionMacro(vtkPVMPIProcessModule, "1.23.2.1");
 
 int vtkPVMPIProcessModuleCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -180,7 +180,7 @@ int vtkPVMPIProcessModule::Start(int argc, char **argv)
   this->Controller->SetSingleMethod(vtkPVMPIProcessModuleInit,(void*)(this));
   this->Controller->SingleMethodExecute();
 
-  this->Controller->Finalize();
+  this->Controller->Finalize(1);
 
   return this->ReturnValue;
 }

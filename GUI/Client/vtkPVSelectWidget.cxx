@@ -34,7 +34,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectWidget);
-vtkCxxRevisionMacro(vtkPVSelectWidget, "1.39");
+vtkCxxRevisionMacro(vtkPVSelectWidget, "1.39.2.1");
 
 int vtkPVSelectWidgetCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -182,15 +182,17 @@ int vtkPVSelectWidget::GetModifiedFlag()
 void vtkPVSelectWidget::SaveInBatchScript(ofstream *file)
 {
   vtkPVWidgetProperty *pvwp;
-  pvwp = (vtkPVWidgetProperty*)(
+  pvwp = vtkPVWidgetProperty::SafeDownCast(
     this->WidgetProperties->GetItemAsObject(this->CurrentIndex));
+  if (!pvwp)
+    {
+    return;
+    }
+
   pvwp->GetWidget()->SaveInBatchScript(file);
  
   if(this->ElementType == OBJECT)
     { 
-    vtkPVWidgetProperty *pvwp;
-    pvwp = vtkPVWidgetProperty::SafeDownCast(
-      this->WidgetProperties->GetItemAsObject(this->CurrentIndex));
     // TODO Fix this hack.
     vtkPVObjectWidget* ow = 
       vtkPVObjectWidget::SafeDownCast(pvwp->GetWidget()); 
@@ -302,11 +304,38 @@ void vtkPVSelectWidget::ResetInternal()
 {
   int index=-1, i;
   int num = this->Values->GetNumberOfStrings();
-  const char* value;
-  char* currentValue;
 
   if (this->AcceptCalled)
     {
+    if(this->ElementType == OBJECT)
+      {
+      vtkClientServerID csid = this->Property->GetObjectID();
+      for (i = 0; i < num; ++i)
+        {
+        vtkPVWidgetProperty *pvwp;
+        pvwp = vtkPVWidgetProperty::SafeDownCast(
+          this->WidgetProperties->GetItemAsObject(i));
+        if (pvwp)
+          {
+          vtkPVObjectWidget* ow = 
+            vtkPVObjectWidget::SafeDownCast(pvwp->GetWidget()); 
+          if (ow)
+            {
+            vtkClientServerID id = 
+              ow->GetObjectByName(this->GetVTKValue(i));
+            if (id == csid)
+              {
+              index = i;
+              break;
+              }
+            }
+          }
+        }
+      }
+    else
+      {
+      const char* value;
+      char* currentValue;
     currentValue = new char[strlen(this->Property->GetString())+1];
     strcpy(currentValue, this->Property->GetString());
     for (i = 0; i < num; ++i)
@@ -318,12 +347,13 @@ void vtkPVSelectWidget::ResetInternal()
         break;
         }
       }
+      delete[] currentValue;
+      }
     if ( index >= 0 )
       {
       this->Menu->SetValue(this->Labels->GetString(index));
       this->SetCurrentIndex(index);
       }
-    delete[] currentValue;
     this->ModifiedFlag = 0;
     }
   else

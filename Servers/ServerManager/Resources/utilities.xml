@@ -84,4 +84,22 @@
       </DoubleVectorProperty>
     </Proxy>
   </ProxyGroup>
+
+  <ProxyGroup name="transforms">
+    <Proxy name="Transform" class="vtkTransform">
+      <ProxyProperty name="Matrix" command="SetMatrix"/>
+    </Proxy>
+  </ProxyGroup>
+
+  <ProxyGroup name="math">
+    <Proxy name="Matrix4x4" class="vtkMatrix4x4">
+      <DoubleVectorProperty
+         name="DeepCopy"
+         command="DeepCopy"
+         number_of_elements="16" 
+         argument_is_array="1">
+      </DoubleVectorProperty>
+    </Proxy>
+  </ProxyGroup>
+
 </ServerManagerConfiguration>

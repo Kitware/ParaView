@@ -23,7 +23,7 @@
 #include <vtkstd/vector>
 
 
-vtkCxxRevisionMacro(vtkMPIMToNSocketConnection, "1.7");
+vtkCxxRevisionMacro(vtkMPIMToNSocketConnection, "1.7.2.1");
 vtkStandardNewMacro(vtkMPIMToNSocketConnection);
 
 vtkCxxSetObjectMacro(vtkMPIMToNSocketConnection,Controller, vtkMultiProcessController);
@@ -60,6 +60,7 @@ vtkMPIMToNSocketConnection::~vtkMPIMToNSocketConnection()
     this->SocketCommunicator->CloseConnection();
     this->SocketCommunicator->Delete();
     }
+  this->SetController(0);
   delete [] this->HostName;
   this->HostName = 0;
   delete this->Internals;

@@ -145,7 +145,7 @@ void vtkPVSendStreamToClientServerNodeRMI(void *localArg, void *remoteArg,
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVClientServerModule);
-vtkCxxRevisionMacro(vtkPVClientServerModule, "1.71");
+vtkCxxRevisionMacro(vtkPVClientServerModule, "1.71.2.1");
 
 int vtkPVClientServerModuleCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -266,6 +266,7 @@ void vtkPVClientServerModule::Initialize()
       this->RenderServerSocket->Receive(&numServerProcs, 1, 1, 8843);
       this->NumberOfRenderServerProcesses = numServerProcs;
       }
+
     // attempt to initialize render server connection to data server
     this->InitializeRenderServer();
       
@@ -313,6 +314,8 @@ void vtkPVClientServerModule::Initialize()
       {
       this->Controller->TriggerRMI(id, vtkMultiProcessController::BREAK_RMI_TAG);
       }
+
+    this->SocketController->CloseConnection();
     }
   else
     { // Sattelite processes of server.
@@ -688,8 +691,6 @@ void vtkPVClientServerModule::InitializeRenderServer()
     << vtkClientServerStream::Invoke << id << "Connect"
     << vtkClientServerStream::End;
   this->SendStreamToServer();
-
-  info->Print(cerr);
   info->Delete();
 }
 
@@ -708,7 +709,7 @@ int vtkPVClientServerModule::Start(int argc, char **argv)
   this->Controller->Initialize(&argc, &argv, 1);
   this->Controller->SetSingleMethod(vtkPVClientServerInit, (void *)(this));
   this->Controller->SingleMethodExecute();
-  this->Controller->Finalize();
+  this->Controller->Finalize(1);
 #else
   this->Controller = vtkDummyController::New();
   // This would be simpler if vtkDummyController::SingleMethodExecute

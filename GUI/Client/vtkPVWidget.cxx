@@ -41,7 +41,7 @@ template class VTK_EXPORT vtkArrayMapIterator<vtkPVWidget*, vtkPVWidget*>;
 #endif
 
 //-----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkPVWidget, "1.44");
+vtkCxxRevisionMacro(vtkPVWidget, "1.44.2.1");
 
 //-----------------------------------------------------------------------------
 vtkPVWidget::vtkPVWidget()
@@ -139,6 +139,7 @@ void vtkPVWidget::AcceptInternal(vtkClientServerID)
   // Suppress reset just allows the widget to set its own default value.
   // After accept is called, we want to enable the reset.
   this->SuppressReset = 0;
+  this->AcceptCalled = 1;
 }
 
 //-----------------------------------------------------------------------------

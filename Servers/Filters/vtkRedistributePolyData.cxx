@@ -43,7 +43,7 @@
 #include "vtkMultiProcessController.h"
 
 vtkStandardNewMacro(vtkRedistributePolyData);
-vtkCxxRevisionMacro(vtkRedistributePolyData, "1.6");
+vtkCxxRevisionMacro(vtkRedistributePolyData, "1.6.2.1");
 
 vtkCxxSetObjectMacro(vtkRedistributePolyData, Controller, 
                      vtkMultiProcessController);
@@ -2742,7 +2742,7 @@ void vtkRedistributePolyData::ReceiveInputArrays(vtkDataSetAttributes* attr,
   int nameLength = 0;
   int type = 0;
   int numComps = 0;
-  int index;
+  int index = -1;
   int attributeType = 0;
   int copyFlag = 0;
 

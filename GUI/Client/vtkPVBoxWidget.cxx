@@ -40,9 +40,11 @@
 #include "vtkTransform.h"
 #include "vtkCommand.h"
 #include "vtkPVProcessModule.h"
+#include "vtkPlanes.h"
+#include "vtkPlane.h"
 
 vtkStandardNewMacro(vtkPVBoxWidget);
-vtkCxxRevisionMacro(vtkPVBoxWidget, "1.23");
+vtkCxxRevisionMacro(vtkPVBoxWidget, "1.23.2.1");
 
 int vtkPVBoxWidgetCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -56,6 +58,7 @@ vtkPVBoxWidget::vtkPVBoxWidget()
   this->BoxTransformID.ID = 0;
 
   this->BoxTransform = 0;
+  this->Box = 0;
 
   this->ControlFrame = vtkKWFrame::New();
   this->TranslateLabel = vtkKWLabel::New();
@@ -117,7 +120,7 @@ vtkPVBoxWidget::~vtkPVBoxWidget()
     }
   if(pm)
     {
-    pm->SendStreamToClientAndRenderServer();
+    pm->SendStreamToRenderServerClientAndServer();
     }
 }
 
@@ -159,15 +162,28 @@ void vtkPVBoxWidget::ActualPlaceWidget()
   vtkPVApplication *pvApp = static_cast<vtkPVApplication*>(
     this->Application);
   vtkPVProcessModule* pm = pvApp->GetProcessModule();
+  // now make sure the widget is placed on the server
+  // since this is the only 3d widget on the server....
+  double bds[6];
+  this->PVSource->GetPVInput(0)->GetDataInformation()->GetBounds(bds);
+  pvApp->GetProcessModule()->GetStream() << vtkClientServerStream::Invoke << this->Widget3DID
+                  << "PlaceWidget" 
+                  << bds[0] << bds[1] << bds[2] << bds[3] 
+                  << bds[4] << bds[5] << vtkClientServerStream::End;
+  pvApp->GetProcessModule()->SendStreamToServer();
+  
   pm->GetStream() << vtkClientServerStream::Invoke 
                   << this->Widget3DID << "GetPlanes" << this->BoxID 
                   << vtkClientServerStream::End;
-  pm->SendStreamToClientAndRenderServer();
+  pm->SendStreamToRenderServerClientAndServer();
 }
 
 //----------------------------------------------------------------------------
 void vtkPVBoxWidget::AcceptInternal(vtkClientServerID sourceID)  
 {
+  vtkPVApplication *pvApp = static_cast<vtkPVApplication*>(this->Application);
+  vtkPVProcessModule* pm = pvApp->GetProcessModule();
+
   this->PlaceWidget();
   if ( ! this->ModifiedFlag)
     {
@@ -175,15 +191,13 @@ void vtkPVBoxWidget::AcceptInternal(vtkClientServerID sourceID)
     }
   if ( this->BoxID.ID )
     {
-    vtkPVApplication *pvApp = static_cast<vtkPVApplication*>(
-      this->Application);
-    vtkPVProcessModule* pm = pvApp->GetProcessModule();
     pm->GetStream() << vtkClientServerStream::Invoke 
                     << this->Widget3DID << "GetPlanes" << this->BoxID 
                     << vtkClientServerStream::End;
     this->SetStoredPosition(this->PositionGUI);
     this->SetStoredRotation(this->RotationGUI);
     this->SetStoredScale(this->ScaleGUI);
+    pm->SendStreamToRenderServerClientAndServer(); 
     }
   this->Superclass::AcceptInternal(sourceID);
   this->Initialized = 1;
@@ -242,16 +256,6 @@ void vtkPVBoxWidget::UpdateVTKObject(const char*)
 //----------------------------------------------------------------------------
 void vtkPVBoxWidget::SaveInBatchScript(ofstream *file)
 {
-  *file << "vtkPlanes " << "pvTemp" << this->BoxID.ID << endl;
-  double bds[6];
-  *file << "vtkBoxWidget " << "pvTemp" << this->Widget3DID << endl;
-  this->PVSource->GetPVInput(0)->GetDataInformation()->GetBounds(bds);
-  *file << "\t" << this->Widget3DID << " SetPlaceFactor 1.0" << endl;
-  *file << "\t" << this->Widget3DID << " PlaceWidget "
-    << bds[0] << " " << bds[1] << " " << bds[2] << " "
-    << bds[3] << " " << bds[4] << " " << bds[5] << endl;
-  *file << "vtkTransform " << "pvTemp" << this->BoxTransformID.ID << endl;
-  *file << "vtkMatrix4x4 " << "pvTemp" << this->BoxMatrixID.ID << endl;
   vtkTransform* trans = this->BoxTransform;
   trans->Identity();
   trans->Translate(this->GetPositionFromGUI());
@@ -261,42 +265,31 @@ void vtkPVBoxWidget::SaveInBatchScript(ofstream *file)
   trans->RotateY(this->RotationGUI[1]);
   trans->Scale(this->GetScaleFromGUI());
   vtkMatrix4x4* mat = trans->GetMatrix();
-  *file << "\t" << this->BoxMatrixID.ID << " DeepCopy "
-    << (*mat)[0][0] << " " << (*mat)[0][1] << " " << (*mat)[0][2] << " " 
-    << (*mat)[0][3] << " " << (*mat)[1][0] << " " << (*mat)[1][1] << " " 
-    << (*mat)[1][2] << " " << (*mat)[1][3] << " " << (*mat)[2][0] << " " 
-    << (*mat)[2][1] << " " << (*mat)[2][2] << " " << (*mat)[2][3] << " "
-    << (*mat)[3][0] << " " << (*mat)[3][1] << " " << (*mat)[3][2] << " " 
-    << (*mat)[3][3] << endl;
-  //*file << "\tputs [" << this->BoxMatrixTclName << " Print ]" << endl;
-  *file << "\t" << this->BoxTransformID.ID << " SetMatrix " 
-    << this->BoxMatrixID.ID << endl;
-  *file << "\t" << this->BoxTransformID.ID << " Update"  << endl;
-  *file << "\t" << this->Widget3DID << " SetTransform " 
-    << this->BoxTransformID.ID << endl;
-  *file << "\t" << this->Widget3DID << " GetPlanes " << this->BoxID.ID << endl;
 
-  /*
-  *file << "set normals [ " << this->BoxTclName << " GetNormals ]\n"
-  "puts \"Normal:\" \n"
-  "for { set c 0 } { $c < 6 } { incr c } {\n"
-  "  puts [ $normals GetTuple3 $c ]\n"
-  "}\n"
-  "puts \"Points:\" \n"
-  "set points [ " << this->BoxTclName << " GetPoints]\n"
-  "for { set c 0 } { $c < 6 } { incr c } {\n"
-  "  puts [ $points GetPoint $c ]\n"
-  "}\n";
-  */
+  *file << endl;
+  *file << "set pvTemp" << this->BoxMatrixID.ID
+        << " [$proxyManager NewProxy math Matrix4x4]"
+        << endl;
+  for(int i=0; i<16; i++)
+    {
+    *file << "  [$pvTemp" << this->BoxMatrixID.ID
+          << " GetProperty DeepCopy] SetElement " << i
+          << " " << *(&mat->Element[0][0] + i)
+          << endl;
+    }
+  *file << "  $pvTemp" << this->BoxMatrixID.ID
+        << " UpdateVTKObjects" << endl;
 
-  /*
-  *file << "\t" << this->BoxTclName << " SetCenter ";
-  this->Script("%s GetCenter", this->BoxTclName);
-  *file << this->Application->GetMainInterp()->result << endl;
-  *file << "\t" << this->BoxTclName << " SetRadius ";
-  this->Script("%s GetRadius", this->BoxTclName);
-  *file << this->Application->GetMainInterp()->result << endl;
-  */
+  *file << endl;
+  *file << "set pvTemp" << this->BoxTransformID.ID
+        << " [$proxyManager NewProxy transforms Transform]"
+        << endl;
+  *file << "  [$pvTemp" << this->BoxTransformID.ID
+        << " GetProperty Matrix] SetProxy $pvTemp" << this->BoxMatrixID.ID
+        << endl;
+  *file << "  $pvTemp" << this->BoxTransformID.ID
+        << " UpdateVTKObjects"  << endl;
+
   *file << endl;
 }
 
@@ -306,6 +299,8 @@ void vtkPVBoxWidget::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os,indent);
   os << indent << "BoxID: " << this->BoxID.ID
      << endl;
+  os << indent << "Box: " 
+    << this->Box << endl;
   os << indent << "BoxTransform: " 
     << this->BoxTransform << endl;
   os << indent << "BoxTransformID" << this->BoxTransformID << endl;
@@ -370,11 +365,13 @@ void vtkPVBoxWidget::ChildCreate(vtkPVApplication* pvApp)
   pm->GetStream() << vtkClientServerStream::Invoke << this->Widget3DID << "PlaceWidget"
                   << 0 << 1 << 0 << 1 << 0 << 1
                   << vtkClientServerStream::End;
+  pm->SendStreamToRenderServerClientAndServer();
   this->BoxID = pm->NewStreamObject("vtkPlanes");
-  this->BoxTransformID = pm->NewStreamObject("vtkTransform");
   this->BoxMatrixID = pm->NewStreamObject("vtkMatrix4x4");
+  this->BoxTransformID = pm->NewStreamObject("vtkTransform");
+  pm->SendStreamToRenderServerClientAndServer();
   
-  pm->SendStreamToClientAndRenderServer();
+  this->Box = vtkPlanes::SafeDownCast(pm->GetObjectFromID(this->BoxID));
   this->BoxTransform = vtkTransform::SafeDownCast(pm->GetObjectFromID(this->BoxTransformID));
   this->SetFrameLabel("Box Widget");
 
@@ -725,10 +722,11 @@ void vtkPVBoxWidget::UpdateBox(int update)
                   << vtkClientServerStream::InsertArray(&mat->Element[0][0], 16)
                   << vtkClientServerStream::End;
   pm->GetStream() << vtkClientServerStream::Invoke << this->BoxTransformID
-                  << "SetMatrix" << this->BoxMatrixID << vtkClientServerStream::End
-                  << vtkClientServerStream::Invoke << this->Widget3DID
+                  << "SetMatrix" << this->BoxMatrixID << vtkClientServerStream::End;
+  pm->SendStreamToRenderServerClientAndServer();
+  pm->GetStream() << vtkClientServerStream::Invoke << this->Widget3DID
                   << "SetTransform" << this->BoxTransformID << vtkClientServerStream::End;
-  pm->SendStreamToClientAndRenderServer();
+  pm->SendStreamToRenderServerClientAndServer();
   this->SetValueChanged();
 }
 

@@ -34,7 +34,7 @@ public:
 
 
 vtkStandardNewMacro(vtkMPIMToNSocketConnectionPortInformation);
-vtkCxxRevisionMacro(vtkMPIMToNSocketConnectionPortInformation, "1.2");
+vtkCxxRevisionMacro(vtkMPIMToNSocketConnectionPortInformation, "1.2.2.1");
 
 //----------------------------------------------------------------------------
 vtkMPIMToNSocketConnectionPortInformation::vtkMPIMToNSocketConnectionPortInformation()
@@ -193,6 +193,10 @@ const char* vtkMPIMToNSocketConnectionPortInformation::GetProcessHostName(unsign
     {
     vtkErrorMacro("Process number greater than number of processes");
     return 0;
+    }
+  if(this->Internals->ServerInformation[processNumber].HostName.size() == 0)
+    {
+    return this->GetHostName();
     }
   return this->Internals->ServerInformation[processNumber].HostName.c_str();
 }

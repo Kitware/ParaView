@@ -35,7 +35,7 @@
 #include "vtkPVProcessModule.h"
 
 vtkStandardNewMacro(vtkPVSphereWidget);
-vtkCxxRevisionMacro(vtkPVSphereWidget, "1.34");
+vtkCxxRevisionMacro(vtkPVSphereWidget, "1.34.2.1");
 
 int vtkPVSphereWidgetCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -167,7 +167,7 @@ void vtkPVSphereWidget::AcceptInternal(vtkClientServerID sourceID)
     pm->GetStream() << vtkClientServerStream::Invoke << this->SphereID
                     << "SetRadius" << rad
                     << vtkClientServerStream::End;
-    pm->SendStreamToClientAndRenderServer();
+    pm->SendStreamToRenderServerClientAndServer();
     this->SetLastAcceptedCenter(val);
     this->SetLastAcceptedRadius(rad);
     }

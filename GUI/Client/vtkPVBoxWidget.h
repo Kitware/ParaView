@@ -33,6 +33,7 @@ class vtkKWThumbWheel;
 class vtkKWScale;
 class vtkTransform;
 class vtkBoxWidget;
+class vtkPlanes;
 
 class VTK_EXPORT vtkPVBoxWidget : public vtkPV3DWidget
 {
@@ -173,6 +174,7 @@ protected:
   vtkKWScale*        OrientationScale[3];
 
   vtkTransform*      BoxTransform;
+  vtkPlanes*         Box;
 
   int ReadXMLAttributes(vtkPVXMLElement* element,
                         vtkPVXMLPackageParser* parser);

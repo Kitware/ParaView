@@ -21,7 +21,7 @@
 #include "vtkPVXMLElement.h"
 
 vtkStandardNewMacro(vtkPVScaleFactorEntry);
-vtkCxxRevisionMacro(vtkPVScaleFactorEntry, "1.9");
+vtkCxxRevisionMacro(vtkPVScaleFactorEntry, "1.9.2.1");
 
 vtkCxxSetObjectMacro(vtkPVScaleFactorEntry, InputMenu, vtkPVInputMenu);
 
@@ -42,6 +42,7 @@ void vtkPVScaleFactorEntry::ResetInternal()
   if (this->AcceptCalled)
     {
     this->Superclass::ResetInternal();
+    return;
     }
   this->Update();
 }
