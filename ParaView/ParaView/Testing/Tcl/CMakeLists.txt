@@ -35,6 +35,7 @@ SET(PROJECT_TESTS
   Transform
   ImageReader
   Mandelbrot
+  MouseInteraction
   OrientationWidget
   ProbeLine
   ProbePoint

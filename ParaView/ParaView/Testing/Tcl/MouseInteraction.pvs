@@ -1,0 +1,642 @@
+$Application ExitOnReturnOn
+
+set kw(vtkTemp4) [$Application GetMainWindow]
+set kw(vtkTemp18) [$kw(vtkTemp4) GetMainView]
+
+if {[info exists argc]} { 
+    set argcm1 [expr $argc - 1]
+    for {set i 0} {$i < $argcm1} {incr i} {
+        if {[lindex $argv $i] == "-D" && $i < $argcm1} {
+		set DataDir [lindex $argv [expr $i + 1]]
+        }
+        if {[lindex $argv $i] == "-UC" && $i < $argcm1} {
+            set rmui [$kw(vtkTemp18) GetRenderModuleUI]
+            catch {$rmui SetCompositeThreshold 0}
+        }
+    }
+} 
+
+# create superquadric
+set kw(vtkTemp897) [$kw(vtkTemp4) CreatePVSource SuperquadricSource]
+set kw(vtkTemp903) [$kw(vtkTemp897) GetPVWidget {Center}]
+$kw(vtkTemp903) SetValue 0 0 0
+set kw(vtkTemp908) [$kw(vtkTemp897) GetPVWidget {Scale}]
+$kw(vtkTemp908) SetValue 1 1 1
+set kw(vtkTemp914) [$kw(vtkTemp897) GetPVWidget {ThetaResolution}]
+$kw(vtkTemp914) SetValue 16
+set kw(vtkTemp919) [$kw(vtkTemp897) GetPVWidget {PhiResolution}]
+$kw(vtkTemp919) SetValue 16
+set kw(vtkTemp924) [$kw(vtkTemp897) GetPVWidget {Thickness}]
+$kw(vtkTemp924) SetValue 0.3333
+set kw(vtkTemp928) [$kw(vtkTemp897) GetPVWidget {ThetaRoundness}]
+$kw(vtkTemp928) SetValue 1
+set kw(vtkTemp931) [$kw(vtkTemp897) GetPVWidget {PhiRoundness}]
+$kw(vtkTemp931) SetValue 1
+set kw(vtkTemp934) [$kw(vtkTemp897) GetPVWidget {Size}]
+$kw(vtkTemp934) SetValue 0.5
+set kw(vtkTemp937) [$kw(vtkTemp897) GetPVWidget {Toroidal}]
+$kw(vtkTemp937) SetState 1
+$kw(vtkTemp897) AcceptCallback
+
+set kw(vtkTemp100) [$kw(vtkTemp4) GetCameraStyle3D]
+set kw(vtkTemp101) [$kw(vtkTemp4) GetCenterOfRotationStyle]
+set kw(vtkTemp200) [$kw(vtkTemp4) GetInteractor]
+
+# Pan
+$kw(vtkTemp200) SetEventPosition 255 303
+$kw(vtkTemp100) OnMiddleButtonDown
+$kw(vtkTemp200) SetEventPosition 256 303
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 256 302
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 256 301
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 255 300
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 255 298
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 253 297
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 253 296
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 252 295
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 251 293
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 249 290
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 249 289
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 248 287
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 247 286
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 244 285
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 244 282
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 242 280
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 240 278
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 239 274
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 238 273
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 236 272
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 235 268
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 233 266
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 231 263
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 230 261
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 227 259
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 226 256
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 225 252
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 223 251
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 221 249
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 220 247
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 218 243
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 217 242
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 215 239
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 214 237
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 212 235
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 211 233
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 210 231
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 208 230
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 208 229
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 207 229
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 207 228
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 207 228
+$kw(vtkTemp100) OnMiddleButtonUp
+
+# Roll
+$kw(vtkTemp200) SetEventPosition 370 85
+$kw(vtkTemp200) SetShiftKey 1
+$kw(vtkTemp100) OnLeftButtonDown
+$kw(vtkTemp200) SetEventPosition 370 86
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 370 87
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 370 89
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 370 90
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 372 90
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 372 91
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 372 92
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 372 94
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 373 97
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 373 99
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 374 101
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 374 104
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 374 106
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 374 109
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 375 110
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 375 113
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 376 117
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 376 122
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 376 124
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 376 129
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 376 134
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 376 141
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 376 144
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 376 149
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 376 156
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 376 163
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 376 165
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 376 170
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 376 177
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 376 180
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 376 186
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 376 193
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 376 196
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 376 198
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 376 206
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 377 211
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 377 215
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 377 217
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 377 221
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 377 224
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 377 227
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 377 229
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 377 235
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 377 237
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 377 241
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 377 246
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 377 249
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 377 250
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 377 252
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 377 253
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 377 258
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 377 259
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 377 262
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 377 263
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 377 263
+$kw(vtkTemp100) OnLeftButtonUp
+$kw(vtkTemp200) SetShiftKey 0
+
+# Choose center of rotation
+$kw(vtkTemp4) ChangeInteractorStyle 4
+$kw(vtkTemp200) SetEventPosition 234 273
+$kw(vtkTemp101) OnLeftButtonDown
+$kw(vtkTemp101) OnLeftButtonUp
+$kw(vtkTemp4) ChangeInteractorStyle 1
+
+# Rotate
+$kw(vtkTemp200) SetEventPosition 197 228
+$kw(vtkTemp100) OnLeftButtonDown
+$kw(vtkTemp200) SetEventPosition 197 230
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 197 231
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 197 232
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 197 233
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 197 234
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 197 235
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 197 236
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 197 238
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 197 239
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 197 240
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 197 241
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 197 242
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 197 243
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 197 244
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 197 245
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 197 249
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 197 252
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 197 256
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 197 258
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 197 264
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 197 269
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 198 274
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 198 278
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 198 282
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 198 285
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 198 286
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 198 289
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 198 291
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 197 293
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 197 295
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 196 297
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 196 298
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 195 300
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 195 304
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 193 307
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 193 308
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 191 312
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 191 313
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 190 314
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 190 314
+$kw(vtkTemp100) OnLeftButtonUp
+
+# Zoom
+$kw(vtkTemp200) SetEventPosition 371 109
+$kw(vtkTemp100) OnRightButtonDown
+$kw(vtkTemp200) SetEventPosition 371 110
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 371 111
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 371 112
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 371 113
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 371 114
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 371 115
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 371 117
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 371 118
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 371 120
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 371 121
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 371 123
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 371 126
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 371 128
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 371 129
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 371 130
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 371 133
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 371 135
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 371 138
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 371 140
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 372 145
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 372 152
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 373 157
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 373 164
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 373 168
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 373 173
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 373 180
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 373 185
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 373 195
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 373 200
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 373 206
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 373 213
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 373 220
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 373 224
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 373 231
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 373 238
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 373 243
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 373 248
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 373 251
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 373 254
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 373 259
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 373 264
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 373 265
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 373 269
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 373 272
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 373 275
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 373 276
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 373 277
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 375 278
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 375 278
+$kw(vtkTemp100) OnRightButtonUp
+
+# Move
+[$kw(vtkTemp18) GetManipulatorControl3D] SetCurrentManipulator 0 "Move"
+$kw(vtkTemp200) SetEventPosition 196 240
+$kw(vtkTemp100) OnLeftButtonDown
+$kw(vtkTemp200) SetEventPosition 196 241
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 196 243
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 189 254
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 180 266
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 166 282
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 155 297
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 145 317
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 134 343
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 129 357
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 126 368
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 119 395
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 118 397
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 118 397
+$kw(vtkTemp100) OnLeftButtonUp
+
+# parallel projection (pan and zoom work differently with parallel and
+# perspective projections)
+$kw(vtkTemp18) ParallelProjectionOn
+
+# pan
+$kw(vtkTemp200) SetEventPosition 134 346
+$kw(vtkTemp100) OnMiddleButtonDown
+$kw(vtkTemp200) SetEventPosition 135 346
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 136 346
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 137 346
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 142 346
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 145 346
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 154 345
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 164 342
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 176 339
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 185 337
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 200 334
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 217 330
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 238 324
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 249 322
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 269 319
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 286 315
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 298 312
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 307 311
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 310 309
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 312 309
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 312 309
+$kw(vtkTemp100) OnMiddleButtonUp
+
+# zoom
+$kw(vtkTemp200) SetEventPosition 103 373
+$kw(vtkTemp100) OnRightButtonDown
+$kw(vtkTemp200) SetEventPosition 103 372
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 103 371
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 103 370
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 103 367
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 103 366
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 103 365
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 103 364
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 103 363
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 103 362
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 103 360
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 103 359
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 103 358
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 103 356
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 103 355
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 103 354
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 103 351
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 103 350
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 103 349
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 103 348
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 103 347
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 103 346
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 103 345
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 103 343
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 103 342
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 103 340
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 103 338
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 103 334
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 103 333
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 103 328
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 103 325
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 103 321
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 103 320
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 103 317
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 103 315
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 103 312
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 103 311
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 103 309
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 103 307
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 103 304
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 103 301
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 103 300
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 103 296
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 103 294
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 103 292
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 103 289
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 103 288
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 103 287
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 103 284
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 103 283
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 103 281
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 103 280
+$kw(vtkTemp100) OnMouseMove
+$kw(vtkTemp200) SetEventPosition 103 280
+$kw(vtkTemp100) OnRightButtonUp
+
+# Fix the size of the image.
+set RenWin1 [[[$Application GetMainWindow] GetMainView] GetRenderWindow]
+$RenWin1 SetSize 300 300
+$RenWin1 Render
+update
+
+for {set i  1} {$i < [expr $argc - 1]} {incr i} {
+    if {[lindex $argv $i] == "-C"} {
+	source [lindex $argv [expr $i + 1]]
+	$Application SetExitStatus [CompareImage [[$Application GetMainWindow] GetMainView]]
+    }
+}
+
+$Application Exit
