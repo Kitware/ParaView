@@ -81,6 +81,11 @@ private:
   vtkstd::vector<vtkstd::string> MPIServerPreFlags;
   vtkstd::vector<vtkstd::string> MPIClientPostFlags;
   vtkstd::vector<vtkstd::string> MPIServerPostFlags;
+
+  // PVSSHFlags allows user to pass ssh command to access distant machine
+  // to do remote testing
+  vtkstd::vector<vtkstd::string> PVSSHFlags;
+  vtkstd::string                 PVSetupScript;
   
   // Specify the number of process flag, this can be set using: VTK_MPI_NUMPROC_FLAG. 
   // This is then split into : 

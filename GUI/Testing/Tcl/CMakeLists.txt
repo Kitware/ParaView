@@ -125,6 +125,21 @@ FOREACH (tfile ${PROJECT_TESTS})
       )
   ENDIF (PARAVIEW_TEST_COMPOSITING)
   # repeat the test with the client server driver
+  # There is a special hidden mode where the testing is being done remotely
+  # Basically it ssh onto another machine start server, once server is started,
+  # start the client on localhost. You need to set:
+  # A ssh command to log onto another machine (use ssh-key rather than passwd)  
+  # - PV_SSH_FLAGS              ( ssh -l kitware dash8 )
+  # a shell script that would initialize the server
+  # - PV_SETUP_SCRIPT           (eval ${PARAVIEW_SETUP_SCRIPT} ; eval  ${PARAVIEW_EXECUTABLE} --server --port=11111)
+  # with echo ${PARAVIEW_SETUP_SCRIPT}
+  # . ~/Software/paraview_env.sh
+  # and cat paraview_env.sh
+  # > export DISPLAY=:0.0
+  # > export PARAVIEW_EXECUTABLE="/home/kitware/Dashboard/MyTests/ParaView-gcc/bin/paraview"
+  # > echo "ParaView Environment Established"
+  # and paraview flags to connect to specific server:
+  # - VTK_MPI_CLIENT_POSTFLAGS  (--user=kitware --host=dash8)
   ADD_TEST("${tfile}ClientServer-ParaView" 
     ${PARAVIEW_CS_EXECUTABLE} 
     --test-server

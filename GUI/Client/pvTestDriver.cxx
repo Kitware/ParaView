@@ -132,6 +132,27 @@ void pvTestDriver::CollectConfiguredOptions()
   
 #endif // VTK_USE_MPI
 
+# ifdef VTK_MPI_CLIENT_PREFLAGS
+  this->SeparateArguments(VTK_MPI_CLIENT_PREFLAGS, this->MPIClientPreFlags);
+# endif
+# ifdef VTK_MPI_CLIENT_POSTFLAGS
+  this->SeparateArguments(VTK_MPI_CLIENT_POSTFLAGS, this->MPIClientPostFlags);
+# endif  
+# ifdef VTK_MPI_SERVER_PREFLAGS
+  this->SeparateArguments(VTK_MPI_SERVER_PREFLAGS, this->MPIServerPreFlags);
+# endif
+# ifdef VTK_MPI_SERVER_POSTFLAGS
+  this->SeparateArguments(VTK_MPI_SERVER_POSTFLAGS, this->MPIServerPostFlags);
+# endif  
+
+// For remote testing (via ssh)
+# ifdef PV_SSH_FLAGS
+  this->SeparateArguments(PV_SSH_FLAGS, this->PVSSHFlags);
+# endif //PV_SSH_FLAGS
+
+# ifdef PV_SETUP_SCRIPT
+  this->PVSetupScript = PV_SETUP_SCRIPT;
+# endif //PV_SETUP_SCRIPT
 }
 
 int pvTestDriver::ProcessCommandLine(int argc, char* argv[])
@@ -186,25 +207,28 @@ int pvTestDriver::ProcessCommandLine(int argc, char* argv[])
       {
       this->SeparateArguments(argv[i+1], this->MPIClientPreFlags);
       this->ArgStart = i+2;
-      fprintf(stderr, "Extras client preflags were specified.\n");
+      fprintf(stderr, "Extras client preflags were specified: %s\n", argv[i+1]);
       }
     if(strncmp(argv[i], "--client-postflags",18) == 0)
       {
       this->SeparateArguments(argv[i+1], this->MPIClientPostFlags);
       this->ArgStart = i+2;
-      fprintf(stderr, "Extras client postflags were specified.\n");
+      fprintf(stderr, "Extras client postflags were specified: %s\n", argv[i+1]);
       }
     if(strncmp(argv[i], "--server-preflags",17) == 0)
       {
       this->SeparateArguments(argv[i+1], this->MPIServerPreFlags);
       this->ArgStart = i+2;
-      fprintf(stderr, "Extras server preflags were specified.\n");
+      fprintf(stderr, "Extras server preflags were specified: %s\n", argv[i+1]);
+      fprintf(stderr, "Extras server preflags were specified: %d %s\n",
+      this->MPIServerPreFlags.size(), 
+      this->MPIServerPreFlags[1].c_str());
       }
     if(strncmp(argv[i], "--server-postflags",18 ) == 0)
       {
       this->SeparateArguments(argv[i+1], this->MPIServerPostFlags);
       this->ArgStart = i+2;
-      fprintf(stderr, "Extras server postflags were specified.\n");
+      fprintf(stderr, "Extras server postflags were specified: %s\n", argv[i+1]);
       }
     }
   
@@ -257,24 +281,38 @@ pvTestDriver::CreateCommandLine(kwsys_stl::vector<const char*>& commandLine,
         }
       }
     }
-  commandLine.push_back(paraView);
-  if(strlen(paraviewFlags) > 0)
+
+  if(this->PVSSHFlags.size() && (strcmp( paraviewFlags, "--server" ) == 0))
     {
-    commandLine.push_back(paraviewFlags);
+      {
+      // First add the ssh command:
+      for(unsigned int i = 0; i < this->PVSSHFlags.size(); ++i)
+        {
+        commandLine.push_back(this->PVSSHFlags[i].c_str());
+        }
+      // then the paraview intialization:
+      if( this->PVSetupScript.size() )
+        {
+        commandLine.push_back(this->PVSetupScript.c_str());
+        }
+      }
     }
-  if(this->ReverseConnection)
+  else
     {
-    commandLine.push_back("-rc");
-    }
-  
-  for(int ii = argStart; ii < argCount; ++ii)
-    {
-    commandLine.push_back(argv[ii]);
-    }
-  for(unsigned int i = 0; i < this->MPIPostFlags.size(); ++i)
-    {
-    commandLine.push_back(MPIPostFlags[i].c_str());
-    }
+    commandLine.push_back(paraView);
+    if(strlen(paraviewFlags) > 0)
+      {
+      commandLine.push_back(paraviewFlags);
+      }
+    if(this->ReverseConnection)
+      {
+      commandLine.push_back("-rc");
+      }
+    
+    for(unsigned int i = 0; i < this->MPIPostFlags.size(); ++i)
+      {
+      commandLine.push_back(MPIPostFlags[i].c_str());
+      }
     // If there is specific flags for the server to pass to paraview, add them
     if( strcmp( paraviewFlags, "--client" ) == 0)
       {
@@ -291,6 +329,12 @@ pvTestDriver::CreateCommandLine(kwsys_stl::vector<const char*>& commandLine,
         commandLine.push_back(this->MPIServerPostFlags[i].c_str());
         }
       }
+    // remaining flags for the test 
+    for(int ii = argStart; ii < argCount; ++ii)
+      {
+      commandLine.push_back(argv[ii]);
+      }
+    }
   commandLine.push_back(0);
 }
 
@@ -418,7 +462,7 @@ int pvTestDriver::Main(int argc, char* argv[])
     return 1;
     } 
   
- // mpi code
+  // mpi code
   // Allocate process managers.
   kwsysProcess* renderServer = 0;
   if(this->TestRenderServer)
