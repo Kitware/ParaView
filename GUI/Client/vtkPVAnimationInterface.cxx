@@ -176,7 +176,7 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterface);
-vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.166");
+vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.167");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterface,ControlledWidget, vtkPVWidget);
 
@@ -1269,8 +1269,8 @@ void vtkPVAnimationInterface::SaveImagesCallback()
       { 
       dlg->SetText(
         "Specify the width and height of the images to be saved from this "
-        "animation. Each dimension must be a multiple of 4. Each will be "
-        "resized to the next smallest multiple of 4 if it does not meet this "
+        "animation. Each dimension must be a multiple of 32. Each will be "
+        "resized to the next smallest multiple of 32 if it does not meet this "
         "criterion.");
       }
     vtkKWWidget *frame = vtkKWWidget::New();
@@ -1369,13 +1369,13 @@ void vtkPVAnimationInterface::SaveImagesCallback()
         }
       }
     
-    if ((width % 4) > 0)
+    if ((width % 32) > 0)
       {
-      width -= width % 4;
+      width -= width % 32;
       }
-    if ((height % 4) > 0)
+    if ((height % 32) > 0)
       {
-      height -= height % 4;
+      height -= height % 32;
       }
     
     widthEntry->Delete();
@@ -1533,6 +1533,7 @@ void vtkPVAnimationInterface::SaveImages(const char* fileRoot,
     }
   else if ( awriter )
     {
+    awriter->End();
     awriter->SetInput(0);
     awriter->Delete();
     awriter = 0;
