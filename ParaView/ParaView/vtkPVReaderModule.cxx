@@ -29,7 +29,7 @@
 #include <vtkstd/string>
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVReaderModule);
-vtkCxxRevisionMacro(vtkPVReaderModule, "1.38");
+vtkCxxRevisionMacro(vtkPVReaderModule, "1.39");
 
 int vtkPVReaderModuleCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -213,7 +213,9 @@ int vtkPVReaderModule::ReadFileInformation(const char* fname)
 
   // Update the reader's information.
   vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
-  pm->GetStream() << vtkClientServerStream::Invoke <<  this->GetVTKSourceID()
+  // Since this is a reader, it is ok to assume that there is on
+  // VTKSource. Hence, the use of index 0.
+  pm->GetStream() << vtkClientServerStream::Invoke <<  this->GetVTKSourceID(0)
                   << "UpdateInformation" << vtkClientServerStream::End;
   pm->SendStreamToServer();
   return VTK_OK;
@@ -347,8 +349,10 @@ void vtkPVReaderModule::SetReaderFileName(const char* fname)
     {
     this->FileEntry->SetValue(fname);
     vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
+  // Since this is a reader, it is ok to assume that there is on
+  // VTKSource. Hence, the use of index 0.
     pm->GetStream() << vtkClientServerStream::Invoke 
-                    << this->GetVTKSourceID() 
+                    << this->GetVTKSourceID(0) 
                     << (vtkstd::string("Set") 
                         + vtkstd::string(this->FileEntry->GetVariableName())).c_str()
                     << fname

@@ -47,7 +47,7 @@
  
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProbe);
-vtkCxxRevisionMacro(vtkPVProbe, "1.107");
+vtkCxxRevisionMacro(vtkPVProbe, "1.108");
 
 int vtkPVProbeCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -129,7 +129,9 @@ void vtkPVProbe::CreateProperties()
   vtkPVApplication* pvApp = this->GetPVApplication();
   vtkPVProcessModule* pm = pvApp->GetProcessModule();
   this->vtkPVSource::CreateProperties();
-  pm->GetStream() << vtkClientServerStream::Invoke <<  this->GetVTKSourceID()
+  // We do not support probing groups and multi-block objects. Therefore,
+  // we use the first VTKSource id.
+  pm->GetStream() << vtkClientServerStream::Invoke <<  this->GetVTKSourceID(0)
                   << "SetSpatialMatch" << 2
                   << vtkClientServerStream::End;
 
@@ -175,7 +177,7 @@ void vtkPVProbe::CreateProperties()
     pm->GetStream() << vtkClientServerStream::Invoke << pm->GetApplicationID()
                     << "GetController"
                     << vtkClientServerStream::End;
-    pm->GetStream() << vtkClientServerStream::Invoke << this->GetVTKSourceID() 
+    pm->GetStream() << vtkClientServerStream::Invoke << this->GetVTKSourceID(0) 
                     << "SetController"
                     << vtkClientServerStream::LastResult
                     << vtkClientServerStream::End; 
@@ -423,7 +425,7 @@ void vtkPVProbe::SaveInBatchScript(ofstream *file)
     {
     *file << "vtkLineSource line" << this->InstanceCount << "\n";
 
-    pm->GetStream() << vtkClientServerStream::Invoke << this->GetVTKSourceID()
+    pm->GetStream() << vtkClientServerStream::Invoke << this->GetVTKSourceID(0)
                     << "GetInput"
                     << vtkClientServerStream::End;
     pm->GetStream() << vtkClientServerStream::Invoke 
@@ -442,7 +444,7 @@ void vtkPVProbe::SaveInBatchScript(ofstream *file)
     *file << "\tline" << this->InstanceCount << " SetPoint1 " << result.str() << "\n";
     delete []result.str();
     }
-    pm->GetStream() << vtkClientServerStream::Invoke << this->GetVTKSourceID()
+    pm->GetStream() << vtkClientServerStream::Invoke << this->GetVTKSourceID(0)
                     << "GetInput"
                     << vtkClientServerStream::End;
     pm->GetStream() << vtkClientServerStream::Invoke 
@@ -461,7 +463,7 @@ void vtkPVProbe::SaveInBatchScript(ofstream *file)
     *file << "\tline" << this->InstanceCount << " SetPoint2 " << result.str() << "\n";
     delete []result.str();
     }
-    pm->GetStream() << vtkClientServerStream::Invoke << this->GetVTKSourceID()
+    pm->GetStream() << vtkClientServerStream::Invoke << this->GetVTKSourceID(0)
                     << "GetInput"
                     << vtkClientServerStream::End;
     pm->GetStream() << vtkClientServerStream::Invoke 
@@ -484,20 +486,20 @@ void vtkPVProbe::SaveInBatchScript(ofstream *file)
   
 //  *file << this->GetVTKSource()->GetClassName() << " "
   *file << this->GetSourceClassName() << " pvTemp"
-        << this->GetVTKSourceID() << "\n";
+        << this->GetVTKSourceID(0) << "\n";
   if (this->GetDimensionality() == 0)
     {
-    *file << "\tpvTemp" << this->GetVTKSourceID() << " SetInput probeInput" 
+    *file << "\tpvTemp" << this->GetVTKSourceID(0) << " SetInput probeInput" 
           << this->InstanceCount << "\n";
     }
   else
     {
-    *file << "\tpvTemp" << this->GetVTKSourceID()
+    *file << "\tpvTemp" << this->GetVTKSourceID(0)
           << " SetInput [line" << this->InstanceCount << " GetOutput]\n";
     }
   
-  *file << "\tpvTemp" << this->GetVTKSourceID() << " SetSource [pvTemp";
-  *file << this->GetPVInput(0)->GetVTKSourceID()
+  *file << "\tpvTemp" << this->GetVTKSourceID(0) << " SetSource [pvTemp";
+  *file << this->GetPVInput(0)->GetVTKSourceID(0)
         << " GetOutput]\n\n";
   
   if (this->GetDimensionality() == 1)
@@ -519,7 +521,7 @@ void vtkPVProbe::SaveInBatchScript(ofstream *file)
             << xyp->GetXTitle() << "\" \n";
       *file << "\t" << this->XYPlotTclName << " RemoveAllInputs" << endl;
       *file << "\t" << this->XYPlotTclName << " AddInput [ pvTemp" 
-            << this->GetVTKSourceID() << " GetOutput ]" << endl;
+            << this->GetVTKSourceID(0) << " GetOutput ]" << endl;
 
       *file << "Ren1" << " AddActor "
             << this->XYPlotTclName << endl;
@@ -533,12 +535,12 @@ void vtkPVProbe::SaveInBatchScript(ofstream *file)
 //----------------------------------------------------------------------------
 int vtkPVProbe::GetDimensionality()
 {
-  if (!this->GetVTKSourceID().ID)
+  if (!this->GetVTKSourceID(0).ID)
     {
     return 0;
     }
   vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
-  pm->GetStream() << vtkClientServerStream::Invoke <<  this->GetVTKSourceID()
+  pm->GetStream() << vtkClientServerStream::Invoke <<  this->GetVTKSourceID(0)
                   << "GetInput" 
                   << vtkClientServerStream::End;
   pm->GetStream() << vtkClientServerStream::Invoke 
