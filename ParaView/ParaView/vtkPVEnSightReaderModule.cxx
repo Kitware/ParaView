@@ -71,7 +71,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVEnSightReaderModule);
-vtkCxxRevisionMacro(vtkPVEnSightReaderModule, "1.38");
+vtkCxxRevisionMacro(vtkPVEnSightReaderModule, "1.39");
 
 int vtkPVEnSightReaderModuleCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -364,19 +364,22 @@ int vtkPVEnSightReaderModule::InitialVariableSelection(const char* tclName,
 //----------------------------------------------------------------------------
 int vtkPVEnSightReaderModule::CanReadFile(const char* fname)
 {
+  vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
+  
   // Find the EnSight file type.
-  this->GetPVApplication()->GetProcessModule()->RootScript(
+  pm->RootScript(
     "vtkGenericEnSightReader vtkPVEnSightReaderModuleCanReadFileTemp\n"
     "vtkPVEnSightReaderModuleCanReadFileTemp SetCaseFileName {%s}\n"
     "vtkPVEnSightReaderModuleCanReadFileTemp DetermineEnSightVersion",
     fname
     );
-  char* result = this->GetPVApplication()->GetProcessModule()->NewRootResult();
-  this->GetPVApplication()->GetProcessModule()->RootScript(
-    "vtkPVEnSightReaderModuleCanReadFileTemp Delete"
-    );
-  int fileType = atoi(result);
-  delete [] result;
+  const char* result = pm->GetRootResult();
+  int fileType = -1;
+  if(result)
+    {
+    fileType = atoi(result);
+    }
+  pm->RootScript("vtkPVEnSightReaderModuleCanReadFileTemp Delete");
   
   int retVal = 0;
   switch (fileType)

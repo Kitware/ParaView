@@ -125,9 +125,8 @@ public:
   // Description:
   // This executes a script on process 0 of the server.
   // Used mainly for client server operation.
-  // Getting the result returns a string which has to be deleted.
   virtual void  RootSimpleScript(const char *str);
-  virtual char* NewRootResult();
+  virtual const char* GetRootResult();
   
   // Description:
   // Get a directory listing for the given directory.  This
@@ -146,7 +145,11 @@ protected:
   int    ArgumentCount;
   char** Arguments;
   int    ReturnValue;
-
+  
+  vtkSetStringMacro(RootResult);
+  
+  // Result from last RootScript.
+  char* RootResult;
 private:  
   vtkPVClientServerModule(const vtkPVClientServerModule&); // Not implemented
   void operator=(const vtkPVClientServerModule&); // Not implemented

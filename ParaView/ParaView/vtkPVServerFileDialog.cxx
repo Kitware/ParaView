@@ -63,7 +63,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVServerFileDialog );
-vtkCxxRevisionMacro(vtkPVServerFileDialog, "1.15");
+vtkCxxRevisionMacro(vtkPVServerFileDialog, "1.16");
 
 int vtkPVServerFileDialogCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -940,6 +940,7 @@ vtkPVApplication* vtkPVServerFileDialog::GetPVApplication()
 //----------------------------------------------------------------------------
 void vtkPVServerFileDialog::Update()
 {
+  vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
   vtkStringList* dirs = vtkStringList::New();
   vtkStringList* files = vtkStringList::New();
   const char* perm = "readable";
@@ -950,12 +951,10 @@ void vtkPVServerFileDialog::Update()
   
   // Make sure we have a directory.
   if(!this->LastPath)
-    {    
-    this->GetPVApplication()->GetProcessModule()->RootScript("pwd");
-    char* result = this->GetPVApplication()->GetProcessModule()->NewRootResult();
-    this->SetLastPath(result);
+    {
+    pm->RootScript("pwd");
+    this->SetLastPath(pm->GetRootResult());
     this->ConvertLastPath();
-    delete [] result;
     }
 
   // Read the list of subdirectories and files.
@@ -964,15 +963,12 @@ void vtkPVServerFileDialog::Update()
     {
     // Directory did not exist, use current directory instead.
     vtkErrorMacro("Cannot open directory: " << this->LastPath);
-    this->GetPVApplication()->GetProcessModule()->RootScript("pwd");
-    char* result = this->GetPVApplication()->GetProcessModule()->NewRootResult();
-    this->SetLastPath(result);
+    pm->RootScript("pwd");
+    this->SetLastPath(pm->GetRootResult());
     this->ConvertLastPath();
-    delete [] result;
     
     // We will now succeed.
-    this->GetPVApplication()->GetProcessModule()
-      ->GetDirectoryListing(this->LastPath, dirs, files, perm);
+    pm->GetDirectoryListing(this->LastPath, dirs, files, perm);
     }
   
   this->Script("%s delete all", this->FileList->GetWidgetName());

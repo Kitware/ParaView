@@ -123,12 +123,11 @@ public:
   // Description:
   // This executes a script on process 0 of the server.
   // Used mainly for client server operation.
-  // Getting the result returns a string which has to be deleted.
 //BTX
   void  RootScript(char *EventString, ...);
 //ETX
   virtual void  RootSimpleScript(const char *str);
-  virtual char* NewRootResult();
+  virtual const char* GetRootResult();
   
   // Description:
   // Set the application instance for this class.

@@ -154,7 +154,7 @@ void vtkPVRelayRemoteScript(void *localArg, void *remoteArg,
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVClientServerModule);
-vtkCxxRevisionMacro(vtkPVClientServerModule, "1.21");
+vtkCxxRevisionMacro(vtkPVClientServerModule, "1.22");
 
 int vtkPVClientServerModuleCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -170,6 +170,7 @@ vtkPVClientServerModule::vtkPVClientServerModule()
   this->ArgumentCount = 0;
   this->Arguments = NULL;
   this->ReturnValue = 0;
+  this->RootResult = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -189,6 +190,7 @@ vtkPVClientServerModule::~vtkPVClientServerModule()
   this->ArgumentCount = 0;
   this->Arguments = NULL;
   this->ReturnValue = 0;
+  this->SetRootResult(0);
 }
 
 
@@ -419,6 +421,9 @@ int vtkPVClientServerModule::GetPartitionId()
 // Called only on client
 void vtkPVClientServerModule::RootSimpleScript(const char *str)
 {
+  // Clear any previous result.
+  this->SetRootResult(0);
+  
   if (this->Application == NULL)
     {
     vtkErrorMacro("Missing application object.");
@@ -438,37 +443,37 @@ void vtkPVClientServerModule::RootSimpleScript(const char *str)
   this->SocketController->TriggerRMI(1, const_cast<char*>(str), 
                                      VTK_PV_ROOT_SCRIPT_RMI_TAG);
 }
+
 //----------------------------------------------------------------------------
 // Called only on client
-char* vtkPVClientServerModule::NewRootResult()
+const char* vtkPVClientServerModule::GetRootResult()
 {
-  int length;
-  char *result;
-
-  if (this->Application == NULL)
+  if(!this->Application)
     {
     vtkErrorMacro("Missing application object.");
-    return NULL;
+    return 0;
     }
-
-  if ( ! this->ClientMode)
+  
+  if(!this->ClientMode)
     {
     vtkErrorMacro("NotExpecting this call on the server.");
-    return NULL;
+    return 0;
     }
-
-  this->SocketController->TriggerRMI(1, "", VTK_PV_ROOT_RESULT_RMI_TAG);
-  this->SocketController->Receive(&length, 1, 1, VTK_PV_ROOT_RESULT_LENGTH_TAG);
-  if (length <= 0)
+  
+  if(!this->RootResult)
     {
-    return NULL;
+    int length;    
+    this->SocketController->TriggerRMI(1, "", VTK_PV_ROOT_RESULT_RMI_TAG);
+    this->SocketController->Receive(&length, 1, 1, VTK_PV_ROOT_RESULT_LENGTH_TAG);
+    if(length <= 0)
+      {
+      return 0;
+      }
+    this->RootResult = new char[length];
+    this->SocketController->Receive(this->RootResult, length, 1, VTK_PV_ROOT_RESULT_TAG);
     }
-  result = new char[length];
-  this->SocketController->Receive(result, length, 1, VTK_PV_ROOT_RESULT_TAG);
-  return result;  
+  return this->RootResult;
 }
-
-
 
 //----------------------------------------------------------------------------
 // Called only in the client.
@@ -812,12 +817,11 @@ int vtkPVClientServerModule::GetDirectoryListing(const char* dir,
     this->RootScript(
       "::paraview::vtkPVProcessModule::GetDirectoryListing {%s} {%s}",
       dir, perm);
-    char* result = this->NewRootResult();    
-    if(strcmp(result, "<NO_SUCH_DIRECTORY>") == 0)
+    const char* result = vtkString::Duplicate(this->GetRootResult());
+    if(!result || strcmp(result, "<NO_SUCH_DIRECTORY>") == 0)
       {
       dirs->RemoveAllItems();
       files->RemoveAllItems();
-      delete [] result;
       return 0;
       }
     vtkTclGetObjectFromPointer(this->Application->GetMainInterp(), dirs,

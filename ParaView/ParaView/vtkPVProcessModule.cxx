@@ -77,7 +77,7 @@ struct vtkPVArgs
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProcessModule);
-vtkCxxRevisionMacro(vtkPVProcessModule, "1.12");
+vtkCxxRevisionMacro(vtkPVProcessModule, "1.13");
 
 int vtkPVProcessModuleCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -384,18 +384,10 @@ void vtkPVProcessModule::RootSimpleScript(const char *script)
   this->Script(script);
 }
 
-
 //----------------------------------------------------------------------------
-char* vtkPVProcessModule::NewRootResult()
+const char* vtkPVProcessModule::GetRootResult()
 {
-  char* str;
-  char* result;
-
-  result = this->Application->GetMainInterp()->result;
-  str = new char[strlen(result)+1];
-  strcpy(str, result);
-
-  return str;
+  return this->Application->GetMainInterp()->result;
 }
 
 //----------------------------------------------------------------------------
