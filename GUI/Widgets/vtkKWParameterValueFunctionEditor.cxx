@@ -32,7 +32,7 @@
 
 #include <vtkstd/string>
 
-vtkCxxRevisionMacro(vtkKWParameterValueFunctionEditor, "1.37");
+vtkCxxRevisionMacro(vtkKWParameterValueFunctionEditor, "1.38");
 
 int vtkKWParameterValueFunctionEditorCommand(ClientData cd, Tcl_Interp *interp, int argc, char *argv[]);
 
@@ -5210,7 +5210,7 @@ void vtkKWParameterValueFunctionEditor::RedrawHistogram()
       vtkImageData *img_data = NULL;
       if (image && secondary_image)
         {
-        vtkImageBlend *blend = vtkImageBlend::New();
+        blend = vtkImageBlend::New();
         blend->AddInput(image);
         blend->AddInput(secondary_image);
         img_data = blend->GetOutput();
