@@ -68,7 +68,7 @@
 #endif
 
 vtkStandardNewMacro(vtkPVAnimationScene);
-vtkCxxRevisionMacro(vtkPVAnimationScene, "1.14");
+vtkCxxRevisionMacro(vtkPVAnimationScene, "1.15");
 #define VTK_PV_PLAYMODE_SEQUENCE_TITLE "Sequence"
 #define VTK_PV_PLAYMODE_REALTIME_TITLE "Real Time"
 
@@ -742,7 +742,7 @@ void vtkPVAnimationScene::Play()
 void vtkPVAnimationScene::Stop()
 {
   this->AnimationSceneProxy->Stop();
-  if (this->Window)
+  if (this->Window && this->Window->GetCurrentPVSource() )
     {
     this->Window->GetCurrentPVSource()->ResetCallback();
     }
@@ -955,7 +955,7 @@ void vtkPVAnimationScene::SetCurrentTime(double time)
     }
   this->AnimationSceneProxy->SetCurrentTime(time);
   this->TimeScale->SetValue(time);
-  if (this->Window)
+  if (this->Window && this->Window->GetCurrentPVSource())
     {
     this->Window->GetCurrentPVSource()->ResetCallback();
     }
