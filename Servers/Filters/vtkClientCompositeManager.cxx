@@ -55,7 +55,7 @@
 #endif
 
 
-vtkCxxRevisionMacro(vtkClientCompositeManager, "1.42");
+vtkCxxRevisionMacro(vtkClientCompositeManager, "1.43");
 vtkStandardNewMacro(vtkClientCompositeManager);
 
 vtkCxxSetObjectMacro(vtkClientCompositeManager,Compositer,vtkCompositer);
@@ -627,37 +627,40 @@ void vtkClientCompositeManager::SatelliteStartRender()
   controller->Receive((int*)(&intInfo), intInfoSize, 
                       otherId, vtkClientCompositeManager::WIN_INFO_TAG);
 
-  // In case the render window is smaller than requested.
-  // This assumes that all server processes will have the
-  // same (or larger) maximum render window size.
-  int* screenSize = renWin->GetScreenSize();
-  if (intInfo.WindowSize[0] > screenSize[0] ||
-      intInfo.WindowSize[1] > screenSize[1])
+  if (!renWin->GetOffScreenRendering())
     {
-    if (myId == 0)
+    // In case the render window is smaller than requested.
+    // This assumes that all server processes will have the
+    // same (or larger) maximum render window size.
+    int* screenSize = renWin->GetScreenSize();
+    if (intInfo.WindowSize[0] > screenSize[0] ||
+        intInfo.WindowSize[1] > screenSize[1])
       {
-      // We need to keep the same aspect ratio.
-      int newSize[2];
-      float k1, k2;
-      k1 = (float)screenSize[0]/(float)intInfo.WindowSize[0];
-      k2 = (float)screenSize[1]/(float)intInfo.WindowSize[1];
-      if (k1 < k2)
+      if (myId == 0)
         {
-        newSize[0] = screenSize[0];
-        newSize[1] = (int)((float)(intInfo.WindowSize[1]) * k1);
+        // We need to keep the same aspect ratio.
+        int newSize[2];
+        float k1, k2;
+        k1 = (float)screenSize[0]/(float)intInfo.WindowSize[0];
+        k2 = (float)screenSize[1]/(float)intInfo.WindowSize[1];
+        if (k1 < k2)
+          {
+          newSize[0] = screenSize[0];
+          newSize[1] = (int)((float)(intInfo.WindowSize[1]) * k1);
+          }
+        else
+          {
+          newSize[0] = (int)((float)(intInfo.WindowSize[0]) * k2);
+          newSize[1] = screenSize[1];
+          }
+        intInfo.WindowSize[0] = newSize[0];
+        intInfo.WindowSize[1] = newSize[1];
         }
       else
-        {
-        newSize[0] = (int)((float)(intInfo.WindowSize[0]) * k2);
-        newSize[1] = screenSize[1];
-        }
-      intInfo.WindowSize[0] = newSize[0];
-      intInfo.WindowSize[1] = newSize[1];
-      }
-    else
-      { // Sanity check that all server 
+        { // Sanity check that all server 
         // procs have the same window limitation.
-      vtkErrorMacro("Server window size mismatch.");
+        vtkErrorMacro("Server window size mismatch.");
+        }
       }
     }
 
