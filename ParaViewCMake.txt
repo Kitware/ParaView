@@ -1,0 +1,3 @@
+OPTION (VTK_USE_MPI 
+        "use MPI (Message Passing Interface) library for parallel support"
+        ON)
