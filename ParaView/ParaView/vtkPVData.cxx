@@ -101,7 +101,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.221");
+vtkCxxRevisionMacro(vtkPVData, "1.222");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -120,6 +120,8 @@ vtkPVData::vtkPVData()
   this->PropertiesParent = NULL; 
 
   this->CubeAxesTclName = NULL;
+  this->PointLabelMapperTclName = NULL;
+  this->PointLabelActorTclName = NULL;
 
   // Create a unique id for creating tcl names.
   ++instanceCount;
@@ -167,6 +169,7 @@ vtkPVData::vtkPVData()
   
   this->ScalarBarCheck = vtkKWCheckButton::New();
   this->CubeAxesCheck = vtkKWCheckButton::New();
+  this->PointLabelCheck = vtkKWCheckButton::New();
 
   this->VisibilityCheck = vtkKWCheckButton::New();
   this->Visibility = 1;
@@ -308,6 +311,13 @@ vtkPVData::~vtkPVData()
     this->SetCubeAxesTclName(NULL);
     }
   
+  // remove the point label objects
+  DeletePointLabelObjects();
+  if (this->PointLabelCheck) 
+    {
+    this->PointLabelCheck->Delete();
+    this->PointLabelCheck = NULL;
+    }
  
   this->ScalarBarCheck->Delete();
   this->ScalarBarCheck = NULL;  
@@ -425,6 +435,7 @@ void vtkPVData::CreateParallelTclObjects(vtkPVApplication *pvApp)
 void vtkPVData::DeleteCallback()
 {
   this->SetCubeAxesVisibility(0);
+  this->SetPointLabelVisibility(0);
 }
 
 //----------------------------------------------------------------------------
@@ -534,6 +545,13 @@ void vtkPVData::CreateProperties()
   this->CubeAxesCheck->SetBalloonHelpString(
     "Toggle the visibility of X,Y,Z scales for this dataset.");
 
+  // label
+  this->PointLabelCheck->SetParent(this->ViewFrame->GetFrame());
+  this->PointLabelCheck->Create(this->Application, "-text {Label Point Data}");
+  this->PointLabelCheck->SetCommand(this, "PointLabelCheckCallback");
+  this->PointLabelCheck->SetBalloonHelpString(
+    "Toggle the visibility of point lables for this dataset.");
+
   this->Script("grid %s %s -sticky wns",
                this->VisibilityCheck->GetWidgetName(),
                this->ResetCameraButton->GetWidgetName());
@@ -547,8 +565,11 @@ void vtkPVData::CreateProperties()
 
   this->Script("grid %s -sticky wns",
                this->CubeAxesCheck->GetWidgetName());
-  // Color
 
+  this->Script("grid %s -sticky wns",
+               this->PointLabelCheck->GetWidgetName());
+
+  // Color
   this->ColorFrame->SetParent(this->Properties->GetFrame());
   this->ColorFrame->ShowHideFrameOn();
   this->ColorFrame->Create(this->Application, 0);
@@ -1354,6 +1375,7 @@ void vtkPVData::ColorByProperty()
   this->AddTraceEntry("$kw(%s) ColorByProperty", this->GetTclName());
   this->ColorMenu->SetValue("Property");
   this->ColorByPropertyInternal();
+  this->PointLabelByInternal(NULL, "Property");
 }
 
 //----------------------------------------------------------------------------
@@ -1445,6 +1467,17 @@ void vtkPVData::ColorByPointFieldInternal(const char *name, int numComps)
     {
     this->GetPVRenderView()->EventuallyRender();
     }
+
+  PointLabelByInternal("Point", name);
+}
+
+void vtkPVData::PointLabelByInternal(const char *type, const char *name)  
+{
+  if ((this->PointLabelCheck->GetEnabled() != 0) &&
+      (this->PointLabelCheck->GetState() != 0) ) 
+    {
+      this->UpdatePointLabelObjects(type, name);
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -1504,6 +1537,8 @@ void vtkPVData::ColorByCellFieldInternal(const char *name, int numComps)
     {
     this->GetPVRenderView()->EventuallyRender();
     }
+
+  PointLabelByInternal("Cell", name);
 }
 
 
@@ -2014,6 +2049,10 @@ void vtkPVData::SetVisibility(int v)
   this->AddTraceEntry("$kw(%s) SetVisibility %d", this->GetTclName(), v);
   this->GetPVSource()->SetVisibilityInternal(v);
   this->Script("%s SetVisibility %d", this->GetCubeAxesTclName(), v);
+  if (this->PointLabelCheck->GetState())
+    {
+    this->SetPointLabelVisibility(v);
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -2106,6 +2145,17 @@ void vtkPVData::SetCubeAxesVisibility(int val)
 }
 
 //----------------------------------------------------------------------------
+void vtkPVData::SetPointLabelVisibility(int val)
+{
+  if (this->PointLabelActorTclName != NULL)
+    {
+    this->Script("%s SetVisibility %d", GetPointLabelActorTclName(), val); 
+    this->AddTraceEntry("$kw(%s) SetPointLabelVisibility %d", 
+        this->GetTclName(), val);
+    }
+}
+
+//----------------------------------------------------------------------------
 void vtkPVData::ScalarBarCheckCallback()
 {
   this->SetScalarBarVisibility(this->ScalarBarCheck->GetState());
@@ -2127,6 +2177,33 @@ void vtkPVData::CubeAxesCheckCallback()
     }
 }
 
+//----------------------------------------------------------------------------
+void vtkPVData::PointLabelCheckCallback()
+{
+  this->AddTraceEntry("$kw(%s) SetPointLabelVisibility %d", this->GetTclName(),
+                      this->PointLabelCheck->GetState());
+  if (this->VisibilityCheck->GetState())
+    {
+    this->SetPointLabelVisibility(this->PointLabelCheck->GetState());
+
+    if (this->PointLabelCheck->GetState()) 
+      {
+      const char *currentColorBy = this->ColorMenu->GetValue();
+      if (currentColorBy != NULL && strcmp(currentColorBy, "Property") != 0) 
+        {
+        char type[64];
+        char name[64];
+        sscanf(currentColorBy, "%s %s", type, name);
+        this->UpdatePointLabelObjects(type, name);
+        }
+      }
+
+    if ( this->GetPVRenderView() )
+      {
+      this->GetPVRenderView()->EventuallyRender();
+      }
+    }
+}
 
 //----------------------------------------------------------------------------
 void vtkPVData::MapScalarsCheckCallback()
@@ -2989,8 +3066,90 @@ void vtkPVData::UpdateActorControlResolutions()
     }
 }
 
-  
 
+// 
+// Create or update label objects
+//----------------------------------------------------------------------------
+void vtkPVData::UpdatePointLabelObjects(const char *type, const char *name)
+{
+  vtkPVSource* source = this->GetPVSource();
+  if (!source)
+    {
+// returning
+    return;
+    }
 
+  // determine if we can annotate the current selection
+  if ((type == NULL) || (strcmp(type, "Point") != 0))
+    {
+      // we cannot map this variable
+      this->SetPointLabelVisibility(0);
+// returning
+      return;
+// returning
+    }
 
+  // if the mapper doesn't exist, make it 
+  vtkPVDataInformation* dataInfo = source->GetDataInformation();
+  if (this->PointLabelMapperTclName == NULL) 
+    {
+    int dataType = dataInfo->GetDataSetType();
+    char mapperTclName[100];
+    sprintf(mapperTclName, "PointLabelMapper%d", this->InstanceCount);
+    SetPointLabelMapperTclName(mapperTclName);
+    this->Script("vtkLabeledDataMapper %s", GetPointLabelMapperTclName()); 
+    this->Script("%s SetInput [%s GetOutput]", GetPointLabelMapperTclName(), 
+        source->GetVTKSourceTclName(0));
+    this->Script("[%s GetLabelTextProperty] SetFontSize 24", 
+        GetPointLabelMapperTclName());
+    }
 
+  int typeId = 0;
+  this->Script("[[%s GetInput] Get%sData] SetActiveAttribute %s %d", 
+      GetPointLabelMapperTclName(), type, name, typeId);
+  this->Script("%s SetLabelModeToLabelScalars", GetPointLabelMapperTclName()); 
+
+  // if the actor doesn't exist, make it
+  if (this->PointLabelActorTclName == NULL)
+    {
+    char actorTclName[100];
+    sprintf(actorTclName, "PointLabelActor%d", this->InstanceCount);
+    SetPointLabelActorTclName(actorTclName);
+    vtkPVApplication *pvApp = this->GetPVApplication();
+    char *renderTclName = pvApp->GetRenderModule()->GetRendererTclName();
+    this->Script("vtkActor2D %s", GetPointLabelActorTclName()); 
+    this->Script("%s SetMapper %s", GetPointLabelActorTclName(), 
+        GetPointLabelMapperTclName());
+    this->Script("%s AddActor %s", renderTclName, GetPointLabelActorTclName());
+    }
+  // make sure we can see it ...
+  this->SetPointLabelVisibility(1);
+}
+
+//
+// Delete all of the point label objects, if they exist
+//----------------------------------------------------------------------------
+void vtkPVData::DeletePointLabelObjects()
+{
+  if (this->PointLabelMapperTclName && this->PointLabelActorTclName)
+    {
+    vtkPVApplication *pvApp = this->GetPVApplication();
+    if ( pvApp )
+      {
+      if (pvApp->GetRenderModule())
+        {
+        char *renderTclName = pvApp->GetRenderModule()->GetRendererTclName();
+        pvApp->Script("%s RemoveActor %s", renderTclName, 
+            this->PointLabelActorTclName);
+        }
+      pvApp->Script("%s Delete", this->PointLabelActorTclName);
+      pvApp->Script("%s Delete", this->PointLabelMapperTclName);
+      }
+    this->SetPointLabelMapperTclName(NULL);
+    this->SetPointLabelActorTclName(NULL);
+    }
+  else 
+    {
+    // error check - if there's only one, there's a problem
+    }
+}

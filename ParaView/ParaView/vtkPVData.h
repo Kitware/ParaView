@@ -239,6 +239,10 @@ public:
   void CubeAxesCheckCallback();
   vtkGetObjectMacro(CubeAxesCheck, vtkKWCheckButton);
 
+  void SetPointLabelVisibility(int val);
+  void PointLabelCheckCallback();
+  vtkGetObjectMacro(PointLabelCheck, vtkKWCheckButton);
+
   void CenterCamera();
   
   // Description:
@@ -313,6 +317,18 @@ protected:
   vtkPVData();
   ~vtkPVData();
 
+  // Point Labeling
+  void UpdatePointLabelObjects(const char *type, const char *name);
+  void DeletePointLabelObjects();
+  vtkKWCheckButton *PointLabelCheck;
+  char *PointLabelMapperTclName;
+  vtkSetStringMacro(PointLabelMapperTclName);
+  vtkGetStringMacro(PointLabelMapperTclName);
+
+  char *PointLabelActorTclName;
+  vtkSetStringMacro(PointLabelActorTclName);
+  vtkGetStringMacro(PointLabelActorTclName);
+
   int InstanceCount;
   
   // This points to the source widget that owns this data widget.
@@ -329,6 +345,7 @@ protected:
   void ColorByCellFieldInternal(const char *name, int numComps);
   void SetColorRangeInternal(float min, float max);
   void SetActorColor(float r, float g, float b);
+  void PointLabelByInternal(const char *type, const char *name);
 
   // A flag that helps UpdateProperties determine 
   // whether tho set the default color.
