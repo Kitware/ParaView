@@ -52,7 +52,7 @@
 #endif
 
 
-vtkCxxRevisionMacro(vtkClientCompositeManager, "1.17.2.1");
+vtkCxxRevisionMacro(vtkClientCompositeManager, "1.17.2.2");
 vtkStandardNewMacro(vtkClientCompositeManager);
 
 vtkCxxSetObjectMacro(vtkClientCompositeManager,Compositer,vtkCompositer);
@@ -830,7 +830,7 @@ void vtkClientCompositeManager::SatelliteStartRender()
       //this->CompositeController->Send((char*)(&winInfo), 
       //                sizeof(struct vtkClientRenderWindowInfo), j,
       //                vtkCompositeManager::WIN_INFO_TAG);
-      this->CompositeController->Send((float*)(&winInfo), 22, j,
+      this->CompositeController->Send((float*)(&winInfo), 5, j,
                       vtkCompositeManager::WIN_INFO_TAG);
       }
     }
