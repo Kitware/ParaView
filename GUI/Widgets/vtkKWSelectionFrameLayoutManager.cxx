@@ -60,7 +60,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include <vtkstd/vector>
 #include <vtkstd/string>
 
-#include "Resources/KWWindowLayout.h"
+#include "Resources/vtkKWWindowLayoutResources.h"
 
 #define VTK_KW_SFLMGR_LABEL_PATTERN "%d x %d"
 #define VTK_KW_SFLMGR_HELP_PATTERN "Set window layout to %d column(s) by %d row(s)"
@@ -71,7 +71,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWSelectionFrameLayoutManager);
-vtkCxxRevisionMacro(vtkKWSelectionFrameLayoutManager, "1.8");
+vtkCxxRevisionMacro(vtkKWSelectionFrameLayoutManager, "1.9");
 
 //----------------------------------------------------------------------------
 class vtkKWSelectionFrameLayoutManagerInternals

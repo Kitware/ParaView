@@ -25,11 +25,11 @@
 #include "vtk_zlib.h"
 #endif
 
-#include "Resources/KWIcons.h"
+#include "Resources/vtkKWIconResources.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWIcon );
-vtkCxxRevisionMacro(vtkKWIcon, "1.4");
+vtkCxxRevisionMacro(vtkKWIcon, "1.5");
 
 //----------------------------------------------------------------------------
 vtkKWIcon::vtkKWIcon()
