@@ -18,8 +18,9 @@
    function (determined by "Scale Mode"). Please note that this will
    generate 56x32x24 glyphs which, depending on your processor and 
    graphics card's performance might take some time. If you have a
-   slow processor or graphics card, you might want to skip this step
-   and move on to step 6.
+   slow processor or graphics card, you might want to skip step 4
+   and move on to step 7 (if you have already created the glyph filter 
+   continue with step 5).
 
    <glyphs1.jpg>
 
