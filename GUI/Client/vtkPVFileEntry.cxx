@@ -72,7 +72,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVFileEntry);
-vtkCxxRevisionMacro(vtkPVFileEntry, "1.88");
+vtkCxxRevisionMacro(vtkPVFileEntry, "1.89");
 
 //----------------------------------------------------------------------------
 vtkPVFileEntry::vtkPVFileEntry()
@@ -685,7 +685,7 @@ void vtkPVFileEntry::Accept()
 
   const char* fname = this->Entry->GetValue();
   
-  this->TimeStep = this->Timestep->GetValue();
+  this->TimeStep = static_cast<int>(this->Timestep->GetValue());
 
   vtkSMStringVectorProperty *svp = vtkSMStringVectorProperty::SafeDownCast(
     this->GetSMProperty());
