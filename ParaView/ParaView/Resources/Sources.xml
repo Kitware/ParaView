@@ -489,7 +489,7 @@ The output of the Superquadric source is polygonal data with point normals and t
                variable="StandardDeviation" type="float" default_value="0.5" 
                help="Standard deviation of the gaussian" />
   <Documentation>
-The Wavelet source can be used to create a regular rectilinear grid in up to three dimensions with values varying according to the following periodic function:
+The Wavelet source can be used to create a uniform rectilinear grid in up to three dimensions with values varying according to the following periodic function:
 OS = M * G * (XM * sin(XF * x) + YM * sin(YF * y) + ZM * cos(ZF * z))
 OS is the output scalar; M represents the maximum value; G represents the Gaussian; XM, YM, and ZM are the X, Y, and Z magnitude values; and XF, YF, and ZF are the X, Y, and Z frequency values. If a two-dimensional extent is specified, the resulting image will be displayed. If a three-dimensional extent is used, then the bounding box of the volume will be displayed. The Wavelet source has the following parameters:
 Extent: These six values indicate the X, Y, and Z extent of the output data. The first two values represent the minimum and maximum X indices, the next two are the minimum and maximum Y indices, and the last two are the minimum and maximum Z indices. By default each axis ranges from -10 to 10.
