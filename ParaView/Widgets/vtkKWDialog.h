@@ -94,12 +94,18 @@ public:
   void SetTitle(const char *);
 
 protected:
+  // Description:
+  // Set the title string of the dialog window. Should be called before
+  // create otherwise it will have no effect.
+  vtkSetStringMacro(TitleString);
+
   vtkKWDialog();
   ~vtkKWDialog();
   vtkKWDialog(const vtkKWDialog&) {};
   void operator=(const vtkKWDialog&) {};
 
   char *Command;
+  char *TitleString;
   int Done;
 };
 

@@ -66,6 +66,8 @@ vtkKWDialog::vtkKWDialog()
   this->CommandFunction = vtkKWDialogCommand;
   this->Command = NULL;
   this->Done = 1;
+  this->TitleString = 0;
+  this->SetTitleString("Kitware Dialog");
 }
 
 vtkKWDialog::~vtkKWDialog()
@@ -145,7 +147,7 @@ void vtkKWDialog::Create(vtkKWApplication *app, const char *args)
   // create the top level
   wname = this->GetWidgetName();
   this->Script("toplevel %s %s",wname,args);
-  this->Script("wm title %s \"Kitware Dialog\"",wname);
+  this->Script("wm title %s \"%s\"",wname,this->TitleString);
   this->Script("wm iconname %s \"Dialog\"",wname);
   this->Script("wm protocol %s WM_DELETE_WINDOW {%s Cancel}",
                wname, this->GetTclName());
@@ -159,7 +161,14 @@ void vtkKWDialog::SetCommand(vtkKWObject* CalledObject, const char *CommandStrin
 
 void vtkKWDialog::SetTitle( const char* title )
 {
-  this->Script("wm title %s \"%s\"", this->GetWidgetName(), 
-	       title);
+  if (this->Application)
+    {
+    this->Script("wm title %s \"%s\"", this->GetWidgetName(), 
+		 title);
+    }
+  else
+    {
+    this->SetTitleString(title);
+    }
 }
 

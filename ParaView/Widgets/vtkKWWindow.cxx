@@ -234,14 +234,23 @@ void vtkKWWindow::Exit()
 {
   vtkKWMessageDialog *dlg = vtkKWMessageDialog::New();
   dlg->SetStyleToYesNo();
+
+  ostrstream title;
+  title << "Exit " << this->GetApplication()->GetApplicationName() << ends;
+  char* ttl = title.str();
+  dlg->SetTitle(ttl);
+  delete[] ttl;
+
   dlg->Create(this->GetApplication(),"");
   ostrstream str;
   str << "Are you sure you want to exit " << this->GetApplication()->GetApplicationName() << "?" << ends;
-  dlg->SetText(str.str());
+  char* msg = str.str();
+  dlg->SetText(msg);
   dlg->SetIcon(vtkKWMessageDialog::Question);
   
   int ret = dlg->Invoke();  
   dlg->Delete();
+  delete[] msg;
   if (ret)
     {
     this->Application->Exit();
@@ -816,5 +825,5 @@ void vtkKWWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWWindow ";
-  this->ExtractRevision(os,"$Revision: 1.32 $");
+  this->ExtractRevision(os,"$Revision: 1.33 $");
 }
