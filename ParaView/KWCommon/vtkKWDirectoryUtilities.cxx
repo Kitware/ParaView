@@ -85,7 +85,7 @@ static inline int Chdir(const char* dir)
 }
 #endif
 
-vtkCxxRevisionMacro(vtkKWDirectoryUtilities, "1.6");
+vtkCxxRevisionMacro(vtkKWDirectoryUtilities, "1.7");
 vtkStandardNewMacro(vtkKWDirectoryUtilities);
 
 //----------------------------------------------------------------------------
@@ -499,6 +499,11 @@ const char* vtkKWDirectoryUtilities::FindSelfPath(const char* argv0)
 const char* vtkKWDirectoryUtilities::GetFilenamePath(const char *filename, 
                                                      char *path)
 {
+  if ( !filename | strlen(filename) == 0 )
+    {
+    path[0] = 0;
+    return path;
+    }
   const char *ptr = filename + strlen(filename) - 1;
   while (ptr > filename && *ptr != '/' && *ptr != '\\')
     {
@@ -519,6 +524,11 @@ const char* vtkKWDirectoryUtilities::GetFilenamePath(const char *filename,
 const char* vtkKWDirectoryUtilities::GetFilenameName(const char *filename, 
                                                      char *name)
 {
+  if ( !filename | strlen(filename) == 0 )
+    {
+    name[0] = 0;
+    return name;
+    }
   int found = 0;
   const char *ptr = filename + strlen(filename) - 1;
   while (ptr > filename)
@@ -534,6 +544,32 @@ const char* vtkKWDirectoryUtilities::GetFilenameName(const char *filename,
   strcpy(name, ptr + found);
   
   return name;
+}
+
+//----------------------------------------------------------------------------
+const char* vtkKWDirectoryUtilities::GetFilenameExtension(const char *filename, 
+                                                          char *ext)
+{
+  if ( !filename | strlen(filename) == 0 )
+    {
+    ext[0] = 0;
+    return ext;
+    }
+  int found = 0;
+  const char *ptr = filename + strlen(filename) - 1;
+  while (ptr > filename)
+    {
+    if (*ptr == '.')
+      {
+      found = 1;
+      break;
+      }
+    ptr--;
+    }
+
+  strcpy(ext, ptr + found);
+  
+  return ext;
 }
 
 //----------------------------------------------------------------------------
