@@ -351,6 +351,11 @@ protected:
   vtkSetStringMacro(CubeAxesTclName);
 
   vtkKWPushButton *ResetCameraButton;
+
+  float PreviousAmbient;
+  float PreviousDiffuse;
+  float PreviousSpecular;
+  int PreviousWasSolid;
 };
 
 #endif

@@ -157,6 +157,10 @@ vtkPVActorComposite::vtkPVActorComposite()
 //  this->Mode = VTK_PV_ACTOR_COMPOSITE_POLY_DATA_MODE;
   
   //this->TextureFilter = NULL;  
+  this->PreviousAmbient = 0;
+  this->PreviousSpecular = 0;
+  this->PreviousDiffuse = 1;
+  this->PreviousWasSolid = 1;
 }
 
 
@@ -1027,21 +1031,17 @@ void vtkPVActorComposite::DrawWireframe()
   
   if (this->PropertyTclName)
     {
+    if (this->PreviousWasSolid)
+      {
+      this->PreviousAmbient = this->Property->GetAmbient();
+      this->PreviousDiffuse = this->Property->GetDiffuse();
+      this->PreviousSpecular = this->Property->GetSpecular();
+      }
+    this->PreviousWasSolid = 0;
+    pvApp->BroadcastScript("%s SetAmbient 1", this->PropertyTclName);
+    pvApp->BroadcastScript("%s SetDiffuse 0", this->PropertyTclName);
+    pvApp->BroadcastScript("%s SetSpecular 0", this->PropertyTclName);
     pvApp->BroadcastScript("%s SetRepresentationToWireframe",
-                           this->PropertyTclName);
-    }
-  
-  this->GetPVRenderView()->EventuallyRender();
-}
-
-//----------------------------------------------------------------------------
-void vtkPVActorComposite::DrawSurface()
-{
-  vtkPVApplication *pvApp = this->GetPVApplication();
-  
-  if (this->PropertyTclName)
-    {
-    pvApp->BroadcastScript("%s SetRepresentationToSurface",
                            this->PropertyTclName);
     }
   
@@ -1055,12 +1055,47 @@ void vtkPVActorComposite::DrawPoints()
   
   if (this->PropertyTclName)
     {
+    if (this->PreviousWasSolid)
+      {
+      this->PreviousAmbient = this->Property->GetAmbient();
+      this->PreviousDiffuse = this->Property->GetDiffuse();
+      this->PreviousSpecular = this->Property->GetSpecular();
+      }
+    this->PreviousWasSolid = 0;
+    pvApp->BroadcastScript("%s SetAmbient 1", this->PropertyTclName);
+    pvApp->BroadcastScript("%s SetDiffuse 0", this->PropertyTclName);
+    pvApp->BroadcastScript("%s SetSpecular 0", this->PropertyTclName);
     pvApp->BroadcastScript("%s SetRepresentationToPoints",
 			   this->PropertyTclName);
     }
   
   this->GetPVRenderView()->EventuallyRender();
 }
+
+//----------------------------------------------------------------------------
+void vtkPVActorComposite::DrawSurface()
+{
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  
+  if (this->PropertyTclName)
+    {
+    if (!this->PreviousWasSolid)
+      {
+      pvApp->BroadcastScript("%s SetAmbient %f",
+			     this->PropertyTclName, this->PreviousAmbient);
+      pvApp->BroadcastScript("%s SetDiffuse %f",
+			     this->PropertyTclName, this->PreviousDiffuse);
+      pvApp->BroadcastScript("%s SetSpecular %f",
+			     this->PropertyTclName, this->PreviousSpecular);
+      pvApp->BroadcastScript("%s SetRepresentationToSurface",
+			     this->PropertyTclName);
+      }
+    this->PreviousWasSolid = 1;
+    }
+  
+  this->GetPVRenderView()->EventuallyRender();
+}
+
 
 
 //----------------------------------------------------------------------------
