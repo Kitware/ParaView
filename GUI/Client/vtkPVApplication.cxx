@@ -112,7 +112,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.314");
+vtkCxxRevisionMacro(vtkPVApplication, "1.315");
 
 
 int vtkPVApplicationCommand(ClientData cd, Tcl_Interp *interp,
@@ -1212,8 +1212,11 @@ void vtkPVApplication::Start(int argc, char*argv[])
   // Some scripts were hanging due to event loop issues.
   // This update prevents such problems.
   this->Script("update");
-  this->LoadScript(this->Options->GetParaViewScriptName());
-
+  if (this->Options->GetParaViewScriptName())
+    {
+    this->LoadScript(this->Options->GetParaViewScriptName());
+    }
+  
   if (this->Options->GetPlayDemoFlag())
     {
     this->Script("set pvDemoCommandLine 1");
