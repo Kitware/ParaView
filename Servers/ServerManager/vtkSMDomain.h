@@ -56,13 +56,6 @@ public:
   virtual void SetAnimationValue(vtkSMProperty*, int, double) {}
 
   // Description:
-  // Set the value of an element of a property from the animation editor in
-  // a batch script.
-  virtual void SetAnimationValueInBatch(ofstream*, vtkSMProperty*,
-                                        vtkClientServerID,
-                                        int, double) {}
-
-  // Description:
   // Assigned by the XML parser. The name assigned in the XML
   // configuration. Can be used to figure out the origin of the
   // domain.

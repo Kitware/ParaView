@@ -23,7 +23,7 @@
 #include "vtkStdString.h"
 
 vtkStandardNewMacro(vtkSMStringListDomain);
-vtkCxxRevisionMacro(vtkSMStringListDomain, "1.10");
+vtkCxxRevisionMacro(vtkSMStringListDomain, "1.11");
 
 struct vtkSMStringListDomainInternals
 {
@@ -220,22 +220,6 @@ void vtkSMStringListDomain::SetAnimationValue(vtkSMProperty *prop, int idx,
     {
     svp->SetElement(idx, this->GetString((int)(floor(value))));
     }
-}
-
-//---------------------------------------------------------------------------
-void vtkSMStringListDomain::SetAnimationValueInBatch(
-  ofstream *file, vtkSMProperty *property, vtkClientServerID sourceID,
-  int idx, double value)
-{
-  if (!file || !property || !sourceID.ID)
-    {
-    return;
-    }
-
-  *file << "  [$pvTemp" << sourceID << " GetProperty "
-        << property->GetXMLName() << "] SetElement " << idx << " {"
-        << this->GetString((int)(floor(value))) << "}" << endl;
-  *file << "  $pvTemp" << sourceID << " UpdateVTKObjects" << endl;
 }
 
 //---------------------------------------------------------------------------

@@ -80,12 +80,6 @@ public:
   // Set the value of an element of a property from the animation editor.
   virtual void SetAnimationValue(vtkSMProperty*, int, double);
 
-  // Description:
-  // Set the value of an element of a property from the animation editor.
-  virtual void SetAnimationValueInBatch(ofstream *file,
-                                        vtkSMProperty *property,
-                                        vtkClientServerID sourceID,
-                                        int idx, double value);
 protected:
   vtkSMStringListDomain();
   ~vtkSMStringListDomain();
