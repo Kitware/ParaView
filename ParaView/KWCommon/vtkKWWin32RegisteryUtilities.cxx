@@ -38,8 +38,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkObjectFactory.h"
 #include "vtkString.h"
 
-vtkCxxRevisionMacro(vtkKWWin32RegisteryUtilities, "1.6");
+vtkCxxRevisionMacro(vtkKWWin32RegisteryUtilities, "1.7");
 vtkStandardNewMacro( vtkKWWin32RegisteryUtilities );
+
+#define BUFFER_SIZE 8192
 
 vtkKWWin32RegisteryUtilities::vtkKWWin32RegisteryUtilities()
 {
@@ -91,7 +93,7 @@ int vtkKWWin32RegisteryUtilities::ReadValueInternal(const char *key,
   int res = 1;
   DWORD dwType, dwSize;  
   dwType = REG_SZ;
-  dwSize = 1023;
+  dwSize = BUFFER_SIZE;
   res = ( RegQueryValueEx(this->HKey, key, NULL, &dwType, 
                           (BYTE *)value, &dwSize) == ERROR_SUCCESS );
   return res;

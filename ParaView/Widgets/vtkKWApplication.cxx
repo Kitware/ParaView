@@ -58,6 +58,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <stdarg.h>
 
+#define REG_KEY_VALUE_SIZE_MAX 8192
+#define REG_KEY_NAME_SIZE_MAX 100
+
 #if !defined(USE_INSTALLED_TCLTK_PACKAGES) && \
     (TCL_MAJOR_VERSION == 8) && (TCL_MINOR_VERSION < 4)
 #include "kwinit.h"
@@ -82,7 +85,7 @@ int vtkKWApplication::WidgetVisibility = 1;
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.142");
+vtkCxxRevisionMacro(vtkKWApplication, "1.143");
 
 extern "C" int Vtktcl_Init(Tcl_Interp *interp);
 extern "C" int Vtkkwwidgetstcl_Init(Tcl_Interp *interp);
@@ -268,11 +271,11 @@ void vtkKWApplication::FindApplicationInstallationDirectory()
     }
   else
     {
-    char setup_key[1024];
+    char setup_key[REG_KEY_NAME_SIZE_MAX];
     sprintf(setup_key, "%s\\Setup", this->GetApplicationVersionName());
     vtkKWRegisteryUtilities *reg 
       = this->GetRegistery(this->GetApplicationName());
-    char installed_path[1024];
+    char installed_path[REG_KEY_VALUE_SIZE_MAX];
     if (reg && reg->ReadValue(setup_key, "InstalledPath", installed_path))
       {
       vtkKWDirectoryUtilities *util = vtkKWDirectoryUtilities::New();
@@ -1193,7 +1196,7 @@ void vtkKWApplication::SetBalloonHelpWidget( vtkKWWidget *widget )
 //----------------------------------------------------------------------------
 int vtkKWApplication::GetMessageDialogResponse(const char* dialogname)
 {
-  char buffer[1024];
+  char buffer[REG_KEY_VALUE_SIZE_MAX];
   int retval = 0;
   if ( this->GetRegisteryValue(3, "Dialogs", dialogname, buffer) )
     {
@@ -1221,8 +1224,8 @@ int vtkKWApplication::SetRegisteryValue(int level, const char* subkey,
     return 0;
     }
   int res = 0;
-  char buffer[100];
-  char value[16000];
+  char buffer[REG_KEY_NAME_SIZE_MAX];
+  char value[REG_KEY_VALUE_SIZE_MAX];
   sprintf(buffer, "%s\\%s", 
           this->GetApplication()->GetApplicationVersionName(),
           subkey);
@@ -1242,14 +1245,14 @@ int vtkKWApplication::GetRegisteryValue(int level, const char* subkey,
                                         const char* key, char* value)
 {
   int res = 0;
-  char buff[1024];
+  char buff[REG_KEY_VALUE_SIZE_MAX];
   if ( !this->GetApplication() ||
        this->GetRegisteryLevel() < 0 ||
        this->GetRegisteryLevel() < level )
     {
     return 0;
     }
-  char buffer[1024];
+  char buffer[REG_KEY_NAME_SIZE_MAX];
   sprintf(buffer, "%s\\%s", 
           this->GetApplicationVersionName(),
           subkey);
@@ -1275,7 +1278,7 @@ int vtkKWApplication::DeleteRegisteryValue(int level, const char* subkey,
     return 0;
     }
   int res = 0;
-  char buffer[100];
+  char buffer[REG_KEY_NAME_SIZE_MAX];
   sprintf(buffer, "%s\\%s", 
           this->GetApplicationVersionName(),
           subkey);
@@ -1290,7 +1293,7 @@ int vtkKWApplication::DeleteRegisteryValue(int level, const char* subkey,
 int vtkKWApplication::HasRegisteryValue(int level, const char* subkey, 
                                         const char* key)
 {
-  char buffer[1024];
+  char buffer[REG_KEY_VALUE_SIZE_MAX];
   return this->GetRegisteryValue(level, subkey, key, buffer);
 }
 
@@ -1339,7 +1342,7 @@ float vtkKWApplication::GetFloatRegisteryValue(int level, const char* subkey,
     return 0;
     }
   float res = 0;
-  char buffer[1024];
+  char buffer[REG_KEY_VALUE_SIZE_MAX];
   if ( this->GetRegisteryValue( 
          level, subkey, key, buffer ) )
     {
@@ -1359,7 +1362,7 @@ int vtkKWApplication::GetIntRegisteryValue(int level, const char* subkey,
     }
 
   int res = 0;
-  char buffer[1024];
+  char buffer[REG_KEY_VALUE_SIZE_MAX];
   if ( this->GetRegisteryValue( 
          level, subkey, key, buffer ) )
     {
@@ -1379,7 +1382,7 @@ int vtkKWApplication::BooleanRegisteryCheck(int level,
     {
     return 0;
     }
-  char buffer[1024];
+  char buffer[REG_KEY_VALUE_SIZE_MAX];
   int allset = 0;
   if ( this->GetRegisteryValue(level, subkey, key, buffer) )
     {
