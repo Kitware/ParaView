@@ -456,11 +456,11 @@ protected:
   char *GeometryTclName;
   vtkSetStringMacro(GeometryTclName);
 
-  char *UpdateSupressorTclName;
-  vtkSetStringMacro(UpdateSupressorTclName);
+  char *UpdateSuppressorTclName;
+  vtkSetStringMacro(UpdateSuppressorTclName);
   
-  char *LODUpdateSupressorTclName;
-  vtkSetStringMacro(LODUpdateSupressorTclName);
+  char *LODUpdateSuppressorTclName;
+  vtkSetStringMacro(LODUpdateSuppressorTclName);
   
   char *CollectTclName;
   vtkSetStringMacro(CollectTclName);

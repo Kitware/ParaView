@@ -77,7 +77,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.139");
+vtkCxxRevisionMacro(vtkPVData, "1.140");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -119,8 +119,8 @@ vtkPVData::vtkPVData()
   this->CollectTclName = NULL;
   this->LODCollectTclName = NULL;
   this->CubeAxesTclName = NULL;
-  this->UpdateSupressorTclName = NULL;
-  this->LODUpdateSupressorTclName = NULL;
+  this->UpdateSuppressorTclName = NULL;
+  this->LODUpdateSuppressorTclName = NULL;
 
   // Create a unique id for creating tcl names.
   ++instanceCount;
@@ -378,22 +378,22 @@ vtkPVData::~vtkPVData()
     this->SetGeometryTclName(NULL);
     }
 
-  if (this->UpdateSupressorTclName)
+  if (this->UpdateSuppressorTclName)
     {
     if ( pvApp )
       {
-      pvApp->BroadcastScript("%s Delete", this->UpdateSupressorTclName);
+      pvApp->BroadcastScript("%s Delete", this->UpdateSuppressorTclName);
       }
-    this->SetUpdateSupressorTclName(NULL);
+    this->SetUpdateSuppressorTclName(NULL);
     }
 
-  if (this->LODUpdateSupressorTclName)
+  if (this->LODUpdateSuppressorTclName)
     {
     if ( pvApp )
       {
-      pvApp->BroadcastScript("%s Delete", this->LODUpdateSupressorTclName);
+      pvApp->BroadcastScript("%s Delete", this->LODUpdateSuppressorTclName);
       }
-    this->SetLODUpdateSupressorTclName(NULL);
+    this->SetLODUpdateSuppressorTclName(NULL);
     }
 
   if (this->CollectTclName)
@@ -553,36 +553,36 @@ void vtkPVData::CreateParallelTclObjects(vtkPVApplication *pvApp)
   // from updating the pipeline.  These are here to ensure that all
   // processes get updated at the same time.
   // ===== Primary branch:
-  sprintf(tclName, "UpdateSupressor%d", this->InstanceCount);
-  pvApp->BroadcastScript("vtkPVUpdateSupressor %s", tclName);
-  this->SetUpdateSupressorTclName(tclName);
+  sprintf(tclName, "UpdateSuppressor%d", this->InstanceCount);
+  pvApp->BroadcastScript("vtkPVUpdateSuppressor %s", tclName);
+  this->SetUpdateSuppressorTclName(tclName);
   if (this->CollectTclName)
     {
     pvApp->BroadcastScript("%s SetInput [%s GetOutput]", 
-                           this->UpdateSupressorTclName, 
+                           this->UpdateSuppressorTclName, 
                            this->CollectTclName);
     }
   else
     {
     pvApp->BroadcastScript("%s SetInput [%s GetOutput]", 
-                           this->UpdateSupressorTclName, 
+                           this->UpdateSuppressorTclName, 
                            this->GeometryTclName);
     }
   //
   // ===== LOD branch:
-  sprintf(tclName, "LODUpdateSupressor%d", this->InstanceCount);
-  pvApp->BroadcastScript("vtkPVUpdateSupressor %s", tclName);
-  this->SetLODUpdateSupressorTclName(tclName);
+  sprintf(tclName, "LODUpdateSuppressor%d", this->InstanceCount);
+  pvApp->BroadcastScript("vtkPVUpdateSuppressor %s", tclName);
+  this->SetLODUpdateSuppressorTclName(tclName);
   if (this->LODCollectTclName)
     {
     pvApp->BroadcastScript("%s SetInput [%s GetOutput]", 
-                           this->LODUpdateSupressorTclName, 
+                           this->LODUpdateSuppressorTclName, 
                            this->LODCollectTclName);
     }
   else
     {
     pvApp->BroadcastScript("%s SetInput [%s GetOutput]", 
-                           this->LODUpdateSupressorTclName, 
+                           this->LODUpdateSuppressorTclName, 
                            this->LODDeciTclName);
     }
 
@@ -598,7 +598,7 @@ void vtkPVData::CreateParallelTclObjects(vtkPVApplication *pvApp)
   pvApp->BroadcastScript("%s UseLookupTableScalarRangeOn", this->MapperTclName);
   pvApp->BroadcastScript("%s SetColorModeToMapScalars", this->MapperTclName);
   pvApp->BroadcastScript("%s SetInput [%s GetOutput]", this->MapperTclName,
-                         this->UpdateSupressorTclName);
+                         this->UpdateSuppressorTclName);
   //
   // ===== LOD branch:
   sprintf(tclName, "LODMapper%d", this->InstanceCount);
@@ -609,7 +609,7 @@ void vtkPVData::CreateParallelTclObjects(vtkPVApplication *pvApp)
   pvApp->BroadcastScript("%s UseLookupTableScalarRangeOn", this->LODMapperTclName);
   pvApp->BroadcastScript("%s SetColorModeToMapScalars", this->LODMapperTclName);
   pvApp->BroadcastScript("%s SetInput [%s GetOutput]", this->LODMapperTclName,
-                         this->LODUpdateSupressorTclName);
+                         this->LODUpdateSuppressorTclName);
   
   
   // Now the two branches merge at the LOD actor.
@@ -643,8 +643,8 @@ void vtkPVData::CreateParallelTclObjects(vtkPVApplication *pvApp)
     {
     this->Script("%s SetNumberOfPieces 0",this->MapperTclName);
     this->Script("%s SetPiece 0", this->MapperTclName);
-    this->Script("%s SetUpdateNumberOfPieces 0",this->UpdateSupressorTclName);
-    this->Script("%s SetUpdatePiece 0", this->UpdateSupressorTclName);
+    this->Script("%s SetUpdateNumberOfPieces 0",this->UpdateSuppressorTclName);
+    this->Script("%s SetUpdatePiece 0", this->UpdateSuppressorTclName);
     this->Script("%s SetNumberOfPieces 0", this->LODMapperTclName);
     this->Script("%s SetPiece 0", this->LODMapperTclName);
     for (id = 1; id < numProcs; ++id)
@@ -653,16 +653,16 @@ void vtkPVData::CreateParallelTclObjects(vtkPVApplication *pvApp)
                           this->MapperTclName, debugNum-1);
       pvApp->RemoteScript(id, "%s SetPiece %d", this->MapperTclName, id-1);
       pvApp->RemoteScript(id, "%s SetUpdateNumberOfPieces %d",
-                          this->UpdateSupressorTclName, debugNum-1);
+                          this->UpdateSuppressorTclName, debugNum-1);
       pvApp->RemoteScript(id, "%s SetUpdatePiece %d", 
-                          this->UpdateSupressorTclName, id-1);
+                          this->UpdateSuppressorTclName, id-1);
       pvApp->RemoteScript(id, "%s SetNumberOfPieces %d",
                           this->LODMapperTclName, debugNum-1);
       pvApp->RemoteScript(id, "%s SetPiece %d", this->LODMapperTclName, id-1);
       pvApp->RemoteScript(id, "%s SetUpdateNumberOfPieces %d",
-                          this->LODUpdateSupressorTclName, debugNum-1);
+                          this->LODUpdateSuppressorTclName, debugNum-1);
       pvApp->RemoteScript(id, "%s SetUpdatePiece %d", 
-                          this->LODUpdateSupressorTclName, id-1);
+                          this->LODUpdateSuppressorTclName, id-1);
       }
     }
   else 
@@ -677,16 +677,16 @@ void vtkPVData::CreateParallelTclObjects(vtkPVApplication *pvApp)
                           this->MapperTclName, debugNum);
       pvApp->RemoteScript(id, "%s SetPiece %d", this->MapperTclName, id);
       pvApp->RemoteScript(id, "%s SetUpdateNumberOfPieces %d",
-                          this->UpdateSupressorTclName, debugNum);
+                          this->UpdateSuppressorTclName, debugNum);
       pvApp->RemoteScript(id, "%s SetUpdatePiece %d", 
-                          this->UpdateSupressorTclName, id);
+                          this->UpdateSuppressorTclName, id);
       pvApp->RemoteScript(id, "%s SetNumberOfPieces %d",
                           this->LODMapperTclName, debugNum);
       pvApp->RemoteScript(id, "%s SetPiece %d", this->LODMapperTclName, id);
       pvApp->RemoteScript(id, "%s SetUpdateNumberOfPieces %d",
-                          this->LODUpdateSupressorTclName, debugNum);
+                          this->LODUpdateSuppressorTclName, debugNum);
       pvApp->RemoteScript(id, "%s SetUpdatePiece %d", 
-                          this->LODUpdateSupressorTclName, id);
+                          this->LODUpdateSuppressorTclName, id);
       }
     }
 }
@@ -694,10 +694,10 @@ void vtkPVData::CreateParallelTclObjects(vtkPVApplication *pvApp)
 //----------------------------------------------------------------------------
 void vtkPVData::ForceUpdate(vtkPVApplication* pvApp)
 {
-  if ( this->UpdateSupressorTclName )
+  if ( this->UpdateSuppressorTclName )
     {
-    pvApp->BroadcastScript("%s ForceUpdate", this->UpdateSupressorTclName);
-    pvApp->BroadcastScript("%s ForceUpdate", this->LODUpdateSupressorTclName);
+    pvApp->BroadcastScript("%s ForceUpdate", this->UpdateSuppressorTclName);
+    pvApp->BroadcastScript("%s ForceUpdate", this->LODUpdateSuppressorTclName);
     }
 }
 
@@ -1420,7 +1420,7 @@ void vtkPVData::UpdateProperties()
   char *str = new char[strlen(this->GetVTKDataTclName()) + 80];
   sprintf(str, "Accept: %s", this->GetVTKDataTclName());
   vtkTimerLog::MarkStartEvent(str);
-  pvApp->BroadcastScript("%s ForceUpdate", this->UpdateSupressorTclName);
+  pvApp->BroadcastScript("%s ForceUpdate", this->UpdateSuppressorTclName);
   pvApp->BroadcastScript("%s Update", this->MapperTclName);
   // Get bounds to time completion (not just triggering) of update.
   this->GetBounds(bounds);
@@ -1429,7 +1429,7 @@ void vtkPVData::UpdateProperties()
 
   // Time creation of the LOD
   vtkTimerLog::MarkStartEvent("Create LOD");
-  pvApp->BroadcastScript("%s ForceUpdate", this->LODUpdateSupressorTclName);
+  pvApp->BroadcastScript("%s ForceUpdate", this->LODUpdateSuppressorTclName);
   pvApp->BroadcastScript("%s Update", this->LODMapperTclName);
   // Get bounds to time completion (not just triggering) of update.
   this->GetBounds(bounds);
@@ -2802,7 +2802,7 @@ void vtkPVData::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVData ";
-  this->ExtractRevision(os,"$Revision: 1.139 $");
+  this->ExtractRevision(os,"$Revision: 1.140 $");
 }
 
 //----------------------------------------------------------------------------
