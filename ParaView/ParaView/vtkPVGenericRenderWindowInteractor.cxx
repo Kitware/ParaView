@@ -48,7 +48,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVGenericRenderWindowInteractor);
-vtkCxxRevisionMacro(vtkPVGenericRenderWindowInteractor, "1.8");
+vtkCxxRevisionMacro(vtkPVGenericRenderWindowInteractor, "1.9");
 
 //----------------------------------------------------------------------------
 vtkPVGenericRenderWindowInteractor::vtkPVGenericRenderWindowInteractor()
@@ -287,7 +287,11 @@ void vtkPVGenericRenderWindowInteractor::SatelliteMove(int x, int y)
   rc->InitTraversal();
   vtkRenderer *aren = rc->GetNextItem();
   renSize = aren->GetSize();
-  int reductionFactor = (int)(0.5 + ((float)winSize[1]/(float)renSize[1]));
+  int reductionFactor = 1;
+  if(winSize[1] > 0 && renSize[1] > 0)
+    {
+    reductionFactor = (int)(0.5 + ((float)winSize[1]/(float)renSize[1]));
+    }
   x = (int)((float)x / (float)(reductionFactor));
   y = (int)((float)(winSize[1]-y) / (float)(reductionFactor));
   this->SetEventInformation(x, y, this->ControlKey, this->ShiftKey,
