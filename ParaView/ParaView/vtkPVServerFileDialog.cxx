@@ -63,7 +63,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVServerFileDialog );
-vtkCxxRevisionMacro(vtkPVServerFileDialog, "1.16");
+vtkCxxRevisionMacro(vtkPVServerFileDialog, "1.17");
 
 int vtkPVServerFileDialogCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -625,7 +625,7 @@ void vtkPVServerFileDialog::DownDirectoryCallback()
 //----------------------------------------------------------------------------
 void vtkPVServerFileDialog::ExtensionsMenuButtonCallback(int typeIdx)
 {
-  char *extensions;
+  const char *extensions;
   char *extensionsCopy;
   char *ptr;
   char *extensionStart;
@@ -886,7 +886,7 @@ int vtkPVServerFileDialog::CheckExtension(const char* name)
   int idx;
   const char *nameExt;
   const char* ptr;
-  char *ext;
+  const char *ext;
 
   if (name == NULL)
     {

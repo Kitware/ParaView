@@ -50,7 +50,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectionList);
-vtkCxxRevisionMacro(vtkPVSelectionList, "1.33");
+vtkCxxRevisionMacro(vtkPVSelectionList, "1.34");
 
 int vtkPVSelectionListCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -162,7 +162,7 @@ void vtkPVSelectionList::Create(vtkKWApplication *app)
 
   char tmp[1024];
   int i, numItems = this->Names->GetLength();
-  char *name;
+  const char *name;
   for(i=0; i<numItems; i++)
     {
     name = this->Names->GetString(i);
@@ -269,7 +269,7 @@ void vtkPVSelectionList::AddItem(const char *name, int value)
 //----------------------------------------------------------------------------
 void vtkPVSelectionList::SetCurrentValue(int value)
 {
-  char *name;
+  const char *name;
 
   if (this->CurrentValue == value)
     {
@@ -313,7 +313,7 @@ void vtkPVSelectionList::CopyProperties(vtkPVWidget* clone,
     pvsl->SetOptionWidth(this->OptionWidth);
     pvsl->SetLabel(this->Label->GetLabel());
     int i, numItems = this->Names->GetLength();
-    char *name;
+    const char *name;
     for(i=0; i<numItems; i++)
       {
       name = this->Names->GetString(i);

@@ -56,7 +56,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVVectorEntry);
-vtkCxxRevisionMacro(vtkPVVectorEntry, "1.31");
+vtkCxxRevisionMacro(vtkPVVectorEntry, "1.32");
 
 //-----------------------------------------------------------------------------
 vtkPVVectorEntry::vtkPVVectorEntry()
@@ -200,7 +200,7 @@ void vtkPVVectorEntry::Create(vtkKWApplication *pvApp)
     }
     
   // Now the sublabels and entries
-  char* subLabelTxt;
+  const char* subLabelTxt;
   for (i = 0; i < this->VectorLength; i++)
     {
     subLabelTxt = this->SubLabelTxts->GetString(i);

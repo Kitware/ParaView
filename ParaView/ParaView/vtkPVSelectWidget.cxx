@@ -53,7 +53,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectWidget);
-vtkCxxRevisionMacro(vtkPVSelectWidget, "1.22");
+vtkCxxRevisionMacro(vtkPVSelectWidget, "1.23");
 
 int vtkPVSelectWidgetCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -138,7 +138,7 @@ void vtkPVSelectWidget::Create(vtkKWApplication *app)
     }
 
   len = this->Labels->GetLength();
-  char* label;
+  const char* label;
   for(i=0; i<len; i++)
     {
     label = this->Labels->GetString(i);
@@ -516,8 +516,8 @@ vtkPVWidget* vtkPVSelectWidget::ClonePrototypeInternal(vtkPVSource* pvSource,
     
     // Now clone all the children
     int len = this->Labels->GetLength();
-    char* label;
-    char* value;
+    const char* label;
+    const char* value;
     vtkPVWidget* widget;
     vtkPVWidget* clone;
     for(int i=0; i<len; i++)
