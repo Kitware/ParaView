@@ -19,7 +19,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWListBox);
-vtkCxxRevisionMacro(vtkKWListBox, "1.31");
+vtkCxxRevisionMacro(vtkKWListBox, "1.32");
 
 
 //----------------------------------------------------------------------------
@@ -61,9 +61,7 @@ int vtkKWListBox::GetNumberOfItems()
     {
     return 0;
     }
-  this->Script("%s size", this->Listbox->GetWidgetName());
-  char* result = this->GetApplication()->GetMainInterp()->result;
-  return atoi(result);
+  return atoi(this->Script("%s size", this->Listbox->GetWidgetName()));
 }
 
 //----------------------------------------------------------------------------
@@ -78,10 +76,10 @@ void vtkKWListBox::DeleteRange(int start, int end)
 //----------------------------------------------------------------------------
 const char* vtkKWListBox::GetItem(int index)
 {
-  this->Script("%s get %d", this->Listbox->GetWidgetName(), index);
-  char* result = this->GetApplication()->GetMainInterp()->result;
+  const char* result = 
+    this->Script("%s get %d", this->Listbox->GetWidgetName(), index);
   delete [] this->Item;
-  this->Item = strcpy(new char[strlen(result)+1], result);
+  this->Item = strcpy(new char[strlen(result) + 1], result);
   return this->Item;
 }
 
@@ -102,9 +100,8 @@ int vtkKWListBox::GetSelectionIndex()
     {
     return 0;
     }
-  this->Script("%s curselection", this->Listbox->GetWidgetName(),
-               this->GetWidgetName());
-  char* result = this->GetApplication()->GetMainInterp()->result;
+  const char* result = this->Script(
+    "%s curselection", this->Listbox->GetWidgetName(), this->GetWidgetName());
   if ( strlen(result)>0 )
     {
     return atoi(result);
@@ -124,9 +121,10 @@ const char *vtkKWListBox::GetSelection()
     {
     return 0;
     }
-  this->Script("%s get [%s curselection]", this->Listbox->GetWidgetName(),
-               this->Listbox->GetWidgetName());
-  char* result = this->GetApplication()->GetMainInterp()->result;
+  const char* result = this->Script(
+    "%s get [%s curselection]", 
+    this->Listbox->GetWidgetName(),
+    this->Listbox->GetWidgetName());
 
   if (this->CurrentSelection)
     {
@@ -189,12 +187,9 @@ int vtkKWListBox::GetSelectState(int idx)
     {
     return 0;
     }
+  return atoi(this->Script("%s selection includes %d", 
+                           this->Listbox->GetWidgetName(), idx));
 
-  this->Script("%s selection includes %d", 
-               this->Listbox->GetWidgetName(), idx);
-
-  int result = atoi(this->GetApplication()->GetMainInterp()->result);
-  return result;
 }
 
 //----------------------------------------------------------------------------

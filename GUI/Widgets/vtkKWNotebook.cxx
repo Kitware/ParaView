@@ -60,7 +60,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWNotebook);
-vtkCxxRevisionMacro(vtkKWNotebook, "1.71");
+vtkCxxRevisionMacro(vtkKWNotebook, "1.72");
 
 //----------------------------------------------------------------------------
 int vtkKWNotebookCommand(ClientData cd, Tcl_Interp *interp,
@@ -400,10 +400,7 @@ vtkKWNotebook::Page* vtkKWNotebook::GetFirstPackedPageNotMatchingTag(int tag)
   // Get the slaves in the tabs frame
 
   char **slaves = 0;
-  int nb_slaves = vtkKWTkUtilities::GetSlaves(
-    this->GetApplication()->GetMainInterp(),
-    this->TabsFrame->GetWidgetName(),
-    &slaves);
+  int nb_slaves = vtkKWTkUtilities::GetSlavesInPack(this->TabsFrame, &slaves);
   if (!nb_slaves)
     {
     return NULL;
@@ -2022,9 +2019,7 @@ void vtkKWNotebook::UpdatePageTabBackgroundColor(vtkKWNotebook::Page *page,
       {
       cmd << page->TabFrame->GetWidgetName() << " config -bg [" 
           << page->Frame->GetWidgetName() << " cget -bg]" << endl;
-      vtkKWTkUtilities::ChangeFontSlantToRoman(
-        this->GetApplication()->GetMainInterp(),
-        page->Label->GetWidgetName());
+      vtkKWTkUtilities::ChangeFontSlantToRoman(page->Label);
       }
     else
       {
@@ -2033,9 +2028,7 @@ void vtkKWNotebook::UpdatePageTabBackgroundColor(vtkKWNotebook::Page *page,
               VTK_KW_NB_TAB_PIN_R, VTK_KW_NB_TAB_PIN_G, VTK_KW_NB_TAB_PIN_B);
       cmd << page->TabFrame->GetWidgetName() 
           << " config -bg " << color << endl;
-      vtkKWTkUtilities::ChangeFontSlantToItalic(
-        this->GetApplication()->GetMainInterp(),
-        page->Label->GetWidgetName());
+      vtkKWTkUtilities::ChangeFontSlantToItalic(page->Label);
       }
     }
   else
@@ -2219,11 +2212,8 @@ void vtkKWNotebook::UpdateMaskPosition()
     else
 #endif
       {
-      vtkKWTkUtilities::GetPackSlaveHorizontalPosition(
-        this->GetApplication()->GetMainInterp(),
-        this->TabsFrame->GetWidgetName(),
-        page->TabFrame->GetWidgetName(),
-        &tab_x);
+      vtkKWTkUtilities::GetSlaveHorizontalPositionInPack(
+        this->TabsFrame, page->TabFrame, &tab_x);
       }
 
     // tab_width: width of the selected tab
@@ -2502,9 +2492,8 @@ void vtkKWNotebook::SetShowOnlyMostRecentPages(int arg)
   if (this->ShowOnlyMostRecentPages && this->IsCreated())
     {
     char **slaves = 0;
-    int nb_slaves = vtkKWTkUtilities::GetSlaves(
-      this->GetApplication()->GetMainInterp(),
-      this->TabsFrame->GetWidgetName(), &slaves);
+    int nb_slaves = vtkKWTkUtilities::GetSlavesInPack(
+      this->TabsFrame, &slaves);
 
     // Iterate over each slave and find the corresponding page
 
@@ -2654,10 +2643,7 @@ int vtkKWNotebook::GetPageIdContainingCoordinatesInTab(int x, int y)
           (*it)->Visibility &&
           (*it)->TabFrame &&
           (*it)->TabFrame->IsCreated() &&
-          vtkKWTkUtilities::ContainsCoordinates(
-            this->GetApplication()->GetMainInterp(),
-            (*it)->TabFrame->GetWidgetName(),
-            x, y))
+          vtkKWTkUtilities::ContainsCoordinates((*it)->TabFrame, x, y))
         {
         return (*it)->Id;
         }

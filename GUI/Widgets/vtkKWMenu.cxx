@@ -19,7 +19,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWMenu );
-vtkCxxRevisionMacro(vtkKWMenu, "1.59");
+vtkCxxRevisionMacro(vtkKWMenu, "1.60");
 
 
 
@@ -82,17 +82,16 @@ void vtkKWMenu::SetTearOff(int val)
 void vtkKWMenu::DisplayHelp(const char* widget)
 {
   const char* tname = this->GetTclName();
-  this->Script(
+  const char * res = this->Script(
     "if [catch {set %sTemp $%sHelpArray([%s entrycget active -label])} %sTemp ]"
     " { set %sTemp \"\"}; set %sTemp", 
     tname, tname, widget, tname, tname, tname );
-  if(this->GetApplication()->GetMainInterp()->result)
+  if(res)
     {
     vtkKWWindow* window = this->GetWindow();
     if ( window )
       {
-      window->SetStatusText(
-        this->GetApplication()->GetMainInterp()->result);
+      window->SetStatusText(res);
       }
     }
 }
@@ -276,8 +275,8 @@ void vtkKWMenu::SetCascade(int index, const char* menu)
     {
     ostrstream clone_menu;
     clone_menu << wname << ".clone_";
-    this->Script("string trim [%s entrycget %d -label]",  wname, index);
-    const char *res = this->GetApplication()->GetMainInterp()->result;
+    const char *res = 
+      this->Script("string trim [%s entrycget %d -label]",  wname, index);
     if (res && *res)
       {
       clone_menu << res;
@@ -478,14 +477,13 @@ int vtkKWMenu::GetCheckedRadioButtonItem(vtkKWObject* Object,
   int numEntries = this->GetNumberOfItems();
   for(int i = 0; i < numEntries; i++)
     {
-    this->Script("%s type %d", this->GetWidgetName(), i);
-    if (!strcmp("radiobutton",
-                this->GetApplication()->GetMainInterp()->result))
+    const char *res = this->Script("%s type %d", this->GetWidgetName(), i);
+    if (!strcmp("radiobutton", res))
       {
-      this->Script("%s entrycget %i -variable", this->GetWidgetName(), i);
-      if (!strcmp(rbv, this->GetApplication()->GetMainInterp()->result))
+      res = 
+        this->Script("%s entrycget %i -variable", this->GetWidgetName(), i);
+      if (!strcmp(rbv, res))
         {
-        ;
         if (atoi(
               this->Script("%s entrycget %i -value", 
                            this->GetWidgetName(), i)) == value)
