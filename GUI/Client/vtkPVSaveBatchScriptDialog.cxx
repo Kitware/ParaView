@@ -31,7 +31,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVSaveBatchScriptDialog );
-vtkCxxRevisionMacro(vtkPVSaveBatchScriptDialog, "1.7");
+vtkCxxRevisionMacro(vtkPVSaveBatchScriptDialog, "1.8");
 
 int vtkPVSaveBatchScriptDialogCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -150,29 +150,6 @@ void vtkPVSaveBatchScriptDialog::Create(vtkKWApplication *app)
   this->Script("toplevel %s", wname);
   this->Script("wm title %s \"%s\"", wname, this->Title);
   this->Script("wm iconname %s \"vtk\"", wname);
-  this->Script("wm geometry %s +%d+%d", this->GetWidgetName(),
-               400, 250);
-
-
-  if (this->MasterWindow)
-    {
-    this->Script("wm transient %s %s", wname, 
-                 this->MasterWindow->GetWidgetName());
-    }
-  else
-    {
-    int sw, sh;
-    this->Script("concat [winfo screenwidth %s] [winfo screenheight %s]",
-                 this->GetWidgetName(), this->GetWidgetName());
-    sscanf(app->GetMainInterp()->result, "%d %d", &sw, &sh);
-
-    int ww, wh;
-    this->Script("concat [winfo reqwidth %s] [winfo reqheight %s]",
-                 this->GetWidgetName(), this->GetWidgetName());
-    sscanf(app->GetMainInterp()->result, "%d %d", &ww, &wh);
-    this->Script("wm geometry %s +%d+%d", this->GetWidgetName(), 
-                 (sw-ww)/2, (sh-wh)/2);
-    }
 
   this->OffScreenCheck->SetParent(this);
   this->OffScreenCheck->Create(app, 0);
@@ -272,6 +249,27 @@ void vtkPVSaveBatchScriptDialog::Create(vtkKWApplication *app)
 
   this->Script("wm protocol %s WM_DELETE_WINDOW { %s Cancel}",
                this->GetWidgetName(), this->GetTclName());
+
+  if (this->MasterWindow)
+    {
+    this->Script("wm transient %s %s", wname, 
+                 this->MasterWindow->GetWidgetName());
+    }
+  else
+    {
+    int sw, sh;
+    this->Script("concat [winfo screenwidth %s] [winfo screenheight %s]",
+                 this->GetWidgetName(), this->GetWidgetName());
+    sscanf(app->GetMainInterp()->result, "%d %d", &sw, &sh);
+
+    int ww, wh;
+    this->Script("concat [winfo reqwidth %s] [winfo reqheight %s]",
+                 this->GetWidgetName(), this->GetWidgetName());
+    sscanf(app->GetMainInterp()->result, "%d %d", &ww, &wh);
+    this->Script("wm geometry %s +%d+%d", this->GetWidgetName(), 
+                 (sw-ww)/2, (sh-wh)/2);
+    }
+
 }
 
 //----------------------------------------------------------------------------
@@ -431,6 +429,53 @@ void vtkPVSaveBatchScriptDialog::GeometryFileNameBrowseButtonCallback()
 //----------------------------------------------------------------------------
 int vtkPVSaveBatchScriptDialog::Invoke()
 {   
+  int sw, sh;
+  sscanf(this->Script("concat [winfo screenwidth .] [winfo screenheight .]"),
+         "%d %d", &sw, &sh);
+  
+  int width, height;
+
+  int x, y;
+
+  if (this->MasterWindow)
+    {
+    this->Script("wm geometry %s", this->MasterWindow->GetWidgetName());
+    sscanf(this->GetApplication()->GetMainInterp()->result, "%dx%d+%d+%d",
+           &width, &height, &x, &y);
+    
+    x += width / 2;
+    y += height / 2;
+    
+    if (x > sw - 200)
+      {
+      x = sw / 2;
+      }
+    if (y > sh - 200)
+      {
+      y = sh / 2;
+      }
+    }
+  else
+    {
+    x = sw / 2;
+    y = sh / 2;
+    }
+
+  width = atoi(this->Script("winfo reqwidth %s", this->GetWidgetName()));
+  height = atoi(this->Script("winfo reqheight %s", this->GetWidgetName()));
+  
+  if (x > width / 2)
+    {
+    x -= width / 2;
+    }
+  if (y > height / 2)
+    {
+    y -= height / 2;
+    }
+
+  this->Script("wm geometry %s +%d+%d", this->GetWidgetName(),
+               x, y);
+
   this->Script("wm deiconify %s", this->GetWidgetName());
   this->Script("grab %s", this->GetWidgetName());
 
