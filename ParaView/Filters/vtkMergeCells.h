@@ -8,6 +8,23 @@
   Date:      $Date$
   Version:   $Revision$
 
+  Copyright (c) 1993-2002 Ken Martin, Will Schroeder, Bill Lorensen
+  All rights reserved.
+  See Copyright.txt or http://www.kitware.com/Copyright.htm for details.
+
+  Copyright (C) 2003 Sandia Corporation
+  Under the terms of Contract DE-AC04-94AL85000, there is a non-exclusive
+  license for use of this work by or on behalf of the U.S. Government.
+  Redistribution and use in source and binary forms, with or without
+  modification, are permitted provided that this Notice and any statement
+  of authorship are reproduced on all copies.
+
+  Contact: Lee Ann Fisk, lafisk@sandia.gov
+
+     This software is distributed WITHOUT ANY WARRANTY; without even
+     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+     PURPOSE.  See the above copyright notice for more information.
+
 =========================================================================*/
 
 // .NAME vtkMergeCells - merges any number of vtkDataSets back into a single
@@ -27,8 +44,6 @@
 //    arrays (3) this class knows duplicate points may be appearing in
 //    the DataSets and can filter those out, (4) this class is not a filter.
 
-//#include "vtksnlGraphicsWin32Header.h"
-
 #include <vtkObject.h>
 #include <vtkUnstructuredGrid.h>
 #include <vtkDataSetAttributes.h>
@@ -36,7 +51,6 @@
 
 class vtkIdList;
 class vtkDataSet;
-class vtkCollection;
 
 class VTK_EXPORT vtkMergeCells : public vtkObject
 { 
@@ -57,16 +71,16 @@ public:
   //    Specify the total number of cells in the final vtkUnstructuredGrid.
   //    Make this call before any call to MergeDataSet().
 
-  vtkSetMacro(TotalCells, int);
-  vtkGetMacro(TotalCells, int);
+  vtkSetMacro(TotalCells, vtkIdType);
+  vtkGetMacro(TotalCells, vtkIdType);
 
   // Description:
   //    Specify the total number of points in the final vtkUnstructuredGrid
   //    Make this call before any call to MergeDataSet().  This is an
   //    upper bound, since some points may be duplicates.
 
-  vtkSetMacro(TotalPoints, int);
-  vtkGetMacro(TotalPoints, int);
+  vtkSetMacro(TotalPoints, vtkIdType);
+  vtkGetMacro(TotalPoints, vtkIdType);
 
   // Description:
   //    You can specify the name of a point array that contains a global
@@ -78,11 +92,20 @@ public:
   vtkGetStringMacro(GlobalIdArrayName);
 
   // Description:
+  //    We need to know the number of different data sets that will
+  //    be merged into one so we can pre-allocate some arrays.
+  //    This can be an upper bound, not necessarily exact.
+
+  vtkSetMacro(TotalNumberOfDataSets, int);
+  vtkGetMacro(TotalNumberOfDataSets, int);
+
+  // Description:
   //    Provide a DataSet to be merged in to the final UnstructuredGrid.
   //    This call returns after the merge has completed.  Be sure to call
-  //    SetTotalCells and SetTotalPoints before making any of these calls.
+  //    SetTotalCells, SetTotalPoints, and SetTotalNumberOfDataSets
+  //    before making this call.  Return 0 if OK, -1 if error.
 
-  void MergeDataSet(vtkDataSet *set);
+  int MergeDataSet(vtkDataSet *set);
 
   // Description:
   //    Call Finish() after merging last DataSet to free unneeded memory and to
@@ -99,34 +122,31 @@ protected:
 private:
 
   void FreeLists();
-//BTX
-  void StartUGrid(vtkDataSetAttributes::FieldList *ptList,
-                  vtkDataSetAttributes::FieldList *cellList);
+  void StartUGrid(vtkPointData *PD, vtkCellData *CD);
+  vtkIdType *MapPointsToIds(vtkDataSet *set);
+  vtkIdType AddNewCellsUnstructuredGrid(vtkDataSet *set, vtkIdType *idMap);
+  vtkIdType AddNewCellsDataSet(vtkDataSet *set, vtkIdType *idMap);
 
-  void FinishInput(vtkDataSet *set, int inputId,
-                   vtkDataSetAttributes::FieldList *ptList,
-                   vtkDataSetAttributes::FieldList *cellList);
-//ETX
+  int TotalNumberOfDataSets;
 
-  int *MapPointsToIds(vtkDataSet *set);
+  vtkIdType TotalCells;
+  vtkIdType TotalPoints;
 
-  int TotalCells;
-  int TotalPoints;
-
-  int NumberOfCells;
-  int NumberOfPoints;
+  vtkIdType NumberOfCells;     // so far
+  vtkIdType NumberOfPoints;
 
   char *GlobalIdArrayName;
 
-//BTX
-  vtkstd::map<int, int> GlobalIdMap;
-//ETX
+  char InputIsUGrid;
 
-  // We need to have all the inputs before we can
-  // use copy allocate.  This is slightly less efficient because
-  // inputs cannot be freed as they are used.
-  vtkCollection* Inputs;
+//BTX
+  vtkstd::map<vtkIdType, vtkIdType> GlobalIdMap;
+
+  vtkDataSetAttributes::FieldList *ptList;
+  vtkDataSetAttributes::FieldList *cellList;
+//ETX
 
   vtkUnstructuredGrid *UnstructuredGrid;
 
+  int nextGrid;
 };
