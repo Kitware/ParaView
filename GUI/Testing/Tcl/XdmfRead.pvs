@@ -73,8 +73,8 @@ $kw(vtkTemp2) ResetCameraCallback
 # Fix the size of the image.
 set MainView [[$Application GetMainWindow] GetMainView]
 $MainView SetRenderWindowSize 300 300
-$MainView Render
 update
+[[$Application GetMainWindow] GetMainView] ForceRender
 
 for {set i  1} {$i < [expr $argc - 1]} {incr i} {
     if {[lindex $argv $i] == "-C"} {
