@@ -53,7 +53,7 @@ int vtkPVProcessModule::GlobalLODFlag = 0;
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProcessModule);
-vtkCxxRevisionMacro(vtkPVProcessModule, "1.21");
+vtkCxxRevisionMacro(vtkPVProcessModule, "1.22");
 
 //----------------------------------------------------------------------------
 vtkPVProcessModule::vtkPVProcessModule()
@@ -219,6 +219,7 @@ void vtkPVProcessModule::PrintSelf(ostream& os, vtkIndent indent)
     {
     os << "(none)" << endl;;
     }
+  os << indent << "ApplicationInstallationDirectory: " << (this->ApplicationInstallationDirectory?this->ApplicationInstallationDirectory:"(none)") << endl;
 }
 
 //----------------------------------------------------------------------------
