@@ -195,7 +195,10 @@ void vtkKWScale::ScaleValueChanged(float num)
     {
     this->Entry->SetValue(this->Value,0);
     }
-  this->Script("eval %s",this->Command);
+  if (this->Command)
+    {
+    this->Script("eval %s",this->Command);
+    }
 }
 
 void vtkKWScale::SetCommand(char *format, ...)
