@@ -44,7 +44,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // ---------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWScale );
-vtkCxxRevisionMacro(vtkKWScale, "1.64");
+vtkCxxRevisionMacro(vtkKWScale, "1.65");
 
 int vtkKWScaleCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -616,6 +616,29 @@ void vtkKWScale::SetResolution(double r)
 // ---------------------------------------------------------------------------
 void vtkKWScale::SetValue(double num)
 {
+  if (this->Range[1] > this->Range[0])
+    {
+    if (num > this->Range[1]) 
+      { 
+      num = this->Range[1]; 
+      }
+    else if (num < this->Range[0])
+      {
+      num = this->Range[0];
+      }
+    }
+  else
+    {
+    if (num < this->Range[1]) 
+      { 
+      num = this->Range[1]; 
+      }
+    else if (num > this->Range[0])
+      {
+      num = this->Range[0];
+      }
+    }
+
   if (this->Value == num)
     {
     return;
@@ -647,7 +670,6 @@ void vtkKWScale::RefreshValue()
     this->DisableScaleValueCallback = 1;
     this->Script("%s set %g", 
                  this->Scale->GetWidgetName(), this->Value);
-    this->DisableScaleValueCallback = 0;
     if (was_disabled)
       {
       this->Scale->SetEnabled(0);
@@ -694,6 +716,7 @@ void vtkKWScale::ScaleValueCallback(double num)
 {
   if (this->DisableScaleValueCallback)
     {
+    this->DisableScaleValueCallback = 0;
     return;
     }
 
