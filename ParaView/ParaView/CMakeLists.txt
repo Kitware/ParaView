@@ -252,6 +252,7 @@ ADD_CUSTOM_COMMAND(
   ${CMAKE_CURRENT_SOURCE_DIR}/Resources/Filters.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/Resources/Manipulators.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/Resources/Sources.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/Resources/Readers.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/Resources/Writers.xml
   ${CMD}
   OUTPUTS ${CMAKE_CURRENT_BINARY_DIR}/vtkPVGeneratedModules.h
