@@ -29,7 +29,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVInputProperty);
-vtkCxxRevisionMacro(vtkPVInputProperty, "1.8");
+vtkCxxRevisionMacro(vtkPVInputProperty, "1.9");
 
 //----------------------------------------------------------------------------
 vtkPVInputProperty::vtkPVInputProperty()
@@ -90,9 +90,11 @@ int vtkPVInputProperty::GetIsValidInput(vtkPVSource *input, vtkPVSource *pvs)
   if (strcmp(this->Type, "vtkDataSet") == 0)
     {
     if ( info->GetDataSetType() == VTK_DATA_SET ||
+         info->GetDataSetType() == VTK_POINT_SET ||
          info->GetDataSetType() == VTK_IMAGE_DATA ||
          info->GetDataSetType() == VTK_RECTILINEAR_GRID ||
          info->GetDataSetType() == VTK_STRUCTURED_GRID ||
+         info->GetDataSetType() == VTK_STRUCTURED_POINTS ||
          info->GetDataSetType() == VTK_POLY_DATA ||
          info->GetDataSetType() == VTK_UNSTRUCTURED_GRID ||
 #ifdef PARAVIEW_BUILD_DEVELOPMENT
