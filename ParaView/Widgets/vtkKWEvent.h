@@ -105,6 +105,7 @@ class VTK_EXPORT vtkKWEvent
     ImageMouseBindingChangedEvent,
     ImageScaleBarColorChangedEvent,
     ImageScaleBarVisibilityChangedEvent,
+    ImageSliceChangedEvent,
     ImageZoomFactorChangedEvent,
     InteractiveRenderStartEvent,
     LeftMouseOptionChangedEvent,
