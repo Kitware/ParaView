@@ -60,7 +60,7 @@ int vtkKWApplication::WidgetVisibility = 1;
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.176");
+vtkCxxRevisionMacro(vtkKWApplication, "1.177");
 
 extern "C" int Vtktcl_Init(Tcl_Interp *interp);
 extern "C" int Vtkkwwidgetstcl_Init(Tcl_Interp *interp);
@@ -450,6 +450,7 @@ void vtkKWApplication::Close(vtkKWWindow *win)
 {
   if ( this->Windows )
     {
+    win->PrepareForDelete();
     this->Windows->RemoveItem(win);
     if (this->Windows->GetNumberOfItems() < 1)
       {

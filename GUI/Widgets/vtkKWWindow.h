@@ -332,6 +332,10 @@ public:
   virtual void UpdateEnableState();
   virtual void UpdateMenuState();
 
+  // Description:
+  // Get rid of all references we own.
+  virtual void PrepareForDelete() {}
+
 protected:
   vtkKWWindow();
   ~vtkKWWindow();
