@@ -41,43 +41,38 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "vtkPVPartDisplay.h"
 
+#include "vtkPVRenderModule.h"
 #include "vtkImageData.h"
-#include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
 #include "vtkProp3D.h"
 #include "vtkPVApplication.h"
 #include "vtkPVProcessModule.h"
 #include "vtkPVConfig.h"
-#include "vtkPVRenderView.h"
 #include "vtkPolyData.h"
 #include "vtkPolyDataMapper.h"
 #include "vtkProperty.h"
 #include "vtkRectilinearGrid.h"
 #include "vtkStructuredGrid.h"
 #include "vtkString.h"
+#include "vtkPVColorMap.h"
 #include "vtkTimerLog.h"
 #include "vtkToolkits.h"
+#include "vtkFieldDataToAttributeDataFilter.h"
 
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPartDisplay);
-vtkCxxRevisionMacro(vtkPVPartDisplay, "1.4");
-
-int vtkPVPartDisplayCommand(ClientData cd, Tcl_Interp *interp,
-                     int argc, char *argv[]);
+vtkCxxRevisionMacro(vtkPVPartDisplay, "1.5");
 
 
 //----------------------------------------------------------------------------
 vtkPVPartDisplay::vtkPVPartDisplay()
 {
-  this->CommandFunction = vtkPVPartDisplayCommand;
+  this->PVApplication = NULL;
 
   this->DirectColorFlag = 1;
   this->Visibility = 1;
   this->Part = NULL;
-
-  this->CollectionDecision = 1;
-  this->LODCollectionDecision = 1;
 
   // Used to be in vtkPVActorComposite
   static int instanceCount = 0;
@@ -87,13 +82,10 @@ vtkPVPartDisplay::vtkPVPartDisplay()
   this->PropertyTclName = NULL;
   this->Prop = NULL;
   this->PropTclName = NULL;
-  this->LODDeciTclName = NULL;
   this->MapperTclName = NULL;
-  this->LODMapperTclName = NULL;
-  this->CollectTclName = NULL;
-  this->LODCollectTclName = NULL;
   this->UpdateSuppressorTclName = NULL;
-  this->LODUpdateSuppressorTclName = NULL;
+
+  this->GeometryIsValid = 0;
 
   // Create a unique id for creating tcl names.
   ++instanceCount;
@@ -111,13 +103,7 @@ vtkPVPartDisplay::~vtkPVPartDisplay()
     }
   this->SetMapperTclName(NULL);
   this->Mapper = NULL;
-  
-  if ( pvApp && this->LODMapperTclName)
-    {
-    pvApp->BroadcastScript("%s Delete", this->LODMapperTclName);
-    }
-  this->SetLODMapperTclName(NULL);
-  
+    
   if ( pvApp && this->PropTclName)
     {
     pvApp->BroadcastScript("%s Delete", this->PropTclName);
@@ -132,15 +118,6 @@ vtkPVPartDisplay::~vtkPVPartDisplay()
   this->SetPropertyTclName(NULL);
   this->Property = NULL;
   
-  if (this->LODDeciTclName)
-    {
-    if ( pvApp )
-      {
-      pvApp->BroadcastScript("%s Delete", this->LODDeciTclName);
-      }
-    this->SetLODDeciTclName(NULL);
-    }
-  
   if (this->UpdateSuppressorTclName)
     {
     if ( pvApp )
@@ -150,32 +127,16 @@ vtkPVPartDisplay::~vtkPVPartDisplay()
     this->SetUpdateSuppressorTclName(NULL);
     }
 
-  if (this->LODUpdateSuppressorTclName)
-    {
-    if ( pvApp )
-      {
-      pvApp->BroadcastScript("%s Delete", this->LODUpdateSuppressorTclName);
-      }
-    this->SetLODUpdateSuppressorTclName(NULL);
-    }
-
-  if (this->CollectTclName)
-    {
-    if ( pvApp )
-      {
-      pvApp->BroadcastScript("%s Delete", this->CollectTclName);
-      }
-    this->SetCollectTclName(NULL);
-    }
-  if (this->LODCollectTclName)
-    {
-    if ( pvApp )
-      {
-      pvApp->BroadcastScript("%s Delete", this->LODCollectTclName);
-      }
-    this->SetLODCollectTclName(NULL);
-    }
   this->SetPart(NULL);
+
+  this->SetPVApplication( NULL);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVPartDisplay::InvalidateGeometry()
+{
+  this->GeometryIsValid = 0;
+  this->RemoveAllCaches();
 }
 
 //----------------------------------------------------------------------------
@@ -183,12 +144,8 @@ void vtkPVPartDisplay::ConnectToGeometry(char* geometryTclName)
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
 
-  // The input of course is the geometry filter.
   pvApp->BroadcastScript("%s SetInput [%s GetOutput]", 
-                         this->LODDeciTclName, geometryTclName);
-
-  pvApp->BroadcastScript("%s SetInput [%s GetOutput]", 
-                         this->CollectTclName, geometryTclName);
+                         this->UpdateSuppressorTclName, geometryTclName);
 }
 
 
@@ -197,106 +154,6 @@ void vtkPVPartDisplay::CreateParallelTclObjects(vtkPVApplication *pvApp)
 {
   char tclName[100];
   
-  this->vtkKWObject::SetApplication(pvApp);
-  
-  // Create the decimation filter which branches the LOD pipeline.
-  sprintf(tclName, "LODDeci%d", this->InstanceCount);
-  pvApp->BroadcastScript("vtkQuadricClustering %s", tclName);
-  this->LODDeciTclName = NULL;
-  this->SetLODDeciTclName(tclName);
-  // Keep track of how long each decimation filter takes to execute.
-  pvApp->BroadcastScript("%s AddObserver StartEvent {$Application LogStartEvent {Execute Decimate}}", 
-                         this->LODDeciTclName);
-  pvApp->BroadcastScript("%s AddObserver EndEvent {$Application LogEndEvent {Execute Decimate}}", 
-                         this->LODDeciTclName);
-  pvApp->BroadcastScript("%s CopyCellDataOn", this->LODDeciTclName);
-  pvApp->BroadcastScript("%s UseInputPointsOn", this->LODDeciTclName);
-  pvApp->BroadcastScript("%s UseInternalTrianglesOff", this->LODDeciTclName);
-  // These options reduce seams, but makes the decimation too slow.
-  //pvApp->BroadcastScript("%s UseFeatureEdgesOn", this->LODDeciTclName);
-  //pvApp->BroadcastScript("%s UseFeaturePointsOn", this->LODDeciTclName);
-  // This should be changed to origin and spacing determined globally.
-
-  if (1) // We could avoid these filters if one processor and not client server.
-    {
-
-    // Create the collection filters which allow small models to render locally.  
-    // They also redistributed data for SGI pipes option.
-    // ===== Primary branch:
-    sprintf(tclName, "Collect%d", this->InstanceCount);
-
-    // Different filter for  pipe redistribution.
-    if (pvApp->GetUseRenderingGroup())
-      {
-      pvApp->BroadcastScript("vtkAllToNRedistributePolyData %s", tclName);
-      pvApp->BroadcastScript("%s SetNumberOfProcesses %d", tclName,
-                             pvApp->GetNumberOfPipes());
-      }
-    else if (pvApp->GetUseTiledDisplay())
-      {
-      int numProcs = pvApp->GetController()->GetNumberOfProcesses();
-      int* dims = pvApp->GetTileDimensions();
-      pvApp->BroadcastScript("vtkPVDuplicatePolyData %s", tclName);
-      pvApp->BroadcastScript("%s InitializeSchedule %d %d", tclName,
-                             numProcs, dims[0]*dims[1]);
-      // Initialize collection descision here. (When we have rendering module).
-      }
-    else
-      {
-      pvApp->BroadcastScript("vtkCollectPolyData %s", tclName);
-      }
-    this->SetCollectTclName(tclName);
-    pvApp->BroadcastScript("%s AddObserver StartEvent {$Application LogStartEvent {Execute Collect}}", 
-                           this->CollectTclName);
-    pvApp->BroadcastScript("%s AddObserver EndEvent {$Application LogEndEvent {Execute Collect}}", 
-                           this->CollectTclName);
-    //
-    // ===== LOD branch:
-    sprintf(tclName, "LODCollect%d", this->InstanceCount);
-
-    // Different filter for pipe redistribution.
-    if (pvApp->GetUseRenderingGroup())
-      {
-      pvApp->BroadcastScript("vtkAllToNRedistributePolyData %s", tclName);
-      pvApp->BroadcastScript("%s SetNumberOfProcesses %d", tclName,
-                             pvApp->GetNumberOfPipes());
-      }
-    else if (pvApp->GetUseTiledDisplay())
-      {
-      int numProcs = pvApp->GetController()->GetNumberOfProcesses();
-      int* dims = pvApp->GetTileDimensions();
-      pvApp->BroadcastScript("vtkPVDuplicatePolyData %s", tclName);
-      pvApp->BroadcastScript("%s InitializeSchedule %d %d", tclName,
-                             numProcs, dims[0]*dims[1]);
-      // Initialize collection descision here. (When we have rendering module).
-      }
-    else
-      {
-      pvApp->BroadcastScript("vtkCollectPolyData %s", tclName);
-      }
-    this->SetLODCollectTclName(tclName);
-    pvApp->BroadcastScript("%s SetInput [%s GetOutput]", 
-                           this->LODCollectTclName, this->LODDeciTclName);
-    pvApp->BroadcastScript("%s AddObserver StartEvent {$Application LogStartEvent {Execute LODCollect}}", 
-                           this->LODCollectTclName);
-    pvApp->BroadcastScript("%s AddObserver EndEvent {$Application LogEndEvent {Execute LODCollect}}", 
-                           this->LODCollectTclName);
-
-    // Handle collection setup with client server.
-    pvApp->BroadcastScript("%s SetSocketController [ $Application GetSocketController ] ", 
-                           this->CollectTclName);
-    pvApp->BroadcastScript("%s SetSocketController [ $Application GetSocketController ] ", 
-                           this->LODCollectTclName);
-    // Special condition to signal the client.
-    // Because both processes of the Socket controller think they are 0!!!!
-    if (pvApp->GetClientMode())
-      {
-      this->Script("%s SetController {}", this->CollectTclName);
-      this->Script("%s SetController {}", this->LODCollectTclName);
-      }
-    }
-
-
 
   // Now create the update supressors which keep the renderers/mappers
   // from updating the pipeline.  These are here to ensure that all
@@ -305,41 +162,8 @@ void vtkPVPartDisplay::CreateParallelTclObjects(vtkPVApplication *pvApp)
   sprintf(tclName, "UpdateSuppressor%d", this->InstanceCount);
   pvApp->BroadcastScript("vtkPVUpdateSuppressor %s", tclName);
   this->SetUpdateSuppressorTclName(tclName);
-  if (this->CollectTclName)
-    {
-    pvApp->BroadcastScript("%s SetInput [%s GetOutput]", 
-                           this->UpdateSuppressorTclName, 
-                           this->CollectTclName);
-    }
-  else
-    {
-    vtkErrorMacro("This should never occur.  I will handle in subclass.");
-    //pvApp->BroadcastScript("%s SetInput [%s GetOutput]", 
-    //                       this->UpdateSuppressorTclName, 
-    //                       this->GeometryTclName);
-    }
-  //
-  // ===== LOD branch:
-  sprintf(tclName, "LODUpdateSuppressor%d", this->InstanceCount);
-  pvApp->BroadcastScript("vtkPVUpdateSuppressor %s", tclName);
-  this->SetLODUpdateSuppressorTclName(tclName);
-  if (this->LODCollectTclName)
-    {
-    pvApp->BroadcastScript("%s SetInput [%s GetOutput]", 
-                           this->LODUpdateSuppressorTclName, 
-                           this->LODCollectTclName);
-    }
-  else
-    {
-    pvApp->BroadcastScript("%s SetInput [%s GetOutput]", 
-                           this->LODUpdateSuppressorTclName, 
-                           this->LODDeciTclName);
-    }
 
-
-  // Now create the mappers for the two branches.
-  // Make a new tcl object.
-  // ===== Primary branch:
+  // Now create the mapper.
   sprintf(tclName, "Mapper%d", this->InstanceCount);
   this->Mapper = (vtkPolyDataMapper*)pvApp->MakeTclObject("vtkPolyDataMapper",
                                                           tclName);
@@ -349,18 +173,9 @@ void vtkPVPartDisplay::CreateParallelTclObjects(vtkPVApplication *pvApp)
   //pvApp->BroadcastScript("%s SetColorModeToMapScalars", this->MapperTclName);
   pvApp->BroadcastScript("%s SetInput [%s GetOutput]", this->MapperTclName,
                          this->UpdateSuppressorTclName);
-  //
-  // ===== LOD branch:
-  sprintf(tclName, "LODMapper%d", this->InstanceCount);
-  pvApp->MakeTclObject("vtkPolyDataMapper", tclName);
-  this->LODMapperTclName = NULL;
-  this->SetLODMapperTclName(tclName);
-  pvApp->BroadcastScript("%s UseLookupTableScalarRangeOn", this->LODMapperTclName);
-  //pvApp->BroadcastScript("%s SetColorModeToMapScalars", this->LODMapperTclName);
-  pvApp->BroadcastScript("%s SetInput [%s GetOutput]", this->LODMapperTclName,
-                         this->LODUpdateSuppressorTclName);
-  
-  // Now the two branches merge at the LOD actor.
+
+  // Create a LOD Actor for the subclasses.
+  // I could use just a plain actor for this class.
   sprintf(tclName, "Actor%d", this->InstanceCount);
   this->Prop = (vtkProp*)pvApp->MakeTclObject("vtkPVLODActor", tclName);
   this->SetPropTclName(tclName);
@@ -375,10 +190,15 @@ void vtkPVPartDisplay::CreateParallelTclObjects(vtkPVApplication *pvApp)
                          this->PropertyTclName);
   pvApp->BroadcastScript("%s SetMapper %s", this->PropTclName, 
                          this->MapperTclName);
-  pvApp->BroadcastScript("%s SetLODMapper %s", this->PropTclName,
-                         this->LODMapperTclName);
-  
-  pvApp->GetProcessModule()->InitializePartition(this);
+
+  int numPartitions = pvApp->GetProcessModule()->GetNumberOfPartitions();
+  int partition =  pvApp->GetProcessModule()->GetPartitionId();
+
+  // Broadcast for subclasses.  
+  pvApp->BroadcastScript("%s SetUpdateNumberOfPieces [[$Application GetProcessModule] GetNumberOfPartitions]",
+                        this->UpdateSuppressorTclName);
+  pvApp->BroadcastScript("%s SetUpdatePiece [[$Application GetProcessModule] GetPartitionId]",
+                        this->UpdateSuppressorTclName);
 }
 
 
@@ -388,98 +208,8 @@ void vtkPVPartDisplay::SetUseImmediateMode(int val)
   vtkPVApplication* pvApp = this->GetPVApplication();
 
   pvApp->BroadcastScript("%s SetImmediateModeRendering %d",
-                         this->GetMapperTclName(),
-                         val);
-  pvApp->BroadcastScript("%s SetImmediateModeRendering %d",
-                         this->GetLODMapperTclName(),
-                         val);
+                         this->MapperTclName, val);
 }
-
-//----------------------------------------------------------------------------
-void vtkPVPartDisplay::SetLODResolution(int res)
-{
-  vtkPVApplication* pvApp = this->GetPVApplication();
-
-  pvApp->BroadcastScript("%s SetNumberOfDivisions %d %d %d", 
-                         this->LODDeciTclName, res, res, res);
-}
-
-//----------------------------------------------------------------------------
-void vtkPVPartDisplay::SetCollectionDecision(int v)
-{
-  vtkPVApplication* pvApp = this->GetPVApplication();
-
-  if (v == this->CollectionDecision)
-    {
-    return;
-    }
-  this->CollectionDecision = v;
-
-  if ( this->UpdateSuppressorTclName == NULL )
-    {
-    vtkErrorMacro("Missing Suppressor.");
-    return;
-    }
-
-  if (this->CollectTclName)
-    {
-    if (this->CollectionDecision)
-      {
-      pvApp->BroadcastScript("%s SetPassThrough 0; %s RemoveAllCaches; %s ForceUpdate", 
-                             this->CollectTclName,
-                             this->UpdateSuppressorTclName,
-                             this->UpdateSuppressorTclName);
-      }
-    else
-      {
-      pvApp->BroadcastScript("%s SetPassThrough 1; %s RemoveAllCaches; %s ForceUpdate", 
-                             this->CollectTclName,
-                             this->UpdateSuppressorTclName,
-                             this->UpdateSuppressorTclName);
-      }
-    }
-
-  this->GetPVApplication()->BroadcastScript(
-             "%s RemoveAllCaches", this->UpdateSuppressorTclName);
-}
-
-//----------------------------------------------------------------------------
-void vtkPVPartDisplay::SetLODCollectionDecision(int v)
-{
-  vtkPVApplication* pvApp = this->GetPVApplication();
-
-  if (v == this->LODCollectionDecision)
-    {
-    return;
-    }
-  this->LODCollectionDecision = v;
-
-  if ( this->UpdateSuppressorTclName == NULL )
-    {
-    vtkErrorMacro("Missing Suppressor.");
-    return;
-    }
-
-  if (this->LODCollectTclName)
-    {
-    if (this->LODCollectionDecision)
-      {
-      pvApp->BroadcastScript("%s SetPassThrough 0; %s RemoveAllCaches; %s ForceUpdate", 
-                             this->LODCollectTclName,
-                             this->LODUpdateSuppressorTclName,
-                             this->LODUpdateSuppressorTclName);
-      }
-    else
-      {
-      pvApp->BroadcastScript("%s SetPassThrough 1; %s RemoveAllCaches; %s ForceUpdate", 
-                             this->LODCollectTclName,
-                             this->LODUpdateSuppressorTclName,
-                             this->LODUpdateSuppressorTclName);
-      }
-    }
-
-}
-
 
 
 //----------------------------------------------------------------------------
@@ -494,68 +224,74 @@ void vtkPVPartDisplay::SetVisibility(int v)
   this->Visibility = v;
 
   // Recompute total visibile memory size.
-  pvApp->SetTotalVisibleMemorySizeValid(0);
+  pvApp->GetRenderModule()->SetTotalVisibleMemorySizeValid(0);
 }
 
 
+//----------------------------------------------------------------------------
+void vtkPVPartDisplay::SetColor(float r, float g, float b)
+{
+  vtkPVApplication *pvApp = this->GetPVApplication();
+
+  pvApp->BroadcastScript("%s SetColor %f %f %f", 
+                         this->PropertyTclName, r, g, b);
+
+  // Add a bit of specular when just coloring by property.
+  pvApp->BroadcastScript("%s SetSpecular 0.1", 
+                         this->PropertyTclName);
+
+  pvApp->BroadcastScript("%s SetSpecularPower 100.0", 
+                         this->PropertyTclName);
+
+  pvApp->BroadcastScript("%s SetSpecularColor 1.0 1.0 1.0", 
+                         this->PropertyTclName);
+}  
+
 
 //----------------------------------------------------------------------------
-void vtkPVPartDisplay::ForceUpdate(vtkPVApplication* pvApp)
+void vtkPVPartDisplay::Update()
 {
-  if ( this->UpdateSuppressorTclName )
+  vtkPVApplication* pvApp = this->GetPVApplication();
+
+  if ( ! this->GeometryIsValid && this->UpdateSuppressorTclName )
     {
     pvApp->BroadcastScript("%s ForceUpdate", this->UpdateSuppressorTclName);
-    pvApp->BroadcastScript("%s ForceUpdate", this->LODUpdateSuppressorTclName);
+    this->GeometryIsValid = 1;
     }
 }
 
 //----------------------------------------------------------------------------
 void vtkPVPartDisplay::SetPVApplication(vtkPVApplication *pvApp)
 {
+  if (pvApp == NULL)
+    {
+    if (this->PVApplication)
+      {
+      this->PVApplication->Delete();
+      this->PVApplication = NULL;
+      }
+    return;
+    }
+
+  if (this->PVApplication)
+    {
+    vtkErrorMacro("PVApplication already set and part has been initialized.");
+    return;
+    }
+
   this->CreateParallelTclObjects(pvApp);
-  this->vtkKWObject::SetApplication(pvApp);
+  this->PVApplication = pvApp;
+  this->PVApplication->Register(this);
 }
 
-
-//----------------------------------------------------------------------------
-void vtkPVPartDisplay::Update()
-{
-  vtkPVApplication *pvApp = this->GetPVApplication();
-  
-  // The mapper has the assignment for this processor.
-  pvApp->GetProcessModule()->ServerScript(
-      "[%s GetOutput] SetUpdateExtent [%s GetPiece] [%s GetNumberOfPieces]", 
-      this->LODDeciTclName, this->MapperTclName, this->MapperTclName);
-  pvApp->GetProcessModule()->ServerScript("%s Update", this->LODDeciTclName);
-}
-
-
-//----------------------------------------------------------------------------
-vtkPVApplication* vtkPVPartDisplay::GetPVApplication()
-{
-  if (this->Application == NULL)
-    {
-    return NULL;
-    }
-  
-  if (this->Application->IsA("vtkPVApplication"))
-    {  
-    return (vtkPVApplication*)(this->Application);
-    }
-  else
-    {
-    vtkErrorMacro("Bad typecast");
-    return NULL;
-    } 
-}
 
 
 //----------------------------------------------------------------------------
 void vtkPVPartDisplay::RemoveAllCaches()
 {
   this->GetPVApplication()->BroadcastScript(
-             "%s RemoveAllCaches; %s RemoveAllCaches",
-             this->UpdateSuppressorTclName, this->LODUpdateSuppressorTclName);
+             "%s RemoveAllCaches",
+             this->UpdateSuppressorTclName);
 }
 
 
@@ -565,11 +301,22 @@ void vtkPVPartDisplay::RemoveAllCaches()
 void vtkPVPartDisplay::CacheUpdate(int idx, int total)
 {
   this->GetPVApplication()->BroadcastScript(
-             "%s CacheUpdate %d %d; %s CacheUpdate %d %d",
-             this->UpdateSuppressorTclName, idx, total,
-             this->LODUpdateSuppressorTclName, idx, total);
+             "%s CacheUpdate %d %d",
+             this->UpdateSuppressorTclName, idx, total);
 }
 
+
+
+
+
+
+//----------------------------------------------------------------------------
+void vtkPVPartDisplay::SetScalarVisibility(int val)
+{
+  vtkPVApplication* pvApp = this->GetPVApplication();
+  pvApp->BroadcastScript("%s SetScalarVisibility %d", 
+                         this->MapperTclName, val);
+}
 
 //----------------------------------------------------------------------------
 void vtkPVPartDisplay::SetDirectColorFlag(int val)
@@ -588,13 +335,46 @@ void vtkPVPartDisplay::SetDirectColorFlag(int val)
   if (val)
     {
     pvApp->BroadcastScript("%s SetColorModeToDefault", this->MapperTclName);
-    pvApp->BroadcastScript("%s SetColorModeToDefault", this->LODMapperTclName);
     }
   else
     {
     pvApp->BroadcastScript("%s SetColorModeToMapScalars", this->MapperTclName);
-    pvApp->BroadcastScript("%s SetColorModeToMapScalars", this->LODMapperTclName);
     }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVPartDisplay::ColorByArray(vtkPVColorMap *colorMap,
+                                    int field)
+{
+  vtkPVApplication *pvApp = this->GetPVApplication();
+
+  // Turn off the specualr so it does not interfere with data.
+  pvApp->BroadcastScript("%s SetSpecular 0.0", 
+                         this->PropertyTclName);
+
+  pvApp->BroadcastScript("%s SetLookupTable %s", 
+                         this->MapperTclName,
+                         colorMap->GetLookupTableTclName());
+  pvApp->BroadcastScript("%s ScalarVisibilityOn", 
+                         this->MapperTclName);
+  if (field == VTK_CELL_DATA_FIELD)
+    {
+    pvApp->BroadcastScript("%s SetScalarModeToUseCellFieldData",
+                           this->MapperTclName);
+    }
+  else if (field == VTK_POINT_DATA_FIELD)
+    {
+    pvApp->BroadcastScript("%s SetScalarModeToUsePointFieldData",
+                           this->MapperTclName);
+    }
+  else
+    {
+    vtkErrorMacro("Only point or cell field please.");
+    }
+
+  pvApp->BroadcastScript("%s SelectColorArray {%s}",
+                         this->MapperTclName, colorMap->GetArrayName());
+
 }
 
 //----------------------------------------------------------------------------
@@ -603,30 +383,16 @@ void vtkPVPartDisplay::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os,indent);
   os << indent << "Visibility: " << this->Visibility << endl;
   os << indent << "Part: " << this->Part << endl;
-  os << indent << "LODMapperTclName: " << (this->LODMapperTclName?this->LODMapperTclName:"none") << endl;
   os << indent << "Mapper: " << this->GetMapper() << endl;
   os << indent << "MapperTclName: " << (this->MapperTclName?this->MapperTclName:"none") << endl;
   os << indent << "PropTclName: " << (this->PropTclName?this->PropTclName:"none") << endl;
   os << indent << "PropertyTclName: " << (this->PropertyTclName?this->PropertyTclName:"none") << endl;
-  os << indent << "CollectTclName: " << (this->CollectTclName?this->CollectTclName:"none") << endl;
-  os << indent << "LODCollectTclName: " << (this->LODCollectTclName?this->LODCollectTclName:"none") << endl;
-  os << indent << "LODDeciTclName: " << (this->LODDeciTclName?this->LODDeciTclName:"none") << endl;
 
   os << indent << "DirectColorFlag: " << this->DirectColorFlag << endl;
-
-  os << indent << "CollectionDecision: " 
-     <<  this->CollectionDecision << endl;
-  os << indent << "LODCollectionDecision: " 
-     <<  this->LODCollectionDecision << endl;
-
 
   if (this->UpdateSuppressorTclName)
     {
     os << indent << "UpdateSuppressor: " << this->UpdateSuppressorTclName << endl;
-    }
-  if (this->LODUpdateSuppressorTclName)
-    {
-    os << indent << "LODUpdateSuppressor: " << this->LODUpdateSuppressorTclName << endl;
     }
 }
 

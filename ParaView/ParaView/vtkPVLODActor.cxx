@@ -56,7 +56,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLODActor);
-vtkCxxRevisionMacro(vtkPVLODActor, "1.17");
+vtkCxxRevisionMacro(vtkPVLODActor, "1.18");
 
 vtkCxxSetObjectMacro(vtkPVLODActor, LODMapper, vtkMapper);
 
@@ -206,7 +206,10 @@ void vtkPVLODActor::ReleaseGraphicsResources(vtkWindow *renWin)
   vtkActor::ReleaseGraphicsResources(renWin);
   
   // broadcast the message down to the individual LOD mappers
-  this->LODMapper->ReleaseGraphicsResources(renWin);
+  if (this->LODMapper)
+    {
+    this->LODMapper->ReleaseGraphicsResources(renWin);
+    }
 }
 
 
@@ -325,5 +328,8 @@ void vtkPVLODActor::ShallowCopy(vtkProp *prop)
 void vtkPVLODActor::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
-  os << indent << "LODMapper: " << this->GetLODMapper() << endl;
+  if (this->LODMapper)
+    {
+    os << indent << "LODMapper: " << this->GetLODMapper() << endl;
+    }
 }

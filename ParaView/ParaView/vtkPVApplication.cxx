@@ -118,7 +118,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.201");
+vtkCxxRevisionMacro(vtkPVApplication, "1.202");
 vtkCxxSetObjectMacro(vtkPVApplication, RenderModule, vtkPVRenderModule);
 
 
@@ -297,8 +297,6 @@ vtkPVApplication::vtkPVApplication()
   this->SetApplicationReleaseName("1");
 
 
-  this->TotalVisibleMemorySizeValid = 0;
-
   this->AboutDialog = 0;
   this->Display3DWidgets = 0;
   this->ProcessId = 0;
@@ -307,7 +305,8 @@ vtkPVApplication::vtkPVApplication()
   this->ProcessModule = NULL;
   this->RenderModule = NULL;
   this->RenderModuleName = NULL;
-  this->SetRenderModuleName("LODRenderModule");
+  // Now initialized in ParaView.cxx
+  //this->SetRenderModuleName("LODRenderModule");
   this->CommandFunction = vtkPVApplicationCommand;
 
   this->NumberOfPipes = 1;
@@ -557,8 +556,8 @@ const char vtkPVApplication::ArgumentList[vtkPVApplication::NUM_ARGS][128] =
   "Specify the port client and server will use (--port=11111).  Client and servers ports must match.", 
   "--stereo", "",
   "Tell the application to enable stero rendering (only when running on a single process).",
-  "--render-module-name", "",
-  "User specified rendering module (--render-module-name=...)",
+  "--render-module", "",
+  "User specified rendering module (--render-module=...)",
   "--start-empty" , "-e", 
   "Start ParaView without any default modules.", 
   "--disable-registry", "-dr", 
@@ -1388,50 +1387,6 @@ void vtkPVApplication::Exit()
     }
 }
 
-//----------------------------------------------------------------------------
-void vtkPVApplication::GetMapperColorRange(float range[2],
-                                           vtkPolyDataMapper *mapper)
-{
-  vtkDataSetAttributes *attr = NULL;
-  vtkDataArray *array;
-  
-  if (mapper == NULL || mapper->GetInput() == NULL)
-    {
-    range[0] = VTK_LARGE_FLOAT;
-    range[1] = -VTK_LARGE_FLOAT;
-    return;
-    }
-
-  // Determine and get the array used to color the model.
-  if (mapper->GetScalarMode() == VTK_SCALAR_MODE_USE_POINT_FIELD_DATA)
-    {
-    attr = mapper->GetInput()->GetPointData();
-    }
-  if (mapper->GetScalarMode() == VTK_SCALAR_MODE_USE_CELL_FIELD_DATA)
-    {
-    attr = mapper->GetInput()->GetCellData();
-    }
-
-  // Sanity check.
-  if (attr == NULL)
-    {
-    range[0] = VTK_LARGE_FLOAT;
-    range[1] = -VTK_LARGE_FLOAT;
-    return;
-    }
-
-  array = attr->GetArray(mapper->GetArrayName());
-  if (array == NULL)
-    {
-    range[0] = VTK_LARGE_FLOAT;
-    range[1] = -VTK_LARGE_FLOAT;
-    return;
-    }
-
-  array->GetRange( range, mapper->GetArrayComponent());
-}
-
-
 
 //----------------------------------------------------------------------------
 void vtkPVApplication::StartRecordingScript(char *filename)
@@ -1726,9 +1681,6 @@ void vtkPVApplication::ErrorExit()
 void vtkPVApplication::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
-
-  os << indent << "TotalVisibleMemorySizeValid: " 
-     << this->TotalVisibleMemorySizeValid << endl;
 
   os << indent << "ProcessModule: " << this->ProcessModule << endl;;
   os << indent << "RunningParaViewScript: " 

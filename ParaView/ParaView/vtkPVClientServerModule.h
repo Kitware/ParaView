@@ -61,7 +61,6 @@ class vtkMapper;
 class vtkMapper;
 class vtkMultiProcessController;
 class vtkPVApplication;
-class vtkPVDataInformation;
 class vtkPVPart;
 class vtkSocketController;
 class vtkSource;
@@ -109,12 +108,6 @@ public:
   // Get the number of processes participating in sharing the data.
   virtual int GetNumberOfPartitions();
   
-
-  // Description:
-  // This initializes the data object to request the correct partiaion.
-  virtual void InitializePartition(vtkPVPartDisplay *partDisplay);
-  void InitializePartition(char *tclName, int updateFlag);
-
   // Description:
   // Flag that differentiates between clinet and server programs.
   vtkGetMacro(ClientMode, int);
@@ -126,7 +119,8 @@ public:
 
   // Description:
   // Module dependant method for collecting data information from all procs.
-  virtual void GatherDataInformation(vtkSource *deci);
+  virtual void GatherInformation(vtkPVInformation* info, char* objectTclName);
+  virtual void GatherInformationInternal(char* infoClassName, vtkObject* object);
 
   // Description:
   // This executes a script on process 0 of the server.

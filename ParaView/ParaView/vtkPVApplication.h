@@ -131,7 +131,7 @@ public:
   vtkSocketController *GetSocketController();
 
   // Description:
-  // Make sure the user accepts the license before running.
+  // No licence required.
   int AcceptLicense();
   int AcceptEvaluation();
 
@@ -168,11 +168,7 @@ public:
   // This method returns pointer to the object specified as a tcl
   // name.
   vtkObject *TclToVTKObject(const char *tclName);
-  
-  // Description:
-  // A method that should probably be in the mapper.
-  void GetMapperColorRange(float range[2], vtkPolyDataMapper *mapper);
-  
+    
   // Description:
   // A start at recording macros in ParaView.  Create a custom trace file
   // that can be loaded back into paraview.  Window variables get
@@ -207,7 +203,8 @@ public:
   // Description:
   // Need to put a global flag that indicates interactive rendering.  All
   // process must be consistent in choosing LODs because of the
-  // vtkCollectPolydata filter.
+  // vtkCollectPolydata filter.  This has to be in vtkPVApplication
+  // because we do not create a render module on remote processes.
   void SetGlobalLODFlag(int val);
   static int GetGlobalLODFlag();
   void SetGlobalLODFlagInternal(int val);
@@ -237,10 +234,6 @@ public:
   //ETX
 
   void DisplayTCLError(const char* message);
-
-  // Description:
-  // Get the process Id when running in MPI mode.
-  vtkGetMacro(ProcessId, int);
 
   // Description:
   // A method used to set environment variables in the satellite
@@ -323,6 +316,10 @@ public:
   vtkGetStringMacro(RenderModuleName);
 
   // Description:
+  // I have ParaView.cxx set the proper default render module.
+  vtkSetStringMacro(RenderModuleName);  
+
+  // Description:
   // This is used (Unix only) to obtain the path of the executable.
   // This path is used to locate demos etc.
   vtkGetStringMacro(Argv0);
@@ -330,17 +327,6 @@ public:
   // Description:
   // The name of the trace file.
   vtkGetStringMacro(TraceFileName);
-
-  // Description:
-  // This is just a convenient spot to keep this flag.
-  // Render view uses this to descide whether to recompute the
-  // total memory size of visible geometry.  This is necessary
-  // to decide between collection vs. distributed rendering.
-  // When we create rendering modules, the render view will be
-  // integrated with the vtkPVProcessModule and vtkPVParts and
-  // this flag can be moved.
-  vtkSetMacro(TotalVisibleMemorySizeValid, int);
-  vtkGetMacro(TotalVisibleMemorySizeValid, int);
 
 protected:
   vtkPVApplication();
@@ -359,7 +345,6 @@ protected:
   vtkPVProcessModule *ProcessModule;
   vtkPVRenderModule *RenderModule;
   char* RenderModuleName;
-  vtkSetStringMacro(RenderModuleName);
 
   // For running with SGI pipes.
   int NumberOfPipes;
@@ -427,8 +412,6 @@ protected:
   //ETX
 
   static vtkPVApplication* MainApplication;  
-
-  int TotalVisibleMemorySizeValid;
 
 private:  
   vtkPVApplication(const vtkPVApplication&); // Not implemented

@@ -112,7 +112,7 @@ static unsigned char image_properties[] =
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.258");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.259");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -162,9 +162,7 @@ vtkPVRenderView::vtkPVRenderView()
     }    
 
   this->CommandFunction = vtkPVRenderViewCommand;
-  
-  this->Interactive = 0;
-  
+    
   this->RenderWindow->SetDesiredUpdateRate(1.0);  
 
   this->SplitFrame = vtkKWSplitFrame::New();
@@ -1423,11 +1421,7 @@ void vtkPVRenderView::ImmediateModeCallback()
     numParts = pvs->GetNumberOfParts();
     for (partIdx = 0; partIdx < numParts; ++partIdx)
       {
-      pvApp->BroadcastScript("%s SetImmediateModeRendering %d",
-                             pvs->GetPart(partIdx)->GetPartDisplay()->GetMapperTclName(),
-                             this->ImmediateModeCheck->GetState());
-      pvApp->BroadcastScript("%s SetImmediateModeRendering %d",
-                             pvs->GetPart(partIdx)->GetPartDisplay()->GetLODMapperTclName(),
+      pvs->GetPart(partIdx)->GetPartDisplay()->SetUseImmediateMode(
                              this->ImmediateModeCheck->GetState());
       }
     }

@@ -57,35 +57,39 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __vtkPVDataInformation_h
 
 
-#include "vtkObject.h"
+#include "vtkPVInformation.h"
 
 class vtkDataSet;
 class vtkPVDataSetAttributesInformation;
 class vtkCollection;
 
-class VTK_EXPORT vtkPVDataInformation : public vtkObject
+class VTK_EXPORT vtkPVDataInformation : public vtkPVInformation
 {
 public:
   static vtkPVDataInformation* New();
-  vtkTypeRevisionMacro(vtkPVDataInformation, vtkObject);
+  vtkTypeRevisionMacro(vtkPVDataInformation, vtkPVInformation);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Transfer information about a single vtk data object into
-  // this object. Note:  CopyFromData does not set 
-  // the GeometryMemorySize or LODMemorySize.
-  void CopyFromData(vtkDataSet* data);
-  void DeepCopy(vtkPVDataInformation* info);
+  // Transfer information about a single object into
+  // this object.
+  virtual void CopyFromObject(vtkObject* data);
+  virtual void CopyFromMessage(unsigned char* msg);
 
   // Description:
-  // Intersect information of argument with information currently
-  // in this object.  Arrays must be in both 
-  // (same name and number of components)to be in final.        
-  void AddInformation(vtkDataSet* data);
-  void AddInformation(vtkPVDataInformation* info);
+  // Merge another information object.
+  virtual void AddInformation(vtkPVInformation* info);
+  
+  // Description:
+  // Serialize message.
+  virtual int GetMessageLength(); 
+  virtual void WriteMessage(unsigned char* msg);
+
+
   
   // Description:
   // Remove all infommation. next add will be like a copy.
+  // I might want to put this in the PVInformation superclass.
   void Initialize();
 
   // Description:
@@ -96,16 +100,8 @@ public:
   vtkGetMacro(NumberOfPoints, vtkIdType);
   vtkGetMacro(NumberOfCells, vtkIdType);
   vtkGetMacro(MemorySize, unsigned long);
-  vtkGetMacro(GeometryMemorySize, unsigned long);
-  vtkGetMacro(LODMemorySize, unsigned long);
   vtkGetVector6Macro(Bounds, double);
   void GetBounds(float* bds);
-
-  // Description:
-  // These values are not copied from data so they have to be set
-  // by the process module.
-  vtkSetMacro(GeometryMemorySize,unsigned long);
-  vtkSetMacro(LODMemorySize,unsigned long);
 
   // Description:
   // Of course Extent is only valid for structured data sets.
@@ -118,14 +114,6 @@ public:
   vtkGetObjectMacro(CellDataInformation,vtkPVDataSetAttributesInformation);
 
   // Description:
-  // Methods used to send and receive these objects.
-  // The user must delete the string returned by new message.
-  // The argument length returns the length of the binary message.
-  // No byte swapping is currently implemented.
-  unsigned char *NewMessage(int &length);
-  void CopyFromMessage(unsigned char *msg);
-
-  // Description:
   // Name stored in field data.
   vtkGetStringMacro(Name);
 
@@ -133,13 +121,13 @@ protected:
   vtkPVDataInformation();
   ~vtkPVDataInformation();
 
+  void DeepCopy(vtkPVDataInformation *dataInfo);
+
   // Data information collected from remote processes.
   int            DataSetType;
   vtkIdType      NumberOfPoints;
   vtkIdType      NumberOfCells;
   unsigned long  MemorySize;
-  unsigned long  GeometryMemorySize;
-  unsigned long  LODMemorySize;
   double         Bounds[6];
   int            Extent[6];
   char*          Name;

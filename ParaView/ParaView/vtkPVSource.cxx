@@ -80,7 +80,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.301");
+vtkCxxRevisionMacro(vtkPVSource, "1.302");
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -506,7 +506,7 @@ void vtkPVSource::ForceUpdate(vtkPVApplication* pvApp)
   this->Parts->InitTraversal();
   while ( (part = (vtkPVPart*)(this->Parts->GetNextItemAsObject())) )
     {
-    part->GetPartDisplay()->ForceUpdate(pvApp);
+    part->GetPartDisplay()->Update();
     }
 }
 
@@ -1370,7 +1370,7 @@ void vtkPVSource::MarkSourcesForUpdate(int flag)
     for (idx = 0; idx < numParts; ++idx)
       {
       part = this->GetPart(idx);
-      part->GetPartDisplay()->RemoveAllCaches();
+      part->GetPartDisplay()->InvalidateGeometry();
       }
     }
   else

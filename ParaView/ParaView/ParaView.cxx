@@ -144,14 +144,29 @@ int MyMain(int argc, char *argv[])
   // Create the process module for initializing the processes.
   if (app->GetClientMode() || serverMode) // only root server processed args.
     {
+    if (app->GetRenderModuleName() == NULL)
+      { // I do not like this initialization here.
+      // Think about moving it.
+      app->SetRenderModuleName("CompositeRenderModule");
+      }
     vtkPVClientServerModule *processModule = vtkPVClientServerModule::New();
     pm = processModule;
     }
   else
     {
 #ifdef VTK_USE_MPI
+    if (app->GetRenderModuleName() == NULL)
+      { // I do not like this initialization here.
+      // Think about moving it.
+      app->SetRenderModuleName("CompositeRenderModule");
+      }
     vtkPVMPIProcessModule *processModule = vtkPVMPIProcessModule::New();
 #else 
+    if (app->GetRenderModuleName() == NULL)
+      { // I do not like this initialization here.
+      // Think about moving it.
+      app->SetRenderModuleName("LODRenderModule");
+      }
     vtkPVProcessModule *processModule = vtkPVProcessModule::New();
 #endif
     pm = processModule;

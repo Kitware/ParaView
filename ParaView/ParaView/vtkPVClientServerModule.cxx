@@ -57,7 +57,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
 #include "vtkPVConfig.h"
-#include "vtkPVDataInformation.h"
+#include "vtkPVInformation.h"
 #include "vtkPVServerFileDialog.h"
 #include "vtkPVWindow.h"
 #include "vtkShortArray.h"
@@ -209,7 +209,7 @@ void vtkPVSendDataObject(void* arg, void*, int, int)
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVClientServerModule);
-vtkCxxRevisionMacro(vtkPVClientServerModule, "1.37");
+vtkCxxRevisionMacro(vtkPVClientServerModule, "1.38");
 
 int vtkPVClientServerModuleCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -821,19 +821,27 @@ int vtkPVClientServerModule::GetNumberOfPartitions()
   return 1;
 }
 
+//----------------------------------------------------------------------------
+void vtkPVClientServerModule::GatherInformation(vtkPVInformation* info, 
+                                                char* objectTclName)
+{
+  // Just a simple way of passing the information object to the next method.
+  this->TemporaryInformation = info;
+  // Some objects are not created on the client (data.
+  this->ServerScript("[$Application GetProcessModule] GatherInformationInternal %s %s",
+                     info->GetClassName(), objectTclName);
+  this->GatherInformationInternal(NULL, NULL);
+  this->TemporaryInformation = NULL; 
+}
 
 //----------------------------------------------------------------------------
 // This method is broadcast to all processes.
-void vtkPVClientServerModule::GatherDataInformation(vtkSource *deci)
+void vtkPVClientServerModule::GatherInformationInternal(char* infoClassName, 
+                                                        vtkObject* object)
 {
   int length;
   unsigned char *msg;
   int myId = this->Controller->GetLocalProcessId();
-  vtkDataObject** dataObjects;
-  vtkSource* geo;
-  vtkDataObject* geoData;
-  vtkDataObject* deciData;
-  vtkDataSet* data;
 
   if (this->GetPVApplication()->GetClientMode())
     { // Client just receives information from the server.
@@ -846,78 +854,53 @@ void vtkPVClientServerModule::GatherDataInformation(vtkSource *deci)
     return;
     }
 
-  if (deci == NULL)
+  if (object == NULL)
     {
     vtkErrorMacro("Deci tcl name must be wrong.");
     return;
     }
 
-  // Get the data object form the decimate filter.
-  // This is a bit of a hack. Maybe we should have a PVPart object
-  // on all processes.
-  // Sanity checks to avoid slim chance of segfault.
-  dataObjects = deci->GetOutputs(); 
-  if (dataObjects == NULL || dataObjects[0] == NULL)
+  // Create a temporary information object.
+  vtkObject* o;
+  o = vtkInstantiator::CreateInstance(infoClassName);
+  if ( o == NULL)
     {
-    vtkErrorMacro("Could not get deci output.");
+    vtkErrorMacro("Could not instantiate object " << infoClassName);
     return;
     }
-  deciData = dataObjects[0];
-  dataObjects = deci->GetInputs(); 
-  if (dataObjects == NULL || dataObjects[0] == NULL)
-    {
-    vtkErrorMacro("Could not get deci input.");
-    return;
-    }
-  geoData = dataObjects[0];
-  geo = geoData->GetSource();
-  if (geo == NULL)
-    {
-    vtkErrorMacro("Could not get geo.");
-    return;
-    }
-  dataObjects = geo->GetInputs(); 
-  if (dataObjects == NULL || dataObjects[0] == NULL)
-    {
-    vtkErrorMacro("Could not get geo input.");
-    return;
-    }
-  data = vtkDataSet::SafeDownCast(dataObjects[0]);
-  if (data == NULL)
-    {
-    vtkErrorMacro("It couldn't be a vtkDataObject???");
-    return;
-    }
+  vtkPVInformation* tmp1;
+  tmp1 = vtkPVInformation::SafeDownCast(o);
+  o = NULL;
 
   if (myId != 0)
     {
-    vtkPVDataInformation *tmp = vtkPVDataInformation::New();
-    tmp->CopyFromData(data);
-    tmp->SetGeometryMemorySize(geoData->GetActualMemorySize());
-    tmp->SetLODMemorySize(deciData->GetActualMemorySize());
-    msg = tmp->NewMessage(length);
-    this->Controller->Send(&length, 1, 0, 398798);
-    this->Controller->Send(msg, length, 0, 398799);
+    tmp1->CopyFromObject(object);
+    length = tmp1->GetMessageLength();
+    msg = new unsigned char[length];
+    tmp1->WriteMessage(msg);
+    this->Controller->Send(&length, 1, 0, 498798);
+    this->Controller->Send(msg, length, 0, 498799);
     delete [] msg;
     msg = NULL;
-    tmp->Delete();
-    tmp = NULL;
+    tmp1->Delete();
+    tmp1 = NULL;
     return;
     }
 
   // Node 0.
+  o = vtkInstantiator::CreateInstance(infoClassName);
+  vtkPVInformation* tmp2;
+  tmp2 = vtkPVInformation::SafeDownCast(o);
+  o = NULL;
+
   int numProcs = this->Controller->GetNumberOfProcesses();
   int idx;
-  vtkPVDataInformation *tmp1 = vtkPVDataInformation::New();
-  vtkPVDataInformation *tmp2 = vtkPVDataInformation::New();
-  tmp1->CopyFromData(data);
-  tmp1->SetGeometryMemorySize(geoData->GetActualMemorySize());
-  tmp1->SetLODMemorySize(deciData->GetActualMemorySize());
+  tmp1->CopyFromObject(object);
   for (idx = 1; idx < numProcs; ++idx)
     {
-    this->Controller->Receive(&length, 1, idx, 398798);
+    this->Controller->Receive(&length, 1, idx, 498798);
     msg = new unsigned char[length];
-    this->Controller->Receive(msg, length, idx, 398799);
+    this->Controller->Receive(msg, length, idx, 498799);
     tmp2->CopyFromMessage(msg);
     tmp1->AddInformation(tmp2);
     delete [] msg;
@@ -927,57 +910,17 @@ void vtkPVClientServerModule::GatherDataInformation(vtkSource *deci)
   tmp2 = NULL;
 
   // Send final information to client over socket connection.
-  msg = tmp1->NewMessage(length);
+  length = tmp1->GetMessageLength();
+  msg = new unsigned char[length];
+  tmp1->WriteMessage(msg);
   this->SocketController->Send(&length, 1, 1, 398798);
   this->SocketController->Send(msg, length, 1, 398799);
   delete [] msg;
   msg = NULL;
   tmp1->Delete();
   tmp1 = NULL;
-
 }    
 
-//----------------------------------------------------------------------------
-void vtkPVClientServerModule::InitializePartition(vtkPVPartDisplay *pDisp)
-{
-  this->BroadcastScript("[$Application GetProcessModule] InitializePartition %s 0",
-                        pDisp->GetMapperTclName());
-  this->BroadcastScript("[$Application GetProcessModule] InitializePartition %s 0",
-                        pDisp->GetLODMapperTclName());
-  this->BroadcastScript("[$Application GetProcessModule] InitializePartition %s 1",
-                        pDisp->GetUpdateSuppressorTclName());
-  this->BroadcastScript("[$Application GetProcessModule] InitializePartition %s 1",
-                        pDisp->GetLODUpdateSuppressorTclName());
-}
-
-//----------------------------------------------------------------------------
-void vtkPVClientServerModule::InitializePartition(char *tclName, int updateFlag)
-{
-  int numPieces;
-  int piece;
-  if (this->ClientMode)
-    {
-    piece = 0;
-    numPieces = 0;
-    }
-  else
-    {
-    numPieces = this->Controller->GetNumberOfProcesses();
-    piece = this->Controller->GetLocalProcessId();
-    }
-
-  // Need to clean up.  Just Set piece of suppressor?
-  if (updateFlag)
-    {
-    this->Application->Script("%s SetUpdateNumberOfPieces %d", tclName, numPieces);
-    this->Application->Script("%s SetUpdatePiece %d", tclName, piece);
-    }
-  else
-    {
-    this->Application->Script("%s SetNumberOfPieces %d", tclName, numPieces);
-    this->Application->Script("%s SetPiece %d", tclName, piece);
-    }
-}
 
 //----------------------------------------------------------------------------
 void vtkPVClientServerModule::PrintSelf(ostream& os, vtkIndent indent)

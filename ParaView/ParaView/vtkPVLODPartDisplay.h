@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    vtkPVPartDisplay.h
+  Module:    vtkPVLODPartDisplay.h
   Language:  C++
   Date:      $Date$
   Version:   $Revision$
@@ -39,43 +39,40 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-// .NAME vtkPVPartDisplay - Superclass for actor/mapper control.
+// .NAME vtkPVLODPartDisplay - This contains all the LOD, mapper and actor stuff.
 // .SECTION Description
-// This is a superclass for objects which display PVParts.
-// vtkPVRenderModules create displays.  This class is not meant to be
-// used directly, but it implements the simplest serial display
-// which has no levels of detail.
-
-#ifndef __vtkPVPartDisplay_h
-#define __vtkPVPartDisplay_h
+// This is the part displays for serial execution of paraview.
+// I handles all of the decimation levels of detail.
 
 
-#include "vtkObject.h"
+#ifndef __vtkPVLODPartDisplay_h
+#define __vtkPVLODPartDisplay_h
+
+
+#include "vtkPVPartDisplay.h"
 
 class vtkDataSet;
 class vtkPVApplication;
-class vtkPVDataInformation;
+class vtkPVLODPartDisplayInformation;
 class vtkPolyDataMapper;
 class vtkProp;
 class vtkProperty;
 class vtkPVPart;
-class vtkPVColorMap;
 
-class VTK_EXPORT vtkPVPartDisplay : public vtkObject
+class VTK_EXPORT vtkPVLODPartDisplay : public vtkPVPartDisplay
 {
 public:
-  static vtkPVPartDisplay* New();
-  vtkTypeRevisionMacro(vtkPVPartDisplay, vtkObject);
+  static vtkPVLODPartDisplay* New();
+  vtkTypeRevisionMacro(vtkPVLODPartDisplay, vtkPVPartDisplay);
   void PrintSelf(ostream& os, vtkIndent indent);
+
+  // Description:
+  // Set the number of bins per axes on the quadric decimation filter.
+  virtual void SetLODResolution(int res);
 
   // Description:
   // Toggles the mappers to use immediate mode rendering or display lists.
   virtual void SetUseImmediateMode(int val);
-
-  // Description:
-  // Turns visibilioty on or off.
-  virtual void SetVisibility(int v);
-  vtkGetMacro(Visibility,int);
 
   // Description:
   // Change the color mode to map scalars or 
@@ -83,20 +80,9 @@ public:
   // MapScalarsOff only works when coloring by an array 
   // on unsigned chars with 1 or 3 components.
   virtual void SetDirectColorFlag(int val);
-  vtkGetMacro(DirectColorFlag, int);
   virtual void SetScalarVisibility(int val);
   virtual void ColorByArray(vtkPVColorMap *colorMap, int field);
 
-  // Description:
-  // This just sets the color of the property.
-  // you also have to set scalar visiblity to off.
-  virtual void SetColor(float r, float g, float b);
-
-  // Description:
-  // This also creates the vtk objects for the composite.
-  // (actor, mapper, ...)
-  virtual void SetPVApplication(vtkPVApplication *pvApp);
-  vtkGetObjectMacro(PVApplication,vtkPVApplication);
 
   // Description:
   // Connect the geometry filter to the display pipeline.
@@ -104,83 +90,49 @@ public:
 
   // Description:
   // This method updates the piece that has been assigned to this process.
+  // It also gathers the data information.
   virtual void Update();
 
   // Description:
   // For flip books.
-  virtual void CacheUpdate(int idx, int total);  
-
-  //===================
-
-  vtkGetObjectMacro(Mapper, vtkPolyDataMapper);
-
-  // Description:
-  // Tcl name of the actor.
-  vtkGetStringMacro(PropTclName);  
-          
+  virtual void RemoveAllCaches();
+  virtual void CacheUpdate(int idx, int total);
+            
   //=============================================================== 
   // Description:
   // These access methods are neede for process module abstraction.
-  vtkGetStringMacro(PropertyTclName);
-  vtkProperty *GetProperty() { return this->Property;}
-  vtkProp *GetProp() { return this->Prop;}
-
-  // Description:
-  // Used for saving a batch file and in animation.
-  // I would like to get rid of access to this name.
-  vtkGetStringMacro(MapperTclName);
+  vtkGetStringMacro(LODUpdateSuppressorTclName);
+  vtkGetStringMacro(LODMapperTclName);
+  vtkGetStringMacro(LODDeciTclName);
     
   // Description:
-  // Not referenced counted.  I might get rid of this reference later.
-  virtual void SetPart(vtkPVPart* part) {this->Part = part;}
-  vtkPVPart* GetPart() {return this->Part;}
-
-  // Description:
-  // PVSource calls this when it gets modified.
-  void InvalidateGeometry();
+  // Returns an up to data information object.
+  // Do not keep a reference to this object.
+  vtkPVLODPartDisplayInformation* GetInformation();
 
 protected:
-  vtkPVPartDisplay();
-  ~vtkPVPartDisplay();
+  vtkPVLODPartDisplay();
+  ~vtkPVLODPartDisplay();
   
-  virtual void RemoveAllCaches();
-
-  // I might get rid of this reference.
-  vtkPVPart* Part;
-
-  vtkPVApplication *PVApplication;
-
-  int DirectColorFlag;
-  int Visibility;
-
-  // Problems with vtkLODActor led me to use these.
-  vtkProperty *Property;
-  vtkProp *Prop;
-        
-  char *PropTclName;
-  vtkSetStringMacro(PropTclName);
+  char *LODMapperTclName;
+  vtkSetStringMacro(LODMapperTclName);
   
-  char *PropertyTclName;
-  vtkSetStringMacro(PropertyTclName);
-  
-  char *MapperTclName;
-  vtkSetStringMacro(MapperTclName);
-
-  char *UpdateSuppressorTclName;
-  vtkSetStringMacro(UpdateSuppressorTclName);
+  char *LODDeciTclName;
+  vtkSetStringMacro(LODDeciTclName);
     
-  // Here to create unique names.
-  int InstanceCount;
-
-  int GeometryIsValid;
-
-  vtkPolyDataMapper *Mapper;
-
-  // This method gets called by SetPVApplication.
+  char *LODUpdateSuppressorTclName;
+  vtkSetStringMacro(LODUpdateSuppressorTclName);
+  
+  // Description:
+  // This method should be called immediately after the object is constructed.
+  // It create VTK objects which have to exeist on all processes.
   virtual void CreateParallelTclObjects(vtkPVApplication *pvApp);
 
-  vtkPVPartDisplay(const vtkPVPartDisplay&); // Not implemented
-  void operator=(const vtkPVPartDisplay&); // Not implemented
+  vtkPVLODPartDisplayInformation* Information;
+  int InformationIsValid;
+
+  vtkPVLODPartDisplay(const vtkPVLODPartDisplay&); // Not implemented
+  void operator=(const vtkPVLODPartDisplay&); // Not implemented
 };
 
 #endif

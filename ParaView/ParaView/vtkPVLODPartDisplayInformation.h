@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    vtkPVRenderModuleUI.cxx
+  Module:    vtkPVLODPartDisplayInformation.h
   Language:  C++
   Date:      $Date$
   Version:   $Revision$
@@ -39,77 +39,56 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-#include "vtkPVRenderModuleUI.h"
-#include "vtkObjectFactory.h"
-#include "vtkPVApplication.h"
-#include "vtkPVRenderModule.h"
+// .NAME vtkPVLODPartDisplayInformation - Holds memory size of geometry.
+// .SECTION Description
+// This information object collects the memory size of the high res geometry
+// and the LOD geometry.  They are used to determine when to use the
+// LOD and when to collect geometry for local rendering.
+
+#ifndef __vtkPVLODPartDisplayInformation_h
+#define __vtkPVLODPartDisplayInformation_h
 
 
-
-//----------------------------------------------------------------------------
-vtkStandardNewMacro(vtkPVRenderModuleUI);
-vtkCxxRevisionMacro(vtkPVRenderModuleUI, "1.4");
-
-int vtkPVRenderModuleUICommand(ClientData cd, Tcl_Interp *interp,
-                             int argc, char *argv[]);
+#include "vtkPVInformation.h"
 
 
-//----------------------------------------------------------------------------
-vtkPVRenderModuleUI::vtkPVRenderModuleUI()
+class VTK_EXPORT vtkPVLODPartDisplayInformation : public vtkPVInformation
 {
-  this->CommandFunction = vtkPVRenderModuleUICommand;
-}
+public:
+  static vtkPVLODPartDisplayInformation* New();
+  vtkTypeRevisionMacro(vtkPVLODPartDisplayInformation, vtkPVInformation);
+  void PrintSelf(ostream& os, vtkIndent indent);
 
+  // Description:
+  // Memory sizes of full resolution geometry and decimated geometry 
+  // summed over all processes.
+  vtkGetMacro(GeometryMemorySize, unsigned long);
+  vtkGetMacro(LODGeometryMemorySize, unsigned long);
 
-//----------------------------------------------------------------------------
-vtkPVRenderModuleUI::~vtkPVRenderModuleUI()
-{
-}
+  // Description:
+  // Transfer information about a single object into
+  // this object.
+  virtual void CopyFromObject(vtkObject* data);
+  virtual void CopyFromMessage(unsigned char* msg);
 
-//----------------------------------------------------------------------------
-vtkPVApplication* vtkPVRenderModuleUI::GetPVApplication()
-{
-  if (this->Application == NULL)
-    {
-    return NULL;
-    }
+  // Description:
+  // Merge another information object.
+  virtual void AddInformation(vtkPVInformation* info);
   
-  if (this->Application->IsA("vtkPVApplication"))
-    {  
-    return (vtkPVApplication*)(this->Application);
-    }
-  else
-    {
-    vtkErrorMacro("Bad typecast");
-    return NULL;
-    } 
-}
+  // Description:
+  // Serialize message.
+  virtual int GetMessageLength(); 
+  virtual void WriteMessage(unsigned char* msg);
 
-//----------------------------------------------------------------------------
-// Not needed in superclass.
-void vtkPVRenderModuleUI::SetRenderModule(vtkPVRenderModule *)
-{
-}
+protected:
+  vtkPVLODPartDisplayInformation() {};
+  ~vtkPVLODPartDisplayInformation() {};
 
+  unsigned long GeometryMemorySize;
+  unsigned long LODGeometryMemorySize;
 
-//----------------------------------------------------------------------------
-void vtkPVRenderModuleUI::Create(vtkKWApplication* app, const char *)
-{
-  if (this->Application)
-    {
-    vtkErrorMacro("Widget has already been created.");
-    return;
-    }
+  vtkPVLODPartDisplayInformation(const vtkPVLODPartDisplayInformation&); // Not implemented
+  void operator=(const vtkPVLODPartDisplayInformation&); // Not implemented
+};
 
-  this->SetApplication(app);
-
-  // Create this widgets frame.
-  this->Script("frame %s -bd 0",this->GetWidgetName());
-}
-
-//----------------------------------------------------------------------------
-void vtkPVRenderModuleUI::PrintSelf(ostream& os, vtkIndent indent)
-{
-  this->Superclass::PrintSelf(os,indent);
-}
-
+#endif

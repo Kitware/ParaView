@@ -121,10 +121,6 @@ public:
   vtkPVApplication *GetPVApplication();
 
   // Description:
-  // Computes the reduction factor to use in compositing.
-  //void StartRender();
-  
-  // Description:
   // Composites
   void Render();
   void EventuallyRender();
@@ -137,27 +133,14 @@ public:
   void UpdateTclButAvoidRendering();
   
   // Description:
-  // Update all the actors.
-  //void Update();
-
-  // Description:
   // Callback method bound to expose or configure events.
   void Exposed();
   void Configured();
   
   // Description:
-  // Are we currently in interactive mode?
-  int IsInteractive() { return this->Interactive; }
-  
-  // Description:
   // My version.
   vtkRenderer *GetRenderer();
   vtkRenderWindow *GetRenderWindow();
-  //const char *GetRenderWindowTclName() {return this->RenderWindowTclName;}
-
-  // Description:
-  // The center of rotation picker needs the compositers zbuffer.
-  //vtkPVTreeComposite *GetComposite() {return this->Composite;}
 
   // Description:
   // Update the navigation window for a particular source
@@ -277,14 +260,7 @@ protected:
   ~vtkPVRenderView();
 
   void CalculateBBox(char* name, int bbox[4]);
-
-  // This is used before a render to make sure all visible sources
-  // have been updated.  It returns 1 if all the data has been collected
-  // and the render should be local.
-  //int UpdateAllPVData(int interactive);
  
-  int Interactive;
-    
   vtkKWLabeledFrame *StandardViewsFrame;
   vtkKWPushButton   *XMaxViewButton; 
   vtkKWPushButton   *XMinViewButton; 

@@ -41,6 +41,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "vtkPVMPIProcessModule.h"
 #include "vtkObjectFactory.h"
+#include "vtkInstantiator.h"
 
 #include "vtkToolkits.h"
 #include "vtkPVConfig.h"
@@ -66,7 +67,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkPVPart.h"
 #include "vtkPVPartDisplay.h"
-#include "vtkPVDataInformation.h"
+#include "vtkPVInformation.h"
 
 
 
@@ -88,7 +89,7 @@ void vtkPVSlaveScript(void *localArg, void *remoteArg,
 
  //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVMPIProcessModule);
-vtkCxxRevisionMacro(vtkPVMPIProcessModule, "1.13");
+vtkCxxRevisionMacro(vtkPVMPIProcessModule, "1.14");
 
 int vtkPVMPIProcessModuleCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -290,10 +291,6 @@ void vtkPVMPIProcessModule::RemoteSimpleScript(int remoteId, const char *str)
 
 
 
-
-
-
-
 //----------------------------------------------------------------------------
 int vtkPVMPIProcessModule::GetNumberOfPartitions()
 {
@@ -308,171 +305,68 @@ int vtkPVMPIProcessModule::GetNumberOfPartitions()
 
 //----------------------------------------------------------------------------
 // This method is broadcast to all processes.
-void vtkPVMPIProcessModule::GatherDataInformation(vtkSource *deci)
+void vtkPVMPIProcessModule::GatherInformationInternal(char* infoClassName, 
+                                                      vtkObject *object)
 {
-  vtkDataObject** dataObjects;
-  vtkSource* geo;
-  vtkDataObject* geoData;
-  vtkDataObject* deciData;
-  vtkDataSet* data;
-  int length;
-  unsigned char *msg;
+  int msgLength;
+  unsigned char* msg;
   int myId = this->Controller->GetLocalProcessId();
-  vtkPVDataInformation *tmp;
 
-  if (deci == NULL)
+  if (object == NULL)
     {
-    vtkErrorMacro("Deci tcl name must be wrong.");
-    return;
-    }
-
-  // Get the data object form the decimate filter.
-  // This is a bit of a hack. Maybe we should have a PVPart object
-  // on all processes.
-  // Sanity checks to avoid slim chance of segfault.
-  dataObjects = deci->GetOutputs(); 
-  if (dataObjects == NULL || dataObjects[0] == NULL)
-    {
-    vtkErrorMacro("Could not get deci output.");
-    return;
-    }
-  deciData = dataObjects[0];
-  dataObjects = deci->GetInputs(); 
-  if (dataObjects == NULL || dataObjects[0] == NULL)
-    {
-    vtkErrorMacro("Could not get deci input.");
-    return;
-    }
-  geoData = dataObjects[0];
-  geo = geoData->GetSource();
-  if (geo == NULL)
-    {
-    vtkErrorMacro("Could not get geo.");
-    return;
-    }
-  dataObjects = geo->GetInputs(); 
-  if (dataObjects == NULL || dataObjects[0] == NULL)
-    {
-    vtkErrorMacro("Could not get geo input.");
-    return;
-    }
-  data = vtkDataSet::SafeDownCast(dataObjects[0]);
-  if (data == NULL)
-    {
-    vtkErrorMacro("It couldn't be a vtkDataObject???");
+    vtkErrorMacro("Object tcl name must be wrong.");
     return;
     }
 
-  tmp = vtkPVDataInformation::New();
+  // Create a temporary information object.
+  vtkObject* o = vtkInstantiator::CreateInstance(infoClassName);
+  vtkPVInformation* tmpInfo = vtkPVInformation::SafeDownCast(o);
+  if (tmpInfo == NULL)
+    {
+    vtkErrorMacro("Could not create information object " << infoClassName);
+    if (o) { o->Delete(); }
+    // How to exit without blocking ???
+    return;
+    }
+  o = NULL;
+  
   if (myId != 0)
     {
-    tmp->CopyFromData(data);
-    tmp->SetGeometryMemorySize(geoData->GetActualMemorySize());
-    tmp->SetLODMemorySize(deciData->GetActualMemorySize());
-    msg = tmp->NewMessage(length);
-    this->Controller->Send(&length, 1, 0, 398798);
-    this->Controller->Send(msg, length, 0, 398799);
+    int msgLength;
+    unsigned char* msg;
+
+    tmpInfo->CopyFromObject(object);
+    msgLength = tmpInfo->GetMessageLength();
+    msg = new unsigned char[msgLength];
+    tmpInfo->WriteMessage(msg);
+    this->Controller->Send(&msgLength, 1, 0, 498798);
+    this->Controller->Send(msg, msgLength, 0, 498799);
     delete [] msg;
     msg = NULL;
-    tmp->Delete();
-    tmp = NULL;
+    tmpInfo->Delete();
+    tmpInfo = NULL;
     return;
     }
 
   // Node 0.
   int numProcs = this->Controller->GetNumberOfProcesses();
   int idx;
-  this->TemporaryInformation->CopyFromData(data);
-  this->TemporaryInformation->SetGeometryMemorySize(geoData->GetActualMemorySize());
-  this->TemporaryInformation->SetLODMemorySize(deciData->GetActualMemorySize());
+  this->TemporaryInformation->CopyFromObject(object);
   for (idx = 1; idx < numProcs; ++idx)
     {
-    this->Controller->Receive(&length, 1, idx, 398798);
-    msg = new unsigned char[length];
-    this->Controller->Receive(msg, length, idx, 398799);
-    tmp->CopyFromMessage(msg);
-    this->TemporaryInformation->AddInformation(tmp);
+    this->Controller->Receive(&msgLength, 1, idx, 498798);
+    msg = new unsigned char[msgLength];
+    this->Controller->Receive(msg, msgLength, idx, 498799);
+    tmpInfo->CopyFromMessage(msg);
+    this->TemporaryInformation->AddInformation(tmpInfo);
     delete [] msg;
     msg = NULL;
     }
-  tmp->Delete();
-  tmp = NULL;
+  tmpInfo->Delete();
+  tmpInfo = NULL;
 }    
 
 
-//----------------------------------------------------------------------------
-void vtkPVMPIProcessModule::InitializePartition(vtkPVPartDisplay *partDisplay)
-{
-  int numProcs, id;
-  vtkPVApplication* pvApp = this->GetPVApplication();
-
-  // Hard code assignment based on processes.
-  numProcs = this->GetNumberOfPartitions();
-
-  // Special debug situation. Only generate half the data.
-  // This allows us to debug the parallel features of the
-  // application and VTK on only one process.
-  int debugNum = numProcs;
-  if (pvApp->GetUseTiledDisplay())
-    {
-    this->Script("%s SetPiece 0", partDisplay->GetMapperTclName());
-    this->Script("%s SetUpdatePiece 0", partDisplay->GetUpdateSuppressorTclName());
-    this->Script("%s SetPiece 0", partDisplay->GetLODMapperTclName());
-    this->Script("%s SetUpdatePiece 0", partDisplay->GetLODUpdateSuppressorTclName());
-    this->Script("%s SetNumberOfPieces %d",
-                 partDisplay->GetMapperTclName(), 0);
-    this->Script("%s SetUpdateNumberOfPieces %d",
-                 partDisplay->GetUpdateSuppressorTclName(), 0);
-    this->Script("%s SetNumberOfPieces %d", 
-                 partDisplay->GetLODMapperTclName(), 0);
-    this->Script("%s SetUpdateNumberOfPieces %d",
-                 partDisplay->GetLODUpdateSuppressorTclName(), 0);
-    for (id = 1; id < numProcs; ++id)
-      {
-      this->RemoteScript(id, "%s SetNumberOfPieces %d",
-                         partDisplay->GetMapperTclName(), debugNum-1);
-      this->RemoteScript(id, "%s SetPiece %d", 
-                         partDisplay->GetMapperTclName(), id-1);
-      this->RemoteScript(id, "%s SetUpdateNumberOfPieces %d",
-                         partDisplay->GetUpdateSuppressorTclName(), debugNum-1);
-      this->RemoteScript(id, "%s SetUpdatePiece %d", 
-                         partDisplay->GetUpdateSuppressorTclName(), id-1);
-      this->RemoteScript(id, "%s SetNumberOfPieces %d",
-                         partDisplay->GetLODMapperTclName(), debugNum-1);
-      this->RemoteScript(id, "%s SetPiece %d", 
-                         partDisplay->GetLODMapperTclName(), id-1);
-      this->RemoteScript(id, "%s SetUpdateNumberOfPieces %d",
-                         partDisplay->GetLODUpdateSuppressorTclName(), debugNum-1);
-      this->RemoteScript(id, "%s SetUpdatePiece %d", 
-                         partDisplay->GetLODUpdateSuppressorTclName(), id-1);
-      }
-    }
-  else 
-    {
-    if (getenv("PV_DEBUG_HALF") != NULL)
-      {
-      debugNum *= 2;
-      }
-    for (id = 0; id < numProcs; ++id)
-      {
-      this->RemoteScript(id, "%s SetNumberOfPieces %d",
-                         partDisplay->GetMapperTclName(), debugNum);
-      this->RemoteScript(id, "%s SetPiece %d", partDisplay->GetMapperTclName(), id);
-      this->RemoteScript(id, "%s SetUpdateNumberOfPieces %d",
-                         partDisplay->GetUpdateSuppressorTclName(), debugNum);
-      this->RemoteScript(id, "%s SetUpdatePiece %d", 
-                         partDisplay->GetUpdateSuppressorTclName(), id);
-      this->RemoteScript(id, "%s SetNumberOfPieces %d",
-                         partDisplay->GetLODMapperTclName(), debugNum);
-      this->RemoteScript(id, "%s SetPiece %d", 
-                         partDisplay->GetLODMapperTclName(), id);
-      this->RemoteScript(id, "%s SetUpdateNumberOfPieces %d",
-                         partDisplay->GetLODUpdateSuppressorTclName(), debugNum);
-      this->RemoteScript(id, "%s SetUpdatePiece %d", 
-                         partDisplay->GetLODUpdateSuppressorTclName(), id);
-      }
-    }
-}
 
 //----------------------------------------------------------------------------
 void vtkPVMPIProcessModule::PrintSelf(ostream& os, vtkIndent indent)

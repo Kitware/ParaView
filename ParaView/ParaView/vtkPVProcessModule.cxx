@@ -53,7 +53,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
 #include "vtkPVConfig.h"
-#include "vtkPVDataInformation.h"
+#include "vtkPVInformation.h"
 #include "vtkPVPart.h"
 #include "vtkPVPartDisplay.h"
 #include "vtkPVPartDisplay.h"
@@ -83,7 +83,7 @@ struct vtkPVArgs
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProcessModule);
-vtkCxxRevisionMacro(vtkPVProcessModule, "1.19");
+vtkCxxRevisionMacro(vtkPVProcessModule, "1.20");
 
 int vtkPVProcessModuleCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -298,101 +298,41 @@ int vtkPVProcessModule::GetNumberOfPartitions()
 
 
 //----------------------------------------------------------------------------
-void vtkPVProcessModule::GatherDataInformation(vtkPVDataInformation* info, 
-                                               char* deciTclName)
+void vtkPVProcessModule::GatherInformation(vtkPVInformation* info, 
+                                           char* objectTclName)
 {
-  // This ivar is so temprary, we do not need to increase the reference count.
+  // Just a simple way of passing the information object to the next method.
   this->TemporaryInformation = info;
-  this->BroadcastScript("[$Application GetProcessModule] GatherDataInformation %s",
-                        deciTclName); 
+  // Some objects are not created on the client (data.
+  this->ServerScript("[$Application GetProcessModule] GatherInformationInternal %s %s",
+                     info->GetClassName(), objectTclName); 
   this->TemporaryInformation = NULL; 
 }
 
 
 //----------------------------------------------------------------------------
-void vtkPVProcessModule::GatherDataInformation(vtkSource *deci)
+void vtkPVProcessModule::GatherInformationInternal(char*, vtkObject* object)
 {
-  vtkDataObject** dataObjects;
-  vtkSource* geo;
-  vtkDataObject* geoData;
-  vtkDataObject* deciData;
-  vtkDataSet* data;
-
-  if (deci == NULL)
+  // This class is used only for one processes.
+  if (this->TemporaryInformation == NULL)
     {
-    vtkErrorMacro("Deci tcl name must be wrong.");
+    vtkErrorMacro("Information argument not set.");
+    return;
+    }
+  if (object == NULL)
+    {
+    vtkErrorMacro("Object tcl name must be wrong.");
     return;
     }
 
-  // Get the data object form the decimate filter.
-  // This is a bit of a hack. Maybe we should have a PVPart object
-  // on all processes.
-  // Sanity checks to avoid slim chance of segfault.
-  dataObjects = deci->GetOutputs(); 
-  if (dataObjects == NULL || dataObjects[0] == NULL)
-    {
-    vtkErrorMacro("Could not get deci output.");
-    return;
-    }
-  deciData = dataObjects[0];
-  dataObjects = deci->GetInputs(); 
-  if (dataObjects == NULL || dataObjects[0] == NULL)
-    {
-    vtkErrorMacro("Could not get deci input.");
-    return;
-    }
-  geoData = dataObjects[0];
-  geo = geoData->GetSource();
-  if (geo == NULL)
-    {
-    vtkErrorMacro("Could not get geo.");
-    return;
-    }
-  dataObjects = geo->GetInputs(); 
-  if (dataObjects == NULL || dataObjects[0] == NULL)
-    {
-    vtkErrorMacro("Could not get geo input.");
-    return;
-    }
-  data = vtkDataSet::SafeDownCast(dataObjects[0]);
-  if (data == NULL)
-    {
-    vtkErrorMacro("It couldn't be a vtkDataObject???");
-    return;
-    }
-
-  this->TemporaryInformation->CopyFromData(data);
-  this->TemporaryInformation->SetGeometryMemorySize(geoData->GetActualMemorySize());
-  this->TemporaryInformation->SetLODMemorySize(deciData->GetActualMemorySize());
+  this->TemporaryInformation->CopyFromObject(object);
  }
 
 
 
 
-//----------------------------------------------------------------------------
-void vtkPVProcessModule::InitializePartition(vtkPVPartDisplay *pDisp)
-{
-  int numProcs = 1;
 
-  if (getenv("PV_DEBUG_HALF") != NULL)
-    {
-    numProcs = 2;
-    }
-  this->Script("%s SetNumberOfPieces %d",
-               pDisp->GetMapperTclName(), numProcs);
-  this->Script("%s SetPiece %d", pDisp->GetMapperTclName(), 0);
-  this->Script("%s SetUpdateNumberOfPieces %d",
-               pDisp->GetUpdateSuppressorTclName(), numProcs);
-  this->Script("%s SetUpdatePiece %d", 
-               pDisp->GetUpdateSuppressorTclName(), 0);
-  this->Script("%s SetNumberOfPieces %d",
-               pDisp->GetLODMapperTclName(), numProcs);
-  this->Script("%s SetPiece %d", pDisp->GetLODMapperTclName(), 0);
-  this->Script("%s SetUpdateNumberOfPieces %d",
-               pDisp->GetLODUpdateSuppressorTclName(), numProcs);
-  this->Script("%s SetUpdatePiece %d", 
-               pDisp->GetLODUpdateSuppressorTclName(), 0);
-}
+
 
 
 

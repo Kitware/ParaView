@@ -67,6 +67,7 @@ class vtkPVWindow;
 class vtkRenderer;
 class vtkRenderWindow;
 class vtkCollection;
+class vtkPVPartDisplay;
 
 class VTK_EXPORT vtkPVRenderModule : public vtkObject
 {
@@ -97,7 +98,7 @@ public:
 
   // Description:
   // Are we currently in interactive mode?
-  int IsInteractive() { return this->Interactive; }
+  //int IsInteractive() { return this->Interactive; }
   
   // Description:
   // My version.
@@ -140,24 +141,39 @@ public:
   // This is necessary for picking the center of rotation.
   virtual float GetZBufferValue(int x, int y);
 
+  // Description:
+  // This is just a convenient spot to keep this flag.
+  // Render view uses this to descide whether to recompute the
+  // total memory size of visible geometry.  This is necessary
+  // to decide between collection vs. distributed rendering.
+  // When we create rendering modules, the render view will be
+  // integrated with the vtkPVProcessModule and vtkPVParts and
+  // this flag can be moved.
+  vtkSetMacro(TotalVisibleMemorySizeValid, int);
+  vtkGetMacro(TotalVisibleMemorySizeValid, int);
+
 protected:
   vtkPVRenderModule();
   ~vtkPVRenderModule();
+
+  // Subclass can create their own vtkPVPartDisplay object by
+  // implementing this method.
+  virtual vtkPVPartDisplay* CreatePartDisplay();
 
   // This collection keeps a reference to all PartDisplays created
   // by this module.
   vtkCollection* PartDisplays;
 
   // This is used before a render to make sure all visible sources
-  // have been updated.  It returns 1 if all the data has been collected
-  // and the render should be local.
-  virtual int UpdateAllPVData(int interactive);
+  // have been updated.
+  virtual void UpdateAllPVData();
  
   vtkPVApplication* PVApplication;
   vtkRenderer*      Renderer;
   vtkRenderWindow*  RenderWindow;
 
-  int Interactive;
+  //int Interactive;
+  int TotalVisibleMemorySizeValid;
   
   char *RendererTclName;
   vtkSetStringMacro(RendererTclName);  

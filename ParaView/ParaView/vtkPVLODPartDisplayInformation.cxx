@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    vtkPVRenderModuleUI.cxx
+  Module:    vtkPVLODPartDisplayInformation.cxx
   Language:  C++
   Date:      $Date$
   Version:   $Revision$
@@ -39,77 +39,97 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-#include "vtkPVRenderModuleUI.h"
+#include "vtkPVLODPartDisplayInformation.h"
 #include "vtkObjectFactory.h"
-#include "vtkPVApplication.h"
-#include "vtkPVRenderModule.h"
-
-
-
-//----------------------------------------------------------------------------
-vtkStandardNewMacro(vtkPVRenderModuleUI);
-vtkCxxRevisionMacro(vtkPVRenderModuleUI, "1.4");
-
-int vtkPVRenderModuleUICommand(ClientData cd, Tcl_Interp *interp,
-                             int argc, char *argv[]);
+#include "vtkDataObject.h"
+#include "vtkQuadricClustering.h"
 
 
 //----------------------------------------------------------------------------
-vtkPVRenderModuleUI::vtkPVRenderModuleUI()
+vtkStandardNewMacro(vtkPVLODPartDisplayInformation);
+vtkCxxRevisionMacro(vtkPVLODPartDisplayInformation, "1.1");
+
+//----------------------------------------------------------------------------
+void vtkPVLODPartDisplayInformation::CopyFromObject(vtkObject* object)
 {
-  this->CommandFunction = vtkPVRenderModuleUICommand;
-}
+  vtkDataObject** dataObjects;
+  vtkDataObject* geoData;
+  vtkDataObject* deciData;
+  vtkSource* deci;
 
-
-//----------------------------------------------------------------------------
-vtkPVRenderModuleUI::~vtkPVRenderModuleUI()
-{
-}
-
-//----------------------------------------------------------------------------
-vtkPVApplication* vtkPVRenderModuleUI::GetPVApplication()
-{
-  if (this->Application == NULL)
+  deci = vtkQuadricClustering::SafeDownCast(object);
+  if (deci == NULL)
     {
-    return NULL;
-    }
-  
-  if (this->Application->IsA("vtkPVApplication"))
-    {  
-    return (vtkPVApplication*)(this->Application);
-    }
-  else
-    {
-    vtkErrorMacro("Bad typecast");
-    return NULL;
-    } 
-}
-
-//----------------------------------------------------------------------------
-// Not needed in superclass.
-void vtkPVRenderModuleUI::SetRenderModule(vtkPVRenderModule *)
-{
-}
-
-
-//----------------------------------------------------------------------------
-void vtkPVRenderModuleUI::Create(vtkKWApplication* app, const char *)
-{
-  if (this->Application)
-    {
-    vtkErrorMacro("Widget has already been created.");
+    vtkErrorMacro("Could not downcast decimation filter.");
     return;
     }
 
-  this->SetApplication(app);
+  // Get the data object form the decimate filter.
+  // This is a bit of a hack. Maybe we should have a PVPart object
+  // on all processes.
+  // Sanity checks to avoid slim chance of segfault.
+  dataObjects = deci->GetOutputs(); 
+  if (dataObjects == NULL || dataObjects[0] == NULL)
+    {
+    vtkErrorMacro("Could not get deci output.");
+    return;
+    }
+  deciData = dataObjects[0];
+  dataObjects = deci->GetInputs(); 
+  if (dataObjects == NULL || dataObjects[0] == NULL)
+    {
+    vtkErrorMacro("Could not get deci input.");
+    return;
+    }
+  geoData = dataObjects[0];
 
-  // Create this widgets frame.
-  this->Script("frame %s -bd 0",this->GetWidgetName());
+  this->GeometryMemorySize = geoData->GetActualMemorySize();
+  this->LODGeometryMemorySize = deciData->GetActualMemorySize();
 }
 
 //----------------------------------------------------------------------------
-void vtkPVRenderModuleUI::PrintSelf(ostream& os, vtkIndent indent)
+void vtkPVLODPartDisplayInformation::CopyFromMessage(unsigned char* msg)
+{
+  memcpy((unsigned char*)&this->GeometryMemorySize, msg, sizeof(unsigned long));
+  msg += sizeof(unsigned long);
+  memcpy((unsigned char*)&this->LODGeometryMemorySize, msg, sizeof(unsigned long));  
+}
+
+//----------------------------------------------------------------------------
+void vtkPVLODPartDisplayInformation::AddInformation(vtkPVInformation* info)
+{
+  vtkPVLODPartDisplayInformation* pdInfo;
+
+  pdInfo = vtkPVLODPartDisplayInformation::SafeDownCast(info);
+  this->GeometryMemorySize += pdInfo->GetGeometryMemorySize();
+  this->LODGeometryMemorySize += pdInfo->GetLODGeometryMemorySize();
+}
+
+//----------------------------------------------------------------------------
+int vtkPVLODPartDisplayInformation::GetMessageLength()
+{
+  return 2 * static_cast<int>(sizeof(unsigned long));
+}
+
+//----------------------------------------------------------------------------
+void vtkPVLODPartDisplayInformation::WriteMessage(unsigned char* msg)
+{
+  memcpy(msg, (unsigned char*)&this->GeometryMemorySize, sizeof(unsigned long));
+  msg += sizeof(unsigned long);
+  memcpy(msg, (unsigned char*)&this->LODGeometryMemorySize, sizeof(unsigned long));  
+}
+
+//----------------------------------------------------------------------------
+void vtkPVLODPartDisplayInformation::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
+
+  os << indent << "GeometryMemorySize: " << this->GeometryMemorySize << endl;
+  os << indent << "LODGeometryMemorySize: " 
+     << this->LODGeometryMemorySize << endl;
 }
+
+  
+
+
 

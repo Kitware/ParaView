@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    vtkPVRenderModuleUI.cxx
+  Module:    vtkPVInformation.cxx
   Language:  C++
   Date:      $Date$
   Version:   $Revision$
@@ -39,77 +39,52 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-#include "vtkPVRenderModuleUI.h"
+#include "vtkPVInformation.h"
 #include "vtkObjectFactory.h"
-#include "vtkPVApplication.h"
-#include "vtkPVRenderModule.h"
-
 
 
 //----------------------------------------------------------------------------
-vtkStandardNewMacro(vtkPVRenderModuleUI);
-vtkCxxRevisionMacro(vtkPVRenderModuleUI, "1.4");
-
-int vtkPVRenderModuleUICommand(ClientData cd, Tcl_Interp *interp,
-                             int argc, char *argv[]);
-
+vtkStandardNewMacro(vtkPVInformation);
+vtkCxxRevisionMacro(vtkPVInformation, "1.1");
 
 //----------------------------------------------------------------------------
-vtkPVRenderModuleUI::vtkPVRenderModuleUI()
+void vtkPVInformation::CopyFromObject(vtkObject*)
 {
-  this->CommandFunction = vtkPVRenderModuleUICommand;
-}
-
-
-//----------------------------------------------------------------------------
-vtkPVRenderModuleUI::~vtkPVRenderModuleUI()
-{
+  vtkErrorMacro("CopyFromObject not implemented.");
 }
 
 //----------------------------------------------------------------------------
-vtkPVApplication* vtkPVRenderModuleUI::GetPVApplication()
+void vtkPVInformation::CopyFromMessage(unsigned char*)
 {
-  if (this->Application == NULL)
-    {
-    return NULL;
-    }
-  
-  if (this->Application->IsA("vtkPVApplication"))
-    {  
-    return (vtkPVApplication*)(this->Application);
-    }
-  else
-    {
-    vtkErrorMacro("Bad typecast");
-    return NULL;
-    } 
+  vtkErrorMacro("CopyFromMessage not implemented.");
 }
 
 //----------------------------------------------------------------------------
-// Not needed in superclass.
-void vtkPVRenderModuleUI::SetRenderModule(vtkPVRenderModule *)
+void vtkPVInformation::AddInformation(vtkPVInformation* info)
 {
-}
-
-
-//----------------------------------------------------------------------------
-void vtkPVRenderModuleUI::Create(vtkKWApplication* app, const char *)
-{
-  if (this->Application)
-    {
-    vtkErrorMacro("Widget has already been created.");
-    return;
-    }
-
-  this->SetApplication(app);
-
-  // Create this widgets frame.
-  this->Script("frame %s -bd 0",this->GetWidgetName());
+  vtkErrorMacro("AddInformation not implemented.");
 }
 
 //----------------------------------------------------------------------------
-void vtkPVRenderModuleUI::PrintSelf(ostream& os, vtkIndent indent)
+int vtkPVInformation::GetMessageLength()
+{
+  vtkErrorMacro("GetMessageLength not implemented.");
+  return 0;
+}
+
+//----------------------------------------------------------------------------
+void vtkPVInformation::WriteMessage(unsigned char*)
+{
+  vtkErrorMacro("WriteMessage not implemented.");
+}
+
+//----------------------------------------------------------------------------
+void vtkPVInformation::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
 }
+
+  
+
+
 

@@ -96,9 +96,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVRenderModule.h"
 #include "vtkPVArrayInformation.h"
 
+// Just for the definition of VTK_POINT_DATA_FIELD ...
+#include "vtkFieldDataToAttributeDataFilter.h"
+
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.205");
+vtkCxxRevisionMacro(vtkPVData, "1.206");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -1265,19 +1268,7 @@ void vtkPVData::SetActorColor(float r, float g, float b)
   for (idx = 0; idx < num; ++idx)
     {
     part = this->GetPVSource()->GetPart(idx);
-    pvApp->BroadcastScript("%s SetColor %f %f %f", 
-                           part->GetPartDisplay()->GetPropertyTclName(), 
-                           r, g, b);
-
-    // Add a bit of specular when just coloring by property.
-    pvApp->BroadcastScript("%s SetSpecular 0.1", 
-                           part->GetPartDisplay()->GetPropertyTclName());
-
-    pvApp->BroadcastScript("%s SetSpecularPower 100.0", 
-                           part->GetPartDisplay()->GetPropertyTclName());
-
-    pvApp->BroadcastScript("%s SetSpecularColor 1.0 1.0 1.0", 
-                           part->GetPartDisplay()->GetPropertyTclName());
+    part->GetPartDisplay()->SetColor(r, g, b);
     }
 }  
 
@@ -1286,11 +1277,6 @@ void vtkPVData::ChangeActorColor(float r, float g, float b)
 {
   vtkPVPart *part;
   part = this->GetPVSource()->GetPart();
-
-  if (part->GetPartDisplay()->GetMapper()->GetScalarVisibility())
-    {
-    return;
-    }
 
   this->AddTraceEntry("$kw(%s) ChangeActorColor %f %f %f",
                       this->GetTclName(), r, g, b);
@@ -1365,10 +1351,7 @@ void vtkPVData::ColorByPropertyInternal()
   for (idx = 0; idx < num; ++idx)
     {
     part = this->GetPVSource()->GetPart(idx);
-    pvApp->BroadcastScript("%s ScalarVisibilityOff", 
-                           part->GetPartDisplay()->GetMapperTclName());
-    pvApp->BroadcastScript("%s ScalarVisibilityOff", 
-                           part->GetPartDisplay()->GetLODMapperTclName());
+    part->GetPartDisplay()->SetScalarVisibility(0);
     }
 
   float *color = this->ColorButton->GetColor();
@@ -1435,29 +1418,7 @@ void vtkPVData::ColorByPointFieldInternal(const char *name, int numComps)
   for (idx = 0; idx < num; ++idx)
     {
     part = this->GetPVSource()->GetPart(idx);
-    // Turn off the specualr so it does not interfere with data.
-    pvApp->BroadcastScript("%s SetSpecular 0.0", 
-                           part->GetPartDisplay()->GetPropertyTclName());
-
-    pvApp->BroadcastScript("%s SetLookupTable %s", 
-                           part->GetPartDisplay()->GetMapperTclName(),
-                           this->PVColorMap->GetLookupTableTclName());
-    pvApp->BroadcastScript("%s ScalarVisibilityOn", 
-                           part->GetPartDisplay()->GetMapperTclName());
-    pvApp->BroadcastScript("%s SetScalarModeToUsePointFieldData",
-                           part->GetPartDisplay()->GetMapperTclName());
-    pvApp->BroadcastScript("%s SelectColorArray {%s}",
-                           part->GetPartDisplay()->GetMapperTclName(), name);
-
-    pvApp->BroadcastScript("%s SetLookupTable %s", 
-                           part->GetPartDisplay()->GetLODMapperTclName(),
-                           this->PVColorMap->GetLookupTableTclName());
-    pvApp->BroadcastScript("%s ScalarVisibilityOn", 
-                           part->GetPartDisplay()->GetLODMapperTclName());
-    pvApp->BroadcastScript("%s SetScalarModeToUsePointFieldData",
-                           part->GetPartDisplay()->GetLODMapperTclName());
-    pvApp->BroadcastScript("%s SelectColorArray {%s}",
-                           part->GetPartDisplay()->GetLODMapperTclName(), name);
+    part->GetPartDisplay()->ColorByArray(this->PVColorMap, VTK_POINT_DATA_FIELD);
     } 
   this->ColorButton->EnabledOff();
   this->UpdateDirectColorCheck(
@@ -1516,28 +1477,7 @@ void vtkPVData::ColorByCellFieldInternal(const char *name, int numComps)
   for (idx = 0; idx < num; ++idx)
     {
     part = this->GetPVSource()->GetPart(idx);
-    // Turn off the specualr so it does not interfere with data.
-    pvApp->BroadcastScript("%s SetSpecular 0.0", 
-                           part->GetPartDisplay()->GetPropertyTclName());
-    pvApp->BroadcastScript("%s SetLookupTable %s", 
-                           part->GetPartDisplay()->GetMapperTclName(),
-                           this->PVColorMap->GetLookupTableTclName());
-    pvApp->BroadcastScript("%s ScalarVisibilityOn", 
-                           part->GetPartDisplay()->GetMapperTclName());
-    pvApp->BroadcastScript("%s SetScalarModeToUseCellFieldData",
-                           part->GetPartDisplay()->GetMapperTclName());
-    pvApp->BroadcastScript("%s SelectColorArray {%s}",
-                           part->GetPartDisplay()->GetMapperTclName(), name);
-
-    pvApp->BroadcastScript("%s SetLookupTable %s", 
-                           part->GetPartDisplay()->GetLODMapperTclName(),
-                           this->PVColorMap->GetLookupTableTclName());
-    pvApp->BroadcastScript("%s ScalarVisibilityOn", 
-                           part->GetPartDisplay()->GetLODMapperTclName());
-    pvApp->BroadcastScript("%s SetScalarModeToUseCellFieldData",
-                           part->GetPartDisplay()->GetLODMapperTclName());
-    pvApp->BroadcastScript("%s SelectColorArray {%s}",
-                           part->GetPartDisplay()->GetLODMapperTclName(), name);
+    part->GetPartDisplay()->ColorByArray(this->PVColorMap, VTK_CELL_DATA_FIELD);
     }
 
   this->ColorButton->EnabledOff();
@@ -1890,12 +1830,8 @@ void vtkPVData::Initialize()
       pvApp->BroadcastScript("%s SetUseStrips %d", part->GetGeometryTclName(),
                              this->GetPVRenderView()->GetTriangleStripsCheck()->GetState());
       }
-    pvApp->BroadcastScript("%s SetImmediateModeRendering %d",
-                           part->GetPartDisplay()->GetMapperTclName(),
-                           this->GetPVRenderView()->GetImmediateModeCheck()->GetState());
-    pvApp->BroadcastScript("%s SetImmediateModeRendering %d", 
-                           part->GetPartDisplay()->GetLODMapperTclName(),
-                           this->GetPVRenderView()->GetImmediateModeCheck()->GetState());
+    part->GetPartDisplay()->SetUseImmediateMode(
+                   this->GetPVRenderView()->GetImmediateModeCheck()->GetState());
     }
 }
 

@@ -55,7 +55,7 @@ class vtkKWLoadSaveDialog;
 class vtkMapper;
 class vtkMultiProcessController;
 class vtkPVApplication;
-class vtkPVDataInformation;
+class vtkPVInformation;
 class vtkPVPart;
 class vtkPVPartDisplay;
 class vtkSource;
@@ -110,16 +110,10 @@ public:
   vtkGetObjectMacro(Controller, vtkMultiProcessController);
 
   // Description:
-  // This has migrated into get PVPartInformation.
-  // If there were PVParts on all processes, the API would be simpler.
-  // User calls the first method passing info object.
-  // Second method gets broadcasted to all procs.
-  // I dislike this, but the info get temporarily stored as an ivar.
-  // If vtkPVPart existed on all processes, 
-  // it would make this method cleaner.
-  void GatherDataInformation(vtkPVDataInformation *info, 
-                             char* deciTclName); 
-  virtual void GatherDataInformation(vtkSource* deci);
+  // This is going to be a generic method of getting/gathering 
+  // information form the server.
+  virtual void GatherInformation(vtkPVInformation* info, char* objectTclName);
+  virtual void GatherInformationInternal(char* infoClassName, vtkObject* object);
   
   // Description:
   // Get the partition piece.  -1 means no assigned piece.
@@ -129,10 +123,6 @@ public:
   // Get the number of processes participating in sharing the data.
   virtual int GetNumberOfPartitions();
   
-  // Description:
-  // This initializes the data object to request the correct partiaion.
-  virtual void InitializePartition(vtkPVPartDisplay* partDisplay);
-
   // Description:
   // This executes a script on process 0 of the server.
   // Used mainly for client server operation.
@@ -170,7 +160,7 @@ protected:
   void InitializeTclMethodImplementations();
   
   vtkMultiProcessController *Controller;
-  vtkPVDataInformation *TemporaryInformation;
+  vtkPVInformation *TemporaryInformation;
 
 private:  
   vtkPVProcessModule(const vtkPVProcessModule&); // Not implemented

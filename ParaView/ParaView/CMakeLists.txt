@@ -34,6 +34,9 @@ SET( ParaView_SRCS
   vtkPVColorMap.cxx
   vtkPVComponentSelection.cxx
   vtkPVCompositeBuffer.cxx
+  vtkPVCompositePartDisplay.cxx
+  vtkPVCompositeRenderModule.cxx
+  vtkPVCompositeRenderModuleUI.cxx
   vtkPVCompositeUtilities.cxx
   vtkPVConnectDialog.cxx
   vtkPVConnectivityFilter.cxx
@@ -67,6 +70,7 @@ SET( ParaView_SRCS
   vtkPVImageGradientMagnitude.cxx
   vtkPVImageMedian3D.cxx
   vtkPVImplicitPlaneWidget.cxx
+  vtkPVInformation.cxx
   vtkPVInitialize.cxx
   vtkPVInputArrayRequirement.cxx
   vtkPVInputFixedTypeRequirement.cxx
@@ -82,6 +86,8 @@ SET( ParaView_SRCS
   vtkPVJoystickFlyIn.cxx
   vtkPVJoystickFlyOut.cxx
   vtkPVLODActor.cxx
+  vtkPVLODPartDisplay.cxx
+  vtkPVLODPartDisplayInformation.cxx
   vtkPVLODRenderModule.cxx
   vtkPVLODRenderModuleUI.cxx
   vtkPVLabel.cxx

@@ -83,10 +83,6 @@ public:
   virtual void Create(vtkKWApplication *app, const char *);
   
   // Description:
-  // Casts to vtkPVApplication.
-  vtkPVApplication *GetPVApplication();
-  
-  // Description:
   // The subclass should implement this method and 
   // downcast it to the right type.  It can then access
   // any unique methods of the specific render module.
@@ -95,18 +91,6 @@ public:
   // Description:
   // Callback for the interrupt render check button
   void RenderInterruptsEnabledCheckCallback();
-  
-  // Description:
-  // Callback for the use char check button.  
-  // These are only public because they are callbacks.
-  // Cannot be used from a script because they do not 
-  // change the state of the check.
-  void CompositeWithFloatCallback();
-  void CompositeWithFloatCallback(int val);
-  void CompositeWithRGBACallback();
-  void CompositeWithRGBACallback(int val);
-  void CompositeCompressionCallback();
-  void CompositeCompressionCallback(int val);
   
   // Description:
   // Threshold for individual actors as number of points.
@@ -141,21 +125,6 @@ public:
   vtkGetMacro(LODResolution, int);
   vtkBooleanMacro(LODResolution, int);
 
-  // Description:
-  // Threshold for collecting data to a single process (MBytes).
-  void CollectThresholdScaleCallback();
-
-  // Description:
-  // This method sets the threshold without tracing or
-  // changing the UI scale.
-  void SetCollectThresholdInternal(float threshold);
-
-  // Description:
-  // This methods can be used from a script.  
-  // "Set" sets the value of the scale, and adds an entry to the trace.
-  void SetCollectThreshold(float);
-  vtkGetMacro(CollectThreshold, float);
-  vtkBooleanMacro(CollectThreshold, float);
 
 protected:
   vtkPVLODRenderModuleUI();
@@ -166,11 +135,7 @@ protected:
   int UseReductionFactor;
   
   vtkKWLabeledFrame *LODFrame;
-  vtkKWLabeledFrame *ParallelRenderParametersFrame;
   vtkKWCheckButton *RenderInterruptsEnabledCheck;
-  vtkKWCheckButton *CompositeWithFloatCheck;
-  vtkKWCheckButton *CompositeWithRGBACheck;
-  vtkKWCheckButton *CompositeCompressionCheck;
 
   vtkKWWidget *LODScalesFrame;
   vtkKWLabel *LODResolutionLabel;
@@ -180,18 +145,9 @@ protected:
   vtkKWScale *LODThresholdScale;
   vtkKWLabel *LODThresholdValue;
 
-  vtkKWLabel *CollectThresholdLabel;
-  vtkKWScale *CollectThresholdScale;
-  vtkKWLabel *CollectThresholdValue;
-
   float LODThreshold;
   int LODResolution;
-  float CollectThreshold;
   int RenderInterruptsEnabled;
-
-  int CompositeWithFloatFlag;
-  int CompositeWithRGBAFlag;
-  int CompositeCompressionFlag;
 
   vtkPVLODRenderModuleUI(const vtkPVLODRenderModuleUI&); // Not implemented
   void operator=(const vtkPVLODRenderModuleUI&); // Not implemented

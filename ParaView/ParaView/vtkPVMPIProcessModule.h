@@ -92,8 +92,8 @@ public:
   virtual void BroadcastSimpleScript(const char *str);
 
   // Description:
-  // This method should eventually replace "CompleteArrays" ...
-  virtual void GatherDataInformation(vtkSource *deci);
+  // A method for getting generic information from the server.
+  virtual void GatherInformationInternal(char* infoClassName, vtkObject *object);
     
   // Description:
   // Get the partition number. -1 means no assigned partition.
@@ -103,11 +103,6 @@ public:
   // Get the number of processes participating in sharing the data.
   virtual int GetNumberOfPartitions();
   
-
-  // Description:
-  // This initializes the data object to request the correct partiaion.
-  virtual void InitializePartition(vtkPVPartDisplay *partDisplay);
-
 protected:
   vtkPVMPIProcessModule();
   ~vtkPVMPIProcessModule();

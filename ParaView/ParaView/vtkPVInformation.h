@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    vtkPVRenderModuleUI.cxx
+  Module:    vtkPVInformation.h
   Language:  C++
   Date:      $Date$
   Version:   $Revision$
@@ -39,77 +39,46 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-#include "vtkPVRenderModuleUI.h"
-#include "vtkObjectFactory.h"
-#include "vtkPVApplication.h"
-#include "vtkPVRenderModule.h"
+// .NAME vtkPVInformation - Superclass for information objects.
+// .SECTION Description
+// Subclasses of this class are used to get information from the server.
 
 
-
-//----------------------------------------------------------------------------
-vtkStandardNewMacro(vtkPVRenderModuleUI);
-vtkCxxRevisionMacro(vtkPVRenderModuleUI, "1.4");
-
-int vtkPVRenderModuleUICommand(ClientData cd, Tcl_Interp *interp,
-                             int argc, char *argv[]);
+#ifndef __vtkPVInformation_h
+#define __vtkPVInformation_h
 
 
-//----------------------------------------------------------------------------
-vtkPVRenderModuleUI::vtkPVRenderModuleUI()
+#include "vtkObject.h"
+
+
+class VTK_EXPORT vtkPVInformation : public vtkObject
 {
-  this->CommandFunction = vtkPVRenderModuleUICommand;
-}
+public:
+  static vtkPVInformation* New();
+  vtkTypeRevisionMacro(vtkPVInformation, vtkObject);
+  void PrintSelf(ostream& os, vtkIndent indent);
 
+  // Description:
+  // Transfer information about a single object into
+  // this object.
+  virtual void CopyFromObject(vtkObject* data);
+  virtual void CopyFromMessage(unsigned char* msg);
 
-//----------------------------------------------------------------------------
-vtkPVRenderModuleUI::~vtkPVRenderModuleUI()
-{
-}
-
-//----------------------------------------------------------------------------
-vtkPVApplication* vtkPVRenderModuleUI::GetPVApplication()
-{
-  if (this->Application == NULL)
-    {
-    return NULL;
-    }
+  // Description:
+  // Merge another information object.
+  virtual void AddInformation(vtkPVInformation* info);
   
-  if (this->Application->IsA("vtkPVApplication"))
-    {  
-    return (vtkPVApplication*)(this->Application);
-    }
-  else
-    {
-    vtkErrorMacro("Bad typecast");
-    return NULL;
-    } 
-}
+  // Description:
+  // Serialize message.
+  virtual int GetMessageLength(); 
+  virtual void WriteMessage(unsigned char* msg);
 
-//----------------------------------------------------------------------------
-// Not needed in superclass.
-void vtkPVRenderModuleUI::SetRenderModule(vtkPVRenderModule *)
-{
-}
+protected:
+  vtkPVInformation() {};
+  ~vtkPVInformation() {};
 
+  vtkPVInformation(const vtkPVInformation&); // Not implemented
+  void operator=(const vtkPVInformation&); // Not implemented
+};
 
-//----------------------------------------------------------------------------
-void vtkPVRenderModuleUI::Create(vtkKWApplication* app, const char *)
-{
-  if (this->Application)
-    {
-    vtkErrorMacro("Widget has already been created.");
-    return;
-    }
-
-  this->SetApplication(app);
-
-  // Create this widgets frame.
-  this->Script("frame %s -bd 0",this->GetWidgetName());
-}
-
-//----------------------------------------------------------------------------
-void vtkPVRenderModuleUI::PrintSelf(ostream& os, vtkIndent indent)
-{
-  this->Superclass::PrintSelf(os,indent);
-}
-
+#endif

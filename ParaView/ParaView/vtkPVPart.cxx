@@ -41,6 +41,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "vtkPVPart.h"
 #include "vtkPVPartDisplay.h"
+#include "vtkPVRenderModule.h"
 
 #include "vtkDataSetSurfaceFilter.h"
 #include "vtkImageData.h"
@@ -64,7 +65,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPart);
-vtkCxxRevisionMacro(vtkPVPart, "1.21");
+vtkCxxRevisionMacro(vtkPVPart, "1.22");
 
 
 int vtkPVPartCommand(ClientData cd, Tcl_Interp *interp,
@@ -178,11 +179,12 @@ void vtkPVPart::GatherDataInformation()
   vtkPVApplication *pvApp = this->GetPVApplication();
   vtkPVProcessModule *pm = pvApp->GetProcessModule();
 
-  pm->GatherDataInformation(this->DataInformation, 
-                            this->PartDisplay->GetLODDeciTclName());
+  pm->GatherInformation(this->DataInformation, 
+                        this->GetVTKDataTclName());
 
-  // Recompute total visibile memory size.
-  pvApp->SetTotalVisibleMemorySizeValid(0);
+  // Recompute total visibile memory size. !!!!!!!
+  // This should really be in vtkPVPartDisplay when it gathers its informantion.
+  pvApp->GetRenderModule()->SetTotalVisibleMemorySizeValid(0);
 
   // Look for a name defined in Field data.
   this->SetName(this->DataInformation->GetName());
@@ -262,6 +264,14 @@ void vtkPVPart::InsertExtractPiecesIfNecessary()
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
   vtkPVProcessModule* pm = pvApp->GetProcessModule();
+
+  static int hack = 1;
+  if (hack)
+    {
+    Sleep(15000);
+    hack = 0;
+    }
+
 
   pm->ServerScript("%s UpdateInformation", this->VTKDataTclName);
   pm->RootScript("%s GetMaximumNumberOfPieces", this->VTKDataTclName);

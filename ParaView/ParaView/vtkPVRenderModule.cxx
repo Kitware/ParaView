@@ -76,7 +76,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderModule);
-vtkCxxRevisionMacro(vtkPVRenderModule, "1.11");
+vtkCxxRevisionMacro(vtkPVRenderModule, "1.12");
 
 //int vtkPVRenderModuleCommand(ClientData cd, Tcl_Interp *interp,
 //                             int argc, char *argv[]);
@@ -89,7 +89,7 @@ vtkCxxRevisionMacro(vtkPVRenderModule, "1.11");
 vtkPVRenderModule::vtkPVRenderModule()
 {
   this->PVApplication = NULL;
-  this->Interactive = 0;
+  this->TotalVisibleMemorySizeValid = 0;
   
   this->PartDisplays = vtkCollection::New();
 
@@ -289,6 +289,13 @@ void vtkPVRenderModule::ComputeVisiblePropBounds(float bds[6])
     }
 }
 
+
+//----------------------------------------------------------------------------
+vtkPVPartDisplay* vtkPVRenderModule::CreatePartDisplay()
+{
+  return vtkPVPartDisplay::New();
+}
+
 //----------------------------------------------------------------------------
 void vtkPVRenderModule::AddPVSource(vtkPVSource *pvs)
 {
@@ -308,7 +315,7 @@ void vtkPVRenderModule::AddPVSource(vtkPVSource *pvs)
     {
     part = pvs->GetPart(idx);
     // Create a part display for each part.
-    pDisp = vtkPVPartDisplay::New();
+    pDisp = this->CreatePartDisplay();
     this->PartDisplays->AddItem(pDisp);
     pDisp->SetPVApplication(pvApp);
     part->SetPartDisplay(pDisp);
@@ -320,16 +327,6 @@ void vtkPVRenderModule::AddPVSource(vtkPVSource *pvs)
                              pDisp->GetPropTclName());
       }
     pDisp->Delete();
-    }
-
-  // I would like to find a new place for this initialization.
-  // The data is not up to date anyway.  Maybe in Update ... !!!!
-  // I would like to gather information for part displays separately.
-  for (idx = 0; idx < num; ++idx)
-    {
-    part = pvs->GetPart(idx);
-    // Create a part display for each part.
-    pDisp = part->GetPartDisplay();
     }
 }
 
@@ -365,7 +362,8 @@ void vtkPVRenderModule::RemovePVSource(vtkPVSource *pvs)
 }
 
 
-int vtkPVRenderModule::UpdateAllPVData(int vtkNotUsed(interactive))
+//----------------------------------------------------------------------------
+void vtkPVRenderModule::UpdateAllPVData()
 {
   vtkObject* object;
   vtkPVPartDisplay* pDisp;
@@ -374,19 +372,17 @@ int vtkPVRenderModule::UpdateAllPVData(int vtkNotUsed(interactive))
   while ( (object = this->PartDisplays->GetNextItemAsObject()) )
     {
     pDisp = vtkPVPartDisplay::SafeDownCast(object);
-    if (pDisp)
+    if (pDisp && pDisp->GetVisibility())
       {
-      pDisp->ForceUpdate(this->GetPVApplication());
+      pDisp->Update();
       }
     }
-
-  return 1;
 }
 
 //----------------------------------------------------------------------------
 void vtkPVRenderModule::InteractiveRender()
 {
-  this->UpdateAllPVData(1);
+  this->UpdateAllPVData();
 
   //this->RenderWindow->SetDesiredUpdateRate(this->InteractiveUpdateRate);
   this->RenderWindow->SetDesiredUpdateRate(5.0);
@@ -399,13 +395,16 @@ void vtkPVRenderModule::InteractiveRender()
 //----------------------------------------------------------------------------
 void vtkPVRenderModule::StillRender()
 {
-  this->UpdateAllPVData(0);
+  this->UpdateAllPVData();
 
   // Still Render can get called some funky ways.
   // Interactive renders get called through the PVInteractorStyles
   // which cal ResetCameraClippingRange on the Renderer.
   // We could convert them to call a method on the module directly ...
   this->Renderer->ResetCameraClippingRange();
+
+  this->RenderWindow->SetDesiredUpdateRate(0.002);
+  // this->GetPVWindow()->GetInteractor()->GetStillUpdateRate());
 
   this->GetPVApplication()->SetGlobalLODFlag(0);
   vtkTimerLog::MarkStartEvent("Still Render");
@@ -525,5 +524,9 @@ void vtkPVRenderModule::PrintSelf(ostream& os, vtkIndent indent)
     {
     os << indent << "PVApplication: NULL" << endl;
     }
+
+
+  os << indent << "TotalVisibleMemorySizeValid: " 
+     << this->TotalVisibleMemorySizeValid << endl;
 }
 

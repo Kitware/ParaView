@@ -54,7 +54,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVDataInformation);
-vtkCxxRevisionMacro(vtkPVDataInformation, "1.8");
+vtkCxxRevisionMacro(vtkPVDataInformation, "1.9");
 
 
 //----------------------------------------------------------------------------
@@ -64,8 +64,6 @@ vtkPVDataInformation::vtkPVDataInformation()
   this->NumberOfPoints = 0;
   this->NumberOfCells = 0;
   this->MemorySize = 0;
-  this->GeometryMemorySize = 0;
-  this->LODMemorySize = 0;
   this->Bounds[0] = this->Bounds[2] = this->Bounds[4] = VTK_LARGE_FLOAT;
   this->Bounds[1] = this->Bounds[3] = this->Bounds[5] = -VTK_LARGE_FLOAT;
   this->Extent[0] = this->Extent[2] = this->Extent[4] = VTK_LARGE_INTEGER;
@@ -103,8 +101,6 @@ void vtkPVDataInformation::Initialize()
   this->NumberOfPoints = 0;
   this->NumberOfCells = 0;
   this->MemorySize = 0;
-  this->GeometryMemorySize = 0;
-  this->LODMemorySize = 0;
   this->Bounds[0] = this->Bounds[2] = this->Bounds[4] = VTK_LARGE_FLOAT;
   this->Bounds[1] = this->Bounds[3] = this->Bounds[5] = -VTK_LARGE_FLOAT;
   this->Extent[0] = this->Extent[2] = this->Extent[4] = VTK_LARGE_INTEGER;
@@ -127,8 +123,6 @@ void vtkPVDataInformation::DeepCopy(vtkPVDataInformation *dataInfo)
   this->NumberOfPoints = dataInfo->GetNumberOfPoints();
   this->NumberOfCells = dataInfo->GetNumberOfCells();
   this->MemorySize = dataInfo->GetMemorySize();
-  this->GeometryMemorySize = dataInfo->GetGeometryMemorySize();
-  this->LODMemorySize = dataInfo->GetLODMemorySize();
 
   bounds = dataInfo->GetBounds();
   for (idx = 0; idx < 6; ++idx)
@@ -149,11 +143,18 @@ void vtkPVDataInformation::DeepCopy(vtkPVDataInformation *dataInfo)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVDataInformation::CopyFromData(vtkDataSet *data)
+void vtkPVDataInformation::CopyFromObject(vtkObject* object)
 {
+  vtkDataSet* data = vtkDataSet::SafeDownCast(object);
   int idx;
   float *bds;
   int *ext = NULL;
+
+  if (data == NULL)
+    {
+    vtkErrorMacro("Cound not cast object to data set.");
+    return;
+    }
 
   this->NumberOfPoints = data->GetNumberOfPoints();
   this->NumberOfCells = data->GetNumberOfCells();
@@ -190,7 +191,7 @@ void vtkPVDataInformation::CopyFromData(vtkDataSet *data)
 
   // Copy Cell Data information
   this->CellDataInformation->CopyFromDataSetAttributes(data->GetCellData());
-
+ 
   // Look for a name stored in Field Data.
   vtkDataArray *nameArray = data->GetFieldData()->GetArray("Name");
   if (nameArray)
@@ -201,11 +202,19 @@ void vtkPVDataInformation::CopyFromData(vtkDataSet *data)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVDataInformation::AddInformation(vtkPVDataInformation *info)
+void vtkPVDataInformation::AddInformation(vtkPVInformation* pvi)
 {
+  vtkPVDataInformation *info;
   int             i,j;
   double*         bounds;
   int*            ext;
+
+  info = vtkPVDataInformation::SafeDownCast(pvi);
+  if (info == NULL)
+    {
+    vtkErrorMacro("Cound not cast object to data information.");
+    return;
+    }
 
   if (this->NumberOfPoints == 0 && this->NumberOfCells == 0)
     { // Just copy the other array information.
@@ -244,8 +253,6 @@ void vtkPVDataInformation::AddInformation(vtkPVDataInformation *info)
   this->NumberOfPoints += info->GetNumberOfPoints();
   this->NumberOfCells += info->GetNumberOfCells();
   this->MemorySize += info->GetMemorySize();
-  this->GeometryMemorySize += info->GetGeometryMemorySize();
-  this->LODMemorySize += info->GetLODMemorySize();
 
   // Bounds are only a little harder.
   bounds = info->GetBounds();
@@ -356,24 +363,21 @@ int vtkPVDataInformation::DataSetTypeIsA(const char* type)
 
 
 //----------------------------------------------------------------------------
-void vtkPVDataInformation::AddInformation(vtkDataSet *data)
-{
-  vtkPVDataInformation *info = vtkPVDataInformation::New();
-
-  info->CopyFromData(data);
-  this->AddInformation(info);
-  info->Delete();
-}
+//void vtkPVDataInformation::AddInformation(vtkDataSet *data)
+//{
+// vtkPVDataInformation *info = vtkPVDataInformation::New();
+//
+//  info->CopyFromData(data);
+//  this->AddInformation(info);
+//  info->Delete();
+//}
 
 
 //----------------------------------------------------------------------------
-unsigned char* vtkPVDataInformation::NewMessage(int &length)
+int vtkPVDataInformation::GetMessageLength()
 {
-  unsigned char* msg;
-  unsigned char* tmp;
-  int attrMsgLength;
-  int idx;
-
+  int length;
+ 
   // Figure out message length, and allocate memory.
   // 1- First byte is a flag specifying big or little endian (ignore for now).
   // 1- Second byte specifies the data set type.
@@ -383,8 +387,8 @@ unsigned char* vtkPVDataInformation::NewMessage(int &length)
   // - vtkIdType for numberOfCells
   length += 2*sizeof(vtkIdType);
 
-  // 3 unsigned longs for memory size.
-  length += 3*sizeof(unsigned long);
+  // 1 unsigned longs for memory size.
+  length += 1*sizeof(unsigned long);
 
   // - 6 doubles for bounds.
   // - 6 integers for extent.
@@ -407,9 +411,28 @@ unsigned char* vtkPVDataInformation::NewMessage(int &length)
     }
   length += (nameLength+1) * sizeof(unsigned char);
 
+  return length;
+}
 
-  // Allocate memory for the message. 
-  msg = new unsigned char[length];
+
+
+
+//----------------------------------------------------------------------------
+void vtkPVDataInformation::WriteMessage(unsigned char* msg)
+{
+  int attrMsgLength;
+  unsigned char* tmp;
+  int idx;
+
+  int nameLength = 0;
+  if (this->Name)
+    {
+    nameLength = static_cast<int>(strlen(this->Name));
+    }
+  if (nameLength > 255)
+    {
+    nameLength = 255;
+    }
 
   // Start filling in the message.
   tmp = msg;
@@ -427,10 +450,6 @@ unsigned char* vtkPVDataInformation::NewMessage(int &length)
   tmp += sizeof(vtkIdType);
   // Memory Size
   memcpy(tmp, (unsigned char*)&this->MemorySize, sizeof(unsigned long));
-  tmp += sizeof(unsigned long);
-  memcpy(tmp, (unsigned char*)&this->GeometryMemorySize, sizeof(unsigned long));
-  tmp += sizeof(unsigned long);
-  memcpy(tmp, (unsigned char*)&this->LODMemorySize, sizeof(unsigned long));
   tmp += sizeof(unsigned long);
 
   // Bounds
@@ -461,8 +480,6 @@ unsigned char* vtkPVDataInformation::NewMessage(int &length)
     {
     tmp[idx] = static_cast<unsigned char>(this->Name[idx]);
     }
-
-  return msg;
 }
 
 //----------------------------------------------------------------------------
@@ -497,10 +514,6 @@ void vtkPVDataInformation::CopyFromMessage(unsigned char *msg)
   tmp += sizeof(vtkIdType);
 
   memcpy((unsigned char*)&this->MemorySize, tmp, sizeof(unsigned long));
-  tmp += sizeof(unsigned long);
-  memcpy((unsigned char*)&this->GeometryMemorySize, tmp, sizeof(unsigned long));
-  tmp += sizeof(unsigned long);
-  memcpy((unsigned char*)&this->LODMemorySize, tmp, sizeof(unsigned long));
   tmp += sizeof(unsigned long);
 
   // Bounds
@@ -545,8 +558,6 @@ void vtkPVDataInformation::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "NumberOfPoints: " << this->NumberOfPoints << endl;
   os << indent << "NumberOfCells: " << this->NumberOfCells << endl;
   os << indent << "MemorySize: " << this->MemorySize << endl;
-  os << indent << "GeometryMemorySize: " << this->GeometryMemorySize << endl;
-  os << indent << "LODMemorySize: " << this->LODMemorySize << endl;
   os << indent << "Bounds: " << this->Bounds[0] << ", " << this->Bounds[1] 
      << ", " << this->Bounds[2] << ", " << this->Bounds[3] 
      << ", " << this->Bounds[4] << ", " << this->Bounds[5] << endl;
@@ -569,6 +580,13 @@ void vtkPVDataInformation::PrintSelf(ostream& os, vtkIndent indent)
 }
 
   
+
+
+
+
+
+
+
 
 
 

@@ -39,7 +39,7 @@
 #include "vtkPVDataSetAttributesInformation.h"
 #include "vtkPVArrayInformation.h"
 
-vtkCxxRevisionMacro(vtkCompleteArrays, "1.1");
+vtkCxxRevisionMacro(vtkCompleteArrays, "1.2");
 vtkStandardNewMacro(vtkCompleteArrays);
 
 
@@ -127,8 +127,10 @@ void vtkCompleteArrays::Execute()
       return;
       }    
     vtkPVDataInformation* dataInfo = vtkPVDataInformation::New();
-    dataInfo->CopyFromData(output);
-    msg = dataInfo->NewMessage(length);
+    dataInfo->CopyFromObject(output);
+    length = dataInfo->GetMessageLength();
+    msg = new unsigned char[length];
+    dataInfo->WriteMessage(msg);
     this->Controller->Send(&length, 1, 0, 3389002);
     this->Controller->Send(msg, length, 0, 3389003);
     dataInfo->Delete();
