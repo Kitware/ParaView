@@ -28,7 +28,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCompositeRenderModule);
-vtkCxxRevisionMacro(vtkPVCompositeRenderModule, "1.17");
+vtkCxxRevisionMacro(vtkPVCompositeRenderModule, "1.18");
 
 
 
@@ -107,11 +107,11 @@ void vtkPVCompositeRenderModule::StillRender()
   this->PVApplication->SendPrepareProgress();
 
   // Find out whether we are going to render localy.
-  this->PartDisplays->InitTraversal();
-  while ( (object = this->PartDisplays->GetNextItemAsObject()) )
+  this->Displays->InitTraversal();
+  while ( (object = this->Displays->GetNextItemAsObject()) )
     {
     pDisp = vtkPVCompositePartDisplay::SafeDownCast(object);
-    if (pDisp->GetVisibility())
+    if (pDisp && pDisp->GetVisibility())
       {
       // This updates if required (collection disabled).
       info = pDisp->GetInformation();
@@ -128,11 +128,11 @@ void vtkPVCompositeRenderModule::StillRender()
     localRender = 1;
     }
   // Change the collection flags and update.
-  this->PartDisplays->InitTraversal();
-  while ( (object = this->PartDisplays->GetNextItemAsObject()) )
+  this->Displays->InitTraversal();
+  while ( (object = this->Displays->GetNextItemAsObject()) )
     {
     pDisp = vtkPVCompositePartDisplay::SafeDownCast(object);
-    if (pDisp->GetVisibility())
+    if (pDisp && pDisp->GetVisibility())
       {
       pDisp->SetCollectionDecision(localRender);
       pDisp->Update();
@@ -245,11 +245,11 @@ void vtkPVCompositeRenderModule::InteractiveRender()
   this->PVApplication->SendPrepareProgress();
 
   // Compute memory totals.
-  this->PartDisplays->InitTraversal();
-  while ( (object = this->PartDisplays->GetNextItemAsObject()) )
+  this->Displays->InitTraversal();
+  while ( (object = this->Displays->GetNextItemAsObject()) )
     {
     pDisp = vtkPVCompositePartDisplay::SafeDownCast(object);
-    if (pDisp->GetVisibility())
+    if (pDisp && pDisp->GetVisibility())
       {
       // This updates if required (collection disabled).
       info = pDisp->GetInformation();
@@ -282,11 +282,11 @@ void vtkPVCompositeRenderModule::InteractiveRender()
     localRender = 1;
     }
   // Change the collection flags and update.
-  this->PartDisplays->InitTraversal();
-  while ( (object = this->PartDisplays->GetNextItemAsObject()) )
+  this->Displays->InitTraversal();
+  while ( (object = this->Displays->GetNextItemAsObject()) )
     {
     pDisp = vtkPVCompositePartDisplay::SafeDownCast(object);
-    if (pDisp->GetVisibility())
+    if (pDisp && pDisp->GetVisibility())
       {
       if (useLOD)
         {
@@ -542,8 +542,8 @@ int vtkPVCompositeRenderModule::MakeCollectionDecision()
     }
   this->CollectionDecision = decision;
     
-  this->PartDisplays->InitTraversal();
-  while ( (object=this->PartDisplays->GetNextItemAsObject()) )
+  this->Displays->InitTraversal();
+  while ( (object=this->Displays->GetNextItemAsObject()) )
     {
     pDisp = vtkPVCompositePartDisplay::SafeDownCast(object);
     if (pDisp)
@@ -582,8 +582,8 @@ int vtkPVCompositeRenderModule::MakeLODCollectionDecision()
     }
   this->LODCollectionDecision = decision;
     
-  this->PartDisplays->InitTraversal();
-  while ( (object=this->PartDisplays->GetNextItemAsObject()) )
+  this->Displays->InitTraversal();
+  while ( (object=this->Displays->GetNextItemAsObject()) )
     {
     pDisp = vtkPVCompositePartDisplay::SafeDownCast(object);
     if (pDisp)
