@@ -48,7 +48,9 @@ SET(PROJECT_TESTS ArrayMenuChangeInput
                TestPolyDataIO
                TestUnstructuredGridIO
                TestRectilinearGridIO
-               TestImageDataIO    )
+	       TestImageDataIO
+               VolumeGroup    )
+
 
 IF(RUN_WITH_MPI)
   FOREACH (tfile ${PROJECT_TESTS})
