@@ -8,8 +8,14 @@ SET(ServersFilters_SRCS
   TestCTH
   TestPVFilters
   TestMPI
-  TestCave
   )
+
+IF(VTK_USE_MPI)
+  SET(ServersFilters_SRCS
+    ${ServersFilters_SRCS}
+    TestCave
+    )
+ENDIF(VTK_USE_MPI)
 
 FOREACH(name ${ServersFilters_SRCS})
   ADD_EXECUTABLE(${name} ${name}.cxx)
