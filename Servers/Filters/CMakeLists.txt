@@ -57,7 +57,6 @@ SET(Filters_SRCS
   vtkXMLPVAnimationWriter.cxx
   vtkXMLCollectionReader.cxx
   vtkSelectInputs.cxx
-  vtkExtractCTHPart.cxx
 	vtkTempTessellatorFilter.cxx # Remove after ParaView 1.4
   )
 
