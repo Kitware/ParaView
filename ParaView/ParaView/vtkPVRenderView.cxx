@@ -135,7 +135,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.310");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.311");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -2114,6 +2114,7 @@ void vtkPVRenderView::SetOrientationAxesVisibility(int val)
     }
 
   this->OrientationAxes->SetEnabled(val);
+  this->EventuallyRender();
 }
 
 //----------------------------------------------------------------------------
@@ -2123,7 +2124,6 @@ void vtkPVRenderView::OrientationAxesCheckCallback()
   this->AddTraceEntry("$kw(%s) SetOrientationAxesVisibility %d",
                       this->GetTclName(), val);
   this->SetOrientationAxesVisibility(val);
-  this->EventuallyRender();
   
   this->Application->SetRegisteryValue(2, "RunTime",
                                        "OrientationAxesVisibility",
