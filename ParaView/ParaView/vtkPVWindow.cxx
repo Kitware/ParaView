@@ -128,7 +128,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.417");
+vtkCxxRevisionMacro(vtkPVWindow, "1.418");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -1920,11 +1920,11 @@ void vtkPVWindow::OpenCallback()
   //vtkKWLoadSaveDialog* loadDialog = vtkKWLoadSaveDialog::New();
   vtkPVServerFileDialog* loadDialog = vtkPVServerFileDialog::New();
   this->RetrieveLastPath(loadDialog, "OpenPath");
-  loadDialog->SetParent(this);
   loadDialog->Create(this->Application,0);
   loadDialog->SetTitle("Open ParaView File");
   loadDialog->SetDefaultExtension(".vtk");
   loadDialog->SetFileTypes(str.str());
+  loadDialog->SetMasterWindow(this);
   str.rdbuf()->freeze(0);  
   if ( loadDialog->Invoke() )
     {
@@ -4047,7 +4047,7 @@ void vtkPVWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVWindow ";
-  this->ExtractRevision(os,"$Revision: 1.417 $");
+  this->ExtractRevision(os,"$Revision: 1.418 $");
 }
 
 //-----------------------------------------------------------------------------
