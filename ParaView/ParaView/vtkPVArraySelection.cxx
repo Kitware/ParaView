@@ -195,6 +195,7 @@ void vtkPVArraySelection::Reset()
     if (this->VTKReaderTclName)
       {
       int numArrays, idx;
+      this->Script("%s UpdateInformation", this->VTKReaderTclName);
       this->Script("%s GetNumberOf%sArrays", 
                    this->VTKReaderTclName, this->AttributeName);
       numArrays = this->GetIntegerResult(this->Application);

@@ -112,6 +112,10 @@ public:
   // Set and Get the widget selection.
   const char* GetCurrentVTKValue();
   void SetCurrentVTKValue(const char* val);
+
+  // Description:
+  // For saving the widget into a VTK tcl script.
+  void SaveInTclScript(ofstream *file);
     
 protected:
   vtkPVSelectWidget();

@@ -367,8 +367,11 @@ void vtkPVPlaneWidget::SaveInTclScript(ofstream *file)
 {
   *file << "vtkPlane " << this->PlaneTclName << endl;
 
-  *file << "\t" << this->ObjectTclName << " Set" << this->VariableName
-        << " " << this->PlaneTclName << endl;
+  if (this->ObjectTclName && this->VariableName)
+    {
+    *file << "\t" << this->ObjectTclName << " Set" << this->VariableName
+          << " " << this->PlaneTclName << endl;
+    }
 
   this->CenterEntry->SaveInTclScript(file);
   this->NormalEntry->SaveInTclScript(file);

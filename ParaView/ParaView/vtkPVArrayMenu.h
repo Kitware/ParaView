@@ -57,6 +57,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 class vtkPVInputMenu;
+class vtkPVScalarRangeLabel;
 class vtkCollection;
 
 class VTK_EXPORT vtkPVArrayMenu : public vtkPVWidget
@@ -183,6 +184,13 @@ public:
   // This is called to update the menus if soething (InputMenu) changes.
   virtual void Update();
 
+  // Description:
+  // Option to have a scalar range label to show the range
+  // of the selected scalars.
+  void SetShowScalarRangeLabel(int val);
+  vtkGetMacro(ShowScalarRangeLabel, int);
+  vtkBooleanMacro(ShowScalarRangeLabel, int);
+
 protected:
   vtkPVArrayMenu();
   ~vtkPVArrayMenu();
@@ -219,6 +227,11 @@ protected:
 
   // Resets the values based on the array.
   void UpdateComponentMenu();
+
+  // Here we have the option of displaying a scalar range label.
+  vtkPVScalarRangeLabel *ScalarRangeLabel;
+  int ShowScalarRangeLabel;
+
 };
 
 #endif

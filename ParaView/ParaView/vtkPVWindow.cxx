@@ -1082,6 +1082,11 @@ vtkPVSource *vtkPVWindow::Open(char *openFileName)
       rInt = this->ReaderInterfaces->GetString(idx);
       pvs = this->OpenWithReaderInterface(openFileName, rootName, rInt);
       }
+    if ( pvs )
+      {
+      // Store MRU
+      this->AddRecentFile(NULL, openFileName, this, "OpenRecentFile");
+      }
     return pvs;
     }
 

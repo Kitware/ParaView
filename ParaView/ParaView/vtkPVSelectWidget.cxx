@@ -331,3 +331,23 @@ void vtkPVSelectWidget::SetCurrentIndex(int idx)
 
   this->ModifiedCallback();
 }
+
+
+
+//----------------------------------------------------------------------------
+void vtkPVSelectWidget::SaveInTclScript(ofstream *file)
+{
+  const char* vtkValue;
+  vtkPVWidget *pvw;
+  pvw = (vtkPVWidget*)(this->Widgets->GetItemAsObject(this->CurrentIndex));
+  pvw->SaveInTclScript(file);
+
+  // The plane and sphere widgets could set this themselves. 
+  // If they were on their own they would.
+  
+  vtkValue = this->GetCurrentVTKValue();
+  *file << "\t" << this->ObjectTclName << " Set" << this->VariableName
+        << " {" << vtkValue << "}" << endl;
+}
+
+

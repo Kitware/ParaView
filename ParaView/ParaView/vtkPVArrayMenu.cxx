@@ -44,6 +44,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkObjectFactory.h"
 #include "vtkKWMessageDialog.h"
 #include "vtkPVInputMenu.h"
+#include "vtkPVScalarRangeLabel.h"
 #include "vtkPVData.h"
 
 //----------------------------------------------------------------------------
@@ -82,6 +83,9 @@ vtkPVArrayMenu::vtkPVArrayMenu()
   this->ComponentMenu = vtkKWOptionMenu::New();
 
   this->InputMenu = NULL;
+
+  this->ShowScalarRangeLabel = 0;
+  this->ScalarRangeLabel = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -102,6 +106,12 @@ vtkPVArrayMenu::~vtkPVArrayMenu()
   this->ComponentMenu = NULL;
 
   this->SetInputMenu(NULL);
+
+  if (this->ScalarRangeLabel)
+    {
+    this->ScalarRangeLabel->Delete();
+    this->ScalarRangeLabel = NULL;
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -208,6 +218,8 @@ void vtkPVArrayMenu::SetShowComponentMenu(int flag)
 //----------------------------------------------------------------------------
 void vtkPVArrayMenu::Create(vtkKWApplication *app)
 {
+  vtkKWWidget *extraFrame;
+
   if (this->Application != NULL)
     {
     vtkErrorMacro("Object has already been created.");
@@ -218,11 +230,18 @@ void vtkPVArrayMenu::Create(vtkKWApplication *app)
   // create the top level
   this->Script("frame %s", this->GetWidgetName());
 
-  this->Label->SetParent(this);
+  // Extra frame is needed because of the range label.
+  extraFrame = vtkKWWidget::New();
+  extraFrame->SetParent(this);
+  extraFrame->Create(app, "frame", "");
+  this->Script("pack %s -side top -fill x -expand t",
+               extraFrame->GetWidgetName());
+
+  this->Label->SetParent(extraFrame);
   this->Label->Create(app, "-width 18 -justify right");
   this->Script("pack %s -side left", this->Label->GetWidgetName());
 
-  this->FieldMenu->SetParent(this);
+  this->FieldMenu->SetParent(extraFrame);
   this->FieldMenu->Create(app, "");
   // Easier to hard code the field enum 
   // than to sprintf into a method and arg string
@@ -249,17 +268,69 @@ void vtkPVArrayMenu::Create(vtkKWApplication *app)
     this->Script("pack %s -side left", this->FieldMenu->GetWidgetName());
     }
 
-  this->ArrayMenu->SetParent(this);
+  this->ArrayMenu->SetParent(extraFrame);
   this->ArrayMenu->Create(app, "");
   this->Script("pack %s -side left", this->ArrayMenu->GetWidgetName());
 
-  this->ComponentMenu->SetParent(this);
+  this->ComponentMenu->SetParent(extraFrame);
   this->ComponentMenu->Create(app, "");
   if (this->ShowComponentMenu)
     {
     this->Script("pack %s -side left", this->ComponentMenu->GetWidgetName());
     }
+
+  extraFrame->Delete();
+  extraFrame = NULL;
+
+  if (this->ShowScalarRangeLabel)
+    {
+    this->ScalarRangeLabel = vtkPVScalarRangeLabel::New();
+    this->ScalarRangeLabel->SetArrayMenu(this);
+    // This causes the range to be recomputed when the menu value changes.
+    this->AddDependant(this->ScalarRangeLabel);  
+    this->ScalarRangeLabel->SetParent(this);
+    this->ScalarRangeLabel->Create(this->Application);
+    this->Script("pack %s -side top -fill x -expand t", this->ScalarRangeLabel->GetWidgetName());
+    }
 }
+
+
+//----------------------------------------------------------------------------
+void vtkPVArrayMenu::SetShowScalarRangeLabel(int val)
+{
+  if (this->ShowScalarRangeLabel == val)
+    {
+    return;
+    }
+  this->Modified();
+  this->ShowScalarRangeLabel = val;
+
+  if (this->Application == NULL)
+    { // Create will do the rest.
+    return;
+    }
+
+  if (this->ScalarRangeLabel == NULL)
+    {
+    this->ScalarRangeLabel = vtkPVScalarRangeLabel::New();
+    this->ScalarRangeLabel->SetArrayMenu(this);
+    // This causes the range to be recomputed when the menu value changes.
+    this->AddDependant(this->ScalarRangeLabel);  
+    this->ScalarRangeLabel->SetParent(this);
+    this->ScalarRangeLabel->Create(this->Application);
+    }
+
+  if (val == 0)
+    {
+    this->Script("pack forget %s", this->ScalarRangeLabel->GetWidgetName());
+    }
+  else
+    {
+    this->Script("pack %s -side top -fill x -expand t", this->ScalarRangeLabel->GetWidgetName());
+    }
+}
+
+
 
 
 //----------------------------------------------------------------------------

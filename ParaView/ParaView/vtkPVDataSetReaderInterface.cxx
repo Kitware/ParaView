@@ -175,6 +175,7 @@ vtkPVSource *vtkPVDataSetReaderInterface::CreateCallback(const char* name,
   // Add the new Source to the View, and make it current.
   pvs->SetView(this->PVWindow->GetMainView());
   pvs->CreateProperties();
+  this->PVWindow->SetCurrentPVSource(pvs);
   this->PVWindow->ShowCurrentSourceProperties();
 
   // Create the output.

@@ -147,6 +147,7 @@ void vtkPVClip::CreateProperties()
   arrayMenu->SetAttributeType(vtkDataSetAttributes::SCALARS);
   arrayMenu->SetObjectTclName(this->VTKSourceTclName);
   arrayMenu->SetLabel("Scalars");
+  arrayMenu->ShowScalarRangeLabelOn();
 
   arrayMenu->SetParent(selectWidget->GetFrame());
   arrayMenu->SetModifiedCommand(this->GetTclName(),"SetAcceptButtonColorToRed");
@@ -178,6 +179,9 @@ void vtkPVClip::CreateProperties()
   this->Script("pack %s -side top -fill x", offsetEntry->GetWidgetName());
   offsetEntry->Delete();
   offsetEntry = NULL;
+
+  // Inside out -------------------------
+  this->AddLabeledToggle("Inside Out", "InsideOut", "Switches which part to keep."); 
 
   this->UpdateProperties();
   this->UpdateParameterWidgets();

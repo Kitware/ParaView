@@ -212,8 +212,11 @@ void vtkPVSphereWidget::SaveInTclScript(ofstream *file)
 {
   *file << "vtkSphere " << this->SphereTclName << endl;
 
-  *file << "\t" << this->ObjectTclName << " Set" << this->VariableName
-        << " " << this->SphereTclName << endl;
+  if (this->ObjectTclName && this->VariableName)
+    {
+    *file << "\t" << this->ObjectTclName << " Set" << this->VariableName
+          << " " << this->SphereTclName << endl;
+    }
 
   this->CenterEntry->SaveInTclScript(file);
   this->RadiusEntry->SaveInTclScript(file);
