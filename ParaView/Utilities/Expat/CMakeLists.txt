@@ -18,6 +18,7 @@ xmlwf/codepage
 ) 
 
 IF(UNIX)
+  ADD_DEFINITIONS(-D_HPUX_SOURCE)
   SOURCE_FILES(Expat_SRCS xmlwf/unixfilemap)
 ELSE(UNIX)
   SOURCE_FILES(Expat_SRCS xmlwf/win32filemap)

@@ -67,6 +67,7 @@ IF (WIN32)
     vtkKWWin32RegisteryUtilities
   )
 ELSE (WIN32)
+  ADD_DEFINITIONS(-D_HPUX_SOURCE)
   SOURCE_FILES( KWWidgets_SRCS 
     vtkKWUNIXRegisteryUtilities
   )
