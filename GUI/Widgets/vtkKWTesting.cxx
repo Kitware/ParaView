@@ -42,7 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWTesting );
-vtkCxxRevisionMacro(vtkKWTesting, "1.2");
+vtkCxxRevisionMacro(vtkKWTesting, "1.3");
 vtkCxxSetObjectMacro(vtkKWTesting,RenderView,vtkKWView);
 
 //----------------------------------------------------------------------------
@@ -93,6 +93,8 @@ void vtkKWTesting::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
   os << indent << "RenderView: " << this->RenderView << endl;
+  os << indent << "ComparisonImage: " 
+    << (this->ComparisonImage?this->ComparisonImage:"(none)") << endl;
 }
 
 

@@ -60,6 +60,7 @@ SET(PROJECT_TESTS
   TestRectilinearGridIO
   TestImageDataIO
   VolumeGroup
+  XdmfRead
   )
 
 IF(RUN_WITH_MPI)
