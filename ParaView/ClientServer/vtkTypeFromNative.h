@@ -31,7 +31,9 @@ template <class T> struct vtkTypeFromNative;
 # if !defined(_COMPILER_VERSION)
 #  define VTK_TEMPLATE_SPECIALIZATION
 # endif
-#else
+#endif
+
+#if !defined(VTK_TEMPLATE_SPECIALIZATION)
 # define VTK_TEMPLATE_SPECIALIZATION template <>
 #endif
 
