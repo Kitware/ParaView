@@ -1606,8 +1606,15 @@ void vtkClientServerStream::PrintMessage(ostream& os, int message) const
         {
         vtkObjectBase* arg;
         this->GetArgument(message, a, &arg);
-        os << "  Argument " << a << " = vtk_object_pointer {"
-           << arg->GetClassName() << " (" << arg << ")}\n";
+        os << "  Argument " << a << " = vtk_object_pointer ";
+        if(arg)
+          {
+          os << "{" << arg->GetClassName() << " (" << arg << ")}\n";
+          }
+        else
+          {
+          os << "(null)\n";
+          }
         } break;
       default:
         {
