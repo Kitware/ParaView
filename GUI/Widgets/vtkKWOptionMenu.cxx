@@ -20,39 +20,42 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWOptionMenu );
-vtkCxxRevisionMacro(vtkKWOptionMenu, "1.32");
+vtkCxxRevisionMacro(vtkKWOptionMenu, "1.33");
 
 //----------------------------------------------------------------------------
 vtkKWOptionMenu::vtkKWOptionMenu()
 {
-  this->CurrentValue = NULL;
-  this->Menu = vtkKWMenu::New();
+  this->CurrentValue      = NULL;
+  this->Menu              = vtkKWMenu::New();
+  this->MaximumLabelWidth = 0;
 }
 
 //----------------------------------------------------------------------------
 vtkKWOptionMenu::~vtkKWOptionMenu()
 {
-  if (this->CurrentValue)
+  this->SetCurrentValue(NULL);
+
+  if (this->Menu)
     {
-    delete [] this->CurrentValue;
-    this->CurrentValue = NULL;
+    this->Menu->Delete();
+    this->Menu = NULL;
     }
-  this->Menu->Delete();
 }
 
 //----------------------------------------------------------------------------
 const char *vtkKWOptionMenu::GetValue()
 {
-  if (this->CurrentValue)
-    {
-    delete [] this->CurrentValue;
-    this->CurrentValue = 0;
-    }
   if (this->IsCreated())
     {
-    this->Script("set %sValue",this->GetWidgetName());
-    this->CurrentValue = vtkString::Duplicate(
-      this->GetApplication()->GetMainInterp()->result);
+    // Why we we re-assign to CurrentValue each time GetValue() is called
+    // That's because the value of the internal variable is set by Tk
+    // through the -variable settings of the radiobutton entries that
+    // have been added to the menu. Therefore, if a radiobutton entry has
+    // a command that will use the value (very likely), there is no
+    // guarantee the variable has been changed before or after calling the
+    // callback. To ensure it is true, always refresh the value from
+    // the variable itself.
+    this->SetCurrentValue(this->Script("set %sValue", this->GetWidgetName()));
     }
   return this->CurrentValue;  
 }
@@ -62,7 +65,7 @@ void vtkKWOptionMenu::SetValue(const char *s)
 {
   if (this->IsCreated() && s)
     {
-    this->Script("set %sValue {%s}", this->GetWidgetName(),s);
+    this->Script("set %sValue {%s}", this->GetWidgetName(), s);
     }
 }
 
@@ -70,6 +73,47 @@ void vtkKWOptionMenu::SetValue(const char *s)
 void vtkKWOptionMenu::SetCurrentEntry(const char *name)
 { 
   this->SetValue(name);
+}
+ 
+//----------------------------------------------------------------------------
+void vtkKWOptionMenu::TracedVariableChangedCallback(
+  const char *, const char *, const char *)
+{
+  this->UpdateOptionMenuLabel();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWOptionMenu::UpdateOptionMenuLabel()
+{
+  if (this->IsCreated())
+    {
+    const char *wname = this->GetWidgetName();
+    if (this->MaximumLabelWidth <= 0)
+      {
+      this->Script("%s configure -text {%s}", wname, this->GetValue());
+      }
+    else
+      {
+      char *cropped = vtkString::Duplicate(this->GetValue());
+      vtkString::CropString(cropped, (size_t)this->MaximumLabelWidth);
+      this->Script("%s configure -text {%s}", wname, cropped);
+      delete [] cropped;
+      }
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWOptionMenu::SetMaximumLabelWidth(int arg)
+{ 
+  if (this->MaximumLabelWidth == arg)
+    {
+    return;
+    }
+
+  this->MaximumLabelWidth = arg;
+  this->Modified();
+
+  this->UpdateOptionMenuLabel();
 }
  
 //----------------------------------------------------------------------------
@@ -162,7 +206,7 @@ int vtkKWOptionMenu::HasEntry(const char *name)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWOptionMenu::ClearEntries()
+void vtkKWOptionMenu::DeleteAllEntries()
 {
   this->Menu->DeleteAllMenuItems();
 }
@@ -183,10 +227,14 @@ void vtkKWOptionMenu::Create(vtkKWApplication *app, const char *args)
 
   const char *wname = this->GetWidgetName();
   
-  this->Script("%s configure -textvariable %sValue -indicatoron 1 -menu %s "
+  this->Script("%s configure -indicatoron 1 -menu %s "
                "-relief raised -bd 2 -highlightthickness 0 -anchor c "
                "-direction flush %s", 
-               wname, wname, this->Menu->GetWidgetName(), (args ? args : ""));
+               wname, this->Menu->GetWidgetName(), (args ? args : ""));
+
+  this->Script("set %sValue {}", this->GetWidgetName());
+  this->Script("trace variable %sValue w {%s TracedVariableChangedCallback}",
+               this->GetWidgetName(), this->GetTclName());
 
   // Update enable state
 
@@ -238,5 +286,6 @@ void vtkKWOptionMenu::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
   os << indent << "Menu: " << this->Menu << endl;
+  os << indent << "MaximumLabelWidth: " << this->MaximumLabelWidth << endl;
 }
 

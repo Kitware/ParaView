@@ -32,46 +32,42 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Create a Tk widget
+  // Create the widget
   virtual void Create(vtkKWApplication *app, const char *args);
 
   // Description:
   // Set/Get the current entry of this optionmenu
-  const char *GetValue();
-  void SetValue(const char *);
-  void SetCurrentEntry(const char *name);
-  void SetCurrentImageEntry(const char *image_name);
-
-  // Description:
-  // Get the menu.
-  vtkGetObjectMacro(Menu, vtkKWMenu);
+  virtual const char *GetValue();
+  virtual void SetValue(const char *);
+  virtual void SetCurrentEntry(const char *name);
+  virtual void SetCurrentImageEntry(const char *image_name);
 
   // Description:
   // Add/Insert entries to an option menu, with or without a command.
-  void AddEntry(const char *name);
-  void AddEntryWithCommand(const char *name, vtkKWObject *obj,
-                           const char *method, const char *options = 0);
-  void AddImageEntryWithCommand(const char *image_name, vtkKWObject *obj,
-                                const char *method, const char *options = 0);
-  void AddSeparator();
+  virtual void AddEntry(const char *name);
+  virtual void AddEntryWithCommand(
+    const char *name, vtkKWObject *obj, const char *method, 
+    const char *options=0);
+  virtual void AddImageEntryWithCommand(
+    const char *image_name, vtkKWObject *obj, const char *method, 
+    const char *options = 0);
+  virtual void AddSeparator();
 
   // Description:
-  // Remove entry from an option menu.
-  void DeleteEntry(const char *name);
-  void DeleteEntry(int index);
+  // Remove entry from an option menu (given its name or position in the menu).
+  // Or remove all entries with DeleteAllEntries.
+  virtual void DeleteEntry(const char *name);
+  virtual void DeleteEntry(int index);
+  virtual void DeleteAllEntries();
   
   // Description:
-  // Has entry ?
-  int HasEntry(const char *name);
-  int GetNumberOfEntries();
+  // Has entry ? Number of Entries
+  virtual int HasEntry(const char *name);
+  virtual int GetNumberOfEntries();
 
   // Description:
-  // Get entry label
-  const char *GetEntryLabel(int index);
-  
-  // Description:
-  // Remove all entries from the option menu.
-  void ClearEntries();
+  // Get the n-th entry label
+  virtual const char *GetEntryLabel(int index);
   
   // Description
   // Set the indicator On/Off. To be called after creation.
@@ -84,6 +80,20 @@ public:
   void SetWidth(int width);
   
   // Description:
+  // Set/Get the maximum width of the option menu label
+  // This does not modify the internal value, this is just for display
+  // purposes: the option menu button can therefore be automatically
+  // shrinked, while the menu associated to it will display all entries
+  // correctly.
+  // Set width to 0 (default) to prevent auto-cropping.
+  virtual void SetMaximumLabelWidth(int);
+  vtkGetMacro(MaximumLabelWidth, int);
+
+  // Description:
+  // Get the menu object
+  vtkGetObjectMacro(Menu, vtkKWMenu);
+
+  // Description:
   // Update the "enable" state of the object and its internal parts.
   // Depending on different Ivars (this->Enabled, the application's 
   // Limited Edition Mode, etc.), the "enable" state of the object is updated
@@ -92,12 +102,23 @@ public:
   // of 3D widgets, etc.
   virtual void UpdateEnableState();
 
+  // Description:
+  // Callbacks (don't call)
+  virtual void TracedVariableChangedCallback(
+    const char *, const char *, const char *);
+
 protected:
   vtkKWOptionMenu();
   ~vtkKWOptionMenu();
 
-  char *CurrentValue;  
+  vtkGetStringMacro(CurrentValue);
+  vtkSetStringMacro(CurrentValue);
+
+  char      *CurrentValue;  
   vtkKWMenu *Menu;
+  int       MaximumLabelWidth;
+
+  virtual void UpdateOptionMenuLabel();
 
 private:
   vtkKWOptionMenu(const vtkKWOptionMenu&); // Not implemented
