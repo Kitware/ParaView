@@ -62,7 +62,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectCTHArrays);
-vtkCxxRevisionMacro(vtkPVSelectCTHArrays, "1.4");
+vtkCxxRevisionMacro(vtkPVSelectCTHArrays, "1.5");
 vtkCxxSetObjectMacro(vtkPVSelectCTHArrays, InputMenu, vtkPVInputMenu);
 
 int vtkPVSelectCTHArraysCommand(ClientData cd, Tcl_Interp *interp,
@@ -371,7 +371,7 @@ int vtkPVSelectCTHArrays::StringMatch(const char* arrayName)
 
   while (*p != '\0')
     {
-    if (strncmp(p,"Fraction",8) == 0)
+    if (strncmp(p,"Fraction",8) == 0 || strncmp(p, "fraction", 8) == 0)
       {
       return 1;
       }
