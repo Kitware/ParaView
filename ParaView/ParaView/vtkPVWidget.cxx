@@ -207,6 +207,12 @@ void vtkPVWidget::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
   os << indent << "ModifiedFlag: " << this->GetModifiedFlag() << endl;
+  os << indent << "ModifiedCommandObjectTclName: "
+     << (this->ModifiedCommandObjectTclName ?
+         this->ModifiedCommandObjectTclName : "(none)") << endl;
+  os << indent << "ModifiedCommandMethod: "
+     << (this->ModifiedCommandMethod ? this->ModifiedCommandMethod : "(none)")
+     << endl;
 }
 
 //----------------------------------------------------------------------------
@@ -338,7 +344,7 @@ void vtkPVWidget::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVWidget ";
-  this->ExtractRevision(os,"$Revision: 1.21 $");
+  this->ExtractRevision(os,"$Revision: 1.22 $");
 }
 
 //----------------------------------------------------------------------------
