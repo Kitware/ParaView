@@ -26,7 +26,7 @@ vtkProcessModule* vtkProcessModule::ProcessModule = 0;
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkProcessModule);
-vtkCxxRevisionMacro(vtkProcessModule, "1.6");
+vtkCxxRevisionMacro(vtkProcessModule, "1.7");
 
 //----------------------------------------------------------------------------
 vtkProcessModule::vtkProcessModule()
@@ -283,7 +283,13 @@ void vtkProcessModule::SendStreamToClientAndRenderServerRoot()
 //----------------------------------------------------------------------------
 vtkClientServerID vtkProcessModule::NewStreamObject(const char* type)
 {
-  vtkClientServerStream& stream = this->GetStream();
+  return this->NewStreamObject(type, this->GetStream());
+}
+
+//----------------------------------------------------------------------------
+vtkClientServerID vtkProcessModule::NewStreamObject(
+  const char* type, vtkClientServerStream& stream)
+{
   vtkClientServerID id = this->GetUniqueID();
   stream << vtkClientServerStream::New << type
          << id <<  vtkClientServerStream::End;
@@ -299,7 +305,13 @@ vtkObjectBase* vtkProcessModule::GetObjectFromID(vtkClientServerID id)
 //----------------------------------------------------------------------------
 void vtkProcessModule::DeleteStreamObject(vtkClientServerID id)
 {
-  vtkClientServerStream& stream = this->GetStream();
+  this->DeleteStreamObject(id, this->GetStream());
+}
+
+//----------------------------------------------------------------------------
+void vtkProcessModule::DeleteStreamObject(
+  vtkClientServerID id, vtkClientServerStream& stream)
+{
   stream << vtkClientServerStream::Delete << id
          <<  vtkClientServerStream::End;
 }

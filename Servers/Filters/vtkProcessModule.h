@@ -90,7 +90,9 @@ public:
   // SendStreamToClientAndServer.  For construction, the unique id for the
   // new object is returned.
   vtkClientServerID NewStreamObject(const char*);
+  vtkClientServerID NewStreamObject(const char*, vtkClientServerStream& stream);
   void DeleteStreamObject(vtkClientServerID);
+  void DeleteStreamObject(vtkClientServerID, vtkClientServerStream& stream);
   
   // Description:
   // Return the vtk object associated with the given id for the client.
