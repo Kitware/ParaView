@@ -229,7 +229,7 @@
                  help="Set the number of ghost levels to read."/>
   </Module>
   <Module name="ensightMS" class="vtkPVEnSightReaderModule"
-          root_name="Ensight" 
+          root_name="EnsightMS" 
           module_type="Reader"
           extensions=".sos" file_description="EnSight Master Server Files">
     <Source class="vtkPVEnSightMasterServerReader"/>
