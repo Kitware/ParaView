@@ -2541,7 +2541,6 @@
    Memcheck:Cond
    fun:__stpcpy
    obj:/lib/libc-2.3.3.so
-   fun:__sysconf
 }
 {
    <insert a suppression name here>
@@ -2556,4 +2555,10 @@
    fun: strlen
    obj:/lib/libc-2.3.3.so
    fun:_dl_catch_error_internal
+}
+{
+   <insert a suppression name here>
+   Memcheck:Cond
+   fun:strchr
+   fun:__glXGetCurrentContext
 }
