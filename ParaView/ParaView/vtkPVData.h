@@ -423,6 +423,9 @@ protected:
   char *UpdateSupressorTclName;
   vtkSetStringMacro(UpdateSupressorTclName);
   
+  char *LODUpdateSupressorTclName;
+  vtkSetStringMacro(LODUpdateSupressorTclName);
+  
   char *CollectTclName;
   vtkSetStringMacro(CollectTclName);
 
