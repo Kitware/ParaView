@@ -89,7 +89,7 @@ int vtkKWApplication::WidgetVisibility = 1;
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.153");
+vtkCxxRevisionMacro(vtkKWApplication, "1.154");
 
 extern "C" int Vtktcl_Init(Tcl_Interp *interp);
 extern "C" int Vtkkwwidgetstcl_Init(Tcl_Interp *interp);
@@ -732,18 +732,21 @@ Tcl_Interp *vtkKWApplication::InitializeTcl(int argc,
 
   // Init Tk
 
-  status = Tk_Init(interp);
-  if (status != TCL_OK)
+  if (vtkKWApplication::WidgetVisibility)
     {
-    if (err)
+    status = Tk_Init(interp);
+    if (status != TCL_OK)
       {
-      *err << "Tk_Init error: " << Tcl_GetStringResult(interp) << endl;
+      if (err)
+        {
+        *err << "Tk_Init error: " << Tcl_GetStringResult(interp) << endl;
+        }
+      return NULL;
       }
-    return NULL;
+    
+    Tcl_StaticPackage(interp, "Tk", Tk_Init, 0);
     }
-
-  Tcl_StaticPackage(interp, "Tk", Tk_Init, 0);
-
+    
 #endif
   
   // create the SetApplicationIcon command
@@ -1644,6 +1647,9 @@ int vtkKWApplication::GetCheckForUpdatesPath(ostream &path)
     }
 #endif
 
+  // To remove compiler warning on unused variable
+  (void)path;
+
   return 0;
 }
 
@@ -1922,6 +1928,9 @@ int vtkKWApplication::GetSystemVersion(ostream &os)
       break;
     }
 #endif
+
+  // Here to suppress compiler warning on unused variable
+  (void)os;
 
   return 1;
 }
