@@ -57,7 +57,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <ctype.h>
 
-vtkCxxRevisionMacro(vtkPVXMLPackageParser, "1.12");
+vtkCxxRevisionMacro(vtkPVXMLPackageParser, "1.13");
 vtkStandardNewMacro(vtkPVXMLPackageParser);
 
 #ifndef VTK_NO_EXPLICIT_TEMPLATE_INSTANTIATION
@@ -470,21 +470,6 @@ int vtkPVXMLPackageParser::CreateModule(vtkPVXMLElement* me, vtkPVSource* pvm)
     return 0;
     }
 
-  const char* name = me->GetAttribute("name");
-  const char* button_image = me->GetAttribute("button_image");
-  if(name && button_image) 
-    {
-    const char* button_image_file = me->GetAttribute("button_image_file");
-
-    const char* button_help = me->GetAttribute("button_help");
-    ostrstream command;
-    command << "CreatePVSource " << name << ends;
-    this->Window->AddToolbarButton(name, button_image, button_image_file,
-                                   command.str(), button_help);
-    command.rdbuf()->freeze(0);
-    pvm->SetToolbarModule(1);
-    }
-
   const char* multiprocess_support = me->GetAttribute("multiprocess_support");
   if(multiprocess_support) 
     { 
@@ -523,6 +508,22 @@ int vtkPVXMLPackageParser::CreateModule(vtkPVXMLElement* me, vtkPVSource* pvm)
       }
     }
   
+  const char* name = me->GetAttribute("name");
+  const char* button_image = me->GetAttribute("button_image");
+  if(name && button_image) 
+    {
+    const char* button_image_file = me->GetAttribute("button_image_file");
+
+    const char* button_help = me->GetAttribute("button_help");
+    ostrstream command;
+    command << "CreatePVSource " << name << ends;
+    this->Window->AddToolbarButton(name, button_image, button_image_file,
+                                   command.str(), button_help);
+    command.rdbuf()->freeze(0);
+    pvm->SetToolbarModule(1);
+    }
+
+
   const char* output = me->GetAttribute("output");
   if(output) { pvm->SetOutputClassName(output); }
   else
