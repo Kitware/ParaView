@@ -31,7 +31,7 @@
 #include <vtkstd/map>
 #include <vtkstd/algorithm>
 
-vtkCxxRevisionMacro(vtkXMLCollectionReader, "1.13");
+vtkCxxRevisionMacro(vtkXMLCollectionReader, "1.14");
 vtkStandardNewMacro(vtkXMLCollectionReader);
 
 //----------------------------------------------------------------------------
@@ -70,9 +70,9 @@ public:
 
 //----------------------------------------------------------------------------
 vtkXMLCollectionReader::vtkXMLCollectionReader()
-{  
+{
   this->Internal = new vtkXMLCollectionReaderInternals;
-   
+
   // Setup a callback for the internal readers to report progress.
   this->InternalProgressObserver = vtkCallbackCommand::New();
   this->InternalProgressObserver->SetCallback(
@@ -99,7 +99,7 @@ int vtkXMLCollectionReader::GetNumberOfOutputs()
   // We must call UpdateInformation to make sure the set of outputs is
   // up to date.
   this->UpdateInformation();
-  
+
   // Now return the requested number.
   return this->Superclass::GetNumberOfOutputPorts();
 }
@@ -110,7 +110,7 @@ vtkDataSet* vtkXMLCollectionReader::GetOutput(int index)
   // We must call UpdateInformation to make sure the set of outputs is
   // up to date.
   this->UpdateInformation();
-  
+
   // Now return the requested output.
   return this->GetOutputAsDataSet(index);
 }
@@ -120,7 +120,7 @@ void vtkXMLCollectionReader::Update()
 {
   // Update information first to make sure an output exists.
   this->UpdateInformation();
-  
+
   // Now complete the standard Update.
   this->Superclass::Update();
 }
@@ -232,7 +232,7 @@ const char* vtkXMLCollectionReader::GetDataSetName()
 int vtkXMLCollectionReader::ReadPrimaryElement(vtkXMLDataElement* ePrimary)
 {
   if(!this->Superclass::ReadPrimaryElement(ePrimary)) { return 0; }
-  
+
   // Count the number of data sets in the file.
   int numNested = ePrimary->GetNumberOfNestedElements();
   int numDataSets = 0;
@@ -242,7 +242,7 @@ int vtkXMLCollectionReader::ReadPrimaryElement(vtkXMLDataElement* ePrimary)
     vtkXMLDataElement* eNested = ePrimary->GetNestedElement(i);
     if(strcmp(eNested->GetName(), "DataSet") == 0) { ++numDataSets; }
     }
-  
+
   // Now read each data set.  Build the list of data sets, their
   // attributes, and the attribute values.
   this->Internal->AttributeNames.clear();
@@ -295,6 +295,7 @@ int vtkXMLCollectionReader::ProcessRequest(vtkInformation* request,
       vtkInformation* outInfo = outputVector->GetInformationObject(i);
       outInfo->Set(vtkDemandDrivenPipeline::DATA_NOT_GENERATED(), 1);
       }
+
     }
   return this->Superclass::ProcessRequest(request, inputVector, outputVector);
 }
@@ -302,8 +303,8 @@ int vtkXMLCollectionReader::ProcessRequest(vtkInformation* request,
 
 //----------------------------------------------------------------------------
 int vtkXMLCollectionReader::RequestDataObject(
-  vtkInformation *vtkNotUsed(request), 
-  vtkInformationVector **vtkNotUsed(inputVector), 
+  vtkInformation *vtkNotUsed(request),
+  vtkInformationVector **vtkNotUsed(inputVector),
   vtkInformationVector *outputVector)
 {
   // need to Parse the file first
@@ -335,7 +336,7 @@ int vtkXMLCollectionReader::RequestDataObject(
       this->Internal->RestrictedDataSets.push_back(ds);
       }
     }
-  
+
   // Find the path to this file in case the internal files are
   // specified as relative paths.
   vtkstd::string filePath = this->FileName;
@@ -348,7 +349,7 @@ int vtkXMLCollectionReader::RequestDataObject(
     {
     filePath = "";
     }
-  
+
   // Create the readers for each data set to be read.
   int i;
   int n = static_cast<int>(this->Internal->RestrictedDataSets.size());
@@ -357,9 +358,9 @@ int vtkXMLCollectionReader::RequestDataObject(
   this->Internal->Readers.resize(n);
   for(i=0; i < n; ++i)
     {
-    this->SetupOutput(filePath.c_str(), i, 
+    this->SetupOutput(filePath.c_str(), i,
       outputVector->GetInformationObject(i));
-    }  
+    }
 
   return 1;
 }
@@ -383,7 +384,7 @@ void vtkXMLCollectionReader::SetupOutput(const char* filePath, int index,
       }
     }
   fileName += file;
-  
+
   // Get the file extension.
   vtkstd::string ext;
   vtkstd::string::size_type pos = fileName.rfind('.');
@@ -391,7 +392,7 @@ void vtkXMLCollectionReader::SetupOutput(const char* filePath, int index,
     {
     ext = fileName.substr(pos+1);
     }
-  
+
   // Search for the reader matching this extension.
   const char* rname = 0;
   for(const vtkXMLCollectionReaderEntry* r = this->Internal->ReaderList;
@@ -402,9 +403,8 @@ void vtkXMLCollectionReader::SetupOutput(const char* filePath, int index,
       rname = r->name;
       }
     }
-  
-  // If a reader was found, allocate an instance of it for this
-  // output.
+
+  // If a reader was found, allocate an instance of it for this output.
   if(rname)
     {
     if(!(this->Internal->Readers[index].GetPointer() &&
@@ -434,17 +434,17 @@ void vtkXMLCollectionReader::SetupOutput(const char* filePath, int index,
     {
     this->Internal->Readers[index] = 0;
     }
-  
+
   // If we have a reader for this output, connect its output to our
   // output by sharing the data with a ShallowCopy.
   if(this->Internal->Readers[index].GetPointer())
     {
     // Assign the file name to the internal reader.
     this->Internal->Readers[index]->SetFileName(fileName.c_str());
-    
+
     // Update the information on the internal reader's output.
-    this->Internal->Readers[index]->UpdateInformation();    
-    
+    this->Internal->Readers[index]->UpdateInformation();
+
     // Allocate an instance of the same output type for our output.
     vtkDataSet* out = this->Internal->Readers[index]->GetOutputAsDataSet();
     vtkDataSet *currentOutput = vtkDataSet::SafeDownCast(
@@ -459,8 +459,7 @@ void vtkXMLCollectionReader::SetupOutput(const char* filePath, int index,
       newOut->Delete();
       }
 
-    // Share the data between the internal reader's output and our
-    // output.
+    // Share the data between the internal reader's output and our output.
     this->GetExecutive()->GetOutputData(index)->ShallowCopy(out);
     }
   else
@@ -468,6 +467,44 @@ void vtkXMLCollectionReader::SetupOutput(const char* filePath, int index,
     // We do not have a reader for this output, remove it.
     this->GetExecutive()->SetOutputData(index, 0);
     }
+}
+
+
+//----------------------------------------------------------------------------
+int vtkXMLCollectionReader::RequestInformation(vtkInformation *request,
+  vtkInformationVector **vtkNotUsed(inputVector), vtkInformationVector *outputVector)
+{
+  this->InformationError = 0;
+  int outputPort = -1;
+
+  // not even sure that a request is going to come through for a particular
+  // port, but check
+  if ( request->Has(vtkDemandDrivenPipeline::FROM_OUTPUT_PORT()) )
+    {
+    outputPort = request->Get( vtkDemandDrivenPipeline::FROM_OUTPUT_PORT() );
+    }
+
+  if (outputPort < 0)
+    {
+    int i, numberOfOutputs = this->GetNumberOfOutputPorts();
+
+    for (i = 0; i < numberOfOutputs; i++)
+      {
+      // We already did the RequestInformation/UpdateInformation on the
+      // individual readers during the ReqeustDataObject pass for the
+      // vtkXMLCollectionReader, in SetupOutput; now, we need to copy relevant
+      // keys that were setup in the child readers to the outputs of this reader
+      this->Internal->Readers[i]->CopyOutputInformation(
+        outputVector->GetInformationObject(i), 0);
+      }
+    }
+  else
+    {
+    this->Internal->Readers[outputPort]->CopyOutputInformation(
+      outputVector->GetInformationObject(outputPort), 0);
+    }
+
+  return !this->InformationError;
 }
 
 //----------------------------------------------------------------------------
@@ -480,7 +517,7 @@ void vtkXMLCollectionReader::ReadXMLData()
     // Observe the progress of the internal reader.
     r->AddObserver(vtkCommand::ProgressEvent, this->InternalProgressObserver);
     vtkDataSet* out = r->GetOutputAsDataSet();
-    
+
     // Give the update request from this output to its internal
     // reader.
     if(out->GetExtentType() == VTK_PIECES_EXTENT)
@@ -496,16 +533,17 @@ void vtkXMLCollectionReader::ReadXMLData()
       this->GetExecutive()->GetOutputData(this->CurrentOutput)->GetUpdateExtent(e);
       out->SetUpdateExtent(e);
       }
-    
+
     // Read the data.
     out->Update();
-    
+
     // The internal reader is finished.  Remove the observer in case
     // we delete the reader later.
     r->RemoveObserver(this->InternalProgressObserver);
-    
+
     // Share the new data with our output.
     this->GetExecutive()->GetOutputData(this->CurrentOutput)->ShallowCopy(out);
+
 
     // If a "name" attribute exists, store the name of the output in
     // its field data.
@@ -532,7 +570,7 @@ void vtkXMLCollectionReader::AddAttributeNameValue(const char* name,
                                                    const char* value)
 {
   vtkXMLCollectionReaderString s = name;
-  
+
   // Find an entry for this attribute.
   vtkXMLCollectionReaderAttributeNames::iterator n =
     vtkstd::find(this->Internal->AttributeNames.begin(),
@@ -542,7 +580,7 @@ void vtkXMLCollectionReader::AddAttributeNameValue(const char* name,
     {
     // Need to create an entry for this attribute.
     this->Internal->AttributeNames.push_back(name);
-    
+
     this->Internal->AttributeValueSets.resize(
       this->Internal->AttributeValueSets.size()+1);
     values = &*(this->Internal->AttributeValueSets.end()-1);
@@ -552,12 +590,12 @@ void vtkXMLCollectionReader::AddAttributeNameValue(const char* name,
     values = &*(this->Internal->AttributeValueSets.begin() +
                 (n-this->Internal->AttributeNames.begin()));
     }
-  
+
   // Find an entry within the attribute for this value.
   s = value;
   vtkstd::vector<vtkXMLCollectionReaderString>::iterator i =
     vtkstd::find(values->begin(), values->end(), s);
-  
+
   if(i == values->end())
     {
     // Need to add the value.
@@ -607,7 +645,7 @@ int vtkXMLCollectionReader::GetNumberOfAttributeValues(int attribute)
     {
     return static_cast<int>(this->Internal->AttributeValueSets[attribute].size());
     }
-  return 0;  
+  return 0;
 }
 
 //----------------------------------------------------------------------------
@@ -659,7 +697,7 @@ vtkXMLDataElement* vtkXMLCollectionReader::GetOutputXMLDataElement(int index)
   // We must call UpdateInformation to make sure the set of outputs is
   // up to date.
   this->UpdateInformation();
-  
+
   // Make sure the index is in range.
   if(index < 0 ||
      index >= static_cast<int>(this->Internal->RestrictedDataSets.size()))
