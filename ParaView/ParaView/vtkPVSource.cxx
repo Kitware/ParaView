@@ -81,7 +81,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.314");
+vtkCxxRevisionMacro(vtkPVSource, "1.315");
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -1286,7 +1286,6 @@ void vtkPVSource::Accept(int hideFlag, int hideSource)
     { // This is the first time, initialize data.    
     vtkPVData *pvd;
     
-    this->Initialized = 1;
     pvd = this->GetPVOutput();
     if (pvd == NULL)
       { // I suppose we should try and delete the source.
@@ -1364,6 +1363,7 @@ void vtkPVSource::Accept(int hideFlag, int hideSource)
     // This causes input to be checked for validity.
     // I put it at the end so the InputFixedTypeRequirement will work.
     this->UnGrabFocus();
+    this->Initialized = 1;
     }
 
   window->GetMenuView()->CheckRadioButton(
@@ -2454,6 +2454,7 @@ int vtkPVSource::InitializeData()
       part->SetPVApplication(pvApp);
       this->Script("%s SetVTKDataTclName {${%s}}", part->GetTclName(),
                    dataName);
+      
       this->AddPart(part);
 
       // Create the extent translator (sources with no inputs only).

@@ -27,6 +27,7 @@ set pv(vtkTemp999) [$pvElevation GetPVWidget {Line}]
 $pv(vtkTemp999) SetPoint1 0 0 0
 $pv(vtkTemp999) SetPoint2 0 0 1
 $pvElevation AcceptCallback
+[$pvElevation GetPVOutput] DrawSurface
 
 set pvExtract [$pvWindow CreatePVSource ExtractEdges]
 $pvExtract AcceptCallback

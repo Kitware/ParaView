@@ -50,6 +50,7 @@ $pv(vtkTemp1) SetCurrentPVSource $pv(vtkTemp182)
 $pv(vtkTemp1) ShowCurrentSourceProperties
 $pv(vtkTemp191) SetNormal -0.80121 -0.53206 -0.27383
 $pv(vtkTemp182) AcceptCallback
+[$pv(vtkTemp182) GetPVOutput] DrawSurface
 $pv(vtkTemp1) SetCurrentPVSource $pv(vtkTemp213)
 $pv(vtkTemp1) ShowCurrentSourceProperties
 $pv(vtkTemp1) SetCurrentPVSource $pv(vtkTemp249)

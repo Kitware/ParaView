@@ -43,6 +43,11 @@ public:
   // that the input was 3d and an outline representation was used.
   vtkGetMacro(OutlineFlag, int);
 
+  // Description:
+  // Set/get whether to produce outline (vs. surface).
+  vtkSetMacro(UseOutline, int);
+  vtkGetMacro(UseOutline, int);
+  
 protected:
   vtkPVGeometryFilter();
   ~vtkPVGeometryFilter();
@@ -53,9 +58,11 @@ protected:
   void StructuredGridExecute(vtkStructuredGrid *input);
   void RectilinearGridExecute(vtkRectilinearGrid *input);
   void UnstructuredGridExecute(vtkUnstructuredGrid *input);
+  void PolyDataExecute(vtkPolyData *input);
 
   int OutlineFlag;
-
+  int UseOutline;
+  
 private:
   vtkPVGeometryFilter(const vtkPVGeometryFilter&); // Not implemented
   void operator=(const vtkPVGeometryFilter&); // Not implemented

@@ -207,6 +207,7 @@ public:
   void DrawWireframe();
   void DrawSurface();
   void DrawPoints();
+  void DrawOutline();
   
   // Description:
   // Methods called when item chosen from RepresentationMenu

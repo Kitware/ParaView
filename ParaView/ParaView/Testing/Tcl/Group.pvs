@@ -101,6 +101,7 @@ set kw(vtkTemp1326) [$kw(vtkTemp1320) GetPVWidget {ShrinkFactor}]
 $kw(vtkTemp1326) SetValue 0.5
 $kw(vtkTemp1320) AcceptCallback
 set kw(vtkTemp1356) [$kw(vtkTemp1320) GetPVOutput]
+$kw(vtkTemp1356) DrawSurface
 $kw(vtkTemp1356) ChangeActorColor 0.517647 1 0.035294
 $kw(vtkTemp1356) SetActorTranslate 0 -0.126582 0
 $kw(vtkTemp17) SetBackgroundColor 0 0 0

@@ -101,7 +101,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.212");
+vtkCxxRevisionMacro(vtkPVData, "1.213");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -631,11 +631,13 @@ void vtkPVData::CreateProperties()
 
   this->RepresentationMenu->SetParent(this->DisplayStyleFrame->GetFrame());
   this->RepresentationMenu->Create(this->Application, "");
-  this->RepresentationMenu->AddEntryWithCommand("Wireframe", this,
-                                                "DrawWireframe");
+  this->RepresentationMenu->AddEntryWithCommand("Outline", this,
+                                                "DrawOutline");
   this->RepresentationMenu->AddEntryWithCommand("Surface", this,
                                                 "DrawSurface");
-  this->RepresentationMenu->AddEntryWithCommand("Points", this,
+  this->RepresentationMenu->AddEntryWithCommand("Wireframe of Surface", this,
+                                                "DrawWireframe");
+  this->RepresentationMenu->AddEntryWithCommand("Points of Surface", this,
                                                 "DrawPoints");
   this->RepresentationMenu->SetValue("Surface");
   this->RepresentationMenu->SetBalloonHelpString(
@@ -1543,7 +1545,7 @@ void vtkPVData::UpdateMapScalarsCheck(vtkPVDataSetAttributesInformation* info,
 //----------------------------------------------------------------------------
 void vtkPVData::SetRepresentation(const char* repr)
 {
-  if ( vtkString::Equals(repr, "Wireframe") )
+  if ( vtkString::Equals(repr, "Wireframe of Surface") )
     {
     this->DrawWireframe();
     }
@@ -1551,9 +1553,13 @@ void vtkPVData::SetRepresentation(const char* repr)
     {
     this->DrawSurface();
     }
-  else if ( vtkString::Equals(repr, "Points") )
+  else if ( vtkString::Equals(repr, "Points of Surface") )
     {
     this->DrawPoints();
+    }
+  else if ( vtkString::Equals(repr, "Outline") )
+    {
+    this->DrawOutline();
     }
   else
     {
@@ -1569,8 +1575,12 @@ void vtkPVData::DrawWireframe()
   vtkPVPart *part;
   int idx, num;
   
-  this->AddTraceEntry("$kw(%s) DrawWireframe", this->GetTclName());
-
+  if (this->GetPVSource()->GetInitialized())
+    {
+    this->AddTraceEntry("$kw(%s) DrawWireframe", this->GetTclName());
+    this->RepresentationMenu->SetValue("Wireframe of Surface");
+    }
+  
   // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   // We could move the property into vtkPVData so parts would share one object.
   // Well, this would complicate initialization.  We would have to pass
@@ -1595,6 +1605,16 @@ void vtkPVData::DrawWireframe()
       pvApp->BroadcastScript("%s SetRepresentationToWireframe",
                              part->GetPartDisplay()->GetPropertyTclName());
       }
+    if (part->GetGeometryTclName())
+      {
+      this->Script("%s GetUseOutline", part->GetGeometryTclName());
+      if (vtkKWObject::GetIntegerResult(pvApp))
+        {
+        pvApp->BroadcastScript("%s SetUseOutline 0",
+                               part->GetGeometryTclName());
+        part->GetPartDisplay()->InvalidateGeometry();
+        }
+      }
     }
 
   if ( this->GetPVRenderView() )
@@ -1610,9 +1630,12 @@ void vtkPVData::DrawPoints()
   vtkPVPart *part;
   int idx, num;
 
-  this->AddTraceEntry("$kw(%s) DrawPoints", this->GetTclName());
-  this->RepresentationMenu->SetValue("Points");
-
+  if (this->GetPVSource()->GetInitialized())
+    {
+    this->AddTraceEntry("$kw(%s) DrawPoints", this->GetTclName());
+    this->RepresentationMenu->SetValue("Points of Surface");
+    }
+  
   num = this->GetPVSource()->GetNumberOfParts();
   for (idx = 0; idx < num; ++idx)
     {
@@ -1632,6 +1655,16 @@ void vtkPVData::DrawPoints()
       pvApp->BroadcastScript("%s SetRepresentationToPoints",
                              part->GetPartDisplay()->GetPropertyTclName());
       }
+    if (part->GetGeometryTclName())
+      {
+      this->Script("%s GetUseOutline", part->GetGeometryTclName());
+      if (vtkKWObject::GetIntegerResult(pvApp))
+        {
+        pvApp->BroadcastScript("%s SetUseOutline 0",
+                               part->GetGeometryTclName());
+        part->GetPartDisplay()->InvalidateGeometry();
+        }
+      }
     }
   
   if ( this->GetPVRenderView() )
@@ -1647,9 +1680,11 @@ void vtkPVData::DrawSurface()
   vtkPVPart *part;
   int num, idx;
   
-  this->AddTraceEntry("$kw(%s) DrawSurface", this->GetTclName());
-  this->RepresentationMenu->SetValue("Surface");
-
+  if (this->GetPVSource()->GetInitialized())
+    {
+    this->AddTraceEntry("$kw(%s) DrawSurface", this->GetTclName());
+    this->RepresentationMenu->SetValue("Surface");
+    }
 
   num = this->GetPVSource()->GetNumberOfParts();
   for (idx = 0; idx < num; ++idx)
@@ -1669,8 +1704,66 @@ void vtkPVData::DrawSurface()
                                part->GetPartDisplay()->GetPropertyTclName());
         }
       }
+    if (part->GetGeometryTclName())
+      {
+      this->Script("%s GetUseOutline", part->GetGeometryTclName());
+      if (vtkKWObject::GetIntegerResult(pvApp))
+        {
+        pvApp->BroadcastScript("%s SetUseOutline 0",
+                               part->GetGeometryTclName());
+        part->GetPartDisplay()->InvalidateGeometry();
+        }
+      }
     }
   this->PreviousWasSolid = 1;
+
+  if ( this->GetPVRenderView() )
+    {
+    this->GetPVRenderView()->EventuallyRender();
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVData::DrawOutline()
+{
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  vtkPVPart *part;
+  int num, idx;
+  
+  if (this->GetPVSource()->GetInitialized())
+    {
+    this->AddTraceEntry("$kw(%s) DrawOutline", this->GetTclName());
+    this->RepresentationMenu->SetValue("Outline");
+    }
+
+  num = this->GetPVSource()->GetNumberOfParts();
+  for (idx = 0; idx < num; ++idx)
+    {
+    part = this->GetPVSource()->GetPart(idx);
+    if (part->GetPartDisplay()->GetPropertyTclName())
+      {
+      if (this->PreviousWasSolid)
+        {
+        this->PreviousAmbient = part->GetPartDisplay()->GetProperty()->GetAmbient();
+        this->PreviousDiffuse = part->GetPartDisplay()->GetProperty()->GetDiffuse();
+        this->PreviousSpecular = part->GetPartDisplay()->GetProperty()->GetSpecular();
+        }
+      this->PreviousWasSolid = 0;
+      pvApp->BroadcastScript("%s SetAmbient 1",
+                             part->GetPartDisplay()->GetPropertyTclName());
+      pvApp->BroadcastScript("%s SetDiffuse 0",
+                             part->GetPartDisplay()->GetPropertyTclName());
+      pvApp->BroadcastScript("%s SetSpecular 0",
+                             part->GetPartDisplay()->GetPropertyTclName());
+      pvApp->BroadcastScript("%s SetRepresentationToSurface",
+                             part->GetPartDisplay()->GetPropertyTclName());
+      }
+    if (part->GetGeometryTclName())
+      {
+      pvApp->BroadcastScript("%s SetUseOutline 1", part->GetGeometryTclName());
+      part->GetPartDisplay()->InvalidateGeometry();
+      }
+    }
 
   if ( this->GetPVRenderView() )
     {
@@ -1820,6 +1913,14 @@ void vtkPVData::Initialize()
                this->GetCubeAxesTclName(), tclName);
   this->Script("%s SetInertia 20", this->GetCubeAxesTclName());
   
+  if (this->GetPVSource()->GetDataInformation()->GetDataSetType() == VTK_POLY_DATA)
+    {
+    this->SetRepresentation("Surface");
+    }
+  else
+    {
+    this->SetRepresentation("Outline");
+    }
 }
 
 
