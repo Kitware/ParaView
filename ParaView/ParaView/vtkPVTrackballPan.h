@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    vtkPVInteractorStyleRotateCamera.h
+  Module:    vtkPVTrackballPan.h
   Language:  C++
   Date:      $Date$
   Version:   $Revision$
@@ -39,62 +39,42 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-// .NAME vtkPVInteractorStyleRotateCamera - interactive manipulation of the camera
+// .NAME vtkPVTrackballPan - Pans camera with x y mouse movements.
 // .SECTION Description
-// vtkPVInteractorStyleRotateCamera allows the user to interactively
+// vtkPVTrackballPan allows the user to interactively
 // manipulate the camera, the viewpoint of the scene.
-// The left button is for rotation; shift + left button is for rolling;
-// the right button is for panning; and shift + right button is for zooming.
+// Moving the mouse down zooms in. Up zooms out.
+// This manipulator has not been extended to parallel projection yet.
+// It works in perspective by rotating the camera.
 
-#ifndef __vtkPVInteractorStyleRotateCamera_h
-#define __vtkPVInteractorStyleRotateCamera_h
+#ifndef __vtkPVTrackballPan_h
+#define __vtkPVTrackballPan_h
 
-#include "vtkInteractorStyle.h"
+#include "vtkPVCameraManipulator.h"
 
-class vtkTransform;
-class vtkCamera;
-
-class VTK_EXPORT vtkPVInteractorStyleRotateCamera : public vtkInteractorStyle
+class VTK_EXPORT vtkPVTrackballPan : public vtkPVCameraManipulator
 {
 public:
-  static vtkPVInteractorStyleRotateCamera *New();
-  vtkTypeRevisionMacro(vtkPVInteractorStyleRotateCamera, vtkInteractorStyle);
+  static vtkPVTrackballPan *New();
+  vtkTypeRevisionMacro(vtkPVTrackballPan, vtkPVCameraManipulator);
   void PrintSelf(ostream& os, vtkIndent indent);
   
   // Description:
   // Event bindings controlling the effects of pressing mouse buttons
   // or moving the mouse.
-  virtual void OnMouseMove();
-  virtual void OnLeftButtonDown();
-  virtual void OnLeftButtonUp();
-  virtual void OnRightButtonDown();
-  virtual void OnRightButtonUp();
-  
-  // Description:
-  // These methods are for the interactions for this interactor style.
-  virtual void Rotate();
-  virtual void Roll();
-  virtual void Pan();
-  virtual void Zoom();
-
-  // Description:
-  // Set the center of rotation
-  vtkSetVector3Macro(Center, float);
-  vtkGetVector3Macro(Center, float);
+  virtual void OnMouseMove(int x, int y, vtkRenderer *ren,
+                           vtkRenderWindowInteractor *iren);
+  virtual void OnButtonDown(int x, int y, vtkRenderer *ren,
+                            vtkRenderWindowInteractor *iren);
+  virtual void OnButtonUp(int x, int y, vtkRenderer *ren,
+                          vtkRenderWindowInteractor *iren);
   
 protected:
-  vtkPVInteractorStyleRotateCamera();
-  ~vtkPVInteractorStyleRotateCamera();
+  vtkPVTrackballPan();
+  ~vtkPVTrackballPan();
 
-  void ResetLights();
-  void TransformCamera(vtkTransform *transform, vtkCamera *camera);
-  
-  float ZoomScale;
-  float Center[3];
-  float DisplayCenter[2];
-
-  vtkPVInteractorStyleRotateCamera(const vtkPVInteractorStyleRotateCamera&); // Not implemented
-  void operator=(const vtkPVInteractorStyleRotateCamera&); // Not implemented
+  vtkPVTrackballPan(const vtkPVTrackballPan&); // Not implemented
+  void operator=(const vtkPVTrackballPan&); // Not implemented
 };
 
 #endif

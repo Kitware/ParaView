@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    vtkPVInteractorStyleTranslateCamera.cxx
+  Module:    vtkPVInteractorStyle.cxx
   Language:  C++
   Date:      $Date$
   Version:   $Revision$
@@ -39,157 +39,156 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-#include "vtkPVInteractorStyleTranslateCamera.h"
+#include "vtkPVInteractorStyle.h"
 
-#include "vtkCamera.h"
-#include "vtkCommand.h"
-#include "vtkLight.h"
+
 #include "vtkObjectFactory.h"
 #include "vtkRenderWindowInteractor.h"
+#include "vtkPVCameraManipulator.h"
+#include "vtkCollection.h"
+#include "vtkLight.h"
+#include "vtkLightCollection.h"
 #include "vtkRenderer.h"
+#include "vtkCamera.h"
 
-vtkCxxRevisionMacro(vtkPVInteractorStyleTranslateCamera, "1.3");
-vtkStandardNewMacro(vtkPVInteractorStyleTranslateCamera);
+vtkCxxRevisionMacro(vtkPVInteractorStyle, "1.1");
+vtkStandardNewMacro(vtkPVInteractorStyle);
 
 //-------------------------------------------------------------------------
-vtkPVInteractorStyleTranslateCamera::vtkPVInteractorStyleTranslateCamera()
+vtkPVInteractorStyle::vtkPVInteractorStyle()
 {
   this->UseTimers = 0;
-  this->ZoomScale = 0.0;
-}
+  this->CameraManipulators = vtkCollection::New();
+  this->Current = NULL;
+ }
 
 //-------------------------------------------------------------------------
-vtkPVInteractorStyleTranslateCamera::~vtkPVInteractorStyleTranslateCamera()
+vtkPVInteractorStyle::~vtkPVInteractorStyle()
 {
+  this->CameraManipulators->Delete();
+  this->CameraManipulators = NULL;
 }
 
 //-------------------------------------------------------------------------
-void vtkPVInteractorStyleTranslateCamera::OnMouseMove()
+void vtkPVInteractorStyle::AddManipulator(vtkPVCameraManipulator *m)
+{
+  this->CameraManipulators->AddItem(m);
+}
+
+//-------------------------------------------------------------------------
+void vtkPVInteractorStyle::OnLeftButtonDown()
+{
+  this->OnButtonDown(1, this->Interactor->GetShiftKey(), 
+		     this->Interactor->GetControlKey());
+}
+
+//-------------------------------------------------------------------------
+void vtkPVInteractorStyle::OnMiddleButtonDown()
+{
+  this->OnButtonDown(2, this->Interactor->GetShiftKey(), 
+		     this->Interactor->GetControlKey());
+}
+
+//-------------------------------------------------------------------------
+void vtkPVInteractorStyle::OnRightButtonDown()
+{
+  this->OnButtonDown(3, this->Interactor->GetShiftKey(), 
+		     this->Interactor->GetControlKey());
+}
+
+
+//-------------------------------------------------------------------------
+void vtkPVInteractorStyle::OnButtonDown(int button, int shift, int control)
+{
+  vtkPVCameraManipulator *manipulator;
+
+  // Must not be processing an interaction to start another.
+  if (this->Current)
+    {
+    return;
+    }
+
+  // Get the renderer.
+  this->FindPokedRenderer(this->Interactor->GetEventPosition()[0],
+                          this->Interactor->GetEventPosition()[1]);
+  if (this->CurrentRenderer == NULL)
+    {
+    return;
+    }
+  
+
+  // Look for a matching camera interactor.
+  this->CameraManipulators->InitTraversal();
+  while ((manipulator = (vtkPVCameraManipulator*)
+                        this->CameraManipulators->GetNextItemAsObject()))
+    {
+    if (manipulator->GetButton() == button && 
+        manipulator->GetShift() == shift &&
+	manipulator->GetControl() == control)
+      {
+      this->Current = manipulator;
+      this->Current->Register(this);
+      this->Current->OnButtonDown(this->Interactor->GetEventPosition()[0],
+                                  this->Interactor->GetEventPosition()[1],
+                                  this->CurrentRenderer,
+                                  this->Interactor);
+      return;
+      }
+    }
+}
+
+//-------------------------------------------------------------------------
+void vtkPVInteractorStyle::OnLeftButtonUp()
+{
+  this->OnButtonUp(1);
+}
+//-------------------------------------------------------------------------
+void vtkPVInteractorStyle::OnMiddleButtonUp()
+{
+  this->OnButtonUp(2);
+}
+//-------------------------------------------------------------------------
+void vtkPVInteractorStyle::OnRightButtonUp()
+{
+  this->OnButtonUp(3);
+}
+
+//-------------------------------------------------------------------------
+void vtkPVInteractorStyle::OnButtonUp(int button)
+{
+  if (this->Current == NULL)
+    {
+    return;
+    }
+  if (this->Current->GetButton() == button)
+    {
+    this->Current->OnButtonUp(this->Interactor->GetEventPosition()[0],
+                              this->Interactor->GetEventPosition()[1],
+                              this->CurrentRenderer,
+                              this->Interactor);
+    this->Current->UnRegister(this);
+    this->Current = NULL;
+    }
+}
+
+//-------------------------------------------------------------------------
+void vtkPVInteractorStyle::OnMouseMove()
 {
   this->FindPokedRenderer(this->Interactor->GetEventPosition()[0],
                           this->Interactor->GetEventPosition()[1]);
-  
-  switch (this->State)
+
+  if (this->Current)
     {
-    case VTKIS_PAN:
-      this->Pan();
-      break;
-    case VTKIS_ZOOM:
-      this->Zoom();
-      break;
+    this->Current->OnMouseMove(this->Interactor->GetEventPosition()[0],
+                               this->Interactor->GetEventPosition()[1],
+                               this->CurrentRenderer,
+                               this->Interactor);
     }
 }
 
-//-------------------------------------------------------------------------
-void vtkPVInteractorStyleTranslateCamera::OnLeftButtonDown()
-{
-  this->FindPokedRenderer(this->Interactor->GetEventPosition()[0],
-                          this->Interactor->GetEventPosition()[1]);
-  if (this->CurrentRenderer == NULL)
-    {
-    return;
-    }
-  
-  this->StartPan();
-}
 
 //-------------------------------------------------------------------------
-void vtkPVInteractorStyleTranslateCamera::OnLeftButtonUp()
-{
-  this->EndPan();
-}
-
-//-------------------------------------------------------------------------
-void vtkPVInteractorStyleTranslateCamera::OnRightButtonDown()
-{
-  this->FindPokedRenderer(this->Interactor->GetEventPosition()[0],
-                          this->Interactor->GetEventPosition()[1]);
-  if (this->CurrentRenderer == NULL)
-    {
-    return;
-    }
-  
-  int *size = this->CurrentRenderer->GetSize();
-  double *range = this->CurrentRenderer->GetActiveCamera()->GetClippingRange();
-  this->ZoomScale = 1.5 * range[1] / (float)size[1];
-  
-  this->StartZoom();
-}
-
-//-------------------------------------------------------------------------
-void vtkPVInteractorStyleTranslateCamera::OnRightButtonUp()
-{
-  this->EndZoom();
-}
-
-//-------------------------------------------------------------------------
-void vtkPVInteractorStyleTranslateCamera::Pan()
-{
-  if (this->CurrentRenderer == NULL)
-    {
-    return;
-    }
-
-  vtkRenderWindowInteractor *rwi = this->Interactor;
-  
-  vtkCamera *camera = this->CurrentRenderer->GetActiveCamera();
-  float viewAngle = camera->GetViewAngle();
-  int *size = this->CurrentRenderer->GetSize();
-  
-  // These are different because y is flipped.
-  float dx = rwi->GetEventPosition()[0] - rwi->GetLastEventPosition()[0];
-  float dy = rwi->GetLastEventPosition()[1] - rwi->GetEventPosition()[1];
-  
-  camera->Yaw(viewAngle * dx / size[0]);
-  camera->Pitch(viewAngle * dy / size[1]);
-  
-  this->ResetLights();
-  this->CurrentRenderer->ResetCameraClippingRange();
-  
-  rwi->Render();
-}
-
-//-------------------------------------------------------------------------
-void vtkPVInteractorStyleTranslateCamera::Zoom()
-{
-  if (this->CurrentRenderer == NULL)
-    {
-    return;
-    }
-
-  vtkRenderWindowInteractor *rwi = this->Interactor;
-  double dy = rwi->GetLastEventPosition()[1] - rwi->GetEventPosition()[1];
-  vtkCamera *camera = this->CurrentRenderer->GetActiveCamera();
-  double pos[3], fp[3], *norm, k, tmp;
-  
-  camera->GetPosition(pos);
-  camera->GetFocalPoint(fp);
-  norm = camera->GetDirectionOfProjection();
-  k = dy * this->ZoomScale;
-
-  tmp = k * norm[0];
-  pos[0] += tmp;
-  fp[0] += tmp;
-  
-  tmp = k*norm[1];
-  pos[1] += tmp;
-  fp[1] += tmp;
-  
-  tmp = k * norm[2];
-  pos[2] += tmp;
-  fp[2] += tmp;
-  
-  camera->SetFocalPoint(fp);
-  camera->SetPosition(pos);
-  
-  this->ResetLights();
-  this->CurrentRenderer->ResetCameraClippingRange();
-  
-  rwi->Render();
-}
-
-//-------------------------------------------------------------------------
-void vtkPVInteractorStyleTranslateCamera::ResetLights()
+void vtkPVInteractorStyle::ResetLights()
 {
   if ( ! this->CurrentRenderer)
     {
@@ -212,7 +211,7 @@ void vtkPVInteractorStyleTranslateCamera::ResetLights()
 }
 
 //-------------------------------------------------------------------------
-void vtkPVInteractorStyleTranslateCamera::PrintSelf(ostream& os, vtkIndent indent)
+void vtkPVInteractorStyle::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 }

@@ -73,12 +73,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVDemoPaths.h"
 #include "vtkPVErrorLogDisplay.h"
 #include "vtkPVFileEntry.h"
-#include "vtkPVFileEntry.h"
 #include "vtkPVGenericRenderWindowInteractor.h"
 #include "vtkPVInteractorStyleCenterOfRotation.h"
 #include "vtkPVInteractorStyleFly.h"
-#include "vtkPVInteractorStyleRotateCamera.h"
-#include "vtkPVInteractorStyleTranslateCamera.h"
+#include "vtkPVInteractorStyle.h"
+#include "vtkPVTrackballRoll.h"
+#include "vtkPVTrackballRotate.h"
+#include "vtkPVTrackballPan.h"
+#include "vtkPVTrackballZoom.h"
 #include "vtkPVReaderModule.h"
 #include "vtkPVRenderView.h"
 #include "vtkPVRenderView.h"
@@ -153,17 +155,67 @@ vtkPVWindow::vtkPVWindow()
   this->FlyButton = vtkKWRadioButton::New();
   this->RotateCameraButton = vtkKWRadioButton::New();
   this->TranslateCameraButton = vtkKWRadioButton::New();
-  //this->TrackballCameraButton = vtkKWRadioButton::New();
   
   this->GenericInteractor = vtkPVGenericRenderWindowInteractor::New();
   
   // This toolbar contains buttons for instantiating new modules
   this->Toolbar = vtkKWToolbar::New();
 
-  
-  //this->TrackballCameraStyle = vtkInteractorStyleTrackballCamera::New();
-  this->TranslateCameraStyle = vtkPVInteractorStyleTranslateCamera::New();
-  this->RotateCameraStyle = vtkPVInteractorStyleRotateCamera::New();
+  this->RotationManipulators = vtkCollection::New();
+
+  this->RotateCameraStyle = vtkPVInteractorStyle::New();
+  vtkPVCameraManipulator *manipulator;
+  vtkPVCenterOfRotationManipulator *rotationManipulator;
+  // ----
+  rotationManipulator = vtkPVTrackballRotate::New();
+  rotationManipulator->SetButton(1);
+  this->RotateCameraStyle->AddManipulator(rotationManipulator);
+  this->RotationManipulators->AddItem(rotationManipulator);
+  rotationManipulator->Delete();
+  rotationManipulator = NULL;
+  // ----
+  rotationManipulator = vtkPVTrackballRoll::New();
+  rotationManipulator->SetButton(1);
+  rotationManipulator->ShiftOn();
+  this->RotateCameraStyle->AddManipulator(rotationManipulator);
+  this->RotationManipulators->AddItem(rotationManipulator);
+  rotationManipulator->Delete();
+  rotationManipulator = NULL;
+  // ----
+  manipulator = vtkPVTrackballPan::New();
+  manipulator->SetButton(2);
+  this->RotateCameraStyle->AddManipulator(manipulator);
+  manipulator->Delete();
+  manipulator = NULL;
+  // ----
+  manipulator = vtkPVTrackballZoom::New();
+  manipulator->SetButton(3);
+  this->RotateCameraStyle->AddManipulator(manipulator);
+  manipulator->Delete();
+  manipulator = NULL;
+  // ----
+  manipulator = vtkPVTrackballPan::New();
+  manipulator->SetButton(3);
+  manipulator->ShiftOn();
+  this->RotateCameraStyle->AddManipulator(manipulator);
+  manipulator->Delete();
+  manipulator = NULL;
+
+
+  this->TranslateCameraStyle = vtkPVInteractorStyle::New();
+  // ----
+  manipulator = vtkPVTrackballPan::New();
+  manipulator->SetButton(1);
+  this->TranslateCameraStyle->AddManipulator(manipulator);
+  manipulator->Delete();
+  manipulator = NULL;
+  // ----
+  manipulator = vtkPVTrackballZoom::New();
+  manipulator->SetButton(3);
+  this->TranslateCameraStyle->AddManipulator(manipulator);
+  manipulator->Delete();
+  manipulator = NULL;
+
   this->CenterOfRotationStyle = vtkPVInteractorStyleCenterOfRotation::New();
   this->FlyStyle = vtkPVInteractorStyleFly::New();
   
@@ -290,6 +342,9 @@ vtkPVWindow::~vtkPVWindow()
   this->TranslateCameraButton = NULL;
   //this->TrackballCameraButton->Delete();
   //this->TrackballCameraButton = NULL;
+
+  this->RotationManipulators->Delete();
+  this->RotationManipulators = NULL;
 
   this->CenterSource->Delete();
   this->CenterSource = NULL;
@@ -734,7 +789,6 @@ void vtkPVWindow::InitializeInteractorInterfaces(vtkKWApplication *app)
   //             this->TrackballCameraButton->GetWidgetName());
   //this->TrackballCameraButton->SetState(1);
   
-  this->RotateCameraStyle->SetCenter(0.0, 0.0, 0.0);
   this->MainView->ResetCamera();
 }
 
@@ -832,7 +886,8 @@ void vtkPVWindow::Create(vtkKWApplication *app, char* vtkNotUsed(args))
   this->CenterXEntry->Create(app, "-width 7");
   this->Script("bind %s <KeyPress-Return> {%s CenterEntryCallback}",
                this->CenterXEntry->GetWidgetName(), this->GetTclName());
-  this->CenterXEntry->SetValue(this->RotateCameraStyle->GetCenter()[0], 3);
+  //this->CenterXEntry->SetValue(this->RotateCameraStyle->GetCenter()[0], 3);
+  this->CenterXEntry->SetValue(0.0, 3);
   
   this->CenterYLabel->SetParent(this->CenterEntryFrame);
   this->CenterYLabel->Create(app, "");
@@ -842,7 +897,8 @@ void vtkPVWindow::Create(vtkKWApplication *app, char* vtkNotUsed(args))
   this->CenterYEntry->Create(app, "-width 7");
   this->Script("bind %s <KeyPress-Return> {%s CenterEntryCallback}",
                this->CenterYEntry->GetWidgetName(), this->GetTclName());
-  this->CenterYEntry->SetValue(this->RotateCameraStyle->GetCenter()[1], 3);
+  //this->CenterYEntry->SetValue(this->RotateCameraStyle->GetCenter()[1], 3);
+  this->CenterYEntry->SetValue(0.0, 3);
 
   this->CenterZLabel->SetParent(this->CenterEntryFrame);
   this->CenterZLabel->Create(app, "");
@@ -852,7 +908,8 @@ void vtkPVWindow::Create(vtkKWApplication *app, char* vtkNotUsed(args))
   this->CenterZEntry->Create(app, "-width 7");
   this->Script("bind %s <KeyPress-Return> {%s CenterEntryCallback}",
                this->CenterZEntry->GetWidgetName(), this->GetTclName());
-  this->CenterZEntry->SetValue(this->RotateCameraStyle->GetCenter()[2], 3);
+  //this->CenterZEntry->SetValue(this->RotateCameraStyle->GetCenter()[2], 3);
+  this->CenterZEntry->SetValue(0.0, 3);
 
   this->Script("pack %s %s %s %s %s %s %s -side left",
                this->CenterXLabel->GetWidgetName(),
@@ -1068,16 +1125,32 @@ void vtkPVWindow::CenterEntryCloseCallback()
                this->CenterEntryOpenButton->GetWidgetName());
 }
 
+
+//----------------------------------------------------------------------------
+void vtkPVWindow::SetCenterOfRotation(float x, float y, float z)
+{
+  vtkPVCenterOfRotationManipulator *m;
+
+  this->RotationManipulators->InitTraversal();
+  while ( (m = (vtkPVCenterOfRotationManipulator*)
+                 (this->RotationManipulators->GetNextItemAsObject()) ))
+    {
+    m->SetCenter(x, y, z);
+    }
+  this->CenterActor->SetPosition(x, y, z);
+}
+
+//----------------------------------------------------------------------------
 void vtkPVWindow::CenterEntryCallback()
 {
   float x = this->CenterXEntry->GetValueAsFloat();
   float y = this->CenterYEntry->GetValueAsFloat();
   float z = this->CenterZEntry->GetValueAsFloat();
-  this->RotateCameraStyle->SetCenter(x, y, z);
-  this->CenterActor->SetPosition(x, y, z);
+  this->SetCenterOfRotation(x, y, z);
   this->MainView->EventuallyRender();
 }
 
+//----------------------------------------------------------------------------
 void vtkPVWindow::ResetCenterCallback()
 {
   if ( ! this->CurrentPVData)
@@ -1093,20 +1166,21 @@ void vtkPVWindow::ResetCenterCallback()
   center[1] = (bounds[2]+bounds[3])/2.0;
   center[2] = (bounds[4]+bounds[5])/2.0;
 
-  this->RotateCameraStyle->SetCenter(center);
+  this->SetCenterOfRotation(center[0], center[1], center[2]);
   this->CenterXEntry->SetValue(center[0], 3);
   this->CenterYEntry->SetValue(center[1], 3);
   this->CenterZEntry->SetValue(center[2], 3);
-  this->CenterActor->SetPosition(center);
   this->ResizeCenterActor();
   this->MainView->EventuallyRender();
 }
 
+//----------------------------------------------------------------------------
 void vtkPVWindow::FlySpeedScaleCallback()
 {
   this->FlyStyle->SetSpeed(this->FlySpeedScale->GetValue());
 }
 
+//----------------------------------------------------------------------------
 void vtkPVWindow::ResizeCenterActor()
 {
   float bounds[6];
@@ -1133,6 +1207,7 @@ void vtkPVWindow::ResizeCenterActor()
   this->CenterActor->SetVisibility(vis);
 }
 
+//----------------------------------------------------------------------------
 void vtkPVWindow::ChangeInteractorStyle(int index)
 {
   this->Script("catch {eval pack forget %s}",
@@ -1184,6 +1259,7 @@ void vtkPVWindow::ChangeInteractorStyle(int index)
   this->MainView->EventuallyRender();
 }
 
+//----------------------------------------------------------------------------
 void vtkPVWindow::AButtonPress(int button, int x, int y)
 {
   // not binding middle button
@@ -1199,6 +1275,7 @@ void vtkPVWindow::AButtonPress(int button, int x, int y)
     }
 }
 
+//----------------------------------------------------------------------------
 void vtkPVWindow::AShiftButtonPress(int button, int x, int y)
 {
   // not binding middle button
@@ -1214,6 +1291,7 @@ void vtkPVWindow::AShiftButtonPress(int button, int x, int y)
     }
 }
 
+//----------------------------------------------------------------------------
 void vtkPVWindow::AButtonRelease(int button, int x, int y)
 {
   // not binding middle button
@@ -1229,6 +1307,7 @@ void vtkPVWindow::AButtonRelease(int button, int x, int y)
     }
 }
 
+//----------------------------------------------------------------------------
 void vtkPVWindow::AShiftButtonRelease(int button, int x, int y)
 {
   // not binding middle button
@@ -1244,12 +1323,14 @@ void vtkPVWindow::AShiftButtonRelease(int button, int x, int y)
     }
 }
 
+//----------------------------------------------------------------------------
 void vtkPVWindow::MouseMotion(int x, int y)
 {
   this->GenericInteractor->SetEventInformationFlipY(x, y);
   this->GenericInteractor->MouseMoveEvent();
 }
 
+//----------------------------------------------------------------------------
 void vtkPVWindow::Configure(int width, int height)
 {
   this->GenericInteractor->UpdateSize(width, height);
@@ -1506,14 +1587,14 @@ int vtkPVWindow::Open(char *openFileName)
     }
 
 
-// These should be added manually to regression scripts so that
-// they don't hang with a dialog up.
-//  this->GetPVApplication()->AddTraceEntry("$kw(%s) UseMessageDialogOff", 
-//                                        this->GetTclName());
+  // These should be added manually to regression scripts so that
+  // they don't hang with a dialog up.
+  //  this->GetPVApplication()->AddTraceEntry("$kw(%s) UseMessageDialogOff", 
+  //                                        this->GetTclName());
   this->GetPVApplication()->AddTraceEntry("$kw(%s) Open \"%s\"", 
                                           this->GetTclName(), openFileName);
-//  this->GetPVApplication()->AddTraceEntry("$kw(%s) UseMessageDialogOn", 
-//                                        this->GetTclName());
+  //  this->GetPVApplication()->AddTraceEntry("$kw(%s) UseMessageDialogOn", 
+  //                                        this->GetTclName());
 
   // Ask each reader module if it can read the file. This first
   // one which says OK gets to read the file.

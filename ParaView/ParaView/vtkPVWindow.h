@@ -83,7 +83,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class vtkActor;
 class vtkAxes;
 class vtkGenericRenderWindowInteractor;
-class vtkInteractorStyleTrackballCamera;
 class vtkKWCheckButton;
 class vtkKWEntry;
 class vtkKWLabel;
@@ -102,8 +101,7 @@ class vtkPVErrorLogDisplay;
 class vtkPVGenericRenderWindowInteractor;
 class vtkPVInteractorStyleCenterOfRotation;
 class vtkPVInteractorStyleFly;
-class vtkPVInteractorStyleRotateCamera;
-class vtkPVInteractorStyleTranslateCamera;
+class vtkPVInteractorStyle;
 class vtkPVReaderModule;
 class vtkPVRenderView;
 class vtkPVSource;
@@ -113,6 +111,7 @@ class vtkPVXMLPackageParser;
 class vtkPolyDataMapper;
 class vtkCollection;
 class vtkPVColorMap;
+class vtkPVTrackballRoll;
 
 //BTX
 template <class key, class data> 
@@ -257,8 +256,8 @@ public:
   
   // Description:
   // Access to the interactor styles from tcl.
-  vtkGetObjectMacro(RotateCameraStyle, vtkPVInteractorStyleRotateCamera);
-  vtkGetObjectMacro(TranslateCameraStyle, vtkPVInteractorStyleTranslateCamera);
+  vtkGetObjectMacro(RotateCameraStyle, vtkPVInteractorStyle);
+  vtkGetObjectMacro(TranslateCameraStyle, vtkPVInteractorStyle);
   vtkGetObjectMacro(FlyStyle, vtkPVInteractorStyleFly);
   
   // Description:
@@ -391,6 +390,10 @@ public:
   // (e.g. Temperature).
   vtkPVColorMap* GetPVColorMap(const char* parameterName);
 
+  // Description:
+  // Propagates the center to the manipulators.
+  void SetCenterOfRotation(float x, float y, float z);
+
 protected:
   vtkPVWindow();
   ~vtkPVWindow();
@@ -405,12 +408,17 @@ protected:
   vtkKWMenu *SelectMenu;
   vtkKWMenu *GlyphMenu;
   
-  vtkInteractorStyleTrackballCamera *TrackballCameraStyle;
-  vtkPVInteractorStyleTranslateCamera *TranslateCameraStyle;
-  vtkPVInteractorStyleRotateCamera *RotateCameraStyle;
+  vtkPVInteractorStyle *TranslateCameraStyle;
+  vtkPVInteractorStyle *RotateCameraStyle;
+  vtkCollection *RotationManipulators;
+
+  // This should be made into a 3D Widget.
   vtkPVInteractorStyleCenterOfRotation *CenterOfRotationStyle;
+
+  // Fly should also be made into a manipulator.
   vtkPVInteractorStyleFly *FlyStyle;
-  
+
+    
   // Interactor stuff
   vtkKWToolbar *InteractorToolbar;
   vtkKWRadioButton *FlyButton;

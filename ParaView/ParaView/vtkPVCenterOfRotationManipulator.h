@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    vtkPVInteractorStyleTranslateCamera.h
+  Module:    vtkPVCenterOfRotationManipulator.h
   Language:  C++
   Date:      $Date$
   Version:   $Revision$
@@ -39,48 +39,39 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-// .NAME vtkPVInteractorStyleTranslateCamera - interactive manipulation of the camera
+// .NAME vtkPVCenterOfRotationManipulator - Camera manipulators that requires selection of a center.
 // .SECTION Description
-// vtkPVInteractorStyleTranslateCamera allows the user to interactively
-// manipulate camera, the viewpoint of the scene.
-// The left button is for panning, and the right button is for zooming.
+// This super class contains a center variable.  Subclass use this center
+// as the center of rotation.
 
-#ifndef __vtkPVInteractorStyleTranslateCamera_h
-#define __vtkPVInteractorStyleTranslateCamera_h
+#ifndef __vtkPVCenterOfRotationManipulator_h
+#define __vtkPVCenterOfRotationManipulator_h
 
-#include "vtkInteractorStyle.h"
+#include "vtkPVCameraManipulator.h"
+class vtkRenderer;
 
-class VTK_EXPORT vtkPVInteractorStyleTranslateCamera : public vtkInteractorStyle
+class VTK_EXPORT vtkPVCenterOfRotationManipulator : public vtkPVCameraManipulator
 {
 public:
-  static vtkPVInteractorStyleTranslateCamera *New();
-  vtkTypeRevisionMacro(vtkPVInteractorStyleTranslateCamera, vtkInteractorStyle);
+  static vtkPVCenterOfRotationManipulator *New();
+  vtkTypeRevisionMacro(vtkPVCenterOfRotationManipulator, vtkPVCameraManipulator);
   void PrintSelf(ostream& os, vtkIndent indent);
   
   // Description:
-  // Event bindings controlling the effects of pressing mouse buttons
-  // or moving the mouse.
-  virtual void OnMouseMove();
-  virtual void OnLeftButtonDown();
-  virtual void OnLeftButtonUp();
-  virtual void OnRightButtonDown();
-  virtual void OnRightButtonUp();
-  
-  // Description:
-  // These methods are for the interactions for this interactor style.
-  virtual void Pan();
-  virtual void Zoom();
+  // For setting the center of rotation.
+  vtkSetVector3Macro(Center, float);
+  vtkGetVector3Macro(Center, float);
   
 protected:
-  vtkPVInteractorStyleTranslateCamera();
-  ~vtkPVInteractorStyleTranslateCamera();
+  vtkPVCenterOfRotationManipulator();
+  ~vtkPVCenterOfRotationManipulator();
 
-  void ResetLights();
+  float Center[3];
+  float DisplayCenter[2];
+  void ComputeDisplayCenter(vtkRenderer *ren);
 
-  float ZoomScale;
-
-  vtkPVInteractorStyleTranslateCamera(const vtkPVInteractorStyleTranslateCamera&); // Not implemented
-  void operator=(const vtkPVInteractorStyleTranslateCamera&); // Not implemented
+  vtkPVCenterOfRotationManipulator(const vtkPVCenterOfRotationManipulator&); // Not implemented
+  void operator=(const vtkPVCenterOfRotationManipulator&); // Not implemented
 };
 
 #endif

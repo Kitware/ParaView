@@ -45,6 +45,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkDummyRenderWindow.h"
 #include "vtkDummyRenderer.h"
 #include "vtkKWChangeColorButton.h"
+#include "vtkKWPushButton.h"
 #include "vtkKWCheckButton.h"
 #include "vtkKWCornerAnnotation.h"
 #include "vtkKWLabel.h"
@@ -123,11 +124,20 @@ vtkPVRenderView::vtkPVRenderView()
 
   this->SetMenuPropertiesName(" 3D View Settings");
   this->SetMenuPropertiesHelp("Show global view parameters (background color, annoations2 etc.)");
+
+  this->StandardViewsFrame = vtkKWLabeledFrame::New();
+  this->XMaxViewButton = vtkKWPushButton::New();
+  this->XMinViewButton = vtkKWPushButton::New();
+  this->YMaxViewButton = vtkKWPushButton::New();
+  this->YMinViewButton = vtkKWPushButton::New();
+  this->ZMaxViewButton = vtkKWPushButton::New();
+  this->ZMinViewButton = vtkKWPushButton::New();
   
   this->RenderParametersFrame = vtkKWLabeledFrame::New();
   this->RenderParametersFrame->SetParent( this->GeneralProperties );
 
   this->TriangleStripsCheck = vtkKWCheckButton::New();
+  this->ParallelProjectionCheck = vtkKWCheckButton::New();
   this->ImmediateModeCheck = vtkKWCheckButton::New();
   this->InterruptRenderCheck = vtkKWCheckButton::New();
   this->CompositeWithFloatCheck = vtkKWCheckButton::New();
@@ -222,8 +232,26 @@ vtkPVRenderView::~vtkPVRenderView()
     this->TopLevelRenderWindow = NULL;
     }
   
+  this->StandardViewsFrame->Delete();
+  this->StandardViewsFrame = NULL;
+  this->XMaxViewButton->Delete();
+  this->XMaxViewButton = NULL;
+  this->XMinViewButton->Delete();
+  this->XMinViewButton = NULL;
+  this->YMaxViewButton->Delete();
+  this->YMaxViewButton = NULL;
+  this->YMinViewButton->Delete();
+  this->YMinViewButton = NULL;
+  this->ZMaxViewButton->Delete();
+  this->ZMaxViewButton = NULL;
+  this->ZMinViewButton->Delete();
+  this->ZMinViewButton = NULL;
+
   this->RenderParametersFrame->Delete();
   this->RenderParametersFrame = 0;
+
+  this->ParallelProjectionCheck->Delete();
+  this->ParallelProjectionCheck = NULL;
 
   this->TriangleStripsCheck->Delete();
   this->TriangleStripsCheck = NULL;
@@ -356,6 +384,8 @@ void vtkPVRenderView::PrepareForDelete()
   vtkPVApplication* pvapp = this->GetPVApplication();
   if (pvapp)
     {
+    pvapp->SetRegisteryValue(2, "RunTime", "UseParallelProjection", "%d",
+			     this->ParallelProjectionCheck->GetState());
     pvapp->SetRegisteryValue(2, "RunTime", "UseStrips", "%d",
 			     this->TriangleStripsCheck->GetState());
     pvapp->SetRegisteryValue(2, "RunTime", "UseImmediateMode", "%d",
@@ -531,15 +561,81 @@ void vtkPVRenderView::CreateViewProperties()
   vtkPVWindow* pvwindow = this->GetPVWindow();
   vtkPVApplication* pvapp = this->GetPVApplication();
   //this->RenderParametersFrame->ShowHideFrameOn();
+
+  
+  this->StandardViewsFrame->SetParent( this->GeneralProperties );
+  this->StandardViewsFrame->Create(this->Application);
+  this->StandardViewsFrame->SetLabel("Standard Views");
+  this->Script("pack %s -padx 2 -pady 2 -fill x -expand yes -anchor w",
+               this->StandardViewsFrame->GetWidgetName());
+
+  this->XMaxViewButton->SetParent(this->StandardViewsFrame->GetFrame());
+  this->XMaxViewButton->SetLabel("+X");
+  this->XMaxViewButton->Create(this->Application, "");
+  this->XMaxViewButton->SetCommand(this, "StandardViewCallback 1 0 0");
+  this->Script("grid configure %s -column 0 -row 0 -padx 2 -pady 2 -ipadx 5 -sticky ew",
+               this->XMaxViewButton->GetWidgetName());
+  this->XMinViewButton->SetParent(this->StandardViewsFrame->GetFrame());
+  this->XMinViewButton->SetLabel("-X");
+  this->XMinViewButton->Create(this->Application, "");
+  this->XMinViewButton->SetCommand(this, "StandardViewCallback -1 0 0");
+  this->Script("grid configure %s -column 0 -row 1 -padx 2 -pady 2 -ipadx 5 -sticky ew",
+               this->XMinViewButton->GetWidgetName());
+
+  this->YMaxViewButton->SetParent(this->StandardViewsFrame->GetFrame());
+  this->YMaxViewButton->SetLabel("+Y");
+  this->YMaxViewButton->Create(this->Application, "");
+  this->YMaxViewButton->SetCommand(this, "StandardViewCallback 0 1 0");
+  this->Script("grid configure %s -column 1 -row 0 -padx 2 -pady 2 -ipadx 5 -sticky ew",
+               this->YMaxViewButton->GetWidgetName());
+  this->YMinViewButton->SetParent(this->StandardViewsFrame->GetFrame());
+  this->YMinViewButton->SetLabel("-Y");
+  this->YMinViewButton->Create(this->Application, "");
+  this->YMinViewButton->SetCommand(this, "StandardViewCallback 0 -1 0");
+  this->Script("grid configure %s -column 1 -row 1 -padx 2 -pady 2 -ipadx 5 -sticky ew",
+               this->YMinViewButton->GetWidgetName());
+
+  this->ZMaxViewButton->SetParent(this->StandardViewsFrame->GetFrame());
+  this->ZMaxViewButton->SetLabel("+Z");
+  this->ZMaxViewButton->Create(this->Application, "");
+  this->ZMaxViewButton->SetCommand(this, "StandardViewCallback 0 0 1");
+  this->Script("grid configure %s -column 2 -row 0 -padx 2 -pady 2 -ipadx 5 -sticky ew",
+               this->ZMaxViewButton->GetWidgetName());
+  this->ZMinViewButton->SetParent(this->StandardViewsFrame->GetFrame());
+  this->ZMinViewButton->SetLabel("-Z");
+  this->ZMinViewButton->Create(this->Application, "");
+  this->ZMinViewButton->SetCommand(this, "StandardViewCallback 0 0 -1");
+  this->Script("grid configure %s -column 2 -row 1 -padx 2 -pady 2 -ipadx 5 -sticky ew",
+               this->ZMinViewButton->GetWidgetName());
+
   this->RenderParametersFrame->Create(this->Application);
   this->RenderParametersFrame->SetLabel("Advanced Render Parameters");
   this->Script("pack %s -padx 2 -pady 2 -fill x -expand yes -anchor w",
                this->RenderParametersFrame->GetWidgetName());
 
+  this->ParallelProjectionCheck->SetParent(
+    this->RenderParametersFrame->GetFrame());
+  this->ParallelProjectionCheck->Create(this->Application, "");
+  this->ParallelProjectionCheck->SetText("Use Parallel Projection");
+  if (pvapp && pvwindow && 
+      pvapp->GetRegisteryValue(2, "RunTime", "UseParallelProjection", 0))
+    {
+    this->ParallelProjectionCheck->SetState(
+      pvwindow->GetIntRegisteryValue(2, "RunTime", "UseParallelProjection"));
+    this->ParallelProjectionCallback();
+    }
+  else
+    {
+    this->ParallelProjectionCheck->SetState(0);
+    }
+  this->ParallelProjectionCheck->SetCommand(this, "ParallelProjectionCallback");
+  this->ParallelProjectionCheck->SetBalloonHelpString(
+    "Toggle the use of parallel projection vesus perspective.");
+  
   this->TriangleStripsCheck->SetParent(
     this->RenderParametersFrame->GetFrame());
-  this->TriangleStripsCheck->Create(this->Application, 
-				    "-text \"Use Triangle Strips\"");
+  this->TriangleStripsCheck->Create(this->Application, "");
+  this->TriangleStripsCheck->SetText("Use Triangle Strips");
   if (pvapp && pvwindow && 
       pvapp->GetRegisteryValue(2, "RunTime", "UseStrips", 0))
     {
@@ -701,7 +797,8 @@ void vtkPVRenderView::CreateViewProperties()
     "It should not change the final rendered image.");
 
   
-  this->Script("pack %s %s %s %s %s %s %s %s -side top -anchor w",
+  this->Script("pack %s %s %s %s %s %s %s %s %s -side top -anchor w",
+               this->ParallelProjectionCheck->GetWidgetName(),
                this->TriangleStripsCheck->GetWidgetName(),
                this->ImmediateModeCheck->GetWidgetName(),
                this->ReductionCheck->GetWidgetName(),
@@ -712,14 +809,35 @@ void vtkPVRenderView::CreateViewProperties()
                this->CompositeCompressionCheck->GetWidgetName());
 #else
   this->Script("pack %s %s %s %s -side top -anchor w",
+               this->ParallelProjectionCheck->GetWidgetName(),
                this->TriangleStripsCheck->GetWidgetName(),
                this->ImmediateModeCheck->GetWidgetName(),
-               this->ReductionCheck->GetWidgetName(),
                this->FrameRateFrame->GetWidgetName());
 
 #endif
 }
 
+//----------------------------------------------------------------------------
+void vtkPVRenderView::StandardViewCallback(float x, float y, float z)
+{
+  vtkCamera *cam = this->Renderer->GetActiveCamera();
+  cam->SetFocalPoint(0.0, 0.0, 0.0);
+  cam->SetPosition(x, y, z);
+  if (x == 0.0)
+    {
+    cam->SetViewUp(1.0, 0.0, 0.0);
+    }
+  else
+    {
+    cam->SetViewUp(0.0, 1.0, 0.0);
+    }
+
+  this->GetRenderer()->ResetCamera();
+  this->EventuallyRender();
+}
+
+
+//----------------------------------------------------------------------------
 void vtkPVRenderView::FrameRateScaleCallback()
 {
   float newRate = this->FrameRateScale->GetValue();
@@ -730,12 +848,14 @@ void vtkPVRenderView::FrameRateScaleCallback()
   this->SetInteractiveUpdateRate(newRate);
 }
 
+//----------------------------------------------------------------------------
 void vtkPVRenderView::ReductionCheckCallback()
 {
   int reduce = this->ReductionCheck->GetState();
   this->SetUseReductionFactor(reduce);
 }
 
+//----------------------------------------------------------------------------
 void vtkPVRenderView::UpdateNavigationWindow(vtkPVSource *currentSource)
 {
   if (this->NavigationWindow)
@@ -1133,6 +1253,24 @@ void vtkPVRenderView::TriangleStripsCallback()
     vtkTimerLog::MarkEvent("--- Disable triangle strips.");
     }
 
+}
+
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::ParallelProjectionCallback()
+{
+
+  if (this->ParallelProjectionCheck->GetState())
+    {
+    vtkTimerLog::MarkEvent("--- Enable parallel projection.");
+    this->Renderer->GetActiveCamera()->ParallelProjectionOn();
+    }
+  else
+    {
+    vtkTimerLog::MarkEvent("--- Disable parallel projection.");
+    this->Renderer->GetActiveCamera()->ParallelProjectionOff();
+    }
+  this->EventuallyRender();
 }
 
 //----------------------------------------------------------------------------

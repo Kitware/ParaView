@@ -59,6 +59,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class vtkKWLabel;
 class vtkKWScale;
+class vtkKWPushButton;
 class vtkLabeledFrame;
 class vtkPVApplication;
 class vtkPVData;
@@ -110,6 +111,9 @@ public:
   // visible actors. This ensures that no props are cut off
   void ResetCameraClippingRange();
 
+  // Description:
+  // Callback to set the view up or down one of the three axes.
+  void StandardViewCallback(float x, float y, float z);
 
   // Description:
   // This method is executed in all processes.
@@ -200,6 +204,10 @@ public:
   vtkGetMacro(InteractiveCompositeTime, double);
 
   // Description:
+  // Callback for toggling between parallel and perspective.
+  void ParallelProjectionCallback();
+  
+  // Description:
   // Callback for the triangle strips check button
   void TriangleStripsCallback();
   
@@ -272,8 +280,17 @@ protected:
   vtkKWWidget       *NavigationCanvas;
   vtkKWWidget       *NavScrollBar;
 
+  vtkKWLabeledFrame *StandardViewsFrame;
+  vtkKWPushButton   *XMaxViewButton; 
+  vtkKWPushButton   *XMinViewButton; 
+  vtkKWPushButton   *YMaxViewButton; 
+  vtkKWPushButton   *YMinViewButton; 
+  vtkKWPushButton   *ZMaxViewButton; 
+  vtkKWPushButton   *ZMinViewButton; 
+
   vtkKWLabeledFrame *RenderParametersFrame;
   vtkKWCheckButton *TriangleStripsCheck;
+  vtkKWCheckButton *ParallelProjectionCheck;
   vtkKWCheckButton *ImmediateModeCheck;
   vtkKWCheckButton *InterruptRenderCheck;
   vtkKWCheckButton *CompositeWithFloatCheck;

@@ -721,10 +721,9 @@ void vtkPVSource::Accept(int hideFlag)
       {
       float bds[6];
       ac->GetBounds(bds);
-      window->GetRotateCameraStyle()->SetCenter(
-                    0.5*(bds[0]+bds[1]), 
-                    0.5*(bds[2]+bds[3]),
-                    0.5*(bds[4]+bds[5]));
+      window->SetCenterOfRotation(0.5*(bds[0]+bds[1]), 
+                                  0.5*(bds[2]+bds[3]),
+                                  0.5*(bds[4]+bds[5]));
       window->ResetCenterCallback();
       window->GetMainView()->ResetCamera();
       }

@@ -16,6 +16,8 @@ vtkPVArrayCalculator.cxx
 vtkPVArrayMenu.cxx 
 vtkPVArraySelection.cxx
 vtkPVBoundsDisplay.cxx
+vtkPVCameraManipulator.cxx
+vtkPVCenterOfRotationManipulator.cxx
 vtkPVColorMap.cxx
 vtkPVComponentSelection.cxx
 vtkPVConnectivityFilter.cxx
@@ -34,10 +36,9 @@ vtkPVFileEntry.cxx
 vtkPVGenericRenderWindowInteractor.cxx
 vtkPVGlyph3D.cxx 
 vtkPVInputMenu.cxx 
+vtkPVInteractorStyle.cxx
 vtkPVInteractorStyleCenterOfRotation.cxx
 vtkPVInteractorStyleFly.cxx
-vtkPVInteractorStyleRotateCamera.cxx
-vtkPVInteractorStyleTranslateCamera.cxx
 vtkPVLODActor.cxx
 vtkPVLabel.cxx
 vtkPVLabeledToggle.cxx
@@ -61,6 +62,10 @@ vtkPVSphereWidget.cxx
 vtkPVStringEntry.cxx
 vtkPVThreshold.cxx 
 vtkPVTimerLogDisplay.cxx
+vtkPVTrackballPan.cxx
+vtkPVTrackballRoll.cxx
+vtkPVTrackballRotate.cxx
+vtkPVTrackballZoom.cxx
 vtkPVTreeComposite.cxx 
 vtkPVVectorEntry.cxx
 vtkPVWidget.cxx
