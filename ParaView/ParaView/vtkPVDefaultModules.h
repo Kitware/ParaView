@@ -443,7 +443,7 @@ const char* vtkPVWindow::StandardFilterInterfaces=
 "  <ExtentEntry variable=\"Extent\" help=\"Set the min/max extents of the grid\"/>\n"
 "</Module>\n"
 "\n"
-"<Module name=\"ReflectionFilter\" root_name=\"Reflect\" input=\"vtkPolyData\" output=\"vtkPolyData\" module_type=\"Filter\">\n"
+"<Module name=\"ReflectionFilter\" root_name=\"Reflect\" input=\"vtkDataSet\" output=\"vtkUnstructuredGrid\" module_type=\"Filter\">\n"
 "  <Filter type=\"vtkReflectionFilter\"/>\n"
 "  <InputMenu label=\"Input\" help=\"Set the input to this filter.\"\n"
 "             input_name=\"PVInput\" input_type=\"vtkPolyData\"/>\n"
