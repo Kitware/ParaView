@@ -2788,14 +2788,14 @@ void vtkKWWindow::AddRecentFile(char *key, char *name,vtkKWObject *target,
     if (strlen(File) > 1)
       {
       char cmd[1024];
-      sprintf(cmd,"%s {%s}",command, File);
+      sprintf(cmd,"%s {%s}",command, name);
       this->GetMenuFile()->InsertCommand(
         this->GetFileMenuIndex()+2,name,target,cmd);
       }
     else
       {
       char cmd[1024];
-      sprintf(cmd,"%s {%s}",command, File);
+      sprintf(cmd,"%s {%s}",command, name);
       this->GetMenuFile()->InsertCommand(
         this->GetMenuFile()->GetIndex("Close")-1,name,target,cmd);
       }
