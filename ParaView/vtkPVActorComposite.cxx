@@ -1520,6 +1520,15 @@ void vtkPVActorComposite::SaveInTclScript(ofstream *file, const char *sourceName
         << this->PropTclName << " SetVisibility "
         << this->Prop->GetVisibility() << "\n\n";
 
+  if (!this->Mapper->GetScalarVisibility())
+    {
+    float propColor[3];
+    this->Property->GetColor(propColor);
+    *file << "[" << this->PropTclName << " GetProperty] SetColor "
+          << propColor[0] << " " << propColor[1] << " " << propColor[2]
+          << "\n\n";
+    }
+  
   //*file << "\n";
   //*file << renTclName << " AddActor " << this->PropTclName << "\n"
   
