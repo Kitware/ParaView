@@ -17,27 +17,21 @@
 #include "vtkClientServerStream.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVInformation.h"
-#include "vtkSMProcessModule.h"
-#include "vtkSocketController.h"
 
 #include "vtkProcessModule.h"
 
-#define VTK_PV_CLIENTSERVER_RMI_TAG          938531
-
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMSimpleCommunicationModule);
-vtkCxxRevisionMacro(vtkSMSimpleCommunicationModule, "1.3");
+vtkCxxRevisionMacro(vtkSMSimpleCommunicationModule, "1.4");
 
 //----------------------------------------------------------------------------
 vtkSMSimpleCommunicationModule::vtkSMSimpleCommunicationModule()
 {
-  this->SocketController = vtkSocketController::New();
 }
 
 //----------------------------------------------------------------------------
 vtkSMSimpleCommunicationModule::~vtkSMSimpleCommunicationModule()
 {
-  this->SocketController->Delete();
 }
 
 //----------------------------------------------------------------------------
@@ -57,10 +51,6 @@ void vtkSMSimpleCommunicationModule::SendStreamToServer(
   vtkClientServerStream* stream, int serverid)
 {
 
-  // TODO Replace this with a generic controller where each node is the
-  // root node of one server. The server manager is simple another 
-  // server. The controller should take care of sending/receiving etc.
-
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
 
   if (!pm->GetStreamPointer())
@@ -77,6 +67,10 @@ void vtkSMSimpleCommunicationModule::SendStreamToServer(
     {
     pm->SendStreamToServer();
     }
+
+  // TODO Replace this with a generic controller where each node is the
+  // root node of one server. The server manager is simple another 
+  // server. The controller should take care of sending/receiving etc.
 
 //   const unsigned char* data;
 //   size_t len;
@@ -113,20 +107,6 @@ void vtkSMSimpleCommunicationModule::GatherInformation(vtkPVInformation* info,
 //   stream.SetData(data, length);
 //   info->CopyFromStream(&stream);
 //   delete [] data;
-}
-
-//----------------------------------------------------------------------------
-void vtkSMSimpleCommunicationModule::Connect()
-{
-  vtkErrorMacro("Deprecated Function");
-}
-
-//----------------------------------------------------------------------------
-void vtkSMSimpleCommunicationModule::Disconnect()
-{
-  this->SocketController->TriggerRMI(
-    1, vtkMultiProcessController::BREAK_RMI_TAG);
-  this->SocketController->CloseConnection();
 }
 
 //---------------------------------------------------------------------------

@@ -12,8 +12,10 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSMLookupTableProxy -
+// .NAME vtkSMLookupTableProxy - proxy for a VTK lookup table
 // .SECTION Description
+// This proxy class is an example of how vtkSMProxy can be subclassed
+// to add functionality. It adds one simple method : Build().
 
 #ifndef __vtkSMLookupTableProxy_h
 #define __vtkSMLookupTableProxy_h
@@ -28,6 +30,7 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
+  // Create the lookup table values.
   void Build();
 
 protected:

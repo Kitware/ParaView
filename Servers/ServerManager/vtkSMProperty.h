@@ -12,7 +12,7 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSMProperty - abstract superclass for all ParaView properties
+// .NAME vtkSMProperty - abstract superclass for all SM properties
 // .SECTION Description
 // vtkSMProperty is an abstract class that represents a parameter of
 // a vtk object stored on one or more client manager or server nodes.
@@ -36,6 +36,8 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
+  // The command name used to set the value on the server object.
+  // For example: SetThetaResolution
   vtkSetStringMacro(Command);
   vtkGetStringMacro(Command);
 
@@ -48,12 +50,16 @@ protected:
   friend class vtkSMProxy;
 
   // Description:
-  // Update the vtk object (with the given id and on the given
-  // nodes) with the property values(s).
+  // Append a command to update the vtk object with the property values(s).
+  // The proxy objects create a stream by calling this method on all the
+  // modified properties.
   virtual void AppendCommandToStream(
     vtkClientServerStream* stream, vtkClientServerID objectId ) = 0;
   //ETX
 
+  // Description:
+  // Set the appropriate ivars from the xml element. Should
+  // be overwritten by subclass if adding ivars.
   virtual int ReadXMLAttributes(vtkPVXMLElement* element);
 
   char* Command;

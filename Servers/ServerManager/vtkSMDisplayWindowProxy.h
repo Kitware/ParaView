@@ -12,8 +12,13 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSMDisplayWindowProxy -
+// .NAME vtkSMDisplayWindowProxy - composite proxy for renderer, render window...
 // .SECTION Description
+// vtkSMDisplayWindowProxy is a composite proxy that manages objects related
+// to rendering including renderer, render window, composite manager,
+// camera, image writer (for screenshots)
+// .SECTION See Also
+// vtkSMDisplayerProxy vtkSMProxy
 
 #ifndef __vtkSMDisplayWindowProxy_h
 #define __vtkSMDisplayWindowProxy_h
@@ -31,32 +36,39 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  virtual void CreateVTKObjects(int numObjects);
-
-  // Description:
+  // Render without LOD.
   void StillRender();
 
   // Description:
+  // Render with LOD. Not used yet.
   void InteractiveRender();
 
   // Description:
+  // Adds a display to the list of managed displays. This adds
+  // the actor(s) to the renderer.
   void AddDisplay(vtkSMDisplayerProxy* display);
 
   // Description:
+  // Update all VTK objects. Including the ones managed by the
+  // sub-proxies.
   virtual void UpdateVTKObjects();
 
   // Description:
-  void WriteImage(const char* filename);
+  // Generate a screenshot from the render window.
+  void WriteImage(const char* filename, const char* writerName);
 
 protected:
   vtkSMDisplayWindowProxy();
   ~vtkSMDisplayWindowProxy();
 
+  // Description:
+  // Create all VTK objects including the ones for sub-proxies.
+  virtual void CreateVTKObjects(int numObjects);
+
   vtkSMProxy* RendererProxy;
   vtkSMProxy* CameraProxy;
   vtkSMProxy* CompositeProxy;
   vtkSMProxy* WindowToImage;
-  vtkSMProxy* ImageWriter;
 
 private:
   vtkSMDisplayWindowProxy(const vtkSMDisplayWindowProxy&); // Not implemented

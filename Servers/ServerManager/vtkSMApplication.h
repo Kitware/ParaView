@@ -12,8 +12,10 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSMApplication -
+// .NAME vtkSMApplication - provides initialization and finalization for server manager
 // .SECTION Description
+// vtkSMApplication provides methods to initialize and finalize the
+// server manager.
 
 #ifndef __vtkSMApplication_h
 #define __vtkSMApplication_h
@@ -28,9 +30,16 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
+  // Perform initialization: add the server manager symbols to the
+  // interpreter, read default interfaces from strings, create
+  // singletons... Should be called before any server manager objects
+  // are created.
   void Initialize();
 
   // Description:
+  // Cleanup: cleans singletons
+  // Should be called before exit, after all server manager objects
+  // are deleted.
   void Finalize();
 
 protected:

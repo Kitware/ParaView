@@ -12,8 +12,12 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSMDoubleVectorProperty -
+// .NAME vtkSMDoubleVectorProperty - property representing a vector of doubles
 // .SECTION Description
+// vtkSMDoubleVectorProperty is a concrete sub-class of vtkSMVectorProperty
+// representing a vector of double.
+// .SECTION See Also
+// vtkSMVectorProperty vtkSMIntVectorProperty vtkSMStringVectorProperty
 
 #ifndef __vtkSMDoubleVectorProperty_h
 #define __vtkSMDoubleVectorProperty_h
@@ -32,30 +36,50 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  virtual int GetNumberOfElements();
+  // Returns the size of the vector.
+  virtual unsigned int GetNumberOfElements();
 
   // Description:
-  virtual void SetNumberOfElements(int num);
+  // Sets the size of the vector. If num is larger than the current
+  // number of elements, this may cause reallocation and copying.
+  virtual void SetNumberOfElements(unsigned int num);
 
   // Description:
-  void SetElement(int idx, double value);
+  // Set the value of 1 element. The vector is resized as necessary.
+  void SetElement(unsigned int idx, double value);
 
   // Description:
-  void SetElements(double* values);
+  // Set the values of all elements. The size of the values array
+  // has to be equal or larger to the size of the vector.
+  void SetElements(const double* values);
 
   // Description:
+  // Set the value of 1st element. The vector is resized as necessary.
   void SetElements1(double value0);
 
   // Description:
+  // Set the values of the first 2 elements. The vector is resized as necessary.
   void SetElements2(double value0, double value1);
 
   // Description:
+  // Set the values of the first 3 elements. The vector is resized as necessary.
   void SetElements3(double value0, double value1, double value2);
 
   // Description:
-  double GetElement(int idx);
+  // Returns the value of 1 element.
+  double GetElement(unsigned int idx);
 
   // Description:
+  // If ArgumentIsArray is true, multiple elements are passed in as
+  // array arguments. For example, For example, if
+  // RepeatCommand is true, NumberOfElementsPerCommand is 2, the
+  // command is SetFoo and the values are 1 2 3 4 5 6, the resulting
+  // stream will have:
+  // @verbatim
+  // * Invoke obj SetFoo array(1, 2)
+  // * Invoke obj SetFoo array(3, 4)
+  // * Invoke obj SetFoo array(5, 6)
+  // @endverbatim
   vtkGetMacro(ArgumentIsArray, int);
   vtkSetMacro(ArgumentIsArray, int);
 
@@ -67,8 +91,9 @@ protected:
 
 //BTX  
   // Description:
-  // Update the vtk object (with the given id and on the given
-  // nodes) with the property values(s).
+  // Append a command to update the vtk object with the property values(s).
+  // The proxy objects create a stream by calling this method on all the
+  // modified properties.
   virtual void AppendCommandToStream(
     vtkClientServerStream* stream, vtkClientServerID objectId );
 //ETX

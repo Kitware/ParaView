@@ -18,7 +18,6 @@
 #include "vtkDirectory.h"
 #include "vtkKWArguments.h"
 #include "vtkObjectFactory.h"
-#include "vtkSMProcessModule.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMSimpleCommunicationModule.h"
 #include "vtkSMXMLParser.h"
@@ -29,7 +28,7 @@
 #include "vtkSMGeneratedModules.h"
 
 vtkStandardNewMacro(vtkSMApplication);
-vtkCxxRevisionMacro(vtkSMApplication, "1.4");
+vtkCxxRevisionMacro(vtkSMApplication, "1.5");
 
 //---------------------------------------------------------------------------
 vtkSMApplication::vtkSMApplication()
@@ -54,16 +53,10 @@ void vtkSMApplication::Initialize()
 
 //   args->Parse();
 
-  //vtkSMProcessModule* pm = vtkSMProcessModule::New();
-  //pm->InitializeInterpreter();
-  //this->SetProcessModule(pm);
-  //pm->Delete();
-
   vtkPVServerManager_Initialize(
     vtkProcessModule::GetProcessModule()->GetInterpreter());
 
   vtkSMSimpleCommunicationModule* cm = vtkSMSimpleCommunicationModule::New();
-  //cm->Connect();
   this->SetCommunicationModule(cm);
   cm->Delete();
 
@@ -164,11 +157,8 @@ void vtkSMApplication::Initialize()
 //---------------------------------------------------------------------------
 void vtkSMApplication::Finalize()
 {
-  //vtkSMSimpleCommunicationModule::SafeDownCast(this->GetCommunicationModule())
-  //->Disconnect();
   this->SetCommunicationModule(0);
   //this->GetProcessModule()->FinalizeInterpreter();
-  this->SetProcessModule(0);
   this->SetProxyManager(0);
 
 }

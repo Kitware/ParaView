@@ -20,7 +20,7 @@
 #include "vtkSMProxy.h"
 
 vtkStandardNewMacro(vtkSMProxyProperty);
-vtkCxxRevisionMacro(vtkSMProxyProperty, "1.1");
+vtkCxxRevisionMacro(vtkSMProxyProperty, "1.2");
 
 //---------------------------------------------------------------------------
 vtkSMProxyProperty::vtkSMProxyProperty()
@@ -83,4 +83,6 @@ void vtkSMProxyProperty::AppendCommandToStream(
 void vtkSMProxyProperty::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+
+  os << indent << "Proxy: " << this->Proxy << endl;
 }

@@ -9,7 +9,6 @@ SET( ServerManagerCommon_SRCS
   vtkSMLookupTableProxy.cxx
   vtkSMObject.cxx
   vtkSMPart.cxx
-  vtkSMProcessModule.cxx
   vtkSMProperty.cxx
   vtkSMProxy.cxx
   vtkSMSourceProxy.cxx

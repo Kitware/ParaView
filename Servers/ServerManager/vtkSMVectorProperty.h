@@ -12,8 +12,13 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSMVectorProperty -
+// .NAME vtkSMVectorProperty - abstract superclass for all vector properties
 // .SECTION Description
+// vtkSMVectorProperty defines an interface common to all vector properties
+// as well as some common settings. A vector property contains a list
+// of values passed to one or more invocations of a command. How the
+// values are distributed to the different invocations is controlled
+// by several parameters.
 
 #ifndef __vtkSMVectorProperty_h
 #define __vtkSMVectorProperty_h
@@ -27,23 +32,56 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  virtual int GetNumberOfElements() = 0;
+  // Returns the size of the vector.
+  virtual unsigned int GetNumberOfElements() = 0;
 
   // Description:
-  virtual void SetNumberOfElements(int num) = 0;
+  // Sets the size of the vector.
+  virtual void SetNumberOfElements(unsigned int num) = 0;
 
   // Description:
+  // If RepeatCommand is true, the command is invoked multiple times,
+  // each time with NumberOfElementsPerCommand values. For example, if
+  // RepeatCommand is true, NumberOfElementsPerCommand is 2, the
+  // command is SetFoo and the values are 1 2 3 4 5 6, the resulting
+  // stream will have:
+  // @verbatim
+  // * Invoke obj SetFoo 1 2
+  // * Invoke obj SetFoo 3 4
+  // * Invoke obj SetFoo 5 6
+  // @endverbatim
   vtkGetMacro(RepeatCommand, int);
   vtkSetMacro(RepeatCommand, int);
   vtkBooleanMacro(RepeatCommand, int);
 
   // Description:
+  // If RepeatCommand is true, the command is invoked multiple times,
+  // each time with NumberOfElementsPerCommand values. For example, if
+  // RepeatCommand is true, NumberOfElementsPerCommand is 2, the
+  // command is SetFoo and the values are 1 2 3 4 5 6, the resulting
+  // stream will have:
+  // @verbatim
+  // * Invoke obj SetFoo 1 2
+  // * Invoke obj SetFoo 3 4
+  // * Invoke obj SetFoo 5 6
+  // @endverbatim
   vtkGetMacro(NumberOfElementsPerCommand, int);
   vtkSetMacro(NumberOfElementsPerCommand, int);
 
   // Description:
+  // If UseIndex and RepeatCommand are true, the property will add
+  // an index integer before each command. For example, if UseIndex and
+  // RepeatCommand are true, NumberOfElementsPerCommand is 2, the
+  // command is SetFoo and the values are 5 6 7 8 9 10, the resulting
+  // stream will have:
+  // @verbatim
+  // * Invoke obj SetFoo 0 5 6
+  // * Invoke obj SetFoo 1 7 8
+  // * Invoke obj SetFoo 2 9 10
+  // @endverbatim
   vtkGetMacro(UseIndex, int);
   vtkSetMacro(UseIndex, int);
+  vtkBooleanMacro(UseIndex, int);
 
 protected:
   vtkSMVectorProperty();
@@ -53,6 +91,8 @@ protected:
   int NumberOfElementsPerCommand;
   int UseIndex;
 
+  // Description:
+  // Set the appropriate ivars from the xml element.
   virtual int ReadXMLAttributes(vtkPVXMLElement* element);
 
 private:

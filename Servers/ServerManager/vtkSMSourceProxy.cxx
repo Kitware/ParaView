@@ -20,12 +20,11 @@
 #include "vtkSmartPointer.h"
 #include "vtkSMPart.h"
 #include "vtkSMCommunicationModule.h"
-#include "vtkSMProcessModule.h"
 
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMSourceProxy);
-vtkCxxRevisionMacro(vtkSMSourceProxy, "1.6");
+vtkCxxRevisionMacro(vtkSMSourceProxy, "1.7");
 
 struct vtkSMSourceProxyInternals
 {
@@ -43,8 +42,6 @@ vtkSMSourceProxy::vtkSMSourceProxy()
 
   this->NumberOfInputs = 0;
   this->Inputs = 0;
-
-  this->HasMultipleInputs = 0;
 
 }
 
@@ -69,6 +66,8 @@ vtkSMPart* vtkSMSourceProxy::GetPart(int idx)
 }
 
 //---------------------------------------------------------------------------
+// Call UpdateInformation() on all sources
+// TODO this should update information properties.
 void vtkSMSourceProxy::UpdateInformation()
 {
   int numIDs = this->GetNumberOfIDs();
@@ -92,6 +91,8 @@ void vtkSMSourceProxy::UpdateInformation()
 }
 
 //---------------------------------------------------------------------------
+// Call Update() on all sources
+// TODO this should update information properties.
 void vtkSMSourceProxy::Update()
 {
   int numIDs = this->GetNumberOfIDs();
@@ -136,6 +137,7 @@ void vtkSMSourceProxy::CreateParts()
   vtkPVNumberOfOutputsInformation* info = vtkPVNumberOfOutputsInformation::New();
   vtkSMCommunicationModule* cm = this->GetCommunicationModule();
 
+  // Create one part each output of each filter
   vtkClientServerStream stream;
   for (int i=0; i<numIDs; i++)
     {
@@ -154,7 +156,8 @@ void vtkSMSourceProxy::CreateParts()
              << vtkClientServerStream::End;
 
       vtkSMPart* part = vtkSMPart::New();
-      part->SetVTKDataID(dataID);
+      part->CreateVTKObjects(0);
+      part->SetID(0, dataID);
       this->PInternals->Parts.push_back(part);
       part->Delete();
       }
@@ -167,6 +170,8 @@ void vtkSMSourceProxy::CreateParts()
 }
 
 //---------------------------------------------------------------------------
+// This does not touch the managed filters. It only updates the internal
+// data structures.
 void vtkSMSourceProxy::SetNumberOfInputs(int num)
 {
   // in case nothing has changed.
@@ -214,71 +219,9 @@ void vtkSMSourceProxy::SetNumberOfInputs(int num)
   this->Modified();
 }
 
-//----------------------------------------------------------------------------
-void vtkSMSourceProxy::SetInput(int idx, vtkSMSourceProxy *input)
-{
-  this->SetInput(idx, input, "SetInput");
-}
-
-//----------------------------------------------------------------------------
-void vtkSMSourceProxy::SetInput(
-  int idx, vtkSMSourceProxy *input, const char* method)
-{
-
-  // Set the paraview reference to the new input.
-  this->SetNthInput(idx, input);
-  if (!input)
-    {
-    return;
-    }
-
-  input->CreateParts();
-  int numInputs = input->GetNumberOfParts();
-
-  vtkSMCommunicationModule* cm = this->GetCommunicationModule();
-
-  vtkClientServerStream stream;
-  if (this->HasMultipleInputs)
-    {
-    this->CreateVTKObjects(1);
-    vtkClientServerID sourceID = this->GetID(0);
-    for (int partIdx = 0; partIdx < numInputs; ++partIdx)
-      {
-      vtkSMPart* part = input->GetPart(partIdx);
-      stream << vtkClientServerStream::Invoke 
-             << sourceID << method << part->GetVTKDataID() 
-             << vtkClientServerStream::End;
-      }
-    cm->SendStreamToServers(&stream, 
-                            this->GetNumberOfServerIDs(),
-                            this->GetServerIDs());
-    }
-  else
-    {
-    this->CreateVTKObjects(numInputs);
-    int numSources = this->GetNumberOfIDs();
-    for (int sourceIdx = 0; sourceIdx < numSources; ++sourceIdx)
-      {
-      vtkClientServerID sourceID = this->GetID(sourceIdx);
-      // This is to handle the case when there are multiple
-      // inputs and the first one has multiple parts. For
-      // example, in the Glyph filter, when the input has multiple
-      // parts, the glyph source has to be applied to each.
-      // In that case, sourceTclName == glyph input, 
-      // inputName == glyph source.
-      int partIdx = sourceIdx % numInputs;
-      vtkSMPart* part = input->GetPart(partIdx);
-      stream << vtkClientServerStream::Invoke 
-             << sourceID << method << part->GetVTKDataID() 
-             << vtkClientServerStream::End;
-        }
-    cm->SendStreamToServers(&stream, 
-                            this->GetNumberOfServerIDs(),
-                            this->GetServerIDs());
-    }
-}
-
 //---------------------------------------------------------------------------
+// This does not touch the managed filters. It only updates the internal
+// data structures.
 void vtkSMSourceProxy::SetNthInput(int idx, vtkSMSourceProxy *sp)
 {
   if (idx < 0)
@@ -314,6 +257,73 @@ void vtkSMSourceProxy::SetNthInput(int idx, vtkSMSourceProxy *sp)
     }
 
   this->Modified();
+}
+
+//----------------------------------------------------------------------------
+void vtkSMSourceProxy::SetInput(int idx, vtkSMSourceProxy *input)
+{
+  this->SetInput(idx, input, "SetInput", 0);
+}
+
+//----------------------------------------------------------------------------
+void vtkSMSourceProxy::SetInput(
+  int idx, vtkSMSourceProxy *input, const char* method, int hasMultipleInputs)
+{
+
+  // Set the paraview reference to the new input.
+  this->SetNthInput(idx, input);
+  if (!input)
+    {
+    return;
+    }
+
+  input->CreateParts();
+  int numInputs = input->GetNumberOfParts();
+
+  vtkSMCommunicationModule* cm = this->GetCommunicationModule();
+
+  vtkClientServerStream stream;
+  if (hasMultipleInputs)
+    {
+    // One filter, multiple inputs
+    this->CreateVTKObjects(1);
+    vtkClientServerID sourceID = this->GetID(0);
+    for (int partIdx = 0; partIdx < numInputs; ++partIdx)
+      {
+      vtkSMPart* part = input->GetPart(partIdx);
+      stream << vtkClientServerStream::Invoke 
+             << sourceID << method << part->GetID(0) 
+             << vtkClientServerStream::End;
+      }
+    cm->SendStreamToServers(&stream, 
+                            this->GetNumberOfServerIDs(),
+                            this->GetServerIDs());
+    }
+  else
+    {
+    // n inputs, n filters
+    this->CreateVTKObjects(numInputs);
+    int numSources = this->GetNumberOfIDs();
+    for (int sourceIdx = 0; sourceIdx < numSources; ++sourceIdx)
+      {
+      vtkClientServerID sourceID = this->GetID(sourceIdx);
+      // This is to handle the case when there are multiple
+      // inputs and the first one has multiple parts. For
+      // example, in the Glyph filter, when the input has multiple
+      // parts, the glyph source has to be applied to each.
+      // NOTE: Make sure that you set the input which has as
+      // many parts as there will be filters first. OR call
+      // CreateVTKObjects() with the right number of inputs.
+      int partIdx = sourceIdx % numInputs;
+      vtkSMPart* part = input->GetPart(partIdx);
+      stream << vtkClientServerStream::Invoke 
+             << sourceID << method << part->GetID(0) 
+             << vtkClientServerStream::End;
+      }
+    cm->SendStreamToServers(&stream, 
+                            this->GetNumberOfServerIDs(),
+                            this->GetServerIDs());
+    }
 }
 
 //----------------------------------------------------------------------------

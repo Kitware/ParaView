@@ -12,8 +12,13 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSMXMLParser
+// .NAME vtkSMXMLParser - parser of server manager configuration files
 // .SECTION Description
+// vtkSMXMLParser parses configuration files (or strings) and stores
+// the resulting elements in a proxy manager.
+// .SECTION See Also
+// vtkSMProxyManager
+
 #ifndef __vtkSMXMLParser_h
 #define __vtkSMXMLParser_h
 
@@ -31,12 +36,17 @@ public:
   static vtkSMXMLParser* New();
 
   // Description:
+  // Processes the xml data structures and creates the appropriate
+  // map entries (based on group name and proxy name) in the proxy manager.
+  // Should be called after Parse().
   void ProcessConfiguration(vtkSMProxyManager* manager);
 
 protected:
   vtkSMXMLParser();
   ~vtkSMXMLParser();
 
+  // Called by ProcessConfiguration(), processes all proxies in one
+  // group and passes them to the proxy manager.
   void ProcessGroup(vtkPVXMLElement* group, vtkSMProxyManager* manager);
 
 private:

@@ -24,7 +24,6 @@
 #include "vtkObject.h"
 
 class vtkSMCommunicationModule;
-class vtkSMProcessModule;
 class vtkSMProxyManager;
 
 class VTK_EXPORT vtkSMObject : public vtkObject
@@ -41,12 +40,6 @@ public:
   static void SetCommunicationModule(vtkSMCommunicationModule* cm);
 
   // Description:
-  // The process module singleton is used by server manager objects
-  // to process/execute streams.
-  static vtkSMProcessModule* GetProcessModule();
-  static void SetProcessModule(vtkSMProcessModule* pm);
-
-  // Description:
   // Proxy manager singleton stores all proxy groups and instances.
   static vtkSMProxyManager* GetProxyManager();
   static void SetProxyManager(vtkSMProxyManager* pm);
@@ -56,7 +49,6 @@ protected:
   ~vtkSMObject();
 
   static vtkSMCommunicationModule* CommunicationModule;
-  static vtkSMProcessModule* ProcessModule;
   static vtkSMProxyManager* ProxyManager;
 
 private:

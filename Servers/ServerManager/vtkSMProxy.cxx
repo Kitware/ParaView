@@ -29,7 +29,7 @@
 #include "vtkStdString.h"
 
 vtkStandardNewMacro(vtkSMProxy);
-vtkCxxRevisionMacro(vtkSMProxy, "1.4");
+vtkCxxRevisionMacro(vtkSMProxy, "1.5");
 
 //---------------------------------------------------------------------------
 // Internal data structure for storing object IDs, server IDs and
@@ -119,6 +119,9 @@ vtkSMProxy::vtkSMProxy()
   vtkClientServerID nullID = { 0 };
   this->SelfID = nullID;
 
+
+  // Assign a unique clientserver id to this object.
+  // Note that this ups the reference count to 2.
   vtkSMCommunicationModule* cm = this->GetCommunicationModule();
   if (!cm)
     {
@@ -128,18 +131,18 @@ vtkSMProxy::vtkSMProxy()
     return;
     }
   this->SelfID = cm->GetUniqueID();
-  {
   vtkClientServerStream initStream;
   initStream << vtkClientServerStream::Assign 
              << this->SelfID << this
              << vtkClientServerStream::End;
   cm->SendStreamToServer(&initStream, 0);
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  // This is done to make the last result message release it's reference 
+  // count. Otherwise the object has a reference count of 3.
   if (pm)
     {
     pm->GetInterpreter()->ClearLastResult();
     }
-  }
 
 }
 
@@ -155,12 +158,40 @@ vtkSMProxy::~vtkSMProxy()
   this->SetVTKClassName(0);
 }
 
-//------------------------=----------------------------------------------------
+//---------------------------------------------------------------------------
+void vtkSMProxy::UnRegisterVTKObjects()
+{
+  vtkSMCommunicationModule* cm = this->GetCommunicationModule();
+  if (!cm)
+    {
+    return;
+    }
+  vtkClientServerStream stream;
+
+  vtkstd::vector<vtkClientServerID>::iterator it;
+  for (it=this->Internals->IDs.begin(); it!=this->Internals->IDs.end(); ++it)
+    {
+    cm->DeleteStreamObject(*it, stream);
+    }
+  cm->SendStreamToServers(&stream, 
+                          this->GetNumberOfServerIDs(),
+                          this->GetServerIDs());
+
+  this->Internals->IDs.clear();
+
+  this->ObjectsCreated = 0;
+}
+
+//-----------------------------------------------------------------------------
+// UnRegister is overloaded because the object has a reference to itself
+// through the clientserver id.
 void vtkSMProxy::UnRegister(vtkObjectBase* obj)
 {
   if ( this->SelfID.ID != 0 )
     {
     vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+    // If the object is not being deleted by the interpreter and it
+    // has a reference count of 2, unassign the clientserver id.
     if ( pm && obj != pm->GetInterpreter() )
       {
       if (this->ReferenceCount == 2)
@@ -228,6 +259,16 @@ int vtkSMProxy::GetNumberOfIDs()
 vtkClientServerID vtkSMProxy::GetID(int idx)
 {
   return this->Internals->IDs[idx];
+}
+
+//---------------------------------------------------------------------------
+void vtkSMProxy::SetID(unsigned int idx, vtkClientServerID id)
+{
+  if (idx >= this->Internals->IDs.size())
+    {
+    this->Internals->IDs.resize(idx+1);
+    }
+  this->Internals->IDs[idx] = id;
 }
 
 //---------------------------------------------------------------------------
@@ -361,7 +402,9 @@ void vtkSMProxy::UpdateVTKObjects()
   vtkClientServerStream str;
 
   // Make each property push their values to each VTK object
-  // referred by the proxy
+  // referred by the proxy. This is done by appending all
+  // the command to a streaming and executing that stream
+  // at the end.
   vtkSMProxyInternals::PropertyInfoMap::iterator it;
   for (it  = this->Internals->Properties.begin();
        it != this->Internals->Properties.end();
@@ -409,41 +452,20 @@ void vtkSMProxy::CreateVTKObjects(int numObjects)
     
     this->Internals->IDs.push_back(objectId);
     }
-  // TODO: This should be generalized. This class should have an
-  // ivar describing on which "cluster" the objects should be created.
-  cm->SendStreamToServers(&stream, 
-                          this->GetNumberOfServerIDs(),
-                          this->GetServerIDs());
-}
-
-//---------------------------------------------------------------------------
-void vtkSMProxy::UnRegisterVTKObjects()
-{
-  vtkSMCommunicationModule* cm = this->GetCommunicationModule();
-  if (!cm)
+  if (stream.GetNumberOfMessages() > 0)
     {
-    return;
+    cm->SendStreamToServers(&stream, 
+                            this->GetNumberOfServerIDs(),
+                            this->GetServerIDs());
     }
-  vtkClientServerStream stream;
-
-  vtkstd::vector<vtkClientServerID>::iterator it;
-  for (it=this->Internals->IDs.begin(); it!=this->Internals->IDs.end(); ++it)
-    {
-    cm->DeleteStreamObject(*it, stream);
-    }
-  // TODO: This should be generalized. This class should have an
-  // ivar describing on which "cluster" the objects should be created.
-  cm->SendStreamToServers(&stream, 
-                          this->GetNumberOfServerIDs(),
-                          this->GetServerIDs());
-
-  this->Internals->IDs.clear();
-
-  this->ObjectsCreated = 0;
 }
 
 //---------------------------------------------------------------------------
 void vtkSMProxy::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+  
+  os << indent << "VTKClassName: " 
+     << (this->VTKClassName ? this->VTKClassName : "(null)")
+     << endl;
 }

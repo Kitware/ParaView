@@ -27,7 +27,7 @@
 #include "vtkProcessModule.h"
 
 vtkStandardNewMacro(vtkSMDisplayerProxy);
-vtkCxxRevisionMacro(vtkSMDisplayerProxy, "1.4");
+vtkCxxRevisionMacro(vtkSMDisplayerProxy, "1.5");
 
 //---------------------------------------------------------------------------
 vtkSMDisplayerProxy::vtkSMDisplayerProxy()
@@ -53,6 +53,12 @@ vtkSMDisplayerProxy::vtkSMDisplayerProxy()
   // Create the SM properties for the vtkProperty proxy
 
   double ones[3] = {1.0, 1.0, 1.0};
+
+  // Note that the property is added to both the root
+  // proxy (this) and to the sub-proxy. However, observer
+  // addition as well as doUpdate are disabled when adding
+  // it to the root proxy. The only reason the property is
+  // added to the root proxy is to expose it to the outside.
 
   doubleVec = vtkSMDoubleVectorProperty::New();
   doubleVec->SetCommand("SetColor");
@@ -96,6 +102,10 @@ vtkSMDisplayerProxy::vtkSMDisplayerProxy()
 
   // Create the specialized SM properties for this
 
+  // This property actually invokes a method on this (as opposed
+  // to the VTK object on the server). Note that an observer is
+  // added but doUpdate is disabled. The update is done manually
+  // in UpdateVTKObjects() using PushProperty()
   intVec = vtkSMIntVectorProperty::New();
   intVec->SetCommand("SetScalarVisibility");
   intVec->SetNumberOfElements(1);
@@ -210,6 +220,9 @@ void vtkSMDisplayerProxy::UpdateVTKObjects()
 {
   this->Superclass::UpdateVTKObjects();
 
+  // Make these property push their values on this object.
+  // This is a nice way for implementing more complicated functionality
+  // than properties can handle.  
   this->PushProperty("ScalarVisibility", this->SelfID, 0);
   this->SetPropertyModifiedFlag("ScalarVisibility", 0);
   
@@ -222,6 +235,7 @@ void vtkSMDisplayerProxy::UpdateVTKObjects()
 }
 
 //---------------------------------------------------------------------------
+// Adjust scalar visibility as well as lighting.
 void vtkSMDisplayerProxy::SetScalarVisibility(int vis)
 {
   vtkClientServerStream stream;
@@ -262,6 +276,7 @@ void vtkSMDisplayerProxy::SetScalarVisibility(int vis)
 }
 
 //----------------------------------------------------------------------------
+// Adjust representation as well as lighting.
 void vtkSMDisplayerProxy::SetRepresentation(int repr)
 {
   switch (repr)
@@ -281,6 +296,7 @@ void vtkSMDisplayerProxy::SetRepresentation(int repr)
 }
 
 //----------------------------------------------------------------------------
+// Adjust representation as well as lighting.
 void vtkSMDisplayerProxy::DrawWireframe()
 {
   vtkClientServerStream stream;
@@ -304,6 +320,7 @@ void vtkSMDisplayerProxy::DrawWireframe()
 }
 
 //----------------------------------------------------------------------------
+// Adjust representation as well as lighting.
 void vtkSMDisplayerProxy::DrawPoints()
 {
   vtkClientServerStream stream;
@@ -327,6 +344,7 @@ void vtkSMDisplayerProxy::DrawPoints()
 }
 
 //----------------------------------------------------------------------------
+// Adjust representation as well as lighting.
 void vtkSMDisplayerProxy::DrawSurface()
 {
   vtkClientServerStream stream;
@@ -373,7 +391,7 @@ void vtkSMDisplayerProxy::CreateVTKObjects(int numObjects)
     str << vtkClientServerStream::Invoke 
         << this->MapperProxy->GetID(i)
         << "SetInput"
-        << this->GetPart(i)->GetVTKDataID()
+        << this->GetPart(i)->GetID(0)
         << vtkClientServerStream::End;
     str << vtkClientServerStream::Invoke 
         << pm->GetProcessModuleID()

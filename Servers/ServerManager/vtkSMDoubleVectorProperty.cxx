@@ -22,7 +22,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMDoubleVectorProperty);
-vtkCxxRevisionMacro(vtkSMDoubleVectorProperty, "1.2");
+vtkCxxRevisionMacro(vtkSMDoubleVectorProperty, "1.3");
 
 struct vtkSMDoubleVectorPropertyInternals
 {
@@ -76,6 +76,10 @@ void vtkSMDoubleVectorProperty::AppendCommandToStream(
     for(int i=0; i<numCommands; i++)
       {
       *str << vtkClientServerStream::Invoke << objectId << this->Command;
+      if (this->UseIndex)
+        {
+        *str << i;
+        }
       if (this->ArgumentIsArray)
         {
         *str << vtkClientServerStream::InsertArray(
@@ -86,10 +90,6 @@ void vtkSMDoubleVectorProperty::AppendCommandToStream(
         {
         for (int j=0; j<this->NumberOfElementsPerCommand; j++)
           {
-          if (this->UseIndex)
-            {
-            *str << i;
-            }
           *str << this->GetElement(i*this->NumberOfElementsPerCommand+j);
           }
         }
@@ -99,26 +99,26 @@ void vtkSMDoubleVectorProperty::AppendCommandToStream(
 }
 
 //---------------------------------------------------------------------------
-void vtkSMDoubleVectorProperty::SetNumberOfElements(int num)
+void vtkSMDoubleVectorProperty::SetNumberOfElements(unsigned int num)
 {
   this->Internals->Values.resize(num);
   this->Modified();
 }
 
 //---------------------------------------------------------------------------
-int vtkSMDoubleVectorProperty::GetNumberOfElements()
+unsigned int vtkSMDoubleVectorProperty::GetNumberOfElements()
 {
   return this->Internals->Values.size();
 }
 
 //---------------------------------------------------------------------------
-double vtkSMDoubleVectorProperty::GetElement(int idx)
+double vtkSMDoubleVectorProperty::GetElement(unsigned int idx)
 {
   return this->Internals->Values[idx];
 }
 
 //---------------------------------------------------------------------------
-void vtkSMDoubleVectorProperty::SetElement(int idx, double value)
+void vtkSMDoubleVectorProperty::SetElement(unsigned int idx, double value)
 {
   if (idx >= this->GetNumberOfElements())
     {
@@ -151,7 +151,7 @@ void vtkSMDoubleVectorProperty::SetElements3(
 }
 
 //---------------------------------------------------------------------------
-void vtkSMDoubleVectorProperty::SetElements(double* values)
+void vtkSMDoubleVectorProperty::SetElements(const double* values)
 {
   int numArgs = this->GetNumberOfElements();
   memcpy(&this->Internals->Values[0], values, numArgs*sizeof(double));
@@ -183,4 +183,6 @@ int vtkSMDoubleVectorProperty::ReadXMLAttributes(vtkPVXMLElement* element)
 void vtkSMDoubleVectorProperty::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+
+  os << indent << "ArgumentIsArray: " << this->ArgumentIsArray << endl;
 }

@@ -22,7 +22,7 @@
 #include "vtkSMDoubleVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMDisplayWindowProxy);
-vtkCxxRevisionMacro(vtkSMDisplayWindowProxy, "1.3");
+vtkCxxRevisionMacro(vtkSMDisplayWindowProxy, "1.4");
 
 //---------------------------------------------------------------------------
 vtkSMDisplayWindowProxy::vtkSMDisplayWindowProxy()
@@ -36,9 +36,6 @@ vtkSMDisplayWindowProxy::vtkSMDisplayWindowProxy()
   this->WindowToImage = vtkSMProxy::New();
   this->WindowToImage->ClearServerIDs();
   this->WindowToImage->AddServerID(0);
-  this->ImageWriter = vtkSMProxy::New();
-  this->ImageWriter->ClearServerIDs();
-  this->ImageWriter->AddServerID(0);
 
   vtkSMDoubleVectorProperty* doubleVec;
   vtkSMIntVectorProperty* intVec;
@@ -47,6 +44,11 @@ vtkSMDisplayWindowProxy::vtkSMDisplayWindowProxy()
 
   // Create the SM properties for the renderer proxy
 
+  // Note that the property is added to both the root
+  // proxy (this) and to the sub-proxy. However, observer
+  // addition as well as doUpdate are disabled when adding
+  // it to the root proxy. The only reason the property is
+  // added to the root proxy is to expose it to the outside.
   doubleVec = vtkSMDoubleVectorProperty::New();
   doubleVec->SetCommand("SetBackground");
   doubleVec->SetNumberOfElements(3);
@@ -135,7 +137,6 @@ vtkSMDisplayWindowProxy::~vtkSMDisplayWindowProxy()
   this->CameraProxy->Delete();
   this->CompositeProxy->Delete();
   this->WindowToImage->Delete();
-  this->ImageWriter->Delete();
 }
 
 //---------------------------------------------------------------------------
@@ -164,6 +165,8 @@ void vtkSMDisplayWindowProxy::CreateVTKObjects(int numObjects)
   int i;
 
   // TODO revise
+  // These are good defaults for batch scripting but should
+  // be made more general for other uses.
   for (i=0; i<numObjects; i++)
     {
     str << vtkClientServerStream::Invoke 
@@ -224,8 +227,29 @@ void vtkSMDisplayWindowProxy::CreateVTKObjects(int numObjects)
         << vtkClientServerStream::End;
     }
   
-  this->ImageWriter->SetVTKClassName("vtkJPEGWriter");
-  this->ImageWriter->CreateVTKObjects(1);
+
+  cm->SendStreamToServers(&str, 
+                          this->WindowToImage->GetNumberOfServerIDs(),
+                          this->WindowToImage->GetServerIDs());
+}
+
+//---------------------------------------------------------------------------
+void vtkSMDisplayWindowProxy::WriteImage(const char* filename,
+                                         const char* writerName)
+{
+  if (!filename || !writerName)
+    {
+    return;
+    }
+
+  vtkClientServerStream str;
+
+  vtkSMProxy* imageWriter = vtkSMProxy::New();
+  imageWriter->ClearServerIDs();
+  imageWriter->AddServerID(0);
+
+  imageWriter->SetVTKClassName(writerName);
+  imageWriter->CreateVTKObjects(1);
   
   str << vtkClientServerStream::Invoke 
       << this->WindowToImage->GetID(0) 
@@ -233,20 +257,10 @@ void vtkSMDisplayWindowProxy::CreateVTKObjects(int numObjects)
       << vtkClientServerStream::End;
   
   str << vtkClientServerStream::Invoke 
-      << this->ImageWriter->GetID(0) 
+      << imageWriter->GetID(0) 
       << "SetInput" 
       << vtkClientServerStream::LastResult
       << vtkClientServerStream::End;
-
-  cm->SendStreamToServers(&str, 
-                          this->ImageWriter->GetNumberOfServerIDs(),
-                          this->ImageWriter->GetServerIDs());
-}
-
-//---------------------------------------------------------------------------
-void vtkSMDisplayWindowProxy::WriteImage(const char* filename)
-{
-  vtkClientServerStream str;
 
   str << vtkClientServerStream::Invoke 
       << this->WindowToImage->GetID(0) 
@@ -254,21 +268,23 @@ void vtkSMDisplayWindowProxy::WriteImage(const char* filename)
       << vtkClientServerStream::End;
 
   str << vtkClientServerStream::Invoke 
-      << this->ImageWriter->GetID(0) 
+      << imageWriter->GetID(0) 
       << "SetFileName" 
       << filename
       << vtkClientServerStream::End;
 
   str << vtkClientServerStream::Invoke 
-      << this->ImageWriter->GetID(0) 
+      << imageWriter->GetID(0) 
       << "Write" 
       << vtkClientServerStream::End;
 
   vtkSMCommunicationModule* cm = this->GetCommunicationModule();
   cm->SendStreamToServers(&str, 
-                          this->ImageWriter->GetNumberOfServerIDs(),
-                          this->ImageWriter->GetServerIDs());
+                          imageWriter->GetNumberOfServerIDs(),
+                          imageWriter->GetServerIDs());
   str.Reset();
+
+  imageWriter->Delete();
 
 }
 
@@ -306,16 +322,12 @@ void vtkSMDisplayWindowProxy::StillRender()
         << vtkClientServerStream::End;
     }
   vtkSMCommunicationModule* cm = this->GetCommunicationModule();
-  // TODO This might not be the right thing to do if we are using
-  // a composite manager. Then it should be enough to call Render
-  // on the server manager
+  // Call render on the client only. The composite manager should
+  // take care of the rest.
   int serverids = 0;
   cm->SendStreamToServers(&str, 
                           1,
                           &serverids);
-//  cm->SendStreamToServers(&str, 
-//                          this->GetNumberOfServerIDs(),
-//                          this->GetServerIDs());
   str.Reset();
 }
 

@@ -22,7 +22,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMIntVectorProperty);
-vtkCxxRevisionMacro(vtkSMIntVectorProperty, "1.2");
+vtkCxxRevisionMacro(vtkSMIntVectorProperty, "1.3");
 
 struct vtkSMIntVectorPropertyInternals
 {
@@ -76,6 +76,10 @@ void vtkSMIntVectorProperty::AppendCommandToStream(
     for(int i=0; i<numCommands; i++)
       {
       *str << vtkClientServerStream::Invoke << objectId << this->Command;
+      if (this->UseIndex)
+        {
+        *str << i;
+        }
       if (this->ArgumentIsArray)
         {
         *str << vtkClientServerStream::InsertArray(
@@ -86,10 +90,6 @@ void vtkSMIntVectorProperty::AppendCommandToStream(
         {
         for (int j=0; j<this->NumberOfElementsPerCommand; j++)
           {
-          if (this->UseIndex)
-            {
-            *str << i;
-            }
           *str << this->GetElement(i*this->NumberOfElementsPerCommand+j);
           }
         }
@@ -99,26 +99,26 @@ void vtkSMIntVectorProperty::AppendCommandToStream(
 }
 
 //---------------------------------------------------------------------------
-void vtkSMIntVectorProperty::SetNumberOfElements(int num)
+void vtkSMIntVectorProperty::SetNumberOfElements(unsigned int num)
 {
   this->Internals->Values.resize(num);
   this->Modified();
 }
 
 //---------------------------------------------------------------------------
-int vtkSMIntVectorProperty::GetNumberOfElements()
+unsigned int vtkSMIntVectorProperty::GetNumberOfElements()
 {
   return this->Internals->Values.size();
 }
 
 //---------------------------------------------------------------------------
-int vtkSMIntVectorProperty::GetElement(int idx)
+int vtkSMIntVectorProperty::GetElement(unsigned int idx)
 {
   return this->Internals->Values[idx];
 }
 
 //---------------------------------------------------------------------------
-void vtkSMIntVectorProperty::SetElement(int idx, int value)
+void vtkSMIntVectorProperty::SetElement(unsigned int idx, int value)
 {
   if (idx >= this->GetNumberOfElements())
     {
@@ -150,7 +150,7 @@ void vtkSMIntVectorProperty::SetElements3(int value0, int value1, int value2)
 }
 
 //---------------------------------------------------------------------------
-void vtkSMIntVectorProperty::SetElements(int* values)
+void vtkSMIntVectorProperty::SetElements(const int* values)
 {
   int numArgs = this->GetNumberOfElements();
   memcpy(&this->Internals->Values[0], values, numArgs*sizeof(int));
@@ -182,4 +182,6 @@ int vtkSMIntVectorProperty::ReadXMLAttributes(vtkPVXMLElement* element)
 void vtkSMIntVectorProperty::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+
+  os << indent << "ArgumentIsArray: " << this->ArgumentIsArray << endl;
 }

@@ -19,7 +19,7 @@
 #include "vtkProcessModule.h"
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkSMCommunicationModule, "1.1");
+vtkCxxRevisionMacro(vtkSMCommunicationModule, "1.2");
 
 //----------------------------------------------------------------------------
 vtkSMCommunicationModule::vtkSMCommunicationModule()
@@ -35,11 +35,8 @@ vtkSMCommunicationModule::~vtkSMCommunicationModule()
 //----------------------------------------------------------------------------
 vtkClientServerID vtkSMCommunicationModule::GetUniqueID()
 {
+  // Delegate to process module for now.
   return vtkProcessModule::GetProcessModule()->GetUniqueID();
-
-  // TODO revise this
-  //this->UniqueID.ID++;
-  //return this->UniqueID;
 }
 
 //----------------------------------------------------------------------------

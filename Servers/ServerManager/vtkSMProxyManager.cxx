@@ -27,7 +27,7 @@
 
 
 vtkStandardNewMacro(vtkSMProxyManager);
-vtkCxxRevisionMacro(vtkSMProxyManager, "1.2");
+vtkCxxRevisionMacro(vtkSMProxyManager, "1.3");
 
 struct vtkSMProxyManagerInternals
 {
@@ -134,13 +134,6 @@ vtkSMProxy* vtkSMProxyManager::NewProxy(vtkPVXMLElement* pelement)
       }
     }
   return proxy;
-}
-
-//---------------------------------------------------------------------------
-int vtkSMProxyManager::DeleteProxy(vtkSMProxy* proxy)
-{
-  proxy->Delete();
-  return 1;
 }
 
 //---------------------------------------------------------------------------

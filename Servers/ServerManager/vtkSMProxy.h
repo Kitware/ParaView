@@ -15,8 +15,8 @@
 // .NAME vtkSMProxy - proxy for a VTK object(s) on a server
 // .SECTION Description
 // vtkSMProxy manages VTK object(s) that are created on a server 
-// using the proxy pattern. The interface of the managed object
-// is accessed through properties. 
+// using the proxy pattern. The managed object is manipulated through 
+// properties. 
 // The type of object created and managed by vtkSMProxy is determined
 // by the VTKClassName variable. The object is managed by getting the desired
 // property from the proxy, changing it's value and updating the server
@@ -81,6 +81,7 @@ protected:
   friend class vtkSMDisplayerProxy;
   friend class vtkSMDisplayWindowProxy;
   friend class vtkSMProxyObserver;
+  friend class vtkSMSourceProxy;
 //ETX
 
   // Description:
@@ -109,6 +110,16 @@ protected:
   // Returns the number of server ids (same as the number of server objects
   // if CreateVTKObjects() has already been called)
   int GetNumberOfIDs();
+
+  // Description:
+  // Add an ID to be managed by the proxy. In this case, the proxy
+  // takes control of the reference (it unassigns the ID in destructor).
+  // One easy of creating an empty proxy and assigning IDs to it is:
+  // proxy->SetVTKClassName("foobar");
+  // proxy->CreateVTKObjects(0);
+  // proxy->SetID(0, id1);
+  // proxy->SetID(1, id2);
+  void SetID(unsigned int idx, vtkClientServerID id);
 
   // Description:
   // Returns the id of a server object.

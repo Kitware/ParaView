@@ -23,7 +23,7 @@
 #include "vtkStdString.h"
 
 vtkStandardNewMacro(vtkSMStringVectorProperty);
-vtkCxxRevisionMacro(vtkSMStringVectorProperty, "1.1");
+vtkCxxRevisionMacro(vtkSMStringVectorProperty, "1.2");
 
 struct vtkSMStringVectorPropertyInternals
 {
@@ -41,6 +41,21 @@ vtkSMStringVectorProperty::vtkSMStringVectorProperty()
 vtkSMStringVectorProperty::~vtkSMStringVectorProperty()
 {
   delete this->Internals;
+}
+
+//---------------------------------------------------------------------------
+void vtkSMStringVectorProperty::SetElementType(unsigned int idx, int type)
+{
+  unsigned int size = this->Internals->ElementTypes.size();
+  if (idx >= size)
+    {
+    this->Internals->ElementTypes.resize(idx+1);
+    }
+  for (unsigned int i=size; i<=idx; i++)
+    {
+    this->Internals->ElementTypes[i] = STRING;
+    }
+  this->Internals->ElementTypes[idx] = type;
 }
 
 //---------------------------------------------------------------------------
@@ -68,6 +83,7 @@ void vtkSMStringVectorProperty::AppendCommandToStream(
     int numArgs = this->GetNumberOfElements();
     for(int i=0; i<numArgs; i++)
       {
+      // Convert to the appropriate type and add to stream
       switch (this->GetElementType(0))
         {
         case INT:
@@ -90,12 +106,13 @@ void vtkSMStringVectorProperty::AppendCommandToStream(
     for(int i=0; i<numCommands; i++)
       {
       *str << vtkClientServerStream::Invoke << objectId << this->Command;
+      if (this->UseIndex)
+        {
+        *str << i;
+        }
       for (int j=0; j<this->NumberOfElementsPerCommand; j++)
         {
-        if (this->UseIndex)
-          {
-          *str << i;
-          }
+        // Convert to the appropriate type and add to stream
         switch (this->GetElementType(j))
           {
           case INT:
@@ -115,26 +132,26 @@ void vtkSMStringVectorProperty::AppendCommandToStream(
 }
 
 //---------------------------------------------------------------------------
-void vtkSMStringVectorProperty::SetNumberOfElements(int num)
+void vtkSMStringVectorProperty::SetNumberOfElements(unsigned int num)
 {
   this->Internals->Values.resize(num);
   this->Modified();
 }
 
 //---------------------------------------------------------------------------
-int vtkSMStringVectorProperty::GetNumberOfElements()
+unsigned int vtkSMStringVectorProperty::GetNumberOfElements()
 {
   return this->Internals->Values.size();
 }
 
 //---------------------------------------------------------------------------
-const char* vtkSMStringVectorProperty::GetElement(int idx)
+const char* vtkSMStringVectorProperty::GetElement(unsigned int idx)
 {
   return this->Internals->Values[idx].c_str();
 }
 
 //---------------------------------------------------------------------------
-void vtkSMStringVectorProperty::SetElement(int idx, const char* value)
+void vtkSMStringVectorProperty::SetElement(unsigned int idx, const char* value)
 {
   if (idx >= this->GetNumberOfElements())
     {
