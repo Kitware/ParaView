@@ -102,7 +102,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.156.2.14");
+vtkCxxRevisionMacro(vtkPVApplication, "1.156.2.15");
 
 int vtkPVApplicationCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -1375,6 +1375,7 @@ void vtkPVApplication::CompleteArrays(vtkMapper *mapper, char *mapperTclName)
       int numComps = 0;
       
       // First Point data.
+      mapper->GetInput()->GetPointData()->Initialize();
       this->Controller->Receive(&num, 1, i, 987244);
       for (j = 0; j < num; ++j)
         {
@@ -1431,6 +1432,7 @@ void vtkPVApplication::CompleteArrays(vtkMapper *mapper, char *mapperTclName)
       mapper->GetInput()->GetPointData()->SetActiveAttribute(activeAttributes[4],4);
  
       // Next Cell data.
+      mapper->GetInput()->GetCellData()->Initialize();
       this->Controller->Receive(&num, 1, i, 987244);
       for (j = 0; j < num; ++j)
         {
@@ -1491,9 +1493,6 @@ void vtkPVApplication::CompleteArrays(vtkMapper *mapper, char *mapperTclName)
       } // End of if-non-empty check.
     }// End of loop over processes.
 }
-
-
-
 //----------------------------------------------------------------------------
 void vtkPVApplication::SendCompleteArrays(vtkMapper *mapper)
 {
@@ -1567,6 +1566,241 @@ void vtkPVApplication::SendCompleteArrays(vtkMapper *mapper)
   mapper->GetInput()->GetCellData()->GetAttributeIndices(activeAttributes);
   this->Controller->Send(activeAttributes, 5, 0, 987258);
 }
+
+
+// It is easier and safer (for the release) just to duplication this code.
+
+//----------------------------------------------------------------------------
+void vtkPVApplication::CompleteArrays(vtkDataSet *data, char *dataTclName)
+{
+  int i, j;
+  int numProcs;
+  int nonEmptyFlag = 0;
+  int activeAttributes[5];
+
+  if (data == NULL || this->Controller == NULL ||
+      data->GetNumberOfPoints() > 0 ||
+      data->GetNumberOfCells() > 0)
+    {
+    return;
+    }
+
+  // Find the first non empty data object on another processes.
+  numProcs = this->Controller->GetNumberOfProcesses();
+  for (i = 1; i < numProcs; ++i)
+    {
+    this->RemoteScript(i, "$Application SendCompleteArrays %s", dataTclName);
+    this->Controller->Receive(&nonEmptyFlag, 1, i, 987243);
+    if (nonEmptyFlag)
+      { // This process has data.  Receive all the arrays, type and component.
+      int num = 0;
+      vtkDataArray *array = 0;
+      char *name;
+      int nameLength = 0;
+      int type = 0;
+      int numComps = 0;
+      
+      // First Point data.
+      data->GetPointData()->Initialize();
+      this->Controller->Receive(&num, 1, i, 987244);
+      for (j = 0; j < num; ++j)
+        {
+        this->Controller->Receive(&type, 1, i, 987245);
+        switch (type)
+          {
+          case VTK_INT:
+            array = vtkIntArray::New();
+            break;
+          case VTK_FLOAT:
+            array = vtkFloatArray::New();
+            break;
+          case VTK_DOUBLE:
+            array = vtkDoubleArray::New();
+            break;
+          case VTK_CHAR:
+            array = vtkCharArray::New();
+            break;
+          case VTK_LONG:
+            array = vtkLongArray::New();
+            break;
+          case VTK_SHORT:
+            array = vtkShortArray::New();
+            break;
+          case VTK_UNSIGNED_CHAR:
+            array = vtkUnsignedCharArray::New();
+            break;
+          case VTK_UNSIGNED_INT:
+            array = vtkUnsignedIntArray::New();
+            break;
+          case VTK_UNSIGNED_LONG:
+            array = vtkUnsignedLongArray::New();
+            break;
+          case VTK_UNSIGNED_SHORT:
+            array = vtkUnsignedShortArray::New();
+            break;
+          }
+        this->Controller->Receive(&numComps, 1, i, 987246);
+        array->SetNumberOfComponents(numComps);
+        this->Controller->Receive(&nameLength, 1, i, 987247);
+        name = new char[nameLength];
+        this->Controller->Receive(name, nameLength, i, 987248);
+        array->SetName(name);
+        delete [] name;
+        data->GetPointData()->AddArray(array);
+        array->Delete();
+        } // end of loop over point arrays.
+      // Which scalars, ... are active?
+      this->Controller->Receive(activeAttributes, 5, i, 987258);
+      data->GetPointData()->SetActiveAttribute(activeAttributes[0],0);
+      data->GetPointData()->SetActiveAttribute(activeAttributes[1],1);
+      data->GetPointData()->SetActiveAttribute(activeAttributes[2],2);
+      data->GetPointData()->SetActiveAttribute(activeAttributes[3],3);
+      data->GetPointData()->SetActiveAttribute(activeAttributes[4],4);
+ 
+      // Next Cell data.
+      data->GetCellData()->Initialize();
+      this->Controller->Receive(&num, 1, i, 987244);
+      for (j = 0; j < num; ++j)
+        {
+        this->Controller->Receive(&type, 1, i, 987245);
+        switch (type)
+          {
+          case VTK_INT:
+            array = vtkIntArray::New();
+            break;
+          case VTK_FLOAT:
+            array = vtkFloatArray::New();
+            break;
+          case VTK_DOUBLE:
+            array = vtkDoubleArray::New();
+            break;
+          case VTK_CHAR:
+            array = vtkCharArray::New();
+            break;
+          case VTK_LONG:
+            array = vtkLongArray::New();
+            break;
+          case VTK_SHORT:
+            array = vtkShortArray::New();
+            break;
+          case VTK_UNSIGNED_CHAR:
+            array = vtkUnsignedCharArray::New();
+            break;
+          case VTK_UNSIGNED_INT:
+            array = vtkUnsignedIntArray::New();
+            break;
+          case VTK_UNSIGNED_LONG:
+            array = vtkUnsignedLongArray::New();
+            break;
+          case VTK_UNSIGNED_SHORT:
+            array = vtkUnsignedShortArray::New();
+            break;
+          }
+        this->Controller->Receive(&numComps, 1, i, 987246);
+        array->SetNumberOfComponents(numComps);
+        this->Controller->Receive(&nameLength, 1, i, 987247);
+        name = new char[nameLength];
+        this->Controller->Receive(name, nameLength, i, 987248);
+        array->SetName(name);
+        delete [] name;
+        data->GetCellData()->AddArray(array);
+        array->Delete();
+        } // end of loop over cell arrays.
+      // Which scalars, ... are active?
+      this->Controller->Receive(activeAttributes, 5, i, 987258);
+      data->GetCellData()->SetActiveAttribute(activeAttributes[0],0);
+      data->GetCellData()->SetActiveAttribute(activeAttributes[1],1);
+      data->GetCellData()->SetActiveAttribute(activeAttributes[2],2);
+      data->GetCellData()->SetActiveAttribute(activeAttributes[3],3);
+      data->GetCellData()->SetActiveAttribute(activeAttributes[4],4);
+      
+      // We only need information from one.
+      return;
+      } // End of if-non-empty check.
+    }// End of loop over processes.
+}
+//----------------------------------------------------------------------------
+void vtkPVApplication::SendCompleteArrays(vtkDataSet *data)
+{
+  int nonEmptyFlag;
+  int num;
+  int i;
+  int type;
+  int numComps;
+  int nameLength;
+  const char *name;
+  vtkDataArray *array;
+  int activeAttributes[5];
+
+  if (data == NULL ||
+      (data->GetNumberOfPoints() == 0 &&
+       data->GetNumberOfCells() == 0))
+    {
+    nonEmptyFlag = 0;
+    this->Controller->Send(&nonEmptyFlag, 1, 0, 987243);
+    return;
+    }
+  nonEmptyFlag = 1;
+  this->Controller->Send(&nonEmptyFlag, 1, 0, 987243);
+
+  // First point data.
+  num = data->GetPointData()->GetNumberOfArrays();
+  this->Controller->Send(&num, 1, 0, 987244);
+  for (i = 0; i < num; ++i)
+    {
+    array = data->GetPointData()->GetArray(i);
+    type = array->GetDataType();
+
+    this->Controller->Send(&type, 1, 0, 987245);
+    numComps = array->GetNumberOfComponents();
+
+    this->Controller->Send(&numComps, 1, 0, 987246);
+    name = array->GetName();
+    if (name == NULL)
+      {
+      name = "";
+      }
+    nameLength = vtkString::Length(name)+1;
+    this->Controller->Send(&nameLength, 1, 0, 987247);
+    // I am pretty sure that Send does not modify the string.
+    this->Controller->Send(const_cast<char*>(name), nameLength, 0, 987248);
+    }
+  data->GetPointData()->GetAttributeIndices(activeAttributes);
+  this->Controller->Send(activeAttributes, 5, 0, 987258);
+
+  // Next cell data.
+  num = data->GetCellData()->GetNumberOfArrays();
+  this->Controller->Send(&num, 1, 0, 987244);
+  for (i = 0; i < num; ++i)
+    {
+    array = data->GetCellData()->GetArray(i);
+    type = array->GetDataType();
+
+    this->Controller->Send(&type, 1, 0, 987245);
+    numComps = array->GetNumberOfComponents();
+
+    this->Controller->Send(&numComps, 1, 0, 987246);
+    name = array->GetName();
+    if (name == NULL)
+      {
+      name = "";
+      }
+    nameLength = vtkString::Length(name+1);
+    this->Controller->Send(&nameLength, 1, 0, 987247);
+    this->Controller->Send(const_cast<char*>(name), nameLength, 0, 987248);
+    }
+  data->GetCellData()->GetAttributeIndices(activeAttributes);
+  this->Controller->Send(activeAttributes, 5, 0, 987258);
+}
+
+
+
+
+
+
+
+
+
 
 
 void vtkPVApplication::SetGlobalLODFlag(int val)

@@ -175,6 +175,8 @@ public:
   // This will create arrays if they exist on other processes.
   void CompleteArrays(vtkMapper *mapper, char *mapperTclName);
   void SendCompleteArrays(vtkMapper *mapper);
+  void CompleteArrays(vtkDataSet *data, char *dataTclName);
+  void SendCompleteArrays(vtkDataSet *data);
 
   // Description:
   // Since ParaView has only one window, we might as well provide access to it.
