@@ -1,0 +1,8 @@
+#cmakedefine HAVE_TCL8_3
+#undef BUILD_SHARED_LIBS
+#cmakedefine BUILD_SHARED_LIBS
+#ifdef BUILD_SHARED_LIBS
+#define KWDLL
+#else
+#define KWSTATIC
+#endif
