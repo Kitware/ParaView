@@ -722,10 +722,13 @@ void vtkPVAnimationInterface::SaveInTclScript(ofstream *file,
       }
     *file << "set pvTime " << t << "\n";
     *file << this->GetScript() << endl;
-    *file << "if {$myProcId} {treeComp RenderRMI} else {\n\t";  
+    *file << "if {$myProcId != 0} {treeComp RenderRMI} else {\n\t";  
     sprintf(countStr, "%05d", (int)(t));
     // Not necessary because WinToImage causes a render.
     //*file << "RenWin1 Render\n\t";
+    *file << "# This update is necessary to resolve some exposure event\n\t";
+    *file << "# problems which occur with certain cards on Windows.\n\t";
+    *file << "update\n\t";
     *file << "WinToImage Modified\n\t";
     *file << "Writer SetFileName {" << fileRoot << countStr << ".jpg}\n\t";
     *file << "Writer Write\n"; 
