@@ -33,7 +33,7 @@
 #include "vtkWin32OpenGLRenderWindow.h"
 #endif
 
-vtkCxxRevisionMacro(vtkKWRenderWidget, "1.71");
+vtkCxxRevisionMacro(vtkKWRenderWidget, "1.72");
 
 //----------------------------------------------------------------------------
 vtkKWRenderWidget::vtkKWRenderWidget()
@@ -42,8 +42,9 @@ vtkKWRenderWidget::vtkKWRenderWidget()
   this->VTKWidget->SetParent(this);
   
   this->Renderer = vtkRenderer::New();
-  this->Renderer->SetLayer(1);
+  this->Renderer->SetLayer(0);
   this->OverlayRenderer = vtkRenderer::New();
+  this->OverlayRenderer->SetLayer(1);
   this->RenderWindow = vtkRenderWindow::New();
   this->RenderWindow->SetNumberOfLayers(2);
   this->RenderWindow->AddRenderer(this->OverlayRenderer);
