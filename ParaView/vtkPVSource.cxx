@@ -568,9 +568,7 @@ void vtkPVSource::ChangeInput(const char *inputTclName)
   
   this->ChangeAcceptButtonColor();
   
-  pvApp->BroadcastScript("%s SetNthPVInput 0 %s",
-                         this->GetTclName(),
-                         inputTclName);
+  pvApp->Script("%s SetNthPVInput 0 %s", this->GetTclName(), inputTclName);
 }
 
 //----------------------------------------------------------------------------
