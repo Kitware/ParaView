@@ -92,8 +92,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <signal.h>
 
 #ifdef _WIN32
-#include "htmlhelp.h"
 #include "vtkKWRegisteryUtilities.h"
+
+#include "htmlhelp.h"
+#include "direct.h"
 #endif
 
 
@@ -1274,16 +1276,21 @@ void vtkPVApplication::LogEndEvent(char* str)
 void vtkPVApplication::SetupTrapsForSignals(int nodeid)
 {
   vtkPVApplication::MainApplication = this;
+#ifndef _WIN32
   signal(SIGHUP, vtkPVApplication::TrapsForSignals);
+#endif
   signal(SIGINT, vtkPVApplication::TrapsForSignals);
   if ( nodeid == 0 )
     {
-    signal(SIGQUIT, vtkPVApplication::TrapsForSignals);
     signal(SIGILL,  vtkPVApplication::TrapsForSignals);
     signal(SIGABRT, vtkPVApplication::TrapsForSignals);
     signal(SIGSEGV, vtkPVApplication::TrapsForSignals);
+
+#ifndef _WIN32
+    signal(SIGQUIT, vtkPVApplication::TrapsForSignals);
     signal(SIGPIPE, vtkPVApplication::TrapsForSignals);
     signal(SIGBUS,  vtkPVApplication::TrapsForSignals);
+#endif
     }
 }
 
@@ -1297,17 +1304,23 @@ void vtkPVApplication::TrapsForSignals(int signal)
   
   switch ( signal )
     {
+#ifndef _WIN32
     case SIGHUP:
       return;
       break;
+#endif
     case SIGINT:
+#ifndef _WIN32
     case SIGQUIT: 
+#endif
       break;
     case SIGILL:
     case SIGABRT: 
     case SIGSEGV:
+#ifndef _WIN32
     case SIGPIPE:
     case SIGBUS:
+#endif
       vtkPVApplication::ErrorExit(); 
       break;      
     }
@@ -1336,7 +1349,11 @@ void vtkPVApplication::ErrorExit()
   Tcl_Interp *interp = vtkKWApplication::InitializeTcl(1, args);
   ostrstream str;
   char buffer[1024];
+#ifdef _WIN32
+  _getcwd(buffer, 1023);
+#else
   getcwd(buffer, 1023);
+#endif
 
   Tcl_GlobalEval(interp, "wm withdraw .");
 #ifdef _WIN32
