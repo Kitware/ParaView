@@ -43,6 +43,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 class vtkPVSelectionList;
 class vtkPVWindow;
+class vtkPVCommandList;
 
 class VTK_EXPORT vtkPVSource : public vtkKWComposite
 {
@@ -111,6 +112,10 @@ public:
   void AcceptCallback();
   
   // Description:
+  // Called when the accept button is pressed.
+  void CancelCallback();
+  
+  // Description:
   // A method used to broadcast changes resulting from widgets.
   void AcceptHelper(char *method, char *args);
   
@@ -173,18 +178,11 @@ protected:
   vtkKWWidgetCollection *Widgets;
 
   vtkKWPushButton *AcceptButton;
+  vtkKWPushButton *CancelButton;
 
   vtkPVSelectionList *LastSelectionList;
 
-//BTX
-  // List of strings
-  int NumberOfAcceptCommands;
-  int AcceptCommandArrayLength;
-  char **AcceptCommands;
-  void AddAcceptCommand(const char *EventString, ...);
-  void DeleteAcceptCommands();
-//ETX
-
+  vtkPVCommandList *AcceptCommands;
 };
 
 #endif

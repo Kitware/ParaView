@@ -44,6 +44,9 @@ ClientData vtkPVAssignmentNewCommand();
 int vtkPVColorByProcessCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkPVColorByProcessNewCommand();
+int vtkPVCommandListCommand(ClientData cd, Tcl_Interp *interp,
+             int argc, char *argv[]);
+ClientData vtkPVCommandListNewCommand();
 int vtkPVConeSourceCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkPVConeSourceNewCommand();
@@ -195,6 +198,8 @@ int VTK_EXPORT Vtkkwparaviewtcl_Init(Tcl_Interp *interp)
                   vtkPVAssignmentCommand);
   vtkTclCreateNew(interp,"vtkPVColorByProcess", vtkPVColorByProcessNewCommand,
                   vtkPVColorByProcessCommand);
+  vtkTclCreateNew(interp,"vtkPVCommandList", vtkPVCommandListNewCommand,
+                  vtkPVCommandListCommand);
   vtkTclCreateNew(interp,"vtkPVConeSource", vtkPVConeSourceNewCommand,
                   vtkPVConeSourceCommand);
   vtkTclCreateNew(interp,"vtkPVContourFilter", vtkPVContourFilterNewCommand,

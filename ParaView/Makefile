@@ -29,6 +29,7 @@ vtkPVActorComposite \
 vtkPVApplication \
 vtkPVAssignment \
 vtkPVColorByProcess \
+vtkPVCommandList \
 vtkPVConeSource \
 vtkPVContourFilter \
 vtkPVCutter \

@@ -36,6 +36,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkPVRenderView.h"
 #include "vtkPVWindow.h"
 #include "vtkPVSelectionList.h"
+#include "vtkPVCommandList.h"
 
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
@@ -58,13 +59,12 @@ vtkPVSource::vtkPVSource()
   this->NavigationFrame = vtkKWLabeledFrame::New();
   this->ParameterFrame = vtkKWLabeledFrame::New();
   this->AcceptButton = vtkKWPushButton::New();
+  this->CancelButton = vtkKWPushButton::New();
   
   this->Widgets = vtkKWWidgetCollection::New();
-  
-  this->NumberOfAcceptCommands = 0;
-  this->AcceptCommandArrayLength = 0;
-  this->AcceptCommands = NULL;
   this->LastSelectionList = NULL;
+  
+  this->AcceptCommands = vtkPVCommandList::New();
 }
 
 //----------------------------------------------------------------------------
@@ -100,13 +100,17 @@ vtkPVSource::~vtkPVSource()
   this->AcceptButton->Delete();
   this->AcceptButton = NULL;  
   
+  this->CancelButton->Delete();
+  this->CancelButton = NULL;  
+  
   if (this->LastSelectionList)
     {
     this->LastSelectionList->UnRegister(this);
     this->LastSelectionList = NULL;
     }
 
-  this->DeleteAcceptCommands();
+  this->AcceptCommands->Delete();
+  this->AcceptCommands = NULL;  
 }
 
 //----------------------------------------------------------------------------
@@ -274,11 +278,22 @@ void vtkPVSource::CreateProperties()
   this->ParameterFrame->SetLabel("Parameters");
   this->Script("pack %s -fill x -expand t -side top", this->ParameterFrame->GetWidgetName());
 
-  this->AcceptButton->SetParent(this->ParameterFrame->GetFrame());
+  vtkKWWidget *frame = vtkKWWidget::New();
+  frame->SetParent(this->ParameterFrame->GetFrame());
+  frame->Create(this->Application, "frame", "");
+  this->Script("pack %s -fill x -expand t", frame->GetWidgetName());  
+  
+  this->AcceptButton->SetParent(frame);
   this->AcceptButton->Create(this->Application, "-text Accept");
   this->AcceptButton->SetCommand(this, "AcceptCallback");
-  this->Script("pack %s", this->AcceptButton->GetWidgetName());
+  this->Script("pack %s -side left -fill x -expand t", 
+	       this->AcceptButton->GetWidgetName());
 
+  this->CancelButton->SetParent(frame);
+  this->CancelButton->Create(this->Application, "-text Cancel");
+  this->CancelButton->SetCommand(this, "CancelCallback");
+  this->Script("pack %s -side left -fill x -expand t", 
+	       this->CancelButton->GetWidgetName());
 }
 
 //----------------------------------------------------------------------------
@@ -429,27 +444,6 @@ int vtkPVSource::GetVisibility()
 
 
 //----------------------------------------------------------------------------
-void vtkPVSource::AddLabeledEntry(char *label, char *setCmd, char *getCmd)
-{
-  vtkKWLabeledEntry *entry = vtkKWLabeledEntry::New();
-  this->Widgets->AddItem(entry);
-  entry->SetParent(this->ParameterFrame->GetFrame());
-  entry->Create(this->Application);
-  entry->SetLabel(label);
-
-  // Get initial value from the vtk source.
-  this->Script("%s SetValue [[%s GetVTKSource] %s]", 
-               entry->GetTclName(), this->GetTclName(), getCmd); 
-
-  // Format a command to move value from widget to vtkObjects (on all processes).
-  // The VTK objects do not yet have to have the same Tcl name!
-  this->AddAcceptCommand("%s AcceptHelper %s [%s GetValue]",
-                          this->GetTclName(), setCmd, entry->GetTclName()); 
-
-  this->Script("pack %s", entry->GetWidgetName());
-  entry->Delete();
-}  
-//----------------------------------------------------------------------------
 void vtkPVSource::AddLabeledToggle(char *label, char *setCmd, char *getCmd)
 {
   // First a frame to hold the other widgets.
@@ -457,7 +451,7 @@ void vtkPVSource::AddLabeledToggle(char *label, char *setCmd, char *getCmd)
   this->Widgets->AddItem(frame);
   frame->SetParent(this->ParameterFrame->GetFrame());
   frame->Create(this->Application, "frame", "");
-  this->Script("pack %s", frame->GetWidgetName());
+  this->Script("pack %s -fill x -expand t", frame->GetWidgetName());
 
   // Now a label
   if (label && label[0] != '\0')
@@ -465,7 +459,7 @@ void vtkPVSource::AddLabeledToggle(char *label, char *setCmd, char *getCmd)
     vtkKWLabel *labelWidget = vtkKWLabel::New();
     this->Widgets->AddItem(labelWidget);
     labelWidget->SetParent(frame);
-    labelWidget->Create(this->Application, "");
+    labelWidget->Create(this->Application, "-width 19 -justify right");
     labelWidget->SetLabel(label);
     this->Script("pack %s -side left", labelWidget->GetWidgetName());
     labelWidget->Delete();
@@ -485,7 +479,7 @@ void vtkPVSource::AddLabeledToggle(char *label, char *setCmd, char *getCmd)
 
   // Format a command to move value from widget to vtkObjects (on all processes).
   // The VTK objects do not yet have to have the same Tcl name!
-  this->AddAcceptCommand("%s AcceptHelper %s [%s GetState]",
+  this->AcceptCommands->AddCommand("%s AcceptHelper %s [%s GetState]",
                           this->GetTclName(), setCmd, check->GetTclName()); 
 
   this->Script("pack %s -side left", check->GetWidgetName());
@@ -493,6 +487,51 @@ void vtkPVSource::AddLabeledToggle(char *label, char *setCmd, char *getCmd)
   frame->Delete();
   check->Delete();
 }  
+//----------------------------------------------------------------------------
+void vtkPVSource::AddLabeledEntry(char *label, char *setCmd, char *getCmd)
+{
+  vtkKWWidget *frame;
+  vtkKWLabel *labelWidget;
+  vtkKWEntry *entry;
+
+  // First a frame to hold the other widgets.
+  frame = vtkKWWidget::New();
+  this->Widgets->AddItem(frame);
+  frame->SetParent(this->ParameterFrame->GetFrame());
+  frame->Create(this->Application, "frame", "");
+  this->Script("pack %s -fill x -expand t", frame->GetWidgetName());
+
+  // Now a label
+  if (label && label[0] != '\0')
+    {  
+    labelWidget = vtkKWLabel::New();
+    this->Widgets->AddItem(labelWidget);
+    labelWidget->SetParent(frame);
+    labelWidget->Create(this->Application, "-width 19 -justify right");
+    labelWidget->SetLabel(label);
+    this->Script("pack %s -side left", labelWidget->GetWidgetName());
+    labelWidget->Delete();
+    labelWidget = NULL;
+    }
+  
+  entry = vtkKWEntry::New();
+  this->Widgets->AddItem(entry);
+  entry->SetParent(frame);
+  entry->Create(this->Application, "");
+  this->Script("pack %s -side left -fill x -expand t", entry->GetWidgetName());
+
+  // Get initial value from the vtk source.
+  this->Script("%s SetValue [[%s GetVTKSource] %s]", entry->GetTclName(), 
+	       this->GetTclName(), getCmd); 
+
+  // Format a command to move value from widget to vtkObjects (on all processes).
+  // The VTK objects do not yet have to have the same Tcl name!
+  this->AcceptCommands->AddCommand("%s AcceptHelper %s [%s GetValue]",
+			   this->GetTclName(), setCmd, entry->GetTclName());
+
+  frame->Delete();
+  entry->Delete();
+}
 
 //----------------------------------------------------------------------------
 void vtkPVSource::AddVector2Entry(char *label, char *l1, char *l2,
@@ -507,7 +546,7 @@ void vtkPVSource::AddVector2Entry(char *label, char *l1, char *l2,
   this->Widgets->AddItem(frame);
   frame->SetParent(this->ParameterFrame->GetFrame());
   frame->Create(this->Application, "frame", "");
-  this->Script("pack %s", frame->GetWidgetName());
+  this->Script("pack %s -fill x -expand t", frame->GetWidgetName());
 
   // Now a label
   if (label && label[0] != '\0')
@@ -515,7 +554,7 @@ void vtkPVSource::AddVector2Entry(char *label, char *l1, char *l2,
     labelWidget = vtkKWLabel::New();
     this->Widgets->AddItem(labelWidget);
     labelWidget->SetParent(frame);
-    labelWidget->Create(this->Application, "");
+    labelWidget->Create(this->Application, "-width 19 -justify right");
     labelWidget->SetLabel(label);
     this->Script("pack %s -side left", labelWidget->GetWidgetName());
     labelWidget->Delete();
@@ -538,7 +577,7 @@ void vtkPVSource::AddVector2Entry(char *label, char *l1, char *l2,
   this->Widgets->AddItem(minEntry);
   minEntry->SetParent(frame);
   minEntry->Create(this->Application, "-width 7");
-  this->Script("pack %s -side left", minEntry->GetWidgetName());
+  this->Script("pack %s -side left -fill x -expand t", minEntry->GetWidgetName());
 
   // Max
   if (l2 && l2[0] != '\0')
@@ -556,7 +595,7 @@ void vtkPVSource::AddVector2Entry(char *label, char *l1, char *l2,
   this->Widgets->AddItem(maxEntry);
   maxEntry->SetParent(frame);
   maxEntry->Create(this->Application, "-width 7");
-  this->Script("pack %s -side left", maxEntry->GetWidgetName());
+  this->Script("pack %s -side left -fill x -expand t", maxEntry->GetWidgetName());
 
   // Get initial value from the vtk source.
   this->Script("%s SetValue [lindex [[%s GetVTKSource] %s] 0]", 
@@ -566,7 +605,7 @@ void vtkPVSource::AddVector2Entry(char *label, char *l1, char *l2,
 
   // Format a command to move value from widget to vtkObjects (on all processes).
   // The VTK objects do not yet have to have the same Tcl name!
-  this->AddAcceptCommand("%s AcceptHelper %s \"[%s GetValue] [%s GetValue]\"",
+  this->AcceptCommands->AddCommand("%s AcceptHelper %s \"[%s GetValue] [%s GetValue]\"",
                           this->GetTclName(), setCmd, minEntry->GetTclName(),
                           maxEntry->GetTclName());
 
@@ -588,7 +627,7 @@ void vtkPVSource::AddVector3Entry(char *label, char *l1, char *l2, char *l3,
   this->Widgets->AddItem(frame);
   frame->SetParent(this->ParameterFrame->GetFrame());
   frame->Create(this->Application, "frame", "");
-  this->Script("pack %s", frame->GetWidgetName());
+  this->Script("pack %s -fill x -expand t", frame->GetWidgetName());
 
   // Now a label
   if (label && label[0] != '\0')
@@ -596,7 +635,7 @@ void vtkPVSource::AddVector3Entry(char *label, char *l1, char *l2, char *l3,
     labelWidget = vtkKWLabel::New();
     this->Widgets->AddItem(labelWidget);
     labelWidget->SetParent(frame);
-    labelWidget->Create(this->Application, "");
+    labelWidget->Create(this->Application, "-width 19 -justify right");
     labelWidget->SetLabel(label);
     this->Script("pack %s -side left", labelWidget->GetWidgetName());
     labelWidget->Delete();
@@ -619,7 +658,7 @@ void vtkPVSource::AddVector3Entry(char *label, char *l1, char *l2, char *l3,
   this->Widgets->AddItem(xEntry);
   xEntry->SetParent(frame);
   xEntry->Create(this->Application, "-width 6");
-  this->Script("pack %s -side left", xEntry->GetWidgetName());
+  this->Script("pack %s -side left -fill x -expand t", xEntry->GetWidgetName());
 
   // Y
   if (l2 && l2[0] != '\0')
@@ -637,7 +676,7 @@ void vtkPVSource::AddVector3Entry(char *label, char *l1, char *l2, char *l3,
   this->Widgets->AddItem(yEntry);
   yEntry->SetParent(frame);
   yEntry->Create(this->Application, "-width 6");
-  this->Script("pack %s -side left", yEntry->GetWidgetName());
+  this->Script("pack %s -side left -fill x -expand t", yEntry->GetWidgetName());
 
   // Z
   if (l3 && l3[0] != '\0')
@@ -655,7 +694,7 @@ void vtkPVSource::AddVector3Entry(char *label, char *l1, char *l2, char *l3,
   this->Widgets->AddItem(zEntry);
   zEntry->SetParent(frame);
   zEntry->Create(this->Application, "-width 6");
-  this->Script("pack %s -side left", zEntry->GetWidgetName());
+  this->Script("pack %s -side left -fill x -expand t", zEntry->GetWidgetName());
 
   // Get initial value from the vtk source.
   this->Script("%s SetValue [lindex [[%s GetVTKSource] %s] 0]", 
@@ -667,7 +706,7 @@ void vtkPVSource::AddVector3Entry(char *label, char *l1, char *l2, char *l3,
 
   // Format a command to move value from widget to vtkObjects (on all processes).
   // The VTK objects do not yet have to have the same Tcl name!
-  this->AddAcceptCommand("%s AcceptHelper %s \"[%s GetValue] [%s GetValue] [%s GetValue]\"",
+  this->AcceptCommands->AddCommand("%s AcceptHelper %s \"[%s GetValue] [%s GetValue] [%s GetValue]\"",
                           this->GetTclName(), setCmd, xEntry->GetTclName(),
                           yEntry->GetTclName(), zEntry->GetTclName());
 
@@ -691,7 +730,7 @@ void vtkPVSource::AddVector4Entry(char *label, char *l1, char *l2, char *l3,
   this->Widgets->AddItem(frame);
   frame->SetParent(this->ParameterFrame->GetFrame());
   frame->Create(this->Application, "frame", "");
-  this->Script("pack %s", frame->GetWidgetName());
+  this->Script("pack %s -fill x -expand t", frame->GetWidgetName());
 
   // Now a label
   if (label && label[0] != '\0')
@@ -699,7 +738,7 @@ void vtkPVSource::AddVector4Entry(char *label, char *l1, char *l2, char *l3,
     labelWidget = vtkKWLabel::New();
     this->Widgets->AddItem(labelWidget);
     labelWidget->SetParent(frame);
-    labelWidget->Create(this->Application, "");
+    labelWidget->Create(this->Application, "-width 19 -justify right");
     labelWidget->SetLabel(label);
     this->Script("pack %s -side left", labelWidget->GetWidgetName());
     labelWidget->Delete();
@@ -790,7 +829,7 @@ void vtkPVSource::AddVector4Entry(char *label, char *l1, char *l2, char *l3,
 
   // Format a command to move value from widget to vtkObjects (on all processes).
   // The VTK objects do not yet have to have the same Tcl name!
-  this->AddAcceptCommand("%s AcceptHelper %s \"[%s GetValue] [%s GetValue] [%s GetValue] [%s GetValue]\"",
+  this->AcceptCommands->AddCommand("%s AcceptHelper %s \"[%s GetValue] [%s GetValue] [%s GetValue] [%s GetValue]\"",
                           this->GetTclName(), setCmd, xEntry->GetTclName(),
                           yEntry->GetTclName(), zEntry->GetTclName(), wEntry->GetTclName());
 
@@ -817,7 +856,7 @@ void vtkPVSource::AddVector6Entry(char *label, char *l1, char *l2, char *l3,
   this->Widgets->AddItem(frame);
   frame->SetParent(this->ParameterFrame->GetFrame());
   frame->Create(this->Application, "frame", "");
-  this->Script("pack %s", frame->GetWidgetName());
+  this->Script("pack %s -fill x -expand t", frame->GetWidgetName());
 
   // Now a label
   if (label && label[0] != '\0')
@@ -825,7 +864,7 @@ void vtkPVSource::AddVector6Entry(char *label, char *l1, char *l2, char *l3,
     labelWidget = vtkKWLabel::New();
     this->Widgets->AddItem(labelWidget);
     labelWidget->SetParent(frame);
-    labelWidget->Create(this->Application, "");
+    labelWidget->Create(this->Application, "-width 19 -justify right");
     labelWidget->SetLabel(label);
     this->Script("pack %s -side left", labelWidget->GetWidgetName());
     labelWidget->Delete();
@@ -956,7 +995,7 @@ void vtkPVSource::AddVector6Entry(char *label, char *l1, char *l2, char *l3,
 
   // Format a command to move value from widget to vtkObjects (on all processes).
   // The VTK objects do not yet have to have the same Tcl name!
-  this->AddAcceptCommand("%s AcceptHelper %s \"[%s GetValue] [%s GetValue] [%s GetValue] [%s GetValue] [%s GetValue] [%s GetValue]\"",
+  this->AcceptCommands->AddCommand("%s AcceptHelper %s \"[%s GetValue] [%s GetValue] [%s GetValue] [%s GetValue] [%s GetValue] [%s GetValue]\"",
 			 this->GetTclName(), setCmd, uEntry->GetTclName(), 
 			 vEntry->GetTclName(), wEntry->GetTclName(),
 			 xEntry->GetTclName(), yEntry->GetTclName(), zEntry->GetTclName());
@@ -984,13 +1023,13 @@ void vtkPVSource::AddScale(char *label, char *setCmd, char *getCmd,
   this->Widgets->AddItem(frame);
   frame->SetParent(this->ParameterFrame->GetFrame());
   frame->Create(this->Application, "frame", "");
-  this->Script("pack %s", frame->GetWidgetName());
+  this->Script("pack %s -fill x -expand t", frame->GetWidgetName());
 
   // Now a label
   labelWidget = vtkKWLabel::New();
   this->Widgets->AddItem(labelWidget);
   labelWidget->SetParent(frame);
-  labelWidget->Create(this->Application, "");
+  labelWidget->Create(this->Application, "-width 19 -justify right");
   labelWidget->SetLabel(label);
   this->Script("pack %s -side left", labelWidget->GetWidgetName());
 
@@ -1000,7 +1039,7 @@ void vtkPVSource::AddScale(char *label, char *setCmd, char *getCmd,
   slider->Create(this->Application, "-showvalue 1");
   slider->SetRange(min, max);
   slider->SetResolution(resolution);
-  this->Script("pack %s -side left", slider->GetWidgetName());
+  this->Script("pack %s -side left -fill x -expand t", slider->GetWidgetName());
 
   // Get initial value from the vtk source.
   this->Script("%s SetValue [[%s GetVTKSource] %s]", 
@@ -1008,7 +1047,7 @@ void vtkPVSource::AddScale(char *label, char *setCmd, char *getCmd,
 
   // Format a command to move value from widget to vtkObjects (on all processes).
   // The VTK objects do not yet have to have the same Tcl name!
-  this->AddAcceptCommand("%s AcceptHelper %s [%s GetValue]",
+  this->AcceptCommands->AddCommand("%s AcceptHelper %s [%s GetValue]",
 			 this->GetTclName(), setCmd, slider->GetTclName());
 
   frame->Delete();
@@ -1026,13 +1065,13 @@ void vtkPVSource::AddModeList(char *label, char *setCmd, char *getCmd)
   this->Widgets->AddItem(sl);
   sl->SetParent(this->ParameterFrame->GetFrame());
   sl->Create(this->Application);  
-  this->Script("pack %s", sl->GetWidgetName());
+  this->Script("pack %s -fill x -expand t", sl->GetWidgetName());
     
   this->Script("%s SetCurrentValue [[%s GetVTKSource] %s]",
 	       sl->GetTclName(), this->GetTclName(), getCmd);
   // Format a command to move value from widget to vtkObjects (on all processes).
   // The VTK objects do not yet have to have the same Tcl name!
-  this->AddAcceptCommand("%s AcceptHelper %s [%s GetCurrentValue]",
+  this->AcceptCommands->AddCommand("%s AcceptHelper %s [%s GetCurrentValue]",
 			 this->GetTclName(), setCmd, sl->GetTclName());
   
   // Save this selection list so the user can add items to it.
@@ -1068,9 +1107,9 @@ void vtkPVSource::AcceptCallback()
   window = this->GetWindow();
   
   // Call the commands to set ivars from widget values.
-  for (i = 0; i < this->NumberOfAcceptCommands; ++i)
+  for (i = 0; i < this->AcceptCommands->GetLength(); ++i)
     {
-    this->Script(this->AcceptCommands[i]);
+    this->Script(this->AcceptCommands->GetCommand(i));
     }  
   
   // Initialize the output if necessary.
@@ -1099,6 +1138,20 @@ void vtkPVSource::AcceptCallback()
 
 
 //----------------------------------------------------------------------------
+void vtkPVSource::CancelCallback()
+{
+  if (this->PVOutput == NULL)
+    { // Accept has not been called yet.  Delete the object.
+    // ???
+    this->GetWindow()->SetCurrentSource(NULL);
+    this->GetWindow()->GetMainView()->RemoveComposite(this);
+    // How do we delete the sources in all processes ???
+    // this->Delete();
+    }
+}
+
+
+//----------------------------------------------------------------------------
 void vtkPVSource::AcceptHelper(char *method, char *args)
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
@@ -1110,61 +1163,5 @@ void vtkPVSource::AcceptHelper(char *method, char *args)
 
   pvApp->BroadcastScript("[%s GetVTKSource] %s %s", this->GetTclName(),
                          method, args);
-}
-
-//----------------------------------------------------------------------------
-void vtkPVSource::AddAcceptCommand(const char *format, ...)
-{
-  static char event[16000];
-
-  va_list var_args;
-  va_start(var_args, format);
-  vsprintf(event, format, var_args);
-  va_end(var_args);
-
-  // Check to see if we need to extent to array of commands.
-  if (this->AcceptCommandArrayLength <= this->NumberOfAcceptCommands)
-    { // Yes.
-    int i;
-    // Allocate a new array
-    this->AcceptCommandArrayLength += 20;
-    char **tmp = new char* [this->AcceptCommandArrayLength];
-    // Copy array elements.
-    for (i = 0; i < this->NumberOfAcceptCommands; ++i)
-      {
-      tmp[i] = this->AcceptCommands[i];
-      }
-    // Delete the old array.
-    if (this->AcceptCommands)
-      {
-      delete [] this->AcceptCommands;
-      this->AcceptCommands = NULL;
-      }
-    // Set the new array.
-    this->AcceptCommands = tmp;
-    tmp = NULL;
-    }
-
-  // Allocate the string for and set the new command.
-  this->AcceptCommands[this->NumberOfAcceptCommands] 
-              = new char[strlen(event) + 2];
-  strcpy(this->AcceptCommands[this->NumberOfAcceptCommands], event);
-  this->NumberOfAcceptCommands += 1;
-}
-
-//----------------------------------------------------------------------------
-void vtkPVSource::DeleteAcceptCommands()
-{
-  int i;
-
-  for (i = 0; i < this->NumberOfAcceptCommands; ++i)
-    {
-    delete [] this->AcceptCommands[i];
-    this->AcceptCommands[i] = NULL;
-    }
-  delete [] this->AcceptCommands;
-  this->AcceptCommands = NULL;
-  this->NumberOfAcceptCommands = 0;
-  this->AcceptCommandArrayLength = 0;
 }
 
