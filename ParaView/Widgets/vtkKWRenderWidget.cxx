@@ -58,7 +58,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkWin32OpenGLRenderWindow.h"
 #endif
 
-vtkCxxRevisionMacro(vtkKWRenderWidget, "1.21");
+vtkCxxRevisionMacro(vtkKWRenderWidget, "1.22");
 
 //----------------------------------------------------------------------------
 class vtkKWRenderWidgetObserver : public vtkCommand
@@ -195,9 +195,38 @@ void vtkKWRenderWidget::SetupBindings()
   const char *wname = this->VTKWidget->GetWidgetName();
   const char *tname = this->GetTclName();
 
-  // setup some default bindings
-  this->Script("bind %s <Expose> {%s Exposed}",wname,tname);
+  // Setup some default bindings
+
+  this->Script("bind %s <Expose> {%s Exposed}",
+               wname, tname);
   
+  this->Script("bind %s <Enter> {%s Enter %%x %%y}",
+               wname, tname);
+
+  this->Script("bind %s <Configure> {%s Configure %%w %%h}",
+               this->GetWidgetName(), tname);
+  
+  this->SetupInteractionBindings();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWRenderWidget::RemoveBindings()
+{
+  const char *wname = this->VTKWidget->GetWidgetName();
+  
+  this->Script("bind %s <Expose> {}", wname);
+  this->Script("bind %s <Enter> {}", wname);
+  this->Script("bind %s <Configure> {}", this->GetWidgetName());
+
+  this->RemoveInteractionBindings();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWRenderWidget::SetupInteractionBindings()
+{
+  const char *wname = this->VTKWidget->GetWidgetName();
+  const char *tname = this->GetTclName();
+
   this->Script("bind %s <Any-ButtonPress> {%s AButtonPress %%b %%x %%y 0 0}",
                wname, tname);
 
@@ -257,39 +286,37 @@ void vtkKWRenderWidget::SetupBindings()
                wname, tname);
   
   this->Script("bind %s <Motion> {%s MouseMove %%b %%x %%y}", wname, tname);
-
-  this->Script("bind %s <Configure> {%s Configure %%w %%h}",
-               this->GetWidgetName(), tname);
-  
-  this->Script("bind %s <Enter> {%s Enter %%x %%y}",
-               wname, tname);
 }
 
 //----------------------------------------------------------------------------
-void vtkKWRenderWidget::RemoveBindings()
+void vtkKWRenderWidget::RemoveInteractionBindings()
 {
   const char *wname = this->VTKWidget->GetWidgetName();
   
-  this->Script("bind %s <Expose> {}", wname);
   this->Script("bind %s <Any-ButtonPress> {}", wname);
   this->Script("bind %s <Any-ButtonRelease> {}", wname);
   this->Script("bind %s <Shift-Any-ButtonPress> {}", wname);
   this->Script("bind %s <Shift-Any-ButtonRelease> {}", wname);
   this->Script("bind %s <Control-Any-ButtonPress> {}", wname);
   this->Script("bind %s <Control-Any-ButtonRelease> {}", wname);
+
   this->Script("bind %s <B1-Motion> {}", wname);
   this->Script("bind %s <B2-Motion> {}", wname);
   this->Script("bind %s <B3-Motion> {}", wname);
+
   this->Script("bind %s <Shift-B1-Motion> {}", wname);
   this->Script("bind %s <Shift-B2-Motion> {}", wname);
   this->Script("bind %s <Shift-B3-Motion> {}", wname);
+
   this->Script("bind %s <Control-B1-Motion> {}", wname);
   this->Script("bind %s <Control-B2-Motion> {}", wname);
   this->Script("bind %s <Control-B3-Motion> {}", wname);
+
   this->Script("bind %s <KeyPress> {}", wname);
   this->Script("bind %s <Shift-KeyPress> {}", wname);
   this->Script("bind %s <Control-KeyPress> {}", wname);
-  this->Script("bind %s <Configure> {}", wname);
+
+  this->Script("bind %s <Motion> {}", wname);
 }
 
 //----------------------------------------------------------------------------
@@ -665,6 +692,23 @@ void vtkKWRenderWidget::ExecuteEvent(vtkObject*, unsigned long event,
     this->Script("%s config -cursor %s", 
                  this->GetParentWindow()->GetWidgetName(), image);
     } 
+}
+
+//------------------------------------------------------------------------------
+void vtkKWRenderWidget::UpdateEnableState()
+{
+  this->Superclass::UpdateEnableState();
+
+  // If enabled back, set up the bindings, otherwise remove
+
+  if (this->Enabled)
+    {
+    this->SetupInteractionBindings();
+    }
+  else
+    {
+    this->RemoveInteractionBindings();
+    }
 }
 
 //----------------------------------------------------------------------------

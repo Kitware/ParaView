@@ -111,9 +111,14 @@ public:
   virtual void Close();
   
   // Description:
-  // Setup/remove the widget bindings (mouse, keyboard, etc.)
+  // Setup/remove the widget bindings.
+  // SetupBindings(), which sets up general bindings like Expose or Configure
+  // events, will ultimately call SetupInteractionBindings() which sets up
+  // interaction bindings (mouse events, keyboard events, etc.).
   virtual void SetupBindings();
   virtual void RemoveBindings();
+  virtual void SetupInteractionBindings();
+  virtual void RemoveInteractionBindings();
   
   // Description:
   // Manage props inside this widget renderer(s). Add, remove, query.
@@ -201,6 +206,9 @@ public:
   virtual void* GetMemoryDC();
   
   virtual void ExecuteEvent(vtkObject *wdg, unsigned long event, void *calldata);
+  // Update the enable state. This should propagate similar calls to the
+  // internal widgets.
+  virtual void UpdateEnableState();
 
 protected:
   vtkKWRenderWidget();
