@@ -45,7 +45,7 @@ public:
   // Some variables need to be overwritten
   vtkSetStringMacro(HostName);
   vtkSetStringMacro(Username);
-  vtkSetClampMacro(Port, int, 0, 65535);
+  vtkSetClampMacro(PortNumber, int, 0, 65535);
   vtkSetStringMacro(ParaViewScriptName);
 
 protected:

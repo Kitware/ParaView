@@ -21,7 +21,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkPVGUIClientOptions.h"
 
-vtkCxxRevisionMacro(vtkPVProcessModuleGUIHelper, "1.9");
+vtkCxxRevisionMacro(vtkPVProcessModuleGUIHelper, "1.10");
 vtkStandardNewMacro(vtkPVProcessModuleGUIHelper);
 
 vtkCxxSetObjectMacro(vtkPVProcessModuleGUIHelper, PVApplication, vtkPVApplication);
@@ -164,7 +164,7 @@ int vtkPVProcessModuleGUIHelper::OpenConnectionDialog(int* start)
   vtkPVOptions* options = this->ProcessModule->GetOptions();
   dialog->SetHostname(options->GetHostName());
   dialog->SetSSHUser(options->GetUsername());
-  dialog->SetPort(options->GetPort());
+  dialog->SetPortNumber(options->GetPortNumber());
   dialog->SetNumberOfProcesses(pm->GetNumberOfProcesses());
   dialog->SetMultiProcessMode(pm->GetMultiProcessMode());
   dialog->Create(this->PVApplication, 0);
@@ -175,7 +175,7 @@ int vtkPVProcessModuleGUIHelper::OpenConnectionDialog(int* start)
     {
     gcoptions->SetHostName(dialog->GetHostName());
     gcoptions->SetUsername(dialog->GetSSHUser());
-    gcoptions->SetPort(dialog->GetPort());
+    gcoptions->SetPortNumber(dialog->GetPortNumber());
     pm->SetNumberOfProcesses(dialog->GetNumberOfProcesses());
     pm->SetMultiProcessMode(dialog->GetMultiProcessMode());
     *start = 1;

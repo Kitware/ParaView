@@ -148,7 +148,7 @@ void vtkPVSendStreamToClientServerNodeRMI(void *localArg, void *remoteArg,
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVClientServerModule);
-vtkCxxRevisionMacro(vtkPVClientServerModule, "1.21");
+vtkCxxRevisionMacro(vtkPVClientServerModule, "1.22");
 
 
 //----------------------------------------------------------------------------
@@ -483,7 +483,7 @@ int vtkPVClientServerModule::StartRemoteParaView(vtkSocketCommunicator* comm)
     runcommand += " ";
     }
   runcommand += "eval ${PARAVIEW_EXECUTABLE} --server --port=";
-  sprintf(numbuffer, "%d", this->Options->GetPort());
+  sprintf(numbuffer, "%d", this->Options->GetPortNumber());
   runcommand += numbuffer;
   this->RemoteExecution->SetRemoteHost(this->Options->GetHostName());
   if ( this->Options->GetUsername() && this->Options->GetUsername()[0] )
@@ -509,7 +509,7 @@ int vtkPVClientServerModule::StartRemoteParaView(vtkSocketCommunicator* comm)
       cc = max_try;
       break;
       }
-    if (comm->ConnectTo(this->Options->GetHostName(), this->Options->GetPort()))
+    if (comm->ConnectTo(this->Options->GetHostName(), this->Options->GetPortNumber()))
       {
       break;
       }
@@ -549,7 +549,7 @@ void vtkPVClientServerModule::ConnectToRemote()
     {
     start = 1;
     }
-  int port = this->Options->GetPort();
+  int port = this->Options->GetPortNumber();
   if(this->Options->GetRenderServerMode() && !this->Options->GetClientMode())
     {
     port = this->Options->GetRenderServerPort();
@@ -671,7 +671,7 @@ void vtkPVClientServerModule::SetupWaitForConnection()
     cout << "Listen on port: " << this->Options->GetRenderServerPort() << endl;
     sock2 = comm2->OpenSocket(this->Options->GetRenderServerPort());
     }
-  int port= this->Options->GetPort();
+  int port= this->Options->GetPortNumber();
   if((!needTwoSockets && this->Options->GetRenderServerMode()) ||
      (!this->Options->GetClientMode() && this->Options->GetRenderServerMode()))
     {

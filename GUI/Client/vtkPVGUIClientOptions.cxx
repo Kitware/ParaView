@@ -21,7 +21,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVGUIClientOptions);
-vtkCxxRevisionMacro(vtkPVGUIClientOptions, "1.4");
+vtkCxxRevisionMacro(vtkPVGUIClientOptions, "1.5");
 
 //----------------------------------------------------------------------------
 vtkPVGUIClientOptions::vtkPVGUIClientOptions()
@@ -89,7 +89,7 @@ void vtkPVGUIClientOptions::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "PlayDemoFlag: " << this->PlayDemoFlag << endl;
   os << indent << "DisableRegistry: " << this->DisableRegistry << endl;
   os << indent << "CrashOnErrors: " << this->CrashOnErrors << endl;
-  os << indent << "Port: " << this->Port<< endl;
+  os << indent << "PortNumber: " << this->PortNumber<< endl;
   os << indent << "StartEmpty: " << this->StartEmpty << endl;
   os << indent << "Username: " << (this->Username?this->Username:"(none)") << endl;
   os << indent << "HostName: " << (this->HostName?this->HostName:"(none)") << endl;

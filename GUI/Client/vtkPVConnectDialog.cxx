@@ -31,7 +31,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVConnectDialog);
-vtkCxxRevisionMacro(vtkPVConnectDialog, "1.17");
+vtkCxxRevisionMacro(vtkPVConnectDialog, "1.18");
 
 //----------------------------------------------------------------------------
 void vtkPVConnectDialog::Create(vtkKWApplication* app, const char* vtkNotUsed(opts))
@@ -115,7 +115,7 @@ void vtkPVConnectDialog::Create(vtkKWApplication* app, const char* vtkNotUsed(op
     frame->GetWidgetName());
   frame->Delete();
   this->SetHostname(this->HostnameString);
-  this->SetPort(this->PortInt);
+  this->SetPortNumber(this->PortInt);
   this->MPINumberOfServers->EnabledOff();
 
   char servers[1024];
@@ -187,7 +187,7 @@ const char* vtkPVConnectDialog::GetHostName()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVConnectDialog::SetPort(int pt)
+void vtkPVConnectDialog::SetPortNumber(int pt)
 {
   if ( this->Port->IsCreated() )
     {
@@ -199,7 +199,7 @@ void vtkPVConnectDialog::SetPort(int pt)
 }
 
 //----------------------------------------------------------------------------
-int vtkPVConnectDialog::GetPort()
+int vtkPVConnectDialog::GetPortNumber()
 {
   return this->PortInt;
 }

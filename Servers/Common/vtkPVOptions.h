@@ -46,7 +46,7 @@ public:
   vtkGetMacro(UseOffscreenRendering, int);
   vtkGetMacro(UseStereoRendering, int);
   vtkGetMacro(ClientMode, int);
-  vtkGetMacro(Port, int);
+  vtkGetMacro(PortNumber, int);
   vtkGetMacro(RenderNodePort, int);
   vtkGetMacro(RenderServerPort, int);
   vtkGetMacro(DisableComposite, int);
@@ -132,7 +132,7 @@ protected:
   vtkSetStringMacro(HostName);
   char* HostName;
 
-  int Port;
+  int PortNumber;
 
   int ServerMode;
   int ClientMode;

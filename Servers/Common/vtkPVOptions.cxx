@@ -31,7 +31,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVOptions);
-vtkCxxRevisionMacro(vtkPVOptions, "1.17");
+vtkCxxRevisionMacro(vtkPVOptions, "1.18");
 
 //----------------------------------------------------------------------------
 vtkPVOptions::vtkPVOptions()
@@ -61,7 +61,7 @@ vtkPVOptions::vtkPVOptions()
   this->RenderServerHostName = 0;
   this->SetRenderServerHostName("localhost");
   this->SetHostName("localhost");
-  this->Port = 11111;
+  this->PortNumber = 11111;
   this->RenderServerPort = 22221;
   this->RenderNodePort = 0;
   this->ReverseConnection = 0;
@@ -124,7 +124,7 @@ void vtkPVOptions::Initialize()
     "Tell the application to enable stereo rendering (only when running on a single process).");
   this->AddArgument("--host", "-h", &this->HostName, 
     "Tell the program where to look for the peer (default: localhost). Used with --client for client connecting to the server or with --server -rc for server connecting to the client.");
-  this->AddArgument("--port", 0, &this->Port, 
+  this->AddArgument("--port", 0, &this->PortNumber, 
     "Specify the port client and server will use (--port=11111).  Client and servers ports must match.");
   this->AddArgument("--machines", "-m", &this->MachinesFileName, 
     "Specify the network configurations file for the render server.");
@@ -156,9 +156,9 @@ void vtkPVOptions::Initialize()
 //----------------------------------------------------------------------------
 int vtkPVOptions::PostProcess(int, const char* const*)
 {
-  if ( this->ServerMode && this->Port )
+  if ( this->ServerMode && this->PortNumber )
     {
-    this->RenderNodePort = this->Port;
+    this->RenderNodePort = this->PortNumber;
     }
   if ( this->ServerMode && this->HostName )
     {
@@ -320,7 +320,7 @@ void vtkPVOptions::PrintSelf(ostream& os, vtkIndent indent)
   if (this->ClientMode || this->ServerMode || this->RenderServerMode )
     {
     os << indent << "ConnectID is: " << this->ConnectID << endl;
-    os << indent << "Port: " << this->Port << endl;
+    os << indent << "Port Number: " << this->PortNumber << endl;
     os << indent << "Render Node Port: " << this->RenderNodePort << endl;
     os << indent << "Render Server Port: " << this->RenderServerPort << endl;
     os << indent << "Reverse Connection: " << (this->ReverseConnection?"on":"off") << endl;

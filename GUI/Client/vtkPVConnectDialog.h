@@ -49,8 +49,8 @@ public:
   void OK();
   void SetHostname(const char* hn);
   const char* GetHostName();
-  void SetPort(int pt);
-  int GetPort();
+  void SetPortNumber(int pt);
+  int GetPortNumber();
   void MPICheckBoxCallback();
 
   void SetListOfServers(const char* list);
