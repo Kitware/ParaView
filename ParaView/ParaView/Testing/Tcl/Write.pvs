@@ -47,7 +47,6 @@ if { [catch {
     }
   }
 
-  $pvWindow SaveInTclScript vtkParaViewWriteTest.tcl 1
   file delete -force vtkParaViewWriteTest.tcl
 } res ] != 0 } {
 	puts "Error: $res"

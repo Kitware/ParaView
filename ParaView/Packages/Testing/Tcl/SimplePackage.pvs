@@ -34,7 +34,6 @@ if { [catch {
   [ [ $cone GetPVOutput ] GetScalarBarCheck ] SetState 1
   [ $cone GetPVOutput ] ScalarBarCheckCallback
   [ $cone GetPVOutput ] CenterCamera
-  $pvWindow SaveInTclScript vtkParaViewWriteTest.tcl 1 1
   file delete -force vtkParaViewWriteTest.tcl 
   $Application Print
   if { [ $Application SelfTest ] == 0 } {
