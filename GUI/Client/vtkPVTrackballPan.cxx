@@ -16,12 +16,17 @@
 
 #include "vtkCamera.h"
 #include "vtkObjectFactory.h"
+#include "vtkPVApplication.h"
+#include "vtkPVDataInformation.h"
+#include "vtkPVInteractorStyleCenterOfRotation.h"
+#include "vtkPVSource.h"
+#include "vtkPVWindow.h"
 #include "vtkRenderWindowInteractor.h"
 #include "vtkRenderWindow.h"
 #include "vtkRenderer.h"
 #include "vtkMath.h"
 
-vtkCxxRevisionMacro(vtkPVTrackballPan, "1.7");
+vtkCxxRevisionMacro(vtkPVTrackballPan, "1.8");
 vtkStandardNewMacro(vtkPVTrackballPan);
 
 //-------------------------------------------------------------------------
@@ -96,7 +101,28 @@ void vtkPVTrackballPan::OnMouseMove(int x, int y, vtkRenderer *ren,
   else
     {
     double depth, worldPt[4], lastWorldPt[4];
-    ren->SetWorldPoint(fp);
+    vtkPVApplication *app =
+      static_cast<vtkPVApplication*>(this->GetApplication());
+    vtkPVWindow *window = app->GetMainWindow();
+    vtkPVSource *pvs = window->GetCurrentPVSource();
+    if (pvs)
+      {
+      double bounds[6], center[3];
+      int idx;
+      pvs->GetDataInformation()->GetBounds(bounds);
+      for (idx = 0; idx < 3; idx++)
+        {
+        center[idx] = (bounds[idx * 2] + bounds[idx * 2 + 1])/2.0;
+        }
+      ren->SetWorldPoint(center[0], center[1], center[2], 1.0);
+      }
+    else
+      {
+      float center[3];
+      window->GetCenterOfRotationStyle()->GetCenter(center);
+      ren->SetWorldPoint(center[0], center[1], center[2], 1.0);
+      }
+    
     ren->WorldToDisplay();
     depth = ren->GetDisplayPoint()[2];
     
@@ -123,7 +149,7 @@ void vtkPVTrackballPan::OnMouseMove(int x, int y, vtkRenderer *ren,
       lastWorldPt[2] /= lastWorldPt[3];
       lastWorldPt[3] = 1.0;
       }
-    
+
     pos[0] += lastWorldPt[0] - worldPt[0];
     pos[1] += lastWorldPt[1] - worldPt[1];
     pos[2] += lastWorldPt[2] - worldPt[2];
