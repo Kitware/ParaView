@@ -96,6 +96,10 @@ public:
   // is deselected.
   virtual void Deselect();
 
+  // Description:
+  // Create the point source in the VTK Tcl script.
+  void SaveInTclScript(ofstream *file);
+
 protected:
   vtkPVPointSourceWidget();
   ~vtkPVPointSourceWidget();

@@ -98,6 +98,7 @@ public:
 
   void SetPosition();
   void SetPosition(float,float,float);
+  void GetPosition(float pt[3]);
 
 protected:
   vtkPVPointWidget();

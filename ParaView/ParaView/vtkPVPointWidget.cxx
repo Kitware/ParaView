@@ -60,7 +60,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkRenderer.h"
 
 vtkStandardNewMacro(vtkPVPointWidget);
-vtkCxxRevisionMacro(vtkPVPointWidget, "1.10");
+vtkCxxRevisionMacro(vtkPVPointWidget, "1.11");
 
 int vtkPVPointWidgetCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -334,6 +334,19 @@ void vtkPVPointWidget::SetPosition(float x, float y, float z)
     }
   this->ModifiedFlag = 1;
   this->Render();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVPointWidget::GetPosition(float pt[3])
+{
+  if (pt == NULL || this->Application == NULL)
+    {
+    vtkErrorMacro("Cannot get your point.");
+    return;
+    }
+  pt[0] = this->PositionEntry[0]->GetValueAsFloat(); 
+  pt[1] = this->PositionEntry[1]->GetValueAsFloat(); 
+  pt[2] = this->PositionEntry[2]->GetValueAsFloat(); 
 }
 
 //----------------------------------------------------------------------------

@@ -51,7 +51,7 @@ int vtkPVPointSourceWidget::InstanceCount = 0;
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPointSourceWidget);
-vtkCxxRevisionMacro(vtkPVPointSourceWidget, "1.3");
+vtkCxxRevisionMacro(vtkPVPointSourceWidget, "1.4");
 
 int vtkPVPointSourceWidgetCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -86,6 +86,34 @@ vtkPVPointSourceWidget::~vtkPVPointSourceWidget()
   this->NumberOfPointsWidget->Delete();
 }
 
+
+//----------------------------------------------------------------------------
+void vtkPVPointSourceWidget::SaveInTclScript(ofstream *file)
+{
+  float pt[3];
+  float rad;
+  float num;
+  
+  if (this->SourceTclName == NULL || this->PointWidget == NULL)
+    {
+    vtkErrorMacro(<< this->GetClassName() << " must not have SaveInTclScript method.");
+    return;
+    } 
+
+  *file << "vtkPointSource " << this->SourceTclName << "\n";
+  this->PointWidget->GetPosition(pt);
+  *file << "\t" << this->SourceTclName << " SetCenter " 
+        << pt[0] << " " << pt[1] << " " << pt[2] << endl; 
+
+  this->NumberOfPointsWidget->GetValue(&num, 1);
+  *file << "\t" << this->SourceTclName << " SetNumberOfPoints " 
+        << (int)(num) << endl; 
+  this->RadiusWidget->GetValue(&rad, 1);
+  *file << "\t" << this->SourceTclName << " SetRadius " 
+        << rad << endl; 
+}
+
+
 //----------------------------------------------------------------------------
 void vtkPVPointSourceWidget::Create(vtkKWApplication *app)
 {
@@ -109,7 +137,6 @@ void vtkPVPointSourceWidget::Create(vtkKWApplication *app)
   if (pvApp)
     {
     this->SetSourceTclName(name);
-    this->SetOutputTclName(outputName);
 
     pvApp->BroadcastScript("vtkPointSource %s;"
                            "%s SetNumberOfPoints 1;"
@@ -121,6 +148,9 @@ void vtkPVPointSourceWidget::Create(vtkKWApplication *app)
                            name,
                            outputName,
                            name, outputName);
+    //special for saving in tcl scripts.
+    sprintf(outputName, "[%s GetOutput]", name);
+    this->SetOutputTclName(outputName);
     }
 
   this->PointWidget->SetObjectTclName(name);
