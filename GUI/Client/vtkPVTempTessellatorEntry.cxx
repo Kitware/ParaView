@@ -17,22 +17,24 @@
 #include "vtkKWCheckButton.h"
 #include "vtkKWEntry.h"
 #include "vtkKWLabel.h"
-#include "vtkKWApplication.h"
 
 #include "vtkPVSource.h"
 #include "vtkPVInputMenu.h"
 #include "vtkPVDataSetAttributesInformation.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVArrayInformation.h"
-#include "vtkPVScalarListWidgetProperty.h"
+#include "vtkPVApplication.h"
+#include "vtkPVProcessModule.h"
 #include "vtkPVXMLElement.h"
+
+#include "vtkSMDoubleVectorProperty.h"
 
 #define PLAIN "#007700"
 #define EMPHS "#004400"
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVTempTessellatorEntry);
-vtkCxxRevisionMacro(vtkPVTempTessellatorEntry, "1.12");
+vtkCxxRevisionMacro(vtkPVTempTessellatorEntry, "1.13");
 
 //-----------------------------------------------------------------------------
 class vtkTessellatorEntryData
@@ -48,7 +50,6 @@ public:
   vtkKWEntry* CriterionValue;
 
   vtkPVInputMenu* InputMenu;
-  vtkPVScalarListWidgetProperty* Property;
 };
 
 //-----------------------------------------------------------------------------
@@ -70,14 +71,10 @@ vtkPVTempTessellatorEntry::vtkPVTempTessellatorEntry()
 
   d->CriterionEnable = vtkKWCheckButton::New();
   d->CriterionValue = vtkKWEntry::New();
-
-  d->Property = NULL;
 }
 
 vtkPVTempTessellatorEntry::~vtkPVTempTessellatorEntry()
 {
-  this->SetProperty(NULL);
-
   vtkTessellatorEntryData* d = this->Data;
 
   d->CriterionEnable->Delete();
@@ -177,9 +174,18 @@ void vtkPVTempTessellatorEntry::Update()
 {
   vtkTessellatorEntryData* d = this->Data;
 
-  if (this->GetApplication() == NULL || d->Property == NULL)
+  if (this->GetApplication() == NULL)
+    {
     return;
-
+    }
+  
+  vtkSMDoubleVectorProperty *dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+    this->GetSMProperty());
+  if (!dvp)
+    {
+    return;
+    }
+  
   d->ScalarFieldList->DeleteAll();
   d->LastSelectionIndex = -1;
   vtkPVDataSetAttributesInformation* pdi = this->GetPointDataInformation();
@@ -204,15 +210,12 @@ void vtkPVTempTessellatorEntry::Update()
     delete[] listEntry;
     }
   
-  if ( d->Property->GetNumberOfScalars()/2 != numberOfArrays )
+  if ( dvp->GetNumberOfElements() != numberOfArrays )
     {
-    float* scalars = new float[ 2*numberOfArrays ];
     for ( a = 0; a < numberOfArrays; ++a )
       {
-      scalars[2*a  ] = a;
-      scalars[2*a+1] = -1.;
+      dvp->SetElement(a, -1);
       }
-    d->Property->SetScalars( 2*numberOfArrays, scalars );
     }
 
  // that's all for now. Eventually, this should contact the
@@ -451,46 +454,65 @@ void vtkPVTempTessellatorEntry::AnimationMenuCallback( vtkPVAnimationInterfaceEn
   this->ModifiedCallback();
 }
 
-void vtkPVTempTessellatorEntry::AcceptInternal( vtkClientServerID id )
+void vtkPVTempTessellatorEntry::Accept()
 {
-  if (id.ID == 0)
+  int modFlag = this->GetModifiedFlag();
+
+  vtkClientServerID sourceID = this->PVSource->GetVTKSourceID(0);
+  if (!sourceID.ID)
+    {
     return;
-
-  this->Superclass::AcceptInternal( id );
-
+    }
+  
+  vtkPVProcessModule *pm = this->GetPVApplication()->GetProcessModule();
+  pm->GetStream() << vtkClientServerStream::Invoke
+                  << sourceID << "ResetFieldCriteria"
+                  << vtkClientServerStream::End;
+  pm->SendStream(vtkProcessModule::DATA_SERVER);
+  
   this->UpdateProperty();
 
-  int cmd;
-  int ns = this->Data->Property->GetNumberOfScalars()/2;
-  char** commands = new char*[ ns + 1 ];
-  int*   nScalars = new int  [ ns + 1 ];
-
-  commands[0] = this->ResetCriteriaCommand;
-  nScalars[0] = 0;
-
-  for ( cmd = 0; cmd < ns; ++cmd )
+  this->ModifiedFlag = 0;
+  
+  // I put this after the accept internal, because
+  // vtkPVGroupWidget inactivates and builds an input list ...
+  // Putting this here simplifies subclasses AcceptInternal methods.
+  if (modFlag)
     {
-    commands[cmd+1] = this->SetFieldCriterionCommand;
-    nScalars[cmd+1] = 2;
+    vtkPVApplication *pvApp = this->GetPVApplication();
+    ofstream* file = pvApp->GetTraceFile();
+    if (file)
+      {
+      this->Trace(file);
+      }
     }
 
-  this->Data->Property->SetVTKSourceID( id );
-  this->Data->Property->SetVTKCommands( ns+1, commands, nScalars );
-  this->Data->Property->AcceptInternal();
-
-  delete [] commands;
+  this->AcceptCalled = 1;
 }
 
 void vtkPVTempTessellatorEntry::Trace( ofstream *file )
 {
   if ( ! this->InitializeTrace(file) )
+    {
     return;
+    }
+  
+  vtkSMDoubleVectorProperty *dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+    this->GetSMProperty());
+  
+  if (!dvp)
+    {
+    return;
+    }
+  
+  int ns = dvp->GetNumberOfElements();
 
-  int ns = this->Data->Property->GetNumberOfScalars()/2;
-  float* scalars = this->Data->Property->GetScalars();
-  (*file) << "$kw(" << this->GetTclName() << ") ResetFieldCriteria" << endl;
+  *file << "$kw(" << this->GetTclName() << ") ResetFieldCriteria" << endl;
   for ( int s = 0; s < ns; ++s )
-    (*file) << "  $kw(" << this->GetTclName() << ") SetFieldCriterion " << int(scalars[2*s]) << " " << scalars[2*s+1] << endl;
+    {
+    *file << "  $kw(" << this->GetTclName() << ") SetFieldCriterion " << s
+          << " " << dvp->GetElement(s) << endl;
+    }
 }
 
 void vtkPVTempTessellatorEntry::ResetInternal()
@@ -519,55 +541,35 @@ void vtkPVTempTessellatorEntry::ResetInternal()
 
   int numberOfArrays = pdi->GetNumberOfArrays();
   int a;
-  float* scalars = d->Property->GetScalars();
-  for ( a = 0; a < numberOfArrays; ++a )
-    {
-    float scalar = scalars[ 2*a + 1 ];
-    int active = scalar > 0.;
-    const char *name = pdi->GetArrayInformation( a )->GetName();
-    char *listEntry = new char[strlen(name) + 20];
-    if ( !active )
-      sprintf( listEntry, "%s: inactive", name );
-    else
-      sprintf( listEntry, "%s: %g", name, scalars[ 2*a + 1 ] );
 
-    d->ScalarFieldList->AppendUnique( listEntry );
-    this->Script( "%s itemconfigure %d -foreground #%s", d->ScalarFieldList->GetListbox()->GetWidgetName(), a, active ? "006600" : "777744" );
-    delete[] listEntry;
-    }
-}
-
-void vtkPVTempTessellatorEntry::SetProperty( vtkPVWidgetProperty *prop )
-{
-  if (this->Data->Property == prop)
+  vtkSMDoubleVectorProperty *dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+    this->GetSMProperty());
+  if (!dvp)
     {
     return;
     }
   
-  if (this->Data->Property)
+  for ( a = 0; a < numberOfArrays; ++a )
     {
-    this->Data->Property->UnRegister(this);
+    float scalar = dvp->GetElement(a);
+    int active = scalar > 0.;
+    const char *name = pdi->GetArrayInformation( a )->GetName();
+    char *listEntry = new char[strlen(name) + 20];
+    if ( !active )
+      {
+      sprintf( listEntry, "%s: inactive", name );
+      }
+    else
+      {
+      sprintf( listEntry, "%s: %g", name, scalar );
+      }
+    
+    d->ScalarFieldList->AppendUnique( listEntry );
+    this->Script( "%s itemconfigure %d -foreground #%s",
+                  d->ScalarFieldList->GetListbox()->GetWidgetName(), a,
+                  active ? "006600" : "777744" );
+    delete[] listEntry;
     }
-  this->Data->Property = vtkPVScalarListWidgetProperty::SafeDownCast( prop );
-  if (this->Data->Property)
-    {
-    this->Data->Property->Register(this);
-    }
-}
-
-const vtkPVWidgetProperty* vtkPVTempTessellatorEntry::GetProperty() const
-{
-  return this->Data->Property;
-}
-
-vtkPVWidgetProperty* vtkPVTempTessellatorEntry::GetProperty()
-{
-  return this->Data->Property;
-}
-
-vtkPVWidgetProperty* vtkPVTempTessellatorEntry::CreateAppropriateProperty()
-{
-  return vtkPVScalarListWidgetProperty::New();
 }
 
 void vtkPVTempTessellatorEntry::UpdateEnableState()
@@ -597,15 +599,21 @@ vtkPVDataSetAttributesInformation* vtkPVTempTessellatorEntry::GetPointDataInform
 
 void vtkPVTempTessellatorEntry::UpdateProperty()
 {
+  vtkSMDoubleVectorProperty *dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+    this->GetSMProperty());
+  if (!dvp)
+    {
+    return;
+    }
+  
   vtkTessellatorEntryData* d = this->Data;
-  int numberOfArrays = d->Property->GetNumberOfScalars()/2;
-  float* propScalars = new float[ 2*numberOfArrays ];
+  int numberOfArrays = dvp->GetNumberOfElements();
+
   for ( int a = 0; a < numberOfArrays; ++a )
     {
     const char* field = d->ScalarFieldList->GetItem(a);
     int flen = strlen(field);
 
-    propScalars[2*a  ] = a;
     if ( strcmp( field + flen - 8 /*=strlen("inactive")+1*/, "inactive" ) != 0 )
       {
       int colon = flen;
@@ -617,15 +625,13 @@ void vtkPVTempTessellatorEntry::UpdateProperty()
         continue;
         }
 
-      propScalars[2*a+1] = atof( field + colon + 1 );
+      dvp->SetElement(a, atof(field + colon + 1));
       }
     else
       {
-      propScalars[2*a+1] = -1.0;
+      dvp->SetElement(a, -1.0);
       }
     }
-  d->Property->SetScalars( 2*numberOfArrays, propScalars );
-  delete [] propScalars;
 }
 
 void vtkPVTempTessellatorEntry::CopyProperties( vtkPVWidget* clone, vtkPVSource* pvSource,
@@ -651,9 +657,6 @@ int vtkPVTempTessellatorEntry::ReadXMLAttributes( vtkPVXMLElement* element, vtkP
 {
   if ( !this->Superclass::ReadXMLAttributes(element, parser) )
     return 0;
-
-  this->SetSetFieldCriterionCommand( element->GetAttribute("set_criterion_command") );
-  this->SetResetCriteriaCommand( element->GetAttribute("reset_criteria_command") );
 
   const char* input_menu_id = element->GetAttribute("input_menu_id");
   if ( input_menu_id )
@@ -689,12 +692,21 @@ int vtkPVTempTessellatorEntry::ReadXMLAttributes( vtkPVXMLElement* element, vtkP
 
 void vtkPVTempTessellatorEntry::SaveInBatchScriptForPart( ofstream *file, vtkClientServerID id )
 {
-  vtkPVScalarListWidgetProperty* prop = this->Data->Property;
-  int numScalars = prop->GetNumberOfScalars()/2;
-  float* scalars = prop->GetScalars();
+  vtkSMDoubleVectorProperty *dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+    this->GetSMProperty());
+  if (!id.ID || !dvp)
+    {
+    vtkErrorMacro("Sanity check failed. " << this->GetClassName());
+    return;
+    }
+  
+  int numScalars = dvp->GetNumberOfElements();
 
-  (*file) << "pvTemp" << id << " ResetFieldCriteria" << endl;
+  *file << "pvTemp" << id << " ResetFieldCriteria" << endl;
   for ( int a=0; a<numScalars; ++a )
-    (*file) << "pvTemp" << id << "   SetFieldCriterion " << scalars[2*a] << " " << scalars[2*a+1] << endl;
+    {
+    *file << "pvTemp" << id << " SetFieldCriterion " << a << " "
+          << dvp->GetElement(a) << endl;
+    }
 }
 

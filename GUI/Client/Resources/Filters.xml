@@ -1395,11 +1395,9 @@ The Subdivide filter iteratively divides each triangle in the data set into 4 ne
                  help="The maximum chord error allowed at any edge midpoint in the output tessellation."
                  />
     <TempTessellatorEntry label="Max Field Error" trace_name="FieldError2"
-                      variable="FieldError2"
+                      property="FieldError2"
                       help="The maximum field error allowed at any edge midpoint in the output tessellation."
                       input_menu_id="tess_source_select"
-                      set_criterion_command="SetFieldCriterion"
-                      reset_criteria_command="ResetFieldCriteria"
                       />
     <VectorEntry label="Max Num Of Subdivisions"
                  trace_name="MaximumNumberOfSubdivisions"

@@ -24,29 +24,26 @@
 // XML description of the GUI that contains an entry for a TessellatorEntry widget
 // like so:<code>
 // <TessellatorEntry label="Max Field Error Squared" trace_name="FieldError2"
-//                   variable="FieldError2" type="float"
+//                   property="FieldError2"
 //                   help="The square of the maximum field error allowed at any edge midpoint in the output tessellation."
 //                   input_menu_id="tess_source_select"
-//                   add_criterion_command="SetFieldError2"
-//                   reset_criteria_command="ResetFieldCriteria"
 //                   />
 // </code>
 // The \a variable and \a type attributes specify the name and type of the underlying
 // filter's member variable that is controlled by the TessellatorEntry GUI.
 // The \a input_menu_id must correspond to the value of an InputMenu GUI entry's \a id
 // attribute. The TessellatorEntry must reference the current input to the filter
-// so that it can collect the names of point data arrays for its listbox. The
-// \a add_criterion_command and \a reset_criteria_command attributes specify
-// methods of the underlying filter class that may be used to set the scalar value
-// associated with each array. Whenever the user presses Accept, these methods are
-// called to synchronize the GUI entries with the underlying filter class.
+// so that it can collect the names of point data arrays for its listbox.
+// The \a property attribute specifies the server-manager property to be used
+// with this widget. This property handles calling the appropriate commands
+// to synchronize the filter with the GUI values when the user presses the
+// Accept button.
 #ifndef VTKSNL_PVTESSELLATOR_ENTRY_H
 #define VTKSNL_PVTESSELLATOR_ENTRY_H
 
 #include "vtkPVWidget.h"
 
 class vtkPVInputMenu;
-class vtkPVWidgetProperty;
 class vtkPVDataSetAttributesInformation;
 
 class vtkTessellatorEntryData;
@@ -100,7 +97,7 @@ public:
   //BTX
   // Description:
   // Called when Accept is pressed
-  virtual void AcceptInternal( vtkClientServerID );
+  virtual void Accept();
   //ETX
 
   // Description:
@@ -122,16 +119,6 @@ public:
   // the "Accept" button), then \a Update is called to put default entries into
   // the GUI.
   virtual void ResetInternal();
-
-  // Description:
-  // Set/get the property to use with this widget.
-  virtual void SetProperty( vtkPVWidgetProperty *prop );
-  virtual const vtkPVWidgetProperty* GetProperty() const;
-  virtual vtkPVWidgetProperty* GetProperty();
-
-  // Description:
-  // Create a vtkTessellatorEntryProperty.
-  virtual vtkPVWidgetProperty* CreateAppropriateProperty();
 
   // Description:
   // Set the names of the tessellator filter's methods used to
