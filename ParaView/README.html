@@ -104,7 +104,7 @@ delivered open source. Hence ParaView is available as an open-source system.
      <tr>
       <td>
        <ul>
-       <li> 
+       <li>
             All processing operations (filters) produce datasets. This allows
             the user to either process further or to save as a data file the 
             result of every operation. For example, the user can extract a
@@ -118,7 +118,7 @@ delivered open source. Hence ParaView is available as an open-source system.
      <tr>
       <td>
        <ul>
-       <li> 
+       <li>
             <em>Contours and isosurfaces</em> can be extracted from all data 
             types using scalars or vector components. The results can be 
             colored by any other variable or processed further. When possible,
@@ -153,10 +153,9 @@ delivered open source. Hence ParaView is available as an open-source system.
      <tr>
       <td>
        <ul>
-       <li> 
+       <li>
             <em>Streamlines</em> can be generated using constant step or 
-            adaptive integrators (currently, streamlines are not available
-            in parallel, this feature is under development). The results
+            adaptive integrators. The results
             can be displayed as points, lines, tubes, ribbons etc. and
             can be processed by a multitude of filters.
        </ul>
@@ -174,7 +173,7 @@ delivered open source. Hence ParaView is available as an open-source system.
      <tr>
       <td>
        <ul>
-       <li> 
+       <li>
             With the <em>array calculator</em>, new variables can be computed
             using existing point or cell field arrays. A multitude of
             scalar and vector operations are supported.
@@ -217,16 +216,15 @@ delivered open source. Hence ParaView is available as an open-source system.
        <ul>
        <li> Supports a variety of file formats including:
          <ul>
-          <li> VTK (all types including parallel, ascii and binary, can
-               read and written)
+          <li> VTK (new and legacy, all types including parallel, ascii and
+               binary, can read and written)
           <li> EnSight 6 and EnSight Gold (all types including parallel, 
                ascii and binary; multiple parts are supported -each part 
                is loaded separately and can be processed individually)
                (read only)
           <li> Plot3D (ascii and binary, C or Fortran; support for
-               multiple blocks -each block is loaded separately and
-               can be processed individually-, I blanking is currently
-               partially supported) (read only)
+               multiple blocks, I blanking is currently partially supported)
+               (read only)
           <li> Various polygonal file formats including STL and BYU
                (by default, read only, other VTK writers can be added 
                by writing XML description)
@@ -234,11 +232,12 @@ delivered open source. Hence ParaView is available as an open-source system.
        </ul>
       </td>
      </tr>
+
      <tr>
       <td>
        <ul>
-          <li> Since ParaView is open source, the user can easily provide 
-               her own readers and writers.
+          <li> Many other file formats are supported. See the documentation
+               for details.
        </ul>
       </td>
      </tr>
@@ -246,9 +245,8 @@ delivered open source. Hence ParaView is available as an open-source system.
      <tr>
       <td>
        <ul>
-        <li> New flexible  XML based file formats (which fully
-             support distributed data) are being developed and prototypes
-             are provided with ParaView.
+          <li> Since ParaView is open source, the user can easily provide 
+               her own readers and writers.
        </ul>
       </td>
      </tr>
@@ -282,7 +280,7 @@ delivered open source. Hence ParaView is available as an open-source system.
      <tr>
       <td>
        <ul>
-         <li> 
+         <li>
               Allows changing the parameters of many 
               filters by directly interacting with the 3D view using
               <em>3D widgets (manipulators)</em>. For example, the
@@ -324,6 +322,15 @@ delivered open source. Hence ParaView is available as an open-source system.
       </td>
      <tr>
 
+       <tr>
+      <td>
+       <ul>
+       <li> The user interface can be run either on the root MPI node
+            or on a separate workstation using the client/server mode.
+       </ul>
+      </td>
+     <tr>
+
      <tr>
       <td>
        <ul>
@@ -354,7 +361,16 @@ delivered open source. Hence ParaView is available as an open-source system.
        </ul>
       </td>
      <tr>
-     
+
+     <tr>
+      <td>
+       <ul>
+       <li> ParaView supports tiled displays throught built-in display
+            manager. Support for Sandia's Ice-T library is under development.
+       </ul>
+      </td>
+     <tr>
+       
      </tbody>
     </table>
 
