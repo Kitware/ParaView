@@ -88,7 +88,16 @@ public:
   // Setting this string enables balloon help for this widget.
   void SetBalloonHelpString(char *str);
   vtkGetStringMacro(BalloonHelpString);
-
+  
+  // Description:
+  // Adjusts the placement of the baloon help
+  vtkSetMacro(BalloonHelpJustification,int);
+  vtkGetMacro(BalloonHelpJustification,int);  
+  void SetBalloonHelpJustificationToLeft(){
+    this->SetBalloonHelpJustification(0);};
+  void SetBalloonHelpJustificationToRight(){
+    this->SetBalloonHelpJustification(2);};
+  
 protected:
   vtkKWWidget();
   ~vtkKWWidget();
@@ -102,6 +111,7 @@ protected:
   int DeletingChildren;
 
   char *BalloonHelpString;
+  int   BalloonHelpJustification;
 };
 
 

@@ -67,24 +67,7 @@ vtkKWApplication::vtkKWApplication()
   strcpy(this->ApplicationVersionName, "Kitware10" );
 
   // setup tcl stuff
-  //this->MainInterp = Tcl_CreateInterp();
-  this->MainInterp = vtkTclGetGlobalInterp();
-  
-  /// Delete the 'exit' command, which can screw things up 
-  //Tcl_DeleteCommand(this->MainInterp, "exit");
-    
-  //this->MainWindow = Tk_MainWindow(this->MainInterp);
-
-  // call the compiled init funciton
-  //Et_DoInit(this->MainInterp);
-  
-  //if (Vtktcl_Init(this->MainInterp) == TCL_ERROR) 
-  //  {
-  //  vtkErrorMacro("Could not initialize vtk");
-  //  }
-
-  // remove . so that people will not be tempted to use it
-  //Tcl_GlobalEval(this->MainInterp, "wm withdraw .");
+  this->MainInterp = vtkTclGetGlobalInterp();  
   this->Windows = vtkKWWindowCollection::New();  
   
   // add the application as $app
@@ -302,7 +285,52 @@ void vtkKWApplication::BalloonHelpDisplay(vtkKWWidget *widget)
   this->Script( "winfo pointery %s", widget->GetWidgetName());
   y = vtkKWObject::GetIntegerResult(this);
 
+  // Get the position of the mouse in the renderer.
+  this->Script( "winfo rootx %s", widget->GetWidgetName());
+  int xw = vtkKWObject::GetIntegerResult(this);
+  this->Script( "winfo rooty %s", widget->GetWidgetName());
+  int yw = vtkKWObject::GetIntegerResult(this);
+
+  // get the size and of the window
+  this->Script( "winfo reqwidth %s", this->BalloonHelpLabel->GetWidgetName());
+  int dx = vtkKWObject::GetIntegerResult(this);
+  this->Script( "winfo reqheight %s", this->BalloonHelpLabel->GetWidgetName());
+  int dy = vtkKWObject::GetIntegerResult(this);
+  
+  // get the size and of the window
+  this->Script( "winfo width %s", widget->GetWidgetName());
+  int dxw = vtkKWObject::GetIntegerResult(this);
+  this->Script( "winfo height %s", widget->GetWidgetName());
+  int dyw = vtkKWObject::GetIntegerResult(this);
+  
   // Set the position of the window relative to the mouse.
+  int just = widget->GetBalloonHelpJustification();
+
+  // just 0 == left just 2 == right
+  if (just)
+    {
+    if (x + dx > xw + dxw)
+      {
+      x = xw + dxw - dx;
+      }
+    }
+  // with left justification (default) still try to keep the 
+  // help from going past the right edge of the widget
+  else
+    {
+    // if it goes too far right
+    if (x + dx > xw + dxw)
+      {
+      // move it to the left
+      x = xw + dxw - dx;
+      // but not past the left edge of the widget
+      if (x < xw)
+        {
+        x = xw;
+        }
+      }
+    }
+  
   this->Script("wm geometry %s +%d+%d",
                this->BalloonHelpWindow->GetWidgetName(), x, y+15);
   this->Script("update");
