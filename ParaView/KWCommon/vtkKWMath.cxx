@@ -38,7 +38,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkDataArray.h"
 #include "vtkObjectFactory.h"
 
-vtkCxxRevisionMacro(vtkKWMath, "1.3");
+vtkCxxRevisionMacro(vtkKWMath, "1.4");
 vtkStandardNewMacro(vtkKWMath);
 
 //----------------------------------------------------------------------------
@@ -267,7 +267,7 @@ int vtkKWMath::GetScalarTypeFittingRange(
 
   if (range_min_is_int && range_max_is_int && scale_is_int && shift_is_int)
     {
-    for (int i = 0; i < sizeof(IntTypes) / sizeof(TypeRange); i++)
+    for (unsigned int i = 0; i < sizeof(IntTypes) / sizeof(TypeRange); i++)
       {
       if (IntTypes[i].Min <= range_min && range_max <= IntTypes[i].Max)
         {
@@ -276,7 +276,7 @@ int vtkKWMath::GetScalarTypeFittingRange(
       }
     }
 
-  for (int i = 0; i < sizeof(FloatTypes) / sizeof(TypeRange); i++)
+  for (unsigned int i = 0; i < sizeof(FloatTypes) / sizeof(TypeRange); i++)
     {
     if (FloatTypes[i].Min <= range_min && range_max <= FloatTypes[i].Max)
       {
