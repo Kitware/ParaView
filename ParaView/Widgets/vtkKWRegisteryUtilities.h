@@ -45,8 +45,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkKWObject.h"
 
-class vtkKWRegisteryUtilities
+class VTK_EXPORT vtkKWRegisteryUtilities
 {
 public:
   static void ReadAValue(HKEY hKey,char *val,char *key, char *adefault);
-}
+};
+
+#endif
