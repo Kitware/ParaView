@@ -63,7 +63,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVEnSightMasterServerReader);
-vtkCxxRevisionMacro(vtkPVEnSightMasterServerReader, "1.6.2.3");
+vtkCxxRevisionMacro(vtkPVEnSightMasterServerReader, "1.6.2.4");
 
 #ifdef VTK_USE_MPI
 vtkCxxSetObjectMacro(vtkPVEnSightMasterServerReader, Controller,
@@ -572,6 +572,11 @@ int vtkPVEnSightMasterServerReader::ParseMasterServerFile()
     return VTK_ERROR;
     }  
   
+  // A little state machine to read a sequence of lines.
+  // First: Determine what kind of file this is.
+  // We treat a case file like a degenerate sos file with one server.
+  int readingFormat = 0;
+  // Only case files have the SERVER tag.
   int readingServers = 0;
   int numServers = 0;
   
@@ -579,7 +584,52 @@ int vtkPVEnSightMasterServerReader::ParseMasterServerFile()
   vtkstd::string line;
   while(vtkPVEnSightMasterServerReaderGetLineFromStream(fin, line))
     {
-    if(!readingServers && (line == "SERVERS"))
+    // This section determines the type of file: case of SOS.
+    if(!readingFormat && (line == "FORMAT"))
+      {
+      // The FORMAT section starts here.
+      readingFormat = 1;
+      }
+    else if(readingFormat && !numServers &&
+            vtkPVEnSightMasterServerReaderStartsWith(line.c_str(),
+                                                     "type:"))
+      {
+      // Remove the leading "type:" to get the remaining value.
+      const char* p = line.c_str();
+      p += strlen("type:");
+      // Remove leading spaces.
+      while(*p && vtkPVEnSightMasterServerReaderIsSpace(*p))
+        {
+        ++p;
+        }
+      if(!*p)
+        {
+        vtkErrorMacro("Error parsing file type from: "
+                      << line.c_str());
+        return VTK_ERROR;
+        }
+      // These are the special cases (case files).
+      if (strcmp(p,"ensight") == 0 || strcmp(p,"ensight gold")==0)
+        {
+        // Handle the case file line an sos file with one server.
+        numServers = 1;
+        this->Internal->PieceFileNames.push_back(this->CaseFileName);
+        // We could exit the state machine here 
+        // because we have nothing else to do from this state.
+        // We assume the line "SERVERS" will not appear in any case file.
+        }
+      else if (strcmp(p,"master_server gold") != 0)
+        { // We might as well have this sanity check here.
+        vtkErrorMacro("Unexpected file type: '"
+                      << p << "'");
+        return VTK_ERROR;
+        }
+      readingFormat = 0; 
+      }
+
+    // The rest of this stuff is for picking the number of servers
+    // and case file names from the SOS file.
+    else if(!readingServers && (line == "SERVERS"))
       {
       // The SERVERS section starts here.
       readingServers = 1;
