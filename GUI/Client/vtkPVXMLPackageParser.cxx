@@ -37,7 +37,7 @@
 
 #include <ctype.h>
 
-vtkCxxRevisionMacro(vtkPVXMLPackageParser, "1.35.2.2");
+vtkCxxRevisionMacro(vtkPVXMLPackageParser, "1.35.2.3");
 vtkStandardNewMacro(vtkPVXMLPackageParser);
 
 #ifndef VTK_NO_EXPLICIT_TEMPLATE_INSTANTIATION
@@ -240,7 +240,7 @@ void vtkPVXMLPackageParser::ProcessConfiguration()
         return;
         }
       }
-    else
+    else if(strcmp(name, "ServerManagerFile") != 0)
       {
       vtkWarningMacro("Ignoring unknown top-level element " << name);
       }
