@@ -79,18 +79,6 @@ public:
   vtkBooleanMacro(Visibility, int);
 
   // Description:
-  // Set/Get the header text
-  virtual void SetHeaderText(const char *txt);
-  virtual char *GetHeaderText();
-
-  // Description:
-  // Set/Get the color of the annotation
-  virtual void SetTextColor(float r, float g, float b);
-  virtual void SetTextColor(float *rgb)
-               { this->SetTextColor(rgb[0], rgb[1], rgb[2]); }
-  virtual float *GetTextColor();
-
-  // Description:
   // Set/Get the event invoked when the anything in the annotation is changed.
   // Defaults to vtkKWEvent::ViewAnnotationChangedEvent
   vtkSetMacro(AnnotationChangedEvent, int);
@@ -123,11 +111,13 @@ protected:
 
   int                     PopupTextProperty;
 
+  vtkKWFrame              *TextFrame;
   vtkKWLabeledEntry       *TextEntry;
   vtkKWTextProperty       *TextPropertyWidget;
   vtkKWLabeledPopupButton *TextPropertyPopupButton;
 
-  void Render();
+  virtual void Render();
+  virtual void SetHeaderText(const char *txt);
 
   // Get the value that should be used to set the checkbutton state
   // (i.e. depending on the value this checkbutton is supposed to reflect,

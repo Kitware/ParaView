@@ -55,7 +55,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWHeaderAnnotation );
-vtkCxxRevisionMacro(vtkKWHeaderAnnotation, "1.2");
+vtkCxxRevisionMacro(vtkKWHeaderAnnotation, "1.3");
 
 int vtkKWHeaderAnnotationCommand(ClientData cd, Tcl_Interp *interp,
                                  int argc, char *argv[]);
@@ -71,6 +71,7 @@ vtkKWHeaderAnnotation::vtkKWHeaderAnnotation()
 
   // GUI
 
+  this->TextFrame               = vtkKWFrame::New();
   this->TextEntry               = vtkKWLabeledEntry::New();
   this->TextPropertyWidget      = vtkKWTextProperty::New();
   this->TextPropertyPopupButton = NULL;
@@ -80,6 +81,12 @@ vtkKWHeaderAnnotation::vtkKWHeaderAnnotation()
 vtkKWHeaderAnnotation::~vtkKWHeaderAnnotation()
 {
   // GUI
+
+  if (this->TextFrame)
+    {
+    this->TextFrame->Delete();
+    this->TextFrame = NULL;
+    }
 
   if (this->TextEntry)
     {
@@ -174,9 +181,18 @@ void vtkKWHeaderAnnotation::Create(vtkKWApplication *app,
     "Toggle the visibility of the header annotation text");
 
   // --------------------------------------------------------------
+  // Text frame
+
+  this->TextFrame->SetParent(frame);
+  this->TextFrame->Create(app, 0);
+
+  this->Script("pack %s -side top -fill both -expand y", 
+               this->TextFrame->GetWidgetName());
+  
+  // --------------------------------------------------------------
   // Header text
 
-  this->TextEntry->SetParent(frame);
+  this->TextEntry->SetParent(this->TextFrame);
   this->TextEntry->Create(app, 0);
   this->TextEntry->SetLabel("Header:");
   this->TextEntry->GetEntry()->BindCommand(this, "HeaderTextCallback");
@@ -185,8 +201,9 @@ void vtkKWHeaderAnnotation::Create(vtkKWApplication *app,
     "Set the header annotation. The text will automatically scale "
     "to fit within the allocated space");
 
-  this->Script("pack %s -padx 2 -side top -anchor nw -fill x", 
-               this->TextEntry->GetWidgetName());
+  this->Script("pack %s -padx 2 -pady 2 -side %s -anchor nw -expand y -fill x",
+               this->TextEntry->GetWidgetName(),
+               (popup_text_property ? "left" : "top"));
   
   // --------------------------------------------------------------
   // Text property : popup button if needed
@@ -197,9 +214,9 @@ void vtkKWHeaderAnnotation::Create(vtkKWApplication *app,
       {
       this->TextPropertyPopupButton = vtkKWLabeledPopupButton::New();
       }
-    this->TextPropertyPopupButton->SetParent(frame);
+    this->TextPropertyPopupButton->SetParent(this->TextFrame);
     this->TextPropertyPopupButton->Create(this->Application);
-    this->TextPropertyPopupButton->SetLabel("Text properties:");
+    this->TextPropertyPopupButton->SetLabel("Header properties:");
     this->TextPropertyPopupButton->SetPopupButtonLabel("Edit...");
     this->Script("%s configure -bd 2 -relief groove", 
                  this->TextPropertyPopupButton->GetPopupButton()
@@ -213,7 +230,7 @@ void vtkKWHeaderAnnotation::Create(vtkKWApplication *app,
     }
   else
     {
-    this->TextPropertyWidget->SetParent(frame);
+    this->TextPropertyWidget->SetParent(this->TextFrame);
     }
 
   // --------------------------------------------------------------
@@ -223,13 +240,8 @@ void vtkKWHeaderAnnotation::Create(vtkKWApplication *app,
   this->TextPropertyWidget->LabelOnTopOn();
   this->TextPropertyWidget->Create(this->Application);
   this->TextPropertyWidget->ShowLabelOn();
-  this->TextPropertyWidget->GetLabel()->SetLabel("Text properties:");
-
-  ostrstream onchangecommand;
-  onchangecommand << this->GetTclName() 
-                  << " TextPropertyCallback" << ends;
-  this->TextPropertyWidget->SetOnChangeCommand(onchangecommand.str());
-  onchangecommand.rdbuf()->freeze(0);
+  this->TextPropertyWidget->GetLabel()->SetLabel("Header properties:");
+  this->TextPropertyWidget->SetChangedCommand(this, "TextPropertyCallback");
 
   this->Script("pack %s -padx 2 -pady %d -side top -anchor nw -fill y", 
                this->TextPropertyWidget->GetWidgetName(),
@@ -328,33 +340,6 @@ void vtkKWHeaderAnnotation::CheckButtonCallback()
 }
 
 //----------------------------------------------------------------------------
-float *vtkKWHeaderAnnotation::GetTextColor() 
-{
-  if (this->TextPropertyWidget)
-    {
-    return this->TextPropertyWidget->GetColor();
-    }
-
-  return NULL;
-}
-
-//----------------------------------------------------------------------------
-void vtkKWHeaderAnnotation::SetTextColor(float r, float g, float b)
-{
-  // The following call with eventually trigger the TextPropertyCallback 
-  // (see Create()).
-
-  float *rgb = this->GetTextColor();
-
-  if (rgb && 
-      (rgb[0] != r || rgb[1] != g || rgb[2] != b) &&
-      this->TextPropertyWidget)
-    {
-    this->TextPropertyWidget->SetColor(r, g, b);
-    }
-}
-
-//----------------------------------------------------------------------------
 void vtkKWHeaderAnnotation::TextPropertyCallback()
 {
   if (this->GetVisibility())
@@ -366,21 +351,11 @@ void vtkKWHeaderAnnotation::TextPropertyCallback()
 }
 
 //----------------------------------------------------------------------------
-char *vtkKWHeaderAnnotation::GetHeaderText()
-{
-  if (this->RenderWidget)
-    {
-    return this->RenderWidget->GetHeaderAnnotationText();
-    }
-
-  return NULL;
-}
-
-//----------------------------------------------------------------------------
 void vtkKWHeaderAnnotation::SetHeaderText(const char *text) 
 {
   if (this->RenderWidget && text &&
-      (!this->GetHeaderText() || strcmp(this->GetHeaderText(), text)))
+      (!this->RenderWidget->GetHeaderAnnotationText() || 
+       strcmp(this->RenderWidget->GetHeaderAnnotationText(), text)))
     {
     this->RenderWidget->SetHeaderAnnotationText(text);
 
@@ -398,7 +373,7 @@ void vtkKWHeaderAnnotation::SetHeaderText(const char *text)
 //----------------------------------------------------------------------------
 void vtkKWHeaderAnnotation::HeaderTextCallback() 
 {
-  if (this->IsCreated() && this->TextEntry)
+  if (this->TextEntry && this->TextEntry->IsCreated())
     {
     this->SetHeaderText(this->TextEntry->GetEntry()->GetValue());
     }
@@ -408,6 +383,11 @@ void vtkKWHeaderAnnotation::HeaderTextCallback()
 void vtkKWHeaderAnnotation::UpdateEnableState()
 {
   this->Superclass::UpdateEnableState();
+
+  if (this->TextFrame)
+    {
+    this->TextFrame->SetEnabled(this->Enabled);
+    }
 
   if (this->TextEntry)
     {
@@ -440,7 +420,6 @@ void vtkKWHeaderAnnotation::SendChangedEvent()
 
   vtkXMLTextActorWriter *xmlw = vtkXMLTextActorWriter::New();
   xmlw->SetObject(this->RenderWidget->GetHeaderAnnotation());
-  xmlw->DoNotOutputPositionOn();
   xmlw->Write(event);
   xmlw->Delete();
 
@@ -459,7 +438,6 @@ void vtkKWHeaderAnnotation::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "AnnotationChangedEvent: " 
      << this->AnnotationChangedEvent << endl;
   os << indent << "RenderWidget: " << this->GetRenderWidget() << endl;
-  os << indent << "TextPropertyWidget: " << this->TextPropertyWidget << endl;
   os << indent << "PopupTextProperty: " 
      << (this->PopupTextProperty ? "On" : "Off") << endl;
 }
