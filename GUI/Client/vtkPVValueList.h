@@ -50,14 +50,15 @@ public:
   const char* GetLabel();
   
   // Description:
-  // Access to this widget from a script.
+  // Access to this widget from a script. (RemoveAllValues is also a button
+  // callback.)
   void AddValue(double val);
-
+  void RemoveAllValues();
+  
   // Description:
   // Button callbacks.
   void AddValueCallback();
   void DeleteValueCallback();
-  void DeleteAllValuesCallback();
   void GenerateValuesCallback();
 
   // Description:
