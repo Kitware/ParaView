@@ -12,6 +12,7 @@ vtkKWApplication
 vtkKWChangeColorButton 
 vtkKWCheckButton 
 vtkKWCompositeCollection 
+vtkContainer
 vtkKWCornerAnnotation 
 vtkKWDialog 
 vtkKWEntry 
@@ -52,6 +53,7 @@ ${VTK_SOURCE_DIR}/Wrapping/Tcl/vtktcl
 
 ABSTRACT_FILES(
 vtkKWComposite 
+vtkContainer
 vtkKWView 
 )
 
@@ -72,12 +74,14 @@ ELSE (WIN32)
   )
 ENDIF (WIN32)
   
-WRAP_EXCLUDE_FILES(kwinit 
+WRAP_EXCLUDE_FILES(
+  kwinit 
   vtktcl 
   vtkKWHashTable 
-  vtkKWTclCommand
+  vtkKWTclCommand 
+  vtkContainer
   vtkKWRegisteryUtilities
-  )
+)
 
 VTK_WRAP_TCL(vtkKWWidgetsTCL KWWidgetsTCL_SRCS KWWidgets_SRCS)
 ADD_LIBRARY(vtkKWWidgetsTCL KWWidgetsTCL_SRCS KWWidgets_SRCS)
