@@ -59,6 +59,7 @@ public:
   void FrameRateChangedCallback();
   void ToolbarRecordCheckButtonCallback();
   void RecordCheckCallback();
+  void SaveAnimationCallback();
 
   // Description:
   int  IsInPlay();

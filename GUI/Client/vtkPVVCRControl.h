@@ -40,6 +40,7 @@ public:
   void SetLoopCheckCommand(vtkKWObject* calledObject, const char* commandString);
   void SetRecordCheckCommand(vtkKWObject* calledObject, const char* commandString);
   void SetRecordStateCommand(vtkKWObject* calledObject, const char* commandString);
+  void SetSaveAnimationCommand(vtkKWObject* calledObject, const char* commandString);
 
   virtual void Create(vtkKWApplication* app);
   virtual void UpdateEnableState();
@@ -62,6 +63,7 @@ public:
   void LoopCheckCallback();
   void RecordCheckCallback();
   void RecordStateCallback();
+  void SaveAnimationCallback();
 
 protected:
   vtkPVVCRControl();
@@ -77,6 +79,7 @@ protected:
   vtkKWCheckButton *LoopCheckButton;
   vtkKWCheckButton *RecordCheckButton;
   vtkKWPushButton *RecordStateButton;
+  vtkKWPushButton *SaveAnimationButton;
 
   char* PlayCommand;
   char* StopCommand;
@@ -87,6 +90,7 @@ protected:
   char* LoopCheckCommand;
   char* RecordCheckCommand;
   char* RecordStateCommand;
+  char* SaveAnimationCommand;
 
   vtkSetStringMacro(PlayCommand);
   vtkSetStringMacro(StopCommand);
@@ -97,6 +101,7 @@ protected:
   vtkSetStringMacro(LoopCheckCommand);
   vtkSetStringMacro(RecordCheckCommand);
   vtkSetStringMacro(RecordStateCommand);
+  vtkSetStringMacro(SaveAnimationCommand);
 
   void InvokeCommand(const char* command);
 private:

@@ -81,7 +81,7 @@
 #include "Resources/vtkPVInitState.h"
 #include "Resources/vtkPVRecord.h"
 #include "Resources/vtkPVRecordState.h"
-
+#include "Resources/vtkPVMovie.h"
 
 // Splash screen
 
@@ -453,6 +453,13 @@ void vtkPVApplication::CreateButtonPhotos()
     image_PVRecordState_height,
     image_PVRecordState_pixel_size,
     image_PVRecordState_buffer_length);
+
+  this->CreatePhoto("PVMovie",
+    image_PVMovie,
+    image_PVMovie_width,
+    image_PVMovie_height,
+    image_PVMovie_pixel_size,
+    image_PVMovie_buffer_length);
 }
 
 //----------------------------------------------------------------------------

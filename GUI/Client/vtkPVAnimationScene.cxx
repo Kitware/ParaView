@@ -68,7 +68,7 @@
 #endif
 
 vtkStandardNewMacro(vtkPVAnimationScene);
-vtkCxxRevisionMacro(vtkPVAnimationScene, "1.11");
+vtkCxxRevisionMacro(vtkPVAnimationScene, "1.12");
 #define VTK_PV_PLAYMODE_SEQUENCE_TITLE "Sequence"
 #define VTK_PV_PLAYMODE_REALTIME_TITLE "Real Time"
 
@@ -261,6 +261,7 @@ void vtkPVAnimationScene::Create(vtkKWApplication* app, const char* args)
   this->VCRControl->SetLoopCheckCommand(this,"LoopCheckButtonCallback");
   this->VCRControl->SetRecordCheckCommand(this, "RecordCheckCallback");
   this->VCRControl->SetRecordStateCommand(this, "RecordState");
+  this->VCRControl->SetSaveAnimationCommand(this, "SaveAnimationCallback");
   this->Script("grid %s -columnspan 2 -sticky {}",
     this->VCRControl->GetWidgetName());
   this->VCRControl->UpdateEnableState();
@@ -276,6 +277,7 @@ void vtkPVAnimationScene::Create(vtkKWApplication* app, const char* args)
   this->VCRToolbar->SetLoopCheckCommand(this,"ToolbarLoopCheckButtonCallback");
   this->VCRToolbar->SetRecordCheckCommand(this, "ToolbarRecordCheckButtonCallback");
   this->VCRToolbar->SetRecordStateCommand(this, "RecordState");
+  this->VCRToolbar->SetSaveAnimationCommand(this, "SaveAnimationCallback");
   this->Window->AddLowerToolbar(this->VCRToolbar, VTK_PV_TOOLBARS_ANIMATION_LABEL, 0);
   this->VCRToolbar->UpdateEnableState();
 
@@ -685,6 +687,12 @@ void vtkPVAnimationScene::DurationChangedCallback()
 double vtkPVAnimationScene::GetDuration()
 {
   return this->AnimationSceneProxy->GetEndTime();
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVAnimationScene::SaveAnimationCallback()
+{
+  this->Window->SaveAnimation();
 }
 
 //-----------------------------------------------------------------------------

@@ -140,7 +140,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.657");
+vtkCxxRevisionMacro(vtkPVWindow, "1.658");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -4889,6 +4889,40 @@ void vtkPVWindow::UpdateToolbarAspect()
   this->DisableToolbarButtons();
   this->EnableToolbarButtons();
 
+  if (!this->LowerToolbars)
+    {
+    return;
+    }
+  
+  // Decide the properties of the toolbars.
+  int flat_frame;
+  if (this->GetApplication()->HasRegisteryValue(
+    2, "RunTime", VTK_KW_TOOLBAR_FLAT_FRAME_REG_KEY))
+    {
+    flat_frame = this->GetApplication()->GetIntRegisteryValue(
+      2, "RunTime", VTK_KW_TOOLBAR_FLAT_FRAME_REG_KEY);
+    }
+  else
+    {
+    flat_frame = vtkKWToolbar::GetGlobalFlatAspect();
+    }
+
+  int flat_buttons;
+  if (this->GetApplication()->HasRegisteryValue(
+    2, "RunTime", VTK_KW_TOOLBAR_FLAT_BUTTONS_REG_KEY))
+    {
+    flat_buttons = this->GetApplication()->GetIntRegisteryValue(
+      2, "RunTime", VTK_KW_TOOLBAR_FLAT_BUTTONS_REG_KEY);
+    }
+  else
+    {
+    flat_buttons = vtkKWToolbar::GetGlobalWidgetsFlatAspect();
+    }
+
+  this->LowerToolbars->SetToolbarsFlatAspect(flat_frame);
+  this->LowerToolbars->SetToolbarsWidgetsFlatAspect(flat_buttons);
+
+  // Decide if the lower toolbars frame should be shown
   if (this->LowerToolbars->IsCreated())
     {
     if (this->LowerToolbars->GetNumberOfVisibleToolbars())

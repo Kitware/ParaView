@@ -22,7 +22,7 @@
 #include "vtkKWFrame.h"
 
 vtkStandardNewMacro(vtkPVVCRControl);
-vtkCxxRevisionMacro(vtkPVVCRControl, "1.3");
+vtkCxxRevisionMacro(vtkPVVCRControl, "1.4");
 //-----------------------------------------------------------------------------
 vtkPVVCRControl::vtkPVVCRControl()
 {
@@ -35,6 +35,7 @@ vtkPVVCRControl::vtkPVVCRControl()
   this->LoopCheckButton = vtkKWCheckButton::New();
   this->RecordCheckButton = vtkKWCheckButton::New();
   this->RecordStateButton = vtkKWPushButton::New();
+  this->SaveAnimationButton = vtkKWPushButton::New();
 
   this->InPlay = 0;
 
@@ -47,6 +48,7 @@ vtkPVVCRControl::vtkPVVCRControl()
   this->LoopCheckCommand=0;
   this->RecordCheckCommand=0;
   this->RecordStateCommand=0;
+  this->SaveAnimationCommand = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -61,6 +63,8 @@ vtkPVVCRControl::~vtkPVVCRControl()
   this->LoopCheckButton->Delete();
   this->RecordStateButton->Delete();
   this->RecordCheckButton->Delete();
+  this->SaveAnimationButton->Delete();
+
   this->SetPlayCommand(0);
   this->SetStopCommand(0);
   this->SetGoToBeginningCommand(0);
@@ -70,6 +74,7 @@ vtkPVVCRControl::~vtkPVVCRControl()
   this->SetLoopCheckCommand(0);
   this->SetRecordCheckCommand(0);
   this->SetRecordStateCommand(0);
+  this->SetSaveAnimationCommand(0);
 }
 
 //-----------------------------------------------------------------------------
@@ -154,7 +159,11 @@ void vtkPVVCRControl::Create(vtkKWApplication* app)
   this->RecordStateButton->Create(app, "-image PVRecordState");
   this->RecordStateButton->SetCommand(this, "RecordStateCallback");
   this->RecordStateButton->SetBalloonHelpString("Record the current state of the system as key frames.");
-  
+ 
+  this->SaveAnimationButton->SetParent(this->GetFrame());
+  this->SaveAnimationButton->Create(app, "-image PVMovie");
+  this->SaveAnimationButton->SetCommand(this, "SaveAnimationCallback");
+  this->SaveAnimationButton->SetBalloonHelpString("Save animation as a movie or images.");
 
   //  Animation Control: pack the transport buttons
   this->AddWidget(this->GoToBeginningButton);
@@ -166,6 +175,7 @@ void vtkPVVCRControl::Create(vtkKWApplication* app)
   this->AddWidget(this->GoToNextButton);
   this->AddWidget(this->GoToEndButton);
   this->AddWidget(this->LoopCheckButton);
+  this->AddWidget(this->SaveAnimationButton);
   icon->Delete();
 }
 
@@ -221,6 +231,12 @@ void vtkPVVCRControl::SetRecordCheckCommand(vtkKWObject* calledObject, const cha
 void vtkPVVCRControl::SetRecordStateCommand(vtkKWObject* calledObject, const char* commandString)
 {
   this->SetObjectMethodCommand(&this->RecordStateCommand, calledObject, commandString);
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVVCRControl::SetSaveAnimationCommand(vtkKWObject* calledObject, const char* commandString)
+{
+  this->SetObjectMethodCommand(&this->SaveAnimationCommand, calledObject, commandString);
 }
 
 //-----------------------------------------------------------------------------
@@ -300,7 +316,11 @@ void vtkPVVCRControl::RecordCheckCallback()
 }
 
 //-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
+void vtkPVVCRControl::SaveAnimationCallback()
+{
+  this->InvokeCommand(this->SaveAnimationCommand);
+}
+
 //-----------------------------------------------------------------------------
 void vtkPVVCRControl::InvokeCommand(const char *command)
 {
