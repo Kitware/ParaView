@@ -90,11 +90,36 @@ public:
   virtual void ComputeVisiblePropBounds(vtkRenderer *ren, 
                                         float bounds[6]);
 
+
+  // Description:
+  // Also initialize rmi to check for data.
+  virtual void InitializeRMIs();
+
+  // Description:
+  // Public because it is an RMI,  It checks to see if data exists
+  // on the remote processes before bothering to composite.
+  // It uses the supperclasses "UseComposite" flag to disable compositing.
+  virtual void StartRender();
+
+  // Description:
+  // Public because it is an RMI.  
+  void CheckForDataRMI();
+
 protected:
   vtkPVTreeComposite();
   ~vtkPVTreeComposite();
   vtkPVTreeComposite(const vtkPVTreeComposite&) {};
   void operator=(const vtkPVTreeComposite&) {};
+
+  int  CheckForData();
+  int  ShouldIComposite();
+
+//BTX
+
+  enum Tags {
+    CHECK_FOR_DATA_TAG=442445
+  };
+//ETX
 
   int EnableAbort;
 
@@ -105,6 +130,9 @@ protected:
   // Flag used to indicate the first call for a render.
   // There is no initialize method.
   int Initialized;
+
+
+
 
   
 //BTX 

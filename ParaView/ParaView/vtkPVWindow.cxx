@@ -827,7 +827,7 @@ void vtkPVWindow::Create(vtkKWApplication *app, char* vtkNotUsed(args))
 
 
   // Try to load modules we know about.
-  if (this->LoadModule("vtkARLTCL.pvm"))
+  if (0 && this->LoadModule("vtkARLTCL.pvm"))
     {
     this->AddFileType("CTH Files", "xml");
     this->Script("vtkARLXDMFReaderInterface cthReaderInterface");
