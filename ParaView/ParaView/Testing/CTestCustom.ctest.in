@@ -1,0 +1,15 @@
+SET(CTEST_CUSTOM_MEMCHECK_IGNORE
+  ${CTEST_CUSTOM_MEMCHECK_IGNORE}
+  PrintSelf-KWCommon
+  PrintSelf-Packages
+  PrintSelf-ParaView
+  PrintSelf-Widgets
+  TestSetObjectMacro-KWCommon
+  TestSetObjectMacro-ParaView
+  TestSetObjectMacro-Widgets
+  HeaderTesting-KWCommon
+  HeaderTesting-Widgets
+  HeaderTesting-ParaView
+  HeaderTesting-PVPackages
+  Install-ParaView
+)

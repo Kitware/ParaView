@@ -7,11 +7,11 @@ ENDIF (VTK_WRAP_PYTHON)
 
 IF(PYTHON_EXECUTABLE AND VTK_HEADER_TESTING_PY)
   ADD_TEST(HeaderTesting-ParaView ${PYTHON_EXECUTABLE}
-           ${VTK_HEADER_TESTING_PY}
-	   "${PARAVIEW_SOURCE_DIR}/ParaView"
-           vtkPVDefaultModules.h
-           ParaViewRC.h
-           )
+    ${VTK_HEADER_TESTING_PY}
+    "${PARAVIEW_SOURCE_DIR}/ParaView"
+    vtkPVDefaultModules.h
+    ParaViewRC.h
+    )
 ENDIF(PYTHON_EXECUTABLE AND VTK_HEADER_TESTING_PY)
 
 # Test the "make install" procedure on ParaView.
@@ -22,6 +22,11 @@ IF(UNIX)
       ${PARAVIEW_BINARY_DIR}/ParaView/Testing/TestInstall.sh
       @ONLY IMMEDIATE
       )
-    ADD_TEST(Install /bin/sh ${PARAVIEW_BINARY_DIR}/ParaView/Testing/TestInstall.sh)
+    ADD_TEST(Install-ParaView /bin/sh ${PARAVIEW_BINARY_DIR}/ParaView/Testing/TestInstall.sh)
   ENDIF("x${CMAKE_INSTALL_PREFIX}" MATCHES "^x${PARAVIEW_BINARY_DIR}/ParaView/Testing/TestInstall")
 ENDIF(UNIX)
+
+# Suppress memory checking of some tests
+CONFIGURE_FILE(${PARAVIEW_SOURCE_DIR}/ParaView/Testing/CTestCustom.ctest.in
+  ${PARAVIEW_BINARY_DIR}/ParaView/Testing/CTestCustom.ctest @ONLY)
+
