@@ -58,7 +58,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectTimeSet);
-vtkCxxRevisionMacro(vtkPVSelectTimeSet, "1.19");
+vtkCxxRevisionMacro(vtkPVSelectTimeSet, "1.20");
 
 //-----------------------------------------------------------------------------
 int vtkDataArrayCollectionCommand(ClientData cd, Tcl_Interp *interp,
@@ -304,6 +304,15 @@ void vtkPVSelectTimeSet::Reset()
   pm->RootScript("%s GetTimeValue", this->PVSource->GetVTKSourceTclName());
   float actualTimeValue = atof(pm->GetRootResult());
   int matchFound = 0;
+
+  if (this->TimeSets->GetNumberOfItems() == 0)
+    {
+    this->Script("pack forget %s", this->TreeFrame->GetWidgetName());
+    this->TimeLabel->SetLabel("No timesets available.");
+    return;
+    }
+
+  this->Script("pack %s -expand t -fill x", this->TreeFrame->GetWidgetName());
 
   this->TimeSets->InitTraversal();
   vtkDataArray* da;
