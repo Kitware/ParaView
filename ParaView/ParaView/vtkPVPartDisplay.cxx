@@ -37,7 +37,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPartDisplay);
-vtkCxxRevisionMacro(vtkPVPartDisplay, "1.19");
+vtkCxxRevisionMacro(vtkPVPartDisplay, "1.19.2.1");
 
 
 //----------------------------------------------------------------------------
@@ -141,7 +141,17 @@ void vtkPVPartDisplay::CreateParallelTclObjects(vtkPVApplication *pvApp)
   this->UpdateSuppressorID = pm->NewStreamObject("vtkPVUpdateSuppressor");
 
   // Now create the mapper.
+  if (pvApp->GetUseSoftwareRendering())
+    {
+    // vtkPVPolyDataMapper does not have a mangled mesa version. 
+    // Therefore, in case of software rendering, we use vtkPolyDataMapper.
+    // This goes through the factory and creates the right mesa classes.
+    this->MapperID = pm->NewStreamObject("vtkPolyDataMapper");
+    }
+  else
+    {
   this->MapperID = pm->NewStreamObject("vtkPVPolyDataMapper");
+    }
   stream << vtkClientServerStream::Invoke << this->MapperID << "UseLookupTableScalarRangeOn" 
          << vtkClientServerStream::End;
   stream << vtkClientServerStream::Invoke << this->UpdateSuppressorID << "GetOutput" 
@@ -414,9 +424,4 @@ void vtkPVPartDisplay::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "DirectColorFlag: " << this->DirectColorFlag << endl;
   os << indent << "UpdateSuppressor: " << this->UpdateSuppressorID.ID << endl;
 }
-
-
-  
-
-
 
