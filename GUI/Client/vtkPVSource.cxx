@@ -64,7 +64,7 @@
 
 
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.427.2.6");
+vtkCxxRevisionMacro(vtkPVSource, "1.427.2.7");
 vtkCxxSetObjectMacro(vtkPVSource,Notebook,vtkPVSourceNotebook);
 #if defined(PARAVIEW_USE_SERVERMANAGER_RENDERING)
   vtkCxxSetObjectMacro(vtkPVSource,DisplayProxy, vtkSMDisplayProxy);
@@ -1146,6 +1146,7 @@ void vtkPVSource::Accept(int hideFlag, int hideSource)
       }
     else
       {
+      /* TODO: I am not registering Display as animateable....
       vtkSMProxyManager* proxm = vtkSMObject::GetProxyManager();
       ostrstream animName_with_warning_C4701;
       animName_with_warning_C4701 << this->GetSourceList() << "." 
@@ -1155,6 +1156,7 @@ void vtkPVSource::Accept(int hideFlag, int hideSource)
       proxm->RegisterProxy(
         "animateable", animName_with_warning_C4701.str(), pDisp);
       delete[] animName_with_warning_C4701.str();
+      */
       }
 
     // Create the Cube Axes.
@@ -1518,10 +1520,6 @@ void vtkPVSource::SetDefaultColorParameters()
 //----------------------------------------------------------------------------
 void vtkPVSource::ColorByArray(const char* arrayname, int field)
 {
-  this->GetPVApplication()->AddTraceEntry(
-    "$kw(%s) ColorByArray {%s} %d",
-    this->GetTclName(), arrayname, field);
-
   if (field != vtkSMDisplayProxy::POINT_FIELD_DATA &&
     field != vtkSMDisplayProxy::CELL_FIELD_DATA)
     {
