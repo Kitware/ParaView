@@ -208,7 +208,7 @@ The output of the Cylinder source is polygonal data containing both normals and 
 <Module name="LineSource" menu_name="Line" root_name="Line" 
         module_type="Source" 
         button_image="PVRulerButton"
-        button_help="Measure the distance between two point.  Use the 'p' key to pick the points."
+        button_help="Measure the distance between two points.  Use the 'p' key to pick the points."
         long_help="Line between two points. The resolution indicates how many segments are in the line." 
         short_help="Create a line between two points">
   <Source class="vtkLineSource"/>
@@ -232,7 +232,10 @@ The output of the Line source is polygonal data.
 <Module name="ImageMandelbrotSource" menu_name="Mandelbrot" 
         root_name="Fractal" module_type="Source" 
         long_help="Representation (unsigned char ) of the Mandlebrot set in up to 3 dimensions." 
-        short_help="Create a Mandelbrot representation">
+        short_help="Create a Mandelbrot representation"
+        button_image="PVMandelbrotButton"
+        button_help="Create a fractal image or volume."
+	button_visibility="0">
   <Source class="vtkImageMandelbrotSource"/>
   <VectorEntry label="Extent" trace_name="Extent" property="WholeExtent" 
                type="int" length="6"
@@ -334,7 +337,10 @@ The output of the Plane source is polygonal data.
 <Module name="SphereSource" menu_name="Sphere" root_name="Sphere" 
         module_type="Source" 
         long_help="3D sphere given a center and radius." 
-        short_help="Create a 3D sphere">
+        short_help="Create a 3D sphere"
+        button_image="PVSphereSourceButton"
+        button_help="Create a 3D sphere."
+	button_visibility="0">
   <Source class="vtkSphereSource"/>
   <VectorEntry label="Center" property="Center" trace_name="Center"
                type="float" length="3"
@@ -386,7 +392,10 @@ The output of the Sphere source is polygonal data with point normals defined.
 <Module name="SuperquadricSource" menu_name="Superquadric" root_name="SQuad" 
         module_type="Source" 
         long_help="Superquadric according to the theta and phi roundness parameters. This one function can generate a wide variety of 3D objects including a box, a sphere, or a torus." 
-        short_help="Create a superquadric according to the theta and phi roundness parameters">
+        short_help="Create a superquadric according to the theta and phi roundness parameters"
+        button_image="PVSuperquadricButton"
+        button_help="Create a torus shaped surface."
+	button_visibility="0">
   <Source class="vtkSuperquadricSource"/>
   <VectorEntry label="Center" property="Center" trace_name="Center"
                type="float" length="3"
@@ -438,7 +447,10 @@ The output of the Superquadric source is polygonal data with point normals and t
 
 <Module name="RTAnalyticSource" menu_name="Wavelet" root_name="RTSource" 
         module_type="Source" 
-        long_help="Regular rectilinear grid in up to three dimensions with values varying according to a periodic function.">
+        long_help="Regular rectilinear grid in up to three dimensions with values varying according to a periodic function."
+        button_image="PVWaveletButton"
+        button_help="Regular rectilinear grid in up to three dimensions with values varying according to a periodic function."
+	button_visibility="0">
   <Source class="vtkRTAnalyticSource"/>
   <VectorEntry label="Extent" trace_name="WholeExtent" property="WholeExtent" 
                 type="int" length="6"
