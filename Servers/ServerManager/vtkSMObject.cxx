@@ -15,12 +15,14 @@
 #include "vtkSMObject.h"
 
 #include "vtkObjectFactory.h"
+#include "vtkSMApplication.h"
 #include "vtkSMProxyManager.h"
 
 vtkStandardNewMacro(vtkSMObject);
-vtkCxxRevisionMacro(vtkSMObject, "1.5");
+vtkCxxRevisionMacro(vtkSMObject, "1.6");
 
 vtkSMProxyManager* vtkSMObject::ProxyManager = 0;
+vtkSMApplication* vtkSMObject::Application = 0;
 
 //---------------------------------------------------------------------------
 vtkSMObject::vtkSMObject()
@@ -54,6 +56,18 @@ void vtkSMObject::SetProxyManager(vtkSMProxyManager* pm)
     pm->Register(0);
     }
   vtkSMObject::ProxyManager = pm;
+}
+
+//---------------------------------------------------------------------------
+vtkSMApplication* vtkSMObject::GetApplication()
+{
+  return vtkSMObject::Application;
+}
+
+//---------------------------------------------------------------------------
+void vtkSMObject::SetApplication(vtkSMApplication* app)
+{
+  vtkSMObject::Application = app;
 }
 
 //---------------------------------------------------------------------------

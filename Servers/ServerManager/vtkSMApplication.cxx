@@ -43,7 +43,7 @@ struct vtkSMApplicationInternals
 };
 
 vtkStandardNewMacro(vtkSMApplication);
-vtkCxxRevisionMacro(vtkSMApplication, "1.11");
+vtkCxxRevisionMacro(vtkSMApplication, "1.12");
 
 //---------------------------------------------------------------------------
 vtkSMApplication::vtkSMApplication()
@@ -101,6 +101,7 @@ void vtkSMApplication::Initialize()
 
   vtkSMProxyManager* proxyM = vtkSMProxyManager::New();
   this->SetProxyManager(proxyM);
+  this->SetApplication(this);
 
   vtkSMXMLParser* parser = vtkSMXMLParser::New();
 

@@ -24,6 +24,7 @@
 #include "vtkObject.h"
 
 class vtkSMProxyManager;
+class vtkSMApplication;
 
 class VTK_EXPORT vtkSMObject : public vtkObject
 {
@@ -37,11 +38,18 @@ public:
   static vtkSMProxyManager* GetProxyManager();
   static void SetProxyManager(vtkSMProxyManager* pm);
 
+  // Description:
+  // Application singleton is used to initialize server manager
+  // and manages global runtime information.
+  static vtkSMApplication* GetApplication();
+  static void SetApplication(vtkSMApplication* app);
+
 protected:
   vtkSMObject();
   ~vtkSMObject();
 
   static vtkSMProxyManager* ProxyManager;
+  static vtkSMApplication* Application;
 
   // Description:
   // Saves the state of the object in XML format. Should
