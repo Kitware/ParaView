@@ -259,8 +259,11 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 
   vtkMultiProcessController *controller = vtkMultiProcessController::New();
   controller->Initialize(&argc, (char***)(&argv));
-  //  controller->SetNumberOfProcesses(1);
-
+  
+#ifndef VTK_USE_MPI
+  controller->SetNumberOfProcesses(1);
+#endif
+  
   pvArgs.argc = argc;
   pvArgs.argv = argv;
   controller->SetSingleMethod(Process_Init, (void *)(&pvArgs));

@@ -1181,13 +1181,16 @@ void vtkPVActorComposite::SetScalarBarVisibility(int val)
   // I am going to add and remove it from the renderer instead of using visibility.
   // Composites should really have multiple props.
   
-  if (val)
+  if (ren)
     {
-    ren->AddActor(this->ScalarBar);
-    }
-  else
-    {
-    ren->RemoveActor(this->ScalarBar);
+    if (val)
+      {
+      ren->AddActor(this->ScalarBar);
+      }
+    else
+      {
+      ren->RemoveActor(this->ScalarBar);
+      }
     }
 }
 
@@ -1210,13 +1213,16 @@ void vtkPVActorComposite::SetCubeAxesVisibility(int val)
   // I am going to add and remove it from the renderer instead of using visibility.
   // Composites should really have multiple props.
   
-  if (val)
+  if (ren)
     {
-    ren->AddProp(this->CubeAxes);
-    }
-  else
-    {
-    ren->RemoveProp(this->CubeAxes);
+    if (val)
+      {
+      ren->AddProp(this->CubeAxes);
+      }
+    else
+      {
+      ren->RemoveProp(this->CubeAxes);
+      }
     }
 }
 
