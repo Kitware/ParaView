@@ -55,7 +55,7 @@ vtkPVSource *vtkPVDataSetReaderInterface::CreateCallback()
   vtkPVSource *pvs;
   vtkPVApplication *pvApp = this->GetPVApplication();
   int numOutputs, i;
-  
+
   // Create the vtkReader on all processes (through tcl).
   sprintf(tclName, "%s%d", this->RootName, this->InstanceCount);
   reader = (vtkDataSetReader *)
@@ -66,7 +66,14 @@ vtkPVSource *vtkPVDataSetReaderInterface::CreateCallback()
     return NULL;
     }
   // Use dialog to get file name on just prrocess 0
-  pvApp->Script("%s SetFileName [tk_getOpenFile -filetypes {{{VTK Data Sets} {.vtk}} {{All Files} {.*}}}]", tclName);
+  if (!this->GetDataFileName())
+    {
+    pvApp->Script("%s SetFileName [tk_getOpenFile -filetypes {{{VTK Data Sets} {.vtk}} {{All Files} {.*}}}]", tclName);
+    }
+  else
+    {
+    pvApp->Script("%s SetFileName %s", tclName, this->GetDataFileName());
+    }
   
   // No file name?  Just abort.
   if (strcmp(reader->GetFileName(), "") == 0)

@@ -192,6 +192,7 @@ void vtkPVWindow::Create(vtkKWApplication *app, char *args)
 
   // create the top level
   this->MenuFile->InsertCommand(0,"New Window", this, "NewWindow");
+  this->MenuFile->InsertCommand(1, "Open Data File", this, "Open");
   this->MenuFile->InsertCommand(2, "Save Tcl script", this, "Save");
   
   this->SelectMenu->SetParent(this->GetMenu());
@@ -388,6 +389,88 @@ void vtkPVWindow::NewWindow()
   nw->Create(this->Application,"");
   this->Application->AddWindow(nw);  
   nw->Delete();
+}
+
+void vtkPVWindow::Open()
+{
+  char *openFileName = NULL;
+  char *extension = NULL;
+  int i, numSourceInterfaces;
+  char* className;
+  vtkPVSourceInterface *interface;
+  
+  this->Script("set openFileName [tk_getOpenFile -filetypes {{{VTK files} {.vtk}} {{EnSight files} {.case}} {{POP files} {.pop}} {{STL files} {.stl}}}]");
+  openFileName = this->GetPVApplication()->GetMainInterp()->result;
+
+  if (!openFileName)
+    {
+    return;
+    }
+  
+  extension = strchr(openFileName, '.');
+  
+  numSourceInterfaces = this->SourceInterfaces->GetNumberOfItems();
+  
+  if (strcmp(extension, ".vtk") == 0)
+    {
+    for (i = 0; i < numSourceInterfaces; i++)
+      {
+      interface =
+	((vtkPVSourceInterface*)this->SourceInterfaces->GetItemAsObject(i));
+      className = interface->GetSourceClassName();
+      if (strcmp(className, "vtkDataSetReader") == 0)
+	{
+	interface->SetDataFileName(openFileName);
+	((vtkPVDataSetReaderInterface*)interface)->CreateCallback();
+	}
+      }
+    }
+  else if (strcmp(extension, ".case") == 0)
+    {
+    for (i = 0; i < numSourceInterfaces; i++)
+      {
+      interface =
+	((vtkPVSourceInterface*)this->SourceInterfaces->GetItemAsObject(i));
+      className = interface->GetSourceClassName();
+      if (strcmp(className, "vtkGenericEnSightReader") == 0)
+	{
+	interface->SetDataFileName(openFileName);
+	((vtkPVEnSightReaderInterface*)interface)->CreateCallback();
+	}
+      }
+    }
+  else if (strcmp(extension, ".pop") == 0)
+    {
+    for (i = 0; i < numSourceInterfaces; i++)
+      {
+      interface =
+	((vtkPVSourceInterface*)this->SourceInterfaces->GetItemAsObject(i));
+      className = interface->GetSourceClassName();
+      if (strcmp(className, "vtkPOPReader") == 0)
+	{
+	interface->SetDataFileName(openFileName);
+	interface->CreateCallback();
+	}
+      }
+    }
+  else if (strcmp(extension, ".stl") == 0)
+    {
+    for (i = 0; i < numSourceInterfaces; i++)
+      {
+      interface =
+	((vtkPVSourceInterface*)this->SourceInterfaces->GetItemAsObject(i));
+      className = interface->GetSourceClassName();
+      if (strcmp(className, "vtkSTLReader") == 0)
+	{
+	interface->SetDataFileName(openFileName);
+	interface->CreateCallback();
+	}
+      }
+    }
+  else
+    {
+    vtkErrorMacro("Unknown file extension");
+    }
 }
 
 //----------------------------------------------------------------------------

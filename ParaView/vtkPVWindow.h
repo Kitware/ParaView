@@ -109,6 +109,10 @@ public:
   void Save();
 
   // Description:
+  // Open a data file.
+  void Open();
+  
+  // Description:
   // Callback from the calculator button.
   void CalculatorCallback();
   

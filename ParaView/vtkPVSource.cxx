@@ -1398,6 +1398,7 @@ vtkKWEntry *vtkPVSource::AddFileEntry(char *label, char *setCmd, char *getCmd,
   this->Widgets->AddItem(entry);
   entry->SetParent(frame);
   entry->Create(this->Application, "");
+
   this->Script("%s configure -xscrollcommand {%s EntryChanged}",
                entry->GetWidgetName(), this->GetTclName());
   if (help)

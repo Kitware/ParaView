@@ -46,6 +46,7 @@ vtkPVSourceInterface::vtkPVSourceInterface()
   this->RootName = NULL;
   this->InputClassName = NULL;
   this->OutputClassName = NULL;
+  this->DataFileName = NULL;
   this->DefaultScalars = 0;
   
   this->MethodInterfaces = vtkCollection::New();
@@ -65,6 +66,7 @@ vtkPVSourceInterface::~vtkPVSourceInterface()
   this->SetRootName(NULL);
   this->SetInputClassName(NULL);
   this->SetOutputClassName(NULL);
+  this->SetDataFileName(NULL);
   
   this->PVWindow = NULL;
 }
@@ -181,6 +183,12 @@ vtkPVSource *vtkPVSourceInterface::CreateCallback()
   
     if (mInt->GetWidgetType() == VTK_PV_METHOD_WIDGET_FILE)
       {
+      if (this->GetDataFileName())
+	{
+	this->Script("%s %s %s",
+		     pvs->GetVTKSourceTclName(), mInt->GetSetCommand(),
+		     this->GetDataFileName());
+	}
       pvs->AddFileEntry(mInt->GetVariableName(), 
 			mInt->GetSetCommand(),
 			mInt->GetGetCommand(), 

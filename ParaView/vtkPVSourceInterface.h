@@ -62,6 +62,11 @@ public:
   vtkGetStringMacro(OutputClassName);
   
   // Description:
+  // Set/Get name of input file.
+  vtkSetStringMacro(DataFileName);
+  vtkGetStringMacro(DataFileName);
+  
+  // Description:
   // Does this filter operate on scalars?
   vtkBooleanMacro(DefaultScalars, int);
   vtkGetMacro(DefaultScalars, int);
@@ -101,7 +106,8 @@ protected:
   char *SourceClassName;
   char *InputClassName;
   char *OutputClassName;
-
+  char *DataFileName;
+  
   int DefaultScalars;
   
   vtkCollection *MethodInterfaces;
