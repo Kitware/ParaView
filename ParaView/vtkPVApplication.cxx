@@ -439,6 +439,7 @@ void vtkPVApplication::StartLog(char *filename)
     this->StopLog();
     }
   this->Log = (void *)(vtkTimerLog::New());
+  ((vtkTimerLog*)this->Log)->SetMaxEntries(1000);
   this->SetLogFileName(filename);
 }
 
