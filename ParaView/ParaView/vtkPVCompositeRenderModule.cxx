@@ -55,7 +55,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCompositeRenderModule);
-vtkCxxRevisionMacro(vtkPVCompositeRenderModule, "1.6.2.4");
+vtkCxxRevisionMacro(vtkPVCompositeRenderModule, "1.6.2.5");
 
 
 
@@ -77,6 +77,7 @@ vtkPVCompositeRenderModule::vtkPVCompositeRenderModule()
   this->LODCollectionDecision = 1;
 
   this->ReductionFactor = 2;
+  this->SquirtLevel = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -157,11 +158,23 @@ void vtkPVCompositeRenderModule::StillRender()
       pDisp->Update();
       }
     }
+
   // No reduction for still render.
   if (this->PVApplication && this->CompositeTclName)
     {
     this->PVApplication->Script("%s SetReductionFactor 1",
                                 this->CompositeTclName);
+    if (this->PVApplication->GetClientMode())
+      {
+      // No squirt if disabled, otherwise only lossless or still render.  
+      int squirtLevel = 0;
+      if (this->SquirtLevel)
+        {
+        squirtLevel = 1;
+        }
+      this->PVApplication->Script("%s SetSquirtLevel %d",
+                                  this->CompositeTclName, squirtLevel);
+      }
     }
 
   // Switch the compositer to local/composite mode.
@@ -275,10 +288,19 @@ void vtkPVCompositeRenderModule::InteractiveRender()
         }
       else
         {
-        this->PVApplication->Script("%s UseCompositingOn", this->CompositeTclName);
+        this->PVApplication->Script("%s UseCompositingOn", 
+                                    this->CompositeTclName);
         }
       this->LocalRender = localRender;
       }
+    }
+
+  // Handle squirt compression.
+  if (this->PVApplication->GetClientMode())
+    {
+    this->PVApplication->Script("%s UseCompositingOn; %s SetSquirtLevel %d", 
+                                this->CompositeTclName, this->CompositeTclName,
+                                this->SquirtLevel);
     }
 
   // Still Render can get called some funky ways.
@@ -312,21 +334,6 @@ void vtkPVCompositeRenderModule::InteractiveRender()
     }
 }
 
-//----------------------------------------------------------------------------
-void vtkPVCompositeRenderModule::SetSquirtLevel(int val)
-{
-  if (this->PVApplication == NULL)
-    {
-    vtkErrorMacro("Do not change squirt compression before application is set.");
-    return;
-    }
-  if (this->CompositeTclName == NULL)
-    {
-    vtkErrorMacro("Do not change squirt compression before composite manager is set.");
-    return;
-    }
-  this->PVApplication->Script("%s SetSquirtLevel %d", this->CompositeTclName, val);
-}
 
 //----------------------------------------------------------------------------
 void vtkPVCompositeRenderModule::ComputeReductionFactor()
@@ -581,5 +588,6 @@ void vtkPVCompositeRenderModule::PrintSelf(ostream& os, vtkIndent indent)
      << this->GetStillCompositeTime() << endl;
 
   os << indent << "ReductionFactor: " << this->ReductionFactor << endl;
+  os << indent << "SquirtLevel: " << this->SquirtLevel << endl;
 }
 
