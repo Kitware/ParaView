@@ -185,7 +185,7 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterface);
-vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.154");
+vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.155");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterface,ControlledWidget, vtkPVWidget);
 
@@ -1461,7 +1461,6 @@ void vtkPVAnimationInterface::SaveImages(const char* fileRoot,
     {
     //awriter = vtkMPEG2Writer::New();
     awriter = vtkMovieWriter::New();
-    (void)aspectRatio;
     /*
     if ( aspectRatio > 0 && aspectRatio <= 4 )
       {
