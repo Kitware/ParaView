@@ -51,7 +51,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWApplicationSettingsInterface);
-vtkCxxRevisionMacro(vtkKWApplicationSettingsInterface, "1.4");
+vtkCxxRevisionMacro(vtkKWApplicationSettingsInterface, "1.5");
 
 int vtkKWApplicationSettingsInterfaceCommand(ClientData cd, Tcl_Interp *interp,
                                              int argc, char *argv[]);
@@ -374,6 +374,15 @@ void vtkKWApplicationSettingsInterface::ShowBalloonHelpCallback()
 //------------------------------------------------------------------------------
 void vtkKWApplicationSettingsInterface::SetEnabled(int e)
 {
+  this->Superclass::SetEnabled(e);
+
+  if (!this->IsCreated())
+    {
+    return;
+    }
+
+  // Interface settings
+
   if (this->InterfaceSettingsFrame)
     {
     this->InterfaceSettingsFrame->SetEnabled(e);
