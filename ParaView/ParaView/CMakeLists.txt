@@ -21,7 +21,6 @@ vtkPVApplicationSettingsInterface.cxx
 vtkPVArrayInformation.cxx
 vtkPVArrayMenu.cxx 
 vtkPVArraySelection.cxx
-vtkPVBatchExporter.cxx
 vtkPVBoundsDisplay.cxx
 vtkPVCalculatorWidget.cxx
 vtkPVCameraIcon.cxx
