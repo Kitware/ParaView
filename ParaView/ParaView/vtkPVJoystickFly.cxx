@@ -50,7 +50,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkRenderer.h"
 #include "vtkTimerLog.h"
 
-vtkCxxRevisionMacro(vtkPVJoystickFly, "1.6");
+vtkCxxRevisionMacro(vtkPVJoystickFly, "1.7");
 
 //-------------------------------------------------------------------------
 vtkPVJoystickFly::vtkPVJoystickFly()
@@ -175,6 +175,9 @@ void vtkPVJoystickFly::Fly(vtkRenderer* ren, vtkRenderWindowInteractor *rwi,
         (range[1] - range[0])/100.0 * t;
       angle = t;
       }
+
+    double* range = cam->GetClippingRange();
+    speed *= range[1];
 
     float lastx = this->LastX;
     float lasty = size[1] - this->LastY - 1;
