@@ -8,8 +8,8 @@ $kw(vtkTemp273) UpdateScalars
 [$kw(vtkTemp273) GetShowXYPlotToggle] SetState 1
 $kw(vtkTemp273) AcceptCallback
 set kw(vtkTemp300) [$kw(vtkTemp273) GetPVOutput]
-$kw(vtkTemp300) ColorByPointFieldComponent {ImageValues} 0
-$kw(vtkTemp300) ColorByPointFieldComponent {ImageValues} 0
+$kw(vtkTemp300) ColorByPointFieldComponent {RTData} 0
+$kw(vtkTemp300) ColorByPointFieldComponent {RTData} 0
 set kw(vtkTemp280) [$kw(vtkTemp273) GetPVWidget {Line}]
 $kw(vtkTemp280) SetVisibility 1
 $kw(vtkTemp280) SetPoint1 -10.00000 -10.00000 -10.00000
@@ -19,14 +19,14 @@ $kw(vtkTemp273) UseLine
 $kw(vtkTemp273) UpdateScalars
 [$kw(vtkTemp273) GetShowXYPlotToggle] SetState 1
 $kw(vtkTemp273) AcceptCallback
-$kw(vtkTemp300) ColorByPointFieldComponent {ImageValues} 0
-$kw(vtkTemp300) ColorByPointFieldComponent {ImageValues} 0
+$kw(vtkTemp300) ColorByPointFieldComponent {RTData} 0
+$kw(vtkTemp300) ColorByPointFieldComponent {RTData} 0
 $kw(vtkTemp273) UseLine
 $kw(vtkTemp273) UpdateScalars
 [$kw(vtkTemp273) GetShowXYPlotToggle] SetState 1
 $kw(vtkTemp273) AcceptCallback
-$kw(vtkTemp300) ColorByPointFieldComponent {ImageValues} 0
-$kw(vtkTemp300) ColorByPointFieldComponent {ImageValues} 0
+$kw(vtkTemp300) ColorByPointFieldComponent {RTData} 0
+$kw(vtkTemp300) ColorByPointFieldComponent {RTData} 0
 $kw(vtkTemp280) SetPoint1 -10.00000 -10.00000 -10.00000
 $kw(vtkTemp280) SetPoint2 3.59489 6.26422 6.41830
 $kw(vtkTemp280) SetResolution 50
@@ -34,24 +34,24 @@ $kw(vtkTemp273) UseLine
 $kw(vtkTemp273) UpdateScalars
 [$kw(vtkTemp273) GetShowXYPlotToggle] SetState 1
 $kw(vtkTemp273) AcceptCallback
-$kw(vtkTemp300) ColorByPointFieldComponent {ImageValues} 0
-$kw(vtkTemp300) ColorByPointFieldComponent {ImageValues} 0
+$kw(vtkTemp300) ColorByPointFieldComponent {RTData} 0
+$kw(vtkTemp300) ColorByPointFieldComponent {RTData} 0
 $kw(vtkTemp280) SetVisibility 0
 $kw(vtkTemp273) UseLine
 $kw(vtkTemp273) UpdateScalars
 [$kw(vtkTemp273) GetShowXYPlotToggle] SetState 0
 $kw(vtkTemp273) AcceptCallback
-$kw(vtkTemp300) ColorByPointFieldComponent {ImageValues} 0
+$kw(vtkTemp300) ColorByPointFieldComponent {RTData} 0
 $kw(vtkTemp273) UseLine
 $kw(vtkTemp273) UpdateScalars
 [$kw(vtkTemp273) GetShowXYPlotToggle] SetState 1
 $kw(vtkTemp273) AcceptCallback
-$kw(vtkTemp300) ColorByPointFieldComponent {ImageValues} 0
+$kw(vtkTemp300) ColorByPointFieldComponent {RTData} 0
 $kw(vtkTemp273) UseLine
 $kw(vtkTemp273) UpdateScalars
 [$kw(vtkTemp273) GetShowXYPlotToggle] SetState 0
 $kw(vtkTemp273) AcceptCallback
-$kw(vtkTemp300) ColorByPointFieldComponent {ImageValues} 0
+$kw(vtkTemp300) ColorByPointFieldComponent {RTData} 0
 set kw(vtkTemp314) [$kw(vtkTemp1) CreatePVSource TubeFilter]
 $kw(vtkTemp314) AcceptCallback
 set kw(vtkTemp319) [$kw(vtkTemp314) GetPVWidget {NumberOfSides}]
