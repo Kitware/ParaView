@@ -196,7 +196,7 @@ If the Piece invariant option is checked, the whole data set will be processed a
                help="Set the input to this filter."
                input_name="Input"/>
     <Documentation>
-The Clean to Grid filter merges points that are within a tolerance of 1/100,000 of the length of the diagonal of the bounding box of the data set. It also converts the data set to an unstructured grid. The Input menu allows the user to select the data set to which this filter will be applied. The Clean to Grid filter operates on any type of data set.
+The Clean to Grid filter merges points that are within a tolerance of 1/100,000 of the length of the diagonal of the bounding box of the data set. It also converts the data set to an unstructured grid. You may wish to do this if you want to apply a filter to your data set that is available for unstructured grids but not for the initial type of your data set (e.g., applying warp vector to volumetric data). The Input menu allows the user to select the data set to which this filter will be applied. The Clean to Grid filter operates on any type of data set.
     </Documentation>
   </Module>
   <Module name="PVConnectivityFilter"
@@ -460,7 +460,7 @@ This filter only operates on unstructured data. It produces polygonal output.
                help="Set the input to this filter."
                input_name="Input"/>
     <Documentation>
-The Extract Edges filter produces a wireframe version of the input data set by extracting the edges of the data set's cells as lines. The Input menu allows the user to select the data set to which this filter will be applied. This filter operates on any type of data set and produces polygonal output.
+The Extract Edges filter produces a wireframe version of the input data set by extracting all the edges of the data set's cells as lines. The Input menu allows the user to select the data set to which this filter will be applied. This filter operates on any type of data set and produces polygonal output.
     </Documentation>
   </Module>
   <Module name="ExtractParts"
@@ -602,7 +602,7 @@ The Calculator filter is available on the Toolbar.
            entry_and_label_on_top="0"
            display_value="0"/>
     <Documentation>
-The Feature Edges filter extracts various types of edges from the input data set. Which edges are extracted depends on which check boxes are marked. The four types of edges are as follows.
+The Feature Edges filter extracts various subsets of edges from the input data set. Which edges are extracted depends on which check boxes are marked. The four types of edges are as follows.
 Boundary edges: line cells or edges used by only one polygon
 Feature edges: edges used by two polygons whose dihedral angle > the value from the Feature angle slider
 Non-manifold edges: edges used by three or more polygons
@@ -993,7 +993,7 @@ The Part Id Scalars filter assigns a unique scalar value to each part in the inp
                    property="RandomMode"
                    help="Select whether to use random colors for the various pieces"/>
     <Documentation>
-The Process Id Scalars filter assigns a unique scalar value to each piece of the input according to which processor it resides on. If the Random option is selected, the unique value per piece will be chosen at random; otherwise it will match the process id. This filter operates on any type of data when ParaView is run in parallel. The output data set type is the same as that of the input.
+The Process Id Scalars filter assigns a unique scalar value to each piece of the input according to which processor it resides on. If the Random option is selected, the unique value per piece will be chosen at random; otherwise it will match the process id. This filter operates on any type of data when ParaView is run in parallel. It is useful for determining whether your data is load-balanced across the processors being used. The output data set type is the same as that of the input.
     </Documentation>
   </Module>
   <Module name="PointDataToCellData"
@@ -1384,7 +1384,7 @@ The Triangle Strips filter converts triangles into triangle strips and lines int
              class="vtkPolyData"/>
     </Filter>
     <Documentation>
-The Subdivide filter iteratively divides each triangle in the data set into 4 new triangles. The Num. divisions slider determines the number of subdivision passes the filter will take through the data. This filter operates only on polygonal data containing triangles, so run your polygonal data through the Triangulate filter first if it is not composed of triangles. The output of this filter is also polygonal.
+The Subdivide filter iteratively divides each triangle in the data set into 4 new triangles. Three new points are added per triangle -- one at the midpoint of each edge. The image below shows a triangle with the new points inserted and the appropriate edges added to form the four new triangles. The Num. divisions slider determines the number of subdivision passes the filter will take through the data. This filter operates only on polygonal data containing triangles, so run your polygonal data through the Triangulate filter first if it is not composed of triangles. The output of this filter is also polygonal.
     </Documentation>
   </Module>
   <Module name="TempTessellatorFilter" menu_name="Tessellate" root_name="TempTessellatorFilter" module_type="Filter"
@@ -1461,7 +1461,7 @@ The Tetrahedralize filter converts the 3D cells of any type of data set to tetra
                help="Set the input to this filter."
                input_name="Input"/>
     <Documentation>
-The Triangulate filter decomposes polygonal data into only triangles, points, and lines. It separates triangle strips and polylines into individual triangles and lines, respectively. The output is polygonal data. Some filters that take polygonal data as input require that the data be composed of triangles rather than other polygons, so passing your data through this filter first is useful in such situations.
+The Triangulate filter decomposes polygonal data into only triangles, points, and lines. It separates triangle strips and polylines into individual triangles and lines, respectively. The output is polygonal data. Some filters that take polygonal data as input require that the data be composed of triangles rather than other polygons, so passing your data through this filter first is useful in such situations. You should use this filter in these cases rather than the Tetrahedralize filter because they produce different output data set types. The filters referenced require polygonal input, and the Tetrahedralize filter produces unstructured grid output.
     </Documentation>
   </Module>
   <Module name="TransformFilter"
