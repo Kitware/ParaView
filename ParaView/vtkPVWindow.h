@@ -127,6 +127,10 @@ public:
   // Description:
   // Callback from the contour button.
   void GlyphCallback();
+  
+  // Description:
+  // Callback from the frame rate scale.
+  void FrameRateScaleCallback();
 
   virtual void Close();
 
@@ -157,6 +161,9 @@ protected:
   vtkKWPushButton *ContourButton;
   vtkKWPushButton *GlyphButton;
 
+  vtkKWLabel *FrameRateLabel;
+  vtkKWScale *FrameRateScale;
+  
   vtkKWCompositeCollection *Sources;
   vtkKWLabeledFrame *ApplicationAreaFrame;
 

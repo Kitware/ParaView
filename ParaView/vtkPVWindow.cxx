@@ -94,6 +94,9 @@ vtkPVWindow::vtkPVWindow()
   this->ThresholdButton = vtkKWPushButton::New();
   this->ContourButton = vtkKWPushButton::New();
   this->GlyphButton = vtkKWPushButton::New();
+
+  this->FrameRateLabel = vtkKWLabel::New();
+  this->FrameRateScale = vtkKWScale::New();
   
   this->Sources = vtkKWCompositeCollection::New();
   
@@ -170,6 +173,18 @@ void vtkPVWindow::PrepareForDelete()
     {
     this->GlyphButton->Delete();
     this->GlyphButton = NULL;
+    }
+  
+  if (this->FrameRateLabel)
+    {
+    this->FrameRateLabel->Delete();
+    this->FrameRateLabel = NULL;
+    }
+  
+  if (this->FrameRateScale)
+    {
+    this->FrameRateScale->Delete();
+    this->FrameRateScale = NULL;
     }
   
   if (this->Toolbar)
@@ -329,6 +344,22 @@ void vtkPVWindow::Create(vtkKWApplication *app, char *args)
                this->ContourButton->GetWidgetName(),
                this->GlyphButton->GetWidgetName());
 
+  this->FrameRateScale->SetParent(this->GetToolbarFrame());
+  this->FrameRateScale->Create(app, "-resolution 0.1 -orient horizontal");
+  this->FrameRateScale->SetRange(0, 100);
+  this->FrameRateScale->SetValue(3.0);
+  this->FrameRateScale->SetCommand(this, "FrameRateScaleCallback");
+  this->FrameRateScale->SetBalloonHelpString(
+    "This slider adjusts the desired frame rate for interaction.  The level of detail is adjusted to achieve the desired rate.");
+  this->Script("pack %s -side right -fill none -expand no",
+               this->FrameRateScale->GetWidgetName());
+  
+  this->FrameRateLabel->SetParent(this->GetToolbarFrame());
+  this->FrameRateLabel->Create(app, "");
+  this->FrameRateLabel->SetLabel("Frame Rate");
+  this->Script("pack %s -side right -fill none -expand no",
+               this->FrameRateLabel->GetWidgetName());
+  
   // This button doesn't do anything useful right now.  It was put in originally
   // so we could switch between interactor styles.
 //  this->CameraStyleButton->SetParent(this->Toolbar);
@@ -779,6 +810,13 @@ void vtkPVWindow::ResetCameraCallback()
 {
   this->MainView->ResetCamera();
   this->MainView->EventuallyRender();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVWindow::FrameRateScaleCallback()
+{
+  float newRate = this->FrameRateScale->GetValue();
+  this->GetMainView()->GetRenderWindow()->SetDesiredUpdateRate(newRate);
 }
 
 //----------------------------------------------------------------------------
