@@ -24,7 +24,7 @@
 #include <vtkstd/map>
 #include <vtkstd/vector>
 #include "vtkStdString.h"
-
+#include <vtkstd/set>
 
 //---------------------------------------------------------------------------
 // Internal data structure for storing object IDs, server IDs and
@@ -71,6 +71,9 @@ struct vtkSMProxyInternals
     vtkSMProxy* Proxy;
   };
   vtkstd::vector<ConsumerInfo> Consumers;
+  
+  // This is a set of exposed property names. 
+  vtkstd::set<vtkStdString> ExposedPropertyNames;
 };
 
 #endif

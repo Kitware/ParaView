@@ -84,6 +84,12 @@
       <SubProxy>
         <Proxy name="Actor" proxygroup="props" proxyname="Actor">
         </Proxy>
+        <ExposedProperties>
+          <Property name="Visibility" />
+          <Property name="Position" />
+          <Property name="Scale" />
+          <Property name="Origin" />
+        </ExposedProperties>
       </SubProxy>
     </AxesProxy>
   </ProxyGroup>
@@ -968,7 +974,8 @@
         command="AddPoint"
         number_of_elements_per_command="2"
         repeat_command="1"
-        clean_command="RemoveAllPoints">
+        clean_command="RemoveAllPoints"
+        animateable="0">
       </DoubleVectorProperty>
     </Proxy>
   </ProxyGroup>
@@ -980,14 +987,16 @@
         command="AddRGBPoint"
         repeat_command="1"
         number_of_elements_per_command="4"
-        clean_command="RemoveAllPoints">
+        clean_command="RemoveAllPoints"
+        animateable="0">
       </DoubleVectorProperty>
 
       <IntVectorProperty
         name="ColorSpace"
         command="SetColorSpace"
         number_of_elements="1"
-        default_values="0">
+        default_values="0"
+        animateable="0">
         <EnumerationDomain name="enum">
           <Entry value="0" text="RGB" />
           <Entry value="1" text="HSV" />
@@ -998,7 +1007,8 @@
         name="HSVWrap"
         command="SetHSVWrap"
         number_of_elements="1"
-        default_values="0">
+        default_values="0"
+        animateable="0">
         <BooleanDomain name="bool" />
       </IntVectorProperty>
     </Proxy>
@@ -1169,7 +1179,8 @@
         name="Visibility"
         command="SetVisibility"
         number_of_elements="1"
-        default_values="1">
+        default_values="1"
+        animateable="0">
         <BooleanDomain name="bool"/>
       </IntVectorProperty>
 
@@ -1177,7 +1188,8 @@
         name="Orientation"
         command="SetOrientation"
         number_of_elements="1"
-        default_values="1">
+        default_values="1"
+        animateable="0">
         <EnumerationDomain name="enum">
           <Entry value="0" text="Horizontal"/>
           <Entry value="1" text="Vertical"/>
@@ -1189,7 +1201,8 @@
         command="SetPosition"
         number_of_elements="2"
         update_self="1"
-        default_values="0.81 0.25">
+        default_values="0.81 0.25"
+        animateable="0">
         <DoubleRangeDomain name="range" min="0 0" max="1 1" />
       </DoubleVectorProperty>
       
@@ -1198,7 +1211,8 @@
         command="SetPosition2"
         number_of_elements="2"
         update_self="1"
-        default_values="0.13 0.5">
+        default_values="0.13 0.5"
+        animateable="0">
         <DoubleRangeDomain name="range" min="0 0" max="1 1" />
       </DoubleVectorProperty>
       
@@ -1206,14 +1220,16 @@
         name="Title"
         command="SetTitle"
         number_of_elements="1"
-        default_values="">
+        default_values=""
+        animateable="0">
       </StringVectorProperty>
       
       <StringVectorProperty
         name="LabelFormat"
         command="SetLabelFormat"
         number_of_elements="1"
-        default_values="%-#6.3g">
+        default_values="%-#6.3g"
+        animateable="0">
       </StringVectorProperty>
 
       <!--label text property -->
@@ -1221,6 +1237,15 @@
         <Proxy name="LabelTextProperty"
           proxygroup="properties" proxyname="TextProperty">
         </Proxy>
+        <ExposedProperties>
+          <Property name="Color" />
+          <Property name="Opacity" />
+          <Property name="FontFamily" />
+          <Property name="Bold" />
+          <Property name="Italic" />
+          <Property name="Shadow" />
+          <Property name="FontSize" />
+        </ExposedProperties>
       </SubProxy>
 
       <!--title text property -->
@@ -1228,6 +1253,15 @@
         <Proxy name="TitleTextProperty" 
           proxygroup="properties" proxyname="TextProperty">
         </Proxy>
+        <ExposedProperties>
+          <Property name="Color" />
+          <Property name="Opacity" />
+          <Property name="FontFamily" />
+          <Property name="Bold" />
+          <Property name="Italic" />
+          <Property name="Shadow" />
+          <Property name="FontSize" />
+        </ExposedProperties>
       </SubProxy>
     </ScalarBarActorProxy>
     <!-- End of ProxyGroup annotations -->

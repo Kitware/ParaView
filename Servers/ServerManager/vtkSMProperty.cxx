@@ -31,7 +31,7 @@
 #include "vtkSMPropertyInternals.h"
 
 vtkStandardNewMacro(vtkSMProperty);
-vtkCxxRevisionMacro(vtkSMProperty, "1.27.4.1");
+vtkCxxRevisionMacro(vtkSMProperty, "1.27.4.2");
 
 vtkCxxSetObjectMacro(vtkSMProperty, Proxy, vtkSMProxy);
 vtkCxxSetObjectMacro(vtkSMProperty, InformationHelper, vtkSMInformationHelper);
@@ -46,7 +46,7 @@ vtkSMProperty::vtkSMProperty()
 {
   this->Command = 0;
   this->ImmediateUpdate = 0;
-  this->Animateable = 0;
+  this->Animateable = 2; // By default Animateable in advanced mode only.
   this->UpdateSelf = 0;
   this->PInternals = new vtkSMPropertyInternals;
   this->XMLName = 0;
@@ -58,6 +58,7 @@ vtkSMProperty::vtkSMProperty()
   this->InformationProperty = 0;
   this->ControllerProxy = 0;
   this->ControllerProperty = 0;
+  this->Saveable = 0;
 }
 
 //---------------------------------------------------------------------------
@@ -330,6 +331,12 @@ int vtkSMProperty::ReadXMLAttributes(vtkSMProxy* proxy,
   if (retVal)
     {
     this->SetAnimateable(animateable);
+    }
+
+  int saveable;
+  if (element->GetScalarAttribute("saveable", &saveable))
+    {
+    this->SetSaveable(saveable);
     }
 
   // Read and create domains.

@@ -336,6 +336,12 @@ void vtkSMPointLabelDisplayProxy::Update()
 void vtkSMPointLabelDisplayProxy::InvalidateGeometry()
 {
   this->GeometryIsValid = 0;
+  if (this->UpdateSuppressorProxy)
+    {
+    vtkSMProperty *p = this->UpdateSuppressorProxy->GetProperty("RemoveAllCaches");
+    p->Modified();
+    this->UpdateSuppressorProxy->UpdateVTKObjects();
+    }
 }
 
 //-----------------------------------------------------------------------------

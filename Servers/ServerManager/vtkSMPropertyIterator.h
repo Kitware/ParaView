@@ -16,7 +16,8 @@
 // .SECTION Description
 // vtkSMPropertyIterator is used to iterate over the properties of a
 // proxy. The properties of the root proxies as well as sub-proxies are
-// included in the iteration.
+// included in the iteration. For sub-proxies, only
+// exposed properties are iterated over.
 
 #ifndef __vtkSMPropertyIterator_h
 #define __vtkSMPropertyIterator_h

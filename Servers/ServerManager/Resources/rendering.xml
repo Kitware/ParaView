@@ -375,11 +375,9 @@
    
   <ProxyGroup name="renderers">
     <Proxy name="Renderer" class="vtkRenderer">
-      <ProxyProperty name="ActiveCamera" command="SetActiveCamera">
-        <ProxyGroupDomain name="groups">
-          <Group name="camera"/>
-        </ProxyGroupDomain>
-      </ProxyProperty>
+      <!-- Renderer purposefully doesn't have an active camera property.
+      Since the renderer is managed by RenderModule, it sets the camera
+      is perculiar ways, and can't use a property for it-->
       <ProxyProperty 
         name="ViewProps" 
         command="AddViewProp"
@@ -407,19 +405,9 @@
       </IntVectorProperty>
       
       <DoubleVectorProperty
-        name="BackgroundInfo"
-        command="GetBackground"
-        number_of_elements="3"
-        information_only="1"
-        default_values="0 0 0">
-        <SimpleDoubleInformationHelper/>
-      </DoubleVectorProperty>
-      
-      <DoubleVectorProperty
         name="Background"
         command="SetBackground"
         number_of_elements="3"
-        information_property="BackgroundInfo"
         default_values="0 0 0" >
         <DoubleRangeDomain name="range" min="0 0 0" max="1 1 1"/>
       </DoubleVectorProperty>
@@ -531,7 +519,7 @@
       </DoubleVectorProperty>
 
       <IntVectorProperty
-        name="ParallelProjection"
+        name="CameraParallelProjection"
         command="SetParallelProjection"
         number_of_elements="1"
         default_values="0">
@@ -588,6 +576,7 @@
         default_values="0">
         <BooleanDomain name="bool"/>
       </IntVectorProperty>
+
       <Property name="Render" command="Render">
       </Property>
     </Proxy>
@@ -611,7 +600,8 @@
       </ProxyProperty>
       <IntVectorProperty
         name="LabelMode"
-        command="SetLabelMode">
+        command="SetLabelMode"
+        animateable="0">
         <EnumerationDomain name="enum">
           <Entry value="0" text="IDs" />
           <Entry value="1" text="Scalars" />
@@ -662,21 +652,24 @@
         name="ImmediateModeRendering" 
         command="SetImmediateModeRendering"
         number_of_elements="1"
-        default_values="0">
+        default_values="0"
+        animateable="0">
         <BooleanDomain name="bool" />
       </IntVectorProperty>
       <IntVectorProperty
         name="InterpolateScalarsBeforeMapping"
         command="SetInterpolateScalarsBeforeMapping"
         number_of_elements="1"
-        default_values="0">
+        default_values="0"
+        animateable="0">
         <BooleanDomain name="bool" />
       </IntVectorProperty>
       <IntVectorProperty
         name="UseLookupTableScalarRange"
         command="SetUseLookupTableScalarRange"
         number_of_elements="1"
-        default_values="0">
+        default_values="0"
+        animateable="0">
         <BooleanDomain name="bool" />
       </IntVectorProperty>
       <IntVectorProperty
@@ -723,7 +716,8 @@
         name="ScalarMode"
         command="SetScalarMode"
         default_values="3"
-        number_of_elements="1">
+        number_of_elements="1"
+        animateable="0">
         <EnumerationDomain name="enum">
           <Entry value="0" text="Default"/>
           <Entry value="1" text="PointData"/>
@@ -735,7 +729,8 @@
       <StringVectorProperty
         name="SelectScalarArray"
         command="SelectScalarArray"
-        number_of_elements="1">
+        number_of_elements="1"
+        animateable="0">
         <ArrayListDomain name="array_list" attribute_type="Scalars">
           <RequiredProperties>
             <Property name="Input" function="Input"/>
@@ -860,21 +855,24 @@
         command="SetColor"
         number_of_elements="3"
         argument_is_array="1"
-        default_values="1.0 1.0 1.0">
+        default_values="1.0 1.0 1.0"
+        animateable="0">
       </DoubleVectorProperty>
 
       <DoubleVectorProperty
         name="Opacity"
         command="SetOpacity"
         number_of_elements="1"
-        default_values="1.0">
+        default_values="1.0"
+        animateable="0">
       </DoubleVectorProperty>
 
       <IntVectorProperty
         name="FontFamily"
         command="SetFontFamily"
         number_of_elements="1"
-        default_values="0">
+        default_values="0"
+        animateable="0">
         <EnumerationDomain name="enum">
           <Entry value="0" text="Arial"/>
           <Entry value="1" text="Courier"/>
@@ -886,7 +884,8 @@
         name="Bold"
         command="SetBold"
         number_of_elements="1"
-        default_values="0">
+        default_values="0"
+        animateable="0">
         <BooleanDomain name="bool"/>
       </IntVectorProperty>
       
@@ -910,7 +909,8 @@
         name="FontSize"
         command="SetFontSize"
         number_of_elements="1"
-        default_values="12">
+        default_values="12"
+        animateable="0">
         <IntRangeDomain name="range" min="0" />
       </IntVectorProperty>
       <!-- End of TextProperty -->
@@ -954,21 +954,24 @@
         name="LineWidth"
         command="SetLineWidth"
         number_of_elements="1"
-        default_values="1.0">
+        default_values="1.0"
+        animateable="0">
         <DoubleRangeDomain name="range" min="0"/>
       </DoubleVectorProperty>
       <DoubleVectorProperty
         name="PointSize"
         command="SetPointSize"
         number_of_elements="1"
-        default_values="1.0">
+        default_values="1.0"
+        animateable="0">
         <DoubleRangeDomain name="range" min="0" />
       </DoubleVectorProperty>
       <IntVectorProperty
         name="Interpolation"
         command="SetInterpolation"
         number_of_elements="1"
-        default_values="1">
+        default_values="1"
+        animateable="0">
         <EnumerationDomain name="enum">
           <Entry value="0" text="Flat" />
           <Entry value="1" text="Gourand" />
@@ -979,7 +982,8 @@
         name="Representation"
         command="SetRepresentation"
         number_of_elements="1"
-        default_values="2">
+        default_values="2"
+        animateable="0">
         <EnumerationDomain name="enum">
           <Entry value="0" text="Points" />
           <Entry value="1" text="Wireframe" />
@@ -997,42 +1001,48 @@
         name="Opacity"
         command="SetOpacity"
         number_of_elements="1"
-        default_values="1.0">
+        default_values="1.0"
+        animateable="0">
         <DoubleRangeDomain name="range" min="0" max="1" />
       </DoubleVectorProperty>
       <DoubleVectorProperty
         name="Ambient"
         command="SetAmbient"
         number_of_elements="1"
-        default_values="0.0">
+        default_values="0.0"
+        animateable="0">
         <DoubleRangeDomain name="range" min="0" max="1" />
       </DoubleVectorProperty>
       <DoubleVectorProperty
         name="Diffuse"
         command="SetDiffuse"
         number_of_elements="1"
-        default_values="0.0">
+        default_values="0.0"
+        animateable="0">
         <DoubleRangeDomain name="range" min="0" max="1" />
       </DoubleVectorProperty>
       <DoubleVectorProperty
         name="Specular"
         command="SetSpecular"
         number_of_elements="1"
-        default_values="0.0">
+        default_values="0.0"
+        animateable="0">
         <DoubleRangeDomain name="range" min="0" max="1" />
       </DoubleVectorProperty>
       <DoubleVectorProperty
         name="SpecularPower"
         command="SetSpecularPower"
         number_of_elements="1"
-        default_values="0.0">
+        default_values="0.0"
+        animateable="0">
         <DoubleRangeDomain name="range" min="0" max="100" />
       </DoubleVectorProperty>
       <DoubleVectorProperty
         name="SpecularColor"
         command="SetSpecularColor"
         number_of_elements="3"
-        default_values="1.0 1.0 1.0">
+        default_values="1.0 1.0 1.0"
+        animateable="0">
         <DoubleRangeDomain name="range" min="0 0 0" max="1 1 1" />
       </DoubleVectorProperty>
       <!-- End of Property -->
@@ -1072,10 +1082,16 @@
   </ProxyGroup>
 
   <ProxyGroup name="rendermodules">
+    <!-- I don't bother setting animateable attribute on Render Modules since
+    they are never registered as animateable proxies -->
     <SimpleRenderModuleProxy name="SimpleRenderModule">
-      <Property name="StillRender" command="StillRender" update_self="1">
+      <Property 
+        name="StillRender" 
+        command="StillRender" 
+        update_self="1">
       </Property>
-      <Property name="InteractiveRender" command="InteractiveRender" update_self="1">
+      <Property name="InteractiveRender" 
+        command="InteractiveRender" update_self="1">
       </Property>
       <ProxyProperty
         name="Displays"
@@ -1091,7 +1107,8 @@
         command="CacheUpdate"
         number_of_elements="2"
         update_self="1"
-        default_values="0 -1">
+        default_values="0 -1"
+        saveable="0">
         <IntRangeDomain name="range" min="0 0" />
       </IntVectorProperty>
       <Property
@@ -1127,14 +1144,36 @@
       <SubProxy>
         <Proxy name="Renderer" proxyname="Renderer" proxygroup="renderers">
         </Proxy>
+        <ExposedProperties>
+          <!-- only the properties listed in here can be accessed externall
+          for this subproxy -->
+          <Property name="Background" />
+        </ExposedProperties>
       </SubProxy>
+
       <SubProxy>
         <Proxy name="Renderer2D" proxyname="Renderer" proxygroup="renderers">
         </Proxy>
       </SubProxy>
+
       <SubProxy>
         <Proxy name="ActiveCamera" proxyname="Camera" proxygroup="camera">
         </Proxy>
+        <ExposedProperties>
+          <Property name="CameraPositionInfo" />
+          <Property name="CameraPosition" />
+          <Property name="CameraFocalPointInfo" />
+          <Property name="CameraFocalPoint" />
+          <Property name="CameraViewUpInfo" />
+          <Property name="CameraViewUp" />
+          <Property name="CameraViewAngleInfo" />
+          <Property name="CameraViewAngle" />
+          <Property name="CameraClippingRangeInfo" />
+          <Property name="CameraClippingRange" />
+          <Property name="CameraParallelScaleInfo" />
+          <Property name="CameraParallelScale" />
+          <Property name="CameraParallelProjection" />
+        </ExposedProperties>
       </SubProxy>
       <SubProxy>
         <Proxy name="RenderWindow" proxyname="RenderWindow" proxygroup="renderwindow">
@@ -1144,6 +1183,8 @@
         <Proxy name="Interactor" proxyname="GenericRenderWindowInteractor" 
           proxygroup="interactors">
         </Proxy>
+        <!-- TODO: we may expose the InteractorRender property and 
+        GUI call call that property instead on iren->Render() -->
       </SubProxy>
     </SimpleRenderModuleProxy>
 
@@ -1521,23 +1562,42 @@
         <Proxy name="UpdateSuppressor"
           proxygroup="filters" proxyname="UpdateSuppressor">
         </Proxy>
+        <ExposedProperties>
+          <Property name="CacheUpdate" />
+        </ExposedProperties>
       </SubProxy>
       <SubProxy>
         <Proxy name="Property"
           proxygroup="properties" proxyname="TextProperty">
         </Proxy>
+        <ExposedProperties>
+          <Property name="Color" />
+          <Property name="Opacity" />
+          <Property name="FontFamily" />
+          <Property name="Bold" />
+          <Property name="Italic" />
+          <Property name="Shadow" />
+          <Property name="FontSize" />
+        </ExposedProperties>
       </SubProxy>
       <SubProxy>
         <Proxy name="Actor"
           proxygroup="props" proxyname="Actor2D">
         </Proxy>
+        <ExposedProperties>
+          <Property name="Visibility" />
+          <Property name="Position" />
+          <Property name="Position2" />
+        </ExposedProperties>
       </SubProxy>
       <SubProxy>
         <Proxy name="Mapper"
           proxygroup="mappers" proxyname="LabeledDataMapper">
         </Proxy>
+        <ExposedProperties>
+          <Property name="LabelMode" />
+        </ExposedProperties>
       </SubProxy>
-        
     </PointLabelDisplayProxy>
 
     
@@ -1555,6 +1615,16 @@
           proxygroup="annotations"
           proxyname="ScalarBarActor">
         </Proxy>
+        <ExposedProperties>
+          <Property name="LookupTable" />
+          <Property name="TitleTextProperty" />
+          <Property name="LabelTextProperty" />
+          <Property name="Orientation" />
+          <Property name="Position" />
+          <Property name="Position2" />
+          <Property name="Title" />
+          <Property name="LabelFormat" />
+        </ExposedProperties>
       </SubProxy>
     </ScalarBarWidgetProxy>
 
@@ -1590,7 +1660,11 @@
         <BooleanDomain name="bool" />
       </IntVectorProperty>
       <SubProxy>
-        <Proxy name="UpdateSuppressor" proxygroup="filters" proxyname="UpdateSuppressor" />
+        <Proxy name="UpdateSuppressor" 
+          proxygroup="filters" proxyname="UpdateSuppressor" />
+        <ExposedProperties>
+          <Property name="CacheUpdate" />
+        </ExposedProperties>
       </SubProxy>
 
       <SubProxy>
@@ -1635,7 +1709,9 @@
         command="CacheUpdate"
         number_of_elements="2"
         update_self="1"
-        default_values="0 -1">
+        default_values="0 -1"
+        saveable="0"
+        animateable="0">
       </IntVectorProperty>
       <IntVectorProperty
         name="Visibility"
@@ -1647,7 +1723,8 @@
       </IntVectorProperty>
 
       <SubProxy>
-        <Proxy name="CubeAxes" proxygroup="annotations" proxyname="CubeAxesActor2D">
+        <Proxy name="CubeAxes" 
+          proxygroup="annotations" proxyname="CubeAxesActor2D">
         </Proxy>
       </SubProxy>
     </CubeAxesDisplayProxy>
@@ -1677,7 +1754,9 @@
         command="CacheUpdate"
         number_of_elements="2"
         update_self="1"
-        default_values="0 -1">
+        default_values="0 -1"
+        animateable="0"
+        saveable="0">
       </IntVectorProperty>
       <IntVectorProperty
         name="Representation"
@@ -1709,19 +1788,48 @@
       </Property>
         
       <SubProxy>
-        <Proxy name="GeometryFilter" proxygroup="filters" proxyname="GeometryFilter" />
+        <Proxy name="GeometryFilter" 
+          proxygroup="filters" proxyname="GeometryFilter" />
+        <ExposedProperties>
+          <Property name="UseStrips" />
+        </ExposedProperties>
       </SubProxy>
       <SubProxy>
-        <Proxy name="UpdateSuppressor" proxygroup="filters" proxyname="UpdateSuppressor" />
+        <Proxy name="UpdateSuppressor" 
+          proxygroup="filters" proxyname="UpdateSuppressor" />
       </SubProxy>
       <SubProxy>
         <Proxy name="Mapper" proxygroup="mappers" proxyname="PolyDataMapper" />
+        <ExposedProperties>
+          <Property name="LookupTable" />
+          <Property name="ScalarVisibility" />
+          <Property name="ColorMode" />
+          <Property name="ImmediateModeRendering" />
+          <Property name="InterpolateScalarsBeforeMapping" />
+          <Property name="UseLookupTableScalarRange" />
+          <Property name="ScalarMode" />
+          <Property name="ColorArray" />
+        </ExposedProperties>
       </SubProxy>
       <SubProxy>
         <Proxy name="Actor" proxygroup="props" proxyname="LODActor" />
+        <ExposedProperties>
+          <Property name="Position" />
+          <Property name="Scale" />
+          <Property name="Orientation" />
+          <Property name="Origin" />
+        </ExposedProperties>
       </SubProxy>
       <SubProxy>
         <Proxy name="Property" proxygroup="properties" proxyname="Property" />
+        <ExposedProperties>
+          <Property name="LineWidth" />
+          <Property name="PointSize" />
+          <Property name="Interpolation" />
+          <Property name="Color" />
+          <Property name="Opacity" />
+          <Property name="Specular" />
+        </ExposedProperties>
       </SubProxy>
     
       <!-- Subproxies for Volume Pipeline -->
@@ -1729,6 +1837,7 @@
         <SourceProxy name="VolumeFilter" class="vtkDataSetTriangleFilter" >
           <!-- I don't directly use the DataSetTriangleFilter since I need
           a more restrictive domain for this one -->
+          <!-- note this property is not exposed -->
           <InputProperty
             name="Input"
             command="SetInput">
@@ -1748,9 +1857,14 @@
           proxygroup="mappers" 
           proxyname="UnstructuredGridVolumeRayCastMapper">
         </Proxy>
+
         <ShareProperties subproxy="Mapper">
           <Exception name="Input" />
         </ShareProperties>
+        
+        <ExposedProperties>
+          <Property name="ScalarMode" />
+        </ExposedProperties>
       </SubProxy>
 
       <SubProxy>
@@ -1764,37 +1878,56 @@
       </SubProxy>
 
       <SubProxy>
-        <Proxy name="VolumeProperty" proxygroup="properties" proxyname="VolumeProperty" />
+        <Proxy name="VolumeProperty" 
+          proxygroup="properties" proxyname="VolumeProperty" >
+        </Proxy>
+        <ExposedProperties>
+          <Property name="ScalarOpacityUnitDistance" />
+        </ExposedProperties>
       </SubProxy>
 
       <SubProxy>
         <Proxy name="OpacityFunction" 
           proxygroup="piecewise_functions" proxyname="PiecewiseFunction">
         </Proxy>
+        <ExposedProperties>
+          <Property name="Points" />
+        </ExposedProperties>
       </SubProxy>
 
       <SubProxy>
         <Proxy name="ColorTransferFunction"
           proxygroup="transfer_functions" proxyname="ColorTransferFunction">
         </Proxy>
+        <ExposedProperties>
+          <Property name="RGBPoints" />
+          <Property name="ColorSpace" />
+          <Property name="HSVWrap" />
+        </ExposedProperties>
       </SubProxy>
     </SimpleDisplayProxy>
 
     <!-- Display Proxy with support for LOD -->
-    <LODDisplayProxy name="LODDisplay" base_proxygroup="displays" base_proxyname="SimpleDisplay">
+    <LODDisplayProxy name="LODDisplay" 
+      base_proxygroup="displays" base_proxyname="SimpleDisplay">
+     
       <IntVectorProperty name="LODResolution" 
         command="SetLODResolution"
         number_of_elements="1"
         update_self="1"
-        default_values="50">
+        default_values="50"
+        animateable="0">
         <IntRangeDomain name="range" min="0" />
       </IntVectorProperty>
       
       <SubProxy>
-        <Proxy name="LODDecimator" proxygroup="filters" proxyname="QuadricClustering" />
+        <Proxy name="LODDecimator" 
+          proxygroup="filters" proxyname="QuadricClustering" />
       </SubProxy>
+
       <SubProxy>
-        <Proxy name="LODUpdateSuppressor" proxygroup="filters" proxyname="UpdateSuppressor" />
+        <Proxy name="LODUpdateSuppressor" 
+          proxygroup="filters" proxyname="UpdateSuppressor" />
         <ShareProperties subproxy="UpdateSuppressor">
           <Exception name="Input" />
           <Exception name="ForceUpdate" />
@@ -1808,6 +1941,7 @@
           <Exception name="Input" />
         </ShareProperties>
       </SubProxy>
+      <!-- TODO need to add LOD Volume Mapper -->
     </LODDisplayProxy>
 
     <CompositeDisplayProxy name="CompositeDisplay" 
@@ -1817,7 +1951,9 @@
         command="SetCollectionDecision"
         number_of_elements="1"
         update_self="1"
-        default_values="0">
+        default_values="0"
+        animateable="0"
+        saveable="0">
         <BooleanDomain name="bool"/>
       </IntVectorProperty>
       <IntVectorProperty
@@ -1825,7 +1961,9 @@
         command="SetLODCollectionDecision"
         number_of_elements="1"
         update_self="1"
-        default_values="0">
+        default_values="0"
+        animateable="0"
+        saveable="0">
         <BooleanDomain name="bool"/>
       </IntVectorProperty>
      

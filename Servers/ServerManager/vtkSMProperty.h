@@ -31,9 +31,29 @@
 // set of acceptable values the property can have. An Attempt to set a
 // value outside the domain will fail. If more than one domain is specified,
 // the actual domain is the intersection of all domains.
-// A property can be marked "animateable". In which case, it is shown
-// in the key frame animation interface in the non-advanced mode.
-// Other non-information properties are only visible in the advanced mode.
+// 
+// A property can be marked "animateable". "animateable" attribute can have 
+// value {0, 1, 2}. 
+// 0 :-- property is not animateable at all. 
+// 1 :-- property is shown as animateable on the key frame animation interface
+//       in the non-advanced mode.
+// 2 :-- property is animateable but only shown in the advanced mode.
+// Properties that are not vector properties or that don't have domain or that 
+// are information_only properties
+// can never be animated irrespective of the "animateable" attribute's value.
+// All vector properties (vtkSMIntVectorProperty, vtkSMDoubleVectorPropery,
+// vtkSMStringVectorProperty, vtkSMIdTypeVectorProperty) by default have
+// have animateable="2".
+//
+// A property can be marked "saveable". "saveable" attribute can have 
+// value {0, 1}.
+// 0 :-- property is not saveable. Hence, when saving ServerManager state
+//       or saving batch script, the property's value is not saved.
+// 1 :-- property is saveable. Hence, it gets saved when saving SM state
+//       or batch script. 
+// An instance of vtkSMProperty is never savable. All other concrete subclasses
+// are by default savable (i.e. vtkSMProxyProperty and subclasses and
+// vtkSMVectorProperty subclasses).
 // .SECTION See Also
 // vtkSMProxyProperty vtkSMInputProperty vtkSMVectorProperty
 // vtkSMDoubleVectorPropery vtkSMIntVectorPropery vtkSMStringVectorProperty
@@ -181,6 +201,12 @@ public:
   vtkSetMacro(Animateable, int);
   vtkGetMacro(Animateable, int);
 
+  // Description:
+  // Get/Set if the property is saveable. A non-saveable property should not
+  // be saved in state or batch script.
+  vtkSetMacro(Saveable, int);
+  vtkGetMacro(Saveable, int);
+
   // Description: 
   // Copy all property values.
   virtual void DeepCopy(vtkSMProperty* src);
@@ -272,6 +298,7 @@ protected:
   int ImmediateUpdate;
   int UpdateSelf;
   int Animateable;
+  int Saveable;
 
   char* XMLName;
 

@@ -60,7 +60,7 @@ protected:
 
 
 vtkStandardNewMacro(vtkSMXYPlotDisplayProxy);
-vtkCxxRevisionMacro(vtkSMXYPlotDisplayProxy, "1.1.2.6");
+vtkCxxRevisionMacro(vtkSMXYPlotDisplayProxy, "1.1.2.7");
 //-----------------------------------------------------------------------------
 vtkSMXYPlotDisplayProxy::vtkSMXYPlotDisplayProxy()
 {
@@ -598,6 +598,12 @@ vtkPolyData* vtkSMXYPlotDisplayProxy::GetCollectedData()
 void vtkSMXYPlotDisplayProxy::InvalidateGeometry()
 {
   this->GeometryIsValid = 0;
+  if (this->UpdateSuppressorProxy)
+    {
+    vtkSMProperty *p = this->UpdateSuppressorProxy->GetProperty("RemoveAllCaches");
+    p->Modified();
+    this->UpdateSuppressorProxy->UpdateVTKObjects();
+    }
 }
 
 //-----------------------------------------------------------------------------

@@ -19,7 +19,7 @@
 #include "vtkSMProxyInternals.h"
 
 vtkStandardNewMacro(vtkSMPropertyIterator);
-vtkCxxRevisionMacro(vtkSMPropertyIterator, "1.5.6.1");
+vtkCxxRevisionMacro(vtkSMPropertyIterator, "1.5.6.2");
 
 struct vtkSMPropertyIteratorInternals
 {
@@ -127,7 +127,7 @@ void vtkSMPropertyIterator::Next()
 
   // If we are still in the root proxy, move to the next element.
   if (this->Internals->PropertyIterator != 
-      this->Proxy->Internals->Properties.end())
+    this->Proxy->Internals->Properties.end())
     {
     this->Internals->PropertyIterator++;
     return;
@@ -140,33 +140,52 @@ void vtkSMPropertyIterator::Next()
 
   // If we moved past the elements in the root proxy, move to the 
   // sub-proxy elements.
-  if (this->Internals->ProxyIterator != 
-      this->Proxy->Internals->SubProxies.end())
+  int property_is_exposed = 0;
+  while (!property_is_exposed &&
+    this->Internals->ProxyIterator != this->Proxy->Internals->SubProxies.end())
     {
     // Increment
     if (this->Internals->SubPropertyIterator != 
-        this->Internals->ProxyIterator->second->Internals->Properties.end())
+      this->Internals->ProxyIterator->second->Internals->Properties.end())
       {
       this->Internals->SubPropertyIterator++;
       }
 
     // If we reached the end of the current sub-proxy, move to the next one
     if (this->Internals->SubPropertyIterator == 
-        this->Internals->ProxyIterator->second->Internals->Properties.end())
+      this->Internals->ProxyIterator->second->Internals->Properties.end())
       {
       this->Internals->ProxyIterator++;
       // Move to the first sub-proxy which is not empty
       while (this->Internals->ProxyIterator != 
-             this->Proxy->Internals->SubProxies.end())
+        this->Proxy->Internals->SubProxies.end())
         {
         this->Internals->SubPropertyIterator = 
           this->Internals->ProxyIterator->second->Internals->Properties.begin();
         if ( this->Internals->SubPropertyIterator !=
-             this->Internals->ProxyIterator->second->Internals->Properties.end())
+          this->Internals->ProxyIterator->second->Internals->Properties.end())
           {
           break;
           }
         this->Internals->ProxyIterator++;
+        }
+      }
+    // now verify that the current property is an exposed property,
+    // otherwise, we should find the next property.
+    if ( ( this->Internals->ProxyIterator !=
+      this->Proxy->Internals->SubProxies.end())  &&
+      ( this->Internals->SubPropertyIterator !=
+        this->Internals->ProxyIterator->second->Internals->Properties.end() ))
+      {
+      // both iterator are valid.
+
+      if (this->Internals->ProxyIterator->second->Internals->
+        ExposedPropertyNames.find(
+          this->Internals->SubPropertyIterator->first.c_str()) !=
+        this->Internals->ProxyIterator->second->Internals->
+        ExposedPropertyNames.end())
+        {
+        property_is_exposed = 1;
         }
       }
     }

@@ -32,7 +32,7 @@
 #include <vtkstd/string>
 
 vtkStandardNewMacro(vtkSMProxy);
-vtkCxxRevisionMacro(vtkSMProxy, "1.33.2.3");
+vtkCxxRevisionMacro(vtkSMProxy, "1.33.2.4");
 
 vtkCxxSetObjectMacro(vtkSMProxy, XMLElement, vtkPVXMLElement);
 
@@ -273,7 +273,8 @@ vtkSMProperty* vtkSMProxy::GetProperty(const char* name, int selfOnly)
         this->Internals->SubProxies.begin();
       for( ; it2 != this->Internals->SubProxies.end(); it2++)
         {
-        vtkSMProperty* prop = it2->second.GetPointer()->GetProperty(name);
+        vtkSMProperty* prop = it2->second.GetPointer()->
+          GetExposedProperty(name);
         if (prop)
           {
           return prop;
@@ -1023,6 +1024,7 @@ int vtkSMProxy::CreateSubProxiesAndProperties(vtkSMProxyManager* pm,
             return 0;
             }
           this->SetupSharedProperties(subproxy, propElement);
+          this->SetupExposedProperties(subproxy, propElement);
           this->AddSubProxy(name, subproxy);
           subproxy->Delete();
           }
@@ -1038,6 +1040,42 @@ int vtkSMProxy::CreateSubProxiesAndProperties(vtkSMProxyManager* pm,
       }
     }
   return 1;
+}
+
+//---------------------------------------------------------------------------
+void vtkSMProxy::SetupExposedProperties(vtkSMProxy* subproxy, 
+  vtkPVXMLElement *element)
+{
+  if (!subproxy || !element)
+    {
+    return;
+    }
+
+  for (unsigned int i=0; i < element->GetNumberOfNestedElements(); i++)
+    {
+    vtkPVXMLElement* exposedElement = element->GetNestedElement(i);
+    if (strcmp(exposedElement->GetName(), "ExposedProperties")!=0)
+      {
+      continue;
+      }
+     for (unsigned int j=0; 
+       j < exposedElement->GetNumberOfNestedElements(); j++)
+       {
+       vtkPVXMLElement* propertyElement = exposedElement->GetNestedElement(j);
+       if (strcmp(propertyElement->GetName(), "Property") != 0)
+         {
+         vtkErrorMacro("ExposedProperties can only have Property tags.");
+         continue;
+         }
+       const char* name = propertyElement->GetAttribute("name");
+       if (!name || !name[0])
+         {
+         vtkErrorMacro("Attribute name is required!");
+         continue;
+         }
+       subproxy->ExposeProperty(name);
+       }
+    }
 }
 
 //---------------------------------------------------------------------------
@@ -1187,6 +1225,37 @@ void vtkSMProxy::DeepCopy(vtkSMProxy* src, const char* exceptionClass)
     }
 
   iter->Delete();
+}
+
+//---------------------------------------------------------------------------
+void vtkSMProxy::ExposeProperty(const char* name)
+{
+  this->Internals->ExposedPropertyNames.insert(vtkStdString(name));
+}
+
+//---------------------------------------------------------------------------
+vtkSMProperty* vtkSMProxy::GetExposedProperty(const char* name)
+{
+  if ( this->Internals->ExposedPropertyNames.find(name) ==
+    this->Internals->ExposedPropertyNames.end())
+    {
+    return 0; // property has not been exposed.
+    }
+
+  vtkSMProperty* toReturn = 0;
+  vtkSMPropertyIterator* iter = this->NewPropertyIterator();
+  for (iter->Begin(); !iter->IsAtEnd(); iter->Next())
+    {
+    const char* key = iter->GetKey();
+    vtkSMProperty* property = iter->GetProperty();
+    if (strcmp(name, key) == 0)
+      {
+      toReturn = property;
+      break;
+      }
+    }
+  iter->Delete();
+  return toReturn;
 }
 
 //---------------------------------------------------------------------------

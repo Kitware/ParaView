@@ -24,6 +24,76 @@
 // A proxy can be composite. Sub-proxies can be added by the proxy 
 // manager. This is transparent to the user who sees all properties
 // as if they belong to the root proxy.
+// 
+// When defining a proxy in the XML configuration file,
+// to derrive the property interface from another proxy definition,
+// we can use attributes "base_proxygroup" and "base_proxyname" which 
+// identify the proxy group and proxy name of another proxy. Base interfaces
+// can be defined recursively, however care must be taken to avoid cycles.
+//
+// 
+// There are several special XML features available for subproxies.
+// 1) It is possible to share properties among subproxies.
+//    eg.
+//
+//    <Proxy name="Display" class="Alpha">
+//      <SubProxy>
+//        <Proxy name="Mapper" class="vtkPolyDataMapper">
+//          <InputProperty name="Input" ...>
+//            ...
+//          </InputProperty>
+//          <IntVectorProperty name="ScalarVisibility" ...>
+//            ...
+//          </IntVectorProperty>
+//            ...
+//        </Proxy>
+//      </SubProxy>
+//      <SubProxy>
+//        <Proxy name="Mapper2" class="vtkPolyDataMapper">
+//          <InputProperty name="Input" ...>
+//            ...
+//          </InputProperty>
+//          <IntVectorProperty name="ScalarVisibility" ...>
+//            ...
+//          </IntVectorProperty>
+//            ...
+//        </Proxy>
+//        <ShareProperties subproxy="Mapper">
+//          <Exception name="Input" />
+//        </ShareProperties>
+//      </SubProxy>
+//    </Proxy>
+//    Thus, subproxies Mapper and Mapper2 share the properties that are common to both;
+//    except those listed as exceptions using the "Exception" tag.
+//
+//  2) It is possible for a subproxy to use proxy definition defined elsewhere
+//     by identifying the interface with attribues "proxygroup" and "proxyname".
+//     eg.
+//     <SubProxy>
+//       <Proxy name="Mapper" proxygroup="mappers" proxyname="PolyDataMapper" />
+//     </SubProxy>
+//
+//  3) It is possible to scope the properties exposed by a subproxy and expose
+//     only a fixed set of properties to be accessible from outside.
+//     eg.
+//     <Proxy name="Alpha" ..>
+//       ....
+//       <SubProxy>
+//         <Proxy name="Mapper" proxygroup="mappers" proxyname="PolyDataMapper" />
+//         <ExposedProperties>
+//           <Property name="LookupTable ... />
+//         </ExposedProperties>
+//       </SubProxy>
+//     </Proxy>
+//     Thus the only mapper property available on calling
+//     GetProperty on the proxy Alpha is "LookupTable". More than one property 
+//     can be exposed. Note that properties that are not exposed are treated as
+//     non-saveable and non-animateable (see vtkSMProperty for details).
+//     Note that exposed property restrictions only work when 
+//     using the GetProperty on the container proxy (in this case Alpha) or
+//     using the PropertyIterator obtained from the container proxy. If one
+//     is to some how obtain a pointer to the subproxy and call's GetProperty on it,
+//     the properties exposed by the container class are no longer applicable.
 // .SECTION See Also
 // vtkSMProxyManager vtkSMProperty vtkSMSourceProxy vtkSMPropertyIterator
 
@@ -159,9 +229,19 @@ public:
   virtual void DeepCopy(vtkSMProxy* src, const char* exceptionClass);
   virtual void DeepCopy(vtkSMProxy* src);
 
+
 protected:
   vtkSMProxy();
   ~vtkSMProxy();
+
+  // Description:
+  // Return a property of the given name, provided it has been
+  // exposed (by a call to ExposeProperty());
+  vtkSMProperty* GetExposedProperty(const char* name);
+
+  // Description:
+  // Expose a property by the given name.
+  void ExposeProperty(const char* name);
 
 //BTX
   // These classes have been declared as friends to minimize the
@@ -370,6 +450,8 @@ protected:
   virtual void SaveState(const char* name, ostream* file, vtkIndent indent);
 
   void SetupSharedProperties(vtkSMProxy* subproxy, vtkPVXMLElement *element);
+  void SetupExposedProperties(vtkSMProxy* subproxy, vtkPVXMLElement *element);
+  
 
   int CreateProxyHierarchy(vtkSMProxyManager* pm, vtkPVXMLElement* element);
 

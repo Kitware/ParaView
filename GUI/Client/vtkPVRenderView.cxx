@@ -130,7 +130,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.357.2.2");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.357.2.3");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -1741,10 +1741,11 @@ void vtkPVRenderView::ParallelProjectionOn()
   vtkSMRenderModuleProxy* rm = this->GetPVApplication()->
     GetRenderModuleProxy();
   vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
-    rm->GetProperty("ParallelProjection"));
+    rm->GetProperty("CameraParallelProjection"));
   if (!ivp)
     {
-    vtkErrorMacro("Failed to find property ParallelProjection on RenderModuleProxy.");
+    vtkErrorMacro("Failed to find property CameraParallelProjection "
+      "on RenderModuleProxy.");
     return;
     }
   ivp->SetElement(0, 1);
@@ -1764,10 +1765,11 @@ void vtkPVRenderView::ParallelProjectionOff()
   vtkSMRenderModuleProxy* rm = this->GetPVApplication()->
     GetRenderModuleProxy();
   vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
-    rm->GetProperty("ParallelProjection"));
+    rm->GetProperty("CameraParallelProjection"));
   if (!ivp)
     {
-    vtkErrorMacro("Failed to find property ParallelProjection on RenderModuleProxy.");
+    vtkErrorMacro("Failed to find property CameraParallelProjection "
+      "on RenderModuleProxy.");
     return;
     }
   ivp->SetElement(0, 0);

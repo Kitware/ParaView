@@ -36,7 +36,7 @@
 #include "vtkPVUpdateSuppressor.h"
 
 vtkStandardNewMacro(vtkSMSimpleDisplayProxy);
-vtkCxxRevisionMacro(vtkSMSimpleDisplayProxy, "1.1.2.4");
+vtkCxxRevisionMacro(vtkSMSimpleDisplayProxy, "1.1.2.5");
 //-----------------------------------------------------------------------------
 vtkSMSimpleDisplayProxy::vtkSMSimpleDisplayProxy()
 {
@@ -920,24 +920,23 @@ void vtkSMSimpleDisplayProxy::SaveInBatchScript(ofstream* file)
     }
 
   // Now, we save all the properties that are not Proxy or Input.
-  // For shared properties, only one of the properties matter, but
-  // it makes no difference we the property's value is set twice.
-  // Since, we are not saving any proxy properties, we won't be saving
-  // information about actors added to the renderers. However, 
-  // since the displays will be added to the rendermodule using the 
-  // properties, while restoring the state of the render module, 
-  // the actors will get added appropriately.
+  // Also note that only exposed properties are getting saved.
+ 
   vtkSMPropertyIterator* iter = this->NewPropertyIterator();
   for (iter->Begin(); !iter->IsAtEnd(); iter->Next())
     {
     vtkSMProperty* p = iter->GetProperty();
     vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(p);
-    if (pp)
+    if (!p->GetSaveable())
       {
-      *file << "  # skipping proxy property " << pp->GetXMLName() << endl;
+      *file << "  # skipping proxy property " << p->GetXMLName() << endl;
       continue;
       }
-
+    if (pp)
+      {
+      *file << "  #TODO: to save Proxy Property " << pp->GetXMLName() << endl;
+      continue;
+      }
     vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(p);
     vtkSMDoubleVectorProperty* dvp = 
       vtkSMDoubleVectorProperty::SafeDownCast(p);
