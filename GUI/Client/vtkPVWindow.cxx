@@ -127,7 +127,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.580");
+vtkCxxRevisionMacro(vtkPVWindow, "1.581");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -2573,6 +2573,10 @@ void vtkPVWindow::SaveBatchScript(const char *filename, int offScreenFlag, const
 
   *file << endl << "vtkSMObject foo" << endl;
   *file << "set proxyManager [foo GetProxyManager]" << endl;
+  *file << "foo Delete" << endl << endl;
+
+  *file << "vtkSMProperty foo" << endl;
+  *file << "foo SetCheckDomains 0" << endl;
   *file << "foo Delete" << endl << endl;
 
   // Save the renderer stuff.
