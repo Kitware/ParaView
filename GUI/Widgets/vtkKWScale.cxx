@@ -22,7 +22,7 @@
 
 // ---------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWScale );
-vtkCxxRevisionMacro(vtkKWScale, "1.74");
+vtkCxxRevisionMacro(vtkKWScale, "1.75");
 
 int vtkKWScaleCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -1061,7 +1061,7 @@ void vtkKWScale::PrintSelf(ostream& os, vtkIndent indent)
      << (this->DisplayEntryAndLabelOnTop ? "On" : "Off") << endl;
   os << indent << "SmartResize: " 
      << (this->SmartResize ? "On" : "Off") << endl;
-  os << indent << "PupupScale: " 
+  os << indent << "PopupScale: " 
      << (this->PopupScale ? "On" : "Off") << endl;
   os << indent << "ExpandEntry: " 
      << (this->ExpandEntry ? "On" : "Off") << endl;
@@ -1073,5 +1073,6 @@ void vtkKWScale::PrintSelf(ostream& os, vtkIndent indent)
      << (this->DisableCommands ? "On" : "Off") << endl;
   os << indent << "DisableScaleValueCallback: "
      << (this->DisableScaleValueCallback ? "On" : "Off") << endl;
+  os << indent << "ClampValue: " << (this->ClampValue ? "On" : "Off") << endl;
 }
 

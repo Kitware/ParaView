@@ -26,7 +26,7 @@
 #include "vtkObjectFactory.h"
 
 vtkStandardNewMacro( vtkKWRange );
-vtkCxxRevisionMacro(vtkKWRange, "1.32");
+vtkCxxRevisionMacro(vtkKWRange, "1.33");
 
 #define VTK_KW_RANGE_MIN_SLIDER_SIZE        2
 #define VTK_KW_RANGE_MIN_THICKNESS          (2*VTK_KW_RANGE_MIN_SLIDER_SIZE+1)
@@ -2267,6 +2267,7 @@ void vtkKWRange::PrintSelf(ostream& os, vtkIndent indent)
      << this->WholeRange[0] << "..." <<  this->WholeRange[1] << endl;
   os << indent << "Range: " 
      << this->Range[0] << "..." <<  this->Range[1] << endl;
+  os << indent << "ClampRange: " << (this->ClampRange ? "On" : "Off") << endl;
   os << indent << "Resolution: " << this->Resolution << endl;
   os << indent << "Thickness: " << this->Thickness << endl;
   os << indent << "InternalThickness: " << this->InternalThickness << endl;
