@@ -80,6 +80,8 @@ static const char *vtkKWEventStrings[] = {
   "Cursor3DZColorChangedEvent",
   "DistanceVisibilityChangedEvent",
   "EnableShadingEvent",
+  "FilterRedoEvent",
+  "FilterUndoEvent",
   "GradientOpacityFunctionChangedEvent",
   "GradientOpacityFunctionPresetApplyEvent",
   "GradientOpacityStateChangedEvent",
