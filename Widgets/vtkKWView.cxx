@@ -433,6 +433,11 @@ void vtkKWView::SetSelectedComposite(vtkKWComposite *_arg)
 void vtkKWView::AddComposite(vtkKWComposite *c)
 {
   c->SetView(this);
+  // never allow a composite to be added twice
+  if (this->Composites->IsItemPresent(c))
+    {
+    return;
+    }
   this->Composites->AddItem(c);
   this->GetViewport()->AddProp(c->GetProp());
 }
@@ -977,20 +982,26 @@ void vtkKWView::SerializeSelf(ostream& os, vtkIndent indent)
 
   // write out the composite
   if (this->PropertiesCreated)
-	{
-	os << indent << "CornerText ";
-	vtkKWSerializer::WriteSafeString(os, this->CornerText->GetValue());
-	os << endl;
-	os << indent << "CornerButton " << this->CornerButton->GetState() << endl;
-	os << indent << "CornerOptions ";
-	vtkKWSerializer::WriteSafeString(os, this->CornerOptions->GetValue());
-	os << endl;
-  
-	os << indent << "HeaderEntry ";
-	vtkKWSerializer::WriteSafeString(os, this->HeaderEntry->GetValue());
-	os << endl;
-	os << indent << "HeaderButton " << this->HeaderButton->GetState() << endl;
-	}
+    {
+    os << indent << "CornerText ";
+    vtkKWSerializer::WriteSafeString(os, this->CornerText->GetValue());
+    os << endl;
+    os << indent << "CornerButton " << this->CornerButton->GetState() << endl;
+    os << indent << "CornerOptions ";
+    vtkKWSerializer::WriteSafeString(os, this->CornerOptions->GetValue());
+    os << endl;
+    
+    os << indent << "HeaderEntry ";
+    vtkKWSerializer::WriteSafeString(os, this->HeaderEntry->GetValue());
+    os << endl;
+    os << indent << "HeaderButton " << this->HeaderButton->GetState() << endl;
+    
+    os << indent << "HeaderColor ";
+    this->HeaderColor->Serialize(os,indent);
+
+    os << indent << "CornerColor ";
+    this->CornerColor->Serialize(os,indent);
+    }
 }
 
 void vtkKWView::SerializeToken(istream& is, const char token[1024])
@@ -998,6 +1009,13 @@ void vtkKWView::SerializeToken(istream& is, const char token[1024])
   int i;
   char tmp[1024];
   
+  // do we need to create the props ?
+  if (!this->PropertiesCreated)
+    {
+    this->CreateViewProperties();
+    this->PropertiesCreated = 1;
+    }
+
   if (!strcmp(token,"HeaderButton"))
     {
     is >> i;
@@ -1010,6 +1028,11 @@ void vtkKWView::SerializeToken(istream& is, const char token[1024])
     vtkKWSerializer::GetNextToken(&is,tmp);
     this->HeaderEntry->SetValue(tmp);
     this->OnDisplayHeader();
+    return;
+    }
+  if (!strcmp(token,"HeaderColor"))
+    {
+    this->HeaderColor->Serialize(is);
     return;
     }
   if (!strcmp(token,"CornerOptions"))
@@ -1048,6 +1071,11 @@ void vtkKWView::SerializeToken(istream& is, const char token[1024])
     this->OnDisplayCorner();
     return;
     }
+  if (!strcmp(token,"CornerColor"))
+    {
+    this->CornerColor->Serialize(is);
+    return;
+    }
   
   vtkKWWidget::SerializeToken(is,token);
 }
@@ -1056,5 +1084,5 @@ void vtkKWView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWView ";
-  this->ExtractRevision(os,"$Revision: 1.6 $");
+  this->ExtractRevision(os,"$Revision: 1.7 $");
 }
