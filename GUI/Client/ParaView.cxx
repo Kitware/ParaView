@@ -64,6 +64,31 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkClientServerInterpreter.h"
 static void ParaViewInitializeInterpreter(vtkPVProcessModule* pm);
 
+#ifdef PARAVIEW_ENABLE_FPE
+#ifdef __linux__
+#ifndef _GNU_SOURCE
+#define _GNU_SOURCE
+#endif  //_GNU_SOURCE
+#include <fenv.h>
+#endif //__linux__
+void u_fpu_setup()
+{
+#ifdef _MSC_VER
+  // enable floating point exceptions on MSVC
+  short m = 0x372;
+  __asm
+    {
+    fldcw m;
+    }
+#endif  //_MSC_VER
+#ifdef __linux__
+  // This only works on linux, see man fesetenv
+  // It also need to be link to -lm
+  fesetenv (FE_NOMASK_ENV);
+#endif  //__linux__
+}
+#endif //PARAVIEW_ENABLE_FPE
+
 //----------------------------------------------------------------------------
 int MyMain(int argc, char *argv[])
 {
@@ -72,18 +97,10 @@ int MyMain(int argc, char *argv[])
   int myId = 0;
   vtkPVProcessModule *pm;
   vtkPVApplication *app;
-
-#ifdef PARAVIEW_ENABLE_FPE    
-#if defined(_MSC_VER)
-  // enable floating point exceptions on MSVC
-  short m = 0x372;
-  __asm
-    {
-    fldcw m;
-    }
-#endif
-#endif
   
+#ifdef PARAVIEW_ENABLE_FPE
+  u_fpu_setup();
+#endif //PARAVIEW_ENABLE_FPE
 
 #ifdef VTK_USE_MPI
   // This is here to avoid false leak messages from vtkDebugLeaks when
