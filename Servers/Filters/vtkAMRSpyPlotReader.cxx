@@ -31,7 +31,7 @@
 
 #include "spcth_interface.h"
 
-vtkCxxRevisionMacro(vtkAMRSpyPlotReader, "1.6");
+vtkCxxRevisionMacro(vtkAMRSpyPlotReader, "1.7");
 vtkStandardNewMacro(vtkAMRSpyPlotReader);
 vtkCxxSetObjectMacro(vtkAMRSpyPlotReader,Controller,vtkMultiProcessController);
 
@@ -340,21 +340,20 @@ void vtkAMRSpyPlotReader::ExecuteInformation()
 //------------------------------------------------------------------------------
 void vtkAMRSpyPlotReader::UpdateCaseFile(const char* fname)
 {
-
   SPCTH* spcth;
   
-  // Check to see if this is a different filename than before.
-  // If we do have a difference file name we reset the 
-  // filename map and start over/
-  if (!this->GetCurrentFileName() || strcmp(fname,this->GetCurrentFileName()))
+  // Check to see if this is the same filename as before
+  // if so then I already have the meta info, so just return
+  if (this->GetCurrentFileName() && !strcmp(fname,this->GetCurrentFileName()))
     {
-    this->SetCurrentFileName(fname);
-    this->Internals->Clean();
+    return;
     }
+    
+  // Set case file name and clean/initialize file map
+  this->SetCurrentFileName(fname);
+  this->Internals->Clean();
 
-  // Probably don't need to go through all of this everytime
-  // but inside UpdateMetaData we set the timestep which 
-  // obviously needs to happen
+  // Setup the filemap and spcth structures
   ifstream ifs(this->FileName);
   if (!ifs )
     {
