@@ -21,7 +21,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkPolyData.h"
 
-vtkCxxRevisionMacro(vtkPVUpdateSuppressor, "1.4.2.3");
+vtkCxxRevisionMacro(vtkPVUpdateSuppressor, "1.4.2.4");
 vtkStandardNewMacro(vtkPVUpdateSuppressor);
 
 //----------------------------------------------------------------------------
@@ -78,7 +78,7 @@ void vtkPVUpdateSuppressor::ForceUpdate()
   input->SetUpdatePiece(this->UpdatePiece);
   input->SetUpdateNumberOfPieces(this->UpdateNumberOfPieces);
   input->Update();
-  if (input->GetPipelineMTime() > this->UpdateTime)
+  if (input->GetPipelineMTime() > this->UpdateTime || output->GetDataReleased())
     {
     output->ShallowCopy(input);
     this->UpdateTime.Modified();
