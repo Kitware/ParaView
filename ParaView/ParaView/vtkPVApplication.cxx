@@ -981,6 +981,19 @@ void vtkPVApplication::DisplayHelp(vtkKWWindow* master)
   dlg->Delete();
 }
 
+
+//----------------------------------------------------------------------------
+void vtkPVApplication::LogStartEvent(char* str)
+{
+  vtkTimerLog::MarkStartEvent(str);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVApplication::LogEndEvent(char* str)
+{
+  vtkTimerLog::MarkEndEvent(str);
+}
+
 //----------------------------------------------------------------------------
 void vtkPVApplication::PrintSelf(ostream& os, vtkIndent indent)
 {

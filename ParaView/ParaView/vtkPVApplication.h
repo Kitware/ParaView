@@ -186,6 +186,12 @@ public:
   void SetGlobalLODFlag(int val);
   static int GetGlobalLODFlag();
 
+  // Description:
+  // For loggin from Tcl start and end execute events.
+  // We do not have c pointers to all filters.
+  void LogStartEvent(char* str);
+  void LogEndEvent(char* str);
+
 protected:
   vtkPVApplication();
   ~vtkPVApplication();

@@ -321,6 +321,13 @@ void vtkPVSource::SetVTKSource(vtkSource *source, const char *tclName)
     //source->SetStartMethod(vtkPVSourceStartProgress, this);
     //source->SetProgressMethod(vtkPVSourceReportProgress, this);
     //source->SetEndMethod(vtkPVSourceEndProgress, this);
+
+    pvApp->BroadcastScript("%s SetStartMethod {Application LogStartEvent {Execute %s}}", 
+                           tclName, tclName);
+    pvApp->BroadcastScript("%s SetEndMethod {Application LogEndEvent {Execute %s}}", 
+                           tclName, tclName);
+
+
     }
 }
 

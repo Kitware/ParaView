@@ -631,6 +631,7 @@ void vtkPVRenderView::CreateViewProperties()
     }
   this->CompositeWithRGBACheck->SetBalloonHelpString("Toggle the use of RGB/RGBA values when compositing. This is here to bypass some bugs in some graphics card drivers.");
 
+  this->CompositeCompressionCheck->SetState(1);
   this->CompositeCompressionCheck->SetCommand(this, "CompositeCompressionCallback");
   if (pvwindow && pvapp && pvapp->GetRegisteryValue(2, "RunTime", 
                                                     "UseCompressionInComposite", 0))
