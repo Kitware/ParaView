@@ -160,7 +160,6 @@ void vtkKWComposite::CreateProperties()
     if (this->View && this->View->GetPropertiesParent())
       { // if we have a view then use its attachment point
       this->SetPropertiesParent(this->View->GetPropertiesParent());
-      this->Notebook2->SetParent(this->View->GetPropertiesParent());
       }
     else
       {
@@ -174,7 +173,7 @@ void vtkKWComposite::CreateProperties()
       this->SetPropertiesParent(this->TopLevel);
       }
     }
-  
+
   this->Notebook->SetParent(this->PropertiesParent);
   this->Notebook2->SetParent(this->PropertiesParent);
   this->Notebook->Create(this->Application,"");
@@ -212,5 +211,5 @@ void vtkKWComposite::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWObject::SerializeRevision(os,indent);
   os << indent << "vtkKWComposite ";
-  this->ExtractRevision(os,"$Revision: 1.10 $");
+  this->ExtractRevision(os,"$Revision: 1.11 $");
 }
