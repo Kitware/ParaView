@@ -106,7 +106,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.255");
+vtkCxxRevisionMacro(vtkPVApplication, "1.256");
 vtkCxxSetObjectMacro(vtkPVApplication, RenderModule, vtkPVRenderModule);
 
 
@@ -428,9 +428,13 @@ vtkPVApplication::vtkPVApplication()
 
   this->ClientMode = 0;
   this->ServerMode = 0;
+  this->RenderServerMode = 0;
   this->HostName = NULL;
+  this->RenderServerHostName = NULL;
+  this->SetRenderServerHostName("localhost");
   this->SetHostName("localhost");
   this->Port = 11111;
+  this->RenderServerPort = 22222;
   this->ReverseConnection = 0;
   this->Username = 0;
   this->UseSoftwareRendering = 0;
@@ -487,6 +491,7 @@ vtkPVApplication::~vtkPVApplication()
   this->SetGroupFileName(0);
   this->SetTraceFileName(0);
   this->SetArgv0(0);
+  this->SetRenderServerHostName(NULL);
   this->SetHostName(NULL);
   this->SetUsername(0);
   this->SetDemoPath(NULL);
@@ -563,7 +568,11 @@ int vtkPVApplication::CheckRegistration()
 const char vtkPVApplication::ArgumentList[vtkPVApplication::NUM_ARGS][128] = 
 { "--client" , "-c", 
   "Run ParaView as client (MPI run, 1 process) (ParaView Server must be started first).", 
+  "--client-render-server" , "-crs", 
+  "Run ParaView as client (MPI run, 1 process) (ParaView Data Server and Render Server must be started first).", 
   "--server" , "-v", 
+  "Start ParaView as a server (use MPI run).",
+  "--render-server" , "-rs", 
   "Start ParaView as a server (use MPI run).",
   "--host", "-h",
   "Tell the client where to look for the server (default: localhost). Used with --client option or --server -rc options.", 
@@ -571,6 +580,8 @@ const char vtkPVApplication::ArgumentList[vtkPVApplication::NUM_ARGS][128] =
   "Tell the client what username to send to server when establishing SSH connection.",
   "--always-ssh", "",
   "",
+  "--render-port", "",
+  "Specify the port client and render server will use (--port=22222).  Client and render servers ports must match.", 
   "--port", "",
   "Specify the port client and server will use (--port=11111).  Client and servers ports must match.", 
   "--reverse-connection", "-rc",
@@ -926,6 +937,31 @@ int vtkPVApplication::ParseCommandLineArguments(int argc, char*argv[])
       }
     }
 
+    if ( vtkPVApplication::CheckForArgument(argc, argv, "--client-render-server",
+                                          index) == VTK_OK ||
+       vtkPVApplication::CheckForArgument(argc, argv, "-crs",
+                                          index) == VTK_OK )
+    {
+    this->ClientMode = 1;
+    this->RenderServerMode = 1;
+
+    if ( vtkPVApplication::CheckForArgument(argc, argv, "--user",
+                                            index) == VTK_OK )
+      {
+      // Strip string to equals sign.
+      const char* newarg=0;
+      int len = (int)(strlen(argv[index]));
+      for (i=0; i<len; i++)
+        {
+        if (argv[index][i] == '=')
+          {
+          newarg = &(argv[index][i+1]);
+          }
+        }
+      this->SetUsername(newarg);
+      }
+    }
+
   if ( vtkPVApplication::CheckForArgument(argc, argv, "--server",
                                           index) == VTK_OK ||
        vtkPVApplication::CheckForArgument(argc, argv, "-v",
@@ -934,7 +970,15 @@ int vtkPVApplication::ParseCommandLineArguments(int argc, char*argv[])
     this->ServerMode = 1;
     }
 
-  if (this->ServerMode || this->ClientMode)
+  if ( vtkPVApplication::CheckForArgument(argc, argv, "--render-server",
+                                          index) == VTK_OK ||
+       vtkPVApplication::CheckForArgument(argc, argv, "-rs",
+                                          index) == VTK_OK )
+    {
+    this->RenderServerMode = 1;
+    }
+
+  if (this->ServerMode || this->ClientMode || this->RenderServerMode)
     {
     if ( vtkPVApplication::CheckForArgument(argc, argv, "--host",
                                             index) == VTK_OK ||
@@ -953,6 +997,23 @@ int vtkPVApplication::ParseCommandLineArguments(int argc, char*argv[])
         }
       this->SetHostName(newarg);
       }
+    if ( vtkPVApplication::CheckForArgument(argc, argv, "--render-server-host",
+                                            index) == VTK_OK ||
+         vtkPVApplication::CheckForArgument(argc, argv, "-rsh",
+                                          index) == VTK_OK )
+      {
+      // Strip string to equals sign.
+      const char* newarg=0;
+      int len = (int)(strlen(argv[index]));
+      for (i=0; i<len; i++)
+        {
+        if (argv[index][i] == '=')
+          {
+          newarg = &(argv[index][i+1]);
+          }
+        }
+      this->SetRenderServerHostName(newarg);
+      }
 
     if ( vtkPVApplication::CheckForArgument(argc, argv, "--port",
                                             index) == VTK_OK)
@@ -968,6 +1029,21 @@ int vtkPVApplication::ParseCommandLineArguments(int argc, char*argv[])
           }
         }
       this->Port = atoi(newarg);
+      }
+    if ( vtkPVApplication::CheckForArgument(argc, argv, "--render-port",
+                                            index) == VTK_OK)
+      {
+      // Strip string to equals sign.
+      const char* newarg=0;
+      int len = (int)(strlen(argv[index]));
+      for (i=0; i<len; i++)
+        {
+        if (argv[index][i] == '=')
+          {
+          newarg = &(argv[index][i+1]);
+          }
+        }
+      this->RenderServerPort = atoi(newarg);
       }
     // Change behavior so server connects to the client.
     if ( vtkPVApplication::CheckForArgument(argc, argv, "--reverse-connection",
@@ -1498,6 +1574,19 @@ void vtkPVApplication::Start(int argc, char*argv[])
     }
   else
     {
+    if(this->ClientMode && this->RenderServerMode)
+      {
+      cout << "test stream object on render server\n";
+      vtkPVProcessModule* pm = this->GetProcessModule();
+      vtkClientServerID id = pm->NewStreamObject("vtkObject");
+      pm->GetStream() << vtkClientServerStream::Invoke
+                      << id
+                      << "DebugOn"
+                      << vtkClientServerStream::End;
+      pm->DeleteStreamObject(id);
+      pm->SendStreamToRenderServerRoot();
+      
+      }
     this->vtkKWApplication::Start(argc,argv);
     }
   this->OutputWindow->SetWindowCollection(0);
@@ -1905,6 +1994,7 @@ void vtkPVApplication::PrintSelf(ostream& os, vtkIndent indent)
     os << indent << "Running as a client\n";
     os << indent << "Port: " << this->Port << endl;
     os << indent << "Host: " << (this->HostName?this->HostName:"(none)") << endl;
+    os << indent << "Render Host: " << (this->RenderServerHostName?this->RenderServerHostName:"(none)") << endl;
     os << indent << "Username: " 
        << (this->Username?this->Username:"(none)") << endl;
     os << indent << "AlwaysSSH: " << this->AlwaysSSH << endl;
@@ -1915,6 +2005,20 @@ void vtkPVApplication::PrintSelf(ostream& os, vtkIndent indent)
     os << indent << "Running as a server\n";
     os << indent << "Port: " << this->Port << endl;
     os << indent << "ReverseConnection: " << this->ReverseConnection << endl;
+    }
+  if (this->RenderServerMode)
+    {
+    if(this->ClientMode)
+      {
+      os << indent << "Running as a client connectd to a render server\n";
+      }
+    else
+      {
+      os << indent << "Running as a render server\n";
+      os << indent << "Port: " << this->Port << endl;
+      os << indent << "ReverseConnection: " << this->ReverseConnection << endl;
+      }
+    
     }
   if (this->UseSoftwareRendering)
     {

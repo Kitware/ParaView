@@ -158,6 +158,22 @@ public:
   virtual void SendStreamToClientAndServerRoot();
 
   // Description:
+  // Send current ClientServerStream data to the server root and the client.
+  virtual void SendStreamToRenderServerRoot();
+
+  // Description:
+  // Send current ClientServerStream data to the server root and the client.
+  virtual void SendStreamToRenderServer();
+
+  // Description:
+  // Send current ClientServerStream data to the server root and the client.
+  virtual void SendStreamToRenderServerAndServerRoot();
+
+  // Description:
+  // Send current ClientServerStream data to the server root and the client.
+  virtual void SendStreamToRenderServerAndServer();
+  
+  // Description:
   // Send the stream represented by the given string to the client,
   // server, or both.  This should not be called by C++ code and is
   // provided only for debugging and testing purposes.  Returns 1 if
