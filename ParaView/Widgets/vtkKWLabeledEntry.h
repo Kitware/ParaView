@@ -79,11 +79,6 @@ public:
   float GetValueAsFloat();
 
   // Description:
-  // Set/Get the enabled state.
-  // Override to pass down to children.
-  virtual void SetEnabled(int);
-
-  // Description:
   // Set the string that enables balloon help for this widget.
   // Override to pass down to children.
   virtual void SetBalloonHelpString(const char *str);
@@ -98,6 +93,10 @@ protected:
   // Pack or repack the widget
 
   virtual void Pack();
+
+  // Update the enable state. This should propagate similar calls to the
+  // internal widgets.
+  virtual void UpdateEnableState();
 
 private:
   vtkKWLabeledEntry(const vtkKWLabeledEntry&); // Not implemented

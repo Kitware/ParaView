@@ -48,7 +48,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWLabeledCheckButtonSet);
-vtkCxxRevisionMacro(vtkKWLabeledCheckButtonSet, "1.2");
+vtkCxxRevisionMacro(vtkKWLabeledCheckButtonSet, "1.3");
 
 int vtkKWLabeledCheckButtonSetCommand(ClientData cd, Tcl_Interp *interp,
                                       int argc, char *argv[]);
@@ -96,6 +96,10 @@ void vtkKWLabeledCheckButtonSet::Create(vtkKWApplication *app, const char *args)
   // Pack the label and the checkbutton
 
   this->Pack();
+
+  // Update enable state
+
+  this->UpdateEnableState();
 }
 
 // ----------------------------------------------------------------------------
@@ -154,20 +158,14 @@ void vtkKWLabeledCheckButtonSet::SetPackHorizontally(int _arg)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWLabeledCheckButtonSet::SetEnabled(int e)
+void vtkKWLabeledCheckButtonSet::UpdateEnableState()
 {
-  // Propagate first (since objects can be modified externally, they might
-  // not be in synch with this->Enabled)
+  this->Superclass::UpdateEnableState();
 
-  if (this->IsCreated())
+  if (this->CheckButtonSet)
     {
-    this->CheckButtonSet->SetEnabled(e);
+    this->CheckButtonSet->SetEnabled(this->Enabled);
     }
-
-  // Then call superclass, which will call SetEnabled on the label and 
-  // update the internal Enabled ivar (although it is not of much use here)
-
-  this->Superclass::SetEnabled(e);
 }
 
 // ---------------------------------------------------------------------------
