@@ -26,7 +26,7 @@
 #include "vtkStdString.h"
 
 vtkStandardNewMacro(vtkSMProxy);
-vtkCxxRevisionMacro(vtkSMProxy, "1.1");
+vtkCxxRevisionMacro(vtkSMProxy, "1.2");
 
 struct vtkSMProxyInternals
 {
@@ -80,6 +80,14 @@ protected:
   vtkSMProxy* Proxy;
 
   vtkSMProxyObserver() : PropertyName(0) {};
+  ~vtkSMProxyObserver() { 
+    if (this->PropertyName) 
+      {
+      delete [] this->PropertyName;
+      this->PropertyName = 0;
+      }
+  };
+      
 };
 
 //---------------------------------------------------------------------------
