@@ -51,7 +51,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLabeledFrame );
-vtkCxxRevisionMacro(vtkKWLabeledFrame, "1.18.2.4");
+vtkCxxRevisionMacro(vtkKWLabeledFrame, "1.18.2.5");
 
 
 
@@ -259,7 +259,7 @@ void vtkKWLabeledFrame::Create(vtkKWApplication *app)
 
   // If the label frame get resize, reconfigure the margins
 
-  this->Script("bind %s <Configure> { %s AdjustMargin }",
+  this->Script("bind %s <Configure> { catch {%s AdjustMargin} }",
                this->LabelFrame->GetWidgetName(), this->GetTclName());
 }
 
