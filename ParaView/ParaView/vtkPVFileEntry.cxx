@@ -61,7 +61,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVFileEntry);
-vtkCxxRevisionMacro(vtkPVFileEntry, "1.29");
+vtkCxxRevisionMacro(vtkPVFileEntry, "1.30");
 
 //----------------------------------------------------------------------------
 vtkPVFileEntry::vtkPVFileEntry()
@@ -422,10 +422,13 @@ void vtkPVFileEntry::SetValue(const char* fileName)
     ostrstream str;
     str << "set " << this->GetPVSource()->GetVTKSourceTclName() << "_files { ";
     char* name = new char [ this->FileNameLength ];
-    for ( cc = min; cc < max; cc ++ )
+    for ( cc = min; cc <= max; cc ++ )
       {
       sprintf(name, this->Format, this->Path, this->Prefix, cc, this->Ext);
-      str << " " << name;
+      if ( cc < max )
+        {
+        str << " " << name;
+        }
       }
     delete [] name;
     str << "}" << ends;
@@ -556,9 +559,9 @@ const char* vtkPVFileEntry::GetValue()
 //-----------------------------------------------------------------------------
 void vtkPVFileEntry::SaveInBatchScriptForPart(ofstream* file, const char* sourceTclName)
 {
-  *file << "\tset " << sourceTclName << "_files {" << endl;
+  *file << "\tset " << sourceTclName << "_files {";
   *file << this->Script("concat $%s_files", sourceTclName);
-  *file << "\t}" << endl;
+  *file << "}" << endl;
 }
 
 
@@ -570,10 +573,13 @@ void vtkPVFileEntry::AddAnimationScriptsToMenu(vtkKWMenu *menu,
     {
     return;
     }
-  char methodAndArgs[500];
-  
-  sprintf(methodAndArgs, "AnimationMenuCallback %s", ai->GetTclName()); 
-  menu->AddCommand(this->GetTraceName(), this, methodAndArgs, 0,"");
+  if ( (this->Range[1] - this->Range[0]) > 0 )
+    {
+    char methodAndArgs[500];
+
+    sprintf(methodAndArgs, "AnimationMenuCallback %s", ai->GetTclName()); 
+    menu->AddCommand(this->GetTraceName(), this, methodAndArgs, 0,"");
+    }
 }
 
 //-----------------------------------------------------------------------------
