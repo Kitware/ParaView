@@ -308,7 +308,8 @@ public:
   
   // Description:
   // Callback to handle dialog settings change
-  void OnDialogSettingsChange();
+  void OnInterfaceSettingsChange();
+  vtkGetObjectMacro(InterfaceSettingsFrame,vtkKWLabeledFrame);
 
 protected:
   vtkKWWindow();
@@ -381,10 +382,10 @@ protected:
   int   PromptBeforeClose;
   int   InExit;
 
-  vtkKWLabeledFrame *DialogSettingsFrame;
-  vtkKWCheckButton  *DialogSettingsConfirmExitCheck;
-  vtkKWCheckButton  *DialogSettingsSaveWindowGeometry;
-  vtkKWCheckButton  *DialogSettingsShowSplashScreenCheck;
+  vtkKWLabeledFrame *InterfaceSettingsFrame;
+  vtkKWCheckButton  *InterfaceSettingsConfirmExitCheck;
+  vtkKWCheckButton  *InterfaceSettingsSaveWindowGeometry;
+  vtkKWCheckButton  *InterfaceSettingsShowSplashScreenCheck;
   
 //BTX
   // Description:

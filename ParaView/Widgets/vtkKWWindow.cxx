@@ -70,7 +70,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define VTK_KW_WINDOW_GEOMETRY_REG_KEY "WindowGeometry"
 #define VTK_KW_WINDOW_FRAME1_SIZE_REG_KEY "WindowFrame1Size"
 
-vtkCxxRevisionMacro(vtkKWWindow, "1.122.2.4");
+vtkCxxRevisionMacro(vtkKWWindow, "1.122.2.5");
 vtkCxxSetObjectMacro(vtkKWWindow, PropertiesParent, vtkKWWidget);
 
 class vtkKWWindowMenuEntry
@@ -294,10 +294,10 @@ vtkKWWindow::vtkKWWindow()
 
   this->ExitDialogWidget = 0;
 
-  this->DialogSettingsFrame = 0;
-  this->DialogSettingsConfirmExitCheck = 0;
-  this->DialogSettingsSaveWindowGeometry = 0;
-  this->DialogSettingsShowSplashScreenCheck = 0;
+  this->InterfaceSettingsFrame = 0;
+  this->InterfaceSettingsConfirmExitCheck = 0;
+  this->InterfaceSettingsSaveWindowGeometry = 0;
+  this->InterfaceSettingsShowSplashScreenCheck = 0;
 }
 
 vtkKWWindow::~vtkKWWindow()
@@ -376,21 +376,21 @@ vtkKWWindow::~vtkKWWindow()
   this->SetScriptExtension(0);
   this->SetScriptType(0);
 
-  if (this->DialogSettingsFrame)
+  if (this->InterfaceSettingsFrame)
     {
-    this->DialogSettingsFrame->Delete();
+    this->InterfaceSettingsFrame->Delete();
     }
-  if (this->DialogSettingsConfirmExitCheck)
+  if (this->InterfaceSettingsConfirmExitCheck)
     {
-    this->DialogSettingsConfirmExitCheck->Delete();
+    this->InterfaceSettingsConfirmExitCheck->Delete();
     }
-  if (this->DialogSettingsSaveWindowGeometry)
+  if (this->InterfaceSettingsSaveWindowGeometry)
     {
-    this->DialogSettingsSaveWindowGeometry->Delete();
+    this->InterfaceSettingsSaveWindowGeometry->Delete();
     }
-  if (this->DialogSettingsShowSplashScreenCheck)
+  if (this->InterfaceSettingsShowSplashScreenCheck)
     {
-    this->DialogSettingsShowSplashScreenCheck->Delete();
+    this->InterfaceSettingsShowSplashScreenCheck->Delete();
     }
 }
 
@@ -866,54 +866,54 @@ void vtkKWWindow::CreatePreferencesProperties()
 
   // The "Dialog settings" frame (GUI settings)
 
-  if (!this->DialogSettingsFrame)
+  if (!this->InterfaceSettingsFrame)
     {
-    this->DialogSettingsFrame = vtkKWLabeledFrame::New();
+    this->InterfaceSettingsFrame = vtkKWLabeledFrame::New();
     }
 
-  this->DialogSettingsFrame->SetParent(
+  this->InterfaceSettingsFrame->SetParent(
     this->Notebook->GetFrame(VTK_KW_PREFERENCES_PAGE_LABEL));
-  this->DialogSettingsFrame->ShowHideFrameOn();
-  this->DialogSettingsFrame->Create(this->Application);
-  this->DialogSettingsFrame->SetLabel("Interface Settings");
+  this->InterfaceSettingsFrame->ShowHideFrameOn();
+  this->InterfaceSettingsFrame->Create(this->Application);
+  this->InterfaceSettingsFrame->SetLabel("Interface Settings");
   
   // Confirm on exit ?
 
-  if (!this->DialogSettingsConfirmExitCheck)
+  if (!this->InterfaceSettingsConfirmExitCheck)
     {
-    this->DialogSettingsConfirmExitCheck = vtkKWCheckButton::New();
+    this->InterfaceSettingsConfirmExitCheck = vtkKWCheckButton::New();
     }
 
-  this->DialogSettingsConfirmExitCheck->SetParent(
-    this->DialogSettingsFrame->GetFrame());
-  this->DialogSettingsConfirmExitCheck->Create(
+  this->InterfaceSettingsConfirmExitCheck->SetParent(
+    this->InterfaceSettingsFrame->GetFrame());
+  this->InterfaceSettingsConfirmExitCheck->Create(
     this->Application, "-text {Confirm on exit}");
-  this->DialogSettingsConfirmExitCheck->SetState(
+  this->InterfaceSettingsConfirmExitCheck->SetState(
     this->Application->GetMessageDialogResponse(VTK_KW_EXIT_DIALOG_NAME) == 1 ? 0 : 1);
-  this->DialogSettingsConfirmExitCheck->SetCommand(
-    this, "OnDialogSettingsChange");
-  this->DialogSettingsConfirmExitCheck->SetBalloonHelpString(
+  this->InterfaceSettingsConfirmExitCheck->SetCommand(
+    this, "OnInterfaceSettingsChange");
+  this->InterfaceSettingsConfirmExitCheck->SetBalloonHelpString(
     "A confirmation dialog will be presented to the user on exit.");
 
   this->Script("pack %s -side top -anchor w -expand no -fill none",
-               this->DialogSettingsConfirmExitCheck->GetWidgetName());
+               this->InterfaceSettingsConfirmExitCheck->GetWidgetName());
 
   // Save application geometry on exit ?
 
-  if (!this->DialogSettingsSaveWindowGeometry)
+  if (!this->InterfaceSettingsSaveWindowGeometry)
     {
-    this->DialogSettingsSaveWindowGeometry = vtkKWCheckButton::New();
+    this->InterfaceSettingsSaveWindowGeometry = vtkKWCheckButton::New();
     }
 
-  this->DialogSettingsSaveWindowGeometry->SetParent(
-    this->DialogSettingsFrame->GetFrame());
-  this->DialogSettingsSaveWindowGeometry->Create(
+  this->InterfaceSettingsSaveWindowGeometry->SetParent(
+    this->InterfaceSettingsFrame->GetFrame());
+  this->InterfaceSettingsSaveWindowGeometry->Create(
     this->Application, "-text {Save window geometry on exit}");
   
   if (this->Application->HasRegisteryValue(
     2, "Geometry", VTK_KW_SAVE_WINDOW_GEOMETRY_REG_KEY))
     {
-    this->DialogSettingsSaveWindowGeometry->SetState(
+    this->InterfaceSettingsSaveWindowGeometry->SetState(
       this->Application->GetIntRegisteryValue(
         2, "Geometry", VTK_KW_SAVE_WINDOW_GEOMETRY_REG_KEY));
     }
@@ -921,81 +921,81 @@ void vtkKWWindow::CreatePreferencesProperties()
     {
     this->Application->SetRegisteryValue(
       2, "Geometry", VTK_KW_SAVE_WINDOW_GEOMETRY_REG_KEY, "%d", 1);
-    this->DialogSettingsSaveWindowGeometry->SetState(1);
+    this->InterfaceSettingsSaveWindowGeometry->SetState(1);
     }
   
-  this->DialogSettingsSaveWindowGeometry->SetCommand(
-    this, "OnDialogSettingsChange");
-  this->DialogSettingsSaveWindowGeometry->SetBalloonHelpString(
+  this->InterfaceSettingsSaveWindowGeometry->SetCommand(
+    this, "OnInterfaceSettingsChange");
+  this->InterfaceSettingsSaveWindowGeometry->SetBalloonHelpString(
     "Save the window geometry on exit and restore it on startup.");
 
   this->Script("pack %s -side top -anchor w -expand no -fill none",
-               this->DialogSettingsSaveWindowGeometry->GetWidgetName());
+               this->InterfaceSettingsSaveWindowGeometry->GetWidgetName());
 
   // Show splash screen ?
 
   if (this->Application->GetHasSplashScreen())
     {
-    if (!this->DialogSettingsShowSplashScreenCheck)
+    if (!this->InterfaceSettingsShowSplashScreenCheck)
       {
-      this->DialogSettingsShowSplashScreenCheck = vtkKWCheckButton::New();
+      this->InterfaceSettingsShowSplashScreenCheck = vtkKWCheckButton::New();
       }
 
-    this->DialogSettingsShowSplashScreenCheck->SetParent(
-      this->DialogSettingsFrame->GetFrame());
-    this->DialogSettingsShowSplashScreenCheck->Create(
+    this->InterfaceSettingsShowSplashScreenCheck->SetParent(
+      this->InterfaceSettingsFrame->GetFrame());
+    this->InterfaceSettingsShowSplashScreenCheck->Create(
       this->Application, "-text {Show splash screen}");
 
     if (this->Application->HasRegisteryValue(
       2, "RunTime", VTK_KW_SPLASH_SCREEN_REG_KEY))
       {
-      this->DialogSettingsShowSplashScreenCheck->SetState(
+      this->InterfaceSettingsShowSplashScreenCheck->SetState(
         this->Application->GetIntRegisteryValue(
           2, "RunTime", VTK_KW_SPLASH_SCREEN_REG_KEY));
       }
     else
       {
-      this->DialogSettingsShowSplashScreenCheck->SetState(
+      this->InterfaceSettingsShowSplashScreenCheck->SetState(
         this->Application->GetShowSplashScreen());
       }
 
-    this->DialogSettingsShowSplashScreenCheck->SetCommand(
-      this, "OnDialogSettingsChange");
+    this->InterfaceSettingsShowSplashScreenCheck->SetCommand(
+      this, "OnInterfaceSettingsChange");
 
     this->Script("pack %s -side top -anchor w -expand no -fill none",
-                 this->DialogSettingsShowSplashScreenCheck->GetWidgetName());
+                 this->InterfaceSettingsShowSplashScreenCheck->GetWidgetName());
     }
 
   // Pack the frame
 
   this->Script(
     "pack %s -side top -anchor w -expand y -fill x -padx 2 -pady 2",
-    this->DialogSettingsFrame->GetWidgetName());
+    this->InterfaceSettingsFrame->GetWidgetName());
 }
 
-void vtkKWWindow::OnDialogSettingsChange()
+void vtkKWWindow::OnInterfaceSettingsChange()
 {
- if (this->DialogSettingsConfirmExitCheck)
+ if (this->InterfaceSettingsConfirmExitCheck)
    {
    this->Application->SetMessageDialogResponse(
-     VTK_KW_EXIT_DIALOG_NAME, this->DialogSettingsConfirmExitCheck->GetState() ? 0 : 1);
+     VTK_KW_EXIT_DIALOG_NAME, this->InterfaceSettingsConfirmExitCheck->GetState() ? 0 : 1);
    }
 
- if (this->DialogSettingsSaveWindowGeometry)
+ if (this->InterfaceSettingsSaveWindowGeometry)
    {
    this->Application->SetRegisteryValue(
      2, "Geometry", VTK_KW_SAVE_WINDOW_GEOMETRY_REG_KEY,
-     "%d", this->DialogSettingsSaveWindowGeometry->GetState());
+     "%d", this->InterfaceSettingsSaveWindowGeometry->GetState());
    }
 
  if (this->Application->GetHasSplashScreen() && 
-     this->DialogSettingsShowSplashScreenCheck)
+     this->InterfaceSettingsShowSplashScreenCheck)
    {
    this->Application->SetRegisteryValue(
      2, "RunTime", VTK_KW_SPLASH_SCREEN_REG_KEY,
-     "%d", this->DialogSettingsShowSplashScreenCheck->GetState());
+     "%d", this->InterfaceSettingsShowSplashScreenCheck->GetState());
    this->Application->SetShowSplashScreen(
-     this->DialogSettingsShowSplashScreenCheck->GetState());
+     this->InterfaceSettingsShowSplashScreenCheck->GetState());
    }
 }
 
@@ -1252,7 +1252,7 @@ void vtkKWWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWWindow ";
-  this->ExtractRevision(os,"$Revision: 1.122.2.4 $");
+  this->ExtractRevision(os,"$Revision: 1.122.2.5 $");
 }
 
 int vtkKWWindow::ExitDialog()
@@ -1288,9 +1288,9 @@ int vtkKWWindow::ExitDialog()
   delete[] msg;
   delete[] ttl;
 
-  if (this->DialogSettingsConfirmExitCheck)
+  if (this->InterfaceSettingsConfirmExitCheck)
     {
-    this->DialogSettingsConfirmExitCheck->SetState(
+    this->InterfaceSettingsConfirmExitCheck->SetState(
       this->Application->GetMessageDialogResponse(VTK_KW_EXIT_DIALOG_NAME) == 1 ? 0 : 1);
     }
  
@@ -1642,4 +1642,5 @@ void vtkKWWindow::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "WindowClass: " << this->GetWindowClass() << endl;  
   os << indent << "Title: " 
      << ( this->GetTitle() ? this->GetTitle() : "(none)" ) << endl;  
+  os << indent << "InterfaceSettingsFrame: " << this->GetInterfaceSettingsFrame() << endl;
 }
