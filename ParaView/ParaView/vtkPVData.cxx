@@ -1429,7 +1429,7 @@ void vtkPVData::ChangeColorMapToRedBlue()
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
 
-  this->AddTraceEntry("$kw(%s) ChanceColorMapToRedBlue",
+  this->AddTraceEntry("$kw(%s) ChangeColorMapToRedBlue",
                       this->GetTclName());
   
   pvApp->BroadcastScript("[%s GetLookupTable] SetHueRange 0 0.666667",
@@ -1450,7 +1450,7 @@ void vtkPVData::ChangeColorMapToBlueRed()
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
 
-  this->AddTraceEntry("$kw(%s) ChanceColorMapToBlueRed",
+  this->AddTraceEntry("$kw(%s) ChangeColorMapToBlueRed",
                       this->GetTclName());
 
   pvApp->BroadcastScript("[%s GetLookupTable] SetHueRange 0.666667 0",
@@ -1471,7 +1471,7 @@ void vtkPVData::ChangeColorMapToGrayscale()
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
 
-  this->AddTraceEntry("$kw(%s) ChanceColorMapToGrayscale",
+  this->AddTraceEntry("$kw(%s) ChangeColorMapToGrayscale",
                       this->GetTclName());
 
   pvApp->BroadcastScript("[%s GetLookupTable] SetHueRange 0 0",
