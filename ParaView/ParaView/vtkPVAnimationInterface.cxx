@@ -592,6 +592,12 @@ void vtkPVAnimationInterface::Play()
     }
 
   t = this->GetCurrentTime();
+  if ( t == this->GetTimeEnd() )
+    {
+    this->SetCurrentTime(this->GetTimeStart());
+    this->CurrentTimeCallback();
+    t = this->GetCurrentTime();
+    }
   this->StopFlag = 0;
   while ((sgn*t) < (sgn*this->TimeEnd) && ! this->StopFlag)
     {
@@ -610,6 +616,11 @@ void vtkPVAnimationInterface::Play()
 //----------------------------------------------------------------------------
 void vtkPVAnimationInterface::Stop()
 {  
+  if ( this->StopFlag )
+    {
+    this->SetCurrentTime(this->GetTimeStart());
+    this->CurrentTimeCallback();
+    }
   this->StopFlag = 1;
 }
 
