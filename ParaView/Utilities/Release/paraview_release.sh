@@ -444,7 +444,7 @@ docs_zipfile()
     (
         mkdir -p Tarballs &&
         rm -rf Tarballs/${PROJECT}-docs-${VERSION}.zip &&
-        zip -r Tarballs/${PROJECT}-docs-${VERSION}.zip ${PROJECT}-${VERSION}
+        zip -r Tarballs/${PROJECT}-docs-${VERSION}.zip ${PROJECT}-docs-${VERSION}
     ) >Logs/docs_zipfile.log 2>&1 || error_log Logs/docs_zipfile.log
 }
 
