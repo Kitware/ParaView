@@ -31,7 +31,7 @@
 
 // ---------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWThumbWheel );
-vtkCxxRevisionMacro(vtkKWThumbWheel, "1.21");
+vtkCxxRevisionMacro(vtkKWThumbWheel, "1.22");
 
 // ---------------------------------------------------------------------------
 int vtkKWThumbWheelCommand(ClientData cd, 
@@ -1083,6 +1083,7 @@ void vtkKWThumbWheel::SetCommand(vtkKWObject* Object,
   if (this->Command)
     {
     delete [] this->Command;
+    this->Command = NULL;
     }
 
   if (!Object)
@@ -1102,6 +1103,7 @@ void vtkKWThumbWheel::SetStartCommand(vtkKWObject* Object,
   if (this->StartCommand)
     {
     delete [] this->StartCommand;
+    this->StartCommand = NULL;
     }
 
   if (!Object)
@@ -1121,6 +1123,7 @@ void vtkKWThumbWheel::SetEndCommand(vtkKWObject* Object,
   if (this->EndCommand)
     {
     delete [] this->EndCommand;
+    this->EndCommand = NULL;
     }
 
   if (!Object)
@@ -1140,6 +1143,7 @@ void vtkKWThumbWheel::SetEntryCommand(vtkKWObject* Object,
   if (this->EntryCommand)
     {
     delete [] this->EntryCommand;
+    this->EntryCommand = NULL;
     }
 
   if (!Object)
