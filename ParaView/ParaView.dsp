@@ -425,6 +425,10 @@ SOURCE=.\vtkPVThresholdTcl.cxx
 # End Source File
 # Begin Source File
 
+SOURCE=.\vtkPVTreeComposite.cxx
+# End Source File
+# Begin Source File
+
 SOURCE=.\vtkPVTreeCompositeTcl.cxx
 # End Source File
 # Begin Source File

@@ -1444,7 +1444,20 @@ void vtkPVWindow::ReadSourceInterfaces()
   sInt = NULL;
 
   // Filters
-  
+
+  // ---- CleanPolyData ----.
+  sInt = vtkPVSourceInterface::New();
+  sInt->SetApplication(pvApp);
+  sInt->SetPVWindow(this);
+  sInt->SetSourceClassName("vtkCleanPolyData");
+  sInt->SetRootName("CleanPD");
+  sInt->SetInputClassName("vtkPolyData");
+  sInt->SetOutputClassName("vtkPolyData");
+  // Add it to the list.
+  this->SourceInterfaces->AddItem(sInt);
+  sInt->Delete();
+  sInt = NULL;
+    
   // ---- ClipPlane ----.
   sInt = vtkPVSourceInterface::New();
   sInt->SetApplication(pvApp);
