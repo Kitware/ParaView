@@ -671,23 +671,37 @@ void vtkPVRenderView::StartRender()
 {
   float renderTime = 1.0 / this->RenderWindow->GetDesiredUpdateRate();
   int *windowSize = this->RenderWindow->GetSize();
-  int area, reductionFactor;
+  int area, reducedArea, reductionFactor;
   float timePerPixel;
   float getBuffersTime, setBuffersTime, transmitTime;
   float newReductionFactor;
+  float maxReductionFactor;
   
-  renderTime *= 0.7;
+  // Do not let the width go below 150.
+  maxReductionFactor = windowSize[0] / 150.0;
+
+  renderTime *= 0.5;
   area = windowSize[0] * windowSize[1];
   reductionFactor = this->GetComposite()->GetReductionFactor();
+  reducedArea = area / (reductionFactor * reductionFactor);
   getBuffersTime = this->GetComposite()->GetGetBuffersTime();
   setBuffersTime = this->GetComposite()->GetSetBuffersTime();
   transmitTime = this->GetComposite()->GetTransmitTime();
-  
-  timePerPixel = (getBuffersTime + setBuffersTime +
-          (transmitTime * reductionFactor * reductionFactor)) / area;
 
+  // Do not consider SetBufferTime because 
+  //it is not dependent on reduction factor.,
+  timePerPixel = (getBuffersTime + transmitTime) / reducedArea;
   newReductionFactor = sqrt(area * timePerPixel / renderTime);
   
+  if (newReductionFactor > maxReductionFactor)
+    {
+    newReductionFactor = maxReductionFactor;
+    }
+  if (newReductionFactor < 1.0)
+    {
+    newReductionFactor = 1.0;
+    }
+
   //cerr << "---------------------------------------------------------\n";
   //cerr << "New ReductionFactor: " << newReductionFactor << ", oldFact: " 
   //     << reductionFactor << endl;
@@ -707,7 +721,7 @@ void vtkPVRenderView::Render()
   this->Update();
 
   //this->RenderWindow->SetDesiredUpdateRate(this->InteractiveUpdateRate);
-  this->RenderWindow->SetDesiredUpdateRate(10.0);
+  this->RenderWindow->SetDesiredUpdateRate(20.0);
   this->StartRender();
   this->RenderWindow->Render();
 }
