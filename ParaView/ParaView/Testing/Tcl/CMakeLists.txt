@@ -99,3 +99,7 @@ ADD_TEST(TestSetObjectMacro-ParaView ${TCL_TCLSH}
          ${KWCommon_SOURCE_DIR}/Testing/Tcl/FindString.tcl
 	 "${PARAVIEW_SOURCE_DIR}/ParaView/vtk\\\\*.h"
 	 "vtkSetObjectMacro")
+
+ADD_TEST(otherPrint ${PARAVIEW_EXECUTABLE}
+         ${PARAVIEW_SOURCE_DIR}/ParaView/Testing/Tcl/otherPrint.pvs
+         -A ${VTK_SOURCE_DIR}/Wrapping/Tcl)
