@@ -40,11 +40,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkObjectFactory.h"
 
 vtkStandardNewMacro( vtkKWMenuButton );
-vtkCxxRevisionMacro(vtkKWMenuButton, "1.13");
+vtkCxxRevisionMacro(vtkKWMenuButton, "1.14");
 
 int vtkKWMenuButtonCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
 
+//----------------------------------------------------------------------------
 vtkKWMenuButton::vtkKWMenuButton()
 {
   this->CommandFunction = vtkKWMenuButtonCommand;
@@ -52,13 +53,14 @@ vtkKWMenuButton::vtkKWMenuButton()
   this->Menu = vtkKWMenu::New();
 }
 
+//----------------------------------------------------------------------------
 vtkKWMenuButton::~vtkKWMenuButton()
 {
   this->Menu->Delete();
   this->Menu = NULL;
 }
 
-
+//----------------------------------------------------------------------------
 void vtkKWMenuButton::Create(vtkKWApplication *app, char *args)
 { 
   // Set the application
@@ -75,6 +77,7 @@ void vtkKWMenuButton::Create(vtkKWApplication *app, char *args)
                this->GetWidgetName(), this->Menu->GetWidgetName(), (args ? args : ""));
 
   // Should the args be passed through?
+
   this->Menu->Create(app, "");  
 
   // Update enable state
@@ -82,18 +85,21 @@ void vtkKWMenuButton::Create(vtkKWApplication *app, char *args)
   this->UpdateEnableState();
 }
 
+//----------------------------------------------------------------------------
 void vtkKWMenuButton::SetButtonText(const char *text)
 {
     this->Script("%s configure -text {%s}",
                  this->GetWidgetName(), text);
 }
 
+//----------------------------------------------------------------------------
 const char* vtkKWMenuButton::GetButtonText()
 {
     return this->Script("%s cget -text",
                  this->GetWidgetName());
 }
 
+//----------------------------------------------------------------------------
 void vtkKWMenuButton::AddCommand(const char* label, vtkKWObject* Object,
                                  const char* MethodAndArgString,
                                  const char* help)
@@ -101,9 +107,21 @@ void vtkKWMenuButton::AddCommand(const char* label, vtkKWObject* Object,
   this->Menu->AddCommand(label, Object, MethodAndArgString, help);
 }
 
+//----------------------------------------------------------------------------
 vtkKWMenu* vtkKWMenuButton::GetMenu()
 {
   return this->Menu;
+}
+
+//----------------------------------------------------------------------------
+void vtkKWMenuButton::UpdateEnableState()
+{
+  this->Superclass::UpdateEnableState();
+
+  if (this->Menu)
+    {
+    this->Menu->SetEnabled(this->Enabled);
+    }
 }
 
 //----------------------------------------------------------------------------
