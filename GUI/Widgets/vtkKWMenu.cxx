@@ -20,7 +20,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWMenu );
-vtkCxxRevisionMacro(vtkKWMenu, "1.51");
+vtkCxxRevisionMacro(vtkKWMenu, "1.52");
 
 
 
@@ -107,6 +107,11 @@ void vtkKWMenu::AddGeneric(const char* addtype,
                            const char* extra, 
                            const char* help)
 {
+  if (!this->IsCreated())
+    {
+    return;
+    }
+
   ostrstream str;
   str << this->GetWidgetName() << " add " << addtype;
 
