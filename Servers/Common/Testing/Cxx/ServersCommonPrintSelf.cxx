@@ -32,6 +32,7 @@
 #include "vtkPVArrayInformation.h"
 #include "vtkPVInformation.h"
 #include "vtkPVProgressHandler.h"
+#include "vtkPVOptions.h"
 
 int main(int, char * [])
 {
@@ -56,6 +57,7 @@ int main(int, char * [])
   c = vtkPVArrayInformation::New(); c->Print(cout); c->Delete();
   c = vtkPVInformation::New(); c->Print(cout); c->Delete();
   c = vtkPVProgressHandler::New(); c->Print(cout); c->Delete();
+  c = vtkPVOptions::New(); c->Print(cout); c->Delete();
 
   return 0;
 }

@@ -31,7 +31,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVOptions);
-vtkCxxRevisionMacro(vtkPVOptions, "1.5");
+vtkCxxRevisionMacro(vtkPVOptions, "1.6");
 
 //----------------------------------------------------------------------------
 vtkPVOptions::vtkPVOptions()
@@ -41,6 +41,7 @@ vtkPVOptions::vtkPVOptions()
   this->Internals->CMD.SetUnknownArgumentCallback(vtkPVOptions::UnknownArgumentHandler);
   this->Internals->CMD.SetClientData(this);
   this->UnknownArgument = 0;
+  this->ErrorMessage = 0;
 
   this->CaveConfigurationFileName = 0;
   this->MachinesFileName = 0;
@@ -332,9 +333,9 @@ void vtkPVOptions::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "UseStereoRendering: " << this->UseStereoRendering << endl;
   os << indent << "ClientMode: " << this->ClientMode << endl;
   os << indent << "ClientRenderServer: " << this->ClientRenderServer << endl;
+  os << indent << "Port: " << this->Port << endl;
   os << indent << "RenderNodePort: " << this->RenderNodePort << endl;
   os << indent << "RenderServerPort: " << this->RenderServerPort << endl;
-  os << indent << "Port: " << this->Port << endl;
   os << indent << "RenderModuleName: " << (this->RenderModuleName?this->RenderModuleName:"(none)") << endl;
   os << indent << "CaveConfigurationFileName: " << (this->CaveConfigurationFileName?this->CaveConfigurationFileName:"(none)") << endl;
   os << indent << "BatchScriptName: " << (this->BatchScriptName?this->BatchScriptName:"(none)") << endl;
