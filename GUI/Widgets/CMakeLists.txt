@@ -30,6 +30,7 @@ SET( KWWidgets_SRCS
   vtkKWColorTransferFunctionEditor.cxx
   vtkKWCornerAnnotation.cxx 
   vtkKWDialog.cxx 
+  vtkKWDragAndDropTargets.cxx
   vtkKWEntry.cxx 
   vtkKWEvent.cxx
   vtkKWEventMap.cxx
@@ -179,12 +180,12 @@ SET_SOURCE_FILES_PROPERTIES(
 
 SET_SOURCE_FILES_PROPERTIES(
   ${VTK_TCL_HOME}/vtktcl.c
+  vtkKWEvent.cxx
   vtkKWGenericRenderWindowInteractor.cxx
   vtkKWRenderWidgetCallbackCommand.cxx 
   vtkKWTkUtilities.cxx
   vtkKWWidgetCollection.cxx
   vtkKWWindowCollection.cxx
-  vtkKWEvent.cxx
   WRAP_EXCLUDE
   )
 
@@ -243,10 +244,6 @@ ELSE(VTK_WRAP_TCL)
 ENDIF(VTK_WRAP_TCL)
 
 ADD_LIBRARY(KWWidgetsTCL ${KWWidgetsTCL_SRCS} ${KWWidgets_SRCS})
-
-TARGET_LINK_LIBRARIES (KWWidgetsTCL
-  ${KWCommon_LIBRARIES}
-  )
 
 IF(KWSYS_NAMESPACE)
   TARGET_LINK_LIBRARIES (KWWidgetsTCL ${KWSYS_NAMESPACE})

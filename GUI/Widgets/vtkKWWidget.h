@@ -28,12 +28,7 @@
 class vtkKWIcon;
 class vtkKWWidgetCollection;
 class vtkKWWindow;
-
-//BTX
-template<class DataType> class vtkLinkedList;
-template<class DataType> class vtkLinkedListIterator;
-//ETX
-//
+class vtkKWDragAndDropTargets;
 
 class VTK_EXPORT vtkKWWidget : public vtkKWObject
 {
@@ -242,51 +237,14 @@ public:
   virtual int InitializeTrace(ofstream* file);
 
   // Description:
-  // Enable/disable Drag and Drop.
-  virtual void SetEnableDragAndDrop(int);
-  vtkBooleanMacro(EnableDragAndDrop, int);
-  vtkGetMacro(EnableDragAndDrop, int);
-
-  // Description:
-  // Add/Query/Remove a Drag & Drop target. 
-  virtual int AddDragAndDropTarget(vtkKWWidget *target);
-  virtual int RemoveDragAndDropTarget(vtkKWWidget *target);
-  virtual int HasDragAndDropTarget(vtkKWWidget *target);
-  virtual int GetNumberOfDragAndDropTargets();
-
-  // Description:
-  // Set a Drag & Drop target callbacks/commands.
-  // You have to add a target before settings its commands.
-  // The StartCommand of all targets is called when Drag & Drop is initiated.
-  // The PerformCommand of all targets is called while Drag & Drop is 
-  // performed.
-  // The EndCommand of all targets that contain the drop coordinates is called
-  // when Drag & Drop is ended
-  // Note that the each command is passed the absolute/screen (x,y) mouse 
-  // coordinates, the current widget and the DragAndDropAnchor (which are the
-  // same most of the times), i.e. the last 4 parameters are: int, int, 
-  // vtkKWWidget*, vtkKWWidget*). Additionally, EndCommand is passed a 5th 
-  // parameter, the target (vtkKWWidget *).
-  virtual int SetDragAndDropStartCommand(
-    vtkKWWidget *target, vtkKWObject *object, const char *method);
-  virtual int SetDragAndDropPerformCommand(
-    vtkKWWidget *target, vtkKWObject *object, const char *method);
-  virtual int SetDragAndDropEndCommand(
-    vtkKWWidget *target, vtkKWObject *object, const char *method);
-
-  // Description:
-  // Set/Get the Drag and Drop anchor. This is the actual widget (or part of)
-  // that the user drags and drops. It defaults to the current widget (this),
-  // but can be used to specify that a sub-part of the widget is the real
-  // anchor.
-  virtual void SetDragAndDropAnchor(vtkKWWidget*);
-  vtkGetObjectMacro(DragAndDropAnchor, vtkKWWidget);
-
-  // Description:
-  // Drag and Drop callbacks
-  virtual void DragAndDropStartCallback(int x, int y);
-  virtual void DragAndDropPerformCallback(int x, int y);
-  virtual void DragAndDropEndCallback(int x, int y);
+  // Query if there are drag and drop targets between this widget and
+  // other widgets. Get the targets.
+  // IMPORTANT: the vtkKWDragAndDropTargets object is lazy-allocated, i.e.
+  // allocated only when it is needed, when GetDragAndDropTargets() is called.
+  // Therefore, to check if the instance *has* drag and drop targets, use 
+  // HasDragAndDropTargets(), not GetDragAndDropTargets().
+  virtual int HasDragAndDropTargets();
+  virtual vtkKWDragAndDropTargets* GetDragAndDropTargets();
 
   // Description:
   // Some constant that can be used to specify anchoring
@@ -382,41 +340,6 @@ protected:
   char *TraceName;
   int Enabled;
 
-  // Drag and Drop
-
-  //BTX
-
-  class DragAndDropTarget
-  {
-  public:
-    vtkKWWidget *Target;
-    char *StartCommand;
-    char *PerformCommand;
-    char *EndCommand;
-
-    void SetStartCommand(const char*);
-    void SetEndCommand(const char*);
-    void SetPerformCommand(const char*);
-
-    DragAndDropTarget();
-    ~DragAndDropTarget();
-  };
-
-  typedef vtkLinkedList<DragAndDropTarget*> DragAndDropTargetsContainer;
-  typedef vtkLinkedListIterator<DragAndDropTarget*> DragAndDropTargetsContainerIterator;
-  DragAndDropTargetsContainer *DragAndDropTargets;
-
-  DragAndDropTarget* GetDragAndDropTarget(vtkKWWidget *target);
-
-  //ETX
-
-  int EnableDragAndDrop;
-  vtkKWWidget *DragAndDropAnchor;
-
-  virtual void SetDragAndDropBindings();
-  virtual void RemoveDragAndDropBindings();
-  virtual void DeleteDragAndDropTargets();
-
   // Encoding methods
   static const char* GetTclCharacterEncodingAsString(int);
 
@@ -443,6 +366,8 @@ private:
   // to avoid accessing GetChildren(). 
 
   vtkKWWidgetCollection *Children; 
+
+  vtkKWDragAndDropTargets* DragAndDropTargets;
 
   int WidgetIsCreated;
 

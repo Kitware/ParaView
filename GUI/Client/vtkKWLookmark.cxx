@@ -21,21 +21,21 @@
 #include "vtkKWLookmark.h"
 
 #include "vtkKWApplication.h"
-#include "vtkKWFrame.h"
-#include "vtkKWLabel.h"
 #include "vtkKWCheckButton.h"
-//#include "../Client/vtkPVCameraIcon.h"
+#include "vtkKWCheckButtonLabeled.h"
+#include "vtkKWDragAndDropTargets.h"
+#include "vtkKWFrame.h"
 #include "vtkKWFrameLabeled.h"
+#include "vtkKWIcon.h"
+#include "vtkKWLabel.h"
+#include "vtkKWRadioButton.h"
 #include "vtkKWText.h"
 #include "vtkKWTkUtilities.h"
 #include "vtkObjectFactory.h"
-#include "vtkKWIcon.h"
-#include "vtkKWRadioButton.h"
-#include "vtkKWCheckButtonLabeled.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLookmark );
-vtkCxxRevisionMacro( vtkKWLookmark, "1.1");
+vtkCxxRevisionMacro( vtkKWLookmark, "1.2");
 
 int vtkKWLookmarkCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -64,7 +64,8 @@ vtkKWLookmark::vtkKWLookmark()
 
   this->Width = this->Height = 48; 
 
-  this->DragAndDropAnchor = this->LmkMainFrame->GetLabel();
+  this->GetDragAndDropTargets()->SetAnchor(
+    this->LmkMainFrame->GetLabel());
 }
 
 //----------------------------------------------------------------------------
