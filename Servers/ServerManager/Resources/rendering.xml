@@ -259,6 +259,23 @@
      <SubProxy>
        <Proxy name="camera" class="vtkCamera">
          <DoubleVectorProperty
+           name="CameraPositionInfo"
+           command="GetPosition"
+           number_of_elements="3"
+           information_only="1"
+           default_values="1 0 0 ">
+           <SimpleDoubleInformationHelper/>
+         </DoubleVectorProperty>
+         
+         <DoubleVectorProperty
+           name="CameraPosition"
+           command="SetPosition"
+           number_of_elements="3"
+           information_property="CameraPositionInfo"
+           default_values="1 0 0">
+         </DoubleVectorProperty>
+         
+         <DoubleVectorProperty
            name="CameraFocalPointInfo"
            command="GetFocalPoint"
            number_of_elements="3"
@@ -266,38 +283,63 @@
            default_values="0 0 0">
            <SimpleDoubleInformationHelper/>
          </DoubleVectorProperty>
-         <DoubleVectorProperty
-           name="CameraPosition"
-           command="SetPosition"
-           number_of_elements="3"
-           default_values="1 0 0">
-         </DoubleVectorProperty>
 
          <DoubleVectorProperty
            name="CameraFocalPoint"
            command="SetFocalPoint"
            number_of_elements="3"
+           information_property="CameraFocalPointInfo"
            default_values="0 0 0">
+         </DoubleVectorProperty>
+
+         <DoubleVectorProperty
+           name="CameraViewUpInfo"
+           command="GetViewUp"
+           number_of_elements="3"
+           information_only="1"
+           default_values="0 1 0">
+           <SimpleDoubleInformationHelper/>
          </DoubleVectorProperty>
 
          <DoubleVectorProperty
            name="CameraViewUp"
            command="SetViewUp"
            number_of_elements="3"
+           information_property="CameraViewUpInfo"
            default_values="0 1 0">
          </DoubleVectorProperty>
 
          <DoubleVectorProperty
+           name="CameraViewAngleInfo"
+           command="GetViewAngle"
+           number_of_elements="1"
+           information_only="1"
+           default_values="30">
+           <SimpleDoubleInformationHelper/>
+         </DoubleVectorProperty>
+           
+         <DoubleVectorProperty
            name="CameraViewAngle"
            command="SetViewAngle"
            number_of_elements="1"
+           information_property="CameraViewAngleInfo"
            default_values="30">
          </DoubleVectorProperty>
 
          <DoubleVectorProperty
+           name="CameraClippingRangeInfo"
+           command="GetClippingRange"
+           number_of_elements="2"
+           information_only="1"
+           default_values="0.01 1000.01">
+           <SimpleDoubleInformationHelper/>
+         </DoubleVectorProperty>
+           
+         <DoubleVectorProperty
            name="CameraClippingRange"
            command="SetClippingRange"
            number_of_elements="2"
+           information_property="CameraClippingRangeInfo"
            default_values="0.01 1000.01">
          </DoubleVectorProperty>
        </Proxy>
