@@ -32,15 +32,37 @@ void ReportCommand(const char* const* command, const char* name);
 int ReportStatus(kwsysProcess* process, const char* name);
 
 
-inline void PauseForServerStart()
+int WaitForAndPrintData(kwsysProcess* process, double timeout, int* foundWaiting )
 {
-#ifdef _WIN32
-  Sleep(1000);
-#else
-  sleep(1);
-#endif
+  if(!process)
+    {
+    return 0;
+    }
+  char* data;
+  int length;
+  // Look for process output.
+  int processPipe = kwsysProcess_WaitForData(process, &data, &length, &timeout);
+  if(processPipe == kwsysProcess_Pipe_STDOUT)
+    {
+    if(foundWaiting)
+      {
+      vtkstd::string str(data, data+length);
+      if(str.find("Waiting") != str.npos)
+        {
+        *foundWaiting = 1;
+        }
+      }
+    cerr.write(data, length);
+    cerr.flush();
+    }
+  else if(processPipe == kwsysProcess_Pipe_STDERR)
+    {
+    cerr.write(data, length);
+    cerr.flush();
+    }
+  
+  return processPipe;
 }
-
 //----------------------------------------------------------------------------
 int main(int argc, char* argv[])
 {
@@ -157,74 +179,47 @@ int main(int argc, char* argv[])
   // Kill the processes if they are taking too long.
   kwsysProcess_SetTimeout(server, timeOut);
   kwsysProcess_SetTimeout(client, timeOut);
+  int foundWaiting = 0;
   if(renderServer)
     {
-    fprintf(stderr, "start render server\n");
+    cerr << "start render server\n";
     kwsysProcess_SetTimeout(renderServer, timeOut);
     kwsysProcess_Execute(renderServer);
-    PauseForServerStart();
+    while(!foundWaiting)
+      {
+      if(!WaitForAndPrintData(renderServer, 30.0, &foundWaiting))
+        {
+        cerr << "render server never started\n";
+        return -1;
+        }
+      }
+    cerr << "Started Render Server\n";
     }
   
   // Execute the server and then the client.
   kwsysProcess_Execute(server);
-  PauseForServerStart();
+  foundWaiting = 0;
+  while(!foundWaiting)
+    {
+    if(!WaitForAndPrintData(server, 30.0, &foundWaiting))
+      {
+      cerr << "server never started\n";
+      kwsysProcess_Kill(renderServer);
+      return -1;
+      }
+    }
+  cerr << "Started data Server\n";
   kwsysProcess_Execute(client);
 
   // Report the output of the processes.
   int clientPipe = 1;
   int serverPipe = 1;
-  int renderServerPipe = 0;
-  if(renderServer)
-    {
-    renderServerPipe = 1;
-    }
+  int renderServerPipe = 1;
   while(clientPipe || serverPipe || renderServerPipe)
     {
-    char* data;
-    int length;
-    double timeout;
-
-    // Look for client output.
-    timeout = 0.1;
-    clientPipe = kwsysProcess_WaitForData(client, &data, &length, &timeout);
-    if(clientPipe == kwsysProcess_Pipe_STDOUT)
-      {
-      cout.write(data, length);
-      cout.flush();
-      }
-    else if(clientPipe == kwsysProcess_Pipe_STDERR)
-      {
-      cerr.write(data, length);
-      cout.flush();
-      }
-
-    // Look for server output.
-    timeout = 0.1;
-    serverPipe = kwsysProcess_WaitForData(server, &data, &length, &timeout);
-    if(serverPipe == kwsysProcess_Pipe_STDOUT)
-      {
-      cout.write(data, length);
-      cout.flush();
-      }
-    else if(serverPipe == kwsysProcess_Pipe_STDERR)
-      {
-      cerr.write(data, length);
-      cout.flush();
-      }
-    if(renderServer)
-      {
-      renderServerPipe = kwsysProcess_WaitForData(server, &data, &length, &timeout);
-      if(renderServerPipe == kwsysProcess_Pipe_STDOUT)
-        {
-        cout.write(data, length);
-        cout.flush();
-        }
-      else if(renderServerPipe == kwsysProcess_Pipe_STDERR)
-        {
-        cerr.write(data, length);
-        cout.flush();
-        }
-      }
+    clientPipe = WaitForAndPrintData(client, 0.1, 0);
+    serverPipe = WaitForAndPrintData(server, 0.1, 0);
+    renderServerPipe = WaitForAndPrintData(renderServer, 0.1, 0);
     }
 
   // Wait for the client and server to exit.
@@ -270,12 +265,12 @@ int main(int argc, char* argv[])
 //----------------------------------------------------------------------------
 void ReportCommand(const char* const* command, const char* name)
 {
-  cout << "The " << name << " command is:\n";
+  cerr << "The " << name << " command is:\n";
   for(const char* const * c = command; *c; ++c)
     {
-    cout << " \"" << *c << "\"";
+    cerr << " \"" << *c << "\"";
     }
-  cout << "\n";
+  cerr << "\n";
 }
 
 //----------------------------------------------------------------------------
@@ -334,7 +329,7 @@ int ReportStatus(kwsysProcess* process, const char* name)
     case kwsysProcess_State_Exited:
       {
       result = kwsysProcess_GetExitValue(process);
-      cout << "The " << name << " process exited with code "
+      cerr << "The " << name << " process exited with code "
                       << result << "\n";
       } break;
     case kwsysProcess_State_Expired:
