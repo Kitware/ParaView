@@ -335,21 +335,14 @@ The Decimate filter reduces the number of triangles in a polygonal data set. Bec
     <InputMenu trace_name="Input" label="Input"
                help="Set the input to this filter."
                input_name="Input"/>
-    <LabeledToggle label="Assign cells uniquely" 
-                   trace_name="AssignBoundaryCellsToOneRegion" 
-                   variable="AssignBoundaryCellsToOneRegion" 
-                   help="Each cell is assigned to one process only (isosurfacing)" 
-                   default_value="1"/>
-    <LabeledToggle label="or Duplicate cells" 
-                   trace_name="AssignBoundaryCellsToAllIntersectingRegions" 
-                   variable="AssignBoundaryCellsToAllIntersectingRegions" 
-                   help="Cells on processor boundaries will be duplicated" 
-                   default_value="0"/>
-    <LabeledToggle label="or Divide cells" 
-                   trace_name="DivideBoundaryCells" 
-                   variable="DivideBoundaryCells" 
-                   help="Cells on processor boundaries will be split (volume rendering)" 
-                   default_value="0"/>
+    <SelectionList label="Boundary Cells" variable="BoundaryMode"
+                   trace_name="BoundaryMode"
+                   default_value="??"
+                   help="Select how to handle boundary cells. Isosurfacing works well when cells are uniquely assigned to processes. Dividing cells along processor boundaries is useful for volume rendering.">
+      <Item name="Assign cells uniquely" value="0"/>
+      <Item name="Duplicate cells" value="1"/>
+      <Item name="Divide cells" value="2"/>
+    </SelectionList>
     <StringEntry variable="GlobalIdArrayName"
                  trace_name="GlobalIdArrayName"
                  help="Provide name of global node ID array so redistributed data does not duplicate node IDs" />
@@ -747,7 +740,9 @@ The Group Parts filter causes different data sets to be grouped into a collectio
                    help="Turn this off if you do want to process ghost levels and do not mind seams."
                    default_value="0"/>
     <Documentation>
-The Linear Extrusion filter creates a swept surface by translating the input data set along a specified vector. This filter was intended to operate on 2D polygonal data. The Input menu allows the user to select the data set to which this filter will be applied. The three Vector entry boxes specify the X, Y, and Z components of the vector along which to sweep the input. The value of the Scale factor determines the distance along the vector the data set will be translated. (A scale factor of 0.5 will move the data set half the length of the vector, and a scale factor of 2 will move it twice the vector's length.) The Capping check box indicates whether to cap the ends of the swept surface. If the input data set is 3D instead of 2D (e.g., a sphere), then if capping is on, two copies of the data set will be displayed on output (the second translated from the first one along the specified vector). If instead capping is off, then an input 3D data set will produce no output. The Piece invariant check box determines whether the output will be the same regardless of the number of processors used to compute the result. The difference is whether there are internal polygonal faces on the processor boundaries. This filter operates on polygonal data and produces polygonal data output.
+The Linear Extrusion filter creates a swept surface by translating the input data set along a specified vector. This filter is intended to operate on 2D polygonal data. The Input menu allows the user to select the data set to which this filter will be applied. The three Vector entry boxes specify the X, Y, and Z components of the vector along which to sweep the input. The value of the Scale factor determines the distance along the vector the data set will be translated. (A scale factor of 0.5 will move the data set half the length of the vector, and a scale factor of 2 will move it twice the vector's length.)
+The Capping check box indicates whether to cap the ends of the swept surface. Capping works by placing a copy of the input data set on either end of the swept surface, so it behaves properly if the input is a 2D surface composed of filled polygons. If the input data set is a closed solid (e.g., a sphere), then if capping is on, two copies of the data set will be displayed on output (the second translated from the first one along the specified vector). If instead capping is off, then an input closed solid will produce no output.
+The Piece invariant check box determines whether the output will be the same regardless of the number of processors used to compute the result. The difference is whether there are internal polygonal faces on the processor boundaries. This filter operates on polygonal data and produces polygonal data output.
     </Documentation>
   </Module>
   <Module name="LoopSubdivisionFilter"
@@ -1264,6 +1259,9 @@ The Reflection filter reflects the input data set across the specified plane. Th
                    help="Turn on/off the variation of ribbon width with scalar value."
                    default_value="0"/>
     <Documentation>
+The Ribbon filter creates ribbons from the lines in the input data set. This filter is useful for visualizing streamlines. Both the input and output of this filter are polygonal data. The input data set must also have at least one point-centered vector array.
+The vectors and scalars for use in this filter can be selected from the Vectors and Scalars menus respectively. If the Vary width option is on, the width of the ribbons will be be scaled according to the selected scalars. If Use default normal is off, the selected vector array will be used as the normals of the ribbons. If Use default normals is on, the normal for the ribbons is specified by the values in the Default normal entry boxes.
+The Width entry box specifies half the width of the ribbons. If Vary width is on, then the Width value specified is the minimum width of the ribbons. The Angle value determines the orientation of the ribbons; it specifies the offset angle (in degrees) of the ribbon from the normal line.
     </Documentation>
   </Module>
   <Module name="RotationalExtrusionFilter"
@@ -1306,6 +1304,8 @@ The Reflection filter reflects the input data set across the specified plane. Th
                  help="The change in radius during sweep process."
                  default_value="0.0"/>
     <Documentation>
+The Rotational Extrusion filter forms a surface by rotating the input about the Z axis. This filter is intended to operate on 2D polygonal data. The Input menu allows the user to seelct the data set to which this filter will be applied. The value of the Resolution entry box specifies the number of steps taken in rotating from 0 to the value specified in the Angle entry box. The Translation entry box determines the distance along the Z axis to be covered as the data set is rotated. Specifying a non-zero Translation value allows you to create a corkscrew or spring effect. The Delta radius entry box controls how much the radius of the rotation increases as the new data set is swept out.
+The Capping check box controls whether to close the open ends of the swept surface. Capping works by placing a copy of the input data set on either end of the swept surface, so it behaves properly if the input is a 2D surface composed of filled polygons. If the input data set is a closed solid (e.g., a sphere), then either two copies of the data set will be drawn or the no surface will be drawn. No surface is drawn if either capping is on or if the two surfaces would occupy exactly the same 3D space (e.g., Angle is a multiple of 360 and Translation and Delta radius are 0).
     </Documentation>
   </Module>
   <Module name="ShrinkFilter"
@@ -1333,6 +1333,7 @@ The Reflection filter reflects the input data set across the specified plane. Th
            entry_and_label_on_top="0"
            display_value="0"/>
     <Documentation>
+The Shrink filter causes the individual cells of a data set to break apart from each other by moving each cell's points toward the centroid of the cell. (The centroid of a cell is the average position its points.) The Shrink factor scale determines how far the points will move. A value of 0 positions the points at the centroid of the cell; a value of 1 leaves them at their original positions. This filter operates on any type of data set and produces unstructured grid output.
     </Documentation>
   </Module>
     <!--
@@ -1388,6 +1389,7 @@ The Reflection filter reflects the input data set across the specified plane. Th
            entry_and_label_on_top="0"
            display_value="0"/>
     <Documentation>
+The Smooth filter operates on a polygonal data set by iteratively adjusting the position of the points using Laplacian smoothing. (Because this filter only adjusts point postions, the output data set is also polygonal.) This results in better-shaped cells and more evenly distributed points. The Num. iterations entry box specifies the maximum number of smoothing iterations to perform. The Convergence slider limits the maximum motion of any point. It is expressed as a fraction of the length of the diagonal of the bounding box of the data set. If the maximum point motion during a smoothing iteration is less than the Convergence value, the smoothing operation terminates. 
     </Documentation>
   </Module>
   <Module name="Stripper"
@@ -1415,6 +1417,7 @@ The Reflection filter reflects the input data set across the specified plane. Th
            entry_and_label_on_top="0"
            display_value="0"/>
     <Documentation>
+The Triangle Strips filter converts triangles into triangle strips and lines into polylines. The Max. length slider determines the maximum number of triangles or lines to merge into a strip. This filter operates on polygonal data sets and produces polygonal output.
     </Documentation>
   </Module>
   <Module name="Subdivide"
