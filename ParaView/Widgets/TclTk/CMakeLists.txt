@@ -14,6 +14,7 @@ SET (files
   lib/tk8.4/tearoff.tcl
   lib/tk8.4/text.tcl
   lib/tk8.4/tk.tcl
+  lib/tk8.4/tkfbox.tcl
 )
 
 IF (CXX_TEST_PATH)
