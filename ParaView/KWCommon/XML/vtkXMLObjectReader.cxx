@@ -40,7 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkXMLDataParser.h"
 #include "vtkXMLUtilities.h"
 
-vtkCxxRevisionMacro(vtkXMLObjectReader, "1.6");
+vtkCxxRevisionMacro(vtkXMLObjectReader, "1.7");
 
 vtkCxxSetObjectMacro(vtkXMLObjectReader, Object, vtkObject);
 
@@ -251,7 +251,7 @@ void vtkXMLObjectReader::AppendToErrorLog(const char *msg)
     {
     str << this->ErrorLog << endl;
     }
-  str << msg;
+  str << msg << ends;
   this->SetErrorLog(str.str());
   str.rdbuf()->freeze(0);
 }
