@@ -33,6 +33,11 @@ $pvSourceMenu Invoke [$pvSourceMenu GetIndex "SphereSource"]
 set pvSphere [$pvWindow GetCurrentPVSource]
 $pvSphere AcceptCallback
 
+
+RenWin1 SetSize 448 603
+RenWin1 Render
+
+
 if {[info exists PARAVIEW_BASELINE]} {
     vtkWindowToImageFilter winToImage
     winToImage SetInput RenWin1
@@ -53,7 +58,7 @@ if {[info exists PARAVIEW_BASELINE]} {
 	puts "Failed Image Test with error: $imageError"
 	exit 1; 
     } else {
-	exit
+	Application Exit
     }
 	
 } else {
@@ -62,6 +67,7 @@ if {[info exists PARAVIEW_BASELINE]} {
 }
 
 
-exit 0;
+
+Application Exit
 
 
