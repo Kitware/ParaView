@@ -2,6 +2,17 @@ $Application ExitOnReturnOn
 
 set kw(vtkTemp1) [$Application GetMainWindow]
 set kw(vtkTemp16) [$kw(vtkTemp1) GetMainView]
+
+if {[info exists argc]} { 
+    set argcm1 [expr $argc - 1]
+    for {set i 0} {$i < $argcm1} {incr i} {
+        if {[lindex $argv $i] == "-UC" && $i < $argcm1} {
+            set rmui [$kw(vtkTemp16) GetRenderModuleUI]
+            catch {$rmui SetCompositeThreshold 0}
+        }
+    }
+} 
+
 $kw(vtkTemp16) SetBackgroundColor 0 0 0
 set kw(vtkTemp213) [$kw(vtkTemp1) CreatePVSource RTAnalyticSource]
 $kw(vtkTemp213) AcceptCallback

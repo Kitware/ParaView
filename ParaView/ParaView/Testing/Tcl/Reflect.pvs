@@ -1,17 +1,22 @@
 $Application ExitOnReturnOn
 
+set kw(vtkTemp1) [$Application GetMainWindow]
+set kw(vtkTemp29) [$kw(vtkTemp1) GetMainView]
+
 if {[info exists argc]} { 
     set argcm1 [expr $argc - 1]
     for {set i 0} {$i < $argcm1} {incr i} {
         if {[lindex $argv $i] == "-D" && $i < $argcm1} {
 		set DataDir [lindex $argv [expr $i + 1]]
         }
+        if {[lindex $argv $i] == "-UC" && $i < $argcm1} {
+            set rmui [$kw(vtkTemp29) GetRenderModuleUI]
+            catch {$rmui SetCompositeThreshold 0}
+        }
     }
 } 
 
 
-set kw(vtkTemp1) [$Application GetMainWindow]
-set kw(vtkTemp29) [$kw(vtkTemp1) GetMainView]
 set kw(vtkTemp224) [$kw(vtkTemp1) CreatePVSource ImageMandelbrotSource]
 set kw(vtkTemp235) [$kw(vtkTemp224) GetPVWidget {Extent}]
 $kw(vtkTemp235) SetValue 0 25 0 25 0 25

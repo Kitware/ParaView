@@ -1,10 +1,17 @@
 $Application ExitOnReturnOn
 
+set kw(vtkTemp1) [$Application GetMainWindow]
+set kw(vtkTemp44) [$kw(vtkTemp1) GetMainView]
+
 if {[info exists argc]} { 
     set argcm1 [expr $argc - 1]
     for {set i 0} {$i < $argcm1} {incr i} {
         if {[lindex $argv $i] == "-D" && $i < $argcm1} {
 		set DataDir [lindex $argv [expr $i + 1]]
+        }
+        if {[lindex $argv $i] == "-UC" && $i < $argcm1} {
+            set rmui [$kw(vtkTemp44) GetRenderModuleUI]
+            catch {$rmui SetCompositeThreshold 0}
         }
     }
 } 
@@ -20,8 +27,6 @@ if { [catch {set fp [open "out.txt" w]}] != 0 } {
   exit
 }
 
-set kw(vtkTemp1) [$Application GetMainWindow]
-set kw(vtkTemp44) [$kw(vtkTemp1) GetMainView]
 set pv(vtkTemp90) [$kw(vtkTemp1) GetPVSource GlyphSources Arrow0]
 set pv(vtkTemp94) [$kw(vtkTemp1) GetPVSource GlyphSources Cone0]
 set pv(vtkTemp98) [$kw(vtkTemp1) GetPVSource GlyphSources Sphere0]

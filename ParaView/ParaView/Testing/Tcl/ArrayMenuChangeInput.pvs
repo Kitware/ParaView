@@ -1,9 +1,18 @@
 $Application ExitOnReturnOn
+
+set kw(vtkTemp1) [$Application GetMainWindow]
+set kw(vtkTemp22) [$kw(vtkTemp1) GetMainView]
+
 if {[info exists argc]} { 
     set argcm1 [expr $argc - 1]
     for {set i 0} {$i < $argcm1} {incr i} {
         if {[lindex $argv $i] == "-D" && $i < $argcm1} {
 		set DataDir [lindex $argv [expr $i + 1]]
+        }
+        if {[lindex $argv $i] == "-UC" && $i < $argcm1} {
+            set rmui [$kw(vtkTemp22) GetRenderModuleUI]
+            puts [$rmui GetClassName]
+#            catch {$rmui SetCompositeThreshold 0}
         }
     }
 } 
@@ -13,8 +22,6 @@ if {[info exists argc]} {
 # when the input menu is changed.
 
 
-set kw(vtkTemp1) [$Application GetMainWindow]
-set kw(vtkTemp22) [$kw(vtkTemp1) GetMainView]
 set kw(vtkTemp273) [$kw(vtkTemp1) CreatePVSource SphereSource]
 set kw(vtkTemp290) [$kw(vtkTemp273) GetPVWidget {Theta Resolution}]
 $kw(vtkTemp290) SetValue 16

@@ -1,19 +1,25 @@
 $Application ExitOnReturnOn
+
+set kw(vtkTemp1) [$Application GetMainWindow]
+set kw(vtkTemp22) [$kw(vtkTemp1) GetMainView]
+
 if {[info exists argc]} { 
     set argcm1 [expr $argc - 1]
     for {set i 0} {$i < $argcm1} {incr i} {
         if {[lindex $argv $i] == "-D" && $i < $argcm1} {
 		set DataDir [lindex $argv [expr $i + 1]]
         }
+        if {[lindex $argv $i] == "-UC" && $i < $argcm1} {
+            set rmui [$kw(vtkTemp22) GetRenderModuleUI]
+            catch {$rmui SetCompositeThreshold 0}
+        }
     }
 } 
 
 # Disable popup message dialogs.
-set kw(vtkTemp1) [$Application GetMainWindow]
 $kw(vtkTemp1) SetUseMessageDialog 0
 
-# hack to get the window.
-set pvWindow [lindex [vtkPVWindow ListInstances] 0]
+set pvWindow $kw(vtkTemp1)
 
 # Choose the file name/type based on whether we are in parallel mode.
 set kw(vtkTemp1000) [$Application GetController]
