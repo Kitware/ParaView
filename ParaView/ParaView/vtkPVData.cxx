@@ -101,7 +101,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.213");
+vtkCxxRevisionMacro(vtkPVData, "1.214");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -639,7 +639,6 @@ void vtkPVData::CreateProperties()
                                                 "DrawWireframe");
   this->RepresentationMenu->AddEntryWithCommand("Points of Surface", this,
                                                 "DrawPoints");
-  this->RepresentationMenu->SetValue("Surface");
   this->RepresentationMenu->SetBalloonHelpString(
     "Choose what geometry should be used to represent the dataset.");
 
@@ -1578,8 +1577,8 @@ void vtkPVData::DrawWireframe()
   if (this->GetPVSource()->GetInitialized())
     {
     this->AddTraceEntry("$kw(%s) DrawWireframe", this->GetTclName());
-    this->RepresentationMenu->SetValue("Wireframe of Surface");
     }
+  this->RepresentationMenu->SetValue("Wireframe of Surface");
   
   // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   // We could move the property into vtkPVData so parts would share one object.
@@ -1633,8 +1632,8 @@ void vtkPVData::DrawPoints()
   if (this->GetPVSource()->GetInitialized())
     {
     this->AddTraceEntry("$kw(%s) DrawPoints", this->GetTclName());
-    this->RepresentationMenu->SetValue("Points of Surface");
     }
+  this->RepresentationMenu->SetValue("Points of Surface");
   
   num = this->GetPVSource()->GetNumberOfParts();
   for (idx = 0; idx < num; ++idx)
@@ -1683,8 +1682,8 @@ void vtkPVData::DrawSurface()
   if (this->GetPVSource()->GetInitialized())
     {
     this->AddTraceEntry("$kw(%s) DrawSurface", this->GetTclName());
-    this->RepresentationMenu->SetValue("Surface");
     }
+  this->RepresentationMenu->SetValue("Surface");
 
   num = this->GetPVSource()->GetNumberOfParts();
   for (idx = 0; idx < num; ++idx)
@@ -1733,8 +1732,8 @@ void vtkPVData::DrawOutline()
   if (this->GetPVSource()->GetInitialized())
     {
     this->AddTraceEntry("$kw(%s) DrawOutline", this->GetTclName());
-    this->RepresentationMenu->SetValue("Outline");
     }
+  this->RepresentationMenu->SetValue("Outline");
 
   num = this->GetPVSource()->GetNumberOfParts();
   for (idx = 0; idx < num; ++idx)
