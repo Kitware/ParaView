@@ -104,8 +104,6 @@ void vtkPVBoundsDisplay::Update()
 {
   vtkPVData *input;
   float bds[6];
-  
-  return;
 
   if (this->InputMenu == NULL)
     {
