@@ -444,7 +444,7 @@ protected:
   int              SupportPrint;
   int              SupportCopy;
   int              SupportControlFrame;
-  
+
 #ifdef _WIN32
   // internal methods used in printing
   void Print(HDC ghdc, HDC adc);
@@ -458,7 +458,4 @@ private:
   void operator=(const vtkKWView&); // Not implemented
 };
 
-
 #endif
-
-
