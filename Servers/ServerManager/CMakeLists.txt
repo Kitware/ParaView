@@ -70,6 +70,7 @@ SET( ServerManagerCommon_SRCS
   vtkSMStringVectorProperty.cxx
   vtkSMSubPropertyIterator.cxx
   vtkSMSummaryHelperProxy.cxx
+  vtkSMTimeStepsInformationHelper.cxx
   vtkSMTransformProxy.cxx
   vtkSMXDMFInformationHelper.cxx
   vtkSMXDMFPropertyDomain.cxx

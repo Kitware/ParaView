@@ -40,6 +40,7 @@
 #include "vtkPVInputMenu.h"
 #include "vtkSMPart.h"
 #include "vtkSMPartDisplay.h"
+#include "vtkPVCornerAnnotation.h"
 #include "vtkPVInputProperty.h"
 #include "vtkPVNumberOfOutputsInformation.h"
 #include "vtkPVProcessModule.h"
@@ -68,7 +69,7 @@
 
 
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.416");
+vtkCxxRevisionMacro(vtkPVSource, "1.416.2.1");
 vtkCxxSetObjectMacro(vtkPVSource,Notebook,vtkPVSourceNotebook);
 vtkCxxSetObjectMacro(vtkPVSource,PartDisplay,vtkSMPartDisplay);
 
@@ -1162,6 +1163,36 @@ void vtkPVSource::Accept(int hideFlag, int hideSource)
     this->UnGrabFocus();
     this->SetDefaultColorParameters();
     window->AddDefaultAnimation(this);
+
+    // If a property called TimestepValues exists, automatically add
+    // it to the annotation. In time, all readers that support time
+    // (and know about the actual time values) should provide this
+    // information.
+    if (this->Proxy->GetProperty("TimestepValues"))
+      {
+      vtkPVCornerAnnotation* annot =
+        this->GetPVRenderView()->GetCornerAnnotation();
+      const char* prevText = annot->GetCornerText(1);
+      if (prevText && prevText[0] == '\0')
+        {
+        prevText = 0;
+        }
+      ostrstream cornerText;
+      if (prevText)
+        {
+        //cornerText << prevText << "\n";
+        }
+      cornerText 
+        << "Time = [smGet Sources " << this->GetName()
+        << " TimestepValues "
+        << "[smGet Sources " << this->GetName()
+        << " TimeStep] 13.5f]"
+        << ends;
+      annot->SetCornerText(cornerText.str(), 1);
+      delete[] cornerText.str();
+      annot->SetVisibility(1);
+      }
+
     // One may be tempted to move this to the start of this if condition,
     // to avoid badly behaving PVWidgets reset calls to lead to
     // modification of the Accept button state, but that leads to 

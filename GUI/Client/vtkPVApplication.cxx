@@ -111,7 +111,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.336");
+vtkCxxRevisionMacro(vtkPVApplication, "1.336.2.1");
 
 
 int vtkPVApplicationCommand(ClientData cd, Tcl_Interp *interp,
@@ -1036,28 +1036,30 @@ void vtkPVApplication::Start(int argc, char*argv[])
   this->OutputWindow->SetWindowCollection( this->Windows );
 
   this->Script(
-    "proc smGet {group source property {index 0}} {\n"
+    "proc smGet {group source property {index 0} {form s}} {\n"
     "    vtkSMObject smGetTemp\n"
     "    set proxyManager [smGetTemp GetProxyManager]\n"
     "    smGetTemp Delete\n"
     "    set proxyName \"$group.$source\"\n"
     "    set proxy [$proxyManager GetProxy animateable $proxyName]\n"
     "    if {$proxy == \"\"} {\n"
-    "        return \"?no proxy: $group.$source?\"\n"
+//    "        return \"?no proxy: $group.$source?\"\n"
+    "        return \"unknown\"\n"
     "    }\n"
     "    set prop [$proxy GetProperty $property]\n"
     "    if {$prop == \"\"} {\n"
-    "        return \"?no property: $property?\"\n"
+    "        return \"unknown\"\n"
     "    }\n"
     "    vtkSMPropertyAdaptor smGetAdaptor\n"
     "    smGetAdaptor SetProperty $prop\n"
     "    if {$index >= [smGetAdaptor GetNumberOfRangeElements]} {\n"
     "        smGetAdaptor Delete\n"
-    "        return \"?no element: $index?\"\n"
+//    "        return \"?no element: $index?\"\n"
+    "        return \"unknown\"\n"
     "    }\n"
     "    set retVal [smGetAdaptor GetRangeValue $index]\n"
     "    smGetAdaptor Delete\n"
-    "    return $retVal\n"
+    "    return [format %%$form $retVal]\n"
     "}\n");
 
   // Check if there is an existing ParaViewTrace file.

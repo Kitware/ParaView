@@ -64,6 +64,7 @@ SET(Filters_SRCS
   vtkPVServerFileListing.cxx
   vtkPVServerObject.cxx
   vtkPVServerSelectTimeSet.cxx
+  vtkPVServerTimeSteps.cxx
   vtkPVServerXDMFParameters.cxx
   vtkPVSummaryHelper.cxx
   vtkPVThresholdFilter.cxx
