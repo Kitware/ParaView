@@ -42,10 +42,10 @@ set kw(vtkTemp236) [$kw(vtkTemp1) CreatePVSource ElevationFilter]
 set kw(vtkTemp999) [$kw(vtkTemp236) GetPVWidget {Line}]
 $kw(vtkTemp999) SetPoint1 0 0 0
 $kw(vtkTemp999) SetPoint2 0 0 1
-$kw(vtkTemp1) ShowCurrentSourceProperties
 set kw(vtkTemp257) [$kw(vtkTemp236) GetPVWidget {ScalarRange}]
 $kw(vtkTemp257) SetValue 0 10
 $kw(vtkTemp236) AcceptCallback
+$kw(vtkTemp1) ShowCurrentSourceProperties
 
 
 

@@ -46,7 +46,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCalculatorWidget);
-vtkCxxRevisionMacro(vtkPVCalculatorWidget, "1.35");
+vtkCxxRevisionMacro(vtkPVCalculatorWidget, "1.36");
 
 int vtkPVCalculatorWidgetCommand(ClientData cd, Tcl_Interp *interp,
                                 int argc, char *argv[]);
@@ -561,6 +561,7 @@ void vtkPVCalculatorWidget::ClearFunction()
   this->ModifiedCallback();
 }
 
+//----------------------------------------------------------------------------
 void vtkPVCalculatorWidget::ChangeAttributeMode(const char* newMode)
 {
   if (!strcmp(newMode, "point"))
@@ -585,6 +586,7 @@ void vtkPVCalculatorWidget::ChangeAttributeMode(const char* newMode)
   this->ModifiedCallback();
 }
 
+//----------------------------------------------------------------------------
 void vtkPVCalculatorWidget::AddScalarVariable(const char* variableName,
                                               const char* arrayName,
                                               int component)
@@ -672,6 +674,7 @@ int vtkPVCalculatorWidget::ScalarVariableExists(const char *variableName,
   return 0;
 }
 
+//----------------------------------------------------------------------------
 void vtkPVCalculatorWidget::AddVectorVariable(const char* variableName,
                                              const char* arrayName)
 {
@@ -868,25 +871,41 @@ void vtkPVCalculatorWidget::ResetInternal()
   if (ivp)
     {
     int mode = ivp->GetElement(0);
-    switch (mode)
+    if (mode != this->GetAttributeMode())
       {
-      case 0:
+      switch (mode)
+        {
+      case 1:
         this->ChangeAttributeMode("point");
         break;
-      case 1:
+      case 2:
         this->ChangeAttributeMode("cell");
         break;
+        }
       }
     }
-  
+
   vtkSMStringVectorProperty *svp = vtkSMStringVectorProperty::SafeDownCast(
     this->GetSMFunctionProperty());
   if (svp)
     {
     this->FunctionLabel->SetValue(svp->GetElement(0));
     }
-  
   this->ModifiedFlag = 0;
+}
+
+//----------------------------------------------------------------------------
+int vtkPVCalculatorWidget::GetAttributeMode()
+{
+  if (strcmp(this->AttributeModeMenu->GetValue(),"Point Data") == 0)
+    {
+    return 1;
+    }
+  if (strcmp(this->AttributeModeMenu->GetValue(),"Cell Data") == 0)
+    {
+    return 2;
+    }
+  return 0;
 }
 
 //----------------------------------------------------------------------------

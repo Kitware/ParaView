@@ -206,6 +206,7 @@ protected:
   int ReadXMLAttributes(vtkPVXMLElement* element,
                         vtkPVXMLPackageParser* parser);
 
+  int GetAttributeMode();
 private:
   vtkPVCalculatorWidget(const vtkPVCalculatorWidget&); // Not implemented
   void operator=(const vtkPVCalculatorWidget&); // Not implemented
