@@ -76,7 +76,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.239");
+vtkCxxRevisionMacro(vtkPVData, "1.240");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -2544,7 +2544,7 @@ void vtkPVData::SaveInBatchScript(ofstream *file)
             << part->GetPartDisplay()->GetMapper()->GetImmediateModeRendering() << "\n\t";
       part->GetPartDisplay()->GetMapper()->GetScalarRange(range);
       *file << "pvTemp" << part->GetPartDisplay()->GetMapperID() << " SetScalarRange "
-            << range[0] << range[1] << "\n\t";
+            << range[0] << " " << range[1] << "\n\t";
       *file << "pvTemp" << part->GetPartDisplay()->GetMapperID() << " UseLookupTableScalarRangeOn\n\t";
       *file << "pvTemp" << part->GetPartDisplay()->GetMapperID() << " SetScalarVisibility "
             << part->GetPartDisplay()->GetMapper()->GetScalarVisibility() << "\n\t"
