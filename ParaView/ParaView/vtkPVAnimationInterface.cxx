@@ -173,7 +173,7 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterface);
-vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.72.2.11");
+vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.72.2.12");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterface,ControlledWidget, vtkPVWidget);
 
@@ -1819,9 +1819,12 @@ void vtkPVAnimationInterface::SaveState(ofstream* file)
   for ( cc = 0; cc < this->AnimationEntries->GetNumberOfItems(); cc ++ )
     {
     vtkPVAnimationInterfaceEntry* entry = this->GetSourceEntry(cc);
-    *file << "set kw(" << entry->GetTclName() << ") [$kw(" << this->GetTclName() 
-          << ") AddEmptySourceItem]" << endl;
-    entry->SaveState(file);
+    if ( entry->IsActionValid(1) )
+      {
+      *file << "set kw(" << entry->GetTclName() << ") [$kw(" << this->GetTclName() 
+        << ") AddEmptySourceItem]" << endl;
+      entry->SaveState(file);
+      }
     }
 
   *file << "$kw(" << this->GetTclName() << ") SetNumberOfFrames " << numberFrames << endl;
