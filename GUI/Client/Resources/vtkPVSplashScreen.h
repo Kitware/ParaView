@@ -7,7 +7,7 @@
 #define image_PVSplashScreen_pixel_size    3
 #define image_PVSplashScreen_buffer_length 172220
 
-static unsigned char image_PVSplashScreen1[] = 
+static char image_PVSplashScreen1[] = 
   "eNrsvQd8JFl1LyyNZnbybIAlGgMGTFjAz2aNDc448b0PP8wSbYPthzFgMJ95YIPZwEYWlo"
   "zZ3ZmRNIqTR7GDYkeFbnWrozrn3F2dlEZhwu7yTqjq0QTVaAP+7ezXPTX6ta6qbp26de9J"
   "95z/aWiof+qf+qf+qX9evJ9vffQTd8PxsU/CT/j1ro/efddHvwXHRz92D3//6Meo5a5v4a"
@@ -268,7 +268,10 @@ static unsigned char image_PVSplashScreen1[] =
   "HCeKwHbJ+hkTG705vMFEAWyDgiYJSAjEy632Ckd6fTmGemvT53tTIB7ZsJShhDp3PUNGP1"
   "BWIpLP2zqYTCzJ1En1avs846iUWXQGHYyjxED4lhXG8wuuZ8CfSwxTbbQRbNDfVgb/+Ael"
   "gzA4IpmkllS5utX1TtJFhjyd4vcvoGZ4iI65ferxQRIUIVgc7JQKASNlGREZg5ibKGF0cX"
-  "5hn9fuP6JQdyhZXh58x/bjj6JYyObkbqqLFoxlASg+6006PjCOk/M+vxeGMc+BQRi5hzMj"
+  "5hn9fuP6JQdyhZXh58x/bjj6JYyObkbqqLFoxlASg+6006PjCOk/M+vxeGMc+BQRi5hzMj";
+
+
+static char image_PVSplashScreen2[] = 
   "IFYLOTUEJnZSnD+CFi/ReuwBhOCZ/+zLmGBs+uXb+5d+999z8ETLW988TouNEJs4MYKcaf"
   "xPN9guqV514JLHpP++5P/dunDx5qAxY9qBy32DxBcdep4HKX3v97xYaGi007VPv3v/M/v3"
   "Xv40+0AMMHnRyx0SSkjpBkoWTzyBDk802e5wcDQpa6Rkb7T505M6gcmpy2eQNxGPlKZfbC"
@@ -485,7 +488,9 @@ static unsigned char image_PVSplashScreen1[] =
   "p2HQgV7qldXjV13lCg87ccmlX3rx5QNkP4uwdm5xXaOI8g0ODctGG5wWLsRud7vctMqqkJ"
   "Bw9o/NmkSLNK+guKEJuVtjgfjFnjuMqk+fcpR4oxzTPCB5sMv1pDjbdVvtLiczorg8p9y+"
   "k6dP9f3prVzkQoAkX1U0gJjI58no7S2oqDxRXlFaV1/r9+WdE+qrJ+M7u9KyjxdARducHn"
-  "Li3ny98nyPJkh7cnLzCkvIxdYZzGR6nY3fbBvVmsKcoj3l1Km+dy4ANbOPoFadqKgora2r"
+  "Li3ny98nyPJkh7cnLzCkvIxdYZzGR6nY3fbBvVmsKcoj3l1Km+dy4ANbOPoFadqKgora2r";
+
+static char image_PVSplashScreen3[] = 
   "9nuPn/PWr52K7+pKO15QXC4zOkZsw6JZp4Xn9qT5w0mnHrJ433rzvK+JfkacqQVFopaQNV"
   "Vnn97M7OXnkD/qBZjv9OTY+OCf3io554AOe3Ke6A1VSFuY0GCCGkvKR5z4i0AxLU/abT0e"
   "7+Abr5344N045G+gAQ2Eg3+inPDN1xLNpuNl5SVFJUWCnaS4tLKqsZXUs8Fi4v3xXPJ3If"
@@ -728,7 +733,9 @@ static unsigned char image_PVSplashScreen1[] =
   "iIr117bVp6TkKSCESfKKttae/TD9iZdk9E7Ae9tntOrYp6O2rujrl797+YmnE8Pik9J+9E"
   "bT1dZ1FPkZ07tmDBWHhY5mWX33I0OiE2IV0QMRVXNDZ10WjCQ6H9iAP1Q9z4ho8vZTzHIh"
   "yNEdnDUUuhAU0KZChzHc/Ej31T1BOJMLtgiEUsaIjLjhR+PgIQfLNiN7H77PJg10vjc5c0"
-  "GadCIIuBeXhDkWwARnJAxEzwBfEH8QfxB/FfDH6NHTqJCfwn2ssKFS3o7ySNUkV1U21De2"
+  "GadCIIuBeXhDkWwARnJAxEzwBfEH8QfxB/FfDH6NHTqJCfwn2ssKFS3o7ySNUkV1U21De2";
+
+static char image_PVSplashScreen4[] =
   "e3oV9vQZ8vHIyC6VQcX/5x/1szZhRGTP/qkqWZ2Xlx8SlpGTnlVY0ifMEpLsghafH1LHlz"
   "6YLTCxduuORATHRiUgZp8oLCCgSiEUunAV98eWzGjNdDQw8uXnxTUkpmTFxyUkp2cWlNW6"
   "feKKrIuae5HTugqB7CIaPsfs7d1WX+jEMW1Et21oA+CIH4UcuJg12QqGjN030QrPVMvlna"
@@ -830,10 +837,7 @@ static unsigned char image_PVSplashScreen1[] =
   "U3QiCLF1+TnJqNy+j3pTfe9NfhX3zNtfT1s+UfiF8SBZ8L/5anthGYuITUj2L+9OpMIWf+"
   "oWnQ0NRxMfOH/plfVE5feWTdY1Pg1+lN69Y9Pi8qSkn1wMFjH938x9xbs/bBi8F/MfL/2K"
   "7ffyD+ABqlxGP+iQLwQBqlyuomUtH1je1dPeK4kBtjeWQmIXsHaosRkZl+0+D23b4b/uWd"
-  "GZHCOg4La5s155aIiP/8j1+8cjA6Nj6lsLiipa130OQoH61dO37/pX++NOyDcFLRc96dOz";
-
-
-static unsigned char image_PVSplashScreen2[] = 
+  "GZHCOg4La5s155aIiP/8j1+8cjA6Nj6lsLiipa130OQoH61dO37/pX++NOyDcFLRc96dOz"
   "Nx1jfX3nHocPSxmMTsnKK6xq64hMFbvzIwd86rYWHvi5hI6AcR06vDwpZ//wc/OnwkNj4h"
   "raCovL1Tx0SmMmIPGIrGBBF+Dvt4IUOt1+R58HPXA/BT8Xfddqcs9rHCB+GmY3bZXX1MI2"
   "aRKZSoJ0VbYbgtOFZYtmwFSXLT5mc2b9m6/PYVWD52rhUFDctfjZ80G4+89aPATyPfvfJe"
@@ -974,7 +978,9 @@ static unsigned char image_PVSplashScreen2[] =
   "9GUs+L838X6v+HOm3ZDk+S233DZu3B3iZp/GG0T2p8Ue8rd0ucbmbloFPb//KNknJd+SKC"
   "qpVFIgCe3FFCsJP94+5s0+v/2xnqdV+v6D+RYtnR8M0rwEDcZplQU6u5Y2r6Vfo6/htaW1"
   "n+VDJvtPYn7XG0uZ6H5w/MBvCIfS8PEDn0+XYO7o9ZtgxlXC0UH4afy0tLthUjoQXKnz5j"
-  "9G+MFhQuMHzexjharILy29dFN0fpxtlpCpjpXJF4dQgHPh8U/2t83+mHpo/OBxEySCsUpg"
+  "9G+MFhQuMHzexjharILy29dFN0fpxtlpCpjpXJF4dQgHPh8U/2t83+mHpo/OBxEySCsUpg";
+
+static char image_PVSplashScreen5[] =
   "2PFD56THRPhhNMJf19hFo5HcO+EHMxU9OJiR/lpRWX/oSD4NSIx/Y1Ie2JhwPUzc8TQuTf"
   "ZHlsbaX5pMGb/hth2Cf9xZpKwTJz+A95d5XwV/XWMn5kTLcwv70yygVF2zF9D4oTmFhjpd"
   "jgOiQOzLMj6vMf9ji+6wcra5aCQ64KIpbmW+aFpFN3CiA6ordCqoccn5lYvPtNXEQ4YfSW"
@@ -1217,7 +1223,9 @@ static unsigned char image_PVSplashScreen2[] =
   "YeEW5gCzWAfh8TNYCv1T/IGQgOE2hcxqA44xnM1aNbpw9d+VJJ3qcxBeKdkHZf4t4d/L/j"
   "+GnRTqtoWjBzhwuyBNeu/dH9Qf7ZGT9XHX5UdJBzRmYjRRgrCzzSWEVTMOUqq6ptaBcapb"
   "BS54EotUeruNFHSfCYAVW2MrFQ92muhpf3piglagXNAdgGGlK+mDAZ+4gWtKRQlEhzZV/I"
-  "cPp5oWgTQLygaRwBpjzeQSPd6AtEsTlrhYwd/A5+B7+Df5Tj57poUxRtuwvXRjJR4LH5dC"
+  "cPp5oWgTQLygaRwBpjzeQSPd6AtEsTlrhYwd/A5+B7+Df5Tj57poUxRtuwvXRjJR4LH5dC";
+
+static char image_PVSplashScreen6[] =
   "7ISE/kl5aUViHR4fb1othbNi6xR9kHRQPQohKqcPQ0lGi8XJTCG5dMRWJkzd3esF+IUpHA"
   "IZuQ24fgF/p9oFeO6AAZdUxqTMSq1Sz9Yvy4VMuoZDzn9qWSkKW75Py9AoN+7+amdU5JgW"
   "wK9nHwO/gd/A7+UY4fRXcZfTkbUhId0m+YjXppQ0Z60lVWXVPf1iJ80X4RXZVkS59pdUe/"
@@ -1460,7 +1468,9 @@ static unsigned char image_PVSplashScreen2[] =
   "j782qu1/5fDT0jfVx2465C6s6W3xv0jO9sI/9B36Jv382y9d9gz0V/onx/7XNn7V+x66XS"
   "jCWNkZyZwM+QR80a6TNXWNHVzR4VXeaZ1ulAQ7jrtGShyyAn7zoUmtxGwfjb1HhBsUidTt"
   "nRqYk3YmdOiMr+T95PONG2/8wp//9csvv/PPf7tm7k8OTvmXzYsW7F23pqjiZMfefaVHD/"
-  "ibmgKrVxctf9x17NjJ7dt7nv7ZY//8tWmF7refnfQ3+V/+y1e7ve2Pbwrudm1NS5vyHw9s"
+  "ibmgKrVxctf9x17NjJ7dt7nv7ZY//8tWmF7refnfQ3+V/+y1e7ve2Pbwrudm1NS5vyHw9s";
+
+static char image_PVSplashScreen7[] =
   "371v196D5ZX1rR0+g/Ny4scWcAD9SibqAd+sf5DzEBws0LiMQTHHM7jXwJc7/cLLyWSiL9"
   "YVC57qqNlflb/15IGlFUfWtJw64m4uO3Uid3f6E4HO1kAgcuXwv/zi68/MPvDXn160dMau"
   "F1987bfCj7Nhj5sW5BrTId4Mafcrxt7otP+Vxk8+GQ4WmQqLnzwt/RN9mPozO72GPPPZ+O"
@@ -1639,9 +1649,7 @@ static unsigned char image_PVSplashScreen2[] =
   "Y7/gqgPXLkW4sXLTx88GBVZRW/DpPXbmb82zPdkWV7E5sNDQcIg5ah/UFCHej44SKcsfGV"
   "EH15/Chs9BcYKQeWG5bAw8gEDOrAVTZiEaI6ngE5sRlchX/FX7HiAEIud7n9+MfGREKNBX"
   "vGXBXMdsSroE+cXLBPLjcE9c+lruDT4a0VtiwSejsD1xX+Fb+QPBo7/XNsIXgV51jAJ+Ke"
-  "C5uRpBjUGE2WQQFAQlQITecxcQ/OXSizkXvjd9xPZP3/Nj3T2crEqYV7I/irjHo8uNQVZC";
-
-static unsigned char image_PVSplashScreen3[] =
+  "C5uRpBjUGE2WQQFAQlQITecxcQ/OXSizkXvjd9xPZP3/Nj3T2crEqYV7I/irjHo8uNQVZC"
   "m5wfhh+aKv4ehwNniTk0Y26C6VuKNJYaxqvrRerJYosDAW8fkQs5xsitknebE1YrBmIpY8"
   "QApWUcAvrVaF3m9p3k/PMZagA2N5Ez7e0UW4knrOn2dczyhOna5/4N6IFWt/ZpgGxpDHWI"
   "N9QjqPbzt0zmu5VrKbYRIdDzJvjAQE3iqo9Hv3tdrF87Tux/XzZxb8+NPPTfrARF/mmWGR"
@@ -1758,7 +1766,9 @@ static unsigned char image_PVSplashScreen3[] =
   "ZZrKKmFJaW1xWQ1chcs6WK/VCRX1QiVWKCD8/zS1hwim0GOVNE5+kVgllZP0zGvlF4iU/D"
   "oZ8uTbya+BGwnFSm78CMSq2jppLV/Mh0WMQgejFB6KLgYb+PXSwuKqopIqPmEz0mP/CpUB"
   "ui2vqodVT02tiDIYW9FnCKqoqRVz+odxC49fCRqoJkqgJjo8ggGGdF5BObxrUBdWkYOe4b"
-  "mgcXWtmPRA3hdRBVxL/99Z4Aw0+DPjn9YM1f2Tx0+f/P98+bmgO7ScOV80OjoQojMAotOI"
+  "mgcXWtmPRA3hdRBVxL/99Z4Aw0+DPjn9YM1f2Tx0+f/P98+bmgO7ScOV80OjoQojMAotOI";
+
+static char image_PVSplashScreen8[] =
   "o6Osgjg6sOoK5SvWURoKM+6EIt8pRiFiAV9v3+U7tt959MjL+3c+Ex04+vvvb5v76cbOix"
   "eoGXueNaQvUGdHL8MFMvv6nJ06efLSX3+ZOX3GV1/O+XbeAjj55mtvXejs3rZtx/p1mxcv"
   "/Hnm9A+//PLzbVu3L1+94scF3875dNZah7VHDh3c8JvDlPHjt2w49M7USV0XySTQ040dX6"
@@ -2023,7 +2033,9 @@ static unsigned char image_PVSplashScreen3[] =
   "DgTsp/HhGZQuP0Xl67cpW4za0H2TnFGBqRkV26YcPul7c+chrmmqjoZFixKqvq0jhA5lnA"
   "xBUV3b9l60GhzXsEZw145NWrxf0Dw4tKa0kWGx3/xiaCW6VCeBr0tnixGHS1aJGYnPx5Vw"
   "/fvIKKkLC41at3sh2CDGvWSIiLH9q8eS811IVYq1tBUQPMwobm7i6Gt3+4nUZltNG0QSYl"
-  "vA9Bm4RAj4rKoG7n1+tfcPwLvr+vHT/lNUOnjv/p28/fHBH9zcjcL0aumCY8sHN2cfU/f6"
+  "vA9Bm4RAj4rKoG7n1+tfcPwLvr+vHT/lNUOnjv/p28/fHBH9zcjcL0aumCY8sHN2cfU/f6";
+
+static char image_PVSplashScreen9[] =
   "79nRCtbxFK8gFDozKzC8HubW7tb+vof1F5ZyR88tsh+oegGQq74r9kEwzRir7uRTzboZFZ"
   "OSR1BafO9xv/GBftRQpjCdAoDfjRBEPAbcbRQYLu8ssqa5rrGzowSxF06B/8g5ffEBjSYV"
   "E/cjjn+RB9khv9JDyy/7hMAAvR69YZ373b8PBB+9ezzn8zw2TJ/FsLvr+qohQPEK2hnqKq"
@@ -2241,7 +2253,9 @@ static unsigned char image_PVSplashScreen3[] =
   "WQ5s4Pvmn80+xCslH4au1CH0Rpz2EBR0cBcXTwCOluPy3oM7hd4v6O7Q/273XfvdNl326v"
   "/Xu81258MH+x2Yyv9b7+Vn/FGltRcRfxHa5bJFy2bHcS3monJHZPTMJ+1363Q1J+R4/70+"
   "atcDZS8VzMsVOBx06GnlGKkZQJF9nqOH7S2XETVcdNUOeMV6NeDvirAR8mcLQmc3TZ6Rvm"
-  "3K4eGOpPEUkAG+FHR5sQwc3GJhGeFNbySNpPK0M9YD3ABpRNiNA703lNhCH2H0BmIUMDLj"
+  "3K4eGOpPEUkAG+FHR5sQwc3GJhGeFNbySNpPK0M9YD3ABpRNiNA703lNhCH2H0BmIUMDLj";
+
+static char image_PVSplashScreen10[] =
   "UGyEKboevsHsS9P0vLOAy2R7cDjzoiDK5FICSiMwF6AxxwoNR2pMQVnShJCTMa84/VuGj8"
   "CZGfBA88eU4tkCFDg1f7ofRH4REleD7lOR9CCaUlSUUqtNLxFYNXHhn84IQI5AiV96ChXC"
   "S11t6eYXaCC/FhS8s64I5oKlfXklJWWF+sjlJtgPx8oukEXA6AeY/yo/6xt8LiZvTAoPyd"
@@ -2474,4 +2488,16 @@ static unsigned char image_PVSplashScreen3[] =
   "+3psdoAq90ON0lepWRf9+OOv8mjrRTOuicLRaGSekZtBjTod1qyN4gZr+R0GV7DxUGsJxl"
   "qCAR3XKjM+vlYdX+KX+CV+if/qwA8SOGrdxuj1T3KBr0uWLJ0a8Vq4aNEU+ZIv+ZIv+fr/"
   "eM2fv+CyrwsW/A934lar";
+
+static char *image_PVSplashScreen[10] = {
+  image_PVSplashScreen1, 
+  image_PVSplashScreen2, 
+  image_PVSplashScreen3, 
+  image_PVSplashScreen4, 
+  image_PVSplashScreen5, 
+  image_PVSplashScreen6, 
+  image_PVSplashScreen7, 
+  image_PVSplashScreen8, 
+  image_PVSplashScreen9, 
+  image_PVSplashScreen10 };
 
