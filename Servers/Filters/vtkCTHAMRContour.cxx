@@ -42,7 +42,7 @@
 #include "vtkGarbageCollector.h"
 
 
-vtkCxxRevisionMacro(vtkCTHAMRContour, "1.10");
+vtkCxxRevisionMacro(vtkCTHAMRContour, "1.11");
 vtkStandardNewMacro(vtkCTHAMRContour);
 
 //----------------------------------------------------------------------------
@@ -183,8 +183,6 @@ void vtkCTHAMRContour::ExecuteBlock(vtkImageData* block,
 //------------------------------------------------------------------------------
 void vtkCTHAMRContour::CreateInternalPipeline()
 {
-  vtkCTHData* input = this->GetInput();
-
   // Having inputs keeps us from having to set and remove inputs.
   // The garbage collecting associated with this is expensive.
   this->Image = vtkImageData::New();
@@ -194,6 +192,7 @@ void vtkCTHAMRContour::CreateInternalPipeline()
   
   // Create the contour surface.
 #ifdef VTK_USE_PATENTED
+  vtkCTHData* input = this->GetInput();
   if (input->GetDataDimension() == 3)
     {
     vtkSynchronizedTemplates3D* tmp = vtkSynchronizedTemplates3D::New();
