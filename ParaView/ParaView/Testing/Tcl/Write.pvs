@@ -31,6 +31,10 @@ if { [catch {
   $pvWindow WriteVTKFile vtkParaViewWriteTest.$ext
   $pvWindow WriteVTKFile vtkParaViewWriteTestGhost.$ext 3
   
+  # Barrier after write.  We don't want to delete files before they
+  # are written.
+  Application BroadcastSimpleScript { [Application GetController] Barrier }
+
   file delete -force vtkParaViewWriteTest.$ext
   file delete -force vtkParaViewWriteTestGhost.$ext
 
