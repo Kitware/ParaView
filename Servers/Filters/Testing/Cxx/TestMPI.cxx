@@ -20,9 +20,8 @@
 #include "vtkPolyData.h"
 #include "vtkUnstructuredGrid.h"
 
-int main(int argc, char* argv[])
+int main(int , char* [])
 {
-
   vtkMazeSource *maze = vtkMazeSource::New();
 
   vtkMPIDuplicatePolyData *duplicate = vtkMPIDuplicatePolyData::New();
