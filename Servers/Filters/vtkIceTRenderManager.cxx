@@ -46,7 +46,7 @@ const int ICET_INFO_SIZE = sizeof(struct IceTInformation)/sizeof(int);
 // vtkIceTRenderManager implementation.
 //******************************************************************
 
-vtkCxxRevisionMacro(vtkIceTRenderManager, "1.15");
+vtkCxxRevisionMacro(vtkIceTRenderManager, "1.16");
 vtkStandardNewMacro(vtkIceTRenderManager);
 
 vtkCxxSetObjectMacro(vtkIceTRenderManager, SortingKdTree, vtkPKdTree);
@@ -75,6 +75,10 @@ vtkIceTRenderManager::vtkIceTRenderManager()
   this->ReducedImageSharesData = 0;
 
   this->DataReplicationGroup = NULL;
+
+  // Reload the controller so that we make an ICE-T context.
+  this->Superclass::SetController(NULL);
+  this->SetController(vtkMultiProcessController::GetGlobalController());  
 }
 
 vtkIceTRenderManager::~vtkIceTRenderManager()
