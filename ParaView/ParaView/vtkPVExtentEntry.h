@@ -167,6 +167,7 @@ protected:
 
   vtkPVExtentWidgetProperty *Property;
   int AnimationAxis;
+  int UseCellExtent;
   
 private:
   vtkPVExtentEntry(const vtkPVExtentEntry&); // Not implemented
