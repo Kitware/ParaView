@@ -114,7 +114,7 @@ The output of the 3D Text source is polygonal data.
                entry_and_label_on_top="0"
                display_value="0"/>
   <Documentation>
-The Arrow source appends a cylinder to a cone to form an arrow. The parameters for the Arrow source are as follows.
+The Arrow source appends a cylinder to a cone to form a 3D arrow. The parameters for the Arrow source are as follows.
 Tip resolution: Set the number of faces in the representation of the tip of the arrow (the cone). As the resolution increases, the cone will become smoother. The default value is 6.
 Tip radius: Specify the radius of the tip of the arrow (the cone). The length of the whole arrow is 1.0 unit. The default value is 0.1 units.
 Tip length: Specify the length of the tip. The value ranges between 0.0 units and 1.0 unit (the length of the whole arrow). The default is 0.35 units.
@@ -307,7 +307,7 @@ The output of the Mandelbrot source is image (uniform rectilinear) data.
                trace_name="RandomSeed" 
                type="int"
                help="Initializes the random number generator." />
-  <LabeledToggle label="ShowSolution" property="ShowSolution"
+  <LabeledToggle label="Show Solution" property="ShowSolution"
                trace_name="ShowSolution"
                help="Show the solution path." />
   <Documentation>
@@ -317,7 +317,7 @@ Y Size: Specify the size of the maze in the Y dimension. The default value is 20
 Run Factor: This value, which must be at least 2, determines the length of each run (straight segment) of the maze. The default value is 20.
 Magnet Factor: This value, which must greater than 0, determines how the path through the maze turns. With a value of 1, all directions have an equal probability of being chosen. Larger values tend to choose paths that lie next to existing paths, creating longer runs and more interesting mazes. The default value is 4.
 Random Seed: This value is used in determining the final maze. The default value is 111.
-Show Resolution: This check box toggles the visibility of the maze's solution. By default it is off.
+Show Solution: This check box toggles the visibility of the maze's solution. By default it is off.
 The output of the Maze source is polygonal data.
   </Documentation>
 </Module>
@@ -452,8 +452,8 @@ Theta resolution: This number represents the number of divisions in the theta (l
 Phi resolution: This number represents the number of divisions in the phi (latitudinal) direction. The default Phi Resolution value is 16. This number will be rounded to the nearest multiple of 4.
 Thickness: If the Toroidal box is checked, this value represents the thickness of the object as a value between 0 and 1. A value close to 0 leads to a thin object with a large hole, and a value near 1 leads to a thick object with a very small hole.
 Theta roundness: Define the roundness in the theta (longitudinal) direction. A value of 0 represents a rectangular shape, a value of 1 represents a circular shape, and values greater than 1 produce higher order shapes. The default value is 1.
-Phi roundness: Define the roundness in the theta (latitudinal) direction. A value of 0 represents a rectangular shape, a value of 1 represents a circular shape, and values greater than 1 produce higher order shapes. The default value is 1.
-Size: This value represents an isotropic size of the superquadric. By default it is 0.5. Note that the Size and Thickness parameters control coefficients of superquadric generation, so the Size value may not exactly describe the size of the superquadric.
+Phi roundness: Define the roundness in the phi (latitudinal) direction. A value of 0 represents a rectangular shape, a value of 1 represents a circular shape, and values greater than 1 produce higher order shapes. The default value is 1.
+Size: This value represents an isotropic size of the superquadric. By default it is 0.5. Note that both the Size and Thickness parameters control coefficients of superquadric generation, so the Size value may not exactly describe the size of the superquadric.
 Toroidal: If this box is not checked (the default), the generated superquadric will not contain a hole. If checked, a toroidal object is generated.
 The output of the Superquadric source is polygonal data with point normals and texture coordinates defined.
   </Documentation>
