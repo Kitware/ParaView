@@ -21,7 +21,9 @@
 #include "vtkSMObject.h"
 #include "vtkClientServerID.h" // needed for vtkClientServerID
 
-class vtkSMProxyInternals;
+//BTX
+struct vtkSMProxyInternals;
+//ETX
 class vtkSMProperty;
 
 class VTK_EXPORT vtkSMProxy : public vtkSMObject

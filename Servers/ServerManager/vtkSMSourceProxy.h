@@ -21,7 +21,9 @@
 #include "vtkSMProxy.h"
 #include "vtkClientServerID.h" // Needed for ClientServerID
 
-class vtkSMSourceProxyInternals;
+//BTX
+struct vtkSMSourceProxyInternals;
+//ETX
 class vtkSMPart;
 
 class VTK_EXPORT vtkSMSourceProxy : public vtkSMProxy
@@ -42,6 +44,9 @@ public:
 
   // Description:
   void UpdateInformation();
+
+  // Description:
+  void Update();
 
   // Description:
   vtkSetMacro(HasMultipleInputs, int);

@@ -23,7 +23,9 @@
 class vtkPVXMLElement;
 class vtkSMProperty;
 class vtkSMProxy;
-class vtkSMProxyManagerInternals;
+//BTX
+struct vtkSMProxyManagerInternals;
+//ETX
 
 class VTK_EXPORT vtkSMProxyManager : public vtkSMObject
 {
