@@ -31,7 +31,7 @@
 
 #include "spcth_interface.h"
 
-vtkCxxRevisionMacro(vtkAMRSpyPlotReader, "1.10");
+vtkCxxRevisionMacro(vtkAMRSpyPlotReader, "1.10.2.1");
 vtkStandardNewMacro(vtkAMRSpyPlotReader);
 vtkCxxSetObjectMacro(vtkAMRSpyPlotReader,Controller,vtkMultiProcessController);
 
@@ -573,12 +573,7 @@ void vtkAMRSpyPlotReader::Execute()
       double bounds[6];
       spcth_getDataBlockDimensions(spcth, block, dims, dims+1, dims+2);
       int level = spcth_getDataBlockLevel(spcth, block);
-      int b = spcth_getDataBlockBounds(spcth, block, bounds);
-      vtkDebugMacro("Level: " << level);
-      vtkDebugMacro("Dimensions: " << dims[0] << ", " << dims[1] << ", " << dims[2]);
-      vtkDebugMacro("Bounds[" << block << "] " << b << " "
-        << bounds[0] << ", " << bounds[1] << ", " << bounds[2] << ", "
-        << bounds[3] << ", " << bounds[4] << ", " << bounds[5])
+
       for ( cc = 0; cc < 3; cc ++ )
         {
         // spacing for this block
