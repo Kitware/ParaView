@@ -23,7 +23,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVTimerInformation);
-vtkCxxRevisionMacro(vtkPVTimerInformation, "1.5");
+vtkCxxRevisionMacro(vtkPVTimerInformation, "1.6");
 
 
 
@@ -225,6 +225,7 @@ void vtkPVTimerInformation::AddInformation(vtkPVInformation* info)
     }
 }
 
+//----------------------------------------------------------------------------
 void vtkPVTimerInformation::CopyToStream(vtkClientServerStream* css) const
 { 
   css->Reset();
@@ -249,12 +250,13 @@ vtkPVTimerInformation::CopyFromStream(const vtkClientServerStream* css)
     delete []this->Logs[idx];
     }
     
-  if(!css->GetArgument(0, 0, &this->NumberOfLogs))
+  int numLogs;
+  if(!css->GetArgument(0, 0, &numLogs))
     {
     vtkErrorMacro("Error NumberOfLogs from message.");
     return;
     }
-  this->Reallocate(this->NumberOfLogs);
+  this->Reallocate(numLogs);
   for (idx = 0; idx < this->NumberOfLogs; ++idx)
     {
     char* log;

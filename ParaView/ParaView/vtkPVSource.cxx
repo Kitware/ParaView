@@ -62,7 +62,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.330");
+vtkCxxRevisionMacro(vtkPVSource, "1.331");
 
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
@@ -2369,7 +2369,34 @@ int vtkPVSource::ClonePrototypeInternal(vtkPVSource*& clone)
       }
 
     // Create a vtkSource
-    pvs->AddVTKSource(pm->NewStreamObject(this->SourceClassName));
+    vtkClientServerID sourceId = pm->NewStreamObject(this->SourceClassName);
+
+    // Keep track of how long each filter takes to execute.
+    ostrstream filterName_with_warning_C4701;
+    filterName_with_warning_C4701 << "Execute " << this->SourceClassName
+                                  << " id: " << sourceId.ID << ends;
+    vtkClientServerStream start;
+    start << vtkClientServerStream::Invoke << pm->GetApplicationID() 
+          << "LogStartEvent" << filterName_with_warning_C4701.str()
+          << vtkClientServerStream::End;
+    vtkClientServerStream end;
+    end << vtkClientServerStream::Invoke << pm->GetApplicationID() 
+        << "LogEndEvent" << filterName_with_warning_C4701.str()
+        << vtkClientServerStream::End;
+    delete[] filterName_with_warning_C4701.str();
+
+    pm->GetStream() << vtkClientServerStream::Invoke << sourceId 
+                    << "AddObserver"
+                    << "StartEvent"
+                    << start
+                    << vtkClientServerStream::End;
+    pm->GetStream() << vtkClientServerStream::Invoke << sourceId 
+                    << "AddObserver"
+                    << "EndEvent"
+                    << end
+                    << vtkClientServerStream::End;
+    
+    pvs->AddVTKSource(sourceId);
     }
   pm->SendStreamToServer();
   pvs->SetView(this->GetPVWindow()->GetMainView());

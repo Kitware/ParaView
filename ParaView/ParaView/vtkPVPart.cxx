@@ -40,7 +40,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPart);
-vtkCxxRevisionMacro(vtkPVPart, "1.38");
+vtkCxxRevisionMacro(vtkPVPart, "1.39");
 
 
 int vtkPVPartCommand(ClientData cd, Tcl_Interp *interp,
@@ -400,7 +400,7 @@ void vtkPVPart::InsertExtractPiecesIfNecessary()
       pm->GetStream() << vtkClientServerStream::Invoke << tempDataPiece 
                       << "AddObserver"
                       << "EndEvent"
-                      << start
+                      << end
                       << vtkClientServerStream::End;
       }
     }
@@ -453,7 +453,7 @@ void vtkPVPart::InsertExtractPiecesIfNecessary()
       pm->GetStream() << vtkClientServerStream::Invoke << tempDataPiece 
                       << "AddObserver"
                       << "EndEvent"
-                      << start
+                      << end
                       << vtkClientServerStream::End;
       }
     }
