@@ -72,6 +72,7 @@ vtkKWTextProperty.cxx
 vtkKWThumbWheel.cxx
 vtkKWTkUtilities.cxx
 vtkKWToolbar.cxx 
+vtkKWToolbarSet.cxx 
 vtkKWUserInterfaceManager.cxx
 vtkKWUserInterfaceNotebookManager.cxx
 vtkKWUserInterfacePanel.cxx

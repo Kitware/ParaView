@@ -41,6 +41,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWFrame.h"
 #include "vtkKWLabeledFrame.h"
 #include "vtkKWToolbar.h"
+#include "vtkKWToolbarSet.h"
 #include "vtkKWWindow.h"
 #include "vtkObjectFactory.h"
 #include "vtkVector.h"
@@ -51,7 +52,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWApplicationSettingsInterface);
-vtkCxxRevisionMacro(vtkKWApplicationSettingsInterface, "1.16");
+vtkCxxRevisionMacro(vtkKWApplicationSettingsInterface, "1.17");
 
 int vtkKWApplicationSettingsInterfaceCommand(ClientData cd, Tcl_Interp *interp,
                                              int argc, char *argv[]);
@@ -418,7 +419,7 @@ void vtkKWApplicationSettingsInterface::Update()
   // If there is no toolbars, disable the interface
 
   if (!this->Window->GetToolbars() ||
-      !this->Window->GetToolbars()->GetNumberOfItems())
+      !this->Window->GetToolbars()->GetNumberOfToolbars())
     {
     if (this->FlatFrameCheckButton)
       {

@@ -69,6 +69,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWSplitFrame.h"
 #include "vtkKWTkUtilities.h"
 #include "vtkKWToolbar.h"
+#include "vtkKWToolbarSet.h"
 #include "vtkKWUserInterfaceNotebookManager.h"
 #include "vtkLinkedList.txx"
 #include "vtkLinkedListIterator.txx"
@@ -141,7 +142,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.475");
+vtkCxxRevisionMacro(vtkPVWindow, "1.476");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -173,7 +174,7 @@ vtkPVWindow::vtkPVWindow()
   // This toolbar contains buttons for modifying user interaction
   // mode
   this->InteractorToolbar = vtkKWToolbar::New();
-  this->Toolbars->AppendItem(this->InteractorToolbar);
+  this->Toolbars->AddToolbar(this->InteractorToolbar);
 
   //this->FlyButton = vtkKWRadioButton::New();
   this->RotateCameraButton = vtkKWRadioButton::New();
@@ -181,7 +182,7 @@ vtkPVWindow::vtkPVWindow()
     
   // This toolbar contains buttons for instantiating new modules
   this->Toolbar = vtkKWToolbar::New();
-  this->Toolbars->AppendItem(this->Toolbar);
+  this->Toolbars->AddToolbar(this->Toolbar);
 
   // Keep a list of the toolbar buttons so that they can be 
   // disabled/enabled in certain situations.
@@ -192,7 +193,7 @@ vtkPVWindow::vtkPVWindow()
   this->CenterOfRotationStyle = vtkPVInteractorStyleCenterOfRotation::New();
   
   this->PickCenterToolbar = vtkKWToolbar::New();
-  this->Toolbars->AppendItem(this->PickCenterToolbar);
+  this->Toolbars->AddToolbar(this->PickCenterToolbar);
 
   this->PickCenterButton = vtkKWPushButton::New();
   this->ResetCenterButton = vtkKWPushButton::New();
@@ -453,12 +454,6 @@ void vtkPVWindow::PrepareForDelete()
     this->InteractorToolbar = NULL;
     }
 
-  //if (this->FlyStyle)
-  //  {
-  //  this->FlyStyle->Delete();
-  //  this->FlyStyle = NULL;
-  //  }
-
   if (this->CameraStyle3D)
     {
     this->CameraStyle3D->Delete();
@@ -552,24 +547,6 @@ void vtkPVWindow::PrepareForDelete()
     this->PickCenterToolbar->Delete();
     this->PickCenterToolbar = NULL;
     }
-
-//   if (this->FlySpeedLabel)
-//     {
-//     this->FlySpeedLabel->Delete();
-//     this->FlySpeedLabel = NULL;
-//     }
-  
-//   if (this->FlySpeedScale)
-//     {
-//     this->FlySpeedScale->Delete();
-//     this->FlySpeedScale = NULL;
-//     }
-  
-//   if (this->FlySpeedToolbar)
-//     {
-//     this->FlySpeedToolbar->Delete();
-//     this->FlySpeedToolbar = NULL;
-//     }
 
   if (this->MainView)
     {
@@ -788,14 +765,12 @@ void vtkPVWindow::InitializeMenus(vtkKWApplication* vtkNotUsed(app))
 //-----------------------------------------------------------------------------
 void vtkPVWindow::InitializeToolbars(vtkKWApplication *app)
 {
-  this->InteractorToolbar->SetParent(this->GetToolbarFrame());
+  this->InteractorToolbar->SetParent(this->Toolbars->GetToolbarsFrame());
   this->InteractorToolbar->Create(app);
-  this->InteractorToolbar->Pack("-side left");
 
-  this->Toolbar->SetParent(this->GetToolbarFrame());
+  this->Toolbar->SetParent(this->Toolbars->GetToolbarsFrame());
   this->Toolbar->Create(app);
   this->Toolbar->ResizableOn();
-  this->Toolbar->Pack("-side left");
 }
 
 //-----------------------------------------------------------------------------
@@ -810,20 +785,6 @@ void vtkPVWindow::InitializeInteractorInterfaces(vtkKWApplication *app)
   reset_cam->SetBalloonHelpString("Reset the view to show everything visible.");
   this->InteractorToolbar->AddWidget(reset_cam);
   reset_cam->Delete();
-
-  // set up the interactor styles
-  // The interactor styles (selection and events) add no trace entries.
-  
-  // Fly interactor style
-
-//   this->FlyButton->SetParent(this->InteractorToolbar->GetFrame());
-//   this->FlyButton->Create(
-//     app, "-indicatoron 0 -highlightthickness 0 -image PVFlyButton -selectimage PVFlyButtonActive");
-//   this->FlyButton->SetBalloonHelpString(
-//     "Fly View Mode\n   Left Button: Fly toward mouse position.\n   Right Button: Fly backward");
-//   this->Script("%s configure -command {%s ChangeInteractorStyle 0}",
-//                this->FlyButton->GetWidgetName(), this->GetTclName());
-//   this->InteractorToolbar->AddWidget(this->FlyButton);
 
   // Rotate camera interactor style
 
@@ -992,7 +953,7 @@ void vtkPVWindow::Create(vtkKWApplication *app, char* vtkNotUsed(args))
   pvApp->BroadcastScript("%s VisibilityOff", this->CenterActorTclName);
   // -------------------------
 
-  this->PickCenterToolbar->SetParent(this->GetToolbarFrame());
+  this->PickCenterToolbar->SetParent(this->Toolbars->GetToolbarsFrame());
   this->PickCenterToolbar->Create(app);
   
   this->PickCenterButton->SetParent(this->PickCenterToolbar->GetFrame());
@@ -1228,9 +1189,6 @@ void vtkPVWindow::Create(vtkKWApplication *app, char* vtkNotUsed(args))
       }
     }
 
-  // The filter buttons are initially disabled.
-  this->DisableToolbarButtons();
-
   // Show glyph sources in menu.
   this->UpdateSelectMenu();
   // Show the sources (in Advanced).
@@ -1244,6 +1202,9 @@ void vtkPVWindow::Create(vtkKWApplication *app, char* vtkNotUsed(args))
 
   // Update toolbar aspect
   this->UpdateToolbarAspect();
+
+  // The filter buttons are initially disabled.
+  this->DisableToolbarButtons();
 
   // Make the 3D View Settings the current one.
   this->Script("%s invoke \"%s\"", 
@@ -1465,23 +1426,20 @@ void vtkPVWindow::ResizeCenterActor()
 //-----------------------------------------------------------------------------
 void vtkPVWindow::ChangeInteractorStyle(int index)
 {
-  this->PickCenterToolbar->Unpack();
-  //this->FlySpeedToolbar->Unpack();;
+  int pick_toolbar_vis = 0;
   
   switch (index)
     {
     case 1:
-      //this->FlyButton->SetState(0);
       this->TranslateCameraButton->SetState(0);
       // Camera styles are not duplicated on satellites.
       // Cameras are synchronized before each render.
       this->Interactor->SetInteractorStyle(this->CameraStyle3D);
-      this->PickCenterToolbar->Pack("-side left");
+      pick_toolbar_vis = 1;
       this->ResizeCenterActor();
       this->ShowCenterActor();
       break;
     case 2:
-      //this->FlyButton->SetState(0);
       this->RotateCameraButton->SetState(0);
       this->Interactor->SetInteractorStyle(this->CameraStyle2D);
       this->HideCenterActor();
@@ -1494,6 +1452,10 @@ void vtkPVWindow::ChangeInteractorStyle(int index)
       this->HideCenterActor();
       break;
     }
+
+  this->Toolbars->SetToolbarVisibility(
+    this->PickCenterToolbar, pick_toolbar_vis);
+
   this->MainView->EventuallyRender();
 }
 
@@ -3384,8 +3346,6 @@ void vtkPVWindow::EnableToolbarButtons()
   it->Delete();
 
   this->ToolbarButtonsDisabled = 0;
-
-
 }
 
 //-----------------------------------------------------------------------------
@@ -4282,7 +4242,6 @@ void vtkPVWindow::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "SourceMenu: " << this->SourceMenu << endl;
   os << indent << "Toolbar: " << this->GetToolbar() << endl;
   os << indent << "PickCenterToolbar: " << this->GetPickCenterToolbar() << endl;
-//  os << indent << "FlySpeedToolbar: " << this->GetFlySpeedToolbar() << endl;
   os << indent << "Interactor: " << this->Interactor << endl;
   os << indent << "GlyphMenu: " << this->GlyphMenu << endl;
   os << indent << "InitializeDefaultInterfaces: " 
