@@ -68,6 +68,9 @@ public:
   // Description:
   void CleanInputs(const char* method);
 
+  // Description:
+  virtual void UpdateSelfAndAllInputs();
+
 protected:
   vtkSMSourceProxy();
   ~vtkSMSourceProxy();

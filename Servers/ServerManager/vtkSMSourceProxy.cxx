@@ -24,7 +24,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMSourceProxy);
-vtkCxxRevisionMacro(vtkSMSourceProxy, "1.9");
+vtkCxxRevisionMacro(vtkSMSourceProxy, "1.10");
 
 struct vtkSMSourceProxyInternals
 {
@@ -322,6 +322,12 @@ void vtkSMSourceProxy::AddInput(
 //   return this->Consumers[i];
 // }
 
+//---------------------------------------------------------------------------
+void vtkSMSourceProxy::UpdateSelfAndAllInputs()
+{
+  this->Superclass::UpdateSelfAndAllInputs();
+  this->UpdateInformation();
+}
 
 //---------------------------------------------------------------------------
 void vtkSMSourceProxy::PrintSelf(ostream& os, vtkIndent indent)

@@ -62,7 +62,7 @@ public:
   virtual void UpdateVTKObjects();
 
   // Description:
-  void UpdateSelfAndAllInputs();
+  virtual void UpdateSelfAndAllInputs();
 
   // Description:
   // Returns the type of object managed by the proxy.
