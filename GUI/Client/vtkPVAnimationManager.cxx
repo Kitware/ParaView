@@ -61,7 +61,7 @@
 #define VTK_PV_ANIMATION_GROUP "animateable"
 
 vtkStandardNewMacro(vtkPVAnimationManager);
-vtkCxxRevisionMacro(vtkPVAnimationManager, "1.8");
+vtkCxxRevisionMacro(vtkPVAnimationManager, "1.9");
 vtkCxxSetObjectMacro(vtkPVAnimationManager, HorizantalParent, vtkKWWidget);
 vtkCxxSetObjectMacro(vtkPVAnimationManager, VerticalParent, vtkKWWidget);
 //*****************************************************************************
@@ -194,7 +194,7 @@ void vtkPVAnimationManager::Create(vtkKWApplication* app, const char* )
   this->InitStateButton->Create(app, "-image PVInitState");
   this->InitStateButton->SetCommand(this, "InitializeAnimatedPropertyStatus");
   this->InitStateButton->SetBalloonHelpString(
-    "Set a reference point for all animatable properties, so that any changes can noted.");
+    "Set a reference point for all animatable properties, so that any changes can be noted.");
   this->KeyFramesToolbar->AddWidget(this->InitStateButton);
 
   this->AddKeyFramesButton->SetParent(this->KeyFramesToolbar->GetFrame());
