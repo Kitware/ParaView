@@ -28,7 +28,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVMultiDisplayRenderModule);
-vtkCxxRevisionMacro(vtkPVMultiDisplayRenderModule, "1.1");
+vtkCxxRevisionMacro(vtkPVMultiDisplayRenderModule, "1.2");
 
 
 
@@ -129,7 +129,9 @@ void vtkPVMultiDisplayRenderModule::SetProcessModule(vtkPVProcessModule *pm)
 //----------------------------------------------------------------------------
 vtkPVPartDisplay* vtkPVMultiDisplayRenderModule::CreatePartDisplay()
 {
-  return vtkPVMultiDisplayPartDisplay::New();
+  vtkPVPartDisplay* pDisp = vtkPVMultiDisplayPartDisplay::New();
+  pDisp->SetProcessModule(this->GetProcessModule());
+  return pDisp;
 }
 
 

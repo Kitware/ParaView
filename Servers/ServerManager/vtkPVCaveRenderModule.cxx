@@ -30,7 +30,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCaveRenderModule);
-vtkCxxRevisionMacro(vtkPVCaveRenderModule, "1.1");
+vtkCxxRevisionMacro(vtkPVCaveRenderModule, "1.2");
 
 
 
@@ -221,9 +221,9 @@ void vtkPVCaveRenderModule::LoadConfigurationFile(int numDisplays)
 //----------------------------------------------------------------------------
 vtkPVPartDisplay* vtkPVCaveRenderModule::CreatePartDisplay()
 {
-  vtkPVMultiDisplayPartDisplay* pd = vtkPVMultiDisplayPartDisplay::New();
-
-  return pd;
+  vtkPVMultiDisplayPartDisplay* pDisp = vtkPVMultiDisplayPartDisplay::New();
+  pDisp->SetProcessModule(this->GetProcessModule());
+  return pDisp;
 }
 
 

@@ -44,7 +44,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSimpleRenderModule);
-vtkCxxRevisionMacro(vtkPVSimpleRenderModule, "1.1");
+vtkCxxRevisionMacro(vtkPVSimpleRenderModule, "1.2");
 
 
 //----------------------------------------------------------------------------
@@ -136,7 +136,9 @@ void vtkPVSimpleRenderModule::ComputeVisiblePropBounds(double bds[6])
 //----------------------------------------------------------------------------
 vtkPVPartDisplay* vtkPVSimpleRenderModule::CreatePartDisplay()
 {
-  return vtkPVPartDisplay::New();
+  vtkPVPartDisplay* pDisp = vtkPVPartDisplay::New();
+  pDisp->SetProcessModule(this->GetProcessModule());
+  return pDisp;
 }
 //----------------------------------------------------------------------------
 void vtkPVSimpleRenderModule::AddSource(vtkSMSourceProxy *s)
@@ -158,7 +160,6 @@ void vtkPVSimpleRenderModule::AddSource(vtkSMSourceProxy *s)
     // Create a part display for each part.
     pDisp = this->CreatePartDisplay();
     this->Displays->AddItem(pDisp);
-    pDisp->SetProcessModule(pm);
     part->SetPartDisplay(pDisp);
     pDisp->SetPart(part);
    

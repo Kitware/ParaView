@@ -26,7 +26,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLODRenderModule);
-vtkCxxRevisionMacro(vtkPVLODRenderModule, "1.1");
+vtkCxxRevisionMacro(vtkPVLODRenderModule, "1.2");
 
 //int vtkPVLODRenderModuleCommand(ClientData cd, Tcl_Interp *interp,
 //                             int argc, char *argv[]);
@@ -93,6 +93,7 @@ vtkPVPartDisplay* vtkPVLODRenderModule::CreatePartDisplay()
   vtkPVLODPartDisplay* pDisp;
 
   pDisp = vtkPVLODPartDisplay::New();
+  pDisp->SetProcessModule(this->GetProcessModule());
   pDisp->SetLODResolution(this->LODResolution);
   return pDisp;
 }

@@ -27,7 +27,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCompositeRenderModule);
-vtkCxxRevisionMacro(vtkPVCompositeRenderModule, "1.1");
+vtkCxxRevisionMacro(vtkPVCompositeRenderModule, "1.2");
 
 
 
@@ -85,6 +85,7 @@ vtkPVPartDisplay* vtkPVCompositeRenderModule::CreatePartDisplay()
   vtkPVLODPartDisplay* pDisp;
 
   pDisp = vtkPVCompositePartDisplay::New();
+  pDisp->SetProcessModule(this->GetProcessModule());
   pDisp->SetLODResolution(this->LODResolution);
   return pDisp;
 }
