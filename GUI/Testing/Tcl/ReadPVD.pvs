@@ -13,6 +13,13 @@ set kw(vtkTemp903) [$kw(vtkTemp898) GetPVWidget {Filename}]
 $kw(vtkTemp903) SetValue "$DataDir/Data/chombo3d.pvd"
 
 $kw(vtkTemp4) WriteVTKFile tmpchombo3d.pvd
+
+# Barrier after write. We don't want to delete files before they are written.
+$Application SendStringToClientAndServer {
+  Invoke id(2) GetController
+  Invoke result() Barrier
+}
+
 #delete main file:
 file delete -force tmpchombo3d.pvd
 # Delete the temporary file's pieces.
