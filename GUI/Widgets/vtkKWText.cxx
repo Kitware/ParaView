@@ -28,7 +28,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWText);
-vtkCxxRevisionMacro(vtkKWText, "1.25");
+vtkCxxRevisionMacro(vtkKWText, "1.26");
 
 //----------------------------------------------------------------------------
 vtkKWText::vtkKWText()
@@ -416,4 +416,6 @@ void vtkKWText::PrintSelf(ostream& os, vtkIndent indent)
      << (this->QuickFormatting ? "On" : "Off") << endl;
   os << indent << "UseVerticalScrollbar: " 
      << (this->UseVerticalScrollbar ? "On" : "Off") << endl;
+  os << indent << "TextWidget: " << this->TextWidget << endl;
+  os << indent << "VerticalScrollBar: " << this->VerticalScrollBar << endl;
 }
