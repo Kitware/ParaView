@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkObjectFactory.h"
 
 vtkStandardNewMacro( vtkKWRange );
-vtkCxxRevisionMacro(vtkKWRange, "1.23");
+vtkCxxRevisionMacro(vtkKWRange, "1.24");
 
 #define VTK_KW_RANGE_MIN_SLIDER_SIZE        2
 #define VTK_KW_RANGE_MIN_THICKNESS          (2*VTK_KW_RANGE_MIN_SLIDER_SIZE+1)
@@ -600,18 +600,23 @@ void vtkKWRange::GetRelativeRange(float &r0, float &r1)
     }
   else
     {
-    float whole_range = (this->WholeRange[1] - this->WholeRange[0]);
-    r0 = (this->Range[0] - this->WholeRange[0]) / whole_range;
-    r1 = (this->Range[1] - this->WholeRange[0]) / whole_range;
+    double whole_range = 
+      (double)this->WholeRange[1] - (double)this->WholeRange[0];
+    r0 = (float)(((double)this->Range[0] - (double)this->WholeRange[0]) 
+      / whole_range);
+    r1 = (float)(((double)this->Range[1] - (double)this->WholeRange[0]) 
+      / whole_range);
     }
 }
 
 //----------------------------------------------------------------------------
 void vtkKWRange::SetRelativeRange(float r0, float r1)
 {
-  float whole_range = (this->WholeRange[1] - this->WholeRange[0]);
-  this->SetRange(r0 * whole_range + this->WholeRange[0],
-                 r1 * whole_range + this->WholeRange[0]);
+  double whole_range = 
+    (double)this->WholeRange[1] - (double)this->WholeRange[0];
+  this->SetRange(
+    (float)((double)r0 * whole_range + (double)this->WholeRange[0]),
+    (float)((double)r1 * whole_range + (double)this->WholeRange[0]));
 }
 
 //----------------------------------------------------------------------------
@@ -716,9 +721,10 @@ void vtkKWRange::UpdateEntriesResolution()
 //----------------------------------------------------------------------------
 void vtkKWRange::ConstraintValueToResolution(float &value)
 {
-  if (fmod(value, this->Resolution) != 0.0)
+  if (fmod((double)value, (double)this->Resolution) != 0.0)
     {
-    value = this->Resolution * vtkKWMath::Round(value / this->Resolution);
+    value = (float)((double)this->Resolution * 
+      vtkKWMath::Round((double)value / (double)this->Resolution));
     }
 }
 
@@ -2022,18 +2028,18 @@ void vtkKWRange::MaximizeRangeCallback()
 void vtkKWRange::EnlargeRangeCallback()
 {
   float *range = this->GetRange();
-  float delta2 = ((range[1] - range[0]) / 2.0) * 2.0;
-  float center = (range[1] + range[0]) / 2.0;
-  this->SetRange(center - delta2, center + delta2);
+  double delta2 = (((double)range[1] - (double)range[0]) / 2.0) * 2.0;
+  double center = ((double)range[1] + (double)range[0]) / 2.0;
+  this->SetRange((float)(center - delta2), (float)(center + delta2));
 }
 
 //----------------------------------------------------------------------------
 void vtkKWRange::ShrinkRangeCallback()
 {
   float *range = this->GetRange();
-  float delta2 = ((range[1] - range[0]) / 2.0) / 2.0;
-  float center = (range[1] + range[0]) / 2.0;
-  this->SetRange(center - delta2, center + delta2);
+  double delta2 = (((double)range[1] - (double)range[0]) / 2.0) / 2.0;
+  double center = ((double)range[1] + (double)range[0]) / 2.0;
+  this->SetRange((float)(center - delta2), (float)(center + delta2));
 }
 
 //----------------------------------------------------------------------------
@@ -2085,7 +2091,8 @@ void vtkKWRange::SliderMotionCallback(int slider_idx, int x, int y)
     }
 
   const char *canv = this->Canvas->GetWidgetName();
-  float whole_range = (this->WholeRange[1] - this->WholeRange[0]);
+  double whole_range = 
+    (double)this->WholeRange[1] - (double)this->WholeRange[0];
 
   // Update depending on the orientation
 
@@ -2113,8 +2120,9 @@ void vtkKWRange::SliderMotionCallback(int slider_idx, int x, int y)
     {
     new_value = (float)(pos - min);
     }
-  new_value = 
-    this->WholeRange[0] + (new_value / (float)(max - min)) * whole_range;
+  new_value = (float)
+    ((double)this->WholeRange[0] + 
+     ((double)new_value / (double)(max - min)) * whole_range);
 
   if (slider_idx == vtkKWRange::SLIDER_INDEX_1)
     {
@@ -2135,7 +2143,8 @@ void vtkKWRange::RangeMotionCallback(int x, int y)
     }
 
   const char *canv = this->Canvas->GetWidgetName();
-  float whole_range = (this->WholeRange[1] - this->WholeRange[0]);
+  double whole_range = 
+    (double)this->WholeRange[1] - (double)this->WholeRange[0];
 
   // Update depending on the orientation
 
@@ -2154,39 +2163,42 @@ void vtkKWRange::RangeMotionCallback(int x, int y)
     max = atoi(this->Script("%s cget -height", canv)) - 1;
     }
 
-  float rel_delta = whole_range * 
-    (float)((pos - this->StartInteractionPos) - min) / (float)(max - min);
+  double rel_delta = 
+    whole_range * 
+    (double)((pos - this->StartInteractionPos) - min) / (double)(max - min);
   if (this->Inverted)
     {
     rel_delta = -rel_delta;
     }
 
   float new_range[2];
-  new_range[0] = this->StartInteractionRange[0] + rel_delta;
-  new_range[1] = this->StartInteractionRange[1] + rel_delta;
+  new_range[0] = (float)((double)this->StartInteractionRange[0] + rel_delta);
+  new_range[1] = (float)((double)this->StartInteractionRange[1] + rel_delta);
 
   // Check if the constrained new range has the same "width" as the old one
 
   if (!this->SliderCanPush)
     {
-    float old_delta = 
-      (this->StartInteractionRange[1] - this->StartInteractionRange[0]);
+    double old_delta = 
+      (double)this->StartInteractionRange[1] - 
+      (double)this->StartInteractionRange[0];
     this->ConstraintRange(new_range, this->Range);
 
-    if (fabs(old_delta - (new_range[1] - new_range[0])) >= this->Resolution)
+    if (fabs(old_delta - ((double)new_range[1] - (double)new_range[0])) 
+        >= this->Resolution)
       {
       if (whole_range * rel_delta > 0)  // I just care of the sign
         {
-        new_range[0] = new_range[1] - old_delta;
+        new_range[0] = (float)((double)new_range[1] - old_delta);
         }
       else
         {
-        new_range[1] = new_range[0] + old_delta;
+        new_range[1] = (float)((double)new_range[0] + old_delta);
         }
       }
     }
 
-  this->SetRange(new_range[0], new_range[1]);
+  this->SetRange((float)new_range[0], (float)new_range[1]);
 }
 
 //----------------------------------------------------------------------------
