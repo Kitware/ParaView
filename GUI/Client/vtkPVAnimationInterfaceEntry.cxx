@@ -77,7 +77,7 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterfaceEntry);
-vtkCxxRevisionMacro(vtkPVAnimationInterfaceEntry, "1.44");
+vtkCxxRevisionMacro(vtkPVAnimationInterfaceEntry, "1.45");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterfaceEntry, CurrentProperty,
                      vtkPVWidgetProperty);
@@ -159,7 +159,7 @@ void vtkPVAnimationInterfaceEntry::ExecuteEvent(vtkObject *o,
 }
 
 //-----------------------------------------------------------------------------
-const void vtkPVAnimationInterfaceEntry::CreateLabel(int idx)
+void vtkPVAnimationInterfaceEntry::CreateLabel(int idx)
 {
   char index[100];
   sprintf(index, "Action %d", idx);

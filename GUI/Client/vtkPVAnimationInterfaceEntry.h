@@ -47,7 +47,7 @@ public:
 
   void SetParent(vtkKWWidget* widget);
 
-  const void CreateLabel(int idx);
+  void CreateLabel(int idx);
 
   void Create(vtkPVApplication* pvApp, const char*);
 
