@@ -67,7 +67,7 @@ template class VTK_EXPORT vtkArrayMapIterator<vtkPVWidget*, vtkPVWidget*>;
 #endif
 
 //-----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkPVWidget, "1.32");
+vtkCxxRevisionMacro(vtkPVWidget, "1.33");
 
 //-----------------------------------------------------------------------------
 vtkPVWidget::vtkPVWidget()
@@ -294,7 +294,8 @@ void vtkPVWidget::SaveInBatchScriptForPart(ofstream*, const char*)
 {
   // Either SaveInBatchScript or SaveInBatchScriptForPart
   // must be defined.
-  vtkErrorMacro("Method not defined in subclass: " << this->GetClassName());
+  vtkErrorMacro("Method SaveInBatchScriptForPart not defined in subclass: " 
+    << this->GetClassName());
 }
 
 
@@ -435,7 +436,7 @@ void vtkPVWidget::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVWidget ";
-  this->ExtractRevision(os,"$Revision: 1.32 $");
+  this->ExtractRevision(os,"$Revision: 1.33 $");
 }
 
 //-----------------------------------------------------------------------------
