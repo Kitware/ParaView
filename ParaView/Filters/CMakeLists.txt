@@ -60,6 +60,11 @@ IF(NOT PARAVIEW_NO_HDF5)
   SET(Filters_SRCS ${Filters_SRCS} vtkHDF5RawImageReader.cxx)
 ENDIF(NOT PARAVIEW_NO_HDF5)
 
+INCLUDE_DIRECTORIES(${PARAVIEW_BINARY_DIR}/Filters)
+CONFIGURE_FILE(${PARAVIEW_SOURCE_DIR}/Filters/vtkPVFiltersConfig.h.in
+  ${PARAVIEW_BINARY_DIR}/Filters/vtkPVFiltersConfig.h
+  ESCAPE_QUOTES)
+
 # Create filters library.
 ADD_LIBRARY(vtkPVFilters ${Filters_SRCS})
 TARGET_LINK_LIBRARIES(vtkPVFilters vtkKWCommonTCL vtkHybrid vtkParallel)
