@@ -54,6 +54,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVWidget.h"
 
 class vtkKWEntry;
+class vtkKWLabel;
+class vtkKWLabeledFrame;
 class vtkLineWidget;
 class vtkLineWidgetObserver;
 
@@ -97,9 +99,6 @@ protected:
   vtkPVLineWidget();
   ~vtkPVLineWidget();
   
-  vtkPVLineWidget(const vtkPVLineWidget&); // Not implemented
-  void operator=(const vtkPVLineWidget&); // Not implemented
-
   vtkLineWidget* Widget3D;
   vtkLineWidgetObserver* Observer;
 
@@ -115,7 +114,13 @@ protected:
 
   vtkKWEntry* Point1[3];
   vtkKWEntry* Point2[3];
-  
+  vtkKWLabel* Labels[2];
+  vtkKWLabel* CoordinateLabel[3];
+  vtkKWLabeledFrame* Frame;
+
+private:  
+  vtkPVLineWidget(const vtkPVLineWidget&); // Not implemented
+  void operator=(const vtkPVLineWidget&); // Not implemented
 };
 
 #endif

@@ -45,6 +45,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkDataSet.h"
 #include "vtkKWEntry.h"
 #include "vtkKWFrame.h"
+#include "vtkKWLabel.h"
+#include "vtkKWLabeledFrame.h"
 #include "vtkLineWidget.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
@@ -117,11 +119,15 @@ vtkPVLineWidget::vtkPVLineWidget()
   this->Widget3D = vtkLineWidget::New();
   this->Observer = vtkLineWidgetObserver::New();
   this->Observer->PVLineWidget = this;
+  this->Labels[0] = vtkKWLabel::New();
+  this->Labels[1] = vtkKWLabel::New();
   for (int i=0; i<3; i++)
     {
     this->Point1[i] = vtkKWEntry::New();
     this->Point2[i] = vtkKWEntry::New();
+    this->CoordinateLabel[i] = vtkKWLabel::New();
     }
+  this->Frame    = vtkKWLabeledFrame::New();
 }
 
 //----------------------------------------------------------------------------
@@ -135,11 +141,15 @@ vtkPVLineWidget::~vtkPVLineWidget()
     }
   this->Widget3D->Delete();
   this->Observer->Delete();
+  this->Labels[0]->Delete();
+  this->Labels[1]->Delete();
   for (int i=0; i<3; i++)
     {
     this->Point1[i]->Delete();
     this->Point2[i]->Delete();
+    this->CoordinateLabel[i]->Delete();
     }
+  this->Frame->Delete();
 }
 
 
@@ -160,34 +170,56 @@ void vtkPVLineWidget::Create(vtkKWApplication *pvApp)
   wname = this->GetWidgetName();
   this->Script("frame %s -borderwidth 0 -relief flat", wname);
 
-//  vtkKWFrame* frame = vtkKWFrame::New();
-//  frame->SetParent(this);
-//  frame->Create(pvApp, 0);
-//  frame->UnRegister(this);
+  this->Frame->SetParent(this);
+  this->Frame->Create(pvApp);
+  this->Frame->SetLabel("Line Widget");
+  this->Script("%s configure -bg red", 
+	       this->Frame->GetFrame()->GetWidgetName());
 
+  this->Script("pack %s -fill both -expand 1", 
+	       this->Frame->GetWidgetName());
+  
+  this->Labels[0]->SetParent(this->Frame->GetFrame());
+  this->Labels[0]->Create(pvApp, "");
+  this->Labels[0]->SetLabel("Point 0");
+  this->Labels[1]->SetParent(this->Frame->GetFrame());
+  this->Labels[1]->Create(pvApp, "");
+  this->Labels[1]->SetLabel("Point 1");
   int i;
   for (i=0; i<3; i++)
     {
-    this->Point1[i]->SetParent(this);
+    this->CoordinateLabel[i]->SetParent(this->Frame->GetFrame());
+    this->CoordinateLabel[i]->Create(pvApp, "");
+    char buffer[3];
+    sprintf(buffer, "%c", "xyz"[i]);
+    this->CoordinateLabel[i]->SetLabel(buffer);
+    this->Point1[i]->SetParent(this->Frame->GetFrame());
     this->Point1[i]->Create(pvApp, "");
     
-    this->Point2[i]->SetParent(this);
+    this->Point2[i]->SetParent(this->Frame->GetFrame());
     this->Point2[i]->Create(pvApp, "");
     }
     
-  this->Script("grid %s %s %s -sticky ew",
+  this->Script("grid propagate %s 1",
+	       this->Frame->GetFrame()->GetWidgetName());
+
+  this->Script("grid x %s %s %s -sticky ew",
+	       this->CoordinateLabel[0]->GetWidgetName(),
+	       this->CoordinateLabel[1]->GetWidgetName(),
+	       this->CoordinateLabel[2]->GetWidgetName());
+  this->Script("grid %s %s %s %s -sticky ew",
+	       this->Labels[0]->GetWidgetName(),
 	       this->Point1[0]->GetWidgetName(),
 	       this->Point1[1]->GetWidgetName(),
 	       this->Point1[2]->GetWidgetName());
-  this->Script("grid %s %s %s -sticky ew",
+  this->Script("grid %s %s %s %s -sticky ew",
+	       this->Labels[1]->GetWidgetName(),
 	       this->Point2[0]->GetWidgetName(),
 	       this->Point2[1]->GetWidgetName(),
 	       this->Point2[2]->GetWidgetName());
   this->Script("grid columnconfigure %s 0 -weight 1", this->GetWidgetName());
-  this->Script("grid columnconfigure %s 1 -weight 1", this->GetWidgetName());
-  this->Script("grid columnconfigure %s 2 -weight 1", this->GetWidgetName());
-
-//  this->Script("pack %s -side top", frame->GetWidgetName());
+  this->Script("grid columnconfigure %s 0 -weight 1", this->GetWidgetName());
+  this->Script("grid columnconfigure %s 0 -weight 1", this->GetWidgetName());
 
   for (i=0; i<3; i++)
     {
