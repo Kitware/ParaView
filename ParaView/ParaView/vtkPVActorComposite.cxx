@@ -175,7 +175,7 @@ void vtkPVActorComposite::CreateParallelTclObjects(vtkPVApplication *pvApp)
   sprintf(tclName, "Geometry%d", this->InstanceCount);
   pvApp->BroadcastScript("vtkPVGeometryFilter %s", tclName);
   this->SetGeometryTclName(tclName);
-
+  
   // Get rid of previous object created by the superclass.
   if (this->Mapper)
     {
@@ -187,7 +187,10 @@ void vtkPVActorComposite::CreateParallelTclObjects(vtkPVApplication *pvApp)
   this->Mapper = (vtkPolyDataMapper*)pvApp->MakeTclObject("vtkPolyDataMapper", tclName);
   this->MapperTclName = NULL;
   this->SetMapperTclName(tclName);
-  pvApp->BroadcastScript("%s ImmediateModeRenderingOn", this->MapperTclName);
+  
+  pvApp->BroadcastScript("%s ImmediateModeRenderingOn",
+                         this->MapperTclName);
+  
   pvApp->BroadcastScript("%s SetInput [%s GetOutput]", this->MapperTclName,
                          this->GeometryTclName);
   
@@ -1370,6 +1373,12 @@ void vtkPVActorComposite::Initialize()
     this->ColorByPropertyInternal();
     this->ColorMenu->SetValue("Property");
     }
+  
+  pvApp->BroadcastScript("%s SetUseStrips %d", this->GeometryTclName,
+                         ((vtkPVRenderView*)this->GetView())->GetTriangleStripsCheck()->GetState());
+  pvApp->BroadcastScript("%s SetImmediateModeRendering %d",
+                         this->MapperTclName,
+                         ((vtkPVRenderView*)this->GetView())->GetImmediateModeCheck()->GetState());
 }
 
 //----------------------------------------------------------------------------

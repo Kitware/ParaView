@@ -74,6 +74,10 @@ public:
   void CreateRenderObjects(vtkPVApplication *pvApp);
   
   // Description:
+  // Add widgets to vtkKWView's notebook
+  virtual void CreateViewProperties();
+  
+  // Description:
   // Create the TK widgets associated with the view.
   void Create(vtkKWApplication *app, const char *args);
 
@@ -193,6 +197,22 @@ public:
   vtkGetMacro(StillCompositeTime, double);
   vtkGetMacro(InteractiveCompositeTime, double);
 
+  // Description:
+  // Callback for the triangle strips check button
+  void TriangleStripsCallback();
+  
+  // Description:
+  // Callback for the immediate mode rendering check button
+  void ImmediateModeCallback();
+
+  // Description:
+  // Get the triangle strips check button.
+  vtkGetObjectMacro(TriangleStripsCheck, vtkKWCheckButton);
+  
+  // Description:
+  // Get the immediate mode rendering check button.
+  vtkGetObjectMacro(ImmediateModeCheck, vtkKWCheckButton);
+  
 protected:
 
   vtkPVRenderView();
@@ -219,6 +239,9 @@ protected:
 
   vtkKWInteractor *CurrentInteractor;
 
+  vtkKWCheckButton *TriangleStripsCheck;
+  vtkKWCheckButton *ImmediateModeCheck;
+  
   int EventuallyRenderFlag;
   char* RenderPending;
   vtkSetStringMacro(RenderPending);

@@ -119,6 +119,10 @@ vtkPVRenderView::vtkPVRenderView()
 
   this->SetMenuPropertiesName(" 3D View Settings");
   this->SetMenuPropertiesHelp("Show global view parameters (background color, annoations2 etc.)");
+  
+  this->TriangleStripsCheck = vtkKWCheckButton::New();
+  
+  this->ImmediateModeCheck = vtkKWCheckButton::New();
 }
 
 //----------------------------------------------------------------------------
@@ -278,6 +282,11 @@ vtkPVRenderView::~vtkPVRenderView()
     this->TopLevelRenderWindow->Delete();
     this->TopLevelRenderWindow = NULL;
     }
+  
+  this->TriangleStripsCheck->Delete();
+  this->TriangleStripsCheck = NULL;
+  this->ImmediateModeCheck->Delete();
+  this->ImmediateModeCheck = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -422,9 +431,28 @@ void vtkPVRenderView::Create(vtkKWApplication *app, const char *args)
   // 360
   this->NavigationCanvas->Create(this->Application, "canvas", "-height 45 -width 356 -bg white"); 
   this->Script("pack %s -fill x -expand t -side top", this->NavigationCanvas->GetWidgetName());
-
+  
   this->EventuallyRender();
   delete [] local;
+}
+
+void vtkPVRenderView::CreateViewProperties()
+{
+  this->vtkKWView::CreateViewProperties();
+
+  this->TriangleStripsCheck->SetParent(this->GeneralProperties);
+  this->TriangleStripsCheck->Create(this->Application, "-text \"Use Triangle Strips\"");
+  this->TriangleStripsCheck->SetCommand(this, "TriangleStripsCallback");
+  this->TriangleStripsCheck->SetState(0);
+  
+  this->ImmediateModeCheck->SetParent(this->GeneralProperties);
+  this->ImmediateModeCheck->Create(this->Application, "-text \"Use Immediate Mode Rendering\"");
+  this->ImmediateModeCheck->SetCommand(this, "ImmediateModeCallback");
+  this->ImmediateModeCheck->SetState(1);
+  
+  this->Script("pack %s %s -side top -anchor w",
+               this->TriangleStripsCheck->GetWidgetName(),
+               this->ImmediateModeCheck->GetWidgetName());
 }
 
 void vtkPVRenderView::UpdateNavigationWindow(vtkPVSource *currentSource)
@@ -997,7 +1025,50 @@ void vtkPVRenderView::SetInteractor(vtkKWInteractor *interactor)
                            this->GetTclName(), interactor->GetTclName());
       }
     }
+}
 
+//----------------------------------------------------------------------------
+void vtkPVRenderView::TriangleStripsCallback()
+{
+  int numComps = this->Composites->GetNumberOfItems();
+  int i;
+  vtkPVActorComposite *comp;
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  
+  this->Composites->InitTraversal();
+  
+  for (i = 0; i < numComps; i++)
+    {
+    comp = vtkPVActorComposite::SafeDownCast(this->Composites->GetNextKWComposite());
+    if (comp)
+      {
+      pvApp->BroadcastScript("%s SetUseStrips %d",
+                             comp->GetGeometryTclName(),
+                             this->TriangleStripsCheck->GetState());
+      }
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::ImmediateModeCallback()
+{
+  int numComps = this->Composites->GetNumberOfItems();
+  int i;
+  vtkPVActorComposite *comp;
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  
+  this->Composites->InitTraversal();
+  
+  for (i = 0; i < numComps; i++)
+    {
+    comp = vtkPVActorComposite::SafeDownCast(this->Composites->GetNextKWComposite());
+    if (comp)
+      {
+      pvApp->BroadcastScript("%s SetImmediateModeRendering %d",
+                             comp->GetMapperTclName(),
+                             this->TriangleStripsCheck->GetState());
+      }
+    }
 }
 
 //----------------------------------------------------------------------------

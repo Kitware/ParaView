@@ -244,6 +244,14 @@ public:
   void ChangeColorMapToBlueRed();
   void ChangeColorMapToGrayscale();
 
+  // Description:
+  // Get the tcl name of the vtkPVGeometryFilter.
+  vtkGetStringMacro(GeometryTclName);
+
+  // Description:
+  // Get the tcl name of the mapper
+  vtkGetStringMacro(MapperTclName);
+  
 protected:
 
   vtkPVActorComposite();
