@@ -33,14 +33,14 @@ public:
 
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  void Execute();
-
 protected:
 
   vtkCleanUnstructuredGrid();
   ~vtkCleanUnstructuredGrid();
 
   vtkPointLocator *Locator;
+
+  void Execute();
 
 private:
 
