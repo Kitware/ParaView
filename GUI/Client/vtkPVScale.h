@@ -22,7 +22,6 @@
 
 class vtkKWScale;
 class vtkKWLabel;
-class vtkPVScalarListWidgetProperty;
 
 class VTK_EXPORT vtkPVScale : public vtkPVObjectWidget
 {
@@ -87,7 +86,7 @@ public:
   // Called when accept button is pushed.
   // Sets objects variable to the widgets value.
   // Side effect is to turn modified flag off.
-  virtual void AcceptInternal(vtkClientServerID);
+  virtual void Accept();
   //ETX
 
   // Description:
@@ -115,20 +114,6 @@ public:
   vtkSetMacro(Round, int);
   vtkGetMacro(Round, int);
   vtkBooleanMacro(Round, int);
-  
-  // Description:
-  // Set/get the property to use with this widget.
-  virtual void SetProperty(vtkPVWidgetProperty *prop);
-  virtual vtkPVWidgetProperty* GetProperty();
-  
-  // Description:
-  // Create the right property for use with this widget.
-  virtual vtkPVWidgetProperty* CreateAppropriateProperty();
-  
-  // Description:
-  // Call Set VariableName with the time passed to it.
-  // This is used as a script callback in AnimationMenuCallback.
-  void SetObjectVariableToPVTime(int time);
   
   // Description:
   // Flags to determine how to display the scale.
@@ -165,6 +150,7 @@ protected:
   int EntryFlag;
   int EntryAndLabelOnTopFlag;
   int DisplayValueFlag;
+  int Round;
   
   vtkKWLabel *LabelWidget;
   vtkKWScale *Scale;
@@ -180,20 +166,6 @@ protected:
   vtkGetStringMacro(RangeSourceVariable);
   char* RangeSourceVariable;
   
-  int Round;
-
-  int AcceptedValueInitialized;
-
-  vtkPVScalarListWidgetProperty *Property;
-
-  void UpdateVTKSourceInternal(vtkClientServerID sourceID,
-                               float value);
-
-  vtkSetMacro(DefaultValue, float);
-  vtkGetMacro(DefaultValue, float);
-
-  float DefaultValue;
-
   int TraceSliderMovement;
   
 //BTX

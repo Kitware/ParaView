@@ -480,7 +480,7 @@
          name="EndTheta"
          command="SetEndTheta"
          number_of_elements="1"
-         default_values="0" >
+         default_values="360" >
         <DoubleRangeDomain name="range" min="0" max="360" />
       </DoubleVectorProperty>
 
@@ -504,7 +504,7 @@
          name="EndPhi"
          command="SetEndPhi"
          number_of_elements="1"
-         default_values="0" >
+         default_values="180" >
         <DoubleRangeDomain name="range" min="0" max="360" />
       </DoubleVectorProperty>
    <!-- End Sphere -->

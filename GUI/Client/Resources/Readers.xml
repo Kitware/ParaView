@@ -444,8 +444,9 @@
                  help="An XML file containing part and material descriptions and mapping to element blocks." />
 
 
-    <Scale variable="TimeStep"
-           type="int"
+    <Scale label="TimeStep"
+           trace_name="TimeStep"
+           property="TimeStep"
            label="Time step" trace_name="TimeStep"
            help="Set the current timestep."
            range_source="TimeStepRange" />
@@ -511,7 +512,9 @@
           module_type="Reader" extensions=".saf"
           file_description="SAF Reader">
     <Source class="vtkSAFPVReader"/>
-    <Scale variable="TimeStep"
+    <Scale label="TimeStep"
+           trace_name="TimeStep"
+           property="TimeStep"
            type="int"
            label="Time step" trace_name="TimeStep"
            help="Set the current timestep."

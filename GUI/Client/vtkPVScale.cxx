@@ -24,16 +24,19 @@
 #include "vtkPVAnimationInterfaceEntry.h"
 #include "vtkPVApplication.h"
 #include "vtkPVProcessModule.h"
-#include "vtkPVScalarListWidgetProperty.h"
 #include "vtkPVSource.h"
 #include "vtkPVXMLElement.h"
 #include "vtkClientServerStream.h"
+#include "vtkSMDoubleRangeDomain.h"
+#include "vtkSMDoubleVectorProperty.h"
+#include "vtkSMIntRangeDomain.h"
+#include "vtkSMIntVectorProperty.h"
 
 #include <vtkstd/string>
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVScale);
-vtkCxxRevisionMacro(vtkPVScale, "1.41");
+vtkCxxRevisionMacro(vtkPVScale, "1.42");
 
 //----------------------------------------------------------------------------
 vtkPVScale::vtkPVScale()
@@ -41,12 +44,9 @@ vtkPVScale::vtkPVScale()
   this->EntryLabel = 0;
   this->LabelWidget = vtkKWLabel::New();
   this->Scale = vtkKWScale::New();
-  this->Round = 0;
   this->RangeSourceVariable = 0;
-  this->Property = 0;
-  this->DefaultValue = 0.0;
-  this->AcceptedValueInitialized = 0;
   this->EntryFlag = 0;
+  this->Round = 0;
   this->EntryAndLabelOnTopFlag = 1;
   this->DisplayValueFlag = 1;
   this->TraceSliderMovement = 0;
@@ -60,16 +60,17 @@ vtkPVScale::~vtkPVScale()
   this->Scale = NULL;
   this->LabelWidget->Delete();
   this->LabelWidget = NULL;
-  this->SetProperty(NULL);
   this->SetRangeSourceVariable(0);
 }
 
+//----------------------------------------------------------------------------
 void vtkPVScale::SetLabel(const char* label)
 {
   this->SetEntryLabel(label);
   this->LabelWidget->SetLabel(label);
 }
 
+//----------------------------------------------------------------------------
 void vtkPVScale::SetBalloonHelpString(const char *str)
 {
 
@@ -217,26 +218,22 @@ void vtkPVScale::Create(vtkKWApplication *pvApp)
                this->Scale->GetWidgetName());
 }
 
-
 //----------------------------------------------------------------------------
 void vtkPVScale::SetValue(float val)
 {
   float newVal;
   float oldVal;
   
-  if(this->Round)
+  vtkSMIntVectorProperty *ivp = vtkSMIntVectorProperty::SafeDownCast(
+    this->GetSMProperty());
+  
+  if(ivp || this->Round)
     {
     newVal = this->RoundValue(val);
     }
   else
     {
     newVal = val;
-    }
-  
-  if (this->Property && !this->AcceptedValueInitialized)
-    {
-    this->Property->SetScalars(1, &newVal);
-    this->AcceptedValueInitialized = 1;
     }
   
   oldVal = this->Scale->GetValue();
@@ -251,62 +248,78 @@ void vtkPVScale::SetValue(float val)
   this->ModifiedCallback();
 }
 
-
 //-----------------------------------------------------------------------------
 void vtkPVScale::SaveInBatchScript(ofstream *file)
 {
-  float scalar, scaleValue = this->GetValue();
-  if(this->Round)
+  vtkClientServerID sourceID = this->PVSource->GetVTKSourceID(0);
+  
+  if (sourceID.ID == 0 || !this->SMPropertyName)
     {
-    scalar = this->RoundValue(scaleValue);
-    }
-  else
-    {
-    scalar = scaleValue;
+    vtkErrorMacro("Sanity check failed. " << this->GetClassName());
+    return;
     }
   
-  *file << "  if { [[$pvTemp" <<  this->PVSource->GetVTKSourceID(0) 
-        << " GetProperty " << this->VariableName
-        << "] GetClassName] == \"vtkSMIntVectorProperty\"} {" << endl;
-  *file << "    set value [expr round(" << scalar << ")]" << endl;
-  *file << "  } else {" << endl;
-  *file << "    set value " << scalar << endl;
-  *file << "  }" << endl;
+  vtkSMDoubleVectorProperty *dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+    this->GetSMProperty());
+  vtkSMIntVectorProperty *ivp = vtkSMIntVectorProperty::SafeDownCast(
+    this->GetSMProperty());
 
-  *file << "  [$pvTemp" << this->PVSource->GetVTKSourceID(0) 
-        <<  " GetProperty " << this->VariableName << "] SetElements1 $value"
-        << endl;
+  *file << "  [$pvTemp" << sourceID << " GetProperty "
+        << this->SMPropertyName << "] SetElement 0 ";
+  if (ivp || this->Round)
+    {
+    *file << this->RoundValue(this->GetValue()) << endl;
+    }
+  else if (dvp)
+    {
+    *file << this->GetValue() << endl;
+    }
 }
 
-
 //----------------------------------------------------------------------------
-void vtkPVScale::AcceptInternal(vtkClientServerID sourceID)
+void vtkPVScale::Accept()
 {
-  if (sourceID.ID && this->VariableName)
-    { 
-    float scalar, scaleValue = this->GetValue();
-    if (this->EntryFlag)
+  int modFlag = this->GetModifiedFlag();
+  vtkSMDoubleVectorProperty *dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+    this->GetSMProperty());
+  vtkSMIntVectorProperty *ivp = vtkSMIntVectorProperty::SafeDownCast(
+    this->GetSMProperty());
+
+  if (this->EntryFlag)
+    {
+    float entryValue;
+    entryValue = this->Scale->GetEntry()->GetValueAsFloat();
+    if (entryValue != this->GetValue())
       {
-      float entryValue;
-      entryValue = this->Scale->GetEntry()->GetValueAsFloat();
-      if (entryValue != scaleValue)
-        {
-        scaleValue = entryValue;
-        this->Scale->SetValue(entryValue);
-        }
+      this->Scale->SetValue(entryValue);
       }
-    if(this->Round)
-      {
-      scalar = this->RoundValue(scaleValue);
-      }
-    else
-      {
-      scalar = scaleValue;
-      }
-    this->UpdateVTKSourceInternal(sourceID, scalar);
+    }
+
+  if (dvp)
+    {
+    dvp->SetElement(0, this->GetValue());
+    }
+  else if (ivp)
+    {
+    ivp->SetElement(0, this->RoundValue(this->GetValue()));
     }
 
   this->ModifiedFlag = 0;
+
+  // I put this after the accept internal, because
+  // vtkPVGroupWidget inactivates and builds an input list ...
+  // Putting this here simplifies subclasses AcceptInternal methods.
+  if (modFlag)
+    {
+    vtkPVApplication *pvApp = this->GetPVApplication();
+    ofstream* file = pvApp->GetTraceFile();
+    if (file)
+      {
+      this->Trace(file);
+      }
+    }
+
+  this->AcceptCalled = 1;
 }
 
 //---------------------------------------------------------------------------
@@ -330,14 +343,14 @@ void vtkPVScale::Trace(ofstream *file)
         << this->Scale->GetValue() << endl;
 }
 
-
 //----------------------------------------------------------------------------
 void vtkPVScale::ResetInternal()
 {
- if (this->Property)
-    {
-    this->SetValue(this->Property->GetScalar(0));
-    }
+  vtkSMDoubleVectorProperty *dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+    this->GetSMProperty());
+  vtkSMIntVectorProperty *ivp = vtkSMIntVectorProperty::SafeDownCast(
+    this->GetSMProperty());
+  
   if ( this->ObjectID.ID != 0 && this->RangeSourceVariable )
     {
     vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
@@ -346,10 +359,18 @@ void vtkPVScale::ResetInternal()
     pm->GetStream() << vtkClientServerStream::Invoke << this->ObjectID
                     << str.str() << vtkClientServerStream::End;
     pm->SendStream(vtkProcessModule::DATA_SERVER_ROOT);
-    int range[2] = { 0, 0 };
+    double range[2] = { 0, 0 };
     pm->GetLastServerResult().GetArgument(0,0, range, 2);
-    this->Script("eval %s SetRange %i %i", this->Scale->GetTclName(), 
-      range[0], range[1]);
+    this->Scale->SetRange(range);
+    }
+
+  if (dvp)
+    {
+    this->SetValue(dvp->GetElement(0));
+    }
+  else if (ivp)
+    {
+    this->SetValue(ivp->GetElement(0));
     }
 
   if (this->AcceptCalled)
@@ -377,11 +398,11 @@ void vtkPVScale::CopyProperties(vtkPVWidget* clone, vtkPVSource* pvSource,
     float min, max;
     this->Scale->GetRange(min, max);
     pvs->SetRange(min, max);
-    pvs->SetDefaultValue(this->GetDefaultValue());
     pvs->SetResolution(this->Scale->GetResolution());
     pvs->SetLabel(this->EntryLabel);
     pvs->SetRangeSourceVariable(this->RangeSourceVariable);
     pvs->SetEntryFlag(this->EntryFlag);
+    pvs->SetRound(this->Round);
     pvs->SetEntryAndLabelOnTopFlag(this->EntryAndLabelOnTopFlag);
     pvs->SetDisplayValueFlag(this->DisplayValueFlag);
     pvs->SetTraceSliderMovement(this->GetTraceSliderMovement());
@@ -433,28 +454,6 @@ int vtkPVScale::ReadXMLAttributes(vtkPVXMLElement* element,
     }
   this->SetRange(range[0], range[1]);
 
-  // Setup the default value.
-  float default_value;
-  if(!element->GetScalarAttribute("default_value",&default_value))
-    {
-    this->SetDefaultValue(range[0]);
-    }
-  else
-    {
-    if (default_value < range[0] )
-      {
-      this->SetDefaultValue(range[0]);
-      }
-    else if (default_value > range[1])
-      {
-      this->SetDefaultValue(range[1]);
-      }
-    else
-      {
-      this->SetDefaultValue(default_value);
-      }
-    }
-
   const char* range_source = element->GetAttribute("range_source");
   if(range_source)
     {
@@ -493,8 +492,8 @@ int vtkPVScale::ReadXMLAttributes(vtkPVXMLElement* element,
 void vtkPVScale::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
-  os << indent << "Round: " << this->Round << endl;
   os << indent << "EntryFlag: " << this->EntryFlag << endl;
+  os << indent << "Round: " << this->Round << endl;
   os << indent << "EntryAndLabelOnTopFlag: " << this->EntryAndLabelOnTopFlag
      << endl;
   os << indent << "DisplayValueFlag: " << this->DisplayValueFlag << endl;
@@ -512,30 +511,54 @@ void vtkPVScale::AddAnimationScriptsToMenu(vtkKWMenu *menu,
 }
 
 //----------------------------------------------------------------------------
-void vtkPVScale::SetObjectVariableToPVTime(int time)
-{
-  this->UpdateVTKSourceInternal(this->ObjectID, time);
-}
-  
-//----------------------------------------------------------------------------
 void vtkPVScale::AnimationMenuCallback(vtkPVAnimationInterfaceEntry *ai)
 {
-  char script[500];
-  
   if (ai->InitializeTrace(NULL))
     {
     this->AddTraceEntry("$kw(%s) AnimationMenuCallback $kw(%s)", 
                         this->GetTclName(), ai->GetTclName());
     }
   
-  // I do not like setting the label like this but ...
-  sprintf(script, "%s SetObjectVariableToPVTime $pvTime", 
-          this->GetTclName());
-  ai->SetLabelAndScript(this->LabelWidget->GetLabel(), script, this->GetTraceName());
-  ai->SetCurrentProperty(this->Property);
-  ai->SetTimeStart(this->GetRangeMin());
-  ai->SetTimeEnd(this->GetRangeMax());
-  ai->SetTypeToFloat();
+  ai->SetLabelAndScript(this->LabelWidget->GetLabel(), NULL, this->GetTraceName());
+  
+  vtkSMProperty *prop = this->GetSMProperty();
+  vtkSMDomain *dom = prop->GetDomain("range");
+  
+  ai->SetCurrentSMProperty(prop);
+  ai->SetCurrentSMDomain(dom);
+  
+  if (dom)
+    {
+    vtkSMIntRangeDomain *iDom = vtkSMIntRangeDomain::SafeDownCast(dom);
+    vtkSMDoubleRangeDomain *dDom = vtkSMDoubleRangeDomain::SafeDownCast(dom);
+    int minExists = 0, maxExists = 0;
+    if (iDom)
+      {
+      int min = iDom->GetMinimum(0, minExists);
+      int max = iDom->GetMaximum(0, maxExists);
+      if (minExists && maxExists)
+        {
+        ai->SetTimeStart(min);
+        ai->SetTimeEnd(max);
+        }
+      }
+    else if (dDom)
+      {
+      double min = dDom->GetMinimum(0, minExists);
+      double max = dDom->GetMaximum(0, maxExists);
+      if (minExists && maxExists)
+        {
+        ai->SetTimeStart(min);
+        ai->SetTimeEnd(max);
+        }
+      }
+    }
+  else
+    {
+    ai->SetTimeStart(this->GetRangeMin());
+    ai->SetTimeEnd(this->GetRangeMax());
+    }
+  
   ai->Update();
 }
 
@@ -553,46 +576,10 @@ int vtkPVScale::RoundValue(float val)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVScale::SetProperty(vtkPVWidgetProperty *prop)
-{
-  this->Property = vtkPVScalarListWidgetProperty::SafeDownCast(prop);
-  if (this->Property)
-    {
-    this->Property->SetScalars(1, &this->DefaultValue);
-    }
-}
-
-//----------------------------------------------------------------------------
-vtkPVWidgetProperty* vtkPVScale::GetProperty()
-{
-  return this->Property;
-}
-
-//----------------------------------------------------------------------------
-vtkPVWidgetProperty* vtkPVScale::CreateAppropriateProperty()
-{
-  return vtkPVScalarListWidgetProperty::New();
-}
-
-//----------------------------------------------------------------------------
 void vtkPVScale::UpdateEnableState()
 {
   this->Superclass::UpdateEnableState();
 
   this->PropagateEnableState(this->LabelWidget);
   this->PropagateEnableState(this->Scale);
-}
-
-//----------------------------------------------------------------------------
-void vtkPVScale::UpdateVTKSourceInternal(vtkClientServerID sourceID,
-                                         float value)
-{
-  vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
-  vtkstd::string method = "Set";
-  method += this->VariableName;
-  pm->GetStream() << vtkClientServerStream::Invoke
-                  << sourceID << method.c_str() << value
-                  << vtkClientServerStream::End;
-  pm->SendStream(vtkProcessModule::DATA_SERVER);
-  this->Property->SetScalars(1, &value);
 }
