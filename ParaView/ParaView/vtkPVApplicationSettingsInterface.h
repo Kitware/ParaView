@@ -75,8 +75,8 @@ public:
 
   // Description:
   // Callback used when interaction has been performed.
-  void ShowSourcesDescriptionCallback();
-  void ShowSourcesNameCallback();
+  virtual void ShowSourcesDescriptionCallback();
+  virtual void ShowSourcesNameCallback();
 
 protected:
   vtkPVApplicationSettingsInterface();
