@@ -32,7 +32,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVTempTessellatorEntry);
-vtkCxxRevisionMacro(vtkPVTempTessellatorEntry, "1.5");
+vtkCxxRevisionMacro(vtkPVTempTessellatorEntry, "1.6");
 
 //-----------------------------------------------------------------------------
 class vtkTessellatorEntryData
@@ -438,7 +438,7 @@ void vtkPVTempTessellatorEntry::SetFieldCriterion( int fnum, float crit )
   this->ModifiedCallback();
 }
 
-void vtkPVTempTessellatorEntry::AnimationMenuCallback( vtkPVAnimationInterfaceEntry* ai )
+void vtkPVTempTessellatorEntry::AnimationMenuCallback( vtkPVAnimationInterfaceEntry* )
 {
   cout << "AnimationMenuCallback called." << endl;
   this->ModifiedCallback();
