@@ -39,7 +39,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVVolumeAppearanceEditor);
-vtkCxxRevisionMacro(vtkPVVolumeAppearanceEditor, "1.8");
+vtkCxxRevisionMacro(vtkPVVolumeAppearanceEditor, "1.9");
 
 int vtkPVVolumeAppearanceEditorCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -584,7 +584,7 @@ void vtkPVVolumeAppearanceEditor::ColorButtonCallback( float vtkNotUsed(r),
 void vtkPVVolumeAppearanceEditor::ColorRampChanged()
 {
   this->ColorRampChangedInternal();
-  this->AddTraceEntry("$kw(%s) ScalarOpacityRampChanged", this->GetTclName());
+  this->AddTraceEntry("$kw(%s) ColorRampChanged", this->GetTclName());
 }
 
 //----------------------------------------------------------------------------
