@@ -62,8 +62,17 @@ vtkKWActorComposite::vtkKWActorComposite()
 
 vtkKWActorComposite::~vtkKWActorComposite()
 {
-  this->Actor->Delete();
-  this->Mapper->Delete();
+  if (this->Actor)
+    {
+    this->Actor->Delete();
+    this->Actor = NULL;
+    }
+  
+  if (this->Mapper)
+    {
+    this->Mapper->Delete();
+    this->Mapper = NULL;
+    }
 }
 
 void vtkKWActorComposite::SetInput(vtkPolyData *input)
