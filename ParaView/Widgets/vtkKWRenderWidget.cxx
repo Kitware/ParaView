@@ -41,11 +41,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "vtkKWRenderWidget.h"
 
+#include "vtkCallbackCommand.h"
 #include "vtkCamera.h"
 #include "vtkCommand.h"
 #include "vtkCornerAnnotation.h"
 #include "vtkKWApplication.h"
 #include "vtkKWEvent.h"
+#include "vtkKWSerializer.h"
 #include "vtkKWWindow.h"
 #include "vtkObjectFactory.h"
 #include "vtkProp.h"
@@ -54,13 +56,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkRenderer.h"
 #include "vtkTextActor.h"
 #include "vtkTextProperty.h"
-#include "vtkCallbackCommand.h"
 
 #ifdef _WIN32
 #include "vtkWin32OpenGLRenderWindow.h"
 #endif
 
-vtkCxxRevisionMacro(vtkKWRenderWidget, "1.34");
+vtkCxxRevisionMacro(vtkKWRenderWidget, "1.35");
 
 //----------------------------------------------------------------------------
 class vtkKWRenderWidgetObserver : public vtkCommand
@@ -125,8 +126,11 @@ vtkKWRenderWidget::vtkKWRenderWidget()
   
   this->Units = NULL;
 
-  this->CurrentCamera = this->Renderer->GetActiveCamera();
-  this->CurrentCamera->ParallelProjectionOn();  
+  vtkCamera *cam = this->GetCurrentCamera();
+  if (cam)
+    {
+    cam->ParallelProjectionOn();
+    }
 
   this->ScalarShift = 0;
   this->ScalarScale = 1;  
@@ -161,6 +165,18 @@ vtkKWRenderWidget::~vtkKWRenderWidget()
   
   this->Observer->Delete();
   this->Observer = NULL;
+}
+
+//----------------------------------------------------------------------------
+vtkCamera* vtkKWRenderWidget::GetCurrentCamera()
+{
+  vtkRenderer *ren = this->GetRenderer();
+  if (ren)
+    {
+    return ren->GetActiveCamera();
+    }
+
+  return NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -835,6 +851,227 @@ void vtkKWRenderWidget::UpdateEnableState()
     }
 }
 
+//------------------------------------------------------------------------------
+void vtkKWRenderWidget::SerializeSelf(ostream& os, vtkIndent indent)
+{
+  float *fptr;
+  double *dptr;
+
+  // Invoke superclass
+
+  this->Superclass::SerializeSelf(os, indent);
+
+  // Background color
+
+  fptr = this->GetBackgroundColor();
+  if (fptr)
+    {
+    os << indent << "BackgroundColor " 
+       << fptr[0] << " " << fptr[1] << " " << fptr[2] << endl;
+    }
+
+  // Header Annotation
+
+  os << indent << "HeaderAnnotationVisibility " 
+     << this->GetHeaderAnnotationVisibility() << endl;
+
+  fptr = this->GetHeaderAnnotationColor();
+  if (fptr)
+    {
+    os << indent << "HeaderAnnotationColor " 
+       << fptr[0] << " " << fptr[1] << " " << fptr[2] << endl;
+    }
+
+  if (this->GetHeaderAnnotationText())
+    {
+    os << indent << "HeaderAnnotationText " 
+       << this->GetHeaderAnnotationText() << endl;
+    }
+
+  // Units
+
+  if (this->GetUnits())
+    {
+    os << indent << "Units " << this->GetUnits() << endl;
+    }
+
+  // Camera
+
+  vtkCamera *cam = this->GetCurrentCamera();
+  if (cam)
+    {
+    dptr = cam->GetPosition();
+    os << indent << "CameraPosition " 
+       << dptr[0] << " " << dptr[1] << " " << dptr[2] << endl;
+
+    dptr = cam->GetFocalPoint();
+    os << indent << "CameraFocalPoint " 
+       << dptr[0] << " " << dptr[1] << " " << dptr[2] << endl;
+
+    dptr = cam->GetViewUp();
+    os << indent << "CameraViewUp " 
+       << dptr[0] << " " << dptr[1] << " " << dptr[2] << endl;
+
+    dptr = cam->GetClippingRange();
+    os << indent << "CameraClippingRange " 
+       << dptr[0] << " " << dptr[1] << endl;
+
+    os << indent << "CameraViewAngle " << cam->GetViewAngle() << endl;
+
+    os << indent << "CameraParallelScale " << cam->GetParallelScale() << endl;
+
+    os << indent << "CameraParallelProjection " 
+       << cam->GetParallelProjection() << endl;
+    }
+
+  // ScalarShift and ScalarScale
+
+  os << indent << "ScalarShift " << this->GetScalarShift() << endl;
+
+  os << indent << "ScalarScale " << this->GetScalarScale() << endl;
+}
+
+//------------------------------------------------------------------------------
+void vtkKWRenderWidget::SerializeToken(istream& is, const char token[1024])
+{
+  float fval, fbuffer3[3];
+  double dval, dbuffer3[3];
+  int i;
+  char buffer[1024];
+
+  // Background color
+
+  if (!strcmp(token, "BackgroundColor"))
+    {
+    fbuffer3[0] = fbuffer3[1] = fbuffer3[2] = 0.0;
+    is >> fbuffer3[0] >> fbuffer3[1] >> fbuffer3[2];
+    this->SetBackgroundColor(fbuffer3);
+    return;
+    }
+
+  // Header Annotation
+
+  if (!strcmp(token, "HeaderAnnotationVisibility"))
+    {
+    is >> i;
+    this->SetHeaderAnnotationVisibility(i);
+    return;
+    }
+
+  if (!strcmp(token, "HeaderAnnotationColor"))
+    {
+    fbuffer3[0] = fbuffer3[1] = fbuffer3[2] = 1.0;
+    is >> fbuffer3[0] >> fbuffer3[1] >> fbuffer3[2];
+    this->SetHeaderAnnotationColor(fbuffer3);
+    return;
+    }
+
+  if (!strcmp(token, "HeaderAnnotationText"))
+    {
+    buffer[0] = '\0';
+    vtkKWSerializer::EatWhiteSpace(&is);
+    is.getline(buffer, 1024);
+    this->SetHeaderAnnotationText(buffer);
+    return;
+    }
+
+  // Units
+
+  if (!strcmp(token, "Units"))
+    {
+    buffer[0] = '\0';
+    vtkKWSerializer::EatWhiteSpace(&is);
+    is.getline(buffer, 1024);
+    this->SetUnits(buffer);
+    return;
+    }
+
+  // Camera
+
+  vtkCamera *cam = this->GetCurrentCamera();
+  if (cam)
+    {
+    if (!strcmp(token, "CameraPosition"))
+      {
+      is >> dbuffer3[0] >> dbuffer3[1] >> dbuffer3[2];
+      cam->SetPosition(dbuffer3);
+      cam->ComputeViewPlaneNormal();
+      return;
+      }
+
+    if (!strcmp(token, "CameraFocalPoint"))
+      {
+      is >> dbuffer3[0] >> dbuffer3[1] >> dbuffer3[2];
+      cam->SetFocalPoint(dbuffer3);
+      cam->ComputeViewPlaneNormal();
+      return;
+      }
+
+    if (!strcmp(token, "CameraViewUp"))
+      {
+      is >> dbuffer3[0] >> dbuffer3[1] >> dbuffer3[2];
+      cam->SetViewUp(dbuffer3);
+      return;
+      }
+
+    if (!strcmp(token, "CameraClippingRange"))
+      {
+      is >> dbuffer3[0] >> dbuffer3[1];
+      cam->SetClippingRange(dbuffer3[0], dbuffer3[1]);
+      return;
+      }
+
+    if (!strcmp(token, "CameraViewAngle"))
+      {
+      is >> dval;
+      cam->SetViewAngle(dval);
+      return;
+      }
+
+    if (!strcmp(token, "CameraParallelScale"))
+      {
+      is >> dval;
+      cam->SetParallelScale(dval);
+      return;
+      }
+
+    if (!strcmp(token, "CameraParallelProjection"))
+      {
+      is >> i;
+      cam->SetParallelProjection(i);
+      return;
+      }
+    }
+
+  // ScalarShift and ScalarScale
+
+  if (!strcmp(token, "ScalarShift"))
+    {
+    is >> fval;
+    this->SetScalarShift(fval);
+    return;
+    }
+
+  if (!strcmp(token, "ScalarScale"))
+    {
+    is >> fval;
+    this->SetScalarScale(fval);
+    return;
+    }
+
+  // Invoke superclass
+
+  this->Superclass::SerializeToken(is, token);
+}
+
+//------------------------------------------------------------------------------
+void vtkKWRenderWidget::SerializeRevision(ostream& os, vtkIndent indent)
+{
+  this->Superclass::SerializeRevision(os, indent);
+  os << indent << "vtkKWRenderWidget ";
+  this->ExtractRevision(os, "$Revision: 1.35 $");
+}
+
 //----------------------------------------------------------------------------
 void vtkKWRenderWidget::PrintSelf(ostream& os, vtkIndent indent)
 {
@@ -859,7 +1096,6 @@ void vtkKWRenderWidget::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "CollapsingRenders: " << this->CollapsingRenders << endl;
   os << indent << "ScalarShift: " << this->ScalarShift << endl;
   os << indent << "ScalarScale: " << this->ScalarScale << endl;
-  os << indent << "CurrentCamera: " << this->CurrentCamera << endl;
   os << indent << "Units: " << (this->Units ? this->Units : "(none)") << endl;
   os << indent << "EventIdentifier: " << this->EventIdentifier << endl;
 }

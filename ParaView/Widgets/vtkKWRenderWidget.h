@@ -174,7 +174,7 @@ public:
   
   // Description:
   // Get the current camera
-  vtkGetObjectMacro(CurrentCamera, vtkCamera);
+  vtkCamera *GetCurrentCamera();
 
   // Description:
   // Set/Get the scalar shift/scale
@@ -229,6 +229,11 @@ public:
   // internal widgets.
   virtual void UpdateEnableState();
 
+  // Description:
+  // Chaining method to serialize an object and its superclasses.
+  virtual void SerializeSelf(ostream& os, vtkIndent indent);
+  virtual void SerializeToken(istream& is, const char token[1024]);
+
 protected:
   vtkKWRenderWidget();
   ~vtkKWRenderWidget();
@@ -252,8 +257,6 @@ protected:
   
   char *Units;
 
-  vtkCamera *CurrentCamera;
-
   float ScalarShift;
   float ScalarScale;
 
@@ -263,6 +266,8 @@ protected:
   vtkKWRenderWidgetObserver *Observer;
 
   virtual void UpdateAccordingToUnits() {};
+
+  virtual void SerializeRevision(ostream& os, vtkIndent indent);
   
 private:
   vtkKWRenderWidget(const vtkKWRenderWidget&);  // Not implemented
