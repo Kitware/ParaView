@@ -87,7 +87,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.213");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.213.2.1");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -1052,7 +1052,8 @@ void vtkPVRenderView::CreateViewProperties()
                this->LODResolutionFrame->GetWidgetName(),
                this->LODThresholdFrame->GetWidgetName());
 
-  if (pvapp->GetController()->GetNumberOfProcesses() > 1)
+  if (pvapp->GetController()->GetNumberOfProcesses() > 1 &&
+      !pvapp->GetUseRenderingGroup())
     {
     // Determines when geometry is collected to process 0 for rendering.
     this->CollectThresholdFrame->SetParent(this->LODFrame->GetFrame());
@@ -1078,11 +1079,12 @@ void vtkPVRenderView::CreateViewProperties()
     this->CollectThresholdScale->SetCommand(this, 
                                             "CollectThresholdScaleCallback");
     this->CollectThresholdScale->SetBalloonHelpString(
-      "This slider determines when models are collected to process 0 for local "
-      "rendering.  "
-      "Threshold critera is based on size of model in mega bytes.  "
-      "Left: Always leave models distributed. Right: Move even large models to "
-      "process 0.");    pvapp->Script("pack %s %s %s -side left", 
+      "This slider determines when models are collected to process 0 for "
+      "local rendering. Threshold critera is based on size of model in mega "
+      "bytes.  "
+      "Left: Always leave models distributed. Right: Move even large models "
+      "to process 0.");    
+    pvapp->Script("pack %s %s %s -side left", 
                   this->CollectThresholdLabel->GetWidgetName(), 
                   this->CollectThresholdScale->GetWidgetName(),
                   this->CollectThresholdValue->GetWidgetName());
@@ -2341,7 +2343,7 @@ void vtkPVRenderView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVRenderView ";
-  this->ExtractRevision(os,"$Revision: 1.213 $");
+  this->ExtractRevision(os,"$Revision: 1.213.2.1 $");
 }
 
 //------------------------------------------------------------------------------
