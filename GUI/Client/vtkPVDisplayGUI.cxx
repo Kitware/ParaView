@@ -86,7 +86,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVDisplayGUI);
-vtkCxxRevisionMacro(vtkPVDisplayGUI, "1.21");
+vtkCxxRevisionMacro(vtkPVDisplayGUI, "1.22");
 
 int vtkPVDisplayGUICommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -1003,9 +1003,13 @@ void vtkPVDisplayGUI::ShowVolumeAppearanceEditor()
     return;
     }
 
-  const char *menuValue = this->VolumeScalarsMenu->GetValue();
+  vtkStdString command(this->VolumeScalarsMenu->GetValue());
 
-  if ( menuValue && strlen(menuValue) > 6 )
+  vtkStdString::size_type firstspace = command.find_first_of(' ');
+  vtkStdString::size_type lastspace = command.find_last_of(' ');
+  vtkStdString name = command.substr(firstspace+1, lastspace-firstspace-1);
+
+  if ( command.c_str() && strlen(command.c_str()) > 6 )
     {
     vtkPVDataInformation* dataInfo = source->GetDataInformation();
     vtkPVArrayInformation *arrayInfo;
@@ -1014,13 +1018,13 @@ void vtkPVDisplayGUI::ShowVolumeAppearanceEditor()
       {
       vtkPVDataSetAttributesInformation *attrInfo
         = dataInfo->GetPointDataInformation();
-      arrayInfo = attrInfo->GetArrayInformation(menuValue+6);
+      arrayInfo = attrInfo->GetArrayInformation(name.c_str());
       }
     else
       {
       vtkPVDataSetAttributesInformation *attrInfo
         = dataInfo->GetCellDataInformation();
-      arrayInfo = attrInfo->GetArrayInformation(menuValue+5);
+      arrayInfo = attrInfo->GetArrayInformation(name.c_str());
       }
     this->VolumeAppearanceEditor->SetPVSourceAndArrayInfo( source, arrayInfo );
     }
@@ -2941,30 +2945,45 @@ void vtkPVDisplayGUI::SaveVolumeRenderStateDisplay(ofstream *file)
   if(this->VolumeRenderMode)
     {
     *file << "[$kw(" << this->GetPVSource()->GetTclName()
-          << ") GetPVOutput] VolumeRenderModeOn" << endl;
+          << ") GetPVOutput] DrawVolume" << endl;
+//    *file << "[$kw(" << this->GetPVSource()->GetTclName()
+//          << ") GetPVOutput] ShowVolumeAppearanceEditor" << endl;
 
-      // The command is more specific about what is the variable name and
-      // what is the number of vector entries.
-      vtkStdString command(this->VolumeScalarsMenu->GetValue());
+    vtkStdString command(this->VolumeScalarsMenu->GetValue());
 
-      // The form of the command is of the form
-      // vtkTemp??? ColorBy???Field {Field Name} NumComponents
-      // The field name is between the first and last braces, and
-      // the number of components is at the end of the string.
-      vtkStdString::size_type firstspace = command.find_first_of(' ');
-      vtkStdString::size_type lastspace = command.find_last_of(' ');
-      vtkStdString name = command.substr(firstspace+1, lastspace-firstspace-1);
-      vtkStdString::size_type firstbrace = command.find_first_of('(');
-      vtkStdString::size_type lastbrace = command.find_last_of(')');
-      vtkStdString numComps = command.substr(firstbrace+1, lastbrace-firstbrace-1);
+    // The form of the command is of the form
+    // vtkTemp??? ColorBy???Field {Field Name} NumComponents
+    // The field name is between the first and last braces, and
+    // the number of components is at the end of the string.
+    vtkStdString::size_type firstspace = command.find_first_of(' ');
+    vtkStdString::size_type lastspace = command.find_last_of(' ');
+    vtkStdString name = command.substr(firstspace+1, lastspace-firstspace-1);
+  //  vtkStdString numCompsStr = command.substr(command.find_last_of(' '));
 
-      if (strncmp(this->VolumeScalarsMenu->GetValue(), "Point", 5) == 0)
+    // have to visit this panel in order to initialize vars
+//    this->ShowVolumeAppearanceEditor();
+
+    if ( command.c_str() && strlen(command.c_str()) > 6 )
+      {
+      vtkPVDataInformation* dataInfo = this->PVSource->GetDataInformation();
+      vtkPVArrayInformation *arrayInfo;
+      int colorField = this->PVSource->GetPartDisplay()->GetColorField();
+      if (colorField == vtkDataSet::POINT_DATA_FIELD)
         {
-        *file << "[$kw(" << this->GetPVSource()->GetTclName() << ") GetPVOutput] VolumeRenderPointField {" << name << "} " << numComps << endl;
+        vtkPVDataSetAttributesInformation *attrInfo
+          = dataInfo->GetPointDataInformation();
+        arrayInfo = attrInfo->GetArrayInformation(name.c_str());
+        if(arrayInfo)
+          *file << "[$kw(" << this->GetPVSource()->GetTclName() << ") GetPVOutput] VolumeRenderPointField {" << arrayInfo->GetName() << "} " << arrayInfo->GetNumberOfComponents() << endl;
         }
       else
         {
-        *file << "[$kw(" << this->GetPVSource()->GetTclName() << ") GetPVOutput] VolumeRenderCellField {" << name << "} " << numComps << endl;
+        vtkPVDataSetAttributesInformation *attrInfo
+          = dataInfo->GetCellDataInformation();
+        arrayInfo = attrInfo->GetArrayInformation(name.c_str());
+        if(arrayInfo)
+          *file << "[$kw(" << this->GetPVSource()->GetTclName() << ") GetPVOutput] VolumeRenderCellField {" << arrayInfo->GetName() << "} " << arrayInfo->GetNumberOfComponents() << endl;
         }
+      }
     }
 }

@@ -36,7 +36,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVVolumeAppearanceEditor);
-vtkCxxRevisionMacro(vtkPVVolumeAppearanceEditor, "1.25");
+vtkCxxRevisionMacro(vtkPVVolumeAppearanceEditor, "1.26");
 
 int vtkPVVolumeAppearanceEditorCommand(ClientData cd, Tcl_Interp *interp,
                                        int argc, char *argv[]);
@@ -471,9 +471,11 @@ void vtkPVVolumeAppearanceEditor::SaveState(ofstream *file)
       << this->PVRenderView->GetPVWindow()->GetTclName()
       << ") GetVolumeAppearanceEditor]" << endl;
 
-    *file << "[$kw(" << this->PVSource->GetTclName() << ") GetPVOutput] "
-      << "VolumeRenderPointField {" << this->ArrayInfo->GetName() << "} "
-      << this->ArrayInfo->GetNumberOfComponents() << endl;
+// this is handled in vtkPVDisplayGUI for each individual source:
+//    *file << "[$kw(" << this->PVSource->GetTclName() << ") GetPVOutput] "
+//      << "VolumeRenderPointField {" << this->ArrayInfo->GetName() << "} "
+//      << this->ArrayInfo->GetNumberOfComponents() << endl;
+
     *file << "[$kw(" << this->PVSource->GetTclName() << ") GetPVOutput] "
       << "ShowVolumeAppearanceEditor" << endl;
 

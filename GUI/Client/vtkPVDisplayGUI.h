@@ -294,10 +294,6 @@ public:
   // to the script file. 
   void SaveVolumeRenderStateDisplay(ofstream *os);
 
-  // Switch between showing the properties for actors and volumes
-  // Made public to alllow script to call it
-  void VolumeRenderModeOn();
-  void VolumeRenderModeOff();
 
 protected:
   vtkPVDisplayGUI();
@@ -328,6 +324,10 @@ protected:
   void SetActorColor(double r, double g, double b);
   void VolumeRenderPointFieldInternal(const char *name);
   void VolumeRenderCellFieldInternal(const char *name);
+
+  // Switch between showing the properties for actors and volumes
+  void VolumeRenderModeOn();
+  void VolumeRenderModeOff();
   
   // A flag that helps Update determine 
   // whether to set the default color.
