@@ -84,7 +84,7 @@ struct vtkPVArgs
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProcessModule);
-vtkCxxRevisionMacro(vtkPVProcessModule, "1.21");
+vtkCxxRevisionMacro(vtkPVProcessModule, "1.22");
 
 int vtkPVProcessModuleCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -302,11 +302,13 @@ int vtkPVProcessModule::GetNumberOfPartitions()
 void vtkPVProcessModule::GatherInformation(vtkPVInformation* info, 
                                            char* objectTclName)
 {
-  // Just a simple way of passing the information object to the next method.
+  // Just a simple way of passing the information object to the next
+  // method.
   this->TemporaryInformation = info;
   // Some objects are not created on the client (data.
-  this->ServerScript("[$Application GetProcessModule] GatherInformationInternal %s %s",
-                     info->GetClassName(), objectTclName); 
+  this->ServerScript(
+    "[$Application GetProcessModule] GatherInformationInternal %s %s",
+    info->GetClassName(), objectTclName); 
   this->TemporaryInformation = NULL; 
 }
 
@@ -328,13 +330,6 @@ void vtkPVProcessModule::GatherInformationInternal(char*, vtkObject* object)
 
   this->TemporaryInformation->CopyFromObject(object);
  }
-
-
-
-
-
-
-
 
 
 //----------------------------------------------------------------------------

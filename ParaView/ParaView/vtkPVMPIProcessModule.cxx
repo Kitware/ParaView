@@ -70,6 +70,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVInformation.h"
 
 
+//----------------------------------------------------------------------------
+vtkStandardNewMacro(vtkPVMPIProcessModule);
+vtkCxxRevisionMacro(vtkPVMPIProcessModule, "1.15");
+
+int vtkPVMPIProcessModuleCommand(ClientData cd, Tcl_Interp *interp,
+                            int argc, char *argv[]);
+
+
 
 // external global variable.
 vtkMultiProcessController *VTK_PV_UI_CONTROLLER = NULL;
@@ -85,14 +93,6 @@ void vtkPVSlaveScript(void *localArg, void *remoteArg,
   //cerr << " ++++ SlaveScript: " << ((char*)remoteArg) << endl;  
   self->SimpleScript((char*)remoteArg);
 }
-
-
- //----------------------------------------------------------------------------
-vtkStandardNewMacro(vtkPVMPIProcessModule);
-vtkCxxRevisionMacro(vtkPVMPIProcessModule, "1.14");
-
-int vtkPVMPIProcessModuleCommand(ClientData cd, Tcl_Interp *interp,
-                            int argc, char *argv[]);
 
 
 //----------------------------------------------------------------------------
@@ -125,7 +125,8 @@ vtkPVMPIProcessModule::~vtkPVMPIProcessModule()
 // Each process starts with this method.  One process is designated as
 // "master" and starts the application.  The other processes are slaves to
 // the application.
-void vtkPVMPIProcessModuleInit(vtkMultiProcessController *vtkNotUsed(controller), void *arg )
+void vtkPVMPIProcessModuleInit(
+  vtkMultiProcessController *vtkNotUsed(controller), void *arg )
 {
   vtkPVMPIProcessModule *self = (vtkPVMPIProcessModule *)arg;
   self->Initialize();
@@ -184,7 +185,8 @@ int vtkPVMPIProcessModule::Start(int argc, char **argv)
   vtkMultiProcessController::SetGlobalController(this->Controller);
 
   if (this->Controller->GetNumberOfProcesses() > 1)
-    { // !!!!! For unix, this was done when MPI was defined (even for 1 process). !!!!!
+    { // !!!!! For unix, this was done when MPI was defined (even for 1
+      // process). !!!!!
     this->Controller->CreateOutputWindow();
     }
   this->ArgumentCount = argc;
@@ -255,7 +257,6 @@ void vtkPVMPIProcessModule::BroadcastSimpleScript(const char *str)
     this->RemoteSimpleScript(id, str);
     }
   
-//  cout << str << endl;
   // Do reverse order, because 0 will block.
   this->Application->SimpleScript(str);
 }

@@ -175,7 +175,7 @@ void vtkPVRelayRemoteScript(void *localArg, void *remoteArg,
 
 //----------------------------------------------------------------------------
 // This RMI is only on process 0 of server. (socket controller)
-void vtkPVSendDataObject(void* arg, void*, int, int)
+void vtkPVSendPolyData(void* arg, void*, int, int)
 {
   vtkPVClientServerModule* self = static_cast<vtkPVClientServerModule*>(arg);
   
@@ -211,7 +211,7 @@ void vtkPVSendDataObject(void* arg, void*, int, int)
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVClientServerModule);
-vtkCxxRevisionMacro(vtkPVClientServerModule, "1.40");
+vtkCxxRevisionMacro(vtkPVClientServerModule, "1.41");
 
 int vtkPVClientServerModuleCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -464,7 +464,7 @@ void vtkPVClientServerModule::Initialize()
                                    VTK_PV_ROOT_RESULT_RMI_TAG);
     
     // For ReceiveRootDataObject: Send data object back to the client.
-    this->SocketController->AddRMI(vtkPVSendDataObject, this,
+    this->SocketController->AddRMI(vtkPVSendPolyData, this,
                                    VTK_PV_SEND_DATA_OBJECT_TAG);
     
     // Loop listening to the socket for RMI's.
@@ -494,8 +494,6 @@ void vtkPVClientServerModule::Initialize()
 
 
 
-
-
 //----------------------------------------------------------------------------
 // same as the MPI start.
 int vtkPVClientServerModule::Start(int argc, char **argv)
@@ -503,18 +501,16 @@ int vtkPVClientServerModule::Start(int argc, char **argv)
   // First we initialize the mpi controller.
   // We are assuming that the client has been started with one process
   // and is linked with MPI.
+  this->ArgumentCount = argc;
+  this->Arguments = argv;
 #ifdef VTK_USE_MPI
   this->Controller = vtkMPIController::New();
   vtkMultiProcessController::SetGlobalController(this->Controller);
   this->Controller->Initialize(&argc, &argv, 1);
-  this->ArgumentCount = argc;
-  this->Arguments = argv;
   this->Controller->SetSingleMethod(vtkPVClientServerInit, (void *)(this));
   this->Controller->SingleMethodExecute();
   this->Controller->Finalize();
 #else
-  argc = argc;
-  argv = argv;
   this->Controller = vtkDummyController::New();
   // This would be simpler if vtkDummyController::SingleMethodExecute
   // did its job correctly.
@@ -525,16 +521,6 @@ int vtkPVClientServerModule::Start(int argc, char **argv)
 
   return this->ReturnValue;
 }
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -764,7 +750,10 @@ void vtkPVClientServerModule::RelayScriptRMI(const char *str)
   int id, num;
   int destination = 0;
     
-  this->SocketController->Receive(&destination, 1, 1, VTK_PV_REMOTE_SCRIPT_DESTINATION_TAG);
+  this->SocketController->Receive(&destination, 
+                                  1, 
+                                  1, 
+                                  VTK_PV_REMOTE_SCRIPT_DESTINATION_TAG);
   // We count the client as process 0.
   --destination;
 
@@ -830,8 +819,9 @@ void vtkPVClientServerModule::GatherInformation(vtkPVInformation* info,
   // Just a simple way of passing the information object to the next method.
   this->TemporaryInformation = info;
   // Some objects are not created on the client (data.
-  this->ServerScript("[$Application GetProcessModule] GatherInformationInternal %s %s",
-                     info->GetClassName(), objectTclName);
+  this->ServerScript(
+    "[$Application GetProcessModule] GatherInformationInternal %s %s",
+    info->GetClassName(), objectTclName);
   this->GatherInformationInternal(NULL, NULL);
   this->TemporaryInformation = NULL; 
 }
