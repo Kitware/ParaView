@@ -171,7 +171,7 @@ vtkPVRenderView::~vtkPVRenderView()
     this->SetCompositeTclName(NULL);
     this->Composite = NULL;
     }
-
+  
   if (this->Renderer)
     {
     if ( pvApp )
@@ -181,7 +181,7 @@ vtkPVRenderView::~vtkPVRenderView()
     this->SetRendererTclName(NULL);
     this->Renderer = NULL;
     }
-
+  
   if (this->RenderWindow)
     {
     if ( pvApp )
@@ -191,10 +191,13 @@ vtkPVRenderView::~vtkPVRenderView()
     this->SetRenderWindowTclName(NULL);
     this->RenderWindow = NULL;
     }
-
+  
   // undo the binding we set up
-  this->Script("bind %s <Motion> {}", this->VTKWidget->GetWidgetName());
-  if (this->RenderPending)
+  if ( this->Application )
+    {
+    this->Script("bind %s <Motion> {}", this->VTKWidget->GetWidgetName());
+    }
+  if (this->RenderPending && this->Application )
     {
     this->Script("after cancel %s", this->RenderPending);
     }

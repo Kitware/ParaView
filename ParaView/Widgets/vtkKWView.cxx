@@ -223,16 +223,18 @@ vtkKWView::~vtkKWView()
     
   // Remove all binding
   const char *wname = this->VTKWidget->GetWidgetName();
-  this->Script("bind %s <Expose> {}",wname);
-  this->Script("bind %s <Any-ButtonPress> {}",wname);
-  this->Script("bind %s <Any-ButtonRelease> {}",wname);
-  this->Script("bind %s <B1-Motion> {}",wname);
-  this->Script("bind %s <B2-Motion> {}",wname);
-  this->Script("bind %s <B3-Motion> {}",wname);
-  this->Script("bind %s <Shift-B1-Motion> {}",wname);
-  this->Script("bind %s <KeyPress> {}",wname);
-  this->Script("bind %s <Enter> {}",wname);
-
+  if ( this->Application )
+    {
+    this->Script("bind %s <Expose> {}",wname);
+    this->Script("bind %s <Any-ButtonPress> {}",wname);
+    this->Script("bind %s <Any-ButtonRelease> {}",wname);
+    this->Script("bind %s <B1-Motion> {}",wname);
+    this->Script("bind %s <B2-Motion> {}",wname);
+    this->Script("bind %s <B3-Motion> {}",wname);
+    this->Script("bind %s <Shift-B1-Motion> {}",wname);
+    this->Script("bind %s <KeyPress> {}",wname);
+    this->Script("bind %s <Enter> {}",wname);
+    }
   this->GeneralProperties->Delete();
   this->BackgroundFrame->Delete();
   this->BackgroundColor->Delete();
@@ -1324,7 +1326,7 @@ void vtkKWView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWView ";
-  this->ExtractRevision(os,"$Revision: 1.67 $");
+  this->ExtractRevision(os,"$Revision: 1.68 $");
 }
 
 void vtkKWView::SetupMemoryRendering(
