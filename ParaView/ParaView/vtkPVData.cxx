@@ -78,7 +78,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.161.2.8");
+vtkCxxRevisionMacro(vtkPVData, "1.161.2.9");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -1517,7 +1517,7 @@ void vtkPVData::UpdateProperties()
     {
     if (this->VTKData->IsA("vtkPolyData"))
       {
-      this->StatsFrame->SetLabel("Unstructured Surface");
+      this->StatsFrame->SetLabel("Polygonal");
       this->Script("pack forget %s", 
                    this->ExtentDisplay->GetWidgetName());
       }
@@ -1529,7 +1529,7 @@ void vtkPVData::UpdateProperties()
       }
     if (this->VTKData->IsA("vtkStructuredGrid"))
       {
-      this->StatsFrame->SetLabel("Structured Grid");
+      this->StatsFrame->SetLabel("Curvilinear");
       this->ExtentDisplay->SetExtent(
               ((vtkStructuredGrid*)(this->VTKData))->GetExtent());
       this->Script("pack %s -fill x -expand t -pady 2", 
@@ -1537,7 +1537,7 @@ void vtkPVData::UpdateProperties()
       }
     if (this->VTKData->IsA("vtkRectilinearGrid"))
       {
-      this->StatsFrame->SetLabel("Rectilinear Grid");
+      this->StatsFrame->SetLabel("Nonuniform Rectilinear");
       this->ExtentDisplay->SetExtent(
               ((vtkRectilinearGrid*)(this->VTKData))->GetExtent());
       this->Script("pack %s -fill x -expand t -pady 2", 
@@ -1548,11 +1548,11 @@ void vtkPVData::UpdateProperties()
       int *ext = ((vtkImageData*)(this->VTKData))->GetExtent();
       if (ext[0] == ext[1] || ext[2] == ext[3] || ext[4] == ext[5])
         {
-        this->StatsFrame->SetLabel("Image");
+        this->StatsFrame->SetLabel("Image (Uniform Rectilinear)");
         }
       else
         {
-        this->StatsFrame->SetLabel("Volume");
+        this->StatsFrame->SetLabel("Volume (Uniform Rectilinear)");
         }
       this->ExtentDisplay->SetExtent(ext);
       this->Script("pack %s -fill x -expand t -pady 2", 
@@ -2868,7 +2868,7 @@ void vtkPVData::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVData ";
-  this->ExtractRevision(os,"$Revision: 1.161.2.8 $");
+  this->ExtractRevision(os,"$Revision: 1.161.2.9 $");
 }
 
 //----------------------------------------------------------------------------
