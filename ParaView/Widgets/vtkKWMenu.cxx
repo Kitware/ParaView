@@ -42,7 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWMenu );
-vtkCxxRevisionMacro(vtkKWMenu, "1.42");
+vtkCxxRevisionMacro(vtkKWMenu, "1.43");
 
 
 
@@ -81,7 +81,7 @@ void vtkKWMenu::Create(vtkKWApplication* app, const char* args)
                this->GetWidgetName(), this->GetTclName());
 
   // Update enable state
-  //
+  
   this->UpdateEnableState();
 }
 
@@ -955,6 +955,14 @@ const char* vtkKWMenu::GetItemOption(const char *item, const char *option)
 const char* vtkKWMenu::GetItemCommand(int idx)
 {
   return this->GetItemOption(idx, "-command");
+}
+
+//----------------------------------------------------------------------------
+void vtkKWMenu::UpdateEnableState()
+{
+  this->Superclass::UpdateEnableState();
+
+  this->SetState(this->Enabled ? vtkKWMenu::Normal : vtkKWMenu::Disabled);
 }
 
 //----------------------------------------------------------------------------
