@@ -755,6 +755,7 @@ void vtkPVRenderView::Render()
   this->RenderWindow->SetDesiredUpdateRate(this->InteractiveUpdateRate);
   //this->RenderWindow->SetDesiredUpdateRate(20.0);
 
+  // Some aborts require us to que another render.
   abort = this->ShouldIAbort();
   if (abort)
     {
@@ -772,6 +773,9 @@ void vtkPVRenderView::Render()
   this->InteractiveCompositeTime = this->Composite->GetCompositeTime()
                                      + this->Composite->GetGetBuffersTime()
                                      + this->Composite->GetSetBuffersTime();
+  pvApp->AddLogEntry("InteractiveRender", this->InteractiveRenderTime);
+  pvApp->AddLogEntry("InteractiveCcomposite", this->InteractiveCompositeTime);
+
 }
 
 //----------------------------------------------------------------------------
@@ -792,6 +796,7 @@ void vtkPVRenderView::EventuallyRender()
 void vtkPVRenderView::EventuallyRenderCallBack()
 {
   int abort;
+  vtkPVApplication *pvApp = this->GetPVApplication();
   
   // sanity check
   if (this->EventuallyRenderFlag == 0)
@@ -822,6 +827,8 @@ void vtkPVRenderView::EventuallyRenderCallBack()
   this->StillCompositeTime = this->Composite->GetCompositeTime()
                                + this->Composite->GetGetBuffersTime()
                                + this->Composite->GetSetBuffersTime();
+  pvApp->AddLogEntry("StillRender", this->StillRenderTime);
+  pvApp->AddLogEntry("StillCcomposite", this->StillCompositeTime);
 }
 
 //----------------------------------------------------------------------------
