@@ -33,7 +33,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectTimeSet);
-vtkCxxRevisionMacro(vtkPVSelectTimeSet, "1.41");
+vtkCxxRevisionMacro(vtkPVSelectTimeSet, "1.42");
 
 //-----------------------------------------------------------------------------
 int vtkDataArrayCollectionCommand(ClientData cd, Tcl_Interp *interp,
@@ -414,7 +414,8 @@ void vtkPVSelectTimeSet::AnimationMenuCallback(vtkPVAnimationInterfaceEntry *ai)
   vtkSMDomain *rangeDomain = prop->GetDomain("range");
   ai->SetCurrentSMProperty(prop);
   ai->SetCurrentSMDomain(rangeDomain);
-  
+  ai->SetAnimationElement(0);
+
   vtkSMDoubleRangeDomain *doubleRangeDomain =
     vtkSMDoubleRangeDomain::SafeDownCast(rangeDomain);
   int minExists = 0, maxExists = 0;

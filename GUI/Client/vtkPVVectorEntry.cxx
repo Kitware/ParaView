@@ -34,7 +34,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVVectorEntry);
-vtkCxxRevisionMacro(vtkPVVectorEntry, "1.54");
+vtkCxxRevisionMacro(vtkPVVectorEntry, "1.55");
 
 //-----------------------------------------------------------------------------
 vtkPVVectorEntry::vtkPVVectorEntry()
@@ -633,6 +633,7 @@ void vtkPVVectorEntry::AnimationMenuCallback(vtkPVAnimationInterfaceEntry *ai)
     
     ai->SetCurrentSMProperty(prop);
     ai->SetCurrentSMDomain(rangeDomain);
+    ai->SetAnimationElement(0);
 
     if (rangeDomain)
       {

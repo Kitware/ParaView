@@ -36,7 +36,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVScale);
-vtkCxxRevisionMacro(vtkPVScale, "1.44");
+vtkCxxRevisionMacro(vtkPVScale, "1.45");
 
 //----------------------------------------------------------------------------
 vtkPVScale::vtkPVScale()
@@ -535,6 +535,7 @@ void vtkPVScale::AnimationMenuCallback(vtkPVAnimationInterfaceEntry *ai)
   
   ai->SetCurrentSMProperty(prop);
   ai->SetCurrentSMDomain(dom);
+  ai->SetAnimationElement(0);
   
   if (dom)
     {
