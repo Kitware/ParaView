@@ -71,7 +71,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.251");
+vtkCxxRevisionMacro(vtkPVSource, "1.252");
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -377,10 +377,10 @@ void vtkPVSource::SetVTKSource(vtkSource *source, const char *tclName)
                   tclName, this->GetTclName());
     
     pvApp->BroadcastScript(
-      "%s SetStartMethod {$Application LogStartEvent {Execute %s}}", 
+      "%s AddObserver EndMethod {$Application LogStartEvent {Execute %s}}", 
       tclName, tclName);
     pvApp->BroadcastScript(
-      "%s SetEndMethod {$Application LogEndEvent {Execute %s}}", 
+      "%s AddObserver EndMethod {$Application LogEndEvent {Execute %s}}", 
       tclName, tclName);
 
 
@@ -2131,7 +2131,7 @@ void vtkPVSource::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVSource ";
-  this->ExtractRevision(os,"$Revision: 1.251 $");
+  this->ExtractRevision(os,"$Revision: 1.252 $");
 }
 
 //----------------------------------------------------------------------------

@@ -83,7 +83,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.185");
+vtkCxxRevisionMacro(vtkPVData, "1.186");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -482,10 +482,12 @@ void vtkPVData::CreateParallelTclObjects(vtkPVApplication *pvApp)
   pvApp->BroadcastScript("vtkPVGeometryFilter %s", tclName);
   this->SetGeometryTclName(tclName);
   // Keep track of how long each geometry filter takes to execute.
-  pvApp->BroadcastScript("%s SetStartMethod {$Application LogStartEvent "
-                         "{Execute Geometry}}", this->GeometryTclName);
-  pvApp->BroadcastScript("%s SetEndMethod {$Application LogEndEvent "
-                         "{Execute Geometry}}", this->GeometryTclName);
+  pvApp->BroadcastScript(
+    "%s AddObserver StartMethod {$Application LogStartEvent "
+    "{Execute Geometry}}", this->GeometryTclName);
+  pvApp->BroadcastScript(
+    "%s AddObserver EndMethod {$Application LogEndEvent "
+    "{Execute Geometry}}", this->GeometryTclName);
 
 
   // Create the decimation filter which branches the LOD pipeline.
@@ -494,10 +496,12 @@ void vtkPVData::CreateParallelTclObjects(vtkPVApplication *pvApp)
   this->LODDeciTclName = NULL;
   this->SetLODDeciTclName(tclName);
   // Keep track of how long each decimation filter takes to execute.
-  pvApp->BroadcastScript("%s SetStartMethod {$Application LogStartEvent {Execute Decimate}}", 
-                         this->LODDeciTclName);
-  pvApp->BroadcastScript("%s SetEndMethod {$Application LogEndEvent {Execute Decimate}}", 
-                         this->LODDeciTclName);
+  pvApp->BroadcastScript(
+    "%s AddObserver StartMethod {$Application LogStartEvent "
+    "{Execute Decimate}}", this->LODDeciTclName);
+  pvApp->BroadcastScript(
+    "%s AddObserver EndMethod {$Application LogEndEvent "
+    "{Execute Decimate}}", this->LODDeciTclName);
   // The input of course is the geometry filter.
   pvApp->BroadcastScript("%s SetInput [%s GetOutput]", 
                          this->LODDeciTclName, this->GeometryTclName);
@@ -540,10 +544,12 @@ void vtkPVData::CreateParallelTclObjects(vtkPVApplication *pvApp)
   this->SetCollectTclName(tclName);
   pvApp->BroadcastScript("%s SetInput [%s GetOutput]", 
                          this->CollectTclName, this->GeometryTclName);
-  pvApp->BroadcastScript("%s SetStartMethod {$Application LogStartEvent {Execute Collect}}", 
-                         this->CollectTclName);
-  pvApp->BroadcastScript("%s SetEndMethod {$Application LogEndEvent {Execute Collect}}", 
-                         this->CollectTclName);
+  pvApp->BroadcastScript(
+    "%s AddObserver StartMethod {$Application LogStartEvent {Execute Collect}}", 
+    this->CollectTclName);
+  pvApp->BroadcastScript(
+    "%s AddObserver EndMethod {$Application LogEndEvent {Execute Collect}}", 
+    this->CollectTclName);
   //
   // ===== LOD branch:
   sprintf(tclName, "LODCollect%d", this->InstanceCount);
@@ -566,10 +572,12 @@ void vtkPVData::CreateParallelTclObjects(vtkPVApplication *pvApp)
   this->SetLODCollectTclName(tclName);
   pvApp->BroadcastScript("%s SetInput [%s GetOutput]", 
                          this->LODCollectTclName, this->LODDeciTclName);
-  pvApp->BroadcastScript("%s SetStartMethod {$Application LogStartEvent {Execute LODCollect}}", 
-                         this->LODCollectTclName);
-  pvApp->BroadcastScript("%s SetEndMethod {$Application LogEndEvent {Execute LODCollect}}", 
-                         this->LODCollectTclName);
+  pvApp->BroadcastScript(
+    "%s AddObserver StartMethod {$Application LogStartEvent "
+    "{Execute LODCollect}}", this->LODCollectTclName);
+  pvApp->BroadcastScript(
+    "%s AddObserver EndMethod {$Application LogEndEvent "
+    "{Execute LODCollect}}", this->LODCollectTclName);
    }
 #endif
 
@@ -3300,7 +3308,7 @@ void vtkPVData::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVData ";
-  this->ExtractRevision(os,"$Revision: 1.185 $");
+  this->ExtractRevision(os,"$Revision: 1.186 $");
 }
 
 //----------------------------------------------------------------------------
