@@ -188,8 +188,8 @@ The Cell Data to Point Data filter averages the values of the cell attributes of
                    help="Turn this On to control wheter points merging is performed."
                    default_value="1"/>
     <Documentation>
-The Clean filter takes polygonal data as input and generates polygonal data as output. This filter can merge duplicate points, remove unused points, and transform degenerate cells into their appropriate forms (e.g., a triangle is converted into a line if two of its points are merged). The Input menu allows the user to select the data set to which this filter will be applied. If the Point merging option is on, then points will be merged if they are within the specifed Tolerance or Absolute tolerance, depending on whether the Tolerance is absolute box is checked. (Tolerance is specified as a fraction of the length of the diagonal of the bounding box of the data set; Absolute tolerance is specified in the distance units of the input data set.)
-The transforming of degenereate cells into their appropriate forms is controlled by three check boxes on the user interface: Convert lines to points, Convert polys to lines, and Convert strips to polys. If any of these is unchecked, then degenerate cells of that type will not be converted to another type of cell.
+The Clean filter takes polygonal data as input and generates polygonal data as output. This filter can merge duplicate points, remove unused points, and transform degenerate cells into their appropriate forms (e.g., a triangle is converted into a line if two of its points are merged). The Input menu allows the user to select the data set to which this filter will be applied. If the Point merging option is on, then points will be merged if they are within the specified Tolerance or Absolute tolerance, depending on whether the Tolerance is absolute box is checked. (Tolerance is specified as a fraction of the length of the diagonal of the bounding box of the data set; Absolute tolerance is specified in the distance units of the input data set.)
+The transforming of degenerate cells into their appropriate forms is controlled by three check boxes on the user interface: Convert lines to points, Convert polys to lines, and Convert strips to polys. If any of these is unchecked, then degenerate cells of that type will not be converted to another type of cell.
 If the Piece invariant option is checked, the whole data set will be processed at once so that cleaning this data set always produces the same results. If the box is unchecked, the data set can be processed one piece at a time, so it is not necessary for the entire data set to fit into memory, but the results are not guaranteed to be the same as they would be if the Piece invariant option was on.
     </Documentation>
   </Module>
@@ -390,7 +390,7 @@ The D3 filter is available when ParaView is run in parallel. It operates on any 
                 help="Set the minimum and maximum point for elevation"/>
     <Documentation>
 The Elevation filter generates point scalar values for an input data set along a specified direction vector. The Input menu allows the user to select the data set to which this filter will be applied. Use the Scalar range entry boxes to specify the minimum and maximum scalar value to be generated. The Low Point and High Point define a line onto which each point of the dataset is projected. The minimum scalar value is associated with the Low Point and the maximum scalar value is associated with the High Point. The scalar value for each point in the data set is determined by the location along the line to with that point projects.
-The line can be specifed interactively using the 3D line widget. See section 6.4 for more information about this widget.
+The line can be specified interactively using the 3D line widget. See section 6.4 for more information about this widget.
     </Documentation>
   </Module>
 #ifdef PARAVIEW_BUILD_DEVELOPMENT
@@ -458,7 +458,7 @@ The line can be specifed interactively using the 3D line widget. See section 6.4
     </SelectWidget>
     <Documentation>
 Extract CTH Parts is a specialized filter for visualizing the data from a CTH simulation. It first converts the selected cell-centered arrays to point-centered ones. It then contours each array at a value of 0.5. The user has the option of clipping the resulting surface(s) with a plane.
-If the Show All option is on, all the cell-centered scalar (single-component) arrays will be displayed in the array selection box; otherwise only the ones with "Fraction" or "fraction" in the name will be shown. (This behavior is because by default the CTH volume fraction arrays should be listed.) Clicking on the name of a particular array selects it. To choose multiple contiguous array names, click the first one and press the Shift key while clicking the last name you wish to select. If the names are not contigous, press the Ctrl key while selecting the names from the list. The selected arrays will be contoured.
+If the Show All option is on, all the cell-centered scalar (single-component) arrays will be displayed in the array selection box; otherwise only the ones with "Fraction" or "fraction" in the name will be shown. (This behavior is because by default the CTH volume fraction arrays should be listed.) Clicking on the name of a particular array selects it. To choose multiple contiguous array names, click the first one and press the Shift key while clicking the last name you wish to select. If the names are not contiguous, press the Ctrl key while selecting the names from the list. The selected arrays will be contoured.
 If you wish to clip the contour surfaces with a plane, select "On" from the menu in the Clipping section on this Parameters tab. You can interactively position and orient the plane using the plane widget. (See section 6.4 for the details of using this widget or manually setting the plane's parameters.)
 This filter only operates on unstructured data. It produces polygonal output.
     </Documentation>
@@ -567,7 +567,7 @@ abs: Compute the absolute value of a scalar.
 v1.v2: Compute the dot product of two vectors. The operands for this function are not required to be enclosed in parentheses.
 mag: Compute the magnitude of a vector.
 norm: Normalize a vector.
-The operands is described below.
+The operands are described below.
 The digits, 0 - 9, and the decimal point are used to enter constant scalar values.
 iHat, jHat, and kHat are vector constants representing unit vectors in the X, Y, and Z directions, respectively.
 The scalars menu lists the names of the scalar arrays and the components of the vector arrays of either the point-centered or cell-centered data. The vectors menu lists the names of the point-centered or cell-centered vector arrays. The function will be computed for each point (or cell) using the scalar or vector value of the array at that point (or cell).
@@ -853,7 +853,7 @@ The Input menu allows the user to select the data set to which this filter will 
                  help="Determines the smoothing neighborhood."
                  default_value="1 1 1"/>
     <Documentation>
-The Median filter operates on image data and produces image data output. It replaces the scalar value at each pixel / voxel with the median scalar value in the specified surrounding neighborhood (Kernes Size). From the Input menu, the user can select the data set for performing this calculation. The Scalar menu determines which scalar array will be used to determine the median. The Kernel Size entry boxes specify the number of pixels / voxels in each dimension to use in computing the median to assign to each pixel / voxel. If the kernel size in a particular dimension is 1, then the median will not be computed in that direction.
+The Median filter operates on image data and produces image data output. It replaces the scalar value at each pixel / voxel with the median scalar value in the specified surrounding neighborhood (Kernel Size). From the Input menu, the user can select the data set for performing this calculation. The Scalar menu determines which scalar array will be used to determine the median. The Kernel Size entry boxes specify the number of pixels / voxels in each dimension to use in computing the median to assign to each pixel / voxel. If the kernel size in a particular dimension is 1, then the median will not be computed in that direction.
     </Documentation>
   </Module>
   <Module name="PolyDataNormals"
@@ -1312,8 +1312,8 @@ The Width entry box specifies half the width of the ribbons. If Vary width is on
                  help="The change in radius during sweep process."
                  default_value="0.0"/>
     <Documentation>
-The Rotational Extrusion filter forms a surface by rotating the input about the Z axis. This filter is intended to operate on 2D polygonal data. The Input menu allows the user to seelct the data set to which this filter will be applied. The value of the Resolution thumb wheel specifies the number of steps taken in rotating from 0 to the value specified in the Angle entry box. The Translation entry box determines the distance along the Z axis to be covered as the data set is rotated. Specifying a non-zero Translation value allows you to create a corkscrew or spring effect. The Delta radius entry box controls how much the radius of the rotation increases as the new data set is swept out.
-The Capping check box controls whether to close the open ends of the swept surface. Capping works by placing a copy of the input data set on either end of the swept surface, so it behaves properly if the input is a 2D surface composed of filled polygons. If the input data set is a closed solid (e.g., a sphere), then either two copies of the data set will be drawn or the no surface will be drawn. No surface is drawn if either capping is on or if the two surfaces would occupy exactly the same 3D space (e.g., Angle is a multiple of 360 and Translation and Delta radius are 0).
+The Rotational Extrusion filter forms a surface by rotating the input about the Z axis. This filter is intended to operate on 2D polygonal data. The Input menu allows the user to select the data set to which this filter will be applied. The value of the Resolution thumb wheel specifies the number of steps taken in rotating from 0 to the value specified in the Angle entry box. The Translation entry box determines the distance along the Z axis to be covered as the data set is rotated. Specifying a non-zero Translation value allows you to create a corkscrew or spring effect. The Delta radius entry box controls how much the radius of the rotation increases as the new data set is swept out.
+The Capping check box controls whether to close the open ends of the swept surface. Capping works by placing a copy of the input data set on either end of the swept surface, so it behaves properly if the input is a 2D surface composed of filled polygons. If the input data set is a closed solid (e.g., a sphere), then either two copies of the data set will be drawn or no surface will be drawn. No surface is drawn if either capping is on or if the two surfaces would occupy exactly the same 3D space (e.g., Angle is a multiple of 360 and Translation and Delta radius are 0).
     </Documentation>
   </Module>
   <Module name="ShrinkFilter"
@@ -1341,7 +1341,7 @@ The Capping check box controls whether to close the open ends of the swept surfa
            entry_and_label_on_top="0"
            display_value="0"/>
     <Documentation>
-The Shrink filter causes the individual cells of a data set to break apart from each other by moving each cell's points toward the centroid of the cell. (The centroid of a cell is the average position its points.) The Shrink factor scale determines how far the points will move. A value of 0 positions the points at the centroid of the cell; a value of 1 leaves them at their original positions. This filter operates on any type of data set and produces unstructured grid output.
+The Shrink filter causes the individual cells of a data set to break apart from each other by moving each cell's points toward the centroid of the cell. (The centroid of a cell is the average position of its points.) The Shrink factor scale determines how far the points will move. A value of 0 positions the points at the centroid of the cell; a value of 1 leaves them at their original positions. This filter operates on any type of data set and produces unstructured grid output.
     </Documentation>
   </Module>
     <!--
@@ -1397,7 +1397,7 @@ The Shrink filter causes the individual cells of a data set to break apart from 
            entry_and_label_on_top="0"
            display_value="0"/>
     <Documentation>
-The Smooth filter operates on a polygonal data set by iteratively adjusting the position of the points using Laplacian smoothing. (Because this filter only adjusts point postions, the output data set is also polygonal.) This results in better-shaped cells and more evenly distributed points. The Num. iterations thumb wheel specifies the maximum number of smoothing iterations to perform. The Convergence slider limits the maximum motion of any point. It is expressed as a fraction of the length of the diagonal of the bounding box of the data set. If the maximum point motion during a smoothing iteration is less than the Convergence value, the smoothing operation terminates. 
+The Smooth filter operates on a polygonal data set by iteratively adjusting the position of the points using Laplacian smoothing. (Because this filter only adjusts point positions, the output data set is also polygonal.) This results in better-shaped cells and more evenly distributed points. The Num. iterations thumb wheel specifies the maximum number of smoothing iterations to perform. The Convergence slider limits the maximum motion of any point. It is expressed as a fraction of the length of the diagonal of the bounding box of the data set. If the maximum point motion during a smoothing iteration is less than the Convergence value, the smoothing operation terminates. 
     </Documentation>
   </Module>
   <Module name="Stripper"
@@ -1485,7 +1485,7 @@ The Tetrahedralize filter converts the 3D cells of any type of data set to tetra
                help="Set the input to this filter."
                input_name="Input"/>
     <Documentation>
-The Triangulate filter decomposes polygonal data into only triangles, points, and lines. It separates triangle strips and polylines into individual triangles and lines, respectively. The output is polygonal data. Some filters that take polygonal data as input require that the data be composed of triangles rather than other polygons, so passing your data through this filter first is useful in such sitations.
+The Triangulate filter decomposes polygonal data into only triangles, points, and lines. It separates triangle strips and polylines into individual triangles and lines, respectively. The output is polygonal data. Some filters that take polygonal data as input require that the data be composed of triangles rather than other polygons, so passing your data through this filter first is useful in such situations.
     </Documentation>
   </Module>
   <Module name="TransformFilter"
@@ -1514,7 +1514,7 @@ The Triangulate filter decomposes polygonal data into only triangles, points, an
       </Item>
     </SelectWidget>
     <Documentation>
-The Transform filter allows you to specify the position, size, and orientation of polygonal, unstructured grid, and curvilinear data sets. You can interactively perform these affine transformations on the data by using the box widget, and the parameters can also be controlled manually. See section 6.4 for the detauils of using the box widget and manually setting its parameters. The output of this filter will have the same data set type as the input.
+The Transform filter allows you to specify the position, size, and orientation of polygonal, unstructured grid, and curvilinear data sets. You can interactively perform these affine transformations on the data by using the box widget, and the parameters can also be controlled manually. See section 6.4 for the details of using the box widget and manually setting its parameters. The output of this filter will have the same data set type as the input.
     </Documentation>
   </Module>
   <Module name="TubeFilter"
@@ -1718,9 +1718,9 @@ The Warp (vector) filter translates the points of the input data set using a spe
               set_number_command="SetNumberOfContours"
               set_contour_command="SetValue"/>
     <Documentation>
-The Cut filter extracts the portion of the input data set that lies along the specified plane or sphere. From the Cut Function menu, you can select whether cutting will be performed with a plane or a sphere. The appropriate 3D widget (plane widget or sphere widget) will be displayed. The paramters of the cut function can be specified interactively using the 3D widget or manually using the traditional user interface controls. Instructions for using these 3D widgets and their corresponding user interfaces are found in section 6.4.
-By default, the cut lies on the specified plane or sphere. Using the Cut Offset Values portion of the interface, it is also possible to cut the data set at some offset from the original cut function. The Cut Offset Values are in the same units as the data set coordinates. To add a single offset, select the value from the New Value slider in the Add value portion of the interface and click the Add button or press Enter. To instead add a several evenly spaced offsets, use the controls in the Generate range of values section. Select the number of offsets to generate using the Number of Values slider. The Range slider controls the interval in which to generate the offsets. Once the number of values and range have been selected, click the Generate button. To delete a value from the Cutt Offset Values list, select the value and click the Delete button. (If no value is selected, the last value in the list will be removed.) Clicking the Delete All button removes all the values in the list.
-The Cut filter takes any type of data set as input. Use the Input menu to choose a data set to Cut. The output of this filter is polygonal data.
+The Cut filter extracts the portion of the input data set that lies along the specified plane or sphere. From the Cut Function menu, you can select whether cutting will be performed with a plane or a sphere. The appropriate 3D widget (plane widget or sphere widget) will be displayed. The parameters of the cut function can be specified interactively using the 3D widget or manually using the traditional user interface controls. Instructions for using these 3D widgets and their corresponding user interfaces are found in section 6.4.
+By default, the cut lies on the specified plane or sphere. Using the Cut Offset Values portion of the interface, it is also possible to cut the data set at some offset from the original cut function. The Cut Offset Values are in the same units as the data set coordinates. To add a single offset, select the value from the New Value slider in the Add value portion of the interface and click the Add button or press Enter. To instead add a several evenly spaced offsets, use the controls in the Generate range of values section. Select the number of offsets to generate using the Number of Values slider. The Range slider controls the interval in which to generate the offsets. Once the number of values and range have been selected, click the Generate button. To delete a value from the Cut Offset Values list, select the value and click the Delete button. (If no value is selected, the last value in the list will be removed.) Clicking the Delete All button removes all the values in the list.
+The Cut filter takes any type of data set as input. Use the Input menu to choose a data set to cut. The output of this filter is polygonal data.
     </Documentation>
   </Module>
   <Module name="Clip"
@@ -1846,7 +1846,7 @@ This filter operates on all types of data sets, and it returns unstructured grid
                    default_value="1"
                    help="If AllScalars is checked, then a cell is only included if all its points are within the threshold. This is only relevant for point data."/>
     <Documentation>
-The Threshold filter extracts the portions of the input data set whose scalars lie within the specified range. This filter operates on either point-centered and cell-centered data. To select between thses two options, select either Point Data or Cell Data from the Attribute Mode menu. Once the Attribute Mode has been selected, choose the scalar array from which to threshold the data from the Scalars menu. The Lower Threshold and Upper Threshold sliders determine the range of the scalars to retain in the output. The All Scalars check box only takes effect when the Attribute Mode is set to Point Data. If the All Scalars option is checked, then a cell will only be passed to the output if the scalar values of all of its points lie within the range indicated by the Lower Threshold and Upper Threshold sliders. If unchecked, then a cell will be added to the output if the specified scalar value for any of its points is within the chosen range. This filter operates on any type of data set and produces unstructured grid output. The Threshold filter is available on the toolbar.
+The Threshold filter extracts the portions of the input data set whose scalars lie within the specified range. This filter operates on either point-centered and cell-centered data. To select between these two options, select either Point Data or Cell Data from the Attribute Mode menu. Once the Attribute Mode has been selected, choose the scalar array from which to threshold the data from the Scalars menu. The Lower Threshold and Upper Threshold sliders determine the range of the scalars to retain in the output. The All Scalars check box only takes effect when the Attribute Mode is set to Point Data. If the All Scalars option is checked, then a cell will only be passed to the output if the scalar values of all of its points lie within the range indicated by the Lower Threshold and Upper Threshold sliders. If unchecked, then a cell will be added to the output if the specified scalar value for any of its points is within the chosen range. This filter operates on any type of data set and produces unstructured grid output. The Threshold filter is available on the toolbar.
     </Documentation>
   </Module>
   <Module name="Contour"
@@ -2273,7 +2273,7 @@ This filter operates on any type of data set, provided it has point-centered vec
                    default_value="0"
                    help="Select whether to always include the boundary of the grid in the output"/>
     <Documentation>
-The Extract Grid filter returns a subgrid of a structured input (image, volume, curvilinear, or nonuniform rectilinear) data set. The VOI section of the interface provides six sliders for specifying the extents of the desired output along each of the I, J, and K axes. The Sample Rate thumb wheels control whether to subsample the input grid in each dimension. Values greater than 1 result in subsampling. For eample, if the Sample Rate along the I axis is 2, then every other input point will be passed to the output. If the Sample rate in any dimension is greater than 1, then selecting the Include boundary option will pass the values on the boundary of the data set to the output even if the boundary extent is not an even multiple of the sample rate. The output data set type of this filter is the same as the input type. This filter is available on the toolbar.
+The Extract Grid filter returns a subgrid of a structured input (image, volume, curvilinear, or nonuniform rectilinear) data set. The VOI section of the interface provides six sliders for specifying the extents of the desired output along each of the I, J, and K axes. The Sample Rate thumb wheels control whether to subsample the input grid in each dimension. Values greater than 1 result in subsampling. For example, if the Sample Rate along the I axis is 2, then every other input point will be passed to the output. If the Sample rate in any dimension is greater than 1, then selecting the Include boundary option will pass the values on the boundary of the data set to the output even if the boundary extent is not an even multiple of the sample rate. The output data set type of this filter is the same as the input type. This filter is available on the toolbar.
     </Documentation>
   </Module>
 </ModuleInterfaces>
