@@ -43,7 +43,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderModule);
-vtkCxxRevisionMacro(vtkPVRenderModule, "1.21");
+vtkCxxRevisionMacro(vtkPVRenderModule, "1.22");
 
 //===========================================================================
 //***************************************************************************
@@ -59,7 +59,7 @@ public:
     }
 
   virtual void Execute(vtkObject* wdg, unsigned long event,  
-                       void* calldata)
+                       void*)
     {
       if ( this->PVRenderModule )
         {
