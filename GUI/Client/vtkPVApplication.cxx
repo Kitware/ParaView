@@ -112,7 +112,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.315");
+vtkCxxRevisionMacro(vtkPVApplication, "1.316");
 
 
 int vtkPVApplicationCommand(ClientData cd, Tcl_Interp *interp,
@@ -806,71 +806,12 @@ void vtkPVApplication::SaveTraceFile(const char* fname)
 }
 
 //----------------------------------------------------------------------------
-int vtkPVApplication::ParseCommandLineArguments(int argc, char*argv[])
+int vtkPVApplication::ParseCommandLineArguments(int vtkNotUsed(argc), char*argv[])
 {
-  int i;
-
   // This should really be part of Parsing !!!!!!
   if (argv)
     {
     this->SetArgv0(argv[0]);
-    }
-
-  if (!this->Options->GetParaViewScriptName() &&
-    !this->Options->GetBatchScriptName())
-    {
-    for (i=1; i < argc; i++)
-      {
-      int valid=0;
-      if (argv[i])
-        {
-        int  j=0;
-        const char* argument1 = vtkPVApplication::ArgumentList[j];
-        const char* argument2 = vtkPVApplication::ArgumentList[j+1];
-        while (argument1 && argument1[0])
-          {
-
-          char* newarg = vtkString::Duplicate(argv[i]);
-          int len = (int)(strlen(newarg));
-          for (int ik=0; ik<len; ik++)
-            {
-            if (newarg[ik] == '=')
-              {
-              newarg[ik] = '\0';
-              }
-            }
-
-          if ( strcmp(newarg, argument1) == 0 || 
-               strcmp(newarg, argument2) == 0)
-            {
-            valid = 1;
-            }
-          delete[] newarg;
-          j += 3;
-          argument1 = vtkPVApplication::ArgumentList[j];
-          if (argument1 && argument1[0]) 
-            {
-            argument2 = vtkPVApplication::ArgumentList[j+1];
-            }
-          }
-        }
-      if (!valid)
-        {
-        char* error = this->CreateHelpString();
-        vtkErrorMacro("Unrecognized argument " << argv[i] << "." << endl
-                      << error);
-        delete[] error;
-        return 1;
-        }
-      }
-    }
-
-  if ( this->Options->GetHelpSelected() )
-    {
-    char* error = this->CreateHelpString();
-    vtkWarningMacro(<<error);
-    delete[] error;
-    return 1;
     }
 
   if ( this->Options->GetDisableRegistry() )
