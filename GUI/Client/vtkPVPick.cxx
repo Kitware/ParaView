@@ -27,10 +27,11 @@
 
 #include "vtkKWFrame.h"
 #include "vtkKWLabel.h"
+#include <vtkstd/string>
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPick);
-vtkCxxRevisionMacro(vtkPVPick, "1.1");
+vtkCxxRevisionMacro(vtkPVPick, "1.2");
 
 
 //----------------------------------------------------------------------------

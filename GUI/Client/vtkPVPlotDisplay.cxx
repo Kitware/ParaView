@@ -38,12 +38,12 @@
 #include "vtkPVDataInformation.h"
 #include "vtkPVDataSetAttributesInformation.h"
 #include "vtkPVArrayInformation.h"
-#include "vtkMPIDuplicatePolyData.h"
+#include "vtkM2NDuplicate.h"
 
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPlotDisplay);
-vtkCxxRevisionMacro(vtkPVPlotDisplay, "1.4");
+vtkCxxRevisionMacro(vtkPVPlotDisplay, "1.5");
 
 
 //----------------------------------------------------------------------------
@@ -71,19 +71,19 @@ vtkPVPlotDisplay::~vtkPVPlotDisplay()
     if (pm && this->DuplicatePolyDataID.ID)
       {
       pm->DeleteStreamObject(this->DuplicatePolyDataID);
-      pm->SendStreamToClientAndServer();
+      pm->SendStreamToRenderServerClientAndServer();
       }
     this->DuplicatePolyDataID.ID = 0;
     if (pm && this->UpdateSuppressorID.ID)
       {
       pm->DeleteStreamObject(this->UpdateSuppressorID);
-      pm->SendStreamToClientAndServer();
+      pm->SendStreamToRenderServerClientAndServer();
       }
     this->UpdateSuppressorID.ID = 0;
     if (pm && this->XYPlotActorID.ID)
       {
       pm->DeleteStreamObject(this->XYPlotActorID);
-      pm->SendStreamToClientAndServer();
+      pm->SendStreamToClientAndRenderServer();
       }
     this->XYPlotActorID.ID = 0;
     }
@@ -107,7 +107,7 @@ vtkPolyData* vtkPVPlotDisplay::GetCollectedData()
     return NULL;
     }
   vtkMPIDuplicatePolyData* dp;
-  dp = vtkMPIDuplicatePolyData::SafeDownCast(
+  dp = vtkM2NDuplicate::SafeDownCast(
       pm->GetObjectFromID(this->DuplicatePolyDataID));
   if (dp == NULL)
     {
@@ -125,12 +125,53 @@ void vtkPVPlotDisplay::CreateParallelTclObjects(vtkPVApplication *pvApp)
   vtkClientServerStream& stream = pm->GetStream();
 
   // Create the fliter wich duplicates the data on all processes.
-  this->DuplicatePolyDataID = pm->NewStreamObject("vtkMPIDuplicatePolyData");
-  pm->SendStreamToClientAndServer();
+  vtkClientServerID id = pm->NewStreamObject("vtkM2NDuplicate");
+  pm->GetStream()
+    << vtkClientServerStream::Invoke
+    << id << "SetPassThrough" << 1
+    << vtkClientServerStream::End;
+  pm->SendStreamToRenderServerClientAndServer();
+  pm->GetStream()
+    << vtkClientServerStream::Invoke
+    << id << "SetMPIMToNSocketConnection" 
+    << pm->GetMPIMToNSocketConnectionID()
+    << vtkClientServerStream::End;
+  // create, SetPassThrough, and set the mToN connection
+  // object on all servers and client
+  pm->SendStreamToRenderServerAndServer();
+  // always set client mode
+  pm->GetStream()
+    << vtkClientServerStream::Invoke
+    << id << "SetClientMode" << 1
+    << vtkClientServerStream::End;
+  pm->SendStreamToClient();
+  // if running in client mode
+  // then set the server to be servermode
+  if(pvApp->GetClientMode())
+    {
+    pm->GetStream()
+      << vtkClientServerStream::Invoke
+      << id << "SetServerMode" << 1
+      << vtkClientServerStream::End;
+    pm->SendStreamToServer();
+    }
+  // if running in render server mode
+  if(pvApp->GetRenderServerMode())
+    {
+    pm->GetStream()
+      << vtkClientServerStream::Invoke
+      << id << "SetRenderServerMode" << 1
+      << vtkClientServerStream::End;
+    pm->SendStreamToRenderServer();
+    }  
+  this->DuplicatePolyDataID = id;
+    
   if(pvApp->GetClientMode())
     {
     // We need this because the socket controller has no way of distinguishing
     // between processes.
+    // int fixme;  // No need for both client flag and client mode.
+
     pm->GetStream()
       << vtkClientServerStream::Invoke
       << this->DuplicatePolyDataID << "SetClientFlag" << 1
@@ -146,20 +187,22 @@ void vtkPVPlotDisplay::CreateParallelTclObjects(vtkPVApplication *pvApp)
     << this->DuplicatePolyDataID << "SetSocketController"
     << vtkClientServerStream::LastResult
     << vtkClientServerStream::End;
+  pm->SendStreamToClientAndServer();
 
   // Now create the update supressors which keep the renderers/mappers
   // from updating the pipeline.  These are here to ensure that all
   // processes get updated at the same time.
   this->UpdateSuppressorID = pm->NewStreamObject("vtkPVUpdateSuppressor");
-  pm->SendStreamToClientAndServer();
+  pm->SendStreamToRenderServerClientAndServer();
   stream << vtkClientServerStream::Invoke << this->DuplicatePolyDataID << "GetOutput" 
          <<  vtkClientServerStream::End;
   stream << vtkClientServerStream::Invoke << this->UpdateSuppressorID << "SetInput" 
          << vtkClientServerStream::LastResult << vtkClientServerStream::End;
+  pm->SendStreamToRenderServerClientAndServer();
 
   // We cannot hook up the XY-plot until we know array names.
   this->XYPlotActorID = pm->NewStreamObject("vtkXYPlotActor");
-  pm->SendStreamToClientAndServer();
+  pm->SendStreamToClientAndRenderServer();
   pm->GetStream() << vtkClientServerStream::Invoke 
                   << this->XYPlotActorID 
                   << "GetPositionCoordinate" 
@@ -214,7 +257,7 @@ void vtkPVPlotDisplay::CreateParallelTclObjects(vtkPVApplication *pvApp)
                   << this->XYPlotActorID 
                   << "SetLegendPosition2" << 0.5 << 0.25 
                   << vtkClientServerStream::End;
-  pm->SendStreamToClientAndServer();
+  pm->SendStreamToClientAndRenderServer();
 
   // Tell the update suppressor to produce the correct partition.
   pm->GetStream()
@@ -233,7 +276,7 @@ void vtkPVPlotDisplay::CreateParallelTclObjects(vtkPVApplication *pvApp)
     << this->UpdateSuppressorID << "SetUpdatePiece"
     << vtkClientServerStream::LastResult
     << vtkClientServerStream::End;
-  pm->SendStreamToClientAndServer();
+  pm->SendStreamToRenderServerClientAndServer();
 }
 
 //----------------------------------------------------------------------------
@@ -270,6 +313,7 @@ void vtkPVPlotDisplay::SetInput(vtkPVPart* input)
                   << this->XYPlotActorID 
                   << "SetYTitle" << ""
                   << vtkClientServerStream::End;
+  pm->SendStreamToClientAndRenderServer();
 
   int numArrays = dataInfo->GetPointDataInformation()->GetNumberOfArrays();
   float cstep = 1.0 / numArrays;
@@ -325,7 +369,7 @@ void vtkPVPlotDisplay::SetInput(vtkPVPart* input)
                     << "SetPlotColor" << 0 << 1 << 1 << 1
                     << vtkClientServerStream::End;
     }
-  pm->SendStreamToClientAndServer();
+  pm->SendStreamToClientAndRenderServer();
 }
 
 //----------------------------------------------------------------------------
@@ -423,11 +467,11 @@ void vtkPVPlotDisplay::Update()
     vtkClientServerStream& stream = pm->GetStream();
     stream << vtkClientServerStream::Invoke << this->UpdateSuppressorID 
            << "ForceUpdate" << vtkClientServerStream::End;
+    pm->SendStreamToRenderServerClientAndServer();
     // We need to tell the plot to regenerate.
     stream << vtkClientServerStream::Invoke 
            << this->XYPlotActorID
            << "Modified" << vtkClientServerStream::End;
-    pm->SendStreamToClientAndServer();
     this->GeometryIsValid = 1;
     }
 }
@@ -464,7 +508,7 @@ void vtkPVPlotDisplay::RemoveAllCaches()
   vtkClientServerStream& stream = pm->GetStream();
   stream << vtkClientServerStream::Invoke << this->UpdateSuppressorID 
          << "RemoveAllCaches" << vtkClientServerStream::End; 
-  pm->SendStreamToClientAndServer();
+  pm->SendStreamToRenderServerClientAndServer();
 }
 
 
@@ -482,7 +526,7 @@ void vtkPVPlotDisplay::CacheUpdate(int idx, int total)
   // remapped through the lookup table, and this causes that to happen.
   //stream << vtkClientServerStream::Invoke << this->MapperID << "Modified"
   //       << vtkClientServerStream::End;
-  pm->SendStreamToClientAndServer();
+  pm->SendStreamToRenderServerClientAndServer();
 }
 
 

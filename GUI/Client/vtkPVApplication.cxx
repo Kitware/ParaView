@@ -107,7 +107,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.263");
+vtkCxxRevisionMacro(vtkPVApplication, "1.264");
 vtkCxxSetObjectMacro(vtkPVApplication, RenderModule, vtkPVRenderModule);
 
 
@@ -461,7 +461,7 @@ vtkPVApplication::vtkPVApplication()
   this->SetRenderServerHostName("localhost");
   this->SetHostName("localhost");
   this->Port = 11111;
-  this->RenderServerPort = 22222;
+  this->RenderServerPort = 22221;
   this->ReverseConnection = 0;
   this->Username = 0;
   this->UseSoftwareRendering = 0;

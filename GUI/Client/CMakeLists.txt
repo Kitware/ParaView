@@ -30,6 +30,7 @@ SET( ParaViewServer_SRCS
   vtkPVServerSelectTimeSet.cxx
   vtkPVSummaryHelper.cxx
   vtkM2NCollect.cxx
+  vtkM2NDuplicate.cxx
   vtkPVServerXDMFParameters.cxx
   )
 
