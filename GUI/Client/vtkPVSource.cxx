@@ -65,7 +65,7 @@
 
 
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.424");
+vtkCxxRevisionMacro(vtkPVSource, "1.425");
 vtkCxxSetObjectMacro(vtkPVSource,Notebook,vtkPVSourceNotebook);
 vtkCxxSetObjectMacro(vtkPVSource,PartDisplay,vtkSMPartDisplay);
 
@@ -222,6 +222,7 @@ vtkPVSource::~vtkPVSource()
   this->PointLabelDisplay = 0;
 
   this->SetPVColorMap(0);
+  this->SetSourceList(0);
 }
 
 //----------------------------------------------------------------------------
