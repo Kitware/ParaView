@@ -30,7 +30,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkPVImageSlice.h"
 #include "vtkPVComposite.h"
 #include "vtkPVWindow.h"
-#include "vtkOutlineFilter.h"
+#include "vtkImageOutlineFilter.h"
 #include "vtkPVAssignment.h"
 
 int vtkPVImageCommand(ClientData cd, Tcl_Interp *interp,
@@ -171,14 +171,16 @@ int vtkPVImage::Create(char *args)
 //----------------------------------------------------------------------------
 void vtkPVImage::SetImageData(vtkImageData *image)
 {
-  vtkOutlineFilter *outline;
+  vtkImageOutlineFilter *outline;
 
   this->SetData(image);
   
+  // This should really be changed to switch mappers.  The flag
+  // could them be turned on and off ...
   if (this->OutlineFlag)
     {
     image->UpdateInformation();
-    outline = vtkOutlineFilter::New();
+    outline = vtkImageOutlineFilter::New();
     outline->SetInput(image);
     this->Mapper->SetInput(outline->GetOutput());
     outline->Delete();

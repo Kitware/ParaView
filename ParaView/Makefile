@@ -15,6 +15,7 @@ vtkInteractorStyleExtent
 
 CONCRETE = \
 vtkDummyRenderWindowInteractor \
+vtkImageOutlineFilter \
 vtkInteractorStyleCamera \
 vtkInteractorStyleGridExtent \
 vtkInteractorStyleImageExtent \
