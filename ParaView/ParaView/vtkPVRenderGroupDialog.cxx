@@ -56,7 +56,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVRenderGroupDialog );
-vtkCxxRevisionMacro(vtkPVRenderGroupDialog, "1.1.2.2");
+vtkCxxRevisionMacro(vtkPVRenderGroupDialog, "1.1.2.3");
 
 int vtkPVRenderGroupDialogCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -245,8 +245,6 @@ void vtkPVRenderGroupDialog::Create(vtkKWApplication *app)
   this->Script("wm protocol %s WM_DELETE_WINDOW {wm withdraw %s}",
                wname, wname);
 
-
-  
   this->Script("wm withdraw %s", wname);
 
   this->Update();
@@ -287,10 +285,14 @@ void vtkPVRenderGroupDialog::Invoke()
 void vtkPVRenderGroupDialog::Accept()
 {
   // Accept might be pressed to set the value of number of processes.
-  if (this->NumberOfProcessesInGroup != this->NumberEntry->GetValueAsInt())
+  if ((this->NumberOfProcessesInGroup != this->NumberEntry->GetValueAsInt()))
     {
     this->NumberEntryCallback();
-    return;
+    // They might want to change the display variables
+    if (this->DisplayStringRoot)
+      {
+      return;
+      }
     }
   this->AcceptedFlag = 1;
 }
