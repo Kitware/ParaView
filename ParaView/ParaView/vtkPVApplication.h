@@ -434,6 +434,7 @@ protected:
   static int CheckForExtension(const char* arg, const char* ext);
   char* CreateHelpString();
   int CheckForTraceFile(char* name, unsigned int len);
+  void DeleteTraceFiles(char* name, int all);
   void SaveTraceFile(const char* fname);
 
   vtkSetStringMacro(TraceFileName);

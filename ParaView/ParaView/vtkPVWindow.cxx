@@ -117,16 +117,20 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkUnstructuredGrid.h"
 
 #ifdef _WIN32
-#include "vtkKWRegisteryUtilities.h"
+# include "vtkKWRegisteryUtilities.h"
+#endif
+
+#ifndef _WIN32
+# include <unistd.h>
 #endif
 
 #include <ctype.h>
 #include <sys/stat.h>
 
 #ifndef VTK_USE_ANSI_STDLIB
-#define PV_NOCREATE | ios::nocreate
+# define PV_NOCREATE | ios::nocreate
 #else
-#define PV_NOCREATE 
+# define PV_NOCREATE 
 #endif
 
 #define VTK_PV_VTK_FILTERS_MENU_LABEL "Filter"
@@ -137,7 +141,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.473");
+vtkCxxRevisionMacro(vtkPVWindow, "1.474");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);

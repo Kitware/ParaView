@@ -67,6 +67,10 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkCommand.h"
 #include "vtkKWEvent.h"
 
+#ifndef _WIN32
+# include <unistd.h>
+#endif
+
 #include <vtkstd/string>
 #include <vtkstd/map>
 
@@ -175,7 +179,7 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterface);
-vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.85");
+vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.86");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterface,ControlledWidget, vtkPVWidget);
 

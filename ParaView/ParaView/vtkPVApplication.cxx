@@ -123,7 +123,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.218");
+vtkCxxRevisionMacro(vtkPVApplication, "1.219");
 vtkCxxSetObjectMacro(vtkPVApplication, RenderModule, vtkPVRenderModule);
 
 
@@ -666,6 +666,37 @@ void vtkPVApplication::SetEnvironmentVariable(const char* str)
 { 
   char* envstr = vtkString::Duplicate(str);
   putenv(envstr);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVApplication::DeleteTraceFiles(char* name, int all)
+{
+  if ( !all )
+    {
+    unlink(name);
+    return;
+    }
+  char buf[256];
+  if ( vtkDirectory::GetCurrentWorkingDirectory(buf, 256) )
+    {
+    vtkDirectory* dir = vtkDirectory::New();
+    if ( !dir->Open(buf) )
+      {
+      dir->Delete();
+      return;
+      }
+    int numFiles = dir->GetNumberOfFiles();
+    int len = (int)(strlen("ParaViewTrace"));
+    for(int i=0; i<numFiles; i++)
+      {
+      const char* fname = dir->GetFile(i);
+      if ( strncmp(fname, "ParaViewTrace", len) == 0 )
+        {
+        unlink(fname);
+        }
+      }
+    dir->Delete();
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -1343,7 +1374,14 @@ void vtkPVApplication::Start(int argc, char*argv[])
       }
     else if (shouldSave == 1)
       {
-      unlink(traceName);
+      char buffer[1024];
+      sprintf(buffer, "Do you want to delete all the tracefiles? Answering No will only delete \"%s\".",
+        traceName);
+      int all = vtkKWMessageDialog::PopupYesNo(
+        this, ui, "Delete Trace Files",
+        buffer,
+        vtkKWMessageDialog::QuestionIcon);
+      this->DeleteTraceFiles(traceName, all);
       }
     }
 

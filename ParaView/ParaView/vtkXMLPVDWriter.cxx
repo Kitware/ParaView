@@ -42,6 +42,10 @@
 #include <vtkstd/string>
 #include <vtkstd/vector>
 
+#ifndef _WIN32
+# include <unistd.h>
+#endif
+
 #if defined(_WIN32)
 # include <direct.h>
 int vtkXMLPVDWriterMakeDirectory(const char* dirname)
@@ -67,7 +71,7 @@ int vtkXMLPVDWriterRemoveDirectory(const char* dirname)
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkXMLPVDWriter);
-vtkCxxRevisionMacro(vtkXMLPVDWriter, "1.3");
+vtkCxxRevisionMacro(vtkXMLPVDWriter, "1.4");
 
 class vtkXMLPVDWriterInternals
 {
