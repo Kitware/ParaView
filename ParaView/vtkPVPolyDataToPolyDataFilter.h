@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   Visualization Toolkit
-  Module:    vtkPVConeSource.h
+  Module:    vtkPVPolyDataToPolyDataFilter.h
   Language:  C++
   Date:      $Date$
   Version:   $Revision$
@@ -25,18 +25,12 @@ PARTICULAR PURPOSE, AND NON-INFRINGEMENT.  THIS SOFTWARE IS PROVIDED ON AN
 MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 =========================================================================*/
-// .NAME vtkPVConeSource - Parallel cone source with interface.
-// .SECTION Description
-// This is a parallel object.  It needs to be cloned to work correctly.  
-// After cloning, the parallel nature of the object is transparent.
 
-#ifndef __vtkPVConeSource_h
-#define __vtkPVConeSource_h
+#ifndef __vtkPVPolyDataToPolyDataFilter_h
+#define __vtkPVPolyDataToPolyDataFilter_h
 
 #include "vtkKWLabel.h"
-#include "vtkConeSource.h"
 #include "vtkShrinkPolyData.h"
-#include "vtkKWEntry.h"
 #include "vtkKWScale.h"
 #include "vtkKWPushButton.h"
 #include "vtkPVPolyDataSource.h"
@@ -44,45 +38,23 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 class vtkPVPolyData;
 
 
-class VTK_EXPORT vtkPVConeSource : public vtkPVPolyDataSource
+class VTK_EXPORT vtkPVPolyDataToPolyDataFilter : public vtkPVPolyDataSource
 {
 public:
-  static vtkPVConeSource* New();
-  vtkTypeMacro(vtkPVConeSource,vtkPVPolyDataSource);
+  static vtkPVPolyDataToPolyDataFilter* New();
+  vtkTypeMacro(vtkPVPolyDataToPolyDataFilter,vtkPVPolyDataSource);
 
   // Description:
-  // You have to clone this object before you can create it.
-  void CreateProperties();
-
-  // Description:
-  // Used internally to cast source to vtkConeSource.
-  // It may be wise to make it private.
-  vtkConeSource *GetConeSource();
-
-  // Description:
-  // Accept button callback.  It takes the Widget states and sets the 
-  // cone sources parameters.
-  void ConeParameterChanged();
-
-  // Description:
-  // These are parallel versions of the vtkConeSource's methods.
-  void SetRadius(float rad);
-  void SetHeight(float height);
-  void SetResolution(int res);
-
-protected:
-  vtkPVConeSource();
-  ~vtkPVConeSource();
-  vtkPVConeSource(const vtkPVConeSource&) {};
-  void operator=(const vtkPVConeSource&) {};
+  // The methods execute on all processes.
+  void SetInput(vtkPVPolyData *pvData);
   
-  vtkKWLabel *HeightLabel;
-  vtkKWEntry *HeightEntry;
-  vtkKWLabel *RadiusLabel;
-  vtkKWEntry *RadiusEntry;
-  vtkKWLabel *ResolutionLabel;
-  vtkKWEntry *ResolutionEntry;
-  vtkKWPushButton *Accept;
+protected:
+  vtkPVPolyDataToPolyDataFilter();
+  ~vtkPVPolyDataToPolyDataFilter();
+  vtkPVPolyDataToPolyDataFilter(const vtkPVPolyDataToPolyDataFilter&) {};
+  void operator=(const vtkPVPolyDataToPolyDataFilter&) {};
+  
+  void InitializeData();
 };
 
 #endif

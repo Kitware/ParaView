@@ -73,10 +73,6 @@ public:
   void CreateDataPage();
   
   // Description:
-  // Casts to vtkPVApplication.
-  vtkPVApplication *GetPVApplication();
-  
-  // Description:
   // Methods to indicate when this composite is the selected composite.
   // These methods are used by subclasses to modify the menu bar
   // for example. When a volume composite is selected it might 
@@ -97,6 +93,10 @@ public:
   char* GetName();
 
   vtkGetObjectMacro(Input, vtkPVData);
+  
+  // Description:
+  // This just returns the application typecast correctly.
+  vtkPVApplication* GetPVApplication();  
   
 protected:
   vtkPVSource();

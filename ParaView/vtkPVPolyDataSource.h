@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   Visualization Toolkit
-  Module:    vtkPVConeSource.h
+  Module:    vtkPVPolyDataSource.h
   Language:  C++
   Date:      $Date$
   Version:   $Revision$
@@ -25,64 +25,61 @@ PARTICULAR PURPOSE, AND NON-INFRINGEMENT.  THIS SOFTWARE IS PROVIDED ON AN
 MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 =========================================================================*/
-// .NAME vtkPVConeSource - Parallel cone source with interface.
+// .NAME vtkPVPolyDataSource - PV equivavlent to vtkPolyDataSource.
 // .SECTION Description
 // This is a parallel object.  It needs to be cloned to work correctly.  
 // After cloning, the parallel nature of the object is transparent.
 
-#ifndef __vtkPVConeSource_h
-#define __vtkPVConeSource_h
+#ifndef __vtkPVPolyDataSource_h
+#define __vtkPVPolyDataSource_h
 
-#include "vtkKWLabel.h"
-#include "vtkConeSource.h"
-#include "vtkShrinkPolyData.h"
-#include "vtkKWEntry.h"
-#include "vtkKWScale.h"
-#include "vtkKWPushButton.h"
-#include "vtkPVPolyDataSource.h"
+#include "vtkPolyDataSource.h"
+#include "vtkPVSource.h"
 
 class vtkPVPolyData;
 
 
-class VTK_EXPORT vtkPVConeSource : public vtkPVPolyDataSource
+class VTK_EXPORT vtkPVPolyDataSource : public vtkPVSource
 {
 public:
-  static vtkPVConeSource* New();
-  vtkTypeMacro(vtkPVConeSource,vtkPVPolyDataSource);
+  static vtkPVPolyDataSource* New();
+  vtkTypeMacro(vtkPVPolyDataSource, vtkPVSource);
 
   // Description:
-  // You have to clone this object before you can create it.
-  void CreateProperties();
+  // Access to the underlying vtk poly data source.
+  // This access should probably not exist.  Every thing should
+  // be done through the PV interface so that all
+  // clones can be syncronized.
+  vtkGetObjectMacro(PolyDataSource, vtkPolyDataSource);
 
   // Description:
-  // Used internally to cast source to vtkConeSource.
-  // It may be wise to make it private.
-  vtkConeSource *GetConeSource();
+  // This method gets called when the accept button is pressed
+  // for the first time.  It creates a pvData and an actor composite
+  // to display the data.
+  void InitializeData();
 
   // Description:
-  // Accept button callback.  It takes the Widget states and sets the 
-  // cone sources parameters.
-  void ConeParameterChanged();
-
-  // Description:
-  // These are parallel versions of the vtkConeSource's methods.
-  void SetRadius(float rad);
-  void SetHeight(float height);
-  void SetResolution(int res);
-
-protected:
-  vtkPVConeSource();
-  ~vtkPVConeSource();
-  vtkPVConeSource(const vtkPVConeSource&) {};
-  void operator=(const vtkPVConeSource&) {};
+  // This method is called when the GetSource button is pressed.
+  // It makes the input source the current source.
+  void SelectInputSource();
   
-  vtkKWLabel *HeightLabel;
-  vtkKWEntry *HeightEntry;
-  vtkKWLabel *RadiusLabel;
-  vtkKWEntry *RadiusEntry;
-  vtkKWLabel *ResolutionLabel;
-  vtkKWEntry *ResolutionEntry;
-  vtkKWPushButton *Accept;
+  // Description:
+  // The user has to set the output explicitly.
+  // This is executed in all processes.
+  void SetOutput(vtkPVPolyData *pvd);
+  vtkPVPolyData *GetOutput();
+  
+protected:
+  vtkPVPolyDataSource();
+  ~vtkPVPolyDataSource();
+  vtkPVPolyDataSource(const vtkPVPolyDataSource&) {};
+  void operator=(const vtkPVPolyDataSource&) {};
+
+  // Description:
+  // Convenience method for reference counting.
+  vtkSetObjectMacro(PolyDataSource, vtkPolyDataSource);
+  
+  vtkPolyDataSource *PolyDataSource;
 };
 
 #endif

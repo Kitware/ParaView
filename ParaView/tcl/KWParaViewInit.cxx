@@ -80,6 +80,12 @@ ClientData vtkPVMenuButtonNewCommand();
 int vtkPVPolyDataCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkPVPolyDataNewCommand();
+int vtkPVPolyDataSourceCommand(ClientData cd, Tcl_Interp *interp,
+             int argc, char *argv[]);
+ClientData vtkPVPolyDataSourceNewCommand();
+int vtkPVPolyDataToPolyDataFilterCommand(ClientData cd, Tcl_Interp *interp,
+             int argc, char *argv[]);
+ClientData vtkPVPolyDataToPolyDataFilterNewCommand();
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkPVRenderViewNewCommand();
@@ -180,6 +186,10 @@ int VTK_EXPORT Vtkkwparaviewtcl_Init(Tcl_Interp *interp)
                   vtkPVMenuButtonCommand);
   vtkTclCreateNew(interp,"vtkPVPolyData", vtkPVPolyDataNewCommand,
                   vtkPVPolyDataCommand);
+  vtkTclCreateNew(interp,"vtkPVPolyDataSource", vtkPVPolyDataSourceNewCommand,
+                  vtkPVPolyDataSourceCommand);
+  vtkTclCreateNew(interp,"vtkPVPolyDataToPolyDataFilter", vtkPVPolyDataToPolyDataFilterNewCommand,
+                  vtkPVPolyDataToPolyDataFilterCommand);
   vtkTclCreateNew(interp,"vtkPVRenderView", vtkPVRenderViewNewCommand,
                   vtkPVRenderViewCommand);
   vtkTclCreateNew(interp,"vtkPVShrinkPolyData", vtkPVShrinkPolyDataNewCommand,

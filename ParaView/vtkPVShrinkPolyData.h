@@ -33,36 +33,29 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkShrinkPolyData.h"
 #include "vtkKWScale.h"
 #include "vtkKWPushButton.h"
-#include "vtkPVSource.h"
+#include "vtkPVPolyDataToPolyDataFilter.h"
 
 class vtkPVPolyData;
 
 
-class VTK_EXPORT vtkPVShrinkPolyData : public vtkPVSource
+class VTK_EXPORT vtkPVShrinkPolyData : public vtkPVPolyDataToPolyDataFilter
 {
 public:
   static vtkPVShrinkPolyData* New();
-  vtkTypeMacro(vtkPVShrinkPolyData,vtkPVSource);
+  vtkTypeMacro(vtkPVShrinkPolyData,vtkPVPolyDataToPolyDataFilter);
 
   // Description:
   // You have to clone this object before you create its UI.
   void CreateProperties();
   
   // Description:
-  // For now you have to set the output explicitly.  This allows you to manage
-  // the object creation/tcl-names in the other processes.
-  void SetOutput(vtkPVPolyData *pvd);
-  vtkPVPolyData *GetOutput();
-  
+  // This method is called when the accpt button is pressed.
   void ShrinkFactorChanged();
-  void GetSource();
-
-  vtkGetObjectMacro(Shrink, vtkShrinkPolyData);
 
   // Description:
-  // The methods execute on all processes.
-  void SetInput(vtkPVPolyData *pvData);
-  
+  // This is used internally to cast the source to a vtkShrinkPolyData
+  vtkShrinkPolyData *GetShrink();
+
   // Description:
   // The methods execute on all processes.
   void SetShrinkFactor(float factor);
@@ -77,7 +70,6 @@ protected:
   vtkKWPushButton *SourceButton;
   vtkKWScale *ShrinkFactorScale;
 
-  vtkShrinkPolyData *Shrink;
 };
 
 #endif

@@ -27,9 +27,6 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 =========================================================================*/
 
 #include "vtkPVConeSource.h"
-#include "vtkKWApplication.h"
-#include "vtkKWView.h"
-#include "vtkKWRenderView.h"
 #include "vtkPVPolyData.h"
 #include "vtkPVApplication.h"
 #include "vtkPVAssignment.h"
@@ -58,7 +55,10 @@ vtkPVConeSource::vtkPVConeSource()
   this->ResolutionEntry->SetParent(this->Properties);
   this->Accept = vtkKWPushButton::New();
   this->Accept->SetParent(this->Properties);
-  this->ConeSource = vtkConeSource::New();  
+
+  vtkConeSource *source = vtkConeSource::New();  
+  this->SetPolyDataSource(source);
+  source->Delete();
 }
 
 //----------------------------------------------------------------------------
@@ -81,10 +81,10 @@ vtkPVConeSource::~vtkPVConeSource()
   this->Accept->Delete();
   this->Accept = NULL;
     
-  this->ConeSource->Delete();
-  this->ConeSource = NULL;
+  this->SetPolyDataSource(NULL);
 }
 
+//----------------------------------------------------------------------------
 vtkPVConeSource* vtkPVConeSource::New()
 {
   return new vtkPVConeSource();
@@ -93,7 +93,7 @@ vtkPVConeSource* vtkPVConeSource::New()
 //----------------------------------------------------------------------------
 void vtkPVConeSource::CreateProperties()
 {  
-  this->vtkPVSource::CreateProperties();
+  this->vtkPVPolyDataSource::CreateProperties();
   
   this->RadiusLabel->Create(this->Application, "");
   this->RadiusLabel->SetLabel("Radius:");
@@ -102,11 +102,11 @@ void vtkPVConeSource::CreateProperties()
   this->ResolutionLabel->Create(this->Application, "");
   this->ResolutionLabel->SetLabel("Resolution:");
   this->RadiusEntry->Create(this->Application, "");
-  this->RadiusEntry->SetValue(this->ConeSource->GetRadius(), 2);
+  this->RadiusEntry->SetValue(this->GetConeSource()->GetRadius(), 2);
   this->HeightEntry->Create(this->Application, "");
-  this->HeightEntry->SetValue(this->ConeSource->GetHeight(), 2);
+  this->HeightEntry->SetValue(this->GetConeSource()->GetHeight(), 2);
   this->ResolutionEntry->Create(this->Application, "");
-  this->ResolutionEntry->SetValue(this->ConeSource->GetResolution());
+  this->ResolutionEntry->SetValue(this->GetConeSource()->GetResolution());
   this->Accept->Create(this->Application, "-text Accept");
   this->Accept->SetCommand(this, "ConeParameterChanged");
   this->Script("pack %s %s %s %s %s %s %s",
@@ -120,55 +120,18 @@ void vtkPVConeSource::CreateProperties()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVConeSource::SetOutput(vtkPVPolyData *pd)
-{
-  vtkPVApplication *pvApp = this->GetPVApplication();
-
-  this->SetPVData(pd);  
-  pd->SetData(this->ConeSource->GetOutput());
-  
-  if (pvApp && pvApp->GetController()->GetLocalProcessId() == 0)
-    {
-    pvApp->BroadcastScript("%s SetOutput %s", this->GetTclName(), 
-			   pd->GetTclName());
-    }
-}
-
-
-//----------------------------------------------------------------------------
-vtkPVPolyData *vtkPVConeSource::GetOutput()
-{
-  return vtkPVPolyData::SafeDownCast(this->Output);
-}
-
-
-//----------------------------------------------------------------------------
 void vtkPVConeSource::ConeParameterChanged()
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
-  vtkPVPolyData *pvd;
-  vtkPVAssignment *a;
-  vtkPVActorComposite *ac;
   vtkPVWindow *window = this->GetWindow();
  
-  this->ConeSource->SetRadius(this->RadiusEntry->GetValueAsFloat());
-  this->ConeSource->SetHeight(this->HeightEntry->GetValueAsFloat());
-  this->ConeSource->SetResolution(this->ResolutionEntry->GetValueAsInt());
+  this->GetConeSource()->SetRadius(this->RadiusEntry->GetValueAsFloat());
+  this->GetConeSource()->SetHeight(this->HeightEntry->GetValueAsFloat());
+  this->GetConeSource()->SetResolution(this->ResolutionEntry->GetValueAsInt());
 
   if (this->GetPVData() == NULL)
     { // This is the first time, initialize data.  
-    pvd = vtkPVPolyData::New();
-    pvd->Clone(pvApp);
-    a = vtkPVAssignment::New();
-    a->Clone(pvApp);
-  
-    pvd->SetAssignment(a);
-    this->SetOutput(pvd);
-  
-    this->CreateDataPage();
-  
-    ac = this->GetPVData()->GetActorComposite();
-    window->GetMainView()->AddComposite(ac);
+    this->InitializeData();
     }
   
   if (window->GetPreviousSource() != NULL)
@@ -182,32 +145,13 @@ void vtkPVConeSource::ConeParameterChanged()
   window->GetMainView()->ResetCamera();
 }
 
-//----------------------------------------------------------------------------
-vtkPVApplication* vtkPVConeSource::GetPVApplication()
-{
-  if (this->Application == NULL)
-    {
-    return NULL;
-    }
-  
-  if (this->Application->IsA("vtkPVApplication"))
-    {  
-    return (vtkPVApplication*)(this->Application);
-    }
-  else
-    {
-    vtkErrorMacro("Bad typecast");
-    return NULL;
-    } 
-}
-
 
 //----------------------------------------------------------------------------
 void vtkPVConeSource::SetRadius(float rad)
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
   
-  this->ConeSource->SetRadius(rad);
+  this->GetConeSource()->SetRadius(rad);
   
   if (pvApp && pvApp->GetController()->GetNumberOfProcesses() == 0)
     {
@@ -220,7 +164,7 @@ void vtkPVConeSource::SetHeight(float height)
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
   
-  this->ConeSource->SetHeight(height);
+  this->GetConeSource()->SetHeight(height);
   
   if (pvApp && pvApp->GetController()->GetNumberOfProcesses() == 0)
     {
@@ -233,11 +177,18 @@ void vtkPVConeSource::SetResolution(int res)
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
   
-  this->ConeSource->SetResolution(res);
+  this->GetConeSource()->SetResolution(res);
   
   if (pvApp && pvApp->GetController()->GetNumberOfProcesses() == 0)
     {
     pvApp->BroadcastScript("%s SetResolution %d", this->GetTclName(), res);
     }
 }
+
+//----------------------------------------------------------------------------
+vtkConeSource *vtkPVConeSource::GetConeSource() 
+{
+  return vtkConeSource::SafeDownCast(this->PolyDataSource);
+}
+
 

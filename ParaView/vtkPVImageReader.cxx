@@ -201,7 +201,7 @@ vtkPVImage *vtkPVImageReader::GetOutput()
 //----------------------------------------------------------------------------
 void vtkPVImageReader::ImageAccepted()
 {
-  vtkPVApplication *pvApp = vtkPVApplication::SafeDownCast(this->Application);
+  vtkPVApplication *pvApp = this->GetPVApplication();
   vtkPVImage *pvImage;
   vtkPVAssignment *a;
   vtkPVActorComposite *ac;

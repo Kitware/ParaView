@@ -39,23 +39,26 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkKWEntry.h"
 #include "vtkKWScale.h"
 #include "vtkKWPushButton.h"
-#include "vtkPVSource.h"
+#include "vtkPVPolyDataSource.h"
 
 class vtkPVPolyData;
 
 
-class VTK_EXPORT vtkPVSphereSource : public vtkPVSource
+class VTK_EXPORT vtkPVSphereSource : public vtkPVPolyDataSource
 {
 public:
   static vtkPVSphereSource* New();
-  vtkTypeMacro(vtkPVSphereSource, vtkPVSource);
+  vtkTypeMacro(vtkPVSphereSource, vtkPVPolyDataSource);
 
   // Description:
   // You have to clone this object before you can create it.
   void CreateProperties();
 
-  vtkGetObjectMacro(SphereSource, vtkSphereSource);
-
+  // Description:
+  // Used internally to cast source to vtkSphereSource.
+  // It might be wise to protect this method.
+  vtkSphereSource *GetSphereSource();
+  
   // Description:
   // Accept button callback.  It takes the Widget states and sets the 
   // sphere sources parameters.
@@ -66,16 +69,6 @@ public:
   void SetRadius(float rad);
   void SetPhiResolution(int res);
   void SetThetaResolution(int res);
-
-  // Description:
-  // The user has to set the output explicitly.
-  // This is executed in all processes.
-  void SetOutput(vtkPVPolyData *pvd);
-  vtkPVPolyData *GetOutput();
-  
-  // Description:
-  // This just returns the application typecast correctly.
-  vtkPVApplication* GetPVApplication();
 
 protected:
   vtkPVSphereSource();
@@ -90,8 +83,6 @@ protected:
   vtkKWLabel *ThetaResolutionLabel;
   vtkKWEntry *ThetaResolutionEntry;
   vtkKWPushButton *Accept;
-
-  vtkSphereSource *SphereSource;
 };
 
 #endif

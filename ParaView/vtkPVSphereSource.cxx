@@ -27,9 +27,6 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 =========================================================================*/
 
 #include "vtkPVSphereSource.h"
-#include "vtkKWApplication.h"
-#include "vtkKWView.h"
-#include "vtkKWRenderView.h"
 #include "vtkPVPolyData.h"
 #include "vtkPVApplication.h"
 #include "vtkPVAssignment.h"
@@ -58,7 +55,10 @@ vtkPVSphereSource::vtkPVSphereSource()
   this->ThetaResolutionEntry->SetParent(this->Properties);
   this->Accept = vtkKWPushButton::New();
   this->Accept->SetParent(this->Properties);
-  this->SphereSource = vtkSphereSource::New();  
+
+  vtkSphereSource *s = vtkSphereSource::New();  
+  this->SetPolyDataSource(s);
+  s->Delete();
 }
 
 //----------------------------------------------------------------------------
@@ -80,11 +80,9 @@ vtkPVSphereSource::~vtkPVSphereSource()
 
   this->Accept->Delete();
   this->Accept = NULL;
-    
-  this->SphereSource->Delete();
-  this->SphereSource = NULL;
 }
 
+//----------------------------------------------------------------------------
 vtkPVSphereSource* vtkPVSphereSource::New()
 {
   return new vtkPVSphereSource();
@@ -93,7 +91,7 @@ vtkPVSphereSource* vtkPVSphereSource::New()
 //----------------------------------------------------------------------------
 void vtkPVSphereSource::CreateProperties()
 {  
-  this->vtkPVSource::CreateProperties();
+  this->vtkPVPolyDataSource::CreateProperties();
   
   this->RadiusLabel->Create(this->Application, "");
   this->RadiusLabel->SetLabel("Radius:");
@@ -102,11 +100,11 @@ void vtkPVSphereSource::CreateProperties()
   this->ThetaResolutionLabel->Create(this->Application, "");
   this->ThetaResolutionLabel->SetLabel("Theta Resolution:");
   this->RadiusEntry->Create(this->Application, "");
-  this->RadiusEntry->SetValue(this->SphereSource->GetRadius(), 2);
+  this->RadiusEntry->SetValue(this->GetSphereSource()->GetRadius(), 2);
   this->PhiResolutionEntry->Create(this->Application, "");
-  this->PhiResolutionEntry->SetValue(this->SphereSource->GetPhiResolution());
+  this->PhiResolutionEntry->SetValue(this->GetSphereSource()->GetPhiResolution());
   this->ThetaResolutionEntry->Create(this->Application, "");
-  this->ThetaResolutionEntry->SetValue(this->SphereSource->GetThetaResolution());
+  this->ThetaResolutionEntry->SetValue(this->GetSphereSource()->GetThetaResolution());
   this->Accept->Create(this->Application, "-text Accept");
   this->Accept->SetCommand(this, "SphereParameterChanged");
   this->Script("pack %s %s %s %s %s %s %s",
@@ -120,55 +118,18 @@ void vtkPVSphereSource::CreateProperties()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVSphereSource::SetOutput(vtkPVPolyData *pd)
-{
-  vtkPVApplication *pvApp = this->GetPVApplication();
-
-  this->SetPVData(pd);  
-  pd->SetData(this->SphereSource->GetOutput());
-  
-  if (pvApp && pvApp->GetController()->GetLocalProcessId() == 0)
-    {
-    pvApp->BroadcastScript("%s SetOutput %s", this->GetTclName(), 
-			   pd->GetTclName());
-    }
-}
-
-
-//----------------------------------------------------------------------------
-vtkPVPolyData *vtkPVSphereSource::GetOutput()
-{
-  return vtkPVPolyData::SafeDownCast(this->Output);
-}
-
-
-//----------------------------------------------------------------------------
 void vtkPVSphereSource::SphereParameterChanged()
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
-  vtkPVPolyData *pvd;
-  vtkPVAssignment *a;
-  vtkPVActorComposite *ac;
   vtkPVWindow *window = this->GetWindow();
  
-  this->SphereSource->SetRadius(this->RadiusEntry->GetValueAsFloat());
-  this->SphereSource->SetPhiResolution(this->PhiResolutionEntry->GetValueAsInt());
-  this->SphereSource->SetThetaResolution(this->ThetaResolutionEntry->GetValueAsInt());
+  this->GetSphereSource()->SetRadius(this->RadiusEntry->GetValueAsFloat());
+  this->GetSphereSource()->SetPhiResolution(this->PhiResolutionEntry->GetValueAsInt());
+  this->GetSphereSource()->SetThetaResolution(this->ThetaResolutionEntry->GetValueAsInt());
 
   if (this->GetPVData() == NULL)
     { // This is the first time, initialize data.  
-    pvd = vtkPVPolyData::New();
-    pvd->Clone(pvApp);
-    a = vtkPVAssignment::New();
-    a->Clone(pvApp);
-  
-    pvd->SetAssignment(a);
-    this->SetOutput(pvd);
-  
-    this->CreateDataPage();
-  
-    ac = this->GetPVData()->GetActorComposite();
-    window->GetMainView()->AddComposite(ac);
+    this->InitializeData();
     }
   
   if (window->GetPreviousSource() != NULL)
@@ -183,31 +144,11 @@ void vtkPVSphereSource::SphereParameterChanged()
 }
 
 //----------------------------------------------------------------------------
-vtkPVApplication* vtkPVSphereSource::GetPVApplication()
-{
-  if (this->Application == NULL)
-    {
-    return NULL;
-    }
-  
-  if (this->Application->IsA("vtkPVApplication"))
-    {  
-    return (vtkPVApplication*)(this->Application);
-    }
-  else
-    {
-    vtkErrorMacro("Bad typecast");
-    return NULL;
-    } 
-}
-
-
-//----------------------------------------------------------------------------
 void vtkPVSphereSource::SetRadius(float rad)
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
   
-  this->SphereSource->SetRadius(rad);
+  this->GetSphereSource()->SetRadius(rad);
   
   if (pvApp && pvApp->GetController()->GetNumberOfProcesses() == 0)
     {
@@ -220,7 +161,7 @@ void vtkPVSphereSource::SetPhiResolution(int res)
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
   
-  this->SphereSource->SetPhiResolution(res);
+  this->GetSphereSource()->SetPhiResolution(res);
   
   if (pvApp && pvApp->GetController()->GetNumberOfProcesses() == 0)
     {
@@ -233,11 +174,31 @@ void vtkPVSphereSource::SetThetaResolution(int res)
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
   
-  this->SphereSource->SetThetaResolution(res);
+  this->GetSphereSource()->SetThetaResolution(res);
   
   if (pvApp && pvApp->GetController()->GetNumberOfProcesses() == 0)
     {
     pvApp->BroadcastScript("%s SetThetaResolution %d", this->GetTclName(), res);
     }
 }
+
+
+//----------------------------------------------------------------------------
+vtkSphereSource *vtkPVSphereSource::GetSphereSource()
+{
+  return vtkSphereSource::SafeDownCast(this->PolyDataSource);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
 

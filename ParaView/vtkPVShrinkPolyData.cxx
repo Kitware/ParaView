@@ -47,7 +47,10 @@ vtkPVShrinkPolyData::vtkPVShrinkPolyData()
   this->SourceButton->SetParent(this->Properties);
   this->ShrinkFactorScale = vtkKWScale::New();
   this->ShrinkFactorScale->SetParent(this->Properties);
-  this->Shrink = vtkShrinkPolyData::New();
+
+  vtkShrinkPolyData *shrink = vtkShrinkPolyData::New();
+  this->SetPolyDataSource(shrink);
+  shrink->Delete();
 }
 
 //----------------------------------------------------------------------------
@@ -60,9 +63,6 @@ vtkPVShrinkPolyData::~vtkPVShrinkPolyData()
   
   this->ShrinkFactorScale->Delete();
   this->ShrinkFactorScale = NULL;
-  
-  this->Shrink->Delete();
-  this->Shrink = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -84,7 +84,7 @@ void vtkPVShrinkPolyData::CreateProperties()
   this->ShrinkFactorScale->SetValue(this->GetShrink()->GetShrinkFactor());
   
   this->SourceButton->Create(this->Application, "-text GetSource");
-  this->SourceButton->SetCommand(this, "GetSource");
+  this->SourceButton->SetCommand(this, "SelectInputSource");
   this->Accept->Create(this->Application, "-text Accept");
   this->Accept->SetCommand(this, "ShrinkFactorChanged");
   this->Script("pack %s %s %s",
@@ -94,48 +94,16 @@ void vtkPVShrinkPolyData::CreateProperties()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVShrinkPolyData::SetOutput(vtkPVPolyData *pvd)
-{
-  vtkPVApplication *pvApp = this->GetPVApplication();
-  
-  if (pvApp && pvApp->GetController()->GetLocalProcessId() == 0)
-    {
-    pvApp->BroadcastScript("%s SetOutput %s", this->GetTclName(),
-			   pvd->GetTclName());
-    }  
-  
-  this->SetPVData(pvd);  
-  pvd->SetData(this->Shrink->GetOutput());
-}
-
-//----------------------------------------------------------------------------
-vtkPVPolyData *vtkPVShrinkPolyData::GetOutput()
-{
-  return vtkPVPolyData::SafeDownCast(this->Output);
-}
-
-//----------------------------------------------------------------------------
 void vtkPVShrinkPolyData::ShrinkFactorChanged()
 {
   vtkPVApplication *pvApp = (vtkPVApplication *)this->Application;
-  vtkPVPolyData *pvd;
-  vtkPVAssignment *a;
   vtkPVWindow *window = this->GetWindow();
-  vtkPVActorComposite *ac;
   
   this->SetShrinkFactor(this->ShrinkFactorScale->GetValue());
 
   if (this->GetPVData() == NULL)
     { // This is the first time. Create the data.
-    pvd = vtkPVPolyData::New();
-    pvd->Clone(pvApp);
-    this->SetOutput(pvd);
-    a = this->GetInput()->GetAssignment();
-    pvd->SetAssignment(a);
-    this->GetInput()->GetActorComposite()->VisibilityOff();
-    ac = this->GetPVData()->GetActorComposite();
-    window->GetMainView()->AddComposite(ac);
-    this->CreateDataPage();
+    this->InitializeData();
     }
 
   window->GetMainView()->SetSelectedComposite(this);
@@ -152,31 +120,13 @@ void vtkPVShrinkPolyData::SetShrinkFactor(float factor)
 			   factor);
     }
   
-  this->Shrink->SetShrinkFactor(factor);
+  this->GetShrink()->SetShrinkFactor(factor);
 }
 
 //----------------------------------------------------------------------------
-void vtkPVShrinkPolyData::SetInput(vtkPVPolyData *pvData)
+vtkShrinkPolyData *vtkPVShrinkPolyData::GetShrink()
 {
-  vtkPVApplication *pvApp = this->GetPVApplication();
-  
-  if (pvApp && pvApp->GetController()->GetLocalProcessId() == 0)
-    {
-    pvApp->BroadcastScript("%s SetInput %s", this->GetTclName(),
-			   pvData->GetTclName());
-    }  
-  
-  this->GetShrink()->SetInput(pvData->GetPolyData());
-  this->Input = pvData;
+  return vtkShrinkPolyData::SafeDownCast(this->PolyDataSource);
 }
 
-//----------------------------------------------------------------------------
-void vtkPVShrinkPolyData::GetSource()
-{
-  this->GetPVData()->GetActorComposite()->VisibilityOff();
-  this->GetWindow()->GetMainView()->
-    SetSelectedComposite(this->GetInput()->GetPVSource());
-  this->GetInput()->GetActorComposite()->VisibilityOn();
-  this->GetView()->Render();
-  this->GetWindow()->GetMainView()->ResetCamera();
-}
+
