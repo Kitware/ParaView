@@ -271,9 +271,6 @@ vtkPVActorComposite::~vtkPVActorComposite()
   
   this->SetInput(NULL);
     
-  delete [] this->ScalarBarTclName;
-  this->ScalarBarTclName = NULL;
-  
   if (this->ScalarBarTclName)
     {
     pvApp->BroadcastScript("%s Delete", this->ScalarBarTclName);
@@ -349,6 +346,9 @@ vtkPVActorComposite::~vtkPVActorComposite()
   this->DisplayStyleFrame = NULL;
   this->StatsFrame->Delete();
   this->StatsFrame = NULL;
+  
+  this->ResetCameraButton->Delete();
+  this->ResetCameraButton = NULL;
 }
 
 

@@ -31,7 +31,6 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 #include "vtkPVActorComposite.h"
 #include "vtkDataSet.h"
-#include "vtkKWPushButton.h"
 #include "vtkPVSourceCollection.h"
 
 class vtkPVSource;
