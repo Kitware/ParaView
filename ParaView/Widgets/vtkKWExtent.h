@@ -51,7 +51,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkKWWidget.h"
 
-class vtkKWScale;
+class vtkKWRange;
 class vtkKWApplication;
 
 class VTK_EXPORT vtkKWExtent : public vtkKWWidget
@@ -83,12 +83,9 @@ public:
   // sliders has been moved.
   void ExtentSelected();
 
-  vtkKWScale *GetXMinScale() { return this->XMinScale; };
-  vtkKWScale *GetXMaxScale() { return this->XMaxScale; };
-  vtkKWScale *GetYMinScale() { return this->YMinScale; };
-  vtkKWScale *GetYMaxScale() { return this->YMaxScale; };
-  vtkKWScale *GetZMinScale() { return this->ZMinScale; };
-  vtkKWScale *GetZMaxScale() { return this->ZMaxScale; };
+  vtkKWRange *GetXRange() { return this->XRange; };
+  vtkKWRange *GetYRange() { return this->YRange; };
+  vtkKWRange *GetZRange() { return this->ZRange; };
 
   // Description:
   // A method to set callback functions on objects.  The first argument is
@@ -99,23 +96,26 @@ public:
 
   // Description:
   // A convenience method to set the start and end method of all the
-  // internal scales.  
+  // internal ranges.  
   virtual void SetStartCommand(vtkKWObject* Object, 
                                const char *MethodAndArgString);
   virtual void SetEndCommand(vtkKWObject* Object, 
                              const char *MethodAndArgString);
 
   // Description:
-  // Set whether the command should be called or not.
-  // This just propagates SetDisableCommands to the internal scales.
+  // Convenience method to set whether the command should be called or not.
+  // This just propagates SetDisableCommands to the internal ranges.
   virtual void SetDisableCommands(int);
   vtkBooleanMacro(DisableCommands, int);
 
   // Description:
-  // Pack the min and max scale together on the same line.
-  virtual void SetPackMinMaxTogether(int);
-  vtkBooleanMacro(PackMinMaxTogether, int);
-  vtkGetMacro(PackMinMaxTogether, int);
+  // Convenience method to set the ranges orientations and item positions.
+  // This just propagates the same method to the internal ranges.
+  virtual void SetOrientation(int);
+  virtual void SetLabelPosition(int);
+  virtual void SetEntriesPosition(int);
+  virtual void SetSliderCanPush(int);
+  vtkBooleanMacro(SliderCanPush, int);
 
 protected:
   vtkKWExtent();
@@ -123,14 +123,10 @@ protected:
 
   char *Command;
   float Extent[6];
-  vtkKWScale  *XMinScale;
-  vtkKWScale  *XMaxScale;
-  vtkKWScale  *YMinScale;
-  vtkKWScale  *YMaxScale;
-  vtkKWScale  *ZMinScale;
-  vtkKWScale  *ZMaxScale;
 
-  int PackMinMaxTogether;
+  vtkKWRange  *XRange;
+  vtkKWRange  *YRange;
+  vtkKWRange  *ZRange;
 
   // Pack or repack the widget
 
