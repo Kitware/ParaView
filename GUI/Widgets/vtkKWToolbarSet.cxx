@@ -30,7 +30,7 @@
 //----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkKWToolbarSet);
-vtkCxxRevisionMacro(vtkKWToolbarSet, "1.7");
+vtkCxxRevisionMacro(vtkKWToolbarSet, "1.8");
 
 int vtkvtkKWToolbarSetCommand(ClientData cd, Tcl_Interp *interp,
                                   int argc, char *argv[]);
@@ -211,7 +211,7 @@ void vtkKWToolbarSet::PackToolbars()
       if (toolbar_slot->Visibility)
         {
         // Pack a separator
-
+        toolbar_slot->Toolbar->Bind();
         if (previous)
           {
           if (!toolbar_slot->SeparatorFrame->IsCreated())
@@ -238,7 +238,7 @@ void vtkKWToolbarSet::PackToolbars()
       else
         {
         // Unpack separator and toolbar
-
+        toolbar_slot->Toolbar->UnBind();
         if (toolbar_slot->SeparatorFrame->IsCreated())
           {
           tk_cmd << "pack forget " 

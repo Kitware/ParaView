@@ -221,7 +221,7 @@ static unsigned char image_prev[] =
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.631");
+vtkCxxRevisionMacro(vtkPVWindow, "1.632");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -603,10 +603,6 @@ void vtkPVWindow::PrepareForDelete()
    
   if (this->InteractorToolbar)
     {
-    // We need to unhide the toolbar before we destory it
-    // otherwise some references to the toolbar remain on Linux.
-    // This needs to be figured out and fixed.
-    this->ShowToolbar(this->InteractorToolbar,VTK_PV_TOOLBARS_INTERACTION_LABEL);
     this->InteractorToolbar->Delete();
     this->InteractorToolbar = NULL;
     }
@@ -649,10 +645,6 @@ void vtkPVWindow::PrepareForDelete()
   
   if (this->AnimationToolbar)
     {
-    // We need to unhide the toolbar before we destory it
-    // otherwise some references to the toolbar remain on Linux.
-    // This needs to be figured out and fixed.
-    this->ShowToolbar(this->AnimationToolbar,VTK_PV_TOOLBARS_ANIMATION_LABEL);
     this->AnimationToolbar->Delete();
     this->AnimationToolbar = NULL;
     }
@@ -675,10 +667,6 @@ void vtkPVWindow::PrepareForDelete()
   
   if (this->Toolbar)
     {
-    // We need to unhide the toolbar before we destory it
-    // otherwise some references to the toolbar remain on Linux.
-    // This needs to be figured out and fixed.
-    this->ShowToolbar(this->Toolbar,VTK_PV_TOOLBARS_TOOLS_LABEL);
     this->Toolbar->Delete();
     this->Toolbar = NULL;
     }
@@ -756,10 +744,6 @@ void vtkPVWindow::PrepareForDelete()
   
   if (this->PickCenterToolbar)
     {
-    // We need to unhide the toolbar before we destory it
-    // otherwise some references to the toolbar remain on Linux.
-    // This needs to be figured out and fixed.
-    this->ShowToolbar(this->PickCenterToolbar, VTK_PV_TOOLBARS_CAMERA_LABEL);
     this->PickCenterToolbar->Delete();
     this->PickCenterToolbar = NULL;
     }

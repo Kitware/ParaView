@@ -145,6 +145,12 @@ public:
   // of 3D widgets, etc.
   virtual void UpdateEnableState();
 
+
+  // Description:
+  // Bind/Unbind events.
+  virtual void Bind();
+  virtual void UnBind();
+
 protected:
   vtkKWToolbar();
   ~vtkKWToolbar();

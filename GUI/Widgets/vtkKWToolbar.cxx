@@ -57,7 +57,7 @@ void vtkKWToolbar::SetGlobalWidgetsFlatAspect(int val)
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWToolbar );
-vtkCxxRevisionMacro(vtkKWToolbar, "1.38");
+vtkCxxRevisionMacro(vtkKWToolbar, "1.39");
 
 int vtkKWToolbarCommand(ClientData cd, Tcl_Interp *interp,
                        int argc, char *argv[]);
@@ -122,6 +122,24 @@ vtkKWToolbar::~vtkKWToolbar()
 }
 
 //----------------------------------------------------------------------------
+void vtkKWToolbar::Bind()
+{
+  if (this->IsCreated())
+    {
+    this->Script("bind %s <Configure> {%s ScheduleResize}",
+               this->GetWidgetName(), this->GetTclName());
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWToolbar::UnBind()
+{
+  if (this->IsCreated())
+    {
+    this->Script("bind %s <Configure> {}", this->GetWidgetName());
+    }
+}
+//----------------------------------------------------------------------------
 void vtkKWToolbar::Create(vtkKWApplication *app)
 {
   // Call the superclass to create the widget and set the appropriate flags
@@ -131,9 +149,8 @@ void vtkKWToolbar::Create(vtkKWApplication *app)
     vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;
     }
-
-  this->Script("bind %s <Configure> {%s ScheduleResize}",
-               this->GetWidgetName(), this->GetTclName());
+  
+  this->Bind();
 
   // Create the widgets container itself
 
