@@ -24,6 +24,7 @@
 
 #include "vtkPV3DWidget.h"
 
+class vtkPVAnimationInterfaceEntry;
 class vtkPVSource;
 class vtkKWEntry;
 class vtkKWPushButton;
@@ -113,11 +114,35 @@ public:
   virtual vtkSMProxy* GetProxyByName(const char*);
 
   // Description:
+  // adds a script to the menu of the animation interface.
+  virtual void AddAnimationScriptsToMenu(
+    vtkKWMenu *menu, vtkPVAnimationInterfaceEntry *ai);
+
+  // Description:
+  // Called when menu item (above) is selected.  Neede for tracing.
+  // Would not be necessary if menus traced invocations.
+  virtual void AnimationMenuCallback(vtkPVAnimationInterfaceEntry *ai);
+
+  // Description:
+  // Calls UpdateVTKObjects on the plane proxy.
+  virtual void UpdateVTKObjects();
+
+  // Description:
+  // Resets the animation entries (start and end) to values obtained
+  // from the range domain of the Offset property to the plane proxy
+  virtual void ResetAnimationRange(vtkPVAnimationInterfaceEntry* ai);
+
+  // Description:
   // Overloaded to create the ImplicitFunctionProxy
   // BTX
   virtual void Create(vtkKWApplication *app);
   //ETX
-   
+
+  // Description:
+  // Updates the Offset property of the plane proxy 
+  // and calls ModifiedCallback.
+  void UpdateOffsetRange();
+
 protected:
   vtkPVImplicitPlaneWidget();
   ~vtkPVImplicitPlaneWidget();
@@ -145,6 +170,7 @@ protected:
   vtkKWPushButton *CenterResetButton;
 
   vtkKWEntry *NormalEntry[3];
+  vtkKWEntry *OffsetEntry;
 
   vtkKWWidget *NormalButtonFrame;
   vtkKWPushButton *NormalCameraButton;
@@ -152,6 +178,7 @@ protected:
   vtkKWPushButton *NormalYButton;
   vtkKWPushButton *NormalZButton;
   vtkKWLabel* Labels[2];
+  vtkKWLabel* OffsetLabel;
   vtkKWLabel* CoordinateLabel[3];
 
   vtkSMProxy *ImplicitFunctionProxy;

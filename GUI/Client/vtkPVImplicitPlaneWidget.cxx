@@ -20,11 +20,13 @@
 #include "vtkKWEntry.h"
 #include "vtkKWFrame.h"
 #include "vtkKWLabel.h"
+#include "vtkKWMenu.h"
 #include "vtkKWPushButton.h"
 #include "vtkKWView.h"
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
 #include "vtkProperty.h"
+#include "vtkPVAnimationInterfaceEntry.h"
 #include "vtkPVApplication.h"
 #include "vtkPVRenderView.h"
 #include "vtkPVData.h"
@@ -41,6 +43,7 @@
 #include "vtkKWEvent.h"
 #include "vtkSMImplicitPlaneWidgetProxy.h"
 
+#include "vtkSMBoundsDomain.h"
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMProxyManager.h"
@@ -48,7 +51,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVImplicitPlaneWidget);
-vtkCxxRevisionMacro(vtkPVImplicitPlaneWidget, "1.37");
+vtkCxxRevisionMacro(vtkPVImplicitPlaneWidget, "1.38");
 
 vtkCxxSetObjectMacro(vtkPVImplicitPlaneWidget, InputMenu, vtkPVInputMenu);
 
@@ -70,6 +73,8 @@ vtkPVImplicitPlaneWidget::vtkPVImplicitPlaneWidget()
     this->NormalEntry[cc] = vtkKWEntry::New();
     this->CoordinateLabel[cc] = vtkKWLabel::New();
    }
+  this->OffsetLabel = vtkKWLabel::New();
+  this->OffsetEntry = vtkKWEntry::New();
   this->CenterResetButton = vtkKWPushButton::New();
   this->NormalButtonFrame = vtkKWWidget::New();
   this->NormalCameraButton = vtkKWPushButton::New();
@@ -95,6 +100,8 @@ vtkPVImplicitPlaneWidget::~vtkPVImplicitPlaneWidget()
     this->NormalEntry[i]->Delete();
     this->CoordinateLabel[i]->Delete();
     }
+  this->OffsetLabel->Delete();
+  this->OffsetEntry->Delete();
   this->CenterResetButton->Delete();
   this->NormalButtonFrame->Delete();
   this->NormalCameraButton->Delete();
@@ -192,54 +199,74 @@ void vtkPVImplicitPlaneWidget::NormalZCallback()
 //----------------------------------------------------------------------------
 void vtkPVImplicitPlaneWidget::ResetInternal()
 {
+
   if ( !this->AcceptCalled)
     {
     this->ActualPlaceWidget();
-    return;
     }
+
   if ( ! this->ModifiedFlag || this->SuppressReset)
     {
     return;
     }
-  vtkSMDoubleVectorProperty* sdvp = vtkSMDoubleVectorProperty::SafeDownCast(
-    this->ImplicitFunctionProxy->GetProperty("Origin"));
-  if(sdvp)
+
+  if ( this->AcceptCalled )
     {
-    double center[3];
-    center[0] = sdvp->GetElement(0);
-    center[1] = sdvp->GetElement(1);
-    center[2] = sdvp->GetElement(2);
-    this->SetCenterInternal(center[0],center[1],center[2]);
-    }
-  else
-    {
-    vtkErrorMacro("Could not find property Origin for widget: "<< 
-      this->ImplicitFunctionProxy->GetVTKClassName());
+    vtkSMDoubleVectorProperty* sdvp = vtkSMDoubleVectorProperty::SafeDownCast(
+      this->ImplicitFunctionProxy->GetProperty("Origin"));
+    if(sdvp)
+      {
+      double center[3];
+      center[0] = sdvp->GetElement(0);
+      center[1] = sdvp->GetElement(1);
+      center[2] = sdvp->GetElement(2);
+      this->SetCenterInternal(center[0],center[1],center[2]);
+      }
+    else
+      {
+      vtkErrorMacro("Could not find property Origin for widget: "<< 
+                    this->ImplicitFunctionProxy->GetVTKClassName());
+      }
+    
+    sdvp = vtkSMDoubleVectorProperty::SafeDownCast(
+      this->ImplicitFunctionProxy->GetProperty("Normal"));
+    if(sdvp)
+      {
+      double normal[3];
+      normal[0] = sdvp->GetElement(0);
+      normal[1] = sdvp->GetElement(1);
+      normal[2] = sdvp->GetElement(2);
+      this->SetNormalInternal(normal[0],normal[1],normal[2]);
+      }
+    else
+      {
+      vtkErrorMacro("Could not find property Normal for widget: "<< 
+                    this->ImplicitFunctionProxy->GetVTKClassName());
+      }
+
+    sdvp = vtkSMDoubleVectorProperty::SafeDownCast(
+      this->ImplicitFunctionProxy->GetProperty("Offset"));
+    if(sdvp)
+      {
+      double offset = sdvp->GetElement(0);
+      this->OffsetEntry->SetValue(offset);
+      }
+    else
+      {
+      vtkErrorMacro("Could not find property Offset for widget: "<< 
+                    this->ImplicitFunctionProxy->GetVTKClassName());
+      }
+    
+    vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
+      this->WidgetProxy->GetProperty("DrawPlane"));
+    if (ivp)
+      {
+      ivp->SetElements1(0);
+      }
+    this->WidgetProxy->UpdateVTKObjects();
     }
 
-  sdvp = vtkSMDoubleVectorProperty::SafeDownCast(
-    this->ImplicitFunctionProxy->GetProperty("Normal"));
-  if(sdvp)
-    {
-    double normal[3];
-    normal[0] = sdvp->GetElement(0);
-    normal[1] = sdvp->GetElement(1);
-    normal[2] = sdvp->GetElement(2);
-    this->SetNormalInternal(normal[0],normal[1],normal[2]);
-    }
-  else
-    {
-    vtkErrorMacro("Could not find property Normal for widget: "<< 
-      this->ImplicitFunctionProxy->GetVTKClassName());
-    }
-
-  vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
-    this->WidgetProxy->GetProperty("DrawPlane"));
-  if (ivp)
-    {
-    ivp->SetElements1(0);
-    }
-  this->WidgetProxy->UpdateVTKObjects();
+  this->UpdateOffsetRange();
 
   this->Superclass::ResetInternal();
 }
@@ -277,6 +304,17 @@ void vtkPVImplicitPlaneWidget::Accept()
   if (sdvp)
     {
     sdvp->SetElements(normal);
+    }
+  else
+    {
+    vtkErrorMacro("Could not find property Normal for widget: "
+      << this->ImplicitFunctionProxy->GetVTKClassName());
+    }
+  sdvp = vtkSMDoubleVectorProperty::SafeDownCast(
+    this->ImplicitFunctionProxy->GetProperty("Offset"));
+  if (sdvp)
+    {
+    sdvp->SetElement(0, this->OffsetEntry->GetValueAsFloat());
     }
   else
     {
@@ -475,6 +513,9 @@ void vtkPVImplicitPlaneWidget::SetBalloonHelpString(const char *str)
       this->NormalEntry[i]->SetBalloonHelpString(this->BalloonHelpString);
       }
 
+    this->OffsetEntry->SetBalloonHelpString(this->BalloonHelpString);
+    this->OffsetLabel->SetBalloonHelpString(this->BalloonHelpString);
+
     this->BalloonHelpInitialized = 1;
     }
 }
@@ -520,6 +561,13 @@ void vtkPVImplicitPlaneWidget::ChildCreate(vtkPVApplication* pvApp)
     this->NormalEntry[i]->Create(pvApp, "");
     }
 
+  this->OffsetLabel->SetParent(this->Frame->GetFrame());
+  this->OffsetLabel->SetLabel("Offset");
+  this->OffsetLabel->Create(pvApp, "");
+
+  this->OffsetEntry->SetParent(this->Frame->GetFrame());
+  this->OffsetEntry->Create(pvApp, "");
+
   this->Script("grid propagate %s 1",
     this->Frame->GetFrame()->GetWidgetName());
 
@@ -537,6 +585,9 @@ void vtkPVImplicitPlaneWidget::ChildCreate(vtkPVApplication* pvApp)
     this->NormalEntry[0]->GetWidgetName(),
     this->NormalEntry[1]->GetWidgetName(),
     this->NormalEntry[2]->GetWidgetName());
+  this->Script("grid %s %s -sticky ew",
+    this->OffsetLabel->GetWidgetName(),
+    this->OffsetEntry->GetWidgetName());
 
   this->Script("grid columnconfigure %s 0 -weight 0", 
     this->Frame->GetFrame()->GetWidgetName());
@@ -568,6 +619,11 @@ void vtkPVImplicitPlaneWidget::ChildCreate(vtkPVApplication* pvApp)
       this->NormalEntry[i]->GetWidgetName(),
       this->GetTclName());
     }
+  this->Script("bind %s <Key> {%s UpdateOffsetRange; %s ModifiedCallback}", 
+               this->OffsetEntry->GetWidgetName(), 
+               this->GetTclName(),
+               this->GetTclName());
+
   this->CenterResetButton->SetParent(this->Frame->GetFrame());
   this->CenterResetButton->Create(pvApp, "");
   this->CenterResetButton->SetLabel("Set Plane Center to Center of Bounds");
@@ -642,14 +698,15 @@ void vtkPVImplicitPlaneWidget::Create(vtkKWApplication *app)
 //----------------------------------------------------------------------------
 void vtkPVImplicitPlaneWidget::ExecuteEvent(vtkObject* wdg, unsigned long l, void* p)
 {
+
+  double center[3];
+  double normal[3];
+  this->WidgetProxy->UpdateInformation();
+  this->GetCenterInternal(center);
+  this->GetNormalInternal(normal);
+  
   if(l == vtkKWEvent::WidgetModifiedEvent)
     {
-    double center[3];
-    double normal[3];
-    this->WidgetProxy->UpdateInformation();
-    this->GetCenterInternal(center);
-    this->GetNormalInternal(normal);
-
     this->CenterEntry[0]->SetValue(center[0]);
     this->CenterEntry[1]->SetValue(center[1]);
     this->CenterEntry[2]->SetValue(center[2]);
@@ -661,6 +718,29 @@ void vtkPVImplicitPlaneWidget::ExecuteEvent(vtkObject* wdg, unsigned long l, voi
     this->Render();
     this->ModifiedCallback();
     this->ValueChanged = 0;
+    }
+  else
+    {
+    vtkSMDoubleVectorProperty *oProp = vtkSMDoubleVectorProperty::SafeDownCast(
+      this->ImplicitFunctionProxy->GetProperty("Origin"));
+    
+    vtkSMDoubleVectorProperty *nProp = vtkSMDoubleVectorProperty::SafeDownCast(
+      this->ImplicitFunctionProxy->GetProperty("Normal"));
+    
+    if (oProp)
+      {
+      oProp->SetUncheckedElement(0, center[0]);
+      oProp->SetUncheckedElement(1, center[1]);
+      oProp->SetUncheckedElement(2, center[2]);
+      }
+    if (nProp)
+      {
+      nProp->SetUncheckedElement(0, normal[0]);
+      nProp->SetUncheckedElement(1, normal[1]);
+      nProp->SetUncheckedElement(2, normal[2]);
+      }
+    oProp->UpdateDependentDomains();
+    nProp->UpdateDependentDomains();
     }
   this->Superclass::ExecuteEvent(wdg, l, p);
 }
@@ -815,6 +895,69 @@ void vtkPVImplicitPlaneWidget::SetNormal()
 }
 
 //----------------------------------------------------------------------------
+void vtkPVImplicitPlaneWidget::UpdateOffsetRange()
+{
+  double center[3];
+  double normal[3];
+  this->WidgetProxy->UpdateInformation();
+  this->GetCenterInternal(center);
+  this->GetNormalInternal(normal);
+
+  vtkSMDoubleVectorProperty *oProp = vtkSMDoubleVectorProperty::SafeDownCast(
+    this->ImplicitFunctionProxy->GetProperty("Origin"));
+  
+  vtkSMDoubleVectorProperty *nProp = vtkSMDoubleVectorProperty::SafeDownCast(
+    this->ImplicitFunctionProxy->GetProperty("Normal"));
+  
+  if (oProp)
+    {
+    oProp->SetUncheckedElement(0, center[0]);
+    oProp->SetUncheckedElement(1, center[1]);
+    oProp->SetUncheckedElement(2, center[2]);
+    }
+  if (nProp)
+    {
+    nProp->SetUncheckedElement(0, normal[0]);
+    nProp->SetUncheckedElement(1, normal[1]);
+    nProp->SetUncheckedElement(2, normal[2]);
+    }
+  oProp->UpdateDependentDomains();
+  nProp->UpdateDependentDomains();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVImplicitPlaneWidget::Update()
+{
+  vtkPVSource *input;
+  double bds[6];
+
+  this->Superclass::Update();
+
+  if (this->InputMenu == NULL)
+    {
+    return;
+    }
+
+  input = this->InputMenu->GetCurrentValue();
+  if (input)
+    {
+    vtkSMProperty *prop = this->ImplicitFunctionProxy->GetProperty("Offset");
+    vtkSMBoundsDomain *rangeDomain = vtkSMBoundsDomain::SafeDownCast(
+    prop->GetDomain("range"));
+
+    if (rangeDomain)
+      {
+      rangeDomain->SetInputInformation(input->GetDataInformation());
+      }
+
+    prop->UpdateDependentDomains();
+
+    input->GetDataInformation()->GetBounds(bds);
+    this->PlaceWidget(bds);
+    }
+}
+
+//----------------------------------------------------------------------------
 void vtkPVImplicitPlaneWidget::UpdateEnableState()
 {
   this->Superclass::UpdateEnableState();
@@ -838,20 +981,99 @@ void vtkPVImplicitPlaneWidget::UpdateEnableState()
     this->PropagateEnableState(this->CenterEntry[cc]);
     this->PropagateEnableState(this->NormalEntry[cc]);
     }
+
+  this->PropagateEnableState(this->OffsetLabel);
+  this->PropagateEnableState(this->OffsetEntry);
 }
 
-//----------------------------------------------------------------------------
-void vtkPVImplicitPlaneWidget::Update()
+//-----------------------------------------------------------------------------
+void vtkPVImplicitPlaneWidget::UpdateVTKObjects()
 {
-  vtkPVSource* input;
-  double bds[6];
+  this->ImplicitFunctionProxy->UpdateVTKObjects();
+}
 
-  this->Superclass::Update();
-  //Input bounds may have changed so call place widget
-  input = this->InputMenu->GetCurrentValue();
-  if (input)
+//-----------------------------------------------------------------------------
+void vtkPVImplicitPlaneWidget::AddAnimationScriptsToMenu(
+  vtkKWMenu *menu, vtkPVAnimationInterfaceEntry *ai)
+{
+  char methodAndArgs[500];
+
+  sprintf(methodAndArgs, "AnimationMenuCallback %s", ai->GetTclName()); 
+  menu->AddCommand("Offset", this, methodAndArgs, 0, "");
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVImplicitPlaneWidget::ResetAnimationRange(
+  vtkPVAnimationInterfaceEntry *ai)
+{
+  vtkSMProperty *prop = this->ImplicitFunctionProxy->GetProperty("Offset");
+  vtkSMBoundsDomain *rangeDomain = vtkSMBoundsDomain::SafeDownCast(
+    prop->GetDomain("range"));
+
+  if (rangeDomain)
     {
-    input->GetDataInformation()->GetBounds(bds);
-    this->PlaceWidget(bds);
+    double min, max;
+    int exists;
+    min = rangeDomain->GetMinimum(0, exists);
+    if (exists)
+      {
+      ai->SetTimeStart(min);
+      }
+    else
+      {
+      ai->SetTimeStart(0);
+      }
+    max = rangeDomain->GetMaximum(0, exists);
+    if (exists)
+      {
+      ai->SetTimeEnd(max);
+      }
+    else
+      {
+      ai->SetTimeEnd(1);
+      }
     }
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVImplicitPlaneWidget::AnimationMenuCallback(
+  vtkPVAnimationInterfaceEntry *ai)
+{
+  if (ai->InitializeTrace(NULL))
+    {
+    this->AddTraceEntry("$kw(%s) AnimationMenuCallback $kw(%s)",
+                        this->GetTclName(), ai->GetTclName());
+    }
+
+  char methodAndArgs[500];
+
+  sprintf(methodAndArgs, "ResetAnimationRange %s", ai->GetTclName());
+  ai->GetResetRangeButton()->SetCommand(this, methodAndArgs);
+  ai->SetResetRangeButtonState(1);
+  ai->UpdateEnableState();
+
+  ai->SetLabelAndScript("Offset", NULL, this->GetTraceName());
+  
+  vtkSMProperty *prop = this->ImplicitFunctionProxy->GetProperty("Offset");
+  vtkSMBoundsDomain *rangeDomain = vtkSMBoundsDomain::SafeDownCast(
+    prop->GetDomain("range"));
+
+  if (rangeDomain)
+    {
+    ai->SetCurrentSMProperty(prop);
+    ai->SetCurrentSMDomain(rangeDomain);
+    ai->SetAnimationElement(0);
+
+    this->ResetAnimationRange(ai);
+    }
+  else
+    {
+    ai->SetCurrentSMProperty(0);
+    ai->SetCurrentSMDomain(0);
+
+    ai->SetTimeStart(0);
+    ai->SetTimeEnd(0);
+    }
+
+  ai->Update();
 }
