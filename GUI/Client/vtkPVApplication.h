@@ -407,6 +407,12 @@ public:
   // Play the demo
   void PlayDemo(int fromDashboard);
   
+  // Description:
+  // Return the textual representation of the composite (i.e. its name and/or
+  // its description. Memory is allocated, a pointer is return, it's up to
+  // the caller to delete it.
+  char* GetTextRepresentation(vtkPVSource* comp);
+
 protected:
   vtkPVApplication();
   ~vtkPVApplication();

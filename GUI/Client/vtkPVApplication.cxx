@@ -106,7 +106,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.276");
+vtkCxxRevisionMacro(vtkPVApplication, "1.277");
 vtkCxxSetObjectMacro(vtkPVApplication, RenderModule, vtkPVRenderModule);
 
 
@@ -1736,6 +1736,11 @@ void vtkPVApplication::SetSourcesBrowserAlwaysShowName(int v)
   this->SourcesBrowserAlwaysShowName = v;
   this->Modified();
 
+  if (this->GetMainWindow())
+    {
+    this->GetMainWindow()->UpdateSelectMenu();
+    }
+
   if (this->GetMainView())
     {
     this->GetMainView()->SetSourcesBrowserAlwaysShowName(v);
@@ -2401,4 +2406,34 @@ void vtkPVApplication::PlayDemo(int fromDashboard)
     }
 }
 
+
+//-----------------------------------------------------------------------------
+char* vtkPVApplication::GetTextRepresentation(vtkPVSource* comp)
+{
+  char *buffer;
+  if (!comp->GetLabel())
+    {
+    buffer = new char [strlen(comp->GetName()) + 1];
+    sprintf(buffer, "%s", comp->GetName());
+    }
+  else
+    {
+    if (this->GetSourcesBrowserAlwaysShowName() && 
+        comp->GetName() && *comp->GetName())
+      {
+      buffer = new char [strlen(comp->GetLabel())
+                        + 2
+                        + strlen(comp->GetName()) 
+                        + 1
+                        + 1];
+      sprintf(buffer, "%s (%s)", comp->GetLabel(), comp->GetName());
+      }
+    else
+      {
+      buffer = new char [strlen(comp->GetLabel()) + 1];
+      sprintf(buffer, "%s", comp->GetLabel());
+      }
+    }
+  return buffer;
+}
 
