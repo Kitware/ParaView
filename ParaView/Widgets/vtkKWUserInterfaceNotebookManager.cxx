@@ -47,6 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWLabel.h"
 #include "vtkKWLabeledFrame.h"
 #include "vtkKWNotebook.h"
+#include "vtkKWSerializer.h"
 #include "vtkKWTkUtilities.h"
 #include "vtkKWUserInterfacePanel.h"
 #include "vtkKWWidgetCollection.h"
@@ -56,7 +57,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWUserInterfaceNotebookManager);
-vtkCxxRevisionMacro(vtkKWUserInterfaceNotebookManager, "1.10");
+vtkCxxRevisionMacro(vtkKWUserInterfaceNotebookManager, "1.11");
 
 int vtkKWUserInterfaceNotebookManagerCommand(ClientData cd, Tcl_Interp *interp,
                                              int argc, char *argv[]);
@@ -654,6 +655,111 @@ void vtkKWUserInterfaceNotebookManager::DragAndDropEndCallback(
     child_it->GoToNextItem();
     }
   child_it->Delete();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWUserInterfaceNotebookManager::WriteVisiblePagesString(ostream &os)
+{
+  if (!this->Notebook)
+    {
+    return;
+    }
+
+  // For each page, output {panel name}{page title}{pinned}
+
+  int page_nb = this->Notebook->GetNumberOfVisiblePages();
+  for (int idx = page_nb - 1; idx >= 0; idx--)
+    {
+    vtkIdType id = this->Notebook->GetVisiblePageId(idx);
+    if (id < 0)
+      {
+      break;
+      }
+    int tag = this->Notebook->GetPageTag(id);
+    vtkKWUserInterfacePanel *panel = this->GetPanel(tag);
+    if (!panel)
+      {
+      continue;
+      }
+    os << '{';
+    vtkKWSerializer::WriteSafeString(os, panel->GetName());
+    os << "}{";
+    vtkKWSerializer::WriteSafeString(os, this->Notebook->GetPageTitle(id));
+    os << "}{";
+    os << this->Notebook->GetPagePinned(id);
+    os << '}';
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWUserInterfaceNotebookManager::ParseVisiblePagesString(istream &is)
+{
+  if (!this->Notebook)
+    {
+    return;
+    }
+
+  char token[1024], panel_name[1024], page_title[1024], pinned[16];
+
+  vtkKWSerializer::EatWhiteSpace(&is);
+  vtkKWSerializer::GetNextToken(&is, token);
+  
+  // Parse {panel name}{page title}{pinned}
+
+  while (token[0] == '{')
+    {
+    // Panel name
+
+    vtkKWSerializer::GetNextToken(&is, panel_name);
+    vtkKWSerializer::GetNextToken(&is, token);
+    if (token[0] != '}')
+      {
+      break;
+      }
+
+    // Page title
+
+    vtkKWSerializer::GetNextToken(&is, token);
+    if (token[0] != '{')
+      {
+      break;
+      }
+    vtkKWSerializer::GetNextToken(&is, page_title);
+    vtkKWSerializer::GetNextToken(&is, token);
+    if (token[0] != '}')
+      {
+      break;
+      }
+
+    // Pinned ?
+
+    vtkKWSerializer::GetNextToken(&is, token);
+    if (token[0] != '{')
+      {
+      break;
+      }
+    vtkKWSerializer::GetNextToken(&is, pinned);
+    vtkKWSerializer::GetNextToken(&is, token);
+    if (token[0] != '}')
+      {
+      break;
+      }
+
+    // At this point we have the panel name and page title, let's raise
+    // the right page, pinned it eventually
+
+    vtkKWUserInterfacePanel *panel = this->GetPanel(panel_name);
+    if (panel)
+      {
+      panel->RaisePage(page_title);
+      if (atoi(pinned))
+        {
+        this->Notebook->PinPage(this->Notebook->GetRaisedPageId());
+        }
+      }
+
+    vtkKWSerializer::GetNextToken(&is, token);
+    }
 }
 
 //----------------------------------------------------------------------------
