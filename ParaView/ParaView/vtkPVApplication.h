@@ -54,6 +54,7 @@ class vtkPolyDataMapper;
 class vtkProbeFilter;
 class vtkMapper;
 class vtkPVWindow;
+class vtkPVOutputWindow;
 
 #define VTK_PV_SLAVE_SCRIPT_RMI_TAG 1150
 #define VTK_PV_SLAVE_SCRIPT_COMMAND_LENGTH_TAG 1100
@@ -216,8 +217,7 @@ protected:
 
   vtkMultiProcessController *Controller;
 
-  vtkPVApplication(const vtkPVApplication&); // Not implemented
-  void operator=(const vtkPVApplication&); // Not implemented
+  vtkPVOutputWindow *OutputWindow;
 
   static int CheckForArgument(int argc, char* argv[], const char* arg,
 			      int& index);
@@ -230,7 +230,10 @@ protected:
   };
   static const char ArgumentList[vtkPVApplication::NUM_ARGS][128];
   //ETX
-  
+
+private:  
+  vtkPVApplication(const vtkPVApplication&); // Not implemented
+  void operator=(const vtkPVApplication&); // Not implemented
 };
 
 #endif

@@ -97,6 +97,80 @@ extern "C" int Vtkkwparaviewtcl_Init(Tcl_Interp *interp);
 // initialze the class variables
 int vtkPVApplication::GlobalLODFlag = 0;
 
+// Output window which prints out the process id
+// with the error or warning messages
+class VTK_EXPORT vtkPVOutputWindow : public vtkOutputWindow
+{
+public:
+  vtkTypeMacro(vtkPVOutputWindow,vtkOutputWindow);
+  
+  static vtkPVOutputWindow* New();
+
+  void DisplayText(const char* t)
+  {
+    if ( this->Windows && this->Windows->GetNumberOfItems() &&
+	 this->Windows->GetLastKWWindow() )
+      {
+      vtkKWWindow *win = this->Windows->GetLastKWWindow();
+      char buffer[1024];      
+      const char *message = strstr(t, "): ");
+      char type[1024], file[1024];
+      int line;
+      sscanf(t, "%[^:]: In %[^,], line %d", type, file, &line);
+      if ( message )
+	{
+	int error = 0;
+	if ( !strncmp(t, "ERROR", 5) )
+	  {
+	  error = 1;
+	  }
+	message += 3;
+	char *rmessage = new char [ strlen(message)+1 ];
+	strcpy(rmessage, message);
+	int last = strlen(rmessage)-1;
+	while ( last > 0 && 
+		(rmessage[last] == ' ' || rmessage[last] == '\n' || 
+		 rmessage[last] == '\r' || rmessage[last] == '\t') )
+	  {
+	  rmessage[last] = 0;
+	  last--;
+	  }
+	sprintf(buffer, "There was a VTK %s in file: %s (%d)\n %s", 
+		(error ? "Error" : "Warning"),
+		file, line,
+		rmessage);
+	if ( error )
+	  {
+	  win->ErrorMessage(buffer);
+	  }
+	else 
+	  {
+	  win->WarningMessage(buffer);
+	  }
+	delete [] rmessage;
+	}
+      }
+  }
+
+  vtkPVOutputWindow()
+  {
+    this->Windows = 0;
+  }
+  
+  void SetWindowCollection(vtkKWWindowCollection *windows)
+  {
+    this->Windows = windows;
+  }
+
+protected:
+  vtkKWWindowCollection *Windows;
+
+private:
+  vtkPVOutputWindow(const vtkPVOutputWindow&);
+  void operator=(const vtkPVOutputWindow&);
+};
+
+vtkStandardNewMacro(vtkPVOutputWindow);
 
 Tcl_Interp *vtkPVApplication::InitializeTcl(int argc, char *argv[])
 {
@@ -456,8 +530,14 @@ void vtkPVApplication::Start(int argc, char*argv[])
       }
     }
 
-  this->Script("proc bgerror { m } { Application DisplayTCLError m }");
+  this->Script("proc bgerror { m } { Application DisplayTCLError $m }");
+  vtkPVOutputWindow *window = vtkPVOutputWindow::New();
+  window->SetWindowCollection( this->Windows );
+  this->OutputWindow = window;
+  vtkOutputWindow::SetInstance(this->OutputWindow);
   this->vtkKWApplication::Start(argc,argv);
+  vtkOutputWindow::SetInstance(0);
+  this->OutputWindow->Delete();
 }
 
 
