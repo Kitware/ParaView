@@ -50,7 +50,7 @@
 
 //-------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVTreeComposite);
-vtkCxxRevisionMacro(vtkPVTreeComposite, "1.54");
+vtkCxxRevisionMacro(vtkPVTreeComposite, "1.55");
 
 
 //=========================================================================
@@ -1279,8 +1279,8 @@ void vtkPVTreeComposite::SetRenderWindow(vtkRenderWindow *renWin)
       ren = vtkRenderer::SafeDownCast(rens->GetItemAsObject(0));
       if (ren)
         {
-        ren->RemoveObserver(this->ResetCameraTag);
-        ren->RemoveObserver(this->ResetCameraClippingRangeTag);
+        //ren->RemoveObserver(this->ResetCameraTag);
+        //ren->RemoveObserver(this->ResetCameraClippingRangeTag);
         ren->RemoveObserver(this->StartRenderTag);
         ren->RemoveObserver(this->EndRenderTag);
         }
@@ -1338,21 +1338,21 @@ void vtkPVTreeComposite::SetRenderWindow(vtkRenderWindow *renWin)
           this->EndRenderTag = ren->AddObserver(vtkCommand::EndEvent,cbc);
           cbc->Delete();
           
-          cbc = vtkCallbackCommand::New();
-          cbc->SetCallback(vtkPVTreeCompositeResetCameraClippingRange);
-          cbc->SetClientData((void*)this);
+          //cbc = vtkCallbackCommand::New();
+          //cbc->SetCallback(vtkPVTreeCompositeResetCameraClippingRange);
+          //cbc->SetClientData((void*)this);
           // ren will delete the cbc when the observer is removed.
-          this->ResetCameraClippingRangeTag = 
-          ren->AddObserver(vtkCommand::ResetCameraClippingRangeEvent,cbc);
-          cbc->Delete();          
+          //this->ResetCameraClippingRangeTag = 
+          //ren->AddObserver(vtkCommand::ResetCameraClippingRangeEvent,cbc);
+          //cbc->Delete();          
           
-          cbc = vtkCallbackCommand::New();
-          cbc->SetCallback(vtkPVTreeCompositeResetCamera);
-          cbc->SetClientData((void*)this);
+          //cbc = vtkCallbackCommand::New();
+          //cbc->SetCallback(vtkPVTreeCompositeResetCamera);
+          //cbc->SetClientData((void*)this);
           // ren will delete the cbc when the observer is removed.
-          this->ResetCameraTag = 
-          ren->AddObserver(vtkCommand::ResetCameraEvent,cbc);
-          cbc->Delete();
+          //this->ResetCameraTag = 
+          //ren->AddObserver(vtkCommand::ResetCameraEvent,cbc);
+          //cbc->Delete();
           }
         }
       else if (this->Controller && this->Controller->GetLocalProcessId() != 0)
