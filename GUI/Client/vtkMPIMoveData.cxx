@@ -35,7 +35,7 @@
 #include "vtkMPIMToNSocketConnection.h"
 #include "vtkSocketCommunicator.h"
 
-vtkCxxRevisionMacro(vtkMPIMoveData, "1.6");
+vtkCxxRevisionMacro(vtkMPIMoveData, "1.7");
 vtkStandardNewMacro(vtkMPIMoveData);
 
 vtkCxxSetObjectMacro(vtkMPIMoveData,Controller, vtkMultiProcessController);
@@ -321,7 +321,6 @@ void vtkMPIMoveData::DataServerAllToN(vtkDataSet* inData,
 void vtkMPIMoveData::DataServerGatherAll(vtkDataSet* input, 
                                          vtkDataSet* output)
 {
-  int idx;
   int numProcs= this->Controller->GetNumberOfProcesses();
 
   if (numProcs <= 1)
@@ -331,6 +330,7 @@ void vtkMPIMoveData::DataServerGatherAll(vtkDataSet* input,
     }
 
 #ifdef VTK_USE_MPI
+  int idx;
   vtkMPICommunicator* com = vtkMPICommunicator::SafeDownCast(
                                          this->Controller->GetCommunicator()); 
 
