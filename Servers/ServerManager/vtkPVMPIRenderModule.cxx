@@ -19,13 +19,12 @@
 #include "vtkPVProcessModule.h"
 #include "vtkPVTreeComposite.h"
 #include "vtkClientServerStream.h"
-#include "vtkPVServerInformation.h"
 #include "vtkPVOptions.h"
 
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVMPIRenderModule);
-vtkCxxRevisionMacro(vtkPVMPIRenderModule, "1.3");
+vtkCxxRevisionMacro(vtkPVMPIRenderModule, "1.4");
 
 
 
@@ -141,7 +140,7 @@ void vtkPVMPIRenderModule::SetProcessModule(vtkProcessModule *pm)
       << vtkClientServerStream::Invoke
       << this->CompositeID << "EnableAbortOff" << vtkClientServerStream::End;
     }
-  if ( this->ProcessModule->GetServerInformation()->GetUseOffscreenRendering() )
+  if ( this->ProcessModule->GetOptions()->GetUseOffscreenRendering() )
     {
     pm->GetStream()
       << vtkClientServerStream::Invoke << this->CompositeID

@@ -70,6 +70,7 @@ SET( ParaViewClient_SRCS
   vtkPVContainerWidget.cxx
   vtkPVContourEntry.cxx
   vtkPVCutEntry.cxx
+  vtkPVDeskTopRenderModuleUI.cxx
   vtkPVDisplayGUI.cxx
   vtkPVDReaderModule.cxx
   vtkPVDWriter.cxx
@@ -83,6 +84,7 @@ SET( ParaViewClient_SRCS
   vtkPVFileEntry.cxx
   vtkPVGhostLevelDialog.cxx
   vtkPVGroupInputsWidget.cxx
+  vtkPVIceTRenderModuleUI.cxx
   vtkPVImplicitPlaneWidget.cxx
   vtkPVInformationGUI.cxx
   vtkPVInitialize.cxx
@@ -180,8 +182,6 @@ SET(ParaViewBinary_SRCS
 IF (PARAVIEW_USE_ICE_T)
   SET( ParaViewClient_SRCS
     ${ParaViewClient_SRCS}
-    vtkPVDeskTopRenderModuleUI.cxx
-    vtkPVIceTRenderModuleUI.cxx
     )
 
 ENDIF (PARAVIEW_USE_ICE_T)

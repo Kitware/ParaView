@@ -72,6 +72,8 @@ SET( ServerManagerNonWrapped_SRCS
   vtkPVBatchOptions.cxx
   vtkPVCaveRenderModule.cxx
   vtkPVCompositeRenderModule.cxx
+  vtkPVDeskTopRenderModule.cxx
+  vtkPVIceTRenderModule.cxx
   vtkPVMultiDisplayRenderModule.cxx
   vtkPVLODRenderModule.cxx
   vtkPVMPIRenderModule.cxx
@@ -97,14 +99,6 @@ SET_SOURCE_FILES_PROPERTIES(
   vtkSMDisplay.cxx
   ABSTRACT
   )
-
-IF (PARAVIEW_USE_ICE_T)
-  SET(ServerManager_SRCS 
-    ${ServerManager_SRCS}
-    vtkPVDeskTopRenderModule.cxx
-    vtkPVIceTRenderModule.cxx
-    )
-ENDIF (PARAVIEW_USE_ICE_T)
 
 
 INCLUDE_DIRECTORIES(

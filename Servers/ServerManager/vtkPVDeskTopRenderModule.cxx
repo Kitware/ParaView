@@ -24,11 +24,10 @@
 #include "vtkClientServerStream.h"
 #include "vtkCompositeRenderManager.h"
 #include "vtkPVOptions.h"
-#include "vtkPVServerInformation.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVDeskTopRenderModule);
-vtkCxxRevisionMacro(vtkPVDeskTopRenderModule, "1.5");
+vtkCxxRevisionMacro(vtkPVDeskTopRenderModule, "1.6");
 
 
 
@@ -91,7 +90,13 @@ void vtkPVDeskTopRenderModule::SetProcessModule(vtkProcessModule *pm)
   this->ProcessModule = pvm;
   this->ProcessModule->Register(this);
 
+  // Make an ICE-T renderer on the server and a regular renderer on the client.
   this->RendererID = pvm->NewStreamObject("vtkIceTRenderer");
+  pvm->SendStream(vtkProcessModule::RENDER_SERVER);
+  stream << vtkClientServerStream::New << "vtkRenderer" << this->RendererID
+         << vtkClientServerStream::End;
+  pvm->SendStream(vtkProcessModule::CLIENT);
+
   this->Renderer2DID = pvm->NewStreamObject("vtkRenderer");
   this->RenderWindowID = pvm->NewStreamObject("vtkRenderWindow");
   pvm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
@@ -174,10 +179,8 @@ void vtkPVDeskTopRenderModule::SetProcessModule(vtkProcessModule *pm)
   stream << vtkClientServerStream::Invoke << this->CompositeID
                   << "SetController" << vtkClientServerStream::LastResult
                   << vtkClientServerStream::End;
-  vtkClientServerStream tmp = pvm->GetStream();
-  pvm->SendStream(vtkProcessModule::CLIENT);
-  pvm->GetStream() = tmp;
-  pvm->SendStream(vtkProcessModule::RENDER_SERVER_ROOT);
+  pvm->SendStream(  vtkProcessModule::CLIENT
+                  | vtkProcessModule::RENDER_SERVER_ROOT);
   
 
   stream << vtkClientServerStream::Invoke << this->CompositeID
@@ -196,16 +199,14 @@ void vtkPVDeskTopRenderModule::SetProcessModule(vtkProcessModule *pm)
   stream << vtkClientServerStream::Invoke << this->CompositeID
                   << "UseCompositingOff"
                   << vtkClientServerStream::End;
-  if ( this->ProcessModule->GetServerInformation()->GetUseOffscreenRendering() )
+  if ( this->ProcessModule->GetOptions()->GetUseOffscreenRendering() )
     {
     stream
       << vtkClientServerStream::Invoke << this->CompositeID
       << "InitializeOffScreen" << vtkClientServerStream::End;
     }
-  tmp = stream;
-  pvm->SendStream(vtkProcessModule::CLIENT);
-  stream = tmp;
-  pvm->SendStream(vtkProcessModule::RENDER_SERVER_ROOT);
+  pvm->SendStream(  vtkProcessModule::CLIENT
+                  | vtkProcessModule::RENDER_SERVER_ROOT);
 
   this->InitializeObservers();
 }

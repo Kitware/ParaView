@@ -70,6 +70,11 @@ public:
   vtkSetStringMacro(RenderModuleName);
 
   // Description:
+  // vtkPVProcessModule needs to set this.
+  vtkSetVector2Macro(TileDimensions, int);
+  vtkSetMacro(UseOffscreenRendering, int);
+
+  // Description:
   // In case of unknown argument, set this variable with the unknown argument.
   vtkGetStringMacro(UnknownArgument);
 

@@ -251,7 +251,7 @@ public:
   vtkPVRenderModule* GetRenderModule() { return this->RenderModule;}
   
   // Create and start using render module
-  int SetupRenderModule();
+  virtual int SetupRenderModule();
 
   // Description:
   // Set and get the application options

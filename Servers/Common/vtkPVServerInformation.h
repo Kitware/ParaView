@@ -60,15 +60,18 @@ public:
 
   // Description:
   // Varibles (command line argurments) set to render to a tiled display.
-  // Not actually Gathered from the server yet.
-  // It is just transfered from application at the moment.
   vtkSetVector2Macro(TileDimensions, int);
   vtkGetVector2Macro(TileDimensions, int);
 
   // Description:
-  // This will eventually be collected from the server.
+  // Variable (command line argument) to use offscreen rendering.
   vtkSetMacro(UseOffscreenRendering, int);
   vtkGetMacro(UseOffscreenRendering, int);
+
+  // Description:
+  // Returns 1 if ICE-T is available.
+  vtkSetMacro(UseIceT, int);
+  vtkGetMacro(UseIceT, int);
 
 protected:
   vtkPVServerInformation();
@@ -77,6 +80,7 @@ protected:
   int RemoteRendering;
   int TileDimensions[2];
   int UseOffscreenRendering;
+  int UseIceT;
 
   vtkPVServerInformation(const vtkPVServerInformation&); // Not implemented
   void operator=(const vtkPVServerInformation&); // Not implemented

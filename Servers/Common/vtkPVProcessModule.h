@@ -175,6 +175,9 @@ public:
   vtkSetStringMacro(ApplicationInstallationDirectory);
   vtkGetStringMacro(ApplicationInstallationDirectory);
 
+  // Create and start using render module
+  virtual int SetupRenderModule();
+
 protected:
   vtkPVProcessModule();
   ~vtkPVProcessModule();

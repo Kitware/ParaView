@@ -110,7 +110,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.326");
+vtkCxxRevisionMacro(vtkPVApplication, "1.327");
 
 
 int vtkPVApplicationCommand(ClientData cd, Tcl_Interp *interp,
@@ -488,8 +488,6 @@ void vtkPVApplication::SetProcessModule(vtkPVProcessModule *pm)
     // to the process module
     pm->SetOptions(this->Options);
 
-    pm->GetServerInformation()->SetTileDimensions(this->Options->GetTileDimensions());
-    pm->GetServerInformation()->SetUseOffscreenRendering(this->Options->GetUseOffscreenRendering());
     // Juggle the compositing flag to let server in on the decision
     // whether to allow compositing / rendering on the server.
     // Put the flag on the process module.

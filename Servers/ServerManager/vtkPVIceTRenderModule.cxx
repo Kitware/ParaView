@@ -23,12 +23,11 @@
 #include "vtkCallbackCommand.h"
 #include "vtkClientServerStream.h"
 #include "vtkCompositeRenderManager.h"
-#include "vtkPVServerInformation.h"
 #include "vtkPVOptions.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVIceTRenderModule);
-vtkCxxRevisionMacro(vtkPVIceTRenderModule, "1.7");
+vtkCxxRevisionMacro(vtkPVIceTRenderModule, "1.8");
 
 //----------------------------------------------------------------------------
 vtkPVIceTRenderModule::vtkPVIceTRenderModule()
@@ -86,7 +85,13 @@ void vtkPVIceTRenderModule::SetProcessModule(vtkProcessModule *pm)
   this->ProcessModule = pvm;
   this->ProcessModule->Register(this);
 
+  // Make an ICE-T renderer on the server and a regular renderer on the client.
   this->RendererID = pvm->NewStreamObject("vtkIceTRenderer");
+  pvm->SendStream(vtkProcessModule::RENDER_SERVER);
+  stream << vtkClientServerStream::New << "vtkRenderer" << this->RendererID
+         << vtkClientServerStream::End;
+  pvm->SendStream(vtkProcessModule::CLIENT);
+
   this->Renderer2DID = pvm->NewStreamObject("vtkRenderer");
   this->RenderWindowID = pvm->NewStreamObject("vtkRenderWindow");
   pvm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
@@ -140,7 +145,7 @@ void vtkPVIceTRenderModule::SetProcessModule(vtkProcessModule *pm)
 
   this->DisplayManagerID = pvm->NewStreamObject("vtkIceTRenderManager");
   pvm->SendStream(vtkProcessModule::RENDER_SERVER);
-  int *tileDim = pvm->GetServerInformation()->GetTileDimensions();
+  int *tileDim = pvm->GetOptions()->GetTileDimensions();
   cout << "Size: " << tileDim[0] << ", " << tileDim[1] << endl;
   stream << vtkClientServerStream::Invoke
                   << this->DisplayManagerID
@@ -171,10 +176,11 @@ void vtkPVIceTRenderModule::SetProcessModule(vtkProcessModule *pm)
 
   // **********************************************************
 
-  this->CompositeID = pvm->NewStreamObject("vtkIceTClientCompositeManager");
-  vtkClientServerStream tmp = stream;
+  this->CompositeID = pvm->NewStreamObject("vtkDesktopDeliveryClient");
   pvm->SendStream(vtkProcessModule::CLIENT);
-  stream = tmp;
+  // Create a vtkDesktopDeliveryServer on the server, but use the same id.
+  stream << vtkClientServerStream::New << "vtkDesktopDeliveryServer"
+         << this->CompositeID << vtkClientServerStream::End;
   pvm->SendStream(vtkProcessModule::RENDER_SERVER_ROOT);
   // Clean up this mess !!!!!!!!!!!!!
   // Even a cast to vtkPVClientServerModule would be better than this.
@@ -183,13 +189,8 @@ void vtkPVIceTRenderModule::SetProcessModule(vtkProcessModule *pm)
                   << "GetRenderServerSocketController"
                   << vtkClientServerStream::End;
   stream << vtkClientServerStream::Invoke << this->CompositeID
-                  << "SetClientController" << vtkClientServerStream::LastResult
+                  << "SetController" << vtkClientServerStream::LastResult
                   << vtkClientServerStream::End;
-  stream << vtkClientServerStream::Invoke << pvm->GetProcessModuleID() << "GetClientMode"
-                  << vtkClientServerStream::End;
-  stream << vtkClientServerStream::Invoke << this->CompositeID
-                  << "SetClientFlag" << vtkClientServerStream::LastResult
-                  << vtkClientServerStream::End; 
   stream << vtkClientServerStream::Invoke << this->CompositeID
                   << "SetRenderWindow"
                   << this->RenderWindowID
@@ -200,16 +201,15 @@ void vtkPVIceTRenderModule::SetProcessModule(vtkProcessModule *pm)
   stream << vtkClientServerStream::Invoke << this->CompositeID
                   << "UseCompositingOn"
                   << vtkClientServerStream::End;
-  // copy the stream before it is sent and reset
-  vtkClientServerStream copy = stream;
-  pvm->SendStream(vtkProcessModule::CLIENT); // send the stream to the client
-  stream = copy; // now copy the copy into the current stream
-  pvm->SendStream(vtkProcessModule::RENDER_SERVER_ROOT); // send the same stream to the server root
+  pvm->SendStream(  vtkProcessModule::CLIENT
+                  | vtkProcessModule::RENDER_SERVER_ROOT);
 
   // The client server manager needs to set parameters on the IceT manager.
   stream << vtkClientServerStream::Invoke << this->CompositeID
-                  << "SetIceTManager" << this->DisplayManagerID
-                  << vtkClientServerStream::End;
+         << "SetParallelRenderManager" << this->DisplayManagerID
+         << vtkClientServerStream::End;
+  stream << vtkClientServerStream::Invoke << this->CompositeID
+         << "RemoteDisplayOff" << vtkClientServerStream::End;
   pvm->SendStream(vtkProcessModule::RENDER_SERVER_ROOT);
 }
 

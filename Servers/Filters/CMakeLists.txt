@@ -4,6 +4,8 @@ INCLUDE_REGULAR_EXPRESSION("^vtk.*$")
 SET(Filters_SRCS
   vtkMultiDisplayManager.cxx
   vtkCaveRenderManager.cxx
+  vtkDesktopDeliveryClient.cxx
+  vtkDesktopDeliveryServer.cxx
   vtkPVServerArraySelection.cxx
   vtkPVServerFileListing.cxx
   vtkPVServerObject.cxx
@@ -102,8 +104,6 @@ IF (PARAVIEW_USE_ICE_T)
   SET(Filters_SRCS 
     ${Filters_SRCS}
     vtkIceTFactory.cxx
-    vtkDesktopDeliveryServer.cxx
-    vtkDesktopDeliveryClient.cxx
     )
   IF(VTK_USE_MPI)
     SET(Filters_SRCS 
