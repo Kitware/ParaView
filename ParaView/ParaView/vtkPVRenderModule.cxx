@@ -49,7 +49,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderModule);
-vtkCxxRevisionMacro(vtkPVRenderModule, "1.18");
+vtkCxxRevisionMacro(vtkPVRenderModule, "1.19");
 
 //int vtkPVRenderModuleCommand(ClientData cd, Tcl_Interp *interp,
 //                             int argc, char *argv[]);
@@ -250,6 +250,34 @@ void vtkPVRenderModule::SetBackgroundColor(float r, float g, float b)
   pm->SendStreamToClientAndServer();
 }
 
+//-----------------------------------------------------------------------------
+void vtkPVRenderModule::CacheUpdate(int idx, int total)
+{
+  vtkObject* object;
+  vtkPVPartDisplay* pDisp;
+  this->PartDisplays->InitTraversal();
+  while ( (object = this->PartDisplays->GetNextItemAsObject()) )
+    {
+    pDisp = vtkPVPartDisplay::SafeDownCast(object);
+    if (pDisp->GetVisibility())
+      {
+      pDisp->CacheUpdate(idx, total);
+      }
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderModule::InvalidateAllGeometries()
+{
+  vtkObject* object;
+  vtkPVPartDisplay* pDisp;
+  this->PartDisplays->InitTraversal();
+  while ( (object = this->PartDisplays->GetNextItemAsObject()) )
+    {
+    pDisp = vtkPVPartDisplay::SafeDownCast(object);
+    pDisp->InvalidateGeometry();
+    }
+}
 
 //----------------------------------------------------------------------------
 void vtkPVRenderModule::ComputeVisiblePropBounds(double bds[6])

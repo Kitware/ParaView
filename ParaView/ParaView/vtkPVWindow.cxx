@@ -123,7 +123,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.511");
+vtkCxxRevisionMacro(vtkPVWindow, "1.512");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -4280,34 +4280,6 @@ void vtkPVWindow::SetInteractiveRenderEnabled(int s)
   rwi->SetInteractiveRenderEnabled(s);
 }
 
-//-----------------------------------------------------------------------------
-void vtkPVWindow::RemoveAllCaches()
-{
-  // Loop through all parts ...
-}
-
-//-----------------------------------------------------------------------------
-void vtkPVWindow::CacheUpdate(int idx, int total)
-{
-  vtkPVSourceCollection* col = this->GetSourceList("Sources");
-  vtkPVSource* pvs;
-  vtkPVPart* pvp;
-  int partIdx, numParts;
-
-  col->InitTraversal();
-  while ( (pvs=col->GetNextPVSource()) )
-    {
-    if (pvs->GetVisibility())
-      {
-      numParts = pvs->GetNumberOfParts();
-      for (partIdx = 0; partIdx < numParts; ++partIdx)
-        {
-        pvp = pvs->GetPart(partIdx);
-        pvp->GetPartDisplay()->CacheUpdate(idx, total);
-        }
-      }
-    }
-}
 
 //-----------------------------------------------------------------------------
 void vtkPVWindow::PrintSelf(ostream& os, vtkIndent indent)

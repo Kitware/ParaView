@@ -120,6 +120,13 @@ public:
   vtkSetMacro(TotalVisibleMemorySizeValid, int);
   vtkGetMacro(TotalVisibleMemorySizeValid, int);
 
+  // Description:
+  // Update the cache of all visible part displays. For flip books.
+  void CacheUpdate(int idx, int total);
+
+  // Description:
+  // Calls InvalidateGeometry() on all part displays. For flip books.
+  void InvalidateAllGeometries();
   
   vtkClientServerID GetRendererID() { return this->RendererID;}
   vtkClientServerID GetRenderWindowID() { return this->RenderWindowID;}
