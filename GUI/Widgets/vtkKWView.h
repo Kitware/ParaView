@@ -36,7 +36,6 @@ class vtkKWCheckButton;
 class vtkKWComposite;
 class vtkKWCompositeCollection;
 class vtkKWCornerAnnotation;
-class vtkKWCornerAnnotation;
 class vtkKWEntry;
 class vtkKWFrame;
 class vtkKWGenericComposite;
