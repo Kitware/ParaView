@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkStringList);
-vtkCxxRevisionMacro(vtkStringList, "1.9");
+vtkCxxRevisionMacro(vtkStringList, "1.10");
 
 //----------------------------------------------------------------------------
 vtkStringList::vtkStringList()
@@ -83,6 +83,20 @@ void vtkStringList::RemoveAllItems()
     this->NumberOfStrings = 0;
     this->StringArrayLength = 0;
     }
+}
+
+//----------------------------------------------------------------------------
+int vtkStringList::GetIndex(const char* str)
+{
+  int idx;
+  for ( idx = 0; idx < this->NumberOfStrings; ++idx )
+    {
+    if ( strcmp(str, this->Strings[idx]) == 0 )
+      {
+      return idx;
+      }
+    }
+  return -1;
 }
 
 //----------------------------------------------------------------------------
