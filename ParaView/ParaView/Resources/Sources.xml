@@ -217,7 +217,7 @@ The output of the Cone source is polygonal data.
         short_help="Create a 3D cylinder of a given radius and height">
   <Source class="vtkCylinderSource"/>
   <Scale variable="Resolution" trace_name="Resolution"
-               default_value="6" resolution="1" range="0 512"
+               default_value="6" resolution="1" range="2 512"
                display_entry="1" entry_and_label_on_top="0" display_value="0"
                help="The number of facets used to define the cylinder." />
 <!-- should keep value that keeps value non-negative -->
