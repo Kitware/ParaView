@@ -727,7 +727,7 @@ const char* vtkPVWindow::StandardFilterInterfaces=
 " <Module name=\"StreamTracer\" root_name=\"stream\" input=\"vtkDataSet\" \n"
 "         output=\"vtkPolyData\" multiprocess_support=\"single_process\"\n"
 "         module_type=\"Filter\" replace_input=\"0\"\n"
-"         button_image=\"PVProbeButton\"\n"
+"         button_image=\"PVStreamTracerButton\"\n"
 "         button_help=\"Generate streamtraces from a collection of seed points"
 "         \">\n"
 "  <Filter type=\"vtkStreamTracer\"/>\n"

@@ -170,6 +170,15 @@ void vtkPVApplication::CreateButtonPhotos()
                     PV_VECTOR_DISPLACEMENT_BUTTON,
                     PV_VECTOR_DISPLACEMENT_BUTTON_WIDTH, 
                     PV_VECTOR_DISPLACEMENT_BUTTON_HEIGHT);
+
+  /* Yes, I'm using the Vector displacement attributes because the .h
+     has not been generated for that button, it will once everybody is
+     happy with those new icons :)
+  */
+  this->CreatePhoto("PVStreamTracerButton", 
+                    PV_VECTOR_DISPLACEMENT_BUTTON,
+                    PV_VECTOR_DISPLACEMENT_BUTTON_WIDTH, 
+                    PV_VECTOR_DISPLACEMENT_BUTTON_HEIGHT);
 }
 
 //----------------------------------------------------------------------------
