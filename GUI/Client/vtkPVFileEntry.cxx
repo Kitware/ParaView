@@ -72,7 +72,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVFileEntry);
-vtkCxxRevisionMacro(vtkPVFileEntry, "1.87");
+vtkCxxRevisionMacro(vtkPVFileEntry, "1.88");
 
 //----------------------------------------------------------------------------
 vtkPVFileEntry::vtkPVFileEntry()
@@ -289,7 +289,8 @@ void vtkPVFileEntry::SetTimeStep(int ts)
     return;
     }
   
-  if ( ts >= dom->GetNumberOfStrings() && ts < 0 )
+  int numStrings = dom->GetNumberOfStrings();
+  if ( ts >= numStrings || ts < 0 )
     {
     return;
     }
