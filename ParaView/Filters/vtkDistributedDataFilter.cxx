@@ -92,7 +92,7 @@ static char * makeEntry(const char *s)
 
 // Timing data ---------------------------------------------
 
-vtkCxxRevisionMacro(vtkDistributedDataFilter, "1.19");
+vtkCxxRevisionMacro(vtkDistributedDataFilter, "1.20");
 
 vtkStandardNewMacro(vtkDistributedDataFilter);
 
@@ -169,7 +169,7 @@ const char *vtkDistributedDataFilter::GetGlobalNodeIdArray(vtkDataSet *set)
      };
   //------------------------------------------------
 
-  if (this->GlobalIdArrayName && (this->GlobalIdArrayName[0] == NULL))
+  if (this->GlobalIdArrayName && (!this->GlobalIdArrayName[0]))
     {
     delete [] this->GlobalIdArrayName;
     this->GlobalIdArrayName = NULL;
