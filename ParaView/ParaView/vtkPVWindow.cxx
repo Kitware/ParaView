@@ -1693,7 +1693,7 @@ void vtkPVWindow::ExportVTKScript()
     return;
     }
 
-  this->SaveInTclScript(filename, 1);
+  this->SaveInTclScript(filename, 1, 0);
 }
 
 //----------------------------------------------------------------------------
@@ -1717,7 +1717,8 @@ const char* vtkPVWindow::ExtractFileExtension(const char* fname)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVWindow::SaveInTclScript(const char* filename, int vtkFlag)
+void vtkPVWindow::SaveInTclScript(const char* filename,
+				  int vtkFlag, int askFlag)
 {
   ofstream *file;
   vtkPVSource *pvs;
@@ -1770,7 +1771,7 @@ void vtkPVWindow::SaveInTclScript(const char* filename, int vtkFlag)
   // Descide what this script should do.
   // Save an image or series of images, or run interactively.
   const char *script = this->AnimationInterface->GetScript();
-  if (script && vtkString::Length(script) > 0)
+  if (script && vtkString::Length(script) > 0 && !askFlag)
     {
     if (vtkKWMessageDialog::PopupYesNo(
 	  this->Application, this, "Animation", 
@@ -1781,7 +1782,7 @@ void vtkPVWindow::SaveInTclScript(const char* filename, int vtkFlag)
       }
     }
   
-  if (animationFlag == 0)
+  if (animationFlag == 0 && !askFlag)
     {
     if (vtkKWMessageDialog::PopupYesNo(
 	  this->Application, this, "Image", 
@@ -1792,7 +1793,7 @@ void vtkPVWindow::SaveInTclScript(const char* filename, int vtkFlag)
       }
     }
 
-  if (animationFlag || imageFlag)
+  if ( (animationFlag || imageFlag) && !askFlag )
     {
     this->Script("tk_getSaveFile -title {Save Image} -defaultextension {.jpg} -filetypes {{{JPEG Images} {.jpg}} {{PNG Images} {.png}} {{Binary PPM} {.ppm}} {{TIFF Images} {.tif}}}");
     path = vtkString::Duplicate(this->Application->GetMainInterp()->result);

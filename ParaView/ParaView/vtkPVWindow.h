@@ -197,7 +197,7 @@ public:
   
   // Description:
   // Access from script for regression test.
-  void SaveInTclScript(const char *filename, int vtkFlag);
+  void SaveInTclScript(const char *filename, int vtkFlag, int askFlag);
 
   // Description:
   // Save the pipeline as a tcl script.
