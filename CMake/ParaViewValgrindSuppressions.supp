@@ -2439,3 +2439,24 @@
    fun:Tk_MainEx
    fun:main
 }
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:malloc
+   fun:XCreateRegion
+   fun:_XtEventInitialize
+   fun:XtToolkitInitialize
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:malloc
+   fun:XtMalloc
+   fun:XtRegisterGrabAction
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:malloc
+   fun:__cxa_get_globals
+}
