@@ -58,6 +58,7 @@ SET( KWWidgets_SRCS
   vtkKWProgressGauge.cxx 
   vtkKWPushButton.cxx 
   vtkKWPushButtonSet.cxx 
+  vtkKWPushButtonWithMenu.cxx 
   vtkKWRadioButton.cxx 
   vtkKWRadioButtonSet.cxx
   vtkKWRange.cxx 
