@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    vtkPVInteractorStyleCenterOfRotation.h
+  Module:    vtkPVCameraControl.h
   Language:  C++
   Date:      $Date$
   Version:   $Revision$
@@ -39,53 +39,62 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-// .NAME vtkPVInteractorStyleCenterOfRotation - interactively select center of rotation
+// .NAME vtkPVCameraControl
 // .SECTION Description
-// vtkPVInteractorStyleCenterOfRotation is a helper interactor style used
-// in ParaView to interactively pick the center of rotation for the
-// vtkPVInteractorStyleRotateCamera.
 
-#ifndef __vtkPVInteractorStyleCenterOfRotation_h
-#define __vtkPVInteractorStyleCenterOfRotation_h
+#ifndef __vtkPVCameraControl_h
+#define __vtkPVCameraControl_h
 
-#include "vtkInteractorStyle.h"
+#include "vtkKWWidget.h"
 
-class vtkPVWorldPointPicker;
+class vtkKWEntry;
+class vtkKWLabel;
+class vtkKWPushButton;
+class vtkPVInteractorStyleCenterOfRotation;
+class vtkPVRenderView;
 
-class VTK_EXPORT vtkPVInteractorStyleCenterOfRotation :public vtkInteractorStyle
+class VTK_EXPORT vtkPVCameraControl : public vtkKWWidget
 {
 public:
-  static vtkPVInteractorStyleCenterOfRotation *New();
-  vtkTypeRevisionMacro(vtkPVInteractorStyleCenterOfRotation, vtkInteractorStyle);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  static vtkPVCameraControl* New();
+  vtkTypeRevisionMacro(vtkPVCameraControl, vtkKWWidget);
+  void PrintSelf(ostream &os, vtkIndent indent);
   
-  // Description:
-  // Event bindings controlling the effects of pressing mouse buttons
-  // or moving the mouse.
-  virtual void OnLeftButtonDown();
-  virtual void OnLeftButtonUp();
-
-  // Description:
-  // These methods are for the interactions for this interactor style
-  virtual void Pick();
-
-  // Description:
-  // Access to the center of rotation values
-  vtkGetVector3Macro(Center, float);
+  void SetInteractorStyle(vtkPVInteractorStyleCenterOfRotation *style);
+  void SetRenderView(vtkPVRenderView *view);
+  
+  void Create(vtkKWApplication *app, const char *args);
+  
+  void ElevationButtonCallback();
+  void AzimuthButtonCallback();
+  void RollButtonCallback();
   
 protected:
-  vtkPVInteractorStyleCenterOfRotation();
-  ~vtkPVInteractorStyleCenterOfRotation();
+  vtkPVCameraControl();
+  ~vtkPVCameraControl();
   
-  // Description:
-  // Set the center of rotation.
-  void SetCenter(float x, float y, float z);
-  float Center[3];
+  vtkPVInteractorStyleCenterOfRotation *InteractorStyle;
+  vtkPVRenderView *RenderView;
   
-  vtkPVWorldPointPicker *Picker;
+  void Elevation(double angle);
+  void Azimuth(double angle);
+  void Roll(double angle);
+  
+  vtkKWPushButton *ElevationButton;
+  vtkKWEntry *ElevationEntry;
+  vtkKWLabel *ElevationLabel;
+  
+  vtkKWPushButton *AzimuthButton;
+  vtkKWEntry *AzimuthEntry;
+  vtkKWLabel *AzimuthLabel;
 
-  vtkPVInteractorStyleCenterOfRotation(const vtkPVInteractorStyleCenterOfRotation&); // Not implemented
-  void operator=(const vtkPVInteractorStyleCenterOfRotation&); // Not implemented
+  vtkKWPushButton *RollButton;
+  vtkKWEntry *RollEntry;
+  vtkKWLabel *RollLabel;
+  
+private:
+  vtkPVCameraControl(const vtkPVCameraControl&);  // Not implemented
+  void operator=(const vtkPVCameraControl&);  // Not implemented
 };
 
 #endif

@@ -69,6 +69,7 @@ class vtkMultiProcessController;
 class vtkPVApplication;
 class vtkPVAxesWidget;
 class vtkPVCameraIcon;
+class vtkPVCameraControl;
 class vtkPVData;
 class vtkPVInteractorStyleControl;
 class vtkPVRenderViewObserver;
@@ -333,6 +334,10 @@ protected:
   // Camera icons
   vtkKWLabeledFrame* CameraIconsFrame;
   vtkPVCameraIcon* CameraIcons[6];
+  
+  // Camera controls (elevation, azimuth, roll)
+  vtkKWLabeledFrame *CameraControlFrame;
+  vtkPVCameraControl *CameraControl;
 
   vtkPVRenderViewObserver* Observer;
 

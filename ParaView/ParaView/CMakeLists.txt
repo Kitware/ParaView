@@ -62,6 +62,7 @@ SET( ParaViewClient_SRCS
   vtkPVBoundsDisplay.cxx
   vtkPVBoxWidget.cxx
   vtkPVCalculatorWidget.cxx
+  vtkPVCameraControl.cxx
   vtkPVCameraIcon.cxx
   vtkPVCameraManipulator.cxx
   vtkPVClassNameInformation.cxx

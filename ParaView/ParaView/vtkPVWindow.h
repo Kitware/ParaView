@@ -448,6 +448,10 @@ public:
   void SetCenterOfRotation(float x, float y, float z);
 
   // Description:
+  // Access to this style from outside vtkPVWindow
+  vtkGetObjectMacro(CenterOfRotationStyle, vtkPVInteractorStyleCenterOfRotation);
+  
+  // Description:
   // Get the source from a name. This is used for serialization.
   vtkPVSource* GetSourceFromName(const char*);
   void AddToNamesToSources(const char* name, vtkPVSource* source);

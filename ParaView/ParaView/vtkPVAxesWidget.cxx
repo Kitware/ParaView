@@ -56,7 +56,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkRenderWindowInteractor.h"
 
 vtkStandardNewMacro(vtkPVAxesWidget);
-vtkCxxRevisionMacro(vtkPVAxesWidget, "1.4");
+vtkCxxRevisionMacro(vtkPVAxesWidget, "1.5");
 
 vtkCxxSetObjectMacro(vtkPVAxesWidget, AxesActor, vtkPVAxesActor);
 vtkCxxSetObjectMacro(vtkPVAxesWidget, ParentRenderer, vtkRenderer);
@@ -705,6 +705,11 @@ void vtkPVAxesWidget::ResizeBottomRight()
 void vtkPVAxesWidget::SquareRenderer()
 {
   int *size = this->Renderer->GetSize();
+  if (size[0] == 0 || size[1] == 0)
+    {
+    return;
+    }
+  
   float vp[4];
   this->Renderer->GetViewport(vp);
   
@@ -756,6 +761,22 @@ void vtkPVAxesWidget::SetOutlineColor(float r, float g, float b)
 float* vtkPVAxesWidget::GetOutlineColor()
 {
   return this->OutlineActor->GetProperty()->GetColor();
+}
+
+vtkRenderer* vtkPVAxesWidget::GetParentRenderer()
+{
+  return this->ParentRenderer;
+}
+
+void vtkPVAxesWidget::SetViewport(float minX, float minY,
+                                  float maxX, float maxY)
+{
+  this->Renderer->SetViewport(minX, minY, maxX, maxY);
+}
+
+float* vtkPVAxesWidget::GetViewport()
+{
+  return this->Renderer->GetViewport();
 }
 
 void vtkPVAxesWidget::PrintSelf(ostream& os, vtkIndent indent)

@@ -69,6 +69,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVApplication.h"
 #include "vtkPVApplicationSettingsInterface.h"
 #include "vtkPVAxesWidget.h"
+#include "vtkPVCameraControl.h"
 #include "vtkPVCameraIcon.h"
 #include "vtkPVCompositeRenderModule.h"
 #include "vtkPVConfig.h"
@@ -122,7 +123,7 @@ static unsigned char image_properties[] =
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.277");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.278");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -202,6 +203,9 @@ vtkPVRenderView::vtkPVRenderView()
   this->ManipulatorControl3D = vtkPVInteractorStyleControl::New();
   this->ManipulatorControl3D->SetRegisteryName("3D");
 
+  this->CameraControlFrame = vtkKWLabeledFrame::New();
+  this->CameraControl = vtkPVCameraControl::New();
+  
   this->NavigationFrame = vtkKWLabeledFrame::New();
   this->NavigationWindow = vtkPVNavigationWindow::New();
   this->SelectionWindow = vtkPVSourceList::New();
@@ -384,6 +388,9 @@ vtkPVRenderView::~vtkPVRenderView()
 
   this->ManipulatorControl2D->Delete();
   this->ManipulatorControl3D->Delete();
+
+  this->CameraControlFrame->Delete();
+  this->CameraControl->Delete();
   
   this->CameraIconsFrame->Delete();
   this->CameraIconsFrame = 0;
@@ -471,6 +478,9 @@ void vtkPVRenderView::PrepareForDelete()
                              this->TriangleStripsCheck->GetState());
     pvapp->SetRegisteryValue(2, "RunTime", "UseImmediateMode", "%d",
                              this->ImmediateModeCheck->GetState());
+    float *vp = this->OrientationAxes->GetViewport();
+    pvapp->SetRegisteryValue(2, "RunTime", "OrientationAxesViewport",
+                             "%f %f %f %f", vp[0], vp[1], vp[2], vp[3]);
 
     // If it's the last win, save the size of the nav frame
 
@@ -1002,6 +1012,17 @@ void vtkPVRenderView::CreateViewProperties()
   this->OrientationAxesCheck->Create(this->Application, 0);
   this->OrientationAxesCheck->SetText("Display orientation axes");
   this->OrientationAxesCheck->SetCommand(this, "OrientationAxesCheckCallback");
+  if (pvapp && pvwindow &&
+      pvapp->GetRegisteryValue(2, "RunTime", "OrientationAxesVisibility", 0))
+    {
+    this->OrientationAxesCheck->SetState(
+      pvwindow->GetIntRegisteryValue(2, "RunTime", "OrientationAxesVisibility"));
+    this->OrientationAxesCheckCallback();
+    }
+  else
+    {
+    this->OrientationAxesCheck->SetState(0);
+    }
   
   // Orientation axes settings: interactive check
   
@@ -1010,8 +1031,18 @@ void vtkPVRenderView::CreateViewProperties()
   this->OrientationAxesInteractiveCheck->Create(this->Application, 0);
   this->OrientationAxesInteractiveCheck->SetText("Interactive");
   this->OrientationAxesInteractiveCheck->SetCommand(this, "OrientationAxesInteractiveCallback");
-  this->OrientationAxesInteractiveCheck->SetState(1);
-  this->SetOrientationAxesInteractivity(1);
+  if (pvapp && pvwindow &&
+      pvapp->GetRegisteryValue(2, "RunTime", "OrientationAxesInteractivity", 0))
+    {
+    this->OrientationAxesInteractiveCheck->SetState(
+      pvwindow->GetIntRegisteryValue(2, "RunTime", "OrientationAxesInteractivity"));
+    }
+  else
+    {
+    this->OrientationAxesInteractiveCheck->SetState(1);
+    }
+  
+  this->OrientationAxesInteractiveCallback();
   
   // Orientation axes settings: outline color
   
@@ -1020,7 +1051,25 @@ void vtkPVRenderView::CreateViewProperties()
   this->OrientationAxesOutlineColor->SetText("Set Outline Color");
   this->OrientationAxesOutlineColor->Create(this->Application, 0);
   this->OrientationAxesOutlineColor->SetCommand(this, "SetOrientationAxesOutlineColor");
-
+  float rgb[3];
+  if (pvapp && pvwindow)
+    {
+    pvwindow->RetrieveColor(2, "OrientationAxesOutline", rgb);
+    if (rgb[0] == -1)
+      {
+      rgb[0] = 1.0;
+      rgb[1] = 1.0;
+      rgb[2] = 1.0;
+      }
+    }
+  else
+    {
+    rgb[0] = 1.0;
+    rgb[1] = 1.0;
+    rgb[2] = 1.0;
+    }
+  this->SetOrientationAxesOutlineColor(rgb[0], rgb[1], rgb[2]);
+    
   // Orientation axes settings: pack
   
   this->Script("pack %s %s -padx 2 -side top -anchor w",
@@ -1032,6 +1081,26 @@ void vtkPVRenderView::CreateViewProperties()
   // Orientation axes widget
   
   this->OrientationAxes->SetParentRenderer(this->Renderer);
+
+  char buffer[1024];
+  float vp[4];
+  if (pvapp && pvwindow &&
+      pvapp->GetRegisteryValue(2, "RunTime", "OrientationAxesViewport", buffer))
+    {
+    if (*buffer)
+      {
+      sscanf(buffer, "%f %f %f %f", vp, vp+1, vp+2, vp+3);
+      this->OrientationAxes->SetViewport(vp[0], vp[1], vp[2], vp[3]);
+      }
+    else
+      {
+      this->OrientationAxes->SetViewport(0, 0.2, 0, 0.2);
+      }
+    }
+  else
+    {
+    this->OrientationAxes->SetViewport(0, 0.2, 0, 0.2);
+    }
   
   // Camera settings
 
@@ -1144,13 +1213,30 @@ void vtkPVRenderView::CreateViewProperties()
   this->ManipulatorControl3D->Create(pvapp, 0);
   this->ManipulatorControl3D->SetLabel("3D Movements");
 
+  // Camera: camera control frame
+
+  this->CameraControlFrame->SetParent(frame->GetFrame());
+  this->CameraControlFrame->ShowHideFrameOn();
+  this->CameraControlFrame->Create(this->Application, 0);
+  this->CameraControlFrame->SetLabel("Camera Control");
+  
+  // Camera: camera control
+  
+  this->CameraControl->SetParent(this->CameraControlFrame->GetFrame());
+  this->CameraControl->Create(this->Application, 0);
+  this->CameraControl->SetInteractorStyle(this->GetPVWindow()->GetCenterOfRotationStyle());
+  this->CameraControl->SetRenderView(this);
+  
+  this->Script("pack %s -side top -fill x -expand y", this->CameraControl->GetWidgetName());
+  
   // Camera: pack
 
-  this->Script("pack %s %s %s %s -padx 2 -pady 2 -fill x -expand 1 -anchor w",
+  this->Script("pack %s %s %s %s %s -padx 2 -pady 2 -fill x -expand 1 -anchor w",
                this->StandardViewsFrame->GetWidgetName(),
                this->CameraIconsFrame->GetWidgetName(),
                this->ManipulatorControl2D->GetWidgetName(),
-               this->ManipulatorControl3D->GetWidgetName());
+               this->ManipulatorControl3D->GetWidgetName(),
+               this->CameraControlFrame->GetWidgetName());
 
   frame->Delete();
 
@@ -1807,6 +1893,10 @@ void vtkPVRenderView::SetOrientationAxesVisibility(int val)
     {
     this->OrientationAxes->SetInteractor(this->GetPVWindow()->GetInteractor());
     }
+  if (!this->OrientationAxes->GetParentRenderer())
+    {
+    this->OrientationAxes->SetParentRenderer(this->Renderer);
+    }
 
   this->OrientationAxes->SetEnabled(val);
 }
@@ -1814,11 +1904,15 @@ void vtkPVRenderView::SetOrientationAxesVisibility(int val)
 //----------------------------------------------------------------------------
 void vtkPVRenderView::OrientationAxesCheckCallback()
 {
+  int val = this->OrientationAxesCheck->GetState();
   this->AddTraceEntry("$kw(%s) SetOrientationAxesVisibility %d",
-                      this->GetTclName(),
-                      this->OrientationAxesCheck->GetState());
-  this->SetOrientationAxesVisibility(this->OrientationAxesCheck->GetState());
+                      this->GetTclName(), val);
+  this->SetOrientationAxesVisibility(val);
   this->EventuallyRender();
+  
+  this->Application->SetRegisteryValue(2, "RunTime",
+                                       "OrientationAxesVisibility",
+                                       (val ? "1" : "0"));
 }
 
 //----------------------------------------------------------------------------
@@ -1837,11 +1931,13 @@ void vtkPVRenderView::SetOrientationAxesInteractivity(int val)
 //----------------------------------------------------------------------------
 void vtkPVRenderView::OrientationAxesInteractiveCallback()
 {
+  int val = this->OrientationAxesInteractiveCheck->GetState();
   this->AddTraceEntry("$kw(%s) SetOrientationAxesInteractivity %d",
-                      this->GetTclName(),
-                      this->OrientationAxesInteractiveCheck->GetState());
-  this->SetOrientationAxesInteractivity(
-    this->OrientationAxesInteractiveCheck->GetState());
+                      this->GetTclName(), val);
+  this->SetOrientationAxesInteractivity(val);
+  this->Application->SetRegisteryValue(2, "RunTime",
+                                       "OrientationAxesInteractivity",
+                                       (val ? "1" : "0"));
 }
 
 //----------------------------------------------------------------------------
@@ -1855,6 +1951,8 @@ void vtkPVRenderView::SetOrientationAxesOutlineColor(float r, float g, float b)
     this->OrientationAxesOutlineColor->SetColor(r, g, b);
     }
   this->OrientationAxes->SetOutlineColor(r, g, b);
+  this->GetPVWindow()->SaveColor(2, "OrientationAxesOutline",
+                                 this->OrientationAxes->GetOutlineColor());
 }
 
 //----------------------------------------------------------------------------

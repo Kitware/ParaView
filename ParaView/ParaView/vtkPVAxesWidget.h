@@ -48,6 +48,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkInteractorObserver.h"
 
 class vtkActor2D;
+class vtkKWApplication;
 class vtkPolyData;
 class vtkPVAxesActor;
 class vtkPVAxesWidgetObserver;
@@ -72,7 +73,8 @@ public:
   // Description:
   // Set the renderer this 3D widget will be contained in.
   void SetParentRenderer(vtkRenderer *ren);
-
+  vtkRenderer* GetParentRenderer();
+  
   // Description:
   // Callback to keep the camera for the axes actor up to date with the
   // camera in the parent renderer
@@ -89,6 +91,11 @@ public:
   // when (in interactive mode) the cursor is over this 3D widget.
   void SetOutlineColor(float r, float g, float b);
   float *GetOutlineColor();
+  
+  // Description:
+  // Set/get the viewport to position/size this 3D widget.
+  void SetViewport(float minX, float minY, float maxX, float maxY);
+  float* GetViewport();
   
 protected:
   vtkPVAxesWidget();

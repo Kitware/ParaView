@@ -51,7 +51,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVRenderModule.h"
 #include "vtkPVApplication.h"
 
-vtkCxxRevisionMacro(vtkPVInteractorStyleCenterOfRotation, "1.6");
+vtkCxxRevisionMacro(vtkPVInteractorStyleCenterOfRotation, "1.7");
 vtkStandardNewMacro(vtkPVInteractorStyleCenterOfRotation);
 
 //-------------------------------------------------------------------------
@@ -59,6 +59,8 @@ vtkPVInteractorStyleCenterOfRotation::vtkPVInteractorStyleCenterOfRotation()
 {
   this->UseTimers = 0;
   this->Picker = vtkPVWorldPointPicker::New();
+
+  this->Center[0] = this->Center[1] = this->Center[2] = 0.0;
 }
 
 //-------------------------------------------------------------------------
@@ -122,10 +124,17 @@ void vtkPVInteractorStyleCenterOfRotation::SetCenter(float x, float y, float z)
     window->CenterEntryCallback();
     }
   window->ChangeInteractorStyle(1);
+  
+  this->Center[0] = x;
+  this->Center[1] = y;
+  this->Center[2] = z;
 }
 
 //-------------------------------------------------------------------------
 void vtkPVInteractorStyleCenterOfRotation::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+  
+  os << indent << "Center: (" << this->Center[0] << ", " << this->Center[1]
+     << ", " << this->Center[2] << ")" << endl;
 }

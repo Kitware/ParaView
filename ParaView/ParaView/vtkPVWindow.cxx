@@ -147,7 +147,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.498");
+vtkCxxRevisionMacro(vtkPVWindow, "1.499");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -943,6 +943,21 @@ void vtkPVWindow::Create(vtkKWApplication *app, char* vtkNotUsed(args))
 
   // Interface for the preferences.
 
+  // Create a dummy interactor on the satellites so they can have 3d widgets.
+  // SetInteractor needs to be called before the main view is set so that there
+  // is an interactor to pass to the main view's orientation marker.
+  this->InteractorID = pm->NewStreamObject("vtkPVGenericRenderWindowInteractor");
+  vtkClientServerStream& stream = pm->GetStream();
+  stream << vtkClientServerStream::Invoke << this->InteractorID << "SetRenderWindow" 
+         << pvApp->GetRenderModule()->GetRenderWindowID()
+         << vtkClientServerStream::End;
+  stream << vtkClientServerStream::Invoke << this->InteractorID 
+         << "SetInteractorStyle" << 0 << vtkClientServerStream::End;
+  pm->SendStreamToClientAndServer();
+  this->SetInteractor(
+    vtkPVGenericRenderWindowInteractor::SafeDownCast(
+      pvApp->GetProcessModule()->GetObjectFromID(this->InteractorID)));
+  
   // Create the main view.
   if (use_splash)
     {
@@ -1072,20 +1087,7 @@ void vtkPVWindow::Create(vtkKWApplication *app, char* vtkNotUsed(args))
                   << "AddActor" << this->CenterActorID 
                   << vtkClientServerStream::End;
   pm->SendStreamToClientAndServerRoot();
-  vtkClientServerStream& stream = pm->GetStream();
 
-  // Create a dummy interactor on the satellites so they han have 3d widgets.
-  this->InteractorID = pm->NewStreamObject("vtkPVGenericRenderWindowInteractor");
-  stream << vtkClientServerStream::Invoke << this->InteractorID << "SetRenderWindow" 
-         << pvApp->GetRenderModule()->GetRenderWindowID()
-         << vtkClientServerStream::End;
-  stream << vtkClientServerStream::Invoke << this->InteractorID 
-         << "SetInteractorStyle" << 0 << vtkClientServerStream::End;
-  pm->SendStreamToClientAndServer();
-  this->SetInteractor(
-    vtkPVGenericRenderWindowInteractor::SafeDownCast(
-      pvApp->GetProcessModule()->GetObjectFromID(this->InteractorID)));
-  
   this->Interactor->SetPVRenderView(this->MainView);
   this->ChangeInteractorStyle(1);
 
@@ -4321,6 +4323,8 @@ void vtkPVWindow::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "MainView: " << this->GetMainView() << endl;
   os << indent << "CameraStyle2D: " << this->CameraStyle2D << endl;
   os << indent << "CameraStyle3D: " << this->CameraStyle3D << endl;
+  os << indent << "CenterOfRotationStyle: " << this->CenterOfRotationStyle
+     << endl;
   os << indent << "SelectMenu: " << this->SelectMenu << endl;
   os << indent << "SourceMenu: " << this->SourceMenu << endl;
   os << indent << "Toolbar: " << this->GetToolbar() << endl;
