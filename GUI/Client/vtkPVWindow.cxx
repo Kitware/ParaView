@@ -126,7 +126,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.571");
+vtkCxxRevisionMacro(vtkPVWindow, "1.572");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -724,8 +724,9 @@ void vtkPVWindow::InitializeMenus(vtkKWApplication* vtkNotUsed(app))
                                        "Manage available plug-ins");
   
   this->PluginsDialog->Create(this->Application,0);
+  this->PluginsDialog->SetMasterWindow(this);
 
-  this->MenuFile->InsertCascade(clidx++,"Preferences", this->PreferencesMenu, 8);
+  //this->MenuFile->InsertCascade(clidx++,"Preferences", this->PreferencesMenu, 8);
   this->MenuFile->InsertSeparator(clidx++);
 
   this->AddRecentFilesMenu(NULL, this);
@@ -2695,17 +2696,7 @@ void vtkPVWindow::DisplayPluginWindow()
 {
   int res=0;
 
-  cout << "Something" << endl;
-
   res = this->PluginsDialog->Invoke();
-  if(res)
-    {
-    cout << "Something OK" << endl;
-    }
-  else
-    {
-    cout << "Something not OK" << endl;
-    }
 }
 
 //-----------------------------------------------------------------------------
