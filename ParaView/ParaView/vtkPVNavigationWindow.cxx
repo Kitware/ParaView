@@ -45,6 +45,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWLabeledFrame.h"
 #include "vtkKWMenu.h"
 #include "vtkObjectFactory.h"
+#include "vtkPVApplication.h"
 #include "vtkPVData.h"
 #include "vtkPVSource.h"
 #include "vtkPVWindow.h"
@@ -385,6 +386,16 @@ void vtkPVNavigationWindow::Create(vtkKWApplication *app, const char *args)
   this->PopupMenu->Create(this->Application, "-tearoff 0");
   this->PopupMenu->AddCommand("Delete", this, "DeleteWidget", 0, 
 			      "Delete current widget");
+  char *var = this->PopupMenu->CreateCheckButtonVariable(this, "Visibility");
+  this->PopupMenu->AddCheckButton("Visibility", var, this, "Visibility", 0,
+				  "Set visibility for the current object");  
+  delete [] var;
+  /*
+  vtkPVApplication *pvApp = vtkPVApplication::SafeDownCast(this->Application);
+  this->PopupMenu->AddCascade(
+    "VTK Filters", pvApp->GetMainWindow()->GetFilterMenu(),
+    4, "Choose a filter from a list of VTK filters");
+  */
 }
 
 void vtkPVNavigationWindow::SetWidth(int width)
@@ -431,9 +442,10 @@ void vtkPVNavigationWindow::HighlightObject(const char* widget, int onoff)
 //----------------------------------------------------------------------------
 void vtkPVNavigationWindow::DisplayModulePopupMenu(const char* module, int x, int y)
 {
-  cout << "Popup for module: " << module << " at " << x << ", " << y << endl;
+  //cout << "Popup for module: " << module << " at " << x << ", " << y << endl;
+  vtkKWApplication *app = this->Application;
   ostrstream str;
-  if ( this->Application->EvaluateBooleanExpression("%s DeleteCheck", module) )
+  if ( app->EvaluateBooleanExpression("%s DeleteCheck", module) )
     {
     str << "ExecuteCommandOnModule " << module << " DeleteCallback" << ends;
     this->PopupMenu->SetEntryCommand("Delete", this, str.str());
@@ -443,15 +455,36 @@ void vtkPVNavigationWindow::DisplayModulePopupMenu(const char* module, int x, in
     {
     this->PopupMenu->SetState("Delete", vtkKWMenu::Disabled);
     }
-  this->Script("tk_popup %s %d %d", this->PopupMenu->GetWidgetName(), x, y);
   str.rdbuf()->freeze(0);
+  ostrstream str1;
+  if ( 1 /* Something that berk will do */ )
+    {
+    char *var = this->PopupMenu->CreateCheckButtonVariable(this, "Visibility");
+    str1 << "[ " << module << " GetPVOutput ] SetVisibility $" 
+	 << var << ";"
+	 << "[ [ Application GetMainWindow ] GetMainView ] EventuallyRender" 
+	 <<  ends;
+    this->PopupMenu->SetEntryCommand("Visibility", str1.str());
+    if ( app->EvaluateBooleanExpression("[ %s GetPVOutput ] GetVisibility",
+					module) )
+      {
+      this->Script("set %s 1", var);
+      }
+    else
+      {
+      this->Script("set %s 0", var);
+      }
+    delete [] var;
+    }
+  this->Script("tk_popup %s %d %d", this->PopupMenu->GetWidgetName(), x, y);
+  str1.rdbuf()->freeze(0);
 }
 
 //----------------------------------------------------------------------------
 void vtkPVNavigationWindow::ExecuteCommandOnModule(
   const char* module, const char* command)
 {
-  cout << "Executing: " << command << " on module: " << module << endl;
+  //cout << "Executing: " << command << " on module: " << module << endl;
   this->Script("%s %s", module, command);
 }
 
