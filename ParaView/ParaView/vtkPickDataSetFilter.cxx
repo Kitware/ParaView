@@ -24,7 +24,7 @@
 #include "vtkFloatArray.h"
 #include "vtkCellArray.h"
 
-vtkCxxRevisionMacro(vtkPickDataSetFilter, "1.1");
+vtkCxxRevisionMacro(vtkPickDataSetFilter, "1.2");
 vtkStandardNewMacro(vtkPickDataSetFilter);
 
 
@@ -49,6 +49,8 @@ void vtkPickDataSetFilter::Execute()
   vtkIdList *pts;
   vtkUnstructuredGrid *output = this->GetOutput();
   vtkDataSet *input = this->GetInput();
+  vtkPointData* inputPD = input->GetPointData();
+  vtkPointData* outputPD = output->GetPointData();
 
   vtkDebugMacro(<<"Generating glyphs");
 
@@ -102,17 +104,26 @@ void vtkPickDataSetFilter::Execute()
       newPts = vtkPoints::New();
       vtkIdType *points = new vtkIdType[foundcell->GetNumberOfPoints()];
       int cc;
+      outputPD->CopyAllocate(inputPD, foundcell->GetNumberOfPoints());
       for ( cc = 0; cc < foundcell->GetNumberOfPoints(); cc ++ )
         {
-        float* point = input->GetPoint(foundcell->GetPointId(cc));
+        vtkIdType pid = foundcell->GetPointId(cc);
+        float* point = input->GetPoint(pid);
         vtkIdType id = newPts->InsertNextPoint(point);
         points[cc] = id;
+        outputPD->CopyData(inputPD, pid, id);
         }
       
       output->SetPoints(newPts);
-      output->InsertNextCell( foundcell->GetCellType(),
-                              foundcell->GetNumberOfPoints(),
-                              points);
+      vtkIdType cid = output->InsertNextCell( foundcell->GetCellType(),
+                                              foundcell->GetNumberOfPoints(),
+                                              points);
+
+      vtkCellData* inputCD = input->GetCellData();
+      vtkCellData* outputCD = output->GetCellData();
+      outputCD->CopyAllocate(inputCD, 1);
+      outputCD->CopyData(inputCD, cellIdx, cid);
+
       delete [] points;
       foundcell->Delete();    
       newPts->Delete();
@@ -147,6 +158,9 @@ void vtkPickDataSetFilter::Execute()
       //
       output->SetPoints(newPts);
       output->InsertNextCell( VTK_VERTEX, 1, &id);
+
+      outputPD->CopyAllocate(inputPD, 1);
+      outputPD->CopyData(inputPD, pointIdx, id);
 
       newPts->Delete();
       }
