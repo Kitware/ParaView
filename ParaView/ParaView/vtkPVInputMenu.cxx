@@ -43,6 +43,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkArrayMap.txx"
 #include "vtkDataSet.h"
+#include "vtkKWLabel.h"
+#include "vtkKWOptionMenu.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVData.h"
 #include "vtkPVSource.h"
@@ -410,6 +412,30 @@ int vtkPVInputMenu::ReadXMLAttributes(vtkPVXMLElement* element,
     }
   
   return 1;
+}
+
+//----------------------------------------------------------------------------
+const char* vtkPVInputMenu::GetLabel() 
+{
+  return this->Label->GetLabel();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVInputMenu::SetSources(vtkPVSourceCollection *sources) 
+{
+  this->Sources = sources;
+}
+
+//----------------------------------------------------------------------------
+vtkPVSourceCollection *vtkPVInputMenu::GetSources() 
+{
+  return this->Sources;
+}
+
+//----------------------------------------------------------------------------
+void vtkPVInputMenu::ClearEntries() 
+{ 
+  this->Menu->ClearEntries();
 }
 
 //----------------------------------------------------------------------------

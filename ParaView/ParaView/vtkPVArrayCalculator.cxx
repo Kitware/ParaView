@@ -48,6 +48,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWLabel.h"
 #include "vtkKWLabeledFrame.h"
 #include "vtkKWMenuButton.h"
+#include "vtkKWOptionMenu.h"
 #include "vtkKWPushButton.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"

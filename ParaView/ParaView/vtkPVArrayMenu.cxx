@@ -42,9 +42,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVArrayMenu.h"
 
 #include "vtkArrayMap.txx"
+#include "vtkDataArray.h"
 #include "vtkDataSet.h"
 #include "vtkDataSetAttributes.h"
+#include "vtkKWLabel.h"
 #include "vtkKWMessageDialog.h"
+#include "vtkKWOptionMenu.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
 #include "vtkPVApplication.h"
@@ -52,7 +55,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVInputMenu.h"
 #include "vtkPVSource.h"
 #include "vtkPVXMLElement.h"
-#include "vtkDataArray.h"
 
 vtkCxxSetObjectMacro(vtkPVArrayMenu,InputMenu, vtkPVInputMenu);
 

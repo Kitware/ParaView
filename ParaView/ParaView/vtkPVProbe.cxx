@@ -60,6 +60,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWLabeledEntry.h"
 #include "vtkKWCheckButton.h"
 #include "vtkPVData.h"
+#include "vtkKWOptionMenu.h"
+#include "vtkKWLabel.h"
 
 int vtkPVProbeCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);

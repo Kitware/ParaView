@@ -50,8 +50,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __vtkPVSelectionList_h
 
 #include "vtkPVObjectWidget.h"
-#include "vtkKWLabel.h"
-#include "vtkKWMenuButton.h"
 
 class vtkStringList;
 class vtkKWOptionMenu;
@@ -107,7 +105,7 @@ public:
   // using NewInstance() and then copy some necessary state 
   // parameters.
   vtkPVSelectionList* ClonePrototype(vtkPVSource* pvSource,
-				 vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
+				     vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
 //ETX
 
 protected:

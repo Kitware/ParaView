@@ -40,20 +40,19 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 #include "vtkPVLineWidget.h"
-#include "vtkPVApplication.h"
-#include "vtkPVXMLElement.h"
-#include "vtkPVData.h"
-#include "vtkPVWindow.h"
 
+#include "vtkCommand.h"
+#include "vtkDataSet.h"
 #include "vtkKWEntry.h"
 #include "vtkKWFrame.h"
-
-#include "vtkDataSet.h"
-#include "vtkPVGenericRenderWindowInteractor.h"
 #include "vtkLineWidget.h"
-#include "vtkCommand.h"
-
 #include "vtkObjectFactory.h"
+#include "vtkPVApplication.h"
+#include "vtkPVData.h"
+#include "vtkPVGenericRenderWindowInteractor.h"
+#include "vtkPVSource.h"
+#include "vtkPVWindow.h"
+#include "vtkPVXMLElement.h"
 
 //===========================================================================
 //***************************************************************************

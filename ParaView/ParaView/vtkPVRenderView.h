@@ -56,15 +56,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __vtkPVRenderView_h
 
 #include "vtkKWView.h"
-#include "vtkRenderWindowInteractor.h"
-#include "vtkPVSource.h"
 
-class vtkPVApplication;
-class vtkLabeledFrame;
-class vtkPVTreeComposite;
-class vtkPVNavigationWindow;
-class vtkPVWindow;
+class vtkKWLabel;
 class vtkKWScale;
+class vtkLabeledFrame;
+class vtkPVApplication;
+class vtkPVData;
+class vtkPVNavigationWindow;
+class vtkPVSource;
+class vtkPVTreeComposite;
+class vtkPVWindow;
 
 class VTK_EXPORT vtkPVRenderView : public vtkKWView
 {

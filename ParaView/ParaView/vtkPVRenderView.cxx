@@ -55,6 +55,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVData.h"
 #include "vtkPVNavigationWindow.h"
 #include "vtkPVRenderView.h"
+#include "vtkPVSource.h"
 #include "vtkPVSourceCollection.h"
 #include "vtkPVTreeComposite.h"
 #include "vtkPVWindow.h"

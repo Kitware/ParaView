@@ -49,12 +49,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __vtkPVInputMenu_h
 
 #include "vtkPVWidget.h"
-#include "vtkKWOptionMenu.h"
-#include "vtkKWLabel.h"
 
-class vtkPVSourceCollection;
-class vtkPVData;
 class vtkDataSet;
+class vtkKWLabel;
+class vtkKWOptionMenu;
+class vtkPVData;
+class vtkPVSourceCollection;
 
 class VTK_EXPORT vtkPVInputMenu : public vtkPVWidget
 {
@@ -71,7 +71,7 @@ public:
   // Set the label.  The label can be used to get this widget
   // from a script.
   void SetLabel (const char* label);
-  const char* GetLabel() {return this->Label->GetLabel();}
+  const char* GetLabel();
 
   // Description:
   // This is the source collection as possible inputs.
@@ -79,8 +79,8 @@ public:
   // in the menu on the next Reset call.
   // The collection is not referce counted for fear of loops 
   // and memory leaks.  We may wnet to fix his later.
-  void SetSources(vtkPVSourceCollection *sources) {this->Sources = sources;}
-  vtkPVSourceCollection *GetSources() {return this->Sources;}
+  void SetSources(vtkPVSourceCollection *sources);
+  vtkPVSourceCollection *GetSources();
 
   // Description:
   // Set/Get the class type for this input menu
@@ -166,7 +166,7 @@ protected:
 
   // Description:
   // Reset the menu by taking all entries out.
-  void ClearEntries() { this->Menu->ClearEntries();}
+  void ClearEntries();
 
   // Description:
   // Add an entry to the menu.
