@@ -18,6 +18,8 @@ OPTION(BUILD_SHARED_LIBS "Build VTK with shared libraries." OFF)
 OPTION (USE_INCLUDED_TCLTK "Should Tcl/Tk included in ParaViewComplete be used. Turn this off if you want to use your own Tcl/Tk. Note that you need version 8.4.5" ON)
 
 # Include the standard Dart testing module
+OPTION(BUILD_TESTING "Build ParaView Complete Testing" OFF)
+MARK_AS_ADVANCED(BUILD_TESTING)
 INCLUDE (${CMAKE_ROOT}/Modules/FindDart.cmake)
 IF(BUILD_TESTING)
   ENABLE_TESTING()
