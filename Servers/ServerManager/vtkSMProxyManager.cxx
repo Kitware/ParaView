@@ -22,13 +22,14 @@
 #include "vtkSmartPointer.h"
 
 #include <vtkstd/map>
+#include <vtkstd/set>
 
 #include "vtkStdString.h"
 
 #include "vtkSMProxyManagerInternals.h"
 
 vtkStandardNewMacro(vtkSMProxyManager);
-vtkCxxRevisionMacro(vtkSMProxyManager, "1.20");
+vtkCxxRevisionMacro(vtkSMProxyManager, "1.21");
 
 //---------------------------------------------------------------------------
 vtkSMProxyManager::vtkSMProxyManager()
@@ -362,6 +363,7 @@ void vtkSMProxyManager::SaveState(const char* filename)
 void vtkSMProxyManager::SaveState(const char*, ostream* os, vtkIndent indent)
 {
 
+  vtkstd::set<vtkstd::string> seen;
   // First save the state of all proxies
   vtkSMProxyManagerInternals::ProxyGroupType::iterator it =
     this->Internals->RegisteredProxyMap.begin();
@@ -372,21 +374,31 @@ void vtkSMProxyManager::SaveState(const char*, ostream* os, vtkIndent indent)
 
     // Do not save the state of prototypes.
     const char* protstr = "_prototypes";
+    const char* colname = it->first.c_str();
     int do_group = 1;
-    if (strlen(it->first.c_str()) > strlen(protstr))
+    if (strlen(colname) > strlen(protstr))
       {
-      const char* newstr = it->first.c_str() + strlen(it->first.c_str()) -
+      const char* newstr = colname + strlen(colname) -
         strlen(protstr);
       if (strcmp(newstr, protstr) == 0)
         {
         do_group = 0;
         }
       }
+    else if ( colname[0] == '_' )
+      {
+      do_group = 0;
+      }
     if (do_group)
       {
       for (; it2 != it->second.end(); it2++)
         {
-        it2->second->SaveState(it2->first.c_str(), os, indent);
+        const char* name = it2->first.c_str();
+        if ( seen.find(name) == seen.end() )
+          {
+          it2->second->SaveState(name, os, indent);
+          seen.insert(name);
+          }
         }
       }
     }
