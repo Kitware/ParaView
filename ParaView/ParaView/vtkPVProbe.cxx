@@ -47,7 +47,7 @@
  
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProbe);
-vtkCxxRevisionMacro(vtkPVProbe, "1.110");
+vtkCxxRevisionMacro(vtkPVProbe, "1.111");
 
 int vtkPVProbeCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -210,8 +210,8 @@ void vtkPVProbe::CreateProperties()
                     << this->XYPlotActorID 
                     << "SetNumberOfLabels" << 5 
                     << vtkClientServerStream::End;
-    // This is stupid and has to change!
-    int fixme;
+    // This is stupid and has to change! (Line division is meaningless.
+    //int fixme;
     pm->GetStream() << vtkClientServerStream::Invoke 
                     << this->XYPlotActorID 
                     << "SetXTitle" << "Line Divisions" 
