@@ -37,7 +37,7 @@
 
 #include <ctype.h>
 
-vtkCxxRevisionMacro(vtkPVXMLPackageParser, "1.45");
+vtkCxxRevisionMacro(vtkPVXMLPackageParser, "1.46");
 vtkStandardNewMacro(vtkPVXMLPackageParser);
 
 #ifndef VTK_NO_EXPLICIT_TEMPLATE_INSTANTIATION
@@ -235,7 +235,7 @@ void vtkPVXMLPackageParser::ProcessConfiguration()
       }
     else if(strcmp(name, "Library") == 0)
       {
-      if(!this->LoadLibrary(element))
+      if(!this->LoadPackageLibrary(element))
         {
         return;
         }
@@ -645,7 +645,7 @@ int vtkPVXMLPackageParser::ParseVTKFilter(vtkPVXMLElement* filterElement,
 }
 
 //----------------------------------------------------------------------------
-int vtkPVXMLPackageParser::LoadLibrary(vtkPVXMLElement* le)
+int vtkPVXMLPackageParser::LoadPackageLibrary(vtkPVXMLElement* le)
 {
   // Get the library name.
   const char* name = le->GetAttribute("name");

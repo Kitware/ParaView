@@ -59,7 +59,7 @@ protected:
   void CreateManipulator(vtkPVXMLElement* ma);
   void CreateWriter(vtkPVXMLElement* ma);
   int CreateModule(vtkPVXMLElement* me, vtkPVSource* pvm);
-  int LoadLibrary(vtkPVXMLElement* le);
+  int LoadPackageLibrary(vtkPVXMLElement* le);
   int LoadServerManagerFile(vtkPVXMLElement* le);
   int ParseVTKFilter(vtkPVXMLElement* filterElement,
                      vtkPVSource* pvm);
