@@ -80,7 +80,8 @@ void vtkPVGeometryFilter::ComputeInputUpdateExtents( vtkDataObject *output)
   vtkDataSet *input = this->GetInput();
   vtkImageData *image = vtkImageData::SafeDownCast(input);
   
-  if (this->Mode == VTK_PV_IMAGE_OUTLINE && image)
+  // Force update of volumes for timing.
+  if (0 && this->Mode == VTK_PV_IMAGE_OUTLINE && image)
     {
     image->SetUpdateExtent(0, -1, 0, -1, 0, -1);
     }
@@ -99,7 +100,8 @@ void vtkPVGeometryFilter::UpdateData(vtkDataObject *output)
   vtkImageData *image = vtkImageData::SafeDownCast(input);
   int idx;
 
-  if (image == NULL || this->Mode != VTK_PV_IMAGE_OUTLINE)
+  // Lets update even on images for now.  Easy timing.
+  if (1 || image == NULL || this->Mode != VTK_PV_IMAGE_OUTLINE)
     {
     this->vtkDataSetSurfaceFilter::UpdateData(output);
     return;
@@ -184,7 +186,6 @@ void vtkPVGeometryFilter::Execute()
   vtkPolyData *output = this->GetOutput();
   vtkDataSet *ds = this->GetInput();
   vtkImageData *input = vtkImageData::SafeDownCast(ds);
-  int idx;
 
   if (input == NULL || this->Mode != VTK_PV_IMAGE_OUTLINE)
     {
@@ -212,7 +213,9 @@ void vtkPVGeometryFilter::Execute()
     vtkOutlineSource *outline = vtkOutlineSource::New();
     outline->SetBounds(bounds);
     outline->Update();
-    output->ShallowCopy(outline->GetOutput());
+
+    output->SetPoints(outline->GetOutput()->GetPoints());
+    output->SetLines(outline->GetOutput()->GetLines());
     outline->Delete();
     }
 
