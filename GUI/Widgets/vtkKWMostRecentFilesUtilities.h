@@ -11,10 +11,11 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkKWMostRecentFilesUtilities - a window superclass which holds one or more views
+// .NAME vtkKWMostRecentFilesUtilities - a set of most recent files
 // .SECTION Description
-// This class represents a top level window with menu bar and status
-// line. It is designed to hold one or more vtkKWViews in it.
+// This class is basically a container for a set of most recent files.
+// It provides methods to manipulate them, load/save them from/to the
+// registry, and display them as entries in a menu.
 
 #ifndef __vtkKWMostRecentFilesUtilities_h
 #define __vtkKWMostRecentFilesUtilities_h
@@ -115,7 +116,6 @@ protected:
 
   char        *DefaultTargetCommand;
   vtkKWObject *DefaultTargetObject;
-  vtkKWMenu   *MostRecentFilesMenu;
   char        *RegistryKey;
   int         MaximumNumberOfMostRecentFilesInRegistry;
   int         MaximumNumberOfMostRecentFilesInMenu;
@@ -142,6 +142,11 @@ protected:
   virtual void UpdateMostRecentFilesMenu();
 
 private:
+  
+  // In private for lazy allocation using GetMostRecentFilesMenu()
+
+  vtkKWMenu   *MostRecentFilesMenu;
+
   vtkKWMostRecentFilesUtilities(const vtkKWMostRecentFilesUtilities&); // Not implemented
   void operator=(const vtkKWMostRecentFilesUtilities&); // Not implemented
 };
