@@ -68,7 +68,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVColorMap);
-vtkCxxRevisionMacro(vtkPVColorMap, "1.24.2.3");
+vtkCxxRevisionMacro(vtkPVColorMap, "1.24.2.4");
 
 int vtkPVColorMapCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -283,7 +283,7 @@ void vtkPVColorMap::Create(vtkKWApplication *app)
   
   if (this->Application)
     {
-    vtkErrorMacro("LabeledToggle already created");
+    vtkErrorMacro("PVColorMap already created");
     return;
     }
   // Superclass create takes a KWApplication, but we need a PVApplication.
@@ -300,39 +300,81 @@ void vtkPVColorMap::Create(vtkKWApplication *app)
   this->Script("frame %s -borderwidth 0 -relief flat", wname);
   
   // Now for the UI.
+
+  // Color map
+
   this->ColorMapFrame->SetParent(this);
-  this->ColorMapFrame->ShowHideFrameOff();
+  this->ColorMapFrame->ShowHideFrameOn();
   this->ColorMapFrame->Create(this->Application);
   this->ColorMapFrame->SetLabel("Color Map");
+
+  // Color map: parameter name
 
   this->ArrayNameLabel->SetParent(this->ColorMapFrame->GetFrame());
   this->ArrayNameLabel->Create(this->Application, "");
   this->ArrayNameLabel->SetLabel("Parameter: ");
 
-  this->NumberOfColorsScale->SetParent(this->ColorMapFrame->GetFrame());
-  this->NumberOfColorsScale->Create(this->Application, "");
-  this->NumberOfColorsScale->SetRange(2, 256);
-  this->NumberOfColorsScale->SetValue(256);
-  this->NumberOfColorsScale->DisplayLabel("Resolution");
-  this->NumberOfColorsScale->DisplayEntry();
-  this->NumberOfColorsScale->SetEndCommand(this, "NumberOfColorsScaleCallback");
-  this->NumberOfColorsScale->SetBalloonHelpString("Select the discrete number of colors in the color map.");
+  // Color map: range
+
+  this->ColorRangeFrame->SetParent(this->ColorMapFrame->GetFrame());
+  this->ColorRangeFrame->Create(this->Application, "frame", "");
+
+  this->ColorRangeResetButton->SetParent(this->ColorRangeFrame);
+  this->ColorRangeResetButton->Create(this->Application, 
+                                      "-text {Reset Range}");
+  this->ColorRangeResetButton->SetCommand(this, "ResetScalarRange");
+
+  this->ColorRangeMinEntry->SetParent(this->ColorRangeFrame);
+  this->ColorRangeMinEntry->Create(this->Application);
+  this->ColorRangeMinEntry->SetLabel("Min:");
+  this->ColorRangeMinEntry->GetEntry()->SetWidth(10);
+  this->Script("bind %s <KeyPress-Return> {%s ColorRangeEntryCallback}",
+               this->ColorRangeMinEntry->GetEntry()->GetWidgetName(),
+               this->GetTclName());
+  this->Script("bind %s <FocusOut> {%s ColorRangeEntryCallback}",
+               this->ColorRangeMinEntry->GetEntry()->GetWidgetName(),
+               this->GetTclName()); 
+
+  this->ColorRangeMaxEntry->SetParent(this->ColorRangeFrame);
+  this->ColorRangeMaxEntry->Create(this->Application);
+  this->ColorRangeMaxEntry->SetLabel("Max:");
+  this->ColorRangeMaxEntry->GetEntry()->SetWidth(
+    this->ColorRangeMinEntry->GetEntry()->GetWidth());
+  this->Script("bind %s <KeyPress-Return> {%s ColorRangeEntryCallback}",
+               this->ColorRangeMaxEntry->GetEntry()->GetWidgetName(),
+               this->GetTclName());
+  this->Script("bind %s <FocusOut> {%s ColorRangeEntryCallback}",
+               this->ColorRangeMaxEntry->GetEntry()->GetWidgetName(),
+               this->GetTclName());
+
+  this->Script("pack %s -side left -expand f",
+               this->ColorRangeResetButton->GetWidgetName());
+
+  this->Script("pack %s %s -side left -expand t -fill x",
+               this->ColorRangeMinEntry->GetWidgetName(),
+               this->ColorRangeMaxEntry->GetWidgetName());
+
+  // Color map: gradient editor
 
   this->ColorEditorFrame->SetParent(this->ColorMapFrame->GetFrame());
   this->ColorEditorFrame->Create(this->Application, "frame", "");
+
   this->StartColorButton->SetParent(this->ColorEditorFrame);
   this->StartColorButton->SetText("");
   this->StartColorButton->Create(this->Application, "");
   this->StartColorButton->SetColor(1.0, 0.0, 0.0);
   this->StartColorButton->SetCommand(this, "StartColorButtonCallback");
   this->StartColorButton->SetBalloonHelpString("Select the minimum color.");
+
   this->Map->SetParent(this->ColorEditorFrame);
   this->Map->Create(this->Application, "");
   this->Map->SetBalloonHelpString("Select preset color map.");
   this->Script("bind %s <Configure> {%s MapConfigureCallback %s}", 
-               this->ColorEditorFrame->GetWidgetName(), this->GetTclName(), "%w %h");
+               this->ColorEditorFrame->GetWidgetName(), 
+               this->GetTclName(), "%w %h");
   this->Script("bind %s <ButtonPress-1> {%s DisplayPopupMenu %%X %%Y }",
                this->Map->GetWidgetName(), this->GetTclName());
+
   this->EndColorButton->SetParent(this->ColorEditorFrame);
   this->EndColorButton->SetText("");
   this->EndColorButton->Create(this->Application, "");
@@ -349,44 +391,49 @@ void vtkPVColorMap::Create(vtkKWApplication *app)
   this->PopupMenu->AddCommand("Grayscale", this, "SetColorSchemeToGrayscale",
                               0, "Set Color Scheme to Grayscale");
 
-  this->ColorRangeFrame->SetParent(this->ColorMapFrame->GetFrame());
-  this->ColorRangeFrame->Create(this->Application, "frame", "");
-  this->ColorRangeResetButton->SetParent(this->ColorRangeFrame);
-  this->ColorRangeResetButton->Create(this->Application, 
-                                      "-text {Reset Range}");
-  this->ColorRangeResetButton->SetCommand(this, "ResetScalarRange");
-  this->ColorRangeMinEntry->SetParent(this->ColorRangeFrame);
-  this->ColorRangeMinEntry->Create(this->Application);
-  this->ColorRangeMinEntry->SetLabel("Min:");
-  this->ColorRangeMinEntry->GetEntry()->SetWidth(7);
-  this->Script("bind %s <KeyPress-Return> {%s ColorRangeEntryCallback}",
-               this->ColorRangeMinEntry->GetEntry()->GetWidgetName(),
-               this->GetTclName());
-  this->Script("bind %s <FocusOut> {%s ColorRangeEntryCallback}",
-               this->ColorRangeMinEntry->GetEntry()->GetWidgetName(),
-               this->GetTclName()); 
-  this->ColorRangeMaxEntry->SetParent(this->ColorRangeFrame);
-  this->ColorRangeMaxEntry->Create(this->Application);
-  this->ColorRangeMaxEntry->SetLabel("Max:");
-  this->ColorRangeMaxEntry->GetEntry()->SetWidth(7);
-  this->Script("bind %s <KeyPress-Return> {%s ColorRangeEntryCallback}",
-               this->ColorRangeMaxEntry->GetEntry()->GetWidgetName(),
-               this->GetTclName());
-  this->Script("bind %s <FocusOut> {%s ColorRangeEntryCallback}",
-               this->ColorRangeMaxEntry->GetEntry()->GetWidgetName(),
-               this->GetTclName());
+  this->Script("pack %s -side left -expand f -fill none",
+               this->StartColorButton->GetWidgetName());
 
+  this->Script("pack %s -side left -expand t -fill both",
+               this->Map->GetWidgetName());
 
+  this->Script("pack %s -side right -expand f -fill none",
+               this->EndColorButton->GetWidgetName());
 
+  // Color map: resolution
+
+  this->NumberOfColorsScale->SetParent(this->ColorMapFrame->GetFrame());
+  this->NumberOfColorsScale->Create(this->Application, "");
+  this->NumberOfColorsScale->SetRange(2, 256);
+  this->NumberOfColorsScale->SetValue(256);
+  this->NumberOfColorsScale->DisplayLabel("Resolution:");
+  this->NumberOfColorsScale->DisplayEntry();
+  this->NumberOfColorsScale->DisplayEntryAndLabelOnTopOff();
+  this->NumberOfColorsScale->SetEndCommand(this, 
+                                           "NumberOfColorsScaleCallback");
+  this->NumberOfColorsScale->SetBalloonHelpString(
+    "Select the discrete number of colors in the color map.");
+
+  // Color map: pack
+
+  this->Script("pack %s -side top -expand t -fill x -anchor nw",
+               this->ArrayNameLabel->GetWidgetName());
+
+  this->Script("pack %s %s %s -side top -expand t -fill x",
+               this->ColorRangeFrame->GetWidgetName(),
+               this->ColorEditorFrame->GetWidgetName(),
+               this->NumberOfColorsScale->GetWidgetName());
+
+  // Scalar bar frame
 
   this->ScalarBarFrame->SetParent(this);
-  this->ScalarBarFrame->ShowHideFrameOff();
+  this->ScalarBarFrame->ShowHideFrameOn();
   this->ScalarBarFrame->Create(this->Application);
   this->ScalarBarFrame->SetLabel("Scalar Bar");
 
   this->ScalarBarTitleEntry->SetParent(this->ScalarBarFrame->GetFrame());
   this->ScalarBarTitleEntry->Create(this->Application);
-  this->ScalarBarTitleEntry->SetLabel("Title");
+  this->ScalarBarTitleEntry->SetLabel("Title:");
   this->Script("bind %s <KeyPress-Return> {%s NameEntryCallback}",
                this->ScalarBarTitleEntry->GetEntry()->GetWidgetName(),
                this->GetTclName());
@@ -404,38 +451,31 @@ void vtkPVColorMap::Create(vtkKWApplication *app)
     this->ScalarBarCheck->GetWidgetName(),
     this->GetTclName());
 
-  this->BackButton->SetParent(this);
-  this->BackButton->Create(this->Application, "-text {Back}");
-  this->BackButton->SetCommand(this, "BackButtonCallback");
-
-  this->Script("pack %s -fill x", this->ColorMapFrame->GetWidgetName());
-  this->Script("pack %s -fill x", this->ScalarBarFrame->GetWidgetName());
-  this->Script("pack %s -fill x -padx 2 -pady 4", this->BackButton->GetWidgetName());
-
-  this->Script("pack %s %s %s %s -side top -expand t -fill x",
-               this->ArrayNameLabel->GetWidgetName(),
-               this->ColorRangeFrame->GetWidgetName(),
-               this->ColorEditorFrame->GetWidgetName(),
-               this->NumberOfColorsScale->GetWidgetName());
-  this->Script("pack %s -side left -expand f",
-               this->ColorRangeResetButton->GetWidgetName());
-  this->Script("pack %s -side left -expand f -fill none",
-               this->StartColorButton->GetWidgetName());
-  this->Script("pack %s -side left -expand t -fill both",
-               this->Map->GetWidgetName());
-  this->Script("pack %s -side right -expand f -fill none",
-               this->EndColorButton->GetWidgetName());
-  this->Script("pack %s %s -side left -expand t -fill x",
-               this->ColorRangeMinEntry->GetWidgetName(),
-               this->ColorRangeMaxEntry->GetWidgetName());
+  this->Script("pack %s -side left",
+               this->ScalarBarCheck->GetWidgetName());
 
   this->Script("pack %s %s -side top -expand t -fill x",
                this->ScalarBarTitleEntry->GetWidgetName(),
                this->ScalarBarCheckFrame->GetWidgetName());
-  this->Script("pack %s -side left",
-               this->ScalarBarCheck->GetWidgetName());
+
+  // Back button
+
+  this->BackButton->SetParent(this);
+  this->BackButton->Create(this->Application, "-text {Back}");
+  this->BackButton->SetCommand(this, "BackButtonCallback");
+
+  // Pack
+
+  this->Script("pack %s %s %s -side top -anchor n -fill x -pady 2", 
+               this->ColorMapFrame->GetWidgetName(), 
+               this->ScalarBarFrame->GetWidgetName(),
+               this->BackButton->GetWidgetName());
+
+  this->Script("pack %s -padx 4", this->BackButton->GetWidgetName());
 
   this->SetColorSchemeToRedBlue();
+
+  this->ColorMapFrame->AdjustMargin();
 }
 
 
