@@ -50,6 +50,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __vtkPVImageTextureFilter_h
 
 #include "vtkSource.h"
+class vtkPVAssignment;
 class vtkOutlineSource;
 
 class VTK_EXPORT vtkPVImageTextureFilter : public vtkSource
@@ -80,15 +81,26 @@ public:
   // Select which portion of the input we need.
   void ComputeInputUpdateExtents( vtkDataObject *output);
 
+  // Description:
+  // Assignment to a process is encoded in this object.
+  vtkSetMacro(Assignment, vtkPVAssignment);
+  vtkGetMacro(Assignment, vtkPVAssignment);
+  
 protected:
   vtkPVImageTextureFilter();
   ~vtkPVImageTextureFilter();
   vtkPVImageTextureFilter(const vtkPVImageTextureFilter&) {};
   void operator=(const vtkPVImageTextureFilter&) {};
-
-  vtkOutlineSource *OutlineSource;
+  
   void Execute();
-  void ExecuteInformation();
+
+  vtkPVAssignment *Assignment;
+  
+  vtkImageData *IntermediateImage;
+  vtkExtractVOI *Extract;
+  vtkPlaneSource *PlaneSource;
+  
+  int Extent[6];
 };
 
 #endif

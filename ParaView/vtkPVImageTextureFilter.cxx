@@ -64,17 +64,33 @@ vtkPVImageTextureFilter* vtkPVImageTextureFilter::New()
 //----------------------------------------------------------------------------
 vtkPVImageTextureFilter::vtkPVImageTextureFilter ()
 {
-  this->OutlineSource = vtkOutlineSource::New();
+  this->IntermediateImage = vtkImageData:New();
+  this->Extract = vtkExtractVOI::New();
+  this->Extract->SetInput(this->IntermediateInput);
+  
+  this->PlaneSource = vtkPlaneSource::New();
+  this->PlaneSource->SetXResolution(1);
+  this->PlaneSource->SetYResolution(1);
+
+  this->Assignment = NULL;
+  
+  this->Extent[0] = this->Extent[1] = this->Extent[2] = 0;
+  this->Extent[3] = this->Extent[4] = this->Extent[5] = 0;  
 }
 
 //----------------------------------------------------------------------------
 vtkPVImageTextureFilter::~vtkPVImageTextureFilter ()
 {
-  if (this->OutlineSource != NULL)
-    {
-    this->OutlineSource->Delete ();
-    this->OutlineSource = NULL;
-    }
+  this->IntermediateInput->Delete();
+  this->IntermediateInput = NULL;
+
+  this->Extract->Delete();
+  this->Extract = NULL;
+
+  this->PlaneSource->Delete();
+  this->PlaneSource = NULL;
+  
+  this->SetAssignment(NULL);
 }
 
 //----------------------------------------------------------------------------
@@ -129,128 +145,126 @@ vtkStructuredPoints *vtkPVImageTextureFilter::GetTextureOutput()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVImageTextureFilter::ComputeInputUpdateExtents( vtkDataObject *output)
+void vtkPVImageTextureFilter::ComputeInputUpdateExtents( vtkDataObject *o)
 {
   vtkImageData *input = this->GetInput();
-  output = output;
-  
-  input->SetUpdateExtent(0, -1, 0, -1, 0, -1);
-}
+  int aExt[6];
+  o = o;
 
+  input->GetWholeExtent(this->Extent);
 
-
-//----------------------------------------------------------------------------
-void vtkPVImageTextureFilter::UpdateData(vtkDataObject *vtkNotUsed(output))
-{
-  int idx;
-  
-  // Initialize all the outputs
-  for (idx = 0; idx < this->NumberOfOutputs; idx++)
+  if (this->Assignment)
     {
-    if (this->Outputs[idx])
-      {
-      this->Outputs[idx]->PrepareForNewData(); 
-      }
-    }
- 
-  // If there is a start method, call it
-  if ( this->StartMethod )
-    {
-    (*this->StartMethod)(this->StartMethodArg);
-    }
-
-  // Execute this object - we have not aborted yet, and our progress
-  // before we start to execute is 0.0.
-  this->AbortExecute = 0;
-  this->Progress = 0.0;
-  if (this->NumberOfInputs < this->NumberOfRequiredInputs)
-    {
-    vtkErrorMacro(<< "At least " << this->NumberOfRequiredInputs << " inputs are required but only " << this->NumberOfInputs << " are specified");
-    }
-  else
-    {
-    this->Execute();
-    }
-
-  // If we ended due to aborting, push the progress up to 1.0 (since
-  // it probably didn't end there)
-  if ( !this->AbortExecute )
-    {
-    this->UpdateProgress(1.0);
-    }
-
-  // Call the end method, if there is one
-  if ( this->EndMethod )
-    {
-    (*this->EndMethod)(this->EndMethodArg);
-    }
+    this->Assignment->GetExtent(aExt);
     
-  // Now we have to mark the data as up to data.
-  for (idx = 0; idx < this->NumberOfOutputs; ++idx)
-    {
-    if (this->Outputs[idx])
+    if (aExt[0] > this->Extent[0])
       {
-      this->Outputs[idx]->DataHasBeenGenerated();
+      this->Extent[0] = aExt[0];
+      }
+    if (aExt[1] < this->Extent[1])
+      {
+      this->Extent[1] = aExt[1];
+      }
+    
+    if (aExt[2] > this->Extent[2])
+      {
+      this->Extent[2] = aExt[2];
+      }
+    if (aExt[3] < this->Extent[3])
+      {
+      this->Extent[3] = aExt[3];
+      }
+    
+    if (aExt[4] > this->Extent[4])
+      {
+      this->Extent[4] = aExt[4];
+      }
+    if (aExt[5] < this->Extent[5])
+      {
+      this->Extent[5] = aExt[5];
       }
     }
   
-  // Information gets invalidated as soon as Update is called,
-  // so validate it again here.
-  this->InformationTime.Modified();
+  input->SetUpdateExtent(this->Extent);
 }
-
-
 
 
 //----------------------------------------------------------------------------
 void vtkPVImageTextureFilter::Execute()
 {
+  float x, y, z;
   float *spacing;
   float *origin;
-  int *ext;
-  float bounds[6];
-  vtkPolyData *output = this->GetOutput();
   vtkImageData *input = this->GetInput();
-  
-  //
-  // Let OutlineSource do all the work
-  //
-
-  
-  if (input->GetUpdatePiece() == 0)
-    {
-    spacing = input->GetSpacing();
-    origin = input->GetOrigin();
-    ext = input->GetWholeExtent();
-    
-    bounds[0] = spacing[0] * ((float)ext[0]) + origin[0];
-    bounds[1] = spacing[0] * ((float)ext[1]) + origin[0];
-    bounds[2] = spacing[1] * ((float)ext[2]) + origin[1];
-    bounds[3] = spacing[1] * ((float)ext[3]) + origin[1];
-    bounds[4] = spacing[2] * ((float)ext[4]) + origin[2];
-    bounds[5] = spacing[2] * ((float)ext[5]) + origin[2];
-    
-    this->OutlineSource->SetBounds(bounds);
-    this->OutlineSource->Update();
-    
-    output->CopyStructure(this->OutlineSource->GetOutput());
-    }
-
-}
-
-
-//----------------------------------------------------------------------------
-void vtkPVImageTextureFilter::ExecuteInformation()
-{
   vtkPolyData *output = this->GetOutput();
+  vtkStructuredPoints *outputTexture = this->GetTextureOutput();
   
-  vtkDebugMacro(<< "Creating dataset outline");
-
-  //
-  // Let OutlineSource do all the work
-  //
+  this->IntermediateInput->ShallowCopy(input);
+  this->Extract->SetVOI(this->Extent);
+  this->Extract->Update();
   
-  this->vtkSource::ExecuteInformation();
+  outputTexture->ShallowCopy(this->Extract->GetOutput());
 
-  this->OutlineSource->UpdateInformation();
+  // Determine which axis we are displaying.
+  if (this->Extent[0] == this->Extent[1])
+    {
+    this->PlaneAxis = 0;
+    }
+  else if (this->Extent[2] == this->Extent[3])
+    {
+    this->PlaneAxis = 1;
+    }
+  else if (this->Extent[4] == this->Extent[5])
+    {
+    this->PlaneAxis = 2;
+    }
+  else
+    {
+    vtkErrorMacro("We do not handle volumes at this time.");
+    }
+  
+  // Place the plane in the correct position.
+  x = origin[0] + (float)(pieceExt[0]) * spacing[0];
+  y = origin[1] + (float)(pieceExt[2]) * spacing[1];
+  z = origin[2] + (float)(pieceExt[4]) * spacing[2];
+  this->PlaneSource->SetOrigin(x, y, z);
+
+  if (this->PlaneAxis == 0)
+    {
+    x = origin[0] + (float)(pieceExt[0]) * spacing[0];
+    y = origin[1] + (float)(pieceExt[3]) * spacing[1];
+    z = origin[2] + (float)(pieceExt[4]) * spacing[2];
+    this->PlaneSource->SetPoint1(x, y, z);
+    x = origin[0] + (float)(pieceExt[0]) * spacing[0];
+    y = origin[1] + (float)(pieceExt[2]) * spacing[1];
+    z = origin[2] + (float)(pieceExt[5]) * spacing[2];
+    this->PlaneSource->SetPoint2(x, y, z);
+    }
+  if (this->PlaneAxis == 1)
+    {
+    x = origin[0] + (float)(pieceExt[1]) * spacing[0];
+    y = origin[1] + (float)(pieceExt[2]) * spacing[1];
+    z = origin[2] + (float)(pieceExt[4]) * spacing[2];
+    this->PlaneSource->SetPoint1(x, y, z);
+    x = origin[0] + (float)(pieceExt[0]) * spacing[0];
+    y = origin[1] + (float)(pieceExt[2]) * spacing[1];
+    z = origin[2] + (float)(pieceExt[5]) * spacing[2];
+    this->PlaneSource->SetPoint2(x, y, z);
+    }  
+  if (this->PlaneAxis == 2)
+    {
+    x = origin[0] + (float)(pieceExt[1]) * spacing[0];
+    y = origin[1] + (float)(pieceExt[2]) * spacing[1];
+    z = origin[2] + (float)(pieceExt[4]) * spacing[2];
+    this->PlaneSource->SetPoint1(x, y, z);
+    x = origin[0] + (float)(pieceExt[0]) * spacing[0];
+    y = origin[1] + (float)(pieceExt[3]) * spacing[1];
+    z = origin[2] + (float)(pieceExt[4]) * spacing[2];
+    this->PlaneSource->SetPoint2(x, y, z);
+    }
+  
+  this->PlaneSource->Update();
+  output->ShallowCopy(this->PlaneSource->GetOutput());
 }
+
+
