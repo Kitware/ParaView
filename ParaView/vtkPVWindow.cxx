@@ -662,7 +662,10 @@ void vtkPVWindow::SetCurrentPVData(vtkPVData *pvd)
     this->CurrentPVData->UnRegister(this);
     this->CurrentPVData = NULL;
     // Remove all of the entries from the filter menu.
-    this->FilterMenu->DeleteAllMenuItems();
+    if (this->FilterMenu)
+      {
+      this->FilterMenu->DeleteAllMenuItems();
+      }
     }
   if (pvd)
     {
@@ -1802,6 +1805,30 @@ void vtkPVWindow::ReadSourceInterfaces()
   mInt->SetGetCommand("GetOutputWholeExtent");
   mInt->SetWidgetTypeToExtent();
   mInt->SetBalloonHelp("Set the min/max extents in each dimension of the output");
+  sInt->AddMethodInterface(mInt);
+  mInt->Delete();
+  mInt = NULL;
+  this->SourceInterfaces->AddItem(sInt);
+  sInt->Delete();
+  sInt = NULL;
+
+  // ---- ImageGradient ----.
+  sInt = vtkPVSourceInterface::New();
+  sInt->SetApplication(pvApp);
+  sInt->SetPVWindow(this);
+  sInt->SetSourceClassName("vtkImageGradient");
+  sInt->SetRootName("ImageGradient");
+  sInt->SetInputClassName("vtkImageData");
+  sInt->SetOutputClassName("vtkImageData");
+  //Method
+  mInt = vtkPVMethodInterface::New();
+  mInt->SetVariableName("Dimensionality");
+  mInt->SetSetCommand("SetDimensionality");
+  mInt->SetGetCommand("GetDimensionality");
+  mInt->SetWidgetTypeToSelection();
+  mInt->AddSelectionEntry(0, "2");
+  mInt->AddSelectionEntry(1, "3");
+  mInt->SetBalloonHelp("Select whether to perform a 2d or 3d gradient");
   sInt->AddMethodInterface(mInt);
   mInt->Delete();
   mInt = NULL;
