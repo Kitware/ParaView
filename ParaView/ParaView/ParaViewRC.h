@@ -12,6 +12,6 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-#define IDI_PARAVIEWICO32 107
-#define IDI_PARAVIEWICO16 108
+#define IDI_PARAVIEWICO 107
+#define IDI_PARAVIEWICOSMALL 108
 

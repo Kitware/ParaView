@@ -1,4 +1,0 @@
-#include "ParaViewRC.h"
-
-IDI_PARAVIEWICO32     ICON    DISCARDABLE     "../ParaView/Resources/ParaViewIcon32.ico"
-IDI_PARAVIEWICO16     ICON    DISCARDABLE     "../ParaView/Resources/ParaViewIcon16.ico"
