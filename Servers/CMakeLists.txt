@@ -3,7 +3,6 @@ PROJECT(PVServer)
 SUBDIRS(Common)
 SUBDIRS(Filters)
 SUBDIRS(ServerManager)
-SUBDIRS(StreamInterpreter)
 
 IF(BUILD_TESTING)
   SUBDIRS(Testing)
