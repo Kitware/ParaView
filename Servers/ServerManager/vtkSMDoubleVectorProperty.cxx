@@ -22,7 +22,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMDoubleVectorProperty);
-vtkCxxRevisionMacro(vtkSMDoubleVectorProperty, "1.21");
+vtkCxxRevisionMacro(vtkSMDoubleVectorProperty, "1.22");
 
 struct vtkSMDoubleVectorPropertyInternals
 {
@@ -42,6 +42,7 @@ vtkSMDoubleVectorProperty::vtkSMDoubleVectorProperty()
 vtkSMDoubleVectorProperty::~vtkSMDoubleVectorProperty()
 {
   delete this->Internals;
+  this->SetSetNumberCommand(0);
 }
 
 //---------------------------------------------------------------------------
