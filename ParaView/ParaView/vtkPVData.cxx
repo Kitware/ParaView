@@ -103,7 +103,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.226");
+vtkCxxRevisionMacro(vtkPVData, "1.227");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -2718,6 +2718,7 @@ void vtkPVData::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "CubeAxesCheck: " << this->CubeAxesCheck << endl;
   os << indent << "ScalarBarCheck: " << this->ScalarBarCheck << endl;
   os << indent << "AxesWidgetCheck: " << this->AxesWidgetCheck << endl;
+  os << indent << "PointLabelCheck: " << this->PointLabelCheck << endl;
   os << indent << "RepresentationMenu: " << this->RepresentationMenu << endl;
   os << indent << "InterpolationMenu: " << this->InterpolationMenu << endl;
   os << indent << "Visibility: " << this->Visibility << endl;
