@@ -12,8 +12,12 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSMBoundsDomain -
+// .NAME vtkSMBoundsDomain - double range domain based on data set bounds
 // .SECTION Description
+// vtkSMBoundsDomain is a subclass of vtkSMDoubleRangeDomain. In its Update
+// method, it determines the minimum and maximum coordinates of each dimension
+// of the bounding  box of the data set with which it is associated. It
+// requires a vtkSMSourceProxy to do this.
 // .SECTION See Also
 // vtkSMDoubleRangeDomain
 

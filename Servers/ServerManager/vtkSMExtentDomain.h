@@ -12,8 +12,12 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSMExtentDomain -
+// .NAME vtkSMExtentDomain - int range domain based on data set extent
 // .SECTION Description
+// vtkSMExtentDomain is a subclass of vtkSMIntRangeDomain. In its Update
+// method, it determines the minimum and maximum extent in each dimension of
+// the structured data set with which it is associated. It requires a
+// vtkSMSourceProxy to do this.
 // .SECTION See Also
 // vtkSMIntRangeDomain
 
