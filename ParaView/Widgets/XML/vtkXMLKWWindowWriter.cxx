@@ -35,12 +35,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "vtkXMLKWWindowWriter.h"
 
-#include "vtkObjectFactory.h"
+#include "vtkKWUserInterfaceNotebookManager.h"
 #include "vtkKWWindow.h"
+#include "vtkObjectFactory.h"
 #include "vtkXMLDataElement.h"
+#include "vtkXMLKWUserInterfaceNotebookManagerWriter.h"
 
 vtkStandardNewMacro(vtkXMLKWWindowWriter);
-vtkCxxRevisionMacro(vtkXMLKWWindowWriter, "1.2");
+vtkCxxRevisionMacro(vtkXMLKWWindowWriter, "1.3");
 
 //----------------------------------------------------------------------------
 char* vtkXMLKWWindowWriter::GetRootElementName()
@@ -49,9 +51,21 @@ char* vtkXMLKWWindowWriter::GetRootElementName()
 }
 
 //----------------------------------------------------------------------------
-int vtkXMLKWWindowWriter::AddAttributes(vtkXMLDataElement *elem)
+char* vtkXMLKWWindowWriter::GetUserInterfaceElementName()
 {
-  if (!this->Superclass::AddAttributes(elem))
+  return "UserInterface";
+}
+
+//----------------------------------------------------------------------------
+char* vtkXMLKWWindowWriter::GetUserInterfaceManagerElementName()
+{
+  return "UserInterfaceManager";
+}
+
+//----------------------------------------------------------------------------
+int vtkXMLKWWindowWriter::AddNestedElements(vtkXMLDataElement *elem)
+{
+  if (!this->Superclass::AddNestedElements(elem))
     {
     return 0;
     }
@@ -63,9 +77,52 @@ int vtkXMLKWWindowWriter::AddAttributes(vtkXMLDataElement *elem)
     return 0;
     }
 
-  elem->SetIntAttribute("PropertiesVisibility", 
-                        obj->GetPropertiesVisiblity());
+  // User Interface
+
+  vtkXMLDataElement *ui_elem = vtkXMLDataElement::New();
+  ui_elem->SetName(vtkXMLKWWindowWriter::GetUserInterfaceElementName());
+  elem->AddNestedElement(ui_elem);
+  ui_elem->Delete();
+  this->WriteUserInterfaceElement(ui_elem);
 
   return 1;
 }
 
+//----------------------------------------------------------------------------
+int vtkXMLKWWindowWriter::WriteUserInterfaceElement(
+  vtkXMLDataElement *ui_elem)
+{
+  if (!ui_elem)
+    {
+    return 0;
+    }
+
+  vtkKWWindow *obj = vtkKWWindow::SafeDownCast(this->Object);
+  if (!obj)
+    {
+    vtkWarningMacro(<< "The KWWindow is not set!");
+    return 0;
+    }
+
+  // Set attributes
+ 
+  ui_elem->SetIntAttribute(
+    "PropertiesVisibility", obj->GetPropertiesVisiblity());
+
+  // User Interface Manager
+
+  vtkKWUserInterfaceNotebookManager *uim_nb = 
+    vtkKWUserInterfaceNotebookManager::SafeDownCast(
+      obj->GetUserInterfaceManager());
+  if (uim_nb)
+    {
+    vtkXMLKWUserInterfaceNotebookManagerWriter *xmlw = 
+      vtkXMLKWUserInterfaceNotebookManagerWriter::New();
+    xmlw->SetObject(uim_nb);
+    xmlw->CreateInNestedElement(
+      ui_elem, vtkXMLKWWindowWriter::GetUserInterfaceManagerElementName());
+    xmlw->Delete();
+    }
+
+  return 1;
+}

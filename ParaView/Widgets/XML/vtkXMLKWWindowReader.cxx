@@ -35,12 +35,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "vtkXMLKWWindowReader.h"
 
-#include "vtkObjectFactory.h"
+#include "vtkKWNotebook.h"
+#include "vtkKWUserInterfaceNotebookManager.h"
 #include "vtkKWWindow.h"
+#include "vtkObjectFactory.h"
 #include "vtkXMLDataElement.h"
+#include "vtkXMLKWUserInterfaceNotebookManagerReader.h"
+#include "vtkXMLKWWindowWriter.h"
 
 vtkStandardNewMacro(vtkXMLKWWindowReader);
-vtkCxxRevisionMacro(vtkXMLKWWindowReader, "1.2");
+vtkCxxRevisionMacro(vtkXMLKWWindowReader, "1.3");
 
 //----------------------------------------------------------------------------
 char* vtkXMLKWWindowReader::GetRootElementName()
@@ -63,13 +67,62 @@ int vtkXMLKWWindowReader::Parse(vtkXMLDataElement *elem)
     return 0;
     }
 
+  // User Interface
+
+  vtkXMLDataElement *ui_elem = elem->FindNestedElementWithName(
+    vtkXMLKWWindowWriter::GetUserInterfaceElementName());
+  if (ui_elem)
+    {
+    this->ParseUserInterfaceElement(ui_elem);
+    }
+
+  return 1;
+}
+
+//----------------------------------------------------------------------------
+int vtkXMLKWWindowReader::ParseUserInterfaceElement(
+  vtkXMLDataElement *ui_elem)
+{
+  if (!ui_elem)
+    {
+    return 0;
+    }
+
+  vtkKWWindow *obj = vtkKWWindow::SafeDownCast(this->Object);
+  if (!obj)
+    {
+    vtkWarningMacro(<< "The KWWindow is not set!");
+    return 0;
+    }
+
   // Get attributes
 
   int ival;
 
-  if (elem->GetScalarAttribute("PropertiesVisibility", ival))
+  if (ui_elem->GetScalarAttribute("PropertiesVisibility", ival))
     {
     obj->SetPropertiesVisiblity(ival);
+    }
+
+  vtkXMLDataElement *nested_elem;
+
+  // User Interface Manager
+
+  vtkKWUserInterfaceNotebookManager *uim_nb = 
+    vtkKWUserInterfaceNotebookManager::SafeDownCast(
+      obj->GetUserInterfaceManager());
+  if (uim_nb)
+    {
+    nested_elem = ui_elem->FindNestedElementWithName(
+      vtkXMLKWWindowWriter::GetUserInterfaceManagerElementName());
+    if (nested_elem)
+      {
+      vtkXMLKWUserInterfaceNotebookManagerReader *xmlr = 
+        vtkXMLKWUserInterfaceNotebookManagerReader::New();
+      xmlr->SetObject(uim_nb);
+      xmlr->ParseInElement(nested_elem);
+      xmlr->Delete();
+      }
     }
 
   return 1;

@@ -56,14 +56,29 @@ public:
   // is supposed to write.
   virtual char* GetRootElementName();
 
+  // Description:
+  // Return the name of the element used inside that tree to
+  // store the user interface settings.
+  static char* GetUserInterfaceElementName();
+
+  // Description:
+  // Return the name of the element used inside that tree to
+  // store the interface manager.
+  static char* GetUserInterfaceManagerElementName();
+
 protected:
   vtkXMLKWWindowWriter() {};
   ~vtkXMLKWWindowWriter() {};  
   
   // Description:
-  // Add the root element attributes.
+  // Add the root element internal/nested elements
   // Return 1 on success, 0 otherwise.
-  virtual int AddAttributes(vtkXMLDataElement *elem);
+  virtual int AddNestedElements(vtkXMLDataElement *elem);
+
+  // Description:
+  // Add the user-interface internal/nested elements
+  // Return 1 on success, 0 otherwise.
+  virtual int WriteUserInterfaceElement(vtkXMLDataElement *ui_elem);
 
 private:
   vtkXMLKWWindowWriter(const vtkXMLKWWindowWriter&);  // Not implemented.

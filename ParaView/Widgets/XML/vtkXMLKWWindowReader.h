@@ -65,6 +65,11 @@ protected:
   vtkXMLKWWindowReader() {};
   ~vtkXMLKWWindowReader() {};
 
+  // Description:
+  // Parse the user-interface element part.
+  // Return 1 on success, 0 otherwise.
+  virtual int ParseUserInterfaceElement(vtkXMLDataElement *ui_elem);
+
 private:
   vtkXMLKWWindowReader(const vtkXMLKWWindowReader&); // Not implemented
   void operator=(const vtkXMLKWWindowReader&); // Not implemented    
