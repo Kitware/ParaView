@@ -9586,7 +9586,7 @@ int vxprintf(
       case etMEMSTRING:
         zMem = bufpt = va_arg(ap,char*);
         if( bufpt==0 ) bufpt = "(null)";
-        length = strlen(bufpt);
+        length = (int)(strlen(bufpt));
         if( precision>=0 && precision<length ) length = precision;
         break;
       case etTCLESCAPE:
@@ -9765,7 +9765,7 @@ char *vmprintf(const char *zFormat, va_list ap){
   vxprintf(mout,&sMprintf,zFormat,ap);
   sMprintf.zText[sMprintf.nChar] = 0;
   if( sMprintf.zText==sMprintf.zBase ){
-    sMprintf.zText = Tcl_Alloc( strlen(zBuf)+1 );
+    sMprintf.zText = Tcl_Alloc( (int)(strlen(zBuf)+1) );
     if( sMprintf.zText ) strcpy(sMprintf.zText,zBuf);
   }else{
     sMprintf.zText = Tcl_Realloc(sMprintf.zText,sMprintf.nChar+1);
@@ -9977,8 +9977,8 @@ void Et_NewBuiltinFile(
 ){
   int h;
   struct EtFile *p;
-
-  p = (struct EtFile*)Tcl_Alloc( sizeof(struct EtFile) + strlen(zFilename) + 1);
+  
+  p = (struct EtFile*)Tcl_Alloc( (int)(sizeof(struct EtFile) + strlen(zFilename) + 1) );
   if( p==0 ) return;
   p->zName = (char*)&p[1];
   strcpy(p->zName, zFilename);
