@@ -1014,3 +1014,106 @@ void vtkPVProbe::UpdateScalars()
     }
   this->SetDefaultScalarsName(newScalars);
 }
+
+void vtkPVProbe::SaveInTclScript(ofstream *file)
+{
+  Tcl_Interp *interp = this->GetPVApplication()->GetMainInterp();
+  char *tempName;
+  
+  if (this->Dimensionality == 0)
+    {
+    *file << "vtkIdList pointList\n";
+    *file << "\tpointList Allocate 1 1\n";
+    *file << "\tpointList InsertNextId 0\n\n";
+
+    this->Script("set coords [[%s GetInput] GetPoint 0]",
+                 this->GetVTKSourceTclName());
+    *file << "vtkPoints points\n";
+    *file << "\tpoints Allocate 1 1\n";
+    *file << "\tpoints InsertNextPoint " << interp->result << "\n\n";
+    
+    *file << "vtkPolyData probeInput\n";
+    *file << "\tprobeInput Allocate 1 1\n";
+    *file << "\tprobeInput SetPoints points\n";
+    *file << "\tprobeInput InsertNextCell 1 pointList\n\n";
+    }
+  else
+    {
+    *file << "vtkLineSource line\n";
+
+    this->Script("set point1 [[[%s GetInput] GetSource] GetPoint1]",
+                 this->GetVTKSourceTclName());
+    *file << "\tline SetPoint1 " << interp->result << "\n";
+    this->Script("set point2 [[[%s GetInput] GetSource] GetPoint2]",
+                 this->GetVTKSourceTclName());
+    *file << "\tline SetPoint2 " << interp->result << "\n";
+    this->Script("set res [[[%s GetInput] GetSource] GetResolution]",
+                 this->GetVTKSourceTclName());
+    *file << "\tline SetResolution " << interp->result << "\n\n";
+    }
+  
+  *file << this->VTKSource->GetClassName() << " "
+        << this->GetVTKSourceTclName() << "\n";
+  if (this->Dimensionality == 0)
+    {
+    *file << "\t" << this->GetVTKSourceTclName() << " SetInput probeInput\n";
+    }
+  else
+    {
+    *file << "\t" << this->GetVTKSourceTclName()
+          << " SetInput [line GetOutput]\n";
+    }
+  
+  *file << "\t" << this->GetVTKSourceTclName() << " SetSource [";
+
+  if (strcmp(this->PVProbeSource->GetPVSource()->GetInterface()->
+             GetSourceClassName(), "vtkGenericEnSightReader") == 0)
+    {
+    char *dataName = this->ProbeSourceTclName;
+    char *charFound;
+    int pos;
+    
+    charFound = strrchr(dataName, 't');
+    tempName = strtok(dataName, "O");
+    *file << tempName << " GetOutput ";
+    pos = charFound - dataName + 1;
+    *file << dataName+pos << "]\n\n";
+    }
+  else if (strcmp(this->PVProbeSource->GetPVSource()->GetInterface()->
+                  GetSourceClassName(), "vtkDataSetReader") == 0)
+    {
+    tempName = strtok(this->ProbeSourceTclName, "O");
+    *file << tempName << " GetOutput]\n\n";
+    }
+  else
+    {
+    *file << this->PVProbeSource->GetPVSource()->GetVTKSourceTclName()
+          << " GetOutput]\n\n";
+    }
+  
+  if (this->Dimensionality == 1)
+    {
+    *file << "vtkFieldDataToAttributeDataFilter "
+          << this->ChangeScalarsFilterTclName << "\n";
+    *file << "\t" << this->ChangeScalarsFilterTclName << " SetInput ["
+          << this->VTKSourceTclName << " GetOutput]\n";
+    *file << "\t" << this->ChangeScalarsFilterTclName
+          << " SetInputFieldToPointDataField\n";
+    *file << "\t" << this->ChangeScalarsFilterTclName
+          << " SetOutputAttributeDataToPointData\n\n";
+    
+    *file << "vtkXYPlotActor " << this->XYPlotTclName << "\n";
+    *file << "\t[" << this->XYPlotTclName
+          << " GetPositionCoordinate] SetValue 0.05 0.05 0\n";
+    *file << "\t[" << this->XYPlotTclName
+          << " GetPosition2Coordinate] SetValue 0.8 0.3 0\n";
+    *file << "\t" << this->XYPlotTclName << " SetNumberOfXLabels 5\n";
+    *file << "\t" << this->XYPlotTclName << " SetXTitle \"Line Divisions\"\n";
+    *file << "\t" << this->XYPlotTclName << " SetYTitle "
+          << this->DefaultScalarsName << "\n";
+    *file << "\t" << this->XYPlotTclName << " AddInput ["
+          << this->ChangeScalarsFilterTclName << " GetOutput]\n\n";
+    }
+  
+  this->GetPVOutput(0)->SaveInTclScript(file, this->VTKSourceTclName);
+}

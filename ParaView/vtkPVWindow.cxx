@@ -716,9 +716,7 @@ void vtkPVWindow::SaveInTclScript()
 
   *file << "# ParaView Version 0.1\n\n";
 
-  *file << "catch {load vtktcl}\n"
-        << "if { [catch {set VTK_TCL $env(VTK_TCL)}] != 0} { set VTK_TCL \"../../vtk/examplesTcl/\" }\n\n"
-        << "source $VTK_TCL/vtkInt.tcl\n\n"
+  *file << "package require vtktcl_interactor\n\n"
         << "# create a rendering window and renderer\n";
   
   this->GetMainView()->SaveInTclScript(file);
@@ -732,29 +730,29 @@ void vtkPVWindow::SaveInTclScript()
 
   while (sourceCount < numSources)
     {
-    if (strcmp(sources->GetItemAsObject(sourceCount)->GetClassName(),
-               "vtkPVArrayCalculator") == 0)
+    pvs = (vtkPVSource*)sources->GetItemAsObject(sourceCount);
+    if (pvs->IsA("vtkPVArrayCalculator"))
       {
-      ((vtkPVArrayCalculator*)sources->GetItemAsObject(sourceCount))->SaveInTclScript(file);
+      ((vtkPVArrayCalculator*)pvs)->SaveInTclScript(file);
       }
-    else if (strcmp(sources->GetItemAsObject(sourceCount)->GetClassName(),
-                    "vtkPVContour") == 0)
+    else if (pvs->IsA("vtkPVContour"))
       {
-      ((vtkPVContour*)sources->GetItemAsObject(sourceCount))->SaveInTclScript(file);
+      ((vtkPVContour*)pvs)->SaveInTclScript(file);
       }
-    else if (strcmp(sources->GetItemAsObject(sourceCount)->GetClassName(),
-                    "vtkPVGlyph3D") == 0)
+    else if (pvs->IsA("vtkPVGlyph3D"))
       {
-      ((vtkPVGlyph3D*)sources->GetItemAsObject(sourceCount))->SaveInTclScript(file);
+      ((vtkPVGlyph3D*)pvs)->SaveInTclScript(file);
       }
-    else if (strcmp(sources->GetItemAsObject(sourceCount)->GetClassName(),
-                    "vtkPVThreshold") == 0)
+    else if (pvs->IsA("vtkPVThreshold"))
       {
-      ((vtkPVThreshold*)sources->GetItemAsObject(sourceCount))->SaveInTclScript(file);
+      ((vtkPVThreshold*)pvs)->SaveInTclScript(file);
+      }
+    else if (pvs->IsA("vtkPVProbe"))
+      {
+      ((vtkPVProbe*)pvs)->SaveInTclScript(file);
       }
     else
       {
-      pvs = (vtkPVSource*)sources->GetItemAsObject(sourceCount);
       pvs->SaveInTclScript(file);
       }
     sourceCount++;

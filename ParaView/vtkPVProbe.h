@@ -119,6 +119,10 @@ public:
   void ChangeXPosition();
   void ChangeYPosition();
   void ChangeZPosition();
+
+  // Description:
+  // Write out the part of the tcl script cooresponding to vtkPVProbe
+  void SaveInTclScript(ofstream *file);
   
 protected:
   vtkPVProbe();

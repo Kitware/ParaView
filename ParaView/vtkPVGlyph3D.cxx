@@ -403,7 +403,6 @@ void vtkPVGlyph3D::SaveInTclScript(ofstream *file)
                GetSourceClassName(), "vtkGenericEnSightReader") == 0)
       {
       char *charFound;
-      int pos;
       char *dataName = this->GetNthPVInput(0)->GetVTKDataTclName();
       
       charFound = strrchr(dataName, 't');
