@@ -222,4 +222,19 @@ void vtkReferenceCountedLinkedList<DType>::DebugList()
     }
 }
 
+// Description:
+// Since we know that the storage type is a pointer, we can use
+// this knowledge to have easier acces for its members. This
+// method returns either NULL or the object.
+template <class DType>
+DType vtkReferenceCountedLinkedList<DType>::GetItem(vtkIdType id)
+{
+  DType a = 0;
+  if ( this->GetItem(id, a) == VTK_OK )
+    {
+    return a;
+    }
+  return 0;
+}
+
 #endif

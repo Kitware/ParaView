@@ -40,6 +40,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 // .NAME vtkReferenceCountedLinkedList - a templated linked list
+//
+// .SECTION Description
+// This is a vector class with reference counting. It makes some
+// assumptions about the type it is storing. Each element is a pointer 
+// to a type that has methods Register(void*) and Unregister(void*).
 
 #ifndef __vtkReferenceCountedLinkedList_h
 #define __vtkReferenceCountedLinkedList_h
@@ -93,6 +98,12 @@ public:
   // Description:
   // This method dumps debug of the linked list.
   virtual void DebugList();
+
+  // Description:
+  // Since we know that the storage type is a pointer, we can use
+  // this knowledge to have easier acces for its members. This
+  // method returns either NULL or the object.
+  DType GetItem(vtkIdType id);
 
 protected:
   vtkReferenceCountedLinkedList() {}
