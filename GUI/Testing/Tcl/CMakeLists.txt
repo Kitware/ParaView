@@ -1,11 +1,18 @@
 SET(TEST_PATH "ParaView")
-SET(RUN_WITH_MPI 0)
+# initialize these to emtpy
+SET(PARAVIEW_MPI_RUN )
+SET(PARAVIEW_MPI_POST_FLAGS )
+
 IF (VTK_USE_MPI)
-  IF (VTK_MPIRUN_EXE)
-    SET(RUN_WITH_MPI 1)
-  ENDIF (VTK_MPIRUN_EXE)
   SEPARATE_ARGUMENTS(VTK_MPI_PREFLAGS)
   SEPARATE_ARGUMENTS(VTK_MPI_POSTFLAGS)
+  IF (VTK_MPIRUN_EXE)
+    SET(PARAVIEW_MPI_RUN 
+      ${VTK_MPIRUN_EXE} ${VTK_MPI_NUMPROC_FLAG} ${VTK_MPI_MAX_NUMPROCS} ${VTK_MPI_PREFLAGS})
+    SET(PARAVIEW_MPI_RUN_ONE
+      ${VTK_MPIRUN_EXE} ${VTK_MPI_NUMPROC_FLAG} 1 ${VTK_MPI_PREFLAGS})
+    SET(PARAVIEW_MPI_POST_FLAGS ${VTK_MPI_POSTFLAGS})
+  ENDIF (VTK_MPIRUN_EXE)
 ENDIF (VTK_USE_MPI)
 
 SET(PROJECT_TESTS
@@ -61,43 +68,44 @@ SET(PROJECT_TESTS
   XdmfRead
   )
 
-IF(RUN_WITH_MPI)
-  FOREACH (tfile ${PROJECT_TESTS})
-    ADD_TEST(${tfile}-ParaView-MPI ${VTK_MPIRUN_EXE} ${VTK_MPI_PREFLAGS}
-      ${PARAVIEW_EXECUTABLE} --disable-registry
-      ${PVClientTests_SOURCE_DIR}/Tcl/${tfile}.pvs
-      -D ${PVClientTestData}
-      -C ${PVCompareImages}
-      -T ${ParaView_BINARY_DIR}/Testing/Temporary
-      -V ${PVClientTestData}/Baseline/${tfile}.png
-      ${PARAVIEW_MPI_POSTFLAGS})
-    IF (PARAVIEW_TEST_COMPOSITING)
-      ADD_TEST(${tfile}-ParaView-COMPOSITE-MPI ${VTK_MPIRUN_EXE} ${VTK_MPI_PREFLAGS}
-        ${PARAVIEW_EXECUTABLE} --disable-registry
-        ${PVClientTests_SOURCE_DIR}/Tcl/${tfile}.pvs
-        -UC
-        -D ${PVClientTestData}
-        -C ${PVCompareImages}
-        -T ${ParaView_BINARY_DIR}/Testing/Temporary
-        -V ${PVClientTestData}/Baseline/${tfile}.png
-        ${PARAVIEW_MPI_POSTFLAGS})
-    ENDIF (PARAVIEW_TEST_COMPOSITING)
-  ENDFOREACH(tfile)
-ENDIF(RUN_WITH_MPI)
+# Foreach test add the following:
+# 1. the test (possibly with mpirun)
+# 2. the test with compositing and possibly mpi
+# 3. the test in client server mode
+# 4. the test in client server render server mode
+# 
 
-SET (PV_MPI_COMMANDS )
-IF(RUN_WITH_MPI)
-  SET (PV_MPI_COMMANDS "--use-mpi=${VTK_MPIRUN_EXE}")
-ENDIF(RUN_WITH_MPI)
 FOREACH (tfile ${PROJECT_TESTS})
-  ADD_TEST(${tfile}-ParaView ${PARAVIEW_EXECUTABLE} --disable-registry
+  # add the test use MPI if it is available
+  # PARAVIEW_MPI_RUN will be empty if there is no MPI run specified, same
+  # goes for PARAVIEW_MPI_POST_FLAGS.  So the test will be run MPI
+  # if MPI is available but will be called the same thing
+  ADD_TEST(${tfile}-ParaView 
+    ${PARAVIEW_MPI_RUN}
+    ${PARAVIEW_EXECUTABLE} --disable-registry
     ${PVClientTests_SOURCE_DIR}/Tcl/${tfile}.pvs
     -D ${PVClientTestData}
     -C ${PVCompareImages}
     -T ${ParaView_BINARY_DIR}/Testing/Temporary
-    -V ${PVClientTestData}/Baseline/${tfile}.png)
+    -V ${PVClientTestData}/Baseline/${tfile}.png
+    ${PARAVIEW_MPI_POST_FLAGS}
+    )
+  # repeat test in composite mode if test composite is on
+  IF (PARAVIEW_TEST_COMPOSITING)
+    ADD_TEST(${tfile}-ParaView-COMPOSITE-MPI 
+      ${PARAVIEW_MPI_RUN}
+      ${PARAVIEW_EXECUTABLE} --disable-registry 
+      ${PVClientTests_SOURCE_DIR}/Tcl/${tfile}.pvs
+      -UC
+      -D ${PVClientTestData}
+      -C ${PVCompareImages}
+      -T ${ParaView_BINARY_DIR}/Testing/Temporary
+      -V ${PVClientTestData}/Baseline/${tfile}.png
+      ${PARAVIEW_MPI_POST_FLAGS})
+  ENDIF (PARAVIEW_TEST_COMPOSITING)
   # repeat the test with the client server driver
-  ADD_TEST("${tfile}ClientServer-ParaView" ${PARAVIEW_CS_EXECUTABLE}
+  ADD_TEST("${tfile}ClientServer-ParaView" 
+    ${PARAVIEW_CS_EXECUTABLE}
     --disable-registry
     ${PVClientTests_SOURCE_DIR}/Tcl/${tfile}.pvs
     -D ${PVClientTestData}
@@ -105,8 +113,8 @@ FOREACH (tfile ${PROJECT_TESTS})
     -T ${ParaView_BINARY_DIR}/Testing/Temporary
     -V ${PVClientTestData}/Baseline/${tfile}.png)
   # repeat the test with the client server driver in render server mode
-  ADD_TEST("${tfile}RenderServer-ParaView" ${PARAVIEW_CS_EXECUTABLE}
-    ${PV_MPI_COMMANDS}
+  ADD_TEST("${tfile}RenderServer-ParaView" 
+    ${PARAVIEW_CS_EXECUTABLE}
     --test-render-server
     --disable-registry
     ${PVClientTests_SOURCE_DIR}/Tcl/${tfile}.pvs
@@ -116,6 +124,7 @@ FOREACH (tfile ${PROJECT_TESTS})
     -V ${PVClientTestData}/Baseline/${tfile}.png)
 ENDFOREACH (tfile)
 
+# remove the following for the batch tests
 REMOVE (PROJECT_TESTS
   MouseInteraction
   TestDemo
@@ -124,16 +133,21 @@ REMOVE (PROJECT_TESTS
   XdmfRead
 )
 
+# for each test add a batch test that will possibly run in mpi mode
 FOREACH (tfile ${PROJECT_TESTS})
   # test batch
-  ADD_TEST(${tfile}-batch-ParaView ${PARAVIEW_EXECUTABLE} --disable-registry
+  ADD_TEST(${tfile}-batch-ParaView 
+    ${PARAVIEW_MPI_RUN_ONE}
+    ${PARAVIEW_EXECUTABLE} --disable-registry
     ${PVClientTests_SOURCE_DIR}/Tcl/${tfile}.pvs
     -D ${PVClientTestData}
     -T ${ParaView_BINARY_DIR}/Testing/Temporary
     -BT ${PVClientTests_SOURCE_DIR}/Tcl/TestBatch.tcl
     -BC ${PVClientTests_SOURCE_DIR}/Tcl/ComparePNGs.tcl
     -B ${ParaView_BINARY_DIR}/Testing/Temporary/${tfile}batch
-    -V ${ParaView_BINARY_DIR}/Testing/Temporary/${tfile}batch.png)
+    -V ${ParaView_BINARY_DIR}/Testing/Temporary/${tfile}batch.png
+    ${PARAVIEW_MPI_POST_FLAGS}
+    )
 ENDFOREACH (tfile)
 
 IF(VTK_PRINT_SELF_CHECK_TCL AND TCL_TCLSH)
@@ -149,23 +163,35 @@ IF(VTK_FIND_STRING_TCL AND TCL_TCLSH)
     "vtkSetObjectMacro")
 ENDIF(VTK_FIND_STRING_TCL AND TCL_TCLSH)
 
+# run these test with mpi 1 process if mpi is around, or just run the test
 FOREACH(test otherPrint TestSetGet)
-  ADD_TEST(${test}-ParaView ${PARAVIEW_EXECUTABLE} --batch
-    ${PVClientTests_SOURCE_DIR}/Tcl/${test}.pvb)
+  ADD_TEST(${test}-ParaView 
+    ${PARAVIEW_MPI_RUN_ONE}
+    ${PARAVIEW_EXECUTABLE} --batch
+    ${PVClientTests_SOURCE_DIR}/Tcl/${test}.pvb
+    ${PARAVIEW_MPI_POST_FLAGS}
+    )
 ENDFOREACH(test)
 
-ADD_TEST(OtherTests-ParaView ${PARAVIEW_EXECUTABLE} --disable-registry --start-empty
+ADD_TEST(OtherTests-ParaView 
+  ${PARAVIEW_MPI_RUN_ONE}
+  ${PARAVIEW_EXECUTABLE} --disable-registry --start-empty
   ${PVClientTests_SOURCE_DIR}/Tcl/Other.pvs
   -D ${PVClientTestData}
   -A ${VTK_TCL_HOME}
+  ${PARAVIEW_MPI_POST_FLAGS}
   )
 
-ADD_TEST (AnimationImages-ParaView ${PARAVIEW_EXECUTABLE} --disable-registry
+ADD_TEST (AnimationImages-ParaView 
+  ${PARAVIEW_MPI_RUN_ONE}
+  ${PARAVIEW_EXECUTABLE} --disable-registry
   ${PVClientTests_SOURCE_DIR}/Tcl/AnimationImages.pvs
   -D ${PVClientTestData}
   -T ${ParaView_BINARY_DIR}/Testing/Temporary
   -C ${PVClientTests_SOURCE_DIR}/Tcl/ComparePNGs.tcl
-  -V ${PVClientTestData}/Baseline/AnimationImages.png)
+  -V ${PVClientTestData}/Baseline/AnimationImages.png
+  ${PARAVIEW_MPI_POST_FLAGS}
+  )
 
 # Test the PVLocal plugin example.
 IF(${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION} GREATER 1.8)

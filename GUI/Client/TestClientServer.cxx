@@ -63,28 +63,41 @@ int WaitForAndPrintData(kwsysProcess* process, double timeout, int* foundWaiting
   
   return processPipe;
 }
+
+inline void SeparateArguments(const char* str, vtkstd::vector<vtkstd::string>& flags)
+{
+  vtkstd::string arg = str;
+  vtkstd::string::size_type pos1 = 0;
+  vtkstd::string::size_type pos2 = arg.find(" ");
+  if(pos2 == arg.npos)
+    {
+    flags.push_back(str);
+    return;
+    }
+  while(pos2 != arg.npos)
+    {
+    flags.push_back(arg.substr(pos1, pos2-pos1));
+    pos1 = pos2+1;
+    pos2 = arg.find(" ", pos1+1);
+    } 
+  flags.push_back(arg.substr(pos1, pos2-pos1));
+}
+
 //----------------------------------------------------------------------------
 int main(int argc, char* argv[])
 {
   int argStart = 1;
   int testRenderServer = 0;
-  vtkstd::string mpiRun;
-  const char* mpiOption = "--use-mpi=";
-  const int length = strlen(mpiOption);
-  double timeOut = 1400;
+  // try to make sure that this timesout before dart so it can kill all the processes
+  double timeOut = DART_TESTING_TIMEOUT - 10.0;
+  if(timeOut < 0)
+    {
+    timeOut = 1500;
+    }
   
   if(argc > 1)
     {
     int index = 1;
-    if(strncmp(argv[index], mpiOption, length) == 0)
-       {
-       mpiRun = argv[index];
-       mpiRun = mpiRun.substr(length, mpiRun.size() - length);
-       argStart = 2;
-       fprintf(stderr, "Run test with mpi run \'%s\'\n", mpiRun.c_str());
-       index++;
-       argStart = index;
-       }
     if(strcmp(argv[index], "--test-render-server") == 0)
       {
       argStart = index+1;
@@ -92,6 +105,39 @@ int main(int argc, char* argv[])
       fprintf(stderr, "Test Render Server\n");
       }
     }
+  // mpi code
+  vtkstd::string mpiRun;
+  
+  vtkstd::vector<vtkstd::string> mpiFlags;
+  vtkstd::vector<vtkstd::string> mpiPostFlags;
+  vtkstd::string mpiNumProcFlag;
+  int serverNumProc = 1;
+  int renderNumProc = 1;
+#ifdef VTK_MPIRUN_EXE
+  mpiRun = VTK_MPIRUN_EXE;
+
+#ifdef VTK_MPI_MAX_NUMPROCS
+  serverNumProc = VTK_MPI_MAX_NUMPROCS;
+  renderNumProc = serverNumProc-1;
+#endif
+# ifdef VTK_MPI_NUMPROC_FLAG
+  mpiNumProcFlag = VTK_MPI_NUMPROC_FLAG;
+# else
+  cerr << "Error VTK_MPI_NUMPROC_FLAG must be defined to run test\n";
+  return -1;
+# endif
+# ifdef VTK_MPI_PREFLAGS
+  SeparateArguments(VTK_MPI_PREFLAGS, mpiFlags);
+# endif
+# ifdef VTK_MPI_POSTFLAGS
+  SeparateArguments(VTK_MPI_POSTFLAGS, mpiPostFlags);
+# endif  
+  char buf[1024];
+  sprintf(buf, "%d", serverNumProc);
+  vtkstd::string serverNumProcess = buf;
+   sprintf(buf, "%d", renderNumProc);
+  vtkstd::string renderServerNumProcess = buf;
+#endif
   // Allocate process managers.
   kwsysProcess* renderServer = 0;
   if(testRenderServer)
@@ -123,7 +169,7 @@ int main(int argc, char* argv[])
   paraview += "/" CMAKE_INTDIR;
 #endif
   paraview += "/paraview";
-
+  unsigned int i;
   // Construct the render server process command line
   if(renderServer)
     {
@@ -132,11 +178,20 @@ int main(int argc, char* argv[])
     if(mpiRun.size())
       {
       renderServerCommand.push_back(mpiRun.c_str());
-      renderServerCommand.push_back("-np");
-      renderServerCommand.push_back("2");
+      renderServerCommand.push_back(mpiNumProcFlag.c_str());
+      renderServerCommand.push_back(renderServerNumProcess.c_str());
+      for(i = 0; i < mpiFlags.size(); ++i)
+        {
+        cout << mpiFlags[i].c_str() << "\n";
+        renderServerCommand.push_back(mpiFlags[i].c_str());
+        }
       }
     renderServerCommand.push_back(paraview.c_str());
     renderServerCommand.push_back("--render-server");
+    for(i = 0; i < mpiPostFlags.size(); ++i)
+      {
+      renderServerCommand.push_back(mpiPostFlags[i].c_str());
+      }
     renderServerCommand.push_back(0);
     ReportCommand(&renderServerCommand[0], "renderserver");
     kwsysProcess_SetCommand(renderServer, &renderServerCommand[0]);
@@ -147,11 +202,20 @@ int main(int argc, char* argv[])
   if(mpiRun.size())
     {
     serverCommand.push_back(mpiRun.c_str());
-    serverCommand.push_back("-np");
-    serverCommand.push_back("3");
+    serverCommand.push_back(mpiNumProcFlag.c_str());
+    serverCommand.push_back(serverNumProcess.c_str());
+    for(i = 0; i < mpiFlags.size(); ++i)
+      {
+      serverCommand.push_back(mpiFlags[i].c_str());
+      }
     }
   serverCommand.push_back(paraview.c_str()); 
   serverCommand.push_back("--server");
+  for(i = 0; i < mpiPostFlags.size(); ++i)
+    {
+    serverCommand.push_back(mpiPostFlags[i].c_str());
+    }
+    
   serverCommand.push_back(0);
   ReportCommand(&serverCommand[0], "server");
   kwsysProcess_SetCommand(server, &serverCommand[0]);
@@ -168,9 +232,9 @@ int main(int argc, char* argv[])
     clientCommand.push_back("--client");
     }
   
-  for(int i=argStart; i < argc; ++i)
+  for(int ii=argStart; ii < argc; ++ii)
     {
-    clientCommand.push_back(argv[i]);
+    clientCommand.push_back(argv[ii]);
     }
   clientCommand.push_back(0);
   ReportCommand(&clientCommand[0], "client");
