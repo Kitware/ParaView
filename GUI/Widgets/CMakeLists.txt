@@ -87,6 +87,7 @@ SET( KWWidgets_SRCS
   vtkKWWindow.cxx 
   vtkKWWindowCollection.cxx 
   vtkKWXtEmbeddedWidget.cxx 
+  vtkKWTesting.cxx
   )
 
 SET_SOURCE_FILES_PROPERTIES(
@@ -101,6 +102,11 @@ SET_SOURCE_FILES_PROPERTIES(
   ${VTK_TCL_HOME}/vtktcl.c
   vtkKWRenderWidgetCallbackCommand.cxx 
   vtkKWTkUtilities.cxx
+  vtkCornerAnnotation.cxx
+  vtkKWCompositeCollection.cxx
+  vtkKWViewCollection.cxx
+  vtkKWWindowCollection.cxx
+  vtkKWWidgetCollection.cxx
   WRAP_EXCLUDE
   )
 
