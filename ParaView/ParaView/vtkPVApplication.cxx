@@ -82,6 +82,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkOutputWindow.h"
 
+#ifdef _WIN32
+#include "htmlhelp.h"
+#include "vtkKWRegisteryUtilities.h"
+#endif
+
 extern "C" int Vtktkrenderwidget_Init(Tcl_Interp *interp);
 extern "C" int Vtkkwparaviewtcl_Init(Tcl_Interp *interp);
 //extern "C" int Vtkparalleltcl_Init(Tcl_Interp *interp);

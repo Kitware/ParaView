@@ -167,6 +167,11 @@ public:
   // Show help.
   void DisplayHelp();
 
+  virtual int GetApplicationKey() 
+    {
+      return 15;
+    };
+
 protected:
   vtkPVApplication();
   ~vtkPVApplication();
@@ -174,10 +179,6 @@ protected:
   void operator=(const vtkPVApplication&) {};
 
   // For locating help (.chm) on Windows.
-  virtual int GetApplicationKey() 
-    {
-      return 15;
-    };
   
   void *Log;
   char *LogFileName;

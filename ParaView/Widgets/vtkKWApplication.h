@@ -153,6 +153,8 @@ public:
   void AddTraceEntry(char *format, ...);
 //ETX
 
+  virtual int GetApplicationKey() {return -1;};
+
 protected:
   vtkKWApplication();
   ~vtkKWApplication();
@@ -171,8 +173,6 @@ protected:
   vtkKWWidget *BalloonHelpLabel;
   char *BalloonHelpPending;
   vtkSetStringMacro(BalloonHelpPending);
-
-  virtual int GetApplicationKey() {return -1;};
 
   static int WidgetVisibility;
   int InExit;

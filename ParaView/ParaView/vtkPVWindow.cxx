@@ -82,6 +82,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <ctype.h>
 
+#ifdef _WIN32
+#include "vtkKWRegisteryUtilities.h"
+#endif
+
+#ifndef VTK_USE_ANSI_STDLIB
+#define PV_NOCREATE ios::nocreate
+#else
+#define PV_NOCREATE 0
+#endif
 
 //----------------------------------------------------------------------------
 vtkPVWindow* vtkPVWindow::New()
@@ -883,7 +892,7 @@ void vtkPVWindow::PlayDemo()
   char fkey[1024];
   char loc[1024];
 
-  sprintf(fkey,"Software\\Kitware\\%i\\Inst",this->GetApplicationKey());  
+  sprintf(fkey,"Software\\Kitware\\%i\\Inst",this->GetApplication()->GetApplicationKey());  
   HKEY hKey;
   if(RegOpenKeyEx(HKEY_CURRENT_USER, fkey, 
 		  0, KEY_READ, &hKey) == ERROR_SUCCESS)
@@ -894,16 +903,19 @@ void vtkPVWindow::PlayDemo()
     sprintf(temp2,"%s/Data/blow.vtk",loc);
     }
 
-  ifstream fptr2(temp2, ios::in);
+  ifstream fptr2(temp2, ios::in | PV_NOCREATE);
   if (!fptr2.fail())
     {
+    fptr2.close();
     foundData=1;
     this->Application->Script("set tmpPvDataDir %s/Data", loc);
     }
 
-  ifstream fptr(temp1, ios::in);
+  vtkDebugMacro(<<temp1);
+  ifstream fptr(temp1, ios::in | PV_NOCREATE);
   if (!fptr.fail())
     {
+    fptr.close();
     this->LoadScript(temp1);
     found=1;
     }
@@ -913,26 +925,29 @@ void vtkPVWindow::PlayDemo()
 
   // Look in binary and installation directories
 
-  for(const char** dir=VTK_PV_DEMO_PATHS; !found && *dir; ++dir)
+  const char** dir;
+  for(dir=VTK_PV_DEMO_PATHS; !foundData && *dir; ++dir)
     {
     if (!foundData)
       {
       sprintf(temp2, "%s/Data/blow.vtk", *dir);
-      ifstream fptr2(temp2, ios::in);
+      ifstream fptr2(temp2, ios::in | PV_NOCREATE);
       if (!fptr2.fail())
 	{
+	fptr2.close();
 	foundData=1;
 	this->Application->Script("set tmpPvDataDir %s/Data", *dir);
 	}
       }
     }
 
-  for(const char** dir=VTK_PV_DEMO_PATHS; !found && *dir; ++dir)
+  for(dir=VTK_PV_DEMO_PATHS; !found && *dir; ++dir)
     {
     sprintf(temp1, "%s/Demos/Demo1.tcl", *dir);
-    ifstream fptr(temp1, ios::in);
+    ifstream fptr(temp1, ios::in | PV_NOCREATE);
     if (!fptr.fail())
       {
+      fptr.close();
       this->LoadScript(temp1);
       found=1;
       }
@@ -940,6 +955,7 @@ void vtkPVWindow::PlayDemo()
 
   if (!found)
     {
+      vtkDebugMacro("Booo");
     vtkKWMessageDialog *dlg = vtkKWMessageDialog::New();
     dlg->Create(this->Application,"");
     dlg->SetText(
@@ -968,7 +984,7 @@ void vtkPVWindow::OpenCallback()
     return;
     }
 
-  input = new ifstream(openFileName, ios::in);
+  input = new ifstream(openFileName, ios::in|PV_NOCREATE);
   if (input->fail())
     {
     vtkErrorMacro("Permission denied for opening " << openFileName);
@@ -2375,7 +2391,7 @@ void vtkPVWindow::ReadSourceInterfaces()
   char fkey[1024];
   char loc[1024];
 
-  sprintf(fkey,"Software\\Kitware\\%i\\Inst",this->GetApplicationKey());  
+  sprintf(fkey,"Software\\Kitware\\%i\\Inst",this->GetApplication()->GetApplicationKey());  
   HKEY hKey;
   if(RegOpenKeyEx(HKEY_CURRENT_USER, fkey, 
 		  0, KEY_READ, &hKey) == ERROR_SUCCESS)
@@ -2385,7 +2401,7 @@ void vtkPVWindow::ReadSourceInterfaces()
     sprintf(temp,"%s/Config",loc);
     }
 
-  found = this->ReadSourceInterfacesFromDirectory(*dir);
+  found = this->ReadSourceInterfacesFromDirectory(loc);
 
 #endif // _WIN32  
 
