@@ -44,7 +44,7 @@
 #include "vtkGarbageCollector.h"
 
 
-vtkCxxRevisionMacro(vtkCTHExtractAMRPart, "1.17");
+vtkCxxRevisionMacro(vtkCTHExtractAMRPart, "1.18");
 vtkStandardNewMacro(vtkCTHExtractAMRPart);
 vtkCxxSetObjectMacro(vtkCTHExtractAMRPart,ClipPlane,vtkPlane);
 
@@ -278,7 +278,6 @@ void vtkCTHExtractAMRPart::ExecuteBlock(vtkImageData* block,
   vtkFloatArray* pointVolumeFraction;
   int idx, num;
   const char* arrayName;
-  int *dims;
 
   // Loop over parts to convert volume fractions to point arrays.
   num = this->VolumeArrayNames->GetNumberOfStrings();
