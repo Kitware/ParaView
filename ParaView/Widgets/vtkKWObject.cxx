@@ -117,7 +117,7 @@ void vtkKWObject::ExtractRevision(ostream& os,const char *revIn)
 void vtkKWObject::SerializeRevision(ostream& os, vtkIndent indent)
 {
   os << indent << "vtkKWObject ";
-  this->ExtractRevision(os,"$Revision: 1.25 $");
+  this->ExtractRevision(os,"$Revision: 1.26 $");
 }
 
 void vtkKWObject::Serialize(istream& is)
@@ -446,7 +446,7 @@ int vtkKWObject::EstimateFormatLength(const char* format, va_list ap)
   // Should never under-estimate.
   
   // Start with the length of the format string itself.
-  int length = strlen(format);
+  int length = vtkString::Length(format);
   
   // Increase the length for every argument in the format.
   const char* cur = format;
