@@ -62,6 +62,15 @@ public:
   virtual void SetInput(vtkDataObject *input);
   vtkDataObject *GetInput();
   
+  // Description:
+  // Whether to generate cell normals.  Cell normals should speed up
+  // rendering when point normals are not available.  They can only be used
+  // for poly cells now.  This option does nothing if the output
+  // contains lines, verts, or strips.
+  vtkSetMacro(GenerateCellNormals, int);
+  vtkGetMacro(GenerateCellNormals, int);
+  vtkBooleanMacro(GenerateCellNormals, int);
+
 protected:
   vtkPVGeometryFilter();
   ~vtkPVGeometryFilter();
@@ -74,11 +83,13 @@ protected:
   void UnstructuredGridExecute(vtkUnstructuredGrid *input);
   void PolyDataExecute(vtkPolyData *input);
   void DataSetSurfaceExecute(vtkDataSet *input);
+  void ExecuteCellNormals(vtkPolyData *output);
   void HierarchicalBoxExecute(vtkHierarchicalBoxDataSet *input);
 
   int OutlineFlag;
   int UseOutline;
   int UseStrips;
+  int GenerateCellNormals;
 
   vtkDataSetSurfaceFilter* DataSetSurfaceFilter;
   vtkHierarchicalBoxOutlineFilter* HierarchicalBoxOutline;
