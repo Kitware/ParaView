@@ -63,7 +63,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVExtentEntry);
-vtkCxxRevisionMacro(vtkPVExtentEntry, "1.25.2.10");
+vtkCxxRevisionMacro(vtkPVExtentEntry, "1.25.2.11");
 
 vtkCxxSetObjectMacro(vtkPVExtentEntry, InputMenu, vtkPVInputMenu);
 
@@ -454,8 +454,11 @@ void vtkPVExtentEntry::AnimationMenuCallback(vtkPVAnimationInterfaceEntry *ai,
   // the whole extent from sources (in the future.
   vtkPVApplication *pvApp = this->GetPVApplication();
   vtkPVProcessModule* pm = pvApp->GetProcessModule();
-  pm->GetStream() << vtkClientServerStream::Invoke 
-                  << this->ObjectID << "GetWholeExtent" 
+  pm->GetStream() << vtkClientServerStream::Invoke
+                  << this->ObjectID << "GetInput"
+                  << vtkClientServerStream::End
+                  << vtkClientServerStream::Invoke
+                  << vtkClientServerStream::LastResult << "GetWholeExtent"
                   << vtkClientServerStream::End;
   pm->SendStreamToServerRoot();
   for(int i =0; i < 6; ++i)
