@@ -40,6 +40,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 #include "vtkKWApplication.h"
+#include "vtkPVApplication.h"
+#include "vtkPVRenderView.h"
 #include "vtkKWToolbar.h"
 #include "vtkKWInteractor.h"
 
@@ -54,6 +56,9 @@ vtkKWInteractor::vtkKWInteractor()
   this->SelectedState = 0;
   this->ToolbarButton = NULL;
   this->Toolbar = NULL;
+  
+  this->TraceInitialized = 0;
+  this->Tracing = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -128,4 +133,3 @@ void vtkKWInteractor::Deselect()
     }
   this->SelectedState = 0;
 }
-

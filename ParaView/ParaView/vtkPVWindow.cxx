@@ -595,6 +595,7 @@ void vtkPVWindow::Create(vtkKWApplication *app, char *args)
   this->Script("%s configure -command {%s SetInteractor %s}", 
                button->GetWidgetName(), this->MainView->GetTclName(), 
                interactor->GetTclName());
+  
   this->Script("pack %s -side left -fill none -expand no -padx 2 -pady 2", 
                button->GetWidgetName());
   interactor->SetToolbarButton(button);
@@ -613,6 +614,7 @@ void vtkPVWindow::Create(vtkKWApplication *app, char *args)
   this->Script("%s configure -command {%s SetInteractor %s}", 
                button->GetWidgetName(), this->MainView->GetTclName(), 
                interactor->GetTclName());
+
   this->Script("pack %s -side left -fill none -expand no -padx 2 -pady 2", 
                button->GetWidgetName());
   interactor->SetToolbarButton(button);
@@ -631,6 +633,7 @@ void vtkPVWindow::Create(vtkKWApplication *app, char *args)
   this->Script("%s configure -command {%s SetInteractor %s}", 
                button->GetWidgetName(), this->MainView->GetTclName(), 
                interactor->GetTclName());
+
   this->Script("pack %s -side left -fill none -expand no -padx 2 -pady 2", 
                button->GetWidgetName());
   interactor->SetToolbarButton(button);

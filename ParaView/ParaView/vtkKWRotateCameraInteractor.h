@@ -107,9 +107,9 @@ protected:
   void UpdateRollCursor(double px, double py);
 
   int CursorState;
+
+  void InitializeTrace();
 };
 
 
 #endif
-
-

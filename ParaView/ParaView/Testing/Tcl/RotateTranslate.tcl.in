@@ -1,0 +1,275 @@
+set DataDir "@PARAVIEW_DATA_ROOT@"
+
+set pv(vtkTemp1) [Application GetMainWindow]
+set pv(vtkTemp43) [$pv(vtkTemp1) GetMainView]
+set pv(vtkTemp89) [$pv(vtkTemp1) GetGlyphSource Arrow]
+set pv(vtkTemp93) [$pv(vtkTemp1) GetGlyphSource Cone]
+set pv(vtkTemp97) [$pv(vtkTemp1) GetGlyphSource Sphere]
+
+set pv(vtkTemp98) [$pv(vtkTemp1) CreatePVSource vtkSuperquadricSource]
+set pv(vtkTemp110) [$pv(vtkTemp98) GetPVWidget {Center}]
+set pv(vtkTemp115) [$pv(vtkTemp98) GetPVWidget {Scale}]
+set pv(vtkTemp120) [$pv(vtkTemp98) GetPVWidget {ThetaResolution}]
+set pv(vtkTemp123) [$pv(vtkTemp98) GetPVWidget {PhiResolution}]
+set pv(vtkTemp126) [$pv(vtkTemp98) GetPVWidget {Thickness}]
+set pv(vtkTemp129) [$pv(vtkTemp98) GetPVWidget {ThetaRoundness}]
+set pv(vtkTemp132) [$pv(vtkTemp98) GetPVWidget {PhiRoundness}]
+set pv(vtkTemp135) [$pv(vtkTemp98) GetPVWidget {Size}]
+set pv(vtkTemp138) [$pv(vtkTemp98) GetPVWidget {Toroidal}]
+$pv(vtkTemp138) SetState 1
+$pv(vtkTemp98) AcceptCallback
+set pv(vtkTemp77) [$pv(vtkTemp1) GetRotateCameraInteractor]
+$pv(vtkTemp77) MotionCallback 49 171
+$pv(vtkTemp77) MotionCallback 66 178
+$pv(vtkTemp77) MotionCallback 87 192
+$pv(vtkTemp77) MotionCallback 108 196
+$pv(vtkTemp77) MotionCallback 157 206
+$pv(vtkTemp77) MotionCallback 206 220
+$pv(vtkTemp77) MotionCallback 255 224
+$pv(vtkTemp77) MotionCallback 273 231
+$pv(vtkTemp77) MotionCallback 283 234
+$pv(vtkTemp77) MotionCallback 297 241
+$pv(vtkTemp77) MotionCallback 308 245
+$pv(vtkTemp77) MotionCallback 318 248
+$pv(vtkTemp77) MotionCallback 325 248
+$pv(vtkTemp77) MotionCallback 322 252
+$pv(vtkTemp77) MotionCallback 315 252
+$pv(vtkTemp77) MotionCallback 312 255
+$pv(vtkTemp77) MotionCallback 305 255
+$pv(vtkTemp77) MotionCallback 298 259
+$pv(vtkTemp77) MotionCallback 287 259
+$pv(vtkTemp77) MotionCallback 277 262
+$pv(vtkTemp77) MotionCallback 273 262
+$pv(vtkTemp77) MotionCallback 270 262
+$pv(vtkTemp77) MotionCallback 266 266
+$pv(vtkTemp77) MotionCallback 259 266
+$pv(vtkTemp77) MotionCallback 252 269
+$pv(vtkTemp77) MotionCallback 245 273
+$pv(vtkTemp77) MotionCallback 238 273
+$pv(vtkTemp77) MotionCallback 231 276
+$pv(vtkTemp77) MotionCallback 224 276
+$pv(vtkTemp77) MotionCallback 221 276
+$pv(vtkTemp77) MotionCallback 217 276
+$pv(vtkTemp77) MotionCallback 217 280
+$pv(vtkTemp77) MotionCallback 220 283
+$pv(vtkTemp77) AButtonPress 1 220 283
+$pv(vtkTemp77) Button1Motion 224 287
+$pv(vtkTemp77) Button1Motion 231 290
+$pv(vtkTemp77) Button1Motion 238 297
+$pv(vtkTemp77) Button1Motion 248 301
+$pv(vtkTemp77) Button1Motion 255 301
+$pv(vtkTemp77) Button1Motion 266 301
+$pv(vtkTemp77) Button1Motion 269 301
+$pv(vtkTemp77) Button1Motion 273 301
+$pv(vtkTemp77) Button1Motion 276 301
+$pv(vtkTemp77) Button1Motion 280 304
+$pv(vtkTemp77) Button1Motion 283 304
+$pv(vtkTemp77) Button1Motion 290 304
+$pv(vtkTemp77) Button1Motion 301 308
+$pv(vtkTemp77) Button1Motion 311 311
+$pv(vtkTemp77) Button1Motion 325 315
+$pv(vtkTemp77) Button1Motion 332 315
+$pv(vtkTemp77) Button1Motion 339 315
+$pv(vtkTemp77) AButtonRelease 1 339 315
+$pv(vtkTemp77) MotionCallback 336 315
+$pv(vtkTemp77) MotionCallback 333 315
+$pv(vtkTemp77) MotionCallback 329 315
+$pv(vtkTemp77) MotionCallback 326 315
+$pv(vtkTemp77) MotionCallback 322 315
+$pv(vtkTemp77) MotionCallback 319 312
+$pv(vtkTemp77) MotionCallback 315 312
+$pv(vtkTemp77) MotionCallback 312 308
+$pv(vtkTemp77) MotionCallback 301 305
+$pv(vtkTemp77) MotionCallback 287 298
+$pv(vtkTemp77) MotionCallback 273 294
+$pv(vtkTemp77) MotionCallback 270 291
+$pv(vtkTemp77) MotionCallback 270 287
+$pv(vtkTemp77) MotionCallback 270 284
+$pv(vtkTemp77) MotionCallback 270 280
+$pv(vtkTemp77) MotionCallback 270 277
+$pv(vtkTemp77) AButtonPress 3 270 277
+$pv(vtkTemp77) Button3Motion 270 283
+$pv(vtkTemp77) Button3Motion 270 294
+$pv(vtkTemp77) Button3Motion 270 301
+$pv(vtkTemp77) Button3Motion 270 308
+$pv(vtkTemp77) Button3Motion 270 322
+$pv(vtkTemp77) Button3Motion 270 336
+$pv(vtkTemp77) Button3Motion 270 350
+$pv(vtkTemp77) Button3Motion 270 360
+$pv(vtkTemp77) Button3Motion 270 367
+$pv(vtkTemp77) Button3Motion 270 378
+$pv(vtkTemp77) Button3Motion 270 392
+$pv(vtkTemp77) Button3Motion 270 406
+$pv(vtkTemp77) Button3Motion 270 416
+$pv(vtkTemp77) Button3Motion 270 420
+$pv(vtkTemp77) Button3Motion 270 417
+$pv(vtkTemp77) AButtonRelease 3 270 417
+$pv(vtkTemp77) MotionCallback 270 413
+$pv(vtkTemp77) MotionCallback 270 403
+$pv(vtkTemp77) MotionCallback 259 392
+$pv(vtkTemp77) MotionCallback 210 371
+$pv(vtkTemp77) MotionCallback 196 361
+$pv(vtkTemp77) MotionCallback 175 340
+$pv(vtkTemp77) MotionCallback 112 284
+$pv(vtkTemp77) MotionCallback 91 277
+$pv(vtkTemp77) MotionCallback 74 266
+$pv(vtkTemp77) MotionCallback 53 249
+$pv(vtkTemp77) MotionCallback 35 231
+$pv(vtkTemp77) MotionCallback 21 210
+$pv(vtkTemp77) MotionCallback 11 200
+$pv(vtkTemp77) MotionCallback 4 193
+$pv(vtkTemp77) MotionCallback 0 182
+set pv(vtkTemp79) [$pv(vtkTemp1) GetTranslateCameraInteractor]
+$pv(vtkTemp79) MotionCallback 35 124
+$pv(vtkTemp79) MotionCallback 49 142
+$pv(vtkTemp79) MotionCallback 98 191
+$pv(vtkTemp79) MotionCallback 154 212
+$pv(vtkTemp79) MotionCallback 175 222
+$pv(vtkTemp79) MotionCallback 196 236
+$pv(vtkTemp79) MotionCallback 217 247
+$pv(vtkTemp79) MotionCallback 231 257
+$pv(vtkTemp79) MotionCallback 241 271
+$pv(vtkTemp79) MotionCallback 255 282
+$pv(vtkTemp79) MotionCallback 269 289
+$pv(vtkTemp79) MotionCallback 280 299
+$pv(vtkTemp79) MotionCallback 297 313
+$pv(vtkTemp79) MotionCallback 311 324
+$pv(vtkTemp79) MotionCallback 315 331
+$pv(vtkTemp79) MotionCallback 315 341
+$pv(vtkTemp79) MotionCallback 318 352
+$pv(vtkTemp79) MotionCallback 318 359
+$pv(vtkTemp79) MotionCallback 315 366
+$pv(vtkTemp79) MotionCallback 308 373
+$pv(vtkTemp79) MotionCallback 305 387
+$pv(vtkTemp79) MotionCallback 305 397
+$pv(vtkTemp79) MotionCallback 301 404
+$pv(vtkTemp79) MotionCallback 301 408
+$pv(vtkTemp79) AButtonPress 1 301 408
+$pv(vtkTemp79) Button1Motion 298 405
+$pv(vtkTemp79) Button1Motion 291 401
+$pv(vtkTemp79) Button1Motion 284 394
+$pv(vtkTemp79) Button1Motion 273 387
+$pv(vtkTemp79) Button1Motion 256 377
+$pv(vtkTemp79) Button1Motion 249 366
+$pv(vtkTemp79) Button1Motion 242 359
+$pv(vtkTemp79) Button1Motion 235 352
+$pv(vtkTemp79) Button1Motion 228 349
+$pv(vtkTemp79) Button1Motion 224 349
+$pv(vtkTemp79) Button1Motion 221 338
+$pv(vtkTemp79) Button1Motion 217 335
+$pv(vtkTemp79) Button1Motion 214 324
+$pv(vtkTemp79) Button1Motion 210 310
+$pv(vtkTemp79) Button1Motion 210 307
+$pv(vtkTemp79) Button1Motion 207 303
+$pv(vtkTemp79) Button1Motion 203 303
+$pv(vtkTemp79) Button1Motion 196 300
+$pv(vtkTemp79) Button1Motion 182 296
+$pv(vtkTemp79) Button1Motion 168 293
+$pv(vtkTemp79) Button1Motion 161 282
+$pv(vtkTemp79) Button1Motion 151 272
+$pv(vtkTemp79) Button1Motion 144 261
+$pv(vtkTemp79) Button1Motion 144 254
+$pv(vtkTemp79) Button1Motion 140 251
+$pv(vtkTemp79) AButtonRelease 1 140 251
+$pv(vtkTemp79) MotionCallback 147 251
+$pv(vtkTemp79) MotionCallback 154 251
+$pv(vtkTemp79) MotionCallback 164 251
+$pv(vtkTemp79) MotionCallback 175 251
+$pv(vtkTemp79) MotionCallback 189 251
+$pv(vtkTemp79) MotionCallback 206 247
+$pv(vtkTemp79) MotionCallback 217 247
+$pv(vtkTemp79) MotionCallback 224 244
+$pv(vtkTemp79) MotionCallback 231 244
+$pv(vtkTemp79) MotionCallback 234 244
+$pv(vtkTemp79) MotionCallback 238 244
+$pv(vtkTemp79) MotionCallback 241 244
+$pv(vtkTemp79) MotionCallback 245 244
+$pv(vtkTemp79) MotionCallback 252 244
+$pv(vtkTemp79) MotionCallback 255 247
+$pv(vtkTemp79) MotionCallback 262 247
+$pv(vtkTemp79) MotionCallback 269 247
+$pv(vtkTemp79) MotionCallback 273 247
+$pv(vtkTemp79) AButtonPress 1 273 247
+$pv(vtkTemp79) Button1Motion 270 244
+$pv(vtkTemp79) Button1Motion 266 240
+$pv(vtkTemp79) Button1Motion 263 233
+$pv(vtkTemp79) Button1Motion 259 223
+$pv(vtkTemp79) Button1Motion 252 212
+$pv(vtkTemp79) Button1Motion 249 202
+$pv(vtkTemp79) Button1Motion 245 195
+$pv(vtkTemp79) Button1Motion 242 188
+$pv(vtkTemp79) Button1Motion 238 181
+$pv(vtkTemp79) Button1Motion 235 170
+$pv(vtkTemp79) Button1Motion 231 153
+$pv(vtkTemp79) Button1Motion 228 139
+$pv(vtkTemp79) Button1Motion 228 128
+$pv(vtkTemp79) Button1Motion 224 121
+$pv(vtkTemp79) Button1Motion 224 111
+$pv(vtkTemp79) Button1Motion 224 104
+$pv(vtkTemp79) Button1Motion 224 97
+$pv(vtkTemp79) Button1Motion 224 93
+$pv(vtkTemp79) Button1Motion 224 90
+$pv(vtkTemp79) Button1Motion 224 86
+$pv(vtkTemp79) Button1Motion 224 83
+$pv(vtkTemp79) AButtonRelease 1 224 83
+$pv(vtkTemp79) MotionCallback 227 83
+$pv(vtkTemp79) MotionCallback 234 83
+$pv(vtkTemp79) MotionCallback 238 79
+$pv(vtkTemp79) MotionCallback 241 72
+$pv(vtkTemp79) MotionCallback 248 69
+$pv(vtkTemp79) MotionCallback 252 62
+$pv(vtkTemp79) MotionCallback 259 58
+$pv(vtkTemp79) MotionCallback 266 55
+$pv(vtkTemp79) MotionCallback 269 55
+$pv(vtkTemp79) MotionCallback 273 55
+$pv(vtkTemp79) MotionCallback 276 55
+$pv(vtkTemp79) MotionCallback 280 55
+$pv(vtkTemp79) MotionCallback 283 58
+$pv(vtkTemp79) AButtonPress 3 283 58
+$pv(vtkTemp79) Button3Motion 287 58
+$pv(vtkTemp79) Button3Motion 290 58
+$pv(vtkTemp79) Button3Motion 294 61
+$pv(vtkTemp79) Button3Motion 297 65
+$pv(vtkTemp79) Button3Motion 304 65
+$pv(vtkTemp79) Button3Motion 308 72
+$pv(vtkTemp79) Button3Motion 315 79
+$pv(vtkTemp79) Button3Motion 322 82
+$pv(vtkTemp79) Button3Motion 329 89
+$pv(vtkTemp79) Button3Motion 336 93
+$pv(vtkTemp79) Button3Motion 343 96
+$pv(vtkTemp79) Button3Motion 350 103
+$pv(vtkTemp79) Button3Motion 350 107
+$pv(vtkTemp79) Button3Motion 353 114
+$pv(vtkTemp79) Button3Motion 360 121
+$pv(vtkTemp79) Button3Motion 364 131
+$pv(vtkTemp79) Button3Motion 371 135
+$pv(vtkTemp79) Button3Motion 378 138
+$pv(vtkTemp79) Button3Motion 381 142
+$pv(vtkTemp79) Button3Motion 385 145
+$pv(vtkTemp79) Button3Motion 388 149
+$pv(vtkTemp79) Button3Motion 392 149
+$pv(vtkTemp79) Button3Motion 395 152
+$pv(vtkTemp79) Button3Motion 399 159
+$pv(vtkTemp79) Button3Motion 402 163
+$pv(vtkTemp79) Button3Motion 406 166
+$pv(vtkTemp79) Button3Motion 406 170
+$pv(vtkTemp79) AButtonRelease 3 406 170
+$pv(vtkTemp79) MotionCallback 389 170
+$pv(vtkTemp79) MotionCallback 333 167
+$pv(vtkTemp79) MotionCallback 315 167
+$pv(vtkTemp79) MotionCallback 252 156
+$pv(vtkTemp79) MotionCallback 231 142
+$pv(vtkTemp79) MotionCallback 154 135
+$pv(vtkTemp79) MotionCallback 105 125
+$pv(vtkTemp79) MotionCallback 56 111
+$pv(vtkTemp79) MotionCallback 0 93
+
+# Fix the size of the image.
+RenWin1 SetSize 300 300
+RenWin1 Render
+update
+
+source $DataDir/Utility/rtImage.tcl
+pvImageTest $DataDir/Baseline/RotateTranslate.png 10
+   
+Application Exit

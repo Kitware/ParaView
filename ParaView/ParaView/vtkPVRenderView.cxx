@@ -904,7 +904,8 @@ void vtkPVRenderView::EventuallyRenderCallBack()
 void vtkPVRenderView::SetInteractor(vtkKWInteractor *interactor)
 {
   vtkKWInteractor *old = this->CurrentInteractor;
-
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  
   if (old == interactor)
     {
     return;
@@ -925,6 +926,11 @@ void vtkPVRenderView::SetInteractor(vtkKWInteractor *interactor)
   if (interactor)
     {
     interactor->Select();
+    if (interactor->GetTraceInitialized() )
+      {
+      pvApp->AddTraceEntry("$pv(%s) SetInteractor $pv(%s)",
+                           this->GetTclName(), interactor->GetTclName());
+      }
     }
 
 }

@@ -40,9 +40,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 #include "vtkKWApplication.h"
+#include "vtkPVApplication.h"
 #include "vtkKWTranslateCameraInteractor.h"
 #include "vtkPVRenderView.h"
 #include "vtkKWWindow.h"
+#include "vtkPVWindow.h"
 #include "vtkObjectFactory.h"
 
 int vtkKWTranslateCameraInteractorCommand(ClientData cd, Tcl_Interp *interp,
@@ -142,6 +144,17 @@ void vtkKWTranslateCameraInteractor::Deselect()
 //----------------------------------------------------------------------------
 void vtkKWTranslateCameraInteractor::AButtonPress(int num, int x, int y)
 {
+  vtkPVApplication *pvApp = vtkPVApplication::SafeDownCast(this->Application);
+  if (this->Tracing)
+    {
+    if ( ! this->TraceInitialized )
+      {
+      this->InitializeTrace();
+      }
+    pvApp->AddTraceEntry("$pv(%s) AButtonPress %d %d %d",
+                         this->GetTclName(), num, x, y);
+    }
+
   if (this->RenderView == NULL)
     {
     return;
@@ -172,6 +185,17 @@ void vtkKWTranslateCameraInteractor::AButtonPress(int num, int x, int y)
 //----------------------------------------------------------------------------
 void vtkKWTranslateCameraInteractor::Button1Motion(int x, int y)
 {
+  vtkPVApplication *pvApp = vtkPVApplication::SafeDownCast(this->Application);
+  if (this->Tracing)
+    {
+    if ( ! this->TraceInitialized )
+      {
+      this->InitializeTrace();
+      }
+    pvApp->AddTraceEntry("$pv(%s) Button1Motion %d %d",
+                         this->GetTclName(), x, y);
+    }
+
   this->Helper->PanZoomMotion(x, y);
   this->RenderView->GetRenderer()->ResetCameraClippingRange();
   this->RenderView->Render(); 
@@ -180,6 +204,17 @@ void vtkKWTranslateCameraInteractor::Button1Motion(int x, int y)
 //----------------------------------------------------------------------------
 void vtkKWTranslateCameraInteractor::Button3Motion(int x, int y)
 {
+  vtkPVApplication *pvApp = vtkPVApplication::SafeDownCast(this->Application);
+  if (this->Tracing)
+    {
+    if ( ! this->TraceInitialized )
+      {
+      this->InitializeTrace();
+      }
+    pvApp->AddTraceEntry("$pv(%s) Button3Motion %d %d",
+                         this->GetTclName(), x, y);
+    }
+
   this->Helper->ZoomMotion(x, y);
   this->RenderView->GetRenderer()->ResetCameraClippingRange();
   this->RenderView->Render();
@@ -188,6 +223,17 @@ void vtkKWTranslateCameraInteractor::Button3Motion(int x, int y)
 //----------------------------------------------------------------------------
 void vtkKWTranslateCameraInteractor::AButtonRelease(int num, int x, int y)
 {
+  vtkPVApplication *pvApp = vtkPVApplication::SafeDownCast(this->Application);
+  if (this->Tracing)
+    {
+    if ( ! this->TraceInitialized )
+      {
+      this->InitializeTrace();
+      }
+    pvApp->AddTraceEntry("$pv(%s) AButtonRelease %d %d %d",
+                         this->GetTclName(), num, x, y);
+    }
+
   if (this->RenderView == NULL)
     {
     return;
@@ -200,6 +246,17 @@ void vtkKWTranslateCameraInteractor::AButtonRelease(int num, int x, int y)
 //----------------------------------------------------------------------------
 void vtkKWTranslateCameraInteractor::MotionCallback(int x, int y)
 {
+  vtkPVApplication *pvApp = vtkPVApplication::SafeDownCast(this->Application);
+  if (this->Tracing)
+    {
+    if ( ! this->TraceInitialized )
+      {
+      this->InitializeTrace();
+      }
+    pvApp->AddTraceEntry("$pv(%s) MotionCallback %d %d",
+                         this->GetTclName(), x, y);
+    }
+
   int *size = this->RenderView->GetRenderer()->GetSize();
   double pos;
 
@@ -247,4 +304,15 @@ void vtkKWTranslateCameraInteractor::InitializeCursors()
   this->SetPanCursorName("fleur");
 }
 
-
+void vtkKWTranslateCameraInteractor::InitializeTrace()
+{
+  vtkPVApplication *pvApp = vtkPVApplication::SafeDownCast(this->Application);
+  vtkPVWindow *pvWindow = vtkPVWindow::SafeDownCast(this->GetWindow());
+  
+  if (pvApp && pvWindow)
+    {
+    pvApp->AddTraceEntry("set pv(%s) [$pv(%s) GetTranslateCameraInteractor]",
+                         this->GetTclName(), pvWindow->GetTclName());
+    }
+  this->SetTraceInitialized(1);
+}

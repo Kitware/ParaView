@@ -80,7 +80,7 @@ public:
   vtkGetObjectMacro(ToolbarButton, vtkKWRadioButton);
 
   // Description:
-  // The render view forards these messages.
+  // The render view forwards these messages.
   virtual void AButtonPress(int num, int x, int y) {};
   virtual void AButtonRelease(int num, int x, int y) {};
   virtual void Button1Motion(int x, int y) {};
@@ -94,6 +94,17 @@ public:
   // of dealing with reference loops.
   virtual void PrepareForDelete() {};
 
+  // Description:
+  // Set/Get whether the interactor has been added to the trace
+  vtkSetClampMacro(TraceInitialized, int, 0, 1);
+  vtkGetMacro(TraceInitialized, int);
+
+  // Description:
+  // Specify whether to trace the interactor
+  vtkSetClampMacro(Tracing, int, 0, 1);
+  vtkGetMacro(Tracing, int);
+  vtkBooleanMacro(Tracing, int);
+  
 protected:
   vtkKWInteractor();
   ~vtkKWInteractor();
@@ -111,9 +122,10 @@ protected:
   // If the composite has a toolbar, the this super class
   // will manage packing the toolbar with our selection status.
   vtkKWToolbar *Toolbar;
+  
+  int TraceInitialized;
+  int Tracing;
 };
 
 
 #endif
-
-
