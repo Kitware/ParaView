@@ -110,7 +110,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.308");
+vtkCxxRevisionMacro(vtkPVApplication, "1.309");
 
 
 int vtkPVApplicationCommand(ClientData cd, Tcl_Interp *interp,
@@ -2128,6 +2128,7 @@ void vtkPVApplication::PrintSelf(ostream& os, vtkIndent indent)
     {
     os << "(none)" << endl;
     }
+  os << "OldRenderModuleName: " << (this->OldRenderModuleName?this->OldRenderModuleName:"(none)") << endl;
 }
 
 void vtkPVApplication::DisplayTCLError(const char* message)
