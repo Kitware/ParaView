@@ -85,10 +85,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endif
 
 #define VTK_PV_NAV_FRAME_SIZE_REG_KEY "NavigationFrameSize"
+#define VTK_PV_SOURCES_BROWSER_ALWAYS_SHOW_NAME_REG_KEY "SourcesBrowserAlwaysShowName"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.213.2.9");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.213.2.10");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -213,6 +214,7 @@ vtkPVRenderView::vtkPVRenderView()
 
   this->InterfaceSettingsFrame = vtkKWLabeledFrame::New();
   this->Display3DWidgets = vtkKWCheckButton::New();
+  this->SourcesBrowserAlwaysShowName = vtkKWCheckButton::New();
 
   this->LODThreshold = 1000;
   this->LODResolution = 50;
@@ -284,6 +286,10 @@ vtkPVRenderView::~vtkPVRenderView()
 
   this->InterfaceSettingsFrame->Delete();
   this->Display3DWidgets->Delete();
+  this->Display3DWidgets = NULL;
+
+  this->SourcesBrowserAlwaysShowName->Delete();
+  this->SourcesBrowserAlwaysShowName = NULL;
 
   if ( this->SelectionWindow )
     {
@@ -831,16 +837,6 @@ void vtkPVRenderView::Create(vtkKWApplication *app, const char *args)
     this->ShowSelectionWindowCallback(0);
     }
 
-  if (!this->Application->GetRegisteryValue(2,"RunTime","Display3DWidgets",0)||
-    this->GetPVWindow()->GetIntRegisteryValue(2,"RunTime","Display3DWidgets") )
-    {
-    this->SetDisplay3DWidgets(1);
-    }
-  else
-    {
-    this->SetDisplay3DWidgets(0);
-    }
-  
   this->EventuallyRender();
   delete [] local;
 }
@@ -866,6 +862,29 @@ void vtkPVRenderView::SetDisplay3DWidgets(int s)
 {
   this->Display3DWidgets->SetState(s);
   this->GetPVApplication()->SetDisplay3DWidgets(s);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::SourcesBrowserAlwaysShowNameCallback()
+{
+  int val = this->SourcesBrowserAlwaysShowName->GetState();
+  this->SetSourcesBrowserAlwaysShowName(val);
+  this->Application->SetRegisteryValue(
+    2,"RunTime", VTK_PV_SOURCES_BROWSER_ALWAYS_SHOW_NAME_REG_KEY, val?"1":"0");
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::SetSourcesBrowserAlwaysShowName(int s)
+{
+  this->SourcesBrowserAlwaysShowName->SetState(s);
+  if (this->NavigationWindow && this->NavigationWindow->IsCreated())
+    {
+    this->NavigationWindow->SetAlwaysShowName(s);
+    }
+  if (this->SelectionWindow && this->SelectionWindow->IsCreated())
+    {
+    this->SelectionWindow->SetAlwaysShowName(s);
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -1236,8 +1255,45 @@ void vtkPVRenderView::CreateViewProperties()
   this->Display3DWidgets->SetText("Display 3D widgets automatically");
   this->Display3DWidgets->SetCommand(this, "Display3DWidgetsCallback");
 
-  this->Script("pack %s -side top -padx 2 -pady 2 -anchor w",
-               this->Display3DWidgets->GetWidgetName());
+  if (!this->Application->GetRegisteryValue(2,"RunTime","Display3DWidgets",0)||
+    this->GetPVWindow()->GetIntRegisteryValue(2,"RunTime","Display3DWidgets"))
+    {
+    this->SetDisplay3DWidgets(1);
+    }
+  else
+    {
+    this->SetDisplay3DWidgets(0);
+    }
+  
+  // Interface settings: sources browser always show name
+
+  this->SourcesBrowserAlwaysShowName->SetParent(
+    this->InterfaceSettingsFrame->GetFrame());
+  this->SourcesBrowserAlwaysShowName->Create(this->Application, "");
+  this->SourcesBrowserAlwaysShowName->SetText(
+    "Sources browsers show source name");
+  this->SourcesBrowserAlwaysShowName->SetCommand(
+    this, "SourcesBrowserAlwaysShowNameCallback");
+
+  if (this->Application->HasRegisteryValue(
+    2, "RunTime", VTK_PV_SOURCES_BROWSER_ALWAYS_SHOW_NAME_REG_KEY) &&
+      this->Application->GetIntRegisteryValue(
+        2, "RunTime", VTK_PV_SOURCES_BROWSER_ALWAYS_SHOW_NAME_REG_KEY))
+    {
+    this->SetSourcesBrowserAlwaysShowName(1);
+    }
+  else
+    {
+    this->SetSourcesBrowserAlwaysShowName(0);
+    }
+
+  // Interface settings: pack
+
+  this->Script("pack %s %s -side top -padx 2 -pady 2 -anchor w",
+               this->Display3DWidgets->GetWidgetName(),
+               this->SourcesBrowserAlwaysShowName->GetWidgetName());
+
+  // Camera settings
 
   this->Notebook->AddPage("Camera", 
                           "Camera and viewing navigation properties page");
@@ -1333,17 +1389,6 @@ void vtkPVRenderView::CreateViewProperties()
   frame->Delete();
 
   this->Notebook->Raise("General");
-
-  if ( 
-    !this->Application->GetRegisteryValue(2, "RunTime", "Display3DWidgets", 0) ||
-    pvwindow->GetIntRegisteryValue(2, "RunTime", "Display3DWidgets") )
-    {
-    this->SetDisplay3DWidgets(1);
-    }
-  else
-    {
-    this->SetDisplay3DWidgets(0);
-    }
 }
 
 //----------------------------------------------------------------------------
@@ -2394,7 +2439,7 @@ void vtkPVRenderView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVRenderView ";
-  this->ExtractRevision(os,"$Revision: 1.213.2.9 $");
+  this->ExtractRevision(os,"$Revision: 1.213.2.10 $");
 }
 
 //------------------------------------------------------------------------------

@@ -363,6 +363,11 @@ public:
   void Display3DWidgetsCallback();
   void SetDisplay3DWidgets(int s);
 
+  // Description:
+  // Show the names in sources browser.
+  void SourcesBrowserAlwaysShowNameCallback();
+  void SetSourcesBrowserAlwaysShowName(int s);
+
 protected:
   vtkPVRenderView();
   ~vtkPVRenderView();
@@ -410,6 +415,7 @@ protected:
 
   vtkKWLabeledFrame *InterfaceSettingsFrame;
   vtkKWCheckButton *Display3DWidgets;
+  vtkKWCheckButton *SourcesBrowserAlwaysShowName;
 
   vtkKWWidget *LODScalesFrame;
   vtkKWLabel *LODResolutionLabel;
