@@ -60,7 +60,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // ---------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWThumbWheel );
-vtkCxxRevisionMacro(vtkKWThumbWheel, "1.2");
+vtkCxxRevisionMacro(vtkKWThumbWheel, "1.3");
 
 // ---------------------------------------------------------------------------
 int vtkKWThumbWheelCommand(ClientData cd, 
@@ -190,7 +190,8 @@ vtkKWThumbWheel::~vtkKWThumbWheel()
 }
 
 // ---------------------------------------------------------------------------
-void vtkKWThumbWheel::Create(vtkKWApplication *app, const char *args)
+void vtkKWThumbWheel::Create(vtkKWApplication *app, 
+                             const char * vtkNotUsed(args))
 {
   const char *wname;
 
@@ -1351,7 +1352,7 @@ void vtkKWThumbWheel::UpdateThumbWheelImage(float pos)
 {
   // Show position indicator ? Compute range
 
-  int posx_start, posx_end;
+  int posx_start = 0, posx_end = 0;
   float indicator_hsv[3];
   if (this->DisplayThumbWheelPositionIndicator && 
       this->State == vtkKWThumbWheel::InMotion)
@@ -1389,7 +1390,7 @@ void vtkKWThumbWheel::UpdateThumbWheelImage(float pos)
   double notch_size = 
     1.0 / ((double)this->ThumbWheelWidth / (double)this->SizeOfNotches);
   
-  int last_notch;
+  int last_notch = 0;
   int relief_flag = 0;
 
   ostrstream img_name;
@@ -1553,7 +1554,7 @@ void vtkKWThumbWheel::UpdateThumbWheelImage(float pos)
 
     int *indicator_ptr = indicator;
     
-    unsigned char *img_ptr2;
+    unsigned char *img_ptr2 = 0;
     if (show_up_indicator)
       {
       img_ptr2 = img_buffer 
