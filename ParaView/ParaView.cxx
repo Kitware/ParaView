@@ -167,7 +167,6 @@ void Process_Init(vtkMultiProcessController *controller, void *arg )
       {
       cerr << "Could not delete application.\n";
       }
-    app->SetController(NULL);
     }
   else
     {
