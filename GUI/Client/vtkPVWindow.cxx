@@ -124,7 +124,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.547");
+vtkCxxRevisionMacro(vtkPVWindow, "1.548");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -2404,31 +2404,6 @@ void vtkPVWindow::SaveBatchScript(const char *filename, int offScreenFlag, const
     animationFlag = 1;
     }
 
-  // Should I continue to save the batch script if it
-  // does not save an image or geometry?
-
-  file = new ofstream(filename, ios::out);
-  if (file->fail())
-    {
-    vtkErrorMacro("Could not open file " << filename);
-    delete file;
-    return;
-    }
-
-  *file << "# ParaView Version " 
-        << this->GetPVApplication()->GetMajorVersion()
-        << "." << this->GetPVApplication()->GetMinorVersion() << "\n\n";
-
-
-  *file << endl << "#Initialization" << endl;
-
-  *file << endl << "vtkSMApplication app" << endl;
-  *file << "app Initialize" << endl;
-
-  *file << endl << "vtkSMObject foo" << endl;
-  *file << "set proxyManager [foo GetProxyManager]" << endl;
-  *file << "foo Delete" << endl << endl;
-
   const char* extension = 0;
   const char* writerName = 0;
   if (imageFileName && vtkString::Length(imageFileName) > 0)
@@ -2460,6 +2435,30 @@ void vtkPVWindow::SaveBatchScript(const char *filename, int offScreenFlag, const
         }
       }
     }
+  // Should I continue to save the batch script if it
+  // does not save an image or geometry?
+
+  file = new ofstream(filename, ios::out);
+  if (file->fail())
+    {
+    vtkErrorMacro("Could not open file " << filename);
+    delete file;
+    return;
+    }
+
+  *file << "# ParaView Version " 
+        << this->GetPVApplication()->GetMajorVersion()
+        << "." << this->GetPVApplication()->GetMinorVersion() << "\n\n";
+
+
+  *file << endl << "#Initialization" << endl;
+
+  *file << endl << "vtkSMApplication app" << endl;
+  *file << "app Initialize" << endl;
+
+  *file << endl << "vtkSMObject foo" << endl;
+  *file << "set proxyManager [foo GetProxyManager]" << endl;
+  *file << "foo Delete" << endl << endl;
 
   // Save the renderer stuff.
   this->GetMainView()->SaveInBatchScript(file);
@@ -2511,6 +2510,8 @@ void vtkPVWindow::SaveBatchScript(const char *filename, int offScreenFlag, const
     pvs->SaveInBatchScript(file);
     cit->GoToNextItem();
     }
+  cit->Delete();
+  cit = 0;
 
 // TODO replace this
 //   if (geometryFileName)
@@ -2534,23 +2535,39 @@ void vtkPVWindow::SaveBatchScript(const char *filename, int offScreenFlag, const
 
 //     }
 
+  *file << endl;
+
+  
   if (animationFlag)
     {
-    this->AnimationInterface->SaveInBatchScript(file, imageFileName, 
-                                                geometryFileName);
+    this->AnimationInterface->SaveInBatchScript(file, 
+                                                imageFileName, 
+                                                geometryFileName,
+                                                writerName);
     }
   else
     {
     *file << endl << "$Ren1 UpdateVTKObjects" << endl;
     if (imageFileName)
       {
-      *file << "$Ren1 WriteImage {" << imageFileName << "}\n";
+      *file 
+        << "$Ren1 WriteImage {" << imageFileName << "} " << writerName
+        << "\n";
       }
     else
       {
       *file << "$Ren1 StillRender" << endl;
       }
 
+    }
+
+  *file << endl;
+
+  // Mark all color maps as not visited.
+  this->PVColorMaps->InitTraversal();
+  while( (cm = (vtkPVColorMap*)(this->PVColorMaps->GetNextItemAsObject())) )
+    {    
+    cm->SetVisitedFlag(0);
     }
 
   it = this->SourceLists->NewIterator();
@@ -2565,7 +2582,11 @@ void vtkPVWindow::SaveBatchScript(const char *filename, int offScreenFlag, const
       while ( !collIt->IsDoneWithTraversal() )
         {
         pvs = static_cast<vtkPVSource*>(collIt->GetObject()); 
-        pvs->SetVisitedFlag(0);
+        if (pvs->GetVisitedFlag())
+          {
+          pvs->SetVisitedFlag(0);
+          pvs->CleanBatchScript(file);
+          }
         collIt->GoToNextItem();
         }
       collIt->Delete();
@@ -2574,30 +2595,12 @@ void vtkPVWindow::SaveBatchScript(const char *filename, int offScreenFlag, const
     }
   it->Delete();
 
-  // Mark all color maps as not visited.
-  this->PVColorMaps->InitTraversal();
-  while( (cm = (vtkPVColorMap*)(this->PVColorMaps->GetNextItemAsObject())) )
-    {    
-    cm->SetVisitedFlag(0);
-    }
-
-  *file << endl;
-  // Loop through sources saving the visible sources.
-  cit->InitTraversal();
-  while ( !cit->IsDoneWithTraversal() )
-    {
-    pvs = static_cast<vtkPVSource*>(cit->GetObject()); 
-    pvs->CleanBatchScript(file);
-    cit->GoToNextItem();
-    }
-  cit->Delete();
-
   this->GetMainView()->CleanBatchScript(file);
 
   *file << endl;
   *file << "app Finalize" << endl;
   *file << "app Delete" << endl;
-      
+   
 //   else
 //     { // Just do one frame.
 //     if (imageFileName)
@@ -2628,7 +2631,7 @@ void vtkPVWindow::SaveBatchScript(const char *filename, int offScreenFlag, const
     file->close();
     unlink(filename);
     }
-  
+
   delete file;
 }
 
