@@ -73,13 +73,13 @@ public:
 
   // Description:
   // This method allows scripts to modify the widgets value.
-  void SetMinValue(float val);
+  void  SetMinValue(float val);
   float GetMinValue();
-  void SetMaxValue(float val);
+  void  SetMaxValue(float val);
   float GetMaxValue();
-  void SetResolution(float res);
+  void  SetResolution(float res);
   float GetResolution();
-  void SetRange(float min, float max);
+  void  SetRange(float min, float max);
 
   // Description:
   // These commands are used to set/get values on/from the
@@ -119,6 +119,40 @@ public:
   // Set the balloon help string for the maximum value scale.
   void SetMaximumHelp(const char* help);
 
+  // Description:
+  // The underlying scales.
+  vtkGetMacro(PackVertically, int);
+  vtkSetMacro(PackVertically, int);
+  vtkBooleanMacro(PackVertically, int);
+
+  // Description:
+  // Should the label for the min. scale be displayed ?
+  vtkGetMacro(ShowMinLabel, int);
+  vtkSetMacro(ShowMinLabel, int);
+  vtkBooleanMacro(ShowMinLabel, int);
+
+  // Description:
+  // Should the label for the max. scale be displayed ?
+  vtkGetMacro(ShowMaxLabel, int);
+  vtkSetMacro(ShowMaxLabel, int);
+  vtkBooleanMacro(ShowMaxLabel, int);
+
+  // Description:
+  // What should the width of the min. label be ?
+  vtkGetMacro(MinLabelWidth, int);
+  vtkSetMacro(MinLabelWidth, int);
+
+
+  // Description:
+  // What should the width of the max. label be ?
+  vtkGetMacro(MaxLabelWidth, int);
+  vtkSetMacro(MaxLabelWidth, int);
+
+  // Description:
+  // The underlying scales.
+  vtkGetObjectMacro(MinScale, vtkKWScale);
+  vtkGetObjectMacro(MaxScale, vtkKWScale);
+
 //BTX
   // Description:
   // Creates and returns a copy of this widget. It will create
@@ -148,6 +182,14 @@ protected:
   char* MaxHelp;
   vtkSetStringMacro(MinHelp);
   vtkSetStringMacro(MaxHelp);
+
+  int PackVertically;
+
+  int ShowMinLabel;
+  int ShowMaxLabel;
+
+  int MinLabelWidth;
+  int MaxLabelWidth;
 
 //BTX
   virtual void CopyProperties(vtkPVWidget* clone, vtkPVSource* pvSource,
