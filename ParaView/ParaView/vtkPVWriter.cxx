@@ -100,7 +100,7 @@ void vtkPVWriter::Write(const char* fileName, const char* dataTclName,
 {
   vtkPVApplication* pvApp = this->GetPVApplication();
   
-  if(numProcs == 1)
+  if(!this->Parallel)
     {
     pvApp->BroadcastScript("%s writer", this->WriterClassName);
     pvApp->BroadcastScript("writer SetFileName %s", fileName);
