@@ -41,6 +41,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "vtkPVWindow.h"
 
+#include "vtkImageData.h"
+#include "vtkStructuredPoints.h"
+#include "vtkStructuredGrid.h"
+#include "vtkRectilinearGrid.h"
+#include "vtkPolyData.h"
+#include "vtkUnstructuredGrid.h"
 #include "vtkActor.h"
 #include "vtkArrayMap.txx"
 #include "vtkPVGenericRenderWindowInteractor.h"
@@ -130,7 +136,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.442");
+vtkCxxRevisionMacro(vtkPVWindow, "1.443");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -2301,14 +2307,35 @@ void vtkPVWindow::WriteData()
   vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
   pm->RootScript("%s GetClassName",
                  this->GetCurrentPVSource()->GetPVPart()->GetVTKDataTclName());
-  vtkObject* obj = vtkInstantiator::CreateInstance(pm->GetRootResult());
-  vtkDataSet* data = vtkDataSet::SafeDownCast(obj);
-  if(!data)
+  // Instantiator does not work for static builds and VTK objects.
+  vtkDataSet* data;
+  const char* dataClassName = pm->GetRootResult();
+  if (strcmp(dataClassName, "vtkImageData") == 0)
     {
-    if(obj)
-      {
-      obj->Delete();
-      }
+    data = vtkImageData::New();
+    }
+  else if (strcmp(dataClassName, "vtkStructuredPoints") == 0)
+    {
+    data = vtkStructuredPoints::New();
+    }
+  else if (strcmp(dataClassName, "vtkStructuredGrid") == 0)
+    {
+    data = vtkStructuredGrid::New();
+    }
+  else if (strcmp(dataClassName, "vtkRectilinearGrid") == 0)
+    {
+    data = vtkRectilinearGrid::New();
+    }
+  else if (strcmp(dataClassName, "vtkPolyData") == 0)
+    {
+    data = vtkPolyData::New();
+    }
+  else if (strcmp(dataClassName, "vtkUnstructuredGrid") == 0)
+    {
+    data = vtkUnstructuredGrid::New();
+    }
+  else
+    {
     vtkKWMessageDialog::PopupMessage(
       this->Application, this, "Error Saving File", 
       "Error getting data type from root node.",
@@ -2438,15 +2465,32 @@ vtkPVWriter* vtkPVWindow::FindPVWriter(const char* fileName, int parallel)
   vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
   pm->RootScript("%s GetClassName",
                  this->GetCurrentPVSource()->GetPVPart()->GetVTKDataTclName());
-  vtkObject* obj = vtkInstantiator::CreateInstance(pm->GetRootResult());
-  vtkDataSet* data = vtkDataSet::SafeDownCast(obj);
-  if(!data)
+
+  vtkDataSet* data;
+  const char* dataClassName = pm->GetRootResult();
+  if (strcmp(dataClassName, "vtkImageData") == 0)
     {
-    if(obj)
-      {
-      obj->Delete();
-      }
-    return 0;
+    data = vtkImageData::New();
+    }
+  else if (strcmp(dataClassName, "vtkStructuredPoints") == 0)
+    {
+    data = vtkStructuredPoints::New();
+    }
+  else if (strcmp(dataClassName, "vtkStructuredGrid") == 0)
+    {
+    data = vtkStructuredGrid::New();
+    }
+  else if (strcmp(dataClassName, "vtkRectilinearGrid") == 0)
+    {
+    data = vtkRectilinearGrid::New();
+    }
+  else if (strcmp(dataClassName, "vtkPolyData") == 0)
+    {
+    data = vtkPolyData::New();
+    }
+  else if (strcmp(dataClassName, "vtkUnstructuredGrid") == 0)
+    {
+    data = vtkUnstructuredGrid::New();
     }
 
   vtkLinkedListIterator<vtkPVWriter*>* it =
@@ -4206,7 +4250,7 @@ void vtkPVWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVWindow ";
-  this->ExtractRevision(os,"$Revision: 1.442 $");
+  this->ExtractRevision(os,"$Revision: 1.443 $");
 }
 
 //-----------------------------------------------------------------------------
