@@ -101,7 +101,6 @@ protected:
   // Keep the parameters here (in addition to the widgets)
   // so they can be set before the properties are created.
   int PropertiesCreated;
-  int ParametersInitialized;
   int SliceNumber;
   int SliceAxis;
   

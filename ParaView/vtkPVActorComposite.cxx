@@ -91,10 +91,6 @@ void vtkPVActorComposite::CreateProperties()
   this->Label->SetLabel("vtkPVActorComposite label");
   this->Script("pack %s", this->Label->GetWidgetName());
   
-  // Lets try to pick a reasonable scalar range.
-  float range[2];
-  this->GetInputScalarRange(range);
-  this->SetScalarRange(range[0], range[1]);
 }
 
 //----------------------------------------------------------------------------

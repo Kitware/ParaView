@@ -43,6 +43,8 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 class vtkTexture;
 class vtkPVComposite;
 class vtkPVImageTextureFilter;
+class vtkGeometryFilter;
+
 
 class VTK_EXPORT vtkPVImage : public vtkPVData
 {
@@ -67,14 +69,14 @@ public:
   void Slice();
   
   // Description:
-  // Like update extent, but an object tells which piece to assign this process.
-  void SetAssignment(vtkPVAssignment *a);
-
-  // Description:
   // Uses the assignment to set the extent, then updates the data.
   void Update();
   
-
+  // Description: 
+  // The geometry filter needs to know how to break up the extent.
+  // Maybe we should just make the geometry filter a PVFilter.
+  void SetAssignment(vtkPVAssignment *a);
+  
 protected:
   vtkPVImage();
   ~vtkPVImage();
@@ -85,6 +87,14 @@ protected:
   
   vtkPVImageTextureFilter *TextureFilter;
   vtkTexture *Texture;
+  
+  vtkGeometryFilter *GeometryFilter;
 };
 
 #endif
+
+
+
+
+
+

@@ -62,7 +62,6 @@ vtkPVImageSlice::vtkPVImageSlice()
   this->Slice->ClipDataOn();
   
   this->PropertiesCreated = 0;
-  this->ParametersInitialized = 0;
   this->SliceNumber = 0;
   this->SliceAxis = 3;
 }
@@ -133,30 +132,6 @@ void vtkPVImageSlice::CreateProperties()
 	       this->YDimension->GetWidgetName(),
 	       this->ZDimension->GetWidgetName());
 
-
-  if (this->ParametersInitialized == 0 && this->Slice->GetInput())
-    {
-    // Lets try to setup a good default.
-    this->Slice->UpdateInformation();
-    int *ext = this->Slice->GetOutput()->GetWholeExtent();
-    if (ext[0] == ext[1])
-      {
-      this->SetSliceNumber(ext[0]);
-      this->SliceAxis = 0;
-      }
-    else if (ext[2] == ext[3])
-      {
-      this->SliceNumber = ext[1];
-      this->SliceAxis = 1;
-      }
-    else
-      {
-      this->SliceNumber = (int)(((float)(ext[4]) + (float)(ext[5])) * 0.5);
-      this->SliceAxis = 2;
-      }
-    this->ParametersInitialized = 1;
-    }
-  
   this->UpdateProperties();
 }
 
@@ -214,7 +189,6 @@ void vtkPVImageSlice::UpdateProperties()
 //----------------------------------------------------------------------------
 void vtkPVImageSlice::SetSliceNumber(int num)
 {
-  this->ParametersInitialized = 1;
   if (this->SliceNumber == num)
     {
     return;
@@ -229,7 +203,6 @@ void vtkPVImageSlice::SetSliceNumber(int num)
 //----------------------------------------------------------------------------
 void vtkPVImageSlice::SetSliceAxis(int axis)
 {
-  this->ParametersInitialized = 1;
   if (this->SliceAxis == axis)
     {
     return;
@@ -265,23 +238,7 @@ void vtkPVImageSlice::SliceChanged()
     this->SliceAxis = 2;
     }
   this->SliceNumber = this->SliceEntry->GetValueAsInt();
-  this->ParametersInitialized = 1;
   
-  // Create the data if this is the first accept.
-  if (this->GetPVData() == NULL)
-    {
-    pvi = vtkPVImage::New();
-    pvi->Clone(pvApp);
-    pvi->OutlineFlagOff();
-    this->SetOutput(pvi);
-    a = this->GetInput()->GetAssignment();
-    pvi->SetAssignment(a);  
-    this->GetInput()->GetActorComposite()->VisibilityOff();
-    this->CreateDataPage();
-    ac = this->GetPVData()->GetActorComposite();
-    window->GetMainView()->AddComposite(ac);
-    }
-
   // Set the extent of the clip filter.
   this->Slice->GetInput()->UpdateInformation();
   ext = this->Slice->GetInput()->GetWholeExtent();
@@ -326,6 +283,28 @@ void vtkPVImageSlice::SliceChanged()
 				      this->SliceNumber, this->SliceNumber);
     }  
   
+  // Create the data if this is the first accept.
+  if (this->GetPVData() == NULL)
+    {
+    pvi = vtkPVImage::New();
+    pvi->Clone(pvApp);
+    pvi->OutlineFlagOff();
+    this->SetOutput(pvi);
+    a = this->GetInput()->GetAssignment();
+    pvi->SetAssignment(a);  
+    this->GetInput()->GetActorComposite()->VisibilityOff();
+    this->CreateDataPage();
+    ac = this->GetPVData()->GetActorComposite();
+    window->GetMainView()->AddComposite(ac);
+
+    // Lets try to pick a reasonable scalar range.
+    float range[2];
+    // The GetScalarRange is in vtkPVActorComposite instead of vtkPVData,
+    // because the actor composite knows what piece to request.
+    ac->GetInputScalarRange(range);
+    ac->SetScalarRange(range[0], range[1]);
+    }
+
   window->GetMainView()->SetSelectedComposite(this);
   this->GetView()->Render();  
 }

@@ -43,11 +43,17 @@ vtkPVImage::vtkPVImage()
 {
   this->OutlineFlag = 1;
   this->CommandFunction = vtkPVImageCommand;
+  this->GeometryFilter = NULL;
 }
 
 //----------------------------------------------------------------------------
 vtkPVImage::~vtkPVImage()
 {
+  if (this->GeometryFilter)
+    {
+    this->GeometryFilter->Delete();
+    this->GeometryFilter = NULL;
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -103,6 +109,25 @@ void vtkPVImage::Slice()
   window->SetCurrentSource(slice);
   window->GetSourceList()->Update();
   
+  // Lets try to setup a good default parameters.
+  this->GetImageData()->UpdateInformation();
+  int *ext = this->GetImageData()->GetWholeExtent();
+  if (ext[0] == ext[1])
+    {
+    slice->SetSliceNumber(ext[0]);
+    slice->SetSliceAxis(0);
+    }
+  else if (ext[2] == ext[3])
+    {
+    slice->SetSliceNumber(ext[1]);
+    slice->SetSliceAxis(1);
+    }
+  else
+    {
+    slice->SetSliceNumber((int)(((float)(ext[4]) + (float)(ext[5])) * 0.5));
+    slice->SetSliceAxis(2);
+    }
+  
   slice->Delete();
 }
 
@@ -124,10 +149,14 @@ int vtkPVImage::Create(char *args)
 void vtkPVImage::SetImageData(vtkImageData *image)
 {
   vtkImageOutlineFilter *outline;
-  vtkGeometryFilter *geometry;
 
   this->SetData(image);
   this->ActorComposite->SetApplication(this->Application);
+  
+  if (this->Assignment)
+    {
+    image->SetExtentTranslator(this->Assignment->GetTranslator());
+    }
   
   // This should really be changed to switch mappers.  The flag
   // could them be turned on and off ...
@@ -143,16 +172,19 @@ void vtkPVImage::SetImageData(vtkImageData *image)
   else
     {
     image->UpdateInformation();
-    geometry = vtkGeometryFilter::New();
-    geometry->SetInput(image);
-    this->Mapper->SetInput(geometry->GetOutput());
+    if (this->GeometryFilter == NULL)
+      {
+      this->GeometryFilter = vtkGeometryFilter::New();
+      }
+    this->GeometryFilter->SetInput(image);
+    this->Mapper->SetInput(this->GeometryFilter->GetOutput());
     this->Mapper->SetScalarRange(this->Data->GetScalarRange());
-    this->ActorComposite->SetInput(geometry->GetOutput());
-    geometry->Delete();
+    this->ActorComposite->SetInput(this->GeometryFilter->GetOutput());
     }
   
   this->Actor->SetMapper(this->Mapper);
 }
+
 
 //----------------------------------------------------------------------------
 vtkImageData* vtkPVImage::GetImageData()
@@ -163,31 +195,15 @@ vtkImageData* vtkPVImage::GetImageData()
 //----------------------------------------------------------------------------
 void vtkPVImage::SetAssignment(vtkPVAssignment *a)
 {
-  if (this->Assignment == a)
+  // This will take care of broadcasting the method
+  this->vtkPVData::SetAssignment(a);
+  
+  if (a && this->GetImageData())
     {
-    return;
+    this->GetImageData()->SetExtentTranslator(a->GetTranslator());
     }
   
-  if (this->Assignment)
-    {
-    this->Assignment->UnRegister(NULL);
-    this->Assignment = NULL;
-    }
-
-  if (a)
-    {
-    vtkImageData *image = this->GetImageData();
-    
-    if (image == NULL)
-      {
-      vtkErrorMacro("I do not have an image to make an assignment.");
-      return;
-      }
-    this->Assignment = a;
-    a->Register(this);
-    }
 }
-
 
 
 //----------------------------------------------------------------------------
