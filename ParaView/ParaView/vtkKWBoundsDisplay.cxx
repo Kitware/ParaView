@@ -46,7 +46,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWBoundsDisplay);
-vtkCxxRevisionMacro(vtkKWBoundsDisplay, "1.5.2.2");
+vtkCxxRevisionMacro(vtkKWBoundsDisplay, "1.5.2.3");
 
 int vtkKWBoundsDisplayCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -180,15 +180,15 @@ void vtkKWBoundsDisplay::UpdateWidgets()
     else
       {
       char tmp[350];
-      sprintf(tmp, "X range: %f to %f (delta: %f)", 
+      sprintf(tmp, "X range: %.3f to %.3f (delta: %.3f)", 
               this->Bounds[0], this->Bounds[1], 
               this->Bounds[1] - this->Bounds[0]);
       this->XRangeLabel->SetLabel(tmp);
-      sprintf(tmp, "Y range: %f to %f (delta: %f)", 
+      sprintf(tmp, "Y range: %.3f to %.3f (delta: %.3f)", 
               this->Bounds[2], this->Bounds[3],
               this->Bounds[3] - this->Bounds[2]);
       this->YRangeLabel->SetLabel(tmp);
-      sprintf(tmp, "Z range: %f to %f (delta: %f)", 
+      sprintf(tmp, "Z range: %.3f to %.3f (delta: %.3f)", 
               this->Bounds[4], this->Bounds[5],
               this->Bounds[5] - this->Bounds[4]);
       this->ZRangeLabel->SetLabel(tmp);
