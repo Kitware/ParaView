@@ -121,7 +121,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.391.2.1");
+vtkCxxRevisionMacro(vtkPVWindow, "1.391.2.2");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -926,17 +926,6 @@ void vtkPVWindow::Create(vtkKWApplication *app, char* vtkNotUsed(args))
     pvApp->GetSplashScreen()->SetProgressMessage("Creating UI (interactors)...");
     }
   this->InitializeInteractorInterfaces(app);
-
-  // Initialize a couple of variables in the trace file.
-  pvApp->AddTraceEntry("set kw(%s) [$Application GetMainWindow]",
-                       this->GetTclName());
-  this->SetTraceInitialized(1);
-  // We have to set this variable after the window variable is set,
-  // so it has to be done here.
-  pvApp->AddTraceEntry("set kw(%s) [$kw(%s) GetMainView]",
-                       this->GetMainView()->GetTclName(), this->GetTclName());
-  this->GetMainView()->SetTraceInitialized(1);
-
 
   this->PickCenterToolbar->SetParent(this->GetToolbarFrame());
   this->PickCenterToolbar->Create(app);
@@ -3242,17 +3231,15 @@ int vtkPVWindow::SaveTrace(const char* filename)
 {
   ofstream *trace = this->GetPVApplication()->GetTraceFile();
 
-  if ( ! trace)
-    {
-    return 0;
-    }
-  
   if (vtkString::Length(filename) <= 0)
     {
     return 0;
     }
-  
-  trace->close();
+
+  if (trace)
+    {
+    trace->close();
+    }
   
   const int bufferSize = 4096;
   char buffer[bufferSize];
@@ -3269,7 +3256,10 @@ int vtkPVWindow::SaveTrace(const char* filename)
       }
     }
 
-  trace->open("ParaViewTrace.pvs", ios::in | ios::app );
+  if (trace)
+    {
+    trace->open("ParaViewTrace.pvs", ios::in | ios::app );
+    }
   return 1;
 }
 
@@ -3786,7 +3776,7 @@ void vtkPVWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVWindow ";
-  this->ExtractRevision(os,"$Revision: 1.391.2.1 $");
+  this->ExtractRevision(os,"$Revision: 1.391.2.2 $");
 }
 
 //----------------------------------------------------------------------------

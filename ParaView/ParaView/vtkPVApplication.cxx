@@ -99,7 +99,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.156");
+vtkCxxRevisionMacro(vtkPVApplication, "1.156.2.1");
 
 int vtkPVApplicationCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -251,36 +251,17 @@ vtkPVApplication::vtkPVApplication()
   char name[128];
   this->CommandFunction = vtkPVApplicationCommand;
   this->MajorVersion = 0;
-  this->MinorVersion = 5;
+  this->MinorVersion = 6;
   this->SetApplicationName("ParaView");
   sprintf(name, "ParaView%d.%d", this->MajorVersion, this->MinorVersion);
   this->SetApplicationVersionName(name);
-  this->SetApplicationReleaseName("development");
+  this->SetApplicationReleaseName("1");
 
   this->Controller = NULL;
   this->NumberOfPipes = 1;
 
   this->UseRenderingGroup = 0;
   this->GroupFileName = 0;
-
-  struct stat fs;
-
-  if (stat("ParaViewTrace1.pvs", &fs) == 0) 
-    {
-    rename("ParaViewTrace1.pvs", "ParaViewTrace2.pvs");
-    }
-
-  if (stat("ParaViewTrace.pvs", &fs) == 0) 
-    {
-    rename("ParaViewTrace.pvs", "ParaViewTrace1.pvs");
-    }
-
-  this->TraceFile = new ofstream("ParaViewTrace.pvs", ios::out);
-  if (this->TraceFile && this->TraceFile->fail())
-    {
-    delete this->TraceFile;
-    this->TraceFile = NULL;
-    }
 
   // GUI style & consistency
 
@@ -358,6 +339,7 @@ vtkPVApplication::~vtkPVApplication()
     delete this->TraceFile;
     this->TraceFile = 0;
     }
+  unlink("ParaViewTrace.pvs");
   this->SetGroupFileName(0);
 }
 
@@ -596,14 +578,6 @@ void vtkPVApplication::SetEnvironmentVariable(const char* str)
 //----------------------------------------------------------------------------
 void vtkPVApplication::Start(int argc, char*argv[])
 {
-  // Splash screen ?
-
-  if (this->ShowSplashScreen)
-    {
-    this->CreateSplashScreen();
-    this->SplashScreen->SetProgressMessage("Initializing application...");
-    }
-
   // Application Icon 
 #ifdef _WIN32
   this->Script("SetApplicationIcon %s.exe %d big",
@@ -777,6 +751,15 @@ void vtkPVApplication::Start(int argc, char*argv[])
     }
 #endif
 
+  // Splash screen ?
+
+  if (this->ShowSplashScreen)
+    {
+    this->CreateSplashScreen();
+    this->SplashScreen->SetProgressMessage("Initializing application...");
+    }
+
+
   vtkPVWindow *ui = vtkPVWindow::New();
   this->Windows->AddItem(ui);
 
@@ -822,6 +805,57 @@ void vtkPVApplication::Start(int argc, char*argv[])
     {
     this->SplashScreen->Hide();
     }
+
+  // Open the trace file.
+  struct stat fs;
+
+  if (stat("ParaViewTrace.pvs", &fs) == 0 && ! this->RunningParaViewScript) 
+    {
+    vtkKWMessageDialog *dlg2 = vtkKWMessageDialog::New();
+    dlg2->SetStyleToOkCancel();
+    dlg2->SetOptions(
+      vtkKWMessageDialog::WarningIcon | vtkKWMessageDialog::Beep | 
+      vtkKWMessageDialog::YesDefault );
+    dlg2->SetMasterWindow(ui);
+    dlg2->SetOKButtonText("Save");
+    dlg2->SetCancelButtonText("Overwrite");
+    dlg2->Create(this,"");
+    dlg2->SetText( 
+      "Are you sure you want to overwrite the tracefile?\n\n"
+      "A tracefile called ParaViewTrace.pvs was found in "
+      "the current directory. This might mean that ParaView crashed "
+      "previously and failed to delete it. This tracefile can be useful "
+      "in tracing the problem." );
+    dlg2->SetTitle("Overwrite");
+    dlg2->SetIcon();
+    int shouldSave = dlg2->Invoke();
+    dlg2->Delete();
+    if (shouldSave)
+      {
+      ui->SaveTrace();
+      }
+    }
+
+  if (this->TraceFile && this->TraceFile->fail())
+    {
+    delete this->TraceFile;
+    this->TraceFile = NULL;
+    }
+
+
+  this->TraceFile = new ofstream("ParaViewTrace.pvs", ios::out);
+    
+  // Initialize a couple of variables in the trace file.
+  this->AddTraceEntry("set kw(%s) [$Application GetMainWindow]",
+                      ui->GetTclName());
+  ui->SetTraceInitialized(1);
+  // We have to set this variable after the window variable is set,
+  // so it has to be done here.
+  this->AddTraceEntry("set kw(%s) [$kw(%s) GetMainView]",
+                      ui->GetMainView()->GetTclName(), ui->GetTclName());
+  ui->GetMainView()->SetTraceInitialized(1);
+
+
 
   // Handle setting up the SGI pipes.
   if (this->UseRenderingGroup)
