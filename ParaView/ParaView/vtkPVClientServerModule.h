@@ -61,7 +61,7 @@ class vtkPVDataInformation;
 class vtkMultiProcessController;
 class vtkSocketController;
 class vtkMapper;
-class vtkDataSet;
+class vtkSource;
 
 
 class VTK_EXPORT vtkPVClientServerModule : public vtkPVProcessModule
@@ -120,7 +120,7 @@ public:
 
   // Description:
   // Module dependant method for collecting data information from all procs.
-  virtual void GatherDataInformation(vtkDataSet *data);
+  virtual void GatherDataInformation(vtkSource *deci);
 
   // Description:
   // This executes a script on process 0 of the server.

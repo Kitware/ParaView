@@ -49,6 +49,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVApplication.h"
 #include "vtkPVDataInformation.h"
 #include "vtkDataSet.h"
+#include "vtkSource.h"
 #include "vtkFloatArray.h"
 #include "vtkDoubleArray.h"
 #include "vtkCharArray.h"
@@ -73,7 +74,7 @@ struct vtkPVArgs
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProcessModule);
-vtkCxxRevisionMacro(vtkPVProcessModule, "1.5");
+vtkCxxRevisionMacro(vtkPVProcessModule, "1.6");
 
 int vtkPVProcessModuleCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -242,24 +243,58 @@ int vtkPVProcessModule::GetNumberOfPartitions()
 
 //----------------------------------------------------------------------------
 void vtkPVProcessModule::GatherDataInformation(vtkPVDataInformation* info, 
-                                               char *dataTclName)
+                                               char* deciTclName)
 {
   // This ivar is so temprary, we do not need to increase the reference count.
   this->TemporaryInformation = info;
   this->BroadcastScript("[$Application GetProcessModule] GatherDataInformation %s",
-                        dataTclName); 
+                        deciTclName); 
   this->TemporaryInformation = NULL; 
 }
 
 
 //----------------------------------------------------------------------------
-void vtkPVProcessModule::GatherDataInformation(vtkDataSet *data)
+void vtkPVProcessModule::GatherDataInformation(vtkSource *deci)
 {
-  if (data == NULL)
+  vtkDataObject** inputs;
+  vtkSource* geo;
+  vtkDataSet* data;
+
+  if (deci == NULL)
     {
-    vtkErrorMacro("Data Tcl name has not been set correctly.");
+    vtkErrorMacro("Deci tcl name must be wrong.");
     return;
     }
+
+  // Get the data object form the decimate filter.
+  // This is a bit of a hack. Maybe we should have a PVPart object
+  // on all processes.
+  // Sanity checks to avoid slim chance of segfault.
+  inputs = deci->GetInputs(); 
+  if (inputs == NULL || inputs[0] == NULL)
+    {
+    vtkErrorMacro("Could not get deci input.");
+    return;
+    }
+  geo = inputs[0]->GetSource();
+  if (geo == NULL)
+    {
+    vtkErrorMacro("Could not get geo.");
+    return;
+    }
+  inputs = deci->GetInputs(); 
+  if (inputs == NULL || inputs[0] == NULL)
+    {
+    vtkErrorMacro("Could not get geo input.");
+    return;
+    }
+  data = vtkDataSet::SafeDownCast(inputs[0]);
+  if (data == NULL)
+    {
+    vtkErrorMacro("It couldn't be a vtkDataObject???");
+    return;
+    }
+
   this->TemporaryInformation->CopyFromData(data);
 }
 

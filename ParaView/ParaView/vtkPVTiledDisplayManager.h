@@ -82,13 +82,6 @@ public:
   vtkSetVector2Macro(TileDimensions, int);
   vtkGetVector2Macro(TileDimensions, int);
 
-  // Description:
-  // Set the total number of processes.
-  // Will be replaced by MPI num procs eventually.
-  vtkSetMacro(NumberOfProcesses,int);
-  vtkGetMacro(NumberOfProcesses,int);
-
-
 //BTX
   enum Tags {
     RENDER_RMI_TAG=12721,

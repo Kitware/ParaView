@@ -93,7 +93,7 @@ public:
 
   // Description:
   // This method should eventually replace "CompleteArrays" ...
-  virtual void GatherDataInformation(vtkDataSet *data);
+  virtual void GatherDataInformation(vtkSource *deci);
     
   // Description:
   // Get the partition number. -1 means no assigned partition.

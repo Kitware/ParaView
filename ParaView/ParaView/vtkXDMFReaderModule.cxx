@@ -58,7 +58,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkXDMFReaderModule);
-vtkCxxRevisionMacro(vtkXDMFReaderModule, "1.2");
+vtkCxxRevisionMacro(vtkXDMFReaderModule, "1.3");
 
 int vtkXDMFReaderModuleCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -115,8 +115,7 @@ int vtkXDMFReaderModule::ReadFileInformation(const char* fname)
     dlg->SetTitle("Domain and Grid Selection");
     dlg->SetMasterWindow(this->GetPVWindow());
     dlg->Create(pvApp,0);
-    char *msg="Select Domain and Grid";
-    dlg->SetText(msg);
+    dlg->SetText("Select Domain and Grid");
     vtkKWLabeledFrame* frame = vtkKWLabeledFrame::New();
     frame->SetParent(dlg->GetMessageDialogFrame());
     frame->Create(pvApp, 0);

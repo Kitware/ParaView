@@ -20,7 +20,7 @@
 #include "vtkObjectFactory.h"
 
 
-vtkCxxRevisionMacro(vtkTiledDisplaySchedule, "1.1");
+vtkCxxRevisionMacro(vtkTiledDisplaySchedule, "1.2");
 vtkStandardNewMacro(vtkTiledDisplaySchedule);
 
 
@@ -389,6 +389,8 @@ void vtkTiledDisplaySchedule::PrintSelf(ostream& os, vtkIndent indent)
   vtkTiledDisplayProcess* p;
   vtkTiledDisplayElement* e;
   vtkIndent i2 = indent.GetNextIndent();
+
+  this->Superclass::PrintSelf(os, indent);
 
   os << indent << "Schedule: (" << this << ")\n";
 

@@ -67,10 +67,6 @@ public:
   void CreateProperties();
 
   // Description:
-  // We are redefine the input to the VTK probes source.
-  virtual void SetPVInput(vtkPVData *input);
-
-  // Description:
   // Methods to call when this pv source is selected/deselected
   virtual void Deselect() { this->Deselect(1); }
   virtual void Deselect(int doPackForget);

@@ -47,6 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkMultiProcessController.h"
 #include "vtkPVApplication.h"
 #include "vtkDataSet.h"
+#include "vtkSource.h"
 #include "vtkFloatArray.h"
 #include "vtkDoubleArray.h"
 #include "vtkCharArray.h"
@@ -86,7 +87,7 @@ void vtkPVSlaveScript(void *localArg, void *remoteArg,
 
  //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVMPIProcessModule);
-vtkCxxRevisionMacro(vtkPVMPIProcessModule, "1.7");
+vtkCxxRevisionMacro(vtkPVMPIProcessModule, "1.8");
 
 int vtkPVMPIProcessModuleCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -306,19 +307,52 @@ int vtkPVMPIProcessModule::GetNumberOfPartitions()
 
 //----------------------------------------------------------------------------
 // This method is broadcast to all processes.
-void vtkPVMPIProcessModule::GatherDataInformation(vtkDataSet *data)
+void vtkPVMPIProcessModule::GatherDataInformation(vtkSource *deci)
 {
+  vtkDataObject** inputs;
+  vtkSource* geo;
+  vtkDataSet* data;
   int length;
   unsigned char *msg;
   int myId = this->Controller->GetLocalProcessId();
-  vtkPVDataInformation *tmp = vtkPVDataInformation::New();
+  vtkPVDataInformation *tmp;
 
-  if (data == NULL)
+  if (deci == NULL)
     {
-    vtkErrorMacro("Data Tcl name must be wrong.");
+    vtkErrorMacro("Deci tcl name must be wrong.");
     return;
     }
 
+  // Get the data object form the decimate filter.
+  // This is a bit of a hack. Maybe we should have a PVPart object
+  // on all processes.
+  // Sanity checks to avoid slim chance of segfault.
+  inputs = deci->GetInputs(); 
+  if (inputs == NULL || inputs[0] == NULL)
+    {
+    vtkErrorMacro("Could not get deci input.");
+    return;
+    }
+  geo = inputs[0]->GetSource();
+  if (geo == NULL)
+    {
+    vtkErrorMacro("Could not get geo.");
+    return;
+    }
+  inputs = geo->GetInputs(); 
+  if (inputs == NULL || inputs[0] == NULL)
+    {
+    vtkErrorMacro("Could not get geo input.");
+    return;
+    }
+  data = vtkDataSet::SafeDownCast(inputs[0]);
+  if (data == NULL)
+    {
+    vtkErrorMacro("It couldn't be a vtkDataObject???");
+    return;
+    }
+
+  tmp = vtkPVDataInformation::New();
   if (myId != 0)
     {
     tmp->CopyFromData(data);

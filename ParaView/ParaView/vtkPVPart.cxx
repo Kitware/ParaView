@@ -63,7 +63,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPart);
-vtkCxxRevisionMacro(vtkPVPart, "1.3");
+vtkCxxRevisionMacro(vtkPVPart, "1.4");
 
 int vtkPVPartCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -440,7 +440,7 @@ void vtkPVPart::GatherDataInformation()
   vtkPVApplication *pvApp = this->GetPVApplication();
   vtkPVProcessModule *pm = pvApp->GetProcessModule();
 
-  pm->GatherDataInformation(this->DataInformation, this->VTKDataTclName);
+  pm->GatherDataInformation(this->DataInformation, this->LODDeciTclName);
 
   // Look for a name defined in Field data.
   this->SetName(this->DataInformation->GetName());

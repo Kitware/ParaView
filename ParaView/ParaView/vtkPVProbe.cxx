@@ -65,7 +65,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProbe);
-vtkCxxRevisionMacro(vtkPVProbe, "1.87");
+vtkCxxRevisionMacro(vtkPVProbe, "1.88");
 
 int vtkPVProbeCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -130,26 +130,6 @@ vtkPVProbe::~vtkPVProbe()
   this->ProbeFrame->Delete();
   this->ProbeFrame = NULL;
   
-}
-
-//----------------------------------------------------------------------------
-void vtkPVProbe::SetPVInput(vtkPVData *pvd)
-{
-  vtkPVApplication *pvApp = this->GetPVApplication();
-  
-  if (pvApp == NULL)
-    {
-    vtkErrorMacro("No Application. Create the source before setting the input.");
-    return;
-    }
-
-  this->SetNthPVInput(0, pvd);
-
-  // Notice this is set to the source and not the input.
-  // This fits the interface better and was necessary for the
-  // rather inflexible vtkPVArrayMenu.
-  pvApp->BroadcastScript("%s SetSource %s", this->GetVTKSourceTclName(),
-                         pvd->GetPVPart()->GetVTKDataTclName());
 }
 
 //----------------------------------------------------------------------------

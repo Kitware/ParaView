@@ -54,7 +54,7 @@ class vtkPVPart;
 class vtkPVApplication;
 class vtkPVDataInformation;
 class vtkMapper;
-class vtkDataSet;
+class vtkSource;
 
 
 class VTK_EXPORT vtkPVProcessModule : public vtkKWObject
@@ -97,15 +97,16 @@ public:
   vtkGetObjectMacro(Controller, vtkMultiProcessController);
 
   // Description:
-  // This should evenetually replace "CompleteArrays" ...
+  // This has migrated into get PVPartInformation.
+  // If there were PVParts on all processes, the API would be simpler.
   // User calls the first method passing info object.
   // Second method gets broadcasted to all procs.
   // I dislike this, but the info get temporarily stored as an ivar.
   // If vtkPVPart existed on all processes, 
   // it would make this method cleaner.
   void GatherDataInformation(vtkPVDataInformation *info, 
-                             char *dataTclName);
-  virtual void GatherDataInformation(vtkDataSet *data);
+                             char* deciTclName); 
+  virtual void GatherDataInformation(vtkSource* deci);
   
   // Description:
   // Get the partition piece.  -1 means no assigned piece.

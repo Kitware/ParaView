@@ -109,7 +109,7 @@ static unsigned char image_properties[] =
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.236");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.237");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -1569,7 +1569,7 @@ void vtkPVRenderView::StandardViewCallback(float x, float y, float z)
     cam->SetViewUp(0.0, 1.0, 0.0);
     }
 
-  this->GetRenderer()->ResetCamera();
+  this->ResetCamera();
   this->EventuallyRender();
 }
 
@@ -1671,26 +1671,14 @@ void vtkPVRenderView::ComputeVisiblePropBounds(float bds[6])
 //----------------------------------------------------------------------------
 void vtkPVRenderView::ResetCamera()
 {
-  vtkCamera *cam;
-  double *n;
-  double mag2;
   float bds[6];
 
-  // Lets see if we can correct the situation when camera ivars go arwy.
-  // Unfortunately, I cannot reproduce the problem.
-  cam = this->GetRenderer()->GetActiveCamera();
-  n = cam->GetViewPlaneNormal();
-  mag2 = n[0]*n[0] + n[1]*n[1] + n[2]*n[2];
-  if (mag2 > 99999.0 || mag2 < -99999.0)
-    {
-    // Must be a problem.
-    cam->SetPosition(0.0, 0.0, -1.0);
-    cam->SetFocalPoint(0.0, 0.0, -1.0);
-    cam->SetViewUp(0.0, 1.0, 0.0);
-    }
 
   this->ComputeVisiblePropBounds(bds);
-  this->GetRenderer()->ResetCamera(bds);
+  if (bds[0] <= bds[1] && bds[2] <= bds[3] && bds[4] <= bds[5])
+    {
+    this->GetRenderer()->ResetCamera(bds);
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -2693,7 +2681,7 @@ void vtkPVRenderView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVRenderView ";
-  this->ExtractRevision(os,"$Revision: 1.236 $");
+  this->ExtractRevision(os,"$Revision: 1.237 $");
 }
 
 //------------------------------------------------------------------------------

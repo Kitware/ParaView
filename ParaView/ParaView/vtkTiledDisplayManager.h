@@ -84,12 +84,6 @@ public:
   vtkSetVector2Macro(TileDimensions, int);
   vtkGetVector2Macro(TileDimensions, int);
 
-  // Description:
-  // Set the total number of processes.
-  // Will be replaced by MPI num procs eventually.
-  vtkSetMacro(NumberOfProcesses,int);
-  vtkGetMacro(NumberOfProcesses,int);
-
 
 //BTX
   enum Tags {
@@ -113,12 +107,6 @@ public:
   // Description:
   // Tile processes are probably going to be 0, 1, 2 ...
   //void SetTileProcesses(int idx, int id);
-
-
-  // This keeps processes 0 out of the rendering composite group.
-  vtkSetMacro(ZeroEmpty, int);
-  vtkGetMacro(ZeroEmpty, int);
-  vtkBooleanMacro(ZeroEmpty, int);
 
   void InitializeSchedule();
   int ShuffleLevel(int level, int numTiles, 

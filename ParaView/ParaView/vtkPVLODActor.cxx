@@ -50,12 +50,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkTexture.h"
 #include "vtkTimerLog.h"
 #include "vtkTransform.h"
+#include "vtkRenderer.h"
 
 #include <math.h>
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLODActor);
-vtkCxxRevisionMacro(vtkPVLODActor, "1.16");
+vtkCxxRevisionMacro(vtkPVLODActor, "1.17");
 
 vtkCxxSetObjectMacro(vtkPVLODActor, LODMapper, vtkMapper);
 
@@ -162,7 +163,7 @@ void vtkPVLODActor::Render(vtkRenderer *ren, vtkMapper *vtkNotUsed(m))
 int vtkPVLODActor::RenderOpaqueGeometry(vtkViewport *vp)
 {
   int          renderedSomething = 0; 
-  vtkRenderer  *ren = (vtkRenderer *)vp;
+  vtkRenderer  *ren = static_cast<vtkRenderer*>(vp);
 
   if ( ! this->Mapper )
     {

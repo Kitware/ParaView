@@ -51,6 +51,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVApplication.h"
 #include "vtkDataSet.h"
 #include "vtkPVDataInformation.h"
+#include "vtkSource.h"
 #include "vtkFloatArray.h"
 #include "vtkDoubleArray.h"
 #include "vtkCharArray.h"
@@ -148,7 +149,7 @@ void vtkPVRelayRemoteScript(void *localArg, void *remoteArg,
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVClientServerModule);
-vtkCxxRevisionMacro(vtkPVClientServerModule, "1.13");
+vtkCxxRevisionMacro(vtkPVClientServerModule, "1.14");
 
 int vtkPVClientServerModuleCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -621,15 +622,47 @@ int vtkPVClientServerModule::GetNumberOfPartitions()
 
 //----------------------------------------------------------------------------
 // This method is broadcast to all processes.
-void vtkPVClientServerModule::GatherDataInformation(vtkDataSet *data)
+void vtkPVClientServerModule::GatherDataInformation(vtkSource *deci)
 {
   int length;
   unsigned char *msg;
   int myId = this->Controller->GetLocalProcessId();
+  vtkDataObject** inputs;
+  vtkSource* geo;
+  vtkDataSet* data;
 
+  if (deci == NULL)
+    {
+    vtkErrorMacro("Deci tcl name must be wrong.");
+    return;
+    }
+
+  // Get the data object form the decimate filter.
+  // This is a bit of a hack. Maybe we should have a PVPart object
+  // on all processes.
+  // Sanity checks to avoid slim chance of segfault.
+  inputs = deci->GetInputs(); 
+  if (inputs == NULL || inputs[0] == NULL)
+    {
+    vtkErrorMacro("Could not get deci input.");
+    return;
+    }
+  geo = inputs[0]->GetSource();
+  if (geo == NULL)
+    {
+    vtkErrorMacro("Could not get geo.");
+    return;
+    }
+  inputs = deci->GetInputs(); 
+  if (inputs == NULL || inputs[0] == NULL)
+    {
+    vtkErrorMacro("Could not get geo input.");
+    return;
+    }
+  data = vtkDataSet::SafeDownCast(inputs[0]);
   if (data == NULL)
     {
-    vtkErrorMacro("Data Tcl name must be wrong.");
+    vtkErrorMacro("It couldn't be a vtkDataObject???");
     return;
     }
 

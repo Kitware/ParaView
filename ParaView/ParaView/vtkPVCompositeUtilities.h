@@ -41,13 +41,6 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // We are creating this object for tiled displays initialially.
-  // This would be the full size of the render window.
-  // This variable is not used currently, but could be used for a minimum
-  // buffer size.
-  //vtkSetVector2Macro(Size, int);
-
-  // Description:
   // Get a data array of the specified size and type.
   // This will be used to get z and color buffers.
   vtkFloatArray *NewFloatArray(int numTuples, int numComponents);

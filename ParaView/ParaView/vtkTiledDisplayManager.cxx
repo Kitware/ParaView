@@ -42,7 +42,7 @@
  #include <mpi.h>
 #endif
 
-vtkCxxRevisionMacro(vtkTiledDisplayManager, "1.6");
+vtkCxxRevisionMacro(vtkTiledDisplayManager, "1.7");
 vtkStandardNewMacro(vtkTiledDisplayManager);
 
 vtkCxxSetObjectMacro(vtkTiledDisplayManager, RenderView, vtkObject);
@@ -335,6 +335,8 @@ void vtkTiledDisplaySchedule::PrintSelf(ostream& os, vtkIndent indent)
   vtkTiledDisplayProcess* p;
   vtkTiledDisplayElement* e;
   vtkIndent i2 = indent.GetNextIndent();
+
+  this->Superclass::PrintSelf(os, indent);
 
   os << indent << "Schedule: (" << this << ")\n";
 
@@ -655,6 +657,7 @@ vtkTiledDisplayManager::vtkTiledDisplayManager()
   this->RenderWindow = NULL;
   this->RenderWindowInteractor = NULL;
   this->Controller = vtkMultiProcessController::GetGlobalController();
+  this->NumberOfProcesses = this->Controller->GetNumberOfProcesses();
 
   if (this->Controller)
     {

@@ -72,8 +72,8 @@ public:
 
   // Description:
   // Trying out a ne protocal.
-  virtual void Accept(const char* sourceTclName) { this->ModifiedFlag = 0;}
-  virtual void Reset(const char* sourceTclName) { this->ModifiedFlag = 0;}
+  virtual void AcceptInternal(const char* sourceTclName) { this->ModifiedFlag = 0;}
+  virtual void ResetIntenral(const char* sourceTclName) { this->ModifiedFlag = 0;}
 
   // Description:
   // Empty method to keep superclass from complaining.
