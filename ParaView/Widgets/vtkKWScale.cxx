@@ -50,7 +50,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // ---------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWScale );
-vtkCxxRevisionMacro(vtkKWScale, "1.31.2.5");
+vtkCxxRevisionMacro(vtkKWScale, "1.31.2.6");
 
 int vtkKWScaleCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -461,7 +461,7 @@ void vtkKWScale::DisplayPopupScaleCallback()
   
   int x, y, py, ph, scx, scy, sx, sy;
   sscanf(this->Application->GetMainInterp()->result, 
-         "%d %d %d %d %d %d %d %d %d", 
+         "%d %d %d %d %d %d %d %d", 
          &x, &y, &py, &ph, &scx, &scy, &sx, &sy);
  
   // Place the scale so that the slider is coincident with the x mouse position
