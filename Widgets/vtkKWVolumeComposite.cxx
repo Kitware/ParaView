@@ -221,8 +221,6 @@ void vtkKWVolumeComposite::SetInput(vtkImageData *input)
     }
   vtkPiecewiseFunction *pwf = 
     this->VolumeProperty->GetScalarOpacity();
-  vtkGenericWarningMacro("input " << *input);
-  vtkGenericWarningMacro("GetInput " << *this->GetInput() );
   
   float *range = input->GetScalarRange();
   float max;
