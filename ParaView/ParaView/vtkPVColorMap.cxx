@@ -76,6 +76,8 @@ vtkPVColorMap::vtkPVColorMap()
   // Create a unique id for creating tcl names.
   ++instanceCount;
   this->InstanceCount = instanceCount;    
+  
+  this->NumberOfVectorComponents = 1;
 }
 
 //----------------------------------------------------------------------------
