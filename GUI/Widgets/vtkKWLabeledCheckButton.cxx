@@ -20,7 +20,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWLabeledCheckButton);
-vtkCxxRevisionMacro(vtkKWLabeledCheckButton, "1.5");
+vtkCxxRevisionMacro(vtkKWLabeledCheckButton, "1.6");
 
 int vtkKWLabeledCheckButtonCommand(ClientData cd, Tcl_Interp *interp,
                                    int argc, char *argv[]);
@@ -82,15 +82,15 @@ void vtkKWLabeledCheckButton::Pack()
 
   // Unpack everything
 
-  this->Label->UnpackSiblings();
+  this->CheckButton->UnpackSiblings();
 
   // Repack everything
 
   ostrstream tk_cmd;
 
-  if (this->ShowLabel)
+  if (this->ShowLabel && this->HasLabel() && this->GetLabel()->IsCreated())
     {
-    tk_cmd << "pack " << this->Label->GetWidgetName() << " -side left" << endl;
+    tk_cmd << "pack " << this->GetLabel()->GetWidgetName() << " -side left\n";
     }
 
   tk_cmd << "pack " << this->CheckButton->GetWidgetName() 

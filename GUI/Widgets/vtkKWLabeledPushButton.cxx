@@ -20,7 +20,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWLabeledPushButton);
-vtkCxxRevisionMacro(vtkKWLabeledPushButton, "1.5");
+vtkCxxRevisionMacro(vtkKWLabeledPushButton, "1.6");
 
 int vtkKWLabeledPushButtonCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -82,15 +82,15 @@ void vtkKWLabeledPushButton::Pack()
 
   // Unpack everything
 
-  this->Label->UnpackSiblings();
+  this->PushButton->UnpackSiblings();
 
   // Repack everything
 
   ostrstream tk_cmd;
 
-  if (this->ShowLabel)
+  if (this->ShowLabel && this->HasLabel() && this->GetLabel()->IsCreated())
     {
-    tk_cmd << "pack " << this->Label->GetWidgetName() << " -side left" << endl;
+    tk_cmd << "pack " << this->GetLabel()->GetWidgetName() << " -side left\n";
     }
 
   tk_cmd << "pack " << this->PushButton->GetWidgetName() 

@@ -20,7 +20,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWLabeledCheckButtonSet);
-vtkCxxRevisionMacro(vtkKWLabeledCheckButtonSet, "1.7");
+vtkCxxRevisionMacro(vtkKWLabeledCheckButtonSet, "1.8");
 
 int vtkKWLabeledCheckButtonSetCommand(ClientData cd, Tcl_Interp *interp,
                                       int argc, char *argv[]);
@@ -84,7 +84,7 @@ void vtkKWLabeledCheckButtonSet::Pack()
 
   // Unpack everything
 
-  this->Label->UnpackSiblings();
+  this->CheckButtonSet->UnpackSiblings();
 
   // Repack everything
 
@@ -93,18 +93,18 @@ void vtkKWLabeledCheckButtonSet::Pack()
   if (this->PackHorizontally)
     {
     tk_cmd << "pack ";
-    if (this->ShowLabel)
+    if (this->ShowLabel && this->HasLabel() && this->GetLabel()->IsCreated())
       {
-      tk_cmd << this->Label->GetWidgetName() << " ";
+      tk_cmd << this->GetLabel()->GetWidgetName() << " ";
       }
     tk_cmd << this->CheckButtonSet->GetWidgetName() 
            << " -side left -anchor nw" << endl;
     }
   else
     {
-    if (this->ShowLabel)
+    if (this->ShowLabel && this->HasLabel() && this->GetLabel()->IsCreated())
       {
-      tk_cmd << "pack " << this->Label->GetWidgetName() 
+      tk_cmd << "pack " << this->GetLabel()->GetWidgetName() 
              << " -side top -anchor nw" << endl;
       }
     tk_cmd << "pack " << this->CheckButtonSet->GetWidgetName() 

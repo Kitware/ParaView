@@ -20,7 +20,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWLabeledScaleSet);
-vtkCxxRevisionMacro(vtkKWLabeledScaleSet, "1.4");
+vtkCxxRevisionMacro(vtkKWLabeledScaleSet, "1.5");
 
 int vtkKWLabeledScaleSetCommand(ClientData cd, Tcl_Interp *interp,
                                       int argc, char *argv[]);
@@ -84,7 +84,7 @@ void vtkKWLabeledScaleSet::Pack()
 
   // Unpack everything
 
-  this->Label->UnpackSiblings();
+  this->ScaleSet->UnpackSiblings();
 
   // Repack everything
 
@@ -92,9 +92,9 @@ void vtkKWLabeledScaleSet::Pack()
 
   if (this->PackHorizontally)
     {
-    if (this->ShowLabel)
+    if (this->ShowLabel && this->HasLabel() && this->GetLabel()->IsCreated())
       {
-      tk_cmd << "pack " << this->Label->GetWidgetName() 
+      tk_cmd << "pack " << this->GetLabel()->GetWidgetName() 
              << " -side left -anchor nw -fill y" << endl;
       }
     tk_cmd << "pack " << this->ScaleSet->GetWidgetName() 
@@ -102,9 +102,9 @@ void vtkKWLabeledScaleSet::Pack()
     }
   else
     {
-    if (this->ShowLabel)
+    if (this->ShowLabel && this->HasLabel() && this->GetLabel()->IsCreated())
       {
-      tk_cmd << "pack " << this->Label->GetWidgetName() 
+      tk_cmd << "pack " << this->GetLabel()->GetWidgetName() 
              << " -side top -anchor nw" << endl;
       }
     tk_cmd << "pack " << this->ScaleSet->GetWidgetName() 

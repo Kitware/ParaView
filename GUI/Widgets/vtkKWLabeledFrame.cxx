@@ -24,7 +24,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLabeledFrame );
-vtkCxxRevisionMacro(vtkKWLabeledFrame, "1.34");
+vtkCxxRevisionMacro(vtkKWLabeledFrame, "1.35");
 
 int vtkKWLabeledFrameCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -218,10 +218,15 @@ void vtkKWLabeledFrame::Create(vtkKWApplication *app, const char* args)
   this->Script("%s config -bd 1 -pady 0 -padx 0", 
                this->GetLabel()->GetWidgetName());
 
+  // At this point, although this->Label (a labeled label) has been created,
+  // UpdateEnableState() has been called already and ShowLabelOff() has benn
+  // called on the label. Therefore, the label of this->Label was not created
+  // since it is lazy created/allocated on the fly only when needed.
+  // Force label icon to be created now, so that we can set its image option.
+  this->Label->ShowLabelOn();
+  this->GetLabelIcon()->SetImageOption(vtkKWIcon::ICON_LOCK);
   this->Script("%s config -bd 0 -pady 0 -padx 0", 
                this->GetLabelIcon()->GetWidgetName());
-
-  this->GetLabelIcon()->SetImageOption(vtkKWIcon::ICON_LOCK);
 
   const char *lem_name = app->GetLimitedEditionModeName() 
     ? app->GetLimitedEditionModeName() : "limited edition";

@@ -39,23 +39,39 @@ public:
 
   // Description:
   // Get the internal label
-  vtkGetObjectMacro(Label, vtkKWLabel);
+  // The label is lazy evaluated/created, i.e. GetLabel() 
+  // will create the label if it does not exist, otherwise it is
+  // not allocated/created. In subclasses, use HasLabel() to check
+  // that this widget has a label instead of accessing GetLabel() which
+  // would automatically allocate the label. 
+  virtual vtkKWLabel* GetLabel();
+  virtual int HasLabel();
 
   // Description:
-  // Convenience method to set the contents label.
-  void SetLabel(const char *);
-  
-  // Description:
-  // Convenience method to set/get the label width.
-  void SetLabelWidth(int width);
-  int GetLabelWidth();
-  
-  // Description:
   // Show/Hide the label.
+  // Note: On by default. If you know you are not going to show the label,
+  // you may want to set that flag as early as possible (ideally, before
+  // calling Create() in order to lower the footprint of the widget: the
+  // label won't be allocated and created if there is no need to show it).
+  // Later on, you can still show the label, it will be allocated and 
+  // created on the fly.
   virtual void SetShowLabel(int);
   vtkBooleanMacro(ShowLabel, int);
   vtkGetMacro(ShowLabel, int);
 
+  // Description:
+  // Convenience method to set the contents label.
+  // Note: it will create the label on the fly, so use it only if
+  // you are sure that you will display/use the label.
+  void SetLabel(const char *);
+  
+  // Description:
+  // Convenience method to set/get the label width.
+  // Note: it will create the label on the fly, so use it only if
+  // you are sure that you will display/use the label.
+  void SetLabelWidth(int width);
+  int GetLabelWidth();
+  
   // Description:
   // Set the string that enables balloon help for this widget.
   // Override to pass down to children.
@@ -75,15 +91,21 @@ protected:
   vtkKWLabeledWidget();
   ~vtkKWLabeledWidget();
 
-  vtkKWLabel      *Label;
-
   int ShowLabel;
 
   // Pack or repack the widget. To be implemented by subclasses.
 
   virtual void Pack() {};
 
+  virtual void CreateLabel(vtkKWApplication *app);
+
 private:
+
+  // In private: to allow lazy evaluation. GetLabel() will create the
+  // label if it does not exist. This allow this object to remain lightweight. 
+
+  vtkKWLabel      *Label;
+
   vtkKWLabeledWidget(const vtkKWLabeledWidget&); // Not implemented
   void operator=(const vtkKWLabeledWidget&); // Not implemented
 };

@@ -20,7 +20,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWLabeledEntry);
-vtkCxxRevisionMacro(vtkKWLabeledEntry, "1.17");
+vtkCxxRevisionMacro(vtkKWLabeledEntry, "1.18");
 
 int vtkKWLabeledEntryCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -82,15 +82,15 @@ void vtkKWLabeledEntry::Pack()
 
   // Unpack everything
 
-  this->Label->UnpackSiblings();
+  this->Entry->UnpackSiblings();
 
   // Repack everything
 
   ostrstream tk_cmd;
 
-  if (this->ShowLabel)
+  if (this->ShowLabel && this->HasLabel() && this->GetLabel()->IsCreated())
     {
-    tk_cmd << "pack " << this->Label->GetWidgetName() << " -side left" << endl;
+    tk_cmd << "pack " << this->GetLabel()->GetWidgetName() << " -side left\n";
     }
 
   tk_cmd << "pack " << this->Entry->GetWidgetName() 

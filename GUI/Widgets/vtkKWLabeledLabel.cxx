@@ -19,7 +19,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWLabeledLabel);
-vtkCxxRevisionMacro(vtkKWLabeledLabel, "1.14");
+vtkCxxRevisionMacro(vtkKWLabeledLabel, "1.15");
 
 int vtkKWLabeledLabelCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -85,7 +85,7 @@ void vtkKWLabeledLabel::Pack()
 
   // Unpack everything
 
-  this->Label->UnpackSiblings();
+  this->Label2->UnpackSiblings();
 
   // Repack everything
 
@@ -96,9 +96,9 @@ void vtkKWLabeledLabel::Pack()
 
   if (this->PackHorizontally)
     {
-    if (this->ShowLabel)
+    if (this->ShowLabel && this->HasLabel() && this->GetLabel()->IsCreated())
       {
-      tk_cmd << "pack " << this->Label->GetWidgetName() 
+      tk_cmd << "pack " << this->GetLabel()->GetWidgetName() 
              << " -side left -anchor " 
              << this->GetAnchorAsString(this->LabelAnchor) << endl;
       }
@@ -108,9 +108,9 @@ void vtkKWLabeledLabel::Pack()
     }
   else
     {
-    if (this->ShowLabel)
+    if (this->ShowLabel && this->HasLabel() && this->GetLabel()->IsCreated())
       {
-      tk_cmd << "pack " << this->Label->GetWidgetName() 
+      tk_cmd << "pack " << this->GetLabel()->GetWidgetName() 
              << " -side top -anchor " 
              << this->GetAnchorAsString(this->LabelAnchor) << endl;
       }

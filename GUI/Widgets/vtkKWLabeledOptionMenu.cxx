@@ -20,7 +20,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWLabeledOptionMenu);
-vtkCxxRevisionMacro(vtkKWLabeledOptionMenu, "1.10");
+vtkCxxRevisionMacro(vtkKWLabeledOptionMenu, "1.11");
 
 int vtkKWLabeledOptionMenuCommand(ClientData cd, Tcl_Interp *interp,
                                   int argc, char *argv[]);
@@ -81,7 +81,7 @@ void vtkKWLabeledOptionMenu::Pack()
 
   // Unpack everything
 
-  this->Label->UnpackSiblings();
+  this->OptionMenu->UnpackSiblings();
 
   // Repack everything
 
@@ -89,9 +89,9 @@ void vtkKWLabeledOptionMenu::Pack()
 
   if (this->PackHorizontally)
     {
-    if (this->ShowLabel)
+    if (this->ShowLabel && this->HasLabel() && this->GetLabel()->IsCreated())
       {
-      tk_cmd << "pack " << this->Label->GetWidgetName() 
+      tk_cmd << "pack " << this->GetLabel()->GetWidgetName() 
              << " -side left -anchor nw" << endl;
       }
     tk_cmd << "pack " << this->OptionMenu->GetWidgetName() 
@@ -100,9 +100,9 @@ void vtkKWLabeledOptionMenu::Pack()
     }
   else
     {
-    if (this->ShowLabel)
+    if (this->ShowLabel && this->HasLabel() && this->GetLabel()->IsCreated())
       {
-      tk_cmd << "pack " << this->Label->GetWidgetName() 
+      tk_cmd << "pack " << this->GetLabel()->GetWidgetName() 
              << " -side top -anchor nw" << endl;
       }
     tk_cmd << "pack " << this->OptionMenu->GetWidgetName() 

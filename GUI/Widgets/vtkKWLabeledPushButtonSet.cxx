@@ -20,7 +20,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWLabeledPushButtonSet);
-vtkCxxRevisionMacro(vtkKWLabeledPushButtonSet, "1.6");
+vtkCxxRevisionMacro(vtkKWLabeledPushButtonSet, "1.7");
 
 int vtkKWLabeledPushButtonSetCommand(ClientData cd, Tcl_Interp *interp,
                                       int argc, char *argv[]);
@@ -84,7 +84,7 @@ void vtkKWLabeledPushButtonSet::Pack()
 
   // Unpack everything
 
-  this->Label->UnpackSiblings();
+  this->PushButtonSet->UnpackSiblings();
 
   // Repack everything
 
@@ -92,9 +92,9 @@ void vtkKWLabeledPushButtonSet::Pack()
 
   if (this->PackHorizontally)
     {
-    if (this->ShowLabel)
+    if (this->ShowLabel && this->HasLabel() && this->GetLabel()->IsCreated())
       {
-      tk_cmd << "pack " << this->Label->GetWidgetName() 
+      tk_cmd << "pack " << this->GetLabel()->GetWidgetName() 
              << " -side left -anchor nw -fill y" << endl;
       }
     tk_cmd << "pack " << this->PushButtonSet->GetWidgetName() 
@@ -102,9 +102,9 @@ void vtkKWLabeledPushButtonSet::Pack()
     }
   else
     {
-    if (this->ShowLabel)
+    if (this->ShowLabel && this->HasLabel() && this->GetLabel()->IsCreated())
       {
-      tk_cmd << "pack " << this->Label->GetWidgetName() 
+      tk_cmd << "pack " << this->GetLabel()->GetWidgetName() 
              << " -side top -anchor nw" << endl;
       }
     tk_cmd << "pack " << this->PushButtonSet->GetWidgetName() 

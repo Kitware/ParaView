@@ -20,7 +20,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWLabeledPopupButton);
-vtkCxxRevisionMacro(vtkKWLabeledPopupButton, "1.7");
+vtkCxxRevisionMacro(vtkKWLabeledPopupButton, "1.8");
 
 int vtkKWLabeledPopupButtonCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -84,7 +84,7 @@ void vtkKWLabeledPopupButton::Pack()
 
   // Unpack everything
 
-  this->Label->UnpackSiblings();
+  this->PopupButton->UnpackSiblings();
 
   // Repack everything
 
@@ -96,9 +96,9 @@ void vtkKWLabeledPopupButton::Pack()
            << " -side left -fill x -expand t" << endl;
     }
 
-  if (this->ShowLabel)
+  if (this->ShowLabel && this->HasLabel() && this->GetLabel()->IsCreated())
     {
-    tk_cmd << "pack " << this->Label->GetWidgetName() << " -side left" << endl;
+    tk_cmd << "pack " << this->GetLabel()->GetWidgetName() << " -side left\n";
     }
 
   if (!this->PackLabelLast)

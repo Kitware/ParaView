@@ -20,7 +20,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWLabeledLoadSaveButton);
-vtkCxxRevisionMacro(vtkKWLabeledLoadSaveButton, "1.2");
+vtkCxxRevisionMacro(vtkKWLabeledLoadSaveButton, "1.3");
 
 int vtkKWLabeledLoadSaveButtonCommand(ClientData cd, Tcl_Interp *interp,
                                       int argc, char *argv[]);
@@ -84,7 +84,7 @@ void vtkKWLabeledLoadSaveButton::Pack()
 
   // Unpack everything
 
-  this->Label->UnpackSiblings();
+  this->LoadSaveButton->UnpackSiblings();
 
   // Repack everything
 
@@ -96,9 +96,9 @@ void vtkKWLabeledLoadSaveButton::Pack()
            << " -side left -fill x" << endl;
     }
 
-  if (this->ShowLabel)
+  if (this->ShowLabel && this->HasLabel() && this->GetLabel()->IsCreated())
     {
-    tk_cmd << "pack " << this->Label->GetWidgetName() << " -side left" << endl;
+    tk_cmd << "pack " << this->GetLabel()->GetWidgetName() << " -side left\n";
     }
 
   if (!this->PackLabelLast)

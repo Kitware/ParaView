@@ -121,6 +121,8 @@ protected:
 
   virtual void Pack();
 
+  virtual void CreateLabel(vtkKWApplication *app);
+
   int ButtonDown;
   
 private:

@@ -20,7 +20,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWLabeledText);
-vtkCxxRevisionMacro(vtkKWLabeledText, "1.7");
+vtkCxxRevisionMacro(vtkKWLabeledText, "1.8");
 
 int vtkKWLabeledTextCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -60,9 +60,9 @@ void vtkKWLabeledText::Create(vtkKWApplication *app, const char *args)
 
   // Let's make the label slightly smaller
 
-  if (this->Label)
+  if (this->HasLabel() && this->GetLabel()->IsCreated())
     {
-    this->Script("%s configure -bd 1", this->Label->GetWidgetName());
+    this->Script("%s configure -bd 1", this->GetLabel()->GetWidgetName());
     }
 
   // Create the option menu
@@ -89,15 +89,15 @@ void vtkKWLabeledText::Pack()
 
   // Unpack everything
 
-  this->Label->UnpackSiblings();
+  this->Text->UnpackSiblings();
 
   // Repack everything
 
   ostrstream tk_cmd;
 
-  if (this->ShowLabel)
+  if (this->ShowLabel && this->HasLabel() && this->GetLabel()->IsCreated())
     {
-    tk_cmd << "pack " << this->Label->GetWidgetName() 
+    tk_cmd << "pack " << this->GetLabel()->GetWidgetName() 
            << " -anchor nw -pady 0 -ipady 0" << endl;
     }
   tk_cmd << "pack " << this->Text->GetWidgetName() 

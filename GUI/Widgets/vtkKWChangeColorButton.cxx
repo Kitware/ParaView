@@ -20,7 +20,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWChangeColorButton);
-vtkCxxRevisionMacro(vtkKWChangeColorButton, "1.43");
+vtkCxxRevisionMacro(vtkKWChangeColorButton, "1.44");
 
 int vtkKWChangeColorButtonCommand(ClientData cd, Tcl_Interp *interp,
                                   int argc, char *argv[]);
@@ -114,18 +114,12 @@ void vtkKWChangeColorButton::Create(vtkKWApplication *app, const char *args)
   this->MainFrame->SetParent(this);
   this->MainFrame->Create(app, "-relief raised -bd 2");
 
-  // Create the label.
+  // Create the label now if it has to be shown now
 
-  if (this->LabelOutsideButton)
+  if (this->ShowLabel)
     {
-    this->Label->SetParent(this);
+    this->CreateLabel(app);
     }
-  else
-    {
-    this->Label->SetParent(this->MainFrame);
-    }
-  this->Label->Create(app, "-padx 2 -pady 0 -highlightthickness 0 -bd 0");
-  this->Label->SetLabel(this->Text);
 
   // Create the color button
 
@@ -149,6 +143,34 @@ void vtkKWChangeColorButton::Create(vtkKWApplication *app, const char *args)
 }
 
 //----------------------------------------------------------------------------
+void vtkKWChangeColorButton::CreateLabel(vtkKWApplication *app)
+{
+  // Override the parent's CreateLabel()
+  // This will also create the label on the fly, if needed
+  
+  vtkKWLabel *label = this->GetLabel();
+  if (label->IsCreated())
+    {
+    return;
+    }
+
+  if (this->LabelOutsideButton)
+    {
+    label->SetParent(this);
+    }
+  else
+    {
+    label->SetParent(this->MainFrame);
+    }
+
+  label->Create(app, "-padx 2 -pady 0 -highlightthickness 0 -bd 0");
+  label->SetLabel(this->Text);
+
+  label->SetBalloonHelpString(this->GetBalloonHelpString());
+  label->SetBalloonHelpJustification(this->GetBalloonHelpJustification());
+}
+
+//----------------------------------------------------------------------------
 void vtkKWChangeColorButton::Pack()
 {
   if (!this->IsCreated())
@@ -158,7 +180,7 @@ void vtkKWChangeColorButton::Pack()
 
   // Unpack everything
 
-  this->Label->UnpackSiblings();
+  this->ColorButton->UnpackSiblings();
   this->MainFrame->UnpackSiblings();
 
   // Repack everything
@@ -180,16 +202,16 @@ void vtkKWChangeColorButton::Pack()
                  this->LabelAfterColor ? 0 : 1);
     }
 
-  if (this->ShowLabel)
+  if (this->ShowLabel && this->HasLabel() && this->GetLabel()->IsCreated())
     { 
     this->Script("grid %s -row 0 -column %d -sticky news", 
-                 this->Label->GetWidgetName(),
+                 this->GetLabel()->GetWidgetName(),
                  this->LabelAfterColor ? 1 : 0);
     this->Script("grid columnconfigure %s %d -weight 1", 
-                 this->Label->GetParent()->GetWidgetName(),
+                 this->GetLabel()->GetParent()->GetWidgetName(),
                  this->LabelAfterColor ? 1 : 0);
     this->Script("grid columnconfigure %s %d -weight 0", 
-                 this->Label->GetParent()->GetWidgetName(),
+                 this->GetLabel()->GetParent()->GetWidgetName(),
                  this->LabelAfterColor ? 0 : 1);
     }
 
@@ -258,12 +280,13 @@ void vtkKWChangeColorButton::Bind()
   this->Script("bind %s <Any-ButtonRelease> {+%s ButtonReleaseCallback %%X %%Y}",
                this->MainFrame->GetWidgetName(), this->GetTclName());
 
-  if (!this->LabelOutsideButton)
+  if (!this->LabelOutsideButton && 
+      this->HasLabel() && this->GetLabel()->IsCreated())
     {
     this->Script("bind %s <Any-ButtonPress> {+%s ButtonPressCallback %%X %%Y}",
-                 this->Label->GetWidgetName(), this->GetTclName());
+                 this->GetLabel()->GetWidgetName(), this->GetTclName());
     this->Script("bind %s <Any-ButtonRelease> {+%s ButtonReleaseCallback %%X %%Y}",
-                 this->Label->GetWidgetName(), this->GetTclName());
+                 this->GetLabel()->GetWidgetName(), this->GetTclName());
     }
 
   this->Script("bind %s <Any-ButtonPress> {+%s ButtonPressCallback %%X %%Y}",
@@ -285,12 +308,13 @@ void vtkKWChangeColorButton::UnBind()
   this->Script("bind %s <Any-ButtonRelease> {}", 
                this->MainFrame->GetWidgetName());
 
-  if (!this->LabelOutsideButton)
+  if (!this->LabelOutsideButton &&
+      this->HasLabel() && this->GetLabel()->IsCreated())
     {
     this->Script("bind %s <Any-ButtonPress> {}", 
-                 this->Label->GetWidgetName());
+                 this->GetLabel()->GetWidgetName());
     this->Script("bind %s <Any-ButtonRelease> {}", 
-                 this->Label->GetWidgetName());
+                 this->GetLabel()->GetWidgetName());
     }
 
   this->Script("bind %s <Any-ButtonPress> {}",
@@ -488,7 +512,7 @@ void vtkKWChangeColorButton::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWChangeColorButton ";
-  this->ExtractRevision(os,"$Revision: 1.43 $");
+  this->ExtractRevision(os,"$Revision: 1.44 $");
 }
 
 //----------------------------------------------------------------------------

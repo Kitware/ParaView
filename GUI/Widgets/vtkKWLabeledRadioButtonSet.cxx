@@ -20,7 +20,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWLabeledRadioButtonSet);
-vtkCxxRevisionMacro(vtkKWLabeledRadioButtonSet, "1.7");
+vtkCxxRevisionMacro(vtkKWLabeledRadioButtonSet, "1.8");
 
 int vtkKWLabeledRadioButtonSetCommand(ClientData cd, Tcl_Interp *interp,
                                       int argc, char *argv[]);
@@ -84,7 +84,7 @@ void vtkKWLabeledRadioButtonSet::Pack()
 
   // Unpack everything
 
-  this->Label->UnpackSiblings();
+  this->RadioButtonSet->UnpackSiblings();
 
   // Repack everything
 
@@ -93,18 +93,18 @@ void vtkKWLabeledRadioButtonSet::Pack()
   if (this->PackHorizontally)
     {
     tk_cmd << "pack ";
-    if (this->ShowLabel)
+    if (this->ShowLabel && this->HasLabel() && this->GetLabel()->IsCreated())
       {
-      tk_cmd << this->Label->GetWidgetName() << " ";
+      tk_cmd << this->GetLabel()->GetWidgetName() << " ";
       }
     tk_cmd << this->RadioButtonSet->GetWidgetName() 
            << " -side left -anchor nw" << endl;
     }
   else
     {
-    if (this->ShowLabel)
+    if (this->ShowLabel && this->HasLabel() && this->GetLabel()->IsCreated())
       {
-      tk_cmd << "pack " << this->Label->GetWidgetName() 
+      tk_cmd << "pack " << this->GetLabel()->GetWidgetName() 
              << " -side top -anchor nw" << endl;
       }
     tk_cmd << "pack " << this->RadioButtonSet->GetWidgetName() 
