@@ -36,13 +36,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkKWLabeledPushButton.h"
 
-#include "vtkKWImageLabel.h"
+#include "vtkKWLabel.h"
 #include "vtkKWPushButton.h"
 #include "vtkObjectFactory.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWLabeledPushButton);
-vtkCxxRevisionMacro(vtkKWLabeledPushButton, "1.3");
+vtkCxxRevisionMacro(vtkKWLabeledPushButton, "1.4");
 
 int vtkKWLabeledPushButtonCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);

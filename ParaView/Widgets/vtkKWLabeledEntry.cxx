@@ -37,12 +37,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWLabeledEntry.h"
 
 #include "vtkKWEntry.h"
-#include "vtkKWImageLabel.h"
+#include "vtkKWLabel.h"
 #include "vtkObjectFactory.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWLabeledEntry);
-vtkCxxRevisionMacro(vtkKWLabeledEntry, "1.14");
+vtkCxxRevisionMacro(vtkKWLabeledEntry, "1.15");
 
 int vtkKWLabeledEntryCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);

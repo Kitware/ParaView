@@ -37,7 +37,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWLabeledLabelSet.h"
 
 #include "vtkKWApplication.h"
-#include "vtkKWImageLabel.h"
+#include "vtkKWLabel.h"
 #include "vtkKWLabeledLabel.h"
 #include "vtkKWTkUtilities.h"
 #include "vtkLinkedList.txx"
@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkKWLabeledLabelSet);
-vtkCxxRevisionMacro(vtkKWLabeledLabelSet, "1.5");
+vtkCxxRevisionMacro(vtkKWLabeledLabelSet, "1.6");
 
 int vtkvtkKWLabeledLabelSetCommand(ClientData cd, Tcl_Interp *interp,
                                   int argc, char *argv[]);

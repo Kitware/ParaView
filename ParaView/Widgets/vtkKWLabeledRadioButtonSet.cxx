@@ -36,13 +36,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkKWLabeledRadioButtonSet.h"
 
-#include "vtkKWImageLabel.h"
+#include "vtkKWLabel.h"
 #include "vtkKWRadioButtonSet.h"
 #include "vtkObjectFactory.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWLabeledRadioButtonSet);
-vtkCxxRevisionMacro(vtkKWLabeledRadioButtonSet, "1.5");
+vtkCxxRevisionMacro(vtkKWLabeledRadioButtonSet, "1.6");
 
 int vtkKWLabeledRadioButtonSetCommand(ClientData cd, Tcl_Interp *interp,
                                       int argc, char *argv[]);

@@ -36,13 +36,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkKWLabeledScaleSet.h"
 
-#include "vtkKWImageLabel.h"
+#include "vtkKWLabel.h"
 #include "vtkKWScaleSet.h"
 #include "vtkObjectFactory.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWLabeledScaleSet);
-vtkCxxRevisionMacro(vtkKWLabeledScaleSet, "1.2");
+vtkCxxRevisionMacro(vtkKWLabeledScaleSet, "1.3");
 
 int vtkKWLabeledScaleSetCommand(ClientData cd, Tcl_Interp *interp,
                                       int argc, char *argv[]);

@@ -47,7 +47,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class vtkKWApplication;
 class vtkKWFrame;
 class vtkKWIcon;
-class vtkKWImageLabel;
 class vtkKWLabel;
 
 #define VTK_KW_LABEL_CASE_USER_SPECIFIED 0
@@ -133,8 +132,8 @@ protected:
   vtkKWWidget *Border;
   vtkKWWidget *Border2;
   vtkKWWidget *Groove;
-  vtkKWImageLabel *Icon;
-  vtkKWIcon       *IconData;
+  vtkKWLabel  *Icon;
+  vtkKWIcon   *IconData;
   int Displayed;
   static int AllowShowHide;
   static int BoldLabel;

@@ -36,12 +36,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkKWLabeledWidget.h"
 
-#include "vtkKWImageLabel.h"
+#include "vtkKWLabel.h"
 #include "vtkObjectFactory.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWLabeledWidget);
-vtkCxxRevisionMacro(vtkKWLabeledWidget, "1.8");
+vtkCxxRevisionMacro(vtkKWLabeledWidget, "1.9");
 
 int vtkKWLabeledWidgetCommand(ClientData cd, Tcl_Interp *interp,
                               int argc, char *argv[]);
@@ -53,7 +53,7 @@ vtkKWLabeledWidget::vtkKWLabeledWidget()
 
   this->ShowLabel = 1;
 
-  this->Label = vtkKWImageLabel::New();
+  this->Label = vtkKWLabel::New();
 }
 
 //----------------------------------------------------------------------------

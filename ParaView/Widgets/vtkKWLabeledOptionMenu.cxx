@@ -36,13 +36,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkKWLabeledOptionMenu.h"
 
-#include "vtkKWImageLabel.h"
+#include "vtkKWLabel.h"
 #include "vtkKWOptionMenu.h"
 #include "vtkObjectFactory.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWLabeledOptionMenu);
-vtkCxxRevisionMacro(vtkKWLabeledOptionMenu, "1.8");
+vtkCxxRevisionMacro(vtkKWLabeledOptionMenu, "1.9");
 
 int vtkKWLabeledOptionMenuCommand(ClientData cd, Tcl_Interp *interp,
                                   int argc, char *argv[]);

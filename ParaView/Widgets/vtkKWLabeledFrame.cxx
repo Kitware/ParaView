@@ -38,7 +38,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWApplication.h"
 #include "vtkKWFrame.h"
 #include "vtkKWIcon.h"
-#include "vtkKWImageLabel.h"
+#include "vtkKWLabel.h"
 #include "vtkKWTkUtilities.h"
 #include "vtkObjectFactory.h"
 
@@ -46,7 +46,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLabeledFrame );
-vtkCxxRevisionMacro(vtkKWLabeledFrame, "1.26");
+vtkCxxRevisionMacro(vtkKWLabeledFrame, "1.27");
 
 int vtkKWLabeledFrameCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -68,7 +68,7 @@ vtkKWLabeledFrame::vtkKWLabeledFrame()
   this->LabelFrame->SetParent(this);
   this->Label = vtkKWLabel::New();
   this->Label->SetParent(this->LabelFrame);
-  this->Icon = vtkKWImageLabel::New();
+  this->Icon = vtkKWLabel::New();
   this->Icon->SetParent(this);
   this->IconData = vtkKWIcon::New();
   this->IconData->SetImageData(vtkKWIcon::ICON_SHRINK);
