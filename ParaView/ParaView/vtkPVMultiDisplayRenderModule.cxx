@@ -27,7 +27,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVMultiDisplayRenderModule);
-vtkCxxRevisionMacro(vtkPVMultiDisplayRenderModule, "1.12");
+vtkCxxRevisionMacro(vtkPVMultiDisplayRenderModule, "1.13");
 
 
 
@@ -350,12 +350,6 @@ void vtkPVMultiDisplayRenderModule::InteractiveRender()
       }
     }
 
-  // Still Render can get called some funky ways.
-  // Interactive renders get called through the PVInteractorStyles
-  // which cal ResetCameraClippingRange on the Renderer.
-  // We could convert them to call a method on the module directly ...
-  this->Renderer->ResetCameraClippingRange();
-
   // This might be used for Reduction factor.
   this->RenderWindow->SetDesiredUpdateRate(5.0);
   // this->GetPVWindow()->GetInteractor()->GetStillUpdateRate());
@@ -375,6 +369,14 @@ void vtkPVMultiDisplayRenderModule::InteractiveRender()
     this->GetPVApplication()->SetGlobalLODFlagInternal(1);
     }
 
+  // Still Render can get called some funky ways.
+  // Interactive renders get called through the PVInteractorStyles
+  // which cal ResetCameraClippingRange on the Renderer.
+  // We could convert them to call a method on the module directly ...
+  // Reset camera clipping range has to be called after
+  // LOD flag is set, other wise, the wrong bounds could be used.
+  this->Renderer->ResetCameraClippingRange();
+  
   vtkTimerLog::MarkStartEvent("Interactive Render");
   this->RenderWindow->Render();
   vtkTimerLog::MarkEndEvent("Interactive Render");
