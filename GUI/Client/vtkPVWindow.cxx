@@ -128,7 +128,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.599");
+vtkCxxRevisionMacro(vtkPVWindow, "1.600");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -983,6 +983,7 @@ void vtkPVWindow::Create(vtkKWApplication *app, const char* vtkNotUsed(args))
   // SetInteractor needs to be called before the main view is set so that there
   // is an interactor to pass to the main view's orientation marker.
   this->InteractorID = pm->NewStreamObject("vtkPVGenericRenderWindowInteractor");
+  pm->GetRenderModule()->SetInteractorID(this->InteractorID);
   vtkClientServerStream& stream = pm->GetStream();
   stream << vtkClientServerStream::Invoke << this->InteractorID << "SetRenderWindow" 
          << pm->GetRenderModule()->GetRenderWindowID()

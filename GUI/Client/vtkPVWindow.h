@@ -533,6 +533,8 @@ protected:
 
   // Should I move this to vtkPVRenderView?
   vtkPVGenericRenderWindowInteractor *Interactor;
+  //InteractorID is a duplicate of InteractorID in PVRenderModule.
+  //Need to move the logic for InteractorID to PVRenderModule
   vtkClientServerID InteractorID;
   
   // ParaView specific menus
