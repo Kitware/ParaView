@@ -124,7 +124,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.391.2.15");
+vtkCxxRevisionMacro(vtkPVWindow, "1.391.2.16");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -802,7 +802,8 @@ void vtkPVWindow::InitializeInteractorInterfaces(vtkKWApplication *app)
   this->RotateCameraButton->Create(
     app, "-indicatoron 0 -highlightthickness 0 -image PVRotateViewButton -selectimage PVRotateViewButtonActive");
   this->RotateCameraButton->SetBalloonHelpString(
-    "Rotate View Mode\n   Left Button: Rotate.\n  Shift + LeftButton: Z roll.\n   Right Button: Behaves like translate view mode.");
+    "3D Movements Interaction Mode\nThis interaction mode can be configured "
+    "from View->3D View Properties->Camera");
   this->Script("%s configure -command {%s ChangeInteractorStyle 1}",
                this->RotateCameraButton->GetWidgetName(), this->GetTclName());
   this->InteractorToolbar->AddWidget(this->RotateCameraButton);
@@ -814,7 +815,10 @@ void vtkPVWindow::InitializeInteractorInterfaces(vtkKWApplication *app)
   this->TranslateCameraButton->Create(
     app, "-indicatoron 0 -highlightthickness 0 -image PVTranslateViewButton -selectimage PVTranslateViewButtonActive");
   this->TranslateCameraButton->SetBalloonHelpString(
-    "Translate View Mode\n   Left Button: Translate.\n   Right Button: Zoom.");
+    "2D Movements Interaction Mode\nThis mode can be used in conjunction with "
+    "the Parallel Projection setting (View->3D View Properties->General) to "
+    "interact with 2D objects. This interaction mode can be configured "
+    "from View->3D View Properties->Camera");
   this->Script("%s configure -command {%s ChangeInteractorStyle 2}", 
                this->TranslateCameraButton->GetWidgetName(), this->GetTclName());
   this->InteractorToolbar->AddWidget(this->TranslateCameraButton);
@@ -3778,7 +3782,7 @@ void vtkPVWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVWindow ";
-  this->ExtractRevision(os,"$Revision: 1.391.2.15 $");
+  this->ExtractRevision(os,"$Revision: 1.391.2.16 $");
 }
 
 //----------------------------------------------------------------------------

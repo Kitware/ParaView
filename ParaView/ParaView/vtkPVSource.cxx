@@ -71,7 +71,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.248.2.11");
+vtkCxxRevisionMacro(vtkPVSource, "1.248.2.12");
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -535,8 +535,7 @@ void vtkPVSource::CreateProperties()
   this->ResetButton->Create(this->Application, "-text Reset");
   this->ResetButton->SetCommand(this, "ResetCallback");
   this->ResetButton->SetBalloonHelpString(
-    "Revert to the previous parameters of current module.  "
-    "If no values have been set, remove it.");
+    "Revert to the previous parameters of the module.");
 
   this->DeleteButton->SetParent(frame);
   this->DeleteButton->Create(this->Application, "-text Delete");
@@ -2087,7 +2086,7 @@ void vtkPVSource::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVSource ";
-  this->ExtractRevision(os,"$Revision: 1.248.2.11 $");
+  this->ExtractRevision(os,"$Revision: 1.248.2.12 $");
 }
 
 //----------------------------------------------------------------------------
