@@ -52,7 +52,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWIcon );
-vtkCxxRevisionMacro(vtkKWIcon, "1.7");
+vtkCxxRevisionMacro(vtkKWIcon, "1.8");
 
 vtkKWIcon::vtkKWIcon()
 {
@@ -176,7 +176,15 @@ void vtkKWIcon::SetImageData(const unsigned char* pixels, int width, int height,
   if ( data_ptr )
     {
     this->SetData(data_ptr, width, height);
-    delete [] data_ptr;
+    }
+  if (base64)
+    {
+    delete [] base64_buffer;
+    }
+
+  if (zlib)
+    {
+    delete [] zlib_buffer;
     }
 }
 
