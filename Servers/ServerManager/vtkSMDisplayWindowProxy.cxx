@@ -31,7 +31,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMDisplayWindowProxy);
-vtkCxxRevisionMacro(vtkSMDisplayWindowProxy, "1.18");
+vtkCxxRevisionMacro(vtkSMDisplayWindowProxy, "1.19");
 vtkCxxSetObjectMacro(vtkSMDisplayWindowProxy,RenderModule,vtkPVRenderModule);
 
 struct vtkSMDisplayWindowProxyInternals
@@ -323,6 +323,8 @@ void vtkSMDisplayWindowProxy::WriteImage(const char* filename,
     return;
     }
 
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+
   vtkClientServerStream str;
 
   vtkSMProxy* imageWriter = vtkSMProxy::New();
@@ -330,6 +332,8 @@ void vtkSMDisplayWindowProxy::WriteImage(const char* filename,
 
   imageWriter->SetVTKClassName(writerName);
   imageWriter->CreateVTKObjects(1);
+
+  pm->SendPrepareProgress();
 
   str << vtkClientServerStream::Invoke 
     << this->WindowToImage->GetID(0) 
@@ -358,9 +362,9 @@ void vtkSMDisplayWindowProxy::WriteImage(const char* filename,
     << "Write" 
     << vtkClientServerStream::End;
 
-  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   pm->SendStream(imageWriter->Servers, str, 0);
   str.Reset();
+  pm->SendCleanupPendingProgress();
 
   imageWriter->Delete();
 

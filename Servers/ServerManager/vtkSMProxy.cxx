@@ -30,7 +30,7 @@
 #include <vtkstd/algorithm>
 
 vtkStandardNewMacro(vtkSMProxy);
-vtkCxxRevisionMacro(vtkSMProxy, "1.27");
+vtkCxxRevisionMacro(vtkSMProxy, "1.28");
 
 vtkCxxSetObjectMacro(vtkSMProxy, XMLElement, vtkPVXMLElement);
 
@@ -542,6 +542,8 @@ void vtkSMProxy::UpdateInformation()
 void vtkSMProxy::UpdateVTKObjects()
 {
   vtkClientServerStream str;
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  pm->SendPrepareProgress();
 
   // Make each property push their values to each VTK object
   // referred by the proxy. This is done by appending all
@@ -603,9 +605,9 @@ void vtkSMProxy::UpdateVTKObjects()
     }
   if (str.GetNumberOfMessages() > 0)
     {
-    vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
     pm->SendStream(this->Servers, str, 0);
     }
+  pm->SendCleanupPendingProgress();
 
   vtkSMProxyInternals::ProxyMap::iterator it2 =
     this->Internals->SubProxies.begin();
@@ -622,12 +624,14 @@ void vtkSMProxy::UpdateSelfAndAllInputs()
 {
   vtkSMPropertyIterator* iter = this->NewPropertyIterator();
 
+  vtkProcessModule::GetProcessModule()->SendPrepareProgress();
   while (!iter->IsAtEnd())
     {
     iter->GetProperty()->UpdateAllInputs();
     iter->Next();
     }
   iter->Delete();
+  vtkProcessModule::GetProcessModule()->SendCleanupPendingProgress();
 
   this->UpdateVTKObjects();
 }
