@@ -73,7 +73,7 @@ const int REN_INFO_INT_SIZE = sizeof(RendererInfoInt)/sizeof(int);
 const int REN_INFO_FLOAT_SIZE = sizeof(RendererInfoFloat)/sizeof(float);
 const int LIGHT_INFO_FLOAT_SIZE = sizeof(LightInfoFloat)/sizeof(float);
 
-vtkCxxRevisionMacro(vtkParallelRenderManager, "1.2.2.3");
+vtkCxxRevisionMacro(vtkParallelRenderManager, "1.2.2.4");
 
 vtkParallelRenderManager::vtkParallelRenderManager()
 {
@@ -147,6 +147,15 @@ void vtkParallelRenderManager::PrintSelf(ostream &os, vtkIndent indent)
   os << indent << "AutoImageReductionFactor: "
      << (this->AutoImageReductionFactor ? "on" : "off") << endl;
 
+  if (this->MagnifyImageMethod == LINEAR)
+    {
+    os << indent << "MagnifyImageMethod: LINEAR\n";
+    }
+  else if (this->MagnifyImageMethod == NEAREST)
+    {
+    os << indent << "MagnifyImageMethod: NEAREST\n";
+    }
+
   os << indent << "WriteBackImages: "
      << (this->WriteBackImages ? "on" : "off") << endl;
   os << indent << "MagnifyImages: "
@@ -163,6 +172,7 @@ void vtkParallelRenderManager::PrintSelf(ostream &os, vtkIndent indent)
   os << indent << "RootProcessId: " << this->RootProcessId << endl;
 
   os << indent << "Last render time: " << this->GetRenderTime() << endl;
+  //os << indent << "ImageProcessingTime:\n ";
   os << indent << "Last image processing time: "
      << this->GetImageProcessingTime() << endl;
 }

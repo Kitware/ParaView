@@ -22,7 +22,7 @@ static vtkIceTRenderer *currentRenderer;
 // vtkIceTRenderer implementation.
 //******************************************************************
 
-vtkCxxRevisionMacro(vtkIceTRenderer, "1.2.2.3");
+vtkCxxRevisionMacro(vtkIceTRenderer, "1.2.2.4");
 vtkStandardNewMacro(vtkIceTRenderer);
 
 vtkIceTRenderer::vtkIceTRenderer()
@@ -298,6 +298,8 @@ int vtkIceTRenderer::UpdateGeometry()
 void vtkIceTRenderer::PrintSelf(ostream &os, vtkIndent indent)
 {
   this->vtkOpenGLRenderer::PrintSelf(os, indent);
+
+  os << indent << "ComposeNextFrame: " << this->ComposeNextFrame << endl);
 }
 
 //******************************************************************

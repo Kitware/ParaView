@@ -22,8 +22,7 @@
 #define __vtkCompositeRenderManager_h
 
 #include <vtkParallelRenderManager.h>
-
-#include <vtkCompositer.h>
+class vtkCompositer;
 
 class VTK_EXPORT vtkCompositeRenderManager
     : public vtkParallelRenderManager
@@ -35,7 +34,7 @@ public:
 
   // Description:
   // Set/Get the composite algorithm.
-  vtkSetObjectMacro(Compositer, vtkCompositer);
+  vtkCompositer* SetCompositer(vtkCompositer *c);
   vtkGetObjectMacro(Compositer, vtkCompositer);
 
   // Description:

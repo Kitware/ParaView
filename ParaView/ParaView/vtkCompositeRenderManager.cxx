@@ -11,8 +11,9 @@
 #include <vtkRendererCollection.h>
 #include <vtkTimerLog.h>
 
-vtkCxxRevisionMacro(vtkCompositeRenderManager, "1.2.2.2");
+vtkCxxRevisionMacro(vtkCompositeRenderManager, "1.2.2.3");
 vtkStandardNewMacro(vtkCompositeRenderManager);
+vtkCxxSetObjectMacro(vtkCompositeRenderManager,Compositer,vtkCompositer);
 
 vtkCompositeRenderManager::vtkCompositeRenderManager()
 {
