@@ -1319,8 +1319,6 @@ void vtkRedistributePoly::SendCellSizes
   vtkIdType cellId,i;
   vtkIdType numCells = stopCell-startCell+1;
 
-  int myId = this->Controller->GetLocalProcessId();
-
   // ... Allocate maximum possible number of points (use total from
   //     all of input) ...
 
@@ -1417,8 +1415,6 @@ void vtkRedistributePoly::SendCells
 
   vtkIdType cellId,i;
   vtkIdType numCells = stopCell-startCell+1;
-
-  int myId = this->Controller->GetLocalProcessId();
 
   // ... Allocate maximum possible number of points (use total from
   //     all of input) ...
@@ -1676,15 +1672,14 @@ void vtkRedistributePoly::ReceiveCells
 // Allocate space for the attribute data expected from all id's.
 void vtkRedistributePoly::AllocateDataArrays
    (vtkDataSetAttributes* toPd, vtkIdType* numToCopy, const int cntRec,
-    int* recFrom, const vtkIdType numToCopyOnProc)
+    int*, const vtkIdType numToCopyOnProc)
 {
-
-  int myId = this->Controller->GetLocalProcessId();
-  int numProcs = this->Controller->GetNumberOfProcesses();
-
   vtkIdType numToCopyTotal = numToCopyOnProc;
   int id;
-  for (id=0;id<cntRec;id++) numToCopyTotal += numToCopy[id];
+  for (id=0;id<cntRec;id++)
+    {
+    numToCopyTotal += numToCopy[id];
+    }
    
 
   // ... Use WritePointer to allocate memory because it copies existing 
@@ -1693,66 +1688,66 @@ void vtkRedistributePoly::AllocateDataArrays
   vtkDataArray* Data;
 
   if ( toPd->GetCopyScalars() )
-  {
+    {
     vtkDataArray* toScalars = toPd->GetScalars();
     if (toScalars)
-    {
-       Data = toScalars;
-       AllocateArrays (Data, numToCopyTotal );
+      {
+      Data = toScalars;
+      AllocateArrays (Data, numToCopyTotal );
+      }
     }
-  }
 
   if ( toPd->GetCopyVectors() )
-  {
+    {
     vtkDataArray* toVectors = toPd->GetVectors();
     if (toVectors)
-    {
-       Data = toVectors;
-       AllocateArrays (Data, numToCopyTotal );
+      {
+      Data = toVectors;
+      AllocateArrays (Data, numToCopyTotal );
+      }
     }
-  }
 
- if ( toPd->GetCopyNormals() )
-  {
+  if ( toPd->GetCopyNormals() )
+    {
     vtkDataArray* toNormals = toPd->GetNormals();
     if (toNormals)
-    {
-       Data = toNormals;
-       AllocateArrays (Data, numToCopyTotal );
+      {
+      Data = toNormals;
+      AllocateArrays (Data, numToCopyTotal );
+      }
     }
-  }
 
   if ( toPd->GetCopyTCoords() )
-  {
+    {
     vtkDataArray* toTCoords = toPd->GetTCoords();
     if (toTCoords)
-    {
-       Data = toTCoords;
-       AllocateArrays (Data, numToCopyTotal);
+      {
+      Data = toTCoords;
+      AllocateArrays (Data, numToCopyTotal);
+      }
     }
-  }
 
   if ( toPd->GetCopyTensors() )
-  {
+    {
     vtkDataArray* toTensors = toPd->GetTensors();
     if (toTensors)
-    {
-       Data = toTensors;
-       AllocateArrays (Data, numToCopyTotal);
+      {
+      Data = toTensors;
+      AllocateArrays (Data, numToCopyTotal);
+      }
     }
-  }
 
 #if 0
   //if ( toPd->GetCopyFieldData() )
   {
-    vtkFieldData* toFieldData = toPd->GetFieldData();
-    if (toFieldData != NULL)
+  vtkFieldData* toFieldData = toPd->GetFieldData();
+  if (toFieldData != NULL)
     {
-      int numArrays=toFieldData->GetNumberOfArrays();
-      for (int j=0; j<numArrays; j++)
+    int numArrays=toFieldData->GetNumberOfArrays();
+    for (int j=0; j<numArrays; j++)
       {
-       Data = toFieldData->GetArray(j);
-       AllocateArrays (Data, numToCopyTotal);
+      Data = toFieldData->GetArray(j);
+      AllocateArrays (Data, numToCopyTotal);
 
       }
     }
@@ -1955,7 +1950,7 @@ void vtkRedistributePoly::SendDataArrays
   if ( toPd->GetCopyTCoords() )
   {
     vtkDataArray* fromTCoords = fromPd->GetTCoords();
-    vtkDataArray* toTCoords   = toPd->GetTCoords();
+    //vtkDataArray* toTCoords   = toPd->GetTCoords();
     if (fromTCoords != NULL)
     {
       Data = fromTCoords;
@@ -2007,10 +2002,10 @@ void vtkRedistributePoly::SendCellBlockDataArrays
   vtkDataArray* Data;
 
   if ( toPd->GetCopyScalars() )
-  {
+    {
     vtkDataArray* fromScalars = fromPd->GetScalars();
     if (fromScalars != NULL)
-    {
+      {
       Data = fromScalars;
       int numComps = Data->GetNumberOfComponents();
       int activeComponent = 0;
@@ -2021,66 +2016,66 @@ void vtkRedistributePoly::SendCellBlockDataArrays
                     sendTag);
       else
         SendBlockArrays (Data, numToCopy, sendTo, startCell, sendTag);
+      }
     }
-  }
 
   if ( toPd->GetCopyVectors() )
-  {
+    {
     vtkDataArray* fromVectors = fromPd->GetVectors();
     if (fromVectors != NULL)
-    {
+      {
       Data = (vtkFloatArray*)fromVectors;
       int sendTag = VTK_VECTORS_TAG;
       SendBlockArrays (Data, numToCopy, sendTo, startCell, sendTag);
+      }
     }
-  }
 
   if ( toPd->GetCopyNormals() )
-  {
+    {
     vtkDataArray* fromNormals = fromPd->GetNormals();
     if (fromNormals != NULL)
-    {
+      {
       Data = fromNormals;
       int sendTag = VTK_NORMALS_TAG;
       SendBlockArrays (Data, numToCopy, sendTo, startCell, sendTag);
+      }
     }
-  }
 
   if ( toPd->GetCopyTCoords() )
-  {
-    vtkDataArray* fromTCoords = fromPd->GetTCoords();
-    vtkDataArray* toTCoords   = toPd->GetTCoords();
-    if (fromTCoords != NULL)
     {
+    vtkDataArray* fromTCoords = fromPd->GetTCoords();
+    //vtkDataArray* toTCoords   = toPd->GetTCoords();
+    if (fromTCoords != NULL)
+      {
       Data = fromTCoords;
       int sendTag = VTK_TCOORDS_TAG;
       SendBlockArrays (Data, numToCopy, sendTo, startCell, sendTag);
+      }
     }
-  }
 
   if ( toPd->GetCopyTensors() )
-  {
+    {
     vtkDataArray* fromTensors = fromPd->GetTensors();
     if (fromTensors != NULL)
-    {
+      {
       Data = fromTensors;
       int sendTag = VTK_TENSOR_TAG;
       SendBlockArrays (Data, numToCopy, sendTo, startCell, sendTag);
+      }
     }
-  }
 
 #if 0
   //if ( toPd->GetCopyFieldData() )
   {
-    vtkFieldData* fromFieldData = fromPd->GetFieldData();
-    if (fromFieldData != NULL)
+  vtkFieldData* fromFieldData = fromPd->GetFieldData();
+  if (fromFieldData != NULL)
     {
-      int numArrays=fromFieldData->GetNumberOfArrays();
-      for (int j=0; j<numArrays; j++)
+    int numArrays=fromFieldData->GetNumberOfArrays();
+    for (int j=0; j<numArrays; j++)
       {
-        Data = fromFieldData->GetArray(j);
-        int sendTag = VTK_FIELDDATA_TAG+j*100;
-        SendBlockArrays (Data, numToCopy, sendTo, startCell, sendTag);
+      Data = fromFieldData->GetArray(j);
+      int sendTag = VTK_FIELDDATA_TAG+j*100;
+      SendBlockArrays (Data, numToCopy, sendTo, startCell, sendTag);
       }
     }
   }

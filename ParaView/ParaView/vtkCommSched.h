@@ -74,34 +74,35 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _vtkCommSched_h_
 #define _vtkCommSched_h_
 
-#include "vtkSystemIncludes.h"
-
 #include "vtkObject.h"
 
 //*******************************************************************
 class VTK_EXPORT vtkCommSched : public vtkObject
 {
-  public:
+public:
+  vtkTypeMacro(vtkCommSched, vtkObject);
+  void PrintSelf(ostream& os, vtkIndent indent);
+  
+  vtkCommSched();
+  ~vtkCommSched();
+  
+  static vtkCommSched* New();
+  vtkCommSched(vtkCommSched&);
+  
+  int cntSend;
+  int cntRec;
+  int* sendTo;
+  int* recFrom;
+  vtkIdType numCells;
+  vtkIdType* sendNum;
+  vtkIdType* recNum;
+  
+  vtkIdType** sendCellList;
+  vtkIdType* keepCellList;
 
-    vtkTypeMacro(vtkCommSched, vtkObject);
-    void PrintSelf(ostream& os, vtkIndent indent);
-
-    vtkCommSched();
-    ~vtkCommSched();
-    vtkCommSched(vtkCommSched&);
-
-    static vtkCommSched* New();
-
-    int cntSend;
-    int cntRec;
-    int* sendTo;
-    int* recFrom;
-    vtkIdType numCells;
-    vtkIdType* sendNum;
-    vtkIdType* recNum;
-
-    vtkIdType** sendCellList;
-    vtkIdType* keepCellList;
+private:
+  vtkCommSched(const vtkCommSched&); // Not implemented
+  void operator=(const vtkCommSched&); // Not implemented    
 };
 
 #endif    // _vtkCommSched_h_

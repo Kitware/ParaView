@@ -127,32 +127,32 @@ vtkCommSched::vtkCommSched(vtkCommSched& sched)
   int i;
   vtkIdType j;
   for (i=0; i<cntSend; i++)
-  {
-     sendTo[i]  = sched.sendTo[i];
-     sendNum[i] = sched.sendNum[i];
-  }
+    {
+    sendTo[i]  = sched.sendTo[i];
+    sendNum[i] = sched.sendNum[i];
+    }
   if (sched.sendCellList != NULL)
-  {
-     sendCellList = new vtkIdType*[cntSend];
-     for (i=0; i<cntSend; i++)
-     {
-        sendCellList[i] = new vtkIdType[sendNum[i]];
-        for (j=0; j<sendNum[i]; j++)
-           sendCellList[i][j] = sched.sendCellList[i][j];
-     }
-  }
+    {
+    sendCellList = new vtkIdType*[cntSend];
+    for (i=0; i<cntSend; i++)
+      {
+      sendCellList[i] = new vtkIdType[sendNum[i]];
+      for (j=0; j<sendNum[i]; j++)
+	sendCellList[i][j] = sched.sendCellList[i][j];
+      }
+    }
   recFrom = new int [cntRec];
   recNum  = new vtkIdType [cntRec];
   for (i=0; i<cntRec; i++)
-  {
-     recFrom[i] = sched.recFrom[i];
-     recNum[i]  = sched.recNum[i];
-  }
+    {
+    recFrom[i] = sched.recFrom[i];
+    recNum[i]  = sched.recNum[i];
+    }
   if (sched.keepCellList != NULL)
-  {
-     keepCellList = new vtkIdType [numCells];
-     for (i=0; i<numCells; i++) keepCellList[i] = sched.keepCellList[i];
-  }
+    {
+    keepCellList = new vtkIdType [numCells];
+    for (i=0; i<numCells; i++) keepCellList[i] = sched.keepCellList[i];
+    }
   
 }
 //*****************************************************************

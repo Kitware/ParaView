@@ -98,11 +98,11 @@ public:
 protected:
   vtkBalancePoly();
   ~vtkBalancePoly();
-  vtkBalancePoly(const vtkBalancePoly&) {};
-  void operator=(const vtkBalancePoly&) {};
-
   void MakeSchedule (vtkCommSched&);
 
+private:
+  vtkBalancePoly(const vtkBalancePoly&); // Not implemented
+  void operator=(const vtkBalancePoly&); // Not implemented
 };
 
 //****************************************************************

@@ -129,9 +129,7 @@ public:
 protected:
   vtkRedistributePoly();
   ~vtkRedistributePoly();
-  vtkRedistributePoly(const vtkRedistributePoly&) {};
-  void operator=(const vtkRedistributePoly&) {};
-
+  
   virtual void MakeSchedule (vtkCommSched&);
   void OrderSchedule (vtkCommSched&);
 
@@ -188,7 +186,9 @@ protected:
   vtkMultiProcessController *Controller;
   //vtkPointLocator *Locator;
   int colorProc; // Set to 1 to color data according to processor
-  
+private:
+  vtkRedistributePoly(const vtkRedistributePoly&); // Not implemented
+  void operator=(const vtkRedistributePoly&); // Not implemented
 };
 
 //****************************************************************

@@ -100,13 +100,14 @@ public:
 protected:
   vtkAllToNPoly();
   ~vtkAllToNPoly();
-  vtkAllToNPoly(const vtkAllToNPoly&) {};
-  void operator=(const vtkAllToNPoly&) {};
 
   void MakeSchedule (vtkCommSched&);
 
   int numRestrict;
 
+private:
+  vtkAllToNPoly(const vtkAllToNPoly&); // Not implemented
+  void operator=(const vtkAllToNPoly&); // Not implemented
 };
 
 //****************************************************************

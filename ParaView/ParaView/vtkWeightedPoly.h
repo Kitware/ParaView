@@ -89,7 +89,7 @@ class vtkMultiProcessController;
 class VTK_EXPORT vtkWeightedPoly : public vtkRedistributePoly
 {
 public:
-  vtkTypeMacro(vtkWeightedPoly, vtkPolyDataToPolyDataFilter);
+  vtkTypeMacro(vtkWeightedPoly, vtkRedistributePoly);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
@@ -107,12 +107,13 @@ public:
 protected:
   vtkWeightedPoly();
   ~vtkWeightedPoly();
-  vtkWeightedPoly(const vtkWeightedPoly&) {};
-  void operator=(const vtkWeightedPoly&) {};
 
   virtual void MakeSchedule (vtkCommSched&);
   float* Weights;
 
+private:
+  vtkWeightedPoly(const vtkWeightedPoly&); // Not implemented
+  void operator=(const vtkWeightedPoly&); // Not implemented
 };
 
 //****************************************************************

@@ -364,8 +364,8 @@ int vtkPVEnSightReaderModule::ReadFile(const char* fname,
       connection->SetApplication(pvApp);
       connectionTclName = new char[strlen(tclName)+2 + ((i+1)%10)+1];
       sprintf(connectionTclName, "%s_%d", tclName, i+1);
-      vtkSource* source = static_cast<vtkSource*>(
-	pvApp->MakeTclObject("vtkPassThroughFilter", connectionTclName));
+      //vtkSource* source = static_cast<vtkSource*>(
+      //  pvApp->MakeTclObject("vtkPassThroughFilter", connectionTclName));
       connection->SetVTKSource(reader, connectionTclName);
       connection->SetView(window->GetMainView());
       connection->SetName(connectionTclName);
