@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWScale );
-vtkCxxRevisionMacro(vtkKWScale, "1.29");
+vtkCxxRevisionMacro(vtkKWScale, "1.30");
 
 
 
@@ -390,4 +390,5 @@ void vtkKWScale::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "Resolution: " << this->GetResolution() << endl;
   os << indent << "Label: " << this->Label << endl;
   os << indent << "Entry: " << this->Entry << endl;
+  os << indent << "DisplayEntryAndLabelOnTop: " << (this->DisplayEntryAndLabelOnTop ? "On" : "Off") << endl;
 }
