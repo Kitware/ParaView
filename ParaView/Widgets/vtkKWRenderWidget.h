@@ -54,7 +54,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class vtkCamera;
 class vtkCornerAnnotation;
-class vtkKWMarker2D;
 class vtkKWEventMap;
 class vtkKWGenericRenderWindowInteractor;
 class vtkKWRenderWidgetObserver;
@@ -156,17 +155,6 @@ public:
     { this->SetCornerAnnotationColor(rgb[0], rgb[1], rgb[2]); };
   virtual float* GetCornerAnnotationColor();
   vtkGetObjectMacro(CornerAnnotation, vtkCornerAnnotation);
-
-  // Description:
-  // Get and control the 2D cursor annotation.
-  virtual void SetMarker2DVisibility(int v);
-  vtkBooleanMacro(Marker2DVisibility, int);
-  vtkGetMacro(Marker2DVisibility, int);
-  virtual void SetMarker2DColor(float r, float g, float b);
-  virtual void SetMarker2DColor(float *rgb)
-    { this->SetMarker2DColor(rgb[0], rgb[1], rgb[2]); };
-  vtkGetVector3Macro(Marker2DColor, float);
-  virtual void SetMarker2DPosition(float x, float y);
 
   // Description:
   // Get and control the header annotation.
@@ -278,11 +266,6 @@ protected:
   int CollapsingRenders;
   int CollapsingRendersCount;
 
-  int   Marker2DVisibility;
-  float Marker2DColor[3];
-  float Marker2DPosition[2];
-  vtkKWMarker2D* Marker2D;
-  
   vtkKWRenderWidgetObserver *Observer;
   
 private:
