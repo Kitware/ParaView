@@ -68,7 +68,7 @@
 # ifdef _WIN32
 #  include "vtkAVIWriter.h"
 # else
-#  include "vtkMovieWriter.h"
+#  include "vtkMPEG2Writer.h"
 # endif
 #endif
 
@@ -185,7 +185,7 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterface);
-vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.146");
+vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.147");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterface,ControlledWidget, vtkPVWidget);
 
@@ -1439,7 +1439,7 @@ void vtkPVAnimationInterface::SaveImages(const char* fileRoot,
 # ifdef _WIN32
     awriter = vtkAVIWriter::New();
 # else
-    awriter = vtkMovieWriter::New();
+    awriter = vtkMPEG2Writer::New();
 # endif
     }
 #endif
