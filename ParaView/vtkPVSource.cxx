@@ -107,8 +107,11 @@ vtkPVSource::~vtkPVSource()
   
   for (i = 0; i < this->NumberOfPVOutputs; i++)
     {
-    this->PVOutputs[i]->UnRegister(this);
-    this->PVOutputs[i] = NULL;
+    if (this->PVOutputs[i])
+      {
+      this->PVOutputs[i]->UnRegister(this);
+      this->PVOutputs[i] = NULL;
+      }
     }
   
   if (this->PVOutputs)
