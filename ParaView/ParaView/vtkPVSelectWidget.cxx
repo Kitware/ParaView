@@ -32,7 +32,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectWidget);
-vtkCxxRevisionMacro(vtkPVSelectWidget, "1.31");
+vtkCxxRevisionMacro(vtkPVSelectWidget, "1.32");
 
 int vtkPVSelectWidgetCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -190,7 +190,6 @@ void vtkPVSelectWidget::AcceptInternal(vtkClientServerID sourceId)
       vtkClientServerID id = vtkPVObjectWidget::SafeDownCast(pvwp->GetWidget())
         ->GetObjectByName(this->GetCurrentVTKValue());
       this->Property->SetObjectID(id);
-      cout << "Id: " << id << endl;;
       }
     else
       {
@@ -208,7 +207,6 @@ void vtkPVSelectWidget::AcceptInternal(vtkClientServerID sourceId)
     }
 
   this->ModifiedFlag = 0;
-  this->Print(cout);
 }
 
 //-----------------------------------------------------------------------------

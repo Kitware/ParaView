@@ -49,7 +49,7 @@
 #include "vtkPVProcessModule.h"
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVColorMap);
-vtkCxxRevisionMacro(vtkPVColorMap, "1.71");
+vtkCxxRevisionMacro(vtkPVColorMap, "1.72");
 
 int vtkPVColorMapCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -1321,10 +1321,10 @@ void vtkPVColorMap::SetColorSchemeToRGBW()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVColorMap::StartColorButtonCallback(float r, float g, float b)
+void vtkPVColorMap::StartColorButtonCallback(double r, double g, double b)
 {
-  float rgb[3];
-  float hsv[3];
+  double rgb[3];
+  double hsv[3];
 
   // Convert RGB to HSV.
   rgb[0] = r;
@@ -1338,10 +1338,10 @@ void vtkPVColorMap::StartColorButtonCallback(float r, float g, float b)
 
 //----------------------------------------------------------------------------
 // Access for trace files.
-void vtkPVColorMap::SetStartHSV(float h, float s, float v)
+void vtkPVColorMap::SetStartHSV(double h, double s, double v)
 {
-  float hsv[3];
-  float rgb[3];
+  double hsv[3];
+  double rgb[3];
 
   if ( this->StartHSV[0] == h && 
        this->StartHSV[1] == s && this->StartHSV[2] == v)
@@ -1365,10 +1365,10 @@ void vtkPVColorMap::SetStartHSV(float h, float s, float v)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVColorMap::EndColorButtonCallback(float r, float g, float b)
+void vtkPVColorMap::EndColorButtonCallback(double r, double g, double b)
 {
-  float rgb[3];
-  float hsv[3];
+  double rgb[3];
+  double hsv[3];
 
   // Convert RGB to HSV.
   rgb[0] = r;
@@ -1382,10 +1382,10 @@ void vtkPVColorMap::EndColorButtonCallback(float r, float g, float b)
 
 //----------------------------------------------------------------------------
 // Access for trace files.
-void vtkPVColorMap::SetEndHSV(float h, float s, float v)
+void vtkPVColorMap::SetEndHSV(double h, double s, double v)
 {
-  float hsv[3];
-  float rgb[3];
+  double hsv[3];
+  double rgb[3];
 
   if ( this->EndHSV[0] == h && 
        this->EndHSV[1] == s && this->EndHSV[2] == v)
@@ -1812,12 +1812,12 @@ void vtkPVColorMap::ColorRangeEntryCallback()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVColorMap::RGBToHSV(float rgb[3], float hsv[3])
+void vtkPVColorMap::RGBToHSV(double rgb[3], double hsv[3])
 {
-  float hue = 0;
-  float sat = 0;
-  float val = 0;
-  float lx, ly, lz;
+  double hue = 0;
+  double sat = 0;
+  double val = 0;
+  double lx, ly, lz;
 
   if (rgb[0] <= 0.0 && rgb[1] <= 0.0 && rgb[2] <= 0.0)
     {
@@ -1891,12 +1891,12 @@ void vtkPVColorMap::RGBToHSV(float rgb[3], float hsv[3])
 //----------------------------------------------------------------------------
 // Only used to get the color of the button when HSV is set from script.
 // It might be easier to save the RGB values.
-void vtkPVColorMap::HSVToRGB(float hsv[3], float rgb[3])
+void vtkPVColorMap::HSVToRGB(double hsv[3], double rgb[3])
 {
-  float hue = hsv[0];
-  float sat = hsv[1];
-  float val = hsv[2];
-  float lx, ly, lz;
+  double hue = hsv[0];
+  double sat = hsv[1];
+  double val = hsv[2];
+  double lx, ly, lz;
 
   // Wrap hue into expected range.
   while (hue >= 1.0)

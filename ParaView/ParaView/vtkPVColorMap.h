@@ -176,10 +176,10 @@ public:
 
   // Description:
   // Callbacks to change the color map.
-  void StartColorButtonCallback(float r, float g, float b);
-  void EndColorButtonCallback(float r, float g, float b);
-  void SetStartHSV(float h, float s, float v);
-  void SetEndHSV(float h, float s, float v);
+  void StartColorButtonCallback(double r, double g, double b);
+  void EndColorButtonCallback(double r, double g, double b);
+  void SetStartHSV(double h, double s, double v);
+  void SetEndHSV(double h, double s, double v);
 
   // Description:
   // Internal call used when the color map image changes shape.
@@ -256,8 +256,8 @@ protected:
   int VectorMode;
   int VectorComponent;
 
-  float StartHSV[3];
-  float EndHSV[3];
+  double StartHSV[3];
+  double EndHSV[3];
 
   vtkScalarBarWidget* ScalarBar;
   vtkScalarBarWidgetObserver* ScalarBarObserver;
@@ -268,8 +268,8 @@ protected:
   void UpdateLookupTable();
   // Visibility depends on check and UseCount.
   void UpdateInternalScalarBarVisibility();
-  void RGBToHSV(float rgb[3], float hsv[3]);
-  void HSVToRGB(float hsv[3], float rgb[3]);
+  void RGBToHSV(double rgb[3], double hsv[3]);
+  void HSVToRGB(double hsv[3], double rgb[3]);
 
   vtkLookupTable* LookupTable;
   vtkClientServerID LookupTableID;

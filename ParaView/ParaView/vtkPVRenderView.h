@@ -254,7 +254,7 @@ public:
   void OrientationAxesCheckCallback();
   void SetOrientationAxesInteractivity(int val);
   void OrientationAxesInteractiveCallback();
-  void SetOrientationAxesOutlineColor(float r, float g, float b);
+  void SetOrientationAxesOutlineColor(double r, double g, double b);
   
 protected:
   vtkPVRenderView();

@@ -76,7 +76,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.240");
+vtkCxxRevisionMacro(vtkPVData, "1.241");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -1321,7 +1321,7 @@ void vtkPVData::UpdatePropertiesInternal()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVData::SetActorColor(float r, float g, float b)
+void vtkPVData::SetActorColor(double r, double g, double b)
 {
   vtkPVPart *part;
   int idx, num;
@@ -1335,7 +1335,7 @@ void vtkPVData::SetActorColor(float r, float g, float b)
 }  
 
 //----------------------------------------------------------------------------
-void vtkPVData::ChangeActorColor(float r, float g, float b)
+void vtkPVData::ChangeActorColor(double r, double g, double b)
 {
   vtkPVPart *part;
   part = this->GetPVSource()->GetPart();
@@ -1358,7 +1358,7 @@ void vtkPVData::ChangeActorColor(float r, float g, float b)
 }
 
 //----------------------------------------------------------------------------
-float* vtkPVData::GetActorColor()
+double* vtkPVData::GetActorColor()
 {
   return this->GetPVSource()->GetPart(0)->GetPartDisplay()->GetProperty()->GetColor();
 }
@@ -1424,7 +1424,7 @@ void vtkPVData::ColorByPropertyInternal()
     part->GetPartDisplay()->SetScalarVisibility(0);
     }
 
-  float *color = this->ColorButton->GetColor();
+  double *color = this->ColorButton->GetColor();
   this->SetActorColor(color[0], color[1], color[2]);
 
   this->SetPVColorMap(NULL);
@@ -2031,7 +2031,7 @@ void vtkPVData::AmbientChanged()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVData::SetAmbient(float ambient)
+void vtkPVData::SetAmbient(double ambient)
 {
   vtkPVPart *part;
   int num, idx;
@@ -2579,7 +2579,7 @@ void vtkPVData::SaveInBatchScript(ofstream *file)
             << part->GetPartDisplay()->GetProperty()->GetSpecular() << "\n";
       *file << "\t[pvTemp" << part->GetPartDisplay()->GetPropID() << " GetProperty] SetSpecularPower "
             << part->GetPartDisplay()->GetProperty()->GetSpecularPower() << "\n";
-      float *color = part->GetPartDisplay()->GetProperty()->GetSpecularColor();
+      double *color = part->GetPartDisplay()->GetProperty()->GetSpecularColor();
       *file << "\t[pvTemp" << part->GetPartDisplay()->GetPropID() << " GetProperty] SetSpecularColor "
             << color[0] << " " << color[1] << " " << color[2] << "\n";
       if (part->GetPartDisplay()->GetProperty()->GetLineWidth() > 1)
@@ -2595,7 +2595,7 @@ void vtkPVData::SaveInBatchScript(ofstream *file)
 
       if (!part->GetPartDisplay()->GetMapper()->GetScalarVisibility())
         {
-        float propColor[3];
+        double propColor[3];
         part->GetPartDisplay()->GetProperty()->GetColor(propColor);
         *file << "[pvTemp" << part->GetPartDisplay()->GetPropID() << " GetProperty] SetColor "
               << propColor[0] << " " << propColor[1] << " " << propColor[2]
@@ -2632,7 +2632,7 @@ void vtkPVData::SaveInBatchScript(ofstream *file)
 //----------------------------------------------------------------------------
 void vtkPVData::SaveState(ofstream *file)
 {
-  float *pf;
+  double *pf;
   float f1, f2, f3;
   int   i1;
 

@@ -29,7 +29,7 @@
 #include "vtkUnsignedCharArray.h"
 
 
-vtkCxxRevisionMacro(vtkVRMLSource, "1.7");
+vtkCxxRevisionMacro(vtkVRMLSource, "1.8");
 vtkStandardNewMacro(vtkVRMLSource);
 
 //------------------------------------------------------------------------------
@@ -217,7 +217,7 @@ void vtkVRMLSource::CopyImporterToOutputs()
         {
         vtkUnsignedCharArray *colorArray = vtkUnsignedCharArray::New();
         unsigned char r, g, b;
-        float* actorColor;
+        double* actorColor;
      
         actorColor = actor->GetProperty()->GetColor();
         r = static_cast<unsigned char>(actorColor[0]*255.0);

@@ -62,8 +62,8 @@ public:
   // Description:
   // Set/get the color of the outline of this widget.  The outline is visible
   // when (in interactive mode) the cursor is over this 3D widget.
-  void SetOutlineColor(float r, float g, float b);
-  float *GetOutlineColor();
+  void SetOutlineColor(double r, double g, double b);
+  double *GetOutlineColor();
   
   // Description:
   // Set/get the viewport to position/size this 3D widget.

@@ -96,7 +96,7 @@ static unsigned char image_properties[] =
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.284");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.285");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -1915,12 +1915,12 @@ void vtkPVRenderView::OrientationAxesInteractiveCallback()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVRenderView::SetOrientationAxesOutlineColor(float r, float g, float b)
+void vtkPVRenderView::SetOrientationAxesOutlineColor(double r, double g, double b)
 {
-  float *color = this->OrientationAxesOutlineColor->GetColor();
+  double *color = this->OrientationAxesOutlineColor->GetColor();
   if (r != color[0] || g != color[1] || b != color[2])
     {
-    this->AddTraceEntry("$kw(%s) SetOrientationAxesOutlineColor %f %f %f",
+    this->AddTraceEntry("$kw(%s) SetOrientationAxesOutlineColor %lf %lf %lf",
                         this->GetTclName(), r, g, b);
     this->OrientationAxesOutlineColor->SetColor(r, g, b);
     }

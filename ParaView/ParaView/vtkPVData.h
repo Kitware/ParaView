@@ -172,7 +172,7 @@ public:
   // Description:
   // to change the ambient component of the light
   void AmbientChanged();
-  void SetAmbient(float ambient);
+  void SetAmbient(double ambient);
   
   // Description:
   // Methods called when item chosen from RepresentationMenu
@@ -221,8 +221,8 @@ public:
   
   // Description:
   // Callback for the change color button.
-  void ChangeActorColor(float r, float g, float b);
-  float* GetActorColor();
+  void ChangeActorColor(double r, double g, double b);
+  double* GetActorColor();
     
   // Description:
   // Get the name of the cube axes actor.
@@ -311,7 +311,7 @@ protected:
   void ColorByPointFieldInternal(const char *name, int numComps);
   void ColorByCellFieldInternal(const char *name, int numComps);
   void SetColorRangeInternal(double min, double max);
-  void SetActorColor(float r, float g, float b);
+  void SetActorColor(double r, double g, double b);
 
   // A flag that helps UpdateProperties determine 
   // whether to set the default color.
@@ -383,9 +383,9 @@ protected:
 
   vtkKWPushButton *ResetCameraButton;
 
-  float PreviousAmbient;
-  float PreviousDiffuse;
-  float PreviousSpecular;
+  double PreviousAmbient;
+  double PreviousDiffuse;
+  double PreviousSpecular;
   int PreviousWasSolid;
 
   vtkPVColorMap *PVColorMap;

@@ -29,7 +29,7 @@
 #include "vtkRenderWindowInteractor.h"
 
 vtkStandardNewMacro(vtkPVAxesWidget);
-vtkCxxRevisionMacro(vtkPVAxesWidget, "1.8");
+vtkCxxRevisionMacro(vtkPVAxesWidget, "1.9");
 
 vtkCxxSetObjectMacro(vtkPVAxesWidget, AxesActor, vtkPVAxesActor);
 vtkCxxSetObjectMacro(vtkPVAxesWidget, ParentRenderer, vtkRenderer);
@@ -722,7 +722,7 @@ void vtkPVAxesWidget::SetInteractive(int state)
     }
 }
 
-void vtkPVAxesWidget::SetOutlineColor(float r, float g, float b)
+void vtkPVAxesWidget::SetOutlineColor(double r, double g, double b)
 {
   this->OutlineActor->GetProperty()->SetColor(r, g, b);
   if (this->Interactor)
@@ -731,7 +731,7 @@ void vtkPVAxesWidget::SetOutlineColor(float r, float g, float b)
     }
 }
 
-float* vtkPVAxesWidget::GetOutlineColor()
+double* vtkPVAxesWidget::GetOutlineColor()
 {
   return this->OutlineActor->GetProperty()->GetColor();
 }
