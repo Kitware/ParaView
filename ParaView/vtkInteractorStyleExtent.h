@@ -59,7 +59,7 @@ class vtkOutlineSource;
 class VTK_EXPORT vtkInteractorStyleExtent : public vtkInteractorStyle 
 {
 public:
-  vtkTypeMacro(vtkInteractorStyleExtent,vtkObject);
+  vtkTypeMacro(vtkInteractorStyleExtent,vtkInteractorStyle);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
