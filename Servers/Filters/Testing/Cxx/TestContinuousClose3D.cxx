@@ -40,6 +40,11 @@ int main()
   viewer->SetColorLevel(1000);
 
   viewer->Render();
+  
+  reader->Delete();
+  dilate->Delete();
+  erode->Delete();
+  viewer->Delete();
 
   return 0;
 }
