@@ -26,6 +26,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 =========================================================================*/
 #include "vtkKWVolumeComposite.h"
+#include "vtkKWView.h"
 #include "vtkKWWindow.h"
 #include "vtkVolumeRayCastCompositeFunction.h"
 #include "vtkVolumeRayCastMIPFunction.h"
@@ -91,9 +92,9 @@ vtkKWVolumeComposite::vtkKWVolumeComposite()
   this->RayCastMapper->SetGradientEstimator( gradientEstimator );
   this->HiResTextureMapper->SetGradientEstimator( gradientEstimator );
 
-  this->LowResTextureMapper->SetMaximumNumberOfPlanes(128);
-  this->MedResTextureMapper->SetMaximumNumberOfPlanes(128);
-  this->HiResTextureMapper->SetMaximumNumberOfPlanes(128);
+//  this->LowResTextureMapper->SetMaximumNumberOfPlanes(128);
+//  this->MedResTextureMapper->SetMaximumNumberOfPlanes(128);
+//  this->HiResTextureMapper->SetMaximumNumberOfPlanes(128);
   
   gradientEstimator->Delete();
   directionEncoder->Delete();
@@ -182,12 +183,40 @@ void vtkKWVolumeComposite::SetInput(vtkImageData *input)
 {
   int   size[3];
 
+  if ( this->GetView() )
+    {
+    this->GetView()->GetWindow()->GetProgressGauge()->SetValue(0);
+    }
+  
   input->Update();
+
+  if ( this->GetView() )
+    {
+    this->GetView()->GetWindow()->GetProgressGauge()->SetValue(30);
+    }
+  
   this->RayCastMapper->SetInput(input);
   this->VolumeProMapper->SetInput(input);
   this->HiResTextureMapper->SetInput(input);
+
+  float *range = input->GetScalarRange();
+  float max;
+
+  max = range[1];
+  max = (max <= 255.0)?(255.0):(max);
+  max = (max > 255.0 && max <= 4095.0)?(4095.0):(max);
+  max = (max > 4095.0)?(65535.0):(max);
+
+  float scale = 255.0 / max;
   
-  //this->RayCastMapper->GetGradientEstimator()->Update();
+  this->RayCastMapper->GetGradientEstimator()->SetInput(input);
+  this->RayCastMapper->GetGradientEstimator()->SetGradientMagnitudeScale(scale);
+  this->RayCastMapper->GetGradientEstimator()->Update();
+  
+  if ( this->GetView() )
+    {
+    this->GetView()->GetWindow()->GetProgressGauge()->SetValue(60);
+    }
   
   input->GetDimensions( size );
 
@@ -254,7 +283,16 @@ void vtkKWVolumeComposite::SetInput(vtkImageData *input)
     this->LowResTextureMapper->SetInput( this->LowResResampler->GetOutput() );
     
     this->LowResTextureMapper->GetGradientEstimator()->ZeroPadOff();
-    //this->LowResTextureMapper->GetGradientEstimator()->Update();
+    this->LowResTextureMapper->GetGradientEstimator()->
+      SetInput( this->LowResResampler->GetOutput() );
+    this->LowResTextureMapper->GetGradientEstimator()->
+      SetGradientMagnitudeScale(scale);
+    this->LowResTextureMapper->GetGradientEstimator()->Update();
+    
+    if ( this->GetView() )
+      {
+      this->GetView()->GetWindow()->GetProgressGauge()->SetValue(70);
+      }
     
     this->LowResTextureID = 
       this->LODVolume->AddLOD( this->LowResTextureMapper,
@@ -322,7 +360,16 @@ void vtkKWVolumeComposite::SetInput(vtkImageData *input)
     this->MedResTextureMapper->SetInput( this->MedResResampler->GetOutput() );
 
     this->MedResTextureMapper->GetGradientEstimator()->ZeroPadOff();
-    //this->MedResTextureMapper->GetGradientEstimator()->Update();
+    this->MedResTextureMapper->GetGradientEstimator()->
+      SetInput( this->MedResResampler->GetOutput() );
+    this->MedResTextureMapper->GetGradientEstimator()->
+      SetGradientMagnitudeScale(scale);
+    this->MedResTextureMapper->GetGradientEstimator()->Update();
+    
+    if ( this->GetView() )
+      {
+      this->GetView()->GetWindow()->GetProgressGauge()->SetValue(100);
+      }
     
     this->MedResTextureID = 
       this->LODVolume->AddLOD( this->MedResTextureMapper,
@@ -330,14 +377,6 @@ void vtkKWVolumeComposite::SetInput(vtkImageData *input)
     }
   vtkPiecewiseFunction *pwf = 
     this->VolumeProperty->GetScalarOpacity();
-  
-  float *range = input->GetScalarRange();
-  float max;
-
-  max = range[1];
-  max = (max <= 255.0)?(255.0):(max);
-  max = (max > 255.0 && max <= 4095.0)?(4095.0):(max);
-  max = (max > 4095.0)?(65535.0):(max);
   
   pwf->RemoveAllPoints();
   pwf->AddPoint(  0, 0.0);
@@ -349,6 +388,11 @@ void vtkKWVolumeComposite::SetInput(vtkImageData *input)
   pwf->AddPoint( (max/ 50.0), 1.0);
   pwf->AddPoint(         max, 1.0);
   this->VolumeProMapper->GradientOpacityModulationOn();
+
+  if ( this->GetView() )
+    {
+    this->GetView()->GetWindow()->GetProgressGauge()->SetValue(0);
+    }
 }
 
 
@@ -362,5 +406,5 @@ void vtkKWVolumeComposite::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWComposite::SerializeRevision(os,indent);
   os << indent << "vtkKWVolumeComposite ";
-  this->ExtractRevision(os,"$Revision: 1.12 $");
+  this->ExtractRevision(os,"$Revision: 1.13 $");
 }
