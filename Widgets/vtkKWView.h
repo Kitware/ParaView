@@ -256,6 +256,12 @@ public:
   void InteractOn();
   void InteractOff();
 
+  // Description:
+  // Set the name to be used in the Properties menu for the view properties
+  // sheet entry
+  vtkSetStringMacro( MenuPropertiesName );
+  vtkGetStringMacro( MenuPropertiesName );
+  
 protected:
   vtkKWView();
   ~vtkKWView();
@@ -299,6 +305,8 @@ protected:
   int              NumberOfStillUpdates;
   int              RenderMode;
 
+  char             *MenuPropertiesName;
+  
   int Printing;
   float PrintTargetDPI;
 };

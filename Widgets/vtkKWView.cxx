@@ -104,6 +104,9 @@ vtkKWView::vtkKWView()
 
   this->Printing = 0;
   this->PrintTargetDPI = 100;
+  
+  this->MenuPropertiesName = NULL;
+  this->SetMenuPropertiesName(" View");
 }
 
 vtkKWView::~vtkKWView()
@@ -135,6 +138,8 @@ vtkKWView::~vtkKWView()
     }
 
   delete [] this->StillUpdateRates;
+  
+  this->SetMenuPropertiesName(NULL);
 }
 
 void vtkKWView::SetStillUpdateRates( int count, float *rates )
@@ -672,7 +677,7 @@ void vtkKWView::Select(vtkKWWindow *pw)
   char *rbv = 
     pw->GetMenuProperties()->CreateRadioButtonVariable(
       pw->GetMenuProperties(),"Radio");
-  pw->GetMenuProperties()->AddRadioButton(10,"View", rbv, this, "ShowViewProperties");
+  pw->GetMenuProperties()->AddRadioButton(10, this->MenuPropertiesName, rbv, this, "ShowViewProperties");
   delete [] rbv;
   
   // add the Print option
@@ -714,7 +719,7 @@ void vtkKWView::Select(vtkKWWindow *pw)
 
 void vtkKWView::Deselect(vtkKWWindow *pw)
 {
-  pw->GetMenuProperties()->DeleteMenuItem("View");
+  pw->GetMenuProperties()->DeleteMenuItem( this->MenuPropertiesName );
   pw->GetMenuFile()->DeleteMenuItem("Print");
   pw->GetMenuFile()->DeleteMenuItem("Save As Image");
 
@@ -957,5 +962,5 @@ void vtkKWView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWView ";
-  this->ExtractRevision(os,"$Revision: 1.16 $");
+  this->ExtractRevision(os,"$Revision: 1.17 $");
 }
