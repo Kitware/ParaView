@@ -64,11 +64,12 @@ public:
   static int GetNextToken(istream *is, char result[1024]);
   static void WriteSafeString(ostream& os, const char *val);
   
+  static void EatWhiteSpace(istream *is);
+
 protected:
   vtkKWSerializer() {};
   ~vtkKWSerializer() {};
 
-  static void EatWhiteSpace(istream *is);
 private:
   vtkKWSerializer(const vtkKWSerializer&); // Not implemented
   void operator=(const vtkKWSerializer&); // Not implemented
