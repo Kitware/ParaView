@@ -27,6 +27,7 @@ SET( KWWidgets_SRCS
   vtkKWCheckButton.cxx 
   vtkKWCheckButtonSet.cxx 
   vtkKWCheckButtonWithChangeColor.cxx
+  vtkKWColorTransferFunctionEditor.cxx
   vtkKWComposite.cxx 
   vtkKWCompositeCollection.cxx 
   vtkKWCornerAnnotation.cxx 
@@ -37,6 +38,7 @@ SET( KWWidgets_SRCS
   vtkKWFrame.cxx
   vtkKWGenericComposite.cxx 
   vtkKWGenericRenderWindowInteractor.cxx
+  vtkKWHSVColorSelector.cxx
   vtkKWHeaderAnnotation.cxx 
   vtkKWLabel.cxx
   vtkKWLabeledCheckButton.cxx
@@ -58,6 +60,7 @@ SET( KWWidgets_SRCS
   vtkKWListSelectOrder.cxx
   vtkKWLoadSaveButton.cxx
   vtkKWLoadSaveDialog.cxx
+  vtkKWMaterialPropertyWidget.cxx
   vtkKWMenu.cxx 
   vtkKWMenuButton.cxx 
   vtkKWMessageDialog.cxx 
@@ -66,6 +69,9 @@ SET( KWWidgets_SRCS
   vtkKWOKCancelDialog.cxx 
   vtkKWObject.cxx 
   vtkKWOptionMenu.cxx 
+  vtkKWParameterValueFunctionEditor.cxx
+  vtkKWParameterValueFunctionInterface.cxx
+  vtkKWPiecewiseFunctionEditor.cxx
   vtkKWPopupButton.cxx 
   vtkKWPopupFrame.cxx 
   vtkKWPopupFrameCheckButton.cxx 
@@ -101,6 +107,8 @@ SET( KWWidgets_SRCS
   vtkKWUserInterfacePanel.cxx
   vtkKWView.cxx 
   vtkKWViewCollection.cxx 
+  vtkKWVolumeMaterialPropertyWidget.cxx
+  vtkKWVolumePropertyWidget.cxx
   vtkKWWidget.cxx 
   vtkKWWidgetCollection.cxx 
   vtkKWWindow.cxx 
@@ -110,6 +118,9 @@ SET( KWWidgets_SRCS
 
 SET_SOURCE_FILES_PROPERTIES(
   vtkKWComposite.cxx
+  vtkKWMaterialPropertyWidget.cxx
+  vtkKWParameterValueFunctionEditor.cxx
+  vtkKWParameterValueFunctionInterface.cxx
   vtkKWUserInterfaceManager.cxx
   vtkKWView.cxx
   ABSTRACT
@@ -129,10 +140,12 @@ SET_SOURCE_FILES_PROPERTIES(
 
 IF (DO_NOT_BUILD_XML_RW)
   SET_SOURCE_FILES_PROPERTIES(
-    vtkKWScalarBarAnnotation.cxx 
     vtkKWApplication.cxx 
     vtkKWCornerAnnotation.cxx 
     vtkKWHeaderAnnotation.cxx 
+    vtkKWScalarBarAnnotation.cxx 
+    vtkKWVolumeMaterialPropertyWidget.cxx
+    vtkKWVolumePropertyWidget.cxx
     COMPILE_FLAGS -DDO_NOT_BUILD_XML_RW
     )
 ENDIF (DO_NOT_BUILD_XML_RW)
@@ -225,6 +238,10 @@ ENDIF (VTK_USE_PARALLEL AND VTK_WRAP_TCL)
 IF (VTK_USE_PATENTED AND VTK_WRAP_TCL)
   TARGET_LINK_LIBRARIES(vtkKWWidgetsTCL vtkPatentedTCL)
 ENDIF (VTK_USE_PATENTED AND VTK_WRAP_TCL)
+
+IF (NOT DO_NOT_BUILD_XML_RW)
+  TARGET_LINK_LIBRARIES(vtkKWWidgetsTCL vtkKWCommonPro)
+ENDIF (NOT DO_NOT_BUILD_XML_RW)
 
 SET(VTK_WRAP_HINTS ${KWWidgets_SOURCE_DIR}/hints)
 

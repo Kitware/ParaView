@@ -7,6 +7,8 @@ SET( KWCommon_SRCS
   vtkKWArguments.cxx
   vtkKWDirectoryUtilities.cxx
   vtkKWEvent.cxx
+  vtkKWHistogram.cxx
+  vtkKWHistogramSet.cxx
   vtkKWIcon.cxx
   vtkKWMath.cxx
   vtkKWProcessStatistics.cxx
