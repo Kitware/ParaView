@@ -342,6 +342,10 @@ public:
   vtkBooleanMacro(AlwaysSSH, int);
   vtkGetMacro(AlwaysSSH, int);
 
+  // Description:
+  // We need to get the data path for the demo on the server.
+  char* GetDemoPath();
+
 protected:
   vtkPVApplication();
   ~vtkPVApplication();
@@ -428,6 +432,9 @@ protected:
   //ETX
 
   static vtkPVApplication* MainApplication;  
+
+  char* DemoPath;
+  vtkSetStringMacro(DemoPath);
 
 private:  
   vtkPVApplication(const vtkPVApplication&); // Not implemented

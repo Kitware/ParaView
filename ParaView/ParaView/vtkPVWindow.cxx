@@ -83,7 +83,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVConfig.h"
 #include "vtkPVData.h"
 #include "vtkPVDataInformation.h"
-#include "vtkPVDemoPaths.h"
 #include "vtkPVErrorLogDisplay.h"
 #include "vtkPVGenericRenderWindowInteractor.h"
 #include "vtkPVGhostLevelDialog.h"
@@ -138,7 +137,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.462.2.4");
+vtkCxxRevisionMacro(vtkPVWindow, "1.462.2.5");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -1645,11 +1644,10 @@ void vtkPVWindow::PlayDemo()
 //-----------------------------------------------------------------------------
 void vtkPVWindow::PlayDemo(int fromDashboard)
 {
-  int found=0;
+  const char* demoDataPath;
+  const char* demoScriptPath;
+  vtkPVApplication* pvApp = this->GetPVApplication();
 
-  char temp1[1024];
-
-  struct stat fs;
 
   this->Script("catch {unset pvDemoFromDashboard}");
   if (fromDashboard)
@@ -1657,65 +1655,22 @@ void vtkPVWindow::PlayDemo(int fromDashboard)
     this->Script("set pvDemoFromDashboard 1");
     }
 
-#ifdef _WIN32  
+  // Client path
+  demoScriptPath = pvApp->GetDemoPath();
+  // Server path
+  pvApp->GetProcessModule()->RootScript("$Application GetDemoPath");
+  demoDataPath = pvApp->GetProcessModule()->GetRootResult();
 
-  vtkKWApplication *app = this->GetApplication();
-  if (app->GetApplicationInstallationDirectory())
+  if (demoDataPath && demoScriptPath)
     {
-    sprintf(temp1, 
-            "%s/Demos/Demo1.pvs", app->GetApplicationInstallationDirectory());
-    if (stat(temp1, &fs) == 0) 
-      {
-      this->Script("set DemoDir {%s/Demos}", 
-                   app->GetApplicationInstallationDirectory());
-      this->LoadScript(temp1);
-      found=1;
-      }
+    char temp1[1024];
+    sprintf(temp1, "%s/Demo1.pvs", 
+            demoScriptPath);
+
+    this->Script("set DemoDir {%s}", demoDataPath);
+    this->LoadScript(temp1);
     }
-
-#else
-
-  vtkKWDirectoryUtilities* util = vtkKWDirectoryUtilities::New();
-  const char* selfPath = util->FindSelfPath(
-    this->GetPVApplication()->GetArgv0());
-  const char* relPath = "../share/paraview-" PARAVIEW_VERSION "/Demos";
-  char* newPath = new char[strlen(selfPath)+strlen(relPath)+2];
-  sprintf(newPath, "%s/%s", selfPath, relPath);
-
-  char* demoFile = new char[strlen(newPath)+strlen("/Demo1.pvs")+1];
-  sprintf(demoFile, "%s/Demo1.pvs", newPath);
-
-  if (stat(demoFile, &fs) == 0) 
-    {
-    this->Script("set DemoDir {%s}", newPath);
-    this->LoadScript(demoFile);
-    found=1;
-    }
-
-  delete[] demoFile;
-  delete[] newPath;
-  util->Delete();
-
-#endif // _WIN32  
-
-  if (!found)
-    {
-    // Look in binary and installation directories
-    const char** dir;
-    for(dir=VTK_PV_DEMO_PATHS; !found && *dir; ++dir)
-      {
-      sprintf(temp1, "%s/Demo1.pvs", *dir);
-      if (stat(temp1, &fs) == 0) 
-        {
-        this->Script("set DemoDir {%s}", *dir);
-        this->LoadScript(temp1);
-        found=1;
-        break;
-        }
-      }
-    }
-
-  if (!found)
+  else
     {
     if (this->UseMessageDialog)
       {
