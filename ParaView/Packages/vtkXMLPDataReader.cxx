@@ -22,7 +22,7 @@
 #include "vtkXMLDataElement.h"
 #include "vtkXMLDataReader.h"
 
-vtkCxxRevisionMacro(vtkXMLPDataReader, "1.6");
+vtkCxxRevisionMacro(vtkXMLPDataReader, "1.7");
 
 //----------------------------------------------------------------------------
 vtkXMLPDataReader::vtkXMLPDataReader()
@@ -296,8 +296,8 @@ int vtkXMLPDataReader::ReadPieceData()
 {
   vtkDataSet* input = this->GetPieceInputAsDataSet(this->Piece);
   vtkDataSet* output = this->GetOutputAsDataSet();
-  vtkXMLDataElement* ePointData = this->PPointDataElement;
-  vtkXMLDataElement* eCellData = this->PCellDataElement;
+  //vtkXMLDataElement* ePointData = this->PPointDataElement;
+  //vtkXMLDataElement* eCellData = this->PCellDataElement;
   
   // Copy point data and cell data for this piece.
   int a=0;
