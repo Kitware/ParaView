@@ -153,7 +153,6 @@ SET( ParaView_SRCS
   vtkPVXMLElement.cxx
   vtkPVXMLPackageParser.cxx
   vtkPVXMLParser.cxx
-  vtkPickDataSetFilter.cxx
   vtkRedistributePolyData.cxx
   vtkSelectInputs.cxx
   vtkStringList.cxx 
