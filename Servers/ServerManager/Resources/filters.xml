@@ -1637,8 +1637,6 @@
      <DoubleVectorProperty
         name="ContourValues"
         command="SetValue"
-        number_of_elements="1"
-        default_values="0.0" 
         repeat_command="1"
         number_of_elements_per_command="1"
         use_index="1">
@@ -1657,6 +1655,8 @@
           <DataTypeDomain name="input_type">
             <DataType value="vtkDataSet"/>
           </DataTypeDomain>
+          <InputArrayDomain name="input_array" attribute_type="point"
+                            optional="1"/>
      </InputProperty>
 
      <ProxyProperty name="ClipFunction" command="SetClipFunction">
@@ -1796,8 +1796,7 @@
      <DoubleVectorProperty
         name="ContourValues"
         command="SetValue"
-        number_of_elements="1"
-        default_values="0.0" 
+        number_of_elements="0"
         repeat_command="1"
         number_of_elements_per_command="1"
         use_index="1">
@@ -2019,6 +2018,14 @@
           <InputArrayDomain name="input_array" attribute_type="point"
                             number_of_components="3"/>
      </InputProperty>
+
+     <InputProperty
+        name="Source"
+        command="SetSource">
+           <ProxyGroupDomain name="groups">
+             <Group name="streamline_sources"/>
+           </ProxyGroupDomain>
+      </InputProperty>
 
      <StringVectorProperty 
         name="SelectInputVectors" 
