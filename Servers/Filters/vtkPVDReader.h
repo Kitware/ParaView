@@ -28,7 +28,7 @@ public:
   static vtkPVDReader* New();
   vtkTypeRevisionMacro(vtkPVDReader,vtkXMLCollectionReader);
   void PrintSelf(ostream& os, vtkIndent indent);
-  
+
   // Description:
   // Get/Set the required value for the timestep attribute.  The value
   // should be referenced by its index.  Only data sets matching this
@@ -36,11 +36,21 @@ public:
   // restriction.
   void SetTimestepAsIndex(int index);
   int GetTimestepAsIndex();
-  
+
+  // Description:
+  // Get the range of index values valid for the TimestepAsIndex
+  // setting.
+  vtkGetVector2Macro(TimestepIndexRange, int);
 protected:
   vtkPVDReader();
-  ~vtkPVDReader();  
-  
+  ~vtkPVDReader();
+
+  // Set TimestepIndexRange during ExecuteAttributes.
+  virtual void ExecuteAttributes();
+
+  // Save the range of valid timestep index values.
+  int TimestepIndexRange[2];
+
 private:
   vtkPVDReader(const vtkPVDReader&);  // Not implemented.
   void operator=(const vtkPVDReader&);  // Not implemented.
