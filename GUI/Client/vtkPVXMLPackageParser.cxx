@@ -37,7 +37,7 @@
 
 #include <ctype.h>
 
-vtkCxxRevisionMacro(vtkPVXMLPackageParser, "1.40");
+vtkCxxRevisionMacro(vtkPVXMLPackageParser, "1.41");
 vtkStandardNewMacro(vtkPVXMLPackageParser);
 
 #ifndef VTK_NO_EXPLICIT_TEMPLATE_INSTANTIATION
@@ -702,6 +702,8 @@ int vtkPVXMLPackageParser::LoadServerManagerFile(vtkPVXMLElement* le)
     delete[] tmpDir;
     return 0;
     }
+
+  sma->AddConfigurationFile(name, directory);
 
   delete[] tmpDir;
   return 1;
