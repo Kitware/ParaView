@@ -175,7 +175,7 @@ vtkKWView::vtkKWView()
   this->Printing = 0;
   
   this->MenuPropertiesName = NULL;
-  this->SetMenuPropertiesName(" View");
+  this->SetMenuPropertiesName("  View");
   
   this->Renderer = vtkRenderer::New();
   this->RenderWindow = vtkRenderWindow::New();
@@ -1208,7 +1208,7 @@ void vtkKWView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWView ";
-  this->ExtractRevision(os,"$Revision: 1.39 $");
+  this->ExtractRevision(os,"$Revision: 1.39.2.1 $");
 }
 
 void vtkKWView::SetupMemoryRendering(int x, int y, void *cd) 
