@@ -16,15 +16,20 @@
 #include "vtkPVImageContinuousDilate3D.h"
 #include "vtkPVImageContinuousErode3D.h"
 #include "vtkImageViewer.h"
+#include "vtkTesting.h"
 
-int main()
+int main(int argc, char* argv[])
 {
+  char* fname = 
+    vtkTestUtilities::ExpandDataFileName(argc, argv, "Data/headsq/quarter");
+
   // Image pipeline
   vtkImageReader *reader = vtkImageReader::New();
   reader->SetDataByteOrderToLittleEndian();
   reader->SetDataExtent (0, 63, 0, 63, 1, 93);
-  reader->SetFilePrefix ("$VTK_DATA_ROOT/Data/headsq/quarter");
+  reader->SetFilePrefix ( fname );
   reader->SetDataMask (0x7fff);
+  delete [] fname;
 
   vtkPVImageContinuousDilate3D *dilate = vtkPVImageContinuousDilate3D::New();
   dilate->SetInput(reader->GetOutput());
