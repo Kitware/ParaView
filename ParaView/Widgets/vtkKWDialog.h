@@ -137,6 +137,7 @@ protected:
   int Beep;
   int BeepType;
   int InvokeAtPointer;
+  int GrabDialog;
 
 private:
   vtkKWDialog(const vtkKWDialog&); // Not implemented

@@ -57,7 +57,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVConnectDialog);
-vtkCxxRevisionMacro(vtkPVConnectDialog, "1.8");
+vtkCxxRevisionMacro(vtkPVConnectDialog, "1.9");
 
 //----------------------------------------------------------------------------
 void vtkPVConnectDialog::Create(vtkKWApplication* app, const char* vtkNotUsed(opts))
@@ -157,7 +157,7 @@ void vtkPVConnectDialog::Create(vtkKWApplication* app, const char* vtkNotUsed(op
       this->Hostname->GetEntry()->AddValue(server);
       }
     }
-  this->Grab = 0;
+  this->GrabDialog = 0;
 }
 
 //----------------------------------------------------------------------------
