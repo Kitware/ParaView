@@ -37,7 +37,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectCTHArrays);
-vtkCxxRevisionMacro(vtkPVSelectCTHArrays, "1.16");
+vtkCxxRevisionMacro(vtkPVSelectCTHArrays, "1.17");
 vtkCxxSetObjectMacro(vtkPVSelectCTHArrays, InputMenu, vtkPVInputMenu);
 
 int vtkPVSelectCTHArraysCommand(ClientData cd, Tcl_Interp *interp,
@@ -419,8 +419,8 @@ void vtkPVSelectCTHArrays::SaveInBatchScript(ofstream *file)
   for (idx = 0; idx < num; ++idx)
     {
     *file << "  [$pvTemp" << sourceID << " GetProperty "
-          << this->SMPropertyName << "] SetElement " << idx << " "
-          << this->SelectedArrayNames->GetString(idx) << endl;
+          << this->SMPropertyName << "] SetElement " << idx << " {"
+          << this->SelectedArrayNames->GetString(idx) << "}" << endl;
     }
 }
 
