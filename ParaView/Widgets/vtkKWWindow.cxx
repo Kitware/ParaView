@@ -72,7 +72,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define VTK_KW_WINDOW_GEOMETRY_REG_KEY "WindowGeometry"
 #define VTK_KW_WINDOW_FRAME1_SIZE_REG_KEY "WindowFrame1Size"
 
-vtkCxxRevisionMacro(vtkKWWindow, "1.151");
+vtkCxxRevisionMacro(vtkKWWindow, "1.152");
 vtkCxxSetObjectMacro(vtkKWWindow, PropertiesParent, vtkKWWidget);
 
 class vtkKWWindowMenuEntry
@@ -1093,14 +1093,14 @@ void vtkKWWindow::AddRecentFile(const char *key, const char *name, vtkKWObject *
 int vtkKWWindow::GetFileMenuIndex()
 {
   // First find the print-related menu commands
-  if ( this->GetMenuFile()->IsItemPresent(VTK_KW_PAGE_SETUP_MENU_LABEL))
+  if ( this->GetMenuFile()->HasItem(VTK_KW_PAGE_SETUP_MENU_LABEL))
     {
     return this->GetMenuFile()->GetIndex(VTK_KW_PAGE_SETUP_MENU_LABEL) - 1;  
     }
 
   // Otherwise find Close or Exit if Close was removed
   int clidx;
-  if ( this->GetMenuFile()->IsItemPresent("Close") )
+  if ( this->GetMenuFile()->HasItem("Close") )
     {
     clidx = this->GetMenuFile()->GetIndex("Close");  
     }
