@@ -106,6 +106,7 @@ vtkPVActorComposite::vtkPVActorComposite()
   this->ColorFrame = vtkKWLabeledFrame::New();
   this->DisplayStyleFrame = vtkKWLabeledFrame::New();
   this->StatsFrame = vtkKWWidget::New();
+  this->ViewFrame = vtkKWLabeledFrame::New();
   
   this->NumCellsLabel = vtkKWLabel::New();
   this->NumPointsLabel = vtkKWLabel::New();
@@ -128,15 +129,18 @@ vtkPVActorComposite::vtkPVActorComposite()
   this->ColorRangeMinEntry = vtkKWLabeledEntry::New();
   this->ColorRangeMaxEntry = vtkKWLabeledEntry::New();
 
-  this->DisplayMenusFrame = vtkKWWidget::New();
+  this->RepresentationMenuFrame = vtkKWWidget::New();
   this->RepresentationMenuLabel = vtkKWLabel::New();
   this->RepresentationMenu = vtkKWOptionMenu::New();
   
+  this->InterpolationMenuFrame = vtkKWWidget::New();
   this->InterpolationMenuLabel = vtkKWLabel::New();
   this->InterpolationMenu = vtkKWOptionMenu::New();
   
   this->DisplayScalesFrame = vtkKWWidget::New();
+  this->PointSizeLabel = vtkKWLabel::New();
   this->PointSizeScale = vtkKWScale::New();
+  this->LineWidthLabel = vtkKWLabel::New();
   this->LineWidthScale = vtkKWScale::New();
   
   this->ScalarBarCheckFrame = vtkKWWidget::New();
@@ -322,11 +326,17 @@ vtkPVActorComposite::~vtkPVActorComposite()
   this->InterpolationMenu->Delete();
   this->InterpolationMenu = NULL;
   
-  this->DisplayMenusFrame->Delete();
-  this->DisplayMenusFrame = NULL;
+  this->RepresentationMenuFrame->Delete();
+  this->RepresentationMenuFrame = NULL;
+  this->InterpolationMenuFrame->Delete();
+  this->InterpolationMenuFrame = NULL;
   
+  this->PointSizeLabel->Delete();
+  this->PointSizeLabel = NULL;
   this->PointSizeScale->Delete();
   this->PointSizeScale = NULL;
+  this->LineWidthLabel->Delete();
+  this->LineWidthLabel = NULL;
   this->LineWidthScale->Delete();
   this->LineWidthScale = NULL;
   this->DisplayScalesFrame->Delete();
@@ -406,6 +416,8 @@ vtkPVActorComposite::~vtkPVActorComposite()
   this->DisplayStyleFrame = NULL;
   this->StatsFrame->Delete();
   this->StatsFrame = NULL;
+  this->ViewFrame->Delete();
+  this->ViewFrame = NULL;
   
   this->ResetCameraButton->Delete();
   this->ResetCameraButton = NULL;
@@ -433,6 +445,9 @@ void vtkPVActorComposite::CreateProperties()
   this->DisplayStyleFrame->SetLabel("Display Style");
   this->StatsFrame->SetParent(this->Properties);
   this->StatsFrame->Create(this->Application, "frame", "");
+  this->ViewFrame->SetParent(this->Properties);
+  this->ViewFrame->Create(this->Application);
+  this->ViewFrame->SetLabel("View");
  
   this->NumCellsLabel->SetParent(this->StatsFrame);
   this->NumCellsLabel->Create(this->Application, "");
@@ -503,13 +518,13 @@ void vtkPVActorComposite::CreateProperties()
                this->ColorRangeMaxEntry->GetEntry()->GetWidgetName(),
                this->GetTclName());
 
-  this->DisplayMenusFrame->SetParent(this->DisplayStyleFrame->GetFrame());
-  this->DisplayMenusFrame->Create(this->Application, "frame", "");
+  this->RepresentationMenuFrame->SetParent(this->DisplayStyleFrame->GetFrame());
+  this->RepresentationMenuFrame->Create(this->Application, "frame", "");
   
-  this->RepresentationMenuLabel->SetParent(this->DisplayMenusFrame);
+  this->RepresentationMenuLabel->SetParent(this->RepresentationMenuFrame);
   this->RepresentationMenuLabel->Create(this->Application, "");
   this->RepresentationMenuLabel->SetLabel("Representation:");
-  this->RepresentationMenu->SetParent(this->DisplayMenusFrame);
+  this->RepresentationMenu->SetParent(this->RepresentationMenuFrame);
   this->RepresentationMenu->Create(this->Application, "");
   this->RepresentationMenu->AddEntryWithCommand("Wireframe", this,
                                                 "DrawWireframe");
@@ -519,10 +534,12 @@ void vtkPVActorComposite::CreateProperties()
                                                 "DrawPoints");
   this->RepresentationMenu->SetValue("Surface");
   
-  this->InterpolationMenuLabel->SetParent(this->DisplayMenusFrame);
+  this->InterpolationMenuFrame->SetParent(this->DisplayStyleFrame->GetFrame());
+  this->InterpolationMenuFrame->Create(this->Application, "frame", "");
+  this->InterpolationMenuLabel->SetParent(this->InterpolationMenuFrame);
   this->InterpolationMenuLabel->Create(this->Application, "");
   this->InterpolationMenuLabel->SetLabel("Interpolation:");
-  this->InterpolationMenu->SetParent(this->DisplayMenusFrame);
+  this->InterpolationMenu->SetParent(this->InterpolationMenuFrame);
   this->InterpolationMenu->Create(this->Application, "");
   this->InterpolationMenu->AddEntryWithCommand("Flat", this,
 					       "SetInterpolationToFlat");
@@ -533,19 +550,25 @@ void vtkPVActorComposite::CreateProperties()
   this->DisplayScalesFrame->SetParent(this->DisplayStyleFrame->GetFrame());
   this->DisplayScalesFrame->Create(this->Application, "frame", "");
   
+  this->PointSizeLabel->SetParent(this->DisplayScalesFrame);
+  this->PointSizeLabel->Create(this->Application, "");
+  this->PointSizeLabel->SetLabel("Point Size");
+  
   this->PointSizeScale->SetParent(this->DisplayScalesFrame);
   this->PointSizeScale->Create(this->Application, "-showvalue 1");
   this->PointSizeScale->SetRange(1, 5);
   this->PointSizeScale->SetResolution(1);
-  this->PointSizeScale->DisplayLabel("Point Size");
   this->PointSizeScale->SetCommand(this, "ChangePointSize");
   this->PointSizeScale->SetValue(1);
+
+  this->LineWidthLabel->SetParent(this->DisplayScalesFrame);
+  this->LineWidthLabel->Create(this->Application, "");
+  this->LineWidthLabel->SetLabel("Line Width");
   
   this->LineWidthScale->SetParent(this->DisplayScalesFrame);
   this->LineWidthScale->Create(this->Application, "-showvalue 1");
   this->LineWidthScale->SetRange(1, 5);
   this->LineWidthScale->SetResolution(1);
-  this->LineWidthScale->DisplayLabel("LineWidth");
   this->LineWidthScale->SetCommand(this, "ChangeLineWidth");
   this->LineWidthScale->SetValue(1);
   
@@ -565,23 +588,27 @@ void vtkPVActorComposite::CreateProperties()
   this->CubeAxesCheck->Create(this->Application, "-text CubeAxes");
   this->CubeAxesCheck->SetCommand(this, "CubeAxesCheckCallback");
   
-  this->VisibilityCheck->SetParent(this->Properties);
+  this->VisibilityCheck->SetParent(this->ViewFrame->GetFrame());
   this->VisibilityCheck->Create(this->Application, "-text Visibility");
   this->Application->Script("%s configure -command {%s VisibilityCheckCallback}",
                             this->VisibilityCheck->GetWidgetName(),
                             this->GetTclName());
   this->VisibilityCheck->SetState(1);
 
-  this->ResetCameraButton->SetParent(this->Properties);
+  this->ResetCameraButton->SetParent(this->ViewFrame->GetFrame());
   this->ResetCameraButton->Create(this->Application, "");
-  this->ResetCameraButton->SetLabel("Reset Camera");
+  this->ResetCameraButton->SetLabel("Set View to Data");
   this->ResetCameraButton->SetCommand(this, "CenterCamera");
   
+  this->Script("pack %s %s -side left",
+               this->VisibilityCheck->GetWidgetName(),
+               this->ResetCameraButton->GetWidgetName());
   this->Script("pack %s", this->StatsFrame->GetWidgetName());
   this->Script("pack %s %s -side left",
                this->NumCellsLabel->GetWidgetName(),
                this->NumPointsLabel->GetWidgetName());
   this->Script("pack %s -fill x -expand t", this->BoundsDisplay->GetWidgetName());
+  this->Script("pack %s -fill x -expand t", this->ViewFrame->GetWidgetName());
   this->Script("pack %s -fill x -expand t", this->ColorFrame->GetWidgetName());
   this->Script("pack %s %s -side left",
                this->ColorMenuLabel->GetWidgetName(),
@@ -600,24 +627,24 @@ void vtkPVActorComposite::CreateProperties()
 	       this->ColorRangeMinEntry->GetWidgetName(),
 	       this->ColorRangeMaxEntry->GetWidgetName());
 
-  this->Script("pack %s %s -side top -fill x",
-               this->DisplayMenusFrame->GetWidgetName(),
+  this->Script("pack %s %s %s -side top -fill x",
+               this->RepresentationMenuFrame->GetWidgetName(),
+               this->InterpolationMenuFrame->GetWidgetName(),
                this->DisplayScalesFrame->GetWidgetName());
-  this->Script("pack %s %s %s %s -side left",
+  this->Script("pack %s %s -side left",
                this->RepresentationMenuLabel->GetWidgetName(),
-               this->RepresentationMenu->GetWidgetName(),
+               this->RepresentationMenu->GetWidgetName());
+  this->Script("pack %s %s -side left",
                this->InterpolationMenuLabel->GetWidgetName(),
                this->InterpolationMenu->GetWidgetName());
-  this->Script("pack %s %s -side left",
+  this->Script("pack %s %s %s %s -side left",
+               this->PointSizeLabel->GetWidgetName(),
                this->PointSizeScale->GetWidgetName(),
+               this->LineWidthLabel->GetWidgetName(),
                this->LineWidthScale->GetWidgetName());
   this->Script("pack %s -fill x", this->DisplayStyleFrame->GetWidgetName());
   this->Script("pack %s",
                this->CubeAxesCheck->GetWidgetName());
-  this->Script("pack %s",
-               this->VisibilityCheck->GetWidgetName());
-  this->Script("pack %s",
-               this->ResetCameraButton->GetWidgetName());
 }
 
 //----------------------------------------------------------------------------

@@ -253,6 +253,7 @@ protected:
   vtkKWLabeledFrame *ColorFrame;
   vtkKWLabeledFrame *DisplayStyleFrame;
   vtkKWWidget *StatsFrame;
+  vtkKWLabeledFrame *ViewFrame;
   
   vtkKWLabel *ColorMenuLabel;
   vtkKWOptionMenu *ColorMenu;
@@ -262,14 +263,17 @@ protected:
   vtkKWLabel *ColorMapMenuLabel;
   vtkKWOptionMenu *ColorMapMenu;
   
-  vtkKWWidget *DisplayMenusFrame;
+  vtkKWWidget *RepresentationMenuFrame;
   vtkKWLabel *RepresentationMenuLabel;
   vtkKWOptionMenu *RepresentationMenu;
+  vtkKWWidget *InterpolationMenuFrame;
   vtkKWLabel *InterpolationMenuLabel;
   vtkKWOptionMenu *InterpolationMenu;
 
   vtkKWWidget *DisplayScalesFrame;
+  vtkKWLabel *PointSizeLabel;
   vtkKWScale *PointSizeScale;
+  vtkKWLabel *LineWidthLabel;
   vtkKWScale *LineWidthScale;
   
   vtkKWCheckButton *VisibilityCheck;
