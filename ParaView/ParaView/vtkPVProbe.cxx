@@ -48,7 +48,7 @@
  
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProbe);
-vtkCxxRevisionMacro(vtkPVProbe, "1.112");
+vtkCxxRevisionMacro(vtkPVProbe, "1.113");
 
 int vtkPVProbeCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -327,7 +327,6 @@ void vtkPVProbe::SaveInBatchScript(ofstream *file)
     {    
     if (this->ShowXYPlotToggle->GetState())
       {
-      double pos[3];
       /* Who adds the actor to the renderer? I thought the widget did that.
       vtkXYPlotActor* xyp = this->XYPlotWidget->GetXYPlotActor();
       *file << "vtkXYPlotActor " << this->XYPlotTclName << "\n";
