@@ -71,7 +71,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVEnSightReaderModule);
-vtkCxxRevisionMacro(vtkPVEnSightReaderModule, "1.37");
+vtkCxxRevisionMacro(vtkPVEnSightReaderModule, "1.38");
 
 int vtkPVEnSightReaderModuleCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -743,6 +743,8 @@ int vtkPVEnSightReaderModule::ReadFileInformation(const char* fname)
 #else
   pvApp->BroadcastScript("%s Update", tclName);
 #endif
+
+  delete[] tclName;
 
   pvApp->AddTraceEntry("$kw(%s) RunningScriptOn", this->GetTclName());
 
