@@ -85,6 +85,7 @@ ParaView: Makefile ParaView.o vtktcl.o ${TOOLKIT_DEPENDS}
 	${USE_IMAGING_LIBS}	\
 	${USE_GRAPHICS_LIBS}	\
 	${USE_CONTRIB_LIBS}	\
+        ${USE_PARALLEL_LIBS}    \
 	-L${VTKBIN}/common -lVTKCommonTcl  -lVTKCommon \
 	${LDLIBS} ${CONTROLLER_API_LIBS} \
 	${TK_LIB} ${TCL_LIB} ${DL_LIBS} ${THREAD_LIBS} \

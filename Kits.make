@@ -15,10 +15,10 @@ CC_FLAGS = ${CPPFLAGS} ${USER_CFLAGS} ${CFLAGS} ${USE_TOOLKIT_FLAGS} \
 
 
 CXX_FLAGS = ${CPPFLAGS} ${USER_CXXFLAGS} ${CXXFLAGS} -I${srcdir} \
-	${KIT_FLAGS} -I. ${USE_TOOLKIT_FLAGS} ${GRAPHICS_API_FLAGS} \
-	 -I${VTKSRC}/common -I${VTKSRC}/imaging -I${VTKSRC}/graphics \
-	-I${VTKSRC}/patented -I${VTKSRC}/contrib ${TK_INCLUDE} ${TCL_INCLUDE} \
-	-I${VTKBIN}/common -DVTK_USE_TKWIDGET
+	    ${KIT_FLAGS} -I. ${USE_TOOLKIT_FLAGS} ${GRAPHICS_API_FLAGS} \
+	    -I${VTKSRC}/common -I${VTKSRC}/imaging -I${VTKSRC}/graphics \
+	    -I${VTKSRC}/patented -I${VTKSRC}/contrib -I${VTKSRC}/parallel \
+            ${TK_INCLUDE} ${TCL_INCLUDE} -I${VTKBIN}/common -DVTK_USE_TKWIDGET
 
 all: ${BUILD_TCL} 
 
@@ -74,4 +74,5 @@ LDLIBS =  \
 	${USE_PATENTED_LIBS}	\
 	${USE_IMAGING_LIBS}	\
 	${USE_GRAPHICS_LIBS}	\
+        ${USE_PARALLEL_LIBS}    \
         -L${VTKBIN}/common -lVTKCommonTcl -lVTKCommon 

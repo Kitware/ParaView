@@ -27,8 +27,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 =========================================================================*/
 
 #include "vtkPVEnSightReaderInterface.h"
-#include "vtkEnSight6Reader.h"
-#include "vtkEnSightGoldReader.h"
+#include "vtkGenericEnSightReader.h"
 
 int vtkPVEnSightReaderInterfaceCommand(ClientData cd, Tcl_Interp *interp,
 				       int argc, char *argv[]);
@@ -51,9 +50,7 @@ vtkPVSource *vtkPVEnSightReaderInterface::CreateCallback()
   char tclName[100], outputTclName[100], srcTclName[100], fileName[100];
   vtkDataSet *d;
   vtkPVData *pvd;
-  vtkEnSight6Reader *reader6;
-  vtkEnSightGoldReader *readerGold;
-  vtkEnSightReader *reader;
+  vtkGenericEnSightReader *reader;
   vtkPVSource *pvs;
   vtkPVApplication *pvApp = this->GetPVApplication();
   vtkPVMethodInterface *mInt;
@@ -62,48 +59,24 @@ vtkPVSource *vtkPVEnSightReaderInterface::CreateCallback()
   // Create the vtkSource.
   sprintf(tclName, "%s%d", this->RootName, this->InstanceCount);
   // Create the object through tcl on all processes.
-  if (strcmp(this->SourceClassName, "vtkEnSight6Reader") == 0)
+  reader = (vtkGenericEnSightReader *)
+    (pvApp->MakeTclObject(this->SourceClassName, tclName));
+  if (reader == NULL)
     {
-    reader6 = (vtkEnSight6Reader*)
-      (pvApp->MakeTclObject(this->SourceClassName, tclName));
-    if (reader6 == NULL)
-      {
-      vtkErrorMacro("Could not get pointer from object.");
-      return NULL;
-      }
-    pvApp->Script("%s SetCaseFileName [tk_getOpenFile]", tclName);
+    vtkErrorMacro("Could not get pointer from object.");
+    return NULL;
+    }
+  pvApp->Script("%s SetCaseFileName [tk_getOpenFile]", tclName);
 
-    if (strcmp(reader6->GetCaseFileName(), "") == 0)
-      {
-      pvApp->BroadcastScript("%s Delete", tclName);
-      return NULL;
-      }
-    
-    pvApp->BroadcastScript("%s SetCaseFileName %s", tclName,
-			   reader6->GetCaseFileName());
-    reader6->Update();
-    reader = reader6;
-    }
-  else if (strcmp(this->SourceClassName, "vtkEnSightGoldReader") == 0)
+  if (strcmp(reader->GetCaseFileName(), "") == 0)
     {
-    readerGold = (vtkEnSightGoldReader*)
-      (pvApp->MakeTclObject(this->SourceClassName, tclName));
-    if (readerGold == NULL)
-      {
-      vtkErrorMacro("Could not get pointer from object.");
-      return NULL;
-      }
-    pvApp->Script("%s SetCaseFileName [tk_getOpenFile]", tclName);
-    if (strcmp(readerGold->GetCaseFileName(), "") == 0)
-      {
-      pvApp->BroadcastScript("%s Delete", tclName);
-      return NULL;
-      }
-    pvApp->BroadcastScript("%s SetCaseFileName %s", tclName,
-			   readerGold->GetCaseFileName());
-    readerGold->Update();
-    reader = readerGold;
+    pvApp->BroadcastScript("%s Delete", tclName);
+    return NULL;
     }
+    
+  pvApp->BroadcastScript("%s SetCaseFileName %s", tclName,
+			 reader->GetCaseFileName());
+  reader->Update();
   
   numOutputs = reader->GetNumberOfOutputs();
   
@@ -117,7 +90,6 @@ vtkPVSource *vtkPVEnSightReaderInterface::CreateCallback()
     pvd = vtkPVData::New();
     pvd->SetApplication(pvApp);
     pvd->SetVTKData(d, outputTclName);
-//    pvd->SetVTKDataTclName(outputTclName);
     pvs = vtkPVSource::New();
     sprintf(srcTclName, "%s_%d", tclName, i+1);
     pvs->SetName(srcTclName);

@@ -800,22 +800,12 @@ void vtkPVWindow::ReadSourceInterfaces()
 
   // ============= DataSet Sources ==============  
   
-  // ---- EnSightGoldReader ----.
+  // ---- GenericEnSightReader ----.
   sInt = vtkPVEnSightReaderInterface::New();
   sInt->SetApplication(pvApp);
   sInt->SetPVWindow(this);
-  sInt->SetSourceClassName("vtkEnSightGoldReader");
-  sInt->SetRootName("EnSightGoldReader");
-  this->SourceInterfaces->AddItem(sInt);
-  sInt->Delete();
-  sInt = NULL;
-
-  // ---- EnSight6Reader ----.
-  sInt = vtkPVEnSightReaderInterface::New();
-  sInt->SetApplication(pvApp);
-  sInt->SetPVWindow(this);
-  sInt->SetSourceClassName("vtkEnSight6Reader");
-  sInt->SetRootName("EnSight6Reader");
+  sInt->SetSourceClassName("vtkGenericEnSightReader");
+  sInt->SetRootName("EnSight");
   this->SourceInterfaces->AddItem(sInt);
   sInt->Delete();
   sInt = NULL;
