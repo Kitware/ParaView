@@ -365,6 +365,12 @@ public:
   // We need to get the data path for the demo on the server.
   char* GetDemoPath();
 
+  // Description:
+  // Enable or disable test errors. This refers to wether errors make test fail
+  // or not.
+  void EnableTestErrors();
+  void DisableTestErrors();
+
 protected:
   vtkPVApplication();
   ~vtkPVApplication();

@@ -120,7 +120,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.214.2.9");
+vtkCxxRevisionMacro(vtkPVApplication, "1.214.2.10");
 vtkCxxSetObjectMacro(vtkPVApplication, RenderModule, vtkPVRenderModule);
 
 
@@ -217,7 +217,10 @@ public:
         if ( error )
           {
           win->ErrorMessage(buffer);
-          this->ErrorOccurred = 1;
+          if ( this->TestErrors )
+            {
+            this->ErrorOccurred = 1;
+            }
           }
         else 
           {
@@ -232,6 +235,7 @@ public:
   {
     this->Windows = 0;
     this->ErrorOccurred = 0;
+    this->TestErrors = 1;
   }
   
   void SetWindowCollection(vtkKWWindowCollection *windows)
@@ -243,9 +247,13 @@ public:
     {
     return this->ErrorOccurred;
     }
+
+  void EnableTestErrors() { this->TestErrors = 1; }
+  void DisableTestErrors() { this->TestErrors = 0; }
 protected:
   vtkKWWindowCollection *Windows;
   int ErrorOccurred;
+  int TestErrors;
 private:
   vtkPVOutputWindow(const vtkPVOutputWindow&);
   void operator=(const vtkPVOutputWindow&);
@@ -1999,4 +2007,13 @@ char* vtkPVApplication::GetDemoPath()
   return this->DemoPath;
 }
 
+void vtkPVApplication::EnableTestErrors()
+{
+  this->OutputWindow->EnableTestErrors();
+}
+
+void vtkPVApplication::DisableTestErrors()
+{
+  this->OutputWindow->DisableTestErrors();
+}
 
