@@ -55,7 +55,7 @@
 #include "vtkMath.h"
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVColorMap);
-vtkCxxRevisionMacro(vtkPVColorMap, "1.105");
+vtkCxxRevisionMacro(vtkPVColorMap, "1.106");
 
 int vtkPVColorMapCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -966,7 +966,7 @@ void vtkPVColorMap::SetColorSchemeToLabBlueRed()
   this->RMScalarBarWidget->SetStartHSV(startHSV);
   this->RMScalarBarWidget->SetEndHSV(endHSV);
 
-  this->AddTraceEntry("$kw(%s) SetColorSchemeToBlueRed", this->GetTclName());
+  this->AddTraceEntry("$kw(%s) SetColorSchemeToLabBlueRed", this->GetTclName());
 }
 
 //----------------------------------------------------------------------------
@@ -982,8 +982,17 @@ void vtkPVColorMap::StartColorButtonCallback(double r, double g, double b)
   vtkMath::RGBToHSV(rgb, hsv);
 
   this->SetStartHSV(hsv[0], hsv[1], hsv[2]);
+  
+  // Lab color map uses hue > 1.1 as a flag.
+  // We need to make sure the end color hue is not > 1.
+  this->RMScalarBarWidget->GetEndHSV(hsv);
+  if (hsv[0] > 1.1)
+    {
+    double *tmp = this->EndColorButton->GetColor();
+    vtkMath::RGBToHSV(tmp, hsv);
+    this->SetEndHSV(hsv[0], hsv[1], hsv[2]);
+    }  
 }
-
 
 //----------------------------------------------------------------------------
 // Access for trace files.
@@ -1001,9 +1010,18 @@ void vtkPVColorMap::SetStartHSV(double h, double s, double v)
 
   // Change color button (should have no callback effect...)
   hsv[0] = h;  hsv[1] = s;  hsv[2] = v;
-  vtkMath::HSVToRGB(hsv, rgb);
-  this->StartColorButton->SetColor(rgb);
-
+  if (hsv[0] > 1.1)
+    { // Detect the Sandia hack for changing the interpolation.
+    double xyz[3];
+    this->LabToXYZ(hsv,xyz);
+    this->XYZToRGB(xyz,rgb);
+    this->StartColorButton->SetColor(rgb[0],rgb[1],rgb[2]);    
+    }
+  else
+    {
+    vtkMath::HSVToRGB(hsv, rgb);
+    this->StartColorButton->SetColor(rgb);
+    }
   this->AddTraceEntry("$kw(%s) SetStartHSV %g %g %g", 
                       this->GetTclName(), h, s, v);
 
@@ -1023,6 +1041,16 @@ void vtkPVColorMap::EndColorButtonCallback(double r, double g, double b)
   vtkMath::RGBToHSV(rgb, hsv);
 
   this->SetEndHSV(hsv[0], hsv[1], hsv[2]);
+
+  // Lab color map uses hue > 1.1 as a flag.
+  // We need to make sure the end color hue is not > 1.
+  this->RMScalarBarWidget->GetStartHSV(hsv);
+  if (hsv[0] > 1.1)
+    {
+    double *tmp = this->StartColorButton->GetColor();
+    vtkMath::RGBToHSV(tmp, hsv);
+    this->SetStartHSV(hsv[0], hsv[1], hsv[2]);
+    }
 }
 
 
@@ -1042,9 +1070,18 @@ void vtkPVColorMap::SetEndHSV(double h, double s, double v)
 
   // Change color button (should have no callback effect...)
   hsv[0] = h;  hsv[1] = s;  hsv[2] = v;
-  vtkMath::HSVToRGB(hsv, rgb);
-  this->EndColorButton->SetColor(rgb);
-
+  if (hsv[0] > 1.1)
+    { // Detect the Sandia hack for changing the interpolation.
+    double xyz[3];
+    this->LabToXYZ(hsv,xyz);
+    this->XYZToRGB(xyz,rgb);
+    this->EndColorButton->SetColor(rgb[0],rgb[1],rgb[2]);    
+    }
+  else
+    {
+    vtkMath::HSVToRGB(hsv, rgb);
+    this->EndColorButton->SetColor(rgb);
+    }
   this->AddTraceEntry("$kw(%s) SetEndHSV %g %g %g", 
                       this->GetTclName(), h, s, v);
 
@@ -1230,8 +1267,6 @@ void vtkPVColorMap::SaveInBatchScript(ofstream *file)
         << "HueRange] SetElements2 "
         << startHSV[0] << " " << endHSV[0] << endl;
 
-
-        
   *file << "  [$pvTemp" << lookupTableID << " GetProperty "
         << "SaturationRange] SetElements2 "
         << startHSV[1] << " " << endHSV[1] << endl;
@@ -1577,15 +1612,12 @@ void vtkPVColorMap::SaveState(ofstream *file)
           << this->RMScalarBarWidget->GetVectorMagnitudeTitle() << "}\n"; 
     }
 
+
   if (strcmp(this->RMScalarBarWidget->GetScalarBarLabelFormat(), "%-#6.3g") != 0)
     {
     *file << "$kw(" << this->GetTclName() << ") SetScalarBarLabelFormat {" 
           << this->RMScalarBarWidget->GetScalarBarLabelFormat()<< "}\n"; 
     }
-
-  *file << "$kw(" << this->GetTclName() << ") SetScalarRange " 
-        << this->RMScalarBarWidget->GetScalarRange()[0] << " " << 
-        this->RMScalarBarWidget->GetScalarRange()[1] << endl;
 
   double startHSV[3];
   double endHSV[3];
@@ -1618,6 +1650,13 @@ void vtkPVColorMap::SaveState(ofstream *file)
             << this->RMScalarBarWidget->GetVectorComponent() << endl;
       }
     }
+
+  *file << "$kw(" << this->GetTclName() << ") SetScalarRange " 
+        << this->RMScalarBarWidget->GetScalarRange()[0] << " " << 
+        this->RMScalarBarWidget->GetScalarRange()[1] << endl;
+        
+  *file << "$kw(" << this->GetTclName() << ") SetScalarRangeLock " 
+        << this->ScalarRangeLock << "\n"; 
 
   *file << "$kw(" << this->GetTclName() << ") SetScalarBarVisibility " 
         << this->ScalarBarVisibility << endl;
