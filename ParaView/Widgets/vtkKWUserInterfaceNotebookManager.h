@@ -117,6 +117,14 @@ public:
                                      const char *title);
 
   // Description:
+  // Retrieve the parent widget of the pages associated to a panel. It is
+  // the unique widget that is common to all pages in the chain of parents.
+  // Note that you should use the panel's own API to get the page parent: this
+  // will automatically call this method with the proper panel parameter
+  // (see vtkKWUserInterfacePanel::GetPagesParentWidget()).
+  virtual vtkKWWidget *GetPagesParentWidget(vtkKWUserInterfacePanel *panel);
+
+  // Description:
   // Raise a page reserved by the manager. This can be done through the unique 
   // page ID, or using a panel and the page title.
   // In this concrete implementation, this raises a notebook's page.

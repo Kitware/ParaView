@@ -124,6 +124,11 @@ public:
   virtual vtkKWWidget *GetPageWidget(const char *title);
 
   // Description:
+  // Retrieve the parent widget of the pages associated to the panel. It is
+  // the unique widget that is common to all pages in the chain of parents.
+  virtual vtkKWWidget *GetPagesParentWidget();
+
+  // Description:
   // Raise a page added to the panel. This can be done through the unique 
   // page ID, or using the page title. Note that if the panel has not been
   // created at this point, the manager will call the panel's Create() 

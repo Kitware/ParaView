@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWUserInterfacePanel);
-vtkCxxRevisionMacro(vtkKWUserInterfacePanel, "1.3");
+vtkCxxRevisionMacro(vtkKWUserInterfacePanel, "1.4");
 
 int vtkKWUserInterfacePanelCommand(ClientData cd, Tcl_Interp *interp,
                                    int argc, char *argv[]);
@@ -165,6 +165,19 @@ vtkKWWidget* vtkKWUserInterfacePanel::GetPageWidget(const char *title)
     }
 
   return this->UserInterfaceManager->GetPageWidget(this, title);
+}
+
+//----------------------------------------------------------------------------
+vtkKWWidget* vtkKWUserInterfacePanel::GetPagesParentWidget()
+{
+  if (this->UserInterfaceManager == NULL)
+    {
+    vtkErrorMacro("The UserInterfaceManager manager needs to be set before "
+                  "a the pages parent can be queried.");
+    return NULL;
+    }
+
+  return this->UserInterfaceManager->GetPagesParentWidget(this);
 }
 
 //----------------------------------------------------------------------------

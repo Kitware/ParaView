@@ -48,7 +48,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWUserInterfaceNotebookManager);
-vtkCxxRevisionMacro(vtkKWUserInterfaceNotebookManager, "1.3");
+vtkCxxRevisionMacro(vtkKWUserInterfaceNotebookManager, "1.4");
 
 int vtkKWUserInterfaceNotebookManagerCommand(ClientData cd, Tcl_Interp *interp,
                                              int argc, char *argv[]);
@@ -218,6 +218,15 @@ vtkKWWidget* vtkKWUserInterfaceNotebookManager::GetPageWidget(
   // panel). This allow pages from different panels to have the same title.
 
   return this->Notebook->GetFrame(title, tag);
+}
+
+//----------------------------------------------------------------------------
+vtkKWWidget* vtkKWUserInterfaceNotebookManager::GetPagesParentWidget(
+  vtkKWUserInterfacePanel *panel)
+{
+  // Here we probably need this->Notebook->Body but it's not a public member
+
+  return this->Notebook;
 }
 
 //----------------------------------------------------------------------------

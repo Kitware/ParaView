@@ -53,7 +53,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWApplicationSettingsInterface);
-vtkCxxRevisionMacro(vtkKWApplicationSettingsInterface, "1.9");
+vtkCxxRevisionMacro(vtkKWApplicationSettingsInterface, "1.10");
 
 int vtkKWApplicationSettingsInterfaceCommand(ClientData cd, Tcl_Interp *interp,
                                              int argc, char *argv[]);
@@ -163,6 +163,7 @@ void vtkKWApplicationSettingsInterface::Create(vtkKWApplication *app)
   this->Superclass::Create(app);
 
   ostrstream tk_cmd;
+  vtkKWWidget *page;
   vtkKWWidget *frame;
 
   // --------------------------------------------------------------
@@ -174,6 +175,8 @@ void vtkKWApplicationSettingsInterface::Create(vtkKWApplication *app)
                 "Change the application settings", 
                 ico);
   ico->Delete();
+
+  page = this->GetPageWidget(VTK_KW_APPLICATION_SETTINGS_UIP_LABEL);
   
   // --------------------------------------------------------------
   // Interface settings : main frame
@@ -183,14 +186,14 @@ void vtkKWApplicationSettingsInterface::Create(vtkKWApplication *app)
     this->InterfaceSettingsFrame = vtkKWLabeledFrame::New();
     }
 
-  this->InterfaceSettingsFrame->SetParent(
-    this->GetPageWidget(VTK_KW_APPLICATION_SETTINGS_UIP_LABEL));
+  this->InterfaceSettingsFrame->SetParent(this->GetPagesParentWidget());
   this->InterfaceSettingsFrame->ShowHideFrameOn();
   this->InterfaceSettingsFrame->Create(app, 0);
   this->InterfaceSettingsFrame->SetLabel("Interface Settings");
     
   tk_cmd << "pack " << this->InterfaceSettingsFrame->GetWidgetName()
-         << " -side top -anchor w -expand y -fill x -padx 2 -pady 2" << endl;
+         << " -side top -anchor w -expand y -fill x -padx 2 -pady 2 " 
+         << " -in " << page->GetWidgetName() << endl;
   
   frame = this->InterfaceSettingsFrame->GetFrame();
 
@@ -280,14 +283,14 @@ void vtkKWApplicationSettingsInterface::Create(vtkKWApplication *app)
     this->ToolbarSettingsFrame = vtkKWLabeledFrame::New();
     }
 
-  this->ToolbarSettingsFrame->SetParent(
-    this->GetPageWidget(VTK_KW_APPLICATION_SETTINGS_UIP_LABEL));
+  this->ToolbarSettingsFrame->SetParent(this->GetPagesParentWidget());
   this->ToolbarSettingsFrame->ShowHideFrameOn();
   this->ToolbarSettingsFrame->Create(app, 0);
   this->ToolbarSettingsFrame->SetLabel("Toolbar Settings");
     
   tk_cmd << "pack " << this->ToolbarSettingsFrame->GetWidgetName()
-         << " -side top -anchor w -expand y -fill x -padx 2 -pady 2" << endl;
+         << " -side top -anchor w -expand y -fill x -padx 2 -pady 2 "  
+         << " -in " << page->GetWidgetName() << endl;
   
   frame = this->ToolbarSettingsFrame->GetFrame();
 
