@@ -27,7 +27,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWListSelectOrder );
-vtkCxxRevisionMacro(vtkKWListSelectOrder, "1.8");
+vtkCxxRevisionMacro(vtkKWListSelectOrder, "1.9");
 
 //----------------------------------------------------------------------------
 vtkKWListSelectOrder::vtkKWListSelectOrder()
@@ -42,6 +42,7 @@ vtkKWListSelectOrder::vtkKWListSelectOrder()
   this->UpButton = vtkKWPushButton::New();
   this->DownButton = vtkKWPushButton::New();
   this->EllipsisCommand = 0;
+  this->EllipsisDisplayed = 0;
 }
 
 //----------------------------------------------------------------------------
