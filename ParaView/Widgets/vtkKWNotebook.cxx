@@ -183,6 +183,15 @@ void vtkKWNotebook::Create(vtkKWApplication *app, const char *args)
 #endif 
   this->Script("place %s -x 0 -y 0 -relwidth 1.0 -relheight 1.0",
                this->Body->GetWidgetName());
+
+  int r,g,b;
+  this->GetBackgroundColor(&r, &g, &b); 
+  sprintf(this->BackColor, "#%02x%02x%02x", r, g, b);
+  
+  r = static_cast<int>( r * 0.93 );
+  g = static_cast<int>( g * 0.93 );
+  b = static_cast<int>( b * 0.93 );
+  sprintf(this->ForeColor, "#%02x%02x%02x", r, g, b);  
 }
 
 void vtkKWNotebook::Raise(int num)
@@ -202,11 +211,23 @@ void vtkKWNotebook::Raise(int num)
 		   this->Frames[this->Current]->GetWidgetName());
       this->Script("%s configure -disabledforeground black -state normal",
 		   this->Buttons[this->Current]->GetWidgetName());
+      this->Script("%s configure -bg %s -height 2 "
+		   "-highlightcolor %s -activebackground %s",
+		   this->Buttons[this->Current]->GetWidgetName(),
+		   this->ForeColor, this->ForeColor,
+		   this->ForeColor);
+      this->Script("%s configure -bg %s",
+		   this->Icons[this->Current]->GetWidgetName(),
+		   this->ForeColor);
       }
     this->Script("pack %s -fill both -anchor n",
                  this->Frames[num]->GetWidgetName());
-    this->Script("%s configure -disabledforeground black -state disabled",
-		 this->Buttons[num]->GetWidgetName());
+    this->Script("%s configure -disabledforeground black -state disabled"
+		 " -bg %s -height 1",
+		 this->Buttons[num]->GetWidgetName(), this->BackColor);
+    this->Script("%s configure -bg %s",
+		 this->Icons[num]->GetWidgetName(), this->BackColor);
+    this->Script("focus %s", this->Frames[num]->GetWidgetName());
     }
 
   this->Current = num;
@@ -393,6 +414,7 @@ void vtkKWNotebook::AddPage(const char *title, const char *ballon,
     this->Buttons[this->NumberOfPages]->GetWidgetName(), skip,
     this->Titles[this->NumberOfPages], this->BorderWidth,
     this->GetTclName(),this->NumberOfPages);
+
   this->Script("pack %s -side left -pady 0 -padx %d -fill y",
                this->Buttons[this->NumberOfPages]->GetWidgetName(),
                this->Pad);

@@ -126,6 +126,11 @@ protected:
   vtkKWWidget **Buttons;
   vtkKWImageLabel **Icons;
   char **Titles;
+  
+  // Description:
+  // Store background color of the back tab and the front tab.
+  char BackColor[10];
+  char ForeColor[10];
 private:
   vtkKWNotebook(const vtkKWNotebook&); // Not implemented
   void operator=(const vtkKWNotebook&); // Not implemented
