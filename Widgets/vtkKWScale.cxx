@@ -208,7 +208,9 @@ void vtkKWScale::SetStartCommand(vtkKWObject* Object, const char * MethodAndArgS
     {
     delete [] this->StartCommand;
     }
-  this->StartCommand = this->CreateCommand(Object, MethodAndArgString);
+  ostrstream command;
+  command << Object->GetTclName() << " " << MethodAndArgString << ends;
+  this->StartCommand = command.str();
 }
 
 void vtkKWScale::SetEndCommand(vtkKWObject* Object, const char * MethodAndArgString)
@@ -217,7 +219,9 @@ void vtkKWScale::SetEndCommand(vtkKWObject* Object, const char * MethodAndArgStr
     {
     delete [] this->EndCommand;
     }
-  this->EndCommand = this->CreateCommand(Object, MethodAndArgString);
+  ostrstream command;
+  command << Object->GetTclName() << " " << MethodAndArgString << ends;
+  this->EndCommand = command.str();
 }
 
 
