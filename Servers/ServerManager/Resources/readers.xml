@@ -859,6 +859,7 @@
         command="SetDisplacementMagnitude" 
         number_of_elements="1"
         default_values="1" > 
+        <DoubleRangeDomain name="range"/>
      </DoubleVectorProperty>
    <!-- End ExodusReader -->
    </SourceProxy>
