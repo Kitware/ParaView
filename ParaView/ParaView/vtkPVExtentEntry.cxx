@@ -49,7 +49,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWMenu.h"
 #include "vtkKWScale.h"
 #include "vtkObjectFactory.h"
-#include "vtkPVAnimationInterface.h"
+#include "vtkPVAnimationInterfaceEntry.h"
 #include "vtkPVApplication.h"
 #include "vtkPVData.h"
 #include "vtkPVDataInformation.h"
@@ -61,7 +61,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVExtentEntry);
-vtkCxxRevisionMacro(vtkPVExtentEntry, "1.22");
+vtkCxxRevisionMacro(vtkPVExtentEntry, "1.23");
 
 vtkCxxSetObjectMacro(vtkPVExtentEntry, InputMenu, vtkPVInputMenu);
 
@@ -370,7 +370,7 @@ void vtkPVExtentEntry::SetValue(int v0, int v1, int v2,
 
 //-----------------------------------------------------------------------------
 void vtkPVExtentEntry::AddAnimationScriptsToMenu(vtkKWMenu *menu, 
-                                                 vtkPVAnimationInterface *ai)
+                                                 vtkPVAnimationInterfaceEntry *ai)
 {
   vtkKWMenu *cascadeMenu;
   char methodAndArgs[200];
@@ -398,7 +398,7 @@ void vtkPVExtentEntry::AddAnimationScriptsToMenu(vtkKWMenu *menu,
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVExtentEntry::AnimationMenuCallback(vtkPVAnimationInterface *ai,
+void vtkPVExtentEntry::AnimationMenuCallback(vtkPVAnimationInterfaceEntry *ai,
                                              int mode)
 {
   char script[500];
@@ -425,7 +425,6 @@ void vtkPVExtentEntry::AnimationMenuCallback(vtkPVAnimationInterface *ai,
             this->ObjectTclName,this->VariableName,ext[2],ext[3],ext[4],ext[5]);
     ai->SetLabelAndScript("X Axis", script);
     ai->SetTimeStart(ext[0]);
-    ai->SetCurrentTime(ext[0]);
     ai->SetTimeEnd(ext[1]);
     }
   else if (mode == 1)
@@ -435,7 +434,6 @@ void vtkPVExtentEntry::AnimationMenuCallback(vtkPVAnimationInterface *ai,
             this->ObjectTclName,this->VariableName,ext[0],ext[1],ext[4],ext[5]);
     ai->SetLabelAndScript("Y Axis", script);
     ai->SetTimeStart(ext[2]);
-    ai->SetCurrentTime(ext[2]);
     ai->SetTimeEnd(ext[3]);
     }
   else if (mode == 2)
@@ -445,14 +443,13 @@ void vtkPVExtentEntry::AnimationMenuCallback(vtkPVAnimationInterface *ai,
             this->ObjectTclName,this->VariableName,ext[0],ext[1],ext[2],ext[3]);
     ai->SetLabelAndScript("Z Axis", script);
     ai->SetTimeStart(ext[4]);
-    ai->SetCurrentTime(ext[4]);
     ai->SetTimeEnd(ext[5]);
     }
   else
     {
     vtkErrorMacro("Bad extent animation mode.");
     }
-  ai->SetControlledWidget(this);
+  ai->Update();
 }
 
 vtkPVExtentEntry* vtkPVExtentEntry::ClonePrototype(vtkPVSource* pvSource,

@@ -138,7 +138,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.459");
+vtkCxxRevisionMacro(vtkPVWindow, "1.460");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -427,7 +427,7 @@ void vtkPVWindow::PrepareForDelete()
     // it will never go out of its animation loop and this will block
     // the whole destruction process since the animation object registers
     // itself before the loop. See vtkPVAnimationInterface::Play() code.
-    this->AnimationInterface->Stop();
+    this->AnimationInterface->PrepareForDelete();
     this->AnimationInterface->Delete();
     this->AnimationInterface = NULL;
     }

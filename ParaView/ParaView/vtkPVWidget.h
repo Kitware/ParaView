@@ -57,7 +57,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class vtkKWMenu;
 class vtkPVSource;
 class vtkPVApplication;
-class vtkPVAnimationInterface;
+class vtkPVAnimationInterfaceEntry;
 class vtkPVXMLElement;
 class vtkPVXMLPackageParser;
 class vtkPVWindow;
@@ -172,7 +172,7 @@ public:
   // set the min/max/step animation parametets.
   virtual void AddAnimationScriptsToMenu(
     vtkKWMenu* vtkNotUsed(menu), 
-    vtkPVAnimationInterface* vtkNotUsed(object) ) {};
+    vtkPVAnimationInterfaceEntry* vtkNotUsed(object) ) {};
  
   // Description:
   // Create the widget. All sub-classes should use this

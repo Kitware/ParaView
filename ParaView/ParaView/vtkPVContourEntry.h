@@ -86,12 +86,12 @@ public:
   // Description:
   // adds a script to the menu of the animation interface.
   virtual void AddAnimationScriptsToMenu(vtkKWMenu *menu, 
-                                         vtkPVAnimationInterface *ai);
+                                         vtkPVAnimationInterfaceEntry *ai);
 
   // Description:
   // We need to make the callback here so the animation selection
   // can be traced properly.
-  void AnimationMenuCallback(vtkPVAnimationInterface *ai);
+  void AnimationMenuCallback(vtkPVAnimationInterfaceEntry *ai);
 
   // Description:
   // This class redefines SetBalloonHelpString since it

@@ -60,10 +60,7 @@ class vtkPVApplication;
 class vtkCollection;
 class vtkCollectionIterator;
 class vtkKWRange;
-
-//BTX
 class vtkPVAnimationInterfaceEntry;
-//ETX
 
 class VTK_EXPORT vtkPVAnimationInterface : public vtkKWWidget
 {
@@ -77,16 +74,11 @@ public:
 
   // Description:
   // Access to the animation parmeters
-  void SetTimeStart(float t);
-  void SetTimeEnd(float t);
-  void SetTimeSpan(int t);
-  vtkGetMacro(TimeSpan, int);
+  void SetNumberOfFrames(int t);
+  vtkGetMacro(NumberOfFrames, int);
 
   void SetCurrentTime(int time);
   int GetCurrentTime();
-
-  void SetTimeStart(int idx, float t);
-  void SetTimeEnd(int idx, float t);
 
   // Description:
   // Callback that starts an animation.
@@ -127,7 +119,6 @@ public:
   // Description:
   // Access to the interface from scripts.
   void SetScriptCheckButtonState(int);
-  void SetLabelAndScript(const char *label, const char* script);
   const char *GetScript();
 
   // Description:
@@ -160,7 +151,7 @@ public:
   // Decription:
   // Callback for setting the animation parameters from the
   // entries.
-  void TimeSpanEntryCallback();
+  void NumberOfFramesEntryCallback();
 
   // Description:
   // This sets the entries from the animation parameters.
@@ -196,18 +187,16 @@ public:
   void UpdateEntries();
   void DeleteSourceItem(int item);
   void UpdateSourceMenu(int idx);
-  void UpdateMethodMenu(int idx, int samesource=1);
-  void SetPVSource(vtkPVSource *source, int idx);
 
-  void SetLastEntryIndex(int);
+  void ShowEntryInFrame(vtkPVAnimationInterfaceEntry *entry, int idx=-1);
   void ShowEntryInFrame(int idx);
   void UpdateNewScript();
-  void SetTypeToInt();
   void PrepareAnimationInterface(vtkPVWindow* win);
 
-//BTX
   vtkPVAnimationInterfaceEntry* GetSourceEntry(int idx);
-//ETX
+  int GetSourceEntryIndex(vtkPVAnimationInterfaceEntry* entry);
+
+  void PrepareForDelete();
 
 protected:
   vtkPVAnimationInterface();
@@ -228,13 +217,13 @@ protected:
   vtkKWScale *TimeScale;
 
   vtkKWWidget *TimeFrame;
-  vtkKWLabeledEntry *TimeSpanEntry;
+  vtkKWLabeledEntry *NumberOfFramesEntry;
   vtkKWRange        *TimeRange;
 
   void EntryCallback();
 
   // Animation parameters
-  int TimeSpan;
+  int NumberOfFrames;
 
   int StopFlag;
   int InPlay;
@@ -258,6 +247,8 @@ protected:
 
   // The formated string to evaluate.
   char *ScriptString;
+
+  int Dirty;
 
   vtkSetStringMacro(NewScriptString);
   char* NewScriptString;
@@ -283,8 +274,6 @@ protected:
   // Description:
   // Empty the entry frame
   void EmptyEntryFrame();
-
-  int LastEntryIndex;
 
   vtkPVAnimationInterface(const vtkPVAnimationInterface&); // Not implemented
   void operator=(const vtkPVAnimationInterface&); // Not implemented

@@ -17,6 +17,7 @@ SET( ParaView_SRCS
   vtkPV3DWidget.cxx
   vtkPVAdvancedReaderModule.cxx
   vtkPVAnimationInterface.cxx
+  vtkPVAnimationInterfaceEntry.cxx
   vtkPVApplication.cxx 
   vtkPVApplicationResources.cxx 
   vtkPVApplicationSettingsInterface.cxx
@@ -171,6 +172,25 @@ SET( ParaView_SRCS
   vtkXMLPVCollectionWriter.cxx
   )
 
+IF (PARAVIEW_USE_ICE_T)
+  SET( ParaView_SRCS
+    ${ParaView_SRCS}
+    vtkIceTComposite.cxx
+    vtkIceTRenderer.cxx
+    vtkIceTRenderManager.cxx
+    vtkParallelRenderManager.cxx
+    vtkIceTFactory.cxx
+    vtkCompositeRenderManager.cxx
+    vtkPVIceTDisplayRenderModuleUI.cxx
+    vtkPVIceTDisplayRenderModule.cxx
+    )
+  SET_SOURCE_FILES_PROPERTIES(
+    vtkParallelRenderManager.cxx
+    vtkIceTFactory.cxx
+    ABSTRACT
+    )
+ENDIF (PARAVIEW_USE_ICE_T)
+
 IF (VTK_USE_PATENTED)
   SET( ParaView_SRCS
     ${ParaView_SRCS}
@@ -213,6 +233,10 @@ TARGET_LINK_LIBRARIES (vtkKWParaViewTCL
 IF(XDMF_FOUND)
   TARGET_LINK_LIBRARIES(vtkKWParaViewTCL vtkXdmfTCL)
 ENDIF(XDMF_FOUND)
+IF(PARAVIEW_USE_ICE_T)
+  TARGET_LINK_LIBRARIES(vtkKWParaViewTCL ${ICE_T_LIBRARY})
+  INCLUDE_DIRECTORIES(${ICE_T_INCLUDE_DIR})
+ENDIF(PARAVIEW_USE_ICE_T)
 
 
 CONFIGURE_FILE(

@@ -54,7 +54,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkCollection.h"
 #include "vtkCollectionIterator.h"
 #include "vtkKWFrame.h"
-#include "vtkPVAnimationInterface.h"
+#include "vtkPVAnimationInterfaceEntry.h"
 #include "vtkKWMenu.h"
 
 #include <vtkstd/string>
@@ -163,7 +163,7 @@ vtkStandardNewMacro(vtkPVXDMFParametersInternals);
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVXDMFParameters);
-vtkCxxRevisionMacro(vtkPVXDMFParameters, "1.6");
+vtkCxxRevisionMacro(vtkPVXDMFParameters, "1.7");
 
 //----------------------------------------------------------------------------
 vtkPVXDMFParameters::vtkPVXDMFParameters()
@@ -392,7 +392,7 @@ int vtkPVXDMFParameters::ReadXMLAttributes(vtkPVXMLElement* element,
 
 //-----------------------------------------------------------------------------
 void vtkPVXDMFParameters::AddAnimationScriptsToMenu(vtkKWMenu *menu, 
-                                                  vtkPVAnimationInterface *ai)
+                                                  vtkPVAnimationInterfaceEntry *ai)
 {
   if ( !(this->VTKReaderTclName) )
     {
@@ -412,7 +412,7 @@ void vtkPVXDMFParameters::AddAnimationScriptsToMenu(vtkKWMenu *menu,
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVXDMFParameters::AnimationMenuCallback(vtkPVAnimationInterface *ai, const char *name)
+void vtkPVXDMFParameters::AnimationMenuCallback(vtkPVAnimationInterfaceEntry *ai, const char *name)
 {
   char script[1024];
   
@@ -428,9 +428,10 @@ void vtkPVXDMFParameters::AnimationMenuCallback(vtkPVAnimationInterface *ai, con
   vtkPVXDMFParametersInternals::Parameter *p = this->Internals->GetParameter(name);
   ai->SetLabelAndScript(this->GetTraceName(), script);
   ai->SetTimeStart(0);
-  ai->SetCurrentTime(p->Value);
+  //ai->SetCurrentTime(p->Value);
   ai->SetTimeEnd(p->Max);
   ai->SetTypeToInt();
+  ai->Update();
   //cout << "Set time to: " << ai->GetTimeStart() << " - " << ai->GetTimeEnd() << endl;
 }
 

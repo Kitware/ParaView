@@ -49,14 +49,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWMenu.h"
 #include "vtkKWPushButton.h"
 #include "vtkObjectFactory.h"
-#include "vtkPVAnimationInterface.h"
+#include "vtkPVAnimationInterfaceEntry.h"
 #include "vtkPVApplication.h"
 #include "vtkPVSource.h"
 #include "vtkPVXMLElement.h"
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVContourEntry);
-vtkCxxRevisionMacro(vtkPVContourEntry, "1.25");
+vtkCxxRevisionMacro(vtkPVContourEntry, "1.26");
 
 int vtkPVContourEntryCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -449,7 +449,7 @@ void vtkPVContourEntry::ResetInternal(const char* sourceTclName)
 
 //-----------------------------------------------------------------------------
 void vtkPVContourEntry::AddAnimationScriptsToMenu(vtkKWMenu *menu, 
-                                                  vtkPVAnimationInterface *ai)
+                                                  vtkPVAnimationInterfaceEntry *ai)
 {
   char methodAndArgs[500];
   
@@ -458,7 +458,7 @@ void vtkPVContourEntry::AddAnimationScriptsToMenu(vtkKWMenu *menu,
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVContourEntry::AnimationMenuCallback(vtkPVAnimationInterface *ai)
+void vtkPVContourEntry::AnimationMenuCallback(vtkPVAnimationInterfaceEntry *ai)
 {
   char script[500];
   
@@ -472,6 +472,7 @@ void vtkPVContourEntry::AnimationMenuCallback(vtkPVAnimationInterface *ai)
           this->PVSource->GetVTKSourceTclName());
 
   ai->SetLabelAndScript(this->GetTraceName(), script);
+  ai->Update();
 }
 
 //-----------------------------------------------------------------------------

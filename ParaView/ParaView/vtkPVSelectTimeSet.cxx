@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWLabeledFrame.h"
 #include "vtkKWMenu.h"
 #include "vtkObjectFactory.h"
-#include "vtkPVAnimationInterface.h"
+#include "vtkPVAnimationInterfaceEntry.h"
 #include "vtkPVApplication.h"
 #include "vtkPVProcessModule.h"
 #include "vtkPVSource.h"
@@ -58,7 +58,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectTimeSet);
-vtkCxxRevisionMacro(vtkPVSelectTimeSet, "1.23");
+vtkCxxRevisionMacro(vtkPVSelectTimeSet, "1.24");
 
 //-----------------------------------------------------------------------------
 int vtkDataArrayCollectionCommand(ClientData cd, Tcl_Interp *interp,
@@ -362,7 +362,7 @@ void vtkPVSelectTimeSet::Reset()
 
 //-----------------------------------------------------------------------------
 void vtkPVSelectTimeSet::AddAnimationScriptsToMenu(vtkKWMenu *menu, 
-                                                   vtkPVAnimationInterface *ai)
+                                                   vtkPVAnimationInterfaceEntry *ai)
 {
   char methodAndArgs[500];
 
@@ -376,7 +376,7 @@ void vtkPVSelectTimeSet::AddAnimationScriptsToMenu(vtkKWMenu *menu,
 //-----------------------------------------------------------------------------
 // What a pain.  I need this method for tracing.
 // Maybe the animation should call PVwidget methods and not vtk object methods.
-void vtkPVSelectTimeSet::AnimationMenuCallback(vtkPVAnimationInterface *ai)
+void vtkPVSelectTimeSet::AnimationMenuCallback(vtkPVAnimationInterfaceEntry *ai)
 {
   char script[500];
 
@@ -391,6 +391,7 @@ void vtkPVSelectTimeSet::AnimationMenuCallback(vtkPVAnimationInterface *ai)
   sprintf(script, "%s SetTimeValue $pvTime", 
           this->PVSource->GetVTKSourceTclName());
   ai->SetLabelAndScript(this->GetTraceName(), script);
+  ai->Update();
 }
 
 

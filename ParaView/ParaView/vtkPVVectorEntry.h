@@ -109,12 +109,12 @@ public:
 
   // Description:
   // adds a script to the menu of the animation interface.
-  virtual void AddAnimationScriptsToMenu(vtkKWMenu *menu, vtkPVAnimationInterface *ai);
+  virtual void AddAnimationScriptsToMenu(vtkKWMenu *menu, vtkPVAnimationInterfaceEntry *ai);
 
   // Description:
   // Called when menu item (above) is selected.  Neede for tracing.
   // Would not be necessary if menus traced invocations.
-  void AnimationMenuCallback(vtkPVAnimationInterface *ai);
+  void AnimationMenuCallback(vtkPVAnimationInterfaceEntry *ai);
 
   // Description:
   // This is the data type the vtk object is expecting.

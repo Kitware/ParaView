@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWMenu.h"
 #include "vtkKWWidgetCollection.h"
 #include "vtkObjectFactory.h"
-#include "vtkPVAnimationInterface.h"
+#include "vtkPVAnimationInterfaceEntry.h"
 #include "vtkPVApplication.h"
 #include "vtkPVXMLElement.h"
 #include "vtkString.h"
@@ -56,7 +56,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVVectorEntry);
-vtkCxxRevisionMacro(vtkPVVectorEntry, "1.32");
+vtkCxxRevisionMacro(vtkPVVectorEntry, "1.33");
 
 //-----------------------------------------------------------------------------
 vtkPVVectorEntry::vtkPVVectorEntry()
@@ -530,7 +530,7 @@ void vtkPVVectorEntry::SaveInBatchScriptForPart(ofstream *file,
 
 //-----------------------------------------------------------------------------
 void vtkPVVectorEntry::AddAnimationScriptsToMenu(vtkKWMenu *menu, 
-                                                 vtkPVAnimationInterface *ai)
+                                                 vtkPVAnimationInterfaceEntry *ai)
 {
   char methodAndArgs[500];
   
@@ -542,7 +542,7 @@ void vtkPVVectorEntry::AddAnimationScriptsToMenu(vtkKWMenu *menu,
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVVectorEntry::AnimationMenuCallback(vtkPVAnimationInterface *ai)
+void vtkPVVectorEntry::AnimationMenuCallback(vtkPVAnimationInterfaceEntry *ai)
 {
   char script[500];
   
@@ -566,6 +566,7 @@ void vtkPVVectorEntry::AnimationMenuCallback(vtkPVAnimationInterface *ai)
               this->ObjectTclName, this->VariableName);
       }
     ai->SetLabelAndScript(this->LabelWidget->GetLabel(), script);
+    ai->Update();
     }
   // What if there are more than one entry?
 }

@@ -74,12 +74,12 @@ public:
   // Description:
   // adds a script to the menu of the animation interface.
   virtual void AddAnimationScriptsToMenu(vtkKWMenu *menu, 
-                                         vtkPVAnimationInterface *ai);
+                                         vtkPVAnimationInterfaceEntry *ai);
 
   // Description:
   // This method gets called when the user selects this widget to animate.
   // It sets up the script and animation parameters.
-  void AnimationMenuCallback(vtkPVAnimationInterface *ai, int Mode);
+  void AnimationMenuCallback(vtkPVAnimationInterfaceEntry *ai, int Mode);
 
   // Description:
   // The label.

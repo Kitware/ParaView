@@ -51,7 +51,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWPushButton.h"
 #include "vtkKWScale.h"
 #include "vtkObjectFactory.h"
-#include "vtkPVAnimationInterface.h"
+#include "vtkPVAnimationInterfaceEntry.h"
 #include "vtkPVApplication.h"
 #include "vtkPVProcessModule.h"
 #include "vtkPVReaderModule.h"
@@ -61,7 +61,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVFileEntry);
-vtkCxxRevisionMacro(vtkPVFileEntry, "1.41");
+vtkCxxRevisionMacro(vtkPVFileEntry, "1.42");
 
 //----------------------------------------------------------------------------
 vtkPVFileEntry::vtkPVFileEntry()
@@ -661,7 +661,7 @@ void vtkPVFileEntry::SaveInBatchScriptForPart(ofstream* file, const char* source
 
 //-----------------------------------------------------------------------------
 void vtkPVFileEntry::AddAnimationScriptsToMenu(vtkKWMenu *menu, 
-                                                  vtkPVAnimationInterface *ai)
+                                               vtkPVAnimationInterfaceEntry *ai)
 {
   if ( !(this->FileNameLength && this->Format && this->Path && this->Prefix && this->Ext) )
     {
@@ -677,7 +677,7 @@ void vtkPVFileEntry::AddAnimationScriptsToMenu(vtkKWMenu *menu,
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVFileEntry::AnimationMenuCallback(vtkPVAnimationInterface *ai)
+void vtkPVFileEntry::AnimationMenuCallback(vtkPVAnimationInterfaceEntry *ai)
 {
   char script[5000];
   
@@ -693,11 +693,12 @@ void vtkPVFileEntry::AnimationMenuCallback(vtkPVAnimationInterface *ai)
   ai->SetLabelAndScript(this->GetTraceName(), script);
   ai->SetTimeStart(this->Range[0]);
 
-  int ts = static_cast<int>(this->Timestep->GetValue());
-  ai->SetCurrentTime(ts);
+  //int ts = static_cast<int>(this->Timestep->GetValue());
+  //ai->SetCurrentTime(ts);
   ai->SetTimeEnd(this->Range[1]);
   ai->SetTypeToInt();
   //cout << "Set time to: " << ai->GetTimeStart() << " - " << ai->GetTimeEnd() << endl;
+  ai->Update();
 }
 
 //----------------------------------------------------------------------------
