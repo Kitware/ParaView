@@ -101,7 +101,7 @@ Bool vtkKWRenderViewPredProc(Display *vtkNotUsed(disp), XEvent *event,
 }
 #endif
 
-vtkCxxRevisionMacro(vtkKWView, "1.97");
+vtkCxxRevisionMacro(vtkKWView, "1.98");
 
 //----------------------------------------------------------------------------
 int vtkKWViewCommand(ClientData cd, Tcl_Interp *interp,
@@ -1507,7 +1507,7 @@ void vtkKWView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWView ";
-  this->ExtractRevision(os,"$Revision: 1.97 $");
+  this->ExtractRevision(os,"$Revision: 1.98 $");
 }
 
 //----------------------------------------------------------------------------
@@ -1670,4 +1670,5 @@ void vtkKWView::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "SupportSaveAsImage: " << this->GetSupportSaveAsImage() 
      << endl;
   os << indent << "SupportCopy: " << this->GetSupportCopy() << endl;
+  os << indent << "UseProgressGauge: " << this->UseProgressGauge << endl;
 }
