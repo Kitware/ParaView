@@ -179,7 +179,6 @@ SET( ParaViewClient_SRCS
   vtkPVStringAndScalarListWidgetProperty.cxx
   vtkPVStringEntry.cxx
   vtkPVStringWidgetProperty.cxx
-  vtkPVTiledDisplayManager.cxx
   vtkPVTimerInformation.cxx
   vtkPVTimerLogDisplay.cxx
   vtkPVTraceFileDialog.cxx
