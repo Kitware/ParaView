@@ -87,7 +87,7 @@ struct vtkPVArgs
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProcessModule);
-vtkCxxRevisionMacro(vtkPVProcessModule, "1.24.2.24");
+vtkCxxRevisionMacro(vtkPVProcessModule, "1.24.2.25");
 
 int vtkPVProcessModuleCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -103,6 +103,7 @@ vtkPVProcessModule::vtkPVProcessModule()
   this->ClientServerStream = 0;
   this->Interpreter = 0;
   this->InterpreterObserver = 0;
+  this->ReportInterpreterErrors = 1;
 }
 
 //----------------------------------------------------------------------------
@@ -710,6 +711,11 @@ void vtkPVProcessModule::InterpreterCallbackFunction(vtkObject*,
 //----------------------------------------------------------------------------
 void vtkPVProcessModule::InterpreterCallback(unsigned long, void* pinfo)
 {
+  if(!this->ReportInterpreterErrors)
+    {
+    return;
+    }
+
   const char* errorMessage;
   vtkClientServerInterpreterErrorCallbackInfo* info
     = static_cast<vtkClientServerInterpreterErrorCallbackInfo*>(pinfo);

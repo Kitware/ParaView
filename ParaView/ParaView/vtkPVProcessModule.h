@@ -229,6 +229,12 @@ public:
   //ETX
 
   // Description:
+  // Set/Get whether to report errors from the Interpreter.
+  vtkGetMacro(ReportInterpreterErrors, int);
+  vtkSetMacro(ReportInterpreterErrors, int);
+  vtkBooleanMacro(ReportInterpreterErrors, int);
+
+  // Description:
   // Load a ClientServer wrapper module dynamically in the server
   // processes.  Returns 1 if all server nodes loaded the module and 0
   // otherwise.
@@ -261,6 +267,7 @@ protected:
   vtkClientServerStream* ClientServerStream;
   vtkClientServerID UniqueID;
   vtkCallbackCommand* InterpreterObserver;
+  int ReportInterpreterErrors;
 private:
   vtkPVProcessModule(const vtkPVProcessModule&); // Not implemented
   void operator=(const vtkPVProcessModule&); // Not implemented
