@@ -62,7 +62,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.343");
+vtkCxxRevisionMacro(vtkPVSource, "1.344");
 
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
@@ -2515,6 +2515,7 @@ void vtkPVSource::PrintSelf(ostream& os, vtkIndent indent)
     }
   os << indent << "NumberOfOutputsInformation: "
      << this->NumberOfOutputsInformation << endl;
+  os << indent << "SourceGrabbed: " << (this->SourceGrabbed?"on":"off") << endl;
 }
 
 
