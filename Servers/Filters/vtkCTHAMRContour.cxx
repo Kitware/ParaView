@@ -31,6 +31,7 @@
 #ifdef VTK_USE_PATENTED
 #  include "vtkKitwareContourFilter.h"
 #  include "vtkSynchronizedTemplates3D.h"
+#  include "vtkSynchronizedTemplates2D.h"
 #else
 #  include "vtkContourFilter.h"
 #endif
@@ -41,7 +42,7 @@
 #include "vtkGarbageCollector.h"
 
 
-vtkCxxRevisionMacro(vtkCTHAMRContour, "1.9");
+vtkCxxRevisionMacro(vtkCTHAMRContour, "1.10");
 vtkStandardNewMacro(vtkCTHAMRContour);
 
 //----------------------------------------------------------------------------
@@ -52,9 +53,8 @@ vtkCTHAMRContour::vtkCTHAMRContour()
   
   this->Image = 0;
   this->PolyData = 0;
-  this->Contour = 0;
 
-  this->IgnoreGhostLevels = 1;
+  this->IgnoreGhostLevels = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -183,6 +183,8 @@ void vtkCTHAMRContour::ExecuteBlock(vtkImageData* block,
 //------------------------------------------------------------------------------
 void vtkCTHAMRContour::CreateInternalPipeline()
 {
+  vtkCTHData* input = this->GetInput();
+
   // Having inputs keeps us from having to set and remove inputs.
   // The garbage collecting associated with this is expensive.
   this->Image = vtkImageData::New();
@@ -192,19 +194,40 @@ void vtkCTHAMRContour::CreateInternalPipeline()
   
   // Create the contour surface.
 #ifdef VTK_USE_PATENTED
-  vtkSynchronizedTemplates3D* tmp = vtkSynchronizedTemplates3D::New();
-  // vtkDataSetSurfaceFilter does not generate normals, so they will be lost.
-  tmp->ComputeNormalsOff();
-  tmp->SetInput(this->Image);
-  // Copy the contour values to the internal filter.
-  int numContours=this->ContourValues->GetNumberOfContours();
-  double *values=this->ContourValues->GetValues();
-  tmp->SetNumberOfContours(numContours);
-  for (int i=0; i < numContours; i++)
+  if (input->GetDataDimension() == 3)
     {
-    tmp->SetValue(i,values[i]);
+    vtkSynchronizedTemplates3D* tmp = vtkSynchronizedTemplates3D::New();
+    // vtkDataSetSurfaceFilter does not generate normals, so they will be lost.
+    tmp->ComputeNormalsOff();
+    tmp->SetInput(this->Image);
+    // Copy the contour values to the internal filter.
+    int numContours=this->ContourValues->GetNumberOfContours();
+    double *values=this->ContourValues->GetValues();
+    tmp->SetNumberOfContours(numContours);
+    for (int i=0; i < numContours; i++)
+      {
+      tmp->SetValue(i,values[i]);
+      }
+    this->PolyData = tmp->GetOutput();
+    this->PolyData->Register(this);
+    tmp->Delete();
     }
-  this->Contour = tmp;
+  else
+    {
+    vtkSynchronizedTemplates2D* tmp = vtkSynchronizedTemplates2D::New();
+    tmp->SetInput(this->Image);
+    // Copy the contour values to the internal filter.
+    int numContours=this->ContourValues->GetNumberOfContours();
+    double *values=this->ContourValues->GetValues();
+    tmp->SetNumberOfContours(numContours);
+    for (int i=0; i < numContours; i++)
+      {
+      tmp->SetValue(i,values[i]);
+      }
+    this->PolyData = tmp->GetOutput();
+    this->PolyData->Register(this);
+    tmp->Delete();
+    }
 #else
   vtkContourFilter* tmp = vtkContourFilter::New();
   tmp->SetInput(this->Image);
@@ -216,10 +239,11 @@ void vtkCTHAMRContour::CreateInternalPipeline()
     {
     tmp->SetValue(i,values[i]);
     }
-  this->Contour = tmp;  
+    this->PolyData = tmp->GetOutput();
+    this->PolyData->Register(this);
+    tmp->Delete();
 #endif
   
-  this->PolyData = this->Contour->GetOutput();
 }
 
 //------------------------------------------------------------------------------
@@ -231,10 +255,10 @@ void vtkCTHAMRContour::DeleteInternalPipeline()
     this->Image = 0;
     }
 
-  if (this->Contour)
+  if (this->PolyData)
     {
-    this->Contour->Delete();
-    this->Contour = 0;
+    this->PolyData->UnRegister(this);
+    this->PolyData = 0;
     }
 }
 
