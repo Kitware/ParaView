@@ -122,18 +122,20 @@ vtkSelectInputs.cxx
 vtkStringList.cxx 
 vtkTiledDisplayManager.cxx
 
-vtkPVWarpScalar
-vtkPVClipDataSet
-vtkPVContourFilter
-vtkPVGlyphFilter
-vtkPVThresholdFilter
-vtkPVRibbonFilter
-vtkPVWarpVector
-vtkPVImageGradient
-vtkPVImageGradientMagnitude
-vtkPVImageMedian3D
-vtkPVImageContinuousDilate3D
-vtkPVImageContinuousErode3D
+vtkARLReaderModule.cxx
+
+vtkPVWarpScalar.cxx
+vtkPVClipDataSet.cxx
+vtkPVContourFilter.cxx
+vtkPVGlyphFilter.cxx
+vtkPVThresholdFilter.cxx
+vtkPVRibbonFilter.cxx
+vtkPVWarpVector.cxx
+vtkPVImageGradient.cxx
+vtkPVImageGradientMagnitude.cxx
+vtkPVImageMedian3D.cxx
+vtkPVImageContinuousDilate3D.cxx
+vtkPVImageContinuousErode3D.cxx
 )
 
 IF (VTK_USE_PATENTED)
