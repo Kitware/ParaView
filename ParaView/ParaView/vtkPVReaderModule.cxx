@@ -52,7 +52,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVReaderModule);
-vtkCxxRevisionMacro(vtkPVReaderModule, "1.17");
+vtkCxxRevisionMacro(vtkPVReaderModule, "1.18");
 
 int vtkPVReaderModuleCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -180,7 +180,7 @@ const char* vtkPVReaderModule::ExtractExtension(const char* fname)
 }
 
 //----------------------------------------------------------------------------
-int vtkPVReaderModule::Initialize(const char* fname, vtkPVReaderModule*& clone)
+int vtkPVReaderModule::Initialize(const char*, vtkPVReaderModule*& clone)
 {
   clone = 0;
   if (this->ClonePrototype(1, clone) != VTK_OK)
@@ -190,6 +190,7 @@ int vtkPVReaderModule::Initialize(const char* fname, vtkPVReaderModule*& clone)
     clone = 0;
     return VTK_ERROR;
     }
+  return VTK_OK;
 }
 
 //----------------------------------------------------------------------------
@@ -217,8 +218,7 @@ int vtkPVReaderModule::ReadFileInformation(const char* fname)
 }
 
 //----------------------------------------------------------------------------
-int vtkPVReaderModule::FinalizeInternal(const char* fname, 
-                                        int accept)
+int vtkPVReaderModule::FinalizeInternal(const char*, int accept)
 {
   vtkPVWindow* window = this->GetPVApplication()->GetMainWindow();
   window->AddPVSource("Sources", this);
@@ -226,7 +226,6 @@ int vtkPVReaderModule::FinalizeInternal(const char* fname,
 
   if (this->GetTraceInitialized() == 0)
     { 
-    vtkPVApplication* pvApp=this->GetPVApplication();
     this->SetTraceInitialized(1);
     }
   this->GetPVWindow()->GetMainView()->UpdateNavigationWindow(this, 1);
