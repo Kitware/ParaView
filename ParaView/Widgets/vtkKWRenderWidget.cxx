@@ -58,7 +58,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkWin32OpenGLRenderWindow.h"
 #endif
 
-vtkCxxRevisionMacro(vtkKWRenderWidget, "1.23");
+vtkCxxRevisionMacro(vtkKWRenderWidget, "1.24");
 
 //----------------------------------------------------------------------------
 class vtkKWRenderWidgetObserver : public vtkCommand
@@ -416,12 +416,31 @@ void vtkKWRenderWidget::Configure(int width, int height)
 //----------------------------------------------------------------------------
 void vtkKWRenderWidget::Render()
 {
-  if ( this->CollapsingRenders )
+  if (this->CollapsingRenders)
     {
-    this->CollapsingRendersCount ++;
+    this->CollapsingRendersCount++;
     return;
     }
-  this->RenderWindow->Render();
+
+  if (!this->RenderState)
+    {
+    return;
+    }
+
+  static int static_in_render = 0;
+  if (static_in_render)
+    {
+    return;
+    }
+  static_in_render = 1;
+
+  if (this->RenderMode != VTK_KW_DISABLED_RENDER)
+    {
+    this->Renderer->ResetCameraClippingRange();
+    this->RenderWindow->Render();
+    }
+  
+  static_in_render = 0;
 }
 
 //----------------------------------------------------------------------------
