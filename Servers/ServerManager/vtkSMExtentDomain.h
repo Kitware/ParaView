@@ -50,6 +50,8 @@ protected:
   ~vtkSMExtentDomain();
   
   void Update(vtkSMProxyProperty *pp);
+
+  virtual void SaveState(const char*, ostream*, vtkIndent) {}
   
 private:
   vtkSMExtentDomain(const vtkSMExtentDomain&); // Not implemented

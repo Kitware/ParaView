@@ -91,6 +91,8 @@ protected:
   int AttributeType;
   unsigned int DefaultElement;
 
+  virtual void SaveState(const char*, ostream*, vtkIndent) {};
+
 private:
   vtkSMArrayListDomain(const vtkSMArrayListDomain&); // Not implemented
   void operator=(const vtkSMArrayListDomain&); // Not implemented

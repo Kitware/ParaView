@@ -22,7 +22,7 @@
 #include "vtkStdString.h"
 
 vtkStandardNewMacro(vtkSMStringVectorProperty);
-vtkCxxRevisionMacro(vtkSMStringVectorProperty, "1.12");
+vtkCxxRevisionMacro(vtkSMStringVectorProperty, "1.13");
 
 struct vtkSMStringVectorPropertyInternals
 {
@@ -260,7 +260,7 @@ int vtkSMStringVectorProperty::ReadXMLAttributes(vtkSMProxy* proxy,
 
 //---------------------------------------------------------------------------
 void vtkSMStringVectorProperty::SaveState(
-  const char* name, ofstream* file, vtkIndent indent)
+  const char* name, ostream* file, vtkIndent indent)
 {
   unsigned int size = this->GetNumberOfElements();
   *file << indent << "<Property name=\"" << (this->XMLName?this->XMLName:"")

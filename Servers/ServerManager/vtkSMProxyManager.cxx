@@ -28,7 +28,7 @@
 #include "vtkSMProxyManagerInternals.h"
 
 vtkStandardNewMacro(vtkSMProxyManager);
-vtkCxxRevisionMacro(vtkSMProxyManager, "1.14");
+vtkCxxRevisionMacro(vtkSMProxyManager, "1.15");
 
 //---------------------------------------------------------------------------
 vtkSMProxyManager::vtkSMProxyManager()
@@ -342,6 +342,11 @@ void vtkSMProxyManager::SaveState(const char* filename)
 {
   ofstream os(filename, ios::out);
   vtkIndent indent;
+  this->SaveState(0, &os, indent);
+}
+
+void vtkSMProxyManager::SaveState(const char*, ostream* os, vtkIndent indent)
+{
 
   // First save the state of all proxies
   vtkSMProxyManagerInternals::ProxyGroupType::iterator it =
@@ -367,7 +372,7 @@ void vtkSMProxyManager::SaveState(const char* filename)
       {
       for (; it2 != it->second.end(); it2++)
         {
-        it2->second->SaveState(it2->first.c_str(), &os, indent);
+        it2->second->SaveState(it2->first.c_str(), os, indent);
         }
       }
     }
@@ -391,16 +396,16 @@ void vtkSMProxyManager::SaveState(const char* filename)
       }
     if (do_group)
       {
-      os << indent 
+      *os << indent 
          << "<ProxyCollection name=\"" << it->first.c_str() << "\">" << endl;
       vtkSMProxyManagerProxyMapType::iterator it2 =
         it->second.begin();
       for (; it2 != it->second.end(); it2++)
         {
-        os << indent.GetNextIndent()
+        *os << indent.GetNextIndent()
            << "<Item name=\"" << it2->first.c_str() << "\" />" << endl;
         }
-      os << indent << "</ProxyCollection>" << endl;
+      *os << indent << "</ProxyCollection>" << endl;
       }
     }
 }

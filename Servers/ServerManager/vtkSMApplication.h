@@ -49,7 +49,7 @@ protected:
   vtkSMApplication();
   ~vtkSMApplication();
 
-  virtual void SaveState(const char*, ofstream*, vtkIndent) {};
+  virtual void SaveState(const char*, ostream*, vtkIndent) {};
 
 private:
   vtkSMApplication(const vtkSMApplication&); // Not implemented

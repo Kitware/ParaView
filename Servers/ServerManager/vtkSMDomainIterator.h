@@ -63,6 +63,8 @@ public:
   // Returns the current domain.
   vtkSMDomain* GetDomain();
 
+  virtual void SaveState(const char*, ostream*, vtkIndent) {}
+
 protected:
   vtkSMDomainIterator();
   ~vtkSMDomainIterator();

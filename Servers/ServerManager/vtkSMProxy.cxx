@@ -30,7 +30,7 @@
 #include <vtkstd/algorithm>
 
 vtkStandardNewMacro(vtkSMProxy);
-vtkCxxRevisionMacro(vtkSMProxy, "1.18");
+vtkCxxRevisionMacro(vtkSMProxy, "1.19");
 
 vtkCxxSetObjectMacro(vtkSMProxy, XMLElement, vtkPVXMLElement);
 
@@ -879,7 +879,7 @@ int vtkSMProxy::ReadXMLAttributes(
 }
 
 //---------------------------------------------------------------------------
-void vtkSMProxy::SaveState(const char* name, ofstream* file, vtkIndent indent)
+void vtkSMProxy::SaveState(const char* name, ostream* file, vtkIndent indent)
 {
   *file << indent
         << "<Proxy group=\"" 

@@ -22,7 +22,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMDoubleVectorProperty);
-vtkCxxRevisionMacro(vtkSMDoubleVectorProperty, "1.16");
+vtkCxxRevisionMacro(vtkSMDoubleVectorProperty, "1.17");
 
 struct vtkSMDoubleVectorPropertyInternals
 {
@@ -396,7 +396,7 @@ int vtkSMDoubleVectorProperty::ReadXMLAttributes(vtkSMProxy* proxy,
 
 //---------------------------------------------------------------------------
 void vtkSMDoubleVectorProperty::SaveState(
-  const char* name, ofstream* file, vtkIndent indent)
+  const char* name, ostream* file, vtkIndent indent)
 {
   unsigned int size = this->GetNumberOfElements();
   *file << indent << "<Property name=\"" << (this->XMLName?this->XMLName:"")

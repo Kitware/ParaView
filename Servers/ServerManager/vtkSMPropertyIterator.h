@@ -71,6 +71,8 @@ protected:
 
   vtkSMProxy* Proxy;
 
+  virtual void SaveState(const char*, ostream*, vtkIndent) {}
+
 private:
   vtkSMPropertyIteratorInternals* Internals;
 

@@ -27,7 +27,7 @@
 #include "vtkStdString.h"
 
 vtkStandardNewMacro(vtkSMDataTypeDomain);
-vtkCxxRevisionMacro(vtkSMDataTypeDomain, "1.3");
+vtkCxxRevisionMacro(vtkSMDataTypeDomain, "1.4");
 
 struct vtkSMDataTypeDomainInternals
 {
@@ -138,7 +138,7 @@ int vtkSMDataTypeDomain::IsInDomain(vtkSMSourceProxy* proxy)
 
 //---------------------------------------------------------------------------
 void vtkSMDataTypeDomain::SaveState(
-  const char* name, ofstream* file, vtkIndent indent)
+  const char* name, ostream* file, vtkIndent indent)
 {
   *file << indent 
         << "<Domain name=\"" << this->XMLName << "\" id=\"" << name << "\">"

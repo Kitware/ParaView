@@ -22,7 +22,7 @@
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkSMFixedTypeDomain);
-vtkCxxRevisionMacro(vtkSMFixedTypeDomain, "1.2");
+vtkCxxRevisionMacro(vtkSMFixedTypeDomain, "1.3");
 
 //---------------------------------------------------------------------------
 vtkSMFixedTypeDomain::vtkSMFixedTypeDomain()
@@ -120,7 +120,7 @@ int vtkSMFixedTypeDomain::IsInDomain(vtkSMSourceProxy* oldProxy,
 
 //---------------------------------------------------------------------------
 void vtkSMFixedTypeDomain::SaveState(
-  const char* name, ofstream* file, vtkIndent indent)
+  const char* name, ostream* file, vtkIndent indent)
 {
   *file << indent 
         << "<Domain name=\"" << this->XMLName << "\" id=\"" << name << "\">"

@@ -20,7 +20,7 @@
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkSMNumberOfPartsDomain);
-vtkCxxRevisionMacro(vtkSMNumberOfPartsDomain, "1.3");
+vtkCxxRevisionMacro(vtkSMNumberOfPartsDomain, "1.4");
 
 //---------------------------------------------------------------------------
 vtkSMNumberOfPartsDomain::vtkSMNumberOfPartsDomain()
@@ -92,7 +92,7 @@ int vtkSMNumberOfPartsDomain::IsInDomain(vtkSMSourceProxy* proxy)
 
 //---------------------------------------------------------------------------
 void vtkSMNumberOfPartsDomain::SaveState(
-  const char* name, ofstream* file, vtkIndent indent)
+  const char* name, ostream* file, vtkIndent indent)
 {
   *file << indent 
         << "<Domain name=\"" << this->XMLName << "\" id=\"" << name << "\">"

@@ -130,6 +130,8 @@ protected:
   char EnumValue[128];
   char ElemValue[128];
 
+  virtual void SaveState(const char*, ostream*, vtkIndent) {}
+
 private:
   vtkSMPropertyAdaptor(const vtkSMPropertyAdaptor&); // Not implemented
   void operator=(const vtkSMPropertyAdaptor&); // Not implemented
