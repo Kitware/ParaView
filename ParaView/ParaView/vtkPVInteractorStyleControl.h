@@ -163,12 +163,12 @@ protected:
   typedef vtkArrayMapIterator<const char*,vtkPVCameraManipulator*> 
     ManipulatorMapIterator;
   typedef vtkArrayMap<const char*,vtkPVWidget*> WidgetsMap;
-  typedef vtkArrayMap<const char*,vtkPVInteractorStyleControl::ArrayStrings*>
+  typedef vtkArrayMap<const char*,ArrayStrings*>
     MapStringToArrayStrings;
 
-  vtkPVInteractorStyleControl::ManipulatorMap*          Manipulators;
-  vtkPVInteractorStyleControl::WidgetsMap*              Widgets;
-  vtkPVInteractorStyleControl::MapStringToArrayStrings* Arguments;
+  ManipulatorMap*          Manipulators;
+  WidgetsMap*              Widgets;
+  MapStringToArrayStrings* Arguments;
 //ETX
 
   // This is hack to get tcl name;

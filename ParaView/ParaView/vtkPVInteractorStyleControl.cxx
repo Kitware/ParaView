@@ -229,7 +229,7 @@ void vtkPVInteractorStyleControl::ChangeArgument(const char* name,
     }
   vtkPVScale* scale = vtkPVScale::SafeDownCast(widget);
   vtkPVPushButton* pushButton = vtkPVPushButton::SafeDownCast(widget);
-  const char* value = 0;
+  char* value = 0;
   if ( scale )
     {
     ostrstream str;
