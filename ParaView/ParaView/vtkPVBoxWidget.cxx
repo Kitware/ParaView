@@ -60,8 +60,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkBoxWidget.h"
 #include "vtkRenderer.h"
 
+#include "vtkKWFrame.h"
+#include "vtkKWThumbWheel.h"
+#include "vtkKWScale.h"
+#include "vtkPVRenderView.h"
+#include "vtkTransform.h"
+
 vtkStandardNewMacro(vtkPVBoxWidget);
-vtkCxxRevisionMacro(vtkPVBoxWidget, "1.2");
+vtkCxxRevisionMacro(vtkPVBoxWidget, "1.3");
 
 int vtkPVBoxWidgetCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -70,16 +76,48 @@ int vtkPVBoxWidgetCommand(ClientData cd, Tcl_Interp *interp,
 vtkPVBoxWidget::vtkPVBoxWidget()
 {
   this->BoxTclName = 0;
+  this->BoxTransformTclName = 0;
+
+  this->ControlFrame = vtkKWFrame::New();
+  this->TranslateLabel = vtkKWLabel::New();
+  this->ScaleLabel = vtkKWLabel::New();
+  this->OrientationLabel = vtkKWLabel::New();
+
+  int cc;
+  for ( cc = 0; cc < 3; cc ++ )
+    {
+    this->TranslateThumbWheel[cc] = vtkKWThumbWheel::New();
+    this->ScaleThumbWheel[cc] = vtkKWThumbWheel::New();
+    this->OrientationScale[cc] = vtkKWScale::New();
+    }
 }
 
 //----------------------------------------------------------------------------
 vtkPVBoxWidget::~vtkPVBoxWidget()
 {
+  this->ControlFrame->Delete();
+  this->TranslateLabel->Delete();
+  this->ScaleLabel->Delete();
+  this->OrientationLabel->Delete();
+
+  int cc;
+  for ( cc = 0; cc < 3; cc ++ )
+    {
+    this->TranslateThumbWheel[cc]->Delete();
+    this->ScaleThumbWheel[cc]->Delete();
+    this->OrientationScale[cc]->Delete();
+    }
   if (this->BoxTclName)
     {
     this->GetPVApplication()->BroadcastScript("%s Delete", 
                                               this->BoxTclName);
     this->SetBoxTclName(NULL);
+    }
+  if ( this->BoxTransformTclName )
+    {
+    this->GetPVApplication()->BroadcastScript("%s Delete", 
+      this->BoxTransformTclName);
+    this->SetBoxTransformTclName(0);
     }
 }
 
@@ -91,10 +129,10 @@ void vtkPVBoxWidget::ResetInternal(const char* sourceTclName)
     return;
     }
   if ( this->BoxTclName )
-  {
-  //this->Script("eval %s SetState [ %s GetState ]", 
-  //this->GetTclName(), this->BoxTclName);
-  }
+    {
+    //this->Script("eval %s SetState [ %s GetState ]", 
+    //this->GetTclName(), this->BoxTclName);
+    }
   this->Superclass::ResetInternal(sourceTclName);
 }
 
@@ -239,8 +277,125 @@ void vtkPVBoxWidget::ChildCreate(vtkPVApplication* pvApp)
   sprintf(tclName, "pvBox%d", instanceCount);
   pvApp->BroadcastScript("vtkPlanes %s", tclName);
   this->SetBoxTclName(tclName);
+
+  sprintf(tclName, "pvBoxTransform%d", instanceCount);
+  pvApp->BroadcastScript("vtkTransform %s", tclName);
+  this->SetBoxTransformTclName(tclName);
+
+  this->BoxTransform = vtkTransform::SafeDownCast(pvApp->TclToVTKObject(this->BoxTransformTclName));
   
   this->SetFrameLabel("Box Widget");
+
+  this->ControlFrame->SetParent(this->Frame->GetFrame());
+  this->ControlFrame->Create(this->Application, 0);
+
+  this->TranslateLabel->SetParent(this->ControlFrame->GetFrame());
+  this->TranslateLabel->Create(this->Application, 0);
+  this->TranslateLabel->SetLabel("Translate:");
+  this->TranslateLabel->SetBalloonHelpString(
+    "Translate the geometry relative to the dataset location.");
+
+  this->ScaleLabel->SetParent(this->ControlFrame->GetFrame());
+  this->ScaleLabel->Create(this->Application, 0);
+  this->ScaleLabel->SetLabel("Scale:");
+  this->ScaleLabel->SetBalloonHelpString(
+    "Scale the geometry relative to the size of the dataset.");
+
+  this->OrientationLabel->SetParent(this->ControlFrame->GetFrame());
+  this->OrientationLabel->Create(this->Application, 0);
+  this->OrientationLabel->SetLabel("Orientation:");
+  this->OrientationLabel->SetBalloonHelpString(
+    "Orient the geometry relative to the dataset origin.");
+
+  int cc;
+  for ( cc = 0; cc < 3; cc ++ )
+    {
+    this->TranslateThumbWheel[cc]->SetParent(this->ControlFrame->GetFrame());
+    this->TranslateThumbWheel[cc]->PopupModeOn();
+    this->TranslateThumbWheel[cc]->SetValue(0.0);
+    this->TranslateThumbWheel[cc]->Create(this->Application, 0);
+    this->TranslateThumbWheel[cc]->DisplayEntryOn();
+    this->TranslateThumbWheel[cc]->DisplayEntryAndLabelOnTopOff();
+    this->TranslateThumbWheel[cc]->ExpandEntryOn();
+    this->TranslateThumbWheel[cc]->GetEntry()->SetWidth(5);
+    this->TranslateThumbWheel[cc]->SetCommand(this, "TranslateCallback");
+    this->TranslateThumbWheel[cc]->SetEndCommand(this, 
+                                                 "TranslateEndCallback");
+    this->TranslateThumbWheel[cc]->SetEntryCommand(this,
+                                                   "TranslateEndCallback");
+    this->TranslateThumbWheel[cc]->SetBalloonHelpString(
+      "Translate the geometry relative to the dataset location.");
+
+    this->ScaleThumbWheel[cc]->SetParent(this->ControlFrame->GetFrame());
+    this->ScaleThumbWheel[cc]->PopupModeOn();
+    this->ScaleThumbWheel[cc]->SetValue(1.0);
+    this->ScaleThumbWheel[cc]->SetMinimumValue(0.0);
+    this->ScaleThumbWheel[cc]->ClampMinimumValueOn();
+    this->ScaleThumbWheel[cc]->SetResolution(0.05);
+    this->ScaleThumbWheel[cc]->Create(this->Application, 0);
+    this->ScaleThumbWheel[cc]->DisplayEntryOn();
+    this->ScaleThumbWheel[cc]->DisplayEntryAndLabelOnTopOff();
+    this->ScaleThumbWheel[cc]->ExpandEntryOn();
+    this->ScaleThumbWheel[cc]->GetEntry()->SetWidth(5);
+    this->ScaleThumbWheel[cc]->SetCommand(this, "ScaleCallback");
+    this->ScaleThumbWheel[cc]->SetEndCommand(this, "ScaleEndCallback");
+    this->ScaleThumbWheel[cc]->SetEntryCommand(this, "ScaleEndCallback");
+    this->ScaleThumbWheel[cc]->SetBalloonHelpString(
+      "Scale the geometry relative to the size of the dataset.");
+
+    this->OrientationScale[cc]->SetParent(this->ControlFrame->GetFrame());
+    this->OrientationScale[cc]->PopupScaleOn();
+    this->OrientationScale[cc]->Create(this->Application, 0);
+    this->OrientationScale[cc]->SetRange(0, 360);
+    this->OrientationScale[cc]->SetResolution(1);
+    this->OrientationScale[cc]->SetValue(0);
+    this->OrientationScale[cc]->DisplayEntry();
+    this->OrientationScale[cc]->DisplayEntryAndLabelOnTopOff();
+    this->OrientationScale[cc]->ExpandEntryOn();
+    this->OrientationScale[cc]->GetEntry()->SetWidth(5);
+    this->OrientationScale[cc]->SetCommand(this, "OrientationCallback");
+    this->OrientationScale[cc]->SetEndCommand(this, 
+                                              "OrientationEndCallback");
+    this->OrientationScale[cc]->SetEntryCommand(this, 
+                                                "OrientationEndCallback");
+    this->OrientationScale[cc]->SetBalloonHelpString(
+      "Orient the geometry relative to the dataset origin.");
+
+    }
+
+  int button_pady = 1;
+  this->Script("grid %s %s %s %s -sticky news -pady %d",
+               this->TranslateLabel->GetWidgetName(),
+               this->TranslateThumbWheel[0]->GetWidgetName(),
+               this->TranslateThumbWheel[1]->GetWidgetName(),
+               this->TranslateThumbWheel[2]->GetWidgetName(),
+               button_pady);
+
+  this->Script("grid %s -sticky nws",
+               this->TranslateLabel->GetWidgetName());
+
+  this->Script("grid %s %s %s %s -sticky news -pady %d",
+               this->ScaleLabel->GetWidgetName(),
+               this->ScaleThumbWheel[0]->GetWidgetName(),
+               this->ScaleThumbWheel[1]->GetWidgetName(),
+               this->ScaleThumbWheel[2]->GetWidgetName(),
+               button_pady);
+
+  this->Script("grid %s -sticky nws",
+               this->ScaleLabel->GetWidgetName());
+
+  this->Script("grid %s %s %s %s -sticky news -pady %d",
+               this->OrientationLabel->GetWidgetName(),
+               this->OrientationScale[0]->GetWidgetName(),
+               this->OrientationScale[1]->GetWidgetName(),
+               this->OrientationScale[2]->GetWidgetName(),
+               button_pady);
+
+  this->Script("grid %s -sticky nws",
+               this->OrientationLabel->GetWidgetName());
+
+  this->Script("pack %s -fill x -expand t -pady 2",
+    this->ControlFrame->GetWidgetName());
 
   // Initialize the center of the sphere based on the input bounds.
   if (this->PVSource)
@@ -255,6 +410,194 @@ void vtkPVBoxWidget::ChildCreate(vtkPVApplication* pvApp)
 
   this->SetBalloonHelpString(this->BalloonHelpString);
 
+}
+
+//----------------------------------------------------------------------------
+void vtkPVBoxWidget::ScaleCallback()
+{
+  cout << "ScaleCallback" << endl;
+  this->SetScaleNoTrace(this->GetRotationFromGUI());
+  if ( this->GetPVSource()->GetPVRenderView() )
+    {
+    this->GetPVSource()->GetPVRenderView()->EventuallyRender();
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVBoxWidget::TranslateCallback()
+{
+  cout << "TranslateCallback" << endl;
+  this->SetTranslateNoTrace(this->GetRotationFromGUI());
+  if ( this->GetPVSource()->GetPVRenderView() )
+    {
+    this->GetPVSource()->GetPVRenderView()->EventuallyRender();
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVBoxWidget::OrientationCallback()
+{
+  cout << "OrientationCallback" << endl;
+  this->SetOrientationNoTrace(this->GetRotationFromGUI());
+  if ( this->GetPVSource()->GetPVRenderView() )
+    {
+    this->GetPVSource()->GetPVRenderView()->EventuallyRender();
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVBoxWidget::ScaleEndCallback()
+{
+  cout << "ScaleEndCallback" << endl;
+  this->SetScale(this->GetRotationFromGUI());
+}
+
+//----------------------------------------------------------------------------
+void vtkPVBoxWidget::TranslateEndCallback()
+{
+  cout << "TranslateEndCallback" << endl;
+  this->SetTranslate(this->GetRotationFromGUI());
+}
+
+//----------------------------------------------------------------------------
+void vtkPVBoxWidget::OrientationEndCallback()
+{
+  cout << "OrientationEndCallback" << endl;
+  this->SetOrientation(this->GetRotationFromGUI());
+}
+
+//----------------------------------------------------------------------------
+void vtkPVBoxWidget::SetOrientationNoTrace(float, float, float)
+{this->UpdateBox();}
+
+//----------------------------------------------------------------------------
+void vtkPVBoxWidget::SetTranslateNoTrace(float, float, float)
+{this->UpdateBox();}
+
+//----------------------------------------------------------------------------
+void vtkPVBoxWidget::SetScaleNoTrace(float, float, float)
+{this->UpdateBox();}
+
+//----------------------------------------------------------------------------
+void vtkPVBoxWidget::SetOrientation(float px, float py, float pz)
+{
+  this->SetOrientationNoTrace(px, py, pz);
+  if ( this->GetPVSource()->GetPVRenderView() )
+    {
+    this->GetPVSource()->GetPVRenderView()->EventuallyRender();
+    }
+
+  this->AddTraceEntry("$kw(%s) SetOrientation %f %f %f",
+                      this->GetTclName(), px, py, pz);  
+}
+
+//----------------------------------------------------------------------------
+void vtkPVBoxWidget::SetScale(float px, float py, float pz)
+{
+  this->SetScaleNoTrace(px, py, pz);
+  if ( this->GetPVSource()->GetPVRenderView() )
+    {
+    this->GetPVSource()->GetPVRenderView()->EventuallyRender();
+    }
+
+  this->AddTraceEntry("$kw(%s) SetScale %f %f %f",
+                      this->GetTclName(), px, py, pz);  
+}
+
+//----------------------------------------------------------------------------
+void vtkPVBoxWidget::SetTranslate(float px, float py, float pz)
+{
+  this->SetTranslateNoTrace(px, py, pz);
+  if ( this->GetPVSource()->GetPVRenderView() )
+    {
+    this->GetPVSource()->GetPVRenderView()->EventuallyRender();
+    }
+
+  this->AddTraceEntry("$kw(%s) SetTranslate %f %f %f",
+                      this->GetTclName(), px, py, pz);  
+}
+
+//----------------------------------------------------------------------------
+void vtkPVBoxWidget::UpdateBox()
+{
+  vtkPVApplication* pvApp = this->GetPVApplication();
+  vtkTransform* trans = this->BoxTransform;
+  trans->Identity();
+  trans->Translate(this->GetPositionFromGUI());
+  this->GetRotationFromGUI();
+  trans->RotateX(this->RotationGUI[0]);
+  trans->RotateY(this->RotationGUI[1]);
+  trans->RotateZ(this->RotationGUI[2]);
+  trans->Scale(this->GetScalarFromGUI());
+  trans->Print(cout);
+  vtkMatrix4x4* mat = trans->GetMatrix();
+  printf(
+    "%s Identity\n"
+    "[ %s GetMatrix ] DeepCopy { "
+    "%f %f %f %f "
+    "%f %f %f %f "
+    "%f %f %f %f "
+    "%f %f %f %f "
+    " }\n"
+    "%s SetTransform %s\n",
+    this->BoxTransformTclName,
+    this->BoxTransformTclName,
+    (*mat)[0][0], (*mat)[0][1], (*mat)[0][2], (*mat)[0][3],
+    (*mat)[1][0], (*mat)[1][1], (*mat)[1][2], (*mat)[1][3],
+    (*mat)[2][0], (*mat)[2][1], (*mat)[2][2], (*mat)[2][3],
+    (*mat)[3][0], (*mat)[3][1], (*mat)[3][2], (*mat)[3][3],
+    this->Widget3DTclName,
+    this->BoxTransformTclName);
+  pvApp->BroadcastScript(
+    "%s Identity\n"
+    "eval [ %s GetMatrix ] DeepCopy { "
+    "%f %f %f %f "
+    "%f %f %f %f "
+    "%f %f %f %f "
+    "%f %f %f %f "
+    " }\n"
+    "%s SetTransform %s",
+    this->BoxTransformTclName,
+    this->BoxTransformTclName,
+    (*mat)[0][0], (*mat)[0][1], (*mat)[0][2], (*mat)[0][3],
+    (*mat)[1][0], (*mat)[1][1], (*mat)[1][2], (*mat)[1][3],
+    (*mat)[2][0], (*mat)[2][1], (*mat)[2][2], (*mat)[2][3],
+    (*mat)[3][0], (*mat)[3][1], (*mat)[3][2], (*mat)[3][3],
+    this->Widget3DTclName,
+    this->BoxTransformTclName);
+}
+
+//----------------------------------------------------------------------------
+float* vtkPVBoxWidget::GetPositionFromGUI()
+{
+  this->PositionGUI[0] = this->TranslateThumbWheel[0]->GetValue();
+  this->PositionGUI[1] = this->TranslateThumbWheel[1]->GetValue();
+  this->PositionGUI[2] = this->TranslateThumbWheel[2]->GetValue();
+  return this->PositionGUI;
+}
+
+//----------------------------------------------------------------------------
+float* vtkPVBoxWidget::GetRotationFromGUI()
+{
+  this->RotationGUI[0] = this->OrientationScale[0]->GetValue();
+  this->RotationGUI[1] = this->OrientationScale[1]->GetValue();
+  this->RotationGUI[2] = this->OrientationScale[2]->GetValue();
+  return this->RotationGUI;
+}
+
+//----------------------------------------------------------------------------
+float* vtkPVBoxWidget::GetScalarFromGUI()
+{
+  this->ScaleGUI[0] = this->ScaleThumbWheel[0]->GetValue();
+  this->ScaleGUI[1] = this->ScaleThumbWheel[1]->GetValue();
+  this->ScaleGUI[2] = this->ScaleThumbWheel[2]->GetValue();
+  return this->ScaleGUI;
+}
+
+//----------------------------------------------------------------------------
+vtkBoxWidget* vtkPVBoxWidget::GetBoxWidget()
+{
+  return static_cast<vtkBoxWidget*>(this->Widget3D);
 }
 
 //----------------------------------------------------------------------------
