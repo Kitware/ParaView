@@ -36,7 +36,7 @@
 
 
 
-vtkCxxRevisionMacro(vtkCTHAMRCellToPointData, "1.4");
+vtkCxxRevisionMacro(vtkCTHAMRCellToPointData, "1.5");
 vtkStandardNewMacro(vtkCTHAMRCellToPointData);
 
 //----------------------------------------------------------------------------
@@ -179,13 +179,14 @@ void vtkCTHAMRCellToPointData::CreateOutputGeometry(vtkCTHData* input,
       ext[5] -= numGhostLevels;
       }
     output->SetBlockCellExtent(block, level, ext);
+    }
 }
 
 //----------------------------------------------------------------------------
 // This assumes that ghost levels exist.  No boundary condition checks.
 template <class T>
 void vtkCTHAMRExecuteCellDataToPointData(T* pCell,float* pPoint, 
-                                         int cDims[3], int pDims[3])
+                                         int* cDims, int* pDims)
 {
   int i, j, k;
   int jInc, kInc;
