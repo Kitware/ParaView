@@ -2,8 +2,10 @@ CMAKE_MINIMUM_REQUIRED(VERSION 1.8)
 PROJECT(VTKHDF5 C)
 INCLUDE_REGULAR_EXPRESSION("^.*\\.[ch]$")
 
-SET(LIBRARY_OUTPUT_PATH ${VTKHDF5_BINARY_DIR}/bin CACHE PATH "Single output directory for building all libraries.")
-SET(EXECUTABLE_OUTPUT_PATH ${VTKHDF5_BINARY_DIR}/bin CACHE PATH "Single output directory for building all executables.")
+SET(LIBRARY_OUTPUT_PATH ${VTKHDF5_BINARY_DIR}/bin CACHE PATH 
+  "Single output directory for building all libraries.")
+SET(EXECUTABLE_OUTPUT_PATH ${VTKHDF5_BINARY_DIR}/bin CACHE PATH 
+  "Single output directory for building all executables.")
 MARK_AS_ADVANCED(LIBRARY_OUTPUT_PATH EXECUTABLE_OUTPUT_PATH)
 
 SET(CMAKE_C_FLAGS "${CMAKE_ANSI_CFLAGS} ${CMAKE_C_FLAGS}")
@@ -16,7 +18,8 @@ SET(PACKAGE_BUGREPORT "\"hdfhelp@ncsa.uiuc.edu\"")
 
 SET(LINUX_LFS 0)
 IF(CMAKE_SYSTEM MATCHES "Linux-([3-9]\\.[0-9]|2\\.[4-9])\\.")
-  OPTION(HDF5_ENABLE_LINUX_LFS "Enable support for large (64-bit) files on Linux." ON)
+  OPTION(HDF5_ENABLE_LINUX_LFS 
+    "Enable support for large (64-bit) files on Linux." ON)
   IF(HDF5_ENABLE_LINUX_LFS)
     SET(LINUX_LFS 1)
   ENDIF(HDF5_ENABLE_LINUX_LFS)
@@ -45,6 +48,7 @@ ENDIF(WINDOWS)
 # Include all the necessary files for macros
 INCLUDE (${CMAKE_ROOT}/Modules/CheckFunctionExists.cmake)
 INCLUDE (${CMAKE_ROOT}/Modules/CheckIncludeFile.cmake)
+INCLUDE (${CMAKE_ROOT}/Modules/CheckIncludeFileCXX.cmake)
 INCLUDE (${CMAKE_ROOT}/Modules/CheckIncludeFiles.cmake)
 INCLUDE (${CMAKE_ROOT}/Modules/CheckLibraryExists.cmake)
 INCLUDE (${CMAKE_ROOT}/Modules/CheckSymbolExists.cmake)
@@ -128,6 +132,16 @@ ELSE(WINDOWS)
   CHECK_INCLUDE_FILE_CONCAT("inttypes.h" HAVE_INTTYPES_H)
   CHECK_INCLUDE_FILE_CONCAT("winsock.h" HAVE_WINSOCK_H)
 ENDIF(WINDOWS)
+
+# if the c compiler found stdint, check the C++ as well. On some systems this
+# file will be found by C but not C++, only do this test if the C++ compiler
+# has been initialized (e.g. the project also includes some c++) 
+IF (HAVE_STDINT_H AND CMAKE_CXX_COMPILER_LOADED)
+  CHECK_INCLUDE_FILE_CXX("stdint.h" HAVE_STDINT_H_CXX)
+  IF (NOT HAVE_STDINT_H_CXX)
+    SET (HAVE_STDINT_H "" CACHE INTERNAL "Have includes HAVE_STDINT_H")
+  ENDIF (NOT HAVE_STDINT_H_CXX)
+ENDIF (HAVE_STDINT_H AND CMAKE_CXX_COMPILER_LOADED)
 
 IF(XDMF_ZLIB_INCLUDE_DIRS OR VTK_ZLIB_LIBRARIES)
   SET(HAVE_ZLIB_H 1)
@@ -261,10 +275,10 @@ MACRO(OTHER_INTERNAL_TEST OTHER_TEST)
         HAVE_UNISTD_H
         HAVE_SYS_TYPES_H
         HAVE_SYS_SOCKET_H)
-      IF(${def})
+      IF("${def}")
         SET(MACRO_CHECK_FUNCTION_DEFINITIONS 
           "${MACRO_CHECK_FUNCTION_DEFINITIONS} -D${def}")
-      ENDIF(${def})
+      ENDIF("${def}")
     ENDFOREACH(def)
 
     MESSAGE(STATUS "Performing Other Test ${OTHER_TEST}")
@@ -438,9 +452,9 @@ CONFIGURE_FILE(${VTKHDF5_SOURCE_DIR}/H5pubconf.${CONFIG_FILE_EXT}.in
 SET(common_SRCS ${common_SRCS} ${VTKHDF5_BINARY_DIR}/H5Tinit.c)
 SET_SOURCE_FILES_PROPERTIES (${VTKHDF5_BINARY_DIR}/H5Tinit.c GENERATED)
 
-IF(XDMF_ZLIB_INCLUDE_DIRS)
-  INCLUDE_DIRECTORIES(${XDMF_ZLIB_INCLUDE_DIRS})
-ENDIF(XDMF_ZLIB_INCLUDE_DIRS)
+IF(HDF5_ZLIB_INCLUDE_DIRS)
+  INCLUDE_DIRECTORIES(${HDF5_ZLIB_INCLUDE_DIRS})
+ENDIF(HDF5_ZLIB_INCLUDE_DIRS)
 IF(VTK_ZLIB_INCLUDE_DIRS)
   INCLUDE_DIRECTORIES(${VTK_ZLIB_INCLUDE_DIRS})
 ENDIF(VTK_ZLIB_INCLUDE_DIRS)

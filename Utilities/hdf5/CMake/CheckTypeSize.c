@@ -12,8 +12,14 @@
 #  include <stddef.h>
 #endif /* HAVE_STDDEF_H */
 
-int main()
-{
+#ifdef __CLASSIC_C__
+int main(){
+  int ac;
+  char*av[];
+#else
+int main(int ac, char*av[]){
+#endif
+  if(ac > 1000){return *av[0];}
   return sizeof(CHECK_TYPE_SIZE_TYPE);
 }
 
