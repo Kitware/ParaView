@@ -2455,7 +2455,7 @@ const char* vtkPVWindow::StandardFilterInterfaces=
 "</Filter>\n"
 "\n"
 "<Filter class=\"vtkRotationalExtrusionFilter\" root=\"RotExtrude\" input=\"vtkPolyData\" output=\"vtkPolyData\">\n"
-"  <Scalar name=\"Resoultion\" type=\"int\"/>\n"
+"  <Scalar name=\"Resolution\" type=\"int\"/>\n"
 "  <Boolean name=\"Capping\"/>\n"
 "  <Scalar name=\"Angle\" type=\"float\" help=\"Set the angle of rotation.\"/>\n"
 "  <Scalar name=\"Translation\" type=\"float\" help=\"The total amount of translation along the z-axis.\"/>\n"
