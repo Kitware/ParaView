@@ -191,8 +191,6 @@ void vtkPVPointWidget::SaveInTclScript(ofstream *)
 void vtkPVPointWidget::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
-  os << "3D Widget:" << endl;
-  this->Widget3D->PrintSelf(os, indent.GetNextIndent());
 }
 
 //----------------------------------------------------------------------------

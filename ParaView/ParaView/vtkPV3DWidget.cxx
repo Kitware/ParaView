@@ -287,3 +287,11 @@ int vtkPV3DWidget::ReadXMLAttributes(vtkPVXMLElement*,
 {
   return 1;
 }
+
+//----------------------------------------------------------------------------
+void vtkPV3DWidget::PrintSelf(ostream& os, vtkIndent indent)
+{
+  this->Superclass::PrintSelf(os,indent);
+  os << "3D Widget:" << endl;
+  this->Widget3D->PrintSelf(os, indent.GetNextIndent());
+}
