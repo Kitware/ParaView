@@ -40,7 +40,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVServerFileListing);
-vtkCxxRevisionMacro(vtkPVServerFileListing, "1.4");
+vtkCxxRevisionMacro(vtkPVServerFileListing, "1.5");
 
 //----------------------------------------------------------------------------
 class vtkPVServerFileListingInternals
@@ -212,7 +212,6 @@ void vtkPVServerFileListing::List(const char* dirname, int save)
         files.insert(d->d_name);
         }
       }
-    int fixme; // Handle S_IFLNK (symbolic links).
     }
 #endif
 
