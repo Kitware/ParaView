@@ -268,9 +268,10 @@ protected:
   double StartHSV[3];
   double EndHSV[3];
 
-  vtkClientServerID ScalarBarID;
   vtkScalarBarWidget* ScalarBar;
   vtkScalarBarWidgetObserver* ScalarBarObserver;
+
+  vtkClientServerID ScalarBarActorID;
 
   void UpdateScalarBarTitle();
   void UpdateVectorComponentMenu();
