@@ -129,7 +129,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.607");
+vtkCxxRevisionMacro(vtkPVWindow, "1.608");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -1357,9 +1357,6 @@ void vtkPVWindow::Create(vtkKWApplication *app, const char* vtkNotUsed(args))
 
   // Update toolbar aspect
   this->UpdateToolbarAspect();
-
-  // The filter buttons are initially disabled.
-  this->DisableToolbarButtons();
 
   // Make the 3D View Settings the current one.
   this->Script("%s invoke \"%s\"", 
@@ -3047,12 +3044,23 @@ void vtkPVWindow::SaveState(const char* filename)
 
   // Loop through sources saving the visible sources.
   vtkPVSourceCollection* modules = this->GetSourceList("Sources");
-  vtkCollectionIterator* cit = modules->NewIterator();
+  vtkCollectionIterator* cit;
+  cit = modules->NewIterator();
   cit->InitTraversal();
   while ( !cit->IsDoneWithTraversal() )
     {
     pvs = static_cast<vtkPVSource*>(cit->GetObject()); 
-    pvs->SaveState(file);
+    pvs->SaveState(file, 1);
+    cit->GoToNextItem();
+    }
+  cit->Delete();
+  // Visibility has to be done in a second pass.
+  cit = modules->NewIterator();
+  cit->InitTraversal();
+  while ( !cit->IsDoneWithTraversal() )
+    {
+    pvs = static_cast<vtkPVSource*>(cit->GetObject()); 
+    pvs->SaveState(file, 2);
     cit->GoToNextItem();
     }
   cit->Delete();
@@ -3102,6 +3110,13 @@ void vtkPVWindow::SaveWorkspace()
 void vtkPVWindow::UpdateSourceMenu()
 {
   if ( this->AnimationInterface && this->AnimationInterface->GetInPlay() )
+    {
+    return;
+    }
+
+  // We do not want any buttons active when a source is half finished
+  // (accept has not been called yet).
+  if (this->CurrentPVSource && ! this->CurrentPVSource->GetInitialized())
     {
     return;
     }
@@ -3161,6 +3176,10 @@ void vtkPVWindow::UpdateSourceMenu()
     this->SourceMenu->AddCommand(ki->first.c_str(), this,
                                  methodAndArgs.c_str(),
                                  vi->second->GetShortHelp());
+    if (vi->second->GetToolbarModule())
+      {
+      this->EnableToolbarButton(ki->second.c_str());
+      }
     ++ki;
     ++vi;
     }
@@ -3198,7 +3217,6 @@ void vtkPVWindow::UpdateFilterMenu()
 
   // Remove all of the entries from the filter menu.
   this->FilterMenu->DeleteAllMenuItems();
-  this->DisableToolbarButtons();
 
   if ( !this->Enabled )
     {
@@ -3297,7 +3315,6 @@ void vtkPVWindow::UpdateFilterMenu()
   else
     {
     // If there is no current data, disable the menu.
-    this->DisableToolbarButtons();
     this->FilterMenu->SetEnabled(0);
     }
   
@@ -4650,11 +4667,16 @@ void vtkPVWindow::UpdateMenuState()
     {
     return;
     }
+
+  // Since the toolbar now contains sources and filters,
+  // this has to be done outside the menu enable methods.
+  this->DisableToolbarButtons();
+
   // Disable or enable the select menu. Checks if there are any valid
   // entries in the menu, disables the menu if there none, enables it
   // otherwise.
-  vtkPVSourceCollection* sources = this->GetSourceList("Sources");
   int menustate = (this->Enabled ? vtkKWMenu::Normal: vtkKWMenu::Disabled);
+  vtkPVSourceCollection* sources = this->GetSourceList("Sources");
   if (sources && sources->GetNumberOfItems())
     {
     this->PropagateEnableState(this->SelectMenu);
@@ -4673,6 +4695,8 @@ void vtkPVWindow::UpdateMenuState()
       this->MenuView->SetState(VTK_PV_SOURCE_MENU_LABEL, vtkKWMenu::Disabled);
       }
     }
+
+  // Handle the fitler menu and toolbar buttons.
   this->UpdateFilterMenu();
   if ( this->FilterMenu->GetEnabled() )
     {
@@ -4682,6 +4706,9 @@ void vtkPVWindow::UpdateMenuState()
     {
     this->Menu->SetState(VTK_PV_VTK_FILTERS_MENU_LABEL,  vtkKWMenu::Disabled);
     }
+
+  // Handle the source menu and toolbar buttons.
+  this->UpdateSourceMenu();
 }
 
 //-----------------------------------------------------------------------------
