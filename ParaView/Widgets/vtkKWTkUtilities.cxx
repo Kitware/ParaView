@@ -58,7 +58,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWTkUtilities);
-vtkCxxRevisionMacro(vtkKWTkUtilities, "1.18");
+vtkCxxRevisionMacro(vtkKWTkUtilities, "1.19");
 
 //----------------------------------------------------------------------------
 void vtkKWTkUtilities::GetRGBColor(Tcl_Interp *interp,
@@ -681,7 +681,8 @@ int vtkKWTkUtilities::GetPackSlaveHorizontalPosition(Tcl_Interp *interp,
   
   if (!interp->result || !interp->result[0])
     {
-    return 1;
+    vtkGenericWarningMacro(<< "Unable to find slaves!");
+    return 0;
     }
   
   // Browse each slave until the right one if found
@@ -692,6 +693,8 @@ int vtkKWTkUtilities::GetPackSlaveHorizontalPosition(Tcl_Interp *interp,
 
   char *buffer_end = buffer + buffer_length;
   char *ptr = buffer, *word_end;
+
+  int pos = 0;
 
   while (ptr < buffer_end)
     {
@@ -713,7 +716,7 @@ int vtkKWTkUtilities::GetPackSlaveHorizontalPosition(Tcl_Interp *interp,
       {
       int padx = 0;
       vtkKWTkUtilities::GetPackSlavePadding(interp, ptr, 0, 0, &padx, 0);
-      *x += padx;
+      pos += padx;
       break;
       }
 
@@ -744,13 +747,15 @@ int vtkKWTkUtilities::GetPackSlaveHorizontalPosition(Tcl_Interp *interp,
       int ipadx = 0, padx = 0;
       vtkKWTkUtilities::GetPackSlavePadding(interp, ptr, &ipadx, 0, &padx, 0);
       
-      *x += w + 2 * (padx + ipadx);
+      pos += w + 2 * (padx + ipadx);
       }
     
     ptr = word_end + 1;
     }
 
   delete [] buffer;
+
+  *x = pos;
 
   return 1;
 }
