@@ -86,6 +86,10 @@ public:
   int GetStatus() {return this->Done;};
 
   // Description:
+  // Return frame to pack into.
+  vtkKWWidget* GetFrame() { return this; }
+
+  // Description:
   // A method to set callback functions on objects.  The first argument is
   // the KWObject that will have the method called on it.  The second is the
   // name of the method to be called and any arguments in string form.
