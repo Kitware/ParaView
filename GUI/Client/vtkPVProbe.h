@@ -47,10 +47,6 @@ public:
   virtual void Deselect(int doPackForget);
 
   // Description:
-  // Write out the part of the tcl script cooresponding to vtkPVProbe
-  virtual void SaveInBatchScript(ofstream *file);
-  
-  // Description:
   // Access to the ShowXYPlotToggle from Tcl
   vtkGetObjectMacro(ShowXYPlotToggle, vtkKWCheckButton);
 
