@@ -10,7 +10,7 @@ if {[info exists argc]} {
 
 set kw(vtkTemp1) [$Application GetMainWindow]
 set kw(vtkTemp21) [$kw(vtkTemp1) GetMainView]
-$kw(vtkTemp1) Open "/home/andy/vtk/ParaView/Data/Data/vox8_bin.vtk"
+$kw(vtkTemp1) Open "$DataDir/Data/vox8_bin.vtk"
 set kw(vtkTemp285) [vtkTemp1 GetCurrentPVSource]
 set kw(vtkTemp321) [$kw(vtkTemp1) GetPVColorMap {scalars}]
 $kw(vtkTemp321) SetScalarBarVisibility 1
