@@ -12,6 +12,10 @@
 #  include <stddef.h>
 #endif /* HAVE_STDDEF_H */
 
+#ifdef HAVE_INTTYPES_H
+#  include <inttypes.h>
+#endif /* HAVE_INTTYPES_H */
+
 #ifdef __CLASSIC_C__
 int main(){
   int ac;

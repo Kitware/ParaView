@@ -180,3 +180,12 @@ int main() { return 0; }
 #endif
 
 #endif /* INLINE_TEST */
+
+#ifdef HAVE_OFF64_T
+#include <sys/types.h>
+int main()
+{
+  off64_t n = 0;
+  return (int)n;
+}
+#endif
