@@ -354,7 +354,7 @@
          command="SetStride"
          number_of_elements="3"
          default_values="1 1 1" >
-        <IntRangeDomain name="range"/>
+        <IntRangeDomain name="range" min="1 1 1" />
       </IntVectorProperty>
    <!-- End HDF5RawImageReader -->
    </SourceProxy>
@@ -729,7 +729,7 @@
          command="SetStride"
          number_of_elements="3"
          default_values="1 1 1" >
-        <IntRangeDomain name="range"/>
+        <IntRangeDomain name="range" min="1 1 1" />
       </IntVectorProperty>
 
      <StringVectorProperty
