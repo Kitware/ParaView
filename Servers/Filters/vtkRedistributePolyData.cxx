@@ -43,7 +43,7 @@
 #include "vtkMultiProcessController.h"
 
 vtkStandardNewMacro(vtkRedistributePolyData);
-vtkCxxRevisionMacro(vtkRedistributePolyData, "1.8");
+vtkCxxRevisionMacro(vtkRedistributePolyData, "1.9");
 
 vtkCxxSetObjectMacro(vtkRedistributePolyData, Controller, 
                      vtkMultiProcessController);
@@ -261,7 +261,6 @@ void vtkRedistributePolyData::Execute()
     //this->CompleteArrays(recFrom[0]);
     }
 
-
   // ... copy remaining input cell data to output cell data ...
 
   vtkCellArray* inputCellArrays[NUM_CELL_TYPES];
@@ -292,7 +291,8 @@ void vtkRedistributePolyData::Execute()
       {
       origNumCells[type] = numCells[type]; 
       }
-    }
+    } 
+
 #if VTK_REDIST_DO_TIMING
   timerInfo8.Timer->StopTimer();
   timerInfo8.Time += timerInfo8.Timer->GetElapsedTime();
@@ -327,7 +327,6 @@ void vtkRedistributePolyData::Execute()
       prevStopCell[type] = inputNumCells[type] - totalNumCellsToSend[type] -1;
       }
     }
-
   vtkIdType *numPointsSend = new vtkIdType[cntSend];
   vtkIdType **cellArraySize = new vtkIdType*[cntSend];
 
@@ -386,7 +385,6 @@ void vtkRedistributePolyData::Execute()
     }
   timerInfo8.timer->StartTimer();
 #endif
-
   vtkIdType* numPointsRec = new vtkIdType[cntRec];
   vtkIdType** cellptCntr = new vtkIdType*[cntRec];
   for (i=0; i<cntRec; i++)
@@ -403,7 +401,6 @@ void vtkRedistributePolyData::Execute()
                               recFrom[i],
                               POINTS_SIZE_TAG);
     }
-
   vtkCellData* outputCellData   = output->GetCellData();
   vtkPointData* outputPointData = output->GetPointData();
 
@@ -415,7 +412,6 @@ void vtkRedistributePolyData::Execute()
   vtkIdType totalNumPoints = numPointsOnProc;
   vtkIdType totalNumCells[NUM_CELL_TYPES];
   vtkIdType totalNumCellPts[NUM_CELL_TYPES];
-
   for (type=0; type<NUM_CELL_TYPES; type++)
     {
     totalNumCells[type] = origNumCells[type];
@@ -446,10 +442,10 @@ void vtkRedistributePolyData::Execute()
   if (inputCellArrays[3]) { outputStrips = vtkSmartPointer<vtkCellArray>::New(); }
 
   vtkCellArray *outputCellArrays[NUM_CELL_TYPES];
-  outputCellArrays[0] = outputVerts.GetPointer();
-  outputCellArrays[1] = outputLines.GetPointer();
-  outputCellArrays[2] = outputPolys.GetPointer();
-  outputCellArrays[3] = outputStrips.GetPointer(); 
+  outputCellArrays[0] = outputVerts;
+  outputCellArrays[1] = outputLines;
+  outputCellArrays[2] = outputPolys;
+  outputCellArrays[3] = outputStrips; 
 
   vtkIdType* ptr = 0; 
   for (type=0; type<NUM_CELL_TYPES; type ++)
@@ -467,7 +463,6 @@ void vtkRedistributePolyData::Execute()
         }
       }
     }
-
   output->SetVerts(outputVerts.GetPointer());
   output->SetLines(outputLines.GetPointer());
   output->SetPolys(outputPolys.GetPointer());
@@ -498,7 +493,6 @@ void vtkRedistributePolyData::Execute()
   vtkIdType prevStopCellSend[NUM_CELL_TYPES];
 
   vtkIdType  prevNumPointsRec = numPointsOnProc;
-
   vtkIdType  prevCellptCntrRec[NUM_CELL_TYPES];
 
   for (type=0; type<NUM_CELL_TYPES; type++)
@@ -514,7 +508,6 @@ void vtkRedistributePolyData::Execute()
         totalNumCellsToSend[type] -1;
       }
     }
-
 
   int finished = 0;
   int procRec,procSend;
@@ -619,7 +612,6 @@ void vtkRedistributePolyData::Execute()
   input = NULL;
 
 //eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee
-
 #if VTK_REDIST_DO_TIMING
   timerInfo8.Timer->StopTimer();
   timerInfo8.Time += timerInfo8.Timer->GetElapsedTime();
@@ -849,7 +841,7 @@ void vtkRedistributePolyData::CopyDataArrays
 void vtkRedistributePolyData::CopyCellBlockDataArrays
 (vtkDataSetAttributes* fromPd, vtkDataSetAttributes* toPd,
  vtkIdType numToCopy, vtkIdType startCell, 
- vtkIdType offset, int myId )
+ vtkIdType fromOffset, vtkIdType toOffset, int myId )
 //*******************************************************************
 {
 
@@ -864,7 +856,7 @@ void vtkRedistributePolyData::CopyCellBlockDataArrays
     DataTo = toPd->GetArray(i);
 
     this->CopyBlockArrays (DataFrom, DataTo, numToCopy, startCell, 
-                           offset, myId);
+                           fromOffset, toOffset, myId);
     } 
 
 }
@@ -1036,7 +1028,7 @@ void vtkRedistributePolyData::CopyArrays
 void vtkRedistributePolyData::CopyBlockArrays
 (vtkDataArray* DataFrom, vtkDataArray* DataTo, 
  vtkIdType numToCopy, vtkIdType startCell, 
- vtkIdType offset, int myId)
+ vtkIdType fromOffset, vtkIdType toOffset, int myId)
 //******************************************************************
 {
   char *cArrayTo, *cArrayFrom;
@@ -1054,46 +1046,45 @@ void vtkRedistributePolyData::CopyBlockArrays
   vtkIdType  start = numComps*startCell;
   vtkIdType  size = numToCopy*numComps;
   vtkIdType  stop = start + size;
-
   vtkIdType i;
 
   switch (dataType)
     {
     case VTK_CHAR:
-      cArrayFrom = ((vtkCharArray*)DataFrom)->GetPointer(0);
-      cArrayTo = ((vtkCharArray*)DataTo)->GetPointer(offset);
+      cArrayFrom = ((vtkCharArray*)DataFrom)->GetPointer(fromOffset);
+      cArrayTo = ((vtkCharArray*)DataTo)->GetPointer(toOffset);
       for (i=start; i<stop; i++) { cArrayTo[i] = cArrayFrom[i]; }
       break;
 
     case VTK_UNSIGNED_CHAR:
-      ucArrayFrom = ((vtkUnsignedCharArray*)DataFrom)->GetPointer(0);
+      ucArrayFrom = ((vtkUnsignedCharArray*)DataFrom)->GetPointer(fromOffset);
       ucArrayTo = ((vtkUnsignedCharArray*)DataTo)->
-        GetPointer(offset);
+        GetPointer(toOffset);
       for (i=start; i<stop; i++) { ucArrayTo[i] = ucArrayFrom[i]; }
       break;
 
     case VTK_INT:
-      iArrayFrom = ((vtkIntArray*)DataFrom)->GetPointer(0);
-      iArrayTo = ((vtkIntArray*)DataTo)->GetPointer(offset);
+      iArrayFrom = ((vtkIntArray*)DataFrom)->GetPointer(fromOffset);
+      iArrayTo = ((vtkIntArray*)DataTo)->GetPointer(toOffset);
       for (i=start; i<stop; i++) { iArrayTo[i] = iArrayFrom[i]; }
       break;
 
     case VTK_UNSIGNED_LONG:
-      ulArrayFrom = ((vtkUnsignedLongArray*)DataFrom)->GetPointer(0);
+      ulArrayFrom = ((vtkUnsignedLongArray*)DataFrom)->GetPointer(fromOffset);
       ulArrayTo = ((vtkUnsignedLongArray*)DataTo)->
-        GetPointer(offset);
+        GetPointer(toOffset);
       for (i=start; i<stop; i++) { ulArrayTo[i] = ulArrayFrom[i]; }
       break;
 
     case VTK_FLOAT:
-      fArrayFrom = ((vtkFloatArray*)DataFrom)->GetPointer(0);
-      fArrayTo = ((vtkFloatArray*)DataTo)->GetPointer(offset);
+      fArrayFrom = ((vtkFloatArray*)DataFrom)->GetPointer(fromOffset);
+      fArrayTo = ((vtkFloatArray*)DataTo)->GetPointer(toOffset);
       for (i=start; i<stop; i++) { fArrayTo[i] = fArrayFrom[i]; }
       break;
 
     case VTK_DOUBLE:
-      dArrayFrom = ((vtkDoubleArray*)DataFrom)->GetPointer(0);
-      dArrayTo = ((vtkDoubleArray*)DataTo)->GetPointer(offset);
+      dArrayFrom = ((vtkDoubleArray*)DataFrom)->GetPointer(fromOffset);
+      dArrayTo = ((vtkDoubleArray*)DataTo)->GetPointer(toOffset);
       if (!colorProc)
         for (i=start; i<stop; i++) { dArrayTo[i] = dArrayFrom[i]; }
       else
@@ -1101,14 +1092,14 @@ void vtkRedistributePolyData::CopyBlockArrays
       break;
 
     case VTK_LONG:
-      lArrayFrom = ((vtkLongArray*)DataFrom)->GetPointer(0);
-      lArrayTo = ((vtkLongArray*)DataTo)->GetPointer(offset);
+      lArrayFrom = ((vtkLongArray*)DataFrom)->GetPointer(fromOffset);
+      lArrayTo = ((vtkLongArray*)DataTo)->GetPointer(toOffset);
       for (i=start; i<stop; i++) { lArrayTo[i] = lArrayFrom[i]; }
       break;
         
     case VTK_ID_TYPE:
-      idArrayFrom = ((vtkIdTypeArray*)DataFrom)->GetPointer(0);
-      idArrayTo = ((vtkIdTypeArray*)DataTo)->GetPointer(offset);
+      idArrayFrom = ((vtkIdTypeArray*)DataFrom)->GetPointer(fromOffset);
+      idArrayTo = ((vtkIdTypeArray*)DataTo)->GetPointer(toOffset);
       for (i=start; i<stop; i++) { idArrayTo[i] = idArrayFrom[i]; }
       break;
         
@@ -1160,6 +1151,7 @@ void vtkRedistributePolyData::CopyCells (vtkIdType* numCells,
 
 
   vtkIdType cellOffset = 0; 
+  vtkIdType cellOffsetOut = 0; 
 
   vtkCellData* inputCellData = input->GetCellData();
   vtkCellData* outputCellData = output->GetCellData();
@@ -1186,19 +1178,18 @@ void vtkRedistributePolyData::CopyCells (vtkIdType* numCells,
       vtkIdType startCell = 0;
       this->CopyCellBlockDataArrays (inputCellData, outputCellData, 
                                      numCells[type], startCell,
-                                     cellOffset, myId);
+                                     cellOffset, cellOffsetOut, myId);
       }
     else
       {
       this->CopyDataArrays (inputCellData, outputCellData, 
                             numCells[type], fromIds, myId);
       }
-    vtkIdType inputNumCells = 0;
-    if (cellArrays[type]) inputNumCells = 
-                            cellArrays[type]->GetNumberOfCells();
-    {
-    cellOffset += inputNumCells;
-    }
+    if (cellArrays[type]) 
+      {
+      cellOffset += cellArrays[type]->GetNumberOfCells();
+      cellOffsetOut += numCells[type];
+      }
     delete [] fromIds;
 
     }
