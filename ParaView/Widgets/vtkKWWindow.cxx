@@ -70,7 +70,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define VTK_KW_WINDOW_GEOMETRY_REG_KEY "WindowGeometry"
 #define VTK_KW_WINDOW_FRAME1_SIZE_REG_KEY "WindowFrame1Size"
 
-vtkCxxRevisionMacro(vtkKWWindow, "1.141");
+vtkCxxRevisionMacro(vtkKWWindow, "1.142");
 vtkCxxSetObjectMacro(vtkKWWindow, PropertiesParent, vtkKWWidget);
 
 class vtkKWWindowMenuEntry
@@ -910,7 +910,7 @@ void vtkKWWindow::LoadScript()
   loadScriptDialog->Create(this->Application,"");
   loadScriptDialog->SaveDialogOff();
   loadScriptDialog->SetTitle("Load Script");
-  loadScriptDialog->SetDefaultExt(this->ScriptExtension);
+  loadScriptDialog->SetDefaultExtension(this->ScriptExtension);
   ostrstream filetypes;
   filetypes << "{{" << this->ScriptType << " Scripts} {" 
             << this->ScriptExtension << "}} {{All Files} {.*}}" << ends;
@@ -1112,7 +1112,7 @@ void vtkKWWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWWindow ";
-  this->ExtractRevision(os,"$Revision: 1.141 $");
+  this->ExtractRevision(os,"$Revision: 1.142 $");
 }
 
 int vtkKWWindow::ExitDialog()
