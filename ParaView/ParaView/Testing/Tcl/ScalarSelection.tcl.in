@@ -73,7 +73,7 @@ $pv(vtkTemp188) AcceptCallback
 $pv(vtkTemp1) SetCurrentPVSource $pv(vtkTemp136)
 $pv(vtkTemp1) ShowCurrentSourceProperties
 $pv(vtkTemp1) ShowCurrentSourceProperties
-set pv(vtkTemp221) [$pv(vtkTemp1) CreatePVSource vtkLinearSubdivisionFilter]
+set pv(vtkTemp221) [$pv(vtkTemp1) CreatePVSource vtkLoopSubdivisionFilter]
 set pv(vtkTemp227) [$pv(vtkTemp221) GetPVWidget {Input}]
 $pv(vtkTemp227) SetCurrentValue $pv(vtkTemp136)
 set pv(vtkTemp232) [$pv(vtkTemp221) GetPVWidget {NumberOfSubdivisions}]
