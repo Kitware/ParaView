@@ -103,7 +103,6 @@ public:
   // correspond to one output of one filter.
   void CreateParts();
 
-//BTX
   // Description:
   // DataInformation is used by the source proxy to obtain information
   // on the output(s) from the server. The information contained in
@@ -111,7 +110,6 @@ public:
   // The direct use of the data information object is low level and
   // should be avoided if possible.
   vtkPVDataInformation* GetDataInformation();
-//ETX
 
   // Description:
   // Chains to superclass as well as mark the data information as
