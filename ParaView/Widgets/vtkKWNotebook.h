@@ -103,6 +103,13 @@ public:
   vtkSetMacro(MinimumHeight,int);
   vtkGetMacro(MinimumWidth,int);
   vtkGetMacro(MinimumHeight,int);
+
+  // Description:
+  // Normally, the tab frame is not shown when there is only
+  // one page. Turn this on to override that behaviour.
+  vtkSetMacro(AlwaysShowTabs, int);
+  vtkGetMacro(AlwaysShowTabs, int);
+  vtkBooleanMacro(AlwaysShowTabs, int);
   
 protected:
   vtkKWNotebook();
@@ -115,6 +122,7 @@ protected:
   int Pad;
   int BorderWidth;
   int Expanding;
+  int AlwaysShowTabs;
   
   vtkKWWidget *TabsFrame;
   vtkKWWidget *Body;
