@@ -79,7 +79,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.161.2.19");
+vtkCxxRevisionMacro(vtkPVData, "1.161.2.20");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -2866,7 +2866,6 @@ void vtkPVData::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "InterpolationMenu: " << this->InterpolationMenu << endl;
   os << indent << "LODResolution: " << this->LODResolution << endl;
   os << indent << "CollectThreshold: " << this->CollectThreshold << endl;
-  os << indent << "Visibility: " << this->Visibility << endl;
 }
 
 //-------}---------------------------------------------------------------------
@@ -3030,7 +3029,7 @@ void vtkPVData::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVData ";
-  this->ExtractRevision(os,"$Revision: 1.161.2.19 $");
+  this->ExtractRevision(os,"$Revision: 1.161.2.20 $");
 }
 
 //----------------------------------------------------------------------------
