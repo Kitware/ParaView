@@ -12,7 +12,7 @@
 #include <vtkDataSetAttributes.h>
 #include <vtkMatrix4x4.h>
 
-vtkCxxRevisionMacro(vtkSubdivisionAlgorithm,"1.1");
+vtkCxxRevisionMacro(vtkSubdivisionAlgorithm,"1.2");
 
 void vtkSubdivisionAlgorithm::PrintSelf( ostream& os, vtkIndent indent )
 {
@@ -29,8 +29,8 @@ vtkSubdivisionAlgorithm::vtkSubdivisionAlgorithm()
 
 vtkSubdivisionAlgorithm::~vtkSubdivisionAlgorithm()
 {
-  delete this->FieldIds;
-  delete this->FieldOffsets;
+  delete[] this->FieldIds;
+  delete[] this->FieldOffsets;
 };
 
 void vtkSubdivisionAlgorithm::ResetFieldList()
