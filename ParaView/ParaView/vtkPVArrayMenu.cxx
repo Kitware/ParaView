@@ -58,7 +58,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVArrayMenu);
-vtkCxxRevisionMacro(vtkPVArrayMenu, "1.25");
+vtkCxxRevisionMacro(vtkPVArrayMenu, "1.26");
 
 vtkCxxSetObjectMacro(vtkPVArrayMenu,InputMenu, vtkPVInputMenu);
 
@@ -598,7 +598,7 @@ void vtkPVArrayMenu::UpdateArrayMenu()
     { // If the current value is not in the menu, then look for another to use.
     // First look for a default attribute.
     array = field->GetAttribute(this->AttributeType); 
-    if (array == NULL)
+    if (array == NULL || array->GetName() == NULL)
       { // lets just use the first in the menu.
       if (first)
         {
