@@ -128,7 +128,7 @@ typedef signed long long   vtkTypeInt64;
 # define VTK_TYPE_FORMAT_INT64 "lld"
 /* # define VTK_TYPE_UINT64 ??? */
 /* # define VTK_TYPE_INT64 ??? */
-#elif defined(_MSC_VER) && _MSC_VER >= 1200
+#elif defined(VTK_SIZEOF___INT64) && VTK_SIZEOF___INT64 == 8
 # define VTK_TYPE_INT64_NOT_STANDARD
 # define VTK_TYPE_FORMAT_UINT64 "I64u"
 # define VTK_TYPE_FORMAT_INT64 "I64d"
