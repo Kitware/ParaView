@@ -58,7 +58,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkXDMFReaderModule);
-vtkCxxRevisionMacro(vtkXDMFReaderModule, "1.5");
+vtkCxxRevisionMacro(vtkXDMFReaderModule, "1.6");
 
 int vtkXDMFReaderModuleCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -92,7 +92,8 @@ int vtkXDMFReaderModule::Initialize(const char* fname,
     }
   
   const char* res = clone->GetVTKSourceTclName();
-  this->Script("%s Set%s {%s}", res, "FileName", fname);
+  this->GetPVApplication()->BroadcastScript(
+             "%s Set%s {%s}", res, "FileName", fname);
   this->SetGrid(0);
   this->SetDomain(0);
 
@@ -109,7 +110,8 @@ int vtkXDMFReaderModule::ReadFileInformation(const char* fname)
     const char* res = this->GetVTKSourceTclName();
 
     // Change the hardcoded "FileName" to something more elaborated
-    this->Script("%s UpdateInformation", res);
+    this->GetPVApplication()->BroadcastScript(
+            "%s UpdateInformation", res);
 
     vtkKWMessageDialog* dlg = vtkKWMessageDialog::New();
     dlg->SetTitle("Domain and Grid Selection");
@@ -157,15 +159,18 @@ int vtkXDMFReaderModule::ReadFileInformation(const char* fname)
     
     if ( this->Domain )
       {
-      this->Script("%s SetDomainName \"%s\"", res, this->Domain);
+      this->GetPVApplication()->BroadcastScript(
+                "%s SetDomainName \"%s\"", res, this->Domain);
       }
     
     if ( this->Grid )
       {
-      this->Script("%s SetGridName \"%s\"", res, this->Grid);
+      this->GetPVApplication()->BroadcastScript(
+                 "%s SetGridName \"%s\"", res, this->Grid);
       }
 
-    this->Script("%s UpdateInformation", res);
+    this->GetPVApplication()->BroadcastScript(
+                 "%s UpdateInformation", res);
     }
 
   if ( this->Domain )
@@ -187,8 +192,8 @@ int vtkXDMFReaderModule::ReadFileInformation(const char* fname)
 
   int retVal = VTK_OK;
 
-  this->Script("%s UpdateInformation", 
-               this->GetVTKSourceTclName());
+  this->GetPVApplication()->BroadcastScript(
+           "%s UpdateInformation", this->GetVTKSourceTclName());
   retVal = this->InitializeClone(0, 1);
 
   if (retVal != VTK_OK)
@@ -225,7 +230,8 @@ void vtkXDMFReaderModule::UpdateGrids(const char* ob)
 {
   int cc;
   int num;
-  this->Script("%s UpdateInformation", ob);
+  this->GetPVApplication()->BroadcastScript(
+            "%s UpdateInformation", ob);
   num = atoi(this->Script("%s GetNumberOfGrids", ob));
   this->GridMenu->ClearEntries();
   for ( cc = 0; cc < num; cc ++ )
@@ -246,7 +252,9 @@ void vtkXDMFReaderModule::UpdateDomains(const char* ob)
   int cc;
   int num;
   char buffer[1024];
-  this->Script("%s UpdateInformation", ob);
+
+  this->GetPVApplication()->BroadcastScript(
+              "%s UpdateInformation", ob);
   num = atoi(this->Script("%s GetNumberOfDomains", ob));
   this->DomainMenu->ClearEntries();
   for ( cc = 0; cc < num; cc ++ )
