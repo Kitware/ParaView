@@ -209,7 +209,7 @@
     <Source class="vtkVRMLSource"/>
   </Module>
   <Module name="spcthreader"
-          class="vtkPVReaderModule" root_name="SPCTH"
+          class="vtkPVAdvancedReaderModule" root_name="SPCTH"
           module_type="Reader"
           extensions=".spcth"
           file_description="SpyPlot CTH AMR dataset">
