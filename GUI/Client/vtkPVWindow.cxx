@@ -127,7 +127,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.595");
+vtkCxxRevisionMacro(vtkPVWindow, "1.596");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -712,7 +712,7 @@ void vtkPVWindow::InitializeMenus(vtkKWApplication* vtkNotUsed(app))
                                 "Write a script which can run "
                                 "in batch by ParaView");
   this->MenuFile->InsertCommand(clidx++, "Save SM State", this,
-                                "SaveSMState", 7,
+                                "SaveSMState", 6,
                                 "Server the server manager state "
                                 "as xml.");
   this->MenuFile->InsertCommand(clidx++,
