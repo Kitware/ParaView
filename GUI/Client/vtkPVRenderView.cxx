@@ -135,7 +135,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.330");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.331");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -1884,7 +1884,7 @@ void vtkPVRenderView::SaveState(ofstream* file)
   if (camera->GetParallelProjection())
     {
     *file << "$kw(" << this->GetTclName() << ") ParallelProjectionOn" << endl;
-    *file << "$kw(" << this->GetTclName() << " SetCameraParallelScale "
+    *file << "$kw(" << this->GetTclName() << ") SetCameraParallelScale "
           << camera->GetParallelScale() << endl;
     }
   else
