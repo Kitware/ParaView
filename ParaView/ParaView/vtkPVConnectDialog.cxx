@@ -31,7 +31,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVConnectDialog);
-vtkCxxRevisionMacro(vtkPVConnectDialog, "1.13");
+vtkCxxRevisionMacro(vtkPVConnectDialog, "1.14");
 
 //----------------------------------------------------------------------------
 void vtkPVConnectDialog::Create(vtkKWApplication* app, const char* vtkNotUsed(opts))
@@ -268,10 +268,11 @@ void vtkPVConnectDialog::SetListOfServers(const char* list)
     {
     this->Servers->AddUniqueString(cserv.c_str());
     }
-  for ( cc = 0; cc < this->Servers->GetLength(); cc ++ )
+  int kk;
+  for ( kk = 0; kk < this->Servers->GetLength(); kk ++ )
     {
-    cout << "Add to the entry: " << this->Servers->GetString(cc) << endl;
-    this->Hostname->GetEntry()->AddValue(this->Servers->GetString(cc));
+    cout << "Add to the entry: " << this->Servers->GetString(kk) << endl;
+    this->Hostname->GetEntry()->AddValue(this->Servers->GetString(kk));
     }
 }
 

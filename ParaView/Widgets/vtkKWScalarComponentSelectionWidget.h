@@ -31,7 +31,7 @@ public:
 
   // Description:
   // Create the widget
-  virtual void Create(vtkKWApplication *app, char *args);
+  virtual void Create(vtkKWApplication *app, const char *args);
 
   // Description:
   // Are the components independent of each other?

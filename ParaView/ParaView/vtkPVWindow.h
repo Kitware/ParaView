@@ -113,7 +113,7 @@ public:
   // Create the window and all of the associated widgets. This
   // essentially creates the whole user interface. ParaView supports
   // only one window.
-  virtual void Create(vtkKWApplication *app, char *args);
+  virtual void Create(vtkKWApplication *app, const char *args);
 
   // Description:
   // Access to the RenderView.

@@ -29,7 +29,9 @@ public:
   
   virtual void AcceptInternal();
   
-  void SetVTKCommands(int numCmds, char **cmds, int *numScalars);
+//BTX
+  void SetVTKCommands(int numCmds, const char * const*cmds, int *numScalars);
+//ETX
   void SetScalars(int num, float *scalars);
   void AddScalar(float scalar);
   float* GetScalars() { return this->Scalars; }

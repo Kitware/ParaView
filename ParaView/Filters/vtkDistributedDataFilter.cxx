@@ -65,7 +65,7 @@
 static char dots[MSGSIZE] = "...........................................................";
 static char msg[MSGSIZE];
 
-static char * makeEntry(char *s)
+static char * makeEntry(const char *s)
 {
   memcpy(msg, dots, MSGSIZE);
   int len = strlen(s);
@@ -92,7 +92,7 @@ static char * makeEntry(char *s)
 
 // Timing data ---------------------------------------------
 
-vtkCxxRevisionMacro(vtkDistributedDataFilter, "1.12");
+vtkCxxRevisionMacro(vtkDistributedDataFilter, "1.13");
 
 vtkStandardNewMacro(vtkDistributedDataFilter);
 

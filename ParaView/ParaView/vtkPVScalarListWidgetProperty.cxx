@@ -21,7 +21,7 @@
 #include "vtkClientServerStream.h"
 
 vtkStandardNewMacro(vtkPVScalarListWidgetProperty);
-vtkCxxRevisionMacro(vtkPVScalarListWidgetProperty, "1.8");
+vtkCxxRevisionMacro(vtkPVScalarListWidgetProperty, "1.9");
 
 vtkPVScalarListWidgetProperty::vtkPVScalarListWidgetProperty()
 {
@@ -52,7 +52,7 @@ vtkPVScalarListWidgetProperty::~vtkPVScalarListWidgetProperty()
   this->Scalars = NULL;
 }
 
-void vtkPVScalarListWidgetProperty::SetVTKCommands(int numCmds, char **cmd,
+void vtkPVScalarListWidgetProperty::SetVTKCommands(int numCmds, const char * const*cmd,
                                              int *numScalars)
 {
   int i;

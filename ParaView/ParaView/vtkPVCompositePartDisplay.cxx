@@ -34,7 +34,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCompositePartDisplay);
-vtkCxxRevisionMacro(vtkPVCompositePartDisplay, "1.11");
+vtkCxxRevisionMacro(vtkPVCompositePartDisplay, "1.12");
 
 
 //----------------------------------------------------------------------------
@@ -183,7 +183,7 @@ void vtkPVCompositePartDisplay::CreateParallelTclObjects(vtkPVApplication *pvApp
   else if (pvApp->GetUseTiledDisplay())
     { // This should be in subclass.
     //int numProcs = pvApp->GetController()->GetNumberOfProcesses();
-    int* dims = pvApp->GetTileDimensions();
+    //int* dims = pvApp->GetTileDimensions();
 #ifdef USE_MPI
     // It would be better to hide MPI in vtkPVDuplicatePolyData.
     this->LODCollectID = pm->NewStreamObject("vtkMPIDuplicatePolyData");

@@ -37,6 +37,7 @@ public:
   // Pass values to VTK objects.
   virtual void AcceptInternal();
   
+//BTX
   // Description:
   // Set the method(s) to call on the specified VTK object.
   // numCmds is the number of methods to call.
@@ -45,21 +46,22 @@ public:
   // for each method.
   // numScalars is an array containing the number of scalar parameters needed
   // for each method.
-  void SetVTKCommands(int numCmds, char **cmds, int *numStrings,
+  void SetVTKCommands(int numCmds, const char * const*cmds, int *numStrings,
                       int *numScalars);
 
   // Description:
   // Specify the list of strings to pass to VTK.
-  void SetStrings(int num, char **strings);
+  void SetStrings(int num, const char * const*strings);
+//ETX
   
   // Description:
   // Add a string to the list of strings to pass to VTK.
-  void AddString(char *string);
+  void AddString(const char *string);
   
   // Description:
   // Set/get the string indicated by idx from the list of strings to pass
   // to VTK.
-  void SetString(int idx, char *string);
+  void SetString(int idx, const char *string);
   const char* GetString(int idx);
   
   // Description:

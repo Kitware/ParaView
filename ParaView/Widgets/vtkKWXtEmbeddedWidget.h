@@ -38,7 +38,7 @@ public:
   // Create create the widget.  If WindowId is set,
   // then the widget is placed in that window.  If it
   // is not set, then a toplevel window is created.
-  virtual void Create(vtkKWApplication *app, char *args);
+  virtual void Create(vtkKWApplication *app, const char *args);
 
   // Description:
   // If the window id is null, this deiconifies the toplevel

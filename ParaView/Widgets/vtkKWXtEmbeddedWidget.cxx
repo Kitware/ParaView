@@ -19,7 +19,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWXtEmbeddedWidget);
-vtkCxxRevisionMacro(vtkKWXtEmbeddedWidget, "1.9");
+vtkCxxRevisionMacro(vtkKWXtEmbeddedWidget, "1.10");
 
 int vtkKWXtEmbeddedWidgetCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -41,7 +41,7 @@ void vtkKWXtEmbeddedWidget::Display()
 }
 
 
-void vtkKWXtEmbeddedWidget::Create(vtkKWApplication *app, char *args)
+void vtkKWXtEmbeddedWidget::Create(vtkKWApplication *app, const char *args)
 {
   // Set the application
 

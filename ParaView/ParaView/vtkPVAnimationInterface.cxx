@@ -168,7 +168,7 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterface);
-vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.101");
+vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.102");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterface,ControlledWidget, vtkPVWidget);
 
@@ -389,7 +389,7 @@ vtkPVAnimationInterface::~vtkPVAnimationInterface()
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVAnimationInterface::Create(vtkKWApplication *app, char *frameArgs)
+void vtkPVAnimationInterface::Create(vtkKWApplication *app, const char *frameArgs)
 {  
   vtkPVApplication *pvApp = vtkPVApplication::SafeDownCast(app);
 

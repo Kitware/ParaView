@@ -390,7 +390,7 @@ private:
 
   // Parallel build of k-d tree
 
-  int AllCheckForFailure(int rc, char *where, char *how);
+  int AllCheckForFailure(int rc, const char *where, const char *how);
   void AllCheckParameters();
   double *VolumeBounds();
   int DivideTest(int L, int R, int level);

@@ -27,7 +27,7 @@
 #include "vtkSocketController.h"
 #include "vtkTimerLog.h"
 
-vtkCxxRevisionMacro(vtkMPIDuplicatePolyData, "1.4");
+vtkCxxRevisionMacro(vtkMPIDuplicatePolyData, "1.5");
 vtkStandardNewMacro(vtkMPIDuplicatePolyData);
 
 vtkCxxSetObjectMacro(vtkMPIDuplicatePolyData,Controller, vtkMultiProcessController);
@@ -180,9 +180,8 @@ void vtkMPIDuplicatePolyData::ServerExecute(vtkMPICommunicator* com,
   int numProcs;
   numProcs = this->Controller->GetNumberOfProcesses();
   vtkPolyData* input;
-  vtkPolyData* output;
   vtkPolyData* pd;
-  int ret, idx;
+  int idx;
   int sum;
   int myId = this->Controller->GetLocalProcessId();
   
@@ -254,7 +253,7 @@ void vtkMPIDuplicatePolyData::ReconstructOutput(vtkPolyDataReader* reader,
   // Reconstruct the poly datas and append them together.
   vtkAppendPolyData *append = vtkAppendPolyData::New();
   // First append the input from this process.
-  for (idx = 0; 0, idx < numProcs; ++idx)
+  for (idx = 0; idx < numProcs; ++idx)
     {
     // vtkCharArray should not delete the string when it's done.
     reader->Modified();

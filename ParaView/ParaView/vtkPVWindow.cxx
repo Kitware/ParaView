@@ -123,7 +123,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.509");
+vtkCxxRevisionMacro(vtkPVWindow, "1.510");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -858,7 +858,7 @@ void vtkPVWindow::SetInteractor(vtkPVGenericRenderWindowInteractor *interactor)
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVWindow::Create(vtkKWApplication *app, char* vtkNotUsed(args))
+void vtkPVWindow::Create(vtkKWApplication *app, const char* vtkNotUsed(args))
 {
   vtkPVApplication *pvApp = vtkPVApplication::SafeDownCast(app);
   

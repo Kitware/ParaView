@@ -46,7 +46,7 @@
 #define VTK_KW_WINDOW_GEOMETRY_REG_KEY "WindowGeometry"
 #define VTK_KW_WINDOW_FRAME1_SIZE_REG_KEY "WindowFrame1Size"
 
-vtkCxxRevisionMacro(vtkKWWindow, "1.183");
+vtkCxxRevisionMacro(vtkKWWindow, "1.184");
 vtkCxxSetObjectMacro(vtkKWWindow, PropertiesParent, vtkKWWidget);
 
 #define VTK_KW_RECENT_FILES_MAX 20
@@ -275,7 +275,7 @@ vtkKWWindow::~vtkKWWindow()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWWindow::Create(vtkKWApplication *app, char *args)
+void vtkKWWindow::Create(vtkKWApplication *app, const char *args)
 {
   const char *wname;
 

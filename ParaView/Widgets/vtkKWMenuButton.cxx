@@ -18,7 +18,7 @@
 #include "vtkObjectFactory.h"
 
 vtkStandardNewMacro( vtkKWMenuButton );
-vtkCxxRevisionMacro(vtkKWMenuButton, "1.17");
+vtkCxxRevisionMacro(vtkKWMenuButton, "1.18");
 
 int vtkKWMenuButtonCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -39,7 +39,7 @@ vtkKWMenuButton::~vtkKWMenuButton()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWMenuButton::Create(vtkKWApplication *app, char *args)
+void vtkKWMenuButton::Create(vtkKWApplication *app, const char *args)
 { 
   // Set the application
 

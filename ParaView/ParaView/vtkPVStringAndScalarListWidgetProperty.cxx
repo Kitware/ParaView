@@ -22,7 +22,7 @@
 #include "vtkClientServerStream.h"
 
 vtkStandardNewMacro(vtkPVStringAndScalarListWidgetProperty);
-vtkCxxRevisionMacro(vtkPVStringAndScalarListWidgetProperty, "1.7");
+vtkCxxRevisionMacro(vtkPVStringAndScalarListWidgetProperty, "1.8");
 
 vtkPVStringAndScalarListWidgetProperty::vtkPVStringAndScalarListWidgetProperty()
 {
@@ -66,7 +66,7 @@ void vtkPVStringAndScalarListWidgetProperty::AcceptInternal()
 }
 
 void vtkPVStringAndScalarListWidgetProperty::SetVTKCommands(
-  int numCmds, char **cmds, int *numStrings, int *numScalars)
+  int numCmds, const char * const*cmds, int *numStrings, int *numScalars)
 {
   int i;
   int oldNumCmds = this->NumberOfCommands;
@@ -89,7 +89,7 @@ void vtkPVStringAndScalarListWidgetProperty::SetVTKCommands(
 }
 
 void vtkPVStringAndScalarListWidgetProperty::SetStrings(int num,
-                                                        char **strings)
+                                                        const char * const*strings)
 {
   this->Strings->RemoveAllItems();
   int i;
@@ -100,12 +100,12 @@ void vtkPVStringAndScalarListWidgetProperty::SetStrings(int num,
     }
 }
 
-void vtkPVStringAndScalarListWidgetProperty::AddString(char *string)
+void vtkPVStringAndScalarListWidgetProperty::AddString(const char *string)
 {
   this->Strings->AddString(string);
 }
 
-void vtkPVStringAndScalarListWidgetProperty::SetString(int idx, char *string)
+void vtkPVStringAndScalarListWidgetProperty::SetString(int idx, const char *string)
 {
   this->Strings->SetString(idx, string);
 }

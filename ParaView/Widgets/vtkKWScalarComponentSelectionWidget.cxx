@@ -19,7 +19,7 @@
 #include "vtkObjectFactory.h"
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkKWScalarComponentSelectionWidget, "1.3");
+vtkCxxRevisionMacro(vtkKWScalarComponentSelectionWidget, "1.4");
 vtkStandardNewMacro(vtkKWScalarComponentSelectionWidget);
 
 //----------------------------------------------------------------------------
@@ -59,7 +59,7 @@ vtkKWScalarComponentSelectionWidget::~vtkKWScalarComponentSelectionWidget()
 
 //----------------------------------------------------------------------------
 void vtkKWScalarComponentSelectionWidget::Create(
-  vtkKWApplication *app, char *args)
+  vtkKWApplication *app, const char *args)
 {
   // Check if already created
 
