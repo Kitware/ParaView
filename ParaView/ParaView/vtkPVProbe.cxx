@@ -120,6 +120,14 @@ vtkPVProbe::vtkPVProbe()
   
   this->ReplaceInputOff();
   this->InputMenu = 0;
+  this->NumberOfLineDivisions = 10;
+  int cc;
+  for ( cc = 0; cc < 3; cc ++ )
+    {
+    this->EndPoint1[cc] = 0;
+    this->EndPoint2[cc] = 0;
+    this->PointPosition[cc] = 0;
+    }
 }
 
 //----------------------------------------------------------------------------
