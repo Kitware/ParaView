@@ -32,9 +32,10 @@ public:
   vtkTypeRevisionMacro(vtkKWArguments,vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  typedef vtkKWArgumentsInternal Internal;
 
   //BTX
+  typedef vtkKWArgumentsInternal Internal;
+
   // These are prototypes for callbacks.
   typedef int(*CallbackType)(const char* argument, const char* value, 
     void* call_data);
