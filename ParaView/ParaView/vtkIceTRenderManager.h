@@ -69,6 +69,11 @@ public:
   virtual void SetController(vtkMultiProcessController *controller);
 
   // Description:
+  // In addition to the superclass actions, this method
+  // sets up the window for 2D Actors.
+  virtual void SetRenderWindow(vtkRenderWindow *renWin);
+
+  // Description:
   // Methods to set the characteristics of the tiled display.  Currently,
   // only an even grid is supported.  Numbering of tiles is 0 based.  Tiles
   // in the X direction (horizontal) are numbered from left to right.  Tiles
