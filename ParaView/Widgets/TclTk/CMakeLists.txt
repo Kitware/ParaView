@@ -3,6 +3,8 @@ SET (files
   lib/tcl8.4/auto.tcl
   lib/tcl8.4/init.tcl
   lib/tcl8.4/word.tcl
+  lib/tcl8.4/encoding/ascii.enc
+  lib/tcl8.4/encoding/iso8859-1.enc
   lib/tk8.4/tclIndex
   lib/tk8.4/button.tcl
   lib/tk8.4/comdlg.tcl
