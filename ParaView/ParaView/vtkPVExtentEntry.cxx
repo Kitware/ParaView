@@ -63,7 +63,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVExtentEntry);
-vtkCxxRevisionMacro(vtkPVExtentEntry, "1.25.2.4");
+vtkCxxRevisionMacro(vtkPVExtentEntry, "1.25.2.5");
 
 vtkCxxSetObjectMacro(vtkPVExtentEntry, InputMenu, vtkPVInputMenu);
 
@@ -578,7 +578,8 @@ vtkPVWidgetProperty* vtkPVExtentEntry::CreateAppropriateProperty()
 void vtkPVExtentEntry::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
-  os << "InputMenu: " << this->InputMenu << endl;
-  os << "Label: " << (this->Label ? this->Label : "(none)") << endl;
-  os << "Range: " << this->Range[0] << " " << this->Range[1] << endl;
+  os << indent << "InputMenu: " << this->InputMenu << endl;
+  os << indent << "Label: " << (this->Label ? this->Label : "(none)") << endl;
+  os << indent << "Range: " << this->Range[0] << " " << this->Range[1] << endl;
+  os << indent << "AnimationAxis: " << this->AnimationAxis << endl;
 }

@@ -42,7 +42,7 @@
 #include "vtkVoxel.h"
 #include "vtkImageData.h"
 
-vtkCxxRevisionMacro(vtkCTHData, "1.3.2.1");
+vtkCxxRevisionMacro(vtkCTHData, "1.3.2.2");
 vtkStandardNewMacro(vtkCTHData);
 
 //----------------------------------------------------------------------------
@@ -1192,6 +1192,7 @@ void vtkCTHData::PrintSelf(ostream& os, vtkIndent indent)
                        << spacing[1] << ", "
                        << spacing[2] << ")\n";
     }
+  os << indent << "NumberOfGhostLevels: " << this->NumberOfGhostLevels << endl;
 }
 
 

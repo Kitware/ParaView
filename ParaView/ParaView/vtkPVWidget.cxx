@@ -68,7 +68,7 @@ template class VTK_EXPORT vtkArrayMapIterator<vtkPVWidget*, vtkPVWidget*>;
 #endif
 
 //-----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkPVWidget, "1.36.2.5");
+vtkCxxRevisionMacro(vtkPVWidget, "1.36.2.6");
 
 //-----------------------------------------------------------------------------
 vtkPVWidget::vtkPVWidget()
@@ -474,4 +474,7 @@ void vtkPVWidget::PrintSelf(ostream& os, vtkIndent indent)
      << (this->ModifiedCommandObjectTclName?
          this->ModifiedCommandObjectTclName:"(none)") << endl;
   os << indent << "TraceNameState: " << this->TraceNameState << endl;
+  os << indent << "UseWidgetRange: " << this->UseWidgetRange << endl;
+  os << indent << "WidgetRange: " << this->WidgetRange[0] << " "
+     << this->WidgetRange[1] << endl;
 }

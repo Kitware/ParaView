@@ -62,7 +62,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWCornerAnnotation );
-vtkCxxRevisionMacro(vtkKWCornerAnnotation, "1.68.2.1");
+vtkCxxRevisionMacro(vtkKWCornerAnnotation, "1.68.2.2");
 
 int vtkKWCornerAnnotationCommand(ClientData cd, Tcl_Interp *interp,
                                  int argc, char *argv[]);
@@ -551,7 +551,7 @@ void vtkKWCornerAnnotation::SetVisibility(int state)
           this->InternalCornerComposite &&
           !this->View->HasComposite(this->InternalCornerComposite))
         {
-        this->View->Add2DComposite(this->InternalCornerComposite);
+        this->View->AddComposite(this->InternalCornerComposite);
         }
       if (this->RenderWidget)
         {
@@ -565,7 +565,7 @@ void vtkKWCornerAnnotation::SetVisibility(int state)
           this->InternalCornerComposite &&
           this->View->HasComposite(this->InternalCornerComposite))
         {
-        this->View->Remove2DComposite(this->InternalCornerComposite);
+        this->View->RemoveComposite(this->InternalCornerComposite);
         }
       if (this->RenderWidget)
         {
@@ -786,7 +786,7 @@ void vtkKWCornerAnnotation::SerializeToken(istream& is, const char *token)
 void vtkKWCornerAnnotation::SerializeRevision(ostream& os, vtkIndent indent)
 {
   os << indent << "vtkKWCornerAnnotation ";
-  this->ExtractRevision(os,"$Revision: 1.68.2.1 $");
+  this->ExtractRevision(os,"$Revision: 1.68.2.2 $");
 }
 
 //----------------------------------------------------------------------------
