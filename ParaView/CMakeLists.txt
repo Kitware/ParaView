@@ -252,7 +252,8 @@ IF(BUILD_TESTING)
 
   ENABLE_TESTING()
   SUBDIRS(ParaView/Testing)
-  SUBDIR_DEPENDS(ParaView/Testing ParaView)
+  SUBDIRS(Filters/Testing)
+  SUBDIRS(Packages/Testing)
 ENDIF(BUILD_TESTING)
 
  INCLUDE (${PARAVIEW_BINARY_DIR}/LocalUserOptions.cmake OPTIONAL)

@@ -34,8 +34,9 @@
 #include "vtkCamera.h"
 #include "vtkRenderWindow.h"
 #include "vtkCell.h"
+#include "vtkObjectFactory.h"
 
-vtkCxxRevisionMacro(vtkPlanesIntersection, "1.5");
+vtkCxxRevisionMacro(vtkPlanesIntersection, "1.6");
 vtkStandardNewMacro(vtkPlanesIntersection);
 
 // Experiment shows that we get plane equation values on the

@@ -39,10 +39,7 @@
 #ifndef __vtkPointsProjectedHull_h
 #define __vtkPointsProjectedHull_h
 
-#include "vtkObjectFactory.h"
-#include "vtkSetGet.h"
 #include "vtkPoints.h"
-
 
 class VTK_EXPORT vtkPointsProjectedHull : public vtkPoints
 {
@@ -182,6 +179,9 @@ private:
   float hullBBox[3][4];
   int hullSize[3];
   vtkTimeStamp hullTime[3];
+
+  vtkPointsProjectedHull(const vtkPointsProjectedHull&); // Not implemented
+  void operator=(const vtkPointsProjectedHull&); // Not implemented
 };
 #endif
 

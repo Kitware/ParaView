@@ -597,8 +597,6 @@ protected:
 
 private:
 
-    vtkKdTree(const vtkKdTree&);
-
 //BTX
     int DivideRegion(vtkKdNode *kd, float *c1, int nlevels);
     void SelfRegister(vtkKdNode *kd);
@@ -688,5 +686,8 @@ private:
 
     int *CellRegionList;
 
+
+  vtkKdTree(const vtkKdTree&); // Not implemented
+  void operator=(const vtkKdTree&); // Not implemented
 };
 #endif

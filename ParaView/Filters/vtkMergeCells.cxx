@@ -47,10 +47,13 @@
 #include "vtkLongArray.h"
 #include "vtkUnsignedLongArray.h"
 #include "vtkDataArray.h"
+#include "vtkPointData.h"
+#include "vtkCellData.h"
+
 #include <stdlib.h>
 #include <algorithm>
 
-vtkCxxRevisionMacro(vtkMergeCells, "1.4");
+vtkCxxRevisionMacro(vtkMergeCells, "1.5");
 vtkStandardNewMacro(vtkMergeCells);
 
 vtkCxxSetObjectMacro(vtkMergeCells, UnstructuredGrid, vtkUnstructuredGrid);
