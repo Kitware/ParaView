@@ -16,11 +16,11 @@ if {[info exists argc]} {
     }
 } 
 
-set kw(vtkTemp898) [$kw(vtkTemp4) InitializeReadCustom "PVDReader" "C:/ParaView/Data/Data/chombo3d.pvd"]
-$kw(vtkTemp4) ReadFileInformation $kw(vtkTemp898) "C:/ParaView/Data/Data/chombo3d.pvd"
-$kw(vtkTemp4) FinalizeRead $kw(vtkTemp898) "C:/ParaView/Data/Data/chombo3d.pvd"
+set kw(vtkTemp898) [$kw(vtkTemp4) InitializeReadCustom "PVDReader" "$DataDir/Data/chombo3d.pvd"]
+$kw(vtkTemp4) ReadFileInformation $kw(vtkTemp898) "$DataDir/Data/chombo3d.pvd"
+$kw(vtkTemp4) FinalizeRead $kw(vtkTemp898) "$DataDir/Data/chombo3d.pvd"
 set kw(vtkTemp903) [$kw(vtkTemp898) GetPVWidget {Filename}]
-$kw(vtkTemp903) SetValue "C:/ParaView/Data/Data/chombo3d.pvd"
+$kw(vtkTemp903) SetValue "$DataDir/Data/chombo3d.pvd"
 $kw(vtkTemp4) SetCenterOfRotation 4.000000 4.000000 4.000000
 $kw(vtkTemp4) SetCenterOfRotation 4.000000 4.000000 4.000000
 set kw(vtkTemp1014) [$kw(vtkTemp4) CreatePVSource CellDataToPointData]
