@@ -125,7 +125,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.559");
+vtkCxxRevisionMacro(vtkPVWindow, "1.560");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -4457,11 +4457,19 @@ void vtkPVWindow::UpdateMenuState()
     {
     this->PropagateEnableState(this->SelectMenu);
     this->Menu->SetState(VTK_PV_SELECT_SOURCE_MENU_LABEL,  menustate);
+    if (this->MenuView)
+      {
+      this->MenuView->SetState(VTK_PV_SOURCE_MENU_LABEL, menustate);
+      }
     }
   else
     {
     this->SelectMenu->SetEnabled(0);
-    this->Menu->SetState(VTK_PV_SELECT_SOURCE_MENU_LABEL,  vtkKWMenu::Disabled);
+    this->Menu->SetState(VTK_PV_SELECT_SOURCE_MENU_LABEL, vtkKWMenu::Disabled);
+    if (this->MenuView)
+      {
+      this->MenuView->SetState(VTK_PV_SOURCE_MENU_LABEL, vtkKWMenu::Disabled);
+      }
     }
   this->UpdateFilterMenu();
   if ( this->FilterMenu->GetEnabled() )
