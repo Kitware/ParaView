@@ -72,7 +72,7 @@ extern "C" int Vtktcl_Init(Tcl_Interp *interp);
 extern "C" int Vtkkwwidgetstcl_Init(Tcl_Interp *interp);
 
 int vtkKWApplicationCommand(ClientData cd, Tcl_Interp *interp,
-			    int argc, char *argv[]);
+                            int argc, char *argv[]);
 
 vtkKWApplication::vtkKWApplication()
 {
@@ -135,7 +135,7 @@ vtkKWApplication::vtkKWApplication()
       this, "label", "-background LightYellow -justify left -wraplength 2i");
     this->Script("pack %s", this->BalloonHelpLabel->GetWidgetName());
     this->Script("wm overrideredirect %s 1", 
-		 this->BalloonHelpWindow->GetWidgetName());
+                 this->BalloonHelpWindow->GetWidgetName());
     this->Script("wm withdraw %s", this->BalloonHelpWindow->GetWidgetName());
     }
 
@@ -236,8 +236,8 @@ void vtkKWApplication::Script(const char *format, ...)
   if (Tcl_GlobalEval(this->MainInterp, event) != TCL_OK)
     {
     vtkErrorMacro("\n    Script: \n" << event << "\n    Returned Error on line "
-		  << this->MainInterp->errorLine << ": \n"  
-		  << this->MainInterp->result << endl);
+                  << this->MainInterp->errorLine << ": \n"  
+                  << this->MainInterp->result << endl);
     }
 }
 
@@ -260,7 +260,7 @@ void vtkKWApplication::SimpleScript(const char *event)
   if (Tcl_GlobalEval(this->MainInterp, script) != TCL_OK)
     {
     vtkErrorMacro("\n    Script: \n" << event << "\n    Returned Error: \n"  
-		  << this->MainInterp->result << endl);
+                  << this->MainInterp->result << endl);
     }
   delete[] script;
 }
@@ -503,7 +503,7 @@ void vtkKWApplication::DisplayHelp(vtkKWWindow* master)
   else
     {
     sprintf(temp,"%s.chm::/Introduction.htm",
-	    this->ApplicationName);
+            this->ApplicationName);
     }
   
   if ( !HtmlHelp(NULL, temp, HH_DISPLAY_TOPIC, 0) )
@@ -549,7 +549,7 @@ void vtkKWApplication::BalloonHelpTrigger(vtkKWWidget *widget)
   this->BalloonHelpCancel();
   this->SetBalloonHelpWidget(widget);
   this->Script("after %d {catch {%s BalloonHelpDisplay %s}}", 
-	       this->BalloonHelpDelay * 1000,
+               this->BalloonHelpDelay * 1000,
                this->GetTclName(), widget->GetTclName());
   result = this->GetMainInterp()->result;
   this->SetBalloonHelpPending(result);
@@ -787,15 +787,15 @@ int vtkKWApplication::GetMessageDialogResponse(const char* dialogname)
 }
 
 void vtkKWApplication::SetMessageDialogResponse(const char* dialogname, 
-					       int response)
+                                               int response)
 {
   this->SetRegisteryValue(3, "Dialogs", dialogname, "%d", response);
 }
 
 
 int vtkKWApplication::SetRegisteryValue(int level, const char* subkey, 
-					const char* key, 
-					const char* format, ...)
+                                        const char* key, 
+                                        const char* format, ...)
 {
   if ( this->GetRegisteryLevel() < 0 ||
        this->GetRegisteryLevel() < level )
@@ -806,8 +806,8 @@ int vtkKWApplication::SetRegisteryValue(int level, const char* subkey,
   char buffer[100];
   char value[16000];
   sprintf(buffer, "%s\\%s", 
-	  this->GetApplication()->GetApplicationVersionName(),
-	  subkey);
+          this->GetApplication()->GetApplicationVersionName(),
+          subkey);
   va_list var_args;
   va_start(var_args, format);
   vsprintf(value, format, var_args);
@@ -820,7 +820,7 @@ int vtkKWApplication::SetRegisteryValue(int level, const char* subkey,
 }
 
 int vtkKWApplication::GetRegisteryValue(int level, const char* subkey, 
-					const char* key, char* value)
+                                        const char* key, char* value)
 {
   int res = 0;
   char buff[1024];
@@ -832,8 +832,8 @@ int vtkKWApplication::GetRegisteryValue(int level, const char* subkey,
     }
   char buffer[100];
   sprintf(buffer, "%s\\%s", 
-	  this->GetApplicationVersionName(),
-	  subkey);
+          this->GetApplicationVersionName(),
+          subkey);
 
   vtkKWRegisteryUtilities *reg 
     = this->GetRegistery(this->GetApplicationName());
@@ -847,7 +847,7 @@ int vtkKWApplication::GetRegisteryValue(int level, const char* subkey,
 }
 
 int vtkKWApplication::DeleteRegisteryValue(int level, const char* subkey, 
-				      const char* key)
+                                      const char* key)
 {
   if ( this->GetRegisteryLevel() < 0 ||
        this->GetRegisteryLevel() < level )
@@ -857,8 +857,8 @@ int vtkKWApplication::DeleteRegisteryValue(int level, const char* subkey,
   int res = 0;
   char buffer[100];
   sprintf(buffer, "%s\\%s", 
-	  this->GetApplicationVersionName(),
-	  subkey);
+          this->GetApplicationVersionName(),
+          subkey);
   
   vtkKWRegisteryUtilities *reg 
     = this->GetRegistery(this->GetApplicationName());
@@ -886,12 +886,13 @@ int vtkKWApplication::LoadScript(const char* filename)
   if ( Tcl_EvalFile(this->MainInterp, file) != TCL_OK )
     {
     vtkErrorMacro("\n    Script: \n" << filename << "\n    Returned Error on line "
-		  << this->MainInterp->errorLine << ": \n      "  
-		  << Tcl_GetStringResult(this->MainInterp) << endl);
+                  << this->MainInterp->errorLine << ": \n      "  
+                  << Tcl_GetStringResult(this->MainInterp) << endl);
     cout << "\n    Script: \n" << filename << "\n    Returned Error on line "
-	 << this->MainInterp->errorLine << ": \n      "  
-	 << Tcl_GetStringResult(this->MainInterp) << endl;
+         << this->MainInterp->errorLine << ": \n      "  
+         << Tcl_GetStringResult(this->MainInterp) << endl;
     res = 0;
+    this->SetExitStatus(1);
     }
   delete [] file;
 

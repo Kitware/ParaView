@@ -39,18 +39,16 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-#include "vtkKWApplication.h"
 #include "vtkKWOptionMenu.h"
+
+#include "vtkKWApplication.h"
 #include "vtkObjectFactory.h"
+#include "vtkString.h"
 
-
-
-//------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWOptionMenu );
 
-
-
-
+//-----------------------------------------------------------------------------
 vtkKWOptionMenu::vtkKWOptionMenu()
 {
   this->CurrentValue = NULL;
@@ -58,6 +56,7 @@ vtkKWOptionMenu::vtkKWOptionMenu()
   this->Menu->SetParent(this);
 }
 
+//-----------------------------------------------------------------------------
 vtkKWOptionMenu::~vtkKWOptionMenu()
 {
   if (this->CurrentValue)
@@ -69,37 +68,46 @@ vtkKWOptionMenu::~vtkKWOptionMenu()
 }
 
 
+//-----------------------------------------------------------------------------
 char *vtkKWOptionMenu::GetValue()
 {
-  this->Script("set %sValue",this->GetWidgetName());
-  
   if (this->CurrentValue)
     {
     delete [] this->CurrentValue;
+    this->CurrentValue = 0;
     }
-  this->CurrentValue = 
-    strcpy(new char[strlen(this->Application->GetMainInterp()->result)+1], 
-	   this->Application->GetMainInterp()->result);
+  if ( this->Application )
+    {
+    this->Script("set %sValue",this->GetWidgetName());
+    this->CurrentValue = vtkString::Duplicate(
+      this->Application->GetMainInterp()->result);
+    }
   return this->CurrentValue;  
 }
 
+//-----------------------------------------------------------------------------
 void vtkKWOptionMenu::SetValue(const char *s)
 {
-  if (s)
+  if (this->Application && s)
     {
     this->Script("set %sValue {%s}", this->GetWidgetName(),s);
     }
 }
 
+//-----------------------------------------------------------------------------
 void vtkKWOptionMenu::AddEntry(const char *name)
 {
-  this->Script("%s add radiobutton -label {%s} -variable %sValue",
-               this->Menu->GetWidgetName(), name, 
-               this->GetWidgetName());
+  if (this->Application)
+    {
+    this->Script("%s add radiobutton -label {%s} -variable %sValue",
+                 this->Menu->GetWidgetName(), name, 
+                 this->GetWidgetName());
+    }
 }
 
+//-----------------------------------------------------------------------------
 void vtkKWOptionMenu::AddEntryWithCommand(const char *name, const char *obj, 
-					  const char *method)
+                                          const char *method)
 {
   this->Script(
     "%s add radiobutton -label {%s} -variable %sValue -command {%s %s}",
@@ -107,8 +115,9 @@ void vtkKWOptionMenu::AddEntryWithCommand(const char *name, const char *obj,
     this->GetWidgetName(), obj, method);
 }
 
+//-----------------------------------------------------------------------------
 void vtkKWOptionMenu::AddEntryWithCommand(const char *name, vtkKWObject *obj, 
-					  const char *methodAndArgs)
+                                          const char *methodAndArgs)
 {
   this->Script(
     "%s add radiobutton -label {%s} -variable %sValue -command {%s %s}",
@@ -116,6 +125,7 @@ void vtkKWOptionMenu::AddEntryWithCommand(const char *name, vtkKWObject *obj,
     this->GetWidgetName(), obj->GetTclName(), methodAndArgs);
 }
 
+//-----------------------------------------------------------------------------
 void vtkKWOptionMenu::DeleteEntry(const char* name)
 { 
   this->Script(
@@ -124,6 +134,7 @@ void vtkKWOptionMenu::DeleteEntry(const char* name)
 }
 
 
+//-----------------------------------------------------------------------------
 void vtkKWOptionMenu::DeleteEntry(int index)
 {
   this->Script(
@@ -133,16 +144,19 @@ void vtkKWOptionMenu::DeleteEntry(int index)
 }
 
 
+//-----------------------------------------------------------------------------
 void vtkKWOptionMenu::ClearEntries()
 {
   this->Script("%s delete 0 end", this->Menu->GetWidgetName());
 }
 
+//-----------------------------------------------------------------------------
 void vtkKWOptionMenu::SetCurrentEntry(const char *name)
 { 
   this->Script("set %sValue {%s}",this->GetWidgetName(), name);
 }
  
+//-----------------------------------------------------------------------------
 void vtkKWOptionMenu::Create(vtkKWApplication *app, const char *args)
 {
   const char *wname;
@@ -164,6 +178,7 @@ void vtkKWOptionMenu::Create(vtkKWApplication *app, const char *args)
 }
 
 
+//-----------------------------------------------------------------------------
 void vtkKWOptionMenu::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);

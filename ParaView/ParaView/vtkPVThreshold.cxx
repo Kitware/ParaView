@@ -148,7 +148,7 @@ void vtkPVThreshold::CreateProperties()
   this->MinMaxScale->SetGetMinCommand("GetLowerThreshold");
   this->MinMaxScale->SetGetMaxCommand("GetUpperThreshold");
   pvApp->BroadcastScript("%s ThresholdBetween %f %f",
-			 this->GetVTKSourceTclName(), range[0], range[1]);
+                         this->GetVTKSourceTclName(), range[0], range[1]);
   this->MinMaxScale->Create(pvApp);
   this->AddPVWidget(this->MinMaxScale);
   
@@ -182,10 +182,12 @@ void vtkPVThreshold::UpdateMinMaxScale()
 {
   const char *mode;
   float range[2];
+  range[0] = 0;
+  range[1] = 1;
   vtkDataSet *thresholdInput = this->GetPVInput()->GetVTKData();
 
   mode = this->AttributeModeMenu->GetValue();
-  if (strcmp(mode, "Point Data") == 0)
+  if (mode && strcmp(mode, "Point Data") == 0)
     {
     if (thresholdInput->GetPointData()->GetScalars())
       {
@@ -197,7 +199,7 @@ void vtkPVThreshold::UpdateMinMaxScale()
       range[1] = 1;
       }
     }
-  else if (strcmp(mode, "Cell Data") == 0)
+  else if (mode && strcmp(mode, "Cell Data") == 0)
     {
     if (thresholdInput->GetCellData()->GetScalars())
       {
@@ -325,7 +327,7 @@ void vtkPVThreshold::SaveInTclScript(ofstream *file)
   else
     {
     *file << this->GetPVInput()->GetPVSource()->GetVTKSourceTclName()
-	  << " GetOutput]\n\t";
+          << " GetOutput]\n\t";
     }
   
   *file << this->VTKSourceTclName << " SetAttributeModeToUse";
