@@ -118,7 +118,7 @@ static unsigned char image_properties[] =
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.271");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.272");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -433,25 +433,10 @@ void vtkPVRenderView::CreateRenderObjects(vtkPVApplication *pvApp)
   this->RenderWindow->Delete();
   this->RenderWindow = pvApp->GetRenderModule()->GetRenderWindow();
   this->RenderWindow->Register(this);
-  // ordering of the renderers matters for interaction to work
-  this->RenderWindow->RemoveRenderer(this->Renderer);
-  this->RenderWindow->AddRenderer(this->Renderer);
   this->RenderWindow->AddRenderer(this->Renderer2D);
   this->RenderWindow->SetNumberOfLayers(2);
   this->Renderer->SetLayer(1);
 
-  vtkPVCompositeRenderModule *crm =
-    vtkPVCompositeRenderModule::SafeDownCast(pvApp->GetRenderModule());
-  if (crm)
-    {
-    vtkPVTreeComposite *comp = crm->GetComposite();
-    if (comp)
-      {
-      comp->SetRenderWindow(NULL);
-      comp->SetRenderWindow(this->RenderWindow);
-      }
-    }
-  
   this->RenderWindow->AddObserver(
     vtkCommand::CursorChangedEvent, this->Observer);
 }

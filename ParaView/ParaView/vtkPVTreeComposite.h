@@ -55,13 +55,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class vtkMPIController;
 #endif
 
-#include "vtkCompositeManager.h"
+#include "vtkCompositeRenderManager.h"
 
-class VTK_EXPORT vtkPVTreeComposite : public vtkCompositeManager
+class vtkFloatArray;
+class vtkRenderWindowInteractor;
+
+class VTK_EXPORT vtkPVTreeComposite : public vtkCompositeRenderManager
 {
 public:
   static vtkPVTreeComposite *New();
-  vtkTypeRevisionMacro(vtkPVTreeComposite,vtkCompositeManager);
+  vtkTypeRevisionMacro(vtkPVTreeComposite,vtkCompositeRenderManager);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
@@ -94,14 +97,42 @@ public:
   // on the remote processes before bothering to composite.
   // It uses the supperclasses "UseComposite" flag to disable compositing.
   virtual void StartRender();
+  virtual void SatelliteStartRender();
+  virtual void WriteFullImage();
+  void WriteFullFloatImage();
 
   // Description:
   // Public because it is an RMI.  
   void CheckForDataRMI();
-
-  virtual void SetRenderWindow(vtkRenderWindow *renWin);
-  virtual void Composite();
+  virtual void ComputeVisiblePropBoundsRMI();
   
+  virtual void SetRenderWindow(vtkRenderWindow *renWin);
+  virtual void PostRenderProcessing();
+
+  vtkGetMacro(CompositeTime, double);
+  vtkGetMacro(GetBuffersTime, double);
+  vtkGetMacro(SetBuffersTime, double);
+  vtkGetMacro(MaxRenderTime, double);
+  
+  // Description:
+  // Get the value of the z buffer at a position.
+  float GetZ(int x, int y);
+
+  void ExitInteractor();
+
+  void SetUseChar(int useChar);
+  vtkGetMacro(UseChar, int);
+  vtkBooleanMacro(UseChar, int);
+  
+  void SetUseRGB(int useRGB);
+  vtkGetMacro(UseRGB, int);
+  vtkBooleanMacro(UseRGB, int);
+
+  static void ResizeFloatArray(vtkFloatArray *fa, int numComp, vtkIdType size);
+  static void ResizeUnsignedCharArray(vtkUnsignedCharArray *uca, int numComp,
+                                      vtkIdType size);
+  static void DeleteArray(vtkDataArray *da);
+
 protected:
   vtkPVTreeComposite();
   ~vtkPVTreeComposite();
@@ -110,6 +141,8 @@ protected:
   int  ShouldIComposite();
 
   void InternalStartRender();
+
+  void MagnifyFullFloatImage();
   
 //BTX
 
@@ -126,6 +159,11 @@ protected:
   // There is no initialize method.
   int Initialized;
 
+  double CompositeTime;
+  double GetBuffersTime;
+  double SetBuffersTime;
+  double MaxRenderTime;
+  
 //BTX 
 #ifdef VTK_USE_MPI 
   void SatelliteFinalAbortCheck();
@@ -146,7 +184,26 @@ protected:
   int ReceiveMessage;
 #endif
 //ETX  
-    
+
+  vtkRenderWindowInteractor *RenderWindowInteractor;
+  void SetRenderWindowInteractor(vtkRenderWindowInteractor *iren);
+
+  void ReallocDataArrays();
+  virtual void ReadReducedImage();
+  virtual void MagnifyReducedFloatImage();
+  virtual void SetRenderWindowPixelData(vtkFloatArray *pixels,
+                                        const int pixelDimensions[2]);
+  
+  int ExitInteractorTag;
+
+  int UseChar;
+  int UseRGB;
+  
+  vtkFloatArray *ReducedFloatImage;
+  vtkFloatArray *FullFloatImage;
+  vtkFloatArray *TmpFloatPixelData;
+  
+private:
   vtkPVTreeComposite(const vtkPVTreeComposite&); // Not implemented
   void operator=(const vtkPVTreeComposite&); // Not implemented
 };
