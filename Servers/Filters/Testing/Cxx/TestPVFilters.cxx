@@ -27,7 +27,7 @@
 #include "vtkPolyDataMapper.h"
 #include "vtkRenderer.h"
 #include "vtkRenderWindow.h"
-
+#include "vtkMergeArrays.h"
 #include "vtkPVArrowSource.h"
 #include "vtkPVRibbonFilter.h"
 #include "vtkPVThresholdFilter.h"
@@ -60,7 +60,6 @@ int main(int argc, char* argv[])
   glyph->SetInput( clean->GetOutput() );
   glyph->SetSource( gs->GetOutput());
   glyph->SetScaleFactor( 0.75 );
-  glyph->Update();  //discard
 
   vtkPVContourFilter *contour = vtkPVContourFilter::New();
   contour->SetInput( clean->GetOutput() );
@@ -75,7 +74,6 @@ int main(int argc, char* argv[])
   clip->SetClipFunction( plane );
   clip->GenerateClipScalarsOn();
   clip->SetValue( 0.5 );
-  clip->Update(); //discard
   
   vtkPVGeometryFilter *geometry = vtkPVGeometryFilter::New();
   geometry->SetInput( contour->GetOutput() );
@@ -99,7 +97,6 @@ int main(int argc, char* argv[])
   extrude->SetScaleFactor(1);
   extrude->SetExtrusionTypeToNormalExtrusion();
   extrude->SetVector(1, 0, 0);
-  extrude->Update();  //discard
   
   vtkPVThresholdFilter *threshold = vtkPVThresholdFilter::New();
   threshold->SetInput( ribbon->GetOutput() );
@@ -109,7 +106,15 @@ int main(int argc, char* argv[])
   warp->SetInput( threshold->GetOutput() );
   warp->XYPlaneOn();
   warp->SetScaleFactor(0.5);
-  
+
+  vtkMergeArrays *merge = vtkMergeArrays::New();
+  merge->AddInput( warp->GetOutput() );
+  merge->AddInput( extrude->GetOutput() );
+  merge->AddInput( clip->GetOutput() );
+  merge->AddInput( glyph->GetOutput() );
+  merge->Update();  //discard
+  merge->GetNumberOfOutputs ();
+
   vtkDataSetMapper *warpMapper = vtkDataSetMapper::New();
   warpMapper->SetInput( warp->GetOutput() );
   
@@ -140,6 +145,7 @@ int main(int argc, char* argv[])
   ribbon->Delete();
   extrude->Delete();
   threshold->Delete();
+  merge->Delete();
   warp->Delete();
   warpMapper->Delete();
   warpActor->Delete();
