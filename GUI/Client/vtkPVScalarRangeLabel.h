@@ -69,6 +69,11 @@ public:
   // Empty method to keep superclass from complaining.
   virtual void Trace(ofstream*) {};
 
+  // Description:
+  // This widget does not actually use Accept, but it has to override the
+  // pure virtual method of the superclass.
+  virtual void Accept() {this->Superclass::Accept();}
+
 protected:
   vtkPVScalarRangeLabel();
   ~vtkPVScalarRangeLabel();

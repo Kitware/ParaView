@@ -84,7 +84,12 @@ public:
   // enable/disable parts of the widget UI, enable/disable the visibility
   // of 3D widgets, etc.
   virtual void UpdateEnableState();
- 
+
+  // Description:
+  // This widget does not actually use Accept, but it has to override the
+  // pure virtual method of the superclass.
+  virtual void Accept() {this->Superclass::Accept();}
+
 protected:
   vtkPVBoundsDisplay();
   ~vtkPVBoundsDisplay();

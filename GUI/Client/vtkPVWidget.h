@@ -57,7 +57,7 @@ public:
   // Only methods that copy state from PV object need 
   // to override these methods.
   // Accept needs to add to the trace (call trace), but AcceptInternal does not.
-  virtual void Accept();
+  virtual void Accept()=0;
   virtual void PostAccept() {};
   virtual void Reset();
 
