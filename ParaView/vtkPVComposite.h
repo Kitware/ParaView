@@ -70,7 +70,10 @@ public:
 
   void SetWindow(vtkPVWindow *window);
   vtkPVWindow *GetWindow();
-
+  
+  virtual void SetCompositeName(const char *name);
+  char* GetCompositeName();
+  
 protected:
   vtkPVComposite();
   ~vtkPVComposite();
@@ -80,6 +83,7 @@ protected:
   vtkPVWindow *Window;
   
   int NotebookCreated;
+  char *CompositeName;
 };
 
 #endif

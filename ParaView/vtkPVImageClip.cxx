@@ -25,7 +25,6 @@ PARTICULAR PURPOSE, AND NON-INFRINGEMENT.  THIS SOFTWARE IS PROVIDED ON AN
 MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 =========================================================================*/
-
 #include "vtkPVImageClip.h"
 #include "vtkKWApplication.h"
 #include "vtkKWView.h"

@@ -44,6 +44,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkPVPolyData.h"
 #include "vtkPVImageReader.h"
 #include "vtkPVImage.h"
+#include "vtkPVDataList.h"
 
 //----------------------------------------------------------------------------
 vtkPVWindow* vtkPVWindow::New()
@@ -79,6 +80,9 @@ vtkPVWindow::vtkPVWindow()
     
   this->DataPropertiesFrame = vtkKWNotebook::New();
   this->DataPropertiesFrameCreated = 0;
+  
+  this->DataList = vtkPVDataList::New();
+  this->DataList->SetCompositeCollection(this->CompositeList);
 }
 
 //----------------------------------------------------------------------------
@@ -98,6 +102,9 @@ vtkPVWindow::~vtkPVWindow()
     this->CurrentDataComposite->Delete();
     this->CurrentDataComposite = NULL;
     }
+  
+  this->DataList->Delete();
+  this->DataList = NULL;
   
   this->MenuSource->SetParent(NULL);
   this->MenuSource->Delete();
@@ -186,6 +193,11 @@ void vtkPVWindow::Create(vtkKWApplication *app, char *args)
 	       this->PreviousCompositeButton->GetWidgetName(),
 	       this->NextCompositeButton->GetWidgetName());
   
+  this->DataList->SetParent(this->GetDataPropertiesParent());
+  this->DataList->Create(app, "");
+  this->Script("pack %s -side bottom -fill x -expand no",
+	       this->DataList->GetWidgetName());
+  
   this->Script( "wm deiconify %s", this->GetWidgetName());
 
   char *rbv =
@@ -194,11 +206,15 @@ void vtkPVWindow::Create(vtkKWApplication *app, char *args)
   this->GetMenuProperties()->AddRadioButton(11,"Data", rbv, this, "ShowDataProperties");
   delete [] rbv;
   
+  this->GetMenuProperties()->CheckRadioButton(this->GetMenuProperties(),
+					      "Radio", 11);
+  //not sure I should have to explicitly call this
+  this->ShowDataProperties();
+  
   // Setup an interactor style.
   vtkInteractorStyleCamera *style = vtkInteractorStyleCamera::New();
   this->MainView->SetInteractorStyle(style);
 }
-
 
 //----------------------------------------------------------------------------
 void vtkPVWindow::ShowDataProperties()
@@ -243,7 +259,6 @@ void vtkPVWindow::CreateDataPropertiesFrame()
   this->DataPropertiesFrame->AddPage("Only");
 }
 
-
 void vtkPVWindow::SetCurrentDataComposite(vtkPVComposite *comp)
 {
   if (comp->GetPropertiesParent() != this->GetDataPropertiesParent())
@@ -270,7 +285,8 @@ void vtkPVWindow::SetCurrentDataComposite(vtkPVComposite *comp)
       {
       this->CompositeList->AddItem(comp);
       }
-    this->Script("pack %s -side top -anchor w -padx 2 -pady 2 -expand yes -fill x",
+    this->Script("pack %s %s -side top -anchor w -padx 2 -pady 2 -expand yes -fill x",
+		 this->DataList->GetWidgetName(),
 		 comp->GetProperties()->GetWidgetName());
     }
 }
@@ -320,11 +336,13 @@ void vtkPVWindow::NewCone()
   vtkPVApplication *pvApp = (vtkPVApplication *)this->Application;
   vtkPVComposite *comp;
   vtkPVConeSource *cone;
-
+  
   // Maybe theses two objects should be merged ito one.
   cone = vtkPVConeSource::New();
+
   comp = vtkPVComposite::New();
   comp->SetSource(cone);
+  comp->SetCompositeName("cone");
 
   // Create the properties (interface).
   comp->SetPropertiesParent(this->GetDataPropertiesParent());
@@ -337,6 +355,7 @@ void vtkPVWindow::NewCone()
 
   // Clean up.
   comp->Delete();
+  this->DataList->Update();
   cone->Delete();
   
   this->MainView->ResetCamera();
@@ -358,12 +377,14 @@ void vtkPVWindow::NewVolume()
   comp = vtkPVComposite::New();
   comp->SetSource(reader);
   comp->SetData(image);
+  comp->SetCompositeName("volume");
   comp->SetPropertiesParent(this->GetDataPropertiesParent());
   comp->CreateProperties(pvApp, "");
   this->MainView->AddComposite(comp);
   comp->SetWindow(this);
   this->SetCurrentDataComposite(comp);
   comp->Delete();
+  this->DataList->Update();
   
   this->MainView->ResetCamera();
   this->MainView->Render();
@@ -426,6 +447,7 @@ void vtkPVWindow::NextComposite()
     }
   
   this->MainView->Render();
+  this->DataList->Update();
 }
 
 void vtkPVWindow::PreviousComposite()
@@ -439,6 +461,7 @@ void vtkPVWindow::PreviousComposite()
     }
   
   this->MainView->Render();
+  this->DataList->Update();
 }
 
 
@@ -452,4 +475,9 @@ vtkPVComposite* vtkPVWindow::GetPreviousComposite()
 {
   int pos = this->CompositeList->IsItemPresent(this->CurrentDataComposite);
   return (vtkPVComposite*)this->CompositeList->GetItemAsObject(pos-2);
+}
+
+vtkKWCompositeCollection* vtkPVWindow::GetCompositeList()
+{
+  return this->CompositeList;
 }

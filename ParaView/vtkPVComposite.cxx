@@ -37,6 +37,7 @@ vtkPVComposite::vtkPVComposite()
   this->Notebook = vtkKWNotebook::New();
   this->Source = NULL;
   this->Window = NULL;
+  this->CompositeName = NULL;
   
   this->NotebookCreated = 0;
 }
@@ -53,6 +54,7 @@ vtkPVComposite::~vtkPVComposite()
   this->Notebook = NULL;
   
   this->SetSource(NULL);
+  this->SetCompositeName(NULL);
 }
 
 void vtkPVComposite::SetWindow(vtkPVWindow *window)
@@ -187,7 +189,36 @@ void vtkPVComposite::SetData(vtkPVData *data)
     }
   this->Source->SetDataWidget(data);
 }
-  
+
+char* vtkPVComposite::GetCompositeName()
+{
+  return this->CompositeName;
+}
+
+void vtkPVComposite::SetCompositeName (const char* arg) 
+{ 
+  vtkDebugMacro(<< this->GetClassName() << " (" << this << "): setting " 
+                << this->CompositeName << " to " << arg ); 
+  if ( this->CompositeName && arg && (!strcmp(this->CompositeName,arg))) 
+    { 
+    return;
+    } 
+  if (this->CompositeName) 
+    { 
+    delete [] this->CompositeName; 
+    } 
+  if (arg) 
+    { 
+    this->CompositeName = new char[strlen(arg)+1]; 
+    strcpy(this->CompositeName,arg); 
+    } 
+  else 
+    { 
+    this->CompositeName = NULL;
+    }
+  this->Modified(); 
+} 
+ 
 vtkPVData *vtkPVComposite::GetData()
 {
   if (this->Source == NULL)

@@ -25,14 +25,12 @@ PARTICULAR PURPOSE, AND NON-INFRINGEMENT.  THIS SOFTWARE IS PROVIDED ON AN
 MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 =========================================================================*/
-
 #ifndef __vtkPVImageClip_h
 #define __vtkPVImageClip_h
 
 #include "vtkKWLabel.h"
 #include "vtkImageClip.h"
 #include "vtkKWEntry.h"
-#include "vtkKWLabel.h"
 #include "vtkPVSource.h"
 
 

@@ -85,7 +85,8 @@ void vtkPVShrinkPolyData::Create(vtkKWApplication *app, char *args)
   this->Script("frame %s %s", this->GetWidgetName(), args);
   
   this->ShrinkFactorScale->Create(this->Application,
-			    "-showvalue 1 -resolution 0.1");
+				  "-showvalue 1");
+  this->ShrinkFactorScale->SetResolution(0.1);
   this->ShrinkFactorScale->SetRange(0, 1);
   this->ShrinkFactorScale->SetValue(this->GetShrink()->GetShrinkFactor());
   

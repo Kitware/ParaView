@@ -81,7 +81,7 @@ void vtkPVData::Contour()
   float *range;
   
   contour = vtkPVContourFilter::New();
-  // I would like to be seting a PVData as input to PVSource ...
+  // I would like to be setting a PVData as input to PVSource ...
   contour->GetContour()->SetInput(this->GetData());
   
   range = this->GetData()->GetScalarRange();
@@ -89,6 +89,7 @@ void vtkPVData::Contour()
       
   newComp = vtkPVComposite::New();
   newComp->SetSource(contour);
+  newComp->SetCompositeName("contour");
 
   vtkPVWindow *window = this->GetComposite()->GetWindow();
   newComp->SetPropertiesParent(window->GetDataPropertiesParent());
@@ -99,6 +100,7 @@ void vtkPVData::Contour()
   newComp->SetWindow(window);
   
   window->SetCurrentDataComposite(newComp);
+  window->GetDataList()->Update();
   
   this->GetComposite()->GetView()->Render();
   

@@ -68,6 +68,7 @@ void vtkPVImage::Clip()
 
   newComp = vtkPVComposite::New();
   newComp->SetSource(clip);
+  newComp->SetCompositeName("clip");
   
   vtkPVWindow *window = this->GetComposite()->GetWindow();
   newComp->SetPropertiesParent(window->GetDataPropertiesParent());
@@ -78,6 +79,10 @@ void vtkPVImage::Clip()
   newComp->SetWindow(window);
   
   window->SetCurrentDataComposite(newComp);
+  window->GetDataList()->Update();
+
+  window->GetMainView()->ResetCamera();
+  window->GetMainView()->Render();
   
   this->GetComposite()->GetView()->Render();
   
@@ -106,6 +111,7 @@ void vtkPVImage::Slice()
 
   newComp = vtkPVComposite::New();
   newComp->SetSource(slice);
+  newComp->SetCompositeName("slice");
   
   vtkPVWindow *window = this->GetComposite()->GetWindow();
   newComp->SetPropertiesParent(window->GetDataPropertiesParent());
@@ -116,6 +122,7 @@ void vtkPVImage::Slice()
   newComp->SetWindow(window);
   
   window->SetCurrentDataComposite(newComp);
+  window->GetDataList()->Update();
   
   this->GetComposite()->GetView()->Render();
   

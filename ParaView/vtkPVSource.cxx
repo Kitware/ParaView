@@ -81,11 +81,6 @@ void vtkPVSource::SetComposite(vtkPVComposite *comp)
     }
 }
 
-
-
-
-
-
 void vtkPVSource::SetDataWidget(vtkPVData *data)
 {
   if (this->DataWidget == data)

@@ -36,6 +36,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkKWWindow.h"
 #include "vtkPVRenderView.h"
 #include "vtkPVComposite.h"
+#include "vtkPVDataList.h"
 
 class vtkKWNotebook;
 class vtkKWToolbar;
@@ -77,9 +78,13 @@ public:
   vtkPVComposite *GetNextComposite();
   vtkPVComposite *GetPreviousComposite();
   
+  vtkKWCompositeCollection *GetCompositeList();
+  
   //tcl callbacks that use GetNextComposite and GetPreviousComposite
   void NextComposite();
   void PreviousComposite();
+  
+  vtkGetObjectMacro(DataList, vtkPVDataList);
   
 protected:
   vtkPVWindow();
@@ -106,6 +111,7 @@ protected:
 
   vtkPVComposite *CurrentDataComposite;
   vtkKWCompositeCollection *CompositeList;
+  vtkPVDataList *DataList;
 };
 
 

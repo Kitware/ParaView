@@ -213,6 +213,14 @@ SOURCE=.\vtkPVElevationFilterTcl.cxx
 # End Source File
 # Begin Source File
 
+SOURCE=.\vtkPVGlyph3D.cxx
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkPVGlyph3DTcl.cxx
+# End Source File
+# Begin Source File
+
 SOURCE=.\vtkPVImage.cxx
 # End Source File
 # Begin Source File
@@ -595,6 +603,26 @@ SOURCE=.\vtkPVElevationFilter.h
 # Begin Custom Build
 InputPath=.\vtkPVElevationFilter.h
 InputName=vtkPVElevationFilter
+
+"$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx
+
+# End Custom Build
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkPVGlyph3D.h
+
+!IF  "$(CFG)" == "ParaView - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "ParaView - Win32 Debug"
+
+# Begin Custom Build
+InputPath=.\vtkPVGlyph3D.h
+InputName=vtkPVGlyph3D
 
 "$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx

@@ -29,6 +29,8 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkPVPolyData.h"
 #include "vtkPVShrinkPolyData.h"
 #include "vtkPVElevationFilter.h"
+#include "vtkPVConeSource.h"
+#include "vtkPVGlyph3D.h"
 #include "vtkKWView.h"
 
 #include "vtkKWScale.h"
@@ -37,6 +39,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkPVWindow.h"
 #include "vtkKWApplication.h"
 
+#include "vtkConeSource.h"
 
 int vtkPVPolyDataCommand(ClientData cd, Tcl_Interp *interp,
 		                     int argc, char *argv[]);
@@ -61,29 +64,77 @@ void vtkPVPolyData::Shrink()
   //shrink factor defaults to 0.5, which seems reasonable
   vtkPVShrinkPolyData *shrink;
   vtkPVComposite *newComp;
+  vtkPVWindow *window = this->GetComposite()->GetWindow();
   
   shrink = vtkPVShrinkPolyData::New();
   shrink->GetShrink()->SetInput(this->GetPolyData());  
     
   newComp = vtkPVComposite::New();
   newComp->SetSource(shrink);
+  newComp->SetCompositeName("shrink");
   
-  vtkPVWindow *window = this->GetComposite()->GetWindow();
   newComp->SetPropertiesParent(window->GetDataPropertiesParent());
   newComp->CreateProperties(this->Application, "");
+
   this->GetComposite()->GetView()->AddComposite(newComp);
 
   // Turn this data object off so the next will will not be ocluded.
   this->GetComposite()->GetProp()->VisibilityOff();
-  
-  // The windowhere should probably be replaced with the view.
+
+  // The window here should probably be replaced with the view.
   newComp->SetWindow(window);
   window->SetCurrentDataComposite(newComp);
+  window->GetDataList()->Update();
   
   this->GetComposite()->GetView()->Render();
   
   newComp->Delete();
   shrink->New();
+}
+
+void vtkPVPolyData::Glyph()
+{
+  vtkPVComposite *glyphComp;
+  vtkPVConeSource *glyphCone = vtkPVConeSource::New();
+  vtkPVGlyph3D *glyph;
+  vtkPVComposite *newComp;
+  vtkPVWindow *window = this->GetComposite()->GetWindow();
+
+  glyphComp = vtkPVComposite::New();
+  glyphComp->SetSource(glyphCone);
+  glyphComp->SetPropertiesParent(window->GetDataPropertiesParent());
+  glyphComp->CreateProperties(this->Application, "");
+  window->GetMainView()->AddComposite(glyphComp);
+  glyphComp->SetWindow(window);
+  glyphComp->SetCompositeName("glyph comp");
+  
+  glyph = vtkPVGlyph3D::New();
+  glyph->GetGlyph()->SetInput(this->GetPolyData());
+  glyph->GetGlyph()->SetSource(glyphCone->GetConeSource()->GetOutput());
+  glyph->SetGlyphComposite(glyphComp);
+  glyph->GetGlyph()->SetScaleModeToDataScalingOff();
+  
+  glyphComp->GetProp()->VisibilityOff();
+    
+  newComp = vtkPVComposite::New();
+  newComp->SetSource(glyph);
+  newComp->SetCompositeName("glyph");
+ 
+  newComp->SetPropertiesParent(window->GetDataPropertiesParent());
+  newComp->CreateProperties(this->Application, "");
+  this->GetComposite()->GetView()->AddComposite(newComp);
+  this->GetComposite()->GetProp()->VisibilityOff();
+  
+  newComp->SetWindow(window);
+  window->SetCurrentDataComposite(newComp);
+  window->GetDataList()->Update();
+  
+  this->GetComposite()->GetView()->Render();
+  
+  newComp->Delete();
+
+  glyphCone->Delete();
+  glyphComp->Delete();
 }
 
 void vtkPVPolyData::Elevation()
@@ -108,6 +159,7 @@ void vtkPVPolyData::Elevation()
     
   newComp = vtkPVComposite::New();
   newComp->SetSource(elevation);
+  newComp->SetCompositeName("elevation");
   
   vtkPVWindow *window = this->GetComposite()->GetWindow();
   newComp->SetPropertiesParent(window->GetDataPropertiesParent());
@@ -118,7 +170,8 @@ void vtkPVPolyData::Elevation()
   newComp->SetWindow(window);
   
   window->SetCurrentDataComposite(newComp);
-  
+  window->GetDataList()->Update();
+
   this->GetComposite()->GetView()->Render();
   newComp->Delete();
 }
@@ -133,6 +186,8 @@ void vtkPVPolyData::Create(vtkKWApplication *app, char *args)
 				      "Shrink");
   this->FiltersMenuButton->AddCommand("vtkElevationFilter", this,
 				      "Elevation");
+  this->FiltersMenuButton->AddCommand("vtkGlyph3D", this,
+				      "Glyph");
 }
 
 void vtkPVPolyData::SetPolyData(vtkPolyData *data)

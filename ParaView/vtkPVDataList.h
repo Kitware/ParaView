@@ -34,6 +34,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 #include "vtkKWWidget.h"
 #include "vtkPVComposite.h"
+#include "vtkKWCompositeCollection.h"
 
 class vtkKWEntry;
 
@@ -49,7 +50,8 @@ public:
 
   // Description:
   // The assembly that is displayed in the editor.
-  vtkGetObjectMacro(CompositeCollection, vtkCollection);
+  vtkGetObjectMacro(CompositeCollection, vtkKWCompositeCollection);
+  vtkSetObjectMacro(CompositeCollection, vtkKWCompositeCollection);
 
   // Description:
   // Redraws the canvas (assembly or list changed).
@@ -74,21 +76,21 @@ public:
   // Description:
   // This method gets called when the user presses return in the name entry.
   void NameEntryClose();
-
+  
 protected:
   vtkPVDataList();
   ~vtkPVDataList();
   vtkPVDataList(const vtkPVDataList&) {};
   void operator=(const vtkPVDataList&) {};
 
-  int Update(vtkGoAssembly *assy, int y, int in, int pickable);
+  int Update(vtkPVComposite *comp, int y, int in);
 
   vtkKWWidget *ScrollFrame;
   vtkKWWidget *Canvas;
   vtkKWWidget *ScrollBar;
 
   
-  vtkCollection *CompositeCollection;
+  vtkKWCompositeCollection *CompositeCollection;
 
   // -- Stuff for entering the name in the canvas --
   vtkKWEntry *NameEntry;

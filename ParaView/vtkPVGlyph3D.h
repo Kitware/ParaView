@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   Visualization Toolkit
-  Module:    vtkPVPolyData.h
+  Module:    vtkPVGlyph3D.h
   Language:  C++
   Date:      $Date$
   Version:   $Revision$
@@ -26,40 +26,46 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 =========================================================================*/
 
-#ifndef __vtkPVPolyData_h
-#define __vtkPVPolyData_h
+#ifndef __vtkPVGlyph3D_h
+#define __vtkPVGlyph3D_h
 
-#include "vtkPolyData.h"
-#include "vtkKWWidget.h"
-#include "vtkKWScale.h"
-#include "vtkDataSet.h"
-#include "vtkPVData.h"
+#include "vtkKWLabel.h"
+#include "vtkKWEntry.h"
+#include "vtkGlyph3D.h"
+#include "vtkPVSource.h"
+#include "vtkPVComposite.h"
 
-class vtkPVComposite;
-
-class VTK_EXPORT vtkPVPolyData : public vtkPVData
+class VTK_EXPORT vtkPVGlyph3D : public vtkPVSource
 {
 public:
-  static vtkPVPolyData* New();
-  vtkTypeMacro(vtkPVPolyData, vtkKWWidget);
-  
+  static vtkPVGlyph3D* New();
+  vtkTypeMacro(vtkPVGlyph3D, vtkPVSource);
+
   void Create(vtkKWApplication *app, char *args);
 
-  void SetPolyData(vtkPolyData *data);
-  vtkPolyData *GetPolyData();
+  vtkGetObjectMacro(Glyph, vtkGlyph3D);
   
-  void Shrink();
-  void Elevation();
-  void Glyph();
+  vtkGetObjectMacro(GlyphComposite, vtkPVComposite);
+  void SetGlyphComposite(vtkPVComposite *comp);
   
-protected:
-  vtkPVPolyData();
-  ~vtkPVPolyData();
-  vtkPVPolyData(const vtkPVPolyData&) {};
-  void operator=(const vtkPVPolyData&) {};
+  void ShowGlyphComposite();
+  void ScaleFactorChanged();
+  
+  vtkPVData *GetDataWidget();
 
-  vtkSetObjectMacro(Data, vtkDataSet);
+protected:
+  vtkPVGlyph3D();
+  ~vtkPVGlyph3D();
+  vtkPVGlyph3D(const vtkPVGlyph3D&) {};
+  void operator=(const vtkPVGlyph3D&) {};
+  
+  vtkKWWidget *GlyphCompositeButton;
+  vtkKWLabel *ScaleFactorLabel;
+  vtkKWEntry *ScaleFactorEntry;
+  vtkKWWidget *Accept;
+
+  vtkGlyph3D *Glyph;
+  vtkPVComposite *GlyphComposite;
 };
 
 #endif
-
