@@ -124,7 +124,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.553");
+vtkCxxRevisionMacro(vtkPVWindow, "1.554");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -3292,7 +3292,7 @@ void vtkPVWindow::UpdateSelectMenu()
       source = static_cast<vtkPVSource*>(it->GetObject());
       sprintf(methodAndArg, "SetCurrentPVSourceCallback %s", 
               source->GetTclName());
-      this->GlyphMenu->AddCommand(source->GetName(), this, methodAndArg,
+      this->GlyphMenu->AddCommand(source->GetLabel(), this, methodAndArg,
                                   source->GetSourceClassName());
       numGlyphs++;
       it->GoToNextItem();
@@ -3311,7 +3311,7 @@ void vtkPVWindow::UpdateSelectMenu()
       source = static_cast<vtkPVSource*>(it->GetObject());
       sprintf(methodAndArg, "SetCurrentPVSourceCallback %s", 
               source->GetTclName());
-      this->SelectMenu->AddCommand(source->GetName(), this, methodAndArg,
+      this->SelectMenu->AddCommand(source->GetLabel(), this, methodAndArg,
                                    source->GetSourceClassName());
       it->GoToNextItem();
       }

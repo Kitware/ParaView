@@ -62,7 +62,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.354");
+vtkCxxRevisionMacro(vtkPVSource, "1.355");
 
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
@@ -1188,6 +1188,12 @@ void vtkPVSource::SetLabelNoTrace(const char* arg)
 
   // Make sure the description frame is upto date.
   this->UpdateDescriptionFrame();
+
+  vtkPVWindow *window = this->GetPVWindow();
+  if (window)
+    {
+    window->UpdateSelectMenu();
+    }
 
 } 
 
