@@ -23,7 +23,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVTimerInformation);
-vtkCxxRevisionMacro(vtkPVTimerInformation, "1.4");
+vtkCxxRevisionMacro(vtkPVTimerInformation, "1.5");
 
 
 
@@ -59,14 +59,35 @@ vtkPVTimerInformation::~vtkPVTimerInformation()
 
 
 //----------------------------------------------------------------------------
+void vtkPVTimerInformation::InsertLog(int id, char* log)
+{
+  if (id >= this->NumberOfLogs)
+    {
+    this->Reallocate(id+1);
+    }
+  if (this->Logs[id])
+    {
+    delete [] this->Logs[id];
+    this->Logs[id] = NULL;
+    }
+  this->Logs[id] = log;
+}
+
+//----------------------------------------------------------------------------
 void vtkPVTimerInformation::Reallocate(int num)
 {
   int idx;
   char** newLogs;
 
-  if (num <= this->NumberOfLogs)
+  if (num == this->NumberOfLogs)
     {
-    vtkErrorMacro("Could not shrink logs.")
+    return;
+    }
+
+  if (num < this->NumberOfLogs)
+    {
+    vtkWarningMacro("Trying to shrink logs from " << this->NumberOfLogs
+                    << " to " << num);
     return;
     }
 
@@ -98,7 +119,6 @@ void vtkPVTimerInformation::Reallocate(int num)
 // This ignores the object, and gets the log from the timer.
 void vtkPVTimerInformation::CopyFromObject(vtkObject* o)
 {
-  this->Reallocate(1);
   ostrstream *fptr;
   int length;
   char *str;
@@ -133,7 +153,7 @@ void vtkPVTimerInformation::CopyFromObject(vtkObject* o)
       delete fptr;
       
       }
-    this->Logs[0] = str;
+    this->InsertLog(0, str);
     }  
 }
 
@@ -160,14 +180,13 @@ void vtkPVTimerInformation::CopyFromMessage(unsigned char* msg)
   msg += sizeof(int);
 
   // now get the logs.
-  this->Reallocate(num);
   for (idx = 0; idx < num; ++idx)
     {
     char* log;
     length = strlen((const char*)msg);
     log = new char[length+1];
     memcpy(log, msg, length+1);
-    this->Logs[idx] = log;
+    this->InsertLog(idx, log);
     log = NULL;
     msg += length+1;
     }
@@ -192,7 +211,6 @@ void vtkPVTimerInformation::AddInformation(vtkPVInformation* info)
     return;
     }
 
-  this->Reallocate(oldNum+num);
   for (idx = 0; idx < num; ++idx)
     {
     log = pdInfo->GetLog(idx);
@@ -201,7 +219,7 @@ void vtkPVTimerInformation::AddInformation(vtkPVInformation* info)
       length = strlen(log);
       copyLog = new char[length+1];
       memcpy(copyLog, log, length+1);
-      this->Logs[idx+oldNum] = copyLog;
+      this->InsertLog((idx+oldNum), copyLog);
       copyLog = NULL;
       }
     }

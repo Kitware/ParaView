@@ -54,6 +54,7 @@ protected:
   ~vtkPVTimerInformation();
 
   void Reallocate(int num);
+  void InsertLog(int id, char* log);
 
   int NumberOfLogs;
   char** Logs;
