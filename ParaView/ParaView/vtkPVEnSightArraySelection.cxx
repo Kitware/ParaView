@@ -171,6 +171,9 @@ void vtkPVEnSightArraySelection::Reset()
     
     for (idx = 0; idx < numArrays; ++idx)
       {
+      this->Script("%s GetComplexVariableType %d",
+                   this->VTKReaderTclName, idx);
+      variableType = vtkKWObject::GetIntegerResult(this->Application);
       switch (attributeType)
         {
         case 0:
