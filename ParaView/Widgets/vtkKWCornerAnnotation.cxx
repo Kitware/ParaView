@@ -65,7 +65,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWCornerAnnotation );
-vtkCxxRevisionMacro(vtkKWCornerAnnotation, "1.56");
+vtkCxxRevisionMacro(vtkKWCornerAnnotation, "1.57");
 
 int vtkKWCornerAnnotationCommand(ClientData cd, Tcl_Interp *interp,
                                 int argc, char *argv[]);
@@ -343,10 +343,12 @@ void vtkKWCornerAnnotation::Create(vtkKWApplication *app,
   int popup_text_property = 
     this->PopupTextProperty && !this->PopupMode;
 
+  // --------------------------------------------------------------
   // Create the container
 
   this->Script("frame %s -borderwidth 0 -relief flat", this->GetWidgetName());
 
+  // --------------------------------------------------------------
   // If in popup mode, create the popup button
 
   if (this->PopupMode)
@@ -361,6 +363,7 @@ void vtkKWCornerAnnotation::Create(vtkKWApplication *app,
     this->PopupButton->SetLabel("Edit...");
     }
 
+  // --------------------------------------------------------------
   // Create the labeled frame
 
   if (this->PopupMode)
@@ -377,6 +380,7 @@ void vtkKWCornerAnnotation::Create(vtkKWApplication *app,
   this->Script("pack %s -side top -anchor nw -fill both -expand y",
                this->Frame->GetWidgetName());
 
+  // --------------------------------------------------------------
   // Annotation visibility
 
   if (this->PopupMode)
@@ -429,6 +433,7 @@ void vtkKWCornerAnnotation::Create(vtkKWApplication *app,
       }
     }
 
+  // --------------------------------------------------------------
   // Corners text
 
   this->CornerFrame->SetParent(this->Frame->GetFrame());
@@ -489,6 +494,7 @@ void vtkKWCornerAnnotation::Create(vtkKWApplication *app,
   this->Script("grid columnconfigure %s 1 -weight 1",
                this->CornerFrame->GetWidgetName());
 
+  // --------------------------------------------------------------
   // Properties frame
 
   this->PropertiesFrame->SetParent(this->Frame->GetFrame());
@@ -497,6 +503,7 @@ void vtkKWCornerAnnotation::Create(vtkKWApplication *app,
   this->Script("pack %s -side top -padx 2 -expand t -fill both -anchor nw",
                this->PropertiesFrame->GetWidgetName());
 
+  // --------------------------------------------------------------
   // Maximum line height
 
   this->MaximumLineHeightScale->SetParent(this->PropertiesFrame);
@@ -526,6 +533,7 @@ void vtkKWCornerAnnotation::Create(vtkKWApplication *app,
                this->MaximumLineHeightScale->GetWidgetName(),
                (popup_text_property ? "left" : "top"));
   
+  // --------------------------------------------------------------
   // Text property : popup button if needed
 
   if (popup_text_property)
@@ -553,6 +561,7 @@ void vtkKWCornerAnnotation::Create(vtkKWApplication *app,
     this->TextPropertyWidget->SetParent(this->PropertiesFrame);
     }
 
+  // --------------------------------------------------------------
   // Text property
 
   this->TextPropertyWidget->LongFormatOn();
@@ -573,6 +582,7 @@ void vtkKWCornerAnnotation::Create(vtkKWApplication *app,
                this->TextPropertyWidget->GetWidgetName(),
                this->TextPropertyWidget->GetLongFormat() ? 0 : 2);
 
+  // --------------------------------------------------------------
   // Update the GUI according to the Ivar value (i.e. the corner prop, etc.)
 
   this->Update();
@@ -963,7 +973,7 @@ void vtkKWCornerAnnotation::SerializeToken(istream& is,
 void vtkKWCornerAnnotation::SerializeRevision(ostream& os, vtkIndent indent)
 {
   os << indent << "vtkKWCornerAnnotation ";
-  this->ExtractRevision(os,"$Revision: 1.56 $");
+  this->ExtractRevision(os,"$Revision: 1.57 $");
 }
 
 //----------------------------------------------------------------------------
