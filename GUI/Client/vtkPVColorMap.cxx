@@ -50,7 +50,7 @@
 #include "vtkPVRenderModule.h"
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVColorMap);
-vtkCxxRevisionMacro(vtkPVColorMap, "1.83");
+vtkCxxRevisionMacro(vtkPVColorMap, "1.84");
 
 int vtkPVColorMapCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -1721,6 +1721,9 @@ void vtkPVColorMap::SaveInBatchScript(ofstream *file)
   *file << "  [$pvTemp" << this->LookupTableID << " GetProperty "
         << "VectorComponent] SetElements1 "
         << this->VectorComponent << endl;
+  *file << "  [$pvTemp" << this->LookupTableID << " GetProperty "
+        << "VectorMode] SetElements1 "
+        << this->VectorMode << endl;
   *file << "  $pvTemp" << this->LookupTableID << " UpdateVTKObjects"
         << endl;
   *file << "  $pvTemp" << this->LookupTableID << " Build"
