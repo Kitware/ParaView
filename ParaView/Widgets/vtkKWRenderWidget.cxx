@@ -47,6 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkProperty2D.h"
 #include "vtkRenderWindow.h"
 #include "vtkRenderer.h"
+#include "vtkRendererCollection.h"
 #include "vtkTextActor.h"
 #include "vtkTextProperty.h"
 
@@ -54,7 +55,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkWin32OpenGLRenderWindow.h"
 #endif
 
-vtkCxxRevisionMacro(vtkKWRenderWidget, "1.67");
+vtkCxxRevisionMacro(vtkKWRenderWidget, "1.68");
 
 //----------------------------------------------------------------------------
 vtkKWRenderWidget::vtkKWRenderWidget()
@@ -751,14 +752,35 @@ void vtkKWRenderWidget::SetBackgroundColor(float r, float g, float b)
     return;
     }
   
-  this->Renderer->SetBackground(r, g, b);
+  vtkRendererCollection *renderers = this->RenderWindow->GetRenderers();
+  if (renderers)
+    {
+    renderers->InitTraversal();
+    vtkRenderer *renderer = renderers->GetNextItem();
+    while (renderer)
+      {
+      renderer->SetBackground(r, g, b);
+      renderer = renderers->GetNextItem();
+      }
+    }
+
   this->Render();
 }
 
 //----------------------------------------------------------------------------
 float* vtkKWRenderWidget::GetBackgroundColor()
 {
-  return this->Renderer->GetBackground();
+  vtkRendererCollection *renderers = this->RenderWindow->GetRenderers();
+  if (renderers)
+    {
+    renderers->InitTraversal();
+    vtkRenderer *renderer = renderers->GetNextItem();
+    if (renderer)
+      {
+      return renderer->GetBackground();
+      }
+    }
+  return NULL;
 }
 
 //----------------------------------------------------------------------------
