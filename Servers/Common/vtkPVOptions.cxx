@@ -41,7 +41,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVOptions);
-vtkCxxRevisionMacro(vtkPVOptions, "1.22");
+vtkCxxRevisionMacro(vtkPVOptions, "1.23");
 
 //----------------------------------------------------------------------------
 vtkPVOptions::vtkPVOptions()
@@ -288,6 +288,11 @@ int vtkPVOptions::WrongArgument(const char* argument)
       this->SetUnknownArgument(0);
       }
     return 1;
+    }
+  if(kwsys::SystemTools::GetFilenameLastExtension(argument) == ".pvb")
+    {
+    this->SetErrorMessage("Batch file argument to ParaView executable is deprecated. Please use \"pvbatch\".");
+    return 0;
     }
 
   return 0;
