@@ -39,6 +39,10 @@ public:
 
   static vtkDesktopDeliveryServer *New();
 
+  // For ParaView
+  void SetRenderManager(vtkParallelRenderManager* rm)
+  {this->SetParallelRenderManager(rm);}
+
   // Description:
   // Set/Get the controller that is attached to a vtkDesktopDeliveryClient.
   // This object will assume that the controller has two processors, and
